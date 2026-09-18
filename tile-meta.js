@@ -1417,6 +1417,20 @@ const _TILES = [
   ["ac-induced-voltage-pipeline", "E"],
   ["polarization-decay-criterion", "E"],
   ["coke-breeze-backfill", "E"],
+  // spec-v1776..v1788 commercial brewing and distilling
+  ["mash-strike-water", "O"],
+  ["sparge-water-volume", "O"],
+  ["brewhouse-efficiency", "O"],
+  ["ibu-tinseth", "O"],
+  ["beer-color-srm", "O"],
+  ["yeast-pitch-rate", "O"],
+  ["kettle-boil-off", "O"],
+  ["carbonation-volumes-pressure", "O"],
+  ["fermenter-glycol-load", "O"],
+  ["proof-gallon-yield", "O"],
+  ["packaging-yield-loss", "O"],
+  ["mash-tun-grain-bed", "O"],
+  ["dry-hop-beer-loss", "O"],
 ];
 
 

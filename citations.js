@@ -24578,6 +24578,140 @@ export const CITATIONS = {
       { name: "Column", value: "the backfill column is treated as the effective anode for resistance", source: "CP practice" },
     ],
   },
+  // spec-v1776..v1788: commercial brewing and distilling.
+  "mash-strike-water": {
+    formula: "T_strike = T_mash + (c_grain / 2.086) x (T_mash - T_grain) / R, with R in quarts per pound; water = G x R / 4 gal; tun drop = m_tun c_tun (T_mash - T_tun) / (water lb + G c_grain + m_tun c_tun).",
+    edition: "Energy balance, with grain specific heat about 0.40 Btu/lb-degF and 2.086 lb of water per quart. The brewery's own measured mash temperatures and the malt supplier's analysis govern.",
+    freeAccess: "Public thermodynamics.",
+    governance: GOVERNANCE.general,
+    editionNote: "The familiar 0.2 is 0.40 / 2.086 rounded. spec-v1776 divided the tun's heat demand by the water's capacity alone, inconsistent with its own strike formula, which counts the grain; the tile uses the whole mash, giving 1.1 degF on the commercial mash where the spec said 1.28, and 3.8 degF on the small batch where it said 4.6. The conclusion holds: a small mash must preheat its vessel.",
+    assumptions: [
+      { name: "Tun", value: "reaches the mash temperature with the whole mash, water and grain together", source: "energy balance" },
+      { name: "Losses", value: "no heat lost to air during dough-in", source: "spec-v1776 scope" },
+    ],
+  },
+  "sparge-water-volume": {
+    formula: "mash water = G x R / 4; absorbed = G x absorption; first runnings = mash water - absorbed; sparge = pre-boil target - first runnings + deadspace.",
+    edition: "Volume bookkeeping, with grain absorption commonly 0.10 to 0.13 gal per lb. The brewery's own measured runoff governs.",
+    freeAccess: "Public arithmetic.",
+    governance: GOVERNANCE.general,
+    editionNote: "On a high-gravity brew the larger mash carries more of the pre-boil volume itself, so the sparge shrinks and extract is left in the bed -- the mechanism behind falling efficiency at high gravity.",
+    assumptions: [
+      { name: "Absorption", value: "varies with the malt, the crush, and how hard the bed is drained", source: "brewery measurement" },
+    ],
+  },
+  "brewhouse-efficiency": {
+    formula: "efficiency = gravity points x volume / (grain lb x extract potential); OG points = grain x potential x efficiency / volume; malt to recover = shortfall point-gallons / (potential x achieved efficiency).",
+    edition: "Extract bookkeeping in point-gallons, with base malt near 37 points per pound per gallon. The malt supplier's certificate of analysis and the brewery's own measured gravities govern.",
+    freeAccess: "Public arithmetic; the extract potential comes from the malt analysis.",
+    governance: GOVERNANCE.general,
+    editionNote: "spec-v1778 called 3,151 point-gallons the extract 'left in the tun, equivalent to 114 lb of malt'. 3,151 is only the shortfall against the 85% assumption (the total left at 75% is 7,862), its full-extract malt equivalent is 85 lb, and 114 lb is the malt it takes to make the shortfall up at 75%. The tile reports all three under their own labels.",
+    assumptions: [
+      { name: "Measurement point", value: "the volume's point (kettle or fermenter) must be stated with the figure", source: "spec-v1778" },
+    ],
+  },
+  "ibu-tinseth": {
+    formula: "IBU = alpha acids (mg/L) x 1.65 x 0.000125^(SG - 1) x (1 - e^(-0.04 t)) / 4.15.",
+    edition: "Tinseth's empirical utilization fit. The brewery's own measured IBU (ASBC Beer-23) on its own system governs.",
+    freeAccess: "Tinseth's relation is published openly.",
+    governance: GOVERNANCE.general,
+    editionNote: "Utilization rises fastest early, so a quarter of the boil gives about half the bitterness; wort gravity suppresses it, so a strong beer needs a bigger hop bill to taste the same.",
+    assumptions: [
+      { name: "Fit", value: "an empirical fit to measured beers; whirlpool and late additions are not modelled", source: "Tinseth" },
+    ],
+  },
+  "beer-color-srm": {
+    formula: "MCU = sum of (lb x degrees Lovibond) / gal; SRM = 1.4922 x MCU^0.6859.",
+    edition: "Morey's color equation. A spectrophotometer reading of the finished beer (ASBC Beer-10) governs.",
+    freeAccess: "Morey's relation is published openly.",
+    governance: GOVERNANCE.general,
+    editionNote: "The power law bends the answer, so MCU read linearly overstates the color. The fits disagree above about 20 SRM, so the result is a band, not a value.",
+    assumptions: [
+      { name: "Attribution", value: "the roast share is given in malt color units, the only additive decomposition a power law allows", source: "project method" },
+    ],
+  },
+  "yeast-pitch-rate": {
+    formula: "cells = rate (million/mL/degP) x volume mL x degP, with degP = 259 - 259/SG; slurry = cells / (concentration x viability).",
+    edition: "Customary pitch rates of 0.75 for ales and 1.5 for lagers. A viability count on the day of pitching governs.",
+    freeAccess: "Public arithmetic.",
+    governance: GOVERNANCE.general,
+    editionNote: "The slurry volume hides viability: pitching by volume from a mark underpitches the moment the yeast ages, with nothing in the bucket looking different.",
+    assumptions: [
+      { name: "Plato", value: "the 259 - 259/SG approximation", source: "brewing practice" },
+    ],
+  },
+  "kettle-boil-off": {
+    formula: "point-gallons = points x volume, constant; evaporated = V x rate x hours; cooled = hot x (1 - shrinkage); gravity = point-gallons / volume.",
+    edition: "Conservation of extract, with cooling shrinkage about 4%. The kettle's own measured boil-off rate governs.",
+    freeAccess: "Public arithmetic.",
+    governance: GOVERNANCE.general,
+    editionNote: "A harder boil gives a stronger, smaller beer, and topping up to volume at knockout cancels the two errors rather than fixing either.",
+    assumptions: [
+      { name: "Boil-off", value: "a fraction of the pre-boil volume per hour, the brewhouse convention", source: "spec-v1782" },
+    ],
+  },
+  "carbonation-volumes-pressure": {
+    formula: "volumes = (psig + 14.695) x k(T) - 0.003342, with k(T) = 0.01821 + 0.09011 e^(-(T - 32) / 43.11), T in degF; solved both ways.",
+    edition: "A fit to the published CO2 solubility tables at sea level. The brewery's own dissolved-CO2 measurement governs.",
+    freeAccess: "The solubility tables are published openly.",
+    governance: GOVERNANCE.general,
+    editionNote: "The temperature term dominates: a cooler a few degrees warm flattens the beer with the gauge unmoved, and chasing it with pressure over-carbonates once the cooler is fixed.",
+    assumptions: [
+      { name: "Altitude", value: "sea-level atmosphere; altitude lowers it", source: "fit basis" },
+      { name: "Range", value: "28 to 80 degF", source: "fit range" },
+    ],
+  },
+  "fermenter-glycol-load": {
+    formula: "extract = (OG - FG points) x gal / 46; Q = extract x 280 Btu/lb; crash = gal x 8.4 x 0.90 x dT / hours; ambient = A x U x dT; gpm = load / (60 x 8.6 x 0.90 x glycol rise).",
+    edition: "Heat of fermentation about 280 Btu per lb of extract. The chiller manufacturer's capacity at the actual glycol temperature governs.",
+    freeAccess: "Public heat-balance arithmetic.",
+    governance: GOVERNANCE.general,
+    editionNote: "The adiabatic rise (20 to 40 degF observed) checks the heat figure. The crash, not fermentation, sizes the chiller.",
+    assumptions: [
+      { name: "Beer", value: "8.4 lb/gal at 0.90 Btu/lb-degF", source: "spec-v1784" },
+      { name: "Glycol", value: "8.6 lb/gal at 0.90 Btu/lb-degF", source: "spec-v1784" },
+    ],
+  },
+  "proof-gallon-yield": {
+    formula: "absolute alcohol = gal x ABV x recovery; proof gallons = wine gallons x proof / 100 = 2 x absolute alcohol; excise = PG x rate.",
+    edition: "27 CFR Part 19 and the TTB gauging manual; proof at 60 degF. The TTB gauging tables and the current excise rate govern.",
+    freeAccess: "27 CFR is published free at ecfr.gov.",
+    governance: GOVERNANCE.general,
+    editionNote: "Proof gallons always equal twice the absolute alcohol, whatever the proof -- the check on any gauging record. A yield and gauging aid, not a tax filing; the rate is a figure the user supplies.",
+    assumptions: [
+      { name: "Temperature", value: "volumes and proof at 60 degF", source: "27 CFR Part 30" },
+    ],
+  },
+  "packaging-yield-loss": {
+    formula: "packaged = V x (1 - transfer) x (1 - fill); whole packages = floor(packaged / size); remainder = packaged - whole x size.",
+    edition: "Yield bookkeeping; a half barrel is 15.5 gal and a sixth barrel 5.16 gal. The brewery's own packaging records govern.",
+    freeAccess: "Public arithmetic.",
+    governance: GOVERNANCE.general,
+    editionNote: "Remainders do not scale or average, which is why yield is tracked in whole packages rather than percentages.",
+    assumptions: [
+      { name: "Losses", value: "each as a percentage of the volume entering that step", source: "spec-v1786" },
+    ],
+  },
+  "mash-tun-grain-bed": {
+    formula: "mash gal per lb = R/4 + displacement; depth = G x gal per lb / 7.48 / (pi D^2 / 4); max grain = area x depth limit x 7.48 / gal per lb.",
+    edition: "Geometry, with grain displacement about 0.08 gal per lb and 12 to 18 in the usual working bed depth. The lauter tun manufacturer's rated depth governs.",
+    freeAccess: "Public geometry.",
+    governance: GOVERNANCE.general,
+    editionNote: "The depth limit caps the strongest single-mash beer, and area goes as the square of diameter, so a modestly wider tun takes a much larger grain bill.",
+    assumptions: [
+      { name: "Vessel", value: "a flat-bottomed cylinder", source: "spec-v1787" },
+    ],
+  },
+  "dry-hop-beer-loss": {
+    formula: "hops = rate x barrels (31 gal); absorbed = hops x gal per lb; packages lost = absorbed / package size.",
+    edition: "Pellets retain roughly 0.5 to 1.5 gal per lb. The brewery's own measured absorption governs.",
+    freeAccess: "Public arithmetic.",
+    governance: GOVERNANCE.general,
+    editionNote: "Absorption is linear, so doubling the rate doubles the loss exactly. Hop creep is controlled by time and temperature with gravity confirmed stable before packaging.",
+    assumptions: [
+      { name: "Recovery", value: "no beer recovered from the hop bed", source: "spec-v1788 scope" },
+    ],
+  },
   // spec-v1750..v1762: greenhouse and controlled-environment agriculture.
   "greenhouse-vent-area": {
     formula: "Q = Cd x A_eff x sqrt(2 g dH dT / T_absolute), with A_eff = 1/sqrt(1/A_roof^2 + 1/A_side^2) for two openings in series.",

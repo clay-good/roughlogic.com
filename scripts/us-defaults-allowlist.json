@@ -481,6 +481,12 @@
    "match": "A/m^2",
    "family": "cathodic protection and corrosion control",
    "justification": "ISO 18086 and NACE SP21424 state the AC corrosion current-density thresholds in A/m^2, and US pipeline AC mitigation studies report them in those units; there is no US-customary form of the threshold."
+  },
+  {
+   "module": "calc-brewing.js",
+   "match": "/mL",
+   "family": "commercial brewing and distilling",
+   "justification": "Brewery yeast management counts cells per milliliter -- a hemocytometer or cell counter reads cells/mL, and the customary pitch rates (0.75 ale, 1.5 lager) are defined in million cells per mL per degree Plato; US craft brewers and every yeast supplier use these units, and there is no US-customary form of either."
   }
  ]
 }

@@ -2317,6 +2317,20 @@ const RELATED = {
   "ac-induced-voltage-pipeline": ["stray-current-bond","instant-off-ir-drop","pipeline-potential-attenuation"],
   "polarization-decay-criterion": ["instant-off-ir-drop","close-interval-survey-readings","cp-rectifier-sizing"],
   "coke-breeze-backfill": ["anode-bed-resistance","cp-rectifier-sizing","soil-resistivity-wenner"],
+  // spec-v1776..v1788 commercial brewing and distilling band.
+  "mash-strike-water": ["sparge-water-volume","mash-tun-grain-bed","brewhouse-efficiency"],
+  "sparge-water-volume": ["mash-strike-water","kettle-boil-off","brewhouse-efficiency"],
+  "brewhouse-efficiency": ["sparge-water-volume","kettle-boil-off","mash-tun-grain-bed"],
+  "ibu-tinseth": ["kettle-boil-off","dry-hop-beer-loss","beer-color-srm"],
+  "beer-color-srm": ["ibu-tinseth","brewhouse-efficiency","kettle-boil-off"],
+  "yeast-pitch-rate": ["fermenter-glycol-load","abv-from-gravity","brewhouse-efficiency"],
+  "kettle-boil-off": ["brewhouse-efficiency","sparge-water-volume","ibu-tinseth"],
+  "carbonation-volumes-pressure": ["beverage-co2-duration","draft-beer-line-balance","packaging-yield-loss"],
+  "fermenter-glycol-load": ["yeast-pitch-rate","carbonation-volumes-pressure","abv-from-gravity"],
+  "proof-gallon-yield": ["abv-from-gravity","packaging-yield-loss","drink-abv-dilution"],
+  "packaging-yield-loss": ["keg-yield","dry-hop-beer-loss","carbonation-volumes-pressure"],
+  "mash-tun-grain-bed": ["mash-strike-water","brewhouse-efficiency","sparge-water-volume"],
+  "dry-hop-beer-loss": ["packaging-yield-loss","ibu-tinseth","keg-yield"],
 };
 
 export { RELATED };

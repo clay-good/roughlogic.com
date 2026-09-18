@@ -162,6 +162,9 @@ export const PROFESSION_NOUN = {
   // leads on all thirteen tiles. Short on purpose: a long noun is the first
   // thing buildTitle drops at the 70-char cap.
   corrosion: "Corrosion",
+  // Added 2026-09-18 with the commercial brewing and distilling band, where
+  // it leads on all thirteen tiles.
+  brewing: "Brewing",
 };
 
 // Escape a string for embedding inside HTML text content or an attribute.

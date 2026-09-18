@@ -1439,6 +1439,18 @@ export const TOOL_MODULES = (() => {
     "ac-induced-voltage-pipeline", "polarization-decay-criterion",
     "coke-breeze-backfill",
   ]);
+  // spec-v1776..v1788: commercial brewing and distilling. Thirteen Group O
+  // tiles following a brew day from the mash through the kettle, the cellar,
+  // and packaging, with the still's proof-gallon gauging.
+  declare("./calc-brewing.js", "BREWING_RENDERERS", [
+    "mash-strike-water", "sparge-water-volume",
+    "brewhouse-efficiency", "ibu-tinseth",
+    "beer-color-srm", "yeast-pitch-rate",
+    "kettle-boil-off", "carbonation-volumes-pressure",
+    "fermenter-glycol-load", "proof-gallon-yield",
+    "packaging-yield-loss", "mash-tun-grain-bed",
+    "dry-hop-beer-loss",
+  ]);
   // spec-v1845..v1850: the snow and ice management bench -- what a pavement
   // temperature costs in salt, what a brine batch has to be, how long a plow
   // route takes, where the snow goes, when a deicer stops working, and whether

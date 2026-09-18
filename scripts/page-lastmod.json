@@ -2,95 +2,95 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "0ef47563d94f7f86",
+      "sha": "081b501937c42b0b",
       "date": "2026-09-18"
     },
     "/tools/": {
-      "sha": "2366aeef18808f45",
+      "sha": "d447d6f5e4c3dc58",
       "date": "2026-09-18"
     },
     "/groups/accounting/": {
-      "sha": "64d86708ff0d1be8",
+      "sha": "0b266883b6739903",
       "date": "2026-09-18"
     },
     "/groups/agriculture/": {
-      "sha": "d9d1b09ab29acc8b",
+      "sha": "39d52d330a6f9c5d",
       "date": "2026-09-18"
     },
     "/groups/construction/": {
-      "sha": "a68ee01959775346",
+      "sha": "1a622bd204609bc6",
       "date": "2026-09-18"
     },
     "/groups/cross-trade/": {
-      "sha": "cd685d7ca11212b8",
+      "sha": "27bdaea9afb010ca",
       "date": "2026-09-18"
     },
     "/groups/educators/": {
-      "sha": "edfd134d064caae7",
+      "sha": "e75f27a857044b00",
       "date": "2026-09-18"
     },
     "/groups/electrical/": {
-      "sha": "75219609aab2fde1",
+      "sha": "852aea2d99e102d4",
       "date": "2026-09-18"
     },
     "/groups/field/": {
-      "sha": "b4b7c9bcae2fd88e",
+      "sha": "a12d41e8f437d804",
       "date": "2026-09-18"
     },
     "/groups/fire-ground/": {
-      "sha": "5ef6cd29fe0c5094",
+      "sha": "093bcf9c490f179b",
       "date": "2026-09-18"
     },
     "/groups/historical/": {
-      "sha": "018ab39a5520e50c",
+      "sha": "f684977ded26381d",
       "date": "2026-09-18"
     },
     "/groups/hvac/": {
-      "sha": "0b2495dfc2f79b83",
+      "sha": "6e27ff44ee02bdd9",
       "date": "2026-09-18"
     },
     "/groups/kitchen/": {
-      "sha": "89f6fb783cf2793d",
+      "sha": "7230950d03793989",
       "date": "2026-09-18"
     },
     "/groups/lab/": {
-      "sha": "1305441f5b66e7a6",
+      "sha": "371818b547bf4247",
       "date": "2026-09-18"
     },
     "/groups/mechanic/": {
-      "sha": "63c2ee6321a1e15b",
+      "sha": "4f9d8c73fdfa3882",
       "date": "2026-09-18"
     },
     "/groups/plumbing/": {
-      "sha": "f3150ca121790f80",
+      "sha": "4d2c1a3f87230573",
       "date": "2026-09-18"
     },
     "/groups/real-estate/": {
-      "sha": "dc728e1206bbb629",
+      "sha": "001ba823b2b55944",
       "date": "2026-09-18"
     },
     "/groups/references/": {
-      "sha": "0171778eec9357b9",
+      "sha": "0962e5c151e23752",
       "date": "2026-09-18"
     },
     "/groups/restoration/": {
-      "sha": "ed851fd0821eafef",
+      "sha": "3a5366cedbd27bc0",
       "date": "2026-09-18"
     },
     "/groups/rigging-and-heavy-lift/": {
-      "sha": "da5b270461977123",
+      "sha": "c2c39e40c5a86dc1",
       "date": "2026-09-18"
     },
     "/groups/stage/": {
-      "sha": "8f1ad8b2d726150a",
+      "sha": "c803abe582c7d2a6",
       "date": "2026-09-18"
     },
     "/groups/trucking/": {
-      "sha": "dbad68e76791d7a1",
+      "sha": "0d21c4996f157591",
       "date": "2026-09-18"
     },
     "/groups/water/": {
-      "sha": "06ecccaf414b2349",
+      "sha": "42e84f2d0ea27087",
       "date": "2026-09-18"
     },
     "/tools/aav-install-check/": {
@@ -573,6 +573,10 @@
       "sha": "daee8313e12b3e27",
       "date": "2026-09-08"
     },
+    "/tools/beer-color-srm/": {
+      "sha": "02a9d8322df65718",
+      "date": "2026-09-18"
+    },
     "/tools/beer-lambert/": {
       "sha": "0b3453b81c3c1a81",
       "date": "2026-09-01"
@@ -805,6 +809,10 @@
       "sha": "6afc50a504f22b66",
       "date": "2026-09-01"
     },
+    "/tools/brewhouse-efficiency/": {
+      "sha": "5cd33e94103bfa04",
+      "date": "2026-09-18"
+    },
     "/tools/brick-veneer-anchor-spacing/": {
       "sha": "f6b8d71148a0081e",
       "date": "2026-09-01"
@@ -936,6 +944,10 @@
     "/tools/carbon-equivalent/": {
       "sha": "5dbec6abf5ae6d6e",
       "date": "2026-09-01"
+    },
+    "/tools/carbonation-volumes-pressure/": {
+      "sha": "06f979e0967880fc",
+      "date": "2026-09-18"
     },
     "/tools/carburetor-altitude-jetting/": {
       "sha": "f976eff803487ac0",
@@ -1750,8 +1762,8 @@
       "date": "2026-09-01"
     },
     "/tools/cooling-curve/": {
-      "sha": "edd65388c1f852cd",
-      "date": "2026-09-04"
+      "sha": "a8b8ad1c075865f7",
+      "date": "2026-09-18"
     },
     "/tools/cooling-system-flow/": {
       "sha": "547d5bbb325ba5d3",
@@ -2290,8 +2302,8 @@
       "date": "2026-09-01"
     },
     "/tools/drink-abv-dilution/": {
-      "sha": "8a57ea98eaee8fa3",
-      "date": "2026-09-01"
+      "sha": "3826455c753941b0",
+      "date": "2026-09-18"
     },
     "/tools/drinking-fountain-check/": {
       "sha": "1011c277716d2f97",
@@ -2324,6 +2336,10 @@
     "/tools/drone-gsd-overlap/": {
       "sha": "81e8a584e9320296",
       "date": "2026-09-08"
+    },
+    "/tools/dry-hop-beer-loss/": {
+      "sha": "3fdd11a4c5decd1d",
+      "date": "2026-09-18"
     },
     "/tools/dry-time-projection/": {
       "sha": "30a8ccbe5e3a0297",
@@ -2820,6 +2836,10 @@
     "/tools/fermentation-time-q10/": {
       "sha": "63a3cd05fe6f33bf",
       "date": "2026-09-01"
+    },
+    "/tools/fermenter-glycol-load/": {
+      "sha": "12e5b6a2275dbf74",
+      "date": "2026-09-18"
     },
     "/tools/fertigation-injection-rate/": {
       "sha": "89ba252f30c302af",
@@ -3666,8 +3686,8 @@
       "date": "2026-09-04"
     },
     "/tools/hot-holding-energy/": {
-      "sha": "59ee1e213a486cce",
-      "date": "2026-09-08"
+      "sha": "84f5a967120b1cde",
+      "date": "2026-09-18"
     },
     "/tools/house-battery-alternator/": {
       "sha": "b3ea0838bbb6bb45",
@@ -3792,6 +3812,10 @@
     "/tools/hydroxyl-sizing/": {
       "sha": "aa891bb5fbcf3f81",
       "date": "2026-09-04"
+    },
+    "/tools/ibu-tinseth/": {
+      "sha": "a3919ae0295dafdc",
+      "date": "2026-09-18"
     },
     "/tools/ice-barrier-coverage/": {
       "sha": "91021e728eeed656",
@@ -3966,8 +3990,12 @@
       "date": "2026-09-09"
     },
     "/tools/keg-yield/": {
-      "sha": "f402c70bf8993a34",
-      "date": "2026-09-08"
+      "sha": "7cf309ff45c5f74d",
+      "date": "2026-09-18"
+    },
+    "/tools/kettle-boil-off/": {
+      "sha": "5cb3a202f0a28391",
+      "date": "2026-09-18"
     },
     "/tools/key-cut-macs-check/": {
       "sha": "2f745d0380b6762f",
@@ -4396,6 +4424,14 @@
     "/tools/markup-vs-margin/": {
       "sha": "f012cc3bfe706270",
       "date": "2026-09-01"
+    },
+    "/tools/mash-strike-water/": {
+      "sha": "3ac59f76bde51c1e",
+      "date": "2026-09-18"
+    },
+    "/tools/mash-tun-grain-bed/": {
+      "sha": "951fed0cf918dcac",
+      "date": "2026-09-18"
     },
     "/tools/masonry-anchor-bolt/": {
       "sha": "177344bb3fcf60b1",
@@ -5009,6 +5045,10 @@
       "sha": "9575928598677395",
       "date": "2026-09-01"
     },
+    "/tools/packaging-yield-loss/": {
+      "sha": "8294812f34d6b7a8",
+      "date": "2026-09-18"
+    },
     "/tools/paint-coverage/": {
       "sha": "cb994b8b63ced043",
       "date": "2026-09-01"
@@ -5568,6 +5608,10 @@
     "/tools/projector-max-screen-size/": {
       "sha": "ab89a07cb93fcbd5",
       "date": "2026-09-01"
+    },
+    "/tools/proof-gallon-yield/": {
+      "sha": "f716879482c38467",
+      "date": "2026-09-18"
     },
     "/tools/prop-pitch-selection/": {
       "sha": "ef95253ab62ff8f5",
@@ -7020,6 +7064,10 @@
     "/tools/spanline-sag-tension/": {
       "sha": "840ae3d5d28fb34b",
       "date": "2026-09-01"
+    },
+    "/tools/sparge-water-volume/": {
+      "sha": "ffa5da2eb4bc472d",
+      "date": "2026-09-18"
     },
     "/tools/spcc-containment-volume/": {
       "sha": "76216c7f7eb79114",
@@ -8764,6 +8812,10 @@
     "/tools/yaw-error-loss/": {
       "sha": "d278320185dfe702",
       "date": "2026-09-06"
+    },
+    "/tools/yeast-pitch-rate/": {
+      "sha": "15304fc136b53a24",
+      "date": "2026-09-18"
     },
     "/tools/yield-ep/": {
       "sha": "e60214c409d045fb",

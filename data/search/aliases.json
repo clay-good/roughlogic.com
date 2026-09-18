@@ -1,6 +1,6 @@
 {
  "_comment": "v10 Phase D.1 search aliases (spec-v10 \u00a76.1). One row per alias mapping a free-text term to a tile id. AUTHORING MASTER ONLY since the spec-v590 split remediation (2026-07-17): the runtime never fetches this file. scripts/build-alias-shards.mjs derives the per-group runtime shards data/search/aliases-<letter>.json from it (lazy parallel fetch on first search interaction via bindSearch / ensureAliases in app.js; --check in npm run lint gates drift), so edit THIS file and rerun the script. On exact-term match the user is routed to the target tile via the same path as a tool-name suggestion. Industry vocabulary, misspellings, abbreviations, question phrasings (spec-v590), and adjacent-question redirects only. The resolveQuery / matchAliasPrefix helpers in search-discovery.js are the canonical pure-functional resolvers (exercised by test/unit/search-discovery.test.js).",
- "_updated": "2026-09-21",
+ "_updated": "2026-09-22",
  "_schema": "Each alias row: { term: string, target: tile-id, kind: 'question' | 'industry' | 'adjacent' | 'redirect' }. Multiple aliases may map to the same target.",
  "aliases": [
   {
@@ -316,6 +316,331 @@
   {
    "term": "anode column volume",
    "target": "coke-breeze-backfill",
+   "kind": "industry"
+  },
+  {
+   "term": "mash strike water temperature",
+   "target": "mash-strike-water",
+   "kind": "industry"
+  },
+  {
+   "term": "dough in temperature brewing",
+   "target": "mash-strike-water",
+   "kind": "industry"
+  },
+  {
+   "term": "mash thickness quarts per pound",
+   "target": "mash-strike-water",
+   "kind": "industry"
+  },
+  {
+   "term": "infusion mash calculation",
+   "target": "mash-strike-water",
+   "kind": "industry"
+  },
+  {
+   "term": "strike temp grain bill",
+   "target": "mash-strike-water",
+   "kind": "industry"
+  },
+  {
+   "term": "sparge water volume",
+   "target": "sparge-water-volume",
+   "kind": "industry"
+  },
+  {
+   "term": "pre boil volume brewing",
+   "target": "sparge-water-volume",
+   "kind": "industry"
+  },
+  {
+   "term": "grain absorption gallons per pound",
+   "target": "sparge-water-volume",
+   "kind": "industry"
+  },
+  {
+   "term": "lauter runoff calculation",
+   "target": "sparge-water-volume",
+   "kind": "industry"
+  },
+  {
+   "term": "brewing water total",
+   "target": "sparge-water-volume",
+   "kind": "industry"
+  },
+  {
+   "term": "brewhouse efficiency",
+   "target": "brewhouse-efficiency",
+   "kind": "industry"
+  },
+  {
+   "term": "mash efficiency grain bill",
+   "target": "brewhouse-efficiency",
+   "kind": "industry"
+  },
+  {
+   "term": "points per pound per gallon",
+   "target": "brewhouse-efficiency",
+   "kind": "industry"
+  },
+  {
+   "term": "malt extract potential",
+   "target": "brewhouse-efficiency",
+   "kind": "industry"
+  },
+  {
+   "term": "grain bill scaling gravity",
+   "target": "brewhouse-efficiency",
+   "kind": "industry"
+  },
+  {
+   "term": "ibu tinseth calculation",
+   "target": "ibu-tinseth",
+   "kind": "industry"
+  },
+  {
+   "term": "hop bitterness utilization",
+   "target": "ibu-tinseth",
+   "kind": "industry"
+  },
+  {
+   "term": "alpha acid isomerization",
+   "target": "ibu-tinseth",
+   "kind": "industry"
+  },
+  {
+   "term": "hop schedule ibu",
+   "target": "ibu-tinseth",
+   "kind": "industry"
+  },
+  {
+   "term": "boil gravity hop utilization",
+   "target": "ibu-tinseth",
+   "kind": "industry"
+  },
+  {
+   "term": "beer color srm",
+   "target": "beer-color-srm",
+   "kind": "industry"
+  },
+  {
+   "term": "morey color equation",
+   "target": "beer-color-srm",
+   "kind": "industry"
+  },
+  {
+   "term": "malt color units",
+   "target": "beer-color-srm",
+   "kind": "industry"
+  },
+  {
+   "term": "lovibond grain color",
+   "target": "beer-color-srm",
+   "kind": "industry"
+  },
+  {
+   "term": "srm from grain bill",
+   "target": "beer-color-srm",
+   "kind": "industry"
+  },
+  {
+   "term": "yeast pitch rate",
+   "target": "yeast-pitch-rate",
+   "kind": "industry"
+  },
+  {
+   "term": "cell count brewing pitch",
+   "target": "yeast-pitch-rate",
+   "kind": "industry"
+  },
+  {
+   "term": "slurry viability repitch",
+   "target": "yeast-pitch-rate",
+   "kind": "industry"
+  },
+  {
+   "term": "lager pitch rate plato",
+   "target": "yeast-pitch-rate",
+   "kind": "industry"
+  },
+  {
+   "term": "yeast cells per ml per plato",
+   "target": "yeast-pitch-rate",
+   "kind": "industry"
+  },
+  {
+   "term": "kettle boil off rate",
+   "target": "kettle-boil-off",
+   "kind": "industry"
+  },
+  {
+   "term": "post boil gravity",
+   "target": "kettle-boil-off",
+   "kind": "industry"
+  },
+  {
+   "term": "evaporation rate brewing",
+   "target": "kettle-boil-off",
+   "kind": "industry"
+  },
+  {
+   "term": "wort shrinkage cooling",
+   "target": "kettle-boil-off",
+   "kind": "industry"
+  },
+  {
+   "term": "pre boil to og",
+   "target": "kettle-boil-off",
+   "kind": "industry"
+  },
+  {
+   "term": "carbonation volumes co2",
+   "target": "carbonation-volumes-pressure",
+   "kind": "industry"
+  },
+  {
+   "term": "head pressure carbonation table",
+   "target": "carbonation-volumes-pressure",
+   "kind": "industry"
+  },
+  {
+   "term": "force carbonation psi",
+   "target": "carbonation-volumes-pressure",
+   "kind": "industry"
+  },
+  {
+   "term": "draft beer co2 pressure temperature",
+   "target": "carbonation-volumes-pressure",
+   "kind": "industry"
+  },
+  {
+   "term": "volumes of co2 beer",
+   "target": "carbonation-volumes-pressure",
+   "kind": "industry"
+  },
+  {
+   "term": "fermenter glycol load",
+   "target": "fermenter-glycol-load",
+   "kind": "industry"
+  },
+  {
+   "term": "heat of fermentation cooling",
+   "target": "fermenter-glycol-load",
+   "kind": "industry"
+  },
+  {
+   "term": "crash cooling brewery glycol",
+   "target": "fermenter-glycol-load",
+   "kind": "industry"
+  },
+  {
+   "term": "brewery chiller sizing",
+   "target": "fermenter-glycol-load",
+   "kind": "industry"
+  },
+  {
+   "term": "glycol flow fermenter jacket",
+   "target": "fermenter-glycol-load",
+   "kind": "industry"
+  },
+  {
+   "term": "proof gallon calculation",
+   "target": "proof-gallon-yield",
+   "kind": "industry"
+  },
+  {
+   "term": "distillery excise tax proof gallons",
+   "target": "proof-gallon-yield",
+   "kind": "industry"
+  },
+  {
+   "term": "absolute alcohol yield still",
+   "target": "proof-gallon-yield",
+   "kind": "industry"
+  },
+  {
+   "term": "heads hearts tails cut",
+   "target": "proof-gallon-yield",
+   "kind": "industry"
+  },
+  {
+   "term": "wine gallon to proof gallon",
+   "target": "proof-gallon-yield",
+   "kind": "industry"
+  },
+  {
+   "term": "brewery packaging yield",
+   "target": "packaging-yield-loss",
+   "kind": "industry"
+  },
+  {
+   "term": "keg fill loss",
+   "target": "packaging-yield-loss",
+   "kind": "industry"
+  },
+  {
+   "term": "beer loss percentage packaging",
+   "target": "packaging-yield-loss",
+   "kind": "industry"
+  },
+  {
+   "term": "barrels sold per batch",
+   "target": "packaging-yield-loss",
+   "kind": "industry"
+  },
+  {
+   "term": "brite tank to keg yield",
+   "target": "packaging-yield-loss",
+   "kind": "industry"
+  },
+  {
+   "term": "mash tun capacity",
+   "target": "mash-tun-grain-bed",
+   "kind": "industry"
+  },
+  {
+   "term": "grain bed depth lauter",
+   "target": "mash-tun-grain-bed",
+   "kind": "industry"
+  },
+  {
+   "term": "lauter tun sizing brewing",
+   "target": "mash-tun-grain-bed",
+   "kind": "industry"
+  },
+  {
+   "term": "maximum grain bill tun",
+   "target": "mash-tun-grain-bed",
+   "kind": "industry"
+  },
+  {
+   "term": "mash volume per pound",
+   "target": "mash-tun-grain-bed",
+   "kind": "industry"
+  },
+  {
+   "term": "dry hop beer loss",
+   "target": "dry-hop-beer-loss",
+   "kind": "industry"
+  },
+  {
+   "term": "hop absorption gallons per pound",
+   "target": "dry-hop-beer-loss",
+   "kind": "industry"
+  },
+  {
+   "term": "dry hopping rate pounds per barrel",
+   "target": "dry-hop-beer-loss",
+   "kind": "industry"
+  },
+  {
+   "term": "hop creep refermentation",
+   "target": "dry-hop-beer-loss",
+   "kind": "industry"
+  },
+  {
+   "term": "ipa yield loss hops",
+   "target": "dry-hop-beer-loss",
    "kind": "industry"
   },
   {

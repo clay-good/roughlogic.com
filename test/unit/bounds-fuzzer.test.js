@@ -55045,3 +55045,225 @@ test("bounds: spec-v1775 computeCokeBreezeBackfill -- drill deeper, do not auger
     assert.ok(_v1775({ ...base, ...bad }).error);
   }
 });
+
+// ---------------------------------------------------------------------------
+// spec-v1776..v1788: commercial brewing and distilling.
+// ---------------------------------------------------------------------------
+
+import {
+  computeMashStrikeWater as _v1776,
+  computeSpargeWaterVolume as _v1777,
+  computeBrewhouseEfficiency as _v1778,
+  computeIbuTinseth as _v1779,
+  computeBeerColorSrm as _v1780,
+  computeYeastPitchRate as _v1781,
+  computeKettleBoilOff as _v1782,
+  computeCarbonationVolumesPressure as _v1783,
+  computeFermenterGlycolLoad as _v1784,
+  computeProofGallonYield as _v1785,
+  computePackagingYieldLoss as _v1786,
+  computeMashTunGrainBed as _v1787,
+  computeDryHopBeerLoss as _v1788,
+} from "../../calc-brewing.js";
+
+test("bounds: spec-v1776 computeMashStrikeWater -- the tun draws on the whole mash, not the water alone", () => {
+  const base = { grain_weight_lb: 542, mash_thickness_qt_per_lb: 1.25, grain_temp_f: 68, target_mash_temp_f: 152, grain_specific_heat: 0.4, tun_weight_lb: 180, tun_specific_heat: 0.12, tun_temp_f: 68 };
+  const r = _v1776(base); assertFiniteNumericOutputs(r, "v1776");
+  assert.ok(Math.abs(r.strike_temp_f - 164.88) < 0.01);
+  assert.ok(Math.abs(r.convention_strike_temp_f - 165.44) < 0.01);
+  // Energy balance closes: grain heat gained = water heat lost.
+  assert.ok(Math.abs(0.4 * 542 * (152 - 68) - r.water_lb * (r.strike_temp_f - 152)) < 1e-6);
+  // The corrected tun drop is below the spec's water-only 1.28 degF.
+  assert.ok(Math.abs(r.tun_drop_f - 1.0984) < 1e-3);
+  assert.ok(r.tun_drop_f < 180 * 0.12 * 84 / r.water_lb);
+  // A small batch in a small pot loses far more -- the spec's conclusion holds.
+  const small = _v1776({ ...base, grain_weight_lb: 10, tun_weight_lb: 12 });
+  assert.ok(Math.abs(small.tun_drop_f - 3.8378) < 1e-3);
+  assert.ok(small.tun_drop_f > 3 * r.tun_drop_f);
+  // No tun, no drop.
+  assert.equal(_v1776({ ...base, tun_weight_lb: 0 }).tun_drop_f, 0);
+  for (const bad of [{ grain_weight_lb: 0 }, { mash_thickness_qt_per_lb: 0 }, { target_mash_temp_f: 68 }, { grain_specific_heat: 0 }, { grain_specific_heat: 1.2 }, { tun_weight_lb: -1 }, { tun_temp_f: 200 }, { grain_temp_f: NaN }]) {
+    assert.ok(_v1776({ ...base, ...bad }).error);
+  }
+});
+
+test("bounds: spec-v1777 computeSpargeWaterVolume -- the sparge shrinks as the grain bill grows", () => {
+  const base = { grain_weight_lb: 542, mash_thickness_qt_per_lb: 1.25, absorption_gal_per_lb: 0.125, preboil_volume_gal: 350, deadspace_gal: 5, alternative_grain_weight_lb: 850 };
+  const r = _v1777(base); assertFiniteNumericOutputs(r, "v1777");
+  assert.ok(Math.abs(r.sparge_gal - 253.375) < 1e-9);
+  assert.ok(Math.abs(r.total_water_gal - 422.75) < 1e-9);
+  // Water balance: what goes in = pre-boil + deadspace + what the grain keeps.
+  assert.ok(Math.abs(r.total_water_gal - (350 + 5 + r.absorbed_gal)) < 1e-9);
+  assert.ok(r.alternative_sparge_gal < r.sparge_gal);
+  assert.ok(r.sparge_change_pct < 0);
+  for (const bad of [{ grain_weight_lb: 0 }, { absorption_gal_per_lb: 0.4 }, { preboil_volume_gal: 50 }, { deadspace_gal: -1 }, { mash_thickness_qt_per_lb: 0 }]) {
+    assert.ok(_v1777({ ...base, ...bad }).error);
+  }
+});
+
+test("bounds: spec-v1778 computeBrewhouseEfficiency -- the shortfall, the total left, and the malt to recover are three numbers", () => {
+  const base = { grain_weight_lb: 542, extract_potential_ppg: 37, volume_gal: 310, original_gravity: 1.055, transfer_loss_gal: 15, strong_grain_weight_lb: 850, assumed_efficiency_pct: 85.02, achieved_efficiency_pct: 75 };
+  const r = _v1778(base); assertFiniteNumericOutputs(r, "v1778");
+  assert.ok(Math.abs(r.kettle_efficiency_pct - 85.0204) < 1e-3);
+  assert.ok(Math.abs(r.fermenter_efficiency_pct - 80.907) < 1e-3);
+  assert.ok(r.fermenter_efficiency_pct < r.kettle_efficiency_pct);
+  // The spec's 3,151 is the shortfall; the total left in the tun is 7,862.5.
+  assert.ok(Math.abs(r.shortfall_point_gallons - 3151.3) < 0.1);
+  assert.ok(Math.abs(r.total_left_point_gallons - 7862.5) < 1e-9);
+  // 85 lb is the shortfall's full-extract malt; 114 lb is what recovers it at 75%.
+  assert.ok(Math.abs(r.shortfall_malt_equivalent_lb - 85.17) < 0.01);
+  assert.ok(Math.abs(r.malt_to_recover_lb - 113.56) < 0.01);
+  assert.ok(Math.abs(r.malt_to_recover_lb * 0.75 - r.shortfall_malt_equivalent_lb) < 1e-9);
+  const same = _v1778({ ...base, assumed_efficiency_pct: 75 });
+  assert.equal(same.shortfall_point_gallons, 0);
+  for (const bad of [{ grain_weight_lb: 0 }, { original_gravity: 1 }, { transfer_loss_gal: 310 }, { achieved_efficiency_pct: 0 }, { assumed_efficiency_pct: 101 }, { extract_potential_ppg: 0 }]) {
+    assert.ok(_v1778({ ...base, ...bad }).error);
+  }
+});
+
+test("bounds: spec-v1779 computeIbuTinseth -- a quarter of the boil gives half the bitterness", () => {
+  const base = { batch_volume_gal: 310, hop_weight_lb: 5, alpha_acid_pct: 12, boil_minutes: 60, boil_gravity: 1.05, short_boil_minutes: 15, strong_boil_gravity: 1.08 };
+  const r = _v1779(base); assertFiniteNumericOutputs(r, "v1779");
+  assert.ok(Math.abs(r.ibu - 53.496) < 0.01);
+  assert.ok(Math.abs(r.short_boil_ibu - 26.545) < 0.01);
+  assert.ok(Math.abs(r.strong_gravity_ibu - 40.854) < 0.01);
+  assert.ok(Math.abs(r.hops_to_match_lb - 6.547) < 0.01);
+  // IBU is linear in hop weight and alpha acid.
+  assert.ok(Math.abs(_v1779({ ...base, hop_weight_lb: 10 }).ibu / r.ibu - 2) < 1e-12);
+  // More boil never lowers bitterness; stronger wort never raises it.
+  assert.ok(_v1779({ ...base, boil_minutes: 90 }).ibu > r.ibu);
+  assert.ok(r.strong_gravity_ibu < r.ibu);
+  for (const bad of [{ batch_volume_gal: 0 }, { hop_weight_lb: 0 }, { alpha_acid_pct: 40 }, { boil_minutes: 0 }, { boil_gravity: 0.99 }]) {
+    assert.ok(_v1779({ ...base, ...bad }).error);
+  }
+});
+
+test("bounds: spec-v1780 computeBeerColorSrm -- the power law bends the answer", () => {
+  const base = { base_malt_lb: 500, base_lovibond: 2, crystal_malt_lb: 30, crystal_lovibond: 60, roast_malt_lb: 12, roast_lovibond: 500, batch_volume_gal: 310 };
+  const r = _v1780(base); assertFiniteNumericOutputs(r, "v1780");
+  assert.ok(Math.abs(r.mcu - 8800 / 310) < 1e-12);
+  assert.ok(Math.abs(r.srm - 14.809) < 0.01);
+  assert.ok(Math.abs(r.srm_without_roast - 6.7516) < 0.01);
+  assert.ok(r.srm < r.mcu);
+  assert.ok(r.roast_mcu_share_pct > 30 * r.roast_weight_share_pct);
+  assert.equal(r.roast_error_dominates, true);
+  for (const bad of [{ batch_volume_gal: 0 }, { base_malt_lb: -1 }, { roast_lovibond: -5 }, { base_malt_lb: 0, crystal_malt_lb: 0, roast_malt_lb: 0 }]) {
+    assert.ok(_v1780({ ...base, ...bad }).error);
+  }
+});
+
+test("bounds: spec-v1781 computeYeastPitchRate -- the slurry volume hides viability", () => {
+  const base = { batch_volume_gal: 310, original_gravity: 1.055, pitch_rate_million_per_ml_plato: 0.75, slurry_cells_per_ml: 1.2e9, viability_pct: 90, aged_viability_pct: 60, strong_original_gravity: 1.08 };
+  const r = _v1781(base); assertFiniteNumericOutputs(r, "v1781");
+  assert.ok(Math.abs(r.plato - 13.502) < 1e-3);
+  assert.ok(Math.abs(r.cells_required / 1e13 - 1.1884) < 1e-3);
+  assert.ok(Math.abs(r.slurry_ml - 11003) < 1);
+  // 90% to 60% viability is exactly 50% more slurry, and the old mark is a third short.
+  assert.ok(Math.abs(r.aged_slurry_increase_pct - 50) < 1e-9);
+  assert.ok(Math.abs(r.underpitch_by_volume_pct - 100 / 3) < 1e-9);
+  assert.ok(Math.abs(_v1781({ ...base, pitch_rate_million_per_ml_plato: 1.5 }).cells_required / r.cells_required - 2) < 1e-12);
+  for (const bad of [{ batch_volume_gal: 0 }, { original_gravity: 1 }, { viability_pct: 0 }, { aged_viability_pct: 120 }, { slurry_cells_per_ml: 0 }, { pitch_rate_million_per_ml_plato: 0 }]) {
+    assert.ok(_v1781({ ...base, ...bad }).error);
+  }
+});
+
+test("bounds: spec-v1782 computeKettleBoilOff -- extract is conserved through the boil", () => {
+  const base = { preboil_volume_gal: 350, preboil_gravity: 1.049, boiloff_pct_per_hour: 8, boil_hours: 1, shrinkage_pct: 4, hard_boiloff_pct_per_hour: 12 };
+  const r = _v1782(base); assertFiniteNumericOutputs(r, "v1782");
+  assert.ok(Math.abs(r.extract_point_gallons - 17150) < 1e-6);
+  assert.ok(Math.abs(r.cooled_og_points * r.cooled_volume_gal - r.extract_point_gallons) < 1e-6);
+  assert.ok(Math.abs(r.hard_og_points * r.hard_cooled_volume_gal - r.extract_point_gallons) < 1e-6);
+  assert.ok(Math.abs(r.cooled_volume_gal - 309.12) < 1e-9);
+  assert.ok(Math.abs(r.hard_volume_short_gal - 13.44) < 1e-9);
+  assert.ok(r.hard_og_points > r.cooled_og_points);
+  for (const bad of [{ preboil_volume_gal: 0 }, { preboil_gravity: 1 }, { boil_hours: 0 }, { shrinkage_pct: 100 }, { boiloff_pct_per_hour: 100 }, { hard_boiloff_pct_per_hour: -1 }]) {
+    assert.ok(_v1782({ ...base, ...bad }).error);
+  }
+});
+
+test("bounds: spec-v1783 computeCarbonationVolumesPressure -- chase the temperature, not the gauge", () => {
+  const base = { beer_temp_f: 38, gauge_psig: 12, target_volumes: 2.6, warm_temp_f: 45 };
+  const r = _v1783(base); assertFiniteNumericOutputs(r, "v1783");
+  assert.ok(Math.abs(r.co2_volumes - 2.5757) < 1e-3);
+  assert.ok(Math.abs(r.pressure_for_target_psig - 12.251) < 1e-3);
+  assert.ok(Math.abs(r.warm_pressure_for_target_psig - 15.983) < 1e-3);
+  // The two directions invert each other.
+  const back = _v1783({ ...base, gauge_psig: r.pressure_for_target_psig });
+  assert.ok(Math.abs(back.co2_volumes - 2.6) < 1e-9);
+  assert.ok(r.warm_co2_volumes < r.co2_volumes);
+  assert.ok(r.overcarbonation_volumes > base.target_volumes);
+  for (const bad of [{ beer_temp_f: 20 }, { warm_temp_f: 95 }, { gauge_psig: -1 }, { target_volumes: 0 }]) {
+    assert.ok(_v1783({ ...base, ...bad }).error);
+  }
+});
+
+test("bounds: spec-v1784 computeFermenterGlycolLoad -- the crash sizes the chiller", () => {
+  const base = { batch_volume_gal: 310, original_gravity: 1.055, final_gravity: 1.012, heat_of_fermentation_btu_per_lb: 280, peak_day_share_pct: 40, crash_start_temp_f: 68, crash_target_temp_f: 34, crash_hours: 24, tank_surface_sqft: 143, tank_u_factor: 0.15, cellar_temp_f: 70, glycol_delta_t_f: 8 };
+  const r = _v1784(base); assertFiniteNumericOutputs(r, "v1784");
+  assert.ok(Math.abs(r.fermentation_heat_btu - 81139.13) < 0.1);
+  assert.ok(Math.abs(r.adiabatic_rise_f - 34.622) < 1e-3);
+  assert.ok(Math.abs(r.crash_load_btuh - 4092.28) < 0.1);
+  assert.ok(Math.abs(r.fast_crash_load_btuh - 7412.36) < 0.1);
+  assert.ok(Math.abs(r.glycol_gpm - 1.1015) < 1e-3);
+  assert.ok(r.crash_load_btuh > r.fermentation_load_btuh);
+  for (const bad of [{ batch_volume_gal: 0 }, { final_gravity: 1.06 }, { crash_hours: 0 }, { crash_target_temp_f: 70 }, { glycol_delta_t_f: 0 }, { peak_day_share_pct: 0 }, { tank_u_factor: -1 }]) {
+    assert.ok(_v1784({ ...base, ...bad }).error);
+  }
+});
+
+test("bounds: spec-v1785 computeProofGallonYield -- proof gallons are twice the absolute alcohol at any proof", () => {
+  const base = { wash_volume_gal: 500, wash_abv_pct: 8, recovery_pct: 85, collection_proof: 140, alternative_proof: 80, hearts_share_pct: 75, excise_rate_per_pg: 2.70 };
+  const r = _v1785(base); assertFiniteNumericOutputs(r, "v1785");
+  assert.ok(Math.abs(r.proof_gallons - 68) < 1e-9);
+  assert.ok(Math.abs(r.alternative_proof_gallons - 68) < 1e-9);
+  assert.ok(Math.abs(r.excise - 183.6) < 1e-9);
+  assert.ok(Math.abs(r.hearts_proof_gallons - 51) < 1e-9);
+  for (const proof of [40, 100, 160, 190]) {
+    const x = _v1785({ ...base, collection_proof: proof });
+    assert.ok(Math.abs(x.proof_gallons - 2 * x.recovered_alcohol_gal) < 1e-9);
+  }
+  for (const bad of [{ wash_volume_gal: 0 }, { wash_abv_pct: 100 }, { recovery_pct: 0 }, { collection_proof: 201 }, { hearts_share_pct: 0 }, { excise_rate_per_pg: -1 }]) {
+    assert.ok(_v1785({ ...base, ...bad }).error);
+  }
+});
+
+test("bounds: spec-v1786 computePackagingYieldLoss -- the remainder does not scale", () => {
+  const base = { brite_volume_gal: 310, transfer_loss_pct: 2, fill_loss_pct: 1.5, package_gal: 15.5, smallest_package_gal: 5.16, revenue_per_package: 175 };
+  const r = _v1786(base); assertFiniteNumericOutputs(r, "v1786");
+  assert.equal(r.whole_packages, 19);
+  assert.ok(Math.abs(r.remainder_gal - 4.743) < 1e-6);
+  assert.ok(Math.abs(r.total_loss_gal - 15.5) < 1e-9);
+  assert.equal(r.small_packages_from_remainder, 0);
+  assert.ok(r.remainder_gal >= 0 && r.remainder_gal < base.package_gal);
+  assert.ok(Math.abs(r.saleable_gal + r.remainder_gal + r.process_loss_gal - 310) < 1e-9);
+  for (const bad of [{ brite_volume_gal: 0 }, { transfer_loss_pct: 100 }, { package_gal: 0 }, { smallest_package_gal: 20 }, { revenue_per_package: -1 }]) {
+    assert.ok(_v1786({ ...base, ...bad }).error);
+  }
+});
+
+test("bounds: spec-v1787 computeMashTunGrainBed -- capacity goes as the square of diameter", () => {
+  const base = { tun_diameter_ft: 6, grain_weight_lb: 542, mash_thickness_qt_per_lb: 1.25, grain_displacement_gal_per_lb: 0.08, max_bed_depth_in: 18, batch_volume_gal: 310, efficiency_pct: 78, extract_potential_ppg: 37, alternative_diameter_ft: 8 };
+  const r = _v1787(base); assertFiniteNumericOutputs(r, "v1787");
+  assert.ok(Math.abs(r.bed_depth_in - 12.07) < 0.01);
+  assert.ok(Math.abs(r.max_grain_lb - 808.31) < 0.01);
+  assert.ok(Math.abs(r.max_og_points - 75.251) < 1e-3);
+  assert.ok(Math.abs(r.alternative_max_grain_lb / r.max_grain_lb - 16 / 9) < 1e-12);
+  // At the maximum grain bill the bed sits exactly at the depth limit.
+  const full = _v1787({ ...base, grain_weight_lb: r.max_grain_lb });
+  assert.ok(Math.abs(full.bed_depth_in - 18) < 1e-9);
+  for (const bad of [{ tun_diameter_ft: 0 }, { grain_weight_lb: 0 }, { max_bed_depth_in: 0 }, { efficiency_pct: 0 }, { grain_displacement_gal_per_lb: -0.1 }]) {
+    assert.ok(_v1787({ ...base, ...bad }).error);
+  }
+});
+
+test("bounds: spec-v1788 computeDryHopBeerLoss -- doubling the rate doubles the loss exactly", () => {
+  const base = { batch_volume_gal: 310, dry_hop_lb_per_bbl: 2, absorption_gal_per_lb: 1.0, package_gal: 15.5, revenue_per_package: 175, heavy_dry_hop_lb_per_bbl: 4 };
+  const r = _v1788(base); assertFiniteNumericOutputs(r, "v1788");
+  assert.ok(Math.abs(r.absorbed_gal - 20) < 1e-9);
+  assert.ok(Math.abs(r.heavy_absorbed_gal / r.absorbed_gal - 2) < 1e-12);
+  assert.ok(Math.abs(r.heavy_packages_lost - 40 / 15.5) < 1e-12);
+  assert.equal(_v1788({ ...base, dry_hop_lb_per_bbl: 0 }).absorbed_gal, 0);
+  for (const bad of [{ batch_volume_gal: 0 }, { dry_hop_lb_per_bbl: -1 }, { package_gal: 0 }, { heavy_dry_hop_lb_per_bbl: 400 }, { absorption_gal_per_lb: -1 }]) {
+    assert.ok(_v1788({ ...base, ...bad }).error);
+  }
+});
