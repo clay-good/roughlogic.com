@@ -22916,7 +22916,7 @@ export const CITATIONS = {
   // spec-v1495..v1504: the 2026-09-08 trade-expansion building performance and
   // envelope diagnostics band. Eight tiles; spec-v1501 and spec-v1503 cut.
   "effective-leakage-area": {
-    formula: "ELA (US, 4 Pa reference) = CFM50 / 18.9 in square inches, and EqLA (Canadian, 10 Pa reference) = CFM50 / 10.0; specific leakage area = ELA / floor area; normalized leakage = 1000 x SLA x (building height / 8.2 ft)^0.3. The hole side is the square root of the ELA.",
+    formula: "ELA (US, 4 Pa reference) = CFM50 / 18.9 in square inches, and EqLA (Canadian, 10 Pa reference) = CFM50 / 10.0; specific leakage area = ELA / floor area, both in the same units (square feet), so it is dimensionless; normalized leakage = 1000 x SLA x (building height / 8.2 ft)^0.3, which for real houses runs about 0.1 to 1.5 (ASHRAE 119 classes A to J). The hole side is the square root of the ELA.",
     edition: "The LBL effective leakage area conversion at the 4 Pa reference and the CGSB equivalent leakage area at 10 Pa, both by name, with the ASHRAE Fundamentals normalized-leakage definition and its height correction. The two conventions describe the SAME building and differ only by reference pressure, so a figure quoted without its convention cannot be compared with one quoted under the other.",
     freeAccess: "Two published divisors and one power-law height correction.",
     governance: GOVERNANCE.general,
@@ -22924,6 +22924,7 @@ export const CITATIONS = {
     assumptions: [
       { name: "Reference pressure", value: "4 Pa for ELA, 10 Pa for EqLA", source: "LBL and CGSB conventions" },
       { name: "Height correction exponent", value: "0.3 about an 8.2 ft reference", source: "the normalized leakage definition" },
+      { name: "Same units", value: "ELA converted to square feet before dividing by floor area; spec-v1495 mixed square inches with square feet and read 144 times high", source: "ASHRAE 119" },
       { name: "Single-zone envelope", value: "the model does not say where the leakage is", source: "a zonal pressure diagnostic" },
     ],
   },

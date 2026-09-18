@@ -152,15 +152,19 @@ export function computeEffectiveLeakageArea({
   // drives more stack flow through the same hole.
   const building_height_ft = ceiling_height_ft * storeys;
   const height_factor = Math.pow(building_height_ft / _BP_NL_REFERENCE_HEIGHT_FT, _BP_NL_HEIGHT_EXPONENT);
-  const normalized_leakage = 1000 * (ela_in2 / floor_area_ft2) * height_factor;
-  const sla = ela_in2 / floor_area_ft2;
+  // ASHRAE 119 takes ELA and floor area in the SAME units, so specific leakage
+  // area is dimensionless and NL for real houses runs about 0.1 to 1.5 (its
+  // classes A to J). spec-v1495 divided square INCHES by square FEET and got
+  // an NL of 40 for an ordinary house, 144 times the true 0.28.
+  const sla = (ela_in2 / 144) / floor_area_ft2;
+  const normalized_leakage = 1000 * sla * height_factor;
   // The sentence that changes a homeowner's mind.
   const hole_side_in = Math.sqrt(ela_in2);
   const volume_ft3 = floor_area_ft2 * building_height_ft;
   const ach50 = cfm50 * 60 / volume_ft3;
   const hole_verdict = fmt(ela_in2, 1) + " square inches is a hole about " + fmt(hole_side_in, 1) + " in on a side -- a " + fmt(hole_side_in, 0) + " by " + fmt(hole_side_in, 0) + " inch opening in the envelope, permanently. That is the same measurement as " + fmt(ach50, 2) + " ACH50, and it is the one that changes a homeowner's mind";
   const convention_verdict = "on the Canadian 10 Pa convention the same house reports " + fmt(eqla_in2, 1) + " sq in of equivalent leakage area, " + fmt(convention_ratio, 2) + " times the US 4 Pa figure -- an identical building, differing purely by the reference pressure, which is a common source of confused comparisons";
-  const nl_verdict = "normalized leakage is " + fmt(normalized_leakage, 2) + " at " + fmt(building_height_ft, 1) + " ft of height, from a specific leakage area of " + fmt(sla, 5) + " -- and the height correction is why two houses with the SAME ACH50 can have quite different real air change rates, which is what makes normalized leakage rather than ACH50 the right basis for estimating natural infiltration";
+  const nl_verdict = "normalized leakage is " + fmt(normalized_leakage, 2) + " at " + fmt(building_height_ft, 1) + " ft of height, from a specific leakage area of " + fmt(sla, 6) + " (ELA over floor area, both in square feet) -- and the height correction is why two houses with the SAME ACH50 can have quite different real air change rates, which is what makes normalized leakage rather than ACH50 the right basis for estimating natural infiltration";
   if (![ela_in2, eqla_in2, normalized_leakage, sla, hole_side_in, ach50].every(Number.isFinite)) return { error: "Leakage area math is not a finite value." };
   return {
     ela_in2, eqla_in2, convention_ratio, building_height_ft, height_factor,
