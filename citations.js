@@ -24877,6 +24877,7 @@ export const CITATIONS = {
     assumptions: [
       { name: "Decay constant", value: "where the uncertainty lives; it depends overwhelmingly on moisture and a factor of two or three between an arid and a wet site is ordinary", source: "site gas data" },
       { name: "Peak", value: "modelled at closure, when every placement year contributes and none has decayed far", source: "spec-v1790 scope" },
+      { name: "Time step", value: "whole years, the newest counted at age zero; EPA's LandGEM steps in tenths of a year and reads 2.2% lower at closure at k = 0.04, 3.8% at 0.07, and 31% at its wet-inventory 0.7", source: "LandGEM v3.02 equation" },
     ],
   },
   "leachate-water-balance": {
