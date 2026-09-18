@@ -1042,7 +1042,7 @@ export function computeLightingBeam({ beam_angle_deg = 0, throw_distance = 0, di
   const thr = Number(throw_distance) || 0;
   if (!(ang > 0) || !(ang < 180)) return { error: "Beam angle must be between 0 and 180 degrees." };
   if (!(thr > 0)) return { error: "Throw distance must be positive." };
-  const FT_PER_M = 3.280839895013123, M_PER_FT = 0.3048, LUX_PER_FC = 10.76391041670972;
+  const FT_PER_M = 3.280839895013123, M_PER_FT = 0.3048, LUX_PER_FC = 1 / (0.3048 * 0.3048);
   const isFt = String(distance_unit) !== "m";
   const d_ft = isFt ? thr : thr * FT_PER_M;
   const d_m = isFt ? thr * M_PER_FT : thr;
@@ -1128,7 +1128,7 @@ export function computeLedVideoWall({ cab_w_px = 0, cab_h_px = 0, pixel_pitch_mm
   if (!(pixel_pitch_mm > 0)) return { error: "Pixel pitch must be positive." };
   if (!(cols > 0) || !(rows > 0)) return { error: "Columns and rows must be positive." };
   if (!(avg_power_factor > 0 && avg_power_factor <= 1)) return { error: "Average-power factor must be greater than 0 and at most 1." };
-  const MM_PER_FT = 304.8, FT_PER_M = 3.28084;
+  const MM_PER_FT = 304.8, FT_PER_M = 1 / 0.3048;
   const cab_w_mm = cab_w_px * pixel_pitch_mm;
   const cab_h_mm = cab_h_px * pixel_pitch_mm;
   const total_w_px = cab_w_px * cols;

@@ -1283,7 +1283,7 @@ export function computeFrustumVolume({ large_diameter_ft = 0, small_diameter_ft 
   if (!(d <= D)) return { error: "Small diameter cannot exceed the large diameter (ft)." };
   if (!(h > 0)) return { error: "Height must be positive (ft)." };
   const volume_ft3 = (Math.PI * h * (D * D + D * d + d * d)) / 12;
-  const volume_gal = volume_ft3 * 7.480519;
+  const volume_gal = volume_ft3 * (1728 / 231);
   const volume_yd3 = volume_ft3 / 27;
   const R = D / 2, r = d / 2;
   const slant_height_ft = Math.sqrt(h * h + (R - r) * (R - r));
@@ -1420,7 +1420,7 @@ export function computeSphericalCapVolume({ sphere_diameter_ft = 0, fill_depth_f
   if (!(h <= D)) return { error: "Fill depth cannot exceed the sphere diameter (ft)." };
   const R = D / 2;
   const cap_volume_ft3 = (Math.PI * h * h * (3 * R - h)) / 3;
-  const cap_volume_gal = cap_volume_ft3 * 7.480519;
+  const cap_volume_gal = cap_volume_ft3 * (1728 / 231);
   const full_sphere_ft3 = (4 / 3) * Math.PI * R * R * R;
   const percent_full = (cap_volume_ft3 / full_sphere_ft3) * 100;
   if (![cap_volume_ft3, full_sphere_ft3, percent_full].every(Number.isFinite) || !(cap_volume_ft3 > 0)) return { error: "Spherical-cap math is not a finite value; check the inputs." };
@@ -1513,7 +1513,7 @@ export function computePyramidFrustumVolume({ bottom_length_ft = 0, bottom_width
   const A2 = Lt * Wt;
   const volume_ft3 = (h / 3) * (A1 + A2 + Math.sqrt(A1 * A2));
   const volume_yd3 = volume_ft3 / 27;
-  const volume_gal = volume_ft3 * 7.480519;
+  const volume_gal = volume_ft3 * (1728 / 231);
   if (![volume_ft3, volume_yd3].every(Number.isFinite) || !(volume_ft3 > 0)) return { error: "Truncated-pyramid math is not a finite value; check the inputs." };
   return {
     volume_ft3, volume_yd3, volume_gal, bottom_area_ft2: A1, top_area_ft2: A2,
@@ -1600,7 +1600,7 @@ export function computeEllipsoidVolume({ length_ft = 0, width_ft = 0, height_ft 
   if (!(W > 0)) return { error: "Width must be positive (ft)." };
   if (!(H > 0)) return { error: "Height must be positive (ft)." };
   const volume_ft3 = (Math.PI * L * W * H) / 6;
-  const volume_gal = volume_ft3 * 7.480519;
+  const volume_gal = volume_ft3 * (1728 / 231);
   const half_volume_ft3 = volume_ft3 / 2;
   if (![volume_ft3, half_volume_ft3].every(Number.isFinite) || !(volume_ft3 > 0)) return { error: "Ellipsoid math is not a finite value; check the inputs." };
   const is_sphere = Math.abs(L - W) < 1e-9 && Math.abs(W - H) < 1e-9;
@@ -1744,7 +1744,7 @@ export function computeTankVolumeDishedHeads({ diameter_ft = 0, shell_length_ft 
   const heads_volume_ft3 = k * (Math.PI * h * h * (3 * R - h)) / 3;
   const volume_ft3 = shell_volume_ft3 + heads_volume_ft3;
   const full_ft3 = Math.PI * R * R * L + k * (4 / 3) * Math.PI * R * R * R;
-  const GAL_PER_FT3 = 7.480519;
+  const GAL_PER_FT3 = 1728 / 231;
   const volume_gal = volume_ft3 * GAL_PER_FT3;
   const full_gal = full_ft3 * GAL_PER_FT3;
   const percent_full = full_ft3 > 0 ? (volume_ft3 / full_ft3) * 100 : 0;
@@ -1806,7 +1806,7 @@ export function computeSphericalZoneVolume({ base_radius_1_ft = 0, base_radius_2
   if (!(h > 0)) return { error: "Zone height must be positive (ft)." };
   if (!(r1 > 0 || r2 > 0)) return { error: "At least one base radius must be positive (ft)." };
   const volume_ft3 = (Math.PI * h / 6) * (3 * r1 * r1 + 3 * r2 * r2 + h * h);
-  const volume_gal = volume_ft3 * 7.480519;
+  const volume_gal = volume_ft3 * (1728 / 231);
   if (![volume_ft3, volume_gal].every(Number.isFinite) || !(volume_ft3 > 0)) return { error: "Spherical-zone math is not a finite value; check the inputs." };
   const is_cap = r1 === 0 || r2 === 0;
   return {
@@ -1925,7 +1925,7 @@ export function computeConeBottomTankVolume({ diameter_ft = 0, cone_height_ft = 
   else if (h <= Hc) volume_ft3 = (Math.PI * R * R / (3 * Hc * Hc)) * h * h * h; // cone from the apex, r(h) = R h/Hc
   else volume_ft3 = cone_full + Math.PI * R * R * (h - Hc);                     // full cone + straight cylinder
   const full_ft3 = cone_full + Math.PI * R * R * Hcyl;
-  const GAL_PER_FT3 = 7.480519;
+  const GAL_PER_FT3 = 1728 / 231;
   const percent_full = full_ft3 > 0 ? (volume_ft3 / full_ft3) * 100 : 0;
   if (![volume_ft3, full_ft3, percent_full].every(Number.isFinite) || !(full_ft3 > 0)) return { error: "Cone-bottom-tank math is not a finite value; check the inputs." };
   const in_cone = h > 0 && h <= Hc;
@@ -1988,7 +1988,7 @@ export function computeTaperedTankVolume({ bottom_diameter_ft = 0, top_diameter_
   const frustum = (z) => { const r = rAt(z); return Math.PI * z / 3 * (R1 * R1 + R1 * r + r * r); };
   const volume_ft3 = h <= 0 ? 0 : frustum(h);
   const full_ft3 = Math.PI * H / 3 * (R1 * R1 + R1 * R2 + R2 * R2);
-  const GAL_PER_FT3 = 7.480519;
+  const GAL_PER_FT3 = 1728 / 231;
   const percent_full = full_ft3 > 0 ? (volume_ft3 / full_ft3) * 100 : 0;
   if (![volume_ft3, full_ft3, percent_full].every(Number.isFinite) || !(full_ft3 > 0)) return { error: "Tapered-tank math is not a finite value; check the inputs." };
   const r_at_level = rAt(Math.max(0, Math.min(h, H)));
@@ -2040,7 +2040,7 @@ SHOP_RENDERERS["tapered-tank-volume"] = _v1326renderTaperedTankVolume;
 // dims: in { base_diameter_ft: L, height_ft: L, fill_depth_ft: L } out: { full_ft3: L^3, fill_ft3: L^3, percent_full: dimensionless }
 export function computeParaboloidVolume({ base_diameter_ft = 0, height_ft = 0, fill_depth_ft = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
-  const GAL_PER_FT3 = 7.480519;
+  const GAL_PER_FT3 = 1728 / 231;
   const D = Number(base_diameter_ft) || 0;
   const H = Number(height_ft) || 0;
   let y = Number(fill_depth_ft) || 0;
@@ -2093,7 +2093,7 @@ SHOP_RENDERERS["paraboloid-volume"] = _v1329renderParaboloidVolume;
 // dims: in { base_diameter_ft: L, height_ft: L } out: { volume_ft3: L^3, volume_gal: L^3, base_area_ft2: L^2 }
 export function computeCylindricalWedgeVolume({ base_diameter_ft = 0, height_ft = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
-  const GAL_PER_FT3 = 7.480519;
+  const GAL_PER_FT3 = 1728 / 231;
   const D = Number(base_diameter_ft) || 0;
   const H = Number(height_ft) || 0;
   if (!(D > 0)) return { error: "Base diameter must be positive." };

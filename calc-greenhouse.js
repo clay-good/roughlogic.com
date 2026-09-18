@@ -17,7 +17,7 @@ import {
 const G_FPS2 = 32.2;
 const CU_IN_PER_CU_FT = 1728;
 const CU_FT_PER_CU_YD = 27;
-const SQ_FT_PER_SQ_M = 10.7639104;     // (1 / 0.3048)^2
+const SQ_FT_PER_SQ_M = 1 / (0.3048 * 0.3048);
 const SEC_PER_HOUR = 3600;
 const MICROMOL_PER_MOL = 1e6;
 const LB_PER_GAL_WATER = 8.345;

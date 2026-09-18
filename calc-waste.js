@@ -18,9 +18,9 @@ import {
 const CU_FT_PER_CU_YD = 27;
 const SQ_FT_PER_ACRE = 43560;
 const LB_PER_TON = 2000;
-const GAL_PER_CU_FT = 7.48052;
-const LB_PER_MEGAGRAM = 2204.62262185;   // 1 Mg = 1,000 kg, exactly defined
-const CU_FT_PER_CU_M = 35.3146667;       // (1 / 0.3048)^3
+const GAL_PER_CU_FT = 1728 / 231;
+const LB_PER_MEGAGRAM = 1e6 / 453.59237; // 1 Mg = 1,000 kg, exactly defined
+const CU_FT_PER_CU_M = 1 / (0.3048 * 0.3048 * 0.3048);
 const DAYS_PER_YEAR = 365;
 const MIN_PER_HOUR = 60;
 const HOURS_PER_DAY = 24;

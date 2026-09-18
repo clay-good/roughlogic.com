@@ -3807,7 +3807,7 @@ ELECTRICAL_RENDERERS["service-load-optional"] = renderServiceLoadOptional;
 //    annotated dimensionless per spec-v14 §7.1's conservative rule for
 //    photometric quantities.)
 export function computeLuxFootcandle({ mode = "convert", lux = 0, footcandles = 0, lumens = 0, area_ft2 = 0, cu = 0.7, llf = 0.8 } = {}) {
-  const LUX_PER_FC = 10.764;
+  const LUX_PER_FC = 1 / (0.3048 * 0.3048);
   if (mode === "room") {
     const area = Number(area_ft2) || 0;
     const lm = Number(lumens) || 0;

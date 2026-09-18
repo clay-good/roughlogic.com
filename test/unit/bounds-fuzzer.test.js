@@ -3578,7 +3578,7 @@ test("bounds: calc-agriculture computeIrrigationRequirement pins ET_crop = Kc*ET
   assert.ok(Math.abs(r.net_in - 8.0) < 1e-9);
   assert.ok(Math.abs(r.gross_in - 8.0 / 0.9) < 1e-9);
   assert.ok(Math.abs(r.acre_ft - (r.gross_in * 80) / 12) < 1e-9);
-  assert.ok(Math.abs(r.gallons - r.acre_ft * 325851) < 1e-3);
+  assert.ok(Math.abs(r.gallons - r.acre_ft * (43560 * 1728 / 231)) < 1e-3);
   // Rainfall over ET zeroes the requirement.
   const wet = computeIrrigationRequirement({ crop: "pasture", et_ref_in_per_day: 0.1, period_days: 5, area_acres: 10, efficiency_pct: 75, rainfall_in: 5 });
   assert.strictEqual(wet.net_in, 0);
@@ -5331,10 +5331,11 @@ test("bounds: calc-fire computeIsoNeededFireFlow rejects non-positive area / sto
 test("bounds: calc-fire computeScbaCylinderTime pins available_scf = (P_start - P_alarm)/P_rated * V_rated and time = scf/consumption across the operational sweep", () => {
   // Standard 60-min 4500-psi cylinder (88 scf rated) at full fill, 33% low-air
   // alarm (1485 psi), 40 L/min light-work breathing rate. Consumption is
-  // entered in L/min and converted to scf/min by 28.3168 L/ft^3:
+  // entered in L/min and converted to scf/min by 28.316846592 L/ft^3 (the cube
+  // of the international foot, exactly):
   // available_scf = (4500-1485)/4500*88 ~= 58.96 scf; 40 L/min = 1.4126 scfm,
   // so time_to_alarm = 58.96 / 1.4126 ~= 41.74 min.
-  const L_PER_FT3 = 28.3168;
+  const L_PER_FT3 = 0.3048 * 0.3048 * 0.3048 * 1000;
   const r = computeScbaCylinderTime({ V_rated_scf: 88, P_rated_psi: 4500, P_start_psi: 4500, P_alarm_psi: 1485, consumption_lpm: 40 });
   assert.ok(!r.error, JSON.stringify(r));
   const expected_to_alarm = ((4500 - 1485) / 4500) * 88;
@@ -38604,7 +38605,7 @@ import { computeSphericalCapVolume as _v1323cap } from "../../calc-shop.js";
 test("bounds: spec-v1323 computeSphericalZoneVolume pins the prismatoid volume, the spherical-cap reduction, and error seams", () => {
   // r1 4, r2 3, h 2: V = (pi*2/6)(3*16 + 3*9 + 4) = (pi/3)(79) = 82.729 ft^3.
   const z = _v1323({ base_radius_1_ft: 4, base_radius_2_ft: 3, zone_height_ft: 2 });
-  assert.ok(Math.abs(z.volume_ft3 - 82.7286) < 1e-3 && Math.abs(z.volume_gal - z.volume_ft3 * 7.480519) < 1e-6);
+  assert.ok(Math.abs(z.volume_ft3 - 82.7286) < 1e-3 && Math.abs(z.volume_gal - z.volume_ft3 * (1728 / 231)) < 1e-6);
   // With the top base zero the zone IS the spherical cap: match spherical-cap-volume on a sphere of R = 5, cap depth h = 3.
   // cap face radius r1 = sqrt(2Rh - h^2) = sqrt(30 - 9) = sqrt(21).
   const capMatch = _v1323({ base_radius_1_ft: Math.sqrt(21), base_radius_2_ft: 0, zone_height_ft: 3 });
@@ -38625,7 +38626,7 @@ test("bounds: spec-v1329 computeParaboloidVolume pins the half-cylinder full vol
   // D 4 (R 2), H 3: full V = 0.5*pi*4*3 = 6*pi = 18.8496 ft^3, and exactly half the cylinder pi*R^2*H.
   const p = _v1329({ base_diameter_ft: 4, height_ft: 3, fill_depth_ft: 1.5 });
   assert.ok(Math.abs(p.full_ft3 - 18.8496) < 1e-3 && Math.abs(p.full_ft3 - 0.5 * Math.PI * 2 * 2 * 3) < 1e-9);
-  assert.ok(Math.abs(p.full_gal - p.full_ft3 * 7.480519) < 1e-6);
+  assert.ok(Math.abs(p.full_gal - p.full_ft3 * (1728 / 231)) < 1e-6);
   // Fills as the square of depth: half the height is a quarter full.
   assert.ok(Math.abs(p.fill_ft3 - 4.7124) < 1e-3 && Math.abs(p.percent_full - 25) < 1e-6);
   assert.ok(Math.abs(p.radius_at_level - 2 * Math.sqrt(0.5)) < 1e-9);
@@ -38668,7 +38669,7 @@ test("bounds: spec-v1330 computeCylindricalWedgeVolume pins the (2/3)R^2 H close
   // D 4 (R 2), H 3: V = (2/3)(4)(3) = 8 ft^3 exactly = D^2 H/6, and no pi.
   const w = _v1330({ base_diameter_ft: 4, height_ft: 3 });
   assert.ok(Math.abs(w.volume_ft3 - 8) < 1e-9 && Math.abs(w.volume_ft3 - 4 * 4 * 3 / 6) < 1e-9);
-  assert.ok(Math.abs(w.volume_gal - w.volume_ft3 * 7.480519) < 1e-6);
+  assert.ok(Math.abs(w.volume_gal - w.volume_ft3 * (1728 / 231)) < 1e-6);
   // The wedge is 2/(3 pi) = 21.22% of the full enclosing cylinder, for any D and H.
   assert.ok(Math.abs(w.percent_of_cylinder - 200 / (3 * Math.PI)) < 1e-9);
   const w2 = _v1330({ base_diameter_ft: 6, height_ft: 2 });
@@ -38717,7 +38718,7 @@ test("bounds: spec-v1325 computeConeBottomTankVolume pins the cone h^3 law, the 
   const P = Math.PI, R = 3;
   // 6 ft dia, 3 ft cone, 8 ft cylinder: full = (1/3)pi R^2 Hc + pi R^2 Hcyl.
   const full = _v1325({ diameter_ft: 6, cone_height_ft: 3, cylinder_height_ft: 8, depth_ft: 11 });
-  const expectFull = (P * R * R * 3 / 3 + P * R * R * 8) * 7.480519;
+  const expectFull = (P * R * R * 3 / 3 + P * R * R * 8) * (1728 / 231);
   assert.ok(Math.abs(full.full_gal - expectFull) < 1e-6 && Math.abs(full.percent_full - 100) < 1e-9);
   // At the cone height the volume is exactly the full cone (1/3) pi R^2 Hc.
   const atCone = _v1325({ diameter_ft: 6, cone_height_ft: 3, cylinder_height_ft: 8, depth_ft: 3 });
@@ -54228,10 +54229,10 @@ test("bounds: spec-v1790 computeLandfillGasGeneration -- generation is not colle
   // repeating the loop the compute already ran.
   const closed = (1 - Math.exp(-0.04 * 20)) / (1 - Math.exp(-0.04));
   assert.ok(Math.abs(r.decay_sum - closed) < 1e-9);
-  assert.ok(Math.abs(r.methane_cfm - 856.0214972834383) < 1e-6);
+  assert.ok(Math.abs(r.methane_cfm - 856.0214978047934) < 1e-6);
   assert.ok(Math.abs(r.landfill_gas_cfm - r.methane_cfm * 2) < 1e-9);
-  assert.ok(Math.abs(r.heat_rate_mmbtu_per_hr - 46.79013504151274) < 1e-9);
-  assert.ok(Math.abs(r.collected_capacity_kw - 3085.515939138443) < 1e-6);
+  assert.ok(Math.abs(r.heat_rate_mmbtu_per_hr - 46.79013507001001) < 1e-9);
+  assert.ok(Math.abs(r.collected_capacity_kw - 3085.5159410176593) < 1e-6);
   // The collection shortfall IS the site's methane emission.
   assert.ok(Math.abs(r.uncollected_capacity_kw - r.gross_capacity_kw * 0.25) < 1e-9);
   // The whole curve decays as e^(-kt), so the decade ratios are pure physics.
@@ -54252,13 +54253,13 @@ test("bounds: spec-v1791 computeLeachateWaterBalance -- storage rides out the pe
   const base = { open_acres: 20, annual_precip_in: 40, runoff_coefficient: 0.15, evapotranspiration_coefficient: 0.30, capped_infiltration_in_per_year: 2, design_storm_in: 2 };
   const r = _v1791(base); assertFiniteNumericOutputs(r, "v1791");
   assert.ok(Math.abs(r.infiltration_in_per_year - 22) < 1e-12);
-  assert.ok(Math.abs(r.leachate_gal_per_year - 11947886.544) < 1e-3);
-  assert.ok(Math.abs(r.gpd_per_acre - 1636.696786849315) < 1e-6);
+  assert.ok(Math.abs(r.leachate_gal_per_year - 11947885.714285715) < 1e-3);
+  assert.ok(Math.abs(r.gpd_per_acre - 1636.696673189824) < 1e-6);
   // Capping is a different order of magnitude, not an improvement.
   assert.ok(r.capping_reduction_pct > 90);
   assert.ok(Math.abs(r.deferred_cap_gpd - (r.leachate_gpd - r.capped_gpd)) < 1e-9);
   // A design storm arrives as many days of average flow at once.
-  assert.ok(Math.abs(r.storm_volume_gal - 597394.3272) < 1e-3);
+  assert.ok(Math.abs(r.storm_volume_gal - 597394.2857142857) < 1e-3);
   assert.ok(r.storm_days_of_average > 18 && r.storm_days_of_average < 19);
   // Leachate is linear in open area, which is what makes the per-acre figure
   // the one to carry.
@@ -54562,8 +54563,8 @@ test("bounds: spec-v1752 computePpfdDailyLightIntegral -- the glazing makes Dece
 test("bounds: spec-v1753 computeGrowLightFixtureCount -- the on-target fraction costs TWO fixtures here, not one", () => {
   const base = { growing_area_sqft: 1000, target_ppfd_umol_m2_s: 200, fixture_ppf_umol_s: 1700, fixture_watts: 645, on_target_fraction: 0.9, photoperiod_hours: 16, season_days: 180, energy_rate_per_kwh: 0.12 };
   const r = _v1753(base); assertFiniteNumericOutputs(r, "v1753");
-  assert.ok(Math.abs(r.growing_area_m2 - 92.9030401442212) < 1e-9);
-  assert.ok(Math.abs(r.exact_count - 12.144188254146561) < 1e-9);
+  assert.ok(Math.abs(r.growing_area_m2 - 92.90304) < 1e-9);
+  assert.ok(Math.abs(r.exact_count - 12.144188235294118) < 1e-9);
   // spec-v1753 §3 says the 90% on-target fraction "costs a fixture by itself",
   // then prints 11 at a perfect 1.00 against 13 at 0.90. That is TWO fixtures,
   // not one. The tile reports the difference its own inputs produce.

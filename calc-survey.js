@@ -1242,7 +1242,7 @@ export function computeLidarPointDensity({ pulse_rate_khz = 0, scan_angle_deg = 
   if (!(ground_speed_ms > 0)) return { error: "Ground speed must be positive (m/s)." };
   if (!(side_overlap_pct >= 0 && side_overlap_pct < 100)) return { error: "Side overlap must be at least 0 and below 100 percent." };
   if (area_acres < 0) return { error: "The area cannot be negative (acres)." };
-  const M2_PER_ACRE = 4046.856;
+  const M2_PER_ACRE = 43560 * 0.3048 * 0.3048;
   const DEG_TO_RAD_SV = Math.PI / 180;
   const pulses_per_s = pulse_rate_khz * 1000;
   const swathFor = (h) => 2 * h * Math.tan(scan_angle_deg / 2 * DEG_TO_RAD_SV);

@@ -850,7 +850,7 @@ export const IRRIGATION_EFFICIENCY_PCT = {
   flood: 50,
 };
 
-const GAL_PER_ACRE_FT = 325851;
+const GAL_PER_ACRE_FT = 43560 * 1728 / 231;
 
 // dims: in { crop: dimensionless, et_ref_in_per_day: L T^-1, period_days: T, area_acres: L^2, efficiency_pct: dimensionless, rainfall_in: L } out: { et_crop_in: L, gross_in: L, acre_ft: L^3, gallons: L^3 }
 export function computeIrrigationRequirement({

@@ -40,10 +40,10 @@ test("irrigation-requirement: gross depth divides net by efficiency", () => {
   assert.strictEqual(IRRIGATION_EFFICIENCY_PCT.sprinkler, 75);
 });
 
-test("irrigation-requirement: acre-feet = gross_in x acres / 12 and gallons = acre-ft x 325851", () => {
+test("irrigation-requirement: acre-feet = gross_in x acres / 12 and gallons = acre-ft x 43,560 x 1,728 / 231", () => {
   const r = computeIrrigationRequirement(irrigationRequirementExample.inputs);
   assert.ok(close(r.acre_ft, (r.gross_in * r.area_acres) / 12, 1e-9));
-  assert.ok(close(r.gallons, r.acre_ft * 325851, 1e-3));
+  assert.ok(close(r.gallons, r.acre_ft * (43560 * 1728 / 231), 1e-3));
   assert.ok(closePct(r.acre_ft, 59.26, 0.1));
 });
 

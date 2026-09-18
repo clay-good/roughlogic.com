@@ -2296,7 +2296,7 @@ export function computeKitchenMakeupAirDeficit({ hood_exhaust_cfm = 0, other_exh
   if (!(door_width_ft > 0)) return { error: "Door width must be positive (ft)." };
   if (!(door_height_ft > 0)) return { error: "Door height must be positive (ft)." };
   const LBF_PER_PSF_SQFT = 1;
-  const PA_PER_PSF = 47.8803;
+  const PA_PER_PSF = 4.4482216152605 / (0.3048 * 0.3048);
   const EGRESS_DOOR_LIMIT_LBF = 30;
   const total_exhaust_cfm = hood_exhaust_cfm + other_exhaust_cfm;
   const deficit_cfm = total_exhaust_cfm - dedicated_makeup_cfm;

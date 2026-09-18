@@ -3703,9 +3703,9 @@ test("monotonicity: computeShortCircuitPP I_sca_panel_A is strictly decreasing i
 
 test("monotonicity: computeScbaCylinderTime time_to_alarm_min is strictly decreasing in consumption_lpm; strictly increasing in P_start_psi (NFPA 1981 linear pin)", () => {
   // Group F. available_scf_to_alarm = ((Ps - Pa) / Pr) * Vr; consumption is
-  // entered in L/min and converted to scf/min by 28.3168 L/ft^3, so time =
-  // available * 28.3168 / C_lpm. Inversely linear in C, linear in (Ps - Pa).
-  const L_PER_FT3 = 28.3168;
+  // entered in L/min and converted to scf/min by 28.316846592 L/ft^3 (exact), so
+  // time = available * 28.3168 / C_lpm. Inversely linear in C, linear in (Ps - Pa).
+  const L_PER_FT3 = 0.3048 * 0.3048 * 0.3048 * 1000;
   const baseline = { V_rated_scf: 88, P_rated_psi: 4500, P_start_psi: 4500, P_alarm_psi: 1485 };
   let prev = Infinity;
   for (const consumption_lpm of [20, 30, 40, 60, 80, 120, 200]) {

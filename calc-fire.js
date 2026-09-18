@@ -968,7 +968,7 @@ export function computeScbaCylinderTime({
   consumption_lpm = 0,
 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
-  const L_PER_FT3 = 28.3168;
+  const L_PER_FT3 = 0.3048 * 0.3048 * 0.3048 * 1000;
   const Vr = Number(V_rated_scf) || 0;
   const Pr = Number(P_rated_psi) || 0;
   const Ps = Number(P_start_psi) || 0;

@@ -58,26 +58,63 @@ const EXACT = {
   // cannot see: two constants only conflict if they are called the same thing.
   // A synonym is exactly how a fixed inconsistency comes back.
   ML_PER_FL_OZ: [(3.785411784 / 128) * 1000, "the same US fluid ounce, spelled differently"],
+  // Added 2026-09-18 when the reference suite for calc-greenhouse found its
+  // square-foot factor cut at 10.7639104. The scan below then found nine more
+  // exact factors written short -- up to 8 parts per million -- that the
+  // conflict test could not see: a factor defined as an expression (1728 / 231)
+  // or on a line declaring several constants never matched its pattern.
+  GAL_PER_FT3: [1728 / 231, "231 cu in to the US gallon, 1,728 to the cubic foot"],
+  GAL_PER_CU_FT: [1728 / 231, "the same factor, spelled differently"],
+  GAL_PER_ACRE_FT: [43560 * 1728 / 231, "43,560 sq ft to the acre, 231 cu in to the gallon"],
+  FT_PER_M: [1 / 0.3048, "1 ft = 0.3048 m exactly"],
+  SQ_FT_PER_SQ_M: [1 / (0.3048 * 0.3048), "the square of the international foot"],
+  LUX_PER_FC: [1 / (0.3048 * 0.3048), "a footcandle is one lumen per square foot"],
+  CU_FT_PER_CU_M: [1 / (0.3048 * 0.3048 * 0.3048), "the cube of the international foot"],
+  L_PER_FT3: [0.3048 * 0.3048 * 0.3048 * 1000, "the cube of the international foot, in litres"],
+  M2_PER_ACRE: [43560 * 0.3048 * 0.3048, "43,560 international sq ft to the acre"],
+  PA_PER_PSF: [4.4482216152605 / (0.3048 * 0.3048), "1 lbf = 4.4482216152605 N exactly, over a square foot"],
+  LB_PER_MEGAGRAM: [1e6 / 453.59237, "1 lb = 453.59237 g exactly"],
 };
+
+// Every `NAME = value` in a `const` statement, including the second and later
+// names on a line that declares several, with the value either a numeric
+// literal or arithmetic on literals (1728 / 231). Anything else -- a call, a
+// reference to another name -- is not a constant this file can judge.
+const ARITHMETIC = /^[\d.eE\s+\-*/()]+$/;
+// `plain` marks the one form the conflict scan below always read: a single
+// name bound to a bare literal.
+function* numericConstants(src) {
+  for (const stmt of src.matchAll(/^\s*const\s+([^;]+);/gm)) {
+    const parts = stmt[1].split(/,(?![^(]*\))/);
+    for (const part of parts) {
+      const m = /^\s*([A-Z][A-Z0-9_]*)\s*=\s*(.+?)\s*$/.exec(part);
+      if (!m || !ARITHMETIC.test(m[2]) || !/\d/.test(m[2])) continue;
+      const value = Function(`"use strict"; return (${m[2]});`)();
+      const plain = parts.length === 1 && /^-?\d+(?:\.\d+)?(?:e-?\d+)?$/.test(m[2]);
+      if (typeof value === "number" && Number.isFinite(value)) yield [m[1], value, m[2], plain];
+    }
+  }
+}
 
 test("every module defines its unit-conversion constants exactly", () => {
   const wrong = [];
   let found = 0;
   for (const file of readdirSync(ROOT).filter((f) => /^calc-.*\.js$/.test(f))) {
     const src = readFileSync(resolve(ROOT, file), "utf8");
-    for (const [name, [exact, how]] of Object.entries(EXACT)) {
-      const re = new RegExp("\\bconst\\s+" + name + "\\s*=\\s*(-?[\\d.]+)\\s*;", "g");
-      for (const m of src.matchAll(re)) {
-        found++;
-        if (Number(m[1]) !== exact) {
-          wrong.push(`${file}: ${name} = ${m[1]}, but it is ${exact} (${how})`);
-        }
+    for (const [name, value, written] of numericConstants(src)) {
+      if (!Object.hasOwn(EXACT, name)) continue;
+      const [exact, how] = EXACT[name];
+      found++;
+      // Written as a definition, a factor can differ from the table's own
+      // arithmetic in the last binary place; a truncation differs by far more.
+      if (Math.abs(value - exact) > Math.abs(exact) * 1e-15) {
+        wrong.push(`${file}: ${name} = ${written}, but it is ${exact} (${how})`);
       }
     }
   }
   // A rename would leave this asserting nothing, which is the failure mode this
   // whole suite keeps finding elsewhere.
-  assert.ok(found >= 5, `expected to find the unit constants, found ${found} definition(s)`);
+  assert.ok(found >= 20, `expected to find the unit constants, found ${found} definition(s)`);
   assert.deepEqual(wrong, []);
 });
 
@@ -86,8 +123,12 @@ test("no two modules define the same named numeric constant differently", () => 
   const seen = new Map();
   for (const file of readdirSync(ROOT).filter((f) => /^calc-.*\.js$/.test(f))) {
     const src = readFileSync(resolve(ROOT, file), "utf8");
-    for (const m of src.matchAll(/^\s*const\s+([A-Z][A-Z0-9_]{3,})\s*=\s*(-?\d+(?:\.\d+)?(?:e-?\d+)?)\s*;/gm)) {
-      const [, name, value] = m;
+    for (const [name, number, , plain] of numericConstants(src)) {
+      if (name.length < 4) continue;
+      // Function-local limits declared several to a line (MIN_W, H_MAX) name
+      // different quantities in different places; a unit factor never does.
+      if (!plain && !name.includes("_PER_")) continue;
+      const value = String(number);
       if (!seen.has(name)) seen.set(name, new Map());
       const byValue = seen.get(name);
       if (!byValue.has(value)) byValue.set(value, []);
