@@ -9537,7 +9537,7 @@ export const CITATIONS = {
     ],
   },
   "scupper-width-for-flow": {
-    formula: "L = Q / (3.33 H^1.5) (suppressed); L = Q / (3.33 H^1.5) + 0.2 H (contracted); Q_cfs = required_gpm / 448.8; L and H in ft, width reported in inches.",
+    formula: "L = Q / (3.33 H^1.5) (suppressed); L = Q / (3.33 H^1.5) + 0.2 H (contracted); Q_cfs = required_gpm / 448.83; L and H in ft, width reported in inches.",
     edition: "The rectangular (Francis) weir capacity of an overflow scupper (secondary roof drainage per IPC 1108 / FM Global), by name, solved for the width.",
     freeAccess: "The Francis rectangular-weir formula is public; the secondary-drainage requirement is in the published IPC (Section 1108) and FM Global data sheets.",
     governance: GOVERNANCE.general,
@@ -9549,7 +9549,7 @@ export const CITATIONS = {
     ],
   },
   "overflow-scupper-sizing": {
-    formula: "Q = 3.33 L H^1.5 (cfs, L and H in ft); contracted Q = 3.33 (L - 0.2 H) H^1.5; gpm = cfs x 448.8.",
+    formula: "Q = 3.33 L H^1.5 (cfs, L and H in ft); contracted Q = 3.33 (L - 0.2 H) H^1.5; gpm = cfs x 448.83.",
     edition: "The rectangular (Francis) weir capacity of an overflow scupper, secondary roof drainage per IPC 1108 / FM Global, by name.",
     freeAccess: "The Francis rectangular-weir formula is public; the secondary-drainage requirement is in the published IPC (Section 1108) and FM Global data sheets.",
     governance: GOVERNANCE.general,

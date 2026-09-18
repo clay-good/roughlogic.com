@@ -6,6 +6,8 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **Two scupper tiles converted flow with 448.8.** The overflow-scupper and scupper-width tiles converted between cfs and gpm with 448.8, a looser rounding than the 448.831 the previous sweep caught. The exact factor is 448.8312, so they were 70 parts per million off. Both now use the definition, their citation formulas read 448.83, and the exact-constants scan now matches any 448.8x factor.
+
 - **The boiler pipe tile did not say its friction formula is a cool-water fit.** `boiler-pipe-sizing` applies Hazen-Williams to hydronic water. Hazen-Williams is empirical for cool water, and hot water's lower viscosity gives less friction, so the head loss shown runs high. That is conservative for sizing a pump. The formula also does not apply to glycol, whose heat capacity changes the tile's 500 factor too. Both limits are now among the tile's assumptions.
 
 - **The radon pipe loss used Blasius outside its range.** `radon-fan-static` took the friction factor as Blasius's 0.316 / Re^0.25 at every flow. Blasius holds for smooth pipe only from Re 4,000 to 100,000. A small fan in a 6 in pipe runs laminar, and at 8 cfm (Re about 1,300) Blasius overstated the loss by about 7%. The tile now takes f = 64 / Re below Re 2,300, keeps Blasius through its range, and uses the Swamee-Jain smooth-pipe fit above 100,000. The worked example is unchanged. A laminar case in `test/unit/calc-containment.test.js` checks the result against Hagen-Poiseuille.

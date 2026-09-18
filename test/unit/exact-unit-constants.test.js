@@ -204,7 +204,7 @@ test("no code line converts cfs or horsepower with a truncated inline factor", (
     lines.forEach((line, i) => {
       if (/^\s*\/\//.test(line)) return;
       const code = line.replace(/"(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*'|`(?:[^`\\]|\\.)*`/g, '""').replace(/\/\/.*$/, "");
-      if (/[*/]\s*448\.83\d*\b|\b448\.83\d*\s*[*/]/.test(code)) found.push(`${file}:${i + 1}: ${line.trim()}`);
+      if (/[*/]\s*448\.8\d*\b|\b448\.8\d*\s*[*/]/.test(code)) found.push(`${file}:${i + 1}: ${line.trim()}`);
       if (/[*/]\s*0\.745\d*\b|\b0\.745\d*\s*[*/]/.test(code) && !/0\.745699872/.test(code)) found.push(`${file}:${i + 1}: ${line.trim()}`);
       if (/[*/]\s*0\.746\b|\b0\.746\s*[*/]/.test(code) && !INLINE_POWER_FLOW_ALLOWED.has(file)) found.push(`${file}:${i + 1}: ${line.trim()}`);
     });

@@ -275,7 +275,7 @@ export function computeOverflowScupperSizing({ length_in = 0, head_in = 0 } = {}
   const effL = Math.max(0, L - 0.2 * H);
   const q_cfs_contracted = 3.33 * effL * Math.pow(H, 1.5);
   return {
-    q_cfs, q_cfs_contracted, q_gpm: q_cfs * 448.8, q_gpm_contracted: q_cfs_contracted * 448.8,
+    q_cfs, q_cfs_contracted, q_gpm: q_cfs * (60 * 1728 / 231), q_gpm_contracted: q_cfs_contracted * (60 * 1728 / 231),
     note: "Overflow scupper capacity as a rectangular (Francis) weir: Q = 3.33 L H^1.5 (cfs, L and H in feet), or the contracted form 3.33 (L - 0.2 H) H^1.5 for a scupper narrower than the wall. The head H is measured above the scupper invert at the design (blocked-primary) condition, and the overflow scuppers or drains must pass the design rainfall with the primary system assumed plugged (IPC 1108 / FM Global). Round the width up and keep the parapet high enough for the head. A design aid; the plumbing code and the structural roof-loading check govern.",
   };
 }
@@ -312,7 +312,7 @@ export function computeScupperWidthForFlow({ required_gpm = 0, head_in = 0 } = {
   const head = Number(head_in) || 0;
   if (!(gpm > 0)) return { error: "Required overflow flow must be positive (gpm)." };
   if (!(head > 0)) return { error: "Head must be positive (in)." };
-  const q_cfs = gpm / 448.8;
+  const q_cfs = gpm / (60 * 1728 / 231);
   const H = head / 12;
   const base_ft = q_cfs / (3.33 * Math.pow(H, 1.5));
   const width_suppressed_in = base_ft * 12;
