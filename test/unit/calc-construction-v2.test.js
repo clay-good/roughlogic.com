@@ -539,22 +539,22 @@ test("Anchor: example yields positive embedment", () => {
   assert.ok(r.embedment_in > 0);
 });
 
-test("Anchor: doubled load doubles embedment", () => {
+test("Anchor: doubled load deepens embedment by 2^(2/3) (breakout ~ hef^1.5)", () => {
   const a = computeAnchorEmbedment({ uplift_lb: 5000, bolt_diameter_in: 0.625, fc_psi: 3000 });
   const b = computeAnchorEmbedment({ uplift_lb: 10000, bolt_diameter_in: 0.625, fc_psi: 3000 });
-  assert.ok(close(b.embedment_in, 2 * a.embedment_in));
+  assert.ok(close(b.embedment_in, Math.pow(2, 2 / 3) * a.embedment_in));
 });
 
-test("Anchor: doubled diameter halves embedment", () => {
+test("Anchor: concrete breakout does not depend on the bolt diameter", () => {
   const a = computeAnchorEmbedment({ uplift_lb: 5000, bolt_diameter_in: 0.5, fc_psi: 3000 });
   const b = computeAnchorEmbedment({ uplift_lb: 5000, bolt_diameter_in: 1.0, fc_psi: 3000 });
-  assert.ok(close(b.embedment_in, a.embedment_in / 2));
+  assert.ok(close(b.embedment_in, a.embedment_in));
 });
 
-test("Anchor: 4x fc halves embedment (sqrt scaling)", () => {
+test("Anchor: 4x fc shortens embedment by 2^(-2/3) (sqrt fc, hef^1.5)", () => {
   const a = computeAnchorEmbedment({ uplift_lb: 5000, bolt_diameter_in: 0.625, fc_psi: 3000 });
   const b = computeAnchorEmbedment({ uplift_lb: 5000, bolt_diameter_in: 0.625, fc_psi: 12000 });
-  assert.ok(close(b.embedment_in, a.embedment_in / 2));
+  assert.ok(close(b.embedment_in, a.embedment_in * Math.pow(2, -2 / 3)));
 });
 
 test("Anchor: zero load returns error", () => {
@@ -582,8 +582,11 @@ test("Anchor: T returned matches input", () => {
   assert.equal(r.T_lb, 5000);
 });
 
-test("Anchor: hand-calc 5000 / (0.7 * sqrt(3000) * pi * 0.625)", () => {
+test("Anchor: hand-calc ACI 17.6.2 breakout hef = [5000 / (0.70 x 1.25 x 24 x sqrt(3000))]^(2/3)", () => {
   const r = computeAnchorEmbedment({ uplift_lb: 5000, bolt_diameter_in: 0.625, fc_psi: 3000 });
-  const expected = 5000 / (0.7 * Math.sqrt(3000) * Math.PI * 0.625);
-  assert.ok(close(r.embedment_in, expected, 0.01));
+  const expected = Math.pow(5000 / (0.70 * 1.25 * 24 * Math.sqrt(3000)), 2 / 3);
+  assert.ok(close(r.embedment_in, expected, 1e-9));
+  // Cracked: psi_c,N 1.0 -> 1.25^(2/3) deeper.
+  const c = computeAnchorEmbedment({ uplift_lb: 5000, bolt_diameter_in: 0.625, fc_psi: 3000, cracked: true });
+  assert.ok(close(c.embedment_cracked_in, expected * Math.pow(1.25, 2 / 3), 1e-9));
 });

@@ -4103,8 +4103,8 @@ test("monotonicity: computeMolecularWeight molecular_weight is strictly increasi
     `MW(O2) = ${o2.molecular_weight} != 2 * MW(O) = ${2 * o.molecular_weight}`);
 });
 
-test("monotonicity: computeDrywall mud_gal + tape_lf + total_ft2 are strictly increasing in wall_area_ft2 at fixed ceiling / sheet (0.053 gal/ft^2 + 1.0 lf/ft^2 linear pin)", () => {
-  // Group E. mud_gal = total_ft2 * 0.053; tape_lf = total_ft2 * 1.0.
+test("monotonicity: computeDrywall mud_gal + tape_lf + total_ft2 are strictly increasing in wall_area_ft2 at fixed ceiling / sheet (1/70 gal/ft^2 + 0.4 lf/ft^2 linear pin, the citation's rates)", () => {
+  // Group E. mud_gal = total_ft2 / 70; tape_lf = total_ft2 * 0.4.
   // Strictly increasing in wall_area_ft2 at fixed ceiling.
   let prevMud = -Infinity;
   let prevTape = -Infinity;
@@ -4120,13 +4120,13 @@ test("monotonicity: computeDrywall mud_gal + tape_lf + total_ft2 are strictly in
     prevTotal = r.total_ft2;
   }
   // Closed-form pin from drywallExample: wall=1200 + ceiling=600 -> total=1800;
-  // mud = 1800 * 0.053 = 95.4 gal; tape = 1800 lf.
+  // mud = 1800 / 70 = 25.7 gal; tape = 720 lf.
   const ref = computeDrywall({ wall_area_ft2: 1200, ceiling_area_ft2: 600, sheet_size: "4x8", waste_percent: 10 });
   assert.equal(ref.total_ft2, 1800);
-  assert.ok(Math.abs(ref.mud_gal - 1800 * 0.053) < 1e-12,
-    `mud = ${ref.mud_gal}, expected ${1800 * 0.053}`);
-  assert.ok(Math.abs(ref.tape_lf - 1800) < 1e-12,
-    `tape = ${ref.tape_lf}, expected 1800`);
+  assert.ok(Math.abs(ref.mud_gal - 1800 / 70) < 1e-12,
+    `mud = ${ref.mud_gal}, expected ${1800 / 70}`);
+  assert.ok(Math.abs(ref.tape_lf - 720) < 1e-9,
+    `tape = ${ref.tape_lf}, expected 720`);
   // Sheets pin at 4x8 / 10% waste: ceil(1800 * 1.10 / 32) = ceil(61.875) = 62.
   assert.equal(ref.sheets, 62);
 });
@@ -6191,7 +6191,7 @@ import { computeUpgradeROI } from "../../calc-cross.js";
 import { computeSection121 } from "../../calc-realestate.js";
 import { computeLightningCountdown } from "../../calc-field.js";
 
-test("monotonicity: computeAnchorEmbedment embedment_in is strictly increasing in uplift_lb (linear pin); strictly decreasing in bolt_diameter_in at fixed uplift / fc (inverse-in-d pin); strictly decreasing in fc_psi at fixed uplift / d (inverse-sqrt-fc pin); embedment_ft = embedment_in / 12 exact", () => {
+test("monotonicity: computeAnchorEmbedment embedment_in is strictly increasing in uplift_lb (T^(2/3) breakout pin); independent of bolt_diameter_in (breakout is a concrete mode); strictly decreasing in fc_psi (fc^(-1/3) pin); embedment_ft = embedment_in / 12 exact", () => {
   // Group E. ld_in = T / (0.7 * sqrt(fc) * pi * d). Strictly increasing in
   // uplift T (linear), strictly decreasing in bolt diameter d (inverse),
   // strictly decreasing in concrete strength fc (inverse-sqrt).
@@ -6205,12 +6205,10 @@ test("monotonicity: computeAnchorEmbedment embedment_in is strictly increasing i
     prev = r.embedment_in;
   }
   // Strictly decreasing in diameter at fixed uplift / fc.
-  let prevD = Infinity;
-  for (const bolt_diameter_in of [0.25, 0.375, 0.5, 0.625, 0.75, 1.0]) {
+  const d0 = computeAnchorEmbedment({ uplift_lb: 5000, bolt_diameter_in: 0.25, fc_psi: 3000 }).embedment_in;
+  for (const bolt_diameter_in of [0.375, 0.5, 0.625, 0.75, 1.0]) {
     const r = computeAnchorEmbedment({ uplift_lb: 5000, bolt_diameter_in, fc_psi: 3000 });
-    assert.ok(r.embedment_in < prevD,
-      `ld at d=${bolt_diameter_in} = ${r.embedment_in} not less than prev=${prevD}`);
-    prevD = r.embedment_in;
+    assert.ok(Math.abs(r.embedment_in - d0) < 1e-12, `breakout hef should not depend on d: ${r.embedment_in} vs ${d0}`);
   }
   // Strictly decreasing in fc at fixed uplift / diameter (1/sqrt(fc) pin).
   let prevFc = Infinity;
@@ -6220,20 +6218,20 @@ test("monotonicity: computeAnchorEmbedment embedment_in is strictly increasing i
       `ld at fc=${fc_psi} = ${r.embedment_in} not less than prev=${prevFc}`);
     prevFc = r.embedment_in;
   }
-  // Doubling-uplift pin: 2x T -> 2x embedment exactly (linear in T).
+  // Doubling-uplift pin: 2x T -> 2^(2/3) x embedment (breakout ~ hef^1.5).
   const a = computeAnchorEmbedment({ uplift_lb: 2500, bolt_diameter_in: 0.625, fc_psi: 3000 });
   const b = computeAnchorEmbedment({ uplift_lb: 5000, bolt_diameter_in: 0.625, fc_psi: 3000 });
-  assert.ok(Math.abs(b.embedment_in - 2 * a.embedment_in) < 1e-9,
-    `2x T: ld = ${b.embedment_in} != 2 * ${a.embedment_in}`);
-  // 4x fc pin: 4x fc -> ld halved exactly (1/sqrt(fc) pin).
+  assert.ok(Math.abs(b.embedment_in - Math.pow(2, 2 / 3) * a.embedment_in) < 1e-9,
+    `2x T: hef = ${b.embedment_in} != 2^(2/3) * ${a.embedment_in}`);
+  // 4x fc pin: 4x fc -> hef x 2^(-2/3).
   const c = computeAnchorEmbedment({ uplift_lb: 5000, bolt_diameter_in: 0.625, fc_psi: 2000 });
   const d = computeAnchorEmbedment({ uplift_lb: 5000, bolt_diameter_in: 0.625, fc_psi: 8000 });
-  assert.ok(Math.abs(d.embedment_in - c.embedment_in / 2) < 1e-9,
-    `4x fc: ld = ${d.embedment_in}, expected ${c.embedment_in / 2}`);
-  // Closed-form pin from anchorEmbedmentExample: T=5000, d=0.625, fc=3000.
-  // ld = 5000 / (0.7 * sqrt(3000) * pi * 0.625).
+  assert.ok(Math.abs(d.embedment_in - c.embedment_in * Math.pow(2, -2 / 3)) < 1e-9,
+    `4x fc: hef = ${d.embedment_in}, expected ${c.embedment_in * Math.pow(2, -2 / 3)}`);
+  // Closed-form pin from anchorEmbedmentExample: T=5000, fc=3000, uncracked.
+  // hef = [5000 / (0.70 * 1.25 * 24 * sqrt(3000))]^(2/3) = 2.66 in.
   const ref = computeAnchorEmbedment({ uplift_lb: 5000, bolt_diameter_in: 0.625, fc_psi: 3000 });
-  const expectedLd = 5000 / (0.7 * Math.sqrt(3000) * Math.PI * 0.625);
+  const expectedLd = Math.pow(5000 / (0.70 * 1.25 * 24 * Math.sqrt(3000)), 2 / 3);
   assert.ok(Math.abs(ref.embedment_in - expectedLd) < 1e-9,
     `ld = ${ref.embedment_in}, expected ${expectedLd}`);
   assert.equal(ref.T_lb, 5000);
@@ -10393,7 +10391,7 @@ test("monotonicity: computeGlycolMix glycol_percent is monotone non-decreasing a
   assert.ok(tooCold.error, `expected error for T=-100, got ${JSON.stringify(tooCold)}`);
 });
 
-test("monotonicity: computeStairStringer stringer_in = sqrt(rise^2 + run^2) (Pythagorean pin) strictly increasing in both total_rise_in AND total_run_in; board_feet = (1.5 * 11.25 * stringer_in) / 144 (2x12 stringer linear pin); 108 / 126 -> stringer in 165-167 in (stairStringerExample band)", () => {
+test("monotonicity: computeStairStringer stringer_in = sqrt(rise^2 + run^2) (Pythagorean pin) strictly increasing in both total_rise_in AND total_run_in; board_feet = (2 * 12 * stringer_in) / 144 (nominal 2x12 stringer linear pin); 108 / 126 -> stringer in 165-167 in (stairStringerExample band)", () => {
   // Group E. Strictly increasing in rise at fixed run.
   let prev = -Infinity;
   for (const total_rise_in of [60, 80, 100, 120, 150, 200]) {
@@ -10423,8 +10421,8 @@ test("monotonicity: computeStairStringer stringer_in = sqrt(rise^2 + run^2) (Pyt
   // stairStringerExample band pin: 165-167 in for 108/126.
   assert.ok(ref.stringer_in >= 165 && ref.stringer_in <= 167,
     `stringer = ${ref.stringer_in}, expected 165-167 (example)`);
-  // board_feet closed-form pin: (1.5 * 11.25 * stringer_in) / 144.
-  const expectedBF = (1.5 * 11.25 * ref.stringer_in) / 144;
+  // board_feet closed-form pin on the nominal 2x12: (2 * 12 * stringer_in) / 144.
+  const expectedBF = (2 * 12 * ref.stringer_in) / 144;
   assert.ok(Math.abs(ref.board_feet - expectedBF) < 1e-9,
     `board_feet = ${ref.board_feet}, expected ${expectedBF}`);
   // 3-4-5 Pythagorean pin: rise 3 / run 4 -> stringer 5.
@@ -10686,7 +10684,8 @@ test("monotonicity: computeLumberSpan allowable_span_ft strictly decreasing in t
   const ref = computeLumberSpan({ species_grade: "DF-L_No2", nominal_size: "2x10", total_load_psf: 50, tributary_width_in: 16, deflection_limit: 360 });
   const w_lb_ft = 50 * (16 / 12);
   const w_lb_in = w_lb_ft / 12;
-  const expectedBending = Math.sqrt((8 * 900 * ref.section.S_in3) / w_lb_in) / 12;
+  // Fb' = 900 x C_F 1.1 (2x10) x C_r 1.15 (repetitive joists at 16 in).
+  const expectedBending = Math.sqrt((8 * 900 * 1.1 * 1.15 * ref.section.S_in3) / w_lb_in) / 12;
   assert.ok(Math.abs(ref.by_bending_ft - expectedBending) < 1e-9,
     `by_bending = ${ref.by_bending_ft}, expected ${expectedBending}`);
   // Section modulus pin for 2x10: S = b*d^2/6 = 1.5 * 9.25^2 / 6.
@@ -10694,8 +10693,8 @@ test("monotonicity: computeLumberSpan allowable_span_ft strictly decreasing in t
     `S = ${ref.section.S_in3}, expected ${(1.5 * 9.25 * 9.25) / 6}`);
   // allowable_span = min(bending, deflection) pin.
   assert.equal(ref.allowable_span_ft, Math.min(ref.by_bending_ft, ref.by_deflection_ft));
-  // 50 psf 2x10 is bending-governed (bending < deflection here).
-  assert.equal(ref.governing, "bending");
+  // With C_F and C_r applied, 50 psf 2x10 is deflection-governed (15.21 < 15.61 ft), as the IRC tables are.
+  assert.equal(ref.governing, "deflection");
   // allowable_deflection_in = span_in / 360 (default L/360) pin.
   assert.ok(Math.abs(ref.allowable_deflection_in - (ref.allowable_span_ft * 12) / 360) < 1e-9,
     `allowable_deflection = ${ref.allowable_deflection_in}, expected ${(ref.allowable_span_ft * 12) / 360}`);
@@ -10907,7 +10906,7 @@ test("monotonicity: computeDuctLeakage leakage_cfm strictly decreasing in measur
     "expected error for unknown SMACNA class");
 });
 
-test("monotonicity: computeDemoDebris tons strictly increasing in volume_yd3 (linear, tons = volume_yd3*27*pcf/2000) and strictly increasing in structure density wood_frame 50 < mixed 100 < masonry 130 < concrete 150 (lb/ft3); volume_ft3 = volume_yd3*27 exact; 2x volume -> 2x tons; dumpster_yd3 monotone non-decreasing in volume; 25 yd3 wood_frame -> 16.875 tons / 675 ft3 / 30 yd3 example pin; bad type / volume -> error", () => {
+test("monotonicity: computeDemoDebris tons strictly increasing in volume_yd3 (linear, tons = volume_yd3*27*pcf/2000) and follows the loose-debris densities wood_frame 18 < mixed 60 < concrete 85 < masonry 110 (lb/ft3); volume_ft3 = volume_yd3*27 exact; 2x volume -> 2x tons; dumpster_yd3 monotone non-decreasing in volume; 25 yd3 wood_frame -> 6.075 tons / 675 ft3 / 30 yd3 example pin; bad type / volume -> error", () => {
   // Group E. tons = volume_yd3 * 27 * pcf / 2000. Strictly increasing in volume.
   let prev = -Infinity;
   for (const volume_yd3 of [5, 10, 25, 50, 100]) {
@@ -10922,15 +10921,15 @@ test("monotonicity: computeDemoDebris tons strictly increasing in volume_yd3 (li
   const mixed = computeDemoDebris({ structure_type: "mixed", volume_yd3: 25 });
   const masonry = computeDemoDebris({ structure_type: "masonry", volume_yd3: 25 });
   const concrete = computeDemoDebris({ structure_type: "concrete", volume_yd3: 25 });
-  assert.equal(wood.pcf, 50);
-  assert.equal(mixed.pcf, 100);
-  assert.equal(masonry.pcf, 130);
-  assert.equal(concrete.pcf, 150);
-  assert.ok(wood.tons < mixed.tons && mixed.tons < masonry.tons && masonry.tons < concrete.tons,
-    `density ordering: ${wood.tons} < ${mixed.tons} < ${masonry.tons} < ${concrete.tons}`);
+  assert.equal(wood.pcf, 18);
+  assert.equal(mixed.pcf, 60);
+  assert.equal(masonry.pcf, 110);
+  assert.equal(concrete.pcf, 85);
+  assert.ok(wood.tons < mixed.tons && mixed.tons < concrete.tons && concrete.tons < masonry.tons,
+    `density ordering: ${wood.tons} < ${mixed.tons} < ${concrete.tons} < ${masonry.tons}`);
   // Closed-form pin: tons = volume_yd3 * 27 * pcf / 2000.
-  assert.ok(Math.abs(masonry.tons - (25 * 27 * 130) / 2000) < 1e-9,
-    `tons = ${masonry.tons}, expected ${(25 * 27 * 130) / 2000}`);
+  assert.ok(Math.abs(masonry.tons - (25 * 27 * 110) / 2000) < 1e-9,
+    `tons = ${masonry.tons}, expected ${(25 * 27 * 110) / 2000}`);
   // 2x volume -> 2x tons (linear pin).
   const v25 = computeDemoDebris({ structure_type: "concrete", volume_yd3: 25 });
   const v50 = computeDemoDebris({ structure_type: "concrete", volume_yd3: 50 });
@@ -10943,8 +10942,8 @@ test("monotonicity: computeDemoDebris tons strictly increasing in volume_yd3 (li
       `dumpster at V=${volume_yd3} = ${r.dumpster_yd3} below prev=${prevDump}`);
     prevDump = r.dumpster_yd3;
   }
-  // Example pin: 25 yd3 wood frame -> 16.875 tons, 675 ft3, 30 yd3 dumpster.
-  assert.equal(wood.tons, 16.875);
+  // Example pin: 25 yd3 wood frame -> 6.075 tons, 675 ft3, 30 yd3 dumpster.
+  assert.ok(Math.abs(wood.tons - 6.075) < 1e-9);
   assert.equal(wood.volume_ft3, 675);
   assert.equal(wood.dumpster_yd3, 30);
   // Bounds pins.

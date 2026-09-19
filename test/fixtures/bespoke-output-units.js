@@ -17,7 +17,7 @@ export const BESPOKE_OUTPUT_UNITS = {
   "ambient-ampacity-adjust": {"adjusted_ampacity_a":{"prefix":"","suffix":" A","digits":1}},
   "amortization-schedule": {"monthly_principal_and_interest":{"prefix":"$","suffix":"","digits":2},"total_interest":{"prefix":"$","suffix":"","digits":2},"total_paid":{"prefix":"$","suffix":"","digits":2}},
   "amp-power-spl": {"spl_db":{"prefix":"","suffix":" dB","digits":2}},
-  "anchor-embedment": {"embedment_in":{"prefix":"","suffix":" in","digits":2},"embedment_ft":{"prefix":"","suffix":" ft","digits":3}},
+  "anchor-embedment": {"embedment_ft":{"prefix":"","suffix":" ft","digits":3}},
   "annulus-area": {"ring_area":{"prefix":"","suffix":" (square units)","digits":4}},
   "antimicrobial-dilution": {"finished_gal":{"prefix":"","suffix":" gal","digits":2},"water_gal":{"prefix":"","suffix":" gal","digits":2},"per_tank_conc_oz":{"prefix":"","suffix":" oz concentrate","digits":2}},
   "approach-delta-t": {"approach_F":{"prefix":"","suffix":" F","digits":1},"delta_T_F":{"prefix":"","suffix":" F","digits":1}},

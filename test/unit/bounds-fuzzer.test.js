@@ -8720,12 +8720,12 @@ test("bounds: calc-construction computeMaterialQuantity pins units_raw = area/co
   assert.ok("error" in computeMaterialQuantity({ assembly: "moonsheets", area_ft2: 100 }));
 });
 
-test("bounds: calc-construction computeStairStringer pins stringer_in = sqrt(rise^2+run^2) and board_feet on 2x12", () => {
+test("bounds: calc-construction computeStairStringer pins stringer_in = sqrt(rise^2+run^2) and board_feet on a nominal 2x12", () => {
   const r = computeStairStringer({ total_rise_in: 108, total_run_in: 126 });
   const s = Math.sqrt(108 * 108 + 126 * 126);
   assert.ok(Math.abs(r.stringer_in - s) < 1e-9);
   assert.ok(Math.abs(r.stringer_ft - s / 12) < 1e-9);
-  assert.ok(Math.abs(r.board_feet - (1.5 * 11.25 * s) / 144) < 1e-9);
+  assert.ok(Math.abs(r.board_feet - (2 * 12 * s) / 144) < 1e-9); // nominal, as lumber is priced
   assert.ok("error" in computeStairStringer({ total_rise_in: 0, total_run_in: 100 }));
   assert.ok("error" in computeStairStringer({ total_rise_in: 100, total_run_in: 0 }));
 });
@@ -8886,9 +8886,9 @@ test("bounds: calc-construction computeSnowLoad pins Pf = 0.7*Ce*Ct*Is*Pg per AS
   assert.ok("error" in computeSnowLoad({ Pg_psf: 0 }));
 });
 
-test("bounds: calc-construction computeAnchorEmbedment pins ld = T/(0.7*sqrt(fc)*pi*d) from public bond strength", () => {
+test("bounds: calc-construction computeAnchorEmbedment pins the ACI 318-19 17.6.2 breakout embedment", () => {
   const r = computeAnchorEmbedment({ uplift_lb: 5000, bolt_diameter_in: 0.625, fc_psi: 3000 });
-  const expected_in = 5000 / (0.7 * Math.sqrt(3000) * Math.PI * 0.625);
+  const expected_in = Math.pow(5000 / (0.70 * 1.25 * 24 * Math.sqrt(3000)), 2 / 3); // 2.66 in, uncracked
   assert.ok(Math.abs(r.embedment_in - expected_in) < 1e-9);
   assert.ok(Math.abs(r.embedment_ft - expected_in / 12) < 1e-9);
   assert.strictEqual(r.T_lb, 5000);
@@ -8897,12 +8897,12 @@ test("bounds: calc-construction computeAnchorEmbedment pins ld = T/(0.7*sqrt(fc)
   assert.ok("error" in computeAnchorEmbedment({ uplift_lb: 1, bolt_diameter_in: 0.5, fc_psi: 0 }));
 });
 
-test("bounds: calc-construction computeDrywall pins sheets = ceil(total*(1+waste)/sheetA), mud=0.053 gal/ft^2, tape=1 lf/ft^2", () => {
+test("bounds: calc-construction computeDrywall pins sheets = ceil(total*(1+waste)/sheetA), mud = 1 gal/70 ft^2, tape = 0.4 lf/ft^2", () => {
   const r = computeDrywall({ wall_area_ft2: 1200, ceiling_area_ft2: 600, sheet_size: "4x8", waste_percent: 10 });
   assert.strictEqual(r.total_ft2, 1800);
   assert.strictEqual(r.sheets, Math.ceil((1800 * 1.10) / 32));
-  assert.ok(Math.abs(r.mud_gal - 1800 * 0.053) < 1e-9);
-  assert.strictEqual(r.tape_lf, 1800);
+  assert.ok(Math.abs(r.mud_gal - 1800 / 70) < 1e-9);
+  assert.ok(Math.abs(r.tape_lf - 720) < 1e-9);
   assert.strictEqual(r.screws, Math.ceil((1200 / 32) * 28 + (600 / 32) * 32));
   // Rejections.
   assert.ok("error" in computeDrywall({ wall_area_ft2: -1, ceiling_area_ft2: 0 }));
@@ -9175,9 +9175,9 @@ test("bounds: calc-construction computeWeldUsage pins deposit_lb = A*L*0.283 (st
 test("bounds: calc-construction computeDemoDebris pins tons = (volume_ft3*pcf)/2000 and dumpster ladder", () => {
   const r = computeDemoDebris({ structure_type: "wood_frame", volume_yd3: 25 });
   assert.strictEqual(r.volume_ft3, 25 * 27);
-  assert.ok(Math.abs(r.tons - (25 * 27 * 50) / 2000) < 1e-9);
+  assert.ok(Math.abs(r.tons - (25 * 27 * 18) / 2000) < 1e-9); // loose wood-frame debris, 18 pcf
   assert.strictEqual(r.dumpster_yd3, 30); // first ladder entry >= 25.
-  assert.strictEqual(r.pcf, 50);
+  assert.strictEqual(r.pcf, 18);
   // Overflow above 40 yd^3 clamps to 40.
   const big = computeDemoDebris({ structure_type: "wood_frame", volume_yd3: 200 });
   assert.strictEqual(big.dumpster_yd3, 40);

@@ -2,7 +2,7 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "3a22243d48c32790",
+      "sha": "20b6f2ee5745eccd",
       "date": "2026-09-19"
     },
     "/tools/": {
@@ -18,8 +18,8 @@
       "date": "2026-09-18"
     },
     "/groups/construction/": {
-      "sha": "1a622bd204609bc6",
-      "date": "2026-09-18"
+      "sha": "32480ebd93dfbe97",
+      "date": "2026-09-19"
     },
     "/groups/cross-trade/": {
       "sha": "27bdaea9afb010ca",
@@ -274,8 +274,8 @@
       "date": "2026-09-01"
     },
     "/tools/anchor-embedment/": {
-      "sha": "772172b930b696e6",
-      "date": "2026-09-01"
+      "sha": "5b48192226a2645b",
+      "date": "2026-09-19"
     },
     "/tools/anchor-epoxy-volume/": {
       "sha": "2bc5871aa5a3217c",
@@ -2090,8 +2090,8 @@
       "date": "2026-09-01"
     },
     "/tools/demo-debris/": {
-      "sha": "1e9b7623151df300",
-      "date": "2026-09-01"
+      "sha": "9f9a728fdf01670f",
+      "date": "2026-09-19"
     },
     "/tools/density-altitude/": {
       "sha": "2ba3918799a2d131",
@@ -2382,8 +2382,8 @@
       "date": "2026-09-01"
     },
     "/tools/drywall/": {
-      "sha": "39b59b43923b4d74",
-      "date": "2026-09-01"
+      "sha": "37018ac88b986d11",
+      "date": "2026-09-19"
     },
     "/tools/drywall-fastener-takeoff/": {
       "sha": "ad199bfb1c10ce4b",
@@ -4306,8 +4306,8 @@
       "date": "2026-09-06"
     },
     "/tools/lumber-spans/": {
-      "sha": "80919ff7fe89ba6f",
-      "date": "2026-09-01"
+      "sha": "345d5f953156090c",
+      "date": "2026-09-19"
     },
     "/tools/lumen-method/": {
       "sha": "3b6d56ee087789cc",
@@ -7290,8 +7290,8 @@
       "date": "2026-09-01"
     },
     "/tools/stair-stringer/": {
-      "sha": "6d2f90256bb6c356",
-      "date": "2026-09-01"
+      "sha": "34ee5167e38a5e62",
+      "date": "2026-09-19"
     },
     "/tools/stair-stringer-layout/": {
       "sha": "c9f85042b91eb23b",
@@ -8766,8 +8766,8 @@
       "date": "2026-09-01"
     },
     "/tools/wood-combined-bending-axial/": {
-      "sha": "d31eec6291cf4f04",
-      "date": "2026-09-01"
+      "sha": "708cdb25d62b0488",
+      "date": "2026-09-19"
     },
     "/tools/wood-emc/": {
       "sha": "124e438ce7e6c15d",

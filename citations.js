@@ -5015,7 +5015,7 @@ export const CITATIONS = {
     ],
   },
   "anchor-embedment": {
-    formula: "Bond-strength embedment ld = T / (0.7 x sqrt(f'c) x pi x d), with the cracked-concrete case taken as ld / 0.7 and the ACI 318 §17 critical edge distance flagged at 1.5 x hef. A screen, not the §17 concrete-breakout (Ncb) calculation.",
+    formula: "ACI 318-19 §17.6.2 concrete breakout of a single cast-in headed anchor solved for the embedment: hef = [Nua / (0.70 x psi_c,N x 24 x lambda x sqrt(f'c))]^(2/3), psi_c,N = 1.25 uncracked / 1.0 cracked, Nua the factored tension; the critical edge distance 1.5 x hef is flagged. The inverse of concrete-anchor-breakout. Bolt steel (§17.6.1), pullout (§17.6.3) and code minimum embedments are separate checks.",
     edition: "ACI 318-19 §17 (Anchoring to Concrete). " + IBC_2021 + " §1908 references ACI 318.",
     freeAccess: "ACI 318 licensed; principles free in published structural texts.",
     governance: GOVERNANCE.structural,

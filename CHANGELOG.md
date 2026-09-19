@@ -6,6 +6,16 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **Anchor embedment asked for 5.5 ft, and five construction tiles disagreed with their own citations.**
+  - `anchor-embedment` treated a cast-in headed bolt as a bonded smooth bar at about 38 psi of bond. It asked 66 in of embedment for 5,000 lb on a 5/8 in bolt. It now solves ACI 318-19 17.6.2 concrete breakout for the embedment: 2.66 in uncracked. This is the inverse of `concrete-anchor-breakout`, and it round-trips through that tile exactly. Steel, pullout and code minimum embedments are separate checks, and the tile now says so.
+  - `lumber-spans` used the raw reference Fb, with neither the NDS size factor its own module carries nor the 1.15 repetitive-member factor that joist tables include. Spans ran 9-27% short.
+  - `stair-stringer` counted board feet on the actual 1.5 x 11.25 in section, 30% under what is bought. Board feet are priced on nominal size.
+  - `drywall` used 1.0 lf of tape and 0.053 gal of mud per ft^2, where its citation states 0.4 lf and 1 gal per 70 ft^2.
+  - `demo-debris` applied solid densities (wood 50, concrete 150 pcf) to loose debris volume. It now uses the loose densities its citation states (wood-frame 18, mixed 60, masonry 110). Broken concrete takes about 85 pcf, from the 2,000-2,400 lb/yd^3 a container of it weighs.
+  - The pinned `wood-combined-bending-axial` example entered Fc* where the tile's own note requires Fc' with the column-stability factor. With Cp = 0.4685 the interaction is 0.71, not 0.55.
+
+  Found by an independent plausibility pass over calc-construction. Two findings were left: sliding snow, whose ASCE 7 wording supports the tile's conservative reading, and snow drift, pending a readable copy of ASCE 7-22.
+
 - **Galvanized gauges read thin, PV strings came out a module short, and four smaller factor fixes.**
   - `sheet-metal-gauge`: its own comment says galvanized is MSG plus zinc, but it held the 1893 U.S. Standard Gauge fractions for iron plate, e.g. 16 ga = 1/16 = 0.0625 in. The published galvanized chart gives 0.0635. The duct gauges were worst: 30 ga read 0.0125 where galvanized is 0.0157, 20% thin.
   - `pv-string-sizing`: it used the record-high air temperature as the cell temperature. In sun a module runs about 30 C above the air. Its hot-day Vmp read high, and the worked string's minimum came out 7 where 8 is needed; seven modules make 196 V on a hot day, under the 200 V MPPT floor. The cell rise is now an input (default 30 C).

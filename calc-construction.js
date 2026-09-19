@@ -281,7 +281,13 @@ export function computeLumberSpan({ species_grade, nominal_size, total_load_psf,
   if (!(tributary_width_in > 0)) return { error: "Tributary width must be positive." };
   if (!(deflection_limit > 0)) return { error: "Deflection limit must be positive." };
   const w_lb_ft = total_load_psf * (tributary_width_in / 12);
-  const L_b = allowableSpanByBending({ w_lb_ft, Fb_psi: _lumberBaseFb(species_grade, nominal_size, props), b_in: dim.b_in, d_in: dim.d_in });
+  // Fb' for repetitive joists (NDS 4.3): the size factor C_F (1.0 for SP, whose
+  // table is already per width) and the repetitive-member factor C_r = 1.15 at
+  // 24 in on center or closer. Until 2026-09-18 the raw Fb was used, 9-27%
+  // short of the IRC span tables built on the same factors.
+  const C_F = String(species_grade || "").split("_")[0] === "SYP" ? 1.0 : (_V15C_CF_BENDING[nominal_size] || 1.0);
+  const C_r = tributary_width_in <= 24 ? 1.15 : 1.0;
+  const L_b = allowableSpanByBending({ w_lb_ft, Fb_psi: _lumberBaseFb(species_grade, nominal_size, props) * C_F * C_r, b_in: dim.b_in, d_in: dim.d_in });
   const L_d = allowableSpanByDeflection({ w_lb_ft, E_psi: props.E_psi, b_in: dim.b_in, d_in: dim.d_in, deflectionLimit: deflection_limit });
   const L_max = Math.min(L_b, L_d);
   const governs = L_b < L_d ? "bending" : "deflection";
@@ -772,8 +778,10 @@ export function computeStairStringer({ total_rise_in, total_run_in, tread_cut_de
   if (r <= 0 || run <= 0) return { error: "Provide positive rise and run." };
   const stringer_in = Math.sqrt(r * r + run * run);
   const stringer_ft = stringer_in / 12;
-  // Board-foot estimate using a 2x12 stringer (1.5 in x 11.25 in actual).
-  const board_feet = (1.5 * 11.25 * stringer_in) / 144;
+  // Board feet on the NOMINAL 2x12 (2 x 12 in), the way lumber is priced and
+  // the way board-footage and residential-framing count it. Until 2026-09-18
+  // this used the actual 1.5 x 11.25 in section, 30% short of what is bought.
+  const board_feet = (2 * 12 * stringer_in) / 144;
   return { stringer_in, stringer_ft, board_feet, tread_cut_depth_in };
 }
 
@@ -1098,8 +1106,14 @@ export const snowLoadExample = {
 
 // --- Utility 99: Anchor Bolt Embedment ---
 //
-// Pull-out capacity per public bond strength: T = 0.7 * sqrt(fc) * pi * d * ld.
-// Solve for ld given target T: ld = T / (0.7 * sqrt(fc) * pi * d).
+// A cast-in headed anchor in tension is governed by concrete BREAKOUT, ACI
+// 318-19 17.6.2: phi Ncb = phi psi_c,N kc lambda sqrt(f'c) hef^1.5 for a single
+// anchor with full edge distance (1.5 hef), kc = 24, phi = 0.70 (Condition B),
+// psi_c,N = 1.25 uncracked / 1.0 cracked. Solved for hef given the factored
+// tension: hef = [Nua / (phi psi 24 sqrt(f'c))]^(2/3) -- the inverse of
+// concrete-anchor-breakout. Until 2026-09-18 this treated the headed bolt as a
+// bonded smooth bar at 0.7 sqrt(f'c) (~38 psi) of bond: 66 in (5.5 ft) of
+// embedment for 5,000 lb on a 5/8 in bolt, where breakout needs ~2.7 in.
 
 // dims: in { uplift_lb: M L T^-2, bolt_diameter_in: L, fc_psi: M L^-1 T^-2, cracked: dimensionless, edge_distance_in: L } out: { embedment_in: L, embedment_cracked_in: L, edge_critical_in: L }
 export function computeAnchorEmbedment({ uplift_lb, bolt_diameter_in, fc_psi, cracked = false, edge_distance_in = 0 }) {
@@ -1108,17 +1122,17 @@ export function computeAnchorEmbedment({ uplift_lb, bolt_diameter_in, fc_psi, cr
   const d = Number(bolt_diameter_in) || 0;
   const fc = Number(fc_psi) || 0;
   if (T <= 0 || d <= 0 || fc <= 0) return { error: "Provide positive uplift, diameter, fc." };
-  const ld_in = T / (0.7 * Math.sqrt(fc) * Math.PI * d);
-  // v23 EN.9: cracked-concrete derate (ACI 318 Ch.17: cracked capacity ~0.7
-  // of uncracked, so the required embedment grows) and an edge-distance flag
-  // against the 1.5*hef critical edge distance for breakout. Defaults
-  // (uncracked, no edge) leave the base embedment unchanged.
-  const embedment_cracked_in = cracked ? ld_in / 0.7 : ld_in;
+  const hefFor = (psi) => Math.pow(T / (0.70 * psi * 24 * Math.sqrt(fc)), 2 / 3);
+  const ld_in = hefFor(1.25);
+  // Cracked concrete drops psi_c,N from 1.25 to 1.0 (ACI 17.6.2.5), so the
+  // required embedment grows by 1.25^(2/3) = 1.16. The edge flag checks the
+  // 1.5 hef distance a full breakout cone needs.
+  const embedment_cracked_in = cracked ? hefFor(1.0) : ld_in;
   const edge_critical_in = 1.5 * embedment_cracked_in;
   let edge_reduced_flag = false;
   const edge = Number(edge_distance_in) || 0;
   if (edge > 0 && Number.isFinite(edge) && edge < edge_critical_in) edge_reduced_flag = true;
-  return { embedment_in: ld_in, embedment_cracked_in, edge_critical_in, edge_reduced_flag, cracked: !!cracked, embedment_ft: ld_in / 12, T_lb: T };
+  return { embedment_in: ld_in, embedment_cracked_in, edge_critical_in, edge_reduced_flag, cracked: !!cracked, embedment_ft: ld_in / 12, T_lb: T, bolt_diameter_in: d };
 }
 
 export const anchorEmbedmentExample = {
@@ -1384,8 +1398,8 @@ export function renderSnowLoad(inputRegion, outputRegion, citationEl) {
 
 // dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderAnchorEmbedment(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: ld = T / (0.7 * sqrt(fc) * pi * d). Public bond strength formula.";
-  const T = makeNumber("Uplift load (lb)", "ae-t", { step: "any", min: "0" });
+  citationEl.textContent = "Citation: ACI 318-19 17.6.2 concrete breakout of a single cast-in headed anchor, solved for the embedment: hef = [Nua / (0.70 x psi_c,N x 24 x sqrt(fc))]^(2/3), psi_c,N 1.25 uncracked / 1.0 cracked; full breakout needs 1.5 hef to an edge. Breakout only: the bolt steel (17.6.1), head pullout (17.6.3) and any code minimum embedment (e.g. 7 in for IRC sill anchors) are checked separately.";
+  const T = makeNumber("Factored uplift Nua (lb, LRFD)", "ae-t", { step: "any", min: "0" });
   const d = makeNumber("Bolt diameter (in)", "ae-d", { step: "any", min: "0" });
   const fc = makeNumber("Concrete fc (psi)", "ae-fc", { step: "any", min: "0" });
   // v23 EN.9: cracked-concrete toggle + edge distance.
@@ -1405,7 +1419,7 @@ export function renderAnchorEmbedment(inputRegion, outputRegion, citationEl) {
       edge_distance_in: Number(edge.input.value) || 0,
     });
     if (r.error) { oI.textContent = r.error; oF.textContent = "-"; oE.textContent = "-"; return; }
-    oI.textContent = fmt(r.embedment_in, 2) + " in";
+    oI.textContent = fmt(r.embedment_in, 2) + " in (concrete breakout; steel, pullout and code minimums checked separately)";
     oF.textContent = fmt(r.embedment_ft, 3) + " ft";
     oE.textContent = (r.cracked ? "cracked: " + fmt(r.embedment_cracked_in, 2) + " in required; " : "uncracked; ") + "critical edge " + fmt(r.edge_critical_in, 2) + " in" + (r.edge_reduced_flag ? " - FLAG: edge below critical, capacity reduced" : "");
   }, DEBOUNCE_MS);
@@ -1430,9 +1444,11 @@ export function computeDrywall({ wall_area_ft2 = 0, ceiling_area_ft2 = 0, sheet_
   const total_ft2 = wall_area_ft2 + ceiling_area_ft2;
   if (total_ft2 === 0) return { error: "Provide a wall or ceiling area." };
   const sheets = Math.ceil((total_ft2 * (1 + waste_percent / 100)) / sheetA);
-  // Public engineering practice benchmarks: 0.053 gal mud / ft^2; 1.0 lf tape / ft^2.
-  const mud_gal = total_ft2 * 0.053;
-  const tape_lf = total_ft2 * 1.0;
+  // The rates the citation states (USG / GA-216 practice): about 1 gal of
+  // ready-mix per 70 ft^2 and 0.4 lf of tape per ft^2. Until 2026-09-18 the
+  // code used 0.053 gal and 1.0 lf per ft^2, 3.7x and 2.5x its own citation.
+  const mud_gal = total_ft2 / 70;
+  const tape_lf = total_ft2 * 0.4;
   const screws = Math.ceil((wall_area_ft2 / sheetA) * 28 + (ceiling_area_ft2 / sheetA) * 32);
   return { sheets, mud_gal, tape_lf, screws, total_ft2 };
 }
@@ -1770,7 +1786,11 @@ export const weldUsageExample = { inputs: { process: "GMAW", weld_cross_section_
 
 // --- Utility 157: Demolition Debris Weight ---
 
-export const DEMO_DEBRIS_PCF = { wood_frame: 50, mixed: 100, masonry: 130, concrete: 150 };
+// LOOSE debris densities, as the citation states them (wood-frame ~18, mixed ~60,
+// masonry ~110 pcf); broken concrete in a container runs 2,000-2,400 lb/yd^3,
+// about 85 pcf. Until 2026-09-18 these were the SOLID densities (wood 50,
+// concrete 150) applied to loose volume, about 3x the tonnage for wood-frame demo.
+export const DEMO_DEBRIS_PCF = { wood_frame: 18, mixed: 60, masonry: 110, concrete: 85 };
 export const DUMPSTER_SIZES_YD3 = [10, 20, 30, 40];
 
 // dims: in { structure_type: dimensionless, volume_yd3: L^3 } out: { debris_yd3: L^3, containers: dimensionless }
@@ -6632,7 +6652,7 @@ export function computeWoodCombinedBendingAxial({ p_lb = 0, m_inlb = 0, a_in2 = 
     note: "NDS 3.9.2 beam-column interaction (fc/Fc')^2 + fb/[Fb'(1 - fc/FcE)] <= 1.0 with the Euler stress FcE = 0.822 Emin'/(le/d)^2; the 1 - fc/FcE term is the P-delta moment magnifier that grows without bound as the axial stress approaches FcE. Uniaxial bending plus concentric compression; enter Fc' already carrying Cp (column-buckling-wood) and Fb' already carrying CL (wood-beam-bending). Biaxial bending, the eccentric 6e/d term, and tension-plus-bending (3.9.1) are separate. A design aid, not a substitute for the engineer of record.",
   };
 }
-export const woodCombinedBendingAxialExample = { inputs: { p_lb: 3000, m_inlb: 3000, a_in2: 12.25, s_in3: 7.15, fc_adj_psi: 1150, fb_adj_psi: 1350, emin_adj_psi: 580000, le_in: 96, d_in: 3.5 } };
+export const woodCombinedBendingAxialExample = { inputs: { p_lb: 3000, m_inlb: 3000, a_in2: 12.25, s_in3: 7.15, fc_adj_psi: 538.8, fb_adj_psi: 1350, emin_adj_psi: 580000, le_in: 96, d_in: 3.5 } };
 
 const _renderWoodCombinedBendingAxial = _simpleRenderer({
   citation: "Citation: NDS 2018 3.9.2 combined bending and axial compression (fc/Fc')^2 + fb/[Fb'(1 - fc/FcE)] <= 1.0 with FcE = 0.822 Emin'/(le/d)^2 (the P-delta amplifier), by name. Uniaxial, adjusted values entered (Cp in Fc', CL in Fb'). A design aid, not a substitute for the engineer of record.",

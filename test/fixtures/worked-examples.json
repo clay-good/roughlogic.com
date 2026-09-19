@@ -3348,9 +3348,9 @@
    "source_publisher": "Project (first-principles)",
    "source_title": "1200 ft^2 walls + 600 ft^2 ceilings, 4x8 sheets, 10% waste",
    "source_edition_or_year": "engineering practice (USG / National Gypsum spec sheets)",
-   "source_section_or_page": "sheets = ceil(1.10 * 1800 / 32) = 62; mud = 0.053 * 1800 = 95.4 gal; tape = 1.0 * 1800 = 1800 lf",
+   "source_section_or_page": "sheets = ceil(1.10 * 1800 / 32) = 62; mud = 1800 / 70 = 25.7 gal; tape = 0.4 * 1800 = 720 lf (the citation rates: 1 gal per ~70 ft^2, 0.4 lf per ft^2)",
    "verified_by": "rl",
-   "verified_on": "2026-05-11",
+   "verified_on": "2026-09-18",
    "inputs": {
     "wall_area_ft2": 1200,
     "ceiling_area_ft2": 600,
@@ -3365,13 +3365,13 @@
      }
     },
     "mud_gal": {
-     "value": 95.4,
+     "value": 25.714,
      "tolerance": {
       "pct": 0.5
      }
     },
     "tape_lf": {
-     "value": 1800,
+     "value": 720,
      "tolerance": {
       "abs": 1e-06
      }
@@ -6694,12 +6694,12 @@
   },
   {
    "tile_id": "anchor-embedment",
-   "source_publisher": "Project (public bond-strength formula)",
-   "source_title": "Bond-strength embedment: ld = T / (0.7 * sqrt(fc) * pi * d) (uplift T_lb, diameter d_in, concrete strength fc_psi)",
-   "source_edition_or_year": "n/a; standard public bond-strength derivation",
-   "source_section_or_page": "5000 lb uplift / 5/8 in bolt / 3000 psi concrete -> 66.42 in embedment / 5.53 ft (governing design will use a larger factored capacity; this is the screening formula)",
+   "source_publisher": "Project (ACI 318-19 17.6.2 breakout, solved for hef)",
+   "source_title": "Breakout embedment: hef = [Nua / (0.70 x 1.25 x 24 sqrt(fc))]^(2/3), single cast-in anchor, uncracked",
+   "source_edition_or_year": "ACI 318-19 17.6.2 (kc 24, phi 0.70 Condition B, psi_c,N 1.25); round-trips through concrete-anchor-breakout",
+   "source_section_or_page": "5000 lb uplift / 5/8 in bolt / 3000 psi concrete -> 2.66 in embedment (breakout only; the bolt steel, head pullout and code minimum embedment are checked separately)",
    "verified_by": "rl",
-   "verified_on": "2026-05-11",
+   "verified_on": "2026-09-18",
    "inputs": {
     "uplift_lb": 5000,
     "bolt_diameter_in": 0.625,
@@ -6707,13 +6707,13 @@
    },
    "outputs": {
     "embedment_in": {
-     "value": 66.4173,
+     "value": 2.6635,
      "tolerance": {
       "pct": 0.5
      }
     },
     "embedment_ft": {
-     "value": 5.5348,
+     "value": 0.22196,
      "tolerance": {
       "pct": 0.5
      }
@@ -6914,18 +6914,18 @@
   {
    "tile_id": "demo-debris",
    "source_publisher": "Project (industry debris-density rules)",
-   "source_title": "tons = volume_yd3 * 27 ft^3/yd^3 * pcf / 2000; wood-frame debris ~ 50 pcf bulk",
+   "source_title": "tons = volume_yd3 * 27 ft^3/yd^3 * pcf / 2000; loose wood-frame debris ~ 18 pcf (EPA mixed C&D 417 lb/yd^3 = 15 pcf)",
    "source_edition_or_year": "n/a; industry haul-weight rules of thumb",
-   "source_section_or_page": "Wood-frame demo / 25 yd^3 -> 675 ft^3 / 16.875 tons / 30 yd^3 dumpster (smallest >= 25)",
+   "source_section_or_page": "Wood-frame demo / 25 yd^3 -> 675 ft^3 / 6.075 tons / 30 yd^3 dumpster (smallest >= 25)",
    "verified_by": "rl",
-   "verified_on": "2026-05-11",
+   "verified_on": "2026-09-18",
    "inputs": {
     "structure_type": "wood_frame",
     "volume_yd3": 25
    },
    "outputs": {
     "tons": {
-     "value": 16.875,
+     "value": 6.075,
      "tolerance": {
       "pct": 0.5
      }
@@ -6943,7 +6943,7 @@
      }
     },
     "pcf": {
-     "value": 50,
+     "value": 18,
      "tolerance": {
       "abs": 0
      }
@@ -8854,9 +8854,9 @@
    "source_publisher": "Project (first-principles) over AWC NDS bundled F_b / E values",
    "source_title": "Simple-span beam mechanics: M = w*L^2/8, S = b*d^2/6, delta = 5*w*L^4 / (384*E*I); span limited by lesser of bending and deflection",
    "source_edition_or_year": "AWC NDS-2018 design values; DF-L No.2 sawn 2x10 (S = 21.39 in^3, I = 98.93 in^4, F_b = 900 psi, E = 1.6e6 psi)",
-   "source_section_or_page": "DF-L No.2 / 2x10 / 50 psf total / 16 in o.c. / L/360 -> 13.875 ft allowable (bending governs over 15.21 ft deflection limit)",
+   "source_section_or_page": "DF-L No.2 / 2x10 / 50 psf total / 16 in o.c. / L/360 -> 15.21 ft allowable (deflection governs; bending 15.61 ft with Fb prime = 900 x C_F 1.1 x C_r 1.15)",
    "verified_by": "rl",
-   "verified_on": "2026-05-11",
+   "verified_on": "2026-09-18",
    "inputs": {
     "species_grade": "DF-L_No2",
     "nominal_size": "2x10",
@@ -8866,13 +8866,13 @@
    },
    "outputs": {
     "allowable_span_ft": {
-     "value": 13.875,
+     "value": 15.208,
      "tolerance": {
       "abs": 0.01
      }
     },
     "by_bending_ft": {
-     "value": 13.875,
+     "value": 15.606,
      "tolerance": {
       "abs": 0.01
      }
@@ -8884,7 +8884,7 @@
      }
     },
     "governing": {
-     "value": "bending",
+     "value": "deflection",
      "tolerance": {
       "abs": 0
      }
@@ -8927,9 +8927,9 @@
    "source_publisher": "Project (first-principles)",
    "source_title": "Stringer length identity: stringer = sqrt(rise^2 + run^2); board feet from a 2x12 stringer board",
    "source_edition_or_year": "n/a; Pythagorean identity (108^2 + 144^2 = 180^2 right-triangle worked example)",
-   "source_section_or_page": "9 ft rise / 12 ft run -> 180 in stringer (15 ft); 21.09 BF as a 2x12 with 1 in tread cut",
+   "source_section_or_page": "9 ft rise / 12 ft run -> 180 in stringer (15 ft); 30 BF as a nominal 2x12 (2 x 12 x 180 / 144) with 1 in tread cut",
    "verified_by": "rl",
-   "verified_on": "2026-05-11",
+   "verified_on": "2026-09-18",
    "inputs": {
     "total_rise_in": 108,
     "total_run_in": 144,
@@ -8949,7 +8949,7 @@
      }
     },
     "board_feet": {
-     "value": 21.09,
+     "value": 30,
      "tolerance": {
       "abs": 0.01
      }
@@ -53535,17 +53535,17 @@
   {
    "tile_id": "wood-combined-bending-axial",
    "source_publisher": "NDS 2018 3.9.2 (Eq. 3.9-3)",
-   "source_title": "4x4 DF-L stud, 3,000 lb + 3,000 in-lb, 8 ft -> FcE 634 psi, interaction 0.55 passes",
+   "source_title": "4x4 DF-L stud, 3,000 lb + 3,000 in-lb, 8 ft -> FcE 634 psi, Fc prime 538.8 (Fc* 1150 x Cp 0.4685), interaction 0.71 passes",
    "source_edition_or_year": "spec-v292 worked example (machine-verified)",
    "source_section_or_page": "spec-v292 section 2.1 pinned example",
    "verified_by": "rl",
-   "verified_on": "2026-07-03",
+   "verified_on": "2026-09-18",
    "inputs": {
     "p_lb": 3000,
     "m_inlb": 3000,
     "a_in2": 12.25,
     "s_in3": 7.15,
-    "fc_adj_psi": 1150,
+    "fc_adj_psi": 538.8,
     "fb_adj_psi": 1350,
     "emin_adj_psi": 580000,
     "le_in": 96,
@@ -53571,7 +53571,7 @@
      }
     },
     "interaction": {
-     "value": 0.5519,
+     "value": 0.7132,
      "tolerance": {
       "abs": 0.001
      }
@@ -53581,17 +53581,17 @@
   {
    "tile_id": "wood-combined-bending-axial",
    "source_publisher": "NDS 2018 3.9.2 (Eq. 3.9-3)",
-   "source_title": "cross-check: doubling the axial load to 6,000 lb amplifies the bending term to a 1.55 fail",
+   "source_title": "cross-check: doubling the axial load to 6,000 lb amplifies the bending term to a 2.19 fail (Fc prime 538.8 with Cp)",
    "source_edition_or_year": "spec-v292 worked example (machine-verified)",
    "source_section_or_page": "spec-v292 section 2.1 cross-check",
    "verified_by": "rl",
-   "verified_on": "2026-07-03",
+   "verified_on": "2026-09-18",
    "inputs": {
     "p_lb": 6000,
     "m_inlb": 3000,
     "a_in2": 12.25,
     "s_in3": 7.15,
-    "fc_adj_psi": 1150,
+    "fc_adj_psi": 538.8,
     "fb_adj_psi": 1350,
     "emin_adj_psi": 580000,
     "le_in": 96,
@@ -53599,7 +53599,7 @@
    },
    "outputs": {
     "interaction": {
-     "value": 1.5499,
+     "value": 2.1949,
      "tolerance": {
       "abs": 0.002
      }

@@ -194,13 +194,13 @@ test("first-principles: snow load Pf = 0.7 * Ce * Ct * Is * Pg", () => {
 
 // --- Anchor bolt embedment (docs/derivations.md section 21) ---
 //
-// ld = T / (0.7 * sqrt(fc) * pi * d). T=5000, fc=3000, d=0.625:
-//   ld = 5000 / (0.7 * 54.77 * 3.14159 * 0.625) ~ 66.4 in
+// ACI 318-19 17.6.2 breakout, single cast-in anchor, uncracked:
+//   hef = [5000 / (0.70 * 1.25 * 24 * 54.77)]^(2/3) ~ 2.66 in
 
-test("first-principles: anchor embedment matches T / (0.7 * sqrt(fc) * pi * d)", () => {
+test("first-principles: anchor embedment matches the ACI 17.6.2 breakout inverse", () => {
   const r = computeAnchorEmbedment({ uplift_lb: 5000, bolt_diameter_in: 0.625, fc_psi: 3000 });
-  const expected = 5000 / (0.7 * Math.sqrt(3000) * Math.PI * 0.625);
-  within(r.embedment_in, expected, 0.1, "anchor 5000 lb 5/8 in fc 3000");
+  const expected = Math.pow(5000 / (0.70 * 1.25 * 24 * Math.sqrt(3000)), 2 / 3);
+  within(r.embedment_in, expected, 0.01, "anchor 5000 lb 5/8 in fc 3000");
 });
 
 // --- Vehicle braking (docs/derivations.md section 23) ---

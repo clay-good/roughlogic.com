@@ -25,7 +25,7 @@ export const BESPOKE_LABELS = {
   "ambient-ampacity-adjust": {"base_ampacity_a":"Base ampacity (A; from NEC 310.16)","temp_column":"Termination / insulation column","ambient_c":"Ambient temperature (°C)","conductor_count":"Current-carrying conductors"},
   "amortization-schedule": {"principal":"Principal (loan amount, $)","apr_percent":"APR (percent)","term_years":"Term (years)","extra_monthly_principal":"Extra monthly principal ($, optional)"},
   "amp-power-spl": {"sensitivity_db":"Speaker sensitivity (dB @ 1 W / 1 m)","power_w":"Amplifier power per channel (W)","crest_db":"Crest factor / headroom (dB; optional)","target_spl_db":"Target SPL for inverse power (dB; optional)","max_spl_db":"Rated max SPL (dB; optional)"},
-  "anchor-embedment": {"uplift_lb":"Uplift load (lb)","bolt_diameter_in":"Bolt diameter (in)","fc_psi":"Concrete fc (psi)","cracked":"Concrete condition","edge_distance_in":"Edge distance (in, optional)"},
+  "anchor-embedment": {"uplift_lb":"Factored uplift Nua (lb, LRFD)","bolt_diameter_in":"Bolt diameter (in)","fc_psi":"Concrete fc (psi)","cracked":"Concrete condition","edge_distance_in":"Edge distance (in, optional)"},
   "anhydrous-ammonia-rate": {"n_target_lb_per_ac":"Target nitrogen (lb N/acre)","tank_gal":"Nurse tank size (gal, 0 to skip)"},
   "annulus-area": {"outer_diameter":"Outer diameter D","inner_diameter":"Inner (bore) diameter d"},
   "antimicrobial-dilution": {"affected_area_ft2":"Area to treat (ft2)","coverage_ft2_per_gal":"Label coverage (ft2 per gallon)","tank_size_gal":"Sprayer tank size (gal)","mode":"Dilution mode","oz_per_gal":"Concentrate (oz per finished gallon)","ratio_N":"Ratio 1:N (parts water)"},
