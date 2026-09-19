@@ -3582,7 +3582,10 @@ export function computeCompressedAirPower({ free_air_cfm = 0, inlet_psia = 14.7,
   if (!(free_air_cfm > 0)) return { error: "Free-air flow must be positive (cfm)." };
   if (!(inlet_psia > 0)) return { error: "Inlet pressure must be positive (psia)." };
   if (!(run_hours > 0)) return { error: "Run hours must be positive." };
-  const p2_abs = discharge_psig + 14.7;
+  // Gauge pressure is relative to the LOCAL atmosphere, which for a
+  // compressor drawing site air is the inlet pressure (12.2 psia at 5,000
+  // ft); until 2026-09-19 sea-level 14.7 was added regardless.
+  const p2_abs = discharge_psig + inlet_psia;
   if (!(p2_abs > inlet_psia)) return { error: "Discharge pressure must be above the inlet." };
   if (!(overall_eff > 0 && overall_eff <= 1)) return { error: "Overall efficiency must be over 0 and up to 1." };
   if (rate_kwh < 0) return { error: "Energy rate must be non-negative." };
@@ -3627,8 +3630,8 @@ export function computeAirPressureSetpointSavings({ current_psig = 0, reduced_ps
   if (!(reduced_psig < current_psig)) return { error: "Reduced pressure must be below the current pressure." };
   if (rate_kwh < 0) return { error: "Energy rate must be non-negative." };
   const exp = (_K_AIR - 1) / _K_AIR;
-  const work_current = ((current_psig + 14.7) / inlet_psia) ** exp - 1;
-  const work_reduced = ((reduced_psig + 14.7) / inlet_psia) ** exp - 1;
+  const work_current = ((current_psig + inlet_psia) / inlet_psia) ** exp - 1;
+  const work_reduced = ((reduced_psig + inlet_psia) / inlet_psia) ** exp - 1;
   // The saved FRACTION drives the kW; the tile reports a PERCENT, because
   // the key says pct and 268 of the catalog's 278 percent outputs are on a
   // 0-100 scale. Returning 0.0707 under `pct_saved` made the static page

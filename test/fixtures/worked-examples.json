@@ -33492,9 +33492,9 @@
   {
    "tile_id": "aeration-oxygen-demand",
    "source_publisher": "WEF aeration design",
-   "source_title": "O2 = factor x BOD + 4.6 x NH3; air_scfm = O2 / (0.075 x 0.232 x SOTE x 1440)",
+   "source_title": "O2 (AOR) = factor x BOD + 4.6 x NH3; SOR = AOR / [alpha F theta^(T-20) (beta Cs,T - C) / Cs,20]; air_scfm = SOR / (0.075 x 0.232 x SOTE x 1440)",
    "source_edition_or_year": "WEF",
-   "source_section_or_page": "2000 lb BOD, factor 1.1, 200 lb NH3, 20% SOTE -> 3120 lb/day O2, 623 scfm",
+   "source_section_or_page": "2000 lb BOD, factor 1.1, 200 lb NH3, 20% SOTE, alpha 0.5, F 0.9, beta 0.95, 20 C, 2 mg/L DO -> 3120 lb/day AOR, SOR 9,498 lb/day, 1,895 scfm (623 scfm in clean water)",
    "verified_by": "rl",
    "verified_on": "2026-07-10",
    "inputs": {
@@ -33511,7 +33511,7 @@
      }
     },
     "air_scfm": {
-     "value": 623,
+     "value": 1895.36,
      "tolerance": {
       "abs": 1
      }
@@ -33523,7 +33523,7 @@
    "source_publisher": "WEF aeration design",
    "source_title": "forgetting nitrification under-sizes the blower 30%",
    "source_edition_or_year": "WEF",
-   "source_section_or_page": "Same BOD, no ammonia term -> 2200 lb/day O2, only 439 scfm (starves the nitrifiers)",
+   "source_section_or_page": "Same BOD, no ammonia term -> 2200 lb/day O2 AOR, only 1,336 scfm at alpha 0.5 / F 0.9 / beta 0.95 / 2 mg/L DO (starves the nitrifiers)",
    "verified_by": "rl",
    "verified_on": "2026-07-10",
    "inputs": {
@@ -33533,7 +33533,7 @@
    },
    "outputs": {
     "air_scfm": {
-     "value": 439,
+     "value": 1336.47,
      "tolerance": {
       "abs": 1
      }

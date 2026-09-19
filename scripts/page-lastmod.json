@@ -178,8 +178,8 @@
       "date": "2026-09-01"
     },
     "/tools/aeration-oxygen-demand/": {
-      "sha": "e427a8805efa6d3d",
-      "date": "2026-09-01"
+      "sha": "74e17d0dbdaf8d48",
+      "date": "2026-09-19"
     },
     "/tools/aerial-ladder/": {
       "sha": "632a72d136fc8a9e",
@@ -2798,8 +2798,8 @@
       "date": "2026-09-08"
     },
     "/tools/fastener-pullout/": {
-      "sha": "285af841faf9090f",
-      "date": "2026-09-01"
+      "sha": "8dd2515d126ad952",
+      "date": "2026-09-19"
     },
     "/tools/fatigue-safety-factor/": {
       "sha": "a998cabc5bf5166a",

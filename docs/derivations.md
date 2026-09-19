@@ -5796,7 +5796,7 @@ per spec-v14 §13.1 second paragraph.
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
-| `aeration-oxygen-demand` | Activated-Sludge Oxygen and Blower Air Demand | WEF aeration design; 2000 lb BOD, factor 1.1, 200 lb NH3, 20% SOTE -> 3120 lb/... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `aeration-oxygen-demand` | Activated-Sludge Oxygen and Blower Air Demand | WEF aeration design; 2000 lb BOD, factor 1.1, 200 lb NH3, 20% SOTE, alpha 0.5,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `backflow-test-psi` | Backflow Assembly Test Pass Criteria | USC FCCCHR Manual / AWWA C511; #1 check 8 psid, relief 4 psid -> buffer 4 psid, pass | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `bod-tss-loading-removal` | BOD/TSS Mass Loading and Percent Removal | wastewater operations (pounds formula); spec-v406 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `breakpoint-chlorination` | Breakpoint Chlorination Dose | Standard Methods 4500-Cl; spec-v355 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |

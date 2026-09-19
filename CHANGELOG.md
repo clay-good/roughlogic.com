@@ -6,6 +6,11 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **Blowers sized to clean-water ratings, wood screws on the nail formula, and compressors at sea level everywhere.**
+  - `aeration-oxygen-demand` divided the process oxygen demand straight by the diffusers' clean-water SOTE. The standard conversion from actual to standard oxygen, AOR / [α·F·θ^(T−20)·(β·Cs,T − C)/Cs,20], was silently 1. At typical α 0.5, F 0.9 and 2 mg/L DO, the example's 623 scfm is about 1,895. New inputs carry each factor; α = F = β = 1 and DO = 0 give the old clean-water answer.
+  - `fastener-pullout` gave wood screws the nail formula × 1.85. NDS 12.2 gives screws their own W = 2850·G²·D, about 42% more at G = 0.42.
+  - `compressed-air-power` and `air-pressure-setpoint-savings` added 14.7 psi to the gauge discharge while taking a site inlet pressure. Gauge pressure is relative to local atmosphere, so discharge absolute is now psig plus the inlet pressure.
+
 - **More equations missing a term, from the same sweep.**
   - `rigging-check` let every leg of a bridle share the load equally. With three or four legs that cannot be assumed; the tile now counts two, matching `multi-leg-sling`. Its choker branch applied the 0.75 derate twice, to the tension and to the rated load; it now applies it once, to the rated load.
   - `pipe-pressure-rating` had no weld joint strength reduction factor W. B31.3 and current B31.1 design to S·E·W, so a welded line in the creep range read about 20% strong. Required-wall mode now also reports the nominal wall to order after mill tolerance.

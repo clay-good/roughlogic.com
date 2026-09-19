@@ -8699,10 +8699,9 @@ test("bounds: calc-construction computePullout pins W = G^2.5*D*1380 (per inch),
   assert.ok(Math.abs(r.total_withdrawal_lb - w_expected * 1.5) < 1e-9);
   assert.strictEqual(r.specific_gravity, 0.50);
   assert.strictEqual(r.diameter_in, 0.162);
-  // Screws apply the 1.85 multiplier.
+  // Wood screws take their own NDS 12.2 formula, W = 2850 G^2 D.
   const s = computePullout({ fastener_type: "screw", fastener_size: "#10", species: "DF-L", penetration_in: 1 });
-  const sBase = Math.pow(0.50, 2.5) * 0.190 * 1380;
-  assert.ok(Math.abs(s.withdrawal_per_inch_lb - sBase * 1.85) < 1e-9);
+  assert.ok(Math.abs(s.withdrawal_per_inch_lb - 2850 * 0.50 * 0.50 * 0.190) < 1e-9);
   // Rejections.
   assert.ok("error" in computePullout({ fastener_type: "nail", fastener_size: "16d_common", species: "moon", penetration_in: 1 }));
   assert.ok("error" in computePullout({ fastener_type: "claw", fastener_size: "16d_common", species: "DF-L", penetration_in: 1 }));
@@ -26343,11 +26342,15 @@ test("bounds: spec-v574 computeAerationOxygenDemand pins the oxygen-demand relat
   assert.ok(Math.abs(r.o2_carbon_lb_day - 2200) < 1e-9); // 1.1*2000
   assert.ok(Math.abs(r.o2_nitro_lb_day - 920) < 1e-9); // 4.6*200
   assert.ok(Math.abs(r.o2_demand_lb_day - 3120) < 1e-9);
-  assert.ok(Math.abs(r.air_scfm - 623) < 1); // 3120 / (0.075*0.232*0.20*1440)
+  // AOR -> SOR at the defaults (alpha 0.5, F 0.9, beta 0.95, 68 F, 2 mg/L, Cs 9.09): ratio 0.3285.
+  assert.ok(Math.abs(r.aor_sor_ratio - 0.5 * 0.9 * (0.95 * 9.09 - 2) / 9.09) < 1e-9);
+  assert.ok(Math.abs(r.air_scfm - 1895.36) < 1); // SOR / (0.075*0.232*0.20*1440)
+  // Clean-water, zero-DO inputs recover the plain 623 scfm.
+  assert.ok(Math.abs(_v574({ bod_removed_lb_day: 2000, oxygen_factor: 1.1, nh3_nitrified_lb_day: 200, sote_pct: 20, alpha: 1, fouling_f: 1, beta: 1, do_mg_l: 0 }).air_scfm - 623) < 1);
   // Forgetting nitrification under-sizes the blower by ~30%.
   const carb = _v574({ bod_removed_lb_day: 2000, oxygen_factor: 1.1, nh3_nitrified_lb_day: 0, sote_pct: 20 });
   assert.ok(Math.abs(carb.o2_demand_lb_day - 2200) < 1e-9);
-  assert.ok(Math.abs(carb.air_scfm - 439) < 1);
+  assert.ok(Math.abs(carb.air_scfm - 1336.47) < 1);
   assert.ok(carb.air_scfm < r.air_scfm);
   // A lower SOTE demands proportionally more air.
   assert.ok(Math.abs(_v574({ bod_removed_lb_day: 2000, oxygen_factor: 1.1, nh3_nitrified_lb_day: 200, sote_pct: 10 }).air_scfm - 2 * r.air_scfm) < 1e-6);

@@ -4827,7 +4827,7 @@ export const CITATIONS = {
     ],
   },
   "fastener-pullout": {
-    formula: "Withdrawal capacity W = G^2.5 × D × 1380 (lb per inch of thread penetration); G is wood specific gravity, D is fastener shank diameter (NDS nail-withdrawal form). Wood screws apply an approximate 1.85× factor over common nails; lag screws are not modeled.",
+    formula: "Withdrawal capacity per inch of penetration: nails W = 1380 × G^2.5 × D; wood screws W = 2850 × G^2 × D (NDS 12.2); G is wood specific gravity, D is fastener shank diameter; lag screws are not modeled.",
     edition: AWC_NDS + " Chapter 12 (dowel-type fastener withdrawal).",
     freeAccess: "Free at awc.org/codes-standards.",
     governance: GOVERNANCE.structural,
@@ -16143,7 +16143,7 @@ export const CITATIONS = {
     ],
   },
   "aeration-oxygen-demand": {
-    formula: "O2_demand = oxygen_factor x BOD_removed + 4.6 x NH3_nitrified; air_scfm = O2_demand / (0.075 x 0.232 x (SOTE/100) x 1440).",
+    formula: "O2_demand (AOR) = oxygen_factor x BOD_removed + 4.6 x NH3_nitrified; SOR = AOR / [alpha F 1.024^(T-20) (beta Cs,T - C) / Cs,20]; air_scfm = SOR / (0.075 x 0.232 x (SOTE/100) x 1440).",
     edition: "Activated-sludge oxygen and air demand (WEF aeration design), by name.",
     freeAccess: "The oxygen-demand and air-from-SOTE relations are public wastewater-design results; the aeration equipment and the field transfer efficiency govern.",
     governance: GOVERNANCE.general,

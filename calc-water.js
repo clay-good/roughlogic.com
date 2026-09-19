@@ -1861,9 +1861,10 @@ const renderWasSrtControl = _v23SimpleRenderer({
 WATER_RENDERERS["was-srt-control"] = renderWasSrtControl;
 
 // --- spec-v574 M: Activated-sludge oxygen and blower air demand ---
-// O2 = factor*BOD_removed + 4.6*NH3. air_scfm = O2 / (0.075*0.232*(SOTE/100)*1440).
-// dims: in { bod_removed_lb_day: M T^-1, oxygen_factor: dimensionless, nh3_nitrified_lb_day: M T^-1, sote_pct: dimensionless } out: { o2_demand_lb_day: M T^-1, air_scfm: L^3 T^-1 }
-export function computeAerationOxygenDemand({ bod_removed_lb_day = 0, oxygen_factor = 0, nh3_nitrified_lb_day = 0, sote_pct = 0 } = {}) {
+// O2 (AOR) = factor*BOD_removed + 4.6*NH3. SOR = AOR / [alpha F theta^(T-20)
+// (beta Cs,T - C) / Cs,20]. air_scfm = SOR / (0.075*0.232*(SOTE/100)*1440).
+// dims: in { bod_removed_lb_day: M T^-1, oxygen_factor: dimensionless, nh3_nitrified_lb_day: M T^-1, sote_pct: dimensionless, alpha: dimensionless, fouling_f: dimensionless, beta: dimensionless, water_temp_F: T, do_mg_l: M L^-3, cs_field_mg_l: M L^-3, cs20_mg_l: M L^-3 } out: { o2_demand_lb_day: M T^-1, air_scfm: L^3 T^-1 }
+export function computeAerationOxygenDemand({ bod_removed_lb_day = 0, oxygen_factor = 0, nh3_nitrified_lb_day = 0, sote_pct = 0, alpha = 0.5, fouling_f = 0.9, beta = 0.95, water_temp_F = 68, do_mg_l = 2, cs_field_mg_l = 9.09, cs20_mg_l = 9.09 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const bod = Number(bod_removed_lb_day) || 0;
   const factor = Number(oxygen_factor) || 0;
@@ -1876,24 +1877,44 @@ export function computeAerationOxygenDemand({ bod_removed_lb_day = 0, oxygen_fac
   const o2_carbon_lb_day = factor * bod;
   const o2_nitro_lb_day = 4.6 * nh3;
   const o2_demand_lb_day = o2_carbon_lb_day + o2_nitro_lb_day;
-  const air_scfm = o2_demand_lb_day / (0.075 * 0.232 * (sote / 100) * 1440);
+  // The process demand is the ACTUAL oxygen requirement (AOR) in mixed
+  // liquor; SOTE is a clean-water, zero-DO, 20 C rating. The standard
+  // conversion divides by alpha F theta^(T-20) (beta Cs,T - C) / Cs,20, with
+  // theta 1.024. Until 2026-09-19 that ratio was silently 1, sizing the
+  // blowers about 3x short at typical alpha 0.5, F 0.9 and 2 mg/L DO.
+  const a = Number(alpha), F = Number(fouling_f), b = Number(beta), T = (Number(water_temp_F) - 32) / 1.8;
+  const C = Number(do_mg_l), csT = Number(cs_field_mg_l), cs20 = Number(cs20_mg_l);
+  if (!(a > 0 && a <= 1.2) || !(F > 0 && F <= 1) || !(b > 0 && b <= 1.1)) return { error: "Alpha, fouling F and beta must be positive (alpha up to 1.2, F up to 1, beta up to 1.1)." };
+  if (!Number.isFinite(T) || !(C >= 0) || !(csT > 0) || !(cs20 > 0)) return { error: "Enter the water temperature, DO set-point and saturation concentrations." };
+  if (!(b * csT > C)) return { error: "The DO set-point must be below beta x the field saturation concentration." };
+  const aor_sor_ratio = a * F * Math.pow(1.024, T - 20) * (b * csT - C) / cs20;
+  const sor_lb_day = o2_demand_lb_day / aor_sor_ratio;
+  const air_scfm = sor_lb_day / (0.075 * 0.232 * (sote / 100) * 1440);
   return {
-    o2_carbon_lb_day, o2_nitro_lb_day, o2_demand_lb_day, air_scfm,
+    o2_carbon_lb_day, o2_nitro_lb_day, o2_demand_lb_day, aor_sor_ratio, sor_lb_day, air_scfm,
     note: "Nitrification adds 4.6 lb of oxygen per pound of ammonia-nitrogen oxidized - a large term that is easy to forget and that starves the process at high sludge age. The standard oxygen transfer efficiency (SOTE) of diffused aeration is only about 10-35%, so most of the blown air leaves the tank unused and the air demand in scfm far exceeds what the oxygen pounds suggest. The oxygen factor rises 0.9 (short SRT) to 1.5 (extended aeration). The aeration equipment and the field transfer efficiency govern.",
   };
 }
 export const aerationOxygenDemandExample = { inputs: { bod_removed_lb_day: 2000, oxygen_factor: 1.1, nh3_nitrified_lb_day: 200, sote_pct: 20 } };
 const renderAerationOxygenDemand = _v23SimpleRenderer({
-  citation: "Citation: activated-sludge oxygen and air demand (WEF aeration design), by name. O2_demand = factor x BOD_removed + 4.6 x NH3_nitrified; air_scfm = O2_demand / (0.075 x 0.232 x (SOTE/100) x 1440). Nitrification adds 4.6 lb O2 per lb ammonia-N (easy to forget). Diffused-aeration SOTE is only ~10-35%, so the air demand far exceeds the oxygen pounds. The aeration equipment and field transfer efficiency govern.",
+  citation: "Citation: activated-sludge oxygen and air demand (WEF aeration design), by name. O2_demand (AOR) = factor x BOD_removed + 4.6 x NH3_nitrified; SOR = AOR / [alpha F 1.024^(T-20) (beta Cs,T - C) / Cs,20]; air_scfm = SOR / (0.075 x 0.232 x (SOTE/100) x 1440). Nitrification adds 4.6 lb O2 per lb ammonia-N (easy to forget). Diffused-aeration SOTE is only ~10-35%, so the air demand far exceeds the oxygen pounds. The aeration equipment and field transfer efficiency govern.",
   example: aerationOxygenDemandExample.inputs,
   fields: [
     { key: "bod_removed_lb_day", label: "BOD removed (lb/day)", kind: "number" },
     { key: "oxygen_factor", label: "Oxygen factor (lb O2 / lb BOD, 0.9-1.5)", kind: "number" },
     { key: "nh3_nitrified_lb_day", label: "Ammonia-N nitrified (lb/day, 0 to skip)", kind: "number", default: 0 },
     { key: "sote_pct", label: "SOTE (%, ~10-35 diffused)", kind: "number" },
+    { key: "alpha", label: "Alpha (process / clean water, ~0.4-0.8 fine bubble)", kind: "number", default: 0.5 },
+    { key: "fouling_f", label: "Diffuser fouling factor F (~0.65-0.9)", kind: "number", default: 0.9 },
+    { key: "beta", label: "Beta (salinity factor, ~0.95-0.98)", kind: "number", default: 0.95 },
+    { key: "water_temp_F", label: "Mixed-liquor temperature (degF)", kind: "number", default: 68 },
+    { key: "do_mg_l", label: "DO set-point (mg/L)", kind: "number", default: 2 },
+    { key: "cs_field_mg_l", label: "Saturation DO at field temperature and pressure (mg/L)", kind: "number", default: 9.09 },
+    { key: "cs20_mg_l", label: "Saturation DO at 68 degF, sea level (mg/L)", kind: "number", default: 9.09 },
   ],
   outputs: [
     { key: "o", id: "aod-out-o", label: "Oxygen demand (carbon + nitrogen)", value: (r) => fmt(r.o2_demand_lb_day, 0) + " lb/day (" + fmt(r.o2_carbon_lb_day, 0) + " carbon + " + fmt(r.o2_nitro_lb_day, 0) + " nitrification)" },
+    { key: "s", id: "aod-out-s", label: "Standard oxygen requirement (SOR)", value: (r) => fmt(r.sor_lb_day, 0) + " lb/day (AOR / SOR ratio " + fmt(r.aor_sor_ratio, 3) + ")" },
     { key: "a", id: "aod-out-a", label: "Blower air demand", value: (r) => fmt(r.air_scfm, 0) + " scfm" },
     { key: "n", id: "aod-out-n", label: "Note", value: (r) => r.note },
   ],

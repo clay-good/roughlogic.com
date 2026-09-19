@@ -361,12 +361,13 @@ export function computePullout({ fastener_type, fastener_size, species, penetrat
   else return { error: "Unknown fastener type." };
   if (!D) return { error: "Unknown fastener size." };
 
-  const w_per_in = Math.pow(G, 2.5) * D * 1380;
-  // Screws have higher withdrawal capacity than common nails by factor ~1.85.
-  const factor = fastener_type === "screw" ? 1.85 : 1.0;
-  const total_lb = w_per_in * factor * penetration_in;
+  // NDS 12.2: nails W = 1380 G^2.5 D; wood screws W = 2850 G^2 D (lb per in
+  // of thread penetration). Until 2026-09-19 screws were the nail formula x
+  // 1.85, about 42% under NDS at G = 0.42.
+  const w_per_in = fastener_type === "screw" ? 2850 * G * G * D : 1380 * Math.pow(G, 2.5) * D;
+  const total_lb = w_per_in * penetration_in;
   return {
-    withdrawal_per_inch_lb: w_per_in * factor,
+    withdrawal_per_inch_lb: w_per_in,
     total_withdrawal_lb: total_lb,
     specific_gravity: G,
     diameter_in: D,

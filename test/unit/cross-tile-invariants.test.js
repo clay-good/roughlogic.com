@@ -10324,9 +10324,9 @@ test("monotonicity: computePullout total_withdrawal_lb is strictly increasing in
   // get a 1.85x withdrawal multiplier.
   const nail10 = computePullout({ fastener_type: "nail", fastener_size: "10d_common", species: "DF-L", penetration_in: 1.5 });
   const screw10 = computePullout({ fastener_type: "screw", fastener_size: "#10", species: "DF-L", penetration_in: 1.5 });
-  // Diameters: 10d nail 0.148, #10 screw 0.190. The screw will be larger AND
-  // gets the 1.85x; expected_ratio = (0.190/0.148) * 1.85.
-  const expectedRatio = (0.190 / 0.148) * 1.85;
+  // Diameters: 10d nail 0.148, #10 screw 0.190. NDS 12.2: screws 2850 G^2 D,
+  // nails 1380 G^2.5 D; at DF-L G = 0.50 the ratio is (2850 x 0.190) / (1380 x 0.50^0.5 x 0.148).
+  const expectedRatio = (2850 * 0.190) / (1380 * Math.sqrt(0.50) * 0.148);
   assert.ok(Math.abs(screw10.total_withdrawal_lb / nail10.total_withdrawal_lb - expectedRatio) < 1e-9,
     `screw/nail ratio = ${screw10.total_withdrawal_lb / nail10.total_withdrawal_lb}, expected ${expectedRatio}`);
   // Closed-form pin: w_per_in_nail = G^2.5 * D * 1380.
