@@ -166,11 +166,12 @@ function renderNeutralCurrent3ph(inputRegion, outputRegion, citationEl) {
 POWERQUALITY_RENDERERS["neutral-current-3ph"] = renderNeutralCurrent3ph;
 
 // --- v20 A.3: Motor starting voltage dip (`motor-vd-starting`) ---
-// V_drop = (2 for 1-phase, sqrt(3) for 3-phase) * K * LRC * L / cmils;
+// V_drop = (2 for 1-phase, sqrt(3) for 3-phase) * LRC * L * (R cos phi + X sin phi),
+// R = K / cmils per ft, phi the locked-rotor power-factor angle;
 // V_terminal = V_source - V_drop; %dip = V_drop / V_source * 100.
-// dims: in { source_voltage_V: M*L^2*T^-3*I^-1, length_ft: L, cmils: L^2, lrc_A: I, phase: dimensionless, k_const: dimensionless, dip_limit_pct: dimensionless }
+// dims: in { source_voltage_V: M*L^2*T^-3*I^-1, length_ft: L, cmils: L^2, lrc_A: I, phase: dimensionless, k_const: dimensionless, dip_limit_pct: dimensionless, starting_pf: dimensionless, reactance_ohm_per_kft: dimensionless }
 //        out: { v_drop_V: M*L^2*T^-3*I^-1, v_terminal_V: M*L^2*T^-3*I^-1, dip_pct: dimensionless }
-export function computeMotorVdStarting({ source_voltage_V = 0, length_ft = 0, cmils = 0, lrc_A = 0, phase = "three", k_const = 12.9, dip_limit_pct = 15, lrc_estimated = false } = {}) {
+export function computeMotorVdStarting({ source_voltage_V = 0, length_ft = 0, cmils = 0, lrc_A = 0, phase = "three", k_const = 12.9, dip_limit_pct = 15, lrc_estimated = false, starting_pf = 0.35, reactance_ohm_per_kft = 0.05 } = {}) {
   const V = Number(source_voltage_V) || 0;
   const L = Number(length_ft) || 0;
   const cm = Number(cmils) || 0;
@@ -182,8 +183,18 @@ export function computeMotorVdStarting({ source_voltage_V = 0, length_ft = 0, cm
   if (!(cm > 0 && Number.isFinite(cm))) return { error: "Conductor circular mils must be positive." };
   if (!(lrc > 0 && Number.isFinite(lrc))) return { error: "Locked-rotor current must be positive (A)." };
   if (!(K > 0)) return { error: "Conductor constant K must be positive (Cu ~12.9, Al ~21.2)." };
+  const pf = Number(starting_pf);
+  const X = Number(reactance_ohm_per_kft);
+  if (!(pf > 0 && pf <= 1)) return { error: "Starting power factor must be in (0, 1] (locked rotor is typically 0.2-0.4)." };
+  if (!(X >= 0)) return { error: "Conductor reactance cannot be negative (ohm per 1,000 ft)." };
   const factor = phase === "single" ? 2 : Math.sqrt(3);
-  const vDrop = factor * K * lrc * L / cm;
+  // Locked-rotor current is mostly reactive, so the drop is I (R cos phi +
+  // X sin phi) at the STARTING power factor, not I R. Until 2026-09-19 the
+  // resistance-only form was used: 500 kcmil at 600 ft read an 8% dip that
+  // is nearer 18% once the reactance is counted.
+  const R_ft = K / cm;
+  const sinPhi = Math.sqrt(1 - pf * pf);
+  const vDrop = factor * lrc * L * (R_ft * pf + (X / 1000) * sinPhi);
   const vTerminal = V - vDrop;
   const dipPct = vDrop / V * 100;
   const lim = Number.isFinite(limit) && limit > 0 ? limit : 15;
@@ -201,7 +212,7 @@ export function computeMotorVdStarting({ source_voltage_V = 0, length_ft = 0, cm
 export const motorVdStartingExample = { inputs: { source_voltage_V: 480, length_ft: 250, cmils: 250000, lrc_A: 180, phase: "three", k_const: 12.9, dip_limit_pct: 15 } };
 
 function renderMotorVdStarting(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: Ohm's-law voltage-drop method (first principles); motor locked-rotor current per NEC Article 430 code-letter tables (user-supplied, or 6x FLA estimate); contactor pickup/dropout commonly ~85% nominal per NEMA ICS 2, by name. The AHJ governs. Distinct from the steady-state voltage-drop tile. Free read-only at nfpa.org/freeaccess.";
+  citationEl.textContent = "Citation: impedance voltage-drop method V = k I L (R cos phi + X sin phi) at the locked-rotor power factor (IEEE 141 by name); motor locked-rotor current per NEC Article 430 code-letter tables (user-supplied, or 6x FLA estimate); contactor pickup/dropout commonly ~85% nominal per NEMA ICS 2, by name. The AHJ governs. Distinct from the steady-state voltage-drop tile. Free read-only at nfpa.org/freeaccess.";
   const v = makeNumber("Source voltage (V)", "mvds-v", { step: "any", min: "0" });
   const phase = makeSelect("Phase", "mvds-phase", [{ value: "three", label: "3-phase", selected: true }, { value: "single", label: "1-phase" }]);
   const len = makeNumber("One-way conductor length (ft)", "mvds-len", { step: "any", min: "0" });
@@ -209,7 +220,9 @@ function renderMotorVdStarting(inputRegion, outputRegion, citationEl) {
   const lrc = makeNumber("Locked-rotor current (A)", "mvds-lrc", { step: "any", min: "0" });
   const k = makeSelect("Conductor material (K)", "mvds-k", [{ value: "12.9", label: "Copper (K=12.9)", selected: true }, { value: "21.2", label: "Aluminum (K=21.2)" }]);
   const limit = makeNumber("Dip limit (%)", "mvds-lim", { step: "any", min: "0" });
-  for (const f of [v, phase, len, cm, lrc, k, limit]) inputRegion.appendChild(f.wrap);
+  const spf = makeNumber("Locked-rotor power factor (typ. 0.2-0.4)", "mvds-pf", { step: "any", min: "0", max: "1", value: "0.35" });
+  const xr = makeNumber("Conductor reactance (ohm per 1,000 ft; ~0.05 in steel conduit)", "mvds-x", { step: "any", min: "0", value: "0.05" });
+  for (const f of [v, phase, len, cm, lrc, k, limit, spf, xr]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => {
     v.input.value = "480"; phase.select.value = "three"; len.input.value = "250";
     cm.input.value = "250000"; lrc.input.value = "180"; k.select.value = "12.9"; limit.input.value = "15"; update();
@@ -223,6 +236,7 @@ function renderMotorVdStarting(inputRegion, outputRegion, citationEl) {
     const r = computeMotorVdStarting({
       source_voltage_V: readNum(v.input), length_ft: readNum(len.input), cmils: readNum(cm.input),
       lrc_A: readNum(lrc.input), phase: phase.select.value, k_const: Number(k.select.value), dip_limit_pct: readNum(limit.input),
+      starting_pf: spf.input.value === "" ? 0.35 : Number(spf.input.value), reactance_ohm_per_kft: xr.input.value === "" ? 0.05 : Number(xr.input.value),
     });
     if (r.error) { oDrop.textContent = r.error; oTerm.textContent = ""; oDip.textContent = ""; oNote.textContent = ""; return; }
     oDrop.textContent = fmt(r.v_drop_V, 1) + " V";
@@ -230,7 +244,7 @@ function renderMotorVdStarting(inputRegion, outputRegion, citationEl) {
     oDip.textContent = fmt(r.dip_pct, 2) + "% - " + (r.pass ? "PASS" : "FAIL");
     oNote.textContent = r.note;
   }, DEBOUNCE_MS);
-  for (const f of [v.input, phase.select, len.input, cm.input, lrc.input, k.select, limit.input]) f.addEventListener("input", update);
+  for (const f of [v.input, phase.select, len.input, cm.input, lrc.input, k.select, limit.input, spf.input, xr.input]) f.addEventListener("input", update);
 }
 POWERQUALITY_RENDERERS["motor-vd-starting"] = renderMotorVdStarting;
 

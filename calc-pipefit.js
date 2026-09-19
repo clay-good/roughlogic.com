@@ -435,8 +435,8 @@ PIPEFIT_RENDERERS["boiler-horsepower"] = _renderBoilerHorsepower;
 // ---------------------------------------------------------------------
 // v160 ASME B31.1 pipe pressure rating / required wall (pipe-pressure-rating)
 // ---------------------------------------------------------------------
-// dims: in { od_in: L, wall_in: L, allow_stress: M L^-1 T^-2, joint_factor: dimensionless, y_coeff: dimensionless, mill_tol_frac: dimensionless, allowance_in: L, design_p: M L^-1 T^-2, mode: dimensionless } out: { p_allow: M L^-1 T^-2, t_min: L, t_avail: L }
-export function computePipePressureRating({ od_in = 0, wall_in = 0, allow_stress = 0, joint_factor = 1, y_coeff = 0.4, mill_tol_frac = 0.125, allowance_in = 0, design_p = 0, mode = "allowable_pressure" } = {}) {
+// dims: in { od_in: L, wall_in: L, allow_stress: M L^-1 T^-2, joint_factor: dimensionless, y_coeff: dimensionless, mill_tol_frac: dimensionless, allowance_in: L, design_p: M L^-1 T^-2, mode: dimensionless, weld_strength_reduction: dimensionless } out: { p_allow: M L^-1 T^-2, t_min: L, t_avail: L }
+export function computePipePressureRating({ od_in = 0, wall_in = 0, allow_stress = 0, joint_factor = 1, y_coeff = 0.4, mill_tol_frac = 0.125, allowance_in = 0, design_p = 0, mode = "allowable_pressure", weld_strength_reduction = 1 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const od = Number(od_in);
   const S = Number(allow_stress);
@@ -449,11 +449,20 @@ export function computePipePressureRating({ od_in = 0, wall_in = 0, allow_stress
   if (!(E > 0 && E <= 1)) return { error: "Joint factor E must be in (0, 1]." };
   if (!(mt >= 0 && mt < 1)) return { error: "Mill-tolerance fraction must be in [0, 1)." };
   if (A < 0) return { error: "Allowance must be non-negative (in)." };
+  // B31.3 304.1.2 (and current B31.1) carry the weld joint strength
+  // reduction factor W with S E: 1.0 for seamless or below the creep range,
+  // less for welded pipe at elevated temperature. Until 2026-09-19 there was
+  // no W, overstating a welded CrMo line at 1,000 F by about 20%.
+  const W = Number(weld_strength_reduction);
+  if (!(W > 0 && W <= 1)) return { error: "Weld strength reduction factor W must be in (0, 1]." };
+  const SEW = S * E * W;
   if (mode === "required_wall") {
     const dp = Number(design_p);
     if (!(dp > 0)) return { error: "Design pressure must be positive (psi)." };
-    const t_min = (dp * od) / (2 * (S * E + dp * y)) + A;
-    return { mode, t_min };
+    const t_min = (dp * od) / (2 * (SEW + dp * y)) + A;
+    // The pipe ordered must still meet t_min after its mill under-tolerance.
+    const t_nominal_min = t_min / (1 - mt);
+    return { mode, t_min, t_nominal_min };
   }
   // allowable-pressure mode
   const wall = Number(wall_in);
@@ -462,13 +471,13 @@ export function computePipePressureRating({ od_in = 0, wall_in = 0, allow_stress
   const denom = od - 2 * y * (t_avail - A);
   if (!(denom > 0)) return { error: "Degenerate geometry: D - 2y(t - A) is not positive." };
   if (!(t_avail - A > 0)) return { error: "Allowance exceeds the available wall." };
-  const p_allow = (2 * S * E * (t_avail - A)) / denom;
+  const p_allow = (2 * SEW * (t_avail - A)) / denom;
   return { mode, t_avail, p_allow };
 }
 export const pipePressureRatingExample = { inputs: { od_in: 4.5, wall_in: 0.237, allow_stress: 17100, joint_factor: 1, y_coeff: 0.4, mill_tol_frac: 0.125, allowance_in: 0, mode: "allowable_pressure" } };
 
 function _renderPipePressureRating(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: ASME B31.1 Power Piping internal-pressure design - allowable pressure P = 2 S E (t - A) / (D - 2 y (t - A)); minimum wall t = P D / (2 (S E + P y)) + A - by name (B31.3 Process Piping uses the same form with its own allowables). The allowable stress S, joint efficiency E, and y-coefficient are read from the applicable code edition's tables for the specific material and temperature. This is a design screen, not a stamped calculation; the engineer of record and the AHJ govern.";
+  citationEl.textContent = "Citation: ASME B31.1 Power Piping internal-pressure design - allowable pressure P = 2 S E W (t - A) / (D - 2 y (t - A)); minimum wall t = P D / (2 (S E W + P y)) + A, W the weld joint strength reduction factor - by name (B31.3 Process Piping uses the same form with its own allowables). The allowable stress S, joint efficiency E, and y-coefficient are read from the applicable code edition's tables for the specific material and temperature. This is a design screen, not a stamped calculation; the engineer of record and the AHJ govern.";
   const mode = makeSelect("Mode", "pp-mode", [
     { value: "allowable_pressure", label: "Allowable pressure from wall", selected: true },
     { value: "required_wall", label: "Required wall from pressure" },
@@ -484,7 +493,8 @@ function _renderPipePressureRating(inputRegion, outputRegion, citationEl) {
   const mt = makeNumber("Mill under-tolerance fraction", "pp-mt", { step: "any", min: "0", value: "0.125" });
   mt.input.value = "0.125";
   const A = makeNumber("Corrosion + threading allowance A (in)", "pp-a", { step: "any", min: "0", value: "0" });
-  for (const f of [mode, od, wall, dp, S, E, y, mt, A]) inputRegion.appendChild(f.wrap);
+  const Wf = makeNumber("Weld strength reduction W (seamless or below creep = 1.0)", "pp-w", { step: "any", min: "0", max: "1", value: "1" });
+  for (const f of [mode, od, wall, dp, S, E, Wf, y, mt, A]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { mode.select.value = "allowable_pressure"; od.input.value = "4.5"; wall.input.value = "0.237"; dp.input.value = ""; S.input.value = "17100"; E.input.value = "1"; y.input.value = "0.4"; mt.input.value = "0.125"; A.input.value = "0"; update(); });
   const oOut = makeOutputLine(outputRegion, "Result", "pp-out");
   const oWall = makeOutputLine(outputRegion, "Available wall after mill tolerance", "pp-out-wall");
@@ -494,18 +504,18 @@ function _renderPipePressureRating(inputRegion, outputRegion, citationEl) {
       allow_stress: Number(S.input.value) || 0, joint_factor: Number(E.input.value) || 0,
       y_coeff: Number(y.input.value) || 0, mill_tol_frac: Number(mt.input.value) || 0,
       allowance_in: Number(A.input.value) || 0, design_p: Number(dp.input.value) || 0,
-      mode: mode.select.value,
+      mode: mode.select.value, weld_strength_reduction: Number(Wf.input.value) || 1,
     });
     if (r.error) { oOut.textContent = r.error; oWall.textContent = "-"; return; }
     if (r.mode === "required_wall") {
       oOut.textContent = "Minimum wall " + fmt(r.t_min, 4) + " in";
-      oWall.textContent = "-";
+      oWall.textContent = "order at least " + fmt(r.t_nominal_min, 4) + " in nominal (after mill tolerance)";
     } else {
       oOut.textContent = "Maximum allowable pressure " + fmt(r.p_allow, 0) + " psi";
       oWall.textContent = fmt(r.t_avail, 4) + " in";
     }
   }, DEBOUNCE_MS);
-  for (const f of [od.input, wall.input, dp.input, S.input, E.input, y.input, mt.input, A.input]) f.addEventListener("input", update);
+  for (const f of [od.input, wall.input, dp.input, S.input, E.input, Wf.input, y.input, mt.input, A.input]) f.addEventListener("input", update);
   mode.select.addEventListener("change", update);
 }
 PIPEFIT_RENDERERS["pipe-pressure-rating"] = _renderPipePressureRating;
@@ -851,8 +861,8 @@ PIPEFIT_RENDERERS["flange-rating"] = _renderFlangeRating;
 // Required walls come from the pressure design (pipe-pressure-rating); the
 // engineer of record and the AHJ govern - this is the area balance, not a
 // stamped branch-connection design.
-// dims: in { run_od_in: L, run_wall_in: L, run_treq_in: L, branch_od_in: L, branch_wall_in: L, branch_treq_in: L, beta_deg: dimensionless } out: { d1_in: L, a_required_in2: L^2, a_run_in2: L^2, a_branch_in2: L^2, a_available_in2: L^2, pad_area_in2: L^2, branch_run_od_ratio: dimensionless, large_branch: dimensionless }
-export function computeBranchReinforcement({ run_od_in = 0, run_wall_in = 0, run_treq_in = 0, branch_od_in = 0, branch_wall_in = 0, branch_treq_in = 0, beta_deg = 90 } = {}) {
+// dims: in { run_od_in: L, run_wall_in: L, run_treq_in: L, branch_od_in: L, branch_wall_in: L, branch_treq_in: L, beta_deg: dimensionless, mill_tol_frac: dimensionless, corrosion_in: L } out: { d1_in: L, a_required_in2: L^2, a_run_in2: L^2, a_branch_in2: L^2, a_available_in2: L^2, pad_area_in2: L^2, branch_run_od_ratio: dimensionless, large_branch: dimensionless }
+export function computeBranchReinforcement({ run_od_in = 0, run_wall_in = 0, run_treq_in = 0, branch_od_in = 0, branch_wall_in = 0, branch_treq_in = 0, beta_deg = 90, mill_tol_frac = 0.125, corrosion_in = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const rod = Number(run_od_in), bod = Number(branch_od_in);
   const Th = Number(run_wall_in), trh = Number(run_treq_in);
@@ -864,14 +874,22 @@ export function computeBranchReinforcement({ run_od_in = 0, run_wall_in = 0, run
   if (!(trh >= 0) || !(trb >= 0)) return { error: "Required walls must be non-negative (in)." };
   if (!(trh < Th)) return { error: "Run required wall must be less than the nominal wall (no excess to credit)." };
   if (!(beta > 0 && beta <= 90)) return { error: "Branch angle must be in (0, 90] degrees." };
+  const mt = Number(mill_tol_frac), c = Number(corrosion_in) || 0;
+  if (!(mt >= 0 && mt < 1)) return { error: "Mill-tolerance fraction must be in [0, 1)." };
+  if (!(c >= 0)) return { error: "Corrosion allowance cannot be negative (in)." };
+  // B31.3 304.3.3 / B31.1 104.3.1 work in the MINIMUM wall (nominal less the
+  // mill under-tolerance) less the corrosion allowance c. Until 2026-09-19
+  // the nominal walls were used with no c, so the tile's own example read
+  // "adequate, no pad" where the code requires one.
+  const Thm = Th * (1 - mt), Tbm = Tb * (1 - mt);
   const sinB = Math.sin((beta * Math.PI) / 180);
-  const d1 = (bod - 2 * Tb) / sinB;                      // effective opening in the run
+  const d1 = (bod - 2 * (Tbm - c)) / sinB;               // effective opening in the run
   if (!(d1 > 0)) return { error: "Branch bore must be positive (check the branch OD and wall)." };
   const a_required = trh * d1 * (2 - sinB);
-  const d2 = Math.max(d1, Tb + Th + d1 / 2);             // reinforcement zone half-width
-  const L4 = Math.min(2.5 * Th, 2.5 * Tb);               // zone height up the branch (no pad)
-  const a1 = (2 * d2 - d1) * (Th - trh);                 // excess metal in the run
-  const a2 = 2 * L4 * (Tb - trb);                        // excess metal in the branch
+  const d2 = Math.max(d1, (Tbm - c) + (Thm - c) + d1 / 2); // reinforcement zone half-width
+  const L4 = Math.min(2.5 * (Thm - c), 2.5 * (Tbm - c));   // zone height up the branch (no pad)
+  const a1 = (2 * d2 - d1) * Math.max(0, Thm - trh - c);   // excess metal in the run
+  const a2 = 2 * L4 * Math.max(0, Tbm - trb - c) / sinB;   // excess metal in the branch
   const a_available = a1 + a2;
   const adequate = a_available >= a_required;
   const pad_area = Math.max(0, a_required - a_available);
@@ -899,7 +917,9 @@ function _renderBranchReinforcement(inputRegion, outputRegion, citationEl) {
   const btreq = makeNumber("Branch required wall t_rb (in)", "br-btreq", { step: "any", min: "0" });
   const beta = makeNumber("Branch angle to the run (deg, 90 = perpendicular)", "br-beta", { step: "any", min: "0", max: "90", value: "90" });
   beta.input.value = "90";
-  for (const f of [rod, rwall, rtreq, bod, bwall, btreq, beta]) inputRegion.appendChild(f.wrap);
+  const mtol = makeNumber("Mill under-tolerance fraction (0.125 for seamless)", "br-mt", { step: "any", min: "0", value: "0.125" });
+  const corr = makeNumber("Corrosion allowance c (in)", "br-c", { step: "any", min: "0", value: "0" });
+  for (const f of [rod, rwall, rtreq, bod, bwall, btreq, beta, mtol, corr]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => {
     rod.input.value = "6.625"; rwall.input.value = "0.280"; rtreq.input.value = "0.10";
     bod.input.value = "2.375"; bwall.input.value = "0.154"; btreq.input.value = "0.034"; beta.input.value = "90"; update();
@@ -912,13 +932,14 @@ function _renderBranchReinforcement(inputRegion, outputRegion, citationEl) {
       run_od_in: Number(rod.input.value) || 0, run_wall_in: Number(rwall.input.value) || 0, run_treq_in: Number(rtreq.input.value) || 0,
       branch_od_in: Number(bod.input.value) || 0, branch_wall_in: Number(bwall.input.value) || 0, branch_treq_in: Number(btreq.input.value) || 0,
       beta_deg: Number(beta.input.value) || 0,
+      mill_tol_frac: mtol.input.value === "" ? 0.125 : Number(mtol.input.value), corrosion_in: Number(corr.input.value) || 0,
     });
     if (r.error) { oReq.textContent = r.error; oAvail.textContent = "-"; oVerdict.textContent = "-"; return; }
     oReq.textContent = fmt(r.a_required_in2, 3) + " in^2 (opening d1 " + fmt(r.d1_in, 3) + " in)";
     oAvail.textContent = fmt(r.a_available_in2, 3) + " in^2 (run " + fmt(r.a_run_in2, 3) + " + branch " + fmt(r.a_branch_in2, 3) + ")";
     oVerdict.textContent = (r.large_branch ? "Large branch (OD ratio " + fmt(r.branch_run_od_ratio, 2) + " > 0.5; verify a listed tee or a rigorous check applies). " : "") + (r.adequate ? "Adequate - excess wall covers it, no pad" : "Pad required - add " + fmt(r.pad_area_in2, 3) + " in^2 of reinforcement");
   }, DEBOUNCE_MS);
-  for (const f of [rod.input, rwall.input, rtreq.input, bod.input, bwall.input, btreq.input, beta.input]) f.addEventListener("input", update);
+  for (const f of [rod.input, rwall.input, rtreq.input, bod.input, bwall.input, btreq.input, beta.input, mtol.input, corr.input]) f.addEventListener("input", update);
 }
 PIPEFIT_RENDERERS["branch-reinforcement"] = _renderBranchReinforcement;
 

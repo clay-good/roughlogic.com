@@ -9516,9 +9516,9 @@
   {
    "tile_id": "motor-vd-starting",
    "source_publisher": "Ohm's-law voltage-drop method (first principles) + NEC Article 430 LRC",
-   "source_title": "V_drop = sqrt(3) * K * LRC * L / cmils; %dip = V_drop / V_source * 100",
+   "source_title": "V_drop = sqrt(3) * LRC * L * (R cos phi + X sin phi), R = K / cmils; %dip = V_drop / V_source * 100",
    "source_edition_or_year": "K=12.9 ohm-cmil/ft copper one-way",
-   "source_section_or_page": "480 V 3ph, LRC 180 A, 250 ft, 250 kcmil Cu -> V_drop 4.02 V, 0.838% dip",
+   "source_section_or_page": "480 V 3ph, LRC 180 A, 250 ft, 250 kcmil Cu, starting pf 0.35, X 0.05 ohm/kft -> V_drop 5.06 V, 1.05% dip",
    "verified_by": "rl",
    "verified_on": "2026-06-06",
    "inputs": {
@@ -9532,19 +9532,19 @@
    },
    "outputs": {
     "v_drop_V": {
-     "value": 4.0217,
+     "value": 5.05826,
      "tolerance": {
       "abs": 0.01
      }
     },
     "dip_pct": {
-     "value": 0.838,
+     "value": 1.0538,
      "tolerance": {
       "abs": 0.01
      }
     },
     "v_terminal_V": {
-     "value": 475.978,
+     "value": 474.942,
      "tolerance": {
       "abs": 0.05
      }
@@ -37706,7 +37706,7 @@
   {
    "tile_id": "branch-reinforcement",
    "source_publisher": "ASME B31.1 para 104.3.1 area replacement (B31.3 304.3 for process) (by name)",
-   "source_title": "NPS 6 Sch 40 run, NPS 2 Sch 40 branch at 90 deg, t_rh 0.10 -> A_req 0.207 in^2, run excess A1 0.372 alone covers it, no pad",
+   "source_title": "NPS 6 Sch 40 run, NPS 2 Sch 40 branch at 90 deg, t_rh 0.10, 12.5% mill tolerance -> A_req 0.211 in^2, run excess A1 0.305 alone covers it, no pad",
    "source_edition_or_year": "spec-v204 worked example (machine-verified, area balance)",
    "source_section_or_page": "spec-v204 section 2.1 pinned example",
    "verified_by": "rl",
@@ -37722,13 +37722,13 @@
    },
    "outputs": {
     "a_required_in2": {
-     "value": 0.2067,
+     "value": 0.21055,
      "tolerance": {
       "abs": 0.001
      }
     },
     "a_run_in2": {
-     "value": 0.37206,
+     "value": 0.305297,
      "tolerance": {
       "abs": 0.001
      }
@@ -37744,7 +37744,7 @@
   {
    "tile_id": "branch-reinforcement",
    "source_publisher": "ASME B31.1 para 104.3.1 area replacement (B31.3 304.3 for process) (by name)",
-   "source_title": "Same fitting at a higher required wall t_rh 0.25 -> A_req 0.517 in^2, excess falls short, pad ~0.362 in^2 required",
+   "source_title": "Same fitting at a higher required wall t_rh 0.25 (12.5% mill tolerance) -> A_req 0.526 in^2, excess falls short, pad ~0.458 in^2 required",
    "source_edition_or_year": "spec-v204 worked example (machine-verified, area balance)",
    "source_section_or_page": "spec-v204 section 2.1 cross-check",
    "verified_by": "rl",
@@ -37760,13 +37760,13 @@
    },
    "outputs": {
     "a_required_in2": {
-     "value": 0.51675,
+     "value": 0.526375,
      "tolerance": {
       "abs": 0.001
      }
     },
     "pad_area_in2": {
-     "value": 0.36234,
+     "value": 0.458495,
      "tolerance": {
       "abs": 0.001
      }

@@ -90,15 +90,17 @@ test("neutral-current-3ph: negative current rejected", () => {
 // ---------------------------------------------------------------------------
 // A.3 motor-vd-starting (Ohm's-law dip)
 // ---------------------------------------------------------------------------
-test("motor-vd-starting: 480 V 3ph, LRC 180 A, 250 ft, 250 kcmil Cu -> ~0.838% dip", () => {
+test("motor-vd-starting: 480 V 3ph, LRC 180 A, 250 ft, 250 kcmil Cu, pf 0.35, X 0.05 -> ~1.054% dip (0.838% on resistance alone)", () => {
   const r = computeMotorVdStarting({ source_voltage_V: 480, length_ft: 250, cmils: 250000, lrc_A: 180, phase: "three", k_const: 12.9 });
-  assert.ok(Math.abs(r.dip_pct - 0.838) < 0.005);
+  assert.ok(Math.abs(r.dip_pct - 1.0538) < 0.005);
+  // Unity power factor and zero reactance recover the resistance-only drop.
+  assert.ok(Math.abs(computeMotorVdStarting({ source_voltage_V: 480, length_ft: 250, cmils: 250000, lrc_A: 180, phase: "three", k_const: 12.9, starting_pf: 1, reactance_ohm_per_kft: 0 }).dip_pct - 0.838) < 0.005);
   assert.ok(r.pass);
 });
 
 test("motor-vd-starting: example fixture", () => {
   const r = computeMotorVdStarting(motorVdStartingExample.inputs);
-  assert.ok(Math.abs(r.v_drop_V - 4.0217) < 0.01);
+  assert.ok(Math.abs(r.v_drop_V - 5.0583) < 0.01);
 });
 
 test("motor-vd-starting: single-phase uses the factor of 2", () => {

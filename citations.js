@@ -3196,7 +3196,7 @@ export const CITATIONS = {
     editionNote: NEC_DISCLOSURE,
     assumptions: [
       { name: "Method choice", value: "the optional method may be used for a dwelling served by a single 120/240 V or 120/208 V set of service conductors; size to the larger of the optional and standard methods", source: "NEC 2023 220.82 / Table 220.45" },
-      { name: "HVAC", value: "the larger of heating vs cooling is added at 100%; non-simultaneous loads are not summed", source: "NEC 2023 220.82(C)" },
+      { name: "HVAC", value: "the larger of cooling at 100% and heating at 100% (heat-pump compressor), 65% (central resistance, or fewer than 4 separately controlled units) or 40% (4 or more separately controlled units); non-simultaneous loads are not summed", source: "NEC 2023 220.82(C)" },
     ],
   },
 
@@ -3236,7 +3236,7 @@ export const CITATIONS = {
   },
 
   "motor-vd-starting": {
-    formula: "V_drop = (2 for 1-phase, sqrt(3) for 3-phase) x K x LRC x L / cmils; V_terminal = V_source - V_drop; %dip = V_drop / V_source x 100. K is the conductor constant (Cu ~12.9, Al ~21.2 ohm-cmil/ft) and LRC the motor locked-rotor current.",
+    formula: "V_drop = (2 for 1-phase, sqrt(3) for 3-phase) x LRC x L x (R cos phi + X sin phi), R = K / cmils per ft, X the conductor reactance and phi the locked-rotor power-factor angle (typ. pf 0.2-0.4); V_terminal = V_source - V_drop; %dip = V_drop / V_source x 100. K is the conductor constant (Cu ~12.9, Al ~21.2 ohm-cmil/ft) and LRC the motor locked-rotor current.",
     edition: "Ohm's-law voltage-drop method (first principles); motor locked-rotor current per NEC Article 430 code-letter tables; contactor pickup/dropout ~85% nominal per NEMA ICS 2, by name.",
     freeAccess: "NFPA 70 free read-only at nfpa.org/freeaccess; LRC user-supplied from the nameplate code letter or estimated as 6x FLA.",
     governance: GOVERNANCE.electrical,
@@ -21487,7 +21487,7 @@ export const CITATIONS = {
     ],
   },
   "pipe-pressure-rating": {
-    formula: "allowable: P = 2 S E (t_avail - A) / (D - 2 y (t_avail - A)), t_avail = wall x (1 - mill_tol). required wall: t = P D / (2 (S E + P y)) + A. ASME B31.1 internal-pressure design.",
+    formula: "allowable: P = 2 S E W (t_avail - A) / (D - 2 y (t_avail - A)), t_avail = wall x (1 - mill_tol). required wall: t = P D / (2 (S E W + P y)) + A, ordered nominal >= t / (1 - mill_tol). W = weld joint strength reduction factor (1.0 seamless or below the creep range). ASME B31.1 / B31.3 internal-pressure design.",
     edition: "ASME B31.1 Power Piping pressure-design relation, by name (B31.3 Process Piping uses the same form with its own allowables). The allowable stress S, joint factor E, and y-coefficient are read from the code edition's tables.",
     freeAccess: "The internal-pressure design equation (Barlow for the first cut, the B31.1 form for the real one) is public; the material allowable stress, joint factor, and y-coefficient are read from the applicable code tables.",
     governance: GOVERNANCE.general,

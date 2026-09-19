@@ -643,7 +643,6 @@ export const BESPOKE_OUTPUT_LABELS = {
   "pipe-insulation-takeoff": {"sections":"Insulation sections","jacket_sf":"Jacket area"},
   "pipe-miter-cut": {"miter_angle_deg":"Miter angle per cut (deg)","n_welds":"Welds (cuts)","cutback_in":"Cutback, long side minus short side (in)","gore_centerline_in":"Gore centerline (in)","notes":"Notes"},
   "pipe-partial-flow-depth": {"depth_in":"Flow depth","v_fps":"Velocity at that depth","self_cleansing":"Self-cleansing (2 ft/s)","shear_psf":"Boundary shear","note":"Note"},
-  "pipe-pressure-rating": {"t_avail":"Available wall after mill tolerance"},
   "pipe-purge-volume": {"pipe_volume_ft3":"Pipe volume","purge_volume_ft3":"Purge volume","purge_min":"Purge time"},
   "pipe-sizing": {"total_wsfu":"Total WSFU","estimated_demand_gpm":"Estimated demand","recommended_supply_size":"Recommended supply size","total_dfu":"Total DFU","recommended_drainage_size":"Recommended drainage size"},
   "pipe-spacing-rack": {"center_to_center_in":"Center-to-center spacing","pipes_that_fit":"Fit on rack","notes":"Notes"},

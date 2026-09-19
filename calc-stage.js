@@ -314,11 +314,17 @@ export function computeRiggingCheck({ hardware = "sling_5_8_steel", configuratio
   if (configuration === "vertical") tension_per_leg = load_lb / n_legs;
   else if (configuration === "basket" || configuration === "bridle") {
     if (!(included_angle_deg > 0 && included_angle_deg < 180)) return { error: "Included angle must be 0-180 deg." };
-    tension_per_leg = load_lb / (n_legs * Math.cos((included_angle_deg / 2) * Math.PI / 180));
+    // A bridle of three or more legs cannot be assumed to share the load
+    // evenly -- legs of unequal length or a rigid load leave two carrying it
+    // (the multi-leg-sling tile's rule). Until 2026-09-19 all n legs shared.
+    const bearing_legs = configuration === "bridle" ? Math.min(n_legs, 2) : n_legs;
+    tension_per_leg = load_lb / (bearing_legs * Math.cos((included_angle_deg / 2) * Math.PI / 180));
   } else if (configuration === "choker") {
     if (!(included_angle_deg > 0 && included_angle_deg < 180)) return { error: "Included angle must be 0-180 deg." };
+    // The 0.75 choke derate reduces the RATED load once (below); it does not
+    // also raise the leg tension (until 2026-09-19 it was applied twice).
     derate_factor = 0.75;
-    tension_per_leg = load_lb / (n_legs * Math.cos((included_angle_deg / 2) * Math.PI / 180) * derate_factor);
+    tension_per_leg = load_lb / (n_legs * Math.cos((included_angle_deg / 2) * Math.PI / 180));
   } else {
     return { error: "Unknown configuration." };
   }

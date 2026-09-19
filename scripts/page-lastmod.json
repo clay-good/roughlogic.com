@@ -786,8 +786,8 @@
       "date": "2026-09-01"
     },
     "/tools/branch-reinforcement/": {
-      "sha": "9e178f5bf48eb81e",
-      "date": "2026-09-01"
+      "sha": "e1478e93f8886b18",
+      "date": "2026-09-19"
     },
     "/tools/branch-saddle-cutback/": {
       "sha": "0dd0a765f2326c2d",
@@ -4774,8 +4774,8 @@
       "date": "2026-09-01"
     },
     "/tools/motor-vd-starting/": {
-      "sha": "b39012c652a9f42e",
-      "date": "2026-09-01"
+      "sha": "9a6a8d8b496f852d",
+      "date": "2026-09-19"
     },
     "/tools/mstp-segment-loading/": {
       "sha": "090d1abd1270eea3",
@@ -5262,8 +5262,8 @@
       "date": "2026-09-01"
     },
     "/tools/pipe-pressure-rating/": {
-      "sha": "38ea88f8cb9aeb7d",
-      "date": "2026-09-04"
+      "sha": "66c66361473c7b07",
+      "date": "2026-09-19"
     },
     "/tools/pipe-purge-volume/": {
       "sha": "139769b9e6970398",
@@ -6658,7 +6658,7 @@
       "date": "2026-09-19"
     },
     "/tools/service-load-optional/": {
-      "sha": "fadde0dd986031a1",
+      "sha": "c77c687c7ac355ab",
       "date": "2026-09-19"
     },
     "/tools/service-load-standard/": {

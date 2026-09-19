@@ -6,6 +6,13 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **More equations missing a term, from the same sweep.**
+  - `rigging-check` let every leg of a bridle share the load equally. With three or four legs that cannot be assumed; the tile now counts two, matching `multi-leg-sling`. Its choker branch applied the 0.75 derate twice, to the tension and to the rated load; it now applies it once, to the rated load.
+  - `pipe-pressure-rating` had no weld joint strength reduction factor W. B31.3 and current B31.1 design to S·E·W, so a welded line in the creep range read about 20% strong. Required-wall mode now also reports the nominal wall to order after mill tolerance.
+  - `branch-reinforcement` used nominal walls with no corrosion allowance. The B31.3 area replacement works in minimum walls less c, with the branch area divided by sin β; new mill-tolerance and corrosion inputs apply it.
+  - `motor-vd-starting` computed the starting dip from resistance at unity power factor. Locked-rotor current runs at about 0.2–0.4 power factor, so the drop is I(R·cosφ + X·sinφ). A 500 kcmil, 600 ft feeder read an 8% dip that is about 18%.
+  - `service-load-optional` took every heating load at 100%. NEC 220.82(C) allows 65% for central resistance heat and 40% for four or more separately controlled units; a new heating-type input offers them, keeping 100% for heat pumps and the default.
+
 - **Published equations with one of their terms dropped.** A catalog-wide sweep compared each named equation term by term against its source and found:
   - `grounding-electrode`'s buried ring used a 1/(4π²) coefficient with s as the burial depth. Dwight's formula (IEEE 142 Table 4-5) is 1/(2π²) with s twice the depth. The ring read about half its real resistance and could "meet" 25 Ω when it did not.
   - `formwork-pressure` ran ACI 347R's short form for every pour. That form holds only below 7 ft/hr in walls up to 14 ft. Taller or faster pours take the 43,400/T + 2,800R/T form, above 15 ft/hr the full head, and there is a 600·Cw psf floor. A 20 ft wall at 5 ft/hr and 50°F read 1,050 psf against 1,298.

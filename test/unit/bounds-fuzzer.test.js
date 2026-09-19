@@ -2027,10 +2027,14 @@ test("bounds: calc-stage computeRiggingCheck pins per-leg tension = load / n in 
       const expected = load_lb / (2 * Math.cos((included_angle_deg / 2) * Math.PI / 180));
       assert.ok(Math.abs(b.tension_per_leg_lb - expected) < 1e-9, `basket identity L=${load_lb} a=${included_angle_deg}`);
     }
-    // Choker derate: 0.75 reduction on the per-leg-tension denominator AND on effective_wll.
+    // Choker derate: 0.75 on the rated load ONCE; the leg tension is the plain geometry.
     const ch = computeRiggingCheck({ hardware: "sling_5_8_steel", configuration: "choker", load_lb, included_angle_deg: 60, n_legs: 2 });
     assert.strictEqual(ch.derate_factor, 0.75);
     assert.ok(Math.abs(ch.effective_wll_lb - 6700 * 0.75) < 1e-9, `effective_wll derate`);
+    assert.ok(Math.abs(ch.tension_per_leg_lb - load_lb / (2 * Math.cos(Math.PI / 6))) < 1e-9, `choker tension not double-derated`);
+    // A 4-leg bridle is counted as 2 bearing legs.
+    const br = computeRiggingCheck({ hardware: "sling_5_8_steel", configuration: "bridle", load_lb, included_angle_deg: 60, n_legs: 4 });
+    assert.ok(Math.abs(br.tension_per_leg_lb - load_lb / (2 * Math.cos(Math.PI / 6))) < 1e-9, `bridle bearing legs`);
   }
 });
 
@@ -7823,7 +7827,7 @@ test("bounds: calc-powerquality v20 A.1/A.2/A.3 pin constants + reject non-finit
   assert.ok(Number.isFinite(computeNeutralCurrent3ph({ ia_A: 1e6, ib_A: 0, ic_A: 0 }).neutral_A));
   // A.3 motor-vd-starting
   const a3 = computeMotorVdStarting({ source_voltage_V: 480, length_ft: 250, cmils: 250000, lrc_A: 180, phase: "three", k_const: 12.9 });
-  assert.ok(Math.abs(a3.dip_pct - 0.838) < 0.01);
+  assert.ok(Math.abs(a3.dip_pct - 1.0538) < 0.01);
   assert.ok(Number.isFinite(a3.v_terminal_V));
   assert.ok("error" in computeMotorVdStarting({ source_voltage_V: 0, length_ft: 250, cmils: 250000, lrc_A: 180 }));
   assert.ok("error" in computeMotorVdStarting({ source_voltage_V: 480, length_ft: 250, cmils: 0, lrc_A: 180 }));
@@ -14069,15 +14073,18 @@ test("bounds: spec-v203 flange-rating pins the table + interpolation + higher cl
 
 test("bounds: spec-v204 branch-reinforcement pins the adequate example + the pad flip + rejects bad inputs", () => {
   const a = _v204({ run_od_in: 6.625, run_wall_in: 0.280, run_treq_in: 0.10, branch_od_in: 2.375, branch_wall_in: 0.154, branch_treq_in: 0.034, beta_deg: 90 });
-  assert.ok(Math.abs(a.d1_in - 2.067) < 0.001);
-  assert.ok(Math.abs(a.a_required_in2 - 0.2067) < 0.001);
-  assert.ok(Math.abs(a.a_run_in2 - 0.37206) < 0.001);
+  assert.ok(Math.abs(a.d1_in - (2.375 - 2 * 0.154 * 0.875)) < 0.001); // bore at the minimum wall
+  // B31.3 minimum walls: 12.5% mill tolerance by default.
+  assert.ok(Math.abs(a.a_required_in2 - 0.21055) < 0.001);
+  assert.ok(Math.abs(a.a_run_in2 - 0.30530) < 0.001);
   assert.equal(a.adequate, true);
   assert.ok(Math.abs(a.pad_area_in2) < 1e-9);
   // raise the run required wall and the same opening flips to needing a pad.
   const b = _v204({ run_od_in: 6.625, run_wall_in: 0.280, run_treq_in: 0.25, branch_od_in: 2.375, branch_wall_in: 0.154, branch_treq_in: 0.034, beta_deg: 90 });
   assert.equal(b.adequate, false);
-  assert.ok(Math.abs(b.a_required_in2 - 0.51675) < 0.001 && Math.abs(b.pad_area_in2 - 0.36234) < 0.001);
+  assert.ok(Math.abs(b.a_required_in2 - 0.52638) < 0.001 && Math.abs(b.pad_area_in2 - 0.45849) < 0.001);
+  // A corrosion allowance flips the base case to needing a pad.
+  assert.equal(_v204({ run_od_in: 6.625, run_wall_in: 0.280, run_treq_in: 0.10, branch_od_in: 2.375, branch_wall_in: 0.154, branch_treq_in: 0.034, beta_deg: 90, corrosion_in: 0.0625 }).adequate, false);
   assert.ok("error" in _v204({ run_od_in: 0, run_wall_in: 0.280, run_treq_in: 0.10, branch_od_in: 2.375, branch_wall_in: 0.154, branch_treq_in: 0.034 }));
   assert.ok("error" in _v204({ run_od_in: 6.625, run_wall_in: 0, run_treq_in: 0.10, branch_od_in: 2.375, branch_wall_in: 0.154, branch_treq_in: 0.034 }));
   assert.ok("error" in _v204({ run_od_in: 6.625, run_wall_in: 0.280, run_treq_in: 0.30, branch_od_in: 2.375, branch_wall_in: 0.154, branch_treq_in: 0.034 })); // treq >= wall

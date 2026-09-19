@@ -3666,6 +3666,7 @@ export function computeServiceLoadOptional({
   hvac_cooling_kw = 0,
   ev_charger_a = 0,
   service_voltage = 240,
+  heating_type = "heat_pump",
 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const area = Number(area_ft2) || 0;
@@ -3693,8 +3694,15 @@ export function computeServiceLoadOptional({
   const ev_va = ev * V;
   const general_va = 3 * area + 1500 * (sa + laundry) + (fixed + range + dryer + wh) * 1000 + ev_va;
   const general_demand_va = general_va <= 10000 ? general_va : 10000 + 0.40 * (general_va - 10000);
-  // 220.82(C) HVAC: larger of heating vs cooling at 100%.
-  const hvac_demand_va = Math.max(heat, cool) * 1000;
+  // 220.82(C): the larger of cooling at 100% and heating at the factor its
+  // type takes -- 100% for a heat-pump compressor (the default, unchanged),
+  // 65% for central electric resistance heat or fewer than four separately
+  // controlled units, 40% for four or more separately controlled units.
+  // Until 2026-09-19 every heating load was taken at 100%.
+  const HEAT_FACTOR = { heat_pump: 1.0, central_resistance: 0.65, separate_units_4plus: 0.40 };
+  const heat_factor = HEAT_FACTOR[heating_type];
+  if (heat_factor === undefined) return { error: "Heating type must be heat_pump, central_resistance, or separate_units_4plus." };
+  const hvac_demand_va = Math.max(heat * heat_factor, cool) * 1000;
 
   const optional_total_va = general_demand_va + hvac_demand_va;
   const optional_demand_a = optional_total_va / V;
@@ -3774,13 +3782,18 @@ export function renderServiceLoadOptional(inputRegion, outputRegion, citationEl)
   const dryer = makeNumber("Dryer (kW)", "slo-dryer", { step: "any", min: "0" });
   const wh = makeNumber("Water heater (kW)", "slo-wh", { step: "any", min: "0" });
   const heat = makeNumber("Heating (kW)", "slo-heat", { step: "any", min: "0" });
+  const heatType = makeSelect("Heating type (220.82(C) factor)", "slo-heat-type", [
+    { value: "heat_pump", label: "Heat-pump compressor or unsure (100%)", selected: true },
+    { value: "central_resistance", label: "Central resistance, or fewer than 4 separately controlled units (65%)" },
+    { value: "separate_units_4plus", label: "4 or more separately controlled units (40%)" },
+  ]);
   const cool = makeNumber("Cooling (kW)", "slo-cool", { step: "any", min: "0" });
   const ev = makeNumber("EV charger (A; 0 if none)", "slo-ev", { step: "any", min: "0" });
   const volts = makeSelect("Service voltage", "slo-v", [
     { value: "240", label: "240 V (single-phase dwelling)", selected: true },
     { value: "208", label: "208 V" },
   ]);
-  for (const f of [area, sa, laundry, fixed, range, dryer, wh, heat, cool, ev, volts]) inputRegion.appendChild(f.wrap);
+  for (const f of [area, sa, laundry, fixed, range, dryer, wh, heat, heatType, cool, ev, volts]) inputRegion.appendChild(f.wrap);
 
   attachExampleButton(inputRegion, () => {
     area.input.value = "2400"; sa.input.value = "2"; laundry.input.value = "1"; fixed.input.value = "3";
@@ -3811,6 +3824,7 @@ export function renderServiceLoadOptional(inputRegion, outputRegion, citationEl)
       dryer_kw: readNum(dryer.input),
       water_heater_kw: readNum(wh.input),
       hvac_heating_kw: readNum(heat.input),
+      heating_type: heatType.select.value,
       hvac_cooling_kw: readNum(cool.input),
       ev_charger_a: readNum(ev.input),
       service_voltage: Number(volts.select.value),
@@ -3826,7 +3840,7 @@ export function renderServiceLoadOptional(inputRegion, outputRegion, citationEl)
     oRec.textContent = r.recommended_a + " A (governed by " + r.governing_method + ")" + (r.exceeds_standard ? " -- EXCEEDS the largest standard size; this is the ceiling, NOT a sufficient size. Engineered design required." : "");
     oW.textContent = r.warnings.length ? r.warnings.join(" ") : "Size the service to the larger of the two methods; the AHJ-adopted edition governs.";
   }, DEBOUNCE_MS);
-  for (const f of [area.input, sa.input, laundry.input, fixed.input, range.input, dryer.input, wh.input, heat.input, cool.input, ev.input, volts.select]) f.addEventListener("input", update);
+  for (const f of [area.input, sa.input, laundry.input, fixed.input, range.input, dryer.input, wh.input, heat.input, heatType.select, cool.input, ev.input, volts.select]) f.addEventListener("input", update);
 }
 
 ELECTRICAL_RENDERERS["service-load-optional"] = renderServiceLoadOptional;
