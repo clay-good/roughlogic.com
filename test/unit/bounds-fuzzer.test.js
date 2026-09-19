@@ -15216,9 +15216,13 @@ test("bounds: spec-v219 computeAshrae622Ventilation pins Qtot, fan flow, the zer
   assert.strictEqual(r.q_tot, 90);
   assert.strictEqual(r.q_fan, 90);
   // Infiltration credit shrinks the fan but not Qtot.
-  const r2 = _v219({ floor_area_ft2: 2000, bedrooms: 3, infil_credit_cfm: 35.3 });
+  // A balanced system takes the full credit (Phi = 1) ...
+  const r2 = _v219({ floor_area_ft2: 2000, bedrooms: 3, infil_credit_cfm: 35.3, system_type: "balanced" });
   assert.strictEqual(r2.q_tot, 90);
   assert.ok(Math.abs(r2.q_fan - 54.7) < 1e-9);
+  // ... an exhaust-only one only Phi = Qinf / Qtot of it (62.2 Eq. 4.2).
+  const r2u = _v219({ floor_area_ft2: 2000, bedrooms: 3, infil_credit_cfm: 35.3 });
+  assert.ok(Math.abs(r2u.q_fan - (90 - (35.3 / 90) * 35.3)) < 1e-9);
   // Credit meets Qtot -> zero-fan path.
   const r3 = _v219({ floor_area_ft2: 2000, bedrooms: 3, infil_credit_cfm: 200 });
   assert.strictEqual(r3.q_fan, 0);

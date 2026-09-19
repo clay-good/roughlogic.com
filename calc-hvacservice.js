@@ -617,30 +617,41 @@ HVACSERVICE_RENDERERS["blower-door-ach50"] = _simpleRenderer({
 
 // ===================== spec-v219: ASHRAE 62.2 whole-house ventilation =====================
 
-// dims: in { floor_area_ft2: L^2, bedrooms: dimensionless, infil_credit_cfm: L^3 T^-1 } out: { q_tot: L^3 T^-1, q_fan: L^3 T^-1 }
-export function computeAshrae622Ventilation({ floor_area_ft2 = 0, bedrooms = 0, infil_credit_cfm = 0 } = {}) {
+// dims: in { floor_area_ft2: L^2, bedrooms: dimensionless, infil_credit_cfm: L^3 T^-1, system_type: dimensionless, a_ext: dimensionless } out: { q_tot: L^3 T^-1, q_fan: L^3 T^-1 }
+export function computeAshrae622Ventilation({ floor_area_ft2 = 0, bedrooms = 0, infil_credit_cfm = 0, system_type = "unbalanced", a_ext = 1 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(floor_area_ft2 > 0)) return { error: "Conditioned floor area must be positive (ft^2)." };
   if (bedrooms < 0) return { error: "Bedroom count cannot be negative." };
   if (infil_credit_cfm < 0) return { error: "Infiltration credit cannot be negative (cfm)." };
   const q_tot = 0.03 * floor_area_ft2 + 7.5 * (bedrooms + 1);
-  const q_fan = Math.max(0, q_tot - infil_credit_cfm);
+  // 62.2 Eq. 4.2: Qfan = Qtot - Phi (Qinf x Aext). Phi = 1 for a balanced
+  // system and Qinf / Qtot for an unbalanced (exhaust- or supply-only) one;
+  // Aext = 1 for a detached house, the exterior share of the envelope for an
+  // attached unit. Until 2026-09-19 the full credit came off every system,
+  // under-ventilating an exhaust-only house (50 vs 72 cfm at a 40 cfm credit).
+  const Aext = Number(a_ext);
+  if (!(Aext > 0 && Aext <= 1)) return { error: "Aext must be in (0, 1] (1 for a detached house)." };
+  if (system_type !== "balanced" && system_type !== "unbalanced") return { error: "System type must be balanced or unbalanced." };
+  const phi = system_type === "balanced" ? 1 : Math.min(1, infil_credit_cfm / q_tot);
+  const q_fan = Math.max(0, q_tot - phi * infil_credit_cfm * Aext);
   const verdict = q_fan > 0
     ? "Continuous whole-house fan required: " + fmt(q_fan, 0) + " cfm"
     : "Infiltration credit meets Qtot - no continuous fan required by 62.2";
   return {
     q_tot, q_fan, verdict,
-    note: "ASHRAE 62.2-2019 Eq. 4.1a: Qtot = 0.03 x CFA + 7.5 x (Nbr + 1) sets the total required ventilation from floor area and bedrooms only (occupants assumed Nbr + 1); the fan flow is Qtot minus the infiltration credit. The conservative default is zero credit - size the fan to the full Qtot. The credit comes from the measured air-tightness (the blower-door natural infiltration) per the 62.2 infiltration method. Local kitchen and bath exhaust is a separate 62.2 requirement this tile does not cover. A sizing aid, not a 62.2 compliance certificate.",
+    note: "ASHRAE 62.2-2019 Eq. 4.1a: Qtot = 0.03 x CFA + 7.5 x (Nbr + 1) sets the total required ventilation from floor area and bedrooms only (occupants assumed Nbr + 1); the fan flow is Qtot minus Phi x Qinf x Aext (Eq. 4.2): the full credit only for a balanced system, a Qinf / Qtot share of it for an exhaust- or supply-only one. The conservative default is zero credit - size the fan to the full Qtot. The credit comes from the measured air-tightness (the blower-door natural infiltration) per the 62.2 infiltration method. Local kitchen and bath exhaust is a separate 62.2 requirement this tile does not cover. A sizing aid, not a 62.2 compliance certificate.",
   };
 }
 export const ashrae622VentilationExample = { inputs: { floor_area_ft2: 2000, bedrooms: 3, infil_credit_cfm: 0 } };
 HVACSERVICE_RENDERERS["ashrae-622-ventilation"] = _simpleRenderer({
-  citation: "Citation: ASHRAE 62.2-2019 §4.1 whole-house ventilation Qtot = 0.03 x Afloor + 7.5 x (Nbr + 1), and the fan flow Qfan = Qtot - Qinf (by name). The infiltration credit comes from the measured air-tightness; the conservative default is zero credit. Local kitchen/bath exhaust is a separate 62.2 requirement. A sizing aid, not a compliance certificate.",
+  citation: "Citation: ASHRAE 62.2-2019 §4.1 whole-house ventilation Qtot = 0.03 x Afloor + 7.5 x (Nbr + 1), and the fan flow Qfan = Qtot - Phi (Qinf x Aext), Phi = 1 balanced or Qinf / Qtot unbalanced (Eq. 4.2) (by name). The infiltration credit comes from the measured air-tightness; the conservative default is zero credit. Local kitchen/bath exhaust is a separate 62.2 requirement. A sizing aid, not a compliance certificate.",
   example: ashrae622VentilationExample.inputs,
   fields: [
     { key: "floor_area_ft2", label: "Conditioned floor area (ft²)", kind: "number" },
     { key: "bedrooms", label: "Bedrooms (Nbr)", kind: "number" },
     { key: "infil_credit_cfm", label: "Infiltration credit Qinf (cfm)", kind: "number" },
+    { key: "system_type", label: "Ventilation system", kind: "select", options: [{ value: "unbalanced", label: "Unbalanced (exhaust-only or supply-only)" }, { value: "balanced", label: "Balanced (ERV / HRV)" }] },
+    { key: "a_ext", label: "Aext, exterior share of the envelope (1 = detached)", kind: "number", default: 1 },
   ],
   outputs: [
     { key: "t", id: "a62-out-t", label: "Total required Qtot", value: (r) => fmt(r.q_tot, 1) + " cfm" },

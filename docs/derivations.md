@@ -2588,7 +2588,7 @@ cross-check.
 | calc-hvac.js | `renderSeerEer` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-hvac.js | `renderStaticPressureHvac` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-hvac.js | `renderWetBulbPsychrometer` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
-| calc-hvacservice.js | `computeAshrae622Ventilation` | `{ floor_area_ft2 = 0, bedrooms = 0, infil_credit_cfm = 0 } = {}` | _ | _ | _ |
+| calc-hvacservice.js | `computeAshrae622Ventilation` | `{ floor_area_ft2 = 0, bedrooms = 0, infil_credit_cfm = 0, system_type = "unba...` | _ | _ | _ |
 | calc-hvacservice.js | `computeBlowerDoorAch50` | `{ cfm50 = 0, volume_ft3 = 0, n_factor = 17, target_ach50 = 3, n_factor_low = ...` | _ | _ | _ |
 | calc-hvacservice.js | `computeChilledWaterDeltaT` | `{ load_btuh = 0, actual_gpm = 0, design_delta_t_f = 0 } = {}` | _ | _ | _ |
 | calc-hvacservice.js | `computeChimneyDraft` | `{ stack_height_ft = 0, ambient_temp_f = 0, mean_flue_temp_f = 0, baro_psia = ...` | _ | _ | _ |

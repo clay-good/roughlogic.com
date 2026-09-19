@@ -16539,7 +16539,7 @@ export const CITATIONS = {
     ],
   },
   "ashrae-622-ventilation": {
-    formula: "q_tot = 0.03 x floor_area_ft2 + 7.5 x (bedrooms + 1); q_fan = max(0, q_tot - infil_credit_cfm); verdict = q_fan > 0 (fan required) else (credit meets Qtot).",
+    formula: "q_tot = 0.03 x floor_area_ft2 + 7.5 x (bedrooms + 1); q_fan = max(0, q_tot - Phi x infil_credit_cfm x Aext), Phi = 1 balanced or infil_credit / q_tot unbalanced (ASHRAE 62.2 Eq. 4.2); verdict = q_fan > 0 (fan required) else (credit meets Qtot).",
     edition: "ASHRAE 62.2-2019 §4.1 whole-house ventilation rate (Qtot = 0.03 x Afloor + 7.5 x (Nbr + 1)) and the fan flow Qfan = Qtot - Qinf, by name; the 0.03 cfm/ft^2 and 7.5 cfm/person are the standard's rate coefficients.",
     freeAccess: "The whole-house ventilation rate and the fan-flow relation are stated in ASHRAE 62.2-2019 §4.1; the arithmetic is public. The infiltration credit comes from the measured air-tightness.",
     governance: GOVERNANCE.general,

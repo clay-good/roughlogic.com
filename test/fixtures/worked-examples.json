@@ -35341,7 +35341,7 @@
   {
    "tile_id": "ashrae-622-ventilation",
    "source_publisher": "ASHRAE 62.2-2019 \u00a74.1",
-   "source_title": "cross-check: same house, 35.3 cfm credit -> 54.7 cfm fan",
+   "source_title": "cross-check: same house, 35.3 cfm credit -> 54.7 cfm fan (balanced system, Phi = 1)",
    "source_edition_or_year": "spec-v219 worked example (machine-verified)",
    "source_section_or_page": "spec-v219 section 2.1 cross-check (with blower-door credit)",
    "verified_by": "rl",
@@ -35349,7 +35349,8 @@
    "inputs": {
     "floor_area_ft2": 2000,
     "bedrooms": 3,
-    "infil_credit_cfm": 35.3
+    "infil_credit_cfm": 35.3,
+    "system_type": "balanced"
    },
    "outputs": {
     "q_tot": {

@@ -6,6 +6,8 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **`ashrae-622-ventilation` took the full infiltration credit off every ventilation system.** ASHRAE 62.2 Eq. 4.2 is Qfan = Qtot − Φ·(Qinf·Aext). Φ is 1 only for a balanced system; for the common exhaust-only or supply-only system it is Qinf/Qtot. Aext is below 1 for an attached unit. A 2,000 ft², 3-bedroom exhaust-only house with a 40 cfm credit needs 72 cfm, not 50. New system-type and Aext inputs default to unbalanced and detached.
+
 - **Blowers sized to clean-water ratings, wood screws on the nail formula, and compressors at sea level everywhere.**
   - `aeration-oxygen-demand` divided the process oxygen demand straight by the diffusers' clean-water SOTE. The standard conversion from actual to standard oxygen, AOR / [α·F·θ^(T−20)·(β·Cs,T − C)/Cs,20], was silently 1. At typical α 0.5, F 0.9 and 2 mg/L DO, the example's 623 scfm is about 1,895. New inputs carry each factor; α = F = β = 1 and DO = 0 give the old clean-water answer.
   - `fastener-pullout` gave wood screws the nail formula × 1.85. NDS 12.2 gives screws their own W = 2850·G²·D, about 42% more at G = 0.42.
