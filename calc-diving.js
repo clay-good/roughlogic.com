@@ -367,7 +367,13 @@ export function computeUmbilicalAirSupply({ diver_count = 3, depth_ft = 0, rate_
   const max_depth_ft = feet_per_atm * (compressor_scfm / (rate_per_diver_acfm * diver_count) - 1);
   // The reserve is a separate, regulatory calculation, not the flow one.
   const reserve_required_cuft = rate_per_diver_acfm * depth_ata * reserve_minutes;
-  const tank_free_gas_cuft = volume_tank_cuft * tank_pressure_psi / _PSI_ATM;
+  // The tank only delivers while it is above the pressure at the diver: gas
+  // below bottom pressure (depth x 14.7 / feet_per_atm, gauge) never reaches
+  // the helmet. Until 2026-09-19 the tank was drained to 0 psig on paper,
+  // overstating the reserve by 22% at 100 ft. The helmet's over-bottom
+  // pressure reduces it further and is not modeled.
+  const bottom_psig = depth_ft / feet_per_atm * _PSI_ATM;
+  const tank_free_gas_cuft = volume_tank_cuft * Math.max(0, tank_pressure_psi - bottom_psig) / _PSI_ATM;
   const reserve_margin_cuft = tank_free_gas_cuft - reserve_required_cuft;
   return {
     depth_ata, per_diver_acfm, required_acfm, compressor_margin_acfm,
@@ -385,7 +391,7 @@ export function computeUmbilicalAirSupply({ diver_count = 3, depth_ft = 0, rate_
 }
 const umbilicalAirSupplyExample = { inputs: { diver_count: 3, depth_ft: 100, rate_per_diver_acfm: 1.4, compressor_scfm: 20, alt_depth_ft: 190, reserve_minutes: 10, volume_tank_cuft: 8, tank_pressure_psi: 200, feet_per_atm: 33 } };
 DIVING_RENDERERS["umbilical-air-supply"] = _simpleRenderer({
-  citation: "Citation: the surface-supplied flow relation by name -- required flow = the rate per diver x the absolute pressure (1 + depth / 33 seawater) x the number of divers including the standby -- with the reserve breathing supply as a separate requirement, and the volume tank's free gas taken as its capacity x its pressure / 14.7 psi. The rate per diver is set by the applicable regulation, not by arithmetic. The applicable commercial diving regulations, the operation's diving safety manual, and the diving supervisor govern.",
+  citation: "Citation: the surface-supplied flow relation by name -- required flow = the rate per diver x the absolute pressure (1 + depth / 33 seawater) x the number of divers including the standby -- with the reserve breathing supply as a separate requirement, and the volume tank's usable gas taken as its capacity x (its pressure - the bottom pressure) / 14.7 psi, before the helmet's over-bottom pressure, which reduces it further. The rate per diver is set by the applicable regulation, not by arithmetic. The applicable commercial diving regulations, the operation's diving safety manual, and the diving supervisor govern.",
   example: umbilicalAirSupplyExample.inputs,
   fields: [
     { key: "diver_count", label: "Divers supplied, standby included", kind: "number", default: 3 },
@@ -422,8 +428,11 @@ export function computeChamberGasVolume({ chamber_volume_cuft = 0, treatment_pre
   if (!(oxygen_acfm_per_occupant > 0)) return { error: "Oxygen delivery rate must be positive (acfm)." };
   if (!(oxygen_minutes > 0)) return { error: "Oxygen duration must be positive (min)." };
   const treatment_ata = (treatment_pressure_psig + _PSI_ATM) / _PSI_ATM;
-  // One chamber volume of free gas per atmosphere absolute.
-  const pressurize_cuft = chamber_volume_cuft * treatment_ata;
+  // One chamber volume of free gas per atmosphere ADDED: the chamber already
+  // holds one atmosphere of air before the door closes, so pressurizing to
+  // 60 psig takes V x 60/14.7, not V x 74.7/14.7. Until 2026-09-19 this used
+  // the absolute pressure and counted one chamber volume too many.
+  const pressurize_cuft = chamber_volume_cuft * (treatment_ata - 1);
   // Ventilation is the term that dominates, and it is itself multiplied by
   // the absolute pressure.
   const ventilation_cfm_free = ventilation_acfm_per_occupant * occupant_count * treatment_ata;
@@ -444,12 +453,12 @@ export function computeChamberGasVolume({ chamber_volume_cuft = 0, treatment_pre
     inventory_verdict: air_margin_cuft >= 0
       ? "the entered inventory covers this treatment with " + fmt(air_margin_cuft, 0) + " cu ft to spare"
       : "the entered inventory is SHORT by " + fmt(-air_margin_cuft, 0) + " cu ft for this treatment",
-    note: "The pressurization term is straightforward and larger than people expect -- one chamber volume of free gas per atmosphere absolute -- but IT IS USUALLY THE SMALLER HALF. Ventilation is what dominates, because carbon dioxide from the occupants has to be flushed continuously and the required ventilation rate is itself multiplied by the absolute pressure, so the two effects compound over a long treatment. The split between the two is reported here because a supply sized on pressurization alone covers only a fraction of the requirement, and the fraction is not intuitive. THAT IS WHY A TREATMENT TABLE CONSUMES GAS OUT OF ALL PROPORTION TO THE CHAMBER'S SIZE, and why the supply calculation has to cover the LONGEST table the operation might run plus its extensions rather than the shortest. A chamber with gas for a short table and a patient who needs a long one with extensions is a serious problem, and it is discovered under the worst possible circumstances -- which is why the longest treatment the entered inventory actually supports is computed directly. OXYGEN IS A SEPARATE INVENTORY. Treatment runs the occupant on oxygen by mask with overboard dump, so oxygen consumption is its own number and its own cylinder bank, and running out of it ends the treatment as surely as running out of air. A volume calculation on figures the user supplies. It does not select or validate a treatment table, which is a medical decision made by a diving medical officer, and it does not model carbon dioxide scrubbing, chamber temperature and humidity control, or the oxygen fire risk that makes chamber oxygen handling its own discipline. The ventilation rate entered is set by the applicable standard and the occupant load rather than by this arithmetic. It does not address chamber certification, pressure testing, or the operator qualifications required to run one. The applicable treatment tables, a diving medical officer, the chamber manufacturer, the operation's diving safety manual, and the applicable regulations govern.",
+    note: "The pressurization term is straightforward and larger than people expect -- one chamber volume of free gas per atmosphere added above the one already inside -- but IT IS USUALLY THE SMALLER HALF. Ventilation is what dominates, because carbon dioxide from the occupants has to be flushed continuously and the required ventilation rate is itself multiplied by the absolute pressure, so the two effects compound over a long treatment. The split between the two is reported here because a supply sized on pressurization alone covers only a fraction of the requirement, and the fraction is not intuitive. THAT IS WHY A TREATMENT TABLE CONSUMES GAS OUT OF ALL PROPORTION TO THE CHAMBER'S SIZE, and why the supply calculation has to cover the LONGEST table the operation might run plus its extensions rather than the shortest. A chamber with gas for a short table and a patient who needs a long one with extensions is a serious problem, and it is discovered under the worst possible circumstances -- which is why the longest treatment the entered inventory actually supports is computed directly. OXYGEN IS A SEPARATE INVENTORY. Treatment runs the occupant on oxygen by mask with overboard dump, so oxygen consumption is its own number and its own cylinder bank, and running out of it ends the treatment as surely as running out of air. A volume calculation on figures the user supplies. It does not select or validate a treatment table, which is a medical decision made by a diving medical officer, and it does not model carbon dioxide scrubbing, chamber temperature and humidity control, or the oxygen fire risk that makes chamber oxygen handling its own discipline. The ventilation rate entered is set by the applicable standard and the occupant load rather than by this arithmetic. It does not address chamber certification, pressure testing, or the operator qualifications required to run one. The applicable treatment tables, a diving medical officer, the chamber manufacturer, the operation's diving safety manual, and the applicable regulations govern.",
   };
 }
 const chamberGasVolumeExample = { inputs: { chamber_volume_cuft: 250, treatment_pressure_psig: 60, ventilation_acfm_per_occupant: 2, occupant_count: 2, treatment_minutes: 240, air_inventory_cuft: 8000, oxygen_acfm_per_occupant: 1.0, oxygen_minutes: 120 } };
 DIVING_RENDERERS["chamber-gas-volume"] = _simpleRenderer({
-  citation: "Citation: the chamber gas relations by name -- the free air to pressurize = the chamber's internal volume x the absolute pressure (gauge psi + 14.7) / 14.7, and the ventilation air = the rate per occupant x the occupants x that same absolute pressure x the treatment duration. The applicable treatment tables, a diving medical officer, the chamber manufacturer, and the applicable regulations govern.",
+  citation: "Citation: the chamber gas relations by name -- the free air to pressurize = the chamber's internal volume x the gauge pressure / 14.7 (the chamber already holds one atmosphere), and the ventilation air = the rate per occupant x the occupants x that same absolute pressure x the treatment duration. The applicable treatment tables, a diving medical officer, the chamber manufacturer, and the applicable regulations govern.",
   example: chamberGasVolumeExample.inputs,
   fields: [
     { key: "chamber_volume_cuft", label: "Chamber internal volume (cu ft)", kind: "number", default: 250 },
@@ -458,7 +467,7 @@ DIVING_RENDERERS["chamber-gas-volume"] = _simpleRenderer({
     { key: "occupant_count", label: "Occupants, inside attendant included", kind: "number", default: 2 },
     { key: "treatment_minutes", label: "Treatment duration (min)", kind: "number", default: 240 },
     { key: "air_inventory_cuft", label: "Available air inventory (cu ft)", kind: "number", default: 8000 },
-    { key: "oxygen_acfm_per_occupant", label: "Oxygen delivery rate at the mask (acfm)", kind: "number", default: 1.0 },
+    { key: "oxygen_acfm_per_occupant", label: "Total oxygen delivery rate at the masks (acfm, all occupants breathing oxygen)", kind: "number", default: 1.0 },
     { key: "oxygen_minutes", label: "Oxygen duration in the table (min)", kind: "number", default: 120 },
   ],
   outputs: [

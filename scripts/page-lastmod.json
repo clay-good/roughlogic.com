@@ -1086,8 +1086,8 @@
       "date": "2026-09-01"
     },
     "/tools/chamber-gas-volume/": {
-      "sha": "dec34c35731b49c5",
-      "date": "2026-09-06"
+      "sha": "700c63b80c72c218",
+      "date": "2026-09-19"
     },
     "/tools/chamber-turnover/": {
       "sha": "299b4b95da28780d",
@@ -3126,8 +3126,8 @@
       "date": "2026-09-01"
     },
     "/tools/fuel-oil-atomizing-viscosity/": {
-      "sha": "144d3f12bd287688",
-      "date": "2026-09-07"
+      "sha": "12d1b8caf5dead33",
+      "date": "2026-09-19"
     },
     "/tools/fuel-range/": {
       "sha": "50cb09b02ac6649f",
@@ -5446,8 +5446,8 @@
       "date": "2026-09-01"
     },
     "/tools/pool-heat-pump-capacity/": {
-      "sha": "8c67734b8a16321a",
-      "date": "2026-09-09"
+      "sha": "e90c62e0c1c07294",
+      "date": "2026-09-19"
     },
     "/tools/pool-heater-btu/": {
       "sha": "1e35aea2fe5e59b4",
@@ -6094,8 +6094,8 @@
       "date": "2026-09-01"
     },
     "/tools/refrigerated-case-load/": {
-      "sha": "dbca995ab2ab729b",
-      "date": "2026-09-08"
+      "sha": "1d8e7a2011a7d89b",
+      "date": "2026-09-19"
     },
     "/tools/refrigeration-cop/": {
       "sha": "b68367b8d05b9c96",
@@ -8214,8 +8214,8 @@
       "date": "2026-09-01"
     },
     "/tools/umbilical-air-supply/": {
-      "sha": "df109d39da37e3f9",
-      "date": "2026-09-06"
+      "sha": "5bf518db58086f0d",
+      "date": "2026-09-19"
     },
     "/tools/unit-converter/": {
       "sha": "a19618c4811f446a",

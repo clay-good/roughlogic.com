@@ -44948,7 +44948,8 @@ test("bounds: spec-v1561 computeUmbilicalAirSupply keeps flow and reserve separa
   assert.ok(_v1561({ ...base, diver_count: 2 }).required_acfm < r.required_acfm);
   // The reserve is a SEPARATE calculation and carries its own verdict.
   assert.ok(Math.abs(r.reserve_required_cuft - 1.4 * r.depth_ata * 10) < 1e-12);
-  assert.ok(Math.abs(r.tank_free_gas_cuft - 8 * 200 / 14.7) < 1e-9);
+  // Usable only down to bottom pressure: 8 x (200 - 100/33 x 14.7) / 14.7.
+  assert.ok(Math.abs(r.tank_free_gas_cuft - 8 * (200 - 100 / 33 * 14.7) / 14.7) < 1e-9);
   assert.ok(r.reserve_margin_cuft > 0);
   assert.ok(r.reserve_verdict.includes("covers it"));
   // A spread that passes the flow check and fails the reserve check: the
@@ -44971,20 +44972,21 @@ test("bounds: spec-v1562 computeChamberGasVolume puts ventilation ahead of press
   const base = { chamber_volume_cuft: 250, treatment_pressure_psig: 60, ventilation_acfm_per_occupant: 2, occupant_count: 2, treatment_minutes: 240, air_inventory_cuft: 8000, oxygen_acfm_per_occupant: 1.0, oxygen_minutes: 120 };
   const r = _v1562(base);
   assert.ok(Math.abs(r.treatment_ata - 74.7 / 14.7) < 1e-12);
-  assert.ok(Math.abs(r.pressurize_cuft - 250 * r.treatment_ata) < 1e-9);
-  assert.ok(Math.abs(r.pressurize_cuft - 1270.41) < 1e-1);
+  // The chamber already holds one atmosphere: V x (ata - 1) = V x psig / 14.7.
+  assert.ok(Math.abs(r.pressurize_cuft - 250 * (r.treatment_ata - 1)) < 1e-9);
+  assert.ok(Math.abs(r.pressurize_cuft - 1020.41) < 1e-1);
   // Ventilation is the term that dominates, and both shares sum to exactly
   // one hundred percent.
   assert.ok(Math.abs(r.ventilation_cuft - 4878.37) < 1e-1);
   assert.ok(Math.abs(r.total_air_cuft - (r.pressurize_cuft + r.ventilation_cuft)) < 1e-9);
   assert.ok(Math.abs(r.ventilation_share_pct + r.pressurize_share_pct - 100) < 1e-9);
-  assert.ok(Math.abs(r.ventilation_share_pct - 79.3388) < 1e-3);
+  assert.ok(Math.abs(r.ventilation_share_pct - 82.7014) < 1e-3);
   assert.ok(r.ventilation_cuft > r.pressurize_cuft);
   // At zero gauge pressure the chamber holds exactly its own volume of free
   // air: the degenerate case that pins the pressurization relation.
   const surface = _v1562({ ...base, treatment_pressure_psig: 1e-12 });
   assert.ok(Math.abs(surface.treatment_ata - 1) < 1e-12);
-  assert.ok(Math.abs(surface.pressurize_cuft - 250) < 1e-9);
+  assert.ok(Math.abs(surface.pressurize_cuft) < 1e-9); // nothing to add at 0 psig
   // Ventilation is exactly linear in duration and in occupants; pressurization
   // is not a function of either, which is why the split moves with the table.
   const long = _v1562({ ...base, treatment_minutes: 480 });
@@ -44993,7 +44995,7 @@ test("bounds: spec-v1562 computeChamberGasVolume puts ventilation ahead of press
   assert.ok(long.ventilation_share_pct > r.ventilation_share_pct);
   assert.ok(Math.abs(_v1562({ ...base, occupant_count: 4 }).ventilation_cuft - 2 * r.ventilation_cuft) < 1e-9);
   // The longest supportable treatment round-trips to exactly the inventory.
-  assert.ok(Math.abs(r.longest_treatment_min - 331.074) < 1e-2);
+  assert.ok(Math.abs(r.longest_treatment_min - 343.373) < 1e-2);
   assert.ok(Math.abs(_v1562({ ...base, treatment_minutes: r.longest_treatment_min }).total_air_cuft - 8000) < 1e-6);
   assert.ok(r.longest_treatment_min > 240);
   assert.ok(r.inventory_verdict.includes("covers this treatment"));
@@ -45198,10 +45200,12 @@ import { computeFuelOilAtomizingViscosity as _v1570 } from "../../calc-steamplan
 test("bounds: spec-v1570 computeFuelOilAtomizingViscosity fits ASTM D341 (205 degF was wrong)", () => {
   const base = { v1_ssu: 7000, t1_f: 100, v2_ssu: 340, t2_f: 180, target_ssu: 150, pumping_limit_ssu: 4000, check_temp_f: 185 };
   const r = _v1570(base);
-  // The spec said 205 degF. Its own two points give 211.6.
-  assert.ok(Math.abs(r.temp_for_target_f - 211.592) < 1e-2);
-  assert.ok(Math.abs(r.temp_for_pumping_f - 111.811) < 1e-2);
-  assert.ok(Math.abs(r.viscosity_at_check_ssu - 295.428) < 1e-2);
+  // The spec said 205 degF. Its own two points, fitted in centistokes (ASTM
+  // D341 is defined in cSt; SSU converts through ASTM D2161), give 214.9.
+  assert.ok(Math.abs(r.temp_for_target_f - 214.930) < 1e-2);
+  assert.ok(Math.abs(r.temp_for_pumping_f - 111.299) < 1e-2);
+  assert.ok(Math.abs(r.viscosity_at_check_ssu - 297.983) < 1e-2);
+  assert.ok(Math.abs(r.slope_b - 3.9757) < 1e-3);
   assert.ok(Math.abs(r.setpoint_spread_f - (r.temp_for_target_f - r.temp_for_pumping_f)) < 1e-12);
   assert.strictEqual(r.check_verdict.includes("outside the atomizing band"), true);
   // The fit passes exactly through its own two data points.
@@ -51288,8 +51292,15 @@ test("bounds: spec-v1703 computePoolHeatPumpCapacity -- the three factors multip
   // The derated heat-up is LONGER than a nameplate heat-up would be, which
   // is the whole distinction from pool-heater-btu.
   assert.ok(r.heat_up_hours > r.heat_required_btu / 110000);
-  // A cover shortens the effective heat-up without adding capacity.
-  assert.ok(r.heat_up_hours_with_cover < r.heat_up_hours);
+  // With no surface loss entered a cover has nothing to remove; with a loss,
+  // the heat-up is longer than lossless and a cover pulls it back toward, never
+  // below, Q / capacity.
+  assert.strictEqual(r.has_cover, false);
+  const lossy = _v1703({ ...base, surface_loss_btuh: 20000 });
+  assert.ok(Math.abs(lossy.heat_up_hours - r.heat_required_btu / (r.derated_capacity_btuh - 20000)) < 1e-9);
+  assert.ok(lossy.heat_up_hours_with_cover < lossy.heat_up_hours);
+  assert.ok(lossy.heat_up_hours_with_cover > r.heat_required_btu / r.derated_capacity_btuh);
+  assert.ok(_v1703({ ...base, surface_loss_btuh: 60000 }).error);
   assert.ok(Math.abs(r.derated_capacity_btuh - unity.derated_capacity_btuh * r.combined_factor) < 1e-6);
   assert.ok(_v1703({ ...base, air_derate_factor: 0 }).error);
   assert.ok(_v1703({ ...base, rated_capacity_btuh: 0 }).error);

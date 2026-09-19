@@ -259,11 +259,11 @@ POOL_RENDERERS["pool-pump-speed-savings"] = _simpleRenderer({
 // and spec-v1672.
 // =====================================================================
 const _POOL_BTU_PER_GAL_DEGF = 8.34;
-// dims: in { rated_capacity_btuh: L^2 M T^-3, air_derate_factor: dimensionless, humidity_derate_factor: dimensionless, water_derate_factor: dimensionless, rated_cop: dimensionless, cop_derate_factor: dimensionless, pool_gallons: L^3, temperature_rise_f: T, cover_loss_reduction_pct: dimensionless } out: { derated_capacity_btuh: L^2 M T^-3, capacity_pct_of_rating: dimensionless, derated_cop: dimensionless, heat_required_btu: L^2 M T^-2, heat_up_hours: T, heat_up_hours_with_cover: T }
+// dims: in { rated_capacity_btuh: L^2 M T^-3, air_derate_factor: dimensionless, humidity_derate_factor: dimensionless, water_derate_factor: dimensionless, rated_cop: dimensionless, cop_derate_factor: dimensionless, pool_gallons: L^3, temperature_rise_f: T, cover_loss_reduction_pct: dimensionless, surface_loss_btuh: L^2 M T^-3 } out: { derated_capacity_btuh: L^2 M T^-3, capacity_pct_of_rating: dimensionless, derated_cop: dimensionless, heat_required_btu: L^2 M T^-2, heat_up_hours: T, heat_up_hours_with_cover: T }
 export function computePoolHeatPumpCapacity({
   rated_capacity_btuh = 0, air_derate_factor = 1, humidity_derate_factor = 1, water_derate_factor = 1,
   rated_cop = 0, cop_derate_factor = 1,
-  pool_gallons = 0, temperature_rise_f = 0, cover_loss_reduction_pct = 0,
+  pool_gallons = 0, temperature_rise_f = 0, cover_loss_reduction_pct = 0, surface_loss_btuh = 0,
 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(rated_capacity_btuh > 0)) return { error: "Rated capacity must be positive (BTU/h)." };
@@ -271,6 +271,7 @@ export function computePoolHeatPumpCapacity({
     if (!(v > 0) || v > 2) return { error: "The " + n + " factor must be above 0 and no more than 2 (1 means no change)." };
   }
   if (rated_cop < 0 || pool_gallons < 0 || temperature_rise_f < 0) return { error: "COP, pool volume and temperature rise cannot be negative." };
+  if (!(surface_loss_btuh >= 0)) return { error: "The surface loss cannot be negative (BTU/h)." };
   if (cover_loss_reduction_pct < 0 || cover_loss_reduction_pct > 100) return { error: "The cover loss reduction must be between 0 and 100 percent." };
   const combined_factor = air_derate_factor * humidity_derate_factor * water_derate_factor;
   const derated_capacity_btuh = rated_capacity_btuh * combined_factor;
@@ -284,16 +285,23 @@ export function computePoolHeatPumpCapacity({
     : "the COP falls with the same conditions: " + fmt(rated_cop, 1) + " at rating becomes " + fmt(derated_cop, 1) + " at the entered factor. A unit advertised at a COP of 5 or 6 can be near 3 in the shoulder season, so the running cost per BTU roughly doubles at exactly the time of year the owner bought it for";
   const has_heatup = pool_gallons > 0 && temperature_rise_f > 0;
   const heat_required_btu = has_heatup ? pool_gallons * _POOL_BTU_PER_GAL_DEGF * temperature_rise_f : 0;
-  const heat_up_hours = has_heatup && derated_capacity_btuh > 0 ? heat_required_btu / derated_capacity_btuh : 0;
+  // The heat pump only gains on the pool by what it delivers beyond the loss
+  // from the surface while it heats: t = Q / (capacity - loss). A cover cuts
+  // that loss, never below the lossless time Q / capacity. Until 2026-09-19
+  // the lossless time was divided by (1 + cover %), so a cover made the pool
+  // heat faster than a pool with no loss at all.
+  const net_gain_btuh = derated_capacity_btuh - surface_loss_btuh;
+  if (has_heatup && !(net_gain_btuh > 0)) return { error: "The surface loss meets or exceeds the delivered capacity: the pool never reaches the setpoint uncovered. Enter a smaller loss or a cover." };
+  const heat_up_hours = has_heatup && derated_capacity_btuh > 0 ? heat_required_btu / net_gain_btuh : 0;
   const heatup_verdict = !has_heatup
     ? "(no pool volume and temperature rise entered)"
-    : "raising " + fmt(pool_gallons, 0) + " gallons by " + fmt(temperature_rise_f, 0) + " degF takes " + fmt(heat_required_btu / 1e6, 2) + " MMBTU, which at " + fmt(derated_capacity_btuh, 0) + " BTU/h is " + fmt(heat_up_hours, 1) + " hours -- " + fmt(heat_up_hours / 24, 1) + " days of continuous running, and that is BEFORE any loss from the surface while it heats";
-  const has_cover = cover_loss_reduction_pct > 0 && has_heatup;
+    : "raising " + fmt(pool_gallons, 0) + " gallons by " + fmt(temperature_rise_f, 0) + " degF takes " + fmt(heat_required_btu / 1e6, 2) + " MMBTU, which at " + fmt(derated_capacity_btuh, 0) + " BTU/h" + (surface_loss_btuh > 0 ? " less " + fmt(surface_loss_btuh, 0) + " BTU/h of surface loss" : "") + " is " + fmt(heat_up_hours, 1) + " hours -- " + fmt(heat_up_hours / 24, 1) + " days of continuous running" + (surface_loss_btuh > 0 ? "" : ", and that is BEFORE any loss from the surface while it heats");
+  const has_cover = cover_loss_reduction_pct > 0 && has_heatup && surface_loss_btuh > 0;
   // A cover does not add capacity; it removes the loss the heater is fighting.
-  const heat_up_hours_with_cover = has_cover ? heat_up_hours / (1 + cover_loss_reduction_pct / 100) : 0;
+  const heat_up_hours_with_cover = has_cover ? heat_required_btu / (derated_capacity_btuh - surface_loss_btuh * (1 - cover_loss_reduction_pct / 100)) : 0;
   const cover_verdict = !has_cover
-    ? "(no cover loss reduction entered)"
-    : "with a cover cutting the concurrent loss by " + fmt(cover_loss_reduction_pct, 0) + "%, the effective heat-up shortens to about " + fmt(heat_up_hours_with_cover, 1) + " hours. A COVER DOES NOT ADD CAPACITY -- it removes the loss the heat pump is fighting while it works, and on a slow heat-up that is a large share of the output. On an uncovered pool in cool weather a heat pump can run continuously and gain almost nothing, because the surface sheds heat as fast as the unit adds it";
+    ? (cover_loss_reduction_pct > 0 && has_heatup ? "(enter the surface loss: a cover can only shorten the heat-up by the loss it removes)" : "(no cover loss reduction entered)")
+    : "with a cover cutting the " + fmt(surface_loss_btuh, 0) + " BTU/h surface loss by " + fmt(cover_loss_reduction_pct, 0) + "%, the heat-up shortens to about " + fmt(heat_up_hours_with_cover, 1) + " hours, never below the lossless " + fmt(heat_required_btu / derated_capacity_btuh, 1) + ". A COVER DOES NOT ADD CAPACITY -- it removes the loss the heat pump is fighting while it works, and on a slow heat-up that is a large share of the output.";
   const cutoff_verdict = "AND THERE IS AN AIR TEMPERATURE BELOW WHICH THE UNIT PRODUCES NOTHING USEFUL -- commonly around 50 degF for an air-source pool heat pump, as the evaporator approaches frost and the capacity curve collapses. That is a manufacturer figure rather than a calculation, and it is the number that decides whether a heat pump can open the season or whether a gas heater is needed alongside it";
   if (![derated_capacity_btuh, capacity_pct_of_rating, derated_cop, heat_required_btu, heat_up_hours, heat_up_hours_with_cover].every(Number.isFinite)) return { error: "Pool heat pump math is not a finite value." };
   return {
@@ -318,6 +326,7 @@ POOL_RENDERERS["pool-heat-pump-capacity"] = _simpleRenderer({
     { key: "pool_gallons", label: "Pool volume (gal, 0 to skip)", kind: "number", attrs: { step: "any" } },
     { key: "temperature_rise_f", label: "Temperature rise wanted (°F, 0 to skip)", kind: "number", attrs: { step: "any" } },
     { key: "cover_loss_reduction_pct", label: "Cover loss reduction during heat-up (%, 0 to skip)", kind: "number", attrs: { step: "any" } },
+    { key: "surface_loss_btuh", label: "Surface loss while heating, uncovered (BTU/h, 0 to skip)", kind: "number", attrs: { step: "any" } },
   ],
   outputs: [
     { key: "c", id: "phc-out-c", label: "Delivered capacity", value: (r) => r.capacity_verdict },

@@ -6,6 +6,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **A recompression chamber counted the air already inside it, a volume tank was drained below the diver's depth, and a boiler's second safety valve could sit above its code ceiling.** Each was found by re-deriving a worked example.
+  - `chamber-gas-volume` charged V × ata to pressurize a chamber that already holds one atmosphere. It now charges V × psig/14.7: 1,020 cu ft at 60 psig, not 1,270. The longest supportable treatment on 8,000 cu ft rises from 331 to 343 min. The oxygen-rate label now says it is the total at the masks, since the occupant count never multiplied it.
+  - `umbilical-air-supply` credited the volume tank's gas all the way down to 0 psig. Gas below bottom pressure never reaches the helmet, so at 100 ft the usable reserve is 84.6 cu ft, not 108.8, and the helmet's over-bottom pressure cuts it further.
+  - `safety-valve-capacity` checked only that the lowest valve was at or below MAWP. ASME Section I PG-67.3 also limits additional valves to MAWP + 3% and the full range of settings to 10% of the highest. The example's second valve at 155 psig on a 150 psig boiler exceeds its 154.5 psig ceiling and is now flagged.
+  - `pool-heat-pump-capacity` divided the lossless heat-up time by (1 + cover %), so covering the pool made it heat faster than a pool with no loss at all. A new surface-loss input gives t = Q/(capacity − loss); a cover removes part of that loss and can never beat Q/capacity.
+  - `refrigerated-case-load` defaulted the retrofit anti-sweat fraction to 0, so a blank retrofit read as heaters switched off and reported a saving nobody entered. A zero now means no change, as it already did for the retrofit lights.
+  - `fuel-oil-atomizing-viscosity` fed SSU into the ASTM D341 Walther form, which is defined in centistokes (the 0.7 offset means nothing in SSU). SSU now converts through ASTM D2161. The example oil reaches 150 SSU at 214.9°F, not 211.6°F, and the reported slope is now meaningful.
+
 - **Two NEC demand tables stopped early, and five other tiles read a definition off by a basis.** Each was found by re-deriving a worked example against the source it cites.
   - `range-demand-220-55` stopped Table 220.55 Column C at 16 ranges and held 31 kW for any larger count. 50 ranges read 31 kW where Column C gives 62.5 kW, half the load. It now follows the table to the end: 15 kW + 1 kW per range through 40 ranges, then 25 kW + 0.75 kW per range.
   - `dryer-demand-220-54` had eyeballed Table 220.54 rows for 12-15 dryers (45/43/41/40% where the table gives 46/45/44/43%) and held 40% for every larger count. That made 15 dryers 7% light and 43 dryers 60% heavy. It now uses the published steps: 47% − 1% per dryer over 11, 35% − 0.5% per dryer over 23, and 25% from 43 on.

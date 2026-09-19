@@ -24072,7 +24072,7 @@ export const CITATIONS = {
     ],
   },
   "fuel-oil-atomizing-viscosity": {
-    formula: "ASTM D341 (Walther): log10(log10(v + 0.7)) = A - B log10(T absolute), fitted through two viscosity-temperature points from the oil's data sheet; the temperature for any target viscosity follows by interpolation on that line.",
+    formula: "ASTM D341 (Walther): log10(log10(v + 0.7)) = A - B log10(T absolute) with v in centistokes (SSU converted through ASTM D2161 at its 100 F base), fitted through two viscosity-temperature points from the oil's data sheet; the temperature for any target viscosity follows by interpolation on that line.",
     edition: "The ASTM D341 viscosity-temperature relation by name. Typical atomizing viscosity is about 100 to 150 SSU and typical pumping limits about 4,000 SSU; both are entered rather than assumed. The burner manufacturer's atomizing viscosity requirement, the oil supplier's data sheet, the adopted fire and mechanical codes, and the jurisdiction's boiler inspector govern.",
     freeAccess: "A two-point interpolation on data the user reads off the oil's own sheet; no viscosity chart is reproduced.",
     governance: GOVERNANCE.general,
@@ -24133,7 +24133,7 @@ export const CITATIONS = {
     ],
   },
   "umbilical-air-supply": {
-    formula: "required flow = the rate per diver x the absolute pressure (1 + depth / 33 seawater) x the number of divers including the standby; the deepest compliant depth = 33 x (compressor capacity / (rate x divers) - 1); the volume tank's free gas = its capacity x its pressure / 14.7 psi.",
+    formula: "required flow = the rate per diver x the absolute pressure (1 + depth / 33 seawater) x the number of divers including the standby; the deepest compliant depth = 33 x (compressor capacity / (rate x divers) - 1); the volume tank's usable gas = its capacity x (its pressure - the bottom pressure, depth x 14.7 / 33) / 14.7 psi, before the helmet's over-bottom pressure.",
     edition: "The surface-supplied flow relation by name, with the independent reserve breathing supply named as a SEPARATE regulatory requirement. The rate per diver is set by the applicable regulation, not by arithmetic. The applicable commercial diving regulations, the operation's diving safety manual, and the diving supervisor govern.",
     freeAccess: "Flow arithmetic on the spread's own equipment figures; no regulatory table is reproduced.",
     governance: GOVERNANCE.general,
@@ -24145,7 +24145,7 @@ export const CITATIONS = {
     ],
   },
   "chamber-gas-volume": {
-    formula: "free air to pressurize = the chamber's internal volume x the absolute pressure (gauge psi + 14.7) / 14.7; ventilation air = the rate per occupant x the occupants x that same absolute pressure x the treatment duration; the longest supportable treatment = (inventory - pressurization) / the free-air ventilation rate.",
+    formula: "free air to pressurize = the chamber's internal volume x the gauge pressure / 14.7 (one atmosphere is already inside); ventilation air = the rate per occupant x the occupants x the absolute pressure (gauge psi + 14.7) / 14.7 x the treatment duration; the longest supportable treatment = (inventory - pressurization) / the free-air ventilation rate.",
     edition: "The chamber gas relations by name. The applicable treatment tables, a diving medical officer, the chamber manufacturer, the operation's diving safety manual, and the applicable regulations govern.",
     freeAccess: "Volume arithmetic on the chamber's own dimensions and the operation's inventory; no treatment table is reproduced.",
     governance: GOVERNANCE.general,

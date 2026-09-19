@@ -537,6 +537,14 @@ export function computeSafetyValveCapacity({ rated_steaming_capacity_lb_hr = 0, 
   const lowest_set_compliant = lowest_set_psig <= mawp_psig;
   const accumulation_pressure_psig = mawp_psig * (1 + accumulation_limit_pct / 100);
   const supplementary_above_mawp = highest_set_psig > mawp_psig;
+  // ASME Section I PG-67.3: any additional valve may be set no more than 3%
+  // above MAWP, and the full range of set pressures may not exceed 10% of the
+  // highest setting. Until 2026-09-19 only the lowest valve was checked, so a
+  // second valve at 155 psig on a 150 psig boiler (ceiling 154.5) passed.
+  const highest_allowed_psig = mawp_psig * 1.03;
+  const highest_set_compliant = highest_set_psig <= highest_allowed_psig + 1e-9;
+  const spread_compliant = highest_set_psig - lowest_set_psig <= 0.10 * highest_set_psig + 1e-9;
+  const set_pressures_compliant = lowest_set_compliant && highest_set_compliant && spread_compliant;
   const uprated_shortfall_lb_hr = uprated_capacity_lb_hr > 0 ? uprated_capacity_lb_hr - installed_capacity_lb_hr : 0;
   const uprate_passes = uprated_shortfall_lb_hr <= 0;
   const outs = [required_capacity_lb_hr, installed_capacity_lb_hr, margin_lb_hr, margin_pct, accumulation_pressure_psig];
@@ -545,14 +553,19 @@ export function computeSafetyValveCapacity({ rated_steaming_capacity_lb_hr = 0, 
     capacity_from_fuel_lb_hr, required_capacity_lb_hr, fuel_governs,
     installed_capacity_lb_hr, valve_count: valves.length, margin_lb_hr, margin_pct, passes,
     lowest_set_psig, highest_set_psig, lowest_set_compliant, supplementary_above_mawp,
+    highest_allowed_psig, highest_set_compliant, spread_compliant, set_pressures_compliant,
     accumulation_pressure_psig, accumulation_limit_pct, mawp_psig,
     uprated_capacity_lb_hr, uprated_shortfall_lb_hr, uprate_passes,
     capacity_verdict: passes
       ? "PASSES with " + fmt(margin_lb_hr, 0) + " lb/hr, " + fmt(margin_pct, 1) + "% above required"
       : "FAILS by " + fmt(-margin_lb_hr, 0) + " lb/hr -- the boiler is outside its code case",
-    set_pressure_verdict: lowest_set_compliant
-      ? "the lowest set pressure is at or below the maximum allowable working pressure, which the code requires"
-      : "the LOWEST set pressure is ABOVE the maximum allowable working pressure, which no valve may be",
+    set_pressure_verdict: !lowest_set_compliant
+      ? "the LOWEST set pressure is ABOVE the maximum allowable working pressure, which no valve may be"
+      : !highest_set_compliant
+        ? "a valve is set at " + fmt(highest_set_psig, 1) + " psig, ABOVE the " + fmt(highest_allowed_psig, 1) + " psig ceiling (MAWP + 3%) for additional valves"
+        : !spread_compliant
+          ? "the set pressures span " + fmt(highest_set_psig - lowest_set_psig, 1) + " psi, MORE than 10% of the highest setting"
+          : "the lowest set pressure is at or below MAWP, every other valve is within MAWP + 3% (" + fmt(highest_allowed_psig, 1) + " psig), and the range is within 10% of the highest setting",
     uprate_verdict: uprate_passes
       ? "still covered by the installed valves"
       : "short by " + fmt(uprated_shortfall_lb_hr, 0) + " lb/hr -- the valves were never revisited",
@@ -597,16 +610,26 @@ STEAMPLANT_RENDERERS["safety-valve-capacity"] = _simpleRenderer({
 // line; everything else is interpolation on it.
 const _WALTHER_OFFSET = 0.7;
 const _RANKINE_OFFSET = 459.67;
-const _walther = (v) => Math.log10(Math.log10(v + _WALTHER_OFFSET));
-const _unWalther = (x) => Math.pow(10, Math.pow(10, x)) - _WALTHER_OFFSET;
+// D341 is defined in centistokes; the 0.7 offset means nothing in SSU. SSU
+// converts through ASTM D2161 at its 100 F base (the temperature term,
+// 1 + 0.000061 (t - 100), moves SSU under 1% across a heater's range and is
+// left out). Until 2026-09-19 SSU went into the Walther form directly.
+const _ssuFromCst = (v) => 4.6324 * v + (1 + 0.03264 * v) / ((3930.2 + 262.7 * v + 23.97 * v * v + 1.646 * v * v * v) * 1e-5);
+const _cstFromSsu = (ssu) => {
+  let lo = 0.1, hi = 1e7;
+  for (let i = 0; i < 200; i++) { const mid = (lo + hi) / 2; if (_ssuFromCst(mid) < ssu) lo = mid; else hi = mid; }
+  return (lo + hi) / 2;
+};
+const _walther = (ssu) => Math.log10(Math.log10(_cstFromSsu(ssu) + _WALTHER_OFFSET));
+const _unWalther = (x) => _ssuFromCst(Math.pow(10, Math.pow(10, x)) - _WALTHER_OFFSET);
 
 // dims: in { v1_ssu: L^2 / T, t1_f: T, v2_ssu: L^2 / T, t2_f: T, target_ssu: L^2 / T, pumping_limit_ssu: L^2 / T, check_temp_f: T } out: { slope_b: dimensionless, temp_for_target_f: T, temp_for_pumping_f: T, viscosity_at_check_ssu: L^2 / T, setpoint_spread_f: T }
 export function computeFuelOilAtomizingViscosity({ v1_ssu = 0, t1_f = 0, v2_ssu = 0, t2_f = 0, target_ssu = 150, pumping_limit_ssu = 4000, check_temp_f = 185 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
-  if (!(v1_ssu > 1)) return { error: "The first viscosity must exceed 1 SSU." };
-  if (!(v2_ssu > 1)) return { error: "The second viscosity must exceed 1 SSU." };
-  if (!(target_ssu > 1)) return { error: "The target atomizing viscosity must exceed 1 SSU." };
-  if (!(pumping_limit_ssu > 1)) return { error: "The pumping viscosity limit must exceed 1 SSU." };
+  if (!(v1_ssu >= 32)) return { error: "The first viscosity must be at least 32 SSU (the Saybolt scale's floor)." };
+  if (!(v2_ssu >= 32)) return { error: "The second viscosity must be at least 32 SSU (the Saybolt scale's floor)." };
+  if (!(target_ssu >= 32)) return { error: "The target atomizing viscosity must be at least 32 SSU." };
+  if (!(pumping_limit_ssu >= 32)) return { error: "The pumping viscosity limit must be at least 32 SSU." };
   if (!(t1_f > -_RANKINE_OFFSET)) return { error: "The first temperature must be above absolute zero (F)." };
   if (!(t2_f > -_RANKINE_OFFSET)) return { error: "The second temperature must be above absolute zero (F)." };
   if (!(check_temp_f > -_RANKINE_OFFSET)) return { error: "The check temperature must be above absolute zero (F)." };

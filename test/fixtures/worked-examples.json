@@ -97829,7 +97829,7 @@
      }
     },
     "tank_free_gas_cuft": {
-     "value": 108.844,
+     "value": 84.6011,
      "tolerance": {
       "pct": 0.5
      }
@@ -97862,7 +97862,7 @@
      }
     },
     "pressurize_cuft": {
-     "value": 1270.41,
+     "value": 1020.41,
      "tolerance": {
       "pct": 0.5
      }
@@ -97880,13 +97880,13 @@
      }
     },
     "total_air_cuft": {
-     "value": 6148.78,
+     "value": 5898.78,
      "tolerance": {
       "pct": 0.5
      }
     },
     "ventilation_share_pct": {
-     "value": 79.3388,
+     "value": 82.7014,
      "tolerance": {
       "pct": 0.5
      }
@@ -97898,7 +97898,7 @@
      }
     },
     "longest_treatment_min": {
-     "value": 331.074,
+     "value": 343.373,
      "tolerance": {
       "pct": 0.5
      }
@@ -98288,31 +98288,31 @@
    },
    "outputs": {
     "slope_b": {
-     "value": 3.12603,
+     "value": 3.97575,
      "tolerance": {
       "pct": 0.5
      }
     },
     "temp_for_target_f": {
-     "value": 211.592,
+     "value": 214.93,
      "tolerance": {
       "pct": 0.5
      }
     },
     "temp_for_pumping_f": {
-     "value": 111.811,
+     "value": 111.299,
      "tolerance": {
       "pct": 0.5
      }
     },
     "viscosity_at_check_ssu": {
-     "value": 295.428,
+     "value": 297.983,
      "tolerance": {
       "pct": 0.5
      }
     },
     "setpoint_spread_f": {
-     "value": 99.7812,
+     "value": 103.63,
      "tolerance": {
       "pct": 0.5
      }
@@ -107674,7 +107674,7 @@
      }
     },
     "heat_up_hours_with_cover": {
-     "value": 17.770197,
+     "value": 0,
      "tolerance": {
       "pct": 0.5
      }

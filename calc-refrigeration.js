@@ -316,9 +316,13 @@ export function computeRefrigeratedCaseLoad({
   const infiltration_is_largest = infiltration_btuh >= transmission_btuh && infiltration_btuh >= product_btuh && infiltration_btuh >= internal_btuh;
   // The retrofit case: only the internal electric terms move. A retrofit
   // lights entry of zero means "no lighting change", not "no lights".
-  const has_retrofit = retrofit_lights_w > 0 || retrofit_antisweat_run_fraction !== antisweat_run_fraction;
+  // A retrofit anti-sweat fraction of zero means "no change", like the lights:
+  // the form cannot tell a blank from a zero, and until 2026-09-19 a blank
+  // retrofit read as heaters switched fully off, inventing a saving.
+  const retrofit_as_fraction = retrofit_antisweat_run_fraction > 0 ? retrofit_antisweat_run_fraction : antisweat_run_fraction;
+  const has_retrofit = retrofit_lights_w > 0 || retrofit_as_fraction !== antisweat_run_fraction;
   const retrofit_lights_actual_w = retrofit_lights_w > 0 ? retrofit_lights_w : lights_w;
-  const retrofit_internal_w = retrofit_lights_actual_w + fan_w + antisweat_w * retrofit_antisweat_run_fraction + defrost_w * defrost_run_fraction;
+  const retrofit_internal_w = retrofit_lights_actual_w + fan_w + antisweat_w * retrofit_as_fraction + defrost_w * defrost_run_fraction;
   const retrofit_internal_btuh = retrofit_internal_w * _REF_BTUH_PER_WATT;
   const retrofit_total_btuh = infiltration_btuh + transmission_btuh + product_btuh + retrofit_internal_btuh;
   const load_reduction_btuh = total_btuh - retrofit_total_btuh;
@@ -353,7 +357,7 @@ REFRIGERATION_RENDERERS["refrigerated-case-load"] = _simpleRenderer({
     { key: "defrost_w", label: "Defrost heat into the case (W)", kind: "number" },
     { key: "defrost_run_fraction", label: "Defrost run fraction (0-1)", kind: "number" },
     { key: "retrofit_lights_w", label: "Retrofit lights (W, 0 to leave unchanged)", kind: "number" },
-    { key: "retrofit_antisweat_run_fraction", label: "Retrofit anti-sweat run fraction (0-1)", kind: "number" },
+    { key: "retrofit_antisweat_run_fraction", label: "Retrofit anti-sweat run fraction (0-1, 0 = no change)", kind: "number" },
   ],
   outputs: [
     { key: "i", id: "rcl-out-i", label: "Infiltration", value: (r) => fmt(r.infiltration_btuh, 0) + " BTU/h (" + fmt(r.infiltration_pct, 0) + "% of the load" + (r.infiltration_is_largest ? ", the largest single term)" : ")") },
