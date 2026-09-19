@@ -6132,12 +6132,14 @@ export function computeConduitNipple60Fill({ conduit_area_sqin = 0.864, conducto
   const normal_max_conductors = Math.floor(0.40 * conduit_area_sqin / conductor_area_sqin);
   if (![fill_area_sqin, fill_pct, nipple_max_conductors, normal_max_conductors].every(Number.isFinite)) return { error: "Nipple-fill math is not a finite value." };
   const nipple_ok = fill_pct <= 60;
-  const passes_normal = fill_pct <= 40;
+  // Ch. 9 Table 1: the normal limit is 53% for one conductor, 31% for two, 40% for three or more.
+  const normal_limit_pct = conductor_count === 1 ? 53 : conductor_count === 2 ? 31 : 40;
+  const passes_normal = fill_pct <= normal_limit_pct;
   const verdict = !nipple_ok
     ? "OVER 60%: too full even for a nipple -- go up a conduit size."
     : passes_normal
-      ? "OK: under 40%, so this fill is legal in a nipple AND in any normal raceway."
-      : "OK for a NIPPLE only (<= 24 in): the 60% allowance passes, but this fill exceeds the normal 40% -- a longer run would need a bigger conduit.";
+      ? "OK: within the normal " + normal_limit_pct + "%, so this fill is legal in a nipple AND in any normal raceway."
+      : "OK for a NIPPLE only (<= 24 in): the 60% allowance passes, but this fill exceeds the normal " + normal_limit_pct + "% -- a longer run would need a bigger conduit.";
   return {
     fill_area_sqin,
     fill_pct,

@@ -1175,7 +1175,7 @@ PIPEFIT_RENDERERS["radiator-edr-output"] = _v990renderRadiatorEdrOutput;
 //   cylinder (circumferential stress on the LONGITUDINAL seam):  t = P R / (S E - 0.6 P)
 //   sphere:                                                      t = P R / (2 S E - 0.2 P)
 // R is the INSIDE radius, E the joint efficiency, and the corrosion allowance is added AFTER.
-// Validity: t <= R/2, and for the cylinder P <= 0.385 S E. Both formulas and both limits were
+// Validity: cylinder t <= R/2 and P <= 0.385 S E; sphere t <= 0.356 R and P <= 0.665 S E. Both formulas and both limits were
 // confirmed against two independent published sources before shipping.
 // dims: in { design_pressure_psi: M L^-1 T^-2, inside_radius_in: L, allowable_stress_psi: M L^-1 T^-2, joint_efficiency: dimensionless, corrosion_allowance_in: L, geometry: dimensionless } out: { t_required_in: L, t_with_allowance_in: L, mawp_psi: M L^-1 T^-2 }
 export function computeAsmeShellThickness({ design_pressure_psi = 0, inside_radius_in = 0, allowable_stress_psi = 0, joint_efficiency = 0.85, corrosion_allowance_in = 0.0625, geometry = "cylindrical" } = {}) {
@@ -1197,11 +1197,11 @@ export function computeAsmeShellThickness({ design_pressure_psi = 0, inside_radi
   if (!(denom > 0)) return { error: "The design pressure is too high for this material and joint efficiency - the formula's denominator has gone to zero or negative. The section is outside the UG-27 thin-shell range entirely." };
   const t_required_in = P * R / denom;
   const t_with_allowance_in = t_required_in + CA;
-  // null, not Infinity: the v21 contract sweep rejects a non-finite numeric field, and the
-  // 0.385 S E ceiling is a cylinder-only limit that simply does not exist for a sphere.
-  const pressure_limit_psi = cylindrical ? 0.385 * se : null;
-  const thickness_limit_in = R / 2;
-  const over_pressure_limit = cylindrical && P > pressure_limit_psi;
+  // UG-27(c)(1) cylinder: t <= R/2 and P <= 0.385 S E. UG-27(d) sphere: t <= 0.356 R and
+  // P <= 0.665 S E -- the sphere's own pair, not the cylinder's R/2.
+  const pressure_limit_psi = (cylindrical ? 0.385 : 0.665) * se;
+  const thickness_limit_in = (cylindrical ? 0.5 : 0.356) * R;
+  const over_pressure_limit = P > pressure_limit_psi;
   const over_thickness_limit = t_required_in > thickness_limit_in;
   const outside_ug27 = over_pressure_limit || over_thickness_limit;
   // MAWP for the required thickness, inverting the same relation.
@@ -1213,10 +1213,10 @@ export function computeAsmeShellThickness({ design_pressure_psi = 0, inside_radi
     t_required_in, t_with_allowance_in, mawp_psi, se, pressure_limit_psi, thickness_limit_in,
     over_pressure_limit, over_thickness_limit, outside_ug27, cylindrical,
     note: "The code form of a calculation the plain hoop-stress tile does without: joint efficiency and corrosion allowance both belong in it, and they move the answer a long way. "
-      + "E is the weld joint efficiency - roughly 1.00 for a fully radiographed Type 1 butt joint, 0.85 for spot radiography, and 0.70 for no radiography - so choosing not to radiograph costs about 30% more wall. The corrosion allowance is ADDED after the strength calculation (" + CA.toFixed(4) + " in here) and the radius entered should be the inside radius in the CORRODED condition, which is the step most often skipped. "
+      + "E is the weld joint efficiency - roughly 1.00 for a fully radiographed Type 1 butt joint, 0.85 for spot radiography, and 0.70 for no radiography - so choosing no radiography over full costs about 43% more wall. The corrosion allowance is ADDED after the strength calculation (" + CA.toFixed(4) + " in here) and the radius entered should be the inside radius in the CORRODED condition, which is the step most often skipped. "
       + (outside_ug27
-        ? "OUTSIDE THE UG-27 RANGE: " + (over_thickness_limit ? "the required thickness exceeds half the inside radius" : "") + (over_thickness_limit && over_pressure_limit ? " and " : "") + (over_pressure_limit ? "the pressure exceeds 0.385 S E" : "") + " - the thin-shell equations do not apply and the thick-wall rules (Appendix 1) govern. "
-        : "Inside the UG-27 thin-shell range: the thickness is under half the inside radius" + (cylindrical ? " and the pressure is under 0.385 S E" : "") + ". ")
+        ? "OUTSIDE THE UG-27 RANGE: " + (over_thickness_limit ? "the required thickness exceeds " + (cylindrical ? "half the inside radius" : "0.356 of the inside radius") : "") + (over_thickness_limit && over_pressure_limit ? " and " : "") + (over_pressure_limit ? "the pressure exceeds " + (cylindrical ? "0.385" : "0.665") + " S E" : "") + " - the thin-shell equations do not apply and the thick-wall rules (Appendix 1) govern. "
+        : "Inside the UG-27 thin-shell range: the thickness is under " + (cylindrical ? "half the inside radius and the pressure is under 0.385 S E" : "0.356 of the inside radius and the pressure is under 0.665 S E") + ". ")
       + "SCOPE: this is the CIRCUMFERENTIAL-stress case, the hoop force on the LONGITUDINAL seam, which governs a cylinder and is the check people actually run - the longitudinal-stress case on the circumferential seam is a separate and rarely governing equation, and it is deliberately not included here because it could not be confirmed against two independent sources. Nozzle reinforcement, heads, external pressure and buckling, discontinuity stresses, and the allowable-stress table itself are all outside this tile. The allowable stress must come from the code's table at the design TEMPERATURE, not room temperature. ASME BPVC Section VIII and the vessel engineer govern - this is a check, not a stamped design.",
   };
 }
@@ -1247,7 +1247,7 @@ function _v1113renderAsmeShellThickness(inputRegion, outputRegion, citationEl) {
     oT.textContent = fmt(res.t_required_in, 4) + " in by strength, " + fmt(res.t_with_allowance_in, 4) + " in with the corrosion allowance";
     oV.textContent = res.outside_ug27
       ? "OUTSIDE the thin-shell range - Appendix 1 governs"
-      : "inside the range (t limit " + fmt(res.thickness_limit_in, 2) + " in" + (res.cylindrical ? ", P limit " + fmt(res.pressure_limit_psi, 0) + " psi" : "") + ")";
+      : "inside the range (t limit " + fmt(res.thickness_limit_in, 2) + " in, P limit " + fmt(res.pressure_limit_psi, 0) + " psi)";
     oM.textContent = fmt(res.mawp_psi, 1) + " psi (S x E = " + fmt(res.se, 0) + " psi)";
     oN.textContent = res.note;
   }, DEBOUNCE_MS);

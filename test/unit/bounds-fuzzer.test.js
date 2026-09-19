@@ -33191,7 +33191,7 @@ test("bounds: spec-v1113 computeAsmeShellThickness pins both UG-27 forms, the ex
   assert.ok(Math.abs(sph.t_required_in - 150 * 24 / (2 * 14875 - 0.2 * 150)) < 1e-12);
   assert.ok(sph.t_required_in < r.t_required_in && sph.t_required_in > 0.45 * r.t_required_in);
   assert.ok(Math.abs(sph.mawp_psi - 150) < 1e-9); // the sphere inverse round-trips too
-  // Joint efficiency is the lever the tile exists to show: no RT costs about 30% more wall.
+  // Joint efficiency is the lever the tile exists to show: no RT costs about 43% more wall than full RT.
   const noRt = _v1113({ ...base, joint_efficiency: 0.70 });
   const fullRt = _v1113({ ...base, joint_efficiency: 1.0 });
   assert.ok(noRt.t_required_in > r.t_required_in && r.t_required_in > fullRt.t_required_in);
@@ -39401,7 +39401,7 @@ test("bounds: spec-v1370 computeChainHoistLiftTime pins the lift time and the du
   assert.ok(Math.abs(r.set_hp - 7.7576) < 1e-4);
   assert.ok(Math.abs(r.allowed_on_time_min - 4.0) < 1e-9);
   assert.ok(Math.abs(r.lifts_per_period - 1.0667) < 1e-3);
-  assert.ok(r.verdict.startsWith("one lift per period"));
+  assert.ok(/^only 1\.\d lifts per period and no margin/.test(r.verdict));
   // A high-speed hoist halves the time and doubles the power draw.
   const fast = _v1370({ ...base, hoist_speed_fpm: 32 });
   assert.ok(Math.abs(fast.lift_time_min - r.lift_time_min / 2) < 1e-9);
