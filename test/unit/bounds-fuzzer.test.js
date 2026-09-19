@@ -27369,7 +27369,7 @@ test("bounds: spec-v613 computeFlocculatorPaddlePower pins the drag power, the c
   const x = _v613({ paddle_radius_ft: 5, wheel_rpm: 4, paddle_area_ft2: 30, drag_coeff: 1.5, slip_factor: 0.30 });
   assert.ok(Math.abs(x.power_w - 186.201912) < 1e-4);
   assert.ok(Math.abs(x.power_hp - 0.2497) < 1e-3);
-  // Ignoring the slip (k=0) roughly doubles the power vs the 0.25-slip case.
+  // Ignoring the slip (k=0) multiplies the power by 1/0.75^3 = 2.37 vs the 0.25-slip case.
   const noslip = _v613({ paddle_radius_ft: 6, wheel_rpm: 3, paddle_area_ft2: 40, drag_coeff: 1.8, slip_factor: 0 });
   assert.ok(Math.abs(noslip.power_w / r.power_w - 1 / Math.pow(0.75, 3)) < 1e-9); // ~2.37x
   // Cube law: doubling the rpm multiplies power by 8.

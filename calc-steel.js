@@ -1377,14 +1377,14 @@ export function computeSteelFloorVibration({ natural_freq_hz = 0, effective_wt_l
   const pass = ap_over_g <= limit;
   return {
     ap_over_g, limit_ratio: limit, pass,
-    note: "Stiffer is not automatically better: the e^(-0.35 fn) term makes low-frequency floors (about 4-8 Hz) resonate with the walking harmonic, so a floor tuned into that band accelerates more, not less. Damping (beta) and the effective panel weight (W) matter as much as the frequency. The natural frequency comes from the combined beam-plus-girder deflection. A full DG11 evaluation and the engineer of record govern.",
+    note: "Acceleration falls with frequency through the e^(-0.35 fn) term, so for the same weight and damping a stiffer floor responds less; floors at about 4-8 Hz, where the walking harmonics excite them, respond most. Damping (beta) and the effective panel weight (W) matter as much as the frequency. The natural frequency comes from the combined beam-plus-girder deflection. A full DG11 evaluation and the engineer of record govern.",
   };
 }
 
 export const steelFloorVibrationExample = { inputs: { natural_freq_hz: 5, effective_wt_lb: 30000, damping_ratio: 0.03, walker_force_lb: 65, limit_ratio: 0.005 } };
 
 STEEL_RENDERERS["steel-floor-vibration"] = _simpleRenderer({
-  citation: "Citation: AISC Design Guide 11 (2nd ed.) walking-vibration serviceability check: ap/g = P0 x e^(-0.35 fn) / (beta W), pass when ap/g <= ao/g. Common values: P0 ~ 65 lb (office), occupancy limit 0.5% g (office/residence), 1.5% g (mall). Stiffer is not automatically better - the exponential term makes low-frequency floors (~4-8 Hz) resonate with the walking harmonic. A serviceability screen; a full DG11 evaluation and the engineer of record govern.",
+  citation: "Citation: AISC Design Guide 11 (2nd ed.) walking-vibration serviceability check: ap/g = P0 x e^(-0.35 fn) / (beta W), pass when ap/g <= ao/g. Common values: P0 ~ 65 lb (office), occupancy limit 0.5% g (office/residence), 1.5% g (mall). Acceleration falls with frequency through the exponential term; floors at about 4-8 Hz, where walking harmonics excite them, respond most. A serviceability screen; a full DG11 evaluation and the engineer of record govern.",
   example: steelFloorVibrationExample.inputs,
   fields: [
     { key: "natural_freq_hz", label: "Floor natural frequency fn (Hz)", kind: "number" },

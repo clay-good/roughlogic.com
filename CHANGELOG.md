@@ -6,6 +6,16 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **More notes corrected against their own formulas.**
+  - `steel-floor-vibration` said a stiffer floor is "not automatically better", but its own e^(−0.35·fn) term always gives lower acceleration at higher frequency for the same weight and damping.
+  - `wire-rope-stretch` said a 100 ft rope stretches "the better part of a foot" at working load. At a 5:1 working load it is about 5 in.
+  - `center-pivot` put an elliptical pattern's peak 6% above average; it is 4/π, 27% above.
+  - `grain-drying-energy` had the moisture-point effect backwards: each point removed nearer the wet end carries slightly more water.
+  - `flocculator` said ignoring slip "roughly doubles" the power. It multiplies it by 1/(1 − k)³, 2.4× to 4.6×.
+  - The pool-dose note said 12.5% liquid takes five times the weight of cal-hypo. At about 10.4% by weight it takes about six times.
+  - The grain-aeration note gave fourfold fan power for doubling depth; doubling depth at the same cfm/bu gives eight- to tenfold.
+  - The wire-rope clip note named the saddle for both ends.
+
 - **Notes whose own numbers disagreed with them.**
   - The melt-furnace wording from earlier today said aluminum melts at "less than half" cast iron's temperature. At about 1,220°F against 2,150°F it is a little more than half.
   - The casting-yield note called 70% yield "a third or more" gating and risers; it is 30–40%.

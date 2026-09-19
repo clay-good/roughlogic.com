@@ -2728,7 +2728,7 @@ export function computeGrainDryingEnergy({ bushels = 0, lb_per_bushel = 56, mi_p
   const cost_usd = price > 0 ? propane_gal * price : null;
   return {
     weight_lb, water_lb, energy_btu, propane_gal, cost_usd,
-    note: "Grain drying energy: the water removed = wet weight x (Mi - Mf) / (100 - Mf) on the wet basis (the shrink formula), the drying energy = water x the per-pound energy (about 1500 Btu/lb including dryer efficiency), and the propane = energy / 91,500 Btu per gallon. Removing fewer moisture points removes disproportionately less water because the denominator shifts. A planning aid; the dryer's actual efficiency, the fuel heat content, and the market discount schedule govern.",
+    note: "Grain drying energy: the water removed = wet weight x (Mi - Mf) / (100 - Mf) on the wet basis (the shrink formula), the drying energy = water x the per-pound energy (about 1500 Btu/lb including dryer efficiency), and the propane = energy / 91,500 Btu per gallon. Each moisture point removed nearer the wet end carries slightly more water, because the wet-basis denominator shrinks. A planning aid; the dryer's actual efficiency, the fuel heat content, and the market discount schedule govern.",
   };
 }
 export const grainDryingEnergyExample = { inputs: { bushels: 1000, lb_per_bushel: 56, mi_percent: 20, mf_percent: 15, btu_per_lb: 1500, price_per_gal: 0 } };
@@ -2875,7 +2875,7 @@ export function computePivotApplicationRate({ pass_depth_in = 0, pivot_length_ft
   const ratio = app_rate_in_hr / intake;
   return {
     speed_ft_min, wetting_min, app_rate_in_hr, exceeds_intake, ratio,
-    note: "This is the average rate over the wetted band at the outer span; the true peak of a bell-shaped pattern runs a little higher (about 6% for an elliptical package). The outer end always governs because it moves fastest. Runoff is avoided in practice only by the short wetting time and a little surface storage, so a slope or a crusted or tight soil will run off when the rate exceeds the intake - slow the pivot, narrow the band, or pick a lower-rate package. The pivot design, the sprinkler package, and the measured soil intake govern - a design screen, not a runoff model.",
+    note: "This is the average rate over the wetted band at the outer span; the true peak of the pattern runs well above it (4/pi, about 27% higher, for an elliptical package). The outer end always governs because it moves fastest. Runoff is avoided in practice only by the short wetting time and a little surface storage, so a slope or a crusted or tight soil will run off when the rate exceeds the intake - slow the pivot, narrow the band, or pick a lower-rate package. The pivot design, the sprinkler package, and the measured soil intake govern - a design screen, not a runoff model.",
   };
 }
 export const pivotApplicationRateExample = { inputs: { pass_depth_in: 1.0, pivot_length_ft: 1320, revolution_hr: 24, wetted_band_ft: 100, soil_intake_in_hr: 0.5 } };
@@ -2966,7 +2966,7 @@ export function computeGrainAerationAirflow({ bin_capacity_bu = 0, airflow_rate 
   const mode = rate >= 0.5 ? "natural-air drying" : rate >= 0.1 ? "aeration cooling" : "low-rate aeration";
   return {
     required_cfm, cooling_hours, mode,
-    note: "Static pressure rises steeply with grain depth, and fan power grows about fourfold when the airflow rate or the depth doubles - so a fan sized on cfm/bu alone stalls against back-pressure in a tall bin, and the fan curve must be read at the actual static pressure. Aeration cooling (0.1-0.25 cfm/bu) is NOT the same job as natural-air drying (0.5-1.0 cfm/bu) - mixing them up either wastes fan or fails to dry. A sizing aid; the fan selection at the design static pressure and the grain condition govern.",
+    note: "Static pressure rises steeply with grain depth, and fan power grows about four- to fivefold when the airflow rate doubles and about eight- to tenfold when the depth doubles at the same cfm/bu - so a fan sized on cfm/bu alone stalls against back-pressure in a tall bin, and the fan curve must be read at the actual static pressure. Aeration cooling (0.1-0.25 cfm/bu) is NOT the same job as natural-air drying (0.5-1.0 cfm/bu) - mixing them up either wastes fan or fails to dry. A sizing aid; the fan selection at the design static pressure and the grain condition govern.",
   };
 }
 export const grainAerationAirflowExample = { inputs: { bin_capacity_bu: 20000, airflow_rate: 0.15 } };
