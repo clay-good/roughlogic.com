@@ -387,29 +387,37 @@ export function computeEgressLightingCheck({ avg_fc = 0, min_fc = 0, max_fc = 0,
   if (!(avg > 0)) return { error: "Average illuminance must be positive (fc)." };
   if (!(min > 0)) return { error: "Minimum illuminance must be positive (fc)." };
   if (!(max >= min)) return { error: "Maximum must be at least the minimum (fc)." };
+  // Normal egress lighting (IBC 1008.2.1, NFPA 101 7.8.1.3) is at least
+  // 1 fc at EVERY point of the walking surface. The 1.0 average / 0.1
+  // minimum pair is the EMERGENCY initial requirement (NFPA 101 7.9.2.1),
+  // falling to 0.6 / 0.06 at the end of 90 minutes, with max/min <= 40:1.
+  // Until 2026-09-19 "normal" used the emergency-initial pair, passing a
+  // path with a 0.1 fc dark spot 10x below the normal minimum.
   const emergency = mode === "emergency-90min-end";
+  const emergencyInitial = mode === "emergency-initial";
   const avg_thr = emergency ? 0.6 : 1.0;
-  const min_thr = emergency ? 0.06 : 0.1;
+  const min_thr = emergency ? 0.06 : emergencyInitial ? 0.1 : 1.0;
   const max_min = max / min;
   const avg_ok = avg >= avg_thr;
   const min_ok = min >= min_thr;
-  const ratio_ok = max_min <= 40;
+  const ratio_ok = (emergency || emergencyInitial) ? max_min <= 40 : true;
   const pass = avg_ok && min_ok && ratio_ok;
   return {
     max_min, avg_thr, min_thr, avg_ok, min_ok, ratio_ok, pass, emergency,
-    note: "Egress/means-of-egress lighting check per NFPA 101 / IBC: normally the path averages at least 1.0 fc with a minimum of 0.1 fc; at the end of the 90-minute emergency (battery/generator) period the floor drops to 0.6 fc average and 0.06 fc minimum, and the maximum-to-minimum ratio must not exceed 40:1 (no over-bright spot beside a dark one). A single dark spot below the minimum fails the path even when the average holds - the reason a spot check, not just an average, is required. A design aid; the adopted NFPA 101 / IBC edition and the AHJ govern.",
+    note: "Egress/means-of-egress lighting check per NFPA 101 / IBC: normal lighting puts at least 1 fc on every point of the walking surface; emergency lighting starts at 1.0 fc average with a 0.1 fc minimum and, at the end of the 90-minute emergency (battery/generator) period the floor drops to 0.6 fc average and 0.06 fc minimum, and the maximum-to-minimum ratio must not exceed 40:1 (no over-bright spot beside a dark one). A single dark spot below the minimum fails the path even when the average holds - the reason a spot check, not just an average, is required. A design aid; the adopted NFPA 101 / IBC edition and the AHJ govern.",
   };
 }
-export const egressLightingCheckExample = { inputs: { avg_fc: 1.2, min_fc: 0.15, max_fc: 3.0, mode: "normal" } };
+export const egressLightingCheckExample = { inputs: { avg_fc: 1.2, min_fc: 0.15, max_fc: 3.0, mode: "emergency-initial" } };
 ELECDESIGN_RENDERERS["egress-lighting-check"] = _simpleRenderer({
-  citation: "Citation: egress lighting minimums per NFPA 101 / IBC: normal 1.0 fc avg / 0.1 fc min; emergency 90-min end 0.6 fc avg / 0.06 fc min; max/min <= 40:1. The adopted NFPA 101 / IBC edition and the AHJ govern.",
+  citation: "Citation: egress lighting minimums per NFPA 101 / IBC: normal at least 1 fc at every point (IBC 1008.2.1, NFPA 101 7.8.1.3); emergency initial 1.0 fc avg / 0.1 fc min and 90-min end 0.6 fc avg / 0.06 fc min, max/min <= 40:1 (NFPA 101 7.9.2.1). The adopted NFPA 101 / IBC edition and the AHJ govern.",
   example: egressLightingCheckExample.inputs,
   fields: [
     { key: "avg_fc", label: "Average illuminance (fc)", kind: "number" },
     { key: "min_fc", label: "Minimum illuminance (fc)", kind: "number" },
     { key: "max_fc", label: "Maximum illuminance (fc)", kind: "number" },
     { key: "mode", label: "Mode", kind: "select", options: [
-      { value: "normal", label: "Normal (1.0 fc avg / 0.1 fc min)" },
+      { value: "normal", label: "Normal (at least 1 fc at every point)" },
+      { value: "emergency-initial", label: "Emergency, initial (1.0 fc avg / 0.1 fc min)" },
       { value: "emergency-90min-end", label: "Emergency, 90-min end (0.6 / 0.06)" },
     ] },
   ],

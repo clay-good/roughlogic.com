@@ -1717,12 +1717,18 @@ export function computePoEBudget({ poe_class = "at", category = "Cat6", run_leng
   const tempFactor = 1 + 0.00393 * (ambient_C - 20);
   const loopOhms = (ohmsPer100m * (length_m / 100)) * tempFactor;
   // Source voltage per class (PSE port voltage minimums per IEEE):
-  const v_source = poe_class === "af" ? 44 : 50;
+  const v_source = poe_class === "af" ? 44 : poe_class === "bt4" ? 52 : 50;
   // Power-out budget at PSE = pse_W; current at PSE = pse_W / v_source.
   const I = cls.pse_W / v_source;
-  const drop_V = I * loopOhms;
+  // 802.3bt Type 3 / 4 deliver over all four pairs: two pair-sets in
+  // parallel, each carrying I/2, so the drop is I x R/2 and the loss
+  // 2 (I/2)^2 R = I^2 R / 2. Until 2026-09-19 the full current ran one
+  // pair-set, failing standard-compliant 100 m bt3 / bt4 channels.
+  const fourPair = poe_class === "bt3" || poe_class === "bt4";
+  const effOhms = fourPair ? loopOhms / 2 : loopOhms;
+  const drop_V = I * effOhms;
   const v_pd = v_source - drop_V;
-  const power_loss_W = I * I * loopOhms;
+  const power_loss_W = I * I * effOhms;
   const pd_W = cls.pse_W - power_loss_W;
   let flag = "green";
   if (pd_W < cls.pd_min_W) flag = "red";
@@ -2998,8 +3004,8 @@ ELECTRICAL_RENDERERS["motor-branch-from-nameplate"] = renderMotorBranchFromNamep
 //
 //   Driven rod (Dwight 1936):
 //     R = (rho / (2 * pi * L)) * (ln(8L / d) - 1)
-//   Buried ring (IEEE 142 §4.2.2):
-//     R = (rho / (4 * pi^2 * D)) * (ln(8D / d) + ln(4D / s))
+//   Buried ring (IEEE 142 Table 4-5, Dwight):
+//     R = (rho / (2 * pi^2 * D)) * (ln(8D / d) + ln(4D / s)), s = 2 x depth
 //   Buried plate (IEEE 142 §4.2.3):
 //     R = (rho / 4) * sqrt(pi / A)     (rho in ohm-m, A in m^2)
 //   Ufer / concrete-encased (IEEE 142 §4.2.4):
@@ -3072,8 +3078,13 @@ export function computeGroundingElectrodeResistance({
     if (dc_in < 0.258) warnings.push("Ring conductor below 2 AWG (~0.258 in dia.) is below the NEC 250.66 minimum size for grounding-electrode ring conductors.");
     const D_cm = D_ft * 30.48;
     const dc_cm = dc_in * 2.54;
-    const s_cm = s_ft * 30.48;
-    R = (rho / (4 * Math.PI * Math.PI * D_cm)) * (Math.log(8 * D_cm / dc_cm) + Math.log(4 * D_cm / s_cm));
+    // Dwight / IEEE 142 Table 4-5 ring: R = rho / (2 pi^2 D) [ln(8D/d) + ln(4D/s)],
+    // where s is TWICE the burial depth (the distance to the image ring).
+    // Until 2026-09-19 the coefficient was 1/(4 pi^2) and s the depth itself,
+    // about half the true resistance -- a ring could read under 25 ohms
+    // when it was not.
+    const s_cm = 2 * s_ft * 30.48;
+    R = (rho / (2 * Math.PI * Math.PI * D_cm)) * (Math.log(8 * D_cm / dc_cm) + Math.log(4 * D_cm / s_cm));
   } else if (electrode_type === "plate") {
     const A_ft2 = Number(plate_area_ft2) || 0;
     const s_ft = Number(plate_burial_depth_ft) || 0;

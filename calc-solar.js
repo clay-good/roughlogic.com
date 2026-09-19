@@ -84,8 +84,8 @@ export const pvStringSizingExample = {
 
 // --- Utility 68: Battery Runtime ---
 
-// dims: in { amp_hours: I T, system_V: M L^2 T^-3 I^-1, dod_percent: dimensionless, load_W: M L^2 T^-3, peukert_k: dimensionless } out: { usable_wh: M L^2 T^-3 T, hours: T }
-export function computeBatteryRuntime({ amp_hours, system_V, dod_percent = 100, load_W, peukert_k = 1, inverter_efficiency_pct = 100 }) {
+// dims: in { amp_hours: I T, system_V: M L^2 T^-3 I^-1, dod_percent: dimensionless, load_W: M L^2 T^-3, peukert_k: dimensionless, rated_hours: T } out: { usable_wh: M L^2 T^-3 T, hours: T }
+export function computeBatteryRuntime({ amp_hours, system_V, dod_percent = 100, load_W, peukert_k = 1, inverter_efficiency_pct = 100, rated_hours = 20 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const Ah = Number(amp_hours) || 0;
   const V = Number(system_V) || 0;
@@ -102,11 +102,14 @@ export function computeBatteryRuntime({ amp_hours, system_V, dod_percent = 100, 
   const battery_load_W = load / eff;
   let hours;
   if (k > 1) {
-    // Peukert form per spec-v2 section 2: t = C / I^k, C in Ah, I in A.
-    // Reduces to C / I (the simple form) when k = 1.
+    // Peukert with the capacity's rating time H: t = H (C / (I H))^k, C the
+    // nameplate Ah at the H-hour rate. Until 2026-09-19 this was C / I^k,
+    // which treats C as the capacity at 1 A: 6.3 h instead of 8.7 h for
+    // 100 Ah (20 h rate) at 10 A, k 1.2, and too LONG below the rated current.
     const I = battery_load_W / V;
     if (I <= 0) return { error: "Computed current is non-positive." };
-    hours = usable_Ah / Math.pow(I, k);
+    const H = Number(rated_hours) > 0 ? Number(rated_hours) : 20;
+    hours = dod * H * Math.pow(Ah / (I * H), k);
   } else {
     hours = usable_Wh / battery_load_W;
   }
@@ -183,7 +186,8 @@ export function renderBatteryRuntime(inputRegion, outputRegion, citationEl, para
   const k = makeNumber("Peukert exponent k (1 if unknown)", "br-k", { step: "any", min: "1", value: "1" });
   const eff = makeNumber("Inverter efficiency (%, 100 for a DC load)", "br-eff", { step: "any", min: "0", max: "100", value: "100" });
   k.input.value = "1";
-  for (const f of [ah, v, dod, load, k, eff]) inputRegion.appendChild(f.wrap);
+  const rh = makeNumber("Capacity rating time (h; the C/20 rate is 20)", "br-rh", { step: "any", min: "0", value: "20" });
+  for (const f of [ah, v, dod, load, k, rh, eff]) inputRegion.appendChild(f.wrap);
 
   const oH = makeOutputLine(outputRegion, "Runtime (hours)", "br-out-h");
   const oM = makeOutputLine(outputRegion, "Runtime (minutes)", "br-out-m");
@@ -202,6 +206,7 @@ export function renderBatteryRuntime(inputRegion, outputRegion, citationEl, para
       inverter_efficiency_pct: Number(eff.input.value) || 100,
       load_W: Number(load.input.value) || 0,
       peukert_k: Number(k.input.value) || 1,
+      rated_hours: Number(rh.input.value) || 20,
     });
     if (r.error) { oH.textContent = r.error; oM.textContent = "-"; oWh.textContent = "-"; return; }
     oH.textContent = fmt(r.hours, 2) + " hr";
@@ -209,7 +214,7 @@ export function renderBatteryRuntime(inputRegion, outputRegion, citationEl, para
     oWh.textContent = fmt(r.usable_Wh, 0) + " Wh";
   }, DEBOUNCE_MS);
 
-  for (const el of [ah.input, v.input, dod.input, load.input, k.input]) el.addEventListener("input", update);
+  for (const el of [ah.input, v.input, dod.input, load.input, k.input, rh.input]) el.addEventListener("input", update);
 }
 
 // --- v15 A.8: PV interconnection 120% busbar rule (NEC 705.12) ---

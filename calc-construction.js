@@ -1825,9 +1825,10 @@ export function computeDemoDebris({ structure_type = "wood_frame", volume_yd3 = 
 
 export const demoDebrisExample = { inputs: { structure_type: "wood_frame", volume_yd3: 25 } };
 
-// --- Utility 158: Formwork Pressure (ACI 347 short form) ---
+// --- Utility 158: Formwork Pressure (ACI 347R wall equations) ---
 //
-// P = C_w * (150 + 9000R/T)  capped at wet head (rho * h) for tall pours.
+// P = C_w (150 + 9000R/T) (R < 7, h <= 14) or C_w (150 + 43400/T + 2800R/T),
+// min 600 C_w, capped at the wet head (rho * h); full head above 15 ft/hr.
 
 export const ACI_C_W = { normal: 1.0, lightweight_115: 0.85, lightweight_135: 0.93, plasticized: 1.20 };
 
@@ -1840,14 +1841,28 @@ export function computeFormworkPressure({
   if (!(concrete_temp_F > 0)) return { error: "Concrete temperature must be positive." };
   const Cw = ACI_C_W[weight_factor];
   if (!Number.isFinite(Cw)) return { error: "Unknown weight factor." };
-  const P_aci = Cw * (150 + (9000 * pour_rate_ft_per_hr) / concrete_temp_F);
+  // ACI 347R wall pressure. The short form Cw (150 + 9000 R / T) holds only
+  // for R < 7 ft/hr in walls up to 14 ft; taller walls at R < 7, and any wall
+  // at 7-15 ft/hr, take Cw (150 + 43,400 / T + 2,800 R / T); above 15 ft/hr
+  // the full liquid head applies; and the pressure is never below 600 Cw psf.
+  // Until 2026-09-19 the short form ran for every pour with no floor: a
+  // 20 ft wall at 5 ft/hr and 50 F read 1,050 psf against 1,298.
+  const R = pour_rate_ft_per_hr, T = concrete_temp_F, h = wall_height_ft;
   const P_wet = unit_weight_pcf * wall_height_ft;
-  const cap_applied = P_aci > P_wet;
+  let P_aci, aci_form;
+  if (R > 15) { P_aci = P_wet; aci_form = "full liquid head (R > 15 ft/hr)"; }
+  else if (R < 7 && h <= 14) { P_aci = Cw * (150 + 9000 * R / T); aci_form = "short form (R < 7 ft/hr, wall <= 14 ft)"; }
+  else { P_aci = Cw * (150 + 43400 / T + 2800 * R / T); aci_form = R < 7 ? "tall-wall form (wall > 14 ft)" : "7-15 ft/hr form"; }
+  const floor_applied = P_aci < 600 * Cw;
+  P_aci = Math.max(P_aci, 600 * Cw);
+  const cap_applied = P_aci >= P_wet; // the liquid head governs
   return {
     pressure_psf: Math.min(P_aci, P_wet),
     aci_pressure_psf: P_aci,
     wet_head_psf: P_wet,
     cap_applied,
+    floor_applied,
+    aci_form,
     weight_factor: Cw,
   };
 }
@@ -5085,8 +5100,8 @@ CONSTRUCTION_RENDERERS["asce7-load-combinations"] = _simpleRenderer({
 
 // ===================== spec-v226: seismic base shear (ASCE 7 §12.8 ELF) =====================
 
-// dims: in { weight_kip: M L T^-2, sds: dimensionless, sd1: dimensionless, r_factor: dimensionless, ie: dimensionless, period_s: T } out: { cs: dimensionless, base_shear_kip: M L T^-2 }
-export function computeSeismicBaseShear({ weight_kip = 0, sds = 0, sd1 = 0, r_factor = 0, ie = 1.0, period_s = 0 } = {}) {
+// dims: in { weight_kip: M L T^-2, sds: dimensionless, sd1: dimensionless, r_factor: dimensionless, ie: dimensionless, period_s: T, s1: dimensionless } out: { cs: dimensionless, base_shear_kip: M L T^-2 }
+export function computeSeismicBaseShear({ weight_kip = 0, sds = 0, sd1 = 0, r_factor = 0, ie = 1.0, period_s = 0, s1 = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(weight_kip > 0)) return { error: "Seismic weight must be positive (kips)." };
   if (!(sds > 0)) return { error: "SDS must be positive (g)." };
@@ -5096,7 +5111,11 @@ export function computeSeismicBaseShear({ weight_kip = 0, sds = 0, sd1 = 0, r_fa
   const r_over_ie = r_factor / ie;
   const cs_basic = sds / r_over_ie;
   const cs_cap = sd1 / (period_s * r_over_ie);
-  const cs_min = Math.max(0.044 * sds * ie, 0.01);
+  // Eq. 12.8-6 adds, where S1 >= 0.6 g, Cs >= 0.5 S1 / (R / Ie). Until
+  // 2026-09-19 there was no S1 input, so a near-fault tall building's base
+  // shear read 15% low.
+  const s1v = Number(s1) || 0;
+  const cs_min = Math.max(0.044 * sds * ie, 0.01, s1v >= 0.6 ? 0.5 * s1v / r_over_ie : 0);
   const cs = Math.max(cs_min, Math.min(cs_basic, cs_cap));
   const base_shear_kip = cs * weight_kip;
   const governing = cs === cs_min ? "code minimum" : (cs_cap < cs_basic ? "period cap (T <= TL)" : "basic Cs");
@@ -5107,7 +5126,7 @@ export function computeSeismicBaseShear({ weight_kip = 0, sds = 0, sd1 = 0, r_fa
 }
 export const seismicBaseShearExample = { inputs: { weight_kip: 200, sds: 1.0, sd1: 0.6, r_factor: 6.5, ie: 1.0, period_s: 0.3 } };
 CONSTRUCTION_RENDERERS["seismic-base-shear"] = _simpleRenderer({
-  citation: "Citation: ASCE 7 §12.8 equivalent lateral force Cs = SDS / (R / Ie), capped at SD1 / (T x (R / Ie)) for T <= TL, minimum max(0.044 x SDS x Ie, 0.01), base shear V = Cs x W (by name). SDS / SD1 are from the USGS seismic design maps; R is from Table 12.2-1. The ELF base shear for a regular building, not a modal analysis. A licensed engineer governs.",
+  citation: "Citation: ASCE 7 §12.8 equivalent lateral force Cs = SDS / (R / Ie), capped at SD1 / (T x (R / Ie)) for T <= TL, minimum max(0.044 x SDS x Ie, 0.01) and, where S1 >= 0.6 g, 0.5 S1 / (R / Ie) (Eq. 12.8-6), base shear V = Cs x W (by name). SDS / SD1 are from the USGS seismic design maps; R is from Table 12.2-1. The ELF base shear for a regular building, not a modal analysis. A licensed engineer governs.",
   example: seismicBaseShearExample.inputs,
   fields: [
     { key: "weight_kip", label: "Seismic weight W (kips)", kind: "number" },
@@ -5116,6 +5135,7 @@ CONSTRUCTION_RENDERERS["seismic-base-shear"] = _simpleRenderer({
     { key: "r_factor", label: "Response-modification factor R", kind: "number" },
     { key: "ie", label: "Importance factor Ie (1.0-1.5)", kind: "number" },
     { key: "period_s", label: "Fundamental period Ta (s)", kind: "number" },
+    { key: "s1", label: "Mapped S1 (g) -- 0.6 or more adds the Eq. 12.8-6 minimum; 0 to skip", kind: "number", default: 0 },
   ],
   outputs: [
     { key: "cs", id: "sbs-out-cs", label: "Seismic response coefficient Cs", value: (r) => _fmtC(r.cs, 4) },
@@ -8447,19 +8467,28 @@ export function computeSnowUnbalancedGable({ ground_snow_pg_psf = 0, flat_roof_p
   if (!(rise > 0)) return { error: "Roof rise-on-12 must be positive." };
   if (!(W > 0)) return { error: "Eave-to-ridge length must be positive (ft)." };
   const slope_deg = Math.atan(rise / 12) * 180 / Math.PI;
-  const applicable = slope_deg >= 2.38 && slope_deg <= 30.2 && W > 20;
+  // In the slope band the unbalanced case ALWAYS applies. For W <= 20 ft
+  // with simply supported prismatic members, ASCE 7 7.6.1 sets the windward
+  // side to 0 and the leeward to Is x pg, uniform (Is = 1 here). Until
+  // 2026-09-19 W <= 20 ft read "not applicable, balanced governs", missing a
+  // leeward load 20-45% above the balanced one.
+  const inBand = slope_deg >= 2.38 && slope_deg <= 30.2;
+  const applicable = inBand;
+  const shortSpan = W <= 20;
   const gamma = Math.min(0.13 * pg + 14, 30);
   const S = 12 / rise;
-  const hd = 0.43 * Math.pow(W, 1 / 3) * Math.pow(pg + 10, 1 / 4) - 1.5;
-  const windward_psf = 0.3 * ps;
-  const surcharge_psf = hd * gamma / Math.sqrt(S);
-  const leeward_peak_psf = ps + surcharge_psf;
-  const extent_ft = 8 * hd * Math.sqrt(S) / 3;
+  const hd = shortSpan ? 0 : 0.43 * Math.pow(W, 1 / 3) * Math.pow(pg + 10, 1 / 4) - 1.5;
+  const windward_psf = shortSpan ? 0 : 0.3 * ps;
+  const surcharge_psf = shortSpan ? 0 : hd * gamma / Math.sqrt(S);
+  const leeward_peak_psf = shortSpan ? pg : ps + surcharge_psf;
+  const extent_ft = shortSpan ? W : 8 * hd * Math.sqrt(S) / 3;
   return {
     slope_deg, applicable, gamma, hd_ft: hd, windward_psf, surcharge_psf, leeward_peak_psf, extent_ft,
-    note: applicable
+    note: applicable && shortSpan
+      ? "With an eave-to-ridge length of 20 ft or less (and simply supported prismatic members), the unbalanced case is the windward slope at 0 and the whole leeward slope at Is x pg (Is taken as 1 here) -- often heavier than the balanced load. Other framing takes the full drift form. ASCE 7 Section 7.6.1; the engineer of record governs."
+      : applicable
       ? "The windward slope drops to 0.3 ps while the leeward carries ps plus a ridge drift surcharge - this sizes the leeward rafter and the ridge, which the balanced case misses. ASCE 7-22 Section 7.6.1; the engineer of record governs."
-      : "The unbalanced case applies only in the slope band of about 2.38 to 30.2 degrees (roughly 1/2-on-12 to 7-on-12) with an eave-to-ridge length over 20 ft. Outside it, only the balanced load governs. ASCE 7-22 Section 7.6.1; the engineer of record governs.",
+      : "The unbalanced case applies in the slope band of about 2.38 to 30.2 degrees (roughly 1/2-on-12 to 7-on-12). Outside it, only the balanced load governs. ASCE 7-22 Section 7.6.1; the engineer of record governs.",
   };
 }
 export const snowUnbalancedGableExample = { inputs: { ground_snow_pg_psf: 30, flat_roof_ps_psf: 25, roof_rise_on_12: 4, eave_to_ridge_ft: 30 } };
@@ -8474,7 +8503,7 @@ const _v553renderSnowUnbalancedGable = _simpleRenderer({
     { key: "eave_to_ridge_ft", label: "Eave-to-ridge length W (ft)", kind: "number" },
   ],
   outputs: [
-    { key: "ap", id: "sug-out-ap", label: "Unbalanced case applies?", value: (r) => r.applicable ? "YES (slope " + fmt(r.slope_deg, 1) + " deg, in band)" : "NO (slope " + fmt(r.slope_deg, 1) + " deg / W - out of band; balanced governs)" },
+    { key: "ap", id: "sug-out-ap", label: "Unbalanced case applies?", value: (r) => r.applicable ? "YES (slope " + fmt(r.slope_deg, 1) + " deg, in band)" : "NO (slope " + fmt(r.slope_deg, 1) + " deg - out of band; balanced governs)" },
     { key: "ww", id: "sug-out-ww", label: "Windward slope load", value: (r) => fmt(r.windward_psf, 1) + " psf" },
     { key: "lw", id: "sug-out-lw", label: "Leeward peak at ridge", value: (r) => fmt(r.leeward_peak_psf, 1) + " psf (surcharge +" + fmt(r.surcharge_psf, 1) + ")" },
     { key: "ex", id: "sug-out-ex", label: "Surcharge extent from ridge", value: (r) => fmt(r.extent_ft, 1) + " ft" },

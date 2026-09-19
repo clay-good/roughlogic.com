@@ -2542,8 +2542,8 @@
       "date": "2026-09-01"
     },
     "/tools/egress-lighting-check/": {
-      "sha": "b180beea842b5c2c",
-      "date": "2026-09-01"
+      "sha": "e184c56f3bcee4e3",
+      "date": "2026-09-19"
     },
     "/tools/egress-travel-distance/": {
       "sha": "18a1eeb03cacd891",
@@ -3074,8 +3074,8 @@
       "date": "2026-09-01"
     },
     "/tools/formwork-pressure/": {
-      "sha": "b779fbe9bd399b0f",
-      "date": "2026-09-01"
+      "sha": "dbc1645b50c675c0",
+      "date": "2026-09-19"
     },
     "/tools/formwork-tie-load/": {
       "sha": "2c2866f89b40cd07",

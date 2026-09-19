@@ -68558,7 +68558,7 @@
   {
    "tile_id": "egress-lighting-check",
    "source_publisher": "NFPA 101 / IBC",
-   "source_title": "corridor 1.2 fc avg, 0.15 fc min, 3.0 fc max, normal -> max/min 20, compliant",
+   "source_title": "corridor 1.2 fc avg, 0.15 fc min, 3.0 fc max, emergency initial (1.0 avg / 0.1 min) -> max/min 20, compliant",
    "source_edition_or_year": "spec-v367 worked example (machine-verified)",
    "source_section_or_page": "spec-v367 section 2.1 pinned example",
    "verified_by": "rl",
@@ -68567,7 +68567,7 @@
     "avg_fc": 1.2,
     "min_fc": 0.15,
     "max_fc": 3.0,
-    "mode": "normal"
+    "mode": "emergency-initial"
    },
    "outputs": {
     "max_min": {

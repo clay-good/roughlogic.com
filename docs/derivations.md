@@ -1802,7 +1802,7 @@ cross-check.
 | calc-construction.js | `computeSealantJointYield` | `{ joint_lf = 500, cartridge_in3 = 20.5, joint_width_in = 0.375, joint_depth_i...` | _ | _ | _ |
 | calc-construction.js | `computeSectionProperties` | `{ shape = "rectangle", b_in = 0, h_in = 0, d_in = 0, di_in = 0 } = {}` | _ | _ | _ |
 | calc-construction.js | `computeSeismicApproximatePeriod` | `{ system = "other", hn_ft = 0, sd1 = 0 } = {}` | _ | _ | _ |
-| calc-construction.js | `computeSeismicBaseShear` | `{ weight_kip = 0, sds = 0, sd1 = 0, r_factor = 0, ie = 1.0, period_s = 0 } = {}` | _ | _ | _ |
+| calc-construction.js | `computeSeismicBaseShear` | `{ weight_kip = 0, sds = 0, sd1 = 0, r_factor = 0, ie = 1.0, period_s = 0, s1 ...` | _ | _ | _ |
 | calc-construction.js | `computeSeismicDesignSpectralAcceleration` | `{ ss = 0, s1 = 0, fa = 0, fv = 0 } = {}` | _ | _ | _ |
 | calc-construction.js | `computeSeismicOverturningMoment` | `{ base_shear_kip = 0, period_s = 0, stories = [] } = {}` | _ | _ | _ |
 | calc-construction.js | `computeSeismicOverturningStability` | `{ overturning_moment_kipft = 0, dead_load_kip = 0, footprint_width_ft = 0, ar...` | _ | _ | _ |

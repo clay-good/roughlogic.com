@@ -1048,9 +1048,13 @@ export function computeHydrostaticTest({ working_pressure_psi = 0, system_volume
   if (!(working_pressure_psi > 0)) return { error: "Working pressure must be positive." };
   if (!(system_volume_gal >= 0)) return { error: "System volume must be non-negative." };
   // Default multipliers per public engineering practice.
-  const defaultMultiplier = material === "fuel_gas" ? 1.25 : 1.5;
+  // Fuel gas: IFGC 406.4.1 / NFPA 54 8.1.4 test at not less than 1.5 x the
+  // maximum working pressure and never less than 3 psig. Until 2026-09-19
+  // the default was 1.25 x with no floor, so a 0.5 psi system tested at
+  // 0.625 psi against the code's 3.
+  const defaultMultiplier = 1.5;
   const m = multiplier !== null && multiplier > 0 ? multiplier : defaultMultiplier;
-  const test_pressure = working_pressure_psi * m;
+  const test_pressure = material === "fuel_gas" ? Math.max(working_pressure_psi * m, 3) : working_pressure_psi * m;
   // Hold-time recommendation (piecewise):
   let hold_minutes;
   if (system_volume_gal < 50) hold_minutes = 15;

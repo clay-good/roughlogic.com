@@ -394,7 +394,9 @@ export function computeCombustionAir({ btu_input, room_volume_ft3 }) {
   const required_volume_ft3 = (btu_input / 1000) * 50;
   const adequate_by_volume = room_volume_ft3 >= required_volume_ft3;
   const opening_outdoor_in2 = btu_input / 4000;
-  const opening_indoor_in2 = btu_input / 1000;
+  // IFGC 304.5.3.1: each indoor opening at least 1 in^2 per 1,000 Btu/h and
+  // never less than 100 in^2 (the floor was missing until 2026-09-19).
+  const opening_indoor_in2 = Math.max(btu_input / 1000, 100);
   return { required_volume_ft3, adequate_by_volume, opening_outdoor_in2, opening_indoor_in2 };
 }
 

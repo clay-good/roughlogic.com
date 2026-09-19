@@ -5205,7 +5205,7 @@ export const CITATIONS = {
     ],
   },
   "formwork-pressure": {
-    formula: "ACI 347 short-form pressure: P = C_w × (150 + 9000 × R / T) capped at the wet-head pressure ρgh. R is pour rate (ft/hr), T is concrete temperature (°F), C_w is unit-weight coefficient.",
+    formula: "ACI 347R wall pressure: P = C_w × (150 + 9000 × R / T) for R < 7 ft/hr and walls up to 14 ft; C_w × (150 + 43,400 / T + 2,800 × R / T) for taller walls at R < 7 or any wall at 7-15 ft/hr; full wet head above 15 ft/hr; never below 600 × C_w psf; capped at the wet-head pressure ρgh. R is pour rate (ft/hr), T is concrete temperature (°F), C_w is unit-weight coefficient.",
     edition: "ACI 347R-14 (Guide to Formwork for Concrete) by name.",
     freeAccess: "ACI 347 licensed; engineering-practice formulas free in published concrete texts.",
     governance: GOVERNANCE.structural,

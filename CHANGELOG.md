@@ -6,6 +6,15 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **Published equations with one of their terms dropped.** A catalog-wide sweep compared each named equation term by term against its source and found:
+  - `grounding-electrode`'s buried ring used a 1/(4π²) coefficient with s as the burial depth. Dwight's formula (IEEE 142 Table 4-5) is 1/(2π²) with s twice the depth. The ring read about half its real resistance and could "meet" 25 Ω when it did not.
+  - `formwork-pressure` ran ACI 347R's short form for every pour. That form holds only below 7 ft/hr in walls up to 14 ft. Taller or faster pours take the 43,400/T + 2,800R/T form, above 15 ft/hr the full head, and there is a 600·Cw psf floor. A 20 ft wall at 5 ft/hr and 50°F read 1,050 psf against 1,298.
+  - `snow-unbalanced-gable` called the unbalanced case "not applicable" for eave-to-ridge lengths of 20 ft or less. ASCE 7 §7.6.1 loads the whole leeward slope at Is·pg there, up to 45% above the balanced load.
+  - `seismic-base-shear` had no S1 input, so it missed Eq. 12.8-6's 0.5·S1/(R/Ie) minimum where S1 ≥ 0.6 g. That shear read 15% low at a near-fault site.
+  - `slip-critical-with-tension` reused the LRFD ksc for its ASD total. ASD has its own Eq. J3-5b, 1 − 1.5·Ta/(Du·Tb·nb). The ASD capacity read 18% high.
+  - `hydrostatic-test` tested fuel gas at 1.25 × working pressure with no floor. IFGC 406.4.1 requires 1.5 × and at least 3 psig. `combustion-air` omitted IFGC 304.5.3.1's 100 in² minimum indoor opening.
+  - `poe-budget` ran 802.3bt four-pair current through one pair-set, doubling the cable loss and failing compliant 100 m channels; Type 4 also now starts at 52 V. `battery-runtime`'s Peukert form lacked the rating time: it is t = H·(C/(I·H))^k, not C/I^k. `egress-lighting-check`'s "normal" mode used the emergency-initial 1.0 average / 0.1 minimum. Normal egress lighting is 1 fc at every point (IBC 1008.2.1), so the tile now offers normal, emergency-initial and emergency-end modes.
+
 - **A short drainage stack could come out a size too small, and a single exit was allowed for 49 occupants in every occupancy.** An audit of code tables stored only as constants in the calculators found:
   - `sanitary-dfu` stack mode used IPC Table 710.1(2)'s column for stacks of more than three branch intervals for every stack. Stacks of three intervals or fewer have a stricter column: 10 DFU on a 2 in stack, not 24, and 48 on 3 in, not 72. A new branch-intervals input defaults to 3, so the stricter column applies unless the stack is taller. Taller stacks are also reminded of the per-interval cap.
   - `egress-capacity` let any story have one exit up to 49 occupants. IBC Table 1006.3.4(2) sets that limit at 49 only for A, B, E, F, M and U; it is 29 for S, 10 for I, R-1, R-4, H-4 and H-5, and 3 for H-2 and H-3. A new occupancy-group input applies it.

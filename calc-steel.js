@@ -1603,14 +1603,18 @@ export function computeSlipCriticalWithTension({ mu = 0.30, tb_kip = 0, ns = 1, 
   const fully_relieved = ksc_raw <= 0;
   const reduced_rn_bolt_kip = base.rn_bolt_kip * ksc;
   const lrfd_bolt_kip = 1.0 * reduced_rn_bolt_kip;
-  const asd_bolt_kip = reduced_rn_bolt_kip / 1.5;
+  // ASD has its own reduction, AISC Eq. J3-5b: ksc = 1 - 1.5 Ta / (Du Tb nb),
+  // the entered tension read as the service-level Ta. Until 2026-09-19 the
+  // LRFD ksc was reused and divided by Omega, showing an ASD capacity 18% high.
+  const ksc_asd = Math.max(0, 1 - 1.5 * tu / clamp_total_kip);
+  const asd_bolt_kip = base.rn_bolt_kip * ksc_asd / 1.5;
   const lrfd_total_kip = nb * lrfd_bolt_kip;
   const asd_total_kip = nb * asd_bolt_kip;
   const unreduced_lrfd_total_kip = base.lrfd_total_kip;
   const loss_pct = (1 - ksc) * 100;
   if (![ksc, reduced_rn_bolt_kip, lrfd_total_kip].every(Number.isFinite)) return { error: "Slip-tension interaction math did not produce a finite value." };
   return {
-    unreduced_rn_bolt_kip: base.rn_bolt_kip, clamp_total_kip, ksc, fully_relieved,
+    unreduced_rn_bolt_kip: base.rn_bolt_kip, clamp_total_kip, ksc, ksc_asd, fully_relieved,
     reduced_rn_bolt_kip, lrfd_bolt_kip, asd_bolt_kip, lrfd_total_kip, asd_total_kip,
     unreduced_lrfd_total_kip, loss_pct,
     note: (fully_relieved

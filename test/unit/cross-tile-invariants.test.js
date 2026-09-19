@@ -6485,15 +6485,15 @@ test("monotonicity: computeHydrostaticTest test_pressure_psi is strictly increas
       `hold at vol=${system_volume_gal} = ${r.hold_minutes} not >= prev=${prevHold}`);
     prevHold = r.hold_minutes;
   }
-  // Default-multiplier pins: water=1.5; fuel_gas=1.25.
+  // Default-multiplier pins: water=1.5; fuel_gas=1.5 (IFGC 406.4.1, 3 psig floor).
   const water = computeHydrostaticTest({ working_pressure_psi: 80, system_volume_gal: 200, material: "water" });
   assert.equal(water.multiplier, 1.5);
   assert.ok(Math.abs(water.test_pressure_psi - 80 * 1.5) < 1e-12,
     `water test_p = ${water.test_pressure_psi}, expected ${80 * 1.5}`);
   const gas = computeHydrostaticTest({ working_pressure_psi: 80, system_volume_gal: 200, material: "fuel_gas" });
-  assert.equal(gas.multiplier, 1.25);
-  assert.ok(Math.abs(gas.test_pressure_psi - 80 * 1.25) < 1e-12,
-    `gas test_p = ${gas.test_pressure_psi}, expected ${80 * 1.25}`);
+  assert.equal(gas.multiplier, 1.5);
+  assert.ok(Math.abs(gas.test_pressure_psi - 80 * 1.5) < 1e-12,
+    `gas test_p = ${gas.test_pressure_psi}, expected ${80 * 1.5}`);
   // Custom-multiplier override pin: caller multiplier overrides default.
   const custom = computeHydrostaticTest({ working_pressure_psi: 80, system_volume_gal: 200, material: "water", multiplier: 2.0 });
   assert.equal(custom.multiplier, 2.0);
@@ -9297,7 +9297,8 @@ test("monotonicity: computeFormworkPressure aci_pressure_psf is strictly increas
   // Group E. P_aci = Cw * (150 + 9000 * R / T). P_wet = γ * H.
   // Strictly increasing in pour_rate at fixed T.
   let prev = -Infinity;
-  for (const pour_rate_ft_per_hr of [1, 2, 5, 10, 20, 50]) {
+  // Up to 15 ft/hr; above it the full liquid head applies (flat in R).
+  for (const pour_rate_ft_per_hr of [1, 2, 5, 10, 15]) {
     const r = computeFormworkPressure({ pour_rate_ft_per_hr, concrete_temp_F: 70, weight_factor: "normal", unit_weight_pcf: 150, wall_height_ft: 100 });
     assert.ok(Number.isFinite(r.aci_pressure_psf) && r.aci_pressure_psf > 0,
       `P at R=${pour_rate_ft_per_hr}: ${JSON.stringify(r)}`);
@@ -9342,12 +9343,18 @@ test("monotonicity: computeFormworkPressure aci_pressure_psf is strictly increas
   assert.ok(lw115.aci_pressure_psf < lw135.aci_pressure_psf && lw135.aci_pressure_psf < normal.aci_pressure_psf && normal.aci_pressure_psf < plast.aci_pressure_psf,
     `Cw ordering: ${lw115.aci_pressure_psf} ${lw135.aci_pressure_psf} ${normal.aci_pressure_psf} ${plast.aci_pressure_psf}`);
   // Doubling-pour-rate pin: 2x R -> aci grows by (9000 * dR / T) (linear in R).
-  const r1 = computeFormworkPressure({ pour_rate_ft_per_hr: 2.5, concrete_temp_F: 70, weight_factor: "normal", unit_weight_pcf: 150, wall_height_ft: 100 });
-  const r2 = computeFormworkPressure({ pour_rate_ft_per_hr: 5, concrete_temp_F: 70, weight_factor: "normal", unit_weight_pcf: 150, wall_height_ft: 100 });
+  // Short-form range (R < 7 ft/hr, wall <= 14 ft) -- a 100 ft wall takes the
+  // ACI 347R tall-wall form (2,800 R / T), checked below.
+  // (Rates above the 600 psf floor, which a 12 ft wall at 2.5 ft/hr would hit.)
+  const r1 = computeFormworkPressure({ pour_rate_ft_per_hr: 5, concrete_temp_F: 70, weight_factor: "normal", unit_weight_pcf: 150, wall_height_ft: 12 });
+  const r2 = computeFormworkPressure({ pour_rate_ft_per_hr: 6.5, concrete_temp_F: 70, weight_factor: "normal", unit_weight_pcf: 150, wall_height_ft: 12 });
+  const t1 = computeFormworkPressure({ pour_rate_ft_per_hr: 2.5, concrete_temp_F: 70, weight_factor: "normal", unit_weight_pcf: 150, wall_height_ft: 100 });
+  const t2 = computeFormworkPressure({ pour_rate_ft_per_hr: 5, concrete_temp_F: 70, weight_factor: "normal", unit_weight_pcf: 150, wall_height_ft: 100 });
+  assert.ok(Math.abs(t2.aci_pressure_psf - t1.aci_pressure_psf - (2800 * 2.5) / 70) < 1e-9);
   // Cw * (150 + 9000R/T), the constant 150*Cw drops out of the difference:
-  // delta = Cw * 9000 * (5 - 2.5) / 70 = 1 * 9000 * 2.5 / 70.
-  assert.ok(Math.abs(r2.aci_pressure_psf - r1.aci_pressure_psf - (1 * 9000 * 2.5) / 70) < 1e-9,
-    `pour-rate delta: ${r2.aci_pressure_psf - r1.aci_pressure_psf}, expected ${(1 * 9000 * 2.5) / 70}`);
+  // delta = Cw * 9000 * (6.5 - 5) / 70.
+  assert.ok(Math.abs(r2.aci_pressure_psf - r1.aci_pressure_psf - (1 * 9000 * 1.5) / 70) < 1e-9,
+    `pour-rate delta: ${r2.aci_pressure_psf - r1.aci_pressure_psf}, expected ${(1 * 9000 * 1.5) / 70}`);
   // Bounds pin: non-positive pour_rate / temperature -> error; bad weight -> error.
   const bad = computeFormworkPressure({ pour_rate_ft_per_hr: 0, concrete_temp_F: 70 });
   assert.ok(bad.error, `expected error for R=0, got ${JSON.stringify(bad)}`);

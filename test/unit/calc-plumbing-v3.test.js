@@ -140,9 +140,9 @@ test("Hydrostatic: water default 1.5x", () => {
   assert.equal(r.test_pressure_psi, 120);
 });
 
-test("Hydrostatic: gas default 1.25x", () => {
+test("Hydrostatic: gas default 1.5x with a 3 psig floor (IFGC 406.4.1)", () => {
   const r = computeHydrostaticTest({ working_pressure_psi: 80, system_volume_gal: 100, material: "fuel_gas" });
-  assert.equal(r.multiplier, 1.25);
+  assert.equal(r.multiplier, 1.5);
 });
 
 test("Hydrostatic: explicit multiplier overrides default", () => {

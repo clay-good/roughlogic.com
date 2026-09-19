@@ -1106,9 +1106,9 @@ test("bounds: calc-hvac computeCombustionAir pins the 50/1000 volume threshold a
         `required_volume btu=${btu_input}: ${r.required_volume_ft3} vs ${expected_required}`,
       );
       assert.strictEqual(r.adequate_by_volume, room_volume_ft3 >= expected_required);
-      // Opening rules: outdoor = btu/1000, indoor = btu/4000.
+      // Opening rules: outdoor = btu/4000; indoor = btu/1000 with IFGC 304.5.3.1's 100 in^2 floor.
       assert.ok(Math.abs(r.opening_outdoor_in2 - btu_input / 4000) < 1e-9, `outdoor opening (1 in^2 per 4000 BTU/hr)`);
-      assert.ok(Math.abs(r.opening_indoor_in2 - btu_input / 1000) < 1e-9, `indoor communicating opening (larger, 1 in^2 per 1000 BTU/hr)`);
+      assert.ok(Math.abs(r.opening_indoor_in2 - Math.max(btu_input / 1000, 100)) < 1e-9, `indoor communicating opening (1 in^2 per 1000 BTU/hr, 100 in^2 minimum)`);
     }
   }
 });
@@ -8203,8 +8203,10 @@ test("bounds: calc-plumbing computeHydrostaticTest pins 1.5x water / 1.25x gas m
   assert.strictEqual(r.hold_minutes, 30); // 200 in [50, 500)
   // Fuel-gas multiplier.
   const g = computeHydrostaticTest({ working_pressure_psi: 100, system_volume_gal: 30, material: "fuel_gas" });
-  assert.strictEqual(g.test_pressure_psi, 125);
-  assert.strictEqual(g.multiplier, 1.25);
+  assert.strictEqual(g.test_pressure_psi, 150); // IFGC 406.4.1: 1.5 x MWP
+  // ... and never below 3 psig: a 0.5 psi low-pressure gas system tests at 3.
+  assert.strictEqual(computeHydrostaticTest({ working_pressure_psi: 0.5, system_volume_gal: 30, material: "fuel_gas" }).test_pressure_psi, 3);
+  assert.strictEqual(g.multiplier, 1.5);
   assert.strictEqual(g.hold_minutes, 15);
   // Hold-time bands.
   assert.strictEqual(computeHydrostaticTest({ working_pressure_psi: 80, system_volume_gal: 1000, material: "water" }).hold_minutes, 60);
@@ -20810,8 +20812,12 @@ test("bounds: spec-v366 computeLightingUniformityRatio pins the ratios, the pass
 });
 
 test("bounds: spec-v367 computeEgressLightingCheck pins the mode thresholds and error seams", () => {
-  const r = _v367({ avg_fc: 1.2, min_fc: 0.15, max_fc: 3.0, mode: "normal" });
+  // Emergency initial: 1.0 avg / 0.1 min passes; the same path fails NORMAL
+  // lighting, which needs 1 fc at every point (IBC 1008.2.1).
+  const r = _v367({ avg_fc: 1.2, min_fc: 0.15, max_fc: 3.0, mode: "emergency-initial" });
   assert.strictEqual(r.pass, true);
+  assert.strictEqual(_v367({ avg_fc: 1.2, min_fc: 0.15, max_fc: 3.0, mode: "normal" }).pass, false);
+  assert.strictEqual(_v367({ avg_fc: 2.0, min_fc: 1.0, max_fc: 3.0, mode: "normal" }).pass, true);
   assert.strictEqual(r.max_min, 20);
   assert.strictEqual(r.avg_thr, 1.0);
   // A dark spot at the emergency end fails the minimum even at a passing average.
@@ -25703,8 +25709,11 @@ test("bounds: spec-v553 computeSnowUnbalancedGable pins the slope-band applicabi
   assert.ok(Math.abs(r.extent_ft - 8.6) < 0.1);
   // A steep roof (8:12, 33.7 deg > 30.2) escapes the unbalanced case.
   assert.equal(_v553({ ground_snow_pg_psf: 30, flat_roof_ps_psf: 25, roof_rise_on_12: 8, eave_to_ridge_ft: 30 }).applicable, false);
-  // A short eave-to-ridge (<= 20 ft) also escapes it.
-  assert.equal(_v553({ ground_snow_pg_psf: 30, flat_roof_ps_psf: 25, roof_rise_on_12: 4, eave_to_ridge_ft: 15 }).applicable, false);
+  // A short eave-to-ridge (<= 20 ft) does NOT escape it: ASCE 7 7.6.1 loads
+  // the windward side at 0 and the leeward at Is x pg.
+  const shortW = _v553({ ground_snow_pg_psf: 30, flat_roof_ps_psf: 25, roof_rise_on_12: 4, eave_to_ridge_ft: 15 });
+  assert.equal(shortW.applicable, true);
+  assert.ok(shortW.windward_psf === 0 && shortW.leeward_peak_psf === 30);
   // The snow density caps at 30 pcf.
   assert.equal(_v553({ ground_snow_pg_psf: 200, flat_roof_ps_psf: 25, roof_rise_on_12: 4, eave_to_ridge_ft: 30 }).gamma, 30);
   // Error seams: non-finite, non-positive pg / ps / rise / W.
@@ -33127,9 +33136,11 @@ test("bounds: spec-v1112 computeSlipCriticalWithTension pins the J3-5a factor, e
   // Past the clamping force ksc FLOORS at zero rather than going negative.
   const past = _v1112({ ...base, applied_tension_kip: 200 });
   assert.ok(past.ksc === 0 && past.fully_relieved === true && past.lrfd_total_kip === 0);
-  // ASD is exactly the LRFD nominal over 1.5, per bolt and total.
-  assert.ok(Math.abs(r.asd_bolt_kip * 1.5 - r.reduced_rn_bolt_kip) < 1e-12);
-  assert.ok(Math.abs(r.asd_total_kip * 1.5 - r.lrfd_total_kip) < 1e-12);
+  // ASD takes its own reduction (AISC Eq. J3-5b): ksc = 1 - 1.5 Ta / (Du Tb nb), then / 1.5.
+  assert.ok(Math.abs(r.asd_bolt_kip * 1.5 - r.unreduced_rn_bolt_kip * r.ksc_asd) < 1e-12);
+  assert.ok(Math.abs(r.ksc_asd - Math.max(0, 1 - 1.5 * (1 - r.ksc))) < 1e-12);
+  // With tension present the ASD reduction is deeper, so ASD x 1.5 falls below LRFD.
+  assert.ok(r.asd_total_kip * 1.5 < r.lrfd_total_kip);
   // Class B doubles-ish the base but leaves ksc untouched - the factor is independent of mu.
   const classB = _v1112({ ...base, mu: 0.50 });
   assert.ok(Math.abs(classB.ksc - r.ksc) < 1e-12);
