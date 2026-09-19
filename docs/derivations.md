@@ -3569,7 +3569,7 @@ cross-check.
 | calc-stage.js | `computeSPLDistanceForLevel` | `{ L1_dB = 0, d1 = 1, target_L2_dB = 0, mode = "free_field", n_sources = 1 } = {}` | _ | _ | _ |
 | calc-stage.js | `computeSpeakerImpedance` | `{ topology, z_ohm, count, series_per_branch, branches, amp_min_ohm, power_w }` | _ | _ | _ |
 | calc-stage.js | `computeSpeedOfSoundAir` | `{ temperature_f = 68 } = {}` | _ | _ | _ |
-| calc-stage.js | `computeStageDeckLiveLoad` | `{ length_ft = 0, width_ft = 0, legs = 4, design_psf = 125, deck_dead_lb = 0, ...` | _ | _ | _ |
+| calc-stage.js | `computeStageDeckLiveLoad` | `{ length_ft = 0, width_ft = 0, legs = 4, design_psf = 150, deck_dead_lb = 0, ...` | _ | _ | _ |
 | calc-stage.js | `computeTimeAlignment` | `{ d_main_ft = 0, d_delay_ft = 0, ambient_C = 20, ambient_F = null, haas_offse...` | _ | _ | _ |
 | calc-stage.js | `computeTrussCapacity` | `{ truss_model = "16in_box", span_ft = 0, point_loads = [] }` | _ | _ | _ |
 | calc-stage.js | `computeVideoWallDataRate` | `{ width_px = 0, height_px = 0, bit_depth = 8, refresh_hz = 60, pixels_per_por...` | _ | _ | _ |

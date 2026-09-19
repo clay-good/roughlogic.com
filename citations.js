@@ -7297,12 +7297,12 @@ export const CITATIONS = {
   },
   "stage-deck-live-load": {
     formula: "deck_area_sqft = length_ft x width_ft; live_load_lb = deck_area_sqft x design_psf; total_load_lb = live_load_lb + deck_dead_lb; load_per_leg_lb = total_load_lb / legs; leg_utilization_pct = load_per_leg_lb / leg_rating_lb x 100; bearing_psi = point_load_lb / bearing_sqin.",
-    edition: "Uniform live load applied to the deck footprint and divided among the legs, with a separate concentrated-load comparison and bearing pressure; the 125 psf stage-floor and 100 psf assembly live loads are the International Building Code Table 1607.1 values, cited by table and edition and not reproduced. The staging manufacturer's published deck and leg ratings, the locally adopted code edition, and a qualified engineer govern. A screen, never a stamp.",
+    edition: "Uniform live load applied to the deck footprint and divided among the legs, with a separate concentrated-load comparison and bearing pressure; the 150 psf stage-floor and 100 psf assembly live loads are the International Building Code Table 1607.1 values, cited by table and edition and not reproduced. The staging manufacturer's published deck and leg ratings, the locally adopted code edition, and a qualified engineer govern. A screen, never a stamp.",
     freeAccess: "The check is arithmetic on the deck's own dimensions and the manufacturer's published ratings; the code live-load values are cited by table, not mirrored.",
     governance: GOVERNANCE.general,
     editionNote: "The building code assigns stages and platforms a uniform live load, and the whole uniform check is applying it to the deck's own footprint and dividing by the legs beneath it. The arithmetic is trivial and the result is frequently a surprise, because rented staging legs are commonly rated anywhere between one thousand and twenty-five hundred pounds: the same four-by-eight deck can be over its rating or comfortably inside it depending on which product came off the truck, and nobody checks. The concentrated-load line matters more often than the uniform one. A uniform live load is a design abstraction; a piano wheel, a forklift tire, or a truss base plate is a real point load concentrated in a real few square inches, and a deck that passes the uniform check by a wide margin can fail under a single wheel. Both belong on the same screen, and the bearing pressure in pounds per square inch is what decides whether a load-spreading pad is needed under the wheel. This is a screen and never a stamp: the manufacturer's published deck and leg ratings, the locally adopted code edition, and a qualified engineer govern the answer.",
     assumptions: [
-      { name: "Code live loads", value: "125 psf stage floors and 100 psf assembly areas, cited to IBC Table 1607.1 and not reproduced", source: "International Building Code Table 1607.1" },
+      { name: "Code live loads", value: "150 psf stage floors and 100 psf assembly areas, cited to IBC Table 1607.1 and not reproduced", source: "International Building Code Table 1607.1" },
       { name: "Leg ratings vary", value: "rented staging legs commonly run between 1,000 and 2,500 lb; the same deck passes or fails on which product is rented", source: "staging manufacturer data" },
       { name: "Point load is separate", value: "a uniform load is an abstraction; a wheel or base plate is a real point load, and a deck can pass one check and fail the other", source: "structural practice" },
     ],
@@ -22085,7 +22085,7 @@ export const CITATIONS = {
     ],
   },
   "sagging-return-wave": {
-    formula: "sag S = 12.075 (t / N)^2 with S in feet, t the elapsed seconds and N the number of return waves counted; inverted, t = N sqrt(S / 12.075). The wave speed sqrt(H / m) and the sag are set by the same tension and mass per unit length, which is why the span length cancels out.",
+    formula: "sag S = 1.0054 (t / N)^2 with S in feet (g t^2 / 32; 12.07 in inches), t the elapsed seconds and N the number of return waves counted; inverted, t = N sqrt(S / 1.0054). The wave speed sqrt(H / m) and the sag are set by the same tension and mass per unit length, which is why the span length cancels out.",
     edition: "The return-wave (stopwatch) sagging method as standard overhead line practice, by name. Ideal taut string, free span. The utility's stringing charts and construction standards and the crew's own sagging procedure govern.",
     freeAccess: "One square root on a stopwatch reading; no stringing chart is reproduced.",
     governance: GOVERNANCE.general,

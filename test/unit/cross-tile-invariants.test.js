@@ -5142,9 +5142,15 @@ test("monotonicity: computeHOS drive_remaining is strictly non-increasing as mor
   });
   assert.equal(at8Break.needs_break, false);
   assert.equal(at8Break.break_taken, true);
+  // The break is owed after 8 more hours of driving since the LAST 30-min break,
+  // not waived for the shift by an earlier one (49 CFR 395.3(a)(3)(ii)).
+  assert.equal(computeHOS({ profile: "property_70_8", events: [{ kind: "drive", hours: 1 }, { kind: "off_duty", hours: 0.5 }, { kind: "drive", hours: 8.5 }] }).needs_break, true);
+  // Clock time: on 1 + drive 4 + off 3 + drive 5 + on 1 = 14 elapsed hours -> the window is spent.
+  assert.equal(computeHOS({ profile: "property_70_8", events: [{ kind: "on_duty", hours: 1 }, { kind: "drive", hours: 4 }, { kind: "off_duty", hours: 3 }, { kind: "drive", hours: 5 }, { kind: "on_duty", hours: 1 }] }).on_duty_remaining, 0);
   // Closed-form pin from hosExample: 0.5 on_duty + 5 drive + 0.5 off_duty
   // + 4 drive -> drive_used = 9 / drive_remaining = 11 - 9 = 2 /
-  // on_duty_used = 0.5 + 5 + 4 = 9.5 / on_duty_remaining = 14 - 9.5 = 4.5
+  // on_duty_used = 0.5 + 5 + 4 = 9.5 / on_duty_remaining = 14 - 10 = 4.0
+  // (the 30-min off-duty break still spends the clock-time 14-hour window)
   // / weekly_remaining = 70 - (30 + 9.5) = 30.5 / break_taken = true.
   const ref = computeHOS({
     profile: "property_70_8",
@@ -5159,7 +5165,7 @@ test("monotonicity: computeHOS drive_remaining is strictly non-increasing as mor
   assert.equal(ref.drive_used, 9);
   assert.equal(ref.drive_remaining, 2);
   assert.equal(ref.on_duty_used, 9.5);
-  assert.equal(ref.on_duty_remaining, 4.5);
+  assert.equal(ref.on_duty_remaining, 4);
   assert.equal(ref.weekly_remaining, 30.5);
   assert.equal(ref.break_taken, true);
   assert.equal(ref.needs_break, false);

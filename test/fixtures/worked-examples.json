@@ -13062,9 +13062,9 @@
    "source_publisher": "49 CFR 395 (FMCSA hours of service for property carriers)",
    "source_title": "14-hr on-duty / 11-hr drive / 70-hr week budget tracker per profile",
    "source_edition_or_year": "49 CFR 395 property_70_8 profile (14 hr on-duty, 11 hr drive, 70 hr/8 day rolling)",
-   "source_section_or_page": "property_70_8 / 0.5 hr on-duty + 5 hr drive + 0.5 hr off-duty + 4 hr drive / 30 hr weekly used -> 9 hr driven, 2 hr drive remaining (395.3(a)(3) 11-hr limit), 4.5 hr on-duty remaining (395.3(a)(2) 14-hr window), 30.5 hr weekly remaining, 30-min break satisfied by the 0.5 hr off-duty",
+   "source_section_or_page": "property_70_8 / 0.5 hr on-duty + 5 hr drive + 0.5 hr off-duty + 4 hr drive / 30 hr weekly used -> 9 hr driven, 2 hr drive remaining (395.3(a)(3) 11-hr limit), 4.0 hr left in the 395.3(a)(2) 14-hr window (clock time from coming on duty: the 30-min off-duty break spends it too), 30.5 hr weekly remaining, 30-min break satisfied by the 0.5 hr off-duty",
    "verified_by": "rl",
-   "verified_on": "2026-08-20",
+   "verified_on": "2026-09-19",
    "inputs": {
     "profile": "property_70_8",
     "events": [
@@ -13095,7 +13095,7 @@
      }
     },
     "on_duty_remaining": {
-     "value": 4.5,
+     "value": 4,
      "tolerance": {
       "abs": 0.01
      }
@@ -90437,16 +90437,16 @@
   {
    "tile_id": "stage-deck-live-load",
    "source_publisher": "ICC",
-   "source_title": "4 x 8 ft deck at 125 psf, 60 lb dead, four legs rated 1,000 lb",
+   "source_title": "4 x 8 ft deck at 150 psf (IBC Table 1607.1 stage floors), 60 lb dead, four legs rated 1,000 lb",
    "source_edition_or_year": "International Building Code",
    "source_section_or_page": "Table 1607.1 stage live load",
    "verified_by": "rl",
-   "verified_on": "2026-08-26",
+   "verified_on": "2026-09-19",
    "inputs": {
     "length_ft": 4,
     "width_ft": 8,
     "legs": 4,
-    "design_psf": 125,
+    "design_psf": 150,
     "deck_dead_lb": 60,
     "leg_rating_lb": 1000,
     "point_load_lb": 900,
@@ -90461,25 +90461,25 @@
      }
     },
     "live_load_lb": {
-     "value": 4000,
+     "value": 4800,
      "tolerance": {
       "pct": 0.5
      }
     },
     "total_load_lb": {
-     "value": 4060,
+     "value": 4860,
      "tolerance": {
       "pct": 0.5
      }
     },
     "load_per_leg_lb": {
-     "value": 1015,
+     "value": 1215,
      "tolerance": {
       "pct": 0.5
      }
     },
     "leg_utilization_pct": {
-     "value": 101.5,
+     "value": 121.5,
      "tolerance": {
       "pct": 0.5
      }
@@ -98643,7 +98643,7 @@
    "source_edition_or_year": "F_c = p x (d/12) x wind span; F_p = p x tapered projected area at mid-height; M = sum of F x h",
    "source_section_or_page": "the applicable NESC edition and a qualified line designer govern",
    "verified_by": "rl",
-   "verified_on": "2026-09-07",
+   "verified_on": "2026-09-19",
    "inputs": {
     "wind_pressure_psf": 9,
     "wind_speed_mph": 0,
@@ -98681,13 +98681,13 @@
      }
     },
     "groundline_moment_ftlb": {
-     "value": 18335,
+     "value": 17954.7,
      "tolerance": {
       "pct": 0.5
      }
     },
     "pole_share_pct": {
-     "value": 31.1086,
+     "value": 29.6496,
      "tolerance": {
       "pct": 0.5
      }
@@ -98808,7 +98808,7 @@
    "source_edition_or_year": "S = 12.075 (t / N)^2, inverted as t = N sqrt(S / 12.075)",
    "source_section_or_page": "the utility stringing charts and the crew sagging procedure govern",
    "verified_by": "rl",
-   "verified_on": "2026-09-07",
+   "verified_on": "2026-09-19",
    "inputs": {
     "elapsed_seconds": 0,
     "return_waves": 3,
@@ -98817,31 +98817,31 @@
    },
    "outputs": {
     "target_time_seconds": {
-     "value": 2.99067,
+     "value": 10.36417,
      "tolerance": {
       "pct": 0.5
      }
     },
     "period_per_wave_seconds": {
-     "value": 0.99689,
+     "value": 3.45472,
      "tolerance": {
       "pct": 0.5
      }
     },
     "sag_error_ft": {
-     "value": 1.65866,
+     "value": 0.46760,
      "tolerance": {
       "pct": 0.5
      }
     },
     "single_wave_sag_error_ft": {
-     "value": 5.29798,
+     "value": 1.42962,
      "tolerance": {
       "pct": 0.5
      }
     },
     "error_advantage": {
-     "value": 3.19413,
+     "value": 3.05734,
      "tolerance": {
       "pct": 0.5
      }

@@ -2,7 +2,7 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "20b6f2ee5745eccd",
+      "sha": "7fc95711c7b37e4e",
       "date": "2026-09-19"
     },
     "/tools/": {
@@ -3678,8 +3678,8 @@
       "date": "2026-09-01"
     },
     "/tools/hos-math/": {
-      "sha": "7ce69e47430d4a21",
-      "date": "2026-09-01"
+      "sha": "9ae21520699e6ff3",
+      "date": "2026-09-19"
     },
     "/tools/hose-lay-section-count/": {
       "sha": "f7c2db17aead6138",
@@ -6402,8 +6402,8 @@
       "date": "2026-09-01"
     },
     "/tools/sagging-return-wave/": {
-      "sha": "2def1e4560ad8e8c",
-      "date": "2026-09-07"
+      "sha": "4715a1747cda77da",
+      "date": "2026-09-19"
     },
     "/tools/sailboat-performance-ratios/": {
       "sha": "b5f0343100022e17",
@@ -7278,8 +7278,8 @@
       "date": "2026-09-04"
     },
     "/tools/stage-deck-live-load/": {
-      "sha": "eb39ab456a99f052",
-      "date": "2026-09-01"
+      "sha": "c7b89a4d643a5844",
+      "date": "2026-09-19"
     },
     "/tools/staggered-net-width/": {
       "sha": "2eac78ff59029778",
@@ -8034,8 +8034,8 @@
       "date": "2026-09-11"
     },
     "/tools/transverse-wind-load-conductor/": {
-      "sha": "87f35cc90ed3681d",
-      "date": "2026-09-07"
+      "sha": "b1237f5a15247a47",
+      "date": "2026-09-19"
     },
     "/tools/trap-arm/": {
       "sha": "1763e927593c32b6",

@@ -243,9 +243,18 @@ export function computeHOS({ profile = "property_70_8", events = [], weekly_on_d
   const p = HOS_PROFILES[profile];
   if (!p) return { error: "Unknown HOS profile." };
   if (!Array.isArray(events)) return { error: "Events must be a list." };
+  // 49 CFR 395.3: the 14-hour window is CLOCK time from coming on duty -- an
+  // off-duty break inside the shift still spends it -- and a 10-hour
+  // off-duty/sleeper rest starts a new shift. The 30-minute break is owed after
+  // 8 cumulative hours of driving without a 30-minute interruption, which since
+  // 2020 may be on-duty not driving. Until 2026-09-19 the window counted only
+  // on-duty hours (the worked shift read 4.5 h left where 4.0 remain), and the
+  // break flag cleared for the rest of the shift after any one break.
   let drive_used = 0;
   let on_duty_used = 0;
-  let last_break_at = 0;
+  let weekly_on_duty = 0;
+  let window_elapsed = 0;
+  let on_shift = false;
   let cumulative_drive_since_break = 0;
   let break_taken = false;
   for (const e of events) {
@@ -253,16 +262,26 @@ export function computeHOS({ profile = "property_70_8", events = [], weekly_on_d
     if (hours < 0) return { error: "Event hours must be non-negative." };
     const kind = e.kind;
     if (!["drive", "on_duty", "sleeper", "off_duty"].includes(kind)) return { error: "Unknown event kind: " + kind };
-    if (kind === "drive") { drive_used += hours; on_duty_used += hours; cumulative_drive_since_break += hours; }
-    else if (kind === "on_duty") { on_duty_used += hours; }
-    else if (kind === "sleeper" || kind === "off_duty") {
+    if (kind === "drive" || kind === "on_duty") {
+      on_shift = true;
+      window_elapsed += hours;
+      on_duty_used += hours;
+      weekly_on_duty += hours;
+      if (kind === "drive") { drive_used += hours; cumulative_drive_since_break += hours; }
+      else if (hours >= 0.5) { break_taken = true; cumulative_drive_since_break = 0; }
+    } else if (hours >= 10) {
+      // A 10-hour rest resets the shift: new window, new 11 hours of driving.
+      drive_used = 0; on_duty_used = 0; window_elapsed = 0; on_shift = false;
+      cumulative_drive_since_break = 0; break_taken = false;
+    } else {
+      if (on_shift) window_elapsed += hours;
       if (hours >= 0.5) { break_taken = true; cumulative_drive_since_break = 0; }
     }
   }
   const drive_remaining = Math.max(0, p.drive_max - drive_used);
-  const on_duty_remaining = Math.max(0, p.on_duty_window - on_duty_used);
-  const weekly_remaining = Math.max(0, p.weekly_max - (weekly_on_duty_used_hr + on_duty_used));
-  const needs_break_at_8_hours = cumulative_drive_since_break >= 8 && !break_taken;
+  const on_duty_remaining = Math.max(0, p.on_duty_window - window_elapsed);
+  const weekly_remaining = Math.max(0, p.weekly_max - (weekly_on_duty_used_hr + weekly_on_duty));
+  const needs_break_at_8_hours = cumulative_drive_since_break >= 8;
   // v8 §C.5: when current_time_iso is supplied, derive the next legal
   // drive-start timestamp. Driver may resume after a 30-minute break (if
   // mid-shift break required), or after a 10-hour reset (if on-duty
@@ -359,7 +378,15 @@ export function computeBridgeFormula({ axle_weights_lb = [], axle_spacings_ft = 
       group_length += spacings[j - 1];
       group_weight += weights[j];
       const N = j - i + 1;
-      const W = 500 * ((group_length * N) / (N - 1) + 12 * N + 36);
+      let W = 500 * ((group_length * N) / (N - 1) + 12 * N + 36);
+      // 23 CFR 658.17(e): two consecutive tandems may carry 34,000 lb each when
+      // the first-to-last axle spread of the pair is 36 ft or more. Until
+      // 2026-09-19 this exception was missing, so the standard 5-axle
+      // tractor-semitrailer at 12-4-30-4 ft was flagged over the formula.
+      if (N === 4 && spacings[i] <= 8 && spacings[i + 2] <= 8 && group_length >= 36
+          && weights[i] + weights[i + 1] <= tandem_max && weights[i + 2] + weights[i + 3] <= tandem_max) {
+        W = Math.max(W, 2 * tandem_max);
+      }
       if (group_weight > W) {
         bridge_violations.push("axles " + (i + 1) + "-" + (j + 1) + ": " + Math.round(group_weight) + " lb > " + Math.round(W) + " lb formula max");
       }

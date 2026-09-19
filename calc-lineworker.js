@@ -645,13 +645,16 @@ export function computeTransverseWindLoadConductor({ wind_pressure_psf = 0, wind
   const conductor_force_each_lb = conductor_force_per_ft_lb * wind_span_ft;
   const conductor_force_lb = conductor_force_each_lb * conductor_count;
   const conductor_moment_ftlb = conductor_force_lb * conductor_height_ft;
-  // The pole carries its own wind on a tapered projected area, and because it
-  // is distributed the resultant acts at roughly mid-height.
+  // The pole carries its own wind on a tapered projected area; the resultant
+  // acts at the trapezoid's centroid, h/3 x (B + 2T)/(B + T) above the
+  // groundline (B the groundline and T the top diameter) -- below mid-height
+  // because the pole is wider at the bottom. Until 2026-09-19 it was taken at
+  // mid-height, 7% high on the pole's moment (conservative).
   const has_pole = pole_top_diameter_in > 0 && pole_groundline_diameter_in > 0 && pole_height_above_ground_ft > 0;
   const pole_projected_area_ft2 = has_pole
     ? ((pole_top_diameter_in + pole_groundline_diameter_in) / 2 / _IN_PER_FT) * pole_height_above_ground_ft : 0;
   const pole_force_lb = pressure_psf * pole_projected_area_ft2;
-  const pole_resultant_height_ft = has_pole ? pole_height_above_ground_ft / 2 : 0;
+  const pole_resultant_height_ft = has_pole ? pole_height_above_ground_ft / 3 * (pole_groundline_diameter_in + 2 * pole_top_diameter_in) / (pole_groundline_diameter_in + pole_top_diameter_in) : 0;
   const pole_moment_ftlb = pole_force_lb * pole_resultant_height_ft;
   const total_force_lb = conductor_force_lb + pole_force_lb;
   const groundline_moment_ftlb = conductor_moment_ftlb + pole_moment_ftlb;
@@ -850,8 +853,13 @@ LINEWORKER_RENDERERS["conductor-creep-elongation"] = _simpleRenderer({
 
 // The constant carries the unit conversion for feet and seconds: a transverse
 // wave's round trip and the sag are two readings of one physical state, and
-// the span length cancels out of the relation entirely.
-const _RETURN_WAVE_CONSTANT = 12.075;
+// the span length cancels out of the relation entirely. Wave speed
+// c = sqrt(H g / w), one return t = 2L / c, sag D = w L^2 / (8 H), so
+// D = g t^2 / 32 = 1.0054 t^2 in FEET (12.07 in inches). Until 2026-09-19 this
+// was 12.075 -- the INCH constant -- applied to feet, so the time to listen for
+// was sqrt(12) short: 3 waves on a 12 ft sag read 2.99 s where they take 10.4 s,
+// and a crew stopping at 2.99 s leaves about 1 ft of sag, twelve times the tension.
+const _RETURN_WAVE_CONSTANT = 32.174 / 32;
 
 // dims: in { elapsed_seconds: T, return_waves: dimensionless, target_sag_ft: L, stopwatch_error_seconds: T } out: { sag_from_timing_ft: L, target_time_seconds: T, period_per_wave_seconds: T, sag_error_ft: L, single_wave_sag_error_ft: L }
 export function computeSaggingReturnWave({ elapsed_seconds = 0, return_waves = 3, target_sag_ft = 0, stopwatch_error_seconds = 0.2 } = {}) {
@@ -886,7 +894,7 @@ export function computeSaggingReturnWave({ elapsed_seconds = 0, return_waves = 3
 }
 const saggingReturnWaveExample = { inputs: { elapsed_seconds: 0, return_waves: 3, target_sag_ft: 12, stopwatch_error_seconds: 0.2 } };
 LINEWORKER_RENDERERS["sagging-return-wave"] = _simpleRenderer({
-  citation: "Citation: the return-wave (stopwatch) sagging relation by name -- S = 12.075 (t / N)^2 with S in feet, t the elapsed seconds and N the number of return waves counted, inverted as t = N sqrt(S / 12.075). The wave speed sqrt(H / m) and the sag are set by the same tension and mass per unit length, which is why the span length cancels. Ideal taut string, free span. The utility's stringing charts and construction standards and the crew's own sagging procedure govern.",
+  citation: "Citation: the return-wave (stopwatch) sagging relation by name -- S = 1.0054 (t / N)^2 with S in feet (g t^2 / 32; the familiar 12.07 is the same relation in inches), t the elapsed seconds and N the number of return waves counted, inverted as t = N sqrt(S / 1.0054). The wave speed sqrt(H / m) and the sag are set by the same tension and mass per unit length, which is why the span length cancels. Ideal taut string, free span. The utility's stringing charts and construction standards and the crew's own sagging procedure govern.",
   example: saggingReturnWaveExample.inputs,
   fields: [
     { key: "elapsed_seconds", label: "Elapsed time counted (s, 0 if solving for the time)", kind: "number", default: 0 },

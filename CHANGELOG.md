@@ -6,6 +6,15 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **Stopwatch sagging used the inch constant for feet, hours of service misread the 14-hour window, the bridge formula missed the tandem exception, and stage floors took 125 psf.**
+  - `sagging-return-wave`: the wave speed and the sag are set by the same tension, so D = g t^2 / 32, which is 1.0054 (t/N)^2 in feet. The familiar 12.075 is the same relation in inches. The tile used it as feet, so the time to listen for came out sqrt(12) short: 3 waves on a 12 ft sag read 2.99 s where they take 10.4 s. A crew stopping at 2.99 s would leave about 1 ft of sag, twelve times the tension.
+  - `hos-math`: 49 CFR 395.3(a)(2) counts the 14-hour window as clock time from coming on duty, and a 30-minute off-duty break still spends it. The tile counted on-duty hours only, so the worked shift read 4.5 h left where 4.0 remain. The 30-minute break is now owed after 8 hours of driving since the last break, not waived for the whole shift by an earlier one. A 10-hour rest now starts a new shift.
+  - `bridge-formula`: added the 23 CFR 658.17(e) exception, under which two consecutive tandems may carry 34,000 lb each when they span 36 ft or more. The standard 12-4-30-4 ft rig was being flagged on axles 2-5.
+  - `stage-deck-live-load`: IBC Table 1607.1 gives 150 psf for stage floors, not 125. The worked deck's legs carry 1,215 lb each, 121.5% of a 1,000 lb rating.
+  - `transverse-wind-load-conductor`: the pole's own wind resultant now acts at the tapered trapezoid's centroid, h/3 x (B + 2T)/(B + T), rather than mid-height. That lowers the worked groundline moment 2%; the old figure was conservative.
+
+  Found by an independent plausibility pass over calc-trucking, calc-stage, calc-lowvoltage and calc-lineworker; low-voltage checked clean.
+
 - **Sprayer calibration read 12 times low, dehumidifier sizing about 3 times high, and char depth did not follow the NDS model it cites.**
   - `sprayer-calibration` uses the 1/128-acre method, which sizes the course to the width ONE nozzle sprays because the ounces are caught from one nozzle. The field was labeled "Boom width". A 20 ft boom with 20 in spacing therefore got a 17 ft course and read 20 GPA where the rig applies 240. The label and the worked example now use the nozzle spacing: 20 in, a 204 ft course.
   - `dehumidifier` sized at 0.025-0.080 pints per ft^3, then applied an unsourced 1.55 "field" multiplier. It now uses IICRC's own factor chart for low-grain refrigerant units: ft^3 / 100, 50, 40 or 40 for Classes 1-4. The chart already sizes for the job. The worked 6,000 ft^3 Class 2 room needs 120 AHAM pints/day, not 372.

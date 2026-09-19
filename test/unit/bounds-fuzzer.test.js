@@ -45475,10 +45475,11 @@ test("bounds: spec-v1457 computeTransverseWindLoadConductor -- wind span, not ru
   assert.ok(Math.abs(r.conductor_force_lb - 332.4) < 1e-9);
   assert.ok(Math.abs(r.pole_projected_area_ft2 - 32.5) < 1e-9);
   assert.ok(Math.abs(r.pole_force_lb - 292.5) < 1e-9);
-  assert.ok(Math.abs(r.pole_resultant_height_ft - 19.5) < 1e-9);
-  assert.ok(Math.abs(r.groundline_moment_ftlb - 18334.95) < 1e-6);
-  // The pole is 31% of the moment, which is not a rounding error.
-  assert.ok(Math.abs(r.pole_share_pct - 31.1086) < 1e-3);
+  // Tapered-pole centroid: 39/3 x (12 + 2x8)/(12 + 8) = 18.2 ft, below mid-height.
+  assert.ok(Math.abs(r.pole_resultant_height_ft - 18.2) < 1e-9);
+  assert.ok(Math.abs(r.groundline_moment_ftlb - (332.4 * 38 + 292.5 * 18.2)) < 1e-6);
+  // The pole is 30% of the moment, which is not a rounding error.
+  assert.ok(Math.abs(r.pole_share_pct - 29.6496) < 1e-3);
   // The moment is exactly the sum of the two force-height products.
   assert.ok(Math.abs(r.conductor_moment_ftlb + r.pole_moment_ftlb - r.groundline_moment_ftlb) < 1e-9);
   // Three conductors at that height triple the conductor term only.
@@ -45554,17 +45555,18 @@ import { computeSaggingReturnWave as _v1460 } from "../../calc-lineworker.js";
 test("bounds: spec-v1460 computeSaggingReturnWave -- counting waves is the method", () => {
   const base = { elapsed_seconds: 0, return_waves: 3, target_sag_ft: 12, stopwatch_error_seconds: 0.2 };
   const r = _v1460(base);
-  assert.ok(Math.abs(r.target_time_seconds - 2.99067) < 1e-4);
-  assert.ok(Math.abs(r.period_per_wave_seconds - 0.99689) < 1e-4);
-  assert.ok(Math.abs(r.sag_error_ft - 1.65866) < 1e-4);
-  assert.ok(Math.abs(r.single_wave_sag_error_ft - 5.29798) < 1e-4);
-  assert.ok(Math.abs(r.error_advantage - 3.19413) < 1e-4);
+  // D = g t^2 / 32 in feet: 3 waves on a 12 ft sag take 3 sqrt(12 / 1.0054) = 10.364 s.
+  assert.ok(Math.abs(r.target_time_seconds - 10.36417) < 1e-4);
+  assert.ok(Math.abs(r.period_per_wave_seconds - 3.45472) < 1e-4);
+  assert.ok(Math.abs(r.sag_error_ft - 0.46760) < 1e-4);
+  assert.ok(Math.abs(r.single_wave_sag_error_ft - 1.42962) < 1e-4);
+  assert.ok(Math.abs(r.error_advantage - 3.05734) < 1e-4);
   // Round trip: feed the target time back in and the sag comes back.
   const back = _v1460({ elapsed_seconds: r.target_time_seconds, return_waves: 3, target_sag_ft: 0, stopwatch_error_seconds: 0.2 });
   assert.ok(Math.abs(back.sag_from_timing_ft - 12) < 1e-9);
   // The spec's own sensitivity figure: 3.19 s over 3 waves reads 13.66 ft.
-  const slow = _v1460({ elapsed_seconds: 3.19, return_waves: 3, target_sag_ft: 0, stopwatch_error_seconds: 0.2 });
-  assert.ok(Math.abs(slow.sag_from_timing_ft - 13.6533) < 1e-3);
+  const slow = _v1460({ elapsed_seconds: 11, return_waves: 3, target_sag_ft: 0, stopwatch_error_seconds: 0.2 });
+  assert.ok(Math.abs(slow.sag_from_timing_ft - 13.5175) < 1e-3);
   // More waves is strictly less sensitive to the same stopwatch error.
   const five = _v1460({ ...base, return_waves: 5 });
   assert.ok(five.sag_error_ft < r.sag_error_ft);
