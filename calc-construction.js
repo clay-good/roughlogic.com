@@ -12443,10 +12443,12 @@ export function computeFlammableCabinetStorage({ cat123_gallons = 0, cat4_gallon
   if (!Number.isInteger(maxCab) || maxCab < 1) return { error: "Cabinets per storage area must be a whole number of 1 or more." };
   if (!Number.isInteger(have) || have < 0) return { error: "Cabinets available must be a whole number of 0 or more." };
 
-  // Each category has its own per-cabinet cap, and the standard gives no blending rule -
-  // so a cabinet holding both must satisfy both, which is the conservative reading.
+  // 1926.152(b)(3) states a cap for each category and no blending rule. Taking the larger of
+  // the two counts would let one cabinet hold 60 + 120 = 180 gal. NFPA 30 9.5.3 (and
+  // 1910.106(d)(3)) supplies the blend: the Category 4 figure is the cabinet's TOTAL, of which
+  // no more than the Category 1-3 figure may be Category 1-3.
   const cabinets_for_123 = q123 > 0 ? Math.ceil(q123 / cap123) : 0;
-  const cabinets_for_4 = q4 > 0 ? Math.ceil(q4 / cap4) : 0;
+  const cabinets_for_4 = q4 > 0 ? Math.ceil((q123 + q4) / cap4) : 0;
   const cabinets_needed = Math.max(cabinets_for_123, cabinets_for_4, (q123 > 0 || q4 > 0) ? 1 : 0);
   const mixed = q123 > 0 && q4 > 0;
 
@@ -12454,7 +12456,7 @@ export function computeFlammableCabinetStorage({ cat123_gallons = 0, cat4_gallon
   const area_cap_cat123_gal = maxCab * cap123;
   const area_cap_cat4_gal = maxCab * cap4;
   const over_123 = Math.max(0, q123 - area_cap_cat123_gal);
-  const over_4 = Math.max(0, q4 - area_cap_cat4_gal);
+  const over_4 = Math.max(0, q123 + q4 - area_cap_cat4_gal);
   const over_area_cap_gal = Math.max(over_123, over_4);
   const within_area_cap = cabinets_needed <= maxCab;
   const room_required = !within_area_cap;
@@ -12468,8 +12470,8 @@ export function computeFlammableCabinetStorage({ cat123_gallons = 0, cat4_gallon
 
   const note = "PER CABINET: not more than " + cap123 + " gal of Category 1, 2 and/or 3 flammable liquids, or " + cap4 + " gal of Category 4, in any one storage cabinet. "
     + (q123 > 0 ? q123 + " gal of Category 1-3 needs " + cabinets_for_123 + " cabinet" + (cabinets_for_123 === 1 ? "" : "s") + ". " : "")
-    + (q4 > 0 ? q4 + " gal of Category 4 needs " + cabinets_for_4 + ". " : "")
-    + (mixed ? "Both categories are present, and the standard gives NO blending rule between them - it states a limit for each. The conservative reading, used here, is that a cabinet must satisfy both caps, so the requirement is the larger of the two counts rather than a sum. If your AHJ reads it as additive, the number goes up. " : "")
+    + (q4 > 0 ? (mixed ? (q123 + q4) + " gal in all, counted against the " + cap4 + " gal cabinet total, needs " : q4 + " gal of Category 4 needs ") + cabinets_for_4 + ". " : "")
+    + (mixed ? "Both categories are present, and 1926.152(b)(3) gives NO blending rule between them - it states a limit for each. Taking the larger of the two counts would let one cabinet hold " + (cap123 + cap4) + " gal. The blend used here is NFPA 30 9.5.3's: the " + cap4 + " gal figure is the cabinet's TOTAL, of which no more than " + cap123 + " gal may be Category 1-3. If your AHJ reads the OSHA caps as fractions of one cabinet that add, the count goes up again. " : "")
     + "Total " + cabinets_needed + " cabinet" + (cabinets_needed === 1 ? "" : "s") + ". "
     + (have_entered ? have + " available: " + (cabinets_ok ? "enough. " : "SHORT by " + cabinets_short + ". ") : "")
     + "THE RULE THAT ACTUALLY DECIDES THE SITE is the second sentence: not more than " + maxCab + " such cabinets in a single storage area. That is a hard ceiling of " + area_cap_cat123_gal + " gal of Category 1-3 (or " + area_cap_cat4_gal + " gal of Category 4) per area, and you cannot buy your way past it with another cabinet. "

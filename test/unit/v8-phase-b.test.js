@@ -125,9 +125,9 @@ test("B.4 sprinkler-density cites NFPA 13 Chapter 19", async () => {
   const t = await readCalc("calc-fire.js");
   assertCitationContains(t, ["NFPA 13 Chapter 19", "nfpa.org/freeaccess"], "sprinkler-density");
 });
-test("B.4 required-fire-flow cites IFC 2021 Table B105.1", async () => {
+test("B.4 required-fire-flow cites the ISO method it computes, not IFC Table B105.1", async () => {
   const t = await readCalc("calc-fire.js");
-  assertCitationContains(t, ["IFC 2021 Table B105.1", "codes.iccsafe.org"], "required-fire-flow");
+  assertCitationContains(t, ["ISO Public Protection Classification", "not IFC Table B105.1"], "required-fire-flow");
 });
 test("B.4 pdp cites fire-service pump practice (NFPA 1002), not NFPA 13", async () => {
   const t = await readCalc("calc-fire.js");

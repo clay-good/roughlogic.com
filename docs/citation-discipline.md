@@ -96,7 +96,7 @@ The structured §3 reference block in `citations.js` is the deeper source - this
 | Tile | Source-stamp |
 | --- | --- |
 | sprinkler-density | "Citation: per NFPA 13 Chapter 19 (density/area design approach; Chapter 11 before the 2019 edition). total_gpm = area * density (gpm/ft^2). AHJ governs. Free at nfpa.org/freeaccess." |
-| required-fire-flow | "Citation: per IFC 2021 Table B105.1 (ISO needed-fire-flow method). NFF = C * O * X * P; C = 18 * F * sqrt(A). AHJ governs. Free at codes.iccsafe.org." |
+| required-fire-flow | "Citation: the ISO Public Protection Classification needed-fire-flow method by name (not IFC Table B105.1, which tabulates flow by construction type and area). NFF = C * O * X * P; C = 18 * F * sqrt(A), capped at 8,000 gpm for Classes 1-2 and 6,000 for Classes 3-6. AHJ governs." |
 | pdp | "Citation: per fire-service pump operations practice (NFPA 1002 driver/operator by name; IFSTA Pumping Apparatus). PDP = nozzle pressure + friction loss + elevation + appliance loss. Elevation applies the NFA / IFSTA fire-ground shortcut of 0.5 psi/ft, NOT the exact 0.434 psi/ft water column -- it runs about 15% high by design; the elevation-pressure-loss tile shows both side by side. AHJ governs. Free at nfpa.org/freeaccess." |
 | standpipe-friction | "Citation: per NFPA 14-2022 (standpipes). Elevation 0.434 psi/ft of water; CQ^2L friction per outlet hose section. AHJ governs. Free at nfpa.org/freeaccess." |
 

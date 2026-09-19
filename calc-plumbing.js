@@ -1970,7 +1970,7 @@ export function computeRecircLoopSizing({
   // spec-v16 B.3 extension: annual heat-loss energy cost. Optional;
   // the cost figure only renders when a fuel price is supplied.
   fuel = "gas",
-  heater_efficiency = 0.8,
+  heater_efficiency = null,
   runtime_hr_per_year = 8760,
   fuel_price = null,
 } = {}) {
@@ -2019,10 +2019,11 @@ export function computeRecircLoopSizing({
   // at its efficiency. Gas is billed per therm (100,000 BTU); electric
   // per kWh (3,412 BTU). The fuel price is optional, so the cost is null
   // until the user supplies one.
-  const eff = Number.isFinite(Number(heater_efficiency)) && Number(heater_efficiency) > 0 ? Number(heater_efficiency) : 0.8;
+  // With no efficiency entered, default by fuel: 0.98 electric resistance, 0.8 gas.
+  const isElectric = fuel === "electric";
+  const eff = heater_efficiency != null && heater_efficiency !== "" && Number.isFinite(Number(heater_efficiency)) && Number(heater_efficiency) > 0 ? Number(heater_efficiency) : (isElectric ? 0.98 : 0.8);
   const runtime = Number.isFinite(Number(runtime_hr_per_year)) && Number(runtime_hr_per_year) > 0 ? Number(runtime_hr_per_year) : 8760;
   const annual_loss_btu = Q_total_btu_hr * runtime;
-  const isElectric = fuel === "electric";
   const btu_per_unit = isElectric ? 3412 : 100000;
   const energy_unit = isElectric ? "kWh" : "therms";
   const annual_energy_units = annual_loss_btu / btu_per_unit / eff;
@@ -2131,6 +2132,10 @@ function _v9p_renderRecircLoopSizing(inputRegion, outputRegion, citationEl) {
     oW.textContent = r.warnings.join(" ");
   }, DEBOUNCE_MS);
   for (const el of [len.input, sz.select, ins.input, hot.input, amb.input, dt.input, eff.input, runtime.input, price.input]) el.addEventListener("input", update);
+  // Swap the efficiency field to the new fuel's default unless the user has typed their own.
+  fuel.select.addEventListener("change", () => {
+    if (eff.input.value === "0.8" || eff.input.value === "0.98") eff.input.value = fuel.select.value === "electric" ? "0.98" : "0.8";
+  });
   for (const s of [sz.select, fuel.select]) s.addEventListener("change", update);
 }
 

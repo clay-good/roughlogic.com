@@ -15835,7 +15835,7 @@ export const CITATIONS = {
     assumptions: [
       { name: "Per cabinet", value: "60 gal Category 1/2/3, or 120 gal Category 4", source: "29 CFR 1926.152(b)(3)" },
       { name: "Area ceiling", value: "not more than three cabinets in a single storage area", source: "29 CFR 1926.152(b)(3)" },
-      { name: "Mixed contents", value: "no blending rule in the standard; each cap applied independently, count is the larger", source: "conservative reading, stated" },
+      { name: "Mixed contents", value: "no blending rule in 1926.152; NFPA 30 9.5.3's is used - 120 gal total per cabinet, at most 60 of it Category 1-3", source: "NFPA 30 9.5.3 / 29 CFR 1910.106(d)(3)" },
       { name: "Beyond the ceiling", value: "a separate area or a specially constructed inside storage room, not a fourth cabinet", source: "29 CFR 1926.152(b)" },
       { name: "Category naming", value: "Categories 1-3 are the old Class I and II; Category 4 is Class III", source: "GHS alignment" },
       { name: "Not checked", value: "cabinet approval, container sizes, outside-cabinet quantities, ignition separation, dispensing", source: "stated scope limit" },

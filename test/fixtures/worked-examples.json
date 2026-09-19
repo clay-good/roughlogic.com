@@ -81149,11 +81149,11 @@
   {
    "tile_id": "flammable-cabinet-storage",
    "source_publisher": "Occupational Safety and Health Administration",
-   "source_title": "cross-check: mixed categories take the LARGER count, not the sum",
-   "source_edition_or_year": "29 CFR 1926.152(b)(3)",
-   "source_section_or_page": "100 gal of Category 1-3 needs ceil(100/60) = 2 cabinets and 200 gal of Category 4 needs ceil(200/120) = 2. The standard states a limit for each category group and gives no blending rule between them, so the conservative reading is that each cap applies independently and the requirement is the larger of the two counts -- 2, not 4. Two cabinets on hand is therefore enough, and the site stays inside the three-cabinet area ceiling. An AHJ reading the limits as additive would arrive at a higher number.",
+   "source_title": "cross-check: mixed categories count against the 120 gal cabinet total (NFPA 30 blend)",
+   "source_edition_or_year": "29 CFR 1926.152(b)(3); NFPA 30 9.5.3",
+   "source_section_or_page": "1926.152(b)(3) states 60 gal of Category 1-3 or 120 gal of Category 4 per cabinet and gives no blending rule. Taking the larger of the two independent counts would let one cabinet hold 180 gal. NFPA 30 9.5.3 supplies the blend: 120 gal is the cabinet total, of which at most 60 may be Category 1-3. So 100 gal of Category 1-3 needs ceil(100/60) = 2 cabinets, and the 300 gal in all needs ceil(300/120) = 3 -- 3 cabinets, which is inside the three-cabinet area ceiling but one more than the 2 on hand.",
    "verified_by": "rl",
-   "verified_on": "2026-07-28",
+   "verified_on": "2026-09-19",
    "inputs": {
     "cat123_gallons": 100,
     "cat4_gallons": 200,
@@ -81170,13 +81170,13 @@
      }
     },
     "cabinets_for_4": {
-     "value": 2,
+     "value": 3,
      "tolerance": {
       "abs": 0
      }
     },
     "cabinets_needed": {
-     "value": 2,
+     "value": 3,
      "tolerance": {
       "abs": 0
      }

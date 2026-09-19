@@ -35488,12 +35488,15 @@ test("bounds: spec-v1153 computeFlammableCabinetStorage pins the per-cabinet cap
   for (const [gal, n] of [[1, 1], [120, 1], [121, 2], [360, 3]]) {
     assert.ok(_v1153({ ...base, cat123_gallons: 0, cat4_gallons: gal, cabinets_available: 0 }).cabinets_for_4 === n);
   }
-  // LARGER, NOT SUM: a mixed cabinet must satisfy both caps, so the count is the max.
+  // NFPA 30 9.5.3 blend: the 120 gal figure is the cabinet TOTAL, at most 60 of it Category 1-3.
+  // 100 + 200 = 300 gal needs 3 cabinets, not the 2 a larger-of-two-counts reading gave.
   const mixed = _v1153({ ...base, cat123_gallons: 100, cat4_gallons: 200, cabinets_available: 2 });
-  assert.ok(mixed.mixed && mixed.cabinets_for_123 === 2 && mixed.cabinets_for_4 === 2);
-  assert.ok(mixed.cabinets_needed === 2 && mixed.cabinets_needed !== mixed.cabinets_for_123 + mixed.cabinets_for_4);
-  assert.ok(mixed.within_area_cap && mixed.cabinets_ok && mixed.passes);
-  assert.ok(_v1153({ ...base, cat123_gallons: 60, cat4_gallons: 360, cabinets_available: 3 }).cabinets_needed === 3);
+  assert.ok(mixed.mixed && mixed.cabinets_for_123 === 2 && mixed.cabinets_for_4 === 3);
+  assert.ok(mixed.cabinets_needed === 3 && mixed.cabinets_short === 1 && !mixed.passes);
+  // 60 + 120 is 180 gal: two cabinets, never one.
+  assert.ok(_v1153({ ...base, cat123_gallons: 60, cat4_gallons: 120, cabinets_available: 0 }).cabinets_needed === 2);
+  const over = _v1153({ ...base, cat123_gallons: 60, cat4_gallons: 360, cabinets_available: 3 });
+  assert.ok(over.cabinets_needed === 4 && over.room_required && over.over_area_cap_gal === 60);
   // Any non-zero quantity needs at least one cabinet.
   assert.ok(_v1153({ ...base, cat123_gallons: 0.5, cabinets_available: 1 }).cabinets_needed === 1);
   // The caps and the area limit are all editable and move the answer.

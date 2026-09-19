@@ -6,6 +6,7 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **Flammable cabinet mixed contents, recirculation heater efficiency, fire-flow citation.** A cabinet holding both category groups was counted by the larger of two independent caps, which let one cabinet hold 60 + 120 = 180 gal; the tile had called that "the conservative reading". It now uses NFPA 30 9.5.3's blend: 120 gal total, at most 60 of it Category 1-3. The recirculation loop now defaults heater efficiency by fuel (0.98 electric, 0.8 gas), and the field switches when the fuel does. The ISO fire-flow tile's citation named IFC Table B105.1 for a method that is ISO's.
 - **Select options that shared one option's constant.** A sweep of tiles with a select input found limits or factors that belong to one option applied to all of them. **Unsafe direction:**
   - Concrete anchor breakout used the cast-in φ 0.70 for post-installed anchors. ACI Table 17.5.3 gives 0.65 / 0.55 / 0.45 by Category 1 / 2 / 3, which are now selectable.
   - The slab/beam minimum-thickness tiles named Table 9.3.1.1 but used only the slab row. A new `member` select adds the beam row, l/16 to l/8.

@@ -392,7 +392,7 @@ export function renderHydrantFlow(inputRegion, outputRegion, citationEl) {
 //        out: { dom_side_effect: dimensionless }
 // (DOM-mount renderer; HTMLElement refs are categorical.)
 export function renderRequiredFireFlow(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: per IFC 2021 Table B105.1 (ISO needed-fire-flow method). NFF = C * O * X * P; C = 18 * F * sqrt(A). AHJ governs. Free at codes.iccsafe.org.";
+  citationEl.textContent = "Citation: the ISO Public Protection Classification needed-fire-flow method by name (not IFC Table B105.1, which tabulates flow by construction type and area). NFF = C * O * X * P; C = 18 * F * sqrt(A), capped at 8,000 gpm for Classes 1-2 and 6,000 for Classes 3-6. AHJ governs.";
   const A = makeNumber("Structure area (ft²)", "rff-a", { step: "any", min: "0" });
   const cls = makeSelect("Construction class", "rff-c", Object.keys(ISO_CONSTRUCTION_FACTORS).map((k) => ({ value: k, label: k.replace(/_/g, " ") })));
   const O = makeNumber("Occupancy factor", "rff-o", { step: "any", min: "0", value: "1.0" });
