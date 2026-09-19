@@ -52452,9 +52452,11 @@ test("bounds: spec-v1727 computeGaussianDispersionScreen -- the height term domi
   const expected = (r.emission_rate_g_s / (Math.PI * r.wind_speed_m_s * r.sigma_y_m * r.sigma_z_m)) * Math.exp(-(r.effective_height_m ** 2) / (2 * r.sigma_z_m * r.sigma_z_m)) * 1e6;
   assert.ok(Math.abs(r.concentration_ug_m3 - expected) < 1e-9);
   // The standard Pasquill-Gifford D coefficients at 1 km, which the spec called
-  // "roughly 70 and 32".
+  // "roughly 70 and 32": Martin's sigma_z = 33.2 - 1.7 near = 44.5 - 13.0 far = 31.5.
   assert.ok(Math.abs(r.sigma_y_m - 68.0) < 0.1);
-  assert.ok(Math.abs(r.sigma_z_m - 33.2) < 0.1);
+  assert.ok(Math.abs(r.sigma_z_m - 31.5) < 0.1);
+  // Martin's far-field set beyond 1 km: class F at 10 km is 62.6 x 10^0.18 - 48.6 = 46.1 m.
+  assert.ok(Math.abs(_v1727({ ...base, stability_class: "F", distance_mi: 10 / 1.609344 }).sigma_z_m - (62.6 * Math.pow(10, 0.18) - 48.6)) < 1e-9);
   // The US inputs convert EXACTLY to the SI the published curves are drawn in.
   assert.ok(Math.abs(r.emission_rate_g_s - 10) < 1e-3);
   assert.ok(Math.abs(r.effective_height_m - 67) < 1e-2);
@@ -53054,6 +53056,9 @@ test("bounds: spec-v1846 computeBrineBatchSalinity -- the eutectic is a minimum 
   assert.ok(/more dangerous/.test(under.target_verdict));
   // Over the eutectic the failure is the OPPOSITE one and must not read alike.
   const over = _v1846({ ...base, target_pct: 25 });
+  // Past the eutectic the liquidus rises again (hydrohalite branch to the
+  // 26.3% / 32.2 F peritectic), so a stronger brine crystallises WARMER.
+  assert.ok(over.freeze_point_f > r.freeze_point_f + 15);
   assert.ok(/ABOVE THE EUTECTIC/.test(over.target_verdict));
   assert.ok(/crystallises/.test(over.target_verdict));
   assert.ok(!/more dangerous/.test(over.target_verdict));

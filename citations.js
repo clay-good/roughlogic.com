@@ -22223,7 +22223,7 @@ export const CITATIONS = {
   // spec-v1727..v1730: the 2026-09-09 trade-expansion dispersion, community
   // noise and odour band, closing calc-airquality.js. Nothing cut.
   "gaussian-dispersion-screen": {
-    formula: "the Gaussian plume equation with ground reflection on the plume centreline: C = Q / (pi u sigma_y sigma_z) x exp(-H^2 / (2 sigma_z^2)), with sigma_y and sigma_z from the standard Pasquill-Gifford rural power-law fits sigma = a x^b by stability class.",
+    formula: "the Gaussian plume equation with ground reflection on the plume centreline: C = Q / (pi u sigma_y sigma_z) x exp(-H^2 / (2 sigma_z^2)), with sigma_y = a x^0.894 and sigma_z = c x^d + f from Martin's (1976) Pasquill-Gifford rural fits by stability class, one (c, d, f) set below 1 km and another beyond (x in km, sigma in m).",
     edition: "A flat-terrain, steady-state, single-source screening estimate with no chemistry. The bundled Pasquill-Gifford coefficients are the standard RURAL fits; urban terrain disperses differently, and they approximate curves drawn from a limited experimental base. It does not address terrain, building downwash, complex or elevated receptors, plume depletion, deposition, reaction, calm or low wind speeds, fumigation, multiple sources, or averaging-time conversion -- the result is a short-term centreline value, not an annual average. It is NOT a regulatory dispersion model and its result is not a compliance demonstration.",
     freeAccess: "One closed-form equation and a published power-law coefficient set; no proprietary model is reproduced.",
     governance: GOVERNANCE.general,

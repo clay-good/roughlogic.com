@@ -238,6 +238,7 @@ const NEAR_FACTORS = {
 const NEAR_MISS_ALLOWED = new Map(Object.entries({
   "calc-accounting.js:0.205": "a tax or rate figure, not a unit conversion",
   "calc-airquality.js:0.6214": "a worked-example input: one kilometre typed in miles",
+  "calc-airquality.js:0.305": "Martin's (1976) class-E far-field sigma_z exponent, not a foot",
   "calc-cross.js:0.6215": "the NWS wind-chill coefficient",
   "calc-drainage.js:0.51429": "a TR-55 unit-peak-discharge table coefficient",
   "calc-drainage.js:2.23537": "a TR-55 unit-peak-discharge table coefficient",

@@ -94,14 +94,18 @@ export const ropeMAExample = { inputs: { rig: "4:1", efficiency: 0.9, load_lb: 6
 // each leg sits theta/2 off vertical, so tension rises as the legs spread).
 // Choker reduction factor 0.75 typical. ASME B30.9 cited by section.
 
-// spec-v27 EN: standard wire-rope D/d bend-efficiency curve (sling diameter
-// over the pin/load radius it bends around). Interpolated; D/d >= 25 -> 100%.
-const _V27_DD_EFFICIENCY = [[1, 0.50], [2, 0.65], [4, 0.80], [6, 0.85], [8, 0.92], [10, 0.95], [15, 0.96], [20, 0.97], [25, 1.00]];
+// spec-v27 EN: standard wire-rope D/d bend-efficiency curve (the diameter the
+// sling bends around over the rope diameter), as published in the Wire Rope
+// Users Manual and rigging-hardware catalogs: 50 / 65 / 75 / 79 / 83 / 86 /
+// 89 / 91 / 93 / 95% at D/d 1 / 2 / 4 / 6 / 8 / 10 / 15 / 20 / 25 / 40. It
+// never reaches 100%. Until 2026-09-19 the curve ran 5-9 points high from
+// D/d 4 up and credited full strength at 25, overstating capacity by ~10%.
+const _V27_DD_EFFICIENCY = [[1, 0.50], [2, 0.65], [4, 0.75], [6, 0.79], [8, 0.83], [10, 0.86], [15, 0.89], [20, 0.91], [25, 0.93], [40, 0.95]];
 function _v27SlingDDEfficiency(dd) {
   if (!(dd > 0)) return 1.0;
   const t = _V27_DD_EFFICIENCY;
   if (dd <= t[0][0]) return t[0][1];
-  if (dd >= t[t.length - 1][0]) return 1.0;
+  if (dd >= t[t.length - 1][0]) return t[t.length - 1][1];
   for (let i = 0; i < t.length - 1; i++) {
     if (dd >= t[i][0] && dd <= t[i + 1][0]) {
       const [x0, y0] = t[i], [x1, y1] = t[i + 1];

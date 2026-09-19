@@ -141,8 +141,13 @@ WINTEROPS_RENDERERS["salt-application-rate"] = _simpleRenderer({
 // branch, as [weight percent NaCl, freezing point degF], ending at the
 // eutectic. Linearly interpolated between nodes; the curve is not a straight
 // line, which is why it is carried as points rather than as a slope.
+// Past the eutectic the liquidus turns UP along the hydrohalite (NaCl.2H2O)
+// branch to the peritectic at 26.3% and +0.1 C (32.2 F): salt, not ice,
+// comes out of a stronger brine as it cools. Only the two invariant points
+// are carried, so that branch is linear between them. Until 2026-09-19 the
+// table stopped at the eutectic and read -6 F for every stronger brine.
 const _NACL_FREEZE_F = [
-  [0, 32.0], [5, 26.6], [10, 20.1], [15, 12.2], [20, 1.9], [23.3, -6.0],
+  [0, 32.0], [5, 26.6], [10, 20.1], [15, 12.2], [20, 1.9], [23.3, -6.0], [26.3, 32.2],
 ];
 function _naclFreezePointF(pct) {
   const t = _NACL_FREEZE_F;
@@ -178,7 +183,7 @@ export function computeBrineBatchSalinity({ batch_gal = 0, target_pct = 23.3, br
   const alt_freeze_point_f = compared ? _naclFreezePointF(alt_pct) : null;
   const salt_difference_lb = compared ? salt_lb - alt_salt_lb : null;
   const freeze_point_given_up_f = compared ? alt_freeze_point_f - freeze_point_f : null;
-  const eutectic_pct = _NACL_FREEZE_F[_NACL_FREEZE_F.length - 1][0];
+  const eutectic_pct = 23.3; // the minimum of _NACL_FREEZE_F, where the ice and hydrohalite branches meet
   const at_eutectic = Math.abs(target_pct - eutectic_pct) < 0.05;
   const target_verdict = at_eutectic
     ? "AT THE EUTECTIC (" + eutectic_pct + "%), where the freezing point is at its minimum of about " + freeze_point_f.toFixed(0) + " degF."

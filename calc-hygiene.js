@@ -341,10 +341,10 @@ HYGIENE_RENDERERS["arc-rated-clothing-selection"] = _simpleRenderer({
 // =====================================================================
 // spec-v1735: fixed ladder fall protection and rest platform spacing.
 // =====================================================================
-// dims: in { ladder_height_ft: L, fall_protection_threshold_ft: L, rest_platform_interval_ft: L, existing_protection: dimensionless } out: { rest_platforms_required: dimensionless, longest_unbroken_climb_ft: L, height_over_threshold_ft: L }
+// dims: in { ladder_height_ft: L, fall_protection_threshold_ft: L, rest_platform_interval_ft: L, existing_protection: dimensionless, installed_before_nov_2018: dimensionless } out: { rest_platforms_required: dimensionless, longest_unbroken_climb_ft: L, height_over_threshold_ft: L }
 export function computeFixedLadderFallProtection({
   ladder_height_ft = 0, fall_protection_threshold_ft = 24,
-  rest_platform_interval_ft = 50, existing_protection = "none",
+  rest_platform_interval_ft = 50, existing_protection = "none", installed_before_nov_2018 = "no",
 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(ladder_height_ft > 0)) return { error: "Ladder height must be positive (ft)." };
@@ -359,11 +359,19 @@ export function computeFixedLadderFallProtection({
   const isCage = existing_protection === "cage";
   const isSystem = existing_protection === "system";
   const isPfas = existing_protection === "pfas";
-  const compliant = !requires_protection || isSystem || isPfas;
+  // 29 CFR 1910.28(b)(9)(i)(A) and (D): a cage or well on a fixed ladder
+  // installed before November 19, 2018 is acceptable until November 18, 2036.
+  // New ladders and replaced sections need a ladder safety system or personal
+  // fall arrest now. Until 2026-09-19 every caged ladder over the threshold
+  // read non-compliant today, with no installation date asked.
+  const grandfathered = isCage && installed_before_nov_2018 === "yes";
+  const compliant = !requires_protection || isSystem || isPfas || grandfathered;
   const protection_verdict = !requires_protection
     ? "(fall protection is not required on height alone here)"
+    : grandfathered
+      ? "a cage on a ladder installed before November 19, 2018 is accepted UNTIL November 18, 2036 (29 CFR 1910.28(b)(9)(i)(A), (D)); by then it needs a ladder safety system or personal fall arrest, and any section replaced before then needs one at replacement. The cage does not ARREST a fall, which is why it is being phased out"
     : isCage
-      ? "A CAGE IS NOT FALL PROTECTION UNDER THE CURRENT RULE. It was accepted historically and it is not accepted on new ladders, because it does not ARREST a fall -- it may keep a climber roughly in the ladder's plane while they fall the full height inside it. Existing caged ladders are subject to a phase-out, after which a ladder safety system or a personal fall arrest system is required. The cage may remain; it does not satisfy the requirement"
+      ? "A CAGE IS NOT FALL PROTECTION UNDER THE CURRENT RULE for a ladder installed on or after November 19, 2018. It was accepted historically and it is not accepted on new ladders, because it does not ARREST a fall -- it may keep a climber roughly in the ladder's plane while they fall the full height inside it. Existing caged ladders are subject to a phase-out, after which a ladder safety system or a personal fall arrest system is required. The cage may remain; it does not satisfy the requirement"
       : isSystem
         ? "a ladder safety system -- a rail or cable with a travelling attachment -- satisfies the requirement"
         : isPfas
@@ -376,7 +384,7 @@ export function computeFixedLadderFallProtection({
   const platform_verdict = rest_platforms_required <= 0
     ? "at a " + fmt(rest_platform_interval_ft, 0) + " ft interval this " + fmt(ladder_height_ft, 1) + " ft climb needs no intermediate rest platform"
     : "at a " + fmt(rest_platform_interval_ft, 0) + " ft interval this climb needs " + fmt(rest_platforms_required, 0) + " intermediate rest platform" + (rest_platforms_required > 1 ? "s" : "") + ", breaking it into runs of about " + fmt(longest_unbroken_climb_ft, 1) + " ft. Rest platforms belong to the older cage-based provisions, and whether they are present is part of the survey rather than a substitute for fall protection";
-  const survey_verdict = "THE FINDING THAT MATTERS AT A FACILITY LEVEL is that a plant with older fixed ladders almost certainly has several in this condition, and they are non-compliant NOW rather than at some future date once the phase-out has passed. A ladder survey against the current requirement -- height, existing protection, installation date, and dimensional compliance -- is the action, and it usually turns up more than expected";
+  const survey_verdict = "THE FINDING THAT MATTERS AT A FACILITY LEVEL is that a plant with older fixed ladders almost certainly has several in this condition, and the caged ones installed before November 19, 2018 run out of time on November 18, 2036, while any installed or replaced since then without a ladder safety system is non-compliant now. A ladder survey against the current requirement -- height, existing protection, installation date, and dimensional compliance -- is the action, and it usually turns up more than expected";
   const dimension_verdict = "AND HEIGHT IS NOT THE ONLY REQUIREMENT. Rung spacing and diameter, side clearance, the climbing space behind the ladder, the extension above a landing, and the landing platform itself all have dimensional requirements a ladder can fail independently of its fall protection, and a ladder that was compliant when installed may not be under the current rule";
   if (![rest_platforms_required, longest_unbroken_climb_ft, height_over_threshold_ft].every(Number.isFinite)) return { error: "Ladder survey math is not a finite value." };
   return {
@@ -395,7 +403,8 @@ HYGIENE_RENDERERS["fixed-ladder-fall-protection"] = _simpleRenderer({
     { key: "ladder_height_ft", label: "Fixed ladder height (ft)", kind: "number", attrs: { step: "any" } },
     { key: "existing_protection", label: "Existing protection", kind: "select", default: "none", options: [{ value: "none", label: "None" }, { value: "cage", label: "Cage or well" }, { value: "system", label: "Ladder safety system (rail or cable)" }, { value: "pfas", label: "Personal fall arrest" }] },
     { key: "fall_protection_threshold_ft", label: "Fall protection threshold (ft)", kind: "number", default: 24, attrs: { step: "any" } },
-    { key: "rest_platform_interval_ft", label: "Rest platform interval (ft)", kind: "number", default: 50, attrs: { step: "any" } },
+    { key: "rest_platform_interval_ft", label: "Rest platform interval (ft; 50 for a cage, 150 with a ladder safety system)", kind: "number", default: 50, attrs: { step: "any" } },
+    { key: "installed_before_nov_2018", label: "Installed before Nov 19, 2018", kind: "select", default: "no", options: [{ value: "no", label: "No (or section replaced since)" }, { value: "yes", label: "Yes" }] },
   ],
   outputs: [
     { key: "h", id: "flp-out-h", label: "Against the height threshold", value: (r) => r.height_verdict },

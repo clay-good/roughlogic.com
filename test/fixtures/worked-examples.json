@@ -109544,19 +109544,19 @@
      }
     },
     "sigma_z_m": {
-     "value": 33.2,
+     "value": 31.501,
      "tolerance": {
       "pct": 0.5
      }
     },
     "exponential_term": {
-     "value": 0.13052,
+     "value": 0.10419,
      "tolerance": {
       "pct": 1.0
      }
     },
     "concentration_ug_m3": {
-     "value": 45.99,
+     "value": 38.7,
      "tolerance": {
       "pct": 1.0
      }

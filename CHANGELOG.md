@@ -6,6 +6,12 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **A dispersion screen used near-field coefficients 50 km out, a sling credited full strength around a pin, and a caged ladder was called non-compliant that OSHA still allows.**
+  - `gaussian-dispersion-screen` ran Martin's under-1 km σz fit out to 50 km and dropped its additive term. It now uses both of Martin's sets, σz = c·x^d + f, which meet at 1 km. At the example, 1 km under class D reads 38.7 µg/m³, not 46.0. Class F's maximum was 66% high, and class A's was low.
+  - `sling-angle` applied a D/d bend-efficiency curve 5-9 points above the published wire-rope curve, reaching 100% at D/d 25. It now follows the published curve (75% at 4, 86% at 10, 93% at 25, 95% at 40), which never reaches 100%.
+  - `fixed-ladder-fall-protection` called every caged ladder over 24 ft non-compliant today. 29 CFR 1910.28(b)(9) accepts a cage on a ladder installed before November 19, 2018 until November 18, 2036. A new installation-date input applies that; new or replaced ladders still need a ladder safety system.
+  - `brine-batch-salinity` stopped its freezing curve at the 23.3% eutectic and read −6°F for every stronger brine. Past the eutectic, salt (hydrohalite) crystallizes at rising temperatures, up to 32.2°F at 26.3%. The curve now continues to that point, linearly between the two published invariant points.
+
 - **A recompression chamber counted the air already inside it, a volume tank was drained below the diver's depth, and a boiler's second safety valve could sit above its code ceiling.** Each was found by re-deriving a worked example.
   - `chamber-gas-volume` charged V × ata to pressurize a chamber that already holds one atmosphere. It now charges V × psig/14.7: 1,020 cu ft at 60 psig, not 1,270. The longest supportable treatment on 8,000 cu ft rises from 331 to 343 min. The oxygen-rate label now says it is the total at the masks, since the occupant count never multiplied it.
   - `umbilical-air-supply` credited the volume tank's gas all the way down to 0 psig. Gas below bottom pressure never reaches the helmet, so at 100 ft the usable reserve is 84.6 cu ft, not 108.8, and the helmet's over-bottom pressure cuts it further.

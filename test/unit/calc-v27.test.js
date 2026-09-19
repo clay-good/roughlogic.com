@@ -110,7 +110,9 @@ test("sling-angle EN: D/d efficiency, min capacity, low-angle hazard, backward-c
   assert.strictEqual(base.low_angle_hazard, false); // angle factor 1.15 at a steep 60-deg included angle
   // D/d efficiency de-rates the rated capacity
   const dd = computeSlingAngle({ load_lb: 2000, sling_config: "basket", included_angle_deg: 60, n_legs: 2, sling_rated_capacity_lb: 5000, dd_ratio: 4 });
-  assert.ok(near(dd.dd_efficiency, 0.80));
-  assert.ok(near(dd.effective_capacity_lb, 4000));
-  assert.ok(near(dd.utilization, 0.2887)); // 1154.7 / 4000
+  assert.ok(near(dd.dd_efficiency, 0.75)); // published wire-rope curve at D/d 4
+  assert.ok(near(dd.effective_capacity_lb, 3750));
+  assert.ok(near(dd.utilization, 0.3079)); // 1154.7 / 3750
+  // The curve never reaches 100%: D/d 40 and beyond credit 95%.
+  assert.ok(near(computeSlingAngle({ load_lb: 2000, sling_config: "basket", included_angle_deg: 60, n_legs: 2, sling_rated_capacity_lb: 5000, dd_ratio: 100 }).dd_efficiency, 0.95));
 });

@@ -935,15 +935,19 @@ AIRQUALITY_RENDERERS["plume-rise-briggs"] = _simpleRenderer({
 });
 
 // ===================== spec-v1727: Gaussian ground-level concentration screen =====================
-// Pasquill-Gifford sigma coefficients for rural terrain, the standard
-// power-law fits sigma = a x^b with x in km and sigma in m.
+// Pasquill-Gifford sigma coefficients for rural terrain, Martin's (1976)
+// fits with x in km and sigma in m: sigma_y = a x^0.894, sigma_z = c x^d + f,
+// with one (c, d, f) set below 1 km and another beyond it (the two meet at
+// 1 km: D gives 31.5 m either way). Until 2026-09-19 the near-field set ran
+// to 50 km with f dropped, so class F's maximum read 66% high and class A's
+// low.
 const _PG_SIGMA = {
-  A: { ay: 213, by: 0.894, az: 440.8, bz: 1.941 },
-  B: { ay: 156, by: 0.894, az: 106.6, bz: 1.149 },
-  C: { ay: 104, by: 0.894, az: 61.0, bz: 0.911 },
-  D: { ay: 68, by: 0.894, az: 33.2, bz: 0.725 },
-  E: { ay: 50.5, by: 0.894, az: 22.8, bz: 0.678 },
-  F: { ay: 34, by: 0.894, az: 14.35, bz: 0.740 },
+  A: { ay: 213, by: 0.894, near: [440.8, 1.941, 9.27], far: [459.7, 2.094, -9.6] },
+  B: { ay: 156, by: 0.894, near: [106.6, 1.149, 3.3], far: [108.2, 1.098, 2.0] },
+  C: { ay: 104, by: 0.894, near: [61.0, 0.911, 0], far: [61.0, 0.911, 0] },
+  D: { ay: 68, by: 0.894, near: [33.2, 0.725, -1.7], far: [44.5, 0.516, -13.0] },
+  E: { ay: 50.5, by: 0.894, near: [22.8, 0.678, -1.3], far: [55.4, 0.305, -34.0] },
+  F: { ay: 34, by: 0.894, near: [14.35, 0.740, -0.35], far: [62.6, 0.180, -48.6] },
 };
 // dims: in { emission_rate_lb_hr: M T^-1, effective_height_ft: L, wind_mph: L T^-1, distance_mi: L, stability_class: dimensionless, alt_stability_class: dimensionless } out: { sigma_y_m: L, sigma_z_m: L, concentration_ug_m3: M L^-3, max_concentration_ug_m3: M L^-3, max_distance_km: L, effective_height_m: L }
 export function computeGaussianDispersionScreen({
@@ -966,7 +970,8 @@ export function computeGaussianDispersionScreen({
   if (!_PG_SIGMA[cls]) return { error: "Stability class must be one of A through F." };
   const sigmasAt = (x_km, c) => {
     const p = _PG_SIGMA[c];
-    return { y: p.ay * Math.pow(x_km, p.by), z: p.az * Math.pow(x_km, p.bz) };
+    const [cz, dz, fz] = x_km < 1 ? p.near : p.far;
+    return { y: p.ay * Math.pow(x_km, p.by), z: cz * Math.pow(x_km, dz) + fz };
   };
   // The centreline ground-level concentration under a reflecting ground.
   const concAt = (x_km, c) => {
