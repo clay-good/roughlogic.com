@@ -2438,6 +2438,7 @@ cross-check.
 | calc-gas.js | `computePropaneRunTime` | `{ water_capacity_gal = 0, fill_limit_pct = 80, current_gauge_pct = 0, trigger...` | _ | _ | _ |
 | calc-gas.js | `computePropaneVaporizationRate` | `{ tank_diameter_ft = 0, tank_length_ft = 0, percent_full = 0, ambient_f = 0, ...` | _ | _ | _ |
 | calc-gas.js | `computeWobbeIndex` | `{ hhv_btu_ft3 = 1000, specific_gravity = 0.60 } = {}` | _ | _ | _ |
+| calc-gas.js | `ifgcLowPressureFlow` | `{ d_in, dP_in_wc, cr, L_ft }` | _ | _ | _ |
 | calc-gas.js | `renderGasLeakRate` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-gas.js | `renderGasPipeSizing` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-gas.js | `spitzglassFlow` | `{ d_in, dP_in_wc, specific_gravity, L_ft }` | _ | _ | _ |
@@ -3848,7 +3849,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 2434.
+Row count: 2435.
 
 <!-- END function-corpus-v14 -->
 

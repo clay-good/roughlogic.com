@@ -75,7 +75,7 @@ The structured §3 reference block in `citations.js` is the deeper source - this
 | Tile | Source-stamp |
 | --- | --- |
 | pipe-sizing | "Citation: WSFU per IPC 2021 Table 604.3 and DFU per Table 709.1; Hunter's Curve (1940; NBS BMS65) public-domain methodology converts water-supply fixture units to gpm. AHJ governs. Free at codes.iccsafe.org." |
-| gas-pipe-sizing | "Citation: per IFGC 2021 Table 402.4 (NFPA 54). Spitzglass low-pressure gas formula Q = 3550 * sqrt(d^5 * dP / (SG * L * (1 + 3.6/d + 0.03*d))), the diameter-correction term included as the tile computes it. AHJ governs. Free at codes.iccsafe.org." |
+| gas-pipe-sizing | "Citation: per IFGC 2021 Table 402.4 (NFPA 54), via IFGC Equation 4-1 (low pressure), D = Q^0.381 / (19.17 (dH / (Cr L))^0.206), the relation the tables are built from; Cr 0.6094 natural gas, 1.2462 propane. AHJ governs. Free at codes.iccsafe.org." |
 | friction-loss | "Citation: Hazen-Williams (1905, public domain). IPC 2021 referenced for application. Darcy-Weisbach with Colebrook-White for general fluid use. Free at codes.iccsafe.org." |
 | septic-tank | "Citation: EPA Onsite Wastewater Treatment Manual (EPA/625/R-00/008). 150 gpd per bedroom rule of thumb; tank floor 1000 gal; tank gallons >= 2 * daily flow. State primacy agency governs final design. Free at epa.gov/septic." |
 | grease-trap | "Citation: per IPC 2021 Table 1003.2 and PDI G101 by name. Volume = peak_flow * retention * loading_factor. AHJ governs. Free at codes.iccsafe.org." |

@@ -7936,12 +7936,16 @@ test("bounds: calc-plumbing spitzglassFlow pins Q = 3550*sqrt(d^5*dP/(SG*L*(1+3.
   assert.strictEqual(spitzglassFlow({ d_in: 0, dP_in_wc: 0.5, specific_gravity: 0.6, L_ft: 50 }), 0);
 });
 
-test("bounds: calc-plumbing computeGasPipeSizing pins required cfh and Spitzglass-derived achieved dP on the spec NG example", () => {
+test("bounds: calc-plumbing computeGasPipeSizing pins required cfh, the IFGC Eq 4-1 capacity, and the achieved dP on the spec NG example", () => {
   const r = computeGasPipeSizing({ btu_load: 100000, length_ft: 50, gas: "natural_gas" });
   // required_cfh = 100000 / 1030.
   assert.ok(Math.abs(r.required_cfh - 100000 / 1030) < 1e-9);
-  // Selected size's achieved dP = dP_design * (Q_actual/Q_max)^2.
-  const expected_dP = 0.5 * Math.pow(r.required_cfh / r.capacity_cfh, 2);
+  // IFGC Eq 4-1 for 3/4 in (ID 0.824) at 50 ft, 0.5 in w.c., Cr 0.6094: 151.6 cfh,
+  // the 151 IFGC Table 402.4(2) prints.
+  assert.strictEqual(r.recommended_size, "0.75");
+  assert.ok(Math.abs(r.capacity_cfh - 151.61) < 0.05);
+  // Selected size's achieved dP: Q ∝ dH^(0.206/0.381), so dP = dP_design * (Q/Qmax)^(0.381/0.206).
+  const expected_dP = 0.5 * Math.pow(r.required_cfh / r.capacity_cfh, 0.381 / 0.206);
   assert.ok(Math.abs(r.dP_achieved_in_wc - expected_dP) < 1e-9);
   assert.ok(typeof r.recommended_size === "string");
   // No-fit branch: tiny candidate set.
@@ -55310,4 +55314,21 @@ test("bounds: spec-v1788 computeDryHopBeerLoss -- doubling the rate doubles the 
   for (const bad of [{ batch_volume_gal: 0 }, { dry_hop_lb_per_bbl: -1 }, { package_gal: 0 }, { heavy_dry_hop_lb_per_bbl: 400 }, { absorption_gal_per_lb: -1 }]) {
     assert.ok(_v1788({ ...base, ...bad }).error);
   }
+});
+
+import { ifgcLowPressureFlow as _ifgcQ } from "../../calc-gas.js";
+test("bounds: calc-gas ifgcLowPressureFlow reproduces IFGC Table 402.4(2) and guards non-positive inputs", () => {
+  // IFGC Eq 4-1 solved for Q, Schedule 40 IDs, 0.5 in w.c., natural gas Cr 0.6094. Table 402.4(2)
+  // prints 172 (1/2 in, 10 ft), 151 (3/4 in, 50 ft), 195 (1 in, 100 ft); the equation lands within 1%.
+  for (const [d, L, table] of [[0.622, 10, 172], [0.824, 50, 151], [1.049, 100, 195]]) {
+    const q = _ifgcQ({ d_in: d, dP_in_wc: 0.5, cr: 0.6094, L_ft: L });
+    assert.ok(Math.abs(q - table) / table < 0.01, `${d} in at ${L} ft: ${q} vs ${table}`);
+  }
+  // Inverse check: Eq 4-1 in its printed D form returns the diameter.
+  const q = _ifgcQ({ d_in: 0.824, dP_in_wc: 0.5, cr: 0.6094, L_ft: 50 });
+  assert.ok(Math.abs(Math.pow(q, 0.381) / (19.17 * Math.pow(0.5 / (0.6094 * 50), 0.206)) - 0.824) < 1e-12);
+  // Longer runs carry less; a heavier gas (propane Cr) carries less.
+  assert.ok(_ifgcQ({ d_in: 0.824, dP_in_wc: 0.5, cr: 0.6094, L_ft: 100 }) < q);
+  assert.ok(_ifgcQ({ d_in: 0.824, dP_in_wc: 0.5, cr: 1.2462, L_ft: 50 }) < q);
+  for (const bad of [{ L_ft: 0 }, { d_in: 0 }, { dP_in_wc: 0 }]) assert.strictEqual(_ifgcQ({ d_in: 0.824, dP_in_wc: 0.5, cr: 0.6094, L_ft: 50, ...bad }), 0);
 });

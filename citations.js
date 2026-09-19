@@ -3870,7 +3870,7 @@ export const CITATIONS = {
     ],
   },
   "gas-pipe-sizing": {
-    formula: "Spitzglass low-pressure formula Q = 3550 * sqrt(d^5 * dP / (SG * L * (1 + 3.6/d + 0.03 d))) sizing a SINGLE run of the entered length -- it picks the smallest listed diameter whose Spitzglass capacity meets the load. This is a single-segment estimate, NOT the full IFGC 2021 Section 402.4 / Tables 402.4(1)-(36) longest-length network method, and does not implement the Weymouth equation; a multi-branch system is sized on the single longest run to the most remote appliance, which the AHJ and the tables govern.",
+    formula: "IFGC Equation 4-1 (low pressure, under 1.5 psi), D = Q^0.381 / (19.17 (dH / (Cr L))^0.206), solved for Q -- the relation Tables 402.4(1)-(36) are generated from -- sizing a SINGLE run of the entered length: it picks the smallest listed diameter whose capacity meets the load. Cr 0.6094 natural gas, 1.2462 undiluted propane. This is a single-segment estimate, NOT the full IFGC 2021 Section 402.4 / Tables 402.4(1)-(36) longest-length network method; a multi-branch system is sized on the single longest run to the most remote appliance, which the AHJ and the tables govern.",
     edition: IFGC_2021 + " Section 402.4 and capacity tables.",
     freeAccess: ICC_FREE + " NFPA 54: " + NFPA54_FREE,
     governance: GOVERNANCE.plumbing,

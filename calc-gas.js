@@ -123,8 +123,18 @@ export const GAS_RENDERERS = {};
 
 // =====================================================================
 // gas-pipe-sizing (Group B) - IFGC 2021 Table 402.4 (NFPA 54) sizing via
-// the Spitzglass low-pressure formula.
+// IFGC Equation 4-1, the low-pressure (< 1.5 psi) relation the tables are
+// generated from: D = Q^0.381 / (19.17 (dH / (Cr L))^0.206), solved for Q.
+// Until 2026-09-18 this tile computed Spitzglass while citing the table and
+// read about 20% under it (3/4 in at 50 ft: 121.6 cfh; the table prints 151).
+// Cr per IFGC Table 402.4: natural gas 0.6094, undiluted propane 1.2462.
 // =====================================================================
+const _IFGC_CR = { natural_gas: 0.6094, propane: 1.2462 };
+// dims: in { d_in: L, dP_in_wc: M L^-1 T^-2, cr: dimensionless, L_ft: L } out: { flow_cfh: L^3 T^-1 }
+export function ifgcLowPressureFlow({ d_in, dP_in_wc, cr, L_ft }) {
+  if (!(L_ft > 0) || !(d_in > 0) || !(dP_in_wc > 0)) return 0;
+  return Math.pow(19.17 * d_in * Math.pow(dP_in_wc / (cr * L_ft), 0.206), 1 / 0.381);
+}
 
 // dims: in { btu_load: M L^2 T^-3, length_ft: L, gas: dimensionless, dP_in_wc: M L^-1 T^-2, candidate_sizes: dimensionless } out: { recommended_size_in: L, candidates: dimensionless }
 export function computeGasPipeSizing({ btu_load, length_ft, gas, dP_in_wc = 0.5, candidate_sizes = ["0.5", "0.75", "1", "1.25", "1.5", "2"] }) {
@@ -143,11 +153,11 @@ export function computeGasPipeSizing({ btu_load, length_ft, gas, dP_in_wc = 0.5,
   for (const size of candidate_sizes) {
     const d = SCH40_ID_IN[size];
     if (!d) continue;
-    const capacity = spitzglassFlow({ d_in: d, dP_in_wc, specific_gravity: props.specific_gravity, L_ft: length_ft });
+    const capacity = ifgcLowPressureFlow({ d_in: d, dP_in_wc, cr: _IFGC_CR[gas], L_ft: length_ft });
     if (capacity >= required_cfh) {
       // v8 §C.2: actual achieved pressure drop at the chosen size + actual
-      // load. Spitzglass: Q ∝ sqrt(dP), so dP_actual = dP_design × (Q_actual/Q_max)².
-      const dP_achieved_in_wc = capacity > 0 ? dP_in_wc * Math.pow(required_cfh / capacity, 2) : null;
+      // load. Eq 4-1: Q ∝ dH^(0.206/0.381), so dP_actual = dP_design × (Q_actual/Q_max)^(0.381/0.206).
+      const dP_achieved_in_wc = capacity > 0 ? dP_in_wc * Math.pow(required_cfh / capacity, 0.381 / 0.206) : null;
       return { required_cfh, recommended_size: size, capacity_cfh: capacity, dP_in_wc, dP_achieved_in_wc };
     }
   }
@@ -160,7 +170,7 @@ export const gasPipeSizingExample = {
 
 // dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderGasPipeSizing(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: per IFGC 2021 Table 402.4 (NFPA 54). Spitzglass low-pressure gas formula Q = 3550 * sqrt(d^5 * dP / (SG * L * (1 + 3.6/d + 0.03*d))), the diameter-correction term included as the tile computes it. AHJ governs. Free at codes.iccsafe.org.";
+  citationEl.textContent = "Citation: per IFGC 2021 Table 402.4 (NFPA 54), via IFGC Equation 4-1 (low pressure), D = Q^0.381 / (19.17 (dH / (Cr L))^0.206), the relation the tables are built from; Cr 0.6094 natural gas, 1.2462 propane. AHJ governs. Free at codes.iccsafe.org.";
   const btu = makeNumber("BTU load (BTU/hr)", "gp-btu", { step: "any", min: "0" });
   const length = makeNumber("Pipe length (ft)", "gp-len", { step: "any", min: "0" });
   const dP = makeNumber("Allowable pressure drop (in w.c.)", "gp-dp", { step: "any", min: "0", value: "0.5" });
