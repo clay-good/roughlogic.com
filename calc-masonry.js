@@ -252,7 +252,7 @@ export function computeMasonryWallWeight({ hollow_psf = 0, grout_adder = 0, cell
   const total_lb = area > 0 ? wall_psf * area : null;
   return {
     grout_term, wall_psf, line_load_plf, total_lb,
-    note: "Masonry wall dead load: the hollow (ungrouted) wall weight (NCMA table, by thickness and unit density) plus a grout adder prorated by the grout spacing - fully grouted at cell spacing, none if ungrouted, and in between for partial grout (grout_term = adder x cell/spacing, capped at the full adder). Fully grouting can add ~40% to the wall weight and its load on the footing, the trade between reinforcement/strength and dead load. Line load = wall psf x height; total = wall psf x area. A design aid; the NCMA weight tables and the engineer of record govern." ,
+    note: "Masonry wall dead load: the hollow (ungrouted) wall weight (NCMA table, by thickness and unit density) plus a grout adder prorated by the grout spacing - fully grouted at cell spacing, none if ungrouted, and in between for partial grout (grout_term = adder x cell/spacing, capped at the full adder). Fully grouting adds about 50% over the hollow wall (55 to 84 psf in the example; 40% over grout at 48 in o.c.) to the wall weight and its load on the footing, the trade between reinforcement/strength and dead load. Line load = wall psf x height; total = wall psf x area. A design aid; the NCMA weight tables and the engineer of record govern." ,
   };
 }
 export const masonryWallWeightExample = { inputs: { hollow_psf: 55, grout_adder: 29, cell_spacing: 8, grout_spacing: 48, height_ft: 10, area_ft2: 0 } };

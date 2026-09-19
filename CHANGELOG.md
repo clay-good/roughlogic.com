@@ -6,6 +6,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **A fourth batch of notes checked against their own tiles.**
+  - `esal-traffic-loading`: 2% growth over 20 years is about 1.46 on the final year, not 1.22, which is the midpoint year.
+  - `reorder-point`: going from 95% to 99% service adds about 40% safety stock (z 1.645 to 2.326), not double.
+  - `spray-tip-selection`: 128 ft/min is about 2 ft/s, not 1.5.
+  - `thermistor-steinhart-hart`: the note's 0°C and 50°C points were each about 2°C off the tile's own coefficients; its desc already had them right.
+  - `bolt-proof-load`: the tensile stress area is 20–35% below the nominal shank (28% for a ½-13), not 15%.
+  - `masonry-wall-weight`: full grout adds about 50% over a hollow wall at the example's numbers, not 40%.
+
 - **A third batch of notes checked against their own tiles.**
   - `spring-natural-frequency`: fn is 13–20× the camshaft frequency, not the highest harmonic.
   - `thick-wall-cylinder-stress`: thin-wall theory is 12% low at D/t 8; it is Lamé that runs 14% higher.

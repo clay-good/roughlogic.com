@@ -2,7 +2,7 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "caa45fa81833e8fa",
+      "sha": "076f88b2719965ef",
       "date": "2026-09-19"
     },
     "/tools/": {
@@ -10,8 +10,8 @@
       "date": "2026-09-19"
     },
     "/groups/accounting/": {
-      "sha": "0b266883b6739903",
-      "date": "2026-09-18"
+      "sha": "9f11187d3f5838e9",
+      "date": "2026-09-19"
     },
     "/groups/agriculture/": {
       "sha": "39d52d330a6f9c5d",
@@ -2642,8 +2642,8 @@
       "date": "2026-09-01"
     },
     "/tools/esal-traffic-loading/": {
-      "sha": "03f92b7f738708d8",
-      "date": "2026-09-08"
+      "sha": "254dbf58d391606d",
+      "date": "2026-09-19"
     },
     "/tools/escalator-capacity/": {
       "sha": "1e77478915e466d8",
@@ -6142,8 +6142,8 @@
       "date": "2026-09-19"
     },
     "/tools/reorder-point/": {
-      "sha": "a7e7c9f559f7332d",
-      "date": "2026-09-01"
+      "sha": "1bce3ed182233f76",
+      "date": "2026-09-19"
     },
     "/tools/required-face-rent/": {
       "sha": "57b2ae07b6f1b844",
@@ -7158,8 +7158,8 @@
       "date": "2026-09-01"
     },
     "/tools/spray-tip-selection/": {
-      "sha": "7e6976308cf831f7",
-      "date": "2026-09-01"
+      "sha": "085fb0430202434b",
+      "date": "2026-09-19"
     },
     "/tools/spray-transfer-efficiency/": {
       "sha": "39803da5c9c4666b",
