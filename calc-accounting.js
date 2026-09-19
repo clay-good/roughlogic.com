@@ -368,6 +368,20 @@ const PUB_15T_BRACKETS = {
       { up_to: Infinity, rate: 0.37, base: 183647.25 },
     ],
   },
+  // Pub 15-T (2026), Worksheet 1A standard schedule, single ($7,500 /
+  // $19,900 / $57,900 / $113,200 / $209,275 / $263,725 / $648,100), + $8,600.
+  2026: {
+    single: [
+      { up_to: 16100, rate: 0.00, base: 0 },
+      { up_to: 28500, rate: 0.10, base: 0 },
+      { up_to: 66500, rate: 0.12, base: 1240 },
+      { up_to: 121800, rate: 0.22, base: 5800 },
+      { up_to: 217875, rate: 0.24, base: 17966 },
+      { up_to: 272325, rate: 0.32, base: 41024 },
+      { up_to: 656700, rate: 0.35, base: 58448 },
+      { up_to: Infinity, rate: 0.37, base: 192979.25 },
+    ],
+  },
   // Pub 15-T (2025), Worksheet 1A standard schedule, single, + $8,600.
   2025: {
     single: [
@@ -930,7 +944,7 @@ function renderEstimatedTax(inputRegion, outputRegion, citationEl) {
 }
 
 function renderPayroll(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: IRS Publication 15-T percentage method (illustrative single-filer brackets bundled). FICA per FICA at 6.2% / 1.45% / 0.9% Additional.";
+  citationEl.textContent = "Citation: IRS Publication 15-T percentage method, Worksheet 1A (2024, 2025 and 2026 single-filer schedules bundled). FICA per FICA at 6.2% / 1.45% / 0.9% Additional.";
   inputRegion.appendChild(makeNotice(TAX_LAW_NOTICE));
   const ficaTerm = document.createElement("span"); ficaTerm.textContent = "FICA"; inputRegion.appendChild(ficaTerm); attachGlossaryTooltip(ficaTerm, "FICA");
   const gross = makeNumber("Gross wages this period (USD)", "pw-g", { step: "any", min: "0" });
@@ -940,8 +954,13 @@ function renderPayroll(inputRegion, outputRegion, citationEl) {
   ]);
   freq.select.value = "biweekly";
   const fs = makeSelect("Filing status", "pw-fs", [{ value: "single", label: "Single (illustrative)" }]);
+  // Until 2026-09-19 the page had no year, so every payroll ran on 2025
+  // brackets and the 2025 Social Security wage base.
+  const yr = makeSelect("Tax year", "pw-yr", [
+    { value: "2026", label: "2026", selected: true }, { value: "2025", label: "2025" }, { value: "2024", label: "2024" },
+  ]);
   const ytdSs = makeNumber("YTD wages subject to SS (USD)", "pw-ytd", { step: "any", min: "0" });
-  for (const f of [gross, freq, fs, ytdSs]) inputRegion.appendChild(f.wrap);
+  for (const f of [gross, freq, fs, yr, ytdSs]) inputRegion.appendChild(f.wrap);
   const fedOut = makeOutputLine(outputRegion, "Federal income tax this period", "pw-out-f");
   const ssOut = makeOutputLine(outputRegion, "Social Security this period", "pw-out-ss");
   const medOut = makeOutputLine(outputRegion, "Medicare this period", "pw-out-m");
@@ -949,7 +968,7 @@ function renderPayroll(inputRegion, outputRegion, citationEl) {
   const update = debounce(() => {
     const r = computePayrollWithholding({
       gross_per_period: Number(gross.input.value), pay_frequency: freq.select.value,
-      filing_status: fs.select.value, ytd_ss_wages: Number(ytdSs.input.value),
+      filing_status: fs.select.value, ytd_ss_wages: Number(ytdSs.input.value), tax_year: Number(yr.select.value),
     });
     if (r.error) { fedOut.textContent = r.error; ssOut.textContent = medOut.textContent = totOut.textContent = ""; return; }
     fedOut.textContent = "$" + fmt(r.fed_income_tax_period, 2);
@@ -957,9 +976,9 @@ function renderPayroll(inputRegion, outputRegion, citationEl) {
     medOut.textContent = "$" + fmt(r.medicare_period, 2);
     totOut.textContent = "$" + fmt(r.total_employee_period, 2);
   }, DEBOUNCE_MS);
-  for (const el of [gross.input, freq.select, fs.select, ytdSs.input]) el.addEventListener("input", update);
+  for (const el of [gross.input, freq.select, fs.select, yr.select, ytdSs.input]) el.addEventListener("input", update);
   attachExampleButton(inputRegion, () => {
-    gross.input.value = 1500; freq.select.value = "biweekly"; ytdSs.input.value = 0; update();
+    gross.input.value = 1500; freq.select.value = "biweekly"; yr.select.value = "2025"; ytdSs.input.value = 0; update();
   });
 }
 

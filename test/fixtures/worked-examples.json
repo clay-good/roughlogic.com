@@ -6442,13 +6442,13 @@
      }
     },
     "derate_factor": {
-     "value": 0.9789,
+     "value": 0.97842,
      "tolerance": {
       "pct": 0.5
      }
     },
     "nema_hp_derate_pct": {
-     "value": 2.1053,
+     "value": 2.1579,
      "tolerance": {
       "pct": 0.5
      }
@@ -86484,13 +86484,13 @@
    },
    "outputs": {
     "equivalent_load_lbf": {
-     "value": 1310,
+     "value": 1304.23,
      "tolerance": {
       "pct": 0.5
      }
     },
     "e_ratio": {
-     "value": 0.29,
+     "value": 0.29231,
      "tolerance": {
       "pct": 1
      }

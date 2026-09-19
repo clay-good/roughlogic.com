@@ -1193,6 +1193,11 @@ export const WATER_DENSITY_F = [
   { F: 40, rho: 62.43 }, { F: 60, rho: 62.37 }, { F: 80, rho: 62.22 }, { F: 100, rho: 62.00 },
   { F: 120, rho: 61.71 }, { F: 140, rho: 61.39 }, { F: 160, rho: 61.01 }, { F: 180, rho: 60.57 },
   { F: 200, rho: 60.13 }, { F: 220, rho: 59.63 }, { F: 240, rho: 59.10 },
+  // Steam-table saturated-liquid specific volumes: 0.01700 / 0.01708 /
+  // 0.01717 / 0.01726 / 0.01745 ft^3/lb at 250 / 260 / 270 / 280 / 300 F.
+  // Until 2026-09-19 the table stopped at 240 F and held 59.10 above it,
+  // undersizing a 270 F system's tank by 22%.
+  { F: 250, rho: 58.82 }, { F: 260, rho: 58.55 }, { F: 270, rho: 58.24 }, { F: 280, rho: 57.94 }, { F: 300, rho: 57.31 },
 ];
 
 function rhoAt(F) {
@@ -1214,6 +1219,7 @@ export function computeExpansionTank({ system_volume_gal = 0, fill_temperature_F
   fill_pressure_psi = Number(fill_pressure_psi);
   if (!(system_volume_gal > 0)) return { error: "System volume must be positive." };
   if (!(max_temperature_F > fill_temperature_F)) return { error: "Max temperature must exceed fill temperature." };
+  if (Number(max_temperature_F) > 300) return { error: "Maximum temperature above 300 F is past the bundled water-density table; size the tank from the manufacturer's high-temperature data." };
   if (!(relief_pressure_psi > fill_pressure_psi)) return { error: "Relief pressure must exceed fill pressure." };
   const rho_cold = rhoAt(fill_temperature_F);
   const rho_hot = rhoAt(max_temperature_F);
@@ -2356,7 +2362,7 @@ export const WATER_DENSITY_LB_FT3 = [
   { F: 40, rho: 62.42 }, { F: 50, rho: 62.41 }, { F: 60, rho: 62.37 },
   { F: 70, rho: 62.30 }, { F: 80, rho: 62.22 }, { F: 100, rho: 62.00 },
   { F: 120, rho: 61.71 }, { F: 140, rho: 61.38 }, { F: 160, rho: 61.00 },
-  { F: 180, rho: 60.57 },
+  { F: 180, rho: 60.57 }, { F: 200, rho: 60.13 }, { F: 212, rho: 59.81 },
 ];
 
 // Standard diaphragm potable-expansion-tank acceptance volumes (gal).
@@ -2397,6 +2403,9 @@ export function computeWhExpansionTank({
   const delta_T_F = Ts - Ti;
   if (!(delta_T_F > 0)) return { error: "Set-point temperature must exceed incoming temperature." };
 
+  // Until 2026-09-19 the density table stopped at 180 F and held it above,
+  // understating a 200 F set-point's expansion by 20%.
+  if (Ts > 212) return { error: "Set-point above 212 F is outside a water heater's range and the bundled density table." };
   const rho_cold = _v16p_waterDensity(Ti);
   const rho_hot = _v16p_waterDensity(Ts);
   const expansion_factor = (rho_cold - rho_hot) / rho_hot;

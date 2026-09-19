@@ -179,7 +179,7 @@
     },
     "pdp": {
       "group": "calc-fire.js (Group F)",
-      "stamp": "Citation: per NFPA 13-2022 §8.3 (pressure calculations). PDP = nozzle pressure + friction loss + elevation + appliance loss. Elevation applies the NFA / IFSTA fire-ground shortcut of 0.5 psi/ft, NOT the exact 0.434 psi/ft water column -- it runs about 15% high by design; the elevation-pressure-loss tile shows both side by side. AHJ governs. Free at nfpa.org/freeaccess."
+      "stamp": "Citation: per fire-service pump operations practice (NFPA 1002 driver/operator by name; IFSTA Pumping Apparatus). PDP = nozzle pressure + friction loss + elevation + appliance loss. Elevation applies the NFA / IFSTA fire-ground shortcut of 0.5 psi/ft, NOT the exact 0.434 psi/ft water column -- it runs about 15% high by design; the elevation-pressure-loss tile shows both side by side. AHJ governs. Free at nfpa.org/freeaccess."
     },
     "periodic-element": {
       "group": "calc-edu.js (Group Y, v12 §9)",
@@ -251,7 +251,7 @@
     },
     "sprinkler-density": {
       "group": "calc-fire.js (Group F)",
-      "stamp": "Citation: per NFPA 13-2022 Table 12.1 (hazard density). total_gpm = area * density (gpm/ft^2). AHJ governs. Free at nfpa.org/freeaccess."
+      "stamp": "Citation: per NFPA 13 Chapter 19 (density/area design approach; Chapter 11 before the 2019 edition). total_gpm = area * density (gpm/ft^2). AHJ governs. Free at nfpa.org/freeaccess."
     },
     "stairs": {
       "group": "calc-construction.js (Group E)",

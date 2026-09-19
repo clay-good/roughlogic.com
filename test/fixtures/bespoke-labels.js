@@ -613,7 +613,7 @@ export const BESPOKE_LABELS = {
   "paraboloid-volume": {"base_diameter_ft":"Base (rim) diameter (ft)","height_ft":"Height, rim to apex (ft)","fill_depth_ft":"Fill depth from the apex (ft, optional)"},
   "parallel-conductor-derate": {"i_single_A":"Single-conductor ampacity (A)","n_sets":"Number of parallel sets","total_ccc":"Total current-carrying conductors in raceway (>3 for derate)","ambient_factor":"Ambient-correction factor (0-1)","i_load_A":"Total load current (A, optional)","conductor_size":"Conductor size (AWG / kcmil, 1/0+)"},
   "particle-settling-velocity": {"particle_diameter_mm":"Particle diameter (mm)","particle_sg":"Particle specific gravity","water_temp_f":"Water temperature (°F)"},
-  "payroll-withholding": {"gross_per_period":"Gross wages this period (USD)","pay_frequency":"Pay frequency","filing_status":"Filing status","ytd_ss_wages":"YTD wages subject to SS (USD)"},
+  "payroll-withholding": {"gross_per_period":"Gross wages this period (USD)","pay_frequency":"Pay frequency","filing_status":"Filing status","tax_year":"Tax year","ytd_ss_wages":"YTD wages subject to SS (USD)"},
   "pcr-master-mix": {"number_of_reactions":"Number of reactions","components":"Components (name,uL_per_reaction per line)","fudge_factor_pct":"Fudge factor (%)"},
   "pdp": {"nozzle_pressure_psi":"Nozzle pressure (psi)","friction_loss_psi":"Total friction loss (psi)","elevation_ft":"Elevation change (ft up positive)","appliance_loss_psi":"Appliance loss (psi)"},
   "pearson-correlation": {"x_values":"X values (comma or whitespace separated)","y_values":"Y values (same count, paired with X)","alpha":"Significance level (alpha)"},

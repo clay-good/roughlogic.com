@@ -1576,6 +1576,10 @@ const H_ATM_AT_ELEVATION_FT = (elevation_ft) => {
 const VAPOR_PRESSURE_F_PSI = [
   { F: 60, psi: 0.256 }, { F: 80, psi: 0.507 }, { F: 100, psi: 0.949 }, { F: 120, psi: 1.692 },
   { F: 140, psi: 2.889 }, { F: 160, psi: 4.741 }, { F: 180, psi: 7.510 }, { F: 200, psi: 11.526 }, { F: 212, psi: 14.696 },
+  // Steam-table saturation pressures above the atmospheric boiling point.
+  // Until 2026-09-19 the table stopped at 212 F and held 14.696 psia, so a
+  // 230 F suction was credited 14 ft of NPSHa it does not have.
+  { F: 230, psi: 20.78 }, { F: 250, psi: 29.82 }, { F: 280, psi: 49.20 }, { F: 300, psi: 67.01 },
 ];
 
 function vaporPressureFt(F) {
@@ -1606,6 +1610,7 @@ export function computeNPSHa({
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   source_elevation_relative_ft = Number(source_elevation_relative_ft); friction_loss_ft = Number(friction_loss_ft);
   if (!(water_temp_F >= 32)) return { error: "Water temperature must be at or above 32 F." };
+  if (water_temp_F > 300) return { error: "Water temperature above 300 F is past the bundled vapor-pressure table." };
   if (friction_loss_ft < 0) return { error: "Friction loss cannot be negative." };
   const H_atm = H_ATM_AT_ELEVATION_FT(elevation_ft);
   const H_vapor = vaporPressureFt(water_temp_F);

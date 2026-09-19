@@ -121,17 +121,17 @@ test("B.3 combustion-air cites IMC 2021 §304", async () => {
 
 // --- Fire (spec §B.4) ---
 
-test("B.4 sprinkler-density cites NFPA 13-2022 Table 12.1", async () => {
+test("B.4 sprinkler-density cites NFPA 13 Chapter 19", async () => {
   const t = await readCalc("calc-fire.js");
-  assertCitationContains(t, ["NFPA 13-2022 Table 12.1", "nfpa.org/freeaccess"], "sprinkler-density");
+  assertCitationContains(t, ["NFPA 13 Chapter 19", "nfpa.org/freeaccess"], "sprinkler-density");
 });
 test("B.4 required-fire-flow cites IFC 2021 Table B105.1", async () => {
   const t = await readCalc("calc-fire.js");
   assertCitationContains(t, ["IFC 2021 Table B105.1", "codes.iccsafe.org"], "required-fire-flow");
 });
-test("B.4 pdp cites NFPA 13-2022 §8.3", async () => {
+test("B.4 pdp cites fire-service pump practice (NFPA 1002), not NFPA 13", async () => {
   const t = await readCalc("calc-fire.js");
-  assertCitationContains(t, ["NFPA 13-2022 §8.3", "nfpa.org/freeaccess"], "pdp");
+  assertCitationContains(t, ["NFPA 1002", "IFSTA"], "pdp");
 });
 test("B.4 standpipe-friction cites NFPA 14-2022", async () => {
   const t = await readCalc("calc-fire.js");

@@ -336,7 +336,7 @@ export function renderFireFriction(inputRegion, outputRegion, citationEl) {
 //        out: { dom_side_effect: dimensionless }
 // (DOM-mount renderer; HTMLElement refs are categorical.)
 export function renderPDP(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: per NFPA 13-2022 §8.3 (pressure calculations). PDP = nozzle pressure + friction loss + elevation + appliance loss. Elevation applies the NFA / IFSTA fire-ground shortcut of 0.5 psi/ft, NOT the exact 0.434 psi/ft water column -- it runs about 15% high by design; the elevation-pressure-loss tile shows both side by side. AHJ governs. Free at nfpa.org/freeaccess.";
+  citationEl.textContent = "Citation: per fire-service pump operations practice (NFPA 1002 driver/operator by name; IFSTA Pumping Apparatus). PDP = nozzle pressure + friction loss + elevation + appliance loss. Elevation applies the NFA / IFSTA fire-ground shortcut of 0.5 psi/ft, NOT the exact 0.434 psi/ft water column -- it runs about 15% high by design; the elevation-pressure-loss tile shows both side by side. AHJ governs. Free at nfpa.org/freeaccess.";
   const NP = makeNumber("Nozzle pressure (psi)", "pdp-np", { step: "any", min: "0", value: "100" });
   NP.input.value = "100";
   const FL = makeNumber("Total friction loss (psi)", "pdp-fl", { step: "any", min: "0", value: "0" });
@@ -705,7 +705,7 @@ export function renderReverseLayFriction(inputRegion, outputRegion, citationEl) 
 //        out: { dom_side_effect: dimensionless }
 // (DOM-mount renderer; HTMLElement refs are categorical.)
 export function renderSprinklerDensity(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: per NFPA 13-2022 Table 12.1 (hazard density). total_gpm = area * density (gpm/ft^2). AHJ governs. Free at nfpa.org/freeaccess.";
+  citationEl.textContent = "Citation: per NFPA 13 Chapter 19 (density/area design approach; Chapter 11 before the 2019 edition). total_gpm = area * density (gpm/ft^2). AHJ governs. Free at nfpa.org/freeaccess.";
   const a = makeNumber("Area of operation (ft²)", "sd-a", { step: "any", min: "0" });
   const d = makeNumber("Density (gpm/ft²)", "sd-d", { step: "any", min: "0", value: "" });
   const cat = makeSelect("Hazard category (default if density blank)", "sd-c", [

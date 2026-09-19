@@ -2,7 +2,7 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "41a2971b68ef0eb7",
+      "sha": "ab673497459409ed",
       "date": "2026-09-19"
     },
     "/tools/": {
@@ -558,8 +558,8 @@
       "date": "2026-09-07"
     },
     "/tools/bearing-equivalent-load/": {
-      "sha": "0e9610018f2069cf",
-      "date": "2026-09-07"
+      "sha": "57b52693ccccd573",
+      "date": "2026-09-19"
     },
     "/tools/bearing-l10-life/": {
       "sha": "0f523b90bf1f1174",
@@ -2058,8 +2058,8 @@
       "date": "2026-09-01"
     },
     "/tools/defensible-space/": {
-      "sha": "a8bbc2a2aa1fb19d",
-      "date": "2026-09-01"
+      "sha": "ac9a9b7309e5e571",
+      "date": "2026-09-19"
     },
     "/tools/defrost-cycle-sizing/": {
       "sha": "7a94422eb1548943",
@@ -5118,7 +5118,7 @@
       "date": "2026-09-01"
     },
     "/tools/payroll-withholding/": {
-      "sha": "8ac5eac96b1d325a",
+      "sha": "029b083913d90d2e",
       "date": "2026-09-19"
     },
     "/tools/pcr-master-mix/": {
@@ -6066,8 +6066,8 @@
       "date": "2026-09-09"
     },
     "/tools/refrigerant-leak-rate/": {
-      "sha": "a91c20674475be43",
-      "date": "2026-09-01"
+      "sha": "11ccbfb1c5e2acaf",
+      "date": "2026-09-19"
     },
     "/tools/refrigerant-line-size/": {
       "sha": "fbc85b336f057a8d",
@@ -7190,8 +7190,8 @@
       "date": "2026-09-04"
     },
     "/tools/sprinkler-density/": {
-      "sha": "f48cc10315cfcb21",
-      "date": "2026-09-01"
+      "sha": "c3150a63eb619c23",
+      "date": "2026-09-19"
     },
     "/tools/sprinkler-gpm-for-precip/": {
       "sha": "3b0e74e0a1d8ee7c",
@@ -8386,8 +8386,8 @@
       "date": "2026-09-01"
     },
     "/tools/voltage-imbalance/": {
-      "sha": "b6ac68ad00825dc4",
-      "date": "2026-09-01"
+      "sha": "03f4a2fb9e3fab13",
+      "date": "2026-09-19"
     },
     "/tools/volumetric-efficiency/": {
       "sha": "329e814a07ecbd11",

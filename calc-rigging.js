@@ -230,7 +230,10 @@ RIGGING_RENDERERS["crane-ground-bearing"] = renderCraneGroundBearing;
 // still loses about 5% even at D/d = 40, so a bend never restores full straight-
 // pull strength. The previous 25 -> 1.00 endpoint over-credited retained WLL by
 // ~5% in the gentle-bend regime (the non-conservative direction).
-const DD_CURVE = [[1, 0.50], [2, 0.65], [3, 0.70], [4, 0.75], [6, 0.83], [8, 0.87], [10, 0.90], [15, 0.92], [20, 0.94], [25, 0.95]];
+// The published Wire Rope Users Manual curve, the same one sling-angle uses:
+// 75 / 79 / 83 / 86 / 89 / 91 / 93 / 95% at D/d 4 / 6 / 8 / 10 / 15 / 20 /
+// 25 / 40. Until 2026-09-19 this copy ran 3-4 points high from D/d 6 up.
+const DD_CURVE = [[1, 0.50], [2, 0.65], [3, 0.70], [4, 0.75], [6, 0.79], [8, 0.83], [10, 0.86], [15, 0.89], [20, 0.91], [25, 0.93], [40, 0.95]];
 const _ddEfficiency = (ratio) => {
   if (ratio <= DD_CURVE[0][0]) return DD_CURVE[0][1];
   if (ratio >= DD_CURVE[DD_CURVE.length - 1][0]) return DD_CURVE[DD_CURVE.length - 1][1];

@@ -11928,12 +11928,13 @@ test("bounds: calc-rigging v65 Group Z lift-planning core pins every worked exam
   assert.strictEqual(dd.ratio, 3);
   assert.ok(Math.abs(dd.efficiency - 0.70) < 1e-9);
   assert.strictEqual(dd.reduced_wll_lb, 7000);
-  assert.strictEqual(_v65d({ rated_wll_lb: 10000, bend_dia_in: 10, sling_dia_in: 1 }).reduced_wll_lb, 9000); // D/d 10
+  assert.strictEqual(_v65d({ rated_wll_lb: 10000, bend_dia_in: 10, sling_dia_in: 1 }).reduced_wll_lb, 8600); // D/d 10 (published 86%)
   assert.strictEqual(_v65d({ rated_wll_lb: 10000, bend_dia_in: 1, sling_dia_in: 1 }).reduced_wll_lb, 5000); // D/d 1
   // 2026-07-24: the D/d curve PLATEAUS at 0.95, not 1.00. A bend never restores
   // full straight-pull strength -- even D/d = 40 loses ~5% (WRTB / rigging
   // references). The old 25 -> 1.00 endpoint over-credited retained WLL ~5%.
-  assert.ok(Math.abs(_v65d({ rated_wll_lb: 10000, bend_dia_in: 25, sling_dia_in: 1 }).efficiency - 0.95) < 1e-9);
+  assert.ok(Math.abs(_v65d({ rated_wll_lb: 10000, bend_dia_in: 25, sling_dia_in: 1 }).efficiency - 0.93) < 1e-9);
+  assert.ok(Math.abs(_v65d({ rated_wll_lb: 10000, bend_dia_in: 40, sling_dia_in: 1 }).efficiency - 0.95) < 1e-9);
   assert.ok(Math.abs(_v65d({ rated_wll_lb: 10000, bend_dia_in: 400, sling_dia_in: 1 }).efficiency - 0.95) < 1e-9); // huge D/d still capped
   // Efficiency never reaches or exceeds 1.0 at any D/d (a bend always costs strength).
   for (const bd of [1, 3, 10, 20, 25, 50, 200]) {
@@ -37710,10 +37711,16 @@ test("bounds: spec-v1284 computeSpringNaturalFrequency pins the surge frequency,
 import { computeBearingEquivalentLoad as _v1285 } from "../../calc-machining.js";
 import { computeBearingL10Life as _v1285sib } from "../../calc-machining.js";
 test("bounds: spec-v1285 computeBearingEquivalentLoad pins P = X Fr + Y Fa, the ISO 281 table interpolation, the Fa=0 -> P=Fr cross-pin to bearing-l10-life, and error seams", () => {
-  // Fr 1000, Fa 500, C0 5000 deep-groove ball: Fa/C0 0.10 -> e 0.29, Y 1.5; Fa/Fr 0.5 > e -> P 1310 lbf.
+  // Fr 1000, Fa 500, C0 5000 deep-groove ball: Fa/C0 0.10, between the 0.084 (e 0.28, Y 1.55) and 0.110
+  // (e 0.30, Y 1.45) rows -> e 0.2923, Y 1.4885; Fa/Fr 0.5 > e -> P = 560 + 744.2 = 1304.2 lbf.
   const r = _v1285({ radial_load_lbf: 1000, thrust_load_lbf: 500, static_rating_lbf: 5000 });
-  assert.ok(Math.abs(r.equivalent_load_lbf - 1310) < 1.0);
-  assert.ok(Math.abs(r.e_ratio - 0.29) < 1e-3 && Math.abs(r.y_factor - 1.5) < 1e-3 && r.x_factor === 0.56);
+  assert.ok(Math.abs(r.equivalent_load_lbf - 1304.23) < 0.05);
+  assert.ok(Math.abs(r.e_ratio - 0.29231) < 1e-4 && Math.abs(r.y_factor - 1.48846) < 1e-4 && r.x_factor === 0.56);
+  // The published first row: Fa/C0 0.014 -> e 0.19, Y 2.30 (thrust governs once Fa/Fr > 0.19).
+  const light = _v1285({ radial_load_lbf: 1000, thrust_load_lbf: 70, static_rating_lbf: 5000 });
+  assert.ok(Math.abs(light.e_ratio - 0.19) < 1e-9);
+  const lightThrust = _v1285({ radial_load_lbf: 300, thrust_load_lbf: 70, static_rating_lbf: 5000 });
+  assert.ok(Math.abs(lightThrust.y_factor - 2.30) < 1e-9 && Math.abs(lightThrust.equivalent_load_lbf - (0.56 * 300 + 2.30 * 70)) < 1e-9);
   assert.ok(r.thrust_governs === true);
   // Fa = 0 gives P = Fr exactly, the input the bearing-l10-life example (P=1000) feeds in for its 1,190 hr result.
   const noThrust = _v1285({ radial_load_lbf: 1000, thrust_load_lbf: 0, static_rating_lbf: 5000 });

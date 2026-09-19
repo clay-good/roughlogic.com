@@ -308,13 +308,13 @@ test("Voltage imbalance: average correct", () => {
   assert.ok(close(r.average_V, 470));
 });
 
-test("Voltage imbalance: derate at 2% imbalance = 0.96 (NEMA MG-1 table, 4% HP derate)", () => {
-  // derate_factor = 1 - NEMA-HP-derate/100; the 2% table row is 4% -> 0.96.
+test("Voltage imbalance: derate at 2% imbalance = 0.95 (NEMA MG-1 table, 5% HP derate)", () => {
+  // derate_factor = 1 - NEMA-HP-derate/100; the 2% MG-1 row is 5% -> 0.95, as motor-unbalance-derate reads.
   const v_avg = 470;
   // Want max deviation = 0.02 * 470 = 9.4 -> set V_a = v_avg + 9.4
   const r = computeVoltageImbalance({ V_a: 479.4, V_b: 470, V_c: 460.6 });
   assert.ok(Math.abs(r.imbalance_percent - 2.0) < 0.05);
-  assert.ok(Math.abs(r.derate_factor - 0.96) < 0.002);
+  assert.ok(Math.abs(r.derate_factor - 0.95) < 0.002);
 });
 
 test("Voltage imbalance: zero voltage returns error", () => {

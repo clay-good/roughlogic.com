@@ -849,9 +849,14 @@ MACHINING_RENDERERS["bearing-max-load"] = renderBearingMaxLoad;
 // the e-ratio the pure radial load governs (X = 1, Y = 0, P = Fr); above it X = 0.56 and Y applies. With Fa = 0 the
 // result is exactly P = Fr, chaining cleanly into bearing-l10-life.
 // ISO 281 single-row deep-groove ball table: rows of [Fa/C0, e, Y] (X = 0.56 for Fa/Fr > e).
+// The full published rows (Shigley Table 11-1 / ISO 281). Until 2026-09-19
+// six rounded rows starting at 0.025 were carried, so a light thrust
+// (Fa/C0 = 0.014) read e 0.22 / Y 2.0 instead of 0.19 / 2.30 -- P 7% low
+// and L10 about 25% long.
 const BEARING_XY_TABLE = [
-  [0.025, 0.22, 2.0], [0.04, 0.24, 1.8], [0.07, 0.27, 1.6],
-  [0.13, 0.31, 1.4], [0.25, 0.37, 1.2], [0.50, 0.44, 1.0],
+  [0.014, 0.19, 2.30], [0.021, 0.21, 2.15], [0.028, 0.22, 1.99], [0.042, 0.24, 1.85],
+  [0.056, 0.26, 1.71], [0.070, 0.27, 1.63], [0.084, 0.28, 1.55], [0.110, 0.30, 1.45],
+  [0.17, 0.34, 1.31], [0.28, 0.38, 1.15], [0.42, 0.42, 1.04], [0.56, 0.44, 1.00],
 ];
 // dims: in { radial_load_lbf: M L T^-2, thrust_load_lbf: M L T^-2, static_rating_lbf: M L T^-2 } out: { equivalent_load_lbf: M L T^-2, e_ratio: dimensionless, x_factor: dimensionless, y_factor: dimensionless }
 export function computeBearingEquivalentLoad({ radial_load_lbf = 0, thrust_load_lbf = 0, static_rating_lbf = 0 } = {}) {

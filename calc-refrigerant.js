@@ -337,7 +337,11 @@ export const REFRIGERANT_PT_TABLES_v7 = {
 function _interpRefSatT(refrigerant, psia) {
   const tbl = REFRIGERANT_PT_TABLES_v7[refrigerant];
   if (!tbl) return null;
-  if (psia <= tbl[0].psia) return tbl[0].T_F;
+  // Outside the bundled rows the answer is NaN, not the end row: R-454B's
+  // table ends at 350 psia, and until 2026-09-19 a 400 psig liquid line read
+  // 108 F saturation, flipping a high subcooling to "low" (add charge).
+  if (psia < tbl[0].psia || psia > tbl[tbl.length - 1].psia) return NaN;
+  if (psia === tbl[0].psia) return tbl[0].T_F;
   for (let i = 1; i < tbl.length; i++) {
     if (psia <= tbl[i].psia) {
       const lo = tbl[i - 1], hi = tbl[i];
@@ -345,7 +349,7 @@ function _interpRefSatT(refrigerant, psia) {
       return lo.T_F + f * (hi.T_F - lo.T_F);
     }
   }
-  return tbl[tbl.length - 1].T_F;
+  return NaN;
 }
 
 // dims: in { refrigerant: dimensionless, suction_pressure: M L^-1 T^-2, suction_unit: dimensionless, suction_line_temp_F: T, liquid_pressure: M L^-1 T^-2, liquid_unit: dimensionless, liquid_line_temp_F: T } out: { target_subcool_F: T, target_superheat_F: T }
@@ -361,6 +365,10 @@ export function computeRefrigerantCharging({
   const liquid_psia = liquid_unit === "psig" ? liquid_pressure + 14.696 : liquid_pressure;
   const T_sat_suction = _interpRefSatT(refrigerant, suction_psia);
   const T_sat_liquid = _interpRefSatT(refrigerant, liquid_psia);
+  if (!Number.isFinite(T_sat_suction) || !Number.isFinite(T_sat_liquid)) {
+    const t = REFRIGERANT_PT_TABLES_v7[refrigerant];
+    return { error: "A pressure is outside the bundled " + String(refrigerant).replace("_", "-") + " saturation table (" + t[0].psia + " to " + t[t.length - 1].psia + " psia); read the manufacturer's P-T chart." };
+  }
   const superheat_F = Number(suction_line_temp_F) - T_sat_suction;
   const subcool_F = T_sat_liquid - Number(liquid_line_temp_F);
   const superheat_flag = superheat_F < 8 ? "low" : superheat_F > 12 ? "high" : "in-range";
@@ -1374,7 +1382,7 @@ export function computeRefrigerantLeakRate({ full_charge_lb = 0, pounds_added_lb
     pounds_over_lb,
     exceeded,
     verdict,
-    note: "The annualized refrigerant leak rate that decides whether a repair clock has started. The rule is simple arithmetic with real teeth: for an appliance containing 50 pounds or more of refrigerant, the owner or operator tracks refrigerant added, annualizes it against the FULL CHARGE -- the amount the system is designed to hold, not what happens to be in it -- and compares the result against the threshold for that appliance type, which differs by category, with commercial and industrial process refrigeration at higher percentages than comfort cooling. Two details cause most of the errors. Full charge must be established and documented, and a system whose full charge has never been recorded cannot compute a compliant leak rate at all. And the calculation ANNUALIZES, so adding refrigerant twice in three months is a much higher annual rate than the same pounds spread over a year, and the shorter the window the more it magnifies. A 200 lb system with 34 lb added over twelve months is at 17.0%: over a 10% threshold by 14 lb, and comfortably under a 20% one. The same 34 pounds is a violation on one appliance type and unremarkable on another, which is why identifying the category correctly is the first step and not a formality -- and if those 34 pounds went in over six months instead, the annualized rate is 34% and the system is over even the higher threshold, with nothing about the leak having changed. Exceeding the threshold starts a clock: repairs within a set number of days, verification tests, and a retrofit or retirement plan if the leak cannot be repaired. A compliance screen; 40 CFR Part 82 Subpart F in full, the appliance's own category and threshold, and the service records govern.",
+    note: "The annualized refrigerant leak rate that decides whether a repair clock has started. The rule is simple arithmetic with real teeth: for an appliance containing 50 pounds or more of an ozone-depleting refrigerant (40 CFR 82 Subpart F) -- or, from January 1, 2026, 15 pounds or more of an HFC or HFC blend with a GWP above 53 (EPA's AIM Act rule, 40 CFR 84 Subpart C), which takes in most R-410A and R-454B equipment -- the owner or operator tracks refrigerant added, annualizes it against the FULL CHARGE -- the amount the system is designed to hold, not what happens to be in it -- and compares the result against the threshold for that appliance type, which differs by category, with commercial and industrial process refrigeration at higher percentages than comfort cooling. Two details cause most of the errors. Full charge must be established and documented, and a system whose full charge has never been recorded cannot compute a compliant leak rate at all. And the calculation ANNUALIZES, so adding refrigerant twice in three months is a much higher annual rate than the same pounds spread over a year, and the shorter the window the more it magnifies. A 200 lb system with 34 lb added over twelve months is at 17.0%: over a 10% threshold by 14 lb, and comfortably under a 20% one. The same 34 pounds is a violation on one appliance type and unremarkable on another, which is why identifying the category correctly is the first step and not a formality -- and if those 34 pounds went in over six months instead, the annualized rate is 34% and the system is over even the higher threshold, with nothing about the leak having changed. Exceeding the threshold starts a clock: repairs within a set number of days, verification tests, and a retrofit or retirement plan if the leak cannot be repaired. A compliance screen; 40 CFR Part 82 Subpart F in full, the appliance's own category and threshold, and the service records govern.",
   };
 }
 
@@ -1475,6 +1483,7 @@ export function computeHeadPressureControl({ refrigerant = "R_410A", evaporator_
   // DIFFERENCE across itself, so the minimum head is built up from the bottom.
   const min_head_psig = evaporator_psig + valve_dp_psi + line_losses_psi;
   const min_condensing_f = _interpRefSatT(refrigerant, min_head_psig + 14.7);
+  if (!Number.isFinite(min_condensing_f)) return { error: "The minimum head pressure is outside the bundled saturation table for this refrigerant." };
   const flooding_charge_lb = condenser_volume_cf * flooded_fraction * liquid_density_pcf;
   const winter_charge_lb = summer_charge_lb + flooding_charge_lb;
   const receiver_ok = receiver_capacity_lb >= flooding_charge_lb;

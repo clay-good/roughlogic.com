@@ -4396,11 +4396,11 @@ export const CITATIONS = {
     assumptions: [],
   },
   "defensible-space": {
-    formula: "(reference page; no compute) Zone 0 / 1 / 2 wildland-urban-interface defensible-space actions per CALFIRE 2022 guidance and NFPA 1144 (Standard for Reducing Structure Ignition Hazards from Wildland Fire).",
-    edition: "CALFIRE 2022 'Defensible Space' guidance by name; NFPA 1144 by name. IBHS Wildfire Prepared Home program by name.",
-    freeAccess: "CALFIRE guidance free at readyforwildfire.org. NFPA 1144: " + NFPA54_FREE + " IBHS guides free at ibhs.org.",
+    formula: "(reference page; no compute) Zone 0 / 1 / 2 wildland-urban-interface defensible-space actions per CALFIRE 2022 guidance and NFPA 1140 (Standard for Wildland Fire Protection, 2022), which absorbed NFPA 1144 (Reducing Structure Ignition Hazards from Wildland Fire).",
+    edition: "CALFIRE 2022 'Defensible Space' guidance by name; NFPA 1140 (formerly 1144) by name. IBHS Wildfire Prepared Home program by name.",
+    freeAccess: "CALFIRE guidance free at readyforwildfire.org. NFPA 1140: " + NFPA54_FREE + " IBHS guides free at ibhs.org.",
     governance: GOVERNANCE.fire,
-    editionNote: "Editions available: CALFIRE 2022 (Zone 0 / Ember-Resistant Zone added 2020), NFPA 1144-2023. Verify the current edition adopted by your state forestry agency / AHJ.",
+    editionNote: "Editions available: CALFIRE 2022 (Zone 0 / Ember-Resistant Zone added 2020), NFPA 1140-2022 (NFPA 1144 was withdrawn into it; there is no 1144-2023). Verify the current edition adopted by your state forestry agency / AHJ.",
     assumptions: [],
   },
   "storm-shelter": {
@@ -4831,7 +4831,7 @@ export const CITATIONS = {
     edition: AWC_NDS + " Chapter 12 (dowel-type fastener withdrawal).",
     freeAccess: "Free at awc.org/codes-standards.",
     governance: GOVERNANCE.structural,
-    editionNote: "Editions available: AWC NDS-2018 is the current published edition.",
+    editionNote: "Editions available: AWC NDS-2024 is the current published edition (the one the 2024 IBC references); the withdrawal, bearing and C_V relations used here carry over from NDS-2018.",
     assumptions: [
       { name: "Specific gravity table", value: "data/construction/lumber-properties.json keyed to species", source: "AWC NDS-2018" },
     ],
@@ -6265,13 +6265,13 @@ export const CITATIONS = {
     ],
   },
   "sprinkler-density": {
-    formula: "Total demand GPM = density (gpm/ft²) × area_of_operation (ft²) + hose-stream allowance per NFPA 13 §11.2 hydraulic calculations.",
-    edition: "NFPA 13 (2022) §11.2 (Hydraulic Calculation Procedures) by name and section.",
+    formula: "Total demand GPM = density (gpm/ft²) × area_of_operation (ft²) + hose-stream allowance per the NFPA 13 density/area design approach (Chapter 19 since the 2019 edition; §11.2 in 2013/2016).",
+    edition: "NFPA 13 (2022) Chapter 19 (design approaches: density/area curves and hose-stream allowance) by name.",
     freeAccess: "NFPA 13 read-only at nfpa.org/freeaccess.",
     governance: GOVERNANCE.fire,
-    editionNote: "Editions available: NFPA 13-2022 is the current published edition. Earlier editions (2019 / 2016 / 2013) shift area-of-operation curves slightly; verify the edition adopted by your AHJ.",
+    editionNote: "Editions available: NFPA 13-2025 is the current published edition; 2022 and 2019 share the Chapter 19 layout, and 2016 / 2013 carry the same approach as Chapter 11. Verify the edition adopted by your AHJ.",
     assumptions: [
-      { name: "Hose-stream allowance", value: "100 gpm light hazard / 250 gpm ordinary / 500 gpm extra hazard", source: "NFPA 13-2022 §11.2 typical" },
+      { name: "Hose-stream allowance", value: "100 gpm light hazard / 250 gpm ordinary / 500 gpm extra hazard", source: "NFPA 13 hose-stream allowance table (Chapter 19)" },
     ],
   },
   "standpipe-friction": {
@@ -7525,7 +7525,7 @@ export const CITATIONS = {
   },
   "payroll-withholding": {
     formula: "Annualize gross. Apply Pub 15-T percentage-method bracket: fed_annual = base + (annual_gross - prev) * rate. Divide by pay periods. FICA: SS = min(gross, wage_base - ytd) * 0.062. Medicare = gross * 0.0145. Additional Medicare = 0.9% above the threshold.",
-    edition: "IRS Publication 15-T, 2024 and 2025 Worksheet 1A standard schedules bundled (selected by tax year; other years read 2025). Single-filer only.",
+    edition: "IRS Publication 15-T, 2024, 2025 and 2026 Worksheet 1A standard schedules bundled (selected by tax year; other years read 2025). Single-filer only.",
     freeAccess: "Free at irs.gov/publications/p15t.",
     governance: GOVERNANCE.tax,
     editionNote: "Single-filer brackets bundled; MFJ / HoH and the 2020+ W-4 step-2 path are out of scope for the v5 starter (illustrative). The edition names the year the shard carries (data/accounting/pub-15-t-tables.json declares \"2025\") rather than saying \"current year\", which it said until 2026-09-02 -- a bundled bracket table cannot promise it is this year's.",
@@ -14848,7 +14848,7 @@ export const CITATIONS = {
   },
   "refrigerant-leak-rate": {
     formula: "leak_rate_pct = pounds_added_lb / full_charge_lb x (12 / period_months) x 100; allowed_lb = threshold_pct / 100 x full_charge_lb x (period_months / 12); exceeded when the annualized rate is above the threshold.",
-    edition: "The annualized leak-rate calculation of 40 CFR Part 82 Subpart F -- pounds added divided by the FULL CHARGE, annualized over the period, against the threshold for the appliance type -- cited by part and not reproduced. The thresholds differ by appliance category and are entered rather than bundled. 40 CFR Part 82 in full, the appliance's category, and the service records govern.",
+    edition: "The annualized leak-rate calculation of 40 CFR Part 82 Subpart F (ozone-depleting refrigerants, 50 lb and up) and, from January 1, 2026, 40 CFR Part 84 Subpart C (HFCs with GWP above 53, 15 lb and up) -- pounds added divided by the FULL CHARGE, annualized over the period, against the threshold for the appliance type -- cited by part and not reproduced. The thresholds differ by appliance category and are entered rather than bundled. 40 CFR Part 82 in full, the appliance's category, and the service records govern.",
     freeAccess: "The calculation is public federal regulation stated as a relation and cited by part; the full charge, pounds added, period, and applicable threshold are the owner's own records.",
     governance: GOVERNANCE.general,
     editionNote: "The rule is simple arithmetic with real teeth. For an appliance containing fifty pounds or more of refrigerant, the owner or operator tracks refrigerant added, annualizes it against the full charge -- the amount the system is designed to hold, not what happens to be in it -- and compares the result against the threshold for that appliance type, which differs by category, with commercial and industrial process refrigeration at higher percentages than comfort cooling and other appliances. Two details cause most of the errors. Full charge must be established and documented, and a system whose full charge has never been recorded cannot compute a compliant leak rate at all, which makes the recordkeeping a precondition rather than a formality. And the calculation annualizes, so adding refrigerant twice in three months is a much higher annual rate than the same pounds spread across a year, and the shorter the window the more it magnifies -- the same pounds can be unremarkable over twelve months and a violation over six. Identifying the appliance category correctly is the first step, because the same quantity of refrigerant is a violation on one category and well inside the allowance on another. Exceeding the threshold starts a clock: leak repairs within a set number of days, verification tests, and, if the leak cannot be repaired, a retrofit or retirement plan.",

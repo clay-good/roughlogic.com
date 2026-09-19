@@ -6745,9 +6745,10 @@ test("monotonicity: computeTrussCapacity udl_max_lb_per_ft is strictly decreasin
   assert.ok(Math.abs(noLoads.safety_factor - noLoads.udl_max_lb_per_ft / 0.01) < 1e-9,
     `no-load safety = ${noLoads.safety_factor}, expected ${noLoads.udl_max_lb_per_ft / 0.01}`);
   assert.equal(noLoads.pass, true);
-  // Out-of-curve-clamp pin: span beyond last point clamps to last UDL.
+  // Past the last tabulated span the tile errors rather than holding the
+  // last row (which let total capacity RISE with span).
   const beyond = computeTrussCapacity({ truss_model: "12in_box", span_ft: 100 });
-  assert.equal(beyond.udl_max_lb_per_ft, 50); // 50 ft endpoint
+  assert.ok("error" in beyond);
   // Bounds pin: bad model / non-positive span -> error.
   const badModel = computeTrussCapacity({ truss_model: "unknown", span_ft: 30 });
   assert.ok(badModel.error, `expected error for unknown model, got ${JSON.stringify(badModel)}`);

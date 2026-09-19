@@ -1067,10 +1067,13 @@ export const generatorSizeExample = {
 // percentages so the user sees the cost in horsepower, not just an
 // abstract derate factor.
 export const NEMA_HP_DERATE_TABLE = [
+  // MG-1 derating factors 0.98 / 0.95 / 0.88 / 0.82 / 0.75, the curve
+  // motor-unbalance-derate uses. Until 2026-09-19 this copy read 4 / 9 / 14%
+  // at 2 / 3 / 4%, crediting a motor 3-4 points more than MG-1 allows.
   { imbalance_pct: 1.0, hp_derate_pct: 2,  note: "1% imbalance → ~2% HP derate" },
-  { imbalance_pct: 2.0, hp_derate_pct: 4,  note: "2% imbalance → ~4% HP derate" },
-  { imbalance_pct: 3.0, hp_derate_pct: 9,  note: "3% imbalance → ~9% HP derate" },
-  { imbalance_pct: 4.0, hp_derate_pct: 14, note: "4% imbalance → ~14% HP derate" },
+  { imbalance_pct: 2.0, hp_derate_pct: 5,  note: "2% imbalance → ~5% HP derate" },
+  { imbalance_pct: 3.0, hp_derate_pct: 12, note: "3% imbalance → ~12% HP derate" },
+  { imbalance_pct: 4.0, hp_derate_pct: 18, note: "4% imbalance → ~18% HP derate" },
   { imbalance_pct: 5.0, hp_derate_pct: 25, note: "5% imbalance → ~25% HP derate (NEMA MG-1: do NOT operate)" },
 ];
 

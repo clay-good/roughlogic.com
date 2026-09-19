@@ -87,6 +87,11 @@ export function computeTrussCapacity({ truss_model = "16in_box", span_ft = 0, po
   const curve = TRUSS_CAPACITY_CURVES[truss_model];
   if (!curve) return { error: "Unknown truss model." };
   if (!(span_ft > 0)) return { error: "Span must be positive." };
+  // Past the last tabulated span the allowable load keeps falling (bending
+  // goes roughly as 1 / L^2), so holding the last row would let total
+  // capacity RISE with span. Until 2026-09-19 it did.
+  const maxSpan = curve.points[curve.points.length - 1].span_ft;
+  if (span_ft > maxSpan) return { error: "Span exceeds the " + maxSpan + " ft the " + curve.label + " load table covers; use the manufacturer's span chart." };
   const udl_max = interpUDL(curve, span_ft);
   const total_uniform_capacity = udl_max * span_ft;
   // Convert each point load to its UDL-equivalent: a center point load on a
