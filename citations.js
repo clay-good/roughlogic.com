@@ -15008,7 +15008,7 @@ export const CITATIONS = {
     ],
   },
   "turnout-frog-lead": {
-    formula: "frog angle F = 2 arcsin(1 / (2 N)) exactly, about 1 / N in radians; separation beyond the frog = distance / N; clearance point = required separation x N; track consumed from the point of switch = entered lead + clearance point.",
+    formula: "frog angle F = 2 arcsin(1 / (2 N)) exactly, about 1 / N in radians; separation beyond the frog = track gauge (4 ft 8-1/2 in, the centerline offset at the theoretical point of frog) + distance / N; clearance point = (required separation - gauge) x N; track consumed from the point of switch = entered lead + clearance point.",
     edition: "The frog-number geometry relations, by name, with 49 CFR 213 and the railroad's standard plans named. Lead, switch point length, closure curve radius, and the other layout dimensions come from the standard plan for the specific turnout and are entered, not computed. The track owner governs.",
     freeAccess: "Trigonometry on a frog number the user states; no railroad standard plan or turnout dimension table is reproduced.",
     governance: GOVERNANCE.general,
@@ -18323,13 +18323,13 @@ export const CITATIONS = {
     ],
   },
   "air-density-correction": {
-    formula: "alt = (1 - 6.73e-6 elev)^5.258; temp = 530/(460 + T_F); DF = alt x temp; SCFM = ACFM x DF; const = 1.08 x DF; sp = rated_sp x DF.",
+    formula: "alt = (1 - 6.8754e-6 elev)^5.2559; temp = 530/(460 + T_F); DF = alt x temp; SCFM = ACFM x DF; const = 1.08 x DF; sp = rated_sp x DF.",
     edition: "The air density correction for altitude and temperature from the ASHRAE Handbook - Fundamentals, by name.",
     freeAccess: "The barometric altitude factor and the absolute-temperature density ratio are standard ASHRAE air-property relations. The fan curve and equipment ratings at the actual condition govern.",
     governance: GOVERNANCE.general,
-    editionNote: "The air density factor DF vs standard air (0.075 lb/ft^3 at 70 F sea level): the altitude factor (1 - 6.73e-6 x elev)^5.258 and the temperature factor 530/(460 + T_F), multiplied. Thinner air carries less mass per cfm, so SCFM = ACFM x DF, the 1.08 sensible constant scales to 1.08 x DF, and a sea-level-rated fan delivers rated_sp x DF of static. This returns the density factor and the corrected quantities: it assumes dry air and a standard atmosphere, and the delivered performance still must be read from the equipment's own fan curve and ratings at the actual condition. A correction factor; the appliance ratings govern.",
+    editionNote: "The air density factor DF vs standard air (0.075 lb/ft^3 at 70 F sea level): the altitude factor (1 - 6.8754e-6 x elev)^5.2559 and the temperature factor 530/(460 + T_F), multiplied. Thinner air carries less mass per cfm, so SCFM = ACFM x DF, the 1.08 sensible constant scales to 1.08 x DF, and a sea-level-rated fan delivers rated_sp x DF of static. This returns the density factor and the corrected quantities: it assumes dry air and a standard atmosphere, and the delivered performance still must be read from the equipment's own fan curve and ratings at the actual condition. A correction factor; the appliance ratings govern.",
     assumptions: [
-      { name: "Density factor", value: "DF = (1 - 6.73e-6 elev)^5.258 x 530/(460 + T_F)", source: "ASHRAE Fundamentals" },
+      { name: "Density factor", value: "DF = (1 - 6.8754e-6 elev)^5.2559 x 530/(460 + T_F)", source: "ASHRAE Fundamentals" },
       { name: "Corrections", value: "SCFM = ACFM x DF, sensible constant 1.08 x DF, fan static rated x DF", source: "ASHRAE" },
       { name: "Dry standard air", value: "dry air, standard atmosphere; verify against the equipment's fan curve", source: "scope of this tile" },
     ],
@@ -21743,7 +21743,7 @@ export const CITATIONS = {
     ],
   },
   "turbine-density-correction": {
-    formula: "the ISA barometric relation: density = reference density x 518.67 / (459.67 + degF) x (1 - 6.73e-6 x elevation) raised to 5.258; power scales LINEARLY with the density ratio below rated, and the IEC method instead scales the measured wind speed by the cube root of that ratio.",
+    formula: "the ISA barometric relation: density = reference density x 518.67 / (459.67 + degF) x (1 - 6.8754e-6 x elevation) raised to 5.2559; power scales LINEARLY with the density ratio below rated, and the IEC method instead scales the measured wind speed by the cube root of that ratio.",
     edition: "The ISA barometric density relation by name against the IEC/ISO reference of 0.0765 lb/cu ft at 59 degF and sea level, with the IEC 61400-12 cube-root wind-speed correction named. The turbine manufacturer's power curve, its stated reference conditions and correction method, and IEC 61400-12 govern.",
     freeAccess: "A density ratio from the site's own elevation and temperature; no manufacturer power curve is reproduced.",
     governance: GOVERNANCE.general,
@@ -24214,7 +24214,7 @@ export const CITATIONS = {
     edition: "A simplified model of the BACnet MS/TP master node state machine. ASHRAE Standard 135 and the controller manufacturers' documentation govern the real behaviour.",
     freeAccess: "Frame timing arithmetic.",
     governance: GOVERNANCE.general,
-    editionNote: "THE 127 MASTER ADDRESSES THE PROTOCOL PERMITS ARE A NAMING LIMIT, NOT A CAPACITY. 32 devices at 76,800 baud gives a 50 ms idle rotation and 154 ms with half the devices sending a 50 octet frame; 64 devices doubles it to 308 ms, and that is still only half the address space. A segment built to the address limit responds in the high hundreds of milliseconds before anyone adds a trend poll -- adequate for scheduled and reset sequences, not for a safety interlock, and that judgement is what the number is for. DROPPING THE BAUD RATE IS THE SAME PROBLEM FROM THE OTHER SIDE: 32 devices at 38,400 also gives 308 ms, exactly double, because every frame takes twice as long. Raising the rate is the first remedy and it is BOUNDED -- maximum cable length falls as baud rises and the bus becomes far less tolerant of stubs, missing termination and grounding faults, so on a long existing run the answer is another segment rather than another setting. TOKEN LOSS AND RECOVERY, not steady-state rotation, is what makes a marginal segment behave badly, and most MS/TP problems live in the physical layer this does not model.",
+    editionNote: "THE 127 MASTER ADDRESSES THE PROTOCOL PERMITS ARE A NAMING LIMIT, NOT A CAPACITY. 32 devices at 76,800 baud gives a 50 ms idle rotation and 154 ms with half the devices sending a 50 octet frame; 64 devices doubles it to 308 ms, and that is still only half the address space. A segment built to the address limit takes about 200 ms per token rotation at 76,800 baud and over 1.5 s at 9,600 on frame time alone, before each node's reply delay (up to 15 ms per node in ASHRAE 135) and before anyone adds a trend poll -- adequate for scheduled and reset sequences, not for a safety interlock, and that judgement is what the number is for. DROPPING THE BAUD RATE IS THE SAME PROBLEM FROM THE OTHER SIDE: 32 devices at 38,400 also gives 308 ms, exactly double, because every frame takes twice as long. Raising the rate is the first remedy and it is BOUNDED -- maximum cable length falls as baud rises and the bus becomes far less tolerant of stubs, missing termination and grounding faults, so on a long existing run the answer is another segment rather than another setting. TOKEN LOSS AND RECOVERY, not steady-state rotation, is what makes a marginal segment behave badly, and most MS/TP problems live in the physical layer this does not model.",
     assumptions: [
       { name: "Steady-state rotation", value: "no token loss, recovery timeout, or poll-for-master cycle", source: "ASHRAE Standard 135's state machine" },
       { name: "One frame per device per token", value: "Nmax_info_frames may permit more", source: "the controller's configuration" },

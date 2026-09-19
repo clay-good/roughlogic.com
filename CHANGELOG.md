@@ -6,6 +6,11 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **A turnout's clearance point sat 47 ft too far out, and two air-density tiles used a barometric constant the catalog's own psychrometrics does not.**
+  - `turnout-frog-lead` took the track centerlines to meet at the frog. At the theoretical point of frog the gauge lines cross, so the centerlines are already one gauge (4 ft 8½ in) apart. For a No. 10 frog and 13 ft centers the clearance point is about 83 ft past the frog, not 130, and anything between them was wrongly reported as fouling.
+  - `turbine-density-correction` and `air-density-correction` used (1 − 6.73e-6·z)^5.258, credited to ASHRAE. ASHRAE Fundamentals Ch. 1 Eq. 3 in feet is (1 − 6.8754e-6·z)^5.2559, the form `psychrometric` already used, and it gives the standard atmosphere's 0.832 at 5,000 ft, not 0.835.
+  - The `mstp-segment-loading` note said a full segment's token rotation runs "in the high hundreds of milliseconds". The tile's own model gives about 200 ms at 76,800 baud and 1.6 s at 9,600. The note now gives those figures and names the per-node reply delay the model leaves out.
+
 - **A dispersion screen used near-field coefficients 50 km out, a sling credited full strength around a pin, and a caged ladder was called non-compliant that OSHA still allows.**
   - `gaussian-dispersion-screen` ran Martin's under-1 km σz fit out to 50 km and dropped its additive term. It now uses both of Martin's sets, σz = c·x^d + f, which meet at 1 km. At the example, 1 km under class D reads 38.7 µg/m³, not 46.0. Class F's maximum was 66% high, and class A's was low.
   - `sling-angle` applied a D/d bend-efficiency curve 5-9 points above the published wire-rope curve, reaching 100% at D/d 25. It now follows the published curve (75% at 4, 86% at 10, 93% at 25, 95% at 40), which never reaches 100%.

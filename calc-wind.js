@@ -364,7 +364,7 @@ export function computeTurbineDensityCorrection({ elevation_ft = 0, air_temp_f =
   // uses for HVAC air, so the two calculators agree about the air at a site.
   // Its reference differs: a wind power curve is warranted at 59 degF, where
   // standard HVAC air is 70 degF.
-  const altitude_factor = Math.pow(1 - 6.73e-6 * elevation_ft, 5.258);
+  const altitude_factor = Math.pow(1 - 6.8754e-6 * elevation_ft, 5.2559);
   if (!(altitude_factor > 0)) return { error: "Elevation is outside the range this barometric relation covers." };
   const temperature_factor = _T_REF_R / (459.67 + air_temp_f);
   const site_density_pcf = reference_density_pcf * temperature_factor * altitude_factor;
@@ -391,7 +391,7 @@ export function computeTurbineDensityCorrection({ elevation_ft = 0, air_temp_f =
 }
 const turbineDensityCorrectionExample = { inputs: { elevation_ft: 5200, air_temp_f: 95, reference_density_pcf: 0.0765, measured_power_kw: 1850, curve_power_kw: 2200, wind_speed_mph: 20, alt_air_temp_f: 20 } };
 WIND_RENDERERS["turbine-density-correction"] = _simpleRenderer({
-  citation: "Citation: the ISA barometric density relation by name -- the altitude factor (1 - 6.73e-6 x elevation) raised to 5.258, times the temperature factor 518.67 / (459.67 + degF) -- against the IEC/ISO reference of 0.0765 lb/cu ft at 59 degF and sea level, with the IEC 61400-12 cube-root wind-speed correction named. Power is linear in density below rated only. The turbine manufacturer's power curve, its stated reference conditions and correction method, and IEC 61400-12 govern.",
+  citation: "Citation: the ISA barometric density relation by name -- the altitude factor (1 - 6.8754e-6 x elevation) raised to 5.2559, times the temperature factor 518.67 / (459.67 + degF) -- against the IEC/ISO reference of 0.0765 lb/cu ft at 59 degF and sea level, with the IEC 61400-12 cube-root wind-speed correction named. Power is linear in density below rated only. The turbine manufacturer's power curve, its stated reference conditions and correction method, and IEC 61400-12 govern.",
   example: turbineDensityCorrectionExample.inputs,
   fields: [
     { key: "elevation_ft", label: "Site elevation (ft)", kind: "number", default: 5200 },

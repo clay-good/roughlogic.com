@@ -20301,9 +20301,10 @@ test("bounds: spec-v348 computeGrilleFaceVelocity pins both modes, the free-area
 
 test("bounds: spec-v349 computeAirDensityCorrection pins the altitude/temperature factors and error seams", () => {
   const r = _v349({ elev_ft: 5000, T_F: 70, acfm: 1000, rated_sp: 0.5 });
-  assert.ok(Math.abs(r.alt_factor - Math.pow(1 - 6.73e-6 * 5000, 5.258)) < 1e-12);
+  // ASHRAE Fundamentals Ch. 1 Eq. 3 in feet: (1 - 6.8754e-6 z)^5.2559; 0.8321 at 5,000 ft is the standard atmosphere.
+  assert.ok(Math.abs(r.alt_factor - Math.pow(1 - 6.8754e-6 * 5000, 5.2559)) < 1e-12);
   assert.ok(Math.abs(r.temp_factor - 1.0) < 1e-9);
-  assert.ok(Math.abs(r.DF - 0.835) < 0.002);
+  assert.ok(Math.abs(r.DF - 0.832) < 0.002);
   assert.ok(Math.abs(r.SCFM - 1000 * r.DF) < 1e-9);
   assert.ok(Math.abs(r.sp_corr - 0.5 * r.DF) < 1e-9);
   // Hot air at sea level is thinner (temp factor < 1).
@@ -42189,19 +42190,20 @@ test("bounds: spec-v1545 computeTurnoutFrogGeometry pins the clearance point", (
   const r = _v1545(base);
   assert.ok(Math.abs(r.frog_angle_deg - 5.732) < 1e-3);
   assert.ok(Math.abs(r.frog_angle_min - 343.918) < 1e-2);
-  assert.ok(Math.abs(r.separation_at_distance_ft - 15.0) < 1e-9);
-  assert.ok(Math.abs(r.clearance_point_ft - 130.0) < 1e-9);
-  assert.ok(Math.abs(r.total_from_switch_point_ft - 208.0) < 1e-9);
+  // Centerlines are one gauge (4.708 ft) apart at the frog's theoretical point.
+  assert.ok(Math.abs(r.separation_at_distance_ft - (56.5 / 12 + 15.0)) < 1e-9);
+  assert.ok(Math.abs(r.clearance_point_ft - (13 - 56.5 / 12) * 10) < 1e-9);
+  assert.ok(Math.abs(r.total_from_switch_point_ft - (78 + (13 - 56.5 / 12) * 10)) < 1e-9);
   // spec-v1545's worked example reads 15 ft "short of 13 ft -- so a car
   // standing there is fouling". 15 ft is PAST 13 ft: the car is clear. The
   // verdict follows the arithmetic, and the flip is pinned on both sides.
   assert.strictEqual(r.fouls, false);
-  assert.strictEqual(_v1545({ ...base, distance_beyond_frog_ft: 120 }).fouls, true);
-  assert.strictEqual(_v1545({ ...base, distance_beyond_frog_ft: 130 }).fouls, false);
+  assert.strictEqual(_v1545({ ...base, distance_beyond_frog_ft: 80 }).fouls, true);
+  assert.strictEqual(_v1545({ ...base, distance_beyond_frog_ft: 83 }).fouls, false);
   // A number 20 is flatter, and it puts the clearance point twice as far out
   // -- which is why high-number turnouts consume so much real estate.
   const twenty = _v1545({ ...base, frog_number: 20 });
-  assert.ok(Math.abs(twenty.clearance_point_ft - 260.0) < 1e-9);
+  assert.ok(Math.abs(twenty.clearance_point_ft - 2 * r.clearance_point_ft) < 1e-9);
   assert.ok(twenty.frog_angle_deg < r.frog_angle_deg);
   assert.ok(Math.abs(twenty.frog_angle_deg - 2.866) < 1e-3);
   // The small-angle rule of thumb: the exact angle is very close to 1/N rad.
@@ -44600,14 +44602,14 @@ test("bounds: spec-v1554 computeTurbineDensityCorrection uses the ISA relation t
   const base = { elevation_ft: 5200, air_temp_f: 95, reference_density_pcf: 0.0765, measured_power_kw: 1850, curve_power_kw: 2200, wind_speed_mph: 20, alt_air_temp_f: 20 };
   const r = _v1554(base);
   // The identical ISA altitude factor `air-density-correction` uses. The spec
-  // proposed exp(-z/27,000), which gives 0.8248 here against 0.8292 -- close,
+  // proposed exp(-z/27,000), which gives 0.8248 here against 0.8258 -- close,
   // but it would have left two tiles in one catalog disagreeing about the air
   // at the same site, so the sibling's relation is used instead.
-  assert.ok(Math.abs(r.altitude_factor - Math.pow(1 - 6.73e-6 * 5200, 5.258)) < 1e-15);
-  assert.ok(Math.abs(r.altitude_factor - 0.82919) < 1e-4);
+  assert.ok(Math.abs(r.altitude_factor - Math.pow(1 - 6.8754e-6 * 5200, 5.2559)) < 1e-15);
+  assert.ok(Math.abs(r.altitude_factor - 0.82584) < 1e-4);
   assert.ok(Math.abs(r.temperature_factor - 518.67 / 554.67) < 1e-12);
-  assert.ok(Math.abs(r.site_density_pcf - 0.0593160) < 1e-6);
-  assert.ok(Math.abs(r.density_ratio - 0.775373) < 1e-5);
+  assert.ok(Math.abs(r.site_density_pcf - 0.0590766) < 1e-6);
+  assert.ok(Math.abs(r.density_ratio - 0.772243) < 1e-5);
   // At the reference condition the ratio is exactly 1 and nothing is corrected.
   const ref = _v1554({ ...base, elevation_ft: 0, air_temp_f: 59 });
   assert.ok(Math.abs(ref.density_ratio - 1) < 1e-9);
@@ -44622,7 +44624,7 @@ test("bounds: spec-v1554 computeTurbineDensityCorrection uses the ISA relation t
   // The diagnostic: 84% of the raw curve looks like a fault, 108% of the
   // corrected one is not, and the verdict follows the corrected figure.
   assert.ok(Math.abs(r.measured_of_curve_pct - 84.09) < 1e-2);
-  assert.ok(Math.abs(r.measured_of_corrected_pct - 108.45) < 1e-2);
+  assert.ok(Math.abs(r.measured_of_corrected_pct - 108.89) < 1e-2);
   assert.ok(r.performance_verdict.includes("performing correctly"));
   assert.ok(_v1554({ ...base, measured_power_kw: 1400 }).performance_verdict.includes("performance question"));
   // Season moves it as much as altitude: colder air is denser, monotonically.

@@ -401,6 +401,7 @@ RAIL_RENDERERS["ballast-section-volume"] = _simpleRenderer({
 });
 
 // ===================== spec-v1545: turnout frog number and closure geometry =====================
+const _TRACK_GAUGE_FT = 56.5 / 12; // standard gauge, 4 ft 8-1/2 in
 
 // dims: in { frog_number: dimensionless, distance_beyond_frog_ft: L, required_separation_ft: L, lead_ft: L } out: { frog_angle_deg: dimensionless, frog_angle_min: dimensionless, separation_at_distance_ft: L, clearance_point_ft: L, total_from_switch_point_ft: L }
 export function computeTurnoutFrogGeometry({ frog_number = 0, distance_beyond_frog_ft = 0, required_separation_ft = 0, lead_ft = 0 } = {}) {
@@ -411,8 +412,13 @@ export function computeTurnoutFrogGeometry({ frog_number = 0, distance_beyond_fr
   if (!(lead_ft > 0)) return { error: "Lead from the standard plan must be positive." };
   const frog_angle_deg = 2 * Math.asin(1 / (2 * frog_number)) * _DEG;
   const frog_angle_min = frog_angle_deg * 60;
-  const separation_at_distance_ft = distance_beyond_frog_ft / frog_number;
-  const clearance_point_ft = required_separation_ft * frog_number;
+  // At the frog's theoretical point the two gauge lines cross, so the track
+  // centerlines are already one gauge (4 ft 8-1/2 in) apart there and spread
+  // at 1 in N beyond it. Until 2026-09-19 the centerlines were taken to meet
+  // at the frog, which put a No. 10's 13 ft clearance point 130 ft out
+  // instead of about 83 ft.
+  const separation_at_distance_ft = _TRACK_GAUGE_FT + distance_beyond_frog_ft / frog_number;
+  const clearance_point_ft = Math.max(0, required_separation_ft - _TRACK_GAUGE_FT) * frog_number;
   const total_from_switch_point_ft = lead_ft + clearance_point_ft;
   const fouls = separation_at_distance_ft < required_separation_ft;
   return {

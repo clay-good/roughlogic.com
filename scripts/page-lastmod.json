@@ -2,7 +2,7 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "939eee51bf090b31",
+      "sha": "a062bf75cdc83a1b",
       "date": "2026-09-19"
     },
     "/tools/": {
@@ -210,8 +210,8 @@
       "date": "2026-09-07"
     },
     "/tools/air-density-correction/": {
-      "sha": "1d93924c4ac50f73",
-      "date": "2026-09-01"
+      "sha": "89f1ac5cd208c034",
+      "date": "2026-09-19"
     },
     "/tools/air-dryer-sizing/": {
       "sha": "ba0d1d4cc9514404",
@@ -4778,8 +4778,8 @@
       "date": "2026-09-01"
     },
     "/tools/mstp-segment-loading/": {
-      "sha": "84d973a70eaee50b",
-      "date": "2026-09-11"
+      "sha": "090d1abd1270eea3",
+      "date": "2026-09-19"
     },
     "/tools/mt-yoke-coil-amperage/": {
       "sha": "0cef2f7ff5a17c8c",
@@ -8154,8 +8154,8 @@
       "date": "2026-09-01"
     },
     "/tools/turbine-density-correction/": {
-      "sha": "2887c165dc2a3ef6",
-      "date": "2026-09-06"
+      "sha": "470b34496e07b8ee",
+      "date": "2026-09-19"
     },
     "/tools/turbo-max-boost-for-charge-temp/": {
       "sha": "8c5edc91abc98c0e",
@@ -8178,8 +8178,8 @@
       "date": "2026-09-01"
     },
     "/tools/turnout-frog-lead/": {
-      "sha": "de92252c83d65962",
-      "date": "2026-09-05"
+      "sha": "31a8984066921f5a",
+      "date": "2026-09-19"
     },
     "/tools/two-proportion-z-test/": {
       "sha": "9b3e6d708c882af8",

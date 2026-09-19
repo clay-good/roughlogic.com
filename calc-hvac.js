@@ -4354,7 +4354,7 @@ export function computeAirDensityCorrection({ elev_ft = 0, T_F = 70, acfm = 0, r
   const T = Number(T_F);
   if (!Number.isFinite(T)) return { error: "Enter a valid air temperature (F)." };
   if (!(460 + T > 0)) return { error: "Temperature is below absolute zero." };
-  const alt_factor = Math.pow(1 - 6.73e-6 * elev, 5.258);
+  const alt_factor = Math.pow(1 - 6.8754e-6 * elev, 5.2559);
   if (!Number.isFinite(alt_factor) || alt_factor <= 0) return { error: "Elevation is out of range." };
   const temp_factor = 530 / (460 + T);
   const DF = alt_factor * temp_factor;
@@ -4365,12 +4365,12 @@ export function computeAirDensityCorrection({ elev_ft = 0, T_F = 70, acfm = 0, r
   const sp_corr = sp_v > 0 ? sp_v * DF : null;
   return {
     alt_factor, temp_factor, DF, SCFM, const_corr, sp_corr,
-    note: "Air density factor DF vs standard air (0.075 lb/ft^3, 70 F sea level): the altitude factor (1 - 6.73e-6 x elev)^5.258 and the temperature factor 530/(460 + T), multiplied. Thinner air (high altitude or hot air) carries less mass per cfm, so SCFM = ACFM x DF, the sensible constant 1.08 scales to 1.08 x DF, and a sea-level-rated fan delivers rated_sp x DF of static. A 5,000 ft site runs about 16% thinner; 120 F rooftop air is about 9% thinner even at sea level, which is why summer rooftop capacity lags the rating. A correction factor; the fan curve and the equipment ratings at the actual condition govern.",
+    note: "Air density factor DF vs standard air (0.075 lb/ft^3, 70 F sea level): the altitude factor (1 - 6.8754e-6 x elev)^5.2559 and the temperature factor 530/(460 + T), multiplied. Thinner air (high altitude or hot air) carries less mass per cfm, so SCFM = ACFM x DF, the sensible constant 1.08 scales to 1.08 x DF, and a sea-level-rated fan delivers rated_sp x DF of static. A 5,000 ft site runs about 16% thinner; 120 F rooftop air is about 9% thinner even at sea level, which is why summer rooftop capacity lags the rating. A correction factor; the fan curve and the equipment ratings at the actual condition govern.",
   };
 }
 export const airDensityCorrectionExample = { inputs: { elev_ft: 5000, T_F: 70, acfm: 1000, rated_sp: 0.5 } };
 HVAC_RENDERERS["air-density-correction"] = _rEnv({
-  citation: "Citation: Air density correction (ASHRAE Handbook - Fundamentals): altitude factor (1 - 6.73e-6 x elev)^5.258, temperature factor 530/(460 + T_F), density factor DF = their product; SCFM = ACFM x DF, corrected sensible constant 1.08 x DF, delivered fan static = rated x DF. A correction factor; the fan curve and equipment ratings govern.",
+  citation: "Citation: Air density correction (ASHRAE Handbook - Fundamentals): altitude factor (1 - 6.8754e-6 x elev)^5.2559, temperature factor 530/(460 + T_F), density factor DF = their product; SCFM = ACFM x DF, corrected sensible constant 1.08 x DF, delivered fan static = rated x DF. A correction factor; the fan curve and equipment ratings govern.",
   example: airDensityCorrectionExample.inputs,
   fields: [
     { key: "elev_ft", label: "Site elevation (ft)", kind: "number" },

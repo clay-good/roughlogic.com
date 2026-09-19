@@ -65738,19 +65738,19 @@
    },
    "outputs": {
     "DF": {
-     "value": 0.835,
+     "value": 0.8321,
      "tolerance": {
       "pct": 0.5
      }
     },
     "SCFM": {
-     "value": 835,
+     "value": 832.05,
      "tolerance": {
       "pct": 0.5
      }
     },
     "sp_corr": {
-     "value": 0.42,
+     "value": 0.416,
      "tolerance": {
       "pct": 1
      }
@@ -94264,19 +94264,19 @@
      }
     },
     "separation_at_distance_ft": {
-     "value": 15.0,
+     "value": 19.7083,
      "tolerance": {
       "pct": 0.5
      }
     },
     "clearance_point_ft": {
-     "value": 130.0,
+     "value": 82.9167,
      "tolerance": {
       "pct": 0.5
      }
     },
     "total_from_switch_point_ft": {
-     "value": 208.0,
+     "value": 160.9167,
      "tolerance": {
       "pct": 0.5
      }
@@ -97343,37 +97343,37 @@
    },
    "outputs": {
     "site_density_pcf": {
-     "value": 0.059316,
+     "value": 0.0590766,
      "tolerance": {
       "pct": 0.5
      }
     },
     "density_ratio": {
-     "value": 0.775373,
+     "value": 0.772243,
      "tolerance": {
       "pct": 0.5
      }
     },
     "corrected_curve_power_kw": {
-     "value": 1705.82,
+     "value": 1698.93,
      "tolerance": {
       "pct": 0.5
      }
     },
     "iec_speed_factor": {
-     "value": 0.918693,
+     "value": 0.917455,
      "tolerance": {
       "pct": 0.5
      }
     },
     "iec_corrected_wind_mph": {
-     "value": 18.3739,
+     "value": 18.3491,
      "tolerance": {
       "pct": 0.5
      }
     },
     "alt_density_pcf": {
-     "value": 0.0685905,
+     "value": 0.0683136,
      "tolerance": {
       "pct": 0.5
      }
