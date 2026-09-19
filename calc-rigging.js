@@ -1407,7 +1407,17 @@ function renderCraneOutriggerReaction(inputRegion, outputRegion, citationEl) {
 RIGGING_RENDERERS["crane-outrigger-reaction"] = renderCraneOutriggerReaction;
 
 // --- spec-v554 Z: Lifting lug / padeye pin-hole check (ASME BTH-1 3-3.3) ---
-// bearing = 1.25 Fy Dp t/Nd. tension = Fu(w-Dh)t/Nd. tearout = 0.70 Fu (2t(a+Dp/2-Dh/2))/Nd.
+// bearing (3-3.3.3) = 1.25 Fy Dp t / Nd.
+// tension through the pinhole (3-3.3.1) = Cr Fu 2 t beff / (1.20 Nd), with
+//   be = (w - Dh)/2, beff = min(4t, be, be 0.6 (Fu/Fy) sqrt(Dh/be)),
+//   Cr = 1 - 0.275 sqrt(1 - Dp^2/Dh^2).
+// double-plane shear tear-out (3-3.3.1) = 0.70 Fu Av / (1.20 Nd), with
+//   Av = 2 [a' + (Dp/2)(1 - cos phi)] t, phi = 55 Dp/Dh degrees, a' = a - Dh/2
+//   the edge distance from the HOLE EDGE (this tile takes a from the center).
+// Until 2026-09-18 tension was Fu (w - Dh) t / Nd and tear-out took the full
+// Dp/2, both without the 1.20: 40-60% above BTH-1, enough to pass a lug BTH-1
+// fails (44 kip on a 1 in plate, 4 in wide, 2.06 in hole, 1.8 in edge: DCR
+// 0.98 "adequate" where tear-out gives 1.11).
 // dims: in { applied_load_kip: M L T^-2, plate_thick_in: L, hole_dia_in: L, pin_dia_in: L, edge_dist_in: L, plate_width_in: L, fy_ksi: M L^-1 T^-2, fu_ksi: M L^-1 T^-2, design_factor: dimensionless } out: { bearing_kip: M L T^-2, tension_kip: M L T^-2, tearout_kip: M L T^-2, dcr: dimensionless }
 export function computeLiftingLugDesign({ applied_load_kip, plate_thick_in, hole_dia_in, pin_dia_in, edge_dist_in, plate_width_in, fy_ksi = 36, fu_ksi = 58, design_factor = 2.0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
@@ -1424,20 +1434,27 @@ export function computeLiftingLugDesign({ applied_load_kip, plate_thick_in, hole
   if (!Number.isFinite(Fu) || Fu <= 0) return { error: "Ultimate strength must be positive (ksi)." };
   if (!Number.isFinite(Nd) || Nd < 1) return { error: "Design factor Nd must be at least 1." };
   if (w <= Dh) return { error: "Plate width must exceed the hole diameter (no net tension section)." };
+  if (!(a > Dh / 2)) return { error: "The hole-center-to-edge distance a must exceed half the hole diameter; otherwise the plate edge falls inside the hole." };
   const bearing_kip = 1.25 * Fy * Dp * t / Nd;
-  const tension_kip = Fu * (w - Dh) * t / Nd;
-  const tearout_kip = 0.70 * Fu * (2 * t * (a + Dp / 2 - Dh / 2)) / Nd;
+  const be = (w - Dh) / 2;
+  const beff = Math.min(4 * t, be, be * 0.6 * (Fu / Fy) * Math.sqrt(Dh / be));
+  const Cr = 1 - 0.275 * Math.sqrt(1 - (Dp * Dp) / (Dh * Dh));
+  const tension_kip = Cr * Fu * 2 * t * beff / (1.20 * Nd);
+  const phi_rad = (55 * Dp / Dh) * Math.PI / 180;
+  const Av = 2 * ((a - Dh / 2) + (Dp / 2) * (1 - Math.cos(phi_rad))) * t;
+  const tearout_kip = 0.70 * Fu * Av / (1.20 * Nd);
   const governing_kip = Math.min(bearing_kip, tension_kip, tearout_kip);
   const governing_mode = governing_kip === bearing_kip ? "bearing" : governing_kip === tension_kip ? "net tension" : "shear tear-out";
   const dcr = P / governing_kip;
   return {
     bearing_kip, tension_kip, tearout_kip, governing_kip, governing_mode, dcr, adequate: dcr <= 1.0,
+    beff_in: beff, Cr, Av_in2: Av,
     note: "The four modes trade off through hole placement: moving the hole from the edge cures tear-out but shrinks the net tension width, and the pin-to-hole clearance drives bearing - a lug sized for gross tension alone can tear out at the pin. The design factor Nd depends on the ASME BTH-1 design category and service class. Cheek plates and weld design are separate checks. ASME BTH-1 and the engineer of record govern.",
   };
 }
 
 function renderLiftingLugDesign(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: ASME BTH-1 Section 3-3.3 pin-connected plates (lifting lug / padeye): bearing = 1.25 Fy Dp t/Nd; net tension = Fu(w-Dh)t/Nd; double-plane shear tear-out = 0.70 Fu(2t(a+Dp/2-Dh/2))/Nd; governing = the minimum. The four modes trade off through hole placement - a lug sized for gross tension alone can tear out at the pin. Nd depends on the BTH-1 design category and service class. ASME BTH-1 and the engineer of record govern.";
+  citationEl.textContent = "Citation: ASME BTH-1 Section 3-3.3 pin-connected plates (lifting lug / padeye): bearing = 1.25 Fy Dp t/Nd; tension through the pinhole = Cr Fu 2t beff/(1.20 Nd) with beff = min(4t, be, 0.6(Fu/Fy)sqrt(Dh/be) be) and Cr = 1 - 0.275 sqrt(1 - Dp^2/Dh^2); double-plane shear = 0.70 Fu Av/(1.20 Nd) with Av = 2[a' + (Dp/2)(1 - cos phi)]t, phi = 55 Dp/Dh deg, a' measured from the hole edge; governing = the minimum. The four modes trade off through hole placement - a lug sized for gross tension alone can tear out at the pin. Nd depends on the BTH-1 design category and service class. ASME BTH-1 and the engineer of record govern.";
   const P = makeNumber("Applied load (kip)", "llg-p", { step: "any", min: "0" });
   const t = makeNumber("Plate thickness t (in)", "llg-t", { step: "any", min: "0" });
   const Dh = makeNumber("Hole diameter Dh (in)", "llg-dh", { step: "any", min: "0" });

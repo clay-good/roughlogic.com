@@ -25706,22 +25706,31 @@ import { computeLiftingLugDesign as _v554 } from "../../calc-rigging.js";
 test("bounds: spec-v554 computeLiftingLugDesign pins the three mode capacities, the governing minimum, the near-edge tear-out collapse, and error seams", () => {
   const r = _v554({ applied_load_kip: 20, plate_thick_in: 1.0, hole_dia_in: 1.06, pin_dia_in: 1.0, edge_dist_in: 2.0, plate_width_in: 4.0, fy_ksi: 36, fu_ksi: 58, design_factor: 2.0 });
   assert.ok(Math.abs(r.bearing_kip - 22.5) < 0.1); // 1.25*36*1*1/2
-  assert.ok(Math.abs(r.tension_kip - 85.3) < 0.1); // 58*(4-1.06)*1/2
-  assert.ok(Math.abs(r.tearout_kip - 80.0) < 0.2); // 0.70*58*(2*1*(2+0.5-0.53))/2
+  // BTH-1 3-3.3.1: be = 1.47, beff = min(4t, be, 0.6(Fu/Fy)sqrt(Dh/be)be) = 1.207, Cr = 0.909
+  // -> Pt = Cr Fu 2t beff/(1.20 Nd) = 53.0 kip.
+  assert.ok(Math.abs(r.tension_kip - 53.0) < 0.05);
+  // Av = 2[(2 - 0.53) + 0.5(1 - cos 51.9 deg)](1) = 3.32; Pv = 0.70 Fu Av/(1.20 Nd) = 56.2 kip.
+  assert.ok(Math.abs(r.tearout_kip - 56.21) < 0.05);
   assert.equal(r.governing_mode, "bearing"); // 22.5 is the min
   assert.ok(Math.abs(r.dcr - 0.89) < 0.01);
   assert.equal(r.adequate, true);
   // Sliding the hole to the edge collapses tear-out and it governs, failing the lug.
-  const near = _v554({ applied_load_kip: 20, plate_thick_in: 1.0, hole_dia_in: 1.06, pin_dia_in: 1.0, edge_dist_in: 0.4, plate_width_in: 4.0, fy_ksi: 36, fu_ksi: 58, design_factor: 2.0 });
-  assert.ok(Math.abs(near.tearout_kip - 15.0) < 0.1);
+  const near = _v554({ applied_load_kip: 20, plate_thick_in: 1.0, hole_dia_in: 1.06, pin_dia_in: 1.0, edge_dist_in: 0.8, plate_width_in: 4.0, fy_ksi: 36, fu_ksi: 58, design_factor: 2.0 });
+  assert.ok(Math.abs(near.tearout_kip - 15.61) < 0.05);
   assert.equal(near.governing_mode, "shear tear-out");
-  assert.ok(Math.abs(near.dcr - 1.33) < 0.01);
+  assert.ok(Math.abs(near.dcr - 1.281) < 0.005);
   assert.equal(near.adequate, false);
   // Error seams: non-finite, non-positive geometry, pin > hole, Nd < 1.
   assert.ok("error" in _v554({ applied_load_kip: Infinity, plate_thick_in: 1.0, hole_dia_in: 1.06, pin_dia_in: 1.0, edge_dist_in: 2.0, plate_width_in: 4.0 }));
   assert.ok("error" in _v554({ applied_load_kip: 20, plate_thick_in: 0, hole_dia_in: 1.06, pin_dia_in: 1.0, edge_dist_in: 2.0, plate_width_in: 4.0 }));
   assert.ok("error" in _v554({ applied_load_kip: 20, plate_thick_in: 1.0, hole_dia_in: 1.0, pin_dia_in: 1.06, edge_dist_in: 2.0, plate_width_in: 4.0 })); // pin > hole
   assert.ok("error" in _v554({ applied_load_kip: 20, plate_thick_in: 1.0, hole_dia_in: 1.06, pin_dia_in: 1.0, edge_dist_in: 0, plate_width_in: 4.0 }));
+  // An edge distance inside the hole radius is impossible geometry, not a small tear-out.
+  assert.ok("error" in _v554({ applied_load_kip: 20, plate_thick_in: 1.0, hole_dia_in: 1.06, pin_dia_in: 1.0, edge_dist_in: 0.4, plate_width_in: 4.0 }));
+  // The BTH-1 1.20 factor fails a lug the old form passed: 44 kip, 2 in pin in a 2.06 in hole, a = 1.8.
+  const tight = _v554({ applied_load_kip: 44, plate_thick_in: 1.0, hole_dia_in: 2.06, pin_dia_in: 2.0, edge_dist_in: 1.8, plate_width_in: 4.0, fy_ksi: 36, fu_ksi: 58, design_factor: 2.0 });
+  assert.equal(tight.adequate, false);
+  assert.equal(tight.governing_mode, "shear tear-out");
   assert.ok("error" in _v554({ applied_load_kip: 20, plate_thick_in: 1.0, hole_dia_in: 4.0, pin_dia_in: 1.0, edge_dist_in: 2.0, plate_width_in: 4.0 })); // w <= Dh
   assert.ok("error" in _v554({ applied_load_kip: 20, plate_thick_in: 1.0, hole_dia_in: 1.06, pin_dia_in: 1.0, edge_dist_in: 2.0, plate_width_in: 4.0, design_factor: 0.5 }));
 });
