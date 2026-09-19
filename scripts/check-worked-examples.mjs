@@ -138,10 +138,20 @@ async function main() {
   }
 
   const byTilePublisher = new Map();
+  // A row whose own provenance says the project computed it -- "machine-
+  // verified", "recomputed", or a spec-vNNN worked example -- is the project's
+  // derivation of a named method even when source_publisher names the
+  // method's authority. Tracked separately so the README cannot count it as a
+  // publisher's printed worked example.
+  const RECOMPUTED = /machine-verified|recomputed|\bspec-v\d+\b/i;
+  const derivedByTile = new Map();
   for (const row of r.rows) {
     const list = byTilePublisher.get(row.tile_id) || [];
     list.push(row.source_publisher || "");
     byTilePublisher.set(row.tile_id, list);
+    const d = derivedByTile.get(row.tile_id) || [];
+    d.push(RECOMPUTED.test([row.source_edition_or_year, row.source_section_or_page, row.source_title].join(" ")));
+    derivedByTile.set(row.tile_id, d);
   }
 
   const totalTiles = toolIds.size;
@@ -180,11 +190,28 @@ async function main() {
   for (const [tile, publishers] of byTilePublisher) {
     if (publishers.every((pub) => SELF_SOURCED.test(pub))) selfOnlyTiles.push(tile);
   }
+  // 2026-09-19: the split above still let a row that NAMES an authority but
+  // was computed by the project ("NFPA ... machine-verified") count as
+  // publisher-checked. 1,415 of 2,183 tiles were project-derived, not 790.
+  // The README now states both numbers and this gate holds each.
+  const derivedOnlyTiles = [];
+  for (const [tile, publishers] of byTilePublisher) {
+    const flags = derivedByTile.get(tile) || [];
+    if (publishers.every((pub, i) => SELF_SOURCED.test(pub) || flags[i])) derivedOnlyTiles.push(tile);
+  }
   const readme = await readFile(resolve(ROOT, "README.md"), "utf8");
-  const stated = /\b(\d[\d,]*) of them are first-principles\b/.exec(readme);
+  const statedDerived = /\b(\d[\d,]*) of them are the project's own derivation\b/.exec(readme);
+  if (!statedDerived || Number(statedDerived[1].replace(/,/g, "")) !== derivedOnlyTiles.length) {
+    errors.push(
+      "README.md must say how many tiles are checked only against the project's own derivation " +
+      "(first-principles identities plus named methods the project computed and marked machine-verified): " +
+      derivedOnlyTiles.length + " of " + totalTiles + (statedDerived ? "; it says " + statedDerived[1] : "") + ".",
+    );
+  }
+  const stated = /\b(\d[\d,]*) from first principles\b/.exec(readme);
   if (!stated) {
     errors.push(
-      "README.md does not state how many tiles have only first-principles worked " +
+      "README.md does not state how many tiles have only first-principles worked examples ('N from first principles'). " +
       "examples. The trust table calls these publisher-verified; " + selfOnlyTiles.length +
       " of " + totalTiles + " are the project showing its own work instead. Say so.",
     );

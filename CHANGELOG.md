@@ -6,6 +6,8 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **The README counted a tile as checked against a publisher when its example only named one.** The trust table said worked examples reproduce "a published worked example where the publisher prints one", and counted 790 tiles as the project's own derivation. Another 625 tiles cite an authority for the method (NFPA, ASHRAE, ACI and others), but every row's own provenance says the project computed the number ("machine-verified", "recomputed", a spec worked example). So 1,415 of 2,183 tiles are checked only against the project's own derivation, and 768 carry a row read from an outside source. `check-worked-examples` now counts both kinds and holds the README to each number; both were seeded wrong and caught.
+
 - **`ashrae-622-ventilation` took the full infiltration credit off every ventilation system.** ASHRAE 62.2 Eq. 4.2 is Qfan = Qtot − Φ·(Qinf·Aext). Φ is 1 only for a balanced system; for the common exhaust-only or supply-only system it is Qinf/Qtot. Aext is below 1 for an attached unit. A 2,000 ft², 3-bedroom exhaust-only house with a 40 cfm credit needs 72 cfm, not 50. New system-type and Aext inputs default to unbalanced and detached.
 
 - **Blowers sized to clean-water ratings, wood screws on the nail formula, and compressors at sea level everywhere.**

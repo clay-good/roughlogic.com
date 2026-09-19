@@ -578,7 +578,7 @@ async function main() {
   // check-tile-registries: the id count every full registry must hold.
   checked += checkPattern(readme, /names every registry that holds all ([\d,]+) ids/g, live.tiles, "registry id count", errors);
 
-  // NOT anchored here: the "N of them are first-principles" figure in the same
+  // NOT anchored here: the "N of them are the project's own derivation" and "N from first principles" figures in the same
   // table. `check-worked-examples` already holds that sentence to the registry,
   // and it counts tiles whose worked examples are self-sourced in EVERY row --
   // not, as a second implementation here first assumed, tiles with any such
