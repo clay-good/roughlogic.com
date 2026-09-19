@@ -63,18 +63,18 @@
     },
     {
       "file": "commodities/wheat.json",
-      "name": "USDA NASS PWHEAMTUSDM (USD/bushel)",
-      "gzip_size_bytes": 596
+      "name": "USDA NASS WHEAT - PRICE RECEIVED, MEASURED IN $ / BU (USD/bushel)",
+      "gzip_size_bytes": 625
     },
     {
       "file": "commodities/corn.json",
-      "name": "USDA NASS PMAIZMTUSDM (USD/bushel)",
-      "gzip_size_bytes": 587
+      "name": "USDA NASS CORN, GRAIN - PRICE RECEIVED, MEASURED IN $ / BU (USD/bushel)",
+      "gzip_size_bytes": 621
     },
     {
       "file": "commodities/soybeans.json",
-      "name": "USDA NASS PSOYBUSDM (USD/bushel)",
-      "gzip_size_bytes": 607
+      "name": "USDA NASS SOYBEANS - PRICE RECEIVED, MEASURED IN $ / BU (USD/bushel)",
+      "gzip_size_bytes": 644
     }
   ],
   "hashes": {
@@ -89,8 +89,8 @@
     "commodities/diesel.json": "44b74ba1c9c68d3eb834c5670d0c2c37e67aa3ca61e4e5c84d070891c37f85c6",
     "commodities/gasoline.json": "7f1c23482257297afcf28b81107cc46cd02b494830a9a3e01bf0ca442aabd1c5",
     "commodities/natural-gas.json": "3fd03e1ac5cad236199f4e9a9be3a6033e4b8e02f55170c8cd11f64971d03469",
-    "commodities/wheat.json": "fe32529e5dced891950a28e4f14cc5edd206f9b8b73b181d2aae1a6c78107809",
-    "commodities/corn.json": "6b53da6686f7e47b644ac58284202dd82df9f1eb53920cba24c4fb8fb84c6c3a",
-    "commodities/soybeans.json": "995c54be5790361684d24f587552552c72fb302d09c757475eb3247e4716815b"
+    "commodities/wheat.json": "30093535bae19680cef58fc0cc2d722b583233cacbcd21f1e248619529173848",
+    "commodities/corn.json": "8856a82c64ad80fcb393fee5e938e1c65ba9b91d6ad641647546555d342139dc",
+    "commodities/soybeans.json": "dfef8ed9df9ee67c16a97279b0fed201c912c20d5b0587ba31261b5610afbc90"
   }
 }

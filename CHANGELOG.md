@@ -6,6 +6,8 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **The grain price series cited global per-metric-ton series over data in dollars per bushel.** `historical-pricing` and its wheat, corn and soybean shards named FRED's PWHEAMTUSDM, PMAIZMTUSDM and PSOYBUSDM as USDA NASS series in USD/bushel. Those are the IMF's global prices in USD per metric ton, and no NASS series has those IDs. The modeled series are anchored in dollars per bushel, which is USDA NASS's "price received" data item. The shards, generator and citations now name those Quick Stats items (for example "WHEAT - PRICE RECEIVED, MEASURED IN $ / BU"), and the historical manifest, expected hashes and integrity anchor were restamped.
+
 - **Water mains were dosed at half the slug-method chlorine, and liquid bleach was measured on the wrong percent.** The rest of the last audit batch is reference data that had gone stale.
   - `main-disinfection-chlorine` described the AWWA C651 slug method as "about 50 mg/L held about 3 hours". C651 charges at least 100 mg/L for at least 3 hours; 50 is the floor below which the main is rechlorinated. The note and citation now state both methods as published.
   - The same tile ran a liquid's label trade percent (grams per 100 mL) through the weight formula, then told the reader to divide by specific gravity. That delivered about 15% less chlorine than the dose. A new liquid-gallons output uses the trade basis directly: 0.294 gal at the 12.5% cross-check, not 0.251.

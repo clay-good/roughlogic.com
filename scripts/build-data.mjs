@@ -1332,7 +1332,9 @@ const REEFER_BURN_DATA = {
 //   - diesel                EIA PET.EMD_EPD2D_PTE_NUS_DPG.M (US retail diesel)
 //   - gasoline              EIA PET.EMM_EPMR_PTE_NUS_DPG.M (US retail gasoline)
 //   - natural-gas           EIA NG.N3050US3.M  (US city-gate price)
-//   - wheat / corn / soy    USDA NASS / FRED PWHEAMTUSDM, PMAIZMTUSDM, PSOYBUSDM
+//   - wheat / corn / soy    USDA NASS Quick Stats "price received" data items ($/bu). Until
+//                           2026-09-19 these named FRED IMF series (WHEAT - PRICE RECEIVED, MEASURED IN $ / BU etc.), which are
+//                           GLOBAL prices in USD per METRIC TON, over data modeled in $/bushel.
 const HISTORICAL_COMMODITIES = [
   { id: "copper",           agency: "BLS PPI",   series_id: "WPU10250115",                   units: "Index 1982=100", anchor: 530.0,  drift: 0.6,  noise: [ -8, -4, -2, 1, 3, 5, 2, -1, -3, 0, 4, 6 ] },
   { id: "aluminum",         agency: "BLS PPI",   series_id: "WPU102301",                     units: "Index 1982=100", anchor: 295.0,  drift: 0.3,  noise: [ -5, -2, 1, 3, 0, -3, -1, 2, 4, -2, 0, 3 ] },
@@ -1345,9 +1347,9 @@ const HISTORICAL_COMMODITIES = [
   { id: "diesel",           agency: "EIA",       series_id: "PET.EMD_EPD2D_PTE_NUS_DPG.M",   units: "USD/gal",         anchor: 3.85,   drift: 0.005, noise: [ -0.18, -0.10, 0.04, 0.12, 0.18, 0.10, -0.05, -0.14, -0.02, 0.07, 0.13, 0.16 ] },
   { id: "gasoline",         agency: "EIA",       series_id: "PET.EMM_EPMR_PTE_NUS_DPG.M",   units: "USD/gal",         anchor: 3.40,   drift: 0.004, noise: [ -0.22, -0.12, 0.05, 0.16, 0.22, 0.14, -0.04, -0.18, -0.05, 0.06, 0.14, 0.18 ] },
   { id: "natural-gas",      agency: "EIA",       series_id: "NG.N3050US3.M",                units: "USD/Mcf",         anchor: 8.20,   drift: -0.02, noise: [ -1.4, -0.8, -0.2, 0.4, 0.8, 0.4, -0.4, -1.0, -0.4, 0.2, 0.8, 1.6 ] },
-  { id: "wheat",            agency: "USDA NASS", series_id: "PWHEAMTUSDM",                   units: "USD/bushel",      anchor: 6.20,   drift: 0.01,  noise: [ -0.45, -0.20, 0.10, 0.30, 0.50, 0.20, -0.10, -0.35, -0.05, 0.15, 0.40, 0.55 ] },
-  { id: "corn",             agency: "USDA NASS", series_id: "PMAIZMTUSDM",                   units: "USD/bushel",      anchor: 4.45,   drift: 0.005, noise: [ -0.38, -0.15, 0.05, 0.25, 0.45, 0.18, -0.08, -0.30, -0.04, 0.12, 0.32, 0.48 ] },
-  { id: "soybeans",         agency: "USDA NASS", series_id: "PSOYBUSDM",                     units: "USD/bushel",      anchor: 11.85,  drift: 0.02,  noise: [ -0.95, -0.40, 0.20, 0.65, 1.05, 0.40, -0.20, -0.75, -0.10, 0.30, 0.85, 1.15 ] },
+  { id: "wheat",            agency: "USDA NASS", series_id: "WHEAT - PRICE RECEIVED, MEASURED IN $ / BU",                   units: "USD/bushel",      anchor: 6.20,   drift: 0.01,  noise: [ -0.45, -0.20, 0.10, 0.30, 0.50, 0.20, -0.10, -0.35, -0.05, 0.15, 0.40, 0.55 ] },
+  { id: "corn",             agency: "USDA NASS", series_id: "CORN, GRAIN - PRICE RECEIVED, MEASURED IN $ / BU",                   units: "USD/bushel",      anchor: 4.45,   drift: 0.005, noise: [ -0.38, -0.15, 0.05, 0.25, 0.45, 0.18, -0.08, -0.30, -0.04, 0.12, 0.32, 0.48 ] },
+  { id: "soybeans",         agency: "USDA NASS", series_id: "SOYBEANS - PRICE RECEIVED, MEASURED IN $ / BU",                     units: "USD/bushel",      anchor: 11.85,  drift: 0.02,  noise: [ -0.95, -0.40, 0.20, 0.65, 1.05, 0.40, -0.20, -0.75, -0.10, 0.30, 0.85, 1.15 ] },
 ];
 
 const HISTORICAL_MONTHS = 36;

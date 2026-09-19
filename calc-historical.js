@@ -30,9 +30,9 @@ export const COMMODITIES = [
   { id: "diesel",         label: "Diesel #2 (retail)",         agency: "EIA",      series_id: "PET.EMD_EPD2D_PTE_NUS_DPG.M", units: "USD/gal", file: "diesel.json" },
   { id: "gasoline",       label: "Gasoline E10 (retail)",      agency: "EIA",      series_id: "PET.EMM_EPMR_PTE_NUS_DPG.M",  units: "USD/gal", file: "gasoline.json" },
   { id: "natural-gas",    label: "Natural gas (city gate)",    agency: "EIA",      series_id: "NG.N3050US3.M", units: "USD/Mcf",       file: "natural-gas.json" },
-  { id: "wheat",          label: "Wheat",                      agency: "USDA NASS",series_id: "PWHEAMTUSDM",units: "USD/bushel",      file: "wheat.json" },
-  { id: "corn",           label: "Corn",                       agency: "USDA NASS",series_id: "PMAIZMTUSDM",units: "USD/bushel",      file: "corn.json" },
-  { id: "soybeans",       label: "Soybeans",                   agency: "USDA NASS",series_id: "PSOYBUSDM",  units: "USD/bushel",      file: "soybeans.json" },
+  { id: "wheat",          label: "Wheat",                      agency: "USDA NASS",series_id: "WHEAT - PRICE RECEIVED, MEASURED IN $ / BU",units: "USD/bushel",      file: "wheat.json" },
+  { id: "corn",           label: "Corn",                       agency: "USDA NASS",series_id: "CORN, GRAIN - PRICE RECEIVED, MEASURED IN $ / BU",units: "USD/bushel",      file: "corn.json" },
+  { id: "soybeans",       label: "Soybeans",                   agency: "USDA NASS",series_id: "SOYBEANS - PRICE RECEIVED, MEASURED IN $ / BU",  units: "USD/bushel",      file: "soybeans.json" },
 ];
 
 const COMMODITY_BY_ID = Object.fromEntries(COMMODITIES.map((c) => [c.id, c]));
