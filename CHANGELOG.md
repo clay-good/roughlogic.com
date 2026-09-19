@@ -6,6 +6,31 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **Select options that shared one option's constant.** A sweep of tiles with a select input found limits or factors that belong to one option applied to all of them. **Unsafe direction:**
+  - Concrete anchor breakout used the cast-in φ 0.70 for post-installed anchors. ACI Table 17.5.3 gives 0.65 / 0.55 / 0.45 by Category 1 / 2 / 3, which are now selectable.
+  - The slab/beam minimum-thickness tiles named Table 9.3.1.1 but used only the slab row. A new `member` select adds the beam row, l/16 to l/8.
+  - Egress width gave H and I-2 occupancies the sprinklered 0.2 / 0.15 factors, which IBC 1005.3 withholds from them.
+  - The RP backflow test passed a relief valve opening at 0.5 psid and never checked the #2 check.
+  - Commercial stair guards accepted the 4-3/8 in sphere, which applies only to residential stairs.
+  - The crane power-line default gave 50 ft above 1,000 kV, where OSHA leaves the figure to the utility or a PE.
+  - Steel beam shear used φ 1.00 / Ω 1.50 with Cv1 < 1. AISC G2.1(a) limits those factors to Cv1 = 1.0.
+  - Hemispherical heads had no UG-32(f) range check.
+  - Solid-bottom cable tray now limits large cables to 90% of the width and deducts Sd, not 0.917 Sd.
+  - ISO fire flow now caps C at 8,000 / 6,000 gpm by class.
+  - The ADA water closet uses the 17 to 19 in window in an ambulatory compartment.
+  - Suspension-scaffold midrails are checked against 75 lbf.
+  - The solar EGC with no OCPD is sized from 1.25 × Isc.
+  - Single-phase transformers round to the single-phase size ladder.
+  - Fluorosilicic acid feed now accounts for its 79.2% available fluoride ion.
+  - IBC frontage gives no increase for open space under 20 ft wide.
+
+  **Safe direction:**
+  - The ground-ring GEC is capped at the ring conductor, not floored at 2 AWG.
+  - IRC stair guards now require 34 in.
+  - The NIOSH fair-coupling multiplier is 1.00 at a lift origin of 30 in or higher.
+  - Web local yielding and crippling now take separate end distances (d and d/2).
+
+  The hydrostatic-test fuel-gas label also now reads 1.5x with a 3 psig minimum, matching the math.
 - **UG-27 sphere validity limits.** The spherical shell was checked against the cylinder's t <= R/2 limit and no pressure limit at all. UG-27(d) sets t <= 0.356 R and P <= 0.665 S E for a sphere. A 740 psi sphere needing a 4.0 in wall on a 10 in radius was reported "inside the UG-27 thin-shell range"; it is now flagged outside it. Separately, dropping radiography from E = 1.00 to 0.70 costs 43% more wall, not 30%.
 - **Conduit nipple fill: the normal limit depends on conductor count.** NEC Chapter 9 Table 1 allows 53% for one conductor, 31% for two and 40% for three or more. The verdict always compared against 40%, so two conductors at 35% were called legal in any raceway.
 - **Seven more verdicts corrected against their inputs.** The lifeline note now computes the tension at half sag; it had said "roughly doubles", which is 1.36x on a deep sag. The shower-compartment and fixture-clearance examples now state the code minimums they assume. The temporary-stair "three-riser" sentence now uses the entered riser count. The tactile-sign "not the 12 in" clause is dropped when the block height is zero. The chain-hoist verdict says "at least two" lifts and prints the actual fraction below two.

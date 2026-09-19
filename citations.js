@@ -3152,13 +3152,13 @@ export const CITATIONS = {
   },
 
   "solar-egc-690-45": {
-    formula: "basis = OCPD rating > 0 ? OCPD : PV Isc; EGC = Table 250.122 size for the basis, never smaller than 14 AWG; the 250.122(B) proportional upsize does not apply (690.45).",
+    formula: "basis = OCPD rating > 0 ? OCPD : 1.25 x PV Isc; EGC = Table 250.122 size for the basis, never smaller than 14 AWG; the 250.122(B) proportional upsize does not apply (690.45).",
     edition: "The NEC 2023 690.45 equipment grounding conductors for PV systems, with Table 250.122, by name.",
     freeAccess: "The NEC is available through NFPA's free online read-only access at nfpa.org; the 690.45 and Table 250.122 provisions are in the published code.",
     governance: GOVERNANCE.general,
-    editionNote: "A PV source circuit with two or fewer source circuits often has no overcurrent device, so the EGC is sized from the PV short-circuit current, not an OCPD rating; the EGC is never smaller than 14 AWG; NEC 690.45 waives the 250.122(B) rule, so enlarging the circuit conductors for voltage drop does not require enlarging the EGC. A design aid, not the AHJ.",
+    editionNote: "A PV source circuit with two or fewer source circuits often has no overcurrent device, so the EGC is sized from an assumed device rated at the PV maximum circuit current, 1.25 x Isc, not an OCPD rating; the EGC is never smaller than 14 AWG; NEC 690.45 waives the 250.122(B) rule, so enlarging the circuit conductors for voltage drop does not require enlarging the EGC. A design aid, not the AHJ.",
     assumptions: [
-      { name: "No-OCPD sizing", value: "where there is no overcurrent device, the EGC is sized from the PV short-circuit current", source: "NEC 690.45" },
+      { name: "No-OCPD sizing", value: "where there is no overcurrent device, the EGC is sized from an assumed device rated at the PV maximum circuit current, 1.25 x Isc (690.8(A)(1))", source: "NEC 690.45" },
       { name: "14 AWG minimum", value: "the PV EGC is never smaller than 14 AWG (copper)", source: "NEC 690.45" },
       { name: "250.122(B) waived", value: "the voltage-drop proportional upsize does not apply to PV EGCs", source: "NEC 690.45" },
     ],
@@ -3491,7 +3491,7 @@ export const CITATIONS = {
   },
 
   "backflow-test-psi": {
-    formula: "RP pass: #1 check >= 5 psid AND relief opens >= 2 psid below the #1 check. DC pass: each check holds >= 1 psid tight.",
+    formula: "RP pass: #1 check >= 5 psid AND relief opens at >= 2 psid AND >= 2 psid below the #1 check AND #2 check tight >= 1 psid. DC pass: each check holds >= 1 psid tight.",
     edition: "USC FCCCHR Manual of Cross-Connection Control and AWWA C511 field-test procedure, by name.",
     freeAccess: "USC FCCCHR / AWWA published; the tester-procedure thresholds are public. The certified tester and water purveyor govern.",
     governance: GOVERNANCE.water,
@@ -13343,7 +13343,7 @@ export const CITATIONS = {
     ],
   },
   "cable-tray-fill": {
-    formula: "NEC 392.22(A): cables 4/0 and larger, sum of diameters <= tray inside width; smaller cables, sum of cross-sectional areas <= the column-2 allowable (~1.167 * width ladder/ventilated, ~0.917 * width solid bottom); mixed loads reduce the smaller-cable column-1 area by 1.2 * the sum of the 4/0-and-larger diameters (392.22(A)(1)(c), ladder/ventilated).",
+    formula: "NEC 392.22(A): cables 4/0 and larger, sum of diameters <= tray inside width (90% of it on solid bottom, 392.22(A)(3)(a)); smaller cables, sum of cross-sectional areas <= the column allowable (~1.167 * width ladder/ventilated, ~0.917 * width solid bottom); mixed loads reduce that area by 1.2 * the sum of the 4/0-and-larger diameters on ladder/ventilated (392.22(A)(1)(c)) and by the sum itself on solid bottom (Column 4).",
     edition: "Cable-tray fill per NEC Article 392.22 (the sum-of-diameters rule for cables 4/0 and larger and the cross-sectional-area allowance for smaller cables), by name.",
     freeAccess: "NEC is free to read at nfpa.org/freeaccess. Ampacity derating for tray fill (392.80) is a separate check.",
     governance: GOVERNANCE.electrical,
@@ -15872,11 +15872,11 @@ export const CITATIONS = {
     ],
   },
   "scaffold-guardrail-check": {
-    formula: "top rail passes at 38 in <= height <= 45 in; the midrail target is top rail height / 2, tested against a user-set band because the standard says approximately midway; required top rail capacity is 200 lbf for all other scaffolds and 100 lbf for single- and two-point adjustable suspension scaffolds; the 150 lbf midrail capacity applies only where the top rail requirement is 200 lbf; toeboard height >= 3.5 in.",
+    formula: "top rail passes at 38 in <= height <= 45 in; the midrail target is top rail height / 2, tested against a user-set band because the standard says approximately midway; required top rail capacity is 200 lbf for all other scaffolds and 100 lbf for single- and two-point adjustable suspension scaffolds; the midrail capacity is 150 lbf where the top rail requirement is 200 lbf and 75 lbf where it is 100 lbf; toeboard height >= 3.5 in.",
     edition: "OSHA 29 CFR 1926.451(g)(4), Subpart L - Scaffolds. A US federal regulation in the public domain, so the values are quoted directly rather than paraphrased.",
     freeAccess: "29 CFR is published in full at no cost by OSHA and the eCFR. Nothing here is licensed.",
     governance: GOVERNANCE.general,
-    editionNote: "Two features make this more than a tape-measure check. The midrail is specified by RELATION rather than by a dimension - approximately midway between the top edge of the guardrail system and the platform surface - so the target moves with the top rail. A shop standard set for a 45 in rail puts the midrail at 22.5 in, which sits 3.5 in high under a 38 in rail, and neither height is wrong on its own. Because the standard says approximately and gives no number, the tile computes the target and tests it against a band the user sets, and says plainly that the band is its own judgment rather than a code value. The second feature is that the capacities are PAIRED, not independent: 200 lbf on the top rail for scaffolds generally, 100 lbf for single-point and two-point adjustable suspension scaffolds, and 150 lbf on the midrail only where the top rail requirement is 200 - so on a suspension scaffold the 150 figure simply does not apply, and the tile returns nothing rather than inventing a requirement. On height, the range is 38 to 45 in for scaffolds manufactured or placed in service after January 1, 2000; a top edge may exceed 45 in where conditions warrant provided the system still meets every other criterion, but the standard does not allow a top edge under 36 in at all, so a low rail is not a paperwork problem. The toeboard minimum is 3.5 in measured from its top edge to the level of the walking or working surface - but WHETHER a toeboard is required is falling-object protection under 1926.451(h), which turns on whether anyone works or passes below, and that is a different determination the tile does not make. Not checked: whether guardrails are required in the first place; cross-bracing used as a top rail or midrail, which has its own height windows; gaps at ladder access, hoist areas, and end frames; the deflection limit requiring that a rail not deflect below 38 in under the test load; posts, connections, and freedom from puncture and laceration hazards; personal fall arrest where it substitutes; erection and dismantling, when guardrails are often absent by necessity; and the competent-person judgments the standard reserves. A screen, not a scaffold plan; Subpart L and the competent person govern.",
+    editionNote: "Two features make this more than a tape-measure check. The midrail is specified by RELATION rather than by a dimension - approximately midway between the top edge of the guardrail system and the platform surface - so the target moves with the top rail. A shop standard set for a 45 in rail puts the midrail at 22.5 in, which sits 3.5 in high under a 38 in rail, and neither height is wrong on its own. Because the standard says approximately and gives no number, the tile computes the target and tests it against a band the user sets, and says plainly that the band is its own judgment rather than a code value. The second feature is that the capacities are PAIRED, not independent: 200 lbf on the top rail for scaffolds generally, 100 lbf for single-point and two-point adjustable suspension scaffolds, and the midrail figure follows the top rail - 150 lbf where the top rail requirement is 200, 75 lbf where it is 100 - so a suspension scaffold midrail is checked against 75, not 150. On height, the range is 38 to 45 in for scaffolds manufactured or placed in service after January 1, 2000; a top edge may exceed 45 in where conditions warrant provided the system still meets every other criterion, but the standard does not allow a top edge under 36 in at all, so a low rail is not a paperwork problem. The toeboard minimum is 3.5 in measured from its top edge to the level of the walking or working surface - but WHETHER a toeboard is required is falling-object protection under 1926.451(h), which turns on whether anyone works or passes below, and that is a different determination the tile does not make. Not checked: whether guardrails are required in the first place; cross-bracing used as a top rail or midrail, which has its own height windows; gaps at ladder access, hoist areas, and end frames; the deflection limit requiring that a rail not deflect below 38 in under the test load; posts, connections, and freedom from puncture and laceration hazards; personal fall arrest where it substitutes; erection and dismantling, when guardrails are often absent by necessity; and the competent-person judgments the standard reserves. A screen, not a scaffold plan; Subpart L and the competent person govern.",
     assumptions: [
       { name: "Top edge height", value: "38 to 45 in for scaffolds placed in service after 2000; never under 36 in", source: "29 CFR 1926.451(g)(4)" },
       { name: "Midrail", value: "approximately midway - a moving target, tested against a user-set band", source: "29 CFR 1926.451(g)(4)" },
@@ -15997,7 +15997,7 @@ export const CITATIONS = {
     governance: GOVERNANCE.structural,
     editionNote: "Multi-edition (the AHJ-adopted IRC / IBC edition governs the guard, handrail, and infill minimums; the 200 lb concentrated load applies regardless).",
     assumptions: [
-      { name: "Thresholds", value: "guard over 30 in surface; 36 in residential / 42 in commercial height; 4 in sphere (4-3/8 in stair triangle) infill; 34-38 in handrail", source: "IRC R312 / R311.7.8 / IBC 1015" },
+      { name: "Thresholds", value: "guard over 30 in surface; 36 in residential (34 in on a stair) / 42 in commercial height; 4 in sphere infill (4-3/8 in on a residential stair); 34-38 in handrail", source: "IRC R312 / R311.7.8 / IBC 1015" },
       { name: "Load", value: "guards and handrails must also resist a 200 lb concentrated load in any direction (IRC R301.5 / IBC 1607); this tool checks dimensions only", source: "IRC R301.5" },
       { name: "AHJ governs", value: "the AHJ-adopted code and edition govern the final acceptance", source: "AHJ" },
     ],
@@ -18847,7 +18847,7 @@ export const CITATIONS = {
     governance: GOVERNANCE.general,
     editionNote: "The ACI 318-19 Table 7.3.1.1 (one-way slabs) and 9.3.1.1 (beams) minimum thickness l/20 (simply supported), l/24 (one end continuous), l/28 (both continuous), l/10 (cantilever), the (0.4 + fy/100,000) modifier for fy other than 60,000 psi, and the 1.65 - 0.005 wc lightweight factor (>= 1.09). This returns the deflection-control minimum thickness that waives an explicit deflection calculation - it applies to normalweight (unless wc is set) members not supporting or attached to partitions or construction likely to be damaged by large deflections, uses the clear span, and is not the strength (flexure/shear) design or the actual deflection of a thinner member. A design aid, not a substitute for the structural engineer of record's stamped design.",
     assumptions: [
-      { name: "Base thickness", value: "l/20, l/24, l/28, or l/10 by support condition, on the clear span", source: "ACI 318-19 Table 7.3.1.1 / 9.3.1.1" },
+      { name: "Base thickness", value: "slab l/20, l/24, l/28, or l/10 and beam l/16, l/18.5, l/21, or l/8 by support condition, on the clear span", source: "ACI 318-19 Table 7.3.1.1 / 9.3.1.1" },
       { name: "Grade modifier", value: "(0.4 + fy/100,000) for fy other than 60,000 psi", source: "ACI 318-19 Table footnote" },
       { name: "Scope", value: "members not supporting partitions likely to be damaged by deflection; not a strength design", source: "ACI 318-19 7.3.1.1" },
     ],
@@ -19150,7 +19150,7 @@ export const CITATIONS = {
     ],
   },
   "concrete-anchor-breakout": {
-    formula: "Nb = kc lambda sqrt(f'c) hef^1.5 (kc 24 cast-in, 17 post-installed); ANco = 9 hef^2; psi_ed = 0.7 + 0.3 ca1/(1.5 hef) when ca1 < 1.5 hef; Ncb = (ANc/ANco) psi_ed Nb; phiNcb = 0.70 Ncb (Condition B, no supplementary reinforcement).",
+    formula: "Nb = kc lambda sqrt(f'c) hef^1.5 (kc 24 cast-in, 17 post-installed); ANco = 9 hef^2; psi_ed = 0.7 + 0.3 ca1/(1.5 hef) when ca1 < 1.5 hef; Ncb = (ANc/ANco) psi_ed Nb; phiNcb = phi Ncb, phi 0.70 cast-in and 0.65 / 0.55 / 0.45 post-installed Category 1 / 2 / 3 (Condition B, no supplementary reinforcement).",
     edition: "The ACI 318-19 Section 17.6.2 concrete breakout strength in tension (CCD method), by name.",
     freeAccess: "ACI 318 is readable free through the ACI online reading room at concrete.org; the Chapter 17 anchoring provisions are in the published code.",
     governance: GOVERNANCE.general,

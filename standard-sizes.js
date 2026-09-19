@@ -24,6 +24,8 @@ export function roundToStandard(value, standardSizes) {
 // Common ladders ready for import.
 export const STANDARD_SIZES = {
   transformer_kVA: [15, 30, 45, 75, 112.5, 150, 225, 300, 500, 750, 1000],
+  // Single-phase standard ratings (ANSI/IEEE C57.12.00), a different ladder from three-phase.
+  transformer_kVA_1ph: [5, 10, 15, 25, 37.5, 50, 75, 100, 167, 250, 333, 500],
   breaker_amps:    [15, 20, 25, 30, 35, 40, 45, 50, 60, 70, 80, 90, 100, 110, 125, 150, 175, 200, 225, 250, 300, 350, 400, 450, 500, 600, 700, 800, 1000, 1200, 1600, 2000, 2500, 3000, 4000, 5000, 6000],
   pump_HP:         [0.25, 0.333, 0.5, 0.75, 1, 1.5, 2, 3, 5, 7.5, 10, 15, 20, 25, 30, 40, 50, 60, 75, 100],
   water_heater_gal: [40, 50, 75, 80, 100],

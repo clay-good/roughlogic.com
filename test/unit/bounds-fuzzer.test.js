@@ -6948,7 +6948,9 @@ test("bounds: calc-cross computeNIOSHLifting pins RWL = LC * HM * VM * DM * AM *
   assert.ok(Math.abs(r.LI - 30 / expected_RWL) < 1e-9);
   // Coupling adjustments.
   assert.strictEqual(computeNIOSHLifting({ weight_lb: 0, H_in: 10, V_in: 30, D_in: 0, coupling: "poor" }).multipliers.CM, 0.90);
-  assert.strictEqual(computeNIOSHLifting({ weight_lb: 0, H_in: 10, V_in: 30, D_in: 0, coupling: "fair" }).multipliers.CM, 0.95);
+  // NIOSH Table 7: fair is 0.95 below V = 30 in and 1.00 at or above it.
+  assert.strictEqual(computeNIOSHLifting({ weight_lb: 0, H_in: 10, V_in: 20, D_in: 0, coupling: "fair" }).multipliers.CM, 0.95);
+  assert.strictEqual(computeNIOSHLifting({ weight_lb: 0, H_in: 10, V_in: 30, D_in: 0, coupling: "fair" }).multipliers.CM, 1.0);
   // Rejections.
   assert.ok("error" in computeNIOSHLifting({ weight_lb: 30, H_in: 5 }));
   assert.ok("error" in computeNIOSHLifting({ weight_lb: 30, H_in: 30 }));
@@ -13566,9 +13568,12 @@ test("bounds: spec-v113 guard and handrail code check (IRC R312 / R311.7.8)", ()
   assert.ok(a.guard_required === true && a.min_guard === 36 && a.max_infill === 4.0 && a.guard_ok === true && a.infill_ok === true && a.all_pass === true);
   const b = _v113({ occupancy: "residential", surface_height_in: 48, measured_guard_in: 34, measured_infill_gap_in: 4.5, at_stairs: "no", measured_handrail_in: 36 });
   assert.ok(b.guard_ok === false && b.infill_ok === false && b.all_pass === false);
-  // commercial raises the min guard to 42; on stairs the infill allowance opens to 4.375 and the handrail band applies.
+  // commercial raises the min guard to 42; a commercial stair keeps the 4 in sphere (IBC 1015.4) and the handrail band applies.
   const c = _v113({ occupancy: "commercial", surface_height_in: 48, measured_guard_in: 40, measured_infill_gap_in: 4.2, at_stairs: "yes", measured_handrail_in: 32 });
-  assert.ok(c.min_guard === 42 && c.guard_ok === false && c.max_infill === 4.375 && c.infill_ok === true && c.handrail_ok === false);
+  assert.ok(c.min_guard === 42 && c.guard_ok === false && c.max_infill === 4.0 && c.infill_ok === false && c.handrail_ok === false);
+  // a residential stair: 34 in guard (IRC R312.1.2) and the 4-3/8 in sphere (R312.1.3 Exc. 2).
+  const rs = _v113({ occupancy: "residential", surface_height_in: 48, measured_guard_in: 34, measured_infill_gap_in: 4.2, at_stairs: "yes", measured_handrail_in: 36 });
+  assert.ok(rs.min_guard === 34 && rs.guard_ok === true && rs.max_infill === 4.375 && rs.infill_ok === true);
   // a surface 30 in or below needs no guard.
   const d = _v113({ occupancy: "residential", surface_height_in: 28, measured_guard_in: 0, measured_infill_gap_in: 0, at_stairs: "no" });
   assert.ok(d.guard_required === false && d.guard_ok === true);
@@ -25904,10 +25909,10 @@ test("bounds: spec-v559 computeSolarEgc69045 pins the OCPD-vs-Isc basis, the 14 
   assert.equal(r.basis_current_a, 20); // OCPD governs
   assert.equal(r.egc_awg, "12"); // Table 250.122 20 A copper
   assert.equal(r.has_ocpd, true);
-  // No OCPD: the EGC is sized from the PV short-circuit current, floored at 14 AWG.
+  // No OCPD: the EGC is sized from an assumed device at the PV maximum current, 1.25 x Isc, floored at 14 AWG.
   const noOcpd = _v559({ ocpd_rating_a: 0, pv_isc_a: 10, vd_upsized: "yes" });
-  assert.equal(noOcpd.basis_current_a, 10);
-  assert.equal(noOcpd.egc_awg, "14"); // 10 A -> 14 AWG (the minimum)
+  assert.equal(noOcpd.basis_current_a, 12.5);
+  assert.equal(noOcpd.egc_awg, "14"); // 12.5 A -> 14 AWG (the minimum)
   assert.equal(noOcpd.has_ocpd, false);
   // 690.45 waives the 250.122(B) upsize even when the conductors are upsized for voltage drop.
   assert.equal(noOcpd.egc_upsize_required, false);
@@ -35246,7 +35251,7 @@ test("bounds: spec-v1148 computeScaffoldGuardrailCheck pins the moving midrail t
   assert.ok(!_v1148({ ...base, top_rail_height_in: 45.1 }).top_ok && !_v1148({ ...base, top_rail_height_in: 45.1 }).top_low);
   // PAIRED CAPACITIES: suspension drops the top rail to 100 AND removes the midrail figure.
   const susp = _v1148({ ...base, scaffold_type: "suspension", toprail_capacity_lb: 100, midrail_capacity_lb: 0 });
-  assert.ok(susp.required_toprail_lb === 100 && susp.required_midrail_lb === null);
+  assert.ok(susp.required_toprail_lb === 100 && susp.required_midrail_lb === 75);
   assert.ok(susp.toprail_cap_ok && susp.midrail_cap_ok === null && susp.passes);
   assert.ok(!_v1148({ ...base, toprail_capacity_lb: 199 }).toprail_cap_ok);
   assert.ok(!_v1148({ ...base, midrail_capacity_lb: 149 }).midrail_cap_ok);

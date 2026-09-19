@@ -360,7 +360,7 @@ export function computeTransformerSize({ load_kW, power_factor = 1, primary_V, s
   // Round up to the ANSI/IEEE C57 step (15, 30, 45, 75, 112.5, 150, 225,
   // 300, 500, 750, 1000 kVA) via the v8 Phase D helper. Returns the
   // calculated kVA AND the next-standard recommendation per spec §C.1.
-  const r = _v8roundToStandard(kVA, _v8STANDARD_SIZES.transformer_kVA);
+  const r = _v8roundToStandard(kVA, phase === "three" ? _v8STANDARD_SIZES.transformer_kVA : _v8STANDARD_SIZES.transformer_kVA_1ph);
   const next = r && !r.error ? r.recommended : kVA;
   return {
     required_kVA: kVA, next_standard_kVA: next,
@@ -3981,12 +3981,6 @@ function _smallerSize(a, b) {
   if (ba === null) return a;
   return aa <= ba ? a : b;
 }
-// At least the floor size (by area).
-function _atLeastSize(label, floor) {
-  const la = _sizeAreaCmils(label), fa = _sizeAreaCmils(floor);
-  if (la === null || fa === null) return label;
-  return la >= fa ? label : floor;
-}
 
 // NEC Table 250.66: GEC by the largest ungrounded SERVICE conductor area.
 // Thresholds differ by service-conductor material; the GEC column returned
@@ -4034,8 +4028,10 @@ export function computeGroundingElectrodeConductor({ service_kcmil = 0, material
     required_gec = _smallerSize(base_gec, cap);
     cap_note = "Concrete-encased (Ufer) sole connection: 250.66(B) caps the GEC at " + cap + " AWG copper-equivalent.";
   } else if (electrode_type === "ground-ring") {
-    required_gec = _atLeastSize(base_gec, "2");
-    cap_note = "Ground ring: 250.66(C) - the GEC need not be larger than the ring conductor (not modeled here; enter the ring size separately) and the ring itself is not smaller than 2 AWG.";
+    // 250.66(C) is a CAP: the GEC need not exceed the ring conductor, which is at least 2 AWG
+    // copper (250.52(A)(4)). Capped at the minimum ring; a larger ring raises the cap.
+    required_gec = material === "copper" ? _smallerSize(base_gec, "2") : base_gec;
+    cap_note = "Ground ring sole connection: 250.66(C) caps the GEC at the ring conductor size - " + (material === "copper" ? "2 AWG copper for the minimum ring (250.52(A)(4)); a larger ring conductor raises the cap to its own size" : "the ring is copper, so no aluminum cap is applied here and the full Table 250.66 size is shown") + ".";
   } else {
     cap_note = "Water-pipe / structural-steel electrode: no 250.66(A)-(C) cap applies - the full Table 250.66 size is required.";
   }

@@ -652,7 +652,7 @@ Verification: Unit tests verify a worked-example result (100 gal sys 60-200F 12-
 
 ## 28d. Hydrostatic test pressure and hold (v3, utility 134)
 
-Test pressure = working_pressure * multiplier. Default multiplier 1.5 for water lines, 1.25 for fuel gas (public engineering practice). Hold-time recommendation is a piecewise step function of system volume (15 / 30 / 60 / 240 minutes). Acceptable leak rate is qualitative per published practice.
+Test pressure = working_pressure * multiplier. Default multiplier 1.5 for water lines and for fuel gas, with fuel gas never tested below 3 psig (IFGC 406.4.1 / NFPA 54 8.1.4). Hold-time recommendation is a piecewise step function of system volume (15 / 30 / 60 / 240 minutes). Acceptable leak rate is qualitative per published practice.
 
 Citations: Public engineering practice; methodology cited generally.
 
@@ -1621,8 +1621,8 @@ cross-check.
 | calc-concrete.js | `computeRcOneWayShear` | `{ fc_psi = 4000, bw_in = 0, d_in = 0, as_in2 = 0, vu_kip = 0, lambda = 1.0 } ...` | _ | _ | _ |
 | calc-concrete.js | `computeRcPunchingShear` | `{ c1_in = 0, c2_in = 0, d_in = 0, fc_psi = 4000, position = "interior", lambd...` | _ | _ | _ |
 | calc-concrete.js | `computeRcShearFriction` | `{ avf_in2 = 0, fy_psi = 60000, ac_in2 = 0, fc_psi = 4000, iface = "roughened"...` | _ | _ | _ |
-| calc-concrete.js | `computeRcSlabMaxSpanForThickness` | `{ available_thickness_in = 0, support = "simply", fy_psi = 60000, wc_pcf = 14...` | _ | _ | _ |
-| calc-concrete.js | `computeRcSlabMinThickness` | `{ l_ft = 0, support = "simply", fy_psi = 60000, wc_pcf = 145 } = {}` | _ | _ | _ |
+| calc-concrete.js | `computeRcSlabMaxSpanForThickness` | `{ available_thickness_in = 0, support = "simply", member = "slab", fy_psi = 6...` | _ | _ | _ |
+| calc-concrete.js | `computeRcSlabMinThickness` | `{ l_ft = 0, support = "simply", member = "slab", fy_psi = 60000, wc_pcf = 145...` | _ | _ | _ |
 | calc-concrete.js | `computeRcSlenderColumnMagnify` | `{ factored_axial_kip = 0, end_moment_m2_kft = 0, end_moment_m1_kft = 0, unbra...` | _ | _ | _ |
 | calc-concrete.js | `computeRcTBeamFlexure` | `{ fc_psi = 4000, fy_psi = 60000, as_in2 = 0, bw_in = 0, hf_in = 0, d_in = 0, ...` | _ | _ | _ |
 | calc-concrete.js | `computeSlabDowelSchedule` | `{ joint_length_ft = 40, slab_thickness_in = 6, dowel_spacing_in = 12, edge_cl...` | _ | _ | _ |

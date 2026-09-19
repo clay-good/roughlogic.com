@@ -1299,8 +1299,11 @@ export function computeAsmeHeadThickness({ design_pressure_psi = 0, inside_diame
   }
   const t_with_allowance_in = t_required_in + CA;
   if (![t_required_in, t_with_allowance_in, mawp_psi].every(Number.isFinite)) return { error: "Head-thickness math did not produce a finite value." };
+  // UG-32(f): the hemispherical formula holds only while t <= 0.356 L and P <= 0.665 S E (L = D/2),
+  // the same limits UG-27(d) sets for a sphere; beyond them Appendix 1 governs.
+  const outside_ug32 = head_type === "hemispherical" && (t_required_in > 0.356 * D / 2 || P > 0.665 * se);
   return {
-    t_required_in, t_with_allowance_in, mawp_psi, se, head_type,
+    t_required_in, t_with_allowance_in, mawp_psi, se, head_type, outside_ug32,
     note: "ASME BPVC Section VIII Division 1, UG-32 minimum thickness for a formed head under internal pressure: a 2:1 ellipsoidal head t = P D / (2 S E - 0.2 P), a hemispherical head t = P R / (2 S E - 0.2 P) with R = D/2, and a standard flanged-and-dished (torispherical) head t = 0.885 P L / (S E - 0.1 P) with the crown radius L equal to the inside diameter and a 6% knuckle. For the same vessel the hemispherical head is thinnest (the strongest shape), the 2:1 ellipsoidal about twice that, and the torispherical the thickest - which is why a cheap dished head trades material for a shallower profile. D is the INSIDE diameter in the corroded condition and E the joint efficiency; the corrosion allowance (" + (Number.isFinite(CA) ? CA.toFixed(4) : "0") + " in here) is ADDED after the strength calculation. The 0.885 torispherical coefficient is for the standard L = D, r = 0.06 L head; other L/r ratios use the M factor of Appendix 1-4, and ellipsoidal ratios other than 2:1 use the K factor - both outside this tile. Knuckle thinning during forming, the minimum-thickness-after-forming rule, staying-and-stiffening, and external pressure are separate. The allowable stress must come from the code's table at the design TEMPERATURE. ASME BPVC Section VIII and the vessel engineer govern - this is a check, not a stamped design.",
   };
 }
@@ -1329,7 +1332,7 @@ function _renderAsmeHeadThickness(inputRegion, outputRegion, citationEl) {
     if (res.error) { oT.textContent = res.error; oM.textContent = "-"; oN.textContent = "-"; return; }
     oT.textContent = fmt(res.t_required_in, 4) + " in by strength, " + fmt(res.t_with_allowance_in, 4) + " in with the corrosion allowance";
     oM.textContent = fmt(res.mawp_psi, 1) + " psi (S x E = " + fmt(res.se, 0) + " psi)";
-    oN.textContent = res.note;
+    oN.textContent = (res.outside_ug32 ? "OUTSIDE THE UG-32(f) RANGE: the thickness exceeds 0.356 of the inside radius or the pressure exceeds 0.665 S E, so the thin-head formula does not apply and Appendix 1 governs. " : "") + res.note;
   }, DEBOUNCE_MS);
   for (const f of [p, d, s, e, c]) f.input.addEventListener("input", update);
   g.select.addEventListener("change", update);

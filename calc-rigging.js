@@ -1842,9 +1842,10 @@ export function computeCranePowerLineClearance({ option = "default", voltage_kv 
   const table_a_ft = kv > 0 ? tableA(kv) : null;
   const over_1000kv = kv > 1000;
 
-  // The default is 20 ft only up to 350 kV; above that it is 50.
+  // The default is 20 ft only up to 350 kV; above that it is 50, and over 1,000 kV there is no
+  // default number -- the utility or a registered PE sets it (1926.1408(h)).
   const voltage_known = kv > 0;
-  const default_clearance_ft = voltage_known ? (kv <= 350 ? 20 : 50) : 20;
+  const default_clearance_ft = voltage_known ? (kv <= 350 ? 20 : kv <= 1000 ? 50 : null) : 20;
   const default_assumed = !voltage_known;
 
   let required_clearance_ft, route;
@@ -1863,7 +1864,7 @@ export function computeCranePowerLineClearance({ option = "default", voltage_kv 
   const clearance_ok = determinable ? act >= required_clearance_ft : null;
   const clearance_shortfall_ft = determinable ? Math.max(0, required_clearance_ft - act) : 0;
   // What determining the voltage would buy, against the default you would otherwise take.
-  const table_a_saving_ft = table_a_ft !== null ? Math.max(0, default_clearance_ft - table_a_ft) : 0;
+  const table_a_saving_ft = table_a_ft !== null && default_clearance_ft !== null ? Math.max(0, default_clearance_ft - table_a_ft) : 0;
   const table_a_helps = table_a_saving_ft > 0;
   const default_is_unsafe = voltage_known && kv > 350 && option === "default" && act >= 20 && act < 50;
   const boom_reaches = boom > 0 && determinable ? boom > act : null;
@@ -1911,7 +1912,7 @@ function _v1157renderCranePowerLineClearance(inputRegion, outputRegion, citation
     oR.textContent = r.required_clearance_ft === null ? "not a number - utility or qualified engineer sets it" : r.required_clearance_ft + " ft via " + r.route;
     oV.textContent = r.passes ? "PASSES the clearance entered" : r.clearance_ok === null ? "cannot be determined here" : "SHORT by " + fmt(r.clearance_shortfall_ft, 1) + " ft";
     oT.textContent = r.table_a_ft === null ? "-" : r.table_a_helps ? r.table_a_saving_ft + " ft of working radius (" + r.table_a_ft + " ft vs a " + r.default_clearance_ft + " ft default)" : "nothing at this voltage";
-    oD.textContent = r.default_clearance_ft + " ft" + (r.default_assumed ? " - ASSUMES the line is 350 kV or under, since no voltage was entered" : "");
+    oD.textContent = r.default_clearance_ft === null ? "none over 1,000 kV - the utility or a registered PE sets it" : r.default_clearance_ft + " ft" + (r.default_assumed ? " - ASSUMES the line is 350 kV or under, since no voltage was entered" : "");
     oB.textContent = r.boom_reaches === null ? "-" : r.boom_reaches ? "the line is inside the machine's reach - clearance is control, not geometry" : "the boom cannot reach the line";
     oN.textContent = r.note;
   }, DEBOUNCE_MS);

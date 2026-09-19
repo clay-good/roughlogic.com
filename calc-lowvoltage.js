@@ -341,10 +341,12 @@ export function computeCableTrayFill({ tray_type = "ladder", tray_width_in = 0, 
   const notes = [];
   let fill_value, allowable, fill_percent, pass, basis;
   if (hasLarge && !hasSmall) {
-    // 392.22(A)(1)(a): sum of diameters <= tray inside width.
+    // 392.22(A)(1)(a): sum of diameters <= tray inside width on ladder / ventilated trough;
+    // 392.22(A)(3)(a): <= 90% of the width on a solid-bottom tray.
     basis = "sum-of-diameters (cables 4/0 and larger)";
-    fill_value = diameter_sum; allowable = width; pass = diameter_sum <= width;
-    fill_percent = (diameter_sum / width) * 100;
+    const diameter_allow = tray_type === "solid-bottom" ? 0.9 * width : width;
+    fill_value = diameter_sum; allowable = diameter_allow; pass = diameter_sum <= diameter_allow;
+    fill_percent = (diameter_sum / diameter_allow) * 100;
   } else if (hasSmall && !hasLarge) {
     // 392.22(A)(1)(b): sum of areas <= column-2 allowable.
     basis = "sum-of-areas (cables smaller than 4/0)";
@@ -358,7 +360,8 @@ export function computeCableTrayFill({ tray_type = "ladder", tray_width_in = 0, 
     // The 1.2 single-layer allowance is distinct from the 1.167 Column-1 depth; applying the
     // base factor to Sd (the old code) under-reduced the allowance and over-stated the fill.
     basis = "mixed: 4/0-and-larger diameters reduce the smaller-cable area allowance";
-    const sdFactor = tray_type === "solid-bottom" ? 0.917 : 1.2;
+    // Column 4 (solid bottom) deducts Sd itself: area - Sd, with no 1.2 multiplier.
+    const sdFactor = tray_type === "solid-bottom" ? 1.0 : 1.2;
     const reduced_allowable = Math.max(0, _trayColumn2Area(tray_type, width) - sdFactor * diameter_sum);
     allowable = reduced_allowable; fill_value = area_sum;
     pass = diameter_sum <= width && area_sum <= reduced_allowable;
@@ -366,7 +369,7 @@ export function computeCableTrayFill({ tray_type = "ladder", tray_width_in = 0, 
     notes.push("Mixed 4/0-and-larger and smaller cables: verify against NEC 392.22(A)(1)(c). Large-cable diameter sum " + fmt(diameter_sum, 2) + " in of " + fmt(width, 1) + " in width.");
     if (!Number.isFinite(fill_percent)) { fill_percent = null; pass = false; notes.push("Large cables consume the whole tray width; no room for smaller cables."); }
   }
-  if (pass === false && basis.startsWith("sum-of-diameters")) notes.push("Cable diameters sum to " + fmt(diameter_sum, 2) + " in, over the " + fmt(width, 1) + " in tray width.");
+  if (pass === false && basis.startsWith("sum-of-diameters")) notes.push("Cable diameters sum to " + fmt(diameter_sum, 2) + " in, over the " + fmt(allowable, 1) + " in allowed" + (tray_type === "solid-bottom" ? " (90% of the " + fmt(width, 1) + " in solid-bottom width)." : " (the tray width)."));
   notes.push("Ampacity derating for tray fill (NEC 392.80) is a separate check. The AHJ-adopted NEC edition governs.");
   return { tray_type, tray_width_in: width, basis, fill_value, allowable, fill_percent, pass, diameter_sum_in: diameter_sum, area_sum_in2: area_sum, notes };
 }

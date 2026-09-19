@@ -4650,8 +4650,10 @@ export function computeGuardHandrailCheck({ occupancy = "residential", surface_h
   const isCommercial = occupancy === "commercial";
   const onStairs = at_stairs === "yes" || at_stairs === true;
   const guard_required = surface_height_in > 30;
-  const min_guard = isCommercial ? 42 : 36;
-  const max_infill = onStairs ? 4.375 : 4.0;
+  // IRC R312.1.2 allows 34 in on the open side of a stair; IRC R312.1.3 Exc. 2 allows a
+  // 4-3/8 in sphere there. IBC 1015.4 keeps 4 in below 36 in on a commercial stair.
+  const min_guard = isCommercial ? 42 : onStairs ? 34 : 36;
+  const max_infill = onStairs && !isCommercial ? 4.375 : 4.0;
   const guard_ok = !guard_required || measured_guard_in >= min_guard;
   const infill_ok = measured_infill_gap_in <= max_infill;
   const handrail_ok = !onStairs || (measured_handrail_in >= 34 && measured_handrail_in <= 38);
@@ -4659,12 +4661,12 @@ export function computeGuardHandrailCheck({ occupancy = "residential", surface_h
   return {
     guard_required, min_guard, max_infill, guard_ok, infill_ok, handrail_ok, all_pass,
     load_note: "Guards and handrails must also resist a 200 lb concentrated load applied in any direction at any point (IRC R301.5 / IBC 1607); the AHJ governs.",
-    note: "A guard is required where the walking surface is more than 30 in above the grade or floor below. Minimum guard height is 36 in residential (IRC R312.1.2) and 42 in commercial (IBC 1015.3). Infill openings must reject a 4 in sphere (4-3/8 in on the stair side triangle), and a stair handrail sits 34-38 in above the nosings (IRC R311.7.8.1). These are dimensional minimums; the AHJ-adopted code and edition govern, and the assembly must also carry the 200 lb load.",
+    note: "A guard is required where the walking surface is more than 30 in above the grade or floor below. Minimum guard height is 36 in residential (IRC R312.1.2; 34 in on the open side of a stair) and 42 in commercial (IBC 1015.3). Infill openings must reject a 4 in sphere (4-3/8 in on a residential stair; the triangle at a stair side takes 6 in), and a stair handrail sits 34-38 in above the nosings (IRC R311.7.8.1). These are dimensional minimums; the AHJ-adopted code and edition govern, and the assembly must also carry the 200 lb load.",
   };
 }
 export const guardHandrailCheckExample = { inputs: { occupancy: "residential", surface_height_in: 48, measured_guard_in: 36, measured_infill_gap_in: 3.5, at_stairs: "no", measured_handrail_in: 36 } };
 const renderGuardHandrailCheck = _simpleRenderer({
-  citation: "Citation: IRC R312 (guards) / R311.7.8 (handrails) and IBC 1015 (by section, not reproduced). Guard required over 30 in; 36 in residential / 42 in commercial; 4 in sphere infill (4-3/8 in stair triangle); 34-38 in handrail. A 200 lb load applies regardless; the AHJ governs. Free at codes.iccsafe.org.",
+  citation: "Citation: IRC R312 (guards) / R311.7.8 (handrails) and IBC 1015 (by section, not reproduced). Guard required over 30 in; 36 in residential (34 in on a stair) / 42 in commercial; 4 in sphere infill (4-3/8 in on a residential stair); 34-38 in handrail. A 200 lb load applies regardless; the AHJ governs. Free at codes.iccsafe.org.",
   example: guardHandrailCheckExample.inputs,
   fields: [
     { key: "occupancy", label: "Occupancy", kind: "select", options: [{ value: "residential", label: "Residential (IRC)" }, { value: "commercial", label: "Commercial (IBC)" }] },
@@ -5460,7 +5462,10 @@ CONSTRUCTION_RENDERERS["occupant-load"] = _renderOccupantLoad;
 // IBC Table 1006.3.4(2): the most occupants a story may have with ONE exit
 // (with a 75 ft common path; 25 ft for H-2 / H-3). Until 2026-09-19 every
 // occupancy got the A / B / E / F / M / U figure of 49.
-const _SINGLE_EXIT_MAX = { "A-B-E-F-M-U": 49, "S": 29, "I-R1-R4-H4-H5": 10, "H2-H3": 3 };
+const _SINGLE_EXIT_MAX = { "A-B-E-F-M-U": 49, "S": 29, "I1-I3-I4-R1-R4": 10, "H4-H5": 10, "I-R1-R4-H4-H5": 10, "H2-H3": 3 };
+// IBC 1005.3.1 / 1005.3.2: the sprinklered 0.2 / 0.15 factors are for "other than Group H and
+// I-2". The legacy mixed bucket holds I-2 and H-4 / H-5, so it takes the unsprinklered factor.
+const _NO_SPRINKLER_REDUCTION = new Set(["H2-H3", "H4-H5", "I-R1-R4-H4-H5"]);
 
 // dims: in { occupant_load: dimensionless, min_door_in: L, occupancy_group: dimensionless } out: { total_width_in: L, per_exit_in: L, exits_required: dimensionless }
 export function computeEgressCapacity({ occupant_load = 0, sprinklered = true, path = "level", min_door_in = 32, occupancy_group = "A-B-E-F-M-U" } = {}) {
@@ -5469,9 +5474,10 @@ export function computeEgressCapacity({ occupant_load = 0, sprinklered = true, p
   if (!(min_door_in > 0)) return { error: "Minimum door clear width must be positive (in)." };
   const sprk = sprinklered === true || sprinklered === "yes" || sprinklered === "true";
   const isStair = path === "stair";
-  const factor = isStair ? (sprk ? 0.2 : 0.3) : (sprk ? 0.15 : 0.2);
+  const reduced = sprk && !_NO_SPRINKLER_REDUCTION.has(occupancy_group);
+  const factor = isStair ? (reduced ? 0.2 : 0.3) : (reduced ? 0.15 : 0.2);
   const single_max = _SINGLE_EXIT_MAX[occupancy_group];
-  if (single_max === undefined) return { error: "Occupancy group must be one of A-B-E-F-M-U, S, I-R1-R4-H4-H5, or H2-H3 (R-2 dwelling-unit stories follow Table 1006.3.4(1))." };
+  if (single_max === undefined) return { error: "Occupancy group must be one of A-B-E-F-M-U, S, I1-I3-I4-R1-R4, H4-H5, I-R1-R4-H4-H5, or H2-H3 (R-2 dwelling-unit stories follow Table 1006.3.4(1))." };
   const exits_required = occupant_load <= single_max ? 1 : occupant_load <= 500 ? 2 : occupant_load <= 1000 ? 3 : 4;
   const total_width_in = occupant_load * factor;
   const per_exit_in = Math.max(total_width_in / exits_required, min_door_in);
@@ -5484,7 +5490,7 @@ export const egressCapacityExample = {
 };
 
 function _renderEgressCapacity(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: IBC 2021 §1005.3 (egress width = occupant load x capacity factor), §1006.2 / Table 1006.3.4 (exit-count thresholds: 1 up to the Table 1006.3.4(2) single-exit limit -- 49 for A/B/E/F/M/U, 29 for S, 10 for I/R-1/R-4/H-4/H-5, 3 for H-2/H-3 -- then 2 to 500, 3 to 1000, 4 beyond), §1010.1.1 (32 in minimum door clear width). Capacity factors: sprinklered-with-alarm 0.2 in/occ stairs, 0.15 in/occ level; non-sprinklered 0.3 / 0.2. The reduced factors require the §1005.3.1/.2 sprinkler and emergency-communication conditions; the width is divided among the required exits; the door-leaf minimum and §1005.7 projections can govern. A design aid, not a code-official determination.";
+  citationEl.textContent = "Citation: IBC 2021 §1005.3 (egress width = occupant load x capacity factor), §1006.2 / Table 1006.3.4 (exit-count thresholds: 1 up to the Table 1006.3.4(2) single-exit limit -- 49 for A/B/E/F/M/U, 29 for S, 10 for I/R-1/R-4/H-4/H-5, 3 for H-2/H-3 -- then 2 to 500, 3 to 1000, 4 beyond), §1010.1.1 (32 in minimum door clear width). Capacity factors: sprinklered-with-alarm 0.2 in/occ stairs, 0.15 in/occ level; non-sprinklered 0.3 / 0.2, and Groups H and I-2 take 0.3 / 0.2 even when sprinklered. The reduced factors require the §1005.3.1/.2 sprinkler and emergency-communication conditions; the width is divided among the required exits; the door-leaf minimum and §1005.7 projections can govern. A design aid, not a code-official determination.";
   _aeC(inputRegion, () => fillExample(egressCapacityExample.inputs));
   const ol = _mnC("Occupant load (persons)", "egc-ol", { step: "any", min: "0" });
   const sp = _msC("Sprinklered + alarm (1005.3.1/.2)", "egc-sp", [{ value: "yes", label: "Yes" }, { value: "no", label: "No" }]);
@@ -5493,7 +5499,7 @@ function _renderEgressCapacity(inputRegion, outputRegion, citationEl) {
   md.input.value = "32";
   const og = _msC("Occupancy group (single-exit limit, Table 1006.3.4(2))", "egc-og", [
     { value: "A-B-E-F-M-U", label: "A, B, E, F, M, U (49)" }, { value: "S", label: "S (29)" },
-    { value: "I-R1-R4-H4-H5", label: "I, R-1, R-4, H-4, H-5 (10)" }, { value: "H2-H3", label: "H-2, H-3 (3)" },
+    { value: "I1-I3-I4-R1-R4", label: "I-1, I-3, I-4, R-1, R-4 (10)" }, { value: "H4-H5", label: "H-4, H-5 (10, no sprinkler reduction)" }, { value: "I-R1-R4-H4-H5", label: "I-2, or group not split out (10, no sprinkler reduction)" }, { value: "H2-H3", label: "H-2, H-3 (3)" },
   ]);
   for (const f of [ol, sp, pa, md, og]) inputRegion.appendChild(f.wrap);
   const oE = _moC(outputRegion, "Exits required", "egc-out-e");
@@ -6240,8 +6246,9 @@ export function computeAllowableArea({ tabular_area = 0, ns_area = 0, frontage_f
   if (frontage_ft > perimeter_ft) return { error: "Frontage F cannot exceed the perimeter P." };
   const w_eff = Math.min(open_width_ft, 30);
   const ratio = frontage_ft / perimeter_ft;
-  // §506.3.1: no increase unless 25% or more of the perimeter fronts open space.
-  const frontage_if = ratio < 0.25 ? 0 : (ratio - 0.25) * (w_eff / 30);
+  // §506.3.1: no increase unless 25% or more of the perimeter fronts open space, and that
+  // open space must be at least 20 ft wide to count at all.
+  const frontage_if = ratio < 0.25 || open_width_ft < 20 ? 0 : (ratio - 0.25) * (w_eff / 30);
   const allowable = tabular_area + ns_area * frontage_if;
   return { w_eff, ratio, frontage_if, allowable, pass: actual_area <= allowable, margin: allowable - actual_area };
 }
@@ -12096,7 +12103,8 @@ export function computeScaffoldGuardrailCheck({ top_rail_height_in = 0, midrail_
 
   // The capacities are paired, not independent.
   const required_toprail_lb = suspension ? 100 : 200;
-  const required_midrail_lb = required_toprail_lb === 200 ? 150 : null;
+  // 1926.451(g)(4)(xv): 150 lbf with a 200 lbf top rail, 75 lbf with a 100 lbf top rail.
+  const required_midrail_lb = required_toprail_lb === 200 ? 150 : 75;
   const toprail_cap_entered = topCap > 0;
   const toprail_cap_ok = toprail_cap_entered ? topCap >= required_toprail_lb : null;
   const midrail_cap_entered = midCap > 0;
@@ -12109,7 +12117,7 @@ export function computeScaffoldGuardrailCheck({ top_rail_height_in = 0, midrail_
     + (midrail_entered ? "and " + mid + " in is " + Math.abs(midrail_offset_in).toFixed(1) + " in " + (midrail_offset_in >= 0 ? "above" : "below") + " it, " + (midrail_ok ? "within the " + tol + " in band used here. " : "outside the " + tol + " in band used here. ") : "and no midrail height was entered. ")
     + "That relation is the part a fixed shop standard gets wrong: a midrail set for a 45 in top rail sits " + (45 / 2 - 38 / 2).toFixed(1) + " in high under a 38 in one. The standard says approximately, not a dimension, so the band above is a judgment the tile makes visible rather than a code number. "
     + "CAPACITIES ARE PAIRED, not independent: " + (suspension ? "a single- or two-point adjustable suspension scaffold takes at least 100 lbf on the top rail, " : "a scaffold other than a single- or two-point adjustable suspension type takes at least 200 lbf on the top rail, ")
-    + (required_midrail_lb !== null ? "and where the top rail carries 200 lbf the midrail must carry at least 150 lbf. " : "and the 150 lbf midrail figure is tied to a 200 lbf top rail, so it does not apply here. ")
+    + "and the midrail must carry at least " + required_midrail_lb + " lbf, the figure 1926.451(g)(4)(xv) ties to a " + required_toprail_lb + " lbf top rail. "
     + (toprail_cap_entered ? "Top rail " + topCap + " lbf against " + required_toprail_lb + " required: " + (toprail_cap_ok ? "OK. " : "SHORT. ") : "")
     + (midrail_cap_entered && required_midrail_lb !== null ? "Midrail " + midCap + " lbf against " + required_midrail_lb + " required: " + (midrail_cap_ok ? "OK. " : "SHORT. ") : "")
     + "TOEBOARD: at least " + TOE_MIN + " in high from the top edge of the toeboard to the level of the walking or working surface. " + (toeboard_entered ? "This one is " + toe + " in, " + (toeboard_ok ? "OK. " : "SHORT. ") : "None entered. ")
@@ -14287,7 +14295,8 @@ export function computeWaterClosetLocation({ centerline_in = 0, seat_height_in =
   if (!(s > 0)) return { error: "Seat height must be positive (in)." };
   if (cs < 0 || cr < 0) return { error: "Clearances cannot be negative (in)." };
 
-  const C_MIN = 16, C_MAX = 18, S_MIN = 17, S_MAX = 19;
+  // 604.2: 16 to 18 in, but 17 to 19 in inside an ambulatory accessible compartment (604.8.2).
+  const C_MIN = amb ? 17 : 16, C_MAX = amb ? 19 : 18, S_MIN = 17, S_MAX = 19;
   const SIDE_MIN = 60, REAR_MIN = 56, IPC_MIN = 15;
 
   const centerline_ok = c >= C_MIN && c <= C_MAX;
@@ -14315,7 +14324,7 @@ export function computeWaterClosetLocation({ centerline_in = 0, seat_height_in =
   const passes = centerline_ok && seat_ok && (clearance_ok !== false) && (flush_ok !== false);
 
   const note = "THE 18 IN EVERYONE REMEMBERS IS A WINDOW OF 16 TO 18, and the plumbing code's 15 in minimum is not inside it. A water closet roughed at the IPC minimum is code-compliant and ADA-noncompliant by an inch; one set at 20 in, which reads as generous, fails the other end. There are three inches of rough-in between the two codes and two of them do not work. "
-    + "Centerline " + c + " in: " + (centerline_ok ? "within 16 to 18. " : centerline_too_close ? "TOO CLOSE by " + centerline_deficit_in.toFixed(2) + " in" + (meets_ipc_only ? " - and note that it does satisfy the plumbing code's 15 in minimum, which is exactly how this gets roughed in wrong: the plumber met a code, just not this one. " : ". ") : "TOO FAR by " + centerline_deficit_in.toFixed(2) + " in - a centerline can be too far from the wall, because the grab bar has to be in reach from the seat. ")
+    + "Centerline " + c + " in: " + (centerline_ok ? "within " + C_MIN + " to " + C_MAX + (amb ? " (the ambulatory-compartment window). " : ". ") : centerline_too_close ? "TOO CLOSE by " + centerline_deficit_in.toFixed(2) + " in" + (meets_ipc_only ? " - and note that it does satisfy the plumbing code's 15 in minimum, which is exactly how this gets roughed in wrong: the plumber met a code, just not this one. " : ". ") : "TOO FAR by " + centerline_deficit_in.toFixed(2) + " in - a centerline can be too far from the wall, because the grab bar has to be in reach from the seat. ")
     + "SEAT: 17 to 19 in measured to the TOP OF THE SEAT, not the rim of the bowl - so a standard 15 in bowl with a thick seat can still land under, and a comfort-height bowl with a thick seat can land over. Entered " + s + " in: " + (seat_ok ? "OK. " : seat_too_low ? "UNDER by " + seat_deficit_in.toFixed(2) + " in. " : "OVER by " + seat_deficit_in.toFixed(2) + " in - too high is a real failure, because a transfer works both ways. ")
     + (clearance_entered
       ? "CLEARANCE: 60 in minimum measured perpendicular from the SIDE wall and 56 in from the REAR - " + required_area_sf.toFixed(2) + " sq ft of floor. Entered " + cs + " x " + cr + " in (" + clear_area_sf.toFixed(2) + " sq ft): " + (clearance_ok ? "OK. " : (side_ok ? "" : "side short by " + side_deficit_in.toFixed(1) + " in. ") + (rear_ok ? "" : "rear short by " + rear_deficit_in.toFixed(1) + " in. "))

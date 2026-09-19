@@ -2,7 +2,7 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "d643b30b0ac20062",
+      "sha": "3c2e7a72db89c21b",
       "date": "2026-09-19"
     },
     "/tools/": {
@@ -426,8 +426,8 @@
       "date": "2026-09-01"
     },
     "/tools/backflow-test-psi/": {
-      "sha": "aa152df046e716ff",
-      "date": "2026-09-01"
+      "sha": "3f3f97afdae39ca1",
+      "date": "2026-09-19"
     },
     "/tools/baghouse-cleaning-interval/": {
       "sha": "ddf22ea1c46dfe03",
@@ -906,8 +906,8 @@
       "date": "2026-09-01"
     },
     "/tools/cable-tray-fill/": {
-      "sha": "2f6b3a36f6ecf646",
-      "date": "2026-09-13"
+      "sha": "470fbe4bc86608a9",
+      "date": "2026-09-19"
     },
     "/tools/camera-lens-fov/": {
       "sha": "61432710b0a91664",
@@ -1458,8 +1458,8 @@
       "date": "2026-09-01"
     },
     "/tools/concrete-anchor-breakout/": {
-      "sha": "5492061a5e5d4008",
-      "date": "2026-09-01"
+      "sha": "514f40bcb3f9034a",
+      "date": "2026-09-19"
     },
     "/tools/concrete-anchor-interaction/": {
       "sha": "ea1647d055ea3b43",
@@ -3474,8 +3474,8 @@
       "date": "2026-09-01"
     },
     "/tools/guard-handrail-check/": {
-      "sha": "ba16c68f56d97b60",
-      "date": "2026-09-01"
+      "sha": "6f34c7f34acd6c58",
+      "date": "2026-09-19"
     },
     "/tools/guard-post-load/": {
       "sha": "d79cf376bb65386f",
@@ -5946,12 +5946,12 @@
       "date": "2026-09-04"
     },
     "/tools/rc-slab-max-span-for-thickness/": {
-      "sha": "d8c2ebee47fd5247",
-      "date": "2026-09-01"
+      "sha": "3e827b44b9b4afa3",
+      "date": "2026-09-19"
     },
     "/tools/rc-slab-min-thickness/": {
-      "sha": "5743cb86d0d8a1e8",
-      "date": "2026-09-01"
+      "sha": "a33bca04bcb0f614",
+      "date": "2026-09-19"
     },
     "/tools/rc-slender-column-magnify/": {
       "sha": "b13097782f1514c1",
@@ -6442,8 +6442,8 @@
       "date": "2026-09-19"
     },
     "/tools/scaffold-guardrail-check/": {
-      "sha": "b7322038bbb3fa34",
-      "date": "2026-09-02"
+      "sha": "9e1ab39e736a5dd1",
+      "date": "2026-09-19"
     },
     "/tools/scaffold-leg-load/": {
       "sha": "5faf4d122117758b",
@@ -7030,8 +7030,8 @@
       "date": "2026-09-01"
     },
     "/tools/solar-egc-690-45/": {
-      "sha": "0fed7f8de1b3a696",
-      "date": "2026-09-01"
+      "sha": "a99e6212c0f82369",
+      "date": "2026-09-19"
     },
     "/tools/solar-thermal-collector/": {
       "sha": "6964c9612e8d3c92",

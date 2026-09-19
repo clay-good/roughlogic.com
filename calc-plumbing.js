@@ -1332,11 +1332,11 @@ function renderStormwaterMaxDrainageArea(inputRegion, outputRegion, citationEl) 
 
 // dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderHydrostaticTest(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: Public engineering practice. Default multipliers 1.5 for water, 1.25 for fuel gas. Hold-time scales with system volume.";
+  citationEl.textContent = "Citation: Public engineering practice. Default multiplier 1.5 for water and for fuel gas, fuel gas never below 3 psig (IFGC 406.4.1). Hold-time scales with system volume.";
   attachExampleButton(inputRegion, () => fillExample(hydrostaticTestExample.inputs));
   const wp = makeNumber("Working pressure (psi)", "ht-wp", { step: "any", min: "0" });
   const sv = makeNumber("System volume (gal)", "ht-sv", { step: "any", min: "0" });
-  const mat = makeSelect("System type", "ht-m", [{ value: "water", label: "Water (1.5x)" }, { value: "fuel_gas", label: "Fuel gas (1.25x)" }]);
+  const mat = makeSelect("System type", "ht-m", [{ value: "water", label: "Water (1.5x)" }, { value: "fuel_gas", label: "Fuel gas (1.5x, 3 psig min)" }]);
   for (const f of [wp, sv, mat]) inputRegion.appendChild(f.wrap);
   const oP = makeOutputLine(outputRegion, "Test pressure", "ht-out-p");
   const oM = makeOutputLine(outputRegion, "Multiplier", "ht-out-m");

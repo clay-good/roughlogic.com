@@ -1436,7 +1436,8 @@ export function computeSolarEgc69045({ ocpd_rating_a = 0, pv_isc_a = 0, vd_upsiz
   const isc = Number(pv_isc_a) || 0;
   const vdUp = vd_upsized === true || vd_upsized === "yes";
   if (!(ocpd > 0) && !(isc > 0)) return { error: "Provide the OCPD rating, or the PV short-circuit current when there is no overcurrent device." };
-  const basis_current_a = ocpd > 0 ? ocpd : isc;
+  // 690.45(A): with no OCPD, an assumed device rated at the PV maximum circuit current, 1.25 x Isc (690.8(A)(1)).
+  const basis_current_a = ocpd > 0 ? ocpd : 1.25 * isc;
   const has_ocpd = ocpd > 0;
   const row = _PV_EGC_TABLE_CU.find((r) => basis_current_a <= r.ocpd_max_A);
   if (!row) return { error: "Basis current exceeds the bundled Table 250.122 range; consult engineering analysis." };
@@ -1445,7 +1446,7 @@ export function computeSolarEgc69045({ ocpd_rating_a = 0, pv_isc_a = 0, vd_upsiz
     basis_current_a, egc_awg, has_ocpd, egc_upsize_required: false, vd_upsized: vdUp,
     note: (has_ocpd
       ? "The EGC is sized from the overcurrent device rating via Table 250.122."
-      : "This PV source circuit has no overcurrent device (two or fewer source circuits cannot deliver enough fault current), so the EGC is sized from the PV short-circuit current, not an OCPD rating.")
+      : "This PV source circuit has no overcurrent device (two or fewer source circuits cannot deliver enough fault current), so the EGC is sized from an assumed device rated at the PV maximum circuit current, 1.25 x Isc (690.8(A)(1)), not an OCPD rating.")
       + " The EGC is never smaller than 14 AWG. NEC 690.45 waives the 250.122(B) proportional-upsize rule, so enlarging the circuit conductors for voltage drop does NOT require enlarging the EGC" + (vdUp ? " - the conductors were upsized here, but the EGC stays as sized." : ".") + " The NEC and the AHJ govern.",
   };
 }

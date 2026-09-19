@@ -121,7 +121,11 @@ export function computeRequiredFireFlow({ structure_area_ft2, construction_class
   // DR-05 (RC-1): a negative area yields sqrt(negative) = NaN in the flow.
   // Guard positivity exactly as the sibling computeIsoNeededFireFlow does.
   if (!(structure_area_ft2 > 0)) return { error: "Structure area must be positive." };
-  const C = 18 * F * Math.sqrt(structure_area_ft2);
+  // ISO caps C itself before the multipliers: 8,000 gpm for Classes 1-2 (frame, joisted
+  // masonry), 6,000 for Classes 3-6, with a 500 gpm floor -- as computeIsoNeededFireFlow does.
+  // No story count is entered here, so a multi-story Class 1-2 building is assumed.
+  const C_max = construction_class === "wood_frame" || construction_class === "ordinary" ? 8000 : 6000;
+  const C = Math.min(Math.max(18 * F * Math.sqrt(structure_area_ft2), 500), C_max);
   let NFF = C * occupancy_factor * exposure_factor * communication_factor;
   NFF = Math.round(NFF / 250) * 250; // round to nearest 250 gpm per ISO practice
   // ISO maximum guideline: 12000 gpm.

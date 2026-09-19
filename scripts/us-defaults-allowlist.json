@@ -226,12 +226,6 @@
   },
   {
    "module": "calc-concrete.js",
-   "match": "(l/",
-   "family": "not metric",
-   "justification": "ACI 318 minimum-thickness span ratios l/20..l/28 (l = span), not liters."
-  },
-  {
-   "module": "calc-concrete.js",
    "match": "(l / denominator)",
    "family": "not metric",
    "justification": "Span ratio result line (l = span), not liters."

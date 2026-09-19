@@ -1188,7 +1188,8 @@ export function computeNIOSHLifting({
   if (!(D_in >= 0)) return { error: "Vertical travel distance must be non-negative." };
   if (!(asymmetry_deg >= 0 && asymmetry_deg <= 135)) return { error: "Asymmetry must be 0-135 deg." };
   if (!(frequency_per_min >= 0)) return { error: "Frequency must be non-negative." };
-  const cm = NIOSH_COUPLING[coupling];
+  // NIOSH 1991 Table 7: a FAIR coupling is 0.95 only below V = 30 in; at or above 30 in it is 1.00.
+  const cm = coupling === "fair" && V_in >= 30 ? 1.0 : NIOSH_COUPLING[coupling];
   if (!Number.isFinite(cm)) return { error: "Unknown coupling category." };
   // Multipliers per NIOSH 1991 publication.
   const HM = 10 / H_in;

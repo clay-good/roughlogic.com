@@ -2880,9 +2880,12 @@ test("monotonicity: computeRequiredFireFlow needed_fire_flow_gpm is monotone non
     prev = r.needed_fire_flow_gpm;
     prevBase = r.base_C_gpm;
   }
-  // ISO 12000 gpm ceiling pin: very large area is clamped.
+  // ISO caps C itself: 8,000 gpm for Classes 1-2, 6,000 for 3-6, before the multipliers;
+  // the 12,000 gpm ceiling on the product still holds under large multipliers.
   const huge = computeRequiredFireFlow({ structure_area_ft2: 10000000, construction_class: "wood_frame" });
-  assert.equal(huge.needed_fire_flow_gpm, 12000);
+  assert.equal(huge.needed_fire_flow_gpm, 8000);
+  assert.equal(computeRequiredFireFlow({ structure_area_ft2: 10000000, construction_class: "masonry" }).needed_fire_flow_gpm, 6000);
+  assert.equal(computeRequiredFireFlow({ structure_area_ft2: 10000000, construction_class: "wood_frame", occupancy_factor: 1.25, exposure_factor: 1.75 }).needed_fire_flow_gpm, 12000);
   // Construction-class pin: ordinary = 1.0 (catches a future regression
   // in the ISO_CONSTRUCTION_FACTORS table).
   const ord = computeRequiredFireFlow({ structure_area_ft2: 5000, construction_class: "ordinary" });

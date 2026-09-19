@@ -91,7 +91,8 @@ export const CHEMICAL_PURITY = {
   chlorine_gas:           { pct: 100,  label: "Chlorine gas (Cl2)" },
   sodium_hypochlorite:    { pct: 12.5, label: "Sodium hypochlorite (12.5%)" },
   calcium_hypochlorite:   { pct: 65,   label: "Calcium hypochlorite (65%)" },
-  fluorosilicic_acid:     { pct: 23,   label: "Fluorosilicic acid (23%)" },
+  // The fluoride dose is of the F ion, and H2SiF6 is 79.2% fluoride ion by weight (AWWA available fluoride ion).
+  fluorosilicic_acid:     { pct: 23,   afi: 0.792, label: "Fluorosilicic acid (23%, dose as fluoride ion)" },
   alum_dry:               { pct: 100,  label: "Alum, dry" },
   alum_liquid:            { pct: 48.5, label: "Alum liquid (48.5%)" },
   ferric_chloride_38:     { pct: 38,   label: "Ferric chloride (38%)" },
@@ -108,7 +109,7 @@ export function computePoundsFormula({ flow_mgd = 0, dose_mg_l = 0, chemical = "
   if (!(flow_mgd >= 0)) return { error: "Flow must be non-negative." };
   if (!(dose_mg_l >= 0)) return { error: "Dose must be non-negative." };
   const pure_lb_day = flow_mgd * dose_mg_l * 8.34;
-  const purity = c.pct / 100;
+  const purity = (c.pct / 100) * (c.afi ?? 1);
   const product_lb_day = purity > 0 ? pure_lb_day / purity : pure_lb_day;
   return { pure_lb_day, product_lb_day, purity_pct: c.pct, chemical_label: c.label };
 }
@@ -1555,16 +1556,18 @@ export function computeBackflowTestPSI({ assembly_type = "rp", check1_psid = 0, 
     const pass = c1 >= 1 && c2 >= 1;
     return { assembly_type: "dc", pass, buffer_psid: 0, criterion: "DC: each check >= 1 psid tight" };
   }
-  // RP: #1 check >= 5 psid AND relief opens >= 2 psid below the #1 check.
+  // RP: #1 check >= 5 psid, the relief valve opens at >= 2 psid on its own reading and
+  // >= 2 psid below the #1 check, and the #2 check holds tight (>= 1 psid).
   const buffer_psid = c1 - relief;
   const check1_ok = c1 >= 5;
-  const relief_ok = buffer_psid >= 2;
-  const pass = check1_ok && relief_ok;
-  return { assembly_type: "rp", pass, buffer_psid, check1_ok, relief_ok, criterion: "RP: #1 check >= 5 psid and relief opens >= 2 psid below it" };
+  const relief_ok = relief >= 2 && buffer_psid >= 2;
+  const check2_ok = c2 >= 1;
+  const pass = check1_ok && relief_ok && check2_ok;
+  return { assembly_type: "rp", pass, buffer_psid, check1_ok, relief_ok, check2_ok, criterion: "RP: #1 check >= 5 psid, relief opens at >= 2 psid and >= 2 psid below the #1 check, #2 check tight >= 1 psid" };
 }
 export const backflowTestPsiExample = { inputs: { assembly_type: "rp", check1_psid: 8, relief_open_psid: 4, check2_psi: 3 } };
 const renderBackflowTestPSI = _v23SimpleRenderer({
-  citation: "Citation: Per the USC FCCCHR Manual of Cross-Connection Control and the AWWA C511 field-test procedure. RP: relief opens >= 2 psid below the #1 check and the #1 check holds >= 5 psid; DC: each check holds >= 1 psid. The certified tester and the water purveyor govern; gauge accuracy and the opening-point definition apply.",
+  citation: "Citation: Per the USC FCCCHR Manual of Cross-Connection Control and the AWWA C511 field-test procedure. RP: the relief opens at >= 2 psid and >= 2 psid below the #1 check, the #1 check holds >= 5 psid, and the #2 check holds tight; DC: each check holds >= 1 psid. The certified tester and the water purveyor govern; gauge accuracy and the opening-point definition apply.",
   example: backflowTestPsiExample.inputs,
   fields: [
     { key: "assembly_type", label: "Assembly type", kind: "select", options: [

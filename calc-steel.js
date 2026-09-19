@@ -204,7 +204,7 @@ STEEL_RENDERERS["required-section-modulus"] = _simpleRenderer({
 
 // ===================== spec-v255: steel beam web shear capacity =====================
 
-// dims: in { fy: M L^-1 T^-2, d: L, tw: L, cv1: dimensionless, omega_v: dimensionless, vu: M L T^-2 } out: { aw: L^2, vn: M L T^-2, va: M L T^-2, phi_vn: M L T^-2, util_asd: dimensionless }
+// dims: in { fy: M L^-1 T^-2, d: L, tw: L, cv1: dimensionless, omega_v: dimensionless, vu: M L T^-2 } out: { aw: L^2, vn: M L T^-2, va: M L T^-2, phi_vn: M L T^-2, util_asd: dimensionless, omega_used: dimensionless }
 export function computeSteelBeamShear({ fy = 50, d = 0, tw = 0, cv1 = 1.0, omega_v = 1.50, vu = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(fy > 0)) return { error: "Yield stress Fy must be positive (ksi)." };
@@ -215,11 +215,13 @@ export function computeSteelBeamShear({ fy = 50, d = 0, tw = 0, cv1 = 1.0, omega
   if (vu < 0) return { error: "Required shear cannot be negative (kips)." };
   const aw = d * tw;
   const vn = 0.6 * fy * aw * cv1;
-  const phi_v = omega_v === 1.50 ? 1.00 : 0.90;
-  const va = vn / omega_v;
+  // AISC G2.1(a): phi 1.00 / Omega 1.50 only for a web with Cv1 = 1.0; any Cv1 < 1 takes 0.90 / 1.67.
+  const omega_used = cv1 < 1 && omega_v < 1.67 ? 1.67 : omega_v;
+  const phi_v = omega_used === 1.50 && cv1 >= 1 ? 1.00 : 0.90;
+  const va = vn / omega_used;
   const phi_vn = phi_v * vn;
   const util_asd = vu > 0 ? vu / va : null;
-  return { aw, vn, phi_v, va, phi_vn, util_asd };
+  return { aw, vn, phi_v, omega_used, va, phi_vn, util_asd };
 }
 
 export const steelBeamShearExample = { inputs: { fy: 50, d: 17.99, tw: 0.355, cv1: 1.0, omega_v: 1.50, vu: 0 } };
@@ -685,8 +687,12 @@ export function computeSteelWebLocalStrength({ fy = 50, tw = 0, tf = 0, k_in = 0
   for (const [nm, v] of [["web thickness", tw], ["flange thickness", tf], ["k distance", k_in], ["depth", d_in], ["bearing length", lb_in]]) {
     if (!(v > 0)) return { error: "The " + nm + " must be positive (in)." };
   }
+  // J10.2 takes the end form when the force is within d of the member end; J10.3 only
+  // within d/2. "near-end" is the band between: end yielding, interior crippling.
+  if (location !== "interior" && location !== "near-end" && location !== "end") return { error: "Location must be interior, near-end, or end." };
+  const yield_interior = location === "interior";
   const interior = location !== "end";
-  const wly_rn = interior ? fy * tw * (5 * k_in + lb_in) : fy * tw * (2.5 * k_in + lb_in);
+  const wly_rn = yield_interior ? fy * tw * (5 * k_in + lb_in) : fy * tw * (2.5 * k_in + lb_in);
   // AISC 360 J10.3 web crippling: interior (Eq. J10-4) uses the 0.80 lead
   // coefficient; an end force less than d/2 from the member end (Eq. J10-5)
   // uses 0.40 - HALF - and, when lb/d > 0.2, the (4 lb/d - 0.2) bracket of
@@ -721,8 +727,9 @@ STEEL_RENDERERS["steel-web-local-strength"] = _simpleRenderer({
     { key: "d_in", label: "Member depth d (in)", kind: "number" },
     { key: "lb_in", label: "Bearing length lb (in)", kind: "number" },
     { key: "location", label: "Force location", kind: "select", options: [
-      { value: "interior", label: "Interior (5k + lb)" },
-      { value: "end", label: "Near the member end (2.5k + lb)" },
+      { value: "interior", label: "More than d from the end (5k + lb; crippling J10-4)" },
+      { value: "near-end", label: "Between d/2 and d from the end (2.5k + lb; crippling J10-4)" },
+      { value: "end", label: "Within d/2 of the end (2.5k + lb; crippling J10-5)" },
     ], default: "interior" },
   ],
   outputs: [

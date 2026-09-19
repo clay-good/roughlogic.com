@@ -30,7 +30,7 @@ export const BESPOKE_OUTPUT_LABELS = {
   "arc-flash-screen": {"incident_energy_cal_cm2":"Incident energy (cal/cm²)","boundary_distance_in":"Arc-flash boundary (in)","ppe_band":"PPE band (NFPA 70E)","warnings":"Notes"},
   "area-by-coordinates": {"area_ft2":"Area","perimeter_ft":"Perimeter","winding":"Winding"},
   "arrhenius-equation": {"ea_kj_mol":"Activation energy Ea","note":"Note"},
-  "asme-head-thickness": {"t_required_in":"Required thickness","mawp_psi":"MAWP at the required thickness","note":"Note"},
+  "asme-head-thickness": {"t_required_in":"Required thickness","mawp_psi":"MAWP at the required thickness","outside_ug32":"Note"},
   "asme-shell-thickness": {"t_required_in":"Required thickness","outside_ug27":"UG-27 validity","mawp_psi":"MAWP at the required thickness","note":"Note"},
   "asymmetrical-fault-xr": {"i_peak_ka":"First peak current","i_asym_ka":"First-cycle asymmetrical RMS","note":"Note"},
   "atterberg-indices": {"pi":"Plasticity index (A-line PI)","group":"USCS group","li":"Liquidity index","note":"Note"},

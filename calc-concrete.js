@@ -545,15 +545,21 @@ CONCRETE_RENDERERS["rc-hook-development"] = _simpleRenderer({
 // The ACI checks the strength tiles never make: the deflection-control minimum
 // thickness (Table 7.3.1.1 / 9.3.1.1), the doubly-reinforced beam with
 // compression steel, and shear friction across an interface (22.9).
+const _RC_HMIN_DENOMS = {
+  slab: { simply: 20, "one-end": 24, "both-ends": 28, cantilever: 10 },
+  beam: { simply: 16, "one-end": 18.5, "both-ends": 21, cantilever: 8 },
+};
 const _RC_BETA1 = (fc_psi) => fc_psi <= 4000 ? 0.85 : Math.max(0.85 - 0.05 * (fc_psi - 4000) / 1000, 0.65);
 
-// dims: in { l_ft: L, support: dimensionless, fy_psi: M L^-1 T^-2, wc_pcf: M L^-2 T^-2 } out: { base_in: L, kfy: dimensionless, klw: dimensionless, hmin_in: L }
-export function computeRcSlabMinThickness({ l_ft = 0, support = "simply", fy_psi = 60000, wc_pcf = 145 } = {}) {
+// dims: in { l_ft: L, support: dimensionless, member: dimensionless, fy_psi: M L^-1 T^-2, wc_pcf: M L^-2 T^-2 } out: { base_in: L, kfy: dimensionless, klw: dimensionless, hmin_in: L, denom: dimensionless }
+export function computeRcSlabMinThickness({ l_ft = 0, support = "simply", member = "slab", fy_psi = 60000, wc_pcf = 145 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(l_ft > 0)) return { error: "Span must be positive (ft)." };
   if (!(fy_psi > 0)) return { error: "Steel yield fy must be positive (psi)." };
   if (!(wc_pcf > 0)) return { error: "Concrete unit weight must be positive (pcf)." };
-  const denoms = { simply: 20, "one-end": 24, "both-ends": 28, cantilever: 10 };
+  // Table 7.3.1.1 (one-way slabs) and Table 9.3.1.1 (beams) are different rows.
+  const denoms = _RC_HMIN_DENOMS[member];
+  if (!denoms) return { error: "Member must be slab or beam." };
   const denom = denoms[support];
   if (!denom) return { error: "Support condition must be simply, one-end, both-ends, or cantilever." };
   const base_in = (l_ft * 12) / denom;
@@ -561,23 +567,27 @@ export function computeRcSlabMinThickness({ l_ft = 0, support = "simply", fy_psi
   const klw = wc_pcf >= 145 ? 1.0 : Math.max(1.65 - 0.005 * wc_pcf, 1.09);
   const hmin_in = base_in * kfy * klw;
   return {
-    base_in, kfy, klw, hmin_in,
-    note: "ACI 318-19 Table 7.3.1.1 (one-way slabs) / 9.3.1.1 (beams) deflection-control minimum thickness: l/20 simply supported, l/24 one end continuous, l/28 both ends continuous, l/10 cantilever, times (0.4 + fy/100,000) for fy other than 60,000 psi and the 1.65 - 0.005 wc lightweight factor (>= 1.09). This is the depth that WAIVES an explicit deflection calculation - it applies to normalweight (unless wc is set) members not supporting or attached to partitions or construction likely to be damaged by large deflections, uses the clear span, and is not the strength (flexure/shear) design or the actual deflection of a thinner member. A design aid, not a substitute for the structural engineer of record's stamped design.",
+    base_in, kfy, klw, hmin_in, denom,
+    note: "ACI 318-19 Table 7.3.1.1 (one-way slabs) / 9.3.1.1 (beams) deflection-control minimum thickness: for a one-way slab l/20 simply supported, l/24 one end continuous, l/28 both ends continuous, l/10 cantilever; for a beam l/16, l/18.5, l/21 and l/8; times (0.4 + fy/100,000) for fy other than 60,000 psi and the 1.65 - 0.005 wc lightweight factor (>= 1.09). This is the depth that WAIVES an explicit deflection calculation - it applies to normalweight (unless wc is set) members not supporting or attached to partitions or construction likely to be damaged by large deflections, uses the clear span, and is not the strength (flexure/shear) design or the actual deflection of a thinner member. A design aid, not a substitute for the structural engineer of record's stamped design.",
   };
 }
 export const rcSlabMinThicknessExample = { inputs: { l_ft: 12, support: "simply", fy_psi: 60000, wc_pcf: 145 } };
 
 CONCRETE_RENDERERS["rc-slab-min-thickness"] = _simpleRenderer({
-  citation: "Citation: ACI 318-19 Table 7.3.1.1 (one-way slabs) / 9.3.1.1 (beams) deflection-control minimum thickness (l/20, l/24, l/28, l/10), the (0.4 + fy/100,000) grade modifier, and the lightweight factor, by name. The depth that waives a deflection check, not a strength design. A design aid, not a substitute for the engineer of record.",
+  citation: "Citation: ACI 318-19 Table 7.3.1.1 (one-way slabs) / 9.3.1.1 (beams) deflection-control minimum thickness (slab l/20, l/24, l/28, l/10; beam l/16, l/18.5, l/21, l/8), the (0.4 + fy/100,000) grade modifier, and the lightweight factor, by name. The depth that waives a deflection check, not a strength design. A design aid, not a substitute for the engineer of record.",
   example: rcSlabMinThicknessExample.inputs,
   fields: [
     { key: "l_ft", label: "Span l (ft, clear span)", kind: "number" },
     { key: "support", label: "Support condition", kind: "select", options: [
-      { value: "simply", label: "Simply supported (l/20)" },
-      { value: "one-end", label: "One end continuous (l/24)" },
-      { value: "both-ends", label: "Both ends continuous (l/28)" },
-      { value: "cantilever", label: "Cantilever (l/10)" },
+      { value: "simply", label: "Simply supported (slab l/20, beam l/16)" },
+      { value: "one-end", label: "One end continuous (slab l/24, beam l/18.5)" },
+      { value: "both-ends", label: "Both ends continuous (slab l/28, beam l/21)" },
+      { value: "cantilever", label: "Cantilever (slab l/10, beam l/8)" },
     ], default: "simply" },
+    { key: "member", label: "Member", kind: "select", options: [
+      { value: "slab", label: "One-way slab (Table 7.3.1.1)" },
+      { value: "beam", label: "Beam (Table 9.3.1.1)" },
+    ], default: "slab" },
     { key: "fy_psi", label: "Steel yield fy (psi)", kind: "number" },
     { key: "wc_pcf", label: "Concrete unit weight (pcf)", kind: "number" },
   ],
@@ -595,19 +605,18 @@ CONCRETE_RENDERERS["rc-slab-min-thickness"] = _simpleRenderer({
 // waives a deflection check is the inverse: hmin = l x (12/denom) x kfy x klw is
 // linear in l, so max_span = available_thickness / hmin(at l = 1 ft). Reuses the
 // forward at l = 1 ft to carry the denom / kfy / klw geometry in one place.
-// dims: in { available_thickness_in: L, support: dimensionless, fy_psi: M L^-1 T^-2, wc_pcf: M L^-2 T^-2 } out: { max_span_ft: L, kfy: dimensionless, klw: dimensionless, denom: dimensionless }
-export function computeRcSlabMaxSpanForThickness({ available_thickness_in = 0, support = "simply", fy_psi = 60000, wc_pcf = 145 } = {}) {
+// dims: in { available_thickness_in: L, support: dimensionless, member: dimensionless, fy_psi: M L^-1 T^-2, wc_pcf: M L^-2 T^-2 } out: { max_span_ft: L, kfy: dimensionless, klw: dimensionless, denom: dimensionless }
+export function computeRcSlabMaxSpanForThickness({ available_thickness_in = 0, support = "simply", member = "slab", fy_psi = 60000, wc_pcf = 145 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const h = Number(available_thickness_in) || 0;
   if (!(h > 0)) return { error: "Available thickness must be positive (in)." };
-  const base = computeRcSlabMinThickness({ l_ft: 1, support, fy_psi, wc_pcf });
+  const base = computeRcSlabMinThickness({ l_ft: 1, support, member, fy_psi, wc_pcf });
   if (base.error) return { error: base.error };
   const hmin_per_ft = base.hmin_in;
   const max_span_ft = h / hmin_per_ft;
-  const denoms = { simply: 20, "one-end": 24, "both-ends": 28, cantilever: 10 };
   return {
-    max_span_ft, kfy: base.kfy, klw: base.klw, denom: denoms[support],
-    note: "ACI 318-19 Table 7.3.1.1 / 9.3.1.1 deflection-control minimum thickness solved for the span: with the depth fixed, this is the longest span that still WAIVES an explicit deflection calculation (max_span = h x denom / (12 kfy klw), denom 20 / 24 / 28 / 10). A longer span needs either a deflection calculation or a deeper member. It applies to normalweight (unless wc is set) members not supporting or attached to partitions or construction likely to be damaged by large deflections, uses the clear span, and is not the strength (flexure/shear) design. A design aid, not a substitute for the structural engineer of record's stamped design.",
+    max_span_ft, kfy: base.kfy, klw: base.klw, denom: base.denom,
+    note: "ACI 318-19 Table 7.3.1.1 / 9.3.1.1 deflection-control minimum thickness solved for the span: with the depth fixed, this is the longest span that still WAIVES an explicit deflection calculation (max_span = h x denom / (12 kfy klw), denom 20 / 24 / 28 / 10 for a slab and 16 / 18.5 / 21 / 8 for a beam). A longer span needs either a deflection calculation or a deeper member. It applies to normalweight (unless wc is set) members not supporting or attached to partitions or construction likely to be damaged by large deflections, uses the clear span, and is not the strength (flexure/shear) design. A design aid, not a substitute for the structural engineer of record's stamped design.",
   };
 }
 export const rcSlabMaxSpanForThicknessExample = { inputs: { available_thickness_in: 10, support: "both-ends", fy_psi: 60000, wc_pcf: 145 } };
@@ -617,11 +626,15 @@ CONCRETE_RENDERERS["rc-slab-max-span-for-thickness"] = _simpleRenderer({
   fields: [
     { key: "available_thickness_in", label: "Available thickness h (in)", kind: "number" },
     { key: "support", label: "Support condition", kind: "select", options: [
-      { value: "simply", label: "Simply supported (l/20)" },
-      { value: "one-end", label: "One end continuous (l/24)" },
-      { value: "both-ends", label: "Both ends continuous (l/28)" },
-      { value: "cantilever", label: "Cantilever (l/10)" },
+      { value: "simply", label: "Simply supported (slab l/20, beam l/16)" },
+      { value: "one-end", label: "One end continuous (slab l/24, beam l/18.5)" },
+      { value: "both-ends", label: "Both ends continuous (slab l/28, beam l/21)" },
+      { value: "cantilever", label: "Cantilever (slab l/10, beam l/8)" },
     ], default: "simply" },
+    { key: "member", label: "Member", kind: "select", options: [
+      { value: "slab", label: "One-way slab (Table 7.3.1.1)" },
+      { value: "beam", label: "Beam (Table 9.3.1.1)" },
+    ], default: "slab" },
     { key: "fy_psi", label: "Steel yield fy (psi)", kind: "number" },
     { key: "wc_pcf", label: "Concrete unit weight (pcf)", kind: "number" },
   ],
@@ -1545,7 +1558,7 @@ CONCRETE_RENDERERS["concrete-cracked-inertia-tee"] = _simpleRenderer({
 
 // ===================== spec-v548: cast-in anchor tension concrete breakout (ACI 318-19 Ch. 17) =====================
 
-// dims: in { embedment_in: L, fc_psi: M L^-1 T^-2, edge_distance_in: L, anchor_type: dimensionless, lambda: dimensionless } out: { nb_lb: M L T^-2, ncb_lb: M L T^-2, phi_ncb_lb: M L T^-2 }
+// dims: in { embedment_in: L, fc_psi: M L^-1 T^-2, edge_distance_in: L, anchor_type: dimensionless, lambda: dimensionless } out: { nb_lb: M L T^-2, ncb_lb: M L T^-2, phi_ncb_lb: M L T^-2, phi_tension: dimensionless }
 export function computeConcreteAnchorBreakout({ embedment_in = 0, fc_psi = 0, edge_distance_in = 0, anchor_type = "cast-in", lambda = 1.0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const hef = Number(embedment_in) || 0;
@@ -1556,18 +1569,21 @@ export function computeConcreteAnchorBreakout({ embedment_in = 0, fc_psi = 0, ed
   if (!(fc > 0)) return { error: "Concrete strength f'c must be positive (psi)." };
   if (ca1 < 0) return { error: "Edge distance cannot be negative (in)." };
   if (!(lam > 0)) return { error: "Lightweight factor lambda must be positive (1.0 normalweight)." };
-  const kc = anchor_type === "cast-in" ? 24 : anchor_type === "post-installed" ? 17 : null;
-  if (kc === null) return { error: "Anchor type must be cast-in or post-installed." };
+  // ACI 318-19 Table 17.5.3, tension concrete breakout, Condition B: phi 0.70 cast-in; post-installed
+  // by its ACI 355.2 / 355.4 category, 0.65 / 0.55 / 0.45 for Category 1 / 2 / 3.
+  const _anchor = { "cast-in": [24, 0.70], "post-installed": [17, 0.65], "post-installed-cat2": [17, 0.55], "post-installed-cat3": [17, 0.45] }[anchor_type];
+  if (!_anchor) return { error: "Anchor type must be cast-in or post-installed (Category 1, 2 or 3)." };
+  const [kc, phi_tension] = _anchor;
   const nb_lb = kc * lam * Math.sqrt(fc) * Math.pow(hef, 1.5);
   const ANco = 9 * hef * hef;
   const psi_ed = ca1 < 1.5 * hef ? 0.7 + 0.3 * ca1 / (1.5 * hef) : 1.0;
   const ANc = Math.min(ca1 + 1.5 * hef, 3 * hef) * (2 * 1.5 * hef);
   const area_ratio = Math.min(ANc / ANco, 1.0);
   const ncb_lb = area_ratio * psi_ed * nb_lb;
-  const phi_ncb_lb = 0.70 * ncb_lb;
+  const phi_ncb_lb = phi_tension * ncb_lb;
   return {
-    nb_lb, ANco, psi_ed, ANc, area_ratio, ncb_lb, phi_ncb_lb, kc,
-    note: "The basic strength scales with the embedment to the 1.5 power (a deeper anchor gains fast); a near-edge anchor loses capacity to the edge factor psi_ed and a truncated projected area (a full cone needs 1.5 hef of edge on all sides). Cast-in (kc = 24) and post-installed (kc = 17) anchors differ; the cracked-vs-uncracked factor psi_c also applies (taken as 1.0 here). phi = 0.70 is Condition B (no supplementary reinforcement). ACI 318-19 Chapter 17 and the engineer of record govern.",
+    nb_lb, ANco, psi_ed, ANc, area_ratio, ncb_lb, phi_ncb_lb, kc, phi_tension,
+    note: "The basic strength scales with the embedment to the 1.5 power (a deeper anchor gains fast); a near-edge anchor loses capacity to the edge factor psi_ed and a truncated projected area (a full cone needs 1.5 hef of edge on all sides). Cast-in (kc = 24) and post-installed (kc = 17) anchors differ; the cracked-vs-uncracked factor psi_c also applies (taken as 1.0 here). phi is Condition B (no supplementary reinforcement): 0.70 cast-in, and 0.65 / 0.55 / 0.45 for a post-installed anchor qualified in Category 1 / 2 / 3. ACI 318-19 Chapter 17 and the engineer of record govern.",
   };
 }
 
@@ -1705,13 +1721,13 @@ CONCRETE_RENDERERS["concrete-corbel-bracket"] = _simpleRenderer({
 });
 
 CONCRETE_RENDERERS["concrete-anchor-breakout"] = _simpleRenderer({
-  citation: "Citation: ACI 318-19 Section 17.6.2 concrete breakout in tension (CCD method): Nb = kc lambda sqrt(f'c) hef^1.5 (kc = 24 cast-in, 17 post-installed), ANco = 9 hef^2, edge factor psi_ed = 0.7 + 0.3 ca1/(1.5 hef) when ca1 < 1.5 hef, Ncb = (ANc/ANco) psi_ed Nb, phiNcb = 0.70 Ncb (Condition B, no supplementary reinforcement). The basic strength scales with embedment^1.5; a near-edge anchor loses capacity to the edge factor and a truncated projected area. Cracked-vs-uncracked psi_c applies (1.0 here). ACI 318 Chapter 17 and the engineer of record govern.",
+  citation: "Citation: ACI 318-19 Section 17.6.2 concrete breakout in tension (CCD method): Nb = kc lambda sqrt(f'c) hef^1.5 (kc = 24 cast-in, 17 post-installed), ANco = 9 hef^2, edge factor psi_ed = 0.7 + 0.3 ca1/(1.5 hef) when ca1 < 1.5 hef, Ncb = (ANc/ANco) psi_ed Nb, phiNcb = phi Ncb, phi 0.70 cast-in and 0.65 / 0.55 / 0.45 post-installed Category 1 / 2 / 3 (Condition B, no supplementary reinforcement). The basic strength scales with embedment^1.5; a near-edge anchor loses capacity to the edge factor and a truncated projected area. Cracked-vs-uncracked psi_c applies (1.0 here). ACI 318 Chapter 17 and the engineer of record govern.",
   example: concreteAnchorBreakoutExample.inputs,
   fields: [
     { key: "embedment_in", label: "Effective embedment hef (in)", kind: "number" },
     { key: "fc_psi", label: "Concrete strength f'c (psi)", kind: "number" },
     { key: "edge_distance_in", label: "Nearest edge distance ca1 (in, large = away)", kind: "number" },
-    { key: "anchor_type", label: "Anchor type", kind: "select", options: [{ value: "cast-in", label: "Cast-in (kc = 24)" }, { value: "post-installed", label: "Post-installed (kc = 17)" }] },
+    { key: "anchor_type", label: "Anchor type", kind: "select", options: [{ value: "cast-in", label: "Cast-in (kc = 24)" }, { value: "post-installed", label: "Post-installed, Category 1 (kc = 17)" }, { value: "post-installed-cat2", label: "Post-installed, Category 2 (kc = 17)" }, { value: "post-installed-cat3", label: "Post-installed, Category 3 (kc = 17)" }] },
     { key: "lambda", label: "Lightweight factor lambda", kind: "number" },
   ],
   outputs: [
@@ -1917,7 +1933,7 @@ CONCRETE_RENDERERS["concrete-anchor-pryout"] = _simpleRenderer({
     { key: "embedment_in", label: "Effective embedment hef (in)", kind: "number" },
     { key: "fc_psi", label: "Concrete strength f'c (psi)", kind: "number" },
     { key: "edge_distance_in", label: "Nearest edge distance ca1 (in, large = away)", kind: "number" },
-    { key: "anchor_type", label: "Anchor type", kind: "select", options: [{ value: "cast-in", label: "Cast-in (kc = 24)" }, { value: "post-installed", label: "Post-installed (kc = 17)" }] },
+    { key: "anchor_type", label: "Anchor type", kind: "select", options: [{ value: "cast-in", label: "Cast-in (kc = 24)" }, { value: "post-installed", label: "Post-installed, Category 1 (kc = 17)" }, { value: "post-installed-cat2", label: "Post-installed, Category 2 (kc = 17)" }, { value: "post-installed-cat3", label: "Post-installed, Category 3 (kc = 17)" }] },
     { key: "lambda", label: "Lightweight factor lambda_a (1.0 normal weight)", kind: "number" },
   ],
   outputs: [
