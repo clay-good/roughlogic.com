@@ -1774,8 +1774,8 @@
       "date": "2026-09-01"
     },
     "/tools/cooling-water-makeup/": {
-      "sha": "81bfad52b5ec0125",
-      "date": "2026-09-01"
+      "sha": "84470f11388d0527",
+      "date": "2026-09-19"
     },
     "/tools/copper-resistance/": {
       "sha": "b458c792c9bd137f",
@@ -8578,8 +8578,8 @@
       "date": "2026-09-01"
     },
     "/tools/well-casing-purge-volume/": {
-      "sha": "0381b488857353b0",
-      "date": "2026-09-09"
+      "sha": "fd5d8178ea431f22",
+      "date": "2026-09-19"
     },
     "/tools/well-decline-reserves/": {
       "sha": "aa026475aaeb806a",

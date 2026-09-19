@@ -6,6 +6,16 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **Cooling-tower makeup counted drift twice, chlorine doses treated bleach strength as a weight fraction, and the virus CT check copied the Giardia result.**
+  - `cooling-water-makeup` took blowdown as E / (C - 1) and then added drift again. By the solids balance, blowdown plus drift equals E / (C - 1), so makeup is E C / (C - 1). The worked tower needs 13.33 gpm, not 15.33.
+  - `pool-chlorine-dose` and `well-casing-purge-volume` read 12.5% hypochlorite as a weight fraction of a 10 lb/gal liquid. Liquid chlorine is sold by trade percent, grams of available chlorine per 100 mL, so 12.5% carries 1.04 lb of chlorine per gallon. Both were 17% short. The pool dose for 2 ppm in 15,000 gal is 30.7 fl oz, not 25.6. The well dose is 0.223 gal, the figure spec-v1589 printed.
+  - The `chemical-feed-pump` note gave 12.5% trade as about 11.8% by weight; at SG 1.16 it is about 10.8%.
+  - `disinfection-ct` set the 4-log virus flag equal to the 3-log Giardia flag. Meeting Giardia does imply meeting the virus requirement, but failing Giardia does not fail the virus. The tile now computes the virus requirement from EPA's Disinfection Profiling and Benchmarking guidance, Table B-2 (free chlorine, pH 6-9: CT 12 / 8 / 6 / 4 / 3 / 2 from 0.5 to 25 C). CT 12 at 5 C now reads as meeting the virus requirement (8 needed) while failing Giardia.
+
+  Found by an independent plausibility pass over calc-water, calc-treatment, calc-civil and calc-survey; civil and survey checked clean.
+
+  `calc-treatment.js` crossed its 34,000 B gzip cap by 75 B with these corrections. The cap is now 36,000 B. It is a small lazy-loaded module, so it was raised rather than split, as `scripts/check-module-sizes.mjs` records.
+
 - **The lifting-lug check could pass a lug that ASME BTH-1 fails.** `lifting-lug-design` took pinhole tension as Fu (w - Dh) t / Nd and tear-out as 0.70 Fu (2t (a + Dp/2 - Dh/2)) / Nd, both without BTH-1's 1.20 factor on pinned-connection strength. It also omitted the Cr reduction and the effective-width limit b_eff in tension, and took the full Dp/2 in the tear-out area where BTH-1 takes (Dp/2)(1 - cos phi), phi = 55 Dp/Dh degrees. Together these ran 40-60% above BTH-1 3-3.3. A 44 kip load on a 1 in plate, 4 in wide, with a 2 in pin in a 2.06 in hole and 1.8 in to the edge read DCR 0.98 "adequate"; BTH-1 tear-out gives 39.7 kip and DCR 1.11. The tile now applies the 3-3.3.1 forms and rejects an edge distance that puts the plate edge inside the hole. One pinned cross-check had done exactly that (0.4 in from the center of a 1.06 in hole), so that row now uses a real near-edge geometry. The 1.20 factor was confirmed against a published BTH-1 lug calculation.
 
 - **Anchor embedment asked for 5.5 ft, and five construction tiles disagreed with their own citations.**

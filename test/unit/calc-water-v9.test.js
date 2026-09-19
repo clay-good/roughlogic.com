@@ -134,7 +134,9 @@ test("disinfection-ct: failing case (low CT achieved) flags 3-log Giardia not me
   // C=0.2, t10=60 -> CT=12 mg-min/L vs 139 at 5/7 -> well under.
   const r = computeDisinfectionCT({ chlorine_mg_l: 0.2, t10_minutes: 60, temperature_C: 5, pH: 7 });
   assert.equal(r.pass_3log_giardia, false);
-  assert.equal(r.pass_4log_virus, false);
+  // 4-log virus needs only CT 8 at 5 C (EPA Table B-2, pH 6-9): CT 12 meets it though Giardia fails.
+  assert.equal(r.CT_required_4log_virus, 8);
+  assert.equal(r.pass_4log_virus, true);
 });
 
 test("disinfection-ct: log inactivation scales linearly with CT achieved", () => {

@@ -388,7 +388,7 @@ export function computeChemicalFeedPump({ flow_mgd = 0, dose_mgl = 0, strength_p
     setting_pct: settingPct != null && Number.isFinite(settingPct) ? settingPct : null,
     undersized: settingPct != null && settingPct > 100,
     note: (settingPct != null && settingPct > 100 ? "Setting above 100% - pump is undersized for this dose. " : "")
-      + "Percent-by-weight differs from trade strength (12.5% NaOCl is ~11.8% by weight). Calibrate against a drawdown cylinder, not the dial.",
+      + "Percent-by-weight differs from trade strength (12.5% trade NaOCl is ~10.8% by weight). Calibrate against a drawdown cylinder, not the dial.",
   };
 }
 export const chemicalFeedPumpExample = { inputs: { flow_mgd: 0.5, dose_mgl: 8, strength_pct: 12.5, sg: 1.16, pump_max_gpd: 50 } };
@@ -599,16 +599,20 @@ export function computePoolChlorineDose({ ppm = 0, gallons = 0, product = "cal-h
   const lb_cl = rise * (gal / 1e6) * 8.34;
   const lb_prod = lb_cl / (av / 100);
   const dry_oz = lb_prod * 16;
-  const liq_floz = (lb_prod / 10) * 128; // ~10 lb per gallon of liquid chlorine
+  // Liquid chlorine is sold by TRADE percent (g available chlorine per 100 mL):
+  // gallons = lb Cl / (pct/100 x 8.34). Until 2026-09-18 this took the percent
+  // as a weight fraction of a 10 lb/gal liquid, 17% short (8.5 fl oz per ppm
+  // per 10,000 gal where 12.5% trade needs 10.2).
+  const liq_floz = lb_cl / (av / 100 * 8.34) * 128;
   const isLiquid = product === "liquid-12.5" || (product === "custom" && av <= 15);
   return {
     lb_cl, lb_prod, dry_oz, liq_floz, avail_pct: av, isLiquid,
-    note: "Free-chlorine dose: pounds of chlorine = ppm x (gallons/1,000,000) x 8.34, divided by the product's available-chlorine fraction to get the product weight, then expressed as dry ounces or (for liquid, ~10 lb/gal) fluid ounces. A weaker product needs proportionally more weight - liquid 12.5% takes five times the weight of 65% cal-hypo for the same chlorine - the cost/handling trade between a cheap heavy jug and a concentrated scoop. Dose to a target free-chlorine level; test and retest, and follow the product label. A pool-care aid, not a substitute for the label directions.",
+    note: "Free-chlorine dose: pounds of chlorine = ppm x (gallons/1,000,000) x 8.34, divided by the product's available-chlorine fraction to get the product weight, then expressed as dry ounces or (for liquid, sold by TRADE percent -- grams of available chlorine per 100 mL -- gallons = lb / (percent x 8.34)) fluid ounces. A weaker product needs proportionally more weight - liquid 12.5% takes five times the weight of 65% cal-hypo for the same chlorine - the cost/handling trade between a cheap heavy jug and a concentrated scoop. Dose to a target free-chlorine level; test and retest, and follow the product label. A pool-care aid, not a substitute for the label directions.",
   };
 }
 export const poolChlorineDoseExample = { inputs: { ppm: 2, gallons: 15000, product: "cal-hypo-65", avail: 0 } };
 function renderPoolChlorineDose(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: free-chlorine dose = ppm x (gallons/1,000,000) x 8.34 lb, divided by the product available-chlorine fraction; liquid ~10 lb/gal. Product strengths: liquid 12.5%, cal-hypo 65%, dichlor 56%, trichlor 90%. Dose to a target and retest; the product label governs.";
+  citationEl.textContent = "Citation: free-chlorine dose = ppm x (gallons/1,000,000) x 8.34 lb, divided by the product available-chlorine fraction; liquid by trade percent (gal = lb / (pct x 8.34)). Product strengths: liquid 12.5%, cal-hypo 65%, dichlor 56%, trichlor 90%. Dose to a target and retest; the product label governs.";
   const ppm = makeNumber("Target free-chlorine rise (ppm)", "pcd-ppm", { step: "any", min: "0" });
   const gal = makeNumber("Pool volume (gallons)", "pcd-gal", { step: "any", min: "0" });
   const prod = makeSelect("Product", "pcd-prod", [

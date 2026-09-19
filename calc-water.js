@@ -854,10 +854,16 @@ export function computeDisinfectionCT({
   const CT_required_giardia = _bilinearInterp(SWTR_GIARDIA_3LOG_FREECL.table, SWTR_GIARDIA_3LOG_FREECL.temps_C, SWTR_GIARDIA_3LOG_FREECL.pH, T, p);
   const log_inactivation = (CT_achieved / CT_required_giardia) * 3.0;
   const pass_3log_giardia = CT_achieved >= CT_required_giardia;
-  // 4-log virus is far easier to achieve than 3-log Giardia for free
-  // chlorine; if Giardia passes, virus passes. This is the operator
-  // shorthand referenced in the SWTR Guidance Manual.
-  const pass_4log_virus = pass_3log_giardia;
+  // 4-log virus by free chlorine, EPA Disinfection Profiling and Benchmarking
+  // Guidance Table B-2 (pH 6-9): CT 12 / 8 / 6 / 4 / 3 / 2 at 0.5 / 5 / 10 /
+  // 15 / 20 / 25 C, linear in temperature. Meeting 3-log Giardia implies it,
+  // but failing Giardia does not fail it. Until 2026-09-18 the virus flag was
+  // a copy of the Giardia flag, so CT 100 at 12.5 C read "virus FAILS" where
+  // it passes about 20 times over.
+  const _VT = [0.5, 5, 10, 15, 20, 25], _VCT = [12, 8, 6, 4, 3, 2];
+  let vi = 0; while (vi < _VT.length - 2 && T > _VT[vi + 1]) vi++;
+  const CT_required_4log_virus = _VCT[vi] + (T - _VT[vi]) * (_VCT[vi + 1] - _VCT[vi]) / (_VT[vi + 1] - _VT[vi]);
+  const pass_4log_virus = CT_achieved >= CT_required_4log_virus;
 
   const warnings = [];
   if (C > 0.4) warnings.push("Chlorine residual above 0.4 mg/L falls in a different SWTR band; the bundled table covers <= 0.4 mg/L. Verify against the higher-residual table for high-residual systems.");
@@ -876,6 +882,7 @@ export function computeDisinfectionCT({
   return {
     CT_achieved,
     CT_required_3log_Giardia: CT_required_giardia,
+    CT_required_4log_virus,
     CT_required_selected,
     log_target: lt,
     required_t10_min,
@@ -1268,13 +1275,18 @@ export function computeCoolingWaterMakeup({
   // Industry rule of thumb: ~1% of recirculation evaporates per ~10 F of
   // range, i.e. evaporation = recirc * delta_T / 1000.
   const evaporation_gpm = (recirc * dT) / 1000;
-  const blowdown_gpm = evaporation_gpm / (cycles - 1);
+  // Solids balance: everything that leaves as liquid (blowdown AND drift)
+  // carries the concentrated water, so B + D = E / (C - 1) and makeup
+  // M = E + B + D = E x C / (C - 1). Until 2026-09-18 blowdown was taken as
+  // E / (C - 1) and drift added again, counting drift twice (makeup 15% high
+  // on the worked tower). Drift beyond the whole E/(C-1) leaves no blowdown.
   const drift_gpm = recirc * drift;
+  const blowdown_gpm = Math.max(0, evaporation_gpm / (cycles - 1) - drift_gpm);
   const makeup_gpm = evaporation_gpm + blowdown_gpm + drift_gpm;
 
   const warnings = [];
   if (cycles > 10) warnings.push("Cycles of concentration above 10 is a scaling risk; verify the makeup-water hardness and a scale-inhibitor program.");
-  if (drift > 0.005) warnings.push("Drift above 0.5% suggests a deficient drift eliminator; modern eliminators hold ~0.002 (0.2%).");
+  if (drift > 0.005) warnings.push("Drift above 0.5% suggests a missing or deficient drift eliminator; modern high-efficiency eliminators hold drift near 0.001-0.005% of recirculation.");
 
   return {
     evaporation_gpm,
@@ -2355,11 +2367,15 @@ export function computeWellCasingPurgeVolume({
       : ". (No purge rate entered, and the TIME is what decides how a sampling visit is scheduled)");
   const has_dose = target_dose_mg_l > 0;
   const chlorine_lb = has_dose ? casing_volume_gal / 1e6 * _WELL_LB_PER_MG_MGL * target_dose_mg_l : 0;
-  const solution_lb = has_dose ? chlorine_lb / (solution_strength_pct / 100) : 0;
-  const solution_gal = has_dose ? solution_lb / solution_lb_per_gal : 0;
+  // Hypochlorite is sold by TRADE percent: grams of available chlorine per
+  // 100 mL, so 12.5% trade carries 0.125 x 8.34 = 1.04 lb of chlorine per
+  // gallon whatever its density. Until 2026-09-18 the strength was taken as a
+  // weight fraction of a 10 lb/gal solution (1.25 lb/gal), 17% short on volume.
+  const solution_gal = has_dose ? chlorine_lb / (solution_strength_pct / 100 * 8.34) : 0;
+  const solution_lb = has_dose ? solution_gal * solution_lb_per_gal : 0;
   const dose_verdict = !has_dose
     ? "(no disinfection dose entered)"
-    : "dosing the standing column to " + fmt(target_dose_mg_l, 0) + " mg/L needs " + fmt(chlorine_lb, 3) + " lb of available chlorine, which is " + fmt(solution_lb, 2) + " lb of " + fmt(solution_strength_pct, 1) + "% solution -- " + fmt(solution_gal, 3) + " gallons at " + fmt(solution_lb_per_gal, 1) + " lb/gal. Note that a hypochlorite solution is DENSER than water, so using 8.34 lb/gal overstates the volume by about 20%";
+    : "dosing the standing column to " + fmt(target_dose_mg_l, 0) + " mg/L needs " + fmt(chlorine_lb, 3) + " lb of available chlorine, which is " + fmt(solution_gal, 3) + " gallons of " + fmt(solution_strength_pct, 1) + "% (trade) hypochlorite -- " + fmt(solution_lb, 2) + " lb at " + fmt(solution_lb_per_gal, 1) + " lb/gal. Hypochlorite strength is sold as TRADE percent (grams of available chlorine per 100 mL), so the volume follows from the strength and 8.34 lb/gal alone; the solution's own density only turns that volume into a weight";
   const formation_verdict = !has_dose
     ? "(no disinfection dose entered)"
     : "AND THAT DOSE TREATS THE CASING ONLY. The gravel pack and the near-well formation hold water too -- often a comparable volume -- so the practical dose is increased and the chlorine is agitated and given time to reach the formation. Dosing the casing volume alone disinfects the part of the well that was already cleanest, and the sample comes back clean while the source of the contamination is untouched";

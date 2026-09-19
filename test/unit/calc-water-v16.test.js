@@ -105,13 +105,13 @@ test("well-drawdown: pumping above static and zero discharge are rejected", () =
 
 // --- N.4 Cooling water makeup (8 tests) ------------------------------
 
-test("cooling-water-makeup: 1000 GPM, 10 F, COC 4, drift 0.002 -> makeup 15.33 GPM", () => {
+test("cooling-water-makeup: 1000 GPM, 10 F, COC 4, drift 0.002 -> makeup 13.33 GPM (drift counted once)", () => {
   const r = computeCoolingWaterMakeup(coolingWaterMakeupExample.inputs);
   assert.ok(!r.error);
   assert.ok(close(r.evaporation_gpm, 10, 1e-9));
-  assert.ok(close(r.blowdown_gpm, 10 / 3, 1e-9));
+  assert.ok(close(r.blowdown_gpm, 10 / 3 - 2, 1e-9));
   assert.ok(close(r.drift_gpm, 2, 1e-9));
-  assert.ok(closePct(r.makeup_gpm, 15.3333, 0.5));
+  assert.ok(closePct(r.makeup_gpm, 13.3333, 0.5));
 });
 
 test("cooling-water-makeup: evaporation = recirc * delta-T / 1000", () => {
@@ -119,9 +119,9 @@ test("cooling-water-makeup: evaporation = recirc * delta-T / 1000", () => {
   assert.ok(close(r.evaporation_gpm, (2000 * 15) / 1000, 1e-9));
 });
 
-test("cooling-water-makeup: blowdown = evaporation / (COC - 1)", () => {
+test("cooling-water-makeup: blowdown + drift = evaporation / (COC - 1)", () => {
   const r = computeCoolingWaterMakeup({ recirculation_gpm: 1000, delta_T_F: 10, coc: 6 });
-  assert.ok(close(r.blowdown_gpm, r.evaporation_gpm / 5, 1e-9));
+  assert.ok(close(r.blowdown_gpm + r.drift_gpm, r.evaporation_gpm / 5, 1e-9));
 });
 
 test("cooling-water-makeup: drift = recirc * drift fraction", () => {

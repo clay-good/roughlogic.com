@@ -1617,9 +1617,10 @@ test("bounds: spec-v694 computeWellMaxYield pins yield = specific_capacity x all
 test("bounds: calc-water computeCoolingWaterMakeup pins evaporation / blowdown / drift / makeup", () => {
   const r = computeCoolingWaterMakeup({ recirculation_gpm: 1000, delta_T_F: 10, coc: 4, drift_fraction: 0.002 });
   assert.ok(Math.abs(r.evaporation_gpm - 10) < 1e-9);
-  assert.ok(Math.abs(r.blowdown_gpm - 10 / 3) < 1e-9);
+  // Solids balance: B + D = E/(C - 1) = 3.33, so B = 1.33 and M = E C/(C - 1) = 13.33.
+  assert.ok(Math.abs(r.blowdown_gpm - (10 / 3 - 2)) < 1e-9);
   assert.ok(Math.abs(r.drift_gpm - 2) < 1e-9);
-  assert.ok(Math.abs(r.makeup_gpm - (10 + 10 / 3 + 2)) < 1e-9);
+  assert.ok(Math.abs(r.makeup_gpm - 10 * 4 / 3) < 1e-9);
   // Higher COC lowers blowdown (and total makeup).
   const high = computeCoolingWaterMakeup({ recirculation_gpm: 1000, delta_T_F: 10, coc: 8, drift_fraction: 0.002 });
   assert.ok(high.blowdown_gpm < r.blowdown_gpm);
@@ -20388,9 +20389,9 @@ test("bounds: spec-v353 computePoolChlorineDose pins the mass balance, the dry/l
   assert.ok(Math.abs(r.lb_cl - 2 * 0.015 * 8.34) < 1e-9);
   assert.ok(Math.abs(r.dry_oz - 6.16) < 0.1);
   assert.strictEqual(r.avail_pct, 65);
-  // Liquid at a fifth the strength needs five times the weight.
+  // Liquid is sold by TRADE percent (12.5 g Cl per 100 mL): 0.2502 lb / (0.125 x 8.34) gal = 30.7 fl oz.
   const liq = _v353({ ppm: 2, gallons: 15000, product: "liquid-12.5" });
-  assert.ok(liq.isLiquid && Math.abs(liq.liq_floz - 25.6) < 0.2);
+  assert.ok(liq.isLiquid && Math.abs(liq.liq_floz - 30.72) < 0.01);
   assert.ok(Math.abs(liq.lb_prod / r.lb_prod - 65 / 12.5) < 1e-9);
   // Custom available fraction.
   const cust = _v353({ ppm: 2, gallons: 15000, product: "custom", avail: 100 });
@@ -51083,11 +51084,12 @@ test("bounds: spec-v1589 computeWellCasingPurgeVolume -- the spec printed 0.02 a
   assert.ok(Math.abs(r.purge_volume_gal - 837.216) < 1e-6);
   assert.ok(Math.abs(r.purge_minutes - 55.8144) < 1e-6);
   // spec-v1589 says "~ 0.02 gal -- roughly 0.22 gal" for the same quantity.
-  // 0.233 lb of chlorine is 1.86 lb of 12.5% solution: 0.19 gal at 10 lb/gal
-  // (a real hypochlorite density) or 0.22 at water density. 0.02 is a slip.
+  // 0.233 lb of chlorine at 12.5% TRADE strength (0.125 x 8.34 = 1.04 lb Cl
+  // per gallon) is 0.223 gal, the spec's 0.22; the solution density only
+  // weighs that volume. 0.02 is a slip.
   assert.ok(Math.abs(r.chlorine_lb - 0.2327) < 1e-4);
-  assert.ok(Math.abs(r.solution_gal - 0.18620) < 1e-4);
-  assert.ok(Math.abs(_v1589({ ...base, solution_lb_per_gal: 8.34 }).solution_gal - 0.2233) < 1e-4);
+  assert.ok(Math.abs(r.solution_gal - 0.2233) < 1e-4);
+  assert.ok(Math.abs(_v1589({ ...base, solution_lb_per_gal: 8.34 }).solution_gal - r.solution_gal) < 1e-12);
   assert.ok(r.solution_gal > 0.1);
   // IDENTITY: the dose is exactly linear in concentration and in volume.
   assert.ok(Math.abs(_v1589({ ...base, target_dose_mg_l: 200 }).solution_gal - 2 * r.solution_gal) < 1e-9);

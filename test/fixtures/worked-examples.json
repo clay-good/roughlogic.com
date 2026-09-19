@@ -16748,9 +16748,9 @@
    "source_publisher": "CTI / ASHRAE",
    "source_title": "Cooling water makeup: 1,000 GPM recirc, 10 F range, COC 4, drift 0.002",
    "source_edition_or_year": "CTI publications; ASHRAE Systems and Equipment 2020 Ch. 40",
-   "source_section_or_page": "evap = 1000*10/1000 = 10; blowdown = 10/(4-1) = 3.333; drift = 1000*0.002 = 2; makeup = 15.333 GPM",
+   "source_section_or_page": "evap = 1000*10/1000 = 10; blowdown + drift = 10/(4-1) = 3.333 (solids balance), drift = 1000*0.002 = 2, so blowdown = 1.333; makeup = 10 x 4/3 = 13.333 GPM",
    "verified_by": "rl",
-   "verified_on": "2026-06-02",
+   "verified_on": "2026-09-19",
    "inputs": {
     "recirculation_gpm": 1000,
     "delta_T_F": 10,
@@ -16765,7 +16765,7 @@
      }
     },
     "blowdown_gpm": {
-     "value": 3.3333,
+     "value": 1.3333,
      "tolerance": {
       "pct": 0.5
      }
@@ -16777,7 +16777,7 @@
      }
     },
     "makeup_gpm": {
-     "value": 15.3333,
+     "value": 13.3333,
      "tolerance": {
       "pct": 0.5
      }
@@ -67356,11 +67356,11 @@
   {
    "tile_id": "pool-chlorine-dose",
    "source_publisher": "pool-care practice",
-   "source_title": "cross-check: the same 0.250 lb as 12.5% liquid is 25.6 fl oz (five times the weight)",
+   "source_title": "cross-check: the same 0.250 lb as 12.5% TRADE liquid (12.5 g per 100 mL) is 0.250 / (0.125 x 8.34) gal = 30.7 fl oz",
    "source_edition_or_year": "spec-v353 worked example (machine-verified)",
    "source_section_or_page": "spec-v353 section 2.1 cross-check",
    "verified_by": "rl",
-   "verified_on": "2026-07-03",
+   "verified_on": "2026-09-19",
    "inputs": {
     "ppm": 2,
     "gallons": 15000,
@@ -67368,7 +67368,7 @@
    },
    "outputs": {
     "liq_floz": {
-     "value": 25.6,
+     "value": 30.72,
      "tolerance": {
       "pct": 1
      }
@@ -107174,7 +107174,7 @@
    "source_edition_or_year": "spec-v1589 of scope-trade-expansion-2, 2026-09-09",
    "source_section_or_page": "the standards named in the tile citation govern",
    "verified_by": "rl",
-   "verified_on": "2026-09-09",
+   "verified_on": "2026-09-19",
    "inputs": {
     "casing_diameter_in": 6,
     "well_depth_ft": 280,
@@ -107223,7 +107223,7 @@
      }
     },
     "solution_gal": {
-     "value": 0.1862,
+     "value": 0.2233,
      "tolerance": {
       "pct": 0.5
      }
