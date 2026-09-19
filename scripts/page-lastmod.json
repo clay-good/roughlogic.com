@@ -2,7 +2,7 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "023d870c869b624e",
+      "sha": "caa45fa81833e8fa",
       "date": "2026-09-19"
     },
     "/tools/": {
@@ -58,8 +58,8 @@
       "date": "2026-09-18"
     },
     "/groups/mechanic/": {
-      "sha": "4f9d8c73fdfa3882",
-      "date": "2026-09-18"
+      "sha": "4d6288078f2d9f71",
+      "date": "2026-09-19"
     },
     "/groups/plumbing/": {
       "sha": "4d2c1a3f87230573",
@@ -2598,8 +2598,8 @@
       "date": "2026-09-01"
     },
     "/tools/engine-fuel-burn-gph/": {
-      "sha": "42be1241056310ce",
-      "date": "2026-09-01"
+      "sha": "501aea22ca17a7e8",
+      "date": "2026-09-19"
     },
     "/tools/envelope-conduction-load/": {
       "sha": "f2fa40f706e24b6f",
@@ -3710,8 +3710,8 @@
       "date": "2026-09-01"
     },
     "/tools/hull-speed/": {
-      "sha": "ed3b078fc6f8d080",
-      "date": "2026-09-01"
+      "sha": "c376102f5d829d77",
+      "date": "2026-09-19"
     },
     "/tools/humidifier-capacity/": {
       "sha": "b16b139fa3749997",
@@ -4846,8 +4846,8 @@
       "date": "2026-09-01"
     },
     "/tools/neutral-imbalance/": {
-      "sha": "63c0957edfa5f194",
-      "date": "2026-09-01"
+      "sha": "487f58e57c8c5585",
+      "date": "2026-09-19"
     },
     "/tools/nfa-fireground-flow/": {
       "sha": "f742f2bcea617905",
@@ -4914,8 +4914,8 @@
       "date": "2026-09-01"
     },
     "/tools/odor-dilution-threshold/": {
-      "sha": "a5fefeb4ceae5b0c",
-      "date": "2026-09-18"
+      "sha": "8165312f78fba805",
+      "date": "2026-09-19"
     },
     "/tools/off-grid-battery/": {
       "sha": "da080b6ec1923641",
@@ -6342,8 +6342,8 @@
       "date": "2026-09-04"
     },
     "/tools/rotor-balance-grade/": {
-      "sha": "0ef064de11c9b941",
-      "date": "2026-09-01"
+      "sha": "432c2832cac74a78",
+      "date": "2026-09-19"
     },
     "/tools/rough-opening-size/": {
       "sha": "ffac5089e214d624",
@@ -7146,8 +7146,8 @@
       "date": "2026-09-01"
     },
     "/tools/spray-booth-airflow/": {
-      "sha": "70b8236fd4670964",
-      "date": "2026-09-06"
+      "sha": "1de8724223f369de",
+      "date": "2026-09-19"
     },
     "/tools/spray-drift-buffer/": {
       "sha": "24729eb8a21b7515",

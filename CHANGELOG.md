@@ -6,6 +6,18 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **A third batch of notes checked against their own tiles.**
+  - `spring-natural-frequency`: fn is 13–20× the camshaft frequency, not the highest harmonic.
+  - `thick-wall-cylinder-stress`: thin-wall theory is 12% low at D/t 8; it is Lamé that runs 14% higher.
+  - `vfd-reflected-wave`: 3.1× line-to-line is about 1,430 V at 460 V and 1,780 V at 575 V, not "1,600 V for 600 V".
+  - `rotor-balance-grade`: doubling the speed moves G6.3 to G12.6, most of one 2.5× grade step, not a full grade.
+  - `spray-booth-airflow`: 680,400 BTU/hr is about eight times a residential furnace's hourly output, not more than its daily output.
+  - `hull-speed`: the description now calls hull speed a practical ceiling, as the tile's own note and regimes do, not a hard one.
+  - `odor-dilution-threshold`: three times the dilution needs √3 ≈ 1.7× the stack height, not double.
+  - The rolling-sphere note's "100 or 150 ft down to about 30 m" now reads 100 ft (NFPA 780 explosives) and 20 m (IEC LPL I).
+  - `neutral-imbalance`: the neutral carries three times the per-phase third-harmonic current.
+  - `engine-fuel-burn-gph`: 57% more, not 58%.
+
 - **More notes corrected against their own formulas.**
   - `steel-floor-vibration` said a stiffer floor is "not automatically better", but its own e^(−0.35·fn) term always gives lower acceleration at higher frequency for the same weight and damping.
   - `wire-rope-stretch` said a 100 ft rope stretches "the better part of a foot" at working load. At a 5:1 working load it is about 5 in.
