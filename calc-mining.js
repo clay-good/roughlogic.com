@@ -613,12 +613,14 @@ MINING_RENDERERS["dust-collector-air-to-cloth"] = _simpleRenderer({
 
 // ===================== spec-v1516: dust deflagration vent area (NFPA 68) =====================
 
-// dims: in { volume_cuft: L^3, kst_bar_m_s: dimensionless, p_red_psig: M L^-1 T^-2, p_stat_psig: M L^-1 T^-2, length_to_diameter: dimensionless, stronger_p_red_psig: M L^-1 T^-2, available_vent_area_sqft: L^2 } out: { vent_area_sqft: L^2, vent_area_at_stronger_sqft: L^2, dust_class: dimensionless }
-export function computeDustDeflagrationVentArea({ volume_cuft = 0, kst_bar_m_s = 0, p_red_psig = 0, p_stat_psig = 0, length_to_diameter = 2, stronger_p_red_psig = 0, available_vent_area_sqft = 0 } = {}) {
+// dims: in { volume_cuft: L^3, kst_bar_m_s: dimensionless, pmax_bar: M L^-1 T^-2, p_red_psig: M L^-1 T^-2, p_stat_psig: M L^-1 T^-2, length_to_diameter: dimensionless, stronger_p_red_psig: M L^-1 T^-2, available_vent_area_sqft: L^2 } out: { vent_area_sqft: L^2, vent_area_at_stronger_sqft: L^2, dust_class: dimensionless }
+export function computeDustDeflagrationVentArea({ volume_cuft = 0, kst_bar_m_s = 0, pmax_bar = 8, p_red_psig = 0, p_stat_psig = 0, length_to_diameter = 2, stronger_p_red_psig = 0, available_vent_area_sqft = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(volume_cuft > 0)) return { error: "Enclosure volume must be positive." };
   if (!(kst_bar_m_s > 0)) return { error: "Kst must be positive -- and it comes from testing the actual dust, not from a table." };
   if (!(p_red_psig > 0)) return { error: "Enclosure reduced-pressure strength must be positive." };
+  if (!(pmax_bar > 0) || !Number.isFinite(pmax_bar)) return { error: "Pmax must be positive -- and, like Kst, it comes from testing the actual dust." };
+  if (!(stronger_p_red_psig * _BAR_PER_PSI < pmax_bar)) return { error: "The enclosure strengths must stay below the dust's Pmax; an enclosure that holds Pmax needs no vent." };
   if (!(p_stat_psig > 0)) return { error: "Vent panel static activation pressure must be positive." };
   if (!(p_stat_psig < p_red_psig)) return { error: "The vent must open below the pressure the enclosure can hold." };
   if (!(length_to_diameter >= 1)) return { error: "Length-to-diameter ratio must be at least 1." };
@@ -629,7 +631,11 @@ export function computeDustDeflagrationVentArea({ volume_cuft = 0, kst_bar_m_s =
   const ventArea = (pred_psig) => {
     const p_red_bar = pred_psig * _BAR_PER_PSI;
     const p_stat_bar = p_stat_psig * _BAR_PER_PSI;
-    let a_m2 = 1e-4 * (1 + 1.54 * Math.pow(p_stat_bar, 4 / 3)) * kst_bar_m_s * Math.pow(volume_m3, 0.75) / Math.sqrt(p_red_bar);
+    // NFPA 68 (2007+) Eq. 8.2.2: A = 1e-4 (1 + 1.54 Pstat^(4/3)) Kst V^(3/4)
+    // sqrt(Pmax/Pred - 1), pressures in bar-g. Until 2026-09-19 the last factor
+    // was 1/sqrt(Pred) -- the equation with Pmax fixed near 1 bar -- so a dust
+    // at Pmax 8 bar was given about a third of the vent it needs.
+    let a_m2 = 1e-4 * (1 + 1.54 * Math.pow(p_stat_bar, 4 / 3)) * kst_bar_m_s * Math.pow(volume_m3, 0.75) * Math.sqrt(pmax_bar / p_red_bar - 1);
     // NFPA 68 elongation correction for a vessel longer than two diameters.
     if (length_to_diameter > 2) {
       a_m2 *= 1 + 0.6 * Math.pow(length_to_diameter - 2, 0.75) * Math.exp(-0.95 * p_red_bar * p_red_bar);
@@ -650,13 +656,14 @@ export function computeDustDeflagrationVentArea({ volume_cuft = 0, kst_bar_m_s =
     note: "Venting works by opening a large enough hole fast enough that the pressure inside never exceeds what the enclosure can hold. Three quantities set it: how big the enclosure is, how violently the dust burns, and how much pressure the enclosure can take. The last is the one people get wrong. A standard dust collector housing may hold only one or two pounds per square inch, and a low reduced-pressure rating demands a very large vent, which is often why an existing collector cannot be vented adequately and needs suppression or isolation instead -- and why building a stronger enclosure cuts the requirement so sharply. THE HONEST FIRST OUTPUT IS UPSTREAM OF THE ARITHMETIC. A dust's Kst and minimum ignition energy come from laboratory testing of a sample of the ACTUAL dust; published values for a generic material span a range wide enough to change the answer by a factor of two, and a facility that has not tested its dust does not know whether it has a combustible dust hazard at all. NFPA 652 requires a dust hazard analysis to establish exactly that, and it precedes all of this. The other half is isolation. Venting the collector does nothing about the flame front travelling back up the duct into the building, and NFPA 69 isolation -- a chemical barrier, a rotary valve, or a back-blast damper -- is a separate and equally mandatory requirement that no vent area substitutes for. This is a screening calculation only. Deflagration venting is a life-safety design that must be performed by a qualified engineer to the current edition of NFPA 68, using tested values for the actual dust and accounting for vent panel inertia, duct length on the vent, and the safe discharge location, none of which this evaluates in full. It does not address ignition source control, or housekeeping and fugitive dust accumulation, which is what actually causes secondary explosions and which kills far more people than the primary event. NFPA 652, 68, 69, and a qualified engineer govern.",
   };
 }
-const deflagrationExample = { inputs: { volume_cuft: 3500, kst_bar_m_s: 150, p_red_psig: 1.5, p_stat_psig: 0.5, length_to_diameter: 2, stronger_p_red_psig: 5, available_vent_area_sqft: 12 } };
+const deflagrationExample = { inputs: { volume_cuft: 3500, kst_bar_m_s: 150, pmax_bar: 8, p_red_psig: 1.5, p_stat_psig: 0.5, length_to_diameter: 2, stronger_p_red_psig: 5, available_vent_area_sqft: 12 } };
 MINING_RENDERERS["dust-deflagration-vent-area"] = _simpleRenderer({
-  citation: "Citation: the NFPA 68 vent-area relation by name, in enclosure volume, the dust's tested Kst, the enclosure's reduced-pressure strength, and the vent panel's static activation pressure, with the standard elongation correction above a length-to-diameter ratio of 2. Kst comes from laboratory testing of the ACTUAL dust. A screening calculation only: NFPA 652, 68, 69, and a qualified engineer govern.",
+  citation: "Citation: the NFPA 68 vent-area relation by name, A = 1e-4 (1 + 1.54 Pstat^(4/3)) Kst V^(3/4) sqrt(Pmax/Pred - 1) in bar-g and m, in enclosure volume, the dust's tested Kst and Pmax, the enclosure's reduced-pressure strength, and the vent panel's static activation pressure, with the standard elongation correction above a length-to-diameter ratio of 2. Kst and Pmax come from laboratory testing of the ACTUAL dust. A screening calculation only: NFPA 652, 68, 69, and a qualified engineer govern.",
   example: deflagrationExample.inputs,
   fields: [
     { key: "volume_cuft", label: "Enclosure volume (cu ft)", kind: "number", default: 3500 },
     { key: "kst_bar_m_s", label: "Tested Kst (bar-m/s)", kind: "number", default: 150 },
+    { key: "pmax_bar", label: "Tested Pmax (bar-g)", kind: "number", default: 8 },
     { key: "p_red_psig", label: "Enclosure reduced-pressure strength (psig)", kind: "number", default: 1.5 },
     { key: "p_stat_psig", label: "Vent panel static activation pressure (psig)", kind: "number", default: 0.5 },
     { key: "length_to_diameter", label: "Enclosure length-to-diameter ratio", kind: "number", default: 2 },

@@ -1180,7 +1180,7 @@ export const lightingDensityExample = {
 
 // dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderServiceLoad(inputRegion, outputRegion, citationEl, params) {
-  citationEl.textContent = "Citation: per NEC 2023 §220.12 (general lighting 3 VA/ft^2), §220.42 (dwelling demand 3000 / 35% / 25% schedule), §220.82 (optional method). AHJ governs final service sizing. Free at nfpa.org/freeaccess.";
+  citationEl.textContent = "Citation: per NEC 2023 §220.41 (dwelling general lighting 3 VA/ft^2), Table 220.45 (dwelling demand 3000 / 35% / 25% schedule), §220.82 (optional method). AHJ governs final service sizing. Free at nfpa.org/freeaccess.";
   // v10 §B.3 wiring: simplified-screening banner (AHJ governs final sizing).
   renderLimitationBanner(inputRegion, getLimitationCopy("service-load"));
   attachExampleButton(inputRegion, () => fillExample(serviceLoadExample.inputs));
@@ -2225,7 +2225,7 @@ export const generatorMotorStartingExample = {
   },
 };
 
-// --- 237: Service Entrance Demand Load (Standard Method, NEC 220.42) ---
+// --- 237: Service Entrance Demand Load (Standard Method, NEC 2023 Table 220.45; 220.42 before 2023) ---
 //
 // General lighting demand: first 3000 VA at 100%, next 117000 at 35%,
 // remainder at 25%. Range per NEC 220.55 simplified. Dryer 5000 W min per
@@ -2249,7 +2249,7 @@ export function computeServiceLoadStandard({
 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(area_ft2 >= 0)) return { error: "Area must be non-negative." };
-  // General lighting: 3 VA per ft^2 (NEC 220.12 dwelling).
+  // General lighting: 3 VA per ft^2 (NEC 2023 220.41 dwelling; 220.12 before 2023).
   const lighting_VA = (Number(area_ft2) || 0) * 3;
   const sa_VA = (Number(small_appliance_circuits) || 0) * 1500;
   const laundry_VA = (Number(laundry_circuit) || 0) * 1500;
@@ -3636,7 +3636,7 @@ ELECTRICAL_RENDERERS["ambient-ampacity-adjust"] = renderAmbientAmpacityAdjust;
 // small-appliance and laundry circuit + nameplate of fixed appliances, range,
 // dryer, and water heater; demand = first 10 kVA at 100% + remainder at 40%.
 // The HVAC larger-of-heating-vs-cooling is then added at 100% (220.82(C)). A
-// comparison line runs the standard 220.42 method and the service is sized to
+// comparison line runs the standard (Part III, Table 220.45) method and the service is sized to
 // the larger of the two.
 
 // dims: in { area_ft2: L^2, small_appliance_circuits: dimensionless, laundry_circuits: dimensionless, fixed_appliances_kw: M L^2 T^-3, range_kw: M L^2 T^-3, dryer_kw: M L^2 T^-3, water_heater_kw: M L^2 T^-3, hvac_heating_kw: M L^2 T^-3, hvac_cooling_kw: M L^2 T^-3, ev_charger_a: I, service_voltage: M L^2 T^-3 I^-1 } out: { optional_total_va: M L^2 T^-3, optional_demand_a: I, recommended_a: I }
@@ -3685,7 +3685,7 @@ export function computeServiceLoadOptional({
   const optional_total_va = general_demand_va + hvac_demand_va;
   const optional_demand_a = optional_total_va / V;
 
-  // Comparison: standard 220.42 method via the existing standard-method tile.
+  // Comparison: standard Part III method via the existing standard-method tile.
   const std = computeServiceLoadStandard({
     area_ft2: area,
     small_appliance_circuits: sa,
@@ -3721,7 +3721,7 @@ export function computeServiceLoadOptional({
     standard_demand_a,
     recommended_a,
     exceeds_standard,
-    governing_method: optional_demand_a >= (standard_demand_a ?? 0) ? "optional (220.82)" : "standard (220.42)",
+    governing_method: optional_demand_a >= (standard_demand_a ?? 0) ? "optional (220.82)" : "standard (Part III, Table 220.45)",
     warnings: exceeds_standard
       ? warnings.concat("Calculated demand of " + governing_a.toFixed(1) + " A exceeds the largest bundled standard service (" + _so_max + " A). The figure shown is that ceiling, NOT a sufficient service - size the service to the calculated demand.")
       : warnings,
@@ -3750,7 +3750,7 @@ export const serviceLoadOptionalExample = {
 
 // dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderServiceLoadOptional(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: Per NEC 2023 220.82 (optional dwelling load calculation): general load demand = first 10 kVA at 100% + remainder at 40%; 220.82(C) adds the larger of heating vs cooling at 100%. Compared against the standard 220.42 method; size to the larger. AHJ governs the adopted edition. Free at nfpa.org/freeaccess for the NEC table of contents.";
+  citationEl.textContent = "Citation: Per NEC 2023 220.82 (optional dwelling load calculation): general load demand = first 10 kVA at 100% + remainder at 40%; 220.82(C) adds the larger of heating vs cooling at 100%. Compared against the standard Part III method (Table 220.45 lighting demand); size to the larger. AHJ governs the adopted edition. Free at nfpa.org/freeaccess for the NEC table of contents.";
 
   const area = makeNumber("Dwelling area (ft²)", "slo-area", { step: "any", min: "0" });
   const sa = makeNumber("Small-appliance circuits", "slo-sa", { step: "1", min: "0" });

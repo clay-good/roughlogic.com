@@ -184,7 +184,7 @@ export const BESPOKE_OUTPUT_UNITS = {
   "draft-lift-max": {"theoretical_lift_ft":{"prefix":"","suffix":" ft","digits":1}},
   "drainage-invert": {"total_fall_ft":{"prefix":"","suffix":" ft","digits":2},"invert_out_ft":{"prefix":"","suffix":" ft","digits":2},"top_of_pipe_ft":{"prefix":"","suffix":" ft","digits":2}},
   "dry-time-projection": {"remaining_pts":{"prefix":"","suffix":" points","digits":1}},
-  "dryer-demand-220-54": {"demand_factor":{"prefix":"","suffix":"%","digits":0,"scale":100}},
+  "dryer-demand-220-54": {"demand_factor":{"prefix":"","suffix":"%","digits":1,"scale":100}},
   "drying-balance": {"balance_ppd":{"prefix":"","suffix":" ppd","digits":0}},
   "drying-goal": {"target_indoor_RH_percent":{"prefix":"","suffix":" %","digits":1}},
   "drying-log": {"trend_GPP_per_day":{"prefix":"","suffix":" GPP / day","digits":2},"target_GPP":{"prefix":"","suffix":" GPP","digits":1}},

@@ -1675,7 +1675,7 @@ export const CITATIONS = {
     editionNote: NEC_DISCLOSURE,
     assumptions: [
       { name: "Voltage", value: "240 V single-phase split for dwelling unless user supplies", source: "ANSI C84.1 nominal" },
-      { name: "Demand factor for first 3 kVA general lighting", value: "100% (per NEC 220.42)", source: "NEC 2023" },
+      { name: "Demand factor for first 3 kVA general lighting", value: "100% (per NEC 2023 Table 220.45)", source: "NEC 2023" },
     ],
   },
   "termination-temp-ampacity": {
@@ -1859,8 +1859,8 @@ export const CITATIONS = {
     assumptions: [],
   },
   "lighting-density": {
-    formula: "Total lighting power = area × W/ft² benchmark; benchmarks compared to NEC 220.12 unit loads and IECC C405 / ASHRAE 90.1 LPDs.",
-    edition: NEC_2023 + " Section 220.12; IECC 2021 Table C405; ASHRAE 90.1-2022 by name.",
+    formula: "Total lighting power = area × W/ft² benchmark; benchmarks compared to NEC 2023 Table 220.42(A) unit loads and IECC C405 / ASHRAE 90.1 LPDs.",
+    edition: NEC_2023 + " Table 220.42(A); IECC 2021 Table C405; ASHRAE 90.1-2022 by name.",
     freeAccess: NEC_FREE + " IECC free read-only at codes.iccsafe.org. ASHRAE 90.1 read-only at ashrae.org.",
     governance: GOVERNANCE.electrical,
     editionNote: NEC_DISCLOSURE,
@@ -2401,16 +2401,16 @@ export const CITATIONS = {
   },
 
   "disinfection-ct": {
-    formula: "CT_achieved (mg-min/L) = chlorine_mg_l * t10_minutes. CT_required from bilinear interpolation of SWTR Table A-1 (free chlorine, 3-log Giardia, <=0.4 mg/L band) over the 6 temperature x 4 pH grid. 4-log virus pass is inferred from the Giardia result (free-chlorine 3-log Giardia is more stringent than 4-log virus), not from a separate Table E-1 lookup.",
-    edition: "USEPA Surface Water Treatment Rule Guidance Manual EPA 815-R-99-014, Tables A-1 and E-1 (public domain).",
+    formula: "CT_achieved (mg-min/L) = chlorine_mg_l * t10_minutes. CT_required for 3-log Giardia is interpolated linearly in chlorine residual (<=0.4 to 3.0 mg/L), temperature (0.5-25 C) and pH (6.0-9.0) over the SWTR free-chlorine table. CT for 4-log virus is interpolated in temperature from the free-chlorine virus table (pH 6-9).",
+    edition: "USEPA Disinfection Profiling and Benchmarking Technical Guidance Manual EPA 815-R-20-003 (2020), Tables B-1 and B-2, reproducing the SWTR Guidance Manual CT tables (public domain).",
     freeAccess: "epa.gov/dwreginfo/surface-water-treatment-rules.",
     governance: GOVERNANCE.water,
     editionNote: "State primacy agency governs CT compliance; this tile is a planning check, not a compliance report.",
     assumptions: [
-      { name: "Lookup table", value: "SWTR Table A-1 free-chlorine 3-log Giardia, <=0.4 mg/L band, 6 temperatures (0.5-25 C) x 4 pH (6.0-9.0)", source: "USEPA EPA 815-R-99-014" },
+      { name: "Lookup table", value: "free-chlorine 3-log Giardia CT, 14 residuals (<=0.4-3.0 mg/L) x 6 temperatures (0.5-25 C) x 7 pH (6.0-9.0)", source: "USEPA EPA 815-R-20-003 Table B-1" },
       { name: "t10 contact time", value: "input is the tracer-derived t10, not the theoretical detention time", source: "SWTR Guidance Manual procedure" },
-      { name: "Virus credit", value: "4-log virus inactivation passes when CT_achieved exceeds the SWTR Table E-1 simplified value at the input temperature and pH", source: "USEPA EPA 815-R-99-014 Table E-1" },
-      { name: "Chlorine band", value: "applicable to free chlorine residual <=0.4 mg/L; higher residuals warn (the higher-residual bands of Table A-1 are not bundled in this screen)", source: "spec-v9 §E.2" },
+      { name: "Virus credit", value: "4-log virus CT 12 / 8 / 6 / 4 / 3 / 2 at 0.5 / 5 / 10 / 15 / 20 / 25 C, linear in temperature", source: "USEPA EPA 815-R-20-003 Table B-2" },
+      { name: "Chlorine residual", value: "residuals below 0.4 mg/L read the <=0.4 row; above 3.0 mg/L the 3.0 row is used with a warning", source: "USEPA EPA 815-R-20-003 Table B-1" },
     ],
   },
 
@@ -3190,12 +3190,12 @@ export const CITATIONS = {
 
   "service-load-optional": {
     formula: "General load demand = first 10 kVA at 100% + remainder at 40%, where general load = 3 VA/ft^2 + 1500 VA per small-appliance and laundry circuit + nameplate of fixed appliances, range, dryer, water heater. HVAC larger of heating vs cooling added at 100% (220.82(C)).",
-    edition: NEC_2023 + " 220.82 (optional dwelling load calculation); 220.42 (standard method) for the comparison.",
+    edition: NEC_2023 + " 220.82 (optional dwelling load calculation); the Part III standard method (Table 220.45 lighting demand) for the comparison.",
     freeAccess: NEC_FREE,
     governance: GOVERNANCE.electrical,
     editionNote: NEC_DISCLOSURE,
     assumptions: [
-      { name: "Method choice", value: "the optional method may be used for a dwelling served by a single 120/240 V or 120/208 V set of service conductors; size to the larger of the optional and standard methods", source: "NEC 2023 220.82 / 220.42" },
+      { name: "Method choice", value: "the optional method may be used for a dwelling served by a single 120/240 V or 120/208 V set of service conductors; size to the larger of the optional and standard methods", source: "NEC 2023 220.82 / Table 220.45" },
       { name: "HVAC", value: "the larger of heating vs cooling is added at 100%; non-simultaneous loads are not summed", source: "NEC 2023 220.82(C)" },
     ],
   },
@@ -3796,13 +3796,13 @@ export const CITATIONS = {
   },
 
   "service-load-standard": {
-    formula: "Standard Method per NEC 220.42 (general lighting demand factors: first 3000 VA at 100%, next 117000 VA at 35%, remainder at 25%); 220.53 (fixed appliances 75% if 4+ items in branch); 220.54 (dryer 5000 W or nameplate, whichever is greater); 220.55 (range simplified); 430.24 (largest motor at 125%); 220.60 (HVAC larger of cooling vs. heating). Service A = total_VA / V; recommended service from the NEC 100/125/150/175/200/225/300/400 ladder.",
+    formula: "Standard Method per NEC 2023 Table 220.45 (general lighting demand factors, 220.42 before 2023: first 3000 VA at 100%, next 117000 VA at 35%, remainder at 25%); 220.53 (fixed appliances 75% if 4+ items in branch); 220.54 (dryer 5000 W or nameplate, whichever is greater); 220.55 (range simplified); 430.24 (largest motor at 125%); 220.60 (HVAC larger of cooling vs. heating). Service A = total_VA / V; recommended service from the NEC 100/125/150/175/200/225/300/400 ladder.",
     edition: NEC_2023 + " Article 220 (Branch-Circuit, Feeder, and Service Load Calculations).",
     freeAccess: NEC_FREE,
     governance: GOVERNANCE.electrical,
     editionNote: NEC_DISCLOSURE,
     assumptions: [
-      { name: "General lighting load density", value: "3 VA per ft² (NEC 220.12 dwelling)", source: "NEC 2023" },
+      { name: "General lighting load density", value: "3 VA per ft² (NEC 2023 220.41 dwelling)", source: "NEC 2023" },
       { name: "Small-appliance circuit value", value: "1500 VA per circuit (≥ 2 required)", source: "NEC 220.52(A)" },
       { name: "Laundry circuit value", value: "1500 VA (one required)", source: "NEC 220.52(B)" },
       { name: "Range demand", value: "≤ 8 kW: 100%; 8-12 kW: 8000 VA; > 12 kW: 8000 + 5% per kW above 12", source: "NEC 220.55 simplified" },
@@ -7003,7 +7003,7 @@ export const CITATIONS = {
     assumptions: [],
   },
   "vehicle-load": {
-    formula: "Front axle = Σ(weight × (wheelbase − distance_from_rear)) / wheelbase; Rear = total − Front. Compared against user-supplied GVWR and per-axle GAWR labels.",
+    formula: "Rear axle share = payload × (distance of the payload center behind the front axle) / wheelbase; Front share = payload − Rear share; each added to the curb axle weight. Compared against user-supplied GVWR and per-axle GAWR labels.",
     edition: "FMVSS 49 CFR 567.4 (vehicle certification labels) by section.",
     freeAccess: "Free at ecfr.gov.",
     governance: GOVERNANCE.general,
@@ -7525,13 +7525,13 @@ export const CITATIONS = {
   },
   "payroll-withholding": {
     formula: "Annualize gross. Apply Pub 15-T percentage-method bracket: fed_annual = base + (annual_gross - prev) * rate. Divide by pay periods. FICA: SS = min(gross, wage_base - ytd) * 0.062. Medicare = gross * 0.0145. Additional Medicare = 0.9% above the threshold.",
-    edition: "IRS Publication 15-T, 2025 brackets bundled, Worksheet 1A (Percentage Method, manual payroll). Single-filer only.",
+    edition: "IRS Publication 15-T, 2024 and 2025 Worksheet 1A standard schedules bundled (selected by tax year; other years read 2025). Single-filer only.",
     freeAccess: "Free at irs.gov/publications/p15t.",
     governance: GOVERNANCE.tax,
     editionNote: "Single-filer brackets bundled; MFJ / HoH and the 2020+ W-4 step-2 path are out of scope for the v5 starter (illustrative). The edition names the year the shard carries (data/accounting/pub-15-t-tables.json declares \"2025\") rather than saying \"current year\", which it said until 2026-09-02 -- a bundled bracket table cannot promise it is this year's.",
     assumptions: [
-      { name: "Filer type", value: "single (illustrative)", source: "Pub 15-T Worksheet 1A" },
-      { name: "Standard deduction", value: "baked into the bundled bracket starts", source: "Pub 15-T 2025 percentage-method table" },
+      { name: "Filer type", value: "single, 2020-or-later Form W-4 with no Step 2-4 entries", source: "Pub 15-T Worksheet 1A" },
+      { name: "Standard deduction", value: "line 1g $8,600 folded into the bracket starts ($6,400 + $8,600 = $15,000 for 2025)", source: "Pub 15-T 2025 Worksheet 1A" },
     ],
   },
   "loan-amortization": {
@@ -7665,7 +7665,7 @@ export const CITATIONS = {
     ],
   },
   "van-der-waals": {
-    formula: "(P + a n^2/V^2)(V - n b) = nRT, solved for pressure: P = nRT/(V - n b) - a n^2/V^2; R = 0.0820573 L*atm/(mol*K), T in kelvin; a in L^2*atm/mol^2, b in L/mol per gas; compressibility Z = PV/(nRT); deviation vs ideal = (P_real - P_ideal)/P_ideal.",
+    formula: "(P + a n^2/V^2)(V - n b) = nRT, solved for pressure: P = nRT/(V - n b) - a n^2/V^2; R = 0.0820573 L*atm/(mol*K), T in kelvin; a (CRC, L^2*bar/mol^2) divided by 1.01325 to L^2*atm/mol^2, b in L/mol per gas; compressibility Z = PV/(nRT); deviation vs ideal = (P_real - P_ideal)/P_ideal.",
     edition: "The van der Waals equation of state (van der Waals, 1873); a and b constants from the CRC Handbook of Chemistry & Physics. First principles.",
     freeAccess: "The van der Waals equation is public first-principles chemistry; the a and b constants are published in the public-domain CRC Handbook; moles, volume, and temperature are the user's own measurements.",
     governance: GOVERNANCE.lab,
@@ -8950,14 +8950,14 @@ export const CITATIONS = {
     ],
   },
   "commercial-lighting-load": {
-    formula: "lighting_va = area x unit load (Table 220.12); recep_va = straps x 180 VA (220.14(I)); recep_demand = recep_va <= 10 kVA ? recep_va : 10000 + 0.50 x (recep_va - 10000) (220.44); total = lighting + recep_demand; amps = total / V.",
-    edition: "Commercial general-lighting and receptacle load, NEC 2023 Table 220.12, 220.14(I), and 220.44, by name.",
+    formula: "lighting_va = area x unit load (Table 220.42(A)); recep_va = straps x 180 VA (220.14(I)); recep_demand = recep_va <= 10 kVA ? recep_va : 10000 + 0.50 x (recep_va - 10000) (220.47); total = lighting + recep_demand; amps = total / (sqrt(3) x V line-to-line) three-phase, total / V single-phase.",
+    edition: "Commercial general-lighting and receptacle load, NEC 2023 Table 220.42(A), 220.14(I), and 220.47 (Table 220.12 and 220.44 in 2020 and earlier), by name.",
     freeAccess: "NEC is free to read at nfpa.org/freeaccess. The 125% continuous-lighting factor is applied at the OCPD (210.20(A)), not here; the energy code may set the lighting unit load.",
     governance: GOVERNANCE.electrical,
     editionNote: NEC_DISCLOSURE,
     assumptions: [
-      { name: "Unit and strap loads", value: "the general-lighting unit load is from Table 220.12 by occupancy; each general-use receptacle strap counts at 180 VA", source: "NEC Table 220.12, 220.14(I)" },
-      { name: "Receptacle demand", value: "100% of the first 10 kVA of receptacle load plus 50% of the remainder", source: "NEC 220.44" },
+      { name: "Unit and strap loads", value: "the general-lighting unit load is from Table 220.42(A) by occupancy; each general-use receptacle strap counts at 180 VA", source: "NEC Table 220.12, 220.14(I)" },
+      { name: "Receptacle demand", value: "100% of the first 10 kVA of receptacle load plus 50% of the remainder", source: "NEC 2023 220.47" },
     ],
   },
   "noncoincident-load": {
@@ -9387,13 +9387,13 @@ export const CITATIONS = {
   },
   "tdd-ieee-519": {
     formula: "ratio = Isc / IL; limit = ratio < 20 ? 5.0 : ratio < 50 ? 8.0 : ratio < 100 ? 12.0 : ratio <= 1000 ? 15.0 : 20.0 (%); pass = measured_TDD <= limit.",
-    edition: "The IEEE 519-2022 Table 1 current-distortion limits (total demand distortion at the point of common coupling), by name; the utility agreement and a measurement study govern.",
+    edition: "The IEEE 519-2022 Table 2 current-distortion limits (total demand distortion at the point of common coupling), by name; the utility agreement and a measurement study govern.",
     freeAccess: "The IEEE 519 TDD limit bands by Isc/IL ratio are published in the standard; the short-circuit and demand currents come from the facility's service data.",
     governance: GOVERNANCE.general,
-    editionNote: "IEEE 519-2022 Table 1 current-distortion limits (TDD at the PCC). The limit is on total demand distortion -- harmonic current as a percent of the maximum DEMAND load, not THD (percent of the instantaneous fundamental) and not a flat 5%. The limit loosens as the short-circuit ratio Isc/IL rises because a stiffer supply absorbs more harmonic current: ratio < 20 -> 5%, 20-50 -> 8%, 50-100 -> 12%, 100-1000 -> 15%, > 1000 -> 20%. Individual-harmonic and even-harmonic sub-limits also apply (evens are capped at 25% of the odd limit) and are not checked here. A screening aid, not a compliance report; the utility agreement and a measurement study govern.",
+    editionNote: "IEEE 519-2022 Table 2 current-distortion limits (TDD at the PCC). The limit is on total demand distortion -- harmonic current as a percent of the maximum DEMAND load, not THD (percent of the instantaneous fundamental) and not a flat 5%. The limit loosens as the short-circuit ratio Isc/IL rises because a stiffer supply absorbs more harmonic current: ratio < 20 -> 5%, 20-50 -> 8%, 50-100 -> 12%, 100-1000 -> 15%, > 1000 -> 20%. Individual-harmonic and even-harmonic sub-limits also apply (evens are capped at 25% of the odd limit) and are not checked here. A screening aid, not a compliance report; the utility agreement and a measurement study govern.",
     assumptions: [
       { name: "TDD not THD", value: "the limit is on total demand distortion (over the maximum demand load), not THD", source: "IEEE 519-2022" },
-      { name: "Ratio-dependent", value: "the limit loosens as Isc/IL rises because a stiffer supply absorbs more harmonic current", source: "IEEE 519-2022 Table 1" },
+      { name: "Ratio-dependent", value: "the limit loosens as Isc/IL rises because a stiffer supply absorbs more harmonic current", source: "IEEE 519-2022 Table 2" },
       { name: "Sub-limits", value: "individual-harmonic and even-harmonic sub-limits also apply and are not checked here", source: "IEEE 519-2022" },
     ],
   },
@@ -15405,7 +15405,7 @@ export const CITATIONS = {
     ],
   },
   "dust-deflagration-vent-area": {
-    formula: "vent area from the NFPA 68 relation in enclosure volume, the dust's tested Kst, the enclosure's reduced-pressure strength and the vent panel's static activation pressure, with the standard elongation correction applied above a length-to-diameter ratio of 2; dust class from Kst (St1 up to 200, St2 to 300, St3 above).",
+    formula: "vent area from the NFPA 68 relation A = 1e-4 (1 + 1.54 Pstat^(4/3)) Kst V^(3/4) sqrt(Pmax/Pred - 1) (bar-g, m^3, m^2) in enclosure volume, the dust's tested Kst and Pmax, the enclosure's reduced-pressure strength and the vent panel's static activation pressure, with the standard elongation correction applied above a length-to-diameter ratio of 2; dust class from Kst (St1 up to 200, St2 to 300, St3 above).",
     edition: "The NFPA 68 vent-area relation by name. Kst and Pmax come from laboratory testing of the ACTUAL dust and are entered. A screening calculation only: NFPA 652, 68, 69, and a qualified engineer govern.",
     freeAccess: "Arithmetic on tested dust properties and enclosure ratings the user supplies; no NFPA table is reproduced and no tested dust value is shipped.",
     governance: GOVERNANCE.general,
@@ -22909,7 +22909,7 @@ export const CITATIONS = {
     edition: "Melt furnace energy accounting. The theoretical melt energy, the furnace efficiency and the casting yield are all ENTERED because they vary by alloy, by furnace and by how the furnace is operated.",
     freeAccess: "Two divisions and one exact unit conversion.",
     governance: GOVERNANCE.general,
-    editionNote: "Melting point is not what melting costs. Aluminium melts at less than half the temperature of cast iron and takes substantially MORE energy per pound, because its specific heat and its latent heat of fusion are both much higher -- which is why an aluminium foundry's energy per pound bears no resemblance to an iron foundry's. Furnace type is the first multiplier and a large one: induction and gas-fired furnaces melting the same iron differ by a factor of two or more. THE CASTING YIELD IS THE SECOND MULTIPLIER AND THE ONE LEFT OUT -- only the portion of a heat that becomes saleable casting earns anything, so an energy programme that ignores the methoding is working on the smaller of the two terms.",
+    editionNote: "Melting point is not what melting costs. Aluminium melts at less than half the temperature of cast iron yet takes about 82% of iron's energy per pound (DOE Theoretical/Best Practice Energy Use in Metalcasting Operations, 2004, Table 13: 493 BTU/lb aluminium, 600 gray iron, at tapping temperature), because its specific heat and its latent heat of fusion per pound are both much higher. Furnace type is the first multiplier and a large one: induction and gas-fired furnaces melting the same iron differ by a factor of two or more. THE CASTING YIELD IS THE SECOND MULTIPLIER AND THE ONE LEFT OUT -- only the portion of a heat that becomes saleable casting earns anything, so an energy programme that ignores the methoding is working on the smaller of the two terms.",
     assumptions: [
       { name: "Efficiency is entered", value: "depends on holding time, lid discipline and heat size as much as on the equipment", source: "the foundry's own metering" },
       { name: "No holding energy", value: "a furnace left up between pours can rival the melting energy", source: "the furnace manufacturer's data" },

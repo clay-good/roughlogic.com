@@ -330,10 +330,14 @@ export function computeMasonryLintelLoading({ span_ft = 0, wall_psf = 0, wall_h_
   const tri_h_ft = span / 2;
   const arching = hAbove >= tri_h_ft;
   const W_lb = arching ? 0.5 * span * tri_h_ft * psf : span * hAbove * psf;
-  const w_udl_plf = W_lb / span;
+  // Moment-equivalent UDL. The arched triangle (total W, peak at midspan)
+  // gives M = W L / 6; a UDL gives w L^2 / 8, so w = 4 W / (3 L). Until
+  // 2026-09-19 this was W / L, which matches the end shear but understates the
+  // moment by 25%. The full rectangle is already uniform: w = W / L.
+  const w_udl_plf = arching ? 4 * W_lb / (3 * span) : W_lb / span;
   return {
     tri_h_ft, arching, W_lb, w_udl_plf,
-    note: "Masonry lintel arching load: for masonry above an opening, the lintel carries only the triangular dead load within a 45-degree triangle (height = span/2) IF enough wall is above (wall above >= span/2). W = 0.5 x span x (span/2) x wall psf, an equivalent UDL of W/span. If the wall above is shorter than the triangle (a lintel near the top of the wall or under a beam bearing), arching is not developed and the lintel carries the full rectangle span x height x psf - MORE load than the arched case, which is why the arching reduction is not always available. Dead load only; add the floor/roof/superimposed loads separately. A design aid; the engineer of record governs.",
+    note: "Masonry lintel arching load: for masonry above an opening, the lintel carries only the triangular dead load within a 45-degree triangle (height = span/2) IF enough wall is above (wall above >= span/2). W = 0.5 x span x (span/2) x wall psf; the UDL giving the same midspan moment (W L/6) is 4W/(3 x span), while the end shear is W/2. If the wall above is shorter than the triangle (a lintel near the top of the wall or under a beam bearing), arching is not developed and the lintel carries the full rectangle span x height x psf - MORE load than the arched case, which is why the arching reduction is not always available. Dead load only; add the floor/roof/superimposed loads separately. A design aid; the engineer of record governs.",
   };
 }
 export const masonryLintelLoadingExample = { inputs: { span_ft: 6, wall_psf: 60, wall_h_above: 5 } };
@@ -347,7 +351,7 @@ MASONRY_RENDERERS["masonry-lintel-loading"] = _simpleRenderer({
   ],
   outputs: [
     { key: "w", id: "mll-out-w", label: "Lintel dead load", value: (r) => fmt(r.W_lb, 0) + " lb (" + (r.arching ? "arching, triangular" : "full rectangle -- arching not developed") + ")" },
-    { key: "u", id: "mll-out-u", label: "Equivalent UDL", value: (r) => fmt(r.w_udl_plf, 0) + " lb/ft" },
+    { key: "u", id: "mll-out-u", label: "Equivalent UDL (for moment)", value: (r) => fmt(r.w_udl_plf, 0) + " lb/ft" },
     { key: "t", id: "mll-out-t", label: "Triangle height (span/2)", value: (r) => fmt(r.tri_h_ft, 2) + " ft" },
     { key: "n", id: "mll-out-n", label: "Note", value: (r) => r.note },
   ],

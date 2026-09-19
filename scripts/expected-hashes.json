@@ -103,8 +103,8 @@
     "accounting/estimated-tax-due-dates.json": "3b0c02a63d8ae712e060fe79e8514c5570e507838456aca83830a1358482a920",
     "accounting/standard-mileage-rates.json": "8452adf68136d8c6bd05f5b09b3bb4552d5773bd8f035bf9009ea1cae2ef7f2e",
     "accounting/inventory-benchmarks.json": "7f0eb25022d30653a119a6a2b8612f8f0eee5b6c9ce72a56cfbb3beb3b9e6531",
-    "accounting/pub-15-t-tables.json": "e1483a9cfd473567b5d676c5f0f6d7d8cf7b6185ec56c7a84c0e9b8657ff52be",
-    "accounting/manifest.json": "0584d881ab1c7b7efc17ced7f2fca44db445d010c55a400c93ac2478a07a8b44",
+    "accounting/pub-15-t-tables.json": "e19ddf44a2509b01e16371820fd7d934234706080360917e116f17fd808d9051",
+    "accounting/manifest.json": "1e2c6744893eaf1e7c432d81eae615ba4a0ea8df3759a45b7d57830b0c8808ad",
     "legal/sales-tax-nexus.json": "74a0aadde7fc521346a0aea80e5e354d2eb9b7d5a693a3ed8045038c44967138",
     "legal/manifest.json": "cf3e640b44a78247bb0d4a4eb85345ffe2898c31556756c93cbe1590b6cc2c93",
     "lab/iupac-atomic-weights.json": "589cb6bc3f05d0609bdc91f0d7b7d0ec61c2c097208a3f60a7b94217f1c98873",
@@ -118,7 +118,7 @@
     "realestate/loan-limits.json": "b9b390e0dc8345486794602c813518b826495d5d0a4747c57965e8caa3efba5d",
     "realestate/hud-fmr.json": "c44f8a9cd37c2f250c29963b4be38d4bd64a1e0c391601dc513564df6ca5efc6",
     "realestate/manifest.json": "d109d6e0fca82908cd59260c7d8ff065b96c7c95cccb281bdfd0b4c584e08d7a",
-    "fields/manifest.json": "a33704d7dc078b8c9984031a29850045cd5a46bdbbcf121f21a06dbbde1a270c",
+    "fields/manifest.json": "9dc66a6e0bbb90e0af424523c191bf0e336e140b0d02cfe15ef6f18e360e8430",
     "search/manifest.json": "244bee9aa47c52b3248a84907a0b5acf73268020640e1a5eb85be69531527f5a"
   }
 }

@@ -1,6 +1,6 @@
 {
   "_comment": "v10 Phase A.1 source-cycle table. One row per cited standard listing the publishing body, the current edition, the cycle in years, the next-expected release date (best estimate), and a free-access URL. Used by scripts/check-citation-freshness.mjs to flag manifests whose 'edition' string is more than one cycle behind the current publication of that standard. spec-v22 CF-03: when 'next_expected' is in the past, the row must carry a 'last_verified' (ISO date >= next_expected) re-stamp -- the 'verified, not yet released' acknowledgement -- or the freshness gate fails. Update on each rollover (see docs/citation-freshness-ledger.md). Since 2026-09-02 the file also carries `annual_figures`: the bundled federal dollar figures that reprice every year on a known calendar (IRS mileage, Section 179, the SSA wage base, FHFA and HUD loan limits, GSA per-diem, HUD FMRs, Pub 15-T). Five of them were found stale on one day; nothing had ever asked when their publisher last spoke.",
-  "_updated": "2026-09-10",
+  "_updated": "2026-09-19",
   "standards": [
     {
       "id": "nec",
@@ -336,8 +336,8 @@
       "publishes_month": 12,
       "covers": "calendar tax year",
       "where": "data/accounting/pub-15-t-tables.json",
-      "last_verified": "2025-12-01",
-      "verification_note": "The shard declares edition 2025 and the tile discloses the year and that the brackets are single-filer and illustrative. Reviewed on 2026-09-02 and left as-is: it is disclosed rather than stale-and-silent, and this row exists so the next reader is asked. That review read the DISCLOSURE, not the publisher, so last_verified stays 2025-12-01 -- reading our own tile is not a verification of the IRS's tables. Closing this row means fetching Pub 15-T for the current tax year and comparing the bundled single-filer brackets against it."
+      "last_verified": "2026-09-19",
+      "verification_note": "Verified 2026-09-19 against the IRS's own PDF (irs.gov/pub/irs-prior/p15t--2025.pdf), Worksheet 1A STANDARD Withholding Rate Schedule, Single: $6,400 / $18,325 / $54,875 / $109,750 / $203,700 / $256,925 / $632,750 with bases $1,192.50 / $5,578.50 / $17,651 / $40,199 / $57,231 / $188,769.75, plus the line 1g $8,600. WHAT WAS WRONG: the shard labeled 2025 held the 2024 schedule ($14,600 floor = the 2024 standard deduction, 10% band to $26,200), so $39,000 withheld $2,696 against Pub 15-T's $2,641.50. The tile now keys 2024 and 2025 by tax_year."
     },
     {
       "id": "irs-macrs-table-a1",

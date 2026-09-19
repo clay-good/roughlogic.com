@@ -25,7 +25,9 @@ test("IRS Pub 15-T does not claim a verification it never had", async () => {
   const cycle = await readJson("scripts/sources-cycle.json");
   const row = cycle.annual_figures.find((r) => r.id === "irs-pub-15-t");
   assert.equal(shard.verified_on, row.last_verified);
-  assert.equal(shard.verified_on, "2025-12-01");
+  // Read against the IRS's 2025 Pub 15-T PDF on 2026-09-19 (the brackets were
+  // the 2024 schedule until then).
+  assert.equal(shard.verified_on, "2026-09-19");
   // `fetched` is a fact about the build and may move freely; the point of the
   // fix is that the two are allowed to differ.
   assert.match(shard.fetched, /^\d{4}-\d{2}-\d{2}$/);

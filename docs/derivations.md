@@ -2998,7 +2998,7 @@ cross-check.
 | calc-mining.js | `computeBlastStemmingLength` | `{ burden_ft = 0, hole_diameter_in = 0, proposed_stemming_ft = 0, burden_ratio...` | _ | _ | _ |
 | calc-mining.js | `computeCrusherReductionRatio` | `{ feed_size_in = 0, product_size_in = 0, stages = 2, machine_ratio_low = 3, m...` | _ | _ | _ |
 | calc-mining.js | `computeDustCollectorAirToCloth` | `{ airflow_cfm = 0, bag_count = 0, bag_diameter_in = 0, bag_length_ft = 0, ran...` | _ | _ | _ |
-| calc-mining.js | `computeDustDeflagrationVentArea` | `{ volume_cuft = 0, kst_bar_m_s = 0, p_red_psig = 0, p_stat_psig = 0, length_t...` | _ | _ | _ |
+| calc-mining.js | `computeDustDeflagrationVentArea` | `{ volume_cuft = 0, kst_bar_m_s = 0, pmax_bar = 8, p_red_psig = 0, p_stat_psig...` | _ | _ | _ |
 | calc-mining.js | `computeHighwallBenchGeometry` | `{ bench_height_ft = 0, bench_width_ft = 0, face_angle_deg = 0, bench_count = ...` | _ | _ | _ |
 | calc-mining.js | `computeHoistRopeSafetyFactor` | `{ conveyance_lb = 0, people_count = 0, person_weight_lb = 180, rope_length_ft...` | _ | _ | _ |
 | calc-mining.js | `computeMineFaceVentilation` | `{ heading_width_ft = 0, heading_height_ft = 0, fan_airflow_cfm = 0, tubing_ef...` | _ | _ | _ |
@@ -3958,7 +3958,7 @@ per spec-v14 §13.1 second paragraph.
 | `ceiling-speaker-coverage-angle` | Ceiling Speaker Coverage Angle for a Target Spacing | commercial-audio design practice (sol...; spec-v740 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `chromatic-dispersion-reach` | Fiber Chromatic Dispersion Penalty and Reach | Project (first-principles); the equipment dispersion tolerance and cable data govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `coax-rg-loss` | Coaxial Cable Attenuation | Belden / CommScope loss curves (by name); 100 ft RG6 @ 1000 MHz (6 dB/100 ft) -> 6 dB; source 0 dBm... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
-| `commercial-lighting-load` | Commercial General-Lighting and Receptacle Load (NEC 220.12 / 220.44) | NEC 2023 (NFPA 70); 5,000 ft2 x 3 VA = 15,000 VA lighting; 60 x 180 = 10,800 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `commercial-lighting-load` | Commercial General-Lighting and Receptacle Load (NEC 220.42(A) / 220.47) | NEC 2023 (NFPA 70); 5,000 ft2 x 3 VA = 15,000 VA lighting; 60 x 180 = 10,800 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `conductor-blowout` | Conductor Blowout and Horizontal Clearance | Project (first-principles); the applicable NESC edition and the right-of-way requirem... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `conductor-creep-elongation` | Conductor Long-Term Creep and Sag Increase | Project (first-principles); the conductor manufacturer creep and stress-strain data g... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `conductor-sag-at-temperature` | Conductor Sag Change With Temperature | Project (first-principles); the conductor manufacturer stress-strain data and the app... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -4136,7 +4136,7 @@ per spec-v14 §13.1 second paragraph.
 | `step-touch-voltage` | Tolerable Step and Touch Voltage (IEEE 80) | IEEE Std 80 (tolerable step and touch...; 0.5 s, 3000 ohm-m rock over 100, 0.1 m, 50 kg -> Cs 0.70,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `structured-cabling-channel` | Structured Cabling Channel Length (TIA-568) | ANSI/TIA-568; spec-v458 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `support-spacing` | Raceway / Cable Support-Spacing Lookup (NEC Chapter 3) | NEC 2023 (NFPA 70); EMT secure within 36 in of each box; support every 10 ft | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
-| `tdd-ieee-519` | Total Demand Distortion Limit Check (IEEE 519-2022) | IEEE 519-2022 Table 1 current-distort...; spec-v524 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `tdd-ieee-519` | Total Demand Distortion Limit Check (IEEE 519-2022) | IEEE 519-2022 Table 2 current-distort...; spec-v524 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `termination-temp-ampacity` | Termination Temperature Ampacity Limit (NEC 110.14(C)) | NEC 2023 110.14(C) with Table 310.16; 4/0 THHN: 90C 260, 75C 230, 60C 195; 75C term, over 100 A... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `thermistor-beta-temp` | NTC Thermistor Resistance to Temperature (Beta Equation) | NTC thermistor beta (B-parameter) equ...; 1/T = 1/298.15 + (1/3950) ln(20000/10000) -> T = 283.33 K... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `thermistor-steinhart-hart` | NTC Thermistor Steinhart-Hart Equation (3-Constant) | NTC thermistor Steinhart-Hart equatio...; lnR = ln(10000) = 9.21034; 1/T = 1.1253e-3 + 2.3471e-4(9.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -5439,7 +5439,7 @@ per spec-v14 §13.1 second paragraph.
 | `unit-converter` | Unit Converter | NIST SI/customary unit conversion fac...; 100 ft -> meters: 30.48 m; pure unit conversion identity | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `upgrade-roi` | Upgrade ROI / Payback | Project (first-principles); NPV = -C + sum(S / (1+d)^i) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `vbelt-drive` | V-Belt Sheave and Drive Sizing | ANSI/RMA / Gates; L = 2C + (pi/2)(D1+D2) + (D2-D1)^2/(4C); design_HP = HP*SF | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
-| `vehicle-load` | Vehicle Load Distribution | Project (first-principles) over FMVSS...; 140 in wheelbase / 1000 lb payload at 60 in from cab / 88... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `vehicle-load` | Vehicle Load Distribution | Project (first-principles) over FMVSS...; 140 in wheelbase / 1000 lb payload centered 60 in behind ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `walkway-clearing-productivity` | Walkway Clearing Crew Time and Service Window | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wind-chill` | Wind Chill Exposure | NWS; T_wc = 35.74 + 0.6215 T - 35.75 V^0.16 + 0.4275 T V^0.16 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wind-chill-wind-speed` | Wind Speed from Wind Chill and Temperature | NWS (2001 formula, solved for wind sp...; spec-v758 pinned example: 5 F air, -19 F wind chill -> ~2... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -5821,7 +5821,7 @@ per spec-v14 §13.1 second paragraph.
 | `detention-time` | Detention Time | USEPA; Standard hydraulic retention identity | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `digester-gas-production` | Digester Gas and Methane Production | Anaerobic digester gas production (WE...; 10,000 lb/day VS fed at 55% reduction, 15 ft3/lb, 65% met... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `digester-vs-loading` | Anaerobic Digester Volatile Solids Loading | WEF / university operator courses; 15000 gpd, 4% TS, 75% VS, 20000 ft^3 -> 3753 lb/day, 188 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
-| `disinfection-ct` | Disinfection CT (USEPA SWTR) | USEPA; Table A-1 (<=0.4 mg/L band): CT_required = 139 mg-min/L a... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `disinfection-ct` | Disinfection CT (USEPA SWTR) | USEPA; Table A-1 (<=0.4 mg/L band): CT_required = 139 mg-min/L a... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `diversion-rate-contamination` | Recycling Diversion Rate and Residual Contamination | Project (first-principles); the jurisdiction's diversion definition governs | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `filter-area-for-loading` | Filter Area for a Target Loading Rate | USEPA / AWWA general practice; Rapid-sand band 2-5 gpm/ft^2 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `filter-loading` | Filter Loading Rate and Backwash | USEPA; Rapid-sand band 2-5 gpm/ft^2 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -6047,7 +6047,7 @@ per spec-v14 §13.1 second paragraph.
 | `markup-vs-margin` | Markup vs. Margin Converter | Managerial-accounting CVP pricing ide...; cost $60, markup 50% -> price $90, margin 33.3% | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `mileage-rollup` | Mileage Log Roll-Up | IRS Pub. 463 / IRS Notice (annual sta...; Two trips / 60 business miles total / 2025 -> $42.00 dedu... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `overhead-recovery-rate` | Overhead Recovery Rate | contractor cost accounting; spec-v364 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
-| `payroll-withholding` | Payroll Tax Withholding (Simplified) | IRS Pub 15-T percentage method (singl...; $1500 biweekly / single / 2025 -> annualized $39,000 / fe... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `payroll-withholding` | Payroll Tax Withholding (Simplified) | IRS Pub 15-T percentage method (singl...; $1500 biweekly / single / 2025 -> annualized $39,000 / Wo... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `prevailing-wage-fringe` | Prevailing-Wage Package: Cash vs Bona-Fide Fringe | Davis-Bacon / state wage determination; spec-v446 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `reorder-point` | Reorder Point and Safety Stock (Service Level) | reorder point and safety stock (servi...; spec-v530 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `retainage-tracker` | Retainage Withheld and Net Payment (AIA G702/G703) | construction billing (AIA G702/G703); spec-v392 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -6091,7 +6091,7 @@ per spec-v14 §13.1 second paragraph.
 | `resuspension-volume` | Resuspension Volume | Project (first-principles); 0.05 g lyophilized / 10 mg/mL target -> 0.005 (5 mL) resu... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `serial-dilution` | Serial Dilution Planner | Project (first-principles); 1.0 stock / DF 10 / volume 0.001 / 5 steps -> transfer 0.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `substrate-for-velocity` | Substrate for a Target Fraction of Vmax (Michaelis-Menten Inverse) | Enzyme kinetics (Michaelis-Menten equ...; spec-v635 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
-| `van-der-waals` | Van der Waals Real-Gas Pressure & Z Factor | van der Waals equation of state (CRC ...; P = (1 x 0.0820573 x 273.15)/(1 - 0.04267) - 3.640/1 = 23... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `van-der-waals` | Van der Waals Real-Gas Pressure & Z Factor | van der Waals equation of state (CRC ...; P = (1 x 0.0820573 x 273.15)/(1 - 0.04267) - (3.640/1.013... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
 ### Group X Real Estate (35 tiles)
 
@@ -6128,7 +6128,7 @@ per spec-v14 §13.1 second paragraph.
 | `rent-roll-vacancy` | Rent Roll to Effective Gross Income | Appraisal Institute (income approach); $120k PGR, 5% vac + 2% credit, $6k other -> $8.4k loss, $... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `rent-vs-buy` | Rent vs Buy NPV Comparison | New York Times rent-vs-buy methodolog...; $400k / $80k down / 6.5% 30yr / tax 1.2% / ins 1800 / mai... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `rental-total-return` | Rental Total Return (Four Components) | real-estate-investing practice; spec-v404 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
-| `rental-worksheet` | Rental Income / Expense Worksheet (Schedule E) | IRS Schedule E (Form 1040) Part I (pu...; Worked example: $2200 monthly rent / 5% vacancy / $19,412... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `rental-worksheet` | Rental Income / Expense Worksheet (Schedule E) | IRS Schedule E (Form 1040) Part I (pu...; Worked example: $2200 monthly rent / 5% vacancy -> EGI $2... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `required-face-rent` | Required Face Rent from a Target Net Effective Rent | required face rent (inverse of the ne...; spec-v646 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `section-121-exclusion` | Home-Sale Capital-Gains Exclusion (§121) | 26 USC 121 / IRS Pub 523 (public); Worked example MFJ: sale $850k, costs $45k, basis $300k +... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `seller-net-sheet` | Seller Net Proceeds Sheet | TILA-RESPA Closing Disclosure (12 CFR...; $400,000 sale, $250,000 payoff, 5.5% commission, 0.5% tra... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |

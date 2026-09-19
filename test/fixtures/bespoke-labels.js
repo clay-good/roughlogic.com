@@ -178,7 +178,7 @@ export const BESPOKE_LABELS = {
   "combustion-air": {"btu_input":"Appliance BTU input","room_volume_ft3":"Room volume (ft³)"},
   "combustion-air-max-input": {"room_volume_ft3":"Room volume (ft³)"},
   "combustion-lambda": {"fuel":"Fuel","flue_o2_pct":"Flue-gas O2 (%, dry, air-free)"},
-  "commercial-lighting-load": {"floor_area_ft2":"Gross floor area (ft²)","unit_load_va_ft2":"Unit load (VA/ft², Table 220.12)","receptacle_count":"General-use receptacle straps","supply_v":"Supply voltage (V)"},
+  "commercial-lighting-load": {"floor_area_ft2":"Gross floor area (ft²)","unit_load_va_ft2":"Unit load (VA/ft², Table 220.42(A))","receptacle_count":"General-use receptacle straps","supply_v":"Supply voltage (V, line-to-line for 3-phase)","phases":"Phases"},
   "commercial-load-factor": {"usable_sf":"Usable (occupiable) area (SF)","common_area_factor":"Common-area (add-on) factor (decimal, 0.15 = 15%)","base_rent":"Quoted base rent ($/rentable SF/yr)"},
   "commission-split": {"sale_price":"Sale price ($)","total_commission_percent":"Total commission (% of sale)","side_share_percent":"This side's share of gross (% of total commission)","brokerage_split_to_agent_percent":"Brokerage split (agent share of this side, %)","brokerage_flat_fee":"Brokerage flat fee per transaction ($, optional)"},
   "compaction-roller-production": {"drum_width_ft":"Compacting drum width (ft)","speed_mph":"Roller speed (mph)","lift_in":"Compacted lift thickness (in)","passes":"Passes to reach spec density","efficiency":"Job efficiency"},

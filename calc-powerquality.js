@@ -510,12 +510,12 @@ export function computeTddIeee519({ isc_a = 0, il_a = 0, measured_tdd_pct = 0 } 
   if (![ratio, limit_pct].every(Number.isFinite)) return { error: "TDD-limit math is not a finite value." };
   return {
     ratio, limit_pct, pass,
-    note: "IEEE 519-2022 Table 1 current-distortion limits (TDD at the point of common coupling). The limit is on total demand distortion -- harmonic current as a percent of the maximum DEMAND load, not THD (percent of the instantaneous fundamental) and not a flat 5%. The limit LOOSENS as the short-circuit ratio Isc/IL rises, because a stiffer supply absorbs more harmonic current: ratio < 20 -> 5%, 20-50 -> 8%, 50-100 -> 12%, 100-1000 -> 15%, > 1000 -> 20%. Individual-harmonic and even-harmonic sub-limits also apply (evens are capped at 25% of the odd limit) and are not checked here. The pass/fail is TDD <= limit. A screening aid, not a compliance report; the utility agreement and a measurement study govern.",
+    note: "IEEE 519-2022 Table 2 current-distortion limits (TDD at the point of common coupling). The limit is on total demand distortion -- harmonic current as a percent of the maximum DEMAND load, not THD (percent of the instantaneous fundamental) and not a flat 5%. The limit LOOSENS as the short-circuit ratio Isc/IL rises, because a stiffer supply absorbs more harmonic current: ratio < 20 -> 5%, 20-50 -> 8%, 50-100 -> 12%, 100-1000 -> 15%, > 1000 -> 20%. Individual-harmonic and even-harmonic sub-limits also apply (evens are capped at 25% of the odd limit) and are not checked here. The pass/fail is TDD <= limit. A screening aid, not a compliance report; the utility agreement and a measurement study govern.",
   };
 }
 export const tddIeee519Example = { inputs: { isc_a: 10000, il_a: 400, measured_tdd_pct: 6 } };
 function _v524renderTddIeee519(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: IEEE 519-2022 Table 1 current-distortion limits (TDD at the PCC): ratio = Isc/IL; limit = 5% (ratio < 20) / 8% (20-50) / 12% (50-100) / 15% (100-1000) / 20% (> 1000); pass if measured TDD <= limit. The limit is on total demand distortion, not THD, and loosens with a stiffer supply. A screening aid; the utility agreement and a measurement study govern.";
+  citationEl.textContent = "Citation: IEEE 519-2022 Table 2 current-distortion limits (TDD at the PCC): ratio = Isc/IL; limit = 5% (ratio < 20) / 8% (20-50) / 12% (50-100) / 15% (100-1000) / 20% (> 1000); pass if measured TDD <= limit. The limit is on total demand distortion, not THD, and loosens with a stiffer supply. A screening aid; the utility agreement and a measurement study govern.";
   const isc = makeNumber("Short-circuit current at the PCC (A)", "tdd-isc", { step: "any", min: "0" });
   const il = makeNumber("Maximum demand load current (A)", "tdd-il", { step: "any", min: "0" });
   const tdd = makeNumber("Measured TDD (%)", "tdd-tdd", { step: "any", min: "0" });

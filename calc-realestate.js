@@ -1350,13 +1350,13 @@ export function computeRentalWorksheet({
   property_value: property_value_in, cash_invested: cash_invested_in, market_grm: market_grm_in,
   advertising, auto_travel, cleaning_maintenance, commissions, insurance, legal_professional,
   management_fees, mortgage_interest, other_interest, repairs, supplies, property_taxes,
-  utilities, hoa_fees,
+  utilities, hoa_fees, other_expenses,
 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const inputs = {
     advertising, auto_travel, cleaning_maintenance, commissions, insurance, legal_professional,
     management_fees, mortgage_interest, other_interest, repairs, supplies, property_taxes,
-    utilities, hoa_fees,
+    utilities, hoa_fees, other_expenses,
   };
   const monthly_rent = Number(monthly_rent_in);
   const vacancy_pct = Number(vacancy_pct_in) || 0;
@@ -1371,20 +1371,27 @@ export function computeRentalWorksheet({
   const vacancy_loss = gross_rent * (vacancy_pct / 100);
   const effective_gross_income = gross_rent - vacancy_loss + other_income;
   const expense_rows = [];
-  let total_expenses = 0;
+  let total_expenses = 0, interest = 0;
   for (const f of RENTAL_EXPENSE_FIELDS) {
     const v = Number(inputs[f.key]) || 0;
     if (v < 0) return { error: f.label + " must be non-negative." };
     expense_rows.push({ key: f.key, label: f.label, amount: v });
     total_expenses += v;
+    if (f.key === "mortgage_interest" || f.key === "other_interest") interest += v;
   }
   // NOI excludes depreciation (depreciation is non-cash; Schedule E line 18
-  // sits separately on the form).
-  const NOI = effective_gross_income - total_expenses;
-  const taxable_rental_income = NOI - depreciation;
+  // sits separately on the form) and interest (lines 12-13 are financing, not
+  // operating). Until 2026-09-19 interest was inside NOI, so the example's cap
+  // rate read 1.77% where the property earns 4.83%; the other_expenses line
+  // was never read at all. Taxable income still deducts every Schedule E line.
+  const operating_expenses = total_expenses - interest;
+  const NOI = effective_gross_income - operating_expenses;
+  const taxable_rental_income = effective_gross_income - total_expenses - depreciation;
   const cap_rate_pct = property_value > 0 ? (NOI / property_value) * 100 : null;
-  const cash_on_cash_pct = cash_invested > 0 ? (NOI / cash_invested) * 100 : null;
-  const expense_ratio_pct = effective_gross_income > 0 ? (total_expenses / effective_gross_income) * 100 : null;
+  // Cash flow after interest; the form has no principal line, so principal
+  // repayment is not subtracted.
+  const cash_on_cash_pct = cash_invested > 0 ? ((NOI - interest) / cash_invested) * 100 : null;
+  const expense_ratio_pct = effective_gross_income > 0 ? (operating_expenses / effective_gross_income) * 100 : null;
   // X.5 income-method valuation: the gross-rent multiplier on annual
   // scheduled gross rent (GRM = price / gross annual rent; the standard
   // quick-screen the appraisal income approach uses). When the user
@@ -1464,12 +1471,12 @@ export function renderRentalWorksheet(inputRegion, outputRegion, citationEl) {
   });
   const oGross = makeOutputLine(outputRegion, "Gross rent (annual)", "rw-out-gross");
   const oEGI = makeOutputLine(outputRegion, "Effective gross income (gross - vacancy + other)", "rw-out-egi");
-  const oExp = makeOutputLine(outputRegion, "Total expenses", "rw-out-exp");
-  const oNOI = makeOutputLine(outputRegion, "NOI (EGI - expenses; excludes depreciation)", "rw-out-noi");
-  const oTax = makeOutputLine(outputRegion, "Taxable rental income (NOI - depreciation)", "rw-out-tax");
+  const oExp = makeOutputLine(outputRegion, "Total expenses (Schedule E lines 5-19)", "rw-out-exp");
+  const oNOI = makeOutputLine(outputRegion, "NOI (EGI - operating expenses; excludes interest and depreciation)", "rw-out-noi");
+  const oTax = makeOutputLine(outputRegion, "Taxable rental income (EGI - all expenses - depreciation)", "rw-out-tax");
   const oCap = makeOutputLine(outputRegion, "Cap rate (NOI / property value)", "rw-out-cap");
-  const oCoC = makeOutputLine(outputRegion, "Cash-on-cash (NOI / cash invested)", "rw-out-coc");
-  const oER = makeOutputLine(outputRegion, "Expense ratio (expenses / EGI)", "rw-out-er");
+  const oCoC = makeOutputLine(outputRegion, "Cash-on-cash ((NOI - interest) / cash invested; before principal)", "rw-out-coc");
+  const oER = makeOutputLine(outputRegion, "Expense ratio (operating expenses / EGI)", "rw-out-er");
   const oGRM = makeOutputLine(outputRegion, "Gross rent multiplier (value / annual gross rent)", "rw-out-grm");
   const oVMG = makeOutputLine(outputRegion, "Value at market GRM (market GRM x gross rent)", "rw-out-vmg");
   const update = debounce(() => {
@@ -2070,10 +2077,14 @@ export function computeRentVsBuy({
 
   const i = ret / 100;
   const annual_ownership = pi * 12 + (taxPct / 100) * price + ins + hoa * 12 + (maintPct / 100) * price;
+  // Outflow in year t: P&I stops once the loan is paid off (a 15-yr loan
+  // held 20 yr has 5 payment-free years). Until 2026-09-19 every year
+  // carried the full P&I.
+  const ownershipYear = (t) => annual_ownership - pi * (12 - Math.min(12, Math.max(0, n - 12 * (t - 1))));
 
-  // PV of the level annual ownership outflow over N years.
+  // PV of the annual ownership outflow over N years.
   let pv_ownership = 0;
-  for (let t = 1; t <= N; t++) pv_ownership += annual_ownership / Math.pow(1 + i, t);
+  for (let t = 1; t <= N; t++) pv_ownership += ownershipYear(t) / Math.pow(1 + i, t);
 
   const home_value_N = price * Math.pow(1 + appr / 100, N);
   const selling_costs = (sellPct / 100) * home_value_N;
@@ -2098,7 +2109,7 @@ export function computeRentVsBuy({
   const horizon = Math.min(N, 30);
   for (let y = 1; y <= horizon; y++) {
     let own = 0;
-    for (let t = 1; t <= y; t++) own += annual_ownership / Math.pow(1 + i, t);
+    for (let t = 1; t <= y; t++) own += ownershipYear(t) / Math.pow(1 + i, t);
     const ky = Math.min(y * 12, n);
     const baly = mr === 0 ? loan - pi * ky : Math.max(0, loan * Math.pow(1 + mr, ky) - pi * (Math.pow(1 + mr, ky) - 1) / mr);
     const hv = price * Math.pow(1 + appr / 100, y);

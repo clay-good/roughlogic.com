@@ -348,9 +348,12 @@ export const idealGasLawExample = { inputs: { solve_for: "volume", pressure_atm:
 // (P + a n^2/V^2)(V - n b) = n R T, solved for pressure, gives P_real = n R T/(V - n b)
 // - a n^2/V^2; the a (attraction) and b (excluded-volume) constants are tabulated per
 // gas from the public-domain CRC Handbook. Z = P V/(n R T) reports the deviation from
-// ideal. R = 0.0820573 L*atm/(mol*K), a in L^2*atm/mol^2, b in L/mol, T in kelvin.
+// ideal. R = 0.0820573 L*atm/(mol*K), b in L/mol, T in kelvin. The CRC tabulates a
+// in L^2*bar/mol^2; it is divided by 1.01325 bar/atm before use. Until 2026-09-19
+// the bar figure was applied as atm, overstating the attraction term by 1.3%.
+const _BAR_PER_ATM = 1.01325;
 const _VDW_CONSTANTS = {
-  // gas: [a (L^2*atm/mol^2), b (L/mol)] -- CRC Handbook of Chemistry & Physics, van der Waals constants
+  // gas: [a (L^2*bar/mol^2), b (L/mol)] -- CRC Handbook of Chemistry & Physics, van der Waals constants
   helium: [0.0346, 0.0238],
   hydrogen: [0.2476, 0.02661],
   nitrogen: [1.370, 0.0387],
@@ -375,7 +378,7 @@ export function computeVanDerWaals({ gas = "carbon-dioxide", moles = 0, volume_l
   if (!Number.isFinite(Tc)) return { error: "Temperature must be a number (C)." };
   const Tk = Tc + 273.15;
   if (!(Tk > 0)) return { error: "Temperature must be above absolute zero (-273.15 C)." };
-  const [a, b] = c;
+  const a = c[0] / _BAR_PER_ATM, b = c[1];
   if (!(V > n * b)) return { error: "Volume is at or below the molecules' own excluded volume (n b); the gas is too compressed for this model." };
   const pReal = (n * R * Tk) / (V - n * b) - (a * n * n) / (V * V);
   const pIdeal = (n * R * Tk) / V;

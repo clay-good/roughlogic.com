@@ -38,8 +38,8 @@
     },
     {
       "file": "pub-15-t-tables.json",
-      "name": "IRS Pub 15-T percentage-method brackets (single-filer, illustrative)",
-      "gzip_size_bytes": 431
+      "name": "IRS Pub 15-T percentage-method brackets (single-filer)",
+      "gzip_size_bytes": 511
     }
   ],
   "hashes": {
@@ -49,6 +49,6 @@
     "estimated-tax-due-dates.json": "3b0c02a63d8ae712e060fe79e8514c5570e507838456aca83830a1358482a920",
     "standard-mileage-rates.json": "8452adf68136d8c6bd05f5b09b3bb4552d5773bd8f035bf9009ea1cae2ef7f2e",
     "inventory-benchmarks.json": "7f0eb25022d30653a119a6a2b8612f8f0eee5b6c9ce72a56cfbb3beb3b9e6531",
-    "pub-15-t-tables.json": "e1483a9cfd473567b5d676c5f0f6d7d8cf7b6185ec56c7a84c0e9b8657ff52be"
+    "pub-15-t-tables.json": "e19ddf44a2509b01e16371820fd7d934234706080360917e116f17fd808d9051"
   }
 }

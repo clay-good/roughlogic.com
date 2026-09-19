@@ -481,23 +481,23 @@ test("all twelve Group X renderers exposed in REALESTATE_RENDERERS after X.2 / X
 
 // --- X.12 Rental worksheet ---
 
-test("computeRentalWorksheet: $2200 monthly / 5% vacancy / $19,412 expenses -> NOI $5668", () => {
+test("computeRentalWorksheet: $2200 monthly / 5% vacancy / $9,612 operating expenses -> NOI $15,468", () => {
   const r = computeRentalWorksheet(rentalWorksheetExample.inputs);
   assert.equal(r.gross_rent_annual, 26400);
   assert.ok(Math.abs(r.effective_gross_income - 25080) < 0.01);
   assert.ok(Math.abs(r.total_expenses - 19412) < 0.01);
-  assert.ok(Math.abs(r.NOI - 5668) < 0.01);
+  assert.ok(Math.abs(r.NOI - 15468) < 0.01);
 });
 
-test("computeRentalWorksheet: taxable income = NOI - depreciation (passive loss when negative)", () => {
+test("computeRentalWorksheet: taxable income = EGI - all expenses - depreciation (passive loss when negative)", () => {
   const r = computeRentalWorksheet(rentalWorksheetExample.inputs);
-  assert.ok(Math.abs(r.taxable_rental_income - (5668 - 9200)) < 0.01);
+  assert.ok(Math.abs(r.taxable_rental_income - (25080 - 19412 - 9200)) < 0.01);
   assert.ok(r.taxable_rental_income < 0);
 });
 
 test("computeRentalWorksheet: cap rate and CoC populated when property_value and cash_invested supplied", () => {
   const r = computeRentalWorksheet(rentalWorksheetExample.inputs);
-  assert.ok(Math.abs(r.cap_rate_pct - 1.77) < 0.01);
+  assert.ok(Math.abs(r.cap_rate_pct - 4.834) < 0.01);
   assert.ok(Math.abs(r.cash_on_cash_pct - 7.085) < 0.01);
 });
 
@@ -522,10 +522,10 @@ test("computeRentalWorksheet: value at a market GRM = market_grm x annual gross 
   assert.equal(computeRentalWorksheet(rentalWorksheetExample.inputs).value_at_market_grm, null);
 });
 
-test("computeRentalWorksheet: expense ratio = expenses / EGI", () => {
+test("computeRentalWorksheet: expense ratio = operating expenses / EGI", () => {
   const r = computeRentalWorksheet(rentalWorksheetExample.inputs);
-  // 19412 / 25080 = 77.4%.
-  assert.ok(Math.abs(r.expense_ratio_pct - 77.40) < 0.05);
+  // 9612 / 25080 = 38.3% (interest is financing, not operating).
+  assert.ok(Math.abs(r.expense_ratio_pct - 38.33) < 0.05);
 });
 
 test("computeRentalWorksheet: 15 expense rows enumerated even when many are zero", () => {

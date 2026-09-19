@@ -4175,9 +4175,9 @@ test("monotonicity: computeLadderAngle set_angle_deg is strictly increasing in w
   const expectedAngle = Math.asin(23 / 24) * 180 / Math.PI;
   assert.ok(Math.abs(ref.set_angle_deg - expectedAngle) < 1e-9,
     `angle = ${ref.set_angle_deg}, expected ${expectedAngle}`);
-  // 4:1 base-distance pin: recommended_base = h / 4.
-  assert.ok(Math.abs(ref.base_distance_ft - 23 / 4) < 1e-12,
-    `base = ${ref.base_distance_ft}, expected ${23 / 4}`);
+  // 4:1 base-distance pin: recommended_base = working length / 4 (OSHA 1926.1053(b)(5)(i)).
+  assert.ok(Math.abs(ref.base_distance_ft - 24 / 4) < 1e-12,
+    `base = ${ref.base_distance_ft}, expected ${24 / 4}`);
   // h=0 boundary pin: laying flat -> angle=0 / pass=false.
   const flat = computeLadderAngle({ ladder_length_ft: 24, working_height_ft: 0 });
   assert.equal(flat.set_angle_deg, 0);
@@ -5402,8 +5402,8 @@ test("monotonicity: computeRentalWorksheet gross_rent_annual + NOI are strictly 
   const b = computeRentalWorksheet({ monthly_rent: 2200, vacancy_pct: 5, insurance: 1200, mortgage_interest: 9800, property_taxes: 4800, management_fees: 0, repairs: 1500, depreciation_annual: 9200, property_value: 320000, cash_invested: 80000 });
   assert.equal(b.gross_rent_annual, 2 * a.gross_rent_annual);
   // Closed-form pin from rentalWorksheetExample: rent=2200 / vac=5% ->
-  // gross=26400 / vac_loss=1320 / EGI=25080. Expenses=19412. NOI=5668.
-  // Taxable=5668-9200=-3532 (passive loss).
+  // gross=26400 / vac_loss=1320 / EGI=25080. Expenses=19412, of which 9612
+  // operating. NOI=15468 (interest excluded). Taxable=25080-19412-9200=-3532.
   const ref = computeRentalWorksheet({
     monthly_rent: 2200, vacancy_pct: 5, other_income_annual: 0,
     insurance: 1200, mortgage_interest: 9800, property_taxes: 4800,
@@ -5414,12 +5414,12 @@ test("monotonicity: computeRentalWorksheet gross_rent_annual + NOI are strictly 
   assert.equal(ref.vacancy_loss, 1320);
   assert.equal(ref.effective_gross_income, 25080);
   assert.equal(ref.total_expenses, 19412);
-  assert.equal(ref.NOI, 5668);
+  assert.equal(ref.NOI, 15468);
   assert.equal(ref.taxable_rental_income, -3532);
   // cap_rate_pct = NOI / property_value * 100 pin.
-  assert.ok(Math.abs(ref.cap_rate_pct - (5668 / 320000) * 100) < 1e-9,
-    `cap_rate = ${ref.cap_rate_pct}, expected ${(5668 / 320000) * 100}`);
-  // cash_on_cash_pct = NOI / cash_invested * 100 pin.
+  assert.ok(Math.abs(ref.cap_rate_pct - (15468 / 320000) * 100) < 1e-9,
+    `cap_rate = ${ref.cap_rate_pct}, expected ${(15468 / 320000) * 100}`);
+  // cash_on_cash_pct = (NOI - interest) / cash_invested * 100 pin.
   assert.ok(Math.abs(ref.cash_on_cash_pct - (5668 / 80000) * 100) < 1e-9,
     `coc = ${ref.cash_on_cash_pct}, expected ${(5668 / 80000) * 100}`);
 });

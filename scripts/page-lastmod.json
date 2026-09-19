@@ -2,12 +2,12 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "7fc95711c7b37e4e",
+      "sha": "939eee51bf090b31",
       "date": "2026-09-19"
     },
     "/tools/": {
-      "sha": "d447d6f5e4c3dc58",
-      "date": "2026-09-18"
+      "sha": "6116d33ca84ecf35",
+      "date": "2026-09-19"
     },
     "/groups/accounting/": {
       "sha": "0b266883b6739903",
@@ -30,8 +30,8 @@
       "date": "2026-09-18"
     },
     "/groups/electrical/": {
-      "sha": "852aea2d99e102d4",
-      "date": "2026-09-18"
+      "sha": "74d6ff1a0f9eb5ba",
+      "date": "2026-09-19"
     },
     "/groups/field/": {
       "sha": "a12d41e8f437d804",
@@ -1386,8 +1386,8 @@
       "date": "2026-09-01"
     },
     "/tools/commercial-lighting-load/": {
-      "sha": "0b2b8ac6fea6a46b",
-      "date": "2026-09-01"
+      "sha": "901c69a4ec928ced",
+      "date": "2026-09-19"
     },
     "/tools/commercial-load-factor/": {
       "sha": "077a7ec35a8261bf",
@@ -1742,8 +1742,8 @@
       "date": "2026-09-08"
     },
     "/tools/continuous-load-ocpd/": {
-      "sha": "aaedc7d2fc4a7ef9",
-      "date": "2026-09-01"
+      "sha": "2f32e19253de4fa7",
+      "date": "2026-09-19"
     },
     "/tools/contour-slope/": {
       "sha": "8900493181966bdd",
@@ -2162,8 +2162,8 @@
       "date": "2026-09-01"
     },
     "/tools/disinfection-ct/": {
-      "sha": "6a4b2f53ac269305",
-      "date": "2026-09-01"
+      "sha": "aff699abd303cc72",
+      "date": "2026-09-19"
     },
     "/tools/disk-clutch-torque/": {
       "sha": "ee5909f52f841cbf",
@@ -2482,8 +2482,8 @@
       "date": "2026-09-01"
     },
     "/tools/dust-deflagration-vent-area/": {
-      "sha": "15467f2fe84025ad",
-      "date": "2026-09-05"
+      "sha": "229efb05f22da51d",
+      "date": "2026-09-19"
     },
     "/tools/dynamic-compression-ratio/": {
       "sha": "7ed4a744a768057e",
@@ -4058,8 +4058,8 @@
       "date": "2026-09-01"
     },
     "/tools/ladder-angle/": {
-      "sha": "9cf863595eb76052",
-      "date": "2026-09-01"
+      "sha": "230854d15fbed162",
+      "date": "2026-09-19"
     },
     "/tools/ladder-pipe-reach/": {
       "sha": "e9237e8c97f826fd",
@@ -4174,16 +4174,16 @@
       "date": "2026-09-01"
     },
     "/tools/lighting-density/": {
-      "sha": "f62ab8bce0e537d2",
-      "date": "2026-09-06"
+      "sha": "ec9aaac47a911fb7",
+      "date": "2026-09-19"
     },
     "/tools/lighting-light-loss-factor/": {
       "sha": "dd2cb0b4ef7e2d9e",
       "date": "2026-09-01"
     },
     "/tools/lighting-retrofit-savings/": {
-      "sha": "065ef7fd6bcc2645",
-      "date": "2026-09-01"
+      "sha": "eb90a7a5f65934db",
+      "date": "2026-09-19"
     },
     "/tools/lighting-throw-for-pool/": {
       "sha": "7511345c15a3166d",
@@ -4474,8 +4474,8 @@
       "date": "2026-09-01"
     },
     "/tools/masonry-lintel-loading/": {
-      "sha": "d3ea79bbcd0e7cd1",
-      "date": "2026-09-01"
+      "sha": "95b1bbd333541afd",
+      "date": "2026-09-19"
     },
     "/tools/masonry-prism-fm/": {
       "sha": "392550ea0e1b1882",
@@ -4558,8 +4558,8 @@
       "date": "2026-09-01"
     },
     "/tools/melt-furnace-energy/": {
-      "sha": "b4f7386f84db2a61",
-      "date": "2026-09-09"
+      "sha": "e9b9ba585d17445e",
+      "date": "2026-09-19"
     },
     "/tools/membrane-fastener-takeoff/": {
       "sha": "9e536d62edc9a4dd",
@@ -4886,8 +4886,8 @@
       "date": "2026-09-01"
     },
     "/tools/noncoincident-load/": {
-      "sha": "2e75634485e56cb1",
-      "date": "2026-09-04"
+      "sha": "366f2d547e3185b0",
+      "date": "2026-09-19"
     },
     "/tools/nozzle-flow-pressure/": {
       "sha": "b2ba37819897dd98",
@@ -5118,8 +5118,8 @@
       "date": "2026-09-01"
     },
     "/tools/payroll-withholding/": {
-      "sha": "41d090180d52feab",
-      "date": "2026-09-02"
+      "sha": "8ac5eac96b1d325a",
+      "date": "2026-09-19"
     },
     "/tools/pcr-master-mix/": {
       "sha": "afe49b2d0b0f28d6",
@@ -6138,8 +6138,8 @@
       "date": "2026-09-01"
     },
     "/tools/rental-worksheet/": {
-      "sha": "451f7bfcc1b5723f",
-      "date": "2026-09-10"
+      "sha": "ec09817523662dff",
+      "date": "2026-09-19"
     },
     "/tools/reorder-point/": {
       "sha": "a7e7c9f559f7332d",
@@ -6654,16 +6654,16 @@
       "date": "2026-09-01"
     },
     "/tools/service-load/": {
-      "sha": "a031bb92eee5c59b",
-      "date": "2026-09-18"
+      "sha": "7fae3f05166d2417",
+      "date": "2026-09-19"
     },
     "/tools/service-load-optional/": {
-      "sha": "397c866e7177cc85",
-      "date": "2026-09-01"
+      "sha": "fadde0dd986031a1",
+      "date": "2026-09-19"
     },
     "/tools/service-load-standard/": {
-      "sha": "48a6353cb074f396",
-      "date": "2026-09-01"
+      "sha": "29acefa626151e10",
+      "date": "2026-09-19"
     },
     "/tools/settlement-limit-load/": {
       "sha": "5e0ac6a0e62de83b",
@@ -7730,8 +7730,8 @@
       "date": "2026-09-01"
     },
     "/tools/tdd-ieee-519/": {
-      "sha": "5f59953fc4daedd4",
-      "date": "2026-09-01"
+      "sha": "05796dfbf92b92f1",
+      "date": "2026-09-19"
     },
     "/tools/tds-from-conductivity/": {
       "sha": "18238b1ddb7537e1",
@@ -8294,8 +8294,8 @@
       "date": "2026-09-01"
     },
     "/tools/van-der-waals/": {
-      "sha": "50c9472602cf02e1",
-      "date": "2026-09-04"
+      "sha": "632e42117a4c2d73",
+      "date": "2026-09-19"
     },
     "/tools/vapor-barrier-rolls/": {
       "sha": "29a9c0d5e2940a6f",
@@ -8318,8 +8318,8 @@
       "date": "2026-09-01"
     },
     "/tools/vehicle-load/": {
-      "sha": "b1bc5d2345c413a9",
-      "date": "2026-09-01"
+      "sha": "d7bbe824129bc91c",
+      "date": "2026-09-19"
     },
     "/tools/vehicle-road-load-power/": {
       "sha": "38b67fa04f023e31",

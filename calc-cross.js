@@ -1296,10 +1296,13 @@ export const windChillWindSpeedExample = { inputs: { T_F: 5, target_wc_F: -19 } 
 
 // dims: in { ladder_length_ft: L, working_height_ft: L } out: { angle_deg: dimensionless, base_distance_ft: L }
 export function computeLadderAngle({ ladder_length_ft = 0, working_height_ft = 0 }) {
-  if (!(ladder_length_ft > 0)) return { error: "Ladder length must be positive." };
+  if (!(ladder_length_ft > 0) || !Number.isFinite(ladder_length_ft)) return { error: "Ladder length must be a positive, finite number." };
   if (!(working_height_ft >= 0 && working_height_ft <= ladder_length_ft)) return { error: "Working height must be 0..ladder length." };
-  // Published 4:1 rule: recommended base distance = working_height / 4.
-  const recommended_base_ft = working_height_ft / 4;
+  // OSHA 1926.1053(b)(5)(i) 4:1 rule: the foot sits out one quarter of the
+  // working length -- the distance ALONG the ladder from foot to top support,
+  // here the ladder length -- not a quarter of the height. Until 2026-09-19
+  // this divided the working height (3 ft for a 16 ft ladder, not 4 ft).
+  const recommended_base_ft = ladder_length_ft / 4;
   // Actual lean angle the ladder makes for the given length and working height:
   // sin(angle) = working_height / ladder_length.
   const actual_angle_deg = working_height_ft === 0 ? 0 : (Math.asin(Math.min(1, working_height_ft / ladder_length_ft)) * 180) / Math.PI;
@@ -1308,8 +1311,8 @@ export function computeLadderAngle({ ladder_length_ft = 0, working_height_ft = 0
   return { base_distance_ft: recommended_base_ft, set_angle_deg: actual_angle_deg, pass };
 }
 
-// Example chosen so the ladder is leaned correctly at ~75.5 deg:
-// sin(75.5 deg) = 0.968, so a 24 ft ladder reaches ~23.2 ft when set right.
+// Example: a 16 ft ladder reaching only 12 ft leans at 48.6 deg and fails;
+// set right (foot 4 ft out, 75.5 deg) it would reach 16 x 0.968 = 15.5 ft.
 export const ladderAngleExample = { inputs: { ladder_length_ft: 16, working_height_ft: 12 } };
 
 // --- Utility 167: Pulley System Mechanical Advantage (general) ---
@@ -1449,7 +1452,12 @@ export function computeVehicleLoad({ wheelbase_in = 0, payload_lb = 0, payload_p
   if (!(wheelbase_in > 0)) return { error: "Wheelbase must be positive." };
   if (!(payload_lb >= 0)) return { error: "Payload must be non-negative." };
   if (!(payload_position_from_cab_in >= 0)) return { error: "Payload position must be non-negative." };
-  // Static balance: rear axle load = payload * (position / wheelbase); front = payload - rear.
+  // Static balance about the front axle: rear axle load = payload * (position /
+  // wheelbase); front = payload - rear. The position is measured from the
+  // FRONT AXLE (the key name says "from cab" for history; the MCP key stays).
+  // Until 2026-09-19 the field was labeled "from cab", so a bed load 60 in
+  // behind a cab that sits 80 in back of the front axle was put 571 lb onto
+  // the front axle when it sits over the rear axle.
   const payload_to_rear = payload_lb * (payload_position_from_cab_in / wheelbase_in);
   const payload_to_front = payload_lb - payload_to_rear;
   const front_total = curb_front_lb + payload_to_front;
@@ -1751,7 +1759,7 @@ const renderVehicleLoad = _simpleRendererG({
   fields: [
     { key: "wheelbase_in", label: "Wheelbase (in)", kind: "number" },
     { key: "payload_lb", label: "Payload (lb)", kind: "number" },
-    { key: "payload_position_from_cab_in", label: "Payload position from cab (in)", kind: "number" },
+    { key: "payload_position_from_cab_in", label: "Payload center behind the front axle (in)", kind: "number" },
     { key: "curb_front_lb", label: "Curb front axle (lb)", kind: "number" },
     { key: "curb_rear_lb", label: "Curb rear axle (lb)", kind: "number" },
     { key: "gvwr_lb", label: "GVWR (lb, optional)", kind: "number" },

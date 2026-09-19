@@ -43,9 +43,9 @@ test("B.1 box-fill cites NEC 2023 §314.16", async () => {
   const t = await readCalc("calc-electrical.js");
   assertCitationContains(t, ["NEC 2023 §314.16", "nfpa.org/freeaccess"], "box-fill");
 });
-test("B.1 service-load cites NEC 2023 §220.42 / §220.82", async () => {
+test("B.1 service-load cites NEC 2023 §220.41 / Table 220.45 / §220.82", async () => {
   const t = await readCalc("calc-electrical.js");
-  assertCitationContains(t, ["§220.42", "§220.82", "nfpa.org/freeaccess"], "service-load");
+  assertCitationContains(t, ["§220.41", "Table 220.45", "§220.82", "nfpa.org/freeaccess"], "service-load");
 });
 test("B.1 breaker-sizing cites NEC 2023 §215.3 / §230.79 / §408.36 + 125% rule", async () => {
   const t = await readCalc("calc-electrical.js");

@@ -59,7 +59,7 @@
     },
     "disinfection-ct": {
       "group": "calc-electrical.js (Group A)",
-      "stamp": "Citation: Per USEPA Surface Water Treatment Rule Guidance Manual EPA 815-R-99-014 Table A-1 (free chlorine 3-log Giardia inactivation, ≤0.4 mg/L band, 6 temperature x 4 pH grid). 4-log virus pass inferred from the Giardia result (free-chlorine 3-log Giardia is more stringent than 4-log virus; no separate Table E-1 lookup). State primacy agency governs CT compliance; this tile is a planning check, not a compliance report. Free at epa.gov/dwreginfo/surface-water-treatment-rules."
+      "stamp": "Citation: Per USEPA Disinfection Profiling and Benchmarking Technical Guidance Manual EPA 815-R-20-003 Table B-1 (free chlorine 3-log Giardia inactivation, ≤0.4 to 3.0 mg/L residual x 6 temperature x 7 pH grid) and Table B-2 (4-log virus CT by temperature). State primacy agency governs CT compliance; this tile is a planning check, not a compliance report. Free at epa.gov/dwreginfo/surface-water-treatment-rules."
     },
     "drying-log": {
       "group": "calc-electrical.js (Group A)",
@@ -231,7 +231,7 @@
     },
     "service-load": {
       "group": "calc-electrical.js (Group A)",
-      "stamp": "Citation: per NEC 2023 §220.12 (general lighting 3 VA/ft^2), §220.42 (dwelling demand 3000 / 35% / 25% schedule), §220.82 (optional method). AHJ governs final service sizing. Free at nfpa.org/freeaccess."
+      "stamp": "Citation: per NEC 2023 §220.41 (dwelling general lighting 3 VA/ft^2), Table 220.45 (dwelling demand 3000 / 35% / 25% schedule), §220.82 (optional method). AHJ governs final service sizing. Free at nfpa.org/freeaccess."
     },
     "shr-latent": {
       "group": "calc-electrical.js (Group A)",

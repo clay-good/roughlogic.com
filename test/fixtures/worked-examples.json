@@ -691,7 +691,7 @@
      }
     },
     "base_distance_ft": {
-     "value": 3,
+     "value": 4,
      "tolerance": {
       "abs": 0.01
      }
@@ -1386,7 +1386,7 @@
    "source_publisher": "van der Waals equation of state (CRC Handbook constants)",
    "source_title": "CO2, 1 mol in 1 L at 0 C -> P_real 19.77 atm, Z 0.882 (spec-v1258)",
    "source_edition_or_year": "P = nRT/(V - nb) - a n^2/V^2; a = 3.640, b = 0.04267 for CO2",
-   "source_section_or_page": "P = (1 x 0.0820573 x 273.15)/(1 - 0.04267) - 3.640/1 = 23.413 - 3.640 = 19.773 atm; ideal 22.414 atm; Z = 19.773/22.414 = 0.882 (attraction dominates near condensation).",
+   "source_section_or_page": "P = (1 x 0.0820573 x 273.15)/(1 - 0.04267) - (3.640/1.01325)/1 = 23.413 - 3.592 = 19.821 atm (CRC a = 3.640 L^2 bar/mol^2 = 3.592 L^2 atm/mol^2); ideal 22.414 atm; Z = 19.821/22.414 = 0.884 (attraction dominates near condensation).",
    "verified_by": "rl",
    "verified_on": "2026-08-08",
    "inputs": {
@@ -1397,13 +1397,13 @@
    },
    "outputs": {
     "pressure_real_atm": {
-     "value": 19.773,
+     "value": 19.821,
      "tolerance": {
       "abs": 0.01
      }
     },
     "z_factor": {
-     "value": 0.882,
+     "value": 0.884,
      "tolerance": {
       "abs": 0.002
      }
@@ -1415,7 +1415,7 @@
    "source_publisher": "van der Waals equation of state (CRC Handbook constants)",
    "source_title": "helium, 1 mol in 1 L at 0 C -> Z slightly above 1 (excluded volume dominates)",
    "source_edition_or_year": "a = 0.0346, b = 0.0238 for He",
-   "source_section_or_page": "P = (0.0820573 x 273.15)/(1 - 0.0238) - 0.0346/1 = 22.961 - 0.0346 = 22.926 atm; ideal 22.414 atm; Z = 22.926/22.414 = 1.023 (a weakly-attracting gas reads harder to compress than ideal).",
+   "source_section_or_page": "P = (0.0820573 x 273.15)/(1 - 0.0238) - (0.0346/1.01325)/1 = 22.961 - 0.0341 = 22.926 atm; ideal 22.414 atm; Z = 22.926/22.414 = 1.023 (a weakly-attracting gas reads harder to compress than ideal).",
    "verified_by": "rl",
    "verified_on": "2026-08-08",
    "inputs": {
@@ -3857,6 +3857,41 @@
     },
     "pass_4log_virus": {
      "value": 1,
+     "tolerance": {
+      "abs": 0
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "disinfection-ct",
+   "source_publisher": "USEPA",
+   "source_title": "Disinfection Profiling and Benchmarking Technical Guidance Manual, free-chlorine 3-log Giardia CT at 2.0 mg/L, 5 C, pH 7.0",
+   "source_edition_or_year": "EPA 815-R-20-003 (2020)",
+   "source_section_or_page": "Table B-1: CT_required = 165 mg-min/L at 2.0 mg/L, 5 C, pH 7.0 (139 at <=0.4 mg/L); C=2.0 mg/L x t10=80 min = 160 < 165 -> fails 3-log Giardia",
+   "verified_by": "rl",
+   "verified_on": "2026-09-19",
+   "inputs": {
+    "chlorine_mg_l": 2,
+    "t10_minutes": 80,
+    "temperature_C": 5,
+    "pH": 7
+   },
+   "outputs": {
+    "CT_achieved": {
+     "value": 160,
+     "tolerance": {
+      "abs": 1e-06
+     }
+    },
+    "CT_required_3log_Giardia": {
+     "value": 165,
+     "tolerance": {
+      "abs": 1e-06
+     }
+    },
+    "pass_3log_giardia": {
+     "value": 0,
      "tolerance": {
       "abs": 0
      }
@@ -9961,7 +9996,7 @@
    "source_publisher": "Project (first-principles) over FMVSS axle-distribution identity",
    "source_title": "Static axle load distribution: front_axle = curb_front + payload * (wheelbase - position) / wheelbase; rear analog",
    "source_edition_or_year": "n/a; classical static moment identity over a two-axle truck",
-   "source_section_or_page": "140 in wheelbase / 1000 lb payload at 60 in from cab / 8800 GVWR / 4400 fr / 5500 rr / 2500 + 2300 curb -> 3071 fr / 2729 rr / 5800 gross / no over-flags",
+   "source_section_or_page": "140 in wheelbase / 1000 lb payload centered 60 in behind the front axle / 8800 GVWR / 4400 fr / 5500 rr / 2500 + 2300 curb -> 3071 fr / 2729 rr / 5800 gross / no over-flags",
    "verified_by": "rl",
    "verified_on": "2026-05-11",
    "inputs": {
@@ -13873,7 +13908,7 @@
    "source_publisher": "IRS Pub 15-T percentage method (single, biweekly, 2025)",
    "source_title": "Annualize gross; apply Pub 15-T brackets; divide by pay-periods; SS 6.2% (capped) + Medicare 1.45%",
    "source_edition_or_year": "IRS Pub 15-T 2025 (single biweekly bracket; SS wage base $176,100)",
-   "source_section_or_page": "$1500 biweekly / single / 2025 -> annualized $39,000 / fed income $2,696/yr ($103.69/period) / SS $93/period / Medicare $21.75/period",
+   "source_section_or_page": "$1500 biweekly / single / 2025 -> annualized $39,000 / Worksheet 1A: $39,000 - $8,600 = $30,400, $1,192.50 + 12% x ($30,400 - $18,325) = $2,641.50/yr ($101.60/period) / SS $93/period / Medicare $21.75/period",
    "verified_by": "rl",
    "verified_on": "2026-05-11",
    "inputs": {
@@ -13890,13 +13925,13 @@
      }
     },
     "fed_income_tax_period": {
-     "value": 103.69,
+     "value": 101.596,
      "tolerance": {
       "abs": 0.05
      }
     },
     "fed_income_tax_annual": {
-     "value": 2696,
+     "value": 2641.5,
      "tolerance": {
       "abs": 0.5
      }
@@ -13914,7 +13949,7 @@
      }
     },
     "total_employee_period": {
-     "value": 218.44,
+     "value": 216.346,
      "tolerance": {
       "abs": 0.05
      }
@@ -14297,7 +14332,7 @@
    "source_publisher": "IRS Schedule E (Form 1040) Part I (public)",
    "source_title": "Schedule E rental income / expense worksheet",
    "source_edition_or_year": "Current Schedule E instructions",
-   "source_section_or_page": "Worked example: $2200 monthly rent / 5% vacancy / $19,412 expenses -> NOI $5668; cap rate 1.77% on $320k; CoC 7.085% on $80k invested; GRM $320k / $26,400 = 12.121",
+   "source_section_or_page": "Worked example: $2200 monthly rent / 5% vacancy -> EGI $25,080; operating expenses $9,612 (insurance, taxes, management, repairs; the $9,800 mortgage interest is financing, not operating) -> NOI $15,468; cap rate 4.834% on $320k; cash flow after interest $5,668 -> CoC 7.085% on $80k invested; GRM $320k / $26,400 = 12.121",
    "verified_by": "rl",
    "verified_on": "2026-05-16",
    "inputs": {
@@ -14315,13 +14350,13 @@
    },
    "outputs": {
     "NOI": {
-     "value": 5668,
+     "value": 15468,
      "tolerance": {
       "abs": 1
      }
     },
     "cap_rate_pct": {
-     "value": 1.77,
+     "value": 4.834,
      "tolerance": {
       "abs": 0.01
      }
@@ -43397,7 +43432,7 @@
    "source_publisher": "NEC 2023 (NFPA 70)",
    "source_title": "Commercial general-lighting + receptacle load, 220.12/220.14(I)/220.44",
    "source_edition_or_year": "NEC 2023 Section 220.12, 220.14(I), 220.44",
-   "source_section_or_page": "5,000 ft2 x 3 VA = 15,000 VA lighting; 60 x 180 = 10,800 VA -> 10,400 VA demand; total 25,400 VA; 122 A at 208 V",
+   "source_section_or_page": "5,000 ft2 x 3 VA = 15,000 VA lighting; 60 x 180 = 10,800 VA -> 10,400 VA demand; total 25,400 VA; 25,400 / (sqrt(3) x 208) = 70.5 A per line at 208 V three-phase",
    "verified_by": "rl",
    "verified_on": "2026-06-24",
    "inputs": {
@@ -43426,7 +43461,7 @@
      }
     },
     "total_a": {
-     "value": 122.12,
+     "value": 70.503,
      "tolerance": {
       "abs": 0.05
      }
@@ -43846,7 +43881,7 @@
   },
   {
    "tile_id": "tdd-ieee-519",
-   "source_publisher": "IEEE 519-2022 Table 1 current-distortion limits",
+   "source_publisher": "IEEE 519-2022 Table 2 current-distortion limits",
    "source_title": "Isc 10,000 A, IL 400 A (ratio 25), measured TDD 6% -> 8% limit, passes",
    "source_edition_or_year": "spec-v524 worked example (machine-verified)",
    "source_section_or_page": "spec-v524 section 2.1 pinned example",
@@ -43874,7 +43909,7 @@
   },
   {
    "tile_id": "tdd-ieee-519",
-   "source_publisher": "IEEE 519-2022 Table 1 current-distortion limits",
+   "source_publisher": "IEEE 519-2022 Table 2 current-distortion limits",
    "source_title": "cross-check: a soft service (Isc 6,000 A, ratio 15) tightens the limit to 5% -- the same 6% now fails",
    "source_edition_or_year": "spec-v524 worked example (machine-verified)",
    "source_section_or_page": "spec-v524 section 2.1 cross-check",
@@ -68839,7 +68874,7 @@
   {
    "tile_id": "masonry-lintel-loading",
    "source_publisher": "masonry design method",
-   "source_title": "6 ft opening, 60 psf, 5 ft above -> arching, 540 lb (90 lb/ft)",
+   "source_title": "6 ft opening, 60 psf, 5 ft above -> arching, 540 lb (moment-equivalent 4W/3L = 120 lb/ft)",
    "source_edition_or_year": "spec-v370 worked example (machine-verified)",
    "source_section_or_page": "spec-v370 section 2.1 pinned example",
    "verified_by": "rl",
@@ -68857,7 +68892,7 @@
      }
     },
     "w_udl_plf": {
-     "value": 90,
+     "value": 120,
      "tolerance": {
       "abs": 1
      }
@@ -79892,9 +79927,9 @@
   {
    "tile_id": "hearing-protector-nrr",
    "source_publisher": "Occupational Safety and Health Administration / NIOSH",
-   "source_title": "An NRR 29 foam earplug on a 98 dBA job credits 8.7 dB, not 29 (spec-v1166)",
+   "source_title": "An NRR 29 pre-molded earplug on a 98 dBA job credits 8.7 dB, not 29 (spec-v1166)",
    "source_edition_or_year": "29 CFR 1910.95 Appendix B; NIOSH Criteria for a Recommended Standard, Occupational Noise Exposure (1998)",
-   "source_section_or_page": "NIOSH derates the labelled NRR by protector type: 'all other earplugs -- subtract 70% from the manufacturers labeled NRR.' A foam earplug labelled 29 therefore credits 29 x 0.30 = 8.7 dB, leaving 89.3 dB at the ear on a 98 dBA shift -- over an 85 dB target by 4.3 dB, where the package number would have suggested 69. This tile does not also take OSHA Appendix B 7 dB spectral adjustment on top of the NIOSH factor, on the stated reading that the NIOSH derating IS the real-world adjustment. Reaching 85 dB by this method would take an NRR of about 43, which no product provides.",
+   "source_section_or_page": "NIOSH derates the labelled NRR by protector type: 'all other earplugs -- subtract 70% from the manufacturers labeled NRR.' A pre-molded (not foam: foam is a slow-recovery formable plug, less 50%) earplug labelled 29 therefore credits 29 x 0.30 = 8.7 dB, leaving 89.3 dB at the ear on a 98 dBA shift -- over an 85 dB target by 4.3 dB, where the package number would have suggested 69. This tile does not also take OSHA Appendix B 7 dB spectral adjustment on top of the NIOSH factor, on the stated reading that the NIOSH derating IS the real-world adjustment. Reaching 85 dB by this method would take an NRR of about 43, which no product provides.",
    "verified_by": "rl",
    "verified_on": "2026-07-28",
    "inputs": {
@@ -95911,7 +95946,7 @@
   {
    "tile_id": "dust-deflagration-vent-area",
    "source_publisher": "Project (first-principles)",
-   "source_title": "3,500 cu ft collector, tested Kst 150 (St1), rated 1.5 psig, panels at 0.5 psig",
+   "source_title": "3,500 cu ft collector, tested Kst 150 (St1) and Pmax 8 bar, rated 1.5 psig, panels at 0.5 psig",
    "source_edition_or_year": "the NFPA 68 vent-area relation",
    "source_section_or_page": "Kst comes from testing the actual dust; a qualified engineer governs",
    "verified_by": "rl",
@@ -95919,6 +95954,7 @@
    "inputs": {
     "volume_cuft": 3500,
     "kst_bar_m_s": 150,
+    "pmax_bar": 8,
     "p_red_psig": 1.5,
     "p_stat_psig": 0.5,
     "length_to_diameter": 2,
@@ -95933,25 +95969,25 @@
      }
     },
     "vent_area_sqft": {
-     "value": 16.0428,
+     "value": 45.0817,
      "tolerance": {
       "pct": 0.5
      }
     },
     "vent_area_at_stronger_sqft": {
-     "value": 8.78696,
+     "value": 24.312,
      "tolerance": {
       "pct": 0.5
      }
     },
     "stronger_saving_pct": {
-     "value": 45.2277,
+     "value": 46.0711,
      "tolerance": {
       "pct": 0.5
      }
     },
     "shortfall_sqft": {
-     "value": 4.04283,
+     "value": 33.0817,
      "tolerance": {
       "pct": 0.5
      }
@@ -106279,53 +106315,53 @@
   {
    "tile_id": "melt-furnace-energy",
    "source_publisher": "Project (first-principles)",
-   "source_title": "Melt Furnace Energy and Charge Time -- the spec-v1716 worked example, recomputed",
-   "source_edition_or_year": "spec-v1716 of scope-trade-expansion-2, 2026-09-09",
+   "source_title": "Melt Furnace Energy -- 2,000 lb gray iron at the DOE theoretical 600 BTU/lb (aluminium 493 BTU/lb as the alternative metal)",
+   "source_edition_or_year": "DOE Theoretical/Best Practice Energy Use in Metalcasting Operations (2004), Table 13",
    "source_section_or_page": "the standards named in the tile citation govern",
    "verified_by": "rl",
-   "verified_on": "2026-09-09",
+   "verified_on": "2026-09-19",
    "inputs": {
     "charge_weight_lb": 2000,
-    "theoretical_btu_lb": 190,
+    "theoretical_btu_lb": 600,
     "furnace_efficiency_pct": 70,
     "energy_cost_per_kwh": 0.1,
     "alt_efficiency_pct": 30,
-    "alt_theoretical_btu_lb": 500,
+    "alt_theoretical_btu_lb": 493,
     "casting_yield_pct": 62
    },
    "outputs": {
     "theoretical_mmbtu": {
-     "value": 0.38,
+     "value": 1.2,
      "tolerance": {
       "pct": 0.5
      }
     },
     "input_mmbtu": {
-     "value": 0.54286,
+     "value": 1.71429,
      "tolerance": {
       "pct": 0.5
      }
     },
     "input_kwh": {
-     "value": 159.0958,
+     "value": 502.4078,
      "tolerance": {
       "pct": 0.5
      }
     },
     "cost_per_heat": {
-     "value": 15.90958,
+     "value": 50.24078,
      "tolerance": {
       "pct": 0.5
      }
     },
     "alt_input_mmbtu": {
-     "value": 1.26667,
+     "value": 4,
      "tolerance": {
       "pct": 0.5
      }
     },
     "btu_per_saleable_lb": {
-     "value": 437.78802,
+     "value": 1382.48848,
      "tolerance": {
       "pct": 0.5
      }

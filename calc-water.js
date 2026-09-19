@@ -747,37 +747,51 @@ export const WATER_RENDERERS = {
 // equal or exceed the table-required CT for the target log inactivation
 // at the entered temperature, pH, and chlorine residual band.
 //
-// Bundled table: USEPA SWTR Guidance Manual EPA 815-R-99-014 (1999)
-// Table A-1 free chlorine 3-log Giardia inactivation, residual <= 0.4
-// mg/L band. The values are public-domain federal data. The
-// calculator interpolates linearly between the published temperature
-// breakpoints (0.5 / 5 / 10 / 15 / 20 / 25 C) and pH breakpoints
-// (6.0 / 7.0 / 8.0 / 9.0).
+// Bundled table: EPA Disinfection Profiling and Benchmarking Technical
+// Guidance Manual (EPA 815-R-20-003, 2020) Table B-1, the SWTR Guidance
+// Manual free-chlorine table for 3-log Giardia: residual <= 0.4 to 3.0 mg/L
+// in 0.2 steps, temperature 0.5 / 5 / 10 / 15 / 20 / 25 C, pH 6.0 to 9.0 in
+// 0.5 steps. Public-domain federal data. The calculator interpolates
+// linearly in all three. Until 2026-09-19 only the <= 0.4 mg/L row and four
+// pH columns were bundled, so a 2.0 mg/L residual at 5 C / pH 7 was held to
+// CT 139 where the table asks 165 (about 16% short).
 //
 // pH and temperature outside the table range flag the input as
-// outside the SWTR table; the calculator does not extrapolate.
+// outside the SWTR table; the calculator does not extrapolate. A residual
+// above 3.0 mg/L is read at the 3.0 row with a warning.
 
-// Rows: temperatures in C; columns: pH values. Cell = CT_required
-// (mg-min/L) for 3-log Giardia inactivation, free chlorine <= 0.4
-// mg/L. Cited by name only; values per USEPA SWTR Guidance Manual.
 const SWTR_GIARDIA_3LOG_FREECL = {
+  // table[residual][temperature][pH], copied row for row from Table B-1.
+  residual_mg_l: [0.4, 0.6, 0.8, 1.0, 1.2, 1.4, 1.6, 1.8, 2.0, 2.2, 2.4, 2.6, 2.8, 3.0],
   temps_C: [0.5, 5, 10, 15, 20, 25],
-  pH:      [6.0, 7.0, 8.0, 9.0],
-  // Each row matches temps_C; each entry matches pH. Values are
-  // commonly cited from the SWTR Guidance Manual operator-training
-  // table; see citation. Verify against the state-primacy-agency
-  // adopted table before relying on them.
-  // USEPA SWTR Guidance Manual (EPA 815-R-99-014) Table A-1: 3-log Giardia
-  // inactivation by free chlorine, residual <= 0.4 mg/L, at pH 6.0/7.0/8.0/9.0.
+  pH: [6.0, 6.5, 7.0, 7.5, 8.0, 8.5, 9.0],
   table: [
-    [137, 195, 277, 390], // 0.5 C
-    [ 97, 139, 198, 279], //   5 C
-    [ 73, 104, 149, 209], //  10 C
-    [ 49,  70,  99, 140], //  15 C
-    [ 36,  52,  74, 105], //  20 C
-    [ 24,  35,  50,  70], //  25 C
+    [[137, 163, 195, 237, 277, 329, 390], [97, 117, 139, 166, 198, 236, 279], [73, 88, 104, 125, 149, 177, 209], [49, 59, 70, 83, 99, 118, 140], [36, 44, 52, 62, 74, 89, 105], [24, 29, 35, 42, 50, 59, 70]],
+    [[141, 168, 200, 239, 286, 342, 407], [100, 120, 143, 171, 204, 244, 291], [75, 90, 107, 128, 153, 183, 218], [50, 60, 72, 86, 102, 122, 146], [38, 45, 54, 64, 77, 92, 109], [25, 30, 36, 43, 51, 61, 73]],
+    [[145, 172, 205, 246, 295, 354, 422], [103, 122, 146, 175, 210, 252, 301], [78, 92, 110, 131, 158, 189, 226], [52, 61, 73, 88, 105, 126, 151], [39, 46, 55, 66, 79, 95, 113], [26, 31, 37, 44, 53, 63, 75]],
+    [[148, 176, 210, 253, 304, 365, 437], [105, 125, 149, 179, 216, 260, 312], [79, 94, 112, 134, 162, 195, 234], [53, 63, 75, 90, 108, 130, 156], [39, 47, 56, 67, 81, 98, 117], [26, 31, 37, 45, 54, 65, 78]],
+    [[152, 180, 215, 259, 313, 376, 451], [107, 127, 152, 183, 221, 267, 320], [80, 95, 114, 137, 166, 200, 240], [54, 64, 76, 92, 111, 134, 160], [40, 48, 57, 69, 83, 100, 120], [27, 32, 38, 46, 55, 67, 80]],
+    [[155, 184, 221, 266, 321, 387, 464], [109, 130, 155, 187, 227, 274, 329], [82, 98, 116, 140, 170, 206, 247], [55, 65, 78, 94, 114, 137, 165], [41, 49, 58, 70, 85, 103, 123], [27, 33, 39, 47, 57, 69, 82]],
+    [[157, 189, 226, 273, 329, 397, 477], [111, 132, 158, 192, 232, 281, 337], [83, 99, 119, 144, 174, 211, 253], [56, 66, 79, 96, 116, 141, 169], [42, 50, 59, 72, 87, 105, 126], [28, 33, 40, 48, 58, 70, 84]],
+    [[162, 193, 231, 279, 338, 407, 489], [114, 135, 162, 196, 238, 287, 345], [86, 101, 122, 147, 179, 215, 259], [57, 68, 81, 98, 119, 144, 173], [43, 51, 61, 74, 89, 108, 129], [29, 34, 41, 49, 60, 72, 86]],
+    [[165, 197, 236, 286, 346, 417, 500], [116, 138, 165, 200, 243, 294, 353], [87, 104, 124, 150, 182, 221, 265], [58, 69, 83, 100, 122, 147, 177], [44, 52, 62, 75, 91, 110, 132], [29, 35, 41, 50, 61, 74, 88]],
+    [[169, 201, 242, 297, 353, 426, 511], [118, 140, 169, 204, 248, 300, 361], [89, 105, 127, 153, 186, 225, 271], [59, 70, 85, 102, 124, 150, 181], [44, 53, 63, 77, 93, 113, 135], [30, 35, 42, 51, 62, 75, 90]],
+    [[172, 205, 247, 298, 361, 435, 522], [120, 143, 172, 209, 253, 306, 368], [90, 107, 129, 157, 190, 230, 276], [60, 72, 86, 105, 127, 153, 184], [45, 54, 65, 78, 95, 115, 138], [30, 36, 43, 52, 63, 77, 92]],
+    [[175, 209, 252, 304, 368, 444, 533], [122, 146, 175, 213, 258, 312, 375], [92, 110, 131, 160, 194, 234, 281], [61, 73, 88, 107, 129, 156, 188], [46, 55, 66, 80, 97, 117, 141], [31, 37, 44, 53, 65, 78, 94]],
+    [[178, 213, 257, 310, 375, 452, 543], [124, 148, 178, 217, 263, 318, 382], [93, 111, 134, 163, 197, 239, 287], [62, 74, 89, 109, 132, 159, 191], [47, 56, 67, 81, 99, 119, 143], [31, 37, 45, 54, 66, 80, 96]],
+    [[181, 217, 261, 316, 382, 460, 552], [126, 151, 182, 221, 268, 324, 389], [95, 113, 137, 166, 201, 243, 292], [63, 76, 91, 111, 134, 162, 195], [47, 57, 68, 83, 101, 122, 146], [32, 38, 46, 55, 67, 81, 97]],
   ],
 };
+
+function _giardiaCT3log(C, T, p) {
+  const t = SWTR_GIARDIA_3LOG_FREECL, cs = t.residual_mg_l;
+  const c = Math.min(Math.max(C, cs[0]), cs[cs.length - 1]);
+  let ci = 0; while (ci < cs.length - 2 && c > cs[ci + 1]) ci++;
+  const f = (c - cs[ci]) / (cs[ci + 1] - cs[ci]);
+  const lo = _bilinearInterp(t.table[ci], t.temps_C, t.pH, T, p);
+  const hi = _bilinearInterp(t.table[ci + 1], t.temps_C, t.pH, T, p);
+  return lo + f * (hi - lo);
+}
 
 function _bilinearInterp(table, xs, ys, x, y) {
   // Find x interval.
@@ -836,7 +850,7 @@ export function computeDisinfectionCT({
     // required_t10_min stays null: below 0.2 mg/L the SWTR gives no credit,
     // so "raise the residual" is the correct guidance, not a contact time.
     let ltLow = Number(log_target); if (!Number.isFinite(ltLow) || ltLow <= 0) ltLow = 3;
-    const CT_required_giardia_low = _bilinearInterp(SWTR_GIARDIA_3LOG_FREECL.table, SWTR_GIARDIA_3LOG_FREECL.temps_C, SWTR_GIARDIA_3LOG_FREECL.pH, T, p);
+    const CT_required_giardia_low = _giardiaCT3log(C, T, p);
     return {
       CT_achieved: 0,
       CT_required_3log_Giardia: CT_required_giardia_low,
@@ -851,7 +865,7 @@ export function computeDisinfectionCT({
   }
 
   const CT_achieved = C * t10;
-  const CT_required_giardia = _bilinearInterp(SWTR_GIARDIA_3LOG_FREECL.table, SWTR_GIARDIA_3LOG_FREECL.temps_C, SWTR_GIARDIA_3LOG_FREECL.pH, T, p);
+  const CT_required_giardia = _giardiaCT3log(C, T, p);
   const log_inactivation = (CT_achieved / CT_required_giardia) * 3.0;
   const pass_3log_giardia = CT_achieved >= CT_required_giardia;
   // 4-log virus by free chlorine, EPA Disinfection Profiling and Benchmarking
@@ -866,7 +880,7 @@ export function computeDisinfectionCT({
   const pass_4log_virus = CT_achieved >= CT_required_4log_virus;
 
   const warnings = [];
-  if (C > 0.4) warnings.push("Chlorine residual above 0.4 mg/L falls in a different SWTR band; the bundled table covers <= 0.4 mg/L. Verify against the higher-residual table for high-residual systems.");
+  if (C > 3.0) warnings.push("Chlorine residual above 3.0 mg/L is past the SWTR table; CT required is read at the 3.0 mg/L row, which understates it.");
 
   // v23 EN.15: solve-for-required-t10 inverse + log-target selector. Giardia
   // CT scales linearly with the log credit (CT_Nlog = CT_3log * N/3); the
@@ -894,21 +908,15 @@ export function computeDisinfectionCT({
 }
 
 export const disinfectionCTExample = {
-  // 3-log Giardia at 5 C / pH 7.0: CT_required = 139 mg-min/L (SWTR Table A-1).
-  // Operator achieves C=0.4 mg/L * t10=375 min = 150 mg-min/L >= 139 -> passes
-  // 3-log Giardia (log_inactivation = 150/139 * 3 = 3.24).
-  //
-  // The residual is 0.4 and not 1.0 on purpose. This tile bundles the <= 0.4
-  // mg/L column of Table A-1, and required CT RISES with residual, so reading
-  // that column at 1.0 mg/L understates the requirement -- the tile says so in
-  // a warning, and the page's headline example must not be the case that trips
-  // it. 0.4 x 375 is the same 150 mg-min/L against the same verified 139,
-  // inside the band the bundled table actually covers.
+  // 3-log Giardia at 5 C / pH 7.0 / <= 0.4 mg/L: CT_required = 139 mg-min/L
+  // (EPA Table B-1). Operator achieves C=0.4 mg/L * t10=375 min = 150
+  // mg-min/L >= 139 -> passes 3-log Giardia (log_inactivation = 150/139 * 3
+  // = 3.24). The same 150 at 1.0 mg/L would face 149, and at 2.0 mg/L 165.
   inputs: { chlorine_mg_l: 0.4, t10_minutes: 375, temperature_C: 5, pH: 7.0 },
 };
 
 function renderDisinfectionCT(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: Per USEPA Surface Water Treatment Rule Guidance Manual EPA 815-R-99-014 Table A-1 (free chlorine 3-log Giardia inactivation, ≤0.4 mg/L band, 6 temperature x 4 pH grid). 4-log virus pass inferred from the Giardia result (free-chlorine 3-log Giardia is more stringent than 4-log virus; no separate Table E-1 lookup). State primacy agency governs CT compliance; this tile is a planning check, not a compliance report. Free at epa.gov/dwreginfo/surface-water-treatment-rules.";
+  citationEl.textContent = "Citation: Per USEPA Disinfection Profiling and Benchmarking Technical Guidance Manual EPA 815-R-20-003 Table B-1 (free chlorine 3-log Giardia inactivation, ≤0.4 to 3.0 mg/L residual x 6 temperature x 7 pH grid) and Table B-2 (4-log virus CT by temperature). State primacy agency governs CT compliance; this tile is a planning check, not a compliance report. Free at epa.gov/dwreginfo/surface-water-treatment-rules.";
 
   const c = makeNumber("Free chlorine residual (mg/L)", "ct-c", { step: "any", min: "0" });
   const t10 = makeNumber("Contact time t10 (min; basin 10-percentile)", "ct-t10", { step: "any", min: "0" });

@@ -350,13 +350,16 @@ SERVICE_RENDERERS["softener-sizing"] = renderSoftenerSizing;
 // spec-v167..v169 - Group A: dwelling demand-factor trio (NEC 220.xx).
 // =====================================================================
 
-// NEC Table 220.55 Column C demand (kW) for equal-rated household ranges,
-// indexed by range count (1..). Past the bundled count, the table's
-// published continuation governs; the AHJ decides large counts.
-const _RANGE_COL_C_KW = {
-  1: 8, 2: 11, 3: 14, 4: 17, 5: 20, 6: 21, 7: 22, 8: 23, 9: 24, 10: 25,
-  11: 26, 12: 27, 13: 28, 14: 29, 15: 30, 16: 31,
-};
+// NEC Table 220.55 Column C demand (kW) for equal-rated household ranges:
+// 8 / 11 / 14 / 17 / 20 kW for 1-5 ranges, 15 kW + 1 kW per range for 6-40
+// (21 kW at 6, 40 kW at 25, 55 kW at 40), and 25 kW + 0.75 kW per range for
+// 41 and over. Until 2026-09-19 the table stopped at 16 ranges and held 31 kW
+// for any larger count, so 50 ranges read 31 kW where Column C gives 62.5 kW.
+function _rangeColCkW(n) {
+  if (n <= 5) return [8, 11, 14, 17, 20][n - 1];
+  if (n <= 40) return 15 + n;
+  return 25 + 0.75 * n;
+}
 
 // dims: in { num_ranges: dimensionless, nameplate_kw: M L^2 T^-3, supply_v: M L^2 T^-3 I^-1 } out: { col_c_kw: M L^2 T^-3, demand_kw: M L^2 T^-3, demand_a: I }
 export function computeRangeDemand22055({ num_ranges = 1, nameplate_kw = 0, supply_v = 240 } = {}) {
@@ -368,9 +371,7 @@ export function computeRangeDemand22055({ num_ranges = 1, nameplate_kw = 0, supp
   if (!(n >= 1)) return { error: "Number of ranges must be at least 1." };
   if (!(v > 0)) return { error: "Service voltage must be positive (V)." };
 
-  const maxCount = 16;
-  const col_c_kw = n <= maxCount ? _RANGE_COL_C_KW[n] : _RANGE_COL_C_KW[maxCount];
-  const over_table = n > maxCount;
+  const col_c_kw = _rangeColCkW(n);
   // Note 1: ranges over 12 kW add 5% to Column C per kW (or major fraction) over 12.
   // "Major fraction thereof" counts >= 0.5 kW as a full step; < 0.5 kW is dropped -- round-half-up, not ceil.
   const increase = kw > 12 ? Math.round(kw - 12) * 0.05 : 0;
@@ -381,8 +382,7 @@ export function computeRangeDemand22055({ num_ranges = 1, nameplate_kw = 0, supp
     increase_pct: increase * 100,
     demand_kw: Number.isFinite(demand_kw) ? demand_kw : null,
     demand_a: Number.isFinite(demand_a) ? demand_a : null,
-    over_table,
-    note: "NEC Table 220.55 Column C (equal-rating ranges 8.75-27 kW). Note 1: a range over 12 kW adds 5% to Column C per kW (or major fraction) above 12 kW. This is the common equal-rating Column C path; Notes 2-4 (the under-3.5 kW and 3.5-8.75 kW Columns A/B, and unequal-rating averaging) and the AHJ govern the other cases." + (over_table ? " Range count exceeds the bundled table; the published Column C continuation governs." : ""),
+    note: "NEC Table 220.55 Column C (equal-rating ranges 8.75-27 kW). Note 1: a range over 12 kW adds 5% to Column C per kW (or major fraction) above 12 kW. This is the common equal-rating Column C path; Notes 2-4 (the under-3.5 kW and 3.5-8.75 kW Columns A/B, and unequal-rating averaging) and the AHJ govern the other cases.",
   };
 }
 export const rangeDemand22055Example = { inputs: { num_ranges: 1, nameplate_kw: 12, supply_v: 240 } };
@@ -409,11 +409,22 @@ function _v167renderRangeDemand(inputRegion, outputRegion, citationEl) {
 }
 SERVICE_RENDERERS["range-demand-220-55"] = _v167renderRangeDemand;
 
-// Table 220.54 demand factors for household electric clothes dryers, by count.
+// Table 220.54 demand factors for household electric clothes dryers, by count:
+// 100% for 1-4, then 85 / 75 / 65 / 60 / 55 / 50 / 47% for 5-11; 47% minus 1%
+// per dryer over 11 for 12-23; 35% minus 0.5% per dryer over 23 for 24-42;
+// 25% for 43 and over. Until 2026-09-19 rows 12-15 read 45 / 43 / 41 / 40%
+// (the table gives 46 / 45 / 44 / 43%) and every larger count was held at 40%,
+// so 15 dryers were 7% light and 43 dryers 60% heavy.
 const _DRYER_DEMAND_FACTOR = {
   1: 1.00, 2: 1.00, 3: 1.00, 4: 1.00, 5: 0.85, 6: 0.75, 7: 0.65, 8: 0.60,
-  9: 0.55, 10: 0.50, 11: 0.47, 12: 0.45, 13: 0.43, 14: 0.41, 15: 0.40,
+  9: 0.55, 10: 0.50, 11: 0.47,
 };
+function _dryerDemandFactor(n) {
+  if (n <= 11) return _DRYER_DEMAND_FACTOR[n];
+  if (n <= 23) return (47 - (n - 11)) / 100;
+  if (n <= 42) return (35 - 0.5 * (n - 23)) / 100;
+  return 0.25;
+}
 
 // dims: in { num_dryers: dimensionless, nameplate_w: M L^2 T^-3, supply_v: M L^2 T^-3 I^-1 } out: { per_dryer_w: M L^2 T^-3, demand_w: M L^2 T^-3, demand_a: I }
 export function computeDryerDemand22054({ num_dryers = 1, nameplate_w = 5000, supply_v = 240 } = {}) {
@@ -427,11 +438,7 @@ export function computeDryerDemand22054({ num_dryers = 1, nameplate_w = 5000, su
 
   const per_dryer_w = Math.max(w, 5000);          // 220.54: 5000 W or nameplate, larger
   const connected_w = per_dryer_w * n;
-  const maxCount = 15;
-  // Past the bundled table the standard's continuation declines further; the
-  // 15-dryer 40% factor is held as a conservative floor for larger counts.
-  const demand_factor = n <= maxCount ? _DRYER_DEMAND_FACTOR[n] : _DRYER_DEMAND_FACTOR[maxCount];
-  const over_table = n > maxCount;
+  const demand_factor = _dryerDemandFactor(n);
   const demand_w = connected_w * demand_factor;
   const demand_a = demand_w / v;
   return {
@@ -440,8 +447,7 @@ export function computeDryerDemand22054({ num_dryers = 1, nameplate_w = 5000, su
     demand_factor,
     demand_w: Number.isFinite(demand_w) ? demand_w : null,
     demand_a: Number.isFinite(demand_a) ? demand_a : null,
-    over_table,
-    note: "NEC 220.54 and Table 220.54: each dryer counts at the larger of 5,000 W or its nameplate; the demand factor is 100% for 1-4 dryers, then declines (5 -> 85%, 6 -> 75%, ...). Past the bundled table the published continuation governs; the AHJ decides large counts." + (over_table ? " Dryer count exceeds the bundled table; the 40% floor is applied." : ""),
+    note: "NEC 220.54 and Table 220.54: each dryer counts at the larger of 5,000 W or its nameplate; the demand factor is 100% for 1-4 dryers, then declines (5 -> 85%, 6 -> 75%, ... 11 -> 47%, 23 -> 35%, 42 -> 25.5%) to 25% for 43 or more.",
   };
 }
 export const dryerDemand22054Example = { inputs: { num_dryers: 4, nameplate_w: 4500, supply_v: 240 } };
@@ -462,7 +468,7 @@ function _v168renderDryerDemand(inputRegion, outputRegion, citationEl) {
     const r = computeDryerDemand22054({ num_dryers: Number(n.input.value) || 0, nameplate_w: Number(w.input.value) || 0, supply_v: Number(v.input.value) || 0 });
     if (r.error) { oPer.textContent = r.error; oFactor.textContent = "-"; oDemand.textContent = "-"; oNote.textContent = ""; return; }
     oPer.textContent = fmt(r.per_dryer_w, 0) + " W x " + Math.round(r.connected_w / r.per_dryer_w) + " = " + fmt(r.connected_w, 0) + " W connected";
-    oFactor.textContent = fmt(r.demand_factor * 100, 0) + "%";
+    oFactor.textContent = fmt(r.demand_factor * 100, 1) + "%";
     oDemand.textContent = fmt(r.demand_w, 0) + " W = " + fmt(r.demand_a, 1) + " A";
     oNote.textContent = r.note;
   }, DEBOUNCE_MS);
@@ -526,12 +532,12 @@ SERVICE_RENDERERS["neutral-demand-220-61"] = _v169renderNeutralDemand;
 
 // =====================================================================
 // spec-v180 - Group A: Electrical (1 tile)
-// Commercial general-lighting + receptacle demand (NEC 220.12 / 220.14(I)
-// / 220.44).
+// Commercial general-lighting + receptacle demand (NEC 2023 Table 220.42(A)
+// / 220.14(I) / 220.47; Table 220.12 and 220.44 before 2023).
 // =====================================================================
 
-// dims: in { floor_area_ft2: L^2, unit_load_va_ft2: dimensionless, receptacle_count: dimensionless, supply_v: M L^2 T^-3 I^-1 } out: { lighting_va: dimensionless, recep_va: dimensionless, recep_demand_va: dimensionless, total_va: M L^2 T^-3, total_a: I }
-export function computeCommercialLightingLoad({ floor_area_ft2 = 0, unit_load_va_ft2 = 0, receptacle_count = 0, supply_v = 208 } = {}) {
+// dims: in { floor_area_ft2: L^2, unit_load_va_ft2: dimensionless, receptacle_count: dimensionless, supply_v: M L^2 T^-3 I^-1, phases: dimensionless } out: { lighting_va: dimensionless, recep_va: dimensionless, recep_demand_va: dimensionless, total_va: M L^2 T^-3, total_a: I }
+export function computeCommercialLightingLoad({ floor_area_ft2 = 0, unit_load_va_ft2 = 0, receptacle_count = 0, supply_v = 208, phases = 3 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const area = Number(floor_area_ft2) || 0;
   if (!(area >= 0)) return { error: "Floor area must be non-negative (ft^2)." };
@@ -543,34 +549,41 @@ export function computeCommercialLightingLoad({ floor_area_ft2 = 0, unit_load_va
   if (!(v > 0)) return { error: "Supply voltage must be positive (V)." };
   const lighting_va = area * unit;
   const recep_va = count * 180;
-  // NEC 220.44: receptacle load >10 kVA is 100% of the first 10 kVA + 50% of
+  // NEC 2023 220.47: receptacle load >10 kVA is 100% of the first 10 kVA + 50% of
   // the remainder.
   const recep_demand_va = recep_va <= 10000 ? recep_va : 10000 + 0.50 * (recep_va - 10000);
   const total_va = lighting_va + recep_demand_va;
-  const total_a = total_va / v;
+  // Three-phase line current is VA / (sqrt(3) x V line-to-line). Until
+  // 2026-09-19 the default 208 V (a 208Y/120 three-phase service) was divided
+  // straight through, reporting 122 A for 25.4 kVA where the line carries 70.5 A.
+  const ph = Number(phases) === 1 ? 1 : 3;
+  const total_a = total_va / (ph === 3 ? Math.sqrt(3) * v : v);
   return {
     lighting_va,
     recep_va,
     recep_demand_va,
     total_va,
     total_a,
-    note: "NEC 220.12 sets the general-lighting unit load by occupancy (Table 220.12); 220.14(I) counts each general-use receptacle strap at 180 VA; 220.44 applies a 100%/50% demand to the receptacle load above 10 kVA. The continuous-lighting 125% factor (210.20(A)) is applied at the OCPD, not here, and the energy code may set the lighting unit load. The AHJ governs.",
+    note: "NEC 2023 220.42 sets the general-lighting unit load by occupancy (Table 220.42(A), Table 220.12 before 2023); 220.14(I) counts each general-use receptacle strap at 180 VA; 220.47 (220.44 before 2023) applies a 100%/50% demand to the receptacle load above 10 kVA. The continuous-lighting 125% factor (210.20(A)) is applied at the OCPD, not here, and the energy code may set the lighting unit load. The AHJ governs.",
   };
 }
 export const commercialLightingLoadExample = { inputs: { floor_area_ft2: 5000, unit_load_va_ft2: 3, receptacle_count: 60, supply_v: 208 } };
 
 function _v180renderCommercialLightingLoad(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: NEC 2023 Table 220.12 (general-lighting unit load), 220.14(I) (180 VA per receptacle strap), and 220.44 (receptacle demand factor over 10 kVA). The 125% continuous factor is applied at the OCPD; the energy code may set the lighting load. The AHJ governs. Free at nfpa.org/freeaccess.";
+  citationEl.textContent = "Citation: NEC 2023 Table 220.42(A) (general-lighting unit load), 220.14(I) (180 VA per receptacle strap), and 220.47 (receptacle demand factor over 10 kVA). The 125% continuous factor is applied at the OCPD; the energy code may set the lighting load. The AHJ governs. Free at nfpa.org/freeaccess.";
   const area = makeNumber("Gross floor area (ft²)", "cll-area", { step: "any", min: "0" });
-  const unit = makeNumber("Unit load (VA/ft², Table 220.12)", "cll-unit", { step: "any", min: "0" });
+  const unit = makeNumber("Unit load (VA/ft², Table 220.42(A))", "cll-unit", { step: "any", min: "0" });
   const count = makeNumber("General-use receptacle straps", "cll-count", { step: "1", min: "0" });
-  const volt = makeNumber("Supply voltage (V)", "cll-v", { step: "any", min: "0" });
-  for (const f of [area, unit, count, volt]) inputRegion.appendChild(f.wrap);
-  attachExampleButton(inputRegion, () => { area.input.value = "5000"; unit.input.value = "3"; count.input.value = "60"; volt.input.value = "208"; update(); });
+  const volt = makeNumber("Supply voltage (V, line-to-line for 3-phase)", "cll-v", { step: "any", min: "0" });
+  const phase = makeSelect("Phases", "cll-ph", [
+    { value: "3", label: "3-phase", selected: true }, { value: "1", label: "Single-phase" },
+  ]);
+  for (const f of [area, unit, count, volt, phase]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { area.input.value = "5000"; unit.input.value = "3"; count.input.value = "60"; volt.input.value = "208"; phase.select.value = "3"; update(); });
 
   const oLight = makeOutputLine(outputRegion, "Lighting load (VA)", "cll-out-light");
   const oRecep = makeOutputLine(outputRegion, "Receptacle connected (VA)", "cll-out-recep");
-  const oDemand = makeOutputLine(outputRegion, "Receptacle demand (220.44)", "cll-out-demand");
+  const oDemand = makeOutputLine(outputRegion, "Receptacle demand (220.47)", "cll-out-demand");
   const oTotal = makeOutputLine(outputRegion, "Total demand (VA)", "cll-out-total");
   const oAmps = makeOutputLine(outputRegion, "Total current (A)", "cll-out-amps");
   const oNote = makeOutputLine(outputRegion, "Note", "cll-out-note");
@@ -579,6 +592,7 @@ function _v180renderCommercialLightingLoad(inputRegion, outputRegion, citationEl
     const r = computeCommercialLightingLoad({
       floor_area_ft2: Number(area.input.value) || 0, unit_load_va_ft2: Number(unit.input.value) || 0,
       receptacle_count: Number(count.input.value) || 0, supply_v: Number(volt.input.value) || 0,
+      phases: Number(phase.select.value) || 3,
     });
     if (r.error) { oLight.textContent = r.error; oRecep.textContent = "-"; oDemand.textContent = "-"; oTotal.textContent = "-"; oAmps.textContent = "-"; oNote.textContent = ""; return; }
     oLight.textContent = fmt(r.lighting_va, 0) + " VA";
@@ -589,6 +603,7 @@ function _v180renderCommercialLightingLoad(inputRegion, outputRegion, citationEl
     oNote.textContent = r.note;
   }, DEBOUNCE_MS);
   for (const f of [area, unit, count, volt]) f.input.addEventListener("input", update);
+  phase.select.addEventListener("input", update);
 }
 SERVICE_RENDERERS["commercial-lighting-load"] = _v180renderCommercialLightingLoad;
 

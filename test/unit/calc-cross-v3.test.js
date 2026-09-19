@@ -71,7 +71,7 @@ test("Ladder: example (16 ft / 12 ft) placed at ~48.6 deg does not pass", () => 
 test("Ladder: zero working returns no pass", () => { const r = computeLadderAngle({ ladder_length_ft: 24, working_height_ft: 0 }); assert.equal(r.pass, false); });
 test("Ladder: working > length errors", () => { const r = computeLadderAngle({ ladder_length_ft: 10, working_height_ft: 20 }); assert.ok(r.error); });
 test("Ladder: zero length errors", () => { const r = computeLadderAngle({ ladder_length_ft: 0, working_height_ft: 5 }); assert.ok(r.error); });
-test("Ladder: recommended base = working/4", () => { const r = computeLadderAngle({ ladder_length_ft: 24, working_height_ft: 16 }); assert.equal(r.base_distance_ft, 4); });
+test("Ladder: recommended base = working length (along the ladder) / 4 per OSHA 1926.1053(b)(5)(i)", () => { const r = computeLadderAngle({ ladder_length_ft: 24, working_height_ft: 16 }); assert.equal(r.base_distance_ft, 6); });
 test("Ladder: too steep fails (working = ladder, 90 deg)", () => { const r = computeLadderAngle({ ladder_length_ft: 24, working_height_ft: 24 }); assert.equal(r.pass, false); assert.ok(close(r.set_angle_deg, 90, 0.001)); });
 test("Ladder: 24 ft / 23 ft within 75.5 +/- 3", () => { const r = computeLadderAngle({ ladder_length_ft: 24, working_height_ft: 23 }); assert.ok(Math.abs(r.set_angle_deg - 75.5) <= 3); });
 test("Ladder: angle between 0 and 90", () => { const r = computeLadderAngle({ ladder_length_ft: 24, working_height_ft: 12 }); assert.ok(r.set_angle_deg > 0 && r.set_angle_deg < 90); });

@@ -124,10 +124,23 @@ test("disinfection-ct: bilinear interpolation midpoint between known corners", (
   assert.ok(closePct(r.CT_required_3log_Giardia, 121.5, 0.5));
 });
 
-test("disinfection-ct: high residual (>0.4 mg/L) still computes but warns about band", () => {
-  const r = computeDisinfectionCT({ chlorine_mg_l: 1.0, t10_minutes: 100, temperature_C: 5, pH: 7 });
+test("disinfection-ct: CT required rises with residual per EPA Table B-1", () => {
+  // 5 C / pH 7.0: 139 at <=0.4, 149 at 1.0, 165 at 2.0, 182 at 3.0 mg/L.
+  for (const [c, ct] of [[0.3, 139], [1.0, 149], [2.0, 165], [3.0, 182]]) {
+    const r = computeDisinfectionCT({ chlorine_mg_l: c, t10_minutes: 100, temperature_C: 5, pH: 7 });
+    assert.ok(Math.abs(r.CT_required_3log_Giardia - ct) < 1e-9, c + " -> " + r.CT_required_3log_Giardia);
+    assert.equal(r.warnings.length, 0);
+  }
+  // Midway between rows and pH columns: 1.1 mg/L, pH 7.25 at 5 C.
+  const m = computeDisinfectionCT({ chlorine_mg_l: 1.1, t10_minutes: 100, temperature_C: 5, pH: 7.25 });
+  assert.ok(Math.abs(m.CT_required_3log_Giardia - (149 + 179 + 152 + 183) / 4) < 1e-9);
+});
+
+test("disinfection-ct: residual above 3.0 mg/L reads the 3.0 row and warns", () => {
+  const r = computeDisinfectionCT({ chlorine_mg_l: 3.5, t10_minutes: 100, temperature_C: 5, pH: 7 });
   assert.ok(!r.error);
-  assert.equal(r.warnings.length >= 1, true);
+  assert.equal(r.CT_required_3log_Giardia, 182);
+  assert.equal(r.warnings.length, 1);
 });
 
 test("disinfection-ct: failing case (low CT achieved) flags 3-log Giardia not met", () => {

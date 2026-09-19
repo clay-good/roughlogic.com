@@ -1528,9 +1528,9 @@ test("bounds: calc-water computeSVI rejects out-of-domain SV30 and non-positive 
 });
 
 test("bounds: calc-water computeDisinfectionCT pins CT_achieved = chlorine * t10 and the SWTR 3-log Giardia pass / fail flip", () => {
-  // SWTR Table A-1 pins (3-log Giardia, free chlorine <= 0.4 mg/L): pH 7.0 / 5 C = 139.
-  // C=1.0, t10=150 -> CT_achieved=150 >= 139 -> pass.
-  const passing = computeDisinfectionCT({ chlorine_mg_l: 1.0, t10_minutes: 150, temperature_C: 5, pH: 7.0 });
+  // EPA Table B-1 pins (3-log Giardia, free chlorine <= 0.4 mg/L): pH 7.0 / 5 C = 139.
+  // C=0.4, t10=375 -> CT_achieved=150 >= 139 -> pass.
+  const passing = computeDisinfectionCT({ chlorine_mg_l: 0.4, t10_minutes: 375, temperature_C: 5, pH: 7.0 });
   assert.ok(!passing.error, JSON.stringify(passing));
   assert.ok(Math.abs(passing.CT_achieved - 150) < 1e-9, `CT_achieved identity`);
   assert.ok(Math.abs(passing.CT_required_3log_Giardia - 139) < 1e-9, `CT_required table pin (pH 7.0 / 5 C = 139)`);
@@ -1538,10 +1538,10 @@ test("bounds: calc-water computeDisinfectionCT pins CT_achieved = chlorine * t10
   assert.strictEqual(passing.pass_4log_virus, true);
   // High-pH table pins (the columns that were historically mislabeled a half-to-full pH unit low):
   // pH 8.0 / 5 C = 198, pH 9.0 / 5 C = 279. The same 150 mg-min/L that passes at pH 7.0 must FAIL at pH 8.0.
-  const ph8 = computeDisinfectionCT({ chlorine_mg_l: 1.0, t10_minutes: 150, temperature_C: 5, pH: 8.0 });
+  const ph8 = computeDisinfectionCT({ chlorine_mg_l: 0.4, t10_minutes: 375, temperature_C: 5, pH: 8.0 });
   assert.ok(Math.abs(ph8.CT_required_3log_Giardia - 198) < 1e-9, `pH 8.0 / 5 C = 198`);
   assert.strictEqual(ph8.pass_3log_giardia, false);
-  const ph9 = computeDisinfectionCT({ chlorine_mg_l: 1.0, t10_minutes: 150, temperature_C: 5, pH: 9.0 });
+  const ph9 = computeDisinfectionCT({ chlorine_mg_l: 0.4, t10_minutes: 375, temperature_C: 5, pH: 9.0 });
   assert.ok(Math.abs(ph9.CT_required_3log_Giardia - 279) < 1e-9, `pH 9.0 / 5 C = 279`);
   // Lower the chlorine to below the 0.2 mg/L floor -> SWTR gives zero credit per the documented edge case.
   const zero_credit = computeDisinfectionCT({ chlorine_mg_l: 0.1, t10_minutes: 300, temperature_C: 5, pH: 7.0 });
@@ -3058,13 +3058,13 @@ test("bounds: calc-accounting computeEstimatedTax rejects negative inputs (docum
 });
 
 test("bounds: calc-accounting computePayrollWithholding pins annualization gross * periods and the Pub 15-T bracket math + FICA 6.2 / 1.45 / 0.9", () => {
-  // 2500 biweekly * 26 = 65000 annual; single bracket: between 61750 (5426 base, 22% over) and 115125 (5426 + 22% over 61750).
-  // fed_annual = 5426 + 0.22 * (65000 - 61750) = 5426 + 715 = 6141. fed_per_period = 6141 / 26 = 236.19.
+  // 2500 biweekly * 26 = 65000 annual; 2025 Pub 15-T single (Worksheet 1A + $8,600): between 63475 and 118350.
+  // fed_annual = 5578.50 + 0.22 * (65000 - 63475) = 5578.50 + 335.50 = 5914. fed_per_period = 5914 / 26 = 227.46.
   // SS = 2500 * 0.062 = 155. Medicare = 2500 * 0.0145 = 36.25. addl_medicare = 0 (under threshold).
   const r = computePayrollWithholding({ gross_per_period: 2500, pay_frequency: "biweekly", filing_status: "single", tax_year: 2025 });
   assert.ok(!r.error, JSON.stringify(r));
   assert.strictEqual(r.annual_gross, 65000);
-  assert.ok(Math.abs(r.fed_income_tax_annual - (5426 + 0.22 * (65000 - 61750))) < 1e-9, `bracket math`);
+  assert.ok(Math.abs(r.fed_income_tax_annual - (5578.5 + 0.22 * (65000 - 63475))) < 1e-9, `bracket math`);
   assert.ok(Math.abs(r.fed_income_tax_period - r.fed_income_tax_annual / 26) < 1e-9, `per-period`);
   assert.ok(Math.abs(r.ss_tax_period - 2500 * 0.062) < 1e-9, `SS`);
   assert.ok(Math.abs(r.medicare_period - 2500 * 0.0145) < 1e-9, `Medicare`);
@@ -3962,11 +3962,12 @@ test("bounds: spec-v1228 computeIdealGasLaw pins PV=nRT solved four ways, round-
 
 test("bounds: spec-v1258 computeVanDerWaals pins CO2 real pressure/Z, ideal limit, sign of deviation, and error seams", () => {
   const R = 0.0820573;
-  // CO2, 1 mol in 1 L at 0 C: P_real = nRT/(V-nb) - a n^2/V^2 = 22.414/0.95733 - 3.640 = 19.773 atm.
+  // CO2, 1 mol in 1 L at 0 C: P_real = nRT/(V-nb) - a n^2/V^2 = 22.414/0.95733 - 3.640/1.01325 = 19.821 atm
+  // (CRC a = 3.640 L^2 bar/mol^2 = 3.592 L^2 atm/mol^2).
   const co2 = computeVanDerWaals({ gas: "carbon-dioxide", moles: 1, volume_l: 1, temperature_c: 0 });
-  assert.ok(Math.abs(co2.pressure_real_atm - 19.773) < 0.01);
+  assert.ok(Math.abs(co2.pressure_real_atm - 19.821) < 0.001);
   assert.ok(Math.abs(co2.pressure_ideal_atm - R * 273.15) < 1e-9);
-  assert.ok(Math.abs(co2.z_factor - 0.882) < 0.002);
+  assert.ok(Math.abs(co2.z_factor - 0.8843) < 0.0005);
   // Attraction dominates for CO2 near condensation: Z < 1 and deviation negative.
   assert.ok(co2.z_factor < 1 && co2.deviation_pct < 0);
   // Helium in the same state: excluded volume dominates, Z slightly above 1.
@@ -6318,11 +6319,12 @@ test("bounds: calc-realestate computeRentalWorksheet pins Schedule E NOI = EGI -
   assert.ok(Math.abs(r.vacancy_loss - 1320) < 1e-9);
   assert.ok(Math.abs(r.effective_gross_income - 25080) < 1e-9);
   assert.strictEqual(r.total_expenses, 19412);
-  assert.ok(Math.abs(r.NOI - 5668) < 1e-9);
+  // NOI excludes the $9,800 mortgage interest (financing); taxable income deducts it.
+  assert.ok(Math.abs(r.NOI - 15468) < 1e-9);
   assert.ok(Math.abs(r.taxable_rental_income - (-3532)) < 1e-9);
-  assert.ok(Math.abs(r.cap_rate_pct - (5668/320000)*100) < 1e-9);
+  assert.ok(Math.abs(r.cap_rate_pct - (15468/320000)*100) < 1e-9);
   assert.ok(Math.abs(r.cash_on_cash_pct - (5668/80000)*100) < 1e-9);
-  assert.ok(Math.abs(r.expense_ratio_pct - (19412/25080)*100) < 1e-9);
+  assert.ok(Math.abs(r.expense_ratio_pct - (9612/25080)*100) < 1e-9);
   // 15 expense rows present.
   assert.strictEqual(r.expense_rows.length, 15);
   // No value / no cash invested -> ratios null.
@@ -7011,7 +7013,7 @@ test("bounds: calc-cross computeLadderAngle pins OSHA 4:1 base distance + sin(an
   const r = computeLadderAngle({ ladder_length_ft: 24, working_height_ft: 23 });
   const expected_angle = Math.asin(23 / 24) * 180 / Math.PI;
   assert.ok(Math.abs(r.set_angle_deg - expected_angle) < 1e-9);
-  assert.strictEqual(r.base_distance_ft, 23 / 4);
+  assert.strictEqual(r.base_distance_ft, 24 / 4); // a quarter of the working length along the ladder
   // 23 ft / 24 ft -> ~73.4 deg, within 75.5+/-3.
   assert.strictEqual(r.pass, true);
   // Working height 0 -> fail.
@@ -14695,7 +14697,7 @@ test("bounds: spec-v180 commercial-lighting-load pins the over-10kVA demand, the
   const ex = _cv180({ floor_area_ft2: 5000, unit_load_va_ft2: 3, receptacle_count: 60, supply_v: 208 });
   assert.ok(Math.abs(ex.lighting_va - 15000) < 1e-9);
   assert.ok(Math.abs(ex.recep_demand_va - 10400) < 1e-9 && Math.abs(ex.total_va - 25400) < 1e-9);
-  assert.ok(Math.abs(ex.total_a - 25400 / 208) < 1e-9);
+  assert.ok(Math.abs(ex.total_a - 25400 / (Math.sqrt(3) * 208)) < 1e-9); // 208Y/120 three-phase line current
   const under = _cv180({ floor_area_ft2: 5000, unit_load_va_ft2: 3, receptacle_count: 40, supply_v: 208 });
   assert.ok(Math.abs(under.recep_va - 7200) < 1e-9 && Math.abs(under.recep_demand_va - 7200) < 1e-9);
   assert.ok("error" in _cv180({ floor_area_ft2: -1, unit_load_va_ft2: 3, receptacle_count: 10, supply_v: 208 }));
@@ -20863,7 +20865,8 @@ test("bounds: spec-v370 computeMasonryLintelLoading pins the arching branch swit
   const r = _v370({ span_ft: 6, wall_psf: 60, wall_h_above: 5 });
   assert.strictEqual(r.tri_h_ft, 3);
   assert.strictEqual(r.arching, true);
-  assert.ok(Math.abs(r.W_lb - 540) < 1e-9 && Math.abs(r.w_udl_plf - 90) < 1e-9);
+  // Moment-equivalent UDL of the triangle: 4W/(3L) = 4 x 540 / 18 = 120 plf (W L/6 = 540 ft-lb = w L^2/8).
+  assert.ok(Math.abs(r.W_lb - 540) < 1e-9 && Math.abs(r.w_udl_plf - 120) < 1e-9);
   // Not enough wall above -> the full rectangle (more load).
   const norch = _v370({ span_ft: 6, wall_psf: 60, wall_h_above: 2 });
   assert.strictEqual(norch.arching, false);
@@ -43404,19 +43407,24 @@ test("bounds: spec-v1515 computeDustCollectorAirToCloth pins the bag derate", ()
 
 import { computeDustDeflagrationVentArea as _v1516 } from "../../calc-mining.js";
 test("bounds: spec-v1516 computeDustDeflagrationVentArea pins enclosure strength", () => {
-  const base = { volume_cuft: 3500, kst_bar_m_s: 150, p_red_psig: 1.5, p_stat_psig: 0.5, length_to_diameter: 2, stronger_p_red_psig: 5, available_vent_area_sqft: 12 };
+  const base = { volume_cuft: 3500, kst_bar_m_s: 150, pmax_bar: 8, p_red_psig: 1.5, p_stat_psig: 0.5, length_to_diameter: 2, stronger_p_red_psig: 5, available_vent_area_sqft: 12 };
   const r = _v1516(base);
   assert.strictEqual(r.dust_class, "St1");
   assert.ok(Math.abs(r.volume_m3 - 99.109) < 1e-2);
-  assert.ok(Math.abs(r.vent_area_sqft - 16.043) < 1e-2);
+  // NFPA 68 Eq. 8.2.2 carries sqrt(Pmax/Pred - 1): 45.08 sq ft at Pmax 8 bar.
+  assert.ok(Math.abs(r.vent_area_sqft - 45.082) < 1e-2);
   // The finding: a low enclosure rating demands an impractically large vent,
   // and building it stronger cuts the requirement far more than anything
-  // else available -- 45% here for a 3.3x strength increase.
-  assert.ok(Math.abs(r.vent_area_at_stronger_sqft - 8.787) < 1e-2);
-  assert.ok(Math.abs(r.stronger_saving_pct - 45.228) < 1e-2);
-  assert.ok(Math.abs(r.vent_area_sqft / r.vent_area_at_stronger_sqft - Math.sqrt(5 / 1.5)) < 1e-9);
+  // else available -- 46% here for a 3.3x strength increase.
+  assert.ok(Math.abs(r.vent_area_at_stronger_sqft - 24.312) < 1e-2);
+  assert.ok(Math.abs(r.stronger_saving_pct - 46.071) < 1e-2);
+  const psi = 0.0689475729;
+  assert.ok(Math.abs(r.vent_area_sqft / r.vent_area_at_stronger_sqft - Math.sqrt((8 / (1.5 * psi) - 1) / (8 / (5 * psi) - 1))) < 1e-6);
+  // A more violent dust (higher tested Pmax) needs more vent.
+  assert.ok(_v1516({ ...base, pmax_bar: 10 }).vent_area_sqft > r.vent_area_sqft);
+  assert.ok("error" in _v1516({ ...base, pmax_bar: 0 }));
   assert.strictEqual(r.fits, false);
-  assert.ok(Math.abs(r.shortfall_sqft - 4.043) < 1e-2);
+  assert.ok(Math.abs(r.shortfall_sqft - 33.082) < 1e-2);
   // Vent area goes as the square root of enclosure strength, linearly with
   // Kst, and with volume to the three-quarter power.
   assert.ok(Math.abs(_v1516({ ...base, kst_bar_m_s: 300 }).vent_area_sqft - 2 * r.vent_area_sqft) < 1e-9);
@@ -43430,7 +43438,7 @@ test("bounds: spec-v1516 computeDustDeflagrationVentArea pins enclosure strength
   assert.ok(elongated.vent_area_sqft > r.vent_area_sqft);
   assert.strictEqual(_v1516({ ...base, length_to_diameter: 1 }).vent_area_sqft, r.vent_area_sqft);
   // Enough available area is reported as fitting, with no shortfall.
-  const roomy = _v1516({ ...base, available_vent_area_sqft: 20 });
+  const roomy = _v1516({ ...base, available_vent_area_sqft: 50 });
   assert.strictEqual(roomy.fits, true);
   assert.strictEqual(roomy.shortfall_sqft, 0);
   assert.ok("error" in _v1516({ ...base, volume_cuft: 0 }));
@@ -50626,28 +50634,28 @@ test("bounds: spec-v1715 computeSandPermeabilityVent -- water expands seven thou
 });
 
 test("bounds: spec-v1716 computeMeltFurnaceEnergy -- efficiency and yield are two separate divisions", () => {
-  const base = { charge_weight_lb: 2000, theoretical_btu_lb: 190, furnace_efficiency_pct: 70, energy_cost_per_kwh: 0.10, alt_efficiency_pct: 30, alt_theoretical_btu_lb: 500, casting_yield_pct: 62 };
+  // DOE (2004) Table 13 theoretical melt energy: gray iron 600, aluminium 493 BTU/lb.
+  const base = { charge_weight_lb: 2000, theoretical_btu_lb: 600, furnace_efficiency_pct: 70, energy_cost_per_kwh: 0.10, alt_efficiency_pct: 30, alt_theoretical_btu_lb: 493, casting_yield_pct: 62 };
   const r = _v1716(base);
-  assert.ok(Math.abs(r.theoretical_mmbtu - 0.38) < 1e-9);
+  assert.ok(Math.abs(r.theoretical_mmbtu - 1.2) < 1e-9);
   // IDENTITY: input times efficiency is the theoretical.
   assert.ok(Math.abs(r.input_mmbtu * 0.70 - r.theoretical_mmbtu) < 1e-9);
   assert.ok(Math.abs(r.input_kwh * 3412.14 - r.input_btu) < 1e-6);
-  // 159.10 kWh, not the 158.26 the spec's rounded 0.54 MMBTU implies -- the
-  // exact input is 0.542857 MMBTU, and the spec's own 159 kWh agrees.
-  assert.ok(Math.abs(r.input_kwh - 159.10) < 0.05);
+  // 1.714286 MMBTU / 3412.14 = 502.41 kWh.
+  assert.ok(Math.abs(r.input_kwh - 502.41) < 0.05);
   // 100% efficiency is the theoretical figure exactly.
   assert.ok(Math.abs(_v1716({ ...base, furnace_efficiency_pct: 100 }).input_mmbtu - r.theoretical_mmbtu) < 1e-12);
   // IDENTITY: energy per saleable pound times saleable pounds is the input.
   assert.ok(Math.abs(r.btu_per_saleable_lb * 2000 * 0.62 - r.input_btu) < 1e-6);
-  assert.ok(Math.abs(r.btu_per_saleable_lb - 437.8) < 0.5);
+  assert.ok(Math.abs(r.btu_per_saleable_lb - 1382.5) < 0.5);
   // and it is roughly 2.3x the theoretical once BOTH divisions are counted.
-  assert.ok(Math.abs(r.btu_per_saleable_lb / 190 - 2.304) < 0.02);
+  assert.ok(Math.abs(r.btu_per_saleable_lb / 600 - 2.304) < 0.02);
   // A 100% yield leaves only the furnace efficiency.
   assert.ok(Math.abs(_v1716({ ...base, casting_yield_pct: 100 }).btu_per_saleable_lb * 2000 - r.input_btu) < 1e-6);
   // The gas furnace takes 2.3x the input for exactly the same metal.
   assert.ok(Math.abs(r.alt_input_mmbtu / r.input_mmbtu - 70 / 30) < 1e-9);
-  // Aluminium takes MORE energy per pound than iron at half the melting point.
-  assert.ok(base.alt_theoretical_btu_lb > base.theoretical_btu_lb * 2.6);
+  // Aluminium takes about 82% of iron's energy per pound at under half the melting point.
+  assert.ok(Math.abs(base.alt_theoretical_btu_lb / base.theoretical_btu_lb - 0.82) < 0.01);
   assert.ok(_v1716({ ...base, furnace_efficiency_pct: 0 }).error);
 });
 

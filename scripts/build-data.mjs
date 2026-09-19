@@ -1530,22 +1530,22 @@ const INVENTORY_BENCH_DATA_V5 = {
 };
 
 const PUB_15T_DATA_V5 = {
-  source: "IRS Publication 15-T (Federal Income Tax Withholding Methods), Worksheet 1A. Single-filer, illustrative.",
+  source: "IRS Publication 15-T (Federal Income Tax Withholding Methods), Worksheet 1A. Single-filer.",
   edition: "2025",
   fetched: TODAY,
   verified_on: TODAY,
   free_access: "irs.gov/publications/p15t.",
   annualized_brackets_single: [
-    { up_to: 14600,   rate: 0.00, base: 0.00 },
-    { up_to: 26200,   rate: 0.10, base: 0.00 },
-    { up_to: 61750,   rate: 0.12, base: 1160.00 },
-    { up_to: 115125,  rate: 0.22, base: 5426.00 },
-    { up_to: 206550,  rate: 0.24, base: 17168.50 },
-    { up_to: 258325,  rate: 0.32, base: 39110.50 },
-    { up_to: 623950,  rate: 0.35, base: 55678.50 },
-    { up_to: null,    rate: 0.37, base: 183647.25 },
+    { up_to: 15000,   rate: 0.00, base: 0.00 },
+    { up_to: 26925,   rate: 0.10, base: 0.00 },
+    { up_to: 63475,   rate: 0.12, base: 1192.50 },
+    { up_to: 118350,  rate: 0.22, base: 5578.50 },
+    { up_to: 212300,  rate: 0.24, base: 17651.00 },
+    { up_to: 265525,  rate: 0.32, base: 40199.00 },
+    { up_to: 641350,  rate: 0.35, base: 57231.00 },
+    { up_to: null,    rate: 0.37, base: 188769.75 },
   ],
-  note: "Illustrative single-filer brackets; MFJ / HoH and the 2020+ W-4 step-2 path are out of scope for the v5 starter.",
+  note: "Pub 15-T 2025 Worksheet 1A STANDARD schedule, single, with the line 1g $8,600 folded into each bracket start ($6,400 + $8,600 = $15,000). MFJ / HoH and the Step 2 checkbox schedule are out of scope. Until 2026-09-19 this held the 2024 schedule under a 2025 label.",
 };
 
 // --- v5 lab shards ---
@@ -1823,7 +1823,7 @@ const DATASETS = [
       { file: "estimated-tax-due-dates.json", body: ESTIMATED_TAX_DATA_V5, name: "IRS Form 1040-ES quarterly due dates" },
       { file: "standard-mileage-rates.json", body: STANDARD_MILEAGE_DATA_V5, name: "IRS standard mileage rate, per-year" },
       { file: "inventory-benchmarks.json", body: INVENTORY_BENCH_DATA_V5, name: "Industry-median inventory turnover (Census ARTS / SBA)" },
-      { file: "pub-15-t-tables.json", body: PUB_15T_DATA_V5, name: "IRS Pub 15-T percentage-method brackets (single-filer, illustrative)" },
+      { file: "pub-15-t-tables.json", body: PUB_15T_DATA_V5, name: "IRS Pub 15-T percentage-method brackets (single-filer)" },
     ] },
   // Legal folder: only the post-Wayfair sales-tax-nexus shard survives
   // spec-v107 (Legal group retired). Its tile lives in the reference group;

@@ -346,25 +346,41 @@ export const estimatedTaxExample = { inputs: { projected_current_tax: 20000, pri
 
 // --- 239: Payroll Tax Withholding (Simplified, federal only) ---
 //
-// Pub 15-T percentage method (rough; bracket points are illustrative).
-// Real implementation would index per-year per-frequency per-status
-// brackets bundled in a shard. For now: annualize gross, apply 2025
-// single brackets, divide by pay periods.
-// data/accounting/pub-15-t-tables.json
+// Pub 15-T annual percentage method, Worksheet 1A, single, 2020-or-later
+// Form W-4 with no Step 2-4 entries: annualize gross, subtract the line 1g
+// $8,600, apply the STANDARD rate schedule, divide by pay periods. The
+// brackets below fold the $8,600 in (2025: $6,400 + $8,600 = $15,000).
+// Until 2026-09-19 the "2025" table held the 2024 schedule for every year
+// ($14,600 floor), so $39,000 withheld $2,696 where 2025 Pub 15-T gives
+// $2,641.50.
 
-const PUB_15T_BRACKETS_2025 = {
-  // Annualized brackets, single filer, standard deduction baked in
-  // (illustrative; refresh from Pub 15-T worksheet 1A).
-  single: [
-    { up_to: 14600, rate: 0.00, base: 0 },
-    { up_to: 26200, rate: 0.10, base: 0 },
-    { up_to: 61750, rate: 0.12, base: 1160 },
-    { up_to: 115125, rate: 0.22, base: 5426 },
-    { up_to: 206550, rate: 0.24, base: 17168.50 },
-    { up_to: 258325, rate: 0.32, base: 39110.50 },
-    { up_to: 623950, rate: 0.35, base: 55678.50 },
-    { up_to: Infinity, rate: 0.37, base: 183647.25 },
-  ],
+const PUB_15T_BRACKETS = {
+  // Pub 15-T (2024), Worksheet 1A standard schedule, single, + $8,600.
+  2024: {
+    single: [
+      { up_to: 14600, rate: 0.00, base: 0 },
+      { up_to: 26200, rate: 0.10, base: 0 },
+      { up_to: 61750, rate: 0.12, base: 1160 },
+      { up_to: 115125, rate: 0.22, base: 5426 },
+      { up_to: 206550, rate: 0.24, base: 17168.50 },
+      { up_to: 258325, rate: 0.32, base: 39110.50 },
+      { up_to: 623950, rate: 0.35, base: 55678.50 },
+      { up_to: Infinity, rate: 0.37, base: 183647.25 },
+    ],
+  },
+  // Pub 15-T (2025), Worksheet 1A standard schedule, single, + $8,600.
+  2025: {
+    single: [
+      { up_to: 15000, rate: 0.00, base: 0 },
+      { up_to: 26925, rate: 0.10, base: 0 },
+      { up_to: 63475, rate: 0.12, base: 1192.50 },
+      { up_to: 118350, rate: 0.22, base: 5578.50 },
+      { up_to: 212300, rate: 0.24, base: 17651 },
+      { up_to: 265525, rate: 0.32, base: 40199 },
+      { up_to: 641350, rate: 0.35, base: 57231 },
+      { up_to: Infinity, rate: 0.37, base: 188769.75 },
+    ],
+  },
 };
 
 const PAY_FREQ_PERIODS = { weekly: 52, biweekly: 26, semimonthly: 24, monthly: 12 };
@@ -385,7 +401,7 @@ export function computePayrollWithholding({
   const periods = PAY_FREQ_PERIODS[pay_frequency];
   if (!periods) return { error: "Unknown pay frequency." };
   const annual_gross = gross_per_period * periods;
-  const brackets = PUB_15T_BRACKETS_2025[filing_status];
+  const brackets = (PUB_15T_BRACKETS[tax_year] || PUB_15T_BRACKETS[2025])[filing_status];
   if (!brackets) return { error: "Unsupported filing status (illustrative single only)." };
   let prev = 0, fed_annual = 0;
   for (const b of brackets) {
