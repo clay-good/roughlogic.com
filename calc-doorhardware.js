@@ -414,8 +414,11 @@ export function computeMasterKeyCapacity({ cut_positions = 0, usable_depths = 0,
   if (!(change_keys_required >= 1)) return { error: "Change keys required must be at least 1." };
   const theoretical_total = Math.pow(usable_depths, cut_positions);
   // A two-step progression uses every other depth at a mastered position, and
-  // the master claims one of them.
-  const per_mastered_position = Math.floor(usable_depths / 2);
+  // the master claims one of them: 10 depths give 4 per position, the
+  // textbook 4^6 = 4,096 change keys on six positions. Until 2026-09-19 the
+  // master's own depth was never subtracted (5^6 = 15,625).
+  const per_mastered_position = Math.floor(usable_depths / 2) - 1;
+  if (!(per_mastered_position >= 1)) return { error: "A two-step progression needs at least 4 usable depths: the master takes one of each parity pair." };
   const change_keys_available = Math.pow(per_mastered_position, mastered_positions);
   const alternative_change_keys = Math.pow(per_mastered_position, alternative_mastered_positions);
   const margin = change_keys_available - change_keys_required;
@@ -431,13 +434,13 @@ export function computeMasterKeyCapacity({ cut_positions = 0, usable_depths = 0,
     note: "The theoretical count is a power, and powers grow fast enough to be misleading. Six positions with six usable depths gives tens of thousands of combinations, which sounds inexhaustible -- until the master key claims one value at each mastered position, adjacent-cut and maximum-adjacent-cut rules eliminate a large fraction, keyway restrictions cut it again, and the requirement that change keys not accidentally operate other cylinders cuts it further. The number of genuinely usable change keys in a two-level system is a small fraction of the headline figure, commonly by an order of magnitude or more. The failure this prevents is specific and expensive. A system designed without a proper progression eventually issues a change key whose cuts, combined with the master wafer stack, operate a cylinder it was never meant to -- a cross-keying accident. Discovering that in a building with a thousand cylinders means rekeying the building. The design decision the arithmetic supports is how many positions to master: mastering more gives more change keys and less security, mastering fewer gives a tighter system with a smaller capacity, and the trade should be made deliberately at the start rather than discovered at key three hundred. This is a capacity estimate for a simple two-level, two-step progression. Multi-level systems with grand masters, selective keying, cross-keying, constant cuts, keyway families, and manufacturer-specific restricted keyways all change the arithmetic substantially, and the usable depth count itself depends on the manufacturer's cut specification. It does not generate a bitting list, check for cross-keying conflicts, or verify that no change key inadvertently operates another cylinder -- which is the actual work of system design. The lock manufacturer's system specification, a qualified locksmith or system designer, and the facility's key control policy govern.",
   };
 }
-const masterKeyExample = { inputs: { cut_positions: 6, usable_depths: 4, mastered_positions: 2, alternative_mastered_positions: 3, change_keys_required: 40 } };
+const masterKeyExample = { inputs: { cut_positions: 6, usable_depths: 6, mastered_positions: 2, alternative_mastered_positions: 3, change_keys_required: 40 } };
 DOORHARDWARE_RENDERERS["master-key-bitting-capacity"] = _simpleRenderer({
   citation: "Citation: the progression capacity relation as standard master keying practice by name -- theoretical combinations = usable depths raised to the number of cut positions, and the change keys a two-step progression yields = the usable depths halved, raised to the number of mastered positions. The manufacturer's system specification governs.",
   example: masterKeyExample.inputs,
   fields: [
     { key: "cut_positions", label: "Cut positions (pins)", kind: "number", default: 6 },
-    { key: "usable_depths", label: "Usable depths per position after the cut rules", kind: "number", default: 4 },
+    { key: "usable_depths", label: "Usable depths per position after the cut rules", kind: "number", default: 6 },
     { key: "mastered_positions", label: "Positions carrying the master cut", kind: "number", default: 2 },
     { key: "alternative_mastered_positions", label: "Alternative mastered position count", kind: "number", default: 3 },
     { key: "change_keys_required", label: "Change keys the building needs", kind: "number", default: 40 },

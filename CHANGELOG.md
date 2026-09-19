@@ -6,6 +6,13 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **A complete-penetration groove weld was given weld-metal shear, a master key system was credited nearly four times the change keys it has, and the International ¼-inch log rule was really the ⅛-inch rule.**
+  - `groove-weld-strength` and `groove-weld-length-for-load` gave CJP welds the weld-metal shear 0.60·FEXX. AISC 360 Table J2.5 sends CJP shear to the base metal (J4.2): the smaller of 0.60·Fy yielding and 0.60·Fu rupture. For a 0.5 × 6 in A36 plate, LRFD capacity is 64,800 lb, not 94,500, and the length inverse was short by the same ratio. New base-metal Fy and Fu inputs default to A36.
+  - `master-key-bitting-capacity` said "the master claims one" of each position's same-parity depths, but never subtracted it. A two-step progression leaves d/2 − 1 per position: the textbook 4⁶ = 4,096 on 10 depths and 6 positions, not 5⁶ = 15,625. The example now uses 6 depths, where the tile's point (4 change keys against 40 needed) still holds.
+  - `timber-cruise` and `lumber-recovery-overrun` scaled the International ¼-inch rule with the ⅛-inch section formula at the small-end diameter throughout. Each 4 ft section now scales 0.905 × (0.22D² − 0.71D) with ½ in of taper per section. That gives 64.6 bf at 10 in × 16 ft against the published 65 (was 59.6) and 135.6 at 14 in against 135. The Doyle bias at 10 in is 79.6%, not 65.6%.
+  - `sawmill-residue-yield` applied the drop in sawdust, a share of the wood, to the lumber. A thinner kerf raises lumber by (k + t)/(k′ + t) − 1, which is 488,889 bf/yr at the example, not 414,313. It now agrees with `lumber-recovery-overrun`'s kerf gain for the same inputs.
+  - The `effective-leakage-area` note said the US and Canadian leakage areas differ "purely by the reference pressure". The pressure contributes about 1.15 of the tile's own 1.89 ratio; the discharge coefficient (1.0 against 0.61) contributes the rest.
+
 - **Radiography unsharpness used the film distance, a magnetic-particle citation printed the formula the code had already corrected, and two field citations described numbers the tiles do not compute.**
   - `rt-exposure-time` divided by the source-to-film distance. ASME V T-274 defines Ug = F·d/D with D the source-to-object distance (the film distance less the thickness). The example's Ug is 0.00387 in, not 0.00375, about 3% low in the unsafe direction.
   - `mt-yoke-coil-amperage` computes the low-fill coil shot as 45,000/(L/D), but both of its printed citations still read 45,000/(L/D + 2), which would ask 25% less current at the example.

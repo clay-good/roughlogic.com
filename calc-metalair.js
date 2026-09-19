@@ -98,9 +98,9 @@ const _FEXX = { E60: 60, E70: 70, E80: 80, E90: 90, E100: 100, E110: 110 };
 // ---------------------------------------------------------------------
 // 30.1 Groove weld strength (groove-weld-strength) - AWS D1.1 / AISC 360 §J2
 // ---------------------------------------------------------------------
-// dims: in { weld_type: dimensionless, effective_throat_in: L, base_thickness_in: L, length_in: L, applied_load_lb: dimensionless, electrode: dimensionless } out: { throat_in: L, capacity_lb: dimensionless, utilization: dimensionless }
-export function computeGrooveWeldStrength({ weld_type = "PJP", effective_throat_in = 0, base_thickness_in = 0, length_in = 0, electrode = "E70", method = "ASD", applied_load_lb = 0 } = {}) {
-  const _g = _finiteGuard({ effective_throat_in, base_thickness_in, length_in, applied_load_lb }); if (_g) return _g;
+// dims: in { weld_type: dimensionless, effective_throat_in: L, base_thickness_in: L, length_in: L, applied_load_lb: dimensionless, electrode: dimensionless, base_fy_ksi: M L^-1 T^-2, base_fu_ksi: M L^-1 T^-2 } out: { throat_in: L, capacity_lb: dimensionless, utilization: dimensionless }
+export function computeGrooveWeldStrength({ weld_type = "PJP", effective_throat_in = 0, base_thickness_in = 0, length_in = 0, electrode = "E70", method = "ASD", applied_load_lb = 0, base_fy_ksi = 36, base_fu_ksi = 58 } = {}) {
+  const _g = _finiteGuard({ effective_throat_in, base_thickness_in, length_in, applied_load_lb, base_fy_ksi, base_fu_ksi }); if (_g) return _g;
   const Fexx = _FEXX[electrode] || 70;
   const L = Number(length_in);
   const M = String(method) === "LRFD" ? "LRFD" : "ASD";
@@ -116,17 +116,23 @@ export function computeGrooveWeldStrength({ weld_type = "PJP", effective_throat_
     throat_in = Number(effective_throat_in);
     if (!(throat_in > 0)) return { error: "For a PJP weld, enter the effective throat (in)." };
   }
-  // AISC 360 Table J2.5, weld-metal shear: nominal Fnw = 0.60*FEXX.
-  // ASD allowable 0.60*FEXX/2.00 = 0.30*FEXX; LRFD design 0.75*0.60*FEXX.
-  const stress_ksi = M === "LRFD" ? 0.75 * 0.60 * Fexx : 0.30 * Fexx;
+  // AISC 360 Table J2.5. PJP shear is weld metal: Fnw = 0.60*FEXX, ASD
+  // 0.30*FEXX, LRFD 0.75*0.60*FEXX. CJP shear is "controlled by the base
+  // metal" (J4.2): the smaller of yielding 0.60 Fy (phi 1.00, Omega 1.50) and
+  // rupture 0.60 Fu (phi 0.75, Omega 2.00). Until 2026-09-19 the CJP branch
+  // used the weld-metal figure, 46% over A36's 21.6 ksi (LRFD).
+  if (type === "CJP" && !(base_fy_ksi > 0 && base_fu_ksi >= base_fy_ksi)) return { error: "For a CJP weld enter the base metal Fy and Fu (ksi), Fu at least Fy." };
+  const stress_ksi = type === "CJP"
+    ? (M === "LRFD" ? Math.min(1.00 * 0.60 * base_fy_ksi, 0.75 * 0.60 * base_fu_ksi) : Math.min(0.60 * base_fy_ksi / 1.50, 0.60 * base_fu_ksi / 2.00))
+    : (M === "LRFD" ? 0.75 * 0.60 * Fexx : 0.30 * Fexx);
   const strength_per_in_lb = stress_ksi * 1000 * throat_in;
   const capacity_lb = strength_per_in_lb * L;
   let utilization = null;
   const load = Number(applied_load_lb) || 0;
   if (load > 0) utilization = load / capacity_lb;
   const notes = [];
-  notes.push(M + " basis: weld-metal shear at " + fmt(stress_ksi, 2) + " ksi on the " + fmt(throat_in, 3) + " in effective throat (" + electrode + ").");
-  if (type === "CJP") notes.push("A CJP groove weld with matching filler develops the full strength of the base metal in tension and compression normal to the weld axis; the shear capacity shown governs only the shear case (AISC J2.4).");
+  notes.push(M + " basis: " + (type === "CJP" ? "base-metal shear (AISC J4.2, Fy " + fmt(base_fy_ksi, 0) + " / Fu " + fmt(base_fu_ksi, 0) + " ksi)" : "weld-metal shear") + " at " + fmt(stress_ksi, 2) + " ksi on the " + fmt(throat_in, 3) + " in effective throat (" + electrode + ").");
+  if (type === "CJP") notes.push("A CJP groove weld with matching filler develops the full strength of the base metal; AISC Table J2.5 sends every CJP check, shear included, to the base metal (Section J4).");
   else notes.push("Read the PJP effective throat off the qualified WPS (it is the groove depth less the AWS D1.1 Table 3.1 reduction, not the joint thickness).");
   notes.push("The qualified WPS, the weld inspector, and the engineer of record govern.");
   return { weld_type: type, method: M, electrode, F_Exx_ksi: Fexx, throat_in, stress_ksi, strength_per_in_lb, capacity_lb, length_in: L, utilization, notes };
@@ -134,12 +140,14 @@ export function computeGrooveWeldStrength({ weld_type = "PJP", effective_throat_
 export const grooveWeldStrengthExample = { inputs: { weld_type: "PJP", effective_throat_in: 0.25, length_in: 6, electrode: "E70", method: "LRFD" } };
 
 function _renderGrooveWeldStrength(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: Groove weld (CJP / PJP) shear capacity - the AISC 360 Table J2.5 weld-metal shear strength 0.60*FEXX on the effective throat (ASD allowable 0.30*FEXX, LRFD design 0.75*0.60*FEXX) - per AWS D1.1 Structural Welding Code and AISC 360 §J2, by name; first-principles. A CJP weld with matching filler develops the base metal in tension/compression; the PJP effective throat is read off the qualified WPS. The WPS, inspector, and engineer of record govern. Complements the fillet-weld-strength tile.";
+  citationEl.textContent = "Citation: Groove weld (CJP / PJP) shear capacity - the AISC 360 Table J2.5 weld-metal shear strength 0.60*FEXX on the effective throat (ASD allowable 0.30*FEXX, LRFD design 0.75*0.60*FEXX) for PJP, and base-metal shear per J4.2 (the smaller of 0.60 Fy yielding and 0.60 Fu rupture) for CJP - per AWS D1.1 Structural Welding Code and AISC 360 §J2, by name; first-principles. A CJP weld with matching filler develops the base metal in tension/compression; the PJP effective throat is read off the qualified WPS. The WPS, inspector, and engineer of record govern. Complements the fillet-weld-strength tile.";
   const type = makeSelect("Weld type", "gw-type", [
     { value: "PJP", label: "PJP (partial penetration)", selected: true }, { value: "CJP", label: "CJP (complete penetration)" },
   ]);
   const throat = makeNumber("Effective throat (in, PJP)", "gw-throat", { step: "any", min: "0" });
   const base = makeNumber("Thinner part thickness (in, CJP)", "gw-base", { step: "any", min: "0" });
+  const fy = makeNumber("Base metal Fy (ksi, CJP)", "gw-fy", { step: "any", min: "0", value: "36" });
+  const fu = makeNumber("Base metal Fu (ksi, CJP)", "gw-fu", { step: "any", min: "0", value: "58" });
   const len = makeNumber("Weld length (in)", "gw-len", { step: "any", min: "0" });
   const elec = makeSelect("Electrode (FEXX)", "gw-elec", [
     { value: "E60", label: "E60" }, { value: "E70", label: "E70", selected: true },
@@ -149,21 +157,21 @@ function _renderGrooveWeldStrength(inputRegion, outputRegion, citationEl) {
     { value: "ASD", label: "ASD (allowable)", selected: true }, { value: "LRFD", label: "LRFD (design)" },
   ]);
   const load = makeNumber("Applied load (lb, optional)", "gw-load", { step: "any", min: "0" });
-  for (const f of [type, throat, base, len, elec, method, load]) inputRegion.appendChild(f.wrap);
+  for (const f of [type, throat, base, fy, fu, len, elec, method, load]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { type.select.value = "PJP"; throat.input.value = "0.25"; base.input.value = ""; len.input.value = "6"; elec.select.value = "E70"; method.select.value = "LRFD"; load.input.value = ""; update(); });
   const oCap = makeOutputLine(outputRegion, "Shear capacity", "gw-out-cap");
   const oThroat = makeOutputLine(outputRegion, "Effective throat / unit strength", "gw-out-throat");
   const oUtil = makeOutputLine(outputRegion, "Utilization", "gw-out-util");
   const oNote = makeOutputLine(outputRegion, "Notes", "gw-out-note");
   const update = debounce(() => {
-    const r = computeGrooveWeldStrength({ weld_type: type.select.value, effective_throat_in: Number(throat.input.value) || 0, base_thickness_in: Number(base.input.value) || 0, length_in: Number(len.input.value) || 0, electrode: elec.select.value, method: method.select.value, applied_load_lb: Number(load.input.value) || 0 });
+    const r = computeGrooveWeldStrength({ weld_type: type.select.value, effective_throat_in: Number(throat.input.value) || 0, base_thickness_in: Number(base.input.value) || 0, length_in: Number(len.input.value) || 0, electrode: elec.select.value, method: method.select.value, applied_load_lb: Number(load.input.value) || 0 , base_fy_ksi: Number(fy.input.value) || 0, base_fu_ksi: Number(fu.input.value) || 0 });
     if (r.error) { oCap.textContent = r.error; oThroat.textContent = "-"; oUtil.textContent = "-"; oNote.textContent = ""; return; }
     oCap.textContent = fmt(r.capacity_lb, 0) + " lb (" + r.method + ", " + r.electrode + ")";
     oThroat.textContent = fmt(r.throat_in, 3) + " in throat; " + fmt(r.strength_per_in_lb, 0) + " lb per in";
     oUtil.textContent = r.utilization === null ? "(enter an applied load)" : (fmt(r.utilization * 100, 1) + "% - " + (r.utilization <= 1 ? "OK" : "OVERSTRESSED"));
     oNote.textContent = r.notes.join(" ");
   }, DEBOUNCE_MS);
-  for (const f of [throat.input, base.input, len.input, load.input]) f.addEventListener("input", update);
+  for (const f of [throat.input, base.input, fy.input, fu.input, len.input, load.input]) f.addEventListener("input", update);
   for (const s of [type.select, elec.select, method.select]) s.addEventListener("change", update);
 }
 METALAIR_RENDERERS["groove-weld-strength"] = _renderGrooveWeldStrength;
@@ -172,9 +180,9 @@ METALAIR_RENDERERS["groove-weld-strength"] = _renderGrooveWeldStrength;
 // length; the inverse recovers the weld length an applied load needs at a given effective throat, so a detailer sizes the
 // weld run. From capacity = stress_ksi x 1000 x throat x L (stress_ksi = 0.30 FEXX ASD or 0.75 x 0.60 FEXX LRFD),
 // L = load / (stress_ksi x 1000 x throat). CJP uses the thinner-part thickness as the throat; PJP uses the WPS effective throat.
-// dims: in { applied_load_lb: dimensionless, weld_type: dimensionless, effective_throat_in: L, base_thickness_in: L, electrode: dimensionless, method: dimensionless } out: { required_length_in: L, stress_ksi: M L^-1 T^-2, throat_in: L }
-export function computeGrooveWeldLengthForLoad({ applied_load_lb = 0, weld_type = "PJP", effective_throat_in = 0, base_thickness_in = 0, electrode = "E70", method = "ASD" } = {}) {
-  const _g = _finiteGuard({ applied_load_lb, effective_throat_in, base_thickness_in }); if (_g) return _g;
+// dims: in { applied_load_lb: dimensionless, weld_type: dimensionless, effective_throat_in: L, base_thickness_in: L, electrode: dimensionless, method: dimensionless, base_fy_ksi: M L^-1 T^-2, base_fu_ksi: M L^-1 T^-2 } out: { required_length_in: L, stress_ksi: M L^-1 T^-2, throat_in: L }
+export function computeGrooveWeldLengthForLoad({ applied_load_lb = 0, weld_type = "PJP", effective_throat_in = 0, base_thickness_in = 0, electrode = "E70", method = "ASD", base_fy_ksi = 36, base_fu_ksi = 58 } = {}) {
+  const _g = _finiteGuard({ applied_load_lb, effective_throat_in, base_thickness_in, base_fy_ksi, base_fu_ksi }); if (_g) return _g;
   const Fexx = _FEXX[electrode] || 70;
   const M = String(method) === "LRFD" ? "LRFD" : "ASD";
   const type = String(weld_type).toUpperCase() === "CJP" ? "CJP" : "PJP";
@@ -188,7 +196,11 @@ export function computeGrooveWeldLengthForLoad({ applied_load_lb = 0, weld_type 
     throat_in = Number(effective_throat_in);
     if (!(throat_in > 0)) return { error: "For a PJP weld, enter the effective throat (in)." };
   }
-  const stress_ksi = M === "LRFD" ? 0.75 * 0.60 * Fexx : 0.30 * Fexx;
+  // Same Table J2.5 split as groove-weld-strength: CJP shear is base metal.
+  if (type === "CJP" && !(base_fy_ksi > 0 && base_fu_ksi >= base_fy_ksi)) return { error: "For a CJP weld enter the base metal Fy and Fu (ksi), Fu at least Fy." };
+  const stress_ksi = type === "CJP"
+    ? (M === "LRFD" ? Math.min(1.00 * 0.60 * base_fy_ksi, 0.75 * 0.60 * base_fu_ksi) : Math.min(0.60 * base_fy_ksi / 1.50, 0.60 * base_fu_ksi / 2.00))
+    : (M === "LRFD" ? 0.75 * 0.60 * Fexx : 0.30 * Fexx);
   const strength_per_in_lb = stress_ksi * 1000 * throat_in;
   const required_length_in = load / strength_per_in_lb;
   if (![required_length_in, stress_ksi, throat_in].every(Number.isFinite)) return { error: "Weld-length math is not a finite value." };
@@ -203,13 +215,15 @@ export function computeGrooveWeldLengthForLoad({ applied_load_lb = 0, weld_type 
 export const grooveWeldLengthForLoadExample = { inputs: { applied_load_lb: 100000, weld_type: "PJP", effective_throat_in: 0.25, electrode: "E70", method: "LRFD" } };
 
 function _renderGrooveWeldLengthForLoad(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: Groove weld (CJP / PJP) shear capacity (AISC 360 Table J2.5 weld-metal shear 0.60*FEXX on the effective throat; ASD 0.30*FEXX, LRFD 0.75*0.60*FEXX) solved for the length: L = load / (stress_ksi x 1000 x throat), per AWS D1.1 and AISC 360 §J2, by name. The WPS, inspector, and engineer of record govern.";
+  citationEl.textContent = "Citation: Groove weld (CJP / PJP) shear capacity (AISC 360 Table J2.5 weld-metal shear 0.60*FEXX on the effective throat; ASD 0.30*FEXX, LRFD 0.75*0.60*FEXX) solved for the length: L = load / (stress_ksi x 1000 x throat); CJP shear is base metal per Table J2.5 and J4.2 (the smaller of 0.60 Fy yielding and 0.60 Fu rupture), per AWS D1.1 and AISC 360 §J2, by name. The WPS, inspector, and engineer of record govern.";
   const type = makeSelect("Weld type", "gwl-type", [
     { value: "PJP", label: "PJP (partial penetration)", selected: true }, { value: "CJP", label: "CJP (complete penetration)" },
   ]);
   const load = makeNumber("Applied load (lb)", "gwl-load", { step: "any", min: "0" });
   const throat = makeNumber("Effective throat (in, PJP)", "gwl-throat", { step: "any", min: "0" });
   const base = makeNumber("Thinner part thickness (in, CJP)", "gwl-base", { step: "any", min: "0" });
+  const fy = makeNumber("Base metal Fy (ksi, CJP)", "gwl-fy", { step: "any", min: "0", value: "36" });
+  const fu = makeNumber("Base metal Fu (ksi, CJP)", "gwl-fu", { step: "any", min: "0", value: "58" });
   const elec = makeSelect("Electrode (FEXX)", "gwl-elec", [
     { value: "E60", label: "E60" }, { value: "E70", label: "E70", selected: true },
     { value: "E80", label: "E80" }, { value: "E90", label: "E90" }, { value: "E100", label: "E100" }, { value: "E110", label: "E110" },
@@ -217,19 +231,19 @@ function _renderGrooveWeldLengthForLoad(inputRegion, outputRegion, citationEl) {
   const method = makeSelect("Method", "gwl-method", [
     { value: "ASD", label: "ASD (allowable)", selected: true }, { value: "LRFD", label: "LRFD (design)" },
   ]);
-  for (const f of [type, load, throat, base, elec, method]) inputRegion.appendChild(f.wrap);
+  for (const f of [type, load, throat, base, fy, fu, elec, method]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { type.select.value = "PJP"; load.input.value = "100000"; throat.input.value = "0.25"; base.input.value = ""; elec.select.value = "E70"; method.select.value = "LRFD"; update(); });
   const oL = makeOutputLine(outputRegion, "Required weld length", "gwl-out-l");
   const oU = makeOutputLine(outputRegion, "Effective throat / unit strength", "gwl-out-u");
   const oNote = makeOutputLine(outputRegion, "Notes", "gwl-out-note");
   const update = debounce(() => {
-    const r = computeGrooveWeldLengthForLoad({ weld_type: type.select.value, applied_load_lb: Number(load.input.value) || 0, effective_throat_in: Number(throat.input.value) || 0, base_thickness_in: Number(base.input.value) || 0, electrode: elec.select.value, method: method.select.value });
+    const r = computeGrooveWeldLengthForLoad({ weld_type: type.select.value, applied_load_lb: Number(load.input.value) || 0, effective_throat_in: Number(throat.input.value) || 0, base_thickness_in: Number(base.input.value) || 0, electrode: elec.select.value, method: method.select.value, base_fy_ksi: Number(fy.input.value) || 0, base_fu_ksi: Number(fu.input.value) || 0 });
     if (r.error) { oL.textContent = r.error; oU.textContent = "-"; oNote.textContent = ""; return; }
     oL.textContent = fmt(r.required_length_in, 2) + " in (" + r.method + ", " + r.electrode + ")";
     oU.textContent = fmt(r.throat_in, 3) + " in throat; " + fmt(r.strength_per_in_lb, 0) + " lb per in";
     oNote.textContent = r.notes.join(" ");
   }, DEBOUNCE_MS);
-  for (const f of [load.input, throat.input, base.input]) f.addEventListener("input", update);
+  for (const f of [fy.input, fu.input, load.input, throat.input, base.input]) f.addEventListener("input", update);
   for (const s of [type.select, elec.select, method.select]) s.addEventListener("change", update);
 }
 METALAIR_RENDERERS["groove-weld-length-for-load"] = _renderGrooveWeldLengthForLoad;

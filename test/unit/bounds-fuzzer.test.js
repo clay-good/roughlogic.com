@@ -3388,10 +3388,11 @@ test("bounds: calc-agriculture computeTimberCruise pins Doyle BF = (D-4)^2 * L/1
   const doyle = computeTimberCruise({ small_end_dib_in: 14, log_length_ft: 16, rule: "doyle" });
   assert.ok(!doyle.error, JSON.stringify(doyle));
   assert.ok(Math.abs(doyle.board_feet - 100) < 1e-9, `Doyle 14-in 16-ft`);
-  // International 1/4 is a 4-ft-section rule: (0.22*196 - 0.71*14) per 4 ft x (16/4) sections = 33.18 * 4 = 132.72 BF.
+  // International 1/4 is a 4-ft-section rule: 0.905 x (0.22 D^2 - 0.71 D) per section, D rising 1/2 in per
+  // section for taper -- 135.6 BF at 14 in x 16 ft against the published 135.
   // (Correctly the highest of the three rules for a small log, matching the tile note; the old code used L/16 and read 33.)
   const intl = computeTimberCruise({ small_end_dib_in: 14, log_length_ft: 16, rule: "international" });
-  assert.ok(Math.abs(intl.board_feet - (0.22 * 196 - 0.71 * 14) * (16 / 4)) < 1e-9, `Int'l 1/4 14-in 16-ft`);
+  assert.ok(Math.abs(intl.board_feet - 135.6052) < 1e-6, `Int'l 1/4 14-in 16-ft`);
   assert.ok(intl.board_feet > 114 && intl.board_feet > 100, `International reads highest for a small log (> Scribner 114 and Doyle 100)`);
   // Scribner table lookup at 14 in -> 114 BF (per the bundled SCRIBNER_TABLE_16FT).
   const scribner = computeTimberCruise({ small_end_dib_in: 14, log_length_ft: 16, rule: "scribner" });
@@ -42830,12 +42831,16 @@ test("bounds: spec-v1575 computeMaglockLeverage pins lock position as the design
 });
 
 import { computeMasterKeyCapacity as _v1576 } from "../../calc-doorhardware.js";
-test("bounds: spec-v1576 computeMasterKeyCapacity pins 4,096 against 4", () => {
-  const base = { cut_positions: 6, usable_depths: 4, mastered_positions: 2, alternative_mastered_positions: 3, change_keys_required: 40 };
+test("bounds: spec-v1576 computeMasterKeyCapacity pins 46,656 against 4", () => {
+  const base = { cut_positions: 6, usable_depths: 6, mastered_positions: 2, alternative_mastered_positions: 3, change_keys_required: 40 };
   const r = _v1576(base);
-  assert.strictEqual(r.theoretical_total, 4096);
+  assert.strictEqual(r.theoretical_total, 46656);
+  // Two-step progression: 3 same-parity depths, one of them the master's.
   assert.strictEqual(r.per_mastered_position, 2);
-  // The whole finding: 4,096 theoretical combinations, FOUR usable change
+  // The textbook total-position progression: 10 depths, 6 positions -> 4^6.
+  assert.strictEqual(_v1576({ ...base, usable_depths: 10, mastered_positions: 6 }).change_keys_available, 4096);
+  assert.ok("error" in _v1576({ ...base, usable_depths: 3 }));
+  // The whole finding: 46,656 theoretical combinations, FOUR usable change
   // keys, and a building that needs forty.
   assert.strictEqual(r.change_keys_available, 4);
   assert.strictEqual(r.sufficient, false);
@@ -42848,10 +42853,10 @@ test("bounds: spec-v1576 computeMasterKeyCapacity pins 4,096 against 4", () => {
   assert.strictEqual(_v1576({ ...base, mastered_positions: 4 }).change_keys_available, 16);
   // A larger usable depth set moves both numbers, and the theoretical one
   // moves far faster than the usable one -- the reason it misleads.
-  const wide = _v1576({ ...base, usable_depths: 8 });
-  assert.strictEqual(wide.theoretical_total, 262144);
+  const wide = _v1576({ ...base, usable_depths: 10 });
+  assert.strictEqual(wide.theoretical_total, 1000000);
   assert.strictEqual(wide.change_keys_available, 16);
-  assert.ok(wide.theoretical_total / r.theoretical_total === 64);
+  assert.ok(wide.theoretical_total / r.theoretical_total > 21);
   assert.ok(wide.change_keys_available / r.change_keys_available === 4);
   // A system with just enough capacity is flagged as having no room left.
   const tight = _v1576({ ...base, mastered_positions: 6, change_keys_required: 60 });
@@ -44145,23 +44150,23 @@ test("bounds: spec-v1582 computeLumberRecoveryOverrun separates the scale rule f
   // on small wood is the SCALE, not the mill. That is the spec's whole point
   // and it is the number nothing else in the catalog reports.
   assert.ok(Math.abs(r.doyle_bf - 36) < 1e-9);
-  assert.ok(Math.abs(r.international_bf - 59.6) < 1e-9);
-  assert.ok(Math.abs(r.scale_bias_overrun_pct - 65.5556) < 1e-3);
+  assert.ok(Math.abs(r.international_bf - 64.6532) < 1e-9); // published table: 65
+  assert.ok(Math.abs(r.scale_bias_overrun_pct - 79.5922) < 1e-3);
   assert.ok(r.performance_overrun_pts < 0);
   assert.ok(r.bias_verdict.includes("scale rule"));
-  // The bias falls monotonically with log diameter -- 65.6% at 10 in, 15.3%
+  // The bias falls monotonically with log diameter -- 79.6% at 10 in, 13.2%
   // at 20 in -- which is exactly why an overrun figure quoted without the log
   // size means nothing.
   const big = _v1582({ ...base, avg_log_diameter_in: 20 });
-  assert.ok(Math.abs(big.scale_bias_overrun_pct - 15.3125) < 1e-3);
+  assert.ok(Math.abs(big.scale_bias_overrun_pct - 13.2098) < 1e-3);
   assert.ok(big.scale_bias_overrun_pct < r.scale_bias_overrun_pct);
   assert.ok(_v1582({ ...base, avg_log_diameter_in: 14 }).scale_bias_overrun_pct < r.scale_bias_overrun_pct);
   // On 20 in logs the same 24% tally BEATS the bias, and the verdict flips.
   assert.ok(big.performance_overrun_pts > 0);
   assert.ok(big.bias_verdict.includes("sawing"));
-  // Both log rules are exactly linear in length, so the bias is a property
-  // of diameter alone.
-  assert.ok(Math.abs(_v1582({ ...base, log_length_ft: 8 }).scale_bias_overrun_pct - r.scale_bias_overrun_pct) < 1e-9);
+  // Doyle is linear in length but International carries 1/2 in of taper per
+  // 4 ft section, so a shorter log shows less bias at the same small end.
+  assert.ok(_v1582({ ...base, log_length_ft: 8 }).scale_bias_overrun_pct < r.scale_bias_overrun_pct);
   // Kerf: boards recovered go as (kerf + t) / (target + t), and the sawdust
   // share is provably that same ratio's complement.
   assert.ok(Math.abs(r.kerf_gain_pct - ((0.180 + 1) / (0.125 + 1) - 1) * 100) < 1e-12);
@@ -44347,7 +44352,8 @@ test("bounds: spec-v1586 computeSawmillResidueYield halves the kerf gain on thic
   assert.ok(_v1586({ ...base, alt_board_thickness_in: 4 }).gain_ratio < r.gain_ratio);
   assert.ok(_v1586({ ...base, alt_board_thickness_in: 1 }).gain_ratio === 1);
   // A year's worth, on the mill's own production.
-  assert.ok(Math.abs(r.annual_gain_bf - 10000 * 1000 * r.gain_pts / 100) < 1e-9);
+  // The gain is a share of the LUMBER: (k + t) / (k' + t) - 1.
+  assert.ok(Math.abs(r.annual_gain_bf - 10000 * 1000 * ((0.180 + 1) / (0.125 + 1) - 1)) < 1e-6);
   assert.ok(r.annual_gain_bf > 400000);
   // The split is exact: bark plus sawdust plus chips is the whole residue,
   // and the residue is what recovery leaves.

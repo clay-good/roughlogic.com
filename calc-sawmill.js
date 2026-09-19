@@ -82,6 +82,21 @@ const _HOURS_PER_DAY = 24;
 
 // ============ spec-v1582: lumber recovery and overrun ============
 
+// International 1/4-inch log rule: each 4 ft section scales 0.905 x
+// (0.22 D^2 - 0.71 D), the 1/8-inch-kerf section formula cut to a 1/4-inch
+// kerf, with D growing 1/2 in per section for taper (a leftover under 4 ft
+// scales pro rata at the next diameter). A 10 in x 16 ft log scales 64.6 bf
+// against the published 65. Until 2026-09-19 the 1/8-inch formula ran every
+// section at the small-end diameter (59.6 bf; 24% low at 6 in).
+function _international14Bf(D, L) {
+  const sec = (d) => 0.905 * (0.22 * d * d - 0.71 * d);
+  const n = Math.floor(L / 4);
+  let bf = 0;
+  for (let i = 0; i < n; i++) bf += sec(D + 0.5 * i);
+  const rem = L - 4 * n;
+  if (rem > 0) bf += sec(D + 0.5 * n) * rem / 4;
+  return Math.max(0, bf);
+}
 // dims: in { scaled_bf: dimensionless, actual_bf: dimensionless, log_volume_cuft: L^3, benchmark_recovery_bf_per_cuft: L^-3, avg_log_diameter_in: L, log_length_ft: L, kerf_in: L, target_kerf_in: L, board_thickness_in: L } out: { overrun_pct: dimensionless, recovery_bf_per_cuft: L^-3, scale_bias_overrun_pct: dimensionless, kerf_gain_bf: dimensionless, sawdust_share_pct: dimensionless }
 export function computeLumberRecoveryOverrun({ scaled_bf = 0, actual_bf = 0, log_volume_cuft = 0, benchmark_lrf = 7, avg_log_diameter_in = 0, log_length_ft = 16, kerf_in = 0, target_kerf_in = 0, board_thickness_in = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
@@ -103,7 +118,7 @@ export function computeLumberRecoveryOverrun({ scaled_bf = 0, actual_bf = 0, log
   // same relations `timber-cruise` scales a single log with; the useful
   // number here is their DIFFERENCE, which nothing else reports.
   const doyle_bf = Math.pow(avg_log_diameter_in - 4, 2) * (log_length_ft / 16);
-  const international_bf = Math.max(0, 0.22 * avg_log_diameter_in * avg_log_diameter_in - 0.71 * avg_log_diameter_in) * (log_length_ft / 4);
+  const international_bf = _international14Bf(avg_log_diameter_in, log_length_ft);
   const scale_bias_overrun_pct = (international_bf - doyle_bf) / doyle_bf * 100;
   const performance_overrun_pts = overrun_pct - scale_bias_overrun_pct;
   // Kerf: each cut consumes kerf + board thickness of log, so the boards
@@ -122,9 +137,9 @@ export function computeLumberRecoveryOverrun({ scaled_bf = 0, actual_bf = 0, log
     note: "Overrun is a property of the SCALE, not only of the mill. Doyle subtracts a fixed slab allowance that is far too large on small logs, so a small log scales at a fraction of what it actually cuts and a mill running small wood on Doyle can show overrun of 50% or more; the same mill running 20 in logs shows very little. A mill comparing its overrun month to month without tracking log diameter is measuring its log mix, not its performance -- which is why the overrun Doyle's bias alone would produce at the entered diameter is reported beside the measured one. LUMBER RECOVERY FACTOR IS THE HONEST MEASURE because it compares output to actual wood volume rather than to a scaling convention. It responds to the things a mill can control: saw kerf, sawing accuracy, target sizes and how much oversize is being cut for shrinkage, edging and trimming practice, and how the sawyer breaks down each log. The commercial point follows. Overrun on a conservative scale is not free money, because everyone knows the scale is conservative and the log price already reflects it. Improving recovery is real; improving overrun by buying smaller logs is not. A ratio calculation from volumes the user supplies. Overrun is not comparable between mills, between scale rules, or across a changing log mix. It does not compute log scale itself, and it does not address scaling deductions for defect, which materially change the scaled volume and are a matter of the scaler's judgment and the applicable scaling handbook. It does not evaluate GRADE recovery, which is where hardwood value actually sits -- a mill can raise volume recovery and lose money by degrading grade -- or value recovery per log, and it does not address green versus dry tally or the shrinkage allowance in target sizes. The applicable scaling rule and handbook, the grading rules of the applicable agency, and the mill's own scaling and tally records govern.",
   };
 }
-const lumberRecoveryOverrunExample = { inputs: { scaled_bf: 1000, actual_bf: 1240, log_volume_cuft: 210, benchmark_recovery_bf_per_cuft: 7, avg_log_diameter_in: 10, log_length_ft: 16, kerf_in: 0.180, target_kerf_in: 0.125, board_thickness_in: 1 } };
+const lumberRecoveryOverrunExample = { inputs: { scaled_bf: 1000, actual_bf: 1240, log_volume_cuft: 210, benchmark_lrf: 7, avg_log_diameter_in: 10, log_length_ft: 16, kerf_in: 0.180, target_kerf_in: 0.125, board_thickness_in: 1 } };
 SAWMILL_RENDERERS["lumber-recovery-overrun"] = _simpleRenderer({
-  citation: "Citation: the standard mill definitions by name -- overrun = (tallied board feet - scaled board feet) / scaled x 100, and lumber recovery factor = board feet produced / cubic feet of log input. The scale-bias comparison uses the published Doyle rule (D - 4) squared x length / 16 against the International 1/4 rule (0.22 D squared - 0.71 D) per 4 ft section, both public domain. The applicable scaling rule and handbook, the grading agency, and the mill's own scale and tally records govern.",
+  citation: "Citation: the standard mill definitions by name -- overrun = (tallied board feet - scaled board feet) / scaled x 100, and lumber recovery factor = board feet produced / cubic feet of log input. The scale-bias comparison uses the published Doyle rule (D - 4) squared x length / 16 against the International 1/4 rule, 0.905 x (0.22 D squared - 0.71 D) per 4 ft section with 1/2 in of taper per section, both public domain. The applicable scaling rule and handbook, the grading agency, and the mill's own scale and tally records govern.",
   example: lumberRecoveryOverrunExample.inputs,
   fields: [
     { key: "scaled_bf", label: "Scaled volume of the logs (board feet)", kind: "number", default: 1000 },
@@ -372,7 +387,11 @@ export function computeSawmillResidueYield({ lumber_recovery_pct = 0, kerf_in = 
   const sawdust_of_log_pct = sawdust_share_pct * (100 - bark_fraction_pct) / 100;
   const chips_of_log_pct = residue_pct - bark_fraction_pct - sawdust_of_log_pct;
   if (!(chips_of_log_pct >= 0)) return { error: "The entered bark and kerf shares already exceed the residue fraction -- check the recovery figure." };
-  const annual_gain_bf = annual_lumber_mbf * 1000 * gain_pts / 100;
+  // Lumber per unit of wood sawn is t / (k + t), so a thinner kerf raises the
+  // lumber by (k + t) / (k' + t) - 1 -- a share of the LUMBER. Until
+  // 2026-09-19 the drop in sawdust (a share of the wood) was applied to the
+  // lumber, 15% short, and disagreed with lumber-recovery-overrun's kerf gain.
+  const annual_gain_bf = annual_lumber_mbf * 1000 * ((kerf_in + board_thickness_in) / (target_kerf_in + board_thickness_in) - 1);
   return {
     sawdust_share_pct, target_sawdust_share_pct, gain_pts,
     alt_share_pct, alt_target_share_pct, alt_gain_pts, gain_ratio,

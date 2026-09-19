@@ -54,7 +54,7 @@ export const gpaExample = { inputs: { gpm: 0.4, spacing_in: 20, speed_mph: 5, ta
 // --- 204: Timber Cruise (Doyle, Scribner, International 1/4) ---
 //
 // Doyle:        BF = ((D-4)^2) * (L/16)
-// Int'l 1/4:    BF = (0.22 D^2 - 0.71 D)  (board feet per 4 ft section, x L/4)
+// Int'l 1/4:    BF = sum over 4 ft sections of 0.905 (0.22 D^2 - 0.71 D), D + 1/2 in per section
 // Scribner:     bundled public-domain table per small-end DIB.
 
 export const SCRIBNER_TABLE_16FT = {
@@ -63,6 +63,21 @@ export const SCRIBNER_TABLE_16FT = {
   16: 144, 17: 161, 18: 187, 19: 207, 20: 235, 22: 290, 24: 350, 26: 423, 28: 493, 30: 568,
 };
 
+// International 1/4-inch log rule: each 4 ft section scales 0.905 x
+// (0.22 D^2 - 0.71 D), the 1/8-inch-kerf section formula cut to a 1/4-inch
+// kerf, with D growing 1/2 in per section for taper (a leftover under 4 ft
+// scales pro rata at the next diameter). A 10 in x 16 ft log scales 64.6 bf
+// against the published 65. Until 2026-09-19 the 1/8-inch formula ran every
+// section at the small-end diameter (59.6 bf; 24% low at 6 in).
+function _international14Bf(D, L) {
+  const sec = (d) => 0.905 * (0.22 * d * d - 0.71 * d);
+  const n = Math.floor(L / 4);
+  let bf = 0;
+  for (let i = 0; i < n; i++) bf += sec(D + 0.5 * i);
+  const rem = L - 4 * n;
+  if (rem > 0) bf += sec(D + 0.5 * n) * rem / 4;
+  return Math.max(0, bf);
+}
 // dims: in { small_end_dib_in: L, log_length_ft: L, rule: dimensionless, price_per_bf: dimensionless }
 //        out: { board_feet: L^3, rule: dimensionless, note: dimensionless, value_usd: dimensionless }
 // (Diameter and length are lengths `L`; board-feet is a volume
@@ -79,9 +94,7 @@ export function computeTimberCruise({ small_end_dib_in = 0, log_length_ft = 16, 
   if (rule === "doyle") {
     bf = Math.max(0, Math.pow(small_end_dib_in - 4, 2) * (log_length_ft / 16));
   } else if (rule === "international") {
-    // International 1/4-inch rule: 0.22*D^2 - 0.71*D is the board-foot volume of a
-    // 4-FOOT section, so scale by the number of 4-ft sections (length / 4), not / 16.
-    bf = Math.max(0, (0.22 * small_end_dib_in * small_end_dib_in - 0.71 * small_end_dib_in)) * (log_length_ft / 4);
+    bf = _international14Bf(small_end_dib_in, log_length_ft);
   } else if (rule === "scribner") {
     const dib = Math.round(small_end_dib_in);
     let raw = SCRIBNER_TABLE_16FT[dib];
@@ -371,7 +384,7 @@ const renderGPA = _r({
 });
 
 const renderTimberCruise = _r({
-  citation: "Citation: Public USDA Forest Service technical reports by name only. Doyle: BF = (D-4)^2 * (L/16). International 1/4: BF = (0.22 D^2 - 0.71 D) per 4 ft section (x L/4).",
+  citation: "Citation: Public USDA Forest Service technical reports by name only. Doyle: BF = (D-4)^2 * (L/16). International 1/4: BF = 0.905 (0.22 D^2 - 0.71 D) per 4 ft section, D rising 1/2 in per section for taper.",
   example: timberCruiseExample.inputs,
   fields: [
     { key: "small_end_dib_in", label: "Small-end DIB (in)", kind: "number" },

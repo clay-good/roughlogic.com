@@ -95136,21 +95136,21 @@
   {
    "tile_id": "master-key-bitting-capacity",
    "source_publisher": "Project (first-principles)",
-   "source_title": "6-pin system, 4 usable depths, two positions mastered on a two-step progression",
-   "source_edition_or_year": "theoretical = depths ^ positions; change keys = (depths / 2) ^ mastered",
+   "source_title": "6-pin system, 6 usable depths, two positions mastered on a two-step progression",
+   "source_edition_or_year": "theoretical = depths ^ positions; change keys = (depths / 2 - 1) ^ mastered, the master taking one depth of each parity",
    "source_section_or_page": "the manufacturer's system specification governs",
    "verified_by": "rl",
    "verified_on": "2026-09-05",
    "inputs": {
     "cut_positions": 6,
-    "usable_depths": 4,
+    "usable_depths": 6,
     "mastered_positions": 2,
     "alternative_mastered_positions": 3,
     "change_keys_required": 40
    },
    "outputs": {
     "theoretical_total": {
-     "value": 4096,
+     "value": 46656,
      "tolerance": {
       "pct": 0.5
      }
@@ -96744,7 +96744,7 @@
      }
     },
     "scale_bias_overrun_pct": {
-     "value": 65.5556,
+     "value": 79.5922,
      "tolerance": {
       "pct": 0.5
      }
@@ -96756,7 +96756,7 @@
      }
     },
     "international_bf": {
-     "value": 59.6,
+     "value": 64.6532,
      "tolerance": {
       "pct": 0.5
      }
@@ -97030,7 +97030,7 @@
      }
     },
     "annual_gain_bf": {
-     "value": 414313.0,
+     "value": 488888.89,
      "tolerance": {
       "pct": 0.5
      }

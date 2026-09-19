@@ -29,7 +29,7 @@ test("GPA: bigger spacing lowers GPA", () => { const a = computeGPA({ gpm: 0.5, 
 
 // 204 Timber cruise
 test("Timber: Doyle (D-4)^2*L/16", () => { const r = computeTimberCruise({ small_end_dib_in: 14, log_length_ft: 16, rule: "doyle" }); assert.equal(r.board_feet, 100); });
-test("Timber: International formula (4-ft-section rule, L/4 sections)", () => { const r = computeTimberCruise({ small_end_dib_in: 14, log_length_ft: 16, rule: "international" }); assert.ok(close(r.board_feet, (0.22 * 196 - 0.71 * 14) * (16 / 4), 0.01)); });
+test("Timber: International 1/4 rule (0.905 x 1/8 section, 1/2 in taper per 4 ft) reads the published 135 bf at 14 in x 16 ft", () => { const r = computeTimberCruise({ small_end_dib_in: 14, log_length_ft: 16, rule: "international" }); const sec = (d) => 0.905 * (0.22 * d * d - 0.71 * d); assert.ok(close(r.board_feet, sec(14) + sec(14.5) + sec(15) + sec(15.5), 0.01)); assert.ok(Math.abs(r.board_feet - 135) < 1); });
 test("Timber: Scribner table 14 in -> 114 BF", () => { const r = computeTimberCruise({ small_end_dib_in: 14, log_length_ft: 16, rule: "scribner" }); assert.equal(r.board_feet, 114); });
 test("Timber: scales linearly with length", () => { const a = computeTimberCruise({ small_end_dib_in: 14, log_length_ft: 16, rule: "doyle" }); const b = computeTimberCruise({ small_end_dib_in: 14, log_length_ft: 32, rule: "doyle" }); assert.ok(close(b.board_feet / a.board_feet, 2, 0.001)); });
 test("Timber: zero diameter errors", () => { const r = computeTimberCruise({ small_end_dib_in: 0, log_length_ft: 16, rule: "doyle" }); assert.ok(r.error); });

@@ -7029,7 +7029,7 @@ export const CITATIONS = {
     ],
   },
   "timber-cruise": {
-    formula: "Doyle: BF = ((D − 4)² × L) / 16. Scribner Decimal C: from public tabulated values keyed to D (in) and L (ft). International 1/4 inch: BF = (0.22 × D² − 0.71 × D) per 4-ft section, scaled by (L / 4).",
+    formula: "Doyle: BF = ((D − 4)² × L) / 16. Scribner Decimal C: from public tabulated values keyed to D (in) and L (ft). International 1/4 inch: BF = 0.905 × (0.22 × D² − 0.71 × D) per 4-ft section, D rising 1/2 in per section for taper (a short last section pro rata).",
     edition: "Public log-volume tables (Doyle 1825, Scribner Decimal C, International 1/4-inch USDA Forest Service publications); USDA Forest Service Manual 2400 by name.",
     freeAccess: "Free at fs.usda.gov.",
     governance: GOVERNANCE.general,
@@ -21621,7 +21621,7 @@ export const CITATIONS = {
   // spec-v1582..v1587: the 2026-09-05 trade-expansion sawmill and forest
   // products band. Group L, Agriculture and Forestry.
   "lumber-recovery-overrun": {
-    formula: "overrun = (tallied board feet - scaled board feet) / scaled x 100; lumber recovery factor = board feet produced / cubic feet of log input; the scale-bias comparison is the Doyle rule (D - 4) squared x length / 16 against the International 1/4 rule (0.22 D squared - 0.71 D) per 4 ft section at the same diameter and length.",
+    formula: "overrun = (tallied board feet - scaled board feet) / scaled x 100; lumber recovery factor = board feet produced / cubic feet of log input; the scale-bias comparison is the Doyle rule (D - 4) squared x length / 16 against the International 1/4 rule, 0.905 x (0.22 D squared - 0.71 D) per 4 ft section with D rising 1/2 in per section for taper, at the same small-end diameter and length.",
     edition: "The standard mill definitions of overrun and lumber recovery factor by name, with the public-domain Doyle and International 1/4 log rules. The applicable scaling rule and handbook, the grading rules of the applicable agency, and the mill's own scale and tally records govern.",
     freeAccess: "Ratio arithmetic on the mill's own scale and tally figures; the log rules used are public-domain formulas, and no proprietary scaling table is reproduced.",
     governance: GOVERNANCE.general,
@@ -22920,7 +22920,7 @@ export const CITATIONS = {
   // envelope diagnostics band. Eight tiles; spec-v1501 and spec-v1503 cut.
   "effective-leakage-area": {
     formula: "ELA (US, 4 Pa reference) = CFM50 / 18.9 in square inches, and EqLA (Canadian, 10 Pa reference) = CFM50 / 10.0; specific leakage area = ELA / floor area, both in the same units (square feet), so it is dimensionless; normalized leakage = 1000 x SLA x (building height / 8.2 ft)^0.3, which for real houses runs about 0.1 to 1.5 (ASHRAE 119 classes A to J). The hole side is the square root of the ELA.",
-    edition: "The LBL effective leakage area conversion at the 4 Pa reference and the CGSB equivalent leakage area at 10 Pa, both by name, with the ASHRAE Fundamentals normalized-leakage definition and its height correction. The two conventions describe the SAME building and differ only by reference pressure, so a figure quoted without its convention cannot be compared with one quoted under the other.",
+    edition: "The LBL effective leakage area conversion at the 4 Pa reference and the CGSB equivalent leakage area at 10 Pa, both by name, with the ASHRAE Fundamentals normalized-leakage definition and its height correction. The two conventions describe the SAME building and differ by reference pressure AND discharge coefficient (1.0 US, 0.61 Canadian), so a figure quoted without its convention cannot be compared with one quoted under the other.",
     freeAccess: "Two published divisors and one power-law height correction.",
     governance: GOVERNANCE.general,
     editionNote: "The point of the conversion is communication rather than physics: 98 square inches is a hole about 10 inches on a side, permanently open in the envelope, and that sentence changes a homeowner's mind where an ACH50 figure does not. The trap is the CONVENTION -- the US and Canadian figures for one building differ by about 1.9x, and comparing an ELA against an EqLA reports a difference that does not exist. Normalized leakage carries the height correction that ACH50 lacks, which is why two houses with the same ACH50 can have quite different real air change rates and why normalized leakage rather than ACH50 is the right basis for estimating natural infiltration.",
