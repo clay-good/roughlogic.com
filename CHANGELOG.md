@@ -6,6 +6,8 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **Two tiles now say which convention they use.** `spt-bearing-capacity` cited its coefficients "as compiled in Das". Das compiles Bowles' adjusted form, which runs about 50% higher than the Meyerhof (1956) N/4 and N/6 ksf the tile applies. The citation now names Meyerhof's original and says it is the conservative choice. `propane-fill-outage` extends the 1.5%-per-10-F expansion rate in a straight line. It now says that propane's expansion rate climbs as it warms, so the true headroom from a cold fill is shorter than the linear figure over a large swing.
+
 - **Cooling-tower makeup counted drift twice, chlorine doses treated bleach strength as a weight fraction, and the virus CT check copied the Giardia result.**
   - `cooling-water-makeup` took blowdown as E / (C - 1) and then added drift again. By the solids balance, blowdown plus drift equals E / (C - 1), so makeup is E C / (C - 1). The worked tower needs 13.33 gpm, not 15.33.
   - `pool-chlorine-dose` and `well-casing-purge-volume` read 12.5% hypochlorite as a weight fraction of a 10 lb/gal liquid. Liquid chlorine is sold by trade percent, grams of available chlorine per 100 mL, so 12.5% carries 1.04 lb of chlorine per gallon. Both were 17% short. The pool dose for 2 ppm in 15,000 gal is 30.7 fl oz, not 25.6. The well dose is 0.223 gal, the figure spec-v1589 printed.

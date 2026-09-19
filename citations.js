@@ -20672,12 +20672,12 @@ export const CITATIONS = {
   },
   "spt-bearing-capacity": {
     formula: "qa_base = N60/4 (B <= 4 ft) or (N60/6)((B+1)/B)^2; Kd = min(1 + 0.33 D/B, 1.33); qa = qa_base Kd (ksf, 1 in settlement).",
-    edition: "The Meyerhof SPT settlement-based allowable bearing on sand, as compiled in Das, Principles of Foundation Engineering, by name.",
+    edition: "Meyerhof's (1956) original SPT settlement-based allowable bearing on sand (N/8 and N/12 tsf, i.e. N/4 and N/6 ksf), by name. Bowles' adjusted form -- the one Das, Principles of Foundation Engineering, compiles (about N60/2.5 and N60/4 ksf) -- runs about 50% higher; this tile keeps the conservative original.",
     freeAccess: "The Meyerhof N-value allowable-bearing correlations are standard published foundation-engineering results.",
     governance: GOVERNANCE.general,
     editionNote: "The Meyerhof allowable soil bearing pressure on sand for a 1 inch (25 mm) settlement, from the energy-corrected SPT blow count N60: qa = N60/4 ksf for a footing width B <= 4 ft, or (N60/6)((B+1)/B)^2 for wider footings, multiplied by the depth (embedment) factor Kd = 1 + 0.33 D/B capped at 1.33. Because this is a settlement-controlled (serviceability) allowable, no additional factor of safety is applied. The N60 must already be energy-corrected (and, for design, overburden-corrected per the reference used); a high water table near the footing roughly halves the capacity and is not applied here. This returns the allowable; it does not check the ultimate bearing capacity or global settlement. A design aid; the engineer of record and the geotechnical report govern.",
     assumptions: [
-      { name: "Allowable bearing", value: "N60/4 (B <= 4 ft) or (N60/6)((B+1)/B)^2, x Kd", source: "Meyerhof / Das" },
+      { name: "Allowable bearing", value: "N60/4 (B <= 4 ft) or (N60/6)((B+1)/B)^2, x Kd -- Meyerhof's original coefficients; Bowles' adjustment would raise them about 50%", source: "Meyerhof (1956)" },
       { name: "Depth factor", value: "Kd = min(1 + 0.33 D/B, 1.33)", source: "Meyerhof" },
       { name: "Settlement-controlled", value: "1 in settlement allowable; no added FS; N60 energy-corrected", source: "scope of this tile" },
     ],
