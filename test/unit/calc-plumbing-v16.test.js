@@ -177,10 +177,12 @@ test("sanitary-dfu: 2 in horizontal branch caps at 6 DFU (7th DFU bumps to 2.5 i
 
 test("sanitary-dfu: branch and stack columns differ for the same DFU load", () => {
   const branch = computeSanitaryDfu({ fixtures: { shower: 9 }, config: "horizontal_branch" });
-  const stack = computeSanitaryDfu({ fixtures: { shower: 9 }, config: "stack" });
-  // 18 DFU: branch max 20 at 3 in; stack max 24 at 2 in.
+  const stack = computeSanitaryDfu({ fixtures: { shower: 9 }, config: "stack", branch_intervals: 4 });
+  // 18 DFU: branch max 20 at 3 in; a stack of more than three intervals max 24 at 2 in.
   assert.strictEqual(branch.min_size_in, 3);
   assert.strictEqual(stack.min_size_in, 2);
+  // A stack of three intervals or fewer uses the stricter column: 2 in caps at 10, so 18 DFU needs 2.5 in.
+  assert.strictEqual(computeSanitaryDfu({ fixtures: { shower: 9 }, config: "stack" }).min_size_in, 2.5);
 });
 
 test("sanitary-dfu: a proposed undersized pipe is flagged not adequate", () => {

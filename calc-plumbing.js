@@ -389,7 +389,7 @@ import {
 
 // dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderPipeSizing(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: WSFU per IPC 2021 Table 604.3 and DFU per Table 709.1; Hunter's Curve (1940; NBS BMS65) public-domain methodology converts water-supply fixture units to gpm. AHJ governs. Free at codes.iccsafe.org.";
+  citationEl.textContent = "Citation: WSFU from UPC-style private-use fixture-unit values (above IPC Appendix E Table E103.3(2), so the sizing is conservative; IPC Table 604.3 gives flow rates, not fixture units) and DFU per IPC Table 709.1; Hunter's Curve (1940; NBS BMS65) public-domain methodology converts water-supply fixture units to gpm. AHJ governs. Free at codes.iccsafe.org.";
   const fixtures = Object.keys(FIXTURE_UNITS);
   const rows = [];
   for (const f of fixtures) {
@@ -2508,15 +2508,19 @@ export const SANITARY_DFU_VALUES = {
 };
 
 // IPC 2021 Table 710.1(2): horizontal fixture branch and stack max DFU.
+// A stack has two columns: `stack3` for three branch intervals or fewer, and
+// `stack` (with the `per_interval` cap) for more than three. Until
+// 2026-09-19 only the taller-stack column was carried, so a short 2 in stack
+// was allowed 24 DFU where the table allows 10.
 export const SANITARY_BRANCH_STACK_MAX_DFU = [
-  { size: 1.5, branch: 3, stack: 8, per_interval: 2 },
-  { size: 2, branch: 6, stack: 24, per_interval: 6 },
-  { size: 2.5, branch: 12, stack: 42, per_interval: 9 },
-  { size: 3, branch: 20, stack: 72, per_interval: 20 },
-  { size: 4, branch: 160, stack: 500, per_interval: 90 },
-  { size: 5, branch: 360, stack: 1100, per_interval: 200 },
-  { size: 6, branch: 620, stack: 1900, per_interval: 350 },
-  { size: 8, branch: 1400, stack: 3600, per_interval: 600 },
+  { size: 1.5, branch: 3, stack3: 4, stack: 8, per_interval: 2 },
+  { size: 2, branch: 6, stack3: 10, stack: 24, per_interval: 6 },
+  { size: 2.5, branch: 12, stack3: 20, stack: 42, per_interval: 9 },
+  { size: 3, branch: 20, stack3: 48, stack: 72, per_interval: 20 },
+  { size: 4, branch: 160, stack3: 240, stack: 500, per_interval: 90 },
+  { size: 5, branch: 360, stack3: 540, stack: 1100, per_interval: 200 },
+  { size: 6, branch: 620, stack3: 960, stack: 1900, per_interval: 350 },
+  { size: 8, branch: 1400, stack3: 2200, stack: 3600, per_interval: 600 },
 ];
 
 // IPC 2021 Table 710.1(1): building drains and sewers max DFU by slope.
@@ -2526,12 +2530,13 @@ export const SANITARY_BUILDING_DRAIN_MAX_DFU = {
   "0.5": { 2: 26, 2.5: 31, 3: 50, 4: 250, 5: 575, 6: 1000, 8: 2300 },
 };
 
-// dims: in { fixtures: dimensionless, config: dimensionless, slope_in_per_ft: dimensionless, proposed_size_in: L } out: { total_dfu: dimensionless, min_size_in: L }
+// dims: in { fixtures: dimensionless, config: dimensionless, slope_in_per_ft: dimensionless, proposed_size_in: L, branch_intervals: dimensionless } out: { total_dfu: dimensionless, min_size_in: L }
 export function computeSanitaryDfu({
   fixtures = {},
   config = "horizontal_branch",
   slope_in_per_ft = 0.25,
   proposed_size_in = null,
+  branch_intervals = 3,
 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   let total_dfu = 0;
@@ -2553,7 +2558,8 @@ export function computeSanitaryDfu({
       if (table[s] >= total_dfu) { min_size_in = s; capacity_at_size = table[s]; break; }
     }
   } else {
-    const col = config === "stack" ? "stack" : "branch";
+    const tall = Number(branch_intervals) > 3;
+    const col = config === "stack" ? (tall ? "stack" : "stack3") : "branch";
     for (const row of SANITARY_BRANCH_STACK_MAX_DFU) {
       if (row[col] >= total_dfu) { min_size_in = row.size; capacity_at_size = row[col]; break; }
     }
@@ -2569,7 +2575,11 @@ export function computeSanitaryDfu({
     warnings.push("Raised to 3 in: a water closet's 3 in outlet sets the minimum (IPC Table 709.1, 704.2); the DFU load alone allows " + min_size_in + " in.");
     min_size_in = 3;
     if (config === "building_drain") capacity_at_size = SANITARY_BUILDING_DRAIN_MAX_DFU[String(slope_in_per_ft)][3] ?? capacity_at_size;
-    else capacity_at_size = SANITARY_BRANCH_STACK_MAX_DFU.find((r) => r.size === 3)[config === "stack" ? "stack" : "branch"];
+    else capacity_at_size = SANITARY_BRANCH_STACK_MAX_DFU.find((r) => r.size === 3)[config === "stack" ? (Number(branch_intervals) > 3 ? "stack" : "stack3") : "branch"];
+  }
+  if (config === "stack" && Number(branch_intervals) > 3 && min_size_in != null) {
+    const row = SANITARY_BRANCH_STACK_MAX_DFU.find((r) => r.size === min_size_in);
+    warnings.push("A stack of more than three branch intervals also caps each interval at " + row.per_interval + " DFU at " + min_size_in + " in (IPC Table 710.1(2)); check the heaviest floor.");
   }
   if (min_size_in == null) warnings.push("Total DFU exceeds the bundled table maximum; this is a commercial-engineered system, consult IPC Table 710.1 directly.");
   if (total_dfu > 1400) warnings.push("DFU load above 1400 is a commercial-engineered system; an engineer of record should size the drainage.");
@@ -2634,6 +2644,8 @@ function _v16p_renderSanitaryDfu(inputRegion, outputRegion, citationEl) {
   ]);
   inputRegion.appendChild(config.wrap);
   inputRegion.appendChild(slope.wrap);
+  const intervals = makeNumber("Stack branch intervals (stack only; 3 or fewer uses the stricter column)", "dfu-intervals", { step: "1", min: "1", value: "3" });
+  inputRegion.appendChild(intervals.wrap);
   const fixtureInputs = {};
   for (const [key, label] of Object.entries(_v16p_DFU_LABELS)) {
     const f = makeNumber(label + " (" + SANITARY_DFU_VALUES[key] + " DFU)", "dfu-" + key, { step: "1", min: "0", value: "0" });
@@ -2663,6 +2675,7 @@ function _v16p_renderSanitaryDfu(inputRegion, outputRegion, citationEl) {
       fixtures,
       config: config.select.value,
       slope_in_per_ft: Number(slope.select.value),
+      branch_intervals: Number(intervals.input.value) || 3,
     });
     if (r.error) { oDfu.textContent = r.error; oSize.textContent = "-"; oNote.textContent = ""; return; }
     oDfu.textContent = fmt(r.total_dfu, 1) + " DFU";
@@ -2674,6 +2687,7 @@ function _v16p_renderSanitaryDfu(inputRegion, outputRegion, citationEl) {
   for (const input of Object.values(fixtureInputs)) input.addEventListener("input", update);
   config.select.addEventListener("change", update);
   slope.select.addEventListener("change", update);
+  intervals.input.addEventListener("input", update);
 }
 PLUMBING_RENDERERS["sanitary-dfu"] = _v16p_renderSanitaryDfu;
 

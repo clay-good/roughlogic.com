@@ -6,6 +6,11 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **A short drainage stack could come out a size too small, and a single exit was allowed for 49 occupants in every occupancy.** An audit of code tables stored only as constants in the calculators found:
+  - `sanitary-dfu` stack mode used IPC Table 710.1(2)'s column for stacks of more than three branch intervals for every stack. Stacks of three intervals or fewer have a stricter column: 10 DFU on a 2 in stack, not 24, and 48 on 3 in, not 72. A new branch-intervals input defaults to 3, so the stricter column applies unless the stack is taller. Taller stacks are also reminded of the per-interval cap.
+  - `egress-capacity` let any story have one exit up to 49 occupants. IBC Table 1006.3.4(2) sets that limit at 49 only for A, B, E, F, M and U; it is 29 for S, 10 for I, R-1, R-4, H-4 and H-5, and 3 for H-2 and H-3. A new occupancy-group input applies it.
+  - `wire-ampacity`'s description now says what its citation already did: it is a heat-balance estimate that reads about 20% high at 2 AWG and 40% at 4/0 against NEC Table 310.16. `pipe-sizing` cited IPC Table 604.3 for fixture units; that table gives flow rates. Its values are UPC-style and above the IPC Appendix E figures, so the sizing is conservative.
+
 - **Bolt torque ignored that proof strength falls with diameter, and fall-protection clearance was short for two connectors.** A check of the bundled data shards against the standards they name found:
   - `bolt-torque` applied one proof strength to every diameter. SAE J429 Grade 2 drops from 55 to 33 ksi above ¾ in, and Grade 5 and A325 drop from 85 to 74 ksi above 1 in. A ⅞ in Grade 2 bolt was torqued for 67% more preload than its proof load allows at the 75% target. The `bolt-grades` shard also still said A325 was 92 ksi, which is its yield, not its proof.
   - `fall-protection-clearance` gave a 12 ft lanyard 4 ft of deceleration; ANSI Z359.13 allows up to 60 in. A leading-edge SRL was modeled as 2 ft of free fall plus 1 ft to arrest, but it is anchored as low as the feet (up to 5 ft of free fall) and a Class 2 unit may arrest in 60 in. Required clearance was 1 ft short and 7 ft short.

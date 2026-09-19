@@ -5436,19 +5436,26 @@ CONSTRUCTION_RENDERERS["occupant-load"] = _renderOccupantLoad;
 
 // ----- spec-v243: Egress Capacity, Exit Count, and Required Width (IBC 2021 §1005.3 / §1006.2 / §1010.1.1) -----
 
-// dims: in { occupant_load: dimensionless, min_door_in: L } out: { total_width_in: L, per_exit_in: L, exits_required: dimensionless }
-export function computeEgressCapacity({ occupant_load = 0, sprinklered = true, path = "level", min_door_in = 32 } = {}) {
+// IBC Table 1006.3.4(2): the most occupants a story may have with ONE exit
+// (with a 75 ft common path; 25 ft for H-2 / H-3). Until 2026-09-19 every
+// occupancy got the A / B / E / F / M / U figure of 49.
+const _SINGLE_EXIT_MAX = { "A-B-E-F-M-U": 49, "S": 29, "I-R1-R4-H4-H5": 10, "H2-H3": 3 };
+
+// dims: in { occupant_load: dimensionless, min_door_in: L, occupancy_group: dimensionless } out: { total_width_in: L, per_exit_in: L, exits_required: dimensionless }
+export function computeEgressCapacity({ occupant_load = 0, sprinklered = true, path = "level", min_door_in = 32, occupancy_group = "A-B-E-F-M-U" } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(occupant_load > 0)) return { error: "Occupant load must be positive." };
   if (!(min_door_in > 0)) return { error: "Minimum door clear width must be positive (in)." };
   const sprk = sprinklered === true || sprinklered === "yes" || sprinklered === "true";
   const isStair = path === "stair";
   const factor = isStair ? (sprk ? 0.2 : 0.3) : (sprk ? 0.15 : 0.2);
-  const exits_required = occupant_load <= 49 ? 1 : occupant_load <= 500 ? 2 : occupant_load <= 1000 ? 3 : 4;
+  const single_max = _SINGLE_EXIT_MAX[occupancy_group];
+  if (single_max === undefined) return { error: "Occupancy group must be one of A-B-E-F-M-U, S, I-R1-R4-H4-H5, or H2-H3 (R-2 dwelling-unit stories follow Table 1006.3.4(1))." };
+  const exits_required = occupant_load <= single_max ? 1 : occupant_load <= 500 ? 2 : occupant_load <= 1000 ? 3 : 4;
   const total_width_in = occupant_load * factor;
   const per_exit_in = Math.max(total_width_in / exits_required, min_door_in);
   const governed = per_exit_in === min_door_in ? "door/leaf minimum" : "required width";
-  return { factor, exits_required, total_width_in, per_exit_in, governed, sprinklered: sprk, path: isStair ? "stair" : "level" };
+  return { factor, exits_required, single_exit_max: single_max, total_width_in, per_exit_in, governed, sprinklered: sprk, path: isStair ? "stair" : "level" };
 }
 
 export const egressCapacityExample = {
@@ -5456,28 +5463,32 @@ export const egressCapacityExample = {
 };
 
 function _renderEgressCapacity(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: IBC 2021 §1005.3 (egress width = occupant load x capacity factor), §1006.2 / Table 1006.3.4 (exit-count thresholds: 1 up to 49, 2 to 500, 3 to 1000, 4 beyond), §1010.1.1 (32 in minimum door clear width). Capacity factors: sprinklered-with-alarm 0.2 in/occ stairs, 0.15 in/occ level; non-sprinklered 0.3 / 0.2. The reduced factors require the §1005.3.1/.2 sprinkler and emergency-communication conditions; the width is divided among the required exits; the door-leaf minimum and §1005.7 projections can govern. A design aid, not a code-official determination.";
+  citationEl.textContent = "Citation: IBC 2021 §1005.3 (egress width = occupant load x capacity factor), §1006.2 / Table 1006.3.4 (exit-count thresholds: 1 up to the Table 1006.3.4(2) single-exit limit -- 49 for A/B/E/F/M/U, 29 for S, 10 for I/R-1/R-4/H-4/H-5, 3 for H-2/H-3 -- then 2 to 500, 3 to 1000, 4 beyond), §1010.1.1 (32 in minimum door clear width). Capacity factors: sprinklered-with-alarm 0.2 in/occ stairs, 0.15 in/occ level; non-sprinklered 0.3 / 0.2. The reduced factors require the §1005.3.1/.2 sprinkler and emergency-communication conditions; the width is divided among the required exits; the door-leaf minimum and §1005.7 projections can govern. A design aid, not a code-official determination.";
   _aeC(inputRegion, () => fillExample(egressCapacityExample.inputs));
   const ol = _mnC("Occupant load (persons)", "egc-ol", { step: "any", min: "0" });
   const sp = _msC("Sprinklered + alarm (1005.3.1/.2)", "egc-sp", [{ value: "yes", label: "Yes" }, { value: "no", label: "No" }]);
   const pa = _msC("Egress component", "egc-pa", [{ value: "level", label: "Level (doors, corridors, ramps)" }, { value: "stair", label: "Stairway" }]);
   const md = _mnC("Minimum door clear width (in)", "egc-md", { step: "any", min: "0" });
   md.input.value = "32";
-  for (const f of [ol, sp, pa, md]) inputRegion.appendChild(f.wrap);
+  const og = _msC("Occupancy group (single-exit limit, Table 1006.3.4(2))", "egc-og", [
+    { value: "A-B-E-F-M-U", label: "A, B, E, F, M, U (49)" }, { value: "S", label: "S (29)" },
+    { value: "I-R1-R4-H4-H5", label: "I, R-1, R-4, H-4, H-5 (10)" }, { value: "H2-H3", label: "H-2, H-3 (3)" },
+  ]);
+  for (const f of [ol, sp, pa, md, og]) inputRegion.appendChild(f.wrap);
   const oE = _moC(outputRegion, "Exits required", "egc-out-e");
   const oT = _moC(outputRegion, "Total egress width", "egc-out-t");
   const oP = _moC(outputRegion, "Width per exit", "egc-out-p");
   const oG = _moC(outputRegion, "Governed by", "egc-out-g");
   function fillExample(x) { ol.input.value = x.occupant_load; sp.select.value = x.sprinklered ? "yes" : "no"; pa.select.value = x.path; md.input.value = x.min_door_in; update(); }
   const update = _debC(() => {
-    const r = computeEgressCapacity({ occupant_load: Number(ol.input.value) || 0, sprinklered: sp.select.value, path: pa.select.value, min_door_in: Number(md.input.value) || 0 });
+    const r = computeEgressCapacity({ occupant_load: Number(ol.input.value) || 0, sprinklered: sp.select.value, path: pa.select.value, min_door_in: Number(md.input.value) || 0, occupancy_group: og.select.value });
     if (r.error) { oE.textContent = r.error; oT.textContent = "-"; oP.textContent = "-"; oG.textContent = "-"; return; }
     oE.textContent = String(r.exits_required);
     oT.textContent = _fmtC(r.total_width_in, 1) + " in";
     oP.textContent = _fmtC(r.per_exit_in, 1) + " in";
     oG.textContent = r.governed;
   }, _DC);
-  for (const f of [ol.input, sp.select, pa.select, md.input]) f.addEventListener("input", update);
+  for (const f of [ol.input, sp.select, pa.select, md.input, og.select]) f.addEventListener("input", update);
 }
 CONSTRUCTION_RENDERERS["egress-capacity"] = _renderEgressCapacity;
 

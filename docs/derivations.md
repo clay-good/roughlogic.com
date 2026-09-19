@@ -1698,7 +1698,7 @@ cross-check.
 | calc-construction.js | `computeDuctMetalWeight` | `{ width_in = 24, height_in = 12, length_ft = 100, lb_per_sf = 1.156, seam_fac...` | _ | _ | _ |
 | calc-construction.js | `computeDuctWrapTakeoff` | `{ width_in = 20, height_in = 12, length_ft = 40, overlap_waste_factor = 1.15,...` | _ | _ | _ |
 | calc-construction.js | `computeDumpsterCount` | `{ debris_cy = 60, debris_tons = 45, container_cy = 30, fill_efficiency = 0.7,...` | _ | _ | _ |
-| calc-construction.js | `computeEgressCapacity` | `{ occupant_load = 0, sprinklered = true, path = "level", min_door_in = 32 } = {}` | _ | _ | _ |
+| calc-construction.js | `computeEgressCapacity` | `{ occupant_load = 0, sprinklered = true, path = "level", min_door_in = 32, oc...` | _ | _ | _ |
 | calc-construction.js | `computeEgressTravelDistance` | `{ travel_ft = 0, travel_limit_ft = 300, common_path_ft = 0, common_path_limit...` | _ | _ | _ |
 | calc-construction.js | `computeEgressWindowCheck` | `{ clear_width_in = 0, clear_height_in = 0, sill_height_in = 0, location = "ab...` | _ | _ | _ |
 | calc-construction.js | `computeEgressWindowWell` | `{ well_width_in = 0, well_projection_in = 0, well_depth_in = 0, has_ladder = ...` | _ | _ | _ |
