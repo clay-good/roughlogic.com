@@ -2294,7 +2294,7 @@ cross-check.
 | calc-fab.js | `computeWeldMetalVolume` | `{ joint_type = "fillet", fillet_leg_in = 0, groove_area_in2 = 0, length_in = ...` | _ | _ | _ |
 | calc-fab.js | `computeWeldPassesArcTime` | `{ A_groove = 0, length_in = 0, a_pass = 0, dep_rate = 0, density = 0.283, op_...` | _ | _ | _ |
 | calc-fab.js | `computeWeldPreheatFuel` | `{ steel_lb, start_temp_F, preheat_temp_F, efficiency_pct = 25, c_steel = 0.11...` | _ | _ | _ |
-| calc-fab.js | `computeWeldTransverseShrinkage` | `{ weld_area_in2 = 0, thickness_in = 0, weld_count = 1 } = {}` | _ | _ | _ |
+| calc-fab.js | `computeWeldTransverseShrinkage` | `{ weld_area_in2 = 0, thickness_in = 0, weld_count = 1, root_opening_in = 0 } ...` | _ | _ | _ |
 | calc-fab.js | `computeWeldTravelSpeed` | `{ V_volts = 0, I_amps = 0, eta = 0.8, HI_kjin = 0 } = {}` | _ | _ | _ |
 | calc-fab.js | `computeWireFeedDeposition` | `{ wfs_in_min = 0, wire_dia_in = 0, deposition_eff = 0.92 } = {}` | _ | _ | _ |
 | calc-fab.js | `computeWireFeedSpeedForDeposition` | `{ target_deposit_lb_hr = 0, wire_dia_in = 0, deposition_eff = 0.92 } = {}` | _ | _ | _ |
@@ -5675,7 +5675,7 @@ per spec-v14 §13.1 second paragraph.
 | `trap-speed-horsepower` | Horsepower from Quarter-Mile Trap Speed | Hale quarter-mile trap-speed relation; spec-v325 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `travel-lift-sling-placement` | Travel-Lift Sling Placement and Hull Load | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `true-airspeed` | True Airspeed from CAS and Density Altitude | FAA PHAK / ICAO Standard Atmosphere (...; sigma = (1 - 6.87535e-6 x 8000)^4.2559 = (0.945)^4.2559 =... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
-| `turbo-max-boost-for-charge-temp` | Max Boost Before a Charge-Air Temperature Limit | turbocharger charge-air-temperature m...; 250 F limit, 80 F inlet, 70% eff, 14.7 psia -> 15.0 psi m... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `turbo-max-boost-for-charge-temp` | Max Boost Before a Charge-Air Temperature Limit | turbocharger charge-air-temperature m...; 250 F limit, 80 F inlet, 70% eff, 14.7 psia -> 14.8 psi m... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `turbo-pressure-ratio` | Turbocharger Pressure Ratio and Charge-Air Temp | turbocharger pressure-ratio and charg...; spec-v506 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `turn-radius-bank` | Coordinated Turn Radius and Rate | FAA Airplane Flying Handbook (coordin...; 120 kt at 30 deg bank -> 2208 ft radius, 5.25 deg/s rate ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `turning-surface-finish` | Theoretical Surface Finish | First-principles scallop geometry + M...; f 0.005 IPR, r 1/32 in -> Rt 100 uin, Ra 25 uin | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |

@@ -46,22 +46,31 @@ const _finiteGuard = (o) => {
 
 // --- Utility 67: Solar PV String Sizing ---
 
-// dims: in { module_voc_V: M L^2 T^-3 I^-1, module_vmp_V: M L^2 T^-3 I^-1, voc_temp_coeff_pct_per_C: T^-1, record_low_C: T, record_high_C: T, inverter_mppt_min_V: M L^2 T^-3 I^-1, inverter_mppt_max_V: M L^2 T^-3 I^-1, inverter_vdc_max_V: M L^2 T^-3 I^-1 } out: { max_series: dimensionless, min_series: dimensionless, cold_voc_V: M L^2 T^-3 I^-1, warm_vmp_V: M L^2 T^-3 I^-1 }
+// dims: in { module_voc_V: M L^2 T^-3 I^-1, module_vmp_V: M L^2 T^-3 I^-1, voc_temp_coeff_pct_per_C: T^-1, record_low_C: T, record_high_C: T, inverter_mppt_min_V: M L^2 T^-3 I^-1, inverter_mppt_max_V: M L^2 T^-3 I^-1, inverter_vdc_max_V: M L^2 T^-3 I^-1, cell_temp_rise_C: T } out: { max_series: dimensionless, min_series: dimensionless, cold_voc_V: M L^2 T^-3 I^-1, warm_vmp_V: M L^2 T^-3 I^-1 }
 export function computePVStringSizing({
   module_voc_V, module_vmp_V, voc_temp_coeff_pct_per_C,
   record_low_C, record_high_C,
   inverter_mppt_min_V, inverter_mppt_max_V, inverter_vdc_max_V,
+  cell_temp_rise_C = 30,
 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   inverter_mppt_max_V = Number(inverter_mppt_max_V);
   if (!module_voc_V || !module_vmp_V) return { error: "Module Voc and Vmp are required." };
   const coeff = Math.abs(Number(voc_temp_coeff_pct_per_C) || 0);
   const cold_voc = module_voc_V * (1 + coeff * (25 - record_low_C) / 100);
-  const warm_vmp = module_vmp_V * (1 - coeff * (record_high_C - 25) / 100);
+  // A module in full sun runs well above the air: about 25-35 C for rack and
+  // roof mounts. Until 2026-09-18 the record-high AMBIENT was used as the cell
+  // temperature, so hot-day Vmp read high and the minimum string came out one
+  // module short (7 x 31.0 V; at a 75 C cell 7 modules make 196 V, under a
+  // 200 V MPPT floor). Cold Voc stays at the record low: at dawn the cell is at air temperature.
+  const rise = Number(cell_temp_rise_C);
+  if (!(rise >= 0)) return { error: "Cell temperature rise above ambient cannot be negative (C)." };
+  const hot_cell_C = record_high_C + rise;
+  const warm_vmp = module_vmp_V * (1 - coeff * (hot_cell_C - 25) / 100);
   const max_series = Math.floor((Number(inverter_vdc_max_V) || 0) / cold_voc);
   const min_series = Math.ceil((Number(inverter_mppt_min_V) || 0) / warm_vmp);
   const flag = min_series > max_series;
-  return { cold_voc_V: cold_voc, warm_vmp_V: warm_vmp, max_series, min_series, mppt_max_V: inverter_mppt_max_V, flag };
+  return { cold_voc_V: cold_voc, warm_vmp_V: warm_vmp, hot_cell_C, max_series, min_series, mppt_max_V: inverter_mppt_max_V, flag };
 }
 
 export const pvStringSizingExample = {
@@ -111,18 +120,20 @@ export const batteryRuntimeExample = {
 
 // dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderPVStringSizing(inputRegion, outputRegion, citationEl, params) {
-  citationEl.textContent = "Citation: Cold-temperature Voc inflation (V_oc_cold = V_oc * (1 + |coeff| * (25 - T_low) / 100)) and warm-temperature Vmp depression (V_mp_warm = V_mp * (1 - |coeff| * (T_high - 25) / 100)). See docs/derivations.md.";
+  citationEl.textContent = "Citation: Cold-temperature Voc inflation (V_oc_cold = V_oc * (1 + |coeff| * (25 - T_low) / 100)) and warm-temperature Vmp depression (V_mp_warm = V_mp * (1 - |coeff| * (T_high + cell rise - 25) / 100), the cell running ~30 C above the record-high air in sun). See docs/derivations.md.";
   attachExampleButton(inputRegion, () => fillExample(pvStringSizingExample.inputs));
 
   const voc = makeNumber("Module Voc (V)", "pv-voc", { step: "any", min: "0" });
   const vmp = makeNumber("Module Vmp (V)", "pv-vmp", { step: "any", min: "0" });
   const coeff = makeNumber("Voc temp coeff (% per C, magnitude)", "pv-coeff", { step: "any" });
   const tlow = makeNumber("Record low temp (°C)", "pv-tlow", { step: "any" });
-  const thigh = makeNumber("Record high temp (°C)", "pv-thigh", { step: "any" });
+  const thigh = makeNumber("Record high air temp (°C)", "pv-thigh", { step: "any" });
+  const rise = makeNumber("Cell rise above air temp (°C)", "pv-rise", { step: "any", min: "0", value: "30" });
+  rise.input.value = "30";
   const mppt_min = makeNumber("Inverter MPPT min (V)", "pv-mppt-min", { step: "any", min: "0" });
   const mppt_max = makeNumber("Inverter MPPT max (V)", "pv-mppt-max", { step: "any", min: "0" });
   const vdc_max = makeNumber("Inverter Vdc max (V)", "pv-vdc-max", { step: "any", min: "0" });
-  for (const f of [voc, vmp, coeff, tlow, thigh, mppt_min, mppt_max, vdc_max]) inputRegion.appendChild(f.wrap);
+  for (const f of [voc, vmp, coeff, tlow, thigh, rise, mppt_min, mppt_max, vdc_max]) inputRegion.appendChild(f.wrap);
 
   const oCold = makeOutputLine(outputRegion, "Cold Voc per module", "pv-out-cold");
   const oWarm = makeOutputLine(outputRegion, "Warm Vmp per module", "pv-out-warm");
@@ -143,6 +154,7 @@ export function renderPVStringSizing(inputRegion, outputRegion, citationEl, para
       voc_temp_coeff_pct_per_C: Number(coeff.input.value) || 0,
       record_low_C: Number(tlow.input.value),
       record_high_C: Number(thigh.input.value),
+      cell_temp_rise_C: rise.input.value === "" ? 30 : Number(rise.input.value),
       inverter_mppt_min_V: Number(mppt_min.input.value) || 0,
       inverter_mppt_max_V: Number(mppt_max.input.value) || 0,
       inverter_vdc_max_V: Number(vdc_max.input.value) || 0,
@@ -155,7 +167,7 @@ export function renderPVStringSizing(inputRegion, outputRegion, citationEl, para
     oFlag.textContent = r.flag ? "Infeasible: min series exceeds max series." : "Feasible";
   }, DEBOUNCE_MS);
 
-  for (const el of [voc.input, vmp.input, coeff.input, tlow.input, thigh.input, mppt_min.input, mppt_max.input, vdc_max.input]) el.addEventListener("input", update);
+  for (const el of [voc.input, vmp.input, coeff.input, tlow.input, thigh.input, rise.input, mppt_min.input, mppt_max.input, vdc_max.input]) el.addEventListener("input", update);
 }
 
 // dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }

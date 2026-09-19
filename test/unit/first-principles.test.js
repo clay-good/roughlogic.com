@@ -139,9 +139,9 @@ test("first-principles: PV string sizing temperature corrections produce hand-ca
     inverter_mppt_min_V: 200, inverter_mppt_max_V: 480, inverter_vdc_max_V: 600,
   });
   within(r.cold_voc_V, 44.2, 1, "cold V_oc");
-  within(r.warm_vmp_V, 31.02, 1, "warm V_mp");
+  within(r.warm_vmp_V, 28.05, 1, "warm V_mp"); // 45 C air + 30 C cell rise
   assert.equal(r.max_series, 13);
-  assert.equal(r.min_series, 7);
+  assert.equal(r.min_series, 8);
 });
 
 // --- Battery runtime (docs/derivations.md section 13) ---

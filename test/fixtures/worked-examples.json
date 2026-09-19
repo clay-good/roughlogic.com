@@ -8364,9 +8364,9 @@
    "source_publisher": "NFPA",
    "source_title": "NEC 690.7 / 690.8 PV string sizing: Voc at record-low corrected by temperature coefficient + inverter MPPT window",
    "source_edition_or_year": "NEC 2023 Art. 690 (Voc temperature correction; inverter MPPT vs Vdc max)",
-   "source_section_or_page": "Module 40 V Voc / 33 V Vmp / 0.3%/C at -10 C record low and 45 C record high; inverter 200/480 V MPPT, 600 V Vdc max -> max series 13 / min series 7; no flag",
+   "source_section_or_page": "Module 40 V Voc / 33 V Vmp / 0.3%/C at -10 C record low and 45 C record high air (75 C cell with a 30 C rise in sun); inverter 200/480 V MPPT, 600 V Vdc max -> max series 13 / min series 8 (hot Vmp 28.05 V; 7 modules make 196 V, under the 200 V MPPT floor); no flag",
    "verified_by": "rl",
-   "verified_on": "2026-05-11",
+   "verified_on": "2026-09-18",
    "inputs": {
     "module_voc_V": 40,
     "module_vmp_V": 33,
@@ -8385,7 +8385,7 @@
      }
     },
     "min_series": {
-     "value": 7,
+     "value": 8,
      "tolerance": {
       "abs": 0
      }
@@ -33946,11 +33946,11 @@
   {
    "tile_id": "winch-drum-line-pull",
    "source_publisher": "Wire-rope drum mechanics / SAE winch rating convention",
-   "source_title": "Dn = drum_dia + (2n - 1) x rope_dia; Pn = rated_pull x drum_dia / Dn",
+   "source_title": "Dn = drum_dia + (2n - 1) x rope_dia; Pn = rated_pull x (drum_dia + rope_dia) / Dn, the rating being the first layer",
    "source_edition_or_year": "drum mechanics",
-   "source_section_or_page": "10000 lb bare, 10 in drum, 1/2 in rope, 12 in barrel, layer 4 -> 13.5 in, 7407 lb, 1.35x speed, 24 wraps",
+   "source_section_or_page": "10000 lb bare, 10 in drum, 1/2 in rope, 12 in barrel, layer 4 -> 13.5 in, 7778 lb, 1.286x speed (vs the 10.5 in first-layer centerline), 24 wraps",
    "verified_by": "rl",
-   "verified_on": "2026-07-09",
+   "verified_on": "2026-09-18",
    "inputs": {
     "rated_pull_lb": 10000,
     "drum_dia_in": 10,
@@ -33966,7 +33966,7 @@
      }
     },
     "pull_at_layer_lb": {
-     "value": 7407,
+     "value": 7777.8,
      "tolerance": {
       "abs": 1
      }
@@ -33984,9 +33984,9 @@
    "source_publisher": "Wire-rope drum mechanics / SAE winch rating convention",
    "source_title": "a fatter rope grows the drum faster and fades the pull faster",
    "source_edition_or_year": "drum mechanics",
-   "source_section_or_page": "Same winch with 3/4 in rope, layer 4 -> 15.25 in mean diameter, 6557 lb (34% loss)",
+   "source_section_or_page": "Same winch with 3/4 in rope, layer 4 -> 15.25 in mean diameter, 7049 lb (30% loss from the first-layer rating)",
    "verified_by": "rl",
-   "verified_on": "2026-07-09",
+   "verified_on": "2026-09-18",
    "inputs": {
     "rated_pull_lb": 10000,
     "drum_dia_in": 10,
@@ -33996,7 +33996,7 @@
    },
    "outputs": {
     "pull_at_layer_lb": {
-     "value": 6557,
+     "value": 7049.2,
      "tolerance": {
       "abs": 1
      }
@@ -72129,11 +72129,11 @@
   {
    "tile_id": "turbo-pressure-ratio",
    "source_publisher": "turbocharger pressure-ratio and charge-air-temperature model",
-   "source_title": "15 psi at sea level (14.7 psia), 80 F inlet, 70% eff -> PR 2.02, outlet 250 F (170 F rise)",
+   "source_title": "15 psi at sea level (14.7 psia), 80 F inlet, 70% eff -> PR 2.02, outlet 252 F (172 F rise; exponent (gamma-1)/gamma = 2/7)",
    "source_edition_or_year": "spec-v506 worked example (machine-verified)",
    "source_section_or_page": "spec-v506 section 2.1 pinned example",
    "verified_by": "rl",
-   "verified_on": "2026-07-09",
+   "verified_on": "2026-09-18",
    "inputs": {
     "boost_psi": 15,
     "ambient_psia": 14.7,
@@ -72148,13 +72148,13 @@
      }
     },
     "t_out_f": {
-     "value": 250,
+     "value": 251.58,
      "tolerance": {
       "abs": 1
      }
     },
     "temp_rise_f": {
-     "value": 170,
+     "value": 171.58,
      "tolerance": {
       "abs": 1
      }
@@ -72164,11 +72164,11 @@
   {
    "tile_id": "turbo-max-boost-for-charge-temp",
    "source_publisher": "turbocharger charge-air-temperature model",
-   "source_title": "boost = ambient x (PR - 1), PR = [1 + eff x (Tout/Tin - 1)]^(1/0.283); inverse of the pressure-ratio tile",
+   "source_title": "boost = ambient x (PR - 1), PR = [1 + eff x (Tout/Tin - 1)]^(1/0.2857); inverse of the pressure-ratio tile",
    "source_edition_or_year": "spec-v726 worked example (machine-verified; inverse of spec-v506)",
-   "source_section_or_page": "250 F limit, 80 F inlet, 70% eff, 14.7 psia -> 15.0 psi max boost (PR 2.02)",
+   "source_section_or_page": "250 F limit, 80 F inlet, 70% eff, 14.7 psia -> 14.8 psi max boost (PR 2.01)",
    "verified_by": "rl",
-   "verified_on": "2026-07-14",
+   "verified_on": "2026-09-18",
    "inputs": {
     "max_charge_temp_f": 250,
     "inlet_temp_f": 80,
@@ -72177,13 +72177,13 @@
    },
    "outputs": {
     "max_boost_psi": {
-     "value": 15.024,
+     "value": 14.826,
      "tolerance": {
       "abs": 0.05
      }
     },
     "pressure_ratio": {
-     "value": 2.022,
+     "value": 2.0086,
      "tolerance": {
       "abs": 0.01
      }

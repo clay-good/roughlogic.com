@@ -145,7 +145,7 @@ export function computePipeMiterCut({ total_angle_deg = 90, pieces = 2, outside_
   // come off the stock.
   const developed_centerline_in = R > 0 ? R * A * Math.PI / 180 : null;
   const developed_heel_in = R > 0 ? (R + OD / 2) * A * Math.PI / 180 : null;
-  notes.push(cuts + " cut(s)/weld(s); cut angle " + fmt(miter_angle_deg, 3) + " deg from square; cutback = OD*tan(theta). End pieces are half-gores. The welding procedure, bevel, and engineer of record govern.");
+  notes.push(cuts + " cut(s)/weld(s); cut angle " + fmt(miter_angle_deg, 3) + " deg from square; cutback = OD*tan(theta) is the long side minus the short side -- marked from the centerline, each side moves half of it, (OD/2)*tan(theta) = " + fmt(cutback_in / 2, 3) + " in. End pieces are half-gores. The welding procedure, bevel, and engineer of record govern.");
   if (R > 0) notes.push("Each middle gore turns " + fmt(gore_turn_deg, 3) + " deg: heel " + fmt(heel_length_in, 3) + " in, throat " + fmt(throat_length_in, 3) + " in, centerline " + fmt(gore_centerline_in, 3) + " in; end gores are half of each. The elbow develops " + fmt(developed_centerline_in, 3) + " in on the centerline and " + fmt(developed_heel_in, 3) + " in on the heel, before seam and bevel allowance.");
   return {
     total_angle_deg: A, pieces: n, n_welds: cuts, miter_angle_deg, cutback_in,
@@ -169,7 +169,7 @@ function _v26renderPipeMiterCut(inputRegion, outputRegion, citationEl) {
 
   const oAng = makeOutputLine(outputRegion, "Miter angle per cut (deg)", "pmc-out-ang");
   const oWelds = makeOutputLine(outputRegion, "Welds (cuts)", "pmc-out-w");
-  const oCut = makeOutputLine(outputRegion, "Cutback (in)", "pmc-out-cb");
+  const oCut = makeOutputLine(outputRegion, "Cutback, long side minus short side (in)", "pmc-out-cb");
   const oGore = makeOutputLine(outputRegion, "Gore centerline (in)", "pmc-out-g");
   const oNote = makeOutputLine(outputRegion, "Notes", "pmc-out-note");
 
@@ -1031,33 +1031,39 @@ function _v737renderWireFeedSpeedForDeposition(inputRegion, outputRegion, citati
 FAB_RENDERERS["wire-feed-speed-for-deposition"] = _v737renderWireFeedSpeedForDeposition;
 
 // v131 weld-transverse-shrinkage (Group E): Blodgett transverse shrinkage and pre-set.
-// dims: in { weld_area_in2: L^2, thickness_in: L, weld_count: dimensionless } out: { shrink_per_weld_in: L, total_shrink_in: L, recommended_preset_in: L }
-export function computeWeldTransverseShrinkage({ weld_area_in2 = 0, thickness_in = 0, weld_count = 1 } = {}) {
+// dims: in { weld_area_in2: L^2, thickness_in: L, weld_count: dimensionless, root_opening_in: L } out: { shrink_per_weld_in: L, total_shrink_in: L, recommended_preset_in: L }
+export function computeWeldTransverseShrinkage({ weld_area_in2 = 0, thickness_in = 0, weld_count = 1, root_opening_in = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const root = Number(root_opening_in) || 0;
+  if (root < 0) return { error: "Root opening cannot be negative (in)." };
   const area = Number(weld_area_in2);
   const thickness = Number(thickness_in);
   const count = Number(weld_count);
   if (!(area > 0)) return { error: "Weld area must be positive (in2)." };
   if (!(thickness > 0)) return { error: "Plate thickness must be positive (in)." };
   if (!(count >= 1)) return { error: "Weld count must be at least 1." };
-  const shrinkPerWeld = 0.2 * area / thickness;
+  // Blodgett: shrink = 0.2 A_w / t + 0.05 d, d the root opening. Until
+  // 2026-09-18 the d term was dropped; it defaults to 0 (a closed root).
+  const shrinkPerWeld = 0.2 * area / thickness + 0.05 * root;
   const totalShrink = shrinkPerWeld * count;
   return {
     shrink_per_weld_in: shrinkPerWeld,
     total_shrink_in: totalShrink,
     recommended_preset_in: totalShrink,
-    note: "Blodgett transverse-shrinkage screen: shrink = 0.2 x weld area / thickness (the 0.2 coefficient is dimensionless; the weld-area-over-thickness ratio carries the length). Set the parts apart / pre-bow by the total so the assembly cools to size. Restraint, fixturing, sequence, and a mock-up govern the real movement; longitudinal and angular distortion are NOT estimated here.",
+    note: "Blodgett transverse-shrinkage screen: shrink = 0.2 x weld area / thickness + 0.05 x root opening (the coefficients are dimensionless; the weld-area-over-thickness ratio and the root opening carry the length). Set the parts apart / pre-bow by the total so the assembly cools to size. Restraint, fixturing, sequence, and a mock-up govern the real movement; longitudinal and angular distortion are NOT estimated here.",
   };
 }
 export const weldTransverseShrinkageExample = { inputs: { weld_area_in2: 0.10, thickness_in: 0.5, weld_count: 3 } };
 
 function _v131renderWeldTransverseShrinkage(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: Blodgett, Design of Welded Structures, transverse-shrinkage relation (shrink = 0.2 x A_w / t), by name. This is a screen; restraint, sequence, and a mock-up govern the actual movement, and longitudinal and angular distortion are out of scope.";
+  citationEl.textContent = "Citation: Blodgett, Design of Welded Structures, transverse-shrinkage relation (shrink = 0.2 x A_w / t + 0.05 d, d the root opening), by name. This is a screen; restraint, sequence, and a mock-up govern the actual movement, and longitudinal and angular distortion are out of scope.";
   const area = makeNumber("Weld cross-section (in2)", "wts-area", { step: "any", min: "0" });
   const thickness = makeNumber("Plate thickness (in)", "wts-thk", { step: "any", min: "0" });
   const count = makeNumber("Parallel welds pulling the dimension", "wts-count", { step: "1", min: "1", value: "1" });
   count.input.value = "1";
-  for (const f of [area, thickness, count]) inputRegion.appendChild(f.wrap);
+  const rootIn = makeNumber("Root opening (in, 0 = closed root)", "wts-root", { step: "any", min: "0", value: "0" });
+  rootIn.input.value = "0";
+  for (const f of [area, thickness, count, rootIn]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { area.input.value = "0.10"; thickness.input.value = "0.5"; count.input.value = "3"; update(); });
   const oPer = makeOutputLine(outputRegion, "Shrinkage per weld", "wts-out-per");
   const oTotal = makeOutputLine(outputRegion, "Total transverse shrinkage", "wts-out-total");
@@ -1067,13 +1073,14 @@ function _v131renderWeldTransverseShrinkage(inputRegion, outputRegion, citationE
       weld_area_in2: Number(area.input.value) || 0,
       thickness_in: Number(thickness.input.value) || 0,
       weld_count: count.input.value === "" ? 1 : Number(count.input.value),
+      root_opening_in: Number(rootIn.input.value) || 0,
     });
     if (r.error) { oPer.textContent = r.error; for (const o of [oTotal, oPreset]) o.textContent = "-"; return; }
     oPer.textContent = fmt(r.shrink_per_weld_in, 3) + " in";
     oTotal.textContent = fmt(r.total_shrink_in, 3) + " in";
     oPreset.textContent = "lay parts " + fmt(r.recommended_preset_in, 3) + " in wide";
   }, DEBOUNCE_MS);
-  for (const f of [area, thickness, count]) f.input.addEventListener("input", update);
+  for (const f of [area, thickness, count, rootIn]) f.input.addEventListener("input", update);
 }
 FAB_RENDERERS["weld-transverse-shrinkage"] = _v131renderWeldTransverseShrinkage;
 
@@ -1765,7 +1772,11 @@ FAB_RENDERERS["bar-nesting"] = _v1127renderBarNesting;
 // same relation the awg-wire-geometry tile uses. Public-domain reference.
 // =====================================================================
 const _MSG_STEEL_IN = { 3: 0.2391, 4: 0.2242, 5: 0.2092, 6: 0.1943, 7: 0.1793, 8: 0.1644, 9: 0.1495, 10: 0.1345, 11: 0.1196, 12: 0.1046, 13: 0.0897, 14: 0.0747, 15: 0.0673, 16: 0.0598, 17: 0.0538, 18: 0.0478, 19: 0.0418, 20: 0.0359, 21: 0.0329, 22: 0.0299, 23: 0.0269, 24: 0.0239, 25: 0.0209, 26: 0.0179, 27: 0.0164, 28: 0.0149, 29: 0.0135, 30: 0.0120 };
-const _GSG_GALV_IN = { 8: 0.1719, 9: 0.1563, 10: 0.1406, 11: 0.1250, 12: 0.1094, 13: 0.0938, 14: 0.0781, 15: 0.0703, 16: 0.0625, 17: 0.0563, 18: 0.0500, 19: 0.0438, 20: 0.0375, 21: 0.0344, 22: 0.0313, 23: 0.0281, 24: 0.0250, 25: 0.0219, 26: 0.0188, 27: 0.0172, 28: 0.0156, 29: 0.0141, 30: 0.0125 };
+// Galvanized Sheet Gage: MSG plus about 0.0037 in of zinc. Until 2026-09-18
+// this table held the 1893 U.S. Standard Gauge FRACTIONS for iron plate
+// (16 ga = 1/16 = 0.0625) -- up to 20% thin at the duct gauges (30 ga 0.0125
+// where galvanized is 0.0157). Values as the published galvanized gauge charts print.
+const _GSG_GALV_IN = { 8: 0.1681, 9: 0.1532, 10: 0.1382, 11: 0.1233, 12: 0.1084, 13: 0.0934, 14: 0.0785, 15: 0.0710, 16: 0.0635, 17: 0.0575, 18: 0.0516, 19: 0.0456, 20: 0.0396, 21: 0.0366, 22: 0.0336, 23: 0.0306, 24: 0.0276, 25: 0.0247, 26: 0.0217, 27: 0.0202, 28: 0.0187, 29: 0.0172, 30: 0.0157 };
 // dims: in { gauge: dimensionless, material: dimensionless } out: { thickness_in: L, thickness_mm: L }
 export function computeSheetMetalGauge({ gauge = 0, material = "steel" } = {}) {
   const _g = _finiteGuard({ gauge }); if (_g) return _g;

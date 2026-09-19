@@ -2,8 +2,8 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "4f536b2c41d31562",
-      "date": "2026-09-18"
+      "sha": "3a22243d48c32790",
+      "date": "2026-09-19"
     },
     "/tools/": {
       "sha": "d447d6f5e4c3dc58",
@@ -5254,8 +5254,8 @@
       "date": "2026-09-01"
     },
     "/tools/pipe-miter-cut/": {
-      "sha": "14e55d3fc469d3f2",
-      "date": "2026-09-04"
+      "sha": "b28876229525b9e1",
+      "date": "2026-09-19"
     },
     "/tools/pipe-partial-flow-depth/": {
       "sha": "535196db0ad3151b",
@@ -5770,8 +5770,8 @@
       "date": "2026-09-01"
     },
     "/tools/pv-string-sizing/": {
-      "sha": "9fff5af7d6f016b1",
-      "date": "2026-09-01"
+      "sha": "9d2b3724d04495ce",
+      "date": "2026-09-19"
     },
     "/tools/pwht-holding-time/": {
       "sha": "de048ad5802528ab",
@@ -8158,12 +8158,12 @@
       "date": "2026-09-06"
     },
     "/tools/turbo-max-boost-for-charge-temp/": {
-      "sha": "eec5d7313400b8fb",
-      "date": "2026-09-01"
+      "sha": "8c5edc91abc98c0e",
+      "date": "2026-09-19"
     },
     "/tools/turbo-pressure-ratio/": {
-      "sha": "d192c416e1eae93c",
-      "date": "2026-09-01"
+      "sha": "897b6dae5e1a2fec",
+      "date": "2026-09-19"
     },
     "/tools/turn-radius-bank/": {
       "sha": "3243db47f0605862",
@@ -8618,8 +8618,8 @@
       "date": "2026-09-01"
     },
     "/tools/winch-drum-line-pull/": {
-      "sha": "3335e6efe001ec28",
-      "date": "2026-09-01"
+      "sha": "b33aad87b41e6df7",
+      "date": "2026-09-19"
     },
     "/tools/winch-fleet-angle/": {
       "sha": "2bd3f543acd9edea",

@@ -9609,10 +9609,10 @@ test("bounds: calc-electrical computePVStringSizing pins cold-Voc/warm-Vmp serie
   });
   // cold_voc = 40 * (1 + 0.30 * 35 / 100) = 40 * 1.105 = 44.2
   assert.ok(Math.abs(r.cold_voc_V - 44.2) < 1e-9);
-  // warm_vmp = 33 * (1 - 0.30 * 20 / 100) = 33 * 0.94 = 31.02
-  assert.ok(Math.abs(r.warm_vmp_V - 31.02) < 1e-9);
+  // warm_vmp at the 75 C cell (45 C air + 30 C default rise): 33 * (1 - 0.30 * 50 / 100) = 28.05
+  assert.ok(Math.abs(r.warm_vmp_V - 28.05) < 1e-9);
   assert.strictEqual(r.max_series, 13); // floor(600/44.2)
-  assert.strictEqual(r.min_series, 7);  // ceil(200/31.02)
+  assert.strictEqual(r.min_series, 8);  // ceil(200/28.05); 7 would make 196 V on a hot day
   assert.strictEqual(r.flag, false);
   assert.ok("error" in computePVStringSizing({}));
 });
@@ -23840,8 +23840,8 @@ import { computeTurboPressureRatio as _v506 } from "../../calc-mechanic.js";
 test("bounds: spec-v506 computeTurboPressureRatio pins the gauge-to-absolute PR, the heat of compression, the altitude effect, and error seams", () => {
   const r = _v506({ boost_psi: 15, ambient_psia: 14.7, inlet_temp_f: 80, compressor_eff_pct: 70 });
   assert.ok(Math.abs(r.pr - 2.02) < 0.01); // (14.7 + 15) / 14.7, gauge boost + ambient
-  assert.ok(Math.abs(r.t_out_f - 250) < 1);
-  assert.ok(Math.abs(r.temp_rise_f - 170) < 1 && r.temp_rise_f > 0); // compression heats the air
+  assert.ok(Math.abs(r.t_out_f - 251.58) < 0.05); // PR^(2/7), gamma 1.4
+  assert.ok(Math.abs(r.temp_rise_f - 171.58) < 0.05 && r.temp_rise_f > 0); // compression heats the air
   // The same gauge boost needs a higher pressure ratio at altitude (lower ambient).
   const alt = _v506({ boost_psi: 15, ambient_psia: 12.2, inlet_temp_f: 80, compressor_eff_pct: 70 });
   assert.ok(alt.pr > r.pr && Math.abs(alt.pr - 2.23) < 0.01 && alt.t_out_f > r.t_out_f);
@@ -23863,8 +23863,8 @@ import { computeTurboMaxBoostForChargeTemp as _v726 } from "../../calc-mechanic.
 test("bounds: spec-v726 computeTurboMaxBoostForChargeTemp pins boost from the charge-temp limit, round-trips through computeTurboPressureRatio, and error seams", () => {
   const r = _v726({ max_charge_temp_f: 250, inlet_temp_f: 80, compressor_eff_pct: 70, ambient_psia: 14.7 });
   assert.ok(!r.error, JSON.stringify(r));
-  assert.ok(Math.abs(r.max_boost_psi - 15.024) < 1e-2, `pinned 15.0 psi: ${r.max_boost_psi}`);
-  assert.ok(Math.abs(r.pressure_ratio - 2.022) < 1e-3, `PR: ${r.pressure_ratio}`);
+  assert.ok(Math.abs(r.max_boost_psi - 14.826) < 1e-2, `pinned 14.8 psi: ${r.max_boost_psi}`);
+  assert.ok(Math.abs(r.pressure_ratio - 2.0086) < 1e-3, `PR: ${r.pressure_ratio}`);
   // Round-trip: at the max boost the forward tile's compressor-outlet temp equals the limit.
   for (const max_charge_temp_f of [180, 250, 350]) {
     for (const inlet_temp_f of [60, 80, 110]) {
@@ -25522,12 +25522,12 @@ import { computeWinchDrumLinePull as _v545 } from "../../calc-rigging.js";
 test("bounds: spec-v545 computeWinchDrumLinePull pins the per-layer derate, the speed rise, the wraps, and error seams", () => {
   const l4 = _v545({ rated_pull_lb: 10000, drum_dia_in: 10, rope_dia_in: 0.5, barrel_width_in: 12, target_layer: 4 });
   assert.ok(Math.abs(l4.mean_dia_in - 13.5) < 1e-9); // 10 + 7*0.5
-  assert.ok(Math.abs(l4.pull_at_layer_lb - 7407) < 1); // 10000*10/13.5
-  assert.ok(Math.abs(l4.speed_ratio - 1.35) < 1e-9);
+  assert.ok(Math.abs(l4.pull_at_layer_lb - 7777.8) < 0.1); // 10000*10.5/13.5 (rating at the first-layer centerline)
+  assert.ok(Math.abs(l4.speed_ratio - 13.5 / 10.5) < 1e-9);
   assert.equal(l4.wraps_per_layer, 24); // floor(12/0.5)
   // Layer 1 is the bare-drum near-nameplate case.
   const l1 = _v545({ rated_pull_lb: 10000, drum_dia_in: 10, rope_dia_in: 0.5, barrel_width_in: 12, target_layer: 1 });
-  assert.ok(Math.abs(l1.pull_at_layer_lb - 9524) < 1); // 10000*10/10.5
+  assert.ok(Math.abs(l1.pull_at_layer_lb - 10000) < 1e-9); // layer 1 IS the rating
   // Pull falls and speed rises with each layer.
   assert.ok(l4.pull_at_layer_lb < l1.pull_at_layer_lb);
   assert.ok(l4.speed_ratio > l1.speed_ratio);
@@ -34039,12 +34039,14 @@ test("bounds: spec-v1126 computeMembraneFastenerTakeoff pins the usable-width ro
 import { computeBarNesting as _v1127 } from "../../calc-fab.js";
 import { computeSheetMetalGauge as _v1257 } from "../../calc-fab.js";
 test("bounds: spec-v1257 computeSheetMetalGauge pins the MSG/GSG tables, the B&S aluminum formula, the material spread, and error seams", () => {
-  // 16 ga: steel 0.0598, galvanized 0.0625, aluminum 0.0508 (three different thicknesses).
+  // 16 ga: steel 0.0598, galvanized 0.0635 (MSG + zinc), aluminum 0.0508 (three different thicknesses).
   const steel = _v1257({ gauge: 16, material: "steel" });
   const galv = _v1257({ gauge: 16, material: "galvanized" });
   const alum = _v1257({ gauge: 16, material: "aluminum" });
   assert.ok(Math.abs(steel.thickness_in - 0.0598) < 1e-9);
-  assert.ok(Math.abs(galv.thickness_in - 0.0625) < 1e-9 && galv.thickness_in > steel.thickness_in);
+  assert.ok(Math.abs(galv.thickness_in - 0.0635) < 1e-9 && galv.thickness_in > steel.thickness_in);
+  // Galvanized runs MSG plus ~0.0037 in of zinc at every gauge, never the 1893 iron fractions.
+  for (const g of [10, 16, 20, 26, 30]) { const d = _v1257({ gauge: g, material: "galvanized" }).thickness_in - _v1257({ gauge: g, material: "steel" }).thickness_in; assert.ok(d > 0.0033 && d < 0.0042, `gauge ${g}: zinc ${d}`); }
   assert.ok(Math.abs(alum.thickness_in - 0.005 * Math.pow(92, (36 - 16) / 39)) < 1e-9 && Math.abs(alum.thickness_in - 0.0508) < 5e-4);
   assert.ok(alum.thickness_in < steel.thickness_in); // aluminum thinner at the same gauge
   assert.ok(Math.abs(steel.thickness_mm - 0.0598 * 25.4) < 1e-6);

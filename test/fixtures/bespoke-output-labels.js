@@ -641,7 +641,7 @@ export const BESPOKE_OUTPUT_LABELS = {
   "pipe-heat-loss-radial": {"q_per_ft_btuh":"Heat loss per linear foot","q_total_btuh":"Total heat loss","note":"Note"},
   "pipe-insulation-for-condensation": {"dew_point_F":"Ambient dew point","no_risk":"Minimum thickness (round UP to stock)","note":"Note"},
   "pipe-insulation-takeoff": {"sections":"Insulation sections","jacket_sf":"Jacket area"},
-  "pipe-miter-cut": {"miter_angle_deg":"Miter angle per cut (deg)","n_welds":"Welds (cuts)","cutback_in":"Cutback (in)","gore_centerline_in":"Gore centerline (in)","notes":"Notes"},
+  "pipe-miter-cut": {"miter_angle_deg":"Miter angle per cut (deg)","n_welds":"Welds (cuts)","cutback_in":"Cutback, long side minus short side (in)","gore_centerline_in":"Gore centerline (in)","notes":"Notes"},
   "pipe-partial-flow-depth": {"depth_in":"Flow depth","v_fps":"Velocity at that depth","self_cleansing":"Self-cleansing (2 ft/s)","shear_psf":"Boundary shear","note":"Note"},
   "pipe-pressure-rating": {"t_avail":"Available wall after mill tolerance"},
   "pipe-purge-volume": {"pipe_volume_ft3":"Pipe volume","purge_volume_ft3":"Purge volume","purge_min":"Purge time"},

@@ -1320,9 +1320,13 @@ export function computeWinchDrumLinePull({ rated_pull_lb, drum_dia_in, rope_dia_
   if (!Number.isFinite(bw) || bw <= 0) return { error: "Barrel width must be a positive finite number (in)." };
   if (!Number.isFinite(n) || n < 1) return { error: "Target layer must be at least 1." };
   const layer = Math.floor(n);
+  // The rating is the FIRST-LAYER figure, and the first wrap acts at its rope
+  // centerline, D + d -- not at the bare barrel. Until 2026-09-18 the ratio was
+  // taken to D, so layer 1 read below its own rating (9,524 of 10,000 lb).
   const mean_dia_in = D1 + (2 * layer - 1) * dr;
-  const pull_at_layer_lb = P1 * D1 / mean_dia_in;
-  const speed_ratio = mean_dia_in / D1;
+  const first_layer_dia_in = D1 + dr;
+  const pull_at_layer_lb = P1 * first_layer_dia_in / mean_dia_in;
+  const speed_ratio = mean_dia_in / first_layer_dia_in;
   const wraps_per_layer = Math.floor(bw / dr);
   const derate_pct = (1 - pull_at_layer_lb / P1) * 100;
   return {

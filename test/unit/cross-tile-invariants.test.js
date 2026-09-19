@@ -11282,8 +11282,8 @@ test("monotonicity: computePVStringSizing cold_voc_V = Voc*(1 + coeff*(25 - reco
   for (const record_high_C of [30, 40, 50, 60]) {
     const r = pv({ record_high_C });
     assert.ok(r.warm_vmp_V < prevW, `warm_vmp at high=${record_high_C} = ${r.warm_vmp_V} not less than prev=${prevW}`);
-    assert.ok(Math.abs(r.warm_vmp_V - 33 * (1 - 0.30 * (record_high_C - 25) / 100)) < 1e-9,
-      `warm_vmp closed form: ${r.warm_vmp_V} vs ${33 * (1 - 0.30 * (record_high_C - 25) / 100)}`);
+    assert.ok(Math.abs(r.warm_vmp_V - 33 * (1 - 0.30 * (record_high_C + 30 - 25) / 100)) < 1e-9,
+      `warm_vmp closed form (cell = air + 30 C): ${r.warm_vmp_V} vs ${33 * (1 - 0.30 * (record_high_C + 30 - 25) / 100)}`);
     prevW = r.warm_vmp_V;
   }
   // max_series monotone non-decreasing as the inverter Vdc ceiling rises.

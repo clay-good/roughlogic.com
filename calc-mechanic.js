@@ -2961,6 +2961,9 @@ MECHANIC_RENDERERS["anchor-rode-scope"] = _simpleRenderer({
 
 // ===================== spec-v506: turbocharger pressure ratio and charge-air temp =====================
 
+// (gamma - 1)/gamma for air, gamma = 1.4: exactly 2/7 = 0.2857. Until 2026-09-18 written 0.283,
+// about 1% off the gamma the note states.
+const _AIR_ISENTROPIC_EXP = (1.4 - 1) / 1.4;
 // dims: in { boost_psi: M L^-1 T^-2, ambient_psia: M L^-1 T^-2, inlet_temp_f: T, compressor_eff_pct: dimensionless } out: { pr: dimensionless, t_out_f: T, temp_rise_f: T }
 export function computeTurboPressureRatio({ boost_psi = 0, ambient_psia = 14.7, inlet_temp_f = 0, compressor_eff_pct = 70 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
@@ -2974,19 +2977,19 @@ export function computeTurboPressureRatio({ boost_psi = 0, ambient_psia = 14.7, 
   if (!(eff > 0 && eff <= 100)) return { error: "Compressor efficiency must be over 0 and at most 100 percent." };
   const pr = (amb + boost) / amb;
   const t_in_r = tinF + 459.67;
-  const t_out_r = t_in_r * (1 + (Math.pow(pr, 0.283) - 1) / (eff / 100));
+  const t_out_r = t_in_r * (1 + (Math.pow(pr, _AIR_ISENTROPIC_EXP) - 1) / (eff / 100));
   const t_out_f = t_out_r - 459.67;
   const temp_rise_f = t_out_f - tinF;
   if (![pr, t_out_f, temp_rise_f].every(Number.isFinite)) return { error: "Turbo math is not a finite value." };
   return {
     pr, t_out_f, temp_rise_f,
-    note: "Turbocharger pressure ratio and charge-air temperature: boost is a GAUGE number, so PR = (ambient_abs + boost) / ambient_abs -- the ambient must be added before dividing, and the same gauge boost needs a higher pressure ratio at altitude where the ambient is lower. Compressing air heats it: T_out = T_in x [1 + (PR^0.283 - 1) / efficiency] (temperatures absolute), and the PR^0.283 adiabatic term can raise the charge-air temperature well over a hundred degrees, which is why an intercooler is not optional on a serious build. This reports the compressor-OUTLET temperature (it ignores any intercooler, not the manifold temperature) and assumes the gamma = 1.4 dry-air exponent. A planning estimate, not a tune; the compressor map and the engine build govern.",
+    note: "Turbocharger pressure ratio and charge-air temperature: boost is a GAUGE number, so PR = (ambient_abs + boost) / ambient_abs -- the ambient must be added before dividing, and the same gauge boost needs a higher pressure ratio at altitude where the ambient is lower. Compressing air heats it: T_out = T_in x [1 + (PR^0.2857 - 1) / efficiency] (temperatures absolute), and the PR^0.2857 adiabatic term can raise the charge-air temperature well over a hundred degrees, which is why an intercooler is not optional on a serious build. This reports the compressor-OUTLET temperature (it ignores any intercooler, not the manifold temperature) and assumes the gamma = 1.4 dry-air exponent. A planning estimate, not a tune; the compressor map and the engine build govern.",
   };
 }
 export const turboPressureRatioExample = { inputs: { boost_psi: 15, ambient_psia: 14.7, inlet_temp_f: 80, compressor_eff_pct: 70 } };
 
 MECHANIC_RENDERERS["turbo-pressure-ratio"] = _simpleRenderer({
-  citation: "Citation: turbocharger pressure-ratio and charge-air-temperature model (compressor-map sizing; ideal-gas adiabatic compression): PR = (ambient_abs + boost) / ambient_abs; T_out = T_in x [1 + (PR^0.283 - 1) / efficiency], temperatures absolute. Boost is gauge, so add the ambient first; the PR^0.283 term is the heat of compression. Compressor-outlet temperature (ignores any intercooler); gamma = 1.4 assumed. A planning estimate; the compressor map and engine build govern.",
+  citation: "Citation: turbocharger pressure-ratio and charge-air-temperature model (compressor-map sizing; ideal-gas adiabatic compression): PR = (ambient_abs + boost) / ambient_abs; T_out = T_in x [1 + (PR^0.2857 - 1) / efficiency], temperatures absolute. Boost is gauge, so add the ambient first; the PR^0.2857 term is the heat of compression. Compressor-outlet temperature (ignores any intercooler); gamma = 1.4 assumed. A planning estimate; the compressor map and engine build govern.",
   example: turboPressureRatioExample.inputs,
   fields: [
     { key: "boost_psi", label: "Target boost (psi, gauge)", kind: "number" },
@@ -3004,8 +3007,8 @@ MECHANIC_RENDERERS["turbo-pressure-ratio"] = _simpleRenderer({
 
 // turbo-max-boost-for-charge-temp: inverse of turbo-pressure-ratio. The forward
 // tile gives the charge-air temperature from a boost; keeping that temperature
-// under a limit is the inverse. From T_out = T_in x [1 + (PR^0.283 - 1)/eff],
-// PR = [1 + eff x (T_out/T_in - 1)]^(1/0.283) and boost = ambient x (PR - 1),
+// under a limit is the inverse. From T_out = T_in x [1 + (PR^0.2857 - 1)/eff],
+// PR = [1 + eff x (T_out/T_in - 1)]^(1/0.2857) and boost = ambient x (PR - 1),
 // all temperatures absolute (Rankine).
 // dims: in { max_charge_temp_f: T, inlet_temp_f: T, compressor_eff_pct: dimensionless, ambient_psia: M L^-1 T^-2 } out: { max_boost_psi: M L^-1 T^-2, pressure_ratio: dimensionless }
 export function computeTurboMaxBoostForChargeTemp({ max_charge_temp_f = 0, inlet_temp_f = 0, compressor_eff_pct = 70, ambient_psia = 14.7 } = {}) {
@@ -3022,17 +3025,17 @@ export function computeTurboMaxBoostForChargeTemp({ max_charge_temp_f = 0, inlet
   const ratio = tout_r / tin_r;
   if (!(ratio > 1)) return { error: "The charge-air temperature limit must be above the inlet temperature; compressing air only heats it." };
   const pr_pow = 1 + (eff / 100) * (ratio - 1);
-  const pressure_ratio = Math.pow(pr_pow, 1 / 0.283);
+  const pressure_ratio = Math.pow(pr_pow, 1 / _AIR_ISENTROPIC_EXP);
   const max_boost_psi = amb * (pressure_ratio - 1);
   if (![pressure_ratio, max_boost_psi].every(Number.isFinite)) return { error: "Turbo math is not a finite value." };
   return {
     max_boost_psi, pressure_ratio,
-    note: "The compressor-outlet-temperature model solved for the boost: the gauge boost at which the charge-air (compressor-outlet) temperature reaches the limit, boost = ambient x (PR - 1) with PR = [1 + efficiency x (T_out/T_in - 1)]^(1/0.283) (temperatures absolute). Above this boost the outlet air is hotter than the limit, so more intercooling (which resets this against the intercooler-outlet temp), a more efficient compressor, or a cooler inlet is needed to run more boost safely. This is the compressor-outlet temperature and ignores any intercooler and assumes the gamma = 1.4 dry-air exponent. A planning estimate, not a tune; the compressor map and the engine build govern.",
+    note: "The compressor-outlet-temperature model solved for the boost: the gauge boost at which the charge-air (compressor-outlet) temperature reaches the limit, boost = ambient x (PR - 1) with PR = [1 + efficiency x (T_out/T_in - 1)]^(1/0.2857) (temperatures absolute). Above this boost the outlet air is hotter than the limit, so more intercooling (which resets this against the intercooler-outlet temp), a more efficient compressor, or a cooler inlet is needed to run more boost safely. This is the compressor-outlet temperature and ignores any intercooler and assumes the gamma = 1.4 dry-air exponent. A planning estimate, not a tune; the compressor map and the engine build govern.",
   };
 }
 export const turboMaxBoostForChargeTempExample = { inputs: { max_charge_temp_f: 250, inlet_temp_f: 80, compressor_eff_pct: 70, ambient_psia: 14.7 } };
 MECHANIC_RENDERERS["turbo-max-boost-for-charge-temp"] = _simpleRenderer({
-  citation: "Citation: turbocharger charge-air-temperature model solved for the boost: PR = [1 + efficiency x (T_out/T_in - 1)]^(1/0.283), boost = ambient x (PR - 1), temperatures absolute (compressor-map sizing; ideal-gas adiabatic compression). Compressor-outlet temperature (ignores any intercooler); gamma = 1.4 assumed. A planning estimate; the compressor map and engine build govern.",
+  citation: "Citation: turbocharger charge-air-temperature model solved for the boost: PR = [1 + efficiency x (T_out/T_in - 1)]^(1/0.2857), boost = ambient x (PR - 1), temperatures absolute (compressor-map sizing; ideal-gas adiabatic compression). Compressor-outlet temperature (ignores any intercooler); gamma = 1.4 assumed. A planning estimate; the compressor map and engine build govern.",
   example: turboMaxBoostForChargeTempExample.inputs,
   fields: [
     { key: "max_charge_temp_f", label: "Charge-air temperature limit (°F)", kind: "number" },
