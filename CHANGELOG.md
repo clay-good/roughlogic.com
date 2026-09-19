@@ -6,6 +6,13 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **The sous-vide tile halved the Food Code's hold times and cut the come-up short, the fuse let-through placed a constant outside its root, and gutter sizing was 5 times too generous.**
+  - `sous-vide-pasteurization` cited "FDA Food Code Annex 6 Table A", but its hold table matched the Food Code only at 131 F. At 140 F it held 6 minutes where 3-401.11(B)(2) Table 3-2 requires 12, and at 145 F 1.5 where it requires 4. The tile now carries Table 3-2 row for row, and it warns that the table is written for whole meat roasts, not poultry, fish or egg. Its come-up took Fo = 0.4 for a "99.5% approach". The one-term slab solution puts the center only halfway there at Fo = 0.4; 99.5% needs Fo = 2.245. A 1 in chicken breast takes 43 minutes to come up, not 7.7.
+  - `fuse-let-through`: the ICEA/Onderdonk relation is (I/A)^2 t = 0.0297 log10((T2 + 234)/(T1 + 234)), so I = A sqrt(0.0297 log / t). The tile put 0.0297 outside the root, reading the conductor withstand 5.8 times low in current and 34 times low in I^2t. That was conservative, but it was not the ICEA figure.
+  - `gutter-downspout`: the 5,520 sq ft capacity of a 5 in K-style gutter is for plan area x pitch factor x rainfall in in/hr. At 1 in/hr that is 0.13 cfs, what a level 5 in K gutter carries. The tile compared area scaled to a 5 in/hr reference, about 5 times too generous. The worked 1,200 sq ft roof at 5 in/hr (6,600) needs a 6 in gutter, not 5 in. Above 7,960 the tile now says to split the run.
+
+  Found by an independent plausibility pass over calc-pipefit, calc-finish, calc-elecdesign and calc-kitchen; pipefit checked clean. The Food Code table was confirmed against its published text.
+
 - **Stopwatch sagging used the inch constant for feet, hours of service misread the 14-hour window, the bridge formula missed the tandem exception, and stage floors took 125 psf.**
   - `sagging-return-wave`: the wave speed and the sag are set by the same tension, so D = g t^2 / 32, which is 1.0054 (t/N)^2 in feet. The familiar 12.075 is the same relation in inches. The tile used it as feet, so the time to listen for came out sqrt(12) short: 3 waves on a 12 ft sag read 2.99 s where they take 10.4 s. A crew stopping at 2.99 s would leave about 1 ft of sag, twelve times the tension.
   - `hos-math`: 49 CFR 395.3(a)(2) counts the 14-hour window as clock time from coming on duty, and a 30-minute off-duty break still spends it. The tile counted on-duty hours only, so the worked shift read 4.5 h left where 4.0 remain. The 30-minute break is now owed after 8 hours of driving since the last break, not waived for the whole shift by an earlier one. A 10-hour rest now starts a new shift.

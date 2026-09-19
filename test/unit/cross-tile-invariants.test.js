@@ -3768,8 +3768,8 @@ test("monotonicity: computeTireGearing rev_per_mi_new is strictly decreasing in 
     `rev_per_mi drift at identity: ${ref.rev_per_mi_new} vs ${ref.rev_per_mi_orig}`);
 });
 
-test("monotonicity: computeSousVidePasteurization come_up_minutes is strictly increasing in thickness_in at fixed bath / category (Heisler-slab Fo=0.4 * (L/2)^2 / alpha pin)", () => {
-  // Group O. come_up_seconds = 0.4 * (thickness * 0.0254 / 2)^2 / alpha.
+test("monotonicity: computeSousVidePasteurization come_up_minutes is strictly increasing in thickness_in at fixed bath / category (one-term slab Fo=2.245 * (L/2)^2 / alpha pin)", () => {
+  // Group O. come_up_seconds = 2.245 * (thickness * 0.0254 / 2)^2 / alpha.
   // Strictly increasing in thickness^2.
   let prev = -Infinity;
   for (const thickness_in of [0.25, 0.5, 0.75, 1.0, 1.5, 2.0, 3.0]) {
@@ -3788,9 +3788,9 @@ test("monotonicity: computeSousVidePasteurization come_up_minutes is strictly in
     `L^2 scaling broken: ratio = ${ratio} (expected 4)`);
   // Closed-form pin from sousVidePasteurizationExample: thickness=1.0,
   // bath=140 F, poultry alpha=1.4e-7 m^2/s. L = 0.0127 m; come_up =
-  // 0.4 * 0.0127^2 / 1.4e-7 / 60 = 7.6804... min.
+  // 2.245 * 0.0127^2 / 1.4e-7 / 60 = 43.1 min.
   const ref = computeSousVidePasteurization({ category: "poultry", thickness_in: 1.0, bath_temperature_F: 140, initial_temperature_F: 38 });
-  const expectedSec = (0.4 * Math.pow(0.0127, 2)) / ref.diffusivity_m2_per_s;
+  const expectedSec = ((Math.log((4 / Math.PI) / 0.005) / Math.pow(Math.PI / 2, 2)) * Math.pow(0.0127, 2)) / ref.diffusivity_m2_per_s;
   const expectedMin = expectedSec / 60;
   assert.ok(Math.abs(ref.come_up_minutes - expectedMin) < 1e-9,
     `come_up = ${ref.come_up_minutes}, expected ${expectedMin}`);

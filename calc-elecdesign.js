@@ -883,8 +883,11 @@ export function computeFuseLetThrough({ conductor_cmil = 0, initial_temp_c = 75,
   if (!(let_through_i2t > 0)) return { error: "Device let-through I-squared-t must be positive (read it off the manufacturer's curve)." };
   if (!(let_through_peak_a >= 0)) return { error: "Device peak let-through cannot be negative." };
   if (!(equipment_peak_withstand_a >= 0)) return { error: "Equipment peak withstand cannot be negative." };
-  // The copper ICEA/Onderdonk constants: 0.0297 and 234.
-  const withstand_a = 0.0297 * conductor_cmil * Math.sqrt(Math.log10((damage_temp_c + 234) / (initial_temp_c + 234)) / duration_s);
+  // The copper ICEA/Onderdonk relation: (I / A)^2 t = 0.0297 log10((T2 + 234) / (T1 + 234)),
+  // I in amps and A in circular mils, so I = A sqrt(0.0297 log / t). Until
+  // 2026-09-19 the 0.0297 sat OUTSIDE the root, 5.8x low on current and 34x on
+  // I^2t (conservative, but the withstand was not the ICEA figure).
+  const withstand_a = conductor_cmil * Math.sqrt(0.0297 * Math.log10((damage_temp_c + 234) / (initial_temp_c + 234)) / duration_s);
   const withstand_i2t = withstand_a * withstand_a * duration_s;
   const margin = withstand_i2t / let_through_i2t;
   const thermal_ok = margin >= 1;

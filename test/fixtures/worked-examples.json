@@ -3865,12 +3865,12 @@
   },
   {
    "tile_id": "sous-vide-pasteurization",
-   "source_publisher": "FDA / Baldwin",
+   "source_publisher": "FDA Food Code 3-401.11(B)(2) / one-term slab solution",
    "source_title": "1-inch chicken @ 140 F bath (refrigerated 38 F initial) -> 6.5-log Salmonella reduction",
-   "source_edition_or_year": "FDA Food Code Annex 6 Table A; Baldwin Practical Guide to Sous Vide Cooking",
-   "source_section_or_page": "Heisler-slab approximation Fo ~ 0.4; Annex 6 hold at 140 F = 6 min",
+   "source_edition_or_year": "FDA Food Code Table 3-2 (whole meat roasts; the tile warns it is not written for poultry)",
+   "source_section_or_page": "one-term slab centerline, Fo = 2.245 for a 99.5% approach -> 43.1 min come-up; Table 3-2 hold at 140 F = 12 min",
    "verified_by": "rl",
-   "verified_on": "2026-05-11",
+   "verified_on": "2026-09-19",
    "inputs": {
     "category": "poultry",
     "thickness_in": 1,
@@ -3879,19 +3879,19 @@
    },
    "outputs": {
     "come_up_minutes": {
-     "value": 7.68,
+     "value": 43.11,
      "tolerance": {
       "pct": 1
      }
     },
     "hold_minutes": {
-     "value": 6,
+     "value": 12,
      "tolerance": {
       "abs": 0.001
      }
     },
     "total_minutes": {
-     "value": 13.68,
+     "value": 55.11,
      "tolerance": {
       "pct": 1
      }
@@ -30322,11 +30322,11 @@
   {
    "tile_id": "gutter-downspout",
    "source_publisher": "SMACNA / standard residential gutter method",
-   "source_title": "Adjusted area = plan area x pitch factor x (rainfall / 5 in/hr); downspouts = ceil((adjusted / 100) / downspout sq in); gutter 5 in K-style up to ~5,520 sq ft else 6 in.",
+   "source_title": "Downspouts = ceil((plan area x pitch factor x rainfall/5) / 100 / downspout sq in); gutter by plan area x pitch factor x rainfall (in/hr): 5 in K-style to 5,520, 6 in to 7,960 (1,200 x 1.10 x 5 = 6,600 -> 6 in).",
    "source_edition_or_year": "spec-v98 worked example (machine-verified)",
    "source_section_or_page": "spec-v98 section 2 pinned example",
    "verified_by": "rl",
-   "verified_on": "2026-06-18",
+   "verified_on": "2026-09-19",
    "inputs": {
     "roof_area_sqft": 1200,
     "pitch_factor": "1.10",
@@ -92451,9 +92451,9 @@
    "source_publisher": "Project (first-principles)",
    "source_title": "4 AWG copper (41,740 cmil), 75 C to 250 C over 0.01 s, against 25,000 A2s of let-through",
    "source_edition_or_year": "ICEA / Onderdonk",
-   "source_section_or_page": "0.0297 x cmil x sqrt(log10((T2+234)/(T1+234))/t)",
+   "source_section_or_page": "(I/A)^2 t = 0.0297 log10((T2+234)/(T1+234)): I = cmil x sqrt(0.0297 log10((T2+234)/(T1+234))/t) = 31,756 A",
    "verified_by": "rl",
-   "verified_on": "2026-08-26",
+   "verified_on": "2026-09-19",
    "inputs": {
     "conductor_cmil": 41740,
     "initial_temp_c": 75,
@@ -92465,19 +92465,19 @@
    },
    "outputs": {
     "withstand_a": {
-     "value": 5472.68,
+     "value": 31755.7,
      "tolerance": {
       "pct": 0.5
      }
     },
     "withstand_i2t": {
-     "value": 299502,
+     "value": 10084258,
      "tolerance": {
       "pct": 0.5
      }
     },
     "margin": {
-     "value": 11.9801,
+     "value": 403.37,
      "tolerance": {
       "pct": 0.5
      }

@@ -1845,7 +1845,7 @@ test("bounds: calc-kitchen computePanConversion rejects unknown pan size / depth
   assert.ok("error" in computePanConversion({ pan_size: "full", pan_depth_in: 4 }));
 });
 
-test("bounds: calc-kitchen computeSousVidePasteurization pins come-up time = 0.4 * (thickness/2 * 0.0254)^2 / alpha across the food-category sweep", () => {
+test("bounds: calc-kitchen computeSousVidePasteurization pins come-up time = Fo(99.5%) * (thickness/2 * 0.0254)^2 / alpha across the food-category sweep", () => {
   // Poultry alpha = 1.4e-7 per the spec; for 1.0 in thickness in a 140 F bath the example pins ~7.68 min come-up.
   const alpha_by_category = { poultry: 1.4e-7, beef: 1.4e-7, pork: 1.4e-7, fish: 1.4e-7, egg: 1.4e-7 };
   for (const category of Object.keys(alpha_by_category)) {
@@ -1860,7 +1860,7 @@ test("bounds: calc-kitchen computeSousVidePasteurization pins come-up time = 0.4
       );
       // come-up identity: 0.4 * (thickness/2 * 0.0254)^2 / alpha in seconds, / 60 -> minutes.
       const L_m = (thickness_in * 0.0254) / 2;
-      const expected_come_up_min = (0.4 * L_m * L_m) / r.diffusivity_m2_per_s / 60;
+      const expected_come_up_min = ((Math.log((4 / Math.PI) / 0.005) / Math.pow(Math.PI / 2, 2)) * L_m * L_m) / r.diffusivity_m2_per_s / 60;
       assert.ok(
         Math.abs(r.come_up_minutes - expected_come_up_min) < 1e-9,
         `come_up identity ${category} th=${thickness_in}: ${r.come_up_minutes} vs ${expected_come_up_min}`,
@@ -13340,8 +13340,10 @@ test("bounds: spec-v95 finish + v97 hardscape + v98 roofing trim-out", () => {
   assert.ok(_v98a({ attic_floor_area_sqft: 1500, ratio: "150", intake_vent_nfa_sqin: 0 }).intake_vents === null);
   assert.ok("error" in _v98a({ attic_floor_area_sqft: 0 }));
   const g = _v98b({ roof_area_sqft: 1200, pitch_factor: "1.10", rainfall_in_hr: 5, downspout_sqin: 12 });
-  assert.ok(g.adjusted_area === 1320 && g.downspouts === 2 && g.gutter_size === "5 in K-style");
-  assert.ok(_v98b({ roof_area_sqft: 5000, pitch_factor: "1.10", rainfall_in_hr: 5, downspout_sqin: 6 }).gutter_size === "5 in K-style");
+  // 1,200 x 1.10 x 5 in/hr = 6,600 > 5,520: a 6 in K-style, not 5.
+  assert.ok(g.adjusted_area === 1320 && g.downspouts === 2 && g.gutter_size === "6 in K-style");
+  assert.ok(_v98b({ roof_area_sqft: 1000, pitch_factor: "1.10", rainfall_in_hr: 5, downspout_sqin: 6 }).gutter_size === "5 in K-style");
+  assert.ok(/over a single 6 in/.test(_v98b({ roof_area_sqft: 5000, pitch_factor: "1.10", rainfall_in_hr: 5, downspout_sqin: 6 }).gutter_size));
   assert.ok("error" in _v98b({ roof_area_sqft: 0 }));
 });
 
@@ -40982,12 +40984,13 @@ test("bounds: spec-v1421 computeSelectiveCoordinationScreen pins both device beh
 
 import { computeFuseLetThrough as _v1422 } from "../../calc-elecdesign.js";
 test("bounds: spec-v1422 computeFuseLetThrough pins the withstand and the series-rating rule", () => {
-  // 4 AWG copper, 75 C to 250 C over a half cycle: 5,473 A, 299,502 A2s, 12x margin.
+  // 4 AWG copper, 75 C to 250 C over a half cycle: I = A sqrt(0.0297 log10(484/309) / t)
+  // = 41,740 x 0.7608 = 31,756 A, 1.008e7 A2s, a 403x margin over the 25,000 A2s let-through.
   const base = { conductor_cmil: 41740, initial_temp_c: 75, damage_temp_c: 250, duration_s: 0.01, let_through_i2t: 25000, let_through_peak_a: 12000, equipment_peak_withstand_a: 25000 };
   const r = _v1422(base);
-  assert.ok(Math.abs(r.withstand_a - 5473) < 1);
-  assert.ok(Math.abs(r.withstand_i2t - 299502) < 5);
-  assert.ok(Math.abs(r.margin - 12.0) < 1e-1);
+  assert.ok(Math.abs(r.withstand_a - 31756) < 1);
+  assert.ok(Math.abs(r.withstand_i2t / (41740 * 41740 * 0.0297 * Math.log10(484 / 309)) - 1) < 1e-12);
+  assert.ok(Math.abs(r.margin - r.withstand_i2t / 25000) < 1e-9);
   assert.strictEqual(r.thermal_ok, true);
   assert.strictEqual(r.peak_ok, true);
   // The withstand I2t is independent of the duration BASIS: it is a property of the
@@ -40998,11 +41001,11 @@ test("bounds: spec-v1422 computeFuseLetThrough pins the withstand and the series
   // Withstand I2t goes as the SQUARE of area: twice the conductor is four times the energy.
   const bigger = _v1422({ ...base, conductor_cmil: 83480 });
   assert.ok(Math.abs(bigger.withstand_i2t / r.withstand_i2t - 4) < 1e-9);
-  // An unrestricted fault is what current limitation prevents: 25 kA for a half cycle is
-  // 6,250,000 A2s, more than twenty times this conductor's withstand.
-  assert.ok(25000 ** 2 * 0.01 / r.withstand_i2t > 20);
+  // An unrestricted fault is what current limitation prevents: 50 kA for a half cycle is
+  // 25,000,000 A2s, about two and a half times this conductor's 1.0e7 A2s withstand.
+  assert.ok(50000 ** 2 * 0.01 / r.withstand_i2t > 2);
   // A device that lets through more than the conductor can take fails the thermal check.
-  const unprotected = _v1422({ ...base, let_through_i2t: 500000 });
+  const unprotected = _v1422({ ...base, let_through_i2t: 2e7 });
   assert.strictEqual(unprotected.thermal_ok, false);
   assert.ok(unprotected.margin < 1);
   // Peak stress is a separate check and can fail on its own.

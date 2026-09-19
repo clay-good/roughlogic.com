@@ -479,11 +479,11 @@ const renderPanConversion = _r({
 });
 
 // =====================================================================
-// v9 §H.6: Sous-vide pasteurization time (FDA Food Code Annex 6)
+// v9 §H.6: Sous-vide pasteurization time (FDA Food Code Table 3-2)
 // =====================================================================
 //
 // Simplified-screening tile. The bundled food-safety values are taken
-// from public FDA Food Code Annex 6 D-values for 6.5-log Salmonella
+// from the FDA Food Code 3-401.11(B)(2) Table 3-2 roast holding times (6.5-log Salmonella)
 // reduction and from public sous-vide engineering references
 // (Baldwin "Practical Guide to Sous Vide Cooking", an open work).
 // The v10 §B.3 limitation banner above the inputs makes clear that
@@ -492,15 +492,14 @@ const renderPanConversion = _r({
 //
 // Math:
 //
-//   Come-up time uses the slab-form thermal-diffusion approximation
-//   (Heisler chart at the slab centerline). The center temperature
-//   ratio (T_bath - T_center) / (T_bath - T_initial) reaches ~0.005
-//   at Fourier number Fo ~ 0.4 for a slab of half-thickness L:
+//   Come-up time uses the one-term slab solution at the centerline. The
+//   center temperature ratio (T_bath - T_center) / (T_bath - T_initial)
+//   reaches 0.005 at Fourier number Fo = 2.245 for a slab of half-thickness L:
 //
-//     come_up_seconds = 0.4 * L_m^2 / alpha
+//     come_up_seconds = 2.245 * L_m^2 / alpha
 //
 //   Hold time at bath = food center temperature, by linear interpolation
-//   between the bundled FDA Annex 6 break points. Bath temperature
+//   between the Table 3-2 rows. Bath temperature
 //   below the lowest break point flags the tile as unsafe; above the
 //   highest, hold time falls below 1 min (the calculator does not
 //   recommend operating that hot; texture suffers).
@@ -519,36 +518,22 @@ export const SOUS_VIDE_DIFFUSIVITY = {
   egg:     { alpha: 1.40e-7, label: "Egg (in-shell or yolk)" },
 };
 
-// FDA Food Code Annex 6 6.5-log Salmonella reduction time at bath
-// temperature (water-bath = food center). Values in (T_F, hold_min).
-// Source: FDA Food Code Annex 6 Table A. Linear interpolation between
-// rows; below the lowest row the tile reports "unsafe at this
-// temperature" and above the highest the hold time is < 1 min.
+// FDA Food Code 3-401.11(B)(2) Table 3-2, whole meat roasts: the holding time
+// at each internal temperature, in minutes (the seconds rows converted). Linear
+// interpolation between rows; below 130 F the tile reports unsafe. Until
+// 2026-09-19 this table matched the Food Code only at 131 F and ran about half
+// its times elsewhere (140 F: 6 min where the code requires 12). Table 3-2
+// covers whole meat roasts only; the tile says so for poultry, fish and egg.
 const SOUS_VIDE_HOLD_TABLE_F = [
-  [130, 121.4],
-  [131, 89.0],
-  [132, 65.5],
-  [133, 48.3],
-  [134, 35.7],
-  [135, 26.4],
-  [136, 19.5],
-  [137, 14.5],
-  [138, 10.8],
-  [139, 8.0],
-  [140, 6.0],
-  [141, 4.5],
-  [142, 3.4],
-  [143, 2.6],
-  [144, 2.0],
-  [145, 1.5],
-  [146, 1.2],
-  [147, 1.0],
+  [130, 112], [131, 89], [133, 56], [135, 36], [136, 28], [138, 18],
+  [140, 12], [142, 8], [144, 5], [145, 4],
+  [147, 134 / 60], [149, 85 / 60], [151, 54 / 60], [153, 34 / 60], [155, 22 / 60], [157, 14 / 60], [158, 0],
 ];
 
 function _interpolateHoldMinutes(T_F) {
   if (T_F < SOUS_VIDE_HOLD_TABLE_F[0][0]) return null;
   const top = SOUS_VIDE_HOLD_TABLE_F[SOUS_VIDE_HOLD_TABLE_F.length - 1];
-  if (T_F >= top[0]) return Math.max(0.5, top[1]);
+  if (T_F >= top[0]) return top[1];
   for (let i = 0; i < SOUS_VIDE_HOLD_TABLE_F.length - 1; i++) {
     const [t1, h1] = SOUS_VIDE_HOLD_TABLE_F[i];
     const [t2, h2] = SOUS_VIDE_HOLD_TABLE_F[i + 1];
@@ -585,25 +570,30 @@ export function computeSousVidePasteurization({
   // treats heating from both sides (typical sous-vide bag in water),
   // so the relevant half-thickness is thickness / 2.
   const L_m = (thickness * 0.0254) / 2;
-  // Heisler-chart approximation at Fo ~ 0.4 for ~99.5% temperature
-  // approach at the slab centerline.
-  const come_up_seconds = (0.4 * L_m * L_m) / cat.alpha;
+  // One-term slab solution at the centerline (surface held at bath
+  // temperature, Bi -> infinity, the best case): theta = (4/pi) exp(-(pi/2)^2 Fo).
+  // A 99.5% approach (theta = 0.005) needs Fo = ln((4/pi)/0.005)/(pi/2)^2 = 2.245.
+  // Until 2026-09-19 this took Fo = 0.4, where the center has closed only half
+  // the gap (theta = 0.47): the come-up was 5.6x short, on the unsafe side.
+  const Fo_995 = Math.log((4 / Math.PI) / 0.005) / Math.pow(Math.PI / 2, 2);
+  const come_up_seconds = (Fo_995 * L_m * L_m) / cat.alpha;
   const come_up_minutes = come_up_seconds / 60;
 
   const hold_minutes = _interpolateHoldMinutes(T_bath);
   if (hold_minutes === null) {
     return {
-      error: "Bath temperature " + T_bath + " F is below the FDA Annex 6 minimum (130 F). Pasteurization is not achievable at this temperature within reasonable time.",
+      error: "Bath temperature " + T_bath + " F is below the FDA Food Code Table 3-2 minimum (130 F). Pasteurization is not achievable at this temperature within reasonable time.",
     };
   }
   const total_minutes = come_up_minutes + hold_minutes;
 
   const warnings = [
     "Field thermometer at the geometric center of the thickest piece is the verdict; this is a planning estimate only.",
-    "FDA Food Code Annex 6 Table A 6.5-log Salmonella reduction values. Other pathogens may require different times.",
+    "FDA Food Code 3-401.11(B)(2) Table 3-2 holding times, which the Food Code sets for WHOLE MEAT ROASTS (beef, pork, lamb). Other pathogens and products may require different times.",
   ];
-  if (thickness > 4) warnings.push("Thickness above 4 in is outside the Heisler-slab approximation; come-up time may be longer than estimated.");
-  if (T_bath >= 147) warnings.push("Bath temperature " + T_bath + " F is above the typical Annex 6 break-point range; hold reduces to ~1 min but texture suffers above 145 F for most cuts.");
+  if (category === "poultry" || category === "fish" || category === "egg") warnings.push("The Food Code's Table 3-2 is written for whole meat roasts; for " + cat.label + " use a validated time-temperature (e.g. USDA-FSIS lethality tables) or the Food Code's own temperature for that food, not this roast table.");
+  if (thickness > 4) warnings.push("Thickness above 4 in is outside the one-term slab approximation; come-up time may be longer than estimated.");
+  if (T_bath >= 147) warnings.push("Bath temperature " + T_bath + " F is at the short end of Table 3-2 (seconds of hold at 147 F and above); texture suffers above 145 F for most cuts.");
 
   return {
     come_up_minutes,
@@ -619,16 +609,16 @@ export function computeSousVidePasteurization({
 
 export const sousVidePasteurizationExample = {
   // 1-inch chicken breast in a 140 F bath, refrigerated initial 38 F.
-  // L = 0.5 in = 0.0127 m -> Fo=0.4 t = 0.4 * 0.0127^2 / 1.4e-7
-  //   = 0.4 * 1.6129e-4 / 1.4e-7 = 460.83 s = 7.68 min come-up
-  // Hold at 140 F = 6.0 min. Total ~13.7 min.
+  // L = 0.5 in = 0.0127 m -> Fo = 2.245 (99.5% approach) t = 2.245 * 0.0127^2 / 1.4e-7
+  //   = 2.245 * 1.6129e-4 / 1.4e-7 = 2587 s = 43.1 min come-up
+  // Hold at 140 F = 12 min (Table 3-2). Total ~55 min.
   inputs: { category: "poultry", thickness_in: 1.0, bath_temperature_F: 140, initial_temperature_F: 38 },
 };
 
 import { renderLimitationBanner as _v9sv_banner, getLimitationCopy as _v9sv_copy } from "./limitation-banner.js";
 
 function renderSousVidePasteurization(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: Per FDA Food Code Annex 6 Table A 6.5-log Salmonella reduction values. Come-up time from the slab-form thermal-diffusion approximation (Heisler chart at centerline, Fo ~ 0.4). Bundled food-thermal-diffusivity values per public engineering references (Baldwin Practical Guide to Sous Vide Cooking). Local food-safety authority and a qualified processing authority govern commercial-kitchen use. Free at fda.gov/food/retail-food-protection/fda-food-code.";
+  citationEl.textContent = "Citation: Per FDA Food Code 3-401.11(B)(2) Table 3-2 holding times (whole meat roasts). Come-up time from the one-term slab solution at the centerline, Fo = 2.245 for a 99.5% approach. Bundled food-thermal-diffusivity values per public engineering references (Baldwin Practical Guide to Sous Vide Cooking). Local food-safety authority and a qualified processing authority govern commercial-kitchen use. Free at fda.gov/food/retail-food-protection/fda-food-code.";
   _v9sv_banner(inputRegion, _v9sv_copy("sous-vide-pasteurization"));
 
   const c = makeSelect("Food category", "sv-c",

@@ -2487,15 +2487,15 @@ export const CITATIONS = {
   },
 
   "sous-vide-pasteurization": {
-    formula: "come_up_seconds = 0.4 * L_m^2 / alpha (Heisler-chart slab approximation at Fo ~ 0.4). hold_minutes from linear interpolation of FDA Food Code Annex 6 Table A at the bath temperature. total = come_up + hold.",
-    edition: "FDA Food Code Annex 6 Table A (6.5-log Salmonella reduction). Heisler-chart thermal-diffusion approximation.",
+    formula: "come_up_seconds = 2.245 * L_m^2 / alpha (one-term slab centerline solution, Fo for a 99.5% approach). hold_minutes from linear interpolation of FDA Food Code 3-401.11(B)(2) Table 3-2 (whole meat roasts) at the bath temperature. total = come_up + hold.",
+    edition: "FDA Food Code 3-401.11(B)(2) Table 3-2 (holding times for whole meat roasts). One-term slab thermal-diffusion solution.",
     freeAccess: "fda.gov (Food, Retail Food Protection, FDA Food Code).",
     governance: GOVERNANCE.food,
     editionNote: "Field thermometer at the geometric center is the verdict. Other pathogens may require different times.",
     assumptions: [
       { name: "Diffusivity values", value: "poultry / pork 1.4e-7; beef 1.3e-7; fish 1.45e-7; egg 1.4e-7 (m^2/s)", source: "public engineering references (Baldwin)" },
       { name: "Slab model", value: "half-thickness L = thickness / 2 (heat from both sides)", source: "engineering practice for sous-vide bag in bath" },
-      { name: "Hold-time interpolation", value: "linear between bundled Annex 6 break points 130-147 F", source: "FDA Food Code Annex 6 Table A" },
+      { name: "Hold-time interpolation", value: "linear between the Table 3-2 rows, 130-158 F", source: "FDA Food Code 3-401.11(B)(2) Table 3-2" },
       { name: "Limitation", value: "this is a screen, not a HACCP plan", source: "spec-v10 §B.3 simplified-screening invariant" },
     ],
   },

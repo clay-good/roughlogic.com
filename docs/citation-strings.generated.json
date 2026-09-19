@@ -239,7 +239,7 @@
     },
     "sous-vide-pasteurization": {
       "group": "calc-electrical.js (Group A)",
-      "stamp": "Citation: Per FDA Food Code Annex 6 Table A 6.5-log Salmonella reduction values. Come-up time from the slab-form thermal-diffusion approximation (Heisler chart at centerline, Fo ~ 0.4). Bundled food-thermal-diffusivity values per public engineering references (Baldwin Practical Guide to Sous Vide Cooking). Local food-safety authority and a qualified processing authority govern commercial-kitchen use. Free at fda.gov/food/retail-food-protection/fda-food-code."
+      "stamp": "Citation: Per FDA Food Code 3-401.11(B)(2) Table 3-2 holding times (whole meat roasts). Come-up time from the one-term slab solution at the centerline, Fo = 2.245 for a 99.5% approach. Bundled food-thermal-diffusivity values per public engineering references (Baldwin Practical Guide to Sous Vide Cooking). Local food-safety authority and a qualified processing authority govern commercial-kitchen use. Free at fda.gov/food/retail-food-protection/fda-food-code."
     },
     "spl-atmospheric": {
       "group": "calc-electrical.js (Group A)",
