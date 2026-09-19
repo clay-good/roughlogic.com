@@ -6722,8 +6722,8 @@
       "date": "2026-09-01"
     },
     "/tools/shearwall-overturning/": {
-      "sha": "96715f1127574042",
-      "date": "2026-09-01"
+      "sha": "62ef4e005c70f4fb",
+      "date": "2026-09-19"
     },
     "/tools/sheathing-takeoff/": {
       "sha": "fcba1fb72ea53480",
@@ -8562,8 +8562,8 @@
       "date": "2026-09-01"
     },
     "/tools/weld-visual-acceptance/": {
-      "sha": "9c68f65a0471aeef",
-      "date": "2026-09-09"
+      "sha": "84754ed4646f87e6",
+      "date": "2026-09-19"
     },
     "/tools/welded-wire-mesh/": {
       "sha": "a58db588332ab0dd",

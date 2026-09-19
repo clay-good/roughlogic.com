@@ -106381,7 +106381,7 @@
     "measured_leg_in": 0.3125,
     "undersize_length_in": 3,
     "weld_length_in": 20,
-    "allowed_undersize_in": 0.0625,
+    "allowed_undersize_in": 0.125,
     "allowed_undersize_fraction": 0.1,
     "measured_undercut_in": 0.03,
     "allowed_undercut_in": 0.03125,

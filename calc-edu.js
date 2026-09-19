@@ -449,22 +449,13 @@ export function computeScientificNotation({ value }) {
   const ax = Math.abs(x);
   const exponent = Math.floor(Math.log10(ax));
   const mantissa = sign * (ax / Math.pow(10, exponent));
-  // Significant-figure count from the string form, ignoring leading
-  // zeros, leading sign, and the decimal point.
-  let s = String(value).trim();
-  if (s.startsWith("-") || s.startsWith("+")) s = s.slice(1);
-  // strip leading zeros (but keep a single zero if the input was 0.x form)
-  s = s.replace(/^0+/, "");
-  if (s.startsWith(".")) {
-    // 0.0034 -> ".0034"; strip the leading dot and any following zeros
-    s = s.slice(1).replace(/^0+/, "");
-  }
-  // remove the decimal point
-  s = s.replace(".", "");
-  // remove trailing exponent if present (e.g. 1.5e3 -> 15)
-  s = s.replace(/e[-+]?\d+$/i, "");
-  const sigFigs = s.length || 1;
-  const rendered = fmt(mantissa, 6) + " * 10^" + exponent;
+  // Significant figures by the same rule as the sig-figs tile (countSigFigs):
+  // trailing zeros of an integer with no decimal point are ambiguous and not
+  // counted, so "100" is 1 and "100." is 3. The mantissa prints to that
+  // precision. Until 2026-09-19 this tile counted "100" as 3 against the
+  // sibling's 1 and always printed six decimals.
+  const sigFigs = countSigFigs(String(value));
+  const rendered = fmt(mantissa, Math.max(0, sigFigs - 1)) + " * 10^" + exponent;
   return { mantissa, exponent, sig_figs: sigFigs, rendered, value: x };
 }
 

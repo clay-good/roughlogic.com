@@ -148,7 +148,7 @@ LATERAL_RENDERERS["shearwall-overturning"] = _simpleRenderer({
   citation: "Citation: the AWC SDPWS segmented shear-wall model with the ASCE 7 / IBC allowable-stress overturning check -- unit shear v = V / b, overturning moment Mot = V h resisted by 0.6 times the dead-load moment W x (b/2) per the 0.6D + 0.7E ASD load combination, net holdown tension T = (V h - 0.6 W b/2) / b -- as compiled in the AWC/APA wood-frame shear-wall design guides. Returns the service-level unit shear and net holdown uplift of a single fully sheathed shear-wall segment. Uses the 0.6D resisting dead load of the ASD seismic combination (use the wind combination's factor where wind governs); W is the dead load tributary to and acting on the wall (not the whole floor); the wall is segmented (not force-transfer-around-openings or perforated); the sheathing nailing check and the compression-chord bearing check are separate. When 0.6D stabilizes the wall the uplift clamps to zero (no holdown required for overturning; sill anchorage and shear transfer still govern). The unit shear is compared against the SDPWS nominal capacity for the chosen sheathing and nailing. A design aid, not a substitute for the engineer of record's stamped lateral design.",
   example: shearwallOverturningExample.inputs,
   fields: [
-    { key: "v_lb", label: "Story shear V on the wall (lb)", kind: "number" },
+    { key: "v_lb", label: "ASD story shear V on the wall (lb; 0.7 x strength-level seismic or 0.6 x wind)", kind: "number" },
     { key: "b_ft", label: "Shear-wall length b (ft)", kind: "number" },
     { key: "h_ft", label: "Shear-wall height h (ft)", kind: "number" },
     { key: "w_lb", label: "Tributary dead load W (lb)", kind: "number", default: 0 },

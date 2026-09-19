@@ -285,6 +285,13 @@ test("computeScientificNotation: leading zeros are not significant; trailing zer
   assert.equal(r2.sig_figs, 4);
 });
 
+test("computeScientificNotation: agrees with countSigFigs on trailing integer zeros and prints to that precision", () => {
+  assert.equal(computeScientificNotation({ value: "100" }).sig_figs, 1);
+  assert.equal(computeScientificNotation({ value: "1200" }).sig_figs, 2);
+  assert.equal(computeScientificNotation({ value: "100." }).sig_figs, 3);
+  assert.match(computeScientificNotation({ value: "0.00347" }).rendered, /^3\.47 \* 10\^-3$/);
+});
+
 test("computeScientificNotation: non-finite input rejected", () => {
   const r = computeScientificNotation({ value: "not a number" });
   assert.ok(r.error);
