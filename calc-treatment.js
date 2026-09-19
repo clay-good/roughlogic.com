@@ -1520,7 +1520,6 @@ export function computeOilWaterSeparatorSizing({ flow_gpm = 50, oil_sg = 0.85, d
   if (!(water_viscosity_cp > 0)) return { error: "Water viscosity must be positive (cP)." };
   // Stokes rise velocity of the design oil droplet (API 421), computed in SI then converted to ft/min.
   const RHO_W_LB_FT3 = 62.3; // water at ~60 F
-  const F = 1.2;             // API 421 turbulence / short-circuit factor
   const d_m = droplet_micron * 1e-6;
   const rho_w = RHO_W_LB_FT3 * (0.45359237 / (0.3048 * 0.3048 * 0.3048));
   const rho_o = oil_sg * rho_w;
@@ -1528,19 +1527,32 @@ export function computeOilWaterSeparatorSizing({ flow_gpm = 50, oil_sg = 0.85, d
   const vt_ms = 9.81 * (rho_w - rho_o) * d_m * d_m / (18 * mu);
   const rise_velocity_ftmin = vt_ms * 3.28084 * 60;
   const q_ft3min = flow_gpm * (231 / 1728);
+  // API 421: F = Ft x Fs, Fs = 1.2 (short-circuiting) and Ft the turbulence
+  // factor at the design ratio vH / Vt, with vH = 15 Vt capped at 3 ft/min:
+  // Ft 1.07 / 1.14 / 1.27 / 1.37 / 1.45 at vH/Vt 3 / 6 / 10 / 15 / 20.
+  // Until 2026-09-19 F was a flat 1.2 (Ft = 1), about 27% short at 15.
+  const vh_ftmin = Math.min(15 * rise_velocity_ftmin, 3);
+  const vh_ratio = vh_ftmin / rise_velocity_ftmin;
+  const FT = [[3, 1.07], [6, 1.14], [10, 1.27], [15, 1.37], [20, 1.45]];
+  let ft;
+  if (vh_ratio <= FT[0][0]) ft = FT[0][1];
+  else { ft = FT[FT.length - 1][1]; for (let k = 1; k < FT.length; k++) if (vh_ratio <= FT[k][0]) { const [x0, y0] = FT[k - 1], [x1, y1] = FT[k]; ft = y0 + (vh_ratio - x0) * (y1 - y0) / (x1 - x0); break; } }
+  const F = ft * 1.2;
   const horizontal_area_ft2 = F * q_ft3min / rise_velocity_ftmin;
   if (![rise_velocity_ftmin, horizontal_area_ft2].every(Number.isFinite)) return { error: "Separator-sizing math is not a finite value." };
   return {
     rise_velocity_ftmin,
     horizontal_area_ft2,
-    note: "The minimum horizontal (plan) surface area of a gravity oil/water separator per API 421: an oil droplet rises at the Stokes velocity Vt = g (rho_w - rho_o) d^2 / (18 mu), and the separator must give the design droplet time to reach the surface before the flow carries it out, so the horizontal area = F x Q / Vt with a turbulence/short-circuit factor F of about 1.2 and the horizontal velocity held under about 15 x Vt (and under 3 ft/min). A 150 micron droplet of 0.85-SG oil in 60 F water rises about 0.33 ft/min, so 50 gpm needs about 24 ft^2 of surface. Colder water (higher viscosity) and smaller droplets slow the rise and demand more area; an emulsified or dissolved fraction will NOT separate by gravity and needs coalescing, DAF, or downstream treatment. A SCREEN, not a design: API 421, the manufacturer, and the engineer / AHJ govern the separator and the discharge permit." ,
+    vh_ratio,
+    f_total: F,
+    note: "The minimum horizontal (plan) surface area of a gravity oil/water separator per API 421 (F = Ft x 1.2, Ft read at vH / Vt with vH = 15 Vt up to 3 ft/min): an oil droplet rises at the Stokes velocity Vt = g (rho_w - rho_o) d^2 / (18 mu), and the separator must give the design droplet time to reach the surface before the flow carries it out, so the horizontal area = F x Q / Vt with a turbulence/short-circuit factor F of about 1.2 and the horizontal velocity held under about 15 x Vt (and under 3 ft/min). A 150 micron droplet of 0.85-SG oil in 60 F water rises about 0.33 ft/min, so 50 gpm needs about 24 ft^2 of surface. Colder water (higher viscosity) and smaller droplets slow the rise and demand more area; an emulsified or dissolved fraction will NOT separate by gravity and needs coalescing, DAF, or downstream treatment. A SCREEN, not a design: API 421, the manufacturer, and the engineer / AHJ govern the separator and the discharge permit." ,
   };
 }
 
 export const oilWaterSeparatorSizingExample = { inputs: { flow_gpm: 50, oil_sg: 0.85, droplet_micron: 150, water_viscosity_cp: 1.1 } };
 
 function _v943renderOilWaterSeparatorSizing(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: gravity oil/water separator surface area by name (API 421). rise velocity Vt = g(rho_w - rho_o)d^2/(18 mu) (Stokes); horizontal area = 1.2 x Q / Vt. A screen; API 421, the manufacturer, and the engineer / AHJ govern the separator and discharge.";
+  citationEl.textContent = "Citation: gravity oil/water separator surface area by name (API 421). rise velocity Vt = g(rho_w - rho_o)d^2/(18 mu) (Stokes); horizontal area = F x Q / Vt, F = Ft x 1.2 with the turbulence factor Ft at vH / Vt (vH = 15 Vt, max 3 ft/min). A screen; API 421, the manufacturer, and the engineer / AHJ govern the separator and discharge.";
   const q = makeNumber("Design flow (gpm)", "ows-q", { step: "any", min: "0" });
   const sg = makeNumber("Oil specific gravity", "ows-sg", { step: "any", min: "0" });
   const dm = makeNumber("Design droplet (micron)", "ows-dm", { step: "any", min: "0" });

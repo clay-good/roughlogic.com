@@ -29438,10 +29438,12 @@ import { computeOilWaterSeparatorSizing as _v943 } from "../../calc-treatment.js
 test("bounds: spec-v943 computeOilWaterSeparatorSizing pins the Stokes rise, area, and error seams", () => {
   const r = _v943({ flow_gpm: 50, oil_sg: 0.85, droplet_micron: 150, water_viscosity_cp: 1.1 });
   assert.ok(Math.abs(r.rise_velocity_ftmin - 0.328491) < 1e-4); // Vt = g(rho_w-rho_o)d^2/(18mu), SI -> ft/min
-  assert.ok(Math.abs(r.horizontal_area_ft2 - 24.4173) < 5e-3); // 1.2*(50*0.133681)/Vt
+  // API 421 F = Ft x 1.2; here vH = min(15 Vt, 3 ft/min) = 3, vH/Vt 9.13, Ft 1.242.
+  assert.ok(Math.abs(r.vh_ratio - 3 / r.rise_velocity_ftmin) < 1e-9);
+  assert.ok(Math.abs(r.horizontal_area_ft2 - 30.3216) < 5e-3);
   // Area is linear in flow: doubling the flow doubles the area; rise velocity is unchanged.
   const b = _v943({ flow_gpm: 100, oil_sg: 0.85, droplet_micron: 150, water_viscosity_cp: 1.1 });
-  assert.ok(Math.abs(b.horizontal_area_ft2 - 48.8345) < 5e-3);
+  assert.ok(Math.abs(b.horizontal_area_ft2 - 60.6433) < 5e-3);
   assert.ok(Math.abs(b.rise_velocity_ftmin - r.rise_velocity_ftmin) < 1e-9);
   // A smaller droplet slows the rise as d^2, demanding more area; a lighter (lower-SG) oil rises faster.
   const small = _v943({ flow_gpm: 50, oil_sg: 0.85, droplet_micron: 75, water_viscosity_cp: 1.1 });

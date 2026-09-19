@@ -62967,9 +62967,9 @@
   {
    "tile_id": "oil-water-separator-sizing",
    "source_publisher": "API Publication 421 (gravity oil/water separator, Stokes' law)",
-   "source_title": "50 gpm, 0.85 SG oil, 150 micron droplet, 1.1 cP water -> 0.328 ft/min rise, 24.4 ft^2 surface",
+   "source_title": "50 gpm, 0.85 SG oil, 150 micron droplet, 1.1 cP water -> 0.328 ft/min rise, 30.3 ft^2 surface",
    "source_edition_or_year": "spec-v943 worked example",
-   "source_section_or_page": "Vt=9.81*(rho_w-rho_o)*d^2/(18*mu) SI -> 0.3285 ft/min; area=1.2*(50*0.133681)/0.3285=24.42 ft^2",
+   "source_section_or_page": "Vt=9.81*(rho_w-rho_o)*d^2/(18*mu) SI -> 0.3285 ft/min; vH=min(15 Vt, 3)=3 ft/min, vH/Vt=9.13 -> Ft 1.242, F=Ft*1.2=1.490; area=1.490*(50*0.133681)/0.3285=30.32 ft^2",
    "verified_by": "rl",
    "verified_on": "2026-07-18",
    "inputs": {
@@ -62986,7 +62986,7 @@
      }
     },
     "horizontal_area_ft2": {
-     "value": 24.42,
+     "value": 30.3216,
      "tolerance": {
       "abs": 0.05
      }
@@ -62996,9 +62996,9 @@
   {
    "tile_id": "oil-water-separator-sizing",
    "source_publisher": "API Publication 421 (gravity oil/water separator, Stokes' law)",
-   "source_title": "cross-check: doubling the flow to 100 gpm doubles the required surface to 48.8 ft^2",
+   "source_title": "cross-check: doubling the flow to 100 gpm doubles the required surface to 60.6 ft^2",
    "source_edition_or_year": "spec-v943 worked example",
-   "source_section_or_page": "area=1.2*(100*0.133681)/0.3285=48.83 ft^2 (rise velocity unchanged by flow)",
+   "source_section_or_page": "area=1.490*(100*0.133681)/0.3285=60.64 ft^2 (rise velocity and F unchanged by flow)",
    "verified_by": "rl",
    "verified_on": "2026-07-18",
    "inputs": {
@@ -63009,7 +63009,7 @@
    },
    "outputs": {
     "horizontal_area_ft2": {
-     "value": 48.83,
+     "value": 60.6433,
      "tolerance": {
       "abs": 0.05
      }

@@ -6,6 +6,8 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **`oil-water-separator-sizing` used a flat F = 1.2.** API 421's design factor is F = Ft × Fs, with Fs = 1.2 for short-circuiting and a turbulence factor Ft of 1.07–1.45 read at the ratio of horizontal velocity to rise velocity (horizontal velocity 15 × Vt, capped at 3 ft/min). At the example, Ft is about 1.24 and the separator needs 30.3 ft², not 24.4.
+
 - **Two load distributions read against their standards.** `sliding-snow-load` packed the full sliding load into a lower roof narrower than 15 ft, raising the surcharge (32 psf on a 10 ft roof). ASCE 7 §7.9 spreads 0.4·pf·W over 15 ft and reduces the load in proportion on a narrower roof, so the surcharge stays at 21.3 psf. `restrained-pipe-length` divided the full thrust resultant 2PA·sin(Δ/2) by the soil resistance with no safety factor. DIPRA and AWWA M41 resolve the thrust along each leg, L = Sf·P·A·tan(Δ/2)/(Fs + Rs); a 90° bend at Sf 1.5 needs 42.4 ft each side, not 40.
 
 - **`heat-trace-sizing` checked the breaker against running current only.** Self-regulating cable draws two to three times its running current when it starts cold, as the tile's own note says, and that start current is what trips a breaker. The tile now takes the manufacturer's cold-start multiple (default 2) and passes the circuit only when the running current is within 80% of the breaker and the start current within its rating.

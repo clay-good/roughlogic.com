@@ -10465,7 +10465,7 @@ export const CITATIONS = {
     ],
   },
   "oil-water-separator-sizing": {
-    formula: "rise_velocity Vt = g x (rho_w - rho_o) x d^2 / (18 mu) (Stokes, computed in SI, converted to ft/min); horizontal_area_ft2 = F x Q / Vt, with F ~ 1.2 (turbulence factor) and Q in ft3/min.",
+    formula: "rise_velocity Vt = g x (rho_w - rho_o) x d^2 / (18 mu) (Stokes, computed in SI, converted to ft/min); horizontal_area_ft2 = F x Q / Vt, F = Ft x Fs with Fs = 1.2 (short-circuiting) and Ft the API 421 turbulence factor at vH / Vt (vH = 15 Vt, max 3 ft/min; Ft 1.07-1.45), Q in ft3/min.",
     edition: "API Publication 421 (Design and Operation of Oil-Water Separators) gravity-separator method with Stokes' law, by name; the manufacturer and the engineer / AHJ govern.",
     freeAccess: "Stokes' law is public physics; the API 421 turbulence factor (~1.2), the 150 micron design droplet, and the horizontal-velocity limits are the API 421 method, and the flow, oil SG, and viscosity come from the waste stream.",
     governance: GOVERNANCE.water,
