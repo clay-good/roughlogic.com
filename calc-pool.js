@@ -282,7 +282,7 @@ export function computePoolHeatPumpCapacity({
   const derated_cop = has_cop ? rated_cop * cop_derate_factor : 0;
   const cop_verdict = !has_cop
     ? "(no rated COP entered)"
-    : "the COP falls with the same conditions: " + fmt(rated_cop, 1) + " at rating becomes " + fmt(derated_cop, 1) + " at the entered factor. A unit advertised at a COP of 5 or 6 can be near 3 in the shoulder season, so the running cost per BTU roughly doubles at exactly the time of year the owner bought it for";
+    : "the COP " + (derated_cop < rated_cop ? "falls" : "rises") + " with the same conditions: " + fmt(rated_cop, 1) + " at rating becomes " + fmt(derated_cop, 1) + " at the entered factor. A unit advertised at a COP of 5 or 6 can be near 3 in the shoulder season, so the running cost per BTU roughly doubles at exactly the time of year the owner bought it for";
   const has_heatup = pool_gallons > 0 && temperature_rise_f > 0;
   const heat_required_btu = has_heatup ? pool_gallons * _POOL_BTU_PER_GAL_DEGF * temperature_rise_f : 0;
   // The heat pump only gains on the pool by what it delivers beyond the loss

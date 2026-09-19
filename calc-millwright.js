@@ -405,7 +405,7 @@ MILLWRIGHT_RENDERERS["coupling-alignment-tolerance"] = _simpleRenderer({
   outputs: [
     { key: "o", id: "cat-out-o", label: "Offset against tolerance", value: (r) => r.offset_verdict + (r.offset_pct_of_excellent === null ? "" : "; " + fmt(r.offset_pct_of_excellent, 0) + "% of the excellent column") },
     { key: "a", id: "cat-out-a", label: "Angularity against tolerance", value: (r) => r.angularity_verdict + (r.angularity_pct_of_excellent === null ? "" : "; " + fmt(r.angularity_pct_of_excellent, 0) + "% of the excellent column") },
-    { key: "v", id: "cat-out-v", label: "Verdict at speed", value: (r) => r.passes ? "inside the acceptable tolerance at " + fmt(r.rpm, 0) + " rpm on both counts" : "OUTSIDE the acceptable tolerance at " + fmt(r.rpm, 0) + " rpm -- and at half this speed the same readings would likely pass" },
+    { key: "v", id: "cat-out-v", label: "Verdict at speed", value: (r) => r.passes ? "inside the acceptable tolerance at " + fmt(r.rpm, 0) + " rpm on both counts" : "OUTSIDE the acceptable tolerance at " + fmt(r.rpm, 0) + " rpm" },
     { key: "s", id: "cat-out-s", label: "Spacer coupling", value: (r) => r.spacer_verdict },
     { key: "n", id: "cat-out-n", label: "Note", value: (r) => r.note },
   ],

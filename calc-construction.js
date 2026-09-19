@@ -11488,7 +11488,7 @@ CONSTRUCTION_RENDERERS["guard-post-load"] = _simpleRenderer({
     { key: "connection_lever_in", label: "Base connection lever arm / fastener spacing (in)", kind: "number" },
   ],
   outputs: [
-    { key: "l", id: "gpl-out-l", label: "Governing load at the post", value: (r) => fmt(r.governing_load_lb, 0) + " lb - " + (r.concentrated_governs ? "the 200 lb concentrated case" : "the uniform case at " + fmt(r.uniform_at_post_lb, 0) + " lb") },
+    { key: "l", id: "gpl-out-l", label: "Governing load at the post", value: (r) => fmt(r.governing_load_lb, 0) + " lb - " + (r.concentrated_governs ? "the concentrated case" : "the uniform case at " + fmt(r.uniform_at_post_lb, 0) + " lb") },
     { key: "m", id: "gpl-out-m", label: "Moment at the base", value: (r) => fmt(r.moment_inlb, 0) + " in-lb (" + fmt(r.moment_ftlb, 0) + " ft-lb)" },
     { key: "p", id: "gpl-out-p", label: "Post bending", value: (r) => "S = " + fmt(r.section_modulus_in3, 2) + " in^3, needs " + fmt(r.required_fb_psi, 0) + " psi" + (r.post_ok === null ? "" : r.post_ok ? " - OK at " + fmt(r.post_utilization * 100, 0) + "%" : " - OVER at " + fmt(r.post_utilization * 100, 0) + "%") },
     { key: "c", id: "gpl-out-c", label: "Force in the base connection", value: (r) => fmt(r.connection_force_lb, 0) + " lb per side - " + fmt(r.force_multiplier, 1) + "x the applied load" },

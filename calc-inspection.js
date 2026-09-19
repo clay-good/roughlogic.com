@@ -313,7 +313,7 @@ export function computeRtExposureTime({
   const geometry_verdict = !has_geometry
     ? "(no source size and material thickness entered)"
     : "geometric unsharpness is " + fmt(ug_base_in, 5) + " in at " + fmt(base_distance_in, 1) + " in"
-      + (has_new ? " and " + fmt(ug_new_in, 5) + " in at " + fmt(new_distance_in, 1) + " -- a " + fmt((1 - ug_new_in / ug_base_in) * 100, 0) + "% reduction bought with " + fmt(distance_ratio * distance_ratio, 2) + "x the exposure" : "");
+      + (has_new ? " and " + fmt(ug_new_in, 5) + " in at " + fmt(new_distance_in, 1) + (ug_new_in <= ug_base_in ? " -- a " + fmt((1 - ug_new_in / ug_base_in) * 100, 0) + "% reduction bought with " + fmt(distance_ratio * distance_ratio, 2) + "x the exposure" : " -- a " + fmt((ug_new_in / ug_base_in - 1) * 100, 0) + "% increase in unsharpness for " + fmt(distance_ratio * distance_ratio, 2) + "x the exposure") : "");
   const has_limit = unsharpness_limit_in > 0 && has_geometry;
   const base_passes = has_limit && ug_base_in <= unsharpness_limit_in;
   // The distance the limit actually requires -- the number that decides the shot.

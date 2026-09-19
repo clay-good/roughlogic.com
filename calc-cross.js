@@ -3457,7 +3457,7 @@ CROSS_RENDERERS["silica-table-1"] = _simpleRendererG({
 // OSHA then puts a factor on top: 1926.502(d)(8) requires a horizontal lifeline to maintain a
 // safety factor of at least two, and (d)(15) wants an anchorage good for 5,000 lb per employee
 // unless the whole system is engineered to that factor of two by a qualified person.
-// dims: in { span_ft: L, sag_ft: L, arrest_force_lb: M L T^-2, workers: dimensionless } out: { cable_tension_lb: M L T^-2, horizontal_pull_lb: M L T^-2, anchorage_demand_lb: M L T^-2, sag_for_target_ft: L }
+// dims: in { span_ft: L, sag_ft: L, arrest_force_lb: M L T^-2, workers: dimensionless } out: { cable_tension_lb: M L T^-2, horizontal_pull_lb: M L T^-2, anchorage_demand_lb: M L T^-2, sag_for_target_ft: L, target_tension_lb: M L T^-2 }
 export function computeLifelineTension({ span_ft = 0, sag_ft = 0, arrest_force_lb = 1800, workers = 1, safety_factor = 2, anchorage_capacity_lb = 0, target_tension_lb = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const L = Number(span_ft) || 0;
@@ -3509,7 +3509,7 @@ export function computeLifelineTension({ span_ft = 0, sag_ft = 0, arrest_force_l
     + (arrest_over_harness ? "NOTE THE ARREST FORCE ENTERED: " + W + " lb exceeds the 1,800 lb that 1926.502(d)(16)(ii) permits on an employee with a body harness, so the system fails on the worker before the anchors are reached. " : "")
     + "Not checked: the fall clearance below the lifeline, which grows with sag and is the reason sag cannot simply be maximised - that is a separate tile; the cable, its terminations, turnbuckles, and connectors, whose ratings are usually what governs before the anchor does; dynamic and impact effects beyond the static midspan case modelled here, and load applied off midspan, which changes the geometry; more than one worker loading the line at once, which this does not superpose; sag under self-weight before anyone falls; the maximum arresting force, deceleration distance of 3.5 ft, and 6 ft free-fall limits of 1926.502(d)(16); the structure the anchors are attached to, which is the usual real limit; and the requirement, which is not optional, that the whole system be designed and supervised by a QUALIFIED PERSON. A tension estimate, not a lifeline design; 29 CFR 1926 Subpart M and that qualified person govern.";
 
-  return { slant_ft, cable_tension_lb, horizontal_pull_lb, tension_multiple, angle_deg, anchorage_demand_lb, prescriptive_anchorage_lb, governing_anchorage_lb, engineered_governs, anchorage_ok, anchorage_deficit_lb, sag_for_target_ft, tension_at_double_sag_lb, arrest_over_harness, max_arresting_force_lb: MAF_HARNESS, free_fall_max_ft: FREE_FALL_MAX, decel_max_ft: DECEL_MAX, note };
+  return { slant_ft, cable_tension_lb, horizontal_pull_lb, tension_multiple, angle_deg, anchorage_demand_lb, prescriptive_anchorage_lb, governing_anchorage_lb, engineered_governs, anchorage_ok, anchorage_deficit_lb, sag_for_target_ft, target_tension_lb: target, tension_at_double_sag_lb, arrest_over_harness, max_arresting_force_lb: MAF_HARNESS, free_fall_max_ft: FREE_FALL_MAX, decel_max_ft: DECEL_MAX, note };
 }
 
 export const lifelineTensionExample = { inputs: { span_ft: 30, sag_ft: 1, arrest_force_lb: 1800, workers: 1, safety_factor: 2, anchorage_capacity_lb: 5000, target_tension_lb: 5000 } };
@@ -3532,7 +3532,7 @@ CROSS_RENDERERS["lifeline-tension"] = _simpleRendererG({
     { key: "d", id: "llt-out-d", label: "Double the sag", value: (r) => "tension falls to about " + fmt(r.tension_at_double_sag_lb, 0) + " lb" },
     { key: "a", id: "llt-out-a", label: "Anchorage required", value: (r) => fmt(r.governing_anchorage_lb, 0) + " lb - the " + (r.engineered_governs ? "engineered demand (" + fmt(r.anchorage_demand_lb, 0) + ") exceeds the 5,000 lb per worker figure" : "prescriptive 5,000 lb per worker figure exceeds the engineered demand (" + fmt(r.anchorage_demand_lb, 0) + ")") },
     { key: "c", id: "llt-out-c", label: "Against the capacity entered", value: (r) => r.anchorage_ok === null ? "not checked" : r.anchorage_ok ? "adequate" : "SHORT by " + fmt(r.anchorage_deficit_lb, 0) + " lb" },
-    { key: "s", id: "llt-out-s", label: "Sag needed for the target tension", value: (r) => r.sag_for_target_ft === null ? "no sag reaches that target - each half carries at least half the load" : fmt(r.sag_for_target_ft, 2) + " ft" },
+    { key: "s", id: "llt-out-s", label: "Sag needed for the target tension", value: (r) => !(r.target_tension_lb > 0) ? "(no target tension entered)" : r.sag_for_target_ft === null ? "no sag reaches that target - each half carries at least half the load" : fmt(r.sag_for_target_ft, 2) + " ft" },
     { key: "n", id: "llt-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeLifelineTension,

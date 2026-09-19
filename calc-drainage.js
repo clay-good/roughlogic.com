@@ -785,7 +785,7 @@ function renderTr55TimeOfConcentration(inputRegion, outputRegion, citationEl) {
       channel_n: rd(cN.input), channel_hyd_radius_ft: rd(cR.input), channel_length_ft: rd(cL.input), channel_slope: rd(cS.input),
     });
     if (r.error) { oTc.textContent = r.error; oSeg.textContent = "-"; oVel.textContent = "-"; oNote.textContent = ""; return; }
-    oTc.textContent = fmt(r.tc_min, 1) + " min (" + fmt(r.tc_hr, 3) + " hr)" + (r.sheet_over_100 ? " -- sheet length over 100 ft, TR-55 caps it" : "");
+    oTc.textContent = fmt(r.tc_min, 1) + " min (" + fmt(r.tc_hr, 3) + " hr)" + (r.sheet_over_100 ? " -- sheet length is over TR-55's 100 ft limit; this tc uses the full length, uncapped" : "");
     oSeg.textContent = fmt(r.tt_sheet_min, 1) + " / " + fmt(r.tt_shallow_min, 1) + " / " + fmt(r.tt_channel_min, 1) + " min";
     oVel.textContent = (r.v_shallow_fps === null ? "-" : fmt(r.v_shallow_fps, 2) + " ft/s") + " / " + (r.v_channel_fps === null ? "-" : fmt(r.v_channel_fps, 2) + " ft/s");
     oNote.textContent = r.note;

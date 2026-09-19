@@ -1934,7 +1934,7 @@ function renderHydrantAvailableFlow(inputRegion, outputRegion, citationEl) {
   const update = debounce(() => {
     const r = computeHydrantAvailableFlow({ static_psi: Number(s.input.value) || 0, residual_psi: Number(res.input.value) || 0, qf_gpm: Number(qf.input.value) || 0 });
     if (r.error) { oQ.textContent = r.error; oC.textContent = "-"; oN.textContent = ""; return; }
-    oQ.textContent = fmt(r.qr_gpm, 0) + " gpm (drop " + fmt(r.hf_psi, 0) + " -> 20 psi rated)";
+    oQ.textContent = fmt(r.qr_gpm, 0) + " gpm (test drop " + fmt(r.hf_psi, 0) + " psi; " + fmt(r.hr_psi, 0) + " psi drop to the 20 psi rated residual)";
     oC.textContent = "Class " + r.hydrant_class;
     oN.textContent = r.note;
   }, DEBOUNCE_MS);
