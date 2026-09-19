@@ -690,7 +690,8 @@ export function computeBrineCure({ mode = "brine", water_g = 0, salt_g = 0, meat
   const target = Number(target_pct) || 0;
   if (water < 0 || salt < 0 || meat < 0 || cure < 0 || !Number.isFinite(water) || !Number.isFinite(salt) || !Number.isFinite(meat) || !Number.isFinite(cure)) return { error: "Weights must be non-negative finite numbers (g)." };
   const NITRITE_FRACTION = 0.0625; // Prague Powder #1 is 6.25% sodium nitrite
-  const FSIS_INGOING_MAX_PPM = 156; // typical regulated ingoing maximum (user confirms current limit)
+  const FSIS_INGOING_MAX_PPM = 156; // 424.22 ingoing maximum on the green weight of the meat
+  const FSIS_PICKLE_MAX_PPM = 2400; // 424.21(c): 2 lb sodium nitrite per 100 gal of pickle
   let concentration, total;
   if (mode === "equilibrium") {
     total = meat + water + salt + cure;
@@ -708,13 +709,21 @@ export function computeBrineCure({ mode = "brine", water_g = 0, salt_g = 0, meat
   // in the pickle (its own total), which the meat then takes up at an uptake the operator controls.
   const nitriteBasis = mode === "equilibrium" ? meat : total;
   const nitritePpm = nitriteBasis > 0 && cure > 0 ? cure * NITRITE_FRACTION * 1e6 / nitriteBasis : 0;
+  // The two modes report DIFFERENT quantities against DIFFERENT limits. Equilibrium ppm is
+  // ingoing nitrite on the green weight of the meat, capped at 156 ppm (424.22). Brine ppm is
+  // the concentration of the pickle itself, which 424.21(c) caps at 2 lb sodium nitrite per
+  // 100 gal -- about 2,400 ppm -- and the meat's ingoing figure then follows the pump level.
+  const limit_ppm = mode === "equilibrium" ? FSIS_INGOING_MAX_PPM : FSIS_PICKLE_MAX_PPM;
+  const over_max = nitritePpm >= limit_ppm;
   const saltToAdd = target > 0 ? target * total / 100 - salt : null;
   return {
     concentration_pct: Number.isFinite(concentration) ? concentration : null,
     nitrite_ppm: Number.isFinite(nitritePpm) ? nitritePpm : null,
-    nitrite_over_max: nitritePpm >= FSIS_INGOING_MAX_PPM,
+    nitrite_over_max: over_max,
+    nitrite_limit_ppm: limit_ppm,
     salt_to_add_g: saltToAdd != null && Number.isFinite(saltToAdd) ? saltToAdd : null,
-    note: (nitritePpm >= FSIS_INGOING_MAX_PPM ? "Ingoing nitrite is at or above the regulated maximum - reduce cure (confirm the current FSIS limit). " : "")
+    note: (over_max ? (mode === "equilibrium" ? "Ingoing nitrite is at or above the 156 ppm maximum on the green weight of the meat - reduce cure (confirm the current FSIS limit). " : "This pickle is at or above the strength 9 CFR 424.21(c) permits, 2 lb sodium nitrite per 100 gal (about 2,400 ppm) - reduce cure (confirm the current FSIS limit). ") : "")
+      + (mode === "brine" ? "The ppm shown is the concentration of the PICKLE, not the ingoing nitrite in the meat: the meat takes up nitrite at the pump or immersion uptake the operator controls, and 424.21(c) limits an immersion pickle to 2 lb sodium nitrite per 100 gal rather than to the 156 ppm meat-basis figure. " : "")
       + "Salt % by weight (not by volume). Equilibrium cure assumes full absorption (real uptake varies). Prague Powder #1 is 6.25% sodium nitrite.",
   };
 }

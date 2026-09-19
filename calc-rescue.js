@@ -68,7 +68,7 @@ export const ROPE_RIGS = {
   "2:1": { ma: 2, pulleys: 1 },
   "3:1": { ma: 3, pulleys: 2 },
   "4:1": { ma: 4, pulleys: 3 },
-  "5:1": { ma: 5, pulleys: 3 },
+  "5:1": { ma: 5, pulleys: 4 },
   T_method: { ma: 5, pulleys: 4 },
   "5:1_piggyback": { ma: 5, pulleys: 4 },
 };

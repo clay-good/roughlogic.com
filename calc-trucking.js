@@ -222,12 +222,14 @@ export const palletLoadoutExample = {
 // remaining time before each FMCSA limit.
 
 export const HOS_PROFILES = {
-  "property_70_8": { drive_max: 11, on_duty_window: 14, weekly_max: 70, weekly_window_days: 8 },
-  "property_60_7": { drive_max: 11, on_duty_window: 14, weekly_max: 60, weekly_window_days: 7 },
+  "property_70_8": { drive_max: 11, on_duty_window: 14, weekly_max: 70, weekly_window_days: 8, off_duty_reset_hr: 10, window_is_clock: true, break_required: true },
+  "property_60_7": { drive_max: 11, on_duty_window: 14, weekly_max: 60, weekly_window_days: 7, off_duty_reset_hr: 10, window_is_clock: true, break_required: true },
   // Passenger-carrying drivers: 10 hr driving / 15 hr on-duty window, weekly
   // 60 hr / 7 days (FMCSA 49 CFR 395.5). The key name is a legacy identifier
   // kept for shared-URL back-compat; the rule it encodes is 60/7, not 70/7.
-  "passenger_70_7": { drive_max: 10, on_duty_window: 15, weekly_max: 60, weekly_window_days: 7 },
+  // 395.5: an 8-hour break resets the shift, the 15 hours is ACCUMULATED on-duty time rather
+  // than a consecutive clock, and the 30-minute break of 395.3(a)(3)(ii) does not apply.
+  "passenger_70_7": { drive_max: 10, on_duty_window: 15, weekly_max: 60, weekly_window_days: 7, off_duty_reset_hr: 8, window_is_clock: false, break_required: false },
 };
 
 // dims: in { profile: dimensionless, events: dimensionless, weekly_on_duty_used_hr: T, current_time_iso: dimensionless }
@@ -269,19 +271,19 @@ export function computeHOS({ profile = "property_70_8", events = [], weekly_on_d
       weekly_on_duty += hours;
       if (kind === "drive") { drive_used += hours; cumulative_drive_since_break += hours; }
       else if (hours >= 0.5) { break_taken = true; cumulative_drive_since_break = 0; }
-    } else if (hours >= 10) {
-      // A 10-hour rest resets the shift: new window, new 11 hours of driving.
+    } else if (hours >= p.off_duty_reset_hr) {
+      // The off-duty reset: 10 hours for property (395.3), 8 for passenger (395.5).
       drive_used = 0; on_duty_used = 0; window_elapsed = 0; on_shift = false;
       cumulative_drive_since_break = 0; break_taken = false;
     } else {
-      if (on_shift) window_elapsed += hours;
+      if (on_shift && p.window_is_clock) window_elapsed += hours;
       if (hours >= 0.5) { break_taken = true; cumulative_drive_since_break = 0; }
     }
   }
   const drive_remaining = Math.max(0, p.drive_max - drive_used);
   const on_duty_remaining = Math.max(0, p.on_duty_window - window_elapsed);
   const weekly_remaining = Math.max(0, p.weekly_max - (weekly_on_duty_used_hr + weekly_on_duty));
-  const needs_break_at_8_hours = cumulative_drive_since_break >= 8;
+  const needs_break_at_8_hours = p.break_required && cumulative_drive_since_break >= 8;
   // v8 §C.5: when current_time_iso is supplied, derive the next legal
   // drive-start timestamp. Driver may resume after a 30-minute break (if
   // mid-shift break required), or after a 10-hour reset (if on-duty
@@ -292,10 +294,10 @@ export function computeHOS({ profile = "property_70_8", events = [], weekly_on_d
     const t = new Date(current_time_iso);
     if (Number.isNaN(t.getTime())) return { error: "current_time_iso must be a valid ISO date string." };
     if (drive_remaining <= 0 || on_duty_remaining <= 0) {
-      // 10-hour reset.
-      const next = new Date(t.getTime() + 10 * 3600 * 1000);
+      // The profile's off-duty reset.
+      const next = new Date(t.getTime() + p.off_duty_reset_hr * 3600 * 1000);
       next_drive_start_iso = next.toISOString();
-      next_drive_reason = "10-hour reset (drive or on-duty window exhausted)";
+      next_drive_reason = p.off_duty_reset_hr + "-hour reset (drive or on-duty window exhausted)";
     } else if (needs_break_at_8_hours) {
       // 30-minute break.
       const next = new Date(t.getTime() + 30 * 60 * 1000);
@@ -688,7 +690,7 @@ function renderHOS(inputRegion, outputRegion, citationEl) {
   }
 
   const oD = makeOutputLine(outputRegion, "Drive used / remaining", "hos-out-d");
-  const oW = makeOutputLine(outputRegion, "On-duty remaining (14 hr window)", "hos-out-w");
+  const oW = makeOutputLine(outputRegion, "On-duty remaining (14 hr window; 15 hr on duty for passenger)", "hos-out-w");
   const oWk = makeOutputLine(outputRegion, "Weekly remaining", "hos-out-wk");
   const oB = makeOutputLine(outputRegion, "30-min break", "hos-out-b");
   const oNT = makeOutputLine(outputRegion, "Next legal drive start (if current time supplied)", "hos-out-nt");

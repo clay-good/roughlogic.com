@@ -32677,9 +32677,14 @@ test("bounds: spec-v1102 computeAdvanceWarningSignSpacing pins all four MUTCD Ta
   assert.ok(one.open_highway_ok === false && two.open_highway_ok === false);
   // Speed check omitted when no speed is entered.
   assert.ok(r.speed_rule_ok === true && _v1102({ road_type: "rural", sign_count: 3 }).speed_rule_ok === null);
-  // A short urban series fails the 8-12x rule at highway speed - the flag has to be able to fire.
-  const mismatch = _v1102({ road_type: "urban-low", sign_count: 3, speed_mph: 65 });
-  assert.ok(mismatch.total_ft === 300 && mismatch.speed_rule_ok === false);
+  // The 8-12x placement is rural / open-highway guidance, so it is not applied to an urban series.
+  const urban = _v1102({ road_type: "urban-low", sign_count: 3, speed_mph: 65 });
+  assert.ok(urban.total_ft === 300 && urban.speed_rule_ok === null && urban.speed_rule_min_ft === null);
+  // On an expressway it applies and can fire: 3 x 1000 ft of series against 8 x 65 = 520 ft minimum.
+  const xw = _v1102({ road_type: "expressway", sign_count: 1, speed_mph: 65 });
+  assert.ok(xw.speed_rule_min_ft === 520 && xw.speed_rule_ok === true);
+  const xwShort = _v1102({ road_type: "rural", sign_count: 1, speed_mph: 65 });
+  assert.ok(xwShort.total_ft === 500 && xwShort.speed_rule_ok === false);
   // Error seams.
   assert.ok("error" in _v1102({ road_type: "gravel", sign_count: 3 }));
   assert.ok("error" in _v1102({ road_type: "rural", sign_count: 0 }));

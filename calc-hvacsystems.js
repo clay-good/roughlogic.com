@@ -590,7 +590,7 @@ export function computeBoilerPipeSizing({
 
   const warnings = [];
   if (dT < 10 || dT > 40) warnings.push("Delta-T outside the typical 10-40 F hydronic range; high-delta-T commercial systems exist but are non-default.");
-  if (oversize) warnings.push("Flow exceeds the largest tabulated size (3 in) at the velocity ceiling; parallel mains or a larger main are required.");
+  if (oversize) warnings.push("Flow exceeds the largest tabulated " + tbl.label + " size (" + pick.size + " in) at the velocity ceiling; parallel mains or a larger main are required.");
 
   return {
     gpm,

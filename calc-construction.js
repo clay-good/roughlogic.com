@@ -10936,8 +10936,11 @@ export function computeAdvanceWarningSignSpacing({ road_type = "rural", sign_cou
   const first_sign_ft = positions_ft[positions_ft.length - 1];
   const total_ft = first_sign_ft;
   const open_highway_ok = total_ft >= 1500;
+  // The 8-to-12-times-speed placement and the 1,500 ft open-highway extent are RURAL /
+  // open-highway guidance; on an urban street Table 6C-1's own distances govern.
+  const rural_placement = road_type === "rural" || road_type === "expressway";
   let speed_rule_min_ft = null, speed_rule_max_ft = null, speed_rule_ok = null;
-  if (v > 0) {
+  if (v > 0 && rural_placement) {
     speed_rule_min_ft = 8 * v;
     speed_rule_max_ft = 12 * v;
     speed_rule_ok = first_sign_ft >= speed_rule_min_ft;
@@ -10965,10 +10968,10 @@ export function computeAdvanceWarningSignSpacing({ road_type = "rural", sign_cou
     speed_rule_min_ft, speed_rule_max_ft, speed_rule_ok,
     approach_volume_vph: vol, flagger_cycle_min: cyc, vehicle_spacing_ft: spacing,
     queued_vehicles, queue_length_ft, queue_passes_first_sign, queue_verdict,
-    note: "Read the series BACKWARD from how it is signed: the A dimension runs from the transition or point of restriction to the sign CLOSEST to the work, and the third sign - the farthest upstream - is the FIRST one a driver actually sees. The distances here are measured upstream from the transition, so the last number is where the advance warning area begins: " + total_ft + " ft ahead of the taper. Rural placement carries a separate guidance: the first warning sign should sit 8 to 12 times the speed limit in mph"
+    note: "Read the series BACKWARD from how it is signed: the A dimension runs from the transition or point of restriction to the sign CLOSEST to the work, and the third sign - the farthest upstream - is the FIRST one a driver actually sees. The distances here are measured upstream from the transition, so the last number is where the advance warning area begins: " + total_ft + " ft ahead of the taper. " + (rural_placement ? "Rural and open-highway placement carries a separate guidance: the first warning sign should sit 8 to 12 times the speed limit in mph" : "On an urban street the Table 6C-1 distances above govern; the 8-to-12-times-speed placement and the 1,500 ft advance warning area are rural and open-highway guidance, so they are not applied here")
       + (speed_rule_min_ft !== null ? " (" + speed_rule_min_ft + " to " + speed_rule_max_ft + " ft at the speed entered, and this layout puts it at " + first_sign_ft + " ft)" : "")
-      + ", and for open highway conditions the advance warning area should extend 1,500 ft or more"
-      + (open_highway_ok ? "" : " - which this layout does NOT reach, so it suits a lower-speed setting")
+      + (rural_placement ? ", and for open highway conditions the advance warning area should extend 1,500 ft or more" : "")
+      + (rural_placement && !open_highway_ok ? " - which this layout does NOT reach, so it suits a lower-speed setting" : "")
       + ". These are SUGGESTED distances: the urban speed category is set by the highway agency, and site distance, sight lines, and intersections routinely force adjustment. The taper itself is the separate traffic-taper-length tile. The MUTCD as adopted by your state and the agency's traffic control plan govern.",
   };
 }
@@ -14481,8 +14484,10 @@ export function computeRampDetailCheck({ cross_slope_ratio = 48, clear_width_in 
   const rw = Number(run_width_in) || 0;
   const rails = handrails === "yes";
   const turns = changes_direction === "yes";
-  const EDGES = { none: "none provided", "extended-floor": "the floor surface extended 12 in beyond the handrail", "curb-or-barrier": "a curb or barrier stopping a 4 in sphere within 4 in of the surface" };
-  if (!(edge_protection in EDGES)) return { error: "Edge protection must be none, extended-floor, or curb-or-barrier." };
+  // 405.9 Exception 1 waives edge protection on a ramp not required to have handrails whose sides
+  // are flared per 406.3; Exception 2 waives it on a landing side serving an adjoining run or stair.
+  const EDGES = { none: "none provided", "extended-floor": "the floor surface extended 12 in beyond the handrail", "curb-or-barrier": "a curb or barrier stopping a 4 in sphere within 4 in of the surface", "not-required": "not required here under a 405.9 exception" };
+  if (!(edge_protection in EDGES)) return { error: "Edge protection must be none, extended-floor, curb-or-barrier, or not-required." };
   if (handrails !== "yes" && handrails !== "no") return { error: "State whether handrails are provided (yes or no)." };
   if (changes_direction !== "yes" && changes_direction !== "no") return { error: "State whether the ramp changes direction at this landing (yes or no)." };
   if (!(xs > 0)) return { error: "Cross slope ratio must be positive (48 for the 1:48 maximum)." };
@@ -14523,7 +14528,7 @@ export function computeRampDetailCheck({ cross_slope_ratio = 48, clear_width_in 
     + (rails ? "With rails taking " + intr + " in, a " + w + " in ramp leaves " + effective_width_in.toFixed(1) + " in between them: " + (width_ok ? "OK. " : "SHORT by " + width_deficit_in.toFixed(1) + " in. ") + (handrails_cost_compliance ? "NOTE WHAT HAPPENED: the ramp itself is 36 in or wider and the HANDRAILS took it under. A 36 in ramp with rails on both sides is not a 36 in ramp any more, and the fix is a wider slab rather than a different rail - " + width_needed_between_rails_in.toFixed(1) + " in of ramp to leave 36 between the rails. " : "") : "No handrails entered, so the full " + w + " in is the clear width: " + (width_ok ? "OK. " : "SHORT by " + width_deficit_in.toFixed(1) + " in. ") + "Note that adding handrails later measures BETWEEN them and can take a compliant ramp under. ")
     + "LANDING (405.7): 60 in long minimum and at least as wide as the widest run leading to it" + (turns ? " - and this ramp CHANGES DIRECTION here, so the landing must be 60 x 60 minimum" + (turn_drives_width ? ", which at a " + rw + " in run is the 60 in that governs rather than the run width. This is the rule that turns a switchback into a wider footprint than anyone drew. " : ". ") : ". ")
     + "Required " + required_landing_length_in + " x " + required_landing_width_in + " in; entered " + ll + " x " + lw + " in: " + (landing_ok ? "OK. " : (landing_length_ok ? "" : "length short by " + landing_length_deficit_in.toFixed(1) + " in. ") + (landing_width_ok ? "" : "width short by " + landing_width_deficit_in.toFixed(1) + " in. "))
-    + "EDGE PROTECTION (405.9): " + EDGES[edge_protection] + ". " + (edge_ok ? "" : "NONE IS PROVIDED, and a handrail is not edge protection - the hazard is at the WHEEL, not at the hand. The two ways to satisfy it are the floor surface extended 12 in beyond the handrail, or a curb or barrier that stops a 4 in sphere from passing within 4 in of the surface. ")
+    + "EDGE PROTECTION (405.9): " + EDGES[edge_protection] + ". " + (edge_protection === "not-required" ? "Exception 1 covers a ramp that is not required to have handrails and whose sides comply with 406.3; Exception 2 covers the side of a landing serving an adjoining ramp run or stair. Confirm the exception applies before relying on it. " : "") + (edge_ok ? "" : "NONE IS PROVIDED, and a handrail is not edge protection - the hazard is at the WHEEL, not at the hand. The two ways to satisfy it are the floor surface extended 12 in beyond the handrail, or a curb or barrier that stops a 4 in sphere from passing within 4 in of the surface. ")
     + (passes ? "The items entered PASS. " : "The items entered DO NOT pass. ")
     + "Not checked: the running slope, the number of runs, the 30 in maximum rise per run, and the total ramp length, which are a separate tile; handrail height, grip, clearance, and extensions, which are their own tile; the surface, changes in level, and openings on the ramp and its landings; doors opening onto landings and the maneuvering clearance they need, which routinely conflicts with the 60 in landing; wet conditions and the requirement that outdoor ramps and their approaches be designed so water does not accumulate; the structure and its frost depth; curb ramps, which are section 406 and a different set of rules; and state and local accessibility law. A ramp detail screen, not a ramp design; the 2010 ADA Standards and the authority having jurisdiction govern.";
 
@@ -14544,7 +14549,7 @@ CONSTRUCTION_RENDERERS["ramp-detail-check"] = _simpleRenderer({
     { key: "landing_width_in", label: "Landing clear width (in)", kind: "number" },
     { key: "run_width_in", label: "Width of the widest run reaching the landing (in)", kind: "number" },
     { key: "changes_direction", label: "Ramp changes direction at this landing?", kind: "select", options: [{ value: "yes", label: "Yes", selected: true }, { value: "no", label: "No" }] },
-    { key: "edge_protection", label: "Edge protection", kind: "select", options: [{ value: "none", label: "None provided", selected: true }, { value: "extended-floor", label: "Floor extended 12 in beyond the handrail" }, { value: "curb-or-barrier", label: "Curb or barrier stopping a 4 in sphere" }] },
+    { key: "edge_protection", label: "Edge protection", kind: "select", options: [{ value: "none", label: "None provided", selected: true }, { value: "extended-floor", label: "Floor extended 12 in beyond the handrail" }, { value: "not-required", label: "Not required (405.9 Exception 1 or 2)" }, { value: "curb-or-barrier", label: "Curb or barrier stopping a 4 in sphere" }] },
   ],
   outputs: [
     { key: "x", id: "rdc-out-x", label: "Cross slope (1:48 max)", value: (r) => fmt(r.cross_slope_pct, 2) + "% - " + (r.cross_slope_ok ? "OK" : "TOO STEEP") },
