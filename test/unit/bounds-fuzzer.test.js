@@ -50700,7 +50700,7 @@ test("bounds: spec-v1716 computeMeltFurnaceEnergy -- efficiency and yield are tw
   assert.ok(Math.abs(_v1716({ ...base, casting_yield_pct: 100 }).btu_per_saleable_lb * 2000 - r.input_btu) < 1e-6);
   // The gas furnace takes 2.3x the input for exactly the same metal.
   assert.ok(Math.abs(r.alt_input_mmbtu / r.input_mmbtu - 70 / 30) < 1e-9);
-  // Aluminium takes about 82% of iron's energy per pound at under half the melting point.
+  // Aluminium takes about 82% of iron's energy per pound at little more than half the melting point.
   assert.ok(Math.abs(base.alt_theoretical_btu_lb / base.theoretical_btu_lb - 0.82) < 0.01);
   assert.ok(_v1716({ ...base, furnace_efficiency_pct: 0 }).error);
 });

@@ -6,6 +6,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **Notes whose own numbers disagreed with them.**
+  - The melt-furnace wording from earlier today said aluminum melts at "less than half" cast iron's temperature. At about 1,220°F against 2,150°F it is a little more than half.
+  - The casting-yield note called 70% yield "a third or more" gating and risers; it is 30–40%.
+  - The fault-asymmetry note put the stiff-limit peak at 2.6×. The tile's own formula approaches 2√2 = 2.83× (and √3 for RMS) only as X/R grows without bound; it is about 2.6× and 1.6× at X/R 20–25.
+  - The battery-inverter note named 1/0 Cu for a 115.7 A requirement; #1 Cu at 130 A is the smallest that works.
+  - The assembly R-value note's "7.3" and "24%" hold only with no air films or finishes; at the tile's defaults they are about 7.0 and 18%, which is what its verdict prints.
+  - The Betz note said the optimum slows the flow to a third. It slows the air at the rotor by a third; only the far wake is at a third.
+
 - **`oil-water-separator-sizing` used a flat F = 1.2.** API 421's design factor is F = Ft × Fs, with Fs = 1.2 for short-circuiting and a turbulence factor Ft of 1.07–1.45 read at the ratio of horizontal velocity to rise velocity (horizontal velocity 15 × Vt, capped at 3 ft/min). At the example, Ft is about 1.24 and the separator needs 30.3 ft², not 24.4.
 
 - **Two load distributions read against their standards.** `sliding-snow-load` packed the full sliding load into a lower roof narrower than 15 ft, raising the surcharge (32 psf on a 10 ft roof). ASCE 7 §7.9 spreads 0.4·pf·W over 15 ft and reduces the load in proportion on a narrower roof, so the surcharge stays at 21.3 psf. `restrained-pipe-length` divided the full thrust resultant 2PA·sin(Δ/2) by the soil resistance with no safety factor. DIPRA and AWWA M41 resolve the thrust along each leg, L = Sf·P·A·tan(Δ/2)/(Fs + Rs); a 90° bend at Sf 1.5 needs 42.4 ft each side, not 40.
