@@ -6,6 +6,12 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **Bolt torque ignored that proof strength falls with diameter, and fall-protection clearance was short for two connectors.** A check of the bundled data shards against the standards they name found:
+  - `bolt-torque` applied one proof strength to every diameter. SAE J429 Grade 2 drops from 55 to 33 ksi above ¾ in, and Grade 5 and A325 drop from 85 to 74 ksi above 1 in. A ⅞ in Grade 2 bolt was torqued for 67% more preload than its proof load allows at the 75% target. The `bolt-grades` shard also still said A325 was 92 ksi, which is its yield, not its proof.
+  - `fall-protection-clearance` gave a 12 ft lanyard 4 ft of deceleration; ANSI Z359.13 allows up to 60 in. A leading-edge SRL was modeled as 2 ft of free fall plus 1 ft to arrest, but it is anchored as low as the feet (up to 5 ft of free fall) and a Class 2 unit may arrest in 60 in. Required clearance was 1 ft short and 7 ft short.
+  - `helical-pile` Kt read 9 / 7 / 5 for the 1.75 in, 2⅞ in and 3½ in shafts against the AC358 defaults of 10 / 9 / 7 it cites. That was conservative, but it wasn't the cited values.
+  - The `lumber-properties` shard still gave southern pine No. 2 E = 1.6 million psi, the No. 2 Dense figure (the tile already used 1.4). The `insulation-k-values` shard's key said Btu·in/hr·ft²·°F over values that are per foot. The `poe-classes` shard gave 802.3bt Type 4 a 50 V minimum; the standard requires 52.
+
 - **The footing tile's soil bearing values ran 25–67% above the IBC table they cite.** `footing-area` (and its shard `data/construction/soil-bearing.json`) gave 5,000 psf for sandy gravel, 3,000 for sand, 2,500 for silty sand and 2,000 for silty clay. IBC Table 1806.2 gives 3,000 for sandy gravel and gravel (GW, GP), 2,000 for sands and silty or clayey sands and gravels, and 1,500 for clays and silts. On sandy gravel the old value sized a footing 40% smaller than the code allows. A duplicate-table sweep also found `pipe-expansion` using 3.7e-5 in/in/°F for CPVC, where its two sibling tiles and the published FlowGuard figure use 3.4e-5; growth was 8.8% high. Both shards, the generator, and the plumbing and construction hash chains were updated.
 
 - **Tables that held their last row past where they end, and reference labels a year or an edition behind.** Two catalog-wide sweeps looked for each pattern.

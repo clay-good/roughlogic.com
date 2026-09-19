@@ -304,7 +304,7 @@ const POE_CLASSES_DATA = {
     { id: "af", label: "802.3af Type 1", pse_W: 15.4, pd_min_W: 12.95, pse_min_V: 44 },
     { id: "at", label: "802.3at Type 2", pse_W: 30.0, pd_min_W: 25.5, pse_min_V: 50 },
     { id: "bt3", label: "802.3bt Type 3", pse_W: 60.0, pd_min_W: 51.0, pse_min_V: 50 },
-    { id: "bt4", label: "802.3bt Type 4", pse_W: 90.0, pd_min_W: 71.3, pse_min_V: 50 },
+    { id: "bt4", label: "802.3bt Type 4", pse_W: 90.0, pd_min_W: 71.3, pse_min_V: 52 },
   ],
   cable_loop_ohms_per_100m: {
     Cat5e: 9.38,
@@ -415,7 +415,7 @@ const ACI_211_CURVES = {
 
 const BOLT_GRADES_DATA = {
   source: "ASTM / SAE proof-load benchmarks (cited by name only). Tensile stress areas per ANSI/ASME B1.1 short form.",
-  proof_loads_psi: { SAE_2: 55000, SAE_5: 85000, SAE_8: 120000, ASTM_A307: 36000, ASTM_A325: 92000, ASTM_A490: 120000 },
+  proof_loads_psi: { SAE_2: 55000, SAE_5: 85000, SAE_8: 120000, ASTM_A307: 36000, ASTM_A325: 85000, ASTM_A490: 120000 },
   k_factors: { dry: 0.20, oiled: 0.18, antiseize: 0.15 },
   tensile_areas_in2: {
     "0.25": 0.0318, "0.3125": 0.0524, "0.375": 0.0775, "0.4375": 0.1063, "0.5": 0.1419,
@@ -740,7 +740,7 @@ const LUMBER_PROPERTIES = {
     "DF-L_No2": { Fb_psi: 900, E_psi: 1600000, density_lb_ft3: 32 },
     "DF-L_No1": { Fb_psi: 1000, E_psi: 1700000, density_lb_ft3: 32 },
     "SPF_No2": { Fb_psi: 875, E_psi: 1400000, density_lb_ft3: 28 },
-    "SYP_No2": { Fb_psi: 1100, E_psi: 1600000, density_lb_ft3: 36 },
+    "SYP_No2": { Fb_psi: 1100, E_psi: 1400000, density_lb_ft3: 36 },
     "Hem-Fir_No2": { Fb_psi: 850, E_psi: 1300000, density_lb_ft3: 27 },
   },
   nominal_to_actual_in: {
@@ -1011,8 +1011,8 @@ const FALL_PROTECTION_BENCHMARKS_DATA = {
   source: "Manufacturer connector-decel benchmarks for personal fall arrest. 3M / Capital Safety, MSA, Honeywell-Miller cited by name. Free-fall and deceleration values from each manufacturer's published Connector Specification.",
   values: {
     "shock-absorbing-lanyard-6ft":  { decel_ft: 3.5, free_fall_ft: 6, description: "6 ft shock-absorbing lanyard" },
-    "shock-absorbing-lanyard-12ft": { decel_ft: 4.0, free_fall_ft: 12, description: "12 ft shock-absorbing lanyard" },
-    "self-retracting-leading-edge": { decel_ft: 1.0, free_fall_ft: 2, description: "Leading-edge SRL" },
+    "shock-absorbing-lanyard-12ft": { decel_ft: 5.0, free_fall_ft: 12, description: "12 ft shock-absorbing lanyard" },
+    "self-retracting-leading-edge": { decel_ft: 5.0, free_fall_ft: 5, description: "Leading-edge SRL" },
     "self-retracting-overhead":     { decel_ft: 1.0, free_fall_ft: 2, description: "Overhead SRL" },
   },
   notes: "Required clearance = free_fall + decel + worker_height + harness_stretch + safety_factor.",
@@ -1051,9 +1051,9 @@ const HELICAL_PILE_KT_DATA = {
   description: "Empirical multiplier Kt: ultimate axial capacity (lb) = Kt × installation torque (ft-lb). Lower for larger / smoother shafts.",
   values: {
     "1.5_inch_solid":  { Kt: 10, description: "1.5 inch solid square shaft (manufacturer typical)" },
-    "1.75_inch_solid": { Kt: 9,  description: "1.75 inch solid square shaft" },
-    "2.875_inch_pipe": { Kt: 7,  description: "2.875 inch round pipe shaft" },
-    "3.5_inch_pipe":   { Kt: 5,  description: "3.5 inch round pipe shaft" },
+    "1.75_inch_solid": { Kt: 10, description: "1.75 inch solid square shaft" },
+    "2.875_inch_pipe": { Kt: 9,  description: "2.875 inch round pipe shaft" },
+    "3.5_inch_pipe":   { Kt: 7,  description: "3.5 inch round pipe shaft" },
   },
 };
 
@@ -1125,12 +1125,12 @@ const REFRIGERANT_PT_TABLES_DATA = {
 const INSULATION_K_VALUES_DATA = {
   source: "Manufacturer-attributed thermal-conductivity k values for common pipe / duct insulation types. ASHRAE Handbook Fundamentals chapter 25 by name.",
   values: {
-    fiberglass:       { k_BTU_in_per_hr_ft2_F: 0.025, description: "Mineral fiberglass pipe insulation (manufacturer typical)" },
-    mineral_wool:     { k_BTU_in_per_hr_ft2_F: 0.026, description: "Mineral wool pipe insulation (manufacturer typical)" },
-    calcium_silicate: { k_BTU_in_per_hr_ft2_F: 0.040, description: "Calcium silicate (high-temp service)" },
-    elastomeric:      { k_BTU_in_per_hr_ft2_F: 0.026, description: "Elastomeric foam (Armaflex / Aeroflex typical)" },
-    polyiso:          { k_BTU_in_per_hr_ft2_F: 0.018, description: "Polyisocyanurate rigid (manufacturer typical)" },
-    pheno_foam:       { k_BTU_in_per_hr_ft2_F: 0.014, description: "Phenolic foam (manufacturer typical)" },
+    fiberglass:       { k_BTU_per_hr_ft_F: 0.025, description: "Mineral fiberglass pipe insulation (manufacturer typical)" },
+    mineral_wool:     { k_BTU_per_hr_ft_F: 0.026, description: "Mineral wool pipe insulation (manufacturer typical)" },
+    calcium_silicate: { k_BTU_per_hr_ft_F: 0.040, description: "Calcium silicate (high-temp service)" },
+    elastomeric:      { k_BTU_per_hr_ft_F: 0.026, description: "Elastomeric foam (Armaflex / Aeroflex typical)" },
+    polyiso:          { k_BTU_per_hr_ft_F: 0.018, description: "Polyisocyanurate rigid (manufacturer typical)" },
+    pheno_foam:       { k_BTU_per_hr_ft_F: 0.014, description: "Phenolic foam (manufacturer typical)" },
   },
 };
 

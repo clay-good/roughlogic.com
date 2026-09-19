@@ -1819,8 +1819,13 @@ import {
 
 export const FALL_PROTECTION_DECEL = {
   "shock-absorbing-lanyard-6ft":  { decel_ft: 3.5, free_fall_ft: 6, description: "6 ft shock-absorbing lanyard" },
-  "shock-absorbing-lanyard-12ft": { decel_ft: 4.0, free_fall_ft: 12, description: "12 ft shock-absorbing lanyard" },
-  "self-retracting-leading-edge": { decel_ft: 1.0, free_fall_ft: 2, description: "Leading-edge SRL" },
+  // ANSI/ASSP Z359.13 lets a 12 ft free-fall lanyard decelerate up to 60 in;
+  // a leading-edge SRL (Z359.14 Class 2) is anchored as low as the feet, so
+  // up to 5 ft of free fall, and may arrest in up to 60 in -- before any edge
+  // deflection. Until 2026-09-19 these read 4 ft and 2 + 1 ft, understating
+  // the clearance by 1 ft and by 7 ft.
+  "shock-absorbing-lanyard-12ft": { decel_ft: 5.0, free_fall_ft: 12, description: "12 ft shock-absorbing lanyard" },
+  "self-retracting-leading-edge": { decel_ft: 5.0, free_fall_ft: 5, description: "Leading-edge SRL (foot-level anchor)" },
   "self-retracting-overhead":     { decel_ft: 1.0, free_fall_ft: 2, description: "Overhead SRL" },
 };
 

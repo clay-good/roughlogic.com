@@ -1659,10 +1659,21 @@ export const concreteMixDesignExample = { inputs: { strength_psi: 4000, exposure
 //
 // T = K * D * F (short form). Bundled proof loads from public ASTM/SAE benchmarks.
 
+// Proof strength for the smallest size range of each grade.
 export const BOLT_PROOF_LOADS_PSI = {
   SAE_2: 55000, SAE_5: 85000, SAE_8: 120000,
   ASTM_A307: 36000, ASTM_A325: 85000, ASTM_A490: 120000,
 };
+// Proof strength steps DOWN with diameter: SAE J429 Grade 2 is 55 ksi only
+// through 3/4 in and 33 ksi from 7/8 to 1-1/2 in; Grade 5 and A325 are 85 ksi
+// through 1 in and 74 ksi above. Until 2026-09-19 one value ran every size,
+// so a 7/8 in Grade 2 bolt was torqued for 67% more preload than its proof
+// load allows at the 75% target -- enough to yield it.
+function _boltProofPsi(grade, d) {
+  if (grade === "SAE_2" && d > 0.75) return 33000;
+  if ((grade === "SAE_5" || grade === "ASTM_A325") && d > 1) return 74000;
+  return BOLT_PROOF_LOADS_PSI[grade];
+}
 
 export const TORQUE_K_FACTOR = { dry: 0.20, oiled: 0.18, antiseize: 0.15 };
 
@@ -1683,7 +1694,7 @@ export function computeBoltTorque({ grade = "SAE_5", diameter_in = 0.5, lubricat
   if (!(preload_fraction > 0 && preload_fraction <= 1)) return { error: "Preload fraction must be 0..1." };
   const At = BOLT_TENSILE_AREA_IN2[diameter_in];
   if (!Number.isFinite(At)) return { error: "Unsupported bolt diameter." };
-  const F = proof * At * preload_fraction;
+  const F = _boltProofPsi(grade, diameter_in) * At * preload_fraction;
   const T_in_lb = K * diameter_in * F;
   const T_ft_lb = T_in_lb / 12;
   return { K, F_lb: F, torque_in_lb: T_in_lb, torque_ft_lb: T_ft_lb };
@@ -2411,9 +2422,12 @@ export const plywoodSpanExample = {
 
 export const HELICAL_PILE_KT = {
   "1.5_inch_solid":  { Kt: 10, description: "1.5 inch solid square shaft (manufacturer typical)" },
-  "1.75_inch_solid": { Kt: 9,  description: "1.75 inch solid square shaft" },
-  "2.875_inch_pipe": { Kt: 7,  description: "2.875 inch round pipe shaft" },
-  "3.5_inch_pipe":   { Kt: 5,  description: "3.5 inch round pipe shaft" },
+  // ICC-ES AC358 default Kt: 10 for 1.5 and 1.75 in square shafts, 9 for
+  // 2-7/8 in and 7 for 3-1/2 in round shafts. Until 2026-09-19 the last
+  // three read 9 / 7 / 5 (conservative, but not the values cited).
+  "1.75_inch_solid": { Kt: 10, description: "1.75 inch solid square shaft" },
+  "2.875_inch_pipe": { Kt: 9,  description: "2.875 inch round pipe shaft" },
+  "3.5_inch_pipe":   { Kt: 7,  description: "3.5 inch round pipe shaft" },
 };
 
 // dims: in { shaft: dimensionless, torque_ft_lb: M L^2 T^-2, factor_of_safety: dimensionless } out: { capacity_lb: M L T^-2 }

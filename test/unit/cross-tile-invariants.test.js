@@ -10987,7 +10987,12 @@ test("monotonicity: computeFallProtectionClearance required_clearance_ft = free_
   assert.ok(plusWh.remaining_clearance_ft < baseR.remaining_clearance_ft,
     `more worker height should reduce remaining: ${plusWh.remaining_clearance_ft} vs ${baseR.remaining_clearance_ft}`);
   // Connector free-fall ordering pin (SRL 2 < 6 ft lanyard 6 < 12 ft lanyard 12).
-  const srl = computeFallProtectionClearance({ connector: "self-retracting-leading-edge", worker_height_ft: 5, harness_stretch_ft: 1, safety_factor_ft: 1, actual_clearance_ft: 30 });
+  const srl = computeFallProtectionClearance({ connector: "self-retracting-overhead", worker_height_ft: 5, harness_stretch_ft: 1, safety_factor_ft: 1, actual_clearance_ft: 30 });
+  // A leading-edge SRL anchored at the feet free-falls up to 5 ft and arrests in up to 60 in (Z359.14 Class 2).
+  const srlLe = computeFallProtectionClearance({ connector: "self-retracting-leading-edge", worker_height_ft: 5, harness_stretch_ft: 1, safety_factor_ft: 1, actual_clearance_ft: 30 });
+  assert.equal(srlLe.required_clearance_ft, 5 + 5 + 5 + 1 + 1);
+  // Z359.13: a 12 ft free-fall lanyard may decelerate up to 60 in.
+  assert.equal(computeFallProtectionClearance({ connector: "shock-absorbing-lanyard-12ft", worker_height_ft: 5, harness_stretch_ft: 1, safety_factor_ft: 1, actual_clearance_ft: 30 }).required_clearance_ft, 12 + 5 + 5 + 1 + 1);
   const lan6 = computeFallProtectionClearance({ connector: "shock-absorbing-lanyard-6ft", worker_height_ft: 5, harness_stretch_ft: 1, safety_factor_ft: 1, actual_clearance_ft: 30 });
   const lan12 = computeFallProtectionClearance({ connector: "shock-absorbing-lanyard-12ft", worker_height_ft: 5, harness_stretch_ft: 1, safety_factor_ft: 1, actual_clearance_ft: 30 });
   assert.equal(srl.free_fall_ft, 2);
@@ -11140,10 +11145,11 @@ test("monotonicity: computeHelicalPile ultimate_lb = Kt * torque_ft_lb strictly 
   const s2875 = computeHelicalPile({ shaft: "2.875_inch_pipe", torque_ft_lb: 4500, factor_of_safety: 2 });
   const s35 = computeHelicalPile({ shaft: "3.5_inch_pipe", torque_ft_lb: 4500, factor_of_safety: 2 });
   assert.equal(s15.Kt, 10);
-  assert.equal(s175.Kt, 9);
-  assert.equal(s2875.Kt, 7);
-  assert.equal(s35.Kt, 5);
-  assert.ok(s15.ultimate_lb > s175.ultimate_lb && s175.ultimate_lb > s2875.ultimate_lb && s2875.ultimate_lb > s35.ultimate_lb,
+  // ICC-ES AC358 defaults: 10 for 1.5 and 1.75 in square, 9 for 2-7/8 in, 7 for 3-1/2 in round.
+  assert.equal(s175.Kt, 10);
+  assert.equal(s2875.Kt, 9);
+  assert.equal(s35.Kt, 7);
+  assert.ok(s15.ultimate_lb >= s175.ultimate_lb && s175.ultimate_lb > s2875.ultimate_lb && s2875.ultimate_lb > s35.ultimate_lb,
     `Kt ordering: ${s15.ultimate_lb} > ${s175.ultimate_lb} > ${s2875.ultimate_lb} > ${s35.ultimate_lb}`);
   // Example pin: 1.5 in solid, 4500 ft-lb, FoS 2 -> ultimate 45000, allowable 22500.
   assert.equal(s15.ultimate_lb, 45000);

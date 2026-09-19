@@ -303,7 +303,7 @@ A standard the tiles cite but no shard holds data from has no manifest to appear
 - Source: Manufacturer-attributed thermal-conductivity k values for common pipe / duct insulation types. ASHRAE Handbook Fundamentals chapter 25 cited by name.
 - License: Manufacturer-attributed numeric values.
 - Cadence: Quarterly recheck.
-- Shard layout: `values` keyed by insulation type (k_BTU_in_per_hr_ft2_F, description).
+- Shard layout: `values` keyed by insulation type (k_BTU_per_hr_ft_F -- per FOOT of thickness, the radii being in feet -- and description).
 
 ### data/hvac/affinity-laws.json (v3)
 

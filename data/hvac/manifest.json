@@ -69,7 +69,7 @@
     {
       "file": "insulation-k-values.json",
       "name": "Insulation thermal conductivity (manufacturer-attributed)",
-      "gzip_size_bytes": 382
+      "gzip_size_bytes": 376
     }
   ],
   "hashes": {
@@ -85,6 +85,6 @@
     "duct-roughness.json": "2d2a810a36408889fd872a49edd9133fa5a773ac68a277b156dc60ce77beeae4",
     "duct-fittings.json": "a55e7eddff68eb4ae21bbca54f65d4af7e2753c8c9c30b13e58608e87aeab38a",
     "refrigerant-pt-tables.json": "b46a9a2976f2c57aa0c82d672d3a3794b7755f3ae0528ca7134335f62e149684",
-    "insulation-k-values.json": "56ed59c744fecd3a6ab07750709972bc22ada7da5234c65b92c6a7a553f0994f"
+    "insulation-k-values.json": "c76675be762242c84f70fecab94fea277341365cd99a93681335b0fc02a5364d"
   }
 }
