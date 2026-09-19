@@ -11543,7 +11543,7 @@
   {
    "tile_id": "pacing-distance",
    "source_publisher": "Project (first-principles)",
-   "source_title": "Pacing distance: pace_length = calibration_distance / calibration_paces; distance = current_paces * pace_length * terrain_factor",
+   "source_title": "Pacing distance: pace_length = calibration_distance / calibration_paces; distance = current_paces * pace_length / terrain_factor",
    "source_edition_or_year": "n/a; standard land-survey pacing technique (terrain_factor 1.0 for flat)",
    "source_section_or_page": "100 ft over 38 paces / 120 current paces / flat -> pace 2.63 ft / distance 315.79 ft (96.25 m)",
    "verified_by": "rl",
@@ -11583,9 +11583,9 @@
   },
   {
    "tile_id": "backcountry-needs",
-   "source_publisher": "USGS / NOLS backcountry-planning bundled water + kcal tables",
+   "source_publisher": "Project (first-principles) over a resting-metabolism baseline",
    "source_title": "Per-day water and kcal by ambient + exertion band; trip totals scale linearly",
-   "source_edition_or_year": "USGS / NOLS bundled tables (moderate ambient + moderate exertion / 170 lb -> 3.5 L/day, 2890 kcal/day)",
+   "source_edition_or_year": "the tile's own bands: 1,500 kcal BMR at 150 lb x activity 1.7; moderate ambient 3.5 L/day",
    "source_section_or_page": "170 lb / moderate / moderate / 3 days / solo -> 3.5 L/day x 3 = 10.5 L; 2890 kcal/day x 3 = 8670 kcal",
    "verified_by": "rl",
    "verified_on": "2026-05-11",
@@ -106495,13 +106495,13 @@
      }
     },
     "ug_base_in": {
-     "value": 0.00375,
+     "value": 0.00387097,
      "tolerance": {
       "pct": 0.5
      }
     },
     "ug_new_in": {
-     "value": 0.0025,
+     "value": 0.00255319,
      "tolerance": {
       "pct": 0.5
      }

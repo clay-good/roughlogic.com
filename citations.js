@@ -7383,13 +7383,13 @@ export const CITATIONS = {
   // practice backcountry water / kcal benchmarks.
 
   "pacing-distance": {
-    formula: "Distance = pace_count × stride_length × terrain_factor. Terrain factors: flat 1.0 / rolling 0.9 / steep 0.8 / brush 0.7 / snow 0.6.",
+    formula: "Distance = pace_count × calibrated pace length ÷ terrain factor, the factor being how many more paces rough ground takes per unit distance: flat 1.00 / rolling 1.10 / steep 1.25 / brush 1.30 / snow 1.40.",
     edition: "U.S. Army FM 3-25.26 (Map Reading and Land Navigation) and FM 21-26 (predecessor) by name.",
     freeAccess: "U.S. Army field manuals free at army.mil and at archive.org.",
     governance: GOVERNANCE.field,
     editionNote: "Single-edition (FM 3-25.26).",
     assumptions: [
-      { name: "Terrain factors", value: "flat 1.0 / rolling 0.9 / steep 0.8 / brush 0.7 / snow 0.6", source: "FM 3-25.26 typical" },
+      { name: "Terrain factors", value: "divide by flat 1.00 / rolling 1.10 / steep 1.25 / brush 1.30 / snow 1.40; a planning convention -- FM 3-25.26 names slope, vegetation, snow and fatigue as shortening the pace but gives no factors, so calibrate on the ground you will walk", source: "project convention" },
     ],
   },
   "bearing-conversion": {
@@ -7423,7 +7423,7 @@ export const CITATIONS = {
     ],
   },
   "backcountry-needs": {
-    formula: "Water L/day = base × ambient_factor (cool 3 / moderate 4 / hot 6 / extreme 8) × group_size × days. Kcal/day = base × exertion_factor (easy 2500 / moderate 3500 / hard 4500 / extreme 5500) × group × days.",
+    formula: "Water L/day by ambient band (cool 2.0 / moderate 3.5 / hot 5.0 / extreme 6.0) × group_size × days. Kcal/day = a resting (BMR) baseline of 1,500 kcal at 150 lb, scaled with body weight, × an activity factor (easy 1.4 / moderate 1.7 / hard 2.0 / extreme 2.5) × group × days.",
     edition: "U.S. Army FM 21-10 (Field Hygiene and Sanitation) + USDA Dietary Reference Intakes by name; ACSM (American College of Sports Medicine) Position Stand on hydration by name.",
     freeAccess: "USDA DRI free at nal.usda.gov; ACSM Position Stands free at acsm.org.",
     governance: GOVERNANCE.field,
@@ -22662,7 +22662,7 @@ export const CITATIONS = {
     ],
   },
   "rt-exposure-time": {
-    formula: "exposure scales with the INVERSE SQUARE of source-to-film distance, t2 = t1 x (d2/d1)^2; geometric unsharpness Ug = source size x material thickness / distance falls only in direct proportion; and source activity decays as 0.5^(days / half-life), Ir-192 at 73.83 days and Co-60 at 1,925.3 days.",
+    formula: "exposure scales with the INVERSE SQUARE of source-to-film distance, t2 = t1 x (d2/d1)^2; geometric unsharpness Ug = source size x material thickness / (source-to-film distance - thickness), the source-to-object distance of ASME V T-274, falls only in direct proportion; and source activity decays as 0.5^(days / half-life), Ir-192 at 73.83 days and Co-60 at 1,925.3 days.",
     edition: "Radiographic technique arithmetic. The unsharpness LIMIT comes from the applicable code section for the thickness and is entered, as is the half-life so both common industrial sources are covered.",
     freeAccess: "One inverse-square relation, one geometric ratio, and one exponential decay.",
     governance: GOVERNANCE.general,
@@ -22687,7 +22687,7 @@ export const CITATIONS = {
     ],
   },
   "mt-yoke-coil-amperage": {
-    formula: "circular field current = part diameter x amperes per inch; coil shot amp-turns = 35,000 / (L/D + 2) at high fill factor or 45,000 / (L/D + 2) at low, with L/D bounded between 2 and 15; and the yoke lift check of 10 lb on AC or 40 lb on DC at maximum pole spacing.",
+    formula: "circular field current = part diameter x amperes per inch; coil shot amp-turns = 35,000 / (L/D + 2) at high fill factor or 45,000 / (L/D) at low with the part against the coil wall, with L/D bounded between 2 and 15; and the yoke lift check of 10 lb on AC or 40 lb on DC at maximum pole spacing.",
     edition: "Magnetic particle starting currents as ASTM E1444 and E709 practice state them. The amperes per inch is entered (commonly 300 to 800) because it depends on the part and the technique.",
     freeAccess: "Two published formulae and one lift-test figure.",
     governance: GOVERNANCE.general,
@@ -22763,7 +22763,7 @@ export const CITATIONS = {
     edition: "Post-weld heat treatment cycle arithmetic. Every parameter -- rates, minimum, threshold, constants, ceiling and the code's definition of GOVERNING THICKNESS -- is entered from the applicable code, which for a joint between unequal thicknesses does not simply take the thicker member.",
     freeAccess: "Arithmetic on entered code parameters; no code table is reproduced.",
     governance: GOVERNANCE.general,
-    editionNote: "The controlled ramps either side of the hold frequently exceed the hold itself, so a schedule written on the hold alone is wrong by a factor of two or more. THE RATES ARE THE PART MOST OFTEN VIOLATED, and the reason for the limit is mechanism rather than caution: heating or cooling a heavy section too fast puts a thermal gradient through exactly the material the treatment exists to relieve, which ADDS residual stress rather than removing it. Breaking the rate produces nothing visible at the time and saves real schedule, which is why it goes. Thickness compounds three times over -- doubling it doubles the hold and halves both permitted rates -- so the cycle grows with thickness in every one of its three parts. And the governing thickness is defined by the code rather than by measurement, so getting it wrong moves the hold and both rate limits together.",
+    editionNote: "The controlled ramps either side of the hold frequently exceed the hold itself, so a schedule written on the hold alone is wrong by a factor of two or more. THE RATES ARE THE PART MOST OFTEN VIOLATED, and the reason for the limit is mechanism rather than caution: heating or cooling a heavy section too fast puts a thermal gradient through exactly the material the treatment exists to relieve, which ADDS residual stress rather than removing it. Breaking the rate produces nothing visible at the time and saves real schedule, which is why it goes. Thickness compounds three times over -- on a linear hold rate doubling it doubles the hold and halves both permitted rates -- so the cycle grows with thickness in every one of its three parts. And the governing thickness is defined by the code rather than by measurement, so getting it wrong moves the hold and both rate limits together.",
     assumptions: [
       { name: "All code parameters are entered", value: "rates, minimum, threshold, constants and ceiling", source: "ASME VIII, B31.1/B31.3, AWS D1.1" },
       { name: "Governing thickness is a code definition", value: "for unequal thicknesses it is not simply the thicker member", source: "the applicable code" },

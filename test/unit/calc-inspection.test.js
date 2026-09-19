@@ -50,7 +50,7 @@ test("restricted area: the gamma constant is per foot, and Ir-192's is 0.48 R/h 
 test("RT: inverse square, geometric unsharpness, and Ir-192's 73.83-day half-life", () => {
   const r = computeRtExposureTime({ base_exposure_s: 60, base_distance_in: 24, new_distance_in: 36, source_size_in: 0.12, material_thickness_in: 0.75, days_elapsed: 73.83, half_life_days: 73.83, unsharpness_limit_in: 0.0208 });
   close(r.new_exposure_s, 60 * (36 / 24) ** 2, "inverse square");
-  close(r.ug_base_in, 0.12 * 0.75 / 24, "Ug = F t / D");
+  close(r.ug_base_in, 0.12 * 0.75 / (24 - 0.75), "Ug = F t / D, D source-to-object");
   close(r.activity_pct, 50, "one half-life");
 });
 

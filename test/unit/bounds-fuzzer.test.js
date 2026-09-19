@@ -50746,10 +50746,11 @@ test("bounds: spec-v1666 computeRtExposureTime -- inverse square against linear 
   const base = { base_exposure_s: 60, base_distance_in: 24, new_distance_in: 36, source_size_in: 0.120, material_thickness_in: 0.75, days_elapsed: 60, half_life_days: 73.83, unsharpness_limit_in: 0.0208 };
   const r = _v1666(base);
   assert.ok(Math.abs(r.new_exposure_s - 135) < 1e-9);
-  assert.ok(Math.abs(r.ug_base_in - 0.00375) < 1e-12);
-  assert.ok(Math.abs(r.ug_new_in - 0.0025) < 1e-12);
-  // Unsharpness improves LINEARLY while exposure worsens QUADRATICALLY.
-  assert.ok(Math.abs(r.ug_base_in / r.ug_new_in - 1.5) < 1e-12);
+  // ASME V T-274: Ug = F t / (SFD - t), the source-to-object distance.
+  assert.ok(Math.abs(r.ug_base_in - 0.12 * 0.75 / 23.25) < 1e-12);
+  assert.ok(Math.abs(r.ug_new_in - 0.12 * 0.75 / 35.25) < 1e-12);
+  // Unsharpness improves roughly LINEARLY while exposure worsens QUADRATICALLY.
+  assert.ok(Math.abs(r.ug_base_in / r.ug_new_in - 35.25 / 23.25) < 1e-12);
   assert.ok(Math.abs(r.new_exposure_s / 60 - 2.25) < 1e-12);
   // IDENTITY: one half-life leaves exactly 50% of the activity.
   assert.ok(Math.abs(_v1666({ ...base, days_elapsed: 73.83 }).activity_pct - 50) < 1e-9);

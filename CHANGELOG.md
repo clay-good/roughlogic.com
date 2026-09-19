@@ -6,6 +6,12 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **Radiography unsharpness used the film distance, a magnetic-particle citation printed the formula the code had already corrected, and two field citations described numbers the tiles do not compute.**
+  - `rt-exposure-time` divided by the source-to-film distance. ASME V T-274 defines Ug = F·d/D with D the source-to-object distance (the film distance less the thickness). The example's Ug is 0.00387 in, not 0.00375, about 3% low in the unsafe direction.
+  - `mt-yoke-coil-amperage` computes the low-fill coil shot as 45,000/(L/D), but both of its printed citations still read 45,000/(L/D + 2), which would ask 25% less current at the example.
+  - `pwht-holding-time` capped the cooling rate at the 400°F/h heating ceiling. UCS-56 caps cooling at 500°F/h, so thin sections were sent down slower than required. The "doubling thickness doubles the hold" note now says it holds on a linear rate; the UCS-56 P-No. 1 hold flattens past 2 in.
+  - `pacing-distance` and `backcountry-needs` cited terrain factors and water and calorie tables the code never used. `backcountry-needs` also called a resting metabolic baseline "sedentary". The citations now state the tiles' own model, and the pacing factors say what they are: a convention, since FM 3-25.26 publishes none.
+
 - **A turnout's clearance point sat 47 ft too far out, and two air-density tiles used a barometric constant the catalog's own psychrometrics does not.**
   - `turnout-frog-lead` took the track centerlines to meet at the frog. At the theoretical point of frog the gauge lines cross, so the centerlines are already one gauge (4 ft 8½ in) apart. For a No. 10 frog and 13 ft centers the clearance point is about 83 ft past the frog, not 130, and anything between them was wrongly reported as fouling.
   - `turbine-density-correction` and `air-density-correction` used (1 − 6.73e-6·z)^5.258, credited to ASHRAE. ASHRAE Fundamentals Ch. 1 Eq. 3 in feet is (1 − 6.8754e-6·z)^5.2559, the form `psychrometric` already used, and it gives the standard atmosphere's 0.832 at 5,000 ft, not 0.835.

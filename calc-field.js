@@ -166,8 +166,9 @@ export function computeBackcountryNeeds({ body_weight_lb = 0, ambient_band = "mo
   if (!Number.isFinite(water_l)) return { error: "Unknown ambient band." };
   const factor = EXERTION_KCAL_FACTOR[exertion];
   if (!Number.isFinite(factor)) return { error: "Unknown exertion level." };
-  // Kcal per day from a public Mifflin-St Jeor sedentary baseline approx
-  // 1500 kcal at 150 lb scaled linearly with weight, multiplied by exertion factor.
+  // Kcal per day from a resting (BMR) baseline of about 1,500 kcal at 150 lb
+  // (Mifflin-St Jeor lands near 1,460-1,630 for a 150 lb adult), scaled
+  // linearly with weight and multiplied by an activity factor.
   const baseline_kcal = (body_weight_lb / 150) * 1500;
   const kcal_per_day = baseline_kcal * factor;
   const water_per_day = water_l;

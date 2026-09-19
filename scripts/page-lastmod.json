@@ -2,7 +2,7 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "a062bf75cdc83a1b",
+      "sha": "41a2971b68ef0eb7",
       "date": "2026-09-19"
     },
     "/tools/": {
@@ -410,8 +410,8 @@
       "date": "2026-09-01"
     },
     "/tools/backcountry-needs/": {
-      "sha": "ca196e1fef3af91f",
-      "date": "2026-09-01"
+      "sha": "89ce208c4253560e",
+      "date": "2026-09-19"
     },
     "/tools/backflow/": {
       "sha": "829cbd8c536f5cdf",
@@ -4782,8 +4782,8 @@
       "date": "2026-09-19"
     },
     "/tools/mt-yoke-coil-amperage/": {
-      "sha": "0cef2f7ff5a17c8c",
-      "date": "2026-09-09"
+      "sha": "f1320852ba2f0d45",
+      "date": "2026-09-19"
     },
     "/tools/mua-tempering-load/": {
       "sha": "88b092bcdae61093",
@@ -5042,8 +5042,8 @@
       "date": "2026-09-04"
     },
     "/tools/pacing-distance/": {
-      "sha": "9575928598677395",
-      "date": "2026-09-01"
+      "sha": "4289addced9b6550",
+      "date": "2026-09-19"
     },
     "/tools/packaging-yield-loss/": {
       "sha": "8294812f34d6b7a8",
@@ -5774,8 +5774,8 @@
       "date": "2026-09-19"
     },
     "/tools/pwht-holding-time/": {
-      "sha": "de048ad5802528ab",
-      "date": "2026-09-09"
+      "sha": "d148458f195a3951",
+      "date": "2026-09-19"
     },
     "/tools/pyramid-frustum-volume/": {
       "sha": "a11a0d34280d5852",
@@ -6354,8 +6354,8 @@
       "date": "2026-09-09"
     },
     "/tools/rt-exposure-time/": {
-      "sha": "ed98d0239c63113b",
-      "date": "2026-09-09"
+      "sha": "7da6f804ba33b336",
+      "date": "2026-09-19"
     },
     "/tools/rt-restricted-area/": {
       "sha": "dd25723ec4a345f3",
