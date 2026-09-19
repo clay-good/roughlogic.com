@@ -9979,7 +9979,7 @@ export const CITATIONS = {
     ],
   },
   "restrained-pipe-length": {
-    formula: "area_in2 = (PI/4) x od_in^2; thrust_lb = 2 x pressure_psi x area_in2 x sin(bend_angle_deg/2); length_each_side_ft = thrust_lb / unit_resistance_plf.",
+    formula: "area_in2 = (PI/4) x od_in^2; thrust_lb = 2 x pressure_psi x area_in2 x sin(bend_angle_deg/2); length_each_side_ft = Sf x pressure_psi x area_in2 x tan(bend_angle_deg/2) / unit_resistance_plf (DIPRA / AWWA M41, Sf commonly 1.5).",
     edition: "Thrust and restrained-length identity by name (thrust = 2 P A sin(bend/2); length = thrust / unit resistance); first-principles statics.",
     freeAccess: "The thrust geometry is public first-principles statics; the unit soil resistance comes from the restraint manufacturer's tables.",
     governance: GOVERNANCE.general,
@@ -17042,7 +17042,7 @@ export const CITATIONS = {
     ],
   },
   "sliding-snow-load": {
-    formula: "total = 0.4 x pf_upper x W (lb/ft); distributed over min(15 ft, lower_width); surcharge = total / distribution width (psf).",
+    formula: "total = 0.4 x pf_upper x W (lb/ft) over 15 ft, reduced in proportion (x lower_width / 15) on a lower roof narrower than 15 ft; surcharge = total / distribution width (psf).",
     edition: "The ASCE 7 §7.9 sliding snow load on a lower roof, by name.",
     freeAccess: "ASCE 7 is available through the ASCE Library at ascelibrary.org; the §7.9 sliding-load relation is public.",
     governance: GOVERNANCE.general,

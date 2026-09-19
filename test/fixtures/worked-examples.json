@@ -58617,7 +58617,7 @@
    "source_publisher": "Thrust / restrained-length identity (first-principles)",
    "source_title": "12 in main, 150 psi, 90-degree bend, 600 lb/ft soil resistance",
    "source_edition_or_year": "spec-v832 worked example",
-   "source_section_or_page": "area = (PI/4)*12^2 = 113.1; thrust = 2*150*113.1*sin(45) = 23,992; length = 23,992/600 = 40 ft",
+   "source_section_or_page": "area = (PI/4)*12^2 = 113.1; thrust = 2*150*113.1*sin(45) = 23,992; length = 1.5*150*113.1*tan(45)/600 = 42.4 ft (DIPRA / M41, Sf 1.5)",
    "verified_by": "rl",
    "verified_on": "2026-07-17",
    "inputs": {
@@ -58640,7 +58640,7 @@
      }
     },
     "length_each_side_ft": {
-     "value": 39.99,
+     "value": 42.4115,
      "tolerance": {
       "abs": 0.01
      }
@@ -58650,9 +58650,9 @@
   {
    "tile_id": "restrained-pipe-length",
    "source_publisher": "Thrust / restrained-length identity (first-principles)",
-   "source_title": "cross-check: a 45-degree bend needs half the restraint",
+   "source_title": "cross-check: a 45-degree bend needs well under half the restraint",
    "source_edition_or_year": "spec-v832 worked example",
-   "source_section_or_page": "thrust = 2*150*113.1*sin(22.5) = 12,984; length = 12,984/600 = 21.6 ft",
+   "source_section_or_page": "thrust = 2*150*113.1*sin(22.5) = 12,984; length = 1.5*150*113.1*tan(22.5)/600 = 17.6 ft (DIPRA / M41)",
    "verified_by": "rl",
    "verified_on": "2026-07-17",
    "inputs": {
@@ -58669,7 +58669,7 @@
      }
     },
     "length_each_side_ft": {
-     "value": 21.64,
+     "value": 17.5674,
      "tolerance": {
       "abs": 0.01
      }
@@ -72772,7 +72772,7 @@
   {
    "tile_id": "sliding-snow-load",
    "source_publisher": "ASCE 7 \u00a77.9",
-   "source_title": "narrow 10 ft lower roof concentrates 320 lb/ft into 32 psf",
+   "source_title": "narrow 10 ft lower roof takes 10/15 of the 320 lb/ft: 213 lb/ft at the same 21.3 psf (ASCE 7 7.9)",
    "source_edition_or_year": "spec-v469 cross-check (machine-verified)",
    "source_section_or_page": "spec-v469 section 2.1 cross-check",
    "verified_by": "rl",
@@ -72784,7 +72784,7 @@
    },
    "outputs": {
     "surcharge_psf": {
-     "value": 32,
+     "value": 21.3333,
      "tolerance": {
       "pct": 0.5
      }

@@ -8310,8 +8310,12 @@ export function computeSlidingSnowLoad({ pf_upper_psf = 0, eave_ridge_ft = 0, lo
   if (!(pf > 0)) return { error: "Upper-roof snow load must be positive (psf)." };
   if (!(W > 0)) return { error: "Upper-roof eave-to-ridge length must be positive (ft)." };
   if (!(lower > 0)) return { error: "Lower-roof width must be positive (ft)." };
-  const total_lb_ft = 0.4 * pf * W;
+  // ASCE 7 7.9: 0.4 pf W spread over 15 ft; on a lower roof narrower than
+  // 15 ft the load is reduced in proportion (the snow that would land past
+  // its edge falls off). Until 2026-09-19 the full load was packed into the
+  // narrow width, raising the surcharge instead of the total falling.
   const dist_width = Math.min(15, lower);
+  const total_lb_ft = 0.4 * pf * W * (dist_width / 15);
   const surcharge_psf = total_lb_ft / dist_width;
   return {
     total_lb_ft, dist_width, surcharge_psf, narrow: lower < 15,
@@ -8320,7 +8324,7 @@ export function computeSlidingSnowLoad({ pf_upper_psf = 0, eave_ridge_ft = 0, lo
 }
 export const slidingSnowLoadExample = { inputs: { pf_upper_psf: 20, eave_ridge_ft: 40, lower_width_ft: 15 } };
 const _v469renderSlidingSnowLoad = _simpleRenderer({
-  citation: "Citation: Sliding snow load (ASCE 7 §7.9): total = 0.4 x upper Pf x upper eave-to-ridge W (lb/ft), distributed over the lesser of 15 ft or the lower-roof width. Adds to the lower roof's own snow. A design aid, not a substitute for the engineer of record.",
+  citation: "Citation: Sliding snow load (ASCE 7 §7.9): total = 0.4 x upper Pf x upper eave-to-ridge W (lb/ft), distributed over 15 ft; a lower roof narrower than 15 ft takes the load reduced in proportion. Adds to the lower roof's own snow. A design aid, not a substitute for the engineer of record.",
   example: slidingSnowLoadExample.inputs,
   fields: [
     { key: "pf_upper_psf", label: "Upper-roof flat snow load Pf (psf)", kind: "number" },

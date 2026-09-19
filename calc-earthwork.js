@@ -999,9 +999,9 @@ EARTHWORK_RENDERERS["pipe-flotation"] = _v831renderPipeFlotation;
 // friction to hold the thrust when a concrete block will not fit.
 //   area_in2 = (PI/4) x od_in^2
 //   thrust_lb = 2 x pressure_psi x area_in2 x sin(bend_angle_deg/2)
-//   length_each_side_ft = thrust_lb / unit_resistance_plf
-// dims: in { pipe_od_in: L, pressure_psi: M L^-1 T^-2, bend_angle_deg: dimensionless, unit_resistance_plf: M T^-2 } out: { area_in2: L^2, thrust_lb: M L T^-2, length_each_side_ft: L }
-export function computeRestrainedPipeLength({ pipe_od_in = 12, pressure_psi = 150, bend_angle_deg = 90, unit_resistance_plf = 600 } = {}) {
+//   length_each_side_ft = Sf x pressure_psi x area_in2 x tan(bend/2) / unit_resistance_plf
+// dims: in { pipe_od_in: L, pressure_psi: M L^-1 T^-2, bend_angle_deg: dimensionless, unit_resistance_plf: M T^-2, safety_factor: dimensionless } out: { area_in2: L^2, thrust_lb: M L T^-2, length_each_side_ft: L }
+export function computeRestrainedPipeLength({ pipe_od_in = 12, pressure_psi = 150, bend_angle_deg = 90, unit_resistance_plf = 600, safety_factor = 1.5 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(pipe_od_in > 0)) return { error: "Pipe outside diameter must be positive (in)." };
   if (!(pressure_psi > 0)) return { error: "Pressure must be positive (psi)." };
@@ -1009,7 +1009,13 @@ export function computeRestrainedPipeLength({ pipe_od_in = 12, pressure_psi = 15
   if (!(bend_angle_deg > 0 && bend_angle_deg < 180)) return { error: "Bend angle must be between 0 and 180 degrees." };
   const area_in2 = (Math.PI / 4) * pipe_od_in * pipe_od_in;
   const thrust_lb = 2 * pressure_psi * area_in2 * Math.sin((bend_angle_deg / 2) * (Math.PI / 180));
-  const length_each_side_ft = thrust_lb / unit_resistance_plf;
+  // DIPRA / AWWA M41 restrained length: each leg resolves the thrust along
+  // its own axis, L = Sf P A tan(delta/2) / (Fs + Rs), with a safety factor
+  // (commonly 1.5). Until 2026-09-19 the full resultant 2 P A sin(delta/2)
+  // was divided by the resistance with no Sf -- 6% short at a 90-degree bend.
+  const sf = Number(safety_factor);
+  if (!(sf >= 1)) return { error: "Safety factor must be at least 1 (commonly 1.5)." };
+  const length_each_side_ft = sf * pressure_psi * area_in2 * Math.tan((bend_angle_deg / 2) * (Math.PI / 180)) / unit_resistance_plf;
   if (![area_in2, thrust_lb, length_each_side_ft].every(Number.isFinite)) return { error: "Restrained-length math is not a finite value." };
   return {
     area_in2,
@@ -1020,12 +1026,13 @@ export function computeRestrainedPipeLength({ pipe_od_in = 12, pressure_psi = 15
 }
 
 function _v832renderRestrainedPipeLength(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: thrust / restrained-length identity by name. thrust (lb) = 2 x pressure x area x sin(bend/2); length each side (ft) = thrust / unit resistance. The unit resistance comes from the restraint manufacturer's tables (EBAA / AWWA M41).";
+  citationEl.textContent = "Citation: thrust / restrained-length identity by name. thrust (lb) = 2 x pressure x area x sin(bend/2); length each side (ft) = Sf x pressure x area x tan(bend/2) / unit resistance (DIPRA / AWWA M41, Sf commonly 1.5). The unit resistance comes from the restraint manufacturer's tables (EBAA / AWWA M41).";
   const od = makeNumber("Pipe outside diameter (in)", "rpl-od", { step: "any", min: "0" });
   const p = makeNumber("Design (test) pressure (psi)", "rpl-p", { step: "any", min: "0" });
   const ba = makeNumber("Horizontal bend angle (deg)", "rpl-ba", { step: "any", min: "0" });
   const ur = makeNumber("Soil resistance per foot (lb/ft)", "rpl-ur", { step: "any", min: "0" });
-  for (const f of [od, p, ba, ur]) inputRegion.appendChild(f.wrap);
+  const sfx = makeNumber("Safety factor Sf (commonly 1.5)", "rpl-sf", { step: "any", min: "1", value: "1.5" });
+  for (const f of [od, p, ba, ur, sfx]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { od.input.value = "12"; p.input.value = "150"; ba.input.value = "90"; ur.input.value = "600"; update(); });
   const oLen = makeOutputLine(outputRegion, "Restrained length each side", "rpl-out-len");
   const oThrust = makeOutputLine(outputRegion, "Thrust at the bend", "rpl-out-thrust");
@@ -1033,12 +1040,13 @@ function _v832renderRestrainedPipeLength(inputRegion, outputRegion, citationEl) 
     const r = computeRestrainedPipeLength({
       pipe_od_in: od.input.value === "" ? 12 : Number(od.input.value), pressure_psi: p.input.value === "" ? 150 : Number(p.input.value),
       bend_angle_deg: ba.input.value === "" ? 90 : Number(ba.input.value), unit_resistance_plf: ur.input.value === "" ? 600 : Number(ur.input.value),
+      safety_factor: sfx.input.value === "" ? 1.5 : Number(sfx.input.value),
     });
     if (r.error) { oLen.textContent = r.error; oThrust.textContent = "-"; return; }
     oLen.textContent = fmt(r.length_each_side_ft, 1) + " ft each side";
     oThrust.textContent = fmt(r.thrust_lb, 0) + " lb";
   }, DEBOUNCE_MS);
-  for (const f of [od, p, ba, ur]) f.input.addEventListener("input", update);
+  for (const f of [od, p, ba, ur, sfx]) f.input.addEventListener("input", update);
 }
 EARTHWORK_RENDERERS["restrained-pipe-length"] = _v832renderRestrainedPipeLength;
 

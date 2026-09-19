@@ -18968,15 +18968,15 @@ test("bounds: spec-v831 computePipeFlotation pins the uplift, the factor of safe
 });
 
 test("bounds: spec-v832 computeRestrainedPipeLength pins the area, the thrust, the restrained length, and error seams", () => {
-  // 12 in, 150 psi, 90-degree bend, 600 lb/ft -> 113.1 in^2, 23,992 lb, 40 ft.
+  // 12 in, 150 psi, 90-degree bend, 600 lb/ft, Sf 1.5 -> 113.1 in^2, 23,992 lb resultant, 42.4 ft (DIPRA / M41).
   const r = _v832rpl({ pipe_od_in: 12, pressure_psi: 150, bend_angle_deg: 90, unit_resistance_plf: 600 });
   assert.ok(Math.abs(r.area_in2 - 113.097) < 1e-2);
   assert.ok(Math.abs(r.thrust_lb - 23991.6) < 1);
-  assert.ok(Math.abs(r.length_each_side_ft - 39.99) < 1e-2);
-  // A 45-degree bend needs half the restraint (sin of the half-angle governs).
+  assert.ok(Math.abs(r.length_each_side_ft - 1.5 * 150 * 113.097 * Math.tan(Math.PI / 4) / 600) < 1e-2);
+  // A 45-degree bend needs much less restraint (tan of the half-angle governs each leg).
   const b45 = _v832rpl({ pipe_od_in: 12, pressure_psi: 150, bend_angle_deg: 45, unit_resistance_plf: 600 });
   assert.ok(Math.abs(b45.thrust_lb - 12984.1) < 1);
-  assert.ok(Math.abs(b45.length_each_side_ft - 21.64) < 1e-2);
+  assert.ok(Math.abs(b45.length_each_side_ft - 17.567) < 1e-2);
   // Error seams.
   assert.ok("error" in _v832rpl({ pipe_od_in: 0, pressure_psi: 150, bend_angle_deg: 90, unit_resistance_plf: 600 }));
   assert.ok("error" in _v832rpl({ pipe_od_in: 12, pressure_psi: 0, bend_angle_deg: 90, unit_resistance_plf: 600 }));
@@ -21958,9 +21958,9 @@ test("bounds: spec-v468 computeRainOnSnowSurcharge pins the trigger, total, and 
 test("bounds: spec-v469 computeSlidingSnowLoad pins the total, surcharge, and error seams", () => {
   const r = _v469({ pf_upper_psf: 20, eave_ridge_ft: 40, lower_width_ft: 15 });
   assert.ok(Math.abs(r.total_lb_ft - 320) < 1e-9 && Math.abs(r.surcharge_psf - 320 / 15) < 1e-9);
-  // A narrow lower roof concentrates the same total.
+  // A narrow lower roof takes the load reduced in proportion (ASCE 7 7.9): same intensity, less total.
   const narrow = _v469({ pf_upper_psf: 20, eave_ridge_ft: 40, lower_width_ft: 10 });
-  assert.ok(Math.abs(narrow.surcharge_psf - 32) < 1e-9 && narrow.narrow === true);
+  assert.ok(Math.abs(narrow.surcharge_psf - 320 / 15) < 1e-9 && Math.abs(narrow.total_lb_ft - 320 * 10 / 15) < 1e-9 && narrow.narrow === true);
   // A wider-than-15 ft roof still distributes over only 15 ft.
   assert.ok(Math.abs(_v469({ pf_upper_psf: 20, eave_ridge_ft: 40, lower_width_ft: 30 }).surcharge_psf - 320 / 15) < 1e-9);
   // Error seams: non-positive snow, length, width, non-finite.
