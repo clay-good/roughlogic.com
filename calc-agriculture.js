@@ -708,7 +708,10 @@ export function computeSprayerCalibration({
   if (!(t > 0)) return { error: "Travel time must be positive (s)." };
   if (target < 0) return { error: "Target GPA cannot be negative." };
 
-  // 1/128 acre in square feet.
+  // 1/128 acre in square feet. W is the width ONE nozzle sprays -- the nozzle
+  // spacing on a boom -- because the ounces are caught from one nozzle. Until
+  // 2026-09-18 the field was labeled "Boom width", so a 20 ft boom with 20 in
+  // spacing gave a 17 ft course and read 20 GPA where the rig applies 240.
   const acre_fraction_ft2 = 43560 / 128;
   const travel_distance_ft = acre_fraction_ft2 / W;
   // 1/128-acre identity: gpa_actual = oz_per_nozzle.
@@ -765,17 +768,17 @@ export function computeSprayerCalibration({
 }
 
 export const sprayerCalibrationExample = {
-  // USDA worked example: 20 ft boom at 4 mph
-  // travel = 340.3125 / 20 = 17.016 ft
-  // time at 4 mph = 17.016 / (4 * 5280/3600) = 17.016 / 5.867 = 2.9 s
-  // catch 20 oz per nozzle -> 20 GPA at target 20 -> within 5%
-  inputs: { boom_width_ft: 20, oz_per_nozzle: 20, time_s: 2.9, target_gpa: 20 },
+  // Extension 1/128-acre method: 20 in (1.667 ft) nozzle spacing at 4 mph
+  // course = 340.3125 / 1.6667 = 204.2 ft
+  // time at 4 mph = 204.2 / (4 * 5280/3600) = 204.2 / 5.867 = 34.8 s
+  // catch 20 oz from one nozzle -> 20 GPA at target 20 -> within 5%
+  inputs: { boom_width_ft: 20 / 12, oz_per_nozzle: 20, time_s: 34.8, target_gpa: 20 },
 };
 
 function renderSprayerCalibration(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Per USDA Cooperative Extension Service public 1/128-acre calibration method. Pesticide label rates govern application; pesticide-applicator license governs use. Free at extension.org and at land-grant university extension offices.";
 
-  const w = makeNumber("Boom width (ft)", "sc-w", { step: "any", min: "0" });
+  const w = makeNumber("Nozzle spacing -- width one nozzle sprays (ft)", "sc-w", { step: "any", min: "0" });
   const oz = makeNumber("Ounces collected per nozzle (over 1/128 acre)", "sc-oz", { step: "any", min: "0" });
   const t = makeNumber("Time to travel the distance (s)", "sc-t", { step: "any", min: "0" });
   const tg = makeNumber("Target application rate (GPA; optional)", "sc-tg", { step: "any", min: "0" });

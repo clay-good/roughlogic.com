@@ -93,10 +93,10 @@ test("thi-livestock: AGRICULTURE_RENDERERS exposes thi-livestock", () => {
 
 // --- §H.3 sprayer-calibration ---
 
-test("sprayer-calibration: 20 ft boom -> 17.016 ft travel distance for 1/128 acre", () => {
+test("sprayer-calibration: 20 in nozzle spacing -> 204.2 ft course for 1/128 acre", () => {
   const r = computeSprayerCalibration(sprayerCalibrationExample.inputs);
   assert.ok(!r.error);
-  assert.ok(close(r.travel_distance_ft, 17.016, 0.01));
+  assert.ok(close(r.travel_distance_ft, 204.19, 0.05));
 });
 
 test("sprayer-calibration: 1/128-acre identity (oz per nozzle = GPA)", () => {

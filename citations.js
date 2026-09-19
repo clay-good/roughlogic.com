@@ -21272,14 +21272,14 @@ export const CITATIONS = {
     ],
   },
   "char-depth-capacity": {
-    formula: "char_depth_in = char_rate_in_hr x (exposure_min / 60); effective_char_in = char_depth_in + zero_strength_in; residual_width/depth = nominal - effective x faces (floored at 0 -> consumed); section_modulus_ratio = (rw x rd^2) / (b x d^2).",
+    formula: "char_depth_in = char_rate_in_hr x (exposure_min / 60)^0.813 (NDS 16.2.1, nonlinear); effective_char_in = 1.2 x char_depth_in + any additional zero_strength_in (default 0); residual_width/depth = nominal - effective x faces (floored at 0 -> consumed); section_modulus_ratio = (rw x rd^2) / (b x d^2).",
     edition: "AWC National Design Specification one-dimensional char model (about 1.5 in/hr nominal) plus a heat-degraded zero-strength layer, by name.",
     freeAccess: "The one-dimensional char rate and the zero-strength-layer concept are public AWC/NDS structural fire-design provisions; the section-modulus ratio is geometry.",
     governance: GOVERNANCE.general,
     editionNote: "The char rate and zero-strength layer follow the AWC National Design Specification fire-design provisions; the species, density, and exposure shift the rate, so they are editable. This screens the residual BENDING section ONLY. A structural engineer GOVERNS connections, splitting, char-line judgment, and the load path; the engineer of record makes the keep-or-replace call. Not a stamped calculation.",
     assumptions: [
       { name: "Nominal char rate", value: "1.5 in/hr one-dimensional nominal; species and density shift it, so it is editable", source: "AWC NDS" },
-      { name: "Zero-strength layer", value: "a 0.2 in heat-degraded layer beneath the char carries no load", source: "AWC NDS" },
+      { name: "Effective char depth", value: "a_eff = 1.2 a_char, the 20% NDS adds for the heat-degraded zone (1.8 / 2.5 / 3.2 in at 1 / 1.5 / 2 hr, Table 16.2.1A); an extra layer can be entered", source: "AWC NDS 16.2.1" },
       { name: "Bending only", value: "the section-modulus ratio screens bending capacity; shear, connections, and stability are out of scope", source: "structural engineering" },
     ],
   },

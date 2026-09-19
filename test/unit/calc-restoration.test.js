@@ -53,10 +53,9 @@ test("Drying goal: indoor RH is in (0, 100]", () => {
 
 // --- Utility 34: Dehumidifier ---
 
-test("Dehumidifier: 5000 ft^3 class 2 returns AHAM in expected range", () => {
+test("Dehumidifier: 5000 ft^3 class 2 -> 100 pints/day AHAM (IICRC LGR factor 50)", () => {
   const r = computeDehumidifierSize({ room_cubic_feet: 5000, water_class: "2" });
-  assert.ok(r.aham_pints_per_day > 150);
-  assert.ok(r.aham_pints_per_day < 250);
+  assert.ok(Math.abs(r.aham_pints_per_day - 100) < 1e-9);
 });
 
 test("Dehumidifier: higher class -> larger capacity", () => {
@@ -65,9 +64,9 @@ test("Dehumidifier: higher class -> larger capacity", () => {
   assert.ok(b.aham_pints_per_day > a.aham_pints_per_day);
 });
 
-test("Dehumidifier: field method exceeds AHAM rating", () => {
+test("Dehumidifier: the IICRC chart figure is the field recommendation (no extra multiplier)", () => {
   const r = computeDehumidifierSize({ room_cubic_feet: 5000, water_class: "2" });
-  assert.ok(r.field_pints_per_day > r.aham_pints_per_day);
+  assert.equal(r.field_pints_per_day, r.aham_pints_per_day);
 });
 
 // --- Utility 35: Air Movers ---

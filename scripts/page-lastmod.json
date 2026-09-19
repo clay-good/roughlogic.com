@@ -1106,8 +1106,8 @@
       "date": "2026-09-01"
     },
     "/tools/char-depth-capacity/": {
-      "sha": "e98f7529d42ac27c",
-      "date": "2026-09-01"
+      "sha": "9a6725c4122116ba",
+      "date": "2026-09-19"
     },
     "/tools/check-dam-spacing/": {
       "sha": "5420f6b69b74d10f",
@@ -2074,8 +2074,8 @@
       "date": "2026-09-05"
     },
     "/tools/dehumidifier/": {
-      "sha": "c170895d50cf561e",
-      "date": "2026-09-01"
+      "sha": "cf4452505c674562",
+      "date": "2026-09-19"
     },
     "/tools/dehumidifier-derate/": {
       "sha": "a4c99e55577e6b78",
@@ -7166,8 +7166,8 @@
       "date": "2026-09-09"
     },
     "/tools/sprayer-calibration/": {
-      "sha": "227a1e4b59e9bbd1",
-      "date": "2026-09-01"
+      "sha": "78cb0185edbf02e6",
+      "date": "2026-09-19"
     },
     "/tools/sprayer-field-capacity/": {
       "sha": "fb65359e687f110b",

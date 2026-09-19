@@ -6,6 +6,13 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **Sprayer calibration read 12 times low, dehumidifier sizing about 3 times high, and char depth did not follow the NDS model it cites.**
+  - `sprayer-calibration` uses the 1/128-acre method, which sizes the course to the width ONE nozzle sprays because the ounces are caught from one nozzle. The field was labeled "Boom width". A 20 ft boom with 20 in spacing therefore got a 17 ft course and read 20 GPA where the rig applies 240. The label and the worked example now use the nozzle spacing: 20 in, a 204 ft course.
+  - `dehumidifier` sized at 0.025-0.080 pints per ft^3, then applied an unsourced 1.55 "field" multiplier. It now uses IICRC's own factor chart for low-grain refrigerant units: ft^3 / 100, 50, 40 or 40 for Classes 1-4. The chart already sizes for the job. The worked 6,000 ft^3 Class 2 room needs 120 AHAM pints/day, not 372.
+  - `char-depth-capacity` cites the AWC NDS char model but charred linearly and added a flat 0.2 in. NDS 16.2.1 uses a_char = beta_n t^0.813 and a_eff = 1.2 a_char. That gives the Table 16.2.1A depths of 1.8, 2.5 and 3.2 in at 1, 1.5 and 2 hours. The old form read 1.7 in at an hour and overstated residual bending capacity 13%.
+
+  Found by an independent plausibility pass over calc-agriculture, calc-restoration, calc-arborist and calc-earthwork; arborist and earthwork checked clean.
+
 - **Two tiles now say which convention they use.** `spt-bearing-capacity` cited its coefficients "as compiled in Das". Das compiles Bowles' adjusted form, which runs about 50% higher than the Meyerhof (1956) N/4 and N/6 ksf the tile applies. The citation now names Meyerhof's original and says it is the conservative choice. `propane-fill-outage` extends the 1.5%-per-10-F expansion rate in a straight line. It now says that propane's expansion rate climbs as it warms, so the true headroom from a cold fill is shorter than the linear figure over a large swing.
 
 - **Cooling-tower makeup counted drift twice, chlorine doses treated bleach strength as a weight fraction, and the virus CT check copied the Giardia result.**

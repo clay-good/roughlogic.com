@@ -2178,14 +2178,15 @@ test("bounds: calc-restoration computeDryingGoal pins target_indoor_GPP = outdoo
   }
 });
 
-test("bounds: calc-restoration computeDehumidifierSize pins AHAM = volume * per-class factor and field = AHAM * 1.55 across IICRC water classes", () => {
-  const factors = { "1": 0.025, "2": 0.040, "3": 0.060, "4": 0.080 };
+test("bounds: calc-restoration computeDehumidifierSize pins AHAM = volume / IICRC LGR chart factor across water classes", () => {
+  // IICRC S500 LGR factor chart (ft^3 per AHAM pint/day): 100 / 50 / 40 / 40.
+  const factors = { "1": 1 / 100, "2": 1 / 50, "3": 1 / 40, "4": 1 / 40 };
   for (const room_cubic_feet of [1000, 5000, 20000]) {
     for (const [water_class, factor] of Object.entries(factors)) {
       const r = computeDehumidifierSize({ room_cubic_feet, water_class });
       assert.ok(!r.error, `${room_cubic_feet} class ${water_class}: ${JSON.stringify(r)}`);
       assert.ok(Math.abs(r.aham_pints_per_day - room_cubic_feet * factor) < 1e-9, `AHAM identity ${water_class}`);
-      assert.ok(Math.abs(r.field_pints_per_day - r.aham_pints_per_day * 1.55) < 1e-9, `field = 1.55 * AHAM`);
+      assert.ok(Math.abs(r.field_pints_per_day - r.aham_pints_per_day) < 1e-9, `the chart figure is already the field recommendation`);
       assert.ok(typeof r.operational_guidance === "string", `guidance present`);
     }
   }
@@ -14892,13 +14893,17 @@ test("bounds: spec-v141 equipment-heat-load pins sensible heat, required cfm, se
 });
 
 test("bounds: spec-v146 char-depth-capacity pins section ratio, the consumed branch, and error seams", () => {
-  const r = _vf146({ exposure_min: 30, nominal_width_in: 5.5, nominal_depth_in: 9.5, faces_across_width: 2, faces_across_depth: 1, char_rate_in_hr: 1.5, zero_strength_in: 0.2 });
-  assert.ok(Math.abs(r.effective_char_in - 0.95) < 1e-9);
-  assert.ok(Math.abs(r.residual_width_in - 3.6) < 1e-9);
-  assert.ok(Math.abs(r.section_modulus_ratio - 0.5301818) < 1e-5);
+  // NDS 16.2.1: a_char = 1.5 x 0.5^0.813 = 0.8538, a_eff = 1.2 a_char = 1.0245 in.
+  const r = _vf146({ exposure_min: 30, nominal_width_in: 5.5, nominal_depth_in: 9.5, faces_across_width: 2, faces_across_depth: 1, char_rate_in_hr: 1.5 });
+  assert.ok(Math.abs(r.effective_char_in - 1.2 * 1.5 * Math.pow(0.5, 0.813)) < 1e-9);
+  assert.ok(Math.abs(r.residual_width_in - (5.5 - 2 * r.effective_char_in)) < 1e-9);
+  assert.ok(Math.abs(r.section_modulus_ratio - 0.49940) < 1e-4);
+  // NDS Table 16.2.1A: a_eff = 1.8 in at 1 hr, 3.2 in at 2 hr (beta_n 1.5 in/hr).
+  assert.ok(Math.abs(_vf146({ exposure_min: 60, nominal_width_in: 5.5, nominal_depth_in: 9.5 }).effective_char_in - 1.8) < 1e-9);
+  assert.ok(Math.abs(_vf146({ exposure_min: 120, nominal_width_in: 5.5, nominal_depth_in: 9.5 }).effective_char_in - 3.16) < 0.01);
   assert.strictEqual(r.consumed, false);
-  const cc = _vf146({ exposure_min: 60, nominal_width_in: 5.5, nominal_depth_in: 9.5, faces_across_width: 2, faces_across_depth: 1, char_rate_in_hr: 1.5, zero_strength_in: 0.2 });
-  assert.ok(Math.abs(cc.section_modulus_ratio - 0.2573941) < 1e-5);
+  const cc = _vf146({ exposure_min: 60, nominal_width_in: 5.5, nominal_depth_in: 9.5, faces_across_width: 2, faces_across_depth: 1, char_rate_in_hr: 1.5 });
+  assert.ok(Math.abs(cc.section_modulus_ratio - 0.22693) < 1e-4);
   const gone = _vf146({ exposure_min: 240, nominal_width_in: 3.5, nominal_depth_in: 3.5, faces_across_width: 2, faces_across_depth: 2, char_rate_in_hr: 1.5, zero_strength_in: 0.2 });
   assert.strictEqual(gone.consumed, true);
   assert.strictEqual(gone.section_modulus_ratio, 0);

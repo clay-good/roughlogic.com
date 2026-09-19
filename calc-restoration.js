@@ -92,13 +92,13 @@ export const dryingGoalExample = {
 // Two methods. AHAM (rated at 80 F / 60 percent RH) and a field method that
 // accounts for the actual load class. Returns capacity in pints per day.
 
-const AHAM_PINTS_PER_FT3_BY_CLASS = {
-  // Conservative engineering values per IICRC consensus practice.
-  "1": 0.025,
-  "2": 0.040,
-  "3": 0.060,
-  "4": 0.080,
-};
+// IICRC S500 initial dehumidification factor chart, low-grain refrigerant:
+// AHAM pints/day = ft^3 / factor, factors 100 / 50 / 40 / 40 for Classes
+// 1-4 (IICRC's metric chart prints 6 / 3 / 2.4 / 2.4 m^3 per L/day; converted
+// with 35.3147 ft^3/m^3 and 2.11338 pt/L). The chart factor already sizes for
+// the job. Until 2026-09-18 this used 0.025-0.080 pt per ft^3 and then a
+// further unsourced 1.55 "field" multiplier: 372 pt/day where IICRC gives 120.
+const IICRC_LGR_FT3_PER_PINT_BY_CLASS = { "1": 100, "2": 50, "3": 40, "4": 40 };
 
 // dims: in { room_cubic_feet: L^3, water_class: dimensionless, expected_pints_per_day: L^3 T^-1 }
 //        out: { aham_pints_per_day: L^3 T^-1, field_pints_per_day: L^3 T^-1, expected_pints_per_day: L^3 T^-1, recommendation: L^3 T^-1, operational_guidance: dimensionless }
@@ -114,10 +114,11 @@ export function computeDehumidifierSize({ room_cubic_feet, water_class = "2", ex
   // two-or-more large LGRs" to "one small portable LGR". Under-drying a
   // structure is the failure this tile exists to prevent.
   if (Number(room_cubic_feet) < 0) return { error: "Room volume cannot be negative (cubic feet)." };
-  const factor = AHAM_PINTS_PER_FT3_BY_CLASS[String(water_class)];
-  const aham = factor ? room_cubic_feet * factor : null;
-  // Field method: scale by 1.55x to account for actual job conditions.
-  const field = aham !== null ? aham * 1.55 : null;
+  const factor = IICRC_LGR_FT3_PER_PINT_BY_CLASS[String(water_class)];
+  const aham = factor ? room_cubic_feet / factor : null;
+  // The IICRC chart is already the field recommendation in AHAM pints; the
+  // field figure is kept as an output key and now equals it.
+  const field = aham;
   // v8 §C.6: operational guidance based on the field-method recommendation.
   // Sizing thresholds mirror commercial LGR / dessicant unit ratings.
   let operational_guidance = null;
@@ -137,10 +138,9 @@ export function computeDehumidifierSize({ room_cubic_feet, water_class = "2", ex
 }
 
 export const dehumidifierExample = {
-  // The publisher-verified case the tile page prints (AHAM DH-1 / IICRC S500):
-  // 6000 ft^3 Class 2 -> 240 pints/day AHAM, 372 field-corrected.
+  // IICRC S500 LGR factor chart: 6000 ft^3 Class 2 / 50 = 120 pints/day AHAM.
   inputs: { room_cubic_feet: 6000, water_class: "2" },
-  expectedRange: { aham_pints_per_day: { min: 150, max: 250 } },
+  expectedRange: { aham_pints_per_day: { min: 119, max: 121 } },
 };
 
 // --- Utility 35: Air Mover Placement ---
@@ -2504,7 +2504,7 @@ RESTORATION_RENDERERS["equipment-heat-load"] = renderEquipmentHeatLoad;
 // the bending-capacity (section-modulus) fraction. A residual dimension at or
 // below zero reports `consumed` with zero capacity, never a negative number.
 // dims: in { exposure_min: T, nominal_width_in: L, nominal_depth_in: L, faces_across_width: dimensionless, faces_across_depth: dimensionless, char_rate_in_hr: L T^-1, zero_strength_in: L } out: { char_depth_in: L, effective_char_in: L, residual_width_in: L, residual_depth_in: L, residual_area_in2: L^2, section_modulus_ratio: dimensionless }
-export function computeCharDepthCapacity({ exposure_min = 0, nominal_width_in = 0, nominal_depth_in = 0, faces_across_width = 2, faces_across_depth = 1, char_rate_in_hr = 1.5, zero_strength_in = 0.2 } = {}) {
+export function computeCharDepthCapacity({ exposure_min = 0, nominal_width_in = 0, nominal_depth_in = 0, faces_across_width = 2, faces_across_depth = 1, char_rate_in_hr = 1.5, zero_strength_in = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const t = Number(exposure_min), b = Number(nominal_width_in), d = Number(nominal_depth_in);
   const fw = Number(faces_across_width), fd = Number(faces_across_depth);
@@ -2514,8 +2514,14 @@ export function computeCharDepthCapacity({ exposure_min = 0, nominal_width_in = 
   if (!(rate > 0)) return { error: "Char rate must be positive." };
   if (fw < 0 || fd < 0) return { error: "Face counts cannot be negative." };
   if (zs < 0) return { error: "Zero-strength layer cannot be negative." };
-  const charDepth = rate * (t / 60);
-  const effective = charDepth + zs;
+  // AWC NDS 16.2.1: char is NONLINEAR in time, a_char = beta_n t^0.813 (t in
+  // hours, beta_n the 1.5 in/hr nominal rate), and the effective depth adds 20%
+  // for the heat-degraded zone, a_eff = 1.2 a_char -- 1.8 / 2.5 / 3.2 in at
+  // 1 / 1.5 / 2 hr, NDS Table 16.2.1A. Until 2026-09-18 this was linear plus a
+  // flat 0.2 in (1.7 in at 1 hr), overstating residual capacity 13% at an hour.
+  // zero_strength_in is now any ADDITIONAL layer beyond the NDS 1.2 factor.
+  const charDepth = rate * Math.pow(t / 60, 0.813);
+  const effective = 1.2 * charDepth + zs;
   let residualWidth = b - effective * fw;
   let residualDepth = d - effective * fd;
   const consumed = residualWidth <= 0 || residualDepth <= 0;
@@ -2534,7 +2540,7 @@ export function computeCharDepthCapacity({ exposure_min = 0, nominal_width_in = 
     note: "AWC/NDS one-dimensional char model with a heat-degraded zero-strength layer; screens the residual BENDING section only. A structural engineer governs - connections, splitting, char-line judgment, and the load path are out of scope. The engineer of record makes the keep-or-replace call.",
   };
 }
-export const charDepthCapacityExample = { inputs: { exposure_min: 30, nominal_width_in: 5.5, nominal_depth_in: 9.5, faces_across_width: 2, faces_across_depth: 1, char_rate_in_hr: 1.5, zero_strength_in: 0.2 } };
+export const charDepthCapacityExample = { inputs: { exposure_min: 30, nominal_width_in: 5.5, nominal_depth_in: 9.5, faces_across_width: 2, faces_across_depth: 1, char_rate_in_hr: 1.5, zero_strength_in: 0 } };
 
 function renderCharDepthCapacity(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: AWC National Design Specification one-dimensional char model (about 1.5 in/hr nominal) plus a heat-degraded zero-strength layer, by name. Screens the residual BENDING section only; a structural engineer governs connections, splitting, char-line judgment, and the load path. This is a keep-or-replace screen, not a stamped calculation.";
@@ -2557,7 +2563,7 @@ function renderCharDepthCapacity(inputRegion, outputRegion, citationEl) {
       char_rate_in_hr: rate.input.value === "" ? 1.5 : Number(rate.input.value), zero_strength_in: zs.input.value === "" ? 0.2 : Number(zs.input.value),
     });
     if (r.error) { oChar.textContent = r.error; oRes.textContent = "-"; oRatio.textContent = "-"; return; }
-    oChar.textContent = fmt(r.effective_char_in, 2) + " in (char " + fmt(r.char_depth_in, 2) + " in + zero-strength)";
+    oChar.textContent = fmt(r.effective_char_in, 2) + " in (char " + fmt(r.char_depth_in, 2) + " in x 1.2, NDS)";
     oRes.textContent = r.consumed ? "Consumed - no sound section remains" : fmt(r.residual_width_in, 2) + " x " + fmt(r.residual_depth_in, 2) + " in (" + fmt(r.residual_area_in2, 1) + " in^2)";
     oRatio.textContent = r.consumed ? "0% (engineer governs)" : fmt(r.section_modulus_ratio * 100, 0) + "% of bending capacity";
   }, DEBOUNCE_MS);

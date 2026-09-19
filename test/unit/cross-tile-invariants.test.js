@@ -3034,11 +3034,8 @@ test("monotonicity: computePlateCost plate_cost is strictly increasing in single
 });
 
 test("monotonicity: computeDehumidifierSize aham_pints_per_day + field_pints_per_day are strictly increasing in room_cubic_feet at fixed water_class (linear pin)", () => {
-  // Group D. aham = room_cubic_feet * AHAM_PINTS_PER_FT3_BY_CLASS[class];
-  // field = aham * 1.55 (IICRC field-method correction). Both linear
-  // in room_cubic_feet at fixed water class. Pin both strict
-  // monotonicity AND the field-method 1.55 multiplier (catches a
-  // future regression in the IICRC field-method scaling constant).
+  // Group D. aham = room_cubic_feet / IICRC LGR chart factor; the chart is
+  // already field-sized, so field = aham. Both linear in room_cubic_feet.
   let prevAham = -Infinity;
   let prevField = -Infinity;
   for (const v of [500, 1000, 2500, 5000, 10000, 20000]) {
@@ -3049,10 +3046,10 @@ test("monotonicity: computeDehumidifierSize aham_pints_per_day + field_pints_per
     prevAham = r.aham_pints_per_day;
     prevField = r.field_pints_per_day;
   }
-  // IICRC field-method 1.55x multiplier exact pin.
+  // IICRC chart pin: 5000 ft^3 Class 2 / 50 = 100 pints/day.
   const ref = computeDehumidifierSize({ room_cubic_feet: 5000, water_class: "2" });
-  assert.ok(Math.abs(ref.field_pints_per_day - ref.aham_pints_per_day * 1.55) < 1e-9,
-    `field(${ref.aham_pints_per_day} AHAM) = ${ref.field_pints_per_day}, expected ${ref.aham_pints_per_day * 1.55} (1.55x)`);
+  assert.ok(Math.abs(ref.aham_pints_per_day - 100) < 1e-9 && ref.field_pints_per_day === ref.aham_pints_per_day,
+    `aham ${ref.aham_pints_per_day}, field ${ref.field_pints_per_day}`);
   // Doubling identity at fixed water class.
   const a = computeDehumidifierSize({ room_cubic_feet: 2500, water_class: "2" });
   const b = computeDehumidifierSize({ room_cubic_feet: 5000, water_class: "2" });

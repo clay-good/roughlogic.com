@@ -858,7 +858,7 @@ export const BESPOKE_LABELS = {
   "spoil-setback": {"trench_depth_ft":"Trench depth (ft)","spoil_height_ft":"Spoil pile height (ft)","repose_deg":"Angle of repose (deg)","min_setback_ft":"Code minimum setback (ft)"},
   "spore-io-ratio": {"indoor_spores_m3":"Indoor spore concentration (spores/m³)","outdoor_spores_m3":"Outdoor control (spores/m³)"},
   "spray-drift-buffer": {"base_buffer_ft":"Base buffer override (ft, 0 = use class)","droplet_class":"Droplet class","wind_mph":"Wind speed (mph)","boom_height_in":"Release height (in)","ref_height_in":"Reference height (in)"},
-  "sprayer-calibration": {"boom_width_ft":"Boom width (ft)","oz_per_nozzle":"Ounces collected per nozzle (over 1/128 acre)","time_s":"Time to travel the distance (s)","target_gpa":"Target application rate (GPA; optional)","field_acres":"Field acres (optional)","tank_size_gal":"Tank size (gal; optional)"},
+  "sprayer-calibration": {"boom_width_ft":"Nozzle spacing -- width one nozzle sprays (ft)","oz_per_nozzle":"Ounces collected per nozzle (over 1/128 acre)","time_s":"Time to travel the distance (s)","target_gpa":"Target application rate (GPA; optional)","field_acres":"Field acres (optional)","tank_size_gal":"Tank size (gal; optional)"},
   "sprayer-field-capacity": {"boom_width_ft":"Boom / swath width (ft)","speed_mph":"Ground speed (mph)","field_efficiency_pct":"Field efficiency (%)","field_acres":"Field size (acres)","tank_gal":"Tank capacity (gal)","gpa":"Spray volume (GPA)"},
   "spreader-beam": {"load_lb":"Total load (lb)","bar_length_ft":"Bar length, pick to pick (ft)","top_height_ft":"Top point height above bar (ft)"},
   "spreader-beam-min-height": {"load_lb":"Total load (lb)","bar_length_ft":"Bar length, pick to pick (ft)","sling_wll_lb":"Top sling WLL, each (lb)"},

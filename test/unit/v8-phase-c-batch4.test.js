@@ -169,5 +169,5 @@ test("C.6 dehumidifier-sizing operational_guidance text adapts to load", () => {
 test("C.6 dehumidifier-sizing returns both AHAM and field side-by-side (existing parity)", () => {
   const r = computeDehumidifierSize({ room_cubic_feet: 5000, water_class: "2" });
   assert.ok(r.aham_pints_per_day > 0);
-  assert.ok(r.field_pints_per_day > r.aham_pints_per_day);
+  assert.equal(r.field_pints_per_day, r.aham_pints_per_day); // IICRC chart already field-sized
 });

@@ -3901,20 +3901,20 @@
   {
    "tile_id": "sprayer-calibration",
    "source_publisher": "USDA Cooperative Extension Service",
-   "source_title": "1/128-acre calibration: 20 ft boom at 4 mph",
+   "source_title": "1/128-acre calibration: 20 in nozzle spacing at 4 mph",
    "source_edition_or_year": "current",
-   "source_section_or_page": "travel_distance_ft = 43560/128 / boom_width; gpa = oz_per_nozzle",
+   "source_section_or_page": "course = 43560/128 / nozzle spacing (the width ONE nozzle sprays) = 204.2 ft; ounces caught from one nozzle = GPA",
    "verified_by": "rl",
-   "verified_on": "2026-05-10",
+   "verified_on": "2026-09-19",
    "inputs": {
-    "boom_width_ft": 20,
+    "boom_width_ft": 1.6667,
     "oz_per_nozzle": 20,
-    "time_s": 2.9,
+    "time_s": 34.8,
     "target_gpa": 20
    },
    "outputs": {
     "travel_distance_ft": {
-     "value": 17.016,
+     "value": 204.17,
      "tolerance": {
       "pct": 0.5
      }
@@ -10042,31 +10042,31 @@
   },
   {
    "tile_id": "dehumidifier",
-   "source_publisher": "AHAM DH-1 / IICRC S500 dehumidification field-correction (project bundled)",
-   "source_title": "Required pints/day = max(AHAM rated load, field-correction-adjusted load); recommend the larger value",
+   "source_publisher": "IICRC S500 initial dehumidification factor chart (LGR)",
+   "source_title": "AHAM pints/day = cubic feet / chart factor (LGR 100 / 50 / 40 / 40 for Classes 1-4)",
    "source_edition_or_year": "AHAM DH-1 + IICRC S500-2021 dehumidification field-correction multipliers (Class 2 LGR-typical band)",
-   "source_section_or_page": "6000 ft^3 / Class 2 -> 240 pints/day AHAM, 372 pints/day field-corrected, 372 recommended",
+   "source_section_or_page": "6000 ft^3 / Class 2 / 50 -> 120 pints/day AHAM, the recommendation (IICRC metric chart 3 m^3 per L/day)",
    "verified_by": "rl",
-   "verified_on": "2026-05-11",
+   "verified_on": "2026-09-19",
    "inputs": {
     "room_cubic_feet": 6000,
     "water_class": "2"
    },
    "outputs": {
     "aham_pints_per_day": {
-     "value": 240,
+     "value": 120,
      "tolerance": {
       "abs": 1
      }
     },
     "field_pints_per_day": {
-     "value": 372,
+     "value": 120,
      "tolerance": {
       "abs": 1
      }
     },
     "recommendation": {
-     "value": 372,
+     "value": 120,
      "tolerance": {
       "abs": 1
      }
@@ -44551,11 +44551,11 @@
   {
    "tile_id": "char-depth-capacity",
    "source_publisher": "AWC National Design Specification char model",
-   "source_title": "char = rate x hr; residual section -> bending-capacity ratio",
+   "source_title": "a_char = 1.5 t^0.813, a_eff = 1.2 a_char (NDS 16.2.1); residual section -> bending-capacity ratio",
    "source_edition_or_year": "AWC NDS (char provisions)",
-   "source_section_or_page": "6x10 (5.5x9.5) 30 min, 2 width + 1 depth faces -> 0.53 S-ratio",
+   "source_section_or_page": "6x10 (5.5x9.5) 30 min, 2 width + 1 depth faces -> a_eff 1.02 in, 0.50 S-ratio",
    "verified_by": "rl",
-   "verified_on": "2026-06-29",
+   "verified_on": "2026-09-19",
    "inputs": {
     "exposure_min": 30,
     "nominal_width_in": 5.5,
@@ -44563,23 +44563,23 @@
     "faces_across_width": 2,
     "faces_across_depth": 1,
     "char_rate_in_hr": 1.5,
-    "zero_strength_in": 0.2
+    "zero_strength_in": 0
    },
    "outputs": {
     "effective_char_in": {
-     "value": 0.95,
+     "value": 1.0245,
      "tolerance": {
       "abs": 0.001
      }
     },
     "residual_width_in": {
-     "value": 3.6,
+     "value": 3.451,
      "tolerance": {
       "abs": 0.01
      }
     },
     "section_modulus_ratio": {
-     "value": 0.5302,
+     "value": 0.4994,
      "tolerance": {
       "abs": 0.001
      }
@@ -44589,11 +44589,11 @@
   {
    "tile_id": "char-depth-capacity",
    "source_publisher": "AWC National Design Specification char model",
-   "source_title": "cross-check: doubling exposure halves remaining capacity",
+   "source_title": "cross-check: at 60 min a_eff is the NDS Table 16.2.1A 1.8 in",
    "source_edition_or_year": "AWC NDS (char provisions)",
-   "source_section_or_page": "same member at 60 min -> 0.26 S-ratio",
+   "source_section_or_page": "same member at 60 min -> a_eff 1.8 in, 0.23 S-ratio",
    "verified_by": "rl",
-   "verified_on": "2026-06-29",
+   "verified_on": "2026-09-19",
    "inputs": {
     "exposure_min": 60,
     "nominal_width_in": 5.5,
@@ -44601,11 +44601,11 @@
     "faces_across_width": 2,
     "faces_across_depth": 1,
     "char_rate_in_hr": 1.5,
-    "zero_strength_in": 0.2
+    "zero_strength_in": 0
    },
    "outputs": {
     "section_modulus_ratio": {
-     "value": 0.2574,
+     "value": 0.2269,
      "tolerance": {
       "abs": 0.001
      }
