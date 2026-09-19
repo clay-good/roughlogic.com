@@ -255,7 +255,10 @@ export function computeAbatementContainment({ room_len_ft, room_wid_ft, room_ht_
   const polySf = (floorSf * floorLayers + wallSf * wallLayers) * 1.10;
   const reqCfm = volumeCf * ach / 60;
   const namCount = Math.ceil(reqCfm / nam);
-  const wasteBags = Math.ceil(debris * 27 / 4.4);
+  // A 33-gal bag holds 4.4 ft^3 brim-full; abatement bags are not filled to
+  // capacity (abatement-waste-containers defaults to 0.7), so about 3.1 ft^3
+  // each. Until 2026-09-19 the full 4.4 was used, 30% short on bags.
+  const wasteBags = Math.ceil(debris * 27 / (4.4 * 0.7));
   if (![polySf, reqCfm, namCount, wasteBags].every(Number.isFinite)) return { error: "Containment math is not a finite value." };
   return {
     poly_sf: polySf,
@@ -402,14 +405,14 @@ export function computeLeadDustClearance({ lab_result_ug = 0, wipe_area_ft2 = 1,
     note: "Lead dust clearance is a MASS PER AREA, and the arithmetic is one division -- the laboratory reports micrograms recovered from the wipe, and the wiped area turns that into a loading. The reason the calculation matters is the size of the numbers: THE LIMITS ARE SMALL ENOUGH THAT SURFACES WHICH LOOK AND FEEL CLEAN ROUTINELY FAIL. Lead dust is fine, it is invisible at these loadings, and a floor that a supervisor would sign off by eye can be several times over. The laboratory result a wipe can carry and still pass is reported here for that reason: it converts an abstract limit into the amount of dust that is actually allowed on a square foot, and it is startlingly little. THE WIPED AREA HAS TO BE MEASURED, not estimated, because it is the denominator. A template is used for exactly that reason, and a wipe taken over a guessed area produces a loading that is wrong by whatever the guess was wrong by -- in either direction. A larger area wiped with the same effort also collects more dust, so the area and the technique are both part of the result. Floors, interior window sills, and window troughs each carry their OWN limit, and the limits have been tightened over time -- a project clearing against a superseded number is clearing against nothing. The sample count follows the applicable protocol by room and by surface type, and some protocols permit compositing several surfaces into one sample while others require single-surface samples; a composite that fails does not say which surface failed, which is a trade between cost and information. Field blanks are part of the sample set and not an optional extra: a blank that shows lead invalidates the batch, which is the point of it. AND FIELD SCREENING IS NOT CLEARANCE. Analysis is by an accredited laboratory, a portable instrument reading is not a clearance result, and clearance is performed by someone independent of the party that did the work. A failed clearance means re-cleaning and re-testing the affected area, which is why the specialised cleaning -- HEPA vacuum, wet wipe, HEPA vacuum -- is done thoroughly the first time. It does not determine the applicable limit, the sampling protocol, the number or location of samples for a given job, or who may perform the clearance, all of which come from the governing rule and differ between programmes and jurisdictions. It does not address the work practices, containment, or occupant protection that precede clearance. The applicable EPA and HUD rules as adopted, the accredited laboratory, and the certified risk assessor or inspector govern.",
   };
 }
-const leadDustClearanceExample = { inputs: { lab_result_ug: 12, wipe_area_ft2: 1, clearance_limit_ug_ft2: 10, rooms: 4, surfaces_per_room: 3, blanks_per_job: 1 } };
+const leadDustClearanceExample = { inputs: { lab_result_ug: 12, wipe_area_ft2: 1, clearance_limit_ug_ft2: 5, rooms: 4, surfaces_per_room: 3, blanks_per_job: 1 } };
 DEMO_RENDERERS["lead-dust-clearance"] = _simpleRenderer({
   citation: "Citation: the lead dust clearance identity by name -- dust loading = the laboratory's recovered micrograms / the measured wiped area, compared against the limit for that surface type. Floors, interior window sills and window troughs each carry their OWN limit and the limits have been tightened over time, so the limit is ENTERED from the rule as adopted. Analysis is by an accredited laboratory; field screening is not clearance. It does not set the sampling protocol, the sample count or locations, or who may perform clearance. The applicable EPA and HUD rules as adopted, the accredited laboratory, and the certified risk assessor or inspector govern.",
   example: leadDustClearanceExample.inputs,
   fields: [
     { key: "lab_result_ug", label: "Laboratory result (micrograms on the wipe)", kind: "number", default: 12 },
     { key: "wipe_area_ft2", label: "Measured wiped area (sq ft)", kind: "number", default: 1 },
-    { key: "clearance_limit_ug_ft2", label: "Clearance limit for this surface (micrograms per sq ft)", kind: "number", default: 10 },
+    { key: "clearance_limit_ug_ft2", label: "Clearance limit for this surface (micrograms per sq ft; EPA 2024: floors 5, sills 40, troughs 100)", kind: "number", default: 5 },
     { key: "rooms", label: "Rooms to sample (0 to skip the count)", kind: "number", default: 4 },
     { key: "surfaces_per_room", label: "Surface types sampled per room", kind: "number", default: 3 },
     { key: "blanks_per_job", label: "Field blanks", kind: "number", default: 1 },

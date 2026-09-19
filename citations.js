@@ -7456,7 +7456,7 @@ export const CITATIONS = {
   "historical-pricing": {
     formula: "A MODELED monthly series per commodity, shaped after the named public BLS PPI / EIA / USDA NASS / FRED federal series: a maintainer-committed recent reading, a monthly drift, and a fixed seasonal pattern, materialized over the last 36 months at build time. These are not the published monthly values. Percentile bands (p25 / p50 / p75 / p90) computed via linear-interpolation type-7 quantile over a user-selected lookback window.",
     edition: "Modeled after mixed federal series, built at the date stamped on each shard. Series named: BLS PPI WPU* (industrial commodities); EIA PET.* / NG.* (retail fuel + city-gate gas); USDA NASS / FRED PWHEAMTUSDM / PMAIZMTUSDM / PSOYBUSDM (agricultural).",
-    freeAccess: "The series of record are free at bls.gov/data, eia.gov/dnav, fdc.nal.usda.gov, fred.stlouisfed.org. Series IDs are listed verbatim on every shard so the real series can be looked up.",
+    freeAccess: "The series of record are free at bls.gov/data, eia.gov/dnav, quickstats.nass.usda.gov, fred.stlouisfed.org. Series IDs are listed verbatim on every shard so the real series can be looked up.",
     governance: GOVERNANCE.reference,
     editionNote: "Single-edition. The build fetches nothing -- see check-build-hermetic -- so these shards are generated, not downloaded: the maintainer commits the anchor reading and the shape, and the build materializes 36 backdated monthly points from it. Until 2026-09-02 this page called them federal series values and said they were build-fetched, which was wrong in both halves.",
     assumptions: [
@@ -10951,10 +10951,10 @@ export const CITATIONS = {
     edition: "Solder-weight identity by name (solid-wire cross-section x density x length); first-principles geometry.",
     freeAccess: "The wire weight is pure geometry (a length of solid wire of known diameter and density); the field wire-per-joint rule is public practice.",
     governance: GOVERNANCE.general,
-    editionNote: "The wire length per joint is a field rule of thumb (roughly the pipe diameter in inches of 1/8 in solid wire) that varies with cup depth and technique. Lead-free solder runs about 0.30 lb/in^3. The crew buys spools with a spare.",
+    editionNote: "The wire length per joint is a field rule of thumb (roughly the pipe diameter in inches of 1/8 in solid wire) that varies with cup depth and technique. Lead-free plumbing solder (mostly tin, about 7.3 g/cm^3) runs about 0.265 lb/in^3. The crew buys spools with a spare.",
     assumptions: [
       { name: "Wire per joint", value: "~the pipe diameter in inches of 1/8 in solid wire; varies with cup depth and technique", source: "field rule of thumb" },
-      { name: "Solder density", value: "~0.30 lb/in^3 for lead-free solder", source: "solder manufacturer" },
+      { name: "Solder density", value: "~0.265 lb/in^3 for lead-free (tin-based) solder; 0.30 is a tin-lead figure", source: "solder manufacturer" },
     ],
   },
   "pipe-insulation-takeoff": {
@@ -11591,13 +11591,13 @@ export const CITATIONS = {
     ],
   },
   "abatement-containment": {
-    formula: "poly = (floor_sf x floor_layers + wall_sf x wall_layers) x 1.10; req_cfm = volume x ach / 60; nam_count = ceil(req_cfm / nam_cfm); waste_bags = ceil(debris_cy x 27 / 4.4).",
+    formula: "poly = (floor_sf x floor_layers + wall_sf x wall_layers) x 1.10; req_cfm = volume x ach / 60; nam_count = ceil(req_cfm / nam_cfm); waste_bags = ceil(debris_cy x 27 / (4.4 x 0.7)).",
     edition: "EPA NESHAP 40 CFR 61 Subpart M (asbestos), EPA RRP 40 CFR 745 (lead), and OSHA 1926.1101 / 1926.62 by name; a containment take-off.",
     freeAccess: "EPA NESHAP / RRP and OSHA 1926 are free federal regulations (epa.gov, osha.gov). The take-off geometry is public.",
     governance: GOVERNANCE.general,
     editionNote: "4 air changes per hour and the negative-pressure containment are industry practice for asbestos; the actual negative pressure is verified continuously with a manometer, not assumed. This is a take-off, not an abatement plan - a licensed asbestos / certified lead (RRP) contractor governs. Asbestos waste is RACM and lead debris is regulated: double-bagged, labeled, and manifested. OSHA 1926.1101 / 1926.62 and EPA NESHAP / RRP requirements are not optional.",
     assumptions: [
-      { name: "Defaults", value: "4 ACH, 1,500 cfm per HEPA machine, 4.4 ft^3 usable per 33-gal bag, 2 floor / 1 wall poly layers, 10% laps", source: "asbestos abatement practice" },
+      { name: "Defaults", value: "4 ACH, 1,500 cfm per HEPA machine, a 33-gal bag (4.4 ft^3 brim-full) filled to 70%, 2 floor / 1 wall poly layers, 10% laps", source: "asbestos abatement practice" },
     ],
   },
   "pipe-fitting-takeout": {
@@ -15578,13 +15578,13 @@ export const CITATIONS = {
     ],
   },
   "main-disinfection-chlorine": {
-    formula: "volume_gal = 0.0408 x diameter_in^2 x length_ft; available_cl_lb = (volume / 1,000,000) x dose_mg/L x 8.34; product_lb = available_cl / (product% / 100).",
+    formula: "volume_gal = 0.0408 x diameter_in^2 x length_ft; available_cl_lb = (volume / 1,000,000) x dose_mg/L x 8.34; product_lb = available_cl / (weight % / 100) for a dry product; liquid_gal = available_cl / (8.34 x trade % / 100) for a liquid labeled in trade percent.",
     edition: "AWWA C651 Disinfecting Water Mains (by name).",
     freeAccess: "AWWA C651 licensed; the dose/contact-time methods are public water-works practice.",
     governance: GOVERNANCE.general,
     editionNote: "Single-edition (the standard and the local health authority govern; the AHJ is the law).",
     assumptions: [
-      { name: "Dose / contact time", value: "default 25 mg/L held about 24 hours; another method is about 50 mg/L held about 3 hours", source: "AWWA C651" },
+      { name: "Dose / contact time", value: "continuous feed at least 25 mg/L with 10 mg/L left after 24 hours; slug at least 100 mg/L for at least 3 hours, rechlorinated if it drops below 50 mg/L", source: "AWWA C651" },
       { name: "Product strength", value: "cal-hypo (HTH-type) is roughly 65 to 70% available chlorine; liquid sodium hypochlorite is the label trade %", source: "product label" },
       { name: "Clearance", value: "flush and pass a bacteriological test, and dechlorinate any chlorinated water before discharge", source: "AWWA C651" },
     ],

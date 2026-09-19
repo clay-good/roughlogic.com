@@ -80,7 +80,7 @@ const _GAL_PER_MG = 1000000;
 
 // ===================== spec-v103: new water main chlorination =====================
 
-// dims: in { diameter_in: L, length_ft: L, dose_mg_l: M L^-3, product_pct: dimensionless } out: { volume_gal: L^3, available_cl_lb: M, product_lb: M }
+// dims: in { diameter_in: L, length_ft: L, dose_mg_l: M L^-3, product_pct: dimensionless } out: { volume_gal: L^3, available_cl_lb: M, product_lb: M, liquid_gal: L^3 }
 export function computeMainDisinfectionChlorine({ diameter_in = 0, length_ft = 0, dose_mg_l = 25, product_pct = 65 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(diameter_in > 0)) return { error: "Pipe inside diameter must be positive." };
@@ -89,15 +89,21 @@ export function computeMainDisinfectionChlorine({ diameter_in = 0, length_ft = 0
   if (!(product_pct > 0 && product_pct <= 100)) return { error: "Available-chlorine percent must be in (0, 100]." };
   const volume_gal = _GAL_PER_FT_PER_IN2 * diameter_in * diameter_in * length_ft;
   const available_cl_lb = (volume_gal / _GAL_PER_MG) * dose_mg_l * _WATER_LB_PER_GAL;
+  // Weight basis (calcium hypochlorite): pounds of product.
   const product_lb = available_cl_lb / (product_pct / 100);
+  // Trade basis (liquid sodium hypochlorite, g per 100 mL): gallons directly,
+  // lb / (8.34 x trade % / 100). Until 2026-09-19 a liquid's trade percent
+  // went through the weight formula and a specific-gravity divide, which
+  // delivered about 15% less chlorine than the dose.
+  const liquid_gal = available_cl_lb / (_WATER_LB_PER_GAL * product_pct / 100);
   return {
-    volume_gal, available_cl_lb, product_lb,
-    note: "AWWA C651 sets the method - a common one is about 25 mg/L held about 24 hours, another about 50 mg/L held about 3 hours. Calcium hypochlorite (HTH-type) is roughly 65 to 70% available chlorine by weight; sodium hypochlorite (liquid) is the trade percent on the label (for a liquid, gallons are about the pounds divided by 8.34 times the product specific gravity). The main must be flushed and pass a bacteriological test, and any chlorinated water must be dechlorinated before discharge. The standard and the AHJ govern.",
+    volume_gal, available_cl_lb, product_lb, liquid_gal,
+    note: "AWWA C651 sets the method -- the continuous-feed method charges at least 25 mg/L and must hold 10 mg/L after 24 hours, and the slug method at least 100 mg/L for at least 3 hours, rechlorinating if it falls below 50 mg/L. Calcium hypochlorite (HTH-type) is roughly 65 to 70% available chlorine BY WEIGHT: use the pounds of product. Liquid sodium hypochlorite is labeled in TRADE percent (grams per 100 mL): use the gallons, which already account for it -- do not divide the pounds by a specific gravity. The main must be flushed and pass a bacteriological test, and any chlorinated water must be dechlorinated before discharge. The standard and the AHJ govern.",
   };
 }
 const mainDisinfectionExample = { inputs: { diameter_in: 8, length_ft: 1000, dose_mg_l: 25, product_pct: 65 } };
 DISINFECT_RENDERERS["main-disinfection-chlorine"] = _simpleRenderer({
-  citation: "Citation: AWWA C651 Disinfecting Water Mains (by name) - the dose/contact-time methods (about 25 mg/L ~24 hr or about 50 mg/L ~3 hr) and the flush-and-pass-a-bacteriological-test requirement; 0.0408 gal per ft per in^2, 8.34 lb per gallon. Dechlorinate before discharge; the AHJ governs.",
+  citation: "Citation: AWWA C651 Disinfecting Water Mains (by name) - the dose/contact-time methods (continuous feed at least 25 mg/L, 10 mg/L left after 24 hr; slug at least 100 mg/L for at least 3 hr) and the flush-and-pass-a-bacteriological-test requirement; 0.0408 gal per ft per in^2, 8.34 lb per gallon. Dechlorinate before discharge; the AHJ governs.",
   example: mainDisinfectionExample.inputs,
   fields: [
     { key: "diameter_in", label: "Pipe inside diameter (in)", kind: "number" },
@@ -108,7 +114,8 @@ DISINFECT_RENDERERS["main-disinfection-chlorine"] = _simpleRenderer({
   outputs: [
     { key: "v", id: "mdc-out-v", label: "Pipe volume", value: (r) => fmt(r.volume_gal, 0) + " gal" },
     { key: "c", id: "mdc-out-c", label: "Available (100%) chlorine", value: (r) => fmt(r.available_cl_lb, 3) + " lb" },
-    { key: "p", id: "mdc-out-p", label: "Product at strength", value: (r) => fmt(r.product_lb, 3) + " lb" },
+    { key: "p", id: "mdc-out-p", label: "Dry product (weight % basis, e.g. cal-hypo)", value: (r) => fmt(r.product_lb, 3) + " lb" },
+    { key: "l", id: "mdc-out-l", label: "Liquid product (label trade % basis, e.g. bleach)", value: (r) => fmt(r.liquid_gal, 3) + " gal" },
     { key: "n", id: "mdc-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeMainDisinfectionChlorine,

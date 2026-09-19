@@ -6,6 +6,17 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **Water mains were dosed at half the slug-method chlorine, and liquid bleach was measured on the wrong percent.** The rest of the last audit batch is reference data that had gone stale.
+  - `main-disinfection-chlorine` described the AWWA C651 slug method as "about 50 mg/L held about 3 hours". C651 charges at least 100 mg/L for at least 3 hours; 50 is the floor below which the main is rechlorinated. The note and citation now state both methods as published.
+  - The same tile ran a liquid's label trade percent (grams per 100 mL) through the weight formula, then told the reader to divide by specific gravity. That delivered about 15% less chlorine than the dose. A new liquid-gallons output uses the trade basis directly: 0.294 gal at the 12.5% cross-check, not 0.251.
+  - `abatement-containment` counted waste bags at 4.4 ft³, a 33-gal bag's brim-full volume. Its sibling `abatement-waste-containers` fills bags to 70%, and this tile now does too: 27 bags for 3 cy, not 19.
+  - `solder-joint-quantity` used 0.30 lb/in³, a tin-lead density, for lead-free solder. Tin-based plumbing solder is about 0.265 lb/in³ (7.3 g/cm³), so orders were about 12% high.
+  - `lead-dust-clearance` defaulted to 10 µg/ft² for floors, the level EPA's October 2024 rule replaced with 5, while its own note warned against clearing to a superseded number. The label now lists the 2024 floor, sill and trough levels.
+  - `osha-top10` labeled an older year's order as the "most recent published year", with 1910.305 at number 10 and 1926.102 (eye and face protection) missing. It now carries the FY2024 list and says so.
+  - `irs-form-index` gave the 1099-NEC threshold as $600. For payments made after December 31, 2025 it is $2,000.
+  - `lexile-band`'s "CCSS stretch" column repeated the typical ranges for grades 1–5 and invented ranges for grades 7, 8 and 10. It now gives the CCSS Appendix A grade-band stretch ranges.
+  - The `historical-pricing` citation pointed to fdc.nal.usda.gov (FoodData Central) as NASS's free-access site; it now points to Quick Stats. The pipe-purge example named 2.067 in (a Schedule 40 steel bore) "Type L" copper.
+
 - **A complete-penetration groove weld was given weld-metal shear, a master key system was credited nearly four times the change keys it has, and the International ¼-inch log rule was really the ⅛-inch rule.**
   - `groove-weld-strength` and `groove-weld-length-for-load` gave CJP welds the weld-metal shear 0.60·FEXX. AISC 360 Table J2.5 sends CJP shear to the base metal (J4.2): the smaller of 0.60·Fy yielding and 0.60·Fu rupture. For a 0.5 × 6 in A36 plate, LRFD capacity is 64,800 lb, not 94,500, and the length inverse was short by the same ratio. New base-metal Fy and Fu inputs default to A36.
   - `master-key-bitting-capacity` said "the master claims one" of each position's same-parity depths, but never subtracted it. A two-step progression leaves d/2 − 1 per position: the textbook 4⁶ = 4,096 on 10 depths and 6 positions, not 5⁶ = 15,625. The example now uses 6 depths, where the tile's point (4 change keys against 40 needed) still holds.

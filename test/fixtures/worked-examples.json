@@ -12966,7 +12966,7 @@
    "inputs": {},
    "outputs": {
     "publication": {
-     "value": "OSHA Top 10 Most Frequently Cited Standards (most recent published year). Cited by agency publication; not reproduced.",
+     "value": "OSHA Top 10 Most Frequently Cited Standards, fiscal year 2024 (Oct 1, 2023 - Sep 5, 2024). Cited by agency publication; not reproduced. Check osha.gov for a later year.",
      "tolerance": {
       "abs": 0
      }
@@ -27075,7 +27075,7 @@
      }
     },
     "waste_bags": {
-     "value": 19,
+     "value": 27,
      "tolerance": {
       "abs": 0.001
      }
@@ -31461,7 +31461,7 @@
   {
    "tile_id": "main-disinfection-chlorine",
    "source_publisher": "AWWA C651 (by name).",
-   "source_title": "Cross-check: 6 in x 500 ft at 50 mg/L with 12.5% liquid -> 734 gal, 0.306 lb chlorine, 2.45 lb product.",
+   "source_title": "Cross-check: 6 in x 500 ft at 50 mg/L (the slug method's recharge floor) with 12.5% trade liquid -> 734 gal, 0.306 lb chlorine, 0.294 gal of liquid (2.45 lb on a weight basis).",
    "source_edition_or_year": "spec-v103 worked example (machine-verified)",
    "source_section_or_page": "spec-v103 section 2.1 cross-check",
    "verified_by": "rl",
@@ -60102,27 +60102,27 @@
   {
    "tile_id": "solder-joint-quantity",
    "source_publisher": "Solder-weight identity (first-principles)",
-   "source_title": "200 joints, 0.75 in/joint, 1/8 in wire, 0.30 lb/in^3, 1 lb spools",
+   "source_title": "200 joints, 0.75 in/joint, 1/8 in wire, 0.265 lb/in^3 (tin-based lead-free), 1 lb spools",
    "source_edition_or_year": "spec-v856 worked example",
-   "source_section_or_page": "w/in = (PI/4)*0.125^2*0.30 = 0.003682; solder = 200*0.75*0.003682 = 0.55 lb; spools = 1",
+   "source_section_or_page": "w/in = (PI/4)*0.125^2*0.265 = 0.003252; solder = 200*0.75*0.003252 = 0.49 lb; spools = 1",
    "verified_by": "rl",
    "verified_on": "2026-07-17",
    "inputs": {
     "joints": 200,
     "wire_in_per_joint": 0.75,
     "wire_dia_in": 0.125,
-    "solder_density_lb_in3": 0.3,
+    "solder_density_lb_in3": 0.265,
     "spool_lb": 1
    },
    "outputs": {
     "w_per_in": {
-     "value": 0.003682,
+     "value": 0.003252,
      "tolerance": {
       "abs": 1e-05
      }
     },
     "solder_lb": {
-     "value": 0.552,
+     "value": 0.4878,
      "tolerance": {
       "abs": 0.005
      }
@@ -60140,25 +60140,25 @@
    "source_publisher": "Solder-weight identity (first-principles)",
    "source_title": "cross-check: a 2,000-joint job of 1 in pipe (1 in wire per joint)",
    "source_edition_or_year": "spec-v856 worked example",
-   "source_section_or_page": "solder = 2000*1*0.003682 = 7.36 lb; spools = ceil(7.36) = 8",
+   "source_section_or_page": "solder = 2000*1*0.003252 = 6.50 lb; spools = ceil(6.50) = 7",
    "verified_by": "rl",
    "verified_on": "2026-07-17",
    "inputs": {
     "joints": 2000,
     "wire_in_per_joint": 1,
     "wire_dia_in": 0.125,
-    "solder_density_lb_in3": 0.3,
+    "solder_density_lb_in3": 0.265,
     "spool_lb": 1
    },
    "outputs": {
     "solder_lb": {
-     "value": 7.363,
+     "value": 6.504,
      "tolerance": {
       "abs": 0.01
      }
     },
     "spools": {
-     "value": 8,
+     "value": 7,
      "tolerance": {
       "abs": 0.01
      }
@@ -62560,7 +62560,7 @@
   {
    "tile_id": "pipe-purge-volume",
    "source_publisher": "Inert-purge identity (first-principles)",
-   "source_title": "2 in Type L (ID 2.067), 100 ft, 5 changes, 60 scfh -> 2.33 ft^3, 11.65 ft^3, 11.65 min",
+   "source_title": "2 in Schedule 40 steel (ID 2.067), 100 ft, 5 changes, 60 scfh -> 2.33 ft^3, 11.65 ft^3, 11.65 min",
    "source_edition_or_year": "spec-v894 worked example",
    "source_section_or_page": "pipe = (PI/4)*(2.067/12)^2*100 = 2.33; purge = 2.33*5 = 11.65; time = 11.65/60*60 = 11.65",
    "verified_by": "rl",

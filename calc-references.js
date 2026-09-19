@@ -262,18 +262,21 @@ export const handSignalsExample = { inputs: {} };
 // --- Utility 175: OSHA Top-10 Citations (most-recently published) ---
 
 export const OSHA_TOP_10 = {
-  publication: "OSHA Top 10 Most Frequently Cited Standards (most recent published year). Cited by agency publication; not reproduced.",
+  // FY2024 list (Oct 1, 2023 - Sep 5, 2024), announced at the 2024 NSC
+  // Safety Congress. Until 2026-09-19 this carried an older year's order
+  // under a "most recent" label, with 1910.305 at 10 and 1926.102 missing.
+  publication: "OSHA Top 10 Most Frequently Cited Standards, fiscal year 2024 (Oct 1, 2023 - Sep 5, 2024). Cited by agency publication; not reproduced. Check osha.gov for a later year.",
   items: [
     { rank: 1, standard: "29 CFR 1926.501", topic: "Fall protection - general requirements (construction)" },
     { rank: 2, standard: "29 CFR 1910.1200", topic: "Hazard communication" },
     { rank: 3, standard: "29 CFR 1926.1053", topic: "Ladders" },
-    { rank: 4, standard: "29 CFR 1910.147", topic: "Lockout / tagout (control of hazardous energy)" },
-    { rank: 5, standard: "29 CFR 1910.134", topic: "Respiratory protection" },
-    { rank: 6, standard: "29 CFR 1926.451", topic: "Scaffolding - general requirements" },
+    { rank: 4, standard: "29 CFR 1910.134", topic: "Respiratory protection" },
+    { rank: 5, standard: "29 CFR 1910.147", topic: "Lockout / tagout (control of hazardous energy)" },
+    { rank: 6, standard: "29 CFR 1910.178", topic: "Powered industrial trucks" },
     { rank: 7, standard: "29 CFR 1926.503", topic: "Fall protection - training" },
-    { rank: 8, standard: "29 CFR 1910.178", topic: "Powered industrial trucks" },
-    { rank: 9, standard: "29 CFR 1910.212", topic: "Machine guarding" },
-    { rank: 10, standard: "29 CFR 1910.305", topic: "Electrical wiring methods" },
+    { rank: 8, standard: "29 CFR 1926.451", topic: "Scaffolding - general requirements" },
+    { rank: 9, standard: "29 CFR 1926.102", topic: "Eye and face protection (construction)" },
+    { rank: 10, standard: "29 CFR 1910.212", topic: "Machine guarding" },
   ],
 };
 
@@ -438,7 +441,7 @@ export const IRS_FORM_INDEX = [
   { form: "Form 4562", title: "Depreciation and Amortization", purpose: "Section 179, bonus depreciation, MACRS, listed-property depreciation. Required when claiming depreciation in the placed-in-service year or for listed property." },
   { form: "Form 941", title: "Employer's Quarterly Federal Tax Return", purpose: "Employer reports federal income tax withheld and employee + employer FICA each quarter. Filed by the last day of the month after each quarter." },
   { form: "Form W-9", title: "Request for Taxpayer Identification Number and Certification", purpose: "U.S. payee gives a TIN to the payer so the payer can issue a 1099. No filing required; the payee returns it to the requester." },
-  { form: "Form 1099-NEC", title: "Nonemployee Compensation", purpose: "Payer reports $600+ paid to a non-employee for services. Replaces the 1099-MISC box 7 path retired in 2020. Due Jan 31 to recipient and IRS." },
+  { form: "Form 1099-NEC", title: "Nonemployee Compensation", purpose: "Payer reports $600+ paid to a non-employee for services through 2025; for payments made after December 31, 2025 the threshold is $2,000 (the 2025 reconciliation act), indexed for inflation after 2026. Replaces the 1099-MISC box 7 path retired in 2020. Due Jan 31 to recipient and IRS." },
   { form: "Form 1099-K", title: "Payment Card and Third Party Network Transactions", purpose: "Third-party settlement organization (Venmo / PayPal / Stripe / Square) reports gross payments. The reporting threshold has shifted multiple times; verify the current-year threshold with the IRS." },
 ];
 

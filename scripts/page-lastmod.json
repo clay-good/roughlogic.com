@@ -98,8 +98,8 @@
       "date": "2026-09-09"
     },
     "/tools/abatement-containment/": {
-      "sha": "80d7fbe074593ffb",
-      "date": "2026-09-01"
+      "sha": "fdb0c8b0757901fc",
+      "date": "2026-09-19"
     },
     "/tools/abatement-waste-containers/": {
       "sha": "85d5d5587fd97ca2",
@@ -3642,8 +3642,8 @@
       "date": "2026-09-01"
     },
     "/tools/historical-pricing/": {
-      "sha": "966d92bc64338990",
-      "date": "2026-09-02"
+      "sha": "576adee4fb9135ed",
+      "date": "2026-09-19"
     },
     "/tools/hoist-rope-safety-factor/": {
       "sha": "a9dcc69b778c6eb4",
@@ -3954,8 +3954,8 @@
       "date": "2026-09-01"
     },
     "/tools/irs-form-index/": {
-      "sha": "37e11381a62f5f5d",
-      "date": "2026-09-01"
+      "sha": "6b81d2e32627d7c3",
+      "date": "2026-09-19"
     },
     "/tools/iso-nff/": {
       "sha": "2eb4604c3940bf90",
@@ -4122,8 +4122,8 @@
       "date": "2026-09-18"
     },
     "/tools/lead-dust-clearance/": {
-      "sha": "1c248d69090ee6c3",
-      "date": "2026-09-08"
+      "sha": "2e8f432fefe7410a",
+      "date": "2026-09-19"
     },
     "/tools/led-tape-max-run/": {
       "sha": "501438299f7cc580",
@@ -4146,8 +4146,8 @@
       "date": "2026-09-04"
     },
     "/tools/lexile-band/": {
-      "sha": "4d1a59ee62fc811e",
-      "date": "2026-09-01"
+      "sha": "3ba5ef8a6a60f9ef",
+      "date": "2026-09-19"
     },
     "/tools/lfg-flare-capacity/": {
       "sha": "eaf89d278facc4c5",
@@ -4362,8 +4362,8 @@
       "date": "2026-09-10"
     },
     "/tools/main-disinfection-chlorine/": {
-      "sha": "c3b9dc92123e562d",
-      "date": "2026-09-01"
+      "sha": "64512c0d128b437a",
+      "date": "2026-09-19"
     },
     "/tools/main-flushing-volume/": {
       "sha": "a099365ba1648822",
@@ -4974,8 +4974,8 @@
       "date": "2026-09-01"
     },
     "/tools/osha-top10/": {
-      "sha": "a89c2f5945a94631",
-      "date": "2026-09-01"
+      "sha": "e2339967943f3191",
+      "date": "2026-09-19"
     },
     "/tools/osmolarity/": {
       "sha": "2e64e93b7fcb8b3f",
@@ -7042,8 +7042,8 @@
       "date": "2026-09-01"
     },
     "/tools/solder-joint-quantity/": {
-      "sha": "fd874a47d2ade9ed",
-      "date": "2026-09-01"
+      "sha": "e42d300ed9722066",
+      "date": "2026-09-19"
     },
     "/tools/soot-cleaning-takeoff/": {
       "sha": "379c669b39577d22",

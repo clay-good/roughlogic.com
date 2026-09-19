@@ -12277,7 +12277,7 @@ test("bounds: calc v69 coatings, blast, and abatement pin coverage, nozzle air/a
   assert.ok(Math.abs(acn.poly_sf - 1353) < 1);
   assert.ok(Math.abs(acn.req_cfm - 180) < 0.5);
   assert.strictEqual(acn.nam_count, 1);
-  assert.strictEqual(acn.waste_bags, 19);
+  assert.strictEqual(acn.waste_bags, 27); // 81 ft^3 / (4.4 ft^3 x 0.7 fill)
   assert.strictEqual(_v69c({ room_len_ft: 40, room_wid_ft: 30, room_ht_ft: 12, ach_target: 6, nam_cfm: 1000, debris_cy: 0 }).nam_count, 2); // two machines
   assert.ok("error" in _v69c({ room_len_ft: 0, room_wid_ft: 15, room_ht_ft: 9 }));
   assert.ok("error" in _v69c({ room_len_ft: 20, room_wid_ft: 15, room_ht_ft: 9, ach_target: 0 }));

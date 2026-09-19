@@ -42,7 +42,7 @@ const _finiteGuard = (o) => {
 
 // ===================== spec-v856: solder and flux per sweat-joint takeoff =====================
 // dims: in { joints: dimensionless, wire_in_per_joint: L, wire_dia_in: L, solder_density_lb_in3: M L^-3, spool_lb: M } out: { w_per_in: M L^-1, solder_lb: M, spools: dimensionless }
-export function computeSolderJointQuantity({ joints = 200, wire_in_per_joint = 0.75, wire_dia_in = 0.125, solder_density_lb_in3 = 0.30, spool_lb = 1 } = {}) {
+export function computeSolderJointQuantity({ joints = 200, wire_in_per_joint = 0.75, wire_dia_in = 0.125, solder_density_lb_in3 = 0.265, spool_lb = 1 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(joints > 0)) return { error: "Joint count must be positive." };
   if (!(wire_in_per_joint > 0)) return { error: "Wire per joint must be positive (in)." };
@@ -57,27 +57,27 @@ export function computeSolderJointQuantity({ joints = 200, wire_in_per_joint = 0
     w_per_in,
     solder_lb,
     spools,
-    note: "The wire length per joint is a field rule of thumb (roughly the pipe diameter in inches of 1/8 in solid wire) that varies with cup depth and technique. Lead-free solder runs about 0.30 lb/in^3. The crew buys spools with a spare. Flux is a separate small line, roughly one 4 oz jar per 100-150 joints.",
+    note: "The wire length per joint is a field rule of thumb (roughly the pipe diameter in inches of 1/8 in solid wire) that varies with cup depth and technique. Lead-free plumbing solder (mostly tin: 95/5 tin-antimony or tin-copper-silver, about 7.3 g/cm^3) runs about 0.265 lb/in^3; the 0.30 once used here is a tin-lead figure. The crew buys spools with a spare. Flux is a separate small line, roughly one 4 oz jar per 100-150 joints.",
   };
 }
 
-export const solderJointQuantityExample = { inputs: { joints: 200, wire_in_per_joint: 0.75, wire_dia_in: 0.125, solder_density_lb_in3: 0.30, spool_lb: 1 } };
+export const solderJointQuantityExample = { inputs: { joints: 200, wire_in_per_joint: 0.75, wire_dia_in: 0.125, solder_density_lb_in3: 0.265, spool_lb: 1 } };
 
 function _v856renderSolderJointQuantity(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: solder-weight identity by name. weight per inch = pi/4 x diameter^2 x density; solder = joints x wire per joint x weight per inch. The wire per joint is a field rule (~the pipe diameter in inches of 1/8 in wire); lead-free solder is ~0.30 lb/in^3.";
+  citationEl.textContent = "Citation: solder-weight identity by name. weight per inch = pi/4 x diameter^2 x density; solder = joints x wire per joint x weight per inch. The wire per joint is a field rule (~the pipe diameter in inches of 1/8 in wire); lead-free (tin-based) solder is ~0.265 lb/in^3.";
   const j = makeNumber("Joints to sweat", "sjq-j", { step: "any", min: "0" });
   const wj = makeNumber("Solder wire per joint (in)", "sjq-wj", { step: "any", min: "0" });
   const wd = makeNumber("Solder wire diameter (in)", "sjq-wd", { step: "any", min: "0" });
   const dn = makeNumber("Solder density (lb/in³)", "sjq-dn", { step: "any", min: "0" });
   const sp = makeNumber("Spool weight (lb)", "sjq-sp", { step: "any", min: "0" });
   for (const f of [j, wj, wd, dn, sp]) inputRegion.appendChild(f.wrap);
-  attachExampleButton(inputRegion, () => { j.input.value = "200"; wj.input.value = "0.75"; wd.input.value = "0.125"; dn.input.value = "0.30"; sp.input.value = "1"; update(); });
+  attachExampleButton(inputRegion, () => { j.input.value = "200"; wj.input.value = "0.75"; wd.input.value = "0.125"; dn.input.value = "0.265"; sp.input.value = "1"; update(); });
   const oSolder = makeOutputLine(outputRegion, "Solder to order", "sjq-out-solder");
   const oSpools = makeOutputLine(outputRegion, "Spools", "sjq-out-spools");
   const update = debounce(() => {
     const r = computeSolderJointQuantity({
       joints: j.input.value === "" ? 200 : Number(j.input.value), wire_in_per_joint: wj.input.value === "" ? 0.75 : Number(wj.input.value),
-      wire_dia_in: wd.input.value === "" ? 0.125 : Number(wd.input.value), solder_density_lb_in3: dn.input.value === "" ? 0.30 : Number(dn.input.value),
+      wire_dia_in: wd.input.value === "" ? 0.125 : Number(wd.input.value), solder_density_lb_in3: dn.input.value === "" ? 0.265 : Number(dn.input.value),
       spool_lb: sp.input.value === "" ? 1 : Number(sp.input.value),
     });
     if (r.error) { oSolder.textContent = r.error; oSpools.textContent = "-"; return; }

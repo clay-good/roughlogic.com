@@ -1177,18 +1177,23 @@ export function renderLinearSystem2x2(inputRegion, outputRegion, citationEl) {
 // of several text-complexity tools (qualitative + quantitative +
 // reader-and-task; see CCSS Appendix A §III).
 
+// The stretch column is the CCSS Appendix A (2012 supplement) "stretch"
+// band for the grade BAND: 2-3 420-820L, 4-5 740-1010L, 6-8 925-1185L,
+// 9-10 1050-1335L, 11-CCR 1185-1385L; K-1 carry none. Until 2026-09-19
+// grades 1-5 repeated the typical column and grades 7, 8 and 10 carried
+// invented ranges.
 const LEXILE_BANDS = [
-  { grade: "K",  typical: "BR (Beginning Reader) to 230L",   stretch: "Up to 230L" },
-  { grade: "1",  typical: "190L - 530L",   stretch: "190L - 530L" },
-  { grade: "2",  typical: "420L - 650L",   stretch: "420L - 650L" },
-  { grade: "3",  typical: "520L - 820L",   stretch: "520L - 820L" },
-  { grade: "4",  typical: "740L - 940L",   stretch: "740L - 940L" },
-  { grade: "5",  typical: "830L - 1010L",  stretch: "830L - 1010L" },
+  { grade: "K",  typical: "BR (Beginning Reader) to 230L",   stretch: "none set by CCSS for K-1" },
+  { grade: "1",  typical: "190L - 530L",   stretch: "none set by CCSS for K-1" },
+  { grade: "2",  typical: "420L - 650L",   stretch: "420L - 820L" },
+  { grade: "3",  typical: "520L - 820L",   stretch: "420L - 820L" },
+  { grade: "4",  typical: "740L - 940L",   stretch: "740L - 1010L" },
+  { grade: "5",  typical: "830L - 1010L",  stretch: "740L - 1010L" },
   { grade: "6",  typical: "925L - 1070L",  stretch: "925L - 1185L" },
-  { grade: "7",  typical: "970L - 1120L",  stretch: "970L - 1235L" },
-  { grade: "8",  typical: "1010L - 1185L", stretch: "1010L - 1295L" },
+  { grade: "7",  typical: "970L - 1120L",  stretch: "925L - 1185L" },
+  { grade: "8",  typical: "1010L - 1185L", stretch: "925L - 1185L" },
   { grade: "9",  typical: "1050L - 1260L", stretch: "1050L - 1335L" },
-  { grade: "10", typical: "1080L - 1335L", stretch: "1080L - 1385L" },
+  { grade: "10", typical: "1080L - 1335L", stretch: "1050L - 1335L" },
   { grade: "11", typical: "1185L - 1385L", stretch: "1185L - 1385L" },
   { grade: "12", typical: "1185L - 1385L", stretch: "1185L - 1385L" },
 ];
