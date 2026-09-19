@@ -337,7 +337,7 @@
       "covers": "calendar tax year",
       "where": "data/accounting/pub-15-t-tables.json",
       "last_verified": "2026-09-19",
-      "verification_note": "Verified 2026-09-19 against the IRS's own PDF (irs.gov/pub/irs-prior/p15t--2025.pdf), Worksheet 1A STANDARD Withholding Rate Schedule, Single: $6,400 / $18,325 / $54,875 / $109,750 / $203,700 / $256,925 / $632,750 with bases $1,192.50 / $5,578.50 / $17,651 / $40,199 / $57,231 / $188,769.75, plus the line 1g $8,600. WHAT WAS WRONG: the shard labeled 2025 held the 2024 schedule ($14,600 floor = the 2024 standard deduction, 10% band to $26,200), so $39,000 withheld $2,696 against Pub 15-T's $2,641.50. The tile now keys 2024 and 2025 by tax_year."
+      "verification_note": "Verified 2026-09-19 against the IRS's own PDF (irs.gov/pub/irs-prior/p15t--2025.pdf), Worksheet 1A STANDARD Withholding Rate Schedule, Single: $6,400 / $18,325 / $54,875 / $109,750 / $203,700 / $256,925 / $632,750 with bases $1,192.50 / $5,578.50 / $17,651 / $40,199 / $57,231 / $188,769.75, plus the line 1g $8,600. WHAT WAS WRONG: the shard labeled 2025 held the 2024 schedule ($14,600 floor = the 2024 standard deduction, 10% band to $26,200), so $39,000 withheld $2,696 against Pub 15-T's $2,641.50. The tile now keys 2024 and 2025 by tax_year. The 2026 schedule was read the same day from irs.gov/pub/irs-pdf/p15t.pdf (For use in 2026): standard single $7,500 / $19,900 / $57,900 / $113,200 / $209,275 / $263,725 / $648,100, bases $1,240 / $5,800 / $17,966 / $41,024 / $58,448 / $192,979.25, line 1g still $8,600; it is bundled in the runtime and selectable on the page. The shard still mirrors 2025."
     },
     {
       "id": "irs-macrs-table-a1",

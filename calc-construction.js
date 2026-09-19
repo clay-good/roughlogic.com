@@ -827,13 +827,19 @@ export const joistDeflectionExample = {
 
 // --- Utility 92: Footing Area for Soil Bearing ---
 
+// IBC Table 1806.2 presumptive load-bearing values: crystalline bedrock
+// 12,000 psf; sandy gravel / gravel (GW, GP) 3,000; sand, silty sand,
+// clayey sand, silty and clayey gravel (SW, SP, SM, SC, GM, GC) 2,000;
+// clay, sandy / silty clay, silt (CL, ML, MH, CH) 1,500. Until 2026-09-19
+// this table read 5,000 / 3,000 / 2,500 / 2,000 for sandy gravel, sand,
+// silty sand and silty clay -- 25 to 67% over the code it cited.
 export const SOIL_BEARING_PSF = {
   rock: 12000,
-  sandy_gravel: 5000,
-  sand: 3000,
-  silty_sand: 2500,
+  sandy_gravel: 3000,
+  sand: 2000,
+  silty_sand: 2000,
   clay: 1500,
-  silty_clay: 2000,
+  silty_clay: 1500,
 };
 
 // dims: in { column_load_lb: M L T^-2, soil_class: dimensionless, applied_moment_lbft: M L^2 T^-2 } out: { area_ft2: L^2, side_ft: L, q_max_psf: M L^-1 T^-2, q_min_psf: M L^-1 T^-2 }

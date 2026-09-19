@@ -243,7 +243,7 @@ Governing equation:
 
   dL (in) = alpha (1/F) * L (ft) * 12 * dT (F)
 
-Coefficients are bundled in data/plumbing/material-expansion.json (copper 9.4e-6, PEX 1.1e-4, PVC 3.0e-5, CPVC 3.7e-5, steel 6.5e-6).
+Coefficients are bundled in data/plumbing/material-expansion.json (copper 9.4e-6, PEX 1.1e-4, PVC 3.0e-5, CPVC 3.4e-5, steel 6.5e-6).
 
 Citations: NIST and pipe manufacturer technical bulletins.
 

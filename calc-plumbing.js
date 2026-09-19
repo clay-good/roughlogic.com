@@ -704,7 +704,7 @@ export const PIPE_EXPANSION_ALPHA_PER_F = {
   copper: 9.4e-6,
   PEX: 1.1e-4,
   PVC: 3.0e-5,
-  CPVC: 3.7e-5,
+  CPVC: 3.4e-5, // FlowGuard published 3.4e-5 in/in/F (3.7e-5 until 2026-09-19; the other two CPVC tiles already used 3.4e-5)
   steel: 6.5e-6,
 };
 
