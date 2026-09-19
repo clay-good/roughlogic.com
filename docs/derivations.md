@@ -1450,7 +1450,7 @@ cross-check.
 | calc-agriculture.js | `computeCattleHeartGirthWeight` | `{ heart_girth_in = 70, body_length_in = 55 } = {}` | _ | _ | _ |
 | calc-agriculture.js | `computeCenterPivotRuntime` | `{ system_flow_gpm = 0, area_acres = 0, target_depth_in = 0, efficiency_pct = ...` | _ | _ | _ |
 | calc-agriculture.js | `computeCornYieldEstimate` | `{ ears_per_thousandth_acre = 32, kernel_rows_around = 16, kernels_per_row = 3...` | _ | _ | _ |
-| calc-agriculture.js | `computeCropYield` | `{ crop = "corn", rows_per_pass = 1, row_spacing_in = 30, measured_length_ft =...` | _ | _ | _ |
+| calc-agriculture.js | `computeCropYield` | `{ crop = "corn", rows_per_pass = 1, row_spacing_in, measured_length_ft = 0, w...` | _ | _ | _ |
 | calc-agriculture.js | `computeDrawbarPower` | `{ pull_lb = 0, speed_mph = 0, surface = "firm_soil" }` | _ | _ | _ |
 | calc-agriculture.js | `computeDrawbarPull` | `{ power_hp = 0, power_basis = "drawbar", speed_mph = 0, surface = "firm_soil"...` | _ | _ | _ |
 | calc-agriculture.js | `computeDressingPercentage` | `{ live_weight_lb = 1200, hot_carcass_weight_lb = 744, cutting_yield_pct = 67 ...` | _ | _ | _ |
@@ -1828,7 +1828,7 @@ cross-check.
 | calc-construction.js | `computeSnowGuardLayout` | `{ roof_snow_psf = 0, pitch_rise_per_12 = 0, rafter_length_ft = 0, eave_length...` | _ | _ | _ |
 | calc-construction.js | `computeSnowLoad` | `{ Pg_psf, Ce = 1.0, Ct = 1.0, Is = 1.0, Cs = 1.0, drift_upwind_length_ft = 0 }` | _ | _ | _ |
 | calc-construction.js | `computeSnowUnbalancedGable` | `{ ground_snow_pg_psf = 0, flat_roof_ps_psf = 0, roof_rise_on_12 = 0, eave_to_...` | _ | _ | _ |
-| calc-construction.js | `computeSpeedsAndFeeds` | `{ tool = "drill", material = "steel", diameter_in = 0, flutes = 1 }` | _ | _ | _ |
+| calc-construction.js | `computeSpeedsAndFeeds` | `{ tool = "drill", material = "steel", diameter_in = 0, flutes }` | _ | _ | _ |
 | calc-construction.js | `computeSprayFoamBoardFeet` | `{ area_sf = 2000, thickness_in = 3, yield_bd_ft_per_set = 4800, waste_pct = 1...` | _ | _ | _ |
 | calc-construction.js | `computeStairCodeCheck` | `{ occupancy = "commercial", riser_height_in = 0, tread_depth_in = 0, stair_wi...` | _ | _ | _ |
 | calc-construction.js | `computeStairStringer` | `{ total_rise_in, total_run_in, tread_cut_depth_in = 1 }` | _ | _ | _ |
@@ -2516,7 +2516,7 @@ cross-check.
 | calc-hvac.js | `computeCoolingCoilTotalLoad` | `{ cfm = 0, h_ent_btu = 0, h_lvg_btu = 0 } = {}` | _ | _ | _ |
 | calc-hvac.js | `computeCoolingTower` | `{ T_in_F = 0, T_out_F = 0, T_wb_F = 0, gpm = 0, fan_kW = 0 } = {}` | _ | _ | _ |
 | calc-hvac.js | `computeDcvCo2Ventilation` | `{ n = 0, co2_set_ppm = 0, co2_oa_ppm = 400, gen_cfm = 0.0106 } = {}` | _ | _ | _ |
-| calc-hvac.js | `computeDegreeDayEnergy` | `{ ua_btuhf = 0, hdd = 0, eff = 0.80, fuel = "gas", price = 0 } = {}` | _ | _ | _ |
+| calc-hvac.js | `computeDegreeDayEnergy` | `{ ua_btuhf = 0, hdd = 0, eff, fuel = "gas", price = 0 } = {}` | _ | _ | _ |
 | calc-hvac.js | `computeDrybulbFromEnthalpy` | `{ enthalpy_btu = 0, w_lb_lb = 0 } = {}` | _ | _ | _ |
 | calc-hvac.js | `computeDualFuelBalancePoint` | `{ rate_kwh = 0, rate_therm = 0, afue = 0.95, cop_now = 0 } = {}` | _ | _ | _ |
 | calc-hvac.js | `computeDuctFrictionStatic` | `{ shape = "round", D_in = 0, W_in = 0, H_in = 0, material = "galv_smooth", cf...` | _ | _ | _ |
@@ -3058,22 +3058,17 @@ cross-check.
 | calc-pipefit.js | `computeSteamPrvAreaForCapacity` | `{ required_capacity_lb_hr = 0, upstream_p_psia = 0, discharge_coeff = 0.9 } = {}` | _ | _ | _ |
 | calc-pipefit.js | `computeSteamPrvNapier` | `{ orifice_area_in2 = 0, upstream_p_psia = 0, downstream_p_psia = 0, discharge...` | _ | _ | _ |
 | calc-pipefit.js | `computeSteamTrapSizing` | `{ heat_duty_btuhr = 0, hfg_btulb = 0, safety_factor = 2 } = {}` | _ | _ | _ |
-| calc-plumbing.js | `computeAavInstallCheck` | `{ height_above_drain_in = 0, height_above_insulation_in = 0, has_outdoor_vent...` | _ | _ | _ |
-| calc-plumbing.js | `computeAccessibleToiletCompartment` | `{ compartment_count = 0, urinal_count = 0, water_closet_count = 0, wheelchair...` | _ | _ | _ |
 | calc-plumbing.js | `computeBackflow` | `` | _ | _ | _ |
 | calc-plumbing.js | `computeBackflowLoss` | `{ device_class = "RP", flow_gpm = 0, pipe_size_in = "1" }` | _ | _ | _ |
 | calc-plumbing.js | `computeBackflowSizing` | `{ service_flow_gpm = 0, hazard = "high", assembly_type = "RP", pipe_size_in =...` | _ | _ | _ |
 | calc-plumbing.js | `computeBernoulliHead` | `{ P_psi = 0, V_fps = 0, z_ft = 0, gamma = 62.4 } = {}` | _ | _ | _ |
 | calc-plumbing.js | `computeChannelFroudeNumber` | `{ b_ft = 0, q_cfs = 0, y_ft = 0 } = {}` | _ | _ | _ |
 | calc-plumbing.js | `computeChannelNormalDepth` | `{ b_ft = 0, q_cfs = 0, n = 0, s_slope = 0 } = {}` | _ | _ | _ |
-| calc-plumbing.js | `computeCleanoutLayout` | `{ horizontal_run_ft = 0, max_spacing_ft = 100, direction_changes = 0, changes...` | _ | _ | _ |
 | calc-plumbing.js | `computeDrainageInvert` | `{ invert_in_ft = 0, slope = 0, slope_units = "in_per_ft", run_ft = 0, pipe_od...` | _ | _ | _ |
 | calc-plumbing.js | `computeExpansionTank` | `{ system_volume_gal = 0, fill_temperature_F = 60, max_temperature_F = 200, fi...` | _ | _ | _ |
-| calc-plumbing.js | `computeFixtureClearanceCheck` | `{ center_to_left_in = 0, center_to_right_in = 0, front_clearance_in = 0, adja...` | _ | _ | _ |
 | calc-plumbing.js | `computeFlowContinuity` | `{ V1_fps = 0, D1_in = 0, D2_in = 0 } = {}` | _ | _ | _ |
 | calc-plumbing.js | `computeFrictionLoss` | `{ method, material, nominal_size, length_ft, flow_gpm, internal_diameter_in }` | _ | _ | _ |
 | calc-plumbing.js | `computeGlycolMix` | `{ system_volume_gal = 0, target_burst_F = 32, glycol_type = "propylene", prot...` | _ | _ | _ |
-| calc-plumbing.js | `computeGrabBarLayout` | `{ bar_height_in = 34, side_bar_length_in = 42, side_bar_from_rear_in = 12, re...` | _ | _ | _ |
 | calc-plumbing.js | `computeGreaseInterceptorFlowCapacity` | `{ interceptor_volume_gal = 0, retention_minutes = 30, loading_factor = 1.25 }...` | _ | _ | _ |
 | calc-plumbing.js | `computeGreaseTrap` | `{ peak_flow_gpm = 0, retention_minutes = 30, loading_factor = 1.25 }` | _ | _ | _ |
 | calc-plumbing.js | `computeHydraulicJump` | `{ b_ft = 0, q_cfs = 0, y1_ft = 0 } = {}` | _ | _ | _ |
@@ -3094,7 +3089,6 @@ cross-check.
 | calc-plumbing.js | `computeRecircLoopSizing` | `{ loop_length_ft = 0, nominal_size_in = "0.75", insulation_in = 1, hot_supply...` | _ | _ | _ |
 | calc-plumbing.js | `computeRecircPumpHead` | `{ pipe_length_ft, fittings_count = 0, target_flow_gpm, internal_diameter_in, ...` | _ | _ | _ |
 | calc-plumbing.js | `computeSanitaryDfu` | `{ fixtures = {}, config = "horizontal_branch", slope_in_per_ft = 0.25, propos...` | _ | _ | _ |
-| calc-plumbing.js | `computeShowerCompartmentCheck` | `{ width_in = 0, depth_in = 0, base_min_area_sqin = 900, base_min_dim_in = 30,...` | _ | _ | _ |
 | calc-plumbing.js | `computeSlope` | `{ rise, run, units = "in_per_ft" }` | _ | _ | _ |
 | calc-plumbing.js | `computeSpecificEnergy` | `{ b_ft = 0, q_cfs = 0, y_ft = 0 } = {}` | _ | _ | _ |
 | calc-plumbing.js | `computeStaticPressureLossPiping` | `{ elevation_change_ft, friction_loss_psi = 0, fluid_density_lb_ft3 = 62.4 }` | _ | _ | _ |
@@ -3114,14 +3108,12 @@ cross-check.
 | calc-plumbing.js | `computeTrapezoidalChannelFlow` | `{ bottom_width_ft = 0, side_slope_z = 2, depth_ft = 0, n = 0.03, s_slope = 0 ...` | _ | _ | _ |
 | calc-plumbing.js | `computeVelocityHead` | `{ V_fps = 0, gamma = 62.4, rho = 1.94 } = {}` | _ | _ | _ |
 | calc-plumbing.js | `computeVentSizingStack` | `{ vent_dia_in = 0, connected_dfu = 0, developed_length_ft = 0, table_dfu = 0,...` | _ | _ | _ |
-| calc-plumbing.js | `computeVentTerminalCheck` | `{ height_above_roof_in = 6, snow_accumulation_in = 0, roof_other_use = "no", ...` | _ | _ | _ |
 | calc-plumbing.js | `computeWaterHammerArrestor` | `{ wsfu, length_ft = 0, internal_diameter_in = 0, system_pressure_psi = 0 }` | _ | _ | _ |
 | calc-plumbing.js | `computeWaterHammerSurge` | `{ material = "copper", pipe_size = "1", velocity_fps = 0, closure_time_s = 0,...` | _ | _ | _ |
 | calc-plumbing.js | `computeWaterHeaterInput` | `{ heater_type = "gas_atmospheric", target_recovery_gph = 0, efficiency = null...` | _ | _ | _ |
 | calc-plumbing.js | `computeWaterHeaterRecovery` | `{ heater_type = "gas_atmospheric", input_btu_hr = 0, input_kw = 0, efficiency...` | _ | _ | _ |
 | calc-plumbing.js | `computeWaterHeaterStorageSizing` | `{ tank_gal = 0, input_btuh = 0, efficiency_pct = 80, rise_F = 90, usable_frac...` | _ | _ | _ |
 | calc-plumbing.js | `computeWaterMeterSizing` | `{ peak_demand_gpm = 0, normal_rating_gpm = 0, peak_rating_gpm = 0 } = {}` | _ | _ | _ |
-| calc-plumbing.js | `computeWaterServicePressureCheck` | `{ static_pressure_psi = 0, min_fixture_pressure_psi = 20, has_check_or_backfl...` | _ | _ | _ |
 | calc-plumbing.js | `computeWhExpansionTank` | `{ water_heater_vol_gal = 0, incoming_psi = 60, relief_psi = 150, incoming_F =...` | _ | _ | _ |
 | calc-plumbing.js | `computeWsfuDemand` | `{ wsfu, system_type = "flush_tank", curve = null } = {}` | _ | _ | _ |
 | calc-plumbing.js | `pressureConvert` | `{ value, from, to }` | _ | _ | _ |
@@ -3147,6 +3139,14 @@ cross-check.
 | calc-plumbing.js | `renderTanklessGPM` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-plumbing.js | `renderTrapArm` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-plumbing.js | `renderWaterHammerArrestor` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
+| calc-plumbingcode.js | `computeAavInstallCheck` | `{ height_above_drain_in = 0, height_above_insulation_in = 0, has_outdoor_vent...` | _ | _ | _ |
+| calc-plumbingcode.js | `computeAccessibleToiletCompartment` | `{ compartment_count = 0, urinal_count = 0, water_closet_count = 0, wheelchair...` | _ | _ | _ |
+| calc-plumbingcode.js | `computeCleanoutLayout` | `{ horizontal_run_ft = 0, max_spacing_ft = 100, direction_changes = 0, changes...` | _ | _ | _ |
+| calc-plumbingcode.js | `computeFixtureClearanceCheck` | `{ center_to_left_in = 0, center_to_right_in = 0, front_clearance_in = 0, adja...` | _ | _ | _ |
+| calc-plumbingcode.js | `computeGrabBarLayout` | `{ bar_height_in = 34, side_bar_length_in = 42, side_bar_from_rear_in = 12, re...` | _ | _ | _ |
+| calc-plumbingcode.js | `computeShowerCompartmentCheck` | `{ width_in = 0, depth_in = 0, base_min_area_sqin = 900, base_min_dim_in = 30,...` | _ | _ | _ |
+| calc-plumbingcode.js | `computeVentTerminalCheck` | `{ height_above_roof_in = 6, snow_accumulation_in = 0, roof_other_use = "no", ...` | _ | _ | _ |
+| calc-plumbingcode.js | `computeWaterServicePressureCheck` | `{ static_pressure_psi = 0, min_fixture_pressure_psi = 20, has_check_or_backfl...` | _ | _ | _ |
 | calc-plumbingtakeoff.js | `computeHeatTraceSizing` | `{ pipe_ft = 150, allowance_pct = 10, num_valves = 1, valve_allow_ft = 3, rate...` | _ | _ | _ |
 | calc-plumbingtakeoff.js | `computeHydronicSystemVolume` | `{ pipe_length_ft = 500, gal_per_ft = 0.025, terminal_gal = 0, boiler_tank_gal...` | _ | _ | _ |
 | calc-plumbingtakeoff.js | `computePexHomerunTakeoff` | `{ fixtures = 8, hot_fixtures = 6, avg_run_ft = 35, waste_pct = 10 } = {}` | _ | _ | _ |
@@ -5190,7 +5190,7 @@ per spec-v14 §13.1 second paragraph.
 | `weld-preheat-fuel` | Weld Preheat Energy and Fuel | Carbon-steel specific heat / propane ...; 200 lb, 70 to 300 degF, 25% efficiency -> 5,060 Btu, 20,2... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `weld-transverse-shrinkage` | Weld Transverse Shrinkage and Pre-Set | Blodgett, Design of Welded Structures; 0.10 in2 weld in 1/2 in plate, 3 welds -> 0.040 in per we... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `weld-travel-speed` | Weld Travel Speed for a Target Heat Input | AWS / ASME; spec-v358 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
-| `weld-usage` | Welding Rod and Wire Usage | AWS / Lincoln / Miller welding-engine...; GMAW / 0.05 in^2 cross-section / 120 in weld / 4 lb/min -... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `weld-usage` | Welding Rod and Wire Usage | AWS / Lincoln / Miller welding-engine...; GMAW / 0.05 in^2 cross-section / 120 in weld / 0.12 lb pe... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `weld-visual-acceptance` | Weld Visual Acceptance: Cracks, Undersize, and Undercut | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `welded-wire-mesh` | Welded-Wire Reinforcement (Mesh) Sheet Takeoff | Lapped-coverage identity (first-princ...; effective = (5-0.5)(10-0.5) = 42.75 sf; gross = 2000*1.05... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `well-decline-reserves` | Well Decline Curve and Remaining Reserves | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |

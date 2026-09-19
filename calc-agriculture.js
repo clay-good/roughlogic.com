@@ -280,7 +280,7 @@ export const TEST_WEIGHT_LB_PER_BU = { corn: 56, soy: 60, wheat: 60 };
 //  volume 2150.42 in^3). The 43560 ft^2/acre and test-weight
 //  lb/bu constants absorb the unit conversions at the source level.)
 export function computeCropYield({
-  crop = "corn", rows_per_pass = 1, row_spacing_in = 30, measured_length_ft = 0,
+  crop = "corn", rows_per_pass = 1, row_spacing_in, measured_length_ft = 0,
   weight_in_strip_lb = 0, current_moisture_pct = 0, ground_loss_lb_in_area = 0,
   ground_loss_area_ft2 = 0,
 }) {
@@ -288,6 +288,9 @@ export function computeCropYield({
   const stdMoist = STD_MOISTURE_PCT[crop];
   const testWeight = TEST_WEIGHT_LB_PER_BU[crop];
   if (!Number.isFinite(stdMoist)) return { error: "Unknown crop." };
+  // Wheat is drilled, not row-planted, so the 30 in corn row is four times its strip width.
+  // Spacing varies by drill (6 to 10 in), so this is a starting point to be confirmed.
+  if (row_spacing_in === undefined || row_spacing_in === null) row_spacing_in = crop === "wheat" ? 7.5 : 30;
   if (!(rows_per_pass >= 1)) return { error: "Rows per pass must be at least 1." };
   if (!(row_spacing_in > 0)) return { error: "Row spacing must be positive." };
   if (!(measured_length_ft > 0)) return { error: "Measured length must be positive." };

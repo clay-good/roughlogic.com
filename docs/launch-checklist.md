@@ -420,7 +420,7 @@ than sitting here misinforming a reader for three months.
 | --- | --- |
 | Calculators (tiles) in `TOOLS` | **2183 live tiles** |
 | Active catalog groups | **21 live groups** |
-| `calc-*.js` modules | **88 live calc modules** |
+| `calc-*.js` modules | **89 live calc modules** |
 | Sitemap URLs (one per tile, one per group hub, home, catalog hub) | **2206 live sitemap URLs** |
 
 ### Gates

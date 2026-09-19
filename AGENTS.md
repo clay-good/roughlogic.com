@@ -7,7 +7,7 @@ Guidance for AI agents working in or with this repository. (Humans: see
 
 **roughlogic.com** is a static, offline-first site of **2,183 calculators** for the
 trades (electrical, plumbing, HVAC, construction, restoration, and more) across
-**88 calc modules**, plus a local, zero-cost **MCP server** that exposes every one
+**89 calc modules**, plus a local, zero-cost **MCP server** that exposes every one
 of them to an AI agent. US standards only. No AI at runtime. Calculator execution
 is local; the only hosted write path is the bounded, user-initiated D1 feedback
 endpoint, and the MCP server runs on your machine over stdio.

@@ -34417,7 +34417,7 @@ test("bounds: spec-v1131 computeEgressWindowCheck pins the unsatisfiable-minimum
   assert.ok("error" in _v1131({ ...base, clear_width_in: Infinity }));
 });
 
-import { computeFixtureClearanceCheck as _v1132 } from "../../calc-plumbing.js";
+import { computeFixtureClearanceCheck as _v1132 } from "../../calc-plumbingcode.js";
 
 test("bounds: spec-v1132 computeFixtureClearanceCheck pins the four IPC 405.3.1 clearances, the derived row width, and error seams", () => {
   const base = { center_to_left_in: 15, center_to_right_in: 18, front_clearance_in: 24, adjacent_center_in: 30, fixture_count: 2, compartment_width_in: 0, compartment_depth_in: 0, min_side_in: 15, min_center_in: 30, min_front_in: 21 };
@@ -34525,7 +34525,7 @@ test("bounds: spec-v1133 computeLandingCheck pins the directional depth rule, th
   assert.ok("error" in _v1133({ ...base, landing_depth_in: Infinity }));
 });
 
-import { computeShowerCompartmentCheck as _v1134 } from "../../calc-plumbing.js";
+import { computeShowerCompartmentCheck as _v1134 } from "../../calc-plumbingcode.js";
 
 test("bounds: spec-v1134 computeShowerCompartmentCheck pins the two-path rule, the disc identity, both boundary cases, and error seams", () => {
   const base = { width_in: 28, depth_in: 36, base_min_area_sqin: 900, base_min_dim_in: 30, exception_min_area_sqin: 1300, exception_min_dim_in: 25 };
@@ -34584,7 +34584,7 @@ test("bounds: spec-v1134 computeShowerCompartmentCheck pins the two-path rule, t
   assert.ok("error" in _v1134({ ...base, width_in: Infinity }));
 });
 
-import { computeVentTerminalCheck as _v1135 } from "../../calc-plumbing.js";
+import { computeVentTerminalCheck as _v1135 } from "../../calc-plumbingcode.js";
 
 test("bounds: spec-v1135 computeVentTerminalCheck pins all three IPC 903 rules independently, their seams, and error seams", () => {
   const base = { height_above_roof_in: 6, snow_accumulation_in: 18, roof_other_use: "no", design_temp_f: -10, vent_diameter_in: 2, increase_inside_envelope_in: 6, horizontal_to_opening_ft: 4, height_above_opening_ft: 1 };
@@ -34635,7 +34635,7 @@ test("bounds: spec-v1135 computeVentTerminalCheck pins all three IPC 903 rules i
   assert.ok("error" in _v1135({ ...base, design_temp_f: Infinity }));
 });
 
-import { computeAavInstallCheck as _v1136 } from "../../calc-plumbing.js";
+import { computeAavInstallCheck as _v1136 } from "../../calc-plumbingcode.js";
 
 test("bounds: spec-v1136 computeAavInstallCheck pins the 918.7 outdoor-vent override, both placement minimums, capacity, and error seams", () => {
   const base = { height_above_drain_in: 4, height_above_insulation_in: 6, has_outdoor_vent: "yes", ventilated_space: "yes", accessible: "yes", dfu_served: 6, valve_dfu_rating: 20 };
@@ -34679,7 +34679,7 @@ test("bounds: spec-v1136 computeAavInstallCheck pins the 918.7 outdoor-vent over
   assert.ok("error" in _v1136({ ...base, height_above_drain_in: Infinity }));
 });
 
-import { computeGrabBarLayout as _v1137 } from "../../calc-plumbing.js";
+import { computeGrabBarLayout as _v1137 } from "../../calc-plumbingcode.js";
 
 test("bounds: spec-v1137 computeGrabBarLayout pins the tangent rear-bar span, the 33-36 window, the 609.8 load path, and error seams", () => {
   const base = { bar_height_in: 34, side_bar_length_in: 42, side_bar_from_rear_in: 12, rear_bar_length_in: 36, rear_toward_side_in: 12, rear_toward_open_in: 24, load_lb: 250, standoff_in: 1.5, fastener_spacing_in: 3 };
@@ -34827,7 +34827,7 @@ test("bounds: spec-v1139 computeDryerDuctLength pins the developed-length arithm
   assert.ok("error" in _v1139({ ...base, straight_run_ft: Infinity }));
 });
 
-import { computeCleanoutLayout as _v1140 } from "../../calc-plumbing.js";
+import { computeCleanoutLayout as _v1140 } from "../../calc-plumbingcode.js";
 
 test("bounds: spec-v1140 computeCleanoutLayout pins the three additive triggers, the 40 ft grouping cap, the access rules, and error seams", () => {
   const base = { horizontal_run_ft: 240, max_spacing_ft: 100, direction_changes: 9, changes_grouped_away: 0, stack_count: 2, pipe_size_in: 4, clear_space_in: 18, crawl_height_in: 30 };
@@ -35137,7 +35137,7 @@ test("bounds: spec-v1145 computeGasApplianceConnection pins the movable-applianc
   assert.ok("error" in _v1145({ ...base, shutoff_distance_ft: Infinity }));
 });
 
-import { computeWaterServicePressureCheck as _v1146 } from "../../calc-plumbing.js";
+import { computeWaterServicePressureCheck as _v1146 } from "../../calc-plumbingcode.js";
 
 test("bounds: spec-v1146 computeWaterServicePressureCheck pins the 80 psi cap, the closed-system chain, and error seams", () => {
   const base = { static_pressure_psi: 95, min_fixture_pressure_psi: 20, has_check_or_backflow: "no", has_storage_water_heater: "yes", expansion_control_present: "no", prv_setpoint_psi: 60 };
@@ -35866,7 +35866,7 @@ test("bounds: spec-v1159 computeAccessibleParkingCount pins Table 208.2, the 2% 
   assert.ok("error" in _v1159({ ...base, total_spaces: Infinity }));
 });
 
-import { computeAccessibleToiletCompartment as _v1160 } from "../../calc-plumbing.js";
+import { computeAccessibleToiletCompartment as _v1160 } from "../../calc-plumbingcode.js";
 
 test("bounds: spec-v1160 computeAccessibleToiletCompartment pins the OR trigger, the mounting-dependent depth, the 35-37 in width window, and error seams", () => {
   const base = { compartment_count: 4, urinal_count: 3, water_closet_count: 4, wheelchair_width_in: 60, wheelchair_depth_in: 56, wc_mounting: "floor-mounted", ambulatory_provided: "no", ambulatory_width_in: 0, ambulatory_depth_in: 0 };

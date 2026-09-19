@@ -421,7 +421,7 @@ LOWVOLTAGE_RENDERERS["cable-tray-fill"] = _renderCableTrayFill;
 // ---------------------------------------------------------------------
 // 1 Mbps continuous = 0.45 GB/hour = 10.8 GB/day.
 // dims: in { camera_count: dimensionless, bitrate_mbps: dimensionless, motion_duty_percent: dimensionless, retention_days: dimensionless } out: { total_storage_gb: dimensionless, aggregate_bandwidth_mbps: dimensionless }
-export function computeCctvStorage({ camera_count = 1, bitrate_mbps = 0, recording_mode = "continuous", motion_duty_percent = 100, retention_days = 0 } = {}) {
+export function computeCctvStorage({ camera_count = 1, bitrate_mbps = 0, recording_mode = "continuous", motion_duty_percent, retention_days = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const n = Math.max(0, Number(camera_count) || 0);
   const br = Number(bitrate_mbps);
@@ -431,7 +431,9 @@ export function computeCctvStorage({ camera_count = 1, bitrate_mbps = 0, recordi
   if (!(days >= 0)) return { error: "Retention days must be non-negative." };
   let hours;
   if (recording_mode === "motion") {
-    const duty = Number(motion_duty_percent);
+    // With nothing supplied, take the 50% the renderer and both examples use. A 100% default
+    // made "motion" identical to "continuous", so the select silently did nothing.
+    const duty = Number(motion_duty_percent === undefined || motion_duty_percent === null ? 50 : motion_duty_percent);
     if (!(duty > 0 && duty <= 100)) return { error: "Motion duty-cycle must be in (0, 100] percent." };
     hours = 24 * (duty / 100);
   } else {
@@ -483,7 +485,7 @@ LOWVOLTAGE_RENDERERS["cctv-storage"] = _renderCctvStorage;
 // at retention_days = 1 to get the daily total, keeping the daily-rate geometry
 // in one place.
 // dims: in { disk_capacity_gb: dimensionless, camera_count: dimensionless, bitrate_mbps: dimensionless, motion_duty_percent: dimensionless } out: { retention_days: dimensionless, per_camera_day_gb: dimensionless }
-export function computeCctvRetentionDays({ disk_capacity_gb = 0, camera_count = 1, bitrate_mbps = 0, recording_mode = "continuous", motion_duty_percent = 100 } = {}) {
+export function computeCctvRetentionDays({ disk_capacity_gb = 0, camera_count = 1, bitrate_mbps = 0, recording_mode = "continuous", motion_duty_percent } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const cap = Number(disk_capacity_gb);
   if (!(cap > 0)) return { error: "Available disk capacity must be positive (GB)." };

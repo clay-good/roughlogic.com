@@ -1762,14 +1762,18 @@ export const SFM_TABLE = {
   },
 };
 
+// A twist drill has 2 cutting lips and a lathe tool is single-point; an end mill's flute
+// count is a tool property, so 2 is only a starting point there.
+export const TOOL_DEFAULT_FLUTES = { drill: 2, end_mill: 2, lathe: 1 };
 // dims: in { tool: dimensionless, material: dimensionless, diameter_in: L, flutes: dimensionless } out: { rpm: T^-1, feed_ipm: L T^-1 }
-export function computeSpeedsAndFeeds({ tool = "drill", material = "steel", diameter_in = 0, flutes = 1 }) {
+export function computeSpeedsAndFeeds({ tool = "drill", material = "steel", diameter_in = 0, flutes }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const t = SFM_TABLE[tool];
   if (!t) return { error: "Unknown tool type." };
   const m = t[material];
   if (!m) return { error: "Unknown material." };
   if (!(diameter_in > 0)) return { error: "Diameter must be positive." };
+  if (flutes === undefined || flutes === null) flutes = TOOL_DEFAULT_FLUTES[tool] ?? 1;
   if (!(flutes >= 1)) return { error: "Flutes must be at least 1." };
   const rpm = m.sfm * 3.82 / diameter_in;
   const ipm = rpm * m.chipload_ipt * flutes;
@@ -1783,13 +1787,18 @@ export const speedsAndFeedsExample = { inputs: { tool: "drill", material: "steel
 export const WELD_DEPOSITION_EFFICIENCY = { SMAW: 0.60, GMAW: 0.90, FCAW: 0.80, GTAW: 1.00 };
 export const WELD_GAS_FLOW_CFH = { SMAW: 0, GMAW: 35, FCAW: 35, GTAW: 20 };
 
+// Typical deposition rates in lb/MINUTE. The sibling wire-feed tile puts GMAW at .035 wire
+// near 4.5 to 7.5 lb/HOUR, so the old 4 lb/min default was about 40x high and reported a
+// 1.7 lb weld as 25 seconds of arc time.
+export const WELD_DEPOSITION_RATE_LB_PER_MIN = { SMAW: 0.06, GMAW: 0.12, FCAW: 0.20, GTAW: 0.03 };
 // dims: in { process: dimensionless, weld_cross_section_in2: L^2, weld_length_in: L, deposition_rate_lb_per_min: M T^-1 } out: { electrode_lb: M, arc_time_min: T }
-export function computeWeldUsage({ process = "GMAW", weld_cross_section_in2 = 0, weld_length_in = 0, deposition_rate_lb_per_min = 4 }) {
+export function computeWeldUsage({ process = "GMAW", weld_cross_section_in2 = 0, weld_length_in = 0, deposition_rate_lb_per_min }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const eff = WELD_DEPOSITION_EFFICIENCY[process];
   if (!Number.isFinite(eff)) return { error: "Unknown welding process." };
   if (!(weld_cross_section_in2 > 0)) return { error: "Cross-section must be positive." };
   if (!(weld_length_in > 0)) return { error: "Weld length must be positive." };
+  if (deposition_rate_lb_per_min === undefined || deposition_rate_lb_per_min === null) deposition_rate_lb_per_min = WELD_DEPOSITION_RATE_LB_PER_MIN[process];
   if (!(deposition_rate_lb_per_min > 0)) return { error: "Deposition rate must be positive." };
   // Steel density 0.283 lb/in^3.
   const deposit_lb = weld_cross_section_in2 * weld_length_in * 0.283;
@@ -1800,7 +1809,7 @@ export function computeWeldUsage({ process = "GMAW", weld_cross_section_in2 = 0,
   return { deposit_lb, consumable_lb, minutes, gas_ft3, efficiency: eff };
 }
 
-export const weldUsageExample = { inputs: { process: "GMAW", weld_cross_section_in2: 0.05, weld_length_in: 120, deposition_rate_lb_per_min: 4 } };
+export const weldUsageExample = { inputs: { process: "GMAW", weld_cross_section_in2: 0.05, weld_length_in: 120, deposition_rate_lb_per_min: 0.12 } };
 
 // --- Utility 157: Demolition Debris Weight ---
 
@@ -1835,11 +1844,14 @@ export const ACI_C_W = { normal: 1.0, lightweight_115: 0.85, lightweight_135: 0.
 
 // dims: in { pour_rate_ft_per_hr: L T^-1, concrete_temp_F: T, weight_factor: dimensionless, unit_weight_pcf: M L^-3, wall_height_ft: L } out: { pressure_psf: M L^-1 T^-2 }
 export function computeFormworkPressure({
-  pour_rate_ft_per_hr = 0, concrete_temp_F = 70, weight_factor = "normal", unit_weight_pcf = 150, wall_height_ft = 100,
+  pour_rate_ft_per_hr = 0, concrete_temp_F = 70, weight_factor = "normal", unit_weight_pcf, wall_height_ft = 100,
 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(pour_rate_ft_per_hr > 0)) return { error: "Pour rate must be positive." };
   if (!(concrete_temp_F > 0)) return { error: "Concrete temperature must be positive." };
+  // The option names the density, so take it from there when nothing is supplied: a
+  // lightweight_115 pour capped at a 150 pcf head is a head the concrete cannot produce.
+  if (unit_weight_pcf === undefined || unit_weight_pcf === null) unit_weight_pcf = { lightweight_115: 115, lightweight_135: 135 }[weight_factor] ?? 150;
   const Cw = ACI_C_W[weight_factor];
   if (!Number.isFinite(Cw)) return { error: "Unknown weight factor." };
   // ACI 347R wall pressure. The short form Cw (150 + 9000 R / T) holds only
@@ -2144,7 +2156,7 @@ const renderSpeedsAndFeeds = _simpleRenderer({
     { key: "tool", label: "Tool", kind: "select", options: [{ value: "drill", label: "Drill" }, { value: "end_mill", label: "End mill" }, { value: "lathe", label: "Lathe" }] },
     { key: "material", label: "Material", kind: "select", options: ["steel", "stainless", "aluminum", "brass", "hardwood", "softwood", "plastic"].map((v) => ({ value: v, label: v })) },
     { key: "diameter_in", label: "Diameter (in)", kind: "number" },
-    { key: "flutes", label: "Flutes", kind: "number", default: 1 },
+    { key: "flutes", label: "Flutes (blank: 2 for a drill or end mill, 1 for a lathe tool)", kind: "number", default: 2 },
   ],
   outputs: [
     { key: "rpm", id: "sf-out-rpm", label: "RPM", value: (r) => _fmtC(r.rpm, 0) },
@@ -2161,7 +2173,7 @@ const renderWeldUsage = _simpleRenderer({
     { key: "process", label: "Process", kind: "select", options: ["SMAW", "GMAW", "FCAW", "GTAW"].map((v) => ({ value: v, label: v })) },
     { key: "weld_cross_section_in2", label: "Weld cross-section (in²)", kind: "number" },
     { key: "weld_length_in", label: "Weld length (in)", kind: "number" },
-    { key: "deposition_rate_lb_per_min", label: "Deposition rate (lb/min)", kind: "number" },
+    { key: "deposition_rate_lb_per_min", label: "Deposition rate (lb per MINUTE; blank: 0.12 GMAW, 0.06 SMAW, 0.20 FCAW, 0.03 GTAW)", kind: "number" },
   ],
   outputs: [
     { key: "d", id: "wu-out-d", label: "Deposit (lb)", value: (r) => _fmtC(r.deposit_lb, 2) },

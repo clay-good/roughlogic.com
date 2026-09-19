@@ -277,7 +277,7 @@ const UNIT_TAIL_EXEMPT = new Set([
   "calc-fire.js:computeNFPA1142WaterSupply:exposure_within_50_ft",
   // An AREA in square inches whose name stops at the unit's first half; the
   // guard beside it compares it against `area_have_in2`.
-  "calc-plumbing.js:computeShowerCompartmentCheck:area_needed_in",
+  "calc-plumbingcode.js:computeShowerCompartmentCheck:area_needed_in",
   // AISC's shear-lag coefficient U, entered directly to override the computed
   // one. The `_in` marks it as an input, not an inch.
   "calc-steel.js:computeSteelTensionMember:u_in",

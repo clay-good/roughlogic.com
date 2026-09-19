@@ -1395,8 +1395,8 @@ import {
 export function computeStandpipePDP({
   standpipe_class = "I",
   highest_outlet_elevation_ft = 0,
-  nozzle_pressure_psi = 100,
-  design_gpm = 250,
+  nozzle_pressure_psi,
+  design_gpm,
   appliance_loss_psi = 25,
   supply_hose_length_ft = 0,
   supply_hose_diameter = "3_in",
@@ -1404,8 +1404,12 @@ export function computeStandpipePDP({
 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const elev = Number(highest_outlet_elevation_ft) || 0;
-  const NP = Number(nozzle_pressure_psi) || 0;
-  const Q = Number(design_gpm) || 0;
+  // NFPA 14 7.8: Class I and III are 100 psi residual at 250 gpm on a 2-1/2 in outlet;
+  // Class II is 65 psi at 100 gpm on a 1-1/2 in occupant-use station. Supplying neither
+  // number used to hand a Class II system the Class I pair, 42 psi high.
+  const classII = standpipe_class === "II";
+  const NP = Number(nozzle_pressure_psi === undefined || nozzle_pressure_psi === null ? (classII ? 65 : 100) : nozzle_pressure_psi) || 0;
+  const Q = Number(design_gpm === undefined || design_gpm === null ? (classII ? 100 : 250) : design_gpm) || 0;
   const appliance = Number(appliance_loss_psi) || 0;
   const supplyLen = Number(supply_hose_length_ft) || 0;
   const height = Number(building_height_ft) || 0;

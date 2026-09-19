@@ -3985,10 +3985,14 @@ function _v329renderBuildingUa(inputRegion, outputRegion, citationEl) {
 HVAC_RENDERERS["building-ua"] = _v329renderBuildingUa;
 
 // dims: in { ua_btuhf: M L^2 T^-3, hdd: T, eff: dimensionless, fuel: dimensionless, price: dimensionless } out: { q_mmbtu: M L^2 T^-2, fuel_units: dimensionless, cost: dimensionless }
-export function computeDegreeDayEnergy({ ua_btuhf = 0, hdd = 0, eff = 0.80, fuel = "gas", price = 0 } = {}) {
+export function computeDegreeDayEnergy({ ua_btuhf = 0, hdd = 0, eff, fuel = "gas", price = 0 } = {}) {
   const _g = _finiteGuardEnv(arguments[0]); if (_g) return _g;
   if (!(ua_btuhf > 0)) return { error: "The heat-loss coefficient UA must be positive (Btu/h-F)." };
   if (!(hdd > 0)) return { error: "Heating degree-days must be positive (degF-days)." };
+  // With nothing supplied, electric resistance is 1.00 by definition (the 3,412 Btu/kWh
+  // constant IS the full-conversion figure); combustion equipment keeps the 0.80 starting
+  // point, since AFUE is equipment-specific. An explicitly entered 0 stays an error.
+  if (eff === undefined || eff === null) eff = fuel === "electric" ? 1.0 : 0.80;
   if (!(eff > 0)) return { error: "Efficiency (AFUE or COP) must be positive." };
   if (price < 0) return { error: "Fuel price cannot be negative." };
   const per_unit = { gas: 1e5, oil: 138500, electric: 3412 };
@@ -4001,7 +4005,7 @@ export function computeDegreeDayEnergy({ ua_btuhf = 0, hdd = 0, eff = 0.80, fuel
   const cost = fuel_units * price;
   return {
     q_mmbtu: q_btu / 1e6, fuel_units, unit_label, cost,
-    note: "Degree-day annual heating energy Q = 24 x HDD x UA (base-65 degF heating degree-days), the fuel = Q/efficiency, and the cost = fuel x unit price, with 1 therm = 100,000 Btu, 1 gal fuel oil ~ 138,500 Btu, and 1 kWh = 3,412 Btu. The energy scales directly with UA, so a 20% envelope improvement is a 20% lower bill. This is the base-65 steady-state degree-day method - a variable-base method with the building's actual balance point is more accurate, and it ignores internal and solar gains that lower the true balance point; it takes UA and local HDD as entered and adds no cooling, latent, or domestic-hot-water energy. An estimate, not a utility-bill-calibrated model; actual consumption depends on occupancy, weather, and gains.",
+    note: "Degree-day annual heating energy Q = 24 x HDD x UA (base-65 degF heating degree-days), the fuel = Q/efficiency, and the cost = fuel x unit price, with 1 therm = 100,000 Btu, 1 gal fuel oil ~ 138,500 Btu, and 1 kWh = 3,412 Btu. With no efficiency entered, electric defaults to 1.00 (resistance) and combustion to 0.80; a heat pump is entered as its COP. The energy scales directly with UA, so a 20% envelope improvement is a 20% lower bill. This is the base-65 steady-state degree-day method - a variable-base method with the building's actual balance point is more accurate, and it ignores internal and solar gains that lower the true balance point; it takes UA and local HDD as entered and adds no cooling, latent, or domestic-hot-water energy. An estimate, not a utility-bill-calibrated model; actual consumption depends on occupancy, weather, and gains.",
   };
 }
 export const degreeDayEnergyExample = { inputs: { ua_btuhf: 500, hdd: 5000, eff: 0.80, fuel: "gas", price: 1.20 } };

@@ -53,7 +53,7 @@ active. Cache version is keyed to the build hash.
 |  |  +------------+  +-----------+  +---------------------+   | |
 |  |  | pinned     |  | theme     |  | offline / print     |   | |
 |  |  +------------+  +-----------+  +---------------------+   | |
-|  |   dynamic-import: 88 calc-* modules (the repo-root        | |
+|  |   dynamic-import: 89 calc-* modules (the repo-root        | |
 |  |   calc-*.js set, one per trade bench; each holds a        | |
 |  |   documented gzip cap in check-module-sizes.mjs) plus     | |
 |  |   citations / tile-meta / limitation-banner /             | |
@@ -126,7 +126,7 @@ There is no sessionStorage, cookies, or IndexedDB. localStorage is used by `them
 ## v2 module layout
 
 The v2 expansion (spec-v2.md) added the first lazy-loaded module past
-the original seven trade calc-* modules. The set has since grown to 88
+the original seven trade calc-* modules. The set has since grown to 89
 modules; the authoritative current inventory is the
 repo-root `calc-*.js` set, each with a documented gzip cap in
 `scripts/check-module-sizes.mjs`.

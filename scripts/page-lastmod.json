@@ -95,7 +95,7 @@
     },
     "/tools/aav-install-check/": {
       "sha": "4e1b1d5b33ca35e4",
-      "date": "2026-09-09"
+      "date": "2026-09-19"
     },
     "/tools/abatement-containment/": {
       "sha": "fdb0c8b0757901fc",
@@ -143,7 +143,7 @@
     },
     "/tools/accessible-toilet-compartment/": {
       "sha": "427729842997f3d3",
-      "date": "2026-09-01"
+      "date": "2026-09-19"
     },
     "/tools/acid-waste-neutralization/": {
       "sha": "b9f7d081768df71f",
@@ -1227,7 +1227,7 @@
     },
     "/tools/cleanout-layout/": {
       "sha": "b818cc7928db2112",
-      "date": "2026-09-01"
+      "date": "2026-09-19"
     },
     "/tools/clearance-plate-envelope/": {
       "sha": "9d44a85a5da50bce",
@@ -2935,7 +2935,7 @@
     },
     "/tools/fixture-clearance-check/": {
       "sha": "a70be8860b18ae67",
-      "date": "2026-09-01"
+      "date": "2026-09-19"
     },
     "/tools/flammable-cabinet-storage/": {
       "sha": "5f3a60612d749998",
@@ -3359,7 +3359,7 @@
     },
     "/tools/grab-bar-layout/": {
       "sha": "c67bbfc7cfd7446d",
-      "date": "2026-09-01"
+      "date": "2026-09-19"
     },
     "/tools/grade-rod-cut-fill/": {
       "sha": "d813a88833ba70d5",
@@ -6771,7 +6771,7 @@
     },
     "/tools/shower-compartment-check/": {
       "sha": "7b11cb98cba9d15a",
-      "date": "2026-09-01"
+      "date": "2026-09-19"
     },
     "/tools/shr/": {
       "sha": "c1ef8aae986dfe62",
@@ -7098,8 +7098,8 @@
       "date": "2026-09-04"
     },
     "/tools/speeds-feeds/": {
-      "sha": "dce68d73eaa19180",
-      "date": "2026-09-01"
+      "sha": "75b701765f4b03bb",
+      "date": "2026-09-19"
     },
     "/tools/spherical-cap-volume/": {
       "sha": "89a69321eb6ff82e",
@@ -8335,7 +8335,7 @@
     },
     "/tools/vent-terminal-check/": {
       "sha": "1bf0e609f9a0f587",
-      "date": "2026-09-04"
+      "date": "2026-09-19"
     },
     "/tools/ventilation-rate-procedure/": {
       "sha": "4dff7fa056c4e7f1",
@@ -8479,7 +8479,7 @@
     },
     "/tools/water-service-pressure-check/": {
       "sha": "1a0cc60c5437d7c2",
-      "date": "2026-09-04"
+      "date": "2026-09-19"
     },
     "/tools/water-supply-duration/": {
       "sha": "7d1aec34f10ad3ba",
@@ -8558,8 +8558,8 @@
       "date": "2026-09-01"
     },
     "/tools/weld-usage/": {
-      "sha": "f191d1d3bb469740",
-      "date": "2026-09-01"
+      "sha": "5129892ad691b564",
+      "date": "2026-09-19"
     },
     "/tools/weld-visual-acceptance/": {
       "sha": "84754ed4646f87e6",

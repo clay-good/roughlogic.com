@@ -247,9 +247,16 @@ export const TOOL_MODULES = (() => {
     "radiant-loop-sizing",
     // spec-v302..v304 site-hydraulics depth batch.
     "time-of-concentration", "orifice-flow", "orifice-diameter-for-flow", "tank-drain-time", "channel-froude-number",
-    "channel-normal-depth", "trapezoidal-channel-flow", "fixture-clearance-check", "shower-compartment-check", "accessible-toilet-compartment", "vent-terminal-check", "aav-install-check", "grab-bar-layout", "cleanout-layout", "water-service-pressure-check", "hydraulic-jump", "specific-energy",
+    "channel-normal-depth", "trapezoidal-channel-flow", "hydraulic-jump", "specific-energy",
     "velocity-head", "flow-continuity", "bernoulli-head",
     "thrust-block-sizing", "thrust-block-max-pressure",
+  ]);
+  declare("./calc-plumbingcode.js", "PLUMBINGCODE_RENDERERS", [
+    // cap-relief split out of calc-plumbing.js: the fixture and layout half,
+    // what the code requires of a rough-in's dimensions.
+    "fixture-clearance-check", "shower-compartment-check", "accessible-toilet-compartment",
+    "vent-terminal-check", "aav-install-check", "grab-bar-layout", "cleanout-layout",
+    "water-service-pressure-check",
   ]);
   declare("./calc-plumbingtakeoff.js", "PLUMBINGTAKEOFF_RENDERERS", [
     // spec-v1028 cap-relief split out of calc-plumbing.js: the takeoff /

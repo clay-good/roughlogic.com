@@ -10985,15 +10985,15 @@
    "tile_id": "weld-usage",
    "source_publisher": "AWS / Lincoln / Miller welding-engineering bulletins (project bundled)",
    "source_title": "Weld consumable: deposit_lb = volume_in3 * 0.283 lb/in^3 (steel); consumable = deposit / efficiency; minutes = deposit / dep_rate",
-   "source_edition_or_year": "AWS / Lincoln GMAW efficiency 0.90; deposition rate 4 lb/min for the cited mode",
-   "source_section_or_page": "GMAW / 0.05 in^2 cross-section / 120 in weld / 4 lb/min -> 1.698 lb deposit / 1.887 lb consumable / 0.42 min / 0.248 ft^3 gas",
+   "source_edition_or_year": "AWS / Lincoln GMAW efficiency 0.90; deposition rate cross-checked against this project's wire-feed-deposition tile",
+   "source_section_or_page": "GMAW / 0.05 in^2 cross-section / 120 in weld / 0.12 lb per MINUTE (7.2 lb/hr, the range the wire-feed-deposition tile gives for .035 wire at ordinary feed speeds) -> 1.698 lb deposit / 1.887 lb consumable / 14.15 min / 8.254 ft^3 gas. The old 4 lb/min read as 0.42 min of arc time for a 1.7 lb weld.",
    "verified_by": "rl",
-   "verified_on": "2026-05-11",
+   "verified_on": "2026-09-19",
    "inputs": {
     "process": "GMAW",
     "weld_cross_section_in2": 0.05,
     "weld_length_in": 120,
-    "deposition_rate_lb_per_min": 4
+    "deposition_rate_lb_per_min": 0.12
    },
    "outputs": {
     "deposit_lb": {
@@ -11009,13 +11009,13 @@
      }
     },
     "minutes": {
-     "value": 0.4245,
+     "value": 14.15,
      "tolerance": {
-      "abs": 0.001
+      "abs": 0.01
      }
     },
     "gas_ft3": {
-     "value": 0.2476,
+     "value": 8.254,
      "tolerance": {
       "abs": 0.001
      }
