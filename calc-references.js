@@ -14,7 +14,8 @@ export const COLOR_CODES = [
     { item: "Phase B (single-phase 120/240)", color: "Red" },
     { item: "Neutral (grounded)", color: "White or gray" },
     { item: "Equipment grounding conductor", color: "Green or bare" },
-    { item: "Phase A (208/480 three-phase)", color: "Brown / orange / yellow per system" },
+    { item: "Phases A / B / C, 208Y/120 three-phase (convention)", color: "Black / red / blue" },
+    { item: "Phases A / B / C, 480Y/277 three-phase (convention)", color: "Brown / orange / yellow" },
   ] },
   { system: "IEC industrial (Europe / Australia)", entries: [
     { item: "Line L1 / L2 / L3", color: "Brown / black / gray" },
@@ -664,7 +665,8 @@ const _BURIAL_METHODS = [
 const _BURIAL_LOCATIONS = [
   "general earth",
   "under a building",
-  "under 4in concrete in trench",
+  "in trench below 2in concrete",
+  "under 4in exterior slab (no vehicles)",
   "under streets/roads/driveways(public)",
   "one/two-family driveway/parking",
 ];
@@ -672,6 +674,12 @@ const _BURIAL_LOCATIONS = [
 const _BURIAL_COVER = {
   "general earth": [24, 6, 18, 12, 6],
   "under a building": [0, 0, 0, 0, 0],
+  // Table 300.5 has two concrete rows. Until 2026-09-19 one option was
+  // labeled "under 4in concrete in trench" but carried the 4 in exterior-slab
+  // row; the 2 in trench-concrete row (18 / 6 / 12 / 6 / 6) was missing.
+  "in trench below 2in concrete": [18, 6, 12, 6, 6],
+  "under 4in exterior slab (no vehicles)": [18, 4, 4, 6, 6],
+  // Earlier callers' value, kept so a saved request still resolves.
   "under 4in concrete in trench": [18, 4, 4, 6, 6],
   "under streets/roads/driveways(public)": [24, 24, 24, 24, 24],
   "one/two-family driveway/parking": [18, 18, 18, 12, 18],
@@ -801,7 +809,7 @@ const _POOL_BOND_ITEMS = [
   "Perimeter surfaces within 3 ft horizontally, paved and unpaved -- 680.26(B)(2)",
   "Metallic components of the pool structure -- 680.26(B)(3)",
   "Underwater metal forming shells, luminaire, niche -- 680.26(B)(4)",
-  "Metal fittings (ladders, rails, diving stands) 1 in and larger -- 680.26(B)(5)",
+  "Metal fittings within or attached to the pool structure (ladders, handrails, diving stands); parts no more than 4 in in any dimension that penetrate the structure no more than 1 in are exempt -- 680.26(B)(5)",
   "Electrical equipment: pump motor and others (double-insulated note) -- 680.26(B)(6)",
   "Metal piping and metal awnings/fences within 5 ft -- 680.26(B)(7)",
   "Pool water via a listed water-bond fitting (>= 9 sq in) -- 680.26(C)",

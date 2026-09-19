@@ -279,7 +279,7 @@ PLUMBINGTAKEOFF_RENDERERS["pipe-purge-volume"] = _v894renderPipePurgeVolume;
 
 // ===================== spec-v903: hydronic system water and glycol volume =====================
 // dims: in { pipe_length_ft: L, gal_per_ft: L^2, terminal_gal: L^3, boiler_tank_gal: L^3, glycol_fraction: dimensionless } out: { pipe_gal: L^3, system_gal: L^3, glycol_gal: L^3, water_gal: L^3 }
-export function computeHydronicSystemVolume({ pipe_length_ft = 500, gal_per_ft = 0.023, terminal_gal = 0, boiler_tank_gal = 0, glycol_fraction = 0.30 } = {}) {
+export function computeHydronicSystemVolume({ pipe_length_ft = 500, gal_per_ft = 0.025, terminal_gal = 0, boiler_tank_gal = 0, glycol_fraction = 0.30 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(pipe_length_ft > 0)) return { error: "Pipe length must be positive (ft)." };
   if (!(gal_per_ft > 0)) return { error: "Gallons per foot must be positive." };
@@ -296,27 +296,27 @@ export function computeHydronicSystemVolume({ pipe_length_ft = 500, gal_per_ft =
     system_gal,
     glycol_gal,
     water_gal,
-    note: "The gallons per foot comes from the pipe size (3/4 in is about 0.023 gal/ft). The terminal and boiler or buffer volumes come from the equipment. The glycol fraction comes from the freeze-protection target (glycol-mix gives the ratio). This fill volume sizes the expansion tank (expansion-tank) and the glycol order. Distinct from the loop-length radiant-loop-sizing.",
+    note: "The gallons per foot comes from the pipe size (3/4 in Type L copper is about 0.025 gal/ft, Type M 0.027, 3/4 in PEX about 0.018). The terminal and boiler or buffer volumes come from the equipment. The glycol fraction comes from the freeze-protection target (glycol-mix gives the ratio). This fill volume sizes the expansion tank (expansion-tank) and the glycol order. Distinct from the loop-length radiant-loop-sizing.",
   };
 }
 
-export const hydronicSystemVolumeExample = { inputs: { pipe_length_ft: 500, gal_per_ft: 0.023, terminal_gal: 8, boiler_tank_gal: 5, glycol_fraction: 0.30 } };
+export const hydronicSystemVolumeExample = { inputs: { pipe_length_ft: 500, gal_per_ft: 0.025, terminal_gal: 8, boiler_tank_gal: 5, glycol_fraction: 0.30 } };
 
 function _v903renderHydronicSystemVolume(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: volume identity by name. system = pipe length x gallons per foot + terminals + boiler; glycol = system x fraction; water = system - glycol. The gallons per foot comes from the pipe size (3/4 in ~0.023 gal/ft).";
+  citationEl.textContent = "Citation: volume identity by name. system = pipe length x gallons per foot + terminals + boiler; glycol = system x fraction; water = system - glycol. The gallons per foot comes from the pipe size (3/4 in Type L copper ~0.025 gal/ft).";
   const pl = makeNumber("Total pipe length (ft)", "hsv-pl", { step: "any", min: "0" });
   const gf = makeNumber("Gallons per foot (gal/ft)", "hsv-gf", { step: "any", min: "0" });
   const tg = makeNumber("Terminal / emitter volume (gal)", "hsv-tg", { step: "any", min: "0" });
   const bg = makeNumber("Boiler + buffer tank volume (gal)", "hsv-bg", { step: "any", min: "0" });
   const gc = makeNumber("Glycol fraction (0-1)", "hsv-gc", { step: "any", min: "0" });
   for (const f of [pl, gf, tg, bg, gc]) inputRegion.appendChild(f.wrap);
-  attachExampleButton(inputRegion, () => { pl.input.value = "500"; gf.input.value = "0.023"; tg.input.value = "8"; bg.input.value = "5"; gc.input.value = "0.30"; update(); });
+  attachExampleButton(inputRegion, () => { pl.input.value = "500"; gf.input.value = "0.025"; tg.input.value = "8"; bg.input.value = "5"; gc.input.value = "0.30"; update(); });
   const oSystem = makeOutputLine(outputRegion, "System volume", "hsv-out-system");
   const oGlycol = makeOutputLine(outputRegion, "Glycol charge", "hsv-out-glycol");
   const oWater = makeOutputLine(outputRegion, "Water", "hsv-out-water");
   const update = debounce(() => {
     const r = computeHydronicSystemVolume({
-      pipe_length_ft: pl.input.value === "" ? 500 : Number(pl.input.value), gal_per_ft: gf.input.value === "" ? 0.023 : Number(gf.input.value),
+      pipe_length_ft: pl.input.value === "" ? 500 : Number(pl.input.value), gal_per_ft: gf.input.value === "" ? 0.025 : Number(gf.input.value),
       terminal_gal: tg.input.value === "" ? 0 : Number(tg.input.value), boiler_tank_gal: bg.input.value === "" ? 0 : Number(bg.input.value),
       glycol_fraction: gc.input.value === "" ? 0.30 : Number(gc.input.value),
     });

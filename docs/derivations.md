@@ -3148,7 +3148,7 @@ cross-check.
 | calc-plumbing.js | `renderTrapArm` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-plumbing.js | `renderWaterHammerArrestor` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-plumbingtakeoff.js | `computeHeatTraceSizing` | `{ pipe_ft = 150, allowance_pct = 10, num_valves = 1, valve_allow_ft = 3, rate...` | _ | _ | _ |
-| calc-plumbingtakeoff.js | `computeHydronicSystemVolume` | `{ pipe_length_ft = 500, gal_per_ft = 0.023, terminal_gal = 0, boiler_tank_gal...` | _ | _ | _ |
+| calc-plumbingtakeoff.js | `computeHydronicSystemVolume` | `{ pipe_length_ft = 500, gal_per_ft = 0.025, terminal_gal = 0, boiler_tank_gal...` | _ | _ | _ |
 | calc-plumbingtakeoff.js | `computePexHomerunTakeoff` | `{ fixtures = 8, hot_fixtures = 6, avg_run_ft = 35, waste_pct = 10 } = {}` | _ | _ | _ |
 | calc-plumbingtakeoff.js | `computePipeInsulationTakeoff` | `{ pipe_ft = 250, waste_pct = 5, num_fittings = 12, fitting_allow_ft = 1, sect...` | _ | _ | _ |
 | calc-plumbingtakeoff.js | `computePipePurgeVolume` | `{ pipe_id_in = 2.067, length_ft = 100, air_changes = 5, flow_scfh = 60 } = {}` | _ | _ | _ |
@@ -4229,7 +4229,7 @@ per spec-v14 §13.1 second paragraph.
 | `heat-trace-sizing` | Freeze-Protection Heat-Trace Cable and Circuit | Heat-trace sizing identity (first-pri...; cable = 150*1.10 + 3 = 168 ft; watts = 5*168 = 840; amps ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `hydraulic-jump` | Hydraulic Jump: Sequent Depth and Energy Loss | Belanger sequent depth (Chow, Open-Ch...; spec-v632 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `hydronic-fill-pressure` | Hydronic Fill Pressure (Static Height) | hydronic practice (static head); spec-v452 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
-| `hydronic-system-volume` | Hydronic System Water and Glycol Volume | Hydronic system-volume identity (firs...; pipe=500*0.023=11.5; system=11.5+8+5=24.5; glycol=24.5*0.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `hydronic-system-volume` | Hydronic System Water and Glycol Volume | Hydronic system-volume identity (firs...; pipe=500*0.025=12.5; system=12.5+8+5=25.5; glycol=25.5*0.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `hydrostatic-test` | Hydrostatic Test Pressure and Hold | IPC / Plumbing engineering practice; 100 psi working / 200 gal volume / water -> test_pressure... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `leach-field-aggregate` | Leach-Field / Trench Drainrock Volume | Leach-field drainrock identity (first...; stone=3*60*2*1=360; cy=360/27*1.10=14.67; tons=14.67*1.4=... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `lp-container-separation` | LP-Gas Container Separation Check | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
