@@ -2,7 +2,7 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "076f88b2719965ef",
+      "sha": "fa82f549b7e5cbc1",
       "date": "2026-09-19"
     },
     "/tools/": {
@@ -242,8 +242,8 @@
       "date": "2026-09-04"
     },
     "/tools/alignment-thermal-growth/": {
-      "sha": "31b6972df611a3ad",
-      "date": "2026-09-07"
+      "sha": "856924ac1cc74d76",
+      "date": "2026-09-19"
     },
     "/tools/allowable-area/": {
       "sha": "fc84872529c0517a",
@@ -954,8 +954,8 @@
       "date": "2026-09-04"
     },
     "/tools/carburizing-case-depth/": {
-      "sha": "37f80ab4c3553074",
-      "date": "2026-09-09"
+      "sha": "4eb7a784e55879fa",
+      "date": "2026-09-19"
     },
     "/tools/cardioid-sub-array/": {
       "sha": "3f1755158321e872",
@@ -1230,8 +1230,8 @@
       "date": "2026-09-01"
     },
     "/tools/clearance-plate-envelope/": {
-      "sha": "6624d6631fbae75f",
-      "date": "2026-09-08"
+      "sha": "9d44a85a5da50bce",
+      "date": "2026-09-19"
     },
     "/tools/climb-gradient-roc/": {
       "sha": "4db83be93cfc88f0",
@@ -2150,8 +2150,8 @@
       "date": "2026-09-09"
     },
     "/tools/dilution-ventilation-solvent/": {
-      "sha": "8a91694d10462331",
-      "date": "2026-09-09"
+      "sha": "153de817adda8d94",
+      "date": "2026-09-19"
     },
     "/tools/dim-weight/": {
       "sha": "b1464aaeef96fd9c",
@@ -2926,7 +2926,7 @@
       "date": "2026-09-01"
     },
     "/tools/fixed-ladder-fall-protection/": {
-      "sha": "4c4b2071f9776e40",
+      "sha": "31203cc69bcab9f7",
       "date": "2026-09-19"
     },
     "/tools/fixed-orifice-target-superheat/": {
@@ -2954,8 +2954,8 @@
       "date": "2026-09-01"
     },
     "/tools/flare-radiation-distance/": {
-      "sha": "8acb7bcf8f08b4f8",
-      "date": "2026-09-09"
+      "sha": "051bc784d26b0f06",
+      "date": "2026-09-19"
     },
     "/tools/flash-gas-subcool/": {
       "sha": "a36fa5c76d7968b9",
@@ -3126,7 +3126,7 @@
       "date": "2026-09-01"
     },
     "/tools/fuel-oil-atomizing-viscosity/": {
-      "sha": "12d1b8caf5dead33",
+      "sha": "bbe19f1e2d969bc1",
       "date": "2026-09-19"
     },
     "/tools/fuel-range/": {
@@ -4090,8 +4090,8 @@
       "date": "2026-09-01"
     },
     "/tools/laundry-cost-per-pound/": {
-      "sha": "e12ba91307a1d359",
-      "date": "2026-09-07"
+      "sha": "d790fbb526ff666b",
+      "date": "2026-09-19"
     },
     "/tools/laundry-dryer-evaporation/": {
       "sha": "f36f00027c71326b",
@@ -4258,8 +4258,8 @@
       "date": "2026-09-01"
     },
     "/tools/locate-depth-offset/": {
-      "sha": "51d72d849cbb9ab2",
-      "date": "2026-09-05"
+      "sha": "4bab23b6d47bb9bf",
+      "date": "2026-09-19"
     },
     "/tools/lock-backset-strike-layout/": {
       "sha": "95f2e8345681e370",
@@ -5462,8 +5462,8 @@
       "date": "2026-09-01"
     },
     "/tools/pool-pump-speed-savings/": {
-      "sha": "12d1c661a01b62d3",
-      "date": "2026-09-09"
+      "sha": "3f4431aad1497bc2",
+      "date": "2026-09-19"
     },
     "/tools/pool-salt-dose/": {
       "sha": "c710e42617d35c22",
@@ -6094,7 +6094,7 @@
       "date": "2026-09-01"
     },
     "/tools/refrigerated-case-load/": {
-      "sha": "1d8e7a2011a7d89b",
+      "sha": "a89788b635845305",
       "date": "2026-09-19"
     },
     "/tools/refrigeration-cop/": {
@@ -6202,8 +6202,8 @@
       "date": "2026-09-18"
     },
     "/tools/revolving-door-throughput/": {
-      "sha": "5d6d14b4d816fceb",
-      "date": "2026-09-05"
+      "sha": "e2064eb8bdb4565f",
+      "date": "2026-09-19"
     },
     "/tools/reynolds-number-pipe/": {
       "sha": "25605d74175cfcc1",
@@ -6266,8 +6266,8 @@
       "date": "2026-09-01"
     },
     "/tools/roller-chain-wear-elongation/": {
-      "sha": "009f8c288029b9a3",
-      "date": "2026-09-07"
+      "sha": "713658b0539ea971",
+      "date": "2026-09-19"
     },
     "/tools/roller-jack-force/": {
       "sha": "0d64cfae70f18e44",
