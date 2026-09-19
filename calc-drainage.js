@@ -1311,7 +1311,7 @@ const _CULVERT_OUTLET_KE = {
 };
 
 // dims: in { diameter_in: L, flow_cfs: L^3 T^-1, length_ft: L, slope: dimensionless, manning_n: dimensionless, tw_ft: L, config: dimensionless } out: { d_ft: L, barrel_area_ft2: L^2, v_fps: L T^-1, velocity_head_ft: L, head_loss_ft: L, dc_ft: L, ho_ft: L, hw_ft: L, friction_coeff: dimensionless, ke: dimensionless }
-export function computeCulvertOutletControl({ diameter_in = 0, flow_cfs = 0, length_ft = 0, slope = 0, manning_n = 0.012, tw_ft = 0, config = "concrete_square_headwall" } = {}) {
+export function computeCulvertOutletControl({ diameter_in = 0, flow_cfs = 0, length_ft = 0, slope = 0, manning_n, tw_ft = 0, config = "concrete_square_headwall" } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   tw_ft = Number(tw_ft);
   const C = _CULVERT_OUTLET_KE[config];
@@ -1319,6 +1319,10 @@ export function computeCulvertOutletControl({ diameter_in = 0, flow_cfs = 0, len
   if (!(diameter_in > 0)) return { error: "Culvert diameter must be positive (in)." };
   if (!(flow_cfs > 0)) return { error: "Discharge must be positive (cfs)." };
   if (!(length_ft > 0)) return { error: "Barrel length must be positive (ft)." };
+  // With no n supplied at all, take it from the barrel the config names: 0.024 corrugated
+  // metal, 0.012 concrete. Defaulting every barrel to concrete understated friction on a CMP.
+  // An explicitly entered 0 stays an error.
+  if (manning_n === undefined || manning_n === null) manning_n = String(config).startsWith("cmp") ? 0.024 : 0.012;
   if (!(manning_n > 0)) return { error: "Manning n must be positive." };
   if (!(slope >= 0)) return { error: "Barrel slope must be zero or positive (ft/ft)." };
   if (!(tw_ft >= 0)) return { error: "Tailwater depth must be zero or positive (ft)." };
@@ -1509,7 +1513,7 @@ DRAINAGE_RENDERERS["box-culvert-outlet-control"] = renderBoxCulvertOutletControl
 // edge maps to both the Table A.1 K/M/c/Y constants and the Ke entrance loss),
 // so there is no duplicated physics here.
 // dims: in { diameter_in: L, flow_cfs: L^3 T^-1, slope: dimensionless, length_ft: L, manning_n: dimensionless, tw_ft: L, config: dimensionless } out: { d_ft: L, inlet_hw_ft: L, outlet_hw_ft: L, governing_hw_ft: L, hw_over_d: dimensionless, outlet_velocity_fps: L T^-1 }
-export function computeCulvertHeadwater({ diameter_in = 0, flow_cfs = 0, slope = 0, length_ft = 0, manning_n = 0.012, tw_ft = 0, config = "concrete_square_headwall" } = {}) {
+export function computeCulvertHeadwater({ diameter_in = 0, flow_cfs = 0, slope = 0, length_ft = 0, manning_n, tw_ft = 0, config = "concrete_square_headwall" } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!_CULVERT_INLET[config] || !_CULVERT_OUTLET_KE[config]) return { error: "Unknown culvert inlet configuration." };
   const inlet = computeCulvertInletControl({ diameter_in, flow_cfs, slope, config });

@@ -1031,10 +1031,10 @@ export function computeKitchenSanitizerPpm({ sanitizer_type = "chlorine", active
 }
 export const kitchenSanitizerPpmExample = { inputs: { sanitizer_type: "chlorine", active_pct: 5.25, target_ppm: 100, batch_gallons: 3 } };
 const renderKitchenSanitizerPpm = _r({
-  citation: "Citation: FDA Food Code Sec. 4-501.114 sanitizing-solution concentrations, by name. oz_per_gal = 128 x target_ppm / (active_pct x 10000); total_oz = oz_per_gal x gallons. Food Code bands: chlorine 50-100 ppm, quat ~200 ppm per label, iodine 12.5-25 ppm. Chlorine's required ppm rises with colder or more alkaline water; quats weaken in hot or hard water. Confirm with test strips; the EPA-registered product label is the legal authority.",
+  citation: "Citation: FDA Food Code Sec. 4-501.114 sanitizing-solution concentrations, by name. oz_per_gal = 128 x target_ppm / (active_pct x 10000); total_oz = oz_per_gal x gallons. Food Code bands: chlorine 50-100 ppm, quat per its EPA-registered label, commonly 200 ppm and screened here at 150-400 ppm, iodine 12.5-25 ppm. Chlorine's required ppm rises with colder or more alkaline water; quats weaken in hot or hard water. Confirm with test strips; the EPA-registered product label is the legal authority.",
   example: kitchenSanitizerPpmExample.inputs,
   fields: [
-    { key: "sanitizer_type", label: "Sanitizer type", kind: "select", options: [{ value: "chlorine", label: "Chlorine (50-100 ppm)" }, { value: "quat", label: "Quaternary ammonium (~200 ppm)" }, { value: "iodine", label: "Iodine (12.5-25 ppm)" }] },
+    { key: "sanitizer_type", label: "Sanitizer type", kind: "select", options: [{ value: "chlorine", label: "Chlorine (50-100 ppm)" }, { value: "quat", label: "Quaternary ammonium (150-400 ppm per label)" }, { value: "iodine", label: "Iodine (12.5-25 ppm)" }] },
     { key: "active_pct", label: "Concentrate active (%)", kind: "number" },
     { key: "target_ppm", label: "Target concentration (ppm)", kind: "number" },
     { key: "batch_gallons", label: "Sink compartment volume (gal)", kind: "number" },

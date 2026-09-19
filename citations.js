@@ -13613,7 +13613,7 @@ export const CITATIONS = {
     edition: "FDA Food Code Sec. 4-501.114 sanitizing-solution concentrations, by name.",
     freeAccess: "FDA Food Code is public/free at fda.gov; the EPA-registered product label is the legal authority.",
     governance: GOVERNANCE.general,
-    editionNote: "Food Code bands: chlorine 50-100 ppm, quat ~200 ppm per label, iodine 12.5-25 ppm. Chlorine's required concentration rises as water gets colder or more alkaline (the Food Code table steps ppm up by temperature and pH, so a fixed dose can under-sanitize); quats are inactivated by hot or hard water; the concentration must be confirmed with test strips and the minimum contact time observed. A mixing aid, not a substitute for test strips and the label.",
+    editionNote: "Food Code bands: chlorine 50-100 ppm, quat per its EPA-registered label, commonly 200 ppm and screened here at 150-400 ppm, iodine 12.5-25 ppm. Chlorine's required concentration rises as water gets colder or more alkaline (the Food Code table steps ppm up by temperature and pH, so a fixed dose can under-sanitize); quats are inactivated by hot or hard water; the concentration must be confirmed with test strips and the minimum contact time observed. A mixing aid, not a substitute for test strips and the label.",
     assumptions: [
       { name: "Sanitizer bands", value: "chlorine 50-100 ppm, quat ~150-400 (label, often 200), iodine 12.5-25 ppm", source: "FDA Food Code 4-501.114" },
     ],

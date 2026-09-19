@@ -1796,7 +1796,7 @@ export function computeGrowingDegreeDays({ days_series = [], base_f = 50, cutoff
     days: counted,
     flagged_days: flagged,
     daily,
-    note: "GDD is floored at 0 (never subtracted). The modified method caps Tmax at the cutoff and floors Tmin at the base before averaging - it diverges from the standard method on hot days. Days with Tmin > Tmax are skipped.",
+    note: "GDD is floored at 0 (never subtracted). The cutoff caps Tmax under BOTH methods here, because it is entered as its own field (0 = none); what the modified method adds is the floor on Tmin at the base, so the two diverge on COLD NIGHTS rather than on hot days. Days with Tmin > Tmax are skipped.",
   };
 }
 export const growingDegreeDaysExample = { inputs: { days_series: [{ tmax: 92, tmin: 64 }], base_f: 50, cutoff_f: 86, method: "modified" } };

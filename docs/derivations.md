@@ -2023,9 +2023,9 @@ cross-check.
 | calc-drainage.js | `computeBoxCulvertInletControl` | `{ span_in = 0, rise_in = 0, flow_cfs = 0, slope = 0, config = "wingwall_30_75...` | _ | _ | _ |
 | calc-drainage.js | `computeBoxCulvertOutletControl` | `{ span_in = 0, rise_in = 0, flow_cfs = 0, length_ft = 0, slope = 0, manning_n...` | _ | _ | _ |
 | calc-drainage.js | `computeCompositeCurveNumber` | `{ pervious_cn = 0, impervious_pct = 0, connection = "connected", unconnected_...` | _ | _ | _ |
-| calc-drainage.js | `computeCulvertHeadwater` | `{ diameter_in = 0, flow_cfs = 0, slope = 0, length_ft = 0, manning_n = 0.012,...` | _ | _ | _ |
+| calc-drainage.js | `computeCulvertHeadwater` | `{ diameter_in = 0, flow_cfs = 0, slope = 0, length_ft = 0, manning_n, tw_ft =...` | _ | _ | _ |
 | calc-drainage.js | `computeCulvertInletControl` | `{ diameter_in = 0, flow_cfs = 0, slope = 0, config = "concrete_groove_headwal...` | _ | _ | _ |
-| calc-drainage.js | `computeCulvertOutletControl` | `{ diameter_in = 0, flow_cfs = 0, length_ft = 0, slope = 0, manning_n = 0.012,...` | _ | _ | _ |
+| calc-drainage.js | `computeCulvertOutletControl` | `{ diameter_in = 0, flow_cfs = 0, length_ft = 0, slope = 0, manning_n, tw_ft =...` | _ | _ | _ |
 | calc-drainage.js | `computeCurveNumberRunoff` | `{ rainfall_in = 0, curve_number = 0, area_acres = 0 } = {}` | _ | _ | _ |
 | calc-drainage.js | `computeDrywellInfiltration` | `{ runoff_volume_ft3 = 200, void_ratio = 0.35, trench_depth_ft = 4, infiltrati...` | _ | _ | _ |
 | calc-drainage.js | `computeManningPipeCapacity` | `{ d_in = 0, slope = 0, material = "pvc" } = {}` | _ | _ | _ |
