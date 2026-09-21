@@ -4,8 +4,8 @@
   "agency": "USDA NASS",
   "series_id": "SOYBEANS - PRICE RECEIVED, MEASURED IN $ / BU",
   "units": "USD/bushel",
-  "built": "2026-09-09",
-  "fetched": "2026-09-09",
+  "built": "2026-09-21",
+  "fetched": "2026-09-21",
   "cadence": "monthly",
   "points": [
     {

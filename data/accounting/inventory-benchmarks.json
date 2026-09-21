@@ -1,7 +1,7 @@
 {
   "source": "U.S. Census Annual Retail Trade Survey (ARTS), 2022 benchmarked tables released 2026-08-31. Turnover is an INDUSTRY AGGREGATE, not a median across firms: cost of goods sold over average end-of-year inventory, with COGS taken from the survey's own gross-margin and purchases tables.",
   "edition": "ARTS 2022 (benchmarked)",
-  "fetched": "2026-09-09",
+  "fetched": "2026-09-21",
   "verified_on": "2026-09-09",
   "free_access": "census.gov/programs-surveys/arts/data/tables.html; the 2022 benchmarked sales, inventories, purchases and gross-margin tables are free xlsx downloads.",
   "benchmarks": {

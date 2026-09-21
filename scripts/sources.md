@@ -134,6 +134,160 @@ Per spec-v10.md §3.2, a `check:free-access` WARN (4xx / 5xx / network error on 
 
 ## Last-diff log
 
+### 2026-09-21
+
+- run: data-refresh (build-data.mjs + integrity verify)
+- shards inspected: 147
+- shards changed: 29
+
+- `accounting/estimated-tax-due-dates.json` (3b0c02a63d8a -> 14e3e6f17b13): 1 key modified
+- `accounting/inventory-benchmarks.json` (7f0eb25022d3 -> 0882d738d9be): 1 key modified
+- `accounting/macrs-tables.json` (99ccf687b73b -> c3ad28b67928): 1 key modified
+- `accounting/pub-15-t-tables.json` (e19ddf44a250 -> 88ea8c3b0b38): 1 key modified
+- `accounting/se-tax-parameters.json` (5af85ae9117a -> 4eccdfbec038): 1 key modified
+- `accounting/section-179-limits.json` (87edf5e8e9b1 -> 02f33204a556): 1 key modified
+- `accounting/standard-mileage-rates.json` (8452adf68136 -> afdd6bb9705c): 1 key modified
+- `construction/aci-211-curves.json` (ca22e2509e45 -> ca22e2509e45): no change
+- `construction/apa-span-ratings.json` (6ce521275c75 -> 6ce521275c75): no change
+- `construction/aws-deposition.json` (fdd589d4fdb1 -> fdd589d4fdb1): no change
+- `construction/bolt-grades.json` (7cc9bd908979 -> 7cc9bd908979): no change
+- `construction/concrete-mixes.json` (4c302a4012fa -> 4c302a4012fa): no change
+- `construction/helical-pile-kt.json` (dbc1a7421f3c -> dbc1a7421f3c): no change
+- `construction/lumber-properties.json` (947041f4cb75 -> 947041f4cb75): no change
+- `construction/rebar-unit-weights.json` (aa9d90af63d3 -> aa9d90af63d3): no change
+- `construction/sfm-table.json` (c91bd6e512ce -> c91bd6e512ce): no change
+- `construction/soil-bearing.json` (7ead0f1a38b8 -> 7ead0f1a38b8): no change
+- `construction/span-derivations.json` (71a2f3150a43 -> cb142c74eacf): 1 key modified
+- `construction/wind-snow-zones.json` (4b7d5d2b3094 -> 4b7d5d2b3094): no change
+- `cross/glossary.json` (d3050b989c57 -> 77b3078ee47a): 1 key modified
+- `crosswalks/fall-protection-benchmarks.json` (581dd2b68824 -> 581dd2b68824): no change
+- `crosswalks/gsa-perdiem.json` (98001a238f24 -> 98001a238f24): no change
+- `crosswalks/heat-cold-stress.json` (b869cc9f7ecb -> b869cc9f7ecb): no change
+- `crosswalks/irs-mileage.json` (c383b0739291 -> c383b0739291): no change
+- `crosswalks/niosh-coupling.json` (ceb2d1f4928d -> ceb2d1f4928d): no change
+- `crosswalks/osha-trench.json` (48a2a605c8b9 -> 48a2a605c8b9): no change
+- `crosswalks/state-tax-rates.json` (bad5680593df -> 431c87e9b052): 1 key modified
+- `crosswalks/unit-conversions.json` (9a30ff3dd2f4 -> 9a30ff3dd2f4): no change
+- `electrical/ampacity-physics.json` (ee06e7a3364d -> ee06e7a3364d): no change
+- `electrical/cable-bend-radius.json` (86e27ac2c14c -> 86e27ac2c14c): no change
+- `electrical/conductor-c-values.json` (d791e1bdee6d -> d791e1bdee6d): no change
+- `electrical/conductor-properties.json` (6338b2a4c733 -> 6338b2a4c733): no change
+- `electrical/conduit-fill-tables.json` (f9f57a6fbfd9 -> f9f57a6fbfd9): no change
+- `electrical/demand-factors.json` (8f5b31ced991 -> 8f5b31ced991): no change
+- `electrical/dwelling-demand.json` (7e49f0ef7184 -> 7e49f0ef7184): no change
+- `electrical/lighting-density.json` (eadd8967e4cc -> eadd8967e4cc): no change
+- `electrical/motor-fla.json` (28215fa1458e -> 28215fa1458e): no change
+- `electrical/nema-mg1-code-letters.json` (8c66b1680f33 -> 8c66b1680f33): no change
+- `electrical/poe-classes.json` (19201709b44e -> 19201709b44e): no change
+- `field/wmm/coefficients.json` (0e2a631c6b09 -> 0e2a631c6b09): no change
+- `fields/a.json` (c90565c6ee84 -> c90565c6ee84): no change
+- `fields/b.json` (12d03b50d007 -> 12d03b50d007): no change
+- `fields/c.json` (904f07600954 -> 904f07600954): no change
+- `fields/d.json` (e89ec0560e8f -> e89ec0560e8f): no change
+- `fields/e-1.json` (67aae4275e1e -> 67aae4275e1e): no change
+- `fields/e-2.json` (c843a62ea760 -> c843a62ea760): no change
+- `fields/e-3.json` (df10d06b8e78 -> df10d06b8e78): no change
+- `fields/f.json` (5b1ddb778fdd -> 5b1ddb778fdd): no change
+- `fields/g.json` (359141ea1617 -> 359141ea1617): no change
+- `fields/h.json` (492450310773 -> 492450310773): no change
+- `fields/j.json` (a4fabb3c683d -> a4fabb3c683d): no change
+- `fields/k.json` (58ad3466e067 -> 58ad3466e067): no change
+- `fields/l.json` (8b5224beb3dc -> 8b5224beb3dc): no change
+- `fields/m.json` (191b2747d94f -> 191b2747d94f): no change
+- `fields/n.json` (ce75464489f0 -> ce75464489f0): no change
+- `fields/o.json` (6bb8f4a68e2c -> 6bb8f4a68e2c): no change
+- `fields/p.json` (29a1b01874bf -> 29a1b01874bf): no change
+- `fields/q.json` (d7f5bff0b65c -> d7f5bff0b65c): no change
+- `fields/r.json` (18daae55f053 -> 18daae55f053): no change
+- `fields/t.json` (e74286011341 -> e74286011341): no change
+- `fields/x.json` (2ed52619c3b7 -> 2ed52619c3b7): no change
+- `fields/y.json` (461f59b3f007 -> 461f59b3f007): no change
+- `fields/z.json` (b464042e5774 -> b464042e5774): no change
+- `fire/fire-flow-formulas.json` (b2b4a1de0eb3 -> b2b4a1de0eb3): no change
+- `fire/hose-friction.json` (61ea899b5920 -> 61ea899b5920): no change
+- `fire/iso-nff.json` (b2ca30cd7a44 -> b2ca30cd7a44): no change
+- `historical/commodities/aluminum.json` (c6b8e14d2012 -> ca1c117d7b25): 2 keys modified
+- `historical/commodities/asphalt.json` (6dcd8599b8ac -> 9d84b318b8ee): 2 keys modified
+- `historical/commodities/copper.json` (e9b758a4c914 -> e363b20a224f): 2 keys modified
+- `historical/commodities/corn.json` (8856a82c64ad -> b64943ebad6a): 2 keys modified
+- `historical/commodities/diesel.json` (44b74ba1c9c6 -> ffbacb8d9317): 2 keys modified
+- `historical/commodities/drywall.json` (0ddfd1bc5f72 -> b336a0715cea): 2 keys modified
+- `historical/commodities/framing-lumber.json` (2b5fe199c6fc -> 08468e779971): 2 keys modified
+- `historical/commodities/gasoline.json` (7f1c23482257 -> 69b9a953816c): 2 keys modified
+- `historical/commodities/natural-gas.json` (3fd03e1ac5ca -> c15fd8e001c5): 2 keys modified
+- `historical/commodities/osb.json` (cadc4a5ceb61 -> b69ffb12620b): 2 keys modified
+- `historical/commodities/rebar.json` (5c4414631f53 -> e0f63d4b4c46): 2 keys modified
+- `historical/commodities/soybeans.json` (dfef8ed9df9e -> 4bc332af2e8f): 2 keys modified
+- `historical/commodities/structural-steel.json` (45449bb241ca -> 76e65726a4a5): 2 keys modified
+- `historical/commodities/wheat.json` (30093535bae1 -> 44947258a4a4): 2 keys modified
+- `hvac/affinity-laws.json` (659a61a606e1 -> 659a61a606e1): no change
+- `hvac/baseboard-output.json` (7208d9ea6ed0 -> 7208d9ea6ed0): no change
+- `hvac/charge-per-foot.json` (b10b873f3ce4 -> b10b873f3ce4): no change
+- `hvac/climate-data.json` (f6ba8aad7d05 -> f6ba8aad7d05): no change
+- `hvac/duct-fittings.json` (a55e7eddff68 -> a55e7eddff68): no change
+- `hvac/duct-friction.json` (6125423dd611 -> 6125423dd611): no change
+- `hvac/duct-roughness.json` (2d2a810a3640 -> 2d2a810a3640): no change
+- `hvac/equivalent-lengths.json` (af8029560010 -> af8029560010): no change
+- `hvac/geothermal-soil.json` (11da9b836cc7 -> 11da9b836cc7): no change
+- `hvac/insulation-k-values.json` (c76675be7622 -> c76675be7622): no change
+- `hvac/insulation.json` (efe3fdaaf22b -> efe3fdaaf22b): no change
+- `hvac/refrigerant-pt-tables.json` (b46a9a2976f2 -> b46a9a2976f2): no change
+- `hvac/refrigerants.json` (b31aac3059f4 -> b31aac3059f4): no change
+- `lab/buffer-pka.json` (68b3e58cbd02 -> 8bf9dc742325): 1 key modified
+- `lab/centrifuge-rotors.json` (c4f3d4411229 -> 8c7e744861cf): 1 key modified
+- `lab/iupac-atomic-weights.json` (589cb6bc3f05 -> 61459f25764d): 1 key modified
+- `legal/sales-tax-nexus.json` (74a0aadde7fc -> 8864edac2453): 1 key modified
+- `physical-constants/constants.json` (94153d714b42 -> 94153d714b42): no change
+- `physical-constants/material-properties.json` (4dbfa160213e -> 4dbfa160213e): no change
+- `plumbing/backflow-curves.json` (2429ca0cbad8 -> 2429ca0cbad8): no change
+- `plumbing/fixture-units.json` (041663c5b574 -> 041663c5b574): no change
+- `plumbing/gas-pipe-capacity.json` (d3b332e0d44f -> d3b332e0d44f): no change
+- `plumbing/glycol-curves.json` (c41b74c5334e -> c41b74c5334e): no change
+- `plumbing/manning-roughness.json` (0ebd989b23bd -> 0ebd989b23bd): no change
+- `plumbing/material-expansion.json` (14c995619bec -> 14c995619bec): no change
+- `plumbing/pipe-elastic-properties.json` (70e8ee39a251 -> 70e8ee39a251): no change
+- `plumbing/pipe-properties.json` (2f2108960852 -> 2f2108960852): no change
+- `plumbing/pump-curves.json` (79b96ce4cfeb -> 79b96ce4cfeb): no change
+- `plumbing/runoff-coefficients.json` (0392e72c7fc9 -> 0392e72c7fc9): no change
+- `plumbing/septic-rules.json` (11793e82d2a0 -> 11793e82d2a0): no change
+- `plumbing/thermal-expansion-coefficients.json` (900b61a8add7 -> 900b61a8add7): no change
+- `realestate/hud-fmr.json` (c44f8a9cd37c -> c44f8a9cd37c): no change
+- `realestate/loan-limits.json` (b9b390e0dc83 -> b9b390e0dc83): no change
+- `restoration/drying-times.json` (7b74eda4574a -> 7b74eda4574a): no change
+- `restoration/hepa-loading.json` (a8e75891c9f2 -> a8e75891c9f2): no change
+- `restoration/mold-conditions.json` (023951c9bc1c -> 023951c9bc1c): no change
+- `restoration/psychrometrics.json` (077cbd125415 -> 077cbd125415): no change
+- `restoration/water-classes.json` (6eaecad7f3a3 -> 6eaecad7f3a3): no change
+- `search/aliases-a.json` (4227d7fbbb1a -> 4227d7fbbb1a): no change
+- `search/aliases-b.json` (d8a4ade3fc93 -> d8a4ade3fc93): no change
+- `search/aliases-c.json` (8ec9a8bbeb87 -> 8ec9a8bbeb87): no change
+- `search/aliases-d.json` (0b96e3a0423d -> 0b96e3a0423d): no change
+- `search/aliases-e.json` (63767b0d18ae -> 63767b0d18ae): no change
+- `search/aliases-f.json` (7005e335a42f -> 7005e335a42f): no change
+- `search/aliases-g.json` (386e8309cfd7 -> 386e8309cfd7): no change
+- `search/aliases-h.json` (524289408a18 -> 524289408a18): no change
+- `search/aliases-j.json` (94a16bb46b52 -> 94a16bb46b52): no change
+- `search/aliases-k.json` (08dee6bcedca -> 08dee6bcedca): no change
+- `search/aliases-l.json` (4eeefd58bd92 -> 4eeefd58bd92): no change
+- `search/aliases-m.json` (c46a948e3790 -> c46a948e3790): no change
+- `search/aliases-n.json` (f2cb6900bfd8 -> f2cb6900bfd8): no change
+- `search/aliases-o.json` (85fc5cb8b55d -> 85fc5cb8b55d): no change
+- `search/aliases-p.json` (1771685c0f80 -> 1771685c0f80): no change
+- `search/aliases-q.json` (678e2f05311d -> 678e2f05311d): no change
+- `search/aliases-r.json` (f143d81ce3ec -> f143d81ce3ec): no change
+- `search/aliases-t.json` (256d14d5634b -> 256d14d5634b): no change
+- `search/aliases-x.json` (a20a2164e2f4 -> a20a2164e2f4): no change
+- `search/aliases-y.json` (6bf2eea986b0 -> 6bf2eea986b0): no change
+- `search/aliases-z.json` (ac87fbdddd98 -> ac87fbdddd98): no change
+- `search/aliases.json` (- -> dec85b684943): added (new shard)
+- `search/preview-map.json` (121051f5db38 -> 121051f5db38): no change
+- `search/slots.json` (b5135e22912b -> b5135e22912b): no change
+- `summaries/summaries.json` (9034915769ce -> 9034915769ce): no change
+- `summaries/v2-references.json` (d18e2662a73b -> d18e2662a73b): no change
+- `summaries/v3-references.json` (8e42d88b1e5b -> 8e42d88b1e5b): no change
+- `trucking/dim-divisors.json` (840f02d743f0 -> 840f02d743f0): no change
+- `trucking/reefer-burn.json` (0c7a826df5e8 -> 0c7a826df5e8): no change
+
 ### 2026-08-24
 
 - run: data-refresh (build-data.mjs + integrity verify)
