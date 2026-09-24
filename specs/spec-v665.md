@@ -1,6 +1,6 @@
 # roughlogic.com Specification v665 -- PVC Conduit Max Run Before an Expansion Fitting (calc-electrical.js, Group A, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-13). Single-tile spec.**
+> **Status: LANDED 2026-07-14 (proposed 2026-07-13). Single-tile spec.**
 > In-scope catalog expansion under the spec-v106 trades-only charter. Adds one tile to **`calc-electrical.js`** (Group A,
 > electrical), no new module, group, or dependency. Inherits spec.md through spec-v664.md.
 >

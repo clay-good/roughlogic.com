@@ -1,6 +1,6 @@
 # roughlogic.com Specification v782 -- Ice Cream Overrun by Weight (calc-kitchen.js, Group O, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-14). Single-tile spec.**
+> **Status: LANDED 2026-07-14 (proposed 2026-07-14). Single-tile spec.**
 > In-scope catalog expansion under the spec-v106 trades-only charter. Adds one tile to **`calc-kitchen.js`** (Group O),
 > no new module, group, or dependency. Inherits spec.md through spec-v781.md. Explore sweep #20 (entry 2).
 >

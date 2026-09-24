@@ -1,6 +1,6 @@
 # roughlogic.com Specification v568 -- Center-Pivot Application Depth and Runtime (calc-agriculture.js, Group L, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-09). Single-tile spec.**
+> **Status: LANDED 2026-07-10 (proposed 2026-07-09). Single-tile spec.**
 > In-scope catalog expansion under the spec-v106 trades-only charter. Adds one tile to **`calc-agriculture.js`**
 > (Group L, agriculture and forestry); no new module, group, or dependency. Inherits spec.md through spec-v567.md.
 >

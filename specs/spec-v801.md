@@ -1,6 +1,6 @@
 # roughlogic.com Specification v801 -- Sprocket Pitch Diameter (calc-shop.js, Group K, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-15). Single-tile spec.**
+> **Status: LANDED 2026-07-15 (proposed 2026-07-15). Single-tile spec.**
 > In-scope catalog expansion under the spec-v106 trades-only charter. Adds one tile to **`calc-shop.js`** (Group K), no
 > new module, group, or dependency. Inherits spec.md through spec-v800.md. Fresh Explore sweep (post-inverse forward
 > vein), sitting directly beside the existing `roller-chain-length` (spec-v512) tile in the chain-drive cluster.

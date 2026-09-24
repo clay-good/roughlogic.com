@@ -1,6 +1,6 @@
 # roughlogic.com Specification v780 -- Evaporative (Swamp) Cooler Leaving Temperature (calc-hvac.js, Group C, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-14). Single-tile spec.**
+> **Status: LANDED 2026-07-14 (proposed 2026-07-14). Single-tile spec.**
 > In-scope catalog expansion under the spec-v106 trades-only charter. Adds one tile to **`calc-hvac.js`** (Group C),
 > no new module, group, or dependency. Inherits spec.md through spec-v779.md. Explore sweep #19 (entry 6, final). Closes
 > Explore sweep #19.

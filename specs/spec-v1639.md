@@ -1,6 +1,6 @@
 # roughlogic.com Specification v1639 -- Kitchen Exhaust and Makeup Air Balance Deficit (`calc-kitchen.js`, Group O Kitchen and Food Service, commercial kitchen, 1 New Tile)
 
-> **Status: PROPOSED (2026-09-05). Single-tile spec.** Part of [scope-trade-expansion-2](scope-trade-expansion-2.md).
+> **Status: LANDED 2026-09-08 (proposed 2026-09-05). Single-tile spec.** Part of [scope-trade-expansion-2](scope-trade-expansion-2.md).
 > In-scope catalog expansion under the spec-v106 trades-only charter. Adds one tile to **`calc-kitchen.js`**
 > (Group O, Kitchen and Food Service -- the existing category, hub `/groups/kitchen/`; commercial kitchen), no new dependency and no new network call. Inherits spec.md through spec-v1449.md.
 >

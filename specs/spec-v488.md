@@ -1,6 +1,6 @@
 # roughlogic.com Specification v488 -- EV Charge Time, AC Level 2 (calc-solar.js, Group A, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-09). Single-tile spec.**
+> **Status: LANDED 2026-07-09 (proposed 2026-07-09). Single-tile spec.**
 > In-scope catalog expansion under the spec-v106 trades-only charter. Adds one tile to **`calc-solar.js`**
 > (Group A, the solar / battery / EV-charging bench); no new module, group, or dependency. Inherits spec.md through
 > spec-v487.md.

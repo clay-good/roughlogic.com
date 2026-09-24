@@ -1,6 +1,6 @@
 # roughlogic.com Specification v728 -- Interference for a Target Press-Fit Holding Force (calc-shop.js, Group G, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-14). Single-tile spec.**
+> **Status: LANDED 2026-07-14 (proposed 2026-07-14). Single-tile spec.**
 > In-scope catalog expansion under the spec-v106 trades-only charter. Adds one tile to **`calc-shop.js`** (Group G),
 > no new module, group, or dependency. Inherits spec.md through spec-v727.md. Sweep-11 inverse queue (final entry).
 >

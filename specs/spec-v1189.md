@@ -1,6 +1,6 @@
 # roughlogic.com Specification v1189 -- MCP Rendered Outputs: Units, Display, and Verdict (calc-*.js renderer factories, mcp/catalog.mjs, mcp/server.mjs, 0 New Tiles)
 
-> **Status: PROPOSED (2026-07-31). Platform spec, first of the three-part "MCP full agent integration, part 2" series (v1189-v1191) that completes the surface v1184-v1188 opened.**
+> **Status: LANDED 2026-08-01 (proposed 2026-07-31). Platform spec, first of the three-part "MCP full agent integration, part 2" series (v1189-v1191) that completes the surface v1184-v1188 opened.**
 > Spec-only session: no code lands with this file. No new tile, module, group, dependency, or hosted service; the
 > server stays local stdio (the no-hosting constraint carried in v1188). Inherits spec.md through spec-v1188.md.
 >

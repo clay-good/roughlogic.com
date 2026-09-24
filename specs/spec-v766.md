@@ -1,6 +1,6 @@
 # roughlogic.com Specification v766 -- COGO Forward Locate from Bearing and Distance (calc-survey.js, Group P, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-14). Single-tile spec.**
+> **Status: LANDED 2026-07-14 (proposed 2026-07-14). Single-tile spec.**
 > In-scope catalog expansion under the spec-v106 trades-only charter. Adds one tile to **`calc-survey.js`** (Group P),
 > no new module, group, or dependency. Inherits spec.md through spec-v765.md. Explore sweep #17 (entry 1) -- the
 > post-inverse forward-coverage vein in the thin survey module (6 computes).

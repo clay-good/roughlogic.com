@@ -1,6 +1,6 @@
 # roughlogic.com Specification v500 -- Density Altitude and Pressure Altitude (calc-mechanic.js, Group K, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-09). Single-tile spec.**
+> **Status: LANDED 2026-07-09 (proposed 2026-07-09). Single-tile spec.**
 > In-scope catalog expansion under the spec-v106 trades-only charter. Adds one tile to **`calc-mechanic.js`**
 > (Group K, "Mechanic -- Auto, Marine, Aviation"); no new module, group, or dependency. Trade `["mechanic"]` -- the
 > aviation work lives in Group K beside the existing marine tiles, not a separate trade, so the inclusion gate holds.

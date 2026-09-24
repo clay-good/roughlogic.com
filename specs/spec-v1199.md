@@ -1,6 +1,6 @@
 # roughlogic.com Specification v1199 -- Pitot Traverse Airflow from Point Readings (calc-velocity.js, Group C, 1 New Tile)
 
-> **Status: PROPOSED (2026-08-04). Single-tile spec.**
+> **Status: LANDED 2026-08-04 (proposed 2026-08-04). Single-tile spec.**
 > In-scope catalog expansion under the spec-v106 trades-only charter. Adds one tile to **`calc-velocity.js`** (Group C),
 > no new module, group, or dependency. Inherits spec.md through spec-v1198.md.
 >

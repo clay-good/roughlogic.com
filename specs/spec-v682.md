@@ -1,6 +1,6 @@
 # roughlogic.com Specification v682 -- Boring Bar Max Overhang for a Deflection Limit (calc-machining.js, Group K, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-13). Single-tile spec.**
+> **Status: LANDED 2026-07-14 (proposed 2026-07-13). Single-tile spec.**
 > In-scope catalog expansion under the spec-v106 trades-only charter. Adds one tile to **`calc-machining.js`** (Group K,
 > machinist / mechanic), no new module, group, or dependency. Inherits spec.md through spec-v681.md.
 >

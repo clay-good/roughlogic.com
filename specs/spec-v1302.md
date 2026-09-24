@@ -1,6 +1,6 @@
 # roughlogic.com Specification v1302 -- Impact Load Factor (Energy Method) (calc-mechanic.js, Group K, 1 New Tile)
 
-> **Status: PROPOSED (2026-08-10). Single-tile spec.**
+> **Status: LANDED 2026-08-10 (proposed 2026-08-10). Single-tile spec.**
 > In-scope catalog expansion under the spec-v106 trades-only charter. Adds one tile to **`calc-mechanic.js`**
 > (Group K, mechanic/rigging), no new module or dependency. Inherits spec.md through spec-v1301.md.
 >

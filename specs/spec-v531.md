@@ -1,6 +1,6 @@
 # roughlogic.com Specification v531 -- Units-of-Production Depreciation (calc-accounting.js, Group R, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-09). Single-tile spec.**
+> **Status: LANDED 2026-07-10 (proposed 2026-07-09). Single-tile spec.**
 > In-scope catalog expansion under the spec-v106 trades-only charter. Adds one tile to **`calc-accounting.js`**
 > (Group R, accounting and small business); no new module, group, or dependency. Inherits spec.md through spec-v530.md.
 >

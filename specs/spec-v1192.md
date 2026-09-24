@@ -1,6 +1,6 @@
 # roughlogic.com Specification v1192 -- MCP Structured Tool Output: `outputSchema` and `structuredContent` (mcp/server.mjs, mcp/catalog.mjs, 0 New Tiles)
 
-> **Status: PROPOSED (2026-07-31). Platform spec, first of the three-part "MCP full agent integration, part 3" series (v1192-v1194) -- protocol conformance and repo onboarding.**
+> **Status: LANDED 2026-08-01 (proposed 2026-07-31). Platform spec, first of the three-part "MCP full agent integration, part 3" series (v1192-v1194) -- protocol conformance and repo onboarding.**
 > Spec-only session: no code lands with this file. No new tile, module, group, dependency, or hosted service;
 > the server stays local stdio (the no-hosting constraint carried in v1188). Inherits spec.md through spec-v1191.md.
 >

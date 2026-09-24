@@ -1,6 +1,6 @@
 # roughlogic.com Specification v806 -- Transformer Turns / Voltage / Current / Impedance Ratio (calc-electrical.js, Group A, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-15). Single-tile spec.**
+> **Status: LANDED 2026-07-15 (proposed 2026-07-15). Single-tile spec.**
 > In-scope catalog expansion under the spec-v106 trades-only charter. Adds one tile to **`calc-electrical.js`**
 > (Group A), no new module, group, or dependency. Inherits spec.md through spec-v805.md. Explore sweep #25 (entry 2),
 > filling the base ratio the transformer family never computes.

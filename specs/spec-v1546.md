@@ -1,6 +1,6 @@
 # roughlogic.com Specification v1546 -- Railcar Load Limit and Light Weight (`calc-rail.js`, Group J Trucking and Logistics, rail logistics, 1 New Tile)
 
-> **Status: PROPOSED (2026-09-05). Single-tile spec.** Part of [scope-trade-expansion-2](scope-trade-expansion-2.md).
+> **Status: LANDED 2026-09-08 (proposed 2026-09-05). Single-tile spec.** Part of [scope-trade-expansion-2](scope-trade-expansion-2.md).
 > In-scope catalog expansion under the spec-v106 trades-only charter. Adds one tile to **`calc-rail.js`**
 > (Group J, Trucking and Logistics -- the existing category, hub `/groups/trucking/`; railroad track and equipment), no new dependency and no new network call. Inherits spec.md through spec-v1449.md.
 >

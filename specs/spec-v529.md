@@ -1,6 +1,6 @@
 # roughlogic.com Specification v529 -- Economic Order Quantity (EOQ) (calc-accounting.js, Group R, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-09). Single-tile spec.**
+> **Status: LANDED 2026-07-09 (proposed 2026-07-09). Single-tile spec.**
 > In-scope catalog expansion under the spec-v106 trades-only charter. Adds one tile to **`calc-accounting.js`**
 > (Group R, accounting and small business); no new module, group, or dependency. Inherits spec.md through spec-v528.md.
 >

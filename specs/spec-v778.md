@@ -1,6 +1,6 @@
 # roughlogic.com Specification v778 -- Feed Conversion Ratio and Average Daily Gain (calc-agriculture.js, Group L, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-14). Single-tile spec.**
+> **Status: LANDED 2026-07-14 (proposed 2026-07-14). Single-tile spec.**
 > In-scope catalog expansion under the spec-v106 trades-only charter. Adds one tile to **`calc-agriculture.js`** (Group L),
 > no new module, group, or dependency. Inherits spec.md through spec-v777.md. Explore sweep #19 (entry 4).
 >

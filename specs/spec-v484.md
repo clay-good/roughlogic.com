@@ -1,6 +1,6 @@
 # roughlogic.com Specification v484 -- Spanned Cable Sag and Tension (calc-rigging.js, Group Z, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-08). Single-tile spec.**
+> **Status: LANDED 2026-07-09 (proposed 2026-07-08). Single-tile spec.**
 > In-scope catalog expansion under the spec-v106 trades-only charter. Adds one tile to **`calc-rigging.js`**
 > (Group Z); no new module, group, or dependency. Inherits spec.md through spec-v483.md.
 >

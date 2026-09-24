@@ -1,6 +1,6 @@
 # roughlogic.com Specification v1188 -- Zero-Cost Agent Discoverability and Packaging (mcp/package.json, mcp/README.md, build -> dist/llms.txt, dist/.well-known, 0 New Tiles)
 
-> **Status: PROPOSED (2026-07-31). Platform spec, fifth and last of the "MCP full agent integration" series (v1184-v1188).**
+> **Status: LANDED 2026-08-01, discovery half only (proposed 2026-07-31); the section 2 publishable package was superseded 2026-09-02, when `mcp/package.json` became private and runs from a checkout. Platform spec, fifth and last of the "MCP full agent integration" series (v1184-v1188).**
 > Spec-only session: no code lands with this file. No new tile, module, group, or dependency. Inherits spec.md
 > through spec-v1187.md.
 >

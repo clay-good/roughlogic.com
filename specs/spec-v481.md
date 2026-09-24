@@ -1,6 +1,6 @@
 # roughlogic.com Specification v481 -- Stair Geometry Code Check (IBC 1011 / IRC R311) (calc-construction.js, Group E, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-08). Single-tile spec.**
+> **Status: LANDED 2026-07-08 (proposed 2026-07-08). Single-tile spec.**
 > In-scope catalog expansion under the spec-v106 trades-only charter, and the egress follow-on spec-v243 §5 named
 > ("a stair-capacity-vs-tread-geometry cross-check [is a] deliberate future follow-on"). Adds one tile to
 > **`calc-construction.js`** (Group E); no new module, group, or dependency. Inherits spec.md through spec-v480.md.

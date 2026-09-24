@@ -1,6 +1,6 @@
 # roughlogic.com Specification v1232 -- Masonry Anchor Bolt in Shear (calc-masonry.js, Group E, 1 New Tile)
 
-> **Status: PROPOSED (2026-08-08). Single-tile spec.**
+> **Status: LANDED 2026-08-08 (proposed 2026-08-08). Single-tile spec.**
 > In-scope catalog expansion under the spec-v106 trades-only charter. Adds one tile to **`calc-masonry.js`** (Group E),
 > no new module, group, or dependency. Inherits spec.md through spec-v1231.md.
 >

@@ -1,6 +1,6 @@
 # roughlogic.com Specification v575 -- Mixing Velocity Gradient (G / Gt) (calc-treatment.js, Group M, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-09). Single-tile spec.**
+> **Status: LANDED 2026-07-10 (proposed 2026-07-09). Single-tile spec.**
 > In-scope catalog expansion under the spec-v106 trades-only charter. Adds one tile to **`calc-treatment.js`**
 > (Group M, water and wastewater operations); no new module, group, or dependency. Inherits spec.md through spec-v574.md.
 >

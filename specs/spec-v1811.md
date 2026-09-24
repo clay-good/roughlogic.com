@@ -1,6 +1,6 @@
 # roughlogic.com Specification v1811 -- Pallet Rack Base Plate Anchorage and Overturning (`calc-warehouse.js`, Group E Carpentry and Construction, warehouse racking and material handling, 1 New Tile)
 
-> **Status: PROPOSED (2026-09-11). Single-tile spec.** Part of [scope-trade-expansion-3](scope-trade-expansion-3.md).
+> **Status: LANDED 2026-09-17 (proposed 2026-09-11). Single-tile spec.** Part of [scope-trade-expansion-3](scope-trade-expansion-3.md).
 > In-scope catalog expansion under the spec-v106 trades-only charter. Adds one tile to **`calc-warehouse.js`**
 > (Group E Carpentry and Construction, hub `/groups/construction/`), no new dependency and no new network call. Inherits spec.md through spec-v1749.md.
 >

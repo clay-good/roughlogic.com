@@ -1,6 +1,6 @@
 # roughlogic.com Specification v635 -- Substrate Concentration for a Target Fraction of Vmax (calc-lab.js, Group T, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-11). Single-tile spec.**
+> **Status: LANDED 2026-07-11 (proposed 2026-07-11). Single-tile spec.**
 > In-scope catalog expansion under the spec-v106 charter (Group T lab-science, already in the catalog). Adds one
 > tile to **`calc-lab.js`** (Group T), no new module, group, or dependency. Inherits spec.md through spec-v634.md.
 >

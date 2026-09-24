@@ -1,6 +1,6 @@
 # roughlogic.com Specification v1203 -- TR-55 Graphical Peak Discharge (calc-drainage.js, Group B, 1 New Tile)
 
-> **Status: PROPOSED (2026-08-07). Single-tile spec.**
+> **Status: LANDED 2026-08-07 (proposed 2026-08-07). Single-tile spec.**
 > In-scope catalog expansion under the spec-v106 trades-only charter. Adds one tile to **`calc-drainage.js`** (Group B),
 > no new module, group, or dependency. Inherits spec.md through spec-v1202.md.
 >

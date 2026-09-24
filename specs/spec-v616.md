@@ -1,6 +1,6 @@
 # roughlogic.com Specification v616 -- Beam Clamp Reaction and Side-Pull Check (calc-rigging.js, Group Z, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-10). Single-tile spec.**
+> **Status: LANDED 2026-07-11 (proposed 2026-07-10). Single-tile spec.**
 > In-scope catalog expansion under the spec-v106 trades-only charter. Adds one tile to **`calc-rigging.js`**
 > (Group Z, rigging and heavy lift); no new module, group, or dependency. Inherits spec.md through spec-v615.md.
 >

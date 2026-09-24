@@ -1,6 +1,6 @@
 # roughlogic.com Specification v578 -- Relay Pumping Max Distance (calc-fire.js, Group F, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-09). Single-tile spec.**
+> **Status: LANDED 2026-07-10 (proposed 2026-07-09). Single-tile spec.**
 > In-scope catalog expansion under the spec-v106 trades-only charter. Adds one tile to **`calc-fire.js`**
 > (Group F, fire-ground engineering); no new module, group, or dependency. Inherits spec.md through spec-v577.md.
 >

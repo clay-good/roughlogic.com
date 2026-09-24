@@ -1,6 +1,6 @@
 # roughlogic.com Specification v1820 -- Trend Log Sample Interval and Point Storage (`calc-controls.js`, Group C HVAC, building automation and controls, 1 New Tile)
 
-> **Status: PROPOSED (2026-09-11). Single-tile spec.** Part of [scope-trade-expansion-3](scope-trade-expansion-3.md).
+> **Status: LANDED 2026-09-11 (proposed 2026-09-11). Single-tile spec.** Part of [scope-trade-expansion-3](scope-trade-expansion-3.md).
 > In-scope catalog expansion under the spec-v106 trades-only charter. Adds one tile to **`calc-controls.js`**
 > (Group C HVAC, hub `/groups/hvac/`), no new dependency and no new network call. Inherits spec.md through spec-v1749.md.
 >

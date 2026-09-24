@@ -427,8 +427,8 @@ than sitting here misinforming a reader for three months.
 
 | Figure | Live |
 | --- | --- |
-| Static gates in the `npm run lint` chain | **60 live lint gates** |
-| Unit-test suite files under `test/unit/` | **200 live unit suites** |
+| Static gates in the `npm run lint` chain | **61 live lint gates** |
+| Unit-test suite files under `test/unit/` | **201 live unit suites** |
 | Playwright spec files under `test/integration/` | **24 live integration specs** |
 
 CI runs three jobs per push: `test` (lint, unit tests, data-integrity

@@ -1,6 +1,6 @@
 # roughlogic.com Specification v805 -- Tailstock Setover for Taper Turning (calc-shop.js, Group K, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-15). Single-tile spec.**
+> **Status: LANDED 2026-07-15 (proposed 2026-07-15). Single-tile spec.**
 > In-scope catalog expansion under the spec-v106 trades-only charter. Adds one tile to **`calc-shop.js`** (Group K), no
 > new module, group, or dependency. Inherits spec.md through spec-v804.md. Explore sweep #25 (entry 1), completing the
 > lathe-taper cluster beside `taper-calc` (spec-v40) and `taper-diameter` (spec-v650).

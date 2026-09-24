@@ -1,6 +1,6 @@
 # roughlogic.com Specification v625 -- Submerged-Backfill Earth Pressure (Buoyant + Hydrostatic) (calc-geotech.js, Group E, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-11). Single-tile spec.**
+> **Status: LANDED 2026-07-11 (proposed 2026-07-11). Single-tile spec.**
 > In-scope catalog expansion under the spec-v106 trades-only charter. Adds one tile to **`calc-geotech.js`**
 > (Group E, geotechnical), no new module, group, or dependency. Inherits spec.md through spec-v624.md.
 >

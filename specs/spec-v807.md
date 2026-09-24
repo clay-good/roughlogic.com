@@ -1,6 +1,6 @@
 # roughlogic.com Specification v807 -- Belt Power from Tension and Speed (calc-cross.js, Group G, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-15). Single-tile spec.**
+> **Status: LANDED 2026-07-15 (proposed 2026-07-15). Single-tile spec.**
 > In-scope catalog expansion under the spec-v106 trades-only charter. Adds one tile to **`calc-cross.js`** (Group G), no
 > new module, group, or dependency. Inherits spec.md through spec-v806.md. Explore sweep #25 (entry 4), beside the
 > existing `vbelt-drive` power-transmission tile.

@@ -1,6 +1,6 @@
 # roughlogic.com Specification v1309 -- Triangle Solver: Two Sides + Included Angle (calc-layout.js, Group G, 1 New Tile)
 
-> **Status: PROPOSED (2026-08-10). Single-tile spec.**
+> **Status: LANDED 2026-08-13 (proposed 2026-08-10). Single-tile spec.**
 > In-scope catalog expansion under the spec-v106 trades-only charter. Adds one tile to **`calc-layout.js`**
 > (Group G, layout), no new module or dependency. Inherits spec.md through spec-v1308.md.
 >

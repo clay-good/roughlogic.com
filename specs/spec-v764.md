@@ -1,6 +1,6 @@
 # roughlogic.com Specification v764 -- Chlorine Decay Constant from a Bottle Test (calc-water.js, Group M, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-14). Single-tile spec.**
+> **Status: LANDED 2026-07-14 (proposed 2026-07-14). Single-tile spec.**
 > In-scope catalog expansion under the spec-v106 trades-only charter. Adds one tile to **`calc-water.js`** (Group M),
 > no new module, group, or dependency. Inherits spec.md through spec-v763.md. Explore sweep #16 (entry 2, final).
 > Closes Explore sweep #16 and the inverse-of-existing-tile campaign.

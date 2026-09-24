@@ -1,6 +1,6 @@
 # roughlogic.com Specification v647 -- PV Array Size from a Target Annual Energy (calc-solar.js, Group A, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-13). Single-tile spec.**
+> **Status: LANDED 2026-07-13 (proposed 2026-07-13). Single-tile spec.**
 > In-scope catalog expansion under the spec-v106 trades-only charter. Adds one tile to **`calc-solar.js`**
 > (Group A, solar/electrical), no new module, group, or dependency. Inherits spec.md through spec-v646.md.
 >

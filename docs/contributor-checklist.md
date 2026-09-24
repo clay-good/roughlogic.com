@@ -50,6 +50,12 @@ phase docs ([edition-rollover.md](edition-rollover.md),
   unit-test fixture below is a separate thing and does not satisfy it);
   and 3-5 unique search aliases in
   [../data/search/aliases.json](../data/search/aliases.json).
+- [ ] The spec's `**Status:**` line reads `LANDED <date> (proposed <date>)`,
+  with `built as \`<id>\`` when the tile shipped under a different id than
+  the spec's heading names; a spec cut as a duplicate reads `CUT` and names
+  the tile that already computes it. `check-spec-status` fails a spec still
+  marked PROPOSED once its tile is in the catalog. Until 2026-09-24 nothing
+  checked this, and 884 shipped specs still read PROPOSED.
 - [ ] Optionally, a 3-6 id entry in
   [../scripts/related-tiles.mjs](../scripts/related-tiles.mjs). This one is
   **not** required -- 130 live tiles have no curated entry and the lint is

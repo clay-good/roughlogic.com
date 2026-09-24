@@ -1,6 +1,6 @@
 # roughlogic.com Specification v606 -- Manure Storage Covered-vs-Open Roof Savings (calc-agriculture.js, Group L, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-10). Single-tile spec.**
+> **Status: LANDED 2026-07-11 (proposed 2026-07-10). Single-tile spec.**
 > In-scope catalog expansion under the spec-v106 trades-only charter. Adds one tile to **`calc-agriculture.js`**
 > (Group L, the agriculture bench); no new module, group, or dependency. Inherits spec.md through spec-v605.md.
 >

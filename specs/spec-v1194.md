@@ -1,6 +1,6 @@
 # roughlogic.com Specification v1194 -- AGENTS.md: The Repo-Level Agent Onboarding Guide (AGENTS.md, build -> dist/, 0 New Tiles)
 
-> **Status: PROPOSED (2026-07-31). Platform spec, third and last of the "MCP full agent integration, part 3" series (v1192-v1194).**
+> **Status: LANDED 2026-08-01 (proposed 2026-07-31). Platform spec, third and last of the "MCP full agent integration, part 3" series (v1192-v1194).**
 > Spec-only session: no code lands with this file. No new tile, module, group, or dependency. Inherits spec.md
 > through spec-v1193.md.
 >

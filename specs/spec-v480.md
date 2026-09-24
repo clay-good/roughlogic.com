@@ -1,6 +1,6 @@
 # roughlogic.com Specification v480 -- Seismic Overturning Moment (ASCE 7-22 12.8.5) (calc-construction.js, Group E, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-08). Single-tile spec.**
+> **Status: LANDED 2026-07-08 (proposed 2026-07-08). Single-tile spec.**
 > In-scope catalog expansion under the spec-v106 trades-only charter, and the seismic follow-on spec-v477 §5 named
 > explicitly ("the §12.8.5 overturning accumulation ... [is a] deliberate future follow-on"). Adds one tile to
 > **`calc-construction.js`** (Group E); no new module, group, or dependency. Inherits spec.md through spec-v479.md.

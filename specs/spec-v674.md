@@ -1,6 +1,6 @@
 # roughlogic.com Specification v674 -- Max Temperature Change for a Stress Limit (calc-construction.js, Group E, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-13). Single-tile spec.**
+> **Status: LANDED 2026-07-14 (proposed 2026-07-13). Single-tile spec.**
 > In-scope catalog expansion under the spec-v106 trades-only charter. Adds one tile to **`calc-construction.js`** (Group
 > E, construction / carpentry / pipefitting), no new module, group, or dependency. Inherits spec.md through
 > spec-v673.md.

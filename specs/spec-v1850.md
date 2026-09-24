@@ -1,6 +1,6 @@
 # roughlogic.com Specification v1850 -- Walkway Clearing Crew Productivity (`calc-winterops.js`, Group G Cross-Trade Utilities, snow and ice management, 1 New Tile)
 
-> **Status: PROPOSED (2026-09-11). Single-tile spec.** Part of [scope-trade-expansion-3](scope-trade-expansion-3.md).
+> **Status: LANDED 2026-09-11 (proposed 2026-09-11). Single-tile spec.** Part of [scope-trade-expansion-3](scope-trade-expansion-3.md).
 > In-scope catalog expansion under the spec-v106 trades-only charter. Adds one tile to **`calc-winterops.js`**
 > (Group G Cross-Trade Utilities, hub `/groups/cross-trade/`), no new dependency and no new network call. Inherits spec.md through spec-v1749.md.
 >

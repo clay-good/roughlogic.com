@@ -1,6 +1,6 @@
 # roughlogic.com Specification v1275 -- Culvert Headwater by Outlet Control (calc-drainage.js, Group B, 1 New Tile)
 
-> **Status: PROPOSED (2026-08-09). Single-tile spec.**
+> **Status: LANDED 2026-08-09 (proposed 2026-08-09). Single-tile spec.**
 > In-scope catalog expansion under the spec-v106 trades-only charter. Adds one tile to **`calc-drainage.js`**
 > (Group B, civil drainage), no new module or dependency. Inherits spec.md through spec-v1274.md.
 >

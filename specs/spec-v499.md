@@ -1,6 +1,6 @@
 # roughlogic.com Specification v499 -- Motor Locked-Rotor Current from Code Letter (calc-motor.js, Group A, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-09). Single-tile spec.**
+> **Status: LANDED 2026-07-09 (proposed 2026-07-09). Single-tile spec.**
 > In-scope catalog expansion under the spec-v106 trades-only charter. Adds one tile to **`calc-motor.js`**
 > (Group A, the motor bench); no new module, group, or dependency. Inherits spec.md through spec-v498.md.
 >

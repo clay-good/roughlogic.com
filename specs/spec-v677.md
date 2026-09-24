@@ -1,6 +1,6 @@
 # roughlogic.com Specification v677 -- Pool Heater Output for a Target Heat-Up Time (calc-treatment.js, Group M, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-13). Single-tile spec.**
+> **Status: LANDED 2026-07-14 (proposed 2026-07-13). Single-tile spec.**
 > In-scope catalog expansion under the spec-v106 trades-only charter. Adds one tile to **`calc-treatment.js`** (Group M,
 > pool-service / water-operations), no new module, group, or dependency. Inherits spec.md through spec-v676.md.
 >

@@ -1,6 +1,6 @@
 # roughlogic.com Specification v663 -- Dry-Bulb from Enthalpy and Humidity Ratio (calc-hvac.js, Group C, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-13). Single-tile spec.**
+> **Status: LANDED 2026-07-14 (proposed 2026-07-13). Single-tile spec.**
 > In-scope catalog expansion under the spec-v106 trades-only charter. Adds one tile to **`calc-hvac.js`**
 > (Group C, HVAC), no new module, group, or dependency. Inherits spec.md through spec-v662.md.
 >

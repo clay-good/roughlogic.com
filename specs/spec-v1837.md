@@ -1,6 +1,6 @@
 # roughlogic.com Specification v1837 -- OTDR Event Distance and Index of Refraction (`calc-telecom.js`, Group A Electrical, fiber optic outside plant, 1 New Tile)
 
-> **Status: PROPOSED (2026-09-11). Single-tile spec.** Part of [scope-trade-expansion-3](scope-trade-expansion-3.md).
+> **Status: LANDED 2026-09-13 (proposed 2026-09-11). Single-tile spec.** Part of [scope-trade-expansion-3](scope-trade-expansion-3.md).
 > In-scope catalog expansion under the spec-v106 trades-only charter. Adds one tile to **`calc-telecom.js`**
 > (Group A Electrical, hub `/groups/electrical/`), no new dependency and no new network call. Inherits spec.md through spec-v1749.md.
 >

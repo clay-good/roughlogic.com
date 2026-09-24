@@ -1,6 +1,6 @@
 # roughlogic.com Specification v1201 -- SCS/NRCS Curve Number Runoff Depth (calc-drainage.js, Group B, 1 New Tile)
 
-> **Status: PROPOSED (2026-08-04). Single-tile spec.**
+> **Status: LANDED 2026-08-04 (proposed 2026-08-04). Single-tile spec.**
 > In-scope catalog expansion under the spec-v106 trades-only charter. Adds one tile to **`calc-drainage.js`** (Group B),
 > no new module, group, or dependency. Inherits spec.md through spec-v1200.md.
 >

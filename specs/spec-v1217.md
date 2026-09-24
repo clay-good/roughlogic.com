@@ -1,6 +1,6 @@
 # roughlogic.com Specification v1217 -- Indirect Evaporative Cooler Leaving Temperature (calc-hvac.js, Group C, 1 New Tile)
 
-> **Status: PROPOSED (2026-08-08). Single-tile spec.**
+> **Status: LANDED 2026-08-08 (proposed 2026-08-08). Single-tile spec.**
 > In-scope catalog expansion under the spec-v106 trades-only charter. Adds one tile to **`calc-hvac.js`** (Group C),
 > no new module, group, or dependency. Inherits spec.md through spec-v1216.md.
 >

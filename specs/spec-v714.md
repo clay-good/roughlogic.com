@@ -1,6 +1,6 @@
 # roughlogic.com Specification v714 -- Max Grounding-Grid Resistance for the GPR Screen (calc-elecdesign.js, Group A, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-14). Single-tile spec.**
+> **Status: LANDED 2026-07-14 (proposed 2026-07-14). Single-tile spec.**
 > In-scope catalog expansion under the spec-v106 trades-only charter. Adds one tile to **`calc-elecdesign.js`** (Group A),
 > no new module, group, or dependency. Inherits spec.md through spec-v713.md. Sweep-10 inverse queue.
 >

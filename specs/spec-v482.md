@@ -1,6 +1,6 @@
 # roughlogic.com Specification v482 -- ADPI Room Air Diffusion Selection (ASHRAE) (calc-hvac.js, Group C, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-08). Single-tile spec.**
+> **Status: LANDED 2026-07-09 (proposed 2026-07-08). Single-tile spec.**
 > In-scope catalog expansion under the spec-v106 trades-only charter, and the air-distribution follow-on spec-v348 §5
 > named ("a room-air-distribution (ADPI) check [is a] deliberate next follow-on"). Adds one tile to **`calc-hvac.js`**
 > (Group C); no new module, group, or dependency. Inherits spec.md through spec-v481.md.

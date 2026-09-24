@@ -1,6 +1,6 @@
 # roughlogic.com Specification v1279 -- Concrete Immediate Deflection from Ie (calc-concrete.js, Group E, 1 New Tile)
 
-> **Status: PROPOSED (2026-08-09). Single-tile spec.**
+> **Status: LANDED 2026-08-09 (proposed 2026-08-09). Single-tile spec.**
 > In-scope catalog expansion under the spec-v106 trades-only charter. Adds one tile to **`calc-concrete.js`**
 > (Group E, structural concrete), no new module or dependency. Inherits spec.md through spec-v1278.md.
 >

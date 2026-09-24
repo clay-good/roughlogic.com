@@ -1,6 +1,6 @@
 # roughlogic.com Specification v543 -- LED Tape PSU and Voltage-Drop Run (calc-stage.js, Group N, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-09). Single-tile spec.**
+> **Status: LANDED 2026-07-10 (proposed 2026-07-09). Single-tile spec.**
 > In-scope catalog expansion under the spec-v106 trades-only charter. Adds one tile to **`calc-stage.js`**
 > (Group N, stage and live production); no new module, group, or dependency. Inherits spec.md through spec-v542.md.
 >

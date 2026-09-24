@@ -1,6 +1,6 @@
 # roughlogic.com Specification v1434 -- Escalator Handling Capacity and Step Loading (calc-construction.js, Group E, specialty trades, 1 New Tile)
 
-> **Status: PROPOSED (2026-08-26). Single-tile spec.** Part of [scope-trade-expansion](scope-trade-expansion.md).
+> **Status: LANDED 2026-08-27 (proposed 2026-08-26). Single-tile spec.** Part of [scope-trade-expansion](scope-trade-expansion.md).
 > In-scope catalog expansion under the spec-v106 trades-only charter. Adds one tile to **`calc-construction.js`**
 > (Group E, specialty trades), no new module or dependency. Inherits spec.md through spec-v1349.md.
 >

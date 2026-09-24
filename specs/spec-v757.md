@@ -1,6 +1,6 @@
 # roughlogic.com Specification v757 -- Septic LPP Squirt Head for a Target Orifice Flow (calc-septic.js, Group B, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-14). Single-tile spec.**
+> **Status: LANDED 2026-07-14 (proposed 2026-07-14). Single-tile spec.**
 > In-scope catalog expansion under the spec-v106 trades-only charter. Adds one tile to **`calc-septic.js`** (Group B),
 > no new module, group, or dependency. Inherits spec.md through spec-v756.md. Explore sweep #15 (entry 3).
 >

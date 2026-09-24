@@ -1,6 +1,6 @@
 # roughlogic.com Specification v781 -- COGO Inverse (Two Points to Bearing and Distance) (calc-survey.js, Group P, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-14). Single-tile spec.**
+> **Status: LANDED 2026-07-14 (proposed 2026-07-14). Single-tile spec.**
 > In-scope catalog expansion under the spec-v106 trades-only charter. Adds one tile to **`calc-survey.js`** (Group P),
 > no new module, group, or dependency. Inherits spec.md through spec-v780.md. Explore sweep #20 (entry 1).
 >

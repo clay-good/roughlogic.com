@@ -1,6 +1,6 @@
 # roughlogic.com Specification v633 -- Isolator Static Deflection for a Target Isolation Efficiency (calc-hvac.js, Group C, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-11). Single-tile spec.**
+> **Status: LANDED 2026-07-11 (proposed 2026-07-11). Single-tile spec.**
 > In-scope catalog expansion under the spec-v106 trades-only charter. Adds one tile to **`calc-hvac.js`** (Group C,
 > HVAC), no new module, group, or dependency. Inherits spec.md through spec-v632.md.
 >

@@ -1,6 +1,6 @@
 # roughlogic.com Specification v1735 -- Fixed Ladder Rest Platform and Climb System Spacing (`calc-cross.js`, Group G Cross-Trade Utilities, industrial hygiene, 1 New Tile)
 
-> **Status: PROPOSED (2026-09-05). Single-tile spec.** Part of [scope-trade-expansion-2](scope-trade-expansion-2.md).
+> **Status: LANDED 2026-09-09 (proposed 2026-09-05), built as `fixed-ladder-fall-protection`. Single-tile spec.** Part of [scope-trade-expansion-2](scope-trade-expansion-2.md).
 > In-scope catalog expansion under the spec-v106 trades-only charter. Adds one tile to **`calc-cross.js`**
 > (Group G, Cross-Trade Utilities -- the existing category, hub `/groups/cross-trade/`; industrial hygiene and safety), no new dependency and no new network call. Inherits spec.md through spec-v1449.md.
 >

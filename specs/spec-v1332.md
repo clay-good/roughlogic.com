@@ -1,6 +1,6 @@
 # roughlogic.com Specification v1332 -- Belt Drive Center Distance for a Standard Belt (calc-cross.js, Group G, 1 New Tile)
 
-> **Status: PROPOSED (2026-08-13). Single-tile spec.**
+> **Status: LANDED 2026-08-14 (proposed 2026-08-13). Single-tile spec.**
 > In-scope catalog expansion under the spec-v106 trades-only charter. Adds one tile to **`calc-cross.js`**
 > (Group G, cross-trade mechanical), no new module or dependency. Inherits spec.md through spec-v1331.md.
 >

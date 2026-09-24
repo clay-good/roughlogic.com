@@ -1,6 +1,6 @@
 # roughlogic.com Specification v792 -- Compressor Theoretical Displacement (calc-refrigerant.js, Group C, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-14). Single-tile spec.**
+> **Status: LANDED 2026-07-14 (proposed 2026-07-14). Single-tile spec.**
 > In-scope catalog expansion under the spec-v106 trades-only charter. Adds one tile to **`calc-refrigerant.js`** (Group
 > C), no new module, group, or dependency. Inherits spec.md through spec-v791.md. Explore sweep #22 (entry 2).
 >

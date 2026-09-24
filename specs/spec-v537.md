@@ -1,6 +1,6 @@
 # roughlogic.com Specification v537 -- Menu Engineering Matrix (calc-kitchen.js, Group O, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-09). Single-tile spec.**
+> **Status: LANDED 2026-07-10 (proposed 2026-07-09). Single-tile spec.**
 > In-scope catalog expansion under the spec-v106 trades-only charter. Adds one tile to **`calc-kitchen.js`**
 > (Group O, kitchen and food service); no new module, group, or dependency. Inherits spec.md through spec-v536.md.
 >

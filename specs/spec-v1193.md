@@ -1,6 +1,6 @@
 # roughlogic.com Specification v1193 -- MCP Tool Annotations and the Full Example Gallery (mcp/server.mjs, mcp/catalog.mjs, 0 New Tiles)
 
-> **Status: PROPOSED (2026-07-31). Platform spec, second of the three-part "MCP full agent integration, part 3" series (v1192-v1194).**
+> **Status: LANDED 2026-08-01 (proposed 2026-07-31). Platform spec, second of the three-part "MCP full agent integration, part 3" series (v1192-v1194).**
 > Spec-only session: no code lands with this file. No new tile, module, group, dependency, or hosted service.
 > Inherits spec.md through spec-v1192.md.
 >

@@ -1,6 +1,6 @@
 # roughlogic.com Specification v719 -- Max Wind Speed Before a Load's Swing Limit (calc-rigging.js, Group Z, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-14). Single-tile spec.**
+> **Status: LANDED 2026-07-14 (proposed 2026-07-14). Single-tile spec.**
 > In-scope catalog expansion under the spec-v106 trades-only charter. Adds one tile to **`calc-rigging.js`** (Group Z),
 > no new module, group, or dependency. Inherits spec.md through spec-v718.md. Sweep-10 inverse queue.
 >

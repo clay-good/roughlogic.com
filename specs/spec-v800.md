@@ -1,6 +1,6 @@
 # roughlogic.com Specification v800 -- Water-Cementitious Ratio and Exposure Cap (calc-construction.js, Group E, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-14). Single-tile spec. The v800 milestone.**
+> **Status: LANDED 2026-07-14 (proposed 2026-07-14). Single-tile spec. The v800 milestone.**
 > In-scope catalog expansion under the spec-v106 trades-only charter. Adds one tile to **`calc-construction.js`** (Group
 > E), no new module, group, or dependency. Inherits spec.md through spec-v799.md. Explore sweep #23 (entry 4), closing
 > the concrete-QC cluster (yield / fineness-modulus / w-cm).

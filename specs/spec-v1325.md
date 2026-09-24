@@ -1,6 +1,6 @@
 # roughlogic.com Specification v1325 -- Cone-Bottom Tank Volume from Dipstick (calc-shop.js, Group G, 1 New Tile)
 
-> **Status: PROPOSED (2026-08-13). Single-tile spec.**
+> **Status: LANDED 2026-08-13 (proposed 2026-08-13). Single-tile spec.**
 > In-scope catalog expansion under the spec-v106 trades-only charter. Adds one tile to **`calc-shop.js`**
 > (Group G, shop/fabrication/layout), no new module or dependency. Inherits spec.md through spec-v1324.md.
 >

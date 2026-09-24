@@ -1,6 +1,6 @@
 # roughlogic.com Specification v644 -- Fuel-Gas Pipe Capacity from Allowable Drop (calc-gas.js, Group B, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-13). Single-tile spec.**
+> **Status: LANDED 2026-07-13 (proposed 2026-07-13). Single-tile spec.**
 > In-scope catalog expansion under the spec-v106 trades-only charter. Adds one tile to **`calc-gas.js`**
 > (Group B, plumbing/gas), no new module, group, or dependency. Inherits spec.md through spec-v643.md.
 >

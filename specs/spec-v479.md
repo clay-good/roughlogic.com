@@ -1,6 +1,6 @@
 # roughlogic.com Specification v479 -- Sprinkler Pressure Demand at the Base of Riser (NFPA 13) (calc-firesprinkler.js, Group F, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-08). Single-tile spec.**
+> **Status: LANDED 2026-07-08 (proposed 2026-07-08). Single-tile spec.**
 > In-scope catalog expansion under the spec-v106 trades-only charter, and the sprinkler-demand follow-on the v249 tile's
 > own citation named ("a full hydraulic calculation to the most-remote area including friction and elevation yields the
 > governing demand and is a separate analysis") -- spec-v249 §5 defers it explicitly as the "most-remote-area hydraulic

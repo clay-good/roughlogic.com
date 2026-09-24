@@ -1,6 +1,6 @@
 # roughlogic.com Specification v700 -- Septic Drainfield Capacity (calc-septic.js, Group B, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-14). Single-tile spec.**
+> **Status: LANDED 2026-07-14 (proposed 2026-07-14). Single-tile spec.**
 > In-scope catalog expansion under the spec-v106 trades-only charter. Adds one tile to **`calc-septic.js`** (Group B,
 > plumbing / onsite wastewater), no new module, group, or dependency. Inherits spec.md through spec-v699.md.
 >

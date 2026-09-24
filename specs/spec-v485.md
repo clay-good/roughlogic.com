@@ -1,6 +1,6 @@
 # roughlogic.com Specification v485 -- Torque Wrench Extension / Crowfoot Correction (calc-mechanic.js, Group K, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-08). Single-tile spec.**
+> **Status: LANDED 2026-07-09 (proposed 2026-07-08). Single-tile spec.**
 > In-scope catalog expansion under the spec-v106 trades-only charter. Adds one tile to **`calc-mechanic.js`**
 > (Group K); no new module, group, or dependency. Inherits spec.md through spec-v484.md.
 >

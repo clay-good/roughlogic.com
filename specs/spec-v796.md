@@ -1,6 +1,6 @@
 # roughlogic.com Specification v796 -- Climb Gradient to Rate of Climb (calc-mechanic.js, Group K, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-14). Single-tile spec.**
+> **Status: LANDED 2026-07-14 (proposed 2026-07-14). Single-tile spec.**
 > In-scope catalog expansion under the spec-v106 trades-only charter. Adds one tile to **`calc-mechanic.js`** (Group K,
 > the aviation cluster), no new module, group, or dependency. Inherits spec.md through spec-v795.md. Explore sweep #22
 > (entry 6).

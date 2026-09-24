@@ -1,6 +1,6 @@
 # roughlogic.com Specification v705 -- Masonry Anchor Embedment for a Tension (calc-masonry.js, Group E, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-14). Single-tile spec.**
+> **Status: LANDED 2026-07-14 (proposed 2026-07-14). Single-tile spec.**
 > In-scope catalog expansion under the spec-v106 trades-only charter. Adds one tile to **`calc-masonry.js`** (Group E,
 > masonry/structural), no new module, group, or dependency. Inherits spec.md through spec-v704.md.
 >

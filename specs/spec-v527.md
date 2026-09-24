@@ -1,6 +1,6 @@
 # roughlogic.com Specification v527 -- Rentable/Usable Load Factor (BOMA) (calc-realestate.js, Group X, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-09). Single-tile spec.**
+> **Status: LANDED 2026-07-09 (proposed 2026-07-09). Single-tile spec.**
 > In-scope catalog expansion under the spec-v106 trades-only charter. Adds one tile to **`calc-realestate.js`**
 > (Group X, real estate); no new module, group, or dependency. Inherits spec.md through spec-v526.md.
 >

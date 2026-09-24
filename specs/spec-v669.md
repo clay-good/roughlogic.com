@@ -1,6 +1,6 @@
 # roughlogic.com Specification v669 -- Chimney Height for a Target Draft (calc-hvacservice.js, Group C, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-13). Single-tile spec.**
+> **Status: LANDED 2026-07-14 (proposed 2026-07-13). Single-tile spec.**
 > In-scope catalog expansion under the spec-v106 trades-only charter. Adds one tile to **`calc-hvacservice.js`** (Group
 > C, HVAC), no new module, group, or dependency. Inherits spec.md through spec-v668.md.
 >

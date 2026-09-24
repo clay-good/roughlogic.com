@@ -1,6 +1,6 @@
 # roughlogic.com Specification v1190 -- MCP Input Guardrails: Range Validation and Limitation Banners (mcp/catalog.mjs, mcp/server.mjs, 0 New Tiles)
 
-> **Status: PROPOSED (2026-07-31). Platform spec, second of the three-part "MCP full agent integration, part 2" series (v1189-v1191).**
+> **Status: LANDED 2026-08-01 (proposed 2026-07-31). Platform spec, second of the three-part "MCP full agent integration, part 2" series (v1189-v1191).**
 > Spec-only session: no code lands with this file. No new tile, module, group, dependency, or hosted service.
 > Inherits spec.md through spec-v1189.md.
 >

@@ -1,6 +1,6 @@
 # roughlogic.com Specification v1229 -- Arrhenius Activation Energy (calc-lab.js, Group T, 1 New Tile)
 
-> **Status: PROPOSED (2026-08-08). Single-tile spec.**
+> **Status: LANDED 2026-08-08 (proposed 2026-08-08). Single-tile spec.**
 > In-scope catalog expansion under the spec-v106 trades-only charter. Adds one tile to **`calc-lab.js`** (Group T),
 > no new module, group, or dependency. Inherits spec.md through spec-v1228.md.
 >

@@ -1,6 +1,6 @@
 # roughlogic.com Specification v711 -- Max Material Removal Rate from Spindle Power (calc-machining.js, Group K, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-14). Single-tile spec.**
+> **Status: LANDED 2026-07-14 (proposed 2026-07-14). Single-tile spec.**
 > In-scope catalog expansion under the spec-v106 trades-only charter. Adds one tile to **`calc-machining.js`** (Group K),
 > no new module, group, or dependency. Inherits spec.md through spec-v710.md. Sweep-9 inverse queue.
 >

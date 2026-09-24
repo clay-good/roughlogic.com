@@ -1,6 +1,6 @@
 # roughlogic.com Specification v497 -- Long-Term Deflection Multiplier (calc-concrete.js, Group E, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-09). Single-tile spec.**
+> **Status: LANDED 2026-07-09 (proposed 2026-07-09). Single-tile spec.**
 > In-scope catalog expansion under the spec-v106 trades-only charter. Adds one tile to **`calc-concrete.js`**
 > (Group E, the concrete design bench); no new module, group, or dependency. Inherits spec.md through spec-v496.md.
 >

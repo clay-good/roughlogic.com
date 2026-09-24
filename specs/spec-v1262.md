@@ -1,6 +1,6 @@
 # roughlogic.com Specification v1262 -- Chi-Square Test of Independence (calc-edu.js, Group Y, 1 New Tile)
 
-> **Status: PROPOSED (2026-08-08). Single-tile spec.**
+> **Status: LANDED 2026-08-08 (proposed 2026-08-08). Single-tile spec.**
 > In-scope catalog expansion under the spec-v106 trades-only charter. Adds one tile to **`calc-edu.js`** (Group Y),
 > no new module or dependency (reuses the `chi2Cdf` helper already imported from `pure-math.js`). Inherits spec.md
 > through spec-v1261.md.

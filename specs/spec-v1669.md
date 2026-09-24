@@ -1,6 +1,6 @@
 # roughlogic.com Specification v1669 -- Liquid Penetrant Dwell and Development Time (`calc-inspection.js`, Group E Carpentry and Construction, welding inspection, 1 New Tile)
 
-> **Status: PROPOSED (2026-09-05). Single-tile spec.** Part of [scope-trade-expansion-2](scope-trade-expansion-2.md).
+> **Status: LANDED 2026-09-09 (proposed 2026-09-05), built as `pt-dwell-development`. Single-tile spec.** Part of [scope-trade-expansion-2](scope-trade-expansion-2.md).
 > In-scope catalog expansion under the spec-v106 trades-only charter. Adds one tile to **`calc-inspection.js`**
 > (Group E, Carpentry and Construction -- the existing category, hub `/groups/construction/`; welding inspection and ndt), no new dependency and no new network call. Inherits spec.md through spec-v1449.md.
 >

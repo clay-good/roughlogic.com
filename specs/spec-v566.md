@@ -1,6 +1,6 @@
 # roughlogic.com Specification v566 -- Tree Protection / Critical Root Zone (calc-arborist.js, Group L, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-09). Single-tile spec.**
+> **Status: LANDED 2026-07-10 (proposed 2026-07-09). Single-tile spec.**
 > In-scope catalog expansion under the spec-v106 trades-only charter. Adds one tile to **`calc-arborist.js`**
 > (Group L, agriculture and forestry); no new module, group, or dependency. Inherits spec.md through spec-v565.md.
 >

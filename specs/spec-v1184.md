@@ -1,6 +1,6 @@
 # roughlogic.com Specification v1184 -- MCP Field Schemas: Expose the Renderer Descriptors (calc-*.js renderer factories, mcp/catalog.mjs, mcp/server.mjs, 0 New Tiles)
 
-> **Status: PROPOSED (2026-07-31). Platform spec, first of the five-part "MCP full agent integration" series (v1184-v1188).**
+> **Status: LANDED 2026-08-01 (proposed 2026-07-31). Platform spec, first of the five-part "MCP full agent integration" series (v1184-v1188).**
 > Spec-only session: no code lands with this file. This series makes the local, zero-cost MCP server expose
 > everything the site already knows -- field schemas, citations, the MCP resource and prompt surfaces, batch
 > evaluation, and a no-hosting install path -- so an AI agent can use the whole catalog as well as a person

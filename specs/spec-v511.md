@@ -1,6 +1,6 @@
 # roughlogic.com Specification v511 -- Interference Press-Fit Pressure and Holding Force (calc-shop.js, Group G, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-09). Single-tile spec.**
+> **Status: LANDED 2026-07-09 (proposed 2026-07-09). Single-tile spec.**
 > In-scope catalog expansion under the spec-v106 trades-only charter. Adds one tile to **`calc-shop.js`**
 > (Group G, the shop-mechanical bench); no new module, group, or dependency. Inherits spec.md through spec-v510.md.
 >

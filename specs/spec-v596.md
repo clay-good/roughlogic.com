@@ -1,6 +1,6 @@
 # roughlogic.com Specification v596 -- Digester Gas and Methane Production (calc-treatment.js, Group M, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-10). Single-tile spec.**
+> **Status: LANDED 2026-07-10 (proposed 2026-07-10). Single-tile spec.**
 > In-scope catalog expansion under the spec-v106 trades-only charter. Adds one tile to **`calc-treatment.js`**
 > (Group M, the water/wastewater treatment bench); no new module, group, or dependency. Inherits spec.md through
 > spec-v595.md.

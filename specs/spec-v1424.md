@@ -1,6 +1,6 @@
 # roughlogic.com Specification v1424 -- Neutral Current from Nonlinear Loads and Conductor Adjustment (calc-elecdesign.js, Group A, electrical power systems, 1 New Tile)
 
-> **Status: PROPOSED (2026-08-26). Single-tile spec.** Part of [scope-trade-expansion](scope-trade-expansion.md).
+> **Status: CUT 2026-08-26 (proposed 2026-08-26): a duplicate of `neutral-current-3ph`, which already computes it (see [scope-trade-expansion](scope-trade-expansion.md)); not built. Single-tile spec.** Part of [scope-trade-expansion](scope-trade-expansion.md).
 > In-scope catalog expansion under the spec-v106 trades-only charter. Adds one tile to **`calc-elecdesign.js`**
 > (Group A, electrical power systems), no new module or dependency. Inherits spec.md through spec-v1349.md.
 >

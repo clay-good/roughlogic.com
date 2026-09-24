@@ -1,6 +1,6 @@
 # roughlogic.com Specification v549 -- Collector / Drag Strut Axial Force (calc-lateral.js, Group E, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-09). Single-tile spec.**
+> **Status: LANDED 2026-07-10 (proposed 2026-07-09). Single-tile spec.**
 > In-scope catalog expansion under the spec-v106 trades-only charter. Adds one tile to **`calc-lateral.js`**
 > (Group E, the lateral-systems bench); no new module, group, or dependency. Inherits spec.md through spec-v548.md.
 >

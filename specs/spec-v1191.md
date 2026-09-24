@@ -1,6 +1,6 @@
 # roughlogic.com Specification v1191 -- MCP Completeness Gate: Full-Catalog Reachability and a Golden Surface Manifest (test/, mcp/catalog.mjs, 0 New Tiles)
 
-> **Status: PROPOSED (2026-07-31). Platform spec, third and last of the "MCP full agent integration, part 2" series (v1189-v1191).**
+> **Status: LANDED 2026-08-01 (proposed 2026-07-31). Platform spec, third and last of the "MCP full agent integration, part 2" series (v1189-v1191).**
 > Spec-only session: no code lands with this file. No new tile, module, group, dependency, or hosted service.
 > Inherits spec.md through spec-v1190.md.
 >

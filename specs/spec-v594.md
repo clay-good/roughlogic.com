@@ -1,6 +1,6 @@
 # roughlogic.com Specification v594 -- Flue-Gas Combustion Efficiency / Stack Loss (calc-hvacservice.js, Group C, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-10). Single-tile spec.**
+> **Status: LANDED 2026-07-10 (proposed 2026-07-10). Single-tile spec.**
 > In-scope catalog expansion under the spec-v106 trades-only charter. Adds one tile to **`calc-hvacservice.js`**
 > (Group C, the HVAC service bench); no new module, group, or dependency. Inherits spec.md through spec-v593.md.
 >

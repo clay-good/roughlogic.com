@@ -1,6 +1,6 @@
 # roughlogic.com Specification v676 -- Throw Distance for a Target Beam Pool (calc-stage.js, Group N, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-13). Single-tile spec.**
+> **Status: LANDED 2026-07-14 (proposed 2026-07-13). Single-tile spec.**
 > In-scope catalog expansion under the spec-v106 trades-only charter. Adds one tile to **`calc-stage.js`** (Group N,
 > stage / live-production), no new module, group, or dependency. Inherits spec.md through spec-v675.md.
 >

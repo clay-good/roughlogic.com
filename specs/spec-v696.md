@@ -1,6 +1,6 @@
 # roughlogic.com Specification v696 -- CCTV Retention Days from Disk Capacity (calc-lowvoltage.js, Group A, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-14). Single-tile spec.**
+> **Status: LANDED 2026-07-14 (proposed 2026-07-14). Single-tile spec.**
 > In-scope catalog expansion under the spec-v106 trades-only charter. Adds one tile to **`calc-lowvoltage.js`** (Group A,
 > low-voltage / security), no new module, group, or dependency. Inherits spec.md through spec-v695.md.
 >

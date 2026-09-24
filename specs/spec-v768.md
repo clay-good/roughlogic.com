@@ -1,6 +1,6 @@
 # roughlogic.com Specification v768 -- Pool Water Volume by Shape (calc-treatment.js, Group M, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-14). Single-tile spec.**
+> **Status: LANDED 2026-07-14 (proposed 2026-07-14). Single-tile spec.**
 > In-scope catalog expansion under the spec-v106 trades-only charter. Adds one tile to **`calc-treatment.js`** (Group M),
 > no new module, group, or dependency. Inherits spec.md through spec-v767.md. Explore sweep #17 (entry 4).
 >

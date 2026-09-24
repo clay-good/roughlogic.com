@@ -1,6 +1,6 @@
 # roughlogic.com Specification v707 -- Max One-Way Slab / Beam Span for a Given Depth (calc-concrete.js, Group E, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-14). Single-tile spec.**
+> **Status: LANDED 2026-07-14 (proposed 2026-07-14). Single-tile spec.**
 > In-scope catalog expansion under the spec-v106 trades-only charter. Adds one tile to **`calc-concrete.js`** (Group E,
 > reinforced concrete), no new module, group, or dependency. Inherits spec.md through spec-v706.md. Sweep-9 inverse queue.
 >

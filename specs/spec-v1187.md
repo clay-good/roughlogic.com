@@ -1,6 +1,6 @@
 # roughlogic.com Specification v1187 -- MCP Batch Evaluation: `run_calculators` (mcp/catalog.mjs, mcp/server.mjs, 0 New Tiles)
 
-> **Status: PROPOSED (2026-07-31). Platform spec, fourth of the five-part "MCP full agent integration" series (v1184-v1188).**
+> **Status: LANDED 2026-08-01 (proposed 2026-07-31). Platform spec, fourth of the five-part "MCP full agent integration" series (v1184-v1188).**
 > Spec-only session: no code lands with this file. No new tile, module, group, dependency, or hosted service.
 > Inherits spec.md through spec-v1186.md.
 >

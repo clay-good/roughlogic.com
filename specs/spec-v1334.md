@@ -1,6 +1,6 @@
 # roughlogic.com Specification v1334 -- Toggle Mechanism Clamping Force (calc-mechanic.js, Group K, 1 New Tile)
 
-> **Status: PROPOSED (2026-08-13). Single-tile spec.**
+> **Status: LANDED 2026-08-14 (proposed 2026-08-13). Single-tile spec.**
 > In-scope catalog expansion under the spec-v106 trades-only charter. Adds one tile to **`calc-mechanic.js`**
 > (Group K, machine elements / mechanisms), no new module or dependency. Inherits spec.md through spec-v1333.md.
 >

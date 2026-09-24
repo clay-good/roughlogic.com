@@ -1,6 +1,6 @@
 # roughlogic.com Specification v623 -- Buffer Tank with Distribution-Loop Credit (calc-hvacsystems.js, Group C, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-11). Single-tile spec.**
+> **Status: LANDED 2026-07-11 (proposed 2026-07-11). Single-tile spec.**
 > In-scope catalog expansion under the spec-v106 trades-only charter. Adds one tile to **`calc-hvacsystems.js`**
 > (Group C, HVAC systems), no new module, group, or dependency. Inherits spec.md through spec-v622.md.
 >

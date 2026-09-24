@@ -1,6 +1,6 @@
 # roughlogic.com Specification v738 -- Smooth-Bore Tip Diameter for a Target Flow (calc-fire.js, Group F, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-14). Single-tile spec.**
+> **Status: LANDED 2026-07-14 (proposed 2026-07-14). Single-tile spec.**
 > In-scope catalog expansion under the spec-v106 trades-only charter. Adds one tile to **`calc-fire.js`** (Group F),
 > no new module, group, or dependency. Inherits spec.md through spec-v737.md. Explore sweep #13 (entry 2).
 >

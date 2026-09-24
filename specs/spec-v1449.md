@@ -1,6 +1,6 @@
 # roughlogic.com Specification v1449 -- Floating Floor Row Layout, Balanced Rip, and Expansion Gap (calc-finish.js, Group E, finish trades, 1 New Tile)
 
-> **Status: PROPOSED (2026-08-26). Single-tile spec.** Part of [scope-trade-expansion](scope-trade-expansion.md).
+> **Status: CUT 2026-08-27 (proposed 2026-08-26): a duplicate of `flooring-takeoff`, which already computes it (see [scope-trade-expansion](scope-trade-expansion.md)); not built. Single-tile spec.** Part of [scope-trade-expansion](scope-trade-expansion.md).
 > In-scope catalog expansion under the spec-v106 trades-only charter. Adds one tile to **`calc-finish.js`**
 > (Group E, finish trades), no new module or dependency. Inherits spec.md through spec-v1349.md.
 >

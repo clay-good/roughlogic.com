@@ -1,6 +1,6 @@
 # roughlogic.com Specification v693 -- Fiber Max Length for a Loss Budget (calc-lowvoltage.js, Group A, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-13). Single-tile spec.**
+> **Status: LANDED 2026-07-14 (proposed 2026-07-13). Single-tile spec.**
 > In-scope catalog expansion under the spec-v106 trades-only charter. Adds one tile to **`calc-lowvoltage.js`** (Group A,
 > low-voltage / electrical), no new module, group, or dependency. Inherits spec.md through spec-v692.md.
 >

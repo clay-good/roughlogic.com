@@ -1,6 +1,6 @@
 # roughlogic.com Specification v496 -- Asymmetrical and Peak Fault Current from X/R (calc-electrical.js, Group A, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-09). Single-tile spec.**
+> **Status: LANDED 2026-07-09 (proposed 2026-07-09). Single-tile spec.**
 > In-scope catalog expansion under the spec-v106 trades-only charter. Adds one tile to **`calc-electrical.js`**
 > (Group A, the electrical-design bench); no new module, group, or dependency. Inherits spec.md through spec-v495.md.
 >
