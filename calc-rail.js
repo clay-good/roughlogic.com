@@ -410,7 +410,10 @@ export function computeTurnoutFrogGeometry({ frog_number = 0, distance_beyond_fr
   if (!(distance_beyond_frog_ft > 0)) return { error: "Distance beyond the frog must be positive." };
   if (!(required_separation_ft > 0)) return { error: "Required separation must be positive." };
   if (!(lead_ft > 0)) return { error: "Lead from the standard plan must be positive." };
-  const frog_angle_deg = 2 * Math.asin(1 / (2 * frog_number)) * _DEG;
+  // Frog number N = 1/2 cot(F/2) (the centerline, isosceles convention: N units of length per unit of
+  // spread along the frog centerline), so F = 2 arctan(1 / 2N). Until 2026-09-25 this used arcsin, a
+  // 0.08% overstatement at a No. 10 and 0.35% at a No. 6.
+  const frog_angle_deg = 2 * Math.atan(1 / (2 * frog_number)) * _DEG;
   const frog_angle_min = frog_angle_deg * 60;
   // At the frog's theoretical point the two gauge lines cross, so the track
   // centerlines are already one gauge (4 ft 8-1/2 in) apart there and spread
@@ -433,7 +436,7 @@ export function computeTurnoutFrogGeometry({ frog_number = 0, distance_beyond_fr
 }
 const turnoutFrogExample = { inputs: { frog_number: 10, distance_beyond_frog_ft: 150, required_separation_ft: 13, lead_ft: 78 } };
 RAIL_RENDERERS["turnout-frog-lead"] = _simpleRenderer({
-  citation: "Citation: the frog-number geometry relations -- angle F = 2 arcsin(1 / (2 N)) exactly, and a diverging track separating by about 1 in N beyond the frog -- with 49 CFR 213 and the railroad's standard plans named. Lead and the other layout dimensions come from the standard plan and are entered, not computed. The track owner governs.",
+  citation: "Citation: the frog-number geometry relations -- angle F = 2 arctan(1 / (2 N)) (frog number N = 1/2 cot(F/2), the centerline convention), and a diverging track separating by about 1 in N beyond the frog -- with 49 CFR 213 and the railroad's standard plans named. Lead and the other layout dimensions come from the standard plan and are entered, not computed. The track owner governs.",
   example: turnoutFrogExample.inputs,
   fields: [
     { key: "frog_number", label: "Frog number", kind: "number", default: 10 },

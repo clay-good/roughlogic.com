@@ -52547,13 +52547,13 @@
    "source_publisher": "ACI 318-19 Section 6.6.4.5 (nonsway moment magnifier)",
    "source_title": "delta_ns = max(Cm/(1 - Pu/(0.75 Pc)), 1.0); Mc = max(delta_ns M2, M2,min)",
    "source_edition_or_year": "ACI 318-19",
-   "source_section_or_page": "Pu 200, M2 80, M1 50, lu 14 ft, k 1, EI 1.5e6, h 16 -> Cm 0.85, Pc 524.5, delta_ns 1.73, Mc 138.3 kip-ft",
+   "source_section_or_page": "Pu 200, M2 80, M1 -50 (single curvature, ACI 318-19 sign), lu 14 ft, k 1, EI 1.5e6, h 16 -> Cm 0.85, Pc 524.5, delta_ns 1.73, Mc 138.3 kip-ft",
    "verified_by": "rl",
    "verified_on": "2026-07-09",
    "inputs": {
     "factored_axial_kip": 200,
     "end_moment_m2_kft": 80,
-    "end_moment_m1_kft": 50,
+    "end_moment_m1_kft": -50,
     "unbraced_len_ft": 14,
     "eff_length_k": 1.0,
     "eff_stiffness_ei": 1500000,
@@ -52597,7 +52597,7 @@
    "inputs": {
     "factored_axial_kip": 200,
     "end_moment_m2_kft": 80,
-    "end_moment_m1_kft": 50,
+    "end_moment_m1_kft": -50,
     "unbraced_len_ft": 10,
     "eff_length_k": 1.0,
     "eff_stiffness_ei": 1500000,
@@ -56214,7 +56214,7 @@
      }
     },
     "sigma_h_psf": {
-     "value": 97.4,
+     "value": 96,
      "tolerance": {
       "pct": 0.5
      }
@@ -94246,7 +94246,7 @@
    "tile_id": "turnout-frog-lead",
    "source_publisher": "Project (first-principles)",
    "source_title": "number 10 turnout, 13 ft required separation, checked 150 ft beyond the frog",
-   "source_edition_or_year": "F = 2 arcsin(1 / (2 N)); separation = distance / N",
+   "source_edition_or_year": "F = 2 arctan(1 / (2 N)), frog number N = 1/2 cot(F/2); separation = distance / N",
    "source_section_or_page": "lead entered from the railroad's standard plan",
    "verified_by": "rl",
    "verified_on": "2026-09-05",
@@ -94258,13 +94258,13 @@
    },
    "outputs": {
     "frog_angle_deg": {
-     "value": 5.732,
+     "value": 5.7248,
      "tolerance": {
       "pct": 0.5
      }
     },
     "frog_angle_min": {
-     "value": 343.918,
+     "value": 343.489,
      "tolerance": {
       "pct": 0.5
      }

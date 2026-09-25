@@ -18071,7 +18071,7 @@ test("bounds: spec-v310 computeBoussinesqSurchargeWall pins both branches, the s
   const r = _v310({ ql_plf: 1000, h_ft: 10, x_ft: 4, z_ft: 3 });
   assert.ok(Math.abs(r.m_ratio - 0.4) < 1e-9);
   assert.ok(Math.abs(r.n_ratio - 0.3) < 1e-9);
-  assert.ok(Math.abs(r.sigma_h_psf - 97.4) < 0.2); // m <= 0.4 branch
+  assert.ok(Math.abs(r.sigma_h_psf - 96.0) < 0.2); // m <= 0.4 branch, NAVFAC DM-7.02 Fig. 11 coefficient 0.20
   // The two branches agree near m = 0.4 (continuity).
   const rEdge = _v310({ ql_plf: 1000, h_ft: 10, x_ft: 4.1, z_ft: 3 });
   assert.ok(Math.abs(rEdge.sigma_h_psf - r.sigma_h_psf) < 2);
@@ -25748,30 +25748,30 @@ test("bounds: spec-v550 computeCraneOutriggerReaction pins the even share, the o
 import { computeRcSlenderColumnMagnify as _v552 } from "../../calc-concrete.js";
 
 test("bounds: spec-v552 computeRcSlenderColumnMagnify pins Cm, the 0.75-Pc denominator, the M2,min floor, and error seams", () => {
-  const r = _v552({ factored_axial_kip: 200, end_moment_m2_kft: 80, end_moment_m1_kft: 50, unbraced_len_ft: 14, eff_length_k: 1.0, eff_stiffness_ei: 1500000, column_dim_h_in: 16 });
-  assert.ok(Math.abs(r.cm - 0.85) < 0.001); // 0.6 + 0.4*(50/80)
+  const r = _v552({ factored_axial_kip: 200, end_moment_m2_kft: 80, end_moment_m1_kft: -50, unbraced_len_ft: 14, eff_length_k: 1.0, eff_stiffness_ei: 1500000, column_dim_h_in: 16 });
+  assert.ok(Math.abs(r.cm - 0.85) < 0.001); // ACI 318-19: 0.6 - 0.4*(-50/80), single curvature
   assert.ok(Math.abs(r.pc_kip - 524.5) < 0.5); // pi^2*1.5e6/168^2
   assert.ok(Math.abs(r.delta_ns - 1.73) < 0.01);
   assert.ok(Math.abs(r.mc_kft - 138.3) < 0.5);
   // A shorter column magnifies far less.
-  const short = _v552({ factored_axial_kip: 200, end_moment_m2_kft: 80, end_moment_m1_kft: 50, unbraced_len_ft: 10, eff_length_k: 1.0, eff_stiffness_ei: 1500000, column_dim_h_in: 16 });
+  const short = _v552({ factored_axial_kip: 200, end_moment_m2_kft: 80, end_moment_m1_kft: -50, unbraced_len_ft: 10, eff_length_k: 1.0, eff_stiffness_ei: 1500000, column_dim_h_in: 16 });
   assert.ok(Math.abs(short.delta_ns - 1.15) < 0.01);
   assert.ok(short.mc_kft < r.mc_kft);
   // The magnifier is bounded below at 1.0 (a stocky column takes no amplification).
-  assert.equal(_v552({ factored_axial_kip: 10, end_moment_m2_kft: 80, end_moment_m1_kft: 50, unbraced_len_ft: 10, eff_length_k: 1.0, eff_stiffness_ei: 5000000, column_dim_h_in: 16 }).delta_ns, 1.0);
+  assert.equal(_v552({ factored_axial_kip: 10, end_moment_m2_kft: 80, end_moment_m1_kft: -50, unbraced_len_ft: 10, eff_length_k: 1.0, eff_stiffness_ei: 5000000, column_dim_h_in: 16 }).delta_ns, 1.0);
   // The M2,min floor governs when the magnified moment is tiny (small M2).
   const floored = _v552({ factored_axial_kip: 200, end_moment_m2_kft: 0.1, end_moment_m1_kft: 0, unbraced_len_ft: 10, eff_length_k: 1.0, eff_stiffness_ei: 5000000, column_dim_h_in: 16 });
   assert.ok(Math.abs(floored.mc_kft - floored.m2_min_kft) < 1e-9);
-  // Cm is floored at 0.4.
-  assert.ok(_v552({ factored_axial_kip: 200, end_moment_m2_kft: 80, end_moment_m1_kft: -80, unbraced_len_ft: 14, eff_length_k: 1.0, eff_stiffness_ei: 1500000, column_dim_h_in: 16 }).cm >= 0.4);
+  // ACI 318-19 has no Cm floor: equal double-curvature end moments (M1/M2 = +1) give 0.2.
+  assert.ok(Math.abs(_v552({ factored_axial_kip: 200, end_moment_m2_kft: 80, end_moment_m1_kft: 80, unbraced_len_ft: 14, eff_length_k: 1.0, eff_stiffness_ei: 1500000, column_dim_h_in: 16 }).cm - 0.2) < 1e-12);
   // Error seams: non-finite, non-positive Pu / M2 / lu / EI / k, Pu >= 0.75 Pc.
-  assert.ok("error" in _v552({ factored_axial_kip: Infinity, end_moment_m2_kft: 80, end_moment_m1_kft: 50, unbraced_len_ft: 14, eff_length_k: 1.0, eff_stiffness_ei: 1500000, column_dim_h_in: 16 }));
-  assert.ok("error" in _v552({ factored_axial_kip: 0, end_moment_m2_kft: 80, end_moment_m1_kft: 50, unbraced_len_ft: 14, eff_length_k: 1.0, eff_stiffness_ei: 1500000, column_dim_h_in: 16 }));
-  assert.ok("error" in _v552({ factored_axial_kip: 200, end_moment_m2_kft: 0, end_moment_m1_kft: 50, unbraced_len_ft: 14, eff_length_k: 1.0, eff_stiffness_ei: 1500000, column_dim_h_in: 16 }));
-  assert.ok("error" in _v552({ factored_axial_kip: 200, end_moment_m2_kft: 80, end_moment_m1_kft: 50, unbraced_len_ft: 0, eff_length_k: 1.0, eff_stiffness_ei: 1500000, column_dim_h_in: 16 }));
-  assert.ok("error" in _v552({ factored_axial_kip: 200, end_moment_m2_kft: 80, end_moment_m1_kft: 50, unbraced_len_ft: 14, eff_length_k: 0, eff_stiffness_ei: 1500000, column_dim_h_in: 16 }));
-  assert.ok("error" in _v552({ factored_axial_kip: 200, end_moment_m2_kft: 80, end_moment_m1_kft: 50, unbraced_len_ft: 14, eff_length_k: 1.0, eff_stiffness_ei: 0, column_dim_h_in: 16 }));
-  assert.ok("error" in _v552({ factored_axial_kip: 600, end_moment_m2_kft: 80, end_moment_m1_kft: 50, unbraced_len_ft: 14, eff_length_k: 1.0, eff_stiffness_ei: 1500000, column_dim_h_in: 16 })); // Pu >= 0.75 Pc
+  assert.ok("error" in _v552({ factored_axial_kip: Infinity, end_moment_m2_kft: 80, end_moment_m1_kft: -50, unbraced_len_ft: 14, eff_length_k: 1.0, eff_stiffness_ei: 1500000, column_dim_h_in: 16 }));
+  assert.ok("error" in _v552({ factored_axial_kip: 0, end_moment_m2_kft: 80, end_moment_m1_kft: -50, unbraced_len_ft: 14, eff_length_k: 1.0, eff_stiffness_ei: 1500000, column_dim_h_in: 16 }));
+  assert.ok("error" in _v552({ factored_axial_kip: 200, end_moment_m2_kft: 0, end_moment_m1_kft: -50, unbraced_len_ft: 14, eff_length_k: 1.0, eff_stiffness_ei: 1500000, column_dim_h_in: 16 }));
+  assert.ok("error" in _v552({ factored_axial_kip: 200, end_moment_m2_kft: 80, end_moment_m1_kft: -50, unbraced_len_ft: 0, eff_length_k: 1.0, eff_stiffness_ei: 1500000, column_dim_h_in: 16 }));
+  assert.ok("error" in _v552({ factored_axial_kip: 200, end_moment_m2_kft: 80, end_moment_m1_kft: -50, unbraced_len_ft: 14, eff_length_k: 0, eff_stiffness_ei: 1500000, column_dim_h_in: 16 }));
+  assert.ok("error" in _v552({ factored_axial_kip: 200, end_moment_m2_kft: 80, end_moment_m1_kft: -50, unbraced_len_ft: 14, eff_length_k: 1.0, eff_stiffness_ei: 0, column_dim_h_in: 16 }));
+  assert.ok("error" in _v552({ factored_axial_kip: 600, end_moment_m2_kft: 80, end_moment_m1_kft: -50, unbraced_len_ft: 14, eff_length_k: 1.0, eff_stiffness_ei: 1500000, column_dim_h_in: 16 })); // Pu >= 0.75 Pc
 });
 
 import { computeSnowUnbalancedGable as _v553 } from "../../calc-construction.js";
@@ -42335,8 +42335,8 @@ import { computeTurnoutFrogGeometry as _v1545 } from "../../calc-rail.js";
 test("bounds: spec-v1545 computeTurnoutFrogGeometry pins the clearance point", () => {
   const base = { frog_number: 10, distance_beyond_frog_ft: 150, required_separation_ft: 13, lead_ft: 78 };
   const r = _v1545(base);
-  assert.ok(Math.abs(r.frog_angle_deg - 5.732) < 1e-3);
-  assert.ok(Math.abs(r.frog_angle_min - 343.918) < 1e-2);
+  assert.ok(Math.abs(r.frog_angle_deg - 5.7248) < 1e-3); // 2 atan(1/20): N = 1/2 cot(F/2)
+  assert.ok(Math.abs(r.frog_angle_min - 343.489) < 1e-2);
   // Centerlines are one gauge (4.708 ft) apart at the frog's theoretical point.
   assert.ok(Math.abs(r.separation_at_distance_ft - (56.5 / 12 + 15.0)) < 1e-9);
   assert.ok(Math.abs(r.clearance_point_ft - (13 - 56.5 / 12) * 10) < 1e-9);
@@ -42352,11 +42352,11 @@ test("bounds: spec-v1545 computeTurnoutFrogGeometry pins the clearance point", (
   const twenty = _v1545({ ...base, frog_number: 20 });
   assert.ok(Math.abs(twenty.clearance_point_ft - 2 * r.clearance_point_ft) < 1e-9);
   assert.ok(twenty.frog_angle_deg < r.frog_angle_deg);
-  assert.ok(Math.abs(twenty.frog_angle_deg - 2.866) < 1e-3);
+  assert.ok(Math.abs(twenty.frog_angle_deg - 2.8638) < 1e-3);
   // The small-angle rule of thumb: the exact angle is very close to 1/N rad.
   assert.ok(Math.abs(r.frog_angle_deg - (1 / 10) * (180 / Math.PI)) < 0.02);
-  // A number 1 frog is the degenerate 60 degree crossing, and it is legal.
-  assert.ok(Math.abs(_v1545({ ...base, frog_number: 1 }).frog_angle_deg - 60) < 1e-9);
+  // A number 1 frog is a steep crossing, 2 atan(1/2) = 53.13 degrees, and it is legal.
+  assert.ok(Math.abs(_v1545({ ...base, frog_number: 1 }).frog_angle_deg - 2 * Math.atan(0.5) * 180 / Math.PI) < 1e-9);
   assert.ok("error" in _v1545({ ...base, frog_number: 0.5 }));
   assert.ok("error" in _v1545({ ...base, distance_beyond_frog_ft: 0 }));
   assert.ok("error" in _v1545({ ...base, required_separation_ft: 0 }));

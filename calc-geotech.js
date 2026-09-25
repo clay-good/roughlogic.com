@@ -914,19 +914,19 @@ export function computeBoussinesqSurchargeWall({ ql_plf = 0, h_ft = 0, x_ft = 0,
   const n_ratio = z_ft / h_ft;
   let sigma_h_psf;
   if (m_ratio <= 0.4) {
-    sigma_h_psf = (0.203 * ql_plf / h_ft) * n_ratio / Math.pow(0.16 + n_ratio * n_ratio, 2);
+    sigma_h_psf = (0.20 * ql_plf / h_ft) * n_ratio / Math.pow(0.16 + n_ratio * n_ratio, 2);
   } else {
     sigma_h_psf = (1.28 * ql_plf / h_ft) * (m_ratio * m_ratio * n_ratio) / Math.pow(m_ratio * m_ratio + n_ratio * n_ratio, 2);
   }
   return {
     m_ratio, n_ratio, sigma_h_psf,
-    note: "NAVFAC DM-7.2 modified-Boussinesq lateral pressure from a line load qL (parallel to the wall) at setback x, depth z, wall height H, with m = x/H, n = z/H: sigma_h = (0.203 qL/H) n/(0.16 + n^2)^2 for m <= 0.4, and (1.28 qL/H)(m^2 n)/(m^2 + n^2)^2 for m > 0.4 - the doubled elastic Boussinesq solution for an unyielding (non-deflecting) rigid wall (a flexible wall that can deflect sees roughly the un-doubled value). Pressure at a single depth from a line load - a point or strip load uses the companion NAVFAC forms; it does not integrate the resultant thrust and its point of application or add the earth pressure beneath it (lateral-earth-pressure). A design aid, not a substitute for the geotechnical engineer of record's report.",
+    note: "NAVFAC DM-7.2 modified-Boussinesq lateral pressure from a line load qL (parallel to the wall) at setback x, depth z, wall height H, with m = x/H, n = z/H: sigma_h = (0.20 qL/H) n/(0.16 + n^2)^2 for m <= 0.4, and (1.28 qL/H)(m^2 n)/(m^2 + n^2)^2 for m > 0.4 - the doubled elastic Boussinesq solution for an unyielding (non-deflecting) rigid wall (a flexible wall that can deflect sees roughly the un-doubled value). Pressure at a single depth from a line load - a point or strip load uses the companion NAVFAC forms; it does not integrate the resultant thrust and its point of application or add the earth pressure beneath it (lateral-earth-pressure). A design aid, not a substitute for the geotechnical engineer of record's report.",
   };
 }
 export const boussinesqSurchargeWallExample = { inputs: { ql_plf: 1000, h_ft: 10, x_ft: 4, z_ft: 3 } };
 
 GEOTECH_RENDERERS["boussinesq-surcharge-wall"] = _simpleRenderer({
-  citation: "Citation: NAVFAC DM-7.2 modified-Boussinesq line-load lateral pressure sigma_h = (0.203 qL/H) n/(0.16 + n^2)^2 (m <= 0.4) and (1.28 qL/H)(m^2 n)/(m^2 + n^2)^2 (m > 0.4), the rigid-wall doubling, m = x/H, n = z/H, by name. Line load, single depth. A design aid, not a substitute for the geotechnical engineer's report.",
+  citation: "Citation: NAVFAC DM-7.2 modified-Boussinesq line-load lateral pressure sigma_h = (0.20 qL/H, NAVFAC DM-7.02 Figure 11) n/(0.16 + n^2)^2 (m <= 0.4) and (1.28 qL/H)(m^2 n)/(m^2 + n^2)^2 (m > 0.4), the rigid-wall doubling, m = x/H, n = z/H, by name. Line load, single depth. A design aid, not a substitute for the geotechnical engineer's report.",
   example: boussinesqSurchargeWallExample.inputs,
   fields: [
     { key: "ql_plf", label: "Line load qL (lb/ft, parallel to wall)", kind: "number" },

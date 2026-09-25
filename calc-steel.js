@@ -376,7 +376,7 @@ export function computeBoltShearBearing({ d_in = 0.75, ab_in2 = 0.4418, fnv_ksi 
 export const boltShearBearingExample = { inputs: { d_in: 0.75, ab_in2: 0.4418, fnv_ksi: 54, nplanes: 1, t_in: 0.5, fu_ksi: 58, le_in: 1.5, dh_in: 0.8125, s_in: 3 } };
 
 STEEL_RENDERERS["bolt-shear-bearing"] = _simpleRenderer({
-  citation: "Citation: AISC 360-22 §J3.6 bolt shear rupture Rn = nplanes x Fnv x Ab (Fnv from Table J3.2: 54 ksi A325-N, 68 ksi A325-X, 68 ksi A490-N, 84 ksi A490-X) and §J3.10 bearing / tearout at a bolt hole Rn = 1.2 lc t Fu <= 2.4 d t Fu, where lc is the clear distance in the line of force (edge bolt: le - dh/2; interior bolt: s - dh). The governing per-bolt nominal strength is the smaller of bolt shear and edge bearing/tearout; the design strength is phi x Rn (phi = 0.75) and the allowable is Rn / Omega (Omega = 2.00). Standard holes and the deformation-considered coefficients; one bolt at one hole (group effects, slip-critical, and combined tension-shear are separate checks). A design aid, not a substitute for the engineer of record.",
+  citation: "Citation: AISC 360-22 §J3.7 bolt shear rupture Rn = nplanes x Fnv x Ab (Fnv from Table J3.2: 54 ksi A325-N, 68 ksi A325-X, 68 ksi A490-N, 84 ksi A490-X) and §J3.11 bearing / tearout at a bolt hole Rn = 1.2 lc t Fu <= 2.4 d t Fu, where lc is the clear distance in the line of force (edge bolt: le - dh/2; interior bolt: s - dh). The governing per-bolt nominal strength is the smaller of bolt shear and edge bearing/tearout; the design strength is phi x Rn (phi = 0.75) and the allowable is Rn / Omega (Omega = 2.00). Standard holes and the deformation-considered coefficients; one bolt at one hole (group effects, slip-critical, and combined tension-shear are separate checks). A design aid, not a substitute for the engineer of record.",
   example: boltShearBearingExample.inputs,
   fields: [
     { key: "d_in", label: "Bolt diameter d (in)", kind: "number" },
@@ -758,13 +758,13 @@ export function computeSteelBoltSlipCritical({ mu = 0.30, tb_kip = 0, ns = 1, n 
   const lrfd_total_kip = n * lrfd_bolt_kip;
   return {
     rn_bolt_kip, asd_bolt_kip, lrfd_bolt_kip, asd_total_kip, lrfd_total_kip,
-    note: "AISC 360-22 J3.8 slip resistance of a pretensioned high-strength bolt: Rn = mu Du hf Tb ns, with mu = 0.30 (Class A unpainted mill scale) / 0.50 (Class B blast-cleaned), Du = 1.13, hf = 1.0 with no fillers or fillers developed, Tb from Table J3.1, and phi = 1.00 / Omega = 1.50 for STANDARD holes (oversized and slotted holes reduce phi / raise Omega). The strength-level bolt shear and bearing (bolt-shear-bearing) must ALSO be satisfied; the tension-slip interaction (J3.9) and the pretensioning method (turn-of-nut, DTI) are separate. A design aid, not a substitute for the engineer of record.",
+    note: "AISC 360-22 J3.9 slip resistance of a pretensioned high-strength bolt: Rn = mu Du hf Tb ns, with mu = 0.30 (Class A unpainted mill scale) / 0.50 (Class B blast-cleaned), Du = 1.13, hf = 1.0 with no fillers or fillers developed, Tb from Table J3.1, and phi = 1.00 / Omega = 1.50 for STANDARD holes (oversized and slotted holes reduce phi / raise Omega). The strength-level bolt shear and bearing (bolt-shear-bearing) must ALSO be satisfied; the tension-slip interaction (J3.10) and the pretensioning method (turn-of-nut, DTI) are separate. A design aid, not a substitute for the engineer of record.",
   };
 }
 export const steelBoltSlipCriticalExample = { inputs: { mu: 0.3, tb_kip: 28, ns: 1, n: 4, hf: 1, du: 1.13 } };
 
 STEEL_RENDERERS["steel-bolt-slip-critical"] = _simpleRenderer({
-  citation: "Citation: AISC 360-22 J3.8 slip-critical resistance Rn = mu Du hf Tb ns (mu 0.30 Class A / 0.50 Class B, Du = 1.13, Tb per Table J3.1), phi = 1.00 / Omega = 1.50 standard holes, by name. Bolt shear/bearing must also be checked. A design aid, not a substitute for the engineer of record.",
+  citation: "Citation: AISC 360-22 J3.9 slip-critical resistance Rn = mu Du hf Tb ns (mu 0.30 Class A / 0.50 Class B, Du = 1.13, Tb per Table J3.1), phi = 1.00 / Omega = 1.50 standard holes, by name. Bolt shear/bearing must also be checked. A design aid, not a substitute for the engineer of record.",
   example: steelBoltSlipCriticalExample.inputs,
   fields: [
     { key: "mu", label: "Slip coefficient mu (0.30 A / 0.50 B)", kind: "number" },
@@ -1151,13 +1151,13 @@ export function computeSteelBoltTensionShear({ fnt_ksi = 90, fnv_ksi = 54, ab_in
   const pure_tension_kip = method === "LRFD" ? 0.75 * fnt_ksi * ab_in2 : (fnt_ksi * ab_in2) / 2.00;
   return {
     fpnt_ksi, avail_tension_kip, pure_tension_kip, method,
-    note: "AISC 360-22 J3.7 reduced tensile stress for a bearing-type bolt in combined tension and shear: F'nt = 1.3 Fnt - (Fnt/(phi Fnv)) frv <= Fnt (LRFD, phi = 0.75), or 1.3 Fnt - (Omega Fnt/Fnv) frv <= Fnt (ASD, Omega = 2.00), with the required shear stress frv = required shear / Ab and the available tension = phi F'nt Ab (LRFD) or F'nt Ab / Omega (ASD). Table J3.2 values: A325/F1852 Fnt = 90, Fnv = 54 (threads-N) or 68 (threads-X) ksi. F'nt is capped at Fnt (no 1.3 benefit when shear is absent) and floored at zero. Bearing-type interaction only (a slip-critical joint reduces the slip resistance instead, J3.9); the bolt shear/bearing and connected-element limit states are separate. A design aid, not a substitute for the engineer of record.",
+    note: "AISC 360-22 J3.8 reduced tensile stress for a bearing-type bolt in combined tension and shear: F'nt = 1.3 Fnt - (Fnt/(phi Fnv)) frv <= Fnt (LRFD, phi = 0.75), or 1.3 Fnt - (Omega Fnt/Fnv) frv <= Fnt (ASD, Omega = 2.00), with the required shear stress frv = required shear / Ab and the available tension = phi F'nt Ab (LRFD) or F'nt Ab / Omega (ASD). Table J3.2 values: A325/F1852 Fnt = 90, Fnv = 54 (threads-N) or 68 (threads-X) ksi. F'nt is capped at Fnt (no 1.3 benefit when shear is absent) and floored at zero. Bearing-type interaction only (a slip-critical joint reduces the slip resistance instead, J3.10); the bolt shear/bearing and connected-element limit states are separate. A design aid, not a substitute for the engineer of record.",
   };
 }
 export const steelBoltTensionShearExample = { inputs: { fnt_ksi: 90, fnv_ksi: 54, ab_in2: 0.442, frv_ksi: 20, method: "LRFD" } };
 
 STEEL_RENDERERS["steel-bolt-tension-shear"] = _simpleRenderer({
-  citation: "Citation: AISC 360-22 J3.7 combined tension and shear F'nt = 1.3 Fnt - (Fnt/(phi Fnv)) frv <= Fnt (LRFD) / 1.3 Fnt - (Omega Fnt/Fnv) frv <= Fnt (ASD), available tension phi F'nt Ab, Table J3.2 Fnt/Fnv, by name. Bearing-type; slip-critical is J3.9. A design aid, not a substitute for the engineer of record.",
+  citation: "Citation: AISC 360-22 J3.8 combined tension and shear F'nt = 1.3 Fnt - (Fnt/(phi Fnv)) frv <= Fnt (LRFD) / 1.3 Fnt - (Omega Fnt/Fnv) frv <= Fnt (ASD), available tension phi F'nt Ab, Table J3.2 Fnt/Fnv, by name. Bearing-type; slip-critical is J3.10. A design aid, not a substitute for the engineer of record.",
   example: steelBoltTensionShearExample.inputs,
   fields: [
     { key: "fnt_ksi", label: "Nominal tensile stress Fnt (ksi, 90 A325)", kind: "number" },
@@ -1469,7 +1469,7 @@ STEEL_RENDERERS["steel-panel-zone-shear"] = _simpleRenderer({
 
 // --- spec-v603 E: Panel-zone doubler-plate thickness sizer (AISC 360-16 J10.6 / Eq. J10-12) ---
 // phiRn_bare = 0.90*0.6*Fy*dc*tw. shortfall = max(0, Vu - phiRn_bare). t_strength = shortfall/(0.90*0.6*Fy*dc).
-// t_stability = (dz+wz)/90. t_required = shortfall>0 ? max(t_strength, t_stability) : 0. t_plate = ceil to 1/16 in.
+// t_stability = (dz+wz)/90 (AISC 341 Seismic Provisions; AISC 360 has no such limit -- until 2026-09-25 this was credited to 360 Eq. J10-12). t_required = shortfall>0 ? max(t_strength, t_stability) : 0. t_plate = ceil to 1/16 in.
 // dims: in { required_shear_kip: M L T^-2, fy_ksi: M L^-1 T^-2, col_depth_dc_in: L, col_web_tw_in: L, pz_depth_dz_in: L, pz_width_wz_in: L } out: { phi_rn_bare_kip: M L T^-2, shortfall_kip: M L T^-2, t_strength_in: L, t_stability_in: L, t_required_in: L, t_plate_in: L }
 export function computeSteelDoublerPlate({ required_shear_kip = 0, fy_ksi = 50, col_depth_dc_in = 0, col_web_tw_in = 0, pz_depth_dz_in = 0, pz_width_wz_in = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
@@ -1501,7 +1501,7 @@ export function computeSteelDoublerPlate({ required_shear_kip = 0, fy_ksi = 50, 
 }
 export const steelDoublerPlateExample = { inputs: { required_shear_kip: 300, fy_ksi: 50, col_depth_dc_in: 14, col_web_tw_in: 0.485, pz_depth_dz_in: 22.64, pz_width_wz_in: 12.44 } };
 STEEL_RENDERERS["steel-doubler-plate"] = _simpleRenderer({
-  citation: "Citation: AISC 360-16 Section J10.6 panel-zone doubler plate: phiRn_bare = 0.90 x 0.60 Fy dc tw; t_strength = max(0, Vu - phiRn_bare) / (0.90 x 0.60 Fy dc); the stability minimum (Eq. J10-12) is t >= (dz + wz)/90 per individual doubler not plug-welded to the web; t_required = max(t_strength, t_stability). The basic strength (J10-9) is used for the shortfall; a high column axial load (Pr > 0.4 Pc) reduces the strength further. AISC 360 and the engineer of record govern.",
+  citation: "Citation: AISC 360-16 Section J10.6 panel-zone doubler plate: phiRn_bare = 0.90 x 0.60 Fy dc tw; t_strength = max(0, Vu - phiRn_bare) / (0.90 x 0.60 Fy dc); the stability minimum t >= (dz + wz)/90 (from AISC 341, the Seismic Provisions -- AISC 360 J10.9 sets doubler strength and welding only; Eq. J10-12 is the high-axial panel-zone strength) per individual doubler not plug-welded to the web; t_required = max(t_strength, t_stability). The basic strength (J10-9) is used for the shortfall; a high column axial load (Pr > 0.4 Pc) reduces the strength further. AISC 360 and the engineer of record govern.",
   example: steelDoublerPlateExample.inputs,
   fields: [
     { key: "required_shear_kip", label: "Panel-zone shear demand Vu (kip)", kind: "number" },

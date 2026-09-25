@@ -718,8 +718,8 @@
       "date": "2026-09-01"
     },
     "/tools/bolt-shear-bearing/": {
-      "sha": "48e9a89e05f8dcab",
-      "date": "2026-09-01"
+      "sha": "8a5f9d679035c958",
+      "date": "2026-09-25"
     },
     "/tools/bolt-stretch/": {
       "sha": "507ebf3010119a1c",
@@ -750,8 +750,8 @@
       "date": "2026-09-01"
     },
     "/tools/boussinesq-surcharge-wall/": {
-      "sha": "1b488283b167f1dd",
-      "date": "2026-09-04"
+      "sha": "611b23df35019074",
+      "date": "2026-09-25"
     },
     "/tools/box-culvert-headwater/": {
       "sha": "ed7eeee39ad0ede0",
@@ -5954,8 +5954,8 @@
       "date": "2026-09-19"
     },
     "/tools/rc-slender-column-magnify/": {
-      "sha": "b13097782f1514c1",
-      "date": "2026-09-01"
+      "sha": "5dc0a2d990a75283",
+      "date": "2026-09-25"
     },
     "/tools/rc-tbeam-flexure/": {
       "sha": "e2a43eeb93d6e5ad",
@@ -7402,12 +7402,12 @@
       "date": "2026-09-01"
     },
     "/tools/steel-bolt-slip-critical/": {
-      "sha": "5282113b3d8ce2ce",
-      "date": "2026-09-01"
+      "sha": "b5ad48963d5fe1c9",
+      "date": "2026-09-25"
     },
     "/tools/steel-bolt-tension-shear/": {
-      "sha": "5f63c34423bddd36",
-      "date": "2026-09-01"
+      "sha": "b45eb3469a4c6468",
+      "date": "2026-09-25"
     },
     "/tools/steel-camber/": {
       "sha": "780e6bd480089d65",
@@ -7426,8 +7426,8 @@
       "date": "2026-09-08"
     },
     "/tools/steel-doubler-plate/": {
-      "sha": "262f524d0efce470",
-      "date": "2026-09-01"
+      "sha": "a273888b8dc62807",
+      "date": "2026-09-25"
     },
     "/tools/steel-effective-length-k/": {
       "sha": "a1667a2c2a984f97",
@@ -8178,8 +8178,8 @@
       "date": "2026-09-01"
     },
     "/tools/turnout-frog-lead/": {
-      "sha": "31a8984066921f5a",
-      "date": "2026-09-19"
+      "sha": "96d24f4b7259e362",
+      "date": "2026-09-25"
     },
     "/tools/two-proportion-z-test/": {
       "sha": "9b3e6d708c882af8",

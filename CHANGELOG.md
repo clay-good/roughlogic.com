@@ -10,6 +10,12 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **Slender-column Cm, AISC 360-22 section numbers, and three structural constants checked against ACI 318-19, AISC 360-16/-22, NAVFAC DM-7.02 and the frog-number definition.**
+  - `rc-slender-column-magnify` cited ACI 318-19 but used the 318-05 form, Cm = max(0.6 + 0.4 M1/M2, 0.4), with M1/M2 positive for single curvature. ACI 318-19 Eq. 6.6.4.5.3a is Cm = 0.6 - 0.4 M1/M2, with M1/M2 negative for single curvature and no lower bound. A single-curvature M1 entered the 318-19 way came out at Cm 0.4 instead of 0.8, halving the magnifier (unsafe). The tile now follows 318-19; the example's single-curvature M1 is entered as -50 and still gives Cm 0.85. The slenderness limit in the note is 34 + 12(M1/M2).
+  - `bolt-shear-bearing`, `steel-bolt-slip-critical` and `steel-bolt-tension-shear` labeled AISC 360-16 section numbers as 360-22. In 360-22 bolt strength is J3.7, combined bearing-type J3.8, slip-critical J3.9, combined slip-critical J3.10, and bearing and tearout J3.11. The values were already right.
+  - `steel-doubler-plate` credited its (dz + wz)/90 stability minimum to AISC 360 Eq. J10-12, which is the high-axial panel-zone strength equation. The limit comes from the AISC 341 Seismic Provisions; it can only thicken the plate.
+  - `boussinesq-surcharge-wall` used 0.203 for the m <= 0.4 line-load coefficient. NAVFAC DM-7.02 Figure 11 gives 0.20. The example moves from 97.4 to 96.0 psf.
+  - `turnout-frog-lead` computed the frog angle as 2 arcsin(1/2N). The frog number is N = 1/2 cot(F/2), so F = 2 arctan(1/2N): a No. 10 frog is 5.7248°, not 5.7296°.
 - **Blasting, CPVC, data-center humidity and hoist-rope examples checked against 30 CFR, Spears, ASHRAE and MSHA.**
   - `blast-scaled-distance-ppv` paired the 1.00 in/s vibration limit with a scaled distance of 50. In the 30 CFR 816.67(d)(2)(i) table, 1.00 in/s goes with 55 (301 to 5,000 ft); 50 belongs to the 0-300 ft row. At the example's 1,200 ft the allowable charge per delay read 576 lb where the table allows 476 (unsafe). The example, field default and fixture now use 55, and the label gives all three rows.
   - `thermoplastic-temperature-derate` compared PVC at 120°F with CPVC using 0.82, which is the 100°F row of the Spears Schedule 80 CPVC table; at 120°F it is 0.65. The CPVC allowable read 164 psi where the table gives 130.

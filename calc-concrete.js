@@ -1612,7 +1612,10 @@ export function computeRcSlenderColumnMagnify({ factored_axial_kip = 0, end_mome
   if (!(k > 0)) return { error: "Effective-length factor k must be positive." };
   if (!(EI > 0)) return { error: "Effective stiffness EI must be positive (kip-in^2)." };
   if (h < 0) return { error: "Column dimension h cannot be negative (in)." };
-  const cm = Math.max(0.6 + 0.4 * (M1 / M2), 0.4);
+  // ACI 318-19 Eq. 6.6.4.5.3a: Cm = 0.6 - 0.4 M1/M2, with M1/M2 NEGATIVE for single curvature and no
+  // lower bound. Until 2026-09-25 this was the ACI 318-05 form (0.6 + 0.4 M1/M2 >= 0.4, positive for single
+  // curvature) under a 318-19 citation, so a single-curvature M1 entered the 318-19 way halved Cm.
+  const cm = 0.6 - 0.4 * (M1 / M2);
   const lu_in = lu * 12;
   const pc_kip = Math.PI * Math.PI * EI / Math.pow(k * lu_in, 2);
   if (Pu >= 0.75 * pc_kip) return { error: "Axial load is at or above 0.75 x Pc - the column has buckled; increase the section or reduce the length." };
@@ -1621,19 +1624,19 @@ export function computeRcSlenderColumnMagnify({ factored_axial_kip = 0, end_mome
   const mc_kft = Math.max(delta_ns * M2, m2_min_kft);
   return {
     cm, pc_kip, delta_ns, m2_min_kft, mc_kft,
-    note: "The critical buckling load Pc carries a 0.75 stiffness reduction in the denominator; the design moment is floored at M2,min = Pu(0.6 + 0.03h). A column just over the slenderness limit k lu/r <= 34 - 12(M1/M2) picks up a magnifier the flexure check never applies. M1/M2 is negative for double curvature (which lowers Cm). ACI 318 and the engineer of record govern.",
+    note: "The critical buckling load Pc carries a 0.75 stiffness reduction in the denominator; the design moment is floored at M2,min = Pu(0.6 + 0.03h). A column just over the slenderness limit k lu/r <= 34 + 12(M1/M2) (ACI 318-19 Eq. 6.2.5.1b) picks up a magnifier the flexure check never applies. In ACI 318-19, M1/M2 is NEGATIVE for single curvature (Cm up to 1.0) and positive for double curvature (which lowers Cm, to 0.2 at M1 = M2) -- the reverse of the pre-2014 sign convention. ACI 318 and the engineer of record govern.",
   };
 }
 
-export const rcSlenderColumnMagnifyExample = { inputs: { factored_axial_kip: 200, end_moment_m2_kft: 80, end_moment_m1_kft: 50, unbraced_len_ft: 14, eff_length_k: 1.0, eff_stiffness_ei: 1500000, column_dim_h_in: 16 } };
+export const rcSlenderColumnMagnifyExample = { inputs: { factored_axial_kip: 200, end_moment_m2_kft: 80, end_moment_m1_kft: -50, unbraced_len_ft: 14, eff_length_k: 1.0, eff_stiffness_ei: 1500000, column_dim_h_in: 16 } };
 
 CONCRETE_RENDERERS["rc-slender-column-magnify"] = _simpleRenderer({
-  citation: "Citation: ACI 318-19 Section 6.6.4.5 nonsway (braced) moment magnifier: Cm = max(0.6 + 0.4 M1/M2, 0.4); Pc = pi^2 EI / (k lu)^2; delta_ns = max(Cm / (1 - Pu/(0.75 Pc)), 1.0); Mc = max(delta_ns M2, M2,min), M2,min = Pu(0.6 + 0.03h). The 0.75 stiffness reduction sits in the denominator; the moment is floored at M2,min. A column just over the slenderness limit picks up an amplifier the flexure check never applies. ACI 318 and the engineer of record govern.",
+  citation: "Citation: ACI 318-19 Section 6.6.4.5 nonsway (braced) moment magnifier: Cm = 0.6 - 0.4 M1/M2 (M1/M2 negative for single curvature, per 318-19); Pc = pi^2 EI / (k lu)^2; delta_ns = max(Cm / (1 - Pu/(0.75 Pc)), 1.0); Mc = max(delta_ns M2, M2,min), M2,min = Pu(0.6 + 0.03h). The 0.75 stiffness reduction sits in the denominator; the moment is floored at M2,min. A column just over the slenderness limit picks up an amplifier the flexure check never applies. ACI 318 and the engineer of record govern.",
   example: rcSlenderColumnMagnifyExample.inputs,
   fields: [
     { key: "factored_axial_kip", label: "Factored axial load Pu (kip)", kind: "number" },
     { key: "end_moment_m2_kft", label: "Larger end moment M2 (kip-ft)", kind: "number" },
-    { key: "end_moment_m1_kft", label: "Smaller end moment M1 (kip-ft, - double curvature)", kind: "number" },
+    { key: "end_moment_m1_kft", label: "Smaller end moment M1 (kip-ft; negative for single curvature, ACI 318-19)", kind: "number" },
     { key: "unbraced_len_ft", label: "Unbraced length lu (ft)", kind: "number" },
     { key: "eff_length_k", label: "Effective-length factor k", kind: "number" },
     { key: "eff_stiffness_ei", label: "Effective stiffness EI (kip-in²)", kind: "number" },

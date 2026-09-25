@@ -15015,7 +15015,7 @@ export const CITATIONS = {
     ],
   },
   "turnout-frog-lead": {
-    formula: "frog angle F = 2 arcsin(1 / (2 N)) exactly, about 1 / N in radians; separation beyond the frog = track gauge (4 ft 8-1/2 in, the centerline offset at the theoretical point of frog) + distance / N; clearance point = (required separation - gauge) x N; track consumed from the point of switch = entered lead + clearance point.",
+    formula: "frog angle F = 2 arctan(1 / (2 N)) (frog number N = 1/2 cot(F/2)), about 1 / N in radians; separation beyond the frog = track gauge (4 ft 8-1/2 in, the centerline offset at the theoretical point of frog) + distance / N; clearance point = (required separation - gauge) x N; track consumed from the point of switch = entered lead + clearance point.",
     edition: "The frog-number geometry relations, by name, with 49 CFR 213 and the railroad's standard plans named. Lead, switch point length, closure curve radius, and the other layout dimensions come from the standard plan for the specific turnout and are entered, not computed. The track owner governs.",
     freeAccess: "Trigonometry on a frog number the user states; no railroad standard plan or turnout dimension table is reproduced.",
     governance: GOVERNANCE.general,
@@ -17207,14 +17207,14 @@ export const CITATIONS = {
   },
   "steel-bolt-tension-shear": {
     formula: "k = (LRFD) Fnt/(0.75 Fnv), (ASD) 2.00 Fnt/Fnv; F'nt = min(1.3 Fnt - k frv, Fnt) (floored at 0); available tension = 0.75 F'nt Ab (LRFD) or F'nt Ab/2.00 (ASD).",
-    edition: "The AISC 360-22 Section J3.7 reduced tensile stress for a bearing-type bolt in combined tension and shear, with the Table J3.2 nominal stresses, by name.",
-    freeAccess: "AISC 360 is free to read at aisc.org (Specification for Structural Steel Buildings); the J3.7 provision and Table J3.2 are in the published specification.",
+    edition: "The AISC 360-22 Section J3.8 reduced tensile stress for a bearing-type bolt in combined tension and shear, with the Table J3.2 nominal stresses, by name.",
+    freeAccess: "AISC 360 is free to read at aisc.org (Specification for Structural Steel Buildings); the J3.8 provision and Table J3.2 are in the published specification.",
     governance: GOVERNANCE.general,
-    editionNote: "The AISC 360-22 J3.7 reduced tensile stress F'nt = 1.3 Fnt - (Fnt/(phi Fnv)) frv <= Fnt (LRFD, phi = 0.75) / 1.3 Fnt - (Omega Fnt/Fnv) frv <= Fnt (ASD, Omega = 2.00), the available tension phi F'nt Ab, and the Table J3.2 Fnt/Fnv values (A325/F1852: Fnt = 90, Fnv = 54 threads-N / 68 threads-X ksi). This returns the reduced bolt tension capacity in a bearing-type connection under combined tension and shear - it takes the required shear stress frv as entered (= required shear/Ab), uses the bearing-type interaction (a slip-critical joint reduces the slip resistance instead, J3.9), and does not check the bolt shear/bearing itself or the connected-element limit states. A design aid, not a substitute for the structural engineer of record's stamped design.",
+    editionNote: "The AISC 360-22 J3.8 reduced tensile stress F'nt = 1.3 Fnt - (Fnt/(phi Fnv)) frv <= Fnt (LRFD, phi = 0.75) / 1.3 Fnt - (Omega Fnt/Fnv) frv <= Fnt (ASD, Omega = 2.00), the available tension phi F'nt Ab, and the Table J3.2 Fnt/Fnv values (A325/F1852: Fnt = 90, Fnv = 54 threads-N / 68 threads-X ksi). This returns the reduced bolt tension capacity in a bearing-type connection under combined tension and shear - it takes the required shear stress frv as entered (= required shear/Ab), uses the bearing-type interaction (a slip-critical joint reduces the slip resistance instead, J3.10), and does not check the bolt shear/bearing itself or the connected-element limit states. A design aid, not a substitute for the structural engineer of record's stamped design.",
     assumptions: [
-      { name: "Reduced tension", value: "F'nt = 1.3 Fnt - k frv, capped at Fnt (no 1.3 benefit without shear) and floored at zero", source: "AISC 360-22 J3.7" },
+      { name: "Reduced tension", value: "F'nt = 1.3 Fnt - k frv, capped at Fnt (no 1.3 benefit without shear) and floored at zero", source: "AISC 360-22 J3.8" },
       { name: "Nominal stresses", value: "Table J3.2: A325 Fnt = 90, Fnv = 54 (threads-N) or 68 (threads-X) ksi", source: "AISC 360-22 Table J3.2" },
-      { name: "Bearing-type", value: "the bearing-type interaction; a slip-critical joint uses the J3.9 slip reduction", source: "AISC 360-22 J3.7 / J3.9" },
+      { name: "Bearing-type", value: "the bearing-type interaction; a slip-critical joint uses the J3.10 slip reduction", source: "AISC 360-22 J3.8 / J3.10" },
     ],
   },
   "steel-web-local-strength": {
@@ -17231,14 +17231,14 @@ export const CITATIONS = {
   },
   "steel-bolt-slip-critical": {
     formula: "Rn_bolt = mu Du hf Tb ns; ASD = Rn/1.50, LRFD = 1.00 Rn (standard holes); totals = n x per-bolt.",
-    edition: "The AISC 360-22 J3.8 slip-critical connection resistance with the Class A/B slip coefficients, Du = 1.13, the Table J3.1 minimum pretension, and the standard-hole phi = 1.00 / Omega = 1.50, by name.",
-    freeAccess: "AISC 360 is free to read at aisc.org (Specification for Structural Steel Buildings); the J3.8 provision and Table J3.1 pretensions are in the published specification.",
+    edition: "The AISC 360-22 J3.9 slip-critical connection resistance with the Class A/B slip coefficients, Du = 1.13, the Table J3.1 minimum pretension, and the standard-hole phi = 1.00 / Omega = 1.50, by name.",
+    freeAccess: "AISC 360 is free to read at aisc.org (Specification for Structural Steel Buildings); the J3.9 provision and Table J3.1 pretensions are in the published specification.",
     governance: GOVERNANCE.general,
-    editionNote: "The AISC 360-22 J3.8 slip resistance Rn = mu Du hf Tb ns, with mu = 0.30 (Class A) / 0.50 (Class B), Du = 1.13, the Table J3.1 minimum pretension Tb, and phi = 1.00 / Omega = 1.50 for standard holes. This returns the slip resistance of a pretensioned slip-critical bolt - it uses the standard-hole resistance factors (oversized and slotted holes reduce phi / raise Omega), the entered mu, Tb, and ns, and does not check the bolt shear/bearing at the strength level (which must also be satisfied), the bolt tension-slip interaction (J3.9), or the pretension installation method. A design aid, not a substitute for the structural engineer of record's stamped design.",
+    editionNote: "The AISC 360-22 J3.9 slip resistance Rn = mu Du hf Tb ns, with mu = 0.30 (Class A) / 0.50 (Class B), Du = 1.13, the Table J3.1 minimum pretension Tb, and phi = 1.00 / Omega = 1.50 for standard holes. This returns the slip resistance of a pretensioned slip-critical bolt - it uses the standard-hole resistance factors (oversized and slotted holes reduce phi / raise Omega), the entered mu, Tb, and ns, and does not check the bolt shear/bearing at the strength level (which must also be satisfied), the bolt tension-slip interaction (J3.10), or the pretension installation method. A design aid, not a substitute for the structural engineer of record's stamped design.",
     assumptions: [
-      { name: "Slip resistance", value: "mu Du hf Tb per slip plane; friction, not shear, governs the serviceability of the joint", source: "AISC 360-22 J3.8" },
-      { name: "Surface class", value: "mu = 0.30 unpainted mill scale (Class A); 0.50 blast-cleaned (Class B)", source: "AISC 360-22 J3.8" },
-      { name: "Also check strength", value: "the bearing-type shear and bearing/tearout limit states still apply", source: "AISC 360-22 J3.8 user note" },
+      { name: "Slip resistance", value: "mu Du hf Tb per slip plane; friction, not shear, governs the serviceability of the joint", source: "AISC 360-22 J3.9" },
+      { name: "Surface class", value: "mu = 0.30 unpainted mill scale (Class A); 0.50 blast-cleaned (Class B)", source: "AISC 360-22 J3.9" },
+      { name: "Also check strength", value: "the bearing-type shear and bearing/tearout limit states still apply", source: "AISC 360-22 J3.9 user note" },
     ],
   },
   "steel-fillet-weld-size": {
@@ -17532,11 +17532,11 @@ export const CITATIONS = {
     ],
   },
   "boussinesq-surcharge-wall": {
-    formula: "m = x/H, n = z/H; m <= 0.4: sigma_h = (0.203 qL/H) n/(0.16 + n^2)^2; m > 0.4: sigma_h = (1.28 qL/H)(m^2 n)/(m^2 + n^2)^2.",
+    formula: "m = x/H, n = z/H; m <= 0.4: sigma_h = (0.20 qL/H) n/(0.16 + n^2)^2; m > 0.4: sigma_h = (1.28 qL/H)(m^2 n)/(m^2 + n^2)^2.",
     edition: "The NAVFAC DM-7.2 modified-Boussinesq line-load lateral pressure on a rigid wall, the doubled elastic Boussinesq solution for an unyielding wall, by name.",
     freeAccess: "NAVFAC DM-7.2 is public-domain and free online; the modified-Boussinesq surcharge relations are public.",
     governance: GOVERNANCE.general,
-    editionNote: "The NAVFAC DM-7.2 modified-Boussinesq line-load lateral pressure sigma_h = (0.203 qL/H) n/(0.16 + n^2)^2 for m <= 0.4 and (1.28 qL/H)(m^2 n)/(m^2 + n^2)^2 for m > 0.4, the doubling of the elastic Boussinesq solution for an unyielding (non-deflecting) rigid wall, and m = x/H, n = z/H. This returns the lateral pressure at a single depth from a line load parallel to the wall - it uses the rigid-wall (doubled) form (a flexible wall that can deflect sees roughly the un-doubled Boussinesq value), covers a line load (a point or strip load uses the companion NAVFAC forms), and does not integrate the resultant thrust and its point of application or add the at-rest/active earth pressure beneath it. A design aid, not a substitute for the geotechnical engineer of record's report.",
+    editionNote: "The NAVFAC DM-7.2 modified-Boussinesq line-load lateral pressure sigma_h = (0.20 qL/H) n/(0.16 + n^2)^2 for m <= 0.4 and (1.28 qL/H)(m^2 n)/(m^2 + n^2)^2 for m > 0.4, the doubling of the elastic Boussinesq solution for an unyielding (non-deflecting) rigid wall, and m = x/H, n = z/H. This returns the lateral pressure at a single depth from a line load parallel to the wall - it uses the rigid-wall (doubled) form (a flexible wall that can deflect sees roughly the un-doubled Boussinesq value), covers a line load (a point or strip load uses the companion NAVFAC forms), and does not integrate the resultant thrust and its point of application or add the at-rest/active earth pressure beneath it. A design aid, not a substitute for the geotechnical engineer of record's report.",
     assumptions: [
       { name: "Modified Boussinesq", value: "the two m-branch forms with m = x/H, n = z/H; doubled for a rigid non-deflecting wall", source: "NAVFAC DM-7.2" },
       { name: "Line load", value: "a load per unit length parallel to the wall; point/strip loads use the companion forms", source: "NAVFAC DM-7.2" },
@@ -20357,13 +20357,13 @@ export const CITATIONS = {
   },
   "bolt-shear-bearing": {
     formula: "Rn_shear = ns x Fnv x Ab; bearing/tearout Rn = min(1.2 lc t Fu, 2.4 d t Fu) with lc = le - dh/2 (edge) or s - dh (interior); governing = min; phi Rn = 0.75 Rn; Rn/Omega = Rn/2.00.",
-    edition: "AISC 360-22 §J3.6 (Table J3.2 Fnv) and §J3.10, by name; the material Fu and the bolt Ab / Fnv are standard tabulated values.",
+    edition: "AISC 360-22 §J3.7 (Table J3.2 Fnv) and §J3.11, by name; the material Fu and the bolt Ab / Fnv are standard tabulated values.",
     freeAccess: "The bolt shear-rupture and bearing / tearout relations and their phi / Omega factors are stated in AISC 360 §J3; the Fnv values are in Table J3.2.",
     governance: GOVERNANCE.general,
-    editionNote: "AISC 360-22 §J3.6 bolt shear rupture Rn = nplanes x Fnv x Ab (Fnv from Table J3.2: 54 ksi A325-N, 68 ksi A325-X, 68 ksi A490-N, 84 ksi A490-X) and §J3.10 bearing / tearout at a bolt hole Rn = 1.2 lc t Fu <= 2.4 d t Fu, where lc is the clear distance in the line of force (edge bolt: le - dh/2; interior bolt: s - dh). The governing per-bolt nominal strength is the smaller of bolt shear and edge bearing / tearout; the design strength is phi x Rn (phi = 0.75) and the allowable is Rn / Omega (Omega = 2.00). Standard holes and the deformation-considered coefficients; one bolt at one hole (group action, slip-critical, and combined tension-shear are separate checks). A design aid, not a substitute for the engineer of record.",
+    editionNote: "AISC 360-22 §J3.7 bolt shear rupture Rn = nplanes x Fnv x Ab (Fnv from Table J3.2: 54 ksi A325-N, 68 ksi A325-X, 68 ksi A490-N, 84 ksi A490-X) and §J3.11 bearing / tearout at a bolt hole Rn = 1.2 lc t Fu <= 2.4 d t Fu, where lc is the clear distance in the line of force (edge bolt: le - dh/2; interior bolt: s - dh). The governing per-bolt nominal strength is the smaller of bolt shear and edge bearing / tearout; the design strength is phi x Rn (phi = 0.75) and the allowable is Rn / Omega (Omega = 2.00). Standard holes and the deformation-considered coefficients; one bolt at one hole (group action, slip-critical, and combined tension-shear are separate checks). A design aid, not a substitute for the engineer of record.",
     assumptions: [
-      { name: "Two limit states", value: "the per-bolt strength is the smaller of shear rupture (Fnv Ab) and bearing / tearout (1.2 lc t Fu, capped at 2.4 d t Fu)", source: "AISC 360-22 J3.6 / J3.10" },
-      { name: "Clear distance lc", value: "edge bolt lc = le - dh/2; interior bolt lc = s - dh, in the line of the force", source: "AISC 360-22 J3.10" },
+      { name: "Two limit states", value: "the per-bolt strength is the smaller of shear rupture (Fnv Ab) and bearing / tearout (1.2 lc t Fu, capped at 2.4 d t Fu)", source: "AISC 360-22 J3.7 / J3.11" },
+      { name: "Clear distance lc", value: "edge bolt lc = le - dh/2; interior bolt lc = s - dh, in the line of the force", source: "AISC 360-22 J3.11" },
       { name: "Factors", value: "phi = 0.75 (LRFD) and Omega = 2.00 (ASD); standard holes, one bolt at one hole", source: "AISC 360-22 J3" },
     ],
   },
@@ -20439,13 +20439,13 @@ export const CITATIONS = {
     ],
   },
   "steel-doubler-plate": {
-    formula: "phiRn_bare = 0.90 x 0.60 Fy dc tw; t_strength = max(0, Vu - phiRn_bare) / (0.90 x 0.60 Fy dc); t_stability = (dz + wz)/90 (Eq. J10-12); t_required = max(t_strength, t_stability) when a doubler is needed.",
+    formula: "phiRn_bare = 0.90 x 0.60 Fy dc tw; t_strength = max(0, Vu - phiRn_bare) / (0.90 x 0.60 Fy dc); t_stability = (dz + wz)/90 (the AISC 341 Seismic Provisions panel-zone limit; not in AISC 360, whose Eq. J10-12 is the high-axial panel-zone strength); t_required = max(t_strength, t_stability) when a doubler is needed.",
     edition: "The AISC 360-16 Section J10.6 panel-zone doubler-plate provisions, Eq. J10-9 and Eq. J10-12, by name.",
     freeAccess: "AISC 360 is available through AISC; the J10.6 panel-zone and doubler-plate provisions are published design equations.",
     governance: GOVERNANCE.general,
     editionNote: "The stability minimum (Eq. J10-12) applies per individual doubler plate when it is not plug-welded to the web; a plug-welded doubler lets the combined thickness resist buckling. The basic bare strength (J10-9) is used for the shortfall - the flange-stiffened bonus (J10-11) is only allowed when panel-zone deformation is modeled. A high column axial load (Pr > 0.4 Pc) reduces the strength further and is not applied. Above roughly a half-inch shortfall the engineer often chooses a heavier column or a pair of plates. AISC 360 and the engineer of record govern - a detailing aid, not a stamped connection design.",
     assumptions: [
-      { name: "Two limits", value: "the doubler is the greater of the strength thickness (shortfall / 0.90 x 0.60 Fy dc) and the stability minimum (dz + wz)/90", source: "AISC 360-16 J10.6 / Eq. J10-12" },
+      { name: "Two limits", value: "the doubler is the greater of the strength thickness (shortfall / 0.90 x 0.60 Fy dc) and the stability minimum (dz + wz)/90", source: "AISC 360-16 J10.6 (strength) / AISC 341 (the /90 stability limit)" },
       { name: "Not plug-welded", value: "Eq. J10-12 governs per plate unless the doubler is plug-welded to the web, when the combined thickness resists buckling", source: "AISC 360-16 J10.6" },
     ],
   },
