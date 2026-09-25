@@ -20,8 +20,8 @@ test("253 required = free_fall + decel + worker + harness + safety", () => {
     connector: "shock-absorbing-lanyard-6ft",
     worker_height_ft: 5, harness_stretch_ft: 1, safety_factor_ft: 1, actual_clearance_ft: 0,
   });
-  // 6 + 3.5 + 5 + 1 + 1 = 16.5 ft
-  assert.ok(close(r.required_clearance_ft, 16.5, 0.01));
+  // 6 + 4 (Z359.13 48 in) + 5 + 1 + 1 = 17 ft
+  assert.ok(close(r.required_clearance_ft, 17, 0.01));
 });
 
 test("253 SRL connector shorter required clearance (small free-fall + small decel)", () => {
@@ -43,8 +43,8 @@ test("253 FAIL when actual clearance < required (negative remaining)", () => {
 
 test("253 free_fall override applies", () => {
   const r = computeFallProtectionClearance({ connector: "shock-absorbing-lanyard-6ft", free_fall_ft_override: 3, worker_height_ft: 5, harness_stretch_ft: 1, safety_factor_ft: 1 });
-  // 3 + 3.5 + 5 + 1 + 1 = 13.5
-  assert.ok(close(r.required_clearance_ft, 13.5, 0.01));
+  // 3 + 4 + 5 + 1 + 1 = 14
+  assert.ok(close(r.required_clearance_ft, 14, 0.01));
 });
 
 test("253 decel override applies", () => {

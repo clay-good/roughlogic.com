@@ -9941,8 +9941,8 @@
    "tile_id": "fall-protection-clearance",
    "source_publisher": "29 CFR 1926.502 (fall-protection systems criteria) / ANSI Z359",
    "source_title": "Required clearance = free-fall + decel + worker_height + harness_stretch + safety_factor; PASS if actual >= required",
-   "source_edition_or_year": "29 CFR 1926.502 + ANSI Z359 with manufacturer connector decel benchmarks (6 ft shock-absorbing lanyard: free-fall 6 ft, decel 3.5 ft)",
-   "source_section_or_page": "6 ft shock-absorbing lanyard / 5 ft worker height / 1 ft harness stretch / 1 ft safety factor / 18 ft actual -> 16.5 ft required, 1.5 ft margin, PASS",
+   "source_edition_or_year": "29 CFR 1926.502 + ANSI/ASSP Z359.13-2013 maximum deployment distance (6 ft free-fall shock-absorbing lanyard: free-fall 6 ft, decel 48 in = 4 ft)",
+   "source_section_or_page": "6 ft shock-absorbing lanyard / 5 ft worker height / 1 ft harness stretch / 1 ft safety factor / 18 ft actual -> 17 ft required, 1 ft margin, PASS",
    "verified_by": "rl",
    "verified_on": "2026-05-11",
    "inputs": {
@@ -9954,13 +9954,13 @@
    },
    "outputs": {
     "required_clearance_ft": {
-     "value": 16.5,
+     "value": 17,
      "tolerance": {
       "abs": 0.01
      }
     },
     "remaining_clearance_ft": {
-     "value": 1.5,
+     "value": 1,
      "tolerance": {
       "abs": 0.01
      }
@@ -9972,7 +9972,7 @@
      }
     },
     "decel_ft": {
-     "value": 3.5,
+     "value": 4,
      "tolerance": {
       "abs": 0
      }
@@ -75012,28 +75012,28 @@
   },
   {
    "tile_id": "fall-arrest-clearance",
-   "source_publisher": "ANSI Z359.1 / OSHA 1926 Subpart M",
-   "source_title": "6 + 3.5 + 5 + 3 = 17.5 ft required fall clearance below the anchor",
+   "source_publisher": "ANSI/ASSP Z359.13 / OSHA 1926 Subpart M",
+   "source_title": "6 + 4 + 5 + 3 = 18 ft required fall clearance below the anchor",
    "source_edition_or_year": "RFC = free fall + deceleration + worker height + safety margin",
-   "source_section_or_page": "free fall 6 + deceleration 3.5 + worker 5 + margin 3 = 17.5 ft; 20 ft available -> 2.5 ft margin (adequate)",
+   "source_section_or_page": "free fall 6 + deceleration 4 (Z359.13 48 in for a 6 ft free-fall absorber) + worker 5 + margin 3 = 18 ft; 20 ft available -> 2 ft margin (adequate)",
    "verified_by": "rl",
    "verified_on": "2026-07-14",
    "inputs": {
     "free_fall_distance_ft": 6,
-    "deceleration_distance_ft": 3.5,
+    "deceleration_distance_ft": 4,
     "worker_height_ft": 5,
     "safety_margin_ft": 3,
     "available_clearance_ft": 20
    },
    "outputs": {
     "required_clearance_ft": {
-     "value": 17.5,
+     "value": 18,
      "tolerance": {
       "abs": 0.01
      }
     },
     "margin_ft": {
-     "value": 2.5,
+     "value": 2,
      "tolerance": {
       "abs": 0.01
      }

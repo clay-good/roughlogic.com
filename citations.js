@@ -2060,7 +2060,7 @@ export const CITATIONS = {
     editionNote: "Single-edition (29 CFR 1926.502 + manufacturer connector specs; quarterly recheck of manufacturer attribution per spec-v7 §8).",
     assumptions: [
       { name: "Default free-fall", value: "6 ft for personal fall arrest (PFAS)", source: "29 CFR 1926.502(d)(16)" },
-      { name: "Default decel", value: "3.5 ft for shock-absorbing lanyard / 1.0 ft for SRL", source: "manufacturer typical" },
+      { name: "Default decel", value: "4.0 ft for a 6 ft free-fall shock-absorbing lanyard (48 in maximum deployment; OSHA's 3.5 ft is the system limit, not the labeled stroke) / 1.0 ft for an overhead SRL", source: "ANSI/ASSP Z359.13-2013; manufacturer typical for the SRL" },
       { name: "Default worker height", value: "5 ft from D-ring to feet", source: "engineering practice" },
       { name: "Default safety factor", value: "1 ft margin", source: "engineering practice" },
     ],
@@ -6405,10 +6405,10 @@ export const CITATIONS = {
     edition: "ANSI Z359.1 (Fall Protection Code) and OSHA 1926 Subpart M fall-clearance calculation, by name.",
     freeAccess: "The additive fall-clearance model is public (ANSI Z359 / OSHA 1926 Subpart M); OSHA standards are free at osha.gov, the Z359 standards are licensed.",
     governance: GOVERNANCE.fire,
-    editionNote: "The vertical clearance a personal fall-arrest system needs below the anchor so the worker does not strike a lower level: RFC = free-fall distance + deceleration distance + worker height (harness D-ring to the feet) + a safety margin. Each term is entered explicitly because the free-fall distance depends on the anchor position relative to the D-ring (a foot-level anchor produces a large free fall, an overhead anchor a small one) and the connector length; the deceleration distance is the energy absorber's stroke, capped at 3.5 ft for a shock-absorbing lanyard per ANSI Z359.1 (a self-retracting lifeline is far less); the worker height D-ring-to-feet is about 5 ft; and the safety margin (commonly 2-3 ft) keeps the feet off the level. If the available clearance is less than RFC the worker contacts the lower level before arrest. A planning aid; the equipment manufacturer's instructions and a qualified/competent person govern the actual system.",
+    editionNote: "The vertical clearance a personal fall-arrest system needs below the anchor so the worker does not strike a lower level: RFC = free-fall distance + deceleration distance + worker height (harness D-ring to the feet) + a safety margin. Each term is entered explicitly because the free-fall distance depends on the anchor position relative to the D-ring (a foot-level anchor produces a large free fall, an overhead anchor a small one) and the connector length; the deceleration distance is the energy absorber's stroke - OSHA 1926.502(d)(16)(iv) limits the system to 3.5 ft, but an ANSI/ASSP Z359.13 absorber rated for a 6 ft free fall may deploy up to 48 in (4 ft), so plan on the label's figure (a self-retracting lifeline is usually less); the worker height D-ring-to-feet is about 5 ft; and the safety margin (commonly 2-3 ft) keeps the feet off the level. If the available clearance is less than RFC the worker contacts the lower level before arrest. A planning aid; the equipment manufacturer's instructions and a qualified/competent person govern the actual system.",
     assumptions: [
       { name: "Additive model", value: "RFC = free fall + deceleration + worker height + safety margin", source: "ANSI Z359 / OSHA 1926 Subpart M" },
-      { name: "Deceleration cap", value: "3.5 ft max energy-absorber stroke for a shock-absorbing lanyard; an SRL is much less", source: "ANSI Z359.1" },
+      { name: "Deceleration distance", value: "up to 48 in (4 ft) for a 6 ft free-fall energy absorber and 60 in for a 12 ft one; OSHA limits the system to 3.5 ft; an SRL is usually less", source: "ANSI/ASSP Z359.13-2013; 29 CFR 1926.502(d)(16)(iv)" },
       { name: "Free-fall basis", value: "depends on the anchor position relative to the D-ring and the connector length", source: "fall-protection practice" },
     ],
   },

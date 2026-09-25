@@ -10963,7 +10963,7 @@ test("monotonicity: computeDemoDebris tons strictly increasing in volume_yd3 (li
     "expected error for volume=0");
 });
 
-test("monotonicity: computeFallProtectionClearance required_clearance_ft = free_fall + decel + worker_height + harness_stretch + safety_factor (additive, strictly increasing in each term, +1 ft input -> +1 ft required); remaining_clearance_ft strictly increasing in actual_clearance_ft and strictly decreasing in worker_height_ft; connector free-fall ordering SRL 2 < lanyard-6ft 6 < lanyard-12ft 12; example pin 6ft lanyard -> 16.5 ft required, 1.5 ft remaining, PASS; bad connector / negative height -> error", () => {
+test("monotonicity: computeFallProtectionClearance required_clearance_ft = free_fall + decel + worker_height + harness_stretch + safety_factor (additive, strictly increasing in each term, +1 ft input -> +1 ft required); remaining_clearance_ft strictly increasing in actual_clearance_ft and strictly decreasing in worker_height_ft; connector free-fall ordering SRL 2 < lanyard-6ft 6 < lanyard-12ft 12; example pin 6ft lanyard -> 17 ft required, 1 ft remaining, PASS; bad connector / negative height -> error", () => {
   // Group G. required = free_fall + decel + worker_height + harness_stretch + safety_factor.
   let prev = -Infinity;
   for (const worker_height_ft of [4, 5, 6, 7, 8]) {
@@ -11006,10 +11006,10 @@ test("monotonicity: computeFallProtectionClearance required_clearance_ft = free_
   assert.equal(lan12.free_fall_ft, 12);
   assert.ok(srl.required_clearance_ft < lan6.required_clearance_ft && lan6.required_clearance_ft < lan12.required_clearance_ft,
     `connector ordering: ${srl.required_clearance_ft} < ${lan6.required_clearance_ft} < ${lan12.required_clearance_ft}`);
-  // Example pin: 6 ft lanyard, 5/1/1 -> required 6+3.5+5+1+1 = 16.5, actual 18 -> remaining 1.5, PASS.
+  // Example pin: 6 ft lanyard, 5/1/1 -> required 6+4+5+1+1 = 17, actual 18 -> remaining 1, PASS.
   const ref = computeFallProtectionClearance({ connector: "shock-absorbing-lanyard-6ft", worker_height_ft: 5, harness_stretch_ft: 1, safety_factor_ft: 1, actual_clearance_ft: 18 });
-  assert.equal(ref.required_clearance_ft, 16.5);
-  assert.equal(ref.remaining_clearance_ft, 1.5);
+  assert.equal(ref.required_clearance_ft, 17);
+  assert.equal(ref.remaining_clearance_ft, 1);
   assert.equal(ref.flag, "PASS (clearance margin)");
   // A shortfall in actual clearance flips the flag to FAIL.
   const fail = computeFallProtectionClearance({ connector: "shock-absorbing-lanyard-6ft", worker_height_ft: 5, harness_stretch_ft: 1, safety_factor_ft: 1, actual_clearance_ft: 12 });

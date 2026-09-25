@@ -1015,9 +1015,9 @@ const ISO_NFF_DATA = {
 };
 
 const FALL_PROTECTION_BENCHMARKS_DATA = {
-  source: "Manufacturer connector-decel benchmarks for personal fall arrest. 3M / Capital Safety, MSA, Honeywell-Miller cited by name. Free-fall and deceleration values from each manufacturer's published Connector Specification.",
+  source: "Manufacturer connector-decel benchmarks for personal fall arrest. 3M / Capital Safety, MSA, Honeywell-Miller cited by name. Free-fall and deceleration values from each manufacturer's published Connector Specification; the lanyard deceleration figures are the ANSI/ASSP Z359.13-2013 maximum deployment distances (48 in for a 6 ft free fall, 60 in for 12 ft).",
   values: {
-    "shock-absorbing-lanyard-6ft":  { decel_ft: 3.5, free_fall_ft: 6, description: "6 ft shock-absorbing lanyard" },
+    "shock-absorbing-lanyard-6ft":  { decel_ft: 4.0, free_fall_ft: 6, description: "6 ft shock-absorbing lanyard" },
     "shock-absorbing-lanyard-12ft": { decel_ft: 5.0, free_fall_ft: 12, description: "12 ft shock-absorbing lanyard" },
     "self-retracting-leading-edge": { decel_ft: 5.0, free_fall_ft: 5, description: "Leading-edge SRL" },
     "self-retracting-overhead":     { decel_ft: 1.0, free_fall_ft: 2, description: "Overhead SRL" },

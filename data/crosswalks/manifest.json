@@ -1,9 +1,9 @@
 {
   "name": "crosswalks",
-  "version": "2026-09-24",
-  "fetched": "2026-09-24",
+  "version": "2026-09-25",
+  "fetched": "2026-09-25",
   "edition": "NIST SP 811 unit factors; IRS 2026 standard mileage rate (76 cents/mi effective 2026-07-01); GSA FY2026 per-diem; NIOSH 1991 lifting equation; OSHA 29 CFR 1926 Subpart P + 1926.502 fall protection; NWS / OSHA heat-cold-stress formulas; manufacturer connector-decel benchmarks (3M / Capital Safety, MSA, Honeywell-Miller); state revenue rates verified 2026-09-02.",
-  "asOf": "2026-09-24",
+  "asOf": "2026-09-25",
   "refresh_cadence": "quarterly",
   "shards": [
     {
@@ -44,7 +44,7 @@
     {
       "file": "fall-protection-benchmarks.json",
       "name": "Manufacturer connector-decel benchmarks for personal fall arrest",
-      "gzip_size_bytes": 402
+      "gzip_size_bytes": 485
     }
   ],
   "hashes": {
@@ -55,6 +55,6 @@
     "niosh-coupling.json": "ceb2d1f4928d6c077f568fcff517b7c561899e932e93f9aad23d6097547f2cc5",
     "heat-cold-stress.json": "b869cc9f7ecbeeaaca5f30cdab7d24cbb5e88f0d5b70564585089398dc2a2243",
     "osha-trench.json": "48a2a605c8b94cba381b5df1280eef6ecf643eef16d6a0055ac84192b6a01f2b",
-    "fall-protection-benchmarks.json": "581dd2b68824baeb3b765232861be3a0a049571b38a9b1b6d9ae0e450013fafa"
+    "fall-protection-benchmarks.json": "df335342bf6a498794d5c8a2c5a790e4e1ef05f5969a06df8c22872538759fdd"
   }
 }

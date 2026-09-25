@@ -7138,12 +7138,12 @@ test("bounds: calc-cross computeVehicleLoad pins static axle balance rear = payl
 
 test("bounds: calc-cross computeFallProtectionClearance pins OSHA 1926.502 required = free_fall + decel + worker_height + harness_stretch + safety_factor on the spec 6 ft lanyard example", () => {
   // Spec: 6 ft SAL, worker height 5, stretch 1, safety 1, actual 18.
-  // free_fall = 6, decel = 3.5 -> required = 6 + 3.5 + 5 + 1 + 1 = 16.5.
+  // free_fall = 6, decel = 4 (Z359.13 48 in) -> required = 6 + 4 + 5 + 1 + 1 = 17.
   const r = computeFallProtectionClearance({ connector: "shock-absorbing-lanyard-6ft", worker_height_ft: 5, harness_stretch_ft: 1, safety_factor_ft: 1, actual_clearance_ft: 18 });
   assert.strictEqual(r.free_fall_ft, 6);
-  assert.strictEqual(r.decel_ft, 3.5);
-  assert.strictEqual(r.required_clearance_ft, 16.5);
-  assert.strictEqual(r.remaining_clearance_ft, 1.5);
+  assert.strictEqual(r.decel_ft, 4);
+  assert.strictEqual(r.required_clearance_ft, 17);
+  assert.strictEqual(r.remaining_clearance_ft, 1);
   assert.ok(/PASS/.test(r.flag));
   // FAIL when required > actual.
   const fail = computeFallProtectionClearance({ connector: "shock-absorbing-lanyard-6ft", worker_height_ft: 5, harness_stretch_ft: 1, safety_factor_ft: 1, actual_clearance_ft: 10 });

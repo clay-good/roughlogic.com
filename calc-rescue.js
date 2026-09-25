@@ -451,18 +451,18 @@ export function computeFallArrestClearance({ free_fall_distance_ft = 0, decelera
   const adequate = hasAvail ? margin_ft >= 0 : null;
   return {
     required_clearance_ft, margin_ft, adequate,
-    note: "Required fall clearance below the anchor for a personal fall-arrest system: RFC = free-fall distance + deceleration distance + worker height (harness D-ring to the feet) + a safety margin. Enter each explicitly - the free-fall distance depends on the anchor position relative to the D-ring (a foot-level anchor gives a large free fall, an overhead anchor a small one) and on the connector length; the deceleration distance is the energy absorber's stroke, which ANSI Z359.1 caps at 3.5 ft for a shock-absorbing lanyard (a self-retracting lifeline is much less); the worker height D-ring-to-feet is about 5 ft; and the safety margin (commonly 2-3 ft) keeps the feet off the lower level. If the available clearance below the anchor is less than RFC, the worker contacts the level before the system arrests the fall. A planning aid; the equipment manufacturer's instructions and a qualified/competent person govern per ANSI Z359 and OSHA 1926 Subpart M.",
+    note: "Required fall clearance below the anchor for a personal fall-arrest system: RFC = free-fall distance + deceleration distance + worker height (harness D-ring to the feet) + a safety margin. Enter each explicitly - the free-fall distance depends on the anchor position relative to the D-ring (a foot-level anchor gives a large free fall, an overhead anchor a small one) and on the connector length; the deceleration distance is the energy absorber's stroke - OSHA 1926.502(d)(16)(iv) limits the system to 3.5 ft, but an ANSI/ASSP Z359.13 absorber rated for a 6 ft free fall may deploy up to 48 in (4 ft) and one rated for 12 ft up to 60 in, so plan on the label's figure (a self-retracting lifeline is usually less); the worker height D-ring-to-feet is about 5 ft; and the safety margin (commonly 2-3 ft) keeps the feet off the lower level. If the available clearance below the anchor is less than RFC, the worker contacts the level before the system arrests the fall. A planning aid; the equipment manufacturer's instructions and a qualified/competent person govern per ANSI Z359 and OSHA 1926 Subpart M.",
   };
 }
-export const fallArrestClearanceExample = { inputs: { free_fall_distance_ft: 6, deceleration_distance_ft: 3.5, worker_height_ft: 5, safety_margin_ft: 3, available_clearance_ft: 20 } };
+export const fallArrestClearanceExample = { inputs: { free_fall_distance_ft: 6, deceleration_distance_ft: 4, worker_height_ft: 5, safety_margin_ft: 3, available_clearance_ft: 20 } };
 
 function renderFallArrestClearance(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Notice: the equipment manufacturer's instructions and a qualified / competent person govern all fall protection per ANSI Z359.1 and OSHA 1926 Subpart M; a planning aid. Citation: required fall clearance RFC = free-fall distance + deceleration distance + worker height (D-ring to feet) + safety margin. Deceleration distance is capped at 3.5 ft for a shock-absorbing lanyard (Z359); the free-fall distance depends on the anchor position and connector length.";
+  citationEl.textContent = "Notice: the equipment manufacturer's instructions and a qualified / competent person govern all fall protection per ANSI Z359.1 and OSHA 1926 Subpart M; a planning aid. Citation: required fall clearance RFC = free-fall distance + deceleration distance + worker height (D-ring to feet) + safety margin. OSHA 1926.502(d)(16)(iv) limits deceleration to 3.5 ft, while an ANSI/ASSP Z359.13 lanyard rated for a 6 ft free fall may deploy up to 4 ft - plan on the label; the free-fall distance depends on the anchor position and connector length.";
   _aeF(inputRegion, () => fillExample(fallArrestClearanceExample.inputs));
   const ffd = _mnF("Free-fall distance (ft)", "fac-ffd", { step: "any", min: "0", value: "6" });
   ffd.input.value = "6";
-  const dd = _mnF("Deceleration distance (ft, <= 3.5 lanyard)", "fac-dd", { step: "any", min: "0", value: "3.5" });
-  dd.input.value = "3.5";
+  const dd = _mnF("Deceleration distance (ft, 4 for a 6 ft Z359.13 lanyard)", "fac-dd", { step: "any", min: "0", value: "4" });
+  dd.input.value = "4";
   const hh = _mnF("Worker height, D-ring to feet (ft)", "fac-hh", { step: "any", min: "0", value: "5" });
   hh.input.value = "5";
   const sf = _mnF("Safety margin (ft)", "fac-sf", { step: "any", min: "0", value: "3" });

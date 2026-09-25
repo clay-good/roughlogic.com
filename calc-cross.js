@@ -1859,7 +1859,10 @@ import {
 } from "./ui-fields.js";
 
 export const FALL_PROTECTION_DECEL = {
-  "shock-absorbing-lanyard-6ft":  { decel_ft: 3.5, free_fall_ft: 6, description: "6 ft shock-absorbing lanyard" },
+  // ANSI/ASSP Z359.13-2013 lets a 6 ft free-fall absorber deploy up to 48 in
+  // (4 ft). 3.5 ft is OSHA 1926.502(d)(16)(iv)'s system limit, not the stroke
+  // a Z359.13-labeled lanyard may use; until 2026-09-25 this read 3.5 ft.
+  "shock-absorbing-lanyard-6ft":  { decel_ft: 4.0, free_fall_ft: 6, description: "6 ft shock-absorbing lanyard" },
   // ANSI/ASSP Z359.13 lets a 12 ft free-fall lanyard decelerate up to 60 in;
   // a leading-edge SRL (Z359.14 Class 2) is anchored as low as the feet, so
   // up to 5 ft of free fall, and may arrest in up to 60 in -- before any edge
