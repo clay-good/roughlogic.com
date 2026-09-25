@@ -1499,7 +1499,9 @@ SHOP_RENDERERS["parabolic-segment"] = _v1316renderParabolicSegment;
 
 // spec-v1317: truncated pyramid (rectangular frustum) volume. frustum-volume is the round cone; this is the
 // rectangular case - a tapered concrete pier/footing pedestal or a rectangular hopper. Prismatoid formula
-// V = (h/3)(A1 + A2 + sqrt(A1 A2)). Top 0x0 = full pyramid; equal top/bottom = a prism.
+// V = (h/6)(A1 + A2 + 4 Am), Am the mid-height section. Top 0x0 = full pyramid; equal top/bottom = a prism.
+// Until 2026-09-25 this used (h/3)(A1 + A2 + sqrt(A1 A2)), exact only for similar ends: a 20x4 base
+// to a 10x4 top read 353.1 ft^3 of 360, and a wedge (top length 0) read as a pyramid.
 // dims: in { bottom_length_ft: L, bottom_width_ft: L, top_length_ft: L, top_width_ft: L, height_ft: L } out: { volume_ft3: L^3, volume_yd3: L^3, volume_gal: L^3 }
 export function computePyramidFrustumVolume({ bottom_length_ft = 0, bottom_width_ft = 0, top_length_ft = 0, top_width_ft = 0, height_ft = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
@@ -1517,18 +1519,19 @@ export function computePyramidFrustumVolume({ bottom_length_ft = 0, bottom_width
   if (!(h > 0)) return { error: "Height must be positive (ft)." };
   const A1 = Lb * Wb;
   const A2 = Lt * Wt;
-  const volume_ft3 = (h / 3) * (A1 + A2 + Math.sqrt(A1 * A2));
+  const Am = ((Lb + Lt) / 2) * ((Wb + Wt) / 2);
+  const volume_ft3 = (h / 6) * (A1 + A2 + 4 * Am);
   const volume_yd3 = volume_ft3 / 27;
   const volume_gal = volume_ft3 * (1728 / 231);
   if (![volume_ft3, volume_yd3].every(Number.isFinite) || !(volume_ft3 > 0)) return { error: "Truncated-pyramid math is not a finite value; check the inputs." };
   return {
     volume_ft3, volume_yd3, volume_gal, bottom_area_ft2: A1, top_area_ft2: A2,
-    note: "Volume of a right truncated rectangular pyramid (a rectangular frustum) - the shape of a tapered concrete pier or spread-footing pedestal, a rectangular hopper or bin, or a round-to-rectangular transition's rectangular part - by the prismatoid formula V = (h/3)(A1 + A2 + sqrt(A1 A2)), with A1 the bottom area (Lb x Wb) and A2 the top area (Lt x Wt). The sqrt(A1 A2) middle term is what makes it exact: averaging the two areas or footprints understates the volume. A top of 0 x 0 gives a full pyramid (V = A1 h/3); equal top and bottom give a rectangular prism (A1 h). Reported in cubic feet, cubic yards, and gallons for a concrete pour or a material takeoff. The round (conical) frustum is the frustum-volume tile; an offset (oblique) pyramid, wall thickness, and surface area are separate. A takeoff aid; verify against the drawing.",
+    note: "Volume of a right truncated rectangular pyramid (a rectangular frustum) - the shape of a tapered concrete pier or spread-footing pedestal, a rectangular hopper or bin, or a round-to-rectangular transition's rectangular part - by the prismoidal formula V = (h/6)(A1 + A2 + 4 Am), with A1 the bottom area (Lb x Wb) and A2 the top area (Lt x Wt). Am is the section halfway up, ((Lb + Lt)/2) x ((Wb + Wt)/2); the prismoidal formula is exact for any such solid, including a hopper that tapers at different rates in length and width, where the similar-pyramid form (h/3)(A1 + A2 + sqrt(A1 A2)) runs low. Averaging the two end areas overstates the volume. A top of 0 x 0 gives a full pyramid (V = A1 h/3); equal top and bottom give a rectangular prism (A1 h). Reported in cubic feet, cubic yards, and gallons for a concrete pour or a material takeoff. The round (conical) frustum is the frustum-volume tile; an offset (oblique) pyramid, wall thickness, and surface area are separate. A takeoff aid; verify against the drawing.",
   };
 }
 export const pyramidFrustumVolumeExample = { inputs: { bottom_length_ft: 6, bottom_width_ft: 6, top_length_ft: 2, top_width_ft: 2, height_ft: 4 } };
 function _v1317renderPyramidFrustumVolume(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: truncated-pyramid (rectangular frustum) volume V = (h/3)(A1 + A2 + sqrt(A1 A2)) - the prismatoid formula (standard solid geometry; Machinery's Handbook). Top 0x0 gives a full pyramid. A takeoff aid; verify against the drawing.";
+  citationEl.textContent = "Citation: truncated-pyramid (rectangular frustum) volume V = (h/6)(A1 + A2 + 4 Am), Am the mid-height section - the prismoidal formula (standard solid geometry; Machinery's Handbook). Top 0x0 gives a full pyramid. A takeoff aid; verify against the drawing.";
   const Lb = makeNumber("Bottom length (ft)", "pfv-lb", { step: "any", min: "0" });
   const Wb = makeNumber("Bottom width (ft)", "pfv-wb", { step: "any", min: "0" });
   const Lt = makeNumber("Top length (ft)", "pfv-lt", { step: "any", min: "0" });

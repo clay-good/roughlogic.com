@@ -12691,13 +12691,13 @@ export const CITATIONS = {
     ],
   },
   "pyramid-frustum-volume": {
-    formula: "A1 = Lb x Wb; A2 = Lt x Wt; V = (h/3)(A1 + A2 + sqrt(A1 A2)). Top 0x0 -> full pyramid (A1 h/3); equal top/bottom -> prism (A1 h).",
-    edition: "The truncated-pyramid volume V = (h/3)(A1 + A2 + sqrt(A1 A2)) - the prismatoid formula, standard solid geometry as in Machinery's Handbook (Industrial Press), by name; public domain.",
+    formula: "A1 = Lb x Wb; A2 = Lt x Wt; Am = ((Lb + Lt)/2)((Wb + Wt)/2); V = (h/6)(A1 + A2 + 4 Am). Top 0x0 -> full pyramid (A1 h/3); equal top/bottom -> prism (A1 h).",
+    edition: "The truncated-pyramid volume V = (h/6)(A1 + A2 + 4 Am) - the prismoidal formula, standard solid geometry as in Machinery's Handbook (Industrial Press), by name; public domain.",
     freeAccess: "Pure solid geometry, public; the bottom and top dimensions and the height are user-supplied.",
     governance: GOVERNANCE.general,
-    editionNote: "Volume of a right truncated rectangular pyramid (a rectangular frustum) - the shape of a tapered concrete pier or spread-footing pedestal, a rectangular hopper or bin, or a round-to-rectangular transition's rectangular part - by the prismatoid formula V = (h/3)(A1 + A2 + sqrt(A1 A2)), with A1 the bottom area (Lb x Wb) and A2 the top area (Lt x Wt). The sqrt(A1 A2) middle term is what makes it exact: averaging the two areas or footprints understates the volume. A top of 0 x 0 gives a full pyramid (V = A1 h/3); equal top and bottom give a rectangular prism (A1 h). Reported in cubic feet, cubic yards, and gallons for a concrete pour or a material takeoff. The round (conical) frustum is the frustum-volume tile; an offset (oblique) pyramid, wall thickness, and surface area are separate. A takeoff aid; verify against the drawing.",
+    editionNote: "Volume of a right truncated rectangular pyramid (a rectangular frustum) - the shape of a tapered concrete pier or spread-footing pedestal, a rectangular hopper or bin, or a round-to-rectangular transition's rectangular part - by the prismoidal formula V = (h/6)(A1 + A2 + 4 Am), with A1 the bottom area (Lb x Wb) and A2 the top area (Lt x Wt). Am is the section halfway up, ((Lb + Lt)/2) x ((Wb + Wt)/2); the prismoidal formula is exact for any such solid, including a hopper that tapers at different rates in length and width, where the similar-pyramid form (h/3)(A1 + A2 + sqrt(A1 A2)) runs low. Averaging the two end areas overstates the volume. A top of 0 x 0 gives a full pyramid (V = A1 h/3); equal top and bottom give a rectangular prism (A1 h). Reported in cubic feet, cubic yards, and gallons for a concrete pour or a material takeoff. The round (conical) frustum is the frustum-volume tile; an offset (oblique) pyramid, wall thickness, and surface area are separate. A takeoff aid; verify against the drawing.",
     assumptions: [
-      { name: "Prismatoid formula", value: "V = (h/3)(A1 + A2 + sqrt(A1 A2)); the sqrt term makes it exact", source: "solid geometry" },
+      { name: "Prismoidal formula", value: "V = (h/6)(A1 + A2 + 4 Am), exact for any planar-faced prismoid; (h/3)(A1 + A2 + sqrt(A1 A2)) is exact only when the ends are similar", source: "solid geometry" },
       { name: "Limits", value: "top 0x0 gives a full pyramid, equal top/bottom a prism", source: "solid geometry" },
       { name: "Scope", value: "right rectangular frustum; round frustum is separate, as are oblique pyramids", source: "scope of this tile" },
     ],

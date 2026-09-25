@@ -38813,12 +38813,12 @@ test("bounds: spec-v1316 computeParabolicSegment pins the 2/3 area, the exact ar
 });
 
 import { computePyramidFrustumVolume as _v1317 } from "../../calc-shop.js";
-test("bounds: spec-v1317 computePyramidFrustumVolume pins the prismatoid volume, the full-pyramid/prism limits, the sqrt middle term, and error seams", () => {
+test("bounds: spec-v1317 computePyramidFrustumVolume pins the prismoidal volume, the full-pyramid/prism/wedge limits, unequal tapers, and error seams", () => {
   // 6x6 base, 2x2 top, h 4: V 69.33 ft^3, 2.568 yd^3.
   const r = _v1317({ bottom_length_ft: 6, bottom_width_ft: 6, top_length_ft: 2, top_width_ft: 2, height_ft: 4 });
   assert.ok(Math.abs(r.volume_ft3 - 69.333) < 1e-2 && Math.abs(r.volume_yd3 - 2.568) < 1e-2);
   assert.ok(r.bottom_area_ft2 === 36 && r.top_area_ft2 === 4);
-  // The prismatoid volume is below the mean-AREA average ((A1+A2)/2 * h, by AM-GM) but above the
+  // The prismoidal volume is below the mean-AREA average ((A1+A2)/2 * h, by AM-GM) but above the
   // mean-DIMENSION guess (a 4x4 = 16 ft^2 footprint x h), which is the estimate a taper tempts you into.
   assert.ok(r.volume_ft3 < ((36 + 4) / 2) * 4 && r.volume_ft3 > 16 * 4);
   // Top 0x0 gives a full pyramid V = A1 h/3.
@@ -38827,6 +38827,10 @@ test("bounds: spec-v1317 computePyramidFrustumVolume pins the prismatoid volume,
   // Equal top and bottom give a rectangular prism V = A1 h.
   const prism = _v1317({ bottom_length_ft: 6, bottom_width_ft: 6, top_length_ft: 6, top_width_ft: 6, height_ft: 4 });
   assert.ok(Math.abs(prism.volume_ft3 - 36 * 4) < 1e-6);
+  // Ends that taper at different rates: (h/6)(A1 + A2 + 4 Am) = 6/6 (80 + 40 + 4 x 15 x 4) = 360.
+  // The similar-pyramid form used until 2026-09-25 gave 353.1; a wedge (top length 0) gave a pyramid.
+  assert.ok(Math.abs(_v1317({ bottom_length_ft: 20, bottom_width_ft: 4, top_length_ft: 10, top_width_ft: 4, height_ft: 6 }).volume_ft3 - 360) < 1e-9);
+  assert.ok(Math.abs(_v1317({ bottom_length_ft: 6, bottom_width_ft: 4, top_length_ft: 0, top_width_ft: 4, height_ft: 3 }).volume_ft3 - 36) < 1e-9);
   // Error seams: non-positive base, negative top, top exceeding bottom, non-positive height, non-finite.
   assert.ok("error" in _v1317({ bottom_length_ft: 0, bottom_width_ft: 6, top_length_ft: 2, top_width_ft: 2, height_ft: 4 }));
   assert.ok("error" in _v1317({ bottom_length_ft: 6, bottom_width_ft: 6, top_length_ft: -1, top_width_ft: 2, height_ft: 4 }));
