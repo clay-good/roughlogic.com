@@ -59,7 +59,7 @@
     {
       "file": "apa-span-ratings.json",
       "name": "APA plywood / OSB span-rating tables",
-      "gzip_size_bytes": 378
+      "gzip_size_bytes": 566
     },
     {
       "file": "helical-pile-kt.json",
@@ -78,7 +78,7 @@
     "sfm-table.json": "c91bd6e512ce9cf5b6a78477ae1ccb6f30be08424a0f6cbff7f8a78441dff921",
     "aws-deposition.json": "fdd589d4fdb12ee4de93b5cdecff5f140a22a9a2dd8f14f15be41c111dd83360",
     "rebar-unit-weights.json": "aa9d90af63d3d735986b52af4d5a7ae3f50d1db89de02b5e22c0cba22f0ecc35",
-    "apa-span-ratings.json": "6ce521275c75bc85dc3f1f0cd225d48095e988963effab76a571b2d87ace1d47",
+    "apa-span-ratings.json": "2fc73082e7a4068250c74664df666fef56aa7ed65c74687cab7d7c81c5c087be",
     "helical-pile-kt.json": "dbc1a7421f3ced6964933569faf525bf4e6f93ae57e4ef3f30c35cc52b32c7a8"
   }
 }

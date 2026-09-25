@@ -2414,19 +2414,25 @@ export const rebarScheduleExample = {
 
 // --- 249: Plywood and OSB Sheathing Span Rating ---
 
+// Roof rows are APA E30 Table 33: the maximum span with and without edge
+// support (clips, blocking, or T&G) and the allowable live load at each support
+// spacing, with 10 psf dead load assumed (footnote d). Until 2026-09-24 the tile
+// kept only the live load at the maximum span (48/24 read 25 psf; the table
+// says 30), and ignored edge support entirely -- a 48/24 panel at 48 in with no
+// clips passed where APA stops it at 36 in.
 export const APA_SPAN_RATINGS = {
-  "24/0":  { roof: { spacing_in: 24, live_psf: 30, total_psf: 40 }, floor: null },
-  "24/16": { roof: { spacing_in: 24, live_psf: 40, total_psf: 50 }, floor: { spacing_in: 16, total_psf: 100 } },
-  "32/16": { roof: { spacing_in: 32, live_psf: 30, total_psf: 40 }, floor: { spacing_in: 16, total_psf: 100 } },
-  "40/20": { roof: { spacing_in: 40, live_psf: 30, total_psf: 40 }, floor: { spacing_in: 20, total_psf: 100 } },
-  "48/24": { roof: { spacing_in: 48, live_psf: 25, total_psf: 35 }, floor: { spacing_in: 24, total_psf: 100 } },
+  "24/0":  { roof: { spacing_in: 24, no_edge_span_in: 19.2, live_psf: 30, total_psf: 40, live_by_spacing: { 12: 190, 16: 100, 20: 60, 24: 30 } }, floor: null },
+  "24/16": { roof: { spacing_in: 24, no_edge_span_in: 24, live_psf: 40, total_psf: 50, live_by_spacing: { 12: 190, 16: 100, 20: 65, 24: 40 } }, floor: { spacing_in: 16, total_psf: 100 } },
+  "32/16": { roof: { spacing_in: 32, no_edge_span_in: 28, live_psf: 30, total_psf: 40, live_by_spacing: { 12: 300, 16: 165, 20: 110, 24: 65, 32: 30 } }, floor: { spacing_in: 16, total_psf: 100 } },
+  "40/20": { roof: { spacing_in: 40, no_edge_span_in: 32, live_psf: 30, total_psf: 40, live_by_spacing: { 16: 275, 20: 195, 24: 120, 32: 60, 40: 30 } }, floor: { spacing_in: 20, total_psf: 100 } },
+  "48/24": { roof: { spacing_in: 48, no_edge_span_in: 36, live_psf: 30, total_psf: 40, live_by_spacing: { 20: 270, 24: 175, 32: 95, 40: 45, 48: 30 } }, floor: { spacing_in: 24, total_psf: 100 } },
 };
 
-// dims: in { span_rating: dimensionless, panel_thickness_in: L, application: dimensionless, support_spacing_in: L, live_load_psf: M L^-1 T^-2, dead_load_psf: M L^-1 T^-2 } out: { max_span_in: L, deflection_in: L }
+// dims: in { span_rating: dimensionless, panel_thickness_in: L, application: dimensionless, support_spacing_in: L, live_load_psf: M L^-1 T^-2, dead_load_psf: M L^-1 T^-2, edge_support: dimensionless } out: { max_span_in: L, deflection_in: L }
 export function computePlywoodSpan({
   span_rating = "24/16", panel_thickness_in = 0,
   application = "roof", support_spacing_in = 0,
-  live_load_psf = 0, dead_load_psf = 0,
+  live_load_psf = 0, dead_load_psf = 0, edge_support = "yes",
 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   panel_thickness_in = Number(panel_thickness_in);
@@ -2435,15 +2441,26 @@ export function computePlywoodSpan({
   const branch = rating[application];
   if (!branch) return { error: "This rating does not apply to '" + application + "'." };
   if (!(support_spacing_in > 0)) return { error: "Support spacing must be positive." };
-  const spacing_pass = support_spacing_in <= branch.spacing_in;
+  const edge = edge_support !== false && edge_support !== "no";
+  // Roof: the span limit depends on edge support, and the live load on the
+  // actual spacing (the next tabulated spacing at or above it).
+  const max_span_in = branch.no_edge_span_in !== undefined && !edge ? branch.no_edge_span_in : branch.spacing_in;
+  const spacing_pass = support_spacing_in <= max_span_in;
+  let allow_live = branch.live_psf;
+  let allow_total = branch.total_psf;
+  if (branch.live_by_spacing) {
+    const col = Object.keys(branch.live_by_spacing).map(Number).sort((a, b) => a - b).find((c) => c >= support_spacing_in);
+    if (col !== undefined) { allow_live = branch.live_by_spacing[col]; allow_total = allow_live + 10; }
+  }
   let live_pass = true;
-  if (branch.live_psf !== undefined) live_pass = live_load_psf <= branch.live_psf;
-  const total_pass = (live_load_psf + dead_load_psf) <= branch.total_psf;
+  if (allow_live !== undefined) live_pass = live_load_psf <= allow_live;
+  const total_pass = (live_load_psf + dead_load_psf) <= allow_total;
   return {
     span_rating, application,
-    allowable_spacing_in: branch.spacing_in,
-    allowable_live_psf: branch.live_psf || null,
-    allowable_total_psf: branch.total_psf,
+    allowable_spacing_in: max_span_in,
+    edge_support: edge,
+    allowable_live_psf: allow_live || null,
+    allowable_total_psf: allow_total,
     panel_thickness_in,
     spacing_pass, live_pass, total_pass,
     pass: spacing_pass && live_pass && total_pass,
@@ -2661,7 +2678,7 @@ function _v7c_renderRebarSchedule(inputRegion, outputRegion, citationEl) {
 }
 
 function _v7c_renderPlywoodSpan(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: APA span-rating tables (data/construction/apa-span-ratings.json) cited by APA name only. AHJ governs.";
+  citationEl.textContent = "Citation: APA Engineered Wood Construction Guide (E30), Table 33 for roofs: maximum span with and without edge support, and allowable live load by support spacing with 10 psf dead load assumed. AHJ governs.";
   _v7c_attachEx(inputRegion, () => fillExample(plywoodSpanExample.inputs));
   const sr = _v7c_makeSelect("Span rating", "py-sr", Object.keys(APA_SPAN_RATINGS).map((k) => ({ value: k, label: k })));
   const t = _v7c_makeNumber("Panel thickness (in)", "py-t", { step: "any", min: "0" });
@@ -2669,7 +2686,8 @@ function _v7c_renderPlywoodSpan(inputRegion, outputRegion, citationEl) {
   const sp = _v7c_makeNumber("Support spacing (in)", "py-sp", { step: "any", min: "0" });
   const ll = _v7c_makeNumber("Live load (psf)", "py-ll", { step: "any", min: "0" });
   const dl = _v7c_makeNumber("Dead load (psf)", "py-dl", { step: "any", min: "0" });
-  for (const f of [sr, t, app, sp, ll, dl]) inputRegion.appendChild(f.wrap);
+  const eg = _v7c_makeSelect("Roof panel edge support (clips, blocking, or T&G)", "py-eg", [{ value: "yes", label: "Yes" }, { value: "no", label: "No" }]);
+  for (const f of [sr, t, app, sp, ll, dl, eg]) inputRegion.appendChild(f.wrap);
   const oS = _v7c_makeOut(outputRegion, "Allowable spacing", "py-out-s");
   const oL = _v7c_makeOut(outputRegion, "Allowable live", "py-out-l");
   const oTL = _v7c_makeOut(outputRegion, "Allowable total", "py-out-tl");
@@ -2680,6 +2698,7 @@ function _v7c_renderPlywoodSpan(inputRegion, outputRegion, citationEl) {
       span_rating: sr.select.value, panel_thickness_in: Number(t.input.value) || 0,
       application: app.select.value, support_spacing_in: Number(sp.input.value) || 0,
       live_load_psf: Number(ll.input.value) || 0, dead_load_psf: Number(dl.input.value) || 0,
+      edge_support: eg.select.value,
     });
     if (r.error) { oS.textContent = r.error; oL.textContent = "-"; oTL.textContent = "-"; oP.textContent = "-"; return; }
     oS.textContent = r.allowable_spacing_in + " in OC";
@@ -2687,7 +2706,7 @@ function _v7c_renderPlywoodSpan(inputRegion, outputRegion, citationEl) {
     oTL.textContent = r.allowable_total_psf + " psf";
     oP.textContent = r.pass ? "PASS" : "FAIL (spacing " + (r.spacing_pass ? "OK" : "X") + " / live " + (r.live_pass ? "OK" : "X") + " / total " + (r.total_pass ? "OK" : "X") + ")";
   }, _V7C_DEB);
-  for (const f of [sr.select, t.input, app.select, sp.input, ll.input, dl.input]) f.addEventListener("input", update);
+  for (const f of [sr.select, t.input, app.select, sp.input, ll.input, dl.input, eg.select]) f.addEventListener("input", update);
 }
 
 function _v7c_renderHelicalPile(inputRegion, outputRegion, citationEl) {

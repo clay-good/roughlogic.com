@@ -138,3 +138,18 @@ test("Vehicle: gross = front + rear", () => { const r = computeVehicleLoad(vehic
 test("Vehicle: payload + curb totals match gross", () => { const r = computeVehicleLoad({ wheelbase_in: 140, payload_lb: 1000, payload_position_from_cab_in: 70, gvwr_lb: null, front_gawr_lb: null, rear_gawr_lb: null, curb_front_lb: 3000, curb_rear_lb: 2000 }); assert.equal(r.gross_lb, 6000); });
 test("Vehicle: no flags when under all limits", () => { const r = computeVehicleLoad({ wheelbase_in: 140, payload_lb: 100, payload_position_from_cab_in: 70, gvwr_lb: 9500, front_gawr_lb: 4500, rear_gawr_lb: 6200, curb_front_lb: 3200, curb_rear_lb: 2400 }); assert.equal(r.flags.over_gvwr, false); assert.equal(r.flags.over_front_gawr, false); assert.equal(r.flags.over_rear_gawr, false); });
 test("Vehicle: front + rear payload = total payload", () => { const r = computeVehicleLoad({ wheelbase_in: 140, payload_lb: 1500, payload_position_from_cab_in: 84, gvwr_lb: null, front_gawr_lb: null, rear_gawr_lb: null, curb_front_lb: 0, curb_rear_lb: 0 }); assert.ok(close(r.front_axle_lb + r.rear_axle_lb, 1500, 0.001)); });
+
+test("NIOSH lifting: frequency multiplier is NIOSH 94-110 Table 5, by duration and V", async () => {
+  const { computeNIOSHLifting } = await import("../../calc-cross.js");
+  const fm = (f, d, v) => computeNIOSHLifting({ weight_lb: 30, H_in: 12, V_in: v, D_in: 20, asymmetry_deg: 0, coupling: "good", frequency_per_min: f, duration_hr: d }).multipliers.FM;
+  // Rows the old four-step approximation got wrong (the unsafe direction).
+  assert.equal(fm(0.2, 8, 20), 0.85); // was 1.00
+  assert.equal(fm(4, 8, 20), 0.45); // was 0.55
+  assert.equal(fm(9, 2, 20), 0.30); // was 0.45
+  // The V split only bites at high frequency.
+  assert.equal(fm(9, 8, 20), 0.00);
+  assert.equal(fm(9, 8, 35), 0.15);
+  // Between rows, the next higher frequency governs.
+  assert.equal(fm(1.5, 1, 30), 0.91);
+  assert.equal(fm(20, 1, 30), 0);
+});

@@ -10,6 +10,11 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **Four capacities that read high against their own sources (all in the unsafe direction).**
+  - `bolt-proof-load` gave every diameter the smallest-size row of SAE J429. The standard steps the strength down with size: Grade 2 is 33/36/60 ksi over 3/4 in, and Grade 5 is 74/81/105 ksi over 1 in. A 1-8 Grade 2 bolt showed 67% more proof load than it has, and a 1-1/4 Grade 5 showed 15% more. Diameters above J429's 1-1/2 in now return an error.
+  - `niosh-lifting` used a four-step approximation of the frequency multiplier. It is now NIOSH 94-110 Table 5 in full, by lifts per minute, duration and V below 30 in or at/above it. The old steps gave FM 1.00 at 0.2 lifts/min over an 8 h shift (the table says 0.85), 0.55 at 4/min for 8 h (0.45) and 0.45 at 9/min for 2 h (0.30), so the recommended weight limit read up to 50% high.
+  - `sacrificial-anode-life` credited aluminum anodes with 1,150 A·h/lb, a near-theoretical lab figure. DNV-RP-B401 Table 10-6 gives the design value, 2,000 A·h/kg (907 A·h/lb), and says lab data "shall not replace" it. Aluminum anode life had read 27% long.
+  - `plywood-span` (roof) kept only the live load at the maximum span and ignored edge support. It now carries APA E30 Table 33: the live load at each support spacing, 10 psf dead assumed, and the maximum span with and without clips, blocking or T&G. A 48/24 panel at 48 in with no edge support had passed; APA stops it at 36 in. The 48/24 live load at 48 in is 30 psf, not the 25 the tile held.
 - **Five electrical tables checked against their sources.**
   - `grounding-grid-conductor`: the bolted-copper Kf was 11.5, which is in no row of IEEE 80 Table 2. The 250°C hard-drawn row is 11.78, so a 4/0 conductor passed an 18 kA, 1 s fault it is 0.4 kcmil short for (unsafe). Steel was 15.9 where the table gives 15.95. Copper-clad steel had one value where the table has three: 40% wire 10.45, 30% wire 12.06 and 20% rod 14.64, now three options.
   - `fiber-loss-budget` / `fiber-max-length`: single-mode prefilled 0.4 / 0.3 dB/km, cable-spec values found in no TIA row. TIA-568 caps premises single-mode at 1.0 and outside plant at 0.5, so a 2 km inside link was budgeted 0.8 dB instead of 2.0 (unsafe). Both are now options.

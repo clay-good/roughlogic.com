@@ -278,3 +278,14 @@ test("CONSTRUCTION_RENDERERS exposes the 6 v7 ids", () => {
     assert.equal(typeof CONSTRUCTION_RENDERERS[id], "function", id + " should have a renderer");
   }
 });
+
+test("249 roof spans follow APA E30 Table 33, including the no-edge-support span", () => {
+  const f = (o) => computePlywoodSpan({ application: "roof", dead_load_psf: 10, ...o });
+  // 48/24 at 48 in carries 30 psf live (the tile said 25 until 2026-09-24).
+  assert.equal(f({ span_rating: "48/24", support_spacing_in: 48, live_load_psf: 30 }).pass, true);
+  // Without clips, blocking, or T&G, 48/24 stops at 36 in.
+  assert.equal(f({ span_rating: "48/24", support_spacing_in: 48, live_load_psf: 30, edge_support: false }).spacing_pass, false);
+  assert.equal(f({ span_rating: "48/24", support_spacing_in: 36, live_load_psf: 30, edge_support: false }).spacing_pass, true);
+  // Live load is read at the actual spacing: 32/16 at 16 in allows 165 psf.
+  assert.equal(f({ span_rating: "32/16", support_spacing_in: 16, live_load_psf: 100 }).allowable_live_psf, 165);
+});

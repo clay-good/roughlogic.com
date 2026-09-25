@@ -652,7 +652,7 @@ export const BESPOKE_LABELS = {
   "pivot-timer-depth": {"system_flow_gpm":"System flow Q (gpm)","area_acres":"Irrigated area (acres)","revolution_100_hr":"Revolution time at 100% timer (hr)","timer_pct":"End-tower timer setting (%)"},
   "plain-bearing-pressure-pv": {"radial_load_lbf":"Radial load W (lbf)","journal_diameter_in":"Journal diameter D (in)","bearing_length_in":"Bearing length L (in)","speed_rpm":"Shaft speed (rpm)"},
   "plate-cost": {"target_food_cost_pct":"Target food cost (%)"},
-  "plywood-span": {"span_rating":"Span rating","panel_thickness_in":"Panel thickness (in)","application":"Application","support_spacing_in":"Support spacing (in)","live_load_psf":"Live load (psf)","dead_load_psf":"Dead load (psf)"},
+  "plywood-span": {"span_rating":"Span rating","panel_thickness_in":"Panel thickness (in)","application":"Application","support_spacing_in":"Support spacing (in)","live_load_psf":"Live load (psf)","dead_load_psf":"Dead load (psf)","edge_support":"Roof panel edge support (clips, blocking, or T&G)"},
   "pmi-cancellation-date": {"value":"Original property value ($)","loan":"Original loan amount ($)","rate_pct":"Interest rate (% APR)","term_months":"Term (months)"},
   "poe-budget": {"poe_class":"PoE class","category":"Cable category","run_length_ft":"Run length (ft)","ambient_C":"Ambient temp (°C)"},
   "point-load-bearing": {"load_lb":"Reaction load (lb)","width_in":"Member bearing width (in)","fc_perp_psi":"Allowable Fc-perp (psi)","cb":"Bearing-area factor Cb","provided_length_in":"Provided bearing length (in, optional)"},

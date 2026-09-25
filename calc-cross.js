@@ -1176,6 +1176,20 @@ export const trenchSlopeExample = { inputs: { depth_ft: 8, soil_class: "B", surc
 export const NIOSH_COUPLING = { good: 1.0, fair: 0.95, poor: 0.90 };
 export const NIOSH_LC_LB = 51;
 
+// NIOSH Applications Manual for the Revised Lifting Equation (94-110), Table 5:
+// [F lifts/min, [<=1 h V<30, <=1 h V>=30, <=2 h V<30, <=2 h V>=30, <=8 h V<30, <=8 h V>=30]].
+const NIOSH_FM_TABLE = [
+  [0.2, [1.00, 1.00, 0.95, 0.95, 0.85, 0.85]], [0.5, [0.97, 0.97, 0.92, 0.92, 0.81, 0.81]],
+  [1, [0.94, 0.94, 0.88, 0.88, 0.75, 0.75]], [2, [0.91, 0.91, 0.84, 0.84, 0.65, 0.65]],
+  [3, [0.88, 0.88, 0.79, 0.79, 0.55, 0.55]], [4, [0.84, 0.84, 0.72, 0.72, 0.45, 0.45]],
+  [5, [0.80, 0.80, 0.60, 0.60, 0.35, 0.35]], [6, [0.75, 0.75, 0.50, 0.50, 0.27, 0.27]],
+  [7, [0.70, 0.70, 0.42, 0.42, 0.22, 0.22]], [8, [0.60, 0.60, 0.35, 0.35, 0.18, 0.18]],
+  [9, [0.52, 0.52, 0.30, 0.30, 0.00, 0.15]], [10, [0.45, 0.45, 0.26, 0.26, 0.00, 0.13]],
+  [11, [0.41, 0.41, 0.00, 0.23, 0.00, 0.00]], [12, [0.37, 0.37, 0.00, 0.21, 0.00, 0.00]],
+  [13, [0.00, 0.34, 0.00, 0.00, 0.00, 0.00]], [14, [0.00, 0.31, 0.00, 0.00, 0.00, 0.00]],
+  [15, [0.00, 0.28, 0.00, 0.00, 0.00, 0.00]],
+];
+
 // dims: in { load_lb: M, h_in: L, v_in: L, d_in: L, a_deg: dimensionless, f: T^-1, c: dimensionless } out: { rwl_lb: M, li: dimensionless }
 export function computeNIOSHLifting({
   weight_lb = 0, H_in = 10, V_in = 30, D_in = 0,
@@ -1200,13 +1214,14 @@ export function computeNIOSHLifting({
   // non-physical DM > 1, overstating the RWL in the unsafe direction.
   const DM = D_in <= 10 ? 1 : D_in > 70 ? 0 : 0.82 + 1.8 / D_in;
   const AM = 1 - 0.0032 * asymmetry_deg;
-  // Frequency multiplier (very rough piecewise). Public NIOSH FM-table approximation:
-  let FM;
-  if (frequency_per_min <= 0.2) FM = 1.0;
-  else if (frequency_per_min <= 1) FM = duration_hr <= 1 ? 0.94 : (duration_hr <= 2 ? 0.88 : 0.75);
-  else if (frequency_per_min <= 4) FM = duration_hr <= 1 ? 0.84 : (duration_hr <= 2 ? 0.72 : 0.55);
-  else if (frequency_per_min <= 9) FM = duration_hr <= 1 ? 0.52 : (duration_hr <= 2 ? 0.45 : 0.27);
-  else FM = 0.0;
+  // Frequency multiplier: NIOSH 94-110 Table 5, read by duration band and by
+  // V < 30 / V >= 30 in; a frequency between rows takes the next higher row.
+  // Until 2026-09-24 this was a four-step approximation that gave 1.00 at
+  // F <= 0.2 for any duration (the table is .85 over 2-8 h) and ran up to 50%
+  // high at 9 lifts/min, 2 h -- the unsafe direction for a limit.
+  const col = (duration_hr <= 1 ? 0 : duration_hr <= 2 ? 2 : 4) + (V_in >= 30 ? 1 : 0);
+  const fmRow = NIOSH_FM_TABLE.find((r) => frequency_per_min <= r[0]);
+  const FM = fmRow ? fmRow[1][col] : 0;
   const RWL = NIOSH_LC_LB * HM * VM * DM * AM * FM * cm;
   const LI = weight_lb > 0 && RWL > 0 ? weight_lb / RWL : null;
   return { RWL_lb: RWL, LI, multipliers: { HM, VM, DM, AM, FM, CM: cm } };
@@ -1560,7 +1575,7 @@ const renderTrenchSlope = _simpleRendererG({
 });
 
 const renderNIOSHLifting = _simpleRendererG({
-  citation: "Citation: NIOSH 1991 Lifting Equation by publication name. RWL = LC * HM * VM * DM * AM * FM * CM.",
+  citation: "Citation: NIOSH 1991 Lifting Equation, Applications Manual (DHHS/NIOSH 94-110). RWL = LC * HM * VM * DM * AM * FM * CM; FM from Table 5 by lifts per minute, work duration, and V below or at/above 30 in (a frequency between rows takes the next higher row).",
   example: nioshLiftingExample.inputs,
   fields: [
     { key: "weight_lb", label: "Load weight (lb)", kind: "number" },
@@ -2962,10 +2977,18 @@ export function computeBoltProofLoad({ nominal_diameter_in = 0, threads_per_inch
   if (!(d > 0)) return { error: "Nominal diameter must be positive (in)." };
   if (!(n > 0)) return { error: "Threads per inch must be positive." };
   if (!g) return { error: "Grade must be SAE 2, 5, or 8 (A325 = 5, A490 = 8)." };
+  if (d > 1.5) return { error: "SAE J429 covers 1/4 to 1-1/2 in; above that, use the fastener's own specification." };
+  // J429's strengths step DOWN with diameter: Grade 2 is 33/36/60 ksi over 3/4
+  // in, Grade 5 (and A325) 74/81/105 ksi over 1 in. Until 2026-09-24 every
+  // size took the small-size row, so a 1-8 Grade 2 bolt showed 67% more proof
+  // load than it has, and a 1-1/4 Grade 5 15% more.
+  const s = String(grade) === "2" && d > 0.75 ? { proof: 33000, yld: 36000, tensile: 60000 }
+    : String(grade) === "5" && d > 1.0 ? { proof: 74000, yld: 81000, tensile: 105000 }
+    : g;
   const at_in2 = 0.7854 * Math.pow(d - 0.9743 / n, 2);
-  const proof_load_lb = at_in2 * g.proof;
-  const yield_load_lb = at_in2 * g.yld;
-  const tensile_load_lb = at_in2 * g.tensile;
+  const proof_load_lb = at_in2 * s.proof;
+  const yield_load_lb = at_in2 * s.yld;
+  const tensile_load_lb = at_in2 * s.tensile;
   const rec_clamp_lb = 0.75 * proof_load_lb;
   if (![at_in2, proof_load_lb, yield_load_lb, tensile_load_lb, rec_clamp_lb].every(Number.isFinite)) return { error: "Bolt-load math is not a finite value." };
   return {
@@ -2975,7 +2998,7 @@ export function computeBoltProofLoad({ nominal_diameter_in = 0, threads_per_inch
 }
 export const boltProofLoadExample = { inputs: { nominal_diameter_in: 0.5, threads_per_inch: 13, grade: "5" } };
 function renderBoltProofLoad(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: SAE J429 inch-series bolt strength (ASME B1.1 tensile stress area): At = 0.7854 x (D - 0.9743/n)^2; proof / yield / tensile load = At x the grade strength (Grade 2: 55/57/74 ksi; Grade 5 / A325: 85/92/120; Grade 8 / A490: 120/130/150); recommended clamp = 75% of proof. The grade is read from the head markings. A design aid; the joint design and torque method govern.";
+  citationEl.textContent = "Citation: SAE J429 inch-series bolt strength (ASME B1.1 tensile stress area): At = 0.7854 x (D - 0.9743/n)^2; proof / yield / tensile load = At x the grade strength (Grade 2: 55/57/74 ksi through 3/4 in, 33/36/60 over 3/4 to 1-1/2 in; Grade 5 / A325: 85/92/120 through 1 in, 74/81/105 over 1 in; Grade 8 / A490: 120/130/150 through 1-1/2 in); recommended clamp = 75% of proof. The grade is read from the head markings. A design aid; the joint design and torque method govern.";
   const d = makeNumber("Nominal (major) diameter D (in)", "bpl-d", { step: "any", min: "0" });
   const n = makeNumber("Threads per inch (TPI)", "bpl-n", { step: "any", min: "0" });
   const grade = makeSelect("SAE grade", "bpl-grade", [

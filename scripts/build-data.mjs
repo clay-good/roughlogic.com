@@ -1043,13 +1043,13 @@ const REBAR_UNIT_WEIGHTS_DATA = {
 
 const APA_SPAN_RATINGS_DATA = {
   source: "APA - The Engineered Wood Association published span-rating tables. Cited by APA name only. Numeric load tables redistributed under APA's technical-bulletin reuse policy.",
-  description: "Allowable uniform load (psf) by span-rating, application (roof or floor), and support spacing.",
+  description: "Allowable uniform load (psf) by span-rating, application (roof or floor), and support spacing. Roof rows: APA E30 Table 33 (max span with / without edge support; live load by support spacing, 10 psf dead assumed).",
   ratings: {
-    "24/0":  { roof: { spacing_in: 24, live_psf: 30, total_psf: 40 }, floor: null },
-    "24/16": { roof: { spacing_in: 24, live_psf: 40, total_psf: 50 }, floor: { spacing_in: 16, total_psf: 100 } },
-    "32/16": { roof: { spacing_in: 32, live_psf: 30, total_psf: 40 }, floor: { spacing_in: 16, total_psf: 100 } },
-    "40/20": { roof: { spacing_in: 40, live_psf: 30, total_psf: 40 }, floor: { spacing_in: 20, total_psf: 100 } },
-    "48/24": { roof: { spacing_in: 48, live_psf: 25, total_psf: 35 }, floor: { spacing_in: 24, total_psf: 100 } },
+    "24/0":  { roof: { spacing_in: 24, no_edge_span_in: 19.2, live_psf: 30, total_psf: 40, live_by_spacing: { 12: 190, 16: 100, 20: 60, 24: 30 } }, floor: null },
+    "24/16": { roof: { spacing_in: 24, no_edge_span_in: 24, live_psf: 40, total_psf: 50, live_by_spacing: { 12: 190, 16: 100, 20: 65, 24: 40 } }, floor: { spacing_in: 16, total_psf: 100 } },
+    "32/16": { roof: { spacing_in: 32, no_edge_span_in: 28, live_psf: 30, total_psf: 40, live_by_spacing: { 12: 300, 16: 165, 20: 110, 24: 65, 32: 30 } }, floor: { spacing_in: 16, total_psf: 100 } },
+    "40/20": { roof: { spacing_in: 40, no_edge_span_in: 32, live_psf: 30, total_psf: 40, live_by_spacing: { 16: 275, 20: 195, 24: 120, 32: 60, 40: 30 } }, floor: { spacing_in: 20, total_psf: 100 } },
+    "48/24": { roof: { spacing_in: 48, no_edge_span_in: 36, live_psf: 30, total_psf: 40, live_by_spacing: { 20: 270, 24: 175, 32: 95, 40: 45, 48: 30 } }, floor: { spacing_in: 24, total_psf: 100 } },
   },
 };
 

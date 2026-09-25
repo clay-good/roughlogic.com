@@ -3428,8 +3428,13 @@ MECHANIC_RENDERERS["reserve-capacity-amp-hours"] = _simpleRenderer({
 
 // ===================== spec-v786: sacrificial (galvanic) anode service life =====================
 // Faraday's law: an anode's life = the charge it can deliver / the charge it consumes per year.
-// Q (electrochemical capacity, A-h per lb): zinc 354, aluminum (Al-Zn-In) 1150, magnesium 500.
-const _ANODE_CAPACITY_AH_PER_LB = { zinc: 354, aluminum: 1150, magnesium: 500 };
+// Q (electrochemical capacity, A-h per lb): DNV-RP-B401 Table 10-6 design
+// values in seawater -- zinc 780 A-h/kg (354 per lb), Al-based 2,000 A-h/kg
+// (907 per lb). Until 2026-09-24 aluminum was 1,150 per lb (2,535 per kg),
+// the near-theoretical lab figure the RP says "shall not replace" the design
+// value, so an aluminum anode's life read 27% long. Magnesium is not in that
+// table; 500 per lb is the common design figure (about 50% efficiency).
+const _ANODE_CAPACITY_AH_PER_LB = { zinc: 354, aluminum: 907, magnesium: 500 };
 // dims: in { anode_material: dimensionless, anode_mass_lb: M, current_draw_a: I, utilization_factor: dimensionless } out: { life_years: T, life_months: T, consumption_lb_per_year: M T^-1 }
 export function computeSacrificialAnodeLife({ anode_material = "zinc", anode_mass_lb = 0, current_draw_a = 0, utilization_factor = 0.85 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
@@ -3448,13 +3453,13 @@ export function computeSacrificialAnodeLife({ anode_material = "zinc", anode_mas
   if (![life_years, consumption_lb_per_year].every(Number.isFinite)) return { error: "Anode-life math is not a finite value." };
   return {
     life_years, life_months, consumption_lb_per_year, capacity, material: anode_material,
-    note: "Sacrificial-anode life by Faraday's law: the charge an anode can deliver (net mass x electrochemical capacity x utilization) divided by the charge the protective current draws per year (current x 8760 h). Electrochemical capacity is a material property -- zinc about 354 A-h/lb, aluminum (Al-Zn-In alloy) about 1150, magnesium about 500 -- so an aluminum anode of equal mass lasts far longer per amp and is why aluminum has largely replaced zinc on modern boats (it also works in brackish water, where zinc passivates). The utilization factor (about 0.85 for a slender standoff anode) accounts for the anode becoming ineffective before it is fully consumed. The protective current itself depends on the wetted area, coating, and water, so measure it with a reference electrode or a bonding-system meter. Replace an anode at about half consumed, not when it is gone. A planning estimate; a corrosion survey and the reference-cell reading govern.",
+    note: "Sacrificial-anode life by Faraday's law: the charge an anode can deliver (net mass x electrochemical capacity x utilization) divided by the charge the protective current draws per year (current x 8760 h). Electrochemical capacity is a material property -- zinc about 354 A-h/lb, aluminum (Al-Zn-In alloy) 907 (DNV-RP-B401 design value, 2,000 A-h/kg), magnesium about 500 -- so an aluminum anode of equal mass lasts far longer per amp and is why aluminum has largely replaced zinc on modern boats (it also works in brackish water, where zinc passivates). The utilization factor (about 0.85 for a slender standoff anode) accounts for the anode becoming ineffective before it is fully consumed. The protective current itself depends on the wetted area, coating, and water, so measure it with a reference electrode or a bonding-system meter. Replace an anode at about half consumed, not when it is gone. A planning estimate; a corrosion survey and the reference-cell reading govern.",
   };
 }
 export const sacrificialAnodeLifeExample = { inputs: { anode_material: "zinc", anode_mass_lb: 5, current_draw_a: 0.15, utilization_factor: 0.85 } };
 
 MECHANIC_RENDERERS["sacrificial-anode-life"] = _simpleRenderer({
-  citation: "Citation: sacrificial-anode life by Faraday's law (ABYC E-2 cathodic protection; DNV-RP-B401 capacities): life = anode_mass x capacity x utilization / (current x 8760 h). Electrochemical capacity ~354 A-h/lb zinc, ~1150 aluminum (Al-Zn-In), ~500 magnesium; utilization ~0.85 for a standoff anode. The protective current depends on wetted area, coating, and water; measure it with a reference electrode. Replace at about half consumed. A planning estimate; a corrosion survey governs.",
+  citation: "Citation: sacrificial-anode life by Faraday's law (ABYC E-2 cathodic protection; DNV-RP-B401 capacities): life = anode_mass x capacity x utilization / (current x 8760 h). Electrochemical capacity 354 A-h/lb zinc and 907 aluminum (DNV-RP-B401 Table 10-6 seawater design values), ~500 magnesium; utilization ~0.85 for a standoff anode. The protective current depends on wetted area, coating, and water; measure it with a reference electrode. Replace at about half consumed. A planning estimate; a corrosion survey governs.",
   example: sacrificialAnodeLifeExample.inputs,
   fields: [
     { key: "anode_material", label: "Anode material", kind: "select", options: [{ value: "zinc", label: "Zinc (~354 A-h/lb)" }, { value: "aluminum", label: "Aluminum Al-Zn-In (~1150 A-h/lb)" }, { value: "magnesium", label: "Magnesium (~500 A-h/lb)" }] },

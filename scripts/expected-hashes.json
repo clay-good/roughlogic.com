@@ -59,9 +59,9 @@
     "construction/sfm-table.json": "c91bd6e512ce9cf5b6a78477ae1ccb6f30be08424a0f6cbff7f8a78441dff921",
     "construction/aws-deposition.json": "fdd589d4fdb12ee4de93b5cdecff5f140a22a9a2dd8f14f15be41c111dd83360",
     "construction/rebar-unit-weights.json": "aa9d90af63d3d735986b52af4d5a7ae3f50d1db89de02b5e22c0cba22f0ecc35",
-    "construction/apa-span-ratings.json": "6ce521275c75bc85dc3f1f0cd225d48095e988963effab76a571b2d87ace1d47",
+    "construction/apa-span-ratings.json": "2fc73082e7a4068250c74664df666fef56aa7ed65c74687cab7d7c81c5c087be",
     "construction/helical-pile-kt.json": "dbc1a7421f3ced6964933569faf525bf4e6f93ae57e4ef3f30c35cc52b32c7a8",
-    "construction/manifest.json": "ba01eedb9f76ad208990ca8fc0ffad76e90810b467f1d1828f07ac4c1b990246",
+    "construction/manifest.json": "26e5b5e2c98987e022966b889fcc56c61f90dd97d1dfca70069377ea1684dae9",
     "fire/hose-friction.json": "61ea899b59206ed16946e9627de0a0ef2c77fccbb1673bdbe25d9a7145014a41",
     "fire/fire-flow-formulas.json": "b2b4a1de0eb34f5174bfb0f9ef00aaa2337b62c383f2cf756ff61d34898455ea",
     "fire/iso-nff.json": "b2ca30cd7a44da3b5e07b9796ba3c90ad12dc6ae60addc362e4492993bc5a002",
@@ -118,7 +118,7 @@
     "realestate/loan-limits.json": "b9b390e0dc8345486794602c813518b826495d5d0a4747c57965e8caa3efba5d",
     "realestate/hud-fmr.json": "c44f8a9cd37c2f250c29963b4be38d4bd64a1e0c391601dc513564df6ca5efc6",
     "realestate/manifest.json": "d109d6e0fca82908cd59260c7d8ff065b96c7c95cccb281bdfd0b4c584e08d7a",
-    "fields/manifest.json": "4dd7ed0350617dfa4813399b372abf7acac0bd35e292e7952bc3ed3169730d73",
+    "fields/manifest.json": "2867a0b1bb0775b5d54825e18eae85b6f2818a7f6ec1ae726ff9b55edbd5c14c",
     "search/manifest.json": "244bee9aa47c52b3248a84907a0b5acf73268020640e1a5eb85be69531527f5a"
   }
 }

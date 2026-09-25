@@ -23811,6 +23811,14 @@ test("bounds: spec-v503 computeBoltProofLoad pins the stress area, the grade loa
   assert.ok("error" in _v503({ nominal_diameter_in: 0, threads_per_inch: 13, grade: "5" }));
   assert.ok("error" in _v503({ nominal_diameter_in: 0.5, threads_per_inch: 0, grade: "5" }));
   assert.ok("error" in _v503({ nominal_diameter_in: 0.5, threads_per_inch: 13, grade: "10" }));
+  // J429 steps the strength down with size (portlandbolt.com J429 table):
+  // Grade 2 over 3/4 in is 33 ksi proof; Grade 5 over 1 in is 74 ksi.
+  const g2big = _v503({ nominal_diameter_in: 1, threads_per_inch: 8, grade: "2" });
+  assert.ok(Math.abs(g2big.proof_load_lb - g2big.at_in2 * 33000) < 1e-6 && Math.abs(g2big.tensile_load_lb - g2big.at_in2 * 60000) < 1e-6);
+  const g5big = _v503({ nominal_diameter_in: 1.25, threads_per_inch: 7, grade: "5" });
+  assert.ok(Math.abs(g5big.proof_load_lb - g5big.at_in2 * 74000) < 1e-6);
+  assert.ok(Math.abs(_v503({ nominal_diameter_in: 1, threads_per_inch: 8, grade: "5" }).proof_load_lb - 0.6057 * 85000) < 50); // 1 in is still the small row
+  assert.ok("error" in _v503({ nominal_diameter_in: 1.75, threads_per_inch: 5, grade: "5" }));
 });
 
 import { computeBearingL10Life as _v504, computeBearingMaxLoad as _v672 } from "../../calc-machining.js";
@@ -25359,6 +25367,9 @@ test("bounds: spec-v786 computeSacrificialAnodeLife pins Faraday's-law life, mat
   // Aluminum of equal mass lasts far longer per amp (higher capacity); more current shortens life.
   const alum = _v786({ anode_material: "aluminum", anode_mass_lb: 5, current_draw_a: 0.15, utilization_factor: 0.85 });
   assert.ok(alum.life_years > r.life_years);
+  // DNV-RP-B401 Table 10-6: Al-based 2,000 A-h/kg = 907 A-h/lb (was 1,150, the lab figure the RP rejects).
+  assert.strictEqual(alum.capacity, 907);
+  assert.ok(Math.abs(alum.life_years - 5 * 907 * 0.85 / (0.15 * 8760)) < 1e-9);
   assert.ok(_v786({ anode_material: "zinc", anode_mass_lb: 5, current_draw_a: 0.30, utilization_factor: 0.85 }).life_years < r.life_years);
   // Error seams: bad material, non-finite, non-positive mass/current, utilization out of (0,1].
   assert.ok("error" in _v786({ anode_material: "titanium", anode_mass_lb: 5, current_draw_a: 0.15 }));
