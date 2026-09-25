@@ -60,6 +60,14 @@ test("irrigation-requirement: higher efficiency lowers the gross depth", () => {
   assert.ok(flood.gross_in > drip.gross_in);
 });
 
+test("irrigation-requirement: Kc values are FAO 56 Table 12 mid-season figures", () => {
+  // Read at fao.org 2026-09-24. Cotton is listed 1.15-1.20; pasture (rotated) 0.85-1.05.
+  assert.deepEqual(FAO56_CROP_KC, {
+    alfalfa: 0.95, alfalfa_cutting: 1.20, corn: 1.20, cotton: 1.15, wheat: 1.15,
+    pasture: 0.95, turfgrass: 0.95, turfgrass_warm: 0.85, vegetables: 1.05,
+  });
+});
+
 test("irrigation-requirement: every bundled crop carries a Kc in the 0.2-1.4 range", () => {
   for (const [crop, kc] of Object.entries(FAO56_CROP_KC)) {
     assert.ok(kc >= 0.2 && kc <= 1.4, crop + " Kc out of range");

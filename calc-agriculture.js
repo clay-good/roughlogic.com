@@ -877,14 +877,25 @@ function renderSprayerCalibration(inputRegion, outputRegion, citationEl) {
 // 56 (Allen et al. 1998) Table 12. Representative single-value mid-season
 // Kc; the full FAO 56 method varies Kc by growth stage. The reference ET
 // (ET0) is user-supplied from the local CIMIS / Mesonet / NOAA station.
+// Until 2026-09-24 alfalfa read 1.15, which Table 12 does not list (0.95
+// averaged over cuttings, 1.20 within one), and turfgrass 0.80, below both
+// the cool-season 0.95 and the warm-season 0.85 -- a cool-season lawn was
+// scheduled 16% short.
 export const FAO56_CROP_KC = {
-  alfalfa: 1.15,
+  alfalfa: 0.95,
+  alfalfa_cutting: 1.20,
   corn: 1.20,
   cotton: 1.15,
   wheat: 1.15,
   pasture: 0.95,
-  turfgrass: 0.80,
+  turfgrass: 0.95,
+  turfgrass_warm: 0.85,
   vegetables: 1.05,
+};
+const FAO56_CROP_LABELS = {
+  alfalfa: "Alfalfa hay, season average", alfalfa_cutting: "Alfalfa hay, within one cutting",
+  corn: "Corn (field, grain)", cotton: "Cotton", wheat: "Wheat", pasture: "Pasture (rotated grazing)",
+  turfgrass: "Turfgrass, cool season", turfgrass_warm: "Turfgrass, warm season", vegetables: "Small vegetables",
 };
 
 // Application efficiency by irrigation method (NRCS Irrigation Guide).
@@ -955,7 +966,7 @@ export const irrigationRequirementExample = {
 
 function renderIrrigationRequirement(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Per FAO Irrigation and Drainage Paper 56 (Crop Evapotranspiration, Allen et al. 1998) and the USDA NRCS Irrigation Guide. ET_crop = Kc x ET0 x days; gross = max(0, ET_crop - rainfall) / efficiency; acre-ft = gross_in x acres / 12. Kc values from FAO 56 Table 12. Reference ET0 from your local CIMIS / Mesonet / NOAA station. Free at fao.org.";
-  const crop = makeSelect("Crop", "ir-crop", Object.keys(FAO56_CROP_KC).map((k) => ({ value: k, label: k.charAt(0).toUpperCase() + k.slice(1) + " (Kc " + FAO56_CROP_KC[k] + ")", selected: k === "corn" })));
+  const crop = makeSelect("Crop", "ir-crop", Object.keys(FAO56_CROP_KC).map((k) => ({ value: k, label: FAO56_CROP_LABELS[k] + " (Kc " + FAO56_CROP_KC[k] + ")", selected: k === "corn" })));
   const et0 = makeNumber("Reference ET0 (in/day)", "ir-et0", { step: "any", min: "0" });
   const days = makeNumber("Period length (days)", "ir-days", { step: "any", min: "0" });
   const area = makeNumber("Field area (acres)", "ir-area", { step: "any", min: "0" });
