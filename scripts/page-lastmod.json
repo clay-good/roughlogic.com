@@ -2,11 +2,11 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "f7322595f3a5461d",
+      "sha": "48254221c282f90f",
       "date": "2026-09-25"
     },
     "/tools/": {
-      "sha": "192b946397a70a6c",
+      "sha": "4d25a75f7ad4399e",
       "date": "2026-09-25"
     },
     "/groups/accounting/": {
@@ -18,7 +18,7 @@
       "date": "2026-09-25"
     },
     "/groups/construction/": {
-      "sha": "fa49616f7a4e17c1",
+      "sha": "06c02e3f44f2646f",
       "date": "2026-09-25"
     },
     "/groups/cross-trade/": {
@@ -1886,8 +1886,8 @@
       "date": "2026-09-01"
     },
     "/tools/cross-connection-air-gap/": {
-      "sha": "314921a754051731",
-      "date": "2026-09-01"
+      "sha": "697457cc44466858",
+      "date": "2026-09-25"
     },
     "/tools/crosswind-component/": {
       "sha": "77b2289a070ae09c",
@@ -2354,8 +2354,8 @@
       "date": "2026-09-01"
     },
     "/tools/dryer-duct-length/": {
-      "sha": "4bd3e0cfccc0c689",
-      "date": "2026-09-01"
+      "sha": "16a5e06c3a070c8d",
+      "date": "2026-09-25"
     },
     "/tools/drying-balance/": {
       "sha": "bc6f12c38d4d14d0",
@@ -2550,12 +2550,12 @@
       "date": "2026-09-01"
     },
     "/tools/egress-window-check/": {
-      "sha": "82fbb564623b8ce3",
-      "date": "2026-09-01"
+      "sha": "bac0413a7c79b2db",
+      "date": "2026-09-25"
     },
     "/tools/egress-window-well/": {
-      "sha": "1da2438ba21716ad",
-      "date": "2026-09-01"
+      "sha": "6ade14b8c3dad1a9",
+      "date": "2026-09-25"
     },
     "/tools/elastic-settlement-allowable-pressure/": {
       "sha": "e7d97b59021c140f",
@@ -2914,8 +2914,8 @@
       "date": "2026-09-01"
     },
     "/tools/fireplace-flue-area/": {
-      "sha": "d17ee45b176c6737",
-      "date": "2026-09-01"
+      "sha": "23f4d5b75ba8e7c5",
+      "date": "2026-09-25"
     },
     "/tools/firewood-cord/": {
       "sha": "9a282defa57b6d2a",
@@ -3478,8 +3478,8 @@
       "date": "2026-09-19"
     },
     "/tools/guard-post-load/": {
-      "sha": "d79cf376bb65386f",
-      "date": "2026-09-07"
+      "sha": "cba39d8a95a787d8",
+      "date": "2026-09-25"
     },
     "/tools/guide-rail-bracket-span/": {
       "sha": "b119ed0a9f1d0f55",
@@ -4094,8 +4094,8 @@
       "date": "2026-09-19"
     },
     "/tools/laundry-dryer-evaporation/": {
-      "sha": "f36f00027c71326b",
-      "date": "2026-09-07"
+      "sha": "9aaeb5f973574ab0",
+      "date": "2026-09-25"
     },
     "/tools/laundry-washer-turns/": {
       "sha": "e4e164ea5d433ed5",
@@ -6662,8 +6662,8 @@
       "date": "2026-09-19"
     },
     "/tools/service-load-standard/": {
-      "sha": "29acefa626151e10",
-      "date": "2026-09-19"
+      "sha": "867850020564b6e2",
+      "date": "2026-09-25"
     },
     "/tools/settlement-limit-load/": {
       "sha": "5e0ac6a0e62de83b",
@@ -7610,8 +7610,8 @@
       "date": "2026-09-01"
     },
     "/tools/suspended-scaffold-counterweight/": {
-      "sha": "3d5bcbc7270e2ef7",
-      "date": "2026-09-08"
+      "sha": "d9e9c898eb825d92",
+      "date": "2026-09-25"
     },
     "/tools/svi-sludge-index/": {
       "sha": "a4ae1712f0a5d6ce",

@@ -54,7 +54,7 @@ test("excavation: surcharge adds 0.25 to the H:V ratio", () => {
 
 test("excavation: depth below 5 ft surfaces an 'AHJ may waive sloping' warning", () => {
   const r = computeExcavationBenchPlan({ depth_ft: 4, soil_class: "B", length_ft: 30 });
-  assert.ok(r.warnings.some((w) => /does not require sloping/.test(w)));
+  assert.ok(r.warnings.some((w) => /depth alone exempts nothing/.test(w)));
 });
 
 test("excavation: depth above 20 ft rejects (PE design required per 1926.652(b)(4))", () => {

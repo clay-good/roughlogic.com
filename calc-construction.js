@@ -3027,7 +3027,7 @@ export function computeExcavationBenchPlan({
   }
 
   const warnings = [];
-  if (D < 5) warnings.push("Depth below 5 ft does not require sloping per OSHA 1926.652(a)(1); the AHJ may waive the slope plan.");
+  if (D < 5) warnings.push("Under 5 ft, a protective system is not required only if a competent person's examination of the ground shows no indication of a potential cave-in (29 CFR 1926.652(a)(1)(ii)); depth alone exempts nothing.");
   if (surcharge) warnings.push("Surcharge load near trench adds " + (SURCHARGE_BUMP * 100).toFixed(0) + "% to the H:V ratio per engineering practice; the competent person on-site governs the final plan.");
   if (soil_class === "C") warnings.push("Type C soil cannot typically be benched; only the sloped plan is reported. Verify with the competent person.");
 
@@ -3375,18 +3375,26 @@ CONSTRUCTION_RENDERERS["header-sizing"] = _v15c_renderHeaderSizing;
 // 6x6; the post load drives a footing from the E.1 soil-bearing engine; and
 // the ledger fastener spacing follows the public IRC Table R507.9.1.3(1).
 
-// IRC R507.9.1.3(1): on-center spacing of 1/2 in lag screws / approved
-// fasteners through a 2x ledger, by joist span, for a 40 psf live + 10 psf
-// dead deck. Public code table (a number per row, not the table text).
-const _V15C_LEDGER_SPACING_IN = [
-  { max_joist_span_ft: 6, spacing_in: 30 },
-  { max_joist_span_ft: 8, spacing_in: 23 },
-  { max_joist_span_ft: 10, spacing_in: 18 },
-  { max_joist_span_ft: 12, spacing_in: 15 },
-  { max_joist_span_ft: 14, spacing_in: 13 },
-  { max_joist_span_ft: 16, spacing_in: 11 },
-  { max_joist_span_ft: 18, spacing_in: 10 },
-];
+// IRC 2021 Table R507.9.1.3(1): on-center spacing of 1/2 in lag screws through a 2x ledger, by joist
+// span, for 40 psf live and for 50, 60 and 70 psf ground snow (10 psf dead). "Interpolation permitted.
+// Extrapolation is not permitted." Until 2026-09-25 only the 40 psf row was carried and a snow-load deck
+// got it, up to 36% too wide (18 ft span at 70 psf: 10 in vs 7).
+const _V15C_LEDGER_BY_LOAD = {
+  40: [30, 23, 18, 15, 13, 11, 10],
+  50: [29, 22, 17, 14, 12, 11, 9],
+  60: [25, 18, 15, 12, 10, 9, 8],
+  70: [22, 16, 13, 11, 9, 8, 7],
+};
+const _V15C_LEDGER_SPANS = [6, 8, 10, 12, 14, 16, 18];
+function _v15cLedgerSpacing(joist_ft, load_psf) {
+  const col = _V15C_LEDGER_SPANS.findIndex((sp) => joist_ft <= sp);
+  if (col < 0 || load_psf > 70) return null;
+  const L = Math.max(load_psf, 40);
+  const lo = [40, 50, 60, 70].filter((x) => x <= L).pop();
+  const hi = [40, 50, 60, 70].find((x) => x >= L);
+  const a = _V15C_LEDGER_BY_LOAD[lo][col], b = _V15C_LEDGER_BY_LOAD[hi][col];
+  return Math.floor(hi === lo ? a : a + (b - a) * (L - lo) / (hi - lo));
+}
 
 function _v15cPostColumnCapacity({ d_in, height_ft, F_c, E_min }) {
   // NDS column equation for a square sawn post, pinned-pinned (K_e = 1).
@@ -3478,15 +3486,14 @@ export function computeDeckBeamPost({
   // Ledger fastener spacing (attached decks only).
   let ledger_spacing_in = null;
   if (ledger === "attached") {
-    const row = _V15C_LEDGER_SPACING_IN.find((r) => joist <= r.max_joist_span_ft);
-    ledger_spacing_in = row ? row.spacing_in : null;
+    ledger_spacing_in = _v15cLedgerSpacing(joist, live);
   }
 
   const warnings = [];
   if (Number(deck_height_in) > 30) warnings.push("Walking surface above 30 in requires a guardrail per IRC R312.");
   if (beamSpan > 12) warnings.push("Beam span above 12 ft is beyond the common IRC R507 table range; verify against the adopted table or engineer the beam.");
   if (post_warning) warnings.push(post_warning);
-  if (ledger === "attached" && ledger_spacing_in === null) warnings.push("Joist span exceeds the IRC R507.9.1.3 ledger-fastener table; an engineered connection is required.");
+  if (ledger === "attached" && ledger_spacing_in === null) warnings.push(live > 70 ? "A live or ground snow load above 70 psf is beyond IRC Table R507.9.1.3(1), which does not permit extrapolation; an engineered connection is required." : "Joist span exceeds the IRC R507.9.1.3 ledger-fastener table; an engineered connection is required.");
 
   return {
     tributary_width_ft,
@@ -11564,7 +11571,7 @@ CONSTRUCTION_RENDERERS["membrane-fastener-takeoff"] = _simpleRenderer({
 // few inches of bolt spacing, which multiplies the force enormously. Two bolts 4 in apart
 // see 1,800 lb each from a 200 lb push. That ratio - the lever arm going from 36 in down to
 // 4 in - is why deck guards fail at the rim joist and not at the post.
-// IBC 1607.8.1: a 50 plf uniform load and a 200 lb concentrated load, NOT concurrent.
+// IBC 1607.9.1: a 50 plf uniform load and a 200 lb concentrated load, NOT concurrent.
 // dims: in { post_height_in: L, post_spacing_ft: L, concentrated_lb: M L T^-2, uniform_plf: M T^-2, post_b_in: L, post_d_in: L, allowable_fb_psi: M L^-1 T^-2, connection_lever_in: L } out: { governing_load_lb: M L T^-2, moment_inlb: M L^2 T^-2, section_modulus_in3: L^3, required_fb_psi: M L^-1 T^-2, connection_force_lb: M L T^-2, force_multiplier: dimensionless }
 export function computeGuardPostLoad({ post_height_in = 36, post_spacing_ft = 6, concentrated_lb = 200, uniform_plf = 50, post_b_in = 3.5, post_d_in = 3.5, allowable_fb_psi = 0, connection_lever_in = 4 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
@@ -11584,7 +11591,7 @@ export function computeGuardPostLoad({ post_height_in = 36, post_spacing_ft = 6,
   if (Fb < 0) return { error: "Allowable bending stress cannot be negative (psi)." };
   if (!(lever > 0)) return { error: "Connection lever arm must be positive (in)." };
 
-  // 1607.8.1: the two loads are not concurrent, so the post sees whichever is worse.
+  // 1607.9.1: the two loads are not concurrent, so the post sees whichever is worse.
   const uniform_at_post_lb = w * spacing;
   const governing_load_lb = Math.max(P, uniform_at_post_lb);
   const concentrated_governs = P >= uniform_at_post_lb;
@@ -11601,7 +11608,7 @@ export function computeGuardPostLoad({ post_height_in = 36, post_spacing_ft = 6,
   const connection_force_lb = moment_inlb / lever;
   const force_multiplier = connection_force_lb / governing_load_lb;
 
-  const note = "IBC 1607.8.1 puts two loads on a guard and says they do NOT act together: a 200 lb concentrated load anywhere along the top, and a 50 plf uniform load. At " + spacing + " ft of post spacing the uniform load delivers " + uniform_at_post_lb.toFixed(0) + " lb to a post, so "
+  const note = "IBC 1607.9.1 puts two loads on a guard and says they do NOT act together: a 200 lb concentrated load anywhere along the top, and a 50 plf uniform load. At " + spacing + " ft of post spacing the uniform load delivers " + uniform_at_post_lb.toFixed(0) + " lb to a post, so "
     + (concentrated_governs ? "the " + P + " lb CONCENTRATED load governs here" : "the UNIFORM load governs here at " + uniform_at_post_lb.toFixed(0) + " lb - posts spaced past " + (P / w).toFixed(1) + " ft cross over to it")
     + ". "
     + "That load " + h + " in up is " + moment_inlb.toFixed(0) + " in-lb (" + moment_ftlb.toFixed(0) + " ft-lb) at the base. "
@@ -11609,7 +11616,7 @@ export function computeGuardPostLoad({ post_height_in = 36, post_spacing_ft = 6,
     + (Fb > 0 ? " against the " + Fb + " psi allowable you entered - " + (post_ok ? "OK at " + (post_utilization * 100).toFixed(0) + "% utilization. " : "OVER at " + (post_utilization * 100).toFixed(0) + "%. ") : ". Enter an allowable bending stress for the species, grade, and adjustment factors to get a utilization. ")
     + "THE CONNECTION IS THE PROBLEM. The same " + moment_inlb.toFixed(0) + " in-lb has to be resolved into a couple across only " + lever + " in of fastener spacing, so each side of that couple carries " + connection_force_lb.toFixed(0) + " lb - " + force_multiplier.toFixed(1) + " times the load that was applied. The lever arm collapsed from " + h + " in to " + lever + " in and multiplied the force by exactly that ratio. This is why residential deck guards fail at the rim joist rather than at the post, why lag screws into the end grain of a rim are not acceptable, and why the tested details use through-bolts with washers plus blocking, or a proprietary tension hold-down. "
     + "Notching a post at the connection to clear the rim cuts the section right where the moment is highest - use the notched dimensions here if that is the detail. "
-    + "Scope: one post, one direction, bending only. The load is applied in ANY direction by the code, including outward, inward, and vertically, so the worst case may not be the one modeled. Intermediate rails, balusters, and infill take a separate 50 lb concentrated load (1607.8.1.1 / 1607.8.1.2). Not checked here: shear and bearing in the post, withdrawal and shear capacity of the specific fasteners, tension capacity of the rim or blocking, the load path back into the framing and the diaphragm, deflection, or fatigue. Wood values need the NDS adjustment factors. A screen; the tested guard detail, the adopted code, and the engineer of record govern.";
+    + "Scope: one post, one direction, bending only. The load is applied in ANY direction by the code, including outward, inward, and vertically, so the worst case may not be the one modeled. Intermediate rails, balusters, and infill take a separate 50 lb concentrated load (1607.9.1.1 / 1607.9.1.2). Not checked here: shear and bearing in the post, withdrawal and shear capacity of the specific fasteners, tension capacity of the rim or blocking, the load path back into the framing and the diaphragm, deflection, or fatigue. Wood values need the NDS adjustment factors. A screen; the tested guard detail, the adopted code, and the engineer of record govern.";
 
   return { uniform_at_post_lb, governing_load_lb, concentrated_governs, moment_inlb, moment_ftlb, section_modulus_in3, required_fb_psi, post_ok, post_utilization, connection_force_lb, force_multiplier, note };
 }
@@ -11617,7 +11624,7 @@ export function computeGuardPostLoad({ post_height_in = 36, post_spacing_ft = 6,
 export const guardPostLoadExample = { inputs: { post_height_in: 36, post_spacing_ft: 6, concentrated_lb: 200, uniform_plf: 50, post_b_in: 3.5, post_d_in: 3.5, allowable_fb_psi: 1000, connection_lever_in: 4 } };
 
 CONSTRUCTION_RENDERERS["guard-post-load"] = _simpleRenderer({
-  citation: "Citation: IBC 1607.8.1 - handrails and guards designed to resist a linear load of 50 pounds per linear foot and a concentrated load of 200 pounds, with the uniform load not assumed to act concurrently with the concentrated load; intermediate rails, balusters, panel fillers, and guard infill take a separate 50 pound concentrated load (1607.8.1.1 / 1607.8.1.2), which this tile reports but does not check. Statics from there: moment at the base = governing load x post height; post section modulus S = b d^2 / 6 using ACTUAL dimensions; required bending stress = moment / S; the base connection resolves the same moment into a couple across the fastener spacing, so the force per side = moment / lever arm. The allowable bending stress is an INPUT because it depends on species, grade, and the NDS adjustment factors, none of which are shipped here. One post, one direction, bending only - the code applies the load in ANY direction. Fastener withdrawal and shear, rim and blocking tension, the load path into the framing, deflection, and fatigue are not checked. A screen; the tested guard detail, the adopted code, and the engineer of record govern.",
+  citation: "Citation: IBC 1607.9.1 - handrails and guards designed to resist a linear load of 50 pounds per linear foot and a concentrated load of 200 pounds, with the uniform load not assumed to act concurrently with the concentrated load; intermediate rails, balusters, panel fillers, and guard infill take a separate 50 pound concentrated load (1607.9.1.1 / 1607.9.1.2), which this tile reports but does not check. Statics from there: moment at the base = governing load x post height; post section modulus S = b d^2 / 6 using ACTUAL dimensions; required bending stress = moment / S; the base connection resolves the same moment into a couple across the fastener spacing, so the force per side = moment / lever arm. The allowable bending stress is an INPUT because it depends on species, grade, and the NDS adjustment factors, none of which are shipped here. One post, one direction, bending only - the code applies the load in ANY direction. Fastener withdrawal and shear, rim and blocking tension, the load path into the framing, deflection, and fatigue are not checked. A screen; the tested guard detail, the adopted code, and the engineer of record govern.",
   example: guardPostLoadExample.inputs,
   fields: [
     { key: "post_height_in", label: "Top of guard above the connection (in)", kind: "number" },
@@ -11693,7 +11700,7 @@ export function computeEgressWindowCheck({ clear_width_in = 0, clear_height_in =
 export const egressWindowCheckExample = { inputs: { clear_width_in: 20, clear_height_in: 24, sill_height_in: 40, location: "above-grade", min_area_override_sf: 0 } };
 
 CONSTRUCTION_RENDERERS["egress-window-check"] = _simpleRenderer({
-  citation: "Citation: IRC R310.2.1 and R310.2.2 - an emergency escape and rescue opening needs a net clear opening of not less than 5.7 sq ft (5.0 sq ft for a grade-floor opening), a net clear height of not less than 24 in, a net clear width of not less than 20 in, and the bottom of the clear opening not more than 44 in above the floor, all achieved through the normal operation of the opening from the inside. The tile reports the minimum PARTNER dimension because the three minimums are mutually unsatisfiable: 20 x 24 is 480 sq in against the 820.8 sq in the area rule demands. NET CLEAR opening only - not the rough opening, the unit size, or the glass. Dimensional criteria only; the openability requirement, window wells and their ladders, releasable bars and grilles, and which rooms require an opening are not checked. A screen, not a code-official determination; the adopted code and the AHJ govern.",
+  citation: "Citation: IRC R310.2.1 and R310.2.3 - an emergency escape and rescue opening needs a net clear opening of not less than 5.7 sq ft (5.0 sq ft for a grade-floor opening), a net clear height of not less than 24 in, a net clear width of not less than 20 in, and the bottom of the clear opening not more than 44 in above the floor, all achieved through the normal operation of the opening from the inside. The tile reports the minimum PARTNER dimension because the three minimums are mutually unsatisfiable: 20 x 24 is 480 sq in against the 820.8 sq in the area rule demands. NET CLEAR opening only - not the rough opening, the unit size, or the glass. Dimensional criteria only; the openability requirement, window wells and their ladders, releasable bars and grilles, and which rooms require an opening are not checked. A screen, not a code-official determination; the adopted code and the AHJ govern.",
   example: egressWindowCheckExample.inputs,
   fields: [
     { key: "clear_width_in", label: "Net clear width (in)", kind: "number" },
@@ -11874,10 +11881,10 @@ CONSTRUCTION_RENDERERS["door-maneuvering-clearance"] = _simpleRenderer({
 });
 
 
-// --- spec-v1139: dryer exhaust duct developed length (IRC M1502.4.5) ---
+// --- spec-v1139: dryer exhaust duct developed length (IRC M1502.4.6) ---
 // The 35 ft everyone quotes is not the number that matters, because fittings eat it. The
-// code's own priority is worth following: M1502.4.5.2 says the SIZE AND MAXIMUM LENGTH are
-// determined by the dryer manufacturer's installation instructions, and Table M1502.4.5.1
+// code's own priority is worth following: M1502.4.6.2 says the SIZE AND MAXIMUM LENGTH are
+// determined by the dryer manufacturer's installation instructions, and Table M1502.4.6.1
 // is used only in the ABSENCE of fitting equivalent lengths from the manufacturer. So both
 // the ceiling and the per-fitting deductions are inputs here rather than shipped constants
 // - which is also why no code table is reproduced. What the tile adds is the arithmetic and
@@ -11910,7 +11917,7 @@ export function computeDryerDuctLength({ straight_run_ft = 0, elbow_90_count = 0
   const over_by_ft = Math.max(0, developed_length_ft - maxL);
   const remaining_straight_ft = Math.max(0, maxL - developed_length_ft);
   const fitting_share_pct = developed_length_ft > 0 ? (fitting_equivalent_ft / developed_length_ft) * 100 : 0;
-  // M1502.4.6: over 35 ft of equivalent length the duct has to be labelled at the connection.
+  // M1502.4.7: over 35 ft of equivalent length the duct has to be labelled at the connection.
   const label_required = developed_length_ft > 35;
   // M1502.4.3: the transition duct is a separate 8 ft listed assembly and is NOT counted here.
   const transition_over = trans > 8;
@@ -11920,9 +11927,9 @@ export function computeDryerDuctLength({ straight_run_ft = 0, elbow_90_count = 0
     + (within ? "WITHIN, with " + remaining_straight_ft.toFixed(2) + " ft of straight run still available. " : "OVER by " + over_by_ft.toFixed(2) + " ft. ")
     + (has_elbows ? "Fittings are " + fitting_share_pct.toFixed(0) + "% of the total here" + (fitting_share_pct >= 40 ? " - more than the duct itself is doing, which is the usual situation on a short interior run and the reason a 35 ft rule of thumb misleads. " : ". ") : "No fittings entered, so this is a straight-shot run. ")
     + (has_elbows && !equivalents_entered ? "WARNING: you entered elbows but left an equivalent length at zero, so this total is optimistic - it is counting those fittings as free. " : "")
-    + "WHERE THE EQUIVALENT LENGTHS COME FROM, in the code's own order of priority: M1502.4.5.2 says the size and maximum length of the exhaust duct are determined by the DRYER MANUFACTURER'S installation instructions, and the code's own table is used only in the ABSENCE of fitting equivalent lengths from the manufacturer. That is why both the ceiling and the per-fitting values are inputs here and nothing is shipped as a constant. "
+    + "WHERE THE EQUIVALENT LENGTHS COME FROM, in the code's own order of priority: M1502.4.6.2 says the size and maximum length of the exhaust duct are determined by the DRYER MANUFACTURER'S installation instructions, and the code's own table is used only in the ABSENCE of fitting equivalent lengths from the manufacturer. That is why both the ceiling and the per-fitting values are inputs here and nothing is shipped as a constant. "
     + "The judgment that decides most installs: an elbow's equivalent length swings enormously with its bend radius and with whether it is mitered or smooth - a tight mitered ninety can cost more than three times what a wide smooth one does. Changing elbows, not rerouting duct, is usually what brings a long run into compliance, and it is worth pricing before opening a wall. "
-    + (label_required ? "Over 35 ft of equivalent length, M1502.4.6 requires the equivalent length to be identified on a permanent label or tag within 6 ft of the duct connection. " : "")
+    + (label_required ? "Over 35 ft of equivalent length, M1502.4.7 requires the equivalent length to be identified on a permanent label or tag within 6 ft of the duct connection. " : "")
     + "The TRANSITION duct - the flexible piece from the dryer to the rigid duct - is a separate listed assembly limited to 8 ft and is NOT part of this length" + (trans > 0 ? "; the " + trans + " ft entered " + (transition_over ? "EXCEEDS that 8 ft limit. " : "is within it. ") : ". ")
     + "Not checked: the 4 in nominal diameter and smooth-interior metal construction, support at 12 ft maximum intervals, joints made in the direction of airflow with no screws penetrating more than 1/8 in, termination on the outside with a backdraft damper and NO screen, the 3 ft separation from openings where the manufacturer is silent, protective shield plates where fasteners could reach the duct, or booster fans, which have their own rules. A screen; the dryer manufacturer's instructions, the adopted code, and the AHJ govern.";
 
@@ -11932,7 +11939,7 @@ export function computeDryerDuctLength({ straight_run_ft = 0, elbow_90_count = 0
 export const dryerDuctLengthExample = { inputs: { straight_run_ft: 22, elbow_90_count: 3, elbow_45_count: 2, eq_len_90_ft: 5, eq_len_45_ft: 2.5, max_length_ft: 35, transition_duct_ft: 6 } };
 
 CONSTRUCTION_RENDERERS["dryer-duct-length"] = _simpleRenderer({
-  citation: "Citation: IRC M1502.4.5 clothes dryer exhaust duct length - the maximum length measured from the connection to the transition duct to the outlet terminal, reduced by the equivalent length of each fitting, and not including the transition duct; M1502.4.5.2, which makes the DRYER MANUFACTURER'S installation instructions the determining source for both size and maximum length and allows the code's fitting table only in the absence of manufacturer equivalent lengths; M1502.4.6, requiring the equivalent length to be identified on a permanent label or tag within 6 ft of the duct connection where it exceeds 35 ft; and M1502.4.3, limiting the listed transition duct to 8 ft and excluding it from the duct length. The code's fitting-equivalent table is NOT reproduced: per M1502.4.5.2 the manufacturer's values take precedence, so the ceiling and the per-fitting equivalents are inputs. Not checked: diameter and material, support spacing, joint direction and fastener penetration, termination and backdraft damper, screens, shield plates, or booster fans. A screen; the manufacturer's instructions, the adopted code, and the AHJ govern.",
+  citation: "Citation: IRC M1502.4.6 clothes dryer exhaust duct length - the maximum length measured from the connection to the transition duct to the outlet terminal, reduced by the equivalent length of each fitting, and not including the transition duct; M1502.4.6.2, which makes the DRYER MANUFACTURER'S installation instructions the determining source for both size and maximum length and allows the code's fitting table only in the absence of manufacturer equivalent lengths; M1502.4.7, requiring the equivalent length to be identified on a permanent label or tag within 6 ft of the duct connection where it exceeds 35 ft; and M1502.4.3, limiting the listed transition duct to 8 ft and excluding it from the duct length. The code's fitting-equivalent table is NOT reproduced: per M1502.4.6.2 the manufacturer's values take precedence, so the ceiling and the per-fitting equivalents are inputs. Not checked: diameter and material, support spacing, joint direction and fastener penetration, termination and backdraft damper, screens, shield plates, or booster fans. A screen; the manufacturer's instructions, the adopted code, and the AHJ govern.",
   example: dryerDuctLengthExample.inputs,
   fields: [
     { key: "straight_run_ft", label: "Straight duct run (ft)", kind: "number" },
@@ -11947,7 +11954,7 @@ CONSTRUCTION_RENDERERS["dryer-duct-length"] = _simpleRenderer({
     { key: "d", id: "ddl-out-d", label: "Developed length", value: (r) => fmt(r.developed_length_ft, 2) + " ft" + (r.within ? " - WITHIN" : " - OVER by " + fmt(r.over_by_ft, 2) + " ft") },
     { key: "f", id: "ddl-out-f", label: "Fittings cost", value: (r) => fmt(r.fitting_equivalent_ft, 2) + " ft, " + fmt(r.fitting_share_pct, 0) + "% of the total" },
     { key: "r", id: "ddl-out-r", label: "Straight run still available", value: (r) => r.within ? fmt(r.remaining_straight_ft, 2) + " ft" : "none - already over" },
-    { key: "l", id: "ddl-out-l", label: "Label required (M1502.4.6)", value: (r) => r.label_required ? "yes - tag the equivalent length within 6 ft of the connection" : "no" },
+    { key: "l", id: "ddl-out-l", label: "Label required (M1502.4.7)", value: (r) => r.label_required ? "yes - tag the equivalent length within 6 ft of the connection" : "no" },
     { key: "t", id: "ddl-out-t", label: "Transition duct", value: (r) => r.transition_over ? "EXCEEDS the 8 ft limit" : "within the 8 ft limit (and not counted in the length above)" },
     { key: "n", id: "ddl-out-n", label: "Note", value: (r) => r.note },
   ],
@@ -12106,7 +12113,7 @@ CONSTRUCTION_RENDERERS["co-alarm-placement"] = _simpleRenderer({
 });
 
 
-// --- spec-v1147: egress window well (IRC R310.2.3) ---
+// --- spec-v1147: egress window well (IRC R310.4.1) ---
 // egress-window-check names window wells as a separate requirement it does not check.
 // This is that check, and it has the same shape as its sibling: minimums that are exactly
 // tangent. 9 sq ft of horizontal area with a minimum horizontal projection AND width of
@@ -12155,12 +12162,12 @@ export function computeEgressWindowWell({ well_width_in = 0, well_projection_in 
   const minimums_area_sf = (MIN_DIM * MIN_DIM) / 144;
   const tangent = Math.abs(minimums_area_sf - MIN_AREA_SF) < 1e-9;
 
-  const note = "AREA AND DIMENSIONS (R310.2.3): not less than 9 sq ft of horizontal area, with a minimum horizontal projection AND width of 36 in. "
+  const note = "AREA AND DIMENSIONS (R310.4.1): not less than 9 sq ft of horizontal area, with a minimum horizontal projection AND width of 36 in. "
     + (tangent ? "Those minimums are exactly tangent - 36 x 36 is 9 sq ft precisely - so the smallest compliant well is square, and any well narrower than 36 in fails on the dimension no matter how deep it projects. " : "")
     + "This well is " + w + " x " + proj + " in = " + area_sf.toFixed(2) + " sq ft: area " + (area_ok ? "OK" : "SHORT by " + area_deficit_sf.toFixed(2) + " sq ft") + ", width " + (width_ok ? "OK" : "under the 36 in minimum") + ", projection " + (projection_ok ? "OK" : "under the 36 in minimum") + ". "
     + "At this width the projection must reach " + projection_needed_in.toFixed(1) + " in; at this projection the width must reach " + width_needed_in.toFixed(1) + " in. "
     + "THE REQUIREMENT WITH NO NUMBER: the well must allow the escape opening to be FULLY OPENED. " + (fullyOpens ? "Stated as satisfied. " : "NOT satisfied, and this fails regardless of the square footage. ") + "An inward-swinging casement is fine, but an outward-swinging one, or a hopper, can foul the well wall in a shallow projection and leave an opening that measures compliant and does not open - the area is a floor, not a substitute for checking the sash through its swing. "
-    + "LADDER (R310.2.3.1): required where the vertical depth exceeds " + LADDER_DEPTH + " in, permanently affixed and usable with the window in the fully open position. This well is " + depth + " in deep, so a ladder is " + (ladder_required ? "REQUIRED - " + (ladder ? "present. " : "MISSING. ") : "not required. ")
+    + "LADDER (R310.4.2): required where the vertical depth exceeds " + LADDER_DEPTH + " in, permanently affixed and usable with the window in the fully open position. This well is " + depth + " in deep, so a ladder is " + (ladder_required ? "REQUIRED - " + (ladder ? "present. " : "MISSING. ") : "not required. ")
     + (ladder_required && ladder_dims_entered
       ? "Rungs need an inside width of not less than " + LADDER_W + " in (" + lw + " entered, " + (ladder_width_ok ? "OK" : "SHORT") + "), a projection of not less than " + LADDER_PROJ + " in from the wall (" + lp + ", " + (ladder_proj_ok ? "OK" : "SHORT") + "), and spacing not more than " + LADDER_SPACING + " in on centre vertically for the full height of the well (" + ls + ", " + (ladder_spacing_ok ? "OK" : "TOO WIDE") + "). Note the code permits the ladder to encroach into the required dimensions - a ladder is not a reason to enlarge the well. "
       : ladder_required ? "Enter the rung dimensions to check the 12 in inside width, 3 in projection, and 18 in maximum vertical spacing. " : "")
@@ -12173,7 +12180,7 @@ export function computeEgressWindowWell({ well_width_in = 0, well_projection_in 
 export const egressWindowWellExample = { inputs: { well_width_in: 36, well_projection_in: 30, well_depth_in: 60, has_ladder: "no", ladder_inside_width_in: 0, ladder_projection_in: 0, ladder_spacing_in: 0, opening_fully_opens: "yes" } };
 
 CONSTRUCTION_RENDERERS["egress-window-well"] = _simpleRenderer({
-  citation: "Citation: IRC R310.2.3 window wells - a minimum horizontal area of 9 sq ft with a minimum horizontal projection and width of 36 in, and an area that allows the emergency escape and rescue opening to be fully opened. IRC R310.2.3.1 - window wells with a vertical depth greater than 44 in equipped with a permanently affixed ladder or steps usable with the window in the fully open position, with ladders or rungs having an inside width of not less than 12 in, projecting not less than 3 in from the wall, and spaced not more than 18 in on center vertically for the full height of the well; such ladders may encroach into the required dimensions. Not checked: the escape opening itself (see egress-window-check), covers and grates and their release from inside, well drainage, the structural design of the well wall, guards at grade, or whether an escape opening is required at all. A screen, not a code-official determination; the adopted code and the AHJ govern.",
+  citation: "Citation: IRC R310.4.1 window wells - a minimum horizontal area of 9 sq ft with a minimum horizontal projection and width of 36 in, and an area that allows the emergency escape and rescue opening to be fully opened. IRC R310.4.2 - window wells with a vertical depth greater than 44 in equipped with a permanently affixed ladder or steps usable with the window in the fully open position, with ladders or rungs having an inside width of not less than 12 in, projecting not less than 3 in from the wall, and spaced not more than 18 in on center vertically for the full height of the well; such ladders may encroach into the required dimensions. Not checked: the escape opening itself (see egress-window-check), covers and grates and their release from inside, well drainage, the structural design of the well wall, guards at grade, or whether an escape opening is required at all. A screen, not a code-official determination; the adopted code and the AHJ govern.",
   example: egressWindowWellExample.inputs,
   fields: [
     { key: "well_width_in", label: "Well width (in)", kind: "number" },
@@ -15358,19 +15365,25 @@ CONSTRUCTION_RENDERERS["mast-climber-platform-load"] = _simpleRenderer({
 
 // ============ spec-v1688: suspended scaffold outrigger counterweight ============
 
-// dims: in { rated_load_lb: M L T^-2, outboard_arm_ft: L, inboard_arm_ft: L, factor_of_safety: dimensionless, counterweight_unit_lb: M L T^-2, target_counterweight_lb: M L T^-2 } out: { lever_ratio: dimensionless, overturning_moment_ft_lb: M L^2 T^-2, required_counterweight_lb: M L T^-2, counterweight_units: dimensionless, resisting_moment_ft_lb: M L^2 T^-2, inboard_for_target_ft: L }
-export function computeSuspendedScaffoldCounterweight({ rated_load_lb = 0, outboard_arm_ft = 0, inboard_arm_ft = 0, factor_of_safety = 4, counterweight_unit_lb = 0, target_counterweight_lb = 0 } = {}) {
+// dims: in { rated_load_lb: M L T^-2, outboard_arm_ft: L, inboard_arm_ft: L, factor_of_safety: dimensionless, counterweight_unit_lb: M L T^-2, target_counterweight_lb: M L T^-2, hoist_stall_load_lb: M L T^-2 } out: { lever_ratio: dimensionless, stall_counterweight_lb: M L T^-2, overturning_moment_ft_lb: M L^2 T^-2, required_counterweight_lb: M L T^-2, counterweight_units: dimensionless, resisting_moment_ft_lb: M L^2 T^-2, inboard_for_target_ft: L }
+export function computeSuspendedScaffoldCounterweight({ rated_load_lb = 0, outboard_arm_ft = 0, inboard_arm_ft = 0, factor_of_safety = 4, counterweight_unit_lb = 0, target_counterweight_lb = 0, hoist_stall_load_lb = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
-  if (!(rated_load_lb > 0)) return { error: "The platform's RATED load must be positive (lb) -- not its empty weight, and not what happens to be on it today." };
+  if (!(rated_load_lb > 0)) return { error: "The hoist's RATED load must be positive (lb) -- not its empty weight, and not what happens to be on it today." };
   if (!(outboard_arm_ft > 0)) return { error: "The outboard arm must be positive (ft)." };
   if (!(inboard_arm_ft > 0)) return { error: "The inboard arm must be positive (ft)." };
   if (!(factor_of_safety >= 1)) return { error: "The factor of safety cannot be below one; 4:1 against overturning is the common requirement." };
   if (counterweight_unit_lb < 0) return { error: "The counterweight unit weight cannot be negative (lb)." };
   if (target_counterweight_lb < 0) return { error: "The target counterweight cannot be negative (lb)." };
+  if (hoist_stall_load_lb < 0) return { error: "The hoist stall load cannot be negative (lb)." };
   const lever_ratio = outboard_arm_ft / inboard_arm_ft;
   const overturning_moment_ft_lb = rated_load_lb * outboard_arm_ft;
   const balance_counterweight_lb = rated_load_lb * lever_ratio;
-  const required_counterweight_lb = balance_counterweight_lb * factor_of_safety;
+  // 29 CFR 1926.451(a)(2): at least 4 times the tipping moment at the hoist's RATED load, or 1.5 times
+  // the tipping moment at its STALL load, whichever is greater. Until 2026-09-25 only the first test was
+  // applied; the stall test governs once the stall load exceeds 2.67 times the rated load.
+  const stall_counterweight_lb = hoist_stall_load_lb * lever_ratio * 1.5;
+  const stall_governs = stall_counterweight_lb > balance_counterweight_lb * factor_of_safety;
+  const required_counterweight_lb = Math.max(balance_counterweight_lb * factor_of_safety, stall_counterweight_lb);
   const counterweight_units = counterweight_unit_lb > 0 ? Math.ceil(required_counterweight_lb / counterweight_unit_lb) : null;
   const provided_counterweight_lb = counterweight_units === null ? required_counterweight_lb : counterweight_units * counterweight_unit_lb;
   const resisting_moment_ft_lb = provided_counterweight_lb * inboard_arm_ft;
@@ -15378,15 +15391,15 @@ export function computeSuspendedScaffoldCounterweight({ rated_load_lb = 0, outbo
   // Worked backwards: the inboard arm that would bring the counterweight to a
   // target, which is the lever the arithmetic actually gives you to pull.
   const inboard_for_target_ft = target_counterweight_lb > 0
-    ? rated_load_lb * outboard_arm_ft * factor_of_safety / target_counterweight_lb
+    ? Math.max(rated_load_lb * factor_of_safety, hoist_stall_load_lb * 1.5) * outboard_arm_ft / target_counterweight_lb
     : null;
   const outs = [lever_ratio, overturning_moment_ft_lb, required_counterweight_lb, resisting_moment_ft_lb];
   if (!outs.every(Number.isFinite)) return { error: "Counterweight math is not a finite value." };
-  const verdict = "REQUIRED: " + fmt(required_counterweight_lb, 0) + " lb per outrigger -- " + fmt(rated_load_lb, 0) + " lb of rated load at a " + fmt(lever_ratio, 2) + ":1 lever disadvantage, times a " + fmt(factor_of_safety, 1) + ":1 factor"
+  const verdict = "REQUIRED: " + fmt(required_counterweight_lb, 0) + " lb per outrigger" + (stall_governs ? " (the 1.5x stall-load test governs) -- " : " -- ") + fmt(rated_load_lb, 0) + " lb of rated load at a " + fmt(lever_ratio, 2) + ":1 lever disadvantage, times a " + fmt(factor_of_safety, 1) + ":1 factor"
     + (counterweight_units === null ? "" : ", which is " + fmt(counterweight_units, 0) + " units of " + fmt(counterweight_unit_lb, 0) + " lb (" + fmt(provided_counterweight_lb, 0) + " lb provided, " + fmt(achieved_fos, 2) + ":1 achieved)");
   return {
     rated_load_lb, outboard_arm_ft, inboard_arm_ft, lever_ratio, factor_of_safety,
-    overturning_moment_ft_lb, balance_counterweight_lb, required_counterweight_lb,
+    overturning_moment_ft_lb, balance_counterweight_lb, required_counterweight_lb, hoist_stall_load_lb, stall_counterweight_lb, stall_governs,
     counterweight_unit_lb, counterweight_units, provided_counterweight_lb,
     resisting_moment_ft_lb, achieved_fos, target_counterweight_lb, inboard_for_target_ft, verdict,
     note: "THE LEVER RATIO IS WHAT MAKES THE COUNTERWEIGHT LARGE, and it is why crews consistently underestimate it: the physical weight looks absurd next to the platform. An outrigger reaching eighteen inches inboard and six feet outboard carries a four-to-one disadvantage before any factor of safety, so a fifteen hundred pound suspended load needs six thousand pounds just to balance -- and a four-to-one factor against overturning puts the requirement into the tens of thousands per outrigger. Shortening the outboard reach or lengthening the inboard arm are the only two levers, and the inboard arm needed for a target counterweight is reported here because that is the one a crew can usually move. THE LOAD TO USE IS THE PLATFORM'S RATED LOAD, not what happens to be on it. The scaffold is designed to carry that load and the counterweight has to hold it down whether or not today's crew intends to use it -- a counterweight sized for two workers is inadequate the day someone stages material, and nobody re-runs the arithmetic before doing that. TWO REQUIREMENTS SIT ALONGSIDE THE WEIGHT AND ARE NOT SUBSTITUTES FOR IT. Counterweights must be non-flowable and secured to the outrigger: sand bags, water containers, masonry units, and loose material are prohibited because they leak, are removed, or get borrowed for other work, and a counterweight that walks away is the classic failure on this equipment. And a TIEBACK to independent structural anchorage is required in addition to the counterweight, so that the outrigger cannot slide or rotate even if the counterweight is disturbed. The anchorage that tieback goes to has its own requirement and is not a parapet clamp on a cornice. A static moment balance on one outrigger. It does not design the outrigger, the beam, its bearing on the roof, or the roof's ability to take the concentrated loads at both ends -- a counterweight of this size sitting on a roof is itself a structural question. It does not address the tieback capacity or its anchorage, the suspension ropes, the hoists, the secondary lines, or the personal fall arrest that is required independently of everything here. It does not cover parapet clamps, roof cars, or transportable outrigger systems, each of which has its own criteria. Suspended scaffolds kill people. OSHA 29 CFR 1926 Subpart L, the manufacturer's instructions, and the qualified person who designs the rigging govern.",
@@ -15394,10 +15407,11 @@ export function computeSuspendedScaffoldCounterweight({ rated_load_lb = 0, outbo
 }
 const suspendedScaffoldCounterweightExample = { inputs: { rated_load_lb: 1500, outboard_arm_ft: 6, inboard_arm_ft: 1.5, factor_of_safety: 4, counterweight_unit_lb: 50, target_counterweight_lb: 12000 } };
 CONSTRUCTION_RENDERERS["suspended-scaffold-counterweight"] = _simpleRenderer({
-  citation: "Citation: the outrigger moment balance by name -- rated load x outboard arm = counterweight x inboard arm, so the required counterweight = rated load x (outboard / inboard) x the factor of safety, with 4:1 against overturning the common requirement. The load used is the platform's RATED load, not its empty weight. Counterweights must be non-flowable and secured, and a tieback to independent structural anchorage is required IN ADDITION and is not a substitute. OSHA 29 CFR 1926 Subpart L, the manufacturer's instructions, and the qualified person who designs the rigging govern.",
+  citation: "Citation: 29 CFR 1926.451(a)(2) -- counterweights resist at least 4 times the tipping moment at the hoist's rated load, or 1.5 times the tipping moment at its stall load, whichever is greater -- applied through the outrigger moment balance: required counterweight = the larger of rated load x 4 and stall load x 1.5, times (outboard / inboard). The load used is the platform's RATED load, not its empty weight. Counterweights must be non-flowable and secured, and a tieback to independent structural anchorage is required IN ADDITION and is not a substitute. OSHA 29 CFR 1926 Subpart L, the manufacturer's instructions, and the qualified person who designs the rigging govern.",
   example: suspendedScaffoldCounterweightExample.inputs,
   fields: [
-    { key: "rated_load_lb", label: "Platform RATED load (lb)", kind: "number", default: 1500 },
+    { key: "rated_load_lb", label: "Hoist RATED load (lb)", kind: "number", default: 1500 },
+    { key: "hoist_stall_load_lb", label: "Hoist STALL load (lb, 0 if unknown; 1926.451(a)(2) checks 1.5x it)", kind: "number", default: 0 },
     { key: "outboard_arm_ft", label: "Outboard arm (ft)", kind: "number", default: 6 },
     { key: "inboard_arm_ft", label: "Inboard arm (ft)", kind: "number", default: 1.5 },
     { key: "factor_of_safety", label: "Factor of safety against overturning", kind: "number", default: 4 },

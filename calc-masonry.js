@@ -722,8 +722,9 @@ MASONRY_RENDERERS["masonry-lintel-bearing"] = _simpleRenderer({
 // the required fraction depends on the flue's SHAPE, not just its area: a round flue moves
 // smoke most efficiently and is allowed the smallest fraction (1/12), a square or nearly
 // square flue needs 1/10, and a skinny rectangle 2:1 or worse needs 1/8 because the corners
-// and the boundary layer waste part of its cross section. All three ratios are conditioned on
-// a chimney at least 15 ft tall, measured from the firebox floor to the top of the flue.
+// and the boundary layer waste part of its cross section. IRC 2021 R1003.15.1 (Option 1) states
+// NO height condition; the 15 ft check below is an advisory drawn from Option 2's height-based
+// figure (until 2026-09-25 it was presented as an Option 1 requirement).
 // Clay liner NOMINAL sizes are not their net areas, so this tile takes the ACTUAL inside
 // dimensions - the liner tables are code-document tables and are not reproduced here.
 // dims: in { opening_width_in: L, opening_height_in: L, flue_shape: dimensionless, flue_inside_dia_in: L, flue_inside_a_in: L, flue_inside_b_in: L, chimney_height_ft: L } out: { opening_area_sqin: L^2, required_area_sqin: L^2, actual_area_sqin: L^2, min_round_dia_in: L, min_square_side_in: L, aspect_ratio: dimensionless, surplus_sqin: L^2 }
@@ -767,8 +768,8 @@ export function computeFireplaceFlueArea({ opening_width_in = 0, opening_height_
     + (adequate ? "ADEQUATE, with " + surplus_sqin.toFixed(1) + " sq in to spare. " : "UNDERSIZED by " + Math.abs(surplus_sqin).toFixed(1) + " sq in. ")
     + "For this opening the smallest compliant flue is about " + min_round_dia_in.toFixed(1) + " in inside diameter round, or " + min_square_side_in.toFixed(1) + " in square. "
     + (height_ok
-      ? "Chimney height " + H + " ft clears the 15-ft minimum these ratios require. "
-      : "WARNING: the chimney is only " + H + " ft. The 1/12, 1/10, and 1/8 ratios are conditioned on a chimney at least 15 ft tall measured from the firebox FLOOR to the top of the flue; a shorter chimney has to be sized by the code's height-versus-opening figure (Option 2) instead, and it will want a larger flue. ")
+      ? "Chimney height " + H + " ft is at least 15 ft, where these ratios are generally adequate. "
+      : "ADVISORY: the chimney is only " + H + " ft. Option 1's ratios state no height condition, but a chimney under at least 15 ft tall (firebox floor to flue top) drafts weakly; Option 2 (R1003.15.2) sizes the flue from height and opening and will want a larger flue for a short chimney, so check it. ")
     + "Shape matters because a round flue moves smoke with the least loss and gets the smallest allowance, while a narrow rectangle wastes cross section in its corners and boundary layer. Enter the liner's ACTUAL inside dimensions: a clay liner's nominal size is its outside size and its net area is smaller, so sizing off the nominal number silently overstates the flue. This checks flue AREA only - it is not a draft calculation, and a flue that passes here can still smoke from a short chimney, a bad termination, a missing combustion-air path, or a throat and smoke chamber built wrong. A screen against IRC R1003.15.1 / IBC 2113.16.1 Option 1; the adopted code, the liner manufacturer, and the AHJ govern.";
 
   return { opening_area_sqin, required_area_sqin, actual_area_sqin, surplus_sqin, adequate, ratio_actual, aspect_ratio, divisor, min_round_dia_in, min_square_side_in, height_ok, note };
@@ -777,7 +778,7 @@ export function computeFireplaceFlueArea({ opening_width_in = 0, opening_height_
 export const fireplaceFlueAreaExample = { inputs: { opening_width_in: 36, opening_height_in: 29, flue_shape: "rectangular", flue_inside_dia_in: 0, flue_inside_a_in: 11.5, flue_inside_b_in: 11.5, chimney_height_ft: 20 } };
 
 MASONRY_RENDERERS["fireplace-flue-area"] = _simpleRenderer({
-  citation: "Citation: IRC R1003.15.1 (Option 1) and the identical IBC 2113.16.1 - round chimney flues need a net cross-sectional area of at least 1/12 of the fireplace opening, square flues at least 1/10, rectangular flues with an aspect ratio under 2:1 at least 1/10, and rectangular flues 2:1 or greater at least 1/8. All are conditioned on a chimney at least 15 ft high measured from the firebox floor to the top of the chimney flue; below that height the code's Option 2 figure (R1003.15.2) governs and is not reproduced here. Clay flue liner net areas come from the code's liner tables, which are also not reproduced - enter the liner's ACTUAL inside dimensions. Flue AREA only; this is not a draft, throat, smoke-chamber, or termination check. A screen; the adopted code and the AHJ govern.",
+  citation: "Citation: IRC R1003.15.1 (Option 1) and the identical IBC 2113.16.1 - round chimney flues need a net cross-sectional area of at least 1/12 of the fireplace opening, square flues at least 1/10, rectangular flues with an aspect ratio under 2:1 at least 1/10, and rectangular flues 2:1 or greater at least 1/8. Option 1 states no height condition; for a chimney under 15 ft (firebox floor to flue top) this tile advises checking the code's Option 2 figure (R1003.15.2), which sizes by height and is not reproduced here. Clay flue liner net areas come from the code's liner tables, which are also not reproduced - enter the liner's ACTUAL inside dimensions. Flue AREA only; this is not a draft, throat, smoke-chamber, or termination check. A screen; the adopted code and the AHJ govern.",
   example: fireplaceFlueAreaExample.inputs,
   fields: [
     { key: "opening_width_in", label: "Fireplace opening width (in)", kind: "number" },
