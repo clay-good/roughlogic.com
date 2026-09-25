@@ -223,6 +223,23 @@ async function main() {
     );
   }
 
+  // The same README sentence carries two more numbers that follow from these:
+  // the machine-verified share (derived minus first-principles) and the tiles
+  // that do carry an outside source. Neither was gated, and by 2026-09-25 they
+  // disagreed with the gated two by one tile (790 + 625 = 1,415, not 1,414).
+  const namedStated = /\b(\d[\d,]*) a named published method\b/.exec(readme);
+  const namedLive = derivedOnlyTiles.length - selfOnlyTiles.length;
+  if (!namedStated || Number(namedStated[1].replace(/,/g, "")) !== namedLive) {
+    errors.push("README.md must say 'N a named published method' with N = " + namedLive +
+      " (project-derived minus first-principles-only)" + (namedStated ? "; it says " + namedStated[1] : "") + ".");
+  }
+  const otherStated = /\bThe other (\d[\d,]*) carry at least one row read from an outside source\b/.exec(readme);
+  const otherLive = totalTiles - derivedOnlyTiles.length;
+  if (!otherStated || Number(otherStated[1].replace(/,/g, "")) !== otherLive) {
+    errors.push("README.md must say 'The other N carry at least one row read from an outside source' with N = " + otherLive +
+      (otherStated ? "; it says " + otherStated[1] : "") + ".");
+  }
+
   for (const w of warnings) console.warn("WARN: " + w);
   if (errors.length > 0) {
     for (const e of errors) console.error("ERROR: " + e);

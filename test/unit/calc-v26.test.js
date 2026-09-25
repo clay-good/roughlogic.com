@@ -81,10 +81,10 @@ test("pressure-tank-drawdown: Boyle's-law drawdown and size round-trip", () => {
   // size mode round-trips the drawdown (C-4)
   const sized = computePressureTankDrawdown({ mode: "size-the-tank", target_drawdown_gal: r.drawdown_gal, cut_in_psi: 40, cut_out_psi: 60 });
   assert.ok(near(sized.tank_volume_gal, 44, 1e-3));
-  // cut-out <= cut-in rejected; precharge >= cut-in flagged (not negative drawdown)
+  // cut-out <= cut-in rejected; precharge above cut-in flagged (not negative drawdown)
   assert.ok("error" in computePressureTankDrawdown({ mode: "find-drawdown", tank_volume_gal: 44, cut_in_psi: 60, cut_out_psi: 40 }));
   const high = computePressureTankDrawdown({ mode: "find-drawdown", tank_volume_gal: 44, cut_in_psi: 40, cut_out_psi: 60, precharge_psi: 45 });
-  assert.ok(high.notes.some((n) => n.includes("will not draw down")));
+  assert.ok(high.notes.some((n) => n.includes("above cut-in")));
   // pump_gpm = 0 suppresses runtime rather than dividing by zero
   const noPump = computePressureTankDrawdown({ mode: "find-drawdown", tank_volume_gal: 44, cut_in_psi: 40, cut_out_psi: 60 });
   assert.strictEqual(noPump.runtime_min, null);
@@ -174,4 +174,13 @@ test("flange-bolt: tensile stress area is strictly increasing in bolt diameter (
     }
     assert.ok(seen >= 5, `expected >= 5 ${series} sizes, saw ${seen}`);
   }
+});
+
+test("pressure-tank: precharge AT cut-in is the maximum-acceptance setting, not a warning; above cut-in the drawdown caps (Amtrol AF)", () => {
+  const at = computePressureTankDrawdown({ mode: "size-the-tank", cut_in_psi: 30, cut_out_psi: 78, precharge_psi: 30, pump_gpm: 98, target_drawdown_gal: 196 });
+  assert.strictEqual(at.notes.length, 0);
+  assert.ok(Math.abs(at.tank_volume_gal - 196 / (1 - 44.7 / 92.7)) < 1e-9); // Amtrol: 196 / 0.518 = 378 gal
+  const above = computePressureTankDrawdown({ mode: "find-drawdown", tank_volume_gal: 100, cut_in_psi: 30, cut_out_psi: 50, precharge_psi: 40 });
+  assert.ok(above.notes.some((n) => /above cut-in/.test(n)));
+  assert.ok(Math.abs(above.drawdown_gal - 100 * (1 - 54.7 / 64.7)) < 1e-9); // tank empties at the precharge
 });

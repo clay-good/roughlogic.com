@@ -9502,7 +9502,7 @@ export const CITATIONS = {
     governance: GOVERNANCE.plumbing,
     editionNote: "Single-edition (Boyle's law). Precharge defaults to cut-in minus 2 psi, the standard diaphragm-tank rule, and is flagged.",
     assumptions: [
-      { name: "Precharge", value: "cut-in minus 2 psi unless overridden; a precharge at or above cut-in will not draw down", source: "diaphragm-tank practice" },
+      { name: "Precharge", value: "cut-in minus 2 psi unless overridden; a precharge AT cut-in gives the maximum drawdown (Amtrol), while one ABOVE cut-in leaves the tank empty before the pump starts", source: "diaphragm-tank practice" },
     ],
   },
   "pipe-velocity": {

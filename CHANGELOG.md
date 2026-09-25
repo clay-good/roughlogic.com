@@ -6,6 +6,16 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Changed
 
+- **Fourteen tiles now carry a publisher's printed worked example.** Each was re-run and falls within the publisher's rounding:
+  - **FHWA HEC-18 and HEC-22:** `pier-scour-depth`, `manning-pipe-capacity`, `orifice-flow`.
+  - **DOE tip sheets:** `steam-boiler-blowdown`, `motor-operating-cost`, `motor-efficiency-upgrade-savings`.
+  - **Spirax Sarco:** `flash-steam-pct`.
+  - **Michigan DOT, reproducing the AASHTO Green Book:** `horizontal-sightline-offset`, `intersection-sight-triangle`, `sag-vertical-curve`, `vertical-curve-sight-distance`.
+  - **ISO's Needed Fire Flow guide:** `required-fire-flow`.
+  - **City of Temecula's NFPA 291 handout:** `hydrant-available-flow`.
+  - **Amtrol's Well-X-Trol sizing guide:** `pressure-tank-drawdown`.
+
+  README: 1,401 of 2,183 tiles are checked only against the project's own derivation (786 from first principles, 615 by a named method); 782 carry an outside source. `check-worked-examples` now gates all four of those numbers. The last two had drifted a tile apart (790 + 625 was not 1,414). Cross-validation tolerance checks: 4,217.
 - **`voltage-drop` and `service-load-optional` are now checked against published worked examples, not only the project's own derivation.**
   - **Voltage drop:** Mike Holt's *Voltage Drop Calculations* prints two K-method examples. Single-phase No. 6 copper, 44 A at 160 ft on 240 V gives 6.9 V and 233.1 V at the load. Three-phase No. 1 aluminum, 100 A at 80 ft on 208 V gives 3.5 V and 204.5 V. The tile reproduces both to the printed precision.
   - **Service load, optional method:** IAEI Magazine's *Residential Service Calculations* (May/June 2013) prints a 2,900 ft² dwelling at 55,400 VA general load, 28,160 VA after the 10 kVA + 40% demand, and 34,160 VA (142 A) with the AC. The tile matches exactly.
@@ -18,6 +28,8 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **`pressure-tank-drawdown` warned against the setting Amtrol recommends.** A precharge equal to cut-in gives the maximum acceptance factor, 1 − (P2 + 14.7)/(P3 + 14.7). The tile flagged it as "will not draw down usefully." Above cut-in, it let the Boyle term exceed 1 and overstated the drawdown. It now warns only above cut-in, where the tank empties before the pump starts, and caps the drawdown there.
+- **`pump-impeller-trim` said nothing useful about a throttled pump.** With the flow unchanged and head to spare, the flow-based trim correctly finds nothing to cut, but the tile read "$0" with no pointer to the real saving. It now flags the throttled case and gives DOE Pumping Systems Tip Sheet #7's constant-flow estimate, D2/D1 = (H2/H1)^(1/3): 12.76 in on DOE's own 14 in example.
 - **`awning-canopy-load` snow now follows ASCE 7-22, and the gust-effect factor discloses the edition of its constants.** The canopy's flat-roof snow dropped the importance factor Is, as the other snow tiles did: pf = 0.7·Ce·Ct·pg, with pg the 7-22 risk-category ground snow load. An Is of 1.1 or 1.2 on a 7-22 pg counted importance twice. `wind-gust-effect-factor` uses the ASCE 7-16 Table 26.11-1 turbulence constants (c, l, ε̄, zmin). ASCE 7-22 adjusted that table (SEAOG, *Wind Loads: What's New in ASCE 7-22*, 2025), and no public source for the 7-22 values could be verified. The tile now says so instead of implying they are current; the code's G = 0.85 rigid-building option is unaffected. `docs/derivations.md` §20 now gives the 7-22 snow formula.
 - **`refrigerant-leak-rate` had the HFC rule's scope wrong and only one of the two leak-rate methods.**
   - **Scope:** 40 CFR 84.106 covers HFCs at any GWP, and substitutes only above GWP 53. It expressly excludes residential and light commercial AC and heat pumps (84.106(a)(3)(ii)). The tile said the rule "takes in most R-410A and R-454B equipment," which is mostly the excluded equipment.

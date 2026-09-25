@@ -156,3 +156,12 @@ test("curb uplift: net uplift less the weight, plus the overturning couple on th
   close(r.couple_tension_lb, r.lateral_lb * 2 / 5, "M / width");
   close(r.per_windward_lb, (1120 - 1400) / 8 + r.couple_tension_lb / 4, "per windward fastener");
 });
+
+test("pump-impeller-trim: a throttled pump (same flow, excess head) points to the head-based trim DOE Tip Sheet #7 prints (14 in -> 12.76 in)", () => {
+  const r = computePumpImpellerTrim({ current_diameter_in: 14, current_flow_gpm: 3000, required_flow_gpm: 3000, current_head_ft: 165, required_head_ft: 125, max_diameter_in: 0, min_trim_fraction: 0.75, motor_hp: 156, annual_hours: 8000, energy_rate_per_kwh: 0.05 });
+  assert.equal(r.throttled, true);
+  assert.match(r.head_verdict, /HEAD-based trim/);
+  assert.match(r.head_verdict, /12\.76 in/);
+  // A flow reduction is not the throttled case.
+  assert.equal(computePumpImpellerTrim({ current_diameter_in: 9.5, current_flow_gpm: 520, required_flow_gpm: 430, current_head_ft: 95, required_head_ft: 62 }).throttled, false);
+});

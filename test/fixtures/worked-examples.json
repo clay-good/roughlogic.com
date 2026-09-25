@@ -7561,6 +7561,34 @@
    }
   },
   {
+   "tile_id": "manning-pipe-capacity",
+   "source_publisher": "FHWA",
+   "source_title": "HEC-22 Urban Drainage Design Manual, 4th ed. (FHWA-HIF-24-006)",
+   "source_edition_or_year": "FHWA HEC-22, 4th edition",
+   "source_section_or_page": "Example 9.1: 21 in concrete pipe (n 0.013) at 1.5% slope full -> 19.3 ft^3/s, 8.0 ft/s (HEC rounds K)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "d_in": 21,
+    "slope": 0.015,
+    "material": "concrete"
+   },
+   "outputs": {
+    "q_cfs": {
+     "value": 19.3,
+     "tolerance": {
+      "pct": 1
+     }
+    },
+    "v_fps": {
+     "value": 8,
+     "tolerance": {
+      "pct": 1
+     }
+    }
+   }
+  },
+  {
    "tile_id": "water-hammer-arrestor",
    "source_publisher": "PDI",
    "source_title": "PDI WH-201: Water Hammer Arresters - Sizing by Total Branch WSFU",
@@ -9157,6 +9185,30 @@
     },
     "construction_factor": {
      "value": 1,
+     "tolerance": {
+      "abs": 0
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "required-fire-flow",
+   "source_publisher": "Insurance Services Office (ISO)",
+   "source_title": "Guide for Determination of Needed Fire Flow, Ed. 06-2014",
+   "source_edition_or_year": "ISO Guide for Determination of Needed Fire Flow, Chapter 8 examples",
+   "source_section_or_page": "Example 2: 21,000 ft^2 joisted masonry (Class 2), occupancy 1.15, no exposure -> NFF 3,000 gpm",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "structure_area_ft2": 21000,
+    "construction_class": "ordinary",
+    "occupancy_factor": 1.15,
+    "exposure_factor": 0,
+    "communication_factor": 0
+   },
+   "outputs": {
+    "needed_fire_flow_gpm": {
+     "value": 3000,
      "tolerance": {
       "abs": 0
      }
@@ -24118,6 +24170,31 @@
    }
   },
   {
+   "tile_id": "pressure-tank-drawdown",
+   "source_publisher": "Amtrol",
+   "source_title": "Sizing the Well-X-Trol (Part 9017-102)",
+   "source_edition_or_year": "Amtrol Well-X-Trol sizing guide, 2019",
+   "source_section_or_page": "30/78 psi switch, 30 psi precharge, 196 gal drawdown at acceptance factor 0.518 -> 378 gal tank",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "mode": "size-the-tank",
+    "cut_in_psi": 30,
+    "cut_out_psi": 78,
+    "precharge_psi": 30,
+    "pump_gpm": 98,
+    "target_drawdown_gal": 196
+   },
+   "outputs": {
+    "tank_volume_gal": {
+     "value": 378,
+     "tolerance": {
+      "abs": 1
+     }
+    }
+   }
+  },
+  {
    "tile_id": "pipe-velocity",
    "source_publisher": "Continuity; Copper Development Association / ASPE (by name)",
    "source_title": "v (ft/s) = 0.4085 * gpm / d^2",
@@ -36987,6 +37064,28 @@
    }
   },
   {
+   "tile_id": "flash-steam-pct",
+   "source_publisher": "Spirax Sarco",
+   "source_title": "The Steam and Condensate Loop, Block 14.6 Flash Steam",
+   "source_edition_or_year": "Spirax Sarco Steam Engineering Tutorials",
+   "source_section_or_page": "Example 14.6.1: condensate at hf 721 kJ/kg flashing to hf 419, hfg 2,257 -> 13.4% flash",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "hf_high": 721,
+    "hf_low": 419,
+    "hfg_low": 2257
+   },
+   "outputs": {
+    "flash_pct": {
+     "value": 13.4,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
    "tile_id": "steam-pipe-velocity",
    "source_publisher": "Continuity; ASHRAE Fundamentals / Systems (by name)",
    "source_title": "1,000 lb/hr of 15 psig steam (13.7 ft3/lb), 6,000 ft/min -> 3 in main at ~4,450 ft/min",
@@ -37194,6 +37293,34 @@
      "value": 144.93,
      "tolerance": {
       "abs": 0.1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "steam-boiler-blowdown",
+   "source_publisher": "U.S. Department of Energy (AMO)",
+   "source_title": "Steam Tip Sheet #9: Minimize Boiler Blowdown",
+   "source_edition_or_year": "DOE Advanced Manufacturing Office tip sheet",
+   "source_section_or_page": "100,000 lb/hr steam at 8% blowdown (feedwater 108,696 lb/hr): blowdown = 108,696 - 100,000",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "steam_rate_lb_hr": 100000,
+    "feedwater_tds_ppm": 8,
+    "max_boiler_tds_ppm": 100
+   },
+   "outputs": {
+    "blowdown_rate_lb_hr": {
+     "value": 8696,
+     "tolerance": {
+      "abs": 1
+     }
+    },
+    "blowdown_pct_of_feedwater": {
+     "value": 8,
+     "tolerance": {
+      "abs": 0.001
      }
     }
    }
@@ -38273,6 +38400,30 @@
      "value": 9423.2,
      "tolerance": {
       "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "motor-operating-cost",
+   "source_publisher": "U.S. Department of Energy (AMO)",
+   "source_title": "Compressed Air Tip Sheet #1: Determine the Cost of Compressed Air",
+   "source_edition_or_year": "DOE Advanced Manufacturing Office tip sheet",
+   "source_section_or_page": "215 hp at 95% efficiency, full load 5,780 h/yr at $0.05/kWh -> $48,792 per year",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "hp": 215,
+    "efficiency_pct": 95,
+    "load_factor_pct": 100,
+    "hours_per_year": 5780,
+    "rate_usd_per_kwh": 0.05
+   },
+   "outputs": {
+    "annual_cost": {
+     "value": 48792,
+     "tolerance": {
+      "abs": 1
      }
     }
    }
@@ -55457,6 +55608,28 @@
    }
   },
   {
+   "tile_id": "orifice-flow",
+   "source_publisher": "FHWA",
+   "source_title": "HEC-22 Urban Drainage Design Manual, 4th ed. (FHWA-HIF-24-006)",
+   "source_edition_or_year": "FHWA HEC-22, 4th edition",
+   "source_section_or_page": "Example 10.10: 5.88 in orifice, Cd 0.6, head 3.06 ft -> 1.59 ft^3/s",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "d_in": 5.88,
+    "h_ft": 3.06,
+    "cd": 0.6
+   },
+   "outputs": {
+    "q_cfs": {
+     "value": 1.59,
+     "tolerance": {
+      "abs": 0.005
+     }
+    }
+   }
+  },
+  {
    "tile_id": "orifice-diameter-for-flow",
    "source_publisher": "Inverse orifice sizing A = Q / (Cd sqrt(2 g h)), d = sqrt(4 A / pi)",
    "source_title": "release 1.5 cfs under a 4 ft head, Cd 0.60 -> 5.34 in orifice (0.156 ft^2)",
@@ -64425,6 +64598,28 @@
    }
   },
   {
+   "tile_id": "vertical-curve-sight-distance",
+   "source_publisher": "Michigan DOT",
+   "source_title": "Sight Distance Guidelines (reproducing AASHTO Green Book 2018 tables)",
+   "source_edition_or_year": "MDOT Sight Distance Guidelines, 2018 AASHTO basis",
+   "source_section_or_page": "AASHTO Table 3-35: A 10%, S 570 ft, C 2,158 -> K 150.6",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "A_pct": 10,
+    "S_ft": 570,
+    "C": 2158
+   },
+   "outputs": {
+    "K_ft_per_pct": {
+     "value": 150.6,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
    "tile_id": "sag-vertical-curve",
    "source_publisher": "AASHTO Green Book (sag headlight criterion)",
    "source_title": "4% grade break at 400 ft SSD -> S>L branch, L 350 ft, K 87.5 ft/%",
@@ -64468,6 +64663,27 @@
      "value": 864,
      "tolerance": {
       "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "sag-vertical-curve",
+   "source_publisher": "Michigan DOT",
+   "source_title": "Sight Distance Guidelines (reproducing AASHTO Green Book 2018 tables)",
+   "source_edition_or_year": "MDOT Sight Distance Guidelines, 2018 AASHTO basis",
+   "source_section_or_page": "AASHTO Table 3-37: A 10%, S 570 ft -> K 135.7",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "A_pct": 10,
+    "S_ft": 570
+   },
+   "outputs": {
+    "K_ft_per_pct": {
+     "value": 135.7,
+     "tolerance": {
+      "abs": 0.05
      }
     }
    }
@@ -64572,6 +64788,28 @@
      "value": 66.4,
      "tolerance": {
       "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "horizontal-sightline-offset",
+   "source_publisher": "Michigan DOT",
+   "source_title": "Sight Distance Guidelines (reproducing AASHTO Green Book 2018 tables)",
+   "source_edition_or_year": "MDOT Sight Distance Guidelines, 2018 AASHTO basis",
+   "source_section_or_page": "AASHTO Eq. 3-37: R 350 ft, stopping sight distance 360 ft -> middle ordinate 45.3 ft",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "mode": "M",
+    "R_ft": 350,
+    "S_ft": 360
+   },
+   "outputs": {
+    "M_ft": {
+     "value": 45.3,
+     "tolerance": {
+      "abs": 0.05
      }
     }
    }
@@ -66657,6 +66895,28 @@
      "value": 1240,
      "tolerance": {
       "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "hydrant-available-flow",
+   "source_publisher": "City of Temecula Fire Prevention Bureau",
+   "source_title": "Calculations for Fire Flow with Examples",
+   "source_edition_or_year": "Temecula Fire Prevention Bureau handout (NFPA 291 method)",
+   "source_section_or_page": "static 98 psi, residual 86 psi, 804 gpm flowing -> 2,209 gpm available at 20 psi",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "static_psi": 98,
+    "residual_psi": 86,
+    "qf_gpm": 804
+   },
+   "outputs": {
+    "qr_gpm": {
+     "value": 2209,
+     "tolerance": {
+      "abs": 1
      }
     }
    }
@@ -73006,6 +73266,37 @@
      "value": 947,
      "tolerance": {
       "pct": 1.0
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "motor-efficiency-upgrade-savings",
+   "source_publisher": "U.S. Department of Energy (AMO)",
+   "source_title": "Motor Systems Tip Sheet #1: When to Purchase NEMA Premium Efficiency Motors",
+   "source_edition_or_year": "DOE Advanced Manufacturing Office tip sheet",
+   "source_section_or_page": "75 hp at 75% load, 92.0% vs 95.5% efficient, 8,000 h/yr at $0.08/kWh -> 13,373 kWh/yr, $1,070",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "hp": 75,
+    "load": 0.75,
+    "eff_standard": 0.92,
+    "eff_premium": 0.955,
+    "hours": 8000,
+    "rate_kwh": 0.08
+   },
+   "outputs": {
+    "annual_kwh_saved": {
+     "value": 13373,
+     "tolerance": {
+      "abs": 1
+     }
+    },
+    "annual_saving": {
+     "value": 1070,
+     "tolerance": {
+      "abs": 1
      }
     }
    }
@@ -100356,6 +100647,32 @@
    }
   },
   {
+   "tile_id": "intersection-sight-triangle",
+   "source_publisher": "Michigan DOT",
+   "source_title": "Sight Distance Guidelines (reproducing AASHTO Green Book 2018 tables)",
+   "source_edition_or_year": "MDOT Sight Distance Guidelines, 2018 AASHTO basis",
+   "source_section_or_page": "AASHTO Table 9-7 Case B1: 45 mph major road, 7.5 s gap -> 496.1 ft",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "major_speed_mph": 45,
+    "time_gap_s": 7.5,
+    "extra_lanes": 0,
+    "added_gap_per_lane_s": 0.5,
+    "setback_ft": 15,
+    "available_left_ft": 600,
+    "available_right_ft": 600
+   },
+   "outputs": {
+    "required_distance_ft": {
+     "value": 496.1,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
    "tile_id": "pavement-structural-number",
    "source_publisher": "Project (first-principles)",
    "source_title": "4 in of asphalt over 8 in of base over 10 in of subbase, the subbase drainage-penalised to 0.8, against a required SN of 3.00",
@@ -111438,6 +111755,52 @@
    "tile_id": "pier-scour-depth", "source_publisher": "Project (first-principles)", "source_title": "Local Pier Scour Depth -- the spec-v1835 worked example, recomputed", "source_edition_or_year": "spec-v1835 of scope-trade-expansion-3, 2026-09-18", "source_section_or_page": "HEC-18 and the bridge hydraulic study govern", "verified_by": "rl", "verified_on": "2026-09-18",
    "inputs": {"pier_width_ft":6,"pier_length_ft":36,"flow_depth_ft":15,"velocity_fps":8,"nose_shape_factor":1,"bed_condition_factor":1.1,"angle_of_attack_deg":30,"wider_pier_width_ft":12,"foundation_margin_ft":2},
    "outputs": {"froude_number":{"value":0.36401260415463205,"tolerance":{"pct":0.5}},"scour_depth_ft":{"value":11.779666511882333,"tolerance":{"pct":0.5}},"wider_pier_scour_ft":{"value":18.48427804749953,"tolerance":{"pct":0.5}},"wider_pier_increase_pct":{"value":56.916819579350154,"tolerance":{"pct":0.5}},"angle_factor":{"value":2.4083636143819525,"tolerance":{"pct":0.5}},"skewed_scour_ft":{"value":28.36972021677099,"tolerance":{"pct":0.5}},"skew_ratio":{"value":2.4083636143819533,"tolerance":{"pct":0.5}},"foundation_depth_ft":{"value":30.36972021677099,"tolerance":{"pct":0.5}}}
+  },
+  {
+   "tile_id": "pier-scour-depth",
+   "source_publisher": "FHWA",
+   "source_title": "HEC-18 Evaluating Scour at Bridges, 5th ed. (FHWA-HIF-12-003)",
+   "source_edition_or_year": "FHWA HEC-18, 5th edition",
+   "source_section_or_page": "Examples 7.10.1-7.10.2: 4 ft pier, 59 ft long, y1 10.2 ft, V 11.02 ft/s, 20 deg skew -> K2 2.86, ys 9.6 ft capped (2.4a), skewed 28.3 ft",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "pier_width_ft": 4,
+    "pier_length_ft": 59,
+    "flow_depth_ft": 10.2,
+    "velocity_fps": 11.02,
+    "nose_shape_factor": 1,
+    "bed_condition_factor": 1.1,
+    "angle_of_attack_deg": 20,
+    "wider_pier_width_ft": 4,
+    "foundation_margin_ft": 0
+   },
+   "outputs": {
+    "scour_depth_ft": {
+     "value": 9.6,
+     "tolerance": {
+      "abs": 0.05
+     }
+    },
+    "angle_factor": {
+     "value": 2.86,
+     "tolerance": {
+      "abs": 0.005
+     }
+    },
+    "skewed_scour_ft": {
+     "value": 28.3,
+     "tolerance": {
+      "abs": 0.1
+     }
+    },
+    "froude_number": {
+     "value": 0.61,
+     "tolerance": {
+      "abs": 0.005
+     }
+    }
+   }
   },
   {
    "tile_id": "wave-height-fetch", "source_publisher": "Project (first-principles)", "source_title": "Wind-Generated Wave Height from Fetch -- the spec-v1836 worked example, recomputed", "source_edition_or_year": "spec-v1836 of scope-trade-expansion-3, 2026-09-18", "source_section_or_page": "a measured record and site shoaling govern", "verified_by": "rl", "verified_on": "2026-09-18",

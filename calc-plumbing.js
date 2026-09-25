@@ -3372,10 +3372,17 @@ export function computePressureTankDrawdown({ mode = "find-drawdown", tank_volum
   const notes = [];
   const precharge_default = (precharge_psi === null || precharge_psi === undefined || precharge_psi === "");
   if (precharge_default) notes.push("Precharge defaulted to cut-in minus 2 psi (" + fmt(Ppre, 1) + " psi), the standard diaphragm-tank rule.");
-  if (Ppre >= Pin) notes.push("Precharge (" + fmt(Ppre, 1) + " psi) is at or above cut-in (" + Pin + " psi): the tank will not draw down usefully.");
+  // Precharge AT cut-in is the maximum-acceptance setting (Amtrol: AF = 1 -
+  // (P2 + 14.7)/(P3 + 14.7) with the precharge at cut-in). ABOVE cut-in the
+  // tank empties at the precharge, before the pump starts, so the water between
+  // precharge and cut-in never comes from the tank. Until 2026-09-25 this
+  // warned at precharge = cut-in and let the Boyle term exceed 1 above it,
+  // overstating the drawdown.
+  if (Ppre > Pin) notes.push("Precharge (" + fmt(Ppre, 1) + " psi) is above cut-in (" + Pin + " psi): the tank empties at " + fmt(Ppre, 1) + " psi before the pump starts, so the system runs dry of stored water between the two; set the precharge at or just below cut-in.");
 
-  // Drawdown fraction per Boyle's law on absolute pressures.
-  const factor = Ppre_abs / Pin_abs - Ppre_abs / Pout_abs;
+  // Drawdown fraction per Boyle's law on absolute pressures; the tank cannot
+  // deliver below its precharge, so the first term caps at 1.
+  const factor = Math.min(Ppre_abs / Pin_abs, 1) - Ppre_abs / Pout_abs;
 
   if (mode === "size-the-tank") {
     const target = Number(target_drawdown_gal);

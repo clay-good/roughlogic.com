@@ -1931,8 +1931,16 @@ export function computePumpImpellerTrim({
   const has_head_check = current_head_ft > 0 && required_head_ft > 0;
   const head_adequate = has_head_check && head_at_trim_ft >= required_head_ft;
   const head_margin_ft = head_at_trim_ft - required_head_ft;
+  // Flow unchanged but head to spare is the THROTTLED-pump case: the saving is
+  // in removing the excess head, which this flow-balancing trim does not size.
+  // DOE Pumping Systems Tip Sheet #7 estimates it at constant flow from
+  // (H2 Q2)/(H1 Q1) = (D2/D1)^3; the pump curve and manufacturer trim curves
+  // decide it. Until 2026-09-25 this case read "no trim, $0" with no pointer.
+  const throttled = has_head_check && diameter_ratio === 1 && required_head_ft < current_head_ft;
   const head_verdict = !has_head_check
     ? "(no current and required head entered)"
+    : throttled
+      ? "the flow is unchanged but the pump makes " + fmt(current_head_ft - required_head_ft, 1) + " ft more head than the system needs, so it is being throttled -- a flow-based trim finds nothing to cut, but a HEAD-based trim does: DOE Pumping Systems Tip Sheet #7 estimates it at constant flow as D2/D1 = (H2/H1)^(1/3), about " + fmt(current_diameter_in * Math.cbrt(required_head_ft / current_head_ft), 2) + " in here; confirm against the manufacturer's trim curve"
     : head_adequate
       ? "at the trimmed diameter the pump still makes " + fmt(head_at_trim_ft, 1) + " ft against the " + fmt(required_head_ft, 1) + " ft required, with " + fmt(head_margin_ft, 1) + " ft to spare"
       : "at the trimmed diameter the pump makes only " + fmt(head_at_trim_ft, 1) + " ft against the " + fmt(required_head_ft, 1) + " ft required, " + fmt(-head_margin_ft, 1) + " ft SHORT -- the trim delivers the flow and not the head, so it is not usable as computed";
@@ -1951,7 +1959,7 @@ export function computePumpImpellerTrim({
     diameter_ratio, required_diameter_in, trim_in, trim_pct,
     head_at_trim_ft, power_ratio, power_reduction_pct,
     has_max, fraction_of_max, below_practical_limit, limit_verdict,
-    has_head_check, head_adequate, head_margin_ft, excess_head_ft, head_verdict,
+    has_head_check, head_adequate, head_margin_ft, excess_head_ft, head_verdict, throttled,
     has_cost, current_kwh, trimmed_kwh, annual_kwh_saved, annual_cost_saved, cost_verdict,
     note: "The impeller diameter a pump needs to deliver a lower flow without throttling, and what trimming to it saves. The affinity relations for a TRIM are not quite the ones for a speed change, even though they look the same: flow scales with diameter directly, head with the square and power with the cube, but the correspondence is approximate because trimming changes the impeller's geometry relative to its casing rather than scaling the whole machine. The manufacturer's published trim curves are the authority; these relations give a first estimate accurate enough to decide whether trimming is worth pursuing at all. The saving is real and continuous. A pump throttled to reduce flow is developing head the system does not need and then destroying it across a balance valve, and that head times that flow is power converted directly into water temperature. A trimmed impeller never develops the excess head in the first place, so the saving persists for the life of the pump with no control action and nothing to fall out of adjustment. Because power goes as the CUBE of the diameter ratio, a modest trim is a large power reduction -- which is what makes the machine-shop cost pay back in months rather than years. Two checks decide whether the trim is usable, and both are computed here rather than left as caveats. The first is head: the trimmed pump must still make the required HEAD at the required flow, not merely the flow, and a trim that delivers one without the other is not a solution. The second is the practical limit: below roughly three quarters of the casing's maximum diameter the gap between impeller tip and casing grows, the hydraulic match degrades, efficiency falls off, and the affinity estimate itself becomes unreliable -- at which point the manufacturer will usually recommend a different pump or a smaller casing. This is an estimate against published curves: it does not read a pump curve, compute efficiency at the trimmed condition, check NPSH available against the new requirement, or address the minimum flow the pump needs. The pump manufacturer's trim curves and the mechanical engineer of record govern.",
   };
