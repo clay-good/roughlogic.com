@@ -10,6 +10,13 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **Welding heat input, carbon equivalent, vessel heads, flange ratings, hanger rods and powder coverage checked against AWS D1.1, published tables and catalogs.**
+  - `weld-travel-speed` defaulted the arc efficiency to 0.8 under an "AWS/ASME" citation. AWS D1.1 (heat input = 60EI/V) and ASME IX QW-409.1 carry no efficiency, so the travel speed it gave delivered 1.25x a code-basis heat-input limit (unsafe; 1.54x with its GTAW 0.65). The default is now 1.0. The EN 1011-1 factors (0.8 GMAW and SMAW, 0.6 GTAW, 1.0 SAW, where the tile had 0.65 and 0.9) are offered only for an EN-basis limit. The example moves from 5.76 to 7.2 in/min.
+  - `carbon-equivalent` said it used the AWS D1.1 formula but left out silicon. D1.1 Annex XI gives CE = C + (Mn+Si)/6 + (Cr+Mo+V)/5 + (Ni+Cu)/15; a silicon input is added. Left at 0, it is the IIW formula.
+  - `vessel-head-volume` used 0.0847 D³ for a standard flanged-and-dished head (crown D, knuckle 0.06 D). Perry, Chemical Engineering (Sept. 2011) and a numerical integration all give 0.0810 D³, so capacity read 4.6% high. A 48 in head moves from 40.6 to 38.8 gal.
+  - `flange-rating` scaled Classes 900, 1500 and 2500 from Class 600 by 1.5, 2.5 and 4.17, which ran up to 16 psi over the ASME B16.5 Group 1.1 table. The published rows are now bundled.
+  - `hanger-rod-sizing` carried an older threaded-rod table (3/8 in 610 lb) and called it the value "every hanger catalog" publishes. Current MSS SP-58 loads, 10,700 psi on the root area, are 16-20% higher (3/8 in 730 lb) and match National Pipe Hanger (2025) and Anvil. A 1,200 lb hanger now takes a 1/2 in rod where the table gave 5/8.
+  - `powder-coating-coverage` used 192.7 ft²/lb at 1 mil and SG 1.0; the physics gives 192.2 and the industry figure is 192.3.
 - **Cargo securement, passenger hours of service, condensate drains, and two IECC section numbers checked against the eCFR and the 2021 I-codes.**
   - `tiedown-count` and `cargo-securement-wll` credited tiedowns by whether they were secured at both ends (or credited every tiedown in full). 49 CFR 393.106(d) credits by path. A tiedown over or around the cargo to the other side of the vehicle counts its full working load limit. A direct tiedown, vehicle to cargo, or one that returns to the same side, counts half, even though both are anchored at both ends. Direct chains were credited at twice what the rule allows (unsafe). Both tiles now take the tiedown path.
   - `hos-math` offered passenger drivers only 60 hours in 7 days. 395.5(b)(2) also allows 70 hours in 8 days when the carrier operates every day of the week; that profile is added.

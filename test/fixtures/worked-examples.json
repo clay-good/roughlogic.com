@@ -37373,11 +37373,11 @@
   {
    "tile_id": "hanger-rod-sizing",
    "source_publisher": "MSS SP-58 carbon-steel threaded-rod loads (by name)",
-   "source_title": "228 lb per hanger, ambient -> 3/8 in rod (610 lb) at 37% utilization",
+   "source_title": "228 lb per hanger, ambient -> 3/8 in rod (730 lb) at 31% utilization",
    "source_edition_or_year": "spec-v162 worked example (machine-verified, table lookup)",
    "source_section_or_page": "spec-v162 section 2.1 pinned example",
    "verified_by": "rl",
-   "verified_on": "2026-06-23",
+   "verified_on": "2026-09-25",
    "inputs": {
     "load_lb": 228,
     "temp_derate": 1
@@ -37390,7 +37390,7 @@
      }
     },
     "utilization_pct": {
-     "value": 37,
+     "value": 31.2,
      "tolerance": {
       "abs": 1
      }
@@ -37399,25 +37399,25 @@
   },
   {
    "tile_id": "hanger-rod-sizing",
-   "source_publisher": "MSS SP-58 carbon-steel threaded-rod loads (by name)",
-   "source_title": "Heavier 1,200 lb load steps up two sizes -> 5/8 in (1,810 lb) at 66%",
+   "source_publisher": "MSS SP-58 carbon-steel threaded-rod loads (10,700 psi basis; National Pipe Hanger Fig. 755)",
+   "source_title": "Heavier 1,200 lb load steps up one size -> 1/2 in (1,350 lb) at 89%",
    "source_edition_or_year": "spec-v162 worked example (machine-verified, table lookup)",
    "source_section_or_page": "spec-v162 section 2.1 cross-check",
    "verified_by": "rl",
-   "verified_on": "2026-06-23",
+   "verified_on": "2026-09-25",
    "inputs": {
     "load_lb": 1200,
     "temp_derate": 1
    },
    "outputs": {
     "rod_dia": {
-     "value": "5/8",
+     "value": "1/2",
      "tolerance": {
       "abs": 0
      }
     },
     "utilization_pct": {
-     "value": 66,
+     "value": 88.9,
      "tolerance": {
       "abs": 1
      }
@@ -42072,7 +42072,7 @@
   {
    "tile_id": "vessel-head-volume",
    "source_publisher": "dished-head volume geometry (first-principles)",
-   "source_title": "cross-check: 48 in ID hemispherical head -> 125.34 gal; F&D ~ 40.5 gal",
+   "source_title": "cross-check: 48 in ID hemispherical head -> 125.34 gal; F&D ~ 38.8 gal",
    "source_edition_or_year": "spec-v912 worked example (machine-verified)",
    "source_section_or_page": "hemi V = pi*48^3/12 = 28952.9 in3 = 125.34 gal",
    "verified_by": "rl",
@@ -67773,20 +67773,20 @@
   {
    "tile_id": "weld-travel-speed",
    "source_publisher": "AWS / ASME",
-   "source_title": "GMAW 24 V, 200 A, eta 0.80, target 40 kJ/in -> 5.76 in/min",
+   "source_title": "GMAW 24 V, 200 A, AWS/ASME basis (eta 1), target 40 kJ/in -> 7.2 in/min",
    "source_edition_or_year": "spec-v358 worked example (machine-verified)",
    "source_section_or_page": "spec-v358 section 2.1 pinned example",
    "verified_by": "rl",
-   "verified_on": "2026-07-03",
+   "verified_on": "2026-09-25",
    "inputs": {
     "V_volts": 24,
     "I_amps": 200,
-    "eta": 0.8,
+    "eta": 1,
     "HI_kjin": 40
    },
    "outputs": {
     "travel_speed_ipm": {
-     "value": 5.76,
+     "value": 7.2,
      "tolerance": {
       "pct": 0.5
      }
@@ -67795,21 +67795,21 @@
   },
   {
    "tile_id": "weld-travel-speed",
-   "source_publisher": "AWS / ASME",
-   "source_title": "cross-check: a tighter 25 kJ/in ceiling forces 9.22 in/min",
+   "source_publisher": "AWS D1.1 / ASME IX QW-409.1",
+   "source_title": "cross-check: a tighter 25 kJ/in ceiling forces 11.52 in/min",
    "source_edition_or_year": "spec-v358 worked example (machine-verified)",
    "source_section_or_page": "spec-v358 section 2.1 cross-check",
    "verified_by": "rl",
-   "verified_on": "2026-07-03",
+   "verified_on": "2026-09-25",
    "inputs": {
     "V_volts": 24,
     "I_amps": 200,
-    "eta": 0.8,
+    "eta": 1,
     "HI_kjin": 25
    },
    "outputs": {
     "travel_speed_ipm": {
-     "value": 9.22,
+     "value": 11.52,
      "tolerance": {
       "pct": 0.5
      }
@@ -93374,7 +93374,7 @@
    "source_publisher": "Project (first-principles)",
    "source_title": "SG 1.5 powder at 2.0 mils over 500 sq ft, 60% transfer, 95% reclaim",
    "source_edition_or_year": "powder coating practice",
-   "source_section_or_page": "coverage = 192.7 / (SG x mils)",
+   "source_section_or_page": "coverage = 192.3 / (SG x mils); 192.3 = 453.59 g / (1 mil x SG 1.0) in ft^2",
    "verified_by": "rl",
    "verified_on": "2026-08-27",
    "inputs": {
@@ -93387,19 +93387,19 @@
    },
    "outputs": {
     "theoretical_coverage_sqft_lb": {
-     "value": 64.2333,
+     "value": 64.1,
      "tolerance": {
       "pct": 0.5
      }
     },
     "waste_coverage": {
-     "value": 38.54,
+     "value": 38.46,
      "tolerance": {
       "pct": 0.5
      }
     },
     "waste_powder_lb": {
-     "value": 12.9735,
+     "value": 13.0005,
      "tolerance": {
       "pct": 0.5
      }
@@ -93411,13 +93411,13 @@
      }
     },
     "reclaim_coverage": {
-     "value": 62.9487,
+     "value": 62.818,
      "tolerance": {
       "pct": 0.5
      }
     },
     "reclaim_powder_lb": {
-     "value": 7.94298,
+     "value": 7.9595,
      "tolerance": {
       "pct": 0.5
      }

@@ -955,54 +955,57 @@ SHOP_RENDERERS["weld-duty-cycle"] = _v40renderWeldDutyCycle;
 
 // =====================================================================
 // spec-v40 2.10 - carbon-equivalent (Carbon Equivalent and Preheat Screen) - Group E
-// IIW / AWS D1.1: CE = C + Mn/6 + (Cr+Mo+V)/5 + (Ni+Cu)/15.
+// AWS D1.1 (2000) Annex XI: CE = C + (Mn+Si)/6 + (Cr+Mo+V)/5 + (Ni+Cu)/15. The IIW formula is
+// the same without Si; leaving Si at 0 gives it. (Until 2026-09-24 there was no Si input, so the
+// "D1.1" figure read Si/6 low -- 0.03 to 0.07 for ordinary structural steel.)
 // =====================================================================
 
-// dims: in { c: dimensionless, mn: dimensionless, cr: dimensionless, mo: dimensionless, v: dimensionless, ni: dimensionless, cu: dimensionless } out: { carbon_equivalent: dimensionless }
-export function computeCarbonEquivalent({ c = 0, mn = 0, cr = 0, mo = 0, v = 0, ni = 0, cu = 0 } = {}) {
+// dims: in { c: dimensionless, mn: dimensionless, si: dimensionless, cr: dimensionless, mo: dimensionless, v: dimensionless, ni: dimensionless, cu: dimensionless } out: { carbon_equivalent: dimensionless }
+export function computeCarbonEquivalent({ c = 0, mn = 0, si = 0, cr = 0, mo = 0, v = 0, ni = 0, cu = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
-  const vals = { c, mn, cr, mo, v, ni, cu };
+  const vals = { c, mn, si, cr, mo, v, ni, cu };
   for (const [k, val] of Object.entries(vals)) {
     const n = Number(val) || 0;
     if (n < 0) return { error: "Element weight percent cannot be negative (" + k.toUpperCase() + ")." };
     vals[k] = n;
   }
-  const ce = vals.c + vals.mn / 6 + (vals.cr + vals.mo + vals.v) / 5 + (vals.ni + vals.cu) / 15;
-  const total = vals.c + vals.mn + vals.cr + vals.mo + vals.v + vals.ni + vals.cu;
+  const ce = vals.c + (vals.mn + vals.si) / 6 + (vals.cr + vals.mo + vals.v) / 5 + (vals.ni + vals.cu) / 15;
+  const total = vals.c + vals.mn + vals.si + vals.cr + vals.mo + vals.v + vals.ni + vals.cu;
   let band, band_label;
   if (total === 0) { band = "none"; band_label = "Enter a steel composition (all elements are zero)."; }
   else if (ce < 0.35) { band = "low"; band_label = "Readily weldable: low preheat risk."; }
   else if (ce <= 0.55) { band = "medium"; band_label = "Preheat generally advised."; }
   else { band = "high"; band_label = "High hardenability / hydrogen-cracking risk: preheat and a low-hydrogen process required."; }
   const notes = [];
-  notes.push("IIW carbon equivalent CE = C + Mn/6 + (Cr + Mo + V)/5 + (Ni + Cu)/15 (the formula adopted in AWS D1.1). Bands: < 0.35 readily weldable; 0.35-0.55 preheat generally advised; > 0.55 high hardenability, preheat and low-hydrogen process required.");
+  notes.push("Carbon equivalent CE = C + (Mn + Si)/6 + (Cr + Mo + V)/5 + (Ni + Cu)/15 (AWS D1.1 Annex XI); with Si left at 0 this is the IIW formula, which omits Si. Bands: < 0.35 readily weldable; 0.35-0.55 preheat generally advised; > 0.55 high hardenability, preheat and low-hydrogen process required.");
   notes.push("This is a screen, not a welding procedure; the WPS, hydrogen level, restraint, and thickness govern the actual preheat (AWS D1.1 Annex).");
   return { carbon_equivalent: ce, band, band_label, notes };
 }
 export const carbonEquivalentExample = { inputs: { c: 0.25, mn: 0.8, cr: 0, mo: 0, v: 0, ni: 0, cu: 0 } };
 
 function _v40renderCarbonEquivalent(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: The IIW carbon-equivalent formula CE = C + Mn/6 + (Cr+Mo+V)/5 + (Ni+Cu)/15 as adopted in AWS D1.1 Structural Welding Code, by name; published formula. The output is a screening band, not a qualified welding procedure.";
+  citationEl.textContent = "Citation: AWS D1.1 Structural Welding Code (2000) Annex XI carbon equivalent CE = C + (Mn+Si)/6 + (Cr+Mo+V)/5 + (Ni+Cu)/15, by name; with Si = 0 it reduces to the IIW formula; published formula. The output is a screening band, not a qualified welding procedure.";
   const c = makeNumber("Carbon C (wt %)", "ce-c", { step: "any", min: "0" });
   const mn = makeNumber("Manganese Mn (wt %)", "ce-mn", { step: "any", min: "0" });
+  const si = makeNumber("Silicon Si (wt %; 0 for the IIW formula)", "ce-si", { step: "any", min: "0" });
   const cr = makeNumber("Chromium Cr (wt %)", "ce-cr", { step: "any", min: "0" });
   const mo = makeNumber("Molybdenum Mo (wt %)", "ce-mo", { step: "any", min: "0" });
   const v = makeNumber("Vanadium V (wt %)", "ce-v", { step: "any", min: "0" });
   const ni = makeNumber("Nickel Ni (wt %)", "ce-ni", { step: "any", min: "0" });
   const cu = makeNumber("Copper Cu (wt %)", "ce-cu", { step: "any", min: "0" });
-  for (const f of [c, mn, cr, mo, v, ni, cu]) inputRegion.appendChild(f.wrap);
-  attachExampleButton(inputRegion, () => { c.input.value = "0.25"; mn.input.value = "0.8"; cr.input.value = ""; mo.input.value = ""; v.input.value = ""; ni.input.value = ""; cu.input.value = ""; update(); });
+  for (const f of [c, mn, si, cr, mo, v, ni, cu]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { c.input.value = "0.25"; mn.input.value = "0.8"; si.input.value = ""; cr.input.value = ""; mo.input.value = ""; v.input.value = ""; ni.input.value = ""; cu.input.value = ""; update(); });
   const oCe = makeOutputLine(outputRegion, "Carbon equivalent (IIW)", "ce-out-ce");
   const oBand = makeOutputLine(outputRegion, "Weldability / preheat screen", "ce-out-band");
   const oNote = makeOutputLine(outputRegion, "Notes", "ce-out-note");
   const update = debounce(() => {
-    const r = computeCarbonEquivalent({ c: _readNum(c.input), mn: _readNum(mn.input), cr: _readNum(cr.input), mo: _readNum(mo.input), v: _readNum(v.input), ni: _readNum(ni.input), cu: _readNum(cu.input) });
+    const r = computeCarbonEquivalent({ c: _readNum(c.input), mn: _readNum(mn.input), si: _readNum(si.input), cr: _readNum(cr.input), mo: _readNum(mo.input), v: _readNum(v.input), ni: _readNum(ni.input), cu: _readNum(cu.input) });
     if (r.error) { oCe.textContent = r.error; oBand.textContent = "-"; oNote.textContent = ""; return; }
     oCe.textContent = fmt(r.carbon_equivalent, 5);
     oBand.textContent = r.band_label;
     oNote.textContent = r.notes.join(" ");
   }, DEBOUNCE_MS);
-  for (const f of [c.input, mn.input, cr.input, mo.input, v.input, ni.input, cu.input]) f.addEventListener("input", update);
+  for (const f of [c.input, mn.input, si.input, cr.input, mo.input, v.input, ni.input, cu.input]) f.addEventListener("input", update);
 }
 SHOP_RENDERERS["carbon-equivalent"] = _v40renderCarbonEquivalent;
 
@@ -3186,8 +3189,9 @@ export function computePowderCoatingCoverage({ specific_gravity = 0, film_thickn
   if (!(transfer_efficiency > 0 && transfer_efficiency <= 1)) return { error: "Transfer efficiency must be between 0 and 1." };
   if (!(reclaim_efficiency >= 0 && reclaim_efficiency <= 1)) return { error: "Reclaim efficiency must be between 0 and 1." };
   if (!(price_per_lb >= 0)) return { error: "Powder price cannot be negative." };
-  // 192.7 is the standard powder-coating constant: sq ft per lb at 1 mil and SG 1.0.
-  const theoretical_coverage_sqft_lb = 192.7 / (specific_gravity * film_thickness_mils);
+  // 192.3 is the standard powder-coating constant: sq ft per lb at 1 mil and SG 1.0 (453.59 g spread
+  // 0.00254 cm thick covers 192.2 ft^2; the industry figure is 192.3). It was 192.7 until 2026-09-25.
+  const theoretical_coverage_sqft_lb = 192.3 / (specific_gravity * film_thickness_mils);
   const waste_coverage = theoretical_coverage_sqft_lb * transfer_efficiency;
   const waste_powder_lb = part_area_sqft / waste_coverage;
   // Reclaim recovers the overspray, so the utilisation is the first pass plus
@@ -3210,7 +3214,7 @@ export function computePowderCoatingCoverage({ specific_gravity = 0, film_thickn
 export const powderCoatingCoverageExample = { inputs: { specific_gravity: 1.5, film_thickness_mils: 2, part_area_sqft: 500, transfer_efficiency: 0.6, reclaim_efficiency: 0.95, price_per_lb: 6 } };
 
 SHOP_RENDERERS["powder-coating-coverage"] = _simpleRenderer({
-  citation: "Citation: theoretical powder coverage = 192.7 / (specific gravity x film thickness in mils), the standard powder-coating constant (sq ft per lb at 1 mil and SG 1.0), by name; effective coverage from transfer efficiency, and reclaim utilisation = transfer + (1 - transfer) x reclaim efficiency. Material only -- no cure schedule, film uniformity, pretreatment, Faraday-cage effect, or reclaim color-change loss. The powder manufacturer's technical data sheet and the coating specification govern.",
+  citation: "Citation: theoretical powder coverage = 192.3 / (specific gravity x film thickness in mils), the standard powder-coating constant (sq ft per lb at 1 mil and SG 1.0), by name; effective coverage from transfer efficiency, and reclaim utilisation = transfer + (1 - transfer) x reclaim efficiency. Material only -- no cure schedule, film uniformity, pretreatment, Faraday-cage effect, or reclaim color-change loss. The powder manufacturer's technical data sheet and the coating specification govern.",
   example: powderCoatingCoverageExample.inputs,
   fields: [
     { key: "specific_gravity", label: "Powder specific gravity", kind: "number" },

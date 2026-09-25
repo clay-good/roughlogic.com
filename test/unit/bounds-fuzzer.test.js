@@ -12918,6 +12918,8 @@ test("bounds: spec-v40 carbon-equivalent pins CE + bands + rejects bad inputs", 
   const a = _cv40j({ c: 0.25, mn: 0.8 });
   assert.ok(Math.abs(a.carbon_equivalent - (0.25 + 0.8 / 6)) < 1e-12 && a.band === "medium");
   assert.ok(_cv40j({ c: 0.1, mn: 0.5 }).band === "low");
+  // AWS D1.1 Annex XI counts Si with Mn: 0.25 Si adds 0.25/6 to the CE.
+  assert.ok(Math.abs(_cv40j({ c: 0.25, mn: 0.8, si: 0.25 }).carbon_equivalent - a.carbon_equivalent - 0.25 / 6) < 1e-12);
   assert.ok(_cv40j({ c: 0.5, mn: 1.0, cr: 0.5 }).band === "high");
   assert.ok(_cv40j({}).band === "none");
   assert.ok("error" in _cv40j({ c: -0.1 }));
@@ -13996,9 +13998,10 @@ test("bounds: spec-v161 pipe-filled-support-load pins the buildup + insulation a
 test("bounds: spec-v162 hanger-rod-sizing pins the rod pick + steps up with load + exceeds-table + rejects bad inputs", () => {
   const a = _v162({ load_lb: 228, temp_derate: 1 });
   assert.equal(a.rod_dia, "3/8");
-  assert.ok(Math.abs(a.utilization_pct - 37) < 1);
-  // heavier load steps up two sizes.
-  assert.equal(_v162({ load_lb: 1200, temp_derate: 1 }).rod_dia, "5/8");
+  assert.ok(Math.abs(a.utilization_pct - 228 / 730 * 100) < 1e-9); // MSS SP-58 at 10,700 psi: 3/8 in = 730 lb
+  // A heavier load steps up: 1,200 lb fits the 1/2 in rod (1,350 lb).
+  assert.equal(_v162({ load_lb: 1200, temp_derate: 1 }).rod_dia, "1/2");
+  assert.equal(_v162({ load_lb: 1400, temp_derate: 1 }).rod_dia, "5/8");
   // exceeds the largest tabulated rod -> error.
   assert.ok("error" in _v162({ load_lb: 99999, temp_derate: 1 }));
   assert.ok("error" in _v162({ load_lb: 0, temp_derate: 1 }));
@@ -14084,6 +14087,11 @@ test("bounds: spec-v203 flange-rating pins the table + interpolation + higher cl
   assert.ok(Math.abs(_v203({ flange_class: 150, temp_f: 350 }).mawp_psig - 215) < 0.5);
   // 900 scales from the 600 column by the class ratio (1480 x 1.5 cold).
   assert.ok(Math.abs(_v203({ flange_class: 900, temp_f: 100 }).mawp_psig - 2220) < 1);
+  // B16.5 Group 1.1 rows as published (not 600 x ratio): 200 F -> 2,035 / 3,395 / 5,655; 650 F Class 2500 -> 4,575.
+  assert.strictEqual(_v203({ flange_class: 900, temp_f: 200 }).mawp_psig, 2035);
+  assert.strictEqual(_v203({ flange_class: 1500, temp_f: 200 }).mawp_psig, 3395);
+  assert.strictEqual(_v203({ flange_class: 2500, temp_f: 200 }).mawp_psig, 5655);
+  assert.strictEqual(_v203({ flange_class: 2500, temp_f: 650 }).mawp_psig, 4575);
   assert.ok("error" in _v203({ flange_class: 250, temp_f: 400 })); // unlisted class
   assert.ok("error" in _v203({ flange_class: 150, temp_f: 800 })); // out of table range
   assert.ok("error" in _v203({ flange_class: 150, temp_f: 50 }));
@@ -20605,6 +20613,9 @@ test("bounds: spec-v357 computeWeldPassesArcTime pins the ceil passes, weight, a
 });
 
 test("bounds: spec-v358 computeWeldTravelSpeed pins the inverse relation, the round-trip check, and error seams", () => {
+  // AWS D1.1 / ASME IX heat input carries no efficiency, so the default is eta = 1: 60*24*200/40000 = 7.2 ipm.
+  assert.ok(Math.abs(_v358({ V_volts: 24, I_amps: 200, HI_kjin: 40 }).travel_speed_ipm - 7.2) < 1e-9);
+  // An EN 1011-1 effective-heat-input limit takes the process efficiency (0.8 GMAW).
   const r = _v358({ V_volts: 24, I_amps: 200, eta: 0.80, HI_kjin: 40 });
   assert.ok(Math.abs(r.travel_speed_ipm - 5.76) < 0.01);
   // The heat-input back-check reproduces the target.
@@ -29452,7 +29463,7 @@ test("bounds: spec-v912 computeVesselHeadVolume pins the head volumes by type, s
   assert.ok(Math.abs(h.head_volume_gal - 125.34) < 0.02); // pi*48^3/12 / 231
   assert.ok(Math.abs(h.head_depth_in - 24) < 1e-9); // D/2
   const f = _v912({ inside_diameter_in: 48, head_type: "fd", straight_flange_in: 0 });
-  assert.ok(Math.abs(f.head_volume_gal - 40.55) < 0.05); // 0.0847*48^3 / 231
+  assert.ok(Math.abs(f.head_volume_gal - 38.78) < 0.01); // 0.0810*48^3 / 231 (standard F&D, crown D / knuckle 0.06 D)
   // Straight flange adds a cylindrical skirt: pi/4*48^2*2 = 3619.1 in3 = 15.67 gal.
   const sf = _v912({ inside_diameter_in: 48, head_type: "elliptical", straight_flange_in: 2 });
   assert.ok(Math.abs(sf.total_volume_gal - (62.67 + 15.67)) < 0.05);
@@ -41670,12 +41681,12 @@ import { computePowderCoatingCoverage as _v1440 } from "../../calc-shop.js";
 test("bounds: spec-v1440 computePowderCoatingCoverage pins reclaim against film build", () => {
   const base = { specific_gravity: 1.5, film_thickness_mils: 2, part_area_sqft: 500, transfer_efficiency: 0.6, reclaim_efficiency: 0.95, price_per_lb: 6 };
   const r = _v1440(base);
-  assert.ok(Math.abs(r.theoretical_coverage_sqft_lb - 64.23) < 1e-2);
-  assert.ok(Math.abs(r.waste_coverage - 38.54) < 1e-2);
-  assert.ok(Math.abs(r.waste_powder_lb - 12.97) < 1e-2);
+  assert.ok(Math.abs(r.theoretical_coverage_sqft_lb - 64.10) < 1e-2);
+  assert.ok(Math.abs(r.waste_coverage - 38.46) < 1e-2);
+  assert.ok(Math.abs(r.waste_powder_lb - 13.00) < 1e-2);
   assert.ok(Math.abs(r.utilization - 0.98) < 1e-9);
-  assert.ok(Math.abs(r.reclaim_coverage - 62.95) < 1e-2);
-  assert.ok(Math.abs(r.reclaim_powder_lb - 7.94) < 1e-2);
+  assert.ok(Math.abs(r.reclaim_coverage - 62.82) < 1e-2);
+  assert.ok(Math.abs(r.reclaim_powder_lb - 7.96) < 1e-2);
   assert.ok(Math.abs(r.saving_pct - 38.8) < 0.1);
   // Spray to waste is the reclaim_efficiency = 0 case and must agree exactly.
   const toWaste = _v1440({ ...base, reclaim_efficiency: 0 });
@@ -41685,7 +41696,7 @@ test("bounds: spec-v1440 computePowderCoatingCoverage pins reclaim against film 
   // Film build outweighs transfer efficiency: 2.0 -> 3.0 mils raises the
   // no-reclaim requirement 50%, more than reclaim ever saves.
   const thick = _v1440({ ...base, film_thickness_mils: 3 });
-  assert.ok(Math.abs(thick.waste_powder_lb - 19.46) < 1e-2);
+  assert.ok(Math.abs(thick.waste_powder_lb - 19.50) < 1e-2);
   assert.ok(Math.abs(thick.waste_powder_lb / r.waste_powder_lb - 1.5) < 1e-9);
   assert.ok((thick.waste_powder_lb - r.waste_powder_lb) > (r.waste_powder_lb - r.reclaim_powder_lb));
   // Coverage is inverse in BOTH specific gravity and thickness.

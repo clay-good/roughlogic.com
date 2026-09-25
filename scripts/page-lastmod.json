@@ -2,7 +2,7 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "06439c421c492e27",
+      "sha": "dba6085388d8b25c",
       "date": "2026-09-25"
     },
     "/tools/": {
@@ -942,8 +942,8 @@
       "date": "2026-09-08"
     },
     "/tools/carbon-equivalent/": {
-      "sha": "5dbec6abf5ae6d6e",
-      "date": "2026-09-01"
+      "sha": "94bb89acd167a2c1",
+      "date": "2026-09-25"
     },
     "/tools/carbonation-volumes-pressure/": {
       "sha": "06f979e0967880fc",
@@ -2950,8 +2950,8 @@
       "date": "2026-09-09"
     },
     "/tools/flange-rating/": {
-      "sha": "88acc37148671383",
-      "date": "2026-09-01"
+      "sha": "47072bc288f662b2",
+      "date": "2026-09-25"
     },
     "/tools/flare-radiation-distance/": {
       "sha": "051bc784d26b0f06",
@@ -3510,8 +3510,8 @@
       "date": "2026-09-01"
     },
     "/tools/hanger-rod-sizing/": {
-      "sha": "a438fe582df2ec0f",
-      "date": "2026-09-01"
+      "sha": "cdca9c3ca3b17ed7",
+      "date": "2026-09-25"
     },
     "/tools/hardness-tensile-conversion/": {
       "sha": "c69de41985f98b78",
@@ -5510,8 +5510,8 @@
       "date": "2026-09-04"
     },
     "/tools/powder-coating-coverage/": {
-      "sha": "121b17a041107247",
-      "date": "2026-09-01"
+      "sha": "b1ecc52e68af157b",
+      "date": "2026-09-25"
     },
     "/tools/power-distro/": {
       "sha": "7c5cc0a6cca6c217",
@@ -8350,8 +8350,8 @@
       "date": "2026-09-01"
     },
     "/tools/vessel-head-volume/": {
-      "sha": "e47675657bf3b41f",
-      "date": "2026-09-01"
+      "sha": "88173a09d20e9e8f",
+      "date": "2026-09-25"
     },
     "/tools/vfd-energy-savings/": {
       "sha": "e755808f6b0fc871",
@@ -8554,8 +8554,8 @@
       "date": "2026-09-01"
     },
     "/tools/weld-travel-speed/": {
-      "sha": "3fd624df50bce1f3",
-      "date": "2026-09-01"
+      "sha": "37fef35c8e023150",
+      "date": "2026-09-25"
     },
     "/tools/weld-usage/": {
       "sha": "5129892ad691b564",

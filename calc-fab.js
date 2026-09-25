@@ -1394,7 +1394,12 @@ function _v357renderWeldPassesArcTime(inputRegion, outputRegion, citationEl) {
 FAB_RENDERERS["weld-passes-arc-time"] = _v357renderWeldPassesArcTime;
 
 // dims: in { V_volts: M L^2 T^-3 I^-1, I_amps: I, eta: dimensionless, HI_kjin: M L T^-2 } out: { travel_speed_ipm: L T^-1 }
-export function computeWeldTravelSpeed({ V_volts = 0, I_amps = 0, eta = 0.8, HI_kjin = 0 } = {}) {
+// AWS D1.1 (Table 4.5 note) and ASME IX QW-409.1(a) compute heat input as 60 E I / V with NO
+// arc efficiency, so a WPS heat-input limit is on that basis and eta defaults to 1.0. The EN 1011-1
+// thermal-efficiency factors (0.8 GMAW / SMAW, 0.6 GTAW, 1.0 SAW) give an "effective" heat input
+// for EN-basis limits only. (Until 2026-09-24 eta defaulted to 0.8, so the travel speed delivered
+// 1.25x a code-basis limit.)
+export function computeWeldTravelSpeed({ V_volts = 0, I_amps = 0, eta = 1.0, HI_kjin = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const v = Number(V_volts) || 0;
   const i = Number(I_amps) || 0;
@@ -1410,19 +1415,19 @@ export function computeWeldTravelSpeed({ V_volts = 0, I_amps = 0, eta = 0.8, HI_
   const hi_check = (60 * v * i * e) / (1000 * travel_speed_ipm);
   return {
     travel_speed_ipm, hi_check,
-    note: "Travel speed for a target heat input: TS = (60 x V x I x eta) / (1000 x HI), with eta the arc efficiency (about 0.8 GMAW, 0.65 GTAW, 0.9 SAW). Travel at or ABOVE this to hold the heat input at or UNDER the target - a lower heat-input ceiling forces a faster travel, the inverse TS-HI relationship a welder uses to trade travel speed for HAZ control and to meet a WPS's heat-input limit. Slowing down at the same volts and amps raises the heat input. A process aid; the qualified WPS governs the allowable range.",
+    note: "Travel speed for a target heat input: TS = (60 x V x I x eta) / (1000 x HI). AWS D1.1 and ASME IX compute heat input with NO efficiency term, so against a code-basis WPS limit keep eta = 1; use the EN 1011-1 thermal efficiency (0.8 GMAW and SMAW, 0.6 GTAW, 1.0 SAW) only for an EN-basis limit. Travel at or ABOVE this to hold the heat input at or UNDER the target - a lower heat-input ceiling forces a faster travel, the inverse TS-HI relationship a welder uses to trade travel speed for HAZ control and to meet a WPS's heat-input limit. Slowing down at the same volts and amps raises the heat input. A process aid; the qualified WPS governs the allowable range.",
   };
 }
-export const weldTravelSpeedExample = { inputs: { V_volts: 24, I_amps: 200, eta: 0.80, HI_kjin: 40 } };
+export const weldTravelSpeedExample = { inputs: { V_volts: 24, I_amps: 200, eta: 1.0, HI_kjin: 40 } };
 function _v358renderWeldTravelSpeed(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: heat input HI = (60 V I eta)/(1000 TS) solved for travel speed, per the AWS/ASME arc heat-input relation with the arc efficiency eta (0.8 GMAW, 0.65 GTAW, 0.9 SAW), by name. Travel at or above the result to stay at or under the target HI. The qualified WPS governs the allowable range.";
+  citationEl.textContent = "Citation: heat input HI = 60 E I / (1000 TS) per AWS D1.1 and ASME IX QW-409.1(a), which carry no arc efficiency (eta = 1), solved for travel speed; for an EN-basis limit, EN 1011-1 thermal efficiency eta (0.8 GMAW/SMAW, 0.6 GTAW, 1.0 SAW), by name. Travel at or above the result to stay at or under the target HI. The qualified WPS governs the allowable range.";
   const v = makeNumber("Arc voltage (V)", "wts-v", { step: "any", min: "0" });
   const i = makeNumber("Welding current (A)", "wts-i", { step: "any", min: "0" });
-  const e = makeNumber("Arc efficiency (0.8 GMAW, 0.65 GTAW, 0.9 SAW)", "wts-e", { step: "any", min: "0", max: "1" });
+  const e = makeNumber("Arc efficiency (1 for AWS/ASME limits; EN 1011-1: 0.8 GMAW, 0.6 GTAW, 1.0 SAW)", "wts-e", { step: "any", min: "0", max: "1" });
   const hi = makeNumber("Target heat input (kJ/in)", "wts-hi", { step: "any", min: "0" });
   for (const f of [v, i, e, hi]) inputRegion.appendChild(f.wrap);
-  e.input.value = "0.80";
-  attachExampleButton(inputRegion, () => { v.input.value = "24"; i.input.value = "200"; e.input.value = "0.80"; hi.input.value = "40"; update(); });
+  e.input.value = "1";
+  attachExampleButton(inputRegion, () => { v.input.value = "24"; i.input.value = "200"; e.input.value = "1"; hi.input.value = "40"; update(); });
   const oTS = makeOutputLine(outputRegion, "Travel speed (at or above)", "wts-out-ts");
   const oNote = makeOutputLine(outputRegion, "Note", "wts-out-note");
   const update = debounce(() => {
@@ -1538,7 +1543,9 @@ function _v909renderBarstockCutlist(inputRegion, outputRegion, citationEl) {
 FAB_RENDERERS["barstock-cutlist"] = _v909renderBarstockCutlist;
 
 // ===================== spec-v912: dished tank / vessel head volume =====================
-const _VESSEL_HEAD_COEF = { elliptical: Math.PI / 24, fd: 0.0847, hemispherical: Math.PI / 12 };
+// Standard F&D (torispherical, crown radius D, knuckle 0.06 D): 0.08100 D^3 (Perry; Chemical
+// Engineering, Sept. 2011, Table 3; confirmed by numerical integration). Was 0.0847 until 2026-09-25.
+const _VESSEL_HEAD_COEF = { elliptical: Math.PI / 24, fd: 0.0810, hemispherical: Math.PI / 12 };
 // dims: in { inside_diameter_in: L, head_type: dimensionless, straight_flange_in: L } out: { head_volume_in3: L^3, head_volume_gal: L^3, total_volume_gal: L^3, head_depth_in: L }
 export function computeVesselHeadVolume({ inside_diameter_in = 48, head_type = "elliptical", straight_flange_in = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
@@ -1546,7 +1553,7 @@ export function computeVesselHeadVolume({ inside_diameter_in = 48, head_type = "
   if (straight_flange_in < 0) return { error: "Straight flange cannot be negative (in)." };
   const coef = _VESSEL_HEAD_COEF[head_type] || _VESSEL_HEAD_COEF.elliptical;
   const D = inside_diameter_in;
-  // Head bulge volume: 2:1 elliptical = pi D^3/24; hemispherical = pi D^3/12; ASME F&D ~ 0.0847 D^3 (standard).
+  // Head bulge volume: 2:1 elliptical = pi D^3/24; hemispherical = pi D^3/12; ASME F&D ~ 0.0810 D^3 (standard).
   const head_volume_in3 = coef * D * D * D;
   const straight_flange_in3 = Math.PI / 4 * D * D * straight_flange_in;
   const total_in3 = head_volume_in3 + straight_flange_in3;
@@ -1560,14 +1567,14 @@ export function computeVesselHeadVolume({ inside_diameter_in = 48, head_type = "
     head_volume_gal,
     total_volume_gal,
     head_depth_in,
-    note: "Volume of one dished head (the bulge past the tangent line), plus any straight-flange (cylindrical skirt) section. 2:1 semi-elliptical = pi D^3/24; hemispherical = pi D^3/12; ASME flanged-and-dished (torispherical) ~ 0.0847 D^3 for the standard crown = D, knuckle = 0.06 D geometry -- the F&D figure is an approximation, the exact volume needs the actual crown and knuckle radii. Two heads make a tank's end allowance; add the straight-shell volume separately. The head manufacturer's stamped dimensions govern.",
+    note: "Volume of one dished head (the bulge past the tangent line), plus any straight-flange (cylindrical skirt) section. 2:1 semi-elliptical = pi D^3/24; hemispherical = pi D^3/12; ASME flanged-and-dished (torispherical) ~ 0.0810 D^3 for the standard crown = D, knuckle = 0.06 D geometry -- the F&D figure is an approximation, the exact volume needs the actual crown and knuckle radii. Two heads make a tank's end allowance; add the straight-shell volume separately. The head manufacturer's stamped dimensions govern.",
   };
 }
 
 export const vesselHeadVolumeExample = { inputs: { inside_diameter_in: 48, head_type: "elliptical", straight_flange_in: 0 } };
 
 function _v912renderVesselHeadVolume(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: dished-head volume geometry by name. 2:1 semi-elliptical head = pi D^3/24; hemispherical = pi D^3/12; ASME flanged-and-dished (torispherical) ~ 0.0847 D^3 (standard crown/knuckle, approximate); straight flange = pi/4 D^2 x length. US gallons = in^3 / 231.";
+  citationEl.textContent = "Citation: dished-head volume geometry by name. 2:1 semi-elliptical head = pi D^3/24; hemispherical = pi D^3/12; ASME flanged-and-dished (torispherical) ~ 0.0810 D^3 (standard crown/knuckle, approximate); straight flange = pi/4 D^2 x length. US gallons = in^3 / 231.";
   const dia = makeNumber("Inside diameter (in)", "vhv-dia", { step: "any", min: "0" });
   const ht = makeSelect("Head type", "vhv-ht", [
     { value: "elliptical", label: "2:1 semi-elliptical", selected: true },

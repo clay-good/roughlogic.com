@@ -2295,7 +2295,7 @@ cross-check.
 | calc-fab.js | `computeWeldPassesArcTime` | `{ A_groove = 0, length_in = 0, a_pass = 0, dep_rate = 0, density = 0.283, op_...` | _ | _ | _ |
 | calc-fab.js | `computeWeldPreheatFuel` | `{ steel_lb, start_temp_F, preheat_temp_F, efficiency_pct = 25, c_steel = 0.11...` | _ | _ | _ |
 | calc-fab.js | `computeWeldTransverseShrinkage` | `{ weld_area_in2 = 0, thickness_in = 0, weld_count = 1, root_opening_in = 0 } ...` | _ | _ | _ |
-| calc-fab.js | `computeWeldTravelSpeed` | `{ V_volts = 0, I_amps = 0, eta = 0.8, HI_kjin = 0 } = {}` | _ | _ | _ |
+| calc-fab.js | `computeWeldTravelSpeed` | `{ V_volts = 0, I_amps = 0, eta = 1.0, HI_kjin = 0 } = {}` | _ | _ | _ |
 | calc-fab.js | `computeWireFeedDeposition` | `{ wfs_in_min = 0, wire_dia_in = 0, deposition_eff = 0.92 } = {}` | _ | _ | _ |
 | calc-fab.js | `computeWireFeedSpeedForDeposition` | `{ target_deposit_lb_hr = 0, wire_dia_in = 0, deposition_eff = 0.92 } = {}` | _ | _ | _ |
 | calc-feeder.js | `computeContinuousLoadOcpd` | `{ l_cont_A = 0, l_noncont_A = 0, rated_100 = false } = {}` | _ | _ | _ |
@@ -3443,7 +3443,7 @@ cross-check.
 | calc-shop.js | `computeBearingRegrease` | `{ od_mm = 0, width_mm = 0, bore_mm = 0, rpm = 0, correction_factor = 1.0, dut...` | _ | _ | _ |
 | calc-shop.js | `computeBeltConveyorTensionPower` | `{ tons_per_hour = 0, belt_speed_fpm = 0, length_ft = 0, lift_ft = 0, belt_wei...` | _ | _ | _ |
 | calc-shop.js | `computeBucketElevatorCapacity` | `{ bucket_volume_ft3 = 0, spacing_in = 0, speed_fpm = 0, fill_factor = 0.75, b...` | _ | _ | _ |
-| calc-shop.js | `computeCarbonEquivalent` | `{ c = 0, mn = 0, cr = 0, mo = 0, v = 0, ni = 0, cu = 0 } = {}` | _ | _ | _ |
+| calc-shop.js | `computeCarbonEquivalent` | `{ c = 0, mn = 0, si = 0, cr = 0, mo = 0, v = 0, ni = 0, cu = 0 } = {}` | _ | _ | _ |
 | calc-shop.js | `computeCircularSector` | `{ radius = 0, angle_deg = 0 } = {}` | _ | _ | _ |
 | calc-shop.js | `computeCompoundMiter` | `{ spring_angle_deg = 38, corner_angle_deg = 90 } = {}` | _ | _ | _ |
 | calc-shop.js | `computeConeBottomTankVolume` | `{ diameter_ft = 0, cone_height_ft = 0, cylinder_height_ft = 0, depth_ft = 0 }...` | _ | _ | _ |
@@ -5380,7 +5380,7 @@ per spec-v14 §13.1 second paragraph.
 | `pneumatic-cylinder-scfm` | Pneumatic Cylinder Air Consumption (SCFM) | Project (first-principles); SCFM = volume per cycle x cycles x compression ratio | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `polygon-miter` | Regular Polygon Miter and Layout | First-principles regular-polygon geom...; regular hexagon, side 12 in -> 30 deg miter, 120 deg inte... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `portable-ladder-setup` | Portable Ladder Setup Geometry (OSHA 1926.1053) | Occupational Safety and Health Admini...; 'When portable ladders are used for access to an upper la... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
-| `powder-coating-coverage` | Powder Coating Coverage, Transfer Efficiency, and Reclaim | Project (first-principles); coverage = 192.7 / (SG x mils) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `powder-coating-coverage` | Powder Coating Coverage, Transfer Efficiency, and Reclaim | Project (first-principles); coverage = 192.3 / (SG x mils); 192.3 = 453.59 g / (1 mil... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `press-fit-interference-for-force` | Interference for a Target Press-Fit Holding Force | Lame interference-fit model (Machiner...; spec-v728 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `press-fit-pressure` | Interference Press-Fit Pressure and Holding Force (Lame) | Lame interference-fit model (Machiner...; spec-v511 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `pretreatment-bath-dragout` | Pretreatment Bath Dragout and Counterflow Rinse Water | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |

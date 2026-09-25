@@ -39,12 +39,14 @@ export const _SCH40_ID_IN = [
 
 // MSS SP-58 carbon-steel threaded-rod maximum safe loads (lb) at or below
 // 650F, keyed by rod diameter (in), for the hanger-rod sizing (v162).
-// Standard threaded-rod allowable loads (root area x ~allowable stress);
-// the same values published across MSS SP-58 and every hanger catalog.
+// Current MSS SP-58 basis: 50,000 psi ultimate / 3.5 safety factor, less 25% for installation and
+// service = 10,700 psi on the ASME B1.1 root area (National Pipe Hanger Fig. 755, March 2025; the
+// same loads in Anvil Fig. 146). Until 2026-09-25 this carried an older ~9,000 psi table (3/8 in
+// 610 lb) and called it "every hanger catalog"; it read 16-20% low.
 const _MSS_SP58_ROD_LB = [
-  ["3/8", 610], ["1/2", 1130], ["5/8", 1810], ["3/4", 2710],
-  ["7/8", 3770], ["1", 4960], ["1-1/8", 6230], ["1-1/4", 8000],
-  ["1-3/8", 9510], ["1-1/2", 11630],
+  ["3/8", 730], ["1/2", 1350], ["5/8", 2160], ["3/4", 3230],
+  ["7/8", 4480], ["1", 5900], ["1-1/8", 7420], ["1-1/4", 9500],
+  ["1-3/8", 11290], ["1-1/2", 13800],
 ];
 
 const _finiteGuard = (o) => {
@@ -601,7 +603,7 @@ export function computeHangerRodSizing({ load_lb = 0, temp_derate = 1 } = {}) {
 export const hangerRodSizingExample = { inputs: { load_lb: 228, temp_derate: 1 } };
 
 function _renderHangerRodSizing(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: Minimum hanger rod = smallest carbon-steel threaded rod whose MSS SP-58 maximum safe load (at or below 650F) clears the applied load after the temperature derate - by name. The bundled loads (3/8 in 610 lb, 1/2 in 1130 lb, ...) are the standard's carbon-steel values; above 650F apply the standard's derate curve (user factor for an off-table temperature). The engineer of record and the standard's current edition govern the final selection.";
+  citationEl.textContent = "Citation: Minimum hanger rod = smallest carbon-steel threaded rod whose MSS SP-58 maximum safe load (at or below 650F) clears the applied load after the temperature derate - by name. The bundled loads (3/8 in 730 lb, 1/2 in 1,350 lb, ...) are the current MSS SP-58 carbon-steel values, 10,700 psi on the root area, as National Pipe Hanger and Anvil publish them; above 650F apply the standard's derate curve (user factor for an off-table temperature). The engineer of record and the standard's current edition govern the final selection.";
   const load = makeNumber("Operating load per hanger (lb)", "hr-load", { step: "any", min: "0" });
   const derate = makeNumber("Temperature derate factor (1.0 at ambient)", "hr-derate", { step: "any", min: "0", max: "1", value: "1" });
   derate.input.value = "1";
@@ -802,16 +804,18 @@ const _B16_5_GROUP_1_1 = {
   150: [285, 260, 230, 200, 170, 140, 125],
   300: [740, 680, 655, 635, 605, 570, 550],
   600: [1480, 1360, 1310, 1265, 1205, 1135, 1100],
+  // Read from the Group 1.1 table, not scaled from Class 600 (until 2026-09-25 they were
+  // 600 x 1.5 / 2.5 / 4.17, up to 16 psi high at 200 F).
+  900: [2220, 2035, 1965, 1900, 1810, 1705, 1650],
+  1500: [3705, 3395, 3270, 3170, 3015, 2840, 2745],
+  2500: [6170, 5655, 5450, 5280, 5025, 4730, 4575],
 };
-// 900 / 1500 / 2500 scale from the 600 column by the class ratio.
-const _B16_5_SCALE = { 900: 1.5, 1500: 2.5, 2500: 4.17 };
 // dims: in { flange_class: dimensionless, temp_f: T } out: { mawp_psig: M L^-1 T^-2 }
 export function computeFlangeRating({ flange_class = 150, temp_f = 0 } = {}) {
   const _g = _finiteGuard({ flange_class, temp_f }); if (_g) return _g;
   const cls = Number(flange_class);
   const t = Number(temp_f);
-  let row = _B16_5_GROUP_1_1[cls];
-  if (!row && _B16_5_SCALE[cls]) row = _B16_5_GROUP_1_1[600].map((v) => v * _B16_5_SCALE[cls]);
+  const row = _B16_5_GROUP_1_1[cls];
   if (!row) return { error: "Flange class must be 150, 300, 600, 900, 1500, or 2500." };
   const tMin = _B16_5_TEMPS_F[0];
   const tMax = _B16_5_TEMPS_F[_B16_5_TEMPS_F.length - 1];

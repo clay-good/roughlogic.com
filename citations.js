@@ -9205,8 +9205,8 @@ export const CITATIONS = {
     ],
   },
   "powder-coating-coverage": {
-    formula: "theoretical coverage = 192.7 / (specific gravity x mils); effective (to waste) = theoretical x transfer efficiency; utilisation with reclaim = transfer + (1 - transfer) x reclaim efficiency; powder required = area / effective coverage.",
-    edition: "Theoretical powder coverage from the standard powder-coating constant 192.7 sq ft per lb at one mil and specific gravity 1.0, by name, with effective coverage from transfer efficiency and the reclaim utilisation relation. Material only -- no cure schedule, film uniformity, pretreatment, Faraday-cage effect, or reclaim color-change loss. The powder manufacturer's technical data sheet and the coating specification govern.",
+    formula: "theoretical coverage = 192.3 / (specific gravity x mils); effective (to waste) = theoretical x transfer efficiency; utilisation with reclaim = transfer + (1 - transfer) x reclaim efficiency; powder required = area / effective coverage.",
+    edition: "Theoretical powder coverage from the standard powder-coating constant 192.3 sq ft per lb at one mil and specific gravity 1.0, by name, with effective coverage from transfer efficiency and the reclaim utilisation relation. Material only -- no cure schedule, film uniformity, pretreatment, Faraday-cage effect, or reclaim color-change loss. The powder manufacturer's technical data sheet and the coating specification govern.",
     freeAccess: "A density-and-thickness calculation on the user's own powder and film build; no manufacturer coverage table is reproduced.",
     governance: GOVERNANCE.general,
     editionNote: "Theoretical coverage is fixed by physics -- specific gravity and film thickness -- and no shop achieves it, because what leaves the gun is not all what lands on the part. Transfer efficiency is the first-pass share and what misses becomes overspray. Reclaim is the second factor and it is the one that decides the booth, because a reclaim booth recovers the overspray and returns it to the hopper, so the utilisation becomes the first pass plus the recovered share of what missed. That pushes an ordinary manual transfer efficiency close to complete utilisation and cuts material use on a job by something near forty percent, which across a production year is the reclaim booth's payback. Then there is the factor that outweighs both: film build. Running a job thicker than the specification calls for raises the requirement in direct proportion, and it is easy to do and invisible without measurement, so thickness discipline is worth more than transfer efficiency on most jobs. The input this is most sensitive to is the part's surface area, which is genuinely hard to estimate on a complex part -- and on exactly those parts the Faraday cage effect in inside corners and recesses both lowers the real transfer efficiency and leaves those areas thin. Reclaim also has a cost the arithmetic does not show: color changes in a reclaim system are slow and lossy, which is why some shops spray to waste deliberately.",
@@ -12165,13 +12165,13 @@ export const CITATIONS = {
     ],
   },
   "carbon-equivalent": {
-    formula: "CE_IIW = C + Mn/6 + (Cr + Mo + V)/5 + (Ni + Cu)/15. Bands: < 0.35 readily weldable; 0.35-0.55 preheat advised; > 0.55 high hardenability.",
-    edition: "The IIW carbon-equivalent formula as adopted in AWS D1.1 Structural Welding Code, by name; published formula.",
+    formula: "CE = C + (Mn + Si)/6 + (Cr + Mo + V)/5 + (Ni + Cu)/15 (AWS D1.1 Annex XI; Si = 0 gives the IIW form). Bands: < 0.35 readily weldable; 0.35-0.55 preheat advised; > 0.55 high hardenability.",
+    edition: "AWS D1.1 Structural Welding Code (2000) Annex XI carbon equivalent, which adds Si to the IIW formula, by name; published formula.",
     freeAccess: "Published weighted-sum formula; the output is a screening band, not a qualified welding procedure.",
     governance: GOVERNANCE.general,
     editionNote: "The IIW / AWS D1.1 carbon-equivalent weighted sum. This is a screen, not a welding procedure; the WPS, hydrogen level, restraint, and thickness govern the actual preheat (AWS D1.1 Annex).",
     assumptions: [
-      { name: "Composition", value: "the steel chemistry (weight percent of C, Mn, Cr, Mo, V, Ni, Cu) is user-supplied from the mill certificate", source: "AWS D1.1" },
+      { name: "Composition", value: "the steel chemistry (weight percent of C, Mn, Si, Cr, Mo, V, Ni, Cu) is user-supplied from the mill certificate", source: "AWS D1.1" },
     ],
   },
   "shielding-gas-runtime": {
@@ -12368,14 +12368,14 @@ export const CITATIONS = {
     ],
   },
   "vessel-head-volume": {
-    formula: "2:1 semi-elliptical head V = pi D^3 / 24; hemispherical V = pi D^3 / 12; ASME flanged-and-dished (torispherical) V ~ 0.0847 D^3; straight flange V = pi/4 D^2 x length; gallons = in^3 / 231.",
+    formula: "2:1 semi-elliptical head V = pi D^3 / 24; hemispherical V = pi D^3 / 12; ASME flanged-and-dished (torispherical) V ~ 0.0810 D^3; straight flange V = pi/4 D^2 x length; gallons = in^3 / 231.",
     edition: "Dished-head volume geometry, first-principles; the inside diameter, head type, and straight-flange length come from the head. The ASME F&D figure is a standard-geometry approximation.",
     freeAccess: "The elliptical and hemispherical head volumes are exact first-principles solids of revolution; the F&D approximation and the head dimensions come from the head maker's stamp.",
     governance: GOVERNANCE.general,
-    editionNote: "The bulge volume of one dished tank head past its tangent line. A 2:1 semi-elliptical head (depth D/4) is a half-ellipsoid, V = pi D^3 / 24; a hemispherical head (depth D/2) is a half-sphere, V = pi D^3 / 12; a standard ASME flanged-and-dished (torispherical) head is close to 0.0847 D^3 for the common crown = D, knuckle = 0.06 D geometry -- this is an approximation and the exact volume needs the actual crown and knuckle radii. Add the straight-flange (cylindrical skirt) section pi/4 D^2 x length. Two heads give a tank's end allowance on top of the straight-shell volume; the head manufacturer's stamped dimensions govern.",
+    editionNote: "The bulge volume of one dished tank head past its tangent line. A 2:1 semi-elliptical head (depth D/4) is a half-ellipsoid, V = pi D^3 / 24; a hemispherical head (depth D/2) is a half-sphere, V = pi D^3 / 12; a standard ASME flanged-and-dished (torispherical) head is close to 0.0810 D^3 for the common crown = D, knuckle = 0.06 D geometry -- this is an approximation and the exact volume needs the actual crown and knuckle radii. Add the straight-flange (cylindrical skirt) section pi/4 D^2 x length. Two heads give a tank's end allowance on top of the straight-shell volume; the head manufacturer's stamped dimensions govern.",
     assumptions: [
       { name: "Head geometry", value: "elliptical = half-ellipsoid (pi D^3/24), hemispherical = half-sphere (pi D^3/12), both exact", source: "solid of revolution" },
-      { name: "F&D approximation", value: "standard flanged-and-dished ~ 0.0847 D^3; the actual crown and knuckle radii shift it", source: "ASME BPVC VIII head geometry" },
+      { name: "F&D approximation", value: "standard flanged-and-dished ~ 0.0810 D^3; the actual crown and knuckle radii shift it", source: "ASME BPVC VIII head geometry" },
     ],
   },
   "weld-dilution": {
@@ -12417,12 +12417,12 @@ export const CITATIONS = {
   },
   "weld-travel-speed": {
     formula: "TS = (60 x V x I x eta) / (1000 x HI); check HI = (60 V I eta)/(1000 TS).",
-    edition: "The AWS/ASME arc heat-input relation solved for travel speed, by name.",
+    edition: "AWS D1.1 (Table 4.5 note: heat input = 60EI/V) and ASME IX QW-409.1(a), which carry no arc efficiency, solved for travel speed; EN 1011-1 thermal-efficiency factors for an EN-basis limit, by name.",
     freeAccess: "The heat-input relation HI = (60 V I eta)/(1000 x travel speed) is a standard AWS/ASME formula. The qualified WPS governs the allowable range.",
     governance: GOVERNANCE.general,
-    editionNote: "Travel speed for a target heat input: TS = (60 x V x I x eta) / (1000 x HI), with eta the arc efficiency (about 0.8 GMAW, 0.65 GTAW, 0.9 SAW). Travel at or ABOVE this to hold the heat input at or UNDER the target: a lower heat-input ceiling forces a faster travel, the inverse TS-HI relationship a welder uses to trade travel speed for HAZ control and to meet a WPS's heat-input limit; slowing down at the same volts and amps raises the heat input. This returns the travel speed: it uses the entered arc efficiency (match the WPS's convention - some codes omit eta), and it does not model the bead geometry, fusion, or deposition. A process aid; the qualified WPS governs the allowable range.",
+    editionNote: "Travel speed for a target heat input: TS = (60 x V x I x eta) / (1000 x HI), with eta = 1 against an AWS/ASME limit (those formulas carry no efficiency) or the EN 1011-1 thermal efficiency (0.8 GMAW/SMAW, 0.6 GTAW, 1.0 SAW) against an EN-basis limit. Travel at or ABOVE this to hold the heat input at or UNDER the target: a lower heat-input ceiling forces a faster travel, the inverse TS-HI relationship a welder uses to trade travel speed for HAZ control and to meet a WPS's heat-input limit; slowing down at the same volts and amps raises the heat input. This returns the travel speed: it uses the entered arc efficiency (match the WPS's convention - some codes omit eta), and it does not model the bead geometry, fusion, or deposition. A process aid; the qualified WPS governs the allowable range.",
     assumptions: [
-      { name: "Heat-input relation", value: "TS = (60 V I eta)/(1000 HI); eta ~0.8 GMAW, 0.65 GTAW, 0.9 SAW", source: "AWS / ASME" },
+      { name: "Heat-input relation", value: "TS = (60 V I eta)/(1000 HI); eta = 1 on the AWS/ASME basis; EN 1011-1 k = 0.8 GMAW/SMAW, 0.6 GTAW, 1.0 SAW", source: "AWS D1.1 / ASME IX QW-409.1 / EN 1011-1" },
       { name: "Slower is hotter", value: "at fixed V and I, lower travel speed raises the heat input (inverse relation)", source: "arc physics" },
       { name: "Match WPS eta", value: "match the WPS's efficiency convention; no bead-geometry or fusion model", source: "scope of this tile" },
     ],
@@ -21515,9 +21515,9 @@ export const CITATIONS = {
     ],
   },
   "hanger-rod-sizing": {
-    formula: "rated(d) = MSS_SP58_table[d] x temp_derate; required_rod = smallest d such that rated(d) >= load_lb; utilization = load_lb / rated(required_rod) x 100. Table: 3/8 in 610 | 1/2 in 1130 | 5/8 in 1810 | 3/4 in 2710 | 7/8 in 3770 | 1 in 4960 | 1-1/8 in 6230 | 1-1/4 in 8000 | 1-3/8 in 9510 | 1-1/2 in 11630 lb.",
-    edition: "MSS SP-58 carbon-steel threaded-rod maximum safe loads (at or below 650F), by name; the rod-selection logic is first-principles. The values are the standard's published carbon-steel allowable loads.",
-    freeAccess: "The maximum safe loads are the MSS SP-58 carbon-steel threaded-rod values, published across the standard and every hanger catalog; the selection is a simple table lookup.",
+    formula: "rated(d) = MSS_SP58_table[d] x temp_derate; required_rod = smallest d such that rated(d) >= load_lb; utilization = load_lb / rated(required_rod) x 100. Table: 3/8 in 730 | 1/2 in 1350 | 5/8 in 2160 | 3/4 in 3230 | 7/8 in 4480 | 1 in 5900 | 1-1/8 in 7420 | 1-1/4 in 9500 | 1-3/8 in 11290 | 1-1/2 in 13800 lb.",
+    edition: "MSS SP-58 carbon-steel threaded-rod maximum safe loads (at or below 650F), by name; the rod-selection logic is first-principles. The values are the current MSS SP-58 basis (50,000 psi ultimate / 3.5, less 25% = 10,700 psi on the B1.1 root area) as National Pipe Hanger Fig. 755 (2025) and Anvil Fig. 146 publish them.",
+    freeAccess: "The maximum safe loads are the MSS SP-58 carbon-steel threaded-rod values, as published in current hanger catalogs (National Pipe Hanger, Anvil); the selection is a simple table lookup.",
     governance: GOVERNANCE.general,
     editionNote: "The bundled maximum safe loads are the MSS SP-58 carbon-steel threaded-rod values at or below 650F. Above 650F the temperature derate is applied from the standard's curve (user factor for an off-table temperature). The engineer of record and the standard's current edition govern the final selection.",
     assumptions: [
@@ -21575,7 +21575,7 @@ export const CITATIONS = {
     ],
   },
   "flange-rating": {
-    formula: "mawp = interpolate(B16.5 Group 1.1 table[flange_class], temp_f), linear between the table temperatures (100, 200, 300, 400, 500, 600, 650 F). Class 150: 285, 260, 230, 200, 170, 140, 125; Class 300: 740, 680, 655, 635, 605, 570, 550; Class 600: 1480, 1360, 1310, 1265, 1205, 1135, 1100 psig; Class 900, 1500, 2500 scale from the 600 column by 1.5, 2.5, 4.17.",
+    formula: "mawp = interpolate(B16.5 Group 1.1 table[flange_class], temp_f), linear between the table temperatures (100, 200, 300, 400, 500, 600, 650 F). Class 150: 285, 260, 230, 200, 170, 140, 125; Class 300: 740, 680, 655, 635, 605, 570, 550; Class 600: 1480, 1360, 1310, 1265, 1205, 1135, 1100 psig; Class 900: 2220, 2035, 1965, 1900, 1810, 1705, 1650; Class 1500: 3705, 3395, 3270, 3170, 3015, 2840, 2745; Class 2500: 6170, 5655, 5450, 5280, 5025, 4730, 4575 psig (read from the table, not scaled).",
     edition: "ASME B16.5 Pipe Flanges and Flanged Fittings pressure-temperature ratings, Material Group 1.1 (carbon steel, e.g. A105), by name. The ratings are read from the standard's table with linear interpolation.",
     freeAccess: "The pressure-temperature rating is a fixed published table lookup; the Group 1.1 ratings are the standard's carbon-steel values, widely republished.",
     governance: GOVERNANCE.general,
