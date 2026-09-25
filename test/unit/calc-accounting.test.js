@@ -110,6 +110,16 @@ test("SE: example yields positive SE tax", () => { const r = computeSETax(seTaxE
 test("SE: 92.35% adjustment", () => { const r = computeSETax({ net_se_earnings: 100000, tax_year: 2025, filing_status: "single" }); assert.ok(close(r.net_earnings_adjusted, 92350, 0.01)); });
 test("SE: SS portion respects wage base", () => { const params = SE_TAX_PARAMETERS[2025]; const r = computeSETax({ net_se_earnings: 1000000, tax_year: 2025, filing_status: "single" }); assert.ok(close(r.ss_tax, params.ss_wage_base * 0.124, 1)); });
 test("SE: W-2 wages reduce SS-eligible amount", () => { const params = SE_TAX_PARAMETERS[2025]; const r = computeSETax({ net_se_earnings: 1000000, w2_ss_wages: params.ss_wage_base, tax_year: 2025, filing_status: "single" }); assert.equal(r.ss_tax, 0); });
+test("SE: W-2 Medicare wages use up the Additional Medicare threshold first (Form 8959 lines 9-12)", () => {
+  // Single, $150,000 W-2 and $100,000 net SE: line 12 = 92,350 - (200,000 - 150,000) = 42,350; x 0.9% = $381.15.
+  const r = computeSETax({ net_se_earnings: 100000, w2_ss_wages: 150000, tax_year: 2025, filing_status: "single" });
+  assert.ok(close(r.addl_medicare_tax, 381.15, 0.01), String(r.addl_medicare_tax));
+  // Box 5 wages above the SS base: $250,000 of Medicare wages leaves no threshold.
+  const b = computeSETax({ net_se_earnings: 100000, w2_ss_wages: 176100, w2_medicare_wages: 250000, tax_year: 2025, filing_status: "single" });
+  assert.ok(close(b.addl_medicare_tax, 92350 * 0.009, 0.01));
+  // The Additional Medicare tax is not part of the deductible half.
+  assert.ok(close(b.deductible_half, (b.ss_tax + b.medicare_tax) / 2, 1e-9));
+});
 test("SE: Additional Medicare 0.9% above $200k single", () => { const r = computeSETax({ net_se_earnings: 300000, tax_year: 2025, filing_status: "single" }); assert.ok(r.addl_medicare_tax > 0); });
 test("SE: below $400 threshold returns zero", () => { const r = computeSETax({ net_se_earnings: 200, tax_year: 2025, filing_status: "single" }); assert.equal(r.se_tax, 0); });
 test("SE: deductible half is half of SS+Medicare (excludes Addl)", () => { const r = computeSETax({ net_se_earnings: 60000, tax_year: 2025, filing_status: "single" }); assert.ok(close(r.deductible_half, (r.ss_tax + r.medicare_tax) / 2, 0.01)); });

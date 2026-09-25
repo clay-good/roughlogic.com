@@ -127,7 +127,7 @@
     },
     "lexile-band": {
       "group": "calc-edu.js (Group Y, v12 §9)",
-      "stamp": "Citation: Common Core State Standards Appendix A (June 2010), Section III ('Quantitative Measures of Text Complexity'), and state-DOE bulletins implementing the CCSS stretch ranges (Smarter Balanced / PARCC consortium states). 'Lexile' is a registered trademark of MetaMetrics. Grade-band targets here are summarized from publicly published state-DOE guidance; the MetaMetrics text-measure tool itself is not bundled. Teacher governs final text selection."
+      "stamp": "Citation: Supplemental Information for Appendix A of the CCSS: New Research on Text Complexity (2012), Figure 1 (the stretch ranges; the June 2010 Appendix A figure differs), and state-DOE bulletins implementing the CCSS stretch ranges (Smarter Balanced / PARCC consortium states). 'Lexile' is a registered trademark of MetaMetrics. Grade-band targets here are summarized from publicly published state-DOE guidance; the MetaMetrics text-measure tool itself is not bundled. Teacher governs final text selection."
     },
     "lighting-density": {
       "group": "calc-electrical.js (Group A)",

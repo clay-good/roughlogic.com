@@ -778,7 +778,7 @@ export const BESPOKE_LABELS = {
   "sccr-combination": {"component_sccrs_ka":"Component SCCRs (kA, comma or space separated)","feeder_ir_ka":"Feeder OCPD interrupting rating (kA, 0 to omit)","available_fault_ka":"Available fault current (kA)"},
   "scientific-notation": {"value":"Number (decimal or scientific)"},
   "scupper-width-for-flow": {"required_gpm":"Required overflow flow (gpm)","head_in":"Head above scupper invert (in)"},
-  "se-tax": {"net_se_earnings":"Net SE earnings (USD)","w2_ss_wages":"W-2 wages already subject to SS (USD)","tax_year":"Tax year","filing_status":"Filing status"},
+  "se-tax": {"net_se_earnings":"Net SE earnings (USD)","w2_ss_wages":"W-2 wages already subject to SS (USD)","w2_medicare_wages":"W-2 Medicare wages, box 5 (USD; blank = same as SS wages)","tax_year":"Tax year","filing_status":"Filing status"},
   "search-probability": {"poa_pct":"POA (area contains subject, %)"},
   "search-track-spacing": {"target_pod":"Target single-pass POD (0-1, used when spacing is 0)"},
   "searcher-hours": {"area_acres":"Segment area (acres)","track_spacing_ft":"Track spacing (ft)","speed_mph":"Ground speed (mph)","searchers":"Searchers walking simultaneously"},

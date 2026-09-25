@@ -1160,8 +1160,8 @@ export function renderLinearSystem2x2(inputRegion, outputRegion, citationEl) {
 // MetaMetrics registered trademark; the grade-to-band targets here
 // are summarized from publicly published state-DOE bulletins that
 // adopted the Common Core / CCSS "stretch text" alignment after
-// 2012. The bands are the CCSS Appendix A stretch ranges (1100L+
-// at end of grade 6, etc.) plus the standard "typical-reader"
+// 2012. The bands are the stretch ranges from the 2012 Supplement to
+// CCSS Appendix A (Figure 1; 1185L at the top of grades 6-8, etc.) plus the standard "typical-reader"
 // ranges per state-DOE published guidance.
 //
 // Teacher governs final text selection. The Lexile measure is one
@@ -1208,7 +1208,7 @@ export const lexileBandExample = {
 // dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderLexileBand(inputRegion, outputRegion, citationEl) {
   citationEl.textContent =
-    "Citation: Common Core State Standards Appendix A (June 2010), Section III ('Quantitative Measures of Text Complexity'), and state-DOE bulletins implementing the CCSS stretch ranges (Smarter Balanced / PARCC consortium states). 'Lexile' is a registered trademark of MetaMetrics. Grade-band targets here are summarized from publicly published state-DOE guidance; the MetaMetrics text-measure tool itself is not bundled. Teacher governs final text selection.";
+    "Citation: Supplemental Information for Appendix A of the CCSS: New Research on Text Complexity (2012), Figure 1 (the stretch ranges; the June 2010 Appendix A figure differs), and state-DOE bulletins implementing the CCSS stretch ranges (Smarter Balanced / PARCC consortium states). 'Lexile' is a registered trademark of MetaMetrics. Grade-band targets here are summarized from publicly published state-DOE guidance; the MetaMetrics text-measure tool itself is not bundled. Teacher governs final text selection.";
   const G = makeText("Grade (K or 1 to 12, optional)", "lex-g", { placeholder: "e.g. 5" });
   inputRegion.appendChild(G.wrap);
   attachExampleButton(inputRegion, () => { G.input.value = lexileBandExample.inputs.grade; update(); });

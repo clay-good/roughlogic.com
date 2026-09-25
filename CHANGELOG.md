@@ -10,6 +10,11 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **Self-employment tax, the OSHA Top 10, and two citations checked against their sources.**
+  - `se-tax` applied the full Additional Medicare threshold to self-employment income even when W-2 wages had already used it. Form 8959 Part II (lines 9-11) lowers the threshold by W-2 Medicare wages. A single filer with $150,000 of W-2 wages and $100,000 of net SE earnings owes $381.15 of Additional Medicare tax, where the tile showed $0. A new optional input takes W-2 Medicare wages (box 5), which have no cap; left blank, it uses the Social Security wages.
+  - `osha-top10` carried fiscal year 2024's list under a "check for a later year" label. OSHA's fiscal year 2025 list, published April 15, 2026, reorders ranks 4-8: lockout/tagout 4, respiratory protection 5, scaffolding 6, fall-protection training 7, powered industrial trucks 8.
+  - `effective-annual-rate` and `future-value-of-annuity` named 12 CFR 1030 as "TILA / Regulation Z". Part 1030 is Regulation DD (Truth in Savings), which defines the APY in 1030.2(c); Regulation Z is Part 1026.
+  - `lexile-band` credited its stretch ranges to the June 2010 CCSS Appendix A. That document's figure gives different bands (2-3 = 450-790L); the bundled 420-820L set is Figure 1 of the 2012 Supplement, which the tile now cites. 1185L is the top of the grade 6-8 band, not the end of grade 6.
 - **Pipe hangers, T&P discharge, and fixture units read against the IPC 2021 text.**
   - `pipe-support-spacing` held all PEX at 32 in. IPC 2021 Table 308.5 allows 4 ft from 1-1/4 in, so a 1-1/2 in PEX run was given 50% more hangers than needed. Copper pipe (threaded, 12 ft) is now its own option beside copper tubing (6 ft to 1-1/4 in, 10 ft above). The table is labeled as the 2021 values rather than an approximation.
   - `tpr-discharge` cited 504.4 for the rule that the valve's capacity must cover the heater input. That rule, and the 210°F / 150 psi settings, are in 504.5. The checklist said to "terminate 6 in above" the receptor and described the pipe as rated for 210°F. Section 504.6 says not more than 6 in and not less than two pipe diameters above, requires materials per 605.4 or ASME A112.4.1, and asks for one size larger with insert fittings. The checklist now follows 504.6 item by item.

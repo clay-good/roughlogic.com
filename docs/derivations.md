@@ -1435,7 +1435,7 @@ cross-check.
 | calc-accounting.js | `computePrevailingWageFringe` | `{ base_wage_hr = 0, fringe_hr = 0, payroll_tax = 0 } = {}` | _ | _ | _ |
 | calc-accounting.js | `computeReorderPoint` | `{ avg_daily_demand = 0, lead_time_days = 0, demand_sd = 0, service_level_pct ...` | _ | _ | _ |
 | calc-accounting.js | `computeRetainageTracker` | `{ work_this_period_usd = 0, retainage_pct = 10, prior_retained_usd = 0 } = {}` | _ | _ | _ |
-| calc-accounting.js | `computeSETax` | `{ net_se_earnings = 0, w2_ss_wages = 0, tax_year = 2025, filing_status = "sin...` | _ | _ | _ |
+| calc-accounting.js | `computeSETax` | `{ net_se_earnings = 0, w2_ss_wages = 0, w2_medicare_wages = null, tax_year = ...` | _ | _ | _ |
 | calc-accounting.js | `computeSalesTaxCompound` | `{ pre_tax = 0, post_tax = 0, rate1_pct = 0, rate2_pct = 0, }` | _ | _ | _ |
 | calc-accounting.js | `computeSection179` | `{ cost = 0, business_use_pct = 100, taxable_income = 0, tax_year = 2025, bonu...` | _ | _ | _ |
 | calc-accounting.js | `computeStraightLine` | `{ cost = 0, salvage = 0, life_years = 0, year_of_interest = 1 }` | _ | _ | _ |
@@ -6033,7 +6033,7 @@ per spec-v14 §13.1 second paragraph.
 | `cash-conversion-cycle` | Cash Conversion Cycle | Project (first-principles); DSO 45 / DIO 60 / DPO 30 -> CCC 75 days | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `change-order-markup` | Change Order Price with Overhead and Profit | construction estimating (AIA G701); spec-v391 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `declining-balance-depreciation` | Declining-Balance Depreciation (Book) | GAAP book depreciation (ASC 360); $50,000 cost, $5,000 salvage, 5 yr, 200% DDB -> Yr1 $20,000 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
-| `effective-annual-rate` | Effective Annual Rate (APR to APY) | Compounding identity / TILA Reg Z APY...; EAR = (1 + 0.12/12)^12 - 1 = 1.01^12 - 1 = 0.126825 = 12.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `effective-annual-rate` | Effective Annual Rate (APR to APY) | Compounding identity / Truth in Savin...; EAR = (1 + 0.12/12)^12 - 1 = 1.01^12 - 1 = 0.126825 = 12.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `employer-payroll-tax` | Employer Payroll Tax | FICA/FUTA (26 USC 3101-3306 + IRS Pub...; $200,000 wages above the SS base ($168,600) -> SS capped ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `eoq-order-quantity` | Economic Order Quantity (Wilson EOQ) | Wilson economic order quantity (EOQ) ...; spec-v529 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `equipment-hourly-rate` | Equipment Owning and Operating Hourly Rate | CAT / AED method; spec-v363 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -6148,7 +6148,7 @@ per spec-v14 §13.1 second paragraph.
 | `curve-grade-scaler` | Grade-Curve Scaler | Standard psychometric score scaling; square-root curve: raw 49 -> 10 * sqrt(49) = 70 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `final-grade-needed` | Final-Exam Grade Needed | Weighted-average syllabus arithmetic; current 88%, final weight 25%, target 90% -> 96% needed | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `gpa-calculator` | GPA Calculator (Weighted + Unweighted) | Standard US 4.0 / 5.0 scale (AACRAO t...; Five courses: A in AP Calc (5 cr), B+ honors English (4 c... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
-| `lexile-band` | Lexile Band by Grade (CCSS Stretch) | CCSS Appendix A (June 2010); state-DO...; Grade 5 typical band 830L - 1010L | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `lexile-band` | Lexile Band by Grade (CCSS Stretch) | CCSS Appendix A Supplement (2012); st...; Grade 5 typical band 830L - 1010L | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `linear-regression` | Linear Regression (slope, intercept, R^2) | OpenIntro; Sxx=10, Sxy=6, Syy=6 -> slope=0.6, intercept=4-0.6*3=2.2;... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `linear-system-2x2` | System of Two Linear Equations | Cramer (1750); standard linear algebra; 2x + 3y = 8; x - y = 1. det = 2*(-1) - 1*3 = -5. x = (8*(... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `one-sample-t-test` | One-Sample t-Test (Mean vs Target) | OpenIntro Statistics Ch. 7 (single mean); mean 16.1, SD 0.3, n 25 vs target 16.0 -> t = 0.1/(0.3/sq... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |

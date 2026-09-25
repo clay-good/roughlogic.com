@@ -273,16 +273,17 @@ export const section179Example = { inputs: { cost: 50000, business_use_pct: 100,
 // 92.35% net earnings adjustment, SS portion 12.4% capped at the SS
 // wage base (less W-2 wages already subject to SS), Medicare 2.9% with
 // no cap, Additional Medicare 0.9% above the filing-status threshold,
-// deductible half (employer share equivalent).
+// deductible half (employer share equivalent). Form 8959 Part II lowers the
+// Additional Medicare threshold by W-2 Medicare wages (lines 9-11).
 
-// dims: in { net_se_earnings: dimensionless, w2_ss_wages: dimensionless, tax_year: dimensionless, filing_status: dimensionless }
-//        out: { net_earnings_adjusted: dimensionless, ss_taxable: dimensionless, ss_tax: dimensionless, medicare_tax: dimensionless, addl_medicare_tax: dimensionless, se_tax: dimensionless, deductible_half: dimensionless, parameters: dimensionless }
+// dims: in { net_se_earnings: dimensionless, w2_ss_wages: dimensionless, w2_medicare_wages: dimensionless, tax_year: dimensionless, filing_status: dimensionless }
+//        out: { net_earnings_adjusted: dimensionless, ss_taxable: dimensionless, ss_tax: dimensionless, medicare_tax: dimensionless, addl_medicare_tax: dimensionless, addl_medicare_threshold_left: dimensionless, w2_medicare_wages: dimensionless, se_tax: dimensionless, deductible_half: dimensionless, parameters: dimensionless }
 // (Schedule SE: 92.35% adjustment, 12.4% SS up to wage base,
 //  2.9% Medicare, 0.9% Additional Medicare above threshold. All
 //  monetary inputs and outputs are dimensionless dollar aggregates
 //  per the §7.1 monetary convention; filing status and tax year
 //  are categorical tokens.)
-export function computeSETax({ net_se_earnings = 0, w2_ss_wages = 0, tax_year = 2025, filing_status = "single" }) {
+export function computeSETax({ net_se_earnings = 0, w2_ss_wages = 0, w2_medicare_wages = null, tax_year = 2025, filing_status = "single" }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(net_se_earnings >= 0)) return { error: "Net SE earnings cannot be negative." };
   const params = SE_TAX_PARAMETERS[tax_year];
@@ -295,12 +296,18 @@ export function computeSETax({ net_se_earnings = 0, w2_ss_wages = 0, tax_year = 
   const medicare_tax = adj * 0.029;
   const addl_threshold = params.addl_medicare_threshold[filing_status];
   if (addl_threshold === undefined) return { error: "Unknown filing status." };
-  const addl_medicare = Math.max(0, adj - addl_threshold) * 0.009;
+  // Form 8959 line 10: W-2 Medicare wages (box 5) use up the threshold first.
+  // Box 5 is uncapped; when it is left blank, the SS wages stand in.
+  const med_wages = w2_medicare_wages === null || w2_medicare_wages === undefined || w2_medicare_wages === "" ? Number(w2_ss_wages) || 0 : Number(w2_medicare_wages);
+  if (!(med_wages >= 0)) return { error: "W-2 Medicare wages cannot be negative." };
+  const threshold_left = Math.max(0, addl_threshold - med_wages);
+  const addl_medicare = Math.max(0, adj - threshold_left) * 0.009;
   const se_tax = ss_tax + medicare_tax + addl_medicare;
   const deductible_half = (ss_tax + medicare_tax) / 2;
   return {
     net_earnings_adjusted: adj, ss_taxable, ss_tax, medicare_tax,
-    addl_medicare_tax: addl_medicare, se_tax, deductible_half, parameters: params,
+    addl_medicare_tax: addl_medicare, addl_medicare_threshold_left: threshold_left, w2_medicare_wages: med_wages,
+    se_tax, deductible_half, parameters: params,
   };
 }
 
@@ -873,10 +880,11 @@ function renderSection179(inputRegion, outputRegion, citationEl) {
 }
 
 function renderSeTax(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: Schedule SE (Form 1040). Social Security wage base from SSA annual announcement; Additional Medicare 0.9% threshold from IRC 3101(b)(2).";
+  citationEl.textContent = "Citation: Schedule SE (Form 1040). Social Security wage base from SSA annual announcement; Additional Medicare 0.9% threshold from IRC 3101(b)(2), reduced by W-2 Medicare wages per Form 8959 Part II.";
   inputRegion.appendChild(makeNotice(TAX_LAW_NOTICE));
   const ne = makeNumber("Net SE earnings (USD)", "se-ne", { step: "any", min: "0" });
   const w2 = makeNumber("W-2 wages already subject to SS (USD)", "se-w2", { step: "any", min: "0" });
+  const w2m = makeNumber("W-2 Medicare wages, box 5 (USD; blank = same as SS wages)", "se-w2m", { step: "any", min: "0" });
   const yr = makeSelect("Tax year", "se-yr",
     Object.keys(SE_TAX_PARAMETERS).map((y) => ({ value: y, label: y })));
   yr.select.value = "2025";
@@ -884,7 +892,7 @@ function renderSeTax(inputRegion, outputRegion, citationEl) {
     { value: "single", label: "Single" }, { value: "mfj", label: "Married filing jointly" },
     { value: "mfs", label: "Married filing separately" }, { value: "hoh", label: "Head of household" },
   ]);
-  for (const f of [ne, w2, yr, fs]) inputRegion.appendChild(f.wrap);
+  for (const f of [ne, w2, w2m, yr, fs]) inputRegion.appendChild(f.wrap);
   const seTot = makeOutputLine(outputRegion, "Total SE tax", "se-out-t");
   const ssOut = makeOutputLine(outputRegion, "Social Security portion", "se-out-ss");
   const medOut = makeOutputLine(outputRegion, "Medicare portion", "se-out-m");
@@ -893,6 +901,7 @@ function renderSeTax(inputRegion, outputRegion, citationEl) {
   const update = debounce(() => {
     const r = computeSETax({
       net_se_earnings: Number(ne.input.value), w2_ss_wages: Number(w2.input.value),
+      w2_medicare_wages: w2m.input.value === "" ? null : Number(w2m.input.value),
       tax_year: Number(yr.select.value), filing_status: fs.select.value,
     });
     if (r.error) { seTot.textContent = r.error; ssOut.textContent = medOut.textContent = addlOut.textContent = dedOut.textContent = ""; return; }
@@ -903,7 +912,7 @@ function renderSeTax(inputRegion, outputRegion, citationEl) {
     addlOut.textContent = "$" + fmt(r.addl_medicare_tax, 2);
     dedOut.textContent = "$" + fmt(r.deductible_half, 2);
   }, DEBOUNCE_MS);
-  for (const el of [ne.input, w2.input, yr.select, fs.select]) el.addEventListener("input", update);
+  for (const el of [ne.input, w2.input, w2m.input, yr.select, fs.select]) el.addEventListener("input", update);
   attachExampleButton(inputRegion, () => {
     ne.input.value = 80000; w2.input.value = 0; yr.select.value = "2025"; fs.select.value = "single"; update();
   });
@@ -1448,7 +1457,7 @@ ACCOUNTING_RENDERERS["future-value-of-annuity"] = renderFutureValueOfAnnuity;
 // --- spec-v1245 R: Effective annual rate / APY (`effective-annual-rate`) ---
 // Converts a nominal APR at m compounds/year to the effective annual rate: EAR = (1 + APR/m)^m - 1,
 // or e^APR - 1 for continuous compounding. The finance set takes a rate as given but never converts
-// compounding bases. TILA/Reg Z (12 CFR 1030) APY definition.
+// compounding bases. Truth in Savings / Reg DD (12 CFR 1030.2(c), Appendix A) APY definition.
 const _EAR_FREQ = { annual: 1, semiannual: 2, quarterly: 4, monthly: 12, daily: 365 };
 // dims: in { apr_pct: dimensionless, compounding: dimensionless } out: { ear_pct: dimensionless, periodic_rate_pct: dimensionless }
 export function computeEffectiveAnnualRate({ apr_pct = 0, compounding = "monthly" } = {}) {
@@ -1465,13 +1474,13 @@ export function computeEffectiveAnnualRate({ apr_pct = 0, compounding = "monthly
   if (!Number.isFinite(ear_pct)) return { error: "Effective-rate math is not a finite value." };
   return {
     ear_pct, periodic_rate_pct, continuous: isContinuous, periods_per_year: isContinuous ? null : m,
-    note: "The effective annual rate (EAR, the same thing as APY) from a nominal APR and its compounding frequency: EAR = (1 + APR/m)^m - 1 for m compounds per year, or e^APR - 1 in the continuous limit. A nominal rate only equals the effective rate when it compounds once a year; more frequent compounding earns (or costs) more, so a 12% APR is really 12.36% compounded semiannually, 12.68% monthly, 12.75% daily, and 12.75% continuously. This is the number that makes two loans or two savings accounts with different compounding actually comparable, and it is the APY a US deposit account must disclose under TILA/Reg Z. The periodic rate (APR/m) is what one compounding period actually applies -- 1% a month for a 12% monthly APR. To go the other way, the nominal rate from a stated EAR is APR = m [(1+EAR)^(1/m) - 1]. Simple interest and fees (which the APR itself may or may not fold in) are separate; a bookkeeping aid, the account disclosure and a CPA govern.",
+    note: "The effective annual rate (EAR, the same thing as APY) from a nominal APR and its compounding frequency: EAR = (1 + APR/m)^m - 1 for m compounds per year, or e^APR - 1 in the continuous limit. A nominal rate only equals the effective rate when it compounds once a year; more frequent compounding earns (or costs) more, so a 12% APR is really 12.36% compounded semiannually, 12.68% monthly, 12.75% daily, and 12.75% continuously. This is the number that makes two loans or two savings accounts with different compounding actually comparable, and it is the APY a US deposit account must disclose under Truth in Savings / Reg DD. The periodic rate (APR/m) is what one compounding period actually applies -- 1% a month for a 12% monthly APR. To go the other way, the nominal rate from a stated EAR is APR = m [(1+EAR)^(1/m) - 1]. Simple interest and fees (which the APR itself may or may not fold in) are separate; a bookkeeping aid, the account disclosure and a CPA govern.",
   };
 }
 export const effectiveAnnualRateExample = { inputs: { apr_pct: 12, compounding: "monthly" } };
 
 function renderEffectiveAnnualRate(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: effective annual rate / APY = (1 + APR/m)^m - 1 (or e^APR - 1 continuous), the compounding identity behind the TILA/Reg Z (12 CFR 1030) APY disclosure. Inverse nominal APR = m[(1+EAR)^(1/m) - 1]. Accounting information, not advice; the account disclosure and a CPA govern.";
+  citationEl.textContent = "Citation: effective annual rate / APY = (1 + APR/m)^m - 1 (or e^APR - 1 continuous), the compounding identity behind the Truth in Savings / Reg DD (12 CFR 1030) APY disclosure. Inverse nominal APR = m[(1+EAR)^(1/m) - 1]. Accounting information, not advice; the account disclosure and a CPA govern.";
   const apr = makeNumber("Nominal APR (%)", "ear-apr", { step: "any", min: "0" });
   const comp = makeSelect("Compounding", "ear-comp", [
     { value: "annual", label: "Annually" }, { value: "semiannual", label: "Semiannually" },

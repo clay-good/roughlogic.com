@@ -263,19 +263,19 @@ export const handSignalsExample = { inputs: {} };
 // --- Utility 175: OSHA Top-10 Citations (most-recently published) ---
 
 export const OSHA_TOP_10 = {
-  // FY2024 list (Oct 1, 2023 - Sep 5, 2024), announced at the 2024 NSC
-  // Safety Congress. Until 2026-09-19 this carried an older year's order
-  // under a "most recent" label, with 1910.305 at 10 and 1926.102 missing.
-  publication: "OSHA Top 10 Most Frequently Cited Standards, fiscal year 2024 (Oct 1, 2023 - Sep 5, 2024). Cited by agency publication; not reproduced. Check osha.gov for a later year.",
+  // FY2025 list (Oct 1, 2024 - Sep 30, 2025), osha.gov/top10citedstandards
+  // (page updated 2026-04-15). Until 2026-09-24 this carried FY2024's order,
+  // which swapped ranks 4-8 (respiratory above lockout/tagout, trucks at 6).
+  publication: "OSHA Top 10 Most Frequently Cited Standards, fiscal year 2025 (Oct 1, 2024 - Sep 30, 2025). Cited by agency publication; not reproduced. Check osha.gov for a later year.",
   items: [
     { rank: 1, standard: "29 CFR 1926.501", topic: "Fall protection - general requirements (construction)" },
     { rank: 2, standard: "29 CFR 1910.1200", topic: "Hazard communication" },
     { rank: 3, standard: "29 CFR 1926.1053", topic: "Ladders" },
-    { rank: 4, standard: "29 CFR 1910.134", topic: "Respiratory protection" },
-    { rank: 5, standard: "29 CFR 1910.147", topic: "Lockout / tagout (control of hazardous energy)" },
-    { rank: 6, standard: "29 CFR 1910.178", topic: "Powered industrial trucks" },
+    { rank: 4, standard: "29 CFR 1910.147", topic: "Lockout / tagout (control of hazardous energy)" },
+    { rank: 5, standard: "29 CFR 1910.134", topic: "Respiratory protection" },
+    { rank: 6, standard: "29 CFR 1926.451", topic: "Scaffolding - general requirements" },
     { rank: 7, standard: "29 CFR 1926.503", topic: "Fall protection - training" },
-    { rank: 8, standard: "29 CFR 1926.451", topic: "Scaffolding - general requirements" },
+    { rank: 8, standard: "29 CFR 1910.178", topic: "Powered industrial trucks" },
     { rank: 9, standard: "29 CFR 1926.102", topic: "Eye and face protection (construction)" },
     { rank: 10, standard: "29 CFR 1910.212", topic: "Machine guarding" },
   ],

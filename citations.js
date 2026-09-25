@@ -455,7 +455,7 @@ export const CITATIONS = {
 
   "future-value-of-annuity": {
     formula: "Ordinary annuity FV = PMT [((1+i)^n - 1)/i]; PV = PMT [(1-(1+i)^-n)/i]; annuity-due multiplies each by (1+i). At i = 0 both reduce to PMT n. i is the periodic rate, n the number of payments; sinking-fund deposit PMT = FV i/((1+i)^n - 1).",
-    edition: "Standard time-value-of-money identities (public-domain finance); the TILA/Reg Z (12 CFR 1030) compounding convention, by name.",
+    edition: "Standard time-value-of-money identities (public-domain finance); the Truth in Savings / Reg DD (12 CFR 1030) compounding convention, by name.",
     freeAccess: "The annuity FV/PV identities are universal public formulas; a finance text or the SEC investor.gov compound-interest material covers them.",
     governance: GOVERNANCE.general,
     editionNote: "The future and present value of a level annuity. FV = PMT [((1+i)^n - 1)/i] is what a stream of equal deposits grows to (a sinking fund); PV = PMT [(1-(1+i)^-n)/i] is the lump sum today worth that stream (a loan balance or lease). An annuity-due (payments at the start of each period) multiplies both by (1+i); the default is an ordinary annuity (end of period). The rate must be per PERIOD, not per year -- divide an annual rate by the periods per year first. $500 a month at 0.5%/month for 120 months grows to $81,940 ($60,000 contributed, $21,940 interest). To size the deposit for a target FV, rearrange to PMT = FV i/((1+i)^n - 1). Accounting information, not advice; the account terms, compounding convention, and taxes govern.",
@@ -467,13 +467,13 @@ export const CITATIONS = {
 
   "effective-annual-rate": {
     formula: "EAR = (1 + APR/m)^m - 1 for m compounds/year, or e^APR - 1 continuous; periodic rate = APR/m; inverse APR = m[(1+EAR)^(1/m) - 1].",
-    edition: "Standard compounding identity (public-domain finance); the TILA/Reg Z APY definition, 12 CFR 1030 Appendix A, by name.",
-    freeAccess: "The (1+APR/m)^m - 1 identity is a universal public formula, and 12 CFR 1030 (Reg Z / Truth in Savings APY) is a free US government regulation.",
+    edition: "Standard compounding identity (public-domain finance); the Truth in Savings / Reg DD APY definition, 12 CFR 1030.2(c) and Appendix A, by name.",
+    freeAccess: "The (1+APR/m)^m - 1 identity is a universal public formula, and 12 CFR 1030 (Reg DD, Truth in Savings) is a free US government regulation.",
     governance: GOVERNANCE.general,
-    editionNote: "The effective annual rate (EAR = APY) from a nominal APR and its compounding frequency. A nominal rate equals the effective rate only when it compounds once a year; more frequent compounding raises it, so a 12% APR is 12.36% semiannually, 12.68% monthly, 12.75% daily, and 12.75% continuously (e^APR - 1). This is the figure that makes loans or savings accounts with different compounding comparable, and the APY a US deposit account discloses under TILA/Reg Z. The periodic rate APR/m is what one compounding period applies (1% a month for a 12% monthly APR); the inverse nominal rate from a stated EAR is APR = m[(1+EAR)^(1/m) - 1]. Simple interest and fees (which the APR may or may not fold in) are separate. Accounting information, not advice; the account disclosure and a CPA govern.",
+    editionNote: "The effective annual rate (EAR = APY) from a nominal APR and its compounding frequency. A nominal rate equals the effective rate only when it compounds once a year; more frequent compounding raises it, so a 12% APR is 12.36% semiannually, 12.68% monthly, 12.75% daily, and 12.75% continuously (e^APR - 1). This is the figure that makes loans or savings accounts with different compounding comparable, and the APY a US deposit account discloses under Truth in Savings / Reg DD. The periodic rate APR/m is what one compounding period applies (1% a month for a 12% monthly APR); the inverse nominal rate from a stated EAR is APR = m[(1+EAR)^(1/m) - 1]. Simple interest and fees (which the APR may or may not fold in) are separate. Accounting information, not advice; the account disclosure and a CPA govern.",
     assumptions: [
       { name: "Compounding identity", value: "EAR = (1 + APR/m)^m - 1; continuous EAR = e^APR - 1", source: "time-value-of-money" },
-      { name: "APY disclosure", value: "the effective rate is the APY defined by TILA/Reg Z (12 CFR 1030)", source: "12 CFR 1030 Appendix A" },
+      { name: "APY disclosure", value: "the effective rate is the APY defined by Truth in Savings / Reg DD (12 CFR 1030)", source: "12 CFR 1030 Appendix A" },
     ],
   },
 
@@ -7501,7 +7501,7 @@ export const CITATIONS = {
     ],
   },
   "se-tax": {
-    formula: "Net adjusted = net_se * 0.9235. SS tax = min(net_adjusted, ss_wage_base - w2_ss) * 0.124. Medicare = net_adjusted * 0.029. Additional Medicare = max(0, net_adjusted - threshold) * 0.009. SE tax = sum. Deductible half = (SS + Medicare) / 2.",
+    formula: "Net adjusted = net_se * 0.9235. SS tax = min(net_adjusted, ss_wage_base - w2_ss) * 0.124. Medicare = net_adjusted * 0.029. Additional Medicare = max(0, net_adjusted - max(0, threshold - w2_medicare_wages)) * 0.009 (Form 8959 Part II, lines 8-13). SE tax = sum. Deductible half = (SS + Medicare) / 2.",
     edition: "Schedule SE (Form 1040). Social Security wage base from SSA annual wage-base announcement; Additional Medicare 0.9% threshold from IRC 3101(b)(2).",
     freeAccess: "Free at irs.gov/forms-pubs/about-schedule-se-form-1040; SSA wage base at ssa.gov/oact/cola/cbb.html.",
     governance: GOVERNANCE.tax,
@@ -7510,6 +7510,7 @@ export const CITATIONS = {
       { name: "Net-earnings adjustment", value: "92.35%", source: "Schedule SE line 4a" },
       { name: "SS / Medicare rates", value: "12.4% / 2.9% / 0.9% Additional", source: "IRC 1401 / 3101(b)(2)" },
       { name: "$400 filing threshold", value: "below this, no SE tax owed", source: "Schedule SE Part I" },
+      { name: "Additional Medicare threshold", value: "reduced by W-2 Medicare wages (box 5); blank uses the SS wages", source: "Form 8959 lines 9-11" },
     ],
   },
   "estimated-tax": {
@@ -8178,12 +8179,12 @@ export const CITATIONS = {
   },
   "lexile-band": {
     formula: "Reference render: grade-to-Lexile bands (K, 1-12) with both the 'typical reader' midrange and the CCSS Appendix A stretch ranges.",
-    edition: "Common Core State Standards Appendix A (June 2010), Section III ('Quantitative Measures of Text Complexity'). State-DOE bulletins from Smarter Balanced / PARCC consortium states implementing the CCSS stretch alignment.",
+    edition: "Supplemental Information for Appendix A of the CCSS: New Research on Text Complexity (2012), Figure 1, the stretch ranges (they replace the June 2010 Appendix A figure). State-DOE bulletins from Smarter Balanced / PARCC consortium states implementing the CCSS stretch alignment.",
     freeAccess: "CCSS Appendix A free at corestandards.org. State bulletins free at the respective state-DOE sites.",
     governance: GOVERNANCE.education,
     editionNote: "'Lexile' is a registered trademark of MetaMetrics, Inc. The MetaMetrics measure itself is licensed; only the grade-to-band targets summarized from publicly published state-DOE guidance are bundled. The CCSS framework explicitly directs educators to combine quantitative (Lexile) with qualitative + reader-and-task analyses; this tile is one of three inputs to text selection.",
     assumptions: [
-      { name: "Stretch alignment", value: "post-2012 CCSS stretch ranges (1185L+ end of grade 6 etc.); pre-2012 'typical reader' ranges are also surfaced", source: "CCSS Appendix A §III" },
+      { name: "Stretch alignment", value: "post-2012 CCSS stretch ranges (1185L at the top of grades 6-8, etc.); pre-2012 'typical reader' ranges are also surfaced", source: "CCSS Appendix A Supplement (2012), Figure 1" },
       { name: "BR (Beginning Reader)", value: "Lexile assigns 'BR' below 0L for emergent readers; the tile labels K with BR through 230L", source: "MetaMetrics convention" },
     ],
   },
