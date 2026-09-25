@@ -24927,6 +24927,10 @@ test("bounds: spec-v538 computeKitchenSanitizerPpm pins the oz-per-gallon diluti
   assert.ok(Math.abs(cl.oz_per_gal - 0.2438) < 0.001); // 128*100/(5.25*10000)
   assert.ok(Math.abs(cl.total_oz - 0.7314) < 0.001);
   assert.equal(cl.in_range, true); // 100 is at the top of 50-100
+  // Food Code 4-703.11(C): 10 s for chlorine; 7 s is only the 50 ppm warm-water
+  // allowance of (C)(2), which this tile once printed against 100 ppm.
+  assert.match(cl.contact_time, /^at least 10 seconds/);
+  assert.match(_v538({ sanitizer_type: "quat", active_pct: 10, target_ppm: 200, batch_gallons: 3 }).contact_time, /^at least 30 seconds/);
   // Quat at 200 ppm from a 10% concentrate.
   const q = _v538({ sanitizer_type: "quat", active_pct: 10, target_ppm: 200, batch_gallons: 3 });
   assert.ok(Math.abs(q.oz_per_gal - 0.256) < 0.001);

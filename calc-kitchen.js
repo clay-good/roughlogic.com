@@ -1004,10 +1004,13 @@ KITCHEN_RENDERERS["menu-engineering"] = renderMenuEngineering;
 
 // --- spec-v538 O: 3-compartment sink sanitizer dilution (`kitchen-sanitizer-ppm`) ---
 // oz_per_gal = 128 x target_ppm / (active_pct x 10000). FDA Food Code 4-501.114 bands.
+// Contact times are FDA Food Code 2022 4-703.11(C). Until 2026-09-24 chlorine
+// read "at least 7 seconds at 100 ppm"; 7 seconds is (C)(2)'s allowance for a
+// 50 ppm solution in warm water only, and at 100 ppm (C)(1) requires 10.
 const SANITIZER_BANDS = {
-  chlorine: { lo: 50, hi: 100, label: "chlorine", contact: "at least 7 seconds at 100 ppm (longer at lower ppm / colder water)" },
-  quat: { lo: 150, hi: 400, label: "quaternary ammonium", contact: "per label, typically at least 30 seconds" },
-  iodine: { lo: 12.5, hi: 25, label: "iodine", contact: "at least 30 seconds" },
+  chlorine: { lo: 50, hi: 100, label: "chlorine", contact: "at least 10 seconds (Food Code 4-703.11(C)(1)); 7 seconds only for a 50 ppm solution at pH 10 or less and 100 F or warmer, or pH 8 or less and 75 F or warmer" },
+  quat: { lo: 150, hi: 400, label: "quaternary ammonium", contact: "at least 30 seconds (Food Code 4-703.11(C)(3)), or longer if the EPA-registered label says so" },
+  iodine: { lo: 12.5, hi: 25, label: "iodine", contact: "at least 30 seconds (Food Code 4-703.11(C)(3))" },
 };
 // dims: in { sanitizer_type: dimensionless, active_pct: dimensionless, target_ppm: dimensionless, batch_gallons: L^3 } out: { oz_per_gal: dimensionless, total_oz: dimensionless }
 export function computeKitchenSanitizerPpm({ sanitizer_type = "chlorine", active_pct = 0, target_ppm = 0, batch_gallons = 0 } = {}) {
