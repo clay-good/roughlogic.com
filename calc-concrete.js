@@ -203,10 +203,15 @@ export function computeRcDevelopmentLength({ fc = 4000, fy = 60000, db = 0, psi_
   // (no exception, unlike shear's 22.5.3.2). sqrt(f'c) is in the denominator,
   // so the cap lengthens ld above f'c = 10,000 psi - the conservative direction.
   const sqrt_fc = Math.min(Math.sqrt(fc), 100);
-  const ld_calc = (3 / 40) * fy * te * psi_s * psi_g / (lambda * sqrt_fc * conf_eff) * db;
+  // Table 25.4.2.5 fixes psi_g by bar grade: 1.0 for Grade 40/60, 1.15 for
+  // Grade 80, 1.3 for Grade 100. An entered psi_g below the grade's value is
+  // raised to it; until 2026-09-25 a Grade 80 bar left at 1.0 read 13% short.
+  const psi_g_grade = fy <= 60000 ? 1.0 : fy <= 80000 ? 1.15 : 1.3;
+  const psi_g_used = Math.max(psi_g, psi_g_grade);
+  const ld_calc = (3 / 40) * fy * te * psi_s * psi_g_used / (lambda * sqrt_fc * conf_eff) * db;
   const ld_in = Math.max(ld_calc, 12);
   const ld_db = ld_in / db;
-  return { te, conf_eff, ld_in, ld_db };
+  return { te, conf_eff, ld_in, ld_db, psi_g_used };
 }
 
 export const rcDevelopmentLengthExample = { inputs: { fc: 4000, fy: 60000, db: 1.00, psi_t: 1.0, psi_e: 1.0, psi_s: 1.0, psi_g: 1.0, lambda: 1.0, conf: 2.5 } };
@@ -221,7 +226,7 @@ CONCRETE_RENDERERS["rc-development-length"] = _simpleRenderer({
     { key: "psi_t", label: "Casting position psi_t (1.3 top bar, 1.0 other)", kind: "number" },
     { key: "psi_e", label: "Coating psi_e (1.5 / 1.2 epoxy, 1.0 uncoated)", kind: "number" },
     { key: "psi_s", label: "Bar size psi_s (0.8 for #6 and smaller, else 1.0)", kind: "number" },
-    { key: "psi_g", label: "Grade psi_g (1.0 Gr 60, 1.15 Gr 80, 1.3 Gr 100)", kind: "number" },
+    { key: "psi_g", label: "Grade psi_g (raised to 1.15 Gr 80 / 1.3 Gr 100 from fy)", kind: "number" },
     { key: "lambda", label: "Lightweight factor lambda (1.0 normalweight)", kind: "number" },
     { key: "conf", label: "Confinement (cb + Ktr)/db (max 2.5)", kind: "number" },
   ],
