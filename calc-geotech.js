@@ -1210,17 +1210,23 @@ export function computeLiquefactionScreening({ amax_g = 0, sigma_v_psf = 0, sigm
   if (!(crrv > 0)) return { error: "Cyclic resistance ratio CRR must be positive." };
   if (!(msfv > 0)) return { error: "Magnitude scaling factor must be positive." };
   // Seed-Idriss rd restated per foot: 0.00233172 = 0.00765 x 0.3048, 0.00813816 = 0.0267 x 0.3048, breakpoint 9.15 m = 30.02 ft.
-  const rd = depth <= 30.02 ? 1 - 0.00233172 * depth : 1.174 - 0.00813816 * depth;
+  // Youd et al. (2001) Eq. 2: the 1.174 - 0.0267 z line holds to 23 m (75.46 ft), then 0.744 - 0.008 z
+  // to 30 m (98.43 ft), then 0.5. Until 2026-09-25 the second line ran to any depth: rd 0.36 at
+  // 100 ft, and negative (a negative CSR and FS reported "liquefiable") below about 144 ft.
+  const rd = depth <= 30.02 ? 1 - 0.00233172 * depth
+    : depth <= 75.46 ? 1.174 - 0.00813816 * depth
+    : depth <= 98.43 ? 0.744 - 0.0024384 * depth
+    : 0.5;
   const csr = 0.65 * amax * (sv / svp) * rd;
   const fs = (crrv / csr) * msfv;
   return {
     rd, csr, fs, liquefiable: fs < 1.0,
-    note: "Seed-Idriss simplified liquefaction-triggering screen: the stress-reduction factor rd = 1 - 0.00233172 z for a depth z <= 30.02 ft (else 1.174 - 0.00813816 z; the published per-meter constants 0.00765 and 0.0267 and the 9.15 m breakpoint restated per foot via 0.3048), the cyclic stress ratio CSR = 0.65 amax (sigma_v/sigma'_v) rd, and the factor of safety FS = (CRR/CSR) x MSF, with liquefaction triggered when FS < 1. CRR comes from the (N1)60 or CPT charts for the sand, and the magnitude scaling factor adjusts from the Mw 7.5 reference. This is a screening tool for level ground; a site-specific analysis, the fines correction, and the post-liquefaction settlement are the engineer's work. A design aid; the geotechnical engineer of record governs.",
+    note: "Seed-Idriss simplified liquefaction-triggering screen: the stress-reduction factor rd = 1 - 0.00233172 z for a depth z <= 30.02 ft, 1.174 - 0.00813816 z to 75.46 ft, 0.744 - 0.0024384 z to 98.43 ft, and 0.5 below (Youd et al. 2001; the published per-meter constants 0.00765 and 0.0267 and the 9.15 m breakpoint restated per foot via 0.3048), the cyclic stress ratio CSR = 0.65 amax (sigma_v/sigma'_v) rd, and the factor of safety FS = (CRR/CSR) x MSF, with liquefaction triggered when FS < 1. CRR comes from the (N1)60 or CPT charts for the sand, and the magnitude scaling factor adjusts from the Mw 7.5 reference. This is a screening tool for level ground; a site-specific analysis, the fines correction, and the post-liquefaction settlement are the engineer's work. A design aid; the geotechnical engineer of record governs.",
   };
 }
 export const liquefactionScreeningExample = { inputs: { amax_g: 0.30, sigma_v_psf: 2000, sigma_vp_psf: 1200, depth_ft: 16.4042, crr: 0.20, msf: 1.0 } };
 GEOTECH_RENDERERS["liquefaction-screening"] = _simpleRenderer({
-  citation: "Citation: Seed-Idriss simplified liquefaction triggering: rd = 1 - 0.00233172 z (z in ft, <= 30.02 ft) else 1.174 - 0.00813816 z (the published per-meter constants 0.00765 and 0.0267 and the 9.15 m breakpoint restated per foot via 0.3048), CSR = 0.65 amax (sigma_v/sigma'_v) rd, FS = (CRR/CSR) MSF, liquefiable if FS < 1. A screening tool for level ground; the geotechnical engineer of record and a site-specific analysis govern.",
+  citation: "Citation: Seed-Idriss simplified liquefaction triggering: rd = 1 - 0.00233172 z (z in ft, <= 30.02 ft), 1.174 - 0.00813816 z to 75.46 ft, 0.744 - 0.0024384 z to 98.43 ft, then 0.5 (Youd et al. 2001; the published per-meter constants 0.00765, 0.0267 and 0.008 and the 9.15 / 23 / 30 m breakpoints restated per foot via 0.3048), CSR = 0.65 amax (sigma_v/sigma'_v) rd, FS = (CRR/CSR) MSF, liquefiable if FS < 1. A screening tool for level ground; the geotechnical engineer of record and a site-specific analysis govern.",
   example: liquefactionScreeningExample.inputs,
   fields: [
     { key: "amax_g", label: "Peak ground acceleration (g)", kind: "number" },

@@ -12988,6 +12988,17 @@ test("bounds: spec-v41 rolled-blank pins developed length + rejects bad inputs",
 
 test("bounds: spec-v54 compound-miter pins chart values + rejects bad inputs", () => {
   // 38 deg spring / 90 deg corner -> 31.62 deg miter, 33.86 deg bevel (standard chart).
+  // An obtuse corner needs LESS miter than a square one, and a straight run
+  // (corner -> 180) a square cut. Until 2026-09-25 the miter was
+  // atan(tan(C/2) sin S), which agrees only at 90 and read 56 deg at 135.
+  let prevMiter = Infinity;
+  for (const C of [60, 90, 120, 135, 150, 170, 179]) {
+    const m = _cv54a({ spring_angle_deg: 38, corner_angle_deg: C }).miter_angle_deg;
+    assert.ok(m < prevMiter, `miter should fall as the corner opens: ${C} -> ${m}`);
+    prevMiter = m;
+  }
+  assert.ok(_cv54a({ spring_angle_deg: 38, corner_angle_deg: 179 }).miter_angle_deg < 0.5);
+  assert.ok(Math.abs(_cv54a({ spring_angle_deg: 38, corner_angle_deg: 135 }).miter_angle_deg - 14.31) < 0.01);
   const a = _cv54a({ spring_angle_deg: 38, corner_angle_deg: 90 });
   assert.ok(Math.abs(a.miter_angle_deg - 31.619007) < 1e-4);
   assert.ok(Math.abs(a.bevel_angle_deg - 33.862914) < 1e-4);
@@ -22930,6 +22941,13 @@ test("bounds: spec-v416 computeLiquefactionScreening pins CSR/FS, the trigger, a
   assert.ok(Math.abs(r.csr - 0.65 * 0.30 * (2000 / 1200) * r.rd) < 1e-9);
   assert.ok(Math.abs(r.fs - r.crr / r.csr) < 1e-9 || Math.abs(r.fs - (0.20 / r.csr)) < 1e-6);
   assert.ok(r.fs < 1 && r.liquefiable === true);
+  // Youd et al. (2001) Eq. 2 branches: continuous at 23 m and 30 m, then 0.5.
+  // Until 2026-09-25 the 9.15-23 m line ran to any depth and went negative.
+  const rdAt = (z) => _v416({ amax_g: 0.30, sigma_v_psf: 2000, sigma_vp_psf: 1200, depth_ft: z, crr: 0.20 }).rd;
+  assert.ok(Math.abs(rdAt(75.46) - (0.744 - 0.0024384 * 75.46)) < 0.002); // 23 m, both lines ~0.560
+  assert.ok(Math.abs(rdAt(98.43) - 0.5) < 0.006);                        // 30 m
+  assert.equal(rdAt(150), 0.5);
+  assert.ok(_v416({ amax_g: 0.30, sigma_v_psf: 20000, sigma_vp_psf: 12000, depth_ft: 150, crr: 0.20 }).fs > 0);
   // Denser sand (higher CRR) survives.
   const dense = _v416({ amax_g: 0.30, sigma_v_psf: 2000, sigma_vp_psf: 1200, depth_ft: 16.4042, crr: 0.40, msf: 1.0 });
   assert.ok(dense.fs > 1 && dense.liquefiable === false);

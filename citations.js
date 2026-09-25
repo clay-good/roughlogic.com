@@ -12597,7 +12597,7 @@ export const CITATIONS = {
 
   // ---- spec-v54 compound miter for crown molding (calc-shop.js; group E) ----
   "compound-miter": {
-    formula: "Crown cut flat on the saw: miter (table swing) = atan(tan(corner/2) x sin(spring)); bevel (blade tilt) = asin(cos(spring) x cos(corner/2)). Spring is the molding profile angle (38 or 45 deg), corner is the wall angle (90 deg square).",
+    formula: "Crown cut flat on the saw: miter (table swing) = atan(sin(spring) / tan(corner/2)); bevel (blade tilt) = asin(cos(spring) x cos(corner/2)). Spring is the molding profile angle (38 or 45 deg), corner is the wall angle (90 deg square).",
     edition: "Compound-miter geometry for crown molding cut flat - first-principles trigonometry; public domain. Reproduces the standard published compound-miter chart.",
     freeAccess: "Pure trigonometry, public; the spring angle and wall corner angle are user-supplied.",
     governance: GOVERNANCE.general,

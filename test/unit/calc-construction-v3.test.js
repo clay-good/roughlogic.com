@@ -173,3 +173,10 @@ test("Formwork: lighter concrete -> lower pressure", () => { const a = computeFo
 test("Formwork: cap exact at boundary", () => { const r = computeFormworkPressure({ pour_rate_ft_per_hr: 5, concrete_temp_F: 70, weight_factor: "normal", unit_weight_pcf: 150, wall_height_ft: 5 }); assert.ok(r.pressure_psf <= r.wet_head_psf); });
 test("Formwork: every weight factor positive", () => { for (const k of Object.keys(ACI_C_W)) assert.ok(ACI_C_W[k] > 0); });
 test("Formwork: faster pour -> higher ACI value (uncapped)", () => { const a = computeFormworkPressure({ pour_rate_ft_per_hr: 1, concrete_temp_F: 70, weight_factor: "normal", unit_weight_pcf: 150, wall_height_ft: 100 }); const b = computeFormworkPressure({ pour_rate_ft_per_hr: 10, concrete_temp_F: 70, weight_factor: "normal", unit_weight_pcf: 150, wall_height_ft: 100 }); assert.ok(b.aci_pressure_psf > a.aci_pressure_psf); });
+
+test("Drywall: screws scale with area, not with the sheet count (4x12 board is not fastened a third lighter)", () => {
+  const a = computeDrywall({ wall_area_ft2: 960, ceiling_area_ft2: 0, sheet_size: "4x8", waste_percent: 0 });
+  const b = computeDrywall({ wall_area_ft2: 960, ceiling_area_ft2: 0, sheet_size: "4x12", waste_percent: 0 });
+  assert.equal(a.screws, 840); // 960 / 32 x 28
+  assert.equal(b.screws, a.screws);
+});

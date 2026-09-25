@@ -19927,7 +19927,7 @@
   {
    "tile_id": "compound-miter",
    "source_publisher": "First-principles compound-miter trigonometry (standard published compound-miter chart)",
-   "source_title": "miter = atan(tan(corner/2) x sin(spring)); bevel = asin(cos(spring) x cos(corner/2))",
+   "source_title": "miter = atan(sin(spring) / tan(corner/2)); bevel = asin(cos(spring) x cos(corner/2))",
    "source_edition_or_year": "geometric",
    "source_section_or_page": "38 deg spring crown at a 90 deg corner -> 31.62 deg miter, 33.86 deg bevel (chart value); 45/90 -> 35.26/30.00",
    "verified_by": "rl",
@@ -19947,6 +19947,60 @@
      "value": 33.862914,
      "tolerance": {
       "abs": 0.001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "compound-miter",
+   "source_publisher": "Dave Osborne (daveosborne.com)",
+   "source_title": "Tables 8: Cutting Crown Molding",
+   "source_edition_or_year": "web edition",
+   "source_section_or_page": "38/52 crown, 120 deg wall corner: bevel 23.2, miter 19.6",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "spring_angle_deg": 38,
+    "corner_angle_deg": 120
+   },
+   "outputs": {
+    "miter_angle_deg": {
+     "value": 19.6,
+     "tolerance": {
+      "abs": 0.05
+     }
+    },
+    "bevel_angle_deg": {
+     "value": 23.2,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "compound-miter",
+   "source_publisher": "Dave Osborne (daveosborne.com)",
+   "source_title": "Tables 8: Cutting Crown Molding",
+   "source_edition_or_year": "web edition",
+   "source_section_or_page": "38/52 crown, 135 deg wall corner: bevel 17.6, miter 14.3",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "spring_angle_deg": 38,
+    "corner_angle_deg": 135
+   },
+   "outputs": {
+    "miter_angle_deg": {
+     "value": 14.3,
+     "tolerance": {
+      "abs": 0.05
+     }
+    },
+    "bevel_angle_deg": {
+     "value": 17.6,
+     "tolerance": {
+      "abs": 0.05
      }
     }
    }

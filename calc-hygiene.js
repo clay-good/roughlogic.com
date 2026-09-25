@@ -109,7 +109,8 @@ export const HYGIENE_RENDERERS = {};
 // It shipped NINE unrendered python f-string placeholders, so none of its
 // headline figures was ever evaluated. Rendering them gives 2,190 cfm at
 // K = 5 -- and that number is WRONG BY A FACTOR OF 16, because the spec used
-// 403 with an input in pounds per hour.
+// 403 x 10^3 with an input in pounds per hour. (The published 403 x 10^6 form
+// applied to lb/h errs the other way, about 62x high; the page says that one.)
 //
 // 403 is the constant for PINTS PER MINUTE of liquid at a given specific
 // gravity: 387 ft^3/lbmol x 1.043 lb/pint. For a mass rate in lb/h the
@@ -176,7 +177,7 @@ export function computeDilutionVentilationSolvent({
 }
 export const dilutionVentilationSolventExample = { inputs: { evaporation_lb_hr: 2, molecular_weight: 92, tlv_ppm: 20, mixing_factor: 5, lel_pct: 1.1, lel_safety_fraction: 0.25, room_volume_ft3: 20000, alt_mixing_factor: 10 } };
 HYGIENE_RENDERERS["dilution-ventilation-solvent"] = _simpleRenderer({
-  citation: "Citation: dilution airflow = (molar volume 387 ft³/lbmol at 70 °F and 1 atm) × 10⁶ / 60 × (lb/h) × K / (molecular weight × ppm). NOTE THE INPUT UNIT: the familiar constant 403 belongs to a form taking PINTS PER MINUTE of liquid (387 × 1.043 lb/pint), and applying it to a rate in lb/h understates the airflow sixteenfold. The mixing factor K (1 to 10) is ENTERED because nothing in the arithmetic supplies it. The flammability requirement against a fraction of the LEL is computed separately and the larger governs. It does not size a system, place supply and exhaust, handle mixtures, model a peak release, or substitute for air monitoring. The ACGIH Industrial Ventilation manual and a certified industrial hygienist govern.",
+  citation: "Citation: dilution airflow = (molar volume 387 ft³/lbmol at 70 °F and 1 atm) × 10⁶ / 60 × (lb/h) × K / (molecular weight × ppm). NOTE THE INPUT UNIT: the familiar constant 403 belongs to a form taking PINTS PER MINUTE of liquid (387 × 1.043 lb/pint), and applying it to a rate in lb/h overstates the airflow roughly sixty-fold (403 x 10^6 against the 6.448 x 10^6 a pound-per-hour rate takes). The mixing factor K (1 to 10) is ENTERED because nothing in the arithmetic supplies it. The flammability requirement against a fraction of the LEL is computed separately and the larger governs. It does not size a system, place supply and exhaust, handle mixtures, model a peak release, or substitute for air monitoring. The ACGIH Industrial Ventilation manual and a certified industrial hygienist govern.",
   example: dilutionVentilationSolventExample.inputs,
   fields: [
     { key: "evaporation_lb_hr", label: "Solvent evaporation rate (lb/h)", kind: "number", attrs: { step: "any" } },

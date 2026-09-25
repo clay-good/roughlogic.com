@@ -1148,10 +1148,13 @@ SHOP_RENDERERS["rolled-blank"] = _v41renderRolledBlank;
 // spec-v54 - compound-miter (Compound Miter / Crown Molding) - Group E
 // Crown molding cut flat on the saw needs two saw settings, not one.
 // First-principles trigonometry of a profile sprung at angle S meeting a
-// wall corner of angle C: miter (table) = atan(tan(C/2) x sin(S)) and
+// wall corner of angle C: miter (table) = atan(sin(S) / tan(C/2)) and
 // bevel (blade tilt) = asin(cos(S) x cos(C/2)). Reproduces the standard
 // published compound-miter chart to the digit (38 deg spring / 90 deg
-// corner = 31.62 / 33.86; 45 / 90 = 35.26 / 30.00).
+// corner = 31.62 / 33.86; 45 / 90 = 35.26 / 30.00). Until 2026-09-25 the miter
+// was atan(tan(C/2) x sin(S)), which agrees only at C = 90: a 135 deg corner
+// read 56.07 deg of miter instead of 14.31, and a straight run (C -> 180)
+// needed nearly 90 instead of a square cut.
 // =====================================================================
 
 // dims: in { spring_angle_deg: dimensionless, corner_angle_deg: dimensionless } out: { miter_angle_deg: dimensionless, bevel_angle_deg: dimensionless, half_corner_deg: dimensionless }
@@ -1162,7 +1165,7 @@ export function computeCompoundMiter({ spring_angle_deg = 38, corner_angle_deg =
   if (!(S > 0 && S < 90)) return { error: "Spring angle must be between 0 and 90 degrees (38 and 45 are the two common crown profiles)." };
   if (!(C > 0 && C < 180)) return { error: "Wall corner angle must be between 0 and 180 degrees (90 for a square corner)." };
   const Srad = (S * Math.PI) / 180, halfCrad = ((C / 2) * Math.PI) / 180;
-  const miter_angle_deg = (Math.atan(Math.tan(halfCrad) * Math.sin(Srad)) * 180) / Math.PI;
+  const miter_angle_deg = (Math.atan(Math.sin(Srad) / Math.tan(halfCrad)) * 180) / Math.PI;
   const bevel_angle_deg = (Math.asin(Math.cos(Srad) * Math.cos(halfCrad)) * 180) / Math.PI;
   const notes = [];
   notes.push("Set the saw to a " + fmt(miter_angle_deg, 2) + " degree miter (table swing) and a " + fmt(bevel_angle_deg, 2) + " degree bevel (blade tilt) to cut crown lying flat on the table. Spring angle " + fmt(S, 0) + " deg, wall corner " + fmt(C, 0) + " deg.");
@@ -1172,7 +1175,7 @@ export function computeCompoundMiter({ spring_angle_deg = 38, corner_angle_deg =
 export const compoundMiterExample = { inputs: { spring_angle_deg: 38, corner_angle_deg: 90 } };
 
 function _renderCompoundMiter(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: Compound-miter geometry for crown molding cut flat on the saw - miter (table) = atan(tan(corner/2) x sin(spring)) and bevel (blade tilt) = asin(cos(spring) x cos(corner/2)) - first-principles trigonometry, public domain. Reproduces the standard published compound-miter chart (38 deg spring / 90 deg corner = 31.62 miter / 33.86 bevel; 45 / 90 = 35.26 / 30.00). Cut a scrap test corner first.";
+  citationEl.textContent = "Citation: Compound-miter geometry for crown molding cut flat on the saw - miter (table) = atan(sin(spring) / tan(corner/2)) and bevel (blade tilt) = asin(cos(spring) x cos(corner/2)) - first-principles trigonometry, public domain. Reproduces the standard published compound-miter chart (38 deg spring / 90 deg corner = 31.62 miter / 33.86 bevel; 45 / 90 = 35.26 / 30.00). Cut a scrap test corner first.";
   const spring = makeNumber("Spring angle (deg, 38 or 45)", "cm-spring", { step: "any", min: "0" });
   const corner = makeNumber("Wall corner angle (deg, 90 square)", "cm-corner", { step: "any", min: "0" });
   for (const f of [spring, corner]) inputRegion.appendChild(f.wrap);

@@ -1474,7 +1474,11 @@ export function computeDrywall({ wall_area_ft2 = 0, ceiling_area_ft2 = 0, sheet_
   // code used 0.053 gal and 1.0 lf per ft^2, 3.7x and 2.5x its own citation.
   const mud_gal = total_ft2 / 70;
   const tape_lf = total_ft2 * 0.4;
-  const screws = Math.ceil((wall_area_ft2 / sheetA) * 28 + (ceiling_area_ft2 / sheetA) * 32);
+  // 28 / 32 screws per 4x8 (32 ft^2) sheet is a per-area rate: a 4x12 sheet
+  // spans more studs and joists, so it takes more screws, not the same 28.
+  // Until 2026-09-25 this divided by the chosen sheet's area, so 4x12 board
+  // counted a third fewer screws than 4x8 on the same wall.
+  const screws = Math.ceil((wall_area_ft2 / 32) * 28 + (ceiling_area_ft2 / 32) * 32);
   return { sheets, mud_gal, tape_lf, screws, total_ft2 };
 }
 
@@ -1991,7 +1995,7 @@ function _simpleRenderer(spec) {
 }
 
 const renderDrywall = _simpleRenderer({
-  citation: "Citation: Public engineering practice (0.053 gal mud / ft^2; 1.0 lf tape / ft^2; 28-32 screws / sheet).",
+  citation: "Citation: Public engineering practice (USG / GA-216): about 1 gal of ready-mix joint compound per 70 ft^2, 0.4 lf of tape per ft^2, and screws at 28 per 4x8 wall sheet or 32 per 4x8 ceiling sheet, scaled by area for larger sheets.",
   example: drywallExample.inputs,
   fields: [
     { key: "wall_area_ft2", label: "Wall area (ft²)", kind: "number" },
