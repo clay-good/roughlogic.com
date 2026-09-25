@@ -41070,6 +41070,12 @@ test("bounds: spec-v1417 computeRefrigerantLeakRate pins the annualization", () 
   assert.ok("error" in _v1417({ ...base, period_months: 18 }));
   assert.ok("error" in _v1417({ ...base, threshold_pct: 0 }));
   assert.ok("error" in _v1417({ ...base, full_charge_lb: Infinity }));
+  // 40 CFR 82.152 rolling average: the 365-day sum, not scaled -- 34 lb in six months stays 17%.
+  const roll = _v1417({ full_charge_lb: 200, pounds_added_lb: 34, period_months: 6, threshold_pct: 20, method: "rolling" });
+  assert.ok(Math.abs(roll.leak_rate_pct - 17) < 1e-9 && roll.exceeded === false);
+  const ann = _v1417({ full_charge_lb: 200, pounds_added_lb: 34, period_months: 6, threshold_pct: 20 });
+  assert.ok(Math.abs(ann.leak_rate_pct - 34) < 1e-9 && ann.exceeded === true);
+  assert.ok("error" in _v1417({ full_charge_lb: 200, pounds_added_lb: 34, period_months: 6, threshold_pct: 20, method: "monthly" }));
 });
 
 import { computeRefrigerantRecoveryTime as _v1418 } from "../../calc-refrigerant.js";

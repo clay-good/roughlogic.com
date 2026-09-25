@@ -2,7 +2,7 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "7321bd71e4d1e02e",
+      "sha": "cc644e8515ba6561",
       "date": "2026-09-25"
     },
     "/tools/": {
@@ -62,7 +62,7 @@
       "date": "2026-09-19"
     },
     "/groups/plumbing/": {
-      "sha": "ac3798d415370761",
+      "sha": "f3e99563fac64ca4",
       "date": "2026-09-25"
     },
     "/groups/real-estate/": {
@@ -422,7 +422,7 @@
       "date": "2026-09-25"
     },
     "/tools/backflow-sizing/": {
-      "sha": "ee1ec412034474d8",
+      "sha": "0a2446a8ff07fa7e",
       "date": "2026-09-25"
     },
     "/tools/backflow-test-psi/": {
@@ -5578,8 +5578,8 @@
       "date": "2026-09-11"
     },
     "/tools/prevailing-wage-fringe/": {
-      "sha": "8a2594aa0f72a117",
-      "date": "2026-09-01"
+      "sha": "abab82d68615a82b",
+      "date": "2026-09-25"
     },
     "/tools/prime-cost/": {
       "sha": "37c7ce44c4549a3e",
@@ -6066,8 +6066,8 @@
       "date": "2026-09-09"
     },
     "/tools/refrigerant-leak-rate/": {
-      "sha": "11ccbfb1c5e2acaf",
-      "date": "2026-09-19"
+      "sha": "754ffae72cffacf0",
+      "date": "2026-09-25"
     },
     "/tools/refrigerant-line-size/": {
       "sha": "fbc85b336f057a8d",

@@ -92303,7 +92303,8 @@
     "full_charge_lb": 200,
     "pounds_added_lb": 34,
     "period_months": 12,
-    "threshold_pct": 10
+    "threshold_pct": 10,
+    "method": "annualizing"
    },
    "outputs": {
     "leak_rate_pct": {

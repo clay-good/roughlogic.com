@@ -1399,16 +1399,24 @@ REFRIGERANT_RENDERERS["defrost-cycle-sizing"] = _simpleRenderer({
 });
 
 // ===================== spec-v1417: refrigerant leak rate and the repair threshold =====================
-// dims: in { full_charge_lb: M, pounds_added_lb: M, period_months: T, threshold_pct: dimensionless } out: { leak_rate_pct: dimensionless, allowed_lb: M, pounds_over_lb: M }
-export function computeRefrigerantLeakRate({ full_charge_lb = 0, pounds_added_lb = 0, period_months = 12, threshold_pct = 0 } = {}) {
+// 40 CFR 82.152 allows two leak-rate methods. Annualizing: the pounds of one
+// addition over the time since the previous addition (capped at 365 days),
+// scaled to a year. Rolling average: the pounds added over the previous 365
+// days (or since the last successful follow-up verification test), NOT scaled.
+// Until 2026-09-25 the tile scaled every period, which is the annualizing
+// method only when the pounds are one addition.
+// dims: in { full_charge_lb: M, pounds_added_lb: M, period_months: T, threshold_pct: dimensionless, method: dimensionless } out: { leak_rate_pct: dimensionless, allowed_lb: M, pounds_over_lb: M }
+export function computeRefrigerantLeakRate({ full_charge_lb = 0, pounds_added_lb = 0, period_months = 12, threshold_pct = 0, method = "annualizing" } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(full_charge_lb > 0)) return { error: "Full charge must be positive -- a system whose full charge has never been recorded cannot compute a compliant leak rate at all." };
   if (!(pounds_added_lb >= 0)) return { error: "Pounds added cannot be negative." };
   if (!(period_months > 0 && period_months <= 12)) return { error: "The period must be above 0 and at most 12 months." };
   if (!(threshold_pct > 0 && threshold_pct <= 100)) return { error: "The threshold percentage must be above 0 and at most 100." };
-  // The calculation ANNUALIZES: the same pounds over a shorter window is a higher rate.
-  const leak_rate_pct = pounds_added_lb / full_charge_lb * (12 / period_months) * 100;
-  const allowed_lb = threshold_pct / 100 * full_charge_lb * (period_months / 12);
+  if (method !== "annualizing" && method !== "rolling") return { error: "Method must be annualizing or rolling." };
+  // Annualizing scales a short window up to a year; the rolling average does not.
+  const scale = method === "annualizing" ? 12 / period_months : 1;
+  const leak_rate_pct = pounds_added_lb / full_charge_lb * scale * 100;
+  const allowed_lb = threshold_pct / 100 * full_charge_lb / scale;
   const pounds_over_lb = pounds_added_lb - allowed_lb;
   const exceeded = leak_rate_pct > threshold_pct;
   const verdict = exceeded
@@ -1421,23 +1429,24 @@ export function computeRefrigerantLeakRate({ full_charge_lb = 0, pounds_added_lb
     pounds_over_lb,
     exceeded,
     verdict,
-    note: "The annualized refrigerant leak rate that decides whether a repair clock has started. The rule is simple arithmetic with real teeth: for an appliance containing 50 pounds or more of an ozone-depleting refrigerant (40 CFR 82 Subpart F) -- or, from January 1, 2026, 15 pounds or more of an HFC or HFC blend with a GWP above 53 (EPA's AIM Act rule, 40 CFR 84 Subpart C), which takes in most R-410A and R-454B equipment -- the owner or operator tracks refrigerant added, annualizes it against the FULL CHARGE -- the amount the system is designed to hold, not what happens to be in it -- and compares the result against the threshold for that appliance type, which differs by category, with commercial and industrial process refrigeration at higher percentages than comfort cooling. Two details cause most of the errors. Full charge must be established and documented, and a system whose full charge has never been recorded cannot compute a compliant leak rate at all. And the calculation ANNUALIZES, so adding refrigerant twice in three months is a much higher annual rate than the same pounds spread over a year, and the shorter the window the more it magnifies. A 200 lb system with 34 lb added over twelve months is at 17.0%: over a 10% threshold by 14 lb, and comfortably under a 20% one. The same 34 pounds is a violation on one appliance type and unremarkable on another, which is why identifying the category correctly is the first step and not a formality -- and if those 34 pounds went in over six months instead, the annualized rate is 34% and the system is over even the higher threshold, with nothing about the leak having changed. Exceeding the threshold starts a clock: repairs within a set number of days, verification tests, and a retrofit or retirement plan if the leak cannot be repaired. A compliance screen; 40 CFR Part 82 Subpart F in full, the appliance's own category and threshold, and the service records govern.",
+    note: "The annualized refrigerant leak rate that decides whether a repair clock has started. The rule is simple arithmetic with real teeth: for an appliance containing 50 pounds or more of an ozone-depleting refrigerant (40 CFR 82 Subpart F) -- or, from January 1, 2026, 15 pounds or more of an HFC (any GWP) or of a substitute with a GWP above 53 (EPA's AIM Act rule, 40 CFR 84.106), which takes in commercial and industrial refrigeration such as R-404A and R-448A systems but expressly excludes residential and light commercial air conditioning and heat pumps, where most R-410A and R-454B equipment sits -- the owner or operator tracks refrigerant added, annualizes it against the FULL CHARGE -- the amount the system is designed to hold, not what happens to be in it -- and compares the result against the threshold for that appliance type, which differs by category, with commercial and industrial process refrigeration at higher percentages than comfort cooling. Two details cause most of the errors. Full charge must be established and documented, and a system whose full charge has never been recorded cannot compute a compliant leak rate at all. And there are two permitted methods, and a facility must use one for all its appliances (40 CFR 82.152). The ANNUALIZING method takes the pounds of one addition over the time since the previous addition and scales it to a year, so a top-off three months after the last one is magnified four times. The ROLLING-AVERAGE method sums everything added over the previous 365 days and does not scale a shorter window up. A 200 lb system with 34 lb added over twelve months is at 17.0%: over a 10% threshold by 14 lb, and comfortably under a 20% one. The same 34 pounds is a violation on one appliance type and unremarkable on another, which is why identifying the category correctly is the first step and not a formality -- and if those 34 pounds went in as one addition six months after the previous one, the annualizing method reads 34% and the system is over even the higher threshold, with nothing about the leak having changed (the rolling average would still read 17%). Exceeding the threshold starts a clock: repairs within a set number of days, verification tests, and a retrofit or retirement plan if the leak cannot be repaired. A compliance screen; 40 CFR Part 82 Subpart F in full, the appliance's own category and threshold, and the service records govern.",
   };
 }
 
-export const refrigerantLeakRateExample = { inputs: { full_charge_lb: 200, pounds_added_lb: 34, period_months: 12, threshold_pct: 10 } };
+export const refrigerantLeakRateExample = { inputs: { full_charge_lb: 200, pounds_added_lb: 34, period_months: 12, threshold_pct: 10, method: "annualizing" } };
 
 REFRIGERANT_RENDERERS["refrigerant-leak-rate"] = _simpleRenderer({
-  citation: "Citation: the annualized leak-rate calculation of 40 CFR Part 82 Subpart F -- pounds added divided by the FULL CHARGE, annualized over the period, against the threshold for the appliance type -- cited by part and not reproduced. The thresholds differ by appliance category and are entered rather than bundled. 40 CFR Part 82 in full, the appliance's category, and the service records govern.",
+  citation: "Citation: the leak-rate calculation of 40 CFR 82.152 (and 84.106 for HFCs from 2026) -- pounds added divided by the FULL CHARGE, by the annualizing method (one addition scaled to a year) or the rolling-average method (365-day sum), against the threshold for the appliance type -- cited by section and not reproduced. The thresholds differ by appliance category and are entered rather than bundled. 40 CFR Part 82 in full, the appliance's category, and the service records govern.",
   example: refrigerantLeakRateExample.inputs,
   fields: [
     { key: "full_charge_lb", label: "Full charge (lb, as designed and documented)", kind: "number" },
-    { key: "pounds_added_lb", label: "Refrigerant added in the period (lb)", kind: "number" },
-    { key: "period_months", label: "Length of the period (months)", kind: "number" },
+    { key: "pounds_added_lb", label: "Refrigerant added (lb; annualizing: this addition, rolling: all in the window)", kind: "number" },
+    { key: "period_months", label: "Months since the previous addition (annualizing) or in the window (rolling)", kind: "number" },
     { key: "threshold_pct", label: "Threshold for this appliance type (%)", kind: "number" },
+    { key: "method", label: "Leak-rate method (40 CFR 82.152)", kind: "select", options: [{ value: "annualizing", label: "Annualizing (scales to 12 months)", selected: true }, { value: "rolling", label: "Rolling average (365-day sum, not scaled)" }] },
   ],
   outputs: [
-    { key: "r", id: "rflk-out-r", label: "Annualized leak rate", value: (r) => fmt(r.leak_rate_pct, 1) + " %" },
+    { key: "r", id: "rflk-out-r", label: "Leak rate", value: (r) => fmt(r.leak_rate_pct, 1) + " %" },
     { key: "a", id: "rflk-out-a", label: "Allowance in this period", value: (r) => fmt(r.allowed_lb, 1) + " lb" },
     { key: "o", id: "rflk-out-o", label: "Against the allowance", value: (r) => (r.pounds_over_lb > 0 ? fmt(r.pounds_over_lb, 1) + " lb over" : fmt(-r.pounds_over_lb, 1) + " lb remaining") },
     { key: "v", id: "rflk-out-v", label: "Threshold determination", value: (r) => r.verdict },

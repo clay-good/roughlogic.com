@@ -2952,7 +2952,7 @@ export const backflowSizingExample = {
 
 // dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 function _v16p_renderBackflowSizing(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: high (health) hazard requires a reduced-pressure principle (RP) assembly per IPC 608.1 / Table 608.1 and the cross-connection control program; downstream pressure = upstream - assembly head loss. Head loss interpolated from the bundled Watts technical-bulletin curves (representative; the assembly cut sheet and the USC FCCCHR approved-assembly list govern). Annual test required per EPA 40 CFR 141.85 / AWWA M14. AHJ governs. Free at codes.iccsafe.org and awwa.org for M14 TOC.";
+  citationEl.textContent = "Citation: high (health) hazard requires a reduced-pressure principle (RP) assembly per IPC 608.1 / Table 608.1 and the cross-connection control program; downstream pressure = upstream - assembly head loss. Head loss interpolated from the bundled Watts technical-bulletin curves (representative; the assembly cut sheet and the USC FCCCHR approved-assembly list govern). Annual test required per IPC 312.10.2 (and the water purveyor's cross-connection program; AWWA M14). AHJ governs. Free at codes.iccsafe.org and awwa.org for M14 TOC.";
   const flow = makeNumber("Service flow demand (GPM)", "bs-flow", { step: "any", min: "0" });
   const hazard = makeSelect("Hazard category (IPC 312)", "bs-haz", [
     { value: "high", label: "High / health hazard", selected: true },
