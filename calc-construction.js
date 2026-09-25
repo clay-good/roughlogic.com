@@ -1084,15 +1084,34 @@ function renderWindSpeedFromVelocityPressure(inputRegion, outputRegion, citation
 
 // --- Utility 98: Snow Load (ASCE 7 flat-roof) ---
 //
-// Pf = 0.7 * Ce * Ct * Is * Pg  (psf)  [public ASCE 7 formula]
+// Pf = 0.7 * Ce * Ct * Pg  (psf)  [ASCE 7-22 Eq. 7.3-1]
+//
+// ASCE 7-22 removed the snow importance factor Is: the mapped ground snow load
+// is now set per risk category, so the reliability Is used to add is already
+// in pg. Until 2026-09-25 this multiplied by Is, and the drift, minimum,
+// rain-on-snow and unbalanced-gable relations below were the 7-16 forms while
+// the tiles cited 7-22.
 
-// dims: in { Pg_psf: M L^-1 T^-2, Ce: dimensionless, Ct: dimensionless, Is: dimensionless, Cs: dimensionless, drift_upwind_length_ft: L } out: { Pf_psf: M L^-1 T^-2, Ps_psf: M L^-1 T^-2, drift_height_ft: L }
-export function computeSnowLoad({ Pg_psf, Ce = 1.0, Ct = 1.0, Is = 1.0, Cs = 1.0, drift_upwind_length_ft = 0 }) {
+// ASCE 7-22 Eq. 7.6-1 drift height, which replaced the 7-16 relation
+// hd = 0.43 lu^(1/3) (pg + 10)^(1/4) - 1.5: hd = 1.5 sqrt(pg^0.74 lu^0.70
+// W2^1.7 / gamma), gamma = 0.13 pg + 14 <= 30 pcf, W2 the winter wind parameter
+// (Figure 7.6-1: the share of October-April time the wind is 10 mph or more).
+// No 20 ft floor on lu, and no lower-bound drift.
+export const SNOW_W2_DEFAULT = 0.65;
+function _asce722DriftHeight(pg, lu, w2) {
+  const gamma = Math.min(0.13 * pg + 14, 30);
+  return 1.5 * Math.sqrt(Math.pow(pg, 0.74) * Math.pow(lu, 0.70) * Math.pow(w2, 1.7) / gamma);
+}
+
+// dims: in { Pg_psf: M L^-1 T^-2, Ce: dimensionless, Ct: dimensionless, Cs: dimensionless, drift_upwind_length_ft: L, w2: dimensionless } out: { Pf_psf: M L^-1 T^-2, Ps_psf: M L^-1 T^-2, drift_height_ft: L }
+export function computeSnowLoad({ Pg_psf, Ce = 1.0, Ct = 1.0, Cs = 1.0, drift_upwind_length_ft = 0, w2 = SNOW_W2_DEFAULT }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
-  Ce = Number(Ce); Ct = Number(Ct); Is = Number(Is);
+  Ce = Number(Ce); Ct = Number(Ct);
   const Pg = Number(Pg_psf) || 0;
   if (Pg <= 0) return { error: "Ground snow load must be positive." };
-  const Pf = 0.7 * Ce * Ct * Is * Pg;
+  const W2 = Number(w2);
+  if (!(W2 > 0 && W2 <= 1)) return { error: "Winter wind parameter W2 must be a fraction above 0 and at most 1." };
+  const Pf = 0.7 * Ce * Ct * Pg;
   // v23 EN.7: sloped-roof load Ps = Cs * Pf (Cs default 1 -> Ps = Pf), and the
   // ASCE 7 Ch.7 leeward drift height from the upwind fetch (optional).
   let cs = Number(Cs); if (!Number.isFinite(cs) || cs < 0) cs = 1.0;
@@ -1100,14 +1119,14 @@ export function computeSnowLoad({ Pg_psf, Ce = 1.0, Ct = 1.0, Is = 1.0, Cs = 1.0
   let drift_height_ft = null;
   const lu = Number(drift_upwind_length_ft) || 0;
   if (lu > 0 && Number.isFinite(lu)) {
-    const hd = 0.43 * Math.cbrt(lu) * Math.pow(Pg + 10, 0.25) - 1.5;
-    if (Number.isFinite(hd)) drift_height_ft = Math.max(0, hd);
+    const hd = _asce722DriftHeight(Pg, lu, W2);
+    if (Number.isFinite(hd)) drift_height_ft = hd;
   }
-  return { Pf_psf: Pf, Ps_psf: Ps, drift_height_ft, Pg_psf: Pg, Ce, Ct, Is, Cs: cs };
+  return { Pf_psf: Pf, Ps_psf: Ps, drift_height_ft, Pg_psf: Pg, Ce, Ct, Cs: cs, w2: W2 };
 }
 
 export const snowLoadExample = {
-  inputs: { Pg_psf: 30, Ce: 1.0, Ct: 1.0, Is: 1.0 },
+  inputs: { Pg_psf: 30, Ce: 1.0, Ct: 1.0 },
   expected: { Pf_psf: 21 },
 };
 
@@ -1370,19 +1389,18 @@ export function renderWindPressure(inputRegion, outputRegion, citationEl) {
 
 // dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderSnowLoad(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: Pf = 0.7 * Ce * Ct * Is * Pg per public ASCE 7 formula.";
+  citationEl.textContent = "Citation: Pf = 0.7 * Ce * Ct * Pg per ASCE 7-22 Eq. 7.3-1, with pg the risk-category ground snow load (7-22 removed the importance factor Is); leeward drift hd = 1.5 sqrt(pg^0.74 lu^0.70 W2^1.7 / gamma) per Eq. 7.6-1.";
   const Pg = makeNumber("Ground snow load Pg (psf)", "sl-pg", { step: "any", min: "0" });
   const Ce = makeNumber("Exposure factor Ce", "sl-ce", { step: "any", min: "0", value: "1.0" });
   Ce.input.value = "1.0";
   const Ct = makeNumber("Thermal factor Ct", "sl-ct", { step: "any", min: "0", value: "1.0" });
   Ct.input.value = "1.0";
-  const Is = makeNumber("Importance factor Is", "sl-is", { step: "any", min: "0", value: "1.0" });
-  Is.input.value = "1.0";
   // v23 EN.7: sloped-roof factor Cs and the optional drift upwind fetch.
   const Cs = makeNumber("Sloped-roof factor Cs", "sl-cs", { step: "any", min: "0", value: "1.0" }); Cs.input.value = "1.0";
   const lu = makeNumber("Drift upwind fetch (ft, optional)", "sl-lu", { step: "any", min: "0" });
-  for (const f of [Pg, Ce, Ct, Is, Cs, lu]) inputRegion.appendChild(f.wrap);
-  attachExampleButton(inputRegion, () => { Pg.input.value = "30"; Ce.input.value = "1.0"; Ct.input.value = "1.0"; Is.input.value = "1.0"; Cs.input.value = "0.9"; lu.input.value = "50"; update(); });
+  const w2 = makeNumber("Winter wind parameter W2 (Figure 7.6-1)", "sl-w2", { step: "any", min: "0", max: "1", value: String(SNOW_W2_DEFAULT) }); w2.input.value = String(SNOW_W2_DEFAULT);
+  for (const f of [Pg, Ce, Ct, Cs, lu, w2]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { Pg.input.value = "30"; Ce.input.value = "1.0"; Ct.input.value = "1.0"; Cs.input.value = "0.9"; lu.input.value = "50"; w2.input.value = String(SNOW_W2_DEFAULT); update(); });
   const oP = makeOutputLine(outputRegion, "Flat-roof snow load Pf", "sl-out-p");
   const oPs = makeOutputLine(outputRegion, "Sloped-roof load Ps", "sl-out-ps");
   const oDr = makeOutputLine(outputRegion, "Leeward drift height", "sl-out-dr");
@@ -1391,16 +1409,16 @@ export function renderSnowLoad(inputRegion, outputRegion, citationEl) {
       Pg_psf: Number(Pg.input.value) || 0,
       Ce: Number(Ce.input.value) || 1,
       Ct: Number(Ct.input.value) || 1,
-      Is: Number(Is.input.value) || 1,
       Cs: Number(Cs.input.value) || 1,
       drift_upwind_length_ft: Number(lu.input.value) || 0,
+      w2: Number(w2.input.value) || SNOW_W2_DEFAULT,
     });
     if (r.error) { oP.textContent = r.error; oPs.textContent = "-"; oDr.textContent = "-"; return; }
     oP.textContent = fmt(r.Pf_psf, 2) + " psf";
     oPs.textContent = fmt(r.Ps_psf, 2) + " psf (Cs " + fmt(r.Cs, 2) + ")";
     oDr.textContent = r.drift_height_ft == null ? "(enter upwind fetch)" : fmt(r.drift_height_ft, 2) + " ft";
   }, DEBOUNCE_MS);
-  for (const el of [Pg.input, Ce.input, Ct.input, Is.input, Cs.input, lu.input]) el.addEventListener("input", update);
+  for (const el of [Pg.input, Ce.input, Ct.input, Cs.input, lu.input, w2.input]) el.addEventListener("input", update);
 }
 
 // dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
@@ -6874,14 +6892,15 @@ const _renderWindCcPressure = _simpleRenderer({
 });
 CONSTRUCTION_RENDERERS["wind-cc-pressure"] = _renderWindCcPressure;
 
-// dims: in { lu_ft: L, pg_psf: M L^-1 T^-2, hc_ft: L } out: { gamma_pcf: M L^-2 T^-2, hd_ft: L, w_ft: L, pd_psf: M L^-1 T^-2 }
-export function computeSnowDriftLoad({ lu_ft = 0, pg_psf = 0, hc_ft = 0 } = {}) {
+// dims: in { lu_ft: L, pg_psf: M L^-1 T^-2, hc_ft: L, w2: dimensionless } out: { gamma_pcf: M L^-2 T^-2, hd_ft: L, w_ft: L, pd_psf: M L^-1 T^-2 }
+export function computeSnowDriftLoad({ lu_ft = 0, pg_psf = 0, hc_ft = 0, w2 = SNOW_W2_DEFAULT } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(lu_ft > 0)) return { error: "Upwind fetch must be positive (ft)." };
   if (!(pg_psf > 0)) return { error: "Ground snow load must be positive (psf)." };
   if (hc_ft < 0) return { error: "Clear height cannot be negative (ft)." };
+  if (!(w2 > 0 && w2 <= 1)) return { error: "Winter wind parameter W2 must be a fraction above 0 and at most 1." };
   const gamma_pcf = Math.min(0.13 * pg_psf + 14, 30);
-  const hd_ft = Math.max(0.43 * Math.cbrt(lu_ft) * Math.pow(pg_psf + 10, 0.25) - 1.5, 0);
+  const hd_ft = _asce722DriftHeight(pg_psf, lu_ft, w2);
   let w_ft;
   if (hc_ft > 0 && hd_ft > hc_ft) {
     w_ft = Math.min((4 * hd_ft * hd_ft) / hc_ft, 8 * hc_ft);
@@ -6891,18 +6910,19 @@ export function computeSnowDriftLoad({ lu_ft = 0, pg_psf = 0, hc_ft = 0 } = {}) 
   const pd_psf = hd_ft * gamma_pcf;
   return {
     gamma_pcf, hd_ft, w_ft, pd_psf,
-    note: "ASCE 7-22 Chapter 7 leeward snow drift: hd = 0.43 (lu)^(1/3) (pg + 10)^(1/4) - 1.5 (lu upwind fetch ft, pg ground snow psf), the density gamma = 0.13 pg + 14 <= 30 pcf, the peak surcharge pd = hd gamma at the step, and the width w = 4 hd for a full-height triangle (hd <= hc; when the drift reaches the upper roof, w = 4 hd^2/hc <= 8 hc). This is the drift surcharge riding ON TOP OF the balanced load (snow-load) - it uses the leeward form (the windward drift uses 0.75 hd and a different fetch), and excludes the sliding-snow surcharge (7.9) and the unbalanced-gable case (7.6.1). A design aid, not a substitute for the engineer of record.",
+    note: "ASCE 7-22 Chapter 7 leeward snow drift: hd = 1.5 sqrt(pg^0.74 lu^0.70 W2^1.7 / gamma) (Eq. 7.6-1; lu upwind fetch ft, pg the risk-category ground snow psf, W2 the winter wind parameter from Figure 7.6-1 or the ASCE Hazard Tool, defaulting here to " + SNOW_W2_DEFAULT + ", the top of the lower-48 range, which overstates the drift where winter wind is calmer), the density gamma = 0.13 pg + 14 <= 30 pcf, the peak surcharge pd = hd gamma at the step, and the width w = 4 hd for a full-height triangle (hd <= hc; when the drift reaches the upper roof, w = 4 hd^2/hc <= 8 hc). This is the drift surcharge riding ON TOP OF the balanced load (snow-load) - it uses the leeward form (the windward drift uses 0.75 hd with the lower roof's fetch, and 7-22 sets its width at 6 hd), and excludes the sliding-snow surcharge (7.9) and the unbalanced-gable case (7.6.1). A design aid, not a substitute for the engineer of record.",
   };
 }
-export const snowDriftLoadExample = { inputs: { lu_ft: 100, pg_psf: 30, hc_ft: 0 } };
+export const snowDriftLoadExample = { inputs: { lu_ft: 100, pg_psf: 30, hc_ft: 0, w2: 0.5 } };
 
 const _renderSnowDriftLoad = _simpleRenderer({
-  citation: "Citation: ASCE 7-22 Chapter 7 leeward snow drift hd = 0.43 (lu)^(1/3) (pg + 10)^(1/4) - 1.5, density gamma = 0.13 pg + 14 <= 30 pcf, surcharge pd = hd gamma, width w = 4 hd (hd <= hc), by name. The drift on top of the balanced snow-load. A design aid, not a substitute for the engineer of record.",
+  citation: "Citation: ASCE 7-22 Chapter 7 leeward snow drift hd = 1.5 sqrt(pg^0.74 lu^0.70 W2^1.7 / gamma) (Eq. 7.6-1, W2 the winter wind parameter of Figure 7.6-1), density gamma = 0.13 pg + 14 <= 30 pcf, surcharge pd = hd gamma, width w = 4 hd (hd <= hc), by name. The drift on top of the balanced snow-load. A design aid, not a substitute for the engineer of record.",
   example: snowDriftLoadExample.inputs,
   fields: [
     { key: "lu_ft", label: "Upwind fetch lu (ft)", kind: "number" },
     { key: "pg_psf", label: "Ground snow load pg (psf)", kind: "number" },
     { key: "hc_ft", label: "Clear height hc to the step (ft, 0 = full triangle)", kind: "number" },
+    { key: "w2", label: "Winter wind parameter W2 (Figure 7.6-1)", kind: "number" },
   ],
   outputs: [
     { key: "g", id: "sdl-out-g", label: "Snow density gamma", value: (r) => fmt(r.gamma_pcf, 1) + " pcf" },
@@ -8358,8 +8378,13 @@ const _v467renderPoweredAtticVentilator = _simpleRenderer({
 CONSTRUCTION_RENDERERS["powered-attic-ventilator"] = _v467renderPoweredAtticVentilator;
 
 // ===================== spec-v468: rain-on-snow surcharge (ASCE 7-22 7.10) =====================
-// dims: in { pf_psf: M L^-1 T^-2, pg_psf: M L^-1 T^-2, slope_deg: dimensionless, eave_to_ridge_ft: L, surcharge_psf: M L^-1 T^-2 } out: { total_psf: M L^-1 T^-2 }
-export function computeRainOnSnowSurcharge({ pf_psf = 0, pg_psf = 0, slope_deg = 0, eave_to_ridge_ft = 0, surcharge_psf = 8 } = {}) {
+// ASCE 7-22 Table 7.3-4 upper limit on the minimum snow load, pm,max (psf), by
+// risk category. 7-22 section 7.10 triggers the rain-on-snow surcharge at
+// 0 < pg <= pm,max, and 7.3.3 caps the minimum roof snow load at it. Both read
+// a flat 20 psf (times Is for the minimum) under 7-16.
+export const SNOW_PM_MAX_PSF = { I: 25, II: 30, III: 35, IV: 40 };
+// dims: in { pf_psf: M L^-1 T^-2, pg_psf: M L^-1 T^-2, slope_deg: dimensionless, eave_to_ridge_ft: L, surcharge_psf: M L^-1 T^-2, risk_category: dimensionless } out: { total_psf: M L^-1 T^-2 }
+export function computeRainOnSnowSurcharge({ pf_psf = 0, pg_psf = 0, slope_deg = 0, eave_to_ridge_ft = 0, surcharge_psf = 8, risk_category = "II" } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const pf = Number(pf_psf) || 0;
   const pg = Number(pg_psf) || 0;
@@ -8371,27 +8396,30 @@ export function computeRainOnSnowSurcharge({ pf_psf = 0, pg_psf = 0, slope_deg =
   if (!(W > 0)) return { error: "Eave-to-ridge distance W must be positive (ft)." };
   if (slope < 0) return { error: "Slope must be non-negative (deg)." };
   if (surcharge < 0) return { error: "Surcharge must be non-negative (psf)." };
-  const applies = pg <= 20 && slope < W / 50;
+  const pm_max_psf = SNOW_PM_MAX_PSF[String(risk_category)];
+  if (pm_max_psf === undefined) return { error: "Risk category must be I, II, III, or IV." };
+  const applies = pg <= pm_max_psf && slope < W / 50;
   const total_psf = pf + (applies ? surcharge : 0);
   return {
-    applies, total_psf, added_psf: applies ? surcharge : 0,
-    note: "Rain-on-snow surcharge (ASCE 7-22 §7.10): where the ground snow load Pg is 20 psf or less and the roof slope (in degrees) is less than W/50 with W the eave-to-ridge distance in feet, add a surcharge to the balanced flat-roof snow load Pf. ASCE 7-22 raised this surcharge to 5-8 psf (commonly 8) from the older flat 5 psf, because a low-slope roof in a warm, wet-snow climate can hold rain in the snowpack that would run off a steeper roof. It applies only to the balanced load case and only where both triggers are met; a steep roof or a deep-snow (high-Pg) region does not take the surcharge. A design aid, not a substitute for the engineer of record.",
+    applies, total_psf, added_psf: applies ? surcharge : 0, pm_max_psf,
+    note: "Rain-on-snow surcharge (ASCE 7-22 §7.10): where the ground snow load Pg is no more than pm,max (Table 7.3-4: 25, 30, 35, or 40 psf for risk category I, II, III, or IV) and the roof slope (in degrees) is less than W/50 with W the eave-to-ridge distance in feet, add 8 psf to the balanced flat-roof snow load Pf. ASCE 7-16 used 5 psf and a flat 20 psf trigger, because a low-slope roof in a warm, wet-snow climate can hold rain in the snowpack that would run off a steeper roof. It applies only to the balanced load case and only where both triggers are met; a steep roof or a deep-snow (high-Pg) region does not take the surcharge. A design aid, not a substitute for the engineer of record.",
   };
 }
-export const rainOnSnowSurchargeExample = { inputs: { pf_psf: 15, pg_psf: 18, slope_deg: 1, eave_to_ridge_ft: 100, surcharge_psf: 8 } };
+export const rainOnSnowSurchargeExample = { inputs: { pf_psf: 15, pg_psf: 18, slope_deg: 1, eave_to_ridge_ft: 100, surcharge_psf: 8, risk_category: "II" } };
 const _v468renderRainOnSnowSurcharge = _simpleRenderer({
-  citation: "Citation: Rain-on-snow surcharge (ASCE 7-22 §7.10): where Pg <= 20 psf and the slope (deg) < W/50, add a surcharge (5-8 psf, commonly 8) to the balanced flat-roof snow load Pf. Balanced case only, both triggers required. A design aid, not a substitute for the engineer of record.",
+  citation: "Citation: Rain-on-snow surcharge (ASCE 7-22 §7.10): where 0 < Pg <= pm,max (Table 7.3-4: 25 / 30 / 35 / 40 psf for risk category I / II / III / IV) and the slope (deg) < W/50, add 8 psf to the balanced flat-roof snow load Pf. Balanced case only, both triggers required. A design aid, not a substitute for the engineer of record.",
   example: rainOnSnowSurchargeExample.inputs,
   fields: [
     { key: "pf_psf", label: "Balanced flat-roof snow Pf (psf)", kind: "number" },
     { key: "pg_psf", label: "Ground snow load Pg (psf)", kind: "number" },
     { key: "slope_deg", label: "Roof slope (deg)", kind: "number" },
     { key: "eave_to_ridge_ft", label: "Eave-to-ridge distance W (ft)", kind: "number" },
-    { key: "surcharge_psf", label: "Surcharge value (psf, ASCE 7-22 ~8)", kind: "number" },
+    { key: "surcharge_psf", label: "Surcharge value (psf, ASCE 7-22: 8)", kind: "number" },
+    { key: "risk_category", label: "Risk category", kind: "select", options: [{ value: "I", label: "I" }, { value: "II", label: "II", selected: true }, { value: "III", label: "III" }, { value: "IV", label: "IV" }] },
   ],
   outputs: [
     { key: "tot", id: "ros-out-tot", label: "Total with surcharge", value: (r) => fmt(r.total_psf, 1) + " psf" },
-    { key: "app", id: "ros-out-app", label: "Surcharge applies?", value: (r) => r.applies ? "YES -- +" + fmt(r.added_psf, 1) + " psf" : "no (Pg > 20 or slope >= W/50)" },
+    { key: "app", id: "ros-out-app", label: "Surcharge applies?", value: (r) => r.applies ? "YES -- +" + fmt(r.added_psf, 1) + " psf" : "no (Pg > " + fmt(r.pm_max_psf, 0) + " psf or slope >= W/50)" },
     { key: "n", id: "ros-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeRainOnSnowSurcharge,
@@ -8438,30 +8466,30 @@ const _v469renderSlidingSnowLoad = _simpleRenderer({
 });
 CONSTRUCTION_RENDERERS["sliding-snow-load"] = _v469renderSlidingSnowLoad;
 
-// ===================== spec-v470: minimum roof snow load (ASCE 7 7.3.4) =====================
-// dims: in { pg_psf: M L^-1 T^-2, importance: dimensionless, pf_computed: M L^-1 T^-2 } out: { pm_psf: M L^-1 T^-2, governing_psf: M L^-1 T^-2 }
-export function computeMinimumRoofSnow({ pg_psf = 0, importance = 1.0, pf_computed = 0 } = {}) {
+// ===================== spec-v470: minimum roof snow load (ASCE 7-22 7.3.3) =====================
+// dims: in { pg_psf: M L^-1 T^-2, risk_category: dimensionless, pf_computed: M L^-1 T^-2 } out: { pm_psf: M L^-1 T^-2, governing_psf: M L^-1 T^-2 }
+export function computeMinimumRoofSnow({ pg_psf = 0, risk_category = "II", pf_computed = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const pg = Number(pg_psf) || 0;
-  const Is = Number(importance) || 0;
   const pfc = Number(pf_computed) || 0;
   if (!(pg > 0)) return { error: "Ground snow load Pg must be positive (psf)." };
-  if (!(Is > 0)) return { error: "Snow importance factor Is must be positive." };
+  const pm_max_psf = SNOW_PM_MAX_PSF[String(risk_category)];
+  if (pm_max_psf === undefined) return { error: "Risk category must be I, II, III, or IV." };
   if (pfc < 0) return { error: "Computed flat-roof snow must be non-negative (psf)." };
-  const pm_psf = pg <= 20 ? Is * pg : 20 * Is;
+  const pm_psf = Math.min(pg, pm_max_psf);
   const governing_psf = Math.max(pm_psf, pfc);
   return {
-    pm_psf, governing_psf, min_governs: pm_psf >= pfc,
-    note: "Minimum roof snow load (ASCE 7 §7.3.4): a low-slope roof (slope less than 15 degrees, and monoslope/hip/gable roofs with W <= a limit) has a minimum snow load Pm that the design cannot fall below, meant to catch a single heavy snowfall before it is reduced by the exposure, thermal, and slope factors. Pm = Is x Pg where Pg is 20 psf or less, or 20 x Is where Pg is over 20 psf (Is the snow importance factor from ASCE 7 Table 1.5-2). The design flat-roof snow load is the greater of this minimum and the computed Pf. The minimum applies only to the balanced case, not to partial-loading, drift, or sliding cases. A design aid, not a substitute for the engineer of record.",
+    pm_psf, pm_max_psf, governing_psf, min_governs: pm_psf >= pfc,
+    note: "Minimum roof snow load (ASCE 7-22 §7.3.3): a low-slope roof (slope less than 15 degrees, and monoslope/hip/gable roofs with W <= a limit) has a minimum snow load Pm that the design cannot fall below, meant to catch a single heavy snowfall before it is reduced by the exposure, thermal, and slope factors. Pm = Pg up to pm,max, and pm,max above it, where pm,max is 25, 30, 35, or 40 psf for risk category I, II, III, or IV (Table 7.3-4). ASCE 7-16 used Is x Pg up to 20 x Is; 7-22 removed Is because its ground snow loads are already set per risk category. The design flat-roof snow load is the greater of this minimum and the computed Pf. The minimum applies only to the balanced case, not to partial-loading, drift, or sliding cases. A design aid, not a substitute for the engineer of record.",
   };
 }
-export const minimumRoofSnowExample = { inputs: { pg_psf: 15, importance: 1.0, pf_computed: 0 } };
+export const minimumRoofSnowExample = { inputs: { pg_psf: 15, risk_category: "II", pf_computed: 0 } };
 const _v470renderMinimumRoofSnow = _simpleRenderer({
-  citation: "Citation: Minimum roof snow load (ASCE 7 §7.3.4): Pm = Is x Pg for Pg <= 20 psf, else 20 x Is; the design flat-roof snow is the greater of Pm and the computed Pf. Low-slope, balanced case only. A design aid, not a substitute for the engineer of record.",
+  citation: "Citation: Minimum roof snow load (ASCE 7-22 §7.3.3): Pm = min(Pg, pm,max), pm,max = 25 / 30 / 35 / 40 psf for risk category I / II / III / IV (Table 7.3-4); the design flat-roof snow is the greater of Pm and the computed Pf. Low-slope, balanced case only. A design aid, not a substitute for the engineer of record.",
   example: minimumRoofSnowExample.inputs,
   fields: [
     { key: "pg_psf", label: "Ground snow load Pg (psf)", kind: "number" },
-    { key: "importance", label: "Snow importance factor Is (Table 1.5-2)", kind: "number" },
+    { key: "risk_category", label: "Risk category", kind: "select", options: [{ value: "I", label: "I" }, { value: "II", label: "II", selected: true }, { value: "III", label: "III" }, { value: "IV", label: "IV" }] },
     { key: "pf_computed", label: "Computed flat-roof snow Pf (psf, optional)", kind: "number" },
   ],
   outputs: [
@@ -8558,8 +8586,8 @@ CONSTRUCTION_RENDERERS["wind-solid-sign"] = _v546renderWindSolidSign;
 
 // --- spec-v553 E: Unbalanced snow load on gable roof (ASCE 7-22 7.6.1) ---
 // Applies for ~2.38-30.2 deg and W>20 ft. Windward 0.3 ps, leeward ps + hd*gamma/sqrt(S).
-// dims: in { ground_snow_pg_psf: M L^-1 T^-2, flat_roof_ps_psf: M L^-1 T^-2, roof_rise_on_12: dimensionless, eave_to_ridge_ft: L } out: { windward_psf: M L^-1 T^-2, leeward_peak_psf: M L^-1 T^-2, extent_ft: L }
-export function computeSnowUnbalancedGable({ ground_snow_pg_psf = 0, flat_roof_ps_psf = 0, roof_rise_on_12 = 0, eave_to_ridge_ft = 0 } = {}) {
+// dims: in { ground_snow_pg_psf: M L^-1 T^-2, flat_roof_ps_psf: M L^-1 T^-2, roof_rise_on_12: dimensionless, eave_to_ridge_ft: L, w2: dimensionless } out: { windward_psf: M L^-1 T^-2, leeward_peak_psf: M L^-1 T^-2, extent_ft: L }
+export function computeSnowUnbalancedGable({ ground_snow_pg_psf = 0, flat_roof_ps_psf = 0, roof_rise_on_12 = 0, eave_to_ridge_ft = 0, w2 = SNOW_W2_DEFAULT } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const pg = Number(ground_snow_pg_psf) || 0;
   const ps = Number(flat_roof_ps_psf) || 0;
@@ -8569,10 +8597,11 @@ export function computeSnowUnbalancedGable({ ground_snow_pg_psf = 0, flat_roof_p
   if (!(ps > 0)) return { error: "Flat/sloped-roof snow load must be positive (psf)." };
   if (!(rise > 0)) return { error: "Roof rise-on-12 must be positive." };
   if (!(W > 0)) return { error: "Eave-to-ridge length must be positive (ft)." };
+  if (!(w2 > 0 && w2 <= 1)) return { error: "Winter wind parameter W2 must be a fraction above 0 and at most 1." };
   const slope_deg = Math.atan(rise / 12) * 180 / Math.PI;
   // In the slope band the unbalanced case ALWAYS applies. For W <= 20 ft
   // with simply supported prismatic members, ASCE 7 7.6.1 sets the windward
-  // side to 0 and the leeward to Is x pg, uniform (Is = 1 here). Until
+  // side to 0 and the leeward to pg, uniform (7-22 dropped Is). Until
   // 2026-09-19 W <= 20 ft read "not applicable, balanced governs", missing a
   // leeward load 20-45% above the balanced one.
   const inBand = slope_deg >= 2.38 && slope_deg <= 30.2;
@@ -8580,7 +8609,8 @@ export function computeSnowUnbalancedGable({ ground_snow_pg_psf = 0, flat_roof_p
   const shortSpan = W <= 20;
   const gamma = Math.min(0.13 * pg + 14, 30);
   const S = 12 / rise;
-  const hd = shortSpan ? 0 : 0.43 * Math.pow(W, 1 / 3) * Math.pow(pg + 10, 1 / 4) - 1.5;
+  // ASCE 7-22 Eq. 7.6-1 with lu = W (the 7-16 20 ft floor on lu is gone).
+  const hd = shortSpan ? 0 : _asce722DriftHeight(pg, W, Number(w2));
   const windward_psf = shortSpan ? 0 : 0.3 * ps;
   const surcharge_psf = shortSpan ? 0 : hd * gamma / Math.sqrt(S);
   const leeward_peak_psf = shortSpan ? pg : ps + surcharge_psf;
@@ -8588,22 +8618,23 @@ export function computeSnowUnbalancedGable({ ground_snow_pg_psf = 0, flat_roof_p
   return {
     slope_deg, applicable, gamma, hd_ft: hd, windward_psf, surcharge_psf, leeward_peak_psf, extent_ft,
     note: applicable && shortSpan
-      ? "With an eave-to-ridge length of 20 ft or less (and simply supported prismatic members), the unbalanced case is the windward slope at 0 and the whole leeward slope at Is x pg (Is taken as 1 here) -- often heavier than the balanced load. Other framing takes the full drift form. ASCE 7 Section 7.6.1; the engineer of record governs."
+      ? "With an eave-to-ridge length of 20 ft or less (and simply supported prismatic members), the unbalanced case is the windward slope at 0 and the whole leeward slope at pg -- often heavier than the balanced load. Other framing takes the full drift form. ASCE 7 Section 7.6.1; the engineer of record governs."
       : applicable
       ? "The windward slope drops to 0.3 ps while the leeward carries ps plus a ridge drift surcharge - this sizes the leeward rafter and the ridge, which the balanced case misses. ASCE 7-22 Section 7.6.1; the engineer of record governs."
       : "The unbalanced case applies in the slope band of about 2.38 to 30.2 degrees (roughly 1/2-on-12 to 7-on-12). Outside it, only the balanced load governs. ASCE 7-22 Section 7.6.1; the engineer of record governs.",
   };
 }
-export const snowUnbalancedGableExample = { inputs: { ground_snow_pg_psf: 30, flat_roof_ps_psf: 25, roof_rise_on_12: 4, eave_to_ridge_ft: 30 } };
+export const snowUnbalancedGableExample = { inputs: { ground_snow_pg_psf: 30, flat_roof_ps_psf: 25, roof_rise_on_12: 4, eave_to_ridge_ft: 30, w2: 0.5 } };
 
 const _v553renderSnowUnbalancedGable = _simpleRenderer({
-  citation: "Citation: ASCE 7-22 Section 7.6.1 unbalanced snow load on gable roofs: snow density gamma = min(0.13 pg + 14, 30); drift height hd = 0.43 W^(1/3) (pg+10)^(1/4) - 1.5; windward slope 0.3 ps; leeward peak ps + hd gamma/sqrt(S) (S = 12/rise); surcharge extent 8 hd sqrt(S)/3. Applies only in the ~2.38-30.2 degree band with W > 20 ft. This sizes the leeward rafter and ridge the balanced case misses. ASCE 7 and the engineer of record govern.",
+  citation: "Citation: ASCE 7-22 Section 7.6.1 unbalanced snow load on gable roofs: snow density gamma = min(0.13 pg + 14, 30); drift height hd = 1.5 sqrt(pg^0.74 W^0.70 W2^1.7 / gamma) (Eq. 7.6-1, W2 the winter wind parameter); windward slope 0.3 ps; leeward peak ps + hd gamma/sqrt(S) (S = 12/rise); surcharge extent 8 hd sqrt(S)/3. Applies only in the ~2.38-30.2 degree band with W > 20 ft. This sizes the leeward rafter and ridge the balanced case misses. ASCE 7 and the engineer of record govern.",
   example: snowUnbalancedGableExample.inputs,
   fields: [
     { key: "ground_snow_pg_psf", label: "Ground snow load pg (psf)", kind: "number" },
     { key: "flat_roof_ps_psf", label: "Balanced sloped-roof snow ps (psf)", kind: "number" },
     { key: "roof_rise_on_12", label: "Roof slope (rise on 12)", kind: "number" },
     { key: "eave_to_ridge_ft", label: "Eave-to-ridge length W (ft)", kind: "number" },
+    { key: "w2", label: "Winter wind parameter W2 (Figure 7.6-1)", kind: "number" },
   ],
   outputs: [
     { key: "ap", id: "sug-out-ap", label: "Unbalanced case applies?", value: (r) => r.applicable ? "YES (slope " + fmt(r.slope_deg, 1) + " deg, in band)" : "NO (slope " + fmt(r.slope_deg, 1) + " deg - out of band; balanced governs)" },

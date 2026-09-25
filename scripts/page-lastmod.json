@@ -2,11 +2,11 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "48254221c282f90f",
+      "sha": "fe6db3cdf5162d6f",
       "date": "2026-09-25"
     },
     "/tools/": {
-      "sha": "4d25a75f7ad4399e",
+      "sha": "b1eb645023be5a57",
       "date": "2026-09-25"
     },
     "/groups/accounting/": {
@@ -18,7 +18,7 @@
       "date": "2026-09-25"
     },
     "/groups/construction/": {
-      "sha": "06c02e3f44f2646f",
+      "sha": "a254bfcb32a479be",
       "date": "2026-09-25"
     },
     "/groups/cross-trade/": {
@@ -4630,8 +4630,8 @@
       "date": "2026-09-05"
     },
     "/tools/minimum-roof-snow/": {
-      "sha": "7d0af3d758610e34",
-      "date": "2026-09-02"
+      "sha": "ef6841d43630a877",
+      "date": "2026-09-25"
     },
     "/tools/mired-gel-shift/": {
       "sha": "401ce11f8d178554",
@@ -5862,8 +5862,8 @@
       "date": "2026-09-01"
     },
     "/tools/rain-on-snow-surcharge/": {
-      "sha": "450c6c79480c8e96",
-      "date": "2026-09-01"
+      "sha": "74315c8c8022a449",
+      "date": "2026-09-25"
     },
     "/tools/rainwater-catchment-area/": {
       "sha": "6a66f71e9278e8b0",
@@ -6842,8 +6842,8 @@
       "date": "2026-09-04"
     },
     "/tools/sliding-snow-load/": {
-      "sha": "c4a42308768da166",
-      "date": "2026-09-19"
+      "sha": "2dc578ecfae702e4",
+      "date": "2026-09-25"
     },
     "/tools/sling-angle/": {
       "sha": "619ae64b77577fbb",
@@ -6930,24 +6930,24 @@
       "date": "2026-09-01"
     },
     "/tools/snow-drift-load/": {
-      "sha": "fa4419b6ada08e04",
-      "date": "2026-09-01"
+      "sha": "3f7ebd52e1af92bc",
+      "date": "2026-09-25"
     },
     "/tools/snow-guard-layout/": {
       "sha": "1fd062a37e491ef7",
       "date": "2026-09-01"
     },
     "/tools/snow-load/": {
-      "sha": "ffc3f95c3b97196b",
-      "date": "2026-09-01"
+      "sha": "129b98102e4dde1c",
+      "date": "2026-09-25"
     },
     "/tools/snow-stacking-area/": {
       "sha": "fb9c6859004a33b4",
       "date": "2026-09-11"
     },
     "/tools/snow-unbalanced-gable/": {
-      "sha": "a236f73ea5a4d24d",
-      "date": "2026-09-01"
+      "sha": "76141fa08349aee1",
+      "date": "2026-09-25"
     },
     "/tools/snowmelt-load/": {
       "sha": "dcbd615571af1599",

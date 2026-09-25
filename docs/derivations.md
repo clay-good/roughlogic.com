@@ -1759,7 +1759,7 @@ cross-check.
 | calc-construction.js | `computeMetalRoofPanels` | `{ eave_width_ft = 0, panel_length_ft = 0, panel_net_in = 36, fasteners_per_sq...` | _ | _ | _ |
 | calc-construction.js | `computeMetalStudTakeoff` | `{ wall_length_ft = 50, spacing_in = 16, openings = 2, extra_per_opening = 2 }...` | _ | _ | _ |
 | calc-construction.js | `computeMetalWeight` | `{ shape, dia_in, id_in, side_in, width_in, height_in, thickness_in, wall_in, ...` | _ | _ | _ |
-| calc-construction.js | `computeMinimumRoofSnow` | `{ pg_psf = 0, importance = 1.0, pf_computed = 0 } = {}` | _ | _ | _ |
+| calc-construction.js | `computeMinimumRoofSnow` | `{ pg_psf = 0, risk_category = "II", pf_computed = 0 } = {}` | _ | _ | _ |
 | calc-construction.js | `computeMortarMix` | `{ unit_count = 0, unit_kind = "brick", joint_in = 0.375, mortar_type = "N" }` | _ | _ | _ |
 | calc-construction.js | `computeMultiBendFlatPattern` | `{ mold_line_in = 0, n_bends = 0, bd_in = 0 } = {}` | _ | _ | _ |
 | calc-construction.js | `computeOccupantLoad` | `{ spaces = [] } = {}` | _ | _ | _ |
@@ -1824,9 +1824,9 @@ cross-check.
 | calc-construction.js | `computeSillPlateAnchorCount` | `{ wall_length_ft = 40, max_spacing_ft = 6, end_distance_in = 9 } = {}` | _ | _ | _ |
 | calc-construction.js | `computeSlidingSnowLoad` | `{ pf_upper_psf = 0, eave_ridge_ft = 0, lower_width_ft = 15 } = {}` | _ | _ | _ |
 | calc-construction.js | `computeSmokeAlarmPlacement` | `{ sleeping_rooms = 0, sleeping_areas = 1, additional_stories = 0, alarm_type ...` | _ | _ | _ |
-| calc-construction.js | `computeSnowDriftLoad` | `{ lu_ft = 0, pg_psf = 0, hc_ft = 0 } = {}` | _ | _ | _ |
+| calc-construction.js | `computeSnowDriftLoad` | `{ lu_ft = 0, pg_psf = 0, hc_ft = 0, w2 = SNOW_W2_DEFAULT } = {}` | _ | _ | _ |
 | calc-construction.js | `computeSnowGuardLayout` | `{ roof_snow_psf = 0, pitch_rise_per_12 = 0, rafter_length_ft = 0, eave_length...` | _ | _ | _ |
-| calc-construction.js | `computeSnowLoad` | `{ Pg_psf, Ce = 1.0, Ct = 1.0, Is = 1.0, Cs = 1.0, drift_upwind_length_ft = 0 }` | _ | _ | _ |
+| calc-construction.js | `computeSnowLoad` | `{ Pg_psf, Ce = 1.0, Ct = 1.0, Cs = 1.0, drift_upwind_length_ft = 0, w2 = SNOW...` | _ | _ | _ |
 | calc-construction.js | `computeSnowUnbalancedGable` | `{ ground_snow_pg_psf = 0, flat_roof_ps_psf = 0, roof_rise_on_12 = 0, eave_to_...` | _ | _ | _ |
 | calc-construction.js | `computeSpeedsAndFeeds` | `{ tool = "drill", material = "steel", diameter_in = 0, flutes }` | _ | _ | _ |
 | calc-construction.js | `computeSprayFoamBoardFeet` | `{ area_sf = 2000, thickness_in = 3, yield_bd_ft_per_set = 4800, waste_pct = 1...` | _ | _ | _ |
@@ -4916,7 +4916,7 @@ per spec-v14 §13.1 second paragraph.
 | `metal-weight` | Metal Weight by Shape and Alloy | first-principles (volume x density); 1 in x 12 in x 120 in A36 plate -> area 12 in^2, 408.384 lb | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `min-bend-radius` | Minimum Plate Bend Radius | published forming-limit relation; 1/4 in A36 at 20% elongation -> 1.5 T, 0.375 in | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `mine-face-ventilation` | Underground Face Airflow, Velocity, and Diesel Dilution | Project (first-principles); the diesel rate per unit of engine power is set by regula... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
-| `minimum-roof-snow` | Minimum Roof Snow Load (ASCE 7 7.3.4) | ASCE 7 §7.3.4; spec-v470 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `minimum-roof-snow` | Minimum Roof Snow Load (ASCE 7-22 7.3.3) | ASCE 7-22 §7.3.3; spec-v470 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `mortar-batch-c270` | Mortar Batch Proportions by Volume (ASTM C270) | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `mortar-mix` | Mortar Mix and Yield | PCA; 600 modular bricks at 3/8 in joints, Type N -> 20 bags (6... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `mt-yoke-coil-amperage` | Magnetic Particle Yoke, Coil Amperage, and Field Orientation | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -5074,8 +5074,8 @@ per spec-v14 §13.1 second paragraph.
 | `smoke-alarm-placement` | Smoke Alarm Count and Placement (IRC R314) | International Code Council; R314.3 requires an alarm in each sleeping room, outside e... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `snow-drift-load` | Snow Drift Surcharge at a Roof Step or Parapet (ASCE 7 Ch. 7) | ASCE 7-22 Chapter 7; spec-v297 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `snow-guard-layout` | Snow Guard / Retention Row Layout | manufacturer snow-retention design me...; 40 psf, 4:12 (18.435 deg), 30-ft rafter, 40-ft eave, 500-... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
-| `snow-load` | Flat-Roof Snow Load | ASCE; Pg=30 psf ground snow / Ce=Ct=Is=1.0 -> Pf=21 psf flat-ro... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
-| `snow-unbalanced-gable` | Unbalanced Snow Load on Gable Roof (ASCE 7 7.6.1) | ASCE 7-22 Section 7.6.1 (unbalanced s...; pg 30, ps 25, 4:12, W 30 ft -> applies; windward 7.5, lee... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `snow-load` | Flat-Roof Snow Load | ASCE; Pg=30 psf ground snow / Ce=Ct=1.0 -> Pf=21 psf flat-roof ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `snow-unbalanced-gable` | Unbalanced Snow Load on Gable Roof (ASCE 7 7.6.1) | ASCE 7-22 Section 7.6.1 (unbalanced s...; pg 30, ps 25, 4:12, W 30 ft, W2 0.5 -> applies; windward ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `soffit-ridge-vent-count` | Soffit Vent and Ridge-Vent Count from Required NFA | Attic vent-count identity (first-prin...; total=1500/300*144=720; intake=360; soffit=ceil(360/26)=1... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `soil-activity` | Soil Activity (Skempton) | Skempton (1953) soil activity; Skempton 1953 activity definition and inactive/normal/act... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `soil-bearing-capacity` | Shallow Foundation Bearing Capacity (Vesic) | Das, Principles of Foundation Enginee...; spec-v260 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |

@@ -826,7 +826,7 @@ export const BESPOKE_LABELS = {
   "smoke-residue-method": {"residue_type":"Observed smoke residue"},
   "smooth-bore-diameter-for-flow": {"target_gpm":"Target flow (gpm)","nozzle_pressure_psi":"Nozzle pressure (psi)"},
   "smooth-bore-flow": {"bore_in":"Tip / bore diameter (in)","nozzle_pressure_psi":"Nozzle pressure (psi)"},
-  "snow-load": {"Pg_psf":"Ground snow load Pg (psf)","Ce":"Exposure factor Ce","Ct":"Thermal factor Ct","Is":"Importance factor Is","Cs":"Sloped-roof factor Cs","drift_upwind_length_ft":"Drift upwind fetch (ft, optional)"},
+  "snow-load": {"Pg_psf":"Ground snow load Pg (psf)","Ce":"Exposure factor Ce","Ct":"Thermal factor Ct","Cs":"Sloped-roof factor Cs","drift_upwind_length_ft":"Drift upwind fetch (ft, optional)","w2":"Winter wind parameter W2 (Figure 7.6-1)"},
   "softener-sizing": {"people":"Occupants","use_per_cap":"Water use per person (gal/day)","hardness_gpg":"Total hardness (grains/gal)","iron_ppm":"Dissolved iron (ppm, optional)","capacity":"Usable resin capacity (grains)","salt_per_regen":"Salt per regeneration (lb)"},
   "soil-activity": {"ll":"Liquid limit LL (%)","pl":"Plastic limit PL (%)","clay_fraction_pct":"Clay fraction (% finer than 2 microns)"},
   "soil-gradation-coefficients": {"d10_mm":"D10, effective size (mm)","d30_mm":"D30 (mm)","d60_mm":"D60 (mm)","pct_coarse_passing_no4":"Coarse fraction passing the #4 sieve (%, <= 50 = gravel)","pct_fines":"Fines passing the #200 sieve (%)"},

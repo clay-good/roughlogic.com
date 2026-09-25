@@ -493,10 +493,10 @@ test("Snow: zero Pg returns error", () => {
   assert.ok(r.error);
 });
 
-test("Snow: importance factor scales", () => {
-  const a = computeSnowLoad({ Pg_psf: 30, Is: 1.0 });
+test("Snow: ASCE 7-22 has no importance factor (a legacy Is is ignored)", () => {
+  const a = computeSnowLoad({ Pg_psf: 30 });
   const b = computeSnowLoad({ Pg_psf: 30, Is: 1.2 });
-  assert.ok(close(b.Pf_psf, 1.2 * a.Pf_psf));
+  assert.equal(b.Pf_psf, a.Pf_psf);
 });
 
 test("Snow: thermal factor scales", () => {
@@ -522,8 +522,8 @@ test("Snow: surfaces inputs", () => {
 });
 
 test("Snow: combined factors compound", () => {
-  const r = computeSnowLoad({ Pg_psf: 30, Ce: 0.9, Ct: 1.1, Is: 1.2 });
-  assert.ok(close(r.Pf_psf, 0.7 * 0.9 * 1.1 * 1.2 * 30));
+  const r = computeSnowLoad({ Pg_psf: 30, Ce: 0.9, Ct: 1.1 });
+  assert.ok(close(r.Pf_psf, 0.7 * 0.9 * 1.1 * 30));
 });
 
 test("Snow: returns Pf in psf as a number", () => {

@@ -6210,16 +6210,15 @@
   {
    "tile_id": "snow-load",
    "source_publisher": "ASCE",
-   "source_title": "Flat-roof snow load: Pf = 0.7 * Ce * Ct * Is * Pg",
-   "source_edition_or_year": "ASCE 7 (current edition); public formula",
-   "source_section_or_page": "Pg=30 psf ground snow / Ce=Ct=Is=1.0 -> Pf=21 psf flat-roof design",
+   "source_title": "Flat-roof snow load: Pf = 0.7 * Ce * Ct * Pg",
+   "source_edition_or_year": "ASCE 7-22 Eq. 7.3-1 (the importance factor Is removed)",
+   "source_section_or_page": "Pg=30 psf ground snow / Ce=Ct=1.0 -> Pf=21 psf flat-roof design",
    "verified_by": "rl",
    "verified_on": "2026-05-11",
    "inputs": {
     "Pg_psf": 30,
     "Ce": 1,
-    "Ct": 1,
-    "Is": 1
+    "Ct": 1
    },
    "outputs": {
     "Pf_psf": {
@@ -53932,14 +53931,15 @@
   {
    "tile_id": "snow-drift-load",
    "source_publisher": "ASCE 7-22 Chapter 7",
-   "source_title": "leeward drift, 100 ft upwind roof, pg 30 psf -> gamma 17.9, hd 3.52 ft, pd 63 psf",
+   "source_title": "leeward drift, 100 ft upwind roof, pg 30 psf, W2 0.5 -> gamma 17.9, hd 3.47 ft, pd 62.1 psf (ASCE 7-22 Eq. 7.6-1)",
    "source_edition_or_year": "spec-v297 worked example (machine-verified)",
    "source_section_or_page": "spec-v297 section 2.1 pinned example",
    "verified_by": "rl",
    "verified_on": "2026-07-03",
    "inputs": {
     "lu_ft": 100,
-    "pg_psf": 30
+    "pg_psf": 30,
+    "w2": 0.5
    },
    "outputs": {
     "gamma_pcf": {
@@ -53949,19 +53949,19 @@
      }
     },
     "hd_ft": {
-     "value": 3.52,
+     "value": 3.47,
      "tolerance": {
       "abs": 0.02
      }
     },
     "w_ft": {
-     "value": 14.1,
+     "value": 13.88,
      "tolerance": {
       "pct": 0.5
      }
     },
     "pd_psf": {
-     "value": 63.0,
+     "value": 62.1,
      "tolerance": {
       "pct": 0.5
      }
@@ -53971,14 +53971,15 @@
   {
    "tile_id": "snow-drift-load",
    "source_publisher": "ASCE 7-22 Chapter 7",
-   "source_title": "cross-check: a heavier pg 50 psf drives gamma 20.5, hd 4.05 ft, pd 83.1 psf",
+   "source_title": "cross-check: a heavier pg 50 psf drives gamma 20.5, hd 3.92 ft, pd 80.3 psf (W2 0.5)",
    "source_edition_or_year": "spec-v297 worked example (machine-verified)",
    "source_section_or_page": "spec-v297 section 2.1 cross-check",
    "verified_by": "rl",
    "verified_on": "2026-07-03",
    "inputs": {
     "lu_ft": 100,
-    "pg_psf": 50
+    "pg_psf": 50,
+    "w2": 0.5
    },
    "outputs": {
     "gamma_pcf": {
@@ -53988,13 +53989,13 @@
      }
     },
     "hd_ft": {
-     "value": 4.05,
+     "value": 3.92,
      "tolerance": {
       "abs": 0.02
      }
     },
     "pd_psf": {
-     "value": 83.1,
+     "value": 80.3,
      "tolerance": {
       "pct": 0.5
      }
@@ -54238,14 +54239,15 @@
    "source_publisher": "ASCE 7-22 Section 7.6.1 (unbalanced snow load, gable roofs)",
    "source_title": "windward 0.3 ps; leeward ps + hd gamma/sqrt(S)",
    "source_edition_or_year": "ASCE 7-22",
-   "source_section_or_page": "pg 30, ps 25, 4:12, W 30 ft -> applies; windward 7.5, leeward 44.2 psf, extent 8.6 ft",
+   "source_section_or_page": "pg 30, ps 25, 4:12, W 30 ft, W2 0.5 -> applies; windward 7.5, leeward 48.5 psf, extent 10.5 ft (hd per Eq. 7.6-1)",
    "verified_by": "rl",
    "verified_on": "2026-07-09",
    "inputs": {
     "ground_snow_pg_psf": 30,
     "flat_roof_ps_psf": 25,
     "roof_rise_on_12": 4,
-    "eave_to_ridge_ft": 30
+    "eave_to_ridge_ft": 30,
+    "w2": 0.5
    },
    "outputs": {
     "windward_psf": {
@@ -54255,13 +54257,13 @@
      }
     },
     "leeward_peak_psf": {
-     "value": 44.2,
+     "value": 48.5,
      "tolerance": {
       "abs": 0.2
      }
     },
     "extent_ft": {
-     "value": 8.6,
+     "value": 10.5,
      "tolerance": {
       "abs": 0.1
      }
@@ -54280,7 +54282,8 @@
     "ground_snow_pg_psf": 30,
     "flat_roof_ps_psf": 25,
     "roof_rise_on_12": 8,
-    "eave_to_ridge_ft": 30
+    "eave_to_ridge_ft": 30,
+    "w2": 0.5
    },
    "outputs": {
     "windward_psf": {
@@ -72701,7 +72704,7 @@
   {
    "tile_id": "rain-on-snow-surcharge",
    "source_publisher": "ASCE 7-22 \u00a77.10",
-   "source_title": "Pf 15, Pg 18, low slope -> surcharge applies, total 23 psf",
+   "source_title": "Pf 15, Pg 18, risk category II (pm,max 30), low slope -> surcharge applies, total 23 psf",
    "source_edition_or_year": "spec-v468 worked example (machine-verified)",
    "source_section_or_page": "spec-v468 section 2.1 pinned example",
    "verified_by": "rl",
@@ -72711,7 +72714,8 @@
     "pg_psf": 18,
     "slope_deg": 1,
     "eave_to_ridge_ft": 100,
-    "surcharge_psf": 8
+    "surcharge_psf": 8,
+    "risk_category": "II"
    },
    "outputs": {
     "total_psf": {
@@ -72725,17 +72729,18 @@
   {
    "tile_id": "rain-on-snow-surcharge",
    "source_publisher": "ASCE 7-22 \u00a77.10",
-   "source_title": "deep-snow Pg 25 -> surcharge does not apply, total stays 15 psf",
+   "source_title": "deep-snow Pg 35 over risk category II pm,max 30 -> surcharge does not apply, total stays 15 psf",
    "source_edition_or_year": "spec-v468 cross-check (machine-verified)",
    "source_section_or_page": "spec-v468 section 2.1 cross-check",
    "verified_by": "rl",
    "verified_on": "2026-07-04",
    "inputs": {
     "pf_psf": 15,
-    "pg_psf": 25,
+    "pg_psf": 35,
     "slope_deg": 1,
     "eave_to_ridge_ft": 100,
-    "surcharge_psf": 8
+    "surcharge_psf": 8,
+    "risk_category": "II"
    },
    "outputs": {
     "total_psf": {
@@ -72798,15 +72803,15 @@
   },
   {
    "tile_id": "minimum-roof-snow",
-   "source_publisher": "ASCE 7 \u00a77.3.4",
-   "source_title": "Pg 15, Is 1.0 -> Pm 15 psf (Pg <= 20 branch)",
+   "source_publisher": "ASCE 7-22 \u00a77.3.3",
+   "source_title": "Pg 15, risk category II -> Pm 15 psf (Pg <= pm,max 30 branch)",
    "source_edition_or_year": "spec-v470 worked example (machine-verified)",
    "source_section_or_page": "spec-v470 section 2.1 pinned example",
    "verified_by": "rl",
    "verified_on": "2026-07-04",
    "inputs": {
     "pg_psf": 15,
-    "importance": 1.0
+    "risk_category": "II"
    },
    "outputs": {
     "pm_psf": {
@@ -72819,19 +72824,19 @@
   },
   {
    "tile_id": "minimum-roof-snow",
-   "source_publisher": "ASCE 7 \u00a77.3.4",
-   "source_title": "Pg 25, Is 1.1 -> Pm caps at 20 x 1.1 = 22 psf",
+   "source_publisher": "ASCE 7-22 \u00a77.3.3",
+   "source_title": "Pg 35, risk category II -> Pm caps at pm,max = 30 psf (Table 7.3-4)",
    "source_edition_or_year": "spec-v470 cross-check (machine-verified)",
    "source_section_or_page": "spec-v470 section 2.1 cross-check",
    "verified_by": "rl",
    "verified_on": "2026-07-04",
    "inputs": {
-    "pg_psf": 25,
-    "importance": 1.1
+    "pg_psf": 35,
+    "risk_category": "II"
    },
    "outputs": {
     "pm_psf": {
-     "value": 22,
+     "value": 30,
      "tolerance": {
       "pct": 0.5
      }

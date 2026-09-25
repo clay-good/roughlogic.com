@@ -8886,14 +8886,21 @@ test("bounds: spec-v720 computeWindSpeedFromVelocityPressure pins V = sqrt(q/0.0
   assert.ok("error" in computeWindSpeedFromVelocityPressure({ velocity_pressure_psf: Infinity }));
 });
 
-test("bounds: calc-construction computeSnowLoad pins Pf = 0.7*Ce*Ct*Is*Pg per ASCE 7", () => {
-  const r = computeSnowLoad({ Pg_psf: 30, Ce: 1.0, Ct: 1.0, Is: 1.0 });
+test("bounds: calc-construction computeSnowLoad pins Pf = 0.7*Ce*Ct*Pg per ASCE 7-22 Eq. 7.3-1 (no Is)", () => {
+  const r = computeSnowLoad({ Pg_psf: 30, Ce: 1.0, Ct: 1.0 });
   assert.strictEqual(r.Pf_psf, 21);
   assert.strictEqual(r.Pg_psf, 30);
   // Coefficient pass-through.
-  const c = computeSnowLoad({ Pg_psf: 40, Ce: 0.9, Ct: 1.1, Is: 1.2 });
-  assert.ok(Math.abs(c.Pf_psf - 0.7 * 0.9 * 1.1 * 1.2 * 40) < 1e-9);
+  const c = computeSnowLoad({ Pg_psf: 40, Ce: 0.9, Ct: 1.1 });
+  assert.ok(Math.abs(c.Pf_psf - 0.7 * 0.9 * 1.1 * 40) < 1e-9);
+  // 7-22 has no importance factor: a legacy Is does not scale the load.
+  assert.strictEqual(computeSnowLoad({ Pg_psf: 30, Is: 1.2 }).Pf_psf, 21);
+  // The optional drift is the 7-22 Eq. 7.6-1 height at the W2 entered.
+  const d = computeSnowLoad({ Pg_psf: 30, drift_upwind_length_ft: 100, w2: 0.5 });
+  assert.ok(Math.abs(d.drift_height_ft - 1.5 * Math.sqrt(Math.pow(30, 0.74) * Math.pow(100, 0.7) * Math.pow(0.5, 1.7) / 17.9)) < 1e-9);
   assert.ok("error" in computeSnowLoad({ Pg_psf: 0 }));
+  assert.ok("error" in computeSnowLoad({ Pg_psf: 30, w2: 0 }));
+  assert.ok("error" in computeSnowLoad({ Pg_psf: 30, w2: 1.5 }));
 });
 
 test("bounds: calc-construction computeAnchorEmbedment pins the ACI 318-19 17.6.2 breakout embedment", () => {
@@ -17602,20 +17609,24 @@ test("bounds: spec-v296 computeWindCcPressure pins the roof corner, the governin
 });
 
 test("bounds: spec-v297 computeSnowDriftLoad pins the drift, the gamma cap, the hd floor, and error seams", () => {
-  const r = _v297({ lu_ft: 100, pg_psf: 30 });
+  const r = _v297({ lu_ft: 100, pg_psf: 30, w2: 0.5 });
   assert.ok(Math.abs(r.gamma_pcf - 17.9) < 1e-9);
-  assert.ok(Math.abs(r.hd_ft - (0.43 * Math.cbrt(100) * Math.pow(40, 0.25) - 1.5)) < 1e-9);
+  // ASCE 7-22 Eq. 7.6-1: hd = 1.5 sqrt(pg^0.74 lu^0.70 W2^1.7 / gamma).
+  assert.ok(Math.abs(r.hd_ft - 1.5 * Math.sqrt(Math.pow(30, 0.74) * Math.pow(100, 0.7) * Math.pow(0.5, 1.7) / 17.9)) < 1e-9);
+  assert.ok(Math.abs(r.hd_ft - 3.47) < 0.005);
   assert.ok(Math.abs(r.w_ft - 4 * r.hd_ft) < 1e-9);
   assert.ok(Math.abs(r.pd_psf - r.hd_ft * r.gamma_pcf) < 1e-9);
   // A heavier ground snow raises both gamma and hd.
-  const r2 = _v297({ lu_ft: 100, pg_psf: 50 });
+  const r2 = _v297({ lu_ft: 100, pg_psf: 50, w2: 0.5 });
   assert.ok(r2.pd_psf > r.pd_psf);
+  // A windier site (higher W2) drifts deeper.
+  assert.ok(_v297({ lu_ft: 100, pg_psf: 30, w2: 0.65 }).hd_ft > r.hd_ft);
   // gamma caps at 30 pcf for very deep ground snow.
   assert.strictEqual(_v297({ lu_ft: 100, pg_psf: 200 }).gamma_pcf, 30);
-  // A very short fetch floors hd at zero (no drift) via the -1.5 term.
-  assert.strictEqual(_v297({ lu_ft: 3, pg_psf: 5 }).hd_ft, 0);
+  // 7-22 has no -1.5 term: a short fetch still gives a small positive drift.
+  assert.ok(_v297({ lu_ft: 3, pg_psf: 5 }).hd_ft > 0);
   // The two-branch width: a drift that overtops the step uses the reduced-width form.
-  const r3 = _v297({ lu_ft: 100, pg_psf: 30, hc_ft: 2 });
+  const r3 = _v297({ lu_ft: 100, pg_psf: 30, hc_ft: 2, w2: 0.5 });
   assert.ok(r3.hd_ft > 2);
   assert.ok(Math.abs(r3.w_ft - Math.min(4 * r3.hd_ft * r3.hd_ft / 2, 8 * 2)) < 1e-9);
   // Error seams.
@@ -17623,6 +17634,7 @@ test("bounds: spec-v297 computeSnowDriftLoad pins the drift, the gamma cap, the 
   assert.ok("error" in _v297({ lu_ft: 100, pg_psf: 0 }));
   assert.ok("error" in _v297({ lu_ft: 100, pg_psf: 30, hc_ft: -1 }));
   assert.ok("error" in _v297({ lu_ft: NaN, pg_psf: 30 }));
+  assert.ok("error" in _v297({ lu_ft: 100, pg_psf: 30, w2: 0 }));
 });
 
 test("bounds: spec-v298 computeWindMwfrsPressure pins the walls, the internal-cancelling net, and error seams", () => {
@@ -22001,9 +22013,16 @@ import { computeRainOnSnowSurcharge as _v468, computeSlidingSnowLoad as _v469, c
 test("bounds: spec-v468 computeRainOnSnowSurcharge pins the trigger, total, and error seams", () => {
   const r = _v468({ pf_psf: 15, pg_psf: 18, slope_deg: 1, eave_to_ridge_ft: 100, surcharge_psf: 8 });
   assert.ok(r.applies === true && Math.abs(r.total_psf - 23) < 1e-9);
-  // A deep-snow region (Pg > 20) takes no surcharge.
-  const deep = _v468({ pf_psf: 15, pg_psf: 25, slope_deg: 1, eave_to_ridge_ft: 100, surcharge_psf: 8 });
+  // ASCE 7-22: the trigger is pg <= pm,max (30 psf for risk category II), so
+  // Pg 25 now takes the surcharge where 7-16's 20 psf trigger did not.
+  assert.ok(_v468({ pf_psf: 15, pg_psf: 25, slope_deg: 1, eave_to_ridge_ft: 100, surcharge_psf: 8 }).applies === true);
+  // A deep-snow region (Pg > pm,max) takes no surcharge.
+  const deep = _v468({ pf_psf: 15, pg_psf: 35, slope_deg: 1, eave_to_ridge_ft: 100, surcharge_psf: 8 });
   assert.ok(deep.applies === false && Math.abs(deep.total_psf - 15) < 1e-9);
+  // pm,max follows the risk category: 25 / 30 / 35 / 40 psf.
+  assert.ok(_v468({ pf_psf: 15, pg_psf: 28, slope_deg: 1, eave_to_ridge_ft: 100, risk_category: "I" }).applies === false);
+  assert.ok(_v468({ pf_psf: 15, pg_psf: 38, slope_deg: 1, eave_to_ridge_ft: 100, risk_category: "IV" }).applies === true);
+  assert.ok("error" in _v468({ pf_psf: 15, pg_psf: 18, slope_deg: 1, eave_to_ridge_ft: 100, risk_category: "V" }));
   // A steep roop (slope >= W/50) also takes no surcharge.
   assert.ok(_v468({ pf_psf: 15, pg_psf: 18, slope_deg: 5, eave_to_ridge_ft: 100, surcharge_psf: 8 }).applies === false);
   // Error seams: non-positive Pf, Pg, W, non-finite.
@@ -22029,18 +22048,21 @@ test("bounds: spec-v469 computeSlidingSnowLoad pins the total, surcharge, and er
 });
 
 test("bounds: spec-v470 computeMinimumRoofSnow pins Pm, the governing value, and error seams", () => {
-  const r = _v470({ pg_psf: 15, importance: 1.0, pf_computed: 0 });
+  const r = _v470({ pg_psf: 15, risk_category: "II", pf_computed: 0 });
   assert.ok(Math.abs(r.pm_psf - 15) < 1e-9 && Math.abs(r.governing_psf - 15) < 1e-9);
-  // Pg > 20 caps Pm at 20 x Is.
-  assert.ok(Math.abs(_v470({ pg_psf: 30, importance: 1.0 }).pm_psf - 20) < 1e-9);
-  assert.ok(Math.abs(_v470({ pg_psf: 25, importance: 1.1 }).pm_psf - 22) < 1e-9);
+  // ASCE 7-22 7.3.3: Pm = min(Pg, pm,max), pm,max 25 / 30 / 35 / 40 psf by risk category.
+  assert.ok(Math.abs(_v470({ pg_psf: 50, risk_category: "I" }).pm_psf - 25) < 1e-9);
+  assert.ok(Math.abs(_v470({ pg_psf: 50, risk_category: "II" }).pm_psf - 30) < 1e-9);
+  assert.ok(Math.abs(_v470({ pg_psf: 50, risk_category: "III" }).pm_psf - 35) < 1e-9);
+  assert.ok(Math.abs(_v470({ pg_psf: 50, risk_category: "IV" }).pm_psf - 40) < 1e-9);
+  assert.ok(Math.abs(_v470({ pg_psf: 35, risk_category: "IV" }).pm_psf - 35) < 1e-9);
   // The governing value is the greater of Pm and the computed Pf.
-  const g = _v470({ pg_psf: 15, importance: 1.0, pf_computed: 25 });
+  const g = _v470({ pg_psf: 15, risk_category: "II", pf_computed: 25 });
   assert.ok(Math.abs(g.governing_psf - 25) < 1e-9 && g.min_governs === false);
-  // Error seams: non-positive Pg, importance, non-finite.
-  assert.ok("error" in _v470({ pg_psf: 0, importance: 1.0 }));
-  assert.ok("error" in _v470({ pg_psf: 15, importance: 0 }));
-  assert.ok("error" in _v470({ pg_psf: Infinity, importance: 1.0 }));
+  // Error seams: non-positive Pg, unknown risk category, non-finite.
+  assert.ok("error" in _v470({ pg_psf: 0, risk_category: "II" }));
+  assert.ok("error" in _v470({ pg_psf: 15, risk_category: "V" }));
+  assert.ok("error" in _v470({ pg_psf: Infinity, risk_category: "II" }));
 });
 
 // ===================== spec-v471..v473 energy-economics + v474 ADA ramp (campaign close) =====================
@@ -25790,17 +25812,17 @@ test("bounds: spec-v552 computeRcSlenderColumnMagnify pins Cm, the 0.75-Pc denom
 import { computeSnowUnbalancedGable as _v553 } from "../../calc-construction.js";
 
 test("bounds: spec-v553 computeSnowUnbalancedGable pins the slope-band applicability, the density/drift relations, the windward and leeward loads, and error seams", () => {
-  const r = _v553({ ground_snow_pg_psf: 30, flat_roof_ps_psf: 25, roof_rise_on_12: 4, eave_to_ridge_ft: 30 });
+  const r = _v553({ ground_snow_pg_psf: 30, flat_roof_ps_psf: 25, roof_rise_on_12: 4, eave_to_ridge_ft: 30, w2: 0.5 });
   assert.equal(r.applicable, true); // 18.4 deg in band, W > 20
   assert.ok(Math.abs(r.gamma - 17.9) < 0.05); // 0.13*30 + 14
-  assert.ok(Math.abs(r.hd_ft - 1.86) < 0.02); // 0.43*30^(1/3)*40^(1/4) - 1.5
+  assert.ok(Math.abs(r.hd_ft - 2.28) < 0.02); // 1.5 sqrt(30^0.74 30^0.70 0.5^1.7 / 17.9), ASCE 7-22 Eq. 7.6-1
   assert.ok(Math.abs(r.windward_psf - 7.5) < 1e-9); // 0.3*25
-  assert.ok(Math.abs(r.leeward_peak_psf - 44.2) < 0.2);
-  assert.ok(Math.abs(r.extent_ft - 8.6) < 0.1);
+  assert.ok(Math.abs(r.leeward_peak_psf - 48.5) < 0.2);
+  assert.ok(Math.abs(r.extent_ft - 10.5) < 0.1);
   // A steep roof (8:12, 33.7 deg > 30.2) escapes the unbalanced case.
   assert.equal(_v553({ ground_snow_pg_psf: 30, flat_roof_ps_psf: 25, roof_rise_on_12: 8, eave_to_ridge_ft: 30 }).applicable, false);
   // A short eave-to-ridge (<= 20 ft) does NOT escape it: ASCE 7 7.6.1 loads
-  // the windward side at 0 and the leeward at Is x pg.
+  // the windward side at 0 and the leeward at pg.
   const shortW = _v553({ ground_snow_pg_psf: 30, flat_roof_ps_psf: 25, roof_rise_on_12: 4, eave_to_ridge_ft: 15 });
   assert.equal(shortW.applicable, true);
   assert.ok(shortW.windward_psf === 0 && shortW.leeward_peak_psf === 30);
@@ -25812,6 +25834,7 @@ test("bounds: spec-v553 computeSnowUnbalancedGable pins the slope-band applicabi
   assert.ok("error" in _v553({ ground_snow_pg_psf: 30, flat_roof_ps_psf: 0, roof_rise_on_12: 4, eave_to_ridge_ft: 30 }));
   assert.ok("error" in _v553({ ground_snow_pg_psf: 30, flat_roof_ps_psf: 25, roof_rise_on_12: 0, eave_to_ridge_ft: 30 }));
   assert.ok("error" in _v553({ ground_snow_pg_psf: 30, flat_roof_ps_psf: 25, roof_rise_on_12: 4, eave_to_ridge_ft: 0 }));
+  assert.ok("error" in _v553({ ground_snow_pg_psf: 30, flat_roof_ps_psf: 25, roof_rise_on_12: 4, eave_to_ridge_ft: 30, w2: 0 }));
 });
 
 import { computeLiftingLugDesign as _v554 } from "../../calc-rigging.js";
