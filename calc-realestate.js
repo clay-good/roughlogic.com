@@ -77,7 +77,7 @@ export const ltvExample = {
 // (DOM-mount renderer; HTMLElement refs are categorical.)
 export function renderLTV(inputRegion, outputRegion, citationEl) {
   citationEl.textContent =
-    "Citation: LTV = loan amount / value (appraised or purchase, whichever is less, per FNMA Single-Family Selling Guide §B2-1.1-01). PMI generally required at LTV > 80 percent for conventional conforming loans; FHA programs cap LTV at 96.5 percent for purchase. Lender governs final underwriting; appraiser governs final value.";
+    "Citation: LTV = loan amount / value (appraised or purchase, whichever is less, per FNMA Single-Family Selling Guide §B2-1.2-01). PMI generally required at LTV > 80 percent for conventional conforming loans; FHA programs cap LTV at 96.5 percent for purchase. Lender governs final underwriting; appraiser governs final value.";
   const L = makeNumber("Loan amount ($)", "ltv-l", { step: "any", min: "0" });
   const V = makeNumber("Property value ($)", "ltv-v", { step: "any", min: "0" });
   for (const f of [L, V]) inputRegion.appendChild(f.wrap);
@@ -127,10 +127,15 @@ export function computeDTI({ gross_monthly_income, housing_payment, other_monthl
   if (H < 0 || D < 0) return { error: "Payments and debts cannot be negative." };
   const front = (H / I) * 100;
   const back = ((H + D) / I) * 100;
-  // Conventional conforming (FNMA): front 28-36 typical, back 36-45 typical (50 max with compensating factors).
+  // Conventional conforming (Fannie Mae Selling Guide B3-6-02): there is NO
+  // front-end (housing-only) ratio. The maximum TOTAL DTI for a manually
+  // underwritten loan is 36%, up to 45% with the Eligibility Matrix's credit
+  // score and reserves, and 50% through DU. Until 2026-09-24 this also demanded
+  // front <= 36, so 38 / 40 read "exceeds conventional limits" where the guide
+  // allows it. The pass flag uses the 45% manual ceiling.
   // FHA: front 31 / back 43 default thresholds.
   // VA: back 41 default threshold (no front-end limit).
-  const conventional_pass = front <= 36 && back <= 45;
+  const conventional_pass = back <= 45;
   const fha_pass = front <= 31 && back <= 43;
   const va_pass = back <= 41;
   return {
@@ -152,7 +157,7 @@ export const dtiExample = {
 // (DOM-mount renderer; HTMLElement refs are categorical.)
 export function renderDTI(inputRegion, outputRegion, citationEl) {
   citationEl.textContent =
-    "Citation: Front-end DTI = housing payment / gross monthly income. Back-end DTI = (housing + other debts) / gross monthly income. Conventional thresholds per FNMA Single-Family Selling Guide §B3-6-02 (typical 36/45, up to 50 with compensating factors). FHA per Handbook 4000.1 §II.A.5 (default 31/43). VA per Lenders Handbook M26-7 (back-end 41, no front-end limit). Lender governs final underwriting.";
+    "Citation: Front-end DTI = housing payment / gross monthly income. Back-end DTI = (housing + other debts) / gross monthly income. Conventional per Fannie Mae Selling Guide §B3-6-02: no front-end ratio; maximum total DTI 36% manually underwritten, up to 45% with credit score and reserves (the pass flag), 50% through DU. FHA per Handbook 4000.1 §II.A.5 (default 31/43). VA per Lenders Handbook M26-7 (back-end 41, no front-end limit). Lender governs final underwriting.";
   const I = makeNumber("Gross monthly income ($)", "dti-i", { step: "any", min: "0" });
   const H = makeNumber("Housing payment (PITI + HOA, $)", "dti-h", { step: "any", min: "0" });
   const D = makeNumber("Other monthly debts ($, car / cards / student / etc.)", "dti-d", { step: "any", min: "0", value: "0" });

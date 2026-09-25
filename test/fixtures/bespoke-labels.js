@@ -789,7 +789,7 @@ export const BESPOKE_LABELS = {
   "seismic-overturning-moment": {"base_shear_kip":"Base shear V (kips)","period_s":"Fundamental period T (s)"},
   "seismic-vertical-distribution": {"base_shear_kip":"Base shear V (kips)","period_s":"Fundamental period T (s)"},
   "seller-net-sheet": {"price":"Sale price ($)","payoff":"Mortgage payoff ($)","commission_pct":"Commission (%)","transfer_tax_pct":"Transfer/excise tax (%)","fees":"Title/escrow/attorney fees ($)","concessions":"Seller-paid concessions ($)","annual_tax":"Annual property tax ($, for proration)","days_seller_owes":"Days seller owes (proration)","other":"Other ($)"},
-  "septic-dose-tank": {"daily_flow_gpd":"Design daily flow (gpd)","doses_per_day":"Doses per day","drainback_gal":"Drainback (gal)"},
+  "septic-dose-tank": {"daily_flow_gpd":"Design daily flow (gpd)","doses_per_day":"Doses per day","drainback_gal":"Drainback (gal)","network_volume_gal":"Distribution network volume, laterals + manifold (gal)"},
   "septic-drainfield": {"design_flow_gpd":"Design daily flow (gpd)","application_rate_gpd_per_ft2":"Application rate (gpd / ft²)","trench_width_ft":"Trench width (ft)"},
   "septic-drainfield-capacity": {"available_trench_ft":"Available trench length (ft)","application_rate_gpd_per_ft2":"Application rate (gpd / ft²)","trench_width_ft":"Trench width (ft)","gpd_per_bedroom":"Design flow per bedroom (gpd)"},
   "septic-lpp-orifice": {"orifice_dia_in":"Orifice diameter (in)","squirt_ft":"Squirt height (ft)","cd":"Discharge coefficient Cd","orifices_per_lateral":"Orifices per lateral","num_laterals":"Number of laterals"},

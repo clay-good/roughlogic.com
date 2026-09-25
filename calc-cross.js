@@ -268,15 +268,17 @@ export const tmExample = {
 // Statewide base rates as published by each state revenue department
 // (data/crosswalks/state-tax-rates.json). These are NOT average combined
 // state-and-local rates, which is what three surfaces called them until
-// 2026-09-02: Louisiana's 4.45% state rate sits under a combined average near
-// 9.5%, so a job invoiced off this table alone under-collects by more than half.
+// 2026-09-02: Louisiana's state rate sits under a combined average near 10%, so
+// a job invoiced off this table alone under-collects by about half. (That rate
+// is 5% from 2025-01-01 through 2029-12-31 per the Louisiana Department of
+// Revenue; the table held the superseded 4.45% until 2026-09-24.)
 // Local district rates are the reader's to add, which is what the override
 // field is for.
 
 export const STATE_TAX_RATES = {
   AL: 4.0, AK: 0.0, AZ: 5.6, AR: 6.5, CA: 7.25, CO: 2.9, CT: 6.35, DE: 0.0,
   FL: 6.0, GA: 4.0, HI: 4.0, ID: 6.0, IL: 6.25, IN: 7.0, IA: 6.0, KS: 6.5,
-  KY: 6.0, LA: 4.45, ME: 5.5, MD: 6.0, MA: 6.25, MI: 6.0, MN: 6.875, MS: 7.0,
+  KY: 6.0, LA: 5.0, ME: 5.5, MD: 6.0, MA: 6.25, MI: 6.0, MN: 6.875, MS: 7.0,
   MO: 4.225, MT: 0.0, NE: 5.5, NV: 6.85, NH: 0.0, NJ: 6.625, NM: 4.875, NY: 4.0,
   NC: 4.75, ND: 5.0, OH: 5.75, OK: 4.5, OR: 0.0, PA: 6.0, RI: 7.0, SC: 6.0,
   SD: 4.2, TN: 7.0, TX: 6.25, UT: 6.1, VT: 6.0, VA: 5.3, WA: 6.5, WV: 6.0,

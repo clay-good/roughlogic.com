@@ -7834,7 +7834,7 @@ export const CITATIONS = {
   // v12 Group X: Real Estate.
   "ltv": {
     formula: "LTV = loan_amount / value. Conventional conforming loans require PMI when LTV > 80%. Value is the lesser of appraised value or purchase price (FNMA Selling Guide).",
-    edition: "FNMA Single-Family Selling Guide §B2-1.1-01 (current). FHA Handbook 4000.1 §II.A.2 (LTV caps; 96.5% maximum on purchase).",
+    edition: "FNMA Single-Family Selling Guide §B2-1.2-01 (current). FHA Handbook 4000.1 §II.A.2 (LTV caps; 96.5% maximum on purchase).",
     freeAccess: "Free at selling-guide.fanniemae.com and hud.gov/program_offices/housing/sfh/handbook_4000-1.",
     governance: GOVERNANCE.real_estate,
     editionNote: "Underwriting thresholds change over time and by product (conventional / FHA / VA / specialty); the bands shown here are common-practice ranges. Lender governs final underwriting.",

@@ -6907,13 +6907,14 @@ test("monotonicity: computeSepticTank minimum_tank_gallons is strictly non-decre
     assert.equal(r.minimum_tank_gallons, 1000);
     assert.equal(r.daily_flow_gpd, bedrooms * 150);
   }
-  // 2-day reserve rule pin: at 4+ bedrooms the 2 * gpd rule binds.
+  // EPA Table 4-13 pins: 4 BR 1,200 gal, 6 BR 1,650 gal (the 2x-flow rule,
+  // which gave 1,800 at 6 BR, now applies only to a daily-flow entry).
   const fourBr = computeSepticTank({ bedrooms: 4 });
   assert.equal(fourBr.daily_flow_gpd, 600);
   assert.equal(fourBr.minimum_tank_gallons, 1200);
   const sixBr = computeSepticTank({ bedrooms: 6 });
   assert.equal(sixBr.daily_flow_gpd, 900);
-  assert.equal(sixBr.minimum_tank_gallons, 1800);
+  assert.equal(sixBr.minimum_tank_gallons, 1650);
   // Strictly increasing in bedrooms once past the floor (4+).
   let prev2 = 1000;
   for (const bedrooms of [4, 5, 6, 7, 8]) {

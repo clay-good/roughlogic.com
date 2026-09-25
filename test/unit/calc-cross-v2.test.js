@@ -561,7 +561,7 @@ test("Sales tax: no shipped surface calls the bundled rates a combined rate", ()
 // a future edit cannot quietly swap the table for combined averages without
 // this failing.
 test("Sales tax: the bundled rates are the statewide base, not a combined average", () => {
-  assert.equal(STATE_TAX_RATES.LA, 4.45);
+  assert.equal(STATE_TAX_RATES.LA, 5.0); // LDR: 5% from 2025-01-01 through 2029-12-31 (4.45% before)
   assert.equal(STATE_TAX_RATES.AL, 4.0);
   assert.equal(STATE_TAX_RATES.CA, 7.25);
   // Every no-sales-tax state is exactly zero; a combined average would not be.

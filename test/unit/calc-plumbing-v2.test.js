@@ -140,10 +140,10 @@ test("Septic tank: 4 bedrooms -> 600 gpd, 1200 gal", () => {
   assert.equal(r.minimum_tank_gallons, 1200);
 });
 
-test("Septic tank: 5 bedrooms -> 750 gpd, 1500 gal", () => {
+test("Septic tank: 5 bedrooms -> 750 gpd, 1,425 gal (EPA Table 4-13)", () => {
   const r = computeSepticTank({ bedrooms: 5 });
   assert.equal(r.daily_flow_gpd, 750);
-  assert.equal(r.minimum_tank_gallons, 1500);
+  assert.equal(r.minimum_tank_gallons, 1425);
 });
 
 test("Septic tank: explicit gpd overrides bedrooms", () => {
@@ -172,10 +172,10 @@ test("Septic tank: floor_gallons surfaced as 1000", () => {
   assert.equal(r.floor_gallons, 1000);
 });
 
-test("Septic tank: 6 bedrooms -> 900 gpd, 1800 gal", () => {
+test("Septic tank: 6 bedrooms -> 900 gpd, 1,650 gal (EPA Table 4-13)", () => {
   const r = computeSepticTank({ bedrooms: 6 });
   assert.equal(r.daily_flow_gpd, 900);
-  assert.equal(r.minimum_tank_gallons, 1800);
+  assert.equal(r.minimum_tank_gallons, 1650);
 });
 
 test("Septic tank: explicit small gpd still hits 1000 gal floor", () => {

@@ -8025,12 +8025,12 @@ test("bounds: calc-plumbing computeRecircPumpHead pins equivalent_length = fitti
 test("bounds: calc-plumbing computeSepticTank pins gpd = 150*bedrooms with a 1000-gal floor and 2*gpd recommendation", () => {
   const r = computeSepticTank({ bedrooms: 3 });
   assert.strictEqual(r.daily_flow_gpd, 450);
-  assert.strictEqual(r.minimum_tank_gallons, 1000); // floor wins over 2*450=900
+  assert.strictEqual(r.minimum_tank_gallons, 1000); // EPA Table 4-13, 3 BR
   assert.strictEqual(r.floor_gallons, 1000);
-  // 2x branch.
+  // EPA Table 4-13 at 8 bedrooms is 2,100 gal (the 2x rule gave 2,400).
   const big = computeSepticTank({ bedrooms: 8 });
   assert.strictEqual(big.daily_flow_gpd, 1200);
-  assert.strictEqual(big.minimum_tank_gallons, 2400);
+  assert.strictEqual(big.minimum_tank_gallons, 2100);
   // Explicit gpd.
   const e = computeSepticTank({ gallons_per_day: 800 });
   assert.strictEqual(e.daily_flow_gpd, 800);

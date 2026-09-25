@@ -3415,7 +3415,7 @@ cross-check.
 | calc-sawmill.js | `computeLumberRecoveryOverrun` | `{ scaled_bf = 0, actual_bf = 0, log_volume_cuft = 0, benchmark_lrf = 7, avg_l...` | _ | _ | _ |
 | calc-sawmill.js | `computeSawmillResidueYield` | `{ lumber_recovery_pct = 0, kerf_in = 0, target_kerf_in = 0, board_thickness_i...` | _ | _ | _ |
 | calc-septic.js | `computeLeachFieldAggregate` | `{ num_trenches = 3, trench_length_ft = 60, trench_width_in = 24, stone_depth_...` | _ | _ | _ |
-| calc-septic.js | `computeSepticDoseTank` | `{ daily_flow_gpd, doses_per_day = 4, drainback_gal = 0 } = {}` | _ | _ | _ |
+| calc-septic.js | `computeSepticDoseTank` | `{ daily_flow_gpd, doses_per_day = 4, drainback_gal = 0, network_volume_gal = ...` | _ | _ | _ |
 | calc-septic.js | `computeSepticDrainfield` | `{ design_flow_gpd = 0, application_rate_gpd_per_ft2 = 0, trench_width_ft = 3,...` | _ | _ | _ |
 | calc-septic.js | `computeSepticDrainfieldCapacity` | `{ available_trench_ft = 0, application_rate_gpd_per_ft2 = 0, trench_width_ft ...` | _ | _ | _ |
 | calc-septic.js | `computeSepticLppOrifice` | `{ orifice_dia_in, squirt_ft, cd = 0.6, orifices_per_lateral, num_laterals } = {}` | _ | _ | _ |
@@ -4278,7 +4278,7 @@ per spec-v14 §13.1 second paragraph.
 | `septic-lpp-orifice` | Septic LPP Orifice Flow and Squirt Height | Orifice-discharge equation / universi...; 1/4 in orifice, 5 ft squirt, Cd 0.6, 10 orifices x 4 late... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `septic-lpp-squirt-head` | Septic LPP Squirt Head for a Target Orifice Flow | Orifice-discharge equation / universi...; spec-v757 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `septic-pumpout-interval` | Septic Tank Pump-Out Interval | USEPA Onsite Wastewater Treatment Sys...; 1,000 gal tank, 4 people, 30 gal/pp/yr, 1/3 fill -> 330 g... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
-| `septic-tank` | Septic Tank Sizing | IPC / state primacy agency; 4 bedrooms -> 4 x 150 = 600 gpd, 2 x retention = 1200 gal... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `septic-tank` | Septic Tank Sizing | USEPA; 4 bedrooms -> 1,200 gal (EPA Table 4-13, one- and two-fam... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `septic-tank-for-interval` | Septic Tank Size for a Target Pump-Out Interval | USEPA Onsite Wastewater Treatment Sys...; 5 years, 4 people, 30 gal/pp/yr, 1/3 fill -> 600 gal accu... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `sewage-force-main-velocity` | Sewage Force-Main Scour Velocity | Ten States Standards; spec-v427 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `shower-compartment-check` | Shower Compartment Size (IPC 421.4) | International Code Council; 'Shower compartments shall be not less than 900 square in... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |

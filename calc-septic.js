@@ -47,10 +47,20 @@ const _finiteGuard = (o) => {
 // dims: in { bedrooms: dimensionless, gallons_per_day: L^3 T^-1 } out: { tank_gal: L^3 }
 export function computeSepticTank({ bedrooms, gallons_per_day }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
-  const gpd = Number(gallons_per_day) > 0 ? Number(gallons_per_day) : (Number(bedrooms) || 0) * 150;
+  const byFlow = Number(gallons_per_day) > 0;
+  const br = Number(bedrooms) || 0;
+  const gpd = byFlow ? Number(gallons_per_day) : br * 150;
   if (gpd <= 0) return { error: "Provide bedrooms or daily flow gpd." };
-  // Standard rule: tank gallons >= 2 * daily flow, with 1000 gal floor.
-  const recommended = Math.max(1000, 2 * gpd);
+  // A one- or two-family dwelling sized by bedrooms reads EPA/625/R-00/008
+  // Table 4-13 (the ICC private sewage code volumes: 750 / 750 / 1,000 / 1,200 /
+  // 1,425 / 1,650 / 1,875 / 2,100 gal for 1-8 bedrooms, extended 225 gal per
+  // bedroom past 8), held at the 1,000 gal minimum many states set. EPA gives
+  // the 2x-design-flow rule of thumb for OTHER buildings, which is what a
+  // daily-flow entry gets. Until 2026-09-24 bedrooms took the 2x rule too
+  // (1,500 gal at 5 bedrooms against the table's 1,425).
+  const TABLE_4_13 = [750, 750, 1000, 1200, 1425, 1650, 1875, 2100];
+  const tableGal = br <= 8 ? TABLE_4_13[Math.max(1, Math.ceil(br)) - 1] : 2100 + 225 * Math.ceil(br - 8);
+  const recommended = byFlow ? Math.max(1000, 2 * gpd) : Math.max(1000, tableGal);
   return {
     daily_flow_gpd: gpd,
     minimum_tank_gallons: recommended,
@@ -126,8 +136,8 @@ export const septicDrainfieldCapacityExample = {
 // Onsite Wastewater Treatment Systems Manual (EPA/625/R-00/008), university
 // onsite-wastewater extension guidance, and the orifice-discharge equation.
 
-// dims: in { daily_flow_gpd: L^3, doses_per_day: dimensionless, drainback_gal: L^3 } out: { net_dose_gal: L^3, pumped_per_dose: L^3, pumped_per_day: L^3, doses_per_day: dimensionless, void_ratio: dimensionless }
-export function computeSepticDoseTank({ daily_flow_gpd, doses_per_day = 4, drainback_gal = 0 } = {}) {
+// dims: in { daily_flow_gpd: L^3, doses_per_day: dimensionless, drainback_gal: L^3, network_volume_gal: L^3 } out: { net_dose_gal: L^3, pumped_per_dose: L^3, pumped_per_day: L^3, doses_per_day: dimensionless, void_ratio: dimensionless }
+export function computeSepticDoseTank({ daily_flow_gpd, doses_per_day = 4, drainback_gal = 0, network_volume_gal = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const flow = Number(daily_flow_gpd);
   const doses = Number(doses_per_day);
@@ -135,10 +145,19 @@ export function computeSepticDoseTank({ daily_flow_gpd, doses_per_day = 4, drain
   if (!(flow > 0)) return { error: "Daily flow must be positive (gpd)." };
   if (!(doses > 0)) return { error: "Doses per day must be positive." };
   if (!(drainback >= 0)) return { error: "Drainback cannot be negative (gal)." };
+  const network = Number(network_volume_gal) || 0;
+  if (network < 0) return { error: "Distribution network volume cannot be negative (gal)." };
   const netDose = flow / doses;
   const pumpedPerDose = netDose + drainback;
   const pumpedPerDay = pumpedPerDose * doses;
-  const voidRatio = drainback > 0 ? netDose / drainback : null;
+  // EPA/625/R-00/008: the dose should exceed five times the volume of the
+  // DISTRIBUTION NETWORK (laterals plus manifold), which is not the drainback
+  // (the forcemain / manifold volume that returns to the tank). Until
+  // 2026-09-24 the 5x check ran against drainback alone, so a 150 gal dose
+  // passed over a network holding 40 gal (EPA would want 200). The network
+  // volume is used when entered; drainback stands in only as a proxy.
+  const ratioBasis = network > 0 ? network : drainback;
+  const voidRatio = ratioBasis > 0 ? netDose / ratioBasis : null;
   return {
     net_dose_gal: netDose,
     pumped_per_dose: pumpedPerDose,
@@ -146,7 +165,8 @@ export function computeSepticDoseTank({ daily_flow_gpd, doses_per_day = 4, drain
     doses_per_day: doses,
     void_ratio: voidRatio,
     void_ratio_ok: voidRatio === null ? true : voidRatio >= 5,
-    note: "The dose should be at least about five times the volume of the laterals and manifold that drains back, so the field pressurizes fully before the dose is spent; more, smaller doses spread the load and rest the soil better than one big dose; the drainback returns to the tank and is re-pumped, so it is pumping energy, not lost flow; and the dose count, dose volume, and float settings on the permit drawing govern.",
+    void_ratio_basis: network > 0 ? "network" : drainback > 0 ? "drainback (proxy; enter the network volume)" : "none",
+    note: "The dose should be more than five times the volume of the distribution network (laterals plus manifold, EPA/625/R-00/008) -- a different quantity from the drainback that returns to the tank -- so the field pressurizes fully before the dose is spent; more, smaller doses spread the load and rest the soil better than one big dose; the drainback returns to the tank and is re-pumped, so it is pumping energy, not lost flow; and the dose count, dose volume, and float settings on the permit drawing govern.",
   };
 }
 
@@ -226,7 +246,7 @@ export function computeSepticLppOrifice({ orifice_dia_in, squirt_ft, cd = 0.6, o
 
 // dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderSepticTank(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: EPA Onsite Wastewater Treatment Manual (EPA/625/R-00/008). 150 gpd per bedroom rule of thumb; tank floor 1000 gal; tank gallons >= 2 * daily flow. State primacy agency governs final design. Free at epa.gov/septic.";
+  citationEl.textContent = "Citation: EPA Onsite Wastewater Treatment Systems Manual (EPA/625/R-00/008), Table 4-13 for one- and two-family dwellings by bedroom count (750 to 2,100 gal for 1-8 bedrooms), held at the 1,000 gal minimum many states set; for other buildings, a design daily flow entry takes the EPA rule of thumb of about two times the design flow. 150 gpd per bedroom. State primacy agency governs final design. Free at epa.gov/septic.";
   const beds = makeNumber("Bedrooms", "st-b", { step: "1", min: "0" });
   const gpd = makeNumber("Daily flow gpd (overrides bedrooms if > 0)", "st-g", { step: "any", min: "0", value: "0" });
   gpd.input.value = "0";
@@ -309,7 +329,9 @@ function renderSepticDoseTank(inputRegion, outputRegion, citationEl) {
   doses.input.value = "4";
   const drainback = makeNumber("Drainback (gal)", "sdt-db", { step: "any", min: "0", value: "0" });
   drainback.input.value = "0";
-  for (const f of [flow, doses, drainback]) inputRegion.appendChild(f.wrap);
+  const network = makeNumber("Distribution network volume, laterals + manifold (gal)", "sdt-net", { step: "any", min: "0", value: "0" });
+  network.input.value = "0";
+  for (const f of [flow, doses, drainback, network]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { flow.input.value = "600"; doses.input.value = "4"; drainback.input.value = "5"; update(); });
   const oNet = makeOutputLine(outputRegion, "Net dose per cycle", "sdt-out-net");
   const oPer = makeOutputLine(outputRegion, "Pumped per cycle", "sdt-out-per");
@@ -320,14 +342,15 @@ function renderSepticDoseTank(inputRegion, outputRegion, citationEl) {
       daily_flow_gpd: Number(flow.input.value) || 0,
       doses_per_day: doses.input.value === "" ? 4 : Number(doses.input.value),
       drainback_gal: drainback.input.value === "" ? 0 : Number(drainback.input.value),
+      network_volume_gal: network.input.value === "" ? 0 : Number(network.input.value),
     });
     if (r.error) { oNet.textContent = r.error; for (const o of [oPer, oDay, oRatio]) o.textContent = "-"; return; }
     oNet.textContent = fmt(r.net_dose_gal, 1) + " gal";
     oPer.textContent = fmt(r.pumped_per_dose, 1) + " gal";
     oDay.textContent = fmt(r.pumped_per_day, 1) + " gal";
-    oRatio.textContent = r.void_ratio === null ? "n/a (no drainback)" : fmt(r.void_ratio, 1) + (r.void_ratio_ok ? " (OK, >= 5)" : " (low -- raise the dose or cut the drainback)");
+    oRatio.textContent = r.void_ratio === null ? "n/a (enter the network volume)" : fmt(r.void_ratio, 1) + " vs " + r.void_ratio_basis + (r.void_ratio_ok ? " (OK, >= 5)" : " (low -- raise the dose)");
   }, DEBOUNCE_MS);
-  for (const el of [flow.input, doses.input, drainback.input]) el.addEventListener("input", update);
+  for (const el of [flow.input, doses.input, drainback.input, network.input]) el.addEventListener("input", update);
 }
 
 function renderSepticPumpoutInterval(inputRegion, outputRegion, citationEl) {

@@ -814,12 +814,29 @@ test("loan-limits: the shipped shard carries the published 2026 FHFA / HUD basel
     shard.baseline.ceiling_high_cost_one_unit_usd,
     Math.round(shard.baseline.conforming_one_unit_usd * 1.5),
   );
-  // Only counties AT the national ceiling are bundled; anything between the
-  // floor and the ceiling carries its own published value and must route to the
-  // lookup rather than to a number nobody verified.
+  // Each bundled county carries its OWN published 2026 limits (FHFA county list
+  // and HUD CY2026 lookup, read 2026-09-24). Until then every row held the
+  // ceiling for both, which was wrong for these:
+  const published = {
+    "06055": [1017750, 1017750], // Napa
+    "36005": [1209750, 1249125], "36047": [1209750, 1249125], "36061": [1209750, 1249125],
+    "36081": [1209750, 1249125], "36085": [1209750, 1249125], // NYC counties
+    "08097": [1209750, 1249125], // Pitkin
+    "15009": [1299500, 1299500], // Maui (Hawaii may exceed the contiguous ceiling)
+    "15003": [1249125, 828000], // Honolulu
+    "02020": [1249125, 541287], // Anchorage
+  };
   for (const c of shard.high_cost_counties_one_unit) {
-    assert.equal(c.conforming_usd, shard.baseline.ceiling_high_cost_one_unit_usd, c.county_name);
-    assert.equal(c.fha_usd, shard.baseline.fha_ceiling_one_unit_usd, c.county_name);
+    const want = published[c.county_fips] || [shard.baseline.ceiling_high_cost_one_unit_usd, shard.baseline.fha_ceiling_one_unit_usd];
+    assert.equal(c.conforming_usd, want[0], c.county_name + " conforming");
+    assert.equal(c.fha_usd, want[1], c.county_name + " FHA");
   }
   assert.match(shard.unknown_county_message, /between the floor and the ceiling/);
+});
+
+test("DTI: Fannie Mae B3-6-02 has no front-end ratio -- total DTI governs (45% manual ceiling)", () => {
+  // Front 38 / back 40 was failed until 2026-09-24 by a front <= 36 test the guide does not have.
+  const r = computeDTI({ gross_monthly_income: 10000, housing_payment: 3800, other_monthly_debts: 200 });
+  assert.equal(r.conventional_pass, true);
+  assert.equal(computeDTI({ gross_monthly_income: 10000, housing_payment: 3800, other_monthly_debts: 800 }).conventional_pass, false);
 });

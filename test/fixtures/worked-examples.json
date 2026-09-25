@@ -5675,12 +5675,12 @@
   },
   {
    "tile_id": "septic-tank",
-   "source_publisher": "IPC / state primacy agency",
+   "source_publisher": "USEPA",
    "source_title": "Minimum septic tank gallons from bedroom count (typical 150 gpd/br design flow, 2x retention factor, 1000 gal floor)",
-   "source_edition_or_year": "IPC 2024 (and equivalent state codes)",
-   "source_section_or_page": "4 bedrooms -> 4 x 150 = 600 gpd, 2 x retention = 1200 gal minimum tank; 1000 gal regulatory floor",
+   "source_edition_or_year": "EPA Onsite Wastewater Treatment Systems Manual (EPA/625/R-00/008), Table 4-13",
+   "source_section_or_page": "4 bedrooms -> 1,200 gal (EPA Table 4-13, one- and two-family dwellings); 600 gpd design flow at 150 gpd per bedroom",
    "verified_by": "rl",
-   "verified_on": "2026-05-11",
+   "verified_on": "2026-09-24",
    "inputs": {
     "bedrooms": 4
    },

@@ -1,9 +1,9 @@
 {
   "name": "crosswalks",
-  "version": "2026-09-09",
-  "fetched": "2026-09-09",
+  "version": "2026-09-24",
+  "fetched": "2026-09-24",
   "edition": "NIST SP 811 unit factors; IRS 2026 standard mileage rate (76 cents/mi effective 2026-07-01); GSA FY2026 per-diem; NIOSH 1991 lifting equation; OSHA 29 CFR 1926 Subpart P + 1926.502 fall protection; NWS / OSHA heat-cold-stress formulas; manufacturer connector-decel benchmarks (3M / Capital Safety, MSA, Honeywell-Miller); state revenue rates verified 2026-09-02.",
-  "asOf": "2026-09-09",
+  "asOf": "2026-09-24",
   "refresh_cadence": "quarterly",
   "shards": [
     {
@@ -14,7 +14,7 @@
     {
       "file": "state-tax-rates.json",
       "name": "State sales tax rates",
-      "gzip_size_bytes": 521
+      "gzip_size_bytes": 520
     },
     {
       "file": "irs-mileage.json",
@@ -49,7 +49,7 @@
   ],
   "hashes": {
     "unit-conversions.json": "9a30ff3dd2f47b0d62f28cf4bc72363741156cb82f2f19a16289d59afaabf5b1",
-    "state-tax-rates.json": "bad5680593df891d5ff6d753f5e992d9c0a6d502e21579a3bffae50bf5e1d3d1",
+    "state-tax-rates.json": "ac863ffef34e3e8b758090502869b2fbe57a717972e33f2a224559e52248f6ed",
     "irs-mileage.json": "c383b0739291d724c2ea679fe63d5fad2e5593a4a0c3216574d1fb761323c435",
     "gsa-perdiem.json": "98001a238f24ab8fad44050037ccc22944db08c54542c9d95a910c2fb7ff2f36",
     "niosh-coupling.json": "ceb2d1f4928d6c077f568fcff517b7c561899e932e93f9aad23d6097547f2cc5",

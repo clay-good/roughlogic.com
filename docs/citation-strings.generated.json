@@ -67,7 +67,7 @@
     },
     "dti": {
       "group": "calc-realestate.js (Group X, v12 §8)",
-      "stamp": "Citation: Front-end DTI = housing payment / gross monthly income. Back-end DTI = (housing + other debts) / gross monthly income. Conventional thresholds per FNMA Single-Family Selling Guide §B3-6-02 (typical 36/45, up to 50 with compensating factors). FHA per Handbook 4000.1 §II.A.5 (default 31/43). VA per Lenders Handbook M26-7 (back-end 41, no front-end limit). Lender governs final underwriting."
+      "stamp": "Citation: Front-end DTI = housing payment / gross monthly income. Back-end DTI = (housing + other debts) / gross monthly income. Conventional per Fannie Mae Selling Guide §B3-6-02: no front-end ratio; maximum total DTI 36% manually underwritten, up to 45% with credit score and reserves (the pass flag), 50% through DU. FHA per Handbook 4000.1 §II.A.5 (default 31/43). VA per Lenders Handbook M26-7 (back-end 41, no front-end limit). Lender governs final underwriting."
     },
     "duct-sizing": {
       "group": "calc-hvac.js (Group C)",
@@ -143,7 +143,7 @@
     },
     "ltv": {
       "group": "calc-realestate.js (Group X, v12 §8)",
-      "stamp": "Citation: LTV = loan amount / value (appraised or purchase, whichever is less, per FNMA Single-Family Selling Guide §B2-1.1-01). PMI generally required at LTV > 80 percent for conventional conforming loans; FHA programs cap LTV at 96.5 percent for purchase. Lender governs final underwriting; appraiser governs final value."
+      "stamp": "Citation: LTV = loan amount / value (appraised or purchase, whichever is less, per FNMA Single-Family Selling Guide §B2-1.2-01). PMI generally required at LTV > 80 percent for conventional conforming loans; FHA programs cap LTV at 96.5 percent for purchase. Lender governs final underwriting; appraiser governs final value."
     },
     "lumber-spans": {
       "group": "calc-construction.js (Group E)",
@@ -227,7 +227,7 @@
     },
     "septic-tank": {
       "group": "calc-plumbing.js (Group B)",
-      "stamp": "Citation: EPA Onsite Wastewater Treatment Manual (EPA/625/R-00/008). 150 gpd per bedroom rule of thumb; tank floor 1000 gal; tank gallons >= 2 * daily flow. State primacy agency governs final design. Free at epa.gov/septic."
+      "stamp": "Citation: EPA Onsite Wastewater Treatment Systems Manual (EPA/625/R-00/008), Table 4-13 for one- and two-family dwellings by bedroom count (750 to 2,100 gal for 1-8 bedrooms), held at the 1,000 gal minimum many states set; for other buildings, a design daily flow entry takes the EPA rule of thumb of about two times the design flow. 150 gpd per bedroom. State primacy agency governs final design. Free at epa.gov/septic."
     },
     "service-load": {
       "group": "calc-electrical.js (Group A)",
