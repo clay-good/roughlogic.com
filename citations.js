@@ -2054,7 +2054,7 @@ export const CITATIONS = {
 
   "fall-protection-clearance": {
     formula: "Required clearance = free-fall + decel + worker_height + harness_stretch + safety_factor. Compared against the user-entered actual clearance below the anchor. Negative remaining clearance flags FAIL.",
-    edition: "OSHA 29 CFR 1926.502 (Fall protection systems criteria) by section. ANSI Z359 (Fall Protection and Fall Restraint) by name. Manufacturer connector-decel benchmarks from data/cross/fall-protection-benchmarks.json.",
+    edition: "OSHA 29 CFR 1926.502 (Fall protection systems criteria) by section. ANSI Z359 (Fall Protection and Fall Restraint) by name. Manufacturer connector-decel benchmarks from data/crosswalks/fall-protection-benchmarks.json.",
     freeAccess: "29 CFR 1926.502 free at ecfr.gov. ANSI Z359 licensed; manufacturer guides free at each manufacturer site.",
     governance: GOVERNANCE.engineer_of_record,
     editionNote: "Single-edition (29 CFR 1926.502 + manufacturer connector specs; quarterly recheck of manufacturer attribution per spec-v7 §8).",

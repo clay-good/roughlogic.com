@@ -1915,7 +1915,7 @@ export const fallProtectionClearanceExample = {
 };
 
 function _v7x_renderFallProtection(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: 29 CFR 1926.502 (fall protection systems criteria) by section. ANSI Z359 (Fall Protection) by name. Manufacturer connector-decel benchmarks in data/cross/fall-protection-benchmarks.json.";
+  citationEl.textContent = "Citation: 29 CFR 1926.502 (fall protection systems criteria) by section. ANSI Z359 (Fall Protection) by name. Manufacturer connector-decel benchmarks in data/crosswalks/fall-protection-benchmarks.json.";
   _v7x_attachEx(inputRegion, () => fillExample(fallProtectionClearanceExample.inputs));
   const conn = _v7x_makeSelect("Connector type", "fp-c", Object.keys(FALL_PROTECTION_DECEL).map((k) => ({ value: k, label: FALL_PROTECTION_DECEL[k].description + " (free-fall " + FALL_PROTECTION_DECEL[k].free_fall_ft + " ft, decel " + FALL_PROTECTION_DECEL[k].decel_ft + " ft)" })));
   const ff = _v7x_makeNumber("Free-fall override (ft, blank = manufacturer default)", "fp-ff", { step: "any", min: "0" });

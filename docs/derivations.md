@@ -995,11 +995,11 @@ Verification: Class 2 (F=1.0), 5000 ft^2, 2 stories gives A_eff = 7,500, Ci_raw 
   required_clearance_ft = free_fall + decel + worker_height + harness_stretch + safety_factor
   remaining_clearance_ft = actual_clearance - required_clearance
 
-Defaults: free-fall 6 ft for personal fall arrest (29 CFR 1926.502(d)(16)); decel 3.5 ft for shock-absorbing lanyard or 1.0 ft for SRL (manufacturer typical); worker height 5 ft (D-ring to feet); harness stretch 1 ft; safety factor 1 ft. Per-input override exposes user-supplied free-fall and decel values.
+Defaults: free-fall 6 ft for personal fall arrest (29 CFR 1926.502(d)(16)); decel 4 ft for a 6 ft free-fall shock-absorbing lanyard (the ANSI/ASSP Z359.13-2013 48 in maximum deployment; OSHA 1926.502(d)(16)(iv)'s 3.5 ft is the system limit) or 1.0 ft for an overhead SRL (manufacturer typical); worker height 5 ft (D-ring to feet); harness stretch 1 ft; safety factor 1 ft. Per-input override exposes user-supplied free-fall and decel values.
 
-Citations: 29 CFR 1926.502 by section. ANSI Z359 by name. Manufacturer connector benchmarks (3M / Capital Safety, MSA, Honeywell-Miller) in data/cross/fall-protection-benchmarks.json.
+Citations: 29 CFR 1926.502 by section. ANSI Z359 by name. Manufacturer connector benchmarks (3M / Capital Safety, MSA, Honeywell-Miller) in data/crosswalks/fall-protection-benchmarks.json.
 
-Verification: 6 ft lanyard + 3.5 ft decel + 5 + 1 + 1 = 16.5 ft required. SRL connectors give shorter required clearance than shock-absorbing lanyards. PASS / FAIL flags fire correctly. free_fall_ft_override and decel_ft_override are honored. Negative remaining clearance (10 ft actual vs 16.5 ft required) flags FAIL.
+Verification: 6 ft lanyard + 4 ft decel + 5 + 1 + 1 = 17 ft required. SRL connectors give shorter required clearance than shock-absorbing lanyards. PASS / FAIL flags fire correctly. free_fall_ft_override and decel_ft_override are honored. Negative remaining clearance (10 ft actual vs 17 ft required) flags FAIL.
 
 ## 48. Panel loading and phase rebalance (v8 Phase E.1, utility 254)
 
