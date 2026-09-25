@@ -7757,7 +7757,7 @@ test("bounds: calc-hvac computeOutdoorAirVentilation pins ASHRAE 62.1 Vbz = Rp*P
   assert.ok("error" in computeOutdoorAirVentilation({ Rp_cfm_per_person: -1, Ra_cfm_per_ft2: 0.06, people: 25, floor_area_ft2: 2500, Ez: 1.0 }));
 });
 
-test("bounds: calc-hvac computeHoodExhaust pins IMC 507.13 Q = cfm_per_ft * L for the spec 8 ft wall-canopy heavy-duty hood (3200 cfm)", () => {
+test("bounds: calc-hvac computeHoodExhaust pins IMC 507.5.1-507.5.4 Q = cfm_per_ft * L for the spec 8 ft wall-canopy heavy-duty hood (3200 cfm)", () => {
   const r = computeHoodExhaust({ hood_class: "I", hood_type: "wall-canopy", duty: "heavy", length_ft: 8, duct_velocity_fpm: 1500 });
   assert.strictEqual(r.Q_exhaust_cfm, 3200);
   assert.strictEqual(r.cfm_per_ft, 400);
@@ -20426,7 +20426,9 @@ test("bounds: spec-v351 computePvPerformanceRatio pins the multiplicative produc
 
 test("bounds: spec-v352 computePvStringFusing pins the 1.56 Isc round-up, the label check, the three-string rule, and error seams", () => {
   const r = _v352({ Isc_A: 10, max_fuse_A: 20, n_strings: 4 });
-  assert.ok(Math.abs(r.req_A - 15.6) < 1e-9);
+  assert.ok(Math.abs(r.req_A - 15.625) < 1e-9); // 1.25 x 1.25 x 10
+  // At the rating boundary the exact 1.5625 matters: Isc 12.81 A needs 20.02 A, so a 25 A fuse.
+  assert.strictEqual(_v352({ Isc_A: 12.81, max_fuse_A: 30, n_strings: 3 }).fuse_A, 25);
   assert.strictEqual(r.fuse_A, 20);
   assert.strictEqual(r.compliant, true);
   assert.strictEqual(r.fuse_required, true);

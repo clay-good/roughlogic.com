@@ -68,7 +68,7 @@ test("outdoor-air-ventilation: HVAC_RENDERERS exposes outdoor-air-ventilation", 
   assert.equal(typeof HVAC_RENDERERS["outdoor-air-ventilation"], "function");
 });
 
-// v9 §B.3 commercial kitchen hood exhaust (IMC 507.13 / 507.20).
+// v9 §B.3 commercial kitchen hood exhaust (IMC 507.5.1-507.5.5).
 
 test("hood-exhaust: example 8 ft wall-canopy heavy-duty -> 3200 cfm exhaust, 2560 cfm makeup", () => {
   const r = computeHoodExhaust(hoodExhaustExample.inputs);
@@ -147,12 +147,16 @@ test("hood-exhaust: grease-duct slope reminder is 1/4 in/ft for Type I, 0 for Ty
   assert.equal(r2.grease_duct_slope_in_per_ft, 0);
 });
 
-test("hood-exhaust: HOOD_DUTY_MULTIPLIERS_CFM_PER_FT covers six Type I hood types", () => {
-  assert.equal(Object.keys(HOOD_DUTY_MULTIPLIERS_CFM_PER_FT).length, 6);
+test("hood-exhaust: HOOD_DUTY_MULTIPLIERS_CFM_PER_FT covers the IMC 507.5 Type I hood types, eyebrow included", () => {
+  assert.equal(Object.keys(HOOD_DUTY_MULTIPLIERS_CFM_PER_FT).length, 7);
   for (const ht of Object.keys(HOOD_DUTY_MULTIPLIERS_CFM_PER_FT)) {
     const row = HOOD_DUTY_MULTIPLIERS_CFM_PER_FT[ht];
-    assert.ok(row.light > 0); assert.ok(row.medium > 0); assert.ok(row.heavy > 0);
+    assert.ok(row.light > 0); assert.ok(row.medium > 0);
+    if (ht !== "eyebrow") assert.ok(row.heavy > 0);
   }
+  // Eyebrow hoods: 250 cfm/ft at light and medium duty, not allowed for heavy (IMC 507.5.2-507.5.4).
+  assert.equal(HOOD_DUTY_MULTIPLIERS_CFM_PER_FT.eyebrow.medium, 250);
+  assert.equal(HOOD_DUTY_MULTIPLIERS_CFM_PER_FT.eyebrow.heavy, null);
 });
 
 test("hood-exhaust: HVAC_RENDERERS exposes hood-exhaust", () => {

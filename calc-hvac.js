@@ -1312,7 +1312,7 @@ export function renderCfmPerTon(inputRegion, outputRegion, citationEl) {
 
 // dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderCombustionAir(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: per IMC 2021 §304 (combustion air). 50 ft^3 per 1000 BTU/hr by volume; outdoor opening 1 in^2 per 4000 BTU/hr or the larger indoor opening 1 in^2 per 1000 BTU/hr. This is the FREE AREA; each opening's smallest dimension must also be at least 3 in (IFGC 304.6 -- a long narrow opening is blocked by leaves and lint), which a free-area figure cannot enforce. AHJ governs. Free at codes.iccsafe.org.";
+  citationEl.textContent = "Citation: per IFGC 2021 §304.5 (indoor, 50 ft^3 per 1000 BTU/hr) and §304.6 (outdoor openings) -- IMC 701.1 defers gas-appliance combustion air to the IFGC. 50 ft^3 per 1000 BTU/hr by volume; outdoor opening 1 in^2 per 4000 BTU/hr or the larger indoor opening 1 in^2 per 1000 BTU/hr. This is the FREE AREA; each opening's smallest dimension must also be at least 3 in (IFGC 304.6 -- a long narrow opening is blocked by leaves and lint), which a free-area figure cannot enforce. AHJ governs. Free at codes.iccsafe.org.";
   const btu = makeNumber("Appliance BTU input", "ca-b", { step: "any", min: "0" });
   const vol = makeNumber("Room volume (ft³)", "ca-v", { step: "any", min: "0" });
   for (const f of [btu, vol]) inputRegion.appendChild(f.wrap);
@@ -1333,7 +1333,7 @@ export function renderCombustionAir(inputRegion, outputRegion, citationEl) {
 
 // dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderCombustionAirMaxInput(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: per IMC 2021 §304 (combustion air), the standard volume method solved for input. A space is adequate by volume at 50 ft^3 per 1000 BTU/hr, so the max appliance input is (room volume / 50) * 1000; above it, combustion-air openings are required. AHJ governs. Free at codes.iccsafe.org.";
+  citationEl.textContent = "Citation: per IFGC 2021 §304.5 (indoor, 50 ft^3 per 1000 BTU/hr) and §304.6 (outdoor openings) -- IMC 701.1 defers gas-appliance combustion air to the IFGC, the standard volume method solved for input. A space is adequate by volume at 50 ft^3 per 1000 BTU/hr, so the max appliance input is (room volume / 50) * 1000; above it, combustion-air openings are required. AHJ governs. Free at codes.iccsafe.org.";
   const vol = makeNumber("Room volume (ft³)", "cam-v", { step: "any", min: "0" });
   inputRegion.appendChild(vol.wrap);
   attachExampleButton(inputRegion, () => { vol.input.value = "4000"; update(); });
@@ -2502,13 +2502,13 @@ export function renderOutdoorAirVentilation(inputRegion, outputRegion, citationE
 HVAC_RENDERERS["outdoor-air-ventilation"] = renderOutdoorAirVentilation;
 
 // v9 §B.3 commercial kitchen hood exhaust (Type I and Type II).
-// IMC 2021 §507.13 published cfm-per-linear-foot multipliers by hood
+// IMC 2021 §507.5.1-507.5.4 published cfm-per-linear-foot multipliers by hood
 // type and cooking-appliance duty. The numeric multipliers are formula
 // coefficients per v9 §B.3 discipline; cited by name, not as a code-
 // table reproduction. AHJ governs final equipment selection.
 export const HOOD_DUTY_MULTIPLIERS_CFM_PER_FT = {
   // Type I (grease) hood-type x duty table. null = duty not allowed
-  // for that hood type per IMC 507.13 (operator must reselect duty
+  // for that hood type per IMC 507.5.1-507.5.4 (operator must reselect duty
   // or hood type).
   "wall-canopy":      { light: 200, medium: 300, heavy: 400, "extra-heavy": 550 },
   "single-island":    { light: 400, medium: 500, heavy: 600, "extra-heavy": 700 },
@@ -2516,9 +2516,13 @@ export const HOOD_DUTY_MULTIPLIERS_CFM_PER_FT = {
   "backshelf":        { light: 250, medium: 300, heavy: 400, "extra-heavy": null },
   "proximity":        { light: 250, medium: 300, heavy: 400, "extra-heavy": null },
   "pass-over":        { light: 250, medium: 300, heavy: 400, "extra-heavy": null },
+  // IMC 507.5.2-507.5.4 Eyebrow row: 250 cfm/ft for light and medium duty, not allowed for heavy and
+  // extra-heavy. ("proximity" is not an IMC row; it carries the backshelf/pass-over values.)
+  "eyebrow":          { light: 250, medium: 250, heavy: null, "extra-heavy": null },
 };
 
-// Type II vapor-only hoods (IMC 507.20) - flat rate per linear foot.
+// IMC 2021 507.5.5 sets 100 cfm per linear foot for Type II hoods over DISHWASHING appliances only;
+// the code gives no rate for other Type II hoods, where the manufacturer's listing governs.
 export const TYPE_II_HOOD_CFM_PER_FT = 100;
 
 // dims: in { hood_type: dimensionless, hood_class: dimensionless, duty: dimensionless, length_ft: L, width_ft: L, duct_velocity_fpm: L T^-1 } out: { required_cfm: L^3 T^-1 }
@@ -2538,7 +2542,7 @@ export function computeHoodExhaust({
   if (hood_class !== "I" && hood_class !== "II") return { error: "Hood class must be 'I' (grease) or 'II' (vapor)." };
 
   const warnings = [];
-  if (L < 4) warnings.push("Hood length below 4 ft is unusual; verify against the appliance footprint and IMC 507.13.");
+  if (L < 4) warnings.push("Hood length below 4 ft is unusual; verify against the appliance footprint and IMC 507.5.1-507.5.4.");
   if (L > 16) warnings.push("Hood length above 16 ft is unusual; long hoods often split into multiple sections - verify the duty selection.");
 
   let Q_cfm = 0;
@@ -2547,12 +2551,12 @@ export function computeHoodExhaust({
     if (W <= 0) return { error: "Type II vapor-only hood requires positive width (ft)." };
     cfm_per_ft = TYPE_II_HOOD_CFM_PER_FT;
     Q_cfm = cfm_per_ft * L;
-    warnings.push("Type II vapor-only: greasy effluent requires a Type I hood. Confirm the appliance bank is dishwasher / oven / steam-kettle class only.");
+    warnings.push("Type II: the 100 cfm/ft rate is IMC 507.5.5's minimum for hoods over DISHWASHING appliances; the code sets no rate for other Type II hoods (ovens, steam kettles), where the hood listing governs. Greasy effluent requires a Type I hood.");
   } else {
     const row = HOOD_DUTY_MULTIPLIERS_CFM_PER_FT[hood_type];
     if (!row) return { error: "Unknown Type I hood type '" + hood_type + "'." };
     const m = row[duty];
-    if (m == null) return { error: "Duty '" + duty + "' is not permitted with hood type '" + hood_type + "' per IMC 507.13." };
+    if (m == null) return { error: "Duty '" + duty + "' is not permitted with hood type '" + hood_type + "' per IMC 507.5.1-507.5.4." };
     cfm_per_ft = m;
     Q_cfm = m * L;
   }
@@ -2585,7 +2589,7 @@ export const hoodExhaustExample = {
 };
 
 function renderHoodExhaust(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: Per IMC 2021 §507.13 (Type I grease hoods) and §507.20 (Type II vapor-only hoods). Duty multipliers (200 / 300 / 400 / 550 cfm/ft for wall-canopy) are formula coefficients per the published IMC. NFPA 96-2024 governs grease-handling exhaust system design. Makeup air per IMC 508. AHJ governs final equipment selection. Free at codes.iccsafe.org for IMC TOC and at nfpa.org/freeaccess for NFPA 96 TOC.";
+  citationEl.textContent = "Citation: Per IMC 2021 §507.5.1-507.5.4 (Type I grease hoods) and §507.5.5 (Type II vapor-only hoods). Duty multipliers (200 / 300 / 400 / 550 cfm/ft for wall-canopy) are formula coefficients per the published IMC. NFPA 96-2024 governs grease-handling exhaust system design. Makeup air per IMC 508. AHJ governs final equipment selection. Free at codes.iccsafe.org for IMC TOC and at nfpa.org/freeaccess for NFPA 96 TOC.";
 
   const cls = makeSelect("Hood class", "he-class", [
     { value: "I", label: "Type I (grease, hot)" },
@@ -2596,8 +2600,9 @@ function renderHoodExhaust(inputRegion, outputRegion, citationEl) {
     { value: "single-island", label: "Single-island canopy" },
     { value: "double-island", label: "Double-island canopy" },
     { value: "backshelf", label: "Backshelf" },
-    { value: "proximity", label: "Proximity" },
+    { value: "proximity", label: "Proximity (backshelf/pass-over values)" },
     { value: "pass-over", label: "Pass-over" },
+    { value: "eyebrow", label: "Eyebrow (light / medium duty only)" },
   ]);
   const duty = makeSelect("Cooking-appliance duty", "he-duty", [
     { value: "light", label: "Light (steam, oven)" },

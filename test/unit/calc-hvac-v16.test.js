@@ -197,6 +197,13 @@ test("air-changes-hour: an operating-room target band flags a 6 ACH room as belo
   assert.strictEqual(ACH_TARGET_BANDS.operating_room.lo, 20);
 });
 
+test("air-changes-hour: ASHRAE 170 rows are minimums (patient room 4, OR 20), with no ceiling", () => {
+  const pr = computeAirChangesPerHour({ volume_ft3: 3000, supply_cfm: 250, occupancy: "patient_room" }); // 5 ACH
+  assert.ok(/meets the 4 ACH minimum/.test(pr.comparison), pr.comparison);
+  const or = computeAirChangesPerHour({ volume_ft3: 4000, supply_cfm: 2000, occupancy: "operating_room" }); // 30 ACH
+  assert.ok(/meets the 20 ACH minimum/.test(or.comparison), or.comparison);
+});
+
 test("air-changes-hour: ACH above 50 is flagged outside the typical range", () => {
   const r = computeAirChangesPerHour({ volume_ft3: 1000, supply_cfm: 1000 });
   assert.ok(r.ach > 50);

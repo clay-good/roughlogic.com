@@ -202,8 +202,8 @@
       "date": "2026-09-08"
     },
     "/tools/air-changes-hour/": {
-      "sha": "c73d077fb84dd1ca",
-      "date": "2026-09-04"
+      "sha": "323b8d6803b6b261",
+      "date": "2026-09-25"
     },
     "/tools/air-compressor-cfm-sizing/": {
       "sha": "9321252977752f62",
@@ -3658,8 +3658,8 @@
       "date": "2026-09-01"
     },
     "/tools/hood-exhaust/": {
-      "sha": "3bc0a71fd687d90a",
-      "date": "2026-09-09"
+      "sha": "68ef0a12f2ccaa9a",
+      "date": "2026-09-25"
     },
     "/tools/hoop-stress-mawp/": {
       "sha": "66f6603b9794ece3",
@@ -5766,8 +5766,8 @@
       "date": "2026-09-09"
     },
     "/tools/pv-string-fusing/": {
-      "sha": "ab50d863e46fc89a",
-      "date": "2026-09-01"
+      "sha": "b6c086661363ee68",
+      "date": "2026-09-25"
     },
     "/tools/pv-string-sizing/": {
       "sha": "9d2b3724d04495ce",

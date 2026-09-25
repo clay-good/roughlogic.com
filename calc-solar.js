@@ -1267,7 +1267,7 @@ export function computePvStringFusing({ Isc_A = 0, max_fuse_A = 0, n_strings = 1
   if (!(isc > 0)) return { error: "Module short-circuit current Isc must be positive (A)." };
   if (!(maxf > 0)) return { error: "Module maximum series fuse rating must be positive (A)." };
   if (!(n >= 1)) return { error: "Number of source circuits must be at least 1." };
-  const req_A = 1.56 * isc; // NEC 690.9(B): 1.25 x 1.25 x Isc
+  const req_A = 1.25 * 1.25 * isc; // NEC 690.9(B): 1.25 x 1.25 x Isc = 1.5625 (1.56 rounded down picked 20 A at Isc 12.81 A, where 25 A is required)
   let fuse_A = null;
   for (const s of _PV_STD_OCPD_A) { if (s >= req_A) { fuse_A = s; break; } }
   if (fuse_A === null) return { error: "Required fuse exceeds the standard ratings table (check the design)." };

@@ -395,12 +395,15 @@ HVACSYSTEMS_RENDERERS["hx-lmtd-ntu"] = _v16h_renderHxLmtdNtu;
 // code minimum for a specific project; the AHJ and the governing
 // standard's full procedure govern.
 export const ACH_TARGET_BANDS = {
-  residential: { lo: 0.35, hi: 1, label: "Residential whole-house ventilation (ASHRAE 62.2)" },
+  residential: { lo: 0.35, hi: 1, label: "Residential whole-house ventilation (the older ASHRAE 62-1989 0.35 ACH figure; 62.2 sets a cfm rate instead)" },
   office: { lo: 4, hi: 10, label: "Office / commercial" },
   classroom: { lo: 4, hi: 6, label: "Classroom (ASHRAE 62.1)" },
   lab: { lo: 6, hi: 12, label: "Laboratory" },
-  patient_room: { lo: 6, hi: 6, label: "Hospital patient room (ASHRAE 170)" },
-  operating_room: { lo: 20, hi: 25, label: "Operating room (ASHRAE 170)" },
+  // ASHRAE 170 Table 7-1 sets MINIMUM total air changes with no ceiling: patient room 4 (6 for a
+  // single-bed room with Group D diffusers, note y), operating room 20. Until 2026-09-25 these
+  // were 6-6 and 20-25, which failed a compliant 4-6 ACH patient room and a 30 ACH OR.
+  patient_room: { lo: 4, hi: Infinity, label: "Hospital patient room (ASHRAE 170 minimum; 6 with Group D diffusers)" },
+  operating_room: { lo: 20, hi: Infinity, label: "Operating room (ASHRAE 170 minimum)" },
 };
 
 // dims: in { volume_ft3: L^3, supply_cfm: L^3 T^-1, return_cfm: L^3 T^-1, occupancy: dimensionless } out: { ach: T^-1, net_ach: T^-1, pressurization_cfm: L^3 T^-1 }
@@ -426,7 +429,8 @@ export function computeAirChangesPerHour({
 
   const band = ACH_TARGET_BANDS[occupancy] ?? ACH_TARGET_BANDS.classroom;
   let comparison;
-  if (ach < band.lo) comparison = "below the " + band.lo + "-" + band.hi + " ACH target (" + band.label + ")";
+  if (band.hi === Infinity) comparison = (ach < band.lo ? "below the " : "meets the ") + band.lo + " ACH minimum (" + band.label + ")";
+  else if (ach < band.lo) comparison = "below the " + band.lo + "-" + band.hi + " ACH target (" + band.label + ")";
   else if (ach > band.hi) comparison = "above the " + band.lo + "-" + band.hi + " ACH target (" + band.label + ")";
   else comparison = "within the " + band.lo + "-" + band.hi + " ACH target (" + band.label + ")";
 
@@ -470,8 +474,8 @@ function _v16h_renderAirChangesPerHour(inputRegion, outputRegion, citationEl) {
     { value: "office", label: "Office (4-10)" },
     { value: "classroom", label: "Classroom (4-6)", selected: true },
     { value: "lab", label: "Laboratory (6-12)" },
-    { value: "patient_room", label: "Patient room (6)" },
-    { value: "operating_room", label: "Operating room (20-25)" },
+    { value: "patient_room", label: "Patient room (4 minimum; 6 with Group D diffusers)" },
+    { value: "operating_room", label: "Operating room (20 minimum)" },
   ]);
   for (const f of [vol, supply, ret, occ]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => {

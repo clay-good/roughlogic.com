@@ -3789,9 +3789,9 @@
   {
    "tile_id": "hood-exhaust",
    "source_publisher": "ICC",
-   "source_title": "IMC 507.13 8 ft wall-canopy heavy-duty Type I hood",
+   "source_title": "IMC 507.5.1-507.5.4 8 ft wall-canopy heavy-duty Type I hood",
    "source_edition_or_year": "IMC 2021",
-   "source_section_or_page": "\u00a7507.13: 400 cfm/ft heavy-duty wall-canopy x 8 ft = 3200 cfm; makeup 0.80 x Q = 2560 cfm",
+   "source_section_or_page": "\u00a7507.5.2: 400 cfm/ft heavy-duty wall-canopy x 8 ft = 3200 cfm; makeup 0.80 x Q = 2560 cfm",
    "verified_by": "rl",
    "verified_on": "2026-05-11",
    "inputs": {
@@ -67319,7 +67319,7 @@
   {
    "tile_id": "pv-string-fusing",
    "source_publisher": "NEC 690.9",
-   "source_title": "Isc 10 A, 20 A module max, 4 strings -> 15.6 A required, a 20 A fuse, compliant, fuses required",
+   "source_title": "Isc 10 A, 20 A module max, 4 strings -> 15.625 A required (1.25 x 1.25 x 10), a 20 A fuse, compliant, fuses required",
    "source_edition_or_year": "spec-v352 worked example (machine-verified)",
    "source_section_or_page": "spec-v352 section 2.1 pinned example",
    "verified_by": "rl",
@@ -67331,7 +67331,7 @@
    },
    "outputs": {
     "req_A": {
-     "value": 15.6,
+     "value": 15.625,
      "tolerance": {
       "pct": 0.5
      }
@@ -67347,7 +67347,7 @@
   {
    "tile_id": "pv-string-fusing",
    "source_publisher": "NEC 690.9",
-   "source_title": "cross-check: Isc 14 A, 25 A module max -> 21.8 A required, a 25 A fuse, within the label maximum",
+   "source_title": "cross-check: Isc 14 A, 25 A module max -> 21.875 A required, a 25 A fuse, within the label maximum",
    "source_edition_or_year": "spec-v352 worked example (machine-verified)",
    "source_section_or_page": "spec-v352 section 2.1 cross-check",
    "verified_by": "rl",

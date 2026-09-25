@@ -2851,14 +2851,14 @@ export const CITATIONS = {
   },
 
   "hood-exhaust": {
-    formula: "Type I: Q = duty_multiplier * L. Wall-canopy duty multipliers (light 200, medium 300, heavy 400, extra-heavy 550 cfm/ft) per IMC 2021 §507.13. Single-island canopy (400 / 500 / 600 / 700). Double-island (250 / 300 / 400 / 550). Backshelf / proximity / pass-over (250 / 300 / 400; extra-heavy not allowed). Type II: Q = 100 * L (IMC 507.20). Makeup = 0.80 * Q (IMC 508 balance check). Duct area (in^2) = Q / V * 144.",
-    edition: "IMC 2021 §507.13 (Type I) and §507.20 (Type II). NFPA 96-2024 governs grease-handling exhaust system design.",
+    formula: "Type I: Q = duty_multiplier * L. Wall-canopy duty multipliers (light 200, medium 300, heavy 400, extra-heavy 550 cfm/ft) per IMC 2021 §507.5.1-507.5.4. Single-island canopy (400 / 500 / 600 / 700). Double-island (250 / 300 / 400 / 550). Backshelf / proximity / pass-over (250 / 300 / 400; extra-heavy not allowed). Type II: Q = 100 * L (IMC 507.5.5). Makeup = 0.80 * Q (IMC 508 balance check). Duct area (in^2) = Q / V * 144.",
+    edition: "IMC 2021 §507.5.1-507.5.4 (Type I) and §507.5.5 (Type II). NFPA 96-2024 governs grease-handling exhaust system design.",
     freeAccess: "codes.iccsafe.org for IMC TOC; nfpa.org/freeaccess for NFPA 96 TOC.",
     governance: GOVERNANCE.mechanical,
     editionNote: "Duty multipliers are formula coefficients per the published IMC; not a code-table reproduction. AHJ governs final equipment selection.",
     assumptions: [
-      { name: "Hood-type x duty matrix", value: "wall-canopy / single-island / double-island / backshelf / proximity / pass-over, each with light / medium / heavy / extra-heavy multipliers", source: "IMC 2021 §507.13" },
-      { name: "Type II rate", value: "100 cfm per linear foot for vapor-only hoods", source: "IMC 2021 §507.20" },
+      { name: "Hood-type x duty matrix", value: "wall-canopy / single-island / double-island / backshelf / proximity / pass-over, each with light / medium / heavy / extra-heavy multipliers", source: "IMC 2021 §507.5.1-507.5.4" },
+      { name: "Type II rate", value: "100 cfm per linear foot for Type II hoods over dishwashing appliances; the code sets no rate for other Type II hoods", source: "IMC 2021 §507.5.5" },
       { name: "Makeup air", value: "80% of exhaust as a balance-check rule of thumb; AHJ governs final balance", source: "IMC 2021 §508" },
       { name: "Duct velocity range", value: "Type I grease-duct velocity 500-2000 fpm to keep grease suspended", source: "NFPA 96-2024 §8.2.1.1" },
       { name: "Grease-duct slope", value: "1/4 in per ft minimum slope back to the hood", source: "IMC 2021 §506.3" },
@@ -3725,10 +3725,11 @@ export const CITATIONS = {
     governance: GOVERNANCE.mechanical,
     editionNote: "Occupancy target bands are comparison ranges, not the code minimum for a specific project; the AHJ and the governing standard's full procedure govern.",
     assumptions: [
-      { name: "Residential band", value: "0.35-1 ACH", source: "ASHRAE 62.2 whole-house ventilation" },
+      { name: "Residential band", value: "0.35-1 ACH", source: "the older ASHRAE 62-1989 0.35 ACH figure (62.2 sets a cfm rate instead)" },
       { name: "Classroom band", value: "4-6 ACH", source: "ASHRAE 62.1 typical" },
       { name: "Laboratory band", value: "6-12 ACH", source: "ASHRAE typical" },
-      { name: "Operating room band", value: "20-25 ACH", source: "ASHRAE 170 healthcare" },
+      { name: "Operating room", value: "20 ACH minimum, no ceiling", source: "ASHRAE 170 Table 7-1" },
+      { name: "Patient room", value: "4 ACH minimum (6 for a single-bed room with Group D diffusers, note y), no ceiling", source: "ASHRAE 170 Table 7-1" },
     ],
   },
   "boiler-pipe-sizing": {
@@ -16689,7 +16690,7 @@ export const CITATIONS = {
     ],
   },
   "pv-string-fusing": {
-    formula: "req = 1.56 x Isc (1.25 x 1.25); fuse = smallest NEC 240.6(A) standard rating >= req; compliant if fuse <= module max; fuses required when >= 3 paralleled source circuits.",
+    formula: "req = 1.25 x 1.25 x Isc (1.5625, not rounded); fuse = smallest NEC 240.6(A) standard rating >= req; compliant if fuse <= module max; fuses required when >= 3 paralleled source circuits.",
     edition: "NEC 690.9 (PV source-circuit overcurrent protection) and 240.6(A) standard ratings, by name.",
     freeAccess: "NEC 690.9 and 240.6 are in NFPA 70; many jurisdictions publish the code free to read. The NEC and the AHJ govern.",
     governance: GOVERNANCE.general,
