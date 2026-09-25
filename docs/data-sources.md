@@ -319,7 +319,7 @@ A standard the tiles cite but no shard holds data from has no manifest to appear
 
 ### data/hvac/baseboard-output.json (v3)
 
-- Source: Manufacturer baseboard technical bulletins (Slant/Fin Fine Line 30 typical 1 gpm; generic high-output reference). Each model attributes the publishing manufacturer.
+- Source: Slant/Fin Fine/Line 30 hot water ratings chart (element 30-75, 65 F entering air), its 1 gpm row and its 4 gpm row for flow of 4 gpm or more; generic high-output reference. Until 2026-09-24 the Slant/Fin curve was shifted (its 140 and 160 F values were the chart's 150 and 170 F ratings).
 - License: Manufacturer technical data, used with attribution.
 - Cadence: Quarterly attribution-and-link recheck.
 

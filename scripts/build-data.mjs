@@ -374,13 +374,20 @@ const AFFINITY_LAWS_DATA = {
 };
 
 const BASEBOARD_OUTPUT_DATA = {
-  source: "Manufacturer baseboard technical bulletins (Slant/Fin Fine Line 30 Series typical curve at 1 gpm; generic high-output reference).",
-  attribution: { slant_fin_baseline: "Slant/Fin Fine Line 30 Series technical bulletin (typical 1 gpm)", high_capacity: "Generic high-output baseboard (typical 4 gpm)" },
+  source: "Slant/Fin Fine/Line 30 hot water ratings chart (element 30-75, BTU/hr per linear ft at 65 F entering air; 1 gpm row, and the 4 gpm row for flow of 4 gpm or more); generic high-output reference.",
+  attribution: { slant_fin_baseline: "Slant/Fin Fine/Line 30 hot water ratings chart (element 30-75, 65 F entering air)", high_capacity: "Generic high-output baseboard (typical 4 gpm)" },
   models: {
     slant_fin_baseline: [
-      { water_F: 140, btu_per_ft: 380 }, { water_F: 160, btu_per_ft: 510 },
-      { water_F: 180, btu_per_ft: 600 }, { water_F: 200, btu_per_ft: 690 },
-      { water_F: 220, btu_per_ft: 780 },
+      { water_F: 110, btu_per_ft: 160 }, { water_F: 120, btu_per_ft: 210 }, { water_F: 130, btu_per_ft: 260 }, { water_F: 140, btu_per_ft: 320 },
+      { water_F: 150, btu_per_ft: 380 }, { water_F: 160, btu_per_ft: 450 }, { water_F: 170, btu_per_ft: 510 }, { water_F: 180, btu_per_ft: 580 },
+      { water_F: 190, btu_per_ft: 640 }, { water_F: 200, btu_per_ft: 710 }, { water_F: 210, btu_per_ft: 770 }, { water_F: 215, btu_per_ft: 810 },
+      { water_F: 220, btu_per_ft: 840 },
+    ],
+    slant_fin_baseline_4gpm: [
+      { water_F: 110, btu_per_ft: 160 }, { water_F: 120, btu_per_ft: 220 }, { water_F: 130, btu_per_ft: 270 }, { water_F: 140, btu_per_ft: 340 },
+      { water_F: 150, btu_per_ft: 400 }, { water_F: 160, btu_per_ft: 480 }, { water_F: 170, btu_per_ft: 540 }, { water_F: 180, btu_per_ft: 610 },
+      { water_F: 190, btu_per_ft: 680 }, { water_F: 200, btu_per_ft: 750 }, { water_F: 210, btu_per_ft: 810 }, { water_F: 215, btu_per_ft: 860 },
+      { water_F: 220, btu_per_ft: 890 },
     ],
     high_capacity: [
       { water_F: 140, btu_per_ft: 480 }, { water_F: 160, btu_per_ft: 640 },

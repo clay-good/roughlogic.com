@@ -252,14 +252,27 @@ test("Geothermal: horizontal is shorter than vertical for same load (per BTU/ft 
 
 // --- 143 Baseboard output ---
 
-test("Baseboard: example interpolates 180 F to 600 BTU/ft", () => {
+test("Baseboard: example reads the Slant/Fin Fine/Line 30 chart at 180 F, 1 gpm: 580 BTU/ft", () => {
   const r = computeBaseboardOutput(baseboardOutputExample.inputs);
-  assert.ok(close(r.btu_per_ft, 600, 0.5));
+  assert.ok(close(r.btu_per_ft, 580, 1e-9));
 });
 
 test("Baseboard: total = btu_per_ft * length * flow_factor", () => {
   const r = computeBaseboardOutput({ water_temp_F: 180, flow_gpm: 1, length_ft: 8, model: "slant_fin_baseline" });
-  assert.ok(close(r.btu_total, 600 * 8 * 1, 0.5));
+  assert.ok(close(r.btu_total, 580 * 8 * 1, 0.5));
+});
+
+test("Baseboard: the Slant/Fin curve IS the published chart, 1 gpm and 4 gpm rows", () => {
+  // slantfin.com ratings_fineline30_r.pdf, element 30-75, 65 F entering air.
+  const T = [110, 120, 130, 140, 150, 160, 170, 180, 190, 200, 210, 215, 220];
+  const g1 = [160, 210, 260, 320, 380, 450, 510, 580, 640, 710, 770, 810, 840];
+  const g4 = [160, 220, 270, 340, 400, 480, 540, 610, 680, 750, 810, 860, 890];
+  assert.deepEqual(BASEBOARD_OUTPUT.slant_fin_baseline.points, T.map((w, i) => ({ water_F: w, btu_per_ft: g1[i] })));
+  assert.deepEqual(BASEBOARD_OUTPUT.slant_fin_baseline.points_4gpm, T.map((w, i) => ({ water_F: w, btu_per_ft: g4[i] })));
+  // The 4 gpm row applies only at 4 gpm or more; 3 gpm is still the 1 gpm rating.
+  const at = (f) => computeBaseboardOutput({ water_temp_F: 160, flow_gpm: f, length_ft: 1, model: "slant_fin_baseline" }).btu_per_ft;
+  assert.equal(at(3), 450);
+  assert.equal(at(4), 480);
 });
 
 test("Baseboard: hotter water -> more BTU/ft", () => {
@@ -274,14 +287,14 @@ test("Baseboard: high_capacity model > slant_fin at same temp", () => {
   assert.ok(b.btu_per_ft > a.btu_per_ft);
 });
 
-test("Baseboard: clamps below first point", () => {
+test("Baseboard: below the lowest rated temperature errors rather than holding the first row", () => {
   const r = computeBaseboardOutput({ water_temp_F: 100, flow_gpm: 1, length_ft: 1, model: "slant_fin_baseline" });
-  assert.equal(r.btu_per_ft, 380);
+  assert.ok(r.error);
 });
 
 test("Baseboard: clamps above last point", () => {
   const r = computeBaseboardOutput({ water_temp_F: 250, flow_gpm: 1, length_ft: 1, model: "slant_fin_baseline" });
-  assert.equal(r.btu_per_ft, 780);
+  assert.equal(r.btu_per_ft, 840);
 });
 
 test("Baseboard: zero water temp errors", () => {
@@ -299,8 +312,8 @@ test("Baseboard: attribution string set", () => {
   assert.match(r.attribution, /Slant\/Fin/);
 });
 
-test("Baseboard: every model has 5 points", () => {
-  for (const m of Object.keys(BASEBOARD_OUTPUT)) assert.equal(BASEBOARD_OUTPUT[m].points.length, 5);
+test("Baseboard: every model has at least 5 points", () => {
+  for (const m of Object.keys(BASEBOARD_OUTPUT)) assert.ok(BASEBOARD_OUTPUT[m].points.length >= 5);
 });
 
 // --- 144 NPSHa ---
@@ -377,12 +390,13 @@ test("baseboard output table: btu/ft rises with water temperature and high-capac
       assert.ok(p[i].btu_per_ft > p[i - 1].btu_per_ft, `${prod} btu/ft not increasing at ${p[i].water_F} F`);
     }
   }
-  const base = B.slant_fin_baseline.points, hi = B.high_capacity.points;
-  assert.equal(base.length, hi.length, "baseboard product curves have different length");
-  for (let i = 0; i < base.length; i++) {
-    assert.equal(hi[i].water_F, base[i].water_F, `baseboard temperature mismatch at ${i}`);
-    assert.ok(hi[i].btu_per_ft >= base[i].btu_per_ft,
-      `high-capacity baseboard outputs less than baseline at ${base[i].water_F} F: ${hi[i].btu_per_ft} < ${base[i].btu_per_ft}`);
+  // The curves no longer share rows (the Slant/Fin chart has 13, the generic
+  // curve 5), so compare the tile's own output at the generic curve's rows.
+  for (const { water_F } of B.high_capacity.points) {
+    const base = m.computeBaseboardOutput({ water_temp_F: water_F, flow_gpm: 1, length_ft: 1, model: "slant_fin_baseline" }).btu_per_ft;
+    const hi = m.computeBaseboardOutput({ water_temp_F: water_F, flow_gpm: 1, length_ft: 1, model: "high_capacity" }).btu_per_ft;
+    assert.ok(hi >= base,
+      `high-capacity baseboard outputs less than baseline at ${water_F} F: ${hi} < ${base}`);
   }
 });
 

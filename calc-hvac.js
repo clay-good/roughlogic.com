@@ -1494,12 +1494,26 @@ export const geothermalLoopExample = {
 // Manufacturer-attributed BTU-per-foot tables interpolated by water temp.
 
 export const BASEBOARD_OUTPUT = {
+  // Slant/Fin Fine/Line 30 ratings chart, element 30-75, BTU/hr per foot at
+  // 65 F entering air. Until 2026-09-24 this curve was shifted: its 140 and
+  // 160 F values were the chart's 150 and 170 F ratings (380 and ~510), so at
+  // the low water temperatures of reset and condensing systems it overstated
+  // output by 13-19% and a room got too little baseboard.
   slant_fin_baseline: {
-    attribution: "Slant/Fin Fine Line 30 Series technical bulletin (typical 1 gpm)",
+    attribution: "Slant/Fin Fine/Line 30 hot water ratings chart (element 30-75, 65 F entering air)",
     points: [
-      { water_F: 140, btu_per_ft: 380 }, { water_F: 160, btu_per_ft: 510 },
-      { water_F: 180, btu_per_ft: 600 }, { water_F: 200, btu_per_ft: 690 },
-      { water_F: 220, btu_per_ft: 780 },
+      { water_F: 110, btu_per_ft: 160 }, { water_F: 120, btu_per_ft: 210 }, { water_F: 130, btu_per_ft: 260 }, { water_F: 140, btu_per_ft: 320 },
+      { water_F: 150, btu_per_ft: 380 }, { water_F: 160, btu_per_ft: 450 }, { water_F: 170, btu_per_ft: 510 }, { water_F: 180, btu_per_ft: 580 },
+      { water_F: 190, btu_per_ft: 640 }, { water_F: 200, btu_per_ft: 710 }, { water_F: 210, btu_per_ft: 770 }, { water_F: 215, btu_per_ft: 810 },
+      { water_F: 220, btu_per_ft: 840 },
+    ],
+    // The chart's 4 gpm row, which it says to use "only when flow is known to
+    // be equal to or greater than 4 gpm; otherwise, 1 gpm ratings must be used".
+    points_4gpm: [
+      { water_F: 110, btu_per_ft: 160 }, { water_F: 120, btu_per_ft: 220 }, { water_F: 130, btu_per_ft: 270 }, { water_F: 140, btu_per_ft: 340 },
+      { water_F: 150, btu_per_ft: 400 }, { water_F: 160, btu_per_ft: 480 }, { water_F: 170, btu_per_ft: 540 }, { water_F: 180, btu_per_ft: 610 },
+      { water_F: 190, btu_per_ft: 680 }, { water_F: 200, btu_per_ft: 750 }, { water_F: 210, btu_per_ft: 810 }, { water_F: 215, btu_per_ft: 860 },
+      { water_F: 220, btu_per_ft: 890 },
     ],
   },
   high_capacity: {
@@ -1519,7 +1533,11 @@ export function computeBaseboardOutput({ water_temp_F = 0, flow_gpm = 1, length_
   if (!m) return { error: "Unknown baseboard model." };
   if (!(water_temp_F > 0)) return { error: "Water temperature must be positive." };
   if (!(length_ft >= 0)) return { error: "Length must be non-negative." };
-  const pts = m.points;
+  const at4 = Number(flow_gpm) >= 4;
+  const pts = at4 && m.points_4gpm ? m.points_4gpm : m.points;
+  // Below the lowest rated temperature, holding the first row would overstate
+  // the output; the chart does not go lower.
+  if (water_temp_F < pts[0].water_F) return { error: "Average water temperature is below the lowest rated temperature (" + pts[0].water_F + " F) on the " + (m.points_4gpm ? "Slant/Fin chart" : "bundled curve") + "; use the manufacturer's low-temperature data." };
   let btuPerFt;
   if (water_temp_F <= pts[0].water_F) btuPerFt = pts[0].btu_per_ft;
   else if (water_temp_F >= pts[pts.length - 1].water_F) btuPerFt = pts[pts.length - 1].btu_per_ft;
@@ -1532,8 +1550,12 @@ export function computeBaseboardOutput({ water_temp_F = 0, flow_gpm = 1, length_
       }
     }
   }
-  // Flow correction (rough): factor 1.0 at 1 gpm, 1.05 at 4 gpm (manufacturer typical).
-  const flowFactor = 1 + Math.min(Math.max(flow_gpm - 1, 0) * 0.0167, 0.05);
+  // Flow: a rating chart gives a 1 gpm row and a 4 gpm row, and the higher
+  // one applies only at 4 gpm or more (the Slant/Fin chart says so in as many
+  // words). Until 2026-09-24 a bonus ramped in from 1 gpm, up to 5% before the
+  // flow that earns it. The Slant/Fin model reads its 4 gpm row directly; the
+  // generic curve keeps its 5% step.
+  const flowFactor = at4 && !m.points_4gpm ? 1.05 : 1;
   const btu_total = btuPerFt * length_ft * flowFactor;
   return { btu_per_ft: btuPerFt, btu_total, attribution: m.attribution, flow_factor: flowFactor };
 }

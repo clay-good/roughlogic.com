@@ -726,12 +726,12 @@ test("computeBellCurve: bit-stable z-score + percentile at the spec example (x=8
 
 test("computeBaseboardOutput: bit-stable btu_per_ft + btu_total at the slant_fin_baseline 180 F / 1 gpm / 10 ft example", () => {
   // Group C. At 180 F average water temp / 1 gpm / slant_fin_baseline, the
-  // table lookup returns 600 btu/ft; total = 6000 btu (integer, exact
+  // table lookup returns 580 btu/ft; total = 5800 btu (integer, exact
   // IEEE-754). Pins the Slant/Fin Fine Line 30 lookup and the flow factor
   // multiplication chain.
   const r = computeBaseboardOutput({ water_temp_F: 180, flow_gpm: 1, length_ft: 10, model: "slant_fin_baseline" });
-  assert.equal(bits(r.btu_per_ft), "4082c00000000000", `btu_per_ft=${r.btu_per_ft}`);
-  assert.equal(bits(r.btu_total), "40b7700000000000", `btu_total=${r.btu_total}`);
+  assert.equal(bits(r.btu_per_ft), "4082200000000000", `btu_per_ft=${r.btu_per_ft}`);
+  assert.equal(bits(r.btu_total), "40b6a80000000000", `btu_total=${r.btu_total}`);
 });
 
 // --- Phase E ratchet 2026-05-25 (third batch): five more closed-form pins ---

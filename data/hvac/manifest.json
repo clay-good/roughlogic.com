@@ -44,7 +44,7 @@
     {
       "file": "baseboard-output.json",
       "name": "Hydronic baseboard BTU/ft (manufacturer-attributed)",
-      "gzip_size_bytes": 322
+      "gzip_size_bytes": 488
     },
     {
       "file": "geothermal-soil.json",
@@ -80,7 +80,7 @@
     "equivalent-lengths.json": "af8029560010b2b78098f7e5bc5f058605d7d79b32ffdc0022c918d716095d41",
     "insulation.json": "efe3fdaaf22beec61ab882f3583c417d6fc0c768fd3ad0432ee6864a75a5c66a",
     "affinity-laws.json": "659a61a606e177826aa90f2f26159b1640e35e5376ce5109ae2d0745043ff492",
-    "baseboard-output.json": "7208d9ea6ed0215d1417cfa36de4e18c239c603241019cb452ee2a024d14e07b",
+    "baseboard-output.json": "20eae7b39789c849b2fce7f1045c2db61663992956250e0e8c4a25c758af3567",
     "geothermal-soil.json": "11da9b836cc79aeb7e9caa70031c5b9f12b99ef71e7730f860ff66de6b6af4ae",
     "duct-roughness.json": "2d2a810a36408889fd872a49edd9133fa5a773ac68a277b156dc60ce77beeae4",
     "duct-fittings.json": "a55e7eddff68eb4ae21bbca54f65d4af7e2753c8c9c30b13e58608e87aeab38a",

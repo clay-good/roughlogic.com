@@ -7797,9 +7797,9 @@
    "source_publisher": "Slant/Fin",
    "source_title": "Slant/Fin Fine Line 30 Series technical bulletin: BTU/ft at design water temperature and 1 gpm flow",
    "source_edition_or_year": "Manufacturer technical bulletin",
-   "source_section_or_page": "180 F water / 1 gpm / 8 ft of Slant/Fin Fine Line 30 -> 600 BTU/ft, 4800 BTU/hr total output",
+   "source_section_or_page": "180 F water / 1 gpm / 8 ft of Slant/Fin Fine/Line 30 -> 580 BTU/ft (ratings chart), 4,640 BTU/hr total output",
    "verified_by": "rl",
-   "verified_on": "2026-05-11",
+   "verified_on": "2026-09-24",
    "inputs": {
     "water_temp_F": 180,
     "flow_gpm": 1,
@@ -7808,13 +7808,13 @@
    },
    "outputs": {
     "btu_per_ft": {
-     "value": 600,
+     "value": 580,
      "tolerance": {
       "abs": 5
      }
     },
     "btu_total": {
-     "value": 4800,
+     "value": 4640,
      "tolerance": {
       "abs": 25
      }
@@ -7826,9 +7826,9 @@
    "source_publisher": "Slant/Fin (inverse)",
    "source_title": "length = target_load / (btu_per_ft x flow_factor)",
    "source_edition_or_year": "spec-v685 worked example (machine-verified)",
-   "source_section_or_page": "4,800 BTU/hr, 180 F water, 1 gpm, Fine Line 30 (600 BTU/ft) -> 8 ft (round-trips baseboard-output)",
+   "source_section_or_page": "4,800 BTU/hr, 180 F water, 1 gpm, Fine/Line 30 (580 BTU/ft on the ratings chart) -> 8.28 ft (round-trips baseboard-output)",
    "verified_by": "rl",
-   "verified_on": "2026-07-13",
+   "verified_on": "2026-09-24",
    "inputs": {
     "target_btuhr": 4800,
     "water_temp_F": 180,
@@ -7837,7 +7837,7 @@
    },
    "outputs": {
     "length_ft": {
-     "value": 8,
+     "value": 8.28,
      "tolerance": {
       "abs": 0.05
      }
@@ -7849,9 +7849,9 @@
    "source_publisher": "Slant/Fin (inverse)",
    "source_title": "cross-check: hotter 200 F water (690 BTU/ft) shortens the run for the same load",
    "source_edition_or_year": "spec-v685 cross-check (machine-verified)",
-   "source_section_or_page": "4,800 BTU/hr at 200 F -> about 7.0 ft (hotter water, shorter baseboard)",
+   "source_section_or_page": "4,800 BTU/hr at 200 F (710 BTU/ft on the ratings chart) -> about 6.8 ft (hotter water, shorter baseboard)",
    "verified_by": "rl",
-   "verified_on": "2026-07-13",
+   "verified_on": "2026-09-24",
    "inputs": {
     "target_btuhr": 4800,
     "water_temp_F": 200,
@@ -7860,7 +7860,7 @@
    },
    "outputs": {
     "length_ft": {
-     "value": 6.96,
+     "value": 6.76,
      "tolerance": {
       "abs": 0.05
      }

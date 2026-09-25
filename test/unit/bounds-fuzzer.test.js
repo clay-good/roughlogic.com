@@ -7450,15 +7450,19 @@ test("bounds: calc-hvac computeGeothermalLoop pins length_ft = max(heating, cool
   assert.ok("error" in computeGeothermalLoop({ heating_btu: 0, cooling_btu: 0, soil: "clay", loop_type: "vertical" }));
 });
 
-test("bounds: calc-hvac computeBaseboardOutput interpolates Slant/Fin Fine Line 30 at 180 F = 600 BTU/ft, total = btu_per_ft * length * flow_factor", () => {
+test("bounds: calc-hvac computeBaseboardOutput reads Slant/Fin Fine/Line 30 at 180 F = 580 BTU/ft, total = btu_per_ft * length * flow_factor", () => {
   const r = computeBaseboardOutput({ water_temp_F: 180, flow_gpm: 1, length_ft: 8, model: "slant_fin_baseline" });
-  assert.strictEqual(r.btu_per_ft, 600);
+  assert.strictEqual(r.btu_per_ft, 580);
   assert.strictEqual(r.flow_factor, 1);
-  assert.strictEqual(r.btu_total, 4800);
+  assert.strictEqual(r.btu_total, 4640);
   assert.ok(/Slant\/Fin/.test(r.attribution));
-  // Flow correction at 4 gpm = +5 %.
+  // At 4 gpm the chart's own 4 gpm row applies (610), not a factor on the 1 gpm row.
   const high_flow = computeBaseboardOutput({ water_temp_F: 180, flow_gpm: 4, length_ft: 8, model: "slant_fin_baseline" });
-  assert.ok(Math.abs(high_flow.flow_factor - 1.05) < 1e-9);
+  assert.strictEqual(high_flow.btu_per_ft, 610);
+  assert.strictEqual(high_flow.flow_factor, 1);
+  // The generic curve keeps a 5% step at 4 gpm, and nothing below it.
+  assert.ok(Math.abs(computeBaseboardOutput({ water_temp_F: 180, flow_gpm: 4, length_ft: 8, model: "high_capacity" }).flow_factor - 1.05) < 1e-9);
+  assert.strictEqual(computeBaseboardOutput({ water_temp_F: 180, flow_gpm: 3, length_ft: 8, model: "high_capacity" }).flow_factor, 1);
   // Rejections.
   assert.ok("error" in computeBaseboardOutput({ water_temp_F: 180, flow_gpm: 1, length_ft: 8, model: "bogus" }));
   assert.ok("error" in computeBaseboardOutput({ water_temp_F: 0, flow_gpm: 1, length_ft: 8, model: "slant_fin_baseline" }));
@@ -7466,10 +7470,10 @@ test("bounds: calc-hvac computeBaseboardOutput interpolates Slant/Fin Fine Line 
 });
 
 test("bounds: spec-v685 computeBaseboardLengthForLoad pins length = target/(btu_per_ft*flow_factor), round-trips through computeBaseboardOutput, and error seams", () => {
-  const r = computeBaseboardLengthForLoad({ target_btuhr: 4800, water_temp_F: 180, flow_gpm: 1, model: "slant_fin_baseline" });
+  const r = computeBaseboardLengthForLoad({ target_btuhr: 4640, water_temp_F: 180, flow_gpm: 1, model: "slant_fin_baseline" });
   assert.ok(!r.error, JSON.stringify(r));
   assert.ok(Math.abs(r.length_ft - 8) < 1e-9, `length identity: ${r.length_ft}`);
-  assert.strictEqual(r.btu_per_ft, 600);
+  assert.strictEqual(r.btu_per_ft, 580);
   // Hotter water raises btu/ft and shortens the run.
   const hot = computeBaseboardLengthForLoad({ target_btuhr: 4800, water_temp_F: 200, flow_gpm: 1, model: "slant_fin_baseline" });
   assert.ok(hot.length_ft < r.length_ft, `hotter shorter: ${hot.length_ft}`);
