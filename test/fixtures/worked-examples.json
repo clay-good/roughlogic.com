@@ -95,6 +95,68 @@
    }
   },
   {
+   "tile_id": "voltage-drop",
+   "source_publisher": "Mike Holt Enterprises",
+   "source_title": "Single-phase example: No. 6 copper, 44 A, 240 V load 160 ft from the panelboard -> 6.9 V (2.9%), 233.1 V at the load",
+   "source_edition_or_year": "Mike Holt, Voltage Drop Calculations (Part One), mikeholt.com; K method with NEC Chapter 9 Table 8 circular mils",
+   "source_section_or_page": "VD = 2 x 12.9 x 44 A x 160 ft / 26,240 cmil = 6.9 V; operating voltage 240 - 6.9 = 233.1 V",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "phase": "single",
+    "material": "copper",
+    "awg": "6",
+    "length_ft": 160,
+    "current_A": 44,
+    "source_voltage_V": 240
+   },
+   "outputs": {
+    "drop_V": {
+     "value": 6.9,
+     "tolerance": {
+      "abs": 0.05
+     }
+    },
+    "voltage_at_load_V": {
+     "value": 233.1,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "voltage-drop",
+   "source_publisher": "Mike Holt Enterprises",
+   "source_title": "Three-phase example: No. 1 aluminum, 36 kVA at 208 V (100 A) 80 ft from the panelboard -> 3.5 V (1.7%), 204.5 V at the load",
+   "source_edition_or_year": "Mike Holt, Voltage Drop Calculations (Part One), mikeholt.com; K method with NEC Chapter 9 Table 8 circular mils",
+   "source_section_or_page": "VD = 1.732 x 21.2 x 100 A x 80 ft / 83,690 cmil = 3.5 V; operating voltage 208 - 3.5 = 204.5 V",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "phase": "three",
+    "material": "aluminum",
+    "awg": "1",
+    "length_ft": 80,
+    "current_A": 100,
+    "source_voltage_V": 208
+   },
+   "outputs": {
+    "drop_V": {
+     "value": 3.5,
+     "tolerance": {
+      "abs": 0.05
+     }
+    },
+    "voltage_at_load_V": {
+     "value": 204.5,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
    "tile_id": "concrete",
    "source_publisher": "Project (first-principles)",
    "source_title": "Concrete slab volume = L * W * thickness / 27 with waste factor",
@@ -5047,6 +5109,48 @@
     },
     "optional_demand_a": {
      "value": 123.67,
+     "tolerance": {
+      "pct": 0.1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "service-load-optional",
+   "source_publisher": "IAEI Magazine (International Association of Electrical Inspectors)",
+   "source_title": "Residential Service Calculations in the National Electrical Code: 2,900 ft^2 dwelling, optional method totals 34,160 VA / 142 A",
+   "source_edition_or_year": "IAEI Magazine, May/June 2013 (NEC 220.82 optional method, arithmetic unchanged through NEC 2023)",
+   "source_section_or_page": "Table 2: 2,900 ft^2 x 3 VA + 4 small-appliance + 1 laundry circuits + 11 kW range, 8 kW hot tub, 7.2 kW EV charger, 5 kW dryer, 0.8 kW disposal, 1.5 kW microwave, 1.2 kW dishwasher, 4.5 kW water heater = 55,400 VA general; 10,000 + 40% x 45,400 = 28,160; + 6,000 VA AC (gas heat) = 34,160 VA, 142 A",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "area_ft2": 2900,
+    "small_appliance_circuits": 4,
+    "laundry_circuits": 1,
+    "fixed_appliances_kw": 11.5,
+    "range_kw": 11,
+    "dryer_kw": 5,
+    "water_heater_kw": 4.5,
+    "hvac_heating_kw": 0,
+    "hvac_cooling_kw": 6,
+    "ev_charger_a": 30,
+    "service_voltage": 240
+   },
+   "outputs": {
+    "general_demand_va": {
+     "value": 28160,
+     "tolerance": {
+      "abs": 1
+     }
+    },
+    "optional_total_va": {
+     "value": 34160,
+     "tolerance": {
+      "abs": 1
+     }
+    },
+    "optional_demand_a": {
+     "value": 142.33,
      "tolerance": {
       "pct": 0.1
      }
