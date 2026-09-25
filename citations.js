@@ -11355,12 +11355,12 @@ export const CITATIONS = {
   },
   "log-limb-weight": {
     formula: "volume = (pi/3) x length x (r1^2 + r1 r2 + r2^2) with r = dia/24 (frustum; cylinder when butt = top); weight = volume x green density.",
-    edition: "USDA Forest Products Laboratory Wood Handbook green density by species by name; first-principles frustum volume.",
-    freeAccess: "The FPL Wood Handbook is free (US government). The frustum volume is public geometry.",
+    edition: "USDA Forest Products Laboratory Technical Note 218, Weights of Various Woods Grown in the United States (green column); first-principles frustum volume.",
+    freeAccess: "FPL Technical Note 218 is free at fpl.fs.usda.gov (US government). The frustum volume is public geometry.",
     governance: GOVERNANCE.general,
-    editionNote: "Green density varies with species, moisture, and season; the bundled values are representative, not exact - weigh or conservatively over-estimate. A tapered frustum is lighter than a cylinder of the butt diameter, so a cylinder estimate is the safe side. This is the static load that tree-rigging-shock multiplies.",
+    editionNote: "Green density varies with species, moisture, and season; the bundled values are FPL Technical Note 218's green weights, which it cautions can be off by as much as 20% - weigh or conservatively over-estimate. A tapered frustum is lighter than a cylinder of the butt diameter, so a cylinder estimate is the safe side. This is the static load that tree-rigging-shock multiplies.",
     assumptions: [
-      { name: "Green density", value: "FPL green density by species (red oak 64, white pine 36, generic hardwood 58, etc., lb/ft^3)", source: "USDA FPL Wood Handbook" },
+      { name: "Green density", value: "TN-218 green weights (red oak 63, coast Douglas-fir 38, slash pine 56, eastern white pine 36, etc., lb/ft^3); generic hardwood 58 and softwood 45 are round figures", source: "USDA FPL Technical Note 218" },
     ],
   },
   "tree-rigging-shock": {
@@ -11406,12 +11406,12 @@ export const CITATIONS = {
   },
   "crown-pruning-dose": {
     formula: "removal_pct = removed_foliage / live_foliage x 100; cap_pct = mature 25 / young 15 / over-mature 10 / stressed 0; within when removal_pct <= cap_pct.",
-    edition: "The ANSI A300 Part 1 live-crown removal limit (ISA Best Management Practices - Pruning), by name.",
+    edition: "ANSI A300 Part 1 5.5.3 (not more than 25% of the foliage in an annual growing season, adjusted for species, age, health and site) and ISA Best Management Practices - Pruning, by name.",
     freeAccess: "The A300 removal-limit percentages are published arboricultural practice; a qualified arborist governs the actual dose.",
     governance: GOVERNANCE.general,
-    editionNote: "The 25% ceiling is the mature-tree maximum in a single season, not a target, and it drops for young (~15%), over-mature (~10%), or stressed (0%) trees - a stressed tree should not have live foliage removed until it recovers; lion's-tailing (stripping interior foliage, leaving tufts at the branch ends) violates A300 even when the total removed is under the percent cap; removing too much live foliage starves the tree. A planning aid, not an arborist's prescription.",
+    editionNote: "The 25% ceiling (A300 Part 1 5.5.3) is a maximum for one growing season, not a target. A300 says to adjust it for species, age, health and site but gives no other numbers; the young (15%), over-mature (10%) and stressed (0%) caps are this tile's conservative adjustments - a stressed tree should not have live foliage removed until it recovers; lion's-tailing (stripping interior foliage, leaving tufts at the branch ends) violates A300 even when the total removed is under the percent cap; removing too much live foliage starves the tree. A planning aid, not an arborist's prescription.",
     assumptions: [
-      { name: "Class caps", value: "mature <= 25% single season, young ~15%, over-mature ~10%, stressed 0%", source: "ANSI A300 Part 1" },
+      { name: "Class caps", value: "mature <= 25% single season (A300); young 15%, over-mature 10%, stressed 0% are conservative planning adjustments", source: "ANSI A300 Part 1 5.5.3 / project adjustment" },
       { name: "Lion's-tailing", value: "stripping interior foliage violates A300 even under the percent cap", source: "ISA BMP - Pruning" },
     ],
   },

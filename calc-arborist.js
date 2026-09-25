@@ -101,10 +101,16 @@ export const ARBORIST_RENDERERS = {};
 // --- log-limb-weight: Green Log and Limb Weight ---
 //
 // Frustum volume (cylinder when butt = top) times a bundled green density.
+// Green weights (lb/ft^3) from FPL Technical Note 218, read 2026-09-24: red oak
+// (Q. borealis) 63, white oak 62, sugar maple 56, white ash 48, American elm 54,
+// shagbark / mockernut / pignut hickory 64, coast Douglas-fir 38, slash pine 56
+// (the heaviest southern pine; loblolly 54, longleaf and shortleaf 51), eastern
+// white pine 36, eastern cottonwood 49. The Wood Handbook it was credited to has
+// no green-weight table. Generic rows are this project's round figures.
 // Helpers above the dims block so the v14 lint associates the annotation.
 const GREEN_DENSITY = {
-  red_oak: 64, white_oak: 62, sugar_maple: 58, ash: 48, elm: 54, hickory: 63,
-  douglas_fir: 44, southern_pine: 52, eastern_white_pine: 36, cottonwood: 49,
+  red_oak: 63, white_oak: 62, sugar_maple: 56, ash: 48, elm: 54, hickory: 64,
+  douglas_fir: 38, southern_pine: 56, eastern_white_pine: 36, cottonwood: 49,
   generic_hardwood: 58, generic_softwood: 45,
 };
 // dims: in { butt_dia_in: L, top_dia_in: L, length_ft: L, species: dimensionless } out: { volume_ft3: L^3, weight_lb: M L T^-2, density: M L^-3 }
@@ -128,20 +134,20 @@ export function computeLogLimbWeight({ butt_dia_in, top_dia_in, length_ft, speci
     volume_ft3: volumeFt3,
     weight_lb: weightLb,
     density: dens,
-    note: "Green density varies with species, moisture, and season; the bundled values are representative, not exact - weigh or conservatively over-estimate. A tapered frustum is lighter than a cylinder of the butt diameter, so a cylinder estimate is the safe side. Included water makes fresh wood far heavier than seasoned. This is the static load that tree-rigging-shock multiplies when the piece is dropped.",
+    note: "Green density varies with species, moisture, and season; the bundled values are FPL Technical Note 218's green weights, which it says can be off by as much as 20% for a given piece - weigh or conservatively over-estimate. A tapered frustum is lighter than a cylinder of the butt diameter, so a cylinder estimate is the safe side. Included water makes fresh wood far heavier than seasoned. This is the static load that tree-rigging-shock multiplies when the piece is dropped.",
   };
 }
 
 function _v68renderLogLimbWeight(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: USDA FPL Wood Handbook green density by species by name. Frustum volume = (pi/3) x length x (r1^2 + r1 r2 + r2^2); weight = volume x green density. Weigh or over-estimate when in doubt.";
+  citationEl.textContent = "Citation: USDA Forest Products Laboratory Technical Note 218, Weights of Various Woods Grown in the United States (green column); the generic rows are round figures. Frustum volume = (pi/3) x length x (r1^2 + r1 r2 + r2^2); weight = volume x green density. Weigh or over-estimate when in doubt.";
   const butt = makeNumber("Butt (large end) diameter (in)", "ll-butt", { step: "any", min: "0" });
   const top = makeNumber("Top (small end) diameter (in)", "ll-top", { step: "any", min: "0" });
   const length = makeNumber("Length (ft)", "ll-len", { step: "any", min: "0" });
   const species = makeSelect("Species (green density)", "ll-sp", [
-    { value: "red_oak", label: "Red oak (64)", selected: true }, { value: "white_oak", label: "White oak (62)" },
-    { value: "sugar_maple", label: "Sugar maple (58)" }, { value: "ash", label: "Ash (48)" }, { value: "elm", label: "Elm (54)" },
-    { value: "hickory", label: "Hickory (63)" }, { value: "douglas_fir", label: "Douglas-fir (44)" },
-    { value: "southern_pine", label: "Southern pine (52)" }, { value: "eastern_white_pine", label: "Eastern white pine (36)" },
+    { value: "red_oak", label: "Red oak (63)", selected: true }, { value: "white_oak", label: "White oak (62)" },
+    { value: "sugar_maple", label: "Sugar maple (56)" }, { value: "ash", label: "Ash (48)" }, { value: "elm", label: "Elm (54)" },
+    { value: "hickory", label: "Hickory (64)" }, { value: "douglas_fir", label: "Douglas-fir, coast (38)" },
+    { value: "southern_pine", label: "Southern pine, slash (56)" }, { value: "eastern_white_pine", label: "Eastern white pine (36)" },
     { value: "cottonwood", label: "Cottonwood (49)" }, { value: "generic_hardwood", label: "Generic hardwood (58)" },
     { value: "generic_softwood", label: "Generic softwood (45)" },
   ]);
@@ -818,7 +824,9 @@ function _v608renderTreeCrzEncroachment(inputRegion, outputRegion, citationEl) {
 ARBORIST_RENDERERS["tree-crz-encroachment"] = _v608renderTreeCrzEncroachment;
 
 // --- spec-v567 L: Live crown removal limit / pruning dose (ANSI A300 Part 1) ---
-// removal_pct = removed / live x 100. cap: mature 25, young 15, over-mature 10, stressed 0.
+// removal_pct = removed / live x 100. ANSI A300 Part 1 (2001) 5.5.3 sets one ceiling, 25% of the
+// foliage in a growing season, to be adjusted for species, age, health and site. The young 15,
+// over-mature 10 and stressed 0 caps are this tile's conservative adjustments, not A300 values.
 const _CROWN_CAP_PCT = { young: 15, mature: 25, "over-mature": 10, stressed: 0 };
 // dims: in { live_foliage: dimensionless, removed_foliage: dimensionless, maturity_class: dimensionless } out: { removal_pct: dimensionless, cap_pct: dimensionless }
 export function computeCrownPruningDose({ live_foliage = 0, removed_foliage = 0, maturity_class = "mature" } = {}) {
@@ -834,13 +842,13 @@ export function computeCrownPruningDose({ live_foliage = 0, removed_foliage = 0,
   if (!Number.isFinite(removal_pct)) return { error: "Pruning-dose math is not a finite value." };
   return {
     removal_pct, cap_pct, within, maturity_class,
-    note: "The 25% ceiling is the mature-tree maximum in a single season, NOT a target, and it drops for young (~15%), over-mature (~10%), or stressed (0%) trees - a stressed tree should not have live foliage removed until it recovers. Lion's-tailing (stripping interior foliage and leaving tufts at the branch ends) violates ANSI A300 even when the total removed is under the percent cap. Removing too much live foliage starves the tree. A planning aid; a qualified arborist governs.",
+    note: "The 25% ceiling (ANSI A300 Part 1 5.5.3) is a maximum for one growing season, NOT a target. A300 says to adjust it for species, age, health, and site without giving other numbers; the young (15%), over-mature (10%) and stressed (0%) caps here are conservative planning adjustments, not A300 values - a stressed tree should not have live foliage removed until it recovers. Lion's-tailing (stripping interior foliage and leaving tufts at the branch ends) violates ANSI A300 even when the total removed is under the percent cap. Removing too much live foliage starves the tree. A planning aid; a qualified arborist governs.",
   };
 }
 export const crownPruningDoseExample = { inputs: { live_foliage: 100, removed_foliage: 15, maturity_class: "mature" } };
 
 function _v567renderCrownPruningDose(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: ANSI A300 Part 1 live-crown removal limit (ISA Best Management Practices), by name. removal_pct = removed / live x 100, compared to the class cap: mature <= 25% in a single season, young ~15%, over-mature ~10%, stressed 0%. The 25% is the mature maximum, not a target; lion's-tailing violates A300 even under the percent cap. A planning aid; a qualified arborist governs.";
+  citationEl.textContent = "Citation: ANSI A300 Part 1 5.5.3 (not more than 25% of the foliage in an annual growing season, adjusted for species, age, health and site) and the ISA Best Management Practices, by name. removal_pct = removed / live x 100, compared to the class cap: 25% for a mature tree; the young 15%, over-mature 10% and stressed 0% caps are this tile's conservative adjustments, not A300 values. The 25% is the mature maximum, not a target; lion's-tailing violates A300 even under the percent cap. A planning aid; a qualified arborist governs.";
   const live = makeNumber("Live crown / foliage before pruning (ft² or %)", "cpd-live", { step: "any", min: "0" });
   const removed = makeNumber("Foliage proposed for removal (same units)", "cpd-removed", { step: "any", min: "0" });
   const cls = makeSelect("Maturity class", "cpd-cls", [

@@ -26453,12 +26453,12 @@
   },
   {
    "tile_id": "log-limb-weight",
-   "source_publisher": "USDA FPL Wood Handbook green density",
+   "source_publisher": "USDA FPL Technical Note 218 green weights",
    "source_title": "volume = (pi/3) x length x (r1^2 + r1 r2 + r2^2); weight = volume x green density",
-   "source_edition_or_year": "USDA FPL Wood Handbook",
-   "source_section_or_page": "16 in butt / 16 in top, 8 ft red oak (density 64) -> 11.17 ft^3, 715 lb",
+   "source_edition_or_year": "FPL Technical Note 218, Weights of Various Woods Grown in the United States",
+   "source_section_or_page": "16 in butt / 16 in top, 8 ft red oak (Q. borealis, 63 lb/ft^3 green) -> 11.17 ft^3, 704 lb",
    "verified_by": "rl",
-   "verified_on": "2026-06-13",
+   "verified_on": "2026-09-24",
    "inputs": {
     "butt_dia_in": 16,
     "top_dia_in": 16,
@@ -26473,7 +26473,7 @@
      }
     },
     "weight_lb": {
-     "value": 715,
+     "value": 703.7,
      "tolerance": {
       "abs": 1
      }

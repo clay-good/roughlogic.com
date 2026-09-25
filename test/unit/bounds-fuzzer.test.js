@@ -12223,10 +12223,12 @@ import {
   computePortaWrapFriction as _v68d, computeChipperDebris as _v68e,
 } from "../../calc-arborist.js";
 test("bounds: calc-arborist v68 arborist tiles pin green weight, shock load, hinge, friction, and chip volume", () => {
-  // log-limb-weight: 16/16 red oak 8 ft -> 11.17 ft^3, 715 lb
+  // log-limb-weight: 16/16 red oak 8 ft -> 11.17 ft^3 x 63 lb/ft^3 (FPL TN-218) = 704 lb
   const ll = _v68a({ butt_dia_in: 16, top_dia_in: 16, length_ft: 8, species: "red_oak" });
   assert.ok(Math.abs(ll.volume_ft3 - 11.17) < 0.02);
-  assert.ok(Math.abs(ll.weight_lb - 715) < 1);
+  assert.ok(Math.abs(ll.weight_lb - 703.7) < 1);
+  // TN-218 green weights: coast Douglas-fir 38, slash pine 56, shagbark hickory 64.
+  for (const [sp, d] of [["douglas_fir", 38], ["southern_pine", 56], ["hickory", 64], ["sugar_maple", 56]]) assert.strictEqual(_v68a({ butt_dia_in: 16, top_dia_in: 16, length_ft: 8, species: sp }).density, d, sp);
   assert.ok(Math.abs(_v68a({ butt_dia_in: 20, top_dia_in: 10, length_ft: 10, species: "eastern_white_pine" }).weight_lb - 458) < 1); // taper
   assert.ok("error" in _v68a({ butt_dia_in: 0, top_dia_in: 16, length_ft: 8 }));
   assert.ok("error" in _v68a({ butt_dia_in: 16, top_dia_in: 16, length_ft: 0 }));

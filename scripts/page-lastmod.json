@@ -1902,8 +1902,8 @@
       "date": "2026-09-01"
     },
     "/tools/crown-pruning-dose/": {
-      "sha": "70e05655f0267624",
-      "date": "2026-09-01"
+      "sha": "3beae6dc55354ea5",
+      "date": "2026-09-25"
     },
     "/tools/crown-reduction-leaf-area/": {
       "sha": "a819bc10633e1116",
@@ -4266,8 +4266,8 @@
       "date": "2026-09-05"
     },
     "/tools/log-limb-weight/": {
-      "sha": "76807d2ccf42cbc9",
-      "date": "2026-09-01"
+      "sha": "ffde6f741d0414f0",
+      "date": "2026-09-25"
     },
     "/tools/log-truck-payload/": {
       "sha": "fd7bae174a52713f",
