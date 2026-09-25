@@ -19210,6 +19210,68 @@
    }
   },
   {
+   "tile_id": "bolt-proof-load",
+   "source_publisher": "SAE",
+   "source_title": "SAE J429, Mechanical and Material Requirements for Externally Threaded Fasteners",
+   "source_edition_or_year": "JAN1999",
+   "source_section_or_page": "Table 5: 1/2-13 (0.1419 in^2) Grade 5 proof 12,100 lb, tensile 17,000 lb (printed to 100 lb)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "nominal_diameter_in": 0.5,
+    "threads_per_inch": 13,
+    "grade": "5"
+   },
+   "outputs": {
+    "at_in2": {
+     "value": 0.1419,
+     "tolerance": {
+      "abs": 5e-05
+     }
+    },
+    "proof_load_lb": {
+     "value": 12100,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "tensile_load_lb": {
+     "value": 17000,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "bolt-proof-load",
+   "source_publisher": "SAE",
+   "source_title": "SAE J429, Mechanical and Material Requirements for Externally Threaded Fasteners",
+   "source_edition_or_year": "JAN1999",
+   "source_section_or_page": "Table 5: 3/4-10 (0.334 in^2) Grade 8 proof 40,100 lb, tensile 50,100 lb",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "nominal_diameter_in": 0.75,
+    "threads_per_inch": 10,
+    "grade": "8"
+   },
+   "outputs": {
+    "proof_load_lb": {
+     "value": 40100,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "tensile_load_lb": {
+     "value": 50100,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
    "tile_id": "machining-time",
    "source_publisher": "First-principles cutting time + Machinery's Handbook",
    "source_title": "feed_IPM = RPM x IPR; t = L / feed_IPM; total = t x passes",
@@ -29930,6 +29992,28 @@
    }
   },
   {
+   "tile_id": "engine-bmep",
+   "source_publisher": "EPI Inc.",
+   "source_title": "BMEP: Performance Yardstick",
+   "source_edition_or_year": "web article",
+   "source_section_or_page": "BMEP (psi) = 150.8 x torque / displacement: 242 lb-ft from 171 CID -> 213 PSI",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "torque_lb_ft": 242,
+    "displacement_cid": 171,
+    "cycle_type": "four_stroke"
+   },
+   "outputs": {
+    "bmep_psi": {
+     "value": 213,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
    "tile_id": "sacrificial-anode-life",
    "source_publisher": "Sacrificial-anode life by Faraday's law (ABYC E-2; DNV-RP-B401)",
    "source_title": "life = anode_mass x capacity x utilization / (current x 8760 h)",
@@ -31080,6 +31164,36 @@
    }
   },
   {
+   "tile_id": "control-joint-spacing",
+   "source_publisher": "NRMCA",
+   "source_title": "CIP 6, Joints in Concrete Slabs on Grade",
+   "source_edition_or_year": "2014 revision",
+   "source_section_or_page": "a 4-inch slab: joint spacing about 10 feet; sawcut at least 1/4 of the thickness, not less than 1 inch",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "slab_thickness_in": 4,
+    "spacing_factor": 2.5,
+    "max_spacing_ft": 18,
+    "slab_length_ft": 40,
+    "slab_width_ft": 24
+   },
+   "outputs": {
+    "spacing_ft": {
+     "value": 10,
+     "tolerance": {
+      "abs": 0.05
+     }
+    },
+    "depth_in": {
+     "value": 1,
+     "tolerance": {
+      "abs": 0.005
+     }
+    }
+   }
+  },
+  {
    "tile_id": "rebar-lap-splice",
    "source_publisher": "ACI 318 development-and-splice basis (Class B tension lap ~1.3 x development length, by name).",
    "source_title": "Lap = max(lap factor x bar diameter, 12 in); db from the #3..#11 table (bar number / 8 in for #3..#8).",
@@ -31103,6 +31217,50 @@
      "value": 30,
      "tolerance": {
       "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "rebar-lap-splice",
+   "source_publisher": "CMACN Masonry Chronicles (Huang and Ekwueme)",
+   "source_title": "Lap Splice Lengths for Reinforcing Bars, Table 1",
+   "source_edition_or_year": "Summer 2008 (2006 IBC ASD)",
+   "source_section_or_page": "48 db column: #5 30 in., #8 48 in.",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "bar_size": "#8",
+    "lap_factor": 48,
+    "min_lap_in": 12
+   },
+   "outputs": {
+    "lap_in": {
+     "value": 48,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "rebar-lap-splice",
+   "source_publisher": "CMACN Masonry Chronicles (Huang and Ekwueme)",
+   "source_title": "Lap Splice Lengths for Reinforcing Bars, Table 1",
+   "source_edition_or_year": "Summer 2008 (2006 IBC ASD)",
+   "source_section_or_page": "48 db column: #5 30 in.",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "bar_size": "#5",
+    "lap_factor": 48,
+    "min_lap_in": 12
+   },
+   "outputs": {
+    "lap_in": {
+     "value": 30,
+     "tolerance": {
+      "abs": 0.05
      }
     }
    }
@@ -31315,6 +31473,29 @@
      "value": 2,
      "tolerance": {
       "abs": 0
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "gutter-downspout",
+   "source_publisher": "Berger Building Products (reproducing SMACNA ASMM Table 1-1)",
+   "source_title": "Proper Gutter and Downspout Sizing",
+   "source_edition_or_year": "July 2007",
+   "source_section_or_page": "sample problem: 8,500 ft^2 plan area, 6 in./ft slope, factor 1.10 -> design area 9,350 ft^2",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "roof_area_sqft": 8500,
+    "pitch_factor": "1.10",
+    "rainfall_in_hr": 5,
+    "downspout_sqin": 12
+   },
+   "outputs": {
+    "adjusted_area": {
+     "value": 9350,
+     "tolerance": {
+      "abs": 0.5
      }
     }
    }
@@ -32723,6 +32904,50 @@
    }
   },
   {
+   "tile_id": "grounding-electrode-conductor",
+   "source_publisher": "IAEI Magazine (Keith Lofland)",
+   "source_title": "Sizing of Conductors Related to Grounding & Bonding",
+   "source_edition_or_year": "March 1, 2021 (2020 NEC)",
+   "source_section_or_page": "Table 250.66: 3/0 AWG copper service conductors -> minimum 4 AWG copper GEC",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "service_kcmil": 167.8,
+    "material": "copper",
+    "electrode_type": "water-pipe"
+   },
+   "outputs": {
+    "required_gec": {
+     "value": "4",
+     "tolerance": {
+      "abs": 0
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "grounding-electrode-conductor",
+   "source_publisher": "IAEI Magazine (Keith Lofland)",
+   "source_title": "Sizing of Conductors Related to Grounding & Bonding",
+   "source_edition_or_year": "March 1, 2021 (2020 NEC)",
+   "source_section_or_page": "Table 250.66: 500 kcmil copper -> 1/0 copper GEC",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "service_kcmil": 500,
+    "material": "copper",
+    "electrode_type": "water-pipe"
+   },
+   "outputs": {
+    "required_gec": {
+     "value": "1/0",
+     "tolerance": {
+      "abs": 0
+     }
+    }
+   }
+  },
+  {
    "tile_id": "bonding-jumper",
    "source_publisher": "NFPA",
    "source_title": "NEC Table 250.66 supply-side bonding jumper",
@@ -32783,6 +33008,72 @@
    "outputs": {
     "required_jumper": {
      "value": "3",
+     "tolerance": {
+      "abs": 0
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "bonding-jumper",
+   "source_publisher": "IAEI Magazine (Keith Lofland)",
+   "source_title": "Sizing of Conductors Related to Grounding & Bonding",
+   "source_edition_or_year": "March 1, 2021 (2020 NEC)",
+   "source_section_or_page": "Table 250.102(C)(1): 250 kcmil copper -> 2 AWG copper supply-side bonding jumper",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "mode": "supply-side",
+    "material": "copper",
+    "service_kcmil": 250
+   },
+   "outputs": {
+    "required_jumper": {
+     "value": "2",
+     "tolerance": {
+      "abs": 0
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "bonding-jumper",
+   "source_publisher": "IAEI Magazine (Keith Lofland)",
+   "source_title": "Sizing of Conductors Related to Grounding & Bonding",
+   "source_edition_or_year": "March 1, 2021 (2020 NEC)",
+   "source_section_or_page": "12.5% rule: 10 x 500 kcmil = 5,000,000 cmil x 0.125 = 625,000 cmil -> 700 kcmil copper",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "mode": "supply-side",
+    "material": "copper",
+    "service_kcmil": 5000
+   },
+   "outputs": {
+    "required_jumper": {
+     "value": "700",
+     "tolerance": {
+      "abs": 0
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "bonding-jumper",
+   "source_publisher": "Mike Holt Enterprises",
+   "source_title": "Understanding the 2020 NEC Requirements for Bonding and Grounding, 250.102",
+   "source_edition_or_year": "2020 NEC",
+   "source_section_or_page": "Example A: 400 kcmil per raceway -> 1/0 AWG; Example B: 3 x 400 = 1,200 kcmil x 12.5% = 150,000 cmil -> 3/0 AWG",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "mode": "supply-side",
+    "material": "copper",
+    "service_kcmil": 1200
+   },
+   "outputs": {
+    "required_jumper": {
+     "value": "3/0",
      "tolerance": {
       "abs": 0
      }
@@ -33363,6 +33654,29 @@
      "value": 100000,
      "tolerance": {
       "abs": 0
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "gas-altitude-derate",
+   "source_publisher": "ACHR News",
+   "source_title": "Selecting Heating, Cooling Units for High-Altitude Homes",
+   "source_edition_or_year": "March 30, 2009",
+   "source_section_or_page": "80,000 - [80,000 x (4% x 5,000 / 1,000)] = 64,000 Btuh input",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "nameplate_input_btuh": 80000,
+    "elevation_ft": 5000,
+    "derate_pct_per_1000": 4,
+    "threshold_ft": 2000
+   },
+   "outputs": {
+    "derated_input_btuh": {
+     "value": 64000,
+     "tolerance": {
+      "abs": 0.5
      }
     }
    }
@@ -37654,6 +37968,56 @@
    }
   },
   {
+   "tile_id": "manual-d-friction-rate",
+   "source_publisher": "ACCA / Energy Efficiency Partnership",
+   "source_title": "Verifying ACCA Manual D Procedures, Friction Rate Worksheet",
+   "source_edition_or_year": "2012",
+   "source_section_or_page": "ESP 0.70 less 0.50 of device losses = ASP 0.20; TEL 200 ft -> FR = 0.20 x 100 / 200 = 0.10 IWC",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "blower_esp_inwg": 0.7,
+    "component_drop_inwg": 0.5,
+    "tel_ft": 200
+   },
+   "outputs": {
+    "asp_inwg": {
+     "value": 0.2,
+     "tolerance": {
+      "abs": 0.005
+     }
+    },
+    "fr_inwg_100ft": {
+     "value": 0.1,
+     "tolerance": {
+      "abs": 0.005
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "manual-d-friction-rate",
+   "source_publisher": "Shums Coda Associates",
+   "source_title": "Manual D Breakdown",
+   "source_edition_or_year": "October 2025",
+   "source_section_or_page": "ASP 0.29, TEL 190 + 115 = 305 ft -> .29 x 100 / 305 = .095",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "blower_esp_inwg": 0.7,
+    "component_drop_inwg": 0.41,
+    "tel_ft": 305
+   },
+   "outputs": {
+    "fr_inwg_100ft": {
+     "value": 0.095,
+     "tolerance": {
+      "abs": 0.0005
+     }
+    }
+   }
+  },
+  {
    "tile_id": "coil-face-velocity",
    "source_publisher": "coil-selection practice",
    "source_title": "2000 CFM, 24 x 18 coil (3.0 ft^2) -> 667 fpm, carryover risk",
@@ -39198,6 +39562,48 @@
    }
   },
   {
+   "tile_id": "flange-rating",
+   "source_publisher": "Texas Flange (reproducing ASME B16.5)",
+   "source_title": "ASME B16.5 Flange Pressure Ratings and Classes, Material Group 1.1",
+   "source_edition_or_year": "ASME B16.5-2025 as reproduced",
+   "source_section_or_page": "Class 150 at 400 F: 200 psig",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "flange_class": 150,
+    "temp_f": 400
+   },
+   "outputs": {
+    "mawp_psig": {
+     "value": 200,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "flange-rating",
+   "source_publisher": "Texas Flange (reproducing ASME B16.5)",
+   "source_title": "ASME B16.5 Flange Pressure Ratings and Classes, Material Group 1.1",
+   "source_edition_or_year": "ASME B16.5-2025 as reproduced",
+   "source_section_or_page": "Class 300 at 600 F: 570 psig",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "flange_class": 300,
+    "temp_f": 600
+   },
+   "outputs": {
+    "mawp_psig": {
+     "value": 570,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
    "tile_id": "branch-reinforcement",
    "source_publisher": "ASME B31.1 para 104.3.1 area replacement (B31.3 304.3 for process) (by name)",
    "source_title": "NPS 6 Sch 40 run, NPS 2 Sch 40 branch at 90 deg, t_rh 0.10, 12.5% mill tolerance -> A_req 0.211 in^2, run excess A1 0.305 alone covers it, no pad",
@@ -39846,6 +40252,56 @@
    }
   },
   {
+   "tile_id": "conductor-short-circuit-withstand",
+   "source_publisher": "Cooper Bussmann (hosted by Mike Holt)",
+   "source_title": "Conductor Short-Circuit Protection",
+   "source_edition_or_year": "revised August 30, 2002",
+   "source_section_or_page": "Table 3 (75 to 250 C, Soares annealing), 6 AWG (26,240 cmil): 6 cycles 6,313 A; 1 cycle 15,464 A",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "area_cmil": 26240,
+    "fault_current_a": 10000,
+    "clearing_time_s": 0.1,
+    "material": "copper",
+    "t_initial_c": 75,
+    "t_final_c": 250
+   },
+   "outputs": {
+    "withstand_a": {
+     "value": 6313,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "conductor-short-circuit-withstand",
+   "source_publisher": "Cooper Bussmann (hosted by Mike Holt)",
+   "source_title": "Conductor Short-Circuit Protection",
+   "source_edition_or_year": "revised August 30, 2002",
+   "source_section_or_page": "Table 3, 6 AWG copper at 1 cycle (75 to 250 C): 15,464 A",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "area_cmil": 26240,
+    "fault_current_a": 10000,
+    "clearing_time_s": 0.016666666666666666,
+    "material": "copper",
+    "t_initial_c": 75,
+    "t_final_c": 250
+   },
+   "outputs": {
+    "withstand_a": {
+     "value": 15464,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
    "tile_id": "conduit-thermal-expansion",
    "source_publisher": "NFPA",
    "source_title": "100 ft PVC, 50 F swing -> 2.03 in, expansion fitting required",
@@ -39987,6 +40443,56 @@
      "value": 26240,
      "tolerance": {
       "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "egc-upsize-proportional",
+   "source_publisher": "IAEI Magazine (Keith Lofland)",
+   "source_title": "Sizing of Conductors Related to Grounding & Bonding",
+   "source_edition_or_year": "March 1, 2021 (2020 NEC)",
+   "source_section_or_page": "Figure 6: 250,000 / 167,800 = 1.49; 26,240 x 1.49 = 39,098 cmil minimum (ratio rounded before multiplying)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "base_egc_cmil": 26240,
+    "base_phase_cmil": 167800,
+    "installed_phase_cmil": 250000
+   },
+   "outputs": {
+    "ratio": {
+     "value": 1.49,
+     "tolerance": {
+      "abs": 0.005
+     }
+    },
+    "upsized_egc_cmil": {
+     "value": 39098,
+     "tolerance": {
+      "pct": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "egc-upsize-proportional",
+   "source_publisher": "Mike Holt Enterprises",
+   "source_title": "Understanding the 2020 NEC Requirements for Bonding and Grounding, 250.122",
+   "source_edition_or_year": "2020 NEC",
+   "source_section_or_page": "8 AWG phase increased to 6 AWG: 159% multiplier; 10,380 cmil x 159% = 16,504 cmil -> 8 AWG EGC",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "base_egc_cmil": 10380,
+    "base_phase_cmil": 16510,
+    "installed_phase_cmil": 26240
+   },
+   "outputs": {
+    "upsized_egc_cmil": {
+     "value": 16504,
+     "tolerance": {
+      "pct": 0.1
      }
     }
    }
@@ -42564,6 +43070,27 @@
    }
   },
   {
+   "tile_id": "welder-arc-circuit-conductor",
+   "source_publisher": "EC&M (Mike Holt)",
+   "source_title": "Code Q&A",
+   "source_edition_or_year": "September 8, 2011",
+   "source_section_or_page": "40 A primary at 50% duty: 40 A x 0.71 = 28.40 A (Table 630.11(A) multiplier, rounded)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "primary_current_a": 40,
+    "duty_pct": 50
+   },
+   "outputs": {
+    "effective_current_a": {
+     "value": 28.4,
+     "tolerance": {
+      "abs": 0.15
+     }
+    }
+   }
+  },
+  {
    "tile_id": "microinverter-branch-count",
    "source_publisher": "max microinverters per AC branch (NEC 705.60)",
    "source_title": "20 A branch, IQ7+ at 1.21 A -> 13 microinverters",
@@ -43525,6 +44052,70 @@
      "value": 3.0,
      "tolerance": {
       "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "wire-rope-clips",
+   "source_publisher": "OSHA / The Crosby Group",
+   "source_title": "29 CFR 1926.251 Table H-2; Crosby G-450 Table 1",
+   "source_edition_or_year": "OSHA (77 FR 23118, 2012); Crosby 2013",
+   "source_section_or_page": "1/2 in. rope: 3 drop-forged clips at 3 in. spacing (OSHA); 11-1/2 in. turnback (Crosby)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "rope_diameter_in": 0.5
+   },
+   "outputs": {
+    "clip_count": {
+     "value": 3,
+     "tolerance": {
+      "abs": 0
+     }
+    },
+    "spacing_in": {
+     "value": 3,
+     "tolerance": {
+      "abs": 0.005
+     }
+    },
+    "minimum_tail_in": {
+     "value": 11.5,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "wire-rope-clips",
+   "source_publisher": "OSHA / The Crosby Group",
+   "source_title": "29 CFR 1926.251 Table H-2; Crosby G-450 Table 1",
+   "source_edition_or_year": "OSHA (77 FR 23118, 2012); Crosby 2013",
+   "source_section_or_page": "1 in. rope: 5 drop-forged clips at 6 in. spacing (OSHA); 26 in. turnback (Crosby)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "rope_diameter_in": 1
+   },
+   "outputs": {
+    "clip_count": {
+     "value": 5,
+     "tolerance": {
+      "abs": 0
+     }
+    },
+    "spacing_in": {
+     "value": 6,
+     "tolerance": {
+      "abs": 0.005
+     }
+    },
+    "minimum_tail_in": {
+     "value": 26,
+     "tolerance": {
+      "abs": 0.05
      }
     }
    }
@@ -45471,6 +46062,27 @@
    }
   },
   {
+   "tile_id": "harmonic-resonance",
+   "source_publisher": "Eaton",
+   "source_title": "Power Factor Capacitors and Detuned Filters (CA08104001E)",
+   "source_edition_or_year": "December 2015",
+   "source_section_or_page": "p. 35.0-7: kVAsys 17,391, 350 kvar -> h = sqrt(17,391 / 350) = 7.0",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "short_circuit_mva": 17.391,
+    "cap_bank_mvar": 0.35
+   },
+   "outputs": {
+    "h_resonant": {
+     "value": 7.0,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
    "tile_id": "rlc-reactance-resonance",
    "source_publisher": "Series R-L-C reactance / impedance / resonance",
    "source_title": "60 Hz, 10 ohm, 0.05 H, 50 uF -> XL 18.85, XC 53.05, Z 35.63 ohm, PF 0.281, f0 100.66 Hz",
@@ -45598,6 +46210,28 @@
      "value": 5.0,
      "tolerance": {
       "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "tdd-ieee-519",
+   "source_publisher": "Elspec",
+   "source_title": "Are you compliant with the IEEE-519 2022 Edition?",
+   "source_edition_or_year": "September 19, 2022",
+   "source_section_or_page": "Table 2 (120 V to 69 kV), Isc/IL 20 to 50 -> TDD limit 8.0%",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "isc_a": 10000,
+    "il_a": 400,
+    "measured_tdd_pct": 6
+   },
+   "outputs": {
+    "limit_pct": {
+     "value": 8,
+     "tolerance": {
+      "abs": 0.005
      }
     }
    }

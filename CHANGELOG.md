@@ -6,6 +6,16 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Changed
 
+- **Sixteen more tiles now carry a publisher's printed worked example or table.**
+  - **Electrical:** `grounding-electrode-conductor`, `bonding-jumper` and `egc-upsize-proportional` (IAEI Magazine and Mike Holt's 2020 NEC bonding and grounding examples); `conductor-short-circuit-withstand` (Bussmann Table 3 cells, 6,313 A and 15,464 A); `welder-arc-circuit-conductor` (EC&M Code Q&A); `harmonic-resonance` (Eaton CA08104001E); `tdd-ieee-519` (IEEE 519-2022 Table 2, via Elspec).
+  - **Gas:** `gas-altitude-derate` (ACHR News).
+  - **Rigging and fasteners:** `wire-rope-clips` (OSHA Table H-2 and Crosby G-450); `bolt-proof-load` (SAE J429 Table 5).
+  - **Piping:** `flange-rating` (ASME B16.5 Group 1.1).
+  - **Construction:** `rebar-lap-splice` (CMACN), `control-joint-spacing` (NRMCA CIP 6), `gutter-downspout` (SMACNA Table 1-1, via Berger).
+  - **HVAC:** `manual-d-friction-rate` (ACCA worksheet and Shums Coda).
+  - **Engines:** `engine-bmep` (EPI).
+
+  README: 1,327 of 2,183 tiles are checked only against the project's own derivation (785 from first principles, 542 by a named method); 856 carry an outside source. Cross-validation tolerance checks: 4,227.
 - **Seven more tiles now carry a publisher's printed worked example.**
   - **Fire protection:** `fire-pump-curve` (Consulting-Specifying Engineer), `jockey-pump-sizing` (NFPA 20 Annex A.14.2.6 setpoints).
   - **Egress:** `egress-capacity` (IBC width factor, via iDigHardware).
