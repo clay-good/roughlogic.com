@@ -31010,7 +31010,7 @@
   },
   {
    "tile_id": "condensate-drain",
-   "source_publisher": "IMC 307.2.2 (drain size by capacity) and 307.2.5 (slope) (by name).",
+   "source_publisher": "IMC 307.2.2 (drain size by capacity) and 307.2.1 (slope) (by name).",
    "source_title": "rate_gph = tons x pints_per_ton_hr / 8; drain size by IMC 307.2.2 capacity steps; fall = run x slope.",
    "source_edition_or_year": "spec-v102 worked example (machine-verified)",
    "source_section_or_page": "spec-v102 section 2.1 pinned example",
@@ -35246,7 +35246,7 @@
   },
   {
    "tile_id": "blower-door-ach50",
-   "source_publisher": "IECC R402.4.1.2 + LBL infiltration model",
+   "source_publisher": "IECC 2021 R402.4.1.2-R402.4.1.3 + LBL infiltration model",
    "source_title": "1,600 ft2 two-story, 960 cfm50, 12,800 ft3 -> 4.5 ACH50 FAIL, 56.5 cfm natural",
    "source_edition_or_year": "spec-v218 worked example (machine-verified)",
    "source_section_or_page": "spec-v218 section 2.1 pinned example (first test, FAIL)",
@@ -35281,7 +35281,7 @@
   },
   {
    "tile_id": "blower-door-ach50",
-   "source_publisher": "IECC R402.4.1.2 + LBL infiltration model",
+   "source_publisher": "IECC 2021 R402.4.1.2-R402.4.1.3 + LBL infiltration model",
    "source_title": "cross-check: after air sealing, 600 cfm50 -> 2.81 ACH50 PASS, 35.3 cfm",
    "source_edition_or_year": "spec-v218 worked example (machine-verified)",
    "source_section_or_page": "spec-v218 section 2.1 cross-check (post-sealing, PASS)",
@@ -71261,7 +71261,7 @@
   },
   {
    "tile_id": "duct-leakage-cfm25",
-   "source_publisher": "IECC R403.3.5",
+   "source_publisher": "IECC 2021 R403.3.5 (test) / R403.3.6 (limits)",
    "source_title": "80 CFM25, 2000 ft2, limit 4 -> 4.0 CFM25/100 ft2, passes at the limit",
    "source_edition_or_year": "spec-v461 worked example (machine-verified)",
    "source_section_or_page": "spec-v461 section 2.1 pinned example",
@@ -71283,7 +71283,7 @@
   },
   {
    "tile_id": "duct-leakage-cfm25",
-   "source_publisher": "IECC R403.3.5",
+   "source_publisher": "IECC 2021 R403.3.5 (test) / R403.3.6 (limits)",
    "source_title": "a leakier 100 CFM25 on 2000 ft2 -> 5.0, fails the limit of 4",
    "source_edition_or_year": "spec-v461 cross-check (machine-verified)",
    "source_section_or_page": "spec-v461 section 2.1 cross-check",
@@ -90625,7 +90625,7 @@
     "weight_lb": 12000,
     "tiedowns": 4,
     "wll_per_tiedown_lb": 5400,
-    "secured_both_ends": true
+    "tiedown_path": "over_other_side"
    },
    "outputs": {
     "min_tiedowns": {

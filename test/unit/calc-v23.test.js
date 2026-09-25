@@ -213,6 +213,10 @@ test("cargo-securement-wll: 4 x 1500 lb -> 6000 aggregate >= 4000 required, 3 mi
 });
 test("cargo-securement-wll: under-WLL fails; non-positive inputs rejected", () => {
   assert.strictEqual(computeCargoSecurementWLL({ cargo_weight_lb: 8000, tiedown_count: 2, wll_each_lb: 1500, cargo_length_ft: 16 }).pass, false);
+  // 49 CFR 393.106(d): four direct tiedowns count half, 4 x 1,500 x 0.5 = 3,000 < 4,000 lb.
+  const direct = computeCargoSecurementWLL({ cargo_weight_lb: 8000, tiedown_count: 4, wll_each_lb: 1500, cargo_length_ft: 16, tiedown_path: "direct" });
+  assert.strictEqual(direct.aggregate_wll_lb, 3000);
+  assert.strictEqual(direct.pass, false);
   assert.ok("error" in computeCargoSecurementWLL({ cargo_weight_lb: 0, tiedown_count: 4, wll_each_lb: 1500, cargo_length_ft: 16 }));
   assert.ok("error" in computeCargoSecurementWLL({ cargo_weight_lb: 8000, tiedown_count: 0, wll_each_lb: 1500, cargo_length_ft: 16 }));
 });

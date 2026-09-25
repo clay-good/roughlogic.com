@@ -71,6 +71,10 @@ test("HOS: needs_break flag at 8 hr drive without break", () => { const r = comp
 test("HOS: 30-min off_duty resets break flag", () => { const r = computeHOS({ profile: "property_70_8", events: [{ kind: "drive", hours: 4 }, { kind: "off_duty", hours: 0.5 }, { kind: "drive", hours: 4 }] }); assert.equal(r.needs_break, false); });
 test("HOS: unknown profile errors", () => { const r = computeHOS({ profile: "x", events: [] }); assert.ok(r.error); });
 test("HOS: unknown event kind errors", () => { const r = computeHOS({ profile: "property_70_8", events: [{ kind: "naps", hours: 2 }] }); assert.ok(r.error); });
+test("HOS: passenger 70/8 profile when the carrier runs every day (49 CFR 395.5(b)(2))", () => {
+  const r = computeHOS({ profile: "passenger_70_8", events: [{ kind: "drive", hours: 2 }], weekly_on_duty_used_hr: 62 });
+  assert.equal(r.weekly_remaining, 6);
+});
 test("HOS: passenger profile drive_max 10", () => { const r = computeHOS({ profile: "passenger_70_7", events: [{ kind: "drive", hours: 10 }] }); assert.equal(r.drive_remaining, 0); });
 test("HOS: every profile has positive caps", () => { for (const k of Object.keys(HOS_PROFILES)) { const p = HOS_PROFILES[k]; assert.ok(p.drive_max > 0 && p.on_duty_window > 0 && p.weekly_max > 0); } });
 

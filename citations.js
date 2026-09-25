@@ -2191,7 +2191,7 @@ export const CITATIONS = {
   },
   "duct-leakage-cfm25": {
     formula: "normalized = leakage_cfm25 / cfa_ft2 x 100; passes = normalized <= limit (default 4 CFM25 per 100 ft^2).",
-    edition: "IECC (International Energy Conservation Code) §R403.3.5 (duct testing) and RESNET / ANSI 380 duct-leakage test methods, by name.",
+    edition: "IECC (International Energy Conservation Code) §R403.3.5 (duct testing) and §R403.3.6 (leakage limits: 4 / 3 rough-in without air handler / 8 with all ducts inside the envelope) and RESNET / ANSI 380 duct-leakage test methods, by name.",
     freeAccess: "IECC is viewable through the ICC public-access reader; the leakage / area x 100 normalization is public arithmetic.",
     governance: GOVERNANCE.mechanical,
     editionNote: "IECC §R403.3.5 requires the duct system be tested for total leakage with a duct pressurization tester at 25 Pa (0.1 in WC); the result is normalized to the conditioned floor area, CFM25 per 100 ft^2 = leakage / area x 100, and compared to the code limit. The common limits are 4 CFM25 per 100 ft^2 for a post-construction total-leakage test or a rough-in test with the air handler installed, and 3 for a rough-in test without the air handler; some editions and the leakage-to-outdoors path differ, so the limit is an editable input. A tighter system loses less conditioned air to unconditioned spaces. Distinct from the SMACNA leakage-class test for commercial duct (see duct-leakage). A field aid; the adopted IECC edition, the required test type, and the rater's calibrated equipment govern.",
@@ -14778,15 +14778,15 @@ export const CITATIONS = {
     ],
   },
   "condensate-drain": {
-    formula: "rate_gph = tons x pints_per_ton_hr / 8. Drain size by IMC 307.2.2 capacity steps (3/4 in to 20 tons, then 1, 1-1/4, 1-1/2, 2 in). fall = run x slope (>= 1/8 in/ft per 307.2.5).",
-    edition: "IMC 307.2.2 (drain size by capacity) and 307.2.5 (slope) (by name).",
+    formula: "rate_gph = tons x pints_per_ton_hr / 8. Drain size by IMC 307.2.2 capacity steps (3/4 in to 20 tons, then 1, 1-1/4, 1-1/2, 2 in to 250 tons; the table covers manifolded drains). fall = run x slope (>= 1/8 in/ft per IMC 307.2.1).",
+    edition: "IMC 307.2.2 (drain size by capacity) and 307.2.1 (slope) (by name).",
     freeAccess: "IMC free read-only at codes.iccsafe.org; the size steps are stated, not reproduced.",
     governance: GOVERNANCE.general,
     editionNote: "Single-edition (the code and the equipment manual govern).",
     assumptions: [
       { name: "Condensate rate", value: "default 3 pints per ton-hour, editable; about 2 to 4 is common in humid cooling. Tracks the latent load, not a code value", source: "field estimate" },
       { name: "Drain size steps", value: "IMC 307.2.2 by equipment capacity; 8 pints per gallon", source: "IMC 307.2.2" },
-      { name: "Slope", value: "not less than 1/8 in per foot toward the discharge (IMC 307.2.5); a draw-through coil needs a trap", source: "IMC 307.2.5" },
+      { name: "Slope", value: "not less than 1/8 in per foot toward the discharge (IMC 307.2.1); a draw-through coil needs a trap", source: "IMC 307.2.1" },
     ],
   },
   "recovery-cylinder": {
@@ -16532,13 +16532,13 @@ export const CITATIONS = {
   },
   "blower-door-ach50": {
     formula: "ach50 = cfm50 x 60 / volume_ft3; verdict = ach50 <= target_ach50 (PASS) else FAIL; ach_nat = ach50 / n_factor; cfm_nat = ach_nat x volume_ft3 / 60.",
-    edition: "The ACH50 normalization (CFM50 x 60 / conditioned volume) and the LBL natural-infiltration divide-by-N rule, by name; IECC R402.4.1.2 states the air-leakage limit in ACH50 (<= 3 in climate zones 3-8, <= 5 in zones 1-2); ASTM E779 / E1827 are the blower-door test methods.",
-    freeAccess: "The air-leakage limit is in the published IECC R402.4.1.2; the normalization and infiltration relations are public building-science arithmetic. The blower-door test methods are ASTM E779 / E1827.",
+    edition: "The ACH50 normalization (CFM50 x 60 / conditioned volume) and the LBL natural-infiltration divide-by-N rule, by name; IECC 2021 R402.4.1.3 states the prescriptive air-leakage limit in ACH50 (<= 3 in climate zones 3-8, <= 5 in zones 0-2), and R402.4.1.2 caps every compliance path at 5.0; ASTM E779 / E1827 are the blower-door test methods.",
+    freeAccess: "The air-leakage limit is in the published IECC 2021 R402.4.1.2-R402.4.1.3; the normalization and infiltration relations are public building-science arithmetic. The blower-door test methods are ASTM E779 / E1827.",
     governance: GOVERNANCE.general,
-    editionNote: "IECC R402.4.1.2 sets the air-leakage limit, stated in ACH50, with the <= 3 (CZ 3-8) and <= 5 (CZ 1-2) thresholds the user pins as the target; ASTM E779 / E1827 are the blower-door test methods that produce CFM50; the LBL / ASHRAE Fundamentals infiltration model is the N-factor that divides ACH50 down to the annual-average natural ACH. The N-factor depends on climate zone, building height, and wind shielding (a single-story sheltered house and an exposed three-story house differ by roughly a factor of two); the code threshold is the AHJ-adopted IECC edition and climate zone; the volume is the conditioned volume, not the floor area. A field normalization, not a code certificate.",
+    editionNote: "IECC 2021 R402.4.1.3 sets the prescriptive air-leakage limit, stated in ACH50, with the <= 3 (CZ 3-8) and <= 5 (CZ 0-2) thresholds the user pins as the target; ASTM E779 / E1827 are the blower-door test methods that produce CFM50; the LBL / ASHRAE Fundamentals infiltration model is the N-factor that divides ACH50 down to the annual-average natural ACH. The N-factor depends on climate zone, building height, and wind shielding (a single-story sheltered house and an exposed three-story house differ by roughly a factor of two); the code threshold is the AHJ-adopted IECC edition and climate zone; the volume is the conditioned volume, not the floor area. A field normalization, not a code certificate.",
     assumptions: [
       { name: "ACH50", value: "ach50 = CFM50 x 60 / conditioned volume normalizes the gauge reading to air changes per hour at 50 Pa", source: "first principles" },
-      { name: "Code check", value: "verdict compares ACH50 to the editable target (IECC R402.4.1.2: <= 3 ACH50 in CZ 3-8, <= 5 in CZ 1-2)", source: "IECC R402.4.1.2" },
+      { name: "Code check", value: "verdict compares ACH50 to the editable target (IECC 2021 R402.4.1.3: <= 3 ACH50 in CZ 3-8, <= 5 in CZ 0-2)", source: "IECC 2021 R402.4.1.3" },
       { name: "Natural infiltration", value: "ach_nat = ach50 / N (LBL N-factor, default 17); cfm_nat = ach_nat x volume / 60 feeds the 62.2 ventilation and the infiltration load", source: "LBL / ASHRAE Fundamentals" },
     ],
   },

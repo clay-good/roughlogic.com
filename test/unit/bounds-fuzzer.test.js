@@ -13413,6 +13413,8 @@ test("bounds: spec-v102 HVAC field-service bench (IMC condensate drain + 80% rec
   assert.ok(c.rate_pints_hr === 9 && Math.abs(c.rate_gph - 1.125) < 1e-9 && c.min_size_in === 0.75 && Math.abs(c.fall_in - 2.5) < 1e-9);
   assert.ok(_v102a({ tons: 20 }).min_size_in === 0.75 && _v102a({ tons: 40 }).min_size_in === 1.0 && _v102a({ tons: 90 }).min_size_in === 1.25 && _v102a({ tons: 125 }).min_size_in === 1.5 && _v102a({ tons: 126 }).min_size_in === 2.0);
   assert.ok("error" in _v102a({ tons: 0 }) && "error" in _v102a({ tons: 3, run_ft: -1 }));
+  // IMC Table 307.2.2 ends at 125-250 tons (2 in); beyond it the tile declines rather than repeating 2 in.
+  assert.ok(_v102a({ tons: 250 }).min_size_in === 2.0 && "error" in _v102a({ tons: 251 }));
   const r = _v102b({ water_capacity_lb: 50, refrig_density_lb_gal: 9.0, current_net_lb: 30, fill_fraction: 0.8 });
   assert.ok(Math.abs(r.specific_gravity - 1.079) < 0.001 && Math.abs(r.max_net_lb - 43.2) < 0.1 && Math.abs(r.remaining_lb - 13.2) < 0.1 && r.action === "ok to fill");
   assert.ok(Math.abs(_v102b({ water_capacity_lb: 50, refrig_density_lb_gal: 12.0 }).max_net_lb - 57.6) < 0.1);
@@ -39667,7 +39669,7 @@ test("bounds: spec-v1376 computeOutdoorStageWind pins the square law and the bal
 import { computeTiedownCount as _v1377 } from "../../calc-trucking.js";
 test("bounds: spec-v1377 computeTiedownCount pins both rules and which one governs", () => {
   // 24 ft, 12,000 lb: 2 + ceil(14/10) = 4 by count; 6,000 lb aggregate WLL; 4 x 5,400 = 21,600.
-  const base = { length_ft: 24, weight_lb: 12000, tiedowns: 4, wll_per_tiedown_lb: 5400, secured_both_ends: true };
+  const base = { length_ft: 24, weight_lb: 12000, tiedowns: 4, wll_per_tiedown_lb: 5400, tiedown_path: "over_other_side" };
   const r = _v1377(base);
   assert.strictEqual(r.min_tiedowns, 4);
   assert.ok(Math.abs(r.required_wll_lb - 6000) < 1e-9);
@@ -39687,18 +39689,21 @@ test("bounds: spec-v1377 computeTiedownCount pins both rules and which one gover
   assert.strictEqual(r.tiedowns_by_wll, 2);
   // Short and heavy flips it: a 4 ft, 14,000 lb block is trivial on count and needs
   // three 3,000 lb chains on weight, so the chain rating decides.
-  const block = _v1377({ length_ft: 4, weight_lb: 14000, tiedowns: 3, wll_per_tiedown_lb: 3000, secured_both_ends: true });
+  const block = _v1377({ length_ft: 4, weight_lb: 14000, tiedowns: 3, wll_per_tiedown_lb: 3000, tiedown_path: "over_other_side" });
   assert.strictEqual(block.min_tiedowns, 2);
   assert.ok(Math.abs(block.required_wll_lb - 7000) < 1e-9);
   assert.strictEqual(block.tiedowns_by_wll, 3);
   assert.ok(block.governing.includes("working load limit"));
   // With big enough chains the same block is governed by neither rule in particular.
-  const bigChains = _v1377({ length_ft: 4, weight_lb: 14000, tiedowns: 2, wll_per_tiedown_lb: 5400, secured_both_ends: true });
+  const bigChains = _v1377({ length_ft: 4, weight_lb: 14000, tiedowns: 2, wll_per_tiedown_lb: 5400, tiedown_path: "over_other_side" });
   assert.strictEqual(bigChains.tiedowns_by_wll, 2);
   assert.ok(bigChains.governing.startsWith("neither"));
-  // Anchored at one end only, a tiedown counts half its working load limit.
-  const oneEnd = _v1377({ ...base, secured_both_ends: false });
-  assert.ok(Math.abs(oneEnd.provided_wll_lb - r.provided_wll_lb / 2) < 1e-9);
+  // 393.106(d): a direct or same-side tiedown counts half its working load limit.
+  for (const tiedown_path of ["direct", "same_side"]) {
+    const half = _v1377({ ...base, tiedown_path });
+    assert.ok(Math.abs(half.provided_wll_lb - r.provided_wll_lb / 2) < 1e-9, tiedown_path);
+  }
+  assert.ok("error" in _v1377({ ...base, tiedown_path: "both_ends" }));
   // Three chains passes the WLL rule and fails the count rule.
   const three = _v1377({ ...base, tiedowns: 3 });
   assert.ok(three.verdict.startsWith("FAILS the count rule"));

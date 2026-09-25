@@ -230,6 +230,8 @@ export const HOS_PROFILES = {
   // 395.5: an 8-hour break resets the shift, the 15 hours is ACCUMULATED on-duty time rather
   // than a consecutive clock, and the 30-minute break of 395.3(a)(3)(ii) does not apply.
   "passenger_70_7": { drive_max: 10, on_duty_window: 15, weekly_max: 60, weekly_window_days: 7, off_duty_reset_hr: 8, window_is_clock: false, break_required: false },
+  // 395.5(b)(2): 70 hours in 8 days when the carrier operates every day of the week.
+  "passenger_70_8": { drive_max: 10, on_duty_window: 15, weekly_max: 70, weekly_window_days: 8, off_duty_reset_hr: 8, window_is_clock: false, break_required: false },
 };
 
 // dims: in { profile: dimensionless, events: dimensionless, weekly_on_duty_used_hr: T, current_time_iso: dimensionless }
@@ -656,6 +658,7 @@ function renderHOS(inputRegion, outputRegion, citationEl) {
     { value: "property_70_8", label: "Property 70/8" },
     { value: "property_60_7", label: "Property 60/7" },
     { value: "passenger_70_7", label: "Passenger 60/7" },
+    { value: "passenger_70_8", label: "Passenger 70/8 (carrier operates every day)" },
   ]);
   const weekly = makeNumber("Weekly on-duty already used (hr)", "hos-w", { step: "any", min: "0" });
   // v8 §C.5: optional current-time-ISO so the renderer can show the next
@@ -1146,8 +1149,8 @@ export const TRUCKING_RENDERERS = {
 // tiedowns for the article length. WLLs are user-supplied from the marked
 // hardware (the lowest-rated component governs each tiedown).
 //
-// dims: in { cargo_weight_lb: M, tiedown_count: dimensionless, wll_each_lb: M, cargo_length_ft: L } out: { aggregate_wll_lb: M, required_wll_lb: M, min_tiedowns: dimensionless, pass: dimensionless }
-export function computeCargoSecurementWLL({ cargo_weight_lb = 0, tiedown_count = 0, wll_each_lb = 0, cargo_length_ft = 0 } = {}) {
+// dims: in { cargo_weight_lb: M, tiedown_count: dimensionless, wll_each_lb: M, cargo_length_ft: L, tiedown_path: dimensionless } out: { aggregate_wll_lb: M, tiedown_path: dimensionless, required_wll_lb: M, min_tiedowns: dimensionless, pass: dimensionless }
+export function computeCargoSecurementWLL({ cargo_weight_lb = 0, tiedown_count = 0, wll_each_lb = 0, cargo_length_ft = 0, tiedown_path = "over_other_side" } = {}) {
   const W = Number(cargo_weight_lb) || 0;
   const n = Math.floor(Number(tiedown_count) || 0);
   const wll = Number(wll_each_lb) || 0;
@@ -1156,26 +1159,35 @@ export function computeCargoSecurementWLL({ cargo_weight_lb = 0, tiedown_count =
   if (!(n > 0 && Number.isFinite(n))) return { error: "Tiedown count must be a positive whole number." };
   if (!(wll > 0 && Number.isFinite(wll))) return { error: "Per-tiedown WLL must be positive (lb)." };
   if (!(len > 0 && Number.isFinite(len))) return { error: "Cargo length must be positive (ft)." };
-  const aggregate_wll_lb = n * wll;
+  // 393.106(d): full WLL only for a tiedown over the cargo to the other side; half for a
+  // direct or same-side tiedown. (Until 2026-09-24 every tiedown counted in full.)
+  const credit = { over_other_side: 1, direct: 0.5, same_side: 0.5 }[tiedown_path];
+  if (credit === undefined) return { error: "Tiedown path must be over_other_side, direct, or same_side." };
+  const aggregate_wll_lb = n * wll * credit;
   const required_wll_lb = 0.5 * W;
   // 49 CFR 393.110(b) count rule: <=5 ft -> 1 tiedown (2 if >1100 lb);
   // >5 ft to 10 ft -> 2 tiedowns; >10 ft -> 2 for the first 10 ft plus 1 for
   // each additional 10 ft or fraction thereof.
   const min_tiedowns = len <= 5 ? (W > 1100 ? 2 : 1) : len <= 10 ? 2 : 2 + Math.ceil((len - 10) / 10);
   const pass = aggregate_wll_lb >= required_wll_lb && n >= min_tiedowns;
-  return { aggregate_wll_lb, required_wll_lb, min_tiedowns, tiedown_count: n, pass };
+  return { aggregate_wll_lb, required_wll_lb, min_tiedowns, tiedown_count: n, tiedown_path, pass };
 }
 
 export const cargoSecurementWllExample = { inputs: { cargo_weight_lb: 8000, tiedown_count: 4, wll_each_lb: 1500, cargo_length_ft: 16 } };
 
 const renderCargoSecurementWLL = _simpleRenderer({
-  citation: "Citation: Per FMCSA 49 CFR 393.100-393.136 cargo securement (the aggregate-WLL >= half-cargo-weight rule and the tiedown-count rule). WLLs are user-supplied from the marked hardware (the marked rating, not breaking strength; the lowest-rated component governs). Commodity-specific rules (logs, vehicles, coils, etc.) are out of scope. FMCSA enforces. Free at ecfr.gov.",
+  citation: "Citation: Per FMCSA 49 CFR 393.100-393.136 cargo securement (the aggregate-WLL >= half-cargo-weight rule, with a direct or same-side tiedown counted at half its WLL per 393.106(d), and the tiedown-count rule). WLLs are user-supplied from the marked hardware (the marked rating, not breaking strength; the lowest-rated component governs). Commodity-specific rules (logs, vehicles, coils, etc.) are out of scope. FMCSA enforces. Free at ecfr.gov.",
   example: cargoSecurementWllExample.inputs,
   fields: [
     { key: "cargo_weight_lb", label: "Cargo weight (lb)", kind: "number" },
     { key: "cargo_length_ft", label: "Article length (ft)", kind: "number" },
     { key: "tiedown_count", label: "Number of tiedowns", kind: "number" },
     { key: "wll_each_lb", label: "WLL per tiedown (lb, marked)", kind: "number" },
+    { key: "tiedown_path", label: "Tiedown path (49 CFR 393.106(d))", kind: "select", options: [
+      { value: "over_other_side", label: "Over the cargo to the other side (full WLL)" },
+      { value: "direct", label: "Direct, vehicle to cargo (half WLL)" },
+      { value: "same_side", label: "Over the cargo, back to the same side (half WLL)" },
+    ] },
   ],
   outputs: [
     { key: "agg", id: "csw-out-agg", label: "Aggregate WLL", value: (r) => fmt(r.aggregate_wll_lb, 0) + " lb" },
@@ -1989,8 +2001,8 @@ TRUCKING_RENDERERS["hydroplaning-speed"] = _simpleRenderer({
 // ===========================================================================
 
 // ===================== spec-v1377: minimum tiedown count =====================
-// dims: in { length_ft: L, weight_lb: M, tiedowns: dimensionless, wll_per_tiedown_lb: M, secured_both_ends: dimensionless } out: { min_tiedowns: dimensionless, required_wll_lb: M, provided_wll_lb: M }
-export function computeTiedownCount({ length_ft = 0, weight_lb = 0, tiedowns = 0, wll_per_tiedown_lb = 0, secured_both_ends = true } = {}) {
+// dims: in { length_ft: L, weight_lb: M, tiedowns: dimensionless, wll_per_tiedown_lb: M, tiedown_path: dimensionless } out: { min_tiedowns: dimensionless, tiedown_path: dimensionless, required_wll_lb: M, provided_wll_lb: M }
+export function computeTiedownCount({ length_ft = 0, weight_lb = 0, tiedowns = 0, wll_per_tiedown_lb = 0, tiedown_path = "over_other_side" } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(length_ft > 0)) return { error: "Article length must be positive." };
   if (!(weight_lb > 0)) return { error: "Article weight must be positive." };
@@ -2003,9 +2015,14 @@ export function computeTiedownCount({ length_ft = 0, weight_lb = 0, tiedowns = 0
   else if (length_ft <= 10) min_tiedowns = 2;
   else min_tiedowns = 2 + Math.ceil((length_ft - 10) / 10);
   const required_wll_lb = 0.5 * weight_lb;
-  // A tiedown secured at both ends counts its full working load limit; one anchored
-  // at a single end counts half.
-  const effective_wll_each = secured_both_ends ? wll_per_tiedown_lb : wll_per_tiedown_lb / 2;
+  // 49 CFR 393.106(d) credits by PATH: full WLL only for a tiedown that goes over or around
+  // the cargo to an anchor on the OTHER side of the vehicle; half for one that runs direct
+  // from the vehicle to the cargo, or over the cargo back to the SAME side. (Until 2026-09-24
+  // this asked whether the tiedown was secured at both ends, which credited a direct tiedown
+  // -- anchored at both ends -- at twice what the rule allows.)
+  const TIEDOWN_CREDIT = { over_other_side: 1, direct: 0.5, same_side: 0.5 };
+  if (!(tiedown_path in TIEDOWN_CREDIT)) return { error: "Tiedown path must be over_other_side, direct, or same_side." };
+  const effective_wll_each = wll_per_tiedown_lb * TIEDOWN_CREDIT[tiedown_path];
   const provided_wll_lb = tiedowns * effective_wll_each;
   const count_ok = tiedowns >= min_tiedowns;
   const wll_ok = provided_wll_lb >= required_wll_lb;
@@ -2029,6 +2046,7 @@ export function computeTiedownCount({ length_ft = 0, weight_lb = 0, tiedowns = 0
   if (![min_tiedowns, required_wll_lb, provided_wll_lb].every(Number.isFinite)) return { error: "Tiedown math is not a finite value." };
   return {
     min_tiedowns,
+    tiedown_path,
     required_wll_lb,
     provided_wll_lb,
     count_margin,
@@ -2036,21 +2054,25 @@ export function computeTiedownCount({ length_ft = 0, weight_lb = 0, tiedowns = 0
     tiedowns_by_wll,
     governing,
     verdict,
-    note: "The minimum number of tiedowns a piece of cargo needs and the aggregate working load limit it needs, which are two independent rules that both have to be satisfied. The count rule is about the article's LENGTH: an article of 5 ft or less weighing 1,100 lb or less takes one tiedown and a heavier short article takes two; anything over 5 ft and up to 10 ft takes two regardless of weight; and past 10 ft the requirement is two plus one more for each additional 10 ft or fraction. Long cargo needs more attachment points so it cannot rotate or shift within the securement, and the count keeps climbing every ten feet no matter how light the piece is. The aggregate working load limit rule is about WEIGHT: the sum of the tiedowns' working load limits must be at least half the cargo weight, on the reasoning that a tiedown restrains in more than one direction. A tiedown that passes over the load and is secured at both ends counts its full working load limit, while one anchored at only one end counts half. The two rules govern in different situations, which is why both are reported and the controlling one named. A 24 ft, 12,000 lb steel beam needs 2 + ceil(14/10) = 4 tiedowns by count while needing only 6,000 lb of aggregate working load limit, so the count governs and four chains is exactly the minimum. Reverse it -- a 4 ft, 14,000 lb block -- and the count rule asks for two while the working load limit rule asks for 7,000 lb, so the chain rating decides. A crew that has internalized only one of the two rules will be wrong about half the time. A screen; 49 CFR 393 in full, the working load limits marked on the actual hardware, and the driver's own inspection govern.",
+    note: "The minimum number of tiedowns a piece of cargo needs and the aggregate working load limit it needs, which are two independent rules that both have to be satisfied. The count rule is about the article's LENGTH: an article of 5 ft or less weighing 1,100 lb or less takes one tiedown and a heavier short article takes two; anything over 5 ft and up to 10 ft takes two regardless of weight; and past 10 ft the requirement is two plus one more for each additional 10 ft or fraction. Long cargo needs more attachment points so it cannot rotate or shift within the securement, and the count keeps climbing every ten feet no matter how light the piece is. The aggregate working load limit rule is about WEIGHT: the sum of the tiedowns' working load limits must be at least half the cargo weight, on the reasoning that a tiedown restrains in more than one direction. Under 393.106(d) a tiedown that passes over or around the load to an anchor on the other side of the vehicle counts its full working load limit; one that runs direct from the vehicle to the cargo, or over the cargo and back to the same side, counts half. The two rules govern in different situations, which is why both are reported and the controlling one named. A 24 ft, 12,000 lb steel beam needs 2 + ceil(14/10) = 4 tiedowns by count while needing only 6,000 lb of aggregate working load limit, so the count governs and four chains is exactly the minimum. Reverse it -- a 4 ft, 14,000 lb block -- and the count rule asks for two while the working load limit rule asks for 7,000 lb, so the chain rating decides. A crew that has internalized only one of the two rules will be wrong about half the time. A screen; 49 CFR 393 in full, the working load limits marked on the actual hardware, and the driver's own inspection govern.",
   };
 }
 
-export const tiedownCountExample = { inputs: { length_ft: 24, weight_lb: 12000, tiedowns: 4, wll_per_tiedown_lb: 5400, secured_both_ends: true } };
+export const tiedownCountExample = { inputs: { length_ft: 24, weight_lb: 12000, tiedowns: 4, wll_per_tiedown_lb: 5400, tiedown_path: "over_other_side" } };
 
 TRUCKING_RENDERERS["tiedown-count"] = _simpleRenderer({
-  citation: "Citation: 49 CFR 393.110 minimum tiedown count by article length, and 49 CFR 393.106 aggregate working load limit at half the cargo weight, cited by section and not reproduced. Both rules apply; the tile names the controlling one. 49 CFR 393 in full, the working load limits marked on the actual hardware, and the driver's inspection govern.",
+  citation: "Citation: 49 CFR 393.110 minimum tiedown count by article length, and 49 CFR 393.106 aggregate working load limit at half the cargo weight (a direct or same-side tiedown counts half its WLL, 393.106(d)), cited by section and not reproduced. Both rules apply; the tile names the controlling one. 49 CFR 393 in full, the working load limits marked on the actual hardware, and the driver's inspection govern.",
   example: tiedownCountExample.inputs,
   fields: [
     { key: "length_ft", label: "Article length (ft)", kind: "number" },
     { key: "weight_lb", label: "Article weight (lb)", kind: "number" },
     { key: "tiedowns", label: "Tiedowns planned", kind: "number" },
     { key: "wll_per_tiedown_lb", label: "Working load limit per tiedown (lb)", kind: "number" },
-    { key: "secured_both_ends", label: "Each tiedown attached and secured at both ends", kind: "checkbox" },
+    { key: "tiedown_path", label: "Tiedown path (49 CFR 393.106(d))", kind: "select", options: [
+      { value: "over_other_side", label: "Over the cargo to the other side (full WLL)" },
+      { value: "direct", label: "Direct, vehicle to cargo (half WLL)" },
+      { value: "same_side", label: "Over the cargo, back to the same side (half WLL)" },
+    ] },
   ],
   outputs: [
     { key: "c", id: "tdcn-out-c", label: "Minimum tiedowns by the length rule", value: (r) => String(r.min_tiedowns) + " (planned margin " + (r.count_margin >= 0 ? "+" : "") + String(r.count_margin) + ")" },

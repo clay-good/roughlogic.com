@@ -3716,7 +3716,7 @@ cross-check.
 | calc-trucking.js | `computeSsdDesignSpeed` | `{ sight_distance_ft = 0, reaction_time_s = 2.5, friction = 0.35, grade = 0.0 ...` | _ | _ | _ |
 | calc-trucking.js | `computeStaticRolloverThreshold` | `{ track_width_in = 72, cg_height_in = 80, curve_radius_ft = 0 } = {}` | _ | _ | _ |
 | calc-trucking.js | `computeStoppingSightDistance` | `{ speed_mph = 0, reaction_time_s = 2.5, friction = 0.35, grade = 0.0, availab...` | _ | _ | _ |
-| calc-trucking.js | `computeTiedownCount` | `{ length_ft = 0, weight_lb = 0, tiedowns = 0, wll_per_tiedown_lb = 0, secured...` | _ | _ | _ |
+| calc-trucking.js | `computeTiedownCount` | `{ length_ft = 0, weight_lb = 0, tiedowns = 0, wll_per_tiedown_lb = 0, tiedown...` | _ | _ | _ |
 | calc-trucking.js | `computeTireLoadCheck` | `{ axle_weight_lb = 0, tires_on_axle = 2, tire_max_load_lb = 0 } = {}` | _ | _ | _ |
 | calc-trucking.js | `computeTrailerTongueWeight` | `{ trailer_gross_weight_lb = 0, tongue_weight_lb = 0, hitch_type = "convention...` | _ | _ | _ |
 | calc-trucking.js | `computeTruckOffTracking` | `{ turn_radius_ft = 0, wheelbase1_ft = 0, wheelbase2_ft = 0 } = {}` | _ | _ | _ |
@@ -4353,7 +4353,7 @@ per spec-v14 §13.1 second paragraph.
 | `belt-pulley` | Belt Length and Pulley Speed | Project (first-principles); 4 in drive / 8 in driven / 18 in centers / 1750 RPM motor... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `bill-disaggregation` | Utility Bill Baseload and Weather-Sensitive Split (Energy Signature) | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `blowdown-heat-recovery` | Boiler Blowdown Heat Recovery and Efficiency Gain | Project (first-principles); ASME, the boiler manufacturer, the water treatment progra... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
-| `blower-door-ach50` | Blower-Door Air-Tightness (ACH50, Natural Infiltration, Code Check) | IECC R402.4.1.2 + LBL infiltration model; spec-v218 section 2.1 pinned example (first test, FAIL) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `blower-door-ach50` | Blower-Door Air-Tightness (ACH50, Natural Infiltration, Code Check) | IECC 2021 R402.4.1.2-R402.4.1.3 + LBL...; spec-v218 section 2.1 pinned example (first test, FAIL) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `blown-insulation-coverage` | Blown Insulation Coverage | Manufacturer blown-insulation coverag...; spec-v99 section 2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `boiler-pipe-sizing` | Boiler Distribution Pipe Sizing | ASHRAE / Bell & Gossett; GPM = 200000/(500*20) = 20; v(1.265 in) = 5.11 > 4 -> ste... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `buffer-tank-loop-credit` | Buffer Tank with Distribution-Loop Credit | ASHRAE / Idronics (Caleffi); 60 gal gross, 1.5 in x 200 ft loop holds 18.36 gal -> 41.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -4412,7 +4412,7 @@ per spec-v14 §13.1 second paragraph.
 | `duct-friction-static` | Duct Friction Loss and Static Pressure | ASHRAE Fundamentals Darcy-Weisbach + ...; 1200 cfm in 12 in round galvanised duct, 60 ft, with 4 sm... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `duct-heat-gain` | Duct Heat Gain/Loss Through Unconditioned Space | ASHRAE Fundamentals; spec-v347 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `duct-leakage` | Duct Leakage Test-and-Balance | ACCA Manual D + SMACNA HVAC Duct Cons...; 1000 design cfm / 60 measured / 300 ft^2 / 1.0 in WC -> n... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
-| `duct-leakage-cfm25` | Residential Duct Leakage CFM25 (IECC R403.3.5) | IECC R403.3.5; spec-v461 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `duct-leakage-cfm25` | Residential Duct Leakage CFM25 (IECC R403.3.5) | IECC 2021 R403.3.5 (test) / R403.3.6 ...; spec-v461 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `duct-sizing` | Duct Sizing | ACCA Manual D / ASHRAE Fundamentals; 400 cfm @ 0.08 in WC / 100 ft -> 10.14 in round (9.28 in ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `duct-static-pressure-total` | Total External Static Pressure | ACCA Manual D / SMACNA (by name); filter 0.10 + registers 0.03 + grille 0.03 + coil 0.30 + ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `duct-static-regain` | Duct Static Regain at a Velocity Decrease | Duct static-regain method (SMACNA / A...; VP_up = (2000/4005)^2 = 0.2494; VP_dn = (1500/4005)^2 = 0... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
