@@ -1993,9 +1993,14 @@ export function computeDuctFrictionStatic({
   const V_fpm = cfm / area_ft2;
   const V_fps = V_fpm / 60;
   const VP_in_wc = Math.pow(V_fpm / 4005, 2);
-  const Re = (V_fps * D_eq_ft) / _NU_AIR;
-  const f = _frictionFactor(eps_ft, D_eq_ft, Re);
-  const dP_per_ft_psf = f * (1 / D_eq_ft) * (_AIR_RHO * V_fps * V_fps / (2 * _G));
+  // Darcy-Weisbach takes the hydraulic diameter with the duct's own mean
+  // velocity (ASHRAE Fundamentals, duct design). The Huebscher D_eq is the
+  // round duct of equal friction AT EQUAL FLOW, so it pairs with that round
+  // duct's velocity, not this one's. Until 2026-09-25 this mixed D_eq with the
+  // rectangular velocity and read low: 11% on a 12x12, 30% on a 36x8.
+  const Re = (V_fps * D_h_ft) / _NU_AIR;
+  const f = _frictionFactor(eps_ft, D_h_ft, Re);
+  const dP_per_ft_psf = f * (1 / D_h_ft) * (_AIR_RHO * V_fps * V_fps / (2 * _G));
   const dP_per_100_in_wc = (dP_per_ft_psf * 100 / _WATER_RHO) * 12;
   const straight_loss_in_wc = (dP_per_ft_psf * length_ft / _WATER_RHO) * 12;
   let fitting_loss_in_wc = 0;

@@ -770,8 +770,8 @@
       "date": "2026-09-01"
     },
     "/tools/brake-pad-life/": {
-      "sha": "bc529dca3663498f",
-      "date": "2026-09-04"
+      "sha": "11b691e63cbbe16f",
+      "date": "2026-09-25"
     },
     "/tools/brake-pedal-hydraulic/": {
       "sha": "6ced979a098b80f9",
@@ -1566,7 +1566,7 @@
       "date": "2026-09-01"
     },
     "/tools/concrete-shrinkage-temperature-steel/": {
-      "sha": "21032049fb3488b3",
+      "sha": "0a45392879883cb6",
       "date": "2026-09-25"
     },
     "/tools/concrete-stair-volume/": {
@@ -2274,8 +2274,8 @@
       "date": "2026-09-01"
     },
     "/tools/drawbar-power/": {
-      "sha": "732a9309766d7833",
-      "date": "2026-09-01"
+      "sha": "6146359f5a200442",
+      "date": "2026-09-25"
     },
     "/tools/drawbar-pull/": {
       "sha": "85457d525b8e0712",
@@ -2414,8 +2414,8 @@
       "date": "2026-09-18"
     },
     "/tools/duct-friction-static/": {
-      "sha": "545fae5ebfcb56cd",
-      "date": "2026-09-04"
+      "sha": "6fe1c290a20fe4d4",
+      "date": "2026-09-25"
     },
     "/tools/duct-hanger-load/": {
       "sha": "315244dad19456eb",
@@ -3042,16 +3042,16 @@
       "date": "2026-09-01"
     },
     "/tools/foam/": {
-      "sha": "a699fcddc2d0954e",
-      "date": "2026-09-01"
+      "sha": "68ac8e0fb06a6a12",
+      "date": "2026-09-25"
     },
     "/tools/foam-eductor-limit/": {
       "sha": "fedb3aef933892b2",
       "date": "2026-09-01"
     },
     "/tools/foam-max-coverage-area/": {
-      "sha": "fa65898eeee57fd9",
-      "date": "2026-09-01"
+      "sha": "7749cb6faedc2391",
+      "date": "2026-09-25"
     },
     "/tools/food-cost-percentage/": {
       "sha": "cf8ee643a14fc15d",
@@ -3110,8 +3110,8 @@
       "date": "2026-09-07"
     },
     "/tools/friction-loss/": {
-      "sha": "f0b80f3470391ea9",
-      "date": "2026-09-01"
+      "sha": "46aceda18a8e1802",
+      "date": "2026-09-25"
     },
     "/tools/frost-depth-berggren/": {
       "sha": "3a5abd1136f8a384",
@@ -3202,8 +3202,8 @@
       "date": "2026-09-18"
     },
     "/tools/gas-leak-rate/": {
-      "sha": "89d9ea4b36b16e3b",
-      "date": "2026-09-18"
+      "sha": "b4b2c925ff63af8d",
+      "date": "2026-09-25"
     },
     "/tools/gas-meter-clock/": {
       "sha": "d41d992a997ac964",
@@ -3298,8 +3298,8 @@
       "date": "2026-09-25"
     },
     "/tools/generator-sizing/": {
-      "sha": "a265bbe80844d4de",
-      "date": "2026-09-01"
+      "sha": "477b5c3a56d86e6e",
+      "date": "2026-09-25"
     },
     "/tools/geometry/": {
       "sha": "2ee9bf5d8107521a",
@@ -4162,8 +4162,8 @@
       "date": "2026-09-01"
     },
     "/tools/lifting-lug-design/": {
-      "sha": "ab2043a90d43fc29",
-      "date": "2026-09-19"
+      "sha": "bc9114adcb753b79",
+      "date": "2026-09-25"
     },
     "/tools/ligation-molar-ratio/": {
       "sha": "e1c636ecc0f52a04",
@@ -4386,8 +4386,8 @@
       "date": "2026-09-01"
     },
     "/tools/manual-j-cooling/": {
-      "sha": "abe83145b764a074",
-      "date": "2026-09-01"
+      "sha": "a9d2b62388d1576a",
+      "date": "2026-09-25"
     },
     "/tools/manual-j-heating/": {
       "sha": "c6e2855dba5b1d2f",
@@ -5070,8 +5070,8 @@
       "date": "2026-09-17"
     },
     "/tools/pan-conversion/": {
-      "sha": "30ac242dc776bb5a",
-      "date": "2026-09-04"
+      "sha": "9481f28710c30a2d",
+      "date": "2026-09-25"
     },
     "/tools/panel-rebalance/": {
       "sha": "30b9d242cfd93d3a",
@@ -5382,8 +5382,8 @@
       "date": "2026-09-04"
     },
     "/tools/poe-budget/": {
-      "sha": "3f57aac372bde264",
-      "date": "2026-09-04"
+      "sha": "3745d36cb3c3bcac",
+      "date": "2026-09-25"
     },
     "/tools/point-illuminance/": {
       "sha": "cfadc4df2aaaa733",
@@ -5654,8 +5654,8 @@
       "date": "2026-09-01"
     },
     "/tools/psychrometric/": {
-      "sha": "ed891d2f11901dee",
-      "date": "2026-09-01"
+      "sha": "95d21992146c22a5",
+      "date": "2026-09-25"
     },
     "/tools/pt-dwell-development/": {
       "sha": "498b5543082391ba",
@@ -6798,8 +6798,8 @@
       "date": "2026-09-01"
     },
     "/tools/significant-figures/": {
-      "sha": "328af8cbc60d4260",
-      "date": "2026-09-01"
+      "sha": "04d3be4686dcaf9e",
+      "date": "2026-09-25"
     },
     "/tools/silencer-insertion-loss/": {
       "sha": "c4de92beecbe7d59",
@@ -7038,8 +7038,8 @@
       "date": "2026-09-01"
     },
     "/tools/solar-times/": {
-      "sha": "c6bf2588fd888969",
-      "date": "2026-09-01"
+      "sha": "983d572e251179bf",
+      "date": "2026-09-25"
     },
     "/tools/solder-joint-quantity/": {
       "sha": "28c8bf2967c61a52",
@@ -7326,7 +7326,7 @@
       "date": "2026-09-01"
     },
     "/tools/standpipe-friction/": {
-      "sha": "5c517813b5028d22",
+      "sha": "b0eac31d222eabe8",
       "date": "2026-09-25"
     },
     "/tools/standpipe-pdp/": {

@@ -589,10 +589,13 @@ export const sprinklerDensityExample = {
 // --- Utility 102: Standpipe Friction Loss ---
 //
 // total = riser elevation (0.434 psi/ft of water column)
-//       + per-outlet friction summed (CQ^2L per outlet length)
+//       + one outlet's hose friction (CQ^2L per outlet length)
+// Each outlet feeds its own hose line, so the lines run in parallel: their
+// friction does not add, while the flow the riser carries does (n x Q).
+// Until 2026-09-25 this summed n lines' friction into one pressure.
 
 // dims: in { riser_height_ft: L, outlet_count: dimensionless, gpm_per_outlet: L^3 T^-1, outlet_length_ft: L, hose_diameter: dimensionless }
-//        out: { elevation_psi: M L^-1 T^-2, friction_total_psi: M L^-1 T^-2, per_outlet_psi: M L^-1 T^-2, total_psi: M L^-1 T^-2, outlet_count: dimensionless }
+//        out: { elevation_psi: M L^-1 T^-2, friction_total_psi: M L^-1 T^-2, per_outlet_psi: M L^-1 T^-2, total_psi: M L^-1 T^-2, outlet_count: dimensionless, total_flow_gpm: L^3 T^-1 }
 export function computeStandpipeFriction({ riser_height_ft, outlet_count, gpm_per_outlet, outlet_length_ft = 50, hose_diameter = "2.5_in" }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const h = Number(riser_height_ft) || 0;
@@ -603,13 +606,14 @@ export function computeStandpipeFriction({ riser_height_ft, outlet_count, gpm_pe
   if (C === undefined) return { error: "Unknown hose diameter." };
   const elevation_psi = h * 0.434;
   const per_outlet_psi = fireHoseFrictionLoss({ C, gpm: Q, length_ft: outlet_length_ft });
-  const friction_total_psi = per_outlet_psi * n;
+  const friction_total_psi = per_outlet_psi;
   return {
     elevation_psi,
     friction_total_psi,
     per_outlet_psi,
     total_psi: elevation_psi + friction_total_psi,
     outlet_count: n,
+    total_flow_gpm: n * Q,
   };
 }
 
@@ -743,7 +747,7 @@ export function renderSprinklerDensity(inputRegion, outputRegion, citationEl) {
 //        out: { dom_side_effect: dimensionless }
 // (DOM-mount renderer; HTMLElement refs are categorical.)
 export function renderStandpipeFriction(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: per NFPA 14-2022 (standpipes). Elevation 0.434 psi/ft of water; CQ^2L friction per outlet hose section. AHJ governs. Free at nfpa.org/freeaccess.";
+  citationEl.textContent = "Citation: per NFPA 14-2024 (standpipes). Elevation 0.434 psi/ft of water; CQ^2L friction in one outlet's hose line (lines on separate outlets run in parallel, so their friction does not add; the riser carries their combined flow). Riser-pipe friction and the valve/appliance loss are not included. AHJ governs. Free at nfpa.org/freeaccess.";
   const h = makeNumber("Riser height (ft)", "sp-h", { step: "any", min: "0" });
   const n = makeNumber("Outlet count", "sp-n", { step: "1", min: "0" });
   const q = makeNumber("GPM per outlet", "sp-q", { step: "any", min: "0" });
@@ -753,7 +757,8 @@ export function renderStandpipeFriction(inputRegion, outputRegion, citationEl) {
   for (const f of [h, n, q, L, dia]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { h.input.value = "200"; n.input.value = "1"; q.input.value = "250"; L.input.value = "100"; dia.select.value = "2.5_in"; update(); });
   const oE = makeOutputLine(outputRegion, "Elevation pressure", "sp-out-e");
-  const oF = makeOutputLine(outputRegion, "Friction (all outlets)", "sp-out-f");
+  const oF = makeOutputLine(outputRegion, "Hose friction (one line)", "sp-out-f");
+  const oQ = makeOutputLine(outputRegion, "Riser flow (all outlets)", "sp-out-q");
   const oT = makeOutputLine(outputRegion, "Total", "sp-out-t");
   const update = debounce(() => {
     const r = computeStandpipeFriction({
@@ -763,9 +768,10 @@ export function renderStandpipeFriction(inputRegion, outputRegion, citationEl) {
       outlet_length_ft: Number(L.input.value) || 0,
       hose_diameter: dia.select.value,
     });
-    if (r.error) { oE.textContent = r.error; oF.textContent = "-"; oT.textContent = "-"; return; }
+    if (r.error) { oE.textContent = r.error; oF.textContent = "-"; oQ.textContent = "-"; oT.textContent = "-"; return; }
     oE.textContent = fmt(r.elevation_psi, 1) + " psi";
     oF.textContent = fmt(r.friction_total_psi, 1) + " psi";
+    oQ.textContent = fmt(r.total_flow_gpm, 0) + " gpm";
     oT.textContent = fmt(r.total_psi, 1) + " psi";
   }, DEBOUNCE_MS);
   for (const el of [h.input, n.input, q.input, L.input, dia.select]) el.addEventListener("input", update);

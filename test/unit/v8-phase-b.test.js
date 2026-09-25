@@ -133,9 +133,9 @@ test("B.4 pdp cites fire-service pump practice (NFPA 1002), not NFPA 13", async 
   const t = await readCalc("calc-fire.js");
   assertCitationContains(t, ["NFPA 1002", "IFSTA"], "pdp");
 });
-test("B.4 standpipe-friction cites NFPA 14-2022", async () => {
+test("B.4 standpipe-friction cites NFPA 14-2024 (there is no 2022 edition)", async () => {
   const t = await readCalc("calc-fire.js");
-  assertCitationContains(t, ["NFPA 14-2022", "nfpa.org/freeaccess"], "standpipe-friction");
+  assertCitationContains(t, ["NFPA 14-2024", "nfpa.org/freeaccess"], "standpipe-friction");
 });
 
 // --- Construction (spec §B.5) ---

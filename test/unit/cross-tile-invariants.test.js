@@ -7630,9 +7630,9 @@ test("monotonicity: computeVoltageImbalance imbalance_percent = max(|V - avg|) /
   assert.ok(nanV.error, `expected error for NaN V, got ${JSON.stringify(nanV)}`);
 });
 
-test("monotonicity: computeStandpipeFriction total_psi is strictly increasing in riser_height_ft (linear elevation pin) AND in outlet_count (linear friction-sum pin) AND in gpm_per_outlet (NFA C*Q^2 pin); elevation_psi = riser_height * 0.434 exact", () => {
+test("monotonicity: computeStandpipeFriction total_psi is strictly increasing in riser_height_ft (linear elevation pin) AND constant in outlet_count (parallel hose lines) AND in gpm_per_outlet (NFA C*Q^2 pin); elevation_psi = riser_height * 0.434 exact", () => {
   // Group F. elevation_psi = h * 0.434; per_outlet_psi = C * (gpm/100)^2 * (L/100);
-  // friction_total = per_outlet * n; total = elevation + friction_total.
+  // friction_total = per_outlet (parallel lines); total = elevation + friction_total.
   let prev = -Infinity;
   for (const riser_height_ft of [10, 25, 50, 100, 200, 400, 800]) {
     const r = computeStandpipeFriction({ riser_height_ft, outlet_count: 2, gpm_per_outlet: 250 });
@@ -7642,13 +7642,13 @@ test("monotonicity: computeStandpipeFriction total_psi is strictly increasing in
       `total at h=${riser_height_ft} = ${r.total_psi} not greater than prev=${prev}`);
     prev = r.total_psi;
   }
-  // Strictly increasing in outlet_count at fixed h / gpm.
-  let prevN = -Infinity;
+  // Constant in outlet_count at fixed h / gpm: the lines run in parallel,
+  // so more outlets add riser flow, not pressure to one nozzle.
+  const oneLine = computeStandpipeFriction({ riser_height_ft: 100, outlet_count: 1, gpm_per_outlet: 250 }).total_psi;
   for (const outlet_count of [1, 2, 3, 5, 8, 12]) {
     const r = computeStandpipeFriction({ riser_height_ft: 100, outlet_count, gpm_per_outlet: 250 });
-    assert.ok(r.total_psi > prevN,
-      `total at n=${outlet_count} = ${r.total_psi} not greater than prev=${prevN}`);
-    prevN = r.total_psi;
+    assert.equal(r.total_psi, oneLine, `total at n=${outlet_count} = ${r.total_psi}`);
+    assert.equal(r.total_flow_gpm, 250 * outlet_count);
   }
   // Strictly increasing in gpm_per_outlet at fixed h / n (Q^2 pin).
   let prevQ = -Infinity;
@@ -7665,15 +7665,15 @@ test("monotonicity: computeStandpipeFriction total_psi is strictly increasing in
   // total_psi decomposition pin: total = elevation + friction_total.
   assert.ok(Math.abs(ref.total_psi - (ref.elevation_psi + ref.friction_total_psi)) < 1e-9,
     `total = ${ref.total_psi}, expected ${ref.elevation_psi + ref.friction_total_psi}`);
-  // friction_total_psi = per_outlet_psi * outlet_count exact pin.
-  assert.ok(Math.abs(ref.friction_total_psi - ref.per_outlet_psi * ref.outlet_count) < 1e-9,
-    `friction = ${ref.friction_total_psi}, expected ${ref.per_outlet_psi * ref.outlet_count}`);
+  // friction_total_psi = one line's per_outlet_psi exact pin.
+  assert.ok(Math.abs(ref.friction_total_psi - ref.per_outlet_psi) < 1e-9,
+    `friction = ${ref.friction_total_psi}, expected ${ref.per_outlet_psi}`);
   assert.equal(ref.outlet_count, 2);
-  // Doubling-outlets pin: 2x n -> 2x friction_total exactly (linear).
+  // Doubling-outlets pin: 2x n -> 2x riser flow, same friction (parallel lines).
   const a = computeStandpipeFriction({ riser_height_ft: 100, outlet_count: 1, gpm_per_outlet: 250 });
   const b = computeStandpipeFriction({ riser_height_ft: 100, outlet_count: 2, gpm_per_outlet: 250 });
-  assert.ok(Math.abs(b.friction_total_psi - 2 * a.friction_total_psi) < 1e-9,
-    `2x n: friction = ${b.friction_total_psi} != 2 * ${a.friction_total_psi}`);
+  assert.equal(b.friction_total_psi, a.friction_total_psi);
+  assert.equal(b.total_flow_gpm, 2 * a.total_flow_gpm);
   // Doubling-h pin: 2x riser -> 2x elevation_psi exactly (linear).
   const h1 = computeStandpipeFriction({ riser_height_ft: 100, outlet_count: 2, gpm_per_outlet: 250 });
   const h2 = computeStandpipeFriction({ riser_height_ft: 200, outlet_count: 2, gpm_per_outlet: 250 });

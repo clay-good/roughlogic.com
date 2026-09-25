@@ -46,6 +46,22 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **`standpipe-friction` added the friction of hose lines that run side by side.** Each outlet feeds its own line, so the lines run in parallel. The pressure a nozzle needs is the elevation plus one line's friction, while the riser carries the combined flow. The tile multiplied one line's friction by the outlet count, so two 250 gpm outlets on 50 ft of 2½ in hose showed 12.5 psi of friction instead of 6.25. It now reports one line's friction and a new riser flow, n × Q. The page and a test also cited "NFPA 14-2022"; NFPA 14 went from 2019 to 2024, and there is no 2022 edition.
+- **`duct-friction-static` understated rectangular ducts by 11% to 30%.** It put the Huebscher equivalent diameter into Darcy-Weisbach together with the rectangular duct's own velocity. That equivalent diameter describes a round duct of equal friction at equal flow, so it belongs with the round duct's velocity. The tile now uses the hydraulic diameter with the duct's own velocity, as ASHRAE Fundamentals does, and matches its equivalent round duct within 2%. A 12×12 at 800 cfm was 0.072 in. WC per 100 ft and is now 0.080; a 36×8 at 2,000 cfm was 0.077 and is now 0.109. A new test holds the equal-friction identity.
+- **`significant-figures` rounded ties up while its citation said half-to-even.** NIST SP 811 B.7.1 rule 3 keeps the even digit when the dropped digits are exactly 5, so 250 to one figure is 200 and 0.125 to two is 0.12. The tile used `Math.round` and gave 300 and 0.13. It now applies the NIST rules to the number's decimal digits, and three of NIST's own printed examples are fixtures.
+- **Eleven citations described a method their tile does not compute.** A scan compared each citation's constants with its code. In each case below the code was right and the citation text was corrected:
+  - `generator-sizing`: the citation claimed efficiency, surge-factor, and voltage-dip terms that the code does not use.
+  - `poe-budget`: it omitted the four-pair halving and the per-class source voltage.
+  - `friction-loss`: it gave Hazen-Williams "per 100 ft," which is 100 times low; the code multiplies by length.
+  - `gas-leak-rate`: it gave Cd 0.61, but the tile defaults to 0.7.
+  - `manual-j-cooling`: it gave 0.69, but the code uses 0.68, and it left out the floor and internal-gain terms.
+  - `lifting-lug-design`: it gave the simplified BTH-1 forms, and Nd 1.67, which is AISC's Ω. BTH-1 Category A is 2.00.
+  - `concrete-shrinkage-temperature-steel`: it gave ACI 318-14's grade-dependent ratios under a 318-19 citation.
+  - `drawbar-power`: its tractive efficiencies matched no ASABE D497 row.
+  - `solar-times`: it claimed NREL's SPA and ±0.0003° accuracy for NOAA's low-precision series.
+  - `psychrometric`: it gave Sonntag's Magnus constants where the code uses Alduchov-Eskridge.
+  - `brake-pad-life`: it gave a mil-per-stop wear model, but the code uses per-kJ rates and 20% of the stop energy per rotor.
+  - Also corrected: the Gastronorm 1/1 size (20.87 × 12.80 in, not 20.78 × 12.78) and the foam application-rate defaults.
 - **`npsh-a` took atmospheric head from a rule of thumb its own citation did not describe.** The citation named the standard-atmosphere lapse, but the code used "1 inHg per 1,000 ft." That agrees near 5,000 ft (28.2 ft of water) but understates the atmosphere higher up: 22.6 ft at 10,000 ft against Goulds/Xylem's 23.4, and 16.9 ft at 15,000 ft against 19.2. The code now uses the standard atmosphere. Its vapor-pressure table also started at 60 °F, so 50 °F water was charged 0.59 ft of vapor head instead of 0.41. Steam-table rows at 32, 40 and 50 °F are added, and Joe Evans's 2,500 ft, 50 °F example now reproduces.
 - **Both Federal Bridge Formula tiles were stricter than the law.** 23 CFR 658.17 takes W "to the nearest 500 pounds", and FHWA's Bridge Table rounds an exact half down (its footnote 1). Neither tile rounded.
   - **`bridge-formula`** flagged a legal truck. FHWA's own Figure 6, 80,000 lb on five axles over 51 ft, computes to 79,875 lb before rounding, and the tile reported it as a violation.

@@ -608,7 +608,7 @@ export const BESPOKE_OUTPUT_UNITS = {
   "standby-battery-runtime": {"standby_hours":{"prefix":"","suffix":" h","digits":1}},
   "standby-battery-sizing": {"required_ah":{"prefix":"","suffix":" Ah","digits":2}},
   "standing-water": {"gallons":{"prefix":"","suffix":" gal","digits":1},"cubic_feet":{"prefix":"","suffix":" ft^3","digits":2},"pounds":{"prefix":"","suffix":" lb","digits":0}},
-  "standpipe-friction": {"elevation_psi":{"prefix":"","suffix":" psi","digits":1},"friction_total_psi":{"prefix":"","suffix":" psi","digits":1},"total_psi":{"prefix":"","suffix":" psi","digits":1}},
+  "standpipe-friction": {"elevation_psi":{"prefix":"","suffix":" psi","digits":1},"friction_total_psi":{"prefix":"","suffix":" psi","digits":1},"total_flow_gpm":{"prefix":"","suffix":" gpm","digits":0},"total_psi":{"prefix":"","suffix":" psi","digits":1}},
   "standpipe-pdp": {"pdp_psi":{"prefix":"","suffix":" psi","digits":0}},
   "static-pressure-hvac": {"total_in_wc":{"prefix":"","suffix":" in w.c.","digits":3}},
   "static-pressure-piping": {"elevation_loss_psi":{"prefix":"","suffix":" psi","digits":2},"total_psi":{"prefix":"","suffix":" psi","digits":2}},

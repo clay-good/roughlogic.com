@@ -327,3 +327,15 @@ test("cross-tile: refrigerant-pt and superheat-subcool agree on saturation tempe
       `${ref} ${psig} psig: refrigerant-pt satT ${pt.saturated_temperature_F} != superheat-subcool implied ${impliedSat}`);
   }
 });
+
+test("duct-friction-static: a rectangular duct loses what its Huebscher equivalent round duct loses at the same cfm", () => {
+  // D_eq is DEFINED as the round duct of equal friction at equal flow, so the
+  // two must agree. Until 2026-09-25 the rectangular loss mixed D_eq with the
+  // rectangular velocity and read 11% low on a 12x12, 30% low on a 36x8.
+  for (const [W, H, cfm] of [[12, 12, 800], [24, 12, 2000], [36, 8, 2000]]) {
+    const rect = computeDuctFrictionStatic({ shape: "rectangular", W_in: W, H_in: H, cfm, length_ft: 100 });
+    const round = computeDuctFrictionStatic({ shape: "round", D_in: rect.equivalent_diameter_in, cfm, length_ft: 100 });
+    const ratio = rect.friction_loss_per_100ft_in_wc / round.friction_loss_per_100ft_in_wc;
+    assert.ok(Math.abs(ratio - 1) < 0.02, `${W}x${H} at ${cfm} cfm: rect/round = ${ratio}`);
+  }
+});

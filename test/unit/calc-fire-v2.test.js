@@ -153,15 +153,16 @@ test("Standpipe: zero gpm returns error", () => {
   assert.ok(r.error);
 });
 
-test("Standpipe: more outlets -> more friction", () => {
+test("Standpipe: more outlets -> more riser flow, same hose-line friction (lines run in parallel)", () => {
   const a = computeStandpipeFriction({ riser_height_ft: 100, outlet_count: 1, gpm_per_outlet: 250 });
   const b = computeStandpipeFriction({ riser_height_ft: 100, outlet_count: 3, gpm_per_outlet: 250 });
-  assert.ok(b.friction_total_psi > a.friction_total_psi);
+  assert.equal(b.friction_total_psi, a.friction_total_psi);
+  assert.equal(b.total_flow_gpm, 750);
 });
 
-test("Standpipe: friction_total = per_outlet * outlet_count", () => {
+test("Standpipe: friction_total is one line's friction, not per_outlet * outlet_count", () => {
   const r = computeStandpipeFriction({ riser_height_ft: 100, outlet_count: 4, gpm_per_outlet: 250 });
-  assert.ok(close(r.friction_total_psi, r.per_outlet_psi * 4, 0.001));
+  assert.ok(close(r.friction_total_psi, r.per_outlet_psi, 0.001));
 });
 
 test("Standpipe: total = elevation + friction", () => {

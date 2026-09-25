@@ -5737,6 +5737,15 @@ test("bounds: calc-edu sig-figs trio (countSigFigs / roundToSigFigs / computeSig
   assert.strictEqual(countSigFigs(""), 0);
   // roundToSigFigs: 0.00347 to 2 -> 0.0035.
   assert.ok(Math.abs(roundToSigFigs(0.00347, 2) - 0.0035) < 1e-9);
+  // NIST SP 811 B.7.1 rule 3: a tie rounds to the even digit (Math.round, used
+  // until 2026-09-25, rounded 250 up to 300 and 0.125 up to 0.13).
+  assert.strictEqual(roundToSigFigs(6.9749505, 7), 6.97495);
+  assert.strictEqual(roundToSigFigs(6.9749515, 7), 6.974952);
+  assert.strictEqual(roundToSigFigs(250, 1), 200);
+  assert.strictEqual(roundToSigFigs(350, 1), 400);
+  assert.strictEqual(roundToSigFigs(0.125, 2), 0.12);
+  assert.strictEqual(roundToSigFigs(-2.5, 1), -2);
+  assert.strictEqual(roundToSigFigs(99.95, 3), 100);
   assert.strictEqual(roundToSigFigs(1234.567, 3), 1230);
   assert.strictEqual(roundToSigFigs(0, 3), 0);
   assert.strictEqual(roundToSigFigs(1, 0), null, "N <= 0 rejected");

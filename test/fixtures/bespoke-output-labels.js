@@ -877,7 +877,7 @@ export const BESPOKE_OUTPUT_LABELS = {
   "standby-battery-runtime": {"standby_hours":"Standby time supported","note":"Note"},
   "standby-battery-sizing": {"required_ah":"Required capacity (Ah)","next_standard_ah":"Next standard battery","notes":"Notes"},
   "standing-water": {"gallons":"Volume","cubic_feet":"Cubic feet","pounds":"Weight"},
-  "standpipe-friction": {"elevation_psi":"Elevation pressure","friction_total_psi":"Friction (all outlets)","total_psi":"Total"},
+  "standpipe-friction": {"elevation_psi":"Elevation pressure","friction_total_psi":"Hose friction (one line)","total_flow_gpm":"Riser flow (all outlets)","total_psi":"Total"},
   "standpipe-pdp": {"pdp_psi":"Pump discharge pressure (psi)","warnings":"Notes"},
   "static-pressure-hvac": {"total_in_wc":"Total external static pressure"},
   "static-pressure-piping": {"elevation_loss_psi":"Elevation loss","total_psi":"Total"},

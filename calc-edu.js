@@ -547,10 +547,27 @@ export function roundToSigFigs(value, n) {
   const N = Math.floor(Number(n));
   if (!Number.isFinite(x) || !Number.isFinite(N) || N <= 0 || N > 15) return null;
   if (x === 0) return 0;
-  const d = Math.ceil(Math.log10(Math.abs(x)));
-  const power = N - d;
-  const factor = Math.pow(10, power);
-  return Math.round(x * factor) / factor;
+  // NIST SP 811 B.7.1: a dropped 5 followed only by zeros rounds to the even
+  // digit (6.974 950 5 -> 6.974 950 at 7 digits). Until 2026-09-25 this used
+  // Math.round, which rounds half up (250 -> 300, not 200). The tie is judged
+  // on the shortest decimal form of the number, the digits the user typed,
+  // not on its binary approximation.
+  const [mant, expStr] = Math.abs(x).toExponential().split("e");
+  const digits = mant.replace(".", "").split("").map(Number);
+  let exp = Number(expStr);
+  if (digits.length > N) {
+    const kept = digits.slice(0, N);
+    const rest = digits.slice(N);
+    const tie = rest[0] === 5 && rest.slice(1).every((v) => v === 0);
+    if (rest[0] > 5 || (rest[0] === 5 && !tie) || (tie && kept[N - 1] % 2 === 1)) {
+      let i = N - 1;
+      while (i >= 0 && kept[i] === 9) { kept[i] = 0; i -= 1; }
+      if (i >= 0) kept[i] += 1; else { kept.unshift(1); kept.pop(); exp += 1; }
+    }
+    digits.length = 0; digits.push(...kept);
+  }
+  const s = digits[0] + (digits.length > 1 ? "." + digits.slice(1).join("") : "") + "e" + exp;
+  return Math.sign(x) * Number(s);
 }
 
 // dims: in { value: dimensionless, target: dimensionless } out: { rounded: dimensionless, count: dimensionless }

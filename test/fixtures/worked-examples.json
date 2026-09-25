@@ -15073,6 +15073,69 @@
    }
   },
   {
+   "tile_id": "significant-figures",
+   "source_publisher": "NIST",
+   "source_title": "NIST Special Publication 811, Guide for the Use of the International System of Units (SI)",
+   "source_edition_or_year": "2008 edition",
+   "source_section_or_page": "B.7.1 rule 2 example: 6.974 951 5 rounded to 5 digits is 6.9750",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "value": "6.9749515",
+    "target_sig_figs": 5
+   },
+   "outputs": {
+    "rounded_value": {
+     "value": 6.975,
+     "tolerance": {
+      "abs": 1e-09
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "significant-figures",
+   "source_publisher": "NIST",
+   "source_title": "NIST Special Publication 811, Guide for the Use of the International System of Units (SI)",
+   "source_edition_or_year": "2008 edition",
+   "source_section_or_page": "B.7.1 rule 3 example: 6.974 950 5 rounded to 7 digits is 6.974 950 (a tie keeps the even digit)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "value": "6.9749505",
+    "target_sig_figs": 7
+   },
+   "outputs": {
+    "rounded_value": {
+     "value": 6.97495,
+     "tolerance": {
+      "abs": 1e-09
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "significant-figures",
+   "source_publisher": "NIST",
+   "source_title": "NIST Special Publication 811, Guide for the Use of the International System of Units (SI)",
+   "source_edition_or_year": "2008 edition",
+   "source_section_or_page": "B.7.1 rule 3 example: 6.974 951 5 rounded to 7 digits is 6.974 952 (a tie on an odd digit rounds up)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "value": "6.9749515",
+    "target_sig_figs": 7
+   },
+   "outputs": {
+    "rounded_value": {
+     "value": 6.974952,
+     "tolerance": {
+      "abs": 1e-09
+     }
+    }
+   }
+  },
+  {
    "tile_id": "codon-table",
    "source_publisher": "Standard genetic code (universal)",
    "source_title": "RNA -> amino-acid lookup with STOP handling",

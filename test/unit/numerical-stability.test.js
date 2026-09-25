@@ -362,10 +362,10 @@ test("computeStandpipeFriction: monotonic-increasing in riser_height_ft (elevati
   }
 });
 
-test("computeStandpipeFriction: per-outlet friction sum scales linearly in outlet_count", () => {
-  // The per-outlet term is CQ^2L/100 (constant across outlets) and the
-  // total is per_outlet_psi * n. The invariant pins the loop: a refactor
-  // that swapped the sum for a max or a single-outlet shortcut surfaces here.
+test("computeStandpipeFriction: hose-line friction is independent of outlet_count; riser flow scales linearly", () => {
+  // Each outlet feeds its own line, so the lines are in parallel: the
+  // pressure to one nozzle is one line's CQ^2L, and the riser carries n x Q.
+  // Until 2026-09-25 the friction summed across outlets.
   const base = computeStandpipeFriction({
     riser_height_ft: 100,
     outlet_count: 1,
@@ -381,8 +381,9 @@ test("computeStandpipeFriction: per-outlet friction sum scales linearly in outle
       outlet_length_ft: 50,
       hose_diameter: "2.5_in",
     });
-    assert.equal(r.friction_total_psi, base.per_outlet_psi * n, `n=${n}: ft=${r.friction_total_psi}`);
+    assert.equal(r.friction_total_psi, base.per_outlet_psi, `n=${n}: ft=${r.friction_total_psi}`);
     assert.equal(r.per_outlet_psi, base.per_outlet_psi, `n=${n}: per-outlet drifted`);
+    assert.equal(r.total_flow_gpm, 250 * n, `n=${n}: flow=${r.total_flow_gpm}`);
   }
 });
 
@@ -429,7 +430,7 @@ test("computeStandpipeFriction: deterministic across repeated calls", () => {
 test("computeStandpipeFriction: bit-stable for the spec-v14 §9.2 pinned input (h=100, n=2, gpm=250, L=50, 2.5 in)", () => {
   // Pin the four output bit patterns at one canonical input. The four
   // values exercise the elevation accumulator (0.434 * 100), the per-outlet
-  // NFA friction (C=2, (250/100)^2, (50/100)), the per-outlet sum (* 2), and
+  // NFA friction (C=2, (250/100)^2, (50/100)), the one-line friction (parallel lines, not * 2), and
   // the grand total. A coefficient swap on any of the three constants
   // (0.434, 2, the 100 normalizer inside fireHoseFrictionLoss) moves at
   // least one pattern.
@@ -438,8 +439,8 @@ test("computeStandpipeFriction: bit-stable for the spec-v14 §9.2 pinned input (
   });
   assert.equal(bits(r.elevation_psi), "4045b33333333333", `elevation_psi=${r.elevation_psi}`);
   assert.equal(bits(r.per_outlet_psi), "4019000000000000", `per_outlet_psi=${r.per_outlet_psi}`);
-  assert.equal(bits(r.friction_total_psi), "4029000000000000", `friction_total_psi=${r.friction_total_psi}`);
-  assert.equal(bits(r.total_psi), "404bf33333333333", `total_psi=${r.total_psi}`);
+  assert.equal(bits(r.friction_total_psi), "4019000000000000", `friction_total_psi=${r.friction_total_psi}`);
+  assert.equal(bits(r.total_psi), "4048d33333333333", `total_psi=${r.total_psi}`);
 });
 
 // --- Group C Manual J cooling / heating (calc-hvac) ----------------------

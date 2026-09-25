@@ -655,7 +655,7 @@ const renderTireGearing = _simpleRenderer({
 });
 
 const renderBrakePadLife = _simpleRenderer({
-  citation: "Notice: Estimate only. Manufacturer and AHJ govern. Citation: KE = 0.5 m v^2. Wear-rate benchmarks from public engineering practice.",
+  citation: "Notice: Estimate only. Manufacturer and AHJ govern. Citation: KE = 0.5 m v^2; rotor rise = 0.20 KE / (m_rotor x 460 J/kg-K). The per-kJ pad wear rates are illustrative planning defaults, not a published benchmark; a shop-measured rate overrides them.",
   example: brakePadLifeExample.inputs,
   fields: [
     { key: "vehicle_weight_lb", label: "Vehicle weight (lb)", kind: "number" },

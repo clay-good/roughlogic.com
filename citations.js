@@ -1776,13 +1776,13 @@ export const CITATIONS = {
     ],
   },
   "generator-sizing": {
-    formula: "Required kW = max(starting kVA / surge factor, sum of running loads / efficiency); largest-motor LRA contribution per NEC 430.251(B).",
+    formula: "Running kW = sum of the running watts of every load; surge kW = running kW + the largest single (starting − running) excess, i.e. the biggest motor starts while everything else runs. No efficiency, power-factor, or voltage-dip model; the generator's rated surge and the manufacturer's motor-starting data govern.",
     edition: NEC_2023 + " Article 700 / 701 / 702; NEMA MG 1 by name.",
     freeAccess: NEC_FREE,
     governance: GOVERNANCE.electrical,
     editionNote: NEC_DISCLOSURE,
     assumptions: [
-      { name: "Surge tolerance", value: "30% voltage dip on starting (engineering practice)", source: "NEMA MG 1 by name" },
+      { name: "Motor starting", value: "one motor starts at a time, the one with the largest starting-over-running excess; starting watts are the user's nameplate or manufacturer figures", source: "engineering practice" },
     ],
   },
   "existing-load-220-87": {
@@ -1929,7 +1929,7 @@ export const CITATIONS = {
     ],
   },
   "poe-budget": {
-    formula: "I = pse_W / V_source; loop resistance R = R_per_100m × (L / 100m) × (1 + α × (T − 20°C)); P_loss = I² × R; PD power = pse_W − P_loss; flagged against IEEE 802.3 class minimums.",
+    formula: "I = pse_W / V_source; loop resistance R = R_per_100m × (L / 100m) × (1 + α × (T − 20°C)); P_loss = I² × R, with R halved for 802.3bt Type 3 / 4 (power on all four pairs, two pair-sets in parallel); V_source 44 V (af), 50 V (at, bt3), 52 V (bt4); PD power = pse_W − P_loss; flagged against IEEE 802.3 class minimums.",
     edition: "IEEE 802.3bt-2018 by name; manufacturer category cable resistance (Belden / CommScope) attributed in shard.",
     freeAccess: "IEEE 802.3 free at standards.ieee.org/getieee802. Cable specs free at each manufacturer site.",
     governance: GOVERNANCE.electrical,
@@ -3660,7 +3660,7 @@ export const CITATIONS = {
   // --- v7 Group C extensions (utilities 242 through 245) ---
 
   "duct-friction-static": {
-    formula: "Hydraulic diameter D_h = 4A/P (round D_h = D; rectangular Huebscher D_eq = 1.30 × (W×H)^0.625 / (W+H)^0.250). Velocity V_fpm = CFM / A. Velocity pressure VP = (V/4005)². Friction factor from Swamee-Jain explicit Colebrook: f = 0.25 / [log10(eps/(3.7 D) + 5.74/Re^0.9)]². Pressure loss dP = f × (L/D) × (rho_air × V²/(2g)) converted to in WC. Fitting losses dP_fit = Σ (C_o × VP).",
+    formula: "Hydraulic diameter D_h = 4A/P (round D_h = D), used with the duct's own velocity in the friction-factor and loss terms; the rectangular Huebscher equivalent round D_eq = 1.30 × (W×H)^0.625 / (W+H)^0.250 is reported for sizing and is not mixed into the loss. Velocity V_fpm = CFM / A. Velocity pressure VP = (V/4005)². Friction factor from Swamee-Jain explicit Colebrook: f = 0.25 / [log10(eps/(3.7 D) + 5.74/Re^0.9)]². Pressure loss dP = f × (L/D) × (rho_air × V²/(2g)) converted to in WC. Fitting losses dP_fit = Σ (C_o × VP).",
     edition: ASHRAE_62_1.replace("ASHRAE 62.1", "ASHRAE Handbook Fundamentals chapter 21") + " (referenced by name; principles in published engineering texts).",
     freeAccess: ASHRAE_FREE,
     governance: GOVERNANCE.mechanical,
@@ -3831,7 +3831,7 @@ export const CITATIONS = {
     ],
   },
   "friction-loss": {
-    formula: "Hazen-Williams head loss (feet of head): hL = 10.44 × Q^1.852 / (C^1.852 × D^4.87) per 100 ft (water; English units; the NFPA-13 4.52 coefficient gives psi, feet = psi × 2.307). Darcy-Weisbach with Colebrook-White friction factor uses water properties at 60 °F.",
+    formula: "Hazen-Williams head loss (feet of head): hL = 10.44 × L × Q^1.852 / (C^1.852 × D^4.87) with L in ft (water; English units; the NFPA-13 4.52 coefficient gives psi, feet = psi × 2.307). Darcy-Weisbach with Colebrook-White friction factor uses water properties at 60 °F.",
     edition: "Hazen-Williams (AWWA M11, 5th ed., by name). Darcy-Weisbach: classical fluid mechanics.",
     freeAccess: "AWWA M11 licensed; principles free at engineering OCW. NIST fluid-property tables free at nist.gov.",
     governance: GOVERNANCE.plumbing,
@@ -4141,7 +4141,7 @@ export const CITATIONS = {
     governance: GOVERNANCE.plumbing,
     editionNote: "Single-edition (physics).",
     assumptions: [
-      { name: "Discharge coefficient Cd", value: "0.61 sharp-edged orifice unless user supplies", source: "engineering practice" },
+      { name: "Discharge coefficient Cd", value: "0.7 default (a rough-edged crack or fitting leak); 0.61 is the sharp-edged-orifice value; the user may enter either", source: "engineering practice" },
       { name: "Gas density at standard conditions", value: "from data/plumbing/gas-pipe-capacity.json", source: "engineering reference" },
     ],
   },
@@ -4431,7 +4431,7 @@ export const CITATIONS = {
   // calculations, per the spec §2.5 mechanical governance variant.
 
   "manual-j-cooling": {
-    formula: "Sensible cooling load = U×A×ΔT + solar gain + internal gain + infiltration. Latent load = 0.69 × CFM_inf × Δgr (grains/lb). Simplified estimator only; ACCA Manual J 8th ed. is the code-compliant method.",
+    formula: "Sensible cooling load = U×A×ΔT for walls, ceiling and windows + U×A×0.3ΔT for the floor + solar gain + internal gain (230 Btu/h per person + 0.5 Btu/h per ft²) + infiltration 1.08 × CFM_inf × ΔT. Latent load = 0.68 × CFM_inf × Δgr (grains/lb). Simplified estimator only; ACCA Manual J 8th ed. is the code-compliant method.",
     edition: ACCA_J + " NOAA NCEI cooling design temperatures by location (public domain).",
     freeAccess: "ACCA Manual J licensed; principles free in published HVAC engineering texts. NOAA design temps free at ncei.noaa.gov.",
     governance: GOVERNANCE.mechanical,
@@ -5449,14 +5449,14 @@ export const CITATIONS = {
     ],
   },
   "brake-pad-life": {
-    formula: "KE (BTU) = 0.5 × m × v² converted via 1 BTU = 778 ft-lb. Rotor temperature rise ΔT = KE / (mass_rotor × specific_heat). Wear rate by pad chemistry: organic / semi-metallic / ceramic typical mil-per-stop benchmarks.",
+    formula: "KE = 0.5 × m × v² per stop (J). Rotor temperature rise per stop ΔT = 0.20 × KE / (mass_rotor × 460 J/kg-K), taking one rotor as absorbing about a fifth of the stop's energy. Pad wear per stop = KE (kJ) × a per-kJ wear rate by pad chemistry; life = pad thickness / wear per stop, split front/rear by the brake bias.",
     edition: "Classical kinetic-energy theorem; SAE J661 friction test, SAE J2522 (brake performance) by name; manufacturer pad-chemistry technical bulletins (Akebono, EBC, Hawk, StopTech).",
     freeAccess: "SAE licensed; physical-fact derivations free in mechanics texts.",
     governance: GOVERNANCE.general,
     editionNote: "Single-edition (physics + manufacturer wear-rate benchmarks).",
     assumptions: [
-      { name: "Specific heat (cast-iron rotor)", value: "0.108 BTU/lb-°F", source: "engineering-practice value" },
-      { name: "Wear-rate ranges", value: "organic ~ 0.5 mil/stop; semi-metallic ~ 0.3; ceramic ~ 0.2 (typical)", source: "manufacturer technical literature" },
+      { name: "Specific heat (cast-iron rotor)", value: "460 J/kg-K (0.11 BTU/lb-°F); one rotor takes about 20% of the stop energy", source: "engineering-practice value" },
+      { name: "Wear rates", value: "organic 2.0e-5, semi-metallic 1.2e-5, ceramic 0.9e-5 mm per kJ (illustrative defaults; a shop-measured rate overrides)", source: "planning defaults, not a published benchmark" },
     ],
   },
 
@@ -5693,7 +5693,7 @@ export const CITATIONS = {
     governance: GOVERNANCE.food,
     editionNote: "Single-edition (NSF/ANSI 2 / 4 + GN DIN EN 631 dimensions).",
     assumptions: [
-      { name: "Full-size GN dimensions", value: "20.78 in × 12.78 in (1/1 GN per DIN EN 631)", source: "DIN EN 631" },
+      { name: "Full-size GN dimensions", value: "530 × 325 mm, 20.87 in × 12.80 in (1/1 GN per DIN EN 631)", source: "DIN EN 631" },
     ],
   },
 
@@ -5832,7 +5832,7 @@ export const CITATIONS = {
   // industry-standard care reference for damage-restoration work.
 
   "psychrometric": {
-    formula: "Saturation vapor pressure es(T) = 6.112 × exp((17.62 × T) / (243.12 + T)) mb (August-Roche-Magnus). RH × es = e (actual vapor pressure). Dew point Td = (243.12 × ln(e/6.112)) / (17.62 - ln(e/6.112)). GPP = 7000 × (0.622 × e) / (P - e).",
+    formula: "Saturation vapor pressure es(T) = 6.1094 × exp((17.625 × T) / (243.04 + T)) mb (August-Roche-Magnus, Alduchov-Eskridge 1996 coefficients). RH × es = e (actual vapor pressure). Dew point Td = (243.04 × ln(e/6.1094)) / (17.625 - ln(e/6.1094)). GPP = 7000 × (0.622 × e) / (P - e).",
     edition: "August-Roche-Magnus formulation by name; ASHRAE Handbook (Fundamentals) Chapter 1 (Psychrometrics) by name.",
     freeAccess: "Psychrometric formulas free in published engineering texts; ASHRAE Handbook licensed.",
     governance: GOVERNANCE.general,
@@ -6239,7 +6239,7 @@ export const CITATIONS = {
     governance: GOVERNANCE.fire,
     editionNote: "Single-edition (NFPA 11 + manufacturer concentrate specs).",
     assumptions: [
-      { name: "Application-rate defaults", value: "0.10 gpm/ft² Class A; 0.16 gpm/ft² Class B AFFF (NFPA 11 typical)", source: "NFPA 11" },
+      { name: "Application-rate default", value: "0.10 gpm/ft² default, the tile's only preset; NFPA 11 sets the rate by hazard and foam type, so enter the rate the fuel, the foam, and the SOP call for", source: "NFPA 11" },
     ],
   },
   "foam-max-coverage-area": {
@@ -6249,7 +6249,7 @@ export const CITATIONS = {
     governance: GOVERNANCE.fire,
     editionNote: "The inverse of foam: the largest fire area the concentrate on the apparatus can cover for the full duration. A lower application rate, a leaner concentrate percentage, or a shorter duration stretches the same load over more area, but the rate and duration come from the fuel (hydrocarbon vs polar solvent) and the department SOP, not convenience. A master-stream / fixed-supply planning number; the foam type, the burnback resistance, and the incident commander govern.",
     assumptions: [
-      { name: "Application-rate defaults", value: "0.10 gpm/ft² Class A; 0.16 gpm/ft² Class B AFFF (NFPA 11 typical)", source: "NFPA 11" },
+      { name: "Application-rate default", value: "0.10 gpm/ft² default, the tile's only preset; NFPA 11 sets the rate by hazard and foam type, so enter the rate the fuel, the foam, and the SOP call for", source: "NFPA 11" },
       { name: "Fixed supply", value: "the concentrate on hand is the constraint; rate and duration are set by the fuel and SOP", source: "NFPA 11 / department SOP" },
     ],
   },
@@ -6282,7 +6282,7 @@ export const CITATIONS = {
     ],
   },
   "standpipe-friction": {
-    formula: "Total = elevation (0.434 psi/ft × height) + per-outlet friction + appliance friction. Min residual at the topmost outlet 100 psi for Class I per NFPA 14 §7.8 (Minimum and Maximum Pressure Limits; §7.10 is flow rates).",
+    formula: "Total = elevation (0.434 psi/ft × height) + friction in one outlet's hose line (NFA CQ²L). Lines on separate outlets run in parallel, so their friction does not add; the riser carries their combined flow, n × Q. Riser-pipe friction and the valve/appliance loss are not included. Min residual at the topmost outlet 100 psi for Class I per NFPA 14 §7.8 (Minimum and Maximum Pressure Limits; §7.10 is flow rates).",
     edition: "NFPA 14 (2024) §7.8 (Minimum and Maximum Pressure Limits) and §7.10 (Flow Rates) by name and section.",
     freeAccess: "NFPA 14 read-only at nfpa.org/freeaccess.",
     governance: GOVERNANCE.fire,
@@ -7055,13 +7055,13 @@ export const CITATIONS = {
     assumptions: [],
   },
   "drawbar-power": {
-    formula: "Drawbar HP = (pull_lb × speed_mph) / 375. PTO HP estimate = drawbar_HP / tractive_efficiency (typical 0.65 firm soil / 0.55 tilled / 0.45 soft).",
+    formula: "Drawbar HP = (pull_lb × speed_mph) / 375. PTO HP estimate = drawbar_HP / tractive_efficiency, from the ASABE D497 table by tractor type and surface (2WD: 0.87 concrete / 0.72 firm / 0.67 tilled / 0.55 soft or sandy; MFWD, 4WD and track rows higher).",
     edition: "ASABE D497 (Agricultural Machinery Management Data) by name; Nebraska Tractor Test Lab publications.",
     freeAccess: "Nebraska Tractor Test data free at tractortestlab.unl.edu.",
     governance: GOVERNANCE.general,
     editionNote: "Single-edition (ASABE D497 + Nebraska Tractor Test).",
     assumptions: [
-      { name: "Tractive-efficiency table", value: "0.65 firm / 0.55 tilled / 0.45 soft (engineering-practice values)", source: "ASABE D497" },
+      { name: "Tractive-efficiency table", value: "2WD 0.87 concrete / 0.72 firm / 0.67 tilled / 0.55 soft; MFWD, 4WD and track rows by surface", source: "ASABE D497" },
     ],
   },
   "drawbar-pull": {
@@ -7449,13 +7449,13 @@ export const CITATIONS = {
     ],
   },
   "solar-times": {
-    formula: "NOAA Solar Position Algorithm (SPA) calculates declination, equation of time, sunrise / sunset / civil / nautical / astronomical twilight from latitude / longitude / date.",
-    edition: "NOAA Solar Calculator (USNO algorithm) by name; Reda & Andreas, 'Solar Position Algorithm for Solar Radiation Applications' (NREL/TP-560-34302, 2008) by name.",
+    formula: "NOAA's General Solar Position Calculations (the fractional-year Fourier series for declination and the equation of time) give sunrise / sunset / civil / nautical / astronomical twilight from latitude / longitude / date, with the sun's center at zenith 90.833° for sunrise and sunset.",
+    edition: "NOAA Solar Calculator (Global Monitoring Laboratory), its General Solar Position Calculations, by name. Not the NREL Solar Position Algorithm (Reda & Andreas), which is far more precise.",
     freeAccess: "Free at gml.noaa.gov/grad/solcalc.",
     governance: GOVERNANCE.field,
-    editionNote: "Single-edition (NOAA SPA / Reda-Andreas; ≤ ±0.0003° accuracy).",
+    editionNote: "Single-edition (NOAA's low-precision series; sunrise and sunset to about a minute at mid-latitudes, less near the poles).",
     assumptions: [
-      { name: "Atmospheric refraction", value: "−0.833° standard at horizon", source: "NOAA SPA" },
+      { name: "Atmospheric refraction", value: "−0.833° standard at horizon", source: "NOAA General Solar Position Calculations" },
     ],
   },
 
@@ -8104,14 +8104,14 @@ export const CITATIONS = {
     ],
   },
   "significant-figures": {
-    formula: "Sig-fig count: non-zero digits are always significant; zeros between non-zeros are significant; leading zeros are not; trailing zeros after a decimal point ARE significant. Trailing zeros in a bare integer are ambiguous and NOT counted here (use scientific notation for explicit precision). Rounding to N sig figs: scale by 10^(N - ceil(log10(|x|))), round, scale back.",
+    formula: "Sig-fig count: non-zero digits are always significant; zeros between non-zeros are significant; leading zeros are not; trailing zeros after a decimal point ARE significant. Trailing zeros in a bare integer are ambiguous and NOT counted here (use scientific notation for explicit precision). Rounding to N sig figs follows NIST SP 811 B.7.1 on the number's decimal digits: a dropped digit below 5 truncates, a dropped 5 followed by any nonzero digit rounds up, and a dropped 5 followed only by zeros rounds to the even digit.",
     edition: "Significant-figure conventions per NIST SP 811 §7 (Guide for the Use of the International System of Units).",
     freeAccess: "Free at nist.gov/pml/special-publication-811.",
     governance: GOVERNANCE.education,
-    editionNote: "Single-edition (mathematical / SI convention). The rounding implementation uses IEEE-754 round-half-to-even via Math.round which matches the SI / NIST 'banker's rounding' convention for ties.",
+    editionNote: "Single-edition (mathematical / SI convention). Ties round to even per NIST SP 811 B.7.1 rule 3 (6.974 950 5 to 7 digits is 6.974 950; 250 to 1 digit is 200), judged on the shortest decimal form of the number rather than its binary approximation. Many classroom texts round a tie up instead; the two differ only on exact ties.",
     assumptions: [
       { name: "Bare-integer trailing zeros", value: "not counted; use scientific notation (1.500e3) or a trailing decimal (1500.) to mark them as significant", source: "convention; the rule is ambiguous in plain decimal" },
-      { name: "Rounding mode", value: "round half to even (banker's rounding) via IEEE-754", source: "JS Math.round behavior; matches NIST guidance" },
+      { name: "Rounding mode", value: "round half to even on the decimal digits (a 5 followed only by zeros)", source: "NIST SP 811 B.7.1 rule 3" },
     ],
   },
   "codon-table": {
@@ -16361,14 +16361,14 @@ export const CITATIONS = {
     ],
   },
   "lifting-lug-design": {
-    formula: "bearing = 1.25 Fy Dp t / Nd; net tension = Fu (w - Dh) t / Nd; shear tear-out = 0.70 Fu (2 t (a + Dp/2 - Dh/2)) / Nd; governing = min; DCR = load / governing.",
+    formula: "bearing = 1.25 Fy Dp t / Nd; tension through the pinhole = Cr Fu 2 t beff / (1.20 Nd), beff = min(4t, be, 0.6 be (Fu/Fy) sqrt(Dh/be)), Cr = 1 - 0.275 sqrt(1 - Dp²/Dh²); double-plane shear tear-out = 0.70 Fu Av / (1.20 Nd), Av = 2 t (a - Dh/2 + (Dp/2)(1 - cos φ)), φ = 55 Dp/Dh degrees; governing = min; DCR = load / governing.",
     edition: "The ASME BTH-1 Section 3-3.3 pin-connected-plate (lifting lug / padeye) strength checks, by name.",
     freeAccess: "ASME BTH-1 is available through ASME; the pin-plate strength relations are established design checks. An estimate; the engineer of record governs.",
     governance: GOVERNANCE.rigging,
     editionNote: "The four modes trade off through hole placement: moving the hole from the edge cures tear-out but shrinks the net tension width, and the pin-to-hole clearance drives bearing, so a lug sized for gross tension alone can tear out at the pin. The design factor Nd depends on the ASME BTH-1 design category (A or B) and service class; cheek plates and weld design are separate checks. A screening aid, not the engineer of record.",
     assumptions: [
-      { name: "Three checked modes", value: "bearing, net-section tension, and double-plane shear tear-out; the minimum governs", source: "ASME BTH-1 3-3.3" },
-      { name: "Design factor Nd", value: "1.67 (Cat A) or 2.0 (Cat B) times the service-class multiplier", source: "ASME BTH-1 3-1.3" },
+      { name: "Three checked modes", value: "bearing, tension through the pinhole, and double-plane shear tear-out; the minimum governs (dishing and cheek-plate welds are separate)", source: "ASME BTH-1 3-3.3" },
+      { name: "Design factor Nd", value: "2.00 (Design Category A, the default) or 3.00 (Category B); 1.67 is AISC's ASD factor, not BTH-1's", source: "ASME BTH-1 3-1.3" },
     ],
   },
   "hay-dry-matter": {
@@ -18987,13 +18987,13 @@ export const CITATIONS = {
     ],
   },
   "concrete-shrinkage-temperature-steel": {
-    formula: "ratio = 0.0018 (Grade 60) or 0.0020 (Grade 40/50), never below 0.0014; As,min = ratio x b x h; s_max = min(5h, 18 in).",
+    formula: "ratio = 0.0018 for every bar grade (ACI 318-19 Table 24.4.3.2); As,min = ratio x b x h; s_max = min(5h, 18 in).",
     edition: "The ACI 318-19 24.4 shrinkage and temperature reinforcement provisions, by name.",
     freeAccess: "ACI 318 is readable free through the ACI online reading room at concrete.org; the 24.4 shrinkage-and-temperature provisions are in the published code.",
     governance: GOVERNANCE.general,
-    editionNote: "The ACI 318-19 24.4.3.2 minimum shrinkage-and-temperature reinforcement ratio (0.0018 for Grade 60 deformed bars, 0.0020 for Grade 40/50, and never less than 0.0014), As,min = ratio x b x h per design strip, and the 24.4.3.3 spacing limit of the smaller of 5h and 18 in. This is the reinforcement placed perpendicular to the main flexural bars in a one-way slab to control shrinkage and thermal cracking; it does not size the flexural (main) steel and does not check crack width for a given exposure class. A design aid, not a substitute for the structural engineer of record's stamped design.",
+    editionNote: "The ACI 318-19 24.4.3.2 minimum shrinkage-and-temperature reinforcement ratio (0.0018 for all reinforcement; ACI 318-14's grade-dependent 0.0020 / 0.0018 / 0.0014 rule was dropped in 318-19), As,min = ratio x b x h per design strip, and the 24.4.3.3 spacing limit of the smaller of 5h and 18 in. This is the reinforcement placed perpendicular to the main flexural bars in a one-way slab to control shrinkage and thermal cracking; it does not size the flexural (main) steel and does not check crack width for a given exposure class. A design aid, not a substitute for the structural engineer of record's stamped design.",
     assumptions: [
-      { name: "Minimum ratio", value: "0.0018 Grade 60, 0.0020 Grade 40/50, floor 0.0014", source: "ACI 318-19 24.4.3.2" },
+      { name: "Minimum ratio", value: "0.0018, all grades", source: "ACI 318-19 Table 24.4.3.2" },
       { name: "Minimum area", value: "As,min = ratio x b x h per strip", source: "ACI 318-19 24.4.3.2" },
       { name: "Spacing limit", value: "s_max = min(5h, 18 in)", source: "ACI 318-19 24.4.3.3" },
     ],

@@ -259,7 +259,7 @@
     },
     "standpipe-friction": {
       "group": "calc-fire.js (Group F)",
-      "stamp": "Citation: per NFPA 14-2022 (standpipes). Elevation 0.434 psi/ft of water; CQ^2L friction per outlet hose section. AHJ governs. Free at nfpa.org/freeaccess."
+      "stamp": "Citation: per NFPA 14-2024 (standpipes). Elevation 0.434 psi/ft of water; CQ^2L friction in one outlet's hose line (lines on separate outlets run in parallel, so their friction does not add; the riser carries their combined flow). Riser-pipe friction and the valve/appliance loss are not included. AHJ governs. Free at nfpa.org/freeaccess."
     },
     "statistics-quickread": {
       "group": "calc-edu.js (Group Y, v12 §9)",
