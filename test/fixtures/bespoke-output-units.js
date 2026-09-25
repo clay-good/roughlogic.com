@@ -733,7 +733,7 @@ export const BESPOKE_OUTPUT_UNITS = {
   "wire-feed-deposition": {"wire_area_in2":{"prefix":"","suffix":" in2","digits":6},"melt_lb_hr":{"prefix":"","suffix":" lb/hr","digits":2},"deposit_lb_hr":{"prefix":"","suffix":" lb/hr","digits":2}},
   "wire-feed-speed-for-deposition": {"wfs_in_min":{"prefix":"","suffix":" in/min","digits":0},"melt_lb_hr":{"prefix":"","suffix":" lb/hr","digits":2}},
   "wire-pulling-lubricant": {"gallons":{"prefix":"","suffix":" gal","digits":1}},
-  "wire-rope-clips": {"clip_count":{"prefix":"","suffix":" clips","digits":0},"spacing_in":{"prefix":"","suffix":" in on center","digits":2}},
+  "wire-rope-clips": {"clip_count":{"prefix":"","suffix":" clips","digits":0},"spacing_in":{"prefix":"","suffix":" in on center","digits":2},"minimum_tail_in":{"prefix":"","suffix":" in","digits":2}},
   "wire-rope-diameter-for-wll": {"diameter_in":{"prefix":"","suffix":" in","digits":3}},
   "wire-rope-strength": {"mbs_tons":{"prefix":"","suffix":" tons","digits":2},"wll_tons":{"prefix":"","suffix":" tons","digits":2}},
   "wireless-fspl": {"fspl_db":{"prefix":"","suffix":" dB","digits":2},"rx_power_dbm":{"prefix":"","suffix":" dBm","digits":1}},

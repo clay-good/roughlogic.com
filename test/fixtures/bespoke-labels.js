@@ -1049,7 +1049,7 @@ export const BESPOKE_LABELS = {
   "wire-feed-deposition": {"wfs_in_min":"Wire feed speed (in/min)","wire_dia_in":"Wire diameter (in)","deposition_eff":"Deposition efficiency (0-1)"},
   "wire-feed-speed-for-deposition": {"target_deposit_lb_hr":"Target deposition rate (lb/hr)","wire_dia_in":"Wire diameter (in)","deposition_eff":"Deposition efficiency (0-1)"},
   "wire-pulling-lubricant": {"length_ft":"Conduit run length (ft)","conduit_id_in":"Conduit inside diameter (in)","k_factor":"Film-coating K factor","bend_factor":"Bend / fill multiplier"},
-  "wire-rope-clips": {"rope_diameter_in":"Wire rope diameter (in)"},
+  "wire-rope-clips": {"rope_diameter_in":"Wire rope diameter (in)","clip_material":"Clip material"},
   "wire-rope-diameter-for-wll": {"wll_required_tons":"Required working load limit (tons)","construction_factor":"Construction factor (tons/in²)","design_factor":"Design factor (safety factor)"},
   "wire-rope-strength": {"diameter_in":"Rope nominal diameter (in)","construction_factor":"Construction factor (tons/in²)","design_factor":"Design factor (safety factor)"},
   "wire-rope-stretch": {"load_lb":"Line load (lb)","length_ft":"Rope length under load (ft)","rope_diameter_in":"Rope diameter (in)","effective_modulus_psi":"Effective rope modulus (psi)","metallic_area_factor":"Metallic-area factor (fill factor)"},

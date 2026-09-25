@@ -1621,43 +1621,70 @@ function renderBeamClampSidePull(inputRegion, outputRegion, citationEl) {
 RIGGING_RENDERERS["beam-clamp-side-pull"] = renderBeamClampSidePull;
 
 // ===================== spec-v938: wire-rope clip count and spacing (OSHA Table H-2/H-20) =====================
-// dims: in { rope_diameter_in: L } out: { clip_count: dimensionless, spacing_in: L, minimum_tail_in: L }
-export function computeWireRopeClips({ rope_diameter_in = 0.75 } = {}) {
+// OSHA 29 CFR 1926.251 Table H-2: [rope diameter in, drop-forged clips,
+// other-material clips]; minimum spacing is 6 x the diameter on every row.
+// The turnback is the Crosby G-450 application table's "amount of rope to
+// turn back", a manufacturer figure for forged clips. Until 2026-09-24 the
+// tile took clips x 6d as the tail -- 9 in at 1/2 in where Crosby turns back
+// 11-1/2 -- and gave every clip the drop-forged count.
+const WIRE_ROPE_CLIP_ROWS = [
+  [0.125, 2, null, 3.25], [0.1875, 2, null, 3.75], [0.25, 2, null, 4.75], [0.3125, 2, null, 5.25],
+  [0.375, 2, null, 6.5], [0.4375, 2, null, 7],
+  [0.5, 3, 4, 11.5], [0.5625, 3, 4, 12], [0.625, 3, 4, 12], [0.75, 4, 5, 18], [0.875, 4, 5, 19],
+  [1.0, 5, 6, 26], [1.125, 6, 6, 34], [1.25, 6, 7, 44], [1.375, 7, 7, 44], [1.5, 7, 8, 54],
+];
+
+// dims: in { rope_diameter_in: L, clip_material: dimensionless } out: { clip_count: dimensionless, spacing_in: L, minimum_tail_in: L }
+export function computeWireRopeClips({ rope_diameter_in = 0.75, clip_material = "drop_forged" } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(rope_diameter_in > 0)) return { error: "Rope diameter must be positive (in)." };
-  // OSHA 1926.251 Table H-2 (formerly H-20) minimum U-bolt clip count by rope diameter.
+  if (clip_material !== "drop_forged" && clip_material !== "other") return { error: "Clip material must be drop_forged or other." };
   const d = rope_diameter_in;
-  const clip_count = d < 0.5 ? 2 : d <= 0.625 ? 3 : d <= 0.875 ? 4 : d <= 1.0 ? 5 : d <= 1.25 ? 6 : d <= 1.5 ? 7 : 8;
-  // Spacing between clips = 6 x the rope diameter (per the table); the tail past the last clip carries the same spacing.
+  // Between listed sizes, the next larger row governs.
+  const row = WIRE_ROPE_CLIP_ROWS.find((rw) => rw[0] >= d - 1e-9);
+  if (!row) return { error: "OSHA Table H-2 stops at 1-1/2 in rope; above it, follow the clip manufacturer's table." };
+  const forged = row[1];
+  const other = row[2];
+  if (clip_material === "other" && other === null) {
+    return { error: "OSHA Table H-2 starts at 1/2 in rope and the 2-clip minimum below it is for forged clips; for other clip materials follow the manufacturer's table." };
+  }
+  const clip_count = clip_material === "other" ? other : forged;
   const spacing_in = 6 * rope_diameter_in;
-  const minimum_tail_in = (clip_count - 1) * spacing_in + spacing_in;
+  // Crosby's turnback is for its forged count; an extra clip needs one more spacing of rope.
+  const minimum_tail_in = row[3] + (clip_count - forged) * spacing_in;
   if (![clip_count, spacing_in, minimum_tail_in].every(Number.isFinite)) return { error: "Wire-rope-clip math is not a finite value." };
   return {
     clip_count,
     spacing_in,
     minimum_tail_in,
-    note: "The minimum number of U-bolt wire-rope clips and their spacing to form a load-bearing eye, per OSHA 29 CFR 1926.251 Table H-2 (the old H-20): a 3/4 in rope takes 4 clips at 6 x the diameter (4.5 in) on center. The clips MUST be installed with the U-bolt (saddle) on the DEAD (short) end and the saddle (base) on the LIVE (load) end -- 'never saddle a dead horse' -- torqued to the maker's value in sequence, retorqued after the first load. Below 1/2 in the OSHA table does not list a count; 2 clips is the common manufacturer minimum. Use only the wire-rope thimble and clips rated for the rope, and re-check the torque; the clip and rope manufacturer and OSHA govern the termination, and a properly formed clip eye develops only about 80% of the rope's strength." ,
+    note: "The minimum number of U-bolt wire-rope clips and their spacing to form a load-bearing eye, per OSHA 29 CFR 1926.251 Table H-2 (the old H-20): a 3/4 in rope takes 4 drop-forged clips, or 5 of any other material, at 6 x the diameter (4.5 in) on center. The turnback is the Crosby G-450 table's amount of rope to turn back from the thimble (18 in at 3/4 in), plus one spacing per extra clip for other materials; another maker's table governs its own clips, and Crosby itself calls for 7 clips at 1-1/4 in and 8 at 1-1/2 in, one more than OSHA. Install the U-bolt on the DEAD (short) end and the saddle on the LIVE (load) end -- 'never saddle a dead horse' -- torqued to the maker's value in sequence and retorqued after the first load. Below 1/2 in the OSHA table does not list a count; 2 forged clips is the Crosby minimum. A properly formed clip eye develops only about 80% of the rope's strength; the clip and rope manufacturer and OSHA govern the termination.",
   };
 }
 
 export const wireRopeClipsExample = { inputs: { rope_diameter_in: 0.75 } };
 
 function _v938renderWireRopeClips(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: wire-rope clip count and spacing by name (OSHA 29 CFR 1926.251 Table H-2 / H-20). clips by rope diameter (1/2->3, 3/4->4, 1->5, ...); spacing = 6 x diameter. U-bolt on the dead end ('never saddle a dead horse'); torque per the maker. The manufacturer and OSHA govern the termination.";
+  citationEl.textContent = "Citation: wire-rope clip count and spacing by name (OSHA 29 CFR 1926.251 Table H-2 / H-20). Drop-forged clips by rope diameter (1/2->3, 3/4->4, 1->5, ...), one more at most sizes for other materials; spacing = 6 x diameter. Turnback per the Crosby G-450 application instructions. U-bolt on the dead end ('never saddle a dead horse'); torque per the maker. The manufacturer and OSHA govern the termination.";
   const dia = makeNumber("Wire rope diameter (in)", "wrc-dia", { step: "any", min: "0" });
+  const mat = makeSelect("Clip material", "wrc-mat", [
+    { value: "drop_forged", label: "Drop forged", selected: true },
+    { value: "other", label: "Other material (e.g. malleable iron)" },
+  ]);
   inputRegion.appendChild(dia.wrap);
-  attachExampleButton(inputRegion, () => { dia.input.value = "0.75"; update(); });
+  inputRegion.appendChild(mat.wrap);
+  attachExampleButton(inputRegion, () => { dia.input.value = "0.75"; mat.select.value = "drop_forged"; update(); });
   const oClips = makeOutputLine(outputRegion, "Minimum clips", "wrc-out-clips");
   const oSpace = makeOutputLine(outputRegion, "Clip spacing (6 x diameter)", "wrc-out-space");
-  const oTail = makeOutputLine(outputRegion, "Minimum turnback / tail", "wrc-out-tail");
+  const oTail = makeOutputLine(outputRegion, "Rope turnback from the thimble", "wrc-out-tail");
   const update = debounce(() => {
-    const r = computeWireRopeClips({ rope_diameter_in: dia.input.value === "" ? 0.75 : Number(dia.input.value) });
+    const r = computeWireRopeClips({ rope_diameter_in: dia.input.value === "" ? 0.75 : Number(dia.input.value), clip_material: mat.select.value });
     if (r.error) { oClips.textContent = r.error; oSpace.textContent = "-"; oTail.textContent = "-"; return; }
     oClips.textContent = fmt(r.clip_count, 0) + " clips";
     oSpace.textContent = fmt(r.spacing_in, 2) + " in on center";
-    oTail.textContent = "about " + fmt(r.minimum_tail_in, 1) + " in of tail past the thimble";
+    oTail.textContent = fmt(r.minimum_tail_in, 2) + " in";
   }, DEBOUNCE_MS);
   dia.input.addEventListener("input", update);
+  mat.select.addEventListener("input", update);
 }
 RIGGING_RENDERERS["wire-rope-clips"] = _v938renderWireRopeClips;
 

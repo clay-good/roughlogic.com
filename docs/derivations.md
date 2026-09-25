@@ -3404,7 +3404,7 @@ cross-check.
 | calc-rigging.js | `computeThreePointBridle` | `{ apex_load_lb, e1_ft, n1_ft, r1_ft, e2_ft, n2_ft, r2_ft, e3_ft, n3_ft, r3_ft...` | _ | _ | _ |
 | calc-rigging.js | `computeWinchDrumLinePull` | `{ rated_pull_lb, drum_dia_in, rope_dia_in, barrel_width_in, target_layer = 1 ...` | _ | _ | _ |
 | calc-rigging.js | `computeWindOnLoad` | `{ sail_area_ft2, wind_mph, shape_coef = 1.6, load_weight_lb } = {}` | _ | _ | _ |
-| calc-rigging.js | `computeWireRopeClips` | `{ rope_diameter_in = 0.75 } = {}` | _ | _ | _ |
+| calc-rigging.js | `computeWireRopeClips` | `{ rope_diameter_in = 0.75, clip_material = "drop_forged" } = {}` | _ | _ | _ |
 | calc-rigging.js | `computeWireRopeDiameterForWll` | `{ wll_required_tons = 0, construction_factor = 46, design_factor = 5 } = {}` | _ | _ | _ |
 | calc-rigging.js | `computeWireRopeStrength` | `{ diameter_in = 0, construction_factor = 46, design_factor = 5 } = {}` | _ | _ | _ |
 | calc-rigging.js | `computeWireRopeStretch` | `{ load_lb = 0, length_ft = 0, rope_diameter_in = 0, effective_modulus_psi = 1...` | _ | _ | _ |

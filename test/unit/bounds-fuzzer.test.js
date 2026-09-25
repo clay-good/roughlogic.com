@@ -29330,6 +29330,15 @@ test("bounds: spec-v938 computeWireRopeClips pins the OSHA Table H-2 count, spac
   assert.equal(_v938({ rope_diameter_in: 1.5 }).clip_count, 7); // 1-1/2 in
   assert.equal(_v938({ rope_diameter_in: 0.375 }).clip_count, 2); // below the table
   assert.ok(Math.abs(_v938({ rope_diameter_in: 1.0 }).spacing_in - 6.0) < 1e-9); // 6 * 1
+  // OSHA Table H-2 "other material" column, read 2026-09-24 at osha.gov.
+  const other = [[0.5, 4], [0.625, 4], [0.75, 5], [0.875, 5], [1.0, 6], [1.125, 6], [1.25, 7], [1.375, 7], [1.5, 8]];
+  for (const [d, n] of other) assert.equal(_v938({ rope_diameter_in: d, clip_material: "other" }).clip_count, n, `other @ ${d}`);
+  // Crosby G-450 turnback, not clips x 6d (which gave 9 in at 1/2 in).
+  const turnback = [[0.25, 4.75], [0.375, 6.5], [0.5, 11.5], [0.625, 12], [0.75, 18], [0.875, 19], [1.0, 26], [1.125, 34], [1.25, 44], [1.5, 54]];
+  for (const [d, t] of turnback) assert.equal(_v938({ rope_diameter_in: d }).minimum_tail_in, t, `turnback @ ${d}`);
+  // Past the OSHA table, and other-material clips below it, are the maker's call.
+  assert.ok("error" in _v938({ rope_diameter_in: 1.625 }));
+  assert.ok("error" in _v938({ rope_diameter_in: 0.375, clip_material: "other" }));
   // Error seams: non-positive diameter, non-finite.
   assert.ok("error" in _v938({ rope_diameter_in: 0 }));
   assert.ok("error" in _v938({ rope_diameter_in: Infinity }));

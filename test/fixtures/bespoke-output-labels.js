@@ -1048,7 +1048,7 @@ export const BESPOKE_OUTPUT_LABELS = {
   "wire-feed-deposition": {"wire_area_in2":"Wire cross-section","melt_lb_hr":"Melt-off rate","deposit_lb_hr":"Deposition rate"},
   "wire-feed-speed-for-deposition": {"wfs_in_min":"Required wire feed speed","melt_lb_hr":"Melt-off rate","note":"Note"},
   "wire-pulling-lubricant": {"gallons":"Lubricant to bring"},
-  "wire-rope-clips": {"clip_count":"Minimum clips","spacing_in":"Clip spacing (6 x diameter)","minimum_tail_in":"Minimum turnback / tail"},
+  "wire-rope-clips": {"clip_count":"Minimum clips","spacing_in":"Clip spacing (6 x diameter)","minimum_tail_in":"Rope turnback from the thimble"},
   "wire-rope-diameter-for-wll": {"diameter_in":"Exact diameter required","selected_diameter_in":"Next standard size","note":"Note"},
   "wire-rope-strength": {"mbs_tons":"Estimated breaking strength","wll_tons":"Working load limit","note":"Note"},
   "wire-rope-stretch": {"stretch_in":"Elastic stretch","stretch_pct":"Stretch (% of length)","note":"Note"},
