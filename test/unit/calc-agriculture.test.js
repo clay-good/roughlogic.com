@@ -57,10 +57,23 @@ test("Drawbar: HP = pull*speed/375", () => { const r = computeDrawbarPower({ pul
 test("Drawbar: PTO = DBHP / efficiency", () => { const r = computeDrawbarPower({ pull_lb: 3750, speed_mph: 5, surface: "firm_soil" }); assert.ok(close(r.pto_hp_estimate, 50 / 0.72, 0.01)); });
 test("Drawbar: zero pull errors", () => { const r = computeDrawbarPower({ pull_lb: 0, speed_mph: 5, surface: "firm_soil" }); assert.ok(r.error); });
 test("Drawbar: unknown surface errors", () => { const r = computeDrawbarPower({ pull_lb: 1000, speed_mph: 5, surface: "x" }); assert.ok(r.error); });
+test("Drawbar: ratios are ASAE D497.5 Figure 1 by tractor type", async () => {
+  const { TRACTIVE_EFFICIENCY_BY_TYPE } = await import("../../calc-agriculture.js");
+  assert.deepEqual(TRACTIVE_EFFICIENCY_BY_TYPE, {
+    "2wd": { concrete: 0.87, firm_soil: 0.72, tilled_soil: 0.67, sand: 0.55 },
+    mfwd: { concrete: 0.87, firm_soil: 0.76, tilled_soil: 0.72, sand: 0.64 },
+    "4wd": { concrete: 0.88, firm_soil: 0.77, tilled_soil: 0.75, sand: 0.70 },
+    track: { concrete: 0.88, firm_soil: 0.76, tilled_soil: 0.74, sand: 0.72 },
+  });
+  // D497's own example: 4WD, firm soil, 224 kW net flywheel -> 224 x 0.90 x 0.77 drawbar.
+  const r = computeDrawbarPower({ pull_lb: 3750, speed_mph: 5, surface: "firm_soil", tractor_type: "4wd" });
+  assert.equal(r.tractive_efficiency, 0.77);
+  assert.ok("error" in computeDrawbarPower({ pull_lb: 3750, speed_mph: 5, surface: "firm_soil", tractor_type: "hovercraft" }));
+});
 test("Drawbar: concrete most efficient", () => { assert.ok(TRACTIVE_EFFICIENCY.concrete > TRACTIVE_EFFICIENCY.sand); });
 test("Drawbar: faster speed -> more HP", () => { const a = computeDrawbarPower({ pull_lb: 1000, speed_mph: 3, surface: "firm_soil" }); const b = computeDrawbarPower({ pull_lb: 1000, speed_mph: 6, surface: "firm_soil" }); assert.ok(close(b.drawbar_hp / a.drawbar_hp, 2, 0.001)); });
 test("Drawbar: every efficiency 0-1", () => { for (const k of Object.keys(TRACTIVE_EFFICIENCY)) { const e = TRACTIVE_EFFICIENCY[k]; assert.ok(e > 0 && e <= 1); } });
-test("Drawbar: tractive_efficiency returned", () => { const r = computeDrawbarPower({ pull_lb: 1000, speed_mph: 4, surface: "tilled_soil" }); assert.equal(r.tractive_efficiency, 0.55); });
+test("Drawbar: tractive_efficiency returned", () => { const r = computeDrawbarPower({ pull_lb: 1000, speed_mph: 4, surface: "tilled_soil" }); assert.equal(r.tractive_efficiency, 0.67); }); // D497.5 Fig. 1, 2WD tilled
 test("Drawbar: zero speed errors", () => { const r = computeDrawbarPower({ pull_lb: 1000, speed_mph: 0, surface: "firm_soil" }); assert.ok(r.error); });
 
 // 207 Uniformity

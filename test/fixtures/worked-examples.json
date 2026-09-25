@@ -2689,11 +2689,11 @@
   {
    "tile_id": "drawbar-pull",
    "source_publisher": "ASABE (inverse)",
-   "source_title": "cross-check: the same power on sand (efficiency 0.50) develops less pull -- slip wastes power",
-   "source_edition_or_year": "spec-v684 cross-check (machine-verified)",
-   "source_section_or_page": "75 PTO hp at 4.5 mph on sand (0.50) -> 37.5 drawbar hp -> 3,125 lb",
+   "source_title": "cross-check: the same power on soft or sandy soil (2WD ratio 0.55) develops less pull -- slip wastes power",
+   "source_edition_or_year": "spec-v684 cross-check, ratio from ASAE D497.5 Figure 1",
+   "source_section_or_page": "75 PTO hp at 4.5 mph on soft soil (0.55) -> 41.25 drawbar hp -> 3,437.5 lb",
    "verified_by": "rl",
-   "verified_on": "2026-07-13",
+   "verified_on": "2026-09-24",
    "inputs": {
     "power_hp": 75,
     "power_basis": "pto",
@@ -2702,7 +2702,7 @@
    },
    "outputs": {
     "pull_lb": {
-     "value": 3125,
+     "value": 3437.5,
      "tolerance": {
       "abs": 1
      }

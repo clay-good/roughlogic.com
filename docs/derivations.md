@@ -1451,7 +1451,7 @@ cross-check.
 | calc-agriculture.js | `computeCenterPivotRuntime` | `{ system_flow_gpm = 0, area_acres = 0, target_depth_in = 0, efficiency_pct = ...` | _ | _ | _ |
 | calc-agriculture.js | `computeCornYieldEstimate` | `{ ears_per_thousandth_acre = 32, kernel_rows_around = 16, kernels_per_row = 3...` | _ | _ | _ |
 | calc-agriculture.js | `computeCropYield` | `{ crop = "corn", rows_per_pass = 1, row_spacing_in, measured_length_ft = 0, w...` | _ | _ | _ |
-| calc-agriculture.js | `computeDrawbarPower` | `{ pull_lb = 0, speed_mph = 0, surface = "firm_soil" }` | _ | _ | _ |
+| calc-agriculture.js | `computeDrawbarPower` | `{ pull_lb = 0, speed_mph = 0, surface = "firm_soil", tractor_type = "2wd" }` | _ | _ | _ |
 | calc-agriculture.js | `computeDrawbarPull` | `{ power_hp = 0, power_basis = "drawbar", speed_mph = 0, surface = "firm_soil"...` | _ | _ | _ |
 | calc-agriculture.js | `computeDressingPercentage` | `{ live_weight_lb = 1200, hot_carcass_weight_lb = 744, cutting_yield_pct = 67 ...` | _ | _ | _ |
 | calc-agriculture.js | `computeDripZoneFlow` | `{ mode = "inline", tubing_ft = 0, spacing_in = 0, emitter_gph = 0, emitter_co...` | _ | _ | _ |

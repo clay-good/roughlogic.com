@@ -158,11 +158,30 @@ export const seedRateExample = { inputs: { row_width_in: 30, in_row_spacing_in: 
 
 // --- 206: Tractor Drawbar Power ---
 
+// ASAE D497.5 Figure 1: ratio of drawbar to PTO power by tractor type and
+// tractive condition. TRACTIVE_EFFICIENCY is the two-wheel-drive row. Until
+// 2026-09-24 it held tilled 0.55 (D497's SOFT value) and sand 0.50 (in no
+// row), and there was no tractor type, so a 4WD on tilled ground was charged
+// 0.55 where D497 gives 0.75.
 export const TRACTIVE_EFFICIENCY = {
-  concrete: 0.87, firm_soil: 0.72, tilled_soil: 0.55, sand: 0.50,
+  concrete: 0.87, firm_soil: 0.72, tilled_soil: 0.67, sand: 0.55,
 };
+export const TRACTIVE_EFFICIENCY_BY_TYPE = {
+  "2wd": TRACTIVE_EFFICIENCY,
+  mfwd: { concrete: 0.87, firm_soil: 0.76, tilled_soil: 0.72, sand: 0.64 },
+  "4wd": { concrete: 0.88, firm_soil: 0.77, tilled_soil: 0.75, sand: 0.70 },
+  track: { concrete: 0.88, firm_soil: 0.76, tilled_soil: 0.74, sand: 0.72 },
+};
+const SURFACE_OPTIONS = [
+  { value: "concrete", label: "concrete" }, { value: "firm_soil", label: "firm soil" },
+  { value: "tilled_soil", label: "tilled soil" }, { value: "sand", label: "soft or sandy soil" },
+];
+const TRACTOR_TYPE_OPTIONS = [
+  { value: "2wd", label: "2WD" }, { value: "mfwd", label: "MFWD (front-wheel assist)" },
+  { value: "4wd", label: "4WD" }, { value: "track", label: "Track" },
+];
 
-// dims: in { pull_lb: M L T^-2, speed_mph: L T^-1, surface: dimensionless }
+// dims: in { pull_lb: M L T^-2, speed_mph: L T^-1, surface: dimensionless, tractor_type: dimensionless }
 //        out: { drawbar_hp: M L^2 T^-3, pto_hp_estimate: M L^2 T^-3, tractive_efficiency: dimensionless }
 // (Drawbar pull is a force `M L T^-2` (lb-force in the field
 //  context); ground speed is `L T^-1`. Their product is power
@@ -170,11 +189,13 @@ export const TRACTIVE_EFFICIENCY = {
 //  absorbs the lbf*mph -> ft-lb/s -> HP unit conversion. The
 //  ASABE D497 tractive-efficiency lookup converts drawbar to PTO,
 //  both `M L^2 T^-3`; surface class is a categorical token.)
-export function computeDrawbarPower({ pull_lb = 0, speed_mph = 0, surface = "firm_soil" }) {
+export function computeDrawbarPower({ pull_lb = 0, speed_mph = 0, surface = "firm_soil", tractor_type = "2wd" }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(pull_lb > 0)) return { error: "Pull must be positive." };
   if (!(speed_mph > 0)) return { error: "Speed must be positive." };
-  const eff = TRACTIVE_EFFICIENCY[surface];
+  const row = TRACTIVE_EFFICIENCY_BY_TYPE[tractor_type];
+  if (!row) return { error: "Unknown tractor type." };
+  const eff = row[surface];
   if (!Number.isFinite(eff)) return { error: "Unknown surface." };
   const dbhp = (pull_lb * speed_mph) / 375;
   // Public ASABE D497 drawbar-to-PTO benchmark: PTO ~= DBHP / tractive_efficiency.
@@ -184,8 +205,8 @@ export function computeDrawbarPower({ pull_lb = 0, speed_mph = 0, surface = "fir
 
 export const drawbarPowerExample = { inputs: { pull_lb: 4500, speed_mph: 4.5, surface: "firm_soil" } };
 
-// dims: in { power_hp: M L^2 T^-3, power_basis: dimensionless, speed_mph: L T^-1, surface: dimensionless } out: { pull_lb: M L T^-2, drawbar_hp: M L^2 T^-3 }
-export function computeDrawbarPull({ power_hp = 0, power_basis = "drawbar", speed_mph = 0, surface = "firm_soil" } = {}) {
+// dims: in { power_hp: M L^2 T^-3, power_basis: dimensionless, speed_mph: L T^-1, surface: dimensionless, tractor_type: dimensionless } out: { pull_lb: M L T^-2, drawbar_hp: M L^2 T^-3 }
+export function computeDrawbarPull({ power_hp = 0, power_basis = "drawbar", speed_mph = 0, surface = "firm_soil", tractor_type = "2wd" } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const power = Number(power_hp) || 0;
   const basis = String(power_basis);
@@ -193,7 +214,9 @@ export function computeDrawbarPull({ power_hp = 0, power_basis = "drawbar", spee
   if (!(power > 0)) return { error: "Power must be positive (hp)." };
   if (!(speed > 0)) return { error: "Speed must be positive (mph)." };
   if (basis !== "drawbar" && basis !== "pto") return { error: "Power basis must be drawbar or pto." };
-  const eff = TRACTIVE_EFFICIENCY[surface];
+  const row = TRACTIVE_EFFICIENCY_BY_TYPE[tractor_type];
+  if (!row) return { error: "Unknown tractor type." };
+  const eff = row[surface];
   if (!Number.isFinite(eff)) return { error: "Unknown surface." };
   // Inverse of drawbar_hp = pull x speed / 375: pull = 375 x drawbar_hp / speed.
   // A PTO rating converts to drawbar first: drawbar_hp = pto_hp x tractive_efficiency.
@@ -202,7 +225,7 @@ export function computeDrawbarPull({ power_hp = 0, power_basis = "drawbar", spee
   if (!Number.isFinite(pull_lb) || !(pull_lb > 0)) return { error: "Drawbar-pull math is not a finite positive value." };
   return {
     pull_lb, drawbar_hp, tractive_efficiency: eff,
-    note: "The drawbar pull a tractor can develop at a working speed for a given power, the inverse of the drawbar-power tile: from drawbar_hp = pull x speed / 375, pull = 375 x drawbar_hp / speed. A PTO rating is converted to drawbar first with the ASABE D497 tractive efficiency (drawbar_hp = pto_hp x efficiency; concrete 0.87, firm soil 0.72, tilled soil 0.55, sand 0.50), because a soft surface wastes engine power as slip. Pull rises as speed drops, which is why heavy tillage is pulled in a low gear. This is the steady-state drawbar pull the power supports; traction (weight x soil coefficient) can limit the usable pull below this, and the ballast, tires, and conditions govern the real number."
+    note: "The drawbar pull a tractor can develop at a working speed for a given power, the inverse of the drawbar-power tile: from drawbar_hp = pull x speed / 375, pull = 375 x drawbar_hp / speed. A PTO rating is converted to drawbar first with the ASABE D497 tractive efficiency (drawbar_hp = pto_hp x efficiency; for a 2WD tractor concrete 0.87, firm soil 0.72, tilled soil 0.67, soft or sandy 0.55, and higher for MFWD, 4WD and tracks -- a 4WD on tilled ground keeps 0.75), because a soft surface wastes engine power as slip. Pull rises as speed drops, which is why heavy tillage is pulled in a low gear. This is the steady-state drawbar pull the power supports; traction (weight x soil coefficient) can limit the usable pull below this, and the ballast, tires, and conditions govern the real number."
   };
 }
 export const drawbarPullExample = { inputs: { power_hp: 75, power_basis: "pto", speed_mph: 4.5, surface: "firm_soil" } };
@@ -423,12 +446,13 @@ const renderSeedRate = _r({
 });
 
 const renderDrawbarPower = _r({
-  citation: "Citation: ASABE D497 by name only. Drawbar HP = (pull * speed) / 375. PTO HP estimate uses public drawbar-to-PTO benchmark.",
+  citation: "Citation: ASAE D497.5 Figure 1 (drawbar-to-PTO power ratio by tractor type and tractive condition). Drawbar HP = (pull * speed) / 375; PTO HP = drawbar HP / ratio.",
   example: drawbarPowerExample.inputs,
   fields: [
     { key: "pull_lb", label: "Drawbar pull (lb)", kind: "number" },
     { key: "speed_mph", label: "Ground speed (mph)", kind: "number" },
-    { key: "surface", label: "Surface", kind: "select", options: Object.keys(TRACTIVE_EFFICIENCY).map((k) => ({ value: k, label: k.replace(/_/g, " ") })) },
+    { key: "surface", label: "Surface", kind: "select", options: SURFACE_OPTIONS },
+    { key: "tractor_type", label: "Tractor type", kind: "select", options: TRACTOR_TYPE_OPTIONS },
   ],
   outputs: [
     { key: "d", id: "tp-out-d", label: "Drawbar HP", value: (r) => fmt(r.drawbar_hp, 1) + " hp" },
@@ -439,13 +463,14 @@ const renderDrawbarPower = _r({
 });
 
 const renderDrawbarPull = _r({
-  citation: "Citation: ASABE D497 by name only. Drawbar pull = 375 x drawbar_hp / speed, from drawbar HP = (pull * speed) / 375. A PTO rating converts to drawbar with the tractive efficiency (drawbar_hp = pto_hp x efficiency).",
+  citation: "Citation: ASAE D497.5 Figure 1 (drawbar-to-PTO power ratio by tractor type and tractive condition). Drawbar pull = 375 x drawbar_hp / speed, from drawbar HP = (pull * speed) / 375. A PTO rating converts to drawbar with the tractive efficiency (drawbar_hp = pto_hp x efficiency).",
   example: drawbarPullExample.inputs,
   fields: [
     { key: "power_hp", label: "Power (hp)", kind: "number" },
     { key: "power_basis", label: "Power basis", kind: "select", options: [{ value: "drawbar", label: "Drawbar HP" }, { value: "pto", label: "PTO HP" }] },
     { key: "speed_mph", label: "Ground speed (mph)", kind: "number" },
-    { key: "surface", label: "Surface", kind: "select", options: Object.keys(TRACTIVE_EFFICIENCY).map((k) => ({ value: k, label: k.replace(/_/g, " ") })) },
+    { key: "surface", label: "Surface", kind: "select", options: SURFACE_OPTIONS },
+    { key: "tractor_type", label: "Tractor type", kind: "select", options: TRACTOR_TYPE_OPTIONS },
   ],
   outputs: [
     { key: "p", id: "dbp-out-p", label: "Drawbar pull", value: (r) => fmt(r.pull_lb, 0) + " lb" },

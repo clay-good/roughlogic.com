@@ -3448,7 +3448,7 @@ test("bounds: calc-agriculture computeSeedRate rejects non-positive row width / 
 });
 
 test("bounds: calc-agriculture computeDrawbarPower pins DBHP = pull_lb * mph / 375 and per-surface tractive-efficiency PTO derivation", () => {
-  const efficiencies = { concrete: 0.87, firm_soil: 0.72, tilled_soil: 0.55, sand: 0.50 };
+  const efficiencies = { concrete: 0.87, firm_soil: 0.72, tilled_soil: 0.67, sand: 0.55 }; // ASAE D497.5 Fig. 1, 2WD
   for (const pull_lb of [1000, 4500, 10000]) {
     for (const speed_mph of [1.5, 4.5, 8]) {
       for (const [surface, eff] of Object.entries(efficiencies)) {
