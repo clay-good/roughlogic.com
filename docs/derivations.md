@@ -2707,7 +2707,7 @@ cross-check.
 | calc-kitchen.js | `computeYieldEP` | `{ ap_weight = 0, trim_weight = 0, cooking_loss_pct = 0, ap_cost_per_lb = 0 }` | _ | _ | _ |
 | calc-lab.js | `computeArrheniusEquation` | `{ k1 = 0, temp1_c = 0, k2 = 0, temp2_c = 0 } = {}` | _ | _ | _ |
 | calc-lab.js | `computeBeerLambert` | `{ absorbance = 0, path_length_cm = 1, epsilon = 0 }` | _ | _ | _ |
-| calc-lab.js | `computeCfuPlateCount` | `{ colonies = 0, dilution_factor = 0, volume_ml = 0, low = 25, high = 250 } = {}` | _ | _ | _ |
+| calc-lab.js | `computeCfuPlateCount` | `{ colonies = 0, dilution_factor = 0, volume_ml = 0, low = 15, high = 300 } = {}` | _ | _ | _ |
 | calc-lab.js | `computeClausiusClapeyron` | `{ pressure1 = 0, temp1_c = 0, pressure2 = 0, temp2_c = 0 } = {}` | _ | _ | _ |
 | calc-lab.js | `computeDilution` | `{ c1, v1, c2, v2 }` | _ | _ | _ |
 | calc-lab.js | `computeDoublingTime` | `{ initial_count = 0, final_count = 0, elapsed_time = 0 } = {}` | _ | _ | _ |

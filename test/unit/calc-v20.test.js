@@ -1037,6 +1037,11 @@ test("cfu-plate-count: times-form dilution same result", () => {
 test("cfu-plate-count: countable range flag", () => {
   assert.strictEqual(computeCfuPlateCount({ colonies: 150, dilution_factor: 1e-5, volume_ml: 0.1 }).in_countable_range, true);
   assert.strictEqual(computeCfuPlateCount({ colonies: 500, dilution_factor: 1e-5, volume_ml: 0.1 }).in_countable_range, false);
+  // FDA BAM Chapter 3 (March 2025): 15-300 per plate. 20 and 280 were flagged under the old 25-250.
+  assert.strictEqual(computeCfuPlateCount({ colonies: 20, dilution_factor: 1e-5, volume_ml: 0.1 }).in_countable_range, true);
+  assert.strictEqual(computeCfuPlateCount({ colonies: 280, dilution_factor: 1e-5, volume_ml: 0.1 }).in_countable_range, true);
+  // A lab reporting under APHA passes its own range.
+  assert.strictEqual(computeCfuPlateCount({ colonies: 20, dilution_factor: 1e-5, volume_ml: 0.1, low: 25, high: 250 }).in_countable_range, false);
 });
 test("cfu-plate-count: TNTC note above range", () => {
   assert.match(computeCfuPlateCount({ colonies: 400, dilution_factor: 1e-5, volume_ml: 0.1 }).note, /TNTC/);

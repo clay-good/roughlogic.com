@@ -1316,7 +1316,10 @@ LAB_RENDERERS["primer-tm"] = renderPrimerTm;
 // CFU/mL = colonies / (dilution_factor * volume_plated). Dilution accepted as
 // 1e-5 (factor) or 100000 (x) - both normalized to the same result.
 // dims: in { colonies: dimensionless, dilution_factor: dimensionless, volume_ml: L^3 } out: { cfu_per_ml: dimensionless }
-export function computeCfuPlateCount({ colonies = 0, dilution_factor = 0, volume_ml = 0, low = 25, high = 250 } = {}) {
+// Countable range defaults to FDA BAM Chapter 3's 15-300 per plate (revised
+// March 2025 from 25-250, and ISO's range). Until 2026-09-24 the default was
+// the superseded 25-250 and the note had APHA and BAM swapped.
+export function computeCfuPlateCount({ colonies = 0, dilution_factor = 0, volume_ml = 0, low = 15, high = 300 } = {}) {
   const col = Number(colonies) || 0;
   let df = Number(dilution_factor) || 0;
   const vol = Number(volume_ml) || 0;
@@ -1331,13 +1334,13 @@ export function computeCfuPlateCount({ colonies = 0, dilution_factor = 0, volume
     cfu_per_ml: Number.isFinite(cfuPerMl) ? cfuPerMl : null,
     in_countable_range: inRange,
     note: (col > high ? "Count above the countable range (TNTC) - statistically unreliable. " : col < low && col > 0 ? "Count below the countable range (TFTC) - statistically unreliable. " : "")
-      + "Countable range 25-250 (FDA BAM) or 30-300 (APHA). Spread/pour/spiral change the effective plated volume.",
+      + "Countable range " + low + "-" + high + " per plate here; FDA BAM Chapter 3 uses 15-300 (since March 2025, as ISO does), APHA 25-250, USDA and AOAC 30-300 -- use the method your lab reports under. Spread/pour/spiral change the effective plated volume.",
   };
 }
 export const cfuPlateCountExample = { inputs: { colonies: 150, dilution_factor: 1e-5, volume_ml: 0.1 } };
 
 function renderCfuPlateCount(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: Per the FDA Bacteriological Analytical Manual (BAM) Chapter 3 (Aerobic Plate Count) and APHA Standard Methods, by name; both public/free. Countable range 25-250 (FDA BAM) or 30-300 (APHA). Free at fda.gov/food/science-research-food/laboratory-methods-food.";
+  citationEl.textContent = "Citation: Per the FDA Bacteriological Analytical Manual (BAM) Chapter 3 (Aerobic Plate Count) and APHA Standard Methods, by name; both public/free. Countable range 15-300 per plate (FDA BAM Chapter 3 since March 2025, and ISO); APHA uses 25-250, USDA and AOAC 30-300. Free at fda.gov/food/science-research-food/laboratory-methods-food.";
   const col = makeNumber("Colonies counted", "cfu-col", { step: "any", min: "0" });
   const df = makeNumber("Dilution factor (e.g. 1e-5 or 100000)", "cfu-df", { step: "any", min: "0" });
   const vol = makeNumber("Volume plated (mL)", "cfu-vol", { step: "any", min: "0" });

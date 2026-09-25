@@ -5730,14 +5730,14 @@ export function computeScaffoldLegLoad({ platform_dead_lb = 100, num_workers = 2
     swl_lb,
     utilization,
     pass,
-    note: "The component rating is the manufacturer's; OSHA 1926.451(a)(1) sets the 4:1 minimum and counts 250 lb per person. The distribution to legs depends on the configuration and any stacked lifts above - this assumes an even share. A competent person verifies the load and setup. The leg load feeds scaffold-mudsill-bearing for the foundation check.",
+    note: "The component rating is the manufacturer's; OSHA 1926.451(a)(1) sets the 4:1 minimum; the 250 lb per person is the non-mandatory Appendix A to Subpart L's one-person allowance. The distribution to legs depends on the configuration and any stacked lifts above - this assumes an even share. A competent person verifies the load and setup. The leg load feeds scaffold-mudsill-bearing for the foundation check.",
   };
 }
 
 export const scaffoldLegLoadExample = { inputs: { platform_dead_lb: 100, num_workers: 2, worker_lb: 250, material_lb: 500, n_legs: 4, component_rating_lb: 2500 } };
 
 const _renderScaffoldLegLoad = _simpleRenderer({
-  citation: "Citation: OSHA capacity rule by name. safe working load = component rating / 4; leg load = total intended load / legs; total = platform dead + workers x weight + material. OSHA 1926.451(a)(1) requires 4x the intended load and counts 250 lb per person.",
+  citation: "Citation: OSHA capacity rule by name. safe working load = component rating / 4; leg load = total intended load / legs; total = platform dead + workers x weight + material. OSHA 1926.451(a)(1) requires 4x the intended load; the 250 lb per person comes from the non-mandatory Appendix A to Subpart L.",
   example: scaffoldLegLoadExample.inputs,
   fields: [
     { key: "platform_dead_lb", label: "Platform + scaffold dead load in the bay (lb)", kind: "number" },

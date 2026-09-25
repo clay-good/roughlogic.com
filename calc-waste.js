@@ -199,7 +199,7 @@ export function computeLandfillGasGeneration({ annual_tons = 0, placement_years 
 
 const lfgExample = { annual_tons: 250000, placement_years: 20, methane_yield_m3_per_mg: 100, decay_constant_per_year: 0.04, methane_fraction_pct: 50, collection_efficiency_pct: 75, methane_heating_value_btu_per_cf: 911, generator_efficiency_pct: 30 };
 WASTE_RENDERERS["landfill-gas-generation"] = _simpleRenderer({
-  citation: "Citation: first-order decay -- Q = sum over placement years of k x L0 x M x e^(-k t), with L0 the methane yield per megagram (the Clean Air Act default is 100 cubic metres) and k the methane generation rate constant (roughly 0.02 arid, 0.04 conventional, 0.05 to 0.07 wet or bioreactor). Landfill gas is roughly half methane and the energy is in the methane only; a well field recovers perhaps 60 to 85% of what is generated. The site's own gas data and the applicable Clean Air Act rules govern.",
+  citation: "Citation: first-order decay -- Q = sum over placement years of k x L0 x M x e^(-k t), with L0 the methane yield per megagram and k the methane generation rate constant. The AP-42 inventory defaults are L0 100 cubic metres and k 0.04 (roughly 0.02 arid, 0.05 to 0.07 wet or bioreactor); the Clean Air Act regulatory defaults for the NMOC calculation, 40 CFR 60.764, are L0 170 and k 0.05, or 0.02 where annual precipitation averages under 25 in. Landfill gas is roughly half methane and the energy is in the methane only; a well field recovers perhaps 60 to 85% of what is generated. The site's own gas data and the applicable Clean Air Act rules govern.",
   example: lfgExample,
   fields: [
     { key: "annual_tons", label: "Waste placed per year (tons)" },

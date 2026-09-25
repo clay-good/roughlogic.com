@@ -817,10 +817,15 @@ const renderIncoterm = _simpleRenderer({
 // compare directly against the table for a given design speed.
 
 // Common friction-coefficient defaults (cited by name; the calculator
-// surfaces the user's choice and lets them override).
+// surfaces the user's choice and lets them override). AASHTO's design
+// deceleration, 11.2 ft/s^2 (f = 0.35), is itself chosen for WET pavement --
+// drivers keep steering control on wet surfaces at that rate. Until 2026-09-24
+// the labels called 0.35 "dry" and 0.20 "AASHTO conservative"; AASHTO has no
+// 0.20 value, which is a worn-tire, poor-surface assumption of this tile's.
+// The keys stay for shared URLs and agent calls.
 export const SSD_FRICTION_DEFAULTS = {
-  dry: { f: 0.35, label: "Dry pavement (AASHTO design default)" },
-  wet: { f: 0.20, label: "Wet pavement (AASHTO conservative)" },
+  dry: { f: 0.35, label: "AASHTO design, 11.2 ft/s^2 (already a wet-pavement basis)" },
+  wet: { f: 0.20, label: "Poor wet surface or worn tires (not an AASHTO value)" },
   ice: { f: 0.10, label: "Ice / packed snow" },
   custom: { f: null, label: "Custom (enter f directly)" },
 };
@@ -1381,7 +1386,7 @@ export function computeAxleLoadDistribution({ drive_lb = 0, trailer_lb = 0, king
 export const axleLoadDistributionExample = { inputs: { drive_lb: 35200, trailer_lb: 32000, kingpin_to_tandem_in: 400, hole_spacing_in: 6, tandem_cap: 34000 } };
 
 function renderAxleLoadDistribution(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: Per the federal axle/gross weight limits - 23 CFR 658.17 (12,000 lb steer, 34,000 lb tandem, 80,000 lb gross) and the federal Bridge Formula, by name; lever-arm statics is public. Cross-references the bridge-formula tile. FMCSA enforces. Free at ecfr.gov.";
+  citationEl.textContent = "Citation: Per the federal axle/gross weight limits - 23 CFR 658.17 (20,000 lb single, 34,000 lb tandem, 80,000 lb gross; states may not hold a steer axle below 20,000 lb or its manufacturer rating, whichever is lower -- the common 12,000 lb steer figure is a tractor axle rating, not a federal limit) and the federal Bridge Formula, by name; lever-arm statics is public. Cross-references the bridge-formula tile. FMCSA enforces. Free at ecfr.gov.";
   const drive = makeNumber("Drive-tandem weight (lb)", "ald-drive", { step: "any", min: "0" });
   const trailer = makeNumber("Trailer-tandem weight (lb)", "ald-trailer", { step: "any", min: "0" });
   const L = makeNumber("Kingpin-to-tandem distance (in)", "ald-l", { step: "any", min: "0" });

@@ -3103,12 +3103,12 @@ export function computeManureStorageVolume({ daily_manure_ft3 = 0, wastewater_ft
   const short_days = days < 120;
   return {
     manure_volume_ft3, precip_storm_ft3, freeboard_ft3, total_ft3, total_gal, short_days,
-    note: "An uncovered liquid facility must bank the net precipitation and the 25-year, 24-hour storm falling on its own surface over the storage period - sizing to manure alone overtops in a wet spring. The minimum storage is 120 days (or the nutrient-management plan), and freeboard is 6 inches for a vertical-wall tank and 12 inches for other structures. NRCS 313 and the engineer/planner govern - a planning aid, not the engineer of record.",
+    note: "An uncovered liquid facility must bank the net precipitation and the 25-year, 24-hour storm falling on its own surface over the storage period - sizing to manure alone overtops in a wet spring. CPS 313 sets no fixed minimum storage period -- it bases the period on when the manure can be applied safely given climate, crops, and soils, which is why many nutrient-management plans and states land on 120 to 180 days -- and the tile flags anything under 120 days as short for that reason. CPS 313 also requires at least 6 inches of residual solids in a tank that is not cleaned out completely, which this total does not include. Freeboard is 6 inches for a vertical-wall tank and 12 inches for other structures. NRCS 313 and the engineer/planner govern - a planning aid, not the engineer of record.",
   };
 }
 export const manureStorageVolumeExample = { inputs: { daily_manure_ft3: 150, wastewater_ft3: 0, bedding_ft3: 20, storage_days: 120, surface_area_ft2: 8000, net_precip_in: 6, storm_in: 4, freeboard_in: 12 } };
 function _v582renderManureStorageVolume(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Notice: A planning aid, not the engineer of record; NRCS 313 and the engineer/planner govern. Citation: NRCS Conservation Practice Standard 313 / ASABE D384 manure production, by name. manure = (daily + wastewater + bedding) x storage_days; precip_storm = area x (net_precip + storm) / 12; freeboard = area x freeboard_in / 12; total = the sum. An uncovered facility must bank the net precipitation and the 25-year, 24-hour storm over the storage period; minimum storage is 120 days; freeboard is 6 in (vertical wall) or 12 in (other).";
+  citationEl.textContent = "Notice: A planning aid, not the engineer of record; NRCS 313 and the engineer/planner govern. Citation: NRCS Conservation Practice Standard 313 / ASABE D384 manure production, by name. manure = (daily + wastewater + bedding) x storage_days; precip_storm = area x (net_precip + storm) / 12; freeboard = area x freeboard_in / 12; total = the sum. An uncovered facility must bank the net precipitation and the 25-year, 24-hour storm over the storage period; CPS 313 sets the storage period by safe-utilization timing rather than a fixed minimum (under 120 days is flagged as short, a common planning floor); add at least 6 in of residual solids in a tank that is not fully emptied; freeboard is 6 in (vertical wall) or 12 in (other).";
   const manure = makeNumber("Daily manure (ft3/day = head x rate)", "msv-manure", { step: "any", min: "0" });
   const ww = makeNumber("Added wastewater (ft3/day, 0 if none)", "msv-ww", { step: "any", min: "0" });
   const bed = makeNumber("Added bedding (ft3/day, 0 if none)", "msv-bed", { step: "any", min: "0" });
@@ -3131,7 +3131,7 @@ function _v582renderManureStorageVolume(inputRegion, outputRegion, citationEl) {
     oManure.textContent = fmt(r.manure_volume_ft3, 0) + " ft3";
     oPrecip.textContent = fmt(r.precip_storm_ft3, 0) + " ft3";
     oFree.textContent = fmt(r.freeboard_ft3, 0) + " ft3";
-    oTotal.textContent = fmt(r.total_ft3, 0) + " ft3 (" + fmt(r.total_gal, 0) + " gal)" + (r.short_days ? " - under the 120-day minimum" : "");
+    oTotal.textContent = fmt(r.total_ft3, 0) + " ft3 (" + fmt(r.total_gal, 0) + " gal)" + (r.short_days ? " - under 120 days, short of most nutrient-management plans" : "");
     oNote.textContent = r.note;
   }, DEBOUNCE_MS);
   for (const f of [manure, ww, bed, days, area, precip, storm, fb]) f.input.addEventListener("input", update);
