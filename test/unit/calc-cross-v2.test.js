@@ -591,3 +591,11 @@ test("Per diem: the shipped shard agrees with the module table", () => {
     assert.deepEqual(shard.rates_by_state[state], r, state);
   }
 });
+
+test("sales-tax: DC's enacted change to 7.0% applies from 2026-10-01 (DC OTR)", async () => {
+  const { computeSalesTax } = await import("../../calc-cross.js");
+  assert.equal(computeSalesTax({ state: "DC", subtotal: 100, as_of: "2026-09-30" }).rate_percent, 6.0);
+  assert.equal(computeSalesTax({ state: "DC", subtotal: 100, as_of: "2026-10-01" }).rate_percent, 7.0);
+  // A custom rate still overrides the table.
+  assert.equal(computeSalesTax({ state: "DC", subtotal: 100, custom_rate_percent: 5, as_of: "2026-10-01" }).rate_percent, 5);
+});

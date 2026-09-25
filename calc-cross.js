@@ -285,8 +285,16 @@ export const STATE_TAX_RATES = {
   WI: 5.0, WY: 4.0, DC: 6.0,
 };
 
-// dims: in { state: dimensionless, subtotal: dimensionless, custom_rate_percent: dimensionless } out: { tax: dimensionless, total: dimensionless }
-export function computeSalesTax({ state, subtotal, custom_rate_percent = null }) {
+// Enacted statewide rate changes, applied from their effective date. DC Office of Tax and Revenue
+// ("Notice of Oct. 1, 2025 Tax Changes"): the general rate "will remain 6.0% through Sept. 30, 2026"
+// and "will increase to 7.0% for periods beginning on and after Oct. 1, 2026". (Secondary sources
+// describing a 6.5% step on 2025-10-01 are wrong; OTR is the rate of record.)
+export const STATE_TAX_RATE_CHANGES = {
+  DC: [{ effective: "2026-10-01", rate: 7.0 }],
+};
+
+// dims: in { state: dimensionless, subtotal: dimensionless, custom_rate_percent: dimensionless, as_of: dimensionless } out: { tax: dimensionless, total: dimensionless }
+export function computeSalesTax({ state, subtotal, custom_rate_percent = null, as_of = "" }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   subtotal = Number(subtotal);
   let rate;
@@ -295,6 +303,8 @@ export function computeSalesTax({ state, subtotal, custom_rate_percent = null })
   } else {
     rate = STATE_TAX_RATES[state];
     if (rate === undefined) return { error: "Unknown state." };
+    const today = /^\d{4}-\d{2}-\d{2}$/.test(String(as_of)) ? String(as_of) : new Date().toISOString().slice(0, 10);
+    for (const ch of STATE_TAX_RATE_CHANGES[state] || []) if (today >= ch.effective) rate = ch.rate;
   }
   const tax = subtotal * (rate / 100);
   return { rate_percent: rate, tax, total: subtotal + tax };

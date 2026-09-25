@@ -6490,6 +6490,7 @@ export const CITATIONS = {
     editionNote: "Single-edition (state-published rates; monthly recheck). Three surfaces called these average combined state-and-local rates until 2026-09-02; they are the statewide base only, and the gap is large in the states that lean on local option taxes.",
     assumptions: [
       { name: "Rate table", value: "data/crosswalks/state-tax-rates.json; statewide base rate only", source: "state revenue department per row" },
+      { name: "Scheduled change", value: "DC 6.0% through 2026-09-30, 7.0% from 2026-10-01, applied by date", source: "DC Office of Tax and Revenue, Notice of Oct. 1, 2025 Tax Changes" },
       { name: "Local rates", value: "counties, cities and special districts add their own; use the override field with the combined rate for the delivery address", source: "state and local taxing authorities" },
     ],
   },

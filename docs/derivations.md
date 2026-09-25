@@ -1954,7 +1954,7 @@ cross-check.
 | calc-cross.js | `computeRainwaterYield` | `{ catchment_ft2 = 0, monthly_in = [], annual_in = null, efficiency = 0.62 }` | _ | _ | _ |
 | calc-cross.js | `computeRampSlope` | `{ rise_in = 0, run_in = 0 }` | _ | _ | _ |
 | calc-cross.js | `computeRollingOffset` | `{ rise_in, roll_in, angle_deg }` | _ | _ | _ |
-| calc-cross.js | `computeSalesTax` | `{ state, subtotal, custom_rate_percent = null }` | _ | _ | _ |
+| calc-cross.js | `computeSalesTax` | `{ state, subtotal, custom_rate_percent = null, as_of = "" }` | _ | _ | _ |
 | calc-cross.js | `computeSilicaTable1` | `{ task = "xi", location = "outdoors", hours_per_shift = 0, controls_fully_imp...` | _ | _ | _ |
 | calc-cross.js | `computeSlopeFromLevel` | `{ value, from }` | _ | _ | _ |
 | calc-cross.js | `computeSwingFallGeometry` | `{ horizontal_offset_ft = 0, anchor_height_ft = 0, base_required_clearance_ft ...` | _ | _ | _ |
