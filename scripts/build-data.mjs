@@ -502,7 +502,7 @@ const PIPE_PROPERTIES = {
 };
 
 const FIXTURE_UNITS = {
-  source: "Hunter's Curve method per public-domain plumbing engineering texts (Hunter 1940, NBS BMS65). Public method; values reflect public-domain curves.",
+  source: "Private-use (dwelling) water-supply fixture units in the UPC style (lavatory 1, flush-tank water closet 2.5, bathtub 4); these sit above IPC Appendix E Table E103.3(2), so sizing from them is conservative. Hunter's method (NBS BMS65) supplies the fixture-unit concept and the demand curve, not these per-fixture values.",
   fixtures: {
     lavatory: { wsfu_cold: 1, wsfu_hot: 1, wsfu_total: 1, dfu: 1 },
     water_closet_flush_tank: { wsfu_cold: 2.5, wsfu_total: 2.5, dfu: 3 },

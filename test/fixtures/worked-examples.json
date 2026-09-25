@@ -24210,7 +24210,7 @@
    "tile_id": "tpr-discharge",
    "source_publisher": "IPC 2021 Section 504 / ANSI Z21.22",
    "source_title": "rating_ok = valve_rating >= heater_input; discharge_in = valve outlet (never reduced)",
-   "source_edition_or_year": "IPC 2021 Section 504.4 / 504.6",
+   "source_edition_or_year": "IPC 2021 Section 504.5 / 504.6",
    "source_section_or_page": "heater input 50,000, T&P valve 150,000, 3/4 in outlet -> PASS, 3/4 in discharge, 100,000 BTU/hr margin",
    "verified_by": "rl",
    "verified_on": "2026-06-13",

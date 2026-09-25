@@ -50,7 +50,7 @@ The pipeline never runs in production. It runs in CI on a tiered schedule per sp
 - `data/construction/sfm-table.json` (v3) — Engineering consensus speeds and feeds (Machinery's Handbook equivalent values).
 - `data/construction/aws-deposition.json` (v3) — AWS deposition-efficiency benchmarks cited by name only.
 - `data/plumbing/pipe-properties.json` — Nominal pipe size dimensions per ASTM and manufacturer catalogs; Hazen-Williams roughness coefficients from public engineering references.
-- `data/plumbing/fixture-units.json` — Hunter's Curve method (Hunter 1940; NBS BMS65). Public-domain methodology.
+- `data/plumbing/fixture-units.json` — UPC-style private-use water-supply fixture units (conservative against IPC Appendix E Table E103.3(2)); Hunter's method (NBS BMS65) is the underlying fixture-unit concept, not the source of these values.
 - `data/plumbing/gas-pipe-capacity.json` — Spitzglass / Weymouth public formulas with bundled gas properties. Public physical equations.
 - `data/plumbing/material-expansion.json` (v2) — Linear thermal expansion coefficients (1/F) from NIST and pipe manufacturer technical bulletins.
 - `data/plumbing/septic-rules.json` (v2) — U.S. EPA on-site wastewater treatment manual and state-published septic sizing rules.

@@ -32,8 +32,10 @@ const _finiteGuard = (o) => {
 
 // --- Utility 12: Pipe Sizing (Hunter's Curve) ---
 
-// Fixture units per fixture (Hunter's Curve method per public-domain plumbing
-// engineering texts; values reflect public-domain consensus).
+// Fixture units per fixture: UPC-style private-use WSFU (above IPC Appendix E
+// Table E103.3(2), so conservative) and IPC Table 709.1 DFU (the flush-valve
+// water closet at the public >1.6 gpf value, 6; conservative). These per-fixture
+// values are not in Hunter's NBS BMS65, which supplies only the method.
 export const FIXTURE_UNITS = {
   lavatory: { wsfu_total: 1, dfu: 1 },
   water_closet_flush_tank: { wsfu_total: 2.5, dfu: 3 },
@@ -389,7 +391,7 @@ import {
 
 // dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderPipeSizing(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: WSFU from UPC-style private-use fixture-unit values (above IPC Appendix E Table E103.3(2), so the sizing is conservative; IPC Table 604.3 gives flow rates, not fixture units) and DFU per IPC Table 709.1; Hunter's Curve (1940; NBS BMS65) public-domain methodology converts water-supply fixture units to gpm. AHJ governs. Free at codes.iccsafe.org.";
+  citationEl.textContent = "Citation: WSFU from UPC-style private-use fixture-unit values (above IPC Appendix E Table E103.3(2), so the sizing is conservative; IPC Table 604.3 gives flow rates, not fixture units) and DFU per IPC Table 709.1 (the flush-valve water closet at its public, over-1.6 gpf value of 6, conservative for a dwelling); Hunter's Curve (1940; NBS BMS65) public-domain methodology converts water-supply fixture units to gpm. AHJ governs. Free at codes.iccsafe.org.";
   const fixtures = Object.keys(FIXTURE_UNITS);
   const rows = [];
   for (const f of fixtures) {

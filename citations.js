@@ -9621,23 +9621,23 @@ export const CITATIONS = {
   },
   "tpr-discharge": {
     formula: "rating_ok = valve_rating >= heater_input; discharge_in = valve outlet (never reduced). Output is a pass/fail and the IPC 504.6 discharge checklist, not a continuous quantity.",
-    edition: "IPC 2021 Section 504 (504.4 valve rating vs heater input, 504.6 discharge piping) and ANSI Z21.22 / CSA 4.4 by name; first-principles comparison.",
+    edition: "IPC 2021 Section 504 (504.5 valve relieving capacity vs heater input, 504.6 discharge piping) and ANSI Z21.22 / CSA 4.4 by name; first-principles comparison.",
     freeAccess: "IPC 2021 free read-only at codes.iccsafe.org. The discharge requirements are public code text.",
     governance: GOVERNANCE.general,
-    editionNote: "An undersized or missing T&P valve is the top water-heater safety failure. The discharge pipe is the full valve outlet, never reduced, and serves no other valve (IPC 504.6). A replacement valve must match the heater's input and working pressure (ANSI Z21.22).",
+    editionNote: "An undersized or missing T&P valve is the top water-heater safety failure. The discharge pipe is the full valve outlet, never reduced, and serves no other relief device (IPC 504.6). The relieving capacity must equal or exceed the heater input, with the valve set at not more than 210 F and 150 psi (IPC 504.5). A replacement valve must match the heater's input and working pressure (ANSI Z21.22).",
     assumptions: [
       { name: "Discharge size", value: "the full valve outlet (typ. 3/4 in), never reduced", source: "IPC 2021 Section 504.6" },
-      { name: "Rating rule", value: "valve marked relief capacity >= heater input rating", source: "IPC 2021 Section 504.4 / ANSI Z21.22" },
+      { name: "Rating rule", value: "valve marked relief capacity >= heater input rating", source: "IPC 2021 Section 504.5 / ANSI Z21.22" },
     ],
   },
   "pipe-support-spacing": {
     formula: "max_spacing = lookup(table, material, size, orientation); hangers = ceil(run_length / max_spacing) + 1 (both ends plus interior supports).",
     edition: "IPC 2021 Table 308.5 (hanger spacing) and MSS SP-58 by name; the spacing table ships as editable breakpoints by material and size.",
-    freeAccess: "IPC 2021 free read-only at codes.iccsafe.org. The spacing values are an editable approximation to tune to the adopted edition.",
+    freeAccess: "IPC 2021 free read-only at codes.iccsafe.org. The spacing values are IPC 2021 Table 308.5 (editable for another edition).",
     governance: GOVERNANCE.general,
     editionNote: "Plastic pipe supports closer than metal and needs continuous support or mid-story guides on vertical runs. The table values are maximums - closer is always allowed and required near valves, heavy fittings, and changes of direction. Vertical piping is also supported at each floor/story (IPC 308.5).",
     assumptions: [
-      { name: "Spacing table", value: "editable [material, max_size_in, horiz_ft, vert_ft] per IPC Table 308.5", source: "IPC 2021 Table 308.5 / MSS SP-58" },
+      { name: "Spacing table", value: "editable [material, max_size_in, horiz_ft, vert_ft] per IPC Table 308.5: copper tubing 6 ft to 1-1/4 in and 10 ft above, copper pipe 12 ft, PEX 32 in to 1 in and 4 ft from 1-1/4 in", source: "IPC 2021 Table 308.5 / MSS SP-58" },
       { name: "Hanger count", value: "ceil(run / max_spacing) + 1 (both ends plus interior)", source: "first-principles" },
     ],
   },

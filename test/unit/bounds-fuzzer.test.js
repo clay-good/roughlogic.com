@@ -11878,6 +11878,11 @@ test("bounds: calc-plumbing v64 pipe-support-spacing + softener-sizing pin hange
   const b = _v64b1({ material: "pex", pipe_size: 0.5, run_length: 24, orientation: "horizontal" });
   assert.strictEqual(b.max_spacing_ft, 2.67);
   assert.strictEqual(b.hangers, 10);
+  // IPC 2021 Table 308.5: PEX 1-1/4 in and larger is 4 ft; copper PIPE (not tubing) is 12 ft.
+  assert.strictEqual(_v64b1({ material: "pex", pipe_size: 1.25, run_length: 24 }).max_spacing_ft, 4);
+  assert.strictEqual(_v64b1({ material: "pex", pipe_size: 1, run_length: 24 }).max_spacing_ft, 2.67);
+  assert.strictEqual(_v64b1({ material: "copper_pipe", pipe_size: 2, run_length: 24 }).max_spacing_ft, 12);
+  assert.strictEqual(_v64b1({ material: "copper", pipe_size: 1.5, run_length: 24 }).max_spacing_ft, 10);
   assert.ok("error" in _v64b1({ material: "copper", pipe_size: 1, run_length: 0 })); // non-positive run
   assert.ok("error" in _v64b1({ material: "copper", pipe_size: 0, run_length: 24 })); // non-positive size
   assert.ok("error" in _v64b1({ material: "copper", pipe_size: 1, run_length: Infinity })); // non-finite

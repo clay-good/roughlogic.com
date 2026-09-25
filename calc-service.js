@@ -122,15 +122,17 @@ SERVICE_RENDERERS["gas-appliance-demand"] = renderGasApplianceDemand;
 // --- tpr-discharge: Water-Heater Relief Valve and Discharge Check ---
 //
 // rating_ok = valve_rating >= heater_input; the discharge line is the full valve
-// outlet, never reduced. Output is a verdict plus the IPC 504.6 discharge
+// outlet, never reduced. IPC 2021 504.5 sets the rating rule (and the valve
+// settings, 210 F and 150 psi maximum); 504.6 the discharge piping. Output is a verdict plus the IPC 504.6 discharge
 // checklist, not a continuous quantity.
 const TPR_OUTLET_LABEL = { 0.75: "3/4", 1: "1" };
 const TPR_CHECKLIST = [
-  "Full valve-outlet size, no reduction along the run",
-  "Gravity drain, downhill, no traps",
-  "Terminate 6 in above an air gap over an approved receptor / drain",
-  "Of an approved material rated for 210 F",
-  "Run to the outdoors or an indoor receptor per the AHJ; serves no other valve",
+  "Full valve-outlet size, no reduction along the run (one size larger with insert fittings)",
+  "Gravity drain, downhill, no traps, no valves or tees",
+  "Air gap in the same room; terminate not more than 6 in, and not less than 2 pipe diameters, above the floor or receptor rim",
+  "No threaded connection at the end",
+  "Materials per IPC 605.4 or rated to ASME A112.4.1",
+  "To the floor, the heater pan, a waste receptor, or the outdoors, where occupants can see it; serves no other relief device",
 ];
 // dims: in { heater_input: M L^2 T^-3, valve_rating: M L^2 T^-3, outlet_size: L } out: { discharge_in: L, rating_margin_btuh: M L^2 T^-3, rating_ok: dimensionless }
 // (Heater input and valve relief capacity are energy rates M L^2 T^-3 (BTU/hr);
@@ -152,7 +154,7 @@ export function computeTprDischarge({ heater_input, valve_rating, outlet_size = 
     heater_input: input,
     valve_rating: rating,
     checklist: TPR_CHECKLIST,
-    note: "An undersized or missing T&P valve is the top water-heater safety failure. The discharge pipe must be the full outlet size, may not serve any other valve, and follows IPC 504.6. A replacement valve must match the heater's input and working pressure (ANSI Z21.22 / CSA 4.4).",
+    note: "An undersized or missing T&P valve is the top water-heater safety failure. The discharge pipe must be the full outlet size, may not serve any other valve, and follows IPC 504.6. The valve's relieving capacity must equal or exceed the heater input, set at not more than 210 F and 150 psi (IPC 504.5). A replacement valve must match the heater's input and working pressure (ANSI Z21.22 / CSA 4.4).",
   };
 }
 
@@ -162,7 +164,7 @@ export const tprDischargeExample = {
 };
 
 function renderTprDischarge(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: IPC 2021 Section 504 (504.4 valve rating vs heater input, 504.6 discharge piping) and ANSI Z21.22 / CSA 4.4 by name. The discharge line is the full valve outlet, never reduced.";
+  citationEl.textContent = "Citation: IPC 2021 Section 504 (504.5 valve relieving capacity vs heater input, 504.6 discharge piping) and ANSI Z21.22 / CSA 4.4 by name. The discharge line is the full valve outlet, never reduced.";
   const input = makeNumber("Heater input rating (BTU/hr)", "tpr-input", { step: "any", min: "0" });
   const rating = makeNumber("T&P valve marked relief capacity (BTU/hr)", "tpr-rating", { step: "any", min: "0" });
   const outlet = makeSelect("Valve discharge-outlet size", "tpr-outlet", [
@@ -193,14 +195,16 @@ SERVICE_RENDERERS["tpr-discharge"] = renderTprDischarge;
 // max_spacing = lookup(table, material, size, orientation);
 // hangers = ceil(run_length / max_spacing) + 1 (both ends plus interior).
 // The bundled table is editable [material, max_size_in, horiz_ft, vert_ft]
-// breakpoints approximating IPC 2021 Table 308.5 / MSS SP-58. Helpers sit
+// breakpoints from IPC 2021 Table 308.5 (copper = tubing; copper_pipe = the
+// 12 ft copper-pipe row). MSS SP-58 is named for context. Helpers sit
 // ABOVE the dims block so the v14 lint associates it with the export.
 const SUPPORT_SPACING_TABLE = [
   ["copper", 1.25, 6, 10], ["copper", 999, 10, 10],
+  ["copper_pipe", 999, 12, 10],
   ["steel", 999, 12, 15],
   ["cpvc", 1, 3, 10], ["cpvc", 999, 4, 10],
   ["pvc", 999, 4, 10],
-  ["pex", 999, 2.67, 10],
+  ["pex", 1, 2.67, 10], ["pex", 999, 4, 10],
   ["cast_iron", 999, 5, 15],
 ];
 const _supportLookup = (table, material, size, orientation) => {
@@ -239,9 +243,9 @@ export const pipeSupportSpacingExample = {
 };
 
 function renderPipeSupportSpacing(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: IPC 2021 Table 308.5 (hanger spacing) and MSS SP-58 by name; the spacing table ships as editable breakpoints by material and size. hangers = ceil(run / max_spacing) + 1.";
+  citationEl.textContent = "Citation: IPC 2021 Table 308.5 (hanger spacing) and MSS SP-58 by name; the spacing table ships as editable breakpoints by material and size (PEX 32 in to 1 in, 4 ft from 1-1/4 in). hangers = ceil(run / max_spacing) + 1.";
   const material = makeSelect("Pipe material", "pss-mat", [
-    { value: "copper", label: "Copper tube", selected: true }, { value: "steel", label: "Steel" }, { value: "cpvc", label: "CPVC" },
+    { value: "copper", label: "Copper tube", selected: true }, { value: "copper_pipe", label: "Copper pipe (threaded)" }, { value: "steel", label: "Steel" }, { value: "cpvc", label: "CPVC" },
     { value: "pvc", label: "PVC" }, { value: "pex", label: "PEX" }, { value: "cast_iron", label: "Cast iron" },
   ]);
   const size = makeNumber("Nominal pipe size (in)", "pss-size", { step: "any", min: "0" });
