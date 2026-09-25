@@ -182,6 +182,18 @@ test("motor-branch: overload multiplier 125% when SF >= 1.15, else 115%", () => 
   assert.equal(r2.overload_multiplier, 1.15);
 });
 
+test("motor-branch: overload is sized from the nameplate FLA even when the computed FLA is larger (NEC 430.32(A)(1))", () => {
+  // 5 HP 230 V 1-ph at eta 0.875 / PF 0.78 computes 23.76 A; nameplate 22 A.
+  const r = computeMotorBranchFromNameplate({ hp: 5, voltage_V: 230, phase: 1, eta: 0.875, power_factor: 0.78, nameplate_fla_A: 22, service_factor: 1.15 });
+  assert.ok(r.computed_fla_A > 22);
+  assert.equal(r.design_source, "computed"); // the conductor still takes the larger
+  assert.ok(close(r.overload_max_A, 22 * 1.25, 1e-9), `overload ${r.overload_max_A}, want 27.5`);
+  // Without a nameplate the estimate stands in, and says so.
+  const est = computeMotorBranchFromNameplate({ hp: 5, voltage_V: 230, phase: 1, eta: 0.875, power_factor: 0.78, service_factor: 1.15 });
+  assert.ok(close(est.overload_max_A, est.computed_fla_A * 1.25, 1e-9));
+  assert.ok(est.warnings.some((w) => /430\.32\(A\)\(1\)/.test(w)));
+});
+
 test("motor-branch: rejects HP / V / phase / eta / PF / SF outside valid ranges", () => {
   assert.ok(computeMotorBranchFromNameplate({ hp: 0, voltage_V: 230, phase: 1 }).error);
   assert.ok(computeMotorBranchFromNameplate({ hp: 5, voltage_V: 0, phase: 1 }).error);

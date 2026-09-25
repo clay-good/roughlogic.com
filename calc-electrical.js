@@ -2927,11 +2927,18 @@ export function computeMotorBranchFromNameplate({
   // Branch-circuit conductor: 125% continuous rule per NEC §430.22.
   const branch_conductor_A = design_fla_A * 1.25;
 
-  // Overload sizing per NEC §430.32: 125% for SF >= 1.15, else 115%.
+  // Overload sizing per NEC §430.32(A)(1): 125% for SF >= 1.15, else 115%,
+  // of the motor NAMEPLATE full-load current -- not the larger-of design
+  // value. Until 2026-09-24 it used design_fla_A, so a physics estimate above
+  // the nameplate set the overload past the code maximum (nameplate 22 A,
+  // computed 23.8 A: 29.7 A against 27.5 A).
   const overload_multiplier = SF >= 1.15 ? 1.25 : 1.15;
-  const overload_max_A = design_fla_A * overload_multiplier;
+  const overload_max_A = (np !== null ? np : computed_fla_A) * overload_multiplier;
 
   const warnings = [];
+  if (np === null) {
+    warnings.push("NEC 430.32(A)(1) sizes the overload from the motor nameplate full-load current; the overload shown is from the computed estimate until a nameplate FLA is entered.");
+  }
   if (HP < 0.25) {
     warnings.push("HP below 1/4 is below the NEC 430.247-430.250 reference-FLA table range; verify against motor nameplate.");
   }
@@ -3009,7 +3016,7 @@ export function renderMotorBranchFromNameplate(inputRegion, outputRegion, citati
     oN.textContent = r.nameplate_fla_A !== null ? fmt(r.nameplate_fla_A, 2) + " A" : "(not provided)";
     oD.textContent = fmt(r.design_fla_A, 2) + " A (from " + r.design_source + ")";
     oB.textContent = fmt(r.branch_conductor_125pct_A, 2) + " A";
-    oOL.textContent = fmt(r.overload_max_A, 2) + " A (" + Math.round(r.overload_multiplier * 100) + "% per §430.32)";
+    oOL.textContent = fmt(r.overload_max_A, 2) + " A (" + Math.round(r.overload_multiplier * 100) + "% of the " + (r.nameplate_fla_A !== null ? "nameplate" : "computed") + " FLA per §430.32)";
     oW.textContent = r.warnings.join(" ");
   }, DEBOUNCE_MS);
   for (const f of [hp.input, v.input, ph.select, eta.input, pf.input, np.input, sf.input]) f.addEventListener("input", update);
