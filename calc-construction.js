@@ -939,7 +939,8 @@ export const paintCoverageExample = {
 // --- Utility 95: Excavation Volume ---
 //
 // Prism: L * W * D. Slope wedges around the perimeter expand the top opening
-// by D / tan(angle) on each side. Total volume includes prism + wedges.
+// by D / tan(angle) on each side. Total volume includes prism + wedges + the
+// four corner pyramids.
 
 // dims: in { length_ft: L, width_ft: L, depth_ft: L, side_slope_angle_deg: dimensionless } out: { volume_yd3: L^3 }
 export function computeExcavationVolume({ length_ft, width_ft, depth_ft, side_slope_angle_deg = 90 }) {
@@ -953,10 +954,12 @@ export function computeExcavationVolume({ length_ft, width_ft, depth_ft, side_sl
   // Top dimensions:
   const Lt = L + 2 * set_back;
   const Wt = W + 2 * set_back;
-  // Volume of a frustum: V = D/3 * (A1 + A2 + sqrt(A1 * A2)).
-  const A1 = L * W;
-  const A2 = Lt * Wt;
-  const volume_ft3 = (D / 3) * (A1 + A2 + Math.sqrt(A1 * A2));
+  // Prismoidal volume, exact for a constant setback on all four sides:
+  // V = D (L W + (L + W) s + 4 s^2 / 3) -- the prism, four side wedges and four
+  // corner pyramids. Until 2026-09-25 this used the pyramid frustum
+  // D/3 (A1 + A2 + sqrt(A1 A2)), exact only when top and bottom are similar
+  // (a square pit): 3.7% short on a 100 x 5 x 5 ft trench at 45 degrees.
+  const volume_ft3 = D * (L * W + (L + W) * set_back + (4 / 3) * set_back * set_back);
   const cubic_yards = volume_ft3 / 27;
   return { volume_ft3, cubic_yards, top_length_ft: Lt, top_width_ft: Wt, set_back_ft: set_back };
 }
@@ -1302,7 +1305,7 @@ export function renderPaintCoverage(inputRegion, outputRegion, citationEl) {
 
 // dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderExcavation(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: Frustum volume V = D/3 * (A1 + A2 + sqrt(A1*A2)). Set-back per side = D / tan(angle).";
+  citationEl.textContent = "Citation: Prismoidal volume V = D (L W + (L + W) s + 4 s^2 / 3), exact for a constant side slope: the bottom prism, four side wedges and four corner pyramids. Set-back per side s = D / tan(angle).";
   const L = makeNumber("Length (ft)", "ex-l", { step: "any", min: "0" });
   const W = makeNumber("Width (ft)", "ex-w", { step: "any", min: "0" });
   const D = makeNumber("Depth (ft)", "ex-d", { step: "any", min: "0" });

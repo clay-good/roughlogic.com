@@ -877,7 +877,11 @@ export function computeBranchReinforcement({ run_od_in = 0, run_wall_in = 0, run
   if (!(Th > 0) || !(Tb > 0)) return { error: "Nominal walls must be positive (in)." };
   if (!(trh >= 0) || !(trb >= 0)) return { error: "Required walls must be non-negative (in)." };
   if (!(trh < Th)) return { error: "Run required wall must be less than the nominal wall (no excess to credit)." };
-  if (!(beta > 0 && beta <= 90)) return { error: "Branch angle must be in (0, 90] degrees." };
+  // B31.3 304.3.1(b) limits the area-replacement rules to beta of at least 45
+  // deg; a shallower branch needs special design. Until 2026-09-25 the tile
+  // accepted any angle, and with no cap on d2 a 15 deg branch credited run
+  // metal lying outside the run pipe and read "adequate, no pad".
+  if (!(beta >= 45 && beta <= 90)) return { error: "Branch angle must be 45 to 90 degrees: B31.3 304.3.1(b) and B31.1 104.3.1 limit the area-replacement rules to 45 degrees and steeper; a shallower branch needs special design." };
   const mt = Number(mill_tol_frac), c = Number(corrosion_in) || 0;
   if (!(mt >= 0 && mt < 1)) return { error: "Mill-tolerance fraction must be in [0, 1)." };
   if (!(c >= 0)) return { error: "Corrosion allowance cannot be negative (in)." };
@@ -890,7 +894,8 @@ export function computeBranchReinforcement({ run_od_in = 0, run_wall_in = 0, run
   const d1 = (bod - 2 * (Tbm - c)) / sinB;               // effective opening in the run
   if (!(d1 > 0)) return { error: "Branch bore must be positive (check the branch OD and wall)." };
   const a_required = trh * d1 * (2 - sinB);
-  const d2 = Math.max(d1, (Tbm - c) + (Thm - c) + d1 / 2); // reinforcement zone half-width
+  // Reinforcement zone half-width, "but in any case not more than Dh" (B31.3 304.3.3).
+  const d2 = Math.min(rod, Math.max(d1, (Tbm - c) + (Thm - c) + d1 / 2));
   const L4 = Math.min(2.5 * (Thm - c), 2.5 * (Tbm - c));   // zone height up the branch (no pad)
   const a1 = (2 * d2 - d1) * Math.max(0, Thm - trh - c);   // excess metal in the run
   const a2 = 2 * L4 * Math.max(0, Tbm - trb - c) / sinB;   // excess metal in the branch

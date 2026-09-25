@@ -590,3 +590,14 @@ test("Anchor: hand-calc ACI 17.6.2 breakout hef = [5000 / (0.70 x 1.25 x 24 x sq
   const c = computeAnchorEmbedment({ uplift_lb: 5000, bolt_diameter_in: 0.625, fc_psi: 3000, cracked: true });
   assert.ok(close(c.embedment_cracked_in, expected * Math.pow(1.25, 2 / 3), 1e-9));
 });
+
+test("excavation: a rectangular pit with sloped sides is a prismoid, not a pyramid frustum", () => {
+  // Top and bottom are similar only for a square pit, so the frustum formula
+  // (used until 2026-09-25) under-counted long trenches: 100 x 5 x 5 ft at 45 deg
+  // is D (LW + (L+W)s + 4s^2/3) = 5 (500 + 105 x 5 + 100/3) = 5,291.7 ft^3, not 5,097.
+  const r = computeExcavationVolume({ length_ft: 100, width_ft: 5, depth_ft: 5, side_slope_angle_deg: 45 });
+  assert.ok(Math.abs(r.volume_ft3 - 5291.667) < 0.01, `volume ${r.volume_ft3}`);
+  // A square pit still matches the frustum it always did.
+  const sq = computeExcavationVolume({ length_ft: 10, width_ft: 10, depth_ft: 5, side_slope_angle_deg: 45 });
+  assert.ok(Math.abs(sq.volume_ft3 - (5 / 3) * (100 + 400 + 200)) < 1e-9);
+});

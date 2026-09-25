@@ -14163,6 +14163,16 @@ test("bounds: spec-v204 branch-reinforcement pins the adequate example + the pad
   assert.ok("error" in _v204({ run_od_in: 6.625, run_wall_in: 0.280, run_treq_in: 0.10, branch_od_in: 2.375, branch_wall_in: 0.154, branch_treq_in: 0.034, beta_deg: 120 })); // beta > 90
   assert.ok("error" in _v204({ run_od_in: 6.625, run_wall_in: 0.280, run_treq_in: 0.10, branch_od_in: 2.375, branch_wall_in: 0.154, branch_treq_in: 0.034, beta_deg: 0 }));
   assert.ok("error" in _v204({ run_od_in: Infinity, run_wall_in: 0.280, run_treq_in: 0.10, branch_od_in: 2.375, branch_wall_in: 0.154, branch_treq_in: 0.034 }));
+  // B31.3 304.3.1(b): the rules stop at 45 deg (a 30 deg lateral is special design), and
+  // 304.3.3 caps the zone half-width d2 at the run OD.
+  const lat = { run_od_in: 6.625, run_wall_in: 0.280, run_treq_in: 0.10, branch_od_in: 2.375, branch_wall_in: 0.154, branch_treq_in: 0.034 };
+  assert.ok("error" in _v204({ ...lat, beta_deg: 30 }));
+  const r45 = _v204({ ...lat, beta_deg: 45 });
+  assert.ok(!r45.error && Number.isFinite(r45.a_run_in2));
+  // A 3 in branch at 45 deg on a 3.5 in run: d1 = 3.748 exceeds Dh, so d2 = Dh = 3.5 and
+  // A1 = (2 x 3.5 - d1)(0.2625 - 0.05), not (2 d1 - d1)(...).
+  const cap = _v204({ run_od_in: 3.5, run_wall_in: 0.3, run_treq_in: 0.05, branch_od_in: 3.0, branch_wall_in: 0.2, branch_treq_in: 0.05, beta_deg: 45 });
+  assert.ok(Math.abs(cap.a_run_in2 - (2 * 3.5 - cap.d1_in) * (0.3 * 0.875 - 0.05)) < 1e-9);
 });
 
 test("bounds: spec-v205 expansion-guide-spacing pins 4D/14D + scales with diameter + rejects bad inputs", () => {
@@ -39654,17 +39664,22 @@ test("bounds: spec-v1370 computeChainHoistLiftTime pins the lift time and the du
 
 import { computeGoboImageSize as _v1371 } from "../../calc-stage.js";
 test("bounds: spec-v1371 computeGoboImageSize pins the image, the keystone, and the falloff", () => {
-  // 36 deg at 30 ft = 19.5 ft; 45 deg off perpendicular stretches to 27.6 ft at 0.71 illuminance.
+  // 36 deg at 30 ft = 19.5 ft; 45 deg off perpendicular stretches to 30.8 ft at 0.71 illuminance.
+  // The long axis is the two edge rays meeting the tilted plane: throw sin(phi) [1/cos(a - phi) +
+  // 1/cos(a + phi)]. Until 2026-09-25 it was the narrow-beam 1/cos(a), 27.6 ft here.
   const base = { throw_ft: 30, field_angle_deg: 36, incidence_deg: 45, gobo_image_mm: 0, gate_diameter_mm: 0 };
   const r = _v1371(base);
   assert.ok(Math.abs(r.image_diameter_ft - 19.495) < 1e-3);
-  assert.ok(Math.abs(r.keystone_stretch - 1.41421) < 1e-5);
-  assert.ok(Math.abs(r.stretched_axis_ft - 27.570) < 1e-3);
+  assert.ok(Math.abs(r.keystone_stretch - 1.58114) < 1e-5);
+  assert.ok(Math.abs(r.stretched_axis_ft - 30.8246) < 1e-3);
   assert.ok(Math.abs(r.relative_illuminance - 0.70711) < 1e-5);
   assert.ok(Math.abs(r.stops_down - 0.5) < 1e-9);
-  // 60 degrees doubles the long axis exactly, because 1/cos(60) = 2.
+  // 60 degrees nearly triples the long axis for a 36-degree field (the far edge lands at 78 deg).
   const sixty = _v1371({ ...base, incidence_deg: 60 });
-  assert.ok(Math.abs(sixty.keystone_stretch - 2) < 1e-9);
+  assert.ok(Math.abs(sixty.keystone_stretch - 2.92705) < 1e-5);
+  // Once incidence + half the field reaches 90 the far edge never lands: no finite image.
+  assert.ok("error" in _v1371({ ...base, incidence_deg: 72 }));
+  assert.ok(!("error" in _v1371({ ...base, incidence_deg: 71 })));
   // Straight on there is no stretch and no falloff.
   const straight = _v1371({ ...base, incidence_deg: 0 });
   assert.ok(Math.abs(straight.keystone_stretch - 1) < 1e-12);

@@ -2,7 +2,7 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "bb30dcfe59e42968",
+      "sha": "4419800c5162ab64",
       "date": "2026-09-25"
     },
     "/tools/": {
@@ -786,8 +786,8 @@
       "date": "2026-09-01"
     },
     "/tools/branch-reinforcement/": {
-      "sha": "e1478e93f8886b18",
-      "date": "2026-09-19"
+      "sha": "d7024231010bee0f",
+      "date": "2026-09-25"
     },
     "/tools/branch-saddle-cutback/": {
       "sha": "0dd0a765f2326c2d",
@@ -2710,8 +2710,8 @@
       "date": "2026-09-01"
     },
     "/tools/excavation/": {
-      "sha": "529ec7cdf8f0c471",
-      "date": "2026-09-01"
+      "sha": "d8eedc1ff4a6b1e7",
+      "date": "2026-09-25"
     },
     "/tools/excavation-bench-plan/": {
       "sha": "e5070b783ad9e43e",
@@ -3342,8 +3342,8 @@
       "date": "2026-09-01"
     },
     "/tools/gobo-image-size/": {
-      "sha": "89823386650f26d2",
-      "date": "2026-09-01"
+      "sha": "cccce4fddd08d7db",
+      "date": "2026-09-25"
     },
     "/tools/governor-tripping-speed/": {
       "sha": "0e6656f5044f25f0",

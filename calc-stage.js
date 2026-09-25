@@ -2228,10 +2228,15 @@ export function computeGoboImageSize({ throw_ft = 0, field_angle_deg = 0, incide
   if (!(gobo_image_mm >= 0 && gate_diameter_mm >= 0)) return { error: "Gobo image and gate diameters cannot be negative." };
   if (gobo_image_mm > 0 && gate_diameter_mm > 0 && gobo_image_mm > gate_diameter_mm) return { error: "The gobo's usable image cannot be larger than the gate." };
   // The image is the field-angle cone intersected with the surface. Off perpendicular the
-  // circle becomes an ellipse: one axis stretches by 1/cos, the other does not stretch at all.
-  const image_diameter_ft = 2 * throw_ft * Math.tan(field_angle_deg / 2 * Math.PI / 180);
-  const keystone_stretch = 1 / Math.cos(incidence_deg * Math.PI / 180);
-  const stretched_axis_ft = image_diameter_ft * keystone_stretch;
+  // edge rays at +/- phi (half the field) land T sin(phi)/cos(alpha -/+ phi) either side of
+  // the beam centre, so the long axis is T sin(phi) [1/cos(alpha - phi) + 1/cos(alpha + phi)].
+  // Until 2026-09-25 this used the narrow-beam limit 1/cos(alpha), 11% short for a 36-degree
+  // field at 45 degrees and a third short at 60; past alpha + phi = 90 the far edge never lands.
+  const phi = field_angle_deg / 2 * Math.PI / 180, alpha = incidence_deg * Math.PI / 180;
+  if (alpha + phi >= Math.PI / 2 - 1e-9) return { error: "At this incidence the far edge of the beam runs parallel to or away from the surface (incidence + half the field angle reaches 90 degrees), so the image has no finite length." };
+  const image_diameter_ft = 2 * throw_ft * Math.tan(phi);
+  const stretched_axis_ft = throw_ft * Math.sin(phi) * (1 / Math.cos(alpha - phi) + 1 / Math.cos(alpha + phi));
+  const keystone_stretch = stretched_axis_ft / image_diameter_ft;
   const relative_illuminance = Math.cos(incidence_deg * Math.PI / 180);
   const stops_down = -Math.log2(relative_illuminance);
   const frame_fraction = (gobo_image_mm > 0 && gate_diameter_mm > 0) ? gobo_image_mm / gate_diameter_mm : null;
@@ -2244,7 +2249,7 @@ export function computeGoboImageSize({ throw_ft = 0, field_angle_deg = 0, incide
     relative_illuminance,
     stops_down,
     framed_diameter_ft,
-    note: "The size a gobo image projects to, how much a non-perpendicular hit stretches it, and what that costs in brightness. A gobo fills the fixture's field, so the projected image is the field-angle cone intersected with the surface: straight on, a circle whose diameter is twice the throw times the tangent of half the field angle, the same geometry as the beam pool applied to the image rather than the light. Off perpendicular that circle becomes an ellipse. The axis in the plane of the tilt stretches by one over the cosine of the incidence angle while the perpendicular axis does not stretch at all, which is what makes a projected logo look like a trapezoid: at 45 degrees the stretch is 1.41, and at 60 degrees it is 2.00, so the image is twice as long as it is wide. The same cosine works against you on brightness, because the light is spread over more area and illuminance falls by the cosine of the same angle. A 36-degree ellipsoidal at a 30 ft throw makes a 19.5 ft circle straight on; hang it 45 degrees off perpendicular onto a back wall, an ordinary front-of-house angle, and the long axis goes to 27.6 ft while illuminance falls to 0.71, half a stop down. A logo that reads 19.5 ft wide straight on becomes 27.6 ft tall and noticeably dimmer, and it needs optical keystone correction, a distorted gobo cut to compensate, or a better hanging position -- and the case for the better position is worth making before the gobo is ordered. When the gobo's usable image is smaller than the gate, the projection scales by that fraction. A geometric estimate; the fixture's published field angle and a focus check in the room govern.",
+    note: "The size a gobo image projects to, how much a non-perpendicular hit stretches it, and what that costs in brightness. A gobo fills the fixture's field, so the projected image is the field-angle cone intersected with the surface: straight on, a circle whose diameter is twice the throw times the tangent of half the field angle, the same geometry as the beam pool applied to the image rather than the light. Off perpendicular that circle becomes an ellipse. The axis in the plane of the tilt stretches, and more than the narrow-beam 1/cos rule says, because the far edge of the beam lands at a flatter angle than the centre: each edge ray at half the field angle phi lands throw x sin(phi)/cos(incidence -/+ phi) from the centre. The perpendicular axis stays close to its straight-on width, which is what makes a projected logo look like a trapezoid. For a 36-degree field the long axis is 1.58 times the straight-on diameter at 45 degrees and 2.93 times at 60, and once the incidence plus half the field reaches 90 degrees the far edge never lands at all. The same cosine works against you on brightness, because the light is spread over more area and illuminance falls by the cosine of the same angle. A 36-degree ellipsoidal at a 30 ft throw makes a 19.5 ft circle straight on; hang it 45 degrees off perpendicular onto a back wall, an ordinary front-of-house angle, and the long axis goes to 30.8 ft while illuminance at the beam centre falls to 0.71, half a stop down. A logo that reads 19.5 ft wide straight on becomes 30.8 ft tall and noticeably dimmer, and it needs optical keystone correction, a distorted gobo cut to compensate, or a better hanging position -- and the case for the better position is worth making before the gobo is ordered. When the gobo's usable image is smaller than the gate, the projection scales by that fraction. A geometric estimate; the fixture's published field angle and a focus check in the room govern.",
   };
 }
 

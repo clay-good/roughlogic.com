@@ -4965,7 +4965,7 @@ export const CITATIONS = {
     ],
   },
   "excavation": {
-    formula: "Volume = L × W × D plus side-slope swell volume for OSHA-compliant slopes (Type A / B / C per OSHA 29 CFR 1926 Subpart P).",
+    formula: "Volume = D × (L × W + (L + W) × s + 4 s² / 3), the prismoidal volume of a pit with a constant side slope (setback s = D / tan(angle) per side), for OSHA-compliant slopes (Type A / B / C per OSHA 29 CFR 1926 Subpart P).",
     edition: "OSHA 29 CFR 1926 Subpart P (Excavations).",
     freeAccess: "Free at ecfr.gov.",
     governance: GOVERNANCE.structural,
@@ -7268,14 +7268,14 @@ export const CITATIONS = {
     ],
   },
   "gobo-image-size": {
-    formula: "image_diameter_ft = 2 x throw_ft x tan(field_angle_deg / 2); keystone_stretch = 1 / cos(incidence_deg); stretched_axis_ft = image_diameter_ft x keystone_stretch; relative_illuminance = cos(incidence_deg).",
-    edition: "Gobo image size from the field-angle cone with the 1/cos keystone stretch and cos illuminance falloff for a non-perpendicular hit, by name; public projection geometry. The fixture's published field angle and a focus check in the room govern.",
+    formula: "image_diameter_ft = 2 x throw_ft x tan(phi), phi = field_angle_deg / 2; stretched_axis_ft = throw_ft x sin(phi) x [1/cos(incidence - phi) + 1/cos(incidence + phi)] (the two edge rays meeting the tilted surface); keystone_stretch = stretched_axis_ft / image_diameter_ft; relative_illuminance = cos(incidence_deg) at the beam centre; no finite image once incidence + phi reaches 90 degrees.",
+    edition: "Gobo image size from the field-angle cone, with the long axis from the edge rays meeting the tilted surface and the cos illuminance falloff for a non-perpendicular hit, by name; public projection geometry. The fixture's published field angle and a focus check in the room govern.",
     freeAccess: "The projection geometry is public. The throw, field angle, incidence angle, and gobo dimensions are the designer's own values.",
     governance: GOVERNANCE.general,
-    editionNote: "A gobo fills the fixture's field, so the projected image is the field-angle cone intersected with the surface it lands on. Straight on that is a circle whose diameter is twice the throw times the tangent of half the field angle -- the same geometry as the beam pool, applied to the image rather than to the light. Off perpendicular the circle becomes an ellipse, and the asymmetry is the whole problem: the axis lying in the plane of the tilt stretches by one over the cosine of the incidence angle while the perpendicular axis does not stretch at all, which is what turns a projected logo into a trapezoid. At forty-five degrees the stretch is 1.41 and at sixty degrees it is 2.00, meaning the image is twice as long as it is wide. The same cosine works against you on brightness, because the light is spread over more area and illuminance falls by the cosine of the same angle. The practical consequence is that a fixture position chosen for convenience can cost both the shape and half a stop of the image, and the remedies -- optical keystone correction, a distorted gobo cut to compensate, or a better hanging position -- all cost more after the gobo is ordered than before. When the gobo's usable image is smaller than the fixture's gate, the projection scales by that fraction.",
+    editionNote: "A gobo fills the fixture's field, so the projected image is the field-angle cone intersected with the surface it lands on. Straight on that is a circle whose diameter is twice the throw times the tangent of half the field angle -- the same geometry as the beam pool, applied to the image rather than to the light. Off perpendicular the circle becomes an ellipse, and the asymmetry is the whole problem: the axis lying in the plane of the tilt stretches while the perpendicular axis stays near its straight-on width, which is what turns a projected logo into a trapezoid. The stretch is larger than the narrow-beam one-over-cosine rule because the far edge of the beam lands at a flatter angle than the centre: for a 36-degree field it is 1.58 at forty-five degrees and 2.93 at sixty, and once the incidence plus half the field reaches ninety degrees the far edge never lands. The same cosine works against you on brightness, because the light is spread over more area and illuminance falls by the cosine of the same angle. The practical consequence is that a fixture position chosen for convenience can cost both the shape and half a stop of the image, and the remedies -- optical keystone correction, a distorted gobo cut to compensate, or a better hanging position -- all cost more after the gobo is ordered than before. When the gobo's usable image is smaller than the fixture's gate, the projection scales by that fraction.",
     assumptions: [
       { name: "Field angle", value: "the image fills the field, so diameter = 2 x throw x tan(field/2)", source: "projection geometry" },
-      { name: "Keystone", value: "the tilt-plane axis stretches by 1/cos(incidence); the perpendicular axis does not stretch", source: "projection geometry" },
+      { name: "Keystone", value: "the tilt-plane axis is throw x sin(phi) x [1/cos(incidence - phi) + 1/cos(incidence + phi)], more than the narrow-beam 1/cos(incidence); the perpendicular axis stays near its straight-on width", source: "projection geometry" },
       { name: "Illuminance", value: "falls by cos(incidence) as the same light covers more area", source: "photometry" },
     ],
   },
@@ -21600,7 +21600,7 @@ export const CITATIONS = {
     ],
   },
   "branch-reinforcement": {
-    formula: "d1 = (branch_od - 2 x branch_wall) / sin(beta); A_required = run_treq x d1 x (2 - sin beta); d2 = max(d1, branch_wall + run_wall + d1/2); L4 = min(2.5 x run_wall, 2.5 x branch_wall); A1 = (2 d2 - d1)(run_wall - run_treq); A2 = 2 L4 (branch_wall - branch_treq); adequate when A1 + A2 >= A_required, else pad_area = A_required - (A1 + A2).",
+    formula: "d1 = (branch_od - 2 x branch_wall) / sin(beta); A_required = run_treq x d1 x (2 - sin beta); d2 = max(d1, branch_wall + run_wall + d1/2), not more than the run OD Dh; beta limited to 45-90 degrees; L4 = min(2.5 x run_wall, 2.5 x branch_wall); A1 = (2 d2 - d1)(run_wall - run_treq); A2 = 2 L4 (branch_wall - branch_treq); adequate when A1 + A2 >= A_required, else pad_area = A_required - (A1 + A2).",
     edition: "ASME B31.1 para 104.3.1 branch-connection reinforcement (and B31.3 304.3 for process piping), by name; the area-replacement relations are read from the code's figure.",
     freeAccess: "The area-replacement relations are the standard branch-reinforcement balance, widely republished in piping-design texts; the required wall thicknesses come from the pressure design.",
     governance: GOVERNANCE.general,

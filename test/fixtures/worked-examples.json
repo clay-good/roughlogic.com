@@ -93064,9 +93064,9 @@
    "source_publisher": "Project (first-principles)",
    "source_title": "36-degree ellipsoidal at a 30 ft throw, 45 degrees off perpendicular",
    "source_edition_or_year": "projection geometry",
-   "source_section_or_page": "2 x throw x tan(field/2), 1/cos keystone",
+   "source_section_or_page": "2 x throw x tan(field/2); long axis throw sin(phi) [1/cos(a - phi) + 1/cos(a + phi)]",
    "verified_by": "rl",
-   "verified_on": "2026-08-26",
+   "verified_on": "2026-09-25",
    "inputs": {
     "throw_ft": 30,
     "field_angle_deg": 36,
@@ -93082,13 +93082,13 @@
      }
     },
     "keystone_stretch": {
-     "value": 1.41421,
+     "value": 1.58114,
      "tolerance": {
       "pct": 0.5
      }
     },
     "stretched_axis_ft": {
-     "value": 27.5704,
+     "value": 30.8246,
      "tolerance": {
       "pct": 0.5
      }
