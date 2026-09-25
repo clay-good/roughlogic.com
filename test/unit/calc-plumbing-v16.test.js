@@ -202,8 +202,15 @@ test("sanitary-dfu: DFU values and capacity table are internally consistent", ()
   // Capacity table is strictly increasing in branch and stack columns.
   for (let i = 1; i < SANITARY_BRANCH_STACK_MAX_DFU.length; i++) {
     assert.ok(SANITARY_BRANCH_STACK_MAX_DFU[i].branch > SANITARY_BRANCH_STACK_MAX_DFU[i - 1].branch);
-    assert.ok(SANITARY_BRANCH_STACK_MAX_DFU[i].stack > SANITARY_BRANCH_STACK_MAX_DFU[i - 1].stack);
+    // The 15 in row has no stack values (IPC Table 710.1(2) note c).
+    if (SANITARY_BRANCH_STACK_MAX_DFU[i].stack !== null) assert.ok(SANITARY_BRANCH_STACK_MAX_DFU[i].stack > SANITARY_BRANCH_STACK_MAX_DFU[i - 1].stack);
   }
+  // IPC 2021 Table 709.1: a sink (bar sink) is 2 DFU; a residential washer 2, commercial 3.
+  assert.strictEqual(SANITARY_DFU_VALUES.bar_sink, 2);
+  assert.strictEqual(SANITARY_DFU_VALUES.clothes_washer, 2);
+  assert.strictEqual(SANITARY_DFU_VALUES.clothes_washer_commercial, 3);
+  // Table 710.1(1) runs to 15 in: 1,700 DFU at 1/8 in/ft is a 10 in building drain.
+  assert.strictEqual(computeSanitaryDfu({ fixtures: { urinal: 425 }, config: "building_drain", slope_in_per_ft: 0.125 }).min_size_in, 10);
 });
 
 test("sanitary-dfu: empty fixtures and an invalid slope are rejected", () => {

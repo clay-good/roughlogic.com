@@ -2516,7 +2516,10 @@ PLUMBING_RENDERERS["wh-expansion-tank"] = _v16p_renderWhExpansionTank;
 
 // --- B.5 Sanitary stack / branch DFU sizing --------------------------
 
-// Drainage fixture units (DFU) per fixture, IPC 2021 Table 709.1.
+// Drainage fixture units (DFU) per fixture, IPC 2021 Table 709.1. Until
+// 2026-09-24 a bar sink was 1 DFU (the table's sink row is 2) and the clothes
+// washer was the COMMERCIAL row (3); residential is 2 and commercial is now its
+// own entry.
 export const SANITARY_DFU_VALUES = {
   water_closet_private: 3,
   water_closet_public: 4,
@@ -2525,12 +2528,13 @@ export const SANITARY_DFU_VALUES = {
   shower: 2,
   kitchen_sink: 2,
   dishwasher: 2,
-  clothes_washer: 3,
+  clothes_washer: 2,
+  clothes_washer_commercial: 3,
   laundry_tub: 2,
   floor_drain: 2,
   urinal: 4,
   drinking_fountain: 0.5,
-  bar_sink: 1,
+  bar_sink: 2,
   bidet: 1,
 };
 
@@ -2548,13 +2552,20 @@ export const SANITARY_BRANCH_STACK_MAX_DFU = [
   { size: 5, branch: 360, stack3: 540, stack: 1100, per_interval: 200 },
   { size: 6, branch: 620, stack3: 960, stack: 1900, per_interval: 350 },
   { size: 8, branch: 1400, stack3: 2200, stack: 3600, per_interval: 600 },
+  { size: 10, branch: 2500, stack3: 3800, stack: 5600, per_interval: 1000 },
+  { size: 12, branch: 3900, stack3: 6000, stack: 8400, per_interval: 1500 },
+  { size: 15, branch: 7000, stack3: null, stack: null, per_interval: null },
 ];
 
-// IPC 2021 Table 710.1(1): building drains and sewers max DFU by slope.
+// IPC 2021 Table 710.1(1): building drains and sewers max DFU by slope. The
+// full table: until 2026-09-24 it stopped at 8 in and had no 1/16 in/ft
+// column or 1-1/4 and 1-1/2 in rows, so 1,700 DFU at 1/8 in/ft "exceeded the
+// bundled table" where the code sizes it at 10 in.
 export const SANITARY_BUILDING_DRAIN_MAX_DFU = {
-  "0.125": { 3: 36, 4: 180, 5: 390, 6: 700, 8: 1600 },
-  "0.25": { 2: 21, 2.5: 24, 3: 42, 4: 216, 5: 480, 6: 840, 8: 1920 },
-  "0.5": { 2: 26, 2.5: 31, 3: 50, 4: 250, 5: 575, 6: 1000, 8: 2300 },
+  "0.0625": { 8: 1400, 10: 2500, 12: 3900, 15: 7000 },
+  "0.125": { 3: 36, 4: 180, 5: 390, 6: 700, 8: 1600, 10: 2900, 12: 4600, 15: 8300 },
+  "0.25": { 1.25: 1, 1.5: 3, 2: 21, 2.5: 24, 3: 42, 4: 216, 5: 480, 6: 840, 8: 1920, 10: 3500, 12: 5600, 15: 10000 },
+  "0.5": { 1.25: 1, 1.5: 3, 2: 26, 2.5: 31, 3: 50, 4: 250, 5: 575, 6: 1000, 8: 2300, 10: 4200, 12: 6700, 15: 12000 },
 };
 
 // dims: in { fixtures: dimensionless, config: dimensionless, slope_in_per_ft: dimensionless, proposed_size_in: L, branch_intervals: dimensionless } out: { total_dfu: dimensionless, min_size_in: L }
@@ -2579,7 +2590,7 @@ export function computeSanitaryDfu({
   if (config === "building_drain") {
     const slopeKey = String(slope_in_per_ft);
     const table = SANITARY_BUILDING_DRAIN_MAX_DFU[slopeKey];
-    if (!table) return { error: "Slope must be 1/8 (0.125), 1/4 (0.25), or 1/2 (0.5) in per ft." };
+    if (!table) return { error: "Slope must be 1/16 (0.0625), 1/8 (0.125), 1/4 (0.25), or 1/2 (0.5) in per ft." };
     const sizes = Object.keys(table).map(Number).sort((a, b) => a - b);
     for (const s of sizes) {
       if (table[s] >= total_dfu) { min_size_in = s; capacity_at_size = table[s]; break; }
@@ -2647,7 +2658,8 @@ const _v16p_DFU_LABELS = {
   shower: "Shower",
   kitchen_sink: "Kitchen sink",
   dishwasher: "Dishwasher",
-  clothes_washer: "Clothes washer",
+  clothes_washer: "Clothes washer (residential)",
+  clothes_washer_commercial: "Clothes washer (commercial)",
   laundry_tub: "Laundry tub",
   floor_drain: "Floor drain",
   urinal: "Urinal",

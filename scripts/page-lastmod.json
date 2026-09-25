@@ -2,12 +2,12 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "3acd8f26b174f778",
+      "sha": "8bf6fa798cf9566c",
       "date": "2026-09-25"
     },
     "/tools/": {
-      "sha": "6116d33ca84ecf35",
-      "date": "2026-09-19"
+      "sha": "72b482414828a303",
+      "date": "2026-09-25"
     },
     "/groups/accounting/": {
       "sha": "9f11187d3f5838e9",
@@ -62,8 +62,8 @@
       "date": "2026-09-19"
     },
     "/groups/plumbing/": {
-      "sha": "4d2c1a3f87230573",
-      "date": "2026-09-18"
+      "sha": "7ce30a62e040b0da",
+      "date": "2026-09-25"
     },
     "/groups/real-estate/": {
       "sha": "001ba823b2b55944",
@@ -138,8 +138,8 @@
       "date": "2026-09-01"
     },
     "/tools/accessible-shower-check/": {
-      "sha": "a23c94d4d0d8479c",
-      "date": "2026-09-01"
+      "sha": "6c91dd9999f85619",
+      "date": "2026-09-25"
     },
     "/tools/accessible-toilet-compartment/": {
       "sha": "427729842997f3d3",
@@ -2934,8 +2934,8 @@
       "date": "2026-09-04"
     },
     "/tools/fixture-clearance-check/": {
-      "sha": "a70be8860b18ae67",
-      "date": "2026-09-19"
+      "sha": "569ddce27f2cb906",
+      "date": "2026-09-25"
     },
     "/tools/flammable-cabinet-storage/": {
       "sha": "5f3a60612d749998",
@@ -3358,8 +3358,8 @@
       "date": "2026-09-01"
     },
     "/tools/grab-bar-layout/": {
-      "sha": "c67bbfc7cfd7446d",
-      "date": "2026-09-19"
+      "sha": "341aa0da74ada959",
+      "date": "2026-09-25"
     },
     "/tools/grade-rod-cut-fill/": {
       "sha": "d813a88833ba70d5",
@@ -6770,8 +6770,8 @@
       "date": "2026-09-05"
     },
     "/tools/shower-compartment-check/": {
-      "sha": "7b11cb98cba9d15a",
-      "date": "2026-09-19"
+      "sha": "b2088d06b5a75d84",
+      "date": "2026-09-25"
     },
     "/tools/shr/": {
       "sha": "c1ef8aae986dfe62",

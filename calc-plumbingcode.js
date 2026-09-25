@@ -10,7 +10,7 @@
 // and renderer is co-located, and the only module-level names they read are the renderer
 // registry and the finite-input guard, both reproduced here. Tiles:
 //   v1132 fixture-clearance-check        (IPC 405.3.1 side, center, front)
-//   v1134 shower-compartment-check       (IPC 417.4 area and least dimension)
+//   v1134 shower-compartment-check       (IPC 421.4 area and least dimension)
 //   v1135 vent-terminal-check            (IPC 904 roof and opening clearances)
 //   v1136 aav-install-check              (IPC 918 air admittance valve install)
 //   v1137 grab-bar-layout                (ADA 604.5 rear and side bars)
@@ -132,8 +132,8 @@ function _v1132renderFixtureClearanceCheck(inputRegion, outputRegion, citationEl
 }
 PLUMBINGCODE_RENDERERS["fixture-clearance-check"] = _v1132renderFixtureClearanceCheck;
 
-// --- spec-v1134: shower compartment size (IPC 417.4) ---
-// The other "area is not the test" trap, and a two-path one. IPC 417.4 asks for BOTH not
+// --- spec-v1134: shower compartment size (IPC 421.4) ---
+// The other "area is not the test" trap, and a two-path one. IPC 421.4 asks for BOTH not
 // less than 900 sq in of interior cross-sectional area AND not less than 30 in in least
 // dimension - so a 28 x 36 compartment has 1,008 sq in, comfortably past the area rule, and
 // still fails on the 28 in side. The exception gives a second path: a least dimension down
@@ -164,7 +164,7 @@ export function computeShowerCompartmentCheck({ width_in = 0, depth_in = 0, base
   const exc_dim_ok = least_dim_in >= D1;
   const exception_path_ok = exc_area_ok && exc_dim_ok;
   const passes = base_path_ok || exception_path_ok;
-  const path = base_path_ok ? "the base 417.4 rule" : exception_path_ok ? "the 417.4 exception" : "neither path";
+  const path = base_path_ok ? "the base 421.4 rule" : exception_path_ok ? "the 421.4 exception" : "neither path";
 
   // A 30 in disc fits a rectangle exactly when the SHORT side reaches 30.
   const disc_fits = least_dim_in >= D0;
@@ -175,7 +175,7 @@ export function computeShowerCompartmentCheck({ width_in = 0, depth_in = 0, base
   const area_deficit_exc = Math.max(0, A1 - area_sqin);
 
   const note = "Finished interior " + w + " x " + d + " = " + area_sqin.toFixed(0) + " sq in with a least dimension of " + least_dim_in + " in. "
-    + "IPC 417.4 has TWO paths and both have two conditions. Base: at least " + A0 + " sq in AND at least " + D0 + " in in least dimension - here " + (base_area_ok ? "area OK" : "area short by " + area_deficit_base.toFixed(0)) + ", " + (base_dim_ok ? "dimension OK" : "dimension short by " + (D0 - least_dim_in).toFixed(1)) + ". "
+    + "IPC 421.4 has TWO paths and both have two conditions. Base: at least " + A0 + " sq in AND at least " + D0 + " in in least dimension - here " + (base_area_ok ? "area OK" : "area short by " + area_deficit_base.toFixed(0)) + ", " + (base_dim_ok ? "dimension OK" : "dimension short by " + (D0 - least_dim_in).toFixed(1)) + ". "
     + "Exception: a least dimension down to " + D1 + " in is allowed if the area reaches " + A1 + " sq in - here " + (exc_dim_ok ? "dimension OK" : "dimension short") + ", " + (exc_area_ok ? "area OK" : "area short by " + area_deficit_exc.toFixed(0)) + ". "
     + (passes ? "PASSES via " + path + ". " : "FAILS both paths. ")
     + "The trap is that area alone never settles it: at the base IPC figures, a 28 x 36 compartment is 1,008 sq in, well past the 900, and still fails because 28 is under 30 and 1,008 is under the 1,300 the exception would want. Adding area in the long direction does nothing for the short one. "
@@ -191,7 +191,7 @@ export function computeShowerCompartmentCheck({ width_in = 0, depth_in = 0, base
 export const showerCompartmentCheckExample = { inputs: { width_in: 28, depth_in: 36, base_min_area_sqin: 900, base_min_dim_in: 30, exception_min_area_sqin: 1300, exception_min_dim_in: 25 } };
 
 function _v1134renderShowerCompartmentCheck(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: IPC 417.4 - shower compartments not less than 900 sq in in interior cross-sectional area and not less than 30 in in least dimension, measured from the finished interior dimension at a height equal to the top of the threshold and at a point tangent to its centerline, exclusive of fixture valves, showerheads, soap dishes, and safety grab bars or rails, and continued to a height not less than 70 in above the shower drain outlet; with the exception permitting a least dimension of not less than 25 in where the compartment has not less than 1,300 sq in of cross-sectional area. Both conditions of a path must be met - area alone never settles it. Rectangular compartments only; a neo-angle or irregular stall needs the disc drawn on the plan. The door and its swing, the receptor and drain, waterproofing, the 70 in height, and accessible (ANSI A117.1 / ADA) stalls are not checked. All thresholds are editable inputs because local amendments exist. A screen, not a code-official determination; the adopted code and the AHJ govern.";
+  citationEl.textContent = "Citation: IPC 421.4 - shower compartments not less than 900 sq in in interior cross-sectional area and not less than 30 in in least dimension, measured from the finished interior dimension at a height equal to the top of the threshold and at a point tangent to its centerline, exclusive of fixture valves, showerheads, soap dishes, and safety grab bars or rails, and continued to a height not less than 70 in above the shower drain outlet; with the exception permitting a least dimension of not less than 25 in where the compartment has not less than 1,300 sq in of cross-sectional area. Both conditions of a path must be met - area alone never settles it. Rectangular compartments only; a neo-angle or irregular stall needs the disc drawn on the plan. The door and its swing, the receptor and drain, waterproofing, the 70 in height, and accessible (ANSI A117.1 / ADA) stalls are not checked. All thresholds are editable inputs because local amendments exist. A screen, not a code-official determination; the adopted code and the AHJ govern.";
   const w = makeNumber("Finished interior width (in)", "scc-w", { step: "any", min: "0" });
   const d = makeNumber("Finished interior depth (in)", "scc-d", { step: "any", min: "0" });
   const a0 = makeNumber("Base minimum area (sq in; IPC 900)", "scc-a0", { step: "any", min: "0" });
@@ -330,7 +330,7 @@ PLUMBINGCODE_RENDERERS["vent-terminal-check"] = _v1135renderVentTerminalCheck;
 // because an AAV admits air to relieve negative pressure and can do nothing about positive
 // pressure. A system vented entirely by AAVs has no path for the air a discharging stack
 // pushes ahead of it. The rest is placement: not less than 4 in above the horizontal branch
-// or fixture drain being vented (918.4), not less than 6 in above insulation (918.6), in a
+// or fixture drain being vented (918.4), not less than 6 in above insulation (also 918.4), in a
 // ventilated space with access, and rated for the fixture units it serves.
 // dims: in { height_above_drain_in: L, height_above_insulation_in: L, has_outdoor_vent: dimensionless, ventilated_space: dimensionless, accessible: dimensionless, dfu_served: dimensionless, valve_dfu_rating: dimensionless } out: { drain_deficit_in: L, insulation_deficit_in: L, dfu_margin: dimensionless }
 export function computeAavInstallCheck({ height_above_drain_in = 0, height_above_insulation_in = 0, has_outdoor_vent = "yes", ventilated_space = "yes", accessible = "yes", dfu_served = 0, valve_dfu_rating = 0 } = {}) {
@@ -363,8 +363,8 @@ export function computeAavInstallCheck({ height_above_drain_in = 0, height_above
     + (outdoor ? "has one. " : "does NOT. An AAV admits air to relieve NEGATIVE pressure and can do nothing about POSITIVE pressure - the air a discharging stack pushes ahead of it has to go somewhere, and with every vent capped by a valve there is no path for it. Venting a whole building on AAVs is the failure this rule exists to prevent, and no amount of correct placement fixes it. ")
     + "PLACEMENT: 918.4 puts the valve not less than " + MIN_DRAIN + " in above the horizontal branch drain or fixture drain being vented - this one is " + hd + " in, " + (drain_ok ? "OK" : "SHORT by " + drain_deficit_in.toFixed(1) + " in") + ". "
     + (has_insulation
-      ? "918.6 puts it not less than " + MIN_INSUL + " in above insulation materials - this one is " + hi + " in, " + (insulation_ok ? "OK. " : "SHORT by " + insulation_deficit_in.toFixed(1) + " in. ")
-      : "No insulation height entered; where the valve sits above insulation 918.6 wants at least " + MIN_INSUL + " in of clearance, since buried or blanketed valves are a common attic failure. ")
+      ? "918.4 puts it not less than " + MIN_INSUL + " in above insulation materials - this one is " + hi + " in, " + (insulation_ok ? "OK. " : "SHORT by " + insulation_deficit_in.toFixed(1) + " in. ")
+      : "No insulation height entered; where the valve sits above insulation 918.4 wants at least " + MIN_INSUL + " in of clearance, since buried or blanketed valves are a common attic failure. ")
     + "The valve must be in a VENTILATED space - " + (ventilated ? "stated as ventilated" : "NOT stated as ventilated, and a valve sealed inside a tight cabinet or a closed wall cavity has no air to admit") + " - and must remain ACCESSIBLE - " + (access ? "stated as accessible" : "NOT accessible, and a valve is a mechanical device with a diaphragm that eventually fails, so burying it behind finished work guarantees an expensive repair") + ". "
     + (rated ? "Capacity: the valve is rated " + rating + " DFU against " + dfu + " served, " + (dfu_ok ? "with " + dfu_margin + " DFU of margin. " : "which is UNDER by " + Math.abs(dfu_margin) + " DFU. ") : "Enter the served fixture units and the valve's rating to check capacity; ratings are listed per ASSE 1051 or 1050 and are not interchangeable between individual, branch, and stack types. ")
     + (passes ? "PASSES the checks entered. " : "DOES NOT PASS. ")
@@ -376,7 +376,7 @@ export function computeAavInstallCheck({ height_above_drain_in = 0, height_above
 export const aavInstallCheckExample = { inputs: { height_above_drain_in: 4, height_above_insulation_in: 6, has_outdoor_vent: "yes", ventilated_space: "yes", accessible: "yes", dfu_served: 6, valve_dfu_rating: 20 } };
 
 function _v1136renderAavInstallCheck(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: IPC 918 - individual and branch-type air admittance valves located not less than 4 in above the horizontal branch drain or fixture drain being vented (918.4); installed not less than 6 in above insulation materials (918.6); located in a ventilated space and remaining accessible; and, the requirement that governs everything else, at least one vent pipe extending to the OUTDOORS even where air admittance valves are used (918.7), because a valve admits air to relieve negative pressure and provides no relief of positive pressure. Valve capacity is rated in drainage fixture units per its ASSE 1051 or 1050 listing and is not interchangeable between individual, branch, and stack types. Not checked: whether AAVs are permitted at all by the adopted code and the AHJ, the developed length and sizing of the vent, the relief vent required where a horizontal branch is more than four branch intervals from the top of the stack, plenum restrictions, or the fixture arrangement below. A screen, not a code-official determination; the adopted code, the valve's listing, and the AHJ govern.";
+  citationEl.textContent = "Citation: IPC 918 - individual and branch-type air admittance valves located not less than 4 in above the horizontal branch drain or fixture drain being vented (918.4); installed not less than 6 in above insulation materials (also 918.4); located in a ventilated space and remaining accessible; and, the requirement that governs everything else, at least one vent pipe extending to the OUTDOORS even where air admittance valves are used (918.7), because a valve admits air to relieve negative pressure and provides no relief of positive pressure. Valve capacity is rated in drainage fixture units per its ASSE 1051 or 1050 listing and is not interchangeable between individual, branch, and stack types. Not checked: whether AAVs are permitted at all by the adopted code and the AHJ, the developed length and sizing of the vent, the relief vent required where a horizontal branch is more than four branch intervals from the top of the stack, plenum restrictions, or the fixture arrangement below. A screen, not a code-official determination; the adopted code, the valve's listing, and the AHJ govern.";
   const hd = makeNumber("Height above the branch or fixture drain (in)", "aav-hd", { step: "any", min: "0" });
   const hi = makeNumber("Height above insulation (in; 0 = no insulation below)", "aav-hi", { step: "any", min: "0" });
   const ov = makeSelect("At least one vent extends to the outdoors?", "aav-ov", [{ value: "yes", label: "Yes", selected: true }, { value: "no", label: "No" }]);

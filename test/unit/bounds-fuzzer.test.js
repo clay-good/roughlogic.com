@@ -34577,9 +34577,9 @@ test("bounds: spec-v1134 computeShowerCompartmentCheck pins the two-path rule, t
   assert.ok(r.base_other_needed_in === null && Math.abs(r.exc_other_needed_in - 1300 / 28) < 1e-9);
   // BOTH BOUNDARY CASES pass exactly, one on each path.
   const sq = _v1134({ ...base, width_in: 30, depth_in: 30 });
-  assert.ok(sq.area_sqin === 900 && sq.base_path_ok && sq.passes && sq.path === "the base 417.4 rule" && sq.disc_fits);
+  assert.ok(sq.area_sqin === 900 && sq.base_path_ok && sq.passes && sq.path === "the base 421.4 rule" && sq.disc_fits);
   const exc = _v1134({ ...base, width_in: 25, depth_in: 52 });
-  assert.ok(exc.area_sqin === 1300 && exc.exception_path_ok && exc.passes && exc.path === "the 417.4 exception");
+  assert.ok(exc.area_sqin === 1300 && exc.exception_path_ok && exc.passes && exc.path === "the 421.4 exception");
   assert.ok(!exc.disc_fits, "the exception exists precisely for stalls a 30 in disc will not fit");
   // Each of the four conditions has its own seam.
   assert.ok(!_v1134({ ...base, width_in: 29.9, depth_in: 31 }).base_dim_ok);
