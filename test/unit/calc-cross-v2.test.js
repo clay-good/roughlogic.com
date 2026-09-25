@@ -599,3 +599,17 @@ test("sales-tax: DC's enacted change to 7.0% applies from 2026-10-01 (DC OTR)", 
   // A custom rate still overrides the table.
   assert.equal(computeSalesTax({ state: "DC", subtotal: 100, custom_rate_percent: 5, as_of: "2026-10-01" }).rate_percent, 5);
 });
+
+test("per-diem: GSA FY2027 standard lodging $113 from 2026-10-01 (standard-rate states only)", async () => {
+  const { computePerDiem } = await import("../../calc-cross.js");
+  assert.equal(computePerDiem({ state: "SD", type: "lodging", as_of: "2026-09-30" }).rate_dollars, 110);
+  assert.equal(computePerDiem({ state: "SD", type: "lodging", as_of: "2026-10-01" }).rate_dollars, 113);
+  assert.equal(computePerDiem({ state: "TX", type: "lodging", as_of: "2026-10-01" }).rate_dollars, 134); // above-standard row unchanged
+  assert.equal(computePerDiem({ state: "SD", type: "m_and_ie", as_of: "2026-10-01" }).rate_dollars, 68); // M&IE tiers unchanged
+});
+
+test("sales-tax: South Dakota returns to 4.5% on 2027-07-01 (SDCL 10-45-2)", async () => {
+  const { computeSalesTax } = await import("../../calc-cross.js");
+  assert.equal(computeSalesTax({ state: "SD", subtotal: 100, as_of: "2027-06-30" }).rate_percent, 4.2);
+  assert.equal(computeSalesTax({ state: "SD", subtotal: 100, as_of: "2027-07-01" }).rate_percent, 4.5);
+});

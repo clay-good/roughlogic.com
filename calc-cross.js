@@ -291,6 +291,9 @@ export const STATE_TAX_RATES = {
 // describing a 6.5% step on 2025-10-01 are wrong; OTR is the rate of record.)
 export const STATE_TAX_RATE_CHANGES = {
   DC: [{ effective: "2026-10-01", rate: 7.0 }],
+  // SDCL 10-45-2: 4.2% now; the version "Effective July 1, 2027" sets "four and one-half percent"
+  // (SL 2023, ch 32, sections 1 and 19 -- the temporary cut's built-in end date).
+  SD: [{ effective: "2027-07-01", rate: 4.5 }],
 };
 
 // dims: in { state: dimensionless, subtotal: dimensionless, custom_rate_percent: dimensionless, as_of: dimensionless } out: { tax: dimensionless, total: dimensionless }
@@ -689,7 +692,8 @@ export const overtimeExample = {
 // --- Utility 109: Per-Diem (federal GSA) ---
 //
 // GSA publishes per-diem by LOCALITY (county or city), not by state. These
-// per-state values approximate the FY2026 standard CONUS rate ($110 lodging /
+// per-state values approximate the FY2026 standard CONUS rate ($110 lodging, $113 in FY2027 from
+// 2026-10-01 -- see GSA_STANDARD_LODGING below /
 // $68 M&IE), raised where a state is broadly above it. The M&IE figures are the
 // published FY2026 tier values ($68 / $74 / $80 / $86 / $92); which tier a state
 // sits in is the approximation. They were still the FY2023 tiers ($64 / $69 /
@@ -750,11 +754,20 @@ export const GSA_PERDIEM_RATES = {
   WY: { lodging: 110, m_and_ie: 68 },
 };
 
-// dims: in { state: dimensionless, type: dimensionless } out: { rate: dimensionless }
-export function computePerDiem({ state, type = "lodging" }) {
+// GSA FY2027 (effective 2026-10-01): the standard CONUS lodging rate rises from $110 to $113; the M&IE
+// tiers are unchanged ($68 / $74 / $80 / $86 / $92). Per the GSA per diem API, read 2026-09-25. States
+// carried at the standard rate move with it from the effective date; the above-standard rows are this
+// table's own approximations and are unchanged.
+export const GSA_STANDARD_LODGING = { fy2026: 110, next: { fiscal_year: 2027, effective: "2026-10-01", lodging: 113 } };
+
+// dims: in { state: dimensionless, type: dimensionless, as_of: dimensionless } out: { rate: dimensionless }
+export function computePerDiem({ state, type = "lodging", as_of = "" }) {
   const r = GSA_PERDIEM_RATES[state];
   if (!r) return { error: "Unknown state." };
-  if (type === "lodging") return { rate_dollars: r.lodging, type: "lodging", state };
+  const today = /^\d{4}-\d{2}-\d{2}$/.test(String(as_of)) ? String(as_of) : new Date().toISOString().slice(0, 10);
+  const nx = GSA_STANDARD_LODGING.next;
+  const lodging = r.lodging === GSA_STANDARD_LODGING.fy2026 && today >= nx.effective ? nx.lodging : r.lodging;
+  if (type === "lodging") return { rate_dollars: lodging, type: "lodging", state };
   if (type === "m_and_ie") return { rate_dollars: r.m_and_ie, type: "m_and_ie", state };
   return { error: "Unknown type." };
 }

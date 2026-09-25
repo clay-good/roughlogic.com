@@ -1945,7 +1945,7 @@ cross-check.
 | calc-cross.js | `computeNIOSHLifting` | `{ weight_lb = 0, H_in = 10, V_in = 30, D_in = 0, asymmetry_deg = 0, frequency...` | _ | _ | _ |
 | calc-cross.js | `computeNoiseDose` | `{ rows = [] } = {}` | _ | _ | _ |
 | calc-cross.js | `computeOvertime` | `{ total_hours, regular_rate, overtime_multiplier = 1.5, double_time_multiplie...` | _ | _ | _ |
-| calc-cross.js | `computePerDiem` | `{ state, type = "lodging" }` | _ | _ | _ |
+| calc-cross.js | `computePerDiem` | `{ state, type = "lodging", as_of = "" }` | _ | _ | _ |
 | calc-cross.js | `computePortableLadderSetup` | `{ ladder_length_ft = 0, landing_height_ft = 0, extension_above_landing_ft = 0...` | _ | _ | _ |
 | calc-cross.js | `computePulleyMA` | `{ rig = "block_2", efficiency = 0.95 }` | _ | _ | _ |
 | calc-cross.js | `computePumpTdh` | `{ flow_gpm = 0, internal_diameter_in = 0, hw_c = 150, static_suction_lift_ft ...` | _ | _ | _ |
