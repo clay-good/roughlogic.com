@@ -10,6 +10,11 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **Shaft keys, the silica table and mortgage reserves checked against Machinery's Handbook, the eCFR and the Fannie Mae Selling Guide.**
+  - `keyseat-key-size` stopped at a 6-1/2 in shaft and gave every larger shaft a 1-1/2 in key without a warning. ANSI B17.1 (Machinery's Handbook Table 1) continues to 11 in with 1-3/4, 2 and 2-1/2 in keys, so a 10 in shaft's key read 40% narrow. The rows are added, and a shaft outside 5/16-11 in now returns an error.
+  - `silica-table-1` marked large drivable milling machines (row xv) outdoor-only, so an indoor pass read as "not in Table 1". 29 CFR 1926.1153 Table 1 sets no location condition for that row: no respirator either way. Row ii is "handheld power saws (any blade diameter)", not "12 in or less".
+  - `mortgage-reserves` counted vested retirement at 60% by default under a Fannie Mae citation. B3-4.3-03 counts vested retirement funds for reserves with no percentage and without requiring withdrawal, so the default is now 100%, with a field for a program that discounts. The worked example keeps its explicit 60%.
+  - The `per-diem` example's stored expectation ($69 for Texas M&IE) was stale against the bundled table ($74).
 - **Healthcare air changes, kitchen hoods, combustion air and PV fusing checked against ASHRAE 170, the 2021 IMC and IFGC, and NEC 690.9.**
   - `air-changes-hour` set a hospital patient room at exactly 6 ACH and an operating room at 20-25. ASHRAE 170 Table 7-1 sets minimums with no ceiling: 4 ACH for a patient room (6 for a single-bed room with Group D diffusers, note y) and 20 for an operating room. A compliant 5 ACH patient room, or a 30 ACH OR, was flagged. These rows now report "meets the minimum." The residential 0.35 ACH figure is credited to ASHRAE 62-1989; 62.2 sets a cfm rate.
   - `hood-exhaust` cited IMC 507.13 and 507.20, which do not exist in the 2021 IMC. The hood tables are 507.5.1-507.5.4, and 507.5.5 sets 100 cfm/ft only for Type II hoods over dishwashing appliances; the code gives no rate for other Type II hoods. The IMC Eyebrow row (250 cfm/ft for light and medium duty, not allowed for heavy) is added.

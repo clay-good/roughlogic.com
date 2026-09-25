@@ -14665,7 +14665,7 @@
    "source_publisher": "Fannie Mae Selling Guide B3-4.1-01 / B3-4.3-03 (public)",
    "source_title": "required = PITI x months; eligible = liquid + allowable% of retirement",
    "source_edition_or_year": "Current",
-   "source_section_or_page": "Worked example: $2,500 PITI x 6 mo = $15,000 required; $20k liquid + 60% of $30k = $38,000 eligible -> $23,000 surplus",
+   "source_section_or_page": "Worked example: $2,500 PITI x 6 mo = $15,000 required; $20k liquid + $30k retirement at a program's 60% = $38,000 eligible -> $23,000 surplus (Fannie Mae itself counts 100%)",
    "verified_by": "rl",
    "verified_on": "2026-06-05",
    "inputs": {

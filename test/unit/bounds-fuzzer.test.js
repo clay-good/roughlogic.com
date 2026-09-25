@@ -6443,7 +6443,7 @@ test("bounds: calc-realestate computeMortgageReserves pins required = PITI*month
   const short = computeMortgageReserves({ piti_monthly: 3000, reserves_months: 6, liquid_assets: 5000 });
   assert.ok(short.delta < 0 && short.meets === false);
   // Default retirement haircut is 60%.
-  assert.ok(Math.abs(computeMortgageReserves({ piti_monthly: 1000, reserves_months: 2, liquid_assets: 0, retirement_balance: 10000 }).eligible - 6000) < 1e-9);
+  assert.ok(Math.abs(computeMortgageReserves({ piti_monthly: 1000, reserves_months: 2, liquid_assets: 0, retirement_balance: 10000 }).eligible - 10000) < 1e-9); // Fannie B3-4.3-03: no discount by default
   // Above-24-month flag.
   assert.ok(computeMortgageReserves({ piti_monthly: 1000, reserves_months: 30, liquid_assets: 0 }).flags.length >= 1);
   // Rejections.
@@ -24360,6 +24360,11 @@ test("bounds: spec-v513 computeKeyseatKeySize pins the band-table width, the H/2
   assert.ok("error" in _v513({ shaft_diameter_in: 0 }));
   assert.ok("error" in _v513({ shaft_diameter_in: 1.0, torque_in_lb: 1000, key_length_in: 0 }));
   assert.ok("error" in _v513({ shaft_diameter_in: 1.0, torque_in_lb: 0, key_length_in: 1.5 }));
+  // ANSI B17.1 continues past 6-1/2 in (Machinery's Handbook Table 1): 7 in -> 1-3/4, 10 in -> 2-1/2; nothing past 11 in.
+  assert.strictEqual(_v513({ shaft_diameter_in: 7 }).key_width_in, 1.75);
+  assert.strictEqual(_v513({ shaft_diameter_in: 10 }).key_width_in, 2.5);
+  assert.ok("error" in _v513({ shaft_diameter_in: 12 }));
+  assert.ok("error" in _v513({ shaft_diameter_in: 0.25 }));
 });
 
 import { computeBrakePedalHydraulic as _v514 } from "../../calc-mechanic.js";
@@ -36464,7 +36469,7 @@ test("bounds: spec-v1167 computeSilicaTable1 pins all eighteen rows, the four-ho
     i: [0, 0, 0, 0], ii: [0, 10, 10, 10], iii: [0, 0, null, null], iv: [0, 0, 10, 10],
     v: [0, 0, null, null], vi: [0, 0, 0, 0], vii: [0, 0, 0, 0], viii: [10, 10, null, null],
     ix: [0, 0, 0, 0], x: [0, 10, 10, 10], xi: [10, 25, 10, 25], xii: [0, 0, 0, 10],
-    xiii: [0, 0, 0, 0], xiv: [0, 0, 0, 0], xv: [0, 0, null, null], xvi: [0, 0, 0, 0],
+    xiii: [0, 0, 0, 0], xiv: [0, 0, 0, 0], xv: [0, 0, 0, 0], xvi: [0, 0, 0, 0],
     xvii: [0, 0, 0, 0], xviii: [0, 0, 0, 0],
   };
   for (const [task, [o4, oOver, i4, iOver]] of Object.entries(TABLE)) {

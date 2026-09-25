@@ -751,7 +751,7 @@ export function computePerDiem({ state, type = "lodging" }) {
 
 export const perDiemExample = {
   inputs: { state: "TX", type: "m_and_ie" },
-  expected: { rate_dollars: 69 },
+  expected: { rate_dollars: 74 },
 };
 
 // --- Utility 110: Geometry Pack ---
@@ -3364,7 +3364,7 @@ export function computeSilicaTable1({ task = "xi", location = "outdoors", hours_
   // [label, outdoor <=4, outdoor >4, indoor <=4, indoor >4, outdoorOnly]
   const T1 = {
     i: ["Stationary masonry saws", 0, 0, 0, 0, false],
-    ii: ["Handheld power saws (blade diameter 12 in or less)", 0, 10, 10, 10, false],
+    ii: ["Handheld power saws (any blade diameter)", 0, 10, 10, 10, false],
     iii: ["Handheld power saws for cutting fiber-cement board (blade 8 in or less)", 0, 0, null, null, true],
     iv: ["Walk-behind saws", 0, 0, 10, 10, false],
     v: ["Drivable saws", 0, 0, null, null, true],
@@ -3377,7 +3377,9 @@ export function computeSilicaTable1({ task = "xi", location = "outdoors", hours_
     xii: ["Handheld grinders for uses other than mortar removal", 0, 0, 0, 10, false],
     xiii: ["Walk-behind milling machines and floor grinders", 0, 0, 0, 0, false],
     xiv: ["Small drivable milling machines (less than half-lane)", 0, 0, 0, 0, false],
-    xv: ["Large drivable milling machines (half-lane and larger)", 0, 0, null, null, true],
+    // 29 CFR 1926.1153 Table 1 (xv) has no outdoor-only condition (until 2026-09-25 it was marked
+    // outdoor-only, so an indoor run read as "outside Table 1" instead of "no respirator").
+    xv: ["Large drivable milling machines (half-lane and larger)", 0, 0, 0, 0, false],
     xvi: ["Crushing machines", 0, 0, 0, 0, false],
     xvii: ["Heavy equipment and utility vehicles used to abrade or fracture silica-containing materials", 0, 0, 0, 0, false],
     xviii: ["Heavy equipment and utility vehicles for grading and excavating", 0, 0, 0, 0, false],

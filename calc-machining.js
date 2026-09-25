@@ -1615,6 +1615,12 @@ const _B17_1_KEY_BANDS = [
   { maxD: 4.5, w: 1 },
   { maxD: 5.5, w: 1.25 },
   { maxD: 6.5, w: 1.5 },
+  // Machinery's Handbook Table 1 (ANSI B17.1-1967 R1998) continues to 11 in; rectangular keys are
+  // preferred above 6-1/2 in, but the square-key widths still apply. Until 2026-09-25 the table
+  // stopped at 6-1/2 in and every larger shaft silently got a 1-1/2 in key (40% narrow at 10 in).
+  { maxD: 7.5, w: 1.75 },
+  { maxD: 9, w: 2 },
+  { maxD: 11, w: 2.5 },
 ];
 // dims: in { shaft_diameter_in: L, torque_in_lb: M L^2 T^-2, key_length_in: L } out: { key_width_in: L, key_height_in: L, shaft_keyseat_depth_in: L, shear_stress_psi: M L^-1 T^-2, bearing_stress_psi: M L^-1 T^-2 }
 export function computeKeyseatKeySize({ shaft_diameter_in = 0, torque_in_lb = 0, key_length_in = 0 } = {}) {
@@ -1628,8 +1634,9 @@ export function computeKeyseatKeySize({ shaft_diameter_in = 0, torque_in_lb = 0,
     if (!(t > 0)) return { error: "Torque must be positive (in-lb) for the stress check (0 = geometry only)." };
     if (!(len > 0)) return { error: "Key length must be positive (in) for the stress check (0 = geometry only)." };
   }
-  let band = _B17_1_KEY_BANDS.find((b) => d <= b.maxD);
-  if (!band) band = _B17_1_KEY_BANDS[_B17_1_KEY_BANDS.length - 1];
+  if (d <= 0.3125) return { error: "ANSI B17.1 starts over 5/16 in shaft diameter." };
+  const band = _B17_1_KEY_BANDS.find((b) => d <= b.maxD);
+  if (!band) return { error: "ANSI B17.1 (Machinery's Handbook Table 1) stops at an 11 in shaft." };
   const key_width_in = band.w;
   const key_height_in = band.w; // square key
   const shaft_keyseat_depth_in = key_height_in / 2;

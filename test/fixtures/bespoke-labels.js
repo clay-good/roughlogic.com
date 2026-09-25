@@ -551,7 +551,7 @@ export const BESPOKE_LABELS = {
   "mold-remediation-level": {"affected_area_ft2":"Affected area (ft2, summed visible + suspected)"},
   "molecular-weight": {"formula":"Chemical formula"},
   "mortgage-point-breakeven": {"loan_amount":"Loan amount ($)","base_rate_pct":"Base rate, no points (percent)","points_rate_pct":"Rate with points (percent)","point_cost_pct":"Total point cost (percent of loan)","term_years":"Term (years)","holding_years":"Expected holding period (years)"},
-  "mortgage-reserves": {"piti_monthly":"Monthly PITI ($)","reserves_months":"Reserves required (months)","liquid_assets":"Liquid assets after closing ($)","retirement_balance":"Vested retirement balance ($, optional)","retirement_allowable_pct":"Retirement allowable (percent)"},
+  "mortgage-reserves": {"piti_monthly":"Monthly PITI ($)","reserves_months":"Reserves required (months)","liquid_assets":"Liquid assets after closing ($)","retirement_balance":"Vested retirement balance ($, optional)","retirement_allowable_pct":"Retirement allowable (percent; Fannie Mae 100)"},
   "motor-acceleration-time": {"inertia_lbft2":"Total inertia WK² (lb-ft²)","speed_change_rpm":"Speed change (rpm)","net_accel_torque_lbft":"Avg net accelerating torque (lb-ft)"},
   "motor-branch-from-nameplate": {"hp":"HP","voltage_V":"Voltage (V)","phase":"Phase","eta":"Efficiency (eta, 0.5-1.0)","power_factor":"Power factor (0.5-1.0)","nameplate_fla_A":"Nameplate FLA (A, optional)","service_factor":"Service factor (1.0-1.4)"},
   "motor-branch-protection": {"flc_a":"Motor full-load current FLC (A, from Table 430.247-250)","device_type":"Protective device type"},

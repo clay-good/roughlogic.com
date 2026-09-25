@@ -7899,10 +7899,10 @@ export const CITATIONS = {
     edition: "Fannie Mae Single-Family Selling Guide B3-4.1-01 (reserves) and B3-4.3-03 (retirement-account funds). Freddie Mac Single-Family Seller/Servicer Guide 5501.2.",
     freeAccess: "Fannie Mae Selling Guide free at selling-guide.fanniemae.com; Freddie Mac Guide free at guide.freddiemac.com.",
     governance: GOVERNANCE.real_estate,
-    editionNote: "Required reserve months vary by loan type and program (conventional 0-6, jumbo 6-12, investment property 6+); the user enters the figure the lender requires. The allowable fraction of vested retirement (commonly ~60% of the withdrawable balance) and which assets count are lender- and program-specific.",
+    editionNote: "Required reserve months vary by loan type and program (conventional 0-6, jumbo 6-12, investment property 6+); the user enters the figure the lender requires. Fannie Mae B3-4.3-03 counts vested retirement funds for reserves with no percentage discount and without requiring withdrawal (the 100% default); where a program discounts retirement assets, enter its percentage. The allowable fraction and which assets count are lender- and program-specific.",
     assumptions: [
       { name: "Reserve unit", value: "one month of full PITIA payment", source: "Fannie Mae B3-4.1-01" },
-      { name: "Retirement haircut", value: "default 60% of vested balance, user-adjustable", source: "common agency convention" },
+      { name: "Retirement allowance", value: "default 100% of the vested balance (no discount in Fannie Mae B3-4.3-03), user-adjustable for a program that discounts", source: "Fannie Mae B3-4.3-03" },
     ],
   },
   "rent-vs-buy": {

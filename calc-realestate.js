@@ -1933,7 +1933,10 @@ export function computeMortgageReserves({ piti_monthly, reserves_months, liquid_
   const months = Number(reserves_months);
   const liquid = Number(liquid_assets) || 0;
   const ret = Number(retirement_balance) || 0;
-  const retPct = (retirement_allowable_pct === undefined || retirement_allowable_pct === "" || retirement_allowable_pct === null) ? 60 : Number(retirement_allowable_pct);
+  const retPct = (retirement_allowable_pct === undefined || retirement_allowable_pct === "" || retirement_allowable_pct === null) ? 100 : Number(retirement_allowable_pct);
+  // Fannie Mae B3-4.3-03 counts vested retirement funds for reserves with no percentage and without
+  // requiring withdrawal; a program that discounts them takes its own percentage here. (Until
+  // 2026-09-25 the default was 60 under a Fannie citation.)
   if (!Number.isFinite(piti) || piti <= 0) return { error: "Enter a positive monthly PITI." };
   if (!Number.isFinite(months) || months < 0) return { error: "Enter a non-negative reserves-months requirement." };
   if (liquid < 0 || ret < 0) return { error: "Asset balances cannot be negative." };
@@ -1948,7 +1951,8 @@ export function computeMortgageReserves({ piti_monthly, reserves_months, liquid_
 }
 
 export const mortgageReservesExample = {
-  // PITI $2,500, 6 months required, $20k liquid + 60% of $30k retirement
+  // PITI $2,500, 6 months required, $20k liquid + $30k retirement counted at 60% by a program that
+  // discounts retirement assets (Fannie Mae itself counts 100%)
   // -> required 15,000; eligible 38,000; surplus 23,000.
   inputs: { piti_monthly: 2500, reserves_months: 6, liquid_assets: 20000, retirement_balance: 30000, retirement_allowable_pct: 60 },
   expected: { required: 15000, eligible: 38000, delta: 23000 },
@@ -1959,12 +1963,12 @@ export const mortgageReservesExample = {
 // (DOM-mount renderer; HTMLElement refs are categorical.)
 export function renderMortgageReserves(inputRegion, outputRegion, citationEl) {
   citationEl.textContent =
-    "Citation: Reserves = PITI * required months, measured against eligible post-closing liquid assets plus an allowable fraction of vested retirement (Fannie Mae Selling Guide B3-4.1-01 / B3-4.3-03; Freddie Mac Single-Family Seller/Servicer Guide 5501.2). Required months vary by loan type and program (conventional 0-6, jumbo 6-12, investment 6+). Lender governs the final requirement and which assets count.";
+    "Citation: Reserves = PITI * required months, measured against eligible post-closing liquid assets plus vested retirement (Fannie Mae Selling Guide B3-4.1-01 / B3-4.3-03, which counts vested retirement for reserves with no percentage discount -- the 100% default; enter a lower percentage where the program discounts retirement assets; Freddie Mac Single-Family Seller/Servicer Guide 5501.2). Required months vary by loan type and program (conventional 0-6, jumbo 6-12, investment 6+). Lender governs the final requirement and which assets count.";
   const piti = makeNumber("Monthly PITI ($)", "res-piti", { step: "any", min: "0" });
   const months = makeNumber("Reserves required (months)", "res-months", { step: "any", min: "0", value: "6" });
   const liquid = makeNumber("Liquid assets after closing ($)", "res-liquid", { step: "any", min: "0", value: "0" });
   const ret = makeNumber("Vested retirement balance ($, optional)", "res-ret", { step: "any", min: "0", value: "0" });
-  const retPct = makeNumber("Retirement allowable (percent)", "res-retpct", { step: "any", min: "0", max: "100", value: "60" });
+  const retPct = makeNumber("Retirement allowable (percent; Fannie Mae 100)", "res-retpct", { step: "any", min: "0", max: "100", value: "100" });
   for (const f of [piti, months, liquid, ret, retPct]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => {
     const ex = mortgageReservesExample.inputs;
