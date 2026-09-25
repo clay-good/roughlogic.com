@@ -5541,8 +5541,8 @@ CONSTRUCTION_RENDERERS["egress-capacity"] = _renderEgressCapacity;
 
 // ----- spec-v244: Required Plumbing Fixture Count by Occupancy (IBC 2021 §2902 / Table 2902.1) -----
 
-// dims: in { occupant_load: dimensionless, wc_ratio: dimensionless, wc_ratio_over: dimensionless, wc_tier: dimensionless, lav_ratio: dimensionless, fountain_ratio: dimensionless, distribution: dimensionless } out: { wc_total: dimensionless, lav_total: dimensionless, fountains: dimensionless, service_sinks: dimensionless }
-export function computePlumbingFixtureCount({ occupant_load = 0, wc_ratio = 25, wc_ratio_over = 50, wc_tier = 50, lav_ratio = 40, fountain_ratio = 100, distribution = 0.5 } = {}) {
+// dims: in { occupant_load: dimensionless, wc_ratio: dimensionless, wc_ratio_over: dimensionless, wc_tier: dimensionless, lav_ratio: dimensionless, lav_ratio_over: dimensionless, lav_tier: dimensionless, fountain_ratio: dimensionless, distribution: dimensionless } out: { wc_total: dimensionless, lav_total: dimensionless, fountains: dimensionless, service_sinks: dimensionless }
+export function computePlumbingFixtureCount({ occupant_load = 0, wc_ratio = 25, wc_ratio_over = 50, wc_tier = 50, lav_ratio = 40, lav_ratio_over = 0, lav_tier = 0, fountain_ratio = 100, distribution = 0.5 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(occupant_load > 0)) return { error: "Occupant load must be positive." };
   if (!(wc_ratio > 0)) return { error: "Water-closet ratio must be positive." };
@@ -5552,6 +5552,15 @@ export function computePlumbingFixtureCount({ occupant_load = 0, wc_ratio = 25, 
   // Per sex, per IBC §2902.1.1 each ratio rounds up. The water closet uses a
   // two-tier schedule (wc_ratio for the first wc_tier occupants, wc_ratio_over
   // beyond); set wc_tier = 0 for a single-tier ratio.
+  // Lavatories can be two-tier too: Table 2902.1 gives business 1 per 40 for
+  // the first 80 and 1 per 80 beyond, which a single lav_ratio could not say
+  // (until 2026-09-24 it counted 1:40 throughout). The lavatory tier defaults
+  // to single so a caller setting only lav_ratio for another occupancy is not
+  // handed business's 1:80 above 80.
+  const tiered = (n, ratio, over, tier) => {
+    const t = tier > 0 && over > 0 ? tier : Infinity;
+    return Math.ceil(Math.min(n, t) / ratio) + (t < Infinity ? Math.ceil(Math.max(n - t, 0) / over) : 0);
+  };
   const wcFor = (n) => {
     const tierN = Math.min(n, wc_tier);
     const over = Math.max(n - wc_tier, 0);
@@ -5561,8 +5570,8 @@ export function computePlumbingFixtureCount({ occupant_load = 0, wc_ratio = 25, 
   const per_sex_b = occupant_load * (1 - distribution);
   const wc_a = wcFor(per_sex_a);
   const wc_b = wcFor(per_sex_b);
-  const lav_a = Math.ceil(per_sex_a / lav_ratio);
-  const lav_b = Math.ceil(per_sex_b / lav_ratio);
+  const lav_a = tiered(per_sex_a, lav_ratio, lav_ratio_over, lav_tier);
+  const lav_b = tiered(per_sex_b, lav_ratio, lav_ratio_over, lav_tier);
   const wc_total = wc_a + wc_b;
   const lav_total = lav_a + lav_b;
   const fountains = Math.ceil(occupant_load / fountain_ratio);
@@ -5570,18 +5579,20 @@ export function computePlumbingFixtureCount({ occupant_load = 0, wc_ratio = 25, 
 }
 
 export const plumbingFixtureCountExample = {
-  inputs: { occupant_load: 100, wc_ratio: 25, wc_ratio_over: 50, wc_tier: 50, lav_ratio: 40, fountain_ratio: 100, distribution: 0.5 },
+  inputs: { occupant_load: 100, wc_ratio: 25, wc_ratio_over: 50, wc_tier: 50, lav_ratio: 40, lav_ratio_over: 80, lav_tier: 80, fountain_ratio: 100, distribution: 0.5 },
 };
 
 const _renderPlumbingFixtureCount = _simpleRenderer({
-  citation: "Citation: IBC 2021 §2902 and Table 2902.1 (mirrored in IPC Table 403.1): fixtures = ceil(occupants-per-sex / ratio), each rounded up per §2902.1.1; the load splits evenly between two sexes unless a distribution override is given. Representative ratios: business water closet 1:25 first-50 then 1:50, lavatory 1:40; restaurant (A-2) water closet 1:75, lavatory 1:200; drinking fountain 1:100 business / 1:500 assembly; service sink minimum 1. The ratios, net-vs-gross basis, even-split assumption, and any single-user/family-restroom reductions come from the AHJ-adopted code edition and the actual occupancy. A design aid, not a code-official determination.",
+  citation: "Citation: IBC 2021 §2902 and Table 2902.1 (mirrored in IPC Table 403.1): fixtures = ceil(occupants-per-sex / ratio), each rounded up per §2902.1.1; the load splits evenly between two sexes unless a distribution override is given. Representative ratios: business water closet 1:25 first-50 then 1:50, lavatory 1:40 first-80 then 1:80; restaurant (A-2) water closet 1:75, lavatory 1:200; drinking fountain 1:100 business / 1:500 assembly; service sink minimum 1. The ratios, net-vs-gross basis, even-split assumption, and any single-user/family-restroom reductions come from the AHJ-adopted code edition and the actual occupancy. A design aid, not a code-official determination.",
   example: plumbingFixtureCountExample.inputs,
   fields: [
     { key: "occupant_load", label: "Occupant load (persons)", kind: "number" },
     { key: "wc_ratio", label: "WC ratio, first tier (occ/WC)", kind: "number" },
     { key: "wc_ratio_over", label: "WC ratio above tier (0 = n/a)", kind: "number" },
     { key: "wc_tier", label: "First-tier size per sex (0 = single)", kind: "number" },
-    { key: "lav_ratio", label: "Lavatory ratio (occ/lav)", kind: "number" },
+    { key: "lav_ratio", label: "Lavatory ratio, first tier (occ/lav)", kind: "number" },
+    { key: "lav_ratio_over", label: "Lavatory ratio above tier (0 = n/a)", kind: "number" },
+    { key: "lav_tier", label: "Lavatory first-tier size per sex (0 = single)", kind: "number" },
     { key: "fountain_ratio", label: "Fountain ratio (occ/DF)", kind: "number" },
     { key: "distribution", label: "Share as one sex (0-1)", kind: "number" },
   ],

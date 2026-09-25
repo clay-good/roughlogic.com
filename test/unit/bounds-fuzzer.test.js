@@ -15971,6 +15971,13 @@ test("bounds: spec-v244 computePlumbingFixtureCount pins the two-tier WC schedul
   assert.strictEqual(r2.lav_total, 2);
   // Same 160 as an office needs the two-tier six.
   assert.strictEqual(_v244({ occupant_load: 160 }).wc_total, 6);
+  // IBC Table 2902.1 business lavatories: 1 per 40 for the first 80, 1 per 80
+  // beyond. 400 occupants = 200 per sex -> 2 + ceil(120/80) = 4 each, 8 total;
+  // the single 1:40 ratio this tile used until 2026-09-24 gave 10.
+  assert.strictEqual(_v244({ occupant_load: 400, lav_ratio_over: 80, lav_tier: 80 }).lav_total, 8);
+  // Left at its single-tier default, the lavatory ratio is unchanged.
+  assert.strictEqual(_v244({ occupant_load: 400 }).lav_total, 10);
+  assert.strictEqual(_v244({ occupant_load: 400, lav_ratio: 50 }).lav_total, 8);
   // Error seams.
   assert.ok("error" in _v244({ occupant_load: 0 }));
   assert.ok("error" in _v244({ occupant_load: 100, wc_ratio: 0 }));
