@@ -108,6 +108,14 @@ test("Bulk density: zero mass errors", () => { const r = computeBulkDensity({ dr
 test("Bulk density: zero volume errors", () => { const r = computeBulkDensity({ dry_mass_g: 100, core_volume_cc: 0, particle_density_pcc: 2.65, texture: "loam" }); assert.ok(r.error); });
 test("Bulk density: unknown texture errors", () => { const r = computeBulkDensity({ dry_mass_g: 100, core_volume_cc: 100, particle_density_pcc: 2.65, texture: "x" }); assert.ok(r.error); });
 test("Bulk density: every threshold positive", () => { for (const k of Object.keys(COMPACTION_THRESHOLDS_PCC)) assert.ok(COMPACTION_THRESHOLDS_PCC[k] > 0); });
+test("Bulk density: NRCS affects / restricts columns (loam 1.63 / 1.80)", () => {
+  const at = (m) => computeBulkDensity({ dry_mass_g: m, core_volume_cc: 100, particle_density_pcc: 2.65, texture: "loam" });
+  assert.equal(at(155).compacted, false); // 1.55 read "compacted" until 2026-09-24
+  assert.equal(at(155).root_growth_affected, false);
+  assert.equal(at(170).root_growth_affected, true);
+  assert.equal(at(170).compacted, false);
+  assert.equal(at(185).compacted, true);
+});
 test("Bulk density: clay threshold lowest", () => { assert.ok(COMPACTION_THRESHOLDS_PCC.clay < COMPACTION_THRESHOLDS_PCC.sand); });
 
 // 209 Crop yield

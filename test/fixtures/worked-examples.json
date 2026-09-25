@@ -2876,10 +2876,10 @@
    "tile_id": "bulk-density",
    "source_publisher": "USDA-NRCS",
    "source_title": "200 g dry mass in 150 cc core, loam soil",
-   "source_edition_or_year": "USDA-NRCS Soil Survey Manual (compaction-threshold table)",
-   "source_section_or_page": "bulk_density = 200/150 = 1.333 g/cc; porosity = 1 - 1.333/2.65 = 0.497; loam threshold = 1.55 g/cc; not compacted",
+   "source_edition_or_year": "USDA-NRCS Soil Quality Indicators: Bulk Density, Table 2 (affects / restricts root growth by texture)",
+   "source_section_or_page": "bulk_density = 200/150 = 1.333 g/cc; porosity = 1 - 1.333/2.65 = 0.497; loam restricts root growth above 1.80 g/cc (affects it from 1.63); not compacted",
    "verified_by": "rl",
-   "verified_on": "2026-05-11",
+   "verified_on": "2026-09-24",
    "inputs": {
     "dry_mass_g": 200,
     "core_volume_cc": 150,
@@ -2900,7 +2900,7 @@
      }
     },
     "compaction_threshold": {
-     "value": 1.55,
+     "value": 1.8,
      "tolerance": {
       "abs": 1e-09
      }

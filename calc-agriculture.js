@@ -288,12 +288,21 @@ export const uniformityExample = { inputs: { catch_volumes: [100, 95, 98, 102, 1
 
 // --- 208: Soil Bulk Density and Compaction ---
 
+// USDA NRCS Soil Quality Indicators, Bulk Density, Table 2 (g/cc): the bulk
+// density that RESTRICTS root growth (the compaction threshold) and the lower
+// one that already AFFECTS it. Until 2026-09-24 only sand matched the table
+// (sandy loam 1.75, loam 1.55, clay loam 1.45, clay 1.40 are in no column),
+// so loam read "compacted" at 1.55 where NRCS does not flag it at all until
+// 1.63 and calls it restrictive at 1.80.
 export const COMPACTION_THRESHOLDS_PCC = {
-  sand: 1.80, sandy_loam: 1.75, loam: 1.55, clay_loam: 1.45, clay: 1.40,
+  sand: 1.80, sandy_loam: 1.80, loam: 1.80, silt_loam: 1.75, clay_loam: 1.75, silty_clay_loam: 1.65, clay: 1.47,
+};
+export const ROOT_GROWTH_AFFECTED_PCC = {
+  sand: 1.63, sandy_loam: 1.63, loam: 1.63, silt_loam: 1.60, clay_loam: 1.60, silty_clay_loam: 1.55, clay: 1.39,
 };
 
 // dims: in { dry_mass_g: M, core_volume_cc: L^3, particle_density_pcc: M L^-3, texture: dimensionless }
-//        out: { bulk_density: M L^-3, total_porosity: dimensionless, compaction_threshold: M L^-3, compacted: dimensionless }
+//        out: { bulk_density: M L^-3, total_porosity: dimensionless, compaction_threshold: M L^-3, compacted: dimensionless, root_growth_threshold: M L^-3, root_growth_affected: dimensionless }
 // (Dry mass is `M`; core sample volume in cc is `L^3`; particle
 //  density and bulk density are both mass-per-volume `M L^-3`.
 //  Porosity = 1 - (bulk/particle) is a ratio of like-dim mass-
@@ -308,8 +317,10 @@ export function computeBulkDensity({ dry_mass_g = 0, core_volume_cc = 0, particl
   const total_porosity = 1 - (bulk_density / particle_density_pcc);
   const threshold = COMPACTION_THRESHOLDS_PCC[texture];
   if (!Number.isFinite(threshold)) return { error: "Unknown texture class." };
-  const compacted = bulk_density >= threshold;
-  return { bulk_density, total_porosity, compaction_threshold: threshold, compacted };
+  const compacted = bulk_density > threshold;
+  const root_growth_threshold = ROOT_GROWTH_AFFECTED_PCC[texture];
+  const root_growth_affected = bulk_density >= root_growth_threshold;
+  return { bulk_density, total_porosity, compaction_threshold: threshold, compacted, root_growth_threshold, root_growth_affected };
 }
 
 export const bulkDensityExample = { inputs: { dry_mass_g: 200, core_volume_cc: 150, particle_density_pcc: 2.65, texture: "loam" } };
@@ -544,18 +555,18 @@ function renderUniformity(inputRegion, outputRegion, citationEl) {
 }
 
 const renderBulkDensity = _r({
-  citation: "Citation: USDA NRCS technical notes by name only. Bulk density = dry mass / core volume; porosity = 1 - (bulk / particle).",
+  citation: "Citation: USDA NRCS Soil Quality Indicators: Bulk Density, Table 2 (bulk density that affects and that restricts root growth, by texture). Bulk density = dry mass / core volume; porosity = 1 - (bulk / particle). Does not apply to red clayey soils or volcanic ash.",
   example: bulkDensityExample.inputs,
   fields: [
     { key: "dry_mass_g", label: "Dry core mass (g)", kind: "number" },
     { key: "core_volume_cc", label: "Core volume (cc)", kind: "number" },
     { key: "particle_density_pcc", label: "Particle density (g/cc)", kind: "number" },
-    { key: "texture", label: "Texture", kind: "select", options: Object.keys(COMPACTION_THRESHOLDS_PCC).map((k) => ({ value: k, label: k.replace(/_/g, " ") })) },
+    { key: "texture", label: "Texture", kind: "select", options: Object.keys(COMPACTION_THRESHOLDS_PCC).map((k) => ({ value: k, label: k.replace(/_/g, " ") + (k === "clay" ? " (over 45% clay)" : "") })) },
   ],
   outputs: [
     { key: "b", id: "bd-out-b", label: "Bulk density", value: (r) => fmt(r.bulk_density, 2) + " g/cc" },
     { key: "p", id: "bd-out-p", label: "Porosity",     value: (r) => fmt(r.total_porosity * 100, 1) + " %" },
-    { key: "f", id: "bd-out-f", label: "Compacted?",   value: (r) => r.compacted ? "YES (>= " + r.compaction_threshold + " g/cc)" : "no (< " + r.compaction_threshold + " g/cc)" },
+    { key: "f", id: "bd-out-f", label: "Compacted?",   value: (r) => r.compacted ? "YES, restricts root growth (> " + r.compaction_threshold + " g/cc)" : r.root_growth_affected ? "not yet restrictive, but root growth is affected (>= " + r.root_growth_threshold + " g/cc; restrictive above " + r.compaction_threshold + ")" : "no (below " + r.root_growth_threshold + " g/cc, where root growth starts to be affected)" },
   ],
   compute: computeBulkDensity,
 });

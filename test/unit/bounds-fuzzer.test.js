@@ -3522,7 +3522,8 @@ test("bounds: calc-agriculture computeUniformity rejects < 4 readings / non-posi
 });
 
 test("bounds: calc-agriculture computeBulkDensity pins density = dry_mass / core_volume and porosity = 1 - (bulk / particle), plus the per-texture compaction threshold", () => {
-  const thresholds = { sand: 1.80, sandy_loam: 1.75, loam: 1.55, clay_loam: 1.45, clay: 1.40 };
+  // NRCS Soil Quality Indicators: Bulk Density, "restricts root growth" column.
+  const thresholds = { sand: 1.80, sandy_loam: 1.80, loam: 1.80, silt_loam: 1.75, clay_loam: 1.75, silty_clay_loam: 1.65, clay: 1.47 };
   for (const dry_mass_g of [100, 200, 400]) {
     for (const core_volume_cc of [100, 150, 250]) {
       for (const [texture, threshold] of Object.entries(thresholds)) {
@@ -3532,7 +3533,7 @@ test("bounds: calc-agriculture computeBulkDensity pins density = dry_mass / core
         assert.ok(Math.abs(r.bulk_density - expected_bulk) < 1e-12, `bulk identity`);
         assert.ok(Math.abs(r.total_porosity - (1 - expected_bulk / 2.65)) < 1e-12, `porosity identity`);
         assert.strictEqual(r.compaction_threshold, threshold, `threshold ${texture}`);
-        assert.strictEqual(r.compacted, expected_bulk >= threshold, `compacted flag`);
+        assert.strictEqual(r.compacted, expected_bulk > threshold, `compacted flag`);
       }
     }
   }
