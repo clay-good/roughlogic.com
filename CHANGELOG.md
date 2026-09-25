@@ -4,6 +4,10 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### Changed
+
+- **wrangler 4.129.0 → 4.135.0, and the `sharp` override is gone.** Dependabot's bump failed CI on `check-dependency-overrides`. The new wrangler brings a miniflare that asks for the patched `sharp` 0.35.4 itself, so the September 9 pin no longer changed anything. This is the case the gate was written for, so the override is deleted rather than left as a second source of truth. `npm audit` reports 0 vulnerabilities. docs/threat-model.md records the change.
+
 ### Fixed
 
 - **Irrigation crop coefficients checked against FAO 56 Table 12.** `irrigation-requirement` cites that table, but two of its values were not in it. Alfalfa read 1.15, where the table gives 0.95 averaged over the cutting cycle and 1.20 within a single cutting. Turfgrass read 0.80, below both the cool-season 0.95 and the warm-season 0.85, so a cool-season lawn was scheduled 16% short of its water. Alfalfa is now 0.95, and a new within-one-cutting option carries 1.20. Turfgrass is now the cool-season 0.95, with a new warm-season option at 0.85. The other five crops match the table.

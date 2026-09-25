@@ -5,9 +5,11 @@
 // An override is a standing claim that something upstream is wrong. It is the
 // right tool when a transitive dependency is pinned to a vulnerable version by
 // a package you do not control -- `sharp` reached this tree as an OPTIONAL
-// dependency of `miniflare`, which arrives with `wrangler`, and miniflare pins
-// it to an exact `0.35.2`, so no amount of upgrading wrangler moves it off a
-// high-severity libheif advisory. The pin to `0.35.4` is the only lever.
+// dependency of `miniflare`, which arrives with `wrangler`, and miniflare pinned
+// it to an exact `0.35.2`, so upgrading wrangler did not move it off a
+// high-severity libheif advisory; a pin to `0.35.4` was the only lever. (That
+// pin was deleted on 2026-09-24, when wrangler 4.135.0's miniflare asked for
+// 0.35.4 itself and this gate reported it inert -- the case rule B exists for.)
 //
 // It is also the kind of entry nobody deletes. When miniflare finally asks for
 // the patched version itself, the override stops changing anything and becomes

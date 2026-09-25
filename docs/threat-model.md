@@ -66,10 +66,11 @@ Controls:
   as an *optional* dependency of `miniflare`, which arrives with `wrangler`,
   which is used only to deploy the report Worker. No build, lint, test or CI
   step loads it, and nothing here decodes a HEIF image. Upgrading `wrangler`
-  does not move it: `miniflare` pins `sharp` to an exact `0.35.2`, and still
-  does on its newest release, so the fix is an `overrides` pin to the patched
-  `0.35.4` in package.json. `npm audit` reports 0 vulnerabilities and `npm ci`
-  resolves the lockfile clean.
+  did not move it at first: `miniflare` pinned `sharp` to an exact `0.35.2`, so
+  the fix was an `overrides` pin to the patched `0.35.4` in package.json. On
+  2026-09-24 `wrangler` 4.135.0 brought a `miniflare` that asks for `0.35.4`
+  itself, the gate below reported the pin inert, and it was deleted. There
+  are no overrides now; `npm audit` reports 0 vulnerabilities.
 - An override is a claim that something upstream is still wrong, and it outlives
   its reason silently. [scripts/check-dependency-overrides.mjs](../scripts/check-dependency-overrides.mjs)
   fails the lint when an entry in `overrides` no longer changes anything -- when
