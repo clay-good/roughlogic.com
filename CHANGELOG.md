@@ -6,6 +6,16 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Changed
 
+- **Nineteen more tiles now carry a publisher's printed worked example**, each re-run inside the printed rounding:
+  - **AISC Design Examples v15.1:** `steel-beam-flexure` (F.1-1B), `steel-beam-shear` (G.1B), `steel-column-capacity` (E.1D at Fy 50 and 65), `bolt-shear-bearing` (II.A-19A, K.6), `column-base-plate` (J.6), `shear-stud-strength` (I.2), `bolt-group-eccentric` (II.A-25, elastic method).
+  - **FEMA P-2192 NEHRP design examples (ASCE 7-22):** `seismic-base-shear` (Sections 7.4.1 and 7.5), `seismic-vertical-distribution` (Table 7-6).
+  - **Wood:** `wood-bolt-connection` (AWC TR12 Example 3.1 per yield mode, and NDS Table 12A), `wood-beam-bending` (Ochshorn, *Structural Elements*), `wood-beam-shear` (WoodWorks).
+  - **Loads:** `asce-live-load-reduction` (TU Delft open text, Example 2.7), `asce7-load-combinations` (STRUCTURE magazine, D + 0.7S under ASCE 7-22).
+  - **Water and wastewater:** `fluoride-feed-dose` (CDC fluoridation manual), `dechlorination-dose` (EPA fact sheet), `bod-tss-loading-removal` (Pennsylvania DEP operator module), `ro-recovery-concentration` (USBR Desalting Handbook).
+  - **Lighting:** `room-cavity-ratio` (Cornell zonal-cavity notes).
+  - `npsh-a` gains Evans, Pumps & Systems, and Goulds/Xylem rows (it already counted as outside-sourced).
+
+  README: 1,368 of 2,183 tiles are checked only against the project's own derivation (786 from first principles, 582 by a named method); 815 carry an outside source. Cross-validation tolerance checks: 4,221.
 - **Fourteen more tiles now carry a publisher's printed worked example.** Each was re-run and falls within the publisher's rounding:
   - **FAA handbooks and charts:** `aircraft-weight-balance` (Weight and Balance Handbook Figures 7-9 and 8-4), `crosswind-component`, `density-altitude` and `turn-radius-bank` (Pilot's Handbook of Aeronautical Knowledge), `climb-gradient-roc` (the Terminal Procedures rate-of-climb table).
   - **FHWA's *Bridge Formula Weights*:** `bridge-formula-min-spacing`, Figures 5 to 8.
@@ -36,6 +46,7 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **`npsh-a` took atmospheric head from a rule of thumb its own citation did not describe.** The citation named the standard-atmosphere lapse, but the code used "1 inHg per 1,000 ft." That agrees near 5,000 ft (28.2 ft of water) but understates the atmosphere higher up: 22.6 ft at 10,000 ft against Goulds/Xylem's 23.4, and 16.9 ft at 15,000 ft against 19.2. The code now uses the standard atmosphere. Its vapor-pressure table also started at 60 °F, so 50 °F water was charged 0.59 ft of vapor head instead of 0.41. Steam-table rows at 32, 40 and 50 °F are added, and Joe Evans's 2,500 ft, 50 °F example now reproduces.
 - **Both Federal Bridge Formula tiles were stricter than the law.** 23 CFR 658.17 takes W "to the nearest 500 pounds", and FHWA's Bridge Table rounds an exact half down (its footnote 1). Neither tile rounded.
   - **`bridge-formula`** flagged a legal truck. FHWA's own Figure 6, 80,000 lb on five axles over 51 ft, computes to 79,875 lb before rounding, and the tile reported it as a violation.
   - **`bridge-formula-min-spacing`** said the same group needs 51.2 ft. It now returns the first whole-foot Bridge Table row that carries the weight: 51 ft. FHWA's Figures 5 to 8 all reproduce exactly, including the 42,500 lb at 9 ft that depends on rounding the half down.

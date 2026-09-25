@@ -1590,14 +1590,20 @@ export const baseboardLengthForLoadExample = { inputs: { target_btuhr: 4800, wat
 // H_atm and H_vapor are in feet of water at the system temperature.
 
 const H_ATM_AT_ELEVATION_FT = (elevation_ft) => {
-  // Simple lapse: 1 in Hg per 1000 ft above sea level. Sea level = 33.95 ft H2O.
+  // Standard-atmosphere pressure at elevation, the relation behind the Goulds /
+  // Xylem altitude table (5,000 ft 28.2 ft, 10,000 ft 23.4, 15,000 ft 19.2 ft of
+  // water). Until 2026-09-25 this was "1 in Hg per 1000 ft", which agrees near
+  // 5,000 ft but reads 22.6 ft at 10,000 and 16.9 at 15,000.
   // Convert: 1 in Hg ~= 1.133 ft H2O.
-  const inHg = 29.92 - elevation_ft / 1000;
+  const inHg = 29.92 * Math.pow(Math.max(0, 1 - 6.8754e-6 * elevation_ft), 5.2559);
   return Math.max(0, inHg * 1.133);
 };
 
 // Vapor pressure of water in psi by temperature (engineering reference).
 const VAPOR_PRESSURE_F_PSI = [
+  // Saturation pressures below 60 F (steam tables). Until 2026-09-25 the table
+  // started at 60 F, so 50 F water was charged 0.59 ft of vapor head, not 0.41.
+  { F: 32, psi: 0.0887 }, { F: 40, psi: 0.1217 }, { F: 50, psi: 0.1781 },
   { F: 60, psi: 0.256 }, { F: 80, psi: 0.507 }, { F: 100, psi: 0.949 }, { F: 120, psi: 1.692 },
   { F: 140, psi: 2.889 }, { F: 160, psi: 4.741 }, { F: 180, psi: 7.510 }, { F: 200, psi: 11.526 }, { F: 212, psi: 14.696 },
   // Steam-table saturation pressures above the atmospheric boiling point.

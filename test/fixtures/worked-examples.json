@@ -11583,6 +11583,137 @@
    }
   },
   {
+   "tile_id": "npsh-a",
+   "source_publisher": "Joe Evans (Pumps & Systems Pump Ed 101), via R.C. Worst & Co.",
+   "source_title": "A Brief Introduction to Centrifugal Pumps, Part 7: Suction Conditions",
+   "source_edition_or_year": "undated web article",
+   "source_section_or_page": "Example A: 2,500 ft elevation, 13 ft suction lift, 50 F water -> Ha 31, Hvp .41, NPSHA 17.59 ft (from the rounded Ha)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "elevation_ft": 2500,
+    "water_temp_F": 50,
+    "source_elevation_relative_ft": -13,
+    "friction_loss_ft": 0
+   },
+   "outputs": {
+    "H_vapor_ft": {
+     "value": 0.41,
+     "tolerance": {
+      "abs": 0.005
+     }
+    },
+    "NPSHa_ft": {
+     "value": 17.59,
+     "tolerance": {
+      "abs": 0.1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "npsh-a",
+   "source_publisher": "Joe Evans (Pumps & Systems Pump Ed 101), via R.C. Worst & Co.",
+   "source_title": "A Brief Introduction to Centrifugal Pumps, Part 7: Suction Conditions",
+   "source_edition_or_year": "undated web article",
+   "source_section_or_page": "Example B: 5,000 ft, 60 F water, NPSHR 8 ft + 2 ft margin -> Ha 28.2, Hvp .59, maximum lift Hs 17.61 ft",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "elevation_ft": 5000,
+    "water_temp_F": 60,
+    "source_elevation_relative_ft": 0,
+    "friction_loss_ft": 0,
+    "npsh_required_ft": 8,
+    "target_margin_ft": 2
+   },
+   "outputs": {
+    "H_atm_ft": {
+     "value": 28.2,
+     "tolerance": {
+      "abs": 0.05
+     }
+    },
+    "H_vapor_ft": {
+     "value": 0.59,
+     "tolerance": {
+      "abs": 0.005
+     }
+    },
+    "static_for_target_margin_ft": {
+     "value": -17.61,
+     "tolerance": {
+      "abs": 0.02
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "npsh-a",
+   "source_publisher": "Pumps & Systems (Jim Elsey, Summit Pump)",
+   "source_title": "Calculating NPSHa When the Liquid Is Above Ambient Temperature",
+   "source_edition_or_year": "September 2018",
+   "source_section_or_page": "Equations 2-4: sea level, 212 F water, 10 ft flooded suction, 3.2 ft friction -> NPSHa = 35 - 35 + 10 - 3.2 = 6.8 ft",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "elevation_ft": 0,
+    "water_temp_F": 212,
+    "source_elevation_relative_ft": 10,
+    "friction_loss_ft": 3.2
+   },
+   "outputs": {
+    "NPSHa_ft": {
+     "value": 6.8,
+     "tolerance": {
+      "abs": 0.1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "npsh-a",
+   "source_publisher": "Xylem (Goulds Water Technology)",
+   "source_title": "Water Products Technical Data and Pump Fundamentals (TTECHWP R6)",
+   "source_edition_or_year": "December 2022",
+   "source_section_or_page": "p. 23 atmospheric pressure vs altitude: 10,000 ft -> 23.4 ft of water",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "elevation_ft": 10000,
+    "water_temp_F": 60
+   },
+   "outputs": {
+    "H_atm_ft": {
+     "value": 23.4,
+     "tolerance": {
+      "abs": 0.1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "npsh-a",
+   "source_publisher": "Xylem (Goulds Water Technology)",
+   "source_title": "Water Products Technical Data and Pump Fundamentals (TTECHWP R6)",
+   "source_edition_or_year": "December 2022",
+   "source_section_or_page": "p. 23 atmospheric pressure vs altitude: 15,000 ft -> 19.2 ft of water",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "elevation_ft": 15000,
+    "water_temp_F": 60
+   },
+   "outputs": {
+    "H_atm_ft": {
+     "value": 19.2,
+     "tolerance": {
+      "abs": 0.1
+     }
+    }
+   }
+  },
+  {
    "tile_id": "compare-refrigerants",
    "source_publisher": "Chemours / Honeywell / Daikin published P-T bulletins (project bundled)",
    "source_title": "Side-by-side refrigerant P-T comparison at a common pressure (or temperature) input",
@@ -21668,6 +21799,40 @@
    }
   },
   {
+   "tile_id": "bod-tss-loading-removal",
+   "source_publisher": "Pennsylvania DEP",
+   "source_title": "Wastewater & Drinking Water Operator Training Module 28: Basic Math, Answer Key",
+   "source_edition_or_year": "2012",
+   "source_section_or_page": "Unit 3 Exercise 2, answers 3-5: 0.25 MGD, CBOD5 120 in / 6 mg/L out -> 250 lb/day in, 12.51 lb/day out, 95% removal",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "flow_mgd": 0.25,
+    "influent_mgl": 120,
+    "effluent_mgl": 6
+   },
+   "outputs": {
+    "influent_lb_day": {
+     "value": 250,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "effluent_lb_day": {
+     "value": 12.51,
+     "tolerance": {
+      "abs": 0.005
+     }
+    },
+    "removal_pct": {
+     "value": 95,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
    "tile_id": "design-flow-peaking",
    "source_publisher": "Metcalf & Eddy, Wastewater Engineering / Ten States Standards (Harmon peaking, Gifft minimum)",
    "source_title": "50,000 people at 100 gpcd -> 5.0 MGD avg, 11.32 MGD peak (PF 2.26), 1.92 MGD min (spec-v1208)",
@@ -31369,6 +31534,28 @@
    }
   },
   {
+   "tile_id": "room-cavity-ratio",
+   "source_publisher": "Cornell University (DEA 3500)",
+   "source_title": "Zonal Cavity lecture notes, Example: Designing lighting for a laboratory",
+   "source_edition_or_year": "undated course notes",
+   "source_section_or_page": "30 x 20 ft laboratory, 10 ft ceiling, 3 ft work plane (cavity 7.0 ft) -> room cavity ratio 2.9",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "room_length_ft": 30,
+    "room_width_ft": 20,
+    "cavity_height_ft": 7
+   },
+   "outputs": {
+    "room_cavity_ratio": {
+     "value": 2.9,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
    "tile_id": "lumen-method",
    "source_publisher": "IES lumen method (by name).",
    "source_title": "count = ceil(target_fc x area / (lumens x CU x LLF)); achieved_fc = count x lumens x CU x LLF / area.",
@@ -33422,6 +33609,54 @@
    }
   },
   {
+   "tile_id": "fluoride-feed-dose",
+   "source_publisher": "CDC",
+   "source_title": "Water Fluoridation: A Manual for Engineers and Technicians",
+   "source_edition_or_year": "September 1986 (reprinted May 1991)",
+   "source_section_or_page": "Section 4.2.7 B, Example 2 (p. 66): hydrofluosilicic acid, 1.2 - 0.2 mg/L at 1.0 MGD, AFI 0.79, purity 23% -> 45.8 lb/day",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "target_dose_mg_l": 1.2,
+    "raw_fluoride_mg_l": 0.2,
+    "flow_mgd": 1,
+    "afi_fraction": 0.79,
+    "purity_fraction": 0.23
+   },
+   "outputs": {
+    "feed_lb_day": {
+     "value": 45.8,
+     "tolerance": {
+      "abs": 0.1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "fluoride-feed-dose",
+   "source_publisher": "CDC",
+   "source_title": "Water Fluoridation: A Manual for Engineers and Technicians",
+   "source_edition_or_year": "September 1986 (reprinted May 1991)",
+   "source_section_or_page": "Example 1 (p. 64): sodium silicofluoride, 1.1 mg/L at 2.88 MGD, AFI 0.607, purity 98.5% -> 44.19 lb/day",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "target_dose_mg_l": 1.1,
+    "raw_fluoride_mg_l": 0,
+    "flow_mgd": 2.88,
+    "afi_fraction": 0.607,
+    "purity_fraction": 0.985
+   },
+   "outputs": {
+    "feed_lb_day": {
+     "value": 44.19,
+     "tolerance": {
+      "abs": 0.005
+     }
+    }
+   }
+  },
+  {
    "tile_id": "float-method-flow",
    "source_publisher": "Float (velocity-area) open-channel flow method",
    "source_title": "20 ft in 10 s, 4 ft wide, 1.5 ft deep, C 0.85 -> 2.0 ft/s, 10.2 cfs, 4,578 gpm",
@@ -33529,6 +33764,29 @@
      "value": 187.32,
      "tolerance": {
       "abs": 0.2
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "dechlorination-dose",
+   "source_publisher": "US EPA",
+   "source_title": "Wastewater Technology Fact Sheet: Dechlorination (EPA 832-F-00-022)",
+   "source_edition_or_year": "September 2000",
+   "source_section_or_page": "Sample Calculation (p. 2): 20 MGD, 1.5 mg/L chlorine residual, 1:1 SO2 -> 250 lb SO2 per day",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "chlorine_residual_mg_l": 1.5,
+    "flow_mgd": 20,
+    "stoich_ratio": 1,
+    "purity_pct": 100
+   },
+   "outputs": {
+    "feed_lb_day": {
+     "value": 250,
+     "tolerance": {
+      "abs": 0.5
      }
     }
    }
@@ -36305,6 +36563,29 @@
    }
   },
   {
+   "tile_id": "asce7-load-combinations",
+   "source_publisher": "STRUCTURE magazine (Showalter and Adams)",
+   "source_title": "ASCE 7-22 Flat Roof Snow Load Versus Minimum Snow Load",
+   "source_edition_or_year": "November 2025, pp. 47-49",
+   "source_section_or_page": "Table 1 (Richmond, VA), D 20 psf, S = pm 30 psf -> ASD D + 0.7S = 41.0 psf",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "dead_psf": 20,
+    "snow_psf": 30,
+    "wind_psf": 0,
+    "roof_load": "snow-7-22"
+   },
+   "outputs": {
+    "governing_gravity_psf": {
+     "value": 41,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
    "tile_id": "seismic-approximate-period",
    "source_publisher": "ASCE 7 \u00a712.8.2.1 approximate fundamental period",
    "source_title": "120 ft steel moment frame, SD1 0.6 -> Ta 1.29 s, Cu Ta 1.81 s (spec-v1214)",
@@ -36411,6 +36692,80 @@
      "value": 18.461538,
      "tolerance": {
       "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "seismic-base-shear",
+   "source_publisher": "FEMA",
+   "source_title": "FEMA P-2192-V1, 2020 NEHRP Recommended Seismic Provisions: Design Examples, Training Materials, and Design Flow Charts",
+   "source_edition_or_year": "2020 edition (ASCE/SEI 7-22)",
+   "source_section_or_page": "Section 7.4.1, one-story wood assembly hall, Step 2 (pp. 266-268): W 86,288 lb, SDS 1.0, SD1 0.60, R 6.5, Ie 1.25, T 0.22 -> Cs 0.192, V = 0.192 x 86,288 = 16,567 lb",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "weight_kip": 86.288,
+    "sds": 1,
+    "sd1": 0.6,
+    "r_factor": 6.5,
+    "ie": 1.25,
+    "period_s": 0.22
+   },
+   "outputs": {
+    "cs": {
+     "value": 0.192,
+     "tolerance": {
+      "abs": 0.0005
+     }
+    },
+    "cs_cap": {
+     "value": 0.524,
+     "tolerance": {
+      "abs": 0.0005
+     }
+    },
+    "base_shear_kip": {
+     "value": 16.567,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "seismic-base-shear",
+   "source_publisher": "FEMA",
+   "source_title": "FEMA P-2192-V1, 2020 NEHRP Recommended Seismic Provisions: Design Examples, Training Materials, and Design Flow Charts",
+   "source_edition_or_year": "2020 edition (ASCE/SEI 7-22)",
+   "source_section_or_page": "Section 7.5, multi-story steel building, Step 2 (pp. 273-274): W 8,678 kips, SDS 1.20, SD1 0.70, R 6, T 0.49 -> Cs 0.200 governs (period limit 0.238), V 1,736 kips",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "weight_kip": 8678,
+    "sds": 1.2,
+    "sd1": 0.7,
+    "r_factor": 6,
+    "ie": 1,
+    "period_s": 0.49
+   },
+   "outputs": {
+    "cs": {
+     "value": 0.2,
+     "tolerance": {
+      "abs": 0.0005
+     }
+    },
+    "cs_cap": {
+     "value": 0.238,
+     "tolerance": {
+      "abs": 0.0005
+     }
+    },
+    "base_shear_kip": {
+     "value": 1736,
+     "tolerance": {
+      "abs": 0.5
      }
     }
    }
@@ -40998,6 +41353,56 @@
    }
   },
   {
+   "tile_id": "ro-recovery-concentration",
+   "source_publisher": "US Bureau of Reclamation",
+   "source_title": "Desalting Handbook for Planners, 3rd ed. (DWPR Report No. 72)",
+   "source_edition_or_year": "July 2003",
+   "source_section_or_page": "Section 7.3.4 (p. 140): at 75 percent recovery the dissolved solids concentrate by a factor of 4 (perfect membrane, p. 95)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "feed_gpm": 10,
+    "permeate_gpm": 7.5,
+    "feed_tds_mgl": 500
+   },
+   "outputs": {
+    "recovery_pct": {
+     "value": 75,
+     "tolerance": {
+      "abs": 0.005
+     }
+    },
+    "concentration_factor": {
+     "value": 4,
+     "tolerance": {
+      "abs": 0.005
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "ro-recovery-concentration",
+   "source_publisher": "US Bureau of Reclamation",
+   "source_title": "Desalting Handbook for Planners, 3rd ed. (DWPR Report No. 72)",
+   "source_edition_or_year": "July 2003",
+   "source_section_or_page": "p. 169: 90 percent recovery -> concentration factor 10",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "feed_gpm": 10,
+    "permeate_gpm": 9,
+    "feed_tds_mgl": 500
+   },
+   "outputs": {
+    "concentration_factor": {
+     "value": 10,
+     "tolerance": {
+      "abs": 0.005
+     }
+    }
+   }
+  },
+  {
    "tile_id": "rotary-phase-converter-sizing",
    "source_publisher": "rotary phase converter idler sizing (industry rule)",
    "source_title": "10 HP largest, 15 HP total running, 2x start -> 20 HP idler (starting governs)",
@@ -42808,6 +43213,35 @@
      "value": 25,
      "tolerance": {
       "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "asce-live-load-reduction",
+   "source_publisher": "TU Delft (R. Alderliesten), Engineering LibreTexts",
+   "source_title": "Introduction to Aerospace Structures and Materials, 2.5 Live Load Reduction",
+   "source_edition_or_year": "TU Delft Open, CC BY-NC-SA 4.0 (ASCE 7-16 basis)",
+   "source_section_or_page": "Example 2.7: four-story school, interior column at ground level, 30 x 30 ft bays (900 ft^2), KLL 4 -> L = 40(0.25 + 15/sqrt(3600)) = 20 psf",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "unreduced_load_psf": 40,
+    "tributary_area_ft2": 900,
+    "member_type": "interior_column",
+    "floors_supported": "two_plus"
+   },
+   "outputs": {
+    "reduced_load_psf": {
+     "value": 20,
+     "tolerance": {
+      "abs": 0.005
+     }
+    },
+    "KLL": {
+     "value": 4,
+     "tolerance": {
+      "abs": 0
      }
     }
    }
@@ -47507,6 +47941,65 @@
    }
   },
   {
+   "tile_id": "seismic-vertical-distribution",
+   "source_publisher": "FEMA",
+   "source_title": "FEMA P-2192-V1, 2020 NEHRP Recommended Seismic Provisions: Design Examples, Training Materials, and Design Flow Charts",
+   "source_edition_or_year": "2020 edition (ASCE/SEI 7-22)",
+   "source_section_or_page": "Section 7.5, Table 7-6 (p. 275): V 1,736 kips, T 0.49 (k = 1.0), roof 828 kips at 72 ft over five 1,570 kip floors -> roof Fx 302 kips, sum wh 342,216",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "base_shear_kip": 1736,
+    "period_s": 0.49,
+    "stories": [
+     {
+      "w": 1570,
+      "h": 12
+     },
+     {
+      "w": 1570,
+      "h": 24
+     },
+     {
+      "w": 1570,
+      "h": 36
+     },
+     {
+      "w": 1570,
+      "h": 48
+     },
+     {
+      "w": 1570,
+      "h": 60
+     },
+     {
+      "w": 828,
+      "h": 72
+     }
+    ]
+   },
+   "outputs": {
+    "k": {
+     "value": 1,
+     "tolerance": {
+      "abs": 0
+     }
+    },
+    "sigma_wh": {
+     "value": 342216,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "fx_top_kip": {
+     "value": 302,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
    "tile_id": "seismic-overturning-moment",
    "source_publisher": "ASCE 7-22 \u00a712.8.5 (Overturning) with \u00a712.8.3 distribution and \u00a712.13.4",
    "source_title": "3-story, V = 200 kips, T = 0.4 s (k = 1), Fx 37/74/89 kips at 12/24/36 ft -> base overturning 5,422 kip-ft, reduced 4,067",
@@ -47993,6 +48486,42 @@
    }
   },
   {
+   "tile_id": "wood-beam-bending",
+   "source_publisher": "Jonathan Ochshorn (Cornell University)",
+   "source_title": "Structural Elements for Architects and Builders, 3rd ed., 3.07 Beams",
+   "source_edition_or_year": "3rd edition (NDS basis)",
+   "source_section_or_page": "Example 3.6: 14x20 Hem-Fir No. 2 girder, Fb* 640, E'min 400,000, le 161 in. -> FbE 27,864 psi, CL 0.999, Fb' 639 psi",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "fb_star_psi": 640,
+    "emin_psi": 400000,
+    "b_in": 13.5,
+    "d_in": 19.5,
+    "le_in": 161
+   },
+   "outputs": {
+    "fbe_psi": {
+     "value": 27864,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "cl": {
+     "value": 0.999,
+     "tolerance": {
+      "abs": 0.0005
+     }
+    },
+    "fb_prime_psi": {
+     "value": 639,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
    "tile_id": "wood-beam-shear",
    "source_publisher": "NDS 3.4.2 / 3.4.3.2 (National Design Specification for Wood Construction)",
    "source_title": "4x12 notched 2 in at the end (Fv' 180), V 2,000 lb -> Vr 4,725 lb, Vr' 2,626 lb, dcr 0.76",
@@ -48114,6 +48643,30 @@
    }
   },
   {
+   "tile_id": "wood-beam-shear",
+   "source_publisher": "WoodWorks (Harvey and Kinder)",
+   "source_title": "Introduction to Wood: Structural Gravity Framing Design, Design Example: Shear",
+   "source_edition_or_year": "webinar slides, January 14, 2025",
+   "source_section_or_page": "three 2x12 (4.5 x 11.25 in.), V 2,940 lb -> fv = 3V/2A = 87 psi",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "fv_prime_psi": 180,
+    "b_in": 4.5,
+    "d_in": 11.25,
+    "dn_in": 11.25,
+    "v_applied_lb": 2940
+   },
+   "outputs": {
+    "fv_psi": {
+     "value": 87,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
    "tile_id": "wood-bolt-connection",
    "source_publisher": "NDS Table 12.3.1A (National Design Specification for Wood Construction)",
    "source_title": "1/2 in bolt, 4x main into 2x side, DF-L, parallel -> six modes, governing Z 615 lb (mode IIIs)",
@@ -48213,6 +48766,86 @@
    }
   },
   {
+   "tile_id": "wood-bolt-connection",
+   "source_publisher": "American Wood Council",
+   "source_title": "Technical Report 12, General Dowel Equations for Calculating Lateral Connection Values",
+   "source_edition_or_year": "TR12-1510 (2015)",
+   "source_section_or_page": "Example 3.1, gap 0, parallel to grain: 1/2 in. bolt, 1.5 in. members, Fe 4,800 psi (entered as G = 3/7, Fe = 11,200 G) -> Im/Is 900, II 414, IIIm/IIIs 550, IV 663 lb; Z 414 (Mode II)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "d_in": 0.5,
+    "lm_in": 1.5,
+    "ls_in": 1.5,
+    "gm": 0.428571428571,
+    "gs": 0.428571428571,
+    "fyb_psi": 45000
+   },
+   "outputs": {
+    "fem_psi": {
+     "value": 4800,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "z_im": {
+     "value": 900,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "z_ii": {
+     "value": 414,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "z_iiim": {
+     "value": 550,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "z_iv": {
+     "value": 663,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "z_lb": {
+     "value": 414,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "wood-bolt-connection",
+   "source_publisher": "American Wood Council",
+   "source_title": "National Design Specification for Wood Construction, Table 12A (bolts, single shear)",
+   "source_edition_or_year": "NDS 2018",
+   "source_section_or_page": "Table 12A: tm 3-1/2 in., ts 1-1/2 in., D 1/2 in., G 0.50 -> Z parallel 610 lb (tabulated to 10 lb)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "d_in": 0.5,
+    "lm_in": 3.5,
+    "ls_in": 1.5,
+    "gm": 0.5,
+    "gs": 0.5,
+    "fyb_psi": 45000
+   },
+   "outputs": {
+    "z_lb": {
+     "value": 610,
+     "tolerance": {
+      "abs": 5
+     }
+    }
+   }
+  },
+  {
    "tile_id": "steel-beam-flexure",
    "source_publisher": "AISC 360-22 Chapter F / Steel Construction Manual Table 3-2",
    "source_title": "W18x50 A992 (Fy 50, Zx 101) -> Mn 421, Ma 252, phi_b Mn 379 kip-ft, util 0.79 at Mu 200",
@@ -48281,6 +48914,40 @@
      "value": 139.5,
      "tolerance": {
       "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "steel-beam-flexure",
+   "source_publisher": "AISC",
+   "source_title": "Companion to the AISC Steel Construction Manual, Vol. 1: Design Examples",
+   "source_edition_or_year": "v15.1 (AISC 360-16)",
+   "source_section_or_page": "Example F.1-1B, p. F-8: W18x50, Fy 50, Zx 101 -> Mn 421 kip-ft, phi Mn 379, Mn/Omega 252",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "fy": 50,
+    "zx": 101,
+    "mu": 266
+   },
+   "outputs": {
+    "mn_kipft": {
+     "value": 421,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "phi_mn": {
+     "value": 379,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "ma_kipft": {
+     "value": 252,
+     "tolerance": {
+      "abs": 0.5
      }
     }
    }
@@ -48470,6 +49137,42 @@
    }
   },
   {
+   "tile_id": "steel-beam-shear",
+   "source_publisher": "AISC",
+   "source_title": "Companion to the AISC Steel Construction Manual, Vol. 1: Design Examples",
+   "source_edition_or_year": "v15.1 (AISC 360-16)",
+   "source_section_or_page": "Example G.1B, p. G-4: W24x62, Aw = 23.7 x 0.430 = 10.2 in^2 -> Vn 306 kips, Vn/Omega 204 kips",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "fy": 50,
+    "d": 23.7,
+    "tw": 0.43,
+    "cv1": 1,
+    "omega_v": 1.5
+   },
+   "outputs": {
+    "vn": {
+     "value": 306,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "phi_vn": {
+     "value": 306,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "va": {
+     "value": 204,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
    "tile_id": "steel-column-capacity",
    "source_publisher": "AISC 360-22 Chapter E / Steel Construction Manual Table 4-1",
    "source_title": "W10x45 A992, 14 ft pinned (r 2.01, Ag 13.3) -> KL/r 83.6, Fcr 30.0, Pn 399, Pa 239 kips (inelastic)",
@@ -48556,6 +49259,98 @@
    }
   },
   {
+   "tile_id": "steel-column-capacity",
+   "source_publisher": "AISC",
+   "source_title": "Companion to the AISC Steel Construction Manual, Vol. 1: Design Examples",
+   "source_edition_or_year": "v15.1 (AISC 360-16)",
+   "source_section_or_page": "Example E.1D, pp. E-11 to E-12: W14x90 Fy 50, KL 30 ft, rx 6.14 -> Fcr 38.9 ksi, Pn 1,030, phi Pn 927, Pn/Omega 617 kips",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "fy": 50,
+    "e_mod": 29000,
+    "k": 1,
+    "l_ft": 30,
+    "r_in": 6.14,
+    "ag": 26.5
+   },
+   "outputs": {
+    "fe": {
+     "value": 83.3,
+     "tolerance": {
+      "abs": 0.05
+     }
+    },
+    "fcr": {
+     "value": 38.9,
+     "tolerance": {
+      "abs": 0.05
+     }
+    },
+    "pn": {
+     "value": 1030,
+     "tolerance": {
+      "abs": 5
+     }
+    },
+    "phi_pn": {
+     "value": 927,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "pa": {
+     "value": 617,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "steel-column-capacity",
+   "source_publisher": "AISC",
+   "source_title": "Companion to the AISC Steel Construction Manual, Vol. 1: Design Examples",
+   "source_edition_or_year": "v15.1 (AISC 360-16)",
+   "source_section_or_page": "Example E.1D, Fy 65 (A913): Fcr 46.9 ksi, Pn 1,240, phi Pn 1,120, Pn/Omega 743 kips (from the rounded Pn)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "fy": 65,
+    "e_mod": 29000,
+    "k": 1,
+    "l_ft": 30,
+    "r_in": 6.14,
+    "ag": 26.5
+   },
+   "outputs": {
+    "fcr": {
+     "value": 46.9,
+     "tolerance": {
+      "abs": 0.05
+     }
+    },
+    "pn": {
+     "value": 1240,
+     "tolerance": {
+      "abs": 5
+     }
+    },
+    "phi_pn": {
+     "value": 1120,
+     "tolerance": {
+      "abs": 5
+     }
+    },
+    "pa": {
+     "value": 743,
+     "tolerance": {
+      "abs": 1
+     }
+    }
+   }
+  },
+  {
    "tile_id": "bolt-group-eccentric",
    "source_publisher": "AISC Manual Part 7 (elastic vector method)",
    "source_title": "2x3 group, 3 in spacing, 30 kip at 6 in -> Ip 49.5, direct 5.0, R 15.1 kip on the corner bolt",
@@ -48613,6 +49408,43 @@
      "value": 27.0024,
      "tolerance": {
       "abs": 0.005
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "bolt-group-eccentric",
+   "source_publisher": "AISC",
+   "source_title": "Companion to the AISC Steel Construction Manual, Vol. 1: Design Examples",
+   "source_edition_or_year": "v15.1 (AISC 360-16)",
+   "source_section_or_page": "Example II.A-25 (elastic method), pp. IIA-232 to IIA-233: 12 bolts, x = +/-2.75 in., 3 in. pitch, e 16 in. -> Ix 315, Ip 406, critical bolt 0.352P; Pu 69.0 kips at 24.3 kips/bolt",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "load_kip": 69,
+    "ecc_in": 16,
+    "ncols": 2,
+    "nrows": 6,
+    "gage_in": 5.5,
+    "pitch_in": 3
+   },
+   "outputs": {
+    "ix": {
+     "value": 315,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "ip": {
+     "value": 406,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "resultant_kip": {
+     "value": 24.3,
+     "tolerance": {
+      "abs": 0.05
      }
     }
    }
@@ -48699,6 +49531,86 @@
      "value": 14.2734,
      "tolerance": {
       "abs": 0.005
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "bolt-shear-bearing",
+   "source_publisher": "AISC",
+   "source_title": "Companion to the AISC Steel Construction Manual, Vol. 1: Design Examples",
+   "source_edition_or_year": "v15.1 (AISC 360-16)",
+   "source_section_or_page": "Example II.A-19A, pp. IIA-176 to IIA-177: 3/4 in. bolts, 1/2 in. A36 plate, le 1.5 -> bearing 52.2, edge tearout 37.9 (lc 1.09) kips/bolt; bolt shear phi rn 17.9, rn/Omega 11.9",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "d_in": 0.75,
+    "ab_in2": 0.442,
+    "fnv_ksi": 54,
+    "nplanes": 1,
+    "t_in": 0.5,
+    "fu_ksi": 58,
+    "le_in": 1.5,
+    "dh_in": 0.8125,
+    "s_in": 3
+   },
+   "outputs": {
+    "bearing_cap": {
+     "value": 52.2,
+     "tolerance": {
+      "abs": 0.05
+     }
+    },
+    "rn_edge": {
+     "value": 37.9,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "phi_rn": {
+     "value": 17.9,
+     "tolerance": {
+      "abs": 0.05
+     }
+    },
+    "rn_asd": {
+     "value": 11.9,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "bolt-shear-bearing",
+   "source_publisher": "AISC",
+   "source_title": "Companion to the AISC Steel Construction Manual, Vol. 1: Design Examples",
+   "source_edition_or_year": "v15.1 (AISC 360-16)",
+   "source_section_or_page": "Example K.6, p. K-29: 3/4 in. bolt, Fnv 54 -> 23.9 kips/bolt shear; 0.300 in. web, Fu 65 -> bearing 35.1 kips/bolt",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "d_in": 0.75,
+    "ab_in2": 0.442,
+    "fnv_ksi": 54,
+    "nplanes": 1,
+    "t_in": 0.3,
+    "fu_ksi": 65,
+    "le_in": 1.5,
+    "dh_in": 0.8125,
+    "s_in": 3
+   },
+   "outputs": {
+    "rn_shear": {
+     "value": 23.9,
+     "tolerance": {
+      "abs": 0.05
+     }
+    },
+    "bearing_cap": {
+     "value": 35.1,
+     "tolerance": {
+      "abs": 0.05
      }
     }
    }
@@ -48792,6 +49704,62 @@
    }
   },
   {
+   "tile_id": "column-base-plate",
+   "source_publisher": "AISC",
+   "source_title": "Companion to the AISC Steel Construction Manual, Vol. 1: Design Examples",
+   "source_edition_or_year": "v15.1 (AISC 360-16)",
+   "source_section_or_page": "Example J.6, pp. J-16 to J-18: W12x96 on 22 x 22 plate, Pu 690, f'c 3 -> A1 416 in^2, m 4.97, n 6.12, lambda n' 3.11, fpu 1.43 ksi, tmin 1.82 in.",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "pu_kip": 690,
+    "fc_ksi": 3,
+    "fy_ksi": 36,
+    "d_in": 12.7,
+    "bf_in": 12.2,
+    "b_in": 22,
+    "n_in": 22
+   },
+   "outputs": {
+    "a1_req": {
+     "value": 416,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "m": {
+     "value": 4.97,
+     "tolerance": {
+      "abs": 0.005
+     }
+    },
+    "n": {
+     "value": 6.12,
+     "tolerance": {
+      "abs": 0.005
+     }
+    },
+    "np": {
+     "value": 3.11,
+     "tolerance": {
+      "abs": 0.005
+     }
+    },
+    "fpu": {
+     "value": 1.43,
+     "tolerance": {
+      "abs": 0.005
+     }
+    },
+    "tp": {
+     "value": 1.82,
+     "tolerance": {
+      "abs": 0.005
+     }
+    }
+   }
+  },
+  {
    "tile_id": "shear-stud-strength",
    "source_publisher": "AISC 360-22 I8",
    "source_title": "3/4 in stud, f'c 4000, Ec 3.644e6, Fu 65, Rg 1.0, Rp 0.75 -> Qn 21.6 kip, 19 studs at V' 400",
@@ -48849,6 +49817,44 @@
     },
     "studs_each_side": {
      "value": 24,
+     "tolerance": {
+      "abs": 0
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "shear-stud-strength",
+   "source_publisher": "AISC",
+   "source_title": "Companion to the AISC Steel Construction Manual, Vol. 1: Design Examples",
+   "source_edition_or_year": "v15.1 (AISC 360-16)",
+   "source_section_or_page": "Example I.2, pp. I-25 to I-26: 3/4 in. stud, f'c 4 ksi, Ec 3,490 ksi, Rg 1.0, Rp 0.75 -> Qn = min(26.1, 21.5) = 21.5 kips; V' 560 -> 26 anchors each side",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "asc_in2": 0.442,
+    "fc_psi": 4000,
+    "ec_psi": 3490000,
+    "fu_ksi": 65,
+    "rg": 1,
+    "rp": 0.75,
+    "vprime_kip": 560
+   },
+   "outputs": {
+    "qn_calc_kip": {
+     "value": 26.1,
+     "tolerance": {
+      "abs": 0.05
+     }
+    },
+    "qn_kip": {
+     "value": 21.5,
+     "tolerance": {
+      "abs": 0.05
+     }
+    },
+    "studs_each_side": {
+     "value": 26,
      "tolerance": {
       "abs": 0
      }
