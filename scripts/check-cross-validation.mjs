@@ -176,18 +176,18 @@ async function main() {
   // cross-tile agreement claim belongs to test/unit/cross-tile-invariants.test.js,
   // which covers the five shared-computation classes spec-v14 §10 names.
   // docs/correctness.md had it right all along; only the README overstated.
-  const readmeText = await readFile(resolve(ROOT, "README.md"), "utf8");
+  const readmeText = await readFile(resolve(ROOT, "docs", "how-it-works.md"), "utf8");
   const row = readmeText.split("\n").find((l) => l.includes("`check-cross-validation`"));
   if (row) {
     if (!/toleranc/i.test(row)) {
       errors.push(
-        "README.md's check-cross-validation row does not mention tolerance, which is " +
+        "docs/how-it-works.md's check-cross-validation row does not mention tolerance, which is " +
         "the only thing this gate polices. Describe what it checks, not what the name suggests.",
       );
     }
     if (/agree numerically|same quantity/i.test(row)) {
       errors.push(
-        "README.md credits check-cross-validation with cross-tile agreement. That is " +
+        "docs/how-it-works.md credits check-cross-validation with cross-tile agreement. That is " +
         "test/unit/cross-tile-invariants.test.js, over the five shared-computation " +
         "classes spec-v14 section 10 names -- not this gate, which never compares two tiles.",
       );

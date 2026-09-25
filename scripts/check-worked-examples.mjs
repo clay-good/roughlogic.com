@@ -199,11 +199,11 @@ async function main() {
     const flags = derivedByTile.get(tile) || [];
     if (publishers.every((pub, i) => SELF_SOURCED.test(pub) || flags[i])) derivedOnlyTiles.push(tile);
   }
-  const readme = await readFile(resolve(ROOT, "README.md"), "utf8");
+  const readme = await readFile(resolve(ROOT, "docs", "how-it-works.md"), "utf8");
   const statedDerived = /\b(\d[\d,]*) of them are the project's own derivation\b/.exec(readme);
   if (!statedDerived || Number(statedDerived[1].replace(/,/g, "")) !== derivedOnlyTiles.length) {
     errors.push(
-      "README.md must say how many tiles are checked only against the project's own derivation " +
+      "docs/how-it-works.md must say how many tiles are checked only against the project's own derivation " +
       "(first-principles identities plus named methods the project computed and marked machine-verified): " +
       derivedOnlyTiles.length + " of " + totalTiles + (statedDerived ? "; it says " + statedDerived[1] : "") + ".",
     );
@@ -211,13 +211,13 @@ async function main() {
   const stated = /\b(\d[\d,]*) from first principles\b/.exec(readme);
   if (!stated) {
     errors.push(
-      "README.md does not state how many tiles have only first-principles worked examples ('N from first principles'). " +
+      "docs/how-it-works.md does not state how many tiles have only first-principles worked examples ('N from first principles'). " +
       "examples. The trust table calls these publisher-verified; " + selfOnlyTiles.length +
       " of " + totalTiles + " are the project showing its own work instead. Say so.",
     );
   } else if (Number(stated[1].replace(/,/g, "")) !== selfOnlyTiles.length) {
     errors.push(
-      "README.md says " + stated[1] + " tiles are first-principles-only; the registry has " +
+      "docs/how-it-works.md says " + stated[1] + " tiles are first-principles-only; the registry has " +
       selfOnlyTiles.length + ". Update the sentence -- it is the one that tells a reader " +
       "how much of this catalog is checked against an outside publisher.",
     );
@@ -230,13 +230,13 @@ async function main() {
   const namedStated = /\b(\d[\d,]*) a named published method\b/.exec(readme);
   const namedLive = derivedOnlyTiles.length - selfOnlyTiles.length;
   if (!namedStated || Number(namedStated[1].replace(/,/g, "")) !== namedLive) {
-    errors.push("README.md must say 'N a named published method' with N = " + namedLive +
+    errors.push("docs/how-it-works.md must say 'N a named published method' with N = " + namedLive +
       " (project-derived minus first-principles-only)" + (namedStated ? "; it says " + namedStated[1] : "") + ".");
   }
   const otherStated = /\bThe other (\d[\d,]*) carry at least one row read from an outside source\b/.exec(readme);
   const otherLive = totalTiles - derivedOnlyTiles.length;
   if (!otherStated || Number(otherStated[1].replace(/,/g, "")) !== otherLive) {
-    errors.push("README.md must say 'The other N carry at least one row read from an outside source' with N = " + otherLive +
+    errors.push("docs/how-it-works.md must say 'The other N carry at least one row read from an outside source' with N = " + otherLive +
       (otherStated ? "; it says " + otherStated[1] : "") + ".");
   }
 

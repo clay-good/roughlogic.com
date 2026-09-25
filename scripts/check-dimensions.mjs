@@ -714,12 +714,12 @@ async function main() {
     " genuine name collisions). Any name not on those lists must mean one quantity.",
   );
 
-  const readmeText = await readFile(resolve(ROOT, "README.md"), "utf8");
+  const readmeText = await readFile(resolve(ROOT, "docs", "how-it-works.md"), "utf8");
   const row = readmeText.split("\n").find((l) => l.includes("`check-dimensions`"));
   if (row) {
     if (/every formula is dimensionally consistent/i.test(row)) {
       errors.push(
-        "README.md says check-dimensions proves every formula is dimensionally " +
+        "docs/how-it-works.md says check-dimensions proves every formula is dimensionally " +
         "consistent. It parses the // dims: annotation and fails a malformed one; " +
         "it never checks an expression against its declared dimensions.",
       );
@@ -742,7 +742,7 @@ async function main() {
       const got = inPhrase(re);
       if (got === live) return;
       errors.push(
-        "README.md's check-dimensions row does not state the live " + what + " (" +
+        "docs/how-it-works.md's check-dimensions row does not state the live " + what + " (" +
         live.toLocaleString("en-US") + ") in its `" + phrase + "` phrase; it says " +
         (got === null ? "nothing there" : got.toLocaleString("en-US")) +
         ". Numbers found in the row: " + (stated.length ? stated.join(", ") : "none") + ".",
@@ -764,7 +764,7 @@ async function main() {
     const statedStubs = row.match(/\*\*([\d,]+) of those annotations are stubs\*\*/);
     if (!statedStubs || Number(statedStubs[1].replace(/,/g, "")) !== stubs.length) {
       errors.push(
-        "README.md's check-dimensions row does not state the live stub count (" +
+        "docs/how-it-works.md's check-dimensions row does not state the live stub count (" +
         stubs.length + ") in its `**N of those annotations are stubs**` phrase; it " +
         "says " + (statedStubs ? statedStubs[1] : "nothing there") + ". The row claims " +
         "every function declares its inputs; " + stubs.length + " of them declare a " +
@@ -803,7 +803,7 @@ async function main() {
     }
     if (!/annotat|declar/i.test(row)) {
       errors.push(
-        "README.md's check-dimensions row does not say it checks a declaration. " +
+        "docs/how-it-works.md's check-dimensions row does not say it checks a declaration. " +
         "Describe the annotation, not a property of the arithmetic nobody verifies.",
       );
     }

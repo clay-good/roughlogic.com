@@ -51,7 +51,7 @@ function workflowJobs(yaml) {
 async function main() {
   const errors = [];
   const yaml = await readFile(resolve(ROOT, WORKFLOW), "utf8");
-  const readme = await readFile(resolve(ROOT, "README.md"), "utf8");
+  const readme = await readFile(resolve(ROOT, "docs", "how-it-works.md"), "utf8");
 
   const jobs = workflowJobs(yaml);
   if (!jobs || jobs.length === 0) {
@@ -63,20 +63,20 @@ async function main() {
   const stated = /CI adds (\w+) (?:parallel )?jobs? per push/.exec(readme);
   if (!stated) {
     errors.push(
-      `README.md no longer contains the "CI adds <N> jobs per push" sentence this gate anchors on. ` +
+      `docs/how-it-works.md no longer contains the "CI adds <N> jobs per push" sentence this gate anchors on. ` +
         `Restore it or update this gate -- it is how a reader learns what stands between a change and a deploy.`,
     );
   } else {
     const claimed = NUMBER_WORDS[stated[1].toLowerCase()] ?? Number(stated[1]);
     if (claimed !== jobs.length) {
       errors.push(
-        `README.md says "${stated[0]}", but ${WORKFLOW} defines ${jobs.length} (${jobs.join(", ")}).`,
+        `docs/how-it-works.md says "${stated[0]}", but ${WORKFLOW} defines ${jobs.length} (${jobs.join(", ")}).`,
       );
     }
     // B. each job named.
     for (const job of jobs) {
       if (!new RegExp(`\`${job}\``).test(readme)) {
-        errors.push(`${WORKFLOW} defines the "${job}" job, but README.md never names it.`);
+        errors.push(`${WORKFLOW} defines the "${job}" job, but docs/how-it-works.md never names it.`);
       }
     }
   }
@@ -143,7 +143,7 @@ async function main() {
   // prose stops stating a figure at all, so the check cannot go quiet.
   const claimed = readme.match(/the ([\d,]+)-test axe pass/);
   if (!claimed) {
-    errors.push("README no longer states the size of the axe pass; the figure is the thing this check watches.");
+    errors.push("docs/how-it-works.md no longer states the size of the axe pass; the figure is the thing this check watches.");
   } else if (a11yPattern) {
     let live = null;
     try {
@@ -175,7 +175,7 @@ async function main() {
       // landing, in the commit that changes the number.
       const stated = Number(claimed[1].replace(/,/g, ""));
       if (stated !== live) {
-        errors.push(`README says the axe pass is ${claimed[1]} tests; it is ${live}.`);
+        errors.push(`docs/how-it-works.md says the axe pass is ${claimed[1]} tests; it is ${live}.`);
       }
     }
   }
@@ -308,7 +308,7 @@ async function main() {
         `CONTRIBUTING sentences that name it.`);
       continue;
     }
-    for (const doc of ["README.md", "CONTRIBUTING.md"]) {
+    for (const doc of ["docs/how-it-works.md", "CONTRIBUTING.md"]) {
       const body = await readFile(resolve(ROOT, doc), "utf8");
       if (!body.includes(name)) {
         errors.push(
@@ -328,7 +328,7 @@ async function main() {
   const shellRow = readme.split("\n").find((l) => l.includes("`check-shell-mobile`"));
   if (shellRow && /every page at 320\s*px and 200% text zoom/i.test(shellRow)) {
     errors.push(
-      "README.md says check-shell-mobile proves every page at both 320px and 200% " +
+      "docs/how-it-works.md says check-shell-mobile proves every page at both 320px and 200% " +
       "text zoom. Every shell is swept at 320px portrait; the zoom and landscape " +
       "axes run over a sample. Say which is which.");
   }

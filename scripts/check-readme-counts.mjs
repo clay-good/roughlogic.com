@@ -350,6 +350,9 @@ async function checkReadmeExample(readme, errors) {
 
 async function main() {
   const readme = await readFile(resolve(ROOT, "README.md"), "utf8");
+  // The README is the short front door; the gate, build and CI figures it used
+  // to carry now live in docs/how-it-works.md.
+  const howItWorks = await readFile(resolve(ROOT, "docs", "how-it-works.md"), "utf8");
   const live = await liveCounts();
   const errors = [];
   let checked = 0;
@@ -440,10 +443,10 @@ async function main() {
   // exemption, and now that a zero-match anchor fails, leaving them would fail
   // the build for a diagram nobody intends to bring back. If the diagrams
   // return, so should the anchors.
-  checked += checkPattern(readme, /shell per tile \((\d+)\)/g, live.tiles, "tile count", errors);
+  checked += checkPattern(howItWorks, /shell per tile \((\d+)\)/g, live.tiles, "tile count (docs/how-it-works.md)", errors);
 
   // Module count: the file-tree line.
-  checked += checkPattern(readme, /(\d+) per-group calculator modules/g, live.modules, "calc-* module count", errors);
+  checked += checkPattern(howItWorks, /(\d+) per-group calculator modules/g, live.modules, "calc-* module count (docs/how-it-works.md)", errors);
 
   const correctness = await readFile(resolve(ROOT, "docs", "correctness.md"), "utf8");
   const a11yDoc = await readFile(resolve(ROOT, "docs", "accessibility.md"), "utf8");
@@ -525,12 +528,12 @@ async function main() {
   // paragraph, was pinned only through a Mermaid node that no longer exists,
   // and had rotted to 1,878 -- a catalog-and-a-bit out of date, on the copy a
   // reader meets first.
-  checked += checkPattern(readme, /The ([\d,]+) static shells are not precached/g, live.shells, "static shell count", errors);
+  checked += checkPattern(howItWorks, /The ([\d,]+) static shells are not precached/g, live.shells, "static shell count (docs/how-it-works.md)", errors);
 
   // Gate count: the trust section's headline number and the develop-section
   // comment. A reader is being told how much has to pass; say the real number.
-  checked += checkPattern(readme, /runs (\d+) static gates/g, live.gates, "lint gate count", errors);
-  checked += checkPattern(readme, /static-gate chain \((\d+) checks\)/g, live.gates, "lint gate count", errors);
+  checked += checkPattern(howItWorks, /runs (\d+) static gates/g, live.gates, "lint gate count (docs/how-it-works.md)", errors);
+  checked += checkPattern(howItWorks, /static-gate chain \((\d+) checks\)/g, live.gates, "lint gate count (docs/how-it-works.md)", errors);
 
   // CONTRIBUTING.md tells a first-time contributor how much has to pass. It is
   // the same claim the README makes, on the surface GitHub links from the
@@ -541,12 +544,12 @@ async function main() {
   // the private n-gram list -- and nothing read it: at 59 gates both still said
   // 56, three short of the 58 the README's own lede counts. check-ngrams is the
   // only gate that skips, so the runnable count is the gate count less one.
-  checked += checkPattern(readme, /-- (\d+) run without the private n-gram list/g, live.gates - 1, "runnable lint gate count", errors);
+  checked += checkPattern(howItWorks, /-- (\d+) run without the private n-gram list/g, live.gates - 1, "runnable lint gate count (docs/how-it-works.md)", errors);
   checked += checkPattern(contributing, /static gates, of which (\d+) run here/g, live.gates - 1, "runnable lint gate count (CONTRIBUTING.md)", errors);
 
   // Sitemap URL count: the prose "carries N URLs" (the build-diagram node is
   // retired with the other three -- see the note above).
-  checked += checkPattern(readme, /carries (\d+) URLs/g, live.sitemap, "sitemap URL count", errors);
+  checked += checkPattern(howItWorks, /carries (\d+) URLs/g, live.sitemap, "sitemap URL count (docs/how-it-works.md)", errors);
 
   // ---- "Why you can trust the answers": the reach of each guarantee ----
   //
@@ -558,7 +561,7 @@ async function main() {
 
   // check-cross-validation: how many tolerance checks the ceiling polices.
   const xvalChecks = gateFigure("check-cross-validation.mjs", /([\d,]+) tolerance check/, "tolerance-check count");
-  checked += checkPattern(readme, /or carries a written justification \(([\d,]+) checks\)/g, xvalChecks, "cross-validation tolerance-check count", errors);
+  checked += checkPattern(howItWorks, /or carries a written justification \(([\d,]+) checks\)/g, xvalChecks, "cross-validation tolerance-check count (docs/how-it-works.md)", errors);
 
   // check-example-parity: the static half and the browser-driven half, which
   // must also add up to the catalog -- the README's old trio (1,673 + 131)
@@ -567,16 +570,16 @@ async function main() {
   const parityRuntime = execFileSync("node", [resolve(ROOT, "scripts", "check-example-parity.mjs"), "--list-unresolved"], { encoding: "utf8" })
     .split("\n").map((x) => x.trim()).filter(Boolean).length;
   const parityStatic = live.tiles - parityRuntime;
-  checked += checkPattern(readme, /\(([\d,]+) tiles statically;/g, parityStatic, "example-parity static tile count", errors);
-  checked += checkPattern(readme, /the ([\d,]+) that declare theirs inline/g, parityRuntime, "example-parity runtime tile count", errors);
-  checked += checkPattern(readme, /so the claim covers all ([\d,]+)\)/g, live.tiles, "example-parity total tile count", errors);
+  checked += checkPattern(howItWorks, /\(([\d,]+) tiles statically;/g, parityStatic, "example-parity static tile count (docs/how-it-works.md)", errors);
+  checked += checkPattern(howItWorks, /the ([\d,]+) that declare theirs inline/g, parityRuntime, "example-parity runtime tile count (docs/how-it-works.md)", errors);
+  checked += checkPattern(howItWorks, /so the claim covers all ([\d,]+)\)/g, live.tiles, "example-parity total tile count (docs/how-it-works.md)", errors);
 
   // check-dead-inputs: the computes the destructuring sweep actually reaches.
   const deadInputComputes = gateFigure("check-dead-inputs.mjs", /([\d,]+) computes that destructure their inputs/, "destructuring-compute count");
-  checked += checkPattern(readme, /across the ([\d,]+) computes that destructure their inputs/g, deadInputComputes, "destructuring-compute count", errors);
+  checked += checkPattern(howItWorks, /across the ([\d,]+) computes that destructure their inputs/g, deadInputComputes, "destructuring-compute count (docs/how-it-works.md)", errors);
 
   // check-tile-registries: the id count every full registry must hold.
-  checked += checkPattern(readme, /names every registry that holds all ([\d,]+) ids/g, live.tiles, "registry id count", errors);
+  checked += checkPattern(howItWorks, /names every registry that holds all ([\d,]+) ids/g, live.tiles, "registry id count (docs/how-it-works.md)", errors);
 
   // NOT anchored here: the "N of them are the project's own derivation" and "N from first principles" figures in the same
   // table. `check-worked-examples` already holds that sentence to the registry,
@@ -598,9 +601,9 @@ async function main() {
   if (runnable && privateGate) {
     const cap = (w) => w.charAt(0).toUpperCase() + w.slice(1);
     const wanted = `${cap(runnable)} of them run for anyone who clones this repository; the ${privateGate}, \`check-ngrams\`,`;
-    if (!readme.includes(wanted)) {
+    if (!howItWorks.includes(wanted)) {
       errors.push(
-        `README.md: with ${live.gates} lint gates the trust-section lede should read ` +
+        `docs/how-it-works.md: with ${live.gates} lint gates the trust-section lede should read ` +
         `"${cap(runnable)} of them run for anyone who clones this repository; the ${privateGate}, \`check-ngrams\`," ` +
         `-- check-ngrams is the only gate that skips without a file this repository does not ship.`);
     }

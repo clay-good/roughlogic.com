@@ -130,13 +130,13 @@ async function main() {
   // formula has a written derivation" is not the same sentence.
   const derivations = await readFile(resolve(ROOT, "docs", "derivations.md"), "utf8");
   const families = (derivations.match(/^## \d+\. /gm) || []).length;
-  const readmeText = await readFile(resolve(ROOT, "README.md"), "utf8");
+  const readmeText = await readFile(resolve(ROOT, "docs", "how-it-works.md"), "utf8");
   const row = readmeText.split("\n").find((l) => l.includes("`check-derivation-coverage`"));
   const derivErrors = [];
   if (row) {
     if (/every formula has a written derivation/i.test(row)) {
       derivErrors.push(
-        "README.md says every formula has a written derivation. This gate asserts a " +
+        "docs/how-it-works.md says every formula has a written derivation. This gate asserts a " +
         "tile_id appears in docs/derivations.md, which the generated per-tile index " +
         "satisfies for every tile. Say what is actually derived.",
       );
@@ -144,12 +144,12 @@ async function main() {
     const stated = /\*\*(\d+) formula families\*\*/.exec(row);
     if (!stated) {
       derivErrors.push(
-        "README.md's check-derivation-coverage row does not state how many formula " +
+        "docs/how-it-works.md's check-derivation-coverage row does not state how many formula " +
         "families docs/derivations.md derives. It derives " + families + ".",
       );
     } else if (Number(stated[1]) !== families) {
       derivErrors.push(
-        "README.md says " + stated[1] + " formula families; docs/derivations.md has " +
+        "docs/how-it-works.md says " + stated[1] + " formula families; docs/derivations.md has " +
         families + " numbered sections.",
       );
     }

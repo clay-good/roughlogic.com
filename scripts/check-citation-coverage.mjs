@@ -614,18 +614,18 @@ async function main() {
   // Ratcheted on the UNTRACKED count: bringing a source under tracking is
   // welcome and needs only the README number lowered; letting the untracked set
   // grow past what the README admits fails.
-  const readmeText = await readFile(resolve(ROOT, "README.md"), "utf8");
+  const readmeText = await readFile(resolve(ROOT, "docs", "how-it-works.md"), "utf8");
   const statedUntracked = /\b([\d,]+) cite a source no freshness tracker covers\b/.exec(readmeText);
   if (!statedUntracked) {
     errors.push(
-      "README.md does not say how many tiles cite a source outside the freshness " +
+      "docs/how-it-works.md does not say how many tiles cite a source outside the freshness " +
       "trackers. " + untrackedTiles.length + " of " + citationsMap.size + " do (" +
       (100 - Number(trackedTilePct)).toFixed(1) + "%), so calling every citation " +
       "freshness-tracked overstates what this gate can promise.",
     );
   } else if (Number(statedUntracked[1].replace(/,/g, "")) !== untrackedTiles.length) {
     errors.push(
-      "README.md says " + statedUntracked[1] + " tiles cite an untracked source; this run " +
+      "docs/how-it-works.md says " + statedUntracked[1] + " tiles cite an untracked source; this run " +
       "counted " + untrackedTiles.length + ".",
     );
   }
@@ -640,12 +640,12 @@ async function main() {
   const statedTracked = /\b([\d,]+) tiles cite a source on a recheck calendar\b/.exec(readmeText);
   if (!statedTracked) {
     errors.push(
-      "README.md does not state how many tiles cite a source on a recheck calendar; " +
+      "docs/how-it-works.md does not state how many tiles cite a source on a recheck calendar; " +
       trackedTiles + " of " + citationsMap.size + " do.",
     );
   } else if (Number(statedTracked[1].replace(/,/g, "")) !== trackedTiles) {
     errors.push(
-      "README.md says " + statedTracked[1] + " tiles cite a source on a recheck calendar; " +
+      "docs/how-it-works.md says " + statedTracked[1] + " tiles cite a source on a recheck calendar; " +
       "this run counted " + trackedTiles + ".",
     );
   }
