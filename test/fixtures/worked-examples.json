@@ -27949,6 +27949,50 @@
    }
   },
   {
+   "tile_id": "septic-lpp-squirt-head",
+   "source_publisher": "Utah State University (Utah Water Research Laboratory)",
+   "source_title": "Pressure Distribution Systems",
+   "source_edition_or_year": "Revised Draft, May 2024",
+   "source_section_or_page": "Table B-5 (Qo = 11.79 d^2 h^0.5), 1/4 in orifice: 1.28 gpm at 3.0 ft of squirt",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "per_orifice_gpm": 1.28,
+    "orifice_dia_in": 0.25,
+    "cd": 0.6
+   },
+   "outputs": {
+    "squirt_ft": {
+     "value": 3.0,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "septic-lpp-squirt-head",
+   "source_publisher": "Utah State University (Utah Water Research Laboratory)",
+   "source_title": "Pressure Distribution Systems",
+   "source_edition_or_year": "Revised Draft, May 2024",
+   "source_section_or_page": "text example: 1/4 inch orifice with 2.5 ft squirt = 1.17 gpm",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "per_orifice_gpm": 1.17,
+    "orifice_dia_in": 0.25,
+    "cd": 0.6
+   },
+   "outputs": {
+    "squirt_ft": {
+     "value": 2.5,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
    "tile_id": "septic-lpp-orifice",
    "source_publisher": "Orifice-discharge equation / university extension LPP design guidance",
    "source_title": "cross-check: a 3/16 in orifice flows less per orifice",
@@ -29277,6 +29321,27 @@
    }
   },
   {
+   "tile_id": "rolling-sphere-protection",
+   "source_publisher": "CED Engineering (ElectroQuest)",
+   "source_title": "Strike Terminations for Lightning Protection Systems",
+   "source_edition_or_year": "Ed. 1B, May 2012",
+   "source_section_or_page": "pp. 8-9: NFPA 780 d = sqrt(h(2R - h)) with h 35 ft, R 150 ft at ground level -> approximately 96 ft",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "mast_height_ft": 35,
+    "sphere_radius_ft": 150
+   },
+   "outputs": {
+    "protected_radius_ft": {
+     "value": 96,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
    "tile_id": "fresh-concrete-temp",
    "source_publisher": "ACI 305.1 Hot Weather Concreting (batch heat balance); PCA",
    "source_title": "T = [0.22(Ta Wa + Tc Wc) + Tw Ww + Twa Wwa] / [0.22(Wa + Wc) + Ww + Wwa]",
@@ -29298,6 +29363,32 @@
      "value": 85.8,
      "tolerance": {
       "abs": 0.1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "fresh-concrete-temp",
+   "source_publisher": "Portland Cement Association",
+   "source_title": "Design and Control of Concrete Mixtures (EB001)",
+   "source_edition_or_year": "15th edition, 2011",
+   "source_section_or_page": "Table 16-1B (p. 319): 564 lb cement at 150 F, 282 lb water at 80 F, 3,100 lb aggregate at 80 F -> 95,720 / 1088 = 88.0 F",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "agg_weight_lb": 3100,
+    "agg_temp_f": 80,
+    "cement_weight_lb": 564,
+    "cement_temp_f": 150,
+    "water_weight_lb": 282,
+    "water_temp_f": 80,
+    "agg_moisture_weight_lb": 0
+   },
+   "outputs": {
+    "concrete_temp_f": {
+     "value": 88.0,
+     "tolerance": {
+      "abs": 0.05
      }
     }
    }
@@ -29499,6 +29590,29 @@
    }
   },
   {
+   "tile_id": "water-cement-ratio",
+   "source_publisher": "Portland Cement Association",
+   "source_title": "Design and Control of Concrete Mixtures (EB001)",
+   "source_edition_or_year": "15th edition, 2011",
+   "source_section_or_page": "Ch. 12, Example 2 pozzolan note (p. 250): W / (C + P) = 270 / (643 + 75) = 0.38 by weight",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "water_lb": 270,
+    "cement_lb": 643,
+    "scm_lb": 75,
+    "exposure_class": "f2_s2"
+   },
+   "outputs": {
+    "wcm": {
+     "value": 0.38,
+     "tolerance": {
+      "abs": 0.005
+     }
+    }
+   }
+  },
+  {
    "tile_id": "concrete-yield",
    "source_publisher": "ASTM C138 / AASHTO T121 (concrete yield)",
    "source_title": "yield_ft3 = total_batch_mass / measured_unit_weight; relative_yield = yield_yd3 / design",
@@ -29529,6 +29643,29 @@
      "value": 564.4,
      "tolerance": {
       "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "concrete-yield",
+   "source_publisher": "Portland Cement Association",
+   "source_title": "Design and Control of Concrete Mixtures (EB001)",
+   "source_edition_or_year": "15th edition, 2011",
+   "source_section_or_page": "Ch. 12, Example 2 trial batch (p. 248): 284.23 lb at 141.49 lb/ft^3 -> yield 2.009 ft^3 (2.0 ft^3 design batch)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "total_batch_mass_lb": 284.23,
+    "measured_unit_weight_lb_ft3": 141.49,
+    "design_volume_yd3": 0.0740740741,
+    "cement_mass_lb": 47.63
+   },
+   "outputs": {
+    "yield_ft3": {
+     "value": 2.009,
+     "tolerance": {
+      "abs": 0.0005
      }
     }
    }
@@ -31024,6 +31161,82 @@
    }
   },
   {
+   "tile_id": "attic-ventilation",
+   "source_publisher": "Gibraltar Building Products (Air Vent formula)",
+   "source_title": "How Much Attic Ventilation Do I Need for My Attic?",
+   "source_edition_or_year": "undated help-center article",
+   "source_section_or_page": "1,200 ft^2 at 1/150 -> 8 ft^2; 576 in^2 each side; 576 / 18 in^2 per ft = 32 ft of ridge vent; 576 / 56 in^2 = 10.2, rounded up to 11 intake vents",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "attic_floor_area_sqft": 1200,
+    "ratio": "150",
+    "intake_vent_nfa_sqin": 56,
+    "ridge_nfa_per_lf_sqin": 18
+   },
+   "outputs": {
+    "nfa_sqft": {
+     "value": 8,
+     "tolerance": {
+      "abs": 0.005
+     }
+    },
+    "intake_sqin": {
+     "value": 576,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "ridge_lf": {
+     "value": 32,
+     "tolerance": {
+      "abs": 0.05
+     }
+    },
+    "intake_vents": {
+     "value": 11,
+     "tolerance": {
+      "abs": 0
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "attic-ventilation",
+   "source_publisher": "Lomanco",
+   "source_title": "How Many Attic Vents Do I Need?",
+   "source_edition_or_year": "undated web article",
+   "source_section_or_page": "2,000 ft^2 at 1/300 -> 6.67 ft^2, 960 in^2, 480 in^2 each for intake and exhaust",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "attic_floor_area_sqft": 2000,
+    "ratio": "300",
+    "intake_vent_nfa_sqin": 36,
+    "ridge_nfa_per_lf_sqin": 18
+   },
+   "outputs": {
+    "nfa_sqft": {
+     "value": 6.67,
+     "tolerance": {
+      "abs": 0.005
+     }
+    },
+    "nfa_sqin": {
+     "value": 960,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "exhaust_sqin": {
+     "value": 480,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
    "tile_id": "gutter-downspout",
    "source_publisher": "SMACNA / standard residential gutter method",
    "source_title": "Downspouts = ceil((plan area x pitch factor x rainfall/5) / 100 / downspout sq in); gutter by plan area x pitch factor x rainfall (in/hr): 5 in K-style to 5,520, 6 in to 7,960 (1,200 x 1.10 x 5 = 6,600 -> 6 in).",
@@ -31509,6 +31722,61 @@
    }
   },
   {
+   "tile_id": "pull-box-sizing",
+   "source_publisher": "EC&M (Mike Holt)",
+   "source_title": "Taking the Mystery Out of Sizing Pull Boxes and Junction Boxes",
+   "source_edition_or_year": "March 2, 2022",
+   "source_section_or_page": "Example 1: four trade size 3 raceways -> left-to-right straight pull 8 x 3 = 24 in.; between raceways 6 x 3 = 18 in.",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "pull_type": "straight",
+    "largest_raceway_in": 3
+   },
+   "outputs": {
+    "straight_min": {
+     "value": 24,
+     "tolerance": {
+      "abs": 0
+     }
+    },
+    "between": {
+     "value": 18,
+     "tolerance": {
+      "abs": 0
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "pull-box-sizing",
+   "source_publisher": "EC&M (Mike Holt)",
+   "source_title": "Taking the Mystery Out of Sizing Pull Boxes and Junction Boxes",
+   "source_edition_or_year": "March 2, 2022",
+   "source_section_or_page": "Example 2: trade sizes 3 and 2 in the row -> angle pull (6 x 3) + 2 = 20 in.",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "pull_type": "angle",
+    "largest_raceway_in": 3,
+    "other_raceways_in": 2
+   },
+   "outputs": {
+    "angle_min": {
+     "value": 20,
+     "tolerance": {
+      "abs": 0
+     }
+    },
+    "governing": {
+     "value": 20,
+     "tolerance": {
+      "abs": 0
+     }
+    }
+   }
+  },
+  {
    "tile_id": "luminaire-spacing-mh-ratio",
    "source_publisher": "IES luminaire spacing criterion (spacing-to-mounting-height ratio)",
    "source_title": "SMH 1.3, 8 ft above the work plane -> 10.4 ft max spacing; a 9 ft layout is OK",
@@ -31925,6 +32193,34 @@
    }
   },
   {
+   "tile_id": "hvac-equipment-circuit",
+   "source_publisher": "IAEI Magazine (Keith Lofland)",
+   "source_title": "Air-Conditioning Equipment Installations",
+   "source_edition_or_year": "July/August 2017",
+   "source_section_or_page": "Figures 2 and 3: RLA 18.0, fan FLA 1.3 -> MCA (18.0 x 1.25) + 1.3 = 23.8 A (nameplate rounds to 24); MOCP (18.0 x 2.25) + 1.3 = 41.8 -> 40 A",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "compressor_rla_A": 18,
+    "fan_fla_A": 1.3,
+    "installed_breaker_A": 40
+   },
+   "outputs": {
+    "mca_A": {
+     "value": 23.8,
+     "tolerance": {
+      "abs": 0.05
+     }
+    },
+    "mocp_max_A": {
+     "value": 40,
+     "tolerance": {
+      "abs": 0
+     }
+    }
+   }
+  },
+  {
    "tile_id": "run-capacitor-microfarad",
    "source_publisher": "First-principles capacitive reactance; +/-6% run-capacitor tolerance (by name).",
    "source_title": "measured_uf = 1e6 x I / (2 x pi x 60 x V); band = rated x (1 +/- tol%/100). 45 uF, 370 V, 6.2 A -> 44.4 uF, within 42.3-47.7.",
@@ -32185,6 +32481,35 @@
    }
   },
   {
+   "tile_id": "main-disinfection-chlorine",
+   "source_publisher": "AWWA",
+   "source_title": "ANSI/AWWA C651-14, Disinfecting Water Mains",
+   "source_edition_or_year": "2014 (effective February 1, 2015)",
+   "source_section_or_page": "Table 4, 8 in row: 25 mg/L in 100 ft takes 0.054 lb of 100% chlorine or 0.65 gal of 1% solution",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "diameter_in": 8,
+    "length_ft": 100,
+    "dose_mg_l": 25,
+    "product_pct": 1
+   },
+   "outputs": {
+    "available_cl_lb": {
+     "value": 0.054,
+     "tolerance": {
+      "abs": 0.0005
+     }
+    },
+    "liquid_gal": {
+     "value": 0.65,
+     "tolerance": {
+      "abs": 0.005
+     }
+    }
+   }
+  },
+  {
    "tile_id": "well-shock-chlorination",
    "source_publisher": "AWWA A100 / state private-well shock-chlorination guidance (by name).",
    "source_title": "well_volume_gal = 0.0408 x casing^2 x column; bleach_gal = volume x ppm / (1e6 x (bleach% / 100)).",
@@ -32244,6 +32569,29 @@
      "value": 0.095,
      "tolerance": {
       "abs": 0.005
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "well-shock-chlorination",
+   "source_publisher": "Montana DEQ",
+   "source_title": "Fact Sheet SWP-101, Disinfecting Your Water Supply",
+   "source_edition_or_year": "February 2019",
+   "source_section_or_page": "Table 2 and example: 100 ft of water x 1.47 gal per foot of 6 in pipe = 147 gallons",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "casing_diameter_in": 6,
+    "water_column_ft": 100,
+    "target_ppm": 100,
+    "bleach_pct": 6
+   },
+   "outputs": {
+    "well_volume_gal": {
+     "value": 147,
+     "tolerance": {
+      "abs": 0.5
      }
     }
    }
@@ -32561,6 +32909,37 @@
      "value": 91.18,
      "tolerance": {
       "abs": 0.1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "max-circuit-length-for-vd",
+   "source_publisher": "EC&M (Mike Holt)",
+   "source_title": "Don't Let Voltage Drop Get Your System Down",
+   "source_edition_or_year": "June 1, 2004",
+   "source_section_or_page": "6 AWG Cu (26,240 CM), 480 V three-phase, 45 A, 3% (14.4 V), K 12.9 -> (26,240 x 14.4)/(1.732 x 12.9 x 45) = 376 ft",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "source_voltage_v": 480,
+    "target_vd_pct": 3,
+    "current_a": 45,
+    "conductor_cmil": 26240,
+    "k_constant": 12.9,
+    "phases": 3
+   },
+   "outputs": {
+    "vd_target_volts": {
+     "value": 14.4,
+     "tolerance": {
+      "abs": 0.005
+     }
+    },
+    "max_length_ft": {
+     "value": 376,
+     "tolerance": {
+      "abs": 0.5
      }
     }
    }
@@ -36152,6 +36531,27 @@
    }
   },
   {
+   "tile_id": "ashrae-622-ventilation",
+   "source_publisher": "Residential Energy Dynamics (Rick Karg)",
+   "source_title": "ASHRAE 62.2 Morsels, 1",
+   "source_edition_or_year": "web article (62.2-2019/2022 basis)",
+   "source_section_or_page": "Qtot = 0.03 Afloor + 7.5(Nbr + 1): 90 cfm for a 2,000 ft^2 house with three bedrooms",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "floor_area_ft2": 2000,
+    "bedrooms": 3
+   },
+   "outputs": {
+    "q_tot": {
+     "value": 90,
+     "tolerance": {
+      "abs": 0.005
+     }
+    }
+   }
+  },
+  {
    "tile_id": "infiltration-load",
    "source_publisher": "ASHRAE Handbook of Fundamentals (air-side)",
    "source_title": "56.5 cfm at 70 F heating, no latent -> 4,271 Btu/h sensible",
@@ -39251,6 +39651,40 @@
     },
     "standard_feeder_ocpd_a": {
      "value": 110,
+     "tolerance": {
+      "abs": 0
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "multi-motor-feeder",
+   "source_publisher": "EC&M (Mike Holt)",
+   "source_title": "Motor Calculations, Part 2: Feeders",
+   "source_edition_or_year": "May 1, 2004 (2002 NEC)",
+   "source_section_or_page": "Example 3: 28 A and 17 A motors, 70 A largest branch device -> feeder (28 x 1.25) + 17 = 52 A; protection 70 + 17 = 87 A -> 80 A breaker",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "largest_flc_a": 28,
+    "sum_other_flc_a": 17,
+    "largest_branch_ocpd_a": 70
+   },
+   "outputs": {
+    "min_feeder_ampacity_a": {
+     "value": 52,
+     "tolerance": {
+      "abs": 0.05
+     }
+    },
+    "max_feeder_ocpd_a": {
+     "value": 87,
+     "tolerance": {
+      "abs": 0.05
+     }
+    },
+    "standard_feeder_ocpd_a": {
+     "value": 80,
      "tolerance": {
       "abs": 0
      }
@@ -50637,6 +51071,43 @@
    }
   },
   {
+   "tile_id": "rc-beam-flexure",
+   "source_publisher": "University of Memphis",
+   "source_title": "University of Memphis CIVL 4135 course notes, Ch. 5",
+   "source_edition_or_year": "ACI 318-08 basis",
+   "source_section_or_page": "Example 5.10.1 (p. 98): f'c 4 ksi, fy 60 ksi, As 2.35 in^2, b 10, d 23 -> a 4.15 in, Mn 246 kip-ft, phi Mn 0.9 x 246 = 221.4 kip-ft",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "fc": 4000,
+    "fy": 60000,
+    "as_in2": 2.35,
+    "b": 10,
+    "d": 23,
+    "mu": 200
+   },
+   "outputs": {
+    "a_in": {
+     "value": 4.15,
+     "tolerance": {
+      "abs": 0.005
+     }
+    },
+    "mn_kipft": {
+     "value": 246,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "phi_mn": {
+     "value": 221.4,
+     "tolerance": {
+      "abs": 0.15
+     }
+    }
+   }
+  },
+  {
    "tile_id": "rc-beam-shear",
    "source_publisher": "ACI 318-19 (Building Code Requirements for Structural Concrete)",
    "source_title": "12x21.5 beam on 4,000 psi, Vu 40 kip -> phi Vc 24.5 kip, stirrups required, #3 at 13.7 in computed, d/2 = 10.75 in governs",
@@ -50817,6 +51288,90 @@
    }
   },
   {
+   "tile_id": "rc-development-length",
+   "source_publisher": "University of Memphis",
+   "source_title": "University of Memphis CIVL 4135 course notes, Ch. 10",
+   "source_edition_or_year": "ACI 318-08 12.2.3 (318-19 25.4.2.4 with psi_g 1.0 for Grade 60)",
+   "source_section_or_page": "Example 10.7A (p. 201): #7 top bar, psi_t 1.3, (cb + Ktr)/db 2.06 -> ld = 39.3 in",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "fc": 4000,
+    "fy": 60000,
+    "db": 0.875,
+    "psi_t": 1.3,
+    "psi_e": 1,
+    "psi_s": 1,
+    "psi_g": 1,
+    "lambda": 1,
+    "conf": 2.06
+   },
+   "outputs": {
+    "ld_in": {
+     "value": 39.3,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "rc-development-length",
+   "source_publisher": "University of Memphis",
+   "source_title": "University of Memphis CIVL 4135 course notes, Ch. 10",
+   "source_edition_or_year": "ACI 318-08 12.2.3",
+   "source_section_or_page": "Example 10.7A alternative I (Ktr = 0): (cb + Ktr)/db 1.5 -> ld = 54 in",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "fc": 4000,
+    "fy": 60000,
+    "db": 0.875,
+    "psi_t": 1.3,
+    "psi_e": 1,
+    "psi_s": 1,
+    "psi_g": 1,
+    "lambda": 1,
+    "conf": 1.5
+   },
+   "outputs": {
+    "ld_in": {
+     "value": 54,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "rc-development-length",
+   "source_publisher": "University of Memphis",
+   "source_title": "University of Memphis CIVL 4135 course notes, Ch. 10",
+   "source_edition_or_year": "ACI 318-08 12.2.3",
+   "source_section_or_page": "Example 10.8 (p. 205): #11 top bar, (cb + Ktr)/db 2.33 -> ld = 56 in",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "fc": 4000,
+    "fy": 60000,
+    "db": 1.41,
+    "psi_t": 1.3,
+    "psi_e": 1,
+    "psi_s": 1,
+    "psi_g": 1,
+    "lambda": 1,
+    "conf": 2.33
+   },
+   "outputs": {
+    "ld_in": {
+     "value": 56,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
    "tile_id": "soil-bearing-capacity",
    "source_publisher": "Das, Principles of Foundation Engineering / FHWA-NHI-16-009 (GEC 6)",
    "source_title": "6 ft strip footing, 4 ft deep, phi 32 sand at 120 pcf -> Nq 23.18 / Nc 35.49 / Ngamma 30.21, qu 22.0 ksf, 7.3 ksf allowable at FS 3",
@@ -50914,6 +51469,43 @@
     },
     "q_all": {
      "value": 4209.4,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "soil-bearing-capacity",
+   "source_publisher": "FHWA",
+   "source_title": "Geotechnical Engineering Circular No. 6, Shallow Foundations (FHWA-SA-02-054)",
+   "source_edition_or_year": "2002",
+   "source_section_or_page": "Table 5-1 (from AASHTO 1996), phi = 32: Nc 35.5, Nq 23.2, N-gamma 30.2 (N-gamma = 2(Nq + 1) tan phi, Eq. 5-8)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "phi": 32,
+    "gamma": 120,
+    "b_ft": 6,
+    "df_ft": 4,
+    "shape": "strip",
+    "fs": 3
+   },
+   "outputs": {
+    "nc": {
+     "value": 35.5,
+     "tolerance": {
+      "abs": 0.05
+     }
+    },
+    "nq": {
+     "value": 23.2,
+     "tolerance": {
+      "abs": 0.05
+     }
+    },
+    "ngamma": {
+     "value": 30.2,
      "tolerance": {
       "abs": 0.05
      }
@@ -111937,6 +112529,42 @@
      "value": 21.56,
      "tolerance": {
       "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "assembly-r-value",
+   "source_publisher": "Continuous Insulation Council (Timothy Ahrenholz)",
+   "source_title": "Continuous Insulation Solves Energy Code Math Problem",
+   "source_edition_or_year": "April 10, 2018",
+   "source_section_or_page": "2x4 SPF (R-4.375) wall, R-13 cavity, films 0.17 + 0.68, stucco 0.08 + CI 7.5 + two 5/8 in gypsum 0.56 (finish 8.70), 25% framing -> framing path R-13.925, cavity path R-22.55, U 0.051",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "cavity_r": 13,
+    "stud_depth_in": 3.5,
+    "framing_factor": 0.25,
+    "air_films_r": 0.85,
+    "finish_layers_r": 8.7
+   },
+   "outputs": {
+    "r_framing_path": {
+     "value": 13.925,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "r_cavity_path": {
+     "value": 22.55,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "u_assembly": {
+     "value": 0.051,
+     "tolerance": {
+      "abs": 0.0005
      }
     }
    }

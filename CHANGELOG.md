@@ -6,6 +6,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Changed
 
+- **Seventeen more tiles now carry a publisher's printed worked example**, each re-run inside the printed rounding:
+  - **Electrical, from EC&M (Mike Holt) and IAEI Magazine:** `pull-box-sizing`, `hvac-equipment-circuit` (MCA 23.8 A, 40 A maximum OCPD), `max-circuit-length-for-vd` (376 ft, three-phase), `multi-motor-feeder` (52 A feeder, 87 A limit, 80 A breaker).
+  - **Concrete:** `fresh-concrete-temp`, `concrete-yield`, `water-cement-ratio` (PCA *Design and Control of Concrete Mixtures*, 15th ed.); `rc-beam-flexure` and `rc-development-length` (University of Memphis CIVL 4135 examples).
+  - **Geotechnical:** `soil-bearing-capacity` (FHWA GEC 6 Table 5-1 bearing factors).
+  - **Water:** `well-shock-chlorination` (Montana DEQ), `main-disinfection-chlorine` (AWWA C651-14 Table 4), `septic-lpp-squirt-head` (Utah State pressure-distribution tables).
+  - **Building:** `ashrae-622-ventilation`, `attic-ventilation` (Gibraltar/Air Vent and Lomanco), `assembly-r-value` (Continuous Insulation Council parallel-path example), `rolling-sphere-protection` (NFPA 780 formula, CED Engineering example).
+
+  README: 1,351 of 2,183 tiles are checked only against the project's own derivation (786 from first principles, 565 by a named method); 832 carry an outside source.
 - **Nineteen more tiles now carry a publisher's printed worked example**, each re-run inside the printed rounding:
   - **AISC Design Examples v15.1:** `steel-beam-flexure` (F.1-1B), `steel-beam-shear` (G.1B), `steel-column-capacity` (E.1D at Fy 50 and 65), `bolt-shear-bearing` (II.A-19A, K.6), `column-base-plate` (J.6), `shear-stud-strength` (I.2), `bolt-group-eccentric` (II.A-25, elastic method).
   - **FEMA P-2192 NEHRP design examples (ASCE 7-22):** `seismic-base-shear` (Sections 7.4.1 and 7.5), `seismic-vertical-distribution` (Table 7-6).
