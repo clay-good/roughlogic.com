@@ -66,6 +66,18 @@ test("EN.6 glycol-mix: burst mode lower concentrate than freeze; penalty present
   assert.ok(f.heat_transfer_penalty_pct > 0);
 });
 
+test("EN.6 glycol-mix: penalty is the Dow specific-heat drop at 50 F, and propylene loses less than ethylene", () => {
+  // DOWFROST cp 0.877 and DOWTHERM SR-1 cp 0.821 Btu/lb-F at 40% by volume, 50 F.
+  // Target -7 F sits on the propylene curve's 40% row; ethylene reaches 40% near -9 F.
+  const pg = computeGlycolMix({ system_volume_gal: 100, target_burst_F: -7, glycol_type: "propylene" });
+  assert.ok(Math.abs(pg.glycol_percent - 40) < 1e-9);
+  assert.ok(Math.abs(pg.heat_transfer_penalty_pct - 12.3) < 1e-9, `PG 40%: ${pg.heat_transfer_penalty_pct}`);
+  const eg = computeGlycolMix({ system_volume_gal: 100, target_burst_F: -12, glycol_type: "ethylene" });
+  assert.ok(Math.abs(eg.glycol_percent - 40) < 1e-9);
+  assert.ok(Math.abs(eg.heat_transfer_penalty_pct - 17.9) < 1e-9, `EG 40%: ${eg.heat_transfer_penalty_pct}`);
+  assert.ok(pg.heat_transfer_penalty_pct < eg.heat_transfer_penalty_pct);
+});
+
 // EN.7 snow-load: Ps = Cs*Pf (Cs default 1 -> Ps = Pf); drift >= 0.
 test("EN.7 snow-load: Ps = Cs*Pf, default Cs=1 reproduces Pf; drift >= 0", () => {
   assert.strictEqual(computeSnowLoad({ Pg_psf: 30 }).Ps_psf, 21);

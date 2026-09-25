@@ -1136,6 +1136,20 @@ export const GLYCOL_FREEZE_CURVES = {
   ],
 };
 
+// Specific-heat reduction vs water at 50 degF, percent, by glycol volume
+// percent: DOWFROST cp 0.913 / 0.877 / 0.835 and DOWTHERM SR-1 cp 0.865 /
+// 0.821 / 0.776 Btu/lb-degF at 30 / 40 / 50%.
+const GLYCOL_CP_DROP_PCT = {
+  propylene: [[0, 0], [30, 8.7], [40, 12.3], [50, 16.5]],
+  ethylene: [[0, 0], [30, 13.5], [40, 17.9], [50, 22.4]],
+};
+function _interpPenalty(pts, x) {
+  let i = 1;
+  while (i < pts.length - 1 && x > pts[i][0]) i++;
+  const [x0, y0] = pts[i - 1], [x1, y1] = pts[i];
+  return y0 + (x - x0) * (y1 - y0) / (x1 - x0);
+}
+
 export const GLYCOL_ATTRIBUTION = {
   propylene: "Dow Dowfrost technical bulletin (typical curve)",
   ethylene: "Dow Dowtherm SR-1 technical bulletin (typical curve)",
@@ -1170,10 +1184,13 @@ export function computeGlycolMix({ system_volume_gal = 0, target_burst_F = 32, g
   const freeze_percent = percent;
   if (protection_mode === "burst") percent = freeze_percent * 0.7;
   const concentrate_gal = system_volume_gal * (percent / 100);
-  // Heat-transfer penalty: the mix's specific heat is below water's, roughly
-  // ~0.6% per percent glycol (propylene runs higher than ethylene). Reported
-  // as an approximate fractional reduction in heat-carrying capacity.
-  const heat_transfer_penalty_pct = percent * (glycol_type === "propylene" ? 0.6 : 0.5);
+  // Heat-transfer penalty: the mix's specific heat below water's at 50 degF,
+  // interpolated from the Dow saturation-property tables (DOWFROST and
+  // DOWTHERM SR-1 TDS, 30/40/50% by volume; linear past 50%). Until
+  // 2026-09-24 this was 0.6% per percent for propylene and 0.5 for ethylene,
+  // which doubled propylene's loss and ranked it BELOW ethylene -- propylene
+  // solutions keep more specific heat than ethylene at the same strength.
+  const heat_transfer_penalty_pct = _interpPenalty(GLYCOL_CP_DROP_PCT[glycol_type], percent);
   return {
     glycol_percent: percent,
     freeze_percent,
@@ -1417,7 +1434,7 @@ export function renderGlycolMix(inputRegion, outputRegion, citationEl) {
     if (r.error) { oP.textContent = r.error; oC.textContent = "-"; oH.textContent = "-"; oA.textContent = "-"; return; }
     oP.textContent = fmt(r.glycol_percent, 1) + " % (" + r.protection_mode + ")";
     oC.textContent = fmt(r.concentrate_gal, 1) + " gal";
-    oH.textContent = "~" + fmt(r.heat_transfer_penalty_pct, 1) + "% lower heat-carrying capacity vs water";
+    oH.textContent = "~" + fmt(r.heat_transfer_penalty_pct, 1) + "% lower specific heat than water (Dow data at 50 °F)";
     oA.textContent = r.attribution;
   }, DEBOUNCE_MS);
   for (const el of [sv.input, tb.input, gt.select, pm.select]) el.addEventListener("input", update);
