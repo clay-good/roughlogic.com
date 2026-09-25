@@ -45,7 +45,7 @@ The pipeline never runs in production. It runs in CI on a tiered schedule per sp
 - `data/electrical/nema-mg1-code-letters.json` (v7) — NEMA MG-1 code-letter starting kVA per HP. Cited by NEMA MG-1 by name only. Annual recheck.
 - `data/electrical/dwelling-demand.json` (v7) — Dwelling demand-factor parameters (NEC 2023 Article 220). Numeric thresholds only. Annual recheck.
 - `data/historical/commodities/*.json` (v4, utility 233) — BLS PPI / EIA / USDA NASS / FRED public federal series (copper WPU10250115, aluminum WPU102301, structural steel WPU101707, rebar WPU101706, framing lumber WPU081, OSB WPU0832, drywall WPU1322, asphalt WPU0581, diesel PET.EMD_EPD2D_PTE_NUS_DPG.M, gasoline PET.EMM_EPMR_PTE_NUS_DPG.M, natural gas NG.N3050US3.M, wheat WHEAT - PRICE RECEIVED, MEASURED IN $ / BU, corn CORN, GRAIN - PRICE RECEIVED, MEASURED IN $ / BU, soybeans SOYBEANS - PRICE RECEIVED, MEASURED IN $ / BU). Series IDs reproduced verbatim; agency prose not reproduced. Build fails if any shard's latest point is more than 30 days behind the build date. Monthly recheck during the build.
-- `data/construction/aci-211-curves.json` (v3) — ACI 211 published curve points cited by name only.
+- `data/construction/aci-211-curves.json` (v3) — ACI 211.1-91 Table 6.3.4(a) non-air-entrained w/c (interior) and Table 6.3.3 mixing water; exposure rows project-conservative.
 - `data/construction/bolt-grades.json` (v3) — ASTM / SAE proof-load benchmarks cited by name only.
 - `data/construction/sfm-table.json` (v3) — Engineering consensus speeds and feeds (Machinery's Handbook equivalent values).
 - `data/construction/aws-deposition.json` (v3) — AWS deposition-efficiency benchmarks cited by name only.

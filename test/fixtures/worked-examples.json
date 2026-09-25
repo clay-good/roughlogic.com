@@ -2747,11 +2747,11 @@
   {
    "tile_id": "concrete-mix-design",
    "source_publisher": "ACI",
-   "source_title": "4000 psi interior mix, 1 in max aggregate, 4 in slump",
-   "source_edition_or_year": "ACI 211 typical values (water content / w-c ratio tables)",
-   "source_section_or_page": "wc = 0.48; water = 325 lb/yd^3 (1 in agg, 4 in slump baseline); cement = 325 / 0.48 = 677 lb/yd^3 = 7.2 bags; coarse = 1700; fine = 4000 - 325 - 677 - 1700 = 1298 lb/yd^3",
+   "source_title": "4000 psi interior (non-air-entrained) mix, 1 in max aggregate, 4 in slump",
+   "source_edition_or_year": "ACI 211.1-91 Table 6.3.4(a) (w/c by strength) and Table 6.3.3 (mixing water)",
+   "source_section_or_page": "wc = 0.57 (non-air-entrained, 4000 psi); water = 325 lb/yd^3 (1 in agg, 3-4 in slump); cement = 325 / 0.57 = 570 lb/yd^3 = 6.07 bags; coarse = 1700; fine = 4000 - 325 - 570 - 1700 = 1405 lb/yd^3",
    "verified_by": "rl",
-   "verified_on": "2026-05-11",
+   "verified_on": "2026-09-24",
    "inputs": {
     "strength_psi": 4000,
     "exposure": "interior",
@@ -2760,7 +2760,7 @@
    },
    "outputs": {
     "wc_ratio": {
-     "value": 0.48,
+     "value": 0.57,
      "tolerance": {
       "abs": 1e-09
      }
@@ -2772,13 +2772,13 @@
      }
     },
     "cement_lb_yd3": {
-     "value": 677.08,
+     "value": 570.18,
      "tolerance": {
       "pct": 0.5
      }
     },
     "cement_bags_yd3": {
-     "value": 7.2,
+     "value": 6.07,
      "tolerance": {
       "pct": 0.5
      }
@@ -2790,7 +2790,7 @@
      }
     },
     "fine_lb_yd3": {
-     "value": 1297.92,
+     "value": 1404.82,
      "tolerance": {
       "pct": 0.5
      }

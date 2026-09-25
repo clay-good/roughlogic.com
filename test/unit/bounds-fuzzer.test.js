@@ -9112,14 +9112,14 @@ test("bounds: calc-construction computeMortarMix pins bags = ceil((count/yield)*
 
 test("bounds: calc-construction computeConcreteMixDesign pins ACI-211 wc interpolation + water-by-aggregate + slump correction", () => {
   const r = computeConcreteMixDesign({ strength_psi: 4000, exposure: "interior", max_aggregate_in: 1, slump_in: 4 });
-  // wc at 4000 interior = 0.48 exact.
-  assert.strictEqual(r.wc_ratio, 0.48);
+  // wc at 4000 interior = 0.57 exact (ACI 211.1 Table 6.3.4(a), non-air-entrained).
+  assert.strictEqual(r.wc_ratio, 0.57);
   // water at 1" aggregate = 325 lb/yd^3; slump 4 -> no correction.
   assert.strictEqual(r.water_lb_yd3, 325);
-  assert.ok(Math.abs(r.cement_lb_yd3 - 325 / 0.48) < 1e-9);
-  assert.ok(Math.abs(r.cement_bags_yd3 - (325 / 0.48) / 94) < 1e-9);
+  assert.ok(Math.abs(r.cement_lb_yd3 - 325 / 0.57) < 1e-9);
+  assert.ok(Math.abs(r.cement_bags_yd3 - (325 / 0.57) / 94) < 1e-9);
   assert.strictEqual(r.coarse_lb_yd3, 1700);
-  assert.ok(Math.abs(r.fine_lb_yd3 - Math.max(0, 4000 - 325 - 325 / 0.48 - 1700)) < 1e-9);
+  assert.ok(Math.abs(r.fine_lb_yd3 - Math.max(0, 4000 - 325 - 325 / 0.57 - 1700)) < 1e-9);
   // Slump correction: > 4 in adds 6 lb/yd³ per inch.
   const sl = computeConcreteMixDesign({ strength_psi: 4000, exposure: "interior", max_aggregate_in: 1, slump_in: 6 });
   assert.strictEqual(sl.water_lb_yd3, 325 + 12);

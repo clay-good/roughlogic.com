@@ -401,15 +401,16 @@ const GEOTHERMAL_SOIL_DATA = {
 
 // v3 construction shards.
 const ACI_211_CURVES = {
-  source: "ACI 211 published curve points (cited by name only). Values are interpolated public-domain reference points for water-to-cement ratio by target strength and exposure class.",
+  source: "ACI 211.1-91 Table 6.3.4(a) (interior: non-air-entrained w/c by 28-day strength) and Table 6.3.3 (mixing water, 3 to 4 in slump). The exposure rows are project-conservative values below both Table 6.3.4(a) columns.",
   points: {
-    interior: { 2500: 0.65, 3000: 0.58, 3500: 0.52, 4000: 0.48, 5000: 0.40, 6000: 0.36 },
+    interior: { 2000: 0.82, 3000: 0.68, 4000: 0.57, 5000: 0.48, 6000: 0.41 },
     freeze_thaw: { 2500: 0.50, 3000: 0.48, 3500: 0.45, 4000: 0.42, 5000: 0.38, 6000: 0.34 },
     marine: { 2500: 0.45, 3000: 0.45, 3500: 0.42, 4000: 0.40, 5000: 0.38, 6000: 0.34 },
     sulfate: { 2500: 0.50, 3000: 0.45, 3500: 0.42, 4000: 0.40, 5000: 0.38, 6000: 0.34 },
   },
   water_lb_yd3_by_max_aggregate_in: { "0.375": 385, "0.5": 365, "0.75": 340, "1": 325, "1.5": 300, "2": 285 },
-  notes: "Simplified mix design. A submittal-grade mix requires the full ACI 211 procedure.",
+  water_lb_yd3_air_entrained_by_max_aggregate_in: { "0.375": 340, "0.5": 325, "0.75": 305, "1": 295, "1.5": 275, "2": 265 },
+  notes: "Simplified mix design. A submittal-grade mix requires the full ACI 211 procedure. Freeze-thaw mixes are air-entrained and take the air-entrained water row.",
 };
 
 const BOLT_GRADES_DATA = {

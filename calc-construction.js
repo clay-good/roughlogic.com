@@ -1605,10 +1605,15 @@ export const mortarMixExample = { inputs: { unit_count: 600, unit_kind: "brick",
 
 // --- Utility 152: Concrete Mix Design (Simplified, ACI 211 style) ---
 //
-// w/c interpolation by strength and exposure. Public-domain ACI 211 curve points.
+// w/c interpolation by strength and exposure. Interior is ACI 211.1-91 Table
+// 6.3.4(a), non-air-entrained. Until 2026-09-24 the interior row held that
+// table's AIR-ENTRAINED column (0.48 at 4000 psi, not 0.57) beside the
+// non-air-entrained water content, so cement read 677 lb/yd^3 instead of 570.
+// The exposure rows are stricter than both columns and stay as they were;
+// freeze-thaw concrete is air-entrained and takes the air-entrained water.
 
 export const ACI_211_W_C = {
-  interior: { 2500: 0.65, 3000: 0.58, 3500: 0.52, 4000: 0.48, 5000: 0.40, 6000: 0.36 },
+  interior: { 2000: 0.82, 3000: 0.68, 4000: 0.57, 5000: 0.48, 6000: 0.41 },
   freeze_thaw: { 2500: 0.50, 3000: 0.48, 3500: 0.45, 4000: 0.42, 5000: 0.38, 6000: 0.34 },
   marine: { 2500: 0.45, 3000: 0.45, 3500: 0.42, 4000: 0.40, 5000: 0.38, 6000: 0.34 },
   sulfate: { 2500: 0.50, 3000: 0.45, 3500: 0.42, 4000: 0.40, 5000: 0.38, 6000: 0.34 },
@@ -1634,10 +1639,13 @@ export function computeConcreteMixDesign({ strength_psi = 3000, exposure = "inte
       }
     }
   }
-  // Water content from slump and max aggregate (public ACI 211 typical values, lb/yd^3).
-  const waterByAgg = { 0.375: 385, 0.5: 365, 0.75: 340, 1: 325, 1.5: 300, 2: 285 };
+  // Water content from slump and max aggregate: ACI 211.1 Table 6.3.3, 3 to 4 in
+  // slump, lb/yd^3 -- the air-entrained row for freeze-thaw concrete.
+  const waterByAgg = exposure === "freeze_thaw"
+    ? { 0.375: 340, 0.5: 325, 0.75: 305, 1: 295, 1.5: 275, 2: 265 }
+    : { 0.375: 385, 0.5: 365, 0.75: 340, 1: 325, 1.5: 300, 2: 285 };
   const sizes = Object.keys(waterByAgg).map((k) => Number(k)).sort((a, b) => a - b);
-  let baseWater = 325;
+  let baseWater = waterByAgg[1];
   for (let i = 0; i < sizes.length; i++) if (max_aggregate_in <= sizes[i]) { baseWater = waterByAgg[sizes[i]]; break; }
   // Slump correction: +6 lb/in over 4 in baseline.
   const water_lb_yd3 = baseWater + Math.max(0, slump_in - 4) * 6;
@@ -2096,7 +2104,7 @@ const renderMortarMix = _simpleRenderer({
 });
 
 const renderConcreteMixDesign = _simpleRenderer({
-  citation: "Notice: Simplified mix design. A submittal-grade mix requires the full ACI 211 procedure. Citation: ACI 211 by name only; values are interpolated public-domain points.",
+  citation: "Notice: Simplified mix design. A submittal-grade mix requires the full ACI 211 procedure. Citation: ACI 211.1-91 Table 6.3.4(a) (interior w/c, non-air-entrained) and Table 6.3.3 (mixing water; air-entrained for freeze-thaw), interpolated; the exposure rows are project-conservative values below both columns.",
   example: concreteMixDesignExample.inputs,
   fields: [
     { key: "strength_psi", label: "Target strength (psi)", kind: "number" },

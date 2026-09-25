@@ -80,7 +80,18 @@ test("Mortar: joint factor returned", () => { const r = computeMortarMix({ unit_
 test("Mortar: small count rounds up", () => { const r = computeMortarMix({ unit_count: 1, unit_kind: "brick", joint_in: 0.375, mortar_type: "N" }); assert.equal(r.bags, 1); });
 
 // 152 Concrete mix
-test("Mix design: example yields w/c ~ 0.48", () => { const r = computeConcreteMixDesign(concreteMixDesignExample.inputs); assert.ok(close(r.wc_ratio, 0.48, 0.01)); });
+test("Mix design: example yields w/c 0.57 (ACI 211.1 Table 6.3.4(a), non-air-entrained 4000 psi)", () => { const r = computeConcreteMixDesign(concreteMixDesignExample.inputs); assert.ok(close(r.wc_ratio, 0.57, 1e-9)); });
+test("Mix design: interior is the non-air-entrained column of ACI 211.1 Table 6.3.4(a)", () => {
+  // Air-entrained 4000 psi is 0.48 -- the value this row held until 2026-09-24.
+  assert.deepEqual(ACI_211_W_C.interior, { 2000: 0.82, 3000: 0.68, 4000: 0.57, 5000: 0.48, 6000: 0.41 });
+});
+test("Mix design: freeze-thaw concrete is air-entrained and takes Table 6.3.3's air-entrained water", () => {
+  const ft = computeConcreteMixDesign({ strength_psi: 4000, exposure: "freeze_thaw", max_aggregate_in: 1, slump_in: 4 });
+  const ms = computeConcreteMixDesign({ strength_psi: 4000, exposure: "marine", max_aggregate_in: 1, slump_in: 4 });
+  assert.equal(ft.water_lb_yd3, 295);
+  assert.equal(ms.water_lb_yd3, 325);
+  assert.equal(computeConcreteMixDesign({ strength_psi: 4000, exposure: "freeze_thaw", max_aggregate_in: 0.75, slump_in: 4 }).water_lb_yd3, 305);
+});
 test("Mix design: marine has lower w/c than interior", () => { const a = computeConcreteMixDesign({ strength_psi: 4000, exposure: "interior", max_aggregate_in: 1, slump_in: 4 }); const b = computeConcreteMixDesign({ strength_psi: 4000, exposure: "marine", max_aggregate_in: 1, slump_in: 4 }); assert.ok(b.wc_ratio <= a.wc_ratio); });
 test("Mix design: unknown exposure errors", () => { const r = computeConcreteMixDesign({ strength_psi: 4000, exposure: "x", max_aggregate_in: 1, slump_in: 4 }); assert.ok(r.error); });
 test("Mix design: low strength errors", () => { const r = computeConcreteMixDesign({ strength_psi: 1000, exposure: "interior", max_aggregate_in: 1, slump_in: 4 }); assert.ok(r.error); });

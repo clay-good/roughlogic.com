@@ -144,7 +144,7 @@ A standard the tiles cite but no shard holds data from has no manifest to appear
 
 ### data/construction/aci-211-curves.json (v3)
 
-- Source: ACI 211 published curve points (cited by name only). Interpolated public-domain reference points for water-to-cement ratio by target strength and exposure class.
+- Source: ACI 211.1-91 Table 6.3.4(a) (interior: non-air-entrained w/c by strength) and Table 6.3.3 (mixing water, non-air and air-entrained). Until 2026-09-24 the interior row held the air-entrained w/c column beside non-air-entrained water. The freeze-thaw, marine and sulfate rows are project-conservative values below both columns.
 - License: Cited by name; values are engineering reference points.
 - Cadence: Annual review.
 
