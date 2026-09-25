@@ -102,7 +102,7 @@ Used cautiously and only when the manufacturer's technical bulletin permits redi
 
 The v2 expansion (utilities 65 through 124, per spec-v2.md) introduces additional datasets, all under the same four-condition rule:
 
-- Standard residential demand factors (`data/electrical/demand-factors.json`) and lighting power density benchmarks (`data/electrical/lighting-density.json`). NEC sections 220.42, 220.54, 220.55, and 220.82 and ASHRAE 90.1 are referenced by section or name only; no table text is bundled.
+- Standard residential demand factors (`data/electrical/demand-factors.json`) and lighting power densities (`data/electrical/lighting-density.json`). NEC sections 220.42, 220.54, 220.55, and 220.82 are referenced by section only. The lighting shard carries six numeric values from IECC 2021 Table C405.3.2(1), not its table text.
 - Pipe thermal expansion coefficients (`data/plumbing/material-expansion.json`) and septic sizing rules (`data/plumbing/septic-rules.json`). Material-property facts and EPA / state-published rules.
 - Refrigerant charge per foot (`data/hvac/charge-per-foot.json`), fitting equivalent lengths (`data/hvac/equivalent-lengths.json`), and insulation conductivity (`data/hvac/insulation.json`). Manufacturer-attributed where applicable; engineering-practice consensus values otherwise.
 - HEPA loading rates (`data/restoration/hepa-loading.json`). Manufacturer technical bulletin values.

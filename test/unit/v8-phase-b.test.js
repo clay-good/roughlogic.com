@@ -68,9 +68,9 @@ test("B.1 egc-sizing cites NEC 2023 Table 250.122", async () => {
   const t = await readCalc("calc-electrical.js");
   assertCitationContains(t, ["NEC 2023 Table 250.122", "nfpa.org/freeaccess"], "egc-sizing");
 });
-test("B.1 lighting-density cites ASHRAE 90.1-2022 Table 9.5.1", async () => {
+test("B.1 lighting-density cites IECC 2021 Table C405.3.2(1) = ASHRAE 90.1-2019 Table 9.5.1", async () => {
   const t = await readCalc("calc-electrical.js");
-  assertCitationContains(t, ["ASHRAE 90.1-2022 Table 9.5.1", "ashrae.org"], "lighting-density");
+  assertCitationContains(t, ["IECC 2021 Table C405.3.2(1)", "ASHRAE 90.1-2019 Table 9.5.1", "codes.iccsafe.org"], "lighting-density");
 });
 test("B.1 gfci-afci-reference cites NEC 2023 §210.8 / §210.12 / §406.4", async () => {
   const t = await readCalc("calc-electrical.js");

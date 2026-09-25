@@ -1,9 +1,9 @@
 {
   "name": "electrical",
-  "version": "2026-09-09",
-  "fetched": "2026-09-09",
-  "edition": "NEC 2023 (NFPA 70); IEEE 802.3bt-2018 PoE; ANSI/IEEE C57 (transformer step series); NEMA MG-1 (motor code letters); Eaton/Bussmann SPD (point-to-point C-values); manufacturer cable specs as of 2026-09-02.",
-  "asOf": "2026-09-09",
+  "version": "2026-09-24",
+  "fetched": "2026-09-24",
+  "edition": "NEC 2023 (NFPA 70); IEEE 802.3bt-2018 PoE; ANSI/IEEE C57 (transformer step series); NEMA MG-1 (motor code letters); IECC 2021 Table C405.3.2(1) (lighting power density); Eaton/Bussmann SPD (point-to-point C-values); manufacturer cable specs as of 2026-09-02.",
+  "asOf": "2026-09-24",
   "refresh_cadence": "annual",
   "shards": [
     {
@@ -33,8 +33,8 @@
     },
     {
       "file": "lighting-density.json",
-      "name": "Lighting power density benchmarks",
-      "gzip_size_bytes": 307
+      "name": "Lighting power densities (IECC 2021 Building Area Method)",
+      "gzip_size_bytes": 362
     },
     {
       "file": "cable-bend-radius.json",
@@ -68,7 +68,7 @@
     "motor-fla.json": "28215fa1458ee5d210d587892ba24e79a20257d661977852256ffbe1661de0af",
     "conduit-fill-tables.json": "f9f57a6fbfd9c5c778e89044911e17006bd538194e956de54f9011eea2b77da8",
     "demand-factors.json": "8f5b31ced991aacda0509bf32e752555f643a411c8d75afc910a576a16275de4",
-    "lighting-density.json": "eadd8967e4ccb108e2de5b882d3b65ae829d314c4b49b4c722d3380125d8c1c8",
+    "lighting-density.json": "dc48ff0b070a8d5dc6c0630dd33edfef687eeb5e96afd1df6002d3a19a43defd",
     "cable-bend-radius.json": "86e27ac2c14c59af068deb4da711526d80dcb4a12ce5c674f84c793eb4be0ba5",
     "poe-classes.json": "19201709b44e5a75f4030329be75a1560da272a17f165caa372ae3849a82def0",
     "conductor-c-values.json": "d791e1bdee6de7266b2bc7b553465ca06c07e0dd29d24d82176fbe596d22cd43",

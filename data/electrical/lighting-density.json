@@ -1,14 +1,12 @@
 {
-  "source": "Public engineering benchmarks for lighting power density (ASHRAE 90.1 referenced by name only).",
+  "source": "IECC 2021 Table C405.3.2(1), Building Area Method (values identical to ASHRAE 90.1-2019 Table 9.5.1), as reprinted in the DOE Building Energy Codes Program 90.1-2019 lighting training.",
   "benchmark_W_per_ft2": {
-    "office": 1,
-    "warehouse": 0.5,
-    "retail": 1.2,
-    "classroom": 1.1,
-    "corridor": 0.5,
-    "industrial": 1.2,
-    "residential": 0.7,
-    "parking_garage": 0.2
+    "office": 0.64,
+    "warehouse": 0.45,
+    "retail": 0.84,
+    "classroom": 0.72,
+    "industrial": 0.82,
+    "parking_garage": 0.18
   },
-  "notes": "Benchmarks for sizing and verification. Specific code-compliance values are governed by the AHJ-adopted edition of the energy code."
+  "notes": "classroom = School/university; industrial = Manufacturing facility. 90.1-2022 lowers several values; the AHJ-adopted edition of the energy code governs."
 }

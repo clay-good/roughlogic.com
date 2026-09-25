@@ -75,8 +75,8 @@ A standard the tiles cite but no shard holds data from has no manifest to appear
 
 ### data/electrical/lighting-density.json (v2)
 
-- Source: Public engineering benchmarks for lighting power density. ASHRAE 90.1 referenced by name only.
-- License: Engineering-practice consensus values; no standard table text is bundled.
+- Source: IECC 2021 Table C405.3.2(1), Building Area Method (values identical to ASHRAE 90.1-2019 Table 9.5.1), as reprinted in the DOE Building Energy Codes Program 90.1-2019 lighting training. Until 2026-09-24 this shard held older, higher benchmarks (office 1.0 W/ft^2 against the code's 0.64).
+- License: Six numeric values; no standard table text is bundled.
 - Cadence: Annual review.
 - Shard layout: Object keyed by occupancy class with W/ft^2 benchmark.
 

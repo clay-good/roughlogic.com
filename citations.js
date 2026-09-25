@@ -1859,13 +1859,13 @@ export const CITATIONS = {
     assumptions: [],
   },
   "lighting-density": {
-    formula: "Total lighting power = area × W/ft² benchmark; benchmarks compared to NEC 2023 Table 220.42(A) unit loads and IECC C405 / ASHRAE 90.1 LPDs.",
-    edition: NEC_2023 + " Table 220.42(A); IECC 2021 Table C405; ASHRAE 90.1-2022 by name.",
+    formula: "Interior lighting power allowance = area × LPD of the building area type (Building Area Method). An energy-code limit on installed lighting, not the NEC Table 220.42(A) unit load used to size the service.",
+    edition: "IECC 2021 Table C405.3.2(1) (values identical to ASHRAE 90.1-2019 Table 9.5.1; 90.1-2022 lowers several, e.g. parking garage 0.18 -> 0.17).",
     freeAccess: NEC_FREE + " IECC free read-only at codes.iccsafe.org. ASHRAE 90.1 read-only at ashrae.org.",
     governance: GOVERNANCE.electrical,
     editionNote: NEC_DISCLOSURE,
     assumptions: [
-      { name: "Benchmark vintage", value: "IECC 2021 / ASHRAE 90.1-2022 LPDs", source: "data/electrical/lighting-density.json" },
+      { name: "LPD edition", value: "IECC 2021 / ASHRAE 90.1-2019 Building Area Method", source: "data/electrical/lighting-density.json" },
     ],
   },
   "pulling-tension": {

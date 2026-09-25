@@ -1149,18 +1149,39 @@ export const gfciReferenceExample = {
 
 // --- Utility 71: Lighting Density (W/ft^2) ---
 //
-// Public engineering benchmarks (cited generally; ASHRAE 90.1 is named
-// without reproducing its tables).
+// Interior lighting power allowance by the Building Area Method: area times
+// the LPD of the building area type, IECC 2021 Table C405.3.2(1), whose
+// values are ASHRAE 90.1-2019 Table 9.5.1's. Until 2026-09-24 this table held
+// older, higher "benchmarks" (office 1.0, retail 1.2, parking 0.2) under a
+// citation to 90.1-2022 Table 9.5.1, so it allowed an office 56% more light
+// than the code it named. 90.1-2022 lowered several types again (parking
+// garage 0.17); the adopted edition governs.
+//
+// Corridor and residential were removed: a corridor is a space type (the
+// Space-by-Space Method), not a building area type, and 90.1 section 9.4.3
+// gives dwelling units a lamp-efficacy requirement, not a W/ft^2 allowance.
 
 export const LIGHTING_DENSITY_W_PER_FT2 = {
-  office: 1.0,
-  warehouse: 0.5,
-  retail: 1.2,
-  classroom: 1.1,
-  corridor: 0.5,
-  industrial: 1.2,
-  residential: 0.7,
-  parking_garage: 0.2,
+  office: 0.64,
+  warehouse: 0.45,
+  retail: 0.84,
+  classroom: 0.72, // School/university
+  industrial: 0.82, // Manufacturing facility
+  parking_garage: 0.18,
+};
+
+const LIGHTING_DENSITY_LABELS = {
+  office: "office",
+  warehouse: "warehouse",
+  retail: "retail",
+  classroom: "school / university",
+  industrial: "manufacturing facility",
+  parking_garage: "parking garage",
+};
+
+const LIGHTING_DENSITY_REMOVED = {
+  corridor: "A corridor is a space type, not a building area type; its allowance comes from the Space-by-Space Method (IECC Table C405.3.2(2)).",
+  residential: "Dwelling units have no W/ft^2 lighting allowance; the energy code sets a lamp-efficacy requirement for them instead.",
 };
 
 // dims: in { area_ft2: L^2, occupancy_class: dimensionless } out: { max_watts: M L^2 T^-3, watts_per_ft2: M L^2 T^-3 L^-2 }
@@ -1168,7 +1189,7 @@ export function computeLightingDensity({ area_ft2, occupancy_class }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const a = Number(area_ft2) || 0;
   const w_per_ft2 = LIGHTING_DENSITY_W_PER_FT2[occupancy_class];
-  if (w_per_ft2 === undefined) return { error: "Unknown occupancy class." };
+  if (w_per_ft2 === undefined) return { error: LIGHTING_DENSITY_REMOVED[occupancy_class] || "Unknown occupancy class." };
   if (a <= 0) return { error: "Area must be positive." };
   const target_W = a * w_per_ft2;
   return { target_W, w_per_ft2, area_ft2: a };
@@ -1176,7 +1197,7 @@ export function computeLightingDensity({ area_ft2, occupancy_class }) {
 
 export const lightingDensityExample = {
   inputs: { area_ft2: 1000, occupancy_class: "office" },
-  expected: { target_W: 1000, w_per_ft2: 1.0 },
+  expected: { target_W: 640, w_per_ft2: 0.64 },
 };
 
 // --- v2 view renderers ---
@@ -1339,15 +1360,15 @@ export function renderGFCIReference(inputRegion, outputRegion, citationEl, param
 
 // dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderLightingDensity(inputRegion, outputRegion, citationEl, params) {
-  citationEl.textContent = "Citation: per ASHRAE 90.1-2022 Table 9.5.1 (lighting power density by occupancy). AHJ governs adopted edition. Free at ashrae.org/technical-resources/standards-and-guidelines/read-only-versions-of-ashrae-standards.";
+  citationEl.textContent = "Citation: per IECC 2021 Table C405.3.2(1), Building Area Method (the same values as ASHRAE 90.1-2019 Table 9.5.1; 90.1-2022 lowers some). AHJ governs adopted edition. Free at codes.iccsafe.org and ashrae.org/technical-resources/standards-and-guidelines/read-only-versions-of-ashrae-standards.";
   attachExampleButton(inputRegion, () => fillExample(lightingDensityExample.inputs));
 
   const area = makeNumber("Area (ft²)", "ld-area", { step: "any", min: "0" });
-  const cls = makeSelect("Occupancy class", "ld-cls", Object.keys(LIGHTING_DENSITY_W_PER_FT2).map((k) => ({ value: k, label: k.replace(/_/g, " ") })));
+  const cls = makeSelect("Occupancy class", "ld-cls", Object.keys(LIGHTING_DENSITY_W_PER_FT2).map((k) => ({ value: k, label: LIGHTING_DENSITY_LABELS[k] })));
   for (const f of [area, cls]) inputRegion.appendChild(f.wrap);
 
-  const oW = makeOutputLine(outputRegion, "Target lighting power", "ld-out-w");
-  const oRate = makeOutputLine(outputRegion, "Benchmark", "ld-out-rate");
+  const oW = makeOutputLine(outputRegion, "Interior lighting power allowance", "ld-out-w");
+  const oRate = makeOutputLine(outputRegion, "Allowance", "ld-out-rate");
 
   function fillExample(v) { area.input.value = v.area_ft2; cls.select.value = v.occupancy_class; update(); }
   const update = debounce(() => {

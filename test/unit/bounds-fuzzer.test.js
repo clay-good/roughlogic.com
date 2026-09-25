@@ -9658,10 +9658,10 @@ test("bounds: calc-electrical computeGFCIReference returns the 6-area bundled NE
   // No rejection path documented (zero-arg reference utility).
 });
 
-test("bounds: calc-electrical computeLightingDensity pins 1000 ft^2 office at 1.0 W/ft^2 = 1000 W + rejects unknown class", () => {
+test("bounds: calc-electrical computeLightingDensity pins 1000 ft^2 office at 0.64 W/ft^2 = 640 W + rejects unknown class", () => {
   const r = computeLightingDensity({ area_ft2: 1000, occupancy_class: "office" });
-  assert.strictEqual(r.target_W, 1000);
-  assert.strictEqual(r.w_per_ft2, 1.0);
+  assert.strictEqual(r.target_W, 640);
+  assert.strictEqual(r.w_per_ft2, 0.64);
   assert.ok("error" in computeLightingDensity({ area_ft2: 1000, occupancy_class: "magic" }));
   assert.ok("error" in computeLightingDensity({ area_ft2: 0, occupancy_class: "office" }));
 });

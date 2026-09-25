@@ -7175,25 +7175,25 @@
   },
   {
    "tile_id": "lighting-density",
-   "source_publisher": "ASHRAE / IECC",
-   "source_title": "Lighting power density (LPD) target: office class ~1.0 W/ft^2",
-   "source_edition_or_year": "IECC 2021 / ASHRAE 90.1-2019 (allowance varies by code edition; project bundles a representative office allowance)",
-   "source_section_or_page": "1000 ft^2 office @ 1.0 W/ft^2 -> 1000 W target lighting load",
+   "source_publisher": "ICC / ASHRAE",
+   "source_title": "Interior lighting power allowances, Building Area Method: Office 0.64 W/ft^2",
+   "source_edition_or_year": "IECC 2021 Table C405.3.2(1) (values identical to ASHRAE 90.1-2019 Table 9.5.1, as reprinted in the DOE Building Energy Codes Program 90.1-2019 lighting training)",
+   "source_section_or_page": "1000 ft^2 office @ 0.64 W/ft^2 -> 640 W interior lighting power allowance",
    "verified_by": "rl",
-   "verified_on": "2026-05-11",
+   "verified_on": "2026-09-24",
    "inputs": {
     "area_ft2": 1000,
     "occupancy_class": "office"
    },
    "outputs": {
     "target_W": {
-     "value": 1000,
+     "value": 640,
      "tolerance": {
       "abs": 1
      }
     },
     "w_per_ft2": {
-     "value": 1,
+     "value": 0.64,
      "tolerance": {
       "abs": 0.01
      }

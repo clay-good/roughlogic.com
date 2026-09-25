@@ -494,7 +494,7 @@ export const BESPOKE_OUTPUT_LABELS = {
   "lexile-band": {"selected":"Selected grade band","bands":"All grades K to 12"},
   "ligation-molar-ratio": {"insert_ng":"Insert mass to add","vector_pmol":"Amounts (pmol)","note":"Note"},
   "lighting-beam": {"beam_diameter_ft":"Beam diameter at target","illuminance_fc":"Center illuminance","candela":"Center intensity","notes":"Notes"},
-  "lighting-density": {"target_W":"Target lighting power","w_per_ft2":"Benchmark"},
+  "lighting-density": {"target_W":"Interior lighting power allowance","w_per_ft2":"Allowance"},
   "lighting-retrofit-savings": {"kw_saved":"Connected load saved","kwh_saved":"Energy saved","energy_usd":"Energy savings","demand_usd":"Demand savings","annual_usd":"Total annual savings","payback_years":"Simple payback","note":"Note"},
   "lighting-throw-for-pool": {"throw_distance":"Throw distance needed","note":"Note"},
   "lighting-uniformity-ratio": {"pass":"Against target"},

@@ -265,22 +265,21 @@ const DEMAND_FACTORS = {
   notes: "AHJ governs final service sizing. Values support estimation and verification only.",
 };
 
-// Lighting power density benchmarks. ASHRAE 90.1 referenced by name
-// only; published table text is not reproduced. Values are widely cited
-// engineering benchmarks.
+// Lighting power densities, Building Area Method: IECC 2021 Table
+// C405.3.2(1), whose values are ASHRAE 90.1-2019 Table 9.5.1's. Six numeric
+// facts, not table text. Until 2026-09-24 this held older, higher
+// "benchmarks" (office 1.0) that the tile cited as 90.1-2022.
 const LIGHTING_DENSITY = {
-  source: "Public engineering benchmarks for lighting power density (ASHRAE 90.1 referenced by name only).",
+  source: "IECC 2021 Table C405.3.2(1), Building Area Method (values identical to ASHRAE 90.1-2019 Table 9.5.1), as reprinted in the DOE Building Energy Codes Program 90.1-2019 lighting training.",
   benchmark_W_per_ft2: {
-    office: 1.0,
-    warehouse: 0.5,
-    retail: 1.2,
-    classroom: 1.1,
-    corridor: 0.5,
-    industrial: 1.2,
-    residential: 0.7,
-    parking_garage: 0.2,
+    office: 0.64,
+    warehouse: 0.45,
+    retail: 0.84,
+    classroom: 0.72,
+    industrial: 0.82,
+    parking_garage: 0.18,
   },
-  notes: "Benchmarks for sizing and verification. Specific code-compliance values are governed by the AHJ-adopted edition of the energy code.",
+  notes: "classroom = School/university; industrial = Manufacturing facility. 90.1-2022 lowers several values; the AHJ-adopted edition of the energy code governs.",
 };
 
 // v3: Cable bend radius (manufacturer-attributed multiples of OD).
@@ -1719,13 +1718,13 @@ const DATASETS = [
       { file: "constants.json", body: PHYSICAL_CONSTANTS, name: "NIST physical constants" },
       { file: "material-properties.json", body: MATERIAL_PROPERTIES, name: "Material properties" },
     ] },
-  { folder: "electrical", edition: "NEC 2023 (NFPA 70); IEEE 802.3bt-2018 PoE; ANSI/IEEE C57 (transformer step series); NEMA MG-1 (motor code letters); Eaton/Bussmann SPD (point-to-point C-values); manufacturer cable specs as of " + EDITION_VERIFIED.electrical + ".", shards: [
+  { folder: "electrical", edition: "NEC 2023 (NFPA 70); IEEE 802.3bt-2018 PoE; ANSI/IEEE C57 (transformer step series); NEMA MG-1 (motor code letters); IECC 2021 Table C405.3.2(1) (lighting power density); Eaton/Bussmann SPD (point-to-point C-values); manufacturer cable specs as of " + EDITION_VERIFIED.electrical + ".", shards: [
       { file: "conductor-properties.json", body: buildConductorProperties(), name: "Conductor properties (AWG)" },
       { file: "ampacity-physics.json", body: AMPACITY_PHYSICS, name: "Ampacity physics methodology" },
       { file: "motor-fla.json", body: MOTOR_FLA, name: "Motor full-load amps" },
       { file: "conduit-fill-tables.json", body: CONDUIT_FILL, name: "Conduit fill data" },
       { file: "demand-factors.json", body: DEMAND_FACTORS, name: "Residential service demand factors" },
-      { file: "lighting-density.json", body: LIGHTING_DENSITY, name: "Lighting power density benchmarks" },
+      { file: "lighting-density.json", body: LIGHTING_DENSITY, name: "Lighting power densities (IECC 2021 Building Area Method)" },
       { file: "cable-bend-radius.json", body: CABLE_BEND_RADIUS, name: "Cable bend radius (manufacturer-attributed)" },
       { file: "poe-classes.json", body: POE_CLASSES_DATA, name: "PoE class budgets and cable resistance" },
       // v7 Group A extension shards (utilities 234-237).

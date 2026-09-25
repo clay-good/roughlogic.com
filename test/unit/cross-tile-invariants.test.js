@@ -10526,7 +10526,7 @@ import { computeInsulationHeatLoss } from "../../calc-hvac.js";
 import { computeLumberSpan } from "../../calc-construction.js";
 import { computePulleyMA } from "../../calc-cross.js";
 
-test("monotonicity: computeLightingDensity target_W = area_ft2 * w_per_ft2 strictly increasing in area at fixed occupancy class (linear pin); occupancy-class density ordering parking_garage 0.2 < warehouse 0.5 < residential 0.7 < office 1.0 < classroom 1.1 < retail 1.2 (ASHRAE 90.1 LPD table); 1000 ft2 office -> 1000 W example pin; 2x area -> 2x watts", () => {
+test("monotonicity: computeLightingDensity target_W = area_ft2 * w_per_ft2 strictly increasing in area at fixed occupancy class (linear pin); occupancy-class density ordering parking_garage 0.18 < warehouse 0.45 < office 0.64 < classroom 0.72 < industrial 0.82 < retail 0.84 (IECC 2021 Table C405.3.2(1)); 1000 ft2 office -> 640 W example pin; 2x area -> 2x watts", () => {
   // Group A. target_W = area * w_per_ft2. Strictly increasing in area.
   let prev = -Infinity;
   for (const area_ft2 of [100, 250, 500, 1000, 2500, 5000]) {
@@ -10540,27 +10540,27 @@ test("monotonicity: computeLightingDensity target_W = area_ft2 * w_per_ft2 stric
   // Occupancy-class density ordering pin (W/ft2 from the bundled LPD table).
   const garage = computeLightingDensity({ area_ft2: 1000, occupancy_class: "parking_garage" });
   const warehouse = computeLightingDensity({ area_ft2: 1000, occupancy_class: "warehouse" });
-  const residential = computeLightingDensity({ area_ft2: 1000, occupancy_class: "residential" });
+  const industrial = computeLightingDensity({ area_ft2: 1000, occupancy_class: "industrial" });
   const office = computeLightingDensity({ area_ft2: 1000, occupancy_class: "office" });
   const classroom = computeLightingDensity({ area_ft2: 1000, occupancy_class: "classroom" });
   const retail = computeLightingDensity({ area_ft2: 1000, occupancy_class: "retail" });
-  assert.equal(garage.w_per_ft2, 0.2);
-  assert.equal(warehouse.w_per_ft2, 0.5);
-  assert.equal(residential.w_per_ft2, 0.7);
-  assert.equal(office.w_per_ft2, 1.0);
-  assert.equal(classroom.w_per_ft2, 1.1);
-  assert.equal(retail.w_per_ft2, 1.2);
-  assert.ok(garage.target_W < warehouse.target_W && warehouse.target_W < residential.target_W
-    && residential.target_W < office.target_W && office.target_W < classroom.target_W
-    && classroom.target_W < retail.target_W,
-    `LPD ordering: ${garage.target_W} < ${warehouse.target_W} < ${residential.target_W} < ${office.target_W} < ${classroom.target_W} < ${retail.target_W}`);
-  // Example pin: 1000 ft2 office -> 1000 W, w_per_ft2 = 1.0.
-  assert.equal(office.target_W, 1000);
+  assert.equal(garage.w_per_ft2, 0.18);
+  assert.equal(warehouse.w_per_ft2, 0.45);
+  assert.equal(office.w_per_ft2, 0.64);
+  assert.equal(classroom.w_per_ft2, 0.72);
+  assert.equal(industrial.w_per_ft2, 0.82);
+  assert.equal(retail.w_per_ft2, 0.84);
+  assert.ok(garage.target_W < warehouse.target_W && warehouse.target_W < office.target_W
+    && office.target_W < classroom.target_W && classroom.target_W < industrial.target_W
+    && industrial.target_W < retail.target_W,
+    `LPD ordering: ${garage.target_W} < ${warehouse.target_W} < ${office.target_W} < ${classroom.target_W} < ${industrial.target_W} < ${retail.target_W}`);
+  // Example pin: 1000 ft2 office -> 640 W, w_per_ft2 = 0.64.
+  assert.equal(office.target_W, 640);
   assert.equal(office.area_ft2, 1000);
   // Linear closed-form pin: target_W = area * w_per_ft2 exact.
   const ref = computeLightingDensity({ area_ft2: 1500, occupancy_class: "retail" });
-  assert.ok(Math.abs(ref.target_W - 1500 * 1.2) < 1e-9,
-    `target_W = ${ref.target_W}, expected ${1500 * 1.2}`);
+  assert.ok(Math.abs(ref.target_W - 1500 * 0.84) < 1e-9,
+    `target_W = ${ref.target_W}, expected ${1500 * 0.84}`);
   // 2x area -> 2x watts (linear pin).
   const a1000 = computeLightingDensity({ area_ft2: 1000, occupancy_class: "office" });
   const a2000 = computeLightingDensity({ area_ft2: 2000, occupancy_class: "office" });

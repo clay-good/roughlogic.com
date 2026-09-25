@@ -17,7 +17,7 @@ The pipeline never runs in production. It runs in CI on a tiered schedule per sp
 - `data/electrical/motor-fla.json` — Compiled from NEMA-aligned manufacturer technical bulletins (typical published values across publishing manufacturers). Manufacturer technical data, attributed at use site.
 - `data/electrical/conduit-fill-tables.json` — Conductor cross-sectional areas from insulation manufacturer dimensional data and ASTM dimensions; thresholds (40, 31, 53 percent) referenced, not reproduced.
 - `data/electrical/demand-factors.json` (v2) — Standard residential demand factors. NEC sections 220.42, 220.54, 220.55, 220.82 referenced by section number; values are engineering-practice consensus.
-- `data/electrical/lighting-density.json` (v2) — Public engineering benchmarks for lighting power density. ASHRAE 90.1 referenced by name only.
+- `data/electrical/lighting-density.json` (v2) — IECC 2021 Table C405.3.2(1) Building Area Method LPDs (= ASHRAE 90.1-2019 Table 9.5.1). Six numeric values; no table text.
 - `data/electrical/cable-bend-radius.json` (v3) — Manufacturer technical bulletins (Southwire, AFC Cable Systems, Belden, Corning); each row attributes the publishing manufacturer. Quarterly attribution-and-link recheck.
 - `data/electrical/poe-classes.json` (v3) — IEEE 802.3 publication metadata cited by name only; Cat5e / 6 / 6A loop resistance from Belden / CommScope manufacturer benchmarks. Quarterly attribution-and-link recheck.
 - `data/plumbing/runoff-coefficients.json` (v3) — Public engineering practice; rational-method runoff coefficients by surface.

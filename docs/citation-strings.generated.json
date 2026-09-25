@@ -131,7 +131,7 @@
     },
     "lighting-density": {
       "group": "calc-electrical.js (Group A)",
-      "stamp": "Citation: per ASHRAE 90.1-2022 Table 9.5.1 (lighting power density by occupancy). AHJ governs adopted edition. Free at ashrae.org/technical-resources/standards-and-guidelines/read-only-versions-of-ashrae-standards."
+      "stamp": "Citation: per IECC 2021 Table C405.3.2(1), Building Area Method (the same values as ASHRAE 90.1-2019 Table 9.5.1; 90.1-2022 lowers some). AHJ governs adopted edition. Free at codes.iccsafe.org and ashrae.org/technical-resources/standards-and-guidelines/read-only-versions-of-ashrae-standards."
     },
     "lightning-countdown": {
       "group": "calc-electrical.js (Group A)",
