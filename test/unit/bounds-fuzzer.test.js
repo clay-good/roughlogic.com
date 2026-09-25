@@ -3397,10 +3397,10 @@ test("bounds: calc-agriculture computeTimberCruise pins Doyle BF = (D-4)^2 * L/1
   // (Correctly the highest of the three rules for a small log, matching the tile note; the old code used L/16 and read 33.)
   const intl = computeTimberCruise({ small_end_dib_in: 14, log_length_ft: 16, rule: "international" });
   assert.ok(Math.abs(intl.board_feet - 135.6052) < 1e-6, `Int'l 1/4 14-in 16-ft`);
-  assert.ok(intl.board_feet > 114 && intl.board_feet > 100, `International reads highest for a small log (> Scribner 114 and Doyle 100)`);
-  // Scribner table lookup at 14 in -> 114 BF (per the bundled SCRIBNER_TABLE_16FT).
+  assert.ok(intl.board_feet > 110 && intl.board_feet > 100, `International reads highest for a small log (> Scribner 110 and Doyle 100)`);
+  // Scribner Decimal C (Koch 1972) at 14 in x 16 ft -> 110 BF.
   const scribner = computeTimberCruise({ small_end_dib_in: 14, log_length_ft: 16, rule: "scribner" });
-  assert.strictEqual(scribner.board_feet, 114);
+  assert.strictEqual(scribner.board_feet, 110);
   // Length scaling: 32-ft Doyle log at 14 in -> 200 BF (2x).
   const long = computeTimberCruise({ small_end_dib_in: 14, log_length_ft: 32, rule: "doyle" });
   assert.ok(Math.abs(long.board_feet - 200) < 1e-9, `length scaling`);

@@ -30,13 +30,23 @@ test("GPA: bigger spacing lowers GPA", () => { const a = computeGPA({ gpm: 0.5, 
 // 204 Timber cruise
 test("Timber: Doyle (D-4)^2*L/16", () => { const r = computeTimberCruise({ small_end_dib_in: 14, log_length_ft: 16, rule: "doyle" }); assert.equal(r.board_feet, 100); });
 test("Timber: International 1/4 rule (0.905 x 1/8 section, 1/2 in taper per 4 ft) reads the published 135 bf at 14 in x 16 ft", () => { const r = computeTimberCruise({ small_end_dib_in: 14, log_length_ft: 16, rule: "international" }); const sec = (d) => 0.905 * (0.22 * d * d - 0.71 * d); assert.ok(close(r.board_feet, sec(14) + sec(14.5) + sec(15) + sec(15.5), 0.01)); assert.ok(Math.abs(r.board_feet - 135) < 1); });
-test("Timber: Scribner table 14 in -> 114 BF", () => { const r = computeTimberCruise({ small_end_dib_in: 14, log_length_ft: 16, rule: "scribner" }); assert.equal(r.board_feet, 114); });
+test("Timber: Scribner Decimal C 14 in -> 110 BF", () => { const r = computeTimberCruise({ small_end_dib_in: 14, log_length_ft: 16, rule: "scribner" }); assert.equal(r.board_feet, 110); });
+test("Timber: Scribner is Koch's Decimal C table, by diameter and length", async () => {
+  const { SCRIBNER_DECIMAL_C } = await import("../../calc-agriculture.js");
+  // Koch (1972) via Briggs Appendix 3 Table 1: 6/8/10/12/14/16 ft columns.
+  assert.deepEqual(SCRIBNER_DECIMAL_C[20], [110, 140, 170, 210, 240, 280]);
+  assert.deepEqual(SCRIBNER_DECIMAL_C[30], [250, 330, 410, 490, 570, 660]);
+  // A 20 in x 16 ft log scaled 235 BF until 2026-09-24; Decimal C says 280.
+  assert.equal(computeTimberCruise({ small_end_dib_in: 20, log_length_ft: 16, rule: "scribner" }).board_feet, 280);
+  // A tabulated shorter length reads its own column, not a 16 ft proration.
+  assert.equal(computeTimberCruise({ small_end_dib_in: 6, log_length_ft: 8, rule: "scribner" }).board_feet, 5);
+});
 test("Timber: scales linearly with length", () => { const a = computeTimberCruise({ small_end_dib_in: 14, log_length_ft: 16, rule: "doyle" }); const b = computeTimberCruise({ small_end_dib_in: 14, log_length_ft: 32, rule: "doyle" }); assert.ok(close(b.board_feet / a.board_feet, 2, 0.001)); });
 test("Timber: zero diameter errors", () => { const r = computeTimberCruise({ small_end_dib_in: 0, log_length_ft: 16, rule: "doyle" }); assert.ok(r.error); });
 test("Timber: zero length errors", () => { const r = computeTimberCruise({ small_end_dib_in: 14, log_length_ft: 0, rule: "doyle" }); assert.ok(r.error); });
 test("Timber: unknown rule errors", () => { const r = computeTimberCruise({ small_end_dib_in: 14, log_length_ft: 16, rule: "x" }); assert.ok(r.error); });
 test("Timber: Doyle clamps to zero at D <= 4", () => { const r = computeTimberCruise({ small_end_dib_in: 4, log_length_ft: 16, rule: "doyle" }); assert.equal(r.board_feet, 0); });
-test("Timber: Scribner table monotonic", () => { const keys = Object.keys(SCRIBNER_TABLE_16FT).map(Number).sort((a, b) => a - b); for (let i = 1; i < keys.length; i++) assert.ok(SCRIBNER_TABLE_16FT[keys[i]] > SCRIBNER_TABLE_16FT[keys[i - 1]]); });
+test("Timber: Scribner table non-decreasing (Decimal C rounds to 10 BF, so 7 and 8 in tie)", () => { const keys = Object.keys(SCRIBNER_TABLE_16FT).map(Number).sort((a, b) => a - b); for (let i = 1; i < keys.length; i++) assert.ok(SCRIBNER_TABLE_16FT[keys[i]] >= SCRIBNER_TABLE_16FT[keys[i - 1]]); });
 test("Timber: notes string set per rule", () => { const r = computeTimberCruise(timberCruiseExample.inputs); assert.ok(r.note.length > 0); });
 
 // 205 Seed rate

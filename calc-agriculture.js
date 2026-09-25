@@ -55,13 +55,43 @@ export const gpaExample = { inputs: { gpm: 0.4, spacing_in: 20, speed_mph: 5, ta
 //
 // Doyle:        BF = ((D-4)^2) * (L/16)
 // Int'l 1/4:    BF = sum over 4 ft sections of 0.905 (0.22 D^2 - 0.71 D), D + 1/2 in per section
-// Scribner:     bundled public-domain table per small-end DIB.
-
-export const SCRIBNER_TABLE_16FT = {
-  // small-end DIB (in) -> board feet for a 16 ft log
-  6: 18, 7: 21, 8: 32, 9: 41, 10: 54, 11: 64, 12: 79, 13: 95, 14: 114, 15: 124,
-  16: 144, 17: 161, 18: 187, 19: 207, 20: 235, 22: 290, 24: 350, 26: 423, 28: 493, 30: 568,
+// Scribner:     Scribner Decimal C table by small-end DIB and log length.
+//
+// Scribner Decimal C, contents in board feet (the Decimal C figure x 10), from
+// Koch (1972) as reprinted in Appendix 3, Table 1 of Briggs' forest mensuration
+// text (ruraltech.org). Until 2026-09-24 the 16 ft column held figures that are
+// in neither Decimal C nor the Scribner diagram rule -- 235 bf for a 20 in log
+// where Decimal C scales 280 -- so a Scribner cruise read 10-16% light and the
+// seller was paid for wood they delivered.
+export const SCRIBNER_DECIMAL_C_LENGTHS_FT = [6, 8, 10, 12, 14, 16];
+export const SCRIBNER_DECIMAL_C = {
+  6: [5, 5, 10, 10, 10, 20],
+  7: [5, 10, 10, 20, 20, 30],
+  8: [10, 10, 20, 20, 20, 30],
+  9: [10, 20, 30, 30, 30, 40],
+  10: [20, 30, 30, 30, 40, 60],
+  11: [20, 30, 40, 40, 50, 70],
+  12: [30, 40, 50, 60, 70, 80],
+  13: [40, 50, 60, 70, 80, 100],
+  14: [40, 60, 70, 90, 100, 110],
+  15: [50, 70, 90, 110, 120, 140],
+  16: [60, 80, 100, 120, 140, 160],
+  17: [70, 90, 120, 140, 160, 180],
+  18: [80, 110, 130, 160, 190, 210],
+  19: [90, 120, 150, 180, 210, 240],
+  20: [110, 140, 170, 210, 240, 280],
+  21: [120, 150, 190, 230, 270, 300],
+  22: [130, 170, 210, 250, 290, 330],
+  23: [140, 190, 230, 280, 330, 380],
+  24: [150, 210, 250, 300, 350, 400],
+  25: [170, 230, 290, 340, 400, 460],
+  26: [190, 250, 310, 370, 440, 500],
+  27: [210, 270, 340, 410, 480, 550],
+  28: [220, 290, 360, 440, 510, 580],
+  29: [230, 310, 380, 460, 530, 610],
+  30: [250, 330, 410, 490, 570, 660],
 };
+export const SCRIBNER_TABLE_16FT = { 6: 20, 7: 30, 8: 30, 9: 40, 10: 60, 11: 70, 12: 80, 13: 100, 14: 110, 15: 140, 16: 160, 17: 180, 18: 210, 19: 240, 20: 280, 21: 300, 22: 330, 23: 380, 24: 400, 25: 460, 26: 500, 27: 550, 28: 580, 29: 610, 30: 660 };
 
 // International 1/4-inch log rule: each 4 ft section scales 0.905 x
 // (0.22 D^2 - 0.71 D), the 1/8-inch-kerf section formula cut to a 1/4-inch
@@ -96,27 +126,25 @@ export function computeTimberCruise({ small_end_dib_in = 0, log_length_ft = 16, 
   } else if (rule === "international") {
     bf = _international14Bf(small_end_dib_in, log_length_ft);
   } else if (rule === "scribner") {
+    // Scaling diameter is the small-end DIB rounded to the inch, as scalers read it.
     const dib = Math.round(small_end_dib_in);
-    let raw = SCRIBNER_TABLE_16FT[dib];
-    if (raw === undefined) {
-      // Linear interpolate between known points.
-      const keys = Object.keys(SCRIBNER_TABLE_16FT).map(Number).sort((a, b) => a - b);
-      if (dib < keys[0] || dib > keys[keys.length - 1]) return { error: "Diameter outside Scribner table range." };
-      for (let i = 0; i < keys.length - 1; i++) {
-        if (dib >= keys[i] && dib <= keys[i + 1]) {
-          const t = (dib - keys[i]) / (keys[i + 1] - keys[i]);
-          raw = SCRIBNER_TABLE_16FT[keys[i]] + t * (SCRIBNER_TABLE_16FT[keys[i + 1]] - SCRIBNER_TABLE_16FT[keys[i]]);
-          break;
-        }
-      }
+    const row = SCRIBNER_DECIMAL_C[dib];
+    if (!row) return { error: "Diameter outside the Scribner Decimal C table (6 to 30 in)." };
+    const Ls = SCRIBNER_DECIMAL_C_LENGTHS_FT;
+    const L = log_length_ft;
+    if (L < Ls[0]) bf = row[0] * L / Ls[0];
+    else if (L >= Ls[Ls.length - 1]) bf = row[row.length - 1] * L / Ls[Ls.length - 1];
+    else {
+      let i = 0;
+      while (L > Ls[i + 1]) i++;
+      bf = row[i] + (L - Ls[i]) / (Ls[i + 1] - Ls[i]) * (row[i + 1] - row[i]);
     }
-    bf = raw * (log_length_ft / 16);
   } else {
     return { error: "Unknown rule." };
   }
   const note = rule === "doyle" ? "Doyle is industry-standard but underestimates small logs."
     : rule === "international" ? "International 1/4 is most accurate for small logs."
-    : "Scribner is from a published public-domain table.";
+    : "Scribner Decimal C per Koch (1972), read at the scaling diameter; logs outside 6-16 ft are prorated from the nearest tabulated length, which a scaler would instead scale as segments.";
   // v8 §C.6: optional stand-value output. value_usd = bf × $/bf when supplied.
   const value_usd = price_per_bf > 0 && bf > 0 ? bf * price_per_bf : null;
   return { board_feet: bf, rule, note, value_usd };
