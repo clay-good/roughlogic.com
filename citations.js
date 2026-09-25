@@ -655,13 +655,14 @@ export const CITATIONS = {
   },
 
   "brine-cure": {
-    formula: "brine% = salt/(salt+water)*100; equilibrium salt% = salt/(meat+water)*100; equilibrium ingoing nitrite ppm = cure*0.0625*1e6/meat (green meat weight, 9 CFR 424.22); brine nitrite ppm = cure*0.0625*1e6/(salt+water+cure); salt-to-add = target%*total/100 - salt.",
-    edition: "First-principles mass-fraction chemistry. Prague Powder #1 is 6.25% sodium nitrite; finished-product ingoing nitrite is limited per USDA FSIS regulation (9 CFR 424.21/424.22, by name).",
+    formula: "brine% = salt/(salt+water)*100; equilibrium salt% = salt/(meat+water)*100; equilibrium ingoing nitrite ppm = cure*0.0625*1e6/meat (green meat weight), limit by product: chopped 156 and dry cure 625 ppm (9 CFR 424.21(c)), bacon 120 pumped/immersion and 200 dry cured (424.22(b)); brine nitrite ppm = cure*0.0625*1e6/(salt+water+cure); salt-to-add = target%*total/100 - salt.",
+    edition: "First-principles mass-fraction chemistry. Prague Powder #1 is 6.25% sodium nitrite; ingoing nitrite limits from USDA FSIS 9 CFR 424.21(c) (chopped 1/4 oz and dry cure 1 oz per 100 lb; pickle 2 lb per 100 gal) and 424.22(b) (bacon).",
     freeAccess: "Free at fsis.usda.gov and ecfr.gov; the user confirms the current FSIS ingoing limit.",
     governance: GOVERNANCE.general,
     editionNote: "Salt % by weight (not by volume); equilibrium cure assumes full absorption. The 6.25% nitrite constant is fixed; the regulated ingoing maximum is user-confirmed.",
     assumptions: [
       { name: "Cure #1 nitrite", value: "Prague Powder #1 is 6.25% sodium nitrite by weight", source: "USDA FSIS" },
+      { name: "Ingoing limit by product", value: "chopped 156, whole-muscle dry cure 625, bacon pumped/immersion 120, bacon dry cured 200 ppm", source: "9 CFR 424.21(c), 424.22(b)" },
     ],
   },
 
@@ -5486,12 +5487,12 @@ export const CITATIONS = {
   // spec-v1350..v1363: the 2026-08-26 trade-expansion Group O band.
   "ice-machine-sizing": {
     formula: "daily_demand_lb = covers_per_day x lb_per_cover; required_nameplate_lb = daily_demand_lb / (derate_factor x utilization); bin_capacity_lb = daily_demand_lb x peak_fraction.",
-    edition: "AHRI Standard 810 ice-machine rating point (70 F ambient air, 50 F inlet water), by name, with the standard installed-condition derate and the 90% utilization sizing practice; the manufacturer's published capacity table at the installed air and water temperature governs the selection.",
+    edition: "AHRI Standard 810 (standard rating point 90 F ambient air, 70 F inlet water) by name, with a 70 F / 50 F catalog figure derated, with the standard installed-condition derate and the 90% utilization sizing practice; the manufacturer's published capacity table at the installed air and water temperature governs the selection.",
     freeAccess: "The sizing arithmetic is public: covers, pounds of ice per cover, the derate for the installed air and water temperature, the utilization target, and the peak-period fraction are the kitchen's own values. The AHRI rating point is named, not reproduced.",
     governance: GOVERNANCE.general,
-    editionNote: "Ice machines are cataloged at a single rating condition, the AHRI Standard 810 point of 70 F ambient air with 50 F inlet water, and no working kitchen delivers either. At 90 F air with 70 F make-up water the same machine produces roughly a fifth less ice, so a nameplate chosen from the catalog without a derate leaves the bin dry at the dinner rush. Utilization is the second derate and it is an operating rather than a physical one: a machine run at 100% duty has no recovery margin for a hot day or a busy Saturday, so the practice is to size near 90%. Daily demand comes from covers times a pounds-per-cover benchmark, near 1.5 lb for a full-service restaurant and well above that for a bar-heavy concept; the required nameplate is that demand divided by the product of the two derates. The bin is a separate question and sizing it to the daily figure is money spent on stainless: the machine is sized for the day, the bin for the peak block, which is the fraction of the day's ice that must already be sitting in the bin when the rush starts, because production during the rush is slower than draw. A planning screen, not a selection.",
+    editionNote: "Many ice machines are cataloged at 70 F ambient air with 50 F inlet water, which no working kitchen delivers. At 90 F air with 70 F make-up water, the AHRI Standard 810 rating point, the same machine produces roughly a fifth less ice, so a 70/50 nameplate chosen without a derate leaves the bin dry at the dinner rush. An AHRI-certified (90/70) capacity needs no such derate. Utilization is the second derate and it is an operating rather than a physical one: a machine run at 100% duty has no recovery margin for a hot day or a busy Saturday, so the practice is to size near 90%. Daily demand comes from covers times a pounds-per-cover benchmark, near 1.5 lb for a full-service restaurant and well above that for a bar-heavy concept; the required nameplate is that demand divided by the product of the two derates. The bin is a separate question and sizing it to the daily figure is money spent on stainless: the machine is sized for the day, the bin for the peak block, which is the fraction of the day's ice that must already be sitting in the bin when the rush starts, because production during the rush is slower than draw. A planning screen, not a selection.",
     assumptions: [
-      { name: "Rating point", value: "AHRI Standard 810: 70 F ambient air, 50 F inlet water; installed conditions derate the published capacity", source: "AHRI Standard 810" },
+      { name: "Rating point", value: "AHRI Standard 810: 90 F ambient air, 70 F inlet water; the 0.8 default derates a 70 F / 50 F catalog figure (use 1 against an AHRI rating)", source: "AHRI Standard 810 (test conditions as quoted by the CEE ice-machine specification)" },
       { name: "Utilization", value: "size near 90% duty so the machine keeps recovery margin", source: "food-service equipment sizing practice" },
       { name: "Pounds per cover", value: "a planning benchmark near 1.5 lb for full service; a bar-heavy concept runs well above it", source: "food-service planning practice" },
     ],
@@ -5660,7 +5661,7 @@ export const CITATIONS = {
     ],
   },
   "cooling-curve": {
-    formula: "FDA Food Code 2022 §3-501.14: cooked TCS food must cool from 135 °F to 70 °F within 2 hours and from 70 °F to 41 °F within 4 additional hours. Pass / fail flag computed against the user's measured times.",
+    formula: "FDA Food Code 2022 §3-501.14: cooked TCS food must cool from 135 °F to 70 °F within 2 hours, and from 135 °F to 41 °F within a total of 6 hours, so the second stage gets whatever time the first left. The pass / fail flags are computed on the estimated stage times.",
     edition: "FDA Food Code 2022 §3-501.14.",
     freeAccess: "Free at fda.gov (Food, Retail Food Protection, FDA Food Code).",
     governance: GOVERNANCE.food,
@@ -5857,13 +5858,14 @@ export const CITATIONS = {
     ],
   },
   "air-movers": {
-    formula: "Number of air movers = max(area / 150 ft² per AM, perimeter / 12 ft per AM) per IICRC S500-2021 placement guidance (one AM per 150-300 ft² of affected floor, every 10-16 linear ft of wet wall).",
-    edition: "IICRC S500-2021 §10 (Equipment) and §12 (Drying Process) by name.",
-    freeAccess: "IICRC standards licensed; principles free in published water-damage-restoration training literature.",
+    formula: "low = rooms + ceil(wet_floor_ft2 / 70) + ceil(wet_wall_ceiling_ft2 / 150) + insets; high = rooms + ceil(wet_floor_ft2 / 50) + ceil(wet_wall_ceiling_ft2 / 100) + insets. The wet-floor figure includes the lower walls to 2 ft. total_cfm = low count x 2,500 cfm nominal.",
+    edition: "IICRC Airmover and Gallons Calculation Worksheet, US imperial (rev. 7.1.22), which accompanies IICRC S500; S500 itself by name.",
+    freeAccess: "The worksheet is free at iicrc.org; the S500 standard is licensed.",
     governance: GOVERNANCE.general,
-    editionNote: "Single-edition (IICRC S500-2021).",
+    editionNote: "The IICRC worksheet counts one air mover per affected room, one per 50-70 ft² of wet floor, one per 100-150 ft² of wet wall and ceiling above 2 ft, and one per inset or offset over 18 in, rounding each fraction up. The count does not vary by water class. Where water has mainly wet the lower walls with under 2 ft of migration into the room, the worksheet instead gives one per 14 linear ft of affected wall; this tile does not compute that case.",
     assumptions: [
-      { name: "Per-AM coverage", value: "150 ft² Class 1, 200 ft² Class 2, 250 ft² Class 3, 300 ft² Class 4", source: "IICRC S500-2021 typical" },
+      { name: "Coverage", value: "1 per room + 1 per 50-70 ft² wet floor + 1 per 100-150 ft² wet wall/ceiling above 2 ft + 1 per inset/offset over 18 in", source: "IICRC Airmover Worksheet rev. 7.1.22" },
+      { name: "Unit airflow", value: "2,500 cfm nominal per air mover (for the CFM total only)", source: "typical axial unit; the rating plate governs" },
     ],
   },
   "water-classes": {

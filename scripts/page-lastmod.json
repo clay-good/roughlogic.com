@@ -2,7 +2,7 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "ba486b357d4e5070",
+      "sha": "904db0ebdaef5173",
       "date": "2026-09-25"
     },
     "/tools/": {
@@ -74,8 +74,8 @@
       "date": "2026-09-18"
     },
     "/groups/restoration/": {
-      "sha": "3a5366cedbd27bc0",
-      "date": "2026-09-18"
+      "sha": "08d979534ad6eb62",
+      "date": "2026-09-25"
     },
     "/groups/rigging-and-heavy-lift/": {
       "sha": "c2c39e40c5a86dc1",
@@ -222,8 +222,8 @@
       "date": "2026-09-01"
     },
     "/tools/air-movers/": {
-      "sha": "b6de632d4736981c",
-      "date": "2026-09-01"
+      "sha": "db8f538d6e710590",
+      "date": "2026-09-25"
     },
     "/tools/air-pressure-setpoint-savings/": {
       "sha": "5b7544873fc61f5b",
@@ -838,8 +838,8 @@
       "date": "2026-09-11"
     },
     "/tools/brine-cure/": {
-      "sha": "fb7792e8ab21b454",
-      "date": "2026-09-01"
+      "sha": "a659fbdee3d7bce7",
+      "date": "2026-09-25"
     },
     "/tools/broad-crested-weir/": {
       "sha": "c5f521147141b29a",
@@ -1762,8 +1762,8 @@
       "date": "2026-09-01"
     },
     "/tools/cooling-curve/": {
-      "sha": "a8b8ad1c075865f7",
-      "date": "2026-09-18"
+      "sha": "b75e241167951ea8",
+      "date": "2026-09-25"
     },
     "/tools/cooling-system-flow/": {
       "sha": "547d5bbb325ba5d3",
@@ -3822,8 +3822,8 @@
       "date": "2026-09-01"
     },
     "/tools/ice-machine-sizing/": {
-      "sha": "b06055c3d3cd80e4",
-      "date": "2026-09-01"
+      "sha": "013fafd602e3522a",
+      "date": "2026-09-25"
     },
     "/tools/ice-melt-working-temperature/": {
       "sha": "7a6ff39177017203",

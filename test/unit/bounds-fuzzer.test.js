@@ -1771,7 +1771,7 @@ test("bounds: calc-kitchen computeCoolingCurve pins FDA Food Code 2h phase-1 / 6
       assert.ok(Math.abs(r.phase2_minutes - r.phase1_minutes * 1.6) < 1e-9, `phase2 = 1.6 * phase1`);
       // pass flags pinned to the FDA Food Code 2h / 6h thresholds.
       assert.strictEqual(r.phase1_pass, r.phase1_minutes <= 120, `phase1_pass`);
-      assert.strictEqual(r.phase2_pass, r.phase2_minutes <= 240, `phase2_pass`);
+      assert.strictEqual(r.phase2_pass, r.phase1_pass && r.phase1_minutes + r.phase2_minutes <= 360, `phase2_pass: 6 hr total (Food Code 3-501.14(A)(2))`);
     }
   }
   // Specific pin: blast chiller / thin liquid is the fastest combo and should pass both gates;
@@ -2196,15 +2196,14 @@ test("bounds: calc-restoration computeDehumidifierSize pins AHAM = volume / IICR
   }
 });
 
-test("bounds: calc-restoration computeAirMovers pins count = ceil(area / per-class) and total_cfm = count * 2500", () => {
-  const per = { "1": 150, "2": 100, "3": 75, "4": 50 };
+test("bounds: calc-restoration computeAirMovers pins the IICRC worksheet count (room + floor/70..50) and total_cfm = count * 2500", () => {
   for (const affected_area_ft2 of [100, 800, 3000]) {
-    for (const [water_class, ft2_per] of Object.entries(per)) {
+    for (const water_class of ["1", "2", "3", "4"]) {
       const r = computeAirMovers({ affected_area_ft2, water_class });
       assert.ok(!r.error, `${affected_area_ft2} ft^2 class ${water_class}: ${JSON.stringify(r)}`);
-      const expected_count = Math.ceil(affected_area_ft2 / ft2_per);
+      const expected_count = 1 + Math.ceil(affected_area_ft2 / 70);
       assert.strictEqual(r.air_mover_count, expected_count, `count identity`);
-      assert.strictEqual(r.ft2_per_unit, ft2_per);
+      assert.strictEqual(r.air_mover_count_high, 1 + Math.ceil(affected_area_ft2 / 50));
       assert.strictEqual(r.total_cfm, expected_count * 2500, `total_cfm = count * 2500`);
       assert.ok(["corners", "corners + perimeter", "continuous perimeter"].includes(r.placement_pattern), `pattern in ladder`);
     }

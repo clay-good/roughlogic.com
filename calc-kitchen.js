@@ -193,7 +193,10 @@ export function computeCoolingCurve({ start_F = 135, ambient_F = 70, container =
   const phase1_min = base * ambient_factor;
   const phase2_min = phase1_min * 1.6; // 70 F -> 41 F is roughly 1.6x phase 1
   const phase1_pass = phase1_min <= 120;
-  const phase2_pass = phase2_min <= 240;
+  // Food Code 3-501.14(A)(2): 135 F to 41 F "within a total of 6 hours", so the second stage has
+  // whatever the first left, and cannot pass once the first has failed. (Until 2026-09-24 this was a
+  // fixed 4 hours checked on its own.)
+  const phase2_pass = phase1_pass && phase1_min + phase2_min <= 360;
   return { phase1_minutes: phase1_min, phase2_minutes: phase2_min, phase1_pass, phase2_pass };
 }
 
@@ -396,7 +399,7 @@ const renderYieldEP = _r({
 });
 
 const renderCoolingCurve = _r({
-  citation: "Notice: This is a planning aid. The thermometer on the food governs. Citation: per FDA Food Code 2022 §3-401.11 and §3-501.14 (135 F to 70 F in ≤ 2 hr; 70 F to 41 F in ≤ 4 hr). Local health code adopts and may modify. Free at fda.gov/food/retail-food-protection/fda-food-code.",
+  citation: "Notice: This is a planning aid. The thermometer on the food governs. Citation: per FDA Food Code 2022 §3-501.14(A) (135 F to 70 F within 2 hr, and 135 F to 41 F within a total of 6 hr). Local health code adopts and may modify. Free at fda.gov/food/retail-food-protection/fda-food-code.",
   example: coolingCurveExample.inputs,
   fields: [
     { key: "start_F",      label: "Starting temp (F; confirms food is hot; cooling time shown is the FDA 135-to-70-to-41 window, not measured from this temp)", kind: "number", default: 165 },
@@ -679,10 +682,11 @@ export const KITCHEN_RENDERERS = {
 
 // --- v20 O.1: Brine / cure concentration (`brine-cure`) ---
 // brine% = salt/(salt+water)*100; equilibrium salt% = salt/(meat+water)*100;
-// equilibrium ingoing nitrite ppm = cure*0.0625*1e6/meat (green meat weight, 9 CFR 424.22);
+// equilibrium ingoing nitrite ppm = cure*0.0625*1e6/meat (green meat weight), checked against the
+// product's limit: 9 CFR 424.21(c) chopped 156 / dry cure 625; 424.22(b) bacon 120 immersion, 200 dry;
 // brine nitrite ppm = cure*0.0625*1e6/(salt+water+cure); salt-to-add = target%*total/100 - salt.
-// dims: in { mode: dimensionless, water_g: M, salt_g: M, meat_g: M, cure_g: M, target_pct: dimensionless } out: { concentration_pct: dimensionless, nitrite_ppm: dimensionless }
-export function computeBrineCure({ mode = "brine", water_g = 0, salt_g = 0, meat_g = 0, cure_g = 0, target_pct = 0 } = {}) {
+// dims: in { mode: dimensionless, water_g: M, salt_g: M, meat_g: M, cure_g: M, target_pct: dimensionless, product: dimensionless } out: { concentration_pct: dimensionless, nitrite_ppm: dimensionless, product: dimensionless }
+export function computeBrineCure({ mode = "brine", water_g = 0, salt_g = 0, meat_g = 0, cure_g = 0, target_pct = 0, product = "chopped" } = {}) {
   const water = Number(water_g) || 0;
   const salt = Number(salt_g) || 0;
   const meat = Number(meat_g) || 0;
@@ -690,7 +694,12 @@ export function computeBrineCure({ mode = "brine", water_g = 0, salt_g = 0, meat
   const target = Number(target_pct) || 0;
   if (water < 0 || salt < 0 || meat < 0 || cure < 0 || !Number.isFinite(water) || !Number.isFinite(salt) || !Number.isFinite(meat) || !Number.isFinite(cure)) return { error: "Weights must be non-negative finite numbers (g)." };
   const NITRITE_FRACTION = 0.0625; // Prague Powder #1 is 6.25% sodium nitrite
-  const FSIS_INGOING_MAX_PPM = 156; // 424.22 ingoing maximum on the green weight of the meat
+  // Ingoing sodium nitrite maxima on the green weight, by product. 424.21(c): 1/4 oz per 100 lb
+  // chopped product (156 ppm), 1 oz per 100 lb dry cure (625 ppm); 424.22(b): bacon 120 ppm
+  // pumped / massaged / immersion cured, 200 ppm dry cured. (Until 2026-09-24 every equilibrium
+  // cure was held to 156 and credited to 424.22, which passed bacon at up to 155 ppm.)
+  const FSIS_INGOING_MAX_PPM = { chopped: 156, dry_cure: 625, bacon_immersion: 120, bacon_dry: 200 };
+  if (!(product in FSIS_INGOING_MAX_PPM)) return { error: "Product must be chopped, dry_cure, bacon_immersion or bacon_dry." };
   const FSIS_PICKLE_MAX_PPM = 2400; // 424.21(c): 2 lb sodium nitrite per 100 gal of pickle
   let concentration, total;
   if (mode === "equilibrium") {
@@ -703,17 +712,17 @@ export function computeBrineCure({ mode = "brine", water_g = 0, salt_g = 0, meat
     concentration = salt / (salt + water) * 100;
   }
   // Ingoing nitrite ppm. For an equilibrium cure the regulated basis is the GREEN WEIGHT OF THE
-  // MEAT (9 CFR 424.22): all the nitrite ends up in the meat, so 2.5 g Cure #1 / 1 kg meat = 156 ppm.
+  // MEAT (9 CFR 424.21(c) / 424.22(b)): all the nitrite ends up in the meat, so 2.5 g Cure #1 / 1 kg meat = 156 ppm.
   // (Dividing by the whole batch weight -- meat + water + salt + cure -- understated it and could clear
   // the 156 ppm limit when the meat basis is at/over it.) For a brine, ppm is the nitrite concentration
   // in the pickle (its own total), which the meat then takes up at an uptake the operator controls.
   const nitriteBasis = mode === "equilibrium" ? meat : total;
   const nitritePpm = nitriteBasis > 0 && cure > 0 ? cure * NITRITE_FRACTION * 1e6 / nitriteBasis : 0;
   // The two modes report DIFFERENT quantities against DIFFERENT limits. Equilibrium ppm is
-  // ingoing nitrite on the green weight of the meat, capped at 156 ppm (424.22). Brine ppm is
+  // ingoing nitrite on the green weight of the meat, capped by product (424.21(c) / 424.22(b)). Brine ppm is
   // the concentration of the pickle itself, which 424.21(c) caps at 2 lb sodium nitrite per
   // 100 gal -- about 2,400 ppm -- and the meat's ingoing figure then follows the pump level.
-  const limit_ppm = mode === "equilibrium" ? FSIS_INGOING_MAX_PPM : FSIS_PICKLE_MAX_PPM;
+  const limit_ppm = mode === "equilibrium" ? FSIS_INGOING_MAX_PPM[product] : FSIS_PICKLE_MAX_PPM;
   const over_max = nitritePpm >= limit_ppm;
   const saltToAdd = target > 0 ? target * total / 100 - salt : null;
   return {
@@ -721,36 +730,41 @@ export function computeBrineCure({ mode = "brine", water_g = 0, salt_g = 0, meat
     nitrite_ppm: Number.isFinite(nitritePpm) ? nitritePpm : null,
     nitrite_over_max: over_max,
     nitrite_limit_ppm: limit_ppm,
+    product,
     salt_to_add_g: saltToAdd != null && Number.isFinite(saltToAdd) ? saltToAdd : null,
-    note: (over_max ? (mode === "equilibrium" ? "Ingoing nitrite is at or above the 156 ppm maximum on the green weight of the meat - reduce cure (confirm the current FSIS limit). " : "This pickle is at or above the strength 9 CFR 424.21(c) permits, 2 lb sodium nitrite per 100 gal (about 2,400 ppm) - reduce cure (confirm the current FSIS limit). ") : "")
-      + (mode === "brine" ? "The ppm shown is the concentration of the PICKLE, not the ingoing nitrite in the meat: the meat takes up nitrite at the pump or immersion uptake the operator controls, and 424.21(c) limits an immersion pickle to 2 lb sodium nitrite per 100 gal rather than to the 156 ppm meat-basis figure. " : "")
+    note: (over_max ? (mode === "equilibrium" ? "Ingoing nitrite is at or above the " + limit_ppm + " ppm maximum for this product on the green weight of the meat - reduce cure (confirm the current FSIS limit). " : "This pickle is at or above the strength 9 CFR 424.21(c) permits, 2 lb sodium nitrite per 100 gal (about 2,400 ppm) - reduce cure (confirm the current FSIS limit). ") : "")
+      + (mode === "brine" ? "The ppm shown is the concentration of the PICKLE, not the ingoing nitrite in the meat: the meat takes up nitrite at the pump or immersion uptake the operator controls, and 424.21(c) limits an immersion pickle to 2 lb sodium nitrite per 100 gal rather than to a meat-basis figure. " : "")
       + "Salt % by weight (not by volume). Equilibrium cure assumes full absorption (real uptake varies). Prague Powder #1 is 6.25% sodium nitrite.",
   };
 }
 export const brineCureExample = { inputs: { mode: "equilibrium", water_g: 0, salt_g: 25, meat_g: 1000, cure_g: 2.5, target_pct: 0 } };
 
 function renderBrineCure(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: First-principles mass-fraction chemistry. Prague Powder #1 is 6.25% sodium nitrite; finished-product ingoing nitrite is limited per USDA FSIS regulation (9 CFR 424.21/424.22, by name) - the user confirms the current FSIS limit. Free at fsis.usda.gov and ecfr.gov.";
+  citationEl.textContent = "Citation: First-principles mass-fraction chemistry. Prague Powder #1 is 6.25% sodium nitrite. Ingoing nitrite limits: 9 CFR 424.21(c), 156 ppm for chopped product and 625 ppm for a dry cure; 9 CFR 424.22(b), bacon 120 ppm pumped or immersion cured and 200 ppm dry cured; an immersion pickle 2 lb per 100 gal. The user confirms the current FSIS limit. Free at fsis.usda.gov and ecfr.gov.";
   const mode = makeSelect("Mode", "bc-mode", [{ value: "brine", label: "Brine by volume", selected: true }, { value: "equilibrium", label: "Equilibrium cure by weight" }]);
   const meat = makeNumber("Meat weight (g, equilibrium)", "bc-meat", { step: "any", min: "0" });
   const water = makeNumber("Water weight (g)", "bc-water", { step: "any", min: "0" });
   const salt = makeNumber("Salt added (g)", "bc-salt", { step: "any", min: "0", value: "25" }); salt.input.value = "25";
   const cure = makeNumber("Cure #1 (g, 6.25% nitrite, optional)", "bc-cure", { step: "any", min: "0" });
   const target = makeNumber("Target salt % (optional)", "bc-target", { step: "any", min: "0" });
-  for (const f of [mode, meat, water, salt, cure, target]) inputRegion.appendChild(f.wrap);
+  const prod = makeSelect("Product (sets the equilibrium nitrite limit)", "bc-prod", [
+    { value: "chopped", label: "Chopped / ground (156 ppm)", selected: true }, { value: "dry_cure", label: "Whole muscle, dry cure (625 ppm)" },
+    { value: "bacon_immersion", label: "Bacon, pumped or immersion (120 ppm)" }, { value: "bacon_dry", label: "Bacon, dry cured (200 ppm)" },
+  ]);
+  for (const f of [mode, meat, water, salt, cure, target, prod]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { mode.select.value = "equilibrium"; meat.input.value = "1000"; water.input.value = ""; salt.input.value = "25"; cure.input.value = "2.5"; target.input.value = ""; update(); });
   const oConc = makeOutputLine(outputRegion, "Concentration", "bc-out-conc");
   const oNitrite = makeOutputLine(outputRegion, "Finished nitrite", "bc-out-nit");
   const oNote = makeOutputLine(outputRegion, "Note", "bc-out-note");
   function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
   const update = debounce(() => {
-    const r = computeBrineCure({ mode: mode.select.value, water_g: readNum(water.input), salt_g: readNum(salt.input), meat_g: readNum(meat.input), cure_g: readNum(cure.input), target_pct: readNum(target.input) });
+    const r = computeBrineCure({ mode: mode.select.value, water_g: readNum(water.input), salt_g: readNum(salt.input), meat_g: readNum(meat.input), cure_g: readNum(cure.input), target_pct: readNum(target.input), product: prod.select.value });
     if (r.error) { oConc.textContent = r.error; oNitrite.textContent = ""; oNote.textContent = ""; return; }
     oConc.textContent = fmt(r.concentration_pct, 2) + "% salt" + (r.salt_to_add_g != null ? " (add " + fmt(r.salt_to_add_g, 1) + " g for target)" : "");
     oNitrite.textContent = r.nitrite_ppm > 0 ? fmt(r.nitrite_ppm, 0) + " ppm nitrite" + (r.nitrite_over_max ? " (AT/OVER MAX)" : "") : "No cure entered";
     oNote.textContent = r.note;
   }, DEBOUNCE_MS);
-  for (const f of [mode.select, meat.input, water.input, salt.input, cure.input, target.input]) f.addEventListener("input", update);
+  for (const f of [mode.select, meat.input, water.input, salt.input, cure.input, target.input, prod.select]) f.addEventListener("input", update);
 }
 KITCHEN_RENDERERS["brine-cure"] = renderBrineCure;
 
@@ -1329,14 +1343,14 @@ export function computeIceMachineSizing({ covers_per_day = 0, lb_per_cover = 0, 
     daily_demand_lb,
     required_nameplate_lb,
     bin_capacity_lb,
-    note: "Ice machine nameplate production and bin capacity from the covers a kitchen serves, the two sizing questions a food-service package gets wrong most often. Daily demand is covers times pounds of ice per cover, a planning benchmark near 1.5 lb for a full-service restaurant and well above that for a bar-heavy concept. Machines are cataloged at the AHRI 810 rating point, 70 F ambient air with 50 F inlet water, and a real kitchen delivers neither: at 90 F air and 70 F water the same machine makes roughly a fifth less ice, so the nameplate must be bought oversized. Utilization is the second derate, because a machine run at 100% duty has no recovery margin, and the practice is to size near 90%. Nameplate = daily demand / (derate x utilization). A 300-cover restaurant at 1.5 lb per cover needs 450 lb/day, and at a 0.80 derate and 0.90 utilization the nameplate is 450 / 0.72 = 625 lb/day, so a 500 lb/day machine is undersized by a fifth. The bin is a separate question: it is sized for the peak block, the fraction of the day's ice that must be sitting in the bin when the rush starts, because production during the rush is slower than draw, so 40% of 450 lb is a 180 lb bin. A planning estimate; the manufacturer's published capacity table at the installed air and water temperature governs the selection.",
+    note: "Ice machine nameplate production and bin capacity from the covers a kitchen serves, the two sizing questions a food-service package gets wrong most often. Daily demand is covers times pounds of ice per cover, a planning benchmark near 1.5 lb for a full-service restaurant and well above that for a bar-heavy concept. Many makers catalog a machine at 70 F air with 50 F inlet water, which a real kitchen rarely delivers: at 90 F air and 70 F water, the AHRI 810 standard rating point, the same machine makes roughly a fifth less ice. The default 0.8 derate converts a 70/50 catalog figure; against an AHRI 810 (90/70) rating, set the derate to 1. Utilization is the second derate, because a machine run at 100% duty has no recovery margin, and the practice is to size near 90%. Nameplate = daily demand / (derate x utilization). A 300-cover restaurant at 1.5 lb per cover needs 450 lb/day, and at a 0.80 derate and 0.90 utilization the nameplate is 450 / 0.72 = 625 lb/day, so a 500 lb/day machine is undersized by a fifth. The bin is a separate question: it is sized for the peak block, the fraction of the day's ice that must be sitting in the bin when the rush starts, because production during the rush is slower than draw, so 40% of 450 lb is a 180 lb bin. A planning estimate; the manufacturer's published capacity table at the installed air and water temperature governs the selection.",
   };
 }
 
 export const iceMachineSizingExample = { inputs: { covers_per_day: 300, lb_per_cover: 1.5, derate_factor: 0.80, utilization: 0.90, peak_fraction: 0.40 } };
 
 KITCHEN_RENDERERS["ice-machine-sizing"] = _r({
-  citation: "Citation: ice machine capacity and bin sizing against the AHRI Standard 810 rating point (70 F air / 50 F water), by name, with the standard installed-condition derate and utilization practice. Daily demand = covers x lb per cover; nameplate = demand / (derate x utilization); bin = demand x peak fraction. A planning screen; the manufacturer's published capacity at the installed air and water temperature governs the selection.",
+  citation: "Citation: ice machine capacity and bin sizing against AHRI Standard 810 (rating point 90 F air / 70 F water) by name, a 70 F / 50 F catalog figure derated, with the standard installed-condition derate and utilization practice. Daily demand = covers x lb per cover; nameplate = demand / (derate x utilization); bin = demand x peak fraction. A planning screen; the manufacturer's published capacity at the installed air and water temperature governs the selection.",
   example: iceMachineSizingExample.inputs,
   fields: [
     { key: "covers_per_day", label: "Covers per day", kind: "number" },

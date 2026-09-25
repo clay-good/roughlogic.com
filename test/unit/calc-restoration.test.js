@@ -71,15 +71,21 @@ test("Dehumidifier: the IICRC chart figure is the field recommendation (no extra
 
 // --- Utility 35: Air Movers ---
 
-test("Air movers example: 800 ft^2 class 2 -> 8 movers", () => {
+test("Air movers example: 600 ft^2, one room -> 10 to 13 (IICRC worksheet)", () => {
   const r = computeAirMovers(airMoversExample.inputs);
   assert.equal(r.air_mover_count, airMoversExample.expected.air_mover_count);
+  assert.equal(r.air_mover_count_high, 13);
 });
 
-test("Air movers: higher class -> more movers per area", () => {
+test("Air movers: the IICRC worksheet does not vary by water class; rooms, walls and insets add units", () => {
   const a = computeAirMovers({ affected_area_ft2: 600, water_class: "1" });
   const b = computeAirMovers({ affected_area_ft2: 600, water_class: "4" });
-  assert.ok(b.air_mover_count > a.air_mover_count);
+  assert.equal(a.air_mover_count, b.air_mover_count);
+  // 3 rooms, 600 ft^2 floor, 300 ft^2 wall/ceiling, 2 insets: low 3 + 9 + 2 + 2 = 16; high 3 + 12 + 3 + 2 = 20.
+  const c = computeAirMovers({ affected_area_ft2: 600, rooms: 3, wall_ceiling_ft2: 300, insets: 2 });
+  assert.equal(c.air_mover_count, 16);
+  assert.equal(c.air_mover_count_high, 20);
+  assert.ok(computeAirMovers({ affected_area_ft2: 600, rooms: 0 }).error);
 });
 
 test("Air movers: unknown class returns error", () => {

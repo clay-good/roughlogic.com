@@ -267,7 +267,7 @@ export const TOOLS = [
   { id: "psychrometric", name: "Psychrometric Calculator", group: "D", trades: ["restoration", "hvac"], desc: "Dew point, GPP, vapor pressure from temperature and RH." },
   { id: "drying-goal", name: "Drying Goal", group: "D", trades: ["restoration"], desc: "Target indoor GPP based on outdoor conditions." },
   { id: "dehumidifier", name: "Dehumidifier Sizing", group: "D", trades: ["restoration"], desc: "Required pints per day by AHAM and field methods." },
-  { id: "air-movers", name: "Air Mover Placement", group: "D", trades: ["restoration"], desc: "Number and CFM coverage by water class." },
+  { id: "air-movers", name: "Air Mover Placement", group: "D", trades: ["restoration"], desc: "How many air movers a water loss needs, low and high, from the IICRC worksheet: one per room, per 50-70 ft² of wet floor, per 100-150 ft² of wet wall and ceiling, and per inset." },
   { id: "water-classes", name: "Water Loss Class and Category", group: "D", trades: ["restoration"], desc: "Plain-English categories 1, 2, 3 and classes 1 to 4." },
   { id: "drying-times", name: "Material Drying Times", group: "D", trades: ["restoration"], desc: "Typical drying times by material and contamination." },
   { id: "mold", name: "Mold Growth Conditions", group: "D", trades: ["restoration"], desc: "Risk by temperature, RH, and time." },

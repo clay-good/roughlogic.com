@@ -145,37 +145,39 @@ export const dehumidifierExample = {
 
 // --- Utility 35: Air Mover Placement ---
 //
-// IICRC S500 references suggest one air mover per 10-16 ft of wall in
-// affected areas, or one per 50 to 150 ft^2 of affected floor area
-// depending on water class. We use 100 ft^2 per air mover as a midpoint
-// for class 2 with class-driven scaling.
+// IICRC Airmover and Gallons Calculation Worksheet (US imperial, rev.
+// 7.1.22): one per affected room, plus one per 50-70 ft^2 of wet floor
+// (lower walls to 2 ft included), plus one per 100-150 ft^2 of wet wall and
+// ceiling above 2 ft, plus one per wall inset / offset over 18 in. Each
+// fraction rounds up. The worksheet does not vary by water class. Until
+// 2026-09-24 this used one per 150 / 100 / 75 / 50 ft^2 by class, which put
+// the 600 ft^2 Class 2 example at 6 units against the worksheet's 10-13.
 
-const AIR_MOVER_FT2_PER_UNIT_BY_CLASS = {
-  "1": 150,
-  "2": 100,
-  "3": 75,
-  "4": 50,
-};
-
-// dims: in { affected_area_ft2: L^2, water_class: dimensionless }
-//        out: { air_mover_count: dimensionless, ft2_per_unit: L^2, total_cfm: L^3 T^-1, cfm_per_ft2: L T^-1, placement_pattern: dimensionless, placement_note: dimensionless }
-// (Affected area is `L^2`; per-class coverage is also `L^2`. CFM
-//  is volume-per-time `L^3 T^-1`; CFM per ft^2 collapses to a
-//  surface-velocity `L T^-1`. Air-mover count and the categorical
-//  placement-pattern token are dimensionless.)
-export function computeAirMovers({ affected_area_ft2, water_class = "2" }) {
+// dims: in { affected_area_ft2: L^2, water_class: dimensionless, rooms: dimensionless, wall_ceiling_ft2: L^2, insets: dimensionless }
+//        out: { air_mover_count: dimensionless, air_mover_count_high: dimensionless, water_class: dimensionless, total_cfm: L^3 T^-1, cfm_per_ft2: L T^-1, placement_pattern: dimensionless, placement_note: dimensionless }
+// (Floor and wall/ceiling areas are `L^2`. CFM is volume-per-time
+//  `L^3 T^-1`; CFM per ft^2 collapses to a surface-velocity `L T^-1`.
+//  Counts, the class token and the placement pattern are dimensionless.)
+export function computeAirMovers({ affected_area_ft2, water_class = "2", rooms = 1, wall_ceiling_ft2 = 0, insets = 0 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
-  const ft2_per = AIR_MOVER_FT2_PER_UNIT_BY_CLASS[String(water_class)];
-  if (!ft2_per) return { error: "Unknown water class." };
+  if (!["1", "2", "3", "4"].includes(String(water_class))) return { error: "Unknown water class." };
   // A negative area yields a negative count, which then reads as the smallest
   // placement pattern: measured 2026-09-10, `affected_area_ft2 = -600` moved
   // this tile's own example from "corners + perimeter" to "corners".
   if (Number(affected_area_ft2) < 0) return { error: "Affected area cannot be negative (ft2)." };
-  const count = Math.ceil(affected_area_ft2 / ft2_per);
+  const wc = Number(wall_ceiling_ft2) || 0;
+  const nRooms = Number(rooms);
+  const nInsets = Number(insets) || 0;
+  if (wc < 0) return { error: "Wet wall and ceiling area cannot be negative (ft2)." };
+  if (!(nRooms >= 1) || !Number.isInteger(nRooms)) return { error: "Affected rooms must be a whole number, at least 1." };
+  if (nInsets < 0 || !Number.isInteger(nInsets)) return { error: "Insets and offsets must be a whole number, 0 or more." };
+  const floor = Number(affected_area_ft2) || 0;
+  const count = nRooms + Math.ceil(floor / 70) + Math.ceil(wc / 150) + nInsets;
+  const count_high = nRooms + Math.ceil(floor / 50) + Math.ceil(wc / 100) + nInsets;
   // Typical air mover ~ 2500 CFM at low setting. Coverage in CFM/ft^2.
   const cfm_per_unit = 2500;
   const total_cfm = count * cfm_per_unit;
-  const cfm_per_ft2 = affected_area_ft2 > 0 ? total_cfm / affected_area_ft2 : 0;
+  const cfm_per_ft2 = floor > 0 ? total_cfm / floor : 0;
   // v8 §C.6: placement pattern guidance per IICRC S500 §12 typical.
   // 1-3 units → corner placement (45° vortex). 4-6 → corners + perimeter.
   // 7+ → continuous perimeter spaced at 10-16 linear ft.
@@ -191,14 +193,16 @@ export function computeAirMovers({ affected_area_ft2, water_class = "2" }) {
     placement_note = "Space units along the perimeter at 10-16 linear ft. Aim to maintain a single direction of airflow rotation. Verify coverage at the chamber corners.";
   }
   return {
-    air_mover_count: count, ft2_per_unit: ft2_per, total_cfm, cfm_per_ft2,
+    air_mover_count: count, air_mover_count_high: count_high, water_class: String(water_class),
+    rooms: nRooms, wall_ceiling_ft2: wc, insets: nInsets, total_cfm, cfm_per_ft2,
     placement_pattern, placement_note,
   };
 }
 
 export const airMoversExample = {
-  inputs: { affected_area_ft2: 600, water_class: "2" },
-  expected: { air_mover_count: 6 },
+  // IICRC worksheet: 1 room + ceil(600/70) = 10 (low); 1 + 600/50 = 13 (high).
+  inputs: { affected_area_ft2: 600, water_class: "2", rooms: 1, wall_ceiling_ft2: 0, insets: 0 },
+  expected: { air_mover_count: 10 },
 };
 
 // --- Utility 36: Class and Category of Water Loss Reference ---
@@ -386,27 +390,30 @@ export function renderDehumidifier(inputRegion, outputRegion, citationEl) {
 //        out: { dom_side_effect: dimensionless }
 // (DOM-mount renderer; HTMLElement refs are categorical.)
 export function renderAirMovers(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: IICRC S500 consensus practice (referenced; not reproduced). Coverage in ft^2 per air mover varies by water class.";
-  const a = makeNumber("Affected area (ft²)", "am-a", { step: "any", min: "0" });
+  citationEl.textContent = "Citation: IICRC Airmover and Gallons Calculation Worksheet (rev. 7.1.22), which accompanies IICRC S500: one per affected room, one per 50-70 ft^2 of wet floor, one per 100-150 ft^2 of wet wall and ceiling above 2 ft, and one per wall inset or offset over 18 in, each rounded up. The count does not vary by water class.";
+  const a = makeNumber("Wet floor area (ft²)", "am-a", { step: "any", min: "0" });
+  const rm = makeNumber("Affected rooms", "am-rooms", { step: "1", min: "1", value: "1" });
+  const wcf = makeNumber("Wet wall and ceiling above 2 ft (ft²)", "am-wc", { step: "any", min: "0", value: "0" });
+  const ins = makeNumber("Wall insets and offsets over 18 in", "am-ins", { step: "1", min: "0", value: "0" });
   const c = makeSelect("Water class", "am-c", [
     { value: "1", label: "Class 1" }, { value: "2", label: "Class 2", selected: true }, { value: "3", label: "Class 3" }, { value: "4", label: "Class 4" },
   ]);
-  for (const f of [a, c]) inputRegion.appendChild(f.wrap);
-  attachExampleButton(inputRegion, () => { a.input.value = "600"; c.select.value = "2"; update(); });
+  for (const f of [a, rm, wcf, ins, c]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { a.input.value = "600"; rm.input.value = "1"; wcf.input.value = "0"; ins.input.value = "0"; c.select.value = "2"; update(); });
   const oC = makeOutputLine(outputRegion, "Air mover count", "am-out-c");
   const oCFM = makeOutputLine(outputRegion, "Total CFM", "am-out-cfm");
   // v8 §C.6: placement-pattern + placement-note rows per IICRC S500 §12 typical.
   const oP = makeOutputLine(outputRegion, "Placement pattern", "am-out-p");
   const oN = makeOutputLine(outputRegion, "Placement note", "am-out-n");
   const update = debounce(() => {
-    const r = computeAirMovers({ affected_area_ft2: Number(a.input.value) || 0, water_class: c.select.value });
+    const r = computeAirMovers({ affected_area_ft2: Number(a.input.value) || 0, rooms: Number(rm.input.value) || 1, wall_ceiling_ft2: Number(wcf.input.value) || 0, insets: Number(ins.input.value) || 0, water_class: c.select.value });
     if (r.error) { oC.textContent = r.error; oCFM.textContent = "-"; oP.textContent = "-"; oN.textContent = "-"; return; }
-    oC.textContent = String(r.air_mover_count) + " (" + r.ft2_per_unit + " ft^2 each)";
+    oC.textContent = String(r.air_mover_count) + " to " + String(r.air_mover_count_high) + " (IICRC low and high range)";
     oCFM.textContent = fmt(r.total_cfm, 0) + " CFM";
     oP.textContent = r.placement_pattern;
     oN.textContent = r.placement_note;
   }, DEBOUNCE_MS);
-  for (const el of [a.input, c.select]) el.addEventListener("input", update);
+  for (const el of [a.input, rm.input, wcf.input, ins.input, c.select]) el.addEventListener("input", update);
 }
 
 // dims: in { inputRegion: dimensionless, outputRegion: dimensionless, citationEl: dimensionless }

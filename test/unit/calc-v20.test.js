@@ -875,6 +875,17 @@ test("brine-cure: over-max nitrite flagged", () => {
   const r = computeBrineCure({ mode: "equilibrium", salt_g: 25, meat_g: 1000, cure_g: 4 });
   assert.strictEqual(r.nitrite_over_max, true);
 });
+test("brine-cure: the ingoing limit follows the product (9 CFR 424.21(c), 424.22(b))", () => {
+  // 2.0 g Cure #1 per kg = 125 ppm: under the 156 chopped limit, over the 120 bacon-immersion limit.
+  const base = { mode: "equilibrium", salt_g: 25, meat_g: 1000, cure_g: 2.0 };
+  assert.strictEqual(computeBrineCure({ ...base, product: "chopped" }).nitrite_over_max, false);
+  const bacon = computeBrineCure({ ...base, product: "bacon_immersion" });
+  assert.strictEqual(bacon.nitrite_over_max, true);
+  assert.strictEqual(bacon.nitrite_limit_ppm, 120);
+  assert.strictEqual(computeBrineCure({ ...base, product: "bacon_dry" }).nitrite_limit_ppm, 200);
+  assert.strictEqual(computeBrineCure({ ...base, cure_g: 4, product: "dry_cure" }).nitrite_over_max, false); // 250 ppm < 625
+  assert.ok("error" in computeBrineCure({ ...base, product: "ham" }));
+});
 test("brine-cure: negative weight rejected", () => {
   assert.ok("error" in computeBrineCure({ mode: "brine", salt_g: -1, water_g: 100 }));
 });

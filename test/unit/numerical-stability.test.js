@@ -1141,13 +1141,11 @@ import { computePoundsFormula, poundsFormulaExample } from "../../calc-water.js"
 import { computeLTV, ltvExample } from "../../calc-realestate.js";
 
 test("computeAirMovers: bit-stable air_mover_count + total_cfm at the spec example (600 ft^2, water_class=2)", () => {
-  // Group D. IICRC S500 step function: 600/100 = 6 units (exact);
-  // total_cfm = 6 * 2500 = 15000 (exact integer). Pins both the
-  // ft^2-per-unit step at water_class=2 and the typical-unit CFM
-  // attribution.
+  // Group D. IICRC worksheet: 1 room + ceil(600/70) = 10 units (exact);
+  // total_cfm = 10 * 2500 = 25000 (exact integer).
   const r = computeAirMovers(airMoversExample.inputs);
-  assert.equal(bits(r.air_mover_count), "4018000000000000", `air_mover_count=${r.air_mover_count}`);
-  assert.equal(bits(r.total_cfm), "40cd4c0000000000", `total_cfm=${r.total_cfm}`);
+  assert.equal(r.air_mover_count, 10);
+  assert.equal(r.total_cfm, 25000);
 });
 
 test("computeOvertime: bit-stable regular + OT + gross at the spec example (50 hrs at $30/hr, 1.5x OT, 60-hr DT threshold)", () => {

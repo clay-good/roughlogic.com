@@ -125,7 +125,7 @@ test("C.3 refrigerant-pt target clamps to ≤ 30 °F at extreme low OAT / high W
 // --- C.6 air-mover placement pattern ---
 
 test("C.6 air-mover small chamber → corners pattern", () => {
-  const r = computeAirMovers({ affected_area_ft2: 200, water_class: "2" });
+  const r = computeAirMovers({ affected_area_ft2: 100, water_class: "2" });
   assert.equal(r.placement_pattern, "corners");
 });
 

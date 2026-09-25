@@ -10032,43 +10032,46 @@
   },
   {
    "tile_id": "air-movers",
-   "source_publisher": "IICRC S500-2021 air-mover sizing tables (project bundled)",
-   "source_title": "Air-mover count: ceil(area_ft2 / ft2_per_unit) per water class; total_cfm = count * 2500 nominal",
-   "source_edition_or_year": "IICRC S500-2021 (Class 2 -> 100 ft2/unit, perimeter + corner placement)",
-   "source_section_or_page": "600 ft^2 / Class 2 -> 6 air movers / 15,000 total cfm / corners + perimeter",
+   "source_publisher": "IICRC Airmover and Gallons Calculation Worksheet (US imperial, rev. 7.1.22)",
+   "source_title": "Air-mover count: rooms + ceil(floor / 70) low, rooms + ceil(floor / 50) high, plus wall/ceiling and insets; total_cfm = low count * 2500 nominal",
+   "source_edition_or_year": "IICRC worksheet rev. 7.1.22, steps 1-4 (the count does not vary by water class)",
+   "source_section_or_page": "600 ft^2 floor, 1 room -> 1 + ceil(600/70) = 10 low, 1 + 600/50 = 13 high / 25,000 total cfm / continuous perimeter",
    "verified_by": "rl",
-   "verified_on": "2026-05-11",
+   "verified_on": "2026-09-24",
    "inputs": {
     "affected_area_ft2": 600,
-    "water_class": "2"
+    "water_class": "2",
+    "rooms": 1,
+    "wall_ceiling_ft2": 0,
+    "insets": 0
    },
    "outputs": {
     "air_mover_count": {
-     "value": 6,
+     "value": 10,
      "tolerance": {
       "abs": 0
      }
     },
-    "ft2_per_unit": {
-     "value": 100,
+    "air_mover_count_high": {
+     "value": 13,
      "tolerance": {
       "abs": 0
      }
     },
     "total_cfm": {
-     "value": 15000,
+     "value": 25000,
      "tolerance": {
       "abs": 0
      }
     },
     "cfm_per_ft2": {
-     "value": 25,
+     "value": 41.667,
      "tolerance": {
-      "abs": 0
+      "abs": 0.001
      }
     },
     "placement_pattern": {
-     "value": "corners + perimeter",
+     "value": "continuous perimeter",
      "tolerance": {
       "abs": 0
      }
@@ -89427,8 +89430,8 @@
    "tile_id": "ice-machine-sizing",
    "source_publisher": "AHRI",
    "source_title": "300 covers x 1.5 lb/cover, derate 0.80, utilization 0.90, peak 0.40",
-   "source_edition_or_year": "Standard 810 rating point",
-   "source_section_or_page": "70 F air / 50 F water",
+   "source_edition_or_year": "Standard 810 (rating point 90 F air / 70 F water)",
+   "source_section_or_page": "0.80 derates a 70 F air / 50 F water catalog figure to the 90 / 70 condition",
    "verified_by": "rl",
    "verified_on": "2026-08-26",
    "inputs": {

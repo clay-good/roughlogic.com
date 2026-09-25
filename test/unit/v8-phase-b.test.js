@@ -159,9 +159,9 @@ test("B.5 footing-area cites IRC 2021 §R401-R403 + IBC 2021 Table 1806.2", asyn
 
 // --- Cross-cutting (spec §B.6) ---
 
-test("B.6 cooling-curve cites FDA Food Code 2022 §3-401.11 / §3-501.14", async () => {
+test("B.6 cooling-curve cites FDA Food Code 2022 §3-501.14 (cooling; §3-401.11 is cooking)", async () => {
   const t = await readCalc("calc-kitchen.js");
-  assertCitationContains(t, ["FDA Food Code 2022", "§3-401.11", "§3-501.14", "fda.gov"], "cooling-curve");
+  assertCitationContains(t, ["FDA Food Code 2022", "§3-501.14", "6 hr", "fda.gov"], "cooling-curve");
 });
 test("B.6 hos-math cites FMCSA 49 CFR 395 + ELD legal record", async () => {
   const t = await readCalc("calc-trucking.js");

@@ -3313,7 +3313,7 @@ cross-check.
 | calc-rescue.js | `computeSlingAngle` | `{ load_lb = 0, sling_config = "vertical", included_angle_deg = 60, n_legs = 2...` | _ | _ | _ |
 | calc-rescue.js | `computeSweatRateHydration` | `{ pre_weight_lb = 0, post_weight_lb = 0, fluid_oz = 0, urine_oz = 0, duration...` | _ | _ | _ |
 | calc-rescue.js | `computeSweepWidthCorrection` | `{ uncorrected_width_ft = 0, weather_factor = 1, speed_factor = 1, fatigue_fac...` | _ | _ | _ |
-| calc-restoration.js | `computeAirMovers` | `{ affected_area_ft2, water_class = "2" }` | _ | _ | _ |
+| calc-restoration.js | `computeAirMovers` | `{ affected_area_ft2, water_class = "2", rooms = 1, wall_ceiling_ft2 = 0, inse...` | _ | _ | _ |
 | calc-restoration.js | `computeAirSampleVolume` | `{ flow_rate_lpm, target_volume_L, sample_count = 1 } = {}` | _ | _ | _ |
 | calc-restoration.js | `computeAntimicrobialDilution` | `{ affected_area_ft2, coverage_ft2_per_gal, tank_size_gal, mode = "oz_per_gal"...` | _ | _ | _ |
 | calc-restoration.js | `computeBoundWater` | `{ material_volume_ft3 = 0, dry_density_lb_ft3 = 0, mc_current_pct = 0, mc_goa...` | _ | _ | _ |
@@ -4557,7 +4557,7 @@ per spec-v14 §13.1 second paragraph.
 | --- | --- | --- | --- |
 | `abatement-containment` | Asbestos / Lead Abatement Containment Take-Off | EPA NESHAP 40 CFR 61 M / OSHA 1926.1101; 20 x 15 x 9 containment, 4 ACH, 1,500 cfm machines, 3 cy ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `abatement-waste-containers` | Abatement Waste Bulking, Bags, and Containers | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
-| `air-movers` | Air Mover Placement | IICRC S500-2021 air-mover sizing tabl...; 600 ft^2 / Class 2 -> 6 air movers / 15,000 total cfm / c... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `air-movers` | Air Mover Placement | IICRC Airmover and Gallons Calculatio...; 600 ft^2 floor, 1 room -> 1 + ceil(600/70) = 10 low, 1 + ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `air-sample-volume` | Air Sample Run Time and Volume | ASTM D7391 spore-trap method; cassett...; 15 L/min, 75 L, 3 cassettes -> 5.0 min (300 s) each, 225 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `antimicrobial-dilution` | Antimicrobial Mix and Coverage | FIFRA / EPA-registered product label;...; 400 ft2 at 200 ft2/gal, 4 oz/gal, 1.5 gal tank -> 2.0 gal... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `bound-water` | Bound Water in Wet Materials | ANSI/IICRC S500 gravimetric water-mas...; 10 ft^3 softwood at 32 lb/ft^3, 40%->12% -> 320 lb dry ma... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -5952,7 +5952,7 @@ per spec-v14 §13.1 second paragraph.
 | `grease-duct-cleaning-interval` | Grease Duct Buildup and Cleaning Interval (NFPA 96) | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `hot-holding-energy` | Hot-Holding Load, Demand, and Kitchen Heat Gain | Project (first-principles); 3,412 BTU/hr per kW | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `ibu-tinseth` | Hop Bitterness IBU (Tinseth) | Project (first-principles); measured IBU on the brewery's own system governs | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
-| `ice-machine-sizing` | Ice Machine Capacity and Bin Sizing | AHRI; 70 F air / 50 F water | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `ice-machine-sizing` | Ice Machine Capacity and Bin Sizing | AHRI; 0.80 derates a 70 F air / 50 F water catalog figure to th... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `keg-yield` | Keg Yield, Pours, and Cost per Ounce | Project (first-principles); half barrel 15.5 gal x 128 fl oz/gal | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `kettle-boil-off` | Kettle Boil-Off Rate and Post-Boil Gravity | Project (first-principles); the kettle's measured boil-off rate governs | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `kitchen-makeup-air-deficit` | Kitchen Exhaust and Makeup Air Balance Deficit | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
