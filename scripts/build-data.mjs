@@ -1337,14 +1337,18 @@ const REEFER_BURN_DATA = {
 // Provenance (every entry below is a U.S. government publication or the
 // closest publicly available proxy; the series ID is reproduced verbatim
 // while the prose / methodology of the issuing publication is not):
-//   - copper                BLS PPI WPU10250115 (Copper base scrap)
-//   - aluminum              BLS PPI WPU102301   (Primary aluminum)
-//   - structural-steel      BLS PPI WPU101707   (Steel mill products)
-//   - rebar                 BLS PPI WPU101706   (Concrete reinforcing bars)
+//   - copper                BLS PPI WPU102502 (Copper and brass mill shapes)
+//   - aluminum              BLS PPI WPU102501 (Aluminum mill shapes)
+//   - structural-steel      BLS PPI WPU101704 (Hot rolled steel bars, plates, and structural shapes)
+//   - rebar                 BLS PPI WPU1074051 (Fabricated structural metal bar joists and concrete reinforcing bars)
 //   - framing-lumber        BLS PPI WPU081      (Lumber)
-//   - osb                   BLS PPI WPU0832     (Plywood / OSB)
-//   - drywall               BLS PPI WPU1322     (Gypsum products)
-//   - asphalt               BLS PPI WPU0581     (Asphalt felts and coatings)
+//   - osb                   BLS PPI WPU083 (Plywood (BLS has published no OSB series since 2019))
+//   - drywall               BLS PPI WPU137 (Gypsum products)
+//   - asphalt               BLS PPI WPU058102 (Asphalt)
+//   Until 2026-09-25 seven of these IDs named a different commodity (copper pointed at copper base
+//   scrap, aluminum at copper scrap, drywall at hydraulic cement, steel at cold-rolled sheet, rebar at
+//   pipe and tube; the OSB and copper IDs did not exist). Anchors are now the BLS August 2026
+//   readings (published September 2026) of the series named.
 //   - diesel                EIA PET.EMD_EPD2D_PTE_NUS_DPG.M (US retail diesel)
 //   - gasoline              EIA PET.EMM_EPMR_PTE_NUS_DPG.M (US retail gasoline)
 //   - natural-gas           EIA NG.N3050US3.M  (US city-gate price)
@@ -1352,14 +1356,14 @@ const REEFER_BURN_DATA = {
 //                           2026-09-19 these named FRED IMF series (WHEAT - PRICE RECEIVED, MEASURED IN $ / BU etc.), which are
 //                           GLOBAL prices in USD per METRIC TON, over data modeled in $/bushel.
 const HISTORICAL_COMMODITIES = [
-  { id: "copper",           agency: "BLS PPI",   series_id: "WPU10250115",                   units: "Index 1982=100", anchor: 530.0,  drift: 0.6,  noise: [ -8, -4, -2, 1, 3, 5, 2, -1, -3, 0, 4, 6 ] },
-  { id: "aluminum",         agency: "BLS PPI",   series_id: "WPU102301",                     units: "Index 1982=100", anchor: 295.0,  drift: 0.3,  noise: [ -5, -2, 1, 3, 0, -3, -1, 2, 4, -2, 0, 3 ] },
-  { id: "structural-steel", agency: "BLS PPI",   series_id: "WPU101707",                     units: "Index 1982=100", anchor: 365.0,  drift: 0.2,  noise: [ -6, -3, 0, 2, 4, 1, -2, -4, 0, 3, 5, 2 ] },
-  { id: "rebar",            agency: "BLS PPI",   series_id: "WPU101706",                     units: "Index 1982=100", anchor: 340.0,  drift: 0.1,  noise: [ -4, -1, 2, 4, 0, -3, -2, 1, 3, -1, 2, 4 ] },
-  { id: "framing-lumber",   agency: "BLS PPI",   series_id: "WPU081",                        units: "Index 1982=100", anchor: 245.0,  drift: -0.2, noise: [ 12, 6, -8, -4, 2, 6, 10, 4, -6, -3, 1, 7 ] },
-  { id: "osb",              agency: "BLS PPI",   series_id: "WPU0832",                       units: "Index 1982=100", anchor: 220.0,  drift: -0.1, noise: [ 8, 3, -5, -2, 1, 4, 7, 2, -4, -1, 1, 5 ] },
-  { id: "drywall",          agency: "BLS PPI",   series_id: "WPU1322",                       units: "Index 1982=100", anchor: 305.0,  drift: 0.4,  noise: [ -3, -1, 1, 2, 0, -2, 1, 3, 0, -1, 2, 4 ] },
-  { id: "asphalt",          agency: "BLS PPI",   series_id: "WPU0581",                       units: "Index 1982=100", anchor: 410.0,  drift: 0.5,  noise: [ -7, -3, 1, 4, 6, 3, -2, -5, 0, 2, 5, 8 ] },
+  { id: "copper",           agency: "BLS PPI",   series_id: "WPU102502",                   units: "Index 1982=100", anchor: 813.3,  drift: 0.6,  noise: [ -8, -4, -2, 1, 3, 5, 2, -1, -3, 0, 4, 6 ] },
+  { id: "aluminum",         agency: "BLS PPI",   series_id: "WPU102501",                     units: "Index 1982=100", anchor: 370.9,  drift: 0.3,  noise: [ -5, -2, 1, 3, 0, -3, -1, 2, 4, -2, 0, 3 ] },
+  { id: "structural-steel", agency: "BLS PPI",   series_id: "WPU101704",                     units: "Index Jun 1982=100", anchor: 312.5,  drift: 0.2,  noise: [ -6, -3, 0, 2, 4, 1, -2, -4, 0, 3, 5, 2 ] },
+  { id: "rebar",            agency: "BLS PPI",   series_id: "WPU1074051",                     units: "Index 1982=100", anchor: 385.4,  drift: 0.1,  noise: [ -4, -1, 2, 4, 0, -3, -2, 1, 3, -1, 2, 4 ] },
+  { id: "framing-lumber",   agency: "BLS PPI",   series_id: "WPU081",                        units: "Index 1982=100", anchor: 286.6,  drift: -0.2, noise: [ 12, 6, -8, -4, 2, 6, 10, 4, -6, -3, 1, 7 ] },
+  { id: "osb",              agency: "BLS PPI",   series_id: "WPU083",                       units: "Index 1982=100", anchor: 300.1,  drift: -0.1, noise: [ 8, 3, -5, -2, 1, 4, 7, 2, -4, -1, 1, 5 ] },
+  { id: "drywall",          agency: "BLS PPI",   series_id: "WPU137",                       units: "Index 1982=100", anchor: 484.8,  drift: 0.4,  noise: [ -3, -1, 1, 2, 0, -2, 1, 3, 0, -1, 2, 4 ] },
+  { id: "asphalt",          agency: "BLS PPI",   series_id: "WPU058102",                       units: "Index Jun 1985=100", anchor: 295.3,  drift: 0.5,  noise: [ -7, -3, 1, 4, 6, 3, -2, -5, 0, 2, 5, 8 ] },
   { id: "diesel",           agency: "EIA",       series_id: "PET.EMD_EPD2D_PTE_NUS_DPG.M",   units: "USD/gal",         anchor: 3.85,   drift: 0.005, noise: [ -0.18, -0.10, 0.04, 0.12, 0.18, 0.10, -0.05, -0.14, -0.02, 0.07, 0.13, 0.16 ] },
   { id: "gasoline",         agency: "EIA",       series_id: "PET.EMM_EPMR_PTE_NUS_DPG.M",   units: "USD/gal",         anchor: 3.40,   drift: 0.004, noise: [ -0.22, -0.12, 0.05, 0.16, 0.22, 0.14, -0.04, -0.18, -0.05, 0.06, 0.14, 0.18 ] },
   { id: "natural-gas",      agency: "EIA",       series_id: "NG.N3050US3.M",                units: "USD/Mcf",         anchor: 8.20,   drift: -0.02, noise: [ -1.4, -0.8, -0.2, 0.4, 0.8, 0.4, -0.4, -1.0, -0.4, 0.2, 0.8, 1.6 ] },

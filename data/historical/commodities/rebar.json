@@ -1,8 +1,8 @@
 {
-  "source": "MODELED reference series shaped after BLS PPI series WPU101706. A maintainer-committed recent reading with a smooth monthly pattern behind it -- NOT the published monthly values. Use it for magnitude and spread; for the series of record, read BLS PPI WPU101706 at the source. Reference only; ask your supplier for a current quote.",
+  "source": "MODELED reference series shaped after BLS PPI series WPU1074051. A maintainer-committed recent reading with a smooth monthly pattern behind it -- NOT the published monthly values. Use it for magnitude and spread; for the series of record, read BLS PPI WPU1074051 at the source. Reference only; ask your supplier for a current quote.",
   "basis": "modeled",
   "agency": "BLS PPI",
-  "series_id": "WPU101706",
+  "series_id": "WPU1074051",
   "units": "Index 1982=100",
   "built": "2026-09-09",
   "fetched": "2026-09-09",
@@ -10,147 +10,147 @@
   "points": [
     {
       "date": "2023-10",
-      "value": 332.5
+      "value": 377.9
     },
     {
       "date": "2023-11",
-      "value": 335.6
+      "value": 381
     },
     {
       "date": "2023-12",
-      "value": 338.7
+      "value": 384.1
     },
     {
       "date": "2024-01",
-      "value": 340.8
+      "value": 386.2
     },
     {
       "date": "2024-02",
-      "value": 336.9
+      "value": 382.3
     },
     {
       "date": "2024-03",
-      "value": 334
+      "value": 379.4
     },
     {
       "date": "2024-04",
-      "value": 335.1
+      "value": 380.5
     },
     {
       "date": "2024-05",
-      "value": 338.2
+      "value": 383.6
     },
     {
       "date": "2024-06",
-      "value": 340.3
+      "value": 385.7
     },
     {
       "date": "2024-07",
-      "value": 336.4
+      "value": 381.8
     },
     {
       "date": "2024-08",
-      "value": 339.5
+      "value": 384.9
     },
     {
       "date": "2024-09",
-      "value": 341.6
+      "value": 387
     },
     {
       "date": "2024-10",
-      "value": 333.7
+      "value": 379.1
     },
     {
       "date": "2024-11",
-      "value": 336.8
+      "value": 382.2
     },
     {
       "date": "2024-12",
-      "value": 339.9
+      "value": 385.3
     },
     {
       "date": "2025-01",
-      "value": 342
+      "value": 387.4
     },
     {
       "date": "2025-02",
-      "value": 338.1
+      "value": 383.5
     },
     {
       "date": "2025-03",
-      "value": 335.2
+      "value": 380.6
     },
     {
       "date": "2025-04",
-      "value": 336.3
+      "value": 381.7
     },
     {
       "date": "2025-05",
-      "value": 339.4
+      "value": 384.8
     },
     {
       "date": "2025-06",
-      "value": 341.5
+      "value": 386.9
     },
     {
       "date": "2025-07",
-      "value": 337.6
+      "value": 383
     },
     {
       "date": "2025-08",
-      "value": 340.7
+      "value": 386.1
     },
     {
       "date": "2025-09",
-      "value": 342.8
+      "value": 388.2
     },
     {
       "date": "2025-10",
-      "value": 334.9
+      "value": 380.3
     },
     {
       "date": "2025-11",
-      "value": 338
+      "value": 383.4
     },
     {
       "date": "2025-12",
-      "value": 341.1
+      "value": 386.5
     },
     {
       "date": "2026-01",
-      "value": 343.2
+      "value": 388.6
     },
     {
       "date": "2026-02",
-      "value": 339.3
+      "value": 384.7
     },
     {
       "date": "2026-03",
-      "value": 336.4
+      "value": 381.8
     },
     {
       "date": "2026-04",
-      "value": 337.5
+      "value": 382.9
     },
     {
       "date": "2026-05",
-      "value": 340.6
+      "value": 386
     },
     {
       "date": "2026-06",
-      "value": 342.7
+      "value": 388.1
     },
     {
       "date": "2026-07",
-      "value": 338.8
+      "value": 384.2
     },
     {
       "date": "2026-08",
-      "value": 341.9
+      "value": 387.3
     },
     {
       "date": "2026-09",
-      "value": 344
+      "value": 389.4
     }
   ]
 }

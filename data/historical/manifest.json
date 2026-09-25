@@ -1,30 +1,30 @@
 {
   "name": "historical",
-  "version": "2026-09-09",
-  "fetched": "2026-09-09",
+  "version": "2026-09-25",
+  "fetched": "2026-09-25",
   "edition": "Modeled after BLS PPI / EIA / USDA NASS / FRED federal series (series IDs named verbatim; the monthly values are generated from an in-tree anchor, not downloaded -- the build fetches nothing); built 2026-09-09. Build fails if any shard's latest point is more than 30 days behind the build date.",
-  "asOf": "2026-09-09",
+  "asOf": "2026-09-25",
   "refresh_cadence": "monthly",
   "shards": [
     {
       "file": "commodities/copper.json",
-      "name": "BLS PPI WPU10250115 (Index 1982=100)",
-      "gzip_size_bytes": 599
+      "name": "BLS PPI WPU102502 (Index 1982=100)",
+      "gzip_size_bytes": 603
     },
     {
       "file": "commodities/aluminum.json",
-      "name": "BLS PPI WPU102301 (Index 1982=100)",
-      "gzip_size_bytes": 615
+      "name": "BLS PPI WPU102501 (Index 1982=100)",
+      "gzip_size_bytes": 610
     },
     {
       "file": "commodities/structural-steel.json",
-      "name": "BLS PPI WPU101707 (Index 1982=100)",
-      "gzip_size_bytes": 593
+      "name": "BLS PPI WPU101704 (Index Jun 1982=100)",
+      "gzip_size_bytes": 610
     },
     {
       "file": "commodities/rebar.json",
-      "name": "BLS PPI WPU101706 (Index 1982=100)",
-      "gzip_size_bytes": 610
+      "name": "BLS PPI WPU1074051 (Index 1982=100)",
+      "gzip_size_bytes": 611
     },
     {
       "file": "commodities/framing-lumber.json",
@@ -33,18 +33,18 @@
     },
     {
       "file": "commodities/osb.json",
-      "name": "BLS PPI WPU0832 (Index 1982=100)",
-      "gzip_size_bytes": 608
+      "name": "BLS PPI WPU083 (Index 1982=100)",
+      "gzip_size_bytes": 611
     },
     {
       "file": "commodities/drywall.json",
-      "name": "BLS PPI WPU1322 (Index 1982=100)",
-      "gzip_size_bytes": 597
+      "name": "BLS PPI WPU137 (Index 1982=100)",
+      "gzip_size_bytes": 592
     },
     {
       "file": "commodities/asphalt.json",
-      "name": "BLS PPI WPU0581 (Index 1982=100)",
-      "gzip_size_bytes": 583
+      "name": "BLS PPI WPU058102 (Index Jun 1985=100)",
+      "gzip_size_bytes": 592
     },
     {
       "file": "commodities/diesel.json",
@@ -78,14 +78,14 @@
     }
   ],
   "hashes": {
-    "commodities/copper.json": "e9b758a4c91488fd745ecdc58ccc7bdfbc2284600658993448b6cf75b968d18a",
-    "commodities/aluminum.json": "c6b8e14d2012ea418dc45e138f22157c613ba690dccfd67438ddd453e6005f5c",
-    "commodities/structural-steel.json": "45449bb241ca3787e64a5a72d3707a918797783cf176897e171942366ad69a6a",
-    "commodities/rebar.json": "5c4414631f53c3d412f4e9975059e97caf7f477122b056637c7344a6347ca6d5",
-    "commodities/framing-lumber.json": "2b5fe199c6fca28dc890ed0aa65f99deb2d7584e01f11929751104aaa48ff93e",
-    "commodities/osb.json": "cadc4a5ceb61d8a614b80fa59f86bd0605386ba4e7c6ca1410bc26de50c6bdc6",
-    "commodities/drywall.json": "0ddfd1bc5f72f09655c9751536a5841fb215307aa4db57f379c222273c3f31c5",
-    "commodities/asphalt.json": "6dcd8599b8ac399573aa186fcaf96db0dafa5ca8805124c01375cd6ed53035f1",
+    "commodities/copper.json": "3643ed03f11d234747dc2a3047cde23ca665886d15aa22ab6732b147aea611a1",
+    "commodities/aluminum.json": "c23d4f190bdc6a93ba5cca306aadb332f8d718cc6962db25a07d9a3289b2a8d9",
+    "commodities/structural-steel.json": "5a4933a50d405d2838c36bb77d76c695c1f0f73a52d1965e497d06c0ce0ec8a8",
+    "commodities/rebar.json": "80aa8f283d66ee486215d7a8c6d34bcf1833745a629f49847d6265c67d87f921",
+    "commodities/framing-lumber.json": "c30add80f29bd1f6f54ae6cd5402a432e83fb48c35ced277252edd06226691ec",
+    "commodities/osb.json": "170e6056e51f154a72e8fe1b8bd7172f52079cb5540d1ca735b0fb96d2a8592f",
+    "commodities/drywall.json": "99fd3ae78289d7c149e1e98f9a89147dfa3a25346d502795c632bc3bf2c99a5c",
+    "commodities/asphalt.json": "be6f4847eb665732ceb210a2dd628932119129fc6f93e0c910f67ff171f17201",
     "commodities/diesel.json": "44b74ba1c9c68d3eb834c5670d0c2c37e67aa3ca61e4e5c84d070891c37f85c6",
     "commodities/gasoline.json": "7f1c23482257297afcf28b81107cc46cd02b494830a9a3e01bf0ca442aabd1c5",
     "commodities/natural-gas.json": "3fd03e1ac5cad236199f4e9a9be3a6033e4b8e02f55170c8cd11f64971d03469",

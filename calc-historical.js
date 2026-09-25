@@ -19,14 +19,14 @@ import { DEBOUNCE_MS, debounce, makeSelect, makeNumber, fmt, attachExampleButton
 // ID and citing agency so the citation line on the tool view names them
 // without depending on the shard fetch completing first.
 export const COMMODITIES = [
-  { id: "copper",         label: "Copper",                     agency: "BLS PPI",  series_id: "WPU10250115", units: "Index 1982=100",   file: "copper.json" },
-  { id: "aluminum",       label: "Aluminum",                   agency: "BLS PPI",  series_id: "WPU102301",   units: "Index 1982=100",   file: "aluminum.json" },
-  { id: "structural-steel", label: "Structural steel",         agency: "BLS PPI",  series_id: "WPU101707",   units: "Index 1982=100",   file: "structural-steel.json" },
-  { id: "rebar",          label: "Rebar (concrete reinforcing)", agency: "BLS PPI", series_id: "WPU101706",   units: "Index 1982=100",   file: "rebar.json" },
+  { id: "copper",         label: "Copper (mill shapes)",                     agency: "BLS PPI",  series_id: "WPU102502", units: "Index 1982=100",   file: "copper.json" },
+  { id: "aluminum",       label: "Aluminum (mill shapes)",                   agency: "BLS PPI",  series_id: "WPU102501",   units: "Index 1982=100",   file: "aluminum.json" },
+  { id: "structural-steel", label: "Structural steel (hot-rolled bars, plates, shapes)",         agency: "BLS PPI",  series_id: "WPU101704",   units: "Index Jun 1982=100",   file: "structural-steel.json" },
+  { id: "rebar",          label: "Rebar and bar joists", agency: "BLS PPI", series_id: "WPU1074051",   units: "Index 1982=100",   file: "rebar.json" },
   { id: "framing-lumber", label: "Framing lumber",             agency: "BLS PPI",  series_id: "WPU081",      units: "Index 1982=100",   file: "framing-lumber.json" },
-  { id: "osb",            label: "OSB / structural panels",    agency: "BLS PPI",  series_id: "WPU0832",     units: "Index 1982=100",   file: "osb.json" },
-  { id: "drywall",        label: "Drywall (gypsum products)",  agency: "BLS PPI",  series_id: "WPU1322",     units: "Index 1982=100",   file: "drywall.json" },
-  { id: "asphalt",        label: "Asphalt paving / roofing",   agency: "BLS PPI",  series_id: "WPU0581",     units: "Index 1982=100",   file: "asphalt.json" },
+  { id: "osb",            label: "Plywood / structural panels (no current BLS OSB series)",    agency: "BLS PPI",  series_id: "WPU083",     units: "Index 1982=100",   file: "osb.json" },
+  { id: "drywall",        label: "Drywall (gypsum products)",  agency: "BLS PPI",  series_id: "WPU137",     units: "Index 1982=100",   file: "drywall.json" },
+  { id: "asphalt",        label: "Asphalt",   agency: "BLS PPI",  series_id: "WPU058102",     units: "Index Jun 1985=100",   file: "asphalt.json" },
   { id: "diesel",         label: "Diesel #2 (retail)",         agency: "EIA",      series_id: "PET.EMD_EPD2D_PTE_NUS_DPG.M", units: "USD/gal", file: "diesel.json" },
   { id: "gasoline",       label: "Gasoline E10 (retail)",      agency: "EIA",      series_id: "PET.EMM_EPMR_PTE_NUS_DPG.M",  units: "USD/gal", file: "gasoline.json" },
   { id: "natural-gas",    label: "Natural gas (city gate)",    agency: "EIA",      series_id: "NG.N3050US3.M", units: "USD/Mcf",       file: "natural-gas.json" },

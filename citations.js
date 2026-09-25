@@ -14022,7 +14022,7 @@ export const CITATIONS = {
     ],
   },
   "srw-geogrid-spacing": {
-    formula: "spacing limit = min(2 x block depth, 32 in, 2.7 ft, suggested max); working spacing = floor(limit / block height) x block height; levels = floor((floor(H/hb) - 1) / courses_per_layer) + 1, first level one course above the base; unreinforced crest = H - top level height; grid length = max(0.6 H, 4 ft); grid area = levels x length; compaction lifts = ceil(spacing / 8 in).",
+    formula: "spacing limit = min(2 x block depth, 32 in, 2.7 ft, suggested max); working spacing = floor(limit / block height) x block height; levels = floor((floor(H/hb) - 1) / courses_per_layer) + 1, first level one course above the base; unreinforced crest = H - top level height; grid length = max(0.6 H, 4 ft); grid area = levels x length; compaction lifts = ceil(spacing / 8 in). The crest above the top row is limited to 1.5 x the block depth and the facing below the bottom row to the block depth (FHWA NHI-10-024 4.4.7.d, quoting AASHTO 11.10.2.3.1).",
     edition: "NCMA Design Manual for Segmental Retaining Walls, 3rd edition, Section 7.2.2; AASHTO LRFD Bridge Design Specifications 2016, Section 11.10.2.3.1; FHWA NHI-10-024, Section 4.4.7.d. All three are quoted side by side in Keystone Retaining Wall Systems TIS-15 (2021), whose two published spacing examples this tile reproduces exactly.",
     freeAccess: "The spacing rule is stated identically in three independent design documents and is reproduced in manufacturers' free technical bulletins. No proprietary geogrid strength table, reduction factor, or connection curve is reproduced here - none is used.",
     governance: GOVERNANCE.general,
