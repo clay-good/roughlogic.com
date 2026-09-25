@@ -5294,42 +5294,36 @@ test("bounds: calc-fire computeLadderPipeReach pins horizontal_total = ladder_ho
   assert.ok("error" in bad, "unknown nozzle rejected");
 });
 
-test("bounds: calc-fire computeIsoNeededFireFlow pins Ci = 18*F*sqrt(A_eff), the X exposure ladder, the 250-gpm rounding, and the 12000-gpm cap", () => {
-  // Spec example (area 5000, stories 2, class 2 -> F=1.0, occ=1, exposure 50 ft -> X=0.15, no P).
+test("bounds: calc-fire computeIsoNeededFireFlow pins Ci = 18*F*sqrt(A_eff), the 40 ft exposure rule, the 250/500-gpm rounding, and the 12000-gpm cap", () => {
+  // Spec example (area 5000, stories 2, class 2 -> F=1.0, occ=1, exposure 50 ft -> X=0, no P).
   // ISO Guide ch. 2 sec. 4c: A_eff = 5000 + 50% x 5000 = 7500; Ci_raw = 18 sqrt(7500) = 1558.8,
-  // rounded to 1500 (sec. 5); NFF_raw = 1500 x 1.15 = 1725 -> 1750.
+  // rounded to 1500 (sec. 5); beyond 40 ft X = 0, so NFF = 1500.
   const r = computeIsoNeededFireFlow({ area_ft2: 5000, stories: 2, construction_class: 2, occupancy_factor: 1.0, exposure_distance_ft: 50, exposure_communication_factor: 0 });
   assert.ok(!r.error, JSON.stringify(r));
   assert.strictEqual(r.F_factor, 1.0);
   assert.strictEqual(r.A_eff_ft2, 7500);
   assert.ok(Math.abs(r.Ci_raw - 18 * 1.0 * Math.sqrt(7500)) < 1e-9, `Ci_raw identity`);
   assert.strictEqual(r.Ci_capped, 1500, `Ci rounded to 250 before the multipliers`);
-  assert.strictEqual(r.X_exposure, 0.15);
-  assert.ok(Math.abs(r.NFF_raw_gpm - 1725) < 1e-9, `NFF_raw identity`);
-  assert.strictEqual(r.NFF_gpm, 1750, `rounded to nearest 250`);
+  assert.strictEqual(r.X_exposure, 0);
+  assert.ok(Math.abs(r.NFF_raw_gpm - 1500) < 1e-9, `NFF_raw identity`);
+  assert.strictEqual(r.NFF_gpm, 1500, `rounded to nearest 250`);
   // Classes 5-6: 25% of up to two other floors (protected); 50% of up to eight (unprotected).
   assert.strictEqual(computeIsoNeededFireFlow({ area_ft2: 10000, stories: 4, construction_class: 6, exposure_distance_ft: 200 }).A_eff_ft2, 15000);
   assert.strictEqual(computeIsoNeededFireFlow({ area_ft2: 10000, stories: 4, construction_class: 6, exposure_distance_ft: 200, vertical_openings: "unprotected" }).A_eff_ft2, 25000);
   // One-story buildings cap Ci at 6,000 even in Class 1.
   assert.strictEqual(computeIsoNeededFireFlow({ area_ft2: 1e6, stories: 1, construction_class: 1, exposure_distance_ft: 200 }).Ci_capped, 6000);
-  // X-ladder pinning: every band returns the expected coefficient.
-  const ladder = [
-    { d: 5, X: 0.25 }, { d: 10, X: 0.25 },
-    { d: 20, X: 0.20 }, { d: 30, X: 0.20 },
-    { d: 50, X: 0.15 }, { d: 60, X: 0.15 },
-    { d: 80, X: 0.10 }, { d: 100, X: 0.10 },
-    { d: 120, X: 0.05 }, { d: 150, X: 0.05 },
-    { d: 200, X: 0 },
-  ];
-  for (const { d, X } of ladder) {
-    const s = computeIsoNeededFireFlow({ area_ft2: 5000, stories: 1, construction_class: 3, exposure_distance_ft: d });
-    assert.strictEqual(s.X_exposure, X, `X at d=${d}`);
-  }
+  // Exposure within 40 ft needs X from ISO Table 330A; (X + P) caps at 0.60.
+  assert.ok("error" in computeIsoNeededFireFlow({ area_ft2: 5000, stories: 1, construction_class: 3, exposure_distance_ft: 30 }));
+  const capped = computeIsoNeededFireFlow({ area_ft2: 5000, stories: 1, construction_class: 3, exposure_distance_ft: 30, exposure_factor_x: 0.5, exposure_communication_factor: 0.3 });
+  assert.strictEqual(capped.X_exposure, 0.5);
+  // Above 2,500 gpm the NFF rounds to the nearest 500 gpm (ISO Guide ch. 2 sec. 5).
+  const large = computeIsoNeededFireFlow({ area_ft2: 20000, stories: 2, construction_class: 1, exposure_distance_ft: 200 });
+  assert.ok(large.NFF_gpm > 2500 && large.NFF_gpm % 500 === 0, `NFF ${large.NFF_gpm}`);
   // Ci cap at 8000: very large building drives Ci_raw past 8000.
   const big = computeIsoNeededFireFlow({ area_ft2: 1e6, stories: 3, construction_class: 1, occupancy_factor: 1.0, exposure_distance_ft: 200 });
   assert.strictEqual(big.Ci_capped, 8000, `Ci capped at 8000`);
   // Ceiling cap at 12000 gpm: the largest worst-case NFF cannot exceed 12000.
-  const ceiling = computeIsoNeededFireFlow({ area_ft2: 1e7, stories: 5, construction_class: 1, occupancy_factor: 1.25, exposure_distance_ft: 5, exposure_communication_factor: 0.30 });
+  const ceiling = computeIsoNeededFireFlow({ area_ft2: 1e7, stories: 5, construction_class: 1, occupancy_factor: 1.25, exposure_distance_ft: 5, exposure_factor_x: 0.25, exposure_communication_factor: 0.30 });
   assert.strictEqual(ceiling.NFF_gpm, 12000, `12000 gpm ceiling cap`);
   // Floor cap at 500 gpm for tiny buildings.
   const tiny = computeIsoNeededFireFlow({ area_ft2: 100, stories: 1, construction_class: 6, occupancy_factor: 0.75, exposure_distance_ft: 200 });

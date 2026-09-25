@@ -10585,11 +10585,11 @@
   {
    "tile_id": "iso-nff",
    "source_publisher": "ISO Public Protection Classification (PPC) Schedule (cited by name)",
-   "source_title": "Needed Fire Flow: NFF = Ci * Oi * (1 + X + P), Ci = 18 * F * sqrt(A_eff), Ci rounded to 250 gpm, NFF rounded to 250 and capped at 12,000",
-   "source_edition_or_year": "ISO PPC Schedule ISO Guide for Determination of Needed Fire Flow (2014) ch. 2 sec. 4c-5 (Class 2 joisted masonry F = 1.0; A = largest floor + 50% of other floors)",
-   "source_section_or_page": "5000 ft^2 / 2 stories / Class 2 / occupancy 1.0 / 50 ft exposure -> A_eff 7,500 / Ci 1558.8 rounded to 1500 / X 0.15 / 1725 -> NFF 1750 gpm",
+   "source_title": "Needed Fire Flow: NFF = Ci * Oi * (1 + (X + P)), Ci = 18 * F * sqrt(A_eff), Ci rounded to 250 gpm, NFF rounded to 250 (500 above 2,500) and capped at 12,000",
+   "source_edition_or_year": "ISO PPC Schedule ISO Guide for Determination of Needed Fire Flow (2014) ch. 2 sec. 4c-5 and ch. 3 sec. 16 (Class 2 joisted masonry F = 1.0; A = largest floor + 50% of other floors; no exposure charge beyond 40 ft)",
+   "source_section_or_page": "5000 ft^2 / 2 stories / Class 2 / occupancy 1.0 / 50 ft exposure -> A_eff 7,500 / Ci 1558.8 rounded to 1500 / X 0 (beyond 40 ft) -> NFF 1500 gpm",
    "verified_by": "rl",
-   "verified_on": "2026-09-18",
+   "verified_on": "2026-09-24",
    "inputs": {
     "area_ft2": 5000,
     "stories": 2,
@@ -10617,13 +10617,13 @@
      }
     },
     "X_exposure": {
-     "value": 0.15,
+     "value": 0,
      "tolerance": {
       "abs": 0.001
      }
     },
     "NFF_gpm": {
-     "value": 1750,
+     "value": 1500,
      "tolerance": {
       "abs": 0
      }

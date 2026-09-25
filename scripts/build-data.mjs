@@ -827,7 +827,7 @@ const HOSE_FRICTION = {
 const FIRE_FLOW_FORMULAS = {
   source: "ISO Public Protection Classification published formulas; iterated structural-fire-load references.",
   formulas: {
-    iso_needed_fire_flow: "NFF = (C * O * X * P) where C = 18*F*sqrt(A), F is construction class factor, O is occupancy factor, X is exposure factor, P is communication factor.",
+    iso_needed_fire_flow: "NFF = C * O * (1 + (X + P)) where C = 18*F*sqrt(A), F is construction class factor, O is occupancy factor, X is exposure factor, P is communication factor.",
     construction_class_factor: { fire_resistive: 0.6, masonry: 0.8, ordinary: 1.0, wood_frame: 1.5 },
   },
   notes: "Used for estimation only; the AHJ governs the actual fire flow requirement.",

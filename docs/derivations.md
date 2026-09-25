@@ -977,18 +977,18 @@ Verification: gross load = sum of four contributions. Per-leg tension at 60 deg 
 
 ## 46. ISO Needed Fire Flow (v7, utility 252)
 
-  Ci = 18 * F * sqrt(A_eff)        (capped at 8000)
-  A_eff = footprint * min(stories, 3)   for non-fire-resistive
-  A_eff = footprint                     for fire-resistive (class 5/6)
-  X = exposure factor by distance band: 0 ft >= 150 ft to 0.25 within 10 ft
-  NFF_raw = Ci * Oi * (1 + X + P)
-  NFF = round-to-250(NFF_raw), floored at 500, capped at 12 000
+  Ci = 18 * F * sqrt(A_eff), rounded to 250 gpm, 500 min, 8,000 max (Classes 1-2) or 6,000 (Classes 3-6 or one story)
+  A_eff = largest floor + 50% of the other floors               (Classes 1-4)
+  A_eff = largest floor + 25% of up to two others (protected)   (Classes 5-6; 50% of up to eight if unprotected)
+  X = 0 beyond 40 ft; within 40 ft, read from ISO Table 330A(1-3) and entered
+  NFF_raw = Ci * Oi * (1 + (X + P)),  (X + P) <= 0.60
+  NFF = rounded to 250 gpm (500 above 2,500), floored at 500, capped at 12,000
 
 F values per ISO PPC: Frame 1.5; Joisted masonry 1.0; Noncombustible 0.8; Masonry noncombustible 0.8; Modified fire-resistive 0.6; Fire-resistive 0.6.
 
-Citations: ISO Public Protection Classification (PPC) Schedule by name. Cited by name only; the schedule's commentary is not reproduced.
+Citations: ISO Guide for Determination of Needed Fire Flow (2014) ch. 2 sec. 4c-5 and ch. 3 sec. 16. Cited by name only; Table 330A is not reproduced, so an exposure within 40 ft asks for X rather than guessing it.
 
-Verification: Class 2 (F=1.0), 5000 ft^2, 1 story gives Ci_raw = 18 * 1.0 * sqrt(5000) ~ 1273. Stories cap at 3 for non-fire-resistive (regression: stories=3 and stories=10 give the same A_eff). Fire-resistive stops the multiplier (A_eff = footprint regardless of stories). NFF rounded to nearest 250 gpm. Floor 500, cap 12 000 verified at the extremes. X by distance: 8 ft = 0.25, 200 ft = 0.
+Verification: Class 2 (F=1.0), 5000 ft^2, 2 stories gives A_eff = 7,500, Ci_raw = 18 * sqrt(7500) = 1558.8, rounded to 1500; the 50 ft exposure carries no charge, so NFF = 1500 gpm. An exposure at 8 ft without X is refused. Floor 500, cap 12,000 verified at the extremes; above 2,500 gpm the answer is a multiple of 500.
 
 ## 47. Fall protection clearance (v7, utility 253)
 

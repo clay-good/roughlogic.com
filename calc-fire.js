@@ -862,12 +862,13 @@ export const NFF_MAX_GPM = 12000;
 export const NFF_MIN_GPM = 500;
 export const NFF_ROUND_INCREMENT = 250;
 
-// dims: in { area_ft2: L^2, stories: dimensionless, construction_class: dimensionless, occupancy_factor: dimensionless, exposure_distance_ft: L, exposure_communication_factor: dimensionless }
+// dims: in { area_ft2: L^2, stories: dimensionless, construction_class: dimensionless, occupancy_factor: dimensionless, exposure_distance_ft: L, exposure_communication_factor: dimensionless, exposure_factor_x: dimensionless }
 //        out: { F_factor: dimensionless, A_eff_ft2: L^2, Ci_raw: L^3 T^-1, Ci_capped: L^3 T^-1, X_exposure: dimensionless, occupancy_factor: dimensionless, P_communication: dimensionless, NFF_raw_gpm: L^3 T^-1, NFF_gpm: L^3 T^-1 }
 export function computeIsoNeededFireFlow({
   area_ft2 = 0, stories = 1, construction_class = 3,
   occupancy_factor = 1.0, exposure_distance_ft = 100,
   exposure_communication_factor = 0, vertical_openings = "protected",
+  exposure_factor_x = null,
 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(area_ft2 > 0)) return { error: "Building footprint area must be positive." };
@@ -892,18 +893,29 @@ export function computeIsoNeededFireFlow({
   const Ci_raw = 18 * F * Math.sqrt(A_eff);
   const Ci_max = construction_class <= 2 && others > 0 ? 8000 : 6000;
   const Ci = Math.min(Math.max(Math.round(Ci_raw / NFF_ROUND_INCREMENT) * NFF_ROUND_INCREMENT, 500), Ci_max);
+  // Exposure factor X: ISO Table 330A(1-3), which reads the exposure's wall
+  // construction and length-height value as well as the distance, and counts no
+  // exposure beyond 40 ft ("An exposure building has a wall 40 feet or less
+  // from a wall of the subject building"). Until 2026-09-24 a distance-only
+  // ladder (0.25 at 10 ft down to 0.05 at 150 ft) supplied values in no row of
+  // those tables -- the largest ISO value is 0.140. Within 40 ft the reader now
+  // enters X from the table; beyond it X = 0.
   let X = 0;
-  if (exposure_distance_ft > 0) {
-    if (exposure_distance_ft <= 10) X = 0.25;
-    else if (exposure_distance_ft <= 30) X = 0.20;
-    else if (exposure_distance_ft <= 60) X = 0.15;
-    else if (exposure_distance_ft <= 100) X = 0.10;
-    else if (exposure_distance_ft <= 150) X = 0.05;
-    else X = 0;
+  const xIn = exposure_factor_x === null || exposure_factor_x === undefined || exposure_factor_x === "" ? null : Number(exposure_factor_x);
+  if (xIn !== null) {
+    if (!(xIn >= 0 && xIn <= 0.6)) return { error: "Exposure factor X must be between 0 and 0.60 (ISO Table 330A)." };
+    X = xIn;
+  } else if (exposure_distance_ft > 0 && exposure_distance_ft <= 40) {
+    return { error: "An exposure within 40 ft carries a charge that depends on its wall construction and length-height value: read X from ISO Table 330A(1-3) and enter it." };
   }
   const P = Math.max(0, Number(exposure_communication_factor) || 0);
-  const NFF_raw = Ci * occupancy_factor * (1 + X + P);
-  let NFF = Math.round(NFF_raw / NFF_ROUND_INCREMENT) * NFF_ROUND_INCREMENT;
+  // ISO limits (X + P) to 0.60.
+  const XP = Math.min(X + P, 0.6);
+  const NFF_raw = Ci * occupancy_factor * (1 + XP);
+  // ISO rounds NFF to the nearest 250 gpm below 2,500 gpm and the nearest 500
+  // gpm above it (until 2026-09-24 this rounded to 250 throughout).
+  const NFF_step = NFF_raw > 2500 ? 500 : NFF_ROUND_INCREMENT;
+  let NFF = Math.round(NFF_raw / NFF_step) * NFF_step;
   if (NFF > NFF_MAX_GPM) NFF = NFF_MAX_GPM;
   if (NFF < NFF_MIN_GPM) NFF = NFF_MIN_GPM;
   return {
@@ -919,7 +931,7 @@ export const isoNeededFireFlowExample = {
 };
 
 function _v7f_renderIsoNFF(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: ISO Public Protection Classification (PPC) Schedule by name. NFF = Ci × Oi × (1 + X + P) where Ci = 18 × F × sqrt(A), A = largest floor + 50% of other floors (Classes 1-4) or 25% of up to two others (5-6, protected openings; 50% of up to eight if unprotected); Ci rounded to 250 gpm, 500 min, 8,000 max (Classes 1-2) or 6,000 (3-6 or one story); NFF rounded to 250 and capped at 12 000 gpm. SOP-and-incident-command governs.";
+  citationEl.textContent = "Citation: ISO Public Protection Classification (PPC) Schedule by name. NFF = Ci × Oi × (1 + (X + P)) where Ci = 18 × F × sqrt(A), A = largest floor + 50% of other floors (Classes 1-4) or 25% of up to two others (5-6, protected openings; 50% of up to eight if unprotected); Ci rounded to 250 gpm, 500 min, 8,000 max (Classes 1-2) or 6,000 (3-6 or one story); X from ISO Table 330A(1-3) for an exposure within 40 ft (none beyond), with (X + P) limited to 0.60; NFF rounded to 250 gpm below 2,500 and to 500 above, capped at 12,000 gpm. SOP-and-incident-command governs.";
   _v7f_attachEx(inputRegion, () => fillExample(isoNeededFireFlowExample.inputs));
   const a = _v7f_makeNumber("Footprint area (ft²)", "nf-a", { step: "any", min: "0" });
   const s = _v7f_makeNumber("Stories", "nf-s", { step: "1", min: "1" });
@@ -935,13 +947,14 @@ function _v7f_renderIsoNFF(inputRegion, outputRegion, citationEl) {
   const o = _v7f_makeNumber("Occupancy factor Oi (0.75-1.25)", "nf-o", { step: "any", min: "0" });
   o.input.value = "1.0";
   const e = _v7f_makeNumber("Exposure distance (ft)", "nf-e", { step: "any", min: "0" });
+  const xf = _v7f_makeNumber("Exposure factor X from ISO Table 330A (needed within 40 ft)", "nf-x", { step: "any", min: "0" });
   const p = _v7f_makeNumber("Communication factor P (0-0.30)", "nf-p", { step: "any", min: "0" });
   p.input.value = "0";
   const vo = _v7f_makeSelect("Vertical openings (Classes 5-6)", "nf-vo", [
     { value: "protected", label: "Protected (1-hour enclosures)" },
     { value: "unprotected", label: "Unprotected" },
   ]);
-  for (const f of [a, s, c, o, e, p, vo]) inputRegion.appendChild(f.wrap);
+  for (const f of [a, s, c, o, e, xf, p, vo]) inputRegion.appendChild(f.wrap);
   const oCi = _v7f_makeOut(outputRegion, "Construction factor Ci", "nf-out-ci");
   const oX = _v7f_makeOut(outputRegion, "Exposure factor X", "nf-out-x");
   const oNFF = _v7f_makeOut(outputRegion, "Needed Fire Flow (NFF)", "nf-out-nff");
@@ -953,13 +966,14 @@ function _v7f_renderIsoNFF(inputRegion, outputRegion, citationEl) {
       exposure_distance_ft: Number(e.input.value) || 100,
       exposure_communication_factor: Number(p.input.value) || 0,
       vertical_openings: vo.select.value,
+      exposure_factor_x: xf.input.value === "" ? null : Number(xf.input.value),
     });
     if (r.error) { oCi.textContent = r.error; oX.textContent = "-"; oNFF.textContent = "-"; return; }
     oCi.textContent = _v7f_fmt(r.Ci_capped, 0) + " (raw " + _v7f_fmt(r.Ci_raw, 0) + ")";
     oX.textContent = _v7f_fmt(r.X_exposure, 2);
     oNFF.textContent = _v7f_fmt(r.NFF_gpm, 0) + " gpm (rounded; cap 12 000)";
   }, _V7F_DEB);
-  for (const f of [a.input, s.input, c.select, o.input, e.input, p.input, vo.select]) f.addEventListener("input", update);
+  for (const f of [a.input, s.input, c.select, o.input, e.input, xf.input, p.input, vo.select]) f.addEventListener("input", update);
 }
 
 FIRE_RENDERERS["iso-nff"] = _v7f_renderIsoNFF;

@@ -5373,8 +5373,8 @@ test("monotonicity: computeIsoNeededFireFlow NFF_raw_gpm is strictly non-decreas
   assert.equal(ref.A_eff_ft2, 7500);
   assert.ok(Math.abs(ref.Ci_raw - 18 * ref.F_factor * Math.sqrt(7500)) < 1e-9,
     `Ci_raw = ${ref.Ci_raw}, expected ${18 * ref.F_factor * Math.sqrt(7500)}`);
-  // Exposure-distance step pin: 50 ft falls in (30, 60] -> X = 0.15.
-  assert.equal(ref.X_exposure, 0.15);
+  // Beyond 40 ft there is no exposure charge (ISO Guide ch. 3 sec. 16).
+  assert.equal(ref.X_exposure, 0);
   // NFF_gpm is rounded to 250-gpm increment and bounded by min/max.
   assert.ok(ref.NFF_gpm % 250 === 0,
     `NFF_gpm = ${ref.NFF_gpm}, expected multiple of 250`);

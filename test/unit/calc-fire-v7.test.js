@@ -43,7 +43,7 @@ test("252 NFF rounded to nearest 250 gpm", () => {
 
 test("252 NFF capped at 12000 gpm", () => {
   // Force a very large building: 100k ft^2, 3-story, frame.
-  const r = computeIsoNeededFireFlow({ area_ft2: 100000, stories: 3, construction_class: 1, occupancy_factor: 1.25, exposure_distance_ft: 10, exposure_communication_factor: 0.30 });
+  const r = computeIsoNeededFireFlow({ area_ft2: 100000, stories: 3, construction_class: 1, occupancy_factor: 1.25, exposure_distance_ft: 10, exposure_factor_x: 0.14, exposure_communication_factor: 0.30 });
   assert.equal(r.NFF_gpm, NFF_MAX_GPM);
 });
 
@@ -52,11 +52,14 @@ test("252 NFF floored at 500 gpm", () => {
   assert.ok(r.NFF_gpm >= NFF_MIN_GPM);
 });
 
-test("252 exposure factor X scales by distance band", () => {
-  const close_in = computeIsoNeededFireFlow({ area_ft2: 5000, stories: 1, construction_class: 2, exposure_distance_ft: 8 });
-  const far_out = computeIsoNeededFireFlow({ area_ft2: 5000, stories: 1, construction_class: 2, exposure_distance_ft: 200 });
-  assert.equal(close_in.X_exposure, 0.25);
+test("252 exposure X: none beyond 40 ft, read from ISO Table 330A within it", () => {
+  // ISO Guide ch. 3 sec. 16: only exposures within 40 ft carry a charge.
+  const far_out = computeIsoNeededFireFlow({ area_ft2: 5000, stories: 1, construction_class: 2, exposure_distance_ft: 50 });
   assert.equal(far_out.X_exposure, 0);
+  assert.ok(computeIsoNeededFireFlow({ area_ft2: 5000, stories: 1, construction_class: 2, exposure_distance_ft: 8 }).error);
+  const close_in = computeIsoNeededFireFlow({ area_ft2: 5000, stories: 1, construction_class: 2, exposure_distance_ft: 8, exposure_factor_x: 0.22 });
+  assert.equal(close_in.X_exposure, 0.22);
+  assert.ok(computeIsoNeededFireFlow({ area_ft2: 5000, stories: 1, construction_class: 2, exposure_factor_x: 0.7 }).error);
 });
 
 test("252 ISO_CONSTRUCTION_F covers classes 1 through 6", () => {
