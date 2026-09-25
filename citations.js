@@ -5283,7 +5283,7 @@ export const CITATIONS = {
     ],
   },
   "bridge-formula": {
-    formula: "Federal Bridge Formula B: W = 500 × (LN / (N − 1) + 12N + 36) where W is the maximum allowed gross weight (lb) on a group of N consecutive axles spaced L feet apart. Single-axle limit 20 000 lb; tandem-axle limit 34 000 lb. Maximum gross 80 000 lb on Interstate routes.",
+    formula: "Federal Bridge Formula B: W = 500 × (LN / (N − 1) + 12N + 36), to the nearest 500 lb (FHWA rounds an exact half down), where W is the maximum allowed gross weight (lb) on a group of N consecutive axles spaced L feet apart. Single-axle limit 20 000 lb; tandem-axle limit 34 000 lb. Maximum gross 80 000 lb on Interstate routes.",
     edition: "23 CFR 658.17 by section (Federal-aid Highway Act of 1956 / FHWA Bridge Formula).",
     freeAccess: "Free at ecfr.gov.",
     governance: GOVERNANCE.trucking,
@@ -5294,13 +5294,13 @@ export const CITATIONS = {
     ],
   },
   "bridge-formula-min-spacing": {
-    formula: "Federal Bridge Formula B solved for the spread: L = ((W / 500) - 12 N - 36)(N - 1) / N, where W is the target group weight (lb) on N consecutive axles spaced L feet outer-to-outer.",
+    formula: "Federal Bridge Formula B solved for the spread: the first whole foot L at which W = 500 (L N / (N - 1) + 12 N + 36), rounded to the nearest 500 lb, carries the target group weight on N consecutive axles spaced L feet outer-to-outer.",
     edition: "23 CFR 658.17 by section (Federal-aid Highway Act of 1956 / FHWA Bridge Formula), rearranged for the axle spread.",
     freeAccess: "Free at ecfr.gov.",
     governance: GOVERNANCE.trucking,
-    editionNote: "The Federal Bridge Formula B, W = 500 (L N/(N-1) + 12 N + 36), solved for the minimum outer-to-outer axle spread L that legally carries a target group weight W across N consecutive axles: L = ((W/500) - 12 N - 36)(N-1)/N. When the result is zero or negative the axles satisfy the formula bunched together (the group weight is below the N-axle minimum). This is the spacing the bridge formula alone requires; the 20,000 lb single-axle and 34,000 lb tandem caps and the 80,000 lb Interstate gross limit apply independently, and a load above 80,000 lb needs an overweight permit. State limits may be lower on non-Interstate routes, and some states exceed federal limits via grandfathering or annual permits; the enforcing state DOT and the permit govern.",
+    editionNote: "The Federal Bridge Formula B, W = 500 (L N/(N-1) + 12 N + 36), solved for the minimum outer-to-outer axle spread L that legally carries a target group weight W across N consecutive axles. 23 CFR 658.17 takes W to the nearest 500 lb, and FHWA's Bridge Table (Bridge Formula Weights, FHWA-HOP-19-028) lists whole feet and rounds an exact half down; the spread is the first table row that carries the weight, 51 ft for 80,000 lb on 5 axles, where the unrounded inverse L = ((W/500) - 12 N - 36)(N-1)/N gives 51.2. When the axles satisfy the formula bunched together (the group weight is below the N-axle minimum) the spread is zero. This is the spacing the bridge formula alone requires; the 20,000 lb single-axle and 34,000 lb tandem caps and the 80,000 lb Interstate gross limit apply independently, and a load above 80,000 lb needs an overweight permit. State limits may be lower on non-Interstate routes, and some states exceed federal limits via grandfathering or annual permits; the enforcing state DOT and the permit govern.",
     assumptions: [
-      { name: "Spread inverse", value: "L = ((W/500) - 12 N - 36)(N-1)/N; zero when the axles satisfy the formula bunched together", source: "23 CFR 658.17" },
+      { name: "Spread inverse", value: "first whole foot at which W, rounded to the nearest 500 lb (an exact half rounds down), reaches the target; zero when the axles satisfy the formula bunched together", source: "23 CFR 658.17; FHWA-HOP-19-028 Bridge Table footnote 1" },
       { name: "Independent caps", value: "the 20,000 lb single / 34,000 lb tandem / 80,000 lb gross limits still apply; over 80,000 lb needs a permit", source: "23 CFR 658.17" },
     ],
   },
@@ -14655,13 +14655,13 @@ export const CITATIONS = {
     ],
   },
   "density-altitude": {
-    formula: "oat_c = (oat_f - 32) x 5/9; PA = elevation + (29.92 - altimeter) x 1000; ISA = 15 - 2 x (PA/1000); DA = PA + 120 x (oat_c - ISA).",
+    formula: "oat_c = (oat_f - 32) x 5/9; PA = elevation + 145366.45 x (1 - (altimeter/29.92)^0.190284); ISA = 15 - 2 x (PA/1000); DA = PA + 120 x (oat_c - ISA).",
     edition: "FAA density-altitude method (ISA lapse correction), per FAA AC 00-6 / the ICAO Standard Atmosphere, by name; the aircraft flight manual performance charts and the pilot in command govern.",
     freeAccess: "The density-altitude relation is a published FAA/ICAO standard-atmosphere approximation; the inputs come from the field elevation, the altimeter setting, and a thermometer.",
     governance: GOVERNANCE.general,
-    editionNote: "FAA density-altitude method (ISA lapse correction). PA = elevation + (29.92 - altimeter) x 1000, ISA temp = 15 - 2 x (PA/1000) degrees C, and DA = PA + 120 x (OAT - ISA). Density altitude is the pressure altitude corrected for the temperature departure from standard: hot and high robs lift, engine power, and prop thrust even when the field elevation looks benign. Humidity lowers air density further; this dry-air model ignores it, so it slightly under-predicts DA on a humid day. A planning estimate, not a performance guarantee; the aircraft flight manual performance charts and the pilot in command govern.",
+    editionNote: "FAA density-altitude method (ISA lapse correction). PA = elevation + 145,366 x (1 - (altimeter/29.92)^0.190284), the standard-atmosphere conversion behind the FAA Pilot's Handbook of Aeronautical Knowledge (FAA-H-8083-25) altimeter-setting table (30.10 in Hg -> -165 ft); the (29.92 - altimeter) x 1000 rule of thumb drifts to about 100 ft off at 28 in Hg. ISA temp = 15 - 2 x (PA/1000) degrees C, and DA = PA + 120 x (OAT - ISA). Density altitude is the pressure altitude corrected for the temperature departure from standard: hot and high robs lift, engine power, and prop thrust even when the field elevation looks benign. Humidity lowers air density further; this dry-air model ignores it, so it slightly under-predicts DA on a humid day. A planning estimate, not a performance guarantee; the aircraft flight manual performance charts and the pilot in command govern.",
     assumptions: [
-      { name: "Pressure altitude", value: "PA = elevation + (29.92 - altimeter) x 1000; equals the field elevation at a standard 29.92 setting", source: "FAA AC 00-6" },
+      { name: "Pressure altitude", value: "PA = elevation + 145,366 x (1 - (altimeter/29.92)^0.190284); equals the field elevation at a standard 29.92 setting", source: "FAA-H-8083-25, altimeter-setting conversion table" },
       { name: "ISA lapse", value: "standard temperature falls 2 degrees C per 1000 ft from 15 C at sea level", source: "ICAO Standard Atmosphere" },
       { name: "Dry air", value: "ignores humidity, which lowers density and raises DA further", source: "scope of this tile" },
     ],

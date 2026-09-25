@@ -383,21 +383,21 @@
   },
   {
    "tile_id": "bridge-formula-min-spacing",
-   "source_publisher": "FHWA (Federal Bridge Formula B, solved for the spread)",
-   "source_title": "5-axle group at 80,000 lb -> 51.2 ft minimum outer-to-outer spread",
-   "source_edition_or_year": "23 CFR 658.17 (current); spec-v656 (machine-verified)",
-   "source_section_or_page": "spec-v656 section 2.1 pinned example",
+   "source_publisher": "FHWA",
+   "source_title": "Bridge Formula Weights (FHWA-HOP-19-028)",
+   "source_edition_or_year": "FHWA-HOP-19-028, 2019",
+   "source_section_or_page": "Figure 6: 80,000 lb on 5 axles is the Bridge Table row for L = 51 ft (formula 79,875, to the nearest 500 lb)",
    "verified_by": "rl",
-   "verified_on": "2026-07-13",
+   "verified_on": "2026-09-25",
    "inputs": {
     "target_weight_lb": 80000,
     "num_axles": 5
    },
    "outputs": {
     "min_spacing_ft": {
-     "value": 51.2,
+     "value": 51,
      "tolerance": {
-      "abs": 0.05
+      "abs": 0
      }
     }
    }
@@ -419,6 +419,69 @@
      "value": 4.0,
      "tolerance": {
       "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "bridge-formula-min-spacing",
+   "source_publisher": "FHWA",
+   "source_title": "Bridge Formula Weights (FHWA-HOP-19-028)",
+   "source_edition_or_year": "FHWA-HOP-19-028, 2019",
+   "source_section_or_page": "Figure 5: 51,000 lb on 3 axles is the Bridge Table row for L = 20 ft",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "target_weight_lb": 51000,
+    "num_axles": 3
+   },
+   "outputs": {
+    "min_spacing_ft": {
+     "value": 20,
+     "tolerance": {
+      "abs": 0
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "bridge-formula-min-spacing",
+   "source_publisher": "FHWA",
+   "source_title": "Bridge Formula Weights (FHWA-HOP-19-028)",
+   "source_edition_or_year": "FHWA-HOP-19-028, 2019",
+   "source_section_or_page": "Figure 7: 65,500 lb on 4 axles is the Bridge Table row for L = 35 ft",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "target_weight_lb": 65500,
+    "num_axles": 4
+   },
+   "outputs": {
+    "min_spacing_ft": {
+     "value": 35,
+     "tolerance": {
+      "abs": 0
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "bridge-formula-min-spacing",
+   "source_publisher": "FHWA",
+   "source_title": "Bridge Formula Weights (FHWA-HOP-19-028)",
+   "source_edition_or_year": "FHWA-HOP-19-028, 2019",
+   "source_section_or_page": "Figure 8: 42,500 lb on 3 axles at L = 9 ft (formula 42,750; the table rounds an exact half down, footnote 1)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "target_weight_lb": 42500,
+    "num_axles": 3
+   },
+   "outputs": {
+    "min_spacing_ft": {
+     "value": 9,
+     "tolerance": {
+      "abs": 0
      }
     }
    }
@@ -16937,6 +17000,27 @@
    }
   },
   {
+   "tile_id": "well-max-yield",
+   "source_publisher": "Water Replenishment District of Southern California",
+   "source_title": "Technical Bulletin Vol. 2, Specific Capacity: A Measure of Well Performance (Part 1 of 2)",
+   "source_edition_or_year": "Winter 2005",
+   "source_section_or_page": "p. 1: 119 gpm/ft x 50 ft = 5,950 gpm",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "specific_capacity_gpm_ft": 119,
+    "allowable_drawdown_ft": 50
+   },
+   "outputs": {
+    "max_yield_gpm": {
+     "value": 5950,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
    "tile_id": "cooling-water-makeup",
    "source_publisher": "CTI / ASHRAE",
    "source_title": "Cooling water makeup: 1,000 GPM recirc, 10 F range, COC 4, drift 0.002",
@@ -20825,6 +20909,36 @@
    }
   },
   {
+   "tile_id": "manure-nutrient-application",
+   "source_publisher": "Penn State Extension",
+   "source_title": "Agronomy Facts 55, Estimating Manure Application Rates",
+   "source_edition_or_year": "1997",
+   "source_section_or_page": "Worksheet 1 example: 90 lb N/A net need, 10 lb N/ton at 35% available -> 3.5 lb/ton, 25.7 ton/A",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "crop_n_need_lb_acre": 90,
+    "total_n_lb_ton": 10,
+    "availability_pct": 35,
+    "p2o5_lb_ton": 0,
+    "k2o_lb_ton": 0
+   },
+   "outputs": {
+    "avail_n_per_ton": {
+     "value": 3.5,
+     "tolerance": {
+      "abs": 0.05
+     }
+    },
+    "rate_ton_acre": {
+     "value": 25.7,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
    "tile_id": "center-pivot-runtime",
    "source_publisher": "USDA-NRCS center-pivot design / university extension",
    "source_title": "hours = area x depth x 452.6 / flow; gross_gpm_per_acre = flow / area",
@@ -21298,6 +21412,48 @@
    "outputs": {
     "head_ft": {
      "value": 1.0,
+     "tolerance": {
+      "abs": 0.005
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "weir-head-from-flow",
+   "source_publisher": "USBR",
+   "source_title": "Water Measurement Manual",
+   "source_edition_or_year": "3rd ed., 1997 (revised reprint 2001)",
+   "source_section_or_page": "Table A7-4, 90-degree V-notch (Q = 2.49 h^2.48): 2.49 ft^3/s at h = 1.00 ft",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "weir_type": "vnotch90",
+    "target_flow_cfs": 2.49
+   },
+   "outputs": {
+    "head_ft": {
+     "value": 1.0,
+     "tolerance": {
+      "abs": 0.005
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "weir-head-from-flow",
+   "source_publisher": "USBR",
+   "source_title": "Water Measurement Manual",
+   "source_edition_or_year": "3rd ed., 1997 (revised reprint 2001)",
+   "source_section_or_page": "Table A7-4, 90-degree V-notch: 6.81 ft^3/s at h = 1.50 ft",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "weir_type": "vnotch90",
+    "target_flow_cfs": 6.81
+   },
+   "outputs": {
+    "head_ft": {
+     "value": 1.5,
      "tolerance": {
       "abs": 0.005
      }
@@ -29177,6 +29333,54 @@
    }
   },
   {
+   "tile_id": "climb-gradient-roc",
+   "source_publisher": "FAA",
+   "source_title": "Terminal Procedures Publication, Rate of Climb Table (ft per min)",
+   "source_edition_or_year": "d-TPP front matter, cycle 2610",
+   "source_section_or_page": "Supplemental table J2: 200 ft/NM at 120 kt ground speed -> 400 ft/min (3.29%)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "climb_gradient_ft_per_nm": 200,
+    "ground_speed_kt": 120
+   },
+   "outputs": {
+    "roc_fpm": {
+     "value": 400,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "gradient_percent": {
+     "value": 3.29,
+     "tolerance": {
+      "abs": 0.005
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "climb-gradient-roc",
+   "source_publisher": "FAA",
+   "source_title": "Terminal Procedures Publication, Rate of Climb Table (ft per min)",
+   "source_edition_or_year": "d-TPP front matter, cycle 2610",
+   "source_section_or_page": "Supplemental table J2: 350 ft/NM at 210 kt ground speed -> 1,225 ft/min",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "climb_gradient_ft_per_nm": 350,
+    "ground_speed_kt": 210
+   },
+   "outputs": {
+    "roc_fpm": {
+     "value": 1225,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
    "tile_id": "turn-radius-bank",
    "source_publisher": "FAA Airplane Flying Handbook (coordinated turn)",
    "source_title": "radius = 0.08854 x airspeed_kt^2 / tan(bank)",
@@ -29199,6 +29403,60 @@
      "value": 5.25,
      "tolerance": {
       "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "turn-radius-bank",
+   "source_publisher": "FAA",
+   "source_title": "Pilot's Handbook of Aeronautical Knowledge (FAA-H-8083-25B)",
+   "source_edition_or_year": "FAA-H-8083-25B, 2016, Chapter 5",
+   "source_section_or_page": "Figures 5-56 and 5-59: 120 kt at 30 degrees of bank -> ROT 5.25 deg/s, R 2,215 ft (the handbook's 11.26 constant rounds g/1.688^2 = 11.29)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "airspeed_kt": 120,
+    "bank_angle_deg": 30
+   },
+   "outputs": {
+    "rate_of_turn_deg_s": {
+     "value": 5.25,
+     "tolerance": {
+      "abs": 0.005
+     }
+    },
+    "turn_radius_ft": {
+     "value": 2215,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "turn-radius-bank",
+   "source_publisher": "FAA",
+   "source_title": "Pilot's Handbook of Aeronautical Knowledge (FAA-H-8083-25B)",
+   "source_edition_or_year": "FAA-H-8083-25B, 2016, Chapter 5",
+   "source_section_or_page": "Figures 5-57 and 5-60: 240 kt at 30 degrees of bank -> ROT 2.62 deg/s, R 8,861 ft",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "airspeed_kt": 240,
+    "bank_angle_deg": 30
+   },
+   "outputs": {
+    "rate_of_turn_deg_s": {
+     "value": 2.62,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "turn_radius_ft": {
+     "value": 8861,
+     "tolerance": {
+      "pct": 0.5
      }
     }
    }
@@ -33400,6 +33658,28 @@
    }
   },
   {
+   "tile_id": "uv-dose",
+   "source_publisher": "U.S. Army Public Health Command",
+   "source_title": "Technical Information Paper 31-006-0211, Ultraviolet Light Disinfection in the Use of Individual Water Purification Devices",
+   "source_edition_or_year": "March 2006, updated January 2011",
+   "source_section_or_page": "p. 9: 372 mJ/cm^2 at 0.5 mW/cm^2 needs 744 seconds",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "intensity_mw_cm2": 0.5,
+    "exposure_time_s": 744,
+    "target_dose_mj_cm2": 372
+   },
+   "outputs": {
+    "dose_mj_cm2": {
+     "value": 372,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
    "tile_id": "uv-required-exposure",
    "source_publisher": "USEPA UV Disinfection Guidance Manual (inverse of uv-dose)",
    "source_title": "40 mJ/cm^2 target at 10 mW/cm^2 -> 4 s of contact time (round-trips the uv-dose example)",
@@ -36735,6 +37015,69 @@
    "outputs": {
     "emc_pct": {
      "value": 6.172,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "wood-emc",
+   "source_publisher": "USDA Forest Products Laboratory",
+   "source_title": "Wood Handbook, Chapter 4, Table 4-2 (FPL-GTR-282)",
+   "source_edition_or_year": "FPL-GTR-282, 2021 (70 F row unchanged from FPL-GTR-190, 2010)",
+   "source_section_or_page": "Table 4-2, 70 F at 50% RH -> 9.2% EMC",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "temperature_F": 70,
+    "rh_pct": 50
+   },
+   "outputs": {
+    "emc_pct": {
+     "value": 9.2,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "wood-emc",
+   "source_publisher": "USDA Forest Products Laboratory",
+   "source_title": "Wood Handbook, Chapter 4, Table 4-2 (FPL-GTR-282)",
+   "source_edition_or_year": "FPL-GTR-282, 2021",
+   "source_section_or_page": "Table 4-2, 70 F at 30% RH -> 6.2% EMC",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "temperature_F": 70,
+    "rh_pct": 30
+   },
+   "outputs": {
+    "emc_pct": {
+     "value": 6.2,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "wood-emc",
+   "source_publisher": "USDA Forest Products Laboratory",
+   "source_title": "Wood Handbook, Chapter 4, Table 4-2 (FPL-GTR-282)",
+   "source_edition_or_year": "FPL-GTR-282, 2021",
+   "source_section_or_page": "Table 4-2, 70 F at 80% RH -> 16.0% EMC",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "temperature_F": 70,
+    "rh_pct": 80
+   },
+   "outputs": {
+    "emc_pct": {
+     "value": 16.0,
      "tolerance": {
       "abs": 0.05
      }
@@ -46430,6 +46773,37 @@
    }
   },
   {
+   "tile_id": "air-pressure-setpoint-savings",
+   "source_publisher": "Oregon State University Energy Efficiency Center (DOE Industrial Assessment Center)",
+   "source_title": "AR No. 1, Reduce Compressed Air Pressure",
+   "source_edition_or_year": "assessment template, March 2017",
+   "source_section_or_page": "Analysis: 112 -> 105 psig on 2,045.7 kW-mo/yr of compressor demand -> 3.5%, 71.7 kW-mo/yr (input_kw carries the kW-mo)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "current_psig": 112,
+    "reduced_psig": 105,
+    "inlet_psia": 14.7,
+    "input_kw": 2045.7,
+    "run_hours": 1,
+    "rate_kwh": 9.2
+   },
+   "outputs": {
+    "pct_saved": {
+     "value": 3.5,
+     "tolerance": {
+      "abs": 0.05
+     }
+    },
+    "kw_saved": {
+     "value": 71.7,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
    "tile_id": "occupant-load",
    "source_publisher": "IBC 2021 Table 1004.5 occupant-load factors",
    "source_title": "3,000 ft^2 office (150) + 600 ft^2 conference (15) -> 60 occupants",
@@ -55229,6 +55603,54 @@
    }
   },
   {
+   "tile_id": "tr55-time-of-concentration",
+   "source_publisher": "USDA NRCS",
+   "source_title": "Urban Hydrology for Small Watersheds (TR-55)",
+   "source_edition_or_year": "TR-55, 2nd ed., June 1986",
+   "source_section_or_page": "Example 3-1 / Worksheet 3 (Figure 3-2): sheet 0.30 hr + shallow 0.24 hr + channel 0.99 hr = Tc 1.53 hr",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "sheet_n": 0.24,
+    "sheet_length_ft": 100,
+    "p2_in": 3.6,
+    "sheet_slope": 0.01,
+    "shallow_surface": "unpaved",
+    "shallow_length_ft": 1400,
+    "shallow_slope": 0.01,
+    "channel_n": 0.05,
+    "channel_hyd_radius_ft": 0.957,
+    "channel_length_ft": 7300,
+    "channel_slope": 0.005
+   },
+   "outputs": {
+    "tt_sheet_min": {
+     "value": 18,
+     "tolerance": {
+      "abs": 0.3
+     }
+    },
+    "tt_shallow_min": {
+     "value": 14.4,
+     "tolerance": {
+      "abs": 0.3
+     }
+    },
+    "tt_channel_min": {
+     "value": 59.4,
+     "tolerance": {
+      "abs": 0.3
+     }
+    },
+    "tc_hr": {
+     "value": 1.53,
+     "tolerance": {
+      "abs": 0.005
+     }
+    }
+   }
+  },
+  {
    "tile_id": "curve-number-runoff",
    "source_publisher": "USDA NRCS TR-55 (1986), Chapter 2",
    "source_title": "SCS curve-number runoff: P 5 in on CN 80 -> 2.89 in over 10 acres = 2.41 acre-ft (spec-v1201)",
@@ -58400,6 +58822,56 @@
      "value": 36,
      "tolerance": {
       "abs": 0.1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "rusle-soil-loss",
+   "source_publisher": "New York State DEC",
+   "source_title": "New York State Standards and Specifications for Erosion and Sediment Control, Appendix A (RUSLE)",
+   "source_edition_or_year": "November 2016",
+   "source_section_or_page": "p. A.2, Example 1: R 80, K 0.49, LS 3.11, C 1.0 on 50 ac -> A = 122 T/ac/yr (6,100 T/yr from the rounded 122)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "r_factor": 80,
+    "k_factor": 0.49,
+    "ls_factor": 3.11,
+    "c_factor": 1,
+    "p_factor": 1,
+    "acres": 50
+   },
+   "outputs": {
+    "a_tons_ac_yr": {
+     "value": 122,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "rusle-soil-loss",
+   "source_publisher": "USDA NRCS New Mexico",
+   "source_title": "Agronomy Technical Note 28, Revised Universal Soil Loss Equation",
+   "source_edition_or_year": "October 1999",
+   "source_section_or_page": "Example Run, pp. 32-33: 30 x 0.32 x 0.44 x 0.3 x 1.0 = 1.27 t/ac/yr",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "r_factor": 30,
+    "k_factor": 0.32,
+    "ls_factor": 0.44,
+    "c_factor": 0.3,
+    "p_factor": 1,
+    "acres": 160
+   },
+   "outputs": {
+    "a_tons_ac_yr": {
+     "value": 1.27,
+     "tolerance": {
+      "abs": 0.005
      }
     }
    }
@@ -72134,6 +72606,28 @@
    }
   },
   {
+   "tile_id": "density-altitude",
+   "source_publisher": "FAA",
+   "source_title": "Pilot's Handbook of Aeronautical Knowledge (FAA-H-8083-25B)",
+   "source_edition_or_year": "FAA-H-8083-25B, 2016, Chapter 11",
+   "source_section_or_page": "Sample Problem 1: elevation 5,883 ft, altimeter 30.10 (table conversion -165) -> pressure altitude 5,718 ft; the chart then reads about 7,700 ft DA",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "field_elevation_ft": 5883,
+    "altimeter_in_hg": 30.1,
+    "oat_f": 70
+   },
+   "outputs": {
+    "pa_ft": {
+     "value": 5718,
+     "tolerance": {
+      "abs": 2
+     }
+    }
+   }
+  },
+  {
    "tile_id": "true-airspeed",
    "source_publisher": "FAA PHAK / ICAO Standard Atmosphere (TAS from CAS)",
    "source_title": "120 KCAS at 8,000 ft density altitude -> 135.4 KTAS, sigma 0.786 (spec-v1252)",
@@ -72238,6 +72732,34 @@
      "value": -17.32,
      "tolerance": {
       "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "crosswind-component",
+   "source_publisher": "FAA",
+   "source_title": "Pilot's Handbook of Aeronautical Knowledge (FAA-H-8083-25B)",
+   "source_edition_or_year": "FAA-H-8083-25B, 2016, Chapter 11",
+   "source_section_or_page": "Sample Problem 10 (crosswind component chart): runway 17, wind 140 at 25 kt -> headwind 22 kt, crosswind 13 kt (chart read to the knot)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "runway_heading_deg": 170,
+    "wind_dir_deg": 140,
+    "wind_speed_kt": 25
+   },
+   "outputs": {
+    "headwind_kt": {
+     "value": 22,
+     "tolerance": {
+      "abs": 1
+     }
+    },
+    "crosswind_kt": {
+     "value": 13,
+     "tolerance": {
+      "abs": 1
      }
     }
    }
@@ -72948,6 +73470,82 @@
      "value": 47.24,
      "tolerance": {
       "abs": 0.02
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "aircraft-weight-balance",
+   "source_publisher": "FAA",
+   "source_title": "Aircraft Weight and Balance Handbook (FAA-H-8083-1B)",
+   "source_edition_or_year": "FAA-H-8083-1B, 2016",
+   "source_section_or_page": "Figure 7-9, forward adverse-load CG check: 1,876 lb at 36.14 + pilot 170 at 34.0 + fuel 115 at 48.0 -> 2,161.0 lb, CG +36.6",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "empty_weight_lb": 1876,
+    "empty_arm_in": 36.14,
+    "front_weight_lb": 170,
+    "front_arm_in": 34,
+    "fuel_weight_lb": 115,
+    "fuel_arm_in": 48,
+    "max_gross_lb": 3100,
+    "fwd_cg_limit_in": 33,
+    "aft_cg_limit_in": 46,
+    "rear_weight_lb": 0,
+    "rear_arm_in": 0,
+    "baggage_weight_lb": 0,
+    "baggage_arm_in": 0
+   },
+   "outputs": {
+    "total_weight_lb": {
+     "value": 2161,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "cg_in": {
+     "value": 36.6,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "aircraft-weight-balance",
+   "source_publisher": "FAA",
+   "source_title": "Aircraft Weight and Balance Handbook (FAA-H-8083-1B)",
+   "source_edition_or_year": "FAA-H-8083-1B, 2016",
+   "source_section_or_page": "Figure 8-4, helicopter longitudinal CG: 1,545 lb at 101.4 + 200 and 170 at 64.0 + fuel 288 at 96.0 -> 2,203 lb, CG 94.4",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "empty_weight_lb": 1545,
+    "empty_arm_in": 101.4,
+    "front_weight_lb": 200,
+    "front_arm_in": 64,
+    "rear_weight_lb": 170,
+    "rear_arm_in": 64,
+    "fuel_weight_lb": 288,
+    "fuel_arm_in": 96,
+    "baggage_weight_lb": 0,
+    "baggage_arm_in": 0,
+    "max_gross_lb": 2250,
+    "fwd_cg_limit_in": 90,
+    "aft_cg_limit_in": 100
+   },
+   "outputs": {
+    "total_weight_lb": {
+     "value": 2203,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "cg_in": {
+     "value": 94.4,
+     "tolerance": {
+      "abs": 0.05
      }
     }
    }

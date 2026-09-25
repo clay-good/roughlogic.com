@@ -4733,12 +4733,24 @@ import { computeBridgeFormulaMinSpacing as _v656 } from "../../calc-trucking.js"
 
 test("bounds: spec-v656 computeBridgeFormulaMinSpacing solves the bridge formula for the spread, satisfies the forward formula, cross-checks the array tile, and pins error seams", () => {
   const r = _v656({ target_weight_lb: 80000, num_axles: 5 });
-  assert.ok(Math.abs(r.min_spacing_ft - 51.2) < 1e-9); // ((160)-60-36)*4/5
+  // FHWA Bridge Formula Weights Figure 6: 80,000 lb on 5 axles at 51 ft. The
+  // unrounded inverse is 51.2 ft; W to the nearest 500 lb (79,875 -> 80,000) is 51.
+  assert.strictEqual(r.min_spacing_ft, 51);
   assert.ok(r.fits_at_zero === false);
   assert.ok(Math.abs(r.avg_axle_lb - 16000) < 1e-9);
-  // The returned spread, fed into the forward Bridge Formula B, reproduces the target weight.
-  const W = 500 * (r.min_spacing_ft * 5 / 4 + 12 * 5 + 36);
-  assert.ok(Math.abs(W - 80000) < 1e-6);
+  // The returned spread is the FIRST whole foot the forward tile passes: at 51 ft
+  // the array tile finds no violation, at 50 ft (79,250 -> 79,000) it does.
+  const at = (L) => computeBridgeFormula({ axle_weights_lb: [16000, 16000, 16000, 16000, 16000], axle_spacings_ft: [L - 3 * 12, 12, 12, 12] }).bridge_violations;
+  assert.strictEqual(at(51).length, 0);
+  assert.ok(at(50).some((v) => v.startsWith("axles 1-5")));
+  // FHWA rounds an exact half DOWN (table footnote 1): 3 axles at 9 ft is 42,750 by
+  // the formula and 42,500 in the table, so 42,500 needs 9 ft and 43,000 needs 10.
+  assert.strictEqual(_v656({ target_weight_lb: 42500, num_axles: 3 }).min_spacing_ft, 9);
+  assert.strictEqual(_v656({ target_weight_lb: 43000, num_axles: 3 }).min_spacing_ft, 10);
+  // FHWA Figure 8, forward: axles 1-4 carry 57,000 lb within 57,500 at 23 ft; axles
+  // 2-4 carry 45,000 lb over the 42,500 at 9 ft.
+  const fig8 = computeBridgeFormula({ axle_weights_lb: [12000, 15000, 15000, 15000], axle_spacings_ft: [14, 4.5, 4.5] });
+  assert.deepStrictEqual(fig8.bridge_violations, ["axles 2-4: 45000 lb > 42500 lb formula max"]);
   // Cross-check against the array bridge-formula tile: a 2-axle group at 34,000 lb needs 4 ft,
   // and a [17000,17000] pair at exactly 4 ft has no bridge or tandem violation.
   const two = _v656({ target_weight_lb: 34000, num_axles: 2 });
@@ -23826,6 +23838,12 @@ test("bounds: spec-v500 computeDensityAltitude pins the hot-day DA, the ISA laps
   assert.ok(cold.da_ft < cold.pa_ft && Math.abs(cold.da_ft - 1933.33) < 1);
   // A low altimeter setting raises the pressure altitude above the field elevation.
   assert.ok(_v500({ field_elevation_ft: 5000, altimeter_in_hg: 29.42, oat_f: 59 }).pa_ft > 5000);
+  // The FAA PHAK (FAA-H-8083-25B, ch. 11) altimeter-setting conversion table, to its
+  // printed foot within 2 ft. The old x1000 rule gave -180 at 30.10 and +1,920 at 28.0.
+  for (const [alt, faa] of [[28.0, 1824], [29.0, 863], [29.7, 205], [30.1, -165], [31.0, -983]]) {
+    const pa = _v500({ field_elevation_ft: 0, altimeter_in_hg: alt, oat_f: 59 }).pa_ft;
+    assert.ok(Math.abs(pa - faa) <= 2, `altimeter ${alt}: ${pa} vs FAA ${faa}`);
+  }
   // Error seams: non-finite, non-positive altimeter, sub-absolute-zero temperature.
   assert.ok("error" in _v500({ field_elevation_ft: Infinity, altimeter_in_hg: 29.92, oat_f: 59 }));
   assert.ok("error" in _v500({ field_elevation_ft: 5000, altimeter_in_hg: 0, oat_f: 59 }));

@@ -2728,19 +2728,23 @@ export function computeDensityAltitude({ field_elevation_ft = 0, altimeter_in_hg
   if (!(alt > 0)) return { error: "Altimeter setting must be positive (in Hg)." };
   if (!Number.isFinite(oatf) || oatf < -459.67) return { error: "Outside air temperature must be above absolute zero (-459.67 F)." };
   const oat_c = (oatf - 32) * 5 / 9;
-  const pa_ft = elev + (29.92 - alt) * 1000;
+  // The standard-atmosphere pressure/height relation, which the FAA PHAK's
+  // altimeter-setting conversion table prints (30.10 -> -165 ft, 28.0 -> +1,824).
+  // The "(29.92 - altimeter) x 1000" kneeboard rule this used until 2026-09-25
+  // gave -180 and +1,920: 15 ft off FAA's own density-altitude example, 96 ft at 28.0.
+  const pa_ft = elev + 145366.45 * (1 - Math.pow(alt / 29.92, 0.190284));
   const isa_c = 15 - 2 * (pa_ft / 1000);
   const da_ft = pa_ft + 120 * (oat_c - isa_c);
   if (![oat_c, pa_ft, isa_c, da_ft].every(Number.isFinite)) return { error: "Density-altitude math is not a finite value." };
   return {
     oat_c, pa_ft, isa_c, da_ft,
-    note: "FAA density-altitude method (ISA lapse correction): PA = elevation + (29.92 - altimeter) x 1000, ISA temp = 15 - 2 x (PA/1000) degrees C, and DA = PA + 120 x (OAT - ISA). Density altitude is the pressure altitude corrected for the temperature departure from standard -- hot and high robs lift, engine power, and prop thrust even when the field elevation looks benign, so a warm day flies like a much higher field. Humidity lowers air density further; this dry-air model ignores it, so it slightly under-predicts DA on a humid day. A planning estimate; the aircraft flight manual performance charts and the pilot in command govern.",
+    note: "FAA density-altitude method (ISA lapse correction): PA = elevation + 145,366 x (1 - (altimeter/29.92)^0.190284), the standard-atmosphere conversion the FAA PHAK tabulates (the 1,000 ft per in Hg rule of thumb drifts to about 100 ft off by 28 in Hg), ISA temp = 15 - 2 x (PA/1000) degrees C, and DA = PA + 120 x (OAT - ISA). Density altitude is the pressure altitude corrected for the temperature departure from standard -- hot and high robs lift, engine power, and prop thrust even when the field elevation looks benign, so a warm day flies like a much higher field. Humidity lowers air density further; this dry-air model ignores it, so it slightly under-predicts DA on a humid day. A planning estimate; the aircraft flight manual performance charts and the pilot in command govern.",
   };
 }
 export const densityAltitudeExample = { inputs: { field_elevation_ft: 5000, altimeter_in_hg: 29.92, oat_f: 95 } };
 
 MECHANIC_RENDERERS["density-altitude"] = _simpleRenderer({
-  citation: "Citation: FAA density-altitude method (FAA AC 00-6 / ICAO Standard Atmosphere): PA = elevation + (29.92 - altimeter) x 1000; ISA = 15 - 2 x (PA/1000) degrees C; DA = PA + 120 x (OAT - ISA). Density altitude is the pressure altitude corrected for temperature; this dry-air model ignores humidity. A planning estimate; the aircraft flight manual and the pilot in command govern.",
+  citation: "Citation: FAA density-altitude method (FAA-H-8083-25 / ICAO Standard Atmosphere): PA = elevation + 145,366 x (1 - (altimeter/29.92)^0.190284); ISA = 15 - 2 x (PA/1000) degrees C; DA = PA + 120 x (OAT - ISA). Density altitude is the pressure altitude corrected for temperature; this dry-air model ignores humidity. A planning estimate; the aircraft flight manual and the pilot in command govern.",
   example: densityAltitudeExample.inputs,
   fields: [
     { key: "field_elevation_ft", label: "Field / station elevation (ft)", kind: "number" },

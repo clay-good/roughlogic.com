@@ -6,6 +6,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Changed
 
+- **Fourteen more tiles now carry a publisher's printed worked example.** Each was re-run and falls within the publisher's rounding:
+  - **FAA handbooks and charts:** `aircraft-weight-balance` (Weight and Balance Handbook Figures 7-9 and 8-4), `crosswind-component`, `density-altitude` and `turn-radius-bank` (Pilot's Handbook of Aeronautical Knowledge), `climb-gradient-roc` (the Terminal Procedures rate-of-climb table).
+  - **FHWA's *Bridge Formula Weights*:** `bridge-formula-min-spacing`, Figures 5 to 8.
+  - **USDA and state conservation manuals:** `tr55-time-of-concentration` (TR-55 Example 3-1, Tc 1.53 hr), `rusle-soil-loss` (New York's RUSLE appendix and NRCS New Mexico Technical Note 28), `manure-nutrient-application` (Penn State Agronomy Facts 55).
+  - **USBR *Water Measurement Manual*:** `weir-head-from-flow`, from the 90° V-notch table.
+  - **Others:** `wood-emc` (FPL Wood Handbook Table 4-2), `uv-dose` (Army Technical Information Paper 31-006-0211), `well-max-yield` (a Water Replenishment District of Southern California bulletin), `air-pressure-setpoint-savings` (an Oregon State DOE Industrial Assessment Center report).
+
+  README: 1,387 of 2,183 tiles are checked only against the project's own derivation (786 from first principles, 601 by a named method); 796 carry an outside source. Cross-validation tolerance checks: 4,219.
 - **Fourteen tiles now carry a publisher's printed worked example.** Each was re-run and falls within the publisher's rounding:
   - **FHWA HEC-18 and HEC-22:** `pier-scour-depth`, `manning-pipe-capacity`, `orifice-flow`.
   - **DOE tip sheets:** `steam-boiler-blowdown`, `motor-operating-cost`, `motor-efficiency-upgrade-savings`.
@@ -28,6 +36,10 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **Both Federal Bridge Formula tiles were stricter than the law.** 23 CFR 658.17 takes W "to the nearest 500 pounds", and FHWA's Bridge Table rounds an exact half down (its footnote 1). Neither tile rounded.
+  - **`bridge-formula`** flagged a legal truck. FHWA's own Figure 6, 80,000 lb on five axles over 51 ft, computes to 79,875 lb before rounding, and the tile reported it as a violation.
+  - **`bridge-formula-min-spacing`** said the same group needs 51.2 ft. It now returns the first whole-foot Bridge Table row that carries the weight: 51 ft. FHWA's Figures 5 to 8 all reproduce exactly, including the 42,500 lb at 9 ft that depends on rounding the half down.
+- **`density-altitude` computed pressure altitude with a rule of thumb.** It used (29.92 − altimeter) × 1,000 ft. The FAA's Pilot's Handbook tabulates the standard-atmosphere conversion instead, and its own Sample Problem 1 gets 5,718 ft where the tile got 5,703. The gap grows to 96 ft at 28.0 inHg. The tile now uses 145,366 × (1 − (altimeter/29.92)^0.190284), which matches every row of the FAA table checked, from 28.0 to 31.0 inHg, within 2 ft. A standard 29.92 setting still gives the field elevation.
 - **`pressure-tank-drawdown` warned against the setting Amtrol recommends.** A precharge equal to cut-in gives the maximum acceptance factor, 1 − (P2 + 14.7)/(P3 + 14.7). The tile flagged it as "will not draw down usefully." Above cut-in, it let the Boyle term exceed 1 and overstated the drawdown. It now warns only above cut-in, where the tank empties before the pump starts, and caps the drawdown there.
 - **`pump-impeller-trim` said nothing useful about a throttled pump.** With the flow unchanged and head to spare, the flow-based trim correctly finds nothing to cut, but the tile read "$0" with no pointer to the real saving. It now flags the throttled case and gives DOE Pumping Systems Tip Sheet #7's constant-flow estimate, D2/D1 = (H2/H1)^(1/3): 12.76 in on DOE's own 14 in example.
 - **`awning-canopy-load` snow now follows ASCE 7-22, and the gust-effect factor discloses the edition of its constants.** The canopy's flat-roof snow dropped the importance factor Is, as the other snow tiles did: pf = 0.7·Ce·Ct·pg, with pg the 7-22 risk-category ground snow load. An Is of 1.1 or 1.2 on a 7-22 pg counted importance twice. `wind-gust-effect-factor` uses the ASCE 7-16 Table 26.11-1 turbulence constants (c, l, ε̄, zmin). ASCE 7-22 adjusted that table (SEAOG, *Wind Loads: What's New in ASCE 7-22*, 2025), and no public source for the 7-22 values could be verified. The tile now says so instead of implying they are current; the code's G = 0.85 rigid-building option is unaffected. `docs/derivations.md` §20 now gives the 7-22 snow formula.

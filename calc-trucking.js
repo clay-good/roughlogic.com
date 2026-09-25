@@ -338,6 +338,17 @@ export const hosExample = {
 // over distance L (ft, outermost spacing). Per axle: 20,000 lb single,
 // 34,000 lb tandem. Total cap 80,000 lb interstate.
 
+// 23 CFR 658.17 defines W "to the nearest 500 pounds", and FHWA's Bridge Table
+// (Bridge Formula Weights, FHWA-HOP-19-028, table footnote 1) rounds DOWN when
+// the formula lands exactly halfway between 500 lb steps. Until 2026-09-25 both
+// bridge tiles compared against the unrounded formula, so the 80,000 lb five-axle
+// group FHWA's own Figure 6 passes at 51 ft (formula 79,875) read as a violation.
+// The 1e-9 keeps a float that should be an exact half from rounding up.
+function bridgeFormulaW(L, N) {
+  const x = (L * N) / (N - 1) + 12 * N + 36;
+  return 500 * Math.ceil(x - 0.5 - 1e-9);
+}
+
 // dims: in { axle_weights_lb: M, axle_spacings_ft: L }
 //        out: { total_weight_lb: M, interstate_cap_lb: M, over_interstate: dimensionless, axle_violations: dimensionless, bridge_violations: dimensionless }
 // (Per-axle weights are mass `M`; axle spacings are lengths `L`.
@@ -382,7 +393,7 @@ export function computeBridgeFormula({ axle_weights_lb = [], axle_spacings_ft = 
       group_length += spacings[j - 1];
       group_weight += weights[j];
       const N = j - i + 1;
-      let W = 500 * ((group_length * N) / (N - 1) + 12 * N + 36);
+      let W = bridgeFormulaW(group_length, N);
       // 23 CFR 658.17(e): two consecutive tandems may carry 34,000 lb each when
       // the first-to-last axle spread of the pair is 36 ft or more. Until
       // 2026-09-19 this exception was missing, so the standard 5-axle
@@ -417,26 +428,29 @@ export function computeBridgeFormulaMinSpacing({ target_weight_lb = 0, num_axles
   const n = Math.round(Number(num_axles) || 0);
   if (!(w > 0)) return { error: "Target group weight must be positive (lb)." };
   if (!(n >= 2)) return { error: "The bridge formula needs a group of at least 2 axles." };
-  const raw = ((w / 500) - 12 * n - 36) * (n - 1) / n;
-  const min_spacing_ft = Math.max(0, raw);
-  const fits_at_zero = raw <= 0;
+  // The rounded W reaches ceil(w/500) steps once the formula passes that step
+  // less a half; the Bridge Table lists whole feet, so the minimum is the first
+  // whole foot past that threshold (FHWA: 80,000 lb on 5 axles at 51 ft).
+  const threshold = (Math.ceil(w / 500 - 1e-9) - 0.5 - 12 * n - 36) * (n - 1) / n;
+  const fits_at_zero = bridgeFormulaW(0, n) >= w;
+  const min_spacing_ft = fits_at_zero ? 0 : Math.floor(threshold + 1e-9) + 1;
   const over_interstate_cap = w > 80000;
   const avg_axle_lb = w / n;
   return {
     min_spacing_ft, fits_at_zero, over_interstate_cap, avg_axle_lb,
-    note: "Federal Bridge Formula B solved for the minimum outer-to-outer axle spread: from W = 500 (L N/(N-1) + 12 N + 36), the spread that just carries a target group weight W across N axles is L = ((W/500) - 12 N - 36)(N-1)/N. A 5-axle group at 80,000 lb needs at least 51.2 ft outer-to-outer. If the result is zero the axles already satisfy the formula bunched together (the group weight is below the N-axle minimum). This is the spread the bridge formula alone requires; the 20,000 lb single-axle and 34,000 lb tandem caps and the 80,000 lb interstate gross limit apply independently, and a load above 80,000 lb needs an overweight permit. The enforcing state DOT and the permit govern.",
+    note: "Federal Bridge Formula B solved for the minimum outer-to-outer axle spread: W = 500 (L N/(N-1) + 12 N + 36), rounded to the nearest 500 lb (23 CFR 658.17; FHWA rounds an exact half down), gives the whole-foot row of FHWA's Bridge Table that first carries the target group weight. A 5-axle group at 80,000 lb needs 51 ft outer-to-outer, as in FHWA's Bridge Formula Weights Figure 6; the unrounded inverse, L = ((W/500) - 12 N - 36)(N-1)/N, would say 51.2 ft. If the result is zero the axles already satisfy the formula bunched together (the group weight is below the N-axle minimum). This is the spread the bridge formula alone requires; the 20,000 lb single-axle and 34,000 lb tandem caps and the 80,000 lb interstate gross limit apply independently, and a load above 80,000 lb needs an overweight permit. The enforcing state DOT and the permit govern.",
   };
 }
 export const bridgeFormulaMinSpacingExample = { inputs: { target_weight_lb: 80000, num_axles: 5 } };
 const renderBridgeFormulaMinSpacing = _simpleRenderer({
-  citation: "Citation: Federal Bridge Formula B (23 CFR 658.17) solved for the minimum axle spread - L = ((W/500) - 12 N - 36)(N-1)/N from W = 500 (L N/(N-1) + 12 N + 36), by name. The 20,000 lb single / 34,000 lb tandem / 80,000 lb interstate caps apply independently; the enforcing state DOT and the permit govern.",
+  citation: "Citation: Federal Bridge Formula B (23 CFR 658.17) solved for the minimum whole-foot axle spread - W = 500 (L N/(N-1) + 12 N + 36) to the nearest 500 lb, as FHWA's Bridge Table (FHWA-HOP-19-028) prints it. The 20,000 lb single / 34,000 lb tandem / 80,000 lb interstate caps apply independently; the enforcing state DOT and the permit govern.",
   example: bridgeFormulaMinSpacingExample.inputs,
   fields: [
     { key: "target_weight_lb", label: "Target group weight (lb)", kind: "number" },
     { key: "num_axles", label: "Number of axles in the group", kind: "number" },
   ],
   outputs: [
-    { key: "l", id: "bfms-out-l", label: "Minimum outer-to-outer spread", value: (r) => r.fits_at_zero ? "0 ft (the axles already satisfy the formula bunched together)" : fmt(r.min_spacing_ft, 1) + " ft" },
+    { key: "l", id: "bfms-out-l", label: "Minimum outer-to-outer spread", value: (r) => r.fits_at_zero ? "0 ft (the axles already satisfy the formula bunched together)" : fmt(r.min_spacing_ft, 0) + " ft" },
     { key: "a", id: "bfms-out-a", label: "Average per axle", value: (r) => fmt(r.avg_axle_lb, 0) + " lb" + (r.over_interstate_cap ? " - the group exceeds the 80,000 lb interstate cap; an overweight permit is required" : "") },
     { key: "n", id: "bfms-out-n", label: "Note", value: (r) => r.note },
   ],

@@ -2,7 +2,7 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "cc644e8515ba6561",
+      "sha": "2254f7bdc3e2cf83",
       "date": "2026-09-25"
     },
     "/tools/": {
@@ -822,12 +822,12 @@
       "date": "2026-09-01"
     },
     "/tools/bridge-formula/": {
-      "sha": "f5498406d9b898ec",
-      "date": "2026-09-01"
+      "sha": "9506280ceef968fa",
+      "date": "2026-09-25"
     },
     "/tools/bridge-formula-min-spacing/": {
-      "sha": "ea7aa00c04498b20",
-      "date": "2026-09-01"
+      "sha": "50ccda4d4e598dd7",
+      "date": "2026-09-25"
     },
     "/tools/bridle-leg-tension/": {
       "sha": "df64258394cad7a3",
@@ -2094,8 +2094,8 @@
       "date": "2026-09-19"
     },
     "/tools/density-altitude/": {
-      "sha": "2ba3918799a2d131",
-      "date": "2026-09-04"
+      "sha": "adcd523e03cdcb36",
+      "date": "2026-09-25"
     },
     "/tools/depreciation-recapture/": {
       "sha": "665262f123e7fece",
