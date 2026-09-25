@@ -118,7 +118,7 @@ export function computeCmuWallFlexure({ fm_psi = 2000, as_in2 = 0, d_in = 0, b_i
 export const cmuWallFlexureExample = { inputs: { fm_psi: 2000, as_in2: 0.155, d_in: 3.81, b_in: 12, fs_psi: 32000 } };
 
 MASONRY_RENDERERS["cmu-wall-flexure"] = _simpleRenderer({
-  citation: "Citation: TMS 402-16 (Building Code Requirements for Masonry Structures, ACI 530 / ASCE 5) allowable-stress-design cracked transformed-section flexure: n = Es/Em with Es = 29,000,000 psi and Em = 900 f'm for concrete masonry, rho = As/(b d), k = sqrt(2 rho n + (rho n)^2) - rho n, j = 1 - k/3, the steel-governed allowable moment Ms = As Fs j d and the masonry-governed Mm = 0.5 Fb k j b d^2, with Fs = 32,000 psi for Grade 60 reinforcement and Fb = 0.45 f'm, as compiled in the Masonry Designers' Guide and CMHA TEK 14-07C (Allowable Stress Design of Concrete Masonry). Returns the allowable service-level bending moment of a singly reinforced, fully grouted section by the working-stress method: the section is assumed cracked, the reinforcement developed and in tension, the axial compression negligible (near-pure flexure), and one steel layer at the reported depth. The axial term and the one-third stress increase are not applied, and this is not the strength-design (LRFD) moment. Take f'm, the bar size, and the spacing from the structural drawings. A design aid, not a substitute for the engineer of record's stamped design.",
+  citation: "Citation: TMS 402-16 (Building Code Requirements for Masonry Structures) allowable-stress-design cracked transformed-section flexure: n = Es/Em with Es = 29,000,000 psi and Em = 900 f'm for concrete masonry, rho = As/(b d), k = sqrt(2 rho n + (rho n)^2) - rho n, j = 1 - k/3, the steel-governed allowable moment Ms = As Fs j d and the masonry-governed Mm = 0.5 Fb k j b d^2, with Fs = 32,000 psi for Grade 60 reinforcement and Fb = 0.45 f'm, as compiled in the Masonry Designers' Guide and CMHA TEK 14-07C (Allowable Stress Design of Concrete Masonry). Returns the allowable service-level bending moment of a singly reinforced, fully grouted section by the working-stress method: the section is assumed cracked, the reinforcement developed and in tension, the axial compression negligible (near-pure flexure), and one steel layer at the reported depth. The axial term and the one-third stress increase are not applied, and this is not the strength-design (LRFD) moment. Take f'm, the bar size, and the spacing from the structural drawings. A design aid, not a substitute for the engineer of record's stamped design.",
   example: cmuWallFlexureExample.inputs,
   fields: [
     { key: "fm_psi", label: "Masonry strength f'm (psi)", kind: "number" },
@@ -138,8 +138,13 @@ MASONRY_RENDERERS["cmu-wall-flexure"] = _simpleRenderer({
 
 // ===================== spec-v270: reinforced CMU shear wall in-plane allowable shear =====================
 
-// dims: in { fm_psi: M L^-1 T^-2, b_in: L, dv_in: L, p_lb: M L T^-2, mvd: dimensionless, av_in2: L^2, s_in: L, fs_psi: M L^-1 T^-2 } out: { an_in2: L^2, fvm: M L^-1 T^-2, fvs: M L^-1 T^-2, fv: M L^-1 T^-2, fv_max: M L^-1 T^-2, va_kip: M L T^-2 }
-export function computeCmuShearWall({ fm_psi = 1500, b_in = 0, dv_in = 0, p_lb = 0, mvd = 0.5, av_in2 = 0, s_in = 48, fs_psi = 32000 } = {}) {
+// TMS 402-16 8.3.5.1: Fv = (Fvm + Fvs) gamma_g, the 3-to-2 sqrt(f'm) caps also
+// times gamma_g (0.75 partially grouted, 1.0 fully grouted), and Fvm takes 1/4
+// in place of 1/2 for a special reinforced masonry shear wall (8.3.5.1.2).
+// Until 2026-09-25 the tile had neither: a special wall read 1/2, up to about
+// 77% high on the masonry term, and a partially grouted wall had no input.
+// dims: in { fm_psi: M L^-1 T^-2, b_in: L, dv_in: L, p_lb: M L T^-2, mvd: dimensionless, av_in2: L^2, s_in: L, fs_psi: M L^-1 T^-2, grouting: dimensionless, special: dimensionless } out: { an_in2: L^2, fvm: M L^-1 T^-2, fvs: M L^-1 T^-2, fv: M L^-1 T^-2, fv_max: M L^-1 T^-2, va_kip: M L T^-2 }
+export function computeCmuShearWall({ fm_psi = 1500, b_in = 0, dv_in = 0, p_lb = 0, mvd = 0.5, av_in2 = 0, s_in = 48, fs_psi = 32000, grouting = "full", special = "no" } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(fm_psi > 0)) return { error: "Masonry strength f'm must be positive (psi)." };
   if (!(b_in > 0)) return { error: "Net wall thickness must be positive (in)." };
@@ -149,23 +154,26 @@ export function computeCmuShearWall({ fm_psi = 1500, b_in = 0, dv_in = 0, p_lb =
   if (p_lb < 0) return { error: "Axial load P cannot be negative (lb)." };
   if (av_in2 < 0) return { error: "Shear-reinforcement area Av cannot be negative (in^2)." };
   if (mvd < 0) return { error: "Shear-span ratio M/(V dv) cannot be negative." };
+  const gamma_g = { full: 1.0, partial: 0.75 }[grouting];
+  if (gamma_g === undefined) return { error: "Grouting must be full or partial." };
+  if (special !== "yes" && special !== "no") return { error: "Special reinforced shear wall must be yes or no." };
   const an_in2 = b_in * dv_in;
   const root = Math.sqrt(fm_psi);
   const mvd_c = Math.min(mvd, 1.0);
-  const fvm = 0.5 * ((4.0 - 1.75 * mvd_c) * root) + 0.25 * (p_lb / an_in2);
+  const fvm = (special === "yes" ? 0.25 : 0.5) * ((4.0 - 1.75 * mvd_c) * root) + 0.25 * (p_lb / an_in2);
   const fvs = av_in2 > 0 ? 0.5 * (av_in2 * fs_psi * dv_in) / (an_in2 * s_in) : 0;
-  const fv = fvm + fvs;
-  const fv_max = mvd <= 0.25 ? 3 * root : mvd >= 1.0 ? 2 * root : (3 - (mvd - 0.25) / 0.75) * root;
+  const fv = (fvm + fvs) * gamma_g;
+  const fv_max = (mvd <= 0.25 ? 3 * root : mvd >= 1.0 ? 2 * root : (3 - (mvd - 0.25) / 0.75) * root) * gamma_g;
   const fv_gov = Math.min(fv, fv_max);
   const va_kip = fv_gov * an_in2 / 1000;
   const capped = fv > fv_max;
-  return { an_in2, fvm, fvs, fv, fv_max, fv_gov, va_kip, capped };
+  return { an_in2, fvm, fvs, fv, fv_max, fv_gov, va_kip, capped, gamma_g };
 }
 
 export const cmuShearWallExample = { inputs: { fm_psi: 1500, b_in: 7.625, dv_in: 96, p_lb: 20000, mvd: 0.5, av_in2: 0.20, s_in: 48, fs_psi: 32000 } };
 
 MASONRY_RENDERERS["cmu-shear-wall"] = _simpleRenderer({
-  citation: "Citation: TMS 402-16 (ACI 530 / ASCE 5) allowable-stress in-plane shear: Fvm = 0.5 x ((4.0 - 1.75 x M/(V dv)) x sqrt(f'm)) + 0.25 x (P/An) with the shear-span ratio taken positive and not greater than 1.0 inside the masonry term, Fvs = 0.5 x (Av Fs dv) / (An s), the combined Fv = Fvm + Fvs, and the maximum-Fv cap of 3 sqrt(f'm) at M/(V dv) <= 0.25 grading linearly to 2 sqrt(f'm) at M/(V dv) >= 1.0, as compiled in the Masonry Designers' Guide and CMHA TEK 14-07C. Returns the allowable service-level in-plane shear of a reinforced, fully grouted masonry shear wall. P is the sustained gravity compression (a larger P raises the masonry term, so use the load combination that actually acts with the shear); M/(V dv) is the shear-span ratio the designer supplies from the wall's height and length; the special-reinforced detailing and minimum-reinforcement rules of TMS 402 are the engineer's to satisfy separately. A design aid, not a substitute for the engineer of record's stamped lateral design.",
+  citation: "Citation: TMS 402-16 allowable-stress in-plane shear: Fvm = 0.5 x ((4.0 - 1.75 x M/(V dv)) x sqrt(f'm)) + 0.25 x (P/An) with the shear-span ratio taken positive and not greater than 1.0 inside the masonry term, Fvs = 0.5 x (Av Fs dv) / (An s), the combined Fv = Fvm + Fvs, and the maximum-Fv cap of 3 sqrt(f'm) at M/(V dv) <= 0.25 grading linearly to 2 sqrt(f'm) at M/(V dv) >= 1.0, as compiled in the Masonry Designers' Guide and CMHA TEK 14-07C. Returns the allowable service-level in-plane shear of a reinforced, fully grouted masonry shear wall. P is the sustained gravity compression (a larger P raises the masonry term, so use the load combination that actually acts with the shear); M/(V dv) is the shear-span ratio the designer supplies from the wall's height and length; the special-reinforced detailing and minimum-reinforcement rules of TMS 402 are the engineer's to satisfy separately. A design aid, not a substitute for the engineer of record's stamped lateral design.",
   example: cmuShearWallExample.inputs,
   fields: [
     { key: "fm_psi", label: "Masonry strength f'm (psi)", kind: "number" },
@@ -176,6 +184,8 @@ MASONRY_RENDERERS["cmu-shear-wall"] = _simpleRenderer({
     { key: "av_in2", label: "Horizontal bar area Av (in², 0 = none)", kind: "number", default: 0 },
     { key: "s_in", label: "Horizontal bar spacing s (in)", kind: "number" },
     { key: "fs_psi", label: "Allowable steel stress Fs (psi)", kind: "number" },
+    { key: "grouting", label: "Grouting", kind: "select", options: [{ value: "full", label: "Fully grouted (gamma_g 1.0)", selected: true }, { value: "partial", label: "Partially grouted (gamma_g 0.75)" }] },
+    { key: "special", label: "Special reinforced masonry shear wall?", kind: "select", options: [{ value: "no", label: "No (Fvm uses 1/2)", selected: true }, { value: "yes", label: "Yes (Fvm uses 1/4)" }] },
   ],
   outputs: [
     { key: "fm", id: "csw-out-fm", label: "Masonry term Fvm", value: (r) => fmt(r.fvm, 1) + " psi" },
@@ -208,7 +218,7 @@ export function computeCmuWallAxial({ fm_psi = 2000, an_in2 = 0, ast_in2 = 0, h_
 export const cmuWallAxialExample = { inputs: { fm_psi: 2000, an_in2: 91.5, ast_in2: 0.155, h_in: 144, r_in: 2.201, fs_psi: 32000 } };
 
 MASONRY_RENDERERS["cmu-wall-axial"] = _simpleRenderer({
-  citation: "Citation: TMS 402-16 (ACI 530 / ASCE 5) allowable-stress axial compression for reinforced masonry: Pa = (0.25 f'm An + 0.65 Ast Fs) x (1 - (h/(140 r))^2) for a slenderness ratio h/r <= 99, and Pa = (0.25 f'm An + 0.65 Ast Fs) x (70 r / h)^2 for h/r > 99 (the two branches meet at h/r = 99), with Fs the allowable compressive stress in the reinforcement, as compiled in the Masonry Designers' Guide and CMHA TEK 14-07C. Returns the allowable service-level concentric axial compression of a reinforced, fully grouted masonry wall or column. The 0.65 Ast Fs reinforcement term applies where the vertical bars are laterally tied per the code's column provisions -- for an untied wall the conservative practice is to drop that term (enter Ast = 0) and take only 0.25 f'm An x R. Pure axial only: the moment interaction is separate (combine with the CMU wall flexure tile through the unity check). The radius of gyration r and effective height h come from the section and the wall's actual bracing. A design aid, not a substitute for the engineer of record's stamped design.",
+  citation: "Citation: TMS 402-16 allowable-stress axial compression for reinforced masonry: Pa = (0.25 f'm An + 0.65 Ast Fs) x (1 - (h/(140 r))^2) for a slenderness ratio h/r <= 99, and Pa = (0.25 f'm An + 0.65 Ast Fs) x (70 r / h)^2 for h/r > 99 (the two branches meet at h/r = 99), with Fs the allowable compressive stress in the reinforcement, as compiled in the Masonry Designers' Guide and CMHA TEK 14-07C. Returns the allowable service-level concentric axial compression of a reinforced, fully grouted masonry wall or column. The 0.65 Ast Fs reinforcement term applies where the vertical bars are laterally tied per the code's column provisions -- for an untied wall the conservative practice is to drop that term (enter Ast = 0) and take only 0.25 f'm An x R. Pure axial only: the moment interaction is separate (combine with the CMU wall flexure tile through the unity check). The radius of gyration r and effective height h come from the section and the wall's actual bracing. A design aid, not a substitute for the engineer of record's stamped design.",
   example: cmuWallAxialExample.inputs,
   fields: [
     { key: "fm_psi", label: "Masonry strength f'm (psi)", kind: "number" },

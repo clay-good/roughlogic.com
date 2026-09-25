@@ -205,6 +205,9 @@ const SOURCE_PATTERNS = [
   { re: /\bAWS\s*(Welding|A5|D1)/i, name: "AWS (American Welding Society)" },
   { re: /\bMachinery's\s*Handbook\b/i, name: "Machinery's Handbook" },
   { re: /\bBIA\b|\bBrick Industry Association\b|\bNCMA\b/i, name: "BIA / NCMA (masonry)" },
+  // TMS 402 / 602 dropped the ACI 530 / ASCE 5 co-designation in 2016; the
+  // masonry tiles matched only through "ACI 530" until it was removed.
+  { re: /\bTMS[\s-]*(?:402|602)\b/i, name: "TMS 402 / 602 (masonry)" },
   { re: /\bUSG\b|\bNational Gypsum\b|\bGA-?216\b|\bGypsum Association\b/i, name: "USG / National Gypsum / GA-216" },
   { re: /\bARMA\b/i, name: "ARMA (Asphalt Roofing Mfrs Assoc)" },
   { re: /\bCAGI\b|\bCompressed Air and Gas Institute\b/i, name: "CAGI" },
