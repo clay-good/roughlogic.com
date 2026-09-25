@@ -9027,17 +9027,17 @@
   {
    "tile_id": "required-fire-flow",
    "source_publisher": "ISO / NFPA 1142 area-based simplified screening (project bundled)",
-   "source_title": "Needed-fire-flow estimate: NFF = base_C * Co * Cx * Cm rounded to nearest 250 gpm; base_C = 18 * F * sqrt(area)",
+   "source_title": "Needed-fire-flow estimate: NFF = Ci * O * (1 + (X + P)), Ci = 18 * F * sqrt(area) rounded to 250 gpm",
    "source_edition_or_year": "ISO Public Protection Classification base-formula screening; ordinary construction F = 1.0",
-   "source_section_or_page": "5000 ft^2 / ordinary / occupancy 1.0 / exposure 1.0 / communication 1.0 -> base 1273 gpm rounded to 1250 gpm",
+   "source_section_or_page": "5000 ft^2 / ordinary / occupancy 1.0 / no exposure or communication charge (X = P = 0) -> Ci 1273 rounded to 1250 gpm; NFF 1250 gpm",
    "verified_by": "rl",
    "verified_on": "2026-05-11",
    "inputs": {
     "structure_area_ft2": 5000,
     "construction_class": "ordinary",
     "occupancy_factor": 1,
-    "exposure_factor": 1,
-    "communication_factor": 1
+    "exposure_factor": 0,
+    "communication_factor": 0
    },
    "outputs": {
     "needed_fire_flow_gpm": {

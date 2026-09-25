@@ -134,3 +134,12 @@ test("Smoke reading reference: returns 4 attributes", () => {
   const r = computeSmokeReading();
   assert.equal(r.reference.length, 4);
 });
+
+test("Required fire flow: ISO adds (X + P), capped at 0.60, and rounds to 500 above 2,500 gpm", () => {
+  // ISO Guide: 5,000 ft2 ordinary -> Ci 1273 -> 1250; X 0.2 + P 0.1 -> 1250 x 1.3 = 1625 -> 1750.
+  assert.equal(computeRequiredFireFlow({ structure_area_ft2: 5000, construction_class: "ordinary", exposure_factor: 0.2, communication_factor: 0.1 }).needed_fire_flow_gpm, 1750);
+  // (X + P) caps at 0.60: 0.5 + 0.5 behaves as 0.6 -> 1250 x 1.6 = 2000.
+  assert.equal(computeRequiredFireFlow({ structure_area_ft2: 5000, construction_class: "ordinary", exposure_factor: 0.5, communication_factor: 0.5 }).needed_fire_flow_gpm, 2000);
+  // Above 2,500 the step is 500: 20,000 ft2 frame -> Ci 3818 -> 3750; x 1.25 = 4687.5 -> 4500.
+  assert.equal(computeRequiredFireFlow({ structure_area_ft2: 20000, construction_class: "wood_frame", occupancy_factor: 1.25 }).needed_fire_flow_gpm, 4500);
+});

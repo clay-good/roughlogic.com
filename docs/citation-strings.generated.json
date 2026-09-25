@@ -215,7 +215,7 @@
     },
     "required-fire-flow": {
       "group": "calc-fire.js (Group F)",
-      "stamp": "Citation: the ISO Public Protection Classification needed-fire-flow method by name (not IFC Table B105.1, which tabulates flow by construction type and area). NFF = C * O * X * P; C = 18 * F * sqrt(A), capped at 8,000 gpm for Classes 1-2 and 6,000 for Classes 3-6. AHJ governs."
+      "stamp": "Citation: the ISO Public Protection Classification needed-fire-flow method by name (not IFC Table B105.1, which tabulates flow by construction type and area). NFF = Ci * O * (1 + (X + P)) with (X + P) at most 0.60; Ci = 18 * F * sqrt(A), rounded to 250 gpm, capped at 8,000 gpm for Classes 1-2 and 6,000 for Classes 3-6; NFF rounded to 250 gpm below 2,500 and to 500 above, 500 to 12,000 gpm. X and P are the ISO exposure and communication charges (0 when none). AHJ governs."
     },
     "scba-cylinder-time": {
       "group": "calc-electrical.js (Group A)",

@@ -101,9 +101,11 @@ export const hydrantFlowExample = {
 
 // --- Utility 54: Required Fire Flow (ISO method) ---
 
-// Public ISO Public Protection Classification published formulas.
-//   NFF = (C * O * X * P)
-// C is the construction-class factor times sqrt(area). For estimation only.
+// ISO Guide for Determination of Needed Fire Flow: NFF = Ci x Oi x [1.0 + (X + P)], with
+// (X + P) at most 0.60; Ci = 18 F sqrt(A), rounded to 250 gpm; the final flow rounded to 250 gpm
+// below 2,500 and to 500 above, 500 min and 12,000 max. X (exposure) and P (communication) are
+// ADDITIVE charges that start at 0. Until 2026-09-25 this multiplied C x O x X x P with X and P
+// defaulting to 1, so entering the ISO charges (X 0.2, P 0.1) gave 25 gpm -> 0 where ISO gives 1,750.
 
 export const ISO_CONSTRUCTION_FACTORS = {
   fire_resistive: 0.6,
@@ -114,7 +116,7 @@ export const ISO_CONSTRUCTION_FACTORS = {
 
 // dims: in { structure_area_ft2: L^2, construction_class: dimensionless, occupancy_factor: dimensionless, exposure_factor: dimensionless, communication_factor: dimensionless, volume_ft3: L^3 }
 //        out: { needed_fire_flow_gpm: L^3 T^-1, base_C_gpm: L^3 T^-1, construction_factor: dimensionless, iowa_rate_gpm: L^3 T^-1, divergence_gpm: L^3 T^-1 }
-export function computeRequiredFireFlow({ structure_area_ft2, construction_class = "ordinary", occupancy_factor = 1.0, exposure_factor = 1.0, communication_factor = 1.0, volume_ft3 = 0 }) {
+export function computeRequiredFireFlow({ structure_area_ft2, construction_class = "ordinary", occupancy_factor = 1.0, exposure_factor = 0, communication_factor = 0, volume_ft3 = 0 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const F = ISO_CONSTRUCTION_FACTORS[construction_class];
   if (!F) return { error: "Unknown construction class." };
@@ -125,11 +127,15 @@ export function computeRequiredFireFlow({ structure_area_ft2, construction_class
   // masonry), 6,000 for Classes 3-6, with a 500 gpm floor -- as computeIsoNeededFireFlow does.
   // No story count is entered here, so a multi-story Class 1-2 building is assumed.
   const C_max = construction_class === "wood_frame" || construction_class === "ordinary" ? 8000 : 6000;
+  const X = Number(exposure_factor) || 0, P = Number(communication_factor) || 0;
+  if (X < 0 || P < 0) return { error: "Exposure (X) and communication (P) charges cannot be negative." };
   const C = Math.min(Math.max(18 * F * Math.sqrt(structure_area_ft2), 500), C_max);
-  let NFF = C * occupancy_factor * exposure_factor * communication_factor;
-  NFF = Math.round(NFF / 250) * 250; // round to nearest 250 gpm per ISO practice
-  // ISO maximum guideline: 12000 gpm.
-  NFF = Math.min(NFF, 12000);
+  const Ci = Math.round(C / 250) * 250; // ISO rounds Ci to the nearest 250 gpm before the multipliers
+  const XP = Math.min(X + P, 0.6);
+  let NFF = Ci * occupancy_factor * (1 + XP);
+  NFF = Math.round(NFF / (NFF > 2500 ? 500 : 250)) * (NFF > 2500 ? 500 : 250);
+  // ISO minimum 500 gpm, maximum 12,000 gpm.
+  NFF = Math.min(Math.max(NFF, 500), 12000);
   // v23 EN.11: the Iowa State rate-of-flow second method (Q = V / 100, V in
   // ft^3) shown beside the ISO needed-fire-flow with the divergence labeled.
   // Only computed when a structure volume is supplied; default unchanged.
@@ -140,11 +146,11 @@ export function computeRequiredFireFlow({ structure_area_ft2, construction_class
     divergence_gpm = NFF - iowa_rate_gpm;
     if (!Number.isFinite(iowa_rate_gpm)) { iowa_rate_gpm = null; divergence_gpm = null; }
   }
-  return { needed_fire_flow_gpm: NFF, base_C_gpm: Math.round(C), construction_factor: F, iowa_rate_gpm, divergence_gpm };
+  return { needed_fire_flow_gpm: NFF, base_C_gpm: Math.round(C), Ci_rounded_gpm: Ci, x_plus_p: XP, construction_factor: F, iowa_rate_gpm, divergence_gpm };
 }
 
 export const requiredFireFlowExample = {
-  inputs: { structure_area_ft2: 5000, construction_class: "ordinary", occupancy_factor: 1.0, exposure_factor: 1.0, communication_factor: 1.0 },
+  inputs: { structure_area_ft2: 5000, construction_class: "ordinary", occupancy_factor: 1.0, exposure_factor: 0, communication_factor: 0 },
 };
 
 // --- Utility 55: Master Stream Reach ---
@@ -392,19 +398,19 @@ export function renderHydrantFlow(inputRegion, outputRegion, citationEl) {
 //        out: { dom_side_effect: dimensionless }
 // (DOM-mount renderer; HTMLElement refs are categorical.)
 export function renderRequiredFireFlow(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: the ISO Public Protection Classification needed-fire-flow method by name (not IFC Table B105.1, which tabulates flow by construction type and area). NFF = C * O * X * P; C = 18 * F * sqrt(A), capped at 8,000 gpm for Classes 1-2 and 6,000 for Classes 3-6. AHJ governs.";
+  citationEl.textContent = "Citation: the ISO Public Protection Classification needed-fire-flow method by name (not IFC Table B105.1, which tabulates flow by construction type and area). NFF = Ci * O * (1 + (X + P)) with (X + P) at most 0.60; Ci = 18 * F * sqrt(A), rounded to 250 gpm, capped at 8,000 gpm for Classes 1-2 and 6,000 for Classes 3-6; NFF rounded to 250 gpm below 2,500 and to 500 above, 500 to 12,000 gpm. X and P are the ISO exposure and communication charges (0 when none). AHJ governs.";
   const A = makeNumber("Structure area (ft²)", "rff-a", { step: "any", min: "0" });
   const cls = makeSelect("Construction class", "rff-c", Object.keys(ISO_CONSTRUCTION_FACTORS).map((k) => ({ value: k, label: k.replace(/_/g, " ") })));
   const O = makeNumber("Occupancy factor", "rff-o", { step: "any", min: "0", value: "1.0" });
   O.input.value = "1.0";
-  const X = makeNumber("Exposure factor", "rff-x", { step: "any", min: "0", value: "1.0" });
-  X.input.value = "1.0";
-  const Pf = makeNumber("Communication factor", "rff-p", { step: "any", min: "0", value: "1.0" });
-  Pf.input.value = "1.0";
+  const X = makeNumber("Exposure charge X (0 = none; ISO Table 330A)", "rff-x", { step: "any", min: "0", value: "0" });
+  X.input.value = "0";
+  const Pf = makeNumber("Communication charge P (0 = none)", "rff-p", { step: "any", min: "0", value: "0" });
+  Pf.input.value = "0";
   // v23 EN.11: optional structure volume for the Iowa rate-of-flow method.
   const Vol = makeNumber("Structure volume (ft³, for Iowa method)", "rff-v", { step: "any", min: "0" });
   for (const f of [A, cls, O, X, Pf, Vol]) inputRegion.appendChild(f.wrap);
-  attachExampleButton(inputRegion, () => { A.input.value = "5000"; cls.select.value = "ordinary"; O.input.value = "1.0"; X.input.value = "1.0"; Pf.input.value = "1.0"; Vol.input.value = "40000"; update(); });
+  attachExampleButton(inputRegion, () => { A.input.value = "5000"; cls.select.value = "ordinary"; O.input.value = "1.0"; X.input.value = "0"; Pf.input.value = "0"; Vol.input.value = "40000"; update(); });
   const oN = makeOutputLine(outputRegion, "Needed fire flow (ISO)", "rff-out");
   const oC = makeOutputLine(outputRegion, "Base C", "rff-out-c");
   const oIowa = makeOutputLine(outputRegion, "Iowa rate-of-flow (V/100)", "rff-out-iowa");
@@ -413,8 +419,8 @@ export function renderRequiredFireFlow(inputRegion, outputRegion, citationEl) {
       structure_area_ft2: Number(A.input.value) || 0,
       construction_class: cls.select.value,
       occupancy_factor: Number(O.input.value) || 1.0,
-      exposure_factor: Number(X.input.value) || 1.0,
-      communication_factor: Number(Pf.input.value) || 1.0,
+      exposure_factor: Number(X.input.value) || 0,
+      communication_factor: Number(Pf.input.value) || 0,
       volume_ft3: Number(Vol.input.value) || 0,
     });
     if (r.error) { oN.textContent = r.error; oC.textContent = "-"; oIowa.textContent = "-"; return; }

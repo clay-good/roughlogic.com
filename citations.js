@@ -6205,9 +6205,9 @@ export const CITATIONS = {
     ],
   },
   "required-fire-flow": {
-    formula: "ISO Needed Fire Flow NFF = (C × O × X × P) where C = 18 × F × sqrt(A), F is construction-class factor, O is occupancy hazard, X is exposure factor, P is communication factor.",
-    edition: "ISO Public Protection Classification (PPC) Schedule by name.",
-    freeAccess: "ISO PPC documents licensed; the per-class 0.6 / 0.8 / 1.0 / 1.2 / 1.5 F-factor multipliers are reproducible from ISO outreach materials.",
+    formula: "ISO Needed Fire Flow NFF = Ci × O × [1 + (X + P)] with (X + P) at most 0.60, where Ci = 18 × F × sqrt(A) rounded to 250 gpm, F is the construction-class factor, O the occupancy factor, and X and P the additive exposure and communication charges (0 when none); NFF rounded to 250 gpm below 2,500 and to 500 above, 500 to 12,000 gpm.",
+    edition: "ISO Public Protection Classification: the ISO Guide for Determination of Needed Fire Flow, by name.",
+    freeAccess: "ISO PPC documents licensed; the per-class 0.6 / 0.8 / 1.0 / 1.5 F-factor multipliers are reproducible from ISO outreach materials.",
     governance: GOVERNANCE.fire,
     editionNote: "Single-edition (ISO PPC).",
     assumptions: [
