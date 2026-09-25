@@ -131,7 +131,13 @@ CONCRETE_RENDERERS["rc-beam-flexure"] = _simpleRenderer({
 
 // ===================== spec-v258: reinforced concrete beam shear and stirrup spacing =====================
 
-// dims: in { fc: M L^-1 T^-2, fyt: M L^-1 T^-2, bw: L, d: L, av_in2: L^2, vu: M L T^-2, lambda: dimensionless } out: { vc_kip: M L T^-2, phi_vc: M L T^-2, vs_req_kip: M L T^-2, s_req_in: L, s_max_in: L }
+// The simplified Vc (Table 22.5.5.1(a)) holds only with Av >= Av,min, and
+// 9.6.3.1 requires Av,min wherever Vu > phi lambda sqrt(f'c) bw d (half of
+// phi Vc here). s_max_in is the governing maximum spacing: 9.7.6.2.2's d/2 <=
+// 24 in (d/4 <= 12 in when Vs > 4 sqrt(f'c) bw d) and the spacing at which Av
+// still meets 9.6.3.4's Av,min = max(0.75 sqrt(f'c), 50) bw s / fyt. Until
+// 2026-09-25 these were listed as separate checks and s_max was a bare d/2.
+// dims: in { fc: M L^-1 T^-2, fyt: M L^-1 T^-2, bw: L, d: L, av_in2: L^2, vu: M L T^-2, lambda: dimensionless } out: { vc_kip: M L T^-2, phi_vc: M L T^-2, vs_req_kip: M L T^-2, s_req_in: L, s_max_in: L, s_avmin_in: L }
 export function computeRcBeamShear({ fc = 4000, fyt = 60000, bw = 0, d = 0, av_in2 = 0, vu = 0, lambda = 1.0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(fc > 0)) return { error: "Concrete strength f'c must be positive (psi)." };
@@ -144,15 +150,21 @@ export function computeRcBeamShear({ fc = 4000, fyt = 60000, bw = 0, d = 0, av_i
   const phi_vc = 0.75 * vc_kip;
   const vs_req_kip = vu > 0 ? Math.max(0, vu / 0.75 - vc_kip) : 0;
   const s_req_in = vs_req_kip > 0 ? av_in2 * fyt * d / (vs_req_kip * 1000) : null;
-  const s_max_in = d / 2;
+  const sqfc_bwd_kip = Math.sqrt(fc) * bw * d / 1000;
+  const min_required = vu > 0.75 * lambda * sqfc_bwd_kip;
+  const s_avmin_in = av_in2 * fyt / (Math.max(0.75 * Math.sqrt(fc), 50) * bw);
+  const tight = vs_req_kip > 4 * sqfc_bwd_kip;
+  const s_geom_in = tight ? Math.min(d / 4, 12) : Math.min(d / 2, 24);
+  const s_max_in = Math.min(s_geom_in, s_avmin_in);
+  const section_ok = vs_req_kip <= 8 * sqfc_bwd_kip;
   const stirrups = vu > phi_vc;
-  return { vc_kip, phi_vc, vs_req_kip, s_req_in, s_max_in, stirrups };
+  return { vc_kip, phi_vc, vs_req_kip, s_req_in, s_max_in, s_avmin_in, s_max_rule: s_avmin_in < s_geom_in ? "Av,min" : tight ? "d/4" : "d/2", min_required, section_ok, stirrups };
 }
 
 export const rcBeamShearExample = { inputs: { fc: 4000, fyt: 60000, bw: 12, d: 21.5, av_in2: 0.22, vu: 40, lambda: 1.0 } };
 
 CONCRETE_RENDERERS["rc-beam-shear"] = _simpleRenderer({
-  citation: "Citation: ACI 318-19 §22.5.5.1 (Vc = 2 x lambda x sqrt(f'c) x bw x d, the simplified concrete shear for a non-prestressed member without axial load, psi units), §22.5.10.5.3 (Vs = Av x fyt x d / s for vertical stirrups), §21.2.1 (phi = 0.75 for shear), and §9.7.6.2.2 (the d/2 maximum stirrup spacing, halved to d/4 when Vs exceeds 4 x sqrt(f'c) x bw x d). Uses the simplified Vc, not the detailed §22.5.5.1 expression with the reinforcement-ratio and size-effect terms; covers vertical stirrups on a member without significant axial load; does not check the §22.5.1.2 upper limit Vs <= 8 x sqrt(f'c) x bw x d on the section size, the §9.6.3 minimum shear reinforcement, or deep-beam action. Lambda is 1.0 normalweight, 0.75 lightweight (§19.2.4). A design aid, not a substitute for a licensed engineer's design -- the engineer of record's stamped design governs.",
+  citation: "Citation: ACI 318-19 §22.5.5.1 (Vc = 2 x lambda x sqrt(f'c) x bw x d, the simplified concrete shear for a non-prestressed member without axial load, psi units), §22.5.10.5.3 (Vs = Av x fyt x d / s for vertical stirrups), §21.2.1 (phi = 0.75 for shear), and §9.7.6.2.2 (the d/2 <= 24 in maximum stirrup spacing, halved to d/4 <= 12 in when Vs exceeds 4 x sqrt(f'c) x bw x d), §9.6.3.1 and §9.6.3.4 (Av,min = max(0.75 sqrt(f'c), 50) bw s / fyt wherever Vu > phi lambda sqrt(f'c) bw d, the condition for the simplified Vc), and §22.5.1.2 (Vs <= 8 sqrt(f'c) bw d). Uses the simplified Vc, not the detailed §22.5.5.1 expression with the reinforcement-ratio and size-effect terms; covers vertical stirrups on a member without significant axial load; does not check the §22.5.1.2 upper limit Vs <= 8 x sqrt(f'c) x bw x d on the section size, the §9.6.3 minimum shear reinforcement, or deep-beam action. Lambda is 1.0 normalweight, 0.75 lightweight (§19.2.4). A design aid, not a substitute for a licensed engineer's design -- the engineer of record's stamped design governs.",
   example: rcBeamShearExample.inputs,
   fields: [
     { key: "fc", label: "Concrete strength f'c (psi)", kind: "number" },
@@ -166,10 +178,10 @@ CONCRETE_RENDERERS["rc-beam-shear"] = _simpleRenderer({
   outputs: [
     { key: "vc", id: "rbs-out-vc", label: "Concrete shear Vc", value: (r) => fmt(r.vc_kip, 1) + " kip" },
     { key: "pv", id: "rbs-out-pv", label: "Design concrete shear phi Vc (phi = 0.75)", value: (r) => fmt(r.phi_vc, 1) + " kip" },
-    { key: "st", id: "rbs-out-st", label: "Stirrups required by strength", value: (r) => r.stirrups ? "YES (Vu > phi Vc)" : "no (concrete carries Vu; minimums still apply)" },
+    { key: "st", id: "rbs-out-st", label: "Stirrups required", value: (r) => !r.section_ok ? "SECTION TOO SMALL (Vs > 8 sqrt(f'c) bw d; enlarge the beam)" : r.stirrups ? "YES by strength (Vu > phi Vc)" : r.min_required ? "YES, the Av,min minimum (Vu > phi lambda sqrt(f'c) bw d)" : "no (Vu <= phi lambda sqrt(f'c) bw d)" },
     { key: "vs", id: "rbs-out-vs", label: "Stirrup shear demand Vs,req", value: (r) => fmt(r.vs_req_kip, 1) + " kip" },
     { key: "sr", id: "rbs-out-sr", label: "Required stirrup spacing", value: (r) => r.s_req_in === null ? "- (none required by strength)" : fmt(r.s_req_in, 1) + " in" },
-    { key: "sm", id: "rbs-out-sm", label: "Code max spacing d/2", value: (r) => fmt(r.s_max_in, 2) + " in (d/4 if Vs is high)" },
+    { key: "sm", id: "rbs-out-sm", label: "Code max spacing", value: (r) => fmt(r.s_max_in, 2) + " in (" + r.s_max_rule + " governs; Av,min allows " + fmt(r.s_avmin_in, 1) + " in)" },
   ],
   compute: computeRcBeamShear,
 });

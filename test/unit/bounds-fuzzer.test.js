@@ -16614,6 +16614,23 @@ test("bounds: spec-v258 computeRcBeamShear pins Vc/phiVc/Vs/spacing, the no-stir
   assert.strictEqual(r2.stirrups, false);
   assert.strictEqual(r2.vs_req_kip, 0);
   assert.strictEqual(r2.s_req_in, null);
+  // ...but 20 kip is above phi lambda sqrt(f'c) bw d = 12.24 kip, so 9.6.3.1 still requires Av,min.
+  assert.strictEqual(r2.min_required, true);
+  assert.strictEqual(_v258({ fc: 4000, fyt: 60000, bw: 12, d: 21.5, av_in2: 0.22, vu: 12 }).min_required, false);
+  // Av,min spacing: Av fyt / (max(0.75 sqrt(f'c), 50) bw) = 0.22 x 60000 / (50 x 12) = 22 in; d/2 governs.
+  assert.ok(Math.abs(r.s_avmin_in - 22) < 1e-9 && r.s_max_rule === "d/2" && r.section_ok === true);
+  // A light stirrup in a wide web: Av,min governs the spacing.
+  const wide = _v258({ fc: 4000, fyt: 60000, bw: 30, d: 21.5, av_in2: 0.22, vu: 40 });
+  assert.ok(Math.abs(wide.s_max_in - 0.22 * 60000 / (50 * 30)) < 1e-9 && wide.s_max_rule === "Av,min");
+  // 9.6.3.4 uses 0.75 sqrt(f'c) above 4,444 psi.
+  assert.ok(Math.abs(_v258({ fc: 9000, fyt: 60000, bw: 30, d: 21.5, av_in2: 0.22, vu: 40 }).s_avmin_in - 0.22 * 60000 / (0.75 * Math.sqrt(9000) * 30)) < 1e-9);
+  // A deep d: the d/2 cap is 24 in.
+  assert.strictEqual(_v258({ fc: 4000, fyt: 60000, bw: 12, d: 60, av_in2: 0.62, vu: 0 }).s_max_in, 24);
+  // High Vs (> 4 sqrt(f'c) bw d = 65.3 kip) halves the spacing to d/4.
+  const hi = _v258({ fc: 4000, fyt: 60000, bw: 12, d: 21.5, av_in2: 0.62, vu: 90 });
+  assert.ok(hi.s_max_rule === "d/4" && Math.abs(hi.s_max_in - 21.5 / 4) < 1e-9 && hi.section_ok === true);
+  // Vs above 8 sqrt(f'c) bw d = 130.5 kip: the section is too small.
+  assert.strictEqual(_v258({ fc: 4000, fyt: 60000, bw: 12, d: 21.5, av_in2: 0.62, vu: 130 }).section_ok, false);
   // Error seams.
   assert.ok("error" in _v258({ fc: 0, fyt: 60000, bw: 12, d: 21.5, av_in2: 0.22 }));
   assert.ok("error" in _v258({ fc: 4000, fyt: 0, bw: 12, d: 21.5, av_in2: 0.22 }));
