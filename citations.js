@@ -10533,9 +10533,9 @@ export const CITATIONS = {
     edition: "Hydronic system-volume identity by name (pipe plus terminals and boiler; split by the glycol fraction); first-principles arithmetic.",
     freeAccess: "The volume arithmetic is public first-principles; the gallons per foot comes from the pipe size and the fraction from the freeze target.",
     governance: GOVERNANCE.general,
-    editionNote: "The gallons per foot comes from the pipe size (3/4 in is about 0.023 gal/ft). The terminal and boiler or buffer volumes come from the equipment. The glycol fraction comes from the freeze-protection target (glycol-mix gives the ratio). This fill volume sizes the expansion tank (expansion-tank) and the glycol order. Distinct from the loop-length radiant-loop-sizing.",
+    editionNote: "The gallons per foot comes from the pipe size (3/4 in Type L copper, 0.785 in ID, is about 0.025 gal/ft). The terminal and boiler or buffer volumes come from the equipment. The glycol fraction comes from the freeze-protection target (glycol-mix gives the ratio). This fill volume sizes the expansion tank (expansion-tank) and the glycol order. Distinct from the loop-length radiant-loop-sizing.",
     assumptions: [
-      { name: "Gallons per foot", value: "from the pipe size (~0.023 gal/ft for 3/4 in); the pipe schedule governs", source: "pipe dimensions" },
+      { name: "Gallons per foot", value: "from the pipe size (~0.025 gal/ft for 3/4 in Type L copper; PEX and steel differ); the pipe schedule governs", source: "pipe dimensions" },
       { name: "Glycol fraction", value: "from the freeze-protection target (glycol-mix gives the ratio)", source: "glycol-mix / freeze target" },
     ],
   },

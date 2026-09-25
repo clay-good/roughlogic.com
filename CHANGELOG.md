@@ -14,6 +14,13 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **Eleven tile descriptions quoted worked-example numbers from before their own fixes.** A scan compared every fixture output changed since August 25 against the tile's description prose, which no gate reads. The worst was `cleanout-layout`: after the IPC 708 fix it still said three triggers, a stack-base cleanout included, and quoted 10 cleanouts where the tile returns 8. The others:
+  - `turnout-frog-lead`: a clearance point 130 ft out, against the 83 ft it computes.
+  - `blast-scaled-distance-ppv`: the 50 minimum and 576 lb, where 30 CFR 816.67 gives 55 and 476 lb.
+  - `weld-travel-speed`: 5.76 in/min with the arc efficiency the tile dropped; now 7.2.
+  - `hydronic-system-volume`: 0.023 gal/ft; 3/4 in Type L copper is 0.025.
+  - `masonry-lintel-loading`: 90 lb/ft; the moment-equivalent is 120.
+  - Smaller corrections: `pool-chlorine-dose`, `turbo-pressure-ratio`, `solder-joint-quantity`, `bearing-equivalent-load`, `hanger-rod-sizing`.
 - **`shearwall-overturning` now reduces the resisting dead load for seismic.** The ASD seismic combination is (0.6 − 0.14·SDS)D + 0.7Eh (ASCE 7-22 §2.4.5; 7-16 §12.4.2.3), because the vertical effect Ev = 0.2·SDS·D lifts the wall. The tile used 0.6D for every case. At SDS = 1.0 that overstated the resisting moment by 30% (0.6 against 0.46) and understated the holdown. A new SDS input carries the reduction; 0 keeps the wind case (0.6D). This matches `seismic-overturning-stability`, which already reduced it.
 - **`service-load-optional` now carries EV chargers at 7,200 VA minimum on the standard-method side (NEC 2023 220.57).** 220.57 is new in 2023. It sets EVSE load at the larger of 7,200 VA or the nameplate. The comparison took the nameplate alone, so a 16 A charger counted as 3,840 VA. The optional-method (220.82) general load keeps the nameplate, since 220.57 is a Part III rule.
 - **`cmu-shear-wall` now has TMS 402-16's grouting factor and special-wall coefficient.** Fv = (Fvm + Fvs)·γg, and the 3-to-2 √f'm caps also scale by γg: 1.0 fully grouted (the tile's scope and default) and 0.75 partially grouted. A special reinforced masonry shear wall leads Fvm with ¼, not ½. Before this, a special wall read up to about 77% high on the masonry term. The example is unchanged. The masonry tiles also drop the "ACI 530 / ASCE 5" co-designation, which TMS 402/602 dropped in 2016. `check-citation-coverage` now tracks TMS 402/602 directly instead of matching those tiles through that label (README: 1,490 tracked, 693 untracked).

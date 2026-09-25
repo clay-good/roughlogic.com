@@ -2,7 +2,7 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "e48bf847a37e7eca",
+      "sha": "3e6a2f5c5dfcf204",
       "date": "2026-09-25"
     },
     "/tools/": {
@@ -62,7 +62,7 @@
       "date": "2026-09-19"
     },
     "/groups/plumbing/": {
-      "sha": "7ce30a62e040b0da",
+      "sha": "ac3798d415370761",
       "date": "2026-09-25"
     },
     "/groups/real-estate/": {
@@ -558,8 +558,8 @@
       "date": "2026-09-07"
     },
     "/tools/bearing-equivalent-load/": {
-      "sha": "57b52693ccccd573",
-      "date": "2026-09-19"
+      "sha": "59fa236c32cd9b84",
+      "date": "2026-09-25"
     },
     "/tools/bearing-l10-life/": {
       "sha": "0f523b90bf1f1174",
@@ -658,7 +658,7 @@
       "date": "2026-09-05"
     },
     "/tools/blast-scaled-distance-ppv/": {
-      "sha": "ad519f4908b04125",
+      "sha": "b43ea824eeaabcd7",
       "date": "2026-09-25"
     },
     "/tools/blast-stemming-length/": {
@@ -1226,7 +1226,7 @@
       "date": "2026-09-01"
     },
     "/tools/cleanout-layout/": {
-      "sha": "1ecde175277833c5",
+      "sha": "7ee3e699e755f16e",
       "date": "2026-09-25"
     },
     "/tools/clearance-plate-envelope/": {
@@ -3510,7 +3510,7 @@
       "date": "2026-09-01"
     },
     "/tools/hanger-rod-sizing/": {
-      "sha": "cdca9c3ca3b17ed7",
+      "sha": "c98b27bf62b0ab04",
       "date": "2026-09-25"
     },
     "/tools/hardness-tensile-conversion/": {
@@ -3794,8 +3794,8 @@
       "date": "2026-09-09"
     },
     "/tools/hydronic-system-volume/": {
-      "sha": "21bb1170308a2d04",
-      "date": "2026-09-19"
+      "sha": "0238f7202bfaa815",
+      "date": "2026-09-25"
     },
     "/tools/hydroplaning-speed/": {
       "sha": "1a45d399c64b639e",
@@ -4474,8 +4474,8 @@
       "date": "2026-09-01"
     },
     "/tools/masonry-lintel-loading/": {
-      "sha": "95b1bbd333541afd",
-      "date": "2026-09-19"
+      "sha": "cbad65fa531e294f",
+      "date": "2026-09-25"
     },
     "/tools/masonry-prism-fm/": {
       "sha": "d8b09c883bc34f4d",
@@ -5434,8 +5434,8 @@
       "date": "2026-09-01"
     },
     "/tools/pool-chlorine-dose/": {
-      "sha": "fcf29c9205b9c194",
-      "date": "2026-09-01"
+      "sha": "eba257a425eb71a4",
+      "date": "2026-09-25"
     },
     "/tools/pool-cover-evaporation/": {
       "sha": "d83af95a55336bda",
@@ -7042,8 +7042,8 @@
       "date": "2026-09-01"
     },
     "/tools/solder-joint-quantity/": {
-      "sha": "e42d300ed9722066",
-      "date": "2026-09-19"
+      "sha": "28c8bf2967c61a52",
+      "date": "2026-09-25"
     },
     "/tools/soot-cleaning-takeoff/": {
       "sha": "379c669b39577d22",
@@ -8162,8 +8162,8 @@
       "date": "2026-09-19"
     },
     "/tools/turbo-pressure-ratio/": {
-      "sha": "897b6dae5e1a2fec",
-      "date": "2026-09-19"
+      "sha": "fa9f3de32801b9cc",
+      "date": "2026-09-25"
     },
     "/tools/turn-radius-bank/": {
       "sha": "3243db47f0605862",
@@ -8178,7 +8178,7 @@
       "date": "2026-09-01"
     },
     "/tools/turnout-frog-lead/": {
-      "sha": "96d24f4b7259e362",
+      "sha": "794184e4a61d55f4",
       "date": "2026-09-25"
     },
     "/tools/two-proportion-z-test/": {
@@ -8554,7 +8554,7 @@
       "date": "2026-09-01"
     },
     "/tools/weld-travel-speed/": {
-      "sha": "37fef35c8e023150",
+      "sha": "932b17f9f9ae22b8",
       "date": "2026-09-25"
     },
     "/tools/weld-usage/": {
