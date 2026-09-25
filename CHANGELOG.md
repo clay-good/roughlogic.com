@@ -10,6 +10,9 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **Fire-alarm NAC wire resistance and coax loss defaults read from the tables they cite.**
+  - `fire-alarm-nac-voltage-drop` defaulted #14 copper to 2.525 ohm/1000 ft, the 20°C handbook value, under a citation to NEC Chapter 9 Table 8, which lists resistance at 75°C: 3.07 solid, 3.14 stranded. The drop read about 20% low (unsafe: a marginal circuit could pass). The default is now 3.14. The worked example moves from 1.01 V to 1.26 V of drop, and from 19.39 V to 19.14 V at the end of the line.
+  - `coax-rg-loss` pre-filled 6.0 / 11.0 / 3.5 dB per 100 ft at 1 GHz for RG6 / RG59 / RG11 and credited Belden. Belden's data sheets (1694A, 1505A, 7731A) give 6.3 / 7.6 / 4.3; RG6 and RG11 read light.
 - **Green log weights read from the FPL table they come from, and the crown-pruning caps labeled honestly.**
   - `log-limb-weight` credited its green weights to the FPL Wood Handbook, which has no such table. They come from FPL Technical Note 218, and four did not match it. Hickory was 63 (TN-218: 64) and southern pine 52, where the table runs from 51 (longleaf, shortleaf) to 56 (slash). Both read light, the unsafe direction for a rigging load. Douglas-fir was 44 (coast type is 38) and sugar maple 58 (56). Southern pine now uses slash pine, the heaviest; the example red oak (Q. borealis, 63) moves from 715 to 704 lb. The note repeats TN-218's warning that a given piece can be off by as much as 20%.
   - `crown-pruning-dose` credited all four caps to ANSI A300. Part 1 section 5.5.3 gives one ceiling, 25% of the foliage in a growing season, adjusted for species, age, health and site. The young 15%, over-mature 10% and stressed 0% caps are now labeled as this tile's conservative adjustments.

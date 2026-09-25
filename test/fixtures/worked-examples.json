@@ -40054,16 +40054,16 @@
   {
    "tile_id": "fire-alarm-nac-voltage-drop",
    "source_publisher": "fire-alarm NAC voltage drop (NFPA 72)",
-   "source_title": "24 V panel, 0.8 A, 250 ft #14 (2.525 ohm/1000 ft), 16 V device -> 19.39 V EOL, PASS",
+   "source_title": "24 V panel, 0.8 A, 250 ft #14 stranded (3.14 ohm/1000 ft at 75 C, NEC Ch 9 Table 8), 16 V device -> 19.144 V EOL, PASS",
    "source_edition_or_year": "spec-v937 worked example (machine-verified)",
-   "source_section_or_page": "CUSTV = 0.85*24 = 20.4; loop R = 2*250*(2.525/1000) = 1.2625; drop = 0.8*1.2625 = 1.01; EOL = 19.39 >= 16",
+   "source_section_or_page": "CUSTV = 0.85*24 = 20.4; loop R = 2*250*(3.14/1000) = 1.57; drop = 0.8*1.57 = 1.256; EOL = 19.144 >= 16",
    "verified_by": "rl",
-   "verified_on": "2026-07-18",
+   "verified_on": "2026-09-24",
    "inputs": {
     "nominal_voltage_v": 24,
     "total_current_a": 0.8,
     "run_length_ft": 250,
-    "resistance_per_1000ft": 2.525,
+    "resistance_per_1000ft": 3.14,
     "device_min_v": 16
    },
    "outputs": {
@@ -40074,13 +40074,13 @@
      }
     },
     "voltage_drop_v": {
-     "value": 1.01,
+     "value": 1.256,
      "tolerance": {
       "abs": 0.01
      }
     },
     "eol_voltage_v": {
-     "value": 19.39,
+     "value": 19.144,
      "tolerance": {
       "abs": 0.01
      }
@@ -40090,21 +40090,21 @@
   {
    "tile_id": "fire-alarm-nac-voltage-drop",
    "source_publisher": "fire-alarm NAC voltage drop (NFPA 72)",
-   "source_title": "cross-check: a long 500 ft run at the same load drops to 18.38 V (still passes 16 V)",
+   "source_title": "cross-check: a long 500 ft run at the same load drops to 17.888 V (still passes 16 V)",
    "source_edition_or_year": "spec-v937 worked example (machine-verified)",
-   "source_section_or_page": "loop R = 2*500*(2.525/1000) = 2.525; drop = 0.8*2.525 = 2.02; EOL = 20.4 - 2.02 = 18.38",
+   "source_section_or_page": "loop R = 2*500*(3.14/1000) = 3.14; drop = 0.8*3.14 = 2.512; EOL = 20.4 - 2.512 = 17.888",
    "verified_by": "rl",
-   "verified_on": "2026-07-18",
+   "verified_on": "2026-09-24",
    "inputs": {
     "nominal_voltage_v": 24,
     "total_current_a": 0.8,
     "run_length_ft": 500,
-    "resistance_per_1000ft": 2.525,
+    "resistance_per_1000ft": 3.14,
     "device_min_v": 16
    },
    "outputs": {
     "eol_voltage_v": {
-     "value": 18.38,
+     "value": 17.888,
      "tolerance": {
       "abs": 0.01
      }

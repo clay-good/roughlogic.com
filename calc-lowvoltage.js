@@ -729,16 +729,18 @@ export function computeCoaxRgLoss({ mode = "loss", loss_per_100ft_db = 0, length
 }
 export const coaxRgLossExample = { inputs: { mode: "loss", loss_per_100ft_db: 6, length_ft: 100, source_level: 0 } };
 
-const _COAX_DEFAULT_LOSS = { RG6: 6.0, RG59: 11.0, RG11: 3.5 };
+// Nominal attenuation at 1000 MHz from Belden data sheets 1694A (RG6), 1505A (RG59) and 7731A (RG11).
+// Until 2026-09-24 these were 6.0 / 11.0 / 3.5, which read RG6 5% and RG11 19% light.
+const _COAX_DEFAULT_LOSS = { RG6: 6.3, RG59: 7.6, RG11: 4.3 };
 function _renderCoaxRgLoss(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Coaxial-cable attenuation from the per-100-ft loss at frequency (loss = per-100-ft x length/100), per the cable manufacturer's published loss curves (Belden / CommScope) and the standard CATV/CCTV/SDI practice, by name; first-principles. The per-100-ft loss is type- and frequency-specific and user-supplied or a flagged default; the manufacturer's datasheet governs.";
   const mode = makeSelect("Mode", "coax-mode", [
     { value: "loss", label: "Loss over a run", selected: true }, { value: "max-run", label: "Max run for a target level" },
   ]);
-  const type = makeSelect("Coax type (default loss at ~1 GHz)", "coax-type", [
-    { value: "RG6", label: "RG6", selected: true }, { value: "RG59", label: "RG59" }, { value: "RG11", label: "RG11" },
+  const type = makeSelect("Coax type (default loss at 1 GHz, Belden)", "coax-type", [
+    { value: "RG6", label: "RG6 (Belden 1694A, 6.3 dB)", selected: true }, { value: "RG59", label: "RG59 (Belden 1505A, 7.6 dB)" }, { value: "RG11", label: "RG11 (Belden 7731A, 4.3 dB)" },
   ]);
-  const lp = makeNumber("Loss per 100 ft (dB)", "coax-lp", { step: "any", min: "0", value: "6" });
+  const lp = makeNumber("Loss per 100 ft (dB)", "coax-lp", { step: "any", min: "0", value: "6.3" });
   const len = makeNumber("Run length (ft)", "coax-len", { step: "any", min: "0" });
   const src = makeNumber("Source level (dBmV/dBm, optional)", "coax-src", { step: "any" });
   const tgt = makeNumber("Target level (max-run mode)", "coax-tgt", { step: "any" });
@@ -1135,13 +1137,15 @@ LOWVOLTAGE_RENDERERS["access-control-power-supply"] = _v929renderAccessControlPo
 
 // ===================== spec-v937: fire-alarm NAC circuit voltage drop (end-of-line) =====================
 // dims: in { nominal_voltage_v: M L^2 T^-3 I^-1, total_current_a: I, run_length_ft: L, resistance_per_1000ft: M L T^-3 I^-2, device_min_v: M L^2 T^-3 I^-1 } out: { available_voltage_v: M L^2 T^-3 I^-1, voltage_drop_v: M L^2 T^-3 I^-1, eol_voltage_v: M L^2 T^-3 I^-1, margin_v: M L^2 T^-3 I^-1 }
-export function computeFireAlarmNacVoltageDrop({ nominal_voltage_v = 24, total_current_a = 0.8, run_length_ft = 250, resistance_per_1000ft = 2.525, device_min_v = 16 } = {}) {
+export function computeFireAlarmNacVoltageDrop({ nominal_voltage_v = 24, total_current_a = 0.8, run_length_ft = 250, resistance_per_1000ft = 3.14, device_min_v = 16 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(nominal_voltage_v > 0)) return { error: "Nominal panel voltage must be positive (V)." };
   if (!(total_current_a > 0)) return { error: "Total appliance current must be positive (A)." };
   if (!(run_length_ft > 0)) return { error: "Run length must be positive (ft)." };
   if (!(resistance_per_1000ft > 0)) return { error: "Conductor resistance must be positive (ohm/1000 ft)." };
   if (!(device_min_v > 0)) return { error: "Device minimum voltage must be positive (V)." };
+  // Default conductor: #14 stranded copper, 3.14 ohm/1000 ft at 75 C (NEC Ch 9 Table 8; 3.07 solid).
+  // Until 2026-09-24 this was 2.525, the 20 C handbook value, which understated the drop by about 20%.
   // The panel's regulated minimum output (CUSTV) is 85% of nominal per NFPA 72; Class B is out-and-back, so 2x length.
   const available_voltage_v = 0.85 * nominal_voltage_v;
   const loop_resistance = 2 * run_length_ft * (resistance_per_1000ft / 1000);
@@ -1161,24 +1165,24 @@ export function computeFireAlarmNacVoltageDrop({ nominal_voltage_v = 24, total_c
   };
 }
 
-export const fireAlarmNacVoltageDropExample = { inputs: { nominal_voltage_v: 24, total_current_a: 0.8, run_length_ft: 250, resistance_per_1000ft: 2.525, device_min_v: 16 } };
+export const fireAlarmNacVoltageDropExample = { inputs: { nominal_voltage_v: 24, total_current_a: 0.8, run_length_ft: 250, resistance_per_1000ft: 3.14, device_min_v: 16 } };
 
 function _v937renderFireAlarmNacVoltageDrop(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: fire-alarm NAC end-of-line voltage drop by name (NFPA 72). CUSTV = 0.85 x nominal; loop R = 2 x length x (ohm/1000 ft)/1000 (Class B out-and-back, NEC Ch 9 Table 8); V_EOL = CUSTV - I x loop R, must be >= the device's listed minimum. The panel voltage, appliance draws, and the wire table govern.";
+  citationEl.textContent = "Citation: fire-alarm NAC end-of-line voltage drop by name (NFPA 72). CUSTV = 0.85 x nominal; loop R = 2 x length x (ohm/1000 ft)/1000 (Class B out-and-back; NEC Ch 9 Table 8 at 75 C, #14 stranded 3.14 and solid 3.07 ohm/1000 ft); V_EOL = CUSTV - I x loop R, must be >= the device's listed minimum. The panel voltage, appliance draws, and the wire table govern.";
   const nv = makeNumber("Panel nominal voltage (V)", "nac-nv", { step: "any", min: "0" });
   const ic = makeNumber("Total appliance current at EOL (A)", "nac-ic", { step: "any", min: "0" });
   const rl = makeNumber("Run length (ft, one way)", "nac-rl", { step: "any", min: "0" });
   const rr = makeNumber("Conductor resistance (ohm/1000 ft)", "nac-rr", { step: "any", min: "0" });
   const dm = makeNumber("Device minimum voltage (V)", "nac-dm", { step: "any", min: "0" });
   for (const f of [nv, ic, rl, rr, dm]) inputRegion.appendChild(f.wrap);
-  attachExampleButton(inputRegion, () => { nv.input.value = "24"; ic.input.value = "0.8"; rl.input.value = "250"; rr.input.value = "2.525"; dm.input.value = "16"; update(); });
+  attachExampleButton(inputRegion, () => { nv.input.value = "24"; ic.input.value = "0.8"; rl.input.value = "250"; rr.input.value = "3.14"; dm.input.value = "16"; update(); });
   const oV = makeOutputLine(outputRegion, "Verdict", "nac-out-v");
   const oEol = makeOutputLine(outputRegion, "End-of-line voltage", "nac-out-eol");
   const oDrop = makeOutputLine(outputRegion, "Voltage drop (from CUSTV)", "nac-out-drop");
   const update = debounce(() => {
     const r = computeFireAlarmNacVoltageDrop({
       nominal_voltage_v: nv.input.value === "" ? 24 : Number(nv.input.value), total_current_a: ic.input.value === "" ? 0.8 : Number(ic.input.value),
-      run_length_ft: rl.input.value === "" ? 250 : Number(rl.input.value), resistance_per_1000ft: rr.input.value === "" ? 2.525 : Number(rr.input.value),
+      run_length_ft: rl.input.value === "" ? 250 : Number(rl.input.value), resistance_per_1000ft: rr.input.value === "" ? 3.14 : Number(rr.input.value),
       device_min_v: dm.input.value === "" ? 16 : Number(dm.input.value),
     });
     if (r.error) { oV.textContent = r.error; oEol.textContent = "-"; oDrop.textContent = "-"; return; }

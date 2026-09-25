@@ -10265,6 +10265,7 @@ export const CITATIONS = {
     assumptions: [
       { name: "CUSTV and Class B", value: "usable voltage = 0.85 x nominal (NFPA 72 regulated minimum); Class B loop = 2 x length x ohms/1000 ft", source: "NFPA 72 / NEC Ch 9 Table 8" },
       { name: "Worst-case load", value: "total appliance current lumped at the end of the line; each device must still see its listed minimum", source: "NAC design practice" },
+      { name: "Default conductor", value: "#14 stranded copper, 3.14 ohm/1000 ft at 75 C (3.07 solid)", source: "NEC Chapter 9 Table 8" },
     ],
   },
   "loop-signal-scaling": {
