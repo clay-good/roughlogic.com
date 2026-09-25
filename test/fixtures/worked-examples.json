@@ -16276,9 +16276,9 @@
    "source_publisher": "USDA NRCS",
    "source_title": "Cattle stocking rate: 160 acres, 1,500 lb/acre forage, 40% utilization, cow-calf pairs, 30 head",
    "source_edition_or_year": "USDA NRCS National Range and Pasture Handbook Ch. 6",
-   "source_section_or_page": "available = 1500*160*0.40 = 96,000 lb; AUMs = 96,000/780 = 123.08; grazing days (30 head) = 96,000/(30*26) = 123.08",
+   "source_section_or_page": "available = 1500*160*0.40 = 96,000 lb; AUMs = 96,000/790 = 121.52 (NRPH Table 6-5: 790 lb per animal-unit month); grazing days (30 head) = 96,000/(30*26) = 123.08",
    "verified_by": "rl",
-   "verified_on": "2026-06-05",
+   "verified_on": "2026-09-24",
    "inputs": {
     "area_acres": 160,
     "forage_lb_per_acre": 1500,
@@ -16294,7 +16294,7 @@
      }
     },
     "aums_available": {
-     "value": 123.08,
+     "value": 121.52,
      "tolerance": {
       "pct": 0.1
      }

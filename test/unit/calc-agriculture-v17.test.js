@@ -84,18 +84,25 @@ test("irrigation-requirement: unknown crop, non-positive ET0 / days / area, bad 
 
 // --- L.3 Cattle stocking rate (6 tests) ------------------------------
 
-test("cattle-stocking-rate: 160 ac, 1500 lb/ac, 40% util, cow-calf, 30 head -> 96,000 lb, 123.08 AUMs, 123 days", () => {
+test("cattle-stocking-rate: 160 ac, 1500 lb/ac, 40% util, cow-calf, 30 head -> 96,000 lb, 121.52 AUMs, 123 days", () => {
   const r = computeStockingRate(stockingRateExample.inputs);
   assert.ok(!r.error);
   assert.ok(close(r.available_forage_lb, 96000, 1e-6));
-  assert.ok(closePct(r.aums_available, 123.08, 0.1));
+  assert.ok(closePct(r.aums_available, 121.52, 0.1));
   assert.ok(closePct(r.grazing_days, 123.08, 0.1));
 });
 
 test("cattle-stocking-rate: available forage = production x area x utilization", () => {
   const r = computeStockingRate({ area_acres: 100, forage_lb_per_acre: 2000, utilization_pct: 50, animal_class: "cow_calf", herd_size: 0 });
   assert.ok(close(r.available_forage_lb, 2000 * 100 * 0.5, 1e-6));
-  assert.ok(close(r.aums_available, (2000 * 100 * 0.5) / 780, 1e-9));
+  assert.ok(close(r.aums_available, (2000 * 100 * 0.5) / 790, 1e-9));
+});
+
+test("cattle-stocking-rate: AU equivalents and the AUM are NRPH Table 6-5", () => {
+  // Cow with calf 1.00 at 790 lb/month; cattle 1 yr 0.60, 2 yr 0.80; bull 1.35; horse 1.25; sheep 0.20.
+  assert.deepEqual(ANIMAL_UNIT_EQUIV, { cow_calf: 1.0, yearling: 0.6, cattle_2yr: 0.8, bull: 1.35, sheep: 0.2, horse: 1.25 });
+  const r = computeStockingRate({ area_acres: 1, forage_lb_per_acre: 790, utilization_pct: 100, animal_class: "cow_calf" });
+  assert.ok(close(r.aums_available, 1, 1e-12));
 });
 
 test("cattle-stocking-rate: AU equivalents scale the head supported", () => {

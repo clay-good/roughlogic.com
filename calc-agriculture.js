@@ -1037,16 +1037,20 @@ function renderIrrigationRequirement(inputRegion, outputRegion, citationEl) {
 
 // --- spec-v17 L.3 Cattle stocking rate (AUM) -------------------------
 
-// Animal-unit equivalents (USDA NRCS National Range and Pasture Handbook
-// Ch. 6). One animal unit (AU) = a 1,000 lb cow consuming ~26 lb dry
-// matter per day; one animal-unit-month (AUM) = 26 x 30 = 780 lb.
+// Animal-unit equivalents: USDA NRCS National Range and Pasture Handbook
+// Table 6-5. One animal unit (AU) = a 1,000 lb cow with calf eating 26 lb of
+// dry matter a day, and an animal-unit-month is 790 lb (26 x 30.4 days).
+// Until 2026-09-24 the AUM was 780 (a 30-day month) and a yearling was 0.7 AU,
+// which is in no row: the table gives cattle 1 year old 0.60, 2 years old 0.80.
 export const ANIMAL_UNIT_EQUIV = {
   cow_calf: 1.0,
-  yearling: 0.7,
+  yearling: 0.6,
+  cattle_2yr: 0.8,
+  bull: 1.35,
   sheep: 0.2,
   horse: 1.25,
 };
-const AUM_LB_DM = 780;
+const AUM_LB_DM = 790;
 const AU_LB_DM_PER_DAY = 26;
 
 // dims: in { area_acres: L^2, forage_lb_per_acre: M L^-2, utilization_pct: dimensionless, animal_class: dimensionless, herd_size: dimensionless } out: { available_forage_lb: M, aums_available: dimensionless, grazing_days: T }
@@ -1099,18 +1103,20 @@ export function computeStockingRate({
 export const stockingRateExample = {
   // 160 acres, 1,500 lb/acre forage, 40% utilization, cow-calf pairs,
   // herd of 30. available = 1500 * 160 * 0.40 = 96,000 lb; AUMs =
-  // 96,000 / 780 = 123.08; grazing days (30 head) = 96,000 / (30*26) = 123.08.
+  // 96,000 / 790 = 121.52; grazing days (30 head) = 96,000 / (30*26) = 123.08.
   inputs: { area_acres: 160, forage_lb_per_acre: 1500, utilization_pct: 40, animal_class: "cow_calf", herd_size: 30 },
 };
 
 function renderStockingRate(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: Per USDA NRCS National Range and Pasture Handbook Ch. 6 (stocking rate). available forage = production x area x utilization; AUMs = available / 780 lb (26 lb dry matter/day x 30 days per animal unit). Drought and climate adjustments are essential. Free at nrcs.usda.gov for the handbook.";
+  citationEl.textContent = "Citation: Per USDA NRCS National Range and Pasture Handbook Ch. 6 (stocking rate). available forage = production x area x utilization; AUMs = available / 790 lb (26 lb dry matter/day x 30.4 days per animal unit, Table 6-5); animal-unit equivalents from Table 6-5. Drought and climate adjustments are essential. Free at nrcs.usda.gov for the handbook.";
   const area = makeNumber("Pasture area (acres)", "sr-area", { step: "any", min: "0" });
   const forage = makeNumber("Forage production (lb/acre)", "sr-forage", { step: "any", min: "0" });
   const util = makeNumber("Utilization (%)", "sr-util", { step: "any", min: "0", max: "100" });
   const cls = makeSelect("Animal class", "sr-cls", [
     { value: "cow_calf", label: "Cow-calf pair (1.0 AU)", selected: true },
-    { value: "yearling", label: "Yearling (0.7 AU)" },
+    { value: "yearling", label: "Cattle, 1 year old (0.6 AU)" },
+    { value: "cattle_2yr", label: "Cattle, 2 years old (0.8 AU)" },
+    { value: "bull", label: "Bull, mature (1.35 AU)" },
     { value: "sheep", label: "Sheep (0.2 AU)" },
     { value: "horse", label: "Horse (1.25 AU)" },
   ]);

@@ -3595,10 +3595,10 @@ test("bounds: calc-agriculture computeIrrigationRequirement pins ET_crop = Kc*ET
   assert.ok("error" in computeIrrigationRequirement({ crop: "corn", et_ref_in_per_day: 0.2, period_days: 10, area_acres: 5, efficiency_pct: 0 }));
 });
 
-test("bounds: calc-agriculture computeStockingRate pins available = prod*area*util, AUMs = available/780, and grazing days", () => {
+test("bounds: calc-agriculture computeStockingRate pins available = prod*area*util, AUMs = available/790, and grazing days", () => {
   const r = computeStockingRate({ area_acres: 160, forage_lb_per_acre: 1500, utilization_pct: 40, animal_class: "cow_calf", herd_size: 30 });
   assert.ok(Math.abs(r.available_forage_lb - 96000) < 1e-6);
-  assert.ok(Math.abs(r.aums_available - 96000 / 780) < 1e-9);
+  assert.ok(Math.abs(r.aums_available - 96000 / 790) < 1e-9);
   assert.ok(Math.abs(r.grazing_days - 96000 / (30 * 26)) < 1e-9);
   // AU equivalent scales head supported.
   const sheep = computeStockingRate({ area_acres: 160, forage_lb_per_acre: 1500, utilization_pct: 40, animal_class: "sheep" });
