@@ -43301,13 +43301,13 @@ test("bounds: spec-v1508 computeBlastBurdenSpacing pins the stiffness check", ()
 
 import { computeBlastScaledDistancePPV as _v1509 } from "../../calc-mining.js";
 test("bounds: spec-v1509 computeBlastScaledDistancePPV pins per-delay, not per-shot", () => {
-  const base = { distance_ft: 1200, charge_per_delay_lb: 340, site_k: 160, site_b: 1.6, ppv_limit_in_s: 1, required_scaled_distance: 50 };
+  const base = { distance_ft: 1200, charge_per_delay_lb: 340, site_k: 160, site_b: 1.6, ppv_limit_in_s: 1, required_scaled_distance: 55 };
   const r = _v1509(base);
   assert.ok(Math.abs(r.scaled_distance - 65.0791) < 1e-3);
   assert.ok(Math.abs(r.predicted_ppv_in_s - 0.20073) < 1e-4);
   assert.strictEqual(r.ppv_ok, true);
   assert.strictEqual(r.sd_ok, true);
-  assert.ok(Math.abs(r.max_charge_lb - 576) < 1e-9);
+  assert.ok(Math.abs(r.max_charge_lb - (1200 / 55) ** 2) < 1e-9); // 476 lb: 30 CFR 816.67 row 301-5,000 ft
   assert.ok(Math.abs(r.compliant_distance_ft - 439.86) < 1e-2);
   // The misuse the tile exists to prevent: reading the whole shot into the
   // charge field. A 10,000 lb shot on forty 250 lb delays is the vibration
@@ -43322,7 +43322,7 @@ test("bounds: spec-v1509 computeBlastScaledDistancePPV pins per-delay, not per-s
   assert.ok(Math.abs(atDistance.predicted_ppv_in_s - base.ppv_limit_in_s) < 1e-9);
   // Moving the house in cuts the allowable charge as the SQUARE.
   const close = _v1509({ ...base, distance_ft: 400 });
-  assert.ok(Math.abs(close.max_charge_lb - 64) < 1e-9);
+  assert.ok(Math.abs(close.max_charge_lb - (400 / 55) ** 2) < 1e-9);
   assert.ok(Math.abs(r.max_charge_lb / close.max_charge_lb - 9) < 1e-9);
   assert.strictEqual(close.sd_ok, false);
   // Scaled distance is exactly linear in distance and inverse in sqrt(W).

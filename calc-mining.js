@@ -216,7 +216,7 @@ MINING_RENDERERS["blast-burden-spacing"] = _simpleRenderer({
 // ===================== spec-v1509: scaled distance and peak particle velocity =====================
 
 // dims: in { distance_ft: L, charge_per_delay_lb: M L T^-2, site_k: dimensionless, site_b: dimensionless, ppv_limit_in_s: L T^-1, required_scaled_distance: dimensionless } out: { scaled_distance: dimensionless, predicted_ppv_in_s: L T^-1, max_charge_lb: M L T^-2, compliant_distance_ft: L }
-export function computeBlastScaledDistancePPV({ distance_ft = 0, charge_per_delay_lb = 0, site_k = 160, site_b = 1.6, ppv_limit_in_s = 1, required_scaled_distance = 50 } = {}) {
+export function computeBlastScaledDistancePPV({ distance_ft = 0, charge_per_delay_lb = 0, site_k = 160, site_b = 1.6, ppv_limit_in_s = 1, required_scaled_distance = 55 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(distance_ft > 0)) return { error: "Distance to the structure must be positive." };
   if (!(charge_per_delay_lb > 0)) return { error: "Charge weight per delay must be positive." };
@@ -244,7 +244,10 @@ export function computeBlastScaledDistancePPV({ distance_ft = 0, charge_per_dela
     note: "Vibration scales with charge weight per DELAY, not per shot, which is the whole reason delay initiation exists. A 10,000 lb shot fired on forty delays of 250 lb each produces the vibration of a 250 lb shot, and that single fact is what lets a quarry work near a town at all. Reading the charge weight per shot into this relation instead of per delay overstates the vibration enormously and is the most common misuse of it. The propagation constants are site-specific and vary widely with geology; the generic values are a starting point, and a site-specific regression from actual seismograph records is what a serious operation uses -- generic constants can be wrong by a factor of two in either direction. That is why most regulations offer two compliance paths: monitor every shot with a seismograph, or stay above a prescribed minimum scaled distance and skip the monitoring. The second path is conservative by design, and both are computed here. What this does NOT evaluate is frequency, and every modern vibration limit is frequency-dependent: the same peak particle velocity is acceptable at 40 Hz and not at 6 Hz, because low frequencies couple into structures. It does not address airblast, which is a separate limit and a separate calculation, or flyrock, and it does not perform a preblast survey, which is what actually resolves damage claims. Where a regulation requires monitoring this calculation does not substitute for it. Blasting is a licensed activity: the blaster in charge, the state and federal explosives regulations, MSHA or OSHA jurisdiction as applicable, and the site's blast plan govern.",
   };
 }
-const scaledDistanceExample = { inputs: { distance_ft: 1200, charge_per_delay_lb: 340, site_k: 160, site_b: 1.6, ppv_limit_in_s: 1, required_scaled_distance: 50 } };
+const scaledDistanceExample = { inputs: { distance_ft: 1200, charge_per_delay_lb: 340, site_k: 160, site_b: 1.6, ppv_limit_in_s: 1, required_scaled_distance: 55 } };
+// 30 CFR 816.67(d)(2)(i): 301 to 5,000 ft -> 1.00 in/s and a scaled distance of 55 (50 is the 0-300 ft
+// row, which pairs with 1.25 in/s). Until 2026-09-25 the example paired 1.00 with 50, allowing 576 lb per
+// delay at 1,200 ft where the table allows 476.
 MINING_RENDERERS["blast-scaled-distance-ppv"] = _simpleRenderer({
   citation: "Citation: the square-root scaled distance SD = distance / sqrt(charge per delay) and the propagation relation PPV = K x SD raised to minus b, by name, with the regulatory minimum-scaled-distance compliance path named as an alternative to seismograph monitoring. Site constants are entered; a site-specific regression is the defensible basis. The blaster in charge governs.",
   example: scaledDistanceExample.inputs,
@@ -254,7 +257,7 @@ MINING_RENDERERS["blast-scaled-distance-ppv"] = _simpleRenderer({
     { key: "site_k", label: "Site propagation constant K", kind: "number", default: 160 },
     { key: "site_b", label: "Site propagation exponent b", kind: "number", default: 1.6 },
     { key: "ppv_limit_in_s", label: "Regulatory PPV limit (in/s)", kind: "number", default: 1 },
-    { key: "required_scaled_distance", label: "Minimum scaled distance for the no-monitoring path", kind: "number", default: 50 },
+    { key: "required_scaled_distance", label: "Minimum scaled distance for the no-monitoring path (30 CFR 816.67: 50 to 300 ft, 55 to 5,000 ft, 65 beyond)", kind: "number", default: 55 },
   ],
   outputs: [
     { key: "s", id: "bsd-out-s", label: "Scaled distance", value: (r) => fmt(r.scaled_distance, 1) + " -- " + r.sd_verdict },
@@ -997,7 +1000,7 @@ export function computeHoistRopeSafetyFactor({ conveyance_lb = 0, people_count =
 }
 const hoistRopeExample = { inputs: { conveyance_lb: 4200, people_count: 8, person_weight_lb: 180, rope_length_ft: 1400, rope_weight_per_ft: 1.8, rope_count: 4, rope_breaking_lb: 128000, minimum_fs: 8 } };
 MINING_RENDERERS["hoist-rope-safety-factor"] = _simpleRenderer({
-  citation: "Citation: the suspended-load factor of safety -- (rope count x breaking strength) / (conveyance + payload + rope weight below the sheave), where rope weight = count x length x weight per foot -- with the statutory minimum entered because it varies by service and depth and is highest for personnel hoisting. MSHA and the mine's hoisting plan govern.",
+  citation: "Citation: the suspended-load factor of safety -- (rope count x breaking strength) / (conveyance + payload + rope weight below the sheave), where rope weight = count x length x weight per foot -- with the required minimum entered because it varies by rope service and depth: for winding-drum hoist ropes MSHA 30 CFR 57.19021 and 75.1431 set 7.0 - 0.001 x the rope length in ft (5.6 at 1,400 ft), with no separate higher figure for personnel. The default 8 is stricter than that rule. MSHA and the mine's hoisting plan govern.",
   example: hoistRopeExample.inputs,
   fields: [
     { key: "conveyance_lb", label: "Conveyance (cage or skip) weight (lb)", kind: "number", default: 4200 },
@@ -1007,7 +1010,7 @@ MINING_RENDERERS["hoist-rope-safety-factor"] = _simpleRenderer({
     { key: "rope_weight_per_ft", label: "Rope weight (lb per ft, each)", kind: "number", default: 1.8 },
     { key: "rope_count", label: "Number of ropes", kind: "number", default: 4 },
     { key: "rope_breaking_lb", label: "Rope breaking strength (lb, each)", kind: "number", default: 128000 },
-    { key: "minimum_fs", label: "Statutory minimum factor of safety", kind: "number", default: 8 },
+    { key: "minimum_fs", label: "Required factor of safety (MSHA winding drum: 7.0 - 0.001 x length ft; default 8 is stricter)", kind: "number", default: 8 },
   ],
   outputs: [
     { key: "w", id: "hrs-out-w", label: "Rope weight below the sheave", value: (r) => fmt(r.rope_weight_lb, 0) + " lb -- " + fmt(r.rope_share_pct, 0) + "% of the suspended load" },

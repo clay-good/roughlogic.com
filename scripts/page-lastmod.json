@@ -658,8 +658,8 @@
       "date": "2026-09-05"
     },
     "/tools/blast-scaled-distance-ppv/": {
-      "sha": "5ce3e5620befe0ff",
-      "date": "2026-09-05"
+      "sha": "ad519f4908b04125",
+      "date": "2026-09-25"
     },
     "/tools/blast-stemming-length/": {
       "sha": "0272226583f1511e",
@@ -3646,8 +3646,8 @@
       "date": "2026-09-19"
     },
     "/tools/hoist-rope-safety-factor/": {
-      "sha": "a9dcc69b778c6eb4",
-      "date": "2026-09-05"
+      "sha": "b8a7341f2728a176",
+      "date": "2026-09-25"
     },
     "/tools/hoistway-venting/": {
       "sha": "1ac86ca9e9dc3cc4",
@@ -6646,8 +6646,8 @@
       "date": "2026-09-01"
     },
     "/tools/server-inlet-envelope/": {
-      "sha": "ab9c905fb8e16c44",
-      "date": "2026-09-14"
+      "sha": "6229afe790d449f7",
+      "date": "2026-09-25"
     },
     "/tools/service-conductor-sizing/": {
       "sha": "3afae4fbc2222f58",
@@ -7802,8 +7802,8 @@
       "date": "2026-09-09"
     },
     "/tools/thermoplastic-temperature-derate/": {
-      "sha": "12bb5fb01eeb91f6",
-      "date": "2026-09-09"
+      "sha": "32e33b54cdb95f61",
+      "date": "2026-09-25"
     },
     "/tools/thi-livestock/": {
       "sha": "5ce351a047ea0eee",

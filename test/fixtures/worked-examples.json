@@ -95598,7 +95598,7 @@
     "site_k": 160,
     "site_b": 1.6,
     "ppv_limit_in_s": 1,
-    "required_scaled_distance": 50
+    "required_scaled_distance": 55
    },
    "outputs": {
     "scaled_distance": {
@@ -95614,7 +95614,7 @@
      }
     },
     "max_charge_lb": {
-     "value": 576,
+     "value": 476.03,
      "tolerance": {
       "pct": 0.5
      }
@@ -106121,7 +106121,7 @@
     "derating_factor": 0.4,
     "operating_pressure_psi": 100,
     "max_rated_temp_f": 140,
-    "alt_derating_factor": 0.82
+    "alt_derating_factor": 0.65
    },
    "outputs": {
     "derated_pressure_psi": {
@@ -106143,7 +106143,7 @@
      }
     },
     "alt_derated_psi": {
-     "value": 164,
+     "value": 130,
      "tolerance": {
       "pct": 0.5
      }
@@ -111236,7 +111236,7 @@
   },
   {
    "tile_id": "server-inlet-envelope", "source_publisher": "Project (first-principles)", "source_title": "Server Inlet Envelope -- the spec-v1807 worked example, recomputed", "source_edition_or_year": "spec-v1807 of scope-trade-expansion-3, 2026-09-13", "source_section_or_page": "current ASHRAE TC 9.9 and equipment limits govern", "verified_by": "rl", "verified_on": "2026-09-13",
-   "inputs": { "dry_bulb_f": 78, "relative_humidity_pct": 45, "recommended_min_f": 64.4, "recommended_max_f": 80.6, "allowable_min_f": 59, "allowable_max_f": 89.6, "upper_dew_point_f": 59, "upper_rh_pct": 60, "alternative_temp_f": 82, "alternative_rh_pct": 50 },
+   "inputs": { "dry_bulb_f": 78, "relative_humidity_pct": 45, "recommended_min_f": 64.4, "recommended_max_f": 80.6, "allowable_min_f": 59, "allowable_max_f": 89.6, "upper_dew_point_f": 59, "upper_rh_pct": 70, "alternative_temp_f": 82, "alternative_rh_pct": 50 },
    "outputs": { "dew_point_f": { "value": 54.91676593032166, "tolerance": { "pct": 0.5 } }, "dew_point_margin_f": { "value": 4.0832340696783405, "tolerance": { "pct": 0.5 } }, "warm_same_rh_dew_point_f": { "value": 58.53506442390163, "tolerance": { "pct": 0.5 } }, "alternative_dew_point_f": { "value": 61.498353941455896, "tolerance": { "pct": 0.5 } }, "alternative_dew_point_margin_f": { "value": -2.498353941455896, "tolerance": { "pct": 0.5 } } }
   },
   {

@@ -489,7 +489,9 @@ export function computeServerInletEnvelope({ dry_bulb_f = 0, relative_humidity_p
   };
 }
 
-const inletExample = { dry_bulb_f: 78, relative_humidity_pct: 45, recommended_min_f: 64.4, recommended_max_f: 80.6, allowable_min_f: 59, allowable_max_f: 89.6, upper_dew_point_f: 59, upper_rh_pct: 60, alternative_temp_f: 82, alternative_rh_pct: 50 };
+const inletExample = { dry_bulb_f: 78, relative_humidity_pct: 45, recommended_min_f: 64.4, recommended_max_f: 80.6, allowable_min_f: 59, allowable_max_f: 89.6, upper_dew_point_f: 59, upper_rh_pct: 70, alternative_temp_f: 82, alternative_rh_pct: 50 };
+// ASHRAE TC 9.9 thermal guidelines, 5th ed. (2021): recommended upper limit 70% RH where silver and copper
+// corrosion coupons test below 200 / 300 A per month, otherwise 50%. (60% was the 2015 figure.)
 DATACENTER_RENDERERS["server-inlet-envelope"] = _simpleRenderer({
   citation: "Citation: ASHRAE TC 9.9 equipment-inlet thermal envelope and the Tetens/Magnus dew-point relation. Enter the current class limits; equipment manufacturer limits and an inlet-level survey govern.",
   example: inletExample,
