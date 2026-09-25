@@ -1845,14 +1845,24 @@ export const demoDebrisExample = { inputs: { structure_type: "wood_frame", volum
 
 // --- Utility 158: Formwork Pressure (ACI 347R wall equations) ---
 //
-// P = C_w (150 + 9000R/T) (R < 7, h <= 14) or C_w (150 + 43400/T + 2800R/T),
+// P = C_c C_w (150 + 9000R/T) (R < 7, h <= 14) or C_c C_w (150 + 43400/T + 2800R/T),
 // min 600 C_w, capped at the wet head (rho * h); full head above 15 ft/hr.
+// ACI 347R-14 Table 4.2.2.1a(c): C_w = 0.5 (1 + w/145) but >= 0.80 below 140 pcf, 1.0 at
+// 140-150, w/145 above. Table 4.2.2.1a(b): C_c by cement blend and retarder (a high-range
+// water reducer counts as a retarder). Until 2026-09-25 the lightweight C_w were 0.85 / 0.93
+// (the table gives 0.897 / 0.966) and "plasticized" put the 1.2 chemistry factor on the
+// unit-weight list, with no way to reach C_c 1.4 or 1.5 for slag and fly-ash blends.
+const _aciCw = (w) => (w < 140 ? Math.max(0.8, 0.5 * (1 + w / 145)) : w <= 150 ? 1.0 : w / 145);
+export const ACI_C_W = { normal: 1.0, lightweight_115: _aciCw(115), lightweight_135: _aciCw(135), plasticized: 1.0 };
+export const ACI_C_C = {
+  type_i_no_retarder: 1.0, type_i_retarder: 1.2,
+  blend_no_retarder: 1.2, blend_retarder: 1.4,
+  high_blend_no_retarder: 1.4, high_blend_retarder: 1.5,
+};
 
-export const ACI_C_W = { normal: 1.0, lightweight_115: 0.85, lightweight_135: 0.93, plasticized: 1.20 };
-
-// dims: in { pour_rate_ft_per_hr: L T^-1, concrete_temp_F: T, weight_factor: dimensionless, unit_weight_pcf: M L^-3, wall_height_ft: L } out: { pressure_psf: M L^-1 T^-2 }
+// dims: in { pour_rate_ft_per_hr: L T^-1, concrete_temp_F: T, weight_factor: dimensionless, unit_weight_pcf: M L^-3, wall_height_ft: L, chemistry: dimensionless } out: { pressure_psf: M L^-1 T^-2, chemistry_coefficient: dimensionless }
 export function computeFormworkPressure({
-  pour_rate_ft_per_hr = 0, concrete_temp_F = 70, weight_factor = "normal", unit_weight_pcf, wall_height_ft = 100,
+  pour_rate_ft_per_hr = 0, concrete_temp_F = 70, weight_factor = "normal", unit_weight_pcf, wall_height_ft = 100, chemistry = "auto",
 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(pour_rate_ft_per_hr > 0)) return { error: "Pour rate must be positive." };
@@ -1860,8 +1870,12 @@ export function computeFormworkPressure({
   // The option names the density, so take it from there when nothing is supplied: a
   // lightweight_115 pour capped at a 150 pcf head is a head the concrete cannot produce.
   if (unit_weight_pcf === undefined || unit_weight_pcf === null) unit_weight_pcf = { lightweight_115: 115, lightweight_135: 135 }[weight_factor] ?? 150;
-  const Cw = ACI_C_W[weight_factor];
-  if (!Number.isFinite(Cw)) return { error: "Unknown weight factor." };
+  if (!(weight_factor in ACI_C_W)) return { error: "Unknown weight factor." };
+  if (!(Number(unit_weight_pcf) > 0)) return { error: "Unit weight must be positive (pcf)." };
+  const Cw = _aciCw(Number(unit_weight_pcf));
+  const chem = chemistry === null || chemistry === undefined || chemistry === "" ? "auto" : chemistry;
+  const Cc = chem === "auto" ? (weight_factor === "plasticized" ? 1.2 : 1.0) : ACI_C_C[chem];
+  if (!Number.isFinite(Cc)) return { error: "Unknown concrete chemistry." };
   // ACI 347R wall pressure. The short form Cw (150 + 9000 R / T) holds only
   // for R < 7 ft/hr in walls up to 14 ft; taller walls at R < 7, and any wall
   // at 7-15 ft/hr, take Cw (150 + 43,400 / T + 2,800 R / T); above 15 ft/hr
@@ -1872,8 +1886,8 @@ export function computeFormworkPressure({
   const P_wet = unit_weight_pcf * wall_height_ft;
   let P_aci, aci_form;
   if (R > 15) { P_aci = P_wet; aci_form = "full liquid head (R > 15 ft/hr)"; }
-  else if (R < 7 && h <= 14) { P_aci = Cw * (150 + 9000 * R / T); aci_form = "short form (R < 7 ft/hr, wall <= 14 ft)"; }
-  else { P_aci = Cw * (150 + 43400 / T + 2800 * R / T); aci_form = R < 7 ? "tall-wall form (wall > 14 ft)" : "7-15 ft/hr form"; }
+  else if (R < 7 && h <= 14) { P_aci = Cc * Cw * (150 + 9000 * R / T); aci_form = "short form (R < 7 ft/hr, wall <= 14 ft)"; }
+  else { P_aci = Cc * Cw * (150 + 43400 / T + 2800 * R / T); aci_form = R < 7 ? "tall-wall form (wall > 14 ft)" : "7-15 ft/hr form"; }
   const floor_applied = P_aci < 600 * Cw;
   P_aci = Math.max(P_aci, 600 * Cw);
   const cap_applied = P_aci >= P_wet; // the liquid head governs
@@ -1885,6 +1899,8 @@ export function computeFormworkPressure({
     floor_applied,
     aci_form,
     weight_factor: Cw,
+    chemistry_coefficient: Cc,
+    chemistry: chem,
   };
 }
 
@@ -2207,7 +2223,7 @@ const renderDemoDebris = _simpleRenderer({
 });
 
 const renderFormworkPressure = _simpleRenderer({
-  citation: "Notice: Verify formwork shoring with the design engineer. Pour-rate spikes can exceed this. Citation: ACI 347 short form P = C_w * (150 + 9000R/T) capped at wet head.",
+  citation: "Notice: Verify formwork shoring with the design engineer. Pour-rate spikes can exceed this. Citation: ACI 347R-14 4.2.2.1a: P = C_c C_w (150 + 9000R/T) for R < 7 ft/hr in walls up to 14 ft, else C_c C_w (150 + 43,400/T + 2,800R/T), at least 600 C_w, full liquid head above 15 ft/hr, capped at the wet head. C_w from unit weight (Table 4.2.2.1a(c)); C_c by cement blend and retarder, 1.0 to 1.5 (Table 4.2.2.1a(b)).",
   example: formworkPressureExample.inputs,
   fields: [
     { key: "pour_rate_ft_per_hr", label: "Pour rate (ft/hr)", kind: "number" },
@@ -2215,6 +2231,15 @@ const renderFormworkPressure = _simpleRenderer({
     { key: "weight_factor", label: "Weight factor", kind: "select", options: Object.keys(ACI_C_W).map((k) => ({ value: k, label: k.replace(/_/g, " ") })) },
     { key: "unit_weight_pcf", label: "Unit weight (pcf)", kind: "number" },
     { key: "wall_height_ft", label: "Wall height (ft)", kind: "number" },
+    { key: "chemistry", label: "Concrete chemistry C_c (ACI 347R Table 4.2.2.1a(b))", kind: "select", options: [
+      { value: "auto", label: "From the weight class (1.0; 1.2 if plasticized)" },
+      { value: "type_i_no_retarder", label: "Type I/II/III, no slag or fly ash, no retarder (1.0)" },
+      { value: "type_i_retarder", label: "Type I/II/III, with retarder (1.2)" },
+      { value: "blend_no_retarder", label: "Slag < 70% or fly ash < 40%, no retarder (1.2)" },
+      { value: "blend_retarder", label: "Slag < 70% or fly ash < 40%, with retarder (1.4)" },
+      { value: "high_blend_no_retarder", label: "Slag >= 70% or fly ash >= 40%, no retarder (1.4)" },
+      { value: "high_blend_retarder", label: "Slag >= 70% or fly ash >= 40%, with retarder (1.5)" },
+    ] },
   ],
   outputs: [
     { key: "p", id: "fp-out-p", label: "Pressure", value: (r) => _fmtC(r.pressure_psf, 0) + " psf" },
@@ -5446,7 +5471,8 @@ export function computeOccupantLoad({ spaces = [] } = {}) {
     if (!Number.isFinite(area) || !Number.isFinite(olf)) return { error: "All space inputs must be finite numbers." };
     if (!(area > 0)) return { error: "Each space area must be positive (ft^2)." };
     if (!(olf > 0)) return { error: "Each occupant-load factor must be positive (ft^2/occupant)." };
-    // IBC §1004.2: a fraction of a person is counted as a whole person.
+    // A fraction of a person is counted as a whole person (conservative practice; IBC 2021
+    // §1004.2 is cumulative occupant loads and states no rounding rule).
     const load = Math.ceil(area / olf);
     per_space.push({ area, olf, load });
     total_load += load;
@@ -5460,7 +5486,7 @@ export const occupantLoadExample = {
 
 // Custom renderer: three space rows (area + occupant-load factor), summed.
 function _renderOccupantLoad(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: IBC 2021 §1004.5 and Table 1004.5 (occupant load = sum over spaces of ceil(area / occupant-load factor)); §1004.2 (round each space up to a whole person). Representative factors (ft^2/occ): assembly standing 5 net, chairs-only 7 net, tables-and-chairs 15 net, business 150 gross, mercantile 60 gross, classroom 20 net, commercial kitchen 200 gross, industrial 100 gross, storage 500 gross, residential 200 gross. The factor and its net-vs-gross basis come from the AHJ-adopted code edition and the actual use, not the tenant's label; a mezzanine or accessory use is its own line. A design aid, not a code-official determination.";
+  citationEl.textContent = "Citation: IBC 2021 §1004.5 and Table 1004.5 (occupant load = sum over spaces of ceil(area / occupant-load factor)); each space rounded up to a whole person (conservative practice; §1004.2 covers cumulative loads, not rounding). Representative factors (ft^2/occ): assembly standing 5 net, chairs-only 7 net, tables-and-chairs 15 net, business 150 gross, mercantile 60 gross, classroom 20 net, commercial kitchen 200 gross, industrial 100 gross, storage/stock/shipping 300 gross, warehouse 500 gross, residential 200 gross. The factor and its net-vs-gross basis come from the AHJ-adopted code edition and the actual use, not the tenant's label; a mezzanine or accessory use is its own line. A design aid, not a code-official determination.";
   _aeC(inputRegion, () => fillExample(occupantLoadExample.inputs));
   const rows = [];
   for (let i = 1; i <= 3; i++) {
@@ -5501,13 +5527,19 @@ CONSTRUCTION_RENDERERS["occupant-load"] = _renderOccupantLoad;
 // IBC Table 1006.3.4(2): the most occupants a story may have with ONE exit
 // (with a 75 ft common path; 25 ft for H-2 / H-3). Until 2026-09-19 every
 // occupancy got the A / B / E / F / M / U figure of 49.
-const _SINGLE_EXIT_MAX = { "A-B-E-F-M-U": 49, "S": 29, "I1-I3-I4-R1-R4": 10, "H4-H5": 10, "I-R1-R4-H4-H5": 10, "H2-H3": 3 };
+const _SINGLE_EXIT_MAX = { "A-B-E-F-M-U": 49, "B-F-M": 49, "S": 29, "I1-I3-I4-R1-R4": 10, "H4-H5": 10, "I-R1-R4-H4-H5": 10, "H2-H3": 3 };
+// The same table's later rows: on the SECOND story above grade plane only B, F, M and S may have
+// one exit (29 occupants, 75 ft); from the third story up a single exit is not permitted. Until
+// 2026-09-25 the first-story limits applied at every story, so a 40-person second-story A, B or E
+// space was told one exit would do.
+const _SECOND_STORY_SINGLE_EXIT_MAX = { "B-F-M": 29, "S": 29 };
+const _singleExitMax = (group, story) => (story === "first" ? _SINGLE_EXIT_MAX[group] : story === "second" ? (_SECOND_STORY_SINGLE_EXIT_MAX[group] || 0) : 0);
 // IBC 1005.3.1 / 1005.3.2: the sprinklered 0.2 / 0.15 factors are for "other than Group H and
 // I-2". The legacy mixed bucket holds I-2 and H-4 / H-5, so it takes the unsprinklered factor.
 const _NO_SPRINKLER_REDUCTION = new Set(["H2-H3", "H4-H5", "I-R1-R4-H4-H5"]);
 
-// dims: in { occupant_load: dimensionless, min_door_in: L, occupancy_group: dimensionless } out: { total_width_in: L, per_exit_in: L, exits_required: dimensionless }
-export function computeEgressCapacity({ occupant_load = 0, sprinklered = true, path = "level", min_door_in = 32, occupancy_group = "A-B-E-F-M-U" } = {}) {
+// dims: in { occupant_load: dimensionless, min_door_in: L, occupancy_group: dimensionless, story: dimensionless } out: { total_width_in: L, per_exit_in: L, exits_required: dimensionless }
+export function computeEgressCapacity({ occupant_load = 0, sprinklered = true, path = "level", min_door_in = 32, occupancy_group = "A-B-E-F-M-U", story = "first" } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(occupant_load > 0)) return { error: "Occupant load must be positive." };
   if (!(min_door_in > 0)) return { error: "Minimum door clear width must be positive (in)." };
@@ -5515,13 +5547,14 @@ export function computeEgressCapacity({ occupant_load = 0, sprinklered = true, p
   const isStair = path === "stair";
   const reduced = sprk && !_NO_SPRINKLER_REDUCTION.has(occupancy_group);
   const factor = isStair ? (reduced ? 0.2 : 0.3) : (reduced ? 0.15 : 0.2);
-  const single_max = _SINGLE_EXIT_MAX[occupancy_group];
-  if (single_max === undefined) return { error: "Occupancy group must be one of A-B-E-F-M-U, S, I1-I3-I4-R1-R4, H4-H5, I-R1-R4-H4-H5, or H2-H3 (R-2 dwelling-unit stories follow Table 1006.3.4(1))." };
+  if (_SINGLE_EXIT_MAX[occupancy_group] === undefined) return { error: "Occupancy group must be one of A-B-E-F-M-U, B-F-M, S, I1-I3-I4-R1-R4, H4-H5, I-R1-R4-H4-H5, or H2-H3 (R-2 dwelling-unit stories follow Table 1006.3.4(1))." };
+  if (!["first", "second", "third_plus"].includes(story)) return { error: "Story must be first, second, or third_plus (above or below grade plane)." };
+  const single_max = _singleExitMax(occupancy_group, story);
   const exits_required = occupant_load <= single_max ? 1 : occupant_load <= 500 ? 2 : occupant_load <= 1000 ? 3 : 4;
   const total_width_in = occupant_load * factor;
   const per_exit_in = Math.max(total_width_in / exits_required, min_door_in);
   const governed = per_exit_in === min_door_in ? "door/leaf minimum" : "required width";
-  return { factor, exits_required, single_exit_max: single_max, total_width_in, per_exit_in, governed, sprinklered: sprk, path: isStair ? "stair" : "level" };
+  return { factor, exits_required, single_exit_max: single_max, story, total_width_in, per_exit_in, governed, sprinklered: sprk, path: isStair ? "stair" : "level" };
 }
 
 export const egressCapacityExample = {
@@ -5529,7 +5562,7 @@ export const egressCapacityExample = {
 };
 
 function _renderEgressCapacity(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: IBC 2021 §1005.3 (egress width = occupant load x capacity factor), §1006.2 / Table 1006.3.4 (exit-count thresholds: 1 up to the Table 1006.3.4(2) single-exit limit -- 49 for A/B/E/F/M/U, 29 for S, 10 for I/R-1/R-4/H-4/H-5, 3 for H-2/H-3 -- then 2 to 500, 3 to 1000, 4 beyond), §1010.1.1 (32 in minimum door clear width). Capacity factors: sprinklered-with-alarm 0.2 in/occ stairs, 0.15 in/occ level; non-sprinklered 0.3 / 0.2, and Groups H and I-2 take 0.3 / 0.2 even when sprinklered. The reduced factors require the §1005.3.1/.2 sprinkler and emergency-communication conditions; the width is divided among the required exits; the door-leaf minimum and §1005.7 projections can govern. A design aid, not a code-official determination.";
+  citationEl.textContent = "Citation: IBC 2021 §1005.3 (egress width = occupant load x capacity factor), Table 1006.3.4(2) (one exit allowed on the first story up to 49 for A/B/E/F/M, 29 for S, 10 for I/R-1/R-2 sleeping units/H-4/H-5, 3 for H-2/H-3; on the second story only B/F/M/S, up to 29; none from the third story up) and Table 1006.3.3 (2 exits to 500, 3 to 1,000, 4 beyond), §1010.1.1 (32 in minimum door clear width). Capacity factors: sprinklered-with-alarm 0.2 in/occ stairs, 0.15 in/occ level; non-sprinklered 0.3 / 0.2, and Groups H and I-2 take 0.3 / 0.2 even when sprinklered. The reduced factors require the §1005.3.1/.2 sprinkler and emergency-communication conditions; the width is divided among the required exits; the door-leaf minimum and §1005.7 projections can govern. A design aid, not a code-official determination.";
   _aeC(inputRegion, () => fillExample(egressCapacityExample.inputs));
   const ol = _mnC("Occupant load (persons)", "egc-ol", { step: "any", min: "0" });
   const sp = _msC("Sprinklered + alarm (1005.3.1/.2)", "egc-sp", [{ value: "yes", label: "Yes" }, { value: "no", label: "No" }]);
@@ -5537,24 +5570,25 @@ function _renderEgressCapacity(inputRegion, outputRegion, citationEl) {
   const md = _mnC("Minimum door clear width (in)", "egc-md", { step: "any", min: "0" });
   md.input.value = "32";
   const og = _msC("Occupancy group (single-exit limit, Table 1006.3.4(2))", "egc-og", [
-    { value: "A-B-E-F-M-U", label: "A, B, E, F, M, U (49)" }, { value: "S", label: "S (29)" },
+    { value: "A-B-E-F-M-U", label: "A, E, or mixed A/B/E/F/M (49 first story; none above)" }, { value: "B-F-M", label: "B, F, M (49 first story, 29 second)" }, { value: "S", label: "S (29 first and second story)" },
     { value: "I1-I3-I4-R1-R4", label: "I-1, I-3, I-4, R-1, R-4 (10)" }, { value: "H4-H5", label: "H-4, H-5 (10, no sprinkler reduction)" }, { value: "I-R1-R4-H4-H5", label: "I-2, or group not split out (10, no sprinkler reduction)" }, { value: "H2-H3", label: "H-2, H-3 (3)" },
   ]);
-  for (const f of [ol, sp, pa, md, og]) inputRegion.appendChild(f.wrap);
+  const st = _msC("Story (Table 1006.3.4(2))", "egc-st", [{ value: "first", label: "First story above or below grade plane" }, { value: "second", label: "Second story above grade plane" }, { value: "third_plus", label: "Third story above grade plane or higher" }]);
+  for (const f of [ol, sp, pa, md, og, st]) inputRegion.appendChild(f.wrap);
   const oE = _moC(outputRegion, "Exits required", "egc-out-e");
   const oT = _moC(outputRegion, "Total egress width", "egc-out-t");
   const oP = _moC(outputRegion, "Width per exit", "egc-out-p");
   const oG = _moC(outputRegion, "Governed by", "egc-out-g");
   function fillExample(x) { ol.input.value = x.occupant_load; sp.select.value = x.sprinklered ? "yes" : "no"; pa.select.value = x.path; md.input.value = x.min_door_in; update(); }
   const update = _debC(() => {
-    const r = computeEgressCapacity({ occupant_load: Number(ol.input.value) || 0, sprinklered: sp.select.value, path: pa.select.value, min_door_in: Number(md.input.value) || 0, occupancy_group: og.select.value });
+    const r = computeEgressCapacity({ occupant_load: Number(ol.input.value) || 0, sprinklered: sp.select.value, path: pa.select.value, min_door_in: Number(md.input.value) || 0, occupancy_group: og.select.value, story: st.select.value });
     if (r.error) { oE.textContent = r.error; oT.textContent = "-"; oP.textContent = "-"; oG.textContent = "-"; return; }
     oE.textContent = String(r.exits_required);
     oT.textContent = _fmtC(r.total_width_in, 1) + " in";
     oP.textContent = _fmtC(r.per_exit_in, 1) + " in";
     oG.textContent = r.governed;
   }, _DC);
-  for (const f of [ol.input, sp.select, pa.select, md.input, og.select]) f.addEventListener("input", update);
+  for (const f of [ol.input, sp.select, pa.select, md.input, og.select, st.select]) f.addEventListener("input", update);
 }
 CONSTRUCTION_RENDERERS["egress-capacity"] = _renderEgressCapacity;
 
@@ -10618,36 +10652,84 @@ CONSTRUCTION_RENDERERS["joist-notch-bore-limit"] = _simpleRenderer({
 });
 
 // ===================== spec-v931: joist / deck cantilever ratio check =====================
-// dims: in { backspan_ft: L, overhang_ft: L } out: { cantilever_max_ft: L, margin_ft: L, within_limit: dimensionless }
-export function computeJoistCantileverCheck({ backspan_ft = 10, overhang_ft = 2 } = {}) {
+// IRC 2021 Table R507.6 maximum deck-joist cantilever (40 psf live load, ground snow <= 40 psf),
+// feet by joist backspan 4 / 6 / 8 / 10 / 12 / 14 / 16 / 18 ft; null = NP (not permitted). The
+// table follows backspan / 4 at short backspans, then caps or forbids the cantilever by joist size
+// and species. Until 2026-09-25 this applied backspan / 4 alone and credited R502.3.3 for it --
+// that section limits a FLOOR cantilever to the nominal joist depth unless its own tables apply.
+const _R507_6_BACKSPANS = [4, 6, 8, 10, 12, 14, 16, 18];
+const _ft = (f, i) => f + i / 12;
+const _R507_6_CANTILEVER = {
+  southern_pine: {
+    "2x6": [1, 1.5, _ft(1, 5), null, null, null, null, null],
+    "2x8": [1, 1.5, 2, 2.5, _ft(2, 3), null, null, null],
+    "2x10": [1, 1.5, 2, 2.5, 3, _ft(3, 4), _ft(3, 4), null],
+    "2x12": [1, 1.5, 2, 2.5, 3, 3.5, 4, _ft(4, 1)],
+  },
+  df_hf_spf: {
+    "2x6": [1, 1.5, _ft(1, 4), null, null, null, null, null],
+    "2x8": [1, 1.5, 2, _ft(2, 3), 2, null, null, null],
+    "2x10": [1, 1.5, 2, 2.5, 3, _ft(3, 3), null, null],
+    "2x12": [1, 1.5, 2, 2.5, 3, 3.5, _ft(3, 11), _ft(3, 11)],
+  },
+  redwood_cedar_pine: {
+    "2x6": [1, _ft(1, 4), _ft(1, 1), null, null, null, null, null],
+    "2x8": [1, 1.5, 2, _ft(1, 11), null, null, null, null],
+    "2x10": [1, 1.5, 2, 2.5, 3, _ft(2, 9), null, null],
+    "2x12": [1, 1.5, 2, 2.5, 3, 3.5, _ft(3, 8), null],
+  },
+};
+// dims: in { backspan_ft: L, overhang_ft: L, joist_size: dimensionless, species: dimensionless } out: { cantilever_max_ft: L, margin_ft: L, within_limit: dimensionless, ratio_limit_ft: L, table_limit_ft: L }
+export function computeJoistCantileverCheck({ backspan_ft = 10, overhang_ft = 2, joist_size = "2x10", species = "southern_pine" } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(backspan_ft > 0)) return { error: "Backspan must be positive (ft)." };
   if (overhang_ft < 0) return { error: "Overhang cannot be negative (ft)." };
-  // IRC R507.6 (decks) / R502.3.3: a joist cantilever may not exceed one quarter of its actual backspan.
-  const cantilever_max_ft = backspan_ft / 4;
+  const bySpecies = _R507_6_CANTILEVER[species];
+  if (!bySpecies) return { error: "Species must be southern_pine, df_hf_spf, or redwood_cedar_pine." };
+  const row = bySpecies[joist_size];
+  if (!row) return { error: "Joist size must be 2x6, 2x8, 2x10, or 2x12." };
+  if (backspan_ft > 18) return { error: "IRC Table R507.6 stops at an 18 ft backspan; a longer backspan is an engineered case." };
+  // The tabulated column at or above the backspan (conservative between columns), never more than backspan / 4.
+  const col = _R507_6_BACKSPANS.findIndex((b) => b >= backspan_ft - 1e-9);
+  const table_limit_ft = row[col];
+  const ratio_limit_ft = backspan_ft / 4;
+  const permitted = table_limit_ft !== null;
+  const cantilever_max_ft = permitted ? Math.min(ratio_limit_ft, table_limit_ft) : 0;
   const margin_ft = cantilever_max_ft - overhang_ft;
-  const within_limit = overhang_ft <= cantilever_max_ft;
+  const within_limit = permitted && overhang_ft <= cantilever_max_ft;
   if (![cantilever_max_ft, margin_ft].every(Number.isFinite)) return { error: "Cantilever math is not a finite value." };
   return {
     cantilever_max_ft,
     margin_ft,
     within_limit,
-    verdict: within_limit ? "WITHIN LIMIT" : "EXCEEDS",
-    note: "The 1:4 joist-cantilever ratio rule: a joist may overhang its support by no more than one quarter of its backspan (the span from that support back to the next), per IRC R507.6 for decks and R502.3.3 for floors. A 10 ft backspan allows a 2.5 ft cantilever; a 3 ft overhang on that backspan EXCEEDS the limit and needs a longer backspan (>= 12 ft). The prescriptive tables also cap the absolute overhang and require the cantilever be checked for uplift and for the load it carries (a roof or a wall bearing on the tip is a separate engineered case). This is the RATIO screen; the prescriptive span tables, the connection at the support, and the AHJ-adopted code govern -- and a beam or roof landing on the cantilever tip is an engineered condition.",
+    ratio_limit_ft,
+    table_limit_ft,
+    joist_size,
+    species,
+    verdict: !permitted ? "NOT PERMITTED (Table R507.6: NP at this backspan)" : within_limit ? "WITHIN LIMIT" : "EXCEEDS",
+    note: "Deck-joist cantilever per IRC 2021 Table R507.6 (40 psf live load): the table follows the 1:4 ratio -- a joist may overhang by no more than a quarter of its backspan -- at short backspans, then caps the overhang or marks it NP (not permitted) by joist size and species, because a long backspan puts the joist near its own span limit. A 10 ft backspan of 2x10 southern pine allows 2.5 ft; the same backspan of 2x6 is NP. Between tabulated backspans this reads the next longer column, which is never less restrictive. Heavier ground snow loads have their own, tighter rows. For a FLOOR joist, IRC R502.3.3 limits the cantilever to the nominal joist depth unless Table R502.3.3(1) (bearing wall and roof) or R502.3.3(2) (balcony) applies. The prescriptive tables assume uniform load; a beam, roof, or hot tub on the tip is an engineered case.",
   };
 }
-export const joistCantileverCheckExample = { inputs: { backspan_ft: 10, overhang_ft: 3 } };
+export const joistCantileverCheckExample = { inputs: { backspan_ft: 10, overhang_ft: 3, joist_size: "2x10", species: "southern_pine" } };
 
 CONSTRUCTION_RENDERERS["joist-cantilever-check"] = _simpleRenderer({
-  citation: "Citation: IRC R507.6 / R502.3.3 joist cantilever ratio by name. cantilever_max = backspan / 4; within limit when overhang <= max. The prescriptive span tables, the tip load, and the AHJ-adopted code govern; a beam/roof on the tip is an engineered case.",
+  citation: "Citation: IRC 2021 Table R507.6 maximum deck-joist cantilever (40 psf live load) by joist size, species and backspan, capped at backspan / 4; NP where the table forbids a cantilever. A floor cantilever is limited to the nominal joist depth under R502.3.3 unless its Tables R502.3.3(1)/(2) apply. The tip load and the AHJ-adopted code govern; a beam/roof on the tip is an engineered case.",
   example: joistCantileverCheckExample.inputs,
   fields: [
     { key: "backspan_ft", label: "Backspan (ft, support to next support)", kind: "number" },
     { key: "overhang_ft", label: "Cantilever / overhang (ft)", kind: "number", default: 2 },
+    { key: "joist_size", label: "Deck joist size", kind: "select", options: [
+      { value: "2x6", label: "2x6" }, { value: "2x8", label: "2x8" }, { value: "2x10", label: "2x10" }, { value: "2x12", label: "2x12" },
+    ] },
+    { key: "species", label: "Joist species (Table R507.6 group)", kind: "select", options: [
+      { value: "southern_pine", label: "Southern pine" },
+      { value: "df_hf_spf", label: "Douglas fir-larch / hem-fir / spruce-pine-fir" },
+      { value: "redwood_cedar_pine", label: "Redwood / western cedars / ponderosa or red pine" },
+    ] },
   ],
   outputs: [
     { key: "v", id: "jcc-out-v", label: "Verdict", value: (r) => r.verdict + " (" + (r.margin_ft >= 0 ? "+" : "") + fmt(r.margin_ft, 2) + " ft margin)" },
-    { key: "m", id: "jcc-out-m", label: "Max cantilever (backspan / 4)", value: (r) => fmt(r.cantilever_max_ft, 2) + " ft (" + fmt(r.cantilever_max_ft * 12, 1) + " in)" },
+    { key: "m", id: "jcc-out-m", label: "Max cantilever (Table R507.6, at most backspan / 4)", value: (r) => fmt(r.cantilever_max_ft, 2) + " ft (" + fmt(r.cantilever_max_ft * 12, 1) + " in)" },
     { key: "n", id: "jcc-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeJoistCantileverCheck,

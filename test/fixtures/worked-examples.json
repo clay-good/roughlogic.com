@@ -40981,15 +40981,17 @@
   },
   {
    "tile_id": "joist-cantilever-check",
-   "source_publisher": "joist cantilever ratio (IRC R507.6)",
+   "source_publisher": "IRC 2021 Table R507.6 deck-joist cantilever",
    "source_title": "10 ft backspan, 3 ft overhang -> max 2.5 ft, EXCEEDS",
    "source_edition_or_year": "spec-v931 worked example (machine-verified)",
-   "source_section_or_page": "max = 10/4 = 2.5; overhang 3 > 2.5 -> EXCEEDS (margin -0.5 ft)",
+   "source_section_or_page": "2x10 southern pine at a 10 ft backspan: Table R507.6 2-6 = 10/4 = 2.5; overhang 3 > 2.5 -> EXCEEDS (margin -0.5 ft)",
    "verified_by": "rl",
-   "verified_on": "2026-07-18",
+   "verified_on": "2026-09-25",
    "inputs": {
     "backspan_ft": 10,
-    "overhang_ft": 3
+    "overhang_ft": 3,
+    "joist_size": "2x10",
+    "species": "southern_pine"
    },
    "outputs": {
     "cantilever_max_ft": {
@@ -41008,12 +41010,12 @@
   },
   {
    "tile_id": "joist-cantilever-check",
-   "source_publisher": "joist cantilever ratio (IRC R507.6)",
+   "source_publisher": "IRC 2021 Table R507.6 deck-joist cantilever",
    "source_title": "cross-check: 12 ft backspan, 2 ft overhang -> max 3.0 ft, WITHIN LIMIT",
    "source_edition_or_year": "spec-v931 worked example (machine-verified)",
    "source_section_or_page": "max = 12/4 = 3.0; overhang 2 <= 3.0 -> WITHIN (margin +1.0 ft)",
    "verified_by": "rl",
-   "verified_on": "2026-07-18",
+   "verified_on": "2026-09-25",
    "inputs": {
     "backspan_ft": 12,
     "overhang_ft": 2

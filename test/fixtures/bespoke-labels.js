@@ -299,7 +299,7 @@ export const BESPOKE_LABELS = {
   "egc-parallel-raceways": {"ocpd_A":"Overcurrent device rating (A)","raceway_count":"Number of parallel raceways","material":"Conductor material"},
   "egc-sizing": {"ocpd_A":"OCPD rating (A)","material":"EGC material"},
   "egc-upsize-proportional": {"base_egc_cmil":"Base EGC area (cmil, per 250.122)","base_phase_cmil":"Base (minimum) phase area (cmil)","installed_phase_cmil":"Installed phase area (cmil)"},
-  "egress-capacity": {"occupant_load":"Occupant load (persons)","sprinklered":"Sprinklered + alarm (1005.3.1/.2)","path":"Egress component","min_door_in":"Minimum door clear width (in)","occupancy_group":"Occupancy group (single-exit limit, Table 1006.3.4(2))"},
+  "egress-capacity": {"occupant_load":"Occupant load (persons)","sprinklered":"Sprinklered + alarm (1005.3.1/.2)","path":"Egress component","min_door_in":"Minimum door clear width (in)","occupancy_group":"Occupancy group (single-exit limit, Table 1006.3.4(2))","story":"Story (Table 1006.3.4(2))"},
   "elevation-pressure-loss": {"mode":"Input mode","value":"Floors or feet","floor_height_ft":"Floor height (ft)","direction":"Direction"},
   "ellipse-area-perimeter": {"major_axis":"Major axis (long width)","minor_axis":"Minor axis (short width)"},
   "ellipsoid-volume": {"length_ft":"Length L (ft)","width_ft":"Width W (ft)","height_ft":"Height H (ft)"},

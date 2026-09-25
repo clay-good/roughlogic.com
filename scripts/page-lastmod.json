@@ -2,7 +2,7 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "dba6085388d8b25c",
+      "sha": "2ba8f97158e5b136",
       "date": "2026-09-25"
     },
     "/tools/": {
@@ -2538,8 +2538,8 @@
       "date": "2026-09-04"
     },
     "/tools/egress-capacity/": {
-      "sha": "e6f0bc5de224bfe1",
-      "date": "2026-09-01"
+      "sha": "4eac668c9ad89a51",
+      "date": "2026-09-25"
     },
     "/tools/egress-lighting-check/": {
       "sha": "e184c56f3bcee4e3",
@@ -3074,8 +3074,8 @@
       "date": "2026-09-01"
     },
     "/tools/formwork-pressure/": {
-      "sha": "dbc1645b50c675c0",
-      "date": "2026-09-19"
+      "sha": "49604145bf5119bd",
+      "date": "2026-09-25"
     },
     "/tools/formwork-tie-load/": {
       "sha": "2c2866f89b40cd07",
@@ -3970,8 +3970,8 @@
       "date": "2026-09-04"
     },
     "/tools/joist-cantilever-check/": {
-      "sha": "20b4d41d63346df2",
-      "date": "2026-09-01"
+      "sha": "1a4c31edcbf395fa",
+      "date": "2026-09-25"
     },
     "/tools/joist-deflection/": {
       "sha": "f5dfd5d98035c8f8",
@@ -4906,8 +4906,8 @@
       "date": "2026-09-01"
     },
     "/tools/occupant-load/": {
-      "sha": "719bdd4bebafccdc",
-      "date": "2026-09-01"
+      "sha": "206e0bd525ac8522",
+      "date": "2026-09-25"
     },
     "/tools/od600-cell-count/": {
       "sha": "cd6a92258411bd1d",

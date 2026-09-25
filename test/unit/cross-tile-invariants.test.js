@@ -9323,14 +9323,22 @@ test("monotonicity: computeFormworkPressure aci_pressure_psf is strictly increas
     assert.equal(ref.pressure_psf, ref.aci_pressure_psf);
   }
   // Weight-factor ordering pin.
-  const lw115 = computeFormworkPressure({ pour_rate_ft_per_hr: 5, concrete_temp_F: 70, weight_factor: "lightweight_115", unit_weight_pcf: 150, wall_height_ft: 100 });
-  const lw135 = computeFormworkPressure({ pour_rate_ft_per_hr: 5, concrete_temp_F: 70, weight_factor: "lightweight_135", unit_weight_pcf: 150, wall_height_ft: 100 });
+  // ACI 347R-14 Table 4.2.2.1a(c): C_w from the unit weight, 0.5 (1 + w/145) below 140 pcf.
+  const lw115 = computeFormworkPressure({ pour_rate_ft_per_hr: 5, concrete_temp_F: 70, weight_factor: "lightweight_115", wall_height_ft: 100 });
+  const lw135 = computeFormworkPressure({ pour_rate_ft_per_hr: 5, concrete_temp_F: 70, weight_factor: "lightweight_135", wall_height_ft: 100 });
   const normal = computeFormworkPressure({ pour_rate_ft_per_hr: 5, concrete_temp_F: 70, weight_factor: "normal", unit_weight_pcf: 150, wall_height_ft: 100 });
   const plast = computeFormworkPressure({ pour_rate_ft_per_hr: 5, concrete_temp_F: 70, weight_factor: "plasticized", unit_weight_pcf: 150, wall_height_ft: 100 });
-  assert.equal(lw115.weight_factor, 0.85);
-  assert.equal(lw135.weight_factor, 0.93);
+  assert.ok(Math.abs(lw115.weight_factor - 0.5 * (1 + 115 / 145)) < 1e-12);
+  assert.ok(Math.abs(lw135.weight_factor - 0.5 * (1 + 135 / 145)) < 1e-12);
   assert.equal(normal.weight_factor, 1.0);
-  assert.equal(plast.weight_factor, 1.20);
+  // Plasticized is a chemistry effect (C_c 1.2: an HRWR counts as a retarder), not a unit weight.
+  assert.equal(plast.weight_factor, 1.0);
+  assert.equal(plast.chemistry_coefficient, 1.2);
+  // Table 4.2.2.1a(b) reaches 1.5 for a >= 70% slag / >= 40% fly-ash blend with retarder.
+  const hb = computeFormworkPressure({ pour_rate_ft_per_hr: 5, concrete_temp_F: 70, weight_factor: "normal", unit_weight_pcf: 150, wall_height_ft: 100, chemistry: "high_blend_retarder" });
+  assert.ok(Math.abs(hb.aci_pressure_psf / normal.aci_pressure_psf - 1.5) < 1e-12);
+  // C_w above 150 pcf is w/145.
+  assert.ok(Math.abs(computeFormworkPressure({ pour_rate_ft_per_hr: 5, concrete_temp_F: 70, unit_weight_pcf: 160, wall_height_ft: 100 }).weight_factor - 160 / 145) < 1e-12);
   assert.ok(lw115.aci_pressure_psf < lw135.aci_pressure_psf && lw135.aci_pressure_psf < normal.aci_pressure_psf && normal.aci_pressure_psf < plast.aci_pressure_psf,
     `Cw ordering: ${lw115.aci_pressure_psf} ${lw135.aci_pressure_psf} ${normal.aci_pressure_psf} ${plast.aci_pressure_psf}`);
   // Doubling-pour-rate pin: 2x R -> aci grows by (9000 * dR / T) (linear in R).

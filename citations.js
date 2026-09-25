@@ -5206,13 +5206,15 @@ export const CITATIONS = {
     ],
   },
   "formwork-pressure": {
-    formula: "ACI 347R wall pressure: P = C_w × (150 + 9000 × R / T) for R < 7 ft/hr and walls up to 14 ft; C_w × (150 + 43,400 / T + 2,800 × R / T) for taller walls at R < 7 or any wall at 7-15 ft/hr; full wet head above 15 ft/hr; never below 600 × C_w psf; capped at the wet-head pressure ρgh. R is pour rate (ft/hr), T is concrete temperature (°F), C_w is unit-weight coefficient.",
+    formula: "ACI 347R wall pressure: P = C_c × C_w × (150 + 9000 × R / T) for R < 7 ft/hr and walls up to 14 ft; C_c × C_w × (150 + 43,400 / T + 2,800 × R / T) for taller walls at R < 7 or any wall at 7-15 ft/hr; full wet head above 15 ft/hr; never below 600 × C_w psf; capped at the wet-head pressure ρgh. R is pour rate (ft/hr), T is concrete temperature (°F), C_w is unit-weight coefficient.",
     edition: "ACI 347R-14 (Guide to Formwork for Concrete) by name.",
     freeAccess: "ACI 347 licensed; engineering-practice formulas free in published concrete texts.",
     governance: GOVERNANCE.structural,
     editionNote: "Single-edition (ACI 347R-14 simplified formula; full procedure supersedes).",
     assumptions: [
       { name: "Concrete unit weight", value: "150 pcf normal-weight unless user supplies", source: "ACI 347" },
+      { name: "Unit weight coefficient C_w", value: "0.5 (1 + w/145) but not less than 0.80 below 140 pcf; 1.0 at 140-150 pcf; w/145 above 150", source: "ACI 347R-14 Table 4.2.2.1a(c)" },
+      { name: "Chemistry coefficient C_c", value: "1.0 Type I/II/III without retarder up to 1.5 for >= 70% slag or >= 40% fly ash with retarder; an HRWR counts as a retarder", source: "ACI 347R-14 Table 4.2.2.1a(b)" },
     ],
   },
   "concrete-pour-rate": {
@@ -19893,24 +19895,24 @@ export const CITATIONS = {
   },
   "occupant-load": {
     formula: "per_space_load = ceil(area / olf); total_load = sum over spaces of per_space_load.",
-    edition: "IBC 2021 §1004.5 and Table 1004.5 (occupant load = area / occupant-load factor, summed over spaces) and §1004.2 (round up to a whole person), by name.",
+    edition: "IBC 2021 §1004.5 and Table 1004.5 (occupant load = area / occupant-load factor, summed over spaces) by name; each space is rounded up to a whole person as conservative practice (§1004.2 covers cumulative loads and states no rounding rule).",
     freeAccess: "The occupant-load relation is stated in the published IBC §1004.5; the arithmetic is public. The occupant-load factors are the Table 1004.5 values for the actual use.",
     governance: GOVERNANCE.general,
-    editionNote: "IBC 2021 §1004.5 and Table 1004.5: the occupant load is the sum over spaces of ceil(area / occupant-load factor), rounded up per §1004.2 so a fraction of a person counts as a whole person. Bundled representative factors (ft^2/occupant) are editable defaults: assembly standing 5 net, chairs-only 7 net, tables-and-chairs 15 net, business 150 gross, mercantile 60 gross, classroom 20 net, commercial kitchen 200 gross, industrial 100 gross, storage 500 gross, residential 200 gross. The factor and whether it applies to net or gross area come from the AHJ-adopted code edition and the actual use, not the tenant's label; a mezzanine or accessory use is its own line; the §1004.6 fixed-seating and §1004.7 outdoor-area rules are handled separately. A design aid, not a code-official determination.",
+    editionNote: "IBC 2021 §1004.5 and Table 1004.5: the occupant load is the sum over spaces of ceil(area / occupant-load factor), rounded up so a fraction of a person counts as a whole person (conservative practice). Bundled representative factors (ft^2/occupant) are editable defaults: assembly standing 5 net, chairs-only 7 net, tables-and-chairs 15 net, business 150 gross, mercantile 60 gross, classroom 20 net, commercial kitchen 200 gross, industrial 100 gross, storage/stock/shipping 300 gross, warehouse 500 gross, residential 200 gross. The factor and whether it applies to net or gross area come from the AHJ-adopted code edition and the actual use, not the tenant's label; a mezzanine or accessory use is its own line; the §1004.6 fixed-seating and §1004.7 outdoor-area rules are handled separately. A design aid, not a code-official determination.",
     assumptions: [
-      { name: "Per-space load", value: "ceil(area / occupant-load factor) per §1004.2 rounds each space up to a whole person", source: "IBC 2021 §1004.5 / §1004.2" },
+      { name: "Per-space load", value: "ceil(area / occupant-load factor): each space rounded up to a whole person (conservative practice)", source: "IBC 2021 §1004.5" },
       { name: "Total", value: "the occupant load is the sum across spaces; the use, not the area alone, governs the factor", source: "IBC 2021 Table 1004.5" },
       { name: "Factor source", value: "the bundled factors are representative defaults; the AHJ-adopted edition and the actual use set the governing factor and its net-vs-gross basis", source: "IBC 2021 Table 1004.5" },
     ],
   },
   "egress-capacity": {
-    formula: "factor = stair ? (sprinklered ? 0.2 : 0.3) : (sprinklered ? 0.15 : 0.2); exits_required = ol <= 49 ? 1 : ol <= 500 ? 2 : ol <= 1000 ? 3 : 4; total_width_in = ol x factor; per_exit_in = max(total_width_in / exits_required, min_door_in).",
-    edition: "IBC 2021 §1005.3 (egress width = occupant load x capacity factor), §1006.2 / Table 1006.3.4 (exit-count thresholds), and §1010.1.1 (32 in minimum door clear width), by name.",
+    formula: "factor = stair ? (sprinklered ? 0.2 : 0.3) : (sprinklered ? 0.15 : 0.2); exits_required = ol <= single_exit_max(group, story) ? 1 : ol <= 500 ? 2 : ol <= 1000 ? 3 : 4 (Table 1006.3.4(2) single-exit limit: first story 49 A/B/E/F/M, 29 S, 10 I/R-1/R-2/H-4/H-5, 3 H-2/H-3; second story 29 for B/F/M/S only; third story and up none; Table 1006.3.3 beyond); total_width_in = ol x factor; per_exit_in = max(total_width_in / exits_required, min_door_in).",
+    edition: "IBC 2021 §1005.3 (egress width = occupant load x capacity factor), Table 1006.3.4(2) (single-exit limits by story and occupancy), Table 1006.3.3 (2 / 3 / 4 exits), and §1010.1.1 (32 in minimum door clear width), by name.",
     freeAccess: "The egress-width and exit-count relations are stated in the published IBC §1005.3 / §1006.2 / Table 1006.3.4; the arithmetic is public.",
     governance: GOVERNANCE.general,
-    editionNote: "IBC 2021 §1005.3 (egress width = occupant load x capacity factor), §1006.2 / Table 1006.3.4 (one exit up to 49 occupants, two to 500, three to 1,000, four beyond), and §1010.1.1 (32 in minimum door clear width). Bundled capacity factors (editable): sprinklered-with-alarm 0.2 in/occ stairways and 0.15 in/occ other; non-sprinklered 0.3 and 0.2. The 0.15 / 0.2 reduced factors require the §1005.3.1 / §1005.3.2 sprinkler and emergency-communication conditions; the width is divided among the required exits so no one exit carries more than its share; the door-leaf minimum and the §1005.7 projection rules can govern over the arithmetic width; high-hazard and some assembly occupancies have their own factors. A design aid, not a code-official determination.",
+    editionNote: "IBC 2021 §1005.3 (egress width = occupant load x capacity factor), Table 1006.3.4(2) (one exit on the first story up to 49 occupants for A/B/E/F/M, on the second story only for B/F/M/S up to 29, never from the third story up) and Table 1006.3.3 (two to 500, three to 1,000, four beyond), and §1010.1.1 (32 in minimum door clear width). Bundled capacity factors (editable): sprinklered-with-alarm 0.2 in/occ stairways and 0.15 in/occ other; non-sprinklered 0.3 and 0.2. The 0.15 / 0.2 reduced factors require the §1005.3.1 / §1005.3.2 sprinkler and emergency-communication conditions; the width is divided among the required exits so no one exit carries more than its share; the door-leaf minimum and the §1005.7 projection rules can govern over the arithmetic width; high-hazard and some assembly occupancies have their own factors. A design aid, not a code-official determination.",
     assumptions: [
-      { name: "Exit count", value: "the §1006.2 / Table 1006.3.4 thresholds (49 / 500 / 1000) set the number of separate exits, which usually controls a small space", source: "IBC 2021 §1006.2" },
+      { name: "Exit count", value: "the Table 1006.3.4(2) single-exit limit for the story and occupancy, then Table 1006.3.3 (500 / 1,000), sets the number of separate exits, which usually controls a small space", source: "IBC 2021 Tables 1006.3.3 / 1006.3.4(2)" },
       { name: "Required width", value: "occupant load x the §1005.3 capacity factor, divided among the exits", source: "IBC 2021 §1005.3" },
       { name: "Door minimum", value: "each leaf is floored at the §1010.1.1 32 in clear width; the sprinkler credit nearly halves the factor", source: "IBC 2021 §1010.1.1" },
     ],

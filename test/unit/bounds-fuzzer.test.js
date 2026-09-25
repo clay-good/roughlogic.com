@@ -15980,6 +15980,13 @@ test("bounds: spec-v243 computeEgressCapacity pins factor/exit-count/width, the 
   assert.ok("error" in _v243({ occupant_load: 0 }));
   assert.ok("error" in _v243({ occupant_load: 160, min_door_in: 0 }));
   assert.ok("error" in _v243({ occupant_load: Infinity }));
+  // Table 1006.3.4(2): a second story allows one exit only for B/F/M/S (29); third story and up, never.
+  assert.equal(_v243({ occupant_load: 40, occupancy_group: "A-B-E-F-M-U" }).exits_required, 1);
+  assert.equal(_v243({ occupant_load: 40, occupancy_group: "A-B-E-F-M-U", story: "second" }).exits_required, 2);
+  assert.equal(_v243({ occupant_load: 25, occupancy_group: "B-F-M", story: "second" }).exits_required, 1);
+  assert.equal(_v243({ occupant_load: 30, occupancy_group: "B-F-M", story: "second" }).exits_required, 2);
+  assert.equal(_v243({ occupant_load: 5, occupancy_group: "S", story: "third_plus" }).exits_required, 2);
+  assert.ok("error" in _v243({ occupant_load: 5, story: "roof" }));
 });
 
 test("bounds: spec-v244 computePlumbingFixtureCount pins the two-tier WC schedule, round-up, and error seams", () => {
@@ -29164,6 +29171,13 @@ test("bounds: spec-v931 computeJoistCantileverCheck pins the 1:4 max, verdict, a
   assert.ok(Math.abs(ok.cantilever_max_ft - 3.0) < 1e-9);
   assert.equal(ok.within_limit, true); // 2 <= 3
   assert.equal(ok.verdict, "WITHIN LIMIT");
+  // IRC Table R507.6 caps or forbids by joist size: 2x6 southern pine at 10 ft is NP, 2x8 at 12 ft is 2-3.
+  const np = _v931({ backspan_ft: 10, overhang_ft: 0.5, joist_size: "2x6" });
+  assert.equal(np.within_limit, false);
+  assert.ok(np.verdict.startsWith("NOT PERMITTED"));
+  assert.ok(Math.abs(_v931({ backspan_ft: 12, overhang_ft: 1, joist_size: "2x8" }).cantilever_max_ft - 2.25) < 1e-9);
+  assert.ok(Math.abs(_v931({ backspan_ft: 8, overhang_ft: 1, joist_size: "2x6", species: "redwood_cedar_pine" }).cantilever_max_ft - (1 + 1 / 12)) < 1e-9);
+  assert.ok("error" in _v931({ backspan_ft: 20, overhang_ft: 2, joist_size: "2x12" }));
   // Error seams: non-positive backspan, negative overhang, non-finite.
   assert.ok("error" in _v931({ backspan_ft: 0, overhang_ft: 2 }));
   assert.ok("error" in _v931({ backspan_ft: 10, overhang_ft: -1 }));
