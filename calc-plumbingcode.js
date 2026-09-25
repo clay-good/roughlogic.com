@@ -222,16 +222,16 @@ PLUMBINGCODE_RENDERERS["shower-compartment-check"] = _v1134renderShowerCompartme
 
 // --- spec-v1135: vent terminal height, frost closure, and location (IPC 903) ---
 // Three independent rules that all land on the same pipe, and a plumber can satisfy any two
-// and still fail. 903.1: terminate at least 6 in above the roof OR 6 in above the
+// and still fail. IRC P3103.1.1 (IPC 2021 903.1.1 leaves the number to the adopting jurisdiction): terminate at least 6 in above the roof OR 6 in above the
 // anticipated snow accumulation, whichever is greater - and at least 7 FT where the roof is
-// used for any purpose other than weather protection. 903.1.1: where the 97.5% outdoor
+// used as a promenade, deck or for a similar purpose (903.1.2). 903.2: where the 97.5% outdoor
 // design temperature is 0 F or less the extension must be not less than 3 in in diameter,
 // and any increase in size must be made not less than 1 ft INSIDE the thermal envelope -
 // the part everyone forgets, because an increaser fitted up in the cold attic frosts shut
-// exactly like the small pipe it replaced. 903.2: not directly beneath and not within 10 ft
+// exactly like the small pipe it replaced. 903.5: not directly beneath and not within 10 ft
 // horizontally of any door, openable window, or other air intake unless 3 ft above it.
-// dims: in { height_above_roof_in: L, snow_accumulation_in: L, roof_other_use: dimensionless, design_temp_f: T, vent_diameter_in: L, increase_inside_envelope_in: L, horizontal_to_opening_ft: L, height_above_opening_ft: L } out: { required_height_in: L, height_deficit_in: L, min_diameter_in: L, min_increase_depth_in: L }
-export function computeVentTerminalCheck({ height_above_roof_in = 6, snow_accumulation_in = 0, roof_other_use = "no", design_temp_f = 20, vent_diameter_in = 2, increase_inside_envelope_in = 0, horizontal_to_opening_ft = 20, height_above_opening_ft = 0 } = {}) {
+// dims: in { height_above_roof_in: L, snow_accumulation_in: L, roof_other_use: dimensionless, design_temp_f: T, vent_diameter_in: L, increase_inside_envelope_in: L, horizontal_to_opening_ft: L, height_above_opening_ft: L, roof_minimum_in: L } out: { required_height_in: L, height_deficit_in: L, min_diameter_in: L, min_increase_depth_in: L }
+export function computeVentTerminalCheck({ height_above_roof_in = 6, snow_accumulation_in = 0, roof_other_use = "no", design_temp_f = 20, vent_diameter_in = 2, increase_inside_envelope_in = 0, horizontal_to_opening_ft = 20, height_above_opening_ft = 0, roof_minimum_in = 6 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const h = Number(height_above_roof_in) || 0;
   const snow = Number(snow_accumulation_in) || 0;
@@ -241,6 +241,8 @@ export function computeVentTerminalCheck({ height_above_roof_in = 6, snow_accumu
   const horiz = Number(horizontal_to_opening_ft) || 0;
   const above = Number(height_above_opening_ft) || 0;
   const otherUse = roof_other_use === "yes";
+  const roofMin = Number(roof_minimum_in);
+  if (!(roofMin > 0)) return { error: "Minimum height above the roof must be positive (in; IRC 6, or the number the jurisdiction wrote into IPC 903.1.1)." };
   if (!(h > 0)) return { error: "Vent height above the roof must be positive (in)." };
   if (snow < 0) return { error: "Anticipated snow accumulation cannot be negative (in)." };
   if (!Number.isFinite(t)) return { error: "Outdoor design temperature must be a number (degF)." };
@@ -249,13 +251,15 @@ export function computeVentTerminalCheck({ height_above_roof_in = 6, snow_accumu
   if (horiz < 0) return { error: "Horizontal distance to the nearest opening cannot be negative (ft)." };
   if (above < 0) return { error: "Height above the opening cannot be negative (ft) - a terminal below an opening is the condition the code prohibits outright." };
 
-  // 903.1
-  const required_height_in = otherUse ? 84 : Math.max(6, snow + 6);
+  // Height: IRC P3103.1.1 (6 in, or 6 in over the anticipated snow); IPC 2021 903.1.1 leaves the
+  // number to the adopting jurisdiction (Connecticut writes 12). Until 2026-09-25 this was credited
+  // to IPC 903.1 with the 6 in hard-coded, so a 12 in jurisdiction passed a 6 in vent.
+  const required_height_in = otherUse ? 84 : Math.max(roofMin, snow + 6);
   const height_ok = h >= required_height_in;
   const height_deficit_in = Math.max(0, required_height_in - h);
-  const snow_governs = !otherUse && snow + 6 > 6;
+  const snow_governs = !otherUse && snow + 6 > roofMin;
 
-  // 903.1.1
+  // Frost closure: IPC 903.2 / IRC P3103.2
   const frost_zone = t <= 0;
   const min_diameter_in = frost_zone ? 3 : null;
   const min_increase_depth_in = frost_zone ? 12 : null;
@@ -264,7 +268,7 @@ export function computeVentTerminalCheck({ height_above_roof_in = 6, snow_accumu
   const increase_ok = frost_zone && inc > 0 ? inc >= 12 : null;
   const frost_ok = frost_zone ? (diameter_ok && increase_ok !== false) : null;
 
-  // 903.2
+  // Location: IPC 903.5 / IRC P3103.5
   const clears_horizontally = horiz >= 10;
   const clears_vertically = above >= 3;
   const location_ok = clears_horizontally || clears_vertically;
@@ -272,16 +276,16 @@ export function computeVentTerminalCheck({ height_above_roof_in = 6, snow_accumu
   const passes = height_ok && (frost_ok !== false) && location_ok;
 
   const note = "IPC 903 puts three independent rules on the same pipe, and satisfying two of them is not compliance. "
-    + "HEIGHT (903.1): " + (otherUse ? "this roof is used for a purpose other than weather protection, so the extension must run at least 7 ft - 84 in - above it, not 6 in. " : "at least 6 in above the roof or 6 in above the anticipated snow accumulation, whichever is greater; with " + snow + " in of snow that is " + required_height_in + " in" + (snow_governs ? " and the SNOW governs, not the 6 in floor. " : ". "))
+    + "HEIGHT (IRC P3103.1.1; IPC 903.1.1 leaves the number to the adopting jurisdiction): " + (otherUse ? "this roof is used as a promenade, deck, or for a similar purpose, so the extension must run at least 7 ft - 84 in - above it (IPC 903.1.2). " : "at least " + roofMin + " in above the roof or 6 in above the anticipated snow accumulation, whichever is greater; with " + snow + " in of snow that is " + required_height_in + " in" + (snow_governs ? " and the SNOW governs, not the " + roofMin + " in floor. " : ". "))
     + "This terminal is " + h + " in: " + (height_ok ? "OK. " : "SHORT by " + height_deficit_in.toFixed(1) + " in. ")
-    + "FROST CLOSURE (903.1.1): the 97.5% outdoor design temperature entered is " + t + " F, "
+    + "FROST CLOSURE (IPC 903.2): the 97.5% outdoor design temperature entered is " + t + " F, "
     + (frost_zone
       ? "which is 0 F or less, so the extension must be not less than 3 in in diameter - this one is " + dia + " in, " + (diameter_ok ? "OK" : "TOO SMALL") + ". "
         + (inc > 0
           ? "The size increase is made " + inc + " in inside the thermal envelope against the 1 ft minimum: " + (increase_ok ? "OK. " : "TOO SHALLOW. ")
           : "No increase depth entered. This is the part that gets missed: the increaser has to be at least 1 ft INSIDE the thermal envelope, because a fitting made up in a cold attic frosts shut exactly like the small pipe it replaced. ")
       : "which is above 0 F, so the 3 in frost-closure rule does not apply and the vent may be sized by the drainage rules alone. ")
-    + "LOCATION (903.2): a terminal may not sit directly beneath, or within 10 ft horizontally of, any door, openable window, or other air intake of this or an adjacent building unless it is 3 ft above the opening. At " + horiz + " ft horizontally and " + above + " ft above: "
+    + "LOCATION (IPC 903.5): a terminal may not sit directly beneath, or within 10 ft horizontally of, any door, openable window, or other air intake of this or an adjacent building unless it is 3 ft above the opening. At " + horiz + " ft horizontally and " + above + " ft above: "
     + (location_ok ? (clears_horizontally ? "clears on the 10 ft horizontal separation. " : "inside 10 ft horizontally but 3 ft or more above, which the code permits. ") : "FAILS - inside 10 ft horizontally and less than 3 ft above. Move it, or take it up. ")
     + (passes ? "PASSES all three. " : "DOES NOT PASS. ")
     + "Note that the neighbour's windows count as much as your own: the section says this or an ADJACENT building, which is the one that surprises people on a tight lot. Snow accumulation is a local figure - the code says ANTICIPATED, not a national number - so use what your AHJ or the local design data gives. "
@@ -293,25 +297,26 @@ export function computeVentTerminalCheck({ height_above_roof_in = 6, snow_accumu
 export const ventTerminalCheckExample = { inputs: { height_above_roof_in: 6, snow_accumulation_in: 18, roof_other_use: "no", design_temp_f: -10, vent_diameter_in: 2, increase_inside_envelope_in: 6, horizontal_to_opening_ft: 4, height_above_opening_ft: 1 } };
 
 function _v1135renderVentTerminalCheck(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: IPC 903.1 - open vent pipes extending through a roof terminated not less than 6 in above the roof or 6 in above the anticipated snow accumulation, whichever is greater, except not less than 7 ft where the roof is used for any purpose other than weather protection. IPC 903.1.1 - where the 97.5-percent value for outdoor design temperature is 0 degF or less, vent extensions through a roof or wall not less than 3 in in diameter, with any increase in the size of the vent made not less than 1 ft inside the thermal envelope of the building. IPC 903.2 - an open vent terminal not located directly beneath any door, openable window, or other air intake of the building or of an adjacent building, and not within 10 ft horizontally of such an opening unless it is 3 ft above it. Anticipated snow accumulation and the design temperature are local figures. Not checked: the vent SIZE from drainage fixture units and developed length, whether a vent is required, the branch below, flashing, wall terminations, or fuel-gas venting. A screen, not a code-official determination; the adopted code and the AHJ govern.";
+  citationEl.textContent = "Citation: IRC P3103.1.1 - open vent pipes extending through a roof terminated not less than 6 in above the roof or 6 in above the anticipated snow accumulation, whichever is greater (IPC 2021 903.1.1 leaves the height to the adopting jurisdiction, entered here); not less than 7 ft where the roof is used as a promenade, deck, or for a similar purpose (IPC 903.1.2). IPC 903.2 - where the 97.5-percent value for outdoor design temperature is 0 degF or less, vent extensions through a roof or wall not less than 3 in in diameter, with any increase in the size of the vent made not less than 1 ft inside the thermal envelope of the building. IPC 903.5 - an open vent terminal not located directly beneath any door, openable window, or other air intake of the building or of an adjacent building, and not within 10 ft horizontally of such an opening unless it is 3 ft above it. Anticipated snow accumulation and the design temperature are local figures. Not checked: the vent SIZE from drainage fixture units and developed length, whether a vent is required, the branch below, flashing, wall terminations, or fuel-gas venting. A screen, not a code-official determination; the adopted code and the AHJ govern.";
   const h = makeNumber("Height above the roof (in)", "vtc-h", { step: "any", min: "0" });
   const sn = makeNumber("Anticipated snow accumulation (in)", "vtc-sn", { step: "any", min: "0" });
-  const ru = makeSelect("Roof used for anything but weather protection?", "vtc-ru", [{ value: "no", label: "No", selected: true }, { value: "yes", label: "Yes - 7 ft applies" }]);
+  const rm = makeNumber("Minimum height above the roof (in; IRC 6, or the IPC 903.1.1 number adopted)", "vtc-rm", { step: "any", min: "0", value: "6" });
+  const ru = makeSelect("Roof used as a promenade, deck, or similar?", "vtc-ru", [{ value: "no", label: "No", selected: true }, { value: "yes", label: "Yes - 7 ft applies" }]);
   const dt = makeNumber("97.5% outdoor design temperature (°F)", "vtc-dt", { step: "any" });
   const di = makeNumber("Vent diameter through the roof (in)", "vtc-di", { step: "any", min: "0" });
   const ic = makeNumber("Size increase made this far inside the thermal envelope (in; 0 = none)", "vtc-ic", { step: "any", min: "0" });
   const hz = makeNumber("Horizontal distance to the nearest door, openable window, or intake (ft)", "vtc-hz", { step: "any", min: "0" });
   const ab = makeNumber("Height above that opening (ft)", "vtc-ab", { step: "any", min: "0" });
-  inputRegion.appendChild(h.wrap); inputRegion.appendChild(sn.wrap); inputRegion.appendChild(ru.wrap);
+  inputRegion.appendChild(h.wrap); inputRegion.appendChild(rm.wrap); inputRegion.appendChild(sn.wrap); inputRegion.appendChild(ru.wrap);
   for (const x of [dt, di, ic, hz, ab]) inputRegion.appendChild(x.wrap);
-  attachExampleButton(inputRegion, () => { h.input.value = "6"; sn.input.value = "18"; ru.select.value = "no"; dt.input.value = "-10"; di.input.value = "2"; ic.input.value = "6"; hz.input.value = "4"; ab.input.value = "1"; update(); });
+  attachExampleButton(inputRegion, () => { h.input.value = "6"; rm.input.value = "6"; sn.input.value = "18"; ru.select.value = "no"; dt.input.value = "-10"; di.input.value = "2"; ic.input.value = "6"; hz.input.value = "4"; ab.input.value = "1"; update(); });
   const oV = makeOutputLine(outputRegion, "Verdict", "vtc-out-v");
-  const oH = makeOutputLine(outputRegion, "Height (903.1)", "vtc-out-h");
-  const oF = makeOutputLine(outputRegion, "Frost closure (903.1.1)", "vtc-out-f");
-  const oL = makeOutputLine(outputRegion, "Location (903.2)", "vtc-out-l");
+  const oH = makeOutputLine(outputRegion, "Height (IRC P3103.1.1 / IPC 903.1.1)", "vtc-out-h");
+  const oF = makeOutputLine(outputRegion, "Frost closure (IPC 903.2)", "vtc-out-f");
+  const oL = makeOutputLine(outputRegion, "Location (IPC 903.5)", "vtc-out-l");
   const oNote = makeOutputLine(outputRegion, "Note", "vtc-out-note");
   const update = debounce(() => {
-    const r = computeVentTerminalCheck({ height_above_roof_in: Number(h.input.value) || 0, snow_accumulation_in: Number(sn.input.value) || 0, roof_other_use: ru.select.value, design_temp_f: Number(dt.input.value), vent_diameter_in: Number(di.input.value) || 0, increase_inside_envelope_in: Number(ic.input.value) || 0, horizontal_to_opening_ft: Number(hz.input.value) || 0, height_above_opening_ft: Number(ab.input.value) || 0 });
+    const r = computeVentTerminalCheck({ height_above_roof_in: Number(h.input.value) || 0, roof_minimum_in: rm.input.value === "" ? 6 : Number(rm.input.value), snow_accumulation_in: Number(sn.input.value) || 0, roof_other_use: ru.select.value, design_temp_f: Number(dt.input.value), vent_diameter_in: Number(di.input.value) || 0, increase_inside_envelope_in: Number(ic.input.value) || 0, horizontal_to_opening_ft: Number(hz.input.value) || 0, height_above_opening_ft: Number(ab.input.value) || 0 });
     if (r.error) { oV.textContent = r.error; oH.textContent = "-"; oF.textContent = "-"; oL.textContent = "-"; oNote.textContent = "-"; return; }
     oV.textContent = r.passes ? "PASSES all three rules" : "DOES NOT PASS";
     oH.textContent = "needs " + fmt(r.required_height_in, 1) + " in" + (r.snow_governs ? " (snow governs)" : r.other_use ? " (roof in use)" : "") + " - " + (r.height_ok ? "OK" : "short by " + fmt(r.height_deficit_in, 1) + " in");
@@ -319,7 +324,7 @@ function _v1135renderVentTerminalCheck(inputRegion, outputRegion, citationEl) {
     oL.textContent = r.location_ok ? (r.clears_horizontally ? "clears 10 ft horizontally" : "within 10 ft but 3 ft or more above - permitted") : "FAILS - within 10 ft and under 3 ft above";
     oNote.textContent = r.note;
   }, DEBOUNCE_MS);
-  for (const x of [h, sn, dt, di, ic, hz, ab]) x.input.addEventListener("input", update);
+  for (const x of [h, rm, sn, dt, di, ic, hz, ab]) x.input.addEventListener("input", update);
   ru.select.addEventListener("change", update);
 }
 PLUMBINGCODE_RENDERERS["vent-terminal-check"] = _v1135renderVentTerminalCheck;
@@ -534,8 +539,11 @@ export function computeCleanoutLayout({ horizontal_run_ft = 0, max_spacing_ft = 
   const change_claimed = changes - grouped;
   const change_cleanouts = Math.min(change_claimed, change_cap);
   const cap_governs = change_claimed > change_cap;
+  // IPC 2021 708.1.1-708.1.12 has no base-of-stack cleanout rule (older codes did). The count is
+  // reported as practice but kept OUT of the code total; until 2026-09-25 it was added, and
+  // credited to IPC 708.
   const stack_cleanouts = stacks;
-  const total_cleanouts = spacing_cleanouts + change_cleanouts + stack_cleanouts;
+  const total_cleanouts = spacing_cleanouts + change_cleanouts;
 
   const small_bore = size <= 6;
   const clear_ok = small_bore ? clear >= 18 : null;
@@ -543,12 +551,12 @@ export function computeCleanoutLayout({ horizontal_run_ft = 0, max_spacing_ft = 
   const crawl_ok = in_crawl ? crawl >= 24 : null;
   const access_ok = (clear_ok !== false) && (crawl_ok !== false);
 
-  const note = "Three triggers, and they ADD - counting from any one of them comes out low. "
-    + "SPACING (708.1): horizontal drains get cleanouts not more than " + spacing + " ft apart, so a " + L + " ft run takes " + spacing_cleanouts + " intermediate cleanout" + (spacing_cleanouts === 1 ? "" : "s") + " on top of whatever sits at its head. "
-    + "CHANGES OF DIRECTION: a cleanout at every change of horizontal direction greater than 45 degrees - but where more than one such change occurs within 40 ft of developed length, the cleanout at the FIRST change serves all of them. That caps the change-driven count at ceil(" + L + "/40) = " + change_cap + " for this run no matter how many bends are drawn. "
+  const note = "Two code triggers, and they ADD - counting from either alone comes out low. "
+    + "SPACING (708.1.1): horizontal drains get cleanouts not more than " + spacing + " ft apart, so a " + L + " ft run takes " + spacing_cleanouts + " intermediate cleanout" + (spacing_cleanouts === 1 ? "" : "s") + " on top of whatever sits at its head. "
+    + "CHANGES OF DIRECTION (708.1.4): a cleanout at every change of horizontal direction greater than 45 degrees - but where more than one such change occurs within 40 ft of developed length, the cleanout at the FIRST change serves all of them. That caps the change-driven count at ceil(" + L + "/40) = " + change_cap + " for this run no matter how many bends are drawn. "
     + "You entered " + changes + " change" + (changes === 1 ? "" : "s") + (grouped > 0 ? " with " + grouped + " grouped away" : "") + ", giving " + change_cleanouts + (cap_governs ? " - the 40 ft grouping CAP governs here, not your count, which is the allowance that keeps a bendy run from needing a fitting at every elbow. " : ". ")
-    + "STACK BASES: one at the base of each waste or soil stack, " + stack_cleanouts + " here. "
-    + "TOTAL " + total_cleanouts + ". "
+    + "TOTAL " + total_cleanouts + " by the code. "
+    + (stack_cleanouts > 0 ? "STACK BASES: IPC 2021 section 708 no longer requires a cleanout at the base of a stack (older codes did); " + stack_cleanouts + " there would be good practice and come on top of the code count. " : "")
     + "ACCESS is a requirement, not a courtesy, and it is where cleanouts get valued-engineered into uselessness. "
     + (small_bore ? "For a cleanout " + size + " in and smaller the opening needs at least 18 in of clear space in front - " + clear + " in entered, " + (clear_ok ? "OK. " : "SHORT. ") : "This is over 6 in, and larger cleanouts carry their own larger clearance requirement which this tile does not check - read the section. ")
     + (in_crawl ? "In a crawl space the unobstructed height along the pathway to the cleanout must be at least 24 in - " + crawl + " in entered, " + (crawl_ok ? "OK. " : "TOO LOW, so the cleanout is not accessible even if it exists. ") : "")

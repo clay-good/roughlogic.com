@@ -94,8 +94,8 @@
       "date": "2026-09-18"
     },
     "/tools/aav-install-check/": {
-      "sha": "4e1b1d5b33ca35e4",
-      "date": "2026-09-19"
+      "sha": "2937f47124079735",
+      "date": "2026-09-25"
     },
     "/tools/abatement-containment/": {
       "sha": "fdb0c8b0757901fc",
@@ -1226,8 +1226,8 @@
       "date": "2026-09-01"
     },
     "/tools/cleanout-layout/": {
-      "sha": "b818cc7928db2112",
-      "date": "2026-09-19"
+      "sha": "1ecde175277833c5",
+      "date": "2026-09-25"
     },
     "/tools/clearance-plate-envelope/": {
       "sha": "9d44a85a5da50bce",
@@ -8334,8 +8334,8 @@
       "date": "2026-09-01"
     },
     "/tools/vent-terminal-check/": {
-      "sha": "1bf0e609f9a0f587",
-      "date": "2026-09-19"
+      "sha": "e3c80d5b294e0036",
+      "date": "2026-09-25"
     },
     "/tools/ventilation-rate-procedure/": {
       "sha": "4dff7fa056c4e7f1",

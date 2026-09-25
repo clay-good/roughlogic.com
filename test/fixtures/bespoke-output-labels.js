@@ -998,7 +998,7 @@ export const BESPOKE_OUTPUT_LABELS = {
   "vbelt-drive": {"ratio":"Speed ratio","driven_pitch_diameter_in":"Driven pitch diameter (in)","belt_length_in":"Belt length (in)","design_hp":"Design HP (service-adjusted)","belts":"Belts (planning estimate)","warnings":"Notes"},
   "velocity-head": {"h_v_ft":"Velocity head","q_psf":"Dynamic pressure","note":"Note"},
   "vent-sizing-stack": {"pass":"Verdict","note":"Note"},
-  "vent-terminal-check": {"passes":"Verdict","required_height_in":"Height (903.1)","frost_zone":"Frost closure (903.1.1)","location_ok":"Location (903.2)","note":"Note"},
+  "vent-terminal-check": {"passes":"Verdict","frost_zone":"Frost closure (IPC 903.2)","location_ok":"Location (IPC 903.5)","note":"Note"},
   "vertical-curve": {"eval_elevation_ft":"Elevation at station"},
   "vertical-curve-sight-distance": {"L_ft":"Minimum curve length L","K_ft_per_pct":"Rate of vertical curvature K"},
   "vessel-head-volume": {"head_volume_gal":"One head volume","total_volume_gal":"Head + straight flange","head_depth_in":"Inside dish depth"},

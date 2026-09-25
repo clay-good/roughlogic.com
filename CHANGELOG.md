@@ -10,6 +10,10 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **Vent terminals, cleanouts and air admittance valves checked against the 2021 IPC and IRC.**
+  - `vent-terminal-check` credited "6 in above the roof or 6 in above the anticipated snow" to IPC 903.1. In the 2021 IPC, 903.1.1 leaves the height as a blank for the adopting jurisdiction (Connecticut writes 12 in); the 6 in and snow wording is IRC P3103.1.1. With the 6 in hard-coded, a 12 in jurisdiction's short vent passed. The minimum height is now an input (default 6, the IRC figure). Frost closure is 903.2 and terminal location 903.5, not 903.1.1 and 903.2. The 7 ft case is a roof used as a promenade, deck or similar (903.1.2), not "any purpose other than weather protection."
+  - `cleanout-layout` added a cleanout at the base of every stack and credited IPC 708. IPC 2021 708.1.1-708.1.12 has no base-of-stack rule, so stacks are now reported as practice, outside the code total. The example moves from 10 to 8.
+  - `aav-install-check` cited 918.6 for the 6 in clearance above insulation in its citation entry; that is 918.4 (918.6 is Size).
 - **Shaft keys, the silica table and mortgage reserves checked against Machinery's Handbook, the eCFR and the Fannie Mae Selling Guide.**
   - `keyseat-key-size` stopped at a 6-1/2 in shaft and gave every larger shaft a 1-1/2 in key without a warning. ANSI B17.1 (Machinery's Handbook Table 1) continues to 11 in with 1-3/4, 2 and 2-1/2 in keys, so a 10 in shaft's key read 40% narrow. The rows are added, and a shaft outside 5/16-11 in now returns an error.
   - `silica-table-1` marked large drivable milling machines (row xv) outdoor-only, so an indoor pass read as "not in Table 1". 29 CFR 1926.1153 Table 1 sets no location condition for that row: no respirator either way. Row ii is "handheld power saws (any blade diameter)", not "12 in or less".

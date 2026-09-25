@@ -82429,7 +82429,7 @@
    "source_publisher": "International Code Council",
    "source_title": "IPC 708 -- nine bends, but the 40 ft grouping cap allows six (spec-v1140)",
    "source_edition_or_year": "IPC 708",
-   "source_section_or_page": "'All horizontal drains shall be provided with cleanouts located not more than 100 feet apart' and 'where more than one change of horizontal direction greater than 45 degrees occurs within 40 feet of developed length of piping, the cleanout installed for the first change of direction shall serve as the cleanout for all changes in direction within that 40 feet.' A 240 ft run takes ceil(240/100) - 1 = 2 intermediate spacing cleanouts. Nine bends would suggest nine, but the grouping cap is ceil(240/40) = 6, and the cap governs. Two stack bases add two. Total 10, not 13.",
+   "source_section_or_page": "'All horizontal drains shall be provided with cleanouts located not more than 100 feet apart' and 'where more than one change of horizontal direction greater than 45 degrees occurs within 40 feet of developed length of piping, the cleanout installed for the first change of direction shall serve as the cleanout for all changes in direction within that 40 feet.' A 240 ft run takes ceil(240/100) - 1 = 2 intermediate spacing cleanouts. Nine bends would suggest nine, but the grouping cap is ceil(240/40) = 6, and the cap governs. Total 8 by the code, not 11: IPC 2021 section 708 has no base-of-stack cleanout, so the two stacks are reported as practice, outside the count.",
    "verified_by": "rl",
    "verified_on": "2026-07-27",
    "inputs": {
@@ -82467,7 +82467,7 @@
      }
     },
     "total_cleanouts": {
-     "value": 10,
+     "value": 8,
      "tolerance": {
       "abs": 0
      }
@@ -82479,7 +82479,7 @@
    "source_publisher": "International Code Council",
    "source_title": "cross-check: a short run needs no spacing cleanout at all, and fails on ACCESS instead",
    "source_edition_or_year": "IPC 708",
-   "source_section_or_page": "An 80 ft run is under the 100 ft spacing limit, so ceil(80/100) - 1 = 0 intermediate cleanouts; three bends are capped at ceil(80/40) = 2; one stack base makes 3 total. But the access checks fail: 12 in of clear space is short of the 18 in required for a 4 in cleanout, and a 20 in crawl pathway is short of the 24 in minimum. A cleanout that cannot be reached and turned does not count as one, so the layout is non-compliant despite the correct count.",
+   "source_section_or_page": "An 80 ft run is under the 100 ft spacing limit, so ceil(80/100) - 1 = 0 intermediate cleanouts; three bends are capped at ceil(80/40) = 2; 2 total by the code (IPC 2021 708 has no base-of-stack cleanout; the one stack is reported as practice). But the access checks fail: 12 in of clear space is short of the 18 in required for a 4 in cleanout, and a 20 in crawl pathway is short of the 24 in minimum. A cleanout that cannot be reached and turned does not count as one, so the layout is non-compliant despite the correct count.",
    "verified_by": "rl",
    "verified_on": "2026-07-27",
    "inputs": {
@@ -82511,7 +82511,7 @@
      }
     },
     "total_cleanouts": {
-     "value": 3,
+     "value": 2,
      "tolerance": {
       "abs": 0
      }

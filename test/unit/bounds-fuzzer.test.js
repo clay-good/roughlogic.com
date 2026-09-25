@@ -34915,11 +34915,11 @@ test("bounds: spec-v1139 computeDryerDuctLength pins the developed-length arithm
 
 import { computeCleanoutLayout as _v1140 } from "../../calc-plumbingcode.js";
 
-test("bounds: spec-v1140 computeCleanoutLayout pins the three additive triggers, the 40 ft grouping cap, the access rules, and error seams", () => {
+test("bounds: spec-v1140 computeCleanoutLayout pins the two additive code triggers, the 40 ft grouping cap, the access rules, and error seams", () => {
   const base = { horizontal_run_ft: 240, max_spacing_ft: 100, direction_changes: 9, changes_grouped_away: 0, stack_count: 2, pipe_size_in: 4, clear_space_in: 18, crawl_height_in: 30 };
   const r = _v1140(base);
   assert.ok(r.spacing_cleanouts === 2 && r.change_cap === 6 && r.change_cleanouts === 6 && r.cap_governs);
-  assert.ok(r.stack_cleanouts === 2 && r.total_cleanouts === 10 && r.clear_ok && r.crawl_ok && r.access_ok);
+  assert.ok(r.stack_cleanouts === 2 && r.total_cleanouts === 8 && r.clear_ok && r.crawl_ok && r.access_ok);
   // THE CAP: the change-driven count can never exceed ceil(run/40), however many bends.
   for (const L of [40, 80, 240, 500]) {
     for (const n of [0, 1, 5, 50]) {
@@ -34929,7 +34929,7 @@ test("bounds: spec-v1140 computeCleanoutLayout pins the three additive triggers,
       assert.ok(t.change_cleanouts <= t.change_cap && t.change_cleanouts <= n);
       assert.ok(t.cap_governs === (n > t.change_cap));
       // The three triggers are additive and independent.
-      assert.ok(t.total_cleanouts === t.spacing_cleanouts + t.change_cleanouts + t.stack_cleanouts);
+      assert.ok(t.total_cleanouts === t.spacing_cleanouts + t.change_cleanouts); // IPC 2021 708: stack bases are not a code trigger
       assert.ok(t.spacing_cleanouts === Math.max(0, Math.ceil(L / 100) - 1));
     }
   }
