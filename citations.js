@@ -17344,12 +17344,12 @@ export const CITATIONS = {
   },
   "seismic-design-spectral-acceleration": {
     formula: "SMS = Fa Ss; SM1 = Fv S1; SDS = (2/3) SMS; SD1 = (2/3) SM1.",
-    edition: "The ASCE 7-22 11.4 site-adjusted MCER and design spectral response accelerations, by name.",
+    edition: "The ASCE 7-16 11.4 site-adjusted MCER and design spectral response accelerations, by name (ASCE 7-22 replaced the Fa / Fv site coefficients with USGS multi-period SMS and SM1).",
     freeAccess: "The ASCE 7 site-coefficient adjustment and two-thirds design reduction are the published seismic-load procedure; the mapped Ss/S1 come free from the USGS seismic design maps.",
     governance: GOVERNANCE.general,
-    editionNote: "ASCE 7-22 §11.4.4 (site-adjusted MCER: SMS = Fa Ss, SM1 = Fv S1) and §11.4.5 (design values SDS = 2/3 SMS, SD1 = 2/3 SM1). Fa and Fv are the short-period and 1-second site coefficients from Tables 11.4-1 and 11.4-2, selected by Site Class (from a geotechnical report); Ss and S1 are the mapped MCER accelerations from the USGS seismic design maps. This returns the design spectral accelerations that feed the base shear (seismic-base-shear) and the drift checks; it does not select the Site Class, the Seismic Design Category, or the risk category. A design aid, not a substitute for the structural engineer of record's stamped design.",
+    editionNote: "ASCE 7-16 §11.4.4 (site-adjusted MCER: SMS = Fa Ss, SM1 = Fv S1) and §11.4.5 (design values SDS = 2/3 SMS, SD1 = 2/3 SM1). Fa and Fv are the short-period and 1-second site coefficients from Tables 11.4-1 and 11.4-2, selected by Site Class (from a geotechnical report); Ss and S1 are the mapped MCER accelerations from the USGS seismic design maps. This returns the design spectral accelerations that feed the base shear (seismic-base-shear) and the drift checks; it does not select the Site Class, the Seismic Design Category, or the risk category. A design aid, not a substitute for the structural engineer of record's stamped design.",
     assumptions: [
-      { name: "Site adjustment", value: "SMS = Fa Ss, SM1 = Fv S1", source: "ASCE 7-22 11.4.4" },
+      { name: "Site adjustment", value: "SMS = Fa Ss, SM1 = Fv S1", source: "ASCE 7-16 11.4.4" },
       { name: "Design reduction", value: "SDS = 2/3 SMS, SD1 = 2/3 SM1", source: "ASCE 7-22 11.4.5" },
       { name: "Site coefficients", value: "Fa/Fv from Tables 11.4-1/11.4-2 by Site Class", source: "ASCE 7-22" },
     ],

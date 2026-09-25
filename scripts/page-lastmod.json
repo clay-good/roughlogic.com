@@ -2,11 +2,11 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "1e9370d0a3d68516",
+      "sha": "52ed158fdbd88e03",
       "date": "2026-09-25"
     },
     "/tools/": {
-      "sha": "72b482414828a303",
+      "sha": "192b946397a70a6c",
       "date": "2026-09-25"
     },
     "/groups/accounting/": {
@@ -18,8 +18,8 @@
       "date": "2026-09-25"
     },
     "/groups/construction/": {
-      "sha": "32480ebd93dfbe97",
-      "date": "2026-09-19"
+      "sha": "fa49616f7a4e17c1",
+      "date": "2026-09-25"
     },
     "/groups/cross-trade/": {
       "sha": "27bdaea9afb010ca",
@@ -4218,8 +4218,8 @@
       "date": "2026-09-01"
     },
     "/tools/liquefaction-screening/": {
-      "sha": "a1741b7c203be05f",
-      "date": "2026-09-01"
+      "sha": "df3d18db7be4c76d",
+      "date": "2026-09-25"
     },
     "/tools/liquid-pipeline-station-spacing/": {
       "sha": "96dc823b66feb552",
@@ -6286,8 +6286,8 @@
       "date": "2026-09-01"
     },
     "/tools/roof-drain-sizing/": {
-      "sha": "9d46da2d11347999",
-      "date": "2026-09-01"
+      "sha": "7b5f6752aaf10990",
+      "date": "2026-09-25"
     },
     "/tools/roof-insulation-fasteners/": {
       "sha": "9d7a91bf90f113db",
@@ -6558,16 +6558,16 @@
       "date": "2026-09-01"
     },
     "/tools/seismic-approximate-period/": {
-      "sha": "66727600b89f0be5",
-      "date": "2026-09-02"
+      "sha": "79a4f28ffacdd004",
+      "date": "2026-09-25"
     },
     "/tools/seismic-base-shear/": {
       "sha": "3ce89cd5e889d7d2",
       "date": "2026-09-01"
     },
     "/tools/seismic-design-spectral-acceleration/": {
-      "sha": "2edf38a216f762fa",
-      "date": "2026-09-01"
+      "sha": "970af4cc4c6103cd",
+      "date": "2026-09-25"
     },
     "/tools/seismic-earth-pressure/": {
       "sha": "1487ef7815c64520",
@@ -6582,12 +6582,12 @@
       "date": "2026-09-01"
     },
     "/tools/seismic-pdelta-stability/": {
-      "sha": "bbf94eda33ac0586",
-      "date": "2026-09-01"
+      "sha": "594aba12a7a38272",
+      "date": "2026-09-25"
     },
     "/tools/seismic-story-drift/": {
-      "sha": "103ecfc5a7d624ef",
-      "date": "2026-09-01"
+      "sha": "ed016987e840f967",
+      "date": "2026-09-25"
     },
     "/tools/seismic-vertical-distribution/": {
       "sha": "1696e2413ad9c087",

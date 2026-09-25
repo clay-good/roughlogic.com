@@ -93,18 +93,22 @@ export const DRAINAGE_RENDERERS = {};
 // in/hr -- 1 in/hr over 1 ft^2 = 0.623 gal/min ... = 0.0104 GPM per the IPC
 // basis). The vertical leader and the sloped horizontal storm drain are then
 // sized to the smallest pipe whose capacity >= gpm against editable
-// breakpoint tables. The bundled tables are conservative approximations of
-// IPC 2021 Tables 1106.2 (vertical conductors), 1106.3 (horizontal storm
-// drains by slope), and 1106.6 (roof drains); tune them to the published
-// edition for the locale. Helpers sit ABOVE the dims block so the v14
-// dimensions lint associates the annotation with the export below it.
-const ROOF_LEADER_TABLE = [[2, 30], [3, 90], [4, 180], [6, 290], [8, 540], [10, 970]];
-// columns: [size_in, gpm @ 1/8 in/ft, gpm @ 1/4 in/ft, gpm @ 1/2 in/ft]
+// breakpoint tables. The bundled tables are IPC 2021 Table 1106.3 (vertical
+// leader sizing, round leaders to 8 in, then the vertical-drain column of
+// Table 1106.2 for 10-15 in) and Table 1106.2 (storm drain pipe sizing,
+// horizontal, by slope). Until 2026-09-24 they were "conservative
+// breakpoints" at 40-67% of the published capacities under a citation that
+// swapped the table numbers (1106.2 is the storm drain table, 1106.3 the
+// leader table, and 1106.6 is gutters). Helpers sit ABOVE the dims block so
+// the v14 dimensions lint associates the annotation with the export below it.
+const ROOF_LEADER_TABLE = [[2, 30], [2.5, 54], [3, 92], [4, 192], [5, 360], [6, 563], [8, 1208], [10, 2050], [12, 3272], [15, 5543]];
+// columns: [size_in, gpm @ 1/16 in/ft, gpm @ 1/8, gpm @ 1/4, gpm @ 1/2]
 const ROOF_HORIZ_TABLE = [
-  [3, 30, 42, 60], [4, 68, 96, 138], [5, 110, 150, 215], [6, 150, 200, 290],
-  [8, 230, 290, 415], [10, 400, 510, 730], [12, 640, 820, 1170], [15, 1140, 1460, 2080],
+  [2, 15, 22, 31, 44], [3, 39, 55, 79, 111], [4, 81, 115, 163, 231], [5, 117, 165, 234, 331],
+  [6, 243, 344, 487, 689], [8, 505, 714, 1010, 1429], [10, 927, 1311, 1855, 2623],
+  [12, 1480, 2093, 2960, 4187], [15, 2508, 3546, 5016, 7093],
 ];
-const ROOF_SLOPE_COL = { "1/8": 1, "1/4": 2, "1/2": 3 };
+const ROOF_SLOPE_COL = { "1/16": 1, "1/8": 2, "1/4": 3, "1/2": 4 };
 const _roofMonotonic = (table, col) => {
   for (let i = 1; i < table.length; i++) {
     if (!(Number(table[i][0]) > Number(table[i - 1][0]))) return false;
@@ -130,7 +134,7 @@ export function computeRoofDrainSizing({ roof_area, rainfall_rate, drain_slope =
   if (!Number.isFinite(area) || area <= 0) return { error: "Roof area must be a positive finite number (ft^2)." };
   if (!Number.isFinite(rain) || rain <= 0) return { error: "Rainfall rate must be a positive finite number (in/hr)." };
   const col = ROOF_SLOPE_COL[drain_slope];
-  if (col == null) return { error: "Drain slope must be 1/8, 1/4, or 1/2 in per ft." };
+  if (col == null) return { error: "Drain slope must be 1/16, 1/8, 1/4, or 1/2 in per ft." };
   const lead = Array.isArray(leader_table) ? leader_table : ROOF_LEADER_TABLE;
   const horiz = Array.isArray(horiz_table) ? horiz_table : ROOF_HORIZ_TABLE;
   if (lead.length < 2 || horiz.length < 2) return { error: "Capacity tables must have at least two breakpoints." };
@@ -157,11 +161,11 @@ export const roofDrainSizingExample = {
 };
 
 function renderRoofDrainSizing(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: IPC 2021 Section 1106 (Tables 1106.2 vertical conductors, 1106.3 horizontal storm drains, 1106.6 roof drains) by name; the capacity tables ship as editable conservative breakpoints, not a transcribed table. Storm flow gpm = area x rainfall x 0.0104.";
+  citationEl.textContent = "Citation: IPC 2021 Section 1106: Table 1106.2 (storm drain pipe sizing, horizontal by slope and vertical) and Table 1106.3 (vertical leader sizing), bundled as published and still editable. Storm flow gpm = area x rainfall x 0.0104.";
   const area = makeNumber("Roof area served (ft², horizontally projected)", "rd-area", { step: "any", min: "0" });
   const rain = makeNumber("Design rainfall, 100-yr / 1-hr (in/hr)", "rd-rain", { step: "any", min: "0" });
   const slope = makeSelect("Horizontal storm-drain slope", "rd-slope", [
-    { value: "1/8", label: "1/8 in per ft" }, { value: "1/4", label: "1/4 in per ft", selected: true }, { value: "1/2", label: "1/2 in per ft" },
+    { value: "1/16", label: "1/16 in per ft" }, { value: "1/8", label: "1/8 in per ft" }, { value: "1/4", label: "1/4 in per ft", selected: true }, { value: "1/2", label: "1/2 in per ft" },
   ]);
   for (const f of [area, rain, slope]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { area.input.value = "5000"; rain.input.value = "4"; slope.select.value = "1/4"; update(); });

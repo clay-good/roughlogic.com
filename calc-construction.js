@@ -7559,12 +7559,12 @@ export function computeSeismicDesignSpectralAcceleration({ ss = 0, s1 = 0, fa = 
   const sds = (2 / 3) * sms, sd1 = (2 / 3) * sm1;
   return {
     sms, sm1, sds, sd1,
-    note: "ASCE 7-22 §11.4.4/§11.4.5: site-adjust the mapped MCER accelerations by the site coefficients (SMS = Fa Ss, SM1 = Fv S1), then take two-thirds for the design values (SDS = 2/3 SMS, SD1 = 2/3 SM1). Fa and Fv come from Tables 11.4-1/11.4-2 by Site Class; a geotechnical report sets the Site Class. SDS and SD1 feed the base shear and drift checks. A design aid; the engineer of record's stamped design governs.",
+    note: "ASCE 7-16 §11.4.4/§11.4.5: site-adjust the mapped MCER accelerations by the site coefficients (SMS = Fa Ss, SM1 = Fv S1), then take two-thirds for the design values (SDS = 2/3 SMS, SD1 = 2/3 SM1). Fa and Fv come from Tables 11.4-1/11.4-2 by Site Class; a geotechnical report sets the Site Class. SDS and SD1 feed the base shear and drift checks. A design aid; the engineer of record's stamped design governs.",
   };
 }
 export const seismicDesignSpectralAccelerationExample = { inputs: { ss: 1.0, s1: 0.4, fa: 1.1, fv: 1.6 } };
 const _renderSeismicSpectral = _simpleRenderer({
-  citation: "Citation: ASCE 7-22 §11.4.4 (SMS = Fa Ss, SM1 = Fv S1) and §11.4.5 (SDS = 2/3 SMS, SD1 = 2/3 SM1). Fa and Fv are the site coefficients from Tables 11.4-1 and 11.4-2, selected by Site Class from a geotechnical report; the mapped Ss and S1 come from the USGS seismic design maps for the site. Returns the design spectral accelerations that feed the base shear and drift; it does not select the Site Class or the SDC. A design aid, not a substitute for a licensed engineer's design -- the engineer of record's stamped design governs.",
+  citation: "Citation: ASCE 7-16 §11.4.4 (SMS = Fa Ss, SM1 = Fv S1) and §11.4.5 (SDS = 2/3 SMS, SD1 = 2/3 SM1). ASCE 7-22 dropped the Fa / Fv tables: it takes SMS and SM1 directly from the USGS multi-period data for the site class, and only the two-thirds step carries over. Fa and Fv are the site coefficients from Tables 11.4-1 and 11.4-2, selected by Site Class from a geotechnical report; the mapped Ss and S1 come from the USGS seismic design maps for the site. Returns the design spectral accelerations that feed the base shear and drift; it does not select the Site Class or the SDC. A design aid, not a substitute for a licensed engineer's design -- the engineer of record's stamped design governs.",
   example: seismicDesignSpectralAccelerationExample.inputs,
   fields: [
     { key: "ss", label: "Mapped Ss (short-period, fraction of g)", kind: "number" },

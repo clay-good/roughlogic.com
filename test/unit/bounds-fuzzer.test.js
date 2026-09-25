@@ -11601,16 +11601,19 @@ test("bounds: calc-plumbing v61 wsfu-demand + supply-pressure-budget pin Hunter 
 
 import { computeRoofDrainSizing as _v62b1, computeSumpBasinSizing as _v62b2 } from "../../calc-drainage.js";
 test("bounds: calc-plumbing v62 roof-drain-sizing + sump-basin-sizing pin storm flow, leader/storm-drain size, and the basin cycle", () => {
-  // 5000 ft^2, 4 in/hr -> 208 GPM, 6 in leader, 8 in horizontal at 1/4 in/ft
+  // 5000 ft^2, 4 in/hr -> 208 GPM: IPC 2021 Table 1106.3 leader 5 in (4 in carries 192),
+  // Table 1106.2 horizontal at 1/4 in/ft 5 in (4 in carries 163).
   const r = _v62b1({ roof_area: 5000, rainfall_rate: 4, drain_slope: "1/4" });
   assert.ok(Math.abs(r.gpm - 208) < 1e-9);
-  assert.strictEqual(r.leader_in, 6);
-  assert.strictEqual(r.horiz_in, 8);
-  // 6 in/hr cross-check -> 312 GPM, both sizes up one increment (8 leader, 10 horizontal)
+  assert.strictEqual(r.leader_in, 5);
+  assert.strictEqual(r.horiz_in, 5);
+  // 6 in/hr cross-check -> 312 GPM: leader still 5 in (360), horizontal 6 in (487).
   const r2 = _v62b1({ roof_area: 5000, rainfall_rate: 6, drain_slope: "1/4" });
   assert.ok(Math.abs(r2.gpm - 312) < 1e-9);
-  assert.strictEqual(r2.leader_in, 8);
-  assert.strictEqual(r2.horiz_in, 10);
+  assert.strictEqual(r2.leader_in, 5);
+  assert.strictEqual(r2.horiz_in, 6);
+  // The 1/16 in/ft column exists: 208 GPM needs 6 in (243).
+  assert.strictEqual(_v62b1({ roof_area: 5000, rainfall_rate: 4, drain_slope: "1/16" }).horiz_in, 6);
   assert.ok("error" in _v62b1({ roof_area: -1, rainfall_rate: 4 })); // non-positive area
   assert.ok("error" in _v62b1({ roof_area: 5000, rainfall_rate: 0 })); // non-positive rainfall
   assert.ok("error" in _v62b1({ roof_area: Infinity, rainfall_rate: 4 })); // non-finite

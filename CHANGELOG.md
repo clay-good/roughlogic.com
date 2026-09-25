@@ -10,6 +10,9 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **Roof drainage sized from the published IPC 2021 tables, and a seismic tile cited to the right edition.**
+  - `roof-drain-sizing` shipped "conservative breakpoints" at 40-67% of the published capacities, under a citation that swapped the table numbers: in the 2021 IPC, 1106.2 is storm drain pipe sizing, 1106.3 is vertical leaders, and 1106.6 is gutters. The tables are now Table 1106.3 for leaders, round sizes to 8 in and then the vertical column of 1106.2, and Table 1106.2 for horizontal drains, with its 1/16 in/ft column added. The worked example (5,000 ft² at 4 in/hr, 208 gpm) now sizes to a 5 in leader and a 5 in horizontal drain, where the old tables gave 6 in and 8 in. The tables can still be edited.
+  - `seismic-design-spectral-acceleration` cited ASCE 7-22 for SMS = Fa Ss and SM1 = Fv S1. That is the ASCE 7-16 procedure: 7-22 dropped the Fa / Fv tables and takes SMS and SM1 straight from the USGS multi-period data. The tile, whose inputs are Ss, S1, Fa and Fv, is now labeled ASCE 7-16 and says how 7-22 differs.
 - **Acme thread depth for fine pitches, and the ACI 318-19 shrinkage steel ratio.**
   - `acme-thread-depth` used ASME B1.5's 0.010 in root allowance (0.020 on the minor diameter) at every pitch. The standard uses it for 10 TPI and coarser and halves it for finer pitches. A 1/4-16 minor diameter came out 0.1675 where the table's maximum is 0.1775, cut 14% too deep and below the class 3G and 4G minimums, which weakens the screw's root (unsafe).
   - `concrete-shrinkage-temperature-steel` cited ACI 318-19 but carried the 318-14 split: 0.0020 below Grade 60, and a 60/fy scaling for higher grades in the text that the code never applied. 318-19 Table 24.4.3.2 is 0.0018 for deformed bars and welded wire of every grade. The grade input is kept and echoed so existing calls still work.
