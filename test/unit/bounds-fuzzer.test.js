@@ -17689,14 +17689,20 @@ test("bounds: spec-v1211 computeWindGustEffectFactor pins the rigid G, the inter
 import { computeWindKz as _v1212 } from "../../calc-construction.js";
 
 test("bounds: spec-v1212 computeWindKz pins the exposure formula, the repo stub reproduction, the 15 ft floor, the trends, and error seams", () => {
-  // Kz = 2.01 (z/zg)^(2/alpha). Exposure C, 50 ft.
+  // ASCE 7-22: Kz = 2.41 (z/zg)^(2/alpha), Table 26.11-1 constants. Exposure C, 50 ft.
   const r = _v1212({ exposure: "C", z_ft: 50 });
-  assert.ok(Math.abs(r.kz - 2.01 * Math.pow(50 / 900, 2 / 9.5)) < 1e-12);
-  assert.ok(Math.abs(r.kz - 1.094) < 0.002 && r.z_used_ft === 50 && r.floored === false);
-  // Reproduces the hard-coded 30 ft stub exactly: B 0.70, C 0.98, D 1.16.
-  assert.ok(Math.abs(_v1212({ exposure: "B", z_ft: 30 }).kz - 0.70) < 0.005);
+  assert.ok(Math.abs(r.kz - 2.41 * Math.pow(50 / 2460, 2 / 9.8)) < 1e-12);
+  assert.ok(Math.abs(r.kz - 1.088) < 0.002 && r.z_used_ft === 50 && r.floored === false);
+  // Within 0.01 of the hard-coded 30 ft stub: B 0.70, C 0.98, D 1.16.
+  assert.ok(Math.abs(_v1212({ exposure: "B", z_ft: 30 }).kz - 0.70) < 0.012);
   assert.ok(Math.abs(_v1212({ exposure: "C", z_ft: 30 }).kz - 0.98) < 0.005);
-  assert.ok(Math.abs(_v1212({ exposure: "D", z_ft: 30 }).kz - 1.16) < 0.005);
+  assert.ok(Math.abs(_v1212({ exposure: "D", z_ft: 30 }).kz - 1.16) < 0.012);
+  // The 7-22 Table 26.10-1 values where the 7-16 constants diverge: B 40 ft 0.74
+  // (7-16 0.76), B 100 ft 0.95 (7-16 0.99), C 200 ft 1.44 (7-16 1.46).
+  assert.ok(Math.abs(_v1212({ exposure: "B", z_ft: 40 }).kz - 0.74) < 0.005);
+  assert.ok(Math.abs(_v1212({ exposure: "B", z_ft: 100 }).kz - 0.95) < 0.005);
+  assert.ok(Math.abs(_v1212({ exposure: "C", z_ft: 200 }).kz - 1.44) < 0.005);
+  assert.ok(Math.abs(_v1212({ exposure: "D", z_ft: 15 }).kz - 1.03) < 0.006); // 1.035, tabulated 1.03
   // Below 15 ft is held at the z = 15 ft value (floored).
   const low = _v1212({ exposure: "C", z_ft: 10 });
   assert.ok(low.z_used_ft === 15 && low.floored === true);
@@ -17707,7 +17713,8 @@ test("bounds: spec-v1212 computeWindKz pins the exposure formula, the repo stub 
   assert.ok(_v1212({ exposure: "D", z_ft: at60 }).kz > _v1212({ exposure: "C", z_ft: at60 }).kz);
   assert.ok(_v1212({ exposure: "C", z_ft: at60 }).kz > _v1212({ exposure: "B", z_ft: at60 }).kz);
   // Above zg is flagged.
-  assert.ok(_v1212({ exposure: "D", z_ft: 800 }).above_zg === true);
+  assert.ok(_v1212({ exposure: "D", z_ft: 2000 }).above_zg === true);
+  assert.ok(_v1212({ exposure: "D", z_ft: 800 }).above_zg === false);
   // Error seams: bad exposure, non-positive height, non-finite.
   assert.ok("error" in _v1212({ exposure: "A", z_ft: 30 }));
   assert.ok("error" in _v1212({ exposure: "C", z_ft: 0 }));

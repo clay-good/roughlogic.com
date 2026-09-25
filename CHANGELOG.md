@@ -13,6 +13,7 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **`wind-velocity-pressure-exposure-coefficient` now uses ASCE 7-22's revised exposure constants.** It used the 7-16 set: Kz = 2.01(z/zg)^(2/α) with B 7.0/1,200 ft, C 9.5/900 ft, D 11.5/700 ft. It now uses 7-22's Kz = 2.41(z/zg)^(2/α), with Table 26.11-1 constants B 7.5/3,280 ft, C 9.8/2,460 ft, D 11.5/1,935 ft. That reproduces the 7-22 Table 26.10-1 values the old set missed: B at 40 ft is 0.74 (7-16: 0.76), B at 100 ft is 0.95 (0.99), C at 200 ft is 1.44 (1.46). The Exposure C 50 ft example moves from 1.094 to 1.088. The text now states qz = 0.00256·Kz·Kzt·Ke·V², since 7-22 moved Kd into the pressure equations.
 - **Five snow tiles cited ASCE 7-22 but computed the 7-16 relations.** They now use the 7-22 forms (sources: the 7-22 change summaries in STRUCTURE magazine, NFBA Frame Builder, and Trimble's Tekla 7-22 notes):
   - `snow-load`: Pf = 0.7·Ce·Ct·pg. 7-22 removed the importance factor Is because its ground snow loads are set per risk category.
   - `snow-drift-load`, the `snow-load` drift add-on, and `snow-unbalanced-gable`: drift height is Eq. 7.6-1, hd = 1.5·√(pg^0.74·lu^0.70·W2^1.7/γ), with a new winter wind parameter input W2 (Figure 7.6-1). W2 defaults to 0.65, the top of the lower-48 range, which is conservative. The gable case no longer floors lu at 20 ft.

@@ -7045,10 +7045,11 @@ CONSTRUCTION_RENDERERS["wind-gust-effect-factor"] = _renderWindGustEffectFactor;
 // The wind-pressure and wind-cc-pressure tiles take Kz as an input, and computeWindPressure's own comment
 // names the gap: the built-in exposure kz is "only a fallback -- enter Kz for the actual mean roof height,"
 // a flat 3-value stub fixed at 30 ft (B 0.70, C 0.98, D 1.16). This computes the real height-dependent
-// value. ASCE 7 §26.10.1 Eq. 26.10-1: Kz = 2.01 (z/zg)^(2/alpha) for 15 ft <= z <= zg, held at the z = 15 ft
-// value below 15 ft, with the Table 26.10-1 exposure constants alpha and zg (3 pairs, inlined like the
-// gust-factor tile's Table 26.11-1 set). At z = 30 ft this reproduces the stub's 0.70/0.98/1.16 exactly.
-const WIND_KZ_EXPOSURE = { B: { alpha: 7.0, zg: 1200 }, C: { alpha: 9.5, zg: 900 }, D: { alpha: 11.5, zg: 700 } };
+// value. ASCE 7-22 Table 26.10-1 note: Kz = 2.41 (z/zg)^(2/alpha) for 15 ft <= z <= zg, held at the z = 15 ft
+// value below 15 ft, with the revised 7-22 Table 26.11-1 constants alpha and zg (3 pairs). Until 2026-09-25
+// this used the 7-16 set, 2.01 with B 7.0/1200, C 9.5/900, D 11.5/700 ft, which read up to about 4% high
+// aloft (B at 100 ft: 0.99 against the 7-22 table's 0.95). At 30 ft it gives 0.69/0.98/1.17.
+const WIND_KZ_EXPOSURE = { B: { alpha: 7.5, zg: 3280 }, C: { alpha: 9.8, zg: 2460 }, D: { alpha: 11.5, zg: 1935 } };
 // dims: in { exposure: dimensionless, z_ft: L } out: { kz: dimensionless, z_used_ft: L, zg_ft: L, alpha: dimensionless }
 export function computeWindKz({ exposure = "C", z_ft = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
@@ -7057,16 +7058,16 @@ export function computeWindKz({ exposure = "C", z_ft = 0 } = {}) {
   const z = Number(z_ft) || 0;
   if (!(z > 0)) return { error: "Height z must be positive (ft)." };
   const zUsed = Math.max(z, 15);
-  const kz = 2.01 * Math.pow(zUsed / k.zg, 2 / k.alpha);
+  const kz = 2.41 * Math.pow(zUsed / k.zg, 2 / k.alpha);
   if (!Number.isFinite(kz)) return { error: "Kz math is not a finite value." };
   return {
     kz, z_used_ft: zUsed, zg_ft: k.zg, alpha: k.alpha, floored: z < 15, above_zg: z > k.zg,
-    note: "The ASCE 7 §26.10.1 velocity pressure exposure coefficient Kz, the height- and exposure-dependent factor the wind-pressure and wind-cc-pressure tiles take as an input but only stub with a flat 30 ft value. Kz = 2.01 (z/zg)^(2/alpha) for 15 ft <= z <= zg, held at the z = 15 ft value below 15 ft, with the Table 26.10-1 constants alpha and zg by exposure (B: 7.0/1200 ft, C: 9.5/900 ft, D: 11.5/700 ft). It scales the velocity pressure qz = 0.00256 Kz Kzt Kd Ke V^2, so it rises with height (a taller building sees faster wind) and with a smoother exposure. At the standard 30 ft it returns 0.70 (B), 0.98 (C), and 1.16 (D) -- the values the tiles hard-code -- but a 50 ft eave in Exposure C is 1.09, about 11% more pressure the 30 ft stub misses. Use Kz at each height z for the windward wall and Kh (Kz at the mean roof height) for the leeward, side, and roof surfaces and for all components and cladding. Above the gradient height zg the tabulated range ends and the value is flagged. A design aid, not a substitute for the engineer of record.",
+    note: "The ASCE 7-22 §26.10.1 velocity pressure exposure coefficient Kz, the height- and exposure-dependent factor the wind-pressure and wind-cc-pressure tiles take as an input but only stub with a flat 30 ft value. Kz = 2.41 (z/zg)^(2/alpha) for 15 ft <= z <= zg, held at the z = 15 ft value below 15 ft, with the 7-22 Table 26.11-1 constants alpha and zg by exposure (B: 7.5/3280 ft, C: 9.8/2460 ft, D: 11.5/1935 ft; 7-16 used 2.01 with 7.0/1200, 9.5/900, 11.5/700). It scales the velocity pressure qz = 0.00256 Kz Kzt Ke V^2 (7-22 moved the directionality factor Kd out of qz and into the pressure equations), so it rises with height (a taller building sees faster wind) and with a smoother exposure. At 30 ft it returns 0.69 (B), 0.98 (C), and 1.17 (D), within 0.01 of the 0.70/0.98/1.16 the tiles hard-code, but a 50 ft eave in Exposure C is 1.09, about 11% more pressure the 30 ft stub misses. Use Kz at each height z for the windward wall and Kh (Kz at the mean roof height) for the leeward, side, and roof surfaces and for all components and cladding. Above the gradient height zg the tabulated range ends and the value is flagged. A design aid, not a substitute for the engineer of record.",
   };
 }
 export const windKzExample = { inputs: { exposure: "C", z_ft: 50 } };
 const _renderWindKz = _simpleRenderer({
-  citation: "Citation: ASCE 7 §26.10.1 velocity pressure exposure coefficient Kz = 2.01 (z/zg)^(2/alpha) for 15 ft <= z <= zg (held at the z = 15 ft value below 15 ft), with the Table 26.10-1 exposure constants (B 7.0/1200, C 9.5/900, D 11.5/700), by name. Scales qz = 0.00256 Kz Kzt Kd Ke V^2; reproduces the 30 ft 0.70/0.98/1.16 stub. A design aid, not a substitute for the engineer of record.",
+  citation: "Citation: ASCE 7-22 §26.10.1 velocity pressure exposure coefficient Kz = 2.41 (z/zg)^(2/alpha) for 15 ft <= z <= zg (held at the z = 15 ft value below 15 ft), with the 7-22 Table 26.11-1 exposure constants (B 7.5/3280, C 9.8/2460, D 11.5/1935), by name. Scales qz = 0.00256 Kz Kzt Ke V^2 (Kd now applied in the pressure equations); within 0.01 of the 30 ft 0.70/0.98/1.16 stub. A design aid, not a substitute for the engineer of record.",
   example: windKzExample.inputs,
   fields: [
     { key: "exposure", label: "Exposure category", kind: "select", default: "C", options: [

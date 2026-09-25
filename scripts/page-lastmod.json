@@ -2,11 +2,11 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "fe6db3cdf5162d6f",
+      "sha": "5a0a8e09e791a4ae",
       "date": "2026-09-25"
     },
     "/tools/": {
-      "sha": "b1eb645023be5a57",
+      "sha": "1b018d46ba21a007",
       "date": "2026-09-25"
     },
     "/groups/accounting/": {
@@ -18,7 +18,7 @@
       "date": "2026-09-25"
     },
     "/groups/construction/": {
-      "sha": "a254bfcb32a479be",
+      "sha": "1fb7a8daefa28288",
       "date": "2026-09-25"
     },
     "/groups/cross-trade/": {
@@ -8626,8 +8626,8 @@
       "date": "2026-09-01"
     },
     "/tools/wind-cc-pressure/": {
-      "sha": "90234021b9399a43",
-      "date": "2026-09-04"
+      "sha": "53d50b29043dc8f6",
+      "date": "2026-09-25"
     },
     "/tools/wind-chill/": {
       "sha": "c7ba2490664e9bcd",
@@ -8670,8 +8670,8 @@
       "date": "2026-09-01"
     },
     "/tools/wind-velocity-pressure-exposure-coefficient/": {
-      "sha": "7e4f71fbb23d07e5",
-      "date": "2026-09-04"
+      "sha": "e81e14eb0ffc4247",
+      "date": "2026-09-25"
     },
     "/tools/window-film-shgc/": {
       "sha": "ead22fbbad5e5782",
