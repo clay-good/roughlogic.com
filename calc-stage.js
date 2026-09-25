@@ -2272,17 +2272,23 @@ STAGE_RENDERERS["gobo-image-size"] = _r({
 });
 
 // ===================== spec-v1372: color-temperature correction in mireds =====================
-// The standard correction sheets, as mired shifts. Negative is blue (raises color
-// temperature), positive is orange (lowers it).
+// The standard correction sheets, as mired shifts: Rosco's published figures.
+// Negative is blue (raises color temperature), positive is orange (lowers it).
+// CTB and CTO are not mirror images. Until 2026-09-24 the CTO rows were the
+// CTB magnitudes with the sign flipped (+12/+30/+68/+131); Rosco's CTOs are
+// +20/+42/+81/+167, and +131 is RoscoSun 85, the 3/4 CTO -- so a 5,600 to
+// 3,200 K conversion was told "Full CTO" and a full CTO was said to land at
+// 3,230 K when it lands near 2,890 K.
 export const MIRED_CORRECTIONS = [
   { name: "Full CTB", shift: -131 },
   { name: "Half CTB", shift: -68 },
   { name: "Quarter CTB", shift: -30 },
   { name: "Eighth CTB", shift: -12 },
-  { name: "Eighth CTO", shift: 12 },
-  { name: "Quarter CTO", shift: 30 },
-  { name: "Half CTO", shift: 68 },
-  { name: "Full CTO", shift: 131 },
+  { name: "Eighth CTO", shift: 20 },
+  { name: "Quarter CTO", shift: 42 },
+  { name: "Half CTO", shift: 81 },
+  { name: "3/4 CTO", shift: 131 },
+  { name: "Full CTO", shift: 167 },
 ];
 
 // dims: in { source_k: T, target_k: T, applied_shift: T^-1 } out: { source_mired: T^-1, target_mired: T^-1, shift_needed: T^-1, resulting_k: T }
@@ -2312,14 +2318,14 @@ export function computeMiredGelShift({ source_k = 3200, target_k = 5600, applied
     nearest_error,
     resulting_k,
     effective_shift,
-    note: "The mired shift that takes one color temperature to another, the standard correction sheet closest to it, and where a given sheet actually lands. Kelvin is not a perceptually even scale: going from 3,000 K to 3,200 K is a visible correction while going from 9,000 K to 9,200 K is invisible. Mireds -- reciprocal color temperature times a million -- ARE even, which is why every correction filter on the market is specified as a mired shift rather than as a pair of kelvin values, and why a full CTB is about -131 mireds no matter what it is put in front of. Once a crew is thinking in mireds, what gel gets me from here to there is a subtraction and what does this gel do to that source is an addition. Negative shifts are blue and raise color temperature; positive shifts are orange and lower it. Matching a 3,200 K tungsten fixture to 5,600 K daylight is 178.6 minus 312.5, a shift of -133.9 mireds, and a full CTB at about -131 lands within three mireds of the target -- effectively exact. Try the same correction by kelvin arithmetic and the difference is 2,400 K, but there is no gel labeled 2,400 K because the number means something different depending on where you start: from 5,600 K a full CTO lands at 3,230 K, while from 6,500 K the same sheet lands at 3,510 K. Same gel, different result, and only the mired scale predicts it. A conversion; the filter manufacturer's published mired shift for the specific sheet and a color meter govern a critical match.",
+    note: "The mired shift that takes one color temperature to another, the standard correction sheet closest to it, and where a given sheet actually lands. Kelvin is not a perceptually even scale: going from 3,000 K to 3,200 K is a visible correction while going from 9,000 K to 9,200 K is invisible. Mireds -- reciprocal color temperature times a million -- ARE even, which is why every correction filter on the market is specified as a mired shift rather than as a pair of kelvin values, and why a full CTB is about -131 mireds no matter what it is put in front of. Once a crew is thinking in mireds, what gel gets me from here to there is a subtraction and what does this gel do to that source is an addition. Negative shifts are blue and raise color temperature; positive shifts are orange and lower it. Matching a 3,200 K tungsten fixture to 5,600 K daylight is 178.6 minus 312.5, a shift of -133.9 mireds, and a full CTB at about -131 lands within three mireds of the target -- effectively exact. Try the same correction by kelvin arithmetic and the difference is 2,400 K, but there is no gel labeled 2,400 K because the number means something different depending on where you start: from 5,600 K a full CTO (+167) lands at 2,890 K, while from 6,500 K the same sheet lands at 3,120 K. CTB and CTO are not mirror images: the sheet that takes daylight to 3,200 K is the 3/4 CTO (+131), not the full. Same gel, different result, and only the mired scale predicts it. A conversion; the filter manufacturer's published mired shift for the specific sheet and a color meter govern a critical match.",
   };
 }
 
 export const miredGelShiftExample = { inputs: { source_k: 3200, target_k: 5600, applied_shift: 0 } };
 
 STAGE_RENDERERS["mired-gel-shift"] = _r({
-  citation: "Citation: reciprocal color temperature (mireds = 1,000,000 / kelvin) and the mired-shift specification of correction filters, by name. The full/half/quarter/eighth CTB and CTO shift values are the conventional nominal figures; the filter manufacturer's published mired shift for the specific sheet, and a color meter, govern a critical match.",
+  citation: "Citation: reciprocal color temperature (mireds = 1,000,000 / kelvin) and the mired-shift specification of correction filters, by name. The full/half/quarter/eighth CTB and CTO shift values are Rosco's published figures (Full CTB -131, Full CTO +167, 3/4 CTO +131); other makers' sheets differ (Lee Full CTO +159); the filter manufacturer's published mired shift for the specific sheet, and a color meter, govern a critical match.",
   example: miredGelShiftExample.inputs,
   fields: [
     { key: "source_k", label: "Source color temperature (K)", kind: "number" },

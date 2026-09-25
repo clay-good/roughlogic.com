@@ -39495,10 +39495,14 @@ test("bounds: spec-v1372 computeMiredGelShift pins the shift and the same-sheet-
   assert.ok(Math.abs(r.shift_needed + 133.929) < 1e-3);
   assert.strictEqual(r.nearest_name, "Full CTB");
   assert.ok(Math.abs(r.nearest_error) < 3);
-  // Reversed, the shift is the same size and the opposite sign -- one full CTO.
+  // Reversed, the shift is the same size and the opposite sign -- and the sheet
+  // for it is the 3/4 CTO (Rosco +131), not the full CTO (+167): CTB and CTO
+  // are not mirror images.
   const reversed = _v1372({ source_k: 5600, target_k: 3200, applied_shift: 0 });
   assert.ok(Math.abs(reversed.shift_needed - -r.shift_needed) < 1e-9);
-  assert.strictEqual(reversed.nearest_name, "Full CTO");
+  assert.strictEqual(reversed.nearest_name, "3/4 CTO");
+  // A full CTO from daylight lands near 2,890 K.
+  assert.ok(Math.abs(_v1372({ source_k: 5600, target_k: 3200, applied_shift: 167 }).resulting_k - 2894) < 1);
   // The same sheet lands somewhere different depending on where it starts, which is the
   // whole reason mireds exist: +131 from 5,600 K reaches 3,230 K, from 6,500 K only 3,510 K.
   const fromDaylight = _v1372({ source_k: 5600, target_k: 3200, applied_shift: 131 });
