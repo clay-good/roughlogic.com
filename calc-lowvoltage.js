@@ -61,16 +61,22 @@ export function computeFiberLossBudget({ length_m = 0, attenuation_db_km = 0, co
 }
 export const fiberLossBudgetExample = { inputs: { length_m: 300, attenuation_db_km: 3.0, connector_count: 2, loss_per_connector_db: 0.75, splice_count: 0, max_channel_loss_db: 2.6 } };
 
+// Prefill values are the TIA-568 maximum cable attenuation (dB/km), the
+// planning figure a loss budget uses. Until 2026-09-24 single-mode prefilled
+// 0.4 / 0.3, typical cable-spec values in no TIA row; TIA-568 caps premises
+// (inside plant) single-mode at 1.0 and outside plant at 0.5, so a 2 km inside
+// link was budgeted 0.8 dB where TIA allows for 2.0.
 const _FIBER_DEFAULT_ATT = {
   "om3-850": 3.5, "om4-850": 3.0, "om5-850": 3.0, "om4-1300": 1.5,
-  "smf-1310": 0.4, "smf-1550": 0.3,
+  "smf-1310": 1.0, "smf-1550": 1.0, "smf-osp-1310": 0.5, "smf-osp-1550": 0.5,
 };
 function _renderFiberLossBudget(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: Optical link loss budget - fiber attenuation plus connector and splice losses against the application's maximum channel loss - per the TIA-568 / TIA-526 fiber-test methods and the IEEE 802.3 channel-loss limits, by name; first-principles. Attenuation coefficients and component losses are user-supplied; the OTDR/power-meter field test governs the certified link.";
+  citationEl.textContent = "Citation: Optical link loss budget - fiber attenuation plus connector and splice losses against the application's maximum channel loss - per the TIA-568 / TIA-526 fiber-test methods and the IEEE 802.3 channel-loss limits, by name; first-principles. Attenuation coefficients and component losses are user-supplied (the fiber select prefills the TIA-568 maximum cable attenuation: single-mode 1.0 dB/km premises, 0.5 outside plant); the OTDR/power-meter field test governs the certified link.";
   const fiber = makeSelect("Fiber / wavelength (sets default dB/km)", "flb-fiber", [
     { value: "om4-850", label: "OM4 @ 850 nm", selected: true }, { value: "om3-850", label: "OM3 @ 850 nm" },
     { value: "om5-850", label: "OM5 @ 850 nm" }, { value: "om4-1300", label: "OM4 @ 1300 nm" },
-    { value: "smf-1310", label: "Single-mode @ 1310 nm" }, { value: "smf-1550", label: "Single-mode @ 1550 nm" },
+    { value: "smf-1310", label: "Single-mode premises @ 1310 nm" }, { value: "smf-1550", label: "Single-mode premises @ 1550 nm" },
+    { value: "smf-osp-1310", label: "Single-mode outside plant @ 1310 nm" }, { value: "smf-osp-1550", label: "Single-mode outside plant @ 1550 nm" },
   ]);
   const len = makeNumber("Link length (m)", "flb-len", { step: "any", min: "0" });
   const att = makeNumber("Attenuation (dB/km)", "flb-att", { step: "any", min: "0" });
@@ -286,7 +292,8 @@ function _renderFiberMaxLength(inputRegion, outputRegion, citationEl) {
   const fiber = makeSelect("Fiber / wavelength (sets default dB/km)", "fml-fiber", [
     { value: "om4-850", label: "OM4 @ 850 nm", selected: true }, { value: "om3-850", label: "OM3 @ 850 nm" },
     { value: "om5-850", label: "OM5 @ 850 nm" }, { value: "om4-1300", label: "OM4 @ 1300 nm" },
-    { value: "smf-1310", label: "Single-mode @ 1310 nm" }, { value: "smf-1550", label: "Single-mode @ 1550 nm" },
+    { value: "smf-1310", label: "Single-mode premises @ 1310 nm" }, { value: "smf-1550", label: "Single-mode premises @ 1550 nm" },
+    { value: "smf-osp-1310", label: "Single-mode outside plant @ 1310 nm" }, { value: "smf-osp-1550", label: "Single-mode outside plant @ 1550 nm" },
   ]);
   const maxch = makeNumber("Max channel loss (dB)", "fml-max", { step: "any", min: "0" });
   const att = makeNumber("Attenuation (dB/km)", "fml-att", { step: "any", min: "0" });

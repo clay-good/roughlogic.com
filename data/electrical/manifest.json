@@ -39,7 +39,7 @@
     {
       "file": "cable-bend-radius.json",
       "name": "Cable bend radius (manufacturer-attributed)",
-      "gzip_size_bytes": 390
+      "gzip_size_bytes": 450
     },
     {
       "file": "poe-classes.json",
@@ -69,7 +69,7 @@
     "conduit-fill-tables.json": "f9f57a6fbfd9c5c778e89044911e17006bd538194e956de54f9011eea2b77da8",
     "demand-factors.json": "8f5b31ced991aacda0509bf32e752555f643a411c8d75afc910a576a16275de4",
     "lighting-density.json": "dc48ff0b070a8d5dc6c0630dd33edfef687eeb5e96afd1df6002d3a19a43defd",
-    "cable-bend-radius.json": "86e27ac2c14c59af068deb4da711526d80dcb4a12ce5c674f84c793eb4be0ba5",
+    "cable-bend-radius.json": "3114252d284c0dde95eb55c2db9a757737b46b7cc2c91f39faf69b14c789368d",
     "poe-classes.json": "19201709b44e5a75f4030329be75a1560da272a17f165caa372ae3849a82def0",
     "conductor-c-values.json": "d791e1bdee6de7266b2bc7b553465ca06c07e0dd29d24d82176fbe596d22cd43",
     "nema-mg1-code-letters.json": "ee7832404dab8a9f8a1621a84dc194a4344f34bfd6ce70613d05693aad8338d9",

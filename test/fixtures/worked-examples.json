@@ -5413,22 +5413,22 @@
    "source_publisher": "Southwire",
    "source_title": "Cable Bend Radius (single conductor, no shield) = 8 x cable OD",
    "source_edition_or_year": "Southwire Power Cable Manual / technical bulletin",
-   "source_section_or_page": "Single-conductor THHN: 8x multiple; 0.5 in OD -> 4 in minimum inside bend radius",
+   "source_section_or_page": "Single-conductor THHN, 1000 V and below: 4D up to 1.0 in OD (Southwire bend radius table); 0.5 in OD -> 2 in minimum inside bend radius",
    "verified_by": "rl",
-   "verified_on": "2026-05-11",
+   "verified_on": "2026-09-24",
    "inputs": {
     "cable_type": "THHN",
     "cable_od_in": 0.5
    },
    "outputs": {
     "multiple": {
-     "value": 8,
+     "value": 4,
      "tolerance": {
       "abs": 0
      }
     },
     "min_radius_in": {
-     "value": 4,
+     "value": 2,
      "tolerance": {
       "abs": 0.001
      }

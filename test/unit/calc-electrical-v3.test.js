@@ -85,9 +85,9 @@ test("Pulling tension: sidewall pressure tracks small radius", () => {
 
 // --- Utility 126: Cable Bend Radius Minimum ---
 
-test("Bend radius: example THHN OD 0.5 in -> 4 in", () => {
+test("Bend radius: example THHN OD 0.5 in -> 2 in (4D, Southwire)", () => {
   const r = computeBendRadius(bendRadiusExample.inputs);
-  assert.ok(close(r.min_radius_in, 4));
+  assert.ok(close(r.min_radius_in, 2));
 });
 
 test("Bend radius: fiber multiple is 20", () => {

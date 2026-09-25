@@ -2,7 +2,7 @@
   "generated": "2026-09-09",
   "manifests": {
     "physical-constants": "f39664f647623799109d1d52f20086a21a890ffb9edaf8a27ab65d76fd74da1e",
-    "electrical": "81d588faf3d4857f6311b91d0b77b97704b8a2a71e64acdbd0774538cc66a403",
+    "electrical": "b8ada9eedaf86be295fb097335e2e0c410b9d45ba9a03a3c61677d19fa557a80",
     "plumbing": "0c34955d48d77aad598a46e264335d21228b026b2c88f090ed58f2c33d3a5a9d",
     "hvac": "0f81728b66f165c78d6edc9f31fadcbf0da0b09d5ae8a652be86cccf383a2d62",
     "restoration": "a185fe4ba69ff4bb0acfc0a6366153e1cd6ae1b7637ce04ef2a97766c060ea1f",
@@ -18,7 +18,7 @@
     "cross": "b09a90b95ae9defdd50d30b67269a5f374f63f91dbc5ef3626abb8dbaf6400b8",
     "field": "90ccb1beec1cecd36ea7b2e3b639dcec971410e467710dd4426595fc955ab3cf",
     "realestate": "d109d6e0fca82908cd59260c7d8ff065b96c7c95cccb281bdfd0b4c584e08d7a",
-    "fields": "027a8e85b0fc4f78dd7c3c74dfc257f7288b41c042a6ab988c67b4442dcd7239",
+    "fields": "4dd7ed0350617dfa4813399b372abf7acac0bd35e292e7952bc3ed3169730d73",
     "search": "244bee9aa47c52b3248a84907a0b5acf73268020640e1a5eb85be69531527f5a"
   }
 }

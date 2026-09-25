@@ -9700,10 +9700,13 @@ test("bounds: calc-electrical computePullingTension pins capstan T_out = T_in * 
   assert.ok("error" in computePullingTension({ cable_weight_lb_per_ft: 1.5, run_length_ft: 200, lubricant: "magic" }));
 });
 
-test("bounds: calc-electrical computeBendRadius pins THHN 0.5 in OD -> 4 in min radius (8x multiple)", () => {
+test("bounds: calc-electrical computeBendRadius pins THHN 0.5 in OD -> 2 in min radius (Southwire 4D to 1 in OD)", () => {
   const r = computeBendRadius({ cable_type: "THHN", cable_od_in: 0.5 });
-  assert.strictEqual(r.multiple, 8);
-  assert.strictEqual(r.min_radius_in, 4);
+  assert.strictEqual(r.multiple, 4);
+  assert.strictEqual(r.min_radius_in, 2);
+  // 5D from 1.0 to 2.0 in, 6D above (Southwire, 1000 V and below).
+  assert.strictEqual(computeBendRadius({ cable_type: "XHHW", cable_od_in: 1.5 }).multiple, 5);
+  assert.strictEqual(computeBendRadius({ cable_type: "THHN", cable_od_in: 2.2 }).multiple, 6);
   assert.ok("error" in computeBendRadius({ cable_type: "magic", cable_od_in: 0.5 }));
   assert.ok("error" in computeBendRadius({ cable_type: "THHN", cable_od_in: 0 }));
 });
@@ -41009,7 +41012,13 @@ test("bounds: spec-v1420 computeGroundingGridConductor pins the sqrt-time, linea
   assert.ok(Math.abs(bigFault.area_kcmil - 2 * r.area_kcmil) < 1e-9);
   // Steel needs more than twice the area of brazed copper for the same duty.
   const steel = _v1420({ ...base, material: "steel" });
-  assert.ok(Math.abs(steel.area_kcmil - 134.9) < 1e-1);
+  assert.ok(Math.abs(steel.area_kcmil - 135.3) < 1e-1); // Kf 15.95, IEEE 80 Table 2
+  // Every constant is a Table 2 row (bolted copper is the 250 C hard-drawn row, 11.78).
+  for (const [mat, kf] of [["copper_bolted", 11.78], ["copper_clad_steel", 14.64], ["copper_clad_steel_wire_40", 10.45], ["copper_clad_steel_wire_30", 12.06], ["steel", 15.95]]) {
+    assert.strictEqual(_v1420({ ...base, material: mat }).kf, kf, mat);
+  }
+  // 4/0 bolted at 18 kA / 1 s is short under Table 2 (it passed at the old 11.5).
+  assert.strictEqual(_v1420({ fault_current_ka: 18, clearing_time_s: 1, material: "copper_bolted", installed_kcmil: 211.6 }).adequate, false);
   assert.ok(steel.area_kcmil > 2 * r.area_kcmil);
   // A bolted joint holds a lower temperature and therefore needs more conductor.
   assert.ok(_v1420({ ...base, material: "copper_bolted" }).area_kcmil > r.area_kcmil);

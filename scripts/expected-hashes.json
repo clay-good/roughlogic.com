@@ -10,12 +10,12 @@
     "electrical/conduit-fill-tables.json": "f9f57a6fbfd9c5c778e89044911e17006bd538194e956de54f9011eea2b77da8",
     "electrical/demand-factors.json": "8f5b31ced991aacda0509bf32e752555f643a411c8d75afc910a576a16275de4",
     "electrical/lighting-density.json": "dc48ff0b070a8d5dc6c0630dd33edfef687eeb5e96afd1df6002d3a19a43defd",
-    "electrical/cable-bend-radius.json": "86e27ac2c14c59af068deb4da711526d80dcb4a12ce5c674f84c793eb4be0ba5",
+    "electrical/cable-bend-radius.json": "3114252d284c0dde95eb55c2db9a757737b46b7cc2c91f39faf69b14c789368d",
     "electrical/poe-classes.json": "19201709b44e5a75f4030329be75a1560da272a17f165caa372ae3849a82def0",
     "electrical/conductor-c-values.json": "d791e1bdee6de7266b2bc7b553465ca06c07e0dd29d24d82176fbe596d22cd43",
     "electrical/nema-mg1-code-letters.json": "ee7832404dab8a9f8a1621a84dc194a4344f34bfd6ce70613d05693aad8338d9",
     "electrical/dwelling-demand.json": "7e49f0ef7184c83bb365214ac19d8461efa74ef40313343302fe926ec049698c",
-    "electrical/manifest.json": "81d588faf3d4857f6311b91d0b77b97704b8a2a71e64acdbd0774538cc66a403",
+    "electrical/manifest.json": "b8ada9eedaf86be295fb097335e2e0c410b9d45ba9a03a3c61677d19fa557a80",
     "plumbing/pipe-properties.json": "2f210896085237d74667de6933632c8cc3a68509fe68b4f7bc4da9d26295aeb8",
     "plumbing/fixture-units.json": "041663c5b574daf584c73efb4c9e687d2c669b5ae1dac121b4c8b2442ab636af",
     "plumbing/gas-pipe-capacity.json": "d3b332e0d44fd9cbdaf50fda30b485993cd8558e443b63f98a1b71cb296844b1",
@@ -118,7 +118,7 @@
     "realestate/loan-limits.json": "b9b390e0dc8345486794602c813518b826495d5d0a4747c57965e8caa3efba5d",
     "realestate/hud-fmr.json": "c44f8a9cd37c2f250c29963b4be38d4bd64a1e0c391601dc513564df6ca5efc6",
     "realestate/manifest.json": "d109d6e0fca82908cd59260c7d8ff065b96c7c95cccb281bdfd0b4c584e08d7a",
-    "fields/manifest.json": "027a8e85b0fc4f78dd7c3c74dfc257f7288b41c042a6ab988c67b4442dcd7239",
+    "fields/manifest.json": "4dd7ed0350617dfa4813399b372abf7acac0bd35e292e7952bc3ed3169730d73",
     "search/manifest.json": "244bee9aa47c52b3248a84907a0b5acf73268020640e1a5eb85be69531527f5a"
   }
 }

@@ -10,6 +10,12 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **Five electrical tables checked against their sources.**
+  - `grounding-grid-conductor`: the bolted-copper Kf was 11.5, which is in no row of IEEE 80 Table 2. The 250°C hard-drawn row is 11.78, so a 4/0 conductor passed an 18 kA, 1 s fault it is 0.4 kcmil short for (unsafe). Steel was 15.9 where the table gives 15.95. Copper-clad steel had one value where the table has three: 40% wire 10.45, 30% wire 12.06 and 20% rod 14.64, now three options.
+  - `fiber-loss-budget` / `fiber-max-length`: single-mode prefilled 0.4 / 0.3 dB/km, cable-spec values found in no TIA row. TIA-568 caps premises single-mode at 1.0 and outside plant at 0.5, so a 2 km inside link was budgeted 0.8 dB instead of 2.0 (unsafe). Both are now options.
+  - `cable-bend-radius`: THHN / XHHW used 8D, Southwire's over-1000 V row. Its table for 1000 V and below gives 4D up to 1 in OD, 5D up to 2 in and 6D above (conservative before). The shard and fixture follow.
+  - `working-space-110-26`: NEC Table 110.26(A)(1)'s 601-1000 V row (3 / 4 / 5 ft), added in 2017, was missing, so the tile refused that band.
+  - `tdd-ieee-519`: the note said evens are capped at 25% of the odd limit, which is the 2014 rule. IEEE 519-2022 limits evens through h = 6 to 50% and gives the odd limits to evens above 6.
 - **Seven citations that said something their source does not.** Found by the same audit and checked against the primary text; no computed number changes except the plate-count range:
   - `landfill-gas-generation` called 100 m³/Mg "the Clean Air Act default." 100 is the AP-42 inventory default; 40 CFR 60.764 sets L0 = 170 and k = 0.05 (0.02 in arid areas).
   - `stopping-sight-distance` labeled f = 0.35 "dry pavement" and 0.20 "AASHTO conservative." AASHTO's 11.2 ft/s² design deceleration is itself chosen for wet pavement, and AASHTO publishes no 0.20. The values and keys are unchanged; the labels now say what each value is.

@@ -1463,9 +1463,13 @@ export const pullingTensionExample = {
 // Minimum inside bend radius as a multiple of cable OD. Manufacturer-attributed
 // table mirrored in data/electrical/cable-bend-radius.json.
 
+// THHN / XHHW: Southwire's minimum bend radius table for 1000 V and below
+// (NEC 336.24 / ICEA S-95-658 single conductors): 4D to 1.0 in OD, 5D to 2.0
+// in, 6D above. Until 2026-09-24 both read a flat 8D -- the over-1000 V row --
+// which doubled the radius for building wire.
 export const CABLE_BEND_RADIUS_TABLE = {
-  THHN: { multiple: 8, attribution: "Southwire technical bulletin (single conductor, no shield)" },
-  XHHW: { multiple: 8, attribution: "Southwire technical bulletin (single conductor, no shield)" },
+  THHN: { multiple: 4, by_od: [[1.0, 4], [2.0, 5], [Infinity, 6]], attribution: "Southwire minimum bend radius table, 1000 V and below (single conductor, no shield: 4D to 1 in OD, 5D to 2 in, 6D above)" },
+  XHHW: { multiple: 4, by_od: [[1.0, 4], [2.0, 5], [Infinity, 6]], attribution: "Southwire minimum bend radius table, 1000 V and below (single conductor, no shield: 4D to 1 in OD, 5D to 2 in, 6D above)" },
   MC: { multiple: 7, attribution: "AFC Cable Systems technical reference" },
   control: { multiple: 6, attribution: "Belden control cable bulletin" },
   coax: { multiple: 10, attribution: "Belden coax bulletin (rigid runs)" },
@@ -1478,16 +1482,17 @@ export function computeBendRadius({ cable_type, cable_od_in }) {
   const row = CABLE_BEND_RADIUS_TABLE[cable_type];
   if (!row) return { error: "Unknown cable type." };
   if (!(cable_od_in > 0)) return { error: "Cable OD must be positive." };
+  const multiple = row.by_od ? row.by_od.find(([maxOd]) => cable_od_in <= maxOd)[1] : row.multiple;
   return {
-    multiple: row.multiple,
-    min_radius_in: row.multiple * cable_od_in,
+    multiple,
+    min_radius_in: multiple * cable_od_in,
     attribution: row.attribution,
   };
 }
 
 export const bendRadiusExample = {
   inputs: { cable_type: "THHN", cable_od_in: 0.5 },
-  expected: { min_radius_in: 4 },
+  expected: { min_radius_in: 2 },
 };
 
 // --- Utility 127: Power Factor Correction Capacitor ---
@@ -4682,16 +4687,19 @@ ELECTRICAL_RENDERERS["rooftop-temp-adder"] = _v174renderRooftopTempAdder;
 // NEC 110.26(A) working-space clearance reference lookup.
 // =====================================================================
 
+// NEC 2023 Table 110.26(A)(1). The 601-1000 V row (3 / 4 / 5 ft), added in
+// the 2017 NEC, was missing until 2026-09-24, so the tile refused that band.
 const _WORKING_SPACE_DEPTH = {
   "0-150 V": { 1: 3.0, 2: 3.0, 3: 3.0 },
   "151-600 V": { 1: 3.0, 2: 3.5, 3: 4.0 },
+  "601-1000 V": { 1: 3.0, 2: 4.0, 3: 5.0 },
 };
 
 // dims: in { nominal_v_to_ground: dimensionless, condition: dimensionless, equipment_width_in: L } out: { depth_ft: L, width_in: L, height_ft: L }
 export function computeWorkingSpace11026({ nominal_v_to_ground = "0-150 V", condition = 1, equipment_width_in = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const band = _WORKING_SPACE_DEPTH[nominal_v_to_ground];
-  if (!band) return { error: "Voltage band must be \"0-150 V\" or \"151-600 V\"." };
+  if (!band) return { error: "Voltage band must be \"0-150 V\", \"151-600 V\", or \"601-1000 V\" (above 1000 V, Table 110.34(A) applies)." };
   const cond = Number(condition) || 0;
   const depth_ft = band[cond];
   if (depth_ft === undefined) return { error: "Condition must be 1, 2, or 3." };
@@ -4715,6 +4723,7 @@ function _v176renderWorkingSpace11026(inputRegion, outputRegion, citationEl) {
   const band = makeSelect("Nominal voltage to ground", "ws-band", [
     { value: "0-150 V", label: "0-150 V (e.g. 120/208Y)" },
     { value: "151-600 V", label: "151-600 V (e.g. 277/480Y)" },
+    { value: "601-1000 V", label: "601-1000 V (e.g. 1000 V dc PV)" },
   ]);
   const cond = makeSelect("Condition (what is opposite the live parts)", "ws-cond", [
     { value: "1", label: "Condition 1 - nothing live/grounded opposite" },

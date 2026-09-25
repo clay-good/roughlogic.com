@@ -2253,9 +2253,10 @@ test("monotonicity: computeHydrantFlow flow_gpm is strictly increasing in outlet
 // three different catalog groups: computeBendRadius (Group A), computeAsphaltTonnage
 // (Group E), computeMaterialCost (Group G).
 
-test("monotonicity: computeBendRadius min_radius_in is strictly increasing in cable_od_in (Southwire 8x-multiplier linear pin)", () => {
-  // Group A. min_radius = multiple * cable_od; at THHN single-conductor
-  // the multiplier is 8 (Southwire technical bulletin); linear in OD.
+test("monotonicity: computeBendRadius min_radius_in is strictly increasing in cable_od_in (Southwire 4D/5D/6D steps)", () => {
+  // Group A. min_radius = multiple * cable_od; for THHN at 1000 V and below
+  // Southwire gives 4D to 1.0 in OD, 5D to 2.0 in, 6D above -- the steps only
+  // raise the multiple, so the radius stays strictly increasing in OD.
   let prev = -Infinity;
   for (const od of [0.25, 0.5, 0.75, 1, 1.5, 2, 3]) {
     const r = computeBendRadius({ cable_type: "THHN", cable_od_in: od });
@@ -2263,10 +2264,10 @@ test("monotonicity: computeBendRadius min_radius_in is strictly increasing in ca
     assert.ok(r.min_radius_in > prev, `min_radius at OD=${od} = ${r.min_radius_in} not greater than prev=${prev}`);
     prev = r.min_radius_in;
   }
-  // 8x multiplier pin: at OD=1.0 in the min_radius must be 8.0 exactly.
+  // 4D pin: at OD=1.0 in (the top of the 4D row) the min_radius is 4.0 exactly.
   const at1 = computeBendRadius({ cable_type: "THHN", cable_od_in: 1.0 });
-  assert.equal(at1.multiple, 8);
-  assert.equal(at1.min_radius_in, 8);
+  assert.equal(at1.multiple, 4);
+  assert.equal(at1.min_radius_in, 4);
 });
 
 test("monotonicity: computeAsphaltTonnage tons is strictly increasing in area_ft2 + depth_in (cubic-volume linear pin)", () => {

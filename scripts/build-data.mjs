@@ -287,8 +287,8 @@ const CABLE_BEND_RADIUS = {
   source: "Manufacturer technical bulletins (Southwire, AFC Cable Systems, Belden, Corning). Each row attributes the publishing manufacturer.",
   notes: "Minimum inside bend radius expressed as a multiple of cable outside diameter (OD).",
   cables: [
-    { type: "THHN", multiple_of_OD: 8, attribution: "Southwire technical bulletin (single conductor, no shield)" },
-    { type: "XHHW", multiple_of_OD: 8, attribution: "Southwire technical bulletin (single conductor, no shield)" },
+    { type: "THHN", multiple_of_OD: 4, multiple_by_max_OD_in: { "1.0": 4, "2.0": 5, "over": 6 }, attribution: "Southwire minimum bend radius table, 1000 V and below (single conductor, no shield)" },
+    { type: "XHHW", multiple_of_OD: 4, multiple_by_max_OD_in: { "1.0": 4, "2.0": 5, "over": 6 }, attribution: "Southwire minimum bend radius table, 1000 V and below (single conductor, no shield)" },
     { type: "MC", multiple_of_OD: 7, attribution: "AFC Cable Systems technical reference" },
     { type: "control", multiple_of_OD: 6, attribution: "Belden control cable bulletin" },
     { type: "coax", multiple_of_OD: 10, attribution: "Belden coax bulletin (rigid runs)" },

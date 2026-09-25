@@ -756,12 +756,18 @@ ELECDESIGN_RENDERERS["luminaire-spacing-mh-ratio"] = _simpleRenderer({
 // ===================== spec-v1420: ground grid conductor sizing (IEEE 80) =====================
 // IEEE 80 Kf constants: the temperature limit is set by the JOINT, not the conductor,
 // which is why the same copper gets a different constant depending on how it is joined.
+// Kf values are IEEE 80 Table 2 rows. Until 2026-09-24 the bolted-copper
+// constant was 11.5, in no row (the 250 C hard-drawn row is 11.78), so 4/0
+// passed an 18 kA / 1 s fault it is 0.4 kcmil short for; steel was 15.9 for
+// 15.95; and copper-clad steel was one value where the table has three.
 export const IEEE80_KF = {
-  copper_brazed: { kf: 7.00, label: "Soft-drawn copper, brazed or exothermic joints" },
-  copper_hard_brazed: { kf: 7.06, label: "Hard-drawn copper, brazed joints" },
-  copper_bolted: { kf: 11.5, label: "Copper, bolted or pressure connections" },
-  copper_clad_steel: { kf: 14.6, label: "Copper-clad steel" },
-  steel: { kf: 15.9, label: "Steel" },
+  copper_brazed: { kf: 7.00, label: "Soft-drawn copper, to its fusing temperature (exothermic joints)" },
+  copper_hard_brazed: { kf: 7.06, label: "Hard-drawn copper, to its fusing temperature" },
+  copper_bolted: { kf: 11.78, label: "Hard-drawn copper limited to 250 C (bolted or pressure connections)" },
+  copper_clad_steel: { kf: 14.64, label: "Copper-clad steel rod (20% conductivity)" },
+  copper_clad_steel_wire_40: { kf: 10.45, label: "Copper-clad steel wire (40% conductivity)" },
+  copper_clad_steel_wire_30: { kf: 12.06, label: "Copper-clad steel wire (30% conductivity)" },
+  steel: { kf: 15.95, label: "Steel 1020" },
 };
 
 // dims: in { fault_current_ka: I, clearing_time_s: T, material: dimensionless, installed_kcmil: L^2 } out: { area_kcmil: L^2, area_cmil: L^2 }
@@ -789,7 +795,7 @@ export function computeGroundingGridConductor({ fault_current_ka = 0, clearing_t
     kf: m.kf,
     adequate,
     verdict,
-    note: "The smallest grounding-grid conductor that survives a fault long enough for protection to clear it, by the IEEE 80 sizing relation. The conductor has to carry the fault without reaching a temperature that damages it or, worse, its joints -- and the constant encodes the material's thermal capacity and its temperature limit, where the limit is set by the JOINT rather than by the conductor. A bolted or pressure connection has to be held far below the conductor's fusing point while an exothermic or brazed connection can go much higher, which is why the same copper gets a different constant depending on how it is joined. Two properties of the relation matter in practice. It scales with the SQUARE ROOT of time, so a fault that clears in a quarter of the time needs only half the conductor, which makes protection speed a real substitute for copper. And it scales LINEARLY with current, so a system with high available fault current needs proportionally more conductor everywhere in the grid. A conductor carrying 12 kA for 0.5 s needs 59.4 kcmil of brazed copper or 135.3 kcmil of steel -- copper needs less than half the area for the same duty, which is most of the reason grids are copper. But the thermal number is a FLOOR and not a specification: a buried grid conductor is handled, tamped over, and expected to last forty years in soil, so 4/0 copper is the common practical minimum regardless of what the thermal calculation allows. This is the bare-grid counterpart to the insulated-conductor thermal withstand calculation, which works from the ICEA adiabatic relation and an insulation temperature limit instead. A screen, never a stamp; IEEE 80 in full, the soil and corrosion conditions, and the engineer of record govern.",
+    note: "The smallest grounding-grid conductor that survives a fault long enough for protection to clear it, by the IEEE 80 sizing relation. The conductor has to carry the fault without reaching a temperature that damages it or, worse, its joints -- and the constant encodes the material's thermal capacity and its temperature limit, where the limit is set by the JOINT rather than by the conductor. A bolted or pressure connection has to be held far below the conductor's fusing point while an exothermic or brazed connection can go much higher, which is why the same copper gets a different constant depending on how it is joined. Two properties of the relation matter in practice. It scales with the SQUARE ROOT of time, so a fault that clears in a quarter of the time needs only half the conductor, which makes protection speed a real substitute for copper. And it scales LINEARLY with current, so a system with high available fault current needs proportionally more conductor everywhere in the grid. A conductor carrying 12 kA for 0.5 s needs 59.4 kcmil of copper at its fusing limit or 135.3 kcmil of steel 1020 -- copper needs less than half the area for the same duty, which is most of the reason grids are copper. But the thermal number is a FLOOR and not a specification: a buried grid conductor is handled, tamped over, and expected to last forty years in soil, so 4/0 copper is the common practical minimum regardless of what the thermal calculation allows. This is the bare-grid counterpart to the insulated-conductor thermal withstand calculation, which works from the ICEA adiabatic relation and an insulation temperature limit instead. A screen, never a stamp; IEEE 80 in full, the soil and corrosion conditions, and the engineer of record govern.",
   };
 }
 
