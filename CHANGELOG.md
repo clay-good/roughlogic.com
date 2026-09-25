@@ -6,6 +6,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Changed
 
+- **Seven more tiles now carry a publisher's printed worked example.**
+  - **Fire protection:** `fire-pump-curve` (Consulting-Specifying Engineer), `jockey-pump-sizing` (NFPA 20 Annex A.14.2.6 setpoints).
+  - **Egress:** `egress-capacity` (IBC width factor, via iDigHardware).
+  - **Masonry:** `masonry-prism-fm` (TMS 602-16 Table 2, via NCMA TEK 18-01D); `cmu-wall-flexure` and `cmu-shear-wall` (The Masonry Society's ASD Night School, Masonry Designers' Guide examples 11.4-2 and 11.4-7).
+  - **Cooling load:** `envelope-conduction-load` (PDHonline M318 CLTD examples).
+  - The egress input now names what IBC 1005.3's reduced factors require, sprinklers AND an emergency voice/alarm system, rather than "sprinklered + alarm."
+
+  README: 1,343 of 2,183 tiles are checked only against the project's own derivation (785 from first principles, 558 by a named method); 840 carry an outside source.
 - **Seventeen more tiles now carry a publisher's printed worked example**, each re-run inside the printed rounding:
   - **Electrical, from EC&M (Mike Holt) and IAEI Magazine:** `pull-box-sizing`, `hvac-equipment-circuit` (MCA 23.8 A, 40 A maximum OCPD), `max-circuit-length-for-vd` (376 ft, three-phase), `multi-motor-feeder` (52 A feeder, 87 A limit, 80 A breaker).
   - **Concrete:** `fresh-concrete-temp`, `concrete-yield`, `water-cement-ratio` (PCA *Design and Control of Concrete Mixtures*, 15th ed.); `rc-beam-flexure` and `rc-development-length` (University of Memphis CIVL 4135 examples).

@@ -5606,7 +5606,7 @@ function _renderEgressCapacity(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: IBC 2021 §1005.3 (egress width = occupant load x capacity factor), Table 1006.3.4(2) (one exit allowed on the first story up to 49 for A/B/E/F/M, 29 for S, 10 for I/R-1/R-2 sleeping units/H-4/H-5, 3 for H-2/H-3; on the second story only B/F/M/S, up to 29; none from the third story up) and Table 1006.3.3 (2 exits to 500, 3 to 1,000, 4 beyond), §1010.1.1 (32 in minimum door clear width). Capacity factors: sprinklered-with-alarm 0.2 in/occ stairs, 0.15 in/occ level; non-sprinklered 0.3 / 0.2, and Groups H and I-2 take 0.3 / 0.2 even when sprinklered. The reduced factors require the §1005.3.1/.2 sprinkler and emergency-communication conditions; the width is divided among the required exits; the door-leaf minimum and §1005.7 projections can govern. A design aid, not a code-official determination.";
   _aeC(inputRegion, () => fillExample(egressCapacityExample.inputs));
   const ol = _mnC("Occupant load (persons)", "egc-ol", { step: "any", min: "0" });
-  const sp = _msC("Sprinklered + alarm (1005.3.1/.2)", "egc-sp", [{ value: "yes", label: "Yes" }, { value: "no", label: "No" }]);
+  const sp = _msC("Sprinklered AND emergency voice/alarm system (1005.3.1/.2 exceptions)", "egc-sp", [{ value: "yes", label: "Yes" }, { value: "no", label: "No" }]);
   const pa = _msC("Egress component", "egc-pa", [{ value: "level", label: "Level (doors, corridors, ramps)" }, { value: "stair", label: "Stairway" }]);
   const md = _mnC("Minimum door clear width (in)", "egc-md", { step: "any", min: "0" });
   md.input.value = "32";

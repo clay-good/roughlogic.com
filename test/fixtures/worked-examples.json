@@ -37560,6 +37560,50 @@
    }
   },
   {
+   "tile_id": "envelope-conduction-load",
+   "source_publisher": "PDHonline (A. Bhatia)",
+   "source_title": "Course M318, HVAC Cooling Load Calculations and Principles",
+   "source_edition_or_year": "course text",
+   "source_section_or_page": "p. 39: south wall U 0.2, A 192 ft^2, CLTD 18 -> 691 Btu/hr",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "area_ft2": 192,
+    "u_factor": 0.2,
+    "cltd_f": 18
+   },
+   "outputs": {
+    "q_cond": {
+     "value": 691,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "envelope-conduction-load",
+   "source_publisher": "PDHonline (A. Bhatia)",
+   "source_title": "Course M318, HVAC Cooling Load Calculations and Principles",
+   "source_edition_or_year": "course text",
+   "source_section_or_page": "p. 41: window U 0.55, A 48 ft^2, CLTD 9 -> 238 Btu/hr",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "area_ft2": 48,
+    "u_factor": 0.55,
+    "cltd_f": 9
+   },
+   "outputs": {
+    "q_cond": {
+     "value": 238,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
    "tile_id": "manual-d-friction-rate",
    "source_publisher": "ACCA Manual D",
    "source_title": "0.60 ESP, 0.42 drops, 180 ft TEL -> ASP 0.18, FR 0.10 in wg/100 ft",
@@ -42151,6 +42195,40 @@
      "value": 130,
      "tolerance": {
       "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "jockey-pump-sizing",
+   "source_publisher": "Fire Protection Specialists (reproducing NFPA 20 Annex A.14.2.6)",
+   "source_title": "Fire Pump Settings",
+   "source_edition_or_year": "October 15, 2018",
+   "source_section_or_page": "1,000 gpm, 100 psi pump, 115 psi churn, 50 psi minimum static: jockey stop 115 + 50 = 165, jockey start 155, fire pump start 150 psi",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "fire_pump_gpm": 1000,
+    "churn_psi": 115,
+    "min_static_psi": 50
+   },
+   "outputs": {
+    "jockey_stop_psi": {
+     "value": 165,
+     "tolerance": {
+      "abs": 0.005
+     }
+    },
+    "jockey_start_psi": {
+     "value": 155,
+     "tolerance": {
+      "abs": 0.005
+     }
+    },
+    "fire_pump_start_psi": {
+     "value": 150,
+     "tolerance": {
+      "abs": 0.005
      }
     }
    }
@@ -47925,6 +48003,35 @@
    }
   },
   {
+   "tile_id": "egress-capacity",
+   "source_publisher": "iDigHardware (Lori Greene)",
+   "source_title": "Decoded: Calculating the Egress Width of Door Openings",
+   "source_edition_or_year": "February 2025 (IBC 2024)",
+   "source_section_or_page": "nonsprinklered: 300 occupants x 0.2 in. per occupant = 60 in.",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "occupant_load": 300,
+    "sprinklered": false,
+    "path": "level",
+    "min_door_in": 32
+   },
+   "outputs": {
+    "factor": {
+     "value": 0.2,
+     "tolerance": {
+      "abs": 0.0005
+     }
+    },
+    "total_width_in": {
+     "value": 60,
+     "tolerance": {
+      "abs": 0.005
+     }
+    }
+   }
+  },
+  {
    "tile_id": "plumbing-fixture-count",
    "source_publisher": "IBC 2021 Table 2902.1 (mirrored in IPC Table 403.1)",
    "source_title": "100-occupant business office -> 4 water closets, 4 lavatories, 1 fountain",
@@ -50766,6 +50873,58 @@
    }
   },
   {
+   "tile_id": "fire-pump-curve",
+   "source_publisher": "Consulting-Specifying Engineer (Milosh Puchovsky)",
+   "source_title": "Using fire pump speed as a design consideration",
+   "source_edition_or_year": "June 2, 2022",
+   "source_section_or_page": "A pump rated at 90 psi cannot develop a churn pressure greater than 126 psi (140%); 65% of rated at 150% flow is 58.5 psi",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "rated_gpm": 500,
+    "rated_psi": 90,
+    "churn_psi": 120,
+    "overload_psi": 60
+   },
+   "outputs": {
+    "churn_limit_psi": {
+     "value": 126,
+     "tolerance": {
+      "abs": 0.005
+     }
+    },
+    "overload_min_psi": {
+     "value": 58.5,
+     "tolerance": {
+      "abs": 0.005
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "fire-pump-curve",
+   "source_publisher": "Consulting-Specifying Engineer (Milosh Puchovsky)",
+   "source_title": "Using fire pump speed as a design consideration",
+   "source_edition_or_year": "June 2, 2022",
+   "source_section_or_page": "For the 750 gpm pump in Figure 2, 150% of rated flow is 1,125 gpm",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "rated_gpm": 750,
+    "rated_psi": 100,
+    "churn_psi": 128,
+    "overload_psi": 72
+   },
+   "outputs": {
+    "overload_flow_gpm": {
+     "value": 1125,
+     "tolerance": {
+      "abs": 0.005
+     }
+    }
+   }
+  },
+  {
    "tile_id": "sprinkler-system-demand",
    "source_publisher": "NFPA 13 (Standard for the Installation of Sprinkler Systems)",
    "source_title": "Ordinary Hazard Group 2: 0.20 gpm/ft^2 x 1,500 ft^2 + 250 gpm hose over 90 min -> 550 gpm, 49,500 gal",
@@ -52650,6 +52809,48 @@
    }
   },
   {
+   "tile_id": "cmu-wall-flexure",
+   "source_publisher": "The Masonry Society, ASD Night School",
+   "source_title": "#2 Design of Beams (Masonry Designers' Guide Example 11.4-2)",
+   "source_edition_or_year": "February 2022",
+   "source_section_or_page": "slide 43: f'm 2,000, As 0.44, b 7.625, d 45.6 -> n 16.11, rho 0.00126 (TMS truncates 0.0012655), k 0.1825, j 0.939",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "fm_psi": 2000,
+    "as_in2": 0.44,
+    "d_in": 45.6,
+    "b_in": 7.625,
+    "fs_psi": 32000
+   },
+   "outputs": {
+    "n_ratio": {
+     "value": 16.11,
+     "tolerance": {
+      "abs": 0.005
+     }
+    },
+    "rho": {
+     "value": 0.00126,
+     "tolerance": {
+      "abs": 1e-05
+     }
+    },
+    "k": {
+     "value": 0.1825,
+     "tolerance": {
+      "abs": 0.0005
+     }
+    },
+    "j": {
+     "value": 0.939,
+     "tolerance": {
+      "abs": 0.0005
+     }
+    }
+   }
+  },
+  {
    "tile_id": "cmu-shear-wall",
    "source_publisher": "TMS 402-16 (ACI 530 / ASCE 5) via Masonry Designers' Guide / CMHA TEK 14-07C",
    "source_title": "8 in x 8 ft wall, f'm 1,500, 20 kip axial, M/(Vdv) 0.5, #4 at 48 in -> Fvm 67.3 + Fvs 8.7 = 76.1 psi, Va 55.7 kip",
@@ -52746,6 +52947,45 @@
      "value": 38.294,
      "tolerance": {
       "abs": 0.005
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "cmu-shear-wall",
+   "source_publisher": "The Masonry Society, ASD Night School",
+   "source_title": "#4 Wall Design for In-Plane Loads (Masonry Designers' Guide Example 11.4-7)",
+   "source_edition_or_year": "March 2, 2022 (TMS 402-16 ASD)",
+   "source_section_or_page": "slides 64-66: f'm 2,900, b 5.5, dv 288, P 124,800 lb, M/(Vd) 1.0, no shear steel -> Fvm 80.3 psi, Fv max 2 sqrt(f'm) = 107.7 psi",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "fm_psi": 2900,
+    "b_in": 5.5,
+    "dv_in": 288,
+    "p_lb": 124800,
+    "mvd": 1.0,
+    "av_in2": 0,
+    "s_in": 48,
+    "fs_psi": 32000
+   },
+   "outputs": {
+    "an_in2": {
+     "value": 1584,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "fvm": {
+     "value": 80.3,
+     "tolerance": {
+      "abs": 0.05
+     }
+    },
+    "fv_max": {
+     "value": 107.7,
+     "tolerance": {
+      "abs": 0.05
      }
     }
    }
@@ -52870,6 +53110,72 @@
      "value": 1750.0,
      "tolerance": {
       "abs": 0.001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "masonry-prism-fm",
+   "source_publisher": "NCMA",
+   "source_title": "TEK 18-01D, Evaluating the Compressive Strength of Concrete Masonry (Table 2, TMS 602-16)",
+   "source_edition_or_year": "2015/2016",
+   "source_section_or_page": "Table 2: concrete units 2,600 psi with Type M or S mortar -> f'm 2,250 psi",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "unit_type": "concrete",
+    "unit_strength_psi": 2600,
+    "mortar_type": "ms"
+   },
+   "outputs": {
+    "f_m_psi": {
+     "value": 2250,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "masonry-prism-fm",
+   "source_publisher": "NCMA",
+   "source_title": "TEK 18-01D, Evaluating the Compressive Strength of Concrete Masonry (Table 2, TMS 602-16)",
+   "source_edition_or_year": "2015/2016",
+   "source_section_or_page": "Table 2: concrete units 4,500 psi with Type M or S mortar -> f'm 3,000 psi",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "unit_type": "concrete",
+    "unit_strength_psi": 4500,
+    "mortar_type": "ms"
+   },
+   "outputs": {
+    "f_m_psi": {
+     "value": 3000,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "masonry-prism-fm",
+   "source_publisher": "NCMA",
+   "source_title": "TEK 18-01D, Evaluating the Compressive Strength of Concrete Masonry (Table 2, TMS 602-16)",
+   "source_edition_or_year": "2015/2016",
+   "source_section_or_page": "Table 2: concrete units 3,400 psi with Type N mortar -> f'm 2,250 psi",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "unit_type": "concrete",
+    "unit_strength_psi": 3400,
+    "mortar_type": "n"
+   },
+   "outputs": {
+    "f_m_psi": {
+     "value": 2250,
+     "tolerance": {
+      "abs": 0.5
      }
     }
    }
