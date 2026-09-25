@@ -400,14 +400,14 @@ test("Backflow: bigger pipe -> less loss at same flow", () => {
   assert.ok(b.pressure_loss_psi < a.pressure_loss_psi);
 });
 
-test("Backflow: clamps below first point", () => {
+test("Backflow: an RP starts near 10 psi at zero flow (Watts LF909 chart)", () => {
   const r = computeBackflowLoss({ device_class: "RP", flow_gpm: 0, pipe_size_in: "1" });
-  assert.equal(r.pressure_loss_psi, 0);
+  assert.equal(r.pressure_loss_psi, 10);
 });
 
-test("Backflow: clamps above last point", () => {
+test("Backflow: flow past the end of the curve is declined, not clamped", () => {
   const r = computeBackflowLoss({ device_class: "RP", flow_gpm: 1000, pipe_size_in: "1" });
-  assert.equal(r.pressure_loss_psi, 13);
+  assert.ok(r.error);
 });
 
 test("Backflow: negative flow returns error", () => {

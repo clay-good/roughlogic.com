@@ -7915,9 +7915,9 @@
    "source_publisher": "Watts Regulator",
    "source_title": "Watts Series 909 RP technical bulletin: typical pressure loss across reduced-pressure backflow assemblies",
    "source_edition_or_year": "Manufacturer technical bulletin (typical RP-class loss across nominal sizes)",
-   "source_section_or_page": "1 in RP at 30 gpm -> ~8.5 psi typical loss across the assembly",
+   "source_section_or_page": "1 in RP at 30 gpm -> 14.8 psi, read from the Watts LF909 capacity chart (ES-LF909S)",
    "verified_by": "rl",
-   "verified_on": "2026-05-11",
+   "verified_on": "2026-09-24",
    "inputs": {
     "device_class": "RP",
     "flow_gpm": 30,
@@ -7925,7 +7925,7 @@
    },
    "outputs": {
     "pressure_loss_psi": {
-     "value": 8.5,
+     "value": 14.8,
      "tolerance": {
       "abs": 0.5
      }
@@ -15943,9 +15943,9 @@
    "source_publisher": "IPC / AWWA / EPA",
    "source_title": "Backflow assembly screen: high-hazard cross-connection, 2 in service at 100 GPM, 70 psi upstream",
    "source_edition_or_year": "IPC 2021 312; AWWA M14; EPA 40 CFR 141.85; Watts technical-bulletin head-loss curves (representative)",
-   "source_section_or_page": "high hazard -> RP required (override from DC); RP 2 in at 100 GPM head loss = 5 + (40/60)*3 = 7.0 psi; downstream = 70 - 7 = 63 psi",
+   "source_section_or_page": "high hazard -> RP required (override from DC); RP 2 in at 100 GPM head loss = 11.5 psi (Watts LF909 capacity chart); downstream = 70 - 11.5 = 58.5 psi",
    "verified_by": "rl",
-   "verified_on": "2026-06-05",
+   "verified_on": "2026-09-24",
    "inputs": {
     "service_flow_gpm": 100,
     "hazard": "high",
@@ -15955,13 +15955,13 @@
    },
    "outputs": {
     "head_loss_psi": {
-     "value": 7,
+     "value": 11.5,
      "tolerance": {
       "abs": 0.001
      }
     },
     "downstream_psi": {
-     "value": 63,
+     "value": 58.5,
      "tolerance": {
       "abs": 0.001
      }

@@ -265,13 +265,13 @@ test("trap-primer: zero drains is rejected", () => {
 
 // --- B.8 Backflow assembly sizing screen (10 tests) ------------------
 
-test("backflow-sizing: high-hazard double-check is overridden to RP, 2 in at 100 GPM -> 7 psi loss, 63 psi downstream", () => {
+test("backflow-sizing: high-hazard double-check is overridden to RP, 2 in at 100 GPM -> 11.5 psi loss, 58.5 psi downstream", () => {
   const r = computeBackflowSizing(backflowSizingExample.inputs);
   assert.ok(!r.error);
   assert.strictEqual(r.required_assembly, "RP");
   assert.strictEqual(r.overridden, true);
-  assert.ok(close(r.head_loss_psi, 7, 1e-9));
-  assert.ok(close(r.downstream_psi, 63, 1e-9));
+  assert.ok(close(r.head_loss_psi, 11.5, 1e-9));
+  assert.ok(close(r.downstream_psi, 58.5, 1e-9));
 });
 
 test("backflow-sizing: downstream pressure = upstream - head loss", () => {

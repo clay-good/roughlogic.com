@@ -1,9 +1,9 @@
 {
   "name": "plumbing",
-  "version": "2026-09-09",
-  "fetched": "2026-09-09",
+  "version": "2026-09-24",
+  "fetched": "2026-09-24",
   "edition": "IPC 2021; IFGC 2021 (IPC 2024 and IFGC 2027 are the current published editions; bundled values follow 2021 and the tile citations disclose it); Hazen-Williams (AWWA M11, 5th ed.); Manning (USGS WSP-2339, public domain); ASME B31.1 / B31.9 (guided-cantilever expansion-loop method); Joukowsky (1898) / ASCE MOP-49; Hydraulic Institute pump engineering practice; manufacturer specs as of 2026-09-02.",
-  "asOf": "2026-09-09",
+  "asOf": "2026-09-24",
   "refresh_cadence": "annual",
   "shards": [
     {
@@ -49,7 +49,7 @@
     {
       "file": "backflow-curves.json",
       "name": "Backflow preventer pressure-loss curves",
-      "gzip_size_bytes": 490
+      "gzip_size_bytes": 817
     },
     {
       "file": "pipe-elastic-properties.json",
@@ -76,7 +76,7 @@
     "runoff-coefficients.json": "0392e72c7fc9d4d1e7a5b0bf53fb21e07bd26c83bbae39e1feac9ccac136674e",
     "manning-roughness.json": "0ebd989b23bd04343f8e4848550b3639c37272fa3a9212cb8ab89fe02fc6822c",
     "glycol-curves.json": "c41b74c5334e311809fc62ae728a1b2d181aaee457bc7f04f56477404109617d",
-    "backflow-curves.json": "2429ca0cbad8289180b1a42ba4fe636db4e2ecc77c68789eb5a5a9326097df38",
+    "backflow-curves.json": "21edc83a0f1db626a87f0fc44a2e8c29a274357735a4037fc1fed93179f94c73",
     "pipe-elastic-properties.json": "70e8ee39a251faa435a606de8f2f8e9bc35388d769a345735c4959c4c7b7f11e",
     "pump-curves.json": "79b96ce4cfeb8ea5cc35d277fe84436eed7093fa14cd62a257d5101395f888b2",
     "thermal-expansion-coefficients.json": "900b61a8add706d0f21e9cf94f53c87b3ca76f388325b846017200b7af13e66d"

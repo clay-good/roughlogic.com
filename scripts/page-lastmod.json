@@ -418,12 +418,12 @@
       "date": "2026-09-01"
     },
     "/tools/backflow-loss/": {
-      "sha": "b7c52dc3d98819b7",
-      "date": "2026-09-04"
+      "sha": "ffd14c00f9f55e8e",
+      "date": "2026-09-25"
     },
     "/tools/backflow-sizing/": {
-      "sha": "e4ede699b85cddcc",
-      "date": "2026-09-01"
+      "sha": "99b1e9ef50660988",
+      "date": "2026-09-25"
     },
     "/tools/backflow-test-psi/": {
       "sha": "3f3f97afdae39ca1",

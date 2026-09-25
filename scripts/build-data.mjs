@@ -349,18 +349,18 @@ const GLYCOL_CURVES_DATA = {
 };
 
 const BACKFLOW_CURVES_DATA = {
-  source: "Manufacturer-published pressure-loss curves (Watts Series 909 RP, 909 DCV, 800 PVB, Series 8 AVB technical bulletins). Each device class attributes the publishing manufacturer.",
+  source: "RP and PVB: Watts Series LF909 (ES-LF909S) and Series 800M4QT (ES-800M4QT) capacity charts, read from the published curves. DCV and AVB: typical curves naming no specific product; the maker's published curve governs.",
   attribution: {
-    RP: "Watts Series 909 RP technical bulletin (typical)",
-    DCV: "Watts Series 909 DCV technical bulletin (typical)",
-    PVB: "Watts Series 800 PVB technical bulletin (typical)",
-    AVB: "Watts Series 8 AVB technical bulletin (typical)",
+    RP: "Watts Series LF909 reduced-pressure zone assembly capacity charts (ES-LF909S), read from the published curves (upper envelope)",
+    DCV: "Typical double-check valve assembly curve (no specific product; the assembly maker's published curve governs)",
+    PVB: "Watts Series 800M4QT pressure vacuum breaker capacity charts (ES-800M4QT), read from the published curves",
+    AVB: "Typical atmospheric vacuum breaker curve (no specific product; the maker's published curve governs)",
   },
   curves: {
-    RP: { "0.75": [[0,0],[10,9],[20,12],[30,15]], "1": [[0,0],[20,7],[40,10],[60,13]], "1.5": [[0,0],[40,6],[80,9],[120,12]], "2": [[0,0],[60,5],[120,8],[180,11]] },
-    DCV: { "0.75": [[0,0],[10,4],[20,6],[30,8]], "1": [[0,0],[20,3.5],[40,5],[60,7]], "1.5": [[0,0],[40,3],[80,4.5],[120,6]], "2": [[0,0],[60,2.5],[120,4],[180,5.5]] },
-    PVB: { "0.75": [[0,0],[10,5],[20,7],[30,9]], "1": [[0,0],[20,4],[40,6],[60,8]], "1.5": [[0,0],[40,3.5],[80,5],[120,7]], "2": [[0,0],[60,3],[120,4.5],[180,6]] },
-    AVB: { "0.75": [[0,0],[10,3],[20,5],[30,7]], "1": [[0,0],[20,2.5],[40,4],[60,6]] },
+    RP: {"1": [[0,10],[5,13.5],[15,14.8],[30,14.8],[40,15.3],[50,16.8],[60,18.8]], "2": [[0,10],[10,10.8],[75,10.8],[100,11.5],[125,11.8],[150,12.5],[175,13.8],[190,14.5]], "0.75": [[0,10.5],[5,12.2],[10,13.2],[12.5,13.8],[20,13.8],[25,13.8],[30,16]], "1.25": [[0,10],[10,11.3],[40,11.3],[60,11.5],[80,12.2],[90,12.4]], "1.5": [[0,10],[10,11.5],[80,11.5],[100,12.8]]},
+    DCV: {"1": [[0,0],[20,3.5],[40,5],[60,7]], "2": [[0,0],[60,2.5],[120,4],[180,5.5]], "0.75": [[0,0],[10,4],[20,6],[30,8]], "1.5": [[0,0],[40,3],[80,4.5],[120,6]]},
+    PVB: {"1": [[0,0.3],[10,2],[20,2.8],[30,4.5],[40,6.5],[50,8.5],[60,10]], "2": [[0,1.5],[20,2.7],[40,3],[60,4.5],[80,5],[100,5.8],[120,7],[140,8.3],[160,9],[180,11]], "0.75": [[0,2],[5,3],[10,4.2],[15,5.3],[20,6.5],[25,7.8],[30,10]], "1.25": [[0,0],[10,2],[20,3.3],[40,3.3],[50,4.8],[70,5.5],[80,6.5]], "1.5": [[0,2],[20,3.2],[40,3.4],[50,3.5],[60,4.5],[80,5],[100,6.5],[120,8]]},
+    AVB: {"1": [[0,0],[20,2.5],[40,4],[60,6]], "0.75": [[0,0],[10,3],[20,5],[30,7]]},
   },
 };
 

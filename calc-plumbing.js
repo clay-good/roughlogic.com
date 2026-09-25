@@ -1268,11 +1268,21 @@ export const expansionTankExample = {
 // Manufacturer-published curves bundled in data/plumbing/backflow-curves.json.
 // Linear interpolation per device class by flow gpm and pipe size.
 
+// RP and PVB are read from the Watts capacity charts they cite (Series LF909
+// reduced-pressure zone, sheet ES-LF909S; Series 800M4QT pressure vacuum
+// breaker, ES-800M4QT), whose loss starts near 10 psi at zero flow for an RP
+// -- the relief-valve differential. Until 2026-09-24 the RP curves started at
+// 0 psi and ran 4-7 psi under the chart (a 1 in RP at 40 gpm read 10 psi, the
+// chart ~15), and the PVB curves ran low at high flow (2 in at 180 gpm read 6,
+// the chart ~11) -- both overstating the pressure left downstream. The RP charts dip a
+// little as the checks open; the curves here are their running maximum, so the
+// tile never reports less loss than the chart. DCV and
+// AVB name no real product and are labeled typical.
 export const BACKFLOW_CURVES = {
-  RP: { attribution: "Watts Series 909 RP technical bulletin (typical)", points: { "0.75": [[0,0],[10,9],[20,12],[30,15]], "1": [[0,0],[20,7],[40,10],[60,13]], "1.5": [[0,0],[40,6],[80,9],[120,12]], "2": [[0,0],[60,5],[120,8],[180,11]] } },
-  DCV: { attribution: "Watts Series 909 DCV technical bulletin (typical)", points: { "0.75": [[0,0],[10,4],[20,6],[30,8]], "1": [[0,0],[20,3.5],[40,5],[60,7]], "1.5": [[0,0],[40,3],[80,4.5],[120,6]], "2": [[0,0],[60,2.5],[120,4],[180,5.5]] } },
-  PVB: { attribution: "Watts Series 800 PVB technical bulletin (typical)", points: { "0.75": [[0,0],[10,5],[20,7],[30,9]], "1": [[0,0],[20,4],[40,6],[60,8]], "1.5": [[0,0],[40,3.5],[80,5],[120,7]], "2": [[0,0],[60,3],[120,4.5],[180,6]] } },
-  AVB: { attribution: "Watts Series 8 AVB technical bulletin (typical)", points: { "0.75": [[0,0],[10,3],[20,5],[30,7]], "1": [[0,0],[20,2.5],[40,4],[60,6]] } },
+  RP: { attribution: "Watts Series LF909 reduced-pressure zone assembly capacity charts (ES-LF909S), read from the published curves (upper envelope)", points: { "0.75": [[0,10.5],[5,12.2],[10,13.2],[12.5,13.8],[20,13.8],[25,13.8],[30,16]], "1": [[0,10],[5,13.5],[15,14.8],[30,14.8],[40,15.3],[50,16.8],[60,18.8]], "1.25": [[0,10],[10,11.3],[40,11.3],[60,11.5],[80,12.2],[90,12.4]], "1.5": [[0,10],[10,11.5],[80,11.5],[100,12.8]], "2": [[0,10],[10,10.8],[75,10.8],[100,11.5],[125,11.8],[150,12.5],[175,13.8],[190,14.5]] } },
+  DCV: { attribution: "Typical double-check valve assembly curve (no specific product; the assembly maker\'s published curve governs)", points: { "0.75": [[0,0],[10,4],[20,6],[30,8]], "1": [[0,0],[20,3.5],[40,5],[60,7]], "1.5": [[0,0],[40,3],[80,4.5],[120,6]], "2": [[0,0],[60,2.5],[120,4],[180,5.5]] } },
+  PVB: { attribution: "Watts Series 800M4QT pressure vacuum breaker capacity charts (ES-800M4QT), read from the published curves", points: { "0.75": [[0,2],[5,3],[10,4.2],[15,5.3],[20,6.5],[25,7.8],[30,10]], "1": [[0,0.3],[10,2],[20,2.8],[30,4.5],[40,6.5],[50,8.5],[60,10]], "1.25": [[0,0],[10,2],[20,3.3],[40,3.3],[50,4.8],[70,5.5],[80,6.5]], "1.5": [[0,2],[20,3.2],[40,3.4],[50,3.5],[60,4.5],[80,5],[100,6.5],[120,8]], "2": [[0,1.5],[20,2.7],[40,3],[60,4.5],[80,5],[100,5.8],[120,7],[140,8.3],[160,9],[180,11]] } },
+  AVB: { attribution: "Typical atmospheric vacuum breaker curve (no specific product; the maker\'s published curve governs)", points: { "0.75": [[0,0],[10,3],[20,5],[30,7]], "1": [[0,0],[20,2.5],[40,4],[60,6]] } },
 };
 
 // dims: in { device_class: dimensionless, flow_gpm: L^3 T^-1, pipe_size_in: L } out: { loss_psi: M L^-1 T^-2 }
@@ -1284,6 +1294,9 @@ export function computeBackflowLoss({ device_class = "RP", flow_gpm = 0, pipe_si
   if (!(flow_gpm >= 0)) return { error: "Flow must be non-negative." };
   // Interpolate.
   let psi_loss;
+  // Past the end of a published curve the loss keeps rising; holding the last
+  // point would understate it, so the tile declines instead.
+  if (flow_gpm > pts[pts.length - 1][0]) return { error: "Flow exceeds the " + pts[pts.length - 1][0] + " gpm end of the bundled curve for this size; use the next size up or the manufacturer's chart." };
   if (flow_gpm <= pts[0][0]) psi_loss = pts[0][1];
   else if (flow_gpm >= pts[pts.length - 1][0]) psi_loss = pts[pts.length - 1][1];
   else {
@@ -1473,11 +1486,11 @@ export function renderExpansionTank(inputRegion, outputRegion, citationEl) {
 
 // dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderBackflowLoss(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: Manufacturer-published backflow preventer pressure-loss curves (Watts technical bulletins). Each result attributes the publishing manufacturer.";
+  citationEl.textContent = "Citation: Watts capacity charts, read from the published curves: Series LF909 reduced-pressure zone (ES-LF909S) and Series 800M4QT pressure vacuum breaker (ES-800M4QT). An RP starts near 10 psi at zero flow -- the relief-valve differential. DCV and AVB are typical curves; the assembly maker's chart governs.";
   attachExampleButton(inputRegion, () => fillExample(backflowLossExample.inputs));
   const dc = makeSelect("Device class", "bl-dc", Object.keys(BACKFLOW_CURVES).map((k) => ({ value: k, label: k })));
   const f = makeNumber("Flow (gpm)", "bl-f", { step: "any", min: "0" });
-  const ps = makeSelect("Pipe size", "bl-ps", ["0.75", "1", "1.5", "2"].map((s) => ({ value: s, label: s + "\"" })));
+  const ps = makeSelect("Pipe size", "bl-ps", ["0.75", "1", "1.25", "1.5", "2"].map((s) => ({ value: s, label: s + "\"" })));
   for (const x of [dc, f, ps]) inputRegion.appendChild(x.wrap);
   const oL = makeOutputLine(outputRegion, "Pressure loss", "bl-out-l");
   const oA = makeOutputLine(outputRegion, "Source", "bl-out-a");

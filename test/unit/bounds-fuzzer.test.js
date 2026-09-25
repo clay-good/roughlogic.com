@@ -8301,15 +8301,14 @@ test("bounds: calc-plumbing computeExpansionTank pins V_tank = V*((rho_c/rho_h)-
 
 test("bounds: calc-plumbing computeBackflowLoss linearly interpolates a manufacturer curve on the spec RP / 1\" / 30 gpm example", () => {
   const r = computeBackflowLoss({ device_class: "RP", flow_gpm: 30, pipe_size_in: "1" });
-  // Curve for RP 1": (0,0),(20,7),(40,10),(60,13). 30 between (20,7) and (40,10); t=0.5 -> 8.5.
-  assert.ok(Math.abs(r.pressure_loss_psi - 8.5) < 1e-9);
+  // Watts LF909 1" chart envelope: flat at 14.8 psi from 15 to 30 gpm.
+  assert.ok(Math.abs(r.pressure_loss_psi - 14.8) < 1e-9);
   assert.ok(typeof r.attribution === "string");
-  // Clamp below first point.
+  // Zero flow reads the chart's ~10 psi relief differential.
   const lo = computeBackflowLoss({ device_class: "RP", flow_gpm: 0, pipe_size_in: "1" });
-  assert.strictEqual(lo.pressure_loss_psi, 0);
-  // Clamp above last point.
-  const hi = computeBackflowLoss({ device_class: "RP", flow_gpm: 1e6, pipe_size_in: "1" });
-  assert.strictEqual(hi.pressure_loss_psi, 13);
+  assert.strictEqual(lo.pressure_loss_psi, 10);
+  // Past the end of the curve: declined.
+  assert.ok("error" in computeBackflowLoss({ device_class: "RP", flow_gpm: 1e6, pipe_size_in: "1" }));
   // Rejections.
   assert.ok("error" in computeBackflowLoss({ device_class: "BOGUS", flow_gpm: 10, pipe_size_in: "1" }));
   assert.ok("error" in computeBackflowLoss({ device_class: "RP", flow_gpm: 10, pipe_size_in: "99" }));
@@ -8320,8 +8319,8 @@ test("bounds: calc-plumbing computeBackflowSizing pins the high-hazard RP overri
   const r = computeBackflowSizing({ service_flow_gpm: 100, hazard: "high", assembly_type: "DC", pipe_size_in: "2", upstream_pressure_psi: 70 });
   assert.strictEqual(r.required_assembly, "RP");
   assert.strictEqual(r.overridden, true);
-  assert.ok(Math.abs(r.head_loss_psi - 7) < 1e-9);
-  assert.ok(Math.abs(r.downstream_psi - 63) < 1e-9);
+  assert.ok(Math.abs(r.head_loss_psi - 11.5) < 1e-9); // Watts LF909 2 in at 100 gpm
+  assert.ok(Math.abs(r.downstream_psi - 58.5) < 1e-9);
   assert.strictEqual(r.low_pressure, false);
   assert.match(r.compliance_note, /141\.85/);
   // Low hazard keeps the selected double-check; downstream = upstream - loss.
