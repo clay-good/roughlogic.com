@@ -15418,9 +15418,15 @@ test("bounds: spec-v224 computeRainLoadPonding pins rain load, design flow, the 
 });
 
 test("bounds: spec-v225 computeAsce7LoadCombinations pins governing demand, net uplift, the no-uplift path, and error seams", () => {
+  // ASCE 7-22 (default): a strength-level snow enters ASD as 0.7S.
   const r = _v225({ dead_psf: 15, live_psf: 0, snow_psf: 30, wind_psf: -25 });
-  assert.deepStrictEqual(r.combos, [15, 15, 45, 37.5, 0, 26.25, -6]);
-  assert.strictEqual(r.governing_gravity_psf, 45);
+  const close = (a, b) => a.every((x, i) => Math.abs(x - b[i]) < 1e-9);
+  assert.ok(close(r.combos, [15, 15, 36, 30.75, 0, 19.5, -6]), JSON.stringify(r.combos));
+  assert.ok(Math.abs(r.governing_gravity_psf - 36) < 1e-9);
+  // A 7-16 snow or roof live load keeps 1.0.
+  assert.deepStrictEqual(_v225({ dead_psf: 15, live_psf: 0, snow_psf: 30, wind_psf: -25, roof_load: "snow-7-16" }).combos, [15, 15, 45, 37.5, 0, 26.25, -6]);
+  assert.strictEqual(_v225({ dead_psf: 15, snow_psf: 30, roof_load: "lr-or-r" }).governing_gravity_psf, 45);
+  assert.ok("error" in _v225({ dead_psf: 15, snow_psf: 30, roof_load: "hail" }));
   assert.strictEqual(r.controlling_case_psf, -6);
   assert.strictEqual(r.net_uplift_psf, 6);
   // Floor case: no uplift.
@@ -16667,6 +16673,11 @@ test("bounds: spec-v259 computeRcDevelopmentLength pins ld, the 1.7 and 2.5 caps
   const rHi2 = _v259({ fc: 10000, fy: 60000, db: 1.0, psi_t: 1.0, psi_e: 1.0, psi_s: 1.0, psi_g: 1.0, lambda: 1.0, conf: 1.5 });
   assert.ok(Math.abs(rHi1.ld_in - rHi2.ld_in) < 1e-9); // frozen at the f'c = 10,000 cap
   assert.ok(rHi1.ld_in > (3 / 40) * 60000 / (Math.sqrt(12000) * 1.5) * 1.0); // longer than uncapped
+  // Table 25.4.2.5: psi_g follows the bar grade even when left at 1.0.
+  const g80 = _v259({ fc: 4000, fy: 80000, db: 1.00, psi_g: 1.0, conf: 2.5 });
+  assert.ok(g80.psi_g_used === 1.15 && Math.abs(g80.ld_in - (3 / 40) * 80000 * 1.15 / (Math.sqrt(4000) * 2.5)) < 1e-9);
+  assert.strictEqual(_v259({ fc: 4000, fy: 100000, db: 1.00 }).psi_g_used, 1.3);
+  assert.strictEqual(_v259({ fc: 4000, fy: 60000, db: 1.00 }).psi_g_used, 1.0);
   // Error seams.
   assert.ok("error" in _v259({ fc: 0, fy: 60000, db: 1 }));
   assert.ok("error" in _v259({ fc: 4000, fy: 0, db: 1 }));
@@ -16820,6 +16831,14 @@ test("bounds: spec-v270 computeCmuShearWall pins Fvm/Fvs/Fv/cap, the mvd clamp, 
   // The squat cap: mvd <= 0.25 uses 3 sqrt(f'm).
   const r5 = _v270({ fm_psi: 1500, b_in: 7.625, dv_in: 96, p_lb: 0, mvd: 0.25, av_in2: 0, s_in: 48 });
   assert.ok(Math.abs(r5.fv_max - 3 * Math.sqrt(1500)) < 1e-12);
+  // TMS 402-16 8.3.5.1: partial grouting scales Fv and its cap by gamma_g = 0.75.
+  const part = _v270({ fm_psi: 1500, b_in: 7.625, dv_in: 96, p_lb: 20000, mvd: 0.5, av_in2: 0.20, s_in: 48, fs_psi: 32000, grouting: "partial" });
+  assert.ok(Math.abs(part.fv - 0.75 * r.fv) < 1e-9 && Math.abs(part.fv_max - 0.75 * r.fv_max) < 1e-9 && part.gamma_g === 0.75);
+  // A special reinforced shear wall leads Fvm with 1/4, not 1/2.
+  const sp = _v270({ fm_psi: 1500, b_in: 7.625, dv_in: 96, p_lb: 20000, mvd: 0.5, av_in2: 0.20, s_in: 48, fs_psi: 32000, special: "yes" });
+  assert.ok(Math.abs(sp.fvm - (0.25 * (4.0 - 1.75 * 0.5) * Math.sqrt(1500) + 0.25 * 20000 / 732)) < 1e-9);
+  assert.ok("error" in _v270({ fm_psi: 1500, b_in: 7.625, dv_in: 96, grouting: "hollow" }));
+  assert.ok("error" in _v270({ fm_psi: 1500, b_in: 7.625, dv_in: 96, special: "maybe" }));
   // Error seams.
   assert.ok("error" in _v270({ fm_psi: 0, b_in: 7.625, dv_in: 96 }));
   assert.ok("error" in _v270({ fm_psi: 1500, b_in: 0, dv_in: 96 }));

@@ -1016,7 +1016,7 @@ export function computeWindPressure({ V_mph, exposure = "C", Kz = 0, Kzt = 1.0, 
   const V = Number(V_mph) || 0;
   if (V <= 0) return { error: "Wind speed must be positive." };
   const q_psf = 0.00256 * V * V;
-  // Exposure multipliers: Kz at 30 ft per ASCE 7-16 Table 26.10-1 (B 0.70, C 0.98, D 1.16);
+  // Exposure multipliers: Kz at 30 ft per ASCE 7-16/7-22 Table 26.10-1 (B 0.70, C 0.98, D 1.16);
   // orientation only, and only a fallback -- enter Kz for the actual mean roof height.
   const kz = exposure === "B" ? 0.70 : exposure === "D" ? 1.16 : 0.98;
   const qz = q_psf * kz;
@@ -5147,37 +5147,46 @@ CONSTRUCTION_RENDERERS["rain-load-ponding"] = _simpleRenderer({
 
 // ===================== spec-v225: ASCE 7 ASD load combinations =====================
 
-// dims: in { dead_psf: M L^-1 T^-2, live_psf: M L^-1 T^-2, snow_psf: M L^-1 T^-2, wind_psf: M L^-1 T^-2 } out: { governing_gravity_psf: M L^-1 T^-2, controlling_case_psf: M L^-1 T^-2, net_uplift_psf: M L^-1 T^-2 }
-export function computeAsce7LoadCombinations({ dead_psf = 0, live_psf = 0, snow_psf = 0, wind_psf = 0 } = {}) {
+// ASCE 7-22 made the snow load strength-level, so its ASD combinations carry
+// 0.7S where Lr and R stay at 1.0: D + (Lr or 0.7S or R). A 7-16 snow load is
+// service-level and keeps 1.0. Until 2026-09-25 every roof load took 1.0, which
+// overstated a 7-22 snow (what snow-load returns) by 43% in the ASD set.
+const ASD_ROOF_LOAD_FACTOR = { "snow-7-22": 0.7, "snow-7-16": 1.0, "lr-or-r": 1.0 };
+// dims: in { dead_psf: M L^-1 T^-2, live_psf: M L^-1 T^-2, snow_psf: M L^-1 T^-2, wind_psf: M L^-1 T^-2, roof_load: dimensionless } out: { governing_gravity_psf: M L^-1 T^-2, controlling_case_psf: M L^-1 T^-2, net_uplift_psf: M L^-1 T^-2 }
+export function computeAsce7LoadCombinations({ dead_psf = 0, live_psf = 0, snow_psf = 0, wind_psf = 0, roof_load = "snow-7-22" } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (dead_psf < 0) return { error: "Dead load cannot be negative (psf)." };
   if (live_psf < 0) return { error: "Live load cannot be negative (psf)." };
   if (snow_psf < 0) return { error: "Roof (snow/rain) load cannot be negative (psf)." };
+  const roof_factor = ASD_ROOF_LOAD_FACTOR[roof_load];
+  if (roof_factor === undefined) return { error: "Roof load type must be snow-7-22, snow-7-16, or lr-or-r." };
+  const roof = roof_factor * snow_psf;
   const combos = [
     dead_psf,
     dead_psf + live_psf,
-    dead_psf + snow_psf,
-    dead_psf + 0.75 * live_psf + 0.75 * snow_psf,
+    dead_psf + roof,
+    dead_psf + 0.75 * live_psf + 0.75 * roof,
     dead_psf + 0.6 * wind_psf,
-    dead_psf + 0.75 * live_psf + 0.75 * 0.6 * wind_psf + 0.75 * snow_psf,
+    dead_psf + 0.75 * live_psf + 0.75 * 0.6 * wind_psf + 0.75 * roof,
     0.6 * dead_psf + 0.6 * wind_psf,
   ];
   const governing_gravity_psf = Math.max(...combos);
   const controlling_case_psf = Math.min(...combos);
   const net_uplift_psf = controlling_case_psf < 0 ? -controlling_case_psf : 0;
   return {
-    combos, governing_gravity_psf, controlling_case_psf, net_uplift_psf,
-    note: "ASCE 7 §2.4.1 basic ASD load combinations: D; D+L; D+(Lr or S or R); D+0.75L+0.75(Lr or S or R); D+0.6W; D+0.75L+0.75(0.6W)+0.75(Lr or S or R); 0.6D+0.6W. The governing gravity demand is the largest (it sizes the member); a controlling case below zero is a net uplift the connection must resist. Wind is signed: positive downward, negative uplift. The roof load entered as snow stands in for the governing of roof-live / snow / rain; the dead in the 0.6D combinations is the reliably-present dead only. The basic ASD set (seismic E and the LRFD strength set are separate). A load-combination aid, not a member design.",
+    combos, governing_gravity_psf, controlling_case_psf, net_uplift_psf, roof_factor,
+    note: "ASCE 7-22 §2.4.1 basic ASD load combinations: D; D+L; D+(Lr or 0.7S or R); D+0.75L+0.75(Lr or 0.7S or R); D+0.6W; D+0.75L+0.75(0.6W)+0.75(Lr or 0.7S or R); 0.6D+0.6W. The 0.7 applies to a 7-22 snow load only, because 7-22 snow is strength-level; pick the 7-16 snow option (1.0) for a service-level snow from the 7-16 maps, since 0.7 on it would be 30% unconservative. The governing gravity demand is the largest (it sizes the member); a controlling case below zero is a net uplift the connection must resist. Wind is signed: positive downward, negative uplift. The roof load entered as snow stands in for the governing of roof-live / snow / rain; the dead in the 0.6D combinations is the reliably-present dead only. The basic ASD set (seismic E and the LRFD strength set are separate). A load-combination aid, not a member design.",
   };
 }
 export const asce7LoadCombinationsExample = { inputs: { dead_psf: 15, live_psf: 0, snow_psf: 30, wind_psf: -25 } };
 CONSTRUCTION_RENDERERS["asce7-load-combinations"] = _simpleRenderer({
-  citation: "Citation: ASCE 7 §2.4.1 basic ASD load combinations (D; D+L; D+(Lr or S or R); D+0.75L+0.75(Lr or S or R); D+0.6W; D+0.75L+0.75(0.6W)+0.75(Lr or S or R); 0.6D+0.6W), by name. The governing gravity demand sizes the member; a controlling case below zero is a net uplift. Wind is signed (+ down, - uplift). Basic ASD set only. A load-combination aid, not a member design.",
+  citation: "Citation: ASCE 7-22 §2.4.1 basic ASD load combinations (D; D+L; D+(Lr or 0.7S or R); D+0.75L+0.75(Lr or 0.7S or R); D+0.6W; D+0.75L+0.75(0.6W)+0.75(Lr or 0.7S or R); 0.6D+0.6W), by name; 0.7S for the strength-level 7-22 snow, 1.0 for a 7-16 snow or Lr/R. The governing gravity demand sizes the member; a controlling case below zero is a net uplift. Wind is signed (+ down, - uplift). Basic ASD set only. A load-combination aid, not a member design.",
   example: asce7LoadCombinationsExample.inputs,
   fields: [
     { key: "dead_psf", label: "Dead load D (psf)", kind: "number" },
     { key: "live_psf", label: "Floor live load L (psf)", kind: "number" },
     { key: "snow_psf", label: "Roof load Lr/S/R (psf)", kind: "number", default: 0 },
+    { key: "roof_load", label: "Roof load type", kind: "select", options: [{ value: "snow-7-22", label: "Snow, ASCE 7-22 (strength-level, x0.7)", selected: true }, { value: "snow-7-16", label: "Snow, ASCE 7-16 (service-level, x1.0)" }, { value: "lr-or-r", label: "Roof live Lr or rain R (x1.0)" }] },
     { key: "wind_psf", label: "Wind load W (psf, + down / - uplift)", kind: "number", default: 0, attrs: { step: "any" } },
   ],
   outputs: [
@@ -8561,16 +8570,16 @@ export function computeWindSolidSign({ velocity_pressure_psf = 0, gust_factor = 
   const moment_caseb_lbft = wind_force_lb * 0.2 * B;
   return {
     wind_force_lb, moment_caseb_lbft,
-    note: "Cf here is a net two-face force coefficient from ASCE 7-22 Figure 29.3-1 as a function of the aspect ratio B/s and the clearance ratio s/h (not the +/- GCp of a building wall); it rises for tall, narrow signs. Case B applies the resultant at a 0.2B eccentricity (the torsion that sizes the post and footing), and a wide sign (B/s >= 2) adds a Case C strip loading. The ASCE 7 figures and the engineer of record govern.",
+    note: "Enter qh including the directionality factor Kd (as wind-pressure reports it): ASCE 7-22 writes F = qh Kd G Cf As with Kd outside qh, so a 7-22 qh must be multiplied by Kd (0.85 for signs) first, or the force reads about 18% high. Cf here is a net two-face force coefficient from ASCE 7-22 Figure 29.3-1 as a function of the aspect ratio B/s and the clearance ratio s/h (not the +/- GCp of a building wall); it rises for tall, narrow signs. Case B applies the resultant at a 0.2B eccentricity (the torsion that sizes the post and footing), and a wide sign (B/s >= 2) adds a Case C strip loading. The ASCE 7 figures and the engineer of record govern.",
   };
 }
 export const windSolidSignExample = { inputs: { velocity_pressure_psf: 17, gust_factor: 0.85, force_coefficient: 1.35, solid_area_ft2: 64, width_ft: 8 } };
 
 const _v546renderWindSolidSign = _simpleRenderer({
-  citation: "Citation: ASCE 7-22 Section 29.3 (solid freestanding walls and signs); F = qh G Cf As, Case B eccentric moment M = F x 0.2 x B. Cf is a net two-face coefficient from Fig 29.3-1 (a function of B/s and s/h, ~1.2-2.0), not the +/- GCp of a building wall; it rises for tall narrow signs. The Case B 0.2B eccentricity is the torsion that sizes the post and footing. The ASCE 7 figures and the engineer of record govern.",
+  citation: "Citation: ASCE 7-22 Section 29.3 (solid freestanding walls and signs); F = qh Kd G Cf As, entered here as F = qh G Cf As with qh including Kd, Case B eccentric moment M = F x 0.2 x B. Cf is a net two-face coefficient from Fig 29.3-1 (a function of B/s and s/h, ~1.2-2.0), not the +/- GCp of a building wall; it rises for tall narrow signs. The Case B 0.2B eccentricity is the torsion that sizes the post and footing. The ASCE 7 figures and the engineer of record govern.",
   example: windSolidSignExample.inputs,
   fields: [
-    { key: "velocity_pressure_psf", label: "Velocity pressure qh (psf)", kind: "number" },
+    { key: "velocity_pressure_psf", label: "Velocity pressure qh, including Kd (psf)", kind: "number" },
     { key: "gust_factor", label: "Gust factor G", kind: "number" },
     { key: "force_coefficient", label: "Force coefficient Cf (net, Fig 29.3-1)", kind: "number" },
     { key: "solid_area_ft2", label: "Solid area As (ft²)", kind: "number" },
@@ -14992,7 +15001,7 @@ CONSTRUCTION_RENDERERS["awning-canopy-load"] = _simpleRenderer({
     { key: "ground_snow_psf", label: "Ground snow load pg (psf)", kind: "number" },
     { key: "ce", label: "Exposure factor Ce", kind: "number" },
     { key: "ct", label: "Thermal factor Ct", kind: "number" },
-    { key: "is", label: "Importance factor Is", kind: "number" },
+    { key: "is", label: "Snow importance factor Is (ASCE 7-16; 1.0 with an ASCE 7-22 pg)", kind: "number" },
     { key: "dead_load_psf", label: "Canopy dead load (psf)", kind: "number" },
   ],
   outputs: [

@@ -1643,7 +1643,7 @@ cross-check.
 | calc-construction.js | `computeAnchorEpoxyVolume` | `{ holes = 40, hole_dia_in = 0.75, bar_dia_in = 0.625, embed_in = 6, cartridge...` | _ | _ | _ |
 | calc-construction.js | `computeAnnularGroutVolume` | `{ bore_dia_in = 0, carrier_od_in = 0, length_ft = 0, waste_pct = 5 } = {}` | _ | _ | _ |
 | calc-construction.js | `computeArea` | `{ shape, ...dims }` | _ | _ | _ |
-| calc-construction.js | `computeAsce7LoadCombinations` | `{ dead_psf = 0, live_psf = 0, snow_psf = 0, wind_psf = 0 } = {}` | _ | _ | _ |
+| calc-construction.js | `computeAsce7LoadCombinations` | `{ dead_psf = 0, live_psf = 0, snow_psf = 0, wind_psf = 0, roof_load = "snow-7...` | _ | _ | _ |
 | calc-construction.js | `computeAsceLiveLoadReduction` | `{ unreduced_load_psf = 0, tributary_area_ft2 = 0, member_type = "interior_col...` | _ | _ | _ |
 | calc-construction.js | `computeAsphaltPavingSpeed` | `{ speed_fpm = 0, width_ft = 0, depth_in = 0, density_pcf = 145, eff_min_per_h...` | _ | _ | _ |
 | calc-construction.js | `computeAsphaltSpreadRate` | `{ thickness_in = 2, density_pcf = 145 } = {}` | _ | _ | _ |

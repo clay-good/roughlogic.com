@@ -2,7 +2,7 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "1208460bd0b307bd",
+      "sha": "dd1265bfc75f5c19",
       "date": "2026-09-25"
     },
     "/tools/": {
@@ -18,7 +18,7 @@
       "date": "2026-09-25"
     },
     "/groups/construction/": {
-      "sha": "1fb7a8daefa28288",
+      "sha": "dcacf2ccda95f0f1",
       "date": "2026-09-25"
     },
     "/groups/cross-trade/": {
@@ -338,8 +338,8 @@
       "date": "2026-09-01"
     },
     "/tools/asce7-load-combinations/": {
-      "sha": "ff087dd944152f97",
-      "date": "2026-09-04"
+      "sha": "c404c2c00cf80cf2",
+      "date": "2026-09-25"
     },
     "/tools/ashrae-622-ventilation/": {
       "sha": "9b61513b71a5419b",
@@ -398,8 +398,8 @@
       "date": "2026-09-04"
     },
     "/tools/awning-canopy-load/": {
-      "sha": "bc146bdab26290bd",
-      "date": "2026-09-04"
+      "sha": "6282c13cb028fc23",
+      "date": "2026-09-25"
     },
     "/tools/axle-load-distribution/": {
       "sha": "2a17ed6908856284",
@@ -1254,16 +1254,16 @@
       "date": "2026-09-08"
     },
     "/tools/cmu-shear-wall/": {
-      "sha": "77fb6b17dc19734f",
-      "date": "2026-09-04"
+      "sha": "5405e91b3723d30f",
+      "date": "2026-09-25"
     },
     "/tools/cmu-wall-axial/": {
-      "sha": "98ba0047497f1561",
-      "date": "2026-09-01"
+      "sha": "1b6669a7ce70b1d5",
+      "date": "2026-09-25"
     },
     "/tools/cmu-wall-flexure/": {
-      "sha": "75d9c90b8f6f463c",
-      "date": "2026-09-01"
+      "sha": "e4c315f428929515",
+      "date": "2026-09-25"
     },
     "/tools/co-air-free/": {
       "sha": "1e7e3ed439490c6a",
@@ -4434,16 +4434,16 @@
       "date": "2026-09-18"
     },
     "/tools/masonry-anchor-bolt/": {
-      "sha": "177344bb3fcf60b1",
-      "date": "2026-09-01"
+      "sha": "c702f26e97e07404",
+      "date": "2026-09-25"
     },
     "/tools/masonry-anchor-embedment/": {
-      "sha": "06023739b95a6fc2",
-      "date": "2026-09-01"
+      "sha": "340e21e44b2fba67",
+      "date": "2026-09-25"
     },
     "/tools/masonry-anchor-shear/": {
-      "sha": "0944482900238e54",
-      "date": "2026-09-04"
+      "sha": "e8c7ea3cc396d082",
+      "date": "2026-09-25"
     },
     "/tools/masonry-cleaning-dilution/": {
       "sha": "3f5465b395ae082d",
@@ -4478,8 +4478,8 @@
       "date": "2026-09-19"
     },
     "/tools/masonry-prism-fm/": {
-      "sha": "392550ea0e1b1882",
-      "date": "2026-09-01"
+      "sha": "d8b09c883bc34f4d",
+      "date": "2026-09-25"
     },
     "/tools/masonry-wall-weight/": {
       "sha": "ad05276fbef1e510",
@@ -5918,8 +5918,8 @@
       "date": "2026-09-01"
     },
     "/tools/rc-development-length/": {
-      "sha": "db39a4f9124d1c1a",
-      "date": "2026-09-01"
+      "sha": "4099d4a2720021cd",
+      "date": "2026-09-25"
     },
     "/tools/rc-doubly-reinforced/": {
       "sha": "fdb442036ceb658a",
@@ -8654,16 +8654,16 @@
       "date": "2026-09-19"
     },
     "/tools/wind-pressure/": {
-      "sha": "56f79084c8e4498c",
-      "date": "2026-09-01"
+      "sha": "2335b704565398ee",
+      "date": "2026-09-25"
     },
     "/tools/wind-shear-hub-height/": {
       "sha": "5992a6ce6644895c",
       "date": "2026-09-06"
     },
     "/tools/wind-solid-sign/": {
-      "sha": "13e3ec84eab2c2ad",
-      "date": "2026-09-01"
+      "sha": "0d6a3c3cdfa529d0",
+      "date": "2026-09-25"
     },
     "/tools/wind-speed-from-velocity-pressure/": {
       "sha": "eb0eebb498e5a0fa",
