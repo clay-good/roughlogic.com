@@ -2304,6 +2304,11 @@ TRUCKING_RENDERERS["oversize-permit-screen"] = _simpleRenderer({
 // dims: in { materials: dimensionless, table1_present: dimensionless } out: { table2_aggregate_lb: M, threshold_met: dimensionless }
 export function computeHazmatPlacardThreshold({ materials = [], table1_present = false } = {}) {
   if (!Array.isArray(materials) || materials.length === 0) return { error: "List at least one hazardous material with its gross weight." };
+  // 172.504(c) opens "Except for bulk packagings": the 1,001 lb exception never
+  // covers a bulk packaging (171.8: over 119 gal for a liquid, over 882 lb and
+  // 119 gal for a solid), so a single 275 gal tote is placarded at any weight.
+  // Until 2026-09-25 there was no bulk input and the note's own "tote" example
+  // read as unplacarded below 1,001 lb.
   let table2_aggregate_lb = 0;
   const classes = new Set();
   for (const m of materials) {
@@ -2315,42 +2320,46 @@ export function computeHazmatPlacardThreshold({ materials = [], table1_present =
     if (gross > 0 && m.hazard_class) classes.add(String(m.hazard_class).trim());
   }
   const any_table1 = !!table1_present || materials.some((m) => m.table1 && (Number(m.gross_lb) || 0) > 0);
+  const any_bulk = materials.some((m) => m.bulk && (Number(m.gross_lb) || 0) > 0);
   if (!(table2_aggregate_lb > 0) && !any_table1) return { error: "Enter a gross weight for at least one material." };
   const threshold_met = table2_aggregate_lb >= 1001;
-  const placard_required = threshold_met || any_table1;
+  const placard_required = threshold_met || any_table1 || any_bulk;
   const margin_lb = 1001 - table2_aggregate_lb;
   const class_list = [...classes].sort().join(", ");
   const verdict = any_table1
     ? "PLACARD REQUIRED: a Table 1 material is aboard, which is placarded at any quantity with no threshold"
     : threshold_met
       ? "PLACARD REQUIRED: the Table 2 aggregate is at or above 1,001 lb"
-      : "not placarded on the Table 2 threshold, " + fmt(margin_lb, 0) + " lb short of 1,001 lb -- a PLACARDING exemption only, not a hazmat exemption";
+      : any_bulk
+        ? "PLACARD REQUIRED: a bulk packaging is aboard, and the 1,001 lb exception does not apply to bulk packagings"
+        : "not placarded on the Table 2 threshold, " + fmt(margin_lb, 0) + " lb short of 1,001 lb -- a PLACARDING exemption only, not a hazmat exemption";
   if (!Number.isFinite(table2_aggregate_lb)) return { error: "Placarding math is not a finite value." };
   return {
     table2_aggregate_lb,
     threshold_met,
     any_table1,
+    any_bulk,
     placard_required,
     margin_lb,
     class_list,
     class_count: classes.size,
     verdict,
-    note: "Whether a load has to be placarded, from the two thresholds that govern it. Hazardous materials split into two tables. Table 1 materials -- among them explosives of divisions 1.1, 1.2 and 1.3, poison-inhalation-hazard materials, and certain radioactives -- must be placarded at ANY quantity, with no threshold at all. Table 2 covers everything else, and a vehicle carrying Table 2 materials must be placarded when the aggregate gross weight of all of them reaches 1,001 pounds. Two details cause most of the errors. First, the aggregate is across ALL Table 2 hazard classes on the vehicle rather than per class: 600 lb of flammable liquid and 500 lb of corrosive is 1,100 lb aggregate and the vehicle gets placarded for both. Second, it is GROSS weight, package and contents together, not net product weight, and drums and totes weigh a great deal empty. A load of 400 lb gross of one Class 3 flammable liquid and 700 lb gross of a second aggregates to 1,100 lb and is placarded; drop the second to 550 lb and the aggregate is 950 lb and it is not. Everything else still applies at any weight -- shipping papers, package marking and labeling, segregation, emergency response information, and driver training have no 1,001 lb threshold. Under 1,001 lb is a PLACARDING exemption, not a hazmat exemption, and treating it as one is how carriers end up cited. A screen; 49 CFR 172.504 and its tables in full, the shipper's papers, and the carrier's hazmat program govern.",
+    note: "Whether a load has to be placarded, from the two thresholds that govern it. Hazardous materials split into two tables. Table 1 materials -- among them explosives of divisions 1.1, 1.2 and 1.3, poison-inhalation-hazard materials, and certain radioactives -- must be placarded at ANY quantity, with no threshold at all. Table 2 covers everything else, and a vehicle carrying Table 2 materials must be placarded when the aggregate gross weight of all of them reaches 1,001 pounds. Two details cause most of the errors. First, the aggregate is across ALL Table 2 hazard classes on the vehicle rather than per class: 600 lb of flammable liquid and 500 lb of corrosive is 1,100 lb aggregate and the vehicle gets placarded for both. Second, it is GROSS weight, package and contents together, not net product weight, and drums weigh a great deal empty. A load of 400 lb gross of one Class 3 flammable liquid in drums and 700 lb gross of a second in cases aggregates to 1,100 lb and is placarded; drop the second to 550 lb and the aggregate is 950 lb and it is not. Third, the 1,001 lb exception does not apply to a BULK packaging -- for a liquid, any container over 119 gallons, which takes in the common 275 and 330 gal tote -- so a vehicle with even a partly filled tote aboard is placarded at any weight. (Empty IBCs moved under 173.29(d) are excepted by 172.504(d)(2).) Everything else still applies at any weight -- shipping papers, package marking and labeling, segregation, emergency response information, and driver training have no 1,001 lb threshold. Under 1,001 lb is a PLACARDING exemption, not a hazmat exemption, and treating it as one is how carriers end up cited. A screen; 49 CFR 172.504 and its tables in full, the shipper's papers, and the carrier's hazmat program govern.",
   };
 }
 
 export const hazmatPlacardThresholdExample = {
   inputs: {
     materials: [
-      { name: "flammable liquid, drum", hazard_class: "3", gross_lb: 400, table1: false },
-      { name: "flammable liquid, tote", hazard_class: "3", gross_lb: 700, table1: false },
+      { name: "flammable liquid, drum", hazard_class: "3", gross_lb: 400, table1: false, bulk: false },
+      { name: "flammable liquid, cases", hazard_class: "3", gross_lb: 700, table1: false, bulk: false },
     ],
     table1_present: false,
   },
 };
 
 function renderHazmatPlacardThreshold(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: 49 CFR 172.504 placarding thresholds -- Table 1 materials placarded at any quantity, Table 2 materials at a 1,001 lb aggregate GROSS weight across all Table 2 classes on the vehicle -- cited by section and not reproduced. Under 1,001 lb is a placarding exemption only: papers, marking, labeling, segregation, emergency response information, and driver training have no threshold. 49 CFR 172 in full, the shipper's papers, and the carrier's hazmat program govern.";
+  citationEl.textContent = "Citation: 49 CFR 172.504 placarding thresholds -- Table 1 materials placarded at any quantity, Table 2 materials at a 1,001 lb aggregate GROSS weight across all Table 2 classes on the vehicle, with no 1,001 lb exception for a bulk packaging (172.504(c); bulk per 171.8, over 119 gal for a liquid) -- cited by section and not reproduced. Under 1,001 lb is a placarding exemption only: papers, marking, labeling, segregation, emergency response information, and driver training have no threshold. 49 CFR 172 in full, the shipper's papers, and the carrier's hazmat program govern.";
   attachExampleButton(inputRegion, () => fillExample(hazmatPlacardThresholdExample.inputs));
   const list = document.createElement("div"); inputRegion.appendChild(list);
   const rows = [];
@@ -2360,10 +2369,12 @@ function renderHazmatPlacardThreshold(inputRegion, outputRegion, citationEl) {
     const nF = makeRowField(tag + "name", "hzp-i" + i + "-n", { type: "text", inputmode: "text" });
     const cF = makeRowField(tag + "hazard class or division", "hzp-i" + i + "-c", { type: "text", inputmode: "text" });
     const gF = makeRowField(tag + "gross weight (lb)", "hzp-i" + i + "-g", { step: "any", min: "0" });
-    for (const f of [nF, cF, gF]) wrap.appendChild(f.wrap);
+    const bF = makeCheckbox(tag + "is a bulk packaging (liquid over 119 gal, e.g. a tote)", "hzp-i" + i + "-b");
+    for (const f of [nF, cF, gF, bF]) wrap.appendChild(f.wrap);
     list.appendChild(wrap);
     [nF.input, cF.input, gF.input].forEach((el) => el.addEventListener("input", update));
-    rows.push({ n: nF.input, c: cF.input, g: gF.input });
+    bF.input.addEventListener("change", update);
+    rows.push({ n: nF.input, c: cF.input, g: gF.input, b: bF.input });
   }
   const t1 = makeCheckbox("A Table 1 material is aboard (placarded at any quantity)", "hzp-t1");
   inputRegion.appendChild(t1.wrap);
@@ -2376,14 +2387,14 @@ function renderHazmatPlacardThreshold(inputRegion, outputRegion, citationEl) {
   function fillExample(v) {
     for (let i = 0; i < rows.length; i++) {
       const m = v.materials[i];
-      if (m) { rows[i].n.value = m.name; rows[i].c.value = m.hazard_class; rows[i].g.value = m.gross_lb; }
+      if (m) { rows[i].n.value = m.name; rows[i].c.value = m.hazard_class; rows[i].g.value = m.gross_lb; rows[i].b.checked = !!m.bulk; }
     }
     t1.input.checked = !!v.table1_present;
     update();
   }
   function update() {
     const materials = rows
-      .map((r) => ({ name: r.n.value, hazard_class: r.c.value, gross_lb: Number(r.g.value) || 0, table1: false }))
+      .map((r) => ({ name: r.n.value, hazard_class: r.c.value, gross_lb: Number(r.g.value) || 0, table1: false, bulk: r.b.checked }))
       .filter((m) => m.gross_lb > 0);
     const outs = [oA, oT, oC, oV, oN];
     if (materials.length === 0 && !t1.input.checked) { for (const o of outs) o.textContent = "-"; return; }

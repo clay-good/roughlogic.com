@@ -14352,7 +14352,7 @@ export const CITATIONS = {
     ],
   },
   "hazmat-placard-threshold": {
-    formula: "table2_aggregate_lb = sum of the GROSS weight of every Table 2 material aboard, across all hazard classes; placard required when that aggregate is at least 1,001 lb, or when any Table 1 material is aboard in any quantity.",
+    formula: "table2_aggregate_lb = sum of the GROSS weight of every Table 2 material aboard, across all hazard classes; placard required when that aggregate is at least 1,001 lb, when any Table 1 material is aboard in any quantity, or when any material is in a bulk packaging (the 1,001 lb exception excludes bulk packagings).",
     edition: "49 CFR 172.504 placarding thresholds -- Table 1 materials placarded at any quantity, Table 2 materials at a 1,001 lb aggregate gross weight across all Table 2 classes on the vehicle -- cited by section and not reproduced. 49 CFR 172 in full, the shipper's papers, and the carrier's hazmat program govern.",
     freeAccess: "The thresholds are public federal law, cited by section rather than mirrored, and the aggregation is addition on the shipment's own gross weights.",
     governance: GOVERNANCE.general,
@@ -14360,6 +14360,7 @@ export const CITATIONS = {
     assumptions: [
       { name: "Table 1", value: "placarded at ANY quantity, no threshold", source: "49 CFR 172.504 Table 1" },
       { name: "Table 2 aggregate", value: "1,001 lb aggregate GROSS weight across ALL Table 2 classes on the vehicle, not per class", source: "49 CFR 172.504 Table 2" },
+      { name: "Bulk packagings", value: "the 1,001 lb exception opens 'Except for bulk packagings'; a liquid container over 119 gal (a 275 or 330 gal tote) is bulk, so it is placarded at any weight", source: "49 CFR 172.504(c); 171.8 (bulk packaging)" },
       { name: "Placarding only", value: "papers, marking, labeling, segregation, emergency response information, and training have no threshold", source: "49 CFR 172" },
     ],
   },

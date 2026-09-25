@@ -14,6 +14,7 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **`hazmat-placard-threshold` called a tote under 1,001 lb unplacarded.** 49 CFR 172.504(c) opens *"Except for bulk packagings"*, and 171.8 defines a liquid bulk packaging as one over 119 gal, which covers the common 275 and 330 gal tote. The tile had no bulk input, and its own example and note said a tote cut to 550 lb dropped under the threshold. Each material now has a bulk-packaging checkbox, and any bulk packaging requires placards at any weight. The example's second material is now a case lot. The note also mentions the 172.504(d)(2) exception for empty IBCs (effective September 3, 2026).
 - **Eleven tile descriptions quoted worked-example numbers from before their own fixes.** A scan compared every fixture output changed since August 25 against the tile's description prose, which no gate reads. The worst was `cleanout-layout`: after the IPC 708 fix it still said three triggers, a stack-base cleanout included, and quoted 10 cleanouts where the tile returns 8. The others:
   - `turnout-frog-lead`: a clearance point 130 ft out, against the 83 ft it computes.
   - `blast-scaled-distance-ppv`: the 50 minimum and 576 lb, where 30 CFR 816.67 gives 55 and 476 lb.

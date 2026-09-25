@@ -39948,9 +39948,12 @@ test("bounds: spec-v1382 computeHazmatPlacardThreshold pins the 1,001 lb aggrega
   // 400 + 700 = 1,100 lb aggregate, at or above 1,001: placard required.
   const materials = [
     { name: "flammable liquid, drum", hazard_class: "3", gross_lb: 400, table1: false },
-    { name: "flammable liquid, tote", hazard_class: "3", gross_lb: 700, table1: false },
+    { name: "flammable liquid, cases", hazard_class: "3", gross_lb: 700, table1: false },
   ];
   const r = _v1382({ materials, table1_present: false });
+  // 172.504(c) excludes bulk packagings from the 1,001 lb exception: one 550 lb tote is placarded.
+  const tote = _v1382({ materials: [{ name: "flammable liquid, 275 gal tote", hazard_class: "3", gross_lb: 550, bulk: true }], table1_present: false });
+  assert.ok(tote.threshold_met === false && tote.any_bulk === true && tote.placard_required === true && /bulk/.test(tote.verdict));
   assert.ok(Math.abs(r.table2_aggregate_lb - 1100) < 1e-9);
   assert.strictEqual(r.threshold_met, true);
   assert.strictEqual(r.placard_required, true);

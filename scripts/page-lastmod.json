@@ -2,7 +2,7 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "3e6a2f5c5dfcf204",
+      "sha": "7321bd71e4d1e02e",
       "date": "2026-09-25"
     },
     "/tools/": {
@@ -3546,8 +3546,8 @@
       "date": "2026-09-01"
     },
     "/tools/hazmat-placard-threshold/": {
-      "sha": "1df650f41357e273",
-      "date": "2026-09-01"
+      "sha": "b9ac50f7336bb5b8",
+      "date": "2026-09-25"
     },
     "/tools/hdd-annular-pressure/": {
       "sha": "901ec8e76834e6fb",
