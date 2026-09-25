@@ -689,7 +689,10 @@ export function computeGasApplianceConnection({ appliance = "furnace", shutoff_s
   if (dist < 0) return { error: "Shutoff distance cannot be negative (ft)." };
   if (conn < 0) return { error: "Connector length cannot be negative (ft)." };
 
-  const MAX_DIST = 6, CONN_SHORT = 3, CONN_LONG = 6;
+  // IFGC 2021 411.1.3.1: "Connectors shall have an overall length not to exceed 6 feet" for every
+  // appliance. The 3 ft limit with a 6 ft allowance for ranges and dryers is older-edition wording; this
+  // tile used it until 2026-09-25, failing 3-6 ft connectors on furnaces, water heaters and boilers.
+  const MAX_DIST = 6, CONN_LIMIT = 6;
   const movable = MOVABLE.includes(appliance);
   const distance_ok = dist <= MAX_DIST;
   const shutoff_distance_deficit_ft = Math.max(0, dist - MAX_DIST);
@@ -699,23 +702,22 @@ export function computeGasApplianceConnection({ appliance = "furnace", shutoff_s
   const trap_required = !trap_exempt && !trapBuiltIn;
   const trap_ok = trap_required ? trap : null;
 
-  const connector_limit_ft = movable ? CONN_LONG : CONN_SHORT;
+  const connector_limit_ft = CONN_LIMIT;
   const has_connector = conn > 0;
   const connector_ok = has_connector ? conn <= connector_limit_ft : null;
   const connector_over_ft = has_connector ? Math.max(0, conn - connector_limit_ft) : 0;
 
   const passes = shutoff_ok && (trap_ok !== false) && (connector_ok !== false);
 
-  const note = "SHUTOFF (409.5): in the SAME ROOM as the appliance, within " + MAX_DIST + " ft of it, and UPSTREAM of the union, connector, or quick-disconnect it serves. Here: " + (sameRoom ? "same room OK" : "NOT in the same room") + ", " + dist + " ft " + (distance_ok ? "OK" : "over by " + shutoff_distance_deficit_ft.toFixed(1) + " ft") + ", " + (upstream ? "upstream OK" : "NOT upstream - a valve downstream of the connector cannot isolate the connector, which is the part most likely to fail") + ". "
+  const note = "SHUTOFF (409.5.1): in the SAME ROOM as the appliance, within " + MAX_DIST + " ft of it, and UPSTREAM of the union, connector, or quick-disconnect it serves. Here: " + (sameRoom ? "same room OK" : "NOT in the same room") + ", " + dist + " ft " + (distance_ok ? "OK" : "over by " + shutoff_distance_deficit_ft.toFixed(1) + " ft") + ", " + (upstream ? "upstream OK" : "NOT upstream - a valve downstream of the connector cannot isolate the connector, which is the part most likely to fail") + ". "
     + (movable ? "For a movable appliance like this one, 409.5 also deems a shutoff installed behind it to be accessible, so being hidden behind the range or dryer is not itself a violation. " : "")
     + "SEDIMENT TRAP (408.4): required downstream of the shutoff and as close to the inlet as practical, "
     + (trap_exempt ? "but this appliance type is on the exemption list - illuminating appliances, ranges, clothes dryers, decorative vented appliances for vented fireplaces, gas fireplaces, and outdoor grills need not be so equipped. None required. "
       : trapBuiltIn ? "and one is incorporated as part of the appliance, which satisfies it - 408.4 only applies where the appliance does not already have one. "
       : "and this appliance needs one: " + (trap ? "present, OK. " : "MISSING. A drip leg on the wrong side of the shutoff is also not a trap - it has to be DOWNSTREAM, or it protects nothing when the valve is closed for service. "))
-    + "CONNECTOR (411.1.3.1): overall length not to exceed " + connector_limit_ft + " ft for this appliance"
-    + (movable ? " - ranges and domestic clothes dryers get 6 ft where everything else gets 3. " : ", the general 3 ft limit. ")
+    + "CONNECTOR (411.1.3.1): overall length not to exceed " + connector_limit_ft + " ft, one connector per appliance (earlier IFGC editions allowed 3 ft, with 6 ft only for ranges and dryers). "
     + (has_connector ? "This one is " + conn + " ft: " + (connector_ok ? "OK. " : "OVER by " + connector_over_ft.toFixed(1) + " ft. ") : "No connector length entered; hard-piped appliances have no connector to measure. ")
-    + "THE PATTERN WORTH SEEING: ranges and clothes dryers appear in BOTH exceptions and get the accessibility allowance too. The code has a coherent idea of a movable appliance - one that gets pulled out to clean behind - and once you spot it, all three answers follow from the category rather than from three memorised lists. "
+    + "THE PATTERN WORTH SEEING: ranges and clothes dryers are on the sediment-trap exception list AND get the accessibility allowance for a shutoff behind them. The code has a coherent idea of a movable appliance - one that gets pulled out to clean behind - and spotting it predicts both answers. "
     + (passes ? "The items entered PASS. " : "The items entered DO NOT pass. ")
     + "Not checked: whether the connector is listed and of an approved type, connectors passing through walls, floors, ceilings, or partitions, which is prohibited; reuse of an old connector, which is not permitted; the piping size and pressure feeding the valve; appliance clearances, venting, and combustion air; CSST bonding; the leak test; or whether the appliance is approved for the fuel and altitude. A screen; the adopted code, the appliance listing, and the AHJ govern.";
 

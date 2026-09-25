@@ -107,7 +107,7 @@
     },
     "grease-trap": {
       "group": "calc-plumbing.js (Group B)",
-      "stamp": "Citation: per IPC 2021 Table 1003.2 and PDI G101 by name. Volume = peak_flow * retention * loading_factor. AHJ governs. Free at codes.iccsafe.org."
+      "stamp": "Citation: per IPC 2021 Section 1003.3 (grease interceptors; Table 1003.3.5.1 rates capacity in pounds of grease, not volume) and PDI G101 by name. Volume = peak_flow * retention * loading_factor. AHJ governs. Free at codes.iccsafe.org."
     },
     "grounding-electrode": {
       "group": "calc-electrical.js (Group A)",
@@ -279,7 +279,7 @@
     },
     "trap-arm": {
       "group": "calc-plumbing.js (Group B)",
-      "stamp": "Citation: Standard trap-arm length table (public plumbing engineering practice). The trap weir must not drain through the vent; total fall limited to one pipe diameter."
+      "stamp": "Citation: IPC 2021 Table 909.1 (1-1/4 in 5 ft, 1-1/2 in 6 ft, 2 in 8 ft at 1/4 in/ft; 3 in 12 ft, 4 in 16 ft at 1/8 in/ft) and IPC 909.2 (total fall not more than one pipe diameter, vent connection not below the trap weir)."
     },
     "wire-ampacity": {
       "group": "calc-electrical.js (Group A)",

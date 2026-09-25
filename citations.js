@@ -4008,15 +4008,15 @@ export const CITATIONS = {
     ],
   },
   "trap-primer": {
-    formula: "primers = ceil(floor-drain count / drains-per-distribution-unit). Annual water = drains × (delivery oz per cycle / 128) × cycles per day × 365. Occupied-space floor drains require a primer per IPC 1002.4.",
-    edition: IPC_2021 + " Section 1002.4 (trap seals). Manufacturer flow rates per published cut sheets (Precision Plumbing Products / Sioux Chief / Mifab).",
+    formula: "primers = ceil(floor-drain count / drains-per-distribution-unit). Annual water = drains × (delivery oz per cycle / 128) × cycles per day × 365. Trap seals subject to evaporation, and emergency floor drain traps, are protected by one of the IPC 1002.4.1.1-1002.4.1.5 methods.",
+    edition: IPC_2021 + " Section 1002.4 (trap seal depth) and 1002.4.1 (trap seal protection). Manufacturer flow rates per published cut sheets (Precision Plumbing Products / Sioux Chief / Mifab).",
     freeAccess: ICC_FREE,
     governance: GOVERNANCE.plumbing,
     editionNote: "Drains-per-unit (electronic / pressure-drop / pump-discharge feed up to 4 drains via a distribution unit; manual serves 1) and delivery volume follow manufacturer cut sheets; the cut sheet governs. AHJ governs.",
     assumptions: [
       { name: "Drains per distribution unit", value: "4 for electronic / pressure-drop / pump-discharge; 1 for manual", source: "PPP / Sioux Chief / Mifab distribution-unit cut sheets" },
       { name: "Default delivery", value: "8 fl oz per cycle, one cycle per day, unless the user enters the manufacturer value", source: "manufacturer cut-sheet typical" },
-      { name: "Occupied-space rule", value: "every floor drain in occupied space requires a primer; manual prime allowed only in mechanical spaces with a documented seasonal procedure", source: "IPC 2021 §1002.4 and exception" },
+      { name: "Protection rule", value: "an emergency floor drain trap, or any trap seal subject to evaporation, needs one of the 1002.4.1 methods (a potable-water or reclaimed-water primer valve, a wastewater-supplied primer device, an ASSE 1072 barrier device, or a lavatory or hand-sink drain connection); manual priming is not one, and the code has no mechanical-space exception", source: "IPC 2021 §1002.4.1" },
     ],
   },
   "septic-tank": {
@@ -4096,7 +4096,7 @@ export const CITATIONS = {
     governance: GOVERNANCE.plumbing,
     editionNote: IPC_DISCLOSURE,
     assumptions: [
-      { name: "Trap-arm slope", value: "1/4 in per ft min, 1 pipe diameter max fall", source: "IPC 2021 Section 909.1" },
+      { name: "Trap-arm slope and fall", value: "1/4 in per ft for 2 in and smaller, 1/8 in per ft for 3 and 4 in (Table 909.1); total fall not more than 1 pipe diameter (909.2)", source: "IPC 2021 Table 909.1 / 909.2" },
     ],
   },
   "pipe-expansion": {
@@ -4227,13 +4227,13 @@ export const CITATIONS = {
     ],
   },
   "hydrostatic-test": {
-    formula: "Test pressure: 1.5× working pressure for water systems (IPC 2021 Section 312), 1.25× for fuel-gas systems (IFGC 2021 Section 406.4); recommended hold time scales with system volume.",
+    formula: "Test pressure: at least the working pressure for water systems (IPC 2021 Section 312.5; 1.5x is common engineering practice, not an IPC rule), and at least 1.5x the maximum working pressure but not less than 3 psig for fuel-gas systems (IFGC 2021 Section 406.4.1); recommended hold time scales with system volume.",
     edition: IPC_2021 + " Section 312; " + IFGC_2021 + " Section 406.4.",
     freeAccess: ICC_FREE,
     governance: GOVERNANCE.plumbing,
     editionNote: IPC_DISCLOSURE + " " + IFGC_DISCLOSURE,
     assumptions: [
-      { name: "Default hold time", value: "≥ 15 min for plumbing tests; ≥ 10 min for fuel-gas tests", source: "IPC 2021 Section 312.3 / IFGC 2021 Section 406.4" },
+      { name: "Default hold time", value: "≥ 15 min for plumbing tests; ≥ 10 min for fuel-gas tests", source: "IPC 2021 Section 312.5 / IFGC 2021 Section 406.4.2" },
     ],
   },
   "grease-trap": {
@@ -4291,14 +4291,14 @@ export const CITATIONS = {
   },
   "backflow-sizing": {
     formula: "Required assembly from the hazard category (high / health hazard requires a reduced-pressure principle assembly). Head loss at design flow interpolated from the bundled assembly curves; downstream pressure = upstream supply pressure − head loss; flag when downstream is below the minimum residual.",
-    edition: "IPC 2021 §312 (cross-connection control) and AWWA M14 (Backflow Prevention and Cross-Connection Control) by name; EPA 40 CFR 141.85 (annual testing) by section. Head-loss curves from data/plumbing/backflow-curves.json (Watts technical bulletins, representative).",
+    edition: "IPC 2021 §312 (cross-connection control) and AWWA M14 (Backflow Prevention and Cross-Connection Control) by name; IPC 2021 §312.10.2 (testing at installation and at least annually) and §608.1 / Table 608.1 (assembly by hazard) by section. Head-loss curves from data/plumbing/backflow-curves.json (Watts technical bulletins, representative).",
     freeAccess: ICC_FREE,
     governance: GOVERNANCE.plumbing,
     editionNote: "High (health) hazard requires an RP assembly regardless of the user's selection; PVB / AVB protect against back-siphonage only. The bundled Watts curves are representative; the specific assembly's cut sheet and the USC FCCCHR approved-assembly list govern the actual head loss.",
     assumptions: [
-      { name: "High-hazard rule", value: "reduced-pressure principle (RP) assembly required", source: "IPC 312 / cross-connection control practice" },
+      { name: "High-hazard rule", value: "reduced-pressure principle (RP) assembly required", source: "IPC 2021 §608.1 / Table 608.1" },
       { name: "Minimum residual", value: "20 psi default (user-adjustable)", source: "engineering practice" },
-      { name: "Annual test", value: "certified tester required yearly", source: "EPA 40 CFR 141.85 / AWWA M14" },
+      { name: "Annual test", value: "tested at installation and at least annually", source: "IPC 2021 §312.10.2 / AWWA M14" },
     ],
   },
 
@@ -9527,10 +9527,10 @@ export const CITATIONS = {
     edition: "IPC 2021 Section 604 and the ASPE Plumbing Engineering Design Handbook Vol. 2 by name; first-principles pressure budget.",
     freeAccess: "IPC 2021 free read-only at codes.iccsafe.org; the 0.433 psi/ft water-column constant is public.",
     governance: GOVERNANCE.general,
-    editionNote: "Use the minimum recorded street pressure. Flush-valve / tankless fixtures need 15-25 psi vs ~8 psi for a tank fixture. IPC 604 caps static pressure at 80 psi (a PRV is required above it and adds its own loss).",
+    editionNote: "Use the minimum recorded street pressure. IPC 2021 Table 604.3 minimum flow pressures: 8 psi for lavatories, sinks, showers, laundry trays and hose bibbs; 20 psi for a tank or flushometer-tank water closet and for thermostatic or pressure-balance shower and tub valves; 25 psi for a urinal flush valve; 35 psi for a siphonic and 45 psi for a blowout flushometer-valve water closet. IPC 604 caps static pressure at 80 psi (a PRV is required above it and adds its own loss).",
     assumptions: [
       { name: "Water column", value: "0.433 psi per foot of elevation", source: "physical fact (water density)" },
-      { name: "Fixture minimum default", value: "8 psi (tank fixture); 15-25 psi flush valve / tankless", source: "IPC 604 / fixture manufacturer" },
+      { name: "Fixture minimum default", value: "8 psi (lavatory, sink, shower); tank water closet 20, urinal valve 25, siphonic flushometer valve 35, blowout flushometer valve 45 psi", source: "IPC 2021 Table 604.3" },
     ],
   },
   "roof-drain-sizing": {
@@ -15738,17 +15738,17 @@ export const CITATIONS = {
     ],
   },
   "gas-appliance-connection": {
-    formula: "shutoff passes when it is in the same room, within 6 ft of the appliance, and upstream of the union or connector; a sediment trap is required unless the appliance type is excepted or a trap is incorporated in the appliance; connector length limit is 6 ft for ranges and domestic clothes dryers and 3 ft otherwise.",
-    edition: "IFGC 409.5 (appliance shutoff valve location, and the allowance treating a shutoff behind a movable appliance as accessible), IFGC 408.4 (sediment trap, with its exception list), and IFGC 411.1.3.1 (maximum connector length).",
+    formula: "shutoff passes when it is in the same room, within 6 ft of the appliance, and upstream of the union or connector; a sediment trap is required unless the appliance type is excepted or a trap is incorporated in the appliance; connector length limit is 6 ft for every appliance (IFGC 2021; earlier editions gave 3 ft except ranges and dryers).",
+    edition: "IFGC 409.5.1 (appliance shutoff valve location, and the allowance treating a shutoff behind a movable appliance as accessible), IFGC 408.4 (sediment trap, with its exception list), and IFGC 411.1.3.1 (maximum connector length).",
     freeAccess: "All three are short prescriptive sentences reproduced in municipal adoptions and inspection checklists. No table is reproduced.",
     governance: GOVERNANCE.general,
-    editionNote: "Three separate sections govern the last three feet of gas piping, and the useful observation is that one category cuts across all of them. Ranges and domestic clothes dryers are on 408.4\'s sediment-trap exception list, get 6 ft of connector under 411.1.3.1 where everything else gets 3, and are the appliances 409.5 has in mind when it deems a shutoff installed behind them to be accessible. The code has a coherent idea of a MOVABLE appliance - one that gets pulled out to clean behind - and once that is visible all three answers follow from the category rather than from three memorised lists. The tile demonstrates it directly: the same installation that fails as a furnace, on a missing trap and a 4 ft connector, passes as a dryer. Two details are worth stating rather than assuming. The shutoff must be UPSTREAM of the union, connector, or quick-disconnect it serves, because a valve downstream of the connector cannot isolate the connector - which is the component most likely to fail and the one most likely to be replaced. And a sediment trap has to be DOWNSTREAM of the shutoff: a drip leg on the wrong side protects nothing once the valve is closed for service, and it is a common field error that looks right in a photograph. 408.4 also applies only where a trap is not already incorporated as part of the appliance, so a built-in trap satisfies it. Not checked: whether the connector is listed and of an approved type; connectors passing through walls, floors, ceilings, or partitions, which is prohibited; reuse of an old connector, which is not permitted; the size and pressure of the piping feeding the valve; appliance clearances, venting, and combustion air; CSST bonding; leak testing; and whether the appliance is approved for the fuel and the altitude. A screen; the adopted code, the appliance listing, and the AHJ govern.",
+    editionNote: "Three separate sections govern the last three feet of gas piping, and the useful observation is that one category cuts across all of them. Ranges and domestic clothes dryers are on 408.4\'s sediment-trap exception list and are the appliances 409.5.1 has in mind when it deems a shutoff installed behind them to be accessible. The code has a coherent idea of a MOVABLE appliance - one that gets pulled out to clean behind - and once that is visible both answers follow from the category. The tile demonstrates it directly: the same installation that fails as a furnace, on a missing trap, passes as a dryer. The 2021 connector limit is 6 ft for every appliance (411.1.3.1); earlier editions allowed 3 ft except for ranges and dryers. Two details are worth stating rather than assuming. The shutoff must be UPSTREAM of the union, connector, or quick-disconnect it serves, because a valve downstream of the connector cannot isolate the connector - which is the component most likely to fail and the one most likely to be replaced. And a sediment trap has to be DOWNSTREAM of the shutoff: a drip leg on the wrong side protects nothing once the valve is closed for service, and it is a common field error that looks right in a photograph. 408.4 also applies only where a trap is not already incorporated as part of the appliance, so a built-in trap satisfies it. Not checked: whether the connector is listed and of an approved type; connectors passing through walls, floors, ceilings, or partitions, which is prohibited; reuse of an old connector, which is not permitted; the size and pressure of the piping feeding the valve; appliance clearances, venting, and combustion air; CSST bonding; leak testing; and whether the appliance is approved for the fuel and the altitude. A screen; the adopted code, the appliance listing, and the AHJ govern.",
     assumptions: [
       { name: "Shutoff location", value: "same room, within 6 ft, upstream of the union or connector", source: "IFGC 409.5" },
       { name: "Movable-appliance access", value: "a shutoff behind a range or dryer is considered accessible", source: "IFGC 409.5" },
       { name: "Sediment trap", value: "downstream of the shutoff, as close to the inlet as practical", source: "IFGC 408.4" },
       { name: "Trap exceptions", value: "illuminating appliances, ranges, dryers, decorative vented appliances, gas fireplaces, outdoor grills", source: "IFGC 408.4" },
-      { name: "Connector length", value: "3 ft, except 6 ft for ranges and domestic clothes dryers", source: "IFGC 411.1.3.1" },
+      { name: "Connector length", value: "6 ft overall for every appliance, one connector per appliance", source: "IFGC 2021 411.1.3.1" },
       { name: "Not checked", value: "connector listing and routing, reuse, upstream piping, venting, combustion air, CSST bonding, leak test", source: "stated scope limit" },
     ],
   },

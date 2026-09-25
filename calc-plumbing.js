@@ -663,13 +663,14 @@ export const recircPumpHeadExample = {
 
 // --- Utility 75: Trap Arm Length ---
 //
-// Public plumbing engineering practice: maximum trap arm length depends
-// on pipe diameter; the slope must not allow the trap weir to drain.
-// Values reflect long-standing engineering consensus.
+// IPC 2021 Table 909.1 maximum distance of fixture trap from vent: 1-1/4 in 5 ft, 1-1/2 in 6 ft,
+// 2 in 8 ft at 1/4 in/ft; 3 in 12 ft and 4 in 16 ft at 1/8 in/ft. IPC 909.2 limits the total fall to one
+// pipe diameter. Until 2026-09-25 the small sizes were 3.5 and 5 ft (neither IPC nor UPC) and the
+// citation called the table "public engineering practice".
 
 export const TRAP_ARM_MAX_FT = {
-  "1.25": 3.5,
-  "1.5": 5,
+  "1.25": 5,
+  "1.5": 6,
   "2": 8,
   "3": 12,
   "4": 16,
@@ -887,7 +888,7 @@ export function renderRecircPumpHead(inputRegion, outputRegion, citationEl) {
 
 // dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderTrapArm(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: Standard trap-arm length table (public plumbing engineering practice). The trap weir must not drain through the vent; total fall limited to one pipe diameter.";
+  citationEl.textContent = "Citation: IPC 2021 Table 909.1 (1-1/4 in 5 ft, 1-1/2 in 6 ft, 2 in 8 ft at 1/4 in/ft; 3 in 12 ft, 4 in 16 ft at 1/8 in/ft) and IPC 909.2 (total fall not more than one pipe diameter, vent connection not below the trap weir).";
   const dia = makeSelect("Pipe diameter (in)", "ta-d", Object.keys(TRAP_ARM_MAX_FT).map((s) => ({ value: s, label: s + "\""})));
   const slope = makeNumber("Slope (in/ft)", "ta-s", { step: "any", min: "0" });
   for (const f of [dia, slope]) inputRegion.appendChild(f.wrap);
@@ -1388,7 +1389,7 @@ export function renderHydrostaticTest(inputRegion, outputRegion, citationEl) {
 
 // dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderGreaseTrap(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: per IPC 2021 Table 1003.2 and PDI G101 by name. Volume = peak_flow * retention * loading_factor. AHJ governs. Free at codes.iccsafe.org.";
+  citationEl.textContent = "Citation: per IPC 2021 Section 1003.3 (grease interceptors; Table 1003.3.5.1 rates capacity in pounds of grease, not volume) and PDI G101 by name. Volume = peak_flow * retention * loading_factor. AHJ governs. Free at codes.iccsafe.org.";
   attachExampleButton(inputRegion, () => fillExample(greaseTrapExample.inputs));
   const pf = makeNumber("Peak fixture flow (gpm)", "gt-pf", { step: "any", min: "0" });
   const rt = makeNumber("Retention time (min)", "gt-rt", { step: "any", min: "0", value: "30" });
@@ -1409,7 +1410,7 @@ export function renderGreaseTrap(inputRegion, outputRegion, citationEl) {
 }
 
 function renderGreaseInterceptorFlowCapacity(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: per IPC 2021 Table 1003.2 and PDI G101 by name, the sizing relation volume = peak_flow x retention x loading solved for the flow: peak_flow = volume / (retention x loading). Compare to the connected fixtures' DFU peak flow. AHJ governs. Free at codes.iccsafe.org.";
+  citationEl.textContent = "Citation: per IPC 2021 Section 1003.3 (grease interceptors; Table 1003.3.5.1 rates capacity in pounds of grease, not volume) and PDI G101 by name, the sizing relation volume = peak_flow x retention x loading solved for the flow: peak_flow = volume / (retention x loading). Compare to the connected fixtures' DFU peak flow. AHJ governs. Free at codes.iccsafe.org.";
   attachExampleButton(inputRegion, () => fillExample(greaseInterceptorFlowCapacityExample.inputs));
   const vol = makeNumber("Interceptor volume (gal)", "gifc-v", { step: "any", min: "0" });
   const rt = makeNumber("Retention time (min)", "gifc-rt", { step: "any", min: "0", value: "30" });
@@ -2779,10 +2780,10 @@ export function computeTrapPrimer({
   let compliant = true;
   if (zone === "occupied" && prime_method === "manual") {
     compliant = false;
-    warnings.push("Manual priming in occupied space is insufficient per IPC 2021 §1002.4; the exception allows manual prime only in mechanical spaces with a documented seasonal procedure.");
+    warnings.push("Manual priming is not one of the trap-seal protection methods of IPC 2021 §1002.4.1 (a potable-water or reclaimed-water primer valve, a wastewater-supplied primer device, an ASSE 1072 barrier device, or a lavatory or hand-sink drain connection); a floor drain whose seal is subject to evaporation needs one of them.");
   }
   if (zone === "parking" && prime_method === "manual") {
-    warnings.push("Parking-structure drains evaporate seasonally; an automatic primer is recommended even where the manual exception applies.");
+    warnings.push("Parking-structure drains evaporate seasonally, and manual priming is not an IPC 1002.4.1 method; where the seal is subject to evaporation, use one of the listed methods.");
   }
   if (ozPerCycle <= 0) warnings.push("Enter the primer delivery volume per cycle (manufacturer cut sheet) to estimate annual water use.");
 
@@ -2812,7 +2813,7 @@ export const trapPrimerExample = {
 
 // dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 function _v16p_renderTrapPrimer(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: primers = ceil(floor drains / drains-per-distribution-unit); annual water = drains x (oz per cycle / 128) x cycles per year. Per IPC 2021 §1002.4 (trap seals) with manufacturer flow rates from published cut sheets (Precision Plumbing Products / Sioux Chief / Mifab). AHJ governs. Free at codes.iccsafe.org.";
+  citationEl.textContent = "Citation: primers = ceil(floor drains / drains-per-distribution-unit); annual water = drains x (oz per cycle / 128) x cycles per year. Per IPC 2021 §1002.4 (trap seal depth) and §1002.4.1 (protection of emergency floor drain traps and trap seals subject to evaporation, by one of the methods in 1002.4.1.1-1002.4.1.5), with manufacturer flow rates from published cut sheets (Precision Plumbing Products / Sioux Chief / Mifab). AHJ governs. Free at codes.iccsafe.org.";
   const drains = makeNumber("Floor-drain count", "tp-drains", { step: "1", min: "0" });
   const zone = makeSelect("Building zone", "tp-zone", [
     { value: "occupied", label: "Occupied space", selected: true },
@@ -2835,7 +2836,7 @@ function _v16p_renderTrapPrimer(inputRegion, outputRegion, citationEl) {
 
   const oPrimers = makeOutputLine(outputRegion, "Primers / distribution units", "tp-out-primers");
   const oWater = makeOutputLine(outputRegion, "Annual water use", "tp-out-water");
-  const oComp = makeOutputLine(outputRegion, "IPC 1002.4 compliance", "tp-out-comp");
+  const oComp = makeOutputLine(outputRegion, "IPC 1002.4.1 compliance", "tp-out-comp");
   const oNote = makeOutputLine(outputRegion, "Notes", "tp-out-note");
 
   const update = debounce(() => {
@@ -2850,7 +2851,7 @@ function _v16p_renderTrapPrimer(inputRegion, outputRegion, citationEl) {
     oPrimers.textContent = String(r.primers_needed) + " (" + r.drains_per_unit + " drains each)";
     oWater.textContent = fmt(r.water_gal_per_year, 1) + " gal/yr";
     oComp.textContent = r.compliant ? "OK for this zone" : "Not compliant as configured";
-    oNote.textContent = r.warnings.length ? r.warnings.join(" ") : "Every floor drain in occupied space has a primer per IPC 1002.4.";
+    oNote.textContent = r.warnings.length ? r.warnings.join(" ") : "Every floor drain in occupied space has a primer (IPC 1002.4.1).";
   }, DEBOUNCE_MS);
   for (const el of [drains.input, vol.input, cyc.input]) el.addEventListener("input", update);
   zone.select.addEventListener("change", update);
@@ -2905,7 +2906,7 @@ export function computeBackflowSizing({
   if (highHazard && assembly_type !== "RP") {
     required_assembly = "RP";
     overridden = true;
-    override_reason = "High (health) hazard requires a reduced-pressure principle (RP) assembly per IPC 312 / the cross-connection control program; overriding the selected " + assembly_type + ".";
+    override_reason = "High (health) hazard requires a reduced-pressure principle (RP) assembly per IPC 608.1 / Table 608.1 and the cross-connection control program; overriding the selected " + assembly_type + ".";
   } else if (!highHazard && !_V16P_BACKPRESSURE_OK.has(assembly_type)) {
     // Low hazard but a back-siphonage-only device under possible backpressure: note it.
     override_reason = assembly_type + " protects against back-siphonage only; if backpressure is possible, use a DC (low hazard) or RP (high hazard) assembly.";
@@ -2937,7 +2938,7 @@ export function computeBackflowSizing({
     min_residual_psi: minRes,
     low_pressure,
     attribution: loss.attribution,
-    compliance_note: "Annual test by a certified backflow assembly tester is required per EPA 40 CFR 141.85 and AWWA M14, and by most local cross-connection control programs. AHJ governs.",
+    compliance_note: "Testing at installation and at least annually is required by IPC 2021 §312.10.2 (and AWWA M14 and most local cross-connection control programs). AHJ governs.",
     warnings,
   };
 }
@@ -2951,7 +2952,7 @@ export const backflowSizingExample = {
 
 // dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 function _v16p_renderBackflowSizing(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: high (health) hazard requires a reduced-pressure principle (RP) assembly per IPC 312 / the cross-connection control program; downstream pressure = upstream - assembly head loss. Head loss interpolated from the bundled Watts technical-bulletin curves (representative; the assembly cut sheet and the USC FCCCHR approved-assembly list govern). Annual test required per EPA 40 CFR 141.85 / AWWA M14. AHJ governs. Free at codes.iccsafe.org and awwa.org for M14 TOC.";
+  citationEl.textContent = "Citation: high (health) hazard requires a reduced-pressure principle (RP) assembly per IPC 608.1 / Table 608.1 and the cross-connection control program; downstream pressure = upstream - assembly head loss. Head loss interpolated from the bundled Watts technical-bulletin curves (representative; the assembly cut sheet and the USC FCCCHR approved-assembly list govern). Annual test required per EPA 40 CFR 141.85 / AWWA M14. AHJ governs. Free at codes.iccsafe.org and awwa.org for M14 TOC.";
   const flow = makeNumber("Service flow demand (GPM)", "bs-flow", { step: "any", min: "0" });
   const hazard = makeSelect("Hazard category (IPC 312)", "bs-haz", [
     { value: "high", label: "High / health hazard", selected: true },
@@ -3644,7 +3645,7 @@ export function computeSupplyPressureBudget({ street_pressure, fixture_height = 
     headroom,
     adequate: headroom >= 0,
     verdict: headroom >= 0 ? "adequate" : "short",
-    note: "Use the minimum recorded street pressure (a residual sized at peak-day low pressure protects the worst case). Flush-valve and tankless fixtures carry a higher minimum (15-25 psi) than a standard tank fixture (8 psi). IPC 604 caps static pressure at 80 psi, requiring a PRV above it (which adds its own downstream loss).",
+    note: "Use the minimum recorded street pressure (a residual sized at peak-day low pressure protects the worst case). IPC 2021 Table 604.3 minimum flow pressures: 8 psi for lavatories, sinks, showers, laundry trays and hose bibbs; 20 psi for a tank or flushometer-tank water closet and for thermostatic or pressure-balance shower and tub valves; 25 psi for a urinal flush valve; 35 psi for a siphonic and 45 psi for a blowout flushometer-valve water closet. The 8 psi default is for the simplest fixtures; enter the governing fixture's figure. IPC 604 caps static pressure at 80 psi, requiring a PRV above it (which adds its own downstream loss).",
   };
 }
 

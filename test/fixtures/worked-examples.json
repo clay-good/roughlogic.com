@@ -81749,9 +81749,9 @@
   {
    "tile_id": "gas-appliance-connection",
    "source_publisher": "International Code Council",
-   "source_title": "IFGC -- a furnace fails on the trap and the connector (spec-v1145)",
+   "source_title": "IFGC 2021 -- a furnace fails on the trap (spec-v1145)",
    "source_edition_or_year": "IFGC 408.4 / 409.5 / 411.1.3.1",
-   "source_section_or_page": "'Where a sediment trap is not incorporated as part of the appliance, a sediment trap shall be installed downstream of the appliance shutoff valve.' 'Connectors shall have an overall length not to exceed 3 feet, except for range and domestic clothes dryer connectors, which shall not exceed 6 feet.' A furnace with a compliant shutoff (same room, 4 ft, upstream) still fails twice: no sediment trap where one is required, and a 4 ft connector against the general 3 ft limit, 1 ft over.",
+   "source_section_or_page": "'Where a sediment trap is not incorporated as part of the appliance, a sediment trap shall be installed downstream of the appliance shutoff valve.' 'Connectors shall have an overall length not to exceed 6 feet.' A furnace with a compliant shutoff (same room, 4 ft, upstream) and a 4 ft connector still fails: no sediment trap where one is required.",
    "verified_by": "rl",
    "verified_on": "2026-07-27",
    "inputs": {
@@ -81765,13 +81765,13 @@
    },
    "outputs": {
     "connector_limit_ft": {
-     "value": 3,
+     "value": 6,
      "tolerance": {
       "abs": 0.0001
      }
     },
     "connector_over_ft": {
-     "value": 1,
+     "value": 0,
      "tolerance": {
       "abs": 0.0001
      }
@@ -81789,7 +81789,7 @@
    "source_publisher": "International Code Council",
    "source_title": "cross-check: the same installation PASSES as a clothes dryer -- the movable-appliance category",
    "source_edition_or_year": "IFGC 408.4 exception / 411.1.3.1 exception",
-   "source_section_or_page": "'Illuminating appliances, ranges, clothes dryers, decorative vented appliances for installation in vented fireplaces, gas fireplaces and outdoor grills need not be so equipped.' A dryer is exempt from the sediment trap and gets the 6 ft connector limit, so a 5 ft connector and no trap both clear -- and 409.5 additionally deems a shutoff behind it accessible. Ranges and dryers appear in every one of these exceptions: the category, not three separate lists, is what predicts the answer.",
+   "source_section_or_page": "'Illuminating appliances, ranges, clothes dryers, decorative vented appliances for installation in vented fireplaces, gas fireplaces and outdoor grills need not be so equipped.' A dryer is exempt from the sediment trap, so no trap clears, and its 5 ft connector is inside the 6 ft limit that now applies to every appliance -- and 409.5.1 additionally deems a shutoff behind it accessible. Ranges and dryers appear in both exceptions: the category is what predicts the answer.",
    "verified_by": "rl",
    "verified_on": "2026-07-27",
    "inputs": {

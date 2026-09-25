@@ -4364,7 +4364,7 @@ import { computeTimberCruise } from "../../calc-agriculture.js";
 import { computeSlopeAvalanche } from "../../calc-field.js";
 import { computeSalesTaxCompound } from "../../calc-accounting.js";
 
-test("monotonicity: computeTrapArm max_length_ft is strictly increasing in pipe_diameter_in at fixed 0.25 in/ft slope (UPC 1002.2 trap-arm table pin)", () => {
+test("monotonicity: computeTrapArm max_length_ft is strictly increasing in pipe_diameter_in at fixed 0.25 in/ft slope (IPC 2021 Table 909.1 trap-arm table pin)", () => {
   // Group B. UPC 1002.2 table: 1.25"->3.5 ft, 1.5"->5 ft, 2"->8 ft,
   // 3"->12 ft, 4"->16 ft. At 0.25 in/ft slope the fall limit (D / slope =
   // 4*D) sits at or above the table for every bundled size, so the
@@ -4379,10 +4379,10 @@ test("monotonicity: computeTrapArm max_length_ft is strictly increasing in pipe_
       `max at D=${pipe_diameter_in} = ${r.max_length_ft} not greater than prev=${prev}`);
     prev = r.max_length_ft;
   }
-  // Table-pin closed form: 1.5" -> 5 ft / 2" -> 8 ft / 3" -> 12 ft / 4" -> 16 ft.
+  // IPC 2021 Table 909.1 pin: 1.5" -> 6 ft / 2" -> 8 ft / 3" -> 12 ft / 4" -> 16 ft.
   const oneHalf = computeTrapArm({ pipe_diameter_in: 1.5, slope_in_per_ft: 0.25 });
-  assert.equal(oneHalf.table_max_ft, 5);
-  assert.equal(oneHalf.max_length_ft, 5);
+  assert.equal(oneHalf.table_max_ft, 6);
+  assert.equal(oneHalf.max_length_ft, 6);
   const four = computeTrapArm({ pipe_diameter_in: 4, slope_in_per_ft: 0.25 });
   assert.equal(four.table_max_ft, 16);
   assert.equal(four.max_length_ft, 16);

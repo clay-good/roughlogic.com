@@ -78,8 +78,8 @@ The structured §3 reference block in `citations.js` is the deeper source - this
 | gas-pipe-sizing | "Citation: per IFGC 2021 Table 402.4 (NFPA 54), via IFGC Equation 4-1 (low pressure), D = Q^0.381 / (19.17 (dH / (Cr L))^0.206), the relation the tables are built from; Cr 0.6094 natural gas, 1.2462 propane. AHJ governs. Free at codes.iccsafe.org." |
 | friction-loss | "Citation: Hazen-Williams (1905, public domain). IPC 2021 referenced for application. Darcy-Weisbach with Colebrook-White for general fluid use. Free at codes.iccsafe.org." |
 | septic-tank | "Citation: EPA Onsite Wastewater Treatment Systems Manual (EPA/625/R-00/008), Table 4-13 for one- and two-family dwellings by bedroom count (750 to 2,100 gal for 1-8 bedrooms), held at the 1,000 gal minimum many states set; for other buildings, a design daily flow entry takes the EPA rule of thumb of about two times the design flow. 150 gpd per bedroom. State primacy agency governs final design. Free at epa.gov/septic." |
-| grease-trap | "Citation: per IPC 2021 Table 1003.2 and PDI G101 by name. Volume = peak_flow * retention * loading_factor. AHJ governs. Free at codes.iccsafe.org." |
-| trap-arm | "Citation: Standard trap-arm length table (public plumbing engineering practice). The trap weir must not drain through the vent; total fall limited to one pipe diameter." |
+| grease-trap | "Citation: per IPC 2021 Section 1003.3 (grease interceptors; Table 1003.3.5.1 rates capacity in pounds of grease, not volume) and PDI G101 by name. Volume = peak_flow * retention * loading_factor. AHJ governs. Free at codes.iccsafe.org." |
+| trap-arm | "Citation: IPC 2021 Table 909.1 (1-1/4 in 5 ft, 1-1/2 in 6 ft, 2 in 8 ft at 1/4 in/ft; 3 in 12 ft, 4 in 16 ft at 1/8 in/ft) and IPC 909.2 (total fall not more than one pipe diameter, vent connection not below the trap weir)." |
 
 ### calc-hvac.js (Group C)
 

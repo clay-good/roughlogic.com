@@ -962,7 +962,7 @@ export const BESPOKE_OUTPUT_LABELS = {
   "transformer-turns-ratio": {"turns_ratio":"Turns ratio","primary_current_a":"Primary current Ip","reflected_impedance_ohm":"Reflected primary impedance","note":"Note"},
   "transformer-voltage-regulation": {"vr_percent":"Voltage regulation","note":"Note"},
   "trap-arm": {"max_length_ft":"Maximum length","table_max_ft":"Table max"},
-  "trap-primer": {"water_gal_per_year":"Annual water use","compliant":"IPC 1002.4 compliance","warnings":"Notes"},
+  "trap-primer": {"water_gal_per_year":"Annual water use","compliant":"IPC 1002.4.1 compliance","warnings":"Notes"},
   "trap-speed-horsepower": {"hp":"Estimated horsepower","et_s":"Companion 1/4-mile ET","note":"Note"},
   "trapezoidal-channel-flow": {"flow_cfs":"Discharge Q","note":"Note"},
   "traverse-closure": {"closure_note":"Closure","sum_lat":"Misclosure components"},

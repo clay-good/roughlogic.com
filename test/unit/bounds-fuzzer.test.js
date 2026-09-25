@@ -8033,9 +8033,10 @@ test("bounds: calc-plumbing computeSepticTank pins gpd = 150*bedrooms with a 100
 
 test("bounds: calc-plumbing computeTrapArm pins min(table_max, diameter/slope) on the 1.5\" / 1/4 in-per-ft example", () => {
   const r = computeTrapArm({ pipe_diameter_in: 1.5, slope_in_per_ft: 0.25 });
-  assert.strictEqual(r.table_max_ft, 5);
-  assert.strictEqual(r.fall_limited_ft, 1.5 / 0.25); // 6
-  assert.strictEqual(r.max_length_ft, 5); // min of 5 and 6
+  assert.strictEqual(r.table_max_ft, 6); // IPC 2021 Table 909.1
+  assert.strictEqual(r.fall_limited_ft, 1.5 / 0.25); // 6 (909.2: fall <= one diameter)
+  assert.strictEqual(r.max_length_ft, 6);
+  assert.strictEqual(computeTrapArm({ pipe_diameter_in: 1.25 }).table_max_ft, 5);
   // Tight slope -> fall-limited wins.
   const tight = computeTrapArm({ pipe_diameter_in: 3, slope_in_per_ft: 0.5 });
   assert.strictEqual(tight.fall_limited_ft, 6);
@@ -8315,7 +8316,7 @@ test("bounds: calc-plumbing computeBackflowSizing pins the high-hazard RP overri
   assert.ok(Math.abs(r.head_loss_psi - 11.5) < 1e-9); // Watts LF909 2 in at 100 gpm
   assert.ok(Math.abs(r.downstream_psi - 58.5) < 1e-9);
   assert.strictEqual(r.low_pressure, false);
-  assert.match(r.compliance_note, /141\.85/);
+  assert.match(r.compliance_note, /312\.10\.2/); // IPC annual-test rule (40 CFR 141.85 is the lead rule)
   // Low hazard keeps the selected double-check; downstream = upstream - loss.
   const low = computeBackflowSizing({ service_flow_gpm: 40, hazard: "low", assembly_type: "DC", pipe_size_in: "1", upstream_pressure_psi: 60 });
   assert.strictEqual(low.required_assembly, "DC");
@@ -35176,24 +35177,25 @@ test("bounds: spec-v1144 computeCondensateOverflowPan pins the overall-not-per-s
 
 import { computeGasApplianceConnection as _v1145 } from "../../calc-gas.js";
 
-test("bounds: spec-v1145 computeGasApplianceConnection pins the movable-appliance category across all three IFGC rules, and the error seams", () => {
+test("bounds: spec-v1145 computeGasApplianceConnection pins the movable-appliance category across the IFGC rules, and the error seams", () => {
   const base = { appliance: "furnace", shutoff_same_room: "yes", shutoff_distance_ft: 4, shutoff_upstream: "yes", trap_present: "no", trap_in_appliance: "no", connector_length_ft: 4 };
   const r = _v1145(base);
   assert.ok(r.shutoff_ok && !r.movable && r.trap_required && r.trap_ok === false);
-  assert.ok(r.connector_limit_ft === 3 && !r.connector_ok && r.connector_over_ft === 1 && !r.passes);
-  // THE CATEGORY: ranges and dryers are exempt from the trap AND get the longer connector.
+  // IFGC 2021 411.1.3.1: 6 ft for every appliance, so the 4 ft furnace connector is fine; the trap still fails it.
+  assert.ok(r.connector_limit_ft === 6 && r.connector_ok && r.connector_over_ft === 0 && !r.passes);
+  // THE CATEGORY: ranges and dryers are exempt from the trap (and the shutoff-behind allowance).
   for (const a of ["range", "dryer"]) {
     const t = _v1145({ ...base, appliance: a, connector_length_ft: 5 });
     assert.ok(t.movable && t.trap_exempt && !t.trap_required && t.connector_limit_ft === 6 && t.connector_ok && t.passes);
   }
   for (const a of ["furnace", "water-heater", "boiler", "other"]) {
     const t = _v1145({ ...base, appliance: a });
-    assert.ok(!t.movable && !t.trap_exempt && t.trap_required && t.connector_limit_ft === 3);
+    assert.ok(!t.movable && !t.trap_exempt && t.trap_required && t.connector_limit_ft === 6);
   }
-  // The other exempt types are exempt from the TRAP but keep the 3 ft connector limit.
+  // The other exempt types are exempt from the TRAP; every appliance has the same 6 ft connector limit.
   for (const a of ["illuminating", "decorative-vented", "gas-fireplace", "outdoor-grill"]) {
     const t = _v1145({ ...base, appliance: a });
-    assert.ok(t.trap_exempt && !t.trap_required && !t.movable && t.connector_limit_ft === 3, a + " is trap-exempt but not movable");
+    assert.ok(t.trap_exempt && !t.trap_required && !t.movable && t.connector_limit_ft === 6, a + " is trap-exempt but not movable");
   }
   // A built-in trap satisfies 408.4 without the appliance being exempt.
   const builtIn = _v1145({ ...base, trap_in_appliance: "yes", connector_length_ft: 3 });
@@ -35204,7 +35206,7 @@ test("bounds: spec-v1145 computeGasApplianceConnection pins the movable-applianc
   assert.ok(_v1145({ ...base, shutoff_distance_ft: 6 }).distance_ok && !_v1145({ ...base, shutoff_distance_ft: 6.1 }).distance_ok);
   assert.ok(Math.abs(_v1145({ ...base, shutoff_distance_ft: 10 }).shutoff_distance_deficit_ft - 4) < 1e-9);
   // Connector seams are exact at each limit, and zero means hard piped rather than a failure.
-  assert.ok(_v1145({ ...base, connector_length_ft: 3 }).connector_ok && !_v1145({ ...base, connector_length_ft: 3.1 }).connector_ok);
+  assert.ok(_v1145({ ...base, connector_length_ft: 6 }).connector_ok && !_v1145({ ...base, connector_length_ft: 6.1 }).connector_ok);
   assert.ok(_v1145({ ...base, appliance: "range", connector_length_ft: 6 }).connector_ok);
   assert.ok(!_v1145({ ...base, appliance: "range", connector_length_ft: 6.1 }).connector_ok);
   const hardPiped = _v1145({ ...base, connector_length_ft: 0, trap_present: "yes" });

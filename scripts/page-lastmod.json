@@ -2,7 +2,7 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "2ba8f97158e5b136",
+      "sha": "5fc82a9bae00f2f2",
       "date": "2026-09-25"
     },
     "/tools/": {
@@ -422,7 +422,7 @@
       "date": "2026-09-25"
     },
     "/tools/backflow-sizing/": {
-      "sha": "99b1e9ef50660988",
+      "sha": "ee1ec412034474d8",
       "date": "2026-09-25"
     },
     "/tools/backflow-test-psi/": {
@@ -3182,8 +3182,8 @@
       "date": "2026-09-18"
     },
     "/tools/gas-appliance-connection/": {
-      "sha": "11efa0afe3b863a3",
-      "date": "2026-09-01"
+      "sha": "123f565408fef3e3",
+      "date": "2026-09-25"
     },
     "/tools/gas-appliance-demand/": {
       "sha": "9531a4fd3899974f",
@@ -3806,8 +3806,8 @@
       "date": "2026-09-01"
     },
     "/tools/hydrostatic-test/": {
-      "sha": "5894690247a775bc",
-      "date": "2026-09-09"
+      "sha": "c0f2e64e614f0e61",
+      "date": "2026-09-25"
     },
     "/tools/hydroxyl-sizing/": {
       "sha": "aa891bb5fbcf3f81",
@@ -7586,8 +7586,8 @@
       "date": "2026-09-01"
     },
     "/tools/supply-pressure-budget/": {
-      "sha": "5d91d778dca2f71f",
-      "date": "2026-09-01"
+      "sha": "01469b12b4ce44d5",
+      "date": "2026-09-25"
     },
     "/tools/support-spacing/": {
       "sha": "9a52da1fd17b3d13",
@@ -8038,12 +8038,12 @@
       "date": "2026-09-19"
     },
     "/tools/trap-arm/": {
-      "sha": "1763e927593c32b6",
-      "date": "2026-09-01"
+      "sha": "d64ecccb3b377e41",
+      "date": "2026-09-25"
     },
     "/tools/trap-primer/": {
-      "sha": "837357dd40806893",
-      "date": "2026-09-01"
+      "sha": "0aea7583bbf27c27",
+      "date": "2026-09-25"
     },
     "/tools/trap-seal-loss/": {
       "sha": "c297a740335eb1ad",

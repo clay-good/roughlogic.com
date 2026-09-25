@@ -309,9 +309,9 @@ test("backflow-sizing: a low downstream residual is flagged", () => {
   assert.ok(r.warnings.some((w) => /minimum residual/.test(w)));
 });
 
-test("backflow-sizing: the compliance note cites EPA 40 CFR 141.85 / AWWA M14", () => {
+test("backflow-sizing: the compliance note cites IPC 312.10.2 / AWWA M14 for the annual test", () => {
   const r = computeBackflowSizing(backflowSizingExample.inputs);
-  assert.match(r.compliance_note, /141\.85/);
+  assert.match(r.compliance_note, /312\.10\.2/);
   assert.match(r.compliance_note, /AWWA M14/);
 });
 
