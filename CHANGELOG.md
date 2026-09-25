@@ -10,6 +10,11 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **Wire-rope clip turnback, eye-bolt angle derate, and three crane citations checked against Crosby and the eCFR.**
+  - `wire-rope-clips`: when other-material clips need more clips than the forged count, Crosby G-450 says to increase the turnback "proportionately." The tile added one 6d spacing per extra clip instead, which left a 1/2 in rope 0.83 in short (14.5 in against 15.33 in; unsafe). The turnback now scales with the clip count.
+  - `shackle-eyebolt-wll`: the shoulder eye-bolt curve fell to 15% at 60° and stayed there. Crosby's chart gives 30% of the rated load at 45° and 25% at 90°, so the 90° capacity read 40% low. The curve now ends at the chart's 25%.
+  - `crane-net-capacity` cited a "1926.1417(o) deduction stack." That paragraph bars operating past rated capacity but lists no deductions; the hook-block, jib and rope deductions come from the load-chart notes and ASME B30.5.
+  - `crane-power-line-clearance` applied the 50 ft default above 350 kV and the over-1,000 kV rule from 1926.1409 but credited them to 1926.1408(h), which covers safety devices. It now cites 1926.1409.
 - **Self-employment tax, the OSHA Top 10, and two citations checked against their sources.**
   - `se-tax` applied the full Additional Medicare threshold to self-employment income even when W-2 wages had already used it. Form 8959 Part II (lines 9-11) lowers the threshold by W-2 Medicare wages. A single filer with $150,000 of W-2 wages and $100,000 of net SE earnings owes $381.15 of Additional Medicare tax, where the tile showed $0. A new optional input takes W-2 Medicare wages (box 5), which have no cap; left blank, it uses the Social Security wages.
   - `osha-top10` carried fiscal year 2024's list under a "check for a later year" label. OSHA's fiscal year 2025 list, published April 15, 2026, reorders ranks 4-8: lockout/tagout 4, respiratory protection 5, scaffolding 6, fall-protection training 7, powered industrial trucks 8.

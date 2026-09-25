@@ -12028,6 +12028,9 @@ test("bounds: calc-rigging v66 hardware and below-the-hook pins every worked exa
   assert.strictEqual(se.derated_capacity_lb, 2100);
   assert.strictEqual(se.pass, false);
   assert.strictEqual(_v66a({ leg_load_lb: 3000, rated_wll_lb: 7000, angle_deg: 0, hardware: "shoulder_eyebolt" }).pass, true); // in-line
+  // Crosby eye bolt chart: 25% at 90 deg; between 45 and 90 the curve runs 30% -> 25%.
+  assert.ok(Math.abs(_v66a({ leg_load_lb: 1000, rated_wll_lb: 7000, angle_deg: 90, hardware: "shoulder_eyebolt" }).derate - 0.25) < 1e-12);
+  assert.ok(Math.abs(_v66a({ leg_load_lb: 1000, rated_wll_lb: 7000, angle_deg: 60, hardware: "shoulder_eyebolt" }).derate - (0.30 - 0.05 / 3)) < 1e-12);
   assert.strictEqual(_v66a({ leg_load_lb: 3000, rated_wll_lb: 5000, angle_deg: 45, hardware: "shackle" }).derated_capacity_lb, 3500); // shackle side load
   assert.ok("error" in _v66a({ leg_load_lb: 0, rated_wll_lb: 7000, angle_deg: 45 }));
   assert.ok("error" in _v66a({ leg_load_lb: 3000, rated_wll_lb: 7000, angle_deg: 91 }));
@@ -29367,6 +29370,9 @@ test("bounds: spec-v938 computeWireRopeClips pins the OSHA Table H-2 count, spac
   // Crosby G-450 turnback, not clips x 6d (which gave 9 in at 1/2 in).
   const turnback = [[0.25, 4.75], [0.375, 6.5], [0.5, 11.5], [0.625, 12], [0.75, 18], [0.875, 19], [1.0, 26], [1.125, 34], [1.25, 44], [1.5, 54]];
   for (const [d, t] of turnback) assert.equal(_v938({ rope_diameter_in: d }).minimum_tail_in, t, `turnback @ ${d}`);
+  // Extra clips increase the turnback proportionately (Crosby G-450): 1/2 in, 4 other-material clips vs 3 forged.
+  assert.ok(Math.abs(_v938({ rope_diameter_in: 0.5, clip_material: "other" }).minimum_tail_in - 11.5 * 4 / 3) < 1e-9);
+  assert.ok(Math.abs(_v938({ rope_diameter_in: 1.5, clip_material: "other" }).minimum_tail_in - 54 * 8 / 7) < 1e-9);
   // Past the OSHA table, and other-material clips below it, are the maker's call.
   assert.ok("error" in _v938({ rope_diameter_in: 1.625 }));
   assert.ok("error" in _v938({ rope_diameter_in: 0.375, clip_material: "other" }));

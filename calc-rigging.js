@@ -136,7 +136,7 @@ export function computeCraneNetCapacity({ gross_chart_lb, hook_block_lb = 0, jib
 }
 
 function renderCraneNetCapacity(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: OSHA 29 CFR 1926.1417(o) deduction stack and ASME B30.5 by name. net = gross - hook block - jib - wire rope; percent = (load + below-hook) / net. Estimate - the manufacturer's load chart governs.";
+  citationEl.textContent = "Citation: ASME B30.5 and the manufacturer's load-chart notes for the deductions (1926.1417(o) forbids operating past rated capacity but lists no deductions). net = gross - hook block - jib - wire rope; percent = (load + below-hook) / net. Estimate - the manufacturer's load chart governs.";
   const gross = makeNumber("Gross chart capacity at radius (lb)", "cnc-gross", { step: "any", min: "0" });
   const hook = makeNumber("Hook block / overhaul ball (lb)", "cnc-hook", { step: "any", min: "0", value: "0" });
   const jib = makeNumber("Erected jib / extension (lb)", "cnc-jib", { step: "any", min: "0", value: "0" });
@@ -537,7 +537,11 @@ RIGGING_RENDERERS["tandem-lift-share"] = renderTandemLiftShare;
 // the leg load. Side-load / angular-pull derate curves are editable
 // approximations of the ASME B30.26 manufacturer charts. Helpers above dims.
 const SHACKLE_DERATE = [[0, 1.00], [45, 0.70], [90, 0.50]];
-const EYEBOLT_DERATE = [[0, 1.00], [15, 0.75], [30, 0.55], [45, 0.30], [60, 0.15]];
+// Crosby shoulder eye bolt chart: 30% of the rated load at 45 deg, 25% at
+// 90 deg. The 15 and 30 deg points are interpolation between in-line and 45,
+// held slightly under the straight line. (Until 2026-09-24 the curve fell to
+// 15% at 60 deg and held there, a floor no source gives.)
+const EYEBOLT_DERATE = [[0, 1.00], [15, 0.75], [30, 0.55], [45, 0.30], [90, 0.25]];
 const _derateInterp = (curve, angle) => {
   if (angle <= curve[0][0]) return curve[0][1];
   if (angle >= curve[curve.length - 1][0]) return curve[curve.length - 1][1];
@@ -575,12 +579,12 @@ export function computeShackleEyeboltWll({ leg_load_lb, rated_wll_lb, angle_deg 
     hardware: hardware === "shoulder_eyebolt" ? "shoulder eye bolt" : "shackle",
     pass: deratedCapacity >= leg,
     verdict: deratedCapacity >= leg ? "pass" : "fail - hardware undersized at this angle",
-    note: "Shackles are loaded in line through the bow and pin; a side load follows the manufacturer's reduced chart. An eye bolt pulled at an angle can lose more than half its rating, and an angular pull on a plain (non-shoulder) eye bolt is not permitted. The 5:1 design factor is on the WLL, not a license to load to the minimum breaking strength. Inspect every piece; the manufacturer's exact chart governs.",
+    note: "Shackles are loaded in line through the bow and pin; a side load follows the manufacturer's reduced chart. A shoulder eye bolt keeps 30% of its rating at 45 degrees and 25% at 90 (Crosby's chart), and an angular pull on a plain (non-shoulder) eye bolt is not permitted. The 5:1 design factor is on the WLL, not a license to load to the minimum breaking strength. Inspect every piece; the manufacturer's exact chart governs.",
   };
 }
 
 function renderShackleEyeboltWll(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: ASME B30.26 (Rigging Hardware) and ASME B18.15 / manufacturer eye-bolt data by name; the angular derate curves ship as editable approximations. Estimate - the rating plate governs.";
+  citationEl.textContent = "Citation: ASME B30.26 (Rigging Hardware) and ASME B18.15 / manufacturer eye-bolt data by name; the eye-bolt curve carries the Crosby chart points (30% at 45 deg, 25% at 90 deg), and the shackle side-load curve is an editable approximation. Estimate - the rating plate governs.";
   const leg = makeNumber("Leg load (lb)", "se-leg", { step: "any", min: "0" });
   const rated = makeNumber("Catalog WLL of the hardware (lb)", "se-rated", { step: "any", min: "0" });
   const hardware = makeSelect("Hardware", "se-hw", [
@@ -1650,14 +1654,16 @@ export function computeWireRopeClips({ rope_diameter_in = 0.75, clip_material = 
   }
   const clip_count = clip_material === "other" ? other : forged;
   const spacing_in = 6 * rope_diameter_in;
-  // Crosby's turnback is for its forged count; an extra clip needs one more spacing of rope.
-  const minimum_tail_in = row[3] + (clip_count - forged) * spacing_in;
+  // Crosby G-450: "If a greater number of clips are used than shown in the
+  // table, the amount of turnback should be increased proportionately."
+  // (Until 2026-09-24 this added one 6d spacing per extra clip, up to 0.83 in short.)
+  const minimum_tail_in = row[3] * clip_count / forged;
   if (![clip_count, spacing_in, minimum_tail_in].every(Number.isFinite)) return { error: "Wire-rope-clip math is not a finite value." };
   return {
     clip_count,
     spacing_in,
     minimum_tail_in,
-    note: "The minimum number of U-bolt wire-rope clips and their spacing to form a load-bearing eye, per OSHA 29 CFR 1926.251 Table H-2 (the old H-20): a 3/4 in rope takes 4 drop-forged clips, or 5 of any other material, at 6 x the diameter (4.5 in) on center. The turnback is the Crosby G-450 table's amount of rope to turn back from the thimble (18 in at 3/4 in), plus one spacing per extra clip for other materials; another maker's table governs its own clips, and Crosby itself calls for 7 clips at 1-1/4 in and 8 at 1-1/2 in, one more than OSHA. Install the U-bolt on the DEAD (short) end and the saddle on the LIVE (load) end -- 'never saddle a dead horse' -- torqued to the maker's value in sequence and retorqued after the first load. Below 1/2 in the OSHA table does not list a count; 2 forged clips is the Crosby minimum. A properly formed clip eye develops only about 80% of the rope's strength; the clip and rope manufacturer and OSHA govern the termination.",
+    note: "The minimum number of U-bolt wire-rope clips and their spacing to form a load-bearing eye, per OSHA 29 CFR 1926.251 Table H-2 (the old H-20): a 3/4 in rope takes 4 drop-forged clips, or 5 of any other material, at 6 x the diameter (4.5 in) on center. The turnback is the Crosby G-450 table's amount of rope to turn back from the thimble (18 in at 3/4 in), increased in proportion to the clip count when other materials need more clips (Crosby G-450); another maker's table governs its own clips, and Crosby itself calls for 7 clips at 1-1/4 in and 8 at 1-1/2 in, one more than OSHA. Install the U-bolt on the DEAD (short) end and the saddle on the LIVE (load) end -- 'never saddle a dead horse' -- torqued to the maker's value in sequence and retorqued after the first load. Below 1/2 in the OSHA table does not list a count; 2 forged clips is the Crosby minimum. A properly formed clip eye develops only about 80% of the rope's strength; the clip and rope manufacturer and OSHA govern the termination.",
   };
 }
 
@@ -1870,7 +1876,7 @@ export function computeCranePowerLineClearance({ option = "default", voltage_kv 
   const over_1000kv = kv > 1000;
 
   // The default is 20 ft only up to 350 kV; above that it is 50, and over 1,000 kV there is no
-  // default number -- the utility or a registered PE sets it (1926.1408(h)).
+  // default number -- the utility or a registered PE sets it (1926.1409(a) and (b)).
   const voltage_known = kv > 0;
   const default_clearance_ft = voltage_known ? (kv <= 350 ? 20 : kv <= 1000 ? 50 : null) : 20;
   const default_assumed = !voltage_known;
@@ -1916,7 +1922,7 @@ export function computeCranePowerLineClearance({ option = "default", voltage_kv 
 export const cranePowerLineClearanceExample = { inputs: { option: "table-a", voltage_kv: 12, actual_clearance_ft: 12, boom_length_ft: 80 } };
 
 function _v1157renderCranePowerLineClearance(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: OSHA 29 CFR 1926.1408, a US federal regulation in the public domain. For power lines up to 350 kV the employer must either confirm from the utility owner or operator that the line has been deenergized and visibly grounded at the worksite; or ensure that no part of the equipment, load line, or load - including rigging and lifting accessories - gets closer than 20 feet to the line while implementing the encroachment-prevention measures of paragraph (b); or determine the line's voltage and use the Table A minimum clearance distance while implementing those same measures. Table A: up to 50 kV, 10 ft; over 50 to 200 kV, 15 ft; over 200 to 350 kV, 20 ft; over 350 to 500 kV, 25 ft; over 500 to 750 kV, 35 ft; over 750 to 1,000 kV, 45 ft; over 1,000 kV, as established by the utility owner or operator or a registered professional engineer who is a qualified person with respect to electrical power transmission and distribution. Not checked: the encroachment-prevention measures themselves, the planning meeting and work-zone identification, assembly and disassembly near power lines, travel with no load, or the utility's voltage confirmation. A screen, not a lift plan; Subpart CC, the utility, and the qualified person govern.";
+  citationEl.textContent = "Citation: OSHA 29 CFR 1926.1408 and 1926.1409 (lines over 350 kV), US federal regulations in the public domain. For power lines up to 350 kV the employer must either confirm from the utility owner or operator that the line has been deenergized and visibly grounded at the worksite; or ensure that no part of the equipment, load line, or load - including rigging and lifting accessories - gets closer than 20 feet to the line while implementing the encroachment-prevention measures of paragraph (b); or determine the line's voltage and use the Table A minimum clearance distance while implementing those same measures. Table A: up to 50 kV, 10 ft; over 50 to 200 kV, 15 ft; over 200 to 350 kV, 20 ft; over 350 to 500 kV, 25 ft; over 500 to 750 kV, 35 ft; over 750 to 1,000 kV, 45 ft; over 1,000 kV, as established by the utility owner or operator or a registered professional engineer who is a qualified person with respect to electrical power transmission and distribution. Not checked: the encroachment-prevention measures themselves, the planning meeting and work-zone identification, assembly and disassembly near power lines, travel with no load, or the utility's voltage confirmation. A screen, not a lift plan; Subpart CC, the utility, and the qualified person govern.";
   const op = makeSelect("Which option", "cpc-op", [
     { value: "default", label: "Default clearance (voltage not determined)", selected: true },
     { value: "table-a", label: "Table A (voltage determined)" },

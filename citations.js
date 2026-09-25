@@ -9665,12 +9665,12 @@ export const CITATIONS = {
   },
   "crane-net-capacity": {
     formula: "net = gross_chart - hook_block - jib - wire_rope; total_hook = load + below_hook; pct_of_net = total_hook / net x 100; flags at 75 / 90 / 100%.",
-    edition: "OSHA 29 CFR 1926.1417(o) deduction stack and ASME B30.5 (Mobile and Locomotive Cranes) by name; arithmetic on chart numbers.",
+    edition: "ASME B30.5 (Mobile and Locomotive Cranes) and the manufacturer's load-chart notes by name for the deductions; OSHA 29 CFR 1926.1417(o) for the rule against exceeding rated capacity. Arithmetic on chart numbers.",
     freeAccess: "OSHA 1926 Subpart CC is free at osha.gov. The capacity numbers come from the manufacturer's load chart.",
     governance: GOVERNANCE.rigging,
     editionNote: "The chart, the configuration (boom length, radius, outrigger spread, counterweight), and a qualified operator govern. Structural-vs-stability ratings and an out-of-level deration live on the chart. The 75 / 90 / 100% values are planning flags, not a substitute for the chart.",
     assumptions: [
-      { name: "Deduction stack", value: "hook block / overhaul ball, erected jib, and wire-rope deduction per the chart", source: "OSHA 1926.1417(o)" },
+      { name: "Deduction stack", value: "hook block / overhaul ball, erected jib, and wire-rope deduction per the chart", source: "manufacturer load-chart notes / ASME B30.5" },
       { name: "Flags", value: "75% critical / engineered, 90% margin gone, 100% over chart (STOP)", source: "rigging planning practice" },
     ],
   },
@@ -9682,9 +9682,9 @@ export const CITATIONS = {
     editionNote: "The 20 ft figure that everyone carries is a DEFAULT rather than the rule, and it is the option you fall back on when you have not determined the voltage. The section gives three: confirm from the utility owner or operator that the line has been deenergized and visibly grounded, which removes the problem; keep everything - equipment, load line, and load including rigging and lifting accessories - at least 20 ft away; or DETERMINE the line\'s voltage and use Table A. Table A starts at 10 ft for lines up to 50 kV, which covers most distribution, so on an ordinary 12 kV service determining the voltage buys back 10 ft of working radius for the price of a phone call to the utility. On a tight site that is the cheapest thing available. The trap runs in the other direction as well, and it is the more dangerous one: the 20 ft default applies only to lines UP TO 350 kV. Above that the default is 50 ft, and Table A itself keeps climbing - 25 ft over 350, 35 over 500, 45 over 750. So on transmission the remembered number is not conservative, it is wrong in the direction that kills people, and the tile explicitly flags a clearance that would satisfy a 20 ft default which does not apply to that line. Over 1,000 kV there is no table figure at all: the minimum clearance is established by the utility owner or operator or by a registered professional engineer who is a qualified person with respect to electrical power transmission and distribution, and the tile returns nothing rather than extrapolating. One framing point the tile makes because a distance alone hides it: where the boom is longer than the clearance being held, the line is inside the machine\'s reach and clearance becomes a matter of control rather than geometry - which is precisely why the clearance options are conditioned on the encroachment-prevention measures of paragraph (b), a dedicated spotter, proximity alarm, range control, insulating link, or range limiting device. Those are conditions of using the clearance, not optional extras, and they are not evaluated here. Also not checked: the planning meeting and work-zone identification, assembly and disassembly near power lines, travel under or near lines with no load, and the utility\'s confirmation of voltage. A screen, not a lift plan; Subpart CC, the utility owner or operator, and the qualified person govern.",
     assumptions: [
       { name: "Three options", value: "deenergize and ground; the default clearance; or Table A after determining voltage", source: "29 CFR 1926.1408(a)" },
-      { name: "Default", value: "20 ft up to 350 kV, 50 ft above 350 kV", source: "29 CFR 1926.1408" },
+      { name: "Default", value: "20 ft up to 350 kV, 50 ft above 350 kV", source: "29 CFR 1926.1408 and 1926.1409(a)" },
       { name: "Table A", value: "10 / 15 / 20 / 25 / 35 / 45 ft by voltage band, reproduced as a public-domain federal table", source: "29 CFR 1926.1408 Table A" },
-      { name: "Over 1,000 kV", value: "no figure - the utility or a qualified engineer establishes it", source: "29 CFR 1926.1408 Table A" },
+      { name: "Over 1,000 kV", value: "no figure - the utility or a qualified engineer establishes it", source: "29 CFR 1926.1408 Table A and 1926.1409(b)" },
       { name: "Scope of the distance", value: "no part of the equipment, load line, or load including rigging and accessories", source: "29 CFR 1926.1408" },
       { name: "Not checked", value: "encroachment-prevention measures, planning meeting, assembly/disassembly, travel, voltage confirmation", source: "stated scope limit" },
     ],
@@ -9754,11 +9754,11 @@ export const CITATIONS = {
     ],
   },
   "shackle-eyebolt-wll": {
-    formula: "derated_capacity = rated_wll x derate(angle, hardware); pass = derated_capacity >= leg_load. Shackle side-load 0->1.00 / 45->0.70 / 90->0.50; shoulder eye bolt 0->1.00 / 15->0.75 / 30->0.55 / 45->0.30 / 60+ ->0.15. MBS = rated_wll x design_factor (5:1).",
-    edition: "ASME B30.26 (Rigging Hardware) and ASME B18.15 / manufacturer eye-bolt data by name; the angular derate curves ship as editable approximations.",
+    formula: "derated_capacity = rated_wll x derate(angle, hardware); pass = derated_capacity >= leg_load. Shackle side-load 0->1.00 / 45->0.70 / 90->0.50; shoulder eye bolt 0->1.00 / 15->0.75 / 30->0.55 / 45->0.30 / 90->0.25 (Crosby chart at 45 and 90 deg; 15 and 30 interpolated). MBS = rated_wll x design_factor (5:1).",
+    edition: "ASME B30.26 (Rigging Hardware) and ASME B18.15 / manufacturer eye-bolt data by name; the eye-bolt curve carries the Crosby chart points (30% at 45 deg, 25% at 90 deg), and the shackle side-load curve is an editable approximation.",
     freeAccess: "ASME B30.26 is a published consensus standard. The angular derate follows the manufacturer's chart.",
     governance: GOVERNANCE.rigging,
-    editionNote: "Shackles are loaded in line through the bow and pin; a side load follows the reduced chart. An eye bolt pulled at an angle can lose more than half its rating, and an angular pull on a plain (non-shoulder) eye bolt is not permitted. The 5:1 design factor is on the WLL.",
+    editionNote: "Shackles are loaded in line through the bow and pin; a side load follows the reduced chart. A shoulder eye bolt keeps 30% of its rating at 45 degrees and 25% at 90 (Crosby), and an angular pull on a plain (non-shoulder) eye bolt is not permitted. The 5:1 design factor is on the WLL.",
     assumptions: [
       { name: "Derate curves", value: "editable [angle, factor] breakpoints per hardware type", source: "ASME B30.26 manufacturer charts" },
       { name: "Design factor", value: "5:1 on the WLL (reported as MBS)", source: "ASME B30.26 / B30.9" },
