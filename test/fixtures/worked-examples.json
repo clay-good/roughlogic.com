@@ -11678,12 +11678,12 @@
   },
   {
    "tile_id": "truss-capacity",
-   "source_publisher": "Tomcat 16 in box truss published technical data sheet (typical)",
+   "source_publisher": "Tomcat USA",
    "source_title": "Truss UDL screening: published udl_max_lb_per_ft * span; pass if total imposed (udl + equivalent point) <= published",
-   "source_edition_or_year": "Tomcat 16 in box truss bulletin (150 plf nominal)",
-   "source_section_or_page": "16 in box / 40 ft span / 200 + 400 + 200 lb point loads -> 150 plf / 6000 lb total uniform capacity / 800 lb of point load / 3.75 safety factor / pass",
+   "source_edition_or_year": "Tomcat Middle Duty 16 in x 16 in box truss data sheet (maximum allowable uniform load, 40 ft span: 77 lb/ft)",
+   "source_section_or_page": "16 in box / 40 ft span / 200 + 400 + 200 lb point loads -> 77 plf / 3,080 lb total uniform capacity / 800 lb of point load (40 plf equivalent) / 1.925 safety factor / pass",
    "verified_by": "rl",
-   "verified_on": "2026-05-11",
+   "verified_on": "2026-09-24",
    "inputs": {
     "truss_model": "16in_box",
     "span_ft": 40,
@@ -11704,13 +11704,13 @@
    },
    "outputs": {
     "udl_max_lb_per_ft": {
-     "value": 150,
+     "value": 77,
      "tolerance": {
       "abs": 0
      }
     },
     "total_uniform_capacity_lb": {
-     "value": 6000,
+     "value": 3080,
      "tolerance": {
       "abs": 0.01
      }
@@ -11722,7 +11722,7 @@
      }
     },
     "safety_factor": {
-     "value": 3.75,
+     "value": 1.925,
      "tolerance": {
       "abs": 0
      }

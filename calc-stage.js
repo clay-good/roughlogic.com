@@ -28,28 +28,33 @@ const _finiteGuard = (o) => {
 
 // --- 216: Truss Point Load and Span Capacity ---
 
+// The two box-truss curves are the maximum allowable uniform loads from the
+// Tomcat data sheets they name (simple span, deflection limited to L/100).
+// Until 2026-09-24 they were "typical" curves that sat BELOW the sheets at
+// 10 ft and far above them past 20 ft -- 130 lb/ft for the 12 in truss at
+// 30 ft where Tomcat allows 53, 2.5 times -- and the 16 in curve had a 60 ft
+// row the sheet does not.
 export const TRUSS_CAPACITY_CURVES = {
   "12in_box": {
-    label: "12-inch box truss",
-    attribution: "Tomcat 12-inch box truss published technical data sheet (typical)",
+    label: "12-inch box truss (Tomcat Light Duty, plated)",
+    attribution: "Tomcat Light Duty 12 in x 12 in plated box truss data sheet (September 2024), maximum allowable uniform load, L/100",
     points: [
-      { span_ft: 10, udl_lb_per_ft: 320 },
-      { span_ft: 20, udl_lb_per_ft: 220 },
-      { span_ft: 30, udl_lb_per_ft: 130 },
-      { span_ft: 40, udl_lb_per_ft: 80 },
-      { span_ft: 50, udl_lb_per_ft: 50 },
+      { span_ft: 10, udl_lb_per_ft: 523 }, { span_ft: 15, udl_lb_per_ft: 229 },
+      { span_ft: 20, udl_lb_per_ft: 126 }, { span_ft: 25, udl_lb_per_ft: 78 },
+      { span_ft: 30, udl_lb_per_ft: 53 }, { span_ft: 35, udl_lb_per_ft: 37 },
+      { span_ft: 40, udl_lb_per_ft: 27 }, { span_ft: 45, udl_lb_per_ft: 20 },
+      { span_ft: 50, udl_lb_per_ft: 15 },
     ],
   },
   "16in_box": {
-    label: "16-inch box truss",
-    attribution: "Tomcat 16-inch box truss published technical data sheet (typical)",
+    label: "16-inch box truss (Tomcat Middle Duty)",
+    attribution: "Tomcat Middle Duty 16 in x 16 in box truss data sheet, maximum allowable uniform load",
     points: [
-      { span_ft: 10, udl_lb_per_ft: 540 },
-      { span_ft: 20, udl_lb_per_ft: 380 },
-      { span_ft: 30, udl_lb_per_ft: 240 },
-      { span_ft: 40, udl_lb_per_ft: 150 },
-      { span_ft: 50, udl_lb_per_ft: 95 },
-      { span_ft: 60, udl_lb_per_ft: 60 },
+      { span_ft: 10, udl_lb_per_ft: 872 },
+      { span_ft: 20, udl_lb_per_ft: 347 },
+      { span_ft: 30, udl_lb_per_ft: 147 },
+      { span_ft: 40, udl_lb_per_ft: 77 },
+      { span_ft: 50, udl_lb_per_ft: 36 },
     ],
   },
   "20p5in_ladder": {
@@ -64,14 +69,19 @@ export const TRUSS_CAPACITY_CURVES = {
   },
 };
 
+// Between rows, interpolate on log span / log load: allowable UDL falls
+// roughly as the square of the span, so a straight line between 10 and 20 ft
+// read 324 lb/ft at 15 ft on the 12 in sheet, which lists 229. The power law
+// through the same two rows gives 225.
 function interpUDL(curve, span_ft) {
   const pts = curve.points;
   if (span_ft <= pts[0].span_ft) return pts[0].udl_lb_per_ft;
   if (span_ft >= pts[pts.length - 1].span_ft) return pts[pts.length - 1].udl_lb_per_ft;
   for (let i = 0; i < pts.length - 1; i++) {
     if (span_ft >= pts[i].span_ft && span_ft <= pts[i + 1].span_ft) {
-      const t = (span_ft - pts[i].span_ft) / (pts[i + 1].span_ft - pts[i].span_ft);
-      return pts[i].udl_lb_per_ft + t * (pts[i + 1].udl_lb_per_ft - pts[i].udl_lb_per_ft);
+      const a = pts[i], b = pts[i + 1];
+      const k = Math.log(b.udl_lb_per_ft / a.udl_lb_per_ft) / Math.log(b.span_ft / a.span_ft);
+      return a.udl_lb_per_ft * Math.pow(span_ft / a.span_ft, k);
     }
   }
   return pts[pts.length - 1].udl_lb_per_ft;

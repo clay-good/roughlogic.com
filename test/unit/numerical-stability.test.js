@@ -1272,7 +1272,8 @@ test("computeTrussCapacity: bit-stable equivalent_udl + total_point_load + safet
   const r = computeTrussCapacity(trussExample.inputs);
   assert.equal(bits(r.equivalent_udl_lb_per_ft), "4044000000000000", `equivalent_udl=${r.equivalent_udl_lb_per_ft}`);
   assert.equal(bits(r.total_point_load_lb), "4089000000000000", `total_point_load=${r.total_point_load_lb}`);
-  assert.equal(bits(r.safety_factor), "400e000000000000", `safety_factor=${r.safety_factor}`);
+  // 77 lb/ft (Tomcat Middle Duty 16 in at 40 ft) / 40 = 1.925.
+  assert.equal(bits(r.safety_factor), "3ffecccccccccccd", `safety_factor=${r.safety_factor}`);
 });
 
 test("computePanConversion: bit-stable total_qt + capacity_qt + servings_per_pan at the spec example (120 servings, 6 oz, full 4 in pan)", () => {

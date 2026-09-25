@@ -6720,12 +6720,16 @@ test("monotonicity: computeTrussCapacity udl_max_lb_per_ft is strictly decreasin
   const ref = computeTrussCapacity({ truss_model: "16in_box", span_ft: 30 });
   assert.ok(Math.abs(ref.total_uniform_capacity_lb - ref.udl_max_lb_per_ft * 30) < 1e-9,
     `total = ${ref.total_uniform_capacity_lb}, expected ${ref.udl_max_lb_per_ft * 30}`);
-  // Tomcat 16in_box published-point pin at span=30 -> 240 lb/ft exact.
-  assert.equal(ref.udl_max_lb_per_ft, 240);
-  // Interior-point linear-interp pin: span=15 on 12in_box (10/320, 20/220)
-  // -> 270 lb/ft exact.
+  // Tomcat Middle Duty 16 in sheet at span=30 -> 147 lb/ft exact.
+  assert.equal(ref.udl_max_lb_per_ft, 147);
+  // Tomcat Light Duty 12 in sheet tabulates 15 ft at 229 lb/ft.
   const interp = computeTrussCapacity({ truss_model: "12in_box", span_ft: 15 });
-  assert.equal(interp.udl_max_lb_per_ft, 270);
+  assert.equal(interp.udl_max_lb_per_ft, 229);
+  // Between rows the curve is a power law in span, not a straight line: the
+  // 16 in sheet has no 15 ft row, and log-log through 10/872 and 20/347 reads
+  // 508.7 (a straight line would say 609.5).
+  const between = computeTrussCapacity({ truss_model: "16in_box", span_ft: 15 });
+  assert.ok(Math.abs(between.udl_max_lb_per_ft - 872 * Math.pow(1.5, Math.log(347 / 872) / Math.log(2))) < 1e-9);
   // trussExample with two 250-lb point loads at 10 / 20 ft on 30-ft span:
   // total_point_load = 500; equivalent_udl = 2 * 500 / 30 = 33.333.
   const withLoads = computeTrussCapacity({ truss_model: "16in_box", span_ft: 30, point_loads: [{ weight_lb: 250, position_ft: 10 }, { weight_lb: 250, position_ft: 20 }] });
@@ -6738,7 +6742,7 @@ test("monotonicity: computeTrussCapacity udl_max_lb_per_ft is strictly decreasin
   // Symmetric loads pin: 250 at 10 + 250 at 20 on 30-ft span -> Ra = Rb.
   assert.ok(Math.abs(withLoads.reaction_a_lb - withLoads.reaction_b_lb) < 1e-9,
     `symmetric: Ra=${withLoads.reaction_a_lb}, Rb=${withLoads.reaction_b_lb}`);
-  // pass flag: equivalent_udl < udl_max (240) -> pass true; safety_factor > 1.
+  // pass flag: equivalent_udl < udl_max (147) -> pass true; safety_factor > 1.
   assert.equal(withLoads.pass, true);
   assert.ok(withLoads.safety_factor > 1, `safety_factor = ${withLoads.safety_factor}`);
   // No-loads pin: equivalent_udl = 0; safety_factor uses 0.01 floor in the
