@@ -92676,7 +92676,7 @@
    "source_publisher": "ASCE",
    "source_title": "12 ft x 20 ft attached canopy, 115 mph basic wind, Cn 1.2 uplift, 30 psf ground snow",
    "source_edition_or_year": "ASCE 7 Ch. 29 and Ch. 7",
-   "source_section_or_page": "q = 0.00256 V^2 Kz Kzt Kd; pf = 0.7 Ce Ct Is pg",
+   "source_section_or_page": "q = 0.00256 V^2 Kz Kzt Kd; pf = 0.7 Ce Ct pg",
    "verified_by": "rl",
    "verified_on": "2026-08-27",
    "inputs": {
@@ -92691,7 +92691,6 @@
     "ground_snow_psf": 30,
     "ce": 1,
     "ct": 1,
-    "is": 1,
     "dead_load_psf": 3.33
    },
    "outputs": {

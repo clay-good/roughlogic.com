@@ -41353,7 +41353,7 @@ test("bounds: spec-v1426 computeGlassThicknessWind pins load, deflection, and th
 
 import { computeAwningCanopyLoad as _v1428 } from "../../calc-construction.js";
 test("bounds: spec-v1428 computeAwningCanopyLoad pins uplift governing over snow", () => {
-  const base = { projection_ft: 12, width_ft: 20, wind_speed_mph: 115, kz: 0.98, kzt: 1, kd: 0.85, cn_uplift: 1.2, cn_downward: 0.7, ground_snow_psf: 30, ce: 1, ct: 1, is: 1, dead_load_psf: 3.33 };
+  const base = { projection_ft: 12, width_ft: 20, wind_speed_mph: 115, kz: 0.98, kzt: 1, kd: 0.85, cn_uplift: 1.2, cn_downward: 0.7, ground_snow_psf: 30, ce: 1, ct: 1, dead_load_psf: 3.33 };
   const r = _v1428(base);
   assert.ok(Math.abs(r.area_sqft - 240) < 1e-9);
   assert.ok(Math.abs(r.q_psf - 28.20) < 1e-2);
@@ -41372,7 +41372,8 @@ test("bounds: spec-v1428 computeAwningCanopyLoad pins uplift governing over snow
   const snowy = _v1428({ ...base, ground_snow_psf: 60 });
   assert.ok(Math.abs(snowy.snow_force_lb - 2 * r.snow_force_lb) < 1e-9);
   assert.strictEqual(snowy.uplift_governs, false);
-  // Ce, Ct, and Is multiply the snow case and leave the wind case untouched.
+  // Ce and Ct multiply the snow case and leave the wind case untouched; ASCE 7-22 has no Is.
+  assert.ok(Math.abs(_v1428({ ...base, is: 1.2 }).snow_pf_psf - r.snow_pf_psf) < 1e-12);
   const sheltered = _v1428({ ...base, ce: 0.9 });
   assert.ok(Math.abs(sheltered.snow_pf_psf - 0.9 * r.snow_pf_psf) < 1e-9);
   assert.ok(Math.abs(sheltered.q_psf - r.q_psf) < 1e-12);

@@ -6999,7 +6999,9 @@ CONSTRUCTION_RENDERERS["wind-mwfrs-pressure"] = _renderWindMwfrsPressure;
 // value G = 0.925 (1 + 1.7 gQ Iz Q)/(1 + 1.7 gv Iz), gQ = gv = 3.4, with the turbulence intensity
 // Iz = c (33/zbar)^(1/6), the integral length scale Lz = l (zbar/33)^eps, the background response
 // Q = sqrt(1/(1 + 0.63 ((B+h)/Lz)^0.63)), and zbar = max(0.6h, zmin). The exposure constants
-// c, l, eps, zmin are the small Table 26.11-1 terrain set (not a copyrighted data table). This is
+// c, l, eps, zmin are the ASCE 7-16 Table 26.11-1 terrain set (not a copyrighted data table).
+// ASCE 7-22 adjusted Table 26.11-1 (SEAOG 2025 7-22 wind seminar); the 7-22 values of these four are
+// unverified here, so the 7-16 set is kept and disclosed rather than guessed. This is
 // the RIGID G only; a flexible/dynamically-sensitive building adds the resonant response R (Gf).
 const WIND_GUST_EXPOSURE = {
   B: { c: 0.30, l: 320, eps: 1 / 3.0, zmin: 30 },
@@ -14948,8 +14950,8 @@ CONSTRUCTION_RENDERERS["glass-thickness-wind"] = _simpleRenderer({
 });
 
 // ===================== spec-v1428: attached canopy wind uplift and snow =====================
-// dims: in { projection_ft: L, width_ft: L, wind_speed_mph: L T^-1, kz: dimensionless, kzt: dimensionless, kd: dimensionless, cn_uplift: dimensionless, cn_downward: dimensionless, ground_snow_psf: M L^-1 T^-2, ce: dimensionless, ct: dimensionless, is: dimensionless, dead_load_psf: M L^-1 T^-2 } out: { area_sqft: L^2, q_psf: M L^-1 T^-2, uplift_force_lb: M L T^-2 }
-export function computeAwningCanopyLoad({ projection_ft = 0, width_ft = 0, wind_speed_mph = 0, kz = 0.98, kzt = 1, kd = 0.85, cn_uplift = 1.2, cn_downward = 0.7, ground_snow_psf = 0, ce = 1, ct = 1, is = 1, dead_load_psf = 0 } = {}) {
+// dims: in { projection_ft: L, width_ft: L, wind_speed_mph: L T^-1, kz: dimensionless, kzt: dimensionless, kd: dimensionless, cn_uplift: dimensionless, cn_downward: dimensionless, ground_snow_psf: M L^-1 T^-2, ce: dimensionless, ct: dimensionless, dead_load_psf: M L^-1 T^-2 } out: { area_sqft: L^2, q_psf: M L^-1 T^-2, uplift_force_lb: M L T^-2 }
+export function computeAwningCanopyLoad({ projection_ft = 0, width_ft = 0, wind_speed_mph = 0, kz = 0.98, kzt = 1, kd = 0.85, cn_uplift = 1.2, cn_downward = 0.7, ground_snow_psf = 0, ce = 1, ct = 1, dead_load_psf = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(projection_ft > 0 && width_ft > 0)) return { error: "Canopy projection and width must be positive." };
   if (!(wind_speed_mph > 0)) return { error: "Basic wind speed must be positive." };
@@ -14957,7 +14959,7 @@ export function computeAwningCanopyLoad({ projection_ft = 0, width_ft = 0, wind_
   if (!(cn_uplift > 0)) return { error: "The net uplift pressure coefficient must be non-zero." };
   if (!(cn_downward > 0)) return { error: "The net downward pressure coefficient must be non-zero." };
   if (!(ground_snow_psf >= 0)) return { error: "Ground snow load cannot be negative." };
-  if (!(ce > 0 && ct > 0 && is > 0)) return { error: "Ce, Ct, and Is must be positive." };
+  if (!(ce > 0 && ct > 0)) return { error: "Ce and Ct must be positive." };
   if (!(dead_load_psf >= 0)) return { error: "Canopy dead load cannot be negative." };
   const area_sqft = projection_ft * width_ft;
   const q_psf = 0.00256 * wind_speed_mph * wind_speed_mph * kz * kzt * kd;
@@ -14967,7 +14969,9 @@ export function computeAwningCanopyLoad({ projection_ft = 0, width_ft = 0, wind_
   const downward_psf = q_psf * cn_downward;
   const uplift_force_lb = uplift_psf * area_sqft;
   const downward_force_lb = downward_psf * area_sqft;
-  const snow_pf_psf = 0.7 * ce * ct * is * ground_snow_psf;
+  // ASCE 7-22 Eq. 7.3-1 has no importance factor: pg is already the risk-category
+  // ground snow load. Until 2026-09-25 this multiplied by a 7-16 Is.
+  const snow_pf_psf = 0.7 * ce * ct * ground_snow_psf;
   const snow_force_lb = snow_pf_psf * area_sqft;
   const dead_force_lb = dead_load_psf * area_sqft;
   const net_uplift_lb = uplift_force_lb - dead_force_lb;
@@ -14980,14 +14984,14 @@ export function computeAwningCanopyLoad({ projection_ft = 0, width_ft = 0, wind_
     snow_pf_psf, snow_force_lb, dead_force_lb, net_uplift_lb, gravity_force_lb,
     uplift_governs, dead_offset_pct,
     governing: uplift_governs ? "UPLIFT governs at " + fmt(uplift_force_lb, 0) + " lb up, " + fmt((uplift_force_lb / gravity_force_lb - 1) * 100, 0) + "% over the gravity case" : "the gravity case governs at " + fmt(gravity_force_lb, 0) + " lb down",
-    note: "Wind uplift and snow on an attached canopy or awning, where the governing case is usually uplift and the anchors are the whole design. A canopy is open underneath, so wind acts on BOTH faces at once -- pressure on top and suction below, or the reverse -- and ASCE 7 handles that with a NET pressure coefficient rather than the separate external and internal coefficients used on an enclosed building. That is what makes a canopy different from a roof. On a roof, gravity is the design case and wind uplift is a check; on a canopy the uplift case frequently governs outright, and it loads the wall anchors in TENSION and the connection in PRYING, which are the two load directions masonry and stud walls are worst at and the two that get detailed most casually because the canopy looks light. Both cases have to be run because the two loads come from different weather: the snow case governs the members and the deflection, the uplift case governs the anchors. A 12 ft by 20 ft canopy in a 115 mph wind sees about 28 psf of velocity pressure, 34 psf of net uplift, and 8,122 lb trying to pull it off the wall, against 5,040 lb of flat-roof snow pushing down -- uplift beats snow by 61 percent and it acts the wrong way, while the canopy's own 800 lb of dead weight offsets only a tenth of it. That is the number that decides whether this canopy is through-bolted with backing plates or lagged into a stud, and it is the number nobody runs before the second one blows off. LOAD ONLY, NOT A CANOPY DESIGN. It does not size members, connections, or anchors, does not compute the prying and eccentric moment at the wall, and does not check the wall or its backup for the tension it is being asked to carry, which on masonry is frequently the actual limit. Kz, Kzt, Kd, Cn, Ce, Ct, and Is are all ASCE 7 values determined elsewhere, and a wrong Cn moves the answer by a factor. Fabric awnings behave differently again, and drifting or sliding snow off the roof above can far exceed the flat-roof value. ASCE 7, the structural engineer, and the AHJ govern.",
+    note: "Wind uplift and snow on an attached canopy or awning, where the governing case is usually uplift and the anchors are the whole design. A canopy is open underneath, so wind acts on BOTH faces at once -- pressure on top and suction below, or the reverse -- and ASCE 7 handles that with a NET pressure coefficient rather than the separate external and internal coefficients used on an enclosed building. That is what makes a canopy different from a roof. On a roof, gravity is the design case and wind uplift is a check; on a canopy the uplift case frequently governs outright, and it loads the wall anchors in TENSION and the connection in PRYING, which are the two load directions masonry and stud walls are worst at and the two that get detailed most casually because the canopy looks light. Both cases have to be run because the two loads come from different weather: the snow case governs the members and the deflection, the uplift case governs the anchors. A 12 ft by 20 ft canopy in a 115 mph wind sees about 28 psf of velocity pressure, 34 psf of net uplift, and 8,122 lb trying to pull it off the wall, against 5,040 lb of flat-roof snow pushing down -- uplift beats snow by 61 percent and it acts the wrong way, while the canopy's own 800 lb of dead weight offsets only a tenth of it. That is the number that decides whether this canopy is through-bolted with backing plates or lagged into a stud, and it is the number nobody runs before the second one blows off. LOAD ONLY, NOT A CANOPY DESIGN. It does not size members, connections, or anchors, does not compute the prying and eccentric moment at the wall, and does not check the wall or its backup for the tension it is being asked to carry, which on masonry is frequently the actual limit. Kz, Kzt, Kd, Cn, Ce, and Ct are all ASCE 7 values determined elsewhere, and pg is the ASCE 7-22 ground snow load for the risk category (7-22 has no Is), and a wrong Cn moves the answer by a factor. Fabric awnings behave differently again, and drifting or sliding snow off the roof above can far exceed the flat-roof value. ASCE 7, the structural engineer, and the AHJ govern.",
   };
 }
 
-export const awningCanopyLoadExample = { inputs: { projection_ft: 12, width_ft: 20, wind_speed_mph: 115, kz: 0.98, kzt: 1, kd: 0.85, cn_uplift: 1.2, cn_downward: 0.7, ground_snow_psf: 30, ce: 1, ct: 1, is: 1, dead_load_psf: 3.33 } };
+export const awningCanopyLoadExample = { inputs: { projection_ft: 12, width_ft: 20, wind_speed_mph: 115, kz: 0.98, kzt: 1, kd: 0.85, cn_uplift: 1.2, cn_downward: 0.7, ground_snow_psf: 30, ce: 1, ct: 1, dead_load_psf: 3.33 } };
 
 CONSTRUCTION_RENDERERS["awning-canopy-load"] = _simpleRenderer({
-  citation: "Citation: velocity pressure q = 0.00256 x V^2 x Kz x Kzt x Kd and the ATTACHED-CANOPY net pressure coefficients of ASCE 7 Chapter 29, cited by chapter and not reproduced -- Cn is entered, not looked up here. Flat-roof snow from ASCE 7 Chapter 7, pf = 0.7 x Ce x Ct x Is x pg, cited by chapter. Load only, not a canopy design: it sizes no member, connection, or anchor and checks no wall for the tension it is asked to carry. ASCE 7, the structural engineer, and the AHJ govern.",
+  citation: "Citation: velocity pressure q = 0.00256 x V^2 x Kz x Kzt x Kd and the ATTACHED-CANOPY net pressure coefficients of ASCE 7 Chapter 29, cited by chapter and not reproduced -- Cn is entered, not looked up here. Flat-roof snow from ASCE 7-22 Chapter 7, pf = 0.7 x Ce x Ct x pg (Eq. 7.3-1, no Is), cited by chapter. Load only, not a canopy design: it sizes no member, connection, or anchor and checks no wall for the tension it is asked to carry. ASCE 7, the structural engineer, and the AHJ govern.",
   example: awningCanopyLoadExample.inputs,
   fields: [
     { key: "projection_ft", label: "Canopy projection from the wall (ft)", kind: "number" },
@@ -15001,7 +15005,6 @@ CONSTRUCTION_RENDERERS["awning-canopy-load"] = _simpleRenderer({
     { key: "ground_snow_psf", label: "Ground snow load pg (psf)", kind: "number" },
     { key: "ce", label: "Exposure factor Ce", kind: "number" },
     { key: "ct", label: "Thermal factor Ct", kind: "number" },
-    { key: "is", label: "Snow importance factor Is (ASCE 7-16; 1.0 with an ASCE 7-22 pg)", kind: "number" },
     { key: "dead_load_psf", label: "Canopy dead load (psf)", kind: "number" },
   ],
   outputs: [

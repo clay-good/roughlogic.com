@@ -336,15 +336,17 @@ Verification: Unit tests cover q ~ V^2 scaling, Cp values, leeward suction sign,
 
 ## 20. Snow load (v2)
 
-Public ASCE 7 flat-roof formula:
+ASCE 7-22 flat-roof formula (Eq. 7.3-1):
 
-  Pf = 0.7 * Ce * Ct * Is * Pg
+  Pf = 0.7 * Ce * Ct * Pg
 
-Citations: Public ASCE 7 form.
+Pg is the ASCE 7-22 ground snow load for the building's risk category; 7-22 removed the importance factor Is that 7-16 multiplied in. The optional leeward drift is Eq. 7.6-1, hd = 1.5 sqrt(Pg^0.74 lu^0.70 W2^1.7 / gamma), with W2 the winter wind parameter.
+
+Citations: ASCE 7-22 §7.3 and §7.6, by name.
 
 Originality: Direct evaluation.
 
-Verification: Unit tests cover linear scaling in each factor and the 0.7 base.
+Verification: Unit tests cover linear scaling in Ce, Ct, and Pg, the 0.7 base, that a legacy Is no longer scales the load, and the Eq. 7.6-1 drift height.
 
 ## 21. Anchor bolt embedment (v2)
 
@@ -4641,7 +4643,7 @@ per spec-v14 §13.1 second paragraph.
 | `at-rest-earth-pressure` | At-Rest Earth Pressure on a Braced Wall (Jaky K0) | Jaky (1944) as compiled in Das / NAVF...; spec-v624 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `atterberg-indices` | Atterberg Plasticity Indices and A-Line Classification | Atterberg limits / USCS A-line; spec-v328 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `attic-ventilation` | Attic Ventilation Net Free Area | IRC R806 attic-ventilation rule; spec-v98 section 2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
-| `awning-canopy-load` | Attached Canopy and Awning Wind Uplift and Snow Load | ASCE; q = 0.00256 V^2 Kz Kzt Kd; pf = 0.7 Ce Ct Is pg | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `awning-canopy-load` | Attached Canopy and Awning Wind Uplift and Snow Load | ASCE; q = 0.00256 V^2 Kz Kzt Kd; pf = 0.7 Ce Ct pg | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `ballast-section-volume` | Track Ballast Section Volume, Tonnage, and Surfacing Raise | Project (first-principles); the railroad's standard plans set the section | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `baluster-picket-count` | Guard Baluster / Picket Count (4-in Sphere Rule) | Guard baluster spacing (IRC 4 in sphe...; pickets = ceil((96-4)/(1.5+4)) = ceil(16.7) = 17; gaps = ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `bar-nesting` | Mixed-Length Bar Nesting (Cutting Stock) | one-dimensional cutting stock (first-...; Cut list 4 x 62, 6 x 38, 9 x 27, 12 x 14.5 in; 240 in sto... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |

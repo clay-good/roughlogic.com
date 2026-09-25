@@ -398,7 +398,7 @@
       "date": "2026-09-04"
     },
     "/tools/awning-canopy-load/": {
-      "sha": "6282c13cb028fc23",
+      "sha": "07f3a3dec4467eca",
       "date": "2026-09-25"
     },
     "/tools/axle-load-distribution/": {
@@ -8638,8 +8638,8 @@
       "date": "2026-09-01"
     },
     "/tools/wind-gust-effect-factor/": {
-      "sha": "08e7f09aaa84fe97",
-      "date": "2026-09-04"
+      "sha": "ac3477c44cd93bdb",
+      "date": "2026-09-25"
     },
     "/tools/wind-mwfrs-pressure/": {
       "sha": "66ed006065602413",
