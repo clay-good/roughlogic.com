@@ -6865,7 +6865,7 @@ export function computeWindCcPressure({ v_mph = 0, kz = 0, gcp = 0, kzt = 1.0, k
   const p_gov_psf = Math.abs(p_a_psf) >= Math.abs(p_b_psf) ? p_a_psf : p_b_psf;
   return {
     qh_psf, p_a_psf, p_b_psf, p_gov_psf,
-    note: "ASCE 7-22 Chapter 30 components-and-cladding design pressure p = qh [(GCp) - (GCpi)], with the velocity pressure qh = 0.00256 Kz Kzt Kd Ke V^2 (Kd = 0.85, V in mph) and GCpi = +/-0.18 for an enclosed building; both internal-pressure signs are evaluated and the larger-magnitude one governs. GCp is read from the Chapter 30 figures for the roof/wall zone and effective wind area (enter it) - a roof corner (Zone 3) draws the worst suction. This is the local cladding/fastener pressure, not the MWFRS whole-building pressure (wind-mwfrs-pressure), and it excludes the parapet/overhang special cases. A design aid, not a substitute for the engineer of record.",
+    note: "ASCE 7-22 Chapter 30 components-and-cladding design pressure p = qh [(GCp) - (GCpi)], with the velocity pressure qh = 0.00256 Kz Kzt Kd Ke V^2 (Kd = 0.85, V in mph; 7-22 moved Kd out of qh and writes p = qh Kd [(GCp) - (GCpi)], the same pressure, so the qh shown here is the 7-22 qh times Kd) and GCpi = +/-0.18 for an enclosed building; both internal-pressure signs are evaluated and the larger-magnitude one governs. GCp is read from the Chapter 30 figures for the roof/wall zone and effective wind area (enter it) - a roof corner (Zone 3) draws the worst suction. This is the local cladding/fastener pressure, not the MWFRS whole-building pressure (wind-mwfrs-pressure), and it excludes the parapet/overhang special cases. A design aid, not a substitute for the engineer of record.",
   };
 }
 export const windCcPressureExample = { inputs: { v_mph: 115, kz: 0.90, gcp: -1.8, kzt: 1.0, kd: 0.85, ke: 1.0, gcpi: 0.18 } };
@@ -6957,17 +6957,17 @@ export function computeWindMwfrsPressure({ qz_psf = 0, qh_psf = 0, cp_ww = 0.8, 
   const p_net_psf = ext_ww - ext_lw;
   return {
     p_ww_psf, p_lw_psf, p_net_psf,
-    note: "ASCE 7-22 Chapter 27 MWFRS wall pressure p = q G Cp - qi (GCpi), with G = 0.85 (rigid building), the wall Cp = +0.8 windward / -0.5 leeward (for L/B <= 1), and GCpi = +/-0.18 (enclosed). Each wall is reported at the internal-pressure sign that maximizes its magnitude; the net horizontal pressure the diaphragm, shear walls, and overturning anchors resist is the external difference, because the internal pressure pushes equally outward on both walls and cancels in the net (so the story force is insensitive to enclosure while the individual walls are not). Enter qz/qh from wind-pressure. Walls only - it does not compute the roof MWFRS pressures, the flexible-building Gf, or the torsional (Case 2-4) patterns. A design aid, not a substitute for the engineer of record.",
+    note: "ASCE 7-22 Chapter 27 MWFRS wall pressure p = q G Cp - qi (GCpi), with G = 0.85 (rigid building), the wall Cp = +0.8 windward / -0.5 leeward (for L/B <= 1), and GCpi = +/-0.18 (enclosed). Each wall is reported at the internal-pressure sign that maximizes its magnitude; the net horizontal pressure the diaphragm, shear walls, and overturning anchors resist is the external difference, because the internal pressure pushes equally outward on both walls and cancels in the net (so the story force is insensitive to enclosure while the individual walls are not). Enter qz/qh from wind-pressure, which folds Kd into q as ASCE 7-16 did; a 7-22 qz/qh (Kd now applied in the pressure equation) must be multiplied by Kd first, or the pressures come out about 18% high. Walls only - it does not compute the roof MWFRS pressures, the flexible-building Gf, or the torsional (Case 2-4) patterns. A design aid, not a substitute for the engineer of record.",
   };
 }
 export const windMwfrsPressureExample = { inputs: { qz_psf: 25.9, qh_psf: 25.9, cp_ww: 0.8, cp_lw: -0.5, g_f: 0.85, gcpi: 0.18 } };
 
 const _renderWindMwfrsPressure = _simpleRenderer({
-  citation: "Citation: ASCE 7-22 Chapter 27 MWFRS wall pressure p = q G Cp - qi (GCpi), G = 0.85 (rigid), Cp = +0.8 windward / -0.5 leeward, GCpi = +/-0.18 (enclosed), by name. Walls only; enter qz/qh from wind-pressure. A design aid, not a substitute for the engineer of record.",
+  citation: "Citation: ASCE 7-22 Chapter 27 MWFRS wall pressure p = q G Cp - qi (GCpi), G = 0.85 (rigid), Cp = +0.8 windward / -0.5 leeward, GCpi = +/-0.18 (enclosed), by name. Walls only; enter qz/qh from wind-pressure, which includes Kd (for a 7-22 qz without Kd, multiply by Kd). A design aid, not a substitute for the engineer of record.",
   example: windMwfrsPressureExample.inputs,
   fields: [
-    { key: "qz_psf", label: "Windward velocity pressure qz (psf)", kind: "number" },
-    { key: "qh_psf", label: "Leeward velocity pressure qh (psf)", kind: "number" },
+    { key: "qz_psf", label: "Windward velocity pressure qz, including Kd (psf)", kind: "number" },
+    { key: "qh_psf", label: "Leeward velocity pressure qh, including Kd (psf)", kind: "number" },
     { key: "cp_ww", label: "Windward wall Cp", kind: "number" },
     { key: "cp_lw", label: "Leeward wall Cp", kind: "number" },
     { key: "g_f", label: "Gust-effect factor G", kind: "number" },
