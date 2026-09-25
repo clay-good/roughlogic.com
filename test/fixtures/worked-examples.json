@@ -12511,7 +12511,7 @@
    "source_publisher": "EPA 402-K-01-001 / NYC DOHMH / IICRC S520-2024 remediation scoping",
    "source_title": "Affected area -> EPA band + NYC DOHMH level + containment / PPE / IEP / clearance",
    "source_edition_or_year": "EPA 402-K-01-001 area bands; NYC DOHMH levels I-V; IICRC S520-2024",
-   "source_section_or_page": "45 ft2 porous, no HVAC, healthy occupant -> medium band, Level III, full containment, half-face P100, optional IEP, clearance recommended",
+   "source_section_or_page": "45 ft2 porous, no HVAC, healthy occupant -> medium band, NYC 2008 medium isolated area, full containment, half-face P100, optional IEP, clearance recommended",
    "verified_by": "rl",
    "verified_on": "2026-06-13",
    "inputs": {
@@ -12528,7 +12528,7 @@
      }
     },
     "level": {
-     "value": "Level III",
+     "value": "Medium isolated area (10-100 ft2)",
      "tolerance": {
       "abs": 0
      }
@@ -36763,15 +36763,15 @@
   {
    "tile_id": "class-of-loss-screen",
    "source_publisher": "ANSI/IICRC S500 Class-of-loss definitions (by name)",
-   "source_title": "Raise the wick to 3.0 ft (> 24 in) -> Class 3 (height escalates)",
-   "source_edition_or_year": "spec-v139 worked example (machine-verified, deterministic screen)",
-   "source_section_or_page": "spec-v139 section 2.1 cross-check",
+   "source_title": "Walls 60% wet -> more than 40% of floor + walls + ceiling -> Class 3",
+   "source_edition_or_year": "IICRC S500 2015 / 2021 class definitions (wet share of combined surfaces)",
+   "source_section_or_page": "12x12x8 room weights 144 / 384 / 144: (144 + 0.6 x 384) / 672 = 55.7% -> Class 3",
    "verified_by": "rl",
-   "verified_on": "2026-06-23",
+   "verified_on": "2026-09-25",
    "inputs": {
     "floor_wet_fraction": 1.0,
-    "wall_wet_fraction": 0.3,
-    "wick_height_ft": 3.0
+    "wall_wet_fraction": 0.6,
+    "wick_height_ft": 1.5
    },
    "outputs": {
     "water_class": {
@@ -46986,7 +46986,7 @@
    },
    "outputs": {
     "q_s": {
-     "value": 3.38,
+     "value": 3.12,
      "tolerance": {
       "abs": 0.001
      }
@@ -47004,25 +47004,25 @@
      }
     },
     "q_e": {
-     "value": 27.5894315,
+     "value": 27.58943149,
      "tolerance": {
       "abs": 0.001
      }
     },
     "q_o": {
-     "value": 110.7443157,
+     "value": 110.4843157,
      "tolerance": {
       "abs": 0.001
      }
     },
     "boiler_btu_hr": {
-     "value": 66446.5894,
+     "value": 66290.58945,
      "tolerance": {
       "abs": 1
      }
     },
     "t_m_f": {
-     "value": 88.3721579,
+     "value": 88.24215787,
      "tolerance": {
       "abs": 0.001
      }
@@ -47048,13 +47048,13 @@
    },
    "outputs": {
     "q_o": {
-     "value": 143.5086315,
+     "value": 143.2486315,
      "tolerance": {
       "abs": 0.001
      }
     },
     "boiler_btu_hr": {
-     "value": 86105.1789,
+     "value": 85949.17889,
      "tolerance": {
       "abs": 1
      }

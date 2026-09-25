@@ -4779,7 +4779,9 @@ export function computeSnowmeltLoad({ s_inhr = 0, t_air_f = 0, wind_mph = 0, rh_
   const es_hpa = 6.1094 * Math.exp((17.625 * tc) / (tc + 243.04));
   const p_av_inhg = (rh_pct / 100) * es_hpa * 0.02953;
   const wind_fn = 0.0201 * wind_mph + 0.055;
-  const q_s = 2.6 * s_inhr * (TF - t_air_f);
+  // Lund prints q_s = 2.6 s (32 - t_a): the snow is warmed to 32 F; 33 F is the film temperature used in
+  // q_h and q_e only (this used 33 here until 2026-09-25, a small conservative overstatement).
+  const q_s = 2.6 * s_inhr * Math.max(0, 32 - t_air_f);
   const q_m = 746 * s_inhr;
   const q_h = 11.4 * wind_fn * (TF - t_air_f);
   // h_fg = 1075.5 Btu/lb at the 33 F film (steam table); 0.188 in Hg = saturation at the film.
@@ -4791,7 +4793,7 @@ export function computeSnowmeltLoad({ s_inhr = 0, t_air_f = 0, wind_mph = 0, rh_
 }
 export const snowmeltLoadExample = { inputs: { s_inhr: 0.1, t_air_f: 20, wind_mph: 10, rh_pct: 80, ar: 0.5, area_ft2: 500, back_loss_pct: 20 } };
 HVAC_RENDERERS["snowmelt-load"] = _rEnv({
-  citation: "Citation: ASHRAE Handbook (HVAC Applications, Snow Melting and Freeze Protection) steady-state surface flux q_o = q_s + q_m + A_r(q_h + q_e), with the Chapman (1956) IP component forms as printed in Lund, Pavement Snow Melting (Geo-Heat Center): q_s = 2.6 s (33 - t_a); q_m = 746 s; q_h = 11.4 (0.0201 V + 0.055)(33 - t_a); q_e = h_fg (0.0201 V + 0.055)(0.188 - p_av) with h_fg = 1075.5 Btu/lb at the 33 F film (steam table) and p_av from the Magnus curve times RH. A_r: 0 Class I residential, 0.5 Class II commercial, 1 Class III critical. Boiler = q_o x area x (1 + back loss), ~20% typical for an insulated slab back. Mean fluid roughly 0.5 q_o + 33 F (Chapman rule of thumb). A steady-state design flux for the chosen storm, not an annual energy; controls, idling, and glycol design follow the manufacturer's manual. A sizing aid, not a stamped hydronic design.",
+  citation: "Citation: ASHRAE Handbook (HVAC Applications, Snow Melting and Freeze Protection) steady-state surface flux q_o = q_s + q_m + A_r(q_h + q_e), with the Chapman (1956) IP component forms as printed in Lund, Pavement Snow Melting (Geo-Heat Center): q_s = 2.6 s (32 - t_a); q_m = 746 s; q_h = 11.4 (0.0201 V + 0.055)(33 - t_a); q_e = h_fg (0.0201 V + 0.055)(0.188 - p_av) with h_fg = 1075.5 Btu/lb at the 33 F film (steam table) and p_av from the Magnus curve times RH. A_r: 0 Class I residential, 0.5 Class II commercial, 1 Class III critical. Boiler = q_o x area x (1 + back loss), ~20% typical for an insulated slab back. Mean fluid roughly 0.5 q_o + 33 F (Chapman rule of thumb). A steady-state design flux for the chosen storm, not an annual energy; controls, idling, and glycol design follow the manufacturer's manual. A sizing aid, not a stamped hydronic design.",
   example: snowmeltLoadExample.inputs,
   fields: [
     { key: "s_inhr", label: "Snowfall rate, water equiv (in/hr)", kind: "number", attrs: { step: "any", min: "0" } },

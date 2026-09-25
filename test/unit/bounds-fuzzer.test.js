@@ -10367,23 +10367,23 @@ test("bounds: calc-restoration v58 mold-conditions returns the three IICRC S520 
   for (const c of r.conditions) assert.ok(typeof c.name === "string" && typeof c.summary === "string");
   assert.ok(typeof r.goal === "string" && /Condition 1/.test(r.goal));
 });
-test("bounds: calc-restoration v58 mold-remediation-level pins EPA band + NYC level + controls and rejects bad area", () => {
+test("bounds: calc-restoration v58 mold-remediation-level pins EPA band + NYC 2008 category + controls and rejects bad area", () => {
   const m = _d3({ affected_area_ft2: 45, porous: true });
   assert.strictEqual(m.band, "medium");
-  assert.strictEqual(m.level, "Level III");
+  assert.strictEqual(m.level, "Medium isolated area (10-100 ft2)"); // NYC DOHMH 2008 (the 2000 Levels I-V are superseded)
   assert.strictEqual(m.iep_assess, "optional");
   assert.strictEqual(m.clearance, "recommended");
   const small = _d3({ affected_area_ft2: 6, porous: false });
   assert.strictEqual(small.band, "small");
-  assert.strictEqual(small.level, "Level I");
+  assert.strictEqual(small.level, "Small isolated area (< 10 ft2)");
   assert.strictEqual(small.clearance, "optional");
   const large = _d3({ affected_area_ft2: 250, porous: true });
   assert.strictEqual(large.band, "large");
-  assert.strictEqual(large.level, "Level IV");
+  assert.strictEqual(large.level, "Large area (> 100 ft2)");
   assert.strictEqual(large.iep_assess, "recommended");
-  // HVAC involvement overrides to Level V and forces IEP + clearance regardless of area.
+  // HVAC involvement is its own NYC 2008 category and forces IEP + clearance regardless of area.
   const hvac = _d3({ affected_area_ft2: 50, hvac_involved: true });
-  assert.strictEqual(hvac.level, "Level V");
+  assert.strictEqual(hvac.level, "HVAC, large (>= 10 ft2)");
   assert.strictEqual(hvac.iep_assess, "recommended");
   assert.strictEqual(hvac.clearance, "recommended");
   assert.ok("error" in _d3({ affected_area_ft2: 0 }));
@@ -13843,13 +13843,18 @@ test("bounds: spec-v139 class-of-loss-screen exercises all four branches + the p
   const a = _v139({ floor_wet_fraction: 1.0, wall_wet_fraction: 0.30, wick_height_ft: 1.5, low_evap_materials: 0 });
   assert.equal(a.water_class, 2);
   assert.ok(a.evap_factor_gal_ft2 > 0);
-  // height escalates to Class 3; material escalates to Class 4 regardless of fractions.
-  assert.equal(_v139({ floor_wet_fraction: 1.0, wall_wet_fraction: 0.30, wick_height_ft: 3.0, low_evap_materials: 0 }).water_class, 3);
+  // S500 2015+: the class follows the wet share of floor + walls + ceiling (default 12x12x8 room:
+  // 144 / 384 / 144 ft2). Floor 1.0 + walls 0.3 = 38.6% -> Class 2; wick height no longer decides.
+  assert.ok(Math.abs(a.wet_share_pct - (144 + 0.3 * 384) / 672 * 100) < 1e-9);
+  assert.equal(_v139({ floor_wet_fraction: 1.0, wall_wet_fraction: 0.30, wick_height_ft: 3.0, low_evap_materials: 0 }).water_class, 2);
   assert.equal(_v139({ floor_wet_fraction: 1.0, wall_wet_fraction: 0.30, wick_height_ft: 1.5, low_evap_materials: 1 }).water_class, 4);
-  // small affected area, low porosity -> Class 1.
-  assert.equal(_v139({ floor_wet_fraction: 0.2, wall_wet_fraction: 0.1, wick_height_ft: 0.5, low_evap_materials: 0 }).water_class, 1);
-  // wall fraction alone escalates to Class 3.
-  assert.equal(_v139({ floor_wet_fraction: 0.5, wall_wet_fraction: 0.40, wick_height_ft: 1.0, low_evap_materials: 0 }).water_class, 3);
+  // Under 5% -> Class 1.
+  assert.equal(_v139({ floor_wet_fraction: 0.02, wall_wet_fraction: 0.02, wick_height_ft: 0.5, low_evap_materials: 0 }).water_class, 1);
+  // The old rules read 30% floor + 30% walls as Class 1; by share (30%) it is Class 2.
+  assert.equal(_v139({ floor_wet_fraction: 0.3, wall_wet_fraction: 0.3, wick_height_ft: 0.5, low_evap_materials: 0 }).water_class, 2);
+  // Over 40% -> Class 3; entered room areas replace the default proportions.
+  assert.equal(_v139({ floor_wet_fraction: 1.0, wall_wet_fraction: 0.6, wick_height_ft: 1.0, low_evap_materials: 0 }).water_class, 3);
+  assert.equal(_v139({ floor_wet_fraction: 1.0, wall_wet_fraction: 0, floor_area_ft2: 100, wall_area_ft2: 100, ceiling_area_ft2: 0 }).water_class, 3);
   assert.ok("error" in _v139({ floor_wet_fraction: 1.5, wall_wet_fraction: 0.3, wick_height_ft: 1 }));
   assert.ok("error" in _v139({ floor_wet_fraction: 0.5, wall_wet_fraction: -0.1, wick_height_ft: 1 }));
   assert.ok("error" in _v139({ floor_wet_fraction: 0.5, wall_wet_fraction: 0.3, wick_height_ft: -1 }));
@@ -15736,21 +15741,21 @@ test("bounds: spec-v478 computeSnowmeltLoad pins the Chapman components, the cla
   // Pinned example: Class II walk, 0.1 in/hr WE, 20 F, 10 mph, 80% RH, 500 ft^2, 20% back loss.
   const r = _v478({ s_inhr: 0.1, t_air_f: 20, wind_mph: 10, rh_pct: 80, ar: 0.5, area_ft2: 500, back_loss_pct: 20 });
   assert.ok(Math.abs(r.p_av_inhg - 0.0877943) < 1e-6);
-  assert.ok(Math.abs(r.q_s - 3.38) < 1e-9);
+  assert.ok(Math.abs(r.q_s - 3.12) < 1e-9);
   assert.ok(Math.abs(r.q_m - 74.6) < 1e-9);
   assert.ok(Math.abs(r.q_h - 37.9392) < 1e-6);
   assert.ok(Math.abs(r.q_e - 27.5894315) < 1e-6);
-  assert.ok(Math.abs(r.q_o - 110.7443157) < 1e-6);
-  assert.ok(Math.abs(r.boiler_btu_hr - 66446.5894) < 1e-3);
-  assert.ok(Math.abs(r.t_m_f - 88.3721579) < 1e-6);
+  assert.ok(Math.abs(r.q_o - 110.4843157) < 1e-6);
+  assert.ok(Math.abs(r.boiler_btu_hr - 66290.5894) < 1e-3);
+  assert.ok(Math.abs(r.t_m_f - 88.2421579) < 1e-6);
   // Class III: A_r = 1 pays the full exposed-surface losses.
   const r3 = _v478({ s_inhr: 0.1, t_air_f: 20, wind_mph: 10, rh_pct: 80, ar: 1.0, area_ft2: 500, back_loss_pct: 20 });
-  assert.ok(Math.abs(r3.q_o - 143.5086315) < 1e-6);
-  assert.ok(Math.abs(r3.boiler_btu_hr - 86105.1789) < 1e-3);
+  assert.ok(Math.abs(r3.q_o - 143.2486315) < 1e-6);
+  assert.ok(Math.abs(r3.boiler_btu_hr - 85949.1789) < 1e-3);
   // Class I: A_r = 0 drops the losses entirely (q_o = q_s + q_m).
   const r1 = _v478({ s_inhr: 0.1, t_air_f: 20, wind_mph: 10, rh_pct: 80, ar: 0, area_ft2: 500, back_loss_pct: 20 });
   assert.ok(Math.abs(r1.q_o - (r1.q_s + r1.q_m)) < 1e-12);
-  assert.ok(Math.abs(r1.q_o - 77.98) < 1e-9);
+  assert.ok(Math.abs(r1.q_o - 77.72) < 1e-9); // q_s = 2.6 x 0.1 x (32 - 20) + 74.6
   // At 100% RH near the film, the evaporative driving term floors at zero (never negative).
   const rw = _v478({ s_inhr: 0.1, t_air_f: 33, wind_mph: 10, rh_pct: 100, ar: 1.0, area_ft2: 500, back_loss_pct: 20 });
   assert.ok(rw.q_e >= 0 && rw.q_e < 0.2);

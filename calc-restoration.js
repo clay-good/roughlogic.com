@@ -214,9 +214,9 @@ export const WATER_CATEGORIES = [
 ];
 
 export const WATER_CLASSES = [
-  { id: "1", name: "Class 1", summary: "Least amount of water absorption and evaporation load. Slow evaporation. Limited area." },
-  { id: "2", name: "Class 2", summary: "Significant amount of water absorption and evaporation load. Wet carpet, cushions, structural components." },
-  { id: "3", name: "Class 3", summary: "Greatest amount of water absorption and evaporation load. Water from overhead, saturated walls and ceilings." },
+  { id: "1", name: "Class 1", summary: "Least amount of water absorption and evaporation load: less than about 5% of the combined floor, wall and ceiling surface in the area is wet." },
+  { id: "2", name: "Class 2", summary: "Significant water absorption and evaporation load: about 5 to 40% of the combined floor, wall and ceiling surface is wet." },
+  { id: "3", name: "Class 3", summary: "Greatest water absorption and evaporation load: more than about 40% of the combined floor, wall and ceiling surface is wet." },
   { id: "4", name: "Class 4", summary: "Specialty drying situations. Materials with low porosity holding bound water (hardwood, plaster, masonry)." },
 ];
 
@@ -1452,8 +1452,8 @@ RESTORATION_RENDERERS["evaporation-load"] = renderEvaporationLoad;
 
 // --- mold-remediation-level: Remediation Scope by Affected Area ---
 //
-// Deterministic EPA 402-K-01-001 area band + NYC DOHMH level (Level V on
-// any HVAC involvement) -> containment, PPE tier, IEP, and clearance
+// Deterministic EPA 402-K-01-001 area band + NYC DOHMH 2008 category (small < 10 ft2, medium
+// 10-100, large > 100; HVAC small < 10 and large >= 10) -> containment, PPE tier, IEP, and clearance
 // recommendations. Scope guidance, not a hazard judgment.
 // dims: in { affected_area_ft2: L^2, porous: dimensionless, hvac_involved: dimensionless, vulnerable_occupant: dimensionless }
 //        out: { band: dimensionless, level: dimensionless, containment: dimensionless, ppe_tier: dimensionless, iep_assess: dimensionless, clearance: dimensionless }
@@ -1467,13 +1467,15 @@ export function computeMoldRemediationLevel({ affected_area_ft2, porous = false,
   const porousB = !!porous, hvac = !!hvac_involved, vuln = !!vulnerable_occupant;
   // EPA 402-K-01-001 area bands.
   const band = area < 10 ? "small" : area <= 100 ? "medium" : "large";
-  // NYC DOHMH levels; HVAC-system involvement overrides to Level V.
+  // NYC DOHMH Guidelines (November 2008, which "supersedes all prior editions"): small isolated
+  // (< 10 ft2), medium isolated (10-100), large (> 100), and HVAC systems split at 10 ft2. Until
+  // 2026-09-25 this used the superseded 2000 edition's Levels I-V, with a 30 ft2 split the current
+  // guideline does not have.
   let level;
-  if (hvac) level = "Level V";
-  else if (area < 10) level = "Level I";
-  else if (area <= 30) level = "Level II";
-  else if (area <= 100) level = "Level III";
-  else level = "Level IV";
+  if (hvac) level = area < 10 ? "HVAC, small (< 10 ft2)" : "HVAC, large (>= 10 ft2)";
+  else if (area < 10) level = "Small isolated area (< 10 ft2)";
+  else if (area <= 100) level = "Medium isolated area (10-100 ft2)";
+  else level = "Large area (> 100 ft2)";
   const full = band === "large" || hvac || (band === "medium" && porousB);
   const containment = full
     ? "full (decontamination chamber + negative air)"
@@ -1493,11 +1495,11 @@ export function computeMoldRemediationLevel({ affected_area_ft2, porous = false,
 
 export const moldRemediationLevelExample = {
   inputs: { affected_area_ft2: 45, porous: true, hvac_involved: false, vulnerable_occupant: false },
-  expected: { band: "medium", level: "Level III" },
+  expected: { band: "medium", level: "Medium isolated area (10-100 ft2)" },
 };
 
 function renderMoldRemediationLevel(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: EPA 402-K-01-001 (Mold Remediation in Schools and Commercial Buildings, free at epa.gov/mold) area bands; NYC DOHMH Guidelines on Assessment and Remediation of Fungi levels; IICRC S520-2024 (licensed) by name. Scope guidance; the protocol of the assessor and remediator governs.";
+  citationEl.textContent = "Citation: EPA 402-K-01-001 (Mold Remediation in Schools and Commercial Buildings, free at epa.gov/mold) area bands; NYC DOHMH Guidelines on Assessment and Remediation of Fungi in Indoor Environments (November 2008) area categories; IICRC S520-2024 (licensed) by name. Scope guidance; the protocol of the assessor and remediator governs.";
   const area = makeNumber("Affected area (ft2, summed visible + suspected)", "mrl-area", { step: "any", min: "0" });
   const porous = makeCheckbox("Porous material present (drywall, carpet, ceiling tile, insulation)", "mrl-porous");
   const hvac = makeCheckbox("Growth in or fed by the HVAC system", "mrl-hvac");
@@ -1505,7 +1507,7 @@ function renderMoldRemediationLevel(inputRegion, outputRegion, citationEl) {
   for (const f of [area, porous, hvac, vuln]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { area.input.value = "45"; porous.input.checked = true; hvac.input.checked = false; vuln.input.checked = false; update(); });
   const oBand = makeOutputLine(outputRegion, "EPA band", "mrl-out-band");
-  const oLevel = makeOutputLine(outputRegion, "NYC DOHMH level", "mrl-out-level");
+  const oLevel = makeOutputLine(outputRegion, "NYC DOHMH (2008) category", "mrl-out-level");
   const oCont = makeOutputLine(outputRegion, "Containment", "mrl-out-cont");
   const oPPE = makeOutputLine(outputRegion, "PPE tier", "mrl-out-ppe");
   const oIEP = makeOutputLine(outputRegion, "Independent assessor", "mrl-out-iep");
@@ -1933,43 +1935,61 @@ RESTORATION_RENDERERS["dehumidifier-derate"] = renderDehumidifierDerate;
 // the matching per-class evaporation factor to feed evaporation-load.
 // A deterministic screen, not a verdict; the inspector and the moisture
 // map govern the classification.
-// dims: in { floor_wet_fraction: dimensionless, wall_wet_fraction: dimensionless, wick_height_ft: L, low_evap_materials: dimensionless }
-//        out: { water_class: dimensionless, rationale: dimensionless, evap_factor_gal_ft2: dimensionless }
-export function computeWaterClassScreen({ floor_wet_fraction = 0, wall_wet_fraction = 0, wick_height_ft = 0, low_evap_materials = 0 } = {}) {
+// IICRC S500 (4th ed. 2015 and 5th ed. 2021) classifies by the WET SHARE of the combined floor, wall
+// and ceiling surface in the affected area: Class 1 under 5%, Class 2 5-40%, Class 3 over 40%; Class 4
+// is the specialty low-evaporation case. Until 2026-09-25 this used the pre-2015 rules (floor >= 40% ->
+// Class 2, wick over 24 in or walls >= 40% -> Class 3), which read a room with 30% of its floor and 30%
+// of its walls wet as Class 1. Room areas are optional; without them the shares are weighted by a
+// 12 x 12 x 8 ft room (floor 144, walls 384, ceiling 144 ft2). Wick height is kept for the record only.
+// dims: in { floor_wet_fraction: dimensionless, wall_wet_fraction: dimensionless, wick_height_ft: L, low_evap_materials: dimensionless, ceiling_wet_fraction: dimensionless, floor_area_ft2: L^2, wall_area_ft2: L^2, ceiling_area_ft2: L^2 }
+//        out: { water_class: dimensionless, rationale: dimensionless, evap_factor_gal_ft2: dimensionless, wet_share_pct: dimensionless, wick_height_ft: L }
+export function computeWaterClassScreen({ floor_wet_fraction = 0, wall_wet_fraction = 0, wick_height_ft = 0, low_evap_materials = 0, ceiling_wet_fraction = 0, floor_area_ft2 = 0, wall_area_ft2 = 0, ceiling_area_ft2 = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const floor = Number(floor_wet_fraction);
   const wall = Number(wall_wet_fraction);
+  const ceil = Number(ceiling_wet_fraction) || 0;
   const wick = Number(wick_height_ft);
   if (!(floor >= 0 && floor <= 1)) return { error: "Floor wet fraction must be in [0, 1]." };
   if (!(wall >= 0 && wall <= 1)) return { error: "Wall wet fraction must be in [0, 1]." };
+  if (!(ceil >= 0 && ceil <= 1)) return { error: "Ceiling wet fraction must be in [0, 1]." };
   if (!(wick >= 0)) return { error: "Wick height must be non-negative (ft)." };
+  const Fa = Number(floor_area_ft2) || 0, Wa = Number(wall_area_ft2) || 0, Ca = Number(ceiling_area_ft2) || 0;
+  if (Fa < 0 || Wa < 0 || Ca < 0) return { error: "Room areas cannot be negative (ft2)." };
+  const useRoom = Fa + Wa + Ca > 0;
+  const F = useRoom ? Fa : 144, W = useRoom ? Wa : 384, C = useRoom ? Ca : 144;
+  const wet_share_pct = (floor * F + wall * W + ceil * C) / (F + W + C) * 100;
+  const basis = useRoom ? "the entered room areas" : "a 12 x 12 x 8 ft room's proportions (enter the room areas for your own)";
   const lowEvap = low_evap_materials ? 1 : 0;
   let water_class, rationale;
   if (lowEvap) {
     water_class = 4;
-    rationale = "Low-evaporation materials wet (hardwood, plaster, lightweight concrete, masonry) - specialty Class 4 drying regardless of the wetted fractions.";
-  } else if (wick > 2.0 || wall >= 0.40) {
+    rationale = "Low-evaporation materials wet (hardwood, plaster, lightweight concrete, masonry) - specialty Class 4 drying regardless of the wet share.";
+  } else if (wet_share_pct > 40) {
     water_class = 3;
-    rationale = "Wicking above 24 in or much of the wall wet (overhead / saturated walls) - Class 3, the greatest absorption and evaporation load.";
-  } else if (floor >= 0.40) {
+    rationale = "More than 40% of the combined floor, wall and ceiling surface is wet (" + wet_share_pct.toFixed(1) + "%, by " + basis + ") - Class 3, the greatest absorption and evaporation load.";
+  } else if (wet_share_pct >= 5) {
     water_class = 2;
-    rationale = "Entire floor and pad wet, wicking under 24 in - Class 2, significant absorption.";
+    rationale = "5 to 40% of the combined floor, wall and ceiling surface is wet (" + wet_share_pct.toFixed(1) + "%, by " + basis + ") - Class 2, significant absorption.";
   } else {
     water_class = 1;
-    rationale = "Small affected area, low porosity, minimal wicking - Class 1, least absorption.";
+    rationale = "Less than 5% of the combined floor, wall and ceiling surface is wet (" + wet_share_pct.toFixed(1) + "%, by " + basis + ") - Class 1, least absorption.";
   }
   const evap_factor_gal_ft2 = WATER_CLASS_LOAD_GAL_FT2[water_class];
-  return { water_class, rationale, evap_factor_gal_ft2 };
+  return { water_class, rationale, evap_factor_gal_ft2, wet_share_pct, wick_height_ft: wick };
 }
 export const waterClassScreenExample = { inputs: { floor_wet_fraction: 1.0, wall_wet_fraction: 0.30, wick_height_ft: 1.5, low_evap_materials: 0 } };
 
 function renderWaterClassScreen(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: IICRC S500 Class-of-loss definitions and the 24 in (2 ft) wick threshold, by name (not reproduced). A deterministic screen evaluated top-down: low-evaporation materials -> Class 4; wick > 2 ft or wall >= 40% -> Class 3; floor >= 40% -> Class 2; else Class 1. The inspector's classification and a moisture map govern; this proposes a Class and states the rationale.";
+  citationEl.textContent = "Citation: IICRC S500 (4th ed. 2015 / 5th ed. 2021) class definitions by name (not reproduced; percentages as published in trade summaries), keyed to the wet share of the combined floor, wall and ceiling surface: under 5% Class 1, 5-40% Class 2, over 40% Class 3; low-evaporation materials Class 4. The pre-2015 floor and 24 in wick rules no longer define the class. The inspector's classification and a moisture map govern; this proposes a Class and states the rationale.";
   const floor = makeNumber("Floor area wet (fraction 0-1)", "cls-floor", { step: "any", min: "0", max: "1" });
   const wall = makeNumber("Wall area wet (fraction 0-1)", "cls-wall", { step: "any", min: "0", max: "1" });
   const wick = makeNumber("Highest wicking up the walls (ft)", "cls-wick", { step: "any", min: "0" });
+  const ceil = makeNumber("Ceiling area wet (fraction 0-1)", "cls-ceil", { step: "any", min: "0", max: "1" });
+  const fa = makeNumber("Floor area (ft2, optional)", "cls-fa", { step: "any", min: "0" });
+  const wa = makeNumber("Wall area (ft2, optional)", "cls-wa", { step: "any", min: "0" });
+  const ca = makeNumber("Ceiling area (ft2, optional)", "cls-ca", { step: "any", min: "0" });
   const lowEvap = makeCheckbox("Low-evaporation materials wet (hardwood / plaster / masonry)", "cls-le", false);
-  for (const f of [floor, wall, wick, lowEvap]) inputRegion.appendChild(f.wrap);
+  for (const f of [floor, wall, ceil, fa, wa, ca, wick, lowEvap]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { floor.input.value = "1.0"; wall.input.value = "0.30"; wick.input.value = "1.5"; lowEvap.input.checked = false; update(); });
   const oClass = makeOutputLine(outputRegion, "Candidate water class", "cls-out-class");
   const oWhy = makeOutputLine(outputRegion, "Rationale", "cls-out-why");
@@ -1980,13 +2000,15 @@ function renderWaterClassScreen(inputRegion, outputRegion, citationEl) {
       wall_wet_fraction: Number(wall.input.value) || 0,
       wick_height_ft: Number(wick.input.value) || 0,
       low_evap_materials: lowEvap.input.checked ? 1 : 0,
+      ceiling_wet_fraction: Number(ceil.input.value) || 0,
+      floor_area_ft2: Number(fa.input.value) || 0, wall_area_ft2: Number(wa.input.value) || 0, ceiling_area_ft2: Number(ca.input.value) || 0,
     });
     if (r.error) { oClass.textContent = r.error; oWhy.textContent = "-"; oFactor.textContent = "-"; return; }
     oClass.textContent = "Class " + r.water_class;
     oWhy.textContent = r.rationale;
     oFactor.textContent = r.evap_factor_gal_ft2 + " gal/ft^2";
   }, DEBOUNCE_MS);
-  for (const el of [floor.input, wall.input, wick.input, lowEvap.input]) el.addEventListener("input", update);
+  for (const el of [floor.input, wall.input, ceil.input, fa.input, wa.input, ca.input, wick.input, lowEvap.input]) el.addEventListener("input", update);
 }
 RESTORATION_RENDERERS["class-of-loss-screen"] = renderWaterClassScreen;
 

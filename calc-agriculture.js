@@ -1164,7 +1164,8 @@ function renderStockingRate(inputRegion, outputRegion, citationEl) {
 
 // --- spec-v17 L.4 Grain bin capacity ---------------------------------
 
-// USDA FGIS standard test weights (lb per bushel).
+// Standard (legal) bushel weights, lb per bushel. These are not FGIS grade figures: 7 CFR 810 sets
+// minimum test weights by grade (corn No. 1 56, No. 2 54; oats No. 1 36, No. 2 33) and none for soybeans.
 export const GRAIN_TEST_WEIGHT_LB_BU = {
   corn: 56,
   wheat: 60,
@@ -1274,7 +1275,7 @@ function renderGrainBinHeightForCapacity(inputRegion, outputRegion, citationEl) 
 }
 
 function renderGrainBin(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: Bin geometry first-principles (cylinder + cone); bushels = ft^3 x 0.8036 (1 bushel = 1.2445 ft^3); test weights per USDA FGIS (Federal Grain Inspection Service) standards. Free at ams.usda.gov/services/grain-inspection.";
+  citationEl.textContent = "Citation: Bin geometry first-principles (cylinder + cone); bushels = ft^3 x 0.8036 (1 bushel = 1.2445 ft^3); standard (legal) bushel weights -- corn 56, wheat 60, soybeans 60, oats 32 lb -- which are not the USDA FGIS grade minimums in 7 CFR 810 (corn No. 1 56 / No. 2 54, oats No. 1 36). Free at ams.usda.gov/services/grain-inspection.";
   const d = makeNumber("Bin diameter (ft)", "gb-d", { step: "any", min: "0" });
   const eave = makeNumber("Eave (wall) height (ft)", "gb-eave", { step: "any", min: "0" });
   const peak = makeNumber("Peak cone height (ft; 0 for flat)", "gb-peak", { step: "any", min: "0" });

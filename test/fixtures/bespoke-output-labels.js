@@ -552,7 +552,7 @@ export const BESPOKE_OUTPUT_LABELS = {
   "molarity-from-stock": {"stock_m":"Stock molarity","volume_to_draw_ml":"Volume of concentrate to draw","note":"Note"},
   "mold": {"risk":"Risk"},
   "mold-cleaning-labor": {"labor_hours":"Labor","crew_hours":"Crew calendar time"},
-  "mold-remediation-level": {"band":"EPA band","level":"NYC DOHMH level","containment":"Containment","ppe_tier":"PPE tier","iep_assess":"Independent assessor","clearance":"Post-remediation verification"},
+  "mold-remediation-level": {"band":"EPA band","level":"NYC DOHMH (2008) category","containment":"Containment","ppe_tier":"PPE tier","iep_assess":"Independent assessor","clearance":"Post-remediation verification"},
   "molecular-weight": {"molecular_weight":"Molecular weight"},
   "mortgage-point-breakeven": {"payment_base":"Monthly payment, no points","payment_points":"Monthly payment, with points","monthly_savings":"Monthly savings","point_cost":"Total point cost","break_even_months":"Break-even","verdict":"Verdict"},
   "mortgage-reserves": {"required":"Required reserves","eligible":"Eligible assets","months_covered":"Months of PITI covered"},

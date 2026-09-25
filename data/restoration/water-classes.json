@@ -6,9 +6,9 @@
     "3": "Grossly contaminated water. May contain pathogens, sewage, or harmful chemicals. Sometimes called black water."
   },
   "classes": {
-    "1": "Least amount of water absorption and evaporation load. Slow evaporation. Limited area.",
-    "2": "Significant amount of water absorption and evaporation load. Wet carpet, cushions, structural components.",
-    "3": "Greatest amount of water absorption and evaporation load. Water from overhead, saturated walls and ceilings.",
+    "1": "Least amount of water absorption and evaporation load: less than about 5% of the combined floor, wall and ceiling surface in the area is wet.",
+    "2": "Significant water absorption and evaporation load: about 5 to 40% of the combined floor, wall and ceiling surface is wet.",
+    "3": "Greatest water absorption and evaporation load: more than about 40% of the combined floor, wall and ceiling surface is wet.",
     "4": "Specialty drying situations. Materials with low porosity (hardwood, plaster, masonry) holding bound water."
   }
 }

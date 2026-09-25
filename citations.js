@@ -2600,7 +2600,7 @@ export const CITATIONS = {
     editionNote: "The moisture-shrink fraction (M_wet - M_dry)/(100 - M_dry), the dried weight W (100 - M_wet)/(100 - M_dry), the handling/invisible shrink deduction, and the net market bushels at the crop's test weight (56 lb/bu corn, 60 lb/bu wheat and soybeans, 32 lb/bu oats). This returns the net dried weight, bushels, and total shrink for the entered moistures: it does not apply dockage for foreign material or damage, does not compute the elevator's moisture-discount dollars, and takes the handling shrink as entered. The buyer's contract and settlement scale govern; each extra point of drying costs more than a point of weight.",
     assumptions: [
       { name: "Moisture-shrink form", value: "(M_wet - M_dry)/(100 - M_dry) with the water-balance dried weight", source: "USDA / land-grant extension" },
-      { name: "Test weight", value: "56 lb/bu corn, 60 lb/bu wheat and soybeans, 32 lb/bu oats", source: "USDA FGIS" },
+      { name: "Bushel weight", value: "56 lb/bu corn, 60 lb/bu wheat and soybeans, 32 lb/bu oats (standard legal bushel weights, not FGIS grade minimums)", source: "standard bushel weights; cf. 7 CFR 810" },
       { name: "No dockage", value: "no foreign-material or damage dockage and no discount-dollar computation", source: "scope of this tile" },
     ],
   },
@@ -2630,13 +2630,13 @@ export const CITATIONS = {
   },
   "grain-bin-capacity": {
     formula: "Cylinder volume = pi x (d/2)^2 x eave height. Cone volume = (1/3) x pi x (d/2)^2 x peak height. Total ft^3 = (cylinder + cone) x packing factor. Bushels = ft^3 x 0.8036 (1 bushel = 1.2445 ft^3). Weight = bushels x test weight.",
-    edition: "Bin geometry first-principles; USDA FGIS (Federal Grain Inspection Service) standard test weights by name.",
+    edition: "Bin geometry first-principles; standard (legal) bushel weights by name (USDA FGIS grade test weights in 7 CFR 810 differ by grade).",
     freeAccess: "Free at ams.usda.gov/services/grain-inspection.",
     governance: GOVERNANCE.general,
     editionNote: "Test weights (lb/bushel): corn 56, wheat 60, soybeans 60, oats 32. The packing factor (1.00 free-flow to 1.05 packed) and actual fill cone govern real capacity; moisture affects test weight.",
     assumptions: [
       { name: "Bushel conversion", value: "1 ft^3 = 0.8036 bushels (1 bushel = 1.2445 ft^3)", source: "USDA standard" },
-      { name: "Test weights", value: "corn 56, wheat 60, soybeans 60, oats 32 lb/bushel", source: "USDA FGIS" },
+      { name: "Bushel weights", value: "corn 56, wheat 60, soybeans 60, oats 32 lb/bushel (standard legal weights; FGIS grade minimums in 7 CFR 810 differ)", source: "standard bushel weights" },
     ],
   },
   "grain-bin-height-for-capacity": {
@@ -5896,14 +5896,14 @@ export const CITATIONS = {
     assumptions: [],
   },
   "mold-remediation-level": {
-    formula: "Deterministic lookup: EPA 402-K-01-001 area bands (small < 10 ft2, medium 10-100, large > 100); NYC DOHMH levels (I < 10, II 10-30, III 30-100, IV > 100, V on any HVAC involvement). Derived controls: containment (limited / full) by band and porous material; PPE tier by band; independent assessor when area > 100, HVAC, or vulnerable occupant; clearance for medium/large, HVAC, or vulnerable occupant.",
-    edition: "EPA 402-K-01-001 (Mold Remediation in Schools and Commercial Buildings) area bands; NYC DOHMH Guidelines on Assessment and Remediation of Fungi in Indoor Environments levels; IICRC S520-2024 by name.",
+    formula: "Deterministic lookup: EPA 402-K-01-001 area bands (small < 10 ft2, medium 10-100, large > 100); NYC DOHMH 2008 categories (small < 10, medium 10-100, large > 100; HVAC small < 10 and large >= 10 ft2; the 2008 edition supersedes the 2000 edition's Levels I-V). Derived controls: containment (limited / full) by band and porous material; PPE tier by band; independent assessor when area > 100, HVAC, or vulnerable occupant; clearance for medium/large, HVAC, or vulnerable occupant.",
+    edition: "EPA 402-K-01-001 (Mold Remediation in Schools and Commercial Buildings) area bands; NYC DOHMH Guidelines on Assessment and Remediation of Fungi in Indoor Environments (November 2008) categories; IICRC S520-2024 by name.",
     freeAccess: "EPA 402-K-01-001 free at epa.gov/mold; NYC DOHMH guidelines free at nyc.gov. IICRC S520-2024 licensed.",
     governance: GOVERNANCE.general,
     editionNote: "Scope guidance keyed to public EPA / NYC DOHMH bands; not a substitute for an assessment. The assessor's and remediator's protocol governs the cut line.",
     assumptions: [
       { name: "EPA area bands", value: "small < 10 ft2, medium 10-100, large > 100", source: "EPA 402-K-01-001" },
-      { name: "HVAC override", value: "any HVAC-system involvement -> NYC DOHMH Level V regardless of area", source: "NYC DOHMH guidelines" },
+      { name: "HVAC category", value: "HVAC-system involvement is its own NYC 2008 category, split at 10 ft2", source: "NYC DOHMH guidelines (2008)" },
     ],
   },
   "mold-conditions": {
@@ -21048,11 +21048,11 @@ export const CITATIONS = {
     ],
   },
   "snowmelt-load": {
-    formula: "q_o = q_s + q_m + A_r(q_h + q_e), with q_s = 2.6 s (33 - t_a); q_m = 746 s; q_h = 11.4 (0.0201 V + 0.055)(33 - t_a); q_e = 1075.5 (0.0201 V + 0.055)(0.188 - p_av); p_av from the Magnus curve x RH; boiler = q_o x area x (1 + back_loss); t_m ~ 0.5 q_o + 33.",
+    formula: "q_o = q_s + q_m + A_r(q_h + q_e), with q_s = 2.6 s (32 - t_a); q_m = 746 s; q_h = 11.4 (0.0201 V + 0.055)(33 - t_a); q_e = 1075.5 (0.0201 V + 0.055)(0.188 - p_av); p_av from the Magnus curve x RH; boiler = q_o x area x (1 + back_loss); t_m ~ 0.5 q_o + 33.",
     edition: "ASHRAE Handbook (HVAC Applications, Snow Melting and Freeze Protection) steady-state surface flux, with the Chapman (1956) IP component forms as printed in Lund, Pavement Snow Melting (Geo-Heat Center / OSTI), by name.",
     freeAccess: "The energy balance is stated in the ASHRAE snow-melting chapter and the Chapman closed forms are reproduced verbatim in Lund's Geo-Heat Center paper (free via OSTI); the Magnus saturation curve and steam-table h_fg are public; the arithmetic is public.",
     governance: GOVERNANCE.general,
-    editionNote: "ASHRAE snow-melting steady-state surface flux q_o = q_s + q_m + A_r(q_h + q_e): warm the falling snow to the 33 F melting film (q_s = 2.6 s (33 - t_a), s in in/hr water equivalent), melt it (q_m = 746 s), and over the snow-free fraction A_r pay the exposed wet surface's convective (q_h = 11.4 (0.0201 V + 0.055)(33 - t_a), V in mph) and evaporative (q_e = h_fg (0.0201 V + 0.055)(0.188 - p_av), p_av in in Hg) losses -- the Chapman (1956) IP forms as printed in Lund, with h_fg = 1075.5 Btu/lb at the film (a steam-table value; Lund leaves it symbolic) and 0.188 in Hg the saturation pressure at the film. The ambient vapor pressure comes from the August-Roche-Magnus saturation curve times the relative humidity. A_r is Chapman's class choice: 0 Class I (residential, may run snow-covered), 0.5 Class II (commercial), 1.0 Class III (critical; must stay clear). The boiler output adds the ~20% ASHRAE-typical back-and-edge loss for an insulated slab (bridges and exposed backs run higher), and the mean fluid temperature is roughly 0.5 q_o + 33 F (Chapman's rule of thumb). A steady-state design flux for the chosen storm, not an annual energy; the idling/pickup strategy, controls, and glycol fluid design follow the manufacturer's manual. A sizing aid, not a stamped hydronic design.",
+    editionNote: "ASHRAE snow-melting steady-state surface flux q_o = q_s + q_m + A_r(q_h + q_e): warm the falling snow to 32 F (q_s = 2.6 s (32 - t_a), s in in/hr water equivalent), melt it (q_m = 746 s), and over the snow-free fraction A_r pay the exposed wet surface's convective (q_h = 11.4 (0.0201 V + 0.055)(33 - t_a), V in mph) and evaporative (q_e = h_fg (0.0201 V + 0.055)(0.188 - p_av), p_av in in Hg) losses -- the Chapman (1956) IP forms as printed in Lund, with h_fg = 1075.5 Btu/lb at the film (a steam-table value; Lund leaves it symbolic) and 0.188 in Hg the saturation pressure at the film. The ambient vapor pressure comes from the August-Roche-Magnus saturation curve times the relative humidity. A_r is Chapman's class choice: 0 Class I (residential, may run snow-covered), 0.5 Class II (commercial), 1.0 Class III (critical; must stay clear). The boiler output adds the ~20% ASHRAE-typical back-and-edge loss for an insulated slab (bridges and exposed backs run higher), and the mean fluid temperature is roughly 0.5 q_o + 33 F (Chapman's rule of thumb). A steady-state design flux for the chosen storm, not an annual energy; the idling/pickup strategy, controls, and glycol fluid design follow the manufacturer's manual. A sizing aid, not a stamped hydronic design.",
     assumptions: [
       { name: "Energy balance", value: "q_o = q_s + q_m + A_r(q_h + q_e) at the 33 F melting film", source: "ASHRAE / Chapman via Lund" },
       { name: "Class ratio", value: "A_r = 0 / 0.5 / 1.0 for Class I / II / III; the class, not the climate, is the first sizing question", source: "Chapman (1957)" },

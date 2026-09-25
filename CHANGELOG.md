@@ -10,6 +10,11 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **Water-loss class, mold scope, snowmelt and grain-bin tiles checked against IICRC S500 (2015 / 2021), the 2008 NYC mold guidelines, Lund, and 7 CFR 810.**
+  - `class-of-loss-screen` used the pre-2015 class rules: floor 40% or more for Class 2, and wicking over 24 in or walls 40% or more for Class 3. Since the 2015 edition, IICRC S500 classes follow the wet share of the combined floor, wall and ceiling surface: under 5% Class 1, 5-40% Class 2, over 40% Class 3. A room with 30% of its floor and 30% of its walls wet read Class 1, and its dehumidification load was undersized (unsafe). The tile now computes that share, weighted by entered room areas or by a 12 x 12 x 8 ft room, and the water-classes reference text is updated to match. The percentages come from trade summaries of the licensed standard.
+  - `mold-remediation-level` used the NYC DOHMH 2000 Levels I-V, including a 30 ft² split. The November 2008 guidelines supersede all prior editions and use three categories: small (under 10 ft²), medium (10-100) and large (over 100), plus HVAC under and over 10 ft². The controls were already conservative against 2008.
+  - `snowmelt-load` warmed the falling snow to 33°F; Lund prints q_s = 2.6 s (32 - t_a), and 33°F is the film temperature for q_h and q_e only. q_s is now also held at zero when the air is above 32°F, where it would otherwise go negative.
+  - `grain-bin` credited its 56 / 60 / 60 / 32 lb bushel weights to USDA FGIS. They are standard legal bushel weights; the FGIS grade minimums in 7 CFR 810 differ (corn No. 1 56, No. 2 54; oats No. 1 36) and soybeans have none.
 - **Welder conductors, capacitor discharge, and two grounding rules checked against NEC Tables 630.11(A) and 630.31(A)(2) and Articles 460 and 250.**
   - `welder-arc-circuit-conductor` applied sqrt(duty) at every duty cycle. Table 630.11(A)'s last row is "20 or less 0.45", so a 10% duty welder's conductor was sized at 0.32 of the primary current where the table gives 0.45 (unsafe, 30% low).
   - `welder-resistance-circuit-conductor` did the same below Table 630.31(A)(2)'s "5 or less 0.22" row: 0.14 at 2% duty (unsafe, 36% low).
