@@ -23538,6 +23538,8 @@ test("bounds: spec-v495 computeCapacitorDischargeTime pins the R_max, the contin
   assert.ok("error" in _v495({ capacitance_uf: 100, initial_voltage: 0 }));
   assert.ok("error" in _v495({ capacitance_uf: 100, initial_voltage: 600, safe_voltage: 600 })); // V_safe >= V0
   assert.ok("error" in _v495({ capacitance_uf: 100, initial_voltage: 600, resistor_ohm: -5 }));
+  // NEC 2023 460.6: 1 minute at 1,000 V nominal or less (the 600 V split is pre-2020).
+  assert.strictEqual(_v495({ capacitance_uf: 100, initial_voltage: 800, safe_voltage: 50, time_limit_s: 0, resistor_ohm: 0 }).limit_s, 60);
 });
 
 import { computeAsymmetricalFaultXr as _v496 } from "../../calc-electrical.js";
@@ -29129,6 +29131,8 @@ test("bounds: spec-v933 computeWelderResistanceCircuitConductor pins the conduct
   assert.ok("error" in _v933({ primary_current_a: 100, duty_pct: 0 }));
   assert.ok("error" in _v933({ primary_current_a: 100, duty_pct: 150 }));
   assert.ok("error" in _v933({ primary_current_a: Infinity, duty_pct: 50 }));
+  // Table 630.31(A)(2) stops at "5 or less 0.22".
+  assert.ok(Math.abs(_v933({ primary_current_a: 100, duty_pct: 2 }).duty_multiplier - 0.22) < 1e-12);
 });
 
 import { computeWelderArcCircuitConductor as _v932 } from "../../calc-electrical.js";
@@ -31732,7 +31736,8 @@ test("bounds: welder tile scopes to the transformer/rectifier column and rounds 
   // against its published values (0.71 at 50%, 0.55 at 30%, 0.45 at 20%). The
   // note previously also claimed motor-generator coverage (a different, higher
   // column) and an OCPD rounding the code never performed.
-  for (const [duty, mult] of [[50, 0.7071], [30, 0.5477], [20, 0.4472], [100, 1.0]]) {
+  // The table's last row is "20 or less 0.45", so the multiplier holds at 0.45 at and below 20%.
+  for (const [duty, mult] of [[50, 0.7071], [30, 0.5477], [20, 0.45], [10, 0.45], [100, 1.0]]) {
     assert.ok(Math.abs(_necWeld({ primary_current_a: 40, duty_pct: duty }).duty_multiplier - mult) < 1e-4);
   }
   const r = _necWeld({ primary_current_a: 40, duty_pct: 50 });

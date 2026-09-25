@@ -2,7 +2,7 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "5fc82a9bae00f2f2",
+      "sha": "de5f4fe07d4afe68",
       "date": "2026-09-25"
     },
     "/tools/": {
@@ -730,8 +730,8 @@
       "date": "2026-09-01"
     },
     "/tools/bonding-jumper/": {
-      "sha": "1d55fb81f9d2c5a8",
-      "date": "2026-09-01"
+      "sha": "a6694ecb1228b1f9",
+      "date": "2026-09-25"
     },
     "/tools/boom-pump-reach/": {
       "sha": "447656901e09d1cd",
@@ -934,8 +934,8 @@
       "date": "2026-09-08"
     },
     "/tools/capacitor-discharge-time/": {
-      "sha": "163510008f13472e",
-      "date": "2026-09-01"
+      "sha": "3ac929c08da2d744",
+      "date": "2026-09-25"
     },
     "/tools/carbon-bed-life/": {
       "sha": "fb86d6b32afa5637",

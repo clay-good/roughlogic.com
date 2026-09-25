@@ -4061,9 +4061,13 @@ export function computeGroundingElectrodeConductor({ service_kcmil = 0, material
     required_gec = _smallerSize(base_gec, cap);
     cap_note = "Rod/pipe/plate sole connection: 250.66(A) caps the GEC at " + cap + " AWG " + material + ".";
   } else if (electrode_type === "concrete-encased") {
-    const cap = material === "aluminum" ? "2" : "4";
-    required_gec = _smallerSize(base_gec, cap);
-    cap_note = "Concrete-encased (Ufer) sole connection: 250.66(B) caps the GEC at " + cap + " AWG copper-equivalent.";
+    // 250.66(B) states a cap for COPPER only (4 AWG). It gives no aluminum figure, and 250.64(A) keeps
+    // aluminum out of contact with concrete. Until 2026-09-25 this capped aluminum at 2 AWG, a rule the
+    // code does not state.
+    if (material === "copper") required_gec = _smallerSize(base_gec, "4");
+    cap_note = material === "copper"
+      ? "Concrete-encased (Ufer) sole connection: 250.66(B) caps the GEC at 4 AWG copper."
+      : "Concrete-encased (Ufer) sole connection: 250.66(B) gives a cap for copper only (4 AWG) and no aluminum figure, and 250.64(A) keeps aluminum out of contact with concrete -- the full Table 250.66 aluminum size is shown; the electrode connection itself is copper.";
   } else if (electrode_type === "ground-ring") {
     // 250.66(C) is a CAP: the GEC need not exceed the ring conductor, which is at least 2 AWG
     // copper (250.52(A)(4)). Capped at the minimum ring; a larger ring raises the cap.
@@ -4117,7 +4121,7 @@ export function computeBondingJumper({ mode = "supply-side", material = "copper"
     // 250.102(C)(1) / 250.28(D): above 1100 kcmil copper (1750 aluminum) the
     // jumper is at least 12.5% of the largest phase conductor area.
     const large_threshold = material === "aluminum" ? 1750 : 1100;
-    let required_jumper = base, rule = "Table 250.66 size (250.102(C)(1) / 250.28(D)).";
+    let required_jumper = base, rule = "Table 250.102(C)(1) size (250.28(D)); its values match Table 250.66 up to 1,100 kcmil.";
     if (service_kcmil > large_threshold) {
       const area_125 = 0.125 * service_kcmil * 1000; // kcmil -> cmils
       const base_cmils = _sizeAreaCmils(base) || 0;
@@ -4128,7 +4132,7 @@ export function computeBondingJumper({ mode = "supply-side", material = "copper"
     }
     return {
       required_jumper, rule,
-      note: "The supply-side bonding jumper (the main bonding jumper at the service and any system bonding jumper) is sized from Table 250.66 by the largest ungrounded service conductor - the same table as the GEC. Where the service phase conductors exceed 1100 kcmil copper (1750 kcmil aluminum), 250.102(C)(1) requires the jumper to be at least 12.5% of the largest phase conductor area. The AHJ-adopted edition governs. Free read-only at nfpa.org/freeaccess.",
+      note: "The supply-side bonding jumper (the main bonding jumper at the service and any system bonding jumper) is sized from Table 250.102(C)(1) by the largest ungrounded service conductor (its own table since the 2014 NEC; the sizes match Table 250.66 up to 1,100 kcmil copper). Where the service phase conductors exceed 1100 kcmil copper (1750 kcmil aluminum), 250.102(C)(1) requires the jumper to be at least 12.5% of the largest phase conductor area. The AHJ-adopted edition governs. Free read-only at nfpa.org/freeaccess.",
     };
   }
   // Equipment / load-side bonding jumper: NEC 250.102(D) -> Table 250.122 by OCPD.
@@ -4147,7 +4151,7 @@ export function computeBondingJumper({ mode = "supply-side", material = "copper"
 export const bondingJumperExample = { inputs: { mode: "supply-side", material: "copper", service_kcmil: 350, ocpd_A: 0, parallel_sets: 1 } };
 
 function renderBondingJumper(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: NEC 250.28(D) / 250.102(C)(D) bonding-jumper sizing - supply-side from Table 250.66 (with the 12.5% rule above 1100 kcmil copper / 1750 aluminum), equipment from Table 250.122 (by section; only the threshold-to-size mapping is encoded). The AHJ-adopted edition governs. Free read-only at nfpa.org/freeaccess.";
+  citationEl.textContent = "Citation: NEC 250.28(D) / 250.102(C)(D) bonding-jumper sizing - supply-side from Table 250.102(C)(1) (with the 12.5% rule above 1100 kcmil copper / 1750 aluminum), equipment from Table 250.122 (by section; only the threshold-to-size mapping is encoded). The AHJ-adopted edition governs. Free read-only at nfpa.org/freeaccess.";
   const mode = makeSelect("Jumper type", "bj-mode", [
     { value: "supply-side", label: "Supply-side (main / system)" },
     { value: "equipment", label: "Equipment (load-side)" },
@@ -5287,7 +5291,7 @@ export function computeCapacitorDischargeTime({ capacitance_uf = 0, initial_volt
   if (!(v0 > 0)) return { error: "Initial voltage must be positive (V)." };
   if (!(vsafe > 0 && vsafe < v0)) return { error: "Safe voltage must be positive and below the initial voltage." };
   if (rin < 0) return { error: "Supplied resistance must be positive (ohm; 0 = solve for the largest compliant resistor)." };
-  const limit_s = Number(time_limit_s) > 0 ? Number(time_limit_s) : (v0 <= 600 ? 60 : 300);
+  const limit_s = Number(time_limit_s) > 0 ? Number(time_limit_s) : (v0 <= 1000 ? 60 : 300); // NEC 2023: 460.6 (1,000 V or less, 1 min) / 460.28 (over 1,000 V, 5 min); 600 V was the pre-2020 threshold
   const C = cuf * 1e-6;
   const ln_ratio = Math.log(v0 / vsafe);
   const r_max_ohm = limit_s / (C * ln_ratio);
@@ -5298,12 +5302,12 @@ export function computeCapacitorDischargeTime({ capacitance_uf = 0, initial_volt
   if (![ln_ratio, r_max_ohm, r_used_ohm, t_discharge_s, p_continuous_w].every(Number.isFinite)) return { error: "Discharge math is not a finite value." };
   return {
     ln_ratio, r_max_ohm, r_used_ohm, t_discharge_s, p_continuous_w, limit_s, meets_code,
-    note: "NEC 460.6: a capacitor holds a lethal charge after disconnect, so a discharge means must bring the residual voltage to 50 V or less within 1 minute at or below 600 V, and within 5 minutes above 600 V. V(t) = V0 e^(-t/RC), so t = R C ln(V0/V_safe) and the largest compliant resistor is R_max = t_limit / (C ln(V0/V_safe)). The discharge means must be PERMANENTLY connected to the capacitor terminals or connect automatically on loss of line voltage -- a manually switched bleed does not comply. Sizing is a trade-off: a smaller resistor discharges faster but dissipates V0^2/R continuously while the bank is energized, so rate it for that power with margin. A listed capacitor's internal discharge resistors may already satisfy this. AND ALL OF THIS ASSUMES THE BLEED PATH WORKS -- spec-v1734's material, landed here. A bleed resistor fails OPEN silently: nothing indicates it, no symptom appears, and a bank whose discharge path has failed holds its charge indefinitely while this calculation keeps returning a comfortable number. That is exactly why the requirement is to VERIFY THE ABSENCE OF VOLTAGE BY TEST, with the tester proven on a known live source immediately before and immediately after the reading. This says what to expect; the meter says what is true, and only one of them is a safety control. STORED ENERGY IS ALSO NOT ONLY CAPACITIVE. A variable frequency drive's DC bus holds a lethal charge after its input disconnect opens and takes minutes to fall, which is why the wait time is printed on the cover -- an electrician who locks the disconnect and immediately opens the drive has locked out the source and walked into the stored energy. A lockout procedure has to address the non-electrical forms explicitly as well: springs under compression, suspended loads, hydraulic and pneumatic accumulators, thermal energy, and material that can flow or fall. A design aid, not a substitute for the equipment listing; 29 CFR 1910.147 and NFPA 70E govern the verification and the lockout.",
+    note: "NEC 460.6: a capacitor holds a lethal charge after disconnect, so a discharge means must bring the residual voltage to 50 V or less within 1 minute for capacitors of 1,000 V nominal or less (460.6), and within 5 minutes above 1,000 V (460.28). V(t) = V0 e^(-t/RC), so t = R C ln(V0/V_safe) and the largest compliant resistor is R_max = t_limit / (C ln(V0/V_safe)). The discharge means must be PERMANENTLY connected to the capacitor terminals or connect automatically on loss of line voltage -- a manually switched bleed does not comply. Sizing is a trade-off: a smaller resistor discharges faster but dissipates V0^2/R continuously while the bank is energized, so rate it for that power with margin. A listed capacitor's internal discharge resistors may already satisfy this. AND ALL OF THIS ASSUMES THE BLEED PATH WORKS -- spec-v1734's material, landed here. A bleed resistor fails OPEN silently: nothing indicates it, no symptom appears, and a bank whose discharge path has failed holds its charge indefinitely while this calculation keeps returning a comfortable number. That is exactly why the requirement is to VERIFY THE ABSENCE OF VOLTAGE BY TEST, with the tester proven on a known live source immediately before and immediately after the reading. This says what to expect; the meter says what is true, and only one of them is a safety control. STORED ENERGY IS ALSO NOT ONLY CAPACITIVE. A variable frequency drive's DC bus holds a lethal charge after its input disconnect opens and takes minutes to fall, which is why the wait time is printed on the cover -- an electrician who locks the disconnect and immediately opens the drive has locked out the source and walked into the stored energy. A lockout procedure has to address the non-electrical forms explicitly as well: springs under compression, suspended loads, hydraulic and pneumatic accumulators, thermal energy, and material that can flow or fall. A design aid, not a substitute for the equipment listing; 29 CFR 1910.147 and NFPA 70E govern the verification and the lockout.",
   };
 }
 export const capacitorDischargeTimeExample = { inputs: { capacitance_uf: 100, initial_voltage: 600, safe_voltage: 50, time_limit_s: 0, resistor_ohm: 0 } };
 function _v495renderCapacitorDischargeTime(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: NEC 2023 460.6 discharge of stored energy: residual voltage to 50 V within 1 minute at or below 600 V (5 minutes above 600 V). V(t) = V0 e^(-t/RC); t = R C ln(V0/V_safe); R_max = t_limit / (C ln(V0/V_safe)); continuous burn = V0^2/R. The discharge means must be permanently or automatically connected. A design aid; the equipment listing and the AHJ govern.";
+  citationEl.textContent = "Citation: NEC 2023 460.6 discharge of stored energy: residual voltage to 50 V within 1 minute at 1,000 V nominal or less (460.28: 5 minutes above 1,000 V). V(t) = V0 e^(-t/RC); t = R C ln(V0/V_safe); R_max = t_limit / (C ln(V0/V_safe)); continuous burn = V0^2/R. The discharge means must be permanently or automatically connected. A design aid; the equipment listing and the AHJ govern.";
   const cap = makeNumber("Total capacitance (uF)", "cdt-cap", { step: "any", min: "0" });
   const v0 = makeNumber("Initial voltage at disconnect (V)", "cdt-v0", { step: "any", min: "0" });
   const vs = makeNumber("Safe voltage target (V, 460.6 = 50)", "cdt-vs", { step: "any", min: "0" });
@@ -5834,8 +5838,10 @@ export function computeWelderArcCircuitConductor({ primary_current_a = 40, duty_
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(primary_current_a > 0)) return { error: "Nameplate primary current must be positive (A)." };
   if (!(duty_pct > 0 && duty_pct <= 100)) return { error: "Duty cycle must be between 0 and 100 percent." };
-  // NEC 630.11(A) / Table 630.11(A): the conductor-sizing multiplier is sqrt(duty), so I_eff = I_primary x sqrt(duty).
-  const duty_multiplier = Math.sqrt(duty_pct / 100);
+  // NEC 630.11(A) / Table 630.11(A), nonmotor-generator column: the rows from 30 to 100% duty track
+  // sqrt(duty), but the table's last row is "20 or less 0.45". Until 2026-09-25 sqrt ran all the way
+  // down (0.32 at 10% duty), undersizing the conductor by up to half.
+  const duty_multiplier = duty_pct <= 20 ? 0.45 : Math.sqrt(duty_pct / 100);
   const effective_current_a = primary_current_a * duty_multiplier;
   // NEC 630.12(A): the overcurrent device for an arc welder may not exceed 200% of the rated primary current.
   const ocpd_max_a = 2.0 * primary_current_a;
@@ -5883,7 +5889,9 @@ export function computeWelderResistanceCircuitConductor({ primary_current_a = 10
   if (!(duty_pct > 0 && duty_pct <= 100)) return { error: "Duty cycle must be between 0 and 100 percent." };
   // NEC 630.31(A)(2): a specific nonrepetitive resistance welder sizes its conductor at the primary current times
   // the square root of the duty cycle (a spot welder fires briefly, so the conductor heats far less than the peak).
-  const duty_multiplier = Math.sqrt(duty_pct / 100);
+  // Table 630.31(A)(2) stops at "5 or less 0.22"; below 5% the multiplier holds at 0.22 (it was
+  // sqrt all the way down until 2026-09-25, 0.14 at 2% duty).
+  const duty_multiplier = duty_pct <= 5 ? 0.22 : Math.sqrt(duty_pct / 100);
   const conductor_current_a = primary_current_a * duty_multiplier;
   // NEC 630.32(A): the overcurrent device for a resistance welder may not exceed 300% of the rated primary current.
   const ocpd_max_a = 3.0 * primary_current_a;

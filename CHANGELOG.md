@@ -10,6 +10,12 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **Welder conductors, capacitor discharge, and two grounding rules checked against NEC Tables 630.11(A) and 630.31(A)(2) and Articles 460 and 250.**
+  - `welder-arc-circuit-conductor` applied sqrt(duty) at every duty cycle. Table 630.11(A)'s last row is "20 or less 0.45", so a 10% duty welder's conductor was sized at 0.32 of the primary current where the table gives 0.45 (unsafe, 30% low).
+  - `welder-resistance-circuit-conductor` did the same below Table 630.31(A)(2)'s "5 or less 0.22" row: 0.14 at 2% duty (unsafe, 36% low).
+  - `capacitor-discharge-time` split the 1 minute / 5 minute discharge limits at 600 V, the pre-2020 threshold. NEC 2023 460.6 gives 1 minute at 1,000 V nominal or less, and 460.28 gives 5 minutes above 1,000 V. A 601-1,000 V capacitor was allowed five times the time, so the largest compliant bleed resistor read five times too large (unsafe).
+  - `grounding-electrode-conductor` capped an aluminum GEC to a concrete-encased electrode at 2 AWG. 250.66(B) gives only a 4 AWG copper cap, and 250.64(A) keeps aluminum out of contact with concrete, so the full Table 250.66 aluminum size is now shown.
+  - `bonding-jumper` said the supply-side jumper is sized from Table 250.66. It has had its own table, 250.102(C)(1), since the 2014 NEC; the sizes match up to 1,100 kcmil.
 - **Gas connectors, trap arms, fixture pressures, test pressures and four plumbing citations checked against the 2021 IFGC and IPC.**
   - `gas-appliance-connection` allowed a 3 ft connector, or 6 ft for ranges and dryers. IFGC 2021 411.1.3.1 allows 6 ft for every appliance; the split is older-edition wording. A 4 ft furnace connector was falsely failed. The shutoff rule is 409.5.1.
   - `trap-arm` gave 1-1/4 in traps 3.5 ft and 1-1/2 in traps 5 ft. IPC 2021 Table 909.1 gives 5 ft and 6 ft (and 1/8 in/ft for 3 and 4 in). The one-diameter fall limit is 909.2. The citation had called the table "public engineering practice."

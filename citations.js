@@ -1740,12 +1740,12 @@ export const CITATIONS = {
   },
   "capacitor-discharge-time": {
     formula: "V(t) = V0 e^(-t/RC); t_discharge = R C ln(V0/V_safe); R_max = t_limit / (C ln(V0/V_safe)); P_continuous = V0^2/R.",
-    edition: "The capacitor stored-energy discharge requirement of NEC 2023 460.6 -- residual voltage to 50 V within 1 minute at or below 600 V, 5 minutes above 600 V, by a permanent or automatic discharge means -- by name. A computational aid; the AHJ-adopted NEC edition and the equipment listing govern.",
+    edition: "The capacitor stored-energy discharge requirement of NEC 2023 460.6 and 460.28 -- residual voltage to 50 V within 1 minute at 1,000 V nominal or less, 5 minutes above 1,000 V, by a permanent or automatic discharge means -- by name. A computational aid; the AHJ-adopted NEC edition and the equipment listing govern.",
     freeAccess: "NEC is free to read at nfpa.org/freeaccess. The RC-discharge relation is first-principles; the 460.6 time limits and the permanent/automatic-connection requirement are in the published code.",
     governance: GOVERNANCE.electrical,
     editionNote: NEC_DISCLOSURE,
     assumptions: [
-      { name: "Time limit", value: "residual to 50 V within 1 minute at or below 600 V, 5 minutes above 600 V", source: "NEC 460.6(A)" },
+      { name: "Time limit", value: "residual to 50 V within 1 minute at 1,000 V nominal or less, 5 minutes above 1,000 V (600 V was the pre-2020 threshold)", source: "NEC 2023 460.6 / 460.28" },
       { name: "Connection", value: "the discharge means must be permanently connected or connect automatically on loss of line; a manually switched bleed does not comply", source: "NEC 460.6(B)" },
       { name: "Continuous power", value: "the resistor dissipates V0^2/R while the bank is energized; rate it with margin", source: "first-principles" },
     ],
@@ -15621,7 +15621,7 @@ export const CITATIONS = {
     ],
   },
   "bonding-jumper": {
-    formula: "Supply-side (main / system) jumper from Table 250.66 by the service conductor; above 1100 kcmil copper (1750 kcmil aluminum) it is at least 12.5% of the largest phase area, rounded up to a standard size (250.102(C)(1) / 250.28(D)). Equipment (load-side) jumper from Table 250.122 by the OCPD, a full-size jumper in each parallel raceway (250.102(D)).",
+    formula: "Supply-side (main / system) jumper from Table 250.102(C)(1) by the service conductor (sizes match Table 250.66 up to 1,100 kcmil); above 1100 kcmil copper (1750 kcmil aluminum) it is at least 12.5% of the largest phase area, rounded up to a standard size (250.102(C)(1) / 250.28(D)). Equipment (load-side) jumper from Table 250.122 by the OCPD, a full-size jumper in each parallel raceway (250.102(D)).",
     edition: NEC_2023 + " Sections 250.28(D), 250.102(C) and 250.102(D).",
     freeAccess: NEC_FREE,
     governance: GOVERNANCE.electrical,
