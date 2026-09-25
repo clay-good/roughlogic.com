@@ -83,15 +83,19 @@ export const REFRIGERANTS = {
       { pressure_psig: 300, temperature_F: 94 },
     ],
   },
+  // R-22, R-404A and R-407C: Arkema Forane saturation P-T charts (psig,
+  // generated from NIST REFPROP 9.0). Until 2026-09-24 the R-22 rows were up
+  // to 2 F off the chart (30 psig read 5 F, the chart 6.9) and disagreed with
+  // this repo's own psia table.
   "R-22": {
-    manufacturer: "Legacy data; Chemours bulletins",
+    manufacturer: "Arkema Forane 22 saturation P-T chart (NIST REFPROP)",
     pt_pairs: [
-      { pressure_psig: 30, temperature_F: 5 },
-      { pressure_psig: 50, temperature_F: 28 },
-      { pressure_psig: 75, temperature_F: 45 },
-      { pressure_psig: 100, temperature_F: 60 },
-      { pressure_psig: 150, temperature_F: 84 },
-      { pressure_psig: 200, temperature_F: 102 },
+      { pressure_psig: 30, temperature_F: 6.9 },
+      { pressure_psig: 50, temperature_F: 26.0 },
+      { pressure_psig: 75, temperature_F: 44.3 },
+      { pressure_psig: 100, temperature_F: 59.1 },
+      { pressure_psig: 150, temperature_F: 82.7 },
+      { pressure_psig: 200, temperature_F: 101.4 },
     ],
   },
   "R-134a": {
@@ -104,24 +108,44 @@ export const REFRIGERANTS = {
       { pressure_psig: 150, temperature_F: 111 },
     ],
   },
+  // The zeotropic blends carry TWO curves. pt_pairs is the dew point (the
+  // chart's Vapor column), which superheat reads; bubble_pairs is the bubble
+  // point (Liquid column), which subcooling reads. Until 2026-09-24 R-407C had
+  // only its dew curve and subcool read against it -- 9 to 11 F high, so a
+  // system short of charge at 200 psig and a 90 F line showed 11 F ("check
+  // overcharge") where the true subcool is 2 F.
   "R-404A": {
-    manufacturer: "Chemours / Honeywell bulletins",
+    manufacturer: "Arkema Forane 404A saturation P-T chart (NIST REFPROP)",
     pt_pairs: [
-      { pressure_psig: 30, temperature_F: -2 },
-      { pressure_psig: 60, temperature_F: 24 },
-      { pressure_psig: 100, temperature_F: 48 },
-      { pressure_psig: 150, temperature_F: 71 },
-      { pressure_psig: 200, temperature_F: 89 },
+      { pressure_psig: 30, temperature_F: -2.8 },
+      { pressure_psig: 60, temperature_F: 23.5 },
+      { pressure_psig: 100, temperature_F: 48.1 },
+      { pressure_psig: 150, temperature_F: 71.0 },
+      { pressure_psig: 200, temperature_F: 89.2 },
+    ],
+    bubble_pairs: [
+      { pressure_psig: 30, temperature_F: -3.8 },
+      { pressure_psig: 60, temperature_F: 22.5 },
+      { pressure_psig: 100, temperature_F: 47.3 },
+      { pressure_psig: 150, temperature_F: 70.3 },
+      { pressure_psig: 200, temperature_F: 88.5 },
     ],
   },
   "R-407C": {
-    manufacturer: "Chemours / Honeywell bulletins",
+    manufacturer: "Arkema Forane 407C saturation P-T chart (NIST REFPROP)",
     pt_pairs: [
-      { pressure_psig: 30, temperature_F: 12 },
-      { pressure_psig: 60, temperature_F: 38 },
-      { pressure_psig: 100, temperature_F: 62 },
-      { pressure_psig: 150, temperature_F: 84 },
-      { pressure_psig: 200, temperature_F: 101 },
+      { pressure_psig: 30, temperature_F: 12.2 },
+      { pressure_psig: 60, temperature_F: 37.8 },
+      { pressure_psig: 100, temperature_F: 61.6 },
+      { pressure_psig: 150, temperature_F: 83.8 },
+      { pressure_psig: 200, temperature_F: 101.2 },
+    ],
+    bubble_pairs: [
+      { pressure_psig: 30, temperature_F: 0.6 },
+      { pressure_psig: 60, temperature_F: 26.6 },
+      { pressure_psig: 100, temperature_F: 51.1 },
+      { pressure_psig: 150, temperature_F: 73.9 },
+      { pressure_psig: 200, temperature_F: 92.0 },
     ],
   },
 };
@@ -185,7 +209,9 @@ export function computeSuperheatSubcool({ refrigerant, system_pressure_psig, lin
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const r = REFRIGERANTS[refrigerant];
   if (!r) return { error: "Unknown refrigerant." };
-  const sat_T = interpolateRefrigerant({ pairs: r.pt_pairs, pressure_psig: system_pressure_psig });
+  // Subcooling reads the bubble point; superheat, the dew point.
+  const pairs = mode === "subcool" && r.bubble_pairs ? r.bubble_pairs : r.pt_pairs;
+  const sat_T = interpolateRefrigerant({ pairs, pressure_psig: system_pressure_psig });
   if (mode === "superheat") {
     const value = line_temperature_F - sat_T;
     const d = _v8shScDiagnostic(value, "superheat");
@@ -328,14 +354,27 @@ export const REFRIGERANT_PT_TABLES_v7 = {
     { psia: 250, T_F: 113 }, { psia: 300, T_F: 127 }, { psia: 350, T_F: 140 },
   ],
   R_134a: [
-    { psia: 15,  T_F: -16 }, { psia: 25,  T_F: 7 },  { psia: 40,  T_F: 29 },
+    { psia: 15,  T_F: -14.3 }, { psia: 25,  T_F: 7 },  { psia: 40,  T_F: 29 },
     { psia: 60,  T_F: 50 },  { psia: 80,  T_F: 66 }, { psia: 100, T_F: 79 },
     { psia: 130, T_F: 96 },  { psia: 170, T_F: 113 }, { psia: 220, T_F: 132 },
   ],
 };
 
-function _interpRefSatT(refrigerant, psia) {
-  const tbl = REFRIGERANT_PT_TABLES_v7[refrigerant];
+// R-454B is a zeotropic blend: its bubble point (the table above, which the
+// liquid-line subcooling reads) sits about 2 F below its dew point, and
+// suction superheat must read the DEW point. From the black (saturated
+// vapor) cells of the Chemours Opteon A/C P-T guide (OPTXLPTAC-2), which are
+// printed through 50 F. Until 2026-09-24 suction read the bubble table, so
+// superheat showed about 1.8 F high -- toward "add charge".
+export const REFRIGERANT_DEW_TABLES_v7 = {
+  R_454B: [
+    { psia: 30, T_F: -29.3 }, { psia: 50, T_F: -6.6 }, { psia: 80, T_F: 16.8 },
+    { psia: 100, T_F: 28.8 }, { psia: 130, T_F: 43.9 }, { psia: 144, T_F: 50 },
+  ],
+};
+
+function _interpRefSatT(refrigerant, psia, dew = false) {
+  const tbl = (dew && REFRIGERANT_DEW_TABLES_v7[refrigerant]) || REFRIGERANT_PT_TABLES_v7[refrigerant];
   if (!tbl) return null;
   // Outside the bundled rows the answer is NaN, not the end row: R-454B's
   // table ends at 350 psia, and until 2026-09-19 a 400 psig liquid line read
@@ -363,10 +402,10 @@ export function computeRefrigerantCharging({
   if (!(suction_pressure > 0) || !(liquid_pressure > 0)) return { error: "Pressures must be positive." };
   const suction_psia = suction_unit === "psig" ? suction_pressure + 14.696 : suction_pressure;
   const liquid_psia = liquid_unit === "psig" ? liquid_pressure + 14.696 : liquid_pressure;
-  const T_sat_suction = _interpRefSatT(refrigerant, suction_psia);
+  const T_sat_suction = _interpRefSatT(refrigerant, suction_psia, true);
   const T_sat_liquid = _interpRefSatT(refrigerant, liquid_psia);
   if (!Number.isFinite(T_sat_suction) || !Number.isFinite(T_sat_liquid)) {
-    const t = REFRIGERANT_PT_TABLES_v7[refrigerant];
+    const t = !Number.isFinite(T_sat_suction) && REFRIGERANT_DEW_TABLES_v7[refrigerant] ? REFRIGERANT_DEW_TABLES_v7[refrigerant] : REFRIGERANT_PT_TABLES_v7[refrigerant];
     return { error: "A pressure is outside the bundled " + String(refrigerant).replace("_", "-") + " saturation table (" + t[0].psia + " to " + t[t.length - 1].psia + " psia); read the manufacturer's P-T chart." };
   }
   const superheat_F = Number(suction_line_temp_F) - T_sat_suction;

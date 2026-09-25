@@ -1114,12 +1114,20 @@ const REFRIGERANT_PT_TABLES_DATA = {
       { psia: 250, T_F: 113 }, { psia: 300, T_F: 127 }, { psia: 350, T_F: 140 },
     ],
     R_134a: [
-      { psia: 15,  T_F: -16 }, { psia: 25,  T_F: 7 },  { psia: 40,  T_F: 29 },
+      { psia: 15,  T_F: -14.3 }, { psia: 25,  T_F: 7 },  { psia: 40,  T_F: 29 },
       { psia: 60,  T_F: 50 },  { psia: 80,  T_F: 66 }, { psia: 100, T_F: 79 },
       { psia: 130, T_F: 96 },  { psia: 170, T_F: 113 }, { psia: 220, T_F: 132 },
     ],
   },
-  notes: "psig is the gauge default; psia adds 14.696 psi to psig.",
+  // R-454B's dew point, which suction superheat reads (the table above is its
+  // bubble point). Chemours Opteon A/C P-T guide, saturated-vapor cells.
+  dew_tables: {
+    R_454B: [
+      { psia: 30, T_F: -29.3 }, { psia: 50, T_F: -6.6 }, { psia: 80, T_F: 16.8 },
+      { psia: 100, T_F: 28.8 }, { psia: 130, T_F: 43.9 }, { psia: 144, T_F: 50 },
+    ],
+  },
+  notes: "psig is the gauge default; psia adds 14.696 psi to psig. R-454B is zeotropic: tables.R_454B is the bubble point (subcooling), dew_tables.R_454B the dew point (superheat).",
 };
 
 const INSULATION_K_VALUES_DATA = {
