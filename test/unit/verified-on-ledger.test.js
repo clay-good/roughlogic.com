@@ -276,7 +276,7 @@ test("the bundled atomic weights are the 2024 edition, in both copies", async ()
 
   // Values the 2024 revision did NOT touch must be unchanged, at the
   // conventional value where the published figure is an interval.
-  for (const [el, w] of Object.entries({ H: 1.008, C: 12.011, N: 14.007, O: 15.999, Cl: 35.45, Ar: 39.948, Pb: 207.2 })) {
+  for (const [el, w] of Object.entries({ H: 1.008, C: 12.011, N: 14.007, O: 15.999, Cl: 35.45, Ar: 39.95, Pb: 207.2 })) {
     assert.equal(shard.weights_g_per_mol[el], w);
   }
 });

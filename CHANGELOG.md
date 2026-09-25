@@ -10,6 +10,13 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **Water and wastewater tiles checked against Ten States, the USC test procedures, the eCFR and CIAAW.**
+  - `flocculation-g-value` called any G of 500 or more "rapid mix (500-1,000 range)" and credited Ten States. The 2022 Recommended Standards for Water Works (4.2.3(b)) require a G of at least 750 per second, so 500-750 was passed as adequate when it is below the minimum (unsafe). The band now trips at 750. The 20-70 flocculation band is credited to textbook practice, since Ten States sets no G for flocculation.
+  - `backflow-test-psi` failed an RP unless the relief opened at least 2 psid below the #1 check. No USC edition says 2: the 10th edition requires the #1 check to be above the relief opening point and at least 5.0 psid, and the 9th edition asked for 3.0 psid above it. A 5.5 psid check over a 4.0 relief now passes, as it does in the field procedure.
+  - `clarifier-surface-loading` quoted "typical" limits (700-1,000 SOR, 10,000-20,000 weir, 20-30 solids) under Ten States. The note now gives the Wastewater Facilities 2014 values: primary 1,000 gpd/ft² average, final activated-sludge tanks 1,200 / 1,000 / 800 at peak hour with 40 or 35 lb/ft²/day solids, and weir loading of 20,000 or 30,000 gpd/ft.
+  - `chlorine-decay` cited 40 CFR 141.74 for the distribution-system residual rule; that section covers analytical methods. The rule is 141.72(a)(4) and (b)(3).
+  - `digester-vs-loading` now notes that Ten States (84.321-84.322) designs completely mixed digesters for 80 lb VS/day per 1,000 ft³ and moderately mixed ones for 40, well under the 400 operating ceiling.
+  - Argon's atomic weight was 39.948, the value before 2017; CIAAW gives [39.792, 39.963], abridged 39.95.
 - **Fire-alarm NAC wire resistance and coax loss defaults read from the tables they cite.**
   - `fire-alarm-nac-voltage-drop` defaulted #14 copper to 2.525 ohm/1000 ft, the 20°C handbook value, under a citation to NEC Chapter 9 Table 8, which lists resistance at 75°C: 3.07 solid, 3.14 stranded. The drop read about 20% low (unsafe: a marginal circuit could pass). The default is now 3.14. The worked example moves from 1.01 V to 1.26 V of drop, and from 19.39 V to 19.14 V at the end of the line.
   - `coax-rg-loss` pre-filled 6.0 / 11.0 / 3.5 dB per 100 ft at 1 GHz for RG6 / RG59 / RG11 and credited Belden. Belden's data sheets (1694A, 1505A, 7731A) give 6.3 / 7.6 / 4.3; RG6 and RG11 read light.

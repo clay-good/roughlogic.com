@@ -857,7 +857,7 @@ export function computeClarifierSurfaceLoading({ flow_mgd = 0, surface_ft2 = 0, 
   return {
     sor_gpd_ft2, weir_gpd_ft, solids_lb_ft2_day,
     sor_overloaded: sor_gpd_ft2 > 1000,
-    note: "Clarifier loading checks: surface overflow rate SOR = flow / surface area (gpd/ft^2), weir overflow rate = flow / total weir length (gpd/ft), and (for a secondary clarifier) solids loading = flow x MLSS x 8.34 / area (lb/ft^2/day). Typical design limits are roughly 700-1000 gpd/ft^2 SOR, 10,000-20,000 gpd/ft weir, and 20-30 lb/ft^2/day solids; exceeding the SOR carries floc over the weir. Ten States Standards and the state design criteria govern the limits. An operations aid; the operator of record and the primacy agency govern compliance.",
+    note: "Clarifier loading checks: surface overflow rate SOR = flow / surface area (gpd/ft^2), weir overflow rate = flow / total weir length (gpd/ft), and (for a secondary clarifier) solids loading = flow x MLSS x 8.34 / area (lb/ft^2/day). Recommended Standards for Wastewater Facilities (Ten States, 2014) limits: primary tanks 1,000 gpd/ft^2 at design average flow (700 if they receive waste activated sludge; 1,500-2,000 and 1,200 at peak hour); activated-sludge final tanks at peak hour 1,200 (conventional), 1,000 (extended aeration) or 800 (2-stage nitrification) gpd/ft^2 with 40 or 35 lb/ft^2/day peak solids (72.232); weir loading 20,000 gpd/ft for plants of 1 MGD or less and 30,000 above (72.43). The flag here trips above 1,000 gpd/ft^2; exceeding the SOR carries floc over the weir. The state design criteria govern. An operations aid; the operator of record and the primacy agency govern compliance.",
   };
 }
 export const clarifierSurfaceLoadingExample = { inputs: { flow_mgd: 1.0, surface_ft2: 1256.6, weir_len_ft: 125.7, mlss_mgl: 2500 } };
@@ -877,7 +877,7 @@ function renderClarifierSurfaceLoading(inputRegion, outputRegion, citationEl) {
   const update = debounce(() => {
     const r = computeClarifierSurfaceLoading({ flow_mgd: readNum(flow.input), surface_ft2: readNum(area.input), weir_len_ft: readNum(weir.input), mlss_mgl: readNum(mlss.input) });
     if (r.error) { oSor.textContent = r.error; oWeir.textContent = "-"; oSolids.textContent = "-"; oNote.textContent = ""; return; }
-    oSor.textContent = fmt(r.sor_gpd_ft2, 0) + " gpd/ft^2" + (r.sor_overloaded ? " (OVER ~1000 -- floc carryover risk)" : "");
+    oSor.textContent = fmt(r.sor_gpd_ft2, 0) + " gpd/ft^2" + (r.sor_overloaded ? " (OVER 1,000, the Ten States primary design-average and extended-aeration limit -- floc carryover risk)" : "");
     oWeir.textContent = fmt(r.weir_gpd_ft, 0) + " gpd/ft";
     oSolids.textContent = r.solids_lb_ft2_day == null ? "(enter MLSS for a secondary clarifier)" : fmt(r.solids_lb_ft2_day, 1) + " lb/ft^2/day";
     oNote.textContent = r.note;
@@ -1056,7 +1056,7 @@ export function computeDigesterVsLoading({ feed_flow_gpd = 0, percent_ts = 0, pe
   const in_band = vslr >= 100 && vslr <= 400;
   return {
     vs_fed_lb_day, vslr, dt_days, over_limit, in_band,
-    note: "Overloading past about 400 lb VS/day per 1,000 ft^3 sours the digester as the acid-formers outrun the methane-formers and the pH and alkalinity crash - a slow failure that takes weeks to recover. The loading rate, not a full tank, is the health metric; a thin feed can hit the limit at high flow and a rich feed at low flow. The high-rate band is 100-400 lb VS/day per 1,000 ft^3. The digester monitoring (pH, alkalinity, gas) and the operator govern.",
+    note: "Overloading past about 400 lb VS/day per 1,000 ft^3 sours the digester as the acid-formers outrun the methane-formers and the pH and alkalinity crash - a slow failure that takes weeks to recover. The loading rate, not a full tank, is the health metric; a thin feed can hit the limit at high flow and a rich feed at low flow. The high-rate band is 100-400 lb VS/day per 1,000 ft^3 (operating practice). A design reviewed under the Recommended Standards for Wastewater Facilities (Ten States, 2014) is held far lower: 80 lb VS/day per 1,000 ft^3 for a completely mixed digester and 40 for a moderately mixed one (84.321-84.322). The digester monitoring (pH, alkalinity, gas) and the operator govern.",
   };
 }
 export const digesterVsLoadingExample = { inputs: { feed_flow_gpd: 15000, percent_ts: 4, percent_vs: 75, digester_ft3: 20000 } };
@@ -1208,13 +1208,13 @@ export function computeFlocculationGValue({ power_input_w = 0, power_input_hp = 
   const g_value = Math.sqrt(p / (mu * v));
   const gt_value = g_value * dt;
   if (![g_value, gt_value].every(Number.isFinite)) return { error: "G-value math is not a finite value." };
-  const band = g_value >= 500 ? "rapid mix (500-1,000 range)" : g_value >= 20 && g_value <= 70 ? "flocculation (20-70 band)" : g_value < 20 ? "below the flocculation floor (weak mixing)" : "between flocculation and rapid mix";
+  const band = g_value >= 750 ? "rapid mix (at least the Ten States 750/s minimum)" : g_value >= 500 ? "below the Ten States rapid-mix minimum of 750/s" : g_value >= 20 && g_value <= 70 ? "flocculation (20-70 band)" : g_value < 20 ? "below the flocculation floor (weak mixing)" : "between flocculation and rapid mix";
   return {
     mu, g_value, gt_value, band,
     // the page's "SI equivalents" line reads these back, so the correlation's
     // native values travel with the result whichever unit family came in.
     power_input_w: p, basin_volume_m3: v, water_temp_c: t,
-    note: "G depends on the water temperature through viscosity, so cold water yields a LOWER G for the same paddle power and can drop flocculation below the 20-per-second floor. Too high a G in the flocculation basin shears the floc apart - the reason rapid mix (G 500-1,000) and flocculation (G 20-70) are staged, not merged. Gt characterizes the whole basin (10^4 to 10^5 typical). The viscosity is taken from a water-property table at the given temperature; the treatment-process design governs.",
+    note: "G depends on the water temperature through viscosity, so cold water yields a LOWER G for the same paddle power and can drop flocculation below the 20-per-second floor. Too high a G in the flocculation basin shears the floc apart - the reason rapid mix (G of at least 750 per Ten States 4.2.3(b)) and flocculation (G 20-70 in textbook practice) are staged, not merged. Gt characterizes the whole basin (10^4 to 10^5 typical). The viscosity is taken from a water-property table at the given temperature; the treatment-process design governs.",
   };
 }
 // Correlation-native (SI) example -- the Camp-Stein compute keeps this signature
@@ -1225,7 +1225,7 @@ export const flocculationGValueExample = { inputs: { power_input_w: 300, basin_v
 // The math and citation stay metric-native; the SI equivalents are echoed as an
 // output line so the metric entry path stays one read away.
 const renderFlocculationGValue = _rPool({
-  citation: "Citation: Camp-Stein velocity gradient (Camp & Stein; Ten States Standards), by name. G = sqrt(P / (mu x V)); Gt = G x detention_time; mu is water dynamic viscosity at the given temperature. Bands: rapid mix G 500-1,000/s, flocculation G 20-70/s, Gt 10^4-10^5. Cold water is more viscous, so the same paddle delivers a lower G in winter; too high a G in flocculation shears the floc. The treatment-process design governs.",
+  citation: "Citation: Camp-Stein velocity gradient (Camp & Stein), by name, and Recommended Standards for Water Works (Ten States) 2022 4.2.3(b). G = sqrt(P / (mu x V)); Gt = G x detention_time; mu is water dynamic viscosity at the given temperature. Rapid mix needs G of at least 750/s (Ten States); flocculation G 20-70/s and Gt 10^4-10^5 are textbook bands. Cold water is more viscous, so the same paddle delivers a lower G in winter; too high a G in flocculation shears the floc. The treatment-process design governs.",
   example: { power_input_hp: 0.4, basin_volume_gal: 26400, water_temp_f: 50, detention_time_s: 1200 },
   fields: [
     { key: "power_input_hp", label: "Net power to the water P (hp)", kind: "number" },
@@ -1279,7 +1279,7 @@ export function computeTaperedFlocculationG({ stage1_g_per_s = 0, stage2_g_per_s
   return {
     stage1_power_w, stage2_power_w, stage3_power_w, total_power_w, mean_g, gt_value, tapered, in_band, stages: gs.length,
     note: (tapered ? "" : "Not tapered - a tapered schedule decreases G stage to stage (vigorous first stage builds floc, gentle last stage grows it without shear). ")
-      + (in_band ? "" : "A stage G is outside the 10-100 per-second flocculation band (rapid mix G 500-1,000 belongs in a separate basin - merging it shears the floc). ")
+      + (in_band ? "" : "A stage G is outside the 10-100 per-second flocculation band (rapid mix, G of at least 750 per Ten States, belongs in a separate basin - merging it shears the floc). ")
       + "Each stage's power is P = G^2 x mu(T) x V; cold water is more viscous, so the same G costs more power in winter. Gt characterizes the whole train (10^4-10^5 typical). The treatment-process design governs.",
   };
 }

@@ -1398,7 +1398,7 @@ export const chlorineDecayExample = {
 
 // dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 function _v16w_renderChlorineDecay(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: first-order decay C(t) = C0 x exp(-k x t); time to target = ln(C0 / target) / k; booster distance = velocity x time-to-target (when a distribution velocity is entered). Per EPA 815-R-02-020 (Effects of Water Age on Distribution System Water Quality) and AWWA M14. EPA 40 CFR 141.74 governs the residual at the extremity. Free at epa.gov and awwa.org.";
+  citationEl.textContent = "Citation: first-order decay C(t) = C0 x exp(-k x t); time to target = ln(C0 / target) / k; booster distance = velocity x time-to-target (when a distribution velocity is entered). Per EPA 815-R-02-020 (Effects of Water Age on Distribution System Water Quality) and AWWA M14. EPA 40 CFR 141.72(a)(4) and (b)(3) govern the residual at the extremity. Free at epa.gov and awwa.org.";
   const c0 = makeNumber("Initial free chlorine (mg/L)", "cd-c0", { step: "any", min: "0"});
   const k = makeNumber("Decay-rate constant k (1/hr)", "cd-k", { step: "any", min: "0", value: "0.1" });
   const t = makeNumber("Elapsed time (hr)", "cd-t", { step: "any", min: "0"});
@@ -1556,18 +1556,20 @@ export function computeBackflowTestPSI({ assembly_type = "rp", check1_psid = 0, 
     const pass = c1 >= 1 && c2 >= 1;
     return { assembly_type: "dc", pass, buffer_psid: 0, criterion: "DC: each check >= 1 psid tight" };
   }
-  // RP: #1 check >= 5 psid, the relief valve opens at >= 2 psid on its own reading and
-  // >= 2 psid below the #1 check, and the #2 check holds tight (>= 1 psid).
+  // RP (USC FCCCHR Manual, 10th edition): the #1 check "must be above the relief valve opening
+  // point and >= 5.0 psid", the relief valve opens at >= 2 psid, and the #2 check holds tight
+  // (>= 1 psid). Until 2026-09-24 this also demanded a 2 psid gap, which no edition states (the
+  // 9th edition's gap was 3.0).
   const buffer_psid = c1 - relief;
   const check1_ok = c1 >= 5;
-  const relief_ok = relief >= 2 && buffer_psid >= 2;
+  const relief_ok = relief >= 2 && buffer_psid > 0;
   const check2_ok = c2 >= 1;
   const pass = check1_ok && relief_ok && check2_ok;
-  return { assembly_type: "rp", pass, buffer_psid, check1_ok, relief_ok, check2_ok, criterion: "RP: #1 check >= 5 psid, relief opens at >= 2 psid and >= 2 psid below the #1 check, #2 check tight >= 1 psid" };
+  return { assembly_type: "rp", pass, buffer_psid, check1_ok, relief_ok, check2_ok, criterion: "RP: #1 check >= 5 psid and above the relief opening point, relief opens at >= 2 psid, #2 check tight >= 1 psid (USC 10th ed.)" };
 }
 export const backflowTestPsiExample = { inputs: { assembly_type: "rp", check1_psid: 8, relief_open_psid: 4, check2_psi: 3 } };
 const renderBackflowTestPSI = _v23SimpleRenderer({
-  citation: "Citation: Per the USC FCCCHR Manual of Cross-Connection Control and the AWWA C511 field-test procedure. RP: the relief opens at >= 2 psid and >= 2 psid below the #1 check, the #1 check holds >= 5 psid, and the #2 check holds tight; DC: each check holds >= 1 psid. The certified tester and the water purveyor govern; gauge accuracy and the opening-point definition apply.",
+  citation: "Citation: Per the USC FCCCHR Manual of Cross-Connection Control (10th edition) and the AWWA C511 field-test procedure. RP: the relief opens at >= 2 psid, the #1 check holds >= 5 psid and above the relief opening point (the 9th edition asked for 3.0 psid above it), and the #2 check holds tight; DC: each check holds >= 1 psid. The certified tester and the water purveyor govern; gauge accuracy and the opening-point definition apply.",
   example: backflowTestPsiExample.inputs,
   fields: [
     { key: "assembly_type", label: "Assembly type", kind: "select", options: [

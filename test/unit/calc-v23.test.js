@@ -308,7 +308,9 @@ test("backflow-test-psi: RP #1 check 8 psid, relief 4 psid -> buffer 4, pass; DC
 });
 test("backflow-test-psi: RP fails at low #1 check or insufficient relief buffer; negative rejected", () => {
   assert.strictEqual(computeBackflowTestPSI({ assembly_type: "rp", check1_psid: 4, relief_open_psid: 1, check2_psi: 3 }).pass, false);
-  assert.strictEqual(computeBackflowTestPSI({ assembly_type: "rp", check1_psid: 6, relief_open_psid: 5, check2_psi: 3 }).pass, false);
+  // USC 10th edition: the #1 check must be ABOVE the relief opening point and >= 5 psid; no fixed gap.
+  assert.strictEqual(computeBackflowTestPSI({ assembly_type: "rp", check1_psid: 6, relief_open_psid: 6, check2_psi: 3 }).pass, false);
+  assert.strictEqual(computeBackflowTestPSI({ assembly_type: "rp", check1_psid: 5.5, relief_open_psid: 4, check2_psi: 3 }).pass, true);
   assert.ok("error" in computeBackflowTestPSI({ assembly_type: "rp", check1_psid: -1 }));
 });
 

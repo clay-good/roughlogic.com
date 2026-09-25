@@ -851,13 +851,13 @@ export const CITATIONS = {
   },
   "flocculation-g-value": {
     formula: "G = sqrt(P / (mu x V)); Gt = G x detention_time; mu = water dynamic viscosity at the given temperature.",
-    edition: "Camp-Stein velocity gradient (Camp & Stein 1943; Ten States Standards), by name.",
+    edition: "Camp-Stein velocity gradient (Camp & Stein 1943), by name; Recommended Standards for Water Works (Ten States) 2022 4.2.3(b) for the rapid-mix minimum.",
     freeAccess: "The velocity-gradient relation is a public water-treatment result; the viscosity comes from a standard water-property table and the treatment-process design governs.",
     governance: GOVERNANCE.general,
-    editionNote: "G depends on the water temperature through viscosity, so cold water yields a lower G for the same paddle power and can drop flocculation below the 20-per-second floor; too high a G in the flocculation basin shears the floc apart (why rapid mix G 500-1,000 and flocculation G 20-70 are staged, not merged); Gt characterizes the whole basin (10^4 to 10^5 typical). The viscosity is taken from a water-property table at the given temperature. A design aid, not a process design.",
+    editionNote: "G depends on the water temperature through viscosity, so cold water yields a lower G for the same paddle power and can drop flocculation below the 20-per-second floor; too high a G in the flocculation basin shears the floc apart (why rapid mix, G of at least 750 per Ten States 4.2.3(b), and flocculation, G 20-70 in textbook practice, are staged, not merged); Gt characterizes the whole basin (10^4 to 10^5 typical). The viscosity is taken from a water-property table at the given temperature. A design aid, not a process design.",
     assumptions: [
       { name: "Temperature-viscosity", value: "mu from a water-property table (0.001307 Pa-s at 10 C, 0.00089 at 25 C); cold water lowers G", source: "water properties" },
-      { name: "Target bands", value: "rapid mix G 500-1,000/s, flocculation G 20-70/s, Gt 10^4-10^5", source: "Ten States Standards" },
+      { name: "Target bands", value: "rapid mix G >= 750/s (Ten States 4.2.3(b)); flocculation G 20-70/s and Gt 10^4-10^5 (textbook practice; Ten States sets no G band for flocculation)", source: "Recommended Standards for Water Works 2022 / water-treatment texts" },
     ],
   },
   "tapered-flocculation-g": {
@@ -2466,11 +2466,11 @@ export const CITATIONS = {
     edition: "EPA 815-R-02-020 (Effects of Water Age on Distribution System Water Quality); AWWA M14.",
     freeAccess: "epa.gov and awwa.org.",
     governance: GOVERNANCE.water,
-    editionNote: "EPA 40 CFR 141.74 governs the detectable residual at the system extremity; the decay constant k depends on temperature, TOC, and pipe material and should come from field decay testing.",
+    editionNote: "EPA 40 CFR 141.72(a)(4) and (b)(3) govern the detectable residual at the system extremity; the decay constant k depends on temperature, TOC, and pipe material and should come from field decay testing.",
     assumptions: [
       { name: "Decay model", value: "bulk first-order C(t) = C0 e^(-kt)", source: "EPA 815-R-02-020 water-age model" },
       { name: "Typical k", value: "0.05-0.20 1/hr depending on TOC and temperature", source: "AWWA M14 / EPA water-age studies" },
-      { name: "Extremity target", value: "0.2 mg/L default detectable residual", source: "EPA 40 CFR 141.74" },
+      { name: "Extremity target", value: "0.2 mg/L default detectable residual", source: "EPA 40 CFR 141.72(b)(3)" },
     ],
   },
 
@@ -3492,13 +3492,13 @@ export const CITATIONS = {
   },
 
   "backflow-test-psi": {
-    formula: "RP pass: #1 check >= 5 psid AND relief opens at >= 2 psid AND >= 2 psid below the #1 check AND #2 check tight >= 1 psid. DC pass: each check holds >= 1 psid tight.",
-    edition: "USC FCCCHR Manual of Cross-Connection Control and AWWA C511 field-test procedure, by name.",
+    formula: "RP pass: #1 check >= 5 psid AND above the relief opening point, AND relief opens at >= 2 psid, AND #2 check tight >= 1 psid. DC pass: each check holds >= 1 psid tight.",
+    edition: "USC FCCCHR Manual of Cross-Connection Control, 10th edition (field test procedures), and AWWA C511, by name.",
     freeAccess: "USC FCCCHR / AWWA published; the tester-procedure thresholds are public. The certified tester and water purveyor govern.",
     governance: GOVERNANCE.water,
     editionNote: "Single-edition (the field-test pass criteria for RP and DC assemblies; gauge accuracy and the opening-point definition apply, and assembly-specific procedures govern).",
     assumptions: [
-      { name: "Thresholds", value: "RP relief >= 2 psid below #1 check and #1 check >= 5 psid; DC checks >= 1 psid", source: "USC FCCCHR Manual / AWWA C511" },
+      { name: "Thresholds", value: "RP #1 check >= 5 psid and above the relief opening point (9th edition: 3.0 psid above), relief >= 2 psid; DC checks >= 1 psid", source: "USC FCCCHR Manual 10th ed. / AWWA C511" },
     ],
   },
 

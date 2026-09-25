@@ -426,8 +426,8 @@
       "date": "2026-09-25"
     },
     "/tools/backflow-test-psi/": {
-      "sha": "3f3f97afdae39ca1",
-      "date": "2026-09-19"
+      "sha": "8cf5f199d5d4d82c",
+      "date": "2026-09-25"
     },
     "/tools/baghouse-cleaning-interval/": {
       "sha": "ddf22ea1c46dfe03",
@@ -1162,8 +1162,8 @@
       "date": "2026-09-01"
     },
     "/tools/chlorine-decay/": {
-      "sha": "a4eef5b09865bb5f",
-      "date": "2026-09-01"
+      "sha": "63d0d5ae188c2e0b",
+      "date": "2026-09-25"
     },
     "/tools/chlorine-decay-constant/": {
       "sha": "d451829adfb8e129",
@@ -2986,8 +2986,8 @@
       "date": "2026-09-01"
     },
     "/tools/flocculation-g-value/": {
-      "sha": "2b896a4e1763fab5",
-      "date": "2026-09-01"
+      "sha": "5317c4dcc3c94b89",
+      "date": "2026-09-25"
     },
     "/tools/flocculator-paddle-power/": {
       "sha": "6f35f081f79dc853",
