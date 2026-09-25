@@ -1116,7 +1116,9 @@ FIRE_RENDERERS["scba-cylinder-time"] = renderScbaCylinder;
 // v9 §C.1: NFPA 1142 rural water-supply
 // =====================================================================
 //
-// Public NFPA 1142 §5 formula for minimum-fire-flow:
+// NFPA 1142-2022 Chapter 4 formula for minimum water supply (2022 layout: Chapter 4 calculation,
+// Chapter 5 occupancy hazard, Chapter 6 construction; the section labels here were an older
+// layout until 2026-09-25):
 //
 //   Q_total = (V * O * H) / X
 //
@@ -1124,17 +1126,17 @@ FIRE_RENDERERS["scba-cylinder-time"] = renderScbaCylinder;
 // H is the construction-class factor, and X is the fire-flow class
 // divisor. Exposure factor (1.5x multiplier when adjacent structure
 // within 50 ft) and sprinkler reduction (0.5x multiplier when UL-
-// listed) per NFPA 1142 §5.4 / §5.5.
+// listed) per NFPA 1142 Ch. 4 / Ch. 4.
 //
 // The occupancy / construction factor values are formula coefficients
-// per the spec-v9 §C.1 discipline: cited by NFPA 1142 §5 by name only,
+// per the spec-v9 §C.1 discipline: cited by NFPA 1142 Ch. 4 by name only,
 // not reproduced as a table.
 //
 // Standard tanker sizes 1000 / 1500 / 2000 / 3000 gal per spec-v9 §C.1.
 
-// Occupancy Hazard Classification Number (OHC) per NFPA 1142 §5.2. The OHC
+// Occupancy Hazard Classification Number (OHC) per NFPA 1142 Ch. 5. The OHC
 // is a DIVISOR (3 = severe hazard needs the most water; 7 = light hazard needs
-// the least). The key IS the OHC. Example occupancies are from NFPA 1142 §5.2.
+// the least). The key IS the OHC. Example occupancies are from NFPA 1142 Ch. 5.
 export const NFPA1142_OCCUPANCY = {
   3: { factor: 3, label: "OHC 3 - severe (flour mills, explosives storage, manufactured homes, plywood mfg)" },
   4: { factor: 4, label: "OHC 4 - high (mercantile, repair garages, paper/rubber mfg, stables)" },
@@ -1143,7 +1145,7 @@ export const NFPA1142_OCCUPANCY = {
   7: { factor: 7, label: "OHC 7 - light (dwellings, apartments, hotels, schools, offices, fire stations)" },
 };
 
-// Construction Classification Number (CCN) per NFPA 1142 §5.2.7. Lower factor =
+// Construction Classification Number (CCN) per NFPA 1142 Ch. 6. Lower factor =
 // more fire-resistive construction.
 export const NFPA1142_CONSTRUCTION = {
   I:   { factor: 0.5, label: "Class I (fire-resistive)" },
@@ -1168,11 +1170,11 @@ export function computeNFPA1142WaterSupply({
   const V = Number(volume_ft3) || 0;
   if (!(V > 0)) return { error: "Building volume must be positive (ft^3)." };
   const occ = NFPA1142_OCCUPANCY[occupancy_class];
-  if (!occ) return { error: "Occupancy Hazard Classification (OHC) must be 3 through 7 per NFPA 1142 §5.2." };
+  if (!occ) return { error: "Occupancy Hazard Classification (OHC) must be 3 through 7 per NFPA 1142 Ch. 5." };
   const con = NFPA1142_CONSTRUCTION[construction_class];
-  if (!con) return { error: "Construction class must be I through V per NFPA 1142 §5.2.7." };
+  if (!con) return { error: "Construction class must be I through V per NFPA 1142 Ch. 6." };
 
-  // NFPA 1142 §5: WS = (Volume x CCN) / OHC. The OHC divides (severe hazard = small OHC = more water).
+  // NFPA 1142 Ch. 4: WS = (Volume x CCN) / OHC. The OHC divides (severe hazard = small OHC = more water).
   let Q = (V * con.factor) / occ.factor;
   if (exposure_within_50_ft) Q *= 1.5;
   const Q_after_exposure = Q;
@@ -1187,7 +1189,7 @@ export function computeNFPA1142WaterSupply({
   }
 
   const warnings = [];
-  if (V < 8000) warnings.push("Building volume below 8,000 ft^3 may not require formal NFPA 1142 calculation per §5.1; the AHJ may waive.");
+  if (V < 8000) warnings.push("Building volume below 8,000 ft^3 may not require formal NFPA 1142 calculation per Ch. 4; the AHJ may waive.");
   if (sprinkler_listed) warnings.push("Sprinkler 0.5x reduction is contingent on a confirmed UL-listed system; AHJ inspection governs.");
   if (exposure_within_50_ft) warnings.push("1.5x exposure multiplier applies when an adjacent structure is within 50 ft; verify pre-incident plan.");
 
@@ -1208,13 +1210,13 @@ export const nfpa1142Example = {
 };
 
 function renderNFPA1142(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: Per NFPA 1142-2022 (Standard on Water Supplies for Suburban and Rural Firefighting) §5. AHJ governs final water-supply requirement. Free at nfpa.org/freeaccess.";
+  citationEl.textContent = "Citation: Per NFPA 1142-2022 (Standard on Water Supplies for Suburban and Rural Firefighting) Ch. 4. AHJ governs final water-supply requirement. Free at nfpa.org/freeaccess.";
 
   const v = makeNumber("Building volume (ft³; footprint x avg ceiling)", "nfpa-v", { step: "any", min: "0" });
-  const occ = makeSelect("Occupancy Hazard Classification (NFPA 1142 §5.2, OHC 3-7)", "nfpa-occ",
+  const occ = makeSelect("Occupancy Hazard Classification (NFPA 1142 Ch. 5, OHC 3-7)", "nfpa-occ",
     Object.keys(NFPA1142_OCCUPANCY).map((k) => ({ value: k, label: NFPA1142_OCCUPANCY[k].label, selected: k === "7" })),
   );
-  const con = makeSelect("Construction class (NFPA 1142 §5.2.7)", "nfpa-con",
+  const con = makeSelect("Construction class (NFPA 1142 Ch. 6)", "nfpa-con",
     Object.keys(NFPA1142_CONSTRUCTION).map((k) => ({ value: k, label: NFPA1142_CONSTRUCTION[k].label, selected: k === "V" })),
   );
   const exp = makeSelect("Exposure within 50 ft", "nfpa-exp", [
@@ -1259,7 +1261,7 @@ function renderNFPA1142(inputRegion, outputRegion, citationEl) {
     o1000.textContent = r.tanker_count[1000] + " trips";
     o2000.textContent = r.tanker_count[2000] + " trips";
     o3000.textContent = r.tanker_count[3000] + " trips";
-    oW.textContent = r.warnings.length > 0 ? r.warnings.join(" ") : "WS = (V * CCN) / OHC per NFPA 1142 §5. AHJ governs final requirement.";
+    oW.textContent = r.warnings.length > 0 ? r.warnings.join(" ") : "WS = (V * CCN) / OHC per NFPA 1142 Ch. 4. AHJ governs final requirement.";
   }, DEBOUNCE_MS);
   for (const f of [v.input, occ.select, con.select, exp.select, spr.select]) f.addEventListener("input", update);
 }
@@ -1444,7 +1446,7 @@ export function computeStandpipePDP({
   const pdp_psi = NP + supply_friction_psi + appliance + elevation_loss_psi;
 
   const warnings = [];
-  if (height > 75) warnings.push("Building over 75 ft is a high-rise; NFPA 14 §7.10 supplemental pressure-regulation and fire-pump requirements apply.");
+  if (height > 75) warnings.push("Building over 75 ft is a high-rise; NFPA 14 pressure limits (§7.8) and pressure regulation at hose connections (§7.2.3) and fire-pump requirements apply.");
   if (elev > 600) warnings.push("Lift above 600 ft is outside typical single-pumper capability; a relay or in-building fire pump is needed.");
   if (pdp_psi > 350) warnings.push("PDP above 350 psi exceeds typical apparatus pump and hose ratings; stage a relay or use the building fire pump.");
 

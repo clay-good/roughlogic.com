@@ -2,7 +2,7 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "de5f4fe07d4afe68",
+      "sha": "f7322595f3a5461d",
       "date": "2026-09-25"
     },
     "/tools/": {
@@ -38,8 +38,8 @@
       "date": "2026-09-18"
     },
     "/groups/fire-ground/": {
-      "sha": "d1248b7e8cc61a1d",
-      "date": "2026-09-18"
+      "sha": "5bfa582a3d9f42c3",
+      "date": "2026-09-25"
     },
     "/groups/historical/": {
       "sha": "f684977ded26381d",
@@ -3310,8 +3310,8 @@
       "date": "2026-09-01"
     },
     "/tools/gfci-afci-reference/": {
-      "sha": "187288f142929853",
-      "date": "2026-09-01"
+      "sha": "1bd53cf31bcce91c",
+      "date": "2026-09-25"
     },
     "/tools/gin-pole-uptower-lift/": {
       "sha": "e2d1fe353ec1b6cd",
@@ -4710,8 +4710,8 @@
       "date": "2026-09-01"
     },
     "/tools/motor-branch-protection/": {
-      "sha": "326deb89ba66ad96",
-      "date": "2026-09-09"
+      "sha": "ef9e0b974f614b3a",
+      "date": "2026-09-25"
     },
     "/tools/motor-capacitor-max/": {
       "sha": "9273ba1f5c878054",
@@ -4854,8 +4854,8 @@
       "date": "2026-09-01"
     },
     "/tools/nfpa-1142-water-supply/": {
-      "sha": "b53541250bee5a4b",
-      "date": "2026-09-01"
+      "sha": "fc20f9b8088d1611",
+      "date": "2026-09-25"
     },
     "/tools/niosh-lifting/": {
       "sha": "6531b4b40c6d8b65",
@@ -7326,8 +7326,8 @@
       "date": "2026-09-01"
     },
     "/tools/standpipe-friction/": {
-      "sha": "3b5a0fa95629993f",
-      "date": "2026-09-01"
+      "sha": "5c517813b5028d22",
+      "date": "2026-09-25"
     },
     "/tools/standpipe-pdp/": {
       "sha": "046bda02cdfad0c4",

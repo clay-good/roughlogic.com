@@ -2794,16 +2794,16 @@ export const CITATIONS = {
   },
 
   "nfpa-1142-water-supply": {
-    formula: "WS = (V * CCN) / OHC per NFPA 1142 §5 (Occupancy Hazard Classification Number OHC 3-7 divides; Construction Classification Number CCN 0.5-1.5). 1.5x exposure multiplier when adjacent structure within 50 ft. 0.5x sprinkler reduction when UL-listed system present.",
-    edition: "NFPA 1142-2022 (Standard on Water Supplies for Suburban and Rural Firefighting) §5.",
+    formula: "WS = (V * CCN) / OHC per NFPA 1142 Ch. 4 (Occupancy Hazard Classification Number OHC 3-7 divides; Construction Classification Number CCN 0.5-1.5). 1.5x exposure multiplier when adjacent structure within 50 ft. 0.5x sprinkler reduction when UL-listed system present.",
+    edition: "NFPA 1142-2022 (Standard on Water Supplies for Suburban and Rural Firefighting) Ch. 4.",
     freeAccess: "nfpa.org/freeaccess.",
     governance: GOVERNANCE.fire,
     editionNote: "Editions available: bundled values follow NFPA 1142-2022 (Water Supplies for Suburban and Rural Fire Fighting). Jurisdictions on an earlier edition differ at the margins; verify the edition adopted by your AHJ.",
     assumptions: [
-      { name: "Occupancy factors", value: "NFPA 1142 §5.2 Occupancy Hazard Classification Number (OHC 3 severe to 7 light; a divisor)", source: "NFPA 1142-2022 §5.2" },
-      { name: "Construction factors", value: "Class I-V per NFPA 1142 §5.2.7", source: "NFPA 1142-2022 §5.2.7" },
-      { name: "Exposure multiplier", value: "1.5x when adjacent structure within 50 ft", source: "NFPA 1142-2022 §5.4" },
-      { name: "Sprinkler reduction", value: "0.5x contingent on confirmed UL-listed system", source: "NFPA 1142-2022 §5.5; AHJ inspection governs" },
+      { name: "Occupancy factors", value: "NFPA 1142 Ch. 5 Occupancy Hazard Classification Number (OHC 3 severe to 7 light; a divisor)", source: "NFPA 1142-2022 Ch. 5" },
+      { name: "Construction factors", value: "Class I-V per NFPA 1142 Ch. 6", source: "NFPA 1142-2022 Ch. 6" },
+      { name: "Exposure multiplier", value: "1.5x when adjacent structure within 50 ft", source: "NFPA 1142-2022 Ch. 4" },
+      { name: "Sprinkler reduction", value: "0.5x contingent on confirmed UL-listed system", source: "NFPA 1142-2022 Ch. 4; AHJ inspection governs" },
       { name: "Standard tanker sizes", value: "1000 / 1500 / 2000 / 3000 gal", source: "common apparatus sizing" },
     ],
   },
@@ -3798,7 +3798,7 @@ export const CITATIONS = {
   },
 
   "service-load-standard": {
-    formula: "Standard Method per NEC 2023 Table 220.45 (general lighting demand factors, 220.42 before 2023: first 3000 VA at 100%, next 117000 VA at 35%, remainder at 25%); 220.53 (fixed appliances 75% if 4+ items in branch); 220.54 (dryer 5000 W or nameplate, whichever is greater); 220.55 (range simplified); 430.24 (largest motor at 125%); 220.60 (HVAC larger of cooling vs. heating). Service A = total_VA / V; recommended service from the NEC 100/125/150/175/200/225/300/400 ladder.",
+    formula: "Standard Method per NEC 2023 Table 220.45 (general lighting demand factors, 220.42 before 2023: first 3000 VA at 100%, next 117000 VA at 35%, remainder at 25%); 220.53 (fixed appliances 75% where four or more fastened-in-place appliances share the feeder or service); 220.54 (dryer 5000 W or nameplate, whichever is greater); 220.55 (range simplified); 430.24 (largest motor at 125%); 220.60 (HVAC larger of cooling vs. heating). Service A = total_VA / V; recommended service from the NEC 100/125/150/175/200/225/300/400 ladder.",
     edition: NEC_2023 + " Article 220 (Branch-Circuit, Feeder, and Service Load Calculations).",
     freeAccess: NEC_FREE,
     governance: GOVERNANCE.electrical,
@@ -6280,13 +6280,13 @@ export const CITATIONS = {
     ],
   },
   "standpipe-friction": {
-    formula: "Total = elevation (0.434 psi/ft × height) + per-outlet friction + appliance friction. Min residual at the topmost outlet 100 psi for Class I per NFPA 14 §7.10.",
-    edition: "NFPA 14 (2024) §7.10 (Pressure Limitations) by name and section.",
+    formula: "Total = elevation (0.434 psi/ft × height) + per-outlet friction + appliance friction. Min residual at the topmost outlet 100 psi for Class I per NFPA 14 §7.8 (Minimum and Maximum Pressure Limits; §7.10 is flow rates).",
+    edition: "NFPA 14 (2024) §7.8 (Minimum and Maximum Pressure Limits) and §7.10 (Flow Rates) by name and section.",
     freeAccess: "NFPA 14 read-only at nfpa.org/freeaccess.",
     governance: GOVERNANCE.fire,
     editionNote: "Editions available: NFPA 14-2024 is the current published edition; earlier editions (2019 / 2016 / 2013) carry slightly different residual-pressure requirements; verify the edition adopted by your AHJ.",
     assumptions: [
-      { name: "Class I min residual", value: "100 psi at the topmost outlet", source: "NFPA 14-2024 §7.10" },
+      { name: "Class I min residual", value: "100 psi at the topmost outlet", source: "NFPA 14-2024 §7.8" },
     ],
   },
   "standpipe-pdp": {
@@ -8945,14 +8945,14 @@ export const CITATIONS = {
     ],
   },
   "motor-branch-protection": {
-    formula: "max_ocpd = FLC x Table 430.52 multiplier (inverse-time breaker 250%, dual-element fuse 175%, nontime-delay fuse 300%, instantaneous-trip breaker 800%); round up to the next standard size (240.6) per 430.52(C)(1) Exception 1; min disconnect = 1.15 x FLC (430.110).",
-    edition: "Motor branch-circuit short-circuit and ground-fault protection, NEC 2023 430.52 and Table 430.52, with the disconnect ampere rating 430.110, by name.",
+    formula: "max_ocpd = FLC x Table 430.52(C)(1) multiplier (inverse-time breaker 250%, dual-element fuse 175%, nontime-delay fuse 300%, instantaneous-trip breaker 800%); round up to the next standard size (240.6) per 430.52(C)(1)(a); min disconnect = 1.15 x FLC (430.110).",
+    edition: "Motor branch-circuit short-circuit and ground-fault protection, NEC 2023 430.52 and Table 430.52(C)(1), with the disconnect ampere rating 430.110, by name.",
     freeAccess: "NEC is free to read at nfpa.org/freeaccess. The table value uses the table FLC (430.6(A)), not nameplate, and protects against short-circuit/ground-fault only; motor overload is sized separately (430.32).",
     governance: GOVERNANCE.electrical,
     editionNote: NEC_DISCLOSURE,
     assumptions: [
-      { name: "Table 430.52 multipliers", value: "inverse-time breaker 250%, dual-element/time-delay fuse 175%, nontime-delay fuse 300%, instantaneous-trip breaker 800% (squirrel-cage/induction)", source: "NEC Table 430.52" },
-      { name: "Round-up and disconnect", value: "430.52(C)(1) Exception 1 permits the next standard size (240.6); the disconnect is rated at least 115% of FLC (430.110(A))", source: "NEC 430.52(C)(1), 430.110(A)" },
+      { name: "Table 430.52(C)(1) multipliers", value: "inverse-time breaker 250%, dual-element/time-delay fuse 175%, nontime-delay fuse 300%, instantaneous-trip breaker 800% (squirrel-cage/induction)", source: "NEC Table 430.52(C)(1)" },
+      { name: "Round-up and disconnect", value: "430.52(C)(1)(a) permits the next standard size (240.6); the disconnect is rated at least 115% of FLC (430.110(A))", source: "NEC 430.52(C)(1), 430.110(A)" },
     ],
   },
   "commercial-lighting-load": {

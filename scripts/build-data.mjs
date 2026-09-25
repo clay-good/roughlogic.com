@@ -982,10 +982,10 @@ const SUMMARIES = {
 const V2_REFERENCES = {
   source: "Original plain-English summaries by the project author. MIT-licensed creative work. Code documents (NEC, IPC, etc.) referenced by section number only; no code text reproduced.",
   gfci_afci_by_area: {
-    kitchen: { gfci: "Required for receptacles serving countertop surfaces and within 6 ft of a sink.", afci: "Required for branch circuits supplying outlets in dwelling-unit kitchens.", nec_ref: "NEC 210.8(A) and 210.12(A)" },
-    bathroom: { gfci: "Required for all 125 V single-phase 15- and 20-amp receptacles.", afci: "Not generally required.", nec_ref: "NEC 210.8(A)(1)" },
+    kitchen: { gfci: "Required for all receptacles in dwelling-unit kitchens (NEC 2023 210.8(A)(6); 2020 covered only countertop receptacles) and within 6 ft of a sink (210.8(A)(7)), 125-250 V on circuits 150 V or less to ground.", afci: "Required for branch circuits supplying outlets in dwelling-unit kitchens.", nec_ref: "NEC 2023 210.8(A)(6)/(7) and 210.12(A)" },
+    bathroom: { gfci: "Required for all 125-250 V receptacles on single-phase circuits rated 150 V or less to ground (NEC 2020 onward).", afci: "Not generally required.", nec_ref: "NEC 210.8(A)(1)" },
     garage: { gfci: "Required for receptacles installed in garages and accessory buildings.", afci: "Not generally required outside dwelling-unit habitable rooms.", nec_ref: "NEC 210.8(A)(2)" },
-    outdoor: { gfci: "Required for all 125 V receptacles in outdoor locations.", afci: "Not generally required.", nec_ref: "NEC 210.8(A)(3)" },
+    outdoor: { gfci: "Required for all 125-250 V receptacles in outdoor locations on circuits rated 150 V or less to ground (NEC 2020 onward).", afci: "Not generally required.", nec_ref: "NEC 210.8(A)(3)" },
     bedroom: { gfci: "Not generally required (unless near a sink).", afci: "Required for all 120 V branch circuits supplying outlets and devices in dwelling-unit bedrooms.", nec_ref: "NEC 210.12(A)" },
     laundry: { gfci: "Required for receptacles in laundry areas.", afci: "Required for branch circuits supplying laundry-area outlets.", nec_ref: "NEC 210.8(A)(10) and 210.12(A)" },
   },

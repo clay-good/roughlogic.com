@@ -167,7 +167,7 @@
     },
     "nfpa-1142-water-supply": {
       "group": "calc-electrical.js (Group A)",
-      "stamp": "Citation: Per NFPA 1142-2022 (Standard on Water Supplies for Suburban and Rural Firefighting) §5. AHJ governs final water-supply requirement. Free at nfpa.org/freeaccess."
+      "stamp": "Citation: Per NFPA 1142-2022 (Standard on Water Supplies for Suburban and Rural Firefighting) Ch. 4. AHJ governs final water-supply requirement. Free at nfpa.org/freeaccess."
     },
     "noise-dose": {
       "group": "calc-electrical.js (Group A)",

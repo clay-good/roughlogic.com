@@ -558,7 +558,7 @@ export const BESPOKE_OUTPUT_LABELS = {
   "mortgage-reserves": {"required":"Required reserves","eligible":"Eligible assets","months_covered":"Months of PITI covered"},
   "motor-acceleration-time": {"accel_time_s":"Acceleration time"},
   "motor-branch-from-nameplate": {"computed_fla_A":"Computed FLA (A)","nameplate_fla_A":"Nameplate FLA (A)","design_fla_A":"Design FLA (A; larger of two)","branch_conductor_125pct_A":"Branch conductor (125% rule, A)","overload_max_A":"Overload max (A)","warnings":"Notes"},
-  "motor-branch-protection": {"multiplier":"Table 430.52 multiplier","max_ocpd_a":"Max OCPD (calculated)","max_ocpd_std_a":"Max standard size (240.6)","min_disconnect_a":"Min disconnect (115% FLC)","note":"Note"},
+  "motor-branch-protection": {"multiplier":"Table 430.52(C)(1) multiplier","max_ocpd_a":"Max OCPD (calculated)","max_ocpd_std_a":"Max standard size (240.6)","min_disconnect_a":"Min disconnect (115% FLC)","note":"Note"},
   "motor-capacitor-max": {"magnetizing_kvar":"Magnetizing kVAR","max_capacitor_kvar":"Max terminal capacitor kVAR","note":"Note"},
   "motor-efficiency-upgrade-savings": {"annual_saving":"Annual saving","note":"Note"},
   "motor-fault-contribution": {"contribution_a":"Motor contribution (first cycle)","total_a":"Total first-cycle fault","note":"Note"},

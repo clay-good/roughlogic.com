@@ -1129,10 +1129,10 @@ export const voltageImbalanceExample = {
 // only; no code text is reproduced.
 
 export const GFCI_AFCI_AREAS = [
-  { area: "Kitchen receptacles", gfci: "Required for receptacles serving countertop surfaces and within 6 ft of a sink.", afci: "Required for branch circuits supplying outlets in dwelling-unit kitchens.", nec_ref: "NEC 210.8(A) and 210.12(A)" },
-  { area: "Bathroom receptacles", gfci: "Required for all 125 V single-phase 15- and 20-amp receptacles.", afci: "Not generally required.", nec_ref: "NEC 210.8(A)(1)" },
+  { area: "Kitchen receptacles", gfci: "Required for all receptacles in dwelling-unit kitchens (NEC 2023 210.8(A)(6); 2020 covered only countertop receptacles) and within 6 ft of a sink (210.8(A)(7)), 125-250 V on circuits 150 V or less to ground.", afci: "Required for branch circuits supplying outlets in dwelling-unit kitchens.", nec_ref: "NEC 2023 210.8(A)(6)/(7) and 210.12(A)" },
+  { area: "Bathroom receptacles", gfci: "Required for all 125-250 V receptacles on single-phase circuits rated 150 V or less to ground (NEC 2020 onward).", afci: "Not generally required.", nec_ref: "NEC 210.8(A)(1)" },
   { area: "Garage and accessory buildings", gfci: "Required for receptacles installed in garages and accessory buildings.", afci: "Not generally required outside dwelling-unit habitable rooms.", nec_ref: "NEC 210.8(A)(2)" },
-  { area: "Outdoor receptacles", gfci: "Required for all 125 V receptacles in outdoor locations.", afci: "Not generally required.", nec_ref: "NEC 210.8(A)(3)" },
+  { area: "Outdoor receptacles", gfci: "Required for all 125-250 V receptacles in outdoor locations on circuits rated 150 V or less to ground (NEC 2020 onward).", afci: "Not generally required.", nec_ref: "NEC 210.8(A)(3)" },
   { area: "Bedrooms (dwelling units)", gfci: "Not generally required (unless near a sink).", afci: "Required for all 120 V branch circuits supplying outlets and devices in dwelling-unit bedrooms.", nec_ref: "NEC 210.12(A)" },
   { area: "Laundry areas", gfci: "Required for receptacles in laundry areas.", afci: "Required for branch circuits supplying laundry-area outlets.", nec_ref: "NEC 210.8(A)(10) and 210.12(A)" },
 ];
@@ -2268,7 +2268,7 @@ export const generatorMotorStartingExample = {
 //
 // General lighting demand: first 3000 VA at 100%, next 117000 at 35%,
 // remainder at 25%. Range per NEC 220.55 simplified. Dryer 5000 W min per
-// NEC 220.54. Fixed-appliance NEC 220.53 (75% if 4+ items in one branch).
+// NEC 220.54. Fixed-appliance NEC 220.53 (75% where four or more fastened-in-place appliances rated 1/4 hp or 500 W or more share the same feeder or service; EVSE excluded).
 
 const STD_SERVICE_AMPACITIES = [100, 125, 150, 175, 200, 225, 300, 400];
 
@@ -3749,16 +3749,21 @@ export function computeServiceLoadOptional({
     area_ft2: area,
     small_appliance_circuits: sa,
     laundry_circuit: laundry,
-    fixed_appliances_W: fixed * 1000,
-    fixed_appliance_count: fixed > 0 ? 4 : 0,
+    // 220.53's 75% needs FOUR OR MORE fixed appliances on the feeder or service; this tile does not
+    // collect a count, so the comparison takes them at 100% (the conservative reading). Until
+    // 2026-09-25 any fixed load at all was treated as four appliances, and the water heater and EV
+    // load were left out, which could lower the standard figure and so the governing amps.
+    fixed_appliances_W: (fixed + wh) * 1000,
+    fixed_appliance_count: 0,
     range_W: range * 1000,
     dryer_W: dryer * 1000,
     hvac_cooling_W: cool * 1000,
     hvac_heating_W: heat * 1000,
     service_voltage: V,
   });
-  const standard_total_va = std.error ? null : std.total_VA;
-  const standard_demand_a = std.error ? null : std.required_A;
+  // EVSE at 100% of nameplate (220.57), outside the 220.53 fixed-appliance group.
+  const standard_total_va = std.error ? null : std.total_VA + ev_va;
+  const standard_demand_a = std.error ? null : standard_total_va / V;
 
   const governing_a = Math.max(optional_demand_a, standard_demand_a ?? 0);
   // The `?? TABLE[last]` fallback silently returned the LARGEST standard size when the
@@ -4762,11 +4767,11 @@ ELECTRICAL_RENDERERS["working-space-110-26"] = _v176renderWorkingSpace11026;
 // =====================================================================
 // spec-v179 - Group A: Electrical (1 tile)
 // Motor branch-circuit short-circuit / ground-fault protective device
-// maximum (NEC 430.52, Table 430.52) and disconnect rating (430.110).
+// maximum (NEC 430.52, Table 430.52(C)(1)) and disconnect rating (430.110).
 // =====================================================================
 
 // NEC 240.6(A) standard overcurrent-device ampere ratings (used for the
-// 430.52(C)(1) Exception 1 round-up to the next standard size).
+// 430.52(C)(1)(a) (Exception 1 in 2020) round-up to the next standard size).
 const _STD_OCPD_240_6 = [
   15, 20, 25, 30, 35, 40, 45, 50, 60, 70, 80, 90, 100, 110, 125, 150, 175, 200,
   225, 250, 300, 350, 400, 450, 500, 600, 700, 800, 1000, 1200, 1600, 2000,
@@ -4777,10 +4782,10 @@ const _STD_OCPD_240_6 = [
 // 10, and 601." Using the breaker ladder (which starts at 15) for a fuse meant a
 // fractional-horsepower motor whose 430.52 ceiling is 3.5 A was told its "max
 // standard size" is 15 A -- more than 4x its OWN computed maximum, and 750% of a
-// 2 A FLC where Table 430.52 allows 175%. These extra ratings exist precisely
+// 2 A FLC where Table 430.52(C)(1) allows 175%. These extra ratings exist precisely
 // for fractional-HP motor and control-circuit protection.
 const _STD_FUSE_240_6 = [1, 3, 6, 10, 601].concat(_STD_OCPD_240_6).sort((a, b) => a - b);
-// NEC Table 430.52 max % of FLC by device type (squirrel-cage / synchronous,
+// NEC Table 430.52(C)(1) max % of FLC by device type (squirrel-cage / synchronous,
 // other than Design B energy-efficient).
 const _MOTOR_OCPD_MULT = {
   "inverse-time breaker": 2.50,
@@ -4797,7 +4802,7 @@ export function computeMotorBranchProtection({ flc_a = 0, device_type = "inverse
   const multiplier = _MOTOR_OCPD_MULT[device_type];
   if (multiplier === undefined) return { error: "Device type must be inverse-time breaker, dual-element/time-delay fuse, nontime-delay fuse, or instantaneous-trip breaker." };
   const max_ocpd_a = flc * multiplier;
-  // 430.52(C)(1) Exception 1: where the calculated value does not correspond
+  // 430.52(C)(1)(a) (Exception 1 in 2020): where the calculated value does not correspond
   // to a standard rating, the next higher standard size (240.6) is permitted.
   // Fuses carry the extra 240.6(A) ratings; breakers do not.
   const ladder = /fuse/i.test(device_type) ? _STD_FUSE_240_6 : _STD_OCPD_240_6;
@@ -4811,14 +4816,14 @@ export function computeMotorBranchProtection({ flc_a = 0, device_type = "inverse
     max_ocpd_std_a,
     rounded_up: !is_standard,
     min_disconnect_a,
-    note: "NEC 430.52 / Table 430.52: the figure is the maximum branch-circuit short-circuit and ground-fault device, sized on the table FLC (430.6(A)), not nameplate; it protects against short-circuit/ground-fault only -- motor overload is sized separately (430.32, see motor-branch-from-nameplate). Exception 1 permits rounding up to the next standard size (240.6); Exception 2 permits a further increase if the motor will not start. The disconnect (430.110(A)) is rated at least 115% of FLC and carries an HP rating at or above the motor HP. The shown values are squirrel-cage/induction; the AHJ and the table govern.",
+    note: "NEC 430.52 / Table 430.52(C)(1): the figure is the maximum branch-circuit short-circuit and ground-fault device, sized on the table FLC (430.6(A)), not nameplate; it protects against short-circuit/ground-fault only -- motor overload is sized separately (430.32, see motor-branch-from-nameplate). 430.52(C)(1)(a) (Exception 1 in 2020) permits rounding up to the next standard size (240.6); Exception 2 permits a further increase if the motor will not start. The disconnect (430.110(A)) is rated at least 115% of FLC and carries an HP rating at or above the motor HP. The shown values are squirrel-cage/induction; the AHJ and the table govern.",
   };
 }
 export const motorBranchProtectionExample = { inputs: { flc_a: 28, device_type: "inverse-time breaker" } };
 
 // dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 function _v179renderMotorBranchProtection(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: NEC 2023 430.52 and Table 430.52 (branch-circuit short-circuit and ground-fault protection) with 430.110 (disconnect ampere rating). Sized on the table FLC (430.6(A)); overload is separate (430.32). The AHJ governs. Free at nfpa.org/freeaccess.";
+  citationEl.textContent = "Citation: NEC 2023 430.52 and Table 430.52(C)(1) (branch-circuit short-circuit and ground-fault protection) with 430.110 (disconnect ampere rating). Sized on the table FLC (430.6(A)); overload is separate (430.32). The AHJ governs. Free at nfpa.org/freeaccess.";
   const flc = makeNumber("Motor full-load current FLC (A, from Table 430.247-250)", "mbp-flc", { step: "any", min: "0" });
   const dev = makeSelect("Protective device type", "mbp-dev", [
     { value: "inverse-time breaker", label: "Inverse-time breaker (250%)" },
@@ -4829,7 +4834,7 @@ function _v179renderMotorBranchProtection(inputRegion, outputRegion, citationEl)
   for (const f of [flc, dev]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { flc.input.value = "28"; dev.select.value = "inverse-time breaker"; update(); });
 
-  const oMult = makeOutputLine(outputRegion, "Table 430.52 multiplier", "mbp-out-mult");
+  const oMult = makeOutputLine(outputRegion, "Table 430.52(C)(1) multiplier", "mbp-out-mult");
   const oMax = makeOutputLine(outputRegion, "Max OCPD (calculated)", "mbp-out-max");
   const oStd = makeOutputLine(outputRegion, "Max standard size (240.6)", "mbp-out-std");
   const oDisc = makeOutputLine(outputRegion, "Min disconnect (115% FLC)", "mbp-out-disc");
