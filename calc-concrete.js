@@ -976,33 +976,38 @@ CONCRETE_RENDERERS["concrete-depth-for-cracking-moment"] = _simpleRenderer({
   compute: computeConcreteDepthForCrackingMoment,
 });
 
-// dims: in { h_in: L, b_in: L, grade_ksi: M L^-1 T^-2 } out: { ratio: dimensionless, as_min_in2: L^2, s_max_in: L }
+// dims: in { h_in: L, b_in: L, grade_ksi: M L^-1 T^-2 } out: { ratio: dimensionless, as_min_in2: L^2, s_max_in: L, grade_ksi: M L^-1 T^-2 }
 export function computeConcreteShrinkageTemperatureSteel({ h_in = 0, b_in = 12, grade_ksi = 60 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(h_in > 0)) return { error: "Slab thickness h must be positive (in)." };
   if (!(b_in > 0)) return { error: "Design strip width b must be positive (in)." };
   if (!(grade_ksi > 0)) return { error: "Reinforcement grade must be positive (ksi)." };
-  const ratio = Math.max(grade_ksi >= 60 ? 0.0018 : 0.0020, 0.0014);
+  // ACI 318-19 Table 24.4.3.2: 0.0018 for deformed bars and welded wire of any
+  // grade. Until 2026-09-24 this carried ACI 318-14's split (0.0020 below Grade
+  // 60, 60/fy scaling above) under a 318-19 citation.
+  const ratio = 0.0018;
   const ag_in2 = b_in * h_in;
   const as_min_in2 = ratio * ag_in2;
   const s_max_in = Math.min(5 * h_in, 18);
   const spacing_governor = 5 * h_in < 18 ? "5h" : "18 in cap";
   return {
     ratio, ag_in2, as_min_in2, s_max_in, spacing_governor,
-    note: "ACI 318-19 §24.4.3.2: minimum shrinkage-and-temperature reinforcement ratio is 0.0018 for Grade 60 (and higher-yield deformed bars per §24.4.3.2(c) scaled by 60/fy but never below 0.0014), 0.0020 for Grade 40/50; As,min = ratio x b x h per strip. §24.4.3.3 caps the spacing at the smaller of 5h and 18 in. This is the steel perpendicular to the main bars in a one-way slab, not the flexural steel. A design aid; the engineer of record's stamped design governs.",
+    // Echoed: under ACI 318-19 the grade no longer changes the ratio.
+    grade_ksi: Number(grade_ksi),
+    note: "ACI 318-19 §24.4.3.2: minimum shrinkage-and-temperature reinforcement ratio is 0.0018 for deformed bars and welded wire of every grade (ACI 318-14 used 0.0020 below Grade 60 and scaled higher grades by 60/fy; the 2019 edition dropped both); As,min = ratio x b x h per strip. §24.4.3.3 caps the spacing at the smaller of 5h and 18 in. This is the steel perpendicular to the main bars in a one-way slab, not the flexural steel. A design aid; the engineer of record's stamped design governs.",
   };
 }
 export const concreteShrinkageTemperatureSteelExample = { inputs: { h_in: 6, b_in: 12, grade_ksi: 60 } };
 CONCRETE_RENDERERS["concrete-shrinkage-temperature-steel"] = _simpleRenderer({
-  citation: "Citation: ACI 318-19 §24.4.3.2 (minimum shrinkage and temperature reinforcement ratio: 0.0018 for Grade 60, 0.0020 for Grade 40/50, never below 0.0014) and §24.4.3.3 (spacing not to exceed the smaller of 5h and 18 in). As,min = ratio x b x h is the reinforcement perpendicular to the main bars in a one-way slab. Does not size the flexural (main) steel or check crack width for exposure. A design aid, not a substitute for a licensed engineer's design -- the engineer of record's stamped design governs.",
+  citation: "Citation: ACI 318-19 §24.4.3.2 (minimum shrinkage and temperature reinforcement ratio: 0.0018 for deformed bars and welded wire of any grade; the 0.0020 for Grade 40/50 was ACI 318-14) and §24.4.3.3 (spacing not to exceed the smaller of 5h and 18 in). As,min = ratio x b x h is the reinforcement perpendicular to the main bars in a one-way slab. Does not size the flexural (main) steel or check crack width for exposure. A design aid, not a substitute for a licensed engineer's design -- the engineer of record's stamped design governs.",
   example: concreteShrinkageTemperatureSteelExample.inputs,
   fields: [
     { key: "h_in", label: "Slab thickness h (in)", kind: "number" },
     { key: "b_in", label: "Design strip width b (in, default 12)", kind: "number" },
     { key: "grade_ksi", label: "Reinforcement grade (ksi)", kind: "select", options: [
       { value: "60", label: "Grade 60 (ratio 0.0018)" },
-      { value: "40", label: "Grade 40 (ratio 0.0020)" },
-      { value: "50", label: "Grade 50 (ratio 0.0020)" },
+      { value: "40", label: "Grade 40 (ratio 0.0018)" },
+      { value: "50", label: "Grade 50 (ratio 0.0018)" },
     ], default: "60" },
   ],
   outputs: [

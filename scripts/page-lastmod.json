@@ -2,7 +2,7 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "8bf6fa798cf9566c",
+      "sha": "1e9370d0a3d68516",
       "date": "2026-09-25"
     },
     "/tools/": {
@@ -1566,8 +1566,8 @@
       "date": "2026-09-01"
     },
     "/tools/concrete-shrinkage-temperature-steel/": {
-      "sha": "da25d393702e887a",
-      "date": "2026-09-02"
+      "sha": "21032049fb3488b3",
+      "date": "2026-09-25"
     },
     "/tools/concrete-stair-volume/": {
       "sha": "bea17ce4e1729745",

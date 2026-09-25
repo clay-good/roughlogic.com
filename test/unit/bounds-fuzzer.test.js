@@ -21199,11 +21199,11 @@ test("bounds: spec-v380 computeConcreteShrinkageTemperatureSteel pins the ratio,
   assert.ok(Math.abs(r.ratio - 0.0018) < 1e-12);
   assert.ok(Math.abs(r.as_min_in2 - 0.0018 * 72) < 1e-12);
   assert.ok(Math.abs(r.s_max_in - 18) < 1e-12); // min(30, 18)
-  // Grade 40/50 raises the ratio.
+  // ACI 318-19 Table 24.4.3.2: 0.0018 for every grade (318-14's 0.0020 for Grade 40/50 is gone).
   const g40 = _v380({ h_in: 6, b_in: 12, grade_ksi: 40 });
-  assert.ok(Math.abs(g40.ratio - 0.0020) < 1e-12 && Math.abs(g40.as_min_in2 - 0.144) < 1e-9);
+  assert.ok(Math.abs(g40.ratio - 0.0018) < 1e-12 && Math.abs(g40.as_min_in2 - 0.1296) < 1e-9);
   // The string select value (from the renderer) behaves like the number.
-  assert.ok(Math.abs(_v380({ h_in: 6, b_in: 12, grade_ksi: "40" }).ratio - 0.0020) < 1e-12);
+  assert.ok(Math.abs(_v380({ h_in: 6, b_in: 12, grade_ksi: "40" }).ratio - 0.0018) < 1e-12);
   // A thin slab makes 5h govern instead of the 18 in cap.
   const thin = _v380({ h_in: 3, b_in: 12, grade_ksi: 60 });
   assert.ok(Math.abs(thin.s_max_in - 15) < 1e-12 && thin.spacing_governor === "5h");
@@ -31000,6 +31000,11 @@ test("bounds: spec-v1220 computeAcmeThreadDepth pins the general-purpose Acme di
   assert.ok(coarse.thread_depth_in > r.thread_depth_in);
   // Depth falls toward the 0.010 floor as TPI rises (finer pitch).
   assert.ok(_v1220({ major_dia_in: 1.0, tpi: 10 }).thread_depth_in < r.thread_depth_in);
+  // Finer than 10 TPI the ASME B1.5 allowance halves: 1/4-16 max minor 0.1775, depth 0.03625.
+  const fine = _v1220({ major_dia_in: 0.25, tpi: 16 });
+  assert.ok(Math.abs(fine.minor_dia_in - 0.1775) < 1e-9 && Math.abs(fine.thread_depth_in - 0.03625) < 1e-9);
+  // 10 TPI is still the coarse allowance.
+  assert.ok(Math.abs(_v1220({ major_dia_in: 1.0, tpi: 10 }).minor_dia_in - (1.0 - 0.1 - 0.020)) < 1e-9);
   // Error seams: non-positive diameter/TPI, a pitch too coarse for the diameter (non-positive minor), non-finite.
   assert.ok("error" in _v1220({ major_dia_in: 0, tpi: 5 }));
   assert.ok("error" in _v1220({ major_dia_in: 1.0, tpi: 0 }));

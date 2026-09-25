@@ -54879,11 +54879,11 @@
   {
    "tile_id": "concrete-shrinkage-temperature-steel",
    "source_publisher": "ACI 318-19 24.4",
-   "source_title": "cross-check: Grade 40 -> ratio 0.0020, As,min 0.144 in^2/ft; thin 3 in slab -> s_max 15 in (5h governs)",
+   "source_title": "cross-check: Grade 40 -> ratio 0.0018 (ACI 318-19 Table 24.4.3.2 applies it to every grade); thin 3 in slab -> s_max 15 in (5h governs)",
    "source_edition_or_year": "spec-v380 worked example (machine-verified)",
    "source_section_or_page": "spec-v380 section 2.1 cross-check",
    "verified_by": "rl",
-   "verified_on": "2026-07-03",
+   "verified_on": "2026-09-24",
    "inputs": {
     "h_in": 3,
     "b_in": 12,
@@ -54891,7 +54891,7 @@
    },
    "outputs": {
     "ratio": {
-     "value": 0.002,
+     "value": 0.0018,
      "tolerance": {
       "abs": 0
      }
