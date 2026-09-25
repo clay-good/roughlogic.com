@@ -356,7 +356,13 @@ test("spec-v1337 chips: a chip fills the box and leaves the results open", async
 
 test("spec-v1337 chips: every chip routes to a real tile with values", async ({ page }) => {
   // A chip that teaches a query the site cannot answer is worse than no chip.
-  const count = await (async () => { await page.goto("/"); return page.locator(".hero-chip").count(); })();
+  // Four journeys with up-to-30 s data waits each cannot share one 30 s test
+  // budget on a throttled runner -- the reason the per-chip tests below exist
+  // and call test.slow(). This loop never got it, and on 2026-09-25 it timed
+  // out in `locator.press` on all three retries of a commit that touched no
+  // chip's tile (3f9cb161, rigging).
+  test.slow();
+  const count =await (async () => { await page.goto("/"); return page.locator(".hero-chip").count(); })();
   for (let i = 0; i < count; i++) {
     await page.goto("/");
     await page.locator(".hero-chip").nth(i).click();
