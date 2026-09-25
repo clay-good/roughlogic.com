@@ -16924,6 +16924,11 @@ test("bounds: spec-v273 computeShearwallOverturning pins v/Mot/Mr/T, the clamp-t
   assert.ok("error" in _v273({ v_lb: 8000, b_ft: 0, h_ft: 10 }));
   assert.ok("error" in _v273({ v_lb: 8000, b_ft: 8, h_ft: 0 }));
   assert.ok("error" in _v273({ v_lb: NaN, b_ft: 8, h_ft: 10 }));
+  // Seismic: (0.6 - 0.14 SDS) D resists. SDS 1.0 -> 0.46 D.
+  const eq = _v273({ v_lb: 8000, b_ft: 8, h_ft: 10, w_lb: 3000, sds: 1.0 });
+  assert.ok(Math.abs(eq.dead_factor - 0.46) < 1e-12 && Math.abs(eq.mr_ftlb - 0.46 * 3000 * 4) < 1e-9);
+  assert.ok(eq.t_lb > _v273({ v_lb: 8000, b_ft: 8, h_ft: 10, w_lb: 3000 }).t_lb);
+  assert.ok("error" in _v273({ v_lb: 8000, b_ft: 8, h_ft: 10, w_lb: 3000, sds: -0.1 }));
 });
 
 test("bounds: spec-v274 computeShearwallDeflection pins the three terms, the h/h^3 scaling laws, da=0, and error seams", () => {

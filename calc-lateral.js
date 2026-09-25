@@ -125,37 +125,45 @@ LATERAL_RENDERERS["diaphragm-shear"] = _simpleRenderer({
 
 // ===================== spec-v273: wood shear wall unit shear and holdown overturning =====================
 
-// dims: in { v_lb: M L T^-2, b_ft: L, h_ft: L, w_lb: M L T^-2 } out: { v_plf: M T^-2, mot_ftlb: M L^2 T^-2, mr_ftlb: M L^2 T^-2, t_kip: M L T^-2 }
-export function computeShearwallOverturning({ v_lb = 0, b_ft = 0, h_ft = 0, w_lb = 0 } = {}) {
+// The seismic ASD combination is (0.6 - 0.14 SDS) D + 0.7 Eh, the vertical
+// effect Ev = 0.2 SDS D taking dead load away (ASCE 7-22 2.4.5 / 7-16
+// 12.4.2.3); wind is 0.6 D + 0.6 W. sds = 0 gives the wind case. Until
+// 2026-09-25 the seismic case used 0.6 D, overstating the resisting moment
+// by 30% at SDS 1.0 and understating the holdown.
+// dims: in { v_lb: M L T^-2, b_ft: L, h_ft: L, w_lb: M L T^-2, sds: dimensionless } out: { v_plf: M T^-2, mot_ftlb: M L^2 T^-2, mr_ftlb: M L^2 T^-2, t_kip: M L T^-2 }
+export function computeShearwallOverturning({ v_lb = 0, b_ft = 0, h_ft = 0, w_lb = 0, sds = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (v_lb < 0) return { error: "Story shear V cannot be negative (lb)." };
   if (w_lb < 0) return { error: "Dead load W cannot be negative (lb)." };
   if (!(b_ft > 0)) return { error: "Wall length must be positive (ft)." };
   if (!(h_ft > 0)) return { error: "Wall height must be positive (ft)." };
+  if (!(sds >= 0)) return { error: "SDS cannot be negative (0 for a wind case)." };
   const v_plf = v_lb / b_ft;
   const mot_ftlb = v_lb * h_ft;
-  const mr_ftlb = 0.6 * w_lb * (b_ft / 2);
+  const dead_factor = Math.max(0.6 - 0.14 * sds, 0);
+  const mr_ftlb = dead_factor * w_lb * (b_ft / 2);
   const t_raw = (mot_ftlb - mr_ftlb) / b_ft;
   const t_lb = Math.max(t_raw, 0);
   const t_kip = t_lb / 1000;
   const holdown_required = t_raw > 0;
-  return { v_plf, mot_ftlb, mr_ftlb, t_lb, t_kip, holdown_required };
+  return { v_plf, mot_ftlb, mr_ftlb, t_lb, t_kip, holdown_required, dead_factor };
 }
 
 export const shearwallOverturningExample = { inputs: { v_lb: 8000, b_ft: 8, h_ft: 10, w_lb: 3000 } };
 
 LATERAL_RENDERERS["shearwall-overturning"] = _simpleRenderer({
-  citation: "Citation: the AWC SDPWS segmented shear-wall model with the ASCE 7 / IBC allowable-stress overturning check -- unit shear v = V / b, overturning moment Mot = V h resisted by 0.6 times the dead-load moment W x (b/2) per the 0.6D + 0.7E ASD load combination, net holdown tension T = (V h - 0.6 W b/2) / b -- as compiled in the AWC/APA wood-frame shear-wall design guides. Returns the service-level unit shear and net holdown uplift of a single fully sheathed shear-wall segment. Uses the 0.6D resisting dead load of the ASD seismic combination (use the wind combination's factor where wind governs); W is the dead load tributary to and acting on the wall (not the whole floor); the wall is segmented (not force-transfer-around-openings or perforated); the sheathing nailing check and the compression-chord bearing check are separate. When 0.6D stabilizes the wall the uplift clamps to zero (no holdown required for overturning; sill anchorage and shear transfer still govern). The unit shear is compared against the SDPWS nominal capacity for the chosen sheathing and nailing. A design aid, not a substitute for the engineer of record's stamped lateral design.",
+  citation: "Citation: the AWC SDPWS segmented shear-wall model with the ASCE 7 / IBC allowable-stress overturning check -- unit shear v = V / b, overturning moment Mot = V h resisted by (0.6 - 0.14 SDS) times the dead-load moment W x (b/2) per the (0.6 - 0.14 SDS)D + 0.7Eh ASD seismic combination (0.6 for wind, SDS = 0), net holdown tension T = (V h - k W b/2) / b -- as compiled in the AWC/APA wood-frame shear-wall design guides. Returns the service-level unit shear and net holdown uplift of a single fully sheathed shear-wall segment. Uses the 0.6D resisting dead load of the ASD seismic combination (use the wind combination's factor where wind governs); W is the dead load tributary to and acting on the wall (not the whole floor); the wall is segmented (not force-transfer-around-openings or perforated); the sheathing nailing check and the compression-chord bearing check are separate. When 0.6D stabilizes the wall the uplift clamps to zero (no holdown required for overturning; sill anchorage and shear transfer still govern). The unit shear is compared against the SDPWS nominal capacity for the chosen sheathing and nailing. A design aid, not a substitute for the engineer of record's stamped lateral design.",
   example: shearwallOverturningExample.inputs,
   fields: [
     { key: "v_lb", label: "ASD story shear V on the wall (lb; 0.7 x strength-level seismic or 0.6 x wind)", kind: "number" },
     { key: "b_ft", label: "Shear-wall length b (ft)", kind: "number" },
     { key: "h_ft", label: "Shear-wall height h (ft)", kind: "number" },
     { key: "w_lb", label: "Tributary dead load W (lb)", kind: "number", default: 0 },
+    { key: "sds", label: "SDS for a seismic case (0 = wind)", kind: "number", default: 0 },
   ],
   outputs: [
     { key: "vp", id: "swo-out-vp", label: "Unit shear v = V/b", value: (r) => fmt(r.v_plf, 0) + " plf" },
-    { key: "mo", id: "swo-out-mo", label: "Overturning Mot / resisting 0.6D Mr", value: (r) => fmt(r.mot_ftlb, 0) + " / " + fmt(r.mr_ftlb, 0) + " lb-ft" },
+    { key: "mo", id: "swo-out-mo", label: "Overturning Mot / resisting Mr", value: (r) => fmt(r.mot_ftlb, 0) + " / " + fmt(r.mr_ftlb, 0) + " lb-ft (" + fmt(r.dead_factor, 2) + "D)" },
     { key: "td", id: "swo-out-td", label: "Net holdown tension T", value: (r) => r.holdown_required ? fmt(r.t_lb, 0) + " lb (" + fmt(r.t_kip, 1) + " kip)" : "0 lb (dead load stabilizes; no holdown required for overturning)" },
   ],
   compute: computeShearwallOverturning,

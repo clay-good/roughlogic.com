@@ -2736,7 +2736,7 @@ cross-check.
 | calc-lateral.js | `computeDiaphragmCollectorForce` | `{ unit_shear_plf = 0, collector_len_ft = 0, omega0 = 2.5 } = {}` | _ | _ | _ |
 | calc-lateral.js | `computeDiaphragmShear` | `{ w_plf = 0, l_ft = 0, b_ft = 0 } = {}` | _ | _ | _ |
 | calc-lateral.js | `computeShearwallDeflection` | `{ v_plf = 0, h_ft = 0, b_ft = 0, e_psi = 1600000, a_in2 = 0, ga_kin = 0, da_i...` | _ | _ | _ |
-| calc-lateral.js | `computeShearwallOverturning` | `{ v_lb = 0, b_ft = 0, h_ft = 0, w_lb = 0 } = {}` | _ | _ | _ |
+| calc-lateral.js | `computeShearwallOverturning` | `{ v_lb = 0, b_ft = 0, h_ft = 0, w_lb = 0, sds = 0 } = {}` | _ | _ | _ |
 | calc-layout.js | `computeBoltCircle` | `{ bolt_circle_dia_in = 0, num_holes = 0, start_angle_deg = 0, center_x_in = 0...` | _ | _ | _ |
 | calc-layout.js | `computeCenterOfGravity2Point` | `{ mode = "two-scale-weigh", reading_1_lb = 0, reading_2_lb = 0, span_ft = 0, ...` | _ | _ | _ |
 | calc-layout.js | `computeCircleFrom3Points` | `{ x1 = 0, y1 = 0, x2 = 0, y2 = 0, x3 = 0, y3 = 0 } = {}` | _ | _ | _ |
