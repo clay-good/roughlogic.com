@@ -382,6 +382,16 @@ test("service-optional: EV charger nameplate adds to the general load", () => {
   assert.strictEqual(withEv.general_va - noEv.general_va, 40 * 240);
 });
 
+test("service-optional: the standard-method side carries EVSE at the larger of 7,200 VA or nameplate (NEC 2023 220.57)", () => {
+  const noEv = computeServiceLoadOptional({ area_ft2: 2000, service_voltage: 240 });
+  const small = computeServiceLoadOptional({ area_ft2: 2000, ev_charger_a: 16, service_voltage: 240 });
+  const big = computeServiceLoadOptional({ area_ft2: 2000, ev_charger_a: 40, service_voltage: 240 });
+  assert.strictEqual(small.standard_total_va - noEv.standard_total_va, 7200); // 16 A x 240 V = 3,840 VA < 7,200
+  assert.strictEqual(big.standard_total_va - noEv.standard_total_va, 9600); // nameplate above the floor
+  // 220.57 is Part III: the optional-method general load keeps the nameplate.
+  assert.strictEqual(small.general_va - noEv.general_va, 16 * 240);
+});
+
 test("service-optional: tiny and huge dwellings are flagged", () => {
   assert.ok(computeServiceLoadOptional({ area_ft2: 300 }).warnings.some((w) => w.includes("below")));
   assert.ok(computeServiceLoadOptional({ area_ft2: 12000 }).warnings.some((w) => w.includes("above")));

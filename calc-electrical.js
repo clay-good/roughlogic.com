@@ -3761,8 +3761,12 @@ export function computeServiceLoadOptional({
     hvac_heating_W: heat * 1000,
     service_voltage: V,
   });
-  // EVSE at 100% of nameplate (220.57), outside the 220.53 fixed-appliance group.
-  const standard_total_va = std.error ? null : std.total_VA + ev_va;
+  // EVSE per NEC 2023 220.57: the larger of 7,200 VA or the nameplate, outside
+  // the 220.53 fixed-appliance group. Until 2026-09-25 this took the nameplate
+  // alone, carrying a 16 A charger at 3,840 VA. 220.57 is a Part III rule, so the
+  // optional-method general load above keeps the nameplate.
+  const ev_std_va = ev > 0 ? Math.max(7200, ev_va) : 0;
+  const standard_total_va = std.error ? null : std.total_VA + ev_std_va;
   const standard_demand_a = std.error ? null : standard_total_va / V;
 
   const governing_a = Math.max(optional_demand_a, standard_demand_a ?? 0);
