@@ -123,7 +123,7 @@
     },
     "hud-fmr": {
       "group": "calc-realestate.js (Group X, v12 §8)",
-      "stamp": "Citation: HUD Office of Policy Development and Research, Fair Market Rents (FY2026, effective 2025-10-01). Free at huduser.gov / portal / datasets / fmr. The 40th-percentile rent of recent-mover units in the HUD-defined FMR Area; used for HCV (Section 8) program payment standards, ESG, HOME, and others."
+      "stamp": "Citation: HUD Office of Policy Development and Research, Fair Market Rents (FY2026, effective 2025-10-01; FY2027 from 2026-10-01, both bundled and selected by today's date). Free at huduser.gov / portal / datasets / fmr. The 40th-percentile rent of recent-mover units in the HUD-defined FMR Area; used for HCV (Section 8) program payment standards, ESG, HOME, and others."
     },
     "lexile-band": {
       "group": "calc-edu.js (Group Y, v12 §9)",

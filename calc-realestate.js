@@ -1637,13 +1637,18 @@ export function renderLoanLimits(inputRegion, outputRegion, citationEl) {
 // representative high-cost / mid-cost MSAs; the canonical per-county
 // lookup is at huduser.gov.
 
-// dims: in { shard: dimensionless, state: dimensionless, fips: dimensionless, area_name: dimensionless }
+// HUD publishes the next fiscal year's FMRs before they take effect. The shard's optional `next` block
+// carries them (FY2027, effective 2026-10-01, from HUD's FY27_FMRs.xlsx); on or after its effective
+// date they replace the current year's rents for the same area. `as_of` (ISO date) defaults to today.
+// dims: in { shard: dimensionless, state: dimensionless, fips: dimensionless, area_name: dimensionless, as_of: dimensionless }
 //        out: { fmr_studio: dimensionless, fmr_1br: dimensionless, fmr_2br: dimensionless, fmr_3br: dimensionless, fmr_4br: dimensionless, area: dimensionless, source: dimensionless, asOf: dimensionless, safmr: dimensionless }
 // (HUD Fair Market Rent shard lookup. FMRs are dimensionless
 //  monthly-rent dollar aggregates per the §7.1 monetary
 //  convention; area / source / asOf tokens are categorical.)
-export function computeHudFmr({ shard = null, state = "", fips = "", area_name = "" } = {}) {
+export function computeHudFmr({ shard = null, state = "", fips = "", area_name = "", as_of = "" } = {}) {
   if (!shard) return { error: "HUD FMR shard not loaded." };
+  const today = /^\d{4}-\d{2}-\d{2}$/.test(String(as_of)) ? String(as_of) : new Date().toISOString().slice(0, 10);
+  const next = shard.next && today >= shard.next.effective ? shard.next : null;
   const wantState = String(state || "").toUpperCase();
   const wantFips = String(fips || "").trim();
   const wantName = String(area_name || "").trim().toLowerCase();
@@ -1662,23 +1667,26 @@ export function computeHudFmr({ shard = null, state = "", fips = "", area_name =
       advisory: shard.unknown_area_message,
     };
   }
+  const nextRents = next && next.rents_0_to_4br ? next.rents_0_to_4br[match.fips] : null;
+  const rents = nextRents || [match.fmr_0br, match.fmr_1br, match.fmr_2br, match.fmr_3br, match.fmr_4br];
+  const fy = nextRents ? next.fiscal_year : shard.fiscal_year;
   return {
     kind: "matched",
-    fiscal_year: shard.fiscal_year,
+    fiscal_year: fy,
     name: match.name,
     state: match.state,
     fips: match.fips,
-    fmr_0br: match.fmr_0br,
-    fmr_1br: match.fmr_1br,
-    fmr_2br: match.fmr_2br,
-    fmr_3br: match.fmr_3br,
-    fmr_4br: match.fmr_4br,
+    fmr_0br: rents[0],
+    fmr_1br: rents[1],
+    fmr_2br: rents[2],
+    fmr_3br: rents[3],
+    fmr_4br: rents[4],
     safmr: match.safmr || "",
     safmr_note:
       match.safmr === "all" ? shard.safmr_message
         : match.safmr === "partial" ? shard.safmr_partial_message
         : "",
-    source: "HUD PD&R Fair Market Rents, FY" + shard.fiscal_year,
+    source: "HUD PD&R Fair Market Rents, FY" + fy,
   };
 }
 
@@ -1692,7 +1700,7 @@ export const hudFmrExample = {
 // (DOM-mount renderer; HTMLElement refs are categorical.)
 export function renderHudFmr(inputRegion, outputRegion, citationEl) {
   citationEl.textContent =
-    "Citation: HUD Office of Policy Development and Research, Fair Market Rents (FY2026, effective 2025-10-01). Free at huduser.gov / portal / datasets / fmr. The 40th-percentile rent of recent-mover units in the HUD-defined FMR Area; used for HCV (Section 8) program payment standards, ESG, HOME, and others.";
+    "Citation: HUD Office of Policy Development and Research, Fair Market Rents (FY2026, effective 2025-10-01; FY2027 from 2026-10-01, both bundled and selected by today's date). Free at huduser.gov / portal / datasets / fmr. The 40th-percentile rent of recent-mover units in the HUD-defined FMR Area; used for HCV (Section 8) program payment standards, ESG, HOME, and others.";
   const S = makeText("State (2-letter)", "fmr-state", { placeholder: "CA", maxlength: "2" });
   const F = makeText("FIPS (5-digit, optional)", "fmr-fips", { placeholder: "06075", maxlength: "5" });
   const N = makeText("FMR area name (optional substring)", "fmr-name", { placeholder: "San Francisco" });

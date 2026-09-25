@@ -3208,7 +3208,7 @@ cross-check.
 | calc-realestate.js | `computeFixFlipProfit` | `{ arv_usd = 0, purchase_usd = 0, rehab_usd = 0, holding_usd = 0, financing_us...` | _ | _ | _ |
 | calc-realestate.js | `computeFloorAreaRatio` | `{ building_floor_area_sf = 0, lot_area_sf = 0, far_limit = 0 } = {}` | _ | _ | _ |
 | calc-realestate.js | `computeGrossRentMultiplier` | `{ price = 0, gross_rent = 0, rent_basis = "annual", market_grm = 0 } = {}` | _ | _ | _ |
-| calc-realestate.js | `computeHudFmr` | `{ shard = null, state = "", fips = "", area_name = "" } = {}` | _ | _ | _ |
+| calc-realestate.js | `computeHudFmr` | `{ shard = null, state = "", fips = "", area_name = "", as_of = "" } = {}` | _ | _ | _ |
 | calc-realestate.js | `computeLTV` | `{ loan_amount, value }` | _ | _ | _ |
 | calc-realestate.js | `computeLoanLimits` | `{ shard = null, state = "", county_fips = "", county_name = "" } = {}` | _ | _ | _ |
 | calc-realestate.js | `computeMaxOffer70Rule` | `{ arv = 0, repairs = 0, rule_pct = 70, fee = 0 } = {}` | _ | _ | _ |

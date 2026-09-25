@@ -608,6 +608,23 @@ test("computeHudFmr: the inline shard double matches the shipped shard", async (
   }
 });
 
+test("computeHudFmr: the shipped FY2027 block takes over on its 2026-10-01 effective date", async () => {
+  // HUD FY27_FMRs.xlsx (huduser.gov, read 2026-09-25): San Francisco 2BR $3,697; Chicago 2BR $2,011.
+  const { readFile } = await import("node:fs/promises");
+  const { resolve, dirname } = await import("node:path");
+  const { fileURLToPath } = await import("node:url");
+  const root = resolve(dirname(fileURLToPath(import.meta.url)), "..", "..");
+  const shipped = JSON.parse(await readFile(resolve(root, "data/realestate/hud-fmr.json"), "utf8"));
+  assert.equal(shipped.next.fiscal_year, 2027);
+  assert.equal(shipped.next.effective, "2026-10-01");
+  assert.equal(Object.keys(shipped.next.rents_0_to_4br).length, shipped.areas.length);
+  const before = computeHudFmr({ shard: shipped, fips: "06075", as_of: "2026-09-30" });
+  const after = computeHudFmr({ shard: shipped, fips: "06075", as_of: "2026-10-01" });
+  assert.equal(before.fiscal_year, 2026); assert.equal(before.fmr_2br, 3604);
+  assert.equal(after.fiscal_year, 2027); assert.equal(after.fmr_2br, 3697);
+  assert.equal(computeHudFmr({ shard: shipped, fips: "17031", as_of: "2026-10-01" }).fmr_2br, 2011);
+});
+
 test("computeHudFmr: FIPS lookup wins over name", () => {
   const r = computeHudFmr({ fips: "36061", shard: HUD_FMR_SHARD });
   assert.equal(r.state, "NY");

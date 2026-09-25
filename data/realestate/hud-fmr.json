@@ -211,5 +211,145 @@
   ],
   "unknown_area_message": "Unknown FMR area. HUD publishes FMRs at the HUD-defined Fair Market Rent Area level (typically MSA, HUD Metro FMR Area, or county). Look up the exact county at huduser.gov/portal/datasets/fmr.",
   "safmr_message": "HUD designates this a Small Area FMR area: Housing Choice Voucher payment standards there are set per ZIP Code, not from this metro-wide figure. The metro-wide FMR still governs other HUD programs. ZIP-level rents are at huduser.gov/portal/datasets/fmr/smallarea.",
-  "safmr_partial_message": "A PHA covering a majority of Housing Choice Vouchers in this area has opted into Small Area FMRs, so voucher payment standards there may be set per ZIP Code rather than from this metro-wide figure."
+  "safmr_partial_message": "A PHA covering a majority of Housing Choice Vouchers in this area has opted into Small Area FMRs, so voucher payment standards there may be set per ZIP Code rather than from this metro-wide figure.",
+  "next": {
+    "fiscal_year": 2027,
+    "effective": "2026-10-01",
+    "source": "HUD PD&R FY2027 Fair Market Rents, FY27_FMRs.xlsx (huduser.gov/portal/datasets/fmr/fmr2027), read 2026-09-25; same HUD area names as FY2026",
+    "rents_0_to_4br": {
+      "06075": [
+        2574,
+        3003,
+        3697,
+        4832,
+        5439
+      ],
+      "06037": [
+        2151,
+        2402,
+        2964,
+        3760,
+        4208
+      ],
+      "06073": [
+        2192,
+        2335,
+        2823,
+        3743,
+        4526
+      ],
+      "06085": [
+        2458,
+        2778,
+        3272,
+        4396,
+        4688
+      ],
+      "36061": [
+        2593,
+        2729,
+        2971,
+        3760,
+        4121
+      ],
+      "25025": [
+        2440,
+        2518,
+        3008,
+        3584,
+        3953
+      ],
+      "11001": [
+        2111,
+        2204,
+        2438,
+        3107,
+        3658
+      ],
+      "53033": [
+        2091,
+        2180,
+        2549,
+        3324,
+        3954
+      ],
+      "17031": [
+        1678,
+        1780,
+        2011,
+        2586,
+        2954
+      ],
+      "08031": [
+        1751,
+        1831,
+        2169,
+        2846,
+        3183
+      ],
+      "48453": [
+        1447,
+        1530,
+        1817,
+        2292,
+        2689
+      ],
+      "48113": [
+        1491,
+        1536,
+        1807,
+        2275,
+        2892
+      ],
+      "48201": [
+        1233,
+        1261,
+        1497,
+        2017,
+        2502
+      ],
+      "12086": [
+        1953,
+        2121,
+        2564,
+        3277,
+        3749
+      ],
+      "13121": [
+        1554,
+        1619,
+        1762,
+        2099,
+        2493
+      ],
+      "04013": [
+        1390,
+        1493,
+        1734,
+        2287,
+        2537
+      ],
+      "15003": [
+        1836,
+        1951,
+        2542,
+        3520,
+        4249
+      ],
+      "41051": [
+        1527,
+        1633,
+        1878,
+        2550,
+        3069
+      ],
+      "27053": [
+        1265,
+        1427,
+        1734,
+        2264,
+        2538
+      ]
+    }
+  }
 }

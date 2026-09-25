@@ -6,6 +6,7 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Changed
 
+- **HUD Fair Market Rents roll to FY2027 on October 1, 2026.** HUD has published the FY2027 FMRs, effective October 1, 2026. `hud-fmr` now bundles them next to the FY2026 set: the 19 area rows are read from HUD's FY27_FMRs.xlsx (every area keeps its FY2026 HUD name), and the tile uses them from the effective date on. San Francisco's 2BR moves from $3,604 to $3,697, and Chicago's from $1,781 to $2,011. The bundled FY2026 figures were re-checked against HUD's revised FY2026 file on the way, and all 19 rows matched.
 - **wrangler 4.129.0 → 4.135.0, and the `sharp` override is gone.** Dependabot's bump failed CI on `check-dependency-overrides`. The new wrangler brings a miniflare that asks for the patched `sharp` 0.35.4 itself, so the September 9 pin no longer changed anything. This is the case the gate was written for, so the override is deleted rather than left as a second source of truth. `npm audit` reports 0 vulnerabilities. docs/threat-model.md records the change.
 
 ### Fixed
