@@ -54,7 +54,7 @@
     {
       "file": "nema-mg1-code-letters.json",
       "name": "NEMA MG-1 code-letter starting kVA per HP",
-      "gzip_size_bytes": 449
+      "gzip_size_bytes": 506
     },
     {
       "file": "dwelling-demand.json",
@@ -72,7 +72,7 @@
     "cable-bend-radius.json": "86e27ac2c14c59af068deb4da711526d80dcb4a12ce5c674f84c793eb4be0ba5",
     "poe-classes.json": "19201709b44e5a75f4030329be75a1560da272a17f165caa372ae3849a82def0",
     "conductor-c-values.json": "d791e1bdee6de7266b2bc7b553465ca06c07e0dd29d24d82176fbe596d22cd43",
-    "nema-mg1-code-letters.json": "8c66b1680f33dda295d8bbba6f896b888bb0f435b2356fed7334efe62ce8cd7b",
+    "nema-mg1-code-letters.json": "ee7832404dab8a9f8a1621a84dc194a4344f34bfd6ce70613d05693aad8338d9",
     "dwelling-demand.json": "7e49f0ef7184c83bb365214ac19d8461efa74ef40313343302fe926ec049698c"
   }
 }

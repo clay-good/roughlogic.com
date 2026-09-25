@@ -143,8 +143,8 @@ test("236 example yields finite outputs", () => {
 
 test("236 worst-case motor drives starting kVA", () => {
   const r = computeGeneratorMotorStarting({ motors: [{ hp: 5, code_letter: "B" }, { hp: 25, code_letter: "G" }], non_motor_kW: 0, dip_factor: 0.30, starts_per_hour: "occasional" });
-  // 25 HP × 5.6 kVA/HP = 140 kVA worst-start
-  assert.ok(close(r.worst_starting_kVA, 25 * 5.6, 0.01));
+  // 25 HP × 5.95 kVA/HP (code G midpoint) = 148.75 kVA worst-start
+  assert.ok(close(r.worst_starting_kVA, 25 * 5.95, 0.01));
 });
 
 test("236 LRA override works when V and phase given", () => {
@@ -155,16 +155,24 @@ test("236 LRA override works when V and phase given", () => {
 
 test("236 30% dip ⇒ required_starting_kVA = worst x X'd x (1 - dip) / dip", () => {
   const r = computeGeneratorMotorStarting({ motors: [{ hp: 10, code_letter: "G" }], non_motor_kW: 0, dip_factor: 0.30, starts_per_hour: "occasional" });
-  // 10 × 5.6 = 56 kVA; reactance divider at X'd 0.25: 56 × 0.25 × 0.7 / 0.3 = 32.67
-  assert.ok(close(r.required_starting_kVA, 56 * 0.25 * 0.7 / 0.3, 0.01));
+  // 10 × 5.95 = 59.5 kVA; reactance divider at X'd 0.25: 59.5 × 0.25 × 0.7 / 0.3 = 34.71
+  assert.ok(close(r.required_starting_kVA, 59.5 * 0.25 * 0.7 / 0.3, 0.01));
   // Back-substitute: that generator dips exactly 30% on this start.
   const S = r.required_starting_kVA;
-  assert.ok(close(0.25 * 56 / (S + 0.25 * 56), 0.30, 1e-9));
+  assert.ok(close(0.25 * 59.5 / (S + 0.25 * 59.5), 0.30, 1e-9));
 });
 
 test("236 frequent-start derate factor is 1.15", () => {
   const r = computeGeneratorMotorStarting({ motors: [{ hp: 10, code_letter: "G" }], non_motor_kW: 0, dip_factor: 0.30, starts_per_hour: "frequent" });
   assert.equal(r.starts_factor, 1.15);
+});
+
+test("236 code letters are the MIDPOINTS of the NEMA MG-1 ranges (Cummins T-030 Table 7), never the lower bound", () => {
+  const ranges = { A: [0, 3.15], B: [3.15, 3.55], C: [3.55, 4.0], D: [4.0, 4.5], E: [4.5, 5.0], F: [5.0, 5.6], G: [5.6, 6.3], H: [6.3, 7.1], J: [7.1, 8.0], K: [8.0, 9.0], L: [9.0, 10.0], M: [10.0, 11.2], N: [11.2, 12.5], P: [12.5, 14.0], R: [14.0, 16.0], S: [16.0, 18.0], T: [18.0, 20.0], U: [20.0, 22.4] };
+  for (const [k, [lo, hi]] of Object.entries(ranges)) assert.ok(close(NEMA_MG1_CODE_LETTERS[k], (lo + hi) / 2, 1e-9), k);
+  assert.equal(NEMA_MG1_CODE_LETTERS.V, 23); // open above 22.4; the Cummins figure
+  // A code-A motor still draws a starting current.
+  assert.ok(computeGeneratorMotorStarting({ motors: [{ hp: 10, code_letter: "A" }] }).worst_starting_kVA > 0);
 });
 
 test("236 NEMA MG-1 table covers A through V", () => {

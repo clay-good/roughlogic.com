@@ -1240,15 +1240,16 @@ const CONDUCTOR_C_VALUES_DATA = {
   },
 };
 
-// NEMA MG-1 code-letter starting kVA per HP (lower bound of each range).
-// Cited by NEMA MG-1 name only.
+// NEMA MG-1 code-letter starting kVA per HP: the midpoint of each range, as
+// generator sizing takes it (Cummins T-030 Table 7). The lower bound until
+// 2026-09-24.
 const NEMA_MG1_CODE_LETTERS_DATA = {
-  source: "NEMA MG-1 (Motors and Generators) published code-letter table for locked-rotor kVA per HP. Cited by NEMA MG-1 by name only.",
-  description: "Locked-rotor kVA per nameplate HP, lower bound of each NEMA MG-1 code-letter range. Used to estimate motor starting kVA for generator sizing under the 30% voltage-dip criterion.",
+  source: "NEMA MG-1 (Motors and Generators) code-letter ranges for locked-rotor kVA per HP, taken at the midpoint of each range as the Cummins T-030 generator set application manual (Table 7) does.",
+  description: "Locked-rotor kVA per nameplate HP, midpoint of each NEMA MG-1 code-letter range (V, open above 22.4, is 23). Used to estimate motor starting kVA for generator sizing under the 30% voltage-dip criterion.",
   per_hp: {
-    A: 0.0, B: 3.15, C: 3.55, D: 4.0, E: 4.5, F: 5.0, G: 5.6, H: 6.3,
-    J: 7.1, K: 8.0, L: 9.0, M: 10.0, N: 11.2, P: 12.5, R: 14.0, S: 16.0,
-    T: 18.0, U: 20.0, V: 22.4,
+    A: 1.575, B: 3.35, C: 3.775, D: 4.25, E: 4.75, F: 5.3, G: 5.95, H: 6.7,
+  J: 7.55, K: 8.5, L: 9.5, M: 10.6, N: 11.85, P: 13.25, R: 15.0, S: 17.0,
+  T: 19.0, U: 21.2, V: 23.0,
   },
   notes: "Code letter typically printed on the motor nameplate. If nameplate gives LRA instead, compute starting kVA = LRA × V × sqrt(phases) / 1000 directly.",
 };

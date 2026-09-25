@@ -1969,7 +1969,7 @@ export const CITATIONS = {
     governance: GOVERNANCE.electrical,
     editionNote: "Single-edition (NEMA MG-1 code-letter table; quarterly recheck).",
     assumptions: [
-      { name: "Code-letter table", value: "data/electrical/nema-mg1-code-letters.json keyed to A through V (lower bound of each range)", source: "NEMA MG-1" },
+      { name: "Code-letter table", value: "data/electrical/nema-mg1-code-letters.json keyed to A through V (midpoint of each range)", source: "NEMA MG-1 ranges; midpoint per Cummins T-030 Table 7" },
       { name: "Default dip factor", value: "0.30 (30% voltage-dip criterion)", source: "engineering practice" },
       { name: "Generator transient reactance X'd", value: "0.25 per unit default (typical sets 0.15-0.30; the manufacturer's data sheet governs)", source: "engineering practice" },
       { name: "Frequent-start derate", value: "occasional 1.0 / frequent 1.15 / continuous 1.30", source: "manufacturer typical" },

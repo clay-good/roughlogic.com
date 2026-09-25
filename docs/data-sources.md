@@ -106,7 +106,7 @@ A standard the tiles cite but no shard holds data from has no manifest to appear
 - Source: NEMA MG-1 (Motors and Generators) code-letter starting-kVA-per-HP table. Cited by NEMA MG-1 by name only.
 - License: Engineering-practice consensus values.
 - Cadence: Annual recheck (NEMA MG-1 tables stable across decades).
-- Shard layout: per_hp keyed by code letter A through V, lower bound of each range.
+- Shard layout: per_hp keyed by code letter A through V, midpoint of each range (the lower bound until 2026-09-24, which put a code-A motor's start at 0 kVA).
 
 ### data/electrical/dwelling-demand.json (v7)
 

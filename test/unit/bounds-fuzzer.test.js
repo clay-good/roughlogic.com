@@ -9789,10 +9789,10 @@ test("bounds: calc-electrical computeGeneratorMotorStarting pins NEMA code-lette
     motors: [{ hp: 25, code_letter: "G" }, { hp: 10, code_letter: "F" }, { hp: 5, code_letter: "B" }],
     non_motor_kW: 15, dip_factor: 0.30, starts_per_hour: "frequent",
   });
-  // Worst motor: 25 HP * 5.6 (G) = 140 kVA.
-  assert.strictEqual(r.worst_starting_kVA, 140);
-  // Reactance divider at X'd 0.25: 140 * 0.25 * 0.7 / 0.3 * 1.15 = 93.92 kVA -> 75.1 kW -> 80 kW.
-  assert.ok(Math.abs(r.required_starting_kVA - 140 * 0.25 * 0.7 / 0.3 * 1.15) < 1e-9);
+  // Worst motor: 25 HP * 5.95 (G, midpoint of 5.6-6.3) = 148.75 kVA.
+  assert.strictEqual(r.worst_starting_kVA, 148.75);
+  // Reactance divider at X'd 0.25: 148.75 * 0.25 * 0.7 / 0.3 * 1.15 = 99.79 kVA -> 79.8 kW -> 80 kW.
+  assert.ok(Math.abs(r.required_starting_kVA - 148.75 * 0.25 * 0.7 / 0.3 * 1.15) < 1e-9);
   assert.strictEqual(r.starts_factor, 1.15);
   assert.strictEqual(r.recommended_kW, 80);
   assert.ok("error" in computeGeneratorMotorStarting({ motors: [{ hp: 5 }], generator_xd: 0 }));

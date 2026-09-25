@@ -12145,10 +12145,10 @@
    "tile_id": "generator-motor-starting",
    "source_publisher": "NEC 430.110 + manufacturer locked-rotor schedule (project bundled)",
    "source_title": "Generator sizing for motor starting: required_kVA = LRA at code letter; recommended kW = next ANSI step above required",
-   "source_edition_or_year": "NEC 430.110 + NEMA MG 1 code-letter table (Code F = 5.0-5.59 kVA/hp locked-rotor)",
-   "source_section_or_page": "25 hp Code G + 10 hp Code F + 5 hp Code B motors, 15 kW non-motor, 0.3 dip, frequent starts -> running 44.84 kW, worst LRA 140 kVA, required 93.92 kVA / 75.13 kW by the reactance divider S_gen = S_m X'd (1 - dip)/dip x 1.15 with X'd 0.25, recommended 80 kW",
+   "source_edition_or_year": "NEC 430.110 + NEMA MG 1 code-letter ranges at their midpoints (Cummins T-030 Table 7; Code G 5.6-6.3 -> 5.95 kVA/hp)",
+   "source_section_or_page": "25 hp Code G + 10 hp Code F + 5 hp Code B motors, 15 kW non-motor, 0.3 dip, frequent starts -> running 44.84 kW, worst start 25 x 5.95 = 148.75 kVA, required 99.79 kVA / 79.83 kW by the reactance divider S_gen = S_m X'd (1 - dip)/dip x 1.15 with X'd 0.25, recommended 80 kW",
    "verified_by": "rl",
-   "verified_on": "2026-09-18",
+   "verified_on": "2026-09-24",
    "inputs": {
     "motors": [
      {
@@ -12176,19 +12176,19 @@
      }
     },
     "worst_starting_kVA": {
-     "value": 140,
+     "value": 148.75,
      "tolerance": {
       "abs": 0.5
      }
     },
     "required_starting_kVA": {
-     "value": 93.92,
+     "value": 99.79,
      "tolerance": {
       "abs": 0.5
      }
     },
     "required_kW": {
-     "value": 75.13,
+     "value": 79.83,
      "tolerance": {
       "abs": 0.5
      }

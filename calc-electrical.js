@@ -2179,11 +2179,15 @@ export const shortCircuitPPExample = {
 // (typical 30% voltage-dip criterion per NEMA MG-1 transient guidance).
 
 // NEMA MG-1 starting kVA per HP for code letters A through V (locked-rotor
-// kVA per HP). Bundled values are the lower bound of each code-letter range.
+// kVA per HP): the MIDPOINT of each code-letter range, as generator sizing
+// practice takes it (Cummins T-030 Table 7: "averages of the specified
+// ranges"; G = 5.9). Until 2026-09-24 this held each range's LOWER bound, so
+// every start read 5-12% light and a code-A motor started at 0 kVA. V is open
+// above 22.4; 23 is the Cummins figure.
 export const NEMA_MG1_CODE_LETTERS = {
-  A: 0.0, B: 3.15, C: 3.55, D: 4.0, E: 4.5, F: 5.0, G: 5.6, H: 6.3,
-  J: 7.1, K: 8.0, L: 9.0, M: 10.0, N: 11.2, P: 12.5, R: 14.0, S: 16.0,
-  T: 18.0, U: 20.0, V: 22.4,
+  A: 1.575, B: 3.35, C: 3.775, D: 4.25, E: 4.75, F: 5.3, G: 5.95, H: 6.7,
+  J: 7.55, K: 8.5, L: 9.5, M: 10.6, N: 11.85, P: 13.25, R: 15.0, S: 17.0,
+  T: 19.0, U: 21.2, V: 23.0,
 };
 
 const GENERATOR_KW_STEPS = [15, 22, 35, 50, 60, 80, 100, 125, 150, 175, 200, 230, 275, 300, 400, 500, 600, 750, 1000];
