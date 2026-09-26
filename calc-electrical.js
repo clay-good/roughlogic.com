@@ -6187,8 +6187,12 @@ export function computeConduitNipple60Fill({ conduit_area_sqin = 0.864, conducto
   // NEC Ch. 9 Note 4: a nipple <= 24 in between enclosures may fill to 60% (vs the normal 40% for 3+ conductors).
   const fill_area_sqin = conductor_count * conductor_area_sqin;
   const fill_pct = fill_area_sqin / conduit_area_sqin * 100;
-  const nipple_max_conductors = Math.floor(0.60 * conduit_area_sqin / conductor_area_sqin);
-  const normal_max_conductors = Math.floor(0.40 * conduit_area_sqin / conductor_area_sqin);
+  // NEC Ch. 9 Note 7: for conductors all of the same size, a count whose decimal
+  // is 0.8 or larger rounds UP to the next whole number (Annex C's 6 #8 THHN in
+  // 3/4 in EMT is 5.82 rounded up). Until 2026-09-25 both counts rounded down.
+  const note7 = (x) => { const w = Math.floor(x); return x - w >= 0.8 - 1e-9 ? w + 1 : w; };
+  const nipple_max_conductors = note7(0.60 * conduit_area_sqin / conductor_area_sqin);
+  const normal_max_conductors = note7(0.40 * conduit_area_sqin / conductor_area_sqin);
   if (![fill_area_sqin, fill_pct, nipple_max_conductors, normal_max_conductors].every(Number.isFinite)) return { error: "Nipple-fill math is not a finite value." };
   const nipple_ok = fill_pct <= 60;
   // Ch. 9 Table 1: the normal limit is 53% for one conductor, 31% for two, 40% for three or more.

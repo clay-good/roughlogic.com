@@ -16571,6 +16571,36 @@
    }
   },
   {
+   "tile_id": "mad-irrigation-trigger",
+   "source_publisher": "Oregon State University Extension",
+   "source_title": "EM 9717, Irrigation Water Scheduling",
+   "source_edition_or_year": "web publication",
+   "source_section_or_page": "Water storage = 1.4 in/ft x 2 ft = 2.8 inches; MAD = 2.8 x 0.6 = 1.7 inches (printed rounded); 1.4 in/ft entered as 0.11667 in/in available water",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "field_capacity": 0.1166667,
+    "wilting_point": 0,
+    "root_depth_in": 24,
+    "mad_fraction": 0.6,
+    "etc_in_day": 0.25
+   },
+   "outputs": {
+    "taw_in": {
+     "value": 2.8,
+     "tolerance": {
+      "abs": 0.005
+     }
+    },
+    "raw_in": {
+     "value": 1.7,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
    "tile_id": "irrigation-requirement",
    "source_publisher": "FAO / USDA NRCS",
    "source_title": "Irrigation requirement: corn (Kc 1.20), 0.25 in/day ET0 over 30 days, 80 acres, 90% drip, 1 in rain",
@@ -16615,16 +16645,17 @@
   },
   {
    "tile_id": "dressing-percentage",
-   "source_publisher": "Carcass dressing percentage and freezer yield",
-   "source_title": "1,200 lb steer, 744 lb carcass, 67% cutting yield -> 62.0% dressing, 498 lb boneless",
-   "source_edition_or_year": "spec-v995 worked example (machine-verified)",
-   "source_section_or_page": "dressing = 744/1200 x 100 = 62.0%; boneless = 744 x 0.67 = 498.5 lb",
+   "source_publisher": "University of Wisconsin-Madison Division of Extension (Grant County)",
+   "source_title": "How much meat should a beef animal yield?, Example Meat Yield Calculations",
+   "source_edition_or_year": "2020",
+   "source_section_or_page": "p. 2: 1200 lb x 62% = 744 lb hot carcass; 744 x (100% - 3.5%) = 718 lb chilled; 718 lb x 67% = 481 lb (whole-pound intermediates)",
    "verified_by": "rl",
-   "verified_on": "2026-07-18",
+   "verified_on": "2026-09-25",
    "inputs": {
     "live_weight_lb": 1200,
     "hot_carcass_weight_lb": 744,
-    "cutting_yield_pct": 67
+    "cutting_yield_pct": 67,
+    "chill_shrink_pct": 3.5
    },
    "outputs": {
     "dressing_pct": {
@@ -16633,8 +16664,14 @@
       "abs": 0.05
      }
     },
+    "chilled_carcass_lb": {
+     "value": 718,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
     "boneless_yield_lb": {
-     "value": 498.5,
+     "value": 481,
      "tolerance": {
       "abs": 0.5
      }
@@ -16657,6 +16694,29 @@
    "outputs": {
     "dressing_pct": {
      "value": 73.08,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "dressing-percentage",
+   "source_publisher": "Mississippi State University Extension",
+   "source_title": "P3489, How Much Meat to Expect from a Beef Animal (farm-direct beef)",
+   "source_edition_or_year": "2024",
+   "source_section_or_page": "1,200-pound steer, 756 pounds hot carcass, 63 percent dressing",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "live_weight_lb": 1200,
+    "hot_carcass_weight_lb": 756,
+    "cutting_yield_pct": 67,
+    "chill_shrink_pct": 4
+   },
+   "outputs": {
+    "dressing_pct": {
+     "value": 63,
      "tolerance": {
       "abs": 0.05
      }
@@ -20629,6 +20689,35 @@
    }
   },
   {
+   "tile_id": "bearing-l10-life",
+   "source_publisher": "NTN Europe (Bearing Wizard)",
+   "source_title": "Lifetime calculation, calculation example",
+   "source_edition_or_year": "web reference",
+   "source_section_or_page": "6206C3 ball bearing, Cr = 21.6 kN, Pr = 2 kN, 2000 rpm -> L10 = 1,259.71 x 10^6 rev, L10h = 10,497.6 h (entered in the tile's lbf fields; only C/P matters)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "dynamic_rating_lbf": 21.6,
+    "equivalent_load_lbf": 2,
+    "speed_rpm": 2000,
+    "bearing_type": "ball"
+   },
+   "outputs": {
+    "l10_rev": {
+     "value": 1259710000,
+     "tolerance": {
+      "pct": 0.01
+     }
+    },
+    "l10_hr": {
+     "value": 10497.6,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
    "tile_id": "bearing-max-load",
    "source_publisher": "ISO 281 basic rating life (inverse)",
    "source_title": "ball bearing C 5,000 lbf at 1,750 rpm for a 1,190 hr L10 -> 1,000 lbf max load (round-trips the forward pinned example)",
@@ -22414,6 +22503,27 @@
      "value": 550,
      "tolerance": {
       "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "tds-from-conductivity",
+   "source_publisher": "Eutech Instruments (Thermo Fisher)",
+   "source_title": "Conductivity To TDS Conversion Factors, Tech Tip 07",
+   "source_edition_or_year": "web table",
+   "source_section_or_page": "TDS 442 column: 1413 uS -> 1000 ppm, factor 0.7078",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "conductivity_us_cm": 1413,
+    "k_factor": 0.7078
+   },
+   "outputs": {
+    "tds_mgl": {
+     "value": 1000,
+     "tolerance": {
+      "abs": 0.5
      }
     }
    }
@@ -33662,7 +33772,7 @@
    "source_publisher": "Conduit nipple 60% fill (NEC Chapter 9 Note 4)",
    "source_title": "20 #10 THHN (0.0211) in a 1 in EMT nipple (0.864) -> 48.8%, nipple-only (over normal 40%)",
    "source_edition_or_year": "spec-v989 worked example (machine-verified)",
-   "source_section_or_page": "fill = 20 x 0.0211 / 0.864 = 48.8%; nipple max floor(0.6 x 0.864/0.0211) = 24; normal floor(0.4 x .864/.0211) = 16",
+   "source_section_or_page": "fill = 20 x 0.0211 / 0.864 = 48.8%; nipple max 0.6 x 0.864/0.0211 = 24.57 -> 24; normal 0.4 x .864/.0211 = 16.38 -> 16 (NEC Ch. 9 Note 7 rounds up only at a decimal of 0.8 or more)",
    "verified_by": "rl",
    "verified_on": "2026-07-18",
    "inputs": {
@@ -33696,7 +33806,7 @@
    "source_publisher": "Conduit nipple 60% fill (NEC Chapter 9 Note 4)",
    "source_title": "cross-check: 30 #12 THHN (0.0133) in the same nipple -> 46.2%, nipple allows 38, normal 25",
    "source_edition_or_year": "spec-v989 worked example (machine-verified)",
-   "source_section_or_page": "fill = 30 x 0.0133 / 0.864 = 46.2%; nipple max floor(0.6 x 0.864/0.0133) = 38; normal 25",
+   "source_section_or_page": "fill = 30 x 0.0133 / 0.864 = 46.2%; nipple max 0.6 x 0.864/0.0133 = 38.98 -> 39 (NEC Ch. 9 Note 7: a decimal of 0.8 or more rounds up); normal 25",
    "verified_by": "rl",
    "verified_on": "2026-07-18",
    "inputs": {
@@ -33712,9 +33822,37 @@
      }
     },
     "nipple_max_conductors": {
-     "value": 38,
+     "value": 39,
      "tolerance": {
       "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "conduit-nipple-60-fill",
+   "source_publisher": "PDHonline (David A. Snyder, PE)",
+   "source_title": "Course E276, Conduit Fill Calculations",
+   "source_edition_or_year": "2026 edition",
+   "source_section_or_page": "p. 14: 5/C #14 TC cable 0.119 sq in in 2 in RMC; 60% area 2.045 / 0.119 = 17.2 -> 17 (nipple); 40% area 1.363 / 0.119 = 11.5 -> 11 (Table 4 total 3.408 sq in)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "conduit_area_sqin": 3.408,
+    "conductor_area_sqin": 0.119,
+    "conductor_count": 17
+   },
+   "outputs": {
+    "nipple_max_conductors": {
+     "value": 17,
+     "tolerance": {
+      "abs": 0
+     }
+    },
+    "normal_max_conductors": {
+     "value": 11,
+     "tolerance": {
+      "abs": 0
      }
     }
    }
@@ -33775,6 +33913,48 @@
      "value": 173.205,
      "tolerance": {
       "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "open-delta-transformer",
+   "source_publisher": "EEPower (Ahmed Sheikh)",
+   "source_title": "Using Open Deltas Strategically to Increase Transformer Capacity",
+   "source_edition_or_year": "2023-11-28",
+   "source_section_or_page": "240 KVA / 86.7% = 276.8 KVA; each transformer 276.8 / 2 = 138.4 KVA (publisher rounds sqrt(3)/2 up to 86.7%)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "transformer_kva_each": 150,
+    "required_load_kva": 240
+   },
+   "outputs": {
+    "per_transformer_kva": {
+     "value": 138.4,
+     "tolerance": {
+      "abs": 0.2
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "open-delta-transformer",
+   "source_publisher": "EEPower (Ahmed Sheikh)",
+   "source_title": "Using Open Deltas Strategically to Increase Transformer Capacity",
+   "source_edition_or_year": "2023-11-28",
+   "source_section_or_page": "three 50 KVA units: 150 KVA x 57.8% = 86.7 KVA open delta (publisher rounds 1/sqrt(3) up to 57.8%)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "transformer_kva_each": 50,
+    "required_load_kva": 80
+   },
+   "outputs": {
+    "available_3ph_kva": {
+     "value": 86.7,
+     "tolerance": {
+      "abs": 0.15
      }
     }
    }
@@ -42417,6 +42597,28 @@
    }
   },
   {
+   "tile_id": "grinding-wheel-rpm",
+   "source_publisher": "Mach-B (Goodson Shop Supplies)",
+   "source_title": "Speed Matters: RPM & SFPM Defined",
+   "source_edition_or_year": "May 6, 2014",
+   "source_section_or_page": "24 in wheel at 600 RPM: SFPM = 24 x 600 x 0.262 = 3772.8 (0.262 rounds pi/12 = 0.2618)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "wheel_diameter_in": 24,
+    "rated_max_sfpm": 6500,
+    "grinder_rpm": 600
+   },
+   "outputs": {
+    "actual_sfpm": {
+     "value": 3772.8,
+     "tolerance": {
+      "pct": 0.1
+     }
+    }
+   }
+  },
+  {
    "tile_id": "knurl-blank-diameter",
    "source_publisher": "knurl tracking rule (first-principles)",
    "source_title": "0.750 in target at 21 TPI -> 49 teeth, turn blank to 0.7427 in (0.0073 in under)",
@@ -45530,6 +45732,27 @@
      "value": 28.41,
      "tolerance": {
       "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "anhydrous-ammonia-rate",
+   "source_publisher": "DTN / Progressive Farmer (Dan Davidson)",
+   "source_title": "Nitrogen Math: Simple Calculations Give You the Right Rates",
+   "source_edition_or_year": "March 21, 2016",
+   "source_section_or_page": "140 pounds N per acre: 140 / 0.82 = 171 pounds of ammonia (printed to the pound)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "n_target_lb_per_ac": 140,
+    "tank_gal": 1000
+   },
+   "outputs": {
+    "product_lb_per_ac": {
+     "value": 171,
+     "tolerance": {
+      "abs": 0.5
      }
     }
    }
@@ -53845,6 +54068,50 @@
    }
   },
   {
+   "tile_id": "rc-beam-shear",
+   "source_publisher": "StructurePoint",
+   "source_title": "Simply Supported Reinforced Concrete Beam Analysis and Design (ACI 318-14)",
+   "source_edition_or_year": "version April-08-2021",
+   "source_section_or_page": "Section 5, pp. 7-8: phi Vc = 0.75 x 2 x sqrt(4350) x 12 x 17.56 = 20.85 kips (printed as Vc); Vs = 28.52/0.75 - 20.85/0.75 = 10.23 kips; sreq = 0.22/0.0097 = 22.67 in (Av/s rounded); smax = min(8.78, 24) = 8.78 in",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "fc": 4350,
+    "fyt": 60000,
+    "bw": 12,
+    "d": 17.56,
+    "av_in2": 0.22,
+    "vu": 28.52,
+    "lambda": 1
+   },
+   "outputs": {
+    "phi_vc": {
+     "value": 20.85,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "vs_req_kip": {
+     "value": 10.23,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "s_req_in": {
+     "value": 22.67,
+     "tolerance": {
+      "abs": 0.05
+     }
+    },
+    "s_max_in": {
+     "value": 8.78,
+     "tolerance": {
+      "abs": 0.005
+     }
+    }
+   }
+  },
+  {
    "tile_id": "rc-development-length",
    "source_publisher": "ACI 318-19 (Building Code Requirements for Structural Concrete)",
    "source_title": "#8 Grade 60 uncoated bottom bar, 4,000 psi, well confined -> ld 28.5 in (about 28 bar diameters)",
@@ -54387,6 +54654,40 @@
    }
   },
   {
+   "tile_id": "at-rest-earth-pressure",
+   "source_publisher": "IGNOU (egyankosh.ac.in)",
+   "source_title": "Foundation Engineering-II, Unit 5 Earth Pressure",
+   "source_edition_or_year": "course unit",
+   "source_section_or_page": "Example 5.2 (printed p. 12), SI: phi 30, gamma 16 kN/m3, H 3 m -> KO = 1 - sin 30 = 0.5; po = 0.5 x 16 x 3 = 24 kN/m2; Po = 1/2 x 0.5 x 16 x 3 x 3 = 36 kN/m (homogeneous units: entered in SI, outputs in kN)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "phi": 30,
+    "gamma": 16,
+    "h_ft": 3
+   },
+   "outputs": {
+    "k0": {
+     "value": 0.5,
+     "tolerance": {
+      "abs": 0.0005
+     }
+    },
+    "p0_base": {
+     "value": 24,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "p0_soil": {
+     "value": 36,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
    "tile_id": "submerged-earth-pressure",
    "source_publisher": "Rankine effective-stress as compiled in Das / NAVFAC DM-7.02",
    "source_title": "fully-submerged sand: buoyant soil 1,043 lb/ft + water 3,120 lb/ft = 4,163 lb/ft, 2.0x the 2,083 lb/ft dry",
@@ -54527,6 +54828,35 @@
      "value": 3960.1,
      "tolerance": {
       "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "sloped-backfill-earth-pressure",
+   "source_publisher": "IGNOU (egyankosh.ac.in)",
+   "source_title": "Foundation Engineering-II, Unit 5 Earth Pressure",
+   "source_edition_or_year": "course unit",
+   "source_section_or_page": "Example 5.4 (printed p. 14), SI: phi 30, beta 20, gamma 16 kN/m3, H 3 m -> Ka = 0.4144; Pa = 1/2 x 16 x 0.4144 x 9 = 29.84 kN/m (cos beta printed to 4 decimals)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "phi": 30,
+    "beta": 20,
+    "gamma": 16,
+    "h_ft": 3
+   },
+   "outputs": {
+    "ka": {
+     "value": 0.4144,
+     "tolerance": {
+      "abs": 0.0005
+     }
+    },
+    "pa": {
+     "value": 29.84,
+     "tolerance": {
+      "abs": 0.05
      }
     }
    }
@@ -55017,6 +55347,62 @@
    }
   },
   {
+   "tile_id": "consolidation-degree",
+   "source_publisher": "FHWA",
+   "source_title": "NHI-06-088 Soils and Foundations Reference Manual, Volume I",
+   "source_edition_or_year": "December 2006",
+   "source_section_or_page": "Example 7-3, p. 7-37: cv 0.2 ft2/day, Hdr 10 ft, Tv = 0.848 (Table 7-4, U = 90%) -> t90 = 0.848 x 10^2 / 0.2 = 424 days (run forward)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "cv_ft2_day": 0.2,
+    "hdr_ft": 10,
+    "t_days": 424
+   },
+   "outputs": {
+    "tv": {
+     "value": 0.848,
+     "tolerance": {
+      "abs": 0.0005
+     }
+    },
+    "u_percent": {
+     "value": 90,
+     "tolerance": {
+      "abs": 0.1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "consolidation-degree",
+   "source_publisher": "King Saud University",
+   "source_title": "CE 481, Compressibility of Soil 4",
+   "source_edition_or_year": "lecture notes",
+   "source_section_or_page": "PDF p. 28, SI: 4 m open layer (Hdr 2 m), cv 0.75 m2/yr, t 1 yr -> time factor 0.1875, Ut = 0.49 (consistent units)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "cv_ft2_day": 0.75,
+    "hdr_ft": 2,
+    "t_days": 1
+   },
+   "outputs": {
+    "tv": {
+     "value": 0.1875,
+     "tolerance": {
+      "abs": 0.0001
+     }
+    },
+    "u_percent": {
+     "value": 49,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
    "tile_id": "spt-bearing-capacity",
    "source_publisher": "Meyerhof / Das",
    "source_title": "N60 20, B 6 ft, D 2 ft -> base 4.54, Kd 1.11, qa 5.04 ksf",
@@ -55242,6 +55628,41 @@
    }
   },
   {
+   "tile_id": "soil-vertical-effective-stress",
+   "source_publisher": "FHWA",
+   "source_title": "NHI-06-088 Soils and Foundations Reference Manual, Volume I",
+   "source_edition_or_year": "December 2006",
+   "source_section_or_page": "Example 2-1, Figure 2-7, p. 2-20: 110 pcf soil, water table at 10 ft -> pt @ 20 ft = 2,200 psf; u = 10 ft x 62.4 = 624 psf; po = 1,576 psf",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "gamma_moist_pcf": 110,
+    "gamma_sat_pcf": 110,
+    "depth_ft": 20,
+    "water_table_depth_ft": 10
+   },
+   "outputs": {
+    "total_stress_psf": {
+     "value": 2200,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "pore_pressure_psf": {
+     "value": 624,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "effective_stress_psf": {
+     "value": 1576,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
    "tile_id": "liquefaction-screening",
    "source_publisher": "Seed-Idriss",
    "source_title": "amax 0.30g, sv 2000, s'v 1200 psf, z 5 m, CRR 0.20 -> CSR 0.313, FS 0.64, liquefiable",
@@ -55394,6 +55815,36 @@
      "value": 546,
      "tolerance": {
       "abs": 1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "pile-group-efficiency",
+   "source_publisher": "Middle East Technical University",
+   "source_title": "CE 366 Recitation 6, Pile Foundations (Converse-Labarre)",
+   "source_edition_or_year": "Spring 2012",
+   "source_section_or_page": "SI: 3 x 4 group, D 0.4 m, s 1.2 m -> theta = arctan(0.4/1.2) = 18.4; E = 1 - 18.4[(4-1)3 + (3-1)4]/(90x3x4) = 0.71 (theta rounded before use)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "rows_n": 3,
+    "cols_m": 4,
+    "diameter_in": 0.4,
+    "spacing_in": 1.2,
+    "single_allow_kip": 275.8
+   },
+   "outputs": {
+    "theta_deg": {
+     "value": 18.4,
+     "tolerance": {
+      "abs": 0.05
+     }
+    },
+    "eg": {
+     "value": 0.71,
+     "tolerance": {
+      "abs": 0.005
      }
     }
    }

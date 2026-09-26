@@ -30787,13 +30787,13 @@ import { computeConduitNipple60Fill as _v989 } from "../../calc-electrical.js";
 test("bounds: spec-v989 computeConduitNipple60Fill pins the 60% nipple allowance vs the normal 40%", () => {
   const r = _v989({ conduit_area_sqin: 0.864, conductor_area_sqin: 0.0211, conductor_count: 20 });
   assert.ok(Math.abs(r.fill_pct - 48.842) < 1e-2); // 20*0.0211/0.864
-  assert.strictEqual(r.nipple_max_conductors, 24); // floor(0.6*0.864/0.0211)
+  assert.strictEqual(r.nipple_max_conductors, 24); // 24.57 -> 24 (Note 7 rounds up only at .8)
   assert.strictEqual(r.normal_max_conductors, 16); // floor(0.4*0.864/0.0211)
   assert.ok(/NIPPLE only/.test(r.verdict)); // 40 < 48.8 <= 60
   // Cross-check with #12 THHN.
   const c12 = _v989({ conduit_area_sqin: 0.864, conductor_area_sqin: 0.0133, conductor_count: 30 });
   assert.ok(Math.abs(c12.fill_pct - 46.18) < 1e-2);
-  assert.strictEqual(c12.nipple_max_conductors, 38);
+  assert.strictEqual(c12.nipple_max_conductors, 39); // 38.98 rounds up (NEC Ch. 9 Note 7)
   // Verdict bands: <= 40% passes both; > 60% fails even a nipple.
   assert.ok(/AND in any normal/.test(_v989({ conduit_area_sqin: 0.864, conductor_area_sqin: 0.0211, conductor_count: 15 }).verdict)); // 36.6%
   assert.ok(/OVER 60%/.test(_v989({ conduit_area_sqin: 0.864, conductor_area_sqin: 0.0211, conductor_count: 26 }).verdict)); // 63.5%
@@ -30920,7 +30920,11 @@ import { computeDressingPercentage as _v995 } from "../../calc-agriculture.js";
 test("bounds: spec-v995 computeDressingPercentage pins the dressing % and freezer yield", () => {
   const r = _v995({ live_weight_lb: 1200, hot_carcass_weight_lb: 744, cutting_yield_pct: 67 });
   assert.ok(Math.abs(r.dressing_pct - 62.0) < 1e-9); // 744/1200*100
-  assert.ok(Math.abs(r.boneless_yield_lb - 498.48) < 1e-2); // 744*0.67
+  // UW-Madison Extension: 744 x (1 - 3.5%) = 718 chilled, x 67% = 481. Until
+  // 2026-09-25 the yield was applied to the hot weight (498.5).
+  assert.ok(Math.abs(r.chilled_carcass_lb - 717.96) < 1e-2);
+  assert.ok(Math.abs(r.boneless_yield_lb - 481.03) < 1e-2);
+  assert.ok(Math.abs(_v995({ live_weight_lb: 1200, hot_carcass_weight_lb: 744, cutting_yield_pct: 67, chill_shrink_pct: 0 }).boneless_yield_lb - 498.48) < 1e-2);
   // Pork cross-check runs higher.
   const hog = _v995({ live_weight_lb: 260, hot_carcass_weight_lb: 190, cutting_yield_pct: 70 });
   assert.ok(Math.abs(hog.dressing_pct - 73.077) < 1e-2);
@@ -55728,4 +55732,16 @@ test("bounds: computeMixedWaterTemp scald flags follow IPC 424.3 / 416.5 (120 F 
   assert.match(r.notes[0], /within the 120 F shower and tub limit/);
   const hot = _cv26b1({ mode: "find-blend", hot_temp_F: 140, cold_temp_F: 50, hot_gpm: 80, cold_gpm: 10 });
   assert.match(hot.notes[0], /120 F scald limit for shower, tub-shower and tub-filler valves/);
+});
+
+test("bounds: computeConduitNipple60Fill max counts follow NEC Ch. 9 Note 7 (a decimal of 0.8 or more rounds up)", () => {
+  // Annex C: 3/4 in EMT (0.533 sq in) holds 6 #8 THHN (0.0366): 0.40 x 0.533 / 0.0366 = 5.82 -> 6.
+  // Until 2026-09-25 both counts floored, giving 5.
+  const r = _v989({ conduit_area_sqin: 0.533, conductor_area_sqin: 0.0366, conductor_count: 6 });
+  assert.equal(r.normal_max_conductors, 6);
+  assert.equal(r.nipple_max_conductors, 8); // 8.74 stays 8
+  // 17.2 and 11.5 round down (PDHonline E276, 2 in RMC, 0.119 sq in cable).
+  const p = _v989({ conduit_area_sqin: 3.408, conductor_area_sqin: 0.119, conductor_count: 17 });
+  assert.equal(p.nipple_max_conductors, 17);
+  assert.equal(p.normal_max_conductors, 11);
 });

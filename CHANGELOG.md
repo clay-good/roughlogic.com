@@ -6,6 +6,26 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Changed
 
+- **Fourteen more tiles now carry a publisher's printed example.**
+  - **Geotechnical:**
+    - `at-rest-earth-pressure` and `sloped-backfill-earth-pressure`: IGNOU Foundation Engineering.
+    - `soil-vertical-effective-stress` and `consolidation-degree`: FHWA NHI-06-088 Examples 2-1 and 7-3, plus King Saud University CE 481.
+    - `pile-group-efficiency`: METU CE 366.
+  - **Structural:** `rc-beam-shear`, from StructurePoint's simply supported beam.
+  - **Electrical:**
+    - `open-delta-transformer`: EEPower.
+    - `conduit-nipple-60-fill`: PDHonline E276.
+  - **Machine shop:**
+    - `bearing-l10-life`: the NTN calculation example.
+    - `grinding-wheel-rpm`: Mach-B.
+  - **Farm and water:**
+    - `dressing-percentage`: UW-Madison and Mississippi State Extension.
+    - `mad-irrigation-trigger`: Oregon State EM 9717.
+    - `anhydrous-ammonia-rate`: DTN.
+    - `tds-from-conductivity`: the Eutech conversion table.
+
+  README: 1,231 of 2,183 tiles are checked only against the project's own derivation; 952 carry an outside source.
+
 - **Fifteen more tiles now carry a publisher's printed example or table.**
   - **Machine design:** `keyseat-key-size` (ANSI B17.1 via *Machinery's Handbook*), `spur-gear-geometry` (Boston Gear catalog and ANSI B6.1), `press-fit-pressure` (Shigley Example T4.17.1, which confirms the tile takes diametral interference).
   - **Farm and food:** `corn-yield-estimate` (NDSU), `cattle-heart-girth-weight` (University of Arizona Extension), `abv-from-gravity` (Brew Your Own, attenuation), `dough-water-temperature` (King Arthur Baking).
@@ -114,6 +134,9 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 - **wrangler 4.129.0 → 4.135.0, and the `sharp` override is gone.** Dependabot's bump failed CI on `check-dependency-overrides`. The new wrangler brings a miniflare that asks for the patched `sharp` 0.35.4 itself, so the September 9 pin no longer changed anything. This is the case the gate was written for, so the override is deleted rather than left as a second source of truth. `npm audit` reports 0 vulnerabilities. docs/threat-model.md records the change.
 
 ### Fixed
+
+- **`conduit-nipple-60-fill` now rounds the maximum conductor count the way NEC Chapter 9 Note 7 requires.** For conductors all of the same size, a decimal of 0.8 or larger rounds up to the next whole conductor. That is how Annex C fits 6 #8 THHN in 3/4 in EMT (5.82). The tile always rounded down, so it reported 38 instead of 39 for #12 THHN in a 1 in EMT nipple.
+- **`dressing-percentage` now applies the cutting yield to the chilled carcass, not the hot one.** A hot carcass loses about 3.5-4% of its weight in the cooler before it is cut. UW-Madison Extension's example uses the tile's exact inputs (1,200 lb steer, 744 lb carcass, 67% yield) and prints 718 lb chilled and 481 lb of meat; the tile said 498.5 lb. A new chill-shrink input defaults to UW's 3.5%. The note also called the hot carcass "the chilled-hanging carcass," which contradicted itself.
 
 - **Two citations named the wrong ASHRAE document, and one named the wrong ladder standard.** `duct-friction-static` and `duct-leakage` built their edition line by string-replacing the ASHRAE 62.1 constant, so both carried 62.1's title, "Ventilation for Acceptable Indoor Air Quality," on a Fundamentals chapter and a 90.1 clause. Both now name their own document. `ladder-angle` cited ANSI A14.7, which covers mobile ladder stands; the 75.5° (4:1) setup angle comes from the portable-ladder standards A14.1, A14.2 and A14.5.
 
