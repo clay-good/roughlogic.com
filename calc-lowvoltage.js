@@ -1443,7 +1443,7 @@ function _v949renderLoopVoltageBudget(inputRegion, outputRegion, citationEl) {
   const sv = makeNumber("Loop supply (Vdc)", "lvb-sv", { step: "any", min: "0" });
   const tv = makeNumber("Transmitter minimum voltage (V)", "lvb-tv", { step: "any", min: "0" });
   const lr = makeNumber("Load / sense resistor (ohms)", "lvb-lr", { step: "any", min: "0" });
-  const wr = makeNumber("Wire + barrier resistance (ohms)", "lvb-wr", { step: "any", min: "0" });
+  const wr = makeNumber("Wire (both conductors, out and back) + barrier resistance (ohms)", "lvb-wr", { step: "any", min: "0" });
   for (const f of [sv, tv, lr, wr]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { sv.input.value = "24"; tv.input.value = "10.5"; lr.input.value = "250"; wr.input.value = "50"; update(); });
   const oV = makeOutputLine(outputRegion, "Verdict", "lvb-out-v");

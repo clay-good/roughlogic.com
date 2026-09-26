@@ -505,7 +505,7 @@ export const BESPOKE_LABELS = {
   "loan-payment": {"principal":"Principal","apr_percent":"APR (%)","term_months":"Term (months)"},
   "log-limb-weight": {"butt_dia_in":"Butt (large end) diameter (in)","top_dia_in":"Top (small end) diameter (in)","length_ft":"Length (ft)","species":"Species (green density)"},
   "loop-signal-scaling": {"signal_ma":"Loop signal (mA)","range_low":"Range low (value at 4 mA)","range_high":"Range high (value at 20 mA)"},
-  "loop-voltage-budget": {"supply_v":"Loop supply (Vdc)","transmitter_min_v":"Transmitter minimum voltage (V)","load_resistance_ohms":"Load / sense resistor (ohms)","wire_resistance_ohms":"Wire + barrier resistance (ohms)"},
+  "loop-voltage-budget": {"supply_v":"Loop supply (Vdc)","transmitter_min_v":"Transmitter minimum voltage (V)","load_resistance_ohms":"Load / sense resistor (ohms)","wire_resistance_ohms":"Wire (both conductors, out and back) + barrier resistance (ohms)"},
   "ltv": {"loan_amount":"Loan amount ($)","value":"Property value ($)"},
   "lumber-spans": {"species_grade":"Species and grade","nominal_size":"Nominal size","total_load_psf":"Total load (psf)","tributary_width_in":"Tributary width (in)","deflection_limit":"Deflection limit (L/x)"},
   "lux-to-footcandle": {"mode":"Mode","lux":"Lux (convert mode)","footcandles":"Footcandles (convert mode)","lumens":"Total luminaire lumens (room mode)","area_ft2":"Room area (ft², room mode)","cu":"Coefficient of utilization (0-1)","llf":"Light-loss factor (0-1)"},

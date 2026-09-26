@@ -5905,7 +5905,11 @@ export function computeWelderResistanceCircuitConductor({ primary_current_a = 10
   // the square root of the duty cycle (a spot welder fires briefly, so the conductor heats far less than the peak).
   // Table 630.31(A)(2) stops at "5 or less 0.22"; below 5% the multiplier holds at 0.22 (it was
   // sqrt all the way down until 2026-09-25, 0.14 at 2% duty).
-  const duty_multiplier = duty_pct <= 5 ? 0.22 : Math.sqrt(duty_pct / 100);
+  // At the duty cycles the table lists, the code's multiplier is the printed two-place value (0.71 at 50%,
+  // not sqrt(0.5) = 0.7071); between rows the square root the table rounds is used. Until 2026-09-25 the
+  // square root was used at the listed rows too, 0.4% under the code at 50%.
+  const WELDER_630_31_A2 = { 50: 0.71, 40: 0.63, 30: 0.55, 25: 0.50, 20: 0.45, 15: 0.39, 10: 0.32, 7.5: 0.27 };
+  const duty_multiplier = duty_pct <= 5 ? 0.22 : (WELDER_630_31_A2[duty_pct] ?? Math.sqrt(duty_pct / 100));
   const conductor_current_a = primary_current_a * duty_multiplier;
   // NEC 630.32(A): the overcurrent device for a resistance welder may not exceed 300% of the rated primary current.
   const ocpd_max_a = 3.0 * primary_current_a;

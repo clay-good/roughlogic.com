@@ -7,6 +7,20 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 ### Changed
 
 - **Ten more tiles now carry a publisher's printed example.**
+  - `belt-hp-transmitted`: Shigley 17-2.
+  - `tire-contact-patch`: Boeing.
+  - `tailstock-setover`: Krar.
+  - `dynamic-compression-ratio`: UEM/KB via Chevy Hardcore.
+  - `loop-voltage-budget`: PDHonline E271.
+  - `infiltration-load`: Texas A&M CONS 335.
+  - `pipe-pressure-rating`: ASME B31.3 via Engineering ToolBox.
+  - `welder-resistance-circuit-conductor`: NEC Table 630.31(A)(2).
+  - `float-method-flow`: Montana DNRC.
+  - `two-source-blend`: Oregon Health Authority.
+
+  README: 1,211 of 2,183 tiles are checked only against the project's own derivation; 972 carry an outside source.
+
+- **Ten more tiles now carry a publisher's printed example.**
   - `wobbe-index`: Emerson 1660AD-5a.
   - `dp-level-hydrostatic`: Viatran.
   - `rlc-reactance-resonance`: OpenStax College Physics 23.12.
@@ -148,6 +162,9 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 - **wrangler 4.129.0 → 4.135.0, and the `sharp` override is gone.** Dependabot's bump failed CI on `check-dependency-overrides`. The new wrangler brings a miniflare that asks for the patched `sharp` 0.35.4 itself, so the September 9 pin no longer changed anything. This is the case the gate was written for, so the override is deleted rather than left as a second source of truth. `npm audit` reports 0 vulnerabilities. docs/threat-model.md records the change.
 
 ### Fixed
+
+- **`welder-resistance-circuit-conductor` now uses the NEC Table 630.31(A)(2) multipliers at the duty cycles the table lists.** The table prints 0.71 at 50%, 0.63 at 40%, 0.55 at 30%, 0.50 at 25%, 0.45 at 20%, 0.39 at 15%, 0.32 at 10% and 0.27 at 7.5%. The tile used the unrounded square root at those rows, so a 100 A welder at 50% duty got 70.7 A instead of the code's 71 A. Between rows it still uses the square root the table rounds.
+- **Two input labels now say what they mean.** `static-rollover-threshold` track width is the average of front and rear, per the CPSC convention. `loop-voltage-budget` wire resistance counts both conductors, out and back.
 
 - **`motor-rms-hp` now divides only stopped time by the cooling factor, and the factor follows the motor enclosure.** In Cowern's (Baldor) RMS-horsepower method, a motor at standstill loses its fan, so stopped seconds are divided by C: 3 for open drip-proof, 2 for totally enclosed. The tile also divided a segment where the motor still ran at light load, and it described C as "3 stopped, 2 unloaded." A 20 hp / 10 s plus 10 hp / 20 s cycle now gives 14.1 hp instead of 19.0 hp, because the light-load segment keeps full cooling.
 - **`draft-beer-line-balance` no longer subtracts a 1 psi "faucet allowance" credited to the Brewers Association.** The Draught Beer Quality Manual (4th ed., Ch. 4) balances line resistance against the full applied pressure and calls couplers and faucets negligible. The tile now has a tower/fixture resistance input, default 0; the manual puts a tower at 0-8 psi per its maker. The 12 psi / 4 ft rise example on 3/16 in vinyl is now 3.3 ft of line, up from 3.0. The manual's barrier-line rows (1/4 in 0.30, 5/16 in 0.10, 3/8 in 0.06 psi/ft) are added. The 3/16 in barrier row (2.2) is kept, but its label now says it is not in the manual's table.

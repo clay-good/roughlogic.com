@@ -4282,8 +4282,8 @@
       "date": "2026-09-11"
     },
     "/tools/loop-voltage-budget/": {
-      "sha": "f6bb7161dffb77f1",
-      "date": "2026-09-01"
+      "sha": "30c25afc821534dd",
+      "date": "2026-09-26"
     },
     "/tools/loto-steps/": {
       "sha": "3829722f3a54a18b",
@@ -7342,8 +7342,8 @@
       "date": "2026-09-01"
     },
     "/tools/static-rollover-threshold/": {
-      "sha": "0ca501cd059b44bc",
-      "date": "2026-09-01"
+      "sha": "b4938095099f7064",
+      "date": "2026-09-26"
     },
     "/tools/statistics-quickread/": {
       "sha": "b46572ef90442d22",
@@ -8574,8 +8574,8 @@
       "date": "2026-09-01"
     },
     "/tools/welder-resistance-circuit-conductor/": {
-      "sha": "13babe6b7ba5ce1c",
-      "date": "2026-09-01"
+      "sha": "76f550a4bc1009f0",
+      "date": "2026-09-26"
     },
     "/tools/well-casing-purge-volume/": {
       "sha": "fd5d8178ea431f22",

@@ -35280,6 +35280,30 @@
    }
   },
   {
+   "tile_id": "two-source-blend",
+   "source_publisher": "Oregon Health Authority, Drinking Water Services",
+   "source_title": "Conventional Filtration class slides, C1Q1 + C2Q2 = C3Q3 alum example",
+   "source_edition_or_year": "3/22/2024",
+   "source_section_or_page": "C1 634,032 mg/l at Q1 63 gpd, C2 0 at Q2 2,000,000 gpd, Q3 2,000,063 gpd -> 19.97 mg/l (flows in gpd; the relation is unit-free in flow)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "flow1_gpm": 63,
+    "conc1": 634032,
+    "flow2_gpm": 2000000,
+    "conc2": 0,
+    "target_conc": 10
+   },
+   "outputs": {
+    "blended_conc": {
+     "value": 19.97,
+     "tolerance": {
+      "abs": 0.005
+     }
+    }
+   }
+  },
+  {
    "tile_id": "fluoride-feed-dose",
    "source_publisher": "Water-fluoridation feed (available-fluoride-ion pounds formula)",
    "source_title": "net 0.6 mg/L (0.7 target - 0.1 raw), 2 MGD, 25% fluorosilicic acid (AFI 0.792) -> 50.55 lb/day",
@@ -35437,6 +35461,36 @@
      "value": 9.6,
      "tolerance": {
       "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "float-method-flow",
+   "source_publisher": "Montana DNRC",
+   "source_title": "Stream Discharge using the Float-Area Method, worked example",
+   "source_edition_or_year": "10/3/2015",
+   "source_section_or_page": "50 ft reach, runs 32 / 28 / 34 s (avg 31.3 s), average area 4.56 sq ft, k = 0.66 -> V(avg) 1.6 ft/s, flow 4.8 cfs (area entered as width 4.56 x depth 1; per-run velocities rounded to 0.1 in print)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "float_distance_ft": 50,
+    "travel_time_s": 31.3,
+    "channel_width_ft": 4.56,
+    "mean_depth_ft": 1,
+    "float_coefficient": 0.66
+   },
+   "outputs": {
+    "surface_velocity_fps": {
+     "value": 1.6,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "flow_cfs": {
+     "value": 4.8,
+     "tolerance": {
+      "abs": 0.05
      }
     }
    }
@@ -38003,6 +38057,27 @@
    }
   },
   {
+   "tile_id": "infiltration-load",
+   "source_publisher": "Texas A&M University (I. Choudhury)",
+   "source_title": "CONS 335 Lecture Note 6, Heat loss and heat gain in buildings: Outside air",
+   "source_edition_or_year": "course notes",
+   "source_section_or_page": "250 CFM infiltration, 70 F inside, 20 F outside: multiply by 1.08 -> 13,500 BTUH",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "cfm": 250,
+    "delta_t_f": 50
+   },
+   "outputs": {
+    "q_sensible": {
+     "value": 13500,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
    "tile_id": "pv-energy-yield",
    "source_publisher": "NREL PVWatts energy model",
    "source_title": "8 kW, 5.0 PSH, 0.77 PR -> 11,242 kWh, 1,405 kWh/kWp, 16.0%",
@@ -40203,6 +40278,32 @@
      "value": 0.0392,
      "tolerance": {
       "abs": 0.0005
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "pipe-pressure-rating",
+   "source_publisher": "Engineering ToolBox",
+   "source_title": "ASME 31.3 Piping Materials - Allowable Pressure",
+   "source_edition_or_year": "web reference",
+   "source_section_or_page": "4 in Sch 40: D 4.5 in, t 0.237 in, 12.5% mill tolerance, S 16,000 psi, E 0.8, Y 0.4 -> 1225 psi",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "od_in": 4.5,
+    "wall_in": 0.237,
+    "allow_stress": 16000,
+    "joint_factor": 0.8,
+    "y_coeff": 0.4,
+    "mill_tol_frac": 0.125,
+    "mode": "allowable_pressure"
+   },
+   "outputs": {
+    "p_allow": {
+     "value": 1225,
+     "tolerance": {
+      "abs": 0.5
      }
     }
    }
@@ -43346,6 +43447,29 @@
    }
   },
   {
+   "tile_id": "loop-voltage-budget",
+   "source_publisher": "PDHonline (David A. Snyder, PE)",
+   "source_title": "Course E271, Understanding 4 to 20 mA Loops, Example 5",
+   "source_edition_or_year": "2020, pp. 8-16",
+   "source_section_or_page": "Rmax = (Vsupply - 12 V) / 20 mA; 750 ohms needs Vsupply = 27 V",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "supply_v": 27,
+    "transmitter_min_v": 12,
+    "load_resistance_ohms": 250,
+    "wire_resistance_ohms": 0
+   },
+   "outputs": {
+    "max_loop_resistance_ohms": {
+     "value": 750,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
    "tile_id": "pulse-flowmeter-k-factor",
    "source_publisher": "Pulse flowmeter K-factor (turbine/paddlewheel)",
    "source_title": "200 pulses/gal meter reading 100 Hz -> 30 gpm (1800 gph)",
@@ -43807,6 +43931,30 @@
      "value": 7.688,
      "tolerance": {
       "abs": 0.02
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "dynamic-compression-ratio",
+   "source_publisher": "Chevy Hardcore (Jeff Smith), quoting the UEM / KB calculator",
+   "source_title": "Discussing Compression Ratio And Pump Gas Compatibility",
+   "source_edition_or_year": "April 22, 2021",
+   "source_section_or_page": "10.0:1 static, 6.125 in rod, 4.00 in stroke, 4.030 bore, intake closing 47 + 15 = 62 degrees ABDC -> 8.198 or 8.2:1 (enter the actual closing angle, not the 0.050 in figure)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "bore_in": 4.03,
+    "stroke_in": 4,
+    "rod_length_in": 6.125,
+    "static_cr": 10,
+    "ivc_abdc_deg": 62
+   },
+   "outputs": {
+    "dynamic_cr": {
+     "value": 8.198,
+     "tolerance": {
+      "abs": 0.001
      }
     }
    }
@@ -44650,7 +44798,7 @@
    "source_publisher": "resistance-welder circuit sizing (NEC 630.31 / 630.32)",
    "source_title": "100 A primary, 50% duty -> 70.71 A conductor, 300 A max OCPD",
    "source_edition_or_year": "spec-v933 worked example (machine-verified)",
-   "source_section_or_page": "mult = sqrt(0.50) = 0.7071; conductor = 100*0.7071 = 70.71; OCPD = 3.0*100 = 300",
+   "source_section_or_page": "Table 630.31(A)(2) multiplier at 50% = 0.71 (the code rounds sqrt(0.5) = 0.7071); conductor = 100*0.71 = 71; OCPD = 3.0*100 = 300",
    "verified_by": "rl",
    "verified_on": "2026-07-18",
    "inputs": {
@@ -44659,7 +44807,7 @@
    },
    "outputs": {
     "conductor_current_a": {
-     "value": 70.711,
+     "value": 71,
      "tolerance": {
       "abs": 0.01
      }
@@ -44677,7 +44825,7 @@
    "source_publisher": "resistance-welder circuit sizing (NEC 630.31 / 630.32)",
    "source_title": "cross-check: 60 A primary, 20% duty -> 26.83 A conductor, 180 A OCPD",
    "source_edition_or_year": "spec-v933 worked example (machine-verified)",
-   "source_section_or_page": "mult = sqrt(0.20) = 0.4472; conductor = 60*0.4472 = 26.83; OCPD = 3.0*60 = 180",
+   "source_section_or_page": "Table 630.31(A)(2) multiplier at 20% = 0.45; conductor = 60*0.45 = 27; OCPD = 3.0*60 = 180",
    "verified_by": "rl",
    "verified_on": "2026-07-18",
    "inputs": {
@@ -44686,13 +44834,40 @@
    },
    "outputs": {
     "conductor_current_a": {
-     "value": 26.833,
+     "value": 27,
      "tolerance": {
       "abs": 0.01
      }
     },
     "ocpd_max_a": {
      "value": 180,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "welder-resistance-circuit-conductor",
+   "source_publisher": "NFPA (National Electrical Code Handbook)",
+   "source_title": "NEC Table 630.31(A)(2), Duty Cycle Multiplication Factors for Resistance Welders",
+   "source_edition_or_year": "2017 handbook sample pages",
+   "source_section_or_page": "duty cycle 30% -> multiplier 0.55 (table value; sqrt(0.30) = 0.5477)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "primary_current_a": 100,
+    "duty_pct": 30
+   },
+   "outputs": {
+    "duty_multiplier": {
+     "value": 0.55,
+     "tolerance": {
+      "abs": 0.0005
+     }
+    },
+    "conductor_current_a": {
+     "value": 55,
      "tolerance": {
       "abs": 0.01
      }
@@ -46696,6 +46871,29 @@
    }
   },
   {
+   "tile_id": "tailstock-setover",
+   "source_publisher": "McGraw-Hill (Krar, Technology of Machine Tools)",
+   "source_title": "Unit 54 Taper Turning, slides 54-21 / 54-22",
+   "source_edition_or_year": "course slides",
+   "source_section_or_page": "metric: 1:30 taper 60 mm long on a 300 mm workpiece, d 20, D 22 -> Offset = (22 - 20)/(2 x 60) x 300 = 5 mm (lengths entered in the inch fields; the ratio is unit-free)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "overall_length_in": 300,
+    "large_dia_in": 22,
+    "small_dia_in": 20,
+    "taper_length_in": 60
+   },
+   "outputs": {
+    "setover_in": {
+     "value": 5,
+     "tolerance": {
+      "abs": 0.0005
+     }
+    }
+   }
+  },
+  {
    "tile_id": "transformer-turns-ratio",
    "source_publisher": "ideal transformer circuit relations",
    "source_title": "480-to-120 V -> 4:1 turns ratio; 50 A secondary -> 12.5 A primary; 8 ohm load -> 128 ohm reflected",
@@ -46839,6 +47037,41 @@
    }
   },
   {
+   "tile_id": "belt-hp-transmitted",
+   "source_publisher": "McGraw-Hill (Budynas and Nisbett)",
+   "source_title": "Shigley's Mechanical Engineering Design, Chapter 17 solutions, Problem 17-2",
+   "source_edition_or_year": "10th edition, pp. 1-2",
+   "source_section_or_page": "d 2 in, 1750 rev/min, (F1)a 147 lbf, F2 57 lbf: V = pi(2)(1750)/12 = 916.3 ft/min; delta F 90 lbf; H = 90(916.3)/33 000 = 2.5 hp",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "tight_side_tension_lb": 147,
+    "slack_side_tension_lb": 57,
+    "sheave_diameter_in": 2,
+    "sheave_rpm": 1750
+   },
+   "outputs": {
+    "belt_speed_fpm": {
+     "value": 916.3,
+     "tolerance": {
+      "abs": 0.05
+     }
+    },
+    "effective_tension_lb": {
+     "value": 90,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "power_hp": {
+     "value": 2.5,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
    "tile_id": "tire-contact-patch",
    "source_publisher": "first-order pneumatic-tire relation A = W / p",
    "source_title": "900 lb corner at 35 psi -> 25.7 in^2 contact patch",
@@ -46880,6 +47113,27 @@
    "outputs": {
     "contact_area_in2": {
      "value": 60,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "tire-contact-patch",
+   "source_publisher": "Boeing Commercial Airplanes",
+   "source_title": "Airport Compatibility, Calculating Tire Contact Area",
+   "source_edition_or_year": "February 4, 2014",
+   "source_section_or_page": "313,900 / 6 = 52,317 lb per tire at 215 PSI -> 52,317 / 215 = 243.3 in2 contact area",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "corner_load_lb": 52317,
+    "inflation_pressure_psi": 215
+   },
+   "outputs": {
+    "contact_area_in2": {
+     "value": 243.3,
      "tolerance": {
       "abs": 0.05
      }

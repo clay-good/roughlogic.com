@@ -29281,10 +29281,13 @@ import { computeWelderResistanceCircuitConductor as _v933 } from "../../calc-ele
 
 test("bounds: spec-v933 computeWelderResistanceCircuitConductor pins the conductor, 300% OCPD, and error seams", () => {
   const r = _v933({ primary_current_a: 100, duty_pct: 50 });
-  assert.ok(Math.abs(r.conductor_current_a - 70.7107) < 1e-3); // 100 * sqrt(0.5)
+  // Table 630.31(A)(2) prints 0.71 at 50% (sqrt would give 70.71; until 2026-09-25 it did).
+  assert.ok(Math.abs(r.conductor_current_a - 71) < 1e-9); // 100 * 0.71
   assert.equal(r.ocpd_max_a, 300); // 3.0 * 100 (higher than arc's 200%)
   const low = _v933({ primary_current_a: 60, duty_pct: 20 });
-  assert.ok(Math.abs(low.conductor_current_a - 26.8328) < 1e-3); // 60 * sqrt(0.2)
+  assert.ok(Math.abs(low.conductor_current_a - 27) < 1e-9); // 60 * 0.45 (table row, not sqrt 0.4472)
+  // Between table rows the square root the table rounds is used.
+  assert.ok(Math.abs(_v933({ primary_current_a: 100, duty_pct: 60 }).duty_multiplier - Math.sqrt(0.6)) < 1e-12);
   assert.equal(low.ocpd_max_a, 180); // 3.0 * 60
   // Error seams: non-positive primary, duty out of range, non-finite.
   assert.ok("error" in _v933({ primary_current_a: 0, duty_pct: 50 }));

@@ -10903,7 +10903,7 @@ export const CITATIONS = {
     ],
   },
   "welder-resistance-circuit-conductor": {
-    formula: "duty_multiplier = sqrt(duty_pct / 100) (NEC 630.31(A)(2)); conductor_current_a = primary_current_a x duty_multiplier; ocpd_max_a = 3.0 x primary_current_a (630.32(A)).",
+    formula: "duty_multiplier = the Table 630.31(A)(2) value at a listed duty cycle (50% 0.71, 40% 0.63, 30% 0.55, 25% 0.50, 20% 0.45, 15% 0.39, 10% 0.32, 7.5% 0.27, 5% or less 0.22), else sqrt(duty_pct / 100), the relation the table rounds; conductor_current_a = primary_current_a x duty_multiplier; ocpd_max_a = 3.0 x primary_current_a (630.32(A)).",
     edition: "NEC 630.31 (conductors) and 630.32 (overcurrent protection) for resistance welding equipment, by name; the welder nameplate and the adopted NEC edition govern.",
     freeAccess: "The duty-cycle conductor derating and the 300% OCPD limit are public NEC (many jurisdictions post the adopted NEC); the rated primary current and duty come from the welder nameplate.",
     governance: GOVERNANCE.general,
