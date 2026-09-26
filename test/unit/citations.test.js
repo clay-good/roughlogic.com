@@ -123,7 +123,7 @@ test("Group G compliance tiles cite OSHA / ADA / NIOSH / NWS by section", () => 
   assert.match(CITATIONS["niosh-lifting"].edition, /NIOSH/);
   assert.match(CITATIONS["wind-chill"].edition, /NWS Wind Chill/);
   assert.match(CITATIONS["ramp-slope"].edition, /ADA Standards/);
-  assert.match(CITATIONS["ladder-angle"].edition, /ANSI A14\.7/);
+  assert.match(CITATIONS["ladder-angle"].edition, /A14\.1 \(wood\), A14\.2 \(metal\) and A14\.5/); // A14.7 is mobile ladder stands
   // The edition names the YEAR of the rate it ships. It read "IRS-published
   // standard mileage rate (current tax year)" until 2026-09-02 while the shard
   // carried the 2024 rate -- a page claiming a currency its bundled value did

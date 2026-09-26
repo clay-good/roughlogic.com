@@ -778,8 +778,8 @@
       "date": "2026-09-01"
     },
     "/tools/braking-distance/": {
-      "sha": "d460f1e6af24f609",
-      "date": "2026-09-01"
+      "sha": "56848653862a36d1",
+      "date": "2026-09-26"
     },
     "/tools/branch-circuit-wire-footage/": {
       "sha": "91cb12b3e5314e6f",
@@ -2414,8 +2414,8 @@
       "date": "2026-09-18"
     },
     "/tools/duct-friction-static/": {
-      "sha": "6fe1c290a20fe4d4",
-      "date": "2026-09-25"
+      "sha": "e84d9124d50885c4",
+      "date": "2026-09-26"
     },
     "/tools/duct-hanger-load/": {
       "sha": "315244dad19456eb",
@@ -2426,7 +2426,7 @@
       "date": "2026-09-01"
     },
     "/tools/duct-leakage/": {
-      "sha": "31ffcab77190c03b",
+      "sha": "b398ba0e5ce001ca",
       "date": "2026-09-26"
     },
     "/tools/duct-leakage-cfm25/": {
@@ -4058,8 +4058,8 @@
       "date": "2026-09-01"
     },
     "/tools/ladder-angle/": {
-      "sha": "230854d15fbed162",
-      "date": "2026-09-19"
+      "sha": "48c03ce4ff7a93db",
+      "date": "2026-09-26"
     },
     "/tools/ladder-pipe-reach/": {
       "sha": "e9237e8c97f826fd",

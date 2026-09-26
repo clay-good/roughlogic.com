@@ -2071,7 +2071,7 @@ export const CITATIONS = {
 
   "duct-leakage": {
     formula: "leakage_cfm = design_cfm - measured_cfm. leak_at_1inwc = leakage_cfm / (test_pressure_inwc)^0.65 (SMACNA leakage-class flow exponent). leak_per_100ft2 = leak_at_1inwc / duct_surface_ft2 × 100. Effective class = smallest SMACNA class (2, 3, 4, 6, 8, 12, 16, 24, 48) whose limit ≥ leak_per_100ft2.",
-    edition: "SMACNA HVAC Air Duct Leakage Test Manual (2nd ed., 2012) by name. " + ASHRAE_62_1.replace("ASHRAE 62.1", "ASHRAE 90.1-2022 §6.4.4.2.2") + " (leakage class 4 for tested duct).",
+    edition: "SMACNA HVAC Air Duct Leakage Test Manual (2nd ed., 2012) by name. ASHRAE 90.1-2022 (Energy Standard for Sites and Buildings Except Low-Rise Residential Buildings) §6.4.4.2.2, leakage class 4 for tested duct.",
     freeAccess: "SMACNA standards licensed; class-system overview free at smacna.org outreach. " + ASHRAE_FREE,
     governance: GOVERNANCE.mechanical,
     editionNote: "The 2012 2nd edition changed the class numbers: rectangular 24/12/6 became 16/8/4 and round/flat-oval 12/6/3 became 8/4/2. Both sets are offered, and a spec written to the 1985 manual still names the old class. ASHRAE 90.1 requires class 4 for all duct.",
@@ -3661,7 +3661,7 @@ export const CITATIONS = {
 
   "duct-friction-static": {
     formula: "Hydraulic diameter D_h = 4A/P (round D_h = D), used with the duct's own velocity in the friction-factor and loss terms; the rectangular Huebscher equivalent round D_eq = 1.30 × (W×H)^0.625 / (W+H)^0.250 is reported for sizing and is not mixed into the loss. Velocity V_fpm = CFM / A. Velocity pressure VP = (V/4005)². Friction factor from Swamee-Jain explicit Colebrook: f = 0.25 / [log10(eps/(3.7 D) + 5.74/Re^0.9)]². Pressure loss dP = f × (L/D) × (rho_air × V²/(2g)) converted to in WC. Fitting losses dP_fit = Σ (C_o × VP).",
-    edition: ASHRAE_62_1.replace("ASHRAE 62.1", "ASHRAE Handbook Fundamentals chapter 21") + " (referenced by name; principles in published engineering texts).",
+    edition: "ASHRAE Handbook, Fundamentals volume, Duct Design chapter (ch. 21), by name; principles in published engineering texts.",
     freeAccess: ASHRAE_FREE,
     governance: GOVERNANCE.mechanical,
     editionNote: "Single-edition (ASHRAE Fundamentals duct chapter; engineering-practice C_o values).",
@@ -6326,10 +6326,10 @@ export const CITATIONS = {
     edition: "Classical kinematics; AASHTO 'Policy on Geometric Design of Highways and Streets' (Green Book) by name.",
     freeAccess: "AASHTO Green Book licensed; kinematics free in physics texts.",
     governance: GOVERNANCE.fire,
-    editionNote: "Single-edition (physics + AASHTO).",
+    editionNote: "Physics, with AASHTO Green Book design values named for comparison: 2.5 s perception-reaction time and 11.2 ft/s² deceleration. The tile's 1.5 s and friction defaults are alert-driver and reconstruction values, not the Green Book's design values.",
     assumptions: [
-      { name: "Default friction μ", value: "0.7 dry asphalt / 0.4 wet / 0.2 ice unless user supplies", source: "AASHTO Green Book typical" },
-      { name: "Default reaction time", value: "1.5 s unless user supplies", source: "AASHTO Green Book typical" },
+      { name: "Default friction μ", value: "0.7 dry asphalt / 0.4 wet / 0.2 ice unless user supplies; the AASHTO Green Book's stopping sight distance uses a fixed 11.2 ft/s² deceleration (about μ = 0.35) instead", source: "common accident-reconstruction values; AASHTO Green Book for the design deceleration" },
+      { name: "Default reaction time", value: "1.5 s unless user supplies, an alert driver expecting to stop; the AASHTO Green Book design perception-reaction time is 2.5 s, which adds 1.0 s x 1.467 ft/s per mph (about 81 ft at 55 mph)", source: "AASHTO Green Book (2.5 s design value)" },
     ],
   },
   "confined-space-purge": {
@@ -6642,13 +6642,13 @@ export const CITATIONS = {
     ],
   },
   "ladder-angle": {
-    formula: "4:1 rule: base distance = working_length / 4. Angle θ = atan(rise / run); pass band 75-77 degrees per ANSI A14.7 / A1264.1 (target 75.5°).",
-    edition: "ANSI A14.7 (Mobile Ladder Stands and Mobile Ladder Stand Platforms) and ANSI/ASSP A1264.1 by name; OSHA 29 CFR 1926.1053 by section.",
+    formula: "4:1 rule: base distance = working_length / 4. Angle θ = atan(rise / run); pass band 75-77 degrees per the ANSI portable-ladder standards A14.1 / A14.2 / A14.5 (target 75.5°).",
+    edition: "ANSI/ASC A14.1 (wood), A14.2 (metal) and A14.5 (reinforced plastic) portable ladders, which set the 75.5° (4:1) setup angle, by name; OSHA 29 CFR 1926.1053 by section. A14.7 covers mobile ladder stands, not leaning ladders.",
     freeAccess: "29 CFR 1926.1053 free at ecfr.gov; ANSI standards licensed.",
     governance: GOVERNANCE.general,
     editionNote: "Single-edition (ANSI + OSHA stable convention).",
     assumptions: [
-      { name: "Pass-fail target", value: "75.5° (4:1)", source: "ANSI A14.7" },
+      { name: "Pass-fail target", value: "75.5° (4:1)", source: "ANSI A14.1 / A14.2 / A14.5" },
     ],
   },
   "pulley-ma-gen": {

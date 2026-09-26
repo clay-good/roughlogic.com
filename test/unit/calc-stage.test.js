@@ -88,3 +88,7 @@ test("Rigging: bridle treated like basket", () => { const a = computeRiggingChec
 
 // Renderers
 test("STAGE_RENDERERS: 6 ids", () => { for (const id of ["truss-capacity","time-alignment","dmx-planner","neutral-imbalance","spl-distance","rigging-check"]) assert.equal(typeof STAGE_RENDERERS[id], "function", id); });
+
+test("Rigging: 3/4 in screw-pin shackle is rated 4-3/4 t = 9,500 lb (Crosby G-209), not 10,000", () => {
+  assert.equal(RIGGING_HARDWARE.shackle_3_4_5T.wll_lb, 9500);
+});

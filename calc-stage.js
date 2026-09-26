@@ -301,7 +301,10 @@ export const splExample = { inputs: { L1_dB: 110, d1: 1, d2: 30, mode: "free_fie
 // Choker reduction factor 0.75 (matches v3 utility 161).
 
 export const RIGGING_HARDWARE = {
-  shackle_3_4_5T:    { wll_lb: 10000, label: "3/4 in screw-pin shackle (5T)" },
+  // A 3/4 in screw-pin shackle is rated 4-3/4 t = 9,500 lb (Crosby G-209,
+  // ASME B30.26 marking). Until 2026-09-25 this read 10,000 lb "(5T)", 5% over
+  // the rating. The key keeps its old name so saved links still resolve.
+  shackle_3_4_5T:    { wll_lb: 9500,  label: "3/4 in screw-pin shackle (4-3/4 t)" },
   sling_5_8_steel:   { wll_lb: 6700,  label: "5/8 in 6x19 IWRC steel sling (vertical)" },
   span_set_2T:       { wll_lb: 4400,  label: "2T span set (vertical)" },
   hoist_chain_1T:    { wll_lb: 2200,  label: "1T chain hoist (vertical)" },
