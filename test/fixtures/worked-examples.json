@@ -78577,6 +78577,45 @@
    }
   },
   {
+   "tile_id": "gas-dp-flow-meter",
+   "source_publisher": "SunCam (H. Bengtson)",
+   "source_title": "Course 247 Orifice and Venturi Pipe Flow Meters for Liquid and Gas Flow, Example 9",
+   "source_edition_or_year": "2010, pp. 28-29",
+   "source_section_or_page": "air (MW 29, k 1.4), 5 in orifice in a 12 in line, 1.20 psi dP, 20 psia, 50 F, Co 0.601: P2/P1 = 0.9400, Y = 0.984, Q = 26.52 cfs at line conditions",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "pipe_id_in": 12,
+    "bore_in": 5,
+    "dp_psi": 1.2,
+    "p1_psia": 20,
+    "temp_f": 50,
+    "gas_sg": 1.0013812154696133,
+    "kappa": 1.4,
+    "cd": 0.601
+   },
+   "outputs": {
+    "pressure_ratio": {
+     "value": 0.94,
+     "tolerance": {
+      "abs": 0.0001
+     }
+    },
+    "expansion_factor": {
+     "value": 0.984,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "acfm": {
+     "value": 1591.2,
+     "tolerance": {
+      "pct": 0.2
+     }
+    }
+   }
+  },
+  {
    "tile_id": "dp-flow-meter",
    "source_publisher": "Bernoulli / ISO 5167 primary element (SI cross-computed)",
    "source_title": "2 in orifice in 4 in water line, 1 psi, Cd 0.61 -> 75.2 gpm, beta 0.5 (spec-v1267)",
@@ -78822,6 +78861,28 @@
      "value": 34.29,
      "tolerance": {
       "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "outside-air-percent-temps",
+   "source_publisher": "Pacific Northwest National Laboratory",
+   "source_title": "PNWD-SA-8511 HVAC Economizers 101, Section 9",
+   "source_edition_or_year": "2009, slides 9-8 and 9-9",
+   "source_section_or_page": "(Tra 80 F - Tma 55 F) / (Tra 80 F - Toa 40 F) = 62.5% OA",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "t_ra_f": 80,
+    "t_ma_f": 55,
+    "t_oa_f": 40
+   },
+   "outputs": {
+    "pct_oa": {
+     "value": 62.5,
+     "tolerance": {
+      "abs": 0.01
      }
     }
    }
@@ -80037,6 +80098,35 @@
    }
   },
   {
+   "tile_id": "pool-chlorine-dose",
+   "source_publisher": "Whatcom County, WA",
+   "source_title": "Determining Pool Dosage Levels",
+   "source_edition_or_year": "2012",
+   "source_section_or_page": "25,000 gal x 8.34 lb/gal: 0.21 x 5 ppm = 1.05 lb chlorine; cal-hypo 1.05 / 0.65 = 1.61 lb (the county rounds 0.21 first)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "ppm": 5,
+    "gallons": 25000,
+    "product": "cal-hypo-65",
+    "avail": 0
+   },
+   "outputs": {
+    "lb_cl": {
+     "value": 1.05,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "lb_prod": {
+     "value": 1.61,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
    "tile_id": "pool-heater-btu",
    "source_publisher": "thermodynamics",
    "source_title": "20,000 gal, +10 F, 400,000 Btu/h gas at 80% -> 1,668,000 Btu, 5.2 h",
@@ -80218,6 +80308,42 @@
      "value": 12,
      "tolerance": {
       "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "breakpoint-chlorination",
+   "source_publisher": "Indiana Department of Health",
+   "source_title": "How to Shock the Pool (Chlorinate to Breakpoint), addendum",
+   "source_edition_or_year": "revised July 2019, pp. 3 and 8-9",
+   "source_section_or_page": "60,000 gal, FC 1.5, TC 2.3, 67% cal-hypo: CC = 0.8 ppm, x 10 = 8.0 ppm; 60,000 x 8.3 x 0.8 x 1.5 x 10 / 1,000,000 = 6 lb (the addendum assumes 0 ppm free chlorine; its main method subtracts FC)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "total_ppm": 2.3,
+    "free_ppm": 1.5,
+    "ratio": 10,
+    "gallons": 60000,
+    "avail": 67
+   },
+   "outputs": {
+    "combined_ppm": {
+     "value": 0.8,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "dose_ppm": {
+     "value": 8,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "lb_product": {
+     "value": 6,
+     "tolerance": {
+      "abs": 0.1
      }
     }
    }
@@ -82559,6 +82685,48 @@
    }
   },
   {
+   "tile_id": "sewage-force-main-velocity",
+   "source_publisher": "Uni-Bell PVC Pipe Association",
+   "source_title": "Force Main Design Guide for PVC Pipe",
+   "source_edition_or_year": "2022, pp. 10-11",
+   "source_section_or_page": "inside diameter 1.69 ft (20.28 in): normal 2,310 gpm -> v = 2.30 ft/s",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "gpm": 2310,
+    "id_in": 20.28
+   },
+   "outputs": {
+    "velocity_fps": {
+     "value": 2.3,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "sewage-force-main-velocity",
+   "source_publisher": "Uni-Bell PVC Pipe Association",
+   "source_title": "Force Main Design Guide for PVC Pipe",
+   "source_edition_or_year": "2022, pp. 10-11",
+   "source_section_or_page": "inside diameter 1.69 ft (20.28 in): maximum 5,070 gpm -> v = 5.04 ft/s",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "gpm": 5070,
+    "id_in": 20.28
+   },
+   "outputs": {
+    "velocity_fps": {
+     "value": 5.04,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
    "tile_id": "drywell-infiltration",
    "source_publisher": "Dry well / infiltration trench (void-ratio storage)",
    "source_title": "200 ft^3 runoff, 0.35 void, 4 ft deep, 0.5 in/hr -> 571 ft^3 pit, 143 sf, 33.6 hr draindown",
@@ -82612,6 +82780,35 @@
      "value": 168,
      "tolerance": {
       "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "drywell-infiltration",
+   "source_publisher": "Walton County, FL",
+   "source_title": "Low Impact Development Stormwater Technical Manual, Sec. 5.6 Infiltration Trench",
+   "source_edition_or_year": "August 16, 2019, pp. 158-159",
+   "source_section_or_page": "421 ft3, porosity 0.3, four feet deep -> 1,403 ft3 of trench, 350 ft2 footprint (truncated; no draindown step printed)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "runoff_volume_ft3": 421,
+    "void_ratio": 0.3,
+    "trench_depth_ft": 4,
+    "infiltration_rate_in_hr": 0.5
+   },
+   "outputs": {
+    "excavation_volume_ft3": {
+     "value": 1403,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "footprint_sf": {
+     "value": 350,
+     "tolerance": {
+      "abs": 1
      }
     }
    }
@@ -83485,6 +83682,40 @@
    }
   },
   {
+   "tile_id": "eoq-order-quantity",
+   "source_publisher": "LibreTexts (Faramarzi and Drane)",
+   "source_title": "Introduction to Operations Management (NWTC), Sec. 9.4 Economic Order Quantity",
+   "source_edition_or_year": "CC BY-NC-SA web edition",
+   "source_section_or_page": "annual demand 250,000, ordering cost $150, holding $12 per unit per year -> EOQ = 2,500; TC = 15,000 + 15,000 = $30,000 (100 orders; cycle length on a 250-day year not compared)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "annual_demand": 250000,
+    "order_cost": 150,
+    "holding_cost": 12
+   },
+   "outputs": {
+    "eoq": {
+     "value": 2500,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "orders_per_year": {
+     "value": 100,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "total_annual": {
+     "value": 30000,
+     "tolerance": {
+      "abs": 1
+     }
+    }
+   }
+  },
+  {
    "tile_id": "reorder-point",
    "source_publisher": "reorder point and safety stock (service-level inventory control)",
    "source_title": "100 units/day, 7-day lead, sd 20, 95% -> z 1.645, 87 units safety stock, reorder at 787",
@@ -83549,6 +83780,35 @@
    }
   },
   {
+   "tile_id": "reorder-point",
+   "source_publisher": "Pressbooks",
+   "source_title": "Supply Chain Management - An Integrated Approach, Sec. 8.4",
+   "source_edition_or_year": "web edition",
+   "source_section_or_page": "100 per day, 5-day lead time, daily sd 10, 95% (z 1.645): lead-time demand 500; safety stock 1.645 x 22.36 = 36.78 (the book rounds up to 37)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "avg_daily_demand": 100,
+    "lead_time_days": 5,
+    "demand_sd": 10,
+    "service_level_pct": 95
+   },
+   "outputs": {
+    "z": {
+     "value": 1.645,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "safety_stock": {
+     "value": 36.78,
+     "tolerance": {
+      "abs": 0.02
+     }
+    }
+   }
+  },
+  {
    "tile_id": "units-of-production-depr",
    "source_publisher": "units-of-production (activity) depreciation (GAAP)",
    "source_title": "$50,000 machine, $5,000 salvage, 100,000-unit life, 8,000 units -> $0.45/unit, $3,600, $46,400 book",
@@ -83602,6 +83862,36 @@
    "outputs": {
     "book_value": {
      "value": 5000,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "units-of-production-depr",
+   "source_publisher": "OpenStax",
+   "source_title": "Principles of Accounting, Vol. 1: Financial Accounting, Sec. 11.3",
+   "source_edition_or_year": "2019",
+   "source_section_or_page": "cost $54,000 + $1,500 shipping + $2,500 setup = $58,000, salvage $10,000, 960,000 pages; year 1 180,000 pages -> $0.05 per page, $9,000",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "cost_basis": 58000,
+    "salvage_value": 10000,
+    "total_units": 960000,
+    "period_units": 180000,
+    "accumulated_units": 180000
+   },
+   "outputs": {
+    "rate": {
+     "value": 0.05,
+     "tolerance": {
+      "abs": 1e-05
+     }
+    },
+    "period_depreciation": {
+     "value": 9000,
      "tolerance": {
       "abs": 0.5
      }
@@ -85724,6 +86014,32 @@
    }
   },
   {
+   "tile_id": "brake-pedal-hydraulic",
+   "source_publisher": "Wilwood Engineering",
+   "source_title": "FL162 Master Cylinder and Pedal Ratio Chart",
+   "source_edition_or_year": "REV 07/09/21",
+   "source_section_or_page": "100 lb pedal effort, 5:1 pedal, 7/8 in bore (0.60 sq in) -> 833 psi (Wilwood divides by the rounded 0.60; pi/4 x 0.875^2 = 0.6013 gives 831.5)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "pedal_force_lb": 100,
+    "pedal_ratio": 5,
+    "booster_factor": 1,
+    "mc_bore_in": 0.875,
+    "caliper_area_in2": 4,
+    "pad_friction": 0.4,
+    "rotor_radius_in": 4.5
+   },
+   "outputs": {
+    "line_psi": {
+     "value": 833,
+     "tolerance": {
+      "abs": 2
+     }
+    }
+   }
+  },
+  {
    "tile_id": "dyno-correction-sae",
    "source_publisher": "SAE J1349 dyno correction factor",
    "source_title": "400 hp observed, 980 mbar dry, 30 C -> CF 1.0220, 408.8 hp corrected",
@@ -85738,7 +86054,7 @@
    },
    "outputs": {
     "cf": {
-     "value": 1.022,
+     "value": 1.0219,
      "tolerance": {
       "abs": 0.001
      }
@@ -85766,7 +86082,7 @@
    },
    "outputs": {
     "cf": {
-     "value": 1.0444,
+     "value": 1.0442,
      "tolerance": {
       "abs": 0.001
      }

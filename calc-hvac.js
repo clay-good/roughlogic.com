@@ -4464,12 +4464,12 @@ export function computeMoistAirEnthalpy({ t_db_f = 0, w_lb_lb = 0 } = {}) {
   const h = h_sensible + h_latent;
   return {
     h, h_sensible, h_latent,
-    note: "ASHRAE I-P moist-air enthalpy h = 0.240 t + W (1061 + 0.444 t) Btu per lb dry air: 0.240 is the dry-air specific heat, 1061 the latent heat of vaporization at the 0 F datum, 0.444 the water-vapor specific heat. The humidity ratio W (lb water / lb dry air) is the moisture input - pair with outdoor-air-mix or a psychrometric chart to get W from RH. This is the total heat content of one air state; a cooling coil removes the difference between two of these. Sea-level coefficients; a design aid, not a substitute for a measured chart state or equipment ratings.",
+    note: "ASHRAE I-P moist-air enthalpy h = 0.240 t + W (1061 + 0.444 t) Btu per lb dry air: 0.240 is the dry-air specific heat, 1061 the enthalpy of saturated water vapor at 0 F (measured from liquid water at 32 F; dry air is referenced to 0 F), 0.444 the water-vapor specific heat. The humidity ratio W (lb water / lb dry air) is the moisture input - pair with outdoor-air-mix or a psychrometric chart to get W from RH. This is the total heat content of one air state; a cooling coil removes the difference between two of these. Sea-level coefficients; a design aid, not a substitute for a measured chart state or equipment ratings.",
   };
 }
 export const moistAirEnthalpyExample = { inputs: { t_db_f: 80, w_lb_lb: 0.0112 } };
 HVAC_RENDERERS["moist-air-enthalpy"] = _rEnv({
-  citation: "Citation: Moist-air enthalpy (ASHRAE Handbook - Fundamentals): h = 0.240 t + W (1061 + 0.444 t) Btu per lb dry air, with t the dry-bulb (F) and W the humidity ratio (lb water / lb dry air). 0.240 = dry-air specific heat, 1061 = latent heat at the 0 F datum, 0.444 = water-vapor specific heat. Total heat content of one air state; pair with outdoor-air-mix or a psychrometric chart for W. Sea-level coefficients; a design aid, not a substitute for a measured chart state or equipment ratings.",
+  citation: "Citation: Moist-air enthalpy (ASHRAE Handbook - Fundamentals): h = 0.240 t + W (1061 + 0.444 t) Btu per lb dry air, with t the dry-bulb (F) and W the humidity ratio (lb water / lb dry air). 0.240 = dry-air specific heat, 1061 = enthalpy of saturated vapor at 0 F (from liquid water at 32 F), 0.444 = water-vapor specific heat. Total heat content of one air state; pair with outdoor-air-mix or a psychrometric chart for W. Sea-level coefficients; a design aid, not a substitute for a measured chart state or equipment ratings.",
   example: moistAirEnthalpyExample.inputs,
   fields: [
     { key: "t_db_f", label: "Dry-bulb temperature (°F)", kind: "number" },
@@ -4495,12 +4495,12 @@ export function computeDrybulbFromEnthalpy({ enthalpy_btu = 0, w_lb_lb = 0 } = {
   const h_sensible = h - h_latent;
   return {
     t_db_f, h_sensible, h_latent,
-    note: "The dry-bulb temperature of a moist-air state from its enthalpy and humidity ratio, the inverse of the moist-air-enthalpy tile: solving h = 0.240 t + W (1061 + 0.444 t) for t gives t = (h - 1061 W) / (0.240 + 0.444 W) deg F. Use it to recover the dry-bulb of a coil's entering or leaving state when a psychrometric analysis gives the enthalpy and the humidity ratio but not the temperature directly. 0.240 is the dry-air specific heat, 1061 the latent heat at the 0 F datum, and 0.444 the water-vapor specific heat (ASHRAE I-P, sea level). The humidity ratio must come from the chart or the RH; this returns the dry-bulb of one state, not the wet-bulb or dew point. A design aid, not a substitute for a measured chart state or equipment ratings.",
+    note: "The dry-bulb temperature of a moist-air state from its enthalpy and humidity ratio, the inverse of the moist-air-enthalpy tile: solving h = 0.240 t + W (1061 + 0.444 t) for t gives t = (h - 1061 W) / (0.240 + 0.444 W) deg F. Use it to recover the dry-bulb of a coil's entering or leaving state when a psychrometric analysis gives the enthalpy and the humidity ratio but not the temperature directly. 0.240 is the dry-air specific heat, 1061 the enthalpy of saturated vapor at 0 F (from liquid water at 32 F), and 0.444 the water-vapor specific heat (ASHRAE I-P, sea level). The humidity ratio must come from the chart or the RH; this returns the dry-bulb of one state, not the wet-bulb or dew point. A design aid, not a substitute for a measured chart state or equipment ratings.",
   };
 }
 export const drybulbFromEnthalpyExample = { inputs: { enthalpy_btu: 31.48, w_lb_lb: 0.0112 } };
 HVAC_RENDERERS["drybulb-from-enthalpy"] = _rEnv({
-  citation: "Citation: Moist-air enthalpy (ASHRAE Handbook - Fundamentals) solved for the dry-bulb: t = (h - 1061 W) / (0.240 + 0.444 W) deg F, the inverse of h = 0.240 t + W (1061 + 0.444 t). 0.240 = dry-air specific heat, 1061 = latent heat at the 0 F datum, 0.444 = water-vapor specific heat. The humidity ratio comes from the chart or RH. Sea-level coefficients; a design aid, not a substitute for a measured chart state or equipment ratings.",
+  citation: "Citation: Moist-air enthalpy (ASHRAE Handbook - Fundamentals) solved for the dry-bulb: t = (h - 1061 W) / (0.240 + 0.444 W) deg F, the inverse of h = 0.240 t + W (1061 + 0.444 t). 0.240 = dry-air specific heat, 1061 = enthalpy of saturated vapor at 0 F (from liquid water at 32 F), 0.444 = water-vapor specific heat. The humidity ratio comes from the chart or RH. Sea-level coefficients; a design aid, not a substitute for a measured chart state or equipment ratings.",
   example: drybulbFromEnthalpyExample.inputs,
   fields: [
     { key: "enthalpy_btu", label: "Enthalpy h (Btu/lb dry air)", kind: "number" },
@@ -4849,18 +4849,33 @@ export function computeEconomizerEnthalpyChangeover({ mode = "differential_entha
   const hoa = Number(h_outdoor);
   const hra = Number(h_return);
   if (!Number.isFinite(hoa) || !Number.isFinite(hra)) return { error: "Enter valid enthalpies (Btu/lb)." };
+  if (mode === "differential_enthalpy_drybulb") {
+    // ASHRAE 90.1-2013+ Table 6.5.1.1.3: "differential enthalpy with fixed dry-bulb" shuts off when
+    // hOA > hRA OR TOA > the fixed limit (65/70/75 F by climate zone). Added 2026-09-26 (Trane EN 44-2).
+    const toa = Number(t_outdoor_f);
+    const sp = Number(setpoint_f);
+    if (!Number.isFinite(toa) || !Number.isFinite(sp) || !(sp > 0)) return { error: "Enter the outdoor dry-bulb and the fixed dry-bulb limit (F)." };
+    const enth_ok = !(hoa > hra);
+    const db_ok = !(toa > sp);
+    const enable = enth_ok && db_ok;
+    return {
+      mode, enable, margin: db_ok ? hra - hoa : sp - toa, unit: db_ok ? "Btu/lb" : "F", margin_btu: hra - hoa, margin_f: sp - toa, enth_ok, db_ok,
+      note: "Differential enthalpy with fixed dry-bulb (the ASHRAE 90.1-2013 and later prescriptive control, Table 6.5.1.1.3): free cooling shuts off when the outdoor enthalpy exceeds the return enthalpy OR the outdoor dry-bulb exceeds the fixed limit (75 F in dry and marine zones, 70 F in 5A/6A, 65 F in 1A-4A). Plain differential enthalpy was removed from the prescriptive table in 90.1-2013, because a hot, dry outdoor day can carry less enthalpy than the return yet still add sensible load. The margin shown is to the dry-bulb limit when that limit locks the economizer out, otherwise to the return enthalpy. A control aid; the 90.1 edition the jurisdiction adopted and the equipment sequence govern.",
+    };
+  }
   const enable = hoa < hra;
   return {
     mode, enable, margin: hra - hoa, unit: "Btu/lb",
-    note: "Differential-enthalpy economizer high-limit: enable free cooling when the outdoor-air total heat content (enthalpy) is below the return-air enthalpy, lock out above it. Unlike a dry-bulb changeover this accounts for the latent (moisture) load, so a cool but humid outdoor condition that carries more total energy than the return correctly locks the economizer out - bringing that air in would add a dehumidification load. Feed the enthalpies from moist-air-enthalpy. A control aid; the ASHRAE 90.1 high-limit and the equipment sequence govern.",
+    note: "Differential-enthalpy economizer high-limit: enable free cooling when the outdoor-air total heat content (enthalpy) is below the return-air enthalpy, lock out above it. Unlike a dry-bulb changeover this accounts for the latent (moisture) load, so a cool but humid outdoor condition that carries more total energy than the return correctly locks the economizer out - bringing that air in would add a dehumidification load. Feed the enthalpies from moist-air-enthalpy. ASHRAE 90.1-2013 and later no longer list plain differential enthalpy as a prescriptive high-limit: it must be paired with a fixed dry-bulb limit (the combined mode). A control aid; the ASHRAE 90.1 high-limit and the equipment sequence govern.",
   };
 }
 export const economizerEnthalpyChangeoverExample = { inputs: { mode: "differential_enthalpy", h_outdoor: 24, h_return: 28, t_outdoor_f: 70, setpoint_f: 65 } };
 function _v443renderEconomizerEnthalpyChangeover(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: Economizer high-limit changeover (ASHRAE 90.1 6.5.1.1.3): differential-enthalpy enables free cooling when outdoor enthalpy < return enthalpy (accounts for latent load); fixed-dry-bulb enables below a dry-bulb setpoint. A control aid; the 90.1 high-limit for the climate zone and the equipment sequence govern.";
+  citationEl.textContent = "Citation: Economizer high-limit changeover (ASHRAE 90.1 6.5.1.1.3): differential-enthalpy enables free cooling when outdoor enthalpy < return enthalpy (accounts for latent load); fixed-dry-bulb enables below a dry-bulb setpoint; 90.1-2013 and later require the combined form, shutting off when hOA > hRA OR TOA > the 65/70/75 F limit. A control aid; the 90.1 high-limit for the climate zone and the equipment sequence govern.";
   const mode = makeSelect("Changeover type", "eco-mode", [
     { value: "differential_enthalpy", label: "Differential enthalpy (accounts for humidity)" },
     { value: "fixed_drybulb", label: "Fixed dry-bulb setpoint" },
+    { value: "differential_enthalpy_drybulb", label: "Differential enthalpy + fixed dry-bulb (90.1-2013+)" },
   ]);
   inputRegion.appendChild(mode.wrap);
   const hoa = makeNumber("Outdoor-air enthalpy (Btu/lb)", "eco-hoa", { step: "any" });
@@ -4872,7 +4887,7 @@ function _v443renderEconomizerEnthalpyChangeover(inputRegion, outputRegion, cita
   const oM = makeOutputLine(outputRegion, "Margin to changeover", "eco-out-m");
   const oNote = makeOutputLine(outputRegion, "Note", "eco-out-n");
   function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
-  function sync() { const en = mode.select.value === "differential_enthalpy"; hoa.wrap.style.display = en ? "" : "none"; hra.wrap.style.display = en ? "" : "none"; toa.wrap.style.display = en ? "none" : ""; sp.wrap.style.display = en ? "none" : ""; }
+  function sync() { const m = mode.select.value; const en = m !== "fixed_drybulb"; const db = m !== "differential_enthalpy"; hoa.wrap.style.display = en ? "" : "none"; hra.wrap.style.display = en ? "" : "none"; toa.wrap.style.display = db ? "" : "none"; sp.wrap.style.display = db ? "" : "none"; }
   const update = debounce(() => {
     const r = computeEconomizerEnthalpyChangeover({ mode: mode.select.value, h_outdoor: readNum(hoa.input), h_return: readNum(hra.input), t_outdoor_f: readNum(toa.input), setpoint_f: readNum(sp.input) });
     if (r.error) { oE.textContent = r.error; oM.textContent = "-"; oNote.textContent = ""; return; }

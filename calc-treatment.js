@@ -597,14 +597,16 @@ export function computePoolChlorineDose({ ppm = 0, gallons = 0, product = "cal-h
   if (av === undefined) return { error: "Unknown product." };
   if (!(av > 0 && av <= 100)) return { error: "Available chlorine must be between 0 and 100 percent." };
   const lb_cl = rise * (gal / 1e6) * 8.34;
-  const lb_prod = lb_cl / (av / 100);
-  const dry_oz = lb_prod * 16;
+  const dry_oz = lb_cl / (av / 100) * 16;
   // Liquid chlorine is sold by TRADE percent (g available chlorine per 100 mL):
   // gallons = lb Cl / (pct/100 x 8.34). Until 2026-09-18 this took the percent
   // as a weight fraction of a 10 lb/gal liquid, 17% short (8.5 fl oz per ppm
   // per 10,000 gal where 12.5% trade needs 10.2).
   const liq_floz = lb_cl / (av / 100 * 8.34) * 128;
   const isLiquid = product === "liquid-12.5" || (product === "custom" && av <= 15);
+  // A liquid's weight follows from its volume and density (12.5% trade weighs about 10 lb/gal, SG ~1.2), not from
+  // lb_cl / trade fraction. Until 2026-09-26 the liquid pounds read 8.34 lb per 1.04 lb Cl where a gallon weighs ~10 lb.
+  const lb_prod = isLiquid ? (liq_floz / 128) * 8.34 * (1 + 0.0158 * av) : lb_cl / (av / 100);
   return {
     lb_cl, lb_prod, dry_oz, liq_floz, avail_pct: av, isLiquid,
     note: "Free-chlorine dose: pounds of chlorine = ppm x (gallons/1,000,000) x 8.34, divided by the product's available-chlorine fraction to get the product weight, then expressed as dry ounces or (for liquid, sold by TRADE percent -- grams of available chlorine per 100 mL -- gallons = lb / (percent x 8.34)) fluid ounces. A weaker product needs proportionally more weight - liquid 12.5% trade (about 10.4% by weight) takes about six times the weight of 65% cal-hypo for the same chlorine - the cost/handling trade between a cheap heavy jug and a concentrated scoop. Dose to a target free-chlorine level; test and retest, and follow the product label. A pool-care aid, not a substitute for the label directions.",
@@ -816,7 +818,7 @@ export function computeBreakpointChlorination({ total_ppm = 0, free_ppm = 0, rat
   if (gal > 0 && av > 0) lb_product = dose_ppm * (gal / 1e6) * 8.34 / (av / 100);
   return {
     combined_ppm, dose_ppm, lb_product,
-    note: "Breakpoint (superchlorination) shock: combined chlorine (chloramines) = total - free, and the free-chlorine dose to reach breakpoint = ratio x combined (the ratio is commonly ~10:1). Chloramines cause the 'chlorine smell' and eye irritation; a partial dose below breakpoint makes it worse, so shock all the way. A heavier chloramine load needs a proportionally heavier shock, the reason letting combined chlorine build is expensive to clear. Optional volume and product strength convert the ppm dose to product weight. A pool-care aid; the product label and testing govern.",
+    note: "Breakpoint (superchlorination) shock: combined chlorine (chloramines) = total - free, and the free-chlorine dose to reach breakpoint = ratio x combined (the ratio is commonly ~10:1). Chloramines cause the 'chlorine smell' and eye irritation; a partial dose below breakpoint makes it worse, so shock all the way. The dose here is the full ratio x combined, added on top of the free chlorine already present (the Indiana Department of Health shortcut, which assumes 0 ppm free); its longer method subtracts the existing free chlorine (breakpoint level - free), a smaller dose, so a pool that already carries free chlorine may need less than this. A heavier chloramine load needs a proportionally heavier shock, the reason letting combined chlorine build is expensive to clear. Optional volume and product strength convert the ppm dose to product weight. A pool-care aid; the product label and testing govern.",
   };
 }
 export const breakpointChlorinationExample = { inputs: { total_ppm: 1.5, free_ppm: 1.0, ratio: 10, gallons: 15000, avail: 65 } };

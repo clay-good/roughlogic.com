@@ -6,10 +6,20 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Added
 
+- **`economizer-enthalpy-changeover` has the ASHRAE 90.1-2013+ control: differential enthalpy with a fixed dry-bulb limit.** Plain differential enthalpy left 90.1's prescriptive table in 2013. The new mode also locks out a hot, dry day whose enthalpy is below the return: 24 Btu/lb at 80 F against a 75 F limit (Trane Engineers Newsletter 44-2).
 - **`stadia-distance` takes the stadia constant C of an external-focusing instrument.** H gains C cos(theta) and V gains C sin(theta). The NAVEDTRA 14070 example (C = 1.0) now reproduces exactly: 692.34 ft, 326.28 ft, elevation 705.98. C defaults to 0, so internal-focusing results are unchanged.
 
 ### Fixed
 
+- **`dyno-correction-sae` uses the SAE J1349 AUG2004 constants, 1.176 and 0.176.** It had the JUN90 1.180 and 0.180 under the AUG2004 validity window. The example's CF moves from 1.0220 to 1.0219.
+- **`pool-chlorine-dose` liquid pounds follow from the gallons.** The fluid ounces already used trade percent, but the pounds were lb Cl / 0.125, so 128 fl oz of 12.5% read 8.34 lb where a gallon weighs about 10 lb. The note's "about six times the weight of cal-hypo" is now what the tile returns.
+- **Prose corrections found against printed sources:**
+  - `breakpoint-chlorination` now says its 10 x CC dose goes on top of the free chlorine already present. That is the Indiana Department of Health shortcut; the department's longer method subtracts FC.
+  - `drywell-infiltration` calls its stone fraction porosity, voids over total. It was labeled "void ratio", which in soils means voids over solids.
+  - `brake-pedal-hydraulic` asks for the piston area on ONE side of the caliper, following Wilwood FL162.
+  - `sewage-force-main-velocity` cites Ten States 49.1 for the 8 ft/s limit (headloss and valves) and notes its 4 in minimum.
+  - `air-density-correction` desc now states the code's 6.8754e-6 and 5.2559 constants.
+  - The moist-air tiles describe 1061 as the enthalpy of saturated vapor at 0 F, measured from liquid water at 32 F.
 - **`sliding-snow-load` no longer says a narrow lower roof concentrates the load.** The code was fixed on September 19 so that a roof narrower than 15 ft takes only its width/15 share. The note, citation, description and output label still said the whole load packs into a heavier surcharge. All four now match the code and O'Rourke's ASCE 7-05 Example 2: a 12 ft garage takes 133 plf at 11.1 psf.
 - **`capacitor-discharge-time` asks for the peak voltage on an ac bank.** The bleed resistor is sized from V0, and an ac capacitor can be cut off at its peak, 1.414 x rms. Entering 480 V rms instead of 679 V returns a resistor too large to meet the 460.6 limit. The label, note and citation now say so; the continuous burn on an ac bank is about half the V0^2/R shown.
 - **Twenty-two tiles now refuse a negative entry instead of returning a negative quantity.** A sweep flipped the sign of every input in each tile's first fixture row. Before this fix, a negative slab length returned -81 bags of concrete; a negative coat count, -4 gallons of paint; a negative module Voc, a -14-module string. The same happened for area, pipe volume, board footage, box fill, water-heater recovery, trap primer, rainwater yield, combustion air, battery runtime, mortar, nail pullout, vehicle axle loads, bolt nut factor, weld cost, pallet weight, SRT/F:M, seller net sheet, sector area and rooftop-curb fasteners. Inputs that really can be signed (a cooling delta-T, a downhill grade, temperatures, a datum arm) were left alone.
@@ -19,6 +29,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 - **`masonry-lintel-loading` now needs 8 in of wall above the triangle before it credits arching.** NCMA TEK 17-1 requires the 45-degree load triangle plus at least 8 in of masonry above its apex. The tile used to credit arching as soon as the wall reached span/2. A 6 ft opening with 3.5 ft of wall above now carries the full 1,260 lb rectangle instead of the 540 lb triangle.
 
 ### Changed
+
+- **Ten more tiles now carry a publisher's printed example.** No formula errors were found beyond the fixes above.
+  - **Inventory and accounting:** `eoq-order-quantity` (LibreTexts), `reorder-point` (Pressbooks), `units-of-production-depr` (OpenStax).
+  - **Flow and HVAC:** `gas-dp-flow-meter` (SunCam 247 Example 9), `outside-air-percent-temps` (PNNL).
+  - **Water and drainage:** `breakpoint-chlorination` (Indiana DOH), `pool-chlorine-dose` (Whatcom County), `sewage-force-main-velocity` (Uni-Bell), `drywell-infiltration` (Walton County LID manual).
+  - **Automotive:** `brake-pedal-hydraulic` (Wilwood FL162).
+
+  README: 1,022 of 2,183 tiles are checked only against the project's own derivation; 1,161 carry an outside source.
 
 - **Nine more tiles now carry a publisher's printed example.** No formula errors were found beyond the fixes above.
   - **Mechanics:** `shaft-torsion` (Pytel & Singer Problem 304), `thermal-stress-restrained` (DOE-HDBK-1017), `hoop-stress-thin-wall` (Hibbeler Problem 8-4).

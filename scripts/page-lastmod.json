@@ -2,7 +2,7 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "bb7dad0b40aeeac8",
+      "sha": "2601a2a968eeba01",
       "date": "2026-09-26"
     },
     "/tools/": {
@@ -210,8 +210,8 @@
       "date": "2026-09-07"
     },
     "/tools/air-density-correction/": {
-      "sha": "89f1ac5cd208c034",
-      "date": "2026-09-19"
+      "sha": "69a92fa3db9a3511",
+      "date": "2026-09-26"
     },
     "/tools/air-dryer-sizing/": {
       "sha": "ba0d1d4cc9514404",
@@ -774,8 +774,8 @@
       "date": "2026-09-25"
     },
     "/tools/brake-pedal-hydraulic/": {
-      "sha": "6ced979a098b80f9",
-      "date": "2026-09-01"
+      "sha": "6840009c55746851",
+      "date": "2026-09-26"
     },
     "/tools/braking-distance/": {
       "sha": "56848653862a36d1",
@@ -2346,8 +2346,8 @@
       "date": "2026-09-01"
     },
     "/tools/drybulb-from-enthalpy/": {
-      "sha": "e048f27125de05d8",
-      "date": "2026-09-01"
+      "sha": "cd6a286ceb26f5ae",
+      "date": "2026-09-26"
     },
     "/tools/dryer-demand-220-54/": {
       "sha": "22d4717a634aef23",
@@ -2390,8 +2390,8 @@
       "date": "2026-09-04"
     },
     "/tools/drywell-infiltration/": {
-      "sha": "0ceb3495fea32d67",
-      "date": "2026-09-04"
+      "sha": "49ecf3279c8a1c7c",
+      "date": "2026-09-26"
     },
     "/tools/dti/": {
       "sha": "e270c2fd4a2d57aa",
@@ -2490,8 +2490,8 @@
       "date": "2026-09-01"
     },
     "/tools/dyno-correction-sae/": {
-      "sha": "34712d84cdc2ccf9",
-      "date": "2026-09-01"
+      "sha": "cb5411b5a599b14b",
+      "date": "2026-09-26"
     },
     "/tools/earthwork-end-area/": {
       "sha": "5f66262e60cb9a63",
@@ -2506,8 +2506,8 @@
       "date": "2026-09-01"
     },
     "/tools/economizer-enthalpy-changeover/": {
-      "sha": "f4a2bbe316cdfd3f",
-      "date": "2026-09-01"
+      "sha": "c7fc65818dbb5e79",
+      "date": "2026-09-26"
     },
     "/tools/economizer-savings-hours/": {
       "sha": "80e9ca3789e306af",
@@ -4642,8 +4642,8 @@
       "date": "2026-09-09"
     },
     "/tools/moist-air-enthalpy/": {
-      "sha": "70ddaaf29f1524df",
-      "date": "2026-09-08"
+      "sha": "d9551c5fbb5c4c1a",
+      "date": "2026-09-26"
     },
     "/tools/moisture-dry-goal/": {
       "sha": "c0c72014d0eb7817",

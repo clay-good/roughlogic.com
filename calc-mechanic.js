@@ -3204,7 +3204,7 @@ export function computeBrakePedalHydraulic({ pedal_force_lb = 0, pedal_ratio = 0
   if (![mc_force_lb, line_psi, clamp_lb, brake_torque_inlb].every(Number.isFinite)) return { error: "Brake-hydraulic math is not a finite value." };
   return {
     mc_force_lb, line_psi, clamp_lb, brake_torque_inlb,
-    note: "Hydraulic brake force chain (Pascal's law): mc_force = pedal_force x pedal_ratio x booster; line_pressure = mc_force / mc_area (mc_area = pi/4 x bore^2); clamp = line_pressure x caliper_area; brake_torque = clamp x 2 x pad_friction x rotor_radius. Because pressure is force over area and area scales with the SQUARE of the bore, DOUBLING the master-cylinder bore QUARTERS the line pressure for the same leg effort -- the whole manual-versus-boosted trade: a big-bore master makes less pressure but moves more fluid (firmer-but-heavier), a small-bore master makes pressure easily but needs more pedal travel. The factor of 2 in the torque accounts for both pad faces. A design aid, not a validated brake system; the actual pad friction, thermal state, and system compliance govern.",
+    note: "Hydraulic brake force chain (Pascal's law): mc_force = pedal_force x pedal_ratio x booster; line_pressure = mc_force / mc_area (mc_area = pi/4 x bore^2); clamp = line_pressure x caliper_area, with caliper_area the piston area on ONE side of the caliper (Wilwood FL162: total piston area from one side; enter an opposed caliper's full count and the torque doubles); brake_torque = clamp x 2 x pad_friction x rotor_radius. Because pressure is force over area and area scales with the SQUARE of the bore, DOUBLING the master-cylinder bore QUARTERS the line pressure for the same leg effort -- the whole manual-versus-boosted trade: a big-bore master makes less pressure but moves more fluid (firmer-but-heavier), a small-bore master makes pressure easily but needs more pedal travel. The factor of 2 in the torque accounts for both pad faces. A design aid, not a validated brake system; the actual pad friction, thermal state, and system compliance govern.",
   };
 }
 export const brakePedalHydraulicExample = { inputs: { pedal_force_lb: 50, pedal_ratio: 5, booster_factor: 1, mc_bore_in: 0.875, caliper_area_in2: 4, pad_friction: 0.4, rotor_radius_in: 4.5 } };
@@ -3217,7 +3217,7 @@ MECHANIC_RENDERERS["brake-pedal-hydraulic"] = _simpleRenderer({
     { key: "pedal_ratio", label: "Pedal ratio", kind: "number" },
     { key: "booster_factor", label: "Booster factor (1.0 = manual)", kind: "number" },
     { key: "mc_bore_in", label: "Master-cylinder bore (in)", kind: "number" },
-    { key: "caliper_area_in2", label: "Caliper piston area per corner (in²)", kind: "number" },
+    { key: "caliper_area_in2", label: "Caliper piston area, ONE side (in²; the torque doubles it for two pad faces)", kind: "number" },
     { key: "pad_friction", label: "Pad friction coefficient (~0.4)", kind: "number" },
     { key: "rotor_radius_in", label: "Effective rotor radius (in)", kind: "number" },
   ],
@@ -3256,13 +3256,15 @@ export function computeDynoCorrectionSae({ observed_hp = 0, baro_mbar = 0, baro_
   const vapor_mbar = es_mbar * rh / 100;
   const p_dry_mbar = baro - vapor_mbar;
   if (!(p_dry_mbar > 0)) return { error: "Dry pressure came out non-positive; check the barometric pressure and humidity." };
-  const cf = 1.18 * (990 / p_dry_mbar) * Math.sqrt((t + 273) / 298) - 0.18;
+  // SAE J1349 AUG2004 constants 1.176 / 0.176 (85% mechanical efficiency); until 2026-09-26 the JUN90 1.180 / 0.180
+  // were used under the AUG2004 validity window (a 0.0001-0.001 difference in CF across that window).
+  const cf = 1.176 * (990 / p_dry_mbar) * Math.sqrt((t + 273) / 298) - 0.176;
   const corrected_hp = p * cf;
   const in_window = t >= 15 && t <= 35 && p_dry_mbar >= 900 && p_dry_mbar <= 1050;
   if (![vapor_mbar, p_dry_mbar, cf, corrected_hp].every(Number.isFinite)) return { error: "Dyno-correction math is not a finite value." };
   return {
     vapor_mbar, p_dry_mbar, cf, corrected_hp, in_window,
-    note: "SAE J1349 dyno correction factor: corrects observed power to a standard day (25 C, 99 kPa DRY). The pressure used must be the DRY pressure with the water-vapor pressure removed (humid air makes less power, and the correction must know it): P_dry = baro - vapor, CF = 1.18 x (990 / P_dry) x sqrt((temp_C + 273)/298) - 0.18, corrected = observed x CF. The factor is valid only in about the 15 to 35 C and 900 to 1050 mbar window; outside it the correction distorts (this tile flags it). The older STD (SAE J607) basis runs about 4% higher than J1349, so a shop quoting STD numbers cannot be compared to a SAE number without matching the basis. A comparison aid, not a certified rating; the dyno, correction basis, and test procedure govern.",
+    note: "SAE J1349 dyno correction factor: corrects observed power to a standard day (25 C, 99 kPa DRY). The pressure used must be the DRY pressure with the water-vapor pressure removed (humid air makes less power, and the correction must know it): P_dry = baro - vapor, CF = 1.176 x (990 / P_dry) x sqrt((temp_C + 273)/298) - 0.176 (SAE J1349 AUG2004), corrected = observed x CF. The factor is valid only in about the 15 to 35 C and 900 to 1050 mbar window; outside it the correction distorts (this tile flags it). The older STD (SAE J607) basis runs about 4% higher than J1349, so a shop quoting STD numbers cannot be compared to a SAE number without matching the basis. A comparison aid, not a certified rating; the dyno, correction basis, and test procedure govern.",
   };
 }
 export const dynoCorrectionSaeExample = { inputs: { observed_hp: 400, baro_mbar: 980, air_temp_c: 30, humidity_pct: 0 } };
@@ -3273,7 +3275,7 @@ export const dynoCorrectionSaeExample = { inputs: { observed_hp: 400, baro_mbar:
 // page shows are real compute parameters and the agent door advertises the same
 // units a person sees. Fixtures stay correlation-native.
 MECHANIC_RENDERERS["dyno-correction-sae"] = _simpleRenderer({
-  citation: "Citation: SAE J1349 dyno correction factor (STD per SAE J607): P_dry = baro - vapor(temp, RH); CF = 1.18 x (990 / P_dry_mbar) x sqrt((temp_C + 273)/298) - 0.18; corrected = observed x CF. Corrects to a standard dry day; the pressure must be dry (vapor removed); valid ~15-35 C, 900-1050 mbar; STD (J607) runs ~4% higher. A comparison aid; the dyno and correction basis govern.",
+  citation: "Citation: SAE J1349 dyno correction factor (STD per SAE J607): P_dry = baro - vapor(temp, RH); CF = 1.176 x (990 / P_dry_mbar) x sqrt((temp_C + 273)/298) - 0.176 (J1349 AUG2004); corrected = observed x CF. Corrects to a standard dry day; the pressure must be dry (vapor removed); valid ~15-35 C, 900-1050 mbar; STD (J607) runs ~4% higher. A comparison aid; the dyno and correction basis govern.",
   example: { observed_hp: 400, baro_inhg: 28.94, air_temp_f: 86, humidity_pct: 0 },
   fields: [
     { key: "observed_hp", label: "Observed power (hp)", kind: "number", default: 400 },

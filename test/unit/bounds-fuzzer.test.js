@@ -20584,7 +20584,10 @@ test("bounds: spec-v353 computePoolChlorineDose pins the mass balance, the dry/l
   // Liquid is sold by TRADE percent (12.5 g Cl per 100 mL): 0.2502 lb / (0.125 x 8.34) gal = 30.7 fl oz.
   const liq = _v353({ ppm: 2, gallons: 15000, product: "liquid-12.5" });
   assert.ok(liq.isLiquid && Math.abs(liq.liq_floz - 30.72) < 0.01);
-  assert.ok(Math.abs(liq.lb_prod / r.lb_prod - 65 / 12.5) < 1e-9);
+  // Liquid pounds follow from the gallons at ~10 lb/gal (SG ~1.2), about 6x the cal-hypo weight, as the note says.
+  // Until 2026-09-26 they were lb_cl / 0.125 (a 5.2x ratio), inconsistent with the trade-percent gallons.
+  assert.ok(Math.abs(liq.lb_prod - (liq.liq_floz / 128) * 8.34 * (1 + 0.0158 * 12.5)) < 1e-9);
+  assert.ok(liq.lb_prod / r.lb_prod > 6 && liq.lb_prod / r.lb_prod < 6.5);
   // Custom available fraction.
   const cust = _v353({ ppm: 2, gallons: 15000, product: "custom", avail: 100 });
   assert.strictEqual(cust.avail_pct, 100);
@@ -24553,12 +24556,12 @@ import { computeDynoCorrectionSae as _v515 } from "../../calc-mechanic.js";
 
 test("bounds: spec-v515 computeDynoCorrectionSae pins the CF, the dry-pressure subtraction, the window flag, and error seams", () => {
   const r = _v515({ observed_hp: 400, baro_mbar: 980, air_temp_c: 30, humidity_pct: 0 });
-  assert.ok(Math.abs(r.cf - 1.0220) < 0.001);
+  assert.ok(Math.abs(r.cf - 1.0219) < 0.001);
   assert.ok(Math.abs(r.corrected_hp - 408.8) < 0.5);
   assert.ok(r.in_window === true);
   // A hotter, thinner day corrects harder.
   const hot = _v515({ observed_hp: 400, baro_mbar: 970, air_temp_c: 35, humidity_pct: 0 });
-  assert.ok(hot.cf > r.cf && Math.abs(hot.cf - 1.0444) < 0.001);
+  assert.ok(hot.cf > r.cf && Math.abs(hot.cf - 1.0442) < 0.001);
   // Humidity lowers the dry pressure, which raises the correction factor.
   const humid = _v515({ observed_hp: 400, baro_mbar: 980, air_temp_c: 30, humidity_pct: 80 });
   assert.ok(humid.p_dry_mbar < 980 && humid.cf > r.cf);
@@ -55927,4 +55930,17 @@ test("bounds: computeSlidingSnowLoad's note says a narrow lower roof takes only 
   const r = _v469ss({ pf_upper_psf: 23.1, eave_ridge_ft: 18, lower_width_ft: 12 });
   assert.ok(Math.abs(r.total_lb_ft - 133.056) < 1e-9);
   assert.doesNotMatch(r.note, /concentrates the same total/);
+});
+
+import { computeEconomizerEnthalpyChangeover as _v443c } from "../../calc-hvac.js";
+test("bounds: computeEconomizerEnthalpyChangeover's 90.1-2013 combined mode locks out a hot dry day plain differential enthalpy would enable", () => {
+  // Trane EN 44-2: return 28.8 Btu/lb, fixed limit 75 F. Outdoor 24 Btu/lb at 80 F: enthalpy alone says enable.
+  const base = { h_outdoor: 24, h_return: 28.8, t_outdoor_f: 80, setpoint_f: 75 };
+  assert.equal(_v443c({ ...base, mode: "differential_enthalpy" }).enable, true);
+  const c = _v443c({ ...base, mode: "differential_enthalpy_drybulb" });
+  assert.equal(c.enable, false);
+  assert.equal(c.unit, "F");
+  assert.equal(c.margin, -5);
+  assert.equal(_v443c({ ...base, t_outdoor_f: 70, mode: "differential_enthalpy_drybulb" }).enable, true);
+  assert.equal(_v443c({ ...base, h_outdoor: 30, t_outdoor_f: 70, mode: "differential_enthalpy_drybulb" }).enable, false);
 });

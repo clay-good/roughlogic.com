@@ -278,7 +278,7 @@ export const BESPOKE_LABELS = {
   "drying-goal": {"outdoor_temperature_F":"Outdoor temperature (°F)","outdoor_RH_percent":"Outdoor RH (percent)","indoor_temperature_F":"Indoor temperature (°F)","margin_GPP":"Margin (GPP below outdoor)"},
   "drying-log": {"readings":"Daily readings (one line per day: outside F, outside RH, chamber F, chamber RH)","drying_target_GPP":"Drying target (grains/lb; blank = outside GPP minus 5)"},
   "drying-times": {"material":"Material"},
-  "drywell-infiltration": {"runoff_volume_ft3":"Runoff (storage) volume (ft³)","void_ratio":"Aggregate void ratio (~0.35)","trench_depth_ft":"Trench/pit depth (ft)","infiltration_rate_in_hr":"Soil infiltration rate (in/hr, perc test)"},
+  "drywell-infiltration": {"runoff_volume_ft3":"Runoff (storage) volume (ft³)","void_ratio":"Aggregate porosity n (void fraction, voids / total, ~0.35)","trench_depth_ft":"Trench/pit depth (ft)","infiltration_rate_in_hr":"Soil infiltration rate (in/hr, perc test)"},
   "dti": {"gross_monthly_income":"Gross monthly income ($)","housing_payment":"Housing payment (PITI + HOA, $)","other_monthly_debts":"Other monthly debts ($, car / cards / student / etc.)"},
   "duct-friction-static": {"shape":"Duct shape","D_in":"Round D (in)","W_in":"Rect W (in)","H_in":"Rect H (in)","material":"Material","cfm":"Airflow (CFM)","length_ft":"Run length (ft)"},
   "duct-leakage": {"design_cfm":"Design CFM","measured_cfm":"Measured CFM at registers","duct_surface_ft2":"Duct surface area (ft²)","test_pressure_inwc":"Test pressure (in WC)","design_class":"Design class"},

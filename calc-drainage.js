@@ -359,7 +359,7 @@ export function computeSewageForceMainVelocity({ gpm = 0, id_in = 0 } = {}) {
   const d_max_scour_in = Math.sqrt(0.4085 * q / 2);
   return {
     velocity_fps, d_max_scour_in, scours: velocity_fps >= 2.0,
-    note: "Sewage force-main scour velocity: V = 0.4085 Q / d^2 (ft/s, Q in gpm, d in inches). A minimum of about 2 ft/s at the design flow is needed to scour the pipe and keep solids in suspension (Ten States Standards); below it grit and grease settle and the main fouls. The largest inside diameter that still holds 2 ft/s at this flow = sqrt(0.4085 Q / 2). An upper limit near 8 ft/s avoids excessive headloss and water hammer. A design aid; the state design criteria and the pump curve govern.",
+    note: "Sewage force-main scour velocity: V = 0.4085 Q / d^2 (ft/s, Q in gpm, d in inches). A minimum of about 2 ft/s at the design flow is needed to scour the pipe and keep solids in suspension (Ten States Standards); below it grit and grease settle and the main fouls. The largest inside diameter that still holds 2 ft/s at this flow = sqrt(0.4085 Q / 2). An upper limit near 8 ft/s avoids high headloss and protects valves (Ten States 49.1). Ten States also sets a 4 in minimum for a raw-wastewater force main; a smaller main (like a 2 in grinder-pump line) is outside that rule. A design aid; the state design criteria and the pump curve govern.",
   };
 }
 export const sewageForceMainVelocityExample = { inputs: { gpm: 50, id_in: 2 } };
@@ -388,7 +388,7 @@ DRAINAGE_RENDERERS["sewage-force-main-velocity"] = renderSewageForceMainVelocity
 export function computeDrywellInfiltration({ runoff_volume_ft3 = 200, void_ratio = 0.35, trench_depth_ft = 4, infiltration_rate_in_hr = 0.5 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(runoff_volume_ft3 > 0)) return { error: "Runoff (storage) volume must be positive (ft^3)." };
-  if (!(void_ratio > 0 && void_ratio <= 1)) return { error: "Void ratio must be between 0 and 1 (clean stone ~0.30-0.40)." };
+  if (!(void_ratio > 0 && void_ratio <= 1)) return { error: "Aggregate porosity (void fraction, voids / total volume) must be between 0 and 1 (clean stone ~0.30-0.40)." };
   if (!(trench_depth_ft > 0)) return { error: "Trench/pit depth must be positive (ft)." };
   if (!(infiltration_rate_in_hr > 0)) return { error: "Soil infiltration rate must be positive (in/hr)." };
   // Aggregate stores water only in its voids, so the excavation is larger than the runoff by 1/void_ratio.
@@ -401,16 +401,16 @@ export function computeDrywellInfiltration({ runoff_volume_ft3 = 200, void_ratio
     excavation_volume_ft3,
     footprint_sf,
     draindown_time_hr,
-    note: "The size of a stone-filled dry well or infiltration trench (soakaway) that stores a runoff volume and lets it soak into the ground. Because clean crushed stone holds water only in its VOIDS (about 30-40% of the aggregate volume), the excavation must be larger than the water it stores by 1 / void ratio: storing 200 ft^3 of runoff in 0.35-void stone needs a 571 ft^3 pit, which at a 4 ft depth is a 143 sf footprint. The pit then empties by infiltration through the bottom (and sides) into the soil; a rough draindown estimate is the void-water column (depth x void ratio) divided by the soil infiltration rate, so a 4 ft deep, 0.35-void pit over a 0.5 in/hr soil drains in about 34 hours -- a well-designed system fully empties between storms (commonly within 24-72 hr) so it is ready for the next. The runoff volume itself comes from the design storm and the contributing area (a rational-method or detention calc), the void ratio from the actual aggregate (open-graded stone ~0.35, a chambered/modular unit is higher), and the infiltration rate from a field PERCOLATION or infiltration test -- NOT a default. An overflow/bypass path is required for storms that exceed the design. A sizing screen; the field perc test, the local stormwater code, and the AHJ / geotech govern the design.",
+    note: "The size of a stone-filled dry well or infiltration trench (soakaway) that stores a runoff volume and lets it soak into the ground. Because clean crushed stone holds water only in its VOIDS (about 30-40% of the aggregate volume), the excavation must be larger than the water it stores by 1 / porosity (void fraction): storing 200 ft^3 of runoff in 0.35-void stone needs a 571 ft^3 pit, which at a 4 ft depth is a 143 sf footprint. The pit then empties by infiltration through the bottom (and sides) into the soil; a rough draindown estimate is the void-water column (depth x porosity (void fraction)) divided by the soil infiltration rate, so a 4 ft deep, 0.35-void pit over a 0.5 in/hr soil drains in about 34 hours -- a well-designed system fully empties between storms (commonly within 24-72 hr) so it is ready for the next. The runoff volume itself comes from the design storm and the contributing area (a rational-method or detention calc), the porosity (void fraction) from the actual aggregate (open-graded stone ~0.35, a chambered/modular unit is higher), and the infiltration rate from a field PERCOLATION or infiltration test -- NOT a default. An overflow/bypass path is required for storms that exceed the design. A sizing screen; the field perc test, the local stormwater code, and the AHJ / geotech govern the design.",
   };
 }
 
 export const drywellInfiltrationExample = { inputs: { runoff_volume_ft3: 200, void_ratio: 0.35, trench_depth_ft: 4, infiltration_rate_in_hr: 0.5 } };
 
 function _v976renderDrywellInfiltration(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: dry well / infiltration trench (soakaway) sizing, by name. excavation = runoff / void ratio; footprint = excavation / depth; draindown ~ 12 x depth x void / infiltration rate. Void from the aggregate (~0.35 open stone), infiltration from a field perc test (not a default), runoff from the design storm. An overflow path is required; the perc test, the stormwater code, and the AHJ / geotech govern.";
+  citationEl.textContent = "Citation: dry well / infiltration trench (soakaway) sizing, by name. excavation = runoff / porosity (void fraction); footprint = excavation / depth; draindown ~ 12 x depth x void / infiltration rate. Void from the aggregate (~0.35 open stone), infiltration from a field perc test (not a default), runoff from the design storm. An overflow path is required; the perc test, the stormwater code, and the AHJ / geotech govern.";
   const rv = makeNumber("Runoff (storage) volume (ft³)", "dwi-rv", { step: "any", min: "0" });
-  const vr = makeNumber("Aggregate void ratio (~0.35)", "dwi-vr", { step: "any", min: "0" });
+  const vr = makeNumber("Aggregate porosity n (void fraction, voids / total, ~0.35)", "dwi-vr", { step: "any", min: "0" });
   const td = makeNumber("Trench/pit depth (ft)", "dwi-td", { step: "any", min: "0" });
   const ir = makeNumber("Soil infiltration rate (in/hr, perc test)", "dwi-ir", { step: "any", min: "0" });
   for (const f of [rv, vr, td, ir]) inputRegion.appendChild(f.wrap);
