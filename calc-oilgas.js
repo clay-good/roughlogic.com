@@ -154,6 +154,7 @@ export function computePipelineMaoBarlow({
   if (!(wall_in > 0)) return { error: "Wall thickness must be positive (in)." };
   if (!(wall_in < od_in / 2)) return { error: "Wall thickness must be less than half the outside diameter." };
   if (!(smys_psi > 0)) return { error: "Specified minimum yield strength must be positive (psi)." };
+  if (smys_psi < 1000) return { error: "Enter SMYS in psi (42000 for X42), not ksi." };
   if (!(joint_factor > 0 && joint_factor <= 1)) return { error: "Longitudinal joint factor must be above 0 and at most 1." };
   if (!(temperature_factor > 0 && temperature_factor <= 1)) return { error: "Temperature derating factor must be above 0 and at most 1." };
   if (operating_pressure_psig < 0 || target_pressure_psig < 0) return { error: "Pressures cannot be negative (psig)." };
@@ -562,6 +563,9 @@ export function computeCorrodedPipeB31g({
   if (!(defect_length_in > 0)) return { error: "Defect axial length must be positive (in)." };
   if (!(defect_depth_in < wall_in)) return { error: "Defect depth must be less than the wall thickness -- a through-wall defect is a leak, not a screening case." };
   if (!(safety_factor > 0)) return { error: "Safety factor must be positive." };
+  // A safety factor is at least 1 (B31G's is 1/F, 1.39 at F 0.72). Typing the DESIGN factor 0.72 here used to report a
+  // safe pressure above the failure pressure as ACCEPTABLE (found 2026-09-26).
+  if (safety_factor < 1) return { error: "Safety factor must be at least 1 (1.39 = 1/0.72); do not enter the design factor F here." };
   if (maop_psig < 0) return { error: "MAOP cannot be negative (psig)." };
   const depth_ratio = defect_depth_in / wall_in;
   const depth_pct = depth_ratio * 100;
@@ -657,6 +661,7 @@ export function computeCasingCementVolume({
   if (!(casing_id_in > 0 && casing_id_in < casing_od_in)) return { error: "Casing inside diameter must be positive and smaller than its outside diameter." };
   if (!(cement_column_ft > 0)) return { error: "Cement column length must be positive (ft)." };
   if (excess_pct < 0) return { error: "Excess cannot be negative (%)." };
+  if (excess_pct > 0 && excess_pct < 1) return { error: "Enter excess as a percent (35 for 35%), not a fraction." };
   if (float_collar_ft < 0) return { error: "Depth to the float collar cannot be negative (ft)." };
   if (slurry_yield_ft3_per_sack < 0) return { error: "Slurry yield cannot be negative (cu ft per sack)." };
   if (low_excess_pct < 0 || high_excess_pct < 0) return { error: "Excess comparison values cannot be negative (%)." };
@@ -730,6 +735,7 @@ export function computeMudHydrostaticPressure({
 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(mud_weight_ppg > 0)) return { error: "Mud weight must be positive (ppg)." };
+  if (mud_weight_ppg < 6 || mud_weight_ppg > 25) return { error: "Mud weight is in pounds per gallon (about 8.3-20); a specific gravity (1.44) must be converted (x 8.33)." };
   if (!(tvd_ft > 0)) return { error: "True vertical depth must be positive (ft)." };
   if (measured_depth_ft < 0) return { error: "Measured depth cannot be negative (ft)." };
   if (measured_depth_ft > 0 && measured_depth_ft < tvd_ft) return { error: "Measured depth cannot be less than true vertical depth." };
@@ -840,7 +846,7 @@ export function computeKillMudWeight({
     icp_psi, fcp_psi,
     has_pump, drillpipe_volume_bbl, strokes_to_bit, minutes_to_bit,
     has_rounded, rounded_bhp_change_psi, rounded_is_below, rounding_verdict,
-    note: "The kill sheet arithmetic for a shut-in well: the mud weight that balances the formation, and the drillpipe pressures to hold while circulating it. Shut-in drillpipe pressure is the amount by which formation pressure exceeds the hydrostatic already in the hole, read directly at surface through a column of clean mud. Converting that pressure back into density is the same 0.052 relation rearranged, and the result is the weight that balances the formation with no surface pressure at all. The circulating pressures follow. Initial circulating pressure is the shut-in pressure plus whatever it takes to move mud at the slow rate; final circulating pressure is the slow-rate pressure scaled by the density ratio, since a heavier mud takes proportionally more pressure to circulate. Between them the drillpipe pressure is walked down on a schedule while kill mud goes to the bit, and it is held at the final value from there until the influx is out. The rounding question is where this gets dangerous, and it is why the rounded weight is an input here rather than a note. A kill weight rounded DOWN -- to a tidier number, or to what is already mixed -- leaves the well underbalanced by the difference, and the arithmetic that looks like it adds pressure actually subtracts it. The direction is therefore reported as a verdict computed from the two weights rather than as a signed number a reader has to interpret. Rounding UP is the safe direction and it has its own limit: excessive kill weight risks fracturing the formation at the shoe and turning a kick into an underground blowout, which is a check against the fracture gradient that this does not make. This is the driller's-method kill sheet for a vertical or near-vertical well with a clean drillpipe column: it does not compute kick tolerance or the equivalent mud weight at the shoe, handle a plugged or wet-string reading, account for influx type and migration, model the annulus pressure profile or choke schedule, or address the wait-and-weight variations. The operator's well control procedures, the certified kill sheet, and a qualified well-control supervisor govern.",
+    note: "The kill sheet arithmetic for a shut-in well: the mud weight that balances the formation, and the drillpipe pressures to hold while circulating it. Shut-in drillpipe pressure is the amount by which formation pressure exceeds the hydrostatic already in the hole, read directly at surface through a column of clean mud. Converting that pressure back into density is the same 0.052 relation rearranged, and the result is the weight that balances the formation with no surface pressure at all. The circulating pressures follow. Initial circulating pressure is the shut-in pressure plus whatever it takes to move mud at the slow rate; final circulating pressure is the slow-rate pressure scaled by the density ratio, since a heavier mud takes proportionally more pressure to circulate. Between them the drillpipe pressure is walked down on a schedule while kill mud goes to the bit, and it is held at the final value from there until the influx is out. The rounding question is where this gets dangerous, and it is why the rounded weight is an input here rather than a note. A kill weight rounded DOWN -- to a tidier number, or to what is already mixed -- leaves the well underbalanced by the difference, and the arithmetic that looks like it adds pressure actually subtracts it. The direction is therefore reported as a verdict computed from the two weights rather than as a signed number a reader has to interpret. Rounding UP is the safe direction and it has its own limit: excessive kill weight risks fracturing the formation at the shoe and turning a kick into an underground blowout, which is a check against the fracture gradient that this does not make. This is the driller's-method kill sheet for a vertical or near-vertical well with a clean drillpipe column: it does not compute kick tolerance or the equivalent mud weight at the shoe, handle a plugged or wet-string reading, account for influx type and migration, or model the annulus pressure profile or choke schedule. The ICP-to-FCP drillpipe schedule it gives is the wait-and-weight (engineer's) method; in the driller's method the second circulation holds casing pressure constant while kill mud goes to the bit. The operator's well control procedures, the certified kill sheet, and a qualified well-control supervisor govern.",
   };
 }
 export const killMudWeightExample = { inputs: { original_mw_ppg: 12.5, tvd_ft: 9800, sidpp_psi: 380, scr_pressure_psi: 600, safety_margin_ppg: 0, rounded_mw_ppg: 13.0, drillpipe_capacity_bbl_ft: 0.01776, measured_depth_ft: 9800, pump_output_bbl_stroke: 0.117, pump_spm: 30 } };

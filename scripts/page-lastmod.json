@@ -2,7 +2,7 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "9c334a80bc364075",
+      "sha": "03a7f0ef2d891c6e",
       "date": "2026-09-26"
     },
     "/tools/": {
@@ -1638,8 +1638,8 @@
       "date": "2026-09-01"
     },
     "/tools/conductor-blowout/": {
-      "sha": "c03db805e6665bd7",
-      "date": "2026-09-07"
+      "sha": "d5a57a6bffef0d7e",
+      "date": "2026-09-26"
     },
     "/tools/conductor-creep-elongation/": {
       "sha": "b689ff417d91f0dd",
@@ -2590,8 +2590,8 @@
       "date": "2026-09-01"
     },
     "/tools/endurance-limit-marin/": {
-      "sha": "34bc0ae4c16e32ea",
-      "date": "2026-09-08"
+      "sha": "b598aadaa7099c54",
+      "date": "2026-09-26"
     },
     "/tools/engine-bmep/": {
       "sha": "8478cecea72f865a",
@@ -3106,8 +3106,8 @@
       "date": "2026-09-04"
     },
     "/tools/fresnel-zone-clearance/": {
-      "sha": "001d02e0e01b7604",
-      "date": "2026-09-07"
+      "sha": "955832c9f3e12241",
+      "date": "2026-09-26"
     },
     "/tools/friction-loss/": {
       "sha": "46aceda18a8e1802",
@@ -4006,8 +4006,8 @@
       "date": "2026-09-01"
     },
     "/tools/kill-mud-weight/": {
-      "sha": "d92ac626d3549432",
-      "date": "2026-09-08"
+      "sha": "efd608566125ab6f",
+      "date": "2026-09-26"
     },
     "/tools/kiln-charge-water/": {
       "sha": "d79485d3b5c38cde",
@@ -5726,7 +5726,7 @@
       "date": "2026-09-01"
     },
     "/tools/pv-cell-temperature-power/": {
-      "sha": "9a10f35e77b05c6e",
+      "sha": "4ae6486e89120a05",
       "date": "2026-09-26"
     },
     "/tools/pv-circuit-ampacity/": {

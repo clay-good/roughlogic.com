@@ -1004,10 +1004,13 @@ MACHINING_RENDERERS["fatigue-safety-factor"] = renderFatigueSafetyFactor;
 // ultimate strength into the real endurance limit, feeding the fatigue tile. Se' = 0.5 Sut (steel, Sut <= 200 ksi).
 // The a/b surface constants use Sut in kpsi; output is in psi so it drops straight into fatigue-safety-factor.
 const MARIN_SURFACE = {
-  ground: { a: 1.34, b: -0.085, label: "Ground" },
-  machined: { a: 2.70, b: -0.265, label: "Machined / cold-drawn" },
-  "hot-rolled": { a: 14.4, b: -0.718, label: "Hot-rolled" },
-  "as-forged": { a: 39.9, b: -0.995, label: "As-forged" },
+  // Shigley 11th ed. Table 6-2 (kpsi): the 9th/10th-edition constants (ground 1.34/-0.085, machined 2.70/-0.265,
+  // hot-rolled 14.4/-0.718, forged 39.9/-0.995) were used until 2026-09-26 and read ka up to ~8% high (unsafe).
+  // 11e solutions: machined 2.00(110)^-0.217 = 0.721; MPa forms ground 1.38/-0.067, machined 3.04, hot-rolled 38.6/-0.650.
+  ground: { a: 1.21, b: -0.067, label: "Ground" },
+  machined: { a: 2.00, b: -0.217, label: "Machined / cold-drawn" },
+  "hot-rolled": { a: 11.0, b: -0.650, label: "Hot-rolled" },
+  "as-forged": { a: 12.7, b: -0.758, label: "As-forged" },
 };
 const MARIN_RELIABILITY = { "50": 1.0, "90": 0.897, "95": 0.868, "99": 0.814, "99.9": 0.753 };
 const MARIN_KC = { bending: 1.0, axial: 0.85, torsion: 0.59 };
@@ -1021,6 +1024,8 @@ export function computeEnduranceLimitMarin({ ultimate_strength_psi = 0, surface_
   const kc = MARIN_KC[load_type];
   const ke = MARIN_RELIABILITY[String(reliability_pct)];
   if (!(Sut > 0)) return { error: "Ultimate strength Sut must be positive (psi)." };
+  if (Sut < 10000) return { error: "Enter Sut in psi (105000), not ksi." };
+  if (kd > 1.2) return { error: "Temperature factor kd is a multiplier near 1 (about 0.5-1.02)." };
   if (!surf) return { error: "Surface finish must be ground, machined, hot-rolled, or as-forged." };
   if (kc === undefined) return { error: "Load type must be bending, axial, or torsion." };
   if (ke === undefined) return { error: "Reliability must be 50, 90, 95, 99, or 99.9 (%)." };
@@ -1039,7 +1044,7 @@ export function computeEnduranceLimitMarin({ ultimate_strength_psi = 0, surface_
   if (![ka, kb, kc, ke, endurance_limit_psi].every(Number.isFinite) || !(endurance_limit_psi > 0)) return { error: "Endurance-limit math is not a finite value; check the inputs." };
   return {
     endurance_limit_psi, uncorrected_se_psi, ka, kb, kc, kd, ke,
-    note: "The corrected endurance limit Se = ka kb kc kd ke Se' (Shigley Ch. 6 Marin equation), the input the fatigue-safety-factor tile needs. Se' is the rotating-beam limit, 0.5 Sut for steel with Sut <= 200 ksi (capped at 100 ksi above that). ka = a (Sut in kpsi)^b corrects for surface finish (ground 1.34/-0.085, machined 2.70/-0.265, hot-rolled 14.4/-0.718, as-forged 39.9/-0.995); kb is the size factor 0.879 d^-0.107 (0.11-2 in) or 0.91 d^-0.157 (2-10 in) for rotating bending/torsion, and 1 for axial loading; kc is the load factor (1 bending, 0.85 axial, 0.59 torsion); kd the temperature factor (1 at room temperature); ke the reliability factor (0.897 at 90%, 0.814 at 99%). The five factors typically cut the raw 0.5 Sut roughly in half, which is why a part sized on Se' alone can be fatigue-unsafe. Feed Se into fatigue-safety-factor. Steel; non-steel materials, stress concentration (Kf), and finite-life S-N reductions are separate. A design aid; Shigley and the engineer of record govern.",
+    note: "The corrected endurance limit Se = ka kb kc kd ke Se' (Shigley Ch. 6 Marin equation), the input the fatigue-safety-factor tile needs. Se' is the rotating-beam limit, 0.5 Sut for steel with Sut <= 200 ksi (capped at 100 ksi above that). ka = a (Sut in kpsi)^b corrects for surface finish (Shigley 11th ed. Table 6-2: ground 1.21/-0.067, machined 2.00/-0.217, hot-rolled 11.0/-0.650, as-forged 12.7/-0.758); kb is the size factor 0.879 d^-0.107 (0.11-2 in) or 0.91 d^-0.157 (2-10 in) for rotating bending/torsion, and 1 for axial loading; kc is the load factor (1 bending, 0.85 axial, 0.59 torsion); kd the temperature factor (1 at room temperature); ke the reliability factor (0.897 at 90%, 0.814 at 99%). The five factors typically cut the raw 0.5 Sut roughly in half, which is why a part sized on Se' alone can be fatigue-unsafe. Feed Se into fatigue-safety-factor. Steel; non-steel materials, stress concentration (Kf), and finite-life S-N reductions are separate. A design aid; Shigley and the engineer of record govern.",
   };
 }
 export const enduranceLimitMarinExample = { inputs: { ultimate_strength_psi: 105000, surface_finish: "machined", diameter_in: 1, load_type: "bending", reliability_pct: "99", temperature_factor_kd: 1 } };
@@ -1090,6 +1095,8 @@ const SCREW_THREAD_HALF_ANGLE = { square: 0, acme: 14.5, unified: 30 };
 // dims: in { axial_load_lbf: M L T^-2, mean_diameter_in: L, lead_in: L, thread_friction: dimensionless, collar_friction: dimensionless, collar_diameter_in: L, thread_form: dimensionless } out: { raise_torque_in_lbf: M L^2 T^-2, lower_torque_in_lbf: M L^2 T^-2, efficiency_pct: dimensionless, lead_angle_deg: dimensionless }
 export function computePowerScrewTorque({ axial_load_lbf = 0, mean_diameter_in = 0, lead_in = 0, thread_friction = 0.15, collar_friction = 0.15, collar_diameter_in = 0, thread_form = "acme" } = {}) {
   const _g = _finiteGuard({ axial_load_lbf, mean_diameter_in, lead_in, thread_friction, collar_friction, collar_diameter_in }); if (_g) return _g;
+  // Unit / range guard added 2026-09-26 after printed-example probing.
+  if (Number(arguments[0]?.thread_friction) > 1 || Number(arguments[0]?.collar_friction) > 1) return { error: "Friction coefficients are fractions (0.15), not percents." };
   const F = Number(axial_load_lbf) || 0;
   const dm = Number(mean_diameter_in) || 0;
   const l = Number(lead_in) || 0;
@@ -1166,6 +1173,8 @@ MACHINING_RENDERERS["power-screw-torque"] = renderPowerScrewTorque;
 // dims: in { clamp_force_lbf: M L T^-2, friction_coefficient: dimensionless, outer_radius_in: L, inner_radius_in: L, friction_surfaces: dimensionless } out: { uniform_wear_torque_in_lbf: M L^2 T^-2, uniform_pressure_torque_in_lbf: M L^2 T^-2, max_pressure_psi: M L^-1 T^-2 }
 export function computeDiskClutchTorque({ clamp_force_lbf = 0, friction_coefficient = 0.3, outer_radius_in = 0, inner_radius_in = 0, friction_surfaces = 1 } = {}) {
   const _g = _finiteGuard({ clamp_force_lbf, friction_coefficient, outer_radius_in, inner_radius_in, friction_surfaces }); if (_g) return _g;
+  // Unit / range guard added 2026-09-26 after printed-example probing.
+  if (Number(arguments[0]?.friction_coefficient) > 1) return { error: "Friction coefficient is a fraction (0.3), not a percent." }; if (!Number.isInteger(Number(arguments[0]?.friction_surfaces ?? 1))) return { error: "Friction surfaces must be a whole number (2 for a single plate)." };
   const F = Number(clamp_force_lbf) || 0;
   const mu = Number(friction_coefficient) || 0;
   const ro = Number(outer_radius_in) || 0;
@@ -1228,6 +1237,8 @@ const COLUMN_END_K = {
 // dims: in { modulus_psi: M L^-1 T^-2, yield_strength_psi: M L^-1 T^-2, moment_of_inertia_in4: L^4, area_in2: L^2, length_in: L, end_condition: dimensionless } out: { critical_load_lbf: M L T^-2, critical_stress_psi: M L^-1 T^-2, slenderness_ratio: dimensionless, transition_slenderness: dimensionless, radius_of_gyration_in: L }
 export function computeEulerJohnsonColumn({ modulus_psi = 30000000, yield_strength_psi = 0, moment_of_inertia_in4 = 0, area_in2 = 0, length_in = 0, end_condition = "pinned-pinned" } = {}) {
   const _g = _finiteGuard({ modulus_psi, yield_strength_psi, moment_of_inertia_in4, area_in2, length_in }); if (_g) return _g;
+  // Unit / range guard added 2026-09-26 after printed-example probing.
+  if (Number(arguments[0]?.modulus_psi) > 0 && Number(arguments[0]?.modulus_psi) < 1e6) return { error: "Enter the modulus E in psi (30,000,000 for steel), not ksi." };
   const E = Number(modulus_psi) || 0;
   const Sy = Number(yield_strength_psi) || 0;
   const I = Number(moment_of_inertia_in4) || 0;

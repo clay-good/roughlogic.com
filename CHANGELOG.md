@@ -13,6 +13,21 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **`endurance-limit-marin` uses the Shigley 11th-edition surface constants.** The tile carried the 9th/10th-edition Table 6-2 values (machined 2.70 / -0.265). These read ka up to about 8% high, on the unsafe side of a fatigue design. The 11th edition's machined 2.00 / -0.217, hot-rolled 11.0 / -0.650, forged 12.7 / -0.758 and ground 1.21 / -0.067 are now used. Shigley 11e Problem 6-8 (Se 33.4 kpsi) reproduces; the tile's example Se moves from 29,548 to 27,366 psi.
+- **`corroded-pipe-b31g` and `guy-anchor-holding-capacity` refuse a safety factor below 1.** Entering the design factor 0.72 as B31G's safety factor used to report a safe pressure above the predicted failure pressure as ACCEPTABLE. An anchor factor of safety of 0.5 put the allowable above the ultimate.
+- **Unit guards found by probing each tile.** Each of these used to return nonsense silently:
+  - mud weight as a specific gravity
+  - SMYS in ksi
+  - pole fiber stress in ksi
+  - service voltage in volts
+  - column modulus in ksi
+  - screw or clutch friction as a percent
+  - cement excess as a fraction
+  - a fractional count of clutch friction surfaces
+- **Prose corrected against printed sources:**
+  - `transverse-wind-load-conductor` note: the pole's wind resultant is at the tapered area's centroid (18.2 ft, 30% of 17,955 ft-lb), not "roughly mid-height" (19.5 ft).
+  - `conductor-blowout` asks for the wind-loaded sag (RUS 1724E-200).
+  - `kill-mud-weight`: its ICP-to-FCP schedule is the wait-and-weight method.
 - **`capacitor-discharge-time` picks the NEC 1-minute or 5-minute limit from the rated (nominal rms) voltage.** The tile asks for the PEAK on an ac bank, then used that peak to choose the limit, so a 750 V rms bank entered at 1,061 V got the 5-minute allowance. A rated-voltage input now sets the limit; Lifasa's 74.5 kohm example reproduces.
 - **`equipment-hourly-rate` uses the Caterpillar average annual investment it cites, [P(N+1) + S(N-1)] / 2N.** The tile used (P + S) / 2, understating the interest / insurance / tax carry. CAT's Example I owning cost of $25.06/hr now reproduces; the tile's example goes from $23.40 to $23.72/hr.
 - **Guards found by probing each tile.** These were accepted and gave nonsense results:
@@ -132,6 +147,13 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 - **`calc-agriculture.js` size cap raised from 64,000 to 66,000 bytes gzipped.** The irrigation and livestock corrections took it to 64,110 B (100.2%).
 - **`calc-electrical.js` size cap raised from 104,000 to 106,000 bytes gzipped.** The battery-vent and capacitor corrections took it to 104,063 B (100.1%). Splitting the module per bench is still the preferred fix.
+- **Fourteen more tiles now carry a publisher's printed example, the first batch from the first-principles pool.**
+  - **Overhead lines:** `ruling-span` (RUS 1724E-200 Example 9-1), `meter-ct-pt-multiplier` (City of Banning).
+  - **Drilling and pipelines:** `kill-mud-weight`, `mud-hydrostatic-pressure`, `annular-velocity-cleaning` and `casing-cement-volume` (DrillingFormulas.com); `pipeline-mao-barlow` (Ohio Gas Association seminar); `corroded-pipe-b31g` (ASME B31G-1991 Appendix A).
+  - **Machine design (Shigley solutions):** `euler-johnson-column` (both regimes), `power-screw-torque`, `thick-wall-cylinder-stress`, `endurance-limit-marin`, `bearing-equivalent-load`, `disk-clutch-torque`.
+
+  README: 926 of 2,183 tiles are checked only against the project's own derivation (771 of them first-principles); 1,257 carry an outside source.
+
 - **Twelve more tiles now carry a publisher's printed example.**
   - **Solar and HVAC:** `pv-cell-temperature-power` (FSU), `pv-performance-ratio` (NREL PVWatts v5 manual), `radiant-floor-output` (ASHRAE chapter lecture), `duct-heat-gain` (FSEC).
   - **Electrical and audio:** `transformer-voltage-regulation` (Chapman via U. Ottawa), `capacitor-discharge-time` (Lifasa), `ceiling-speaker-coverage-angle` (Lowell).

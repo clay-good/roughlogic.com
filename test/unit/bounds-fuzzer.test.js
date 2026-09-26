@@ -38104,17 +38104,20 @@ test("bounds: spec-v1286 computeFatigueSafetyFactor pins Goodman/Soderberg/Gerbe
 import { computeEnduranceLimitMarin as _v1287 } from "../../calc-machining.js";
 import { computeFatigueSafetyFactor as _v1287sib } from "../../calc-machining.js";
 test("bounds: spec-v1287 computeEnduranceLimitMarin pins Se and the Marin factors, the axial kb=1 case, the chain into fatigue-safety-factor, and error seams", () => {
-  // Sut 105 ksi machined, d 1 in, rotating bending, 99%: ka 0.787, kb 0.879, kc 1, ke 0.814, Se 29,548 psi.
+  // Sut 105 ksi machined, d 1 in, rotating bending, 99%: ka 0.729 (Shigley 11e: 2.00 Sut^-0.217), kb 0.879, kc 1, ke 0.814, Se 27,366 psi.
   const r = _v1287({ ultimate_strength_psi: 105000, surface_finish: "machined", diameter_in: 1, load_type: "bending", reliability_pct: "99", temperature_factor_kd: 1 });
-  assert.ok(Math.abs(r.endurance_limit_psi - 29548) < 10);
+  assert.ok(Math.abs(r.endurance_limit_psi - 27365.6) < 10);
   assert.ok(Math.abs(r.uncorrected_se_psi - 52500) < 1e-6);
-  assert.ok(Math.abs(r.ka - 0.7866) < 1e-3 && Math.abs(r.kb - 0.879) < 1e-3 && r.kc === 1 && Math.abs(r.ke - 0.814) < 1e-6);
+  assert.ok(Math.abs(r.ka - 0.7285) < 1e-3 && Math.abs(r.kb - 0.879) < 1e-3 && r.kc === 1 && Math.abs(r.ke - 0.814) < 1e-6);
   // Axial loading forces kb = 1 and kc = 0.85.
   const ax = _v1287({ ultimate_strength_psi: 100000, surface_finish: "machined", diameter_in: 1, load_type: "axial", reliability_pct: "50", temperature_factor_kd: 1 });
-  assert.ok(ax.kb === 1 && ax.kc === 0.85 && Math.abs(ax.endurance_limit_psi - 33865) < 10);
+  assert.ok(ax.kb === 1 && ax.kc === 0.85 && Math.abs(ax.endurance_limit_psi - 31291) < 10);
+  // Shigley 11e Prob. 6-8: Sut 110 kpsi machined, d 1.5 in -> ka 0.721, kb 0.842, Se 33.4 kpsi.
+  const s11 = _v1287({ ultimate_strength_psi: 110000, surface_finish: "machined", diameter_in: 1.5, load_type: "bending", reliability_pct: "50", temperature_factor_kd: 1 });
+  assert.ok(Math.abs(s11.ka - 0.721) < 1e-3 && Math.abs(s11.endurance_limit_psi - 33400) < 50);
   // The corrected Se drops straight into fatigue-safety-factor and makes an "OK on Se'" part fatigue-unsafe.
   const chained = _v1287sib({ alternating_stress_psi: 25000, mean_stress_psi: 30000, endurance_limit_psi: r.endurance_limit_psi, ultimate_strength_psi: 105000, yield_strength_psi: 80000, criterion: "goodman" });
-  assert.ok(chained.fatigue_n < 1 && Math.abs(chained.fatigue_n - 0.882) < 1e-2);
+  assert.ok(chained.fatigue_n < 1 && Math.abs(chained.fatigue_n - 0.834) < 1e-2);
   // Se above 200 ksi Sut is capped at 100 ksi rotating-beam limit (before factors).
   const hi = _v1287({ ultimate_strength_psi: 260000, surface_finish: "ground", diameter_in: 1, load_type: "bending", reliability_pct: "50", temperature_factor_kd: 1 });
   assert.ok(Math.abs(hi.uncorrected_se_psi - 100000) < 1e-6);
@@ -56109,4 +56112,21 @@ test("bounds: batch-40 fixes -- NEC limit from the rated voltage, gamma sign and
   assert.ok("error" in _b40wl({ target_hull_speed_kn: 7, coefficient: 0 }));
   assert.ok("error" in _b40ecs({ current_a: 100, r_small_ohm: 0.2, r_big_ohm: 0.125, hours: 4000, rate_kwh: 12, upsize_cost: 800 }));
   assert.ok("error" in _b40drv({ cpm_usd: 60, pct: 28, miles: 1236, linehaul_usd: 2900 }));
+});
+
+import { computeCorrodedPipeB31g as _b41b31, computeCasingCementVolume as _b41cem, computeMudHydrostaticPressure as _b41mud, computePipelineMaoBarlow as _b41bar } from "../../calc-oilgas.js";
+import { computeGuyAnchorHoldingCapacity as _b41gy, computePoleClassGroundlineMoment as _b41pole, computeMeterCtPtMultiplier as _b41mtr } from "../../calc-lineworker.js";
+import { computeEulerJohnsonColumn as _b41col, computePowerScrewTorque as _b41scr, computeDiskClutchTorque as _b41clu } from "../../calc-machining.js";
+test("bounds: batch-41 guards -- B31G and anchor safety factors below 1, unit mix-ups, friction as percent", () => {
+  // B31G: a design factor typed as the safety factor used to report a safe pressure above the failure pressure.
+  assert.ok("error" in _b41b31({ od_in: 24, wall_in: 0.281, smys_psi: 52000, defect_depth_in: 0.08, defect_length_in: 15, safety_factor: 0.72, maop_psig: 731 }));
+  assert.ok("error" in _b41gy({ helix_diameter_in: 12, installed_depth_ft: 10, cohesion_psf: 3500, factor_of_safety: 0.5 }));
+  assert.ok("error" in _b41cem({ hole_dia_in: 8.6, casing_od_in: 7, casing_id_in: 6.185, cement_column_ft: 2500, excess_pct: 0.35 }));
+  assert.ok("error" in _b41mud({ mud_weight_ppg: 1.44, tvd_ft: 10000 }));
+  assert.ok("error" in _b41bar({ od_in: 12.75, wall_in: 0.25, smys_psi: 52, class_location: "class_1" }));
+  assert.ok("error" in _b41pole({ groundline_circumference_in: 29, fiber_stress_psi: 8 }));
+  assert.ok("error" in _b41mtr({ ct_primary_a: 200, ct_secondary_a: 5, pt_primary_v: 7200, pt_secondary_v: 120, service_voltage_kv: 12470 }));
+  assert.ok("error" in _b41col({ modulus_psi: 30000, yield_strength_psi: 37500, moment_of_inertia_in4: 0.05, area_in2: 1, length_in: 20 }));
+  assert.ok("error" in _b41scr({ axial_load_lbf: 2500, mean_diameter_in: 1.875, lead_in: 0.25, thread_friction: 15, collar_friction: 0.08, collar_diameter_in: 3.5 }));
+  assert.ok("error" in _b41clu({ clamp_force_lbf: 1885, friction_coefficient: 30, outer_radius_in: 3.25, inner_radius_in: 2, friction_surfaces: 6 }));
 });

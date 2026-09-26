@@ -102636,6 +102636,28 @@
    }
   },
   {
+   "tile_id": "bearing-equivalent-load",
+   "source_publisher": "McGraw-Hill (Shigley's MED 10th ed. solutions, via Oakland University)",
+   "source_title": "Problem 11-21(a)",
+   "source_edition_or_year": "10th ed.",
+   "source_section_or_page": "Fr 5 kN, Fa 2 kN, C0 10.0 kN (Fa/C0 0.2): X 0.56, Y 1.27 -> Fe 5.34 kN (entered in consistent units; Shigley rounds Y first)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "radial_load_lbf": 5000,
+    "thrust_load_lbf": 2000,
+    "static_rating_lbf": 10000
+   },
+   "outputs": {
+    "equivalent_load_lbf": {
+     "value": 5340,
+     "tolerance": {
+      "abs": 10
+     }
+    }
+   }
+  },
+  {
    "tile_id": "fatigue-safety-factor",
    "source_publisher": "Project (first-principles)",
    "source_title": "Modified Goodman fatigue factor",
@@ -102709,13 +102731,13 @@
    },
    "outputs": {
     "endurance_limit_psi": {
-     "value": 29548,
+     "value": 27365.6,
      "tolerance": {
       "pct": 0.5
      }
     },
     "ka": {
-     "value": 0.7866,
+     "value": 0.7285,
      "tolerance": {
       "pct": 0.5
      }
@@ -102740,7 +102762,7 @@
    },
    "outputs": {
     "endurance_limit_psi": {
-     "value": 33865,
+     "value": 31291,
      "tolerance": {
       "pct": 0.5
      }
@@ -102749,6 +102771,37 @@
      "value": 1.0,
      "tolerance": {
       "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "endurance-limit-marin",
+   "source_publisher": "McGraw-Hill (Shigley's MED 11th ed. solutions, via Oakland University)",
+   "source_title": "Problem 6-8",
+   "source_edition_or_year": "11th ed., p. 3",
+   "source_section_or_page": "Sut 110 kpsi machined, d 1.5 in, bending: ka = 2.00(110)^-0.217 = 0.721, kb 0.842, Se = 33.4 kpsi",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "ultimate_strength_psi": 110000,
+    "surface_finish": "machined",
+    "diameter_in": 1.5,
+    "load_type": "bending",
+    "reliability_pct": "50",
+    "temperature_factor_kd": 1
+   },
+   "outputs": {
+    "ka": {
+     "value": 0.721,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "endurance_limit_psi": {
+     "value": 33400,
+     "tolerance": {
+      "abs": 50
      }
     }
    }
@@ -102822,6 +102875,32 @@
    }
   },
   {
+   "tile_id": "power-screw-torque",
+   "source_publisher": "McGraw-Hill (Shigley's MED 11th ed. solutions, via Oakland University)",
+   "source_title": "Problem 8-6",
+   "source_edition_or_year": "11th ed., pp. 2-3",
+   "source_section_or_page": "F 2,500 lbf, dm 1.875 in, lead 0.25 in, f 0.05, fc 0.08, dc 3.5 in, Acme: T_R 221.0 + Tc 350 = 571 lbf-in",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "axial_load_lbf": 2500,
+    "mean_diameter_in": 1.875,
+    "lead_in": 0.25,
+    "thread_friction": 0.05,
+    "collar_friction": 0.08,
+    "collar_diameter_in": 3.5,
+    "thread_form": "acme"
+   },
+   "outputs": {
+    "raise_torque_in_lbf": {
+     "value": 571,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
    "tile_id": "disk-clutch-torque",
    "source_publisher": "Project (first-principles)",
    "source_title": "Single friction face, uniform wear vs pressure",
@@ -102877,6 +102956,36 @@
      "value": 1500,
      "tolerance": {
       "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "disk-clutch-torque",
+   "source_publisher": "McGraw-Hill (Shigley's MED 10th ed. solutions, via Oakland University)",
+   "source_title": "Problem 16-17",
+   "source_edition_or_year": "10th ed., p. 15",
+   "source_section_or_page": "D 6.5 in, d 4 in, f 0.24, pa 120 psi, 6 friction surfaces: F 1,885 lbf, T 7,125 lbf-in (uniform wear)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "clamp_force_lbf": 1885,
+    "friction_coefficient": 0.24,
+    "outer_radius_in": 3.25,
+    "inner_radius_in": 2,
+    "friction_surfaces": 6
+   },
+   "outputs": {
+    "uniform_wear_torque_in_lbf": {
+     "value": 7125,
+     "tolerance": {
+      "abs": 1
+     }
+    },
+    "max_pressure_psi": {
+     "value": 120,
+     "tolerance": {
+      "abs": 0.05
      }
     }
    }
@@ -102939,6 +103048,54 @@
      "value": 223.6,
      "tolerance": {
       "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "euler-johnson-column",
+   "source_publisher": "McGraw-Hill (Shigley's MED 11th ed. solutions, via Oakland University)",
+   "source_title": "Problem 4-131(b), Johnson column",
+   "source_edition_or_year": "11th ed., pp. 89-90",
+   "source_section_or_page": "0.75 in solid round, 16 in, pinned, E 30 Mpsi, Sy 37.5 kpsi: l/k = 85.33 (use Johnson), Pcr = 12,748 lbf",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "modulus_psi": 30000000,
+    "yield_strength_psi": 37500,
+    "moment_of_inertia_in4": 0.015531555459594728,
+    "area_in2": 0.44178646640625,
+    "length_in": 16
+   },
+   "outputs": {
+    "critical_load_lbf": {
+     "value": 12748,
+     "tolerance": {
+      "abs": 2
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "euler-johnson-column",
+   "source_publisher": "McGraw-Hill (Shigley's MED 11th ed. solutions, via Oakland University)",
+   "source_title": "Problem 4-131(a), Euler column",
+   "source_edition_or_year": "11th ed., pp. 89-90",
+   "source_section_or_page": "1.25 in solid round, 50 in, pinned: l/k 160 above (l/k)1 126 -> Euler, Pcr = 14,194 lbf",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "modulus_psi": 30000000,
+    "yield_strength_psi": 37500,
+    "moment_of_inertia_in4": 0.11984224891662598,
+    "area_in2": 1.22718462890625,
+    "length_in": 50
+   },
+   "outputs": {
+    "critical_load_lbf": {
+     "value": 14194,
+     "tolerance": {
+      "abs": 2
      }
     }
    }
@@ -103354,6 +103511,40 @@
      "value": -3000,
      "tolerance": {
       "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "thick-wall-cylinder-stress",
+   "source_publisher": "McGraw-Hill (Shigley's MED 11th ed. solutions, via Oakland University)",
+   "source_title": "Problem 3-118",
+   "source_edition_or_year": "11th ed., p. 90",
+   "source_section_or_page": "pi 50 psi, ro 180 in, ri 179.25 in -> tangential 11,975 psi, longitudinal 5,963 psi, radial -50 psi",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "pressure_psi": 50,
+    "inner_radius_in": 179.25,
+    "wall_thickness_in": 0.75
+   },
+   "outputs": {
+    "hoop_bore_psi": {
+     "value": 11975,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "longitudinal_psi": {
+     "value": 5963,
+     "tolerance": {
+      "abs": 0.6
+     }
+    },
+    "radial_bore_psi": {
+     "value": -50,
+     "tolerance": {
+      "abs": 0.01
      }
     }
    }
@@ -114495,6 +114686,42 @@
    }
   },
   {
+   "tile_id": "ruling-span",
+   "source_publisher": "USDA Rural Utilities Service",
+   "source_title": "Bulletin 1724E-200 Design Manual for High Voltage Transmission Lines, Example 9-1",
+   "source_edition_or_year": "p. 9-23",
+   "source_section_or_page": "spans 925, 1,380, 495 and 1,005 ft -> RS = 1,094 ft; average 951 ft; field approximation 1,237 ft",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "span_1_ft": 925,
+    "span_2_ft": 1380,
+    "span_3_ft": 495,
+    "span_4_ft": 1005,
+    "ruling_span_sag_ft": 10
+   },
+   "outputs": {
+    "ruling_span_ft": {
+     "value": 1094,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "average_span_ft": {
+     "value": 951,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "field_approximation_ft": {
+     "value": 1237,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
    "tile_id": "conductor-sag-at-temperature",
    "source_publisher": "Project (first-principles)",
    "source_title": "ACSR Drake on a 600 ft ruling span strung to 6,000 lb at 60 degF, checked at 120 degF",
@@ -116122,6 +116349,37 @@
      "value": 227.79177,
      "tolerance": {
       "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "meter-ct-pt-multiplier",
+   "source_publisher": "City of Banning, CA",
+   "source_title": "Meter Multiplier Explained",
+   "source_edition_or_year": "web page",
+   "source_section_or_page": "200:5 CT, no PT, register constant 1 -> multiplier 40; a 125 kWh register reading bills 5,000 kWh",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "ct_primary_a": 200,
+    "ct_secondary_a": 5,
+    "pt_primary_v": 120,
+    "pt_secondary_v": 120,
+    "register_constant": 1,
+    "register_reading_kwh": 125
+   },
+   "outputs": {
+    "multiplier": {
+     "value": 40,
+     "tolerance": {
+      "abs": 0
+     }
+    },
+    "billed_kwh": {
+     "value": 5000,
+     "tolerance": {
+      "abs": 0.5
      }
     }
    }
@@ -119899,6 +120157,31 @@
    }
   },
   {
+   "tile_id": "pipeline-mao-barlow",
+   "source_publisher": "Utility Technologies International (Ohio Gas Association seminar)",
+   "source_title": "Common Natural Gas Engineering Problems - And Solutions",
+   "source_edition_or_year": "December 3, 2012, p. 16",
+   "source_section_or_page": "P = 2 x 42,000 x 0.250 / 12.75 x 0.50 x 1.00 x 1.00 = 823.53 psig (Class 3)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "od_in": 12.75,
+    "wall_in": 0.25,
+    "smys_psi": 42000,
+    "class_location": "class_3",
+    "joint_factor": 1,
+    "temperature_factor": 1
+   },
+   "outputs": {
+    "maop_psig": {
+     "value": 823.53,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
    "tile_id": "gas-pipeline-flow",
    "source_publisher": "Project (first-principles)",
    "source_title": "Gas Pipeline Flow (Weymouth and Panhandle A) -- the spec-v1525 worked example, recomputed",
@@ -120189,6 +120472,32 @@
    }
   },
   {
+   "tile_id": "corroded-pipe-b31g",
+   "source_publisher": "ASME",
+   "source_title": "B31G-1991 Manual for Determining the Remaining Strength of Corroded Pipelines, Appendix A example",
+   "source_edition_or_year": "1991, p. 47",
+   "source_section_or_page": "24 in x 0.281 in, SMYS 52,000, F 0.72, d 0.08 in, L 15 in, MAOP 731: safe pressure P' = 690 psi (safety factor entered as 1/0.72)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "od_in": 24,
+    "wall_in": 0.281,
+    "smys_psi": 52000,
+    "defect_depth_in": 0.08,
+    "defect_length_in": 15,
+    "safety_factor": 1.3888888888888888,
+    "maop_psig": 731
+   },
+   "outputs": {
+    "safe_pressure_psi": {
+     "value": 690,
+     "tolerance": {
+      "abs": 1
+     }
+    }
+   }
+  },
+  {
    "tile_id": "casing-cement-volume",
    "source_publisher": "Project (first-principles)",
    "source_title": "Well Casing and Annulus Cement Volume -- the spec-v1530 worked example, recomputed",
@@ -120247,6 +120556,43 @@
    }
   },
   {
+   "tile_id": "casing-cement-volume",
+   "source_publisher": "DrillingFormulas.com",
+   "source_title": "Calculate Cement (Oil Well Cement) Volume Required",
+   "source_edition_or_year": "web article",
+   "source_section_or_page": "(8.6^2 - 7^2) / 1029.4 = 0.02425 bbl/ft x 2,500 ft = 60.6 bbl; displacement 0.03716 x 8,960 = 333 bbl (the source also adds 1.5 bbl of shoe track, not modeled)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "hole_dia_in": 8.6,
+    "casing_od_in": 7,
+    "casing_id_in": 6.185,
+    "cement_column_ft": 2500,
+    "excess_pct": 0,
+    "float_collar_ft": 8960
+   },
+   "outputs": {
+    "annular_capacity_bbl_ft": {
+     "value": 0.02425,
+     "tolerance": {
+      "abs": 1e-05
+     }
+    },
+    "annular_volume_bbl": {
+     "value": 60.6,
+     "tolerance": {
+      "abs": 0.05
+     }
+    },
+    "displacement_bbl": {
+     "value": 333,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
    "tile_id": "mud-hydrostatic-pressure",
    "source_publisher": "Project (first-principles)",
    "source_title": "Drilling Mud Weight and Hydrostatic Pressure -- the spec-v1531 worked example, recomputed",
@@ -120295,6 +120641,27 @@
      "value": 1430,
      "tolerance": {
       "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "mud-hydrostatic-pressure",
+   "source_publisher": "DrillingFormulas.com",
+   "source_title": "Hydrostatic Pressure Calculation",
+   "source_edition_or_year": "web article",
+   "source_section_or_page": "12.0 ppg at 10,000 ft TVD -> HP = 6,240 psi",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "mud_weight_ppg": 12,
+    "tvd_ft": 10000
+   },
+   "outputs": {
+    "hydrostatic_psi": {
+     "value": 6240,
+     "tolerance": {
+      "abs": 0.5
      }
     }
    }
@@ -120359,6 +120726,28 @@
    }
   },
   {
+   "tile_id": "kill-mud-weight",
+   "source_publisher": "DrillingFormulas.com",
+   "source_title": "Kill Weight Mud",
+   "source_edition_or_year": "web article",
+   "source_section_or_page": "9.5 ppg, 9,000 ft TVD, SIDPP 500 psi: KWM = 9.5 + 500 / 0.052 / 9,000 = 10.6 ppg (rounded up)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "original_mw_ppg": 9.5,
+    "tvd_ft": 9000,
+    "sidpp_psi": 500
+   },
+   "outputs": {
+    "kill_mw_ppg": {
+     "value": 10.57,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
    "tile_id": "annular-velocity-cleaning",
    "source_publisher": "Project (first-principles)",
    "source_title": "Annular Velocity and Hole Cleaning -- the spec-v1533 worked example, recomputed",
@@ -120411,6 +120800,28 @@
      "value": 139.85203,
      "tolerance": {
       "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "annular-velocity-cleaning",
+   "source_publisher": "DrillingFormulas.com",
+   "source_title": "Annular Velocity Calculation",
+   "source_edition_or_year": "web article",
+   "source_section_or_page": "(24.5 x 800) / (10^2 - 5^2) = 261 ft/min",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "hole_dia_in": 10,
+    "pipe_od_in": 5,
+    "flow_gpm": 800
+   },
+   "outputs": {
+    "annular_velocity_ft_min": {
+     "value": 261,
+     "tolerance": {
+      "abs": 0.5
      }
     }
    }
