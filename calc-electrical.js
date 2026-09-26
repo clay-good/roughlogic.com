@@ -5352,19 +5352,24 @@ export function computeAsymmetricalFaultXr({ isym_ka = 0, x_over_r = 0 } = {}) {
   const xr = Number(x_over_r) || 0;
   if (!(isym > 0)) return { error: "Symmetrical fault current must be positive (kA)." };
   if (!(xr > 0)) return { error: "X/R ratio must be positive." };
-  const i_peak_ka = Math.SQRT2 * isym * (1 + Math.exp(-Math.PI / xr));
+  // The peak falls slightly before the half cycle, at (phi + pi/2) with phi = atan(X/R): the
+  // ANSI C37 / NEMA AB-1 form, which reproduces the Bussmann / NEMA Mp table (2.309 at X/R 6.59,
+  // 2.554 at 14.25). Until 2026-09-25 this took e^(-pi/(X/R)), the value AT the half cycle,
+  // which reads 0.2-0.7% low -- the unconservative side for a peak-withstand rating.
+  const phi = Math.atan(xr);
+  const i_peak_ka = Math.SQRT2 * isym * (1 + Math.exp(-(phi + Math.PI / 2) / xr));
   const mf_rms = Math.sqrt(1 + 2 * Math.exp(-2 * Math.PI / xr));
   const i_asym_ka = isym * mf_rms;
   const peak_factor = i_peak_ka / isym;
   if (![i_peak_ka, mf_rms, i_asym_ka, peak_factor].every(Number.isFinite)) return { error: "Fault-asymmetry math is not a finite value." };
   return {
     i_peak_ka, mf_rms, i_asym_ka, peak_factor,
-    note: "First-cycle fault asymmetry from the DC offset: the first half-cycle of a real fault rides a DC offset on the AC wave, sized by the circuit X/R ratio. I_peak = sqrt(2) x I_sym x (1 + e^(-pi/(X/R))) and the asymmetrical RMS multiplier MF = sqrt(1 + 2 e^(-2 pi/(X/R))). Both grow as X/R rises -- highest near large transformers and generators, about 2.6x peak and 1.6x RMS at X/R 20-25, approaching 2.83x (2 sqrt 2) and 1.73x (sqrt 3) only as X/R grows without bound. A device's peak-withstand and a bus bracing rating must survive the ASYMMETRICAL first-cycle current, not the symmetrical RMS, so comparing gear against the symmetrical value under-rates it on a stiff, high-X/R service. The factors assume the worst-case fully offset phase. A design aid; the interrupting-duty rating and a coordination study govern.",
+    note: "First-cycle fault asymmetry from the DC offset: the first half-cycle of a real fault rides a DC offset on the AC wave, sized by the circuit X/R ratio. I_peak = sqrt(2) x I_sym x (1 + e^(-(phi + pi/2)/(X/R))), phi = atan(X/R), and the asymmetrical RMS multiplier MF = sqrt(1 + 2 e^(-2 pi/(X/R))). Both grow as X/R rises -- highest near large transformers and generators, about 2.6x peak and 1.6x RMS at X/R 20-25, approaching 2.83x (2 sqrt 2) and 1.73x (sqrt 3) only as X/R grows without bound. A device's peak-withstand and a bus bracing rating must survive the ASYMMETRICAL first-cycle current, not the symmetrical RMS, so comparing gear against the symmetrical value under-rates it on a stiff, high-X/R service. The factors assume the worst-case fully offset phase. A design aid; the interrupting-duty rating and a coordination study govern.",
   };
 }
 export const asymmetricalFaultXrExample = { inputs: { isym_ka: 20, x_over_r: 15 } };
 function _v496renderAsymmetricalFaultXr(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: First-cycle fault asymmetry from X/R (IEEE C37 / NEMA AB-4 model): I_peak = sqrt(2) x I_sym x (1 + e^(-pi/(X/R))); asymmetrical RMS multiplier MF = sqrt(1 + 2 e^(-2 pi/(X/R))); I_asym = I_sym x MF. The asymmetrical first-cycle current, not the symmetrical RMS, is what a peak-withstand and bus bracing rating must survive. A design aid; the interrupting-duty rating and coordination study govern.";
+  citationEl.textContent = "Citation: First-cycle fault asymmetry from X/R (IEEE C37 / NEMA AB-4 model): I_peak = sqrt(2) x I_sym x (1 + e^(-(phi + pi/2)/(X/R))), phi = atan(X/R); asymmetrical RMS multiplier MF = sqrt(1 + 2 e^(-2 pi/(X/R))); I_asym = I_sym x MF. The asymmetrical first-cycle current, not the symmetrical RMS, is what a peak-withstand and bus bracing rating must survive. A design aid; the interrupting-duty rating and coordination study govern.";
   const isym = makeNumber("Symmetrical RMS fault current (kA)", "afx-isym", { step: "any", min: "0" });
   const xr = makeNumber("Circuit X/R ratio", "afx-xr", { step: "any", min: "0" });
   for (const f of [isym, xr]) inputRegion.appendChild(f.wrap);

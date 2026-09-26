@@ -2,7 +2,7 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "47810e8652a9a1cc",
+      "sha": "87658c08ffe1eaa6",
       "date": "2026-09-26"
     },
     "/tools/": {
@@ -374,8 +374,8 @@
       "date": "2026-09-01"
     },
     "/tools/asymmetrical-fault-xr/": {
-      "sha": "4af0e3d9ff820e3c",
-      "date": "2026-09-01"
+      "sha": "937d2ff0edf12f6e",
+      "date": "2026-09-26"
     },
     "/tools/at-rest-earth-pressure/": {
       "sha": "2a19a2df44e919ee",
@@ -1214,8 +1214,8 @@
       "date": "2026-09-04"
     },
     "/tools/clarifier-surface-loading/": {
-      "sha": "5bee7ef230cb6323",
-      "date": "2026-09-04"
+      "sha": "917d44bf74e99c11",
+      "date": "2026-09-26"
     },
     "/tools/class-of-loss-screen/": {
       "sha": "53b7f9824c0bd031",
@@ -3382,8 +3382,8 @@
       "date": "2026-09-01"
     },
     "/tools/grain-shrink-moisture/": {
-      "sha": "3acea7e797112973",
-      "date": "2026-09-25"
+      "sha": "98b56cb14ad3202c",
+      "date": "2026-09-26"
     },
     "/tools/grains-removed/": {
       "sha": "ba446168ceec79dc",

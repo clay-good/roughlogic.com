@@ -2610,7 +2610,10 @@ export function computeGrainShrinkMoisture({ W_lb = 0, M_wet_pct = 0, M_dry_pct 
   if (!(tw > 0)) return { error: "Enter a positive test weight (lb/bu)." };
   const moist_shrink = (Mw - Md) / (100 - Md);
   const W_dry = W * (100 - Mw) / (100 - Md);
-  const W_net = W_dry * (1 - h / 100);
+  // Handling loss is a percentage of the ORIGINAL wet weight, added to the water shrink (National
+  // Corn Handbook NCH-61: 11.24% water + 0.5% handling = 11.74% total). Until 2026-09-25 it came off
+  // the dried weight (11.69% on the same example).
+  const W_net = W_dry - W * h / 100;
   const bushels = W_net / tw;
   const total_shrink = (W - W_net) / W * 100;
   return {

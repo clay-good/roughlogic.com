@@ -21916,6 +21916,76 @@
    }
   },
   {
+   "tile_id": "clarifier-surface-loading",
+   "source_publisher": "Pennsylvania DEP",
+   "source_title": "Wastewater Operator Training Module 4, Answer Key",
+   "source_edition_or_year": "operator training",
+   "source_section_or_page": "Problem 2.3: 125 ft clarifier (12,272 ft^2), 6.0 MGD plus 2.0 MGD return sludge at 4,000 mg/L -> 21.75 lb/day/ft^2",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "flow_mgd": 6,
+    "surface_ft2": 12272,
+    "weir_len_ft": 392.7,
+    "mlss_mgl": 4000,
+    "ras_mgd": 2
+   },
+   "outputs": {
+    "solids_lb_ft2_day": {
+     "value": 21.75,
+     "tolerance": {
+      "abs": 0.005
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "clarifier-surface-loading",
+   "source_publisher": "Pennsylvania DEP",
+   "source_title": "Wastewater Operator Training Module 4, Answer Key",
+   "source_edition_or_year": "operator training",
+   "source_section_or_page": "Problem 2.2: 40 x 110 ft at 5.0 MGD -> 1136 gpd/ft^2",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "flow_mgd": 5,
+    "surface_ft2": 4400,
+    "weir_len_ft": 100,
+    "mlss_mgl": 0
+   },
+   "outputs": {
+    "sor_gpd_ft2": {
+     "value": 1136,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "clarifier-surface-loading",
+   "source_publisher": "Pennsylvania DEP",
+   "source_title": "Wastewater Operator Training Module 4, Answer Key",
+   "source_edition_or_year": "operator training",
+   "source_section_or_page": "weir overflow: 75 ft weir diameter (235.6 ft), 3.5 MGD -> 14,855 gpd/ft",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "flow_mgd": 3.5,
+    "surface_ft2": 4418,
+    "weir_len_ft": 235.6,
+    "mlss_mgl": 0
+   },
+   "outputs": {
+    "weir_gpd_ft": {
+     "value": 14855,
+     "tolerance": {
+      "abs": 1
+     }
+    }
+   }
+  },
+  {
    "tile_id": "bod-tss-loading-removal",
    "source_publisher": "wastewater operations (pounds formula)",
    "source_title": "1.0 MGD, 200 -> 20 mg/L -> 1,668 lb/day in, 1,501 removed, 90.0%",
@@ -30024,6 +30094,75 @@
    }
   },
   {
+   "tile_id": "glidepath-descent-rate",
+   "source_publisher": "FAA",
+   "source_title": "Terminal Procedures Publication, Rate of Descent Table (ft per min)",
+   "source_edition_or_year": "d-TPP front matter, cycle 2610",
+   "source_section_or_page": "3.0 deg: 318 ft/NM; 637 ft/min at 120 kt",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "ground_speed_kt": 120,
+    "glidepath_angle_deg": 3
+   },
+   "outputs": {
+    "rod_fpm": {
+     "value": 637,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "ft_per_nm": {
+     "value": 318,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "glidepath-descent-rate",
+   "source_publisher": "FAA",
+   "source_title": "Terminal Procedures Publication, Rate of Descent Table (ft per min)",
+   "source_edition_or_year": "d-TPP front matter, cycle 2610",
+   "source_section_or_page": "2.5 deg at 90 kt: 398 ft/min",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "ground_speed_kt": 90,
+    "glidepath_angle_deg": 2.5
+   },
+   "outputs": {
+    "rod_fpm": {
+     "value": 398,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "glidepath-descent-rate",
+   "source_publisher": "FAA",
+   "source_title": "Terminal Procedures Publication, Rate of Descent Table (ft per min)",
+   "source_edition_or_year": "d-TPP front matter, cycle 2610",
+   "source_section_or_page": "3.5 deg at 150 kt: 929 ft/min",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "ground_speed_kt": 150,
+    "glidepath_angle_deg": 3.5
+   },
+   "outputs": {
+    "rod_fpm": {
+     "value": 929,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
    "tile_id": "engine-bmep",
    "source_publisher": "Brake mean effective pressure (SAE; Heywood)",
    "source_title": "BMEP = 150.8 x torque(lb-ft) / displacement(CID), 4-stroke",
@@ -34365,6 +34504,28 @@
    }
   },
   {
+   "tile_id": "tire-load-check",
+   "source_publisher": "Michelin",
+   "source_title": "Truck tire load and inflation tables (RV and truck compilation)",
+   "source_edition_or_year": "2019",
+   "source_section_or_page": "11R22.5 LRG, single (2 tires per axle): 12,350 lb per axle at 105 psi; sidewall S 6175 lb",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "axle_weight_lb": 12000,
+    "tires_on_axle": 2,
+    "tire_max_load_lb": 6175
+   },
+   "outputs": {
+    "axle_capacity_lb": {
+     "value": 12350,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
    "tile_id": "two-source-blend",
    "source_publisher": "Flow-weighted two-source water blend",
    "source_title": "500 gpm @ 4 mg/L + 300 gpm @ 12 mg/L -> 7.0 mg/L; 50% clean flow to hit 8 mg/L",
@@ -34719,6 +34880,28 @@
      "value": 1,
      "tolerance": {
       "abs": 0
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "chlorine-demand",
+   "source_publisher": "California DPH / RCAC",
+   "source_title": "Water Treatment Math Worksheet",
+   "source_edition_or_year": "2015",
+   "source_section_or_page": "Q20: dose 2.3, residual 1 -> demand 1.3 ppm",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "applied_mg_l": 2.3,
+    "measured_residual_mg_l": 1,
+    "target_residual_mg_l": 1.5
+   },
+   "outputs": {
+    "demand_mg_l": {
+     "value": 1.3,
+     "tolerance": {
+      "abs": 0.005
      }
     }
    }
@@ -44878,6 +45061,28 @@
      "value": -400,
      "tolerance": {
       "abs": 1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "tractor-ballast",
+   "source_publisher": "Mississippi State University Extension (Staton, Harrigan, Turner)",
+   "source_title": "Improving Tractor Performance and Fuel Efficiency (Table 1 after Hanna and AlKaisi, ISU 2005)",
+   "source_edition_or_year": "fact sheet",
+   "source_section_or_page": "MFWD, 200 PTO hp, 4.5 mph at 130 lb/PTO hp: 200 x 130 = 26,000 lb",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "power_hp": 200,
+    "weight_to_power_ratio": 130,
+    "current_weight_lb": 21500
+   },
+   "outputs": {
+    "target_weight_lb": {
+     "value": 26000,
+     "tolerance": {
+      "abs": 0.5
      }
     }
    }
@@ -70602,6 +70807,72 @@
    }
   },
   {
+   "tile_id": "grain-shrink-moisture",
+   "source_publisher": "National Corn Handbook (Hicks and Cloud; Purdue, Iowa State, Wisconsin reviewers)",
+   "source_title": "NCH-61, Calculating Grain Weight Shrinkage in Corn Due to Mechanical Drying",
+   "source_edition_or_year": "February 1992",
+   "source_section_or_page": "1,000 lb dried 25% -> 15.5%: water shrink 11.24%, plus 0.5% handling = total shrink 11.74%",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "W_lb": 1000,
+    "M_wet_pct": 25,
+    "M_dry_pct": 15.5,
+    "handling": 0.5,
+    "tw_lbbu": 56
+   },
+   "outputs": {
+    "moist_shrink_pct": {
+     "value": 11.24,
+     "tolerance": {
+      "abs": 0.005
+     }
+    },
+    "total_shrink_pct": {
+     "value": 11.74,
+     "tolerance": {
+      "abs": 0.005
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "grain-shrink-moisture",
+   "source_publisher": "South Dakota State University Extension",
+   "source_title": "iGrow Corn, Chapter 35, Example 35.1",
+   "source_edition_or_year": "2019",
+   "source_section_or_page": "16,954 lb at 20% dried to 13%, 56 lb/bu: 15,590 lb, 278.4 bushels, 8.045% shrink",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "W_lb": 16954,
+    "M_wet_pct": 20,
+    "M_dry_pct": 13,
+    "handling": 0,
+    "tw_lbbu": 56
+   },
+   "outputs": {
+    "W_dry_lb": {
+     "value": 15590,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "bushels": {
+     "value": 278.4,
+     "tolerance": {
+      "abs": 0.05
+     }
+    },
+    "moist_shrink_pct": {
+     "value": 8.045,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
    "tile_id": "livestock-dry-matter-intake",
    "source_publisher": "NRC Nutrient Requirements",
    "source_title": "1,200 lb steer at 2.5% intake, dry hay 88% DM -> 30 lb DMI, 34.1 lb as-fed",
@@ -70705,6 +70976,29 @@
    "outputs": {
     "rate": {
      "value": 6.0,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "manure-application-rate",
+   "source_publisher": "Minnesota Pollution Control Agency",
+   "source_title": "Manure application rate guide (wq-f6-26)",
+   "source_edition_or_year": "January 2020",
+   "source_section_or_page": "p. 13 chart, injected liquid beef manure (50% year-1 availability): N test 10 lb/1,000 gal, 150 lb available N desired -> 30.0 thousand gal/acre",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "crop_need": 150,
+    "total_nutr": 10,
+    "availability": 50,
+    "form": "liquid"
+   },
+   "outputs": {
+    "rate": {
+     "value": 30,
      "tolerance": {
       "abs": 0.05
      }
@@ -72572,6 +72866,29 @@
      "value": 4472,
      "tolerance": {
       "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "thrust-block-sizing",
+   "source_publisher": "IAPMO UPC Appendix I (Hawaii Plumbing Code 2021, via UpCodes)",
+   "source_title": "Thrust Blocking, Table 2: Thrust at Fittings in Pounds at 100 psi",
+   "source_edition_or_year": "2021",
+   "source_section_or_page": "NPS 8, 90 degree bend: 8,300 lb (rounded to 100 lb)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "pressure_psi": 100,
+    "od_in": 8.625,
+    "bend_deg": 90,
+    "soil_bearing_psf": 2000
+   },
+   "outputs": {
+    "thrust_lb": {
+     "value": 8300,
+     "tolerance": {
+      "abs": 50
      }
     }
    }
@@ -77799,6 +78116,50 @@
    }
   },
   {
+   "tile_id": "torque-adapter-correction",
+   "source_publisher": "FAA",
+   "source_title": "AC 43.13-1B, Figure 7-2, Torque wrench with various adapters",
+   "source_edition_or_year": "September 8, 1998 (with change 1)",
+   "source_section_or_page": "T x L / (L + E) = Y: 135 lb-in, L 10.0 in., E 1.5 in. -> 1350 / 11.5 = 117.39, Y = 117 lb-in (the relation is unit-free in torque)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "target_torque_ftlb": 135,
+    "wrench_length_in": 10,
+    "adapter_length_in": 1.5
+   },
+   "outputs": {
+    "wrench_setting_ftlb": {
+     "value": 117.39,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "torque-adapter-correction",
+   "source_publisher": "Capri Tools",
+   "source_title": "Torque Adapter Calculator",
+   "source_edition_or_year": "web page",
+   "source_section_or_page": "TA 100 ft-lb, L 18 in., A 3 in.: TS = 100 x 18 / 21 -> set the wrench to 85.7 ft-lbs",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "target_torque_ftlb": 100,
+    "wrench_length_in": 18,
+    "adapter_length_in": 3
+   },
+   "outputs": {
+    "wrench_setting_ftlb": {
+     "value": 85.7,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
    "tile_id": "density-altitude",
    "source_publisher": "FAA density-altitude method (ISA lapse correction)",
    "source_title": "5,000 ft field, 29.92 altimeter, 95 F -> PA 5,000 ft, DA 8,600 ft (flies like 3,600 ft higher)",
@@ -79332,7 +79693,7 @@
    },
    "outputs": {
     "i_peak_ka": {
-     "value": 51.2,
+     "value": 51.33,
      "tolerance": {
       "abs": 0.1
      }
@@ -79365,13 +79726,67 @@
    },
    "outputs": {
     "i_peak_ka": {
-     "value": 43.4,
+     "value": 43.98,
      "tolerance": {
       "abs": 0.1
      }
     },
     "mf_rms": {
      "value": 1.253,
+     "tolerance": {
+      "abs": 0.005
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "asymmetrical-fault-xr",
+   "source_publisher": "Cooper Bussmann (reprinting NEMA AB-1)",
+   "source_title": "Engineering Dependable Protection Part I, Bulletin EDP-1, Table 8 Asymmetrical Factors",
+   "source_edition_or_year": "2004",
+   "source_section_or_page": "7% PF, X/R 14.251: Mp 2.554 (peak), Mm 1.512 (single-phase RMS at 1/2 cycle)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "isym_ka": 50,
+    "x_over_r": 14.251
+   },
+   "outputs": {
+    "peak_factor": {
+     "value": 2.554,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "mf_rms": {
+     "value": 1.512,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "asymmetrical-fault-xr",
+   "source_publisher": "Cooper Bussmann (reprinting NEMA AB-1)",
+   "source_title": "Engineering Dependable Protection Part I, Bulletin EDP-1",
+   "source_edition_or_year": "2004",
+   "source_section_or_page": "worked example, 15% PF (X/R 6.5912): Ip = 50,000 x 2.309 = 115,450 A",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "isym_ka": 50,
+    "x_over_r": 6.5912
+   },
+   "outputs": {
+    "i_peak_ka": {
+     "value": 115.45,
+     "tolerance": {
+      "pct": 0.2
+     }
+    },
+    "peak_factor": {
+     "value": 2.309,
      "tolerance": {
       "abs": 0.005
      }

@@ -841,33 +841,39 @@ TREATMENT_RENDERERS["breakpoint-chlorination"] = _rPool({
 
 // ===================== spec-v405..v407: water/wastewater-operations trio (Group M) =====================
 
-// dims: in { flow_mgd: L^3 T^-1, surface_ft2: L^2, weir_len_ft: L, mlss_mgl: dimensionless } out: { sor_gpd_ft2: dimensionless, weir_gpd_ft: dimensionless, solids_lb_ft2_day: dimensionless }
-export function computeClarifierSurfaceLoading({ flow_mgd = 0, surface_ft2 = 0, weir_len_ft = 0, mlss_mgl = 0 } = {}) {
+// dims: in { flow_mgd: L^3 T^-1, surface_ft2: L^2, weir_len_ft: L, mlss_mgl: dimensionless, ras_mgd: L^3 T^-1 } out: { sor_gpd_ft2: dimensionless, weir_gpd_ft: dimensionless, solids_lb_ft2_day: dimensionless }
+export function computeClarifierSurfaceLoading({ flow_mgd = 0, surface_ft2 = 0, weir_len_ft = 0, mlss_mgl = 0, ras_mgd = 0 } = {}) {
   const flow = Number(flow_mgd) || 0;
   const area = Number(surface_ft2) || 0;
   const weir = Number(weir_len_ft) || 0;
   const mlss = Number(mlss_mgl) || 0;
+  const ras = Number(ras_mgd) || 0;
   if (!(flow > 0 && Number.isFinite(flow))) return { error: "Flow must be positive (MGD)." };
+  if (ras < 0 || !Number.isFinite(ras)) return { error: "Return sludge flow must be a non-negative finite number (MGD)." };
   if (!(area > 0 && Number.isFinite(area))) return { error: "Surface area must be positive (ft^2)." };
   if (!(weir > 0 && Number.isFinite(weir))) return { error: "Weir length must be positive (ft)." };
   if (mlss < 0 || !Number.isFinite(mlss)) return { error: "MLSS must be a non-negative finite number (mg/L)." };
   const sor_gpd_ft2 = (flow * 1e6) / area;
   const weir_gpd_ft = (flow * 1e6) / weir;
-  const solids_lb_ft2_day = mlss > 0 ? flow * mlss * 8.34 / area : null;
+  // Solids reach the clarifier on the influent PLUS the return activated sludge (Ten States §72.2:
+  // design flow "plus the design maximum return sludge rate"). Until 2026-09-25 the RAS was left out;
+  // it now enters as ras_mgd (default 0, which reproduces the old influent-only figure).
+  const solids_lb_ft2_day = mlss > 0 ? (flow + ras) * mlss * 8.34 / area : null;
   return {
     sor_gpd_ft2, weir_gpd_ft, solids_lb_ft2_day,
     sor_overloaded: sor_gpd_ft2 > 1000,
-    note: "Clarifier loading checks: surface overflow rate SOR = flow / surface area (gpd/ft^2), weir overflow rate = flow / total weir length (gpd/ft), and (for a secondary clarifier) solids loading = flow x MLSS x 8.34 / area (lb/ft^2/day). Recommended Standards for Wastewater Facilities (Ten States, 2014) limits: primary tanks 1,000 gpd/ft^2 at design average flow (700 if they receive waste activated sludge; 1,500-2,000 and 1,200 at peak hour); activated-sludge final tanks at peak hour 1,200 (conventional), 1,000 (extended aeration) or 800 (2-stage nitrification) gpd/ft^2 with 40 or 35 lb/ft^2/day peak solids (72.232); weir loading 20,000 gpd/ft for plants of 1 MGD or less and 30,000 above (72.43). The flag here trips above 1,000 gpd/ft^2; exceeding the SOR carries floc over the weir. The state design criteria govern. An operations aid; the operator of record and the primacy agency govern compliance.",
+    note: "Clarifier loading checks: surface overflow rate SOR = flow / surface area (gpd/ft^2), weir overflow rate = flow / total weir length (gpd/ft), and (for a secondary clarifier) solids loading = (flow + return sludge flow) x MLSS x 8.34 / area (lb/ft^2/day). Recommended Standards for Wastewater Facilities (Ten States, 2014) limits: primary tanks 1,000 gpd/ft^2 at design average flow (700 if they receive waste activated sludge; 1,500-2,000 and 1,200 at peak hour); activated-sludge final tanks at peak hour 1,200 (conventional), 1,000 (extended aeration) or 800 (2-stage nitrification) gpd/ft^2 with 40 or 35 lb/ft^2/day peak solids (72.232); weir loading 20,000 gpd/ft for plants of 1 MGD or less and 30,000 above (72.43). The flag here trips above 1,000 gpd/ft^2; exceeding the SOR carries floc over the weir. The state design criteria govern. An operations aid; the operator of record and the primacy agency govern compliance.",
   };
 }
 export const clarifierSurfaceLoadingExample = { inputs: { flow_mgd: 1.0, surface_ft2: 1256.6, weir_len_ft: 125.7, mlss_mgl: 2500 } };
 function renderClarifierSurfaceLoading(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: Clarifier hydraulic and solids loading (Ten States Standards / Metcalf & Eddy, Wastewater Engineering): surface overflow rate = flow/area (gpd/ft^2), weir overflow rate = flow/weir length (gpd/ft), solids loading = flow x MLSS x 8.34 / area (lb/ft^2/day). The state design criteria govern the limits. An operations aid; the operator of record and the primacy agency govern compliance.";
+  citationEl.textContent = "Citation: Clarifier hydraulic and solids loading (Ten States Standards / Metcalf & Eddy, Wastewater Engineering): surface overflow rate = flow/area (gpd/ft^2), weir overflow rate = flow/weir length (gpd/ft), solids loading = (flow + return sludge flow) x MLSS x 8.34 / area (lb/ft^2/day). The state design criteria govern the limits. An operations aid; the operator of record and the primacy agency govern compliance.";
   const flow = makeNumber("Flow (MGD)", "csl-flow", { step: "any", min: "0" });
   const area = makeNumber("Surface area (ft²)", "csl-area", { step: "any", min: "0" });
   const weir = makeNumber("Total weir length (ft)", "csl-weir", { step: "any", min: "0" });
   const mlss = makeNumber("MLSS (mg/L, secondary only)", "csl-mlss", { step: "any", min: "0" });
-  for (const f of [flow, area, weir, mlss]) inputRegion.appendChild(f.wrap);
+  const ras = makeNumber("Return sludge flow (MGD, secondary only)", "csl-ras", { step: "any", min: "0" });
+  for (const f of [flow, area, weir, mlss, ras]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { flow.input.value = "1.0"; area.input.value = "1256.6"; weir.input.value = "125.7"; mlss.input.value = "2500"; update(); });
   const oSor = makeOutputLine(outputRegion, "Surface overflow rate", "csl-out-sor");
   const oWeir = makeOutputLine(outputRegion, "Weir overflow rate", "csl-out-weir");
@@ -875,14 +881,14 @@ function renderClarifierSurfaceLoading(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "csl-out-n");
   function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
   const update = debounce(() => {
-    const r = computeClarifierSurfaceLoading({ flow_mgd: readNum(flow.input), surface_ft2: readNum(area.input), weir_len_ft: readNum(weir.input), mlss_mgl: readNum(mlss.input) });
+    const r = computeClarifierSurfaceLoading({ flow_mgd: readNum(flow.input), surface_ft2: readNum(area.input), weir_len_ft: readNum(weir.input), mlss_mgl: readNum(mlss.input), ras_mgd: readNum(ras.input) });
     if (r.error) { oSor.textContent = r.error; oWeir.textContent = "-"; oSolids.textContent = "-"; oNote.textContent = ""; return; }
     oSor.textContent = fmt(r.sor_gpd_ft2, 0) + " gpd/ft^2" + (r.sor_overloaded ? " (OVER 1,000, the Ten States primary design-average and extended-aeration limit -- floc carryover risk)" : "");
     oWeir.textContent = fmt(r.weir_gpd_ft, 0) + " gpd/ft";
     oSolids.textContent = r.solids_lb_ft2_day == null ? "(enter MLSS for a secondary clarifier)" : fmt(r.solids_lb_ft2_day, 1) + " lb/ft^2/day";
     oNote.textContent = r.note;
   }, DEBOUNCE_MS);
-  for (const f of [flow, area, weir, mlss]) f.input.addEventListener("input", update);
+  for (const f of [flow, area, weir, mlss, ras]) f.input.addEventListener("input", update);
 }
 TREATMENT_RENDERERS["clarifier-surface-loading"] = renderClarifierSurfaceLoading;
 

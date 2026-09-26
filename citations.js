@@ -792,14 +792,14 @@ export const CITATIONS = {
     ],
   },
   "clarifier-surface-loading": {
-    formula: "SOR = flow x 1e6 / area (gpd/ft^2); weir = flow x 1e6 / weir_len (gpd/ft); solids = flow x MLSS x 8.34 / area (lb/ft^2/day).",
+    formula: "SOR = flow x 1e6 / area (gpd/ft^2); weir = flow x 1e6 / weir_len (gpd/ft); solids = (flow + return sludge flow) x MLSS x 8.34 / area (lb/ft^2/day).",
     edition: "Clarifier surface, weir, and solids loading rates, standard wastewater-operations practice (Ten States Standards / Metcalf & Eddy), by name.",
     freeAccess: "The overflow-rate and solids-loading relations are standard published wastewater results; the state design criteria govern the limits.",
     governance: GOVERNANCE.water,
-    editionNote: "The clarifier loading checks: the surface overflow rate = flow / surface area (gpd/ft^2), the weir overflow rate = flow / total weir length (gpd/ft), and the secondary-clarifier solids loading = flow x MLSS x 8.34 / area (lb/ft^2/day). Typical design ceilings are roughly 700-1000 gpd/ft^2 SOR, 10,000-20,000 gpd/ft weir, and 20-30 lb/ft^2/day solids; exceeding the SOR carries floc over the weir. This returns the rates for comparison; the Ten States Standards and the state design criteria govern the actual limits. An operations aid; the operator of record and the primacy agency govern.",
+    editionNote: "The clarifier loading checks: the surface overflow rate = flow / surface area (gpd/ft^2), the weir overflow rate = flow / total weir length (gpd/ft), and the secondary-clarifier solids loading = (flow + return sludge flow) x MLSS x 8.34 / area (lb/ft^2/day). Typical design ceilings are roughly 700-1000 gpd/ft^2 SOR, 10,000-20,000 gpd/ft weir, and 20-30 lb/ft^2/day solids; exceeding the SOR carries floc over the weir. This returns the rates for comparison; the Ten States Standards and the state design criteria govern the actual limits. An operations aid; the operator of record and the primacy agency govern.",
     assumptions: [
       { name: "Surface overflow rate", value: "SOR = flow / surface area (gpd/ft^2)", source: "wastewater operations" },
-      { name: "Weir and solids loading", value: "weir = flow / weir length; solids = flow x MLSS x 8.34 / area", source: "Ten States Standards" },
+      { name: "Weir and solids loading", value: "weir = flow / weir length; solids = (flow + return sludge flow) x MLSS x 8.34 / area", source: "Ten States Standards" },
       { name: "Design limits", value: "state design criteria govern the actual ceilings", source: "scope of this tile" },
     ],
   },
@@ -1728,13 +1728,13 @@ export const CITATIONS = {
     ],
   },
   "asymmetrical-fault-xr": {
-    formula: "I_peak = sqrt(2) x I_sym x (1 + e^(-pi/(X/R))); MF_rms = sqrt(1 + 2 e^(-2 pi/(X/R))); I_asym = I_sym x MF_rms.",
+    formula: "I_peak = sqrt(2) x I_sym x (1 + e^(-(phi + pi/2)/(X/R))), phi = atan(X/R); MF_rms = sqrt(1 + 2 e^(-2 pi/(X/R))); I_asym = I_sym x MF_rms.",
     edition: "First-cycle fault-asymmetry model (DC offset from X/R), an IEEE C37 / NEMA AB-4 first-cycle relation, by name; the interrupting-duty rating and coordination study govern the applied duty.",
     freeAccess: "The DC-offset asymmetry factors are a standard first-principles first-cycle model; X/R comes from the utility and transformer impedance data.",
     governance: GOVERNANCE.general,
-    editionNote: "First-cycle fault asymmetry model (DC offset from X/R). I_peak = sqrt(2) x I_sym x (1 + e^(-pi/(X/R))), MF_rms = sqrt(1 + 2 e^(-2 pi/(X/R))), and I_asym_rms = I_sym x MF_rms. The first-cycle asymmetrical current, not the symmetrical RMS, is what a device's peak-withstand and a bus bracing rating must survive; the DC offset and both factors grow as X/R rises (highest near large transformers and generators, about 2.6x peak and 1.6x RMS at X/R 20-25, approaching 2.83x (2 sqrt 2) and 1.73x (sqrt 3) only as X/R grows without bound). The factors assume the worst-case fully offset phase. A design aid, not the engineer of record; the interrupting-duty rating and a protective-device coordination study govern.",
+    editionNote: "First-cycle fault asymmetry model (DC offset from X/R). I_peak = sqrt(2) x I_sym x (1 + e^(-(phi + pi/2)/(X/R))) with phi = atan(X/R), the ANSI C37 / NEMA AB-1 peak that reproduces the NEMA Mp table, MF_rms = sqrt(1 + 2 e^(-2 pi/(X/R))), and I_asym_rms = I_sym x MF_rms. The first-cycle asymmetrical current, not the symmetrical RMS, is what a device's peak-withstand and a bus bracing rating must survive; the DC offset and both factors grow as X/R rises (highest near large transformers and generators, about 2.6x peak and 1.6x RMS at X/R 20-25, approaching 2.83x (2 sqrt 2) and 1.73x (sqrt 3) only as X/R grows without bound). The factors assume the worst-case fully offset phase. A design aid, not the engineer of record; the interrupting-duty rating and a protective-device coordination study govern.",
     assumptions: [
-      { name: "Peak factor", value: "I_peak/I_sym = sqrt(2)(1 + e^(-pi/(X/R))), approaching 2.828 as X/R goes to infinity", source: "first-cycle DC-offset model" },
+      { name: "Peak factor", value: "I_peak/I_sym = sqrt(2)(1 + e^(-(atan(X/R) + pi/2)/(X/R))), approaching 2.828 as X/R goes to infinity", source: "first-cycle DC-offset model" },
       { name: "RMS factor", value: "MF = sqrt(1 + 2 e^(-2 pi/(X/R))), approaching sqrt(3) in the stiff limit", source: "first-cycle DC-offset model" },
       { name: "Worst case", value: "assumes the fully offset phase; the applied duty per the interrupting rating governs", source: "IEEE C37 / NEMA AB-4" },
     ],
@@ -2594,7 +2594,7 @@ export const CITATIONS = {
     ],
   },
   "grain-shrink-moisture": {
-    formula: "moist_shrink = (M_wet - M_dry)/(100 - M_dry); W_dry = W (100 - M_wet)/(100 - M_dry); W_net = W_dry (1 - handling/100); bushels = W_net / test_weight; total_shrink = (W - W_net)/W.",
+    formula: "moist_shrink = (M_wet - M_dry)/(100 - M_dry); W_dry = W (100 - M_wet)/(100 - M_dry); W_net = W_dry - W x handling/100 (handling on the original wet weight, so total shrink = water shrink + handling); bushels = W_net / test_weight; total_shrink = (W - W_net)/W.",
     edition: "The standard grain moisture-shrink relation used by USDA and land-grant extension, by name.",
     freeAccess: "Grain-shrink formulas are published free by land-grant extension services (e.g. Iowa State, Purdue). The buyer's contract, moisture discount schedule, and certified settlement scale govern.",
     governance: GOVERNANCE.general,

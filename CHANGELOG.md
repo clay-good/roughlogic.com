@@ -6,6 +6,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Changed
 
+- **Ten more tiles now carry a publisher's printed example or table.**
+  - **Aviation and tools:** `glidepath-descent-rate` (FAA Terminal Procedures rate-of-descent table), `torque-adapter-correction` (FAA AC 43.13-1B and Capri Tools).
+  - **Farm and truck:** `tractor-ballast` (MSU Extension), `tire-load-check` (Michelin load tables), `grain-shrink-moisture` (National Corn Handbook NCH-61, SDSU iGrow).
+  - **Water and wastewater:** `clarifier-surface-loading` (PA DEP operator module), `manure-application-rate` (Minnesota PCA), `chlorine-demand` (CA DPH worksheet).
+  - **Piping:** `thrust-block-sizing` (IAPMO UPC Appendix I thrust table).
+  - **Electrical:** `asymmetrical-fault-xr` (Bussmann EDP-1 / NEMA AB-1 table).
+
+  README: 1,260 of 2,183 tiles are checked only against the project's own derivation (785 from first principles, 475 by a named method); 923 carry an outside source. Cross-validation tolerance checks: 4,240.
 - **Thirteen more tiles now carry a publisher's printed example or table.**
   - **Electrical:** `conduit-thermal-expansion` (NEC Table 352.44, via Mike Holt); `soil-resistivity-wenner` (Megger and AEMC); `pv-ac-output-circuit` and `battery-inverter-dc-conductor` (IAEI, John Wiles); `microinverter-branch-count` (Enphase IQ8 datasheets); `motor-acceleration-time` (Twin City Fan FE-1800).
   - **Framing and concrete:** `stud-notch-bore-limit` and `joist-notch-bore-limit` (an IRC notching handout from the City of Richmond, KY); `slab-dowel-schedule` (ACI 302.1R Table 3.1).
@@ -99,6 +107,9 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **`asymmetrical-fault-xr` read the first-cycle peak 0.2% to 0.7% low.** It took the offset at exactly the half cycle, e^(−π/(X/R)). The peak arrives slightly before that, at (φ + π/2) with φ = atan(X/R), which is the ANSI C37 / NEMA AB-1 form behind the Mp table. Reading low is the unsafe direction for a peak-withstand or bus-bracing check. The tile now matches Bussmann's reprint of the NEMA table: 2.554 at X/R 14.25, and within 0.15% at X/R 6.59. At 20 kA and X/R 15 the peak is 51.3 kA, not 51.2.
+- **`clarifier-surface-loading` left return sludge out of solids loading.** Solids reach a secondary clarifier on the influent plus the return activated sludge; Ten States §72.2 sizes for both. A new return-sludge input defaults to 0, which keeps the old influent-only figure. PA DEP's example, 6.0 + 2.0 MGD at 4,000 mg/L, now reproduces at 21.75 lb/ft²/day.
+- **`grain-shrink-moisture` took the handling loss from the dried weight.** The National Corn Handbook adds it as a percentage of the original wet weight, so 11.24% water shrink plus 0.5% handling is 11.74% total. The tile gave 11.69%.
 - **`stud-notch-bore-limit` said a single stud may be bored only to 40%.** IRC R602.6 sets 60% of the stud depth as the limit for every stud. The 40% figure is the point above which a stud in an exterior wall or bearing partition must be doubled. A single stud in a nonbearing wall may therefore be bored to 60%. The tile's numbers were right, but its labels and text applied the 40% bearing-wall limit to every single stud. They now say which wall each limit governs.
 - **The fire-alarm battery tiles used the pre-2022 NFPA 72 margin.** NFPA 72-2022 (10.6.7.2.1) replaced the 20% battery safety margin with a 1.25 correction factor for aging. `standby-battery-sizing` and `standby-battery-runtime` defaulted to 1.2. They now default to 1.25; the older factor is still an input for an AHJ on an earlier edition. At the same loads, a 14.6 Ah battery that showed 24 h now shows 23 h. The runtime example now uses the 18 Ah battery the sizing tile selects, which holds 28.5 h. The sizing tile also chose 18 Ah for a requirement of exactly 12 Ah, because the sum came out 12.000000000000002 in floating point; it now picks 12 Ah.
 - **`rain-load-ponding` computed the ASCE 7-16 rain load.** ASCE 7-22 Eq. 8.2-1 adds the ponding head dp, R = 5.2(ds + dh + dp), in place of 7-16's separate ponding-instability check, and it sizes secondary drainage for a 15-minute storm at a return period set by the risk category. The tile takes dp as a new input; it defaults to 0, which leaves existing results unchanged. The citations now describe the 7-22 method.
