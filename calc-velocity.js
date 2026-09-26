@@ -220,7 +220,10 @@ export function computePitotTraverseAverage({ vp_readings, w_in = 0, h_in = 0 } 
   const w = Number(w_in) || 0;
   const h = Number(h_in) || 0;
   if (!Array.isArray(vp_readings) || vp_readings.length < 1) return { error: "Enter at least one traverse-point velocity pressure (in. w.c.)." };
-  for (const vp of vp_readings) { if (!Number.isFinite(vp) || !(vp > 0)) return { error: "Every velocity-pressure reading must be positive (in. w.c.)." }; }
+  // A dead point (0 in. w.c., 0 fpm) stays in the average (MSHA 2009 traverse); dropping it reads the flow high.
+  // Until 2026-09-26 a 0 reading was refused, which forced exactly that 5% over-read on MSHA's own grid.
+  for (const vp of vp_readings) { if (!Number.isFinite(vp) || vp < 0) return { error: "Every velocity-pressure reading must be zero or positive (in. w.c.)." }; }
+  if (!vp_readings.some((vp) => vp > 0)) return { error: "At least one velocity-pressure reading must be positive (in. w.c.)." };
   if (!(w > 0 && Number.isFinite(w))) return { error: "Duct width must be positive (in)." };
   if (!(h > 0 && Number.isFinite(h))) return { error: "Duct height must be positive (in)." };
   const K = 4005; // standard-air velocity constant (0.075 lb/ft^3, sea level)

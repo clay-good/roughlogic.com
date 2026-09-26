@@ -4187,22 +4187,26 @@ export function computeGrilleFaceVelocity({ mode = "velocity", cfm = 0, ratio = 
   const V_face = q / A_free;
   if (!Number.isFinite(V_face)) return { error: "Face velocity is not valid." };
   let band;
-  if (V_face < 400) band = "quiet (return / low-velocity supply, < 400 fpm)";
-  else if (V_face <= 700) band = "typical supply band (400-700 fpm)";
-  else band = "high (> 700 fpm; noise and draft risk)";
+  // Hart & Cooley Engineering Data (2026): supply 500-800 fpm (700 a common target), returns 400-600 fpm maximum.
+  // Until 2026-09-26 anything over 700 fpm read "high", flagging H&C's own common target.
+  if (V_face < 400) band = "quiet (< 400 fpm)";
+  else if (V_face < 500) band = "low supply / return band (400-500 fpm)";
+  else if (V_face <= 600) band = "supply band; the return maximum (500-600 fpm)";
+  else if (V_face <= 800) band = "supply band, too fast for a return (600-800 fpm; 700 a common supply target)";
+  else band = "high (> 800 fpm; noise and draft risk)";
   return { mode: "velocity", V_face, band, A_gross_req_ft2: null };
 }
 export const grilleFaceVelocityExample = { inputs: { mode: "size", cfm: 400, ratio: 0.75, V_target: 500 } };
 
 function _renderGrilleFaceVelocity(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: Grille/register sizing from the free area: face velocity V = cfm / (gross area x free-area ratio), or the required gross area = cfm / (target velocity x ratio). Supply grilles run about 400-700 fpm, returns slower (quieter), which is why a return is larger than a supply for the same airflow. The manufacturer's published free-area ratio and throw data govern the selection.";
+  citationEl.textContent = "Citation: Grille/register sizing from the free area: face velocity V = cfm / (gross area x free-area ratio), or the required gross area = cfm / (target velocity x ratio). Supply grilles run about 500-800 fpm (700 a common target) and returns 400-600 fpm maximum (Hart & Cooley), which is why a return is larger than a supply for the same airflow. Enter the manufacturer's effective area Ak / gross area as the ratio (Ak is lab-measured; the daylight free area reads the velocity low). The manufacturer's data govern the selection.";
   const mode = makeSelect("Solve for", "gfv-mode", [
     { value: "size", label: "Required grille size (from a target velocity)" },
     { value: "velocity", label: "Face velocity (from a gross grille size)" },
   ]);
   inputRegion.appendChild(mode.wrap);
   const cfm = makeNumber("Airflow (cfm)", "gfv-cfm", { step: "any", min: "0" });
-  const ratio = makeNumber("Free-area ratio (0-1, default 0.75)", "gfv-ratio", { step: "any", min: "0", max: "1" }); ratio.input.value = "0.75";
+  const ratio = makeNumber("Effective-area ratio Ak / gross (0-1, default 0.75; from the maker's Ak)", "gfv-ratio", { step: "any", min: "0", max: "1" }); ratio.input.value = "0.75";
   const vtar = makeNumber("Target face velocity (fpm)", "gfv-vtar", { step: "any", min: "0" });
   const agr = makeNumber("Gross grille area (ft²)", "gfv-agr", { step: "any", min: "0" });
   for (const f of [cfm, ratio, vtar, agr]) inputRegion.appendChild(f.wrap);

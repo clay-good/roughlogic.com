@@ -295,7 +295,10 @@ export function computeLightingLightLossFactor({ LLD = 0, LDD = 0, BF = 0, LBO =
   for (const [k, v] of Object.entries(keys)) {
     const val = Number(v) || 0;
     if (val === 0) continue;
-    if (!(val > 0 && val <= 1)) return { error: "Each light-loss factor must be over 0 and at most 1 (" + k + ")." };
+    // The ballast/driver factor and the temperature/voltage factor can exceed 1 (a high-output ballast runs BF 1.15-1.2).
+    // Until 2026-09-26 anything over 1 was refused, which rejected real high-output systems.
+    const cap = k === "BF" || k === "other" ? 1.3 : 1;
+    if (!(val > 0 && val <= cap)) return { error: "Each light-loss factor must be over 0 and at most " + cap + " (" + k + ")." };
     LLF *= val;
     anyEntered = true;
   }
@@ -304,20 +307,20 @@ export function computeLightingLightLossFactor({ LLD = 0, LDD = 0, BF = 0, LBO =
   const maintained_lm = init > 0 ? init * LLF : null;
   return {
     LLF, maintained_lm,
-    note: "Light-loss factor LLF = the product of the entered depreciation factors: lamp lumen depreciation (LLD), luminaire dirt depreciation (LDD), ballast/driver factor (BF), lamp burnout (LBO), room-surface dirt (RSDD), and temperature/voltage/tilt. Maintained lumens = initial x LLF, the output the design must hit at the end of the cleaning/relamp cycle, not day one. A cleaner room and a better lamp raise the LLF, so the same footcandle target needs fewer fixtures - the payoff a lumped 0.8 guess hides. A design aid; the IES recovery-factor tables and the maintenance schedule govern.",
+    note: "Light-loss factor LLF = the product of the entered factors: the recoverable depreciations -- lamp lumen depreciation (LLD), luminaire dirt depreciation (LDD), room-surface dirt (RSDD), lamp burnout (LBO) -- and the non-recoverable ballast/driver factor (BF, which can exceed 1 for a high-output ballast) and temperature/voltage/tilt. Maintained lumens = initial x LLF, the output the design must hit at the end of the cleaning/relamp cycle, not day one. A cleaner room and a better lamp raise the LLF, so the same footcandle target needs fewer fixtures - the payoff a lumped 0.8 guess hides. A design aid; the IES recovery-factor tables and the maintenance schedule govern.",
   };
 }
 export const lightingLightLossFactorExample = { inputs: { LLD: 0.85, LDD: 0.90, BF: 0.95, LBO: 0, RSDD: 0, other: 0, initial_lm: 4000 } };
 ELECDESIGN_RENDERERS["lighting-light-loss-factor"] = _simpleRenderer({
-  citation: "Citation: light-loss factor LLF = product of the IES recovery factors (LLD, LDD, BF, LBO, RSDD, temperature/voltage/tilt); maintained lumens = initial x LLF. The IES recovery-factor tables and the maintenance schedule govern.",
+  citation: "Citation: light-loss factor LLF = product of the IES recoverable factors (LLD, LDD, LBO, RSDD) and non-recoverable factors (BF, which can exceed 1; temperature/voltage/tilt); maintained lumens = initial x LLF. The IES recovery-factor tables and the maintenance schedule govern.",
   example: lightingLightLossFactorExample.inputs,
   fields: [
     { key: "LLD", label: "Lamp lumen depreciation LLD (0-1)", kind: "number" },
     { key: "LDD", label: "Luminaire dirt depreciation LDD (0-1)", kind: "number" },
-    { key: "BF", label: "Ballast/driver factor BF (0-1)", kind: "number" },
+    { key: "BF", label: "Ballast/driver factor BF (up to ~1.2 for high output)", kind: "number" },
     { key: "LBO", label: "Lamp burnout LBO (0-1, optional)", kind: "number" },
     { key: "RSDD", label: "Room-surface dirt RSDD (0-1, optional)", kind: "number" },
-    { key: "other", label: "Other (temp/voltage/tilt) (0-1, optional)", kind: "number" },
+    { key: "other", label: "Other (temp/voltage/tilt) (can exceed 1, optional)", kind: "number" },
     { key: "initial_lm", label: "Initial lumens (optional, for maintained)", kind: "number" },
   ],
   outputs: [

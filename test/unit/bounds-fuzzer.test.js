@@ -21515,7 +21515,9 @@ test("bounds: spec-v1199 computePitotTraverseAverage pins velocity-averaging, th
   // Error seams.
   assert.ok("error" in _v1199({ vp_readings: [], w_in: 24, h_in: 12 }));
   assert.ok("error" in _v1199({ vp_readings: [0.1, -0.2], w_in: 24, h_in: 12 }));
-  assert.ok("error" in _v1199({ vp_readings: [0.1, 0], w_in: 24, h_in: 12 }));
+  // A dead (0) point is a real reading (MSHA 2009 keeps it in the average); a negative one is an error.
+  assert.ok(!("error" in _v1199({ vp_readings: [0.1, 0], w_in: 24, h_in: 12 })));
+  assert.ok("error" in _v1199({ vp_readings: [0.1, -0.1], w_in: 24, h_in: 12 }));
   assert.ok("error" in _v1199({ vp_readings: [0.1, Infinity], w_in: 24, h_in: 12 }));
   assert.ok("error" in _v1199({ vp_readings: "0.1", w_in: 24, h_in: 12 }));
   assert.ok("error" in _v1199({ vp_readings: [0.1], w_in: 0, h_in: 12 }));
@@ -56005,4 +56007,30 @@ test("bounds: batch-36 refrigeration fixes -- already-frozen product, colder-tha
   const w = _b36wic({ u_factor: 0.05, area_ft2: 800, delta_t_f: 60, infiltration_btuh: 3000, product_btuh: 5000, internal_btuh: 1500, safety: 1.1 });
   assert.ok(Math.abs(w.equipment_btuh - w.total_btuh * 24 / 16) < 1e-9);
   assert.ok("error" in _b36wic({ u_factor: 0.05, area_ft2: 800, delta_t_f: 60, safety: 0.5 }));
+});
+
+import { computePitotTraverseAverage as _b37pit } from "../../calc-velocity.js";
+import { computeLightingLightLossFactor as _b37llf } from "../../calc-elecdesign.js";
+import { computeGrilleFaceVelocity as _b37gfv } from "../../calc-hvac.js";
+import { computeFoundationWaterproofingTakeoff as _b37fwt, computeReadyMixConcreteOrder as _b37rmc } from "../../calc-construction.js";
+import { computeWeldPassesArcTime as _b37wpa } from "../../calc-fab.js";
+test("bounds: batch-37 fixes -- pitot zero point, BF above 1, grille bands, dampproofing coats, weld and ready-mix guards", () => {
+  // MSHA 2009: the 0.0 point stays in the 20-point average -> 3,520 fpm (dropping it read 5% high).
+  const vp = [0.9, 0.8, 1.0, 1.0, 0.4, 0.6, 1.1, 1.1, 0.9, 0.4, 0.7, 1.1, 1.5, 0.7, 0.6, 1.0, 1.5, 1.0, 0.5, 0.0];
+  assert.ok(Math.abs(_b37pit({ vp_readings: vp, w_in: 24, h_in: 16 }).v_avg_fpm - 3520.8) < 0.5);
+  assert.ok("error" in _b37pit({ vp_readings: [0, 0], w_in: 24, h_in: 16 }));
+  // A high-output ballast (BF 1.15) is a real system, not an error.
+  assert.ok(Math.abs(_b37llf({ LLD: 0.9, BF: 1.15 }).LLF - 1.035) < 1e-9);
+  assert.ok("error" in _b37llf({ LLD: 1.2 }));
+  // Hart & Cooley: 700 fpm is a common supply target, not "high".
+  assert.doesNotMatch(_b37gfv({ mode: "velocity", cfm: 700, ratio: 1, A_gross_ft2: 1 }).band, /high/);
+  assert.match(_b37gfv({ mode: "velocity", cfm: 900, ratio: 1, A_gross_ft2: 1 }).band, /high/);
+  // Coverage is per coat: two coats double the gallons.
+  const one = _b37fwt({ perimeter_ft: 150, below_grade_height_ft: 8, coverage_sf_per_gal: 50, waste_pct: 0 });
+  assert.equal(_b37fwt({ perimeter_ft: 150, below_grade_height_ft: 8, coverage_sf_per_gal: 50, waste_pct: 0, coats: 2 }).gallons, 2 * one.gallons);
+  // A percent typed into the 0-1 operating factor is refused; negatives are errors, not silent substitutions.
+  const w = { A_groove: 0.15, length_in: 12, a_pass: 0.03, dep_rate: 8 };
+  assert.ok("error" in _b37wpa({ ...w, op_factor: 40 }));
+  assert.ok("error" in _b37wpa({ ...w, op_factor: 0.4, density: -0.283 }));
+  assert.ok("error" in _b37rmc({ volume_yd3: 20, load_yd3: -10 }));
 });

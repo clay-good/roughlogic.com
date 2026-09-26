@@ -6,12 +6,26 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Added
 
+- **`foundation-waterproofing-takeoff` takes a number of coats.** Data-sheet coverage is per coat; W.R. Meadows Sealmastic's brush grade is applied in two. Without the input, a two-coat job ordered half the product.
 - **`walk-in-cooler-load` reports the equipment capacity at the run time.** The box load it returned is a 24-hr average. Copeland AE103 and Heatcraft size the equipment on a 16 hr run for a 35 F room without a defrost timer, or 18 hr with one. The new output is load x 24 / run hours; Copeland's sample prints 939,039 Btu/day -> 58,690 Btu/hr at 16 hr.
 - **`economizer-enthalpy-changeover` has the ASHRAE 90.1-2013+ control: differential enthalpy with a fixed dry-bulb limit.** Plain differential enthalpy left 90.1's prescriptive table in 2013. The new mode also locks out a hot, dry day whose enthalpy is below the return: 24 Btu/lb at 80 F against a 75 F limit (Trane Engineers Newsletter 44-2).
 - **`stadia-distance` takes the stadia constant C of an external-focusing instrument.** H gains C cos(theta) and V gains C sin(theta). The NAVEDTRA 14070 example (C = 1.0) now reproduces exactly: 692.34 ft, 326.28 ft, elevation 705.98. C defaults to 0, so internal-focusing results are unchanged.
 
 ### Fixed
 
+- **`pitot-traverse-average` keeps a zero reading in the average.** MSHA's 2009 traverse grid includes a 0.0 point and averages all 20 velocities to 3,520 fpm. The tile refused the zero, which forced the 5% over-read MSHA warns about.
+- **`lighting-light-loss-factor` accepts a ballast factor above 1**, since high-output ballasts run 1.15-1.2. The prose now separates the recoverable factors (LLD, LDD, RSDD, LBO) from the non-recoverable ballast factor.
+- **`grille-face-velocity` bands follow Hart & Cooley.** Supply runs 500-800 fpm with 700 a common target, and returns run 400-600 fpm maximum. The tile had called anything over 700 "high". The ratio input now asks for the manufacturer's effective area Ak / gross.
+- **`countersink-diameter-from-depth` says where Z is measured from.** The diameter at the tool zero (a hole edge, or a flat-tip tool) is added. For a pointed tool zeroed at the surface, enter 0: the pilot hole then adds nothing, and the old "below surface" label double-counted it. GoEngineer's CAMWorks chamfer example reproduces.
+- **Guards and prose corrected against printed sources:**
+  - `weld-passes-arc-time` refuses an operating factor typed as a percent, and a negative density.
+  - `ready-mix-concrete-order` refuses a negative truck size or price; allowance now 4-10% (NRMCA).
+  - `insulation-batt-coverage`: an R-13 15 x 93 in batt covers 9.69 ft^2 for 16 in o.c. framing. The old 10.67 figure and "15 in on-center" wording were wrong, and the example bag is now Owens Corning's 125.94 ft^2.
+  - `drainage-board-takeoff` orientation depends on the product (a plain membrane goes dimples to the wall; a fabric composite goes flat side to the wall).
+  - `rebar-weight-takeoff`: N/8 in holds only through #8.
+  - `cement-board-takeoff`: floors take about 54 screws per 3 x 5 sheet.
+  - `boring-bar-max-overhang`: Sandvik damped-bar limits.
+  - `hydraulic-drive-flow-limit`: a constant-horsepower curve comes from a horsepower control, not a pressure compensator.
 - **`conduit-jam-ratio` uses the industry jam ratio, 1.05 x ID / OD.** The 1.05 allows for the conduit ovaling in a bend (Southwire, IEEE 1185). EC&M prints 1.05 x 5.07 / 1.60 = 3.33, "no jamming problem". The tile's straight 3.17 flagged that pull as jam-prone, and the tile's own example (3.18, "jam-prone") is really 3.34.
 - **The masonry anchor tiles use the net tensile area, and the shear tile names its real edition.**
   - The area label and examples used the 3/4 in gross area, 0.442 in^2. NCMA TEK 12-03C uses the effective tensile area, 0.334, so the steel capacity was overstated by 32% (9,547 vs 7,214 lb).
@@ -63,6 +77,13 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 ### Changed
 
 - **`calc-electrical.js` size cap raised from 104,000 to 106,000 bytes gzipped.** The battery-vent and capacitor corrections took it to 104,063 B (100.1%). Splitting the module per bench is still the preferred fix.
+- **Ten more tiles now carry a publisher's printed example.**
+  - **HVAC and lighting:** `vibration-isolation` (Kinetics isolator sample), `pitot-traverse-average` (MSHA), `lighting-light-loss-factor` (Peerless / Acuity), `grille-face-velocity` (Hart & Cooley).
+  - **Fabrication and machining:** `countersink-diameter-from-depth` (GoEngineer), `multi-bend-flat-pattern` (SendCutSend), `boring-bar-max-overhang` (Cutting Tool Engineering), `weld-passes-arc-time` (NAVEDTRA 14251A).
+  - **Hydraulics and construction:** `hydraulic-drive-flow-limit` (Hydra-Tech), `cement-board-takeoff` (Lowe's estimator).
+
+  README: 979 of 2,183 tiles are checked only against the project's own derivation; 1,204 carry an outside source.
+
 - **Nine more tiles now carry a publisher's printed example.**
   - **Masonry:** `masonry-anchor-bolt`, `masonry-anchor-embedment`, `masonry-anchor-shear` (NCMA TEK 12-03C), `masonry-wall-weight` (NCMA TEK 14-13B).
   - **Refrigeration and HVAC:** `product-pull-down-load` (Copeland AE103), `adpi-diffuser-selection` (Price Engineering Guide).

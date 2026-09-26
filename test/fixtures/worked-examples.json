@@ -21367,7 +21367,7 @@
   {
    "tile_id": "countersink-diameter-from-depth",
    "source_publisher": "Machinery's Handbook countersinking (solved for the diameter)",
-   "source_title": "0.1438 in plunge, 82 deg inch head, 0.250 in pilot -> 0.500 in countersink diameter",
+   "source_title": "0.1438 in plunge past the edge of a 0.250 in hole (tool zeroed where the cone touches), 82 deg inch head -> 0.500 in countersink; the plunge alone opens 0.250 in",
    "source_edition_or_year": "spec-v733 worked example (machine-verified)",
    "source_section_or_page": "spec-v733 section 2.1 pinned example",
    "verified_by": "rl",
@@ -21386,6 +21386,28 @@
     },
     "cone_dia_in": {
      "value": 0.25,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "countersink-diameter-from-depth",
+   "source_publisher": "GoEngineer (K. Petersen)",
+   "source_title": "How to Machine Large Hole Chamfers in CAMWorks",
+   "source_edition_or_year": "November 7, 2025",
+   "source_section_or_page": "chamfer tool with a 0.35 in flat end zeroed at the surface, 118 deg: (0.625/2 - 0.35/2) = 0.1375; 0.1375 / tan 59 = 0.0826 in depth (run in reverse: 0.0826 in -> 0.625 in)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "plunge_depth_in": 0.0826,
+    "included_angle_deg": 118,
+    "pilot_hole_dia_in": 0.35
+   },
+   "outputs": {
+    "countersink_dia_in": {
+     "value": 0.625,
      "tolerance": {
       "abs": 0.001
      }
@@ -33596,6 +33618,28 @@
    }
   },
   {
+   "tile_id": "hydraulic-drive-flow-limit",
+   "source_publisher": "Hydra-Tech Pumps",
+   "source_title": "How do you calculate the horsepower required in your HPU",
+   "source_edition_or_year": "May 19, 2021",
+   "source_section_or_page": "(15 GPM x 1800 PSI) / (1714 x 85%) = 18.53 hp (run in reverse: 18.53 hp at 1,800 psi -> 15 gpm)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "drive_hp": 18.53,
+    "psi": 1800,
+    "efficiency": 0.85
+   },
+   "outputs": {
+    "max_gpm": {
+     "value": 15,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
    "tile_id": "hydraulic-motor-torque-speed",
    "source_publisher": "fluid-power engineering",
    "source_title": "2000 psi, 2.0 in^3/rev, 10 GPM, 0.90/0.95 -> 573 in-lb, 1097 rpm, 9.98 HP",
@@ -44899,6 +44943,35 @@
      "value": 15,
      "tolerance": {
       "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "cement-board-takeoff",
+   "source_publisher": "Lowe's",
+   "source_title": "Cement Board Materials Estimator and Coverage",
+   "source_edition_or_year": "2023",
+   "source_section_or_page": "120 ft2 total area -> 8 boards (3 x 5 ft); 288 wall screws (36 per 3 x 5 board)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "area_sf": 120,
+    "sheet_area_sf": 15,
+    "waste_pct": 0,
+    "screws_per_sheet": 36
+   },
+   "outputs": {
+    "sheets": {
+     "value": 8,
+     "tolerance": {
+      "abs": 0
+     }
+    },
+    "screws": {
+     "value": 288,
+     "tolerance": {
+      "abs": 0
      }
     }
    }
@@ -68961,6 +69034,29 @@
    }
   },
   {
+   "tile_id": "boring-bar-max-overhang",
+   "source_publisher": "Cutting Tool Engineering (E. Isakov)",
+   "source_title": "Boring: Calculating deflection, Example 1",
+   "source_edition_or_year": "July 15, 2019",
+   "source_section_or_page": "1 in steel bar, E 30 x 10^6, I 0.0491, F 207.8 lbf deflects about 0.003 in at a 4 in overhang (run in reverse: 0.003 in -> ~4 in)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "d_in": 1,
+    "f_lb": 207.8,
+    "allowable_deflection_in": 0.003,
+    "e_psi": 30000000
+   },
+   "outputs": {
+    "max_overhang_in": {
+     "value": 4,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
    "tile_id": "ballnose-scallop-height",
    "source_publisher": "Ballnose scallop geometry",
    "source_title": "0.5 in ballnose (R 0.25), 0.030 in stepover -> scallop 0.00045 in (0.45 mil)",
@@ -78017,6 +78113,29 @@
    }
   },
   {
+   "tile_id": "grille-face-velocity",
+   "source_publisher": "Hart & Cooley",
+   "source_title": "Engineering Data (AR/SR series), 421 table example",
+   "source_edition_or_year": "January 2026, p. 1",
+   "source_section_or_page": "CFM = Ak x face velocity: a 4 x 10 grille (40 in2 gross) with Ak 0.17 ft2 at 600 fpm -> 100 CFM (printed rounded from 102); entered as Ak / gross = 0.612",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "mode": "velocity",
+    "cfm": 100,
+    "ratio": 0.612,
+    "A_gross_ft2": 0.2777777777777778
+   },
+   "outputs": {
+    "V_face": {
+     "value": 600,
+     "tolerance": {
+      "pct": 2.5
+     }
+    }
+   }
+  },
+  {
    "tile_id": "adpi-diffuser-selection",
    "source_publisher": "ASHRAE Handbook -- Fundamentals, Space Air Diffusion (ADPI Selection Guide)",
    "source_title": "circular ceiling diffuser, 40 Btu/hr-ft^2, T0.25 = 8 ft over L = 10 ft -> T/L = 0.80 (the max-ADPI optimum), ADPI 88, in the >80 band",
@@ -78225,6 +78344,27 @@
      "value": 0,
      "tolerance": {
       "abs": 0
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "vibration-isolation",
+   "source_publisher": "SEKON Acoustics (Kinetics FLS isolator sample)",
+   "source_title": "Vibration Isolation Efficiency Calculation",
+   "source_edition_or_year": "sample calculation, pp. 3-4",
+   "source_section_or_page": "static deflection 26.791 mm (1.0548 in), disturbing frequency 2,880 rpm: natural 182.7 rpm, frequency ratio 15.76, T 0.00404, isolation 99.6% (the sheet uses g = 9.81 exactly)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "equipment_rpm": 2880,
+    "static_deflection_in": 1.05476
+   },
+   "outputs": {
+    "efficiency_pct": {
+     "value": 99.6,
+     "tolerance": {
+      "abs": 0.01
      }
     }
    }
@@ -79068,6 +79208,55 @@
      "value": 0,
      "tolerance": {
       "abs": 0.0001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "pitot-traverse-average",
+   "source_publisher": "MSHA Dust Division (M. Schultz, P.E.)",
+   "source_title": "How to Correctly Determine Dust Scrubber Air Quantity (pitot tube measurements)",
+   "source_edition_or_year": "2009",
+   "source_section_or_page": "24 x 16 in duct, 20 readings including a 0.0 point: average of the point velocities (4005 sqrt VP) = 70,414 / 20 = 3,520 fpm; Q = 2.67 ft2 x 3,520 = 9,398 cfm (area rounded)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "vp_readings": [
+     0.9,
+     0.8,
+     1.0,
+     1.0,
+     0.4,
+     0.6,
+     1.1,
+     1.1,
+     0.9,
+     0.4,
+     0.7,
+     1.1,
+     1.5,
+     0.7,
+     0.6,
+     1.0,
+     1.5,
+     1.0,
+     0.5,
+     0.0
+    ],
+    "w_in": 24,
+    "h_in": 16
+   },
+   "outputs": {
+    "v_avg_fpm": {
+     "value": 3520,
+     "tolerance": {
+      "abs": 1.5
+     }
+    },
+    "cfm": {
+     "value": 9398,
+     "tolerance": {
+      "pct": 0.2
      }
     }
    }
@@ -80794,6 +80983,43 @@
    }
   },
   {
+   "tile_id": "weld-passes-arc-time",
+   "source_publisher": "US Navy (NAVEDTRA)",
+   "source_title": "NAVEDTRA 14251A Steelworker Advanced, Ch. 5, welding cost (1/4 in fillet, GMAW)",
+   "source_edition_or_year": "2011, p. 5-17",
+   "source_section_or_page": "0.106 lb/ft deposited / 6.3 lb/hr = 0.017 hr arc time; / 0.50 operating factor = 0.034 hr (a 1/4 in fillet, 0.03125 in2, per foot)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "A_groove": 0.03125,
+    "length_in": 12,
+    "a_pass": 0.03125,
+    "dep_rate": 6.3,
+    "density": 0.283,
+    "op_factor": 0.5
+   },
+   "outputs": {
+    "weight_lb": {
+     "value": 0.106,
+     "tolerance": {
+      "abs": 0.0005
+     }
+    },
+    "arc_h": {
+     "value": 0.017,
+     "tolerance": {
+      "abs": 0.0005
+     }
+    },
+    "total_h": {
+     "value": 0.034,
+     "tolerance": {
+      "abs": 0.0005
+     }
+    }
+   }
+  },
+  {
    "tile_id": "weld-travel-speed",
    "source_publisher": "AWS / ASME",
    "source_title": "GMAW 24 V, 200 A, AWS/ASME basis (eta 1), target 40 kJ/in -> 7.2 in/min",
@@ -81879,6 +82105,32 @@
      "value": 0.884,
      "tolerance": {
       "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "lighting-light-loss-factor",
+   "source_publisher": "Peerless / Acuity Brands",
+   "source_title": "Light Loss Factor Calculations for LEDs",
+   "source_edition_or_year": "2014, p. 1",
+   "source_section_or_page": "RSDD and LDD combined 0.98, driver factor 1.0, LLD 0.87: LLF = 0.98 x 0.87 = 0.85",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "LLD": 0.87,
+    "LDD": 0.98,
+    "BF": 1,
+    "LBO": 0,
+    "RSDD": 0,
+    "other": 0,
+    "initial_lm": 0
+   },
+   "outputs": {
+    "LLF": {
+     "value": 0.85,
+     "tolerance": {
+      "abs": 0.005
      }
     }
    }
@@ -83761,25 +84013,25 @@
   {
    "tile_id": "insulation-batt-coverage",
    "source_publisher": "manufacturer label",
-   "source_title": "500 ft^2, R-13 batt (10.67 ft^2), 88 ft^2/bag -> 47 batts, 6 bags",
+   "source_title": "500 ft^2, R-13 15 x 93 in batt (9.69 ft^2), 125.94 ft^2/bag -> 52 batts, 4 bags",
    "source_edition_or_year": "spec worked example (machine-verified)",
    "source_section_or_page": "spec-v439 section 2.1 pinned example",
    "verified_by": "rl",
    "verified_on": "2026-07-04",
    "inputs": {
     "area_ft2": 500,
-    "coverage_per_batt": 10.67,
-    "coverage_per_bag": 88
+    "coverage_per_batt": 9.69,
+    "coverage_per_bag": 125.94
    },
    "outputs": {
     "batts": {
-     "value": 47,
+     "value": 52,
      "tolerance": {
       "abs": 0
      }
     },
     "bags": {
-     "value": 6,
+     "value": 4,
      "tolerance": {
       "abs": 0
      }
@@ -83789,15 +84041,15 @@
   {
    "tile_id": "insulation-batt-coverage",
    "source_publisher": "manufacturer label",
-   "source_title": "cross-check: an R-21 bag covering 67 ft^2 raises the bag count to 8",
+   "source_title": "cross-check: an R-15 bag covering 67.81 ft^2 raises the bag count to 8",
    "source_edition_or_year": "spec worked example (machine-verified)",
    "source_section_or_page": "spec-v439 section 2.1 cross-check",
    "verified_by": "rl",
    "verified_on": "2026-07-04",
    "inputs": {
     "area_ft2": 500,
-    "coverage_per_batt": 10.67,
-    "coverage_per_bag": 67
+    "coverage_per_batt": 9.69,
+    "coverage_per_bag": 67.81
    },
    "outputs": {
     "bags": {
@@ -85088,6 +85340,28 @@
      "value": 11.458,
      "tolerance": {
       "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "multi-bend-flat-pattern",
+   "source_publisher": "SendCutSend",
+   "source_title": "Calculating Bend Allowance and Bend Deduction",
+   "source_edition_or_year": "August 18, 2023",
+   "source_section_or_page": "0.080 in 5052 aluminum, R 0.050, K 0.43, two 90 deg bends, 2 + 6 + 2 in outside dimensions: BD 0.1274 per bend -> flat 9.7452 in",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "mold_line_in": 10,
+    "n_bends": 2,
+    "bd_in": 0.1274
+   },
+   "outputs": {
+    "flat_in": {
+     "value": 9.7452,
+     "tolerance": {
+      "abs": 0.0001
      }
     }
    }

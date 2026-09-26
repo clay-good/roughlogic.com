@@ -7803,7 +7803,7 @@ export function computeRebarWeightTakeoff({ bar_size = "5", total_len_ft = 0, pr
   const cost_usd = price > 0 ? weight_lb * price : null;
   return {
     unit_wt, weight_lb, tons, cost_usd,
-    note: "Rebar weight takeoff: the ASTM A615 nominal unit weight per foot (a #N bar is about N/8 inch in diameter; #3 is 0.376 lb/ft up to #11 at 5.313, then #14 at 7.65 and #18 at 13.60) times the total linear feet of that size, converted to tons and priced. Rebar is bought and priced by weight, so a bill of material is summed size-by-size. Add lap-splice and waste length before this (the takeoff is of the placed length). A quantity aid; the shop drawings and the mill's actual weights govern.",
+    note: "Rebar weight takeoff: the ASTM A615 nominal unit weight per foot (a #N bar is about N/8 inch in diameter through #8; #9, #10, #11, #14 and #18 are larger, 1.128 to 2.257 in; #3 is 0.376 lb/ft up to #11 at 5.313, then #14 at 7.65 and #18 at 13.60) times the total linear feet of that size, converted to tons and priced. Rebar is bought and priced by weight, so a bill of material is summed size-by-size. Add lap-splice and waste length before this (the takeoff is of the placed length). A quantity aid; the shop drawings and the mill's actual weights govern.",
   };
 }
 export const rebarWeightTakeoffExample = { inputs: { bar_size: "5", total_len_ft: 500, price_per_lb: 0 } };
@@ -7834,6 +7834,8 @@ export function computeReadyMixConcreteOrder({ volume_yd3 = 0, waste_pct = 8, lo
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const vol = Number(volume_yd3) || 0;
   const waste = Number(waste_pct) || 0;
+  // A 0 / blank truck size means the default 10 yd^3; a negative one is an entry error. Until 2026-09-26 -10 silently read 10.
+  if (Number(load_yd3) < 0 || Number(price_per_yd3) < 0) return { error: "Truck capacity and price cannot be negative." };
   const load = Number(load_yd3) > 0 ? Number(load_yd3) : 10;
   const min = Number(min_yd3) || 0;
   const price = Number(price_per_yd3) || 0;
@@ -7848,7 +7850,7 @@ export function computeReadyMixConcreteOrder({ volume_yd3 = 0, waste_pct = 8, lo
   const cost_usd = price > 0 ? ordered_yd3 * price : null;
   return {
     ordered_yd3, trucks, last_load_yd3, short_load, cost_usd,
-    note: "Ready-mix concrete order: the ordered volume = the in-place volume x (1 + a waste/over-order allowance, commonly 5-10% for spillage, over-excavation, and a safety margin so the pour is not short), the number of truckloads = the ordered volume / the truck capacity rounded up, and a short-load fee applies when the order is below the plant minimum (often ~10 yd^3). Running short mid-pour risks a cold joint, so ordering a little long is cheaper than a second small delivery. A quantity aid; the ready-mix supplier's truck size, minimum, and short-load and standby (waiting-time) fees govern.",
+    note: "Ready-mix concrete order: the ordered volume = the in-place volume x (1 + a waste/over-order allowance, commonly 4-10% (NRMCA via Concrete Network) for spillage, over-excavation, and a safety margin so the pour is not short), the number of truckloads = the ordered volume / the truck capacity rounded up, and a short-load fee applies when the order is below the plant minimum (often ~10 yd^3). Running short mid-pour risks a cold joint, so ordering a little long is cheaper than a second small delivery. A quantity aid; the ready-mix supplier's truck size, minimum, and short-load and standby (waiting-time) fees govern.",
   };
 }
 export const readyMixConcreteOrderExample = { inputs: { volume_yd3: 42, waste_pct: 8, load_yd3: 10, min_yd3: 10, price_per_yd3: 0 } };
@@ -8217,16 +8219,16 @@ export function computeInsulationBattCoverage({ area_ft2 = 0, coverage_per_batt 
   const bags = covBag > 0 ? Math.ceil(net_ft2 / covBag) : null;
   return {
     net_ft2, batts, bags,
-    note: "Batt insulation takeoff: the net cavity area (wall or ceiling, less window and door openings) times a waste allowance, divided by the coverage of one batt (a piece) and by the coverage per bag from the label, each rounded up. Coverage depends on the R-value and cavity width: an R-13 batt for a 15 in on-center 2x4 wall covers about 10.67 ft^2, and a deeper R-value packs fewer square feet per bag. Buy by the bag but count the batts to confirm the wall is fully filled. A quantity aid; the manufacturer's label coverage governs.",
+    note: "Batt insulation takeoff: the net cavity area (wall or ceiling, less window and door openings) times a waste allowance, divided by the coverage of one batt (a piece) and by the coverage per bag from the label, each rounded up. Coverage depends on the R-value and cavity width: an R-13 15 x 93 in batt for 16 in on-center 2x4 framing covers about 9.69 ft^2 (Owens Corning: 125.94 ft^2 per bag), and a deeper R-value packs fewer square feet per bag. Buy by the bag but count the batts to confirm the wall is fully filled. A quantity aid; the manufacturer's label coverage governs.",
   };
 }
-export const insulationBattCoverageExample = { inputs: { area_ft2: 500, coverage_per_batt: 10.67, coverage_per_bag: 88, waste_pct: 0 } };
+export const insulationBattCoverageExample = { inputs: { area_ft2: 500, coverage_per_batt: 9.69, coverage_per_bag: 125.94, waste_pct: 0 } };
 const _v439renderInsulationBattCoverage = _simpleRenderer({
-  citation: "Citation: Batt insulation takeoff (manufacturer label coverage): net area x (1 + waste%), divided by the coverage per batt and per bag, each rounded up. Coverage depends on R-value and cavity width (an R-13 15 in batt covers ~10.67 ft^2). A quantity aid; the label coverage governs.",
+  citation: "Citation: Batt insulation takeoff (manufacturer label coverage): net area x (1 + waste%), divided by the coverage per batt and per bag, each rounded up. Coverage depends on R-value and cavity width (an R-13 15 x 93 in batt for 16 in o.c. framing covers ~9.69 ft^2). A quantity aid; the label coverage governs.",
   example: insulationBattCoverageExample.inputs,
   fields: [
     { key: "area_ft2", label: "Net cavity area (ft², less openings)", kind: "number" },
-    { key: "coverage_per_batt", label: "Coverage per batt (ft², e.g. 10.67 for R-13 15 in)", kind: "number" },
+    { key: "coverage_per_batt", label: "Coverage per batt (ft², e.g. 9.69 for an R-13 15 x 93 in batt)", kind: "number" },
     { key: "coverage_per_bag", label: "Coverage per bag (ft², from the label)", kind: "number" },
     { key: "waste_pct", label: "Waste allowance (%)", kind: "number" },
   ],
@@ -10834,34 +10836,38 @@ CONSTRUCTION_RENDERERS["joist-cantilever-check"] = _simpleRenderer({
 });
 
 // ===================== spec-v970: foundation waterproofing / dampproofing takeoff =====================
-// dims: in { perimeter_ft: L, below_grade_height_ft: L, coverage_sf_per_gal: L^-1, waste_pct: dimensionless } out: { wall_area_sf: L^2, gallons: L^3 }
-export function computeFoundationWaterproofingTakeoff({ perimeter_ft = 150, below_grade_height_ft = 8, coverage_sf_per_gal = 50, waste_pct = 10 } = {}) {
+// dims: in { perimeter_ft: L, below_grade_height_ft: L, coverage_sf_per_gal: L^-1, waste_pct: dimensionless, coats: dimensionless } out: { wall_area_sf: L^2, gallons: L^3 }
+export function computeFoundationWaterproofingTakeoff({ perimeter_ft = 150, below_grade_height_ft = 8, coverage_sf_per_gal = 50, waste_pct = 10, coats = 1 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(perimeter_ft > 0)) return { error: "Foundation perimeter must be positive (ft)." };
   if (!(below_grade_height_ft > 0)) return { error: "Below-grade wall height must be positive (ft)." };
   if (!(coverage_sf_per_gal > 0)) return { error: "Coverage rate must be positive (sf/gal)." };
   if (!(waste_pct >= 0)) return { error: "Waste percent cannot be negative." };
-  // Below-grade wall area to coat; fluid-applied gallons from the product's coverage rate.
+  const nc = Number(coats) || 1;
+  if (!(nc >= 1 && Number.isInteger(nc))) return { error: "Coats must be a whole number, at least 1." };
+  // Below-grade wall area to coat; the data-sheet coverage is per coat (W.R. Meadows Sealmastic). Until 2026-09-26
+  // there was no coats input, so a two-coat dampproofing job ordered half the product.
   const wall_area_sf = perimeter_ft * below_grade_height_ft;
-  const gallons = Math.ceil(wall_area_sf * (1 + waste_pct / 100) / coverage_sf_per_gal);
+  const gallons = Math.ceil(wall_area_sf * nc * (1 + waste_pct / 100) / coverage_sf_per_gal);
   if (![wall_area_sf, gallons].every(Number.isFinite)) return { error: "Waterproofing takeoff math is not a finite value." };
   return {
     wall_area_sf,
     gallons,
     pails_5gal: Math.ceil(gallons / 5),
-    note: "The fluid-applied waterproofing or dampproofing to coat a below-grade foundation wall: area = perimeter x the average below-grade height, and gallons = ceil(area x (1 + waste) / the product's coverage rate). A 150 ft perimeter, 8 ft below grade is 1,200 sf, so at a 50 sf/gal spray-applied rate with 10% waste it takes 27 gallons (6 five-gallon pails). The coverage rate is the LEVER and it varies widely: a thin sprayed-asphalt DAMPPROOFing runs ~40-60 sf/gal (a moisture barrier, IRC R406.1), while a true fluid-applied WATERPROOFing membrane built to a wet-mil thickness (a below-grade-with-hydrostatic-pressure requirement, IRC R406.2) covers far fewer sf/gal per coat and often needs two coats and reinforcing fabric at cracks and cold joints -- read the coverage off the product data sheet, not a default. Foundation dampproofing vs waterproofing is a code distinction (waterproofing where a high water table or hydrostatic head exists). Sheet (peel-and-stick) membrane is ordered by the roll instead (see the roll coverage). A material-ordering estimate; the product data sheet, the assembly detail (with the drainage board and footing drain), and the AHJ / IRC R406 govern.",
+    note: "The fluid-applied waterproofing or dampproofing to coat a below-grade foundation wall: area = perimeter x the average below-grade height, and gallons = ceil(area x (1 + waste) / the product's coverage rate). A 150 ft perimeter, 8 ft below grade is 1,200 sf, so at a 50 sf/gal spray-applied rate with 10% waste it takes 27 gallons (6 five-gallon pails). The coverage rate is the LEVER and it varies widely: an emulsion DAMPPROOFing runs ~70-100 sf/gal PER COAT for a spray grade and 40-50 for a brush/trowel grade applied in two coats (W.R. Meadows Sealmastic Type I / II; a moisture barrier, IRC R406.1), so enter the coats, while a true fluid-applied WATERPROOFing membrane built to a wet-mil thickness (a below-grade-with-hydrostatic-pressure requirement, IRC R406.2) covers far fewer sf/gal per coat and often needs two coats and reinforcing fabric at cracks and cold joints -- read the coverage off the product data sheet, not a default. Foundation dampproofing vs waterproofing is a code distinction (waterproofing where a high water table or hydrostatic head exists). Sheet (peel-and-stick) membrane is ordered by the roll instead (see the roll coverage). A material-ordering estimate; the product data sheet, the assembly detail (with the drainage board and footing drain), and the AHJ / IRC R406 govern.",
   };
 }
 
 export const foundationWaterproofingTakeoffExample = { inputs: { perimeter_ft: 150, below_grade_height_ft: 8, coverage_sf_per_gal: 50, waste_pct: 10 } };
 
 CONSTRUCTION_RENDERERS["foundation-waterproofing-takeoff"] = _simpleRenderer({
-  citation: "Citation: foundation waterproofing / dampproofing takeoff, by name. area = perimeter x below-grade height; gallons = ceil(area x (1 + waste) / coverage rate). Coverage varies widely (thin dampproofing ~40-60 sf/gal vs a fluid membrane at a wet-mil thickness) -- read it off the product data sheet. IRC R406 (dampproofing vs waterproofing) and the AHJ govern.",
+  citation: "Citation: foundation waterproofing / dampproofing takeoff, by name. area = perimeter x below-grade height; gallons = ceil(area x (1 + waste) / coverage rate). Coverage is per coat and varies widely (emulsion dampproofing ~70-100 sf/gal spray, 40-50 brush, two coats typical; a fluid membrane at a wet-mil thickness) -- read it off the product data sheet. IRC R406 (dampproofing vs waterproofing) and the AHJ govern.",
   example: foundationWaterproofingTakeoffExample.inputs,
   fields: [
     { key: "perimeter_ft", label: "Foundation perimeter (ft)", kind: "number" },
     { key: "below_grade_height_ft", label: "Average below-grade height (ft)", kind: "number" },
-    { key: "coverage_sf_per_gal", label: "Coverage (sf/gal, from the data sheet)", kind: "number" },
+    { key: "coverage_sf_per_gal", label: "Coverage per coat (sf/gal, from the data sheet)", kind: "number" },
+    { key: "coats", label: "Coats (1 default; 2 typical for brush-grade dampproofing)", kind: "number" },
     { key: "waste_pct", label: "Waste (percent)", kind: "number" },
   ],
   outputs: [
@@ -10931,7 +10937,7 @@ export function computeDrainageBoardTakeoff({ perimeter_ft = 150, below_grade_he
     wall_area_sf,
     rolls,
     termination_lf,
-    note: "The dimpled drainage board (a dimple mat or composite drainage sheet) to cover a below-grade foundation wall over the waterproofing, ordered by the roll. It relieves hydrostatic pressure by giving water an air-gapped path down to the footing drain and protects the membrane from backfill during compaction. Area = perimeter x the average below-grade height, and rolls = ceil(area x (1 + waste) / the roll's coverage). A 150 ft perimeter, 8 ft below grade is 1,200 sf, so at a 4 ft x 50 ft roll (200 sf) with 10% waste it takes 7 rolls, plus about 150 lf of top-edge termination molding (the bar that seals the top of the board so backfill and surface water do not get behind it). The dimples face the WALL (the flat filter-fabric face, if any, goes toward the soil) so the air gap sits against the membrane. Order the termination bar and any inside/outside-corner and butyl-tape accessories separately, and lap the sheets per the maker's detail (usually one dimple course). A material-ordering estimate; the product's roll size and lap, the assembly detail (with the membrane below and the footing drain at the base per IRC R405), and the AHJ govern.",
+    note: "The dimpled drainage board (a dimple mat or composite drainage sheet) to cover a below-grade foundation wall over the waterproofing, ordered by the roll. It relieves hydrostatic pressure by giving water an air-gapped path down to the footing drain and protects the membrane from backfill during compaction. Area = perimeter x the average below-grade height, and rolls = ceil(area x (1 + waste) / the roll's coverage). A 150 ft perimeter, 8 ft below grade is 1,200 sf, so at a 4 ft x 50 ft roll (200 sf) with 10% waste it takes 7 rolls, plus about 150 lf of top-edge termination molding (the bar that seals the top of the board so backfill and surface water do not get behind it). On a plain dimpled membrane the dimples face the WALL (Dorken DELTA-MS, 6 in minimum overlaps); on a fabric-faced drainage composite the FLAT side goes against the wall and the fabric-covered dimples face the soil (Carlisle MiraDRAIN) -- follow the product's own orientation, so the air gap sits against the membrane. Order the termination bar and any inside/outside-corner and butyl-tape accessories separately, and lap the sheets per the maker's detail (usually one dimple course). A material-ordering estimate; the product's roll size and lap, the assembly detail (with the membrane below and the footing drain at the base per IRC R405), and the AHJ govern.",
   };
 }
 

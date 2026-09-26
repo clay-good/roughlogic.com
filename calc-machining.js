@@ -423,7 +423,7 @@ export function computeBoringBarDeflection({ d_in = 0, l_in = 0, f_lb = 0, e_psi
   const verdict = ld <= 4 ? "L/d <= 4: stable for a steel bar" : (ld <= 8 ? "L/d 4-8: carbide/damped-bar territory" : "L/d > 8: chatter-prone, shorten the overhang or use a damped bar");
   return {
     i_in4, delta_in, ld, verdict,
-    note: "Static cantilever tip deflection delta = F L^3/(3 E I) with I = pi d^4/64 for a round bar, and the length-to-diameter ratio L/d for chatter risk (a steel bar is stable to about 4:1, a solid-carbide bar to 6:1-8:1, higher with heavy-metal or damped bars; E = 30e6 psi steel, ~90e6 carbide). The overhang, not the force, dominates via the L^3 law - halving the stickout cuts the deflection to one-eighth, which is why choking up on the tool is the first fix for chatter. A uniform solid round cantilever under a tip point load (a stepped or hollow bar changes I; a real cut adds a dynamic/regenerative-chatter component this static estimate does not capture). A shop aid; the tool and setup govern.",
+    note: "Static cantilever tip deflection delta = F L^3/(3 E I) with I = pi d^4/64 for a round bar, and the length-to-diameter ratio L/d for chatter risk (a steel bar is stable to about 4:1, a solid-carbide bar somewhat further, and damped bars to about 10:1 in steel and 14:1 in carbide per Sandvik, which recommends a damped tool past 4:1; E = 30e6 psi steel, ~90e6 carbide). The overhang, not the force, dominates via the L^3 law - halving the stickout cuts the deflection to one-eighth, which is why choking up on the tool is the first fix for chatter. A uniform solid round cantilever under a tip point load (a stepped or hollow bar changes I; a real cut adds a dynamic/regenerative-chatter component this static estimate does not capture). A shop aid; the tool and setup govern.",
   };
 }
 export const boringBarDeflectionExample = { inputs: { d_in: 0.75, l_in: 6, f_lb: 100, e_psi: 30e6 } };
@@ -469,7 +469,7 @@ export function computeBoringBarMaxOverhang({ d_in = 0, f_lb = 0, allowable_defl
   const chatter_note = ld <= 4 ? "L/d <= 4: within the steel-bar chatter limit" : (ld <= 8 ? "L/d 4-8: past the steel limit - use carbide or a damped bar, or shorten further" : "L/d > 8: chatter-prone even for carbide; the chatter limit, not deflection, governs - shorten the overhang");
   return {
     max_overhang_in, i_in4, ld, chatter_note,
-    note: "The longest overhang a boring bar or tool can stick out before its tip deflection reaches the allowable, the inverse of the boring-bar-deflection tile: from delta = F L^3 / (3 E I) with I = pi d^4 / 64, L_max = (3 E I delta / F)^(1/3). Deflection is only half the story: check the reported L/d against the chatter limit (a steel bar is stable to about 4:1, solid carbide to 6:1-8:1). If the deflection-limited overhang exceeds the chatter L/d, chatter governs and the real max overhang is the shorter one. Because deflection scales with L^3, this length is a hard wall - a little more stickout blows the tolerance. Static solid-round cantilever; a real cut adds dynamic/regenerative chatter this does not model. A shop aid; the tool and setup govern."
+    note: "The longest overhang a boring bar or tool can stick out before its tip deflection reaches the allowable, the inverse of the boring-bar-deflection tile: from delta = F L^3 / (3 E I) with I = pi d^4 / 64, L_max = (3 E I delta / F)^(1/3). Deflection is only half the story: check the reported L/d against the chatter limit (a steel bar is stable to about 4:1; Sandvik recommends a damped bar beyond that, to ~10:1 steel or ~14:1 carbide). If the deflection-limited overhang exceeds the chatter L/d, chatter governs and the real max overhang is the shorter one. Because deflection scales with L^3, this length is a hard wall - a little more stickout blows the tolerance. Static solid-round cantilever; a real cut adds dynamic/regenerative chatter this does not model. A shop aid; the tool and setup govern."
   };
 }
 export const boringBarMaxOverhangExample = { inputs: { d_in: 0.75, f_lb: 100, allowable_deflection_in: 0.0154524, e_psi: 30e6 } };
@@ -1566,12 +1566,12 @@ export function computeCountersinkDiameterFromDepth({ plunge_depth_in = 0, inclu
   if (![cone_dia_in, countersink_dia_in].every(Number.isFinite)) return { error: "Countersink-diameter math is not a finite value." };
   return {
     countersink_dia_in, cone_dia_in,
-    note: "Countersink depth-to-diameter: the machine is set to a plunge DEPTH, but the print calls out the finished (major) DIAMETER -- D_cs = 2 Z tan(angle/2) + d_hole, the diameter the cone opens to at that depth below the surface. A few thousandths of over-plunge sits a flat-head screw proud or buried, so read the diameter back from the actual Z. The included angle is not interchangeable: 82 degrees is the inch flat-head standard and 90 degrees is the metric standard, and a screw and a sink of mismatched angles never seat flush. A shallower (larger) angle opens a wider diameter for the same depth. A setup aid, not the print; the actual tool geometry and the fastener callout govern.",
+    note: "Countersink depth-to-diameter: the machine is set to a plunge DEPTH, but the print calls out the finished (major) DIAMETER -- D_cs = 2 Z tan(angle/2) + d, where Z is measured from the tool zero and d is the diameter at that zero: the pilot-hole edge when the tool is zeroed where the cone first touches the hole, the flat end of a chamfer tool zeroed at the surface (the GoEngineer CAMWorks example: a 0.35 in flat tip plunged 0.0826 in at 118 deg opens 0.625 in), or 0 for a pointed countersink zeroed at the surface (then the pilot hole adds nothing). Until 2026-09-26 the label read 'below surface' while the pilot was added, which double-counts it for a surface-zeroed pointed tool. A few thousandths of over-plunge sits a flat-head screw proud or buried, so read the diameter back from the actual Z. The included angle is not interchangeable: 82 degrees is the inch flat-head standard and 90 degrees is the metric standard, and a screw and a sink of mismatched angles never seat flush. A shallower (larger) angle opens a wider diameter for the same depth. A setup aid, not the print; the actual tool geometry and the fastener callout govern.",
   };
 }
 export const countersinkDiameterFromDepthExample = { inputs: { plunge_depth_in: 0.1438, included_angle_deg: 82, pilot_hole_dia_in: 0.25 } };
 function renderCountersinkDiameterFromDepth(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: countersink depth-to-diameter (Machinery's Handbook countersinking) solved for the diameter: D_cs = 2 Z tan(angle/2) + d_hole. 82 deg inch flat-head and 90 deg metric heads are not interchangeable. A setup aid; the tool geometry and the fastener callout govern.";
+  citationEl.textContent = "Citation: countersink depth-to-diameter (Machinery's Handbook countersinking) solved for the diameter: D_cs = 2 Z tan(angle/2) + d, d = the diameter at the tool zero (hole edge or flat tip; 0 for a pointed tool zeroed at the surface). 82 deg inch flat-head and 90 deg metric heads are not interchangeable. A setup aid; the tool geometry and the fastener callout govern.";
   const z = makeNumber("Plunge depth below surface Z (in)", "cdd-z", { step: "any", min: "0" });
   const ang = makeSelect("Included angle (deg)", "cdd-ang", [
     { value: "82", label: "82 (inch flat-head)", selected: true },
@@ -1580,7 +1580,7 @@ function renderCountersinkDiameterFromDepth(inputRegion, outputRegion, citationE
     { value: "120", label: "120" },
     { value: "60", label: "60 (lathe center)" },
   ]);
-  const hole = makeNumber("Pilot / through-hole diameter (in)", "cdd-hole", { step: "any", min: "0" });
+  const hole = makeNumber("Diameter at the Z zero (in): the hole edge the cone first touches, or a flat-tip tool; 0 if a pointed tool is zeroed at the surface", "cdd-hole", { step: "any", min: "0" });
   for (const f of [z, ang, hole]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { z.input.value = "0.1438"; ang.select.value = "82"; hole.input.value = "0.25"; update(); });
   const oD = makeOutputLine(outputRegion, "Finished countersink diameter D_cs", "cdd-out-d");

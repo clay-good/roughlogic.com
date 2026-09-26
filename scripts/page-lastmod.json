@@ -2,7 +2,7 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "80832184477ef367",
+      "sha": "4c4eb84364b28641",
       "date": "2026-09-26"
     },
     "/tools/": {
@@ -30,7 +30,7 @@
       "date": "2026-09-18"
     },
     "/groups/electrical/": {
-      "sha": "7801fdb135f38c08",
+      "sha": "bf5072a057455c82",
       "date": "2026-09-26"
     },
     "/groups/field/": {
@@ -742,8 +742,8 @@
       "date": "2026-09-08"
     },
     "/tools/boring-bar-max-overhang/": {
-      "sha": "28e5a9bd0b96eef3",
-      "date": "2026-09-01"
+      "sha": "bdbcc6a5a6091801",
+      "date": "2026-09-26"
     },
     "/tools/bound-water/": {
       "sha": "7700330627b0387b",
@@ -1822,8 +1822,8 @@
       "date": "2026-09-01"
     },
     "/tools/countersink-diameter-from-depth/": {
-      "sha": "bf042a7a29767427",
-      "date": "2026-09-01"
+      "sha": "3de7712c5ae42605",
+      "date": "2026-09-26"
     },
     "/tools/countertop-overhang-support/": {
       "sha": "4ad0785940cba181",
@@ -2266,8 +2266,8 @@
       "date": "2026-09-01"
     },
     "/tools/drainage-board-takeoff/": {
-      "sha": "8856e15ab51a24dc",
-      "date": "2026-09-01"
+      "sha": "83e81da5e8940ce3",
+      "date": "2026-09-26"
     },
     "/tools/drainage-invert/": {
       "sha": "9f8699b1a1912d05",
@@ -3082,8 +3082,8 @@
       "date": "2026-09-01"
     },
     "/tools/foundation-waterproofing-takeoff/": {
-      "sha": "e5fcfd38fedf1d03",
-      "date": "2026-09-04"
+      "sha": "36db1904ff3433b0",
+      "date": "2026-09-26"
     },
     "/tools/free-fall-drop/": {
       "sha": "78e7cb791a84a28a",
@@ -3414,8 +3414,8 @@
       "date": "2026-09-01"
     },
     "/tools/grille-face-velocity/": {
-      "sha": "008fc6e91d9bd556",
-      "date": "2026-09-01"
+      "sha": "7ddeef09b437934d",
+      "date": "2026-09-26"
     },
     "/tools/grille-neck-nc/": {
       "sha": "da1240d42b99b9cd",
@@ -3890,8 +3890,8 @@
       "date": "2026-09-18"
     },
     "/tools/insulation-batt-coverage/": {
-      "sha": "61a208a838721821",
-      "date": "2026-09-01"
+      "sha": "4f982d11f41ce9fb",
+      "date": "2026-09-26"
     },
     "/tools/insulation-heat-loss/": {
       "sha": "da474fb22fcb494d",
@@ -4178,8 +4178,8 @@
       "date": "2026-09-25"
     },
     "/tools/lighting-light-loss-factor/": {
-      "sha": "dd2cb0b4ef7e2d9e",
-      "date": "2026-09-01"
+      "sha": "b6d30a748dbe51bb",
+      "date": "2026-09-26"
     },
     "/tools/lighting-retrofit-savings/": {
       "sha": "eb90a7a5f65934db",
