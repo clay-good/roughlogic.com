@@ -4368,8 +4368,8 @@ PLUMBING_RENDERERS["bernoulli-head"] = _v373renderBernoulliHead;
 
 // ===================== spec-v388: thrust block bearing area at a pipe bend (water-system hydraulics trio) =====================
 
-// dims: in { pressure_psi: M L^-1 T^-2, od_in: L, bend_deg: dimensionless, soil_bearing_psf: M L^-1 T^-2 } out: { area_in2: L^2, thrust_lb: M L T^-2, bearing_area_ft2: L^2 }
-export function computeThrustBlockSizing({ pressure_psi = 0, od_in = 0, bend_deg = 0, soil_bearing_psf = 0 } = {}) {
+// dims: in { pressure_psi: M L^-1 T^-2, od_in: L, bend_deg: dimensionless, soil_bearing_psf: M L^-1 T^-2, safety_factor: dimensionless } out: { area_in2: L^2, thrust_lb: M L T^-2, bearing_area_ft2: L^2 }
+export function computeThrustBlockSizing({ pressure_psi = 0, od_in = 0, bend_deg = 0, soil_bearing_psf = 0, safety_factor = 1.5 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const P = Number(pressure_psi) || 0;
   const od = Number(od_in) || 0;
@@ -4380,33 +4380,38 @@ export function computeThrustBlockSizing({ pressure_psi = 0, od_in = 0, bend_deg
   if (!(bend > 0 && bend < 180)) return { error: "Bend angle must be between 0 and 180 degrees." };
   if (!(soil > 0)) return { error: "Allowable soil bearing must be positive (psf)." };
   const area_in2 = (Math.PI / 4) * od * od;
+  const sf = Number(safety_factor);
+  if (!(sf >= 1)) return { error: "Safety factor must be at least 1 (1.5 is customary)." };
   const thrust_lb = 2 * P * area_in2 * Math.sin((bend * Math.PI / 180) / 2);
-  const bearing_area_ft2 = thrust_lb / soil;
+  // DIPRA / AWWA M41 thrust-block practice: Ab = Sf x T / Sb with Sf about 1.5 (EBAA Connections PD-1 prints 1.5:1).
+  // Until 2026-09-26 there was no safety factor, so the block face came out 1/1.5 of the customary size.
+  const bearing_area_ft2 = sf * thrust_lb / soil;
   return {
-    area_in2, thrust_lb, bearing_area_ft2,
-    note: "Thrust at a horizontal bend T = 2 P A sin(theta/2) (AWWA M41), where A is the pipe cross-sectional area from the outside diameter and the sin(theta/2) term makes a 90-degree bend push far harder than a 45; the bearing block face must be at least Ab = T / (allowable soil bearing). Use the test or surge pressure, not the working pressure, and a conservative soil value from the geotechnical report. This sizes the bearing face only; block geometry, depth, and the passive-restraint or restrained-joint alternative are the engineer's design. A design aid; the engineer of record governs.",
+    area_in2, thrust_lb, bearing_area_ft2, safety_factor: sf,
+    note: "Thrust at a horizontal bend T = 2 P A sin(theta/2) (AWWA M41), where A is the pipe cross-sectional area from the outside diameter and the sin(theta/2) term makes a 90-degree bend push far harder than a 45; the bearing block face must be at least Ab = Sf x T / (allowable soil bearing), with a safety factor Sf of about 1.5 (DIPRA; EBAA Connections PD-1 prints 1.5:1). Use the test or surge pressure, not the working pressure, and a conservative soil value from the geotechnical report. This sizes the bearing face only; block geometry, depth, and the passive-restraint or restrained-joint alternative are the engineer's design. A design aid; the engineer of record governs.",
   };
 }
 export const thrustBlockSizingExample = { inputs: { pressure_psi: 100, od_in: 8.625, bend_deg: 90, soil_bearing_psf: 2000 } };
 function _v388renderThrustBlockSizing(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: AWWA M41 (Ductile-Iron Pipe and Fittings) thrust-block method -- resultant thrust at a bend T = 2 P A sin(theta/2), bearing area Ab = T / (allowable soil bearing). Use the test/surge pressure and a geotechnical soil-bearing value. Sizes the bearing face only; the engineer of record governs the block design.";
+  citationEl.textContent = "Citation: AWWA M41 (Ductile-Iron Pipe and Fittings) thrust-block method -- resultant thrust at a bend T = 2 P A sin(theta/2), bearing area Ab = Sf x T / (allowable soil bearing), Sf ~1.5. Use the test/surge pressure and a geotechnical soil-bearing value. Sizes the bearing face only; the engineer of record governs the block design.";
   const P = makeNumber("Internal pressure (psi, test/surge)", "tbs-p", { step: "any", min: "0" });
   const od = makeNumber("Pipe outside diameter (in)", "tbs-od", { step: "any", min: "0" });
   const bend = makeNumber("Bend angle (deg)", "tbs-b", { step: "any", min: "0" });
   const soil = makeNumber("Allowable soil bearing (psf)", "tbs-s", { step: "any", min: "0" });
-  for (const f of [P, od, bend, soil]) inputRegion.appendChild(f.wrap);
+  const sf = makeNumber("Safety factor (1.5 customary)", "tbs-sf", { step: "any", min: "1" }); sf.input.value = "1.5";
+  for (const f of [P, od, bend, soil, sf]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { P.input.value = "100"; od.input.value = "8.625"; bend.input.value = "90"; soil.input.value = "2000"; update(); });
   const oT = makeOutputLine(outputRegion, "Resultant thrust", "tbs-out-t");
   const oA = makeOutputLine(outputRegion, "Required bearing area", "tbs-out-a");
   const oN = makeOutputLine(outputRegion, "Note", "tbs-out-n");
   const update = debounce(() => {
-    const r = computeThrustBlockSizing({ pressure_psi: Number(P.input.value) || 0, od_in: Number(od.input.value) || 0, bend_deg: Number(bend.input.value) || 0, soil_bearing_psf: Number(soil.input.value) || 0 });
+    const r = computeThrustBlockSizing({ pressure_psi: Number(P.input.value) || 0, od_in: Number(od.input.value) || 0, bend_deg: Number(bend.input.value) || 0, soil_bearing_psf: Number(soil.input.value) || 0, safety_factor: sf.input.value === "" ? 1.5 : Number(sf.input.value) });
     if (r.error) { oT.textContent = r.error; oA.textContent = "-"; oN.textContent = ""; return; }
     oT.textContent = fmt(r.thrust_lb, 0) + " lb (pipe area " + fmt(r.area_in2, 1) + " in^2)";
     oA.textContent = fmt(r.bearing_area_ft2, 2) + " ft^2";
     oN.textContent = r.note;
   }, DEBOUNCE_MS);
-  for (const f of [P, od, bend, soil]) f.input.addEventListener("input", update);
+  for (const f of [P, od, bend, soil, sf]) f.input.addEventListener("input", update);
 }
 PLUMBING_RENDERERS["thrust-block-sizing"] = _v388renderThrustBlockSizing;
 
@@ -4414,8 +4419,8 @@ PLUMBING_RENDERERS["thrust-block-sizing"] = _v388renderThrustBlockSizing;
 // pressure; the inverse recovers the highest test/surge pressure a thrust block of a given bearing-face area restrains at
 // a bend, so a designer checks an existing or standard block against a line pressure. From
 // bearing_area = 2 P A sin(theta/2) / soil, P = bearing_area x soil / (2 A sin(theta/2)), with A the pipe area from the OD.
-// dims: in { bearing_area_ft2: L^2, od_in: L, bend_deg: dimensionless, soil_bearing_psf: M L^-1 T^-2 } out: { max_pressure_psi: M L^-1 T^-2, max_thrust_lb: M L T^-2, area_in2: L^2 }
-export function computeThrustBlockMaxPressure({ bearing_area_ft2 = 0, od_in = 0, bend_deg = 0, soil_bearing_psf = 0 } = {}) {
+// dims: in { bearing_area_ft2: L^2, od_in: L, bend_deg: dimensionless, soil_bearing_psf: M L^-1 T^-2, safety_factor: dimensionless } out: { max_pressure_psi: M L^-1 T^-2, max_thrust_lb: M L T^-2, area_in2: L^2 }
+export function computeThrustBlockMaxPressure({ bearing_area_ft2 = 0, od_in = 0, bend_deg = 0, soil_bearing_psf = 0, safety_factor = 1.5 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const Ab = Number(bearing_area_ft2) || 0;
   const od = Number(od_in) || 0;
@@ -4426,34 +4431,38 @@ export function computeThrustBlockMaxPressure({ bearing_area_ft2 = 0, od_in = 0,
   if (!(bend > 0 && bend < 180)) return { error: "Bend angle must be between 0 and 180 degrees." };
   if (!(soil > 0)) return { error: "Allowable soil bearing must be positive (psf)." };
   const area_in2 = (Math.PI / 4) * od * od;
-  const max_thrust_lb = Ab * soil;
+  const sf = Number(safety_factor);
+  if (!(sf >= 1)) return { error: "Safety factor must be at least 1 (1.5 is customary)." };
+  // Ab = Sf x T / Sb solved for T; until 2026-09-26 there was no Sf, overstating the safe pressure 1.5x.
+  const max_thrust_lb = Ab * soil / sf;
   const max_pressure_psi = max_thrust_lb / (2 * area_in2 * Math.sin((bend * Math.PI / 180) / 2));
   if (![area_in2, max_thrust_lb, max_pressure_psi].every(Number.isFinite)) return { error: "Max-pressure math is not a finite value." };
   return {
-    max_pressure_psi, max_thrust_lb, area_in2,
-    note: "Max pressure a thrust block restrains = bearing area x allowable soil bearing / (2 A sin(theta/2)), the inverse of the AWWA M41 thrust relation T = 2 P A sin(theta/2) with A the pipe area from the OD. The soil takes at most Ab x allowable bearing of thrust, which sets the pressure ceiling at the bend. Compare against the TEST or SURGE pressure, not the working pressure, and use a conservative geotechnical soil value. This checks the bearing face only; block geometry, depth, and the restrained-joint alternative are the engineer's design. A design aid; the engineer of record governs.",
+    max_pressure_psi, max_thrust_lb, area_in2, safety_factor: sf,
+    note: "Max pressure a thrust block restrains = bearing area x allowable soil bearing / (Sf x 2 A sin(theta/2)), the inverse of the AWWA M41 thrust relation T = 2 P A sin(theta/2) with A the pipe area from the OD and a safety factor Sf of about 1.5 (DIPRA; EBAA Connections PD-1 prints 1.5:1). The soil takes at most Ab x allowable bearing / Sf of thrust, which sets the pressure ceiling at the bend. Compare against the TEST or SURGE pressure, not the working pressure, and use a conservative geotechnical soil value. This checks the bearing face only; block geometry, depth, and the restrained-joint alternative are the engineer's design. A design aid; the engineer of record governs.",
   };
 }
-export const thrustBlockMaxPressureExample = { inputs: { bearing_area_ft2: 4.13, od_in: 8.625, bend_deg: 90, soil_bearing_psf: 2000 } };
+export const thrustBlockMaxPressureExample = { inputs: { bearing_area_ft2: 6.2, od_in: 8.625, bend_deg: 90, soil_bearing_psf: 2000 } };
 function _v745renderThrustBlockMaxPressure(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: AWWA M41 (Ductile-Iron Pipe and Fittings) thrust-block method -- T = 2 P A sin(theta/2), Ab = T / soil, solved for the pressure: P = Ab x soil / (2 A sin(theta/2)). Compare against the test/surge pressure and a geotechnical soil-bearing value. Checks the bearing face only; the engineer of record governs the block design.";
+  citationEl.textContent = "Citation: AWWA M41 (Ductile-Iron Pipe and Fittings) thrust-block method -- T = 2 P A sin(theta/2), Ab = Sf x T / soil (Sf ~1.5), solved for the pressure: P = Ab x soil / (Sf x 2 A sin(theta/2)). Compare against the test/surge pressure and a geotechnical soil-bearing value. Checks the bearing face only; the engineer of record governs the block design.";
   const Ab = makeNumber("Bearing-face area (ft²)", "tbm-a", { step: "any", min: "0" });
   const od = makeNumber("Pipe outside diameter (in)", "tbm-od", { step: "any", min: "0" });
   const bend = makeNumber("Bend angle (deg)", "tbm-b", { step: "any", min: "0" });
   const soil = makeNumber("Allowable soil bearing (psf)", "tbm-s", { step: "any", min: "0" });
-  for (const f of [Ab, od, bend, soil]) inputRegion.appendChild(f.wrap);
-  attachExampleButton(inputRegion, () => { Ab.input.value = "4.13"; od.input.value = "8.625"; bend.input.value = "90"; soil.input.value = "2000"; update(); });
+  const sf = makeNumber("Safety factor (1.5 customary)", "tbm-sf", { step: "any", min: "1" }); sf.input.value = "1.5";
+  for (const f of [Ab, od, bend, soil, sf]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { Ab.input.value = "6.2"; od.input.value = "8.625"; bend.input.value = "90"; soil.input.value = "2000"; update(); });
   const oP = makeOutputLine(outputRegion, "Max test / surge pressure", "tbm-out-p");
   const oT = makeOutputLine(outputRegion, "Max thrust the soil takes", "tbm-out-t");
   const oN = makeOutputLine(outputRegion, "Note", "tbm-out-n");
   const update = debounce(() => {
-    const r = computeThrustBlockMaxPressure({ bearing_area_ft2: Number(Ab.input.value) || 0, od_in: Number(od.input.value) || 0, bend_deg: Number(bend.input.value) || 0, soil_bearing_psf: Number(soil.input.value) || 0 });
+    const r = computeThrustBlockMaxPressure({ bearing_area_ft2: Number(Ab.input.value) || 0, od_in: Number(od.input.value) || 0, bend_deg: Number(bend.input.value) || 0, soil_bearing_psf: Number(soil.input.value) || 0, safety_factor: sf.input.value === "" ? 1.5 : Number(sf.input.value) });
     if (r.error) { oP.textContent = r.error; oT.textContent = "-"; oN.textContent = ""; return; }
     oP.textContent = fmt(r.max_pressure_psi, 0) + " psi (pipe area " + fmt(r.area_in2, 1) + " in^2)";
     oT.textContent = fmt(r.max_thrust_lb, 0) + " lb";
     oN.textContent = r.note;
   }, DEBOUNCE_MS);
-  for (const f of [Ab, od, bend, soil]) f.input.addEventListener("input", update);
+  for (const f of [Ab, od, bend, soil, sf]) f.input.addEventListener("input", update);
 }
 PLUMBING_RENDERERS["thrust-block-max-pressure"] = _v745renderThrustBlockMaxPressure;
 
@@ -4516,7 +4525,7 @@ export function computeHydronicFillPressure({ height_ft = 0, margin_psi = 4 } = 
   const fill_psi = static_psi + margin;
   return {
     static_psi, fill_psi, top_static_psi: margin,
-    note: "Hydronic fill (make-up) pressure by static height: the cold-fill pressure at the boiler must lift water to the highest point of the loop plus a small margin so the top stays above atmospheric (preventing air being drawn in and pump cavitation). fill = height / 2.31 + margin, where 2.31 ft of water = 1 psi and the margin is commonly about 4 psi (roughly 5 psi at the top of the system). Set the automatic fill valve and the expansion-tank pre-charge to this pressure. The relief valve (typically 30 psi on residential boilers) must sit well above it. A design aid; the boiler and system manufacturer's instructions govern.",
+    note: "Hydronic fill (make-up) pressure by static height: the cold-fill pressure at the boiler must lift water to the highest point of the loop plus a small margin so the top stays above atmospheric (preventing air being drawn in and pump cavitation). fill = height / 2.31 + margin, where 2.31 ft of water = 1 psi and the margin -- the pressure left at the top of the system -- is commonly about 4 psi (some designers also hold an 8 psig minimum fill for any building, RL Deppmann). Set the automatic fill valve and the expansion-tank pre-charge to this pressure. The relief valve (typically 30 psi on residential boilers) must sit well above it. A design aid; the boiler and system manufacturer's instructions govern.",
   };
 }
 export const hydronicFillPressureExample = { inputs: { height_ft: 30, margin_psi: 4 } };

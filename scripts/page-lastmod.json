@@ -2,12 +2,12 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "bdebe149745b7fdf",
+      "sha": "f8f95b40fcd1c373",
       "date": "2026-09-26"
     },
     "/tools/": {
-      "sha": "1b018d46ba21a007",
-      "date": "2026-09-25"
+      "sha": "6dfb001e52cfabf5",
+      "date": "2026-09-26"
     },
     "/groups/accounting/": {
       "sha": "9f11187d3f5838e9",
@@ -62,8 +62,8 @@
       "date": "2026-09-19"
     },
     "/groups/plumbing/": {
-      "sha": "f3e99563fac64ca4",
-      "date": "2026-09-25"
+      "sha": "60af6bf758427094",
+      "date": "2026-09-26"
     },
     "/groups/real-estate/": {
       "sha": "001ba823b2b55944",
@@ -94,8 +94,8 @@
       "date": "2026-09-26"
     },
     "/tools/aav-install-check/": {
-      "sha": "2937f47124079735",
-      "date": "2026-09-25"
+      "sha": "86c64ad81893f162",
+      "date": "2026-09-26"
     },
     "/tools/abatement-containment/": {
       "sha": "fdb0c8b0757901fc",
@@ -1886,8 +1886,8 @@
       "date": "2026-09-01"
     },
     "/tools/cross-connection-air-gap/": {
-      "sha": "697457cc44466858",
-      "date": "2026-09-25"
+      "sha": "7fbeade760bf4c2e",
+      "date": "2026-09-26"
     },
     "/tools/crosswind-component/": {
       "sha": "77b2289a070ae09c",
@@ -3706,8 +3706,8 @@
       "date": "2026-09-10"
     },
     "/tools/hull-displacement/": {
-      "sha": "75cabf76a2502a80",
-      "date": "2026-09-01"
+      "sha": "e782b38b711adb54",
+      "date": "2026-09-26"
     },
     "/tools/hull-speed/": {
       "sha": "c376102f5d829d77",
@@ -3782,8 +3782,8 @@
       "date": "2026-09-01"
     },
     "/tools/hydronic-fill-pressure/": {
-      "sha": "007056e9eb2c0d18",
-      "date": "2026-09-01"
+      "sha": "1df94d41d1f34fa1",
+      "date": "2026-09-26"
     },
     "/tools/hydronic-gpm-deltat/": {
       "sha": "37cf914a271daac5",
@@ -4930,7 +4930,7 @@
       "date": "2026-09-01"
     },
     "/tools/oil-water-separator-sizing/": {
-      "sha": "3cd07dd3dac9b03e",
+      "sha": "d27468695731fc8a",
       "date": "2026-09-26"
     },
     "/tools/one-sample-t-test/": {
@@ -5530,8 +5530,8 @@
       "date": "2026-09-01"
     },
     "/tools/powered-attic-ventilator/": {
-      "sha": "ffffe43ce226a303",
-      "date": "2026-09-01"
+      "sha": "f0f4d6a2e7a9c875",
+      "date": "2026-09-26"
     },
     "/tools/ppe/": {
       "sha": "a95fa69a6f794134",
@@ -7850,12 +7850,12 @@
       "date": "2026-09-01"
     },
     "/tools/thrust-block-max-pressure/": {
-      "sha": "b013626ce6e298f0",
-      "date": "2026-09-01"
+      "sha": "92da060165516bdd",
+      "date": "2026-09-26"
     },
     "/tools/thrust-block-sizing/": {
-      "sha": "24ca2aeb0b1571de",
-      "date": "2026-09-09"
+      "sha": "f8ff5048e975d658",
+      "date": "2026-09-26"
     },
     "/tools/tiedown-count/": {
       "sha": "00799fdf9d195f36",

@@ -21559,7 +21559,10 @@ test("bounds: spec-v388 computeThrustBlockSizing pins T = 2 P A sin(theta/2), th
   const r = _v388({ pressure_psi: 100, od_in: 8.625, bend_deg: 90, soil_bearing_psf: 2000 });
   assert.ok(Math.abs(r.area_in2 - (Math.PI / 4) * 8.625 ** 2) < 1e-9);
   assert.ok(Math.abs(r.thrust_lb - 8263) < 2);
-  assert.ok(Math.abs(r.bearing_area_ft2 - r.thrust_lb / 2000) < 1e-9);
+  // Ab = Sf x T / Sb, Sf 1.5 by default (DIPRA; EBAA PD-1). Until 2026-09-26 there was no safety factor.
+  assert.ok(Math.abs(r.bearing_area_ft2 - 1.5 * r.thrust_lb / 2000) < 1e-9);
+  assert.ok(Math.abs(_v388({ pressure_psi: 100, od_in: 8.625, bend_deg: 90, soil_bearing_psf: 2000, safety_factor: 1 }).bearing_area_ft2 - r.thrust_lb / 2000) < 1e-9);
+  assert.ok("error" in _v388({ pressure_psi: 100, od_in: 8.625, bend_deg: 90, soil_bearing_psf: 2000, safety_factor: 0.5 }));
   // A 45-deg bend is about half the thrust (sin(theta/2)).
   const b45 = _v388({ pressure_psi: 100, od_in: 8.625, bend_deg: 45, soil_bearing_psf: 2000 });
   assert.ok(Math.abs(b45.thrust_lb - 4472) < 2 && b45.thrust_lb < r.thrust_lb);
@@ -21574,9 +21577,11 @@ test("bounds: spec-v388 computeThrustBlockSizing pins T = 2 P A sin(theta/2), th
 
 import { computeThrustBlockMaxPressure as _v745 } from "../../calc-plumbing.js";
 test("bounds: spec-v745 thrust block max pressure for a bearing area (inverse of thrust-block-sizing)", () => {
-  const p = _v745({ bearing_area_ft2: 4.13, od_in: 8.625, bend_deg: 90, soil_bearing_psf: 2000 });
+  const p = _v745({ bearing_area_ft2: 6.2, od_in: 8.625, bend_deg: 90, soil_bearing_psf: 2000 });
   assert.ok(Math.abs(p.max_pressure_psi - 100) < 0.1);
-  assert.ok(Math.abs(p.max_thrust_lb - 4.13 * 2000) < 1e-9);
+  assert.ok(Math.abs(p.max_thrust_lb - 6.2 * 2000 / 1.5) < 1e-9);
+  // EBAA Connections PD-1: 12 in DI (OD 13.20), 90-deg bend, 2000 psf, 1.5:1 -> "almost 22 square feet" at 150 psi.
+  assert.ok(Math.abs(_v745({ bearing_area_ft2: 22, od_in: 13.2, bend_deg: 90, soil_bearing_psf: 2000 }).max_pressure_psi - 150) < 2);
   // round-trip: the recovered max pressure fed to thrust-block-sizing reproduces the bearing area
   for (const [Ab, od, bend, soil] of [[4.13, 8.625, 90, 2000], [6.0, 12.75, 45, 2500], [2.0, 6.625, 90, 1500], [10, 16, 22.5, 3000]]) {
     const inv = _v745({ bearing_area_ft2: Ab, od_in: od, bend_deg: bend, soil_bearing_psf: soil });
@@ -55947,4 +55952,27 @@ test("bounds: computeEconomizerEnthalpyChangeover's 90.1-2013 combined mode lock
   assert.equal(c.margin, -5);
   assert.equal(_v443c({ ...base, t_outdoor_f: 70, mode: "differential_enthalpy_drybulb" }).enable, true);
   assert.equal(_v443c({ ...base, h_outdoor: 30, t_outdoor_f: 70, mode: "differential_enthalpy_drybulb" }).enable, false);
+});
+
+import { computeCrossConnectionAirGap as _b35gap } from "../../calc-cross.js";
+import { computeWheelOffsetBackspacing as _b35wheel, computePropPitchSelection as _b35prop } from "../../calc-mechanic.js";
+import { computeOilWaterSeparatorSizing as _b35ows } from "../../calc-treatment.js";
+test("bounds: batch-35 fixes -- air-gap string flag, wheel backspacing guards, prop pitch at target, OWS water SG", () => {
+  // A "false" string used to read as near a wall (truthy); IPC Table 608.15.1 / 608.16.1: 3/4 in -> 1-1/2 / 2-1/2 in.
+  assert.equal(_b35gap({ opening_in: 0.75, near_wall: "false" }).required_in, 1.5);
+  assert.equal(_b35gap({ opening_in: 0.75, near_wall: true }).required_in, 2.5);
+  // Speedway Motors: 9 in rim, 5-3/4 in backspacing -> 19.05 mm; a backspacing past the wheel or a negative one is refused.
+  assert.ok(Math.abs(_b35wheel({ rim_width_in: 9, backspacing_in: 5.75 }).offset_mm_out - 19.05) < 1e-9);
+  assert.ok("error" in _b35wheel({ rim_width_in: 8, backspacing_in: 12 }));
+  assert.ok("error" in _b35wheel({ rim_width_in: 8, backspacing_in: -2 }));
+  assert.ok("error" in _b35wheel({ rim_width_in: 8, offset_mm: -150 }));
+  // On-target WOT RPM is a zero change, not "over-revving".
+  const same = _b35prop({ current_pitch_in: 21, current_wot_rpm: 5400, target_wot_rpm: 5400 });
+  assert.equal(same.pitch_change_in, 0);
+  assert.equal(same.new_pitch_in, 21);
+  // Hot water (SG 0.986 at 130 F) narrows the density difference, so the separator needs more area than at SG 1.
+  const cold = _b35ows({ flow_gpm: 100, oil_sg: 0.95, droplet_micron: 150, water_viscosity_cp: 0.52 });
+  const hot = _b35ows({ flow_gpm: 100, oil_sg: 0.95, droplet_micron: 150, water_viscosity_cp: 0.52, water_sg: 0.986 });
+  assert.ok(Math.abs(hot.rise_velocity_ftmin / cold.rise_velocity_ftmin - 0.036 / 0.05) < 1e-9);
+  assert.ok("error" in _b35ows({ flow_gpm: 100, oil_sg: 0.95, water_sg: 0.9 }));
 });

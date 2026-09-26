@@ -2591,8 +2591,8 @@ MECHANIC_RENDERERS["prop-pitch-selection"] = _simpleRenderer({
     { key: "rpm_per_inch", label: "RPM change per inch of pitch", kind: "number" },
   ],
   outputs: [
-    { key: "np", id: "pps-out-np", label: "New pitch", value: (r) => fmt(r.new_pitch_in, 1) + " in (" + (r.lower ? "lower pitch, engine was under-revving" : "higher pitch, engine was over-revving") + ")" },
-    { key: "pc", id: "pps-out-pc", label: "Pitch change", value: (r) => fmt(Math.abs(r.pitch_change_in), 1) + " in " + (r.lower ? "less" : "more") },
+    { key: "np", id: "pps-out-np", label: "New pitch", value: (r) => fmt(r.new_pitch_in, 1) + " in (" + (r.pitch_change_in === 0 ? "keep this pitch, WOT RPM is on target" : r.lower ? "lower pitch, engine was under-revving" : "higher pitch, engine was over-revving") + ")" },
+    { key: "pc", id: "pps-out-pc", label: "Pitch change", value: (r) => r.pitch_change_in === 0 ? "none" : fmt(Math.abs(r.pitch_change_in), 1) + " in " + (r.lower ? "less" : "more") },
     { key: "n", id: "pps-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computePropPitchSelection,
@@ -3141,6 +3141,8 @@ export function computeWheelOffsetBackspacing({ rim_width_in = 0, offset_mm = 0,
   const off = Number(offset_mm) || 0;
   const back = Number(backspacing_in) || 0;
   if (!(rim > 0)) return { error: "Rim width must be positive (in)." };
+  // Until 2026-09-26 a negative backspacing was silently ignored and a backspacing wider than the wheel passed.
+  if (back < 0) return { error: "Backspacing cannot be negative (in); enter 0 to solve from the offset." };
   const overall_width_in = rim + 1;
   let backspacing_out_in, offset_mm_out;
   if (back > 0) {
@@ -3151,6 +3153,7 @@ export function computeWheelOffsetBackspacing({ rim_width_in = 0, offset_mm = 0,
     backspacing_out_in = rim / 2 + 0.5 + off / 25.4;
   }
   const frontspacing_in = overall_width_in - backspacing_out_in;
+  if (!(backspacing_out_in > 0 && frontspacing_in > 0)) return { error: "The backspacing must fall inside the wheel's overall width (rim + 1 in); this offset or backspacing puts the mounting face outside the wheel." };
   if (![overall_width_in, backspacing_out_in, offset_mm_out, frontspacing_in].every(Number.isFinite)) return { error: "Wheel-fitment math is not a finite value." };
   return {
     overall_width_in, backspacing_out_in, offset_mm_out, frontspacing_in,
@@ -3788,7 +3791,7 @@ export function computeHullDisplacement({ lwl_ft = 30, bwl_ft = 10, draft_ft = 4
     displacement_ft3,
     displacement_lb,
     displacement_long_tons,
-    note: "A boat's displacement -- what it weighs, because by Archimedes it floats on the weight of water it pushes aside. The immersed volume is the waterline length x waterline beam x draft box, filled only partway by the actual underwater shape: that fill fraction is the block coefficient Cb (roughly 0.35-0.45 for a fine planing or semi-displacement hull, 0.40-0.60 for a full displacement/work hull). Displacement volume = LWL x BWL x draft x Cb; weight = volume x water density (64.0 lb/ft^3 seawater, 62.4 fresh); long tons = weight / 2,240. A 30 ft waterline, 10 ft beam, 4 ft draft hull at Cb 0.5 in seawater displaces 600 ft^3 = 38,400 lb = 17.1 long tons. Fresh water is less dense, so the same hull floats a touch deeper to displace the same weight. This is a first-order estimate from block dimensions; the real value comes from a lines drawing integrated by Simpson's rule (or a builder's displacement/immersion table), and the loaded trim, appendages, and the actual hull form shift it. A screening estimate for sizing ground tackle, a trailer, or a lift; the naval architect's hydrostatics govern.",
+    note: "A boat's displacement -- what it weighs, because by Archimedes it floats on the weight of water it pushes aside. The immersed volume is the waterline length x waterline beam x canoe-body draft (hull only, not the keel) box, filled only partway by the actual underwater shape: that fill fraction is the block coefficient Cb (roughly 0.35-0.45 for a fine planing or semi-displacement hull, 0.40-0.60 for a full displacement/work hull). Displacement volume = LWL x BWL x draft x Cb; weight = volume x water density (64.0 lb/ft^3 seawater, 62.4 fresh); long tons = weight / 2,240. A 30 ft waterline, 10 ft beam, 4 ft draft hull at Cb 0.5 in seawater displaces 600 ft^3 = 38,400 lb = 17.1 long tons. Fresh water is less dense, so the same hull floats a touch deeper to displace the same weight. This is a first-order estimate from block dimensions; the real value comes from a lines drawing integrated by Simpson's rule (or a builder's displacement/immersion table), and the loaded trim, appendages, and the actual hull form shift it. A screening estimate for sizing ground tackle, a trailer, or a lift; the naval architect's hydrostatics govern.",
   };
 }
 
@@ -3800,7 +3803,7 @@ MECHANIC_RENDERERS["hull-displacement"] = _simpleRenderer({
   fields: [
     { key: "lwl_ft", label: "Waterline length LWL (ft)", kind: "number" },
     { key: "bwl_ft", label: "Waterline beam BWL (ft)", kind: "number" },
-    { key: "draft_ft", label: "Draft (ft)", kind: "number" },
+    { key: "draft_ft", label: "Canoe-body draft (ft; hull only, not the keel or skeg)", kind: "number" },
     { key: "block_coefficient", label: "Block coefficient Cb (~0.35-0.60)", kind: "number" },
     { key: "water_density_pcf", label: "Water density (pcf: 64 sea, 62.4 fresh)", kind: "number" },
   ],

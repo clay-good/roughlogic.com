@@ -3101,8 +3101,8 @@ cross-check.
 | calc-plumbing.js | `computeTankDrainTime` | `{ tank_area_ft2 = 0, d_in = 0, cd = 0.60, h1_ft = 0, h2_ft = 0 } = {}` | _ | _ | _ |
 | calc-plumbing.js | `computeTanklessGPM` | `{ kbtu_input, climate_zone, target_outlet_F = 110, solve_for = "gpm", target_...` | _ | _ | _ |
 | calc-plumbing.js | `computeThermalExpansionVolume` | `{ volume_gal = 0, cold_f = 0, hot_f = 0, closed_system = true } = {}` | _ | _ | _ |
-| calc-plumbing.js | `computeThrustBlockMaxPressure` | `{ bearing_area_ft2 = 0, od_in = 0, bend_deg = 0, soil_bearing_psf = 0 } = {}` | _ | _ | _ |
-| calc-plumbing.js | `computeThrustBlockSizing` | `{ pressure_psi = 0, od_in = 0, bend_deg = 0, soil_bearing_psf = 0 } = {}` | _ | _ | _ |
+| calc-plumbing.js | `computeThrustBlockMaxPressure` | `{ bearing_area_ft2 = 0, od_in = 0, bend_deg = 0, soil_bearing_psf = 0, safety...` | _ | _ | _ |
+| calc-plumbing.js | `computeThrustBlockSizing` | `{ pressure_psi = 0, od_in = 0, bend_deg = 0, soil_bearing_psf = 0, safety_fac...` | _ | _ | _ |
 | calc-plumbing.js | `computeTimeOfConcentration` | `{ l_ft = 0, s_slope = 0 } = {}` | _ | _ | _ |
 | calc-plumbing.js | `computeTrapArm` | `{ pipe_diameter_in, slope_in_per_ft = 0.25 }` | _ | _ | _ |
 | calc-plumbing.js | `computeTrapPrimer` | `{ floor_drain_count = 0, zone = "occupied", prime_method = "electronic", prim...` | _ | _ | _ |
@@ -4199,7 +4199,7 @@ per spec-v14 §13.1 second paragraph.
 | `cleanout-layout` | Drainage Cleanout Layout (IPC 708) | International Code Council; 'All horizontal drains shall be provided with cleanouts l... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `composite-curve-number` | Composite Curve Number (Impervious Area) | USDA NRCS TR-55 (1986), Chapter 2; Figure 2-4: CNc = CNp + (Pimp/100)(98 - CNp)(1 - 0.5 R) =... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `condensate-return-sizing` | Condensate Return Line Size From the Flash Steam | Continuity; ASHRAE / Spirax Sarco ret...; spec-v200 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
-| `cross-connection-air-gap` | Cross-Connection Air Gap (IPC 608.15.1) | IPC 608.15.1 / ASME A112.1.2; spec-v450 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `cross-connection-air-gap` | Cross-Connection Air Gap (IPC Table 608.16.1) | IPC 608.15.1 / ASME A112.1.2; spec-v450 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `culvert-headwater` | Governing Culvert Headwater (HDS-5) | FHWA HDS-5 (FHWA-HIF-12-026); HW_inlet = 3.986 ft (unsubmerged inlet control) vs HW_out... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `culvert-inlet-control` | Culvert Headwater by Inlet Control (HDS-5) | FHWA HDS-5 (FHWA-HIF-12-026), Appendix A; D = 3 ft, A = pi 3^2/4 = 7.0686 ft2, flow factor Q/(A sqr... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `culvert-outlet-control` | Culvert Headwater by Outlet Control (HDS-5) | FHWA HDS-5 (FHWA-HIF-12-026), Chapter...; D = 3 ft, A = pi 3^2/4 = 7.0686 ft2, R = D/4 = 0.75 ft, V... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -4230,7 +4230,7 @@ per spec-v14 §13.1 second paragraph.
 | `hanger-rod-sizing` | Minimum Hanger Rod Diameter from Load (MSS SP-58) | MSS SP-58 carbon-steel threaded-rod l...; spec-v162 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+3 more) |
 | `heat-trace-sizing` | Freeze-Protection Heat-Trace Cable and Circuit | Heat-trace sizing identity (first-pri...; cable = 150*1.10 + 3 = 168 ft; watts = 5*168 = 840; amps ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `hydraulic-jump` | Hydraulic Jump: Sequent Depth and Energy Loss | Belanger sequent depth (Chow, Open-Ch...; spec-v632 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
-| `hydronic-fill-pressure` | Hydronic Fill Pressure (Static Height) | hydronic practice (static head); spec-v452 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `hydronic-fill-pressure` | Hydronic Fill Pressure (Static Height) | hydronic practice (static head); spec-v452 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `hydronic-system-volume` | Hydronic System Water and Glycol Volume | Hydronic system-volume identity (firs...; pipe=500*0.025=12.5; system=12.5+8+5=25.5; glycol=25.5*0.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `hydrostatic-test` | Hydrostatic Test Pressure and Hold | IPC / Plumbing engineering practice; 100 psi working / 200 gal volume / water -> test_pressure... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `leach-field-aggregate` | Leach-Field / Trench Drainrock Volume | Leach-field drainrock identity (first...; stone=3*60*2*1=360; cy=360/27*1.10=14.67; tons=14.67*1.4=... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -4308,7 +4308,7 @@ per spec-v14 §13.1 second paragraph.
 | `tankless-gpm` | Tankless Water Heater GPM | Project (first-principles); 199 kBTU input, climate 5A (Chicago) inlet 50 F, target 1... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `thermal-expansion-volume` | Water Thermal-Expansion Volume | NIST / standard steam tables (water d...; 50 gal, 50->140 F -> ~0.839 gal expansion | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `thermoplastic-temperature-derate` | Thermoplastic Pipe Pressure Derating vs Temperature | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
-| `thrust-block-max-pressure` | Max Line Pressure for a Thrust Block (AWWA M41) | AWWA M41 (solved for the pressure); spec-v745 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `thrust-block-max-pressure` | Max Line Pressure for a Thrust Block (AWWA M41) | AWWA M41 (solved for the pressure); spec-v745 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `thrust-block-sizing` | Thrust Block Bearing Area at a Pipe Bend (AWWA M41) | AWWA M41; spec-v388 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `time-of-concentration` | Time of Concentration (Kirpich) | Kirpich (1940) / USDA TR-55; spec-v302 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `tpr-discharge` | Water-Heater T&P Relief and Discharge | IPC 2021 Section 504 / ANSI Z21.22; heater input 50,000, T&P valve 150,000, 3/4 in outlet -> ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -4360,7 +4360,7 @@ per spec-v14 §13.1 second paragraph.
 | `boiler-pipe-sizing` | Boiler Distribution Pipe Sizing | ASHRAE / Bell & Gossett; GPM = 200000/(500*20) = 20; v(1.265 in) = 5.11 > 4 -> ste... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `buffer-tank-loop-credit` | Buffer Tank with Distribution-Loop Credit | ASHRAE / Idronics (Caleffi); 60 gal gross, 1.5 in x 200 ft loop holds 18.36 gal -> 41.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `building-tightness-limit` | Building Tightness Limit vs Minimum Ventilation (When Air Sealing Needs a Fan) | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
-| `building-ua` | Whole-Building Heat-Loss Coefficient UA | Whole-building UA (ASHRAE / RESNET); spec-v329 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `building-ua` | Whole-Building Heat-Loss Coefficient UA | Whole-building UA (ASHRAE / RESNET); spec-v329 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `caz-depressurization-limit` | Combustion Appliance Zone Depressurization Limit (Worst-Case Backdraft Test) | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `cfm-per-ton` | CFM per Ton | Project (first-principles); ACCA Manual D / industry rule of thumb | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `chilled-water-delta-t` | Chilled-Water Low Delta-T Screen and Pump Penalty | Project (first-principles); Q = 500 x gpm x delta-T; cube law on flow | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -4405,7 +4405,7 @@ per spec-v14 §13.1 second paragraph.
 | `deadband-cycling-rate` | Deadband, Differential, and Equipment Cycling Rate | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `deaerator-steam-demand` | Deaerator Steam Demand and Vent Rate | Project (first-principles); ASME, the deaerator manufacturer, the water treatment pro... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `defrost-cycle-sizing` | Evaporator Defrost Heat and Cycle Time | Project (first-principles); 144 BTU/lb latent, 0.5 BTU/lb-F sensible | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
-| `degree-day-energy` | Annual Heating Energy and Fuel Cost from Degree-Days | Degree-day method (ASHRAE / RESNET); spec-v330 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `degree-day-energy` | Annual Heating Energy and Fuel Cost from Degree-Days | Degree-day method (ASHRAE / RESNET); spec-v330 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `dp-flow-meter` | Differential-Pressure Flow Meter (Orifice / Venturi) | Bernoulli / ISO 5167 primary element ...; d=0.0508 m, A2=0.0020268 m2; dP=6894.76 Pa; rho=999.6 kg/... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `draft-hood-dilution` | Draft-Hood Dilution Ratio | Combustion-analysis practice; appliance O2 5%, diluted O2 12% -> ratio 1.79, 44.0% dilu... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `drybulb-from-enthalpy` | Dry-Bulb from Enthalpy and Humidity Ratio | ASHRAE Fundamentals (moist-air enthal...; spec-v663 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -4894,7 +4894,7 @@ per spec-v14 §13.1 second paragraph.
 | `masonry-anchor-embedment` | Masonry Anchor Embedment for a Tension (TMS 402 ASD) | TMS 402 ASD; 5,000 lb tension, 1,500 psi masonry -> 5.73 in embedment;... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `masonry-anchor-shear` | Masonry Anchor Bolt in Shear (TMS 402 ASD) | TMS 402-16 ASD (Section 8.1.5.2); 3/4in A307, 1,500 psi, 5 in embed 4 in from edge: Bvb 1,2... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `masonry-cleaning-dilution` | Masonry Cleaning Dilution, Coverage, and Rinse | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
-| `masonry-control-joint-layout` | Masonry Control-Joint Layout | Masonry control-joint rule (NCMA empi...; max spacing = min(1.5*16, 25) = 24 ft; panels = ceil(80/2... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `masonry-control-joint-layout` | Masonry Control-Joint Layout | Masonry control-joint rule (NCMA empi...; max spacing = min(1.5*16, 25) = 24 ft; panels = ceil(80/2... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `masonry-count` | Brick and CMU Count | Project (first-principles face-area c...; 100 ft^2 wall / CMU 8x8x16 (15.625x7.625 actual) / 3/8 in... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `masonry-coursing` | Masonry Coursing and Course-Out Check | BIA Technical Notes / NCMA TEK; spec-v213 section 2.1 pinned example (CMU wall on module) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `masonry-joint-reinforcement` | Masonry Horizontal Joint-Reinforcement Takeoff (IRC R606.12.2) | masonry joint-reinforcement takeoff (...; courses = ceil(144/16) = 9; per course = 1 + ceil((40 - 1... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -4954,7 +4954,7 @@ per spec-v14 §13.1 second paragraph.
 | `polymeric-sand-bags` | Polymeric Paver Joint Sand Bag Count | Polymeric joint-sand bag-count identi...; bags = ceil(400*1.05/75) = ceil(5.6) = 6 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `post-hole-concrete` | Concrete per Post Hole | Cylinder-volume geometry less post di...; spec-v94 section 2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `post-tension-elongation` | Post-Tension Tendon Elongation and Jacking Force | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
-| `powered-attic-ventilator` | Powered Attic Ventilator Sizing | attic-fan sizing practice; spec-v467 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `powered-attic-ventilator` | Powered Attic Ventilator Sizing | attic-fan sizing practice; spec-v467 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `press-brake-max-thickness` | Press-Brake Max Bendable Thickness | Press-brake air-bend tonnage chart + ...; 100 tons, V 0.5 in, L 4 ft, mild steel -> 0.1474 in max t... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `press-brake-tonnage` | Press-Brake Air-Bend Tonnage | Press-brake air-bend tonnage chart + ...; T 0.125 in, L 4 ft, V 1 in, mild steel -> 8.9844 tons/ft,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `protruding-object-check` | Protruding Objects and Headroom (2010 ADA Standards 307) | US Department of Justice / US Access ...; 307.2: 'Objects with leading edges more than 27 inches an... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -5515,7 +5515,7 @@ per spec-v14 §13.1 second paragraph.
 | `tiedown-count` | Minimum Tiedown Count and Aggregate WLL | FMCSA; 393.110 count rule and 393.106 aggregate WLL | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `tire-load-check` | Tire Load-Rating Check (per Axle) | 49 CFR 393.75 + DOT sidewall marking; spec-v115 section 2.2 pinned example (capacity 12,350, ut... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `tonnage-rating-grade` | Locomotive Tonnage Rating on a Ruling Grade | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
-| `trailer-tongue-weight` | Trailer Tongue Weight and Sway Check | NHTSA / SAE J2807 towing tongue-weigh...; spec-v486 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `trailer-tongue-weight` | Trailer Tongue Weight and Sway Check | NHTSA / SAE J2807 towing tongue-weigh...; spec-v486 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+3 more) |
 | `train-brake-reduction` | Train Air Brake Reduction and Cylinder Pressure | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `transfer-station-throughput` | Transfer Station Throughput and Trailer Loadout | Project (first-principles); the facility's scale records govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `truck-off-tracking` | Low-Speed Off-Tracking (Swept Path) | AASHTO Green Book (low-speed off-trac...; OT = 50 - sqrt(2500 - 400) = 50 - 45.826 = 4.174 ft; effe... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -5527,7 +5527,7 @@ per spec-v14 §13.1 second paragraph.
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
-| `abyc-dc-wire` | ABYC E-11 Marine DC Wire Sizing | ABYC E-11 DC wire sizing by voltage drop; spec-v517 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `abyc-dc-wire` | ABYC E-11 Marine DC Wire Sizing | ABYC E-11 DC wire sizing by voltage drop; spec-v517 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `acme-thread-depth` | Acme (29-degree) Thread Depth and Dimensions | General-purpose Acme thread (Machiner...; pitch = 1/5 = 0.200; depth = 0.200/2 + 0.010 = 0.110; pit... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `adhesive-bond-area` | Structural Adhesive Bond Area and Shear Capacity | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `aerodynamic-drag-force` | Aerodynamic Drag Force and Power | Project (first-principles); F = 1/2 rho V^2 Cd A | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -5584,7 +5584,7 @@ per spec-v14 §13.1 second paragraph.
 | `dyno-correction-sae` | SAE J1349 Dyno Correction Factor | SAE J1349 dyno correction factor; spec-v515 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `endurance-limit-marin` | Corrected Endurance Limit (Shigley Marin Factors) | Project (first-principles); Se = ka kb kc kd ke Se | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `engine-bmep` | Engine BMEP (Brake Mean Effective Pressure) | Brake mean effective pressure (SAE; H...; 350 CID at 400 lb-ft (4-stroke) -> 150.8 x 400 / 350 = 17... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
-| `engine-fuel-burn-gph` | Engine Fuel Burn from Horsepower (BSFC) | BSFC engine-performance practice; spec-v463 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `engine-fuel-burn-gph` | Engine Fuel Burn from Horsepower (BSFC) | BSFC engine-performance practice; spec-v463 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `et-horsepower` | Horsepower from Quarter-Mile ET | Hale quarter-mile ET relation (invers...; spec-v662 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `euler-johnson-column` | Euler-Johnson Column Buckling | Project (first-principles); Euler / J.B. Johnson | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `fatigue-safety-factor` | Fluctuating-Stress Fatigue Safety Factor (Goodman/Soderberg/Gerber) | Project (first-principles); Goodman/Soderberg/Gerber + Langer | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -5633,7 +5633,7 @@ per spec-v14 §13.1 second paragraph.
 | `planetary-gear-ratio` | Planetary (Epicyclic) Gear Ratio | Project (first-principles); Willis epicyclic ratio | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `power-screw-torque` | Power-Screw Torque, Efficiency, and Self-Locking | Project (first-principles); T_raise/T_lower power screw | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `projectile-range` | Projectile Range, Height, and Flight Time | Project (first-principles); R = v^2 sin(2 theta)/g | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
-| `prop-pitch-selection` | Marine Propeller Pitch Selection | outboard prop selection practice; spec-v462 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `prop-pitch-selection` | Marine Propeller Pitch Selection | outboard prop selection practice; spec-v462 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `prop-slip` | Marine Prop Slip | Project (first-principles); theoretical_kt = (4500/1.85) * 19 / 1215.2 = 38.03; slip ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `propeller-track-balance` | Propeller Track, Balance, and Vibration Limit | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `rack-and-pinion` | Rack and Pinion Travel, Speed, and Force | Project (first-principles); rack and pinion | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -5691,7 +5691,7 @@ per spec-v14 §13.1 second paragraph.
 | `volumetric-efficiency` | Volumetric Efficiency and Airflow | Classical four-stroke airflow derivat...; 350 ci at 5500 RPM 4-stroke -> 557 CFM theoretical | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `waterline-for-hull-speed` | Waterline Length for a Target Hull Speed | displacement hull-speed relation (Fro...; 8 kn target displacement hull -> 35.6 ft waterline | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wedge-force` | Wedge Splitting Force and Self-Locking | Project (first-principles); MA=(cos b - mu sin b)/(2 (sin b + mu cos b)), b=15 deg | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
-| `wheel-offset-backspacing` | Wheel Offset and Backspacing | wheel offset / backspacing conversion...; spec-v510 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `wheel-offset-backspacing` | Wheel Offset and Backspacing | wheel offset / backspacing conversion...; spec-v510 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `worm-gear-geometry` | Worm and Worm-Wheel Geometry | Machinery's Handbook (worm gearing); lead = 0.5 x 1 = 0.5 in; lead angle = atan(0.5/(pi x 2)) ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
 ### Group L Agriculture (95 tiles)

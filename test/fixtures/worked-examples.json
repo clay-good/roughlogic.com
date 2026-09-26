@@ -72929,6 +72929,28 @@
    }
   },
   {
+   "tile_id": "masonry-control-joint-layout",
+   "source_publisher": "NCMA",
+   "source_title": "TEK 10-2C Control Joints for Concrete Masonry Walls - Empirical Method",
+   "source_edition_or_year": "2010, p. 3",
+   "source_section_or_page": "20 ft tall warehouse, 100 ft walls: 1-1/2 x 20 ft = 30 ft, but the 25 ft maximum governs (panel count not printed)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "wall_length_ft": 100,
+    "wall_height_ft": 20,
+    "max_spacing_cap_ft": 25
+   },
+   "outputs": {
+    "max_spacing_ft": {
+     "value": 25,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
    "tile_id": "dumpster-count",
    "source_publisher": "Roll-off haul-count identity (first-principles)",
    "source_title": "60 cy, 45 tons, 30 cy box, 0.7 fill, 8-ton cap (weight governs)",
@@ -75918,6 +75940,53 @@
    }
   },
   {
+   "tile_id": "building-ua",
+   "source_publisher": "University of Washington (ARCH 331/431)",
+   "source_title": "Lecture 8, Whole Building Heat Transfer Part 2 (Farnsworth House)",
+   "source_edition_or_year": "April 24, 2008, pp. 6 and 10",
+   "source_section_or_page": "walls/doors/windows U 1.124 on 1,152 ft2, ceiling U 0.158 on 1,152, floor U 0.112 on 1,152: UA conduction = 1606; infiltration 0.018 x 9,216 ft3 x 1.30 ACH = 216 (199.7 cfm); UA = 1822; x (68 - (-4)) = 131,184 Btu/hr (printed from the rounded 1822)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "assemblies": [
+     {
+      "area": 1152,
+      "r": 0.889679715302491
+     },
+     {
+      "area": 1152,
+      "r": 6.329113924050633
+     },
+     {
+      "area": 1152,
+      "r": 8.928571428571429
+     }
+    ],
+    "cfm_inf": 199.68,
+    "dt_f": 72
+   },
+   "outputs": {
+    "cond": {
+     "value": 1606,
+     "tolerance": {
+      "abs": 1
+     }
+    },
+    "ua": {
+     "value": 1822,
+     "tolerance": {
+      "abs": 1
+     }
+    },
+    "design_load": {
+     "value": 131184,
+     "tolerance": {
+      "pct": 0.05
+     }
+    }
+   }
+  },
+  {
    "tile_id": "degree-day-energy",
    "source_publisher": "Degree-day method (ASHRAE / RESNET)",
    "source_title": "UA 500, 5,000 HDD, 80% gas, $1.20/therm -> 60 MMBtu, 750 therms, $900/yr",
@@ -75979,6 +76048,30 @@
      "value": 879,
      "tolerance": {
       "pct": 0.3
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "degree-day-energy",
+   "source_publisher": "University of Washington (ARCH 331/431)",
+   "source_title": "Lecture 8, Whole Building Heat Transfer Part 2",
+   "source_edition_or_year": "April 24, 2008, p. 11",
+   "source_section_or_page": "E = (1822)(6013)(24) / (0.80)(1,050 Btu/ft3) = 313,020 ft3 of natural gas per year = 3,287 therms",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "ua_btuhf": 1822,
+    "hdd": 6013,
+    "eff": 0.8,
+    "fuel": "gas",
+    "price": 1
+   },
+   "outputs": {
+    "fuel_units": {
+     "value": 3286.7,
+     "tolerance": {
+      "abs": 0.5
      }
     }
    }
@@ -79064,7 +79157,7 @@
   {
    "tile_id": "thrust-block-sizing",
    "source_publisher": "AWWA M41",
-   "source_title": "8 in main (OD 8.625), 100 psi, 90-deg bend, 2000 psf soil -> T 8,263 lb, Ab 4.13 ft^2",
+   "source_title": "8 in main (OD 8.625), 100 psi, 90-deg bend, 2000 psf soil, safety factor 1.5 -> T 8,263 lb, Ab 6.20 ft^2",
    "source_edition_or_year": "spec-v388 worked example (machine-verified)",
    "source_section_or_page": "spec-v388 section 2.1 pinned example",
    "verified_by": "rl",
@@ -79083,7 +79176,7 @@
      }
     },
     "bearing_area_ft2": {
-     "value": 4.13,
+     "value": 6.197,
      "tolerance": {
       "pct": 0.5
      }
@@ -79093,13 +79186,13 @@
   {
    "tile_id": "thrust-block-max-pressure",
    "source_publisher": "AWWA M41 (solved for the pressure)",
-   "source_title": "4.13 ft^2 block, 8 in main (OD 8.625), 90-deg bend, 2000 psf soil -> 100 psi max",
+   "source_title": "6.2 ft^2 block, 8 in main (OD 8.625), 90-deg bend, 2000 psf soil, safety factor 1.5 -> 100 psi max",
    "source_edition_or_year": "spec-v745 worked example (machine-verified)",
    "source_section_or_page": "spec-v745 section 2.1 pinned example",
    "verified_by": "rl",
    "verified_on": "2026-07-14",
    "inputs": {
-    "bearing_area_ft2": 4.13,
+    "bearing_area_ft2": 6.2,
     "od_in": 8.625,
     "bend_deg": 90,
     "soil_bearing_psf": 2000
@@ -79112,9 +79205,33 @@
      }
     },
     "max_thrust_lb": {
-     "value": 8260,
+     "value": 8266.7,
      "tolerance": {
       "abs": 1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "thrust-block-max-pressure",
+   "source_publisher": "EBAA Iron",
+   "source_title": "Connections PD-1, Joint Restraint vs. Thrust Blocks",
+   "source_edition_or_year": "1993, p. 1",
+   "source_section_or_page": "90-degree bend in a 12 in ductile-iron line (OD 13.20) at 150 psi, 2000 psf soil, 1.5:1 safety factor -> a bearing area of almost 22 ft2 (run in reverse: 22 ft2 -> ~150 psi)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "bearing_area_ft2": 22,
+    "od_in": 13.2,
+    "bend_deg": 90,
+    "soil_bearing_psf": 2000,
+    "safety_factor": 1.5
+   },
+   "outputs": {
+    "max_pressure_psi": {
+     "value": 150,
+     "tolerance": {
+      "abs": 2
      }
     }
    }
@@ -82683,6 +82800,62 @@
    }
   },
   {
+   "tile_id": "trailer-tongue-weight",
+   "source_publisher": "etrailer",
+   "source_title": "What Exactly is Tongue Weight?",
+   "source_edition_or_year": "updated September 16, 2024",
+   "source_section_or_page": "a 10,000 lb loaded trailer: ideal tongue weight 1,000 (10%) to 1,500 lb (15%)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "trailer_gross_weight_lb": 10000,
+    "tongue_weight_lb": 1200,
+    "hitch_type": "conventional"
+   },
+   "outputs": {
+    "target_low_lb": {
+     "value": 1000,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "target_high_lb": {
+     "value": 1500,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "trailer-tongue-weight",
+   "source_publisher": "etrailer",
+   "source_title": "What Exactly is Tongue Weight?",
+   "source_edition_or_year": "updated September 16, 2024",
+   "source_section_or_page": "a 13,000 lb fifth wheel: pin weight 1,950 (15%) to 3,250 lb (25%)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "trailer_gross_weight_lb": 13000,
+    "tongue_weight_lb": 2500,
+    "hitch_type": "gooseneck"
+   },
+   "outputs": {
+    "target_low_lb": {
+     "value": 1950,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "target_high_lb": {
+     "value": 3250,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
    "tile_id": "def-consumption",
    "source_publisher": "DEF consumption and range model (SCR aftertreatment)",
    "source_title": "13 gal DEF tank, 2.5% dose, 6.5 mpg, 200 gal diesel -> 5.0 gal DEF, 520 gal/tank, 3,380 mi range",
@@ -84485,6 +84658,34 @@
    }
   },
   {
+   "tile_id": "cross-connection-air-gap",
+   "source_publisher": "International Code Council (Louisiana LDH amended copy)",
+   "source_title": "International Plumbing Code 2015, Table 608.15.1 Minimum Air Gaps",
+   "source_edition_or_year": "2015",
+   "source_section_or_page": "effective opening not greater than 3/4 in: 1-1/2 in away from a wall, 2-1/2 in close to a wall",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "opening_in": 0.75,
+    "near_wall": true,
+    "measured_in": 0
+   },
+   "outputs": {
+    "air_gap_in": {
+     "value": 1.5,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "air_gap_wall_in": {
+     "value": 2.5,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
    "tile_id": "hydronic-fill-pressure",
    "source_publisher": "hydronic practice (static head)",
    "source_title": "30 ft system, 4 psi margin -> 17.0 psi fill (4 psi left at the top)",
@@ -84528,6 +84729,27 @@
      "value": 19.152,
      "tolerance": {
       "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "hydronic-fill-pressure",
+   "source_publisher": "RL Deppmann",
+   "source_title": "hydronic fill-pressure article",
+   "source_edition_or_year": "April 13, 2026",
+   "source_section_or_page": "36 ft of static height -> about 20 PSIG fill (the article also holds an 8 PSIG minimum for any building)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "height_ft": 36,
+    "margin_psi": 4
+   },
+   "outputs": {
+    "fill_psi": {
+     "value": 20,
+     "tolerance": {
+      "abs": 0.5
      }
     }
    }
@@ -85196,6 +85418,35 @@
    }
   },
   {
+   "tile_id": "prop-pitch-selection",
+   "source_publisher": "Boating magazine (B. Becker)",
+   "source_title": "Understanding Propeller Pitch",
+   "source_edition_or_year": "updated September 27, 2019",
+   "source_section_or_page": "about 200 rpm per inch of pitch: going from a 23-pitch to a 21-pitch propeller raises engine rpm by about 400",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "current_pitch_in": 23,
+    "current_wot_rpm": 5000,
+    "target_wot_rpm": 5400,
+    "rpm_per_inch": 200
+   },
+   "outputs": {
+    "pitch_change_in": {
+     "value": 2,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "new_pitch_in": {
+     "value": 21,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
    "tile_id": "engine-fuel-burn-gph",
    "source_publisher": "BSFC engine-performance practice",
    "source_title": "300 hp diesel, BSFC 0.37, 7.1 lb/gal -> 15.6 GPH, 12.8 hr on 200 gal",
@@ -85242,6 +85493,29 @@
      "value": 24.59,
      "tolerance": {
       "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "engine-fuel-burn-gph",
+   "source_publisher": "Boating magazine (B. Becker)",
+   "source_title": "Calculating Boat Fuel Consumption",
+   "source_edition_or_year": "updated September 30, 2019",
+   "source_section_or_page": "diesel: GPH = (0.4 x 300) / 7.2 = 16.6 (truncated)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "horsepower": 300,
+    "bsfc_lb_hp_hr": 0.4,
+    "density_lb_gal": 7.2,
+    "tank_gal": 200
+   },
+   "outputs": {
+    "gph": {
+     "value": 16.67,
+     "tolerance": {
+      "abs": 0.08
      }
     }
    }
@@ -86215,6 +86489,33 @@
    }
   },
   {
+   "tile_id": "wheel-offset-backspacing",
+   "source_publisher": "Speedway Motors (J. McCollough)",
+   "source_title": "Wheel Offset vs Backspacing Explained",
+   "source_edition_or_year": "June 16, 2021",
+   "source_section_or_page": "overall width about 1 in wider than the stated 9 in; 10 in overall with 5-3/4 in backspacing -> .750 x 25.4 = 19.05 mm positive offset",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "rim_width_in": 9,
+    "backspacing_in": 5.75
+   },
+   "outputs": {
+    "overall_width_in": {
+     "value": 10,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "offset_mm_out": {
+     "value": 19.05,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
    "tile_id": "brake-pedal-hydraulic",
    "source_publisher": "hydraulic brake force chain (Pascal's law)",
    "source_title": "50 lb pedal, 5:1, manual, 7/8 in master, 4 in^2 caliper, 0.4 pad, 4.5 in rotor -> 416 psi, 1,663 lb, 5,987 in-lb",
@@ -86557,6 +86858,29 @@
    }
   },
   {
+   "tile_id": "abyc-dc-wire",
+   "source_publisher": "Blue Sea Systems",
+   "source_title": "Wire Sizing Chart, Doc 9836 Rev. F, example a",
+   "source_edition_or_year": "2004, p. 2",
+   "source_section_or_page": "12 V at 10% drop, 40 ft circuit (source to load and back = 20 ft one way) x 45 A = 1,800 Famps -> #8 AWG",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "current_a": 45,
+    "run_length_ft": 20,
+    "system_voltage_v": 12,
+    "drop_pct": 10
+   },
+   "outputs": {
+    "awg": {
+     "value": "8",
+     "tolerance": {
+      "abs": 0
+     }
+    }
+   }
+  },
+  {
    "tile_id": "powered-attic-ventilator",
    "source_publisher": "attic-fan sizing practice",
    "source_title": "1500 ft2 attic, 0.7 CFM/ft2, light roof -> 1050 CFM fan, 3.5 ft2 (504 in2) intake",
@@ -86614,6 +86938,28 @@
      "value": 4.025,
      "tolerance": {
       "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "powered-attic-ventilator",
+   "source_publisher": "Home Ventilating Institute (HVI)",
+   "source_title": "Attic Ventilation",
+   "source_edition_or_year": "web publication",
+   "source_section_or_page": "attic area x 0.7: 1,000 ft2 -> 700 CFM, 805 CFM for a dark or steep roof (+15%); intake 1 ft2 per 300 CFM",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "attic_area_ft2": 1000,
+    "cfm_per_ft2": 0.7,
+    "dark_roof": "yes"
+   },
+   "outputs": {
+    "fan_cfm": {
+     "value": 805,
+     "tolerance": {
+      "abs": 0.5
      }
     }
    }

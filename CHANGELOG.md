@@ -11,6 +11,16 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **`thrust-block-sizing` and `thrust-block-max-pressure` apply the customary safety factor.** DIPRA / AWWA M41 practice sizes the block face as Ab = Sf x T / soil bearing with Sf about 1.5, and EBAA Iron Connections PD-1 prints 1.5:1. The tiles had no safety factor. The forward tile's block face came out at 1/1.5 of the customary size, and the inverse overstated the pressure a block holds by 1.5x. A safety-factor input now defaults to 1.5. The example block for 100 psi on an 8 in main goes from 4.13 to 6.20 ft^2. EBAA's 12 in, 150 psi, "almost 22 square feet" now reproduces.
+- **`oil-water-separator-sizing` takes the water's specific gravity at the design temperature.** Water density was fixed at 60 F while the viscosity came from the design temperature. For hot water that overstated the oil-water density difference by about 38%, compared with Applied Mechanical Technology's 130 F sheet. The default, SG 1.0, keeps earlier results. The note's stale "F about 1.2, 50 gpm needs 24 ft^2" now matches the code: F about 1.5, 30 ft^2.
+- **Smaller fixes found against printed sources:**
+  - `cross-connection-air-gap` name, description and output label now state IPC Table 608.16.1's stepped values; a "false" string no longer reads as near a wall.
+  - `wheel-offset-backspacing` refuses a negative backspacing or one outside the wheel.
+  - `prop-pitch-selection` says "keep this pitch" when WOT RPM is already on target.
+  - `hull-displacement` asks for canoe-body draft.
+  - `hydronic-fill-pressure` margin is the pressure left at the top.
+  - `duct-leakage-cfm25` discloses the 2024 IECC changes.
+  - `powered-attic-ventilator` applies +15% for a dark or steep roof, per HVI.
 - **`battery-hydrogen-vent` and `battery-vent-max-current` use the IEEE 1635 hydrogen rate and say which limit they hold.** Each ampere through each cell evolves 0.000269 cfm of hydrogen (IEEE 1635-2018 / ASHRAE Guideline 21 Annex A, and Faraday's law), so the 1% limit of the IFC and NFPA 1 takes 0.0269 x I x N cfm. The tiles used 0.054 x I x N and called it 1%; that constant holds 0.5%, twice the airflow. A new hydrogen-limit input defaults to 1%. IEEE's own example, 72 cells at 66.7 A held to 2%, now reproduces at 64.6 cfm. The current input is now labeled as the current through each cell (charger current / parallel strings). The example exhaust goes from 25.9 to 12.9 cfm; the inverse's supportable current doubles.
 - **`evaporator-td-dtd` humidity bands follow Heatcraft's coil-selection classes.** A 10 F TD is the 80-85% RH class (packaged meats), not ~90% (produce). The classes are 7-9 F ~90%, 10-12 F ~80-85%, 12-16 F ~65-80%, 17-22 F ~50-65%. Heatcraft's beef-cooler example is now a fixture.
 - **`condenser-heat-rejection` and its COP inverse had the motor-heat cases reversed.** A hermetic or suction-cooled compressor puts its motor heat into the refrigerant, so it reaches the condenser. An open or belt-drive compressor rejects its losses to the room.
@@ -40,6 +50,13 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 ### Changed
 
 - **`calc-electrical.js` size cap raised from 104,000 to 106,000 bytes gzipped.** The battery-vent and capacitor corrections took it to 104,063 B (100.1%). Splitting the module per bench is still the preferred fix.
+- **Twelve more tiles now carry a publisher's printed example; derived-only tiles drop below 1,000.**
+  - **Building science:** `building-ua` and `degree-day-energy` (University of Washington ARCH 331), `powered-attic-ventilator` (HVI), `hydronic-fill-pressure` (RL Deppmann).
+  - **Plumbing and masonry:** `thrust-block-max-pressure` (EBAA Iron), `cross-connection-air-gap` (IPC 2015 table), `masonry-control-joint-layout` (NCMA TEK 10-2C).
+  - **Marine and automotive:** `abyc-dc-wire` (Blue Sea Systems), `engine-fuel-burn-gph` and `prop-pitch-selection` (Boating magazine), `wheel-offset-backspacing` (Speedway Motors), `trailer-tongue-weight` (etrailer, two hitch types).
+
+  README: 998 of 2,183 tiles are checked only against the project's own derivation; 1,185 carry an outside source.
+
 - **Twelve more tiles now carry a publisher's printed example.**
   - **Energy:** `power-factor-billing-savings` (DOE Motor Challenge), `air-leak-cost` (DOE Compressed Air Tip Sheet #3).
   - **Refrigeration:** `condenser-heat-rejection` (ACHR News), `evaporator-td-dtd` (Heatcraft).

@@ -2966,12 +2966,13 @@ export function computeCrossConnectionAirGap({ opening_in = 0, near_wall = false
   if (!(opening > 0)) return { error: "Effective opening diameter must be positive (in)." };
   // IPC 2021 Table 608.16.1: stepped values up to a 1 in opening (1/2 in: 1 and 1-1/2; 3/4 in: 1-1/2
   // and 2-1/2; 1 in: 2 and 3), then 2x and 3x the opening. Until 2026-09-25 this used 2x / 3x at every
-  // size with floors of 1 / 1.5 in and cited 608.15.1 (2018 numbering), short by up to 0.7 in near a wall.
+  // size with floors of 1 / 1.5 in and cited 608.15.1 (an earlier edition's numbering), short by up to 0.7 in near a wall.
   const [air_gap_in, air_gap_wall_in] = opening <= 0.5 ? [1, 1.5] : opening <= 0.75 ? [1.5, 2.5] : opening <= 1 ? [2, 3] : [2 * opening, 3 * opening];
-  const required_in = near_wall ? air_gap_wall_in : air_gap_in;
+  const wall = near_wall === true || near_wall === "true" || near_wall === "yes"; // a "false" string must not read as near a wall
+  const required_in = wall ? air_gap_wall_in : air_gap_in;
   const passes = measured > 0 ? measured >= required_in : null;
   return {
-    air_gap_in, air_gap_wall_in, required_in, near_wall: !!near_wall, passes,
+    air_gap_in, air_gap_wall_in, required_in, near_wall: wall, passes,
     note: "IPC 2021 608.16.1 / Table 608.16.1 air gap: the minimum vertical distance between a supply outlet and the flood-level rim of the fixture it discharges into is 1, 1-1/2 or 2 in for effective openings up to 1/2, 3/4 or 1 in (1-1/2, 2-1/2 or 3 in close to a wall), and twice (three times close to a wall) the opening above 1 in. 'Close to a wall' means within three diameters of one wall, or four of two walls meeting. The effective opening is the least cross-sectional area of the supply outlet (a round pipe's diameter, or the equivalent diameter of a non-round outlet). An air gap is the most positive cross-connection protection -- nothing mechanical can defeat it. A design aid, not a substitute for the plumbing code adopted by your AHJ.",
   };
 }
@@ -2991,7 +2992,7 @@ function renderCrossConnectionAirGap(inputRegion, outputRegion, citationEl) {
   const update = debounce(() => {
     const r = computeCrossConnectionAirGap({ opening_in: readNum(op.input), near_wall: nw.input.checked, measured_in: readNum(me.input) });
     if (r.error) { oReq.textContent = r.error; oBoth.textContent = "-"; oPass.textContent = "-"; oNote.textContent = ""; return; }
-    oReq.textContent = fmt(r.required_in, 2) + " in" + (r.near_wall ? " (near a wall, 3x)" : " (standard, 2x)");
+    oReq.textContent = fmt(r.required_in, 2) + " in" + (r.near_wall ? " (near a wall, Table 608.16.1)" : " (standard, Table 608.16.1)");
     oBoth.textContent = fmt(r.air_gap_in, 2) + " in / " + fmt(r.air_gap_wall_in, 2) + " in";
     oPass.textContent = r.passes === null ? "enter a measured gap to check" : (r.passes ? "PASS -- meets the minimum" : "FAIL -- below the minimum");
     oNote.textContent = r.note;

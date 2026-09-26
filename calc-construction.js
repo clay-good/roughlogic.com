@@ -8416,7 +8416,7 @@ export function computePoweredAtticVentilator({ attic_area_ft2 = 0, cfm_per_ft2 
   const intake_in2 = intake_ft2 * 144;
   return {
     fan_cfm, intake_ft2, intake_in2, dark,
-    note: "Powered attic ventilator (fan) sizing: size the fan to about 0.7 CFM per square foot of attic floor (roughly 10 air changes per hour for a typical attic), with about a 15% increase for a dark roof that runs hotter. The fan needs matching intake (soffit) net free area of roughly 1 ft^2 per 300 CFM so it pulls outdoor air rather than starving and depressurizing the attic (which can back-draft combustion appliances or pull conditioned air from the house). Powered ventilators are one approach; balanced passive ridge-and-soffit ventilation (see the attic-ventilation tile) is often preferred and some codes restrict powered fans. A sizing aid; the fan manufacturer's data and the local code govern.",
+    note: "Powered attic ventilator (fan) sizing: size the fan to about 0.7 CFM per square foot of attic floor (roughly 10 air changes per hour for a typical attic), with about a 15% increase for a dark or steep roof (HVI), which runs hotter or holds more air. The fan needs matching intake (soffit) net free area of roughly 1 ft^2 per 300 CFM so it pulls outdoor air rather than starving and depressurizing the attic (which can back-draft combustion appliances or pull conditioned air from the house). Powered ventilators are one approach; balanced passive ridge-and-soffit ventilation (see the attic-ventilation tile) is often preferred and some codes restrict powered fans. A sizing aid; the fan manufacturer's data and the local code govern.",
   };
 }
 export const poweredAtticVentilatorExample = { inputs: { attic_area_ft2: 1500, cfm_per_ft2: 0.7, dark_roof: "no" } };
@@ -8426,7 +8426,7 @@ const _v467renderPoweredAtticVentilator = _simpleRenderer({
   fields: [
     { key: "attic_area_ft2", label: "Attic floor area (ft²)", kind: "number" },
     { key: "cfm_per_ft2", label: "Airflow factor (CFM per ft²)", kind: "number" },
-    { key: "dark_roof", label: "Dark roof (~15% increase)?", kind: "select", default: "no", options: [{ value: "no", label: "No (light/average roof)" }, { value: "yes", label: "Yes (dark roof)" }] },
+    { key: "dark_roof", label: "Dark or steep roof (~15% increase, HVI)?", kind: "select", default: "no", options: [{ value: "no", label: "No (light/average roof)" }, { value: "yes", label: "Yes (dark or steep roof)" }] },
   ],
   outputs: [
     { key: "fan", id: "pav-out-fan", label: "Fan size", value: (r) => fmt(r.fan_cfm, 0) + " CFM" + (r.dark ? " (dark-roof adjusted)" : "") },
