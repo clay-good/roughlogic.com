@@ -1753,8 +1753,8 @@ function _v953renderCraneLoadRadiusBoom(inputRegion, outputRegion, citationEl) {
 RIGGING_RENDERERS["crane-load-radius-boom"] = _v953renderCraneLoadRadiusBoom;
 
 // ===================== spec-v991: block-and-tackle reeving line pull =====================
-// dims: in { load_lb: M L T^-2, parts_of_line: dimensionless, sheave_efficiency: dimensionless } out: { hauling_line_pull_lb: M L T^-2, frictionless_pull_lb: M L T^-2, reeving_efficiency: dimensionless }
-export function computeReevingPartsOfLine({ load_lb = 20000, parts_of_line = 4, sheave_efficiency = 0.98 } = {}) {
+// dims: in { load_lb: M L T^-2, parts_of_line: dimensionless, sheave_efficiency: dimensionless, lead_sheave: dimensionless } out: { hauling_line_pull_lb: M L T^-2, frictionless_pull_lb: M L T^-2, reeving_efficiency: dimensionless }
+export function computeReevingPartsOfLine({ load_lb = 20000, parts_of_line = 4, sheave_efficiency = 0.98, lead_sheave = 1 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(load_lb > 0)) return { error: "Load must be positive (lb)." };
   if (!(parts_of_line >= 1) || !Number.isInteger(parts_of_line)) return { error: "Parts of line must be a whole number >= 1." };
@@ -1763,7 +1763,12 @@ export function computeReevingPartsOfLine({ load_lb = 20000, parts_of_line = 4, 
   const k = sheave_efficiency;
   const frictionless_pull_lb = load_lb / N;
   // Friction stacks per sheave: tension in part i = T*k^(i-1); summing = load, so T = load*(1-k)/(1-k^N).
-  const hauling_line_pull_lb = (k === 1) ? frictionless_pull_lb : load_lb * (1 - k) / (1 - Math.pow(k, N));
+  // When the hauling line leaves the upper block over one more sheave (the usual case), that sheave costs
+  // another factor k: pull = load / (k + k^2 + ... + k^N), the Crosby "How to Figure Line Parts" ratio
+  // (1 part 0.98, 4 parts 3.81, 8 parts 7.32 anti-friction). Until 2026-09-25 the lead sheave was left out.
+  const lead = Number(lead_sheave) === 0 ? 0 : 1;
+  const base_pull = (k === 1) ? frictionless_pull_lb : load_lb * (1 - k) / (1 - Math.pow(k, N));
+  const hauling_line_pull_lb = lead ? base_pull / k : base_pull;
   const reeving_efficiency = load_lb / (N * hauling_line_pull_lb);
   if (![hauling_line_pull_lb, frictionless_pull_lb, reeving_efficiency].every(Number.isFinite)) return { error: "Reeving math is not a finite value." };
   return {
@@ -1774,27 +1779,31 @@ export function computeReevingPartsOfLine({ load_lb = 20000, parts_of_line = 4, 
   };
 }
 
-export const reevingPartsOfLineExample = { inputs: { load_lb: 20000, parts_of_line: 4, sheave_efficiency: 0.98 } };
+export const reevingPartsOfLineExample = { inputs: { load_lb: 20000, parts_of_line: 4, sheave_efficiency: 0.98, lead_sheave: 1 } };
 
 function _v991renderReevingPartsOfLine(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: block-and-tackle reeving line pull, by name. pull = load x (1 - k) / (1 - k^N); reeving efficiency = load / (N x pull); k per-sheave ~0.98 roller / 0.96 plain. Steady hauling pull on the lead line only (not the inertia to start the load). The block/rope ratings, the sheave friction, and a qualified rigger and lift plan govern.";
+  citationEl.textContent = "Citation: block-and-tackle reeving line pull, by name. pull = load / (k + k^2 + ... + k^N) with the lead line over a sheave (the Crosby line-parts ratio), or load x (1 - k) / (1 - k^N) without; reeving efficiency = load / (N x pull); k per-sheave ~0.98 roller / 0.96 plain. Steady hauling pull on the lead line only (not the inertia to start the load). The block/rope ratings, the sheave friction, and a qualified rigger and lift plan govern.";
   const ld = makeNumber("Load (lb)", "rpl-ld", { step: "any", min: "0" });
   const np = makeNumber("Parts of line", "rpl-np", { step: "1", min: "1" });
   const ke = makeNumber("Per-sheave efficiency (0.98 roller, 0.96 plain)", "rpl-ke", { step: "any", min: "0", max: "1" });
-  for (const f of [ld, np, ke]) inputRegion.appendChild(f.wrap);
-  attachExampleButton(inputRegion, () => { ld.input.value = "20000"; np.input.value = "4"; ke.input.value = "0.98"; update(); });
+  const lsh = makeSelect("Lead line leaves the block", "rpl-ls", [
+    { value: "1", label: "Over a sheave (Crosby, usual)", selected: true }, { value: "0", label: "Straight off a part (no lead sheave)" },
+  ]);
+  for (const f of [ld, np, ke, lsh]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { ld.input.value = "20000"; np.input.value = "4"; ke.input.value = "0.98"; lsh.select.value = "1"; update(); });
   const oP = makeOutputLine(outputRegion, "Hauling-line pull", "rpl-out-p");
   const oE = makeOutputLine(outputRegion, "Reeving efficiency", "rpl-out-e");
   const update = debounce(() => {
     const r = computeReevingPartsOfLine({
       load_lb: ld.input.value === "" ? 20000 : Number(ld.input.value), parts_of_line: np.input.value === "" ? 4 : Number(np.input.value),
-      sheave_efficiency: ke.input.value === "" ? 0.98 : Number(ke.input.value),
+      sheave_efficiency: ke.input.value === "" ? 0.98 : Number(ke.input.value), lead_sheave: Number(lsh.select.value),
     });
     if (r.error) { oP.textContent = r.error; oE.textContent = "-"; return; }
     oP.textContent = fmt(r.hauling_line_pull_lb, 0) + " lb (frictionless " + fmt(r.frictionless_pull_lb, 0) + " lb)";
     oE.textContent = fmt(r.reeving_efficiency * 100, 1) + "%";
   }, DEBOUNCE_MS);
   for (const f of [ld, np, ke]) f.input.addEventListener("input", update);
+  lsh.select.addEventListener("input", update);
 }
 RIGGING_RENDERERS["reeving-parts-of-line"] = _v991renderReevingPartsOfLine;
 

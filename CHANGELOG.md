@@ -6,6 +6,24 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Changed
 
+- **Twelve more tiles now carry a publisher's printed example.** More than 1,000 tiles now have an outside source.
+  - **Hydraulics:**
+    - `hydraulic-pump-horsepower` and `hydraulic-pump-flow`: Denison T6.
+    - `hydraulic-motor-torque-speed`: Hydraulics & Pneumatics.
+  - **Compressors:** `compressor-volumetric-efficiency`, from IGNOU.
+  - **Rigging:**
+    - `guy-wire-tension`: USDA RUS 1724E-153.
+    - `reeving-parts-of-line`: Crosby.
+  - **Steel:** `steel-inertia-for-deflection`, from AISC F.1-1A.
+  - **Food service:** `food-cost-percentage`, from Dopson & Hayes.
+  - **Water and pools:**
+    - `clarifier-area-for-loading`: Mesabi Range College.
+    - `pool-salt-dose`: Hayward Aqua Rite.
+  - **Farm:** `grain-drying-energy`, from Purdue.
+  - **Weather:** `wind-chill-wind-speed`, from the NWS chart.
+
+  README: 1,178 of 2,183 tiles are checked only against the project's own derivation; 1,005 carry an outside source.
+
 - **Four more tiles now carry a publisher's printed example.**
   - `steel-camber`: AISC v15.1 Example I.1.
   - `required-section-modulus`: AISC v15.1 Example A-6.2, LRFD and ASD.
@@ -195,6 +213,10 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 - **wrangler 4.129.0 → 4.135.0, and the `sharp` override is gone.** Dependabot's bump failed CI on `check-dependency-overrides`. The new wrangler brings a miniflare that asks for the patched `sharp` 0.35.4 itself, so the September 9 pin no longer changed anything. This is the case the gate was written for, so the override is deleted rather than left as a second source of truth. `npm audit` reports 0 vulnerabilities. docs/threat-model.md records the change.
 
 ### Fixed
+
+- **`reeving-parts-of-line` now counts the sheave the hauling line leaves the block over, as Crosby's line-parts ratio does.** Crosby's anti-friction ratios are 0.98 for 1 part, 3.81 for 4 parts and 7.32 for 8 parts, which is k + k² + ... + kᴺ. The tile's formula left out the lead sheave, so 20,000 lb on 4 parts gave 5,152 lb instead of about 5,258 lb. A new "lead line leaves the block" input defaults to "over a sheave." "Straight off a part" gives the old result.
+- **`food-cost-percentage` can deduct employee meals and transfers out.** Dopson & Hayes (Food and Beverage Cost Control, Ch. 5) take cost of food sold as cost of food consumed less the food that left without a sale. Their example now reproduces: $66,500 consumed, less $1,500 in meals, is $65,000, or 34.2% of $190,000.
+- **`stair-code-check` applies the IBC 1011.2 exception it already described: 36 in of width where the stair serves fewer than 50 occupants.** The note stated the exception, but the check always demanded 44 in. A new occupant-load input turns it on; leave it at 0 to keep 44 in.
 
 - **`steel-camber` now rounds the camber down to the 1/4 in, as AISC does, instead of to the nearest 1/4 in.** In AISC Design Examples v15.1, Example I.1 takes 0.8 × 2.59 = 2.07 in down to 2 in, and Part III takes 1.68 in down to 1-1/2 in. Part III also says not to specify camber when 80% of the deflection is only 0.640 in. The tile rounded that 0.640 in up to 3/4 in and cambered the beam; it now rounds to 1/2 in, below the 3/4 in floor, and leaves the beam flat.
 

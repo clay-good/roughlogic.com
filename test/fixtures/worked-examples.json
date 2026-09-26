@@ -529,6 +529,27 @@
    }
   },
   {
+   "tile_id": "wind-chill-wind-speed",
+   "source_publisher": "National Weather Service",
+   "source_title": "Wind Chill Chart (2001 formula)",
+   "source_edition_or_year": "web chart",
+   "source_section_or_page": "5 F column, 30 mph row reads -19 F (chart rounds wind chill to whole degrees, so the inverse lands within 0.3 mph of 30)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "T_F": 5,
+    "target_wc_F": -19
+   },
+   "outputs": {
+    "wind_mph": {
+     "value": 30,
+     "tolerance": {
+      "abs": 0.3
+     }
+    }
+   }
+  },
+  {
    "tile_id": "egc-sizing",
    "source_publisher": "NFPA",
    "source_title": "NEC Table 250.122",
@@ -21580,6 +21601,30 @@
    }
   },
   {
+   "tile_id": "grain-drying-energy",
+   "source_publisher": "Purdue University (Dirk E. Maier), GEAPS Feed & Grain Conference",
+   "source_title": "Grain Drying Systems",
+   "source_edition_or_year": "July 2002, pp. 8-11",
+   "source_section_or_page": "3,000 bu/h of 56 lb/bu corn from 25% to 15%: moisture shrink 100 x (25 - 15)/(100 - 15) = 11.76%, approximately 20,000 lb of water",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "bushels": 3000,
+    "lb_per_bushel": 56,
+    "mi_percent": 25,
+    "mf_percent": 15,
+    "btu_per_lb": 1500
+   },
+   "outputs": {
+    "water_lb": {
+     "value": 20000,
+     "tolerance": {
+      "abs": 300
+     }
+    }
+   }
+  },
+  {
    "tile_id": "manure-nutrient-application",
    "source_publisher": "USDA NRCS Code 590",
    "source_title": "150 lb N/acre need, 10 lb N/ton, 50% avail -> 30 ton/acre, 150 lb P2O5/acre",
@@ -22306,6 +22351,33 @@
     },
     "equiv_diameter_ft": {
      "value": 39.89,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "clarifier-area-for-loading",
+   "source_publisher": "Mesabi Range College (MECC)",
+   "source_title": "ENV 149 Lesson 5, Surface Loading Rate",
+   "source_edition_or_year": "web course",
+   "source_section_or_page": "1.8 MGD clarifier 45 feet in diameter: Area = 0.785 x 45 x 45 = 1,590 ft2 -> 1,132 gpd/ft2 (run in reverse: 1.8 MGD at 1,132 gpd/ft2)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "flow_mgd": 1.8,
+    "target_sor_gpd_ft2": 1132
+   },
+   "outputs": {
+    "required_area_ft2": {
+     "value": 1590,
+     "tolerance": {
+      "abs": 1
+     }
+    },
+    "equiv_diameter_ft": {
+     "value": 45,
      "tolerance": {
       "abs": 0.05
      }
@@ -27164,21 +27236,50 @@
    }
   },
   {
+   "tile_id": "guy-wire-tension",
+   "source_publisher": "USDA Rural Utilities Service",
+   "source_title": "Bulletin 1724E-153, Electric Distribution Line Guys and Anchors, Section 14",
+   "source_edition_or_year": "April 25, 2001, pp. 18-21",
+   "source_section_or_page": "Gh = 13,180 lbs on a 1:1 guy -> Gr = (1.414)(13,180) = 18,639 lbs",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "horizontal_load_lb": 13180,
+    "attachment_height_ft": 30,
+    "anchor_lead_ft": 30
+   },
+   "outputs": {
+    "guy_angle_deg": {
+     "value": 45,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "guy_tension_lb": {
+     "value": 18639,
+     "tolerance": {
+      "abs": 1
+     }
+    }
+   }
+  },
+  {
    "tile_id": "reeving-parts-of-line",
    "source_publisher": "Block-and-tackle reeving line pull (Wire Rope Users Manual / Crosby)",
-   "source_title": "20,000 lb, 4 parts, k 0.98 -> 5,152 lb hauling pull, 97.0% reeving efficiency",
+   "source_title": "20,000 lb, 4 parts, k 0.98, lead line over a sheave -> 5,258 lb hauling pull, 95.1% reeving efficiency",
    "source_edition_or_year": "spec-v991 worked example (machine-verified)",
-   "source_section_or_page": "pull = 20000 x 0.02 / (1 - 0.98^4) = 20000 x 0.02/0.077632 = 5152.5; eff = 20000/(4 x 5152.5) = 0.9704",
+   "source_section_or_page": "pull = 20000 / (0.98 + 0.98^2 + 0.98^3 + 0.98^4) = 20000 / 3.8039 = 5257.7 (Crosby line-parts ratio, lead sheave counted); eff = 20000/(4 x 5257.7) = 0.9510",
    "verified_by": "rl",
    "verified_on": "2026-07-18",
    "inputs": {
     "load_lb": 20000,
     "parts_of_line": 4,
-    "sheave_efficiency": 0.98
+    "sheave_efficiency": 0.98,
+    "lead_sheave": 1
    },
    "outputs": {
     "hauling_line_pull_lb": {
-     "value": 5152.5,
+     "value": 5257.7,
      "tolerance": {
       "abs": 1
      }
@@ -27190,7 +27291,7 @@
      }
     },
     "reeving_efficiency": {
-     "value": 0.9704,
+     "value": 0.951,
      "tolerance": {
       "abs": 0.001
      }
@@ -27200,7 +27301,7 @@
   {
    "tile_id": "reeving-parts-of-line",
    "source_publisher": "Block-and-tackle reeving line pull (Wire Rope Users Manual / Crosby)",
-   "source_title": "cross-check: 10,000 lb, 2 parts, k 0.98 -> 5,050 lb, 99.0% (one sheave loses little)",
+   "source_title": "cross-check without a lead sheave: 10,000 lb, 2 parts, k 0.98 -> 5,050 lb, 99.0% (one sheave loses little)",
    "source_edition_or_year": "spec-v991 worked example (machine-verified)",
    "source_section_or_page": "pull = 10000 x 0.02 / (1 - 0.98^2) = 10000 x 0.02/0.0396 = 5050.5; eff = 10000/(2 x 5050.5) = 0.9901",
    "verified_by": "rl",
@@ -27208,7 +27309,8 @@
    "inputs": {
     "load_lb": 10000,
     "parts_of_line": 2,
-    "sheave_efficiency": 0.98
+    "sheave_efficiency": 0.98,
+    "lead_sheave": 0
    },
    "outputs": {
     "hauling_line_pull_lb": {
@@ -27221,6 +27323,29 @@
      "value": 0.9901,
      "tolerance": {
       "abs": 0.001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "reeving-parts-of-line",
+   "source_publisher": "The Crosby Group",
+   "source_title": "Catalog p. 443, How to Figure Line Parts",
+   "source_edition_or_year": "2022",
+   "source_section_or_page": "metric: 68,000 kg on an 8 part line, Ratio B 7.32 -> single line pull 9,290 kg (Crosby rounds the ratio to 7.32; unrounded 0.98 + ... + 0.98^8 = 7.311)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "load_lb": 68000,
+    "parts_of_line": 8,
+    "sheave_efficiency": 0.98,
+    "lead_sheave": 1
+   },
+   "outputs": {
+    "hauling_line_pull_lb": {
+     "value": 9290,
+     "tolerance": {
+      "abs": 10
      }
     }
    }
@@ -29472,6 +29597,37 @@
    }
   },
   {
+   "tile_id": "food-cost-percentage",
+   "source_publisher": "Wiley (Dopson and Hayes)",
+   "source_title": "Food and Beverage Cost Control, Ch. 5, Figures 5.5-5.6",
+   "source_edition_or_year": "p. 147",
+   "source_section_or_page": "beginning $63,650 + purchases 73,250 - ending 70,400 = cost of food consumed 66,500; less employee meals 1,500 = cost of food sold $65,000; / $190,000 sales = 34.2%",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "beginning_inventory": 63650,
+    "purchases": 73250,
+    "ending_inventory": 70400,
+    "food_sales": 190000,
+    "theoretical_cost_pct": 0,
+    "employee_meals": 1500
+   },
+   "outputs": {
+    "cogs": {
+     "value": 65000,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "food_cost_pct": {
+     "value": 34.2,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
    "tile_id": "prime-cost",
    "source_publisher": "Standard restaurant P&L prime-cost definition (NRA / restaurant-accounting practice, by name).",
    "source_title": "COGS = food + beverage; prime cost = COGS + total labor; prime/labor/COGS percents are of total sales.",
@@ -30165,6 +30321,29 @@
      "value": 82.86,
      "tolerance": {
       "abs": 0.2
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "compressor-volumetric-efficiency",
+   "source_publisher": "IGNOU (egyankosh.ac.in)",
+   "source_title": "Unit 8 Reciprocating Compressors, Example 8.1",
+   "source_edition_or_year": "course unit, p. 34",
+   "source_section_or_page": "5% clearance, 100 to 500 kPa, n = 1.3 -> 23.26 / 26.4 x 100 = 87.8% (pressures entered in the psia fields; only the ratio matters)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "clearance_ratio": 0.05,
+    "suction_pressure_psia": 100,
+    "discharge_pressure_psia": 500,
+    "polytropic_exponent": 1.3
+   },
+   "outputs": {
+    "volumetric_efficiency_pct": {
+     "value": 87.8,
+     "tolerance": {
+      "abs": 0.1
      }
     }
    }
@@ -31863,6 +32042,28 @@
    }
   },
   {
+   "tile_id": "pool-salt-dose",
+   "source_publisher": "Hayward",
+   "source_title": "Aqua Rite Operation and Installation Manual 092392C Rev D, Pounds of Salt Needed for 3200 PPM",
+   "source_edition_or_year": "2010, p. 4",
+   "source_section_or_page": "20,000 gal at 2000 ppm -> 200 lb (91 kg) to reach 3200 ppm (table prints whole pounds)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "gallons": 20000,
+    "current_salt_ppm": 2000,
+    "target_salt_ppm": 3200
+   },
+   "outputs": {
+    "salt_lb": {
+     "value": 200,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
    "tile_id": "fence-estimate",
    "source_publisher": "Standard fence-layout identities.",
    "source_title": "Sections = ceil(run / spacing); posts = sections + 1; rails = sections x rails/section; pickets = ceil(run x 12 / (picket width + gap)).",
@@ -32577,6 +32778,28 @@
    }
   },
   {
+   "tile_id": "hydraulic-pump-horsepower",
+   "source_publisher": "Denison Hydraulics (Parker)",
+   "source_title": "Vane pumps T6 mobile application, Publ. 1-AM0701-A, Routine and Example",
+   "source_edition_or_year": "11/98, p. 5",
+   "source_section_or_page": "Pi = 18.2 x 2200 / 1714 = 23.4 HP (theoretical flow; Denison then adds a 2.1 HP loss from a curve, not an efficiency)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "gpm": 18.2,
+    "psi": 2200,
+    "efficiency": 0.85
+   },
+   "outputs": {
+    "fluid_hp": {
+     "value": 23.4,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
    "tile_id": "hydraulic-drive-flow-limit",
    "source_publisher": "fluid-power engineering (inverse)",
    "source_title": "gpm = 1714 * drive_hp * efficiency / psi",
@@ -32687,6 +32910,42 @@
    }
   },
   {
+   "tile_id": "hydraulic-motor-torque-speed",
+   "source_publisher": "Hydraulics & Pneumatics (Power & Motion)",
+   "source_title": "Fundamentals of Hydraulic Motors, Sizing a Hydraulic Motor",
+   "source_edition_or_year": "June 26, 2014",
+   "source_section_or_page": "5 hp at 3,000 rpm, 2,900 psi differential: T = 105 lb-in; D = 0.258 in3/rev at 88% mechanical; Q = 3.6 gpm at 93% volumetric (run forward from D and Q)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "psi": 2900,
+    "disp_in3": 0.258,
+    "gpm": 3.6,
+    "mech_eff": 0.88,
+    "vol_eff": 0.93
+   },
+   "outputs": {
+    "torque_inlb": {
+     "value": 105,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "rpm": {
+     "value": 3000,
+     "tolerance": {
+      "abs": 5
+     }
+    },
+    "output_hp": {
+     "value": 5,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
    "tile_id": "hydraulic-pump-flow",
    "source_publisher": "fluid-power engineering",
    "source_title": "2.0 in^3/rev pump at 1800 rpm, 0.95 vol eff -> 15.58 theoretical, 14.81 delivered gpm (0.78 slip)",
@@ -32738,6 +32997,28 @@
      "value": 31.169,
      "tolerance": {
       "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "hydraulic-pump-flow",
+   "source_publisher": "Denison Hydraulics (Parker)",
+   "source_title": "Vane pumps T6 mobile application, Publ. 1-AM0701-A, Routine and Example",
+   "source_edition_or_year": "11/98, p. 5",
+   "source_section_or_page": "2.81 x 1500 / 231 = 18.2 GPM theoretical (Denison then subtracts a curve-read 1.3 GPM slip)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "disp_in3": 2.81,
+    "rpm": 1500,
+    "vol_eff": 0.95
+   },
+   "outputs": {
+    "q_theo_gpm": {
+     "value": 18.2,
+     "tolerance": {
+      "abs": 0.06
      }
     }
    }
@@ -54379,6 +54660,29 @@
     },
     "span_over_defl": {
      "value": 480,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "steel-inertia-for-deflection",
+   "source_publisher": "AISC",
+   "source_title": "Design Examples, Example F.1-1A",
+   "source_edition_or_year": "v14.0, p. F-6",
+   "source_section_or_page": "35 ft span, 0.75 kip/ft live load, L/360 -> delta max = 1.17 in.; Ix(reqd) = 5 w L^4 / 384 E delta max = 746 in.4",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "w_kip_ft": 0.75,
+    "span_ft": 35,
+    "allow_defl_in": 1.17,
+    "e_ksi": 29000
+   },
+   "outputs": {
+    "required_moi_in4": {
+     "value": 746,
      "tolerance": {
       "abs": 0.5
      }

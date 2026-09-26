@@ -724,7 +724,7 @@ export const BESPOKE_LABELS = {
   "recirc-pump-head": {"pipe_length_ft":"Pipe length one-way (ft)","fittings_count":"Fittings count","target_flow_gpm":"Target flow (gpm)","internal_diameter_in":"Internal diameter (in)","material":"Material","equivalent_length_per_fitting_ft":"Equiv length per fitting (ft)"},
   "reduced-voltage-starter": {"across_line_lra_a":"Across-the-line LRA (A)","across_line_lrt_pct":"Across-the-line torque basis (%)","starter_type":"Starter type","tap_fraction":"Tap / voltage fraction (e.g. 0.65)"},
   "reducer-offset": {"large_od_in":"Large-end OD (in)","small_od_in":"Small-end OD (in)","lay_length_in":"Lay length (in, B16.9 / fitting)","type":"Reducer type"},
-  "reeving-parts-of-line": {"load_lb":"Load (lb)","parts_of_line":"Parts of line","sheave_efficiency":"Per-sheave efficiency (0.98 roller, 0.96 plain)"},
+  "reeving-parts-of-line": {"load_lb":"Load (lb)","parts_of_line":"Parts of line","sheave_efficiency":"Per-sheave efficiency (0.98 roller, 0.96 plain)","lead_sheave":"Lead line leaves the block"},
   "refrigerant-charge": {"refrigerant":"Refrigerant"},
   "refrigerant-charging": {"refrigerant":"Refrigerant","suction_pressure":"Suction pressure","suction_unit":"Suction unit","suction_line_temp_F":"Suction line T (°F)","liquid_pressure":"Liquid pressure","liquid_unit":"Liquid unit","liquid_line_temp_F":"Liquid line T (°F)"},
   "refrigerant-line-size": {"mass_flow_lb_hr":"Mass flow (lb/hr)","specific_volume_ft3_lb":"Specific volume (ft^3/lb)","target_velocity_fpm":"Oil-return minimum"},

@@ -13580,7 +13580,7 @@ export const CITATIONS = {
 
   // spec-v90..v100 (25 tiles)
   "food-cost-percentage": {
-    formula: "COGS = beginning inventory + purchases - ending inventory; food cost % = COGS / food sales x 100; variance = actual - theoretical (in points and dollars).",
+    formula: "COGS (cost of food sold) = beginning inventory + purchases - ending inventory - employee meals and transfers out; food cost % = COGS / food sales x 100; variance = actual - theoretical (in points and dollars).",
     edition: "Standard restaurant-accounting identity (NRA / restaurant P&L practice, by name).",
     freeAccess: "NRA Restaurant Industry Forecast free at restaurant.org.",
     governance: GOVERNANCE.general,

@@ -848,13 +848,16 @@ KITCHEN_RENDERERS["bakers-percentage"] = renderBakersPercentage;
 // (29.5735295625 mL). GOVERNANCE.general (business arithmetic, not food safety).
 // =====================================================================
 
-// dims: in { beginning_inventory: dimensionless, purchases: dimensionless, ending_inventory: dimensionless, food_sales: dimensionless, theoretical_cost_pct: dimensionless } out: { cogs: dimensionless, food_cost_pct: dimensionless }
+// dims: in { beginning_inventory: dimensionless, purchases: dimensionless, ending_inventory: dimensionless, food_sales: dimensionless, theoretical_cost_pct: dimensionless, employee_meals: dimensionless } out: { cogs: dimensionless, food_cost_pct: dimensionless }
 // (Dollar amounts are dimensionless money per spec-v14; percent is dimensionless.)
-export function computeFoodCostPercentage({ beginning_inventory = 0, purchases = 0, ending_inventory = 0, food_sales = 0, theoretical_cost_pct = 0 } = {}) {
+export function computeFoodCostPercentage({ beginning_inventory = 0, purchases = 0, ending_inventory = 0, food_sales = 0, theoretical_cost_pct = 0, employee_meals = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
-  if (beginning_inventory < 0 || purchases < 0 || ending_inventory < 0 || theoretical_cost_pct < 0) return { error: "Dollar and percent inputs must be non-negative." };
+  if (beginning_inventory < 0 || purchases < 0 || ending_inventory < 0 || theoretical_cost_pct < 0 || employee_meals < 0) return { error: "Dollar and percent inputs must be non-negative." };
   if (!(food_sales > 0)) return { error: "Food sales must be positive." };
-  const cogs = beginning_inventory + purchases - ending_inventory;
+  // Cost of food consumed = beginning + purchases - ending; cost of food SOLD then deducts food that left
+  // without a sale -- employee meals and transfers out (Dopson & Hayes, Food and Beverage Cost Control, Ch. 5).
+  // Until 2026-09-25 there was no deduction, so staff meals inflated the food-cost percentage.
+  const cogs = beginning_inventory + purchases - ending_inventory - employee_meals;
   const food_cost_pct = cogs / food_sales * 100;
   const variance_pts = theoretical_cost_pct > 0 ? food_cost_pct - theoretical_cost_pct : null;
   const variance_dollars = theoretical_cost_pct > 0 ? (food_cost_pct - theoretical_cost_pct) / 100 * food_sales : null;
@@ -867,7 +870,7 @@ export function computeFoodCostPercentage({ beginning_inventory = 0, purchases =
 }
 export const foodCostPercentageExample = { inputs: { beginning_inventory: 12000, purchases: 30000, ending_inventory: 10000, food_sales: 120000, theoretical_cost_pct: 30 } };
 const renderFoodCostPercentage = _r({
-  citation: "Citation: Standard restaurant-accounting identity COGS = beginning inventory + purchases - ending inventory (NRA / restaurant P&L practice, by name). Food cost % = COGS / food sales.",
+  citation: "Citation: Standard restaurant-accounting identity: cost of food consumed = beginning inventory + purchases - ending inventory; cost of food sold = consumed - employee meals and transfers out (Dopson & Hayes, Food and Beverage Cost Control, Ch. 5). Food cost % = cost of food sold / food sales.",
   example: foodCostPercentageExample.inputs,
   fields: [
     { key: "beginning_inventory", label: "Beginning inventory ($)", kind: "number" },
@@ -875,9 +878,10 @@ const renderFoodCostPercentage = _r({
     { key: "ending_inventory", label: "Ending inventory ($)", kind: "number" },
     { key: "food_sales", label: "Food sales ($)", kind: "number" },
     { key: "theoretical_cost_pct", label: "Theoretical food cost (%, optional)", kind: "number" },
+    { key: "employee_meals", label: "Less employee meals / transfers out ($, optional)", kind: "number" },
   ],
   outputs: [
-    { key: "c", id: "fcp-out-c", label: "COGS", value: (r) => "$" + fmt(r.cogs, 2) },
+    { key: "c", id: "fcp-out-c", label: "Cost of food sold", value: (r) => "$" + fmt(r.cogs, 2) },
     { key: "p", id: "fcp-out-p", label: "Food cost", value: (r) => fmt(r.food_cost_pct, 2) + "%" },
     { key: "v", id: "fcp-out-v", label: "Variance", value: (r) => r.variance_pts === null ? "-" : fmt(r.variance_pts, 2) + " pts" },
     { key: "d", id: "fcp-out-d", label: "Variance ($)", value: (r) => r.variance_dollars === null ? "-" : "$" + fmt(r.variance_dollars, 2) },

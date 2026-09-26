@@ -30840,13 +30840,13 @@ test("bounds: spec-v990 computeRadiatorEdrOutput pins the EDR heat output and bo
 import { computeReevingPartsOfLine as _v991 } from "../../calc-rigging.js";
 
 test("bounds: spec-v991 computeReevingPartsOfLine pins the reeving pull and efficiency", () => {
-  const r = _v991({ load_lb: 20000, parts_of_line: 4, sheave_efficiency: 0.98 });
+  const r = _v991({ load_lb: 20000, parts_of_line: 4, sheave_efficiency: 0.98, lead_sheave: 0 });
   assert.ok(Math.abs(r.hauling_line_pull_lb - 5152.46) < 0.1); // 20000*0.02/(1-0.98^4)
   assert.ok(Math.abs(r.frictionless_pull_lb - 5000) < 1e-9); // 20000/4
   assert.ok(Math.abs(r.reeving_efficiency - 0.97041) < 1e-4);
   assert.ok(r.hauling_line_pull_lb > r.frictionless_pull_lb); // friction always raises the pull
   // Two-part cross-check: one sheave loses little.
-  const c2 = _v991({ load_lb: 10000, parts_of_line: 2, sheave_efficiency: 0.98 });
+  const c2 = _v991({ load_lb: 10000, parts_of_line: 2, sheave_efficiency: 0.98, lead_sheave: 0 });
   assert.ok(Math.abs(c2.hauling_line_pull_lb - 5050.51) < 0.1);
   assert.ok(Math.abs(c2.reeving_efficiency - 0.99010) < 1e-4);
   // Frictionless limit (k=1): pull is exactly load/N, efficiency 1.
@@ -55776,4 +55776,24 @@ test("bounds: computeSteelCamber rounds DOWN to the 1/4 in and leaves a sub-3/4 
   assert.ok(Math.abs(low.camber_raw - 0.64) < 0.002);
   assert.equal(low.camber_in, 0.5);
   assert.equal(low.cambered, false);
+});
+
+test("bounds: computeReevingPartsOfLine counts the lead-line sheave by default (Crosby line-parts ratio)", () => {
+  // Crosby How to Figure Line Parts: anti-friction ratio 1 part .98, 4 parts 3.81, 8 parts 7.32 = k + k^2 + ... + k^N.
+  // Until 2026-09-25 the lead sheave was left out (4 parts: 5,152 lb instead of about 5,258 lb).
+  const r = _v991({ load_lb: 20000, parts_of_line: 4, sheave_efficiency: 0.98 });
+  const ratio = 0.98 + 0.98 ** 2 + 0.98 ** 3 + 0.98 ** 4;
+  assert.ok(Math.abs(r.hauling_line_pull_lb - 20000 / ratio) < 1e-6);
+  assert.ok(Math.abs(_v991({ load_lb: 10000, parts_of_line: 1, sheave_efficiency: 0.98 }).hauling_line_pull_lb - 10000 / 0.98) < 1e-6);
+  // Crosby 8-part example: 68,000 / 7.32 = 9,290 (Crosby's ratio rounded to 2 places; unrounded gives 9,299).
+  assert.ok(Math.abs(_v991({ load_lb: 68000, parts_of_line: 8, sheave_efficiency: 0.98 }).hauling_line_pull_lb - 9290) < 10);
+});
+
+test("bounds: computeStairCodeCheck applies IBC 1011.2's 36 in width where the occupant load is under 50", () => {
+  const base = { occupancy: "commercial", riser_height_in: 7, tread_depth_in: 11, stair_width_in: 40 };
+  assert.equal(_v481(base).min_width, 44); // not entered -> 44 in
+  assert.equal(_v481({ ...base, occupant_load: 49 }).min_width, 36);
+  assert.equal(_v481({ ...base, occupant_load: 49 }).width_ok, true);
+  assert.equal(_v481({ ...base, occupant_load: 50 }).min_width, 44);
+  assert.ok("error" in _v481({ ...base, occupant_load: -1 }));
 });

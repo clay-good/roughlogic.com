@@ -4787,8 +4787,8 @@ CONSTRUCTION_RENDERERS["guard-handrail-check"] = renderGuardHandrailCheck;
 
 // ===================== spec-v481: stair geometry code check (IBC 1011 / IRC R311) =====================
 
-// dims: in { occupancy: dimensionless, riser_height_in: L, tread_depth_in: L, stair_width_in: L } out: { max_riser: L, min_tread: L, min_width: L, two_r_plus_t: L }
-export function computeStairCodeCheck({ occupancy = "commercial", riser_height_in = 0, tread_depth_in = 0, stair_width_in = 0 } = {}) {
+// dims: in { occupancy: dimensionless, riser_height_in: L, tread_depth_in: L, stair_width_in: L, occupant_load: dimensionless } out: { max_riser: L, min_tread: L, min_width: L, two_r_plus_t: L }
+export function computeStairCodeCheck({ occupancy = "commercial", riser_height_in = 0, tread_depth_in = 0, stair_width_in = 0, occupant_load = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   tread_depth_in = Number(tread_depth_in);
   if (riser_height_in < 0 || tread_depth_in < 0 || stair_width_in < 0) {
@@ -4799,7 +4799,11 @@ export function computeStairCodeCheck({ occupancy = "commercial", riser_height_i
   const max_riser = isCommercial ? 7.0 : 7.75;
   const min_riser = isCommercial ? 4.0 : 0;
   const min_tread = isCommercial ? 11.0 : 10.0;
-  const min_width = isCommercial ? 44 : 36;
+  // IBC 1011.2: 44 in, but 36 in where the stair serves an occupant load under 50. The note stated the
+  // exception but, until 2026-09-25, the check always demanded 44 in. 0 = not entered (44 in).
+  const ol = Number(occupant_load) || 0;
+  if (ol < 0) return { error: "Occupant load cannot be negative (enter 0 if unknown)." };
+  const min_width = isCommercial ? (ol > 0 && ol < 50 ? 36 : 44) : 36;
   const riser_ok = riser_height_in <= max_riser && riser_height_in >= min_riser;
   const tread_ok = tread_depth_in >= min_tread;
   const width_ok = stair_width_in >= min_width;
@@ -4819,6 +4823,7 @@ const renderStairCodeCheck = _simpleRenderer({
     { key: "occupancy", label: "Occupancy / code", kind: "select", options: [{ value: "commercial", label: "Commercial (IBC)" }, { value: "residential", label: "Residential (IRC)" }] },
     { key: "riser_height_in", label: "Proposed riser height (in)", kind: "number" },
     { key: "tread_depth_in", label: "Proposed tread run, no nosing (in)", kind: "number" },
+    { key: "occupant_load", label: "Occupant load served (commercial; 0 = 50 or more / unknown)", kind: "number" },
     { key: "stair_width_in", label: "Proposed clear stair width (in)", kind: "number" },
   ],
   outputs: [
