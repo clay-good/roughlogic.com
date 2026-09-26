@@ -41198,6 +41198,29 @@
    }
   },
   {
+   "tile_id": "roller-chain-length",
+   "source_publisher": "Martin Sprocket & Gear",
+   "source_title": "Sprocket Engineering Data",
+   "source_edition_or_year": "catalog (2014, rev. 2023)",
+   "source_section_or_page": "Chain Drive Design Example, Step VI: No. 50 chain, 18T and 70T sprockets on 30 in. centers -> 142 pitches",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "small_teeth_n1": 18,
+    "large_teeth_n2": 70,
+    "center_distance_in": 30,
+    "pitch_in": 0.625
+   },
+   "outputs": {
+    "length_even": {
+     "value": 142,
+     "tolerance": {
+      "abs": 0
+     }
+    }
+   }
+  },
+  {
    "tile_id": "sprocket-pitch-diameter",
    "source_publisher": "ANSI B29.1 sprocket geometry",
    "source_title": "17-tooth #40 sprocket (0.5 in pitch) -> 2.7211 in pitch diameter, 2.9748 in max outside diameter",
@@ -41239,6 +41262,60 @@
    "outputs": {
     "pitch_diameter_in": {
      "value": 4.9867,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "sprocket-pitch-diameter",
+   "source_publisher": "Martin Sprocket & Gear",
+   "source_title": "Sprocket Engineering Data",
+   "source_edition_or_year": "catalog (2014, rev. 2023)",
+   "source_section_or_page": "p. E-172, No. 40 (1/2 in. pitch), 17 teeth: pitch diameter 2.721, outside diameter 2.974 in.",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "chain_pitch_in": 0.5,
+    "tooth_count_n": 17
+   },
+   "outputs": {
+    "pitch_diameter_in": {
+     "value": 2.721,
+     "tolerance": {
+      "abs": 0.0005
+     }
+    },
+    "outside_diameter_in": {
+     "value": 2.974,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "sprocket-pitch-diameter",
+   "source_publisher": "Martin Sprocket & Gear",
+   "source_title": "Sprocket Engineering Data",
+   "source_edition_or_year": "catalog (2014, rev. 2023)",
+   "source_section_or_page": "5/8 in. pitch, 70 teeth: pitch diameter 13.931, outside diameter 14.292 in.",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "chain_pitch_in": 0.625,
+    "tooth_count_n": 70
+   },
+   "outputs": {
+    "pitch_diameter_in": {
+     "value": 13.931,
+     "tolerance": {
+      "abs": 0.0005
+     }
+    },
+    "outside_diameter_in": {
+     "value": 14.292,
      "tolerance": {
       "abs": 0.001
      }
@@ -41677,6 +41754,72 @@
    }
   },
   {
+   "tile_id": "pid-tuning-ziegler-nichols",
+   "source_publisher": "TechTeach (Finn Haugen)",
+   "source_title": "Ziegler-Nichols' Closed-Loop Method",
+   "source_edition_or_year": "July 17, 2010",
+   "source_section_or_page": "Example 1: Ku 3.0, Pu 1100 s -> PI Kp = 0.45 x 3.0 = 1.35, Ti = 1100/1.2 = 917 s",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "ultimate_gain_ku": 3,
+    "ultimate_period_tu_sec": 1100
+   },
+   "outputs": {
+    "pi_kp": {
+     "value": 1.35,
+     "tolerance": {
+      "abs": 0.005
+     }
+    },
+    "pi_ti_sec": {
+     "value": 917,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "pid-tuning-ziegler-nichols",
+   "source_publisher": "G. Zhu, Mechatronics (LibreTexts)",
+   "source_title": "Section 3.4, Example 3.13, Table 3.8",
+   "source_edition_or_year": "LibreTexts edition",
+   "source_section_or_page": "Kc 8, Tc 3.7 -> P 4.0; PID 4.8, Ti 1.85, Td 0.463",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "ultimate_gain_ku": 8,
+    "ultimate_period_tu_sec": 3.7
+   },
+   "outputs": {
+    "p_kp": {
+     "value": 4,
+     "tolerance": {
+      "abs": 0.005
+     }
+    },
+    "pid_kp": {
+     "value": 4.8,
+     "tolerance": {
+      "abs": 0.005
+     }
+    },
+    "pid_ti_sec": {
+     "value": 1.85,
+     "tolerance": {
+      "abs": 0.005
+     }
+    },
+    "pid_td_sec": {
+     "value": 0.463,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
    "tile_id": "dp-level-hydrostatic",
    "source_publisher": "Hydrostatic DP level transmitter (P = 0.433 x SG x H)",
    "source_title": "4.33 psi in water (SG 1.0), 20 ft tank -> 10 ft level, 50% of span, 8.66 psi URV",
@@ -41997,6 +42140,69 @@
    }
   },
   {
+   "tile_id": "rtd-resistance-to-temp",
+   "source_publisher": "Pyromation (cross-checked against WIKA)",
+   "source_title": "Table 29, 100 ohm platinum RTD, 0.00385 coefficient, temperature in C",
+   "source_edition_or_year": "IEC 60751 table",
+   "source_section_or_page": "-100 C row: 60.26 ohms (exercises the Callendar-Van Dusen C term below 0 C)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "resistance_ohms": 60.26,
+    "r0_ohms": 100
+   },
+   "outputs": {
+    "temperature_c": {
+     "value": -100,
+     "tolerance": {
+      "abs": 0.02
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "rtd-resistance-to-temp",
+   "source_publisher": "Pyromation (cross-checked against WIKA)",
+   "source_title": "Table 29, 100 ohm platinum RTD, 0.00385 coefficient, temperature in C",
+   "source_edition_or_year": "IEC 60751 table",
+   "source_section_or_page": "-50 C row: 80.31 ohms",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "resistance_ohms": 80.31,
+    "r0_ohms": 100
+   },
+   "outputs": {
+    "temperature_c": {
+     "value": -50,
+     "tolerance": {
+      "abs": 0.02
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "rtd-resistance-to-temp",
+   "source_publisher": "Pyromation (cross-checked against WIKA)",
+   "source_title": "Table 29, 100 ohm platinum RTD, 0.00385 coefficient, temperature in C",
+   "source_edition_or_year": "IEC 60751 table",
+   "source_section_or_page": "200 C row: 175.86 ohms",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "resistance_ohms": 175.86,
+    "r0_ohms": 100
+   },
+   "outputs": {
+    "temperature_c": {
+     "value": 200,
+     "tolerance": {
+      "abs": 0.02
+     }
+    }
+   }
+  },
+  {
    "tile_id": "dp-flow-signal-scaling",
    "source_publisher": "DP flow transmitter square-root extraction (ISA / instrumentation practice)",
    "source_title": "12 mA on a 0-500 gpm DP flow loop -> 70.7% flow, 353.6 gpm (not the linear 50%) (spec-v1226)",
@@ -42101,6 +42307,28 @@
      "value": 40,
      "tolerance": {
       "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "loop-signal-scaling",
+   "source_publisher": "Tony R. Kuphaldt",
+   "source_title": "Lessons in Industrial Instrumentation, section 13.2",
+   "source_edition_or_year": "v2.33 (October 9, 2024), CC-licensed",
+   "source_section_or_page": "Example 13.2.4: 4 to 10 pH range, 11.3 mA -> 6.74 pH",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "signal_ma": 11.3,
+    "range_low": 4,
+    "range_high": 10
+   },
+   "outputs": {
+    "engineering_value": {
+     "value": 6.74,
+     "tolerance": {
+      "abs": 0.005
      }
     }
    }
@@ -43780,6 +44008,48 @@
    }
   },
   {
+   "tile_id": "valve-authority",
+   "source_publisher": "IMI TA Hydronic College (ASHRAE Rocky Mountain Chapter)",
+   "source_title": "Control Valve Authority and Pressure Independent Systems",
+   "source_edition_or_year": "2013 Technical Conference",
+   "source_section_or_page": "slide 9: valve 5 ft, circuit 7 ft -> authority 5/(5+7) = 0.42",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "valve_pressure_drop_psi": 5,
+    "controlled_circuit_drop_psi": 7
+   },
+   "outputs": {
+    "valve_authority": {
+     "value": 0.42,
+     "tolerance": {
+      "abs": 0.005
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "valve-authority",
+   "source_publisher": "IMI TA Hydronic College (ASHRAE Rocky Mountain Chapter)",
+   "source_title": "Control Valve Authority and Pressure Independent Systems",
+   "source_edition_or_year": "2013 Technical Conference",
+   "source_section_or_page": "slide 16: 13.3 ft valve over a 7 ft circuit -> 13.3/20.3 = 0.66",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "valve_pressure_drop_psi": 13.3,
+    "controlled_circuit_drop_psi": 7
+   },
+   "outputs": {
+    "valve_authority": {
+     "value": 0.66,
+     "tolerance": {
+      "abs": 0.005
+     }
+    }
+   }
+  },
+  {
    "tile_id": "hydronic-injection-mixing",
    "source_publisher": "hydronic injection-mixing loop (primary/secondary energy balance)",
    "source_title": "10 gpm secondary at 110/90 F off a 180 F primary -> 2.22 gpm injection (22.2%)",
@@ -43827,6 +44097,35 @@
      "value": 4,
      "tolerance": {
       "abs": 0.005
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "hydronic-injection-mixing",
+   "source_publisher": "Caleffi",
+   "source_title": "idronics #7, Mixing in Hydronic Systems",
+   "source_edition_or_year": "2010",
+   "source_section_or_page": "Formula 7-1 / Figure 7-3 (pp. 41-42): 110 F supply, 90 F return, 180 F primary, 8.1 gpm distribution -> injection 1.8 gpm, about 22 percent of the distribution flow",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "secondary_gpm": 8.1,
+    "secondary_supply_f": 110,
+    "secondary_return_f": 90,
+    "primary_supply_f": 180
+   },
+   "outputs": {
+    "injection_gpm": {
+     "value": 1.8,
+     "tolerance": {
+      "abs": 0.05
+     }
+    },
+    "injection_pct_of_secondary": {
+     "value": 22,
+     "tolerance": {
+      "abs": 0.5
      }
     }
    }
@@ -43885,6 +44184,36 @@
      "value": 80,
      "tolerance": {
       "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "outdoor-reset-ratio",
+   "source_publisher": "Caleffi",
+   "source_title": "idronics #7, Mixing in Hydronic Systems",
+   "source_edition_or_year": "2010",
+   "source_section_or_page": "Formula 4-2 (p. 15): Twd 110, Twnl 70, Tad -10, Tanl 70 -> RR = 40/80 = 0.5; at 10 F outdoor, 70 + 0.5 x 60 = 100 F",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "supply_design_f": 110,
+    "supply_min_f": 70,
+    "oa_design_f": -10,
+    "oa_noheat_f": 70,
+    "oa_current_f": 10
+   },
+   "outputs": {
+    "reset_ratio": {
+     "value": 0.5,
+     "tolerance": {
+      "abs": 0.0005
+     }
+    },
+    "supply_target_f": {
+     "value": 100,
+     "tolerance": {
+      "abs": 0.05
      }
     }
    }
@@ -44520,6 +44849,84 @@
      "value": 211600,
      "tolerance": {
       "abs": 50
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "awg-wire-geometry",
+   "source_publisher": "ASTM",
+   "source_title": "B258-02, Table 1, Standard Nominal Diameters and Cross-Sectional Areas of AWG Sizes",
+   "source_edition_or_year": "B258-02",
+   "source_section_or_page": "12 AWG: 80.8 mils, 6 530 cmils (d rounded to 0.1 mil, area from the rounded d)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "awg": "12"
+   },
+   "outputs": {
+    "diameter_in": {
+     "value": 0.0808,
+     "tolerance": {
+      "abs": 5e-05
+     }
+    },
+    "area_cmils": {
+     "value": 6530,
+     "tolerance": {
+      "pct": 0.1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "awg-wire-geometry",
+   "source_publisher": "ASTM",
+   "source_title": "B258-02, Table 1",
+   "source_edition_or_year": "B258-02",
+   "source_section_or_page": "4 AWG: 204.3 mils, 41 740 cmils",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "awg": "4"
+   },
+   "outputs": {
+    "diameter_in": {
+     "value": 0.2043,
+     "tolerance": {
+      "abs": 5e-05
+     }
+    },
+    "area_cmils": {
+     "value": 41740,
+     "tolerance": {
+      "pct": 0.1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "awg-wire-geometry",
+   "source_publisher": "ASTM",
+   "source_title": "B258-02, Table 1",
+   "source_edition_or_year": "B258-02",
+   "source_section_or_page": "1/0 AWG: 324.9 mils, 105 600 cmils",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "awg": "1/0"
+   },
+   "outputs": {
+    "diameter_in": {
+     "value": 0.3249,
+     "tolerance": {
+      "abs": 5e-05
+     }
+    },
+    "area_cmils": {
+     "value": 105600,
+     "tolerance": {
+      "pct": 0.1
      }
     }
    }
@@ -54629,6 +55036,29 @@
    }
   },
   {
+   "tile_id": "erv-sensible-recovery",
+   "source_publisher": "Greenheck",
+   "source_title": "Energy Recovery Application Manual (ER-AM)",
+   "source_edition_or_year": "March 1997",
+   "source_section_or_page": "Fig. 2-4 (p. 9): an 80% effective wheel warms 17 F outside air to 61 F against a 72 F room",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "cfm": 1000,
+    "t_oa_F": 17,
+    "t_ra_F": 72,
+    "eps_s": 0.8
+   },
+   "outputs": {
+    "t_leave_F": {
+     "value": 61,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
    "tile_id": "mua-tempering-load",
    "source_publisher": "ASHRAE Fundamentals psychrometric loads / IMC 508 makeup air",
    "source_title": "2,000 cfm MUA, 20 F to 65 F, 80% gas -> 97,200 Btu/h out, 121,500 Btu/h input",
@@ -54783,6 +55213,29 @@
      "value": 800,
      "tolerance": {
       "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "dcv-co2-ventilation",
+   "source_publisher": "CED Engineering (A. Bhatia)",
+   "source_title": "M04-037, HVAC: Guide to Demand Control Ventilation",
+   "source_edition_or_year": "course text (ASHRAE 62-1989 Appendix D basis)",
+   "source_section_or_page": "p. 6: N 0.0106 cfm per person, Cs 1000, Co 300 ppm -> Vo = 15.14 cfm per person",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "n": 20,
+    "co2_set_ppm": 1000,
+    "co2_oa_ppm": 300,
+    "gen_cfm": 0.0106
+   },
+   "outputs": {
+    "Q_person_cfm": {
+     "value": 15.14,
+     "tolerance": {
+      "abs": 0.005
      }
     }
    }

@@ -1318,25 +1318,37 @@ export function computeRtdResistanceToTemp({ resistance_ohms = 119.397, r0_ohms 
   if (!(resistance_ohms > 0)) return { error: "Measured resistance must be positive (ohms)." };
   if (!(r0_ohms > 0)) return { error: "R0 (ice-point resistance) must be positive (100 for Pt100, 1000 for Pt1000)." };
   // Callendar-Van Dusen inverse (IEC 60751 standard coefficients). Exact for T >= 0 C (R >= R0) via the quadratic
-  // R = R0(1 + A T + B T^2); below 0 C the C(T-100)T^3 term is dropped, a close approximation (< ~0.02 C to -40 C).
-  const A = 3.9083e-3, B = -5.775e-7;
+  // R = R0(1 + A T + B T^2). Below 0 C the full curve adds C (T - 100) T^3, C = -4.183e-12, solved by Newton from
+  // the quadratic root. Until 2026-09-25 that term was dropped: 0.2 C off at -100 C (the Pyromation / WIKA 60.26 ohm
+  // row read -100.20) and about 2.5 C at -200 C.
+  const A = 3.9083e-3, B = -5.775e-7, C = -4.183e-12;
   const ratio = resistance_ohms / r0_ohms;
   const disc = A * A - 4 * B * (1 - ratio);
   if (!(disc >= 0)) return { error: "Resistance is outside the platinum RTD range (no real temperature solution)." };
-  const temperature_c = (-A + Math.sqrt(disc)) / (2 * B);
+  let temperature_c = (-A + Math.sqrt(disc)) / (2 * B);
+  if (temperature_c < 0) {
+    for (let i = 0; i < 20; i++) {
+      const T = temperature_c;
+      const f = 1 + A * T + B * T * T + C * (T - 100) * T * T * T - ratio;
+      const df = A + 2 * B * T + C * (4 * T * T * T - 300 * T * T);
+      const step = f / df;
+      temperature_c = T - step;
+      if (Math.abs(step) < 1e-12) break;
+    }
+  }
   const temperature_f = temperature_c * 9 / 5 + 32;
   if (![temperature_c, temperature_f].every(Number.isFinite)) return { error: "RTD temperature math is not a finite value." };
   return {
     temperature_c,
     temperature_f,
-    note: "The temperature a platinum RTD's measured resistance corresponds to, by the IEC 60751 Callendar-Van Dusen relation R = R0 (1 + A T + B T^2) with the standard coefficients A = 3.9083e-3 and B = -5.775e-7 per C, solved for T. R0 is the ice-point (0 C) resistance -- 100 ohms for a Pt100, 1000 ohms for a Pt1000. A Pt100 reading 119.40 ohms is at 50 C, 138.51 ohms is 100 C, and exactly 100.00 ohms is 0 C; a Pt1000 uses the same curve scaled x10. The inverse is exact for T at or above 0 C (R >= R0); below 0 C the standard adds a C (T - 100) T^3 term that this screen drops, which stays within about 0.02 C down to -40 C and grows slowly colder than that. This assumes a 3- or 4-wire measurement (or a lead-resistance-compensated 2-wire) so the reading is the RTD element alone -- uncompensated 2-wire lead resistance ADDS to R and reads high (hotter). The sensor's calibration, tolerance class (A/B), and self-heating govern the field accuracy.",
+    note: "The temperature a platinum RTD's measured resistance corresponds to, by the IEC 60751 Callendar-Van Dusen relation R = R0 (1 + A T + B T^2) with the standard coefficients A = 3.9083e-3 and B = -5.775e-7 per C, solved for T. R0 is the ice-point (0 C) resistance -- 100 ohms for a Pt100, 1000 ohms for a Pt1000. A Pt100 reading 119.40 ohms is at 50 C, 138.51 ohms is 100 C, and exactly 100.00 ohms is 0 C; a Pt1000 uses the same curve scaled x10. The inverse is exact for T at or above 0 C (R >= R0); below 0 C the standard adds a C (T - 100) T^3 term (C = -4.183e-12), and the tile solves the full curve there, so 60.26 ohms reads -100 C and 18.52 ohms -200 C, as the IEC 60751 tables print. This assumes a 3- or 4-wire measurement (or a lead-resistance-compensated 2-wire) so the reading is the RTD element alone -- uncompensated 2-wire lead resistance ADDS to R and reads high (hotter). The sensor's calibration, tolerance class (A/B), and self-heating govern the field accuracy.",
   };
 }
 
 export const rtdResistanceToTempExample = { inputs: { resistance_ohms: 119.397, r0_ohms: 100 } };
 
 function _v947renderRtdResistanceToTemp(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: IEC 60751 platinum RTD (Callendar-Van Dusen) resistance-temperature relation, by name; standard coefficients A = 3.9083e-3, B = -5.775e-7 per C. R = R0(1 + A T + B T^2), solved for T (exact T >= 0 C; below 0 C drops the C-term, a close approximation). Assumes a lead-compensated (3/4-wire) reading; the sensor calibration and class govern.";
+  citationEl.textContent = "Citation: IEC 60751 platinum RTD (Callendar-Van Dusen) resistance-temperature relation, by name; standard coefficients A = 3.9083e-3, B = -5.775e-7 per C. R = R0(1 + A T + B T^2), solved for T at and above 0 C; below 0 C the full R = R0(1 + A T + B T^2 + C (T - 100) T^3), C = -4.183e-12, solved numerically. Assumes a lead-compensated (3/4-wire) reading; the sensor calibration and class govern.";
   const rm = makeNumber("Measured resistance (ohms)", "rtd-rm", { step: "any", min: "0" });
   const r0 = makeNumber("R0 at 0 C (100 = Pt100, 1000 = Pt1000)", "rtd-r0", { step: "any", min: "0" });
   for (const f of [rm, r0]) inputRegion.appendChild(f.wrap);

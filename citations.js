@@ -10298,14 +10298,14 @@ export const CITATIONS = {
     ],
   },
   "rtd-resistance-to-temp": {
-    formula: "R = R0 (1 + A T + B T^2), A = 3.9083e-3, B = -5.775e-7 (IEC 60751), solved for T: T = (-A + sqrt(A^2 - 4B(1 - R/R0))) / (2B). R0 = 100 (Pt100) or 1000 (Pt1000).",
+    formula: "R = R0 (1 + A T + B T^2), A = 3.9083e-3, B = -5.775e-7 (IEC 60751), solved for T at and above 0 C: T = (-A + sqrt(A^2 - 4B(1 - R/R0))) / (2B); below 0 C, R = R0 (1 + A T + B T^2 + C (T - 100) T^3), C = -4.183e-12, solved by Newton iteration. R0 = 100 (Pt100) or 1000 (Pt1000).",
     edition: "IEC 60751 platinum RTD Callendar-Van Dusen resistance-temperature relation with the standard A/B coefficients, by name (not reproduced from a table); the sensor calibration and tolerance class govern.",
     freeAccess: "The Callendar-Van Dusen equation and its standard coefficients (A = 3.9083e-3, B = -5.775e-7) are public, reproduced on every RTD datasheet and by NIST; the measured resistance and R0 come from the sensor and the reading.",
     governance: GOVERNANCE.general,
     editionNote: "A platinum resistance temperature detector (RTD) changes resistance with temperature along the IEC 60751 Callendar-Van Dusen curve R = R0 (1 + A T + B T^2) for T at or above 0 C, where R0 is the ice-point resistance -- 100 ohms for a Pt100, 1000 ohms for a Pt1000 (the same curve, scaled). Inverting the quadratic gives the temperature from a measured resistance, T = (-A + sqrt(A^2 - 4 B (1 - R/R0))) / (2 B), which is what a tech reads off an ohmmeter: 119.40 ohms on a Pt100 is 50 C, 138.51 ohms is 100 C, 100.00 ohms is 0 C. Below 0 C the full standard adds a C (T - 100) T^3 term (C = -4.183e-12); dropping it, as this screen does, keeps the error within about 0.02 C down to -40 C and grows slowly below that. The reading must be the RTD ELEMENT alone: a 3- or 4-wire connection (or a lead-resistance-compensated 2-wire) removes the lead resistance, while an uncompensated 2-wire measurement adds the round-trip lead resistance to R and therefore reads high (hotter than actual). Self-heating from the excitation current, the tolerance class (Class A vs B), and the sensor's own calibration set the real field accuracy.",
     assumptions: [
       { name: "Callendar-Van Dusen (T >= 0 C)", value: "R = R0(1 + A T + B T^2); inverse T = (-A + sqrt(A^2 - 4B(1 - R/R0)))/(2B); A = 3.9083e-3, B = -5.775e-7", source: "IEC 60751" },
-      { name: "Sub-zero + lead resistance", value: "below 0 C drops the C(T-100)T^3 term (< ~0.02 C to -40 C); assumes a lead-compensated 3/4-wire reading", source: "IEC 60751 / RTD wiring practice" },
+      { name: "Sub-zero + lead resistance", value: "below 0 C includes the C(T-100)T^3 term (C = -4.183e-12), solved numerically; assumes a lead-compensated 3/4-wire reading", source: "IEC 60751 / RTD wiring practice" },
     ],
   },
   "pulse-flowmeter-k-factor": {

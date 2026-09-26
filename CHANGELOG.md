@@ -6,6 +6,12 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Changed
 
+- **Eleven more tiles now carry a publisher's printed worked example or table.**
+  - **Instrumentation:** `rtd-resistance-to-temp` (IEC 60751 Pt100 table, Pyromation/WIKA), `loop-signal-scaling` (Kuphaldt, *Lessons in Industrial Instrumentation*), `pid-tuning-ziegler-nichols` (Haugen, TechTeach; Zhu, *Mechatronics*).
+  - **Wire and power transmission:** `awg-wire-geometry` (ASTM B258 Table 1); `sprocket-pitch-diameter` and `roller-chain-length` (Martin Sprocket engineering data).
+  - **Hydronics and ventilation:** `hydronic-injection-mixing` and `outdoor-reset-ratio` (Caleffi idronics #7), `valve-authority` (IMI TA), `dcv-co2-ventilation` (CED/Bhatia), `erv-sensible-recovery` (Greenheck).
+
+  README: 1,283 of 2,183 tiles are checked only against the project's own derivation (785 from first principles, 498 by a named method); 900 carry an outside source. Cross-validation tolerance checks: 4,237.
 - **Fifteen more tiles now carry a publisher's printed worked example.**
   - **NEC motors and services (EC&M, IAEI, Mike Holt):** `motor-overload-sizing`, `motor-locked-rotor-kva`, `service-conductor-sizing` (the 83% dwelling rule), `continuous-load-ocpd`, `generator-conductor-445`, `existing-load-220-87`, `reduced-voltage-starter`.
   - **IBC (ICC):** `occupant-load`, `allowable-area` (frontage increase), `exterior-opening-protection`.
@@ -86,6 +92,7 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **`rtd-resistance-to-temp` dropped the sub-zero term of the Callendar–Van Dusen curve.** Below 0 °C, IEC 60751 adds C(T − 100)T³ with C = −4.183 × 10⁻¹². The tile solved only the quadratic, and called the result "within about 0.02 C to −40 C." It accepted readings down to −200 °C, where the dropped term costs about 2.5 °C. At −100 °C, the table's 60.26 Ω read −100.20. The tile now solves the full curve below 0 °C. The IEC table rows reproduce: 84.27 Ω is −40 °C, 60.26 Ω is −100 °C, and 18.52 Ω is −200 °C.
 - **`allowable-area` cited the 2021 IBC but computed the 2018 frontage increase.** The 2021 edition replaced If = (F/P − 0.25) × W/30 with Table 506.3.3. The table has no 0.25 deduction: it runs up to 0.75 by the percentage of qualifying perimeter (25/50/75%) and the smallest open space (20/25/30 ft or more), and interpolation is permitted. The tile understated every frontage increase. AWC/ICC's 2021 example, 625 of 815 ft of perimeter on 27 ft of open space, reads 0.678 from the table and 0.465 from the old equation, which is 1,917 ft² of allowable area per story on a 9,000 ft² NS. The tile now follows the table, interpolating across the open-space columns, and reproduces that example's 15,102 and 42,102 ft².
 - **`spt-bearing-capacity` and `spt-required-n60` refused a surface footing.** Both rejected an embedment depth of 0. Meyerhof's relation holds at Df = 0 with Kd = 1, and the printed examples use it. Only a negative depth is now an error.
 - **`rc-column-axial` credited high-strength bar past the 80 ksi limit.** ACI 318-19 22.4.2.1 limits fy to 80,000 psi when computing Po. The tile took a Grade 100 bar at 100 ksi, so StructurePoint's 18 × 18 column with 4 in² of Grade 100 bar read 1,488 kips instead of the printed 1,408. The cap now applies, and its inverse, `rc-column-steel-for-load`, applies it too.

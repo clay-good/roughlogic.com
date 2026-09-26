@@ -29801,8 +29801,11 @@ test("bounds: spec-v947 computeRtdResistanceToTemp pins the Callendar-Van Dusen 
   assert.ok(Math.abs(_v947({ resistance_ohms: 138.5055, r0_ohms: 100 }).temperature_c - 100) < 0.01);
   // Pt1000 is the same curve scaled x10: 1385.055 ohms at R0=1000 is also 100 C.
   assert.ok(Math.abs(_v947({ resistance_ohms: 1385.055, r0_ohms: 1000 }).temperature_c - 100) < 0.01);
-  // Sub-zero: R below R0 gives a negative temperature (close approximation).
-  assert.ok(Math.abs(_v947({ resistance_ohms: 84.2707, r0_ohms: 100 }).temperature_c - -40) < 0.05);
+  // Sub-zero: the full curve with the C (T - 100) T^3 term (dropped until 2026-09-25, 0.2 C off at
+  // -100 C, about 2.5 C at -200 C). IEC 60751 table rows: 84.27 ohms -40 C, 60.26 -100 C, 18.52 -200 C.
+  assert.ok(Math.abs(_v947({ resistance_ohms: 84.2707, r0_ohms: 100 }).temperature_c - -40) < 0.01);
+  assert.ok(Math.abs(_v947({ resistance_ohms: 60.26, r0_ohms: 100 }).temperature_c - -100) < 0.02);
+  assert.ok(Math.abs(_v947({ resistance_ohms: 18.52, r0_ohms: 100 }).temperature_c - -200) < 0.02);
   // Monotonic: higher resistance -> higher temperature.
   assert.ok(_v947({ resistance_ohms: 150, r0_ohms: 100 }).temperature_c > _v947({ resistance_ohms: 120, r0_ohms: 100 }).temperature_c);
   // Error seams: non-positive resistance or R0, out-of-range (no real solution), non-finite.
