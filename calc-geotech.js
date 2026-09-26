@@ -1079,7 +1079,8 @@ export function computeSptBearingCapacity({ n60 = 0, b_ft = 0, d_ft = 0 } = {}) 
   const d = Number(d_ft) || 0;
   if (!(n > 0)) return { error: "SPT N60 must be positive." };
   if (!(b > 0)) return { error: "Footing width B must be positive (ft)." };
-  if (!(d > 0)) return { error: "Embedment depth D must be positive (ft)." };
+  // D = 0 is a surface footing, Kd = 1 (Meyerhof); until 2026-09-25 it was refused.
+  if (!(d >= 0)) return { error: "Embedment depth D cannot be negative (ft)." };
   const qa_base_ksf = b <= 4 ? n / 4 : (n / 6) * Math.pow((b + 1) / b, 2);
   const kd = Math.min(1 + 0.33 * d / b, 1.33);
   const qa_ksf = qa_base_ksf * kd;
@@ -1119,7 +1120,8 @@ export function computeSptRequiredN60({ qa_target_ksf = 0, b_ft = 0, d_ft = 0 } 
   const d = Number(d_ft) || 0;
   if (!(qa > 0)) return { error: "Target allowable bearing must be positive (ksf)." };
   if (!(b > 0)) return { error: "Footing width B must be positive (ft)." };
-  if (!(d > 0)) return { error: "Embedment depth D must be positive (ft)." };
+  // D = 0 is a surface footing, Kd = 1 (Meyerhof); until 2026-09-25 it was refused.
+  if (!(d >= 0)) return { error: "Embedment depth D cannot be negative (ft)." };
   const base = computeSptBearingCapacity({ n60: 1, b_ft: b, d_ft: d });
   if (base.error) return { error: base.error };
   const qa_per_n60_ksf = base.qa_ksf;

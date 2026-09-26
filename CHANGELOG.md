@@ -6,6 +6,13 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Changed
 
+- **Fifteen more tiles now carry a publisher's printed worked example.**
+  - **NEC motors and services (EC&M, IAEI, Mike Holt):** `motor-overload-sizing`, `motor-locked-rotor-kva`, `service-conductor-sizing` (the 83% dwelling rule), `continuous-load-ocpd`, `generator-conductor-445`, `existing-load-220-87`, `reduced-voltage-starter`.
+  - **IBC (ICC):** `occupant-load`, `allowable-area` (frontage increase), `exterior-opening-protection`.
+  - **Geotechnical:** `lateral-earth-pressure` (USACE EM 1110-2-2502 and PDHonline), `coulomb-earth-pressure` (Coulomb Ka table), `retaining-wall-stability` (CED/PDH cantilever-wall example), `spt-bearing-capacity` (Meyerhof).
+  - **Concrete:** `concrete-longterm-defl` (StructurePoint, ACI 24.2.4.1).
+
+  README: 1,294 of 2,183 tiles are checked only against the project's own derivation (785 from first principles, 509 by a named method); 889 carry an outside source. Cross-validation tolerance checks: 4,234.
 - **Eighteen more tiles now carry a publisher's printed worked example.**
   - **AISC Design Examples v15.1:** `steel-beam-ltb` (F.1-2B inelastic, F.1-3B elastic LTB), `steel-block-shear` (II.D-3), `steel-tension-member` (D.2), `steel-web-local-strength` (II.D-3 web local yielding), `steel-bolt-slip-critical` (J.4A), `steel-fillet-weld-size` (J.1).
   - **Concrete:** `rc-punching-shear` (StructurePoint flat plate: interior, edge, and corner), `rc-column-axial` (two StructurePoint columns), `rc-one-way-shear` (StructurePoint retaining wall ρw and λs), `rc-hook-development` (Ghosh, PCI Journal 2024), `rc-compression-dev-length` and `concrete-bearing-strength` (ACI Footings Example 1).
@@ -79,6 +86,7 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **`spt-bearing-capacity` and `spt-required-n60` refused a surface footing.** Both rejected an embedment depth of 0. Meyerhof's relation holds at Df = 0 with Kd = 1, and the printed examples use it. Only a negative depth is now an error.
 - **`rc-column-axial` credited high-strength bar past the 80 ksi limit.** ACI 318-19 22.4.2.1 limits fy to 80,000 psi when computing Po. The tile took a Grade 100 bar at 100 ksi, so StructurePoint's 18 × 18 column with 4 in² of Grade 100 bar read 1,488 kips instead of the printed 1,408. The cap now applies, and its inverse, `rc-column-steel-for-load`, applies it too.
 - **`rc-one-way-shear` cited the wrong row of ACI 318-19 Table 22.5.5.1.** The size-effect factor λs belongs to row (c), members with Av < Av,min. Rows (a) and (b) carry no λs. The tile computed row (c) but labeled it (b) on every surface, while another tile's citation already named it (c).
 - **`pyramid-frustum-volume` was exact only for similar ends, and its note called it exact everywhere.** It used (h/3)(A1 + A2 + √(A1·A2)), which is true only when the top is a scaled copy of the bottom. The prismoidal (h/6)(A1 + A2 + 4Am), with Am the mid-height section, is exact for any planar-faced taper. A 20×4 ft base narrowing to a 10×4 ft top over 6 ft holds 360 ft³, not 353.1. A wedge (top length 0) used to read as a pyramid and now reads as the triangular prism it is. Found by scanning for fixtures whose length and width were always equal; `excavation` had the same flaw, fixed above.

@@ -22912,7 +22912,8 @@ test("bounds: spec-v415 computeSptBearingCapacity pins both branches, the depth 
   // Error seams.
   assert.ok("error" in _v415({ n60: 0, b_ft: 6, d_ft: 2 }));
   assert.ok("error" in _v415({ n60: 20, b_ft: 0, d_ft: 2 }));
-  assert.ok("error" in _v415({ n60: 20, b_ft: 6, d_ft: 0 }));
+  assert.ok(Math.abs(_v415({ n60: 20, b_ft: 6, d_ft: 0 }).kd - 1) < 1e-12); // a surface footing takes Kd = 1
+  assert.ok("error" in _v415({ n60: 20, b_ft: 6, d_ft: -1 }));
   assert.ok("error" in _v415({ n60: Infinity, b_ft: 6, d_ft: 2 }));
 });
 
@@ -22941,7 +22942,8 @@ test("bounds: spec-v712 computeSptRequiredN60 pins N60 = qa_target/qa(N60=1), ro
   // Error seams: non-positive target, width, depth, non-finite.
   assert.ok("error" in _v712({ qa_target_ksf: 0, b_ft: 6, d_ft: 2 }));
   assert.ok("error" in _v712({ qa_target_ksf: 5, b_ft: 0, d_ft: 2 }));
-  assert.ok("error" in _v712({ qa_target_ksf: 5, b_ft: 6, d_ft: 0 }));
+  assert.ok(!("error" in _v712({ qa_target_ksf: 5, b_ft: 6, d_ft: 0 }))); // a surface footing (Kd = 1) is valid
+  assert.ok("error" in _v712({ qa_target_ksf: 5, b_ft: 6, d_ft: -1 }));
   assert.ok("error" in _v712({ qa_target_ksf: Infinity, b_ft: 6, d_ft: 2 }));
 });
 
