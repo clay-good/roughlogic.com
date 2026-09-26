@@ -21860,6 +21860,36 @@
    }
   },
   {
+   "tile_id": "mulch-topsoil-volume",
+   "source_publisher": "Texas A&M AgriLife Extension, Travis County (Daphne Richards)",
+   "source_title": "How Much Compost, Soil or Mulch Do I Need to Purchase?",
+   "source_edition_or_year": "February 2010",
+   "source_section_or_page": "Area x Depth / 324 = cubic yards; 1000 sq ft at 3 inches -> 9 1/4 yd (rounded to a quarter yard); 1 cu ft bags: multiply cubic yards by 27",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "area_ft2": 1000,
+    "depth_in": 3,
+    "bulk_density": 1.1,
+    "bag_ft3": 1,
+    "load_yd3": 10
+   },
+   "outputs": {
+    "yd3": {
+     "value": 9.25,
+     "tolerance": {
+      "abs": 0.02
+     }
+    },
+    "bags": {
+     "value": 250,
+     "tolerance": {
+      "abs": 0
+     }
+    }
+   }
+  },
+  {
    "tile_id": "grain-drying-energy",
    "source_publisher": "grain-handling practice",
    "source_title": "1000 bu corn (56 lb/bu), 20% to 15% -> 3,294 lb water, 54 gal propane",
@@ -38784,6 +38814,35 @@
    }
   },
   {
+   "tile_id": "metal-roof-panels",
+   "source_publisher": "Fabral",
+   "source_title": "5 Rib Metal Roofing System Ordering & Installation Guide, Estimating & Ordering a Roof, Step 2",
+   "source_edition_or_year": "LOW-21, 2011, p. 6",
+   "source_section_or_page": "eave to ridge 12 ft, ridge length 25 ft, each panel covers 36 in: 25 / 3 = 9 pcs x 12 ft",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "eave_width_ft": 25,
+    "panel_length_ft": 12,
+    "panel_net_in": 36,
+    "fasteners_per_sq": 80
+   },
+   "outputs": {
+    "panels": {
+     "value": 9,
+     "tolerance": {
+      "abs": 0
+     }
+    },
+    "total_panel_lf": {
+     "value": 108,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
    "tile_id": "ridge-cap-fasteners",
    "source_publisher": "IRC R905.2.6 asphalt-shingle fastening + manufacturer instructions",
    "source_title": "24-square roof, 40 ft ridge, 4-nail -> 2 cap bundles, 43 lb nails",
@@ -38890,6 +38949,38 @@
     },
     "nail_lbs": {
      "value": 65,
+     "tolerance": {
+      "abs": 0
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "ridge-cap-fasteners",
+   "source_publisher": "GAF",
+   "source_title": "Residential Shingles sell sheet, ArmorShield ridge cap row",
+   "source_edition_or_year": "2017, #105 RESHR112",
+   "source_section_or_page": "5 in exposure, 4 bundles cover approx. 100 lineal feet, approx. 60 pieces per bundle (240 pieces)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "ridge_lf": 100,
+    "cap_lf_per_bundle": 25,
+    "cap_exposure_in": 5,
+    "squares": 0,
+    "shingles_per_sq": 64,
+    "nails_per_shingle": 4,
+    "nails_per_lb": 150
+   },
+   "outputs": {
+    "cap_bundles": {
+     "value": 4,
+     "tolerance": {
+      "abs": 0
+     }
+    },
+    "cap_pieces": {
+     "value": 240,
      "tolerance": {
       "abs": 0
      }
@@ -40834,6 +40925,40 @@
      "value": 24.9,
      "tolerance": {
       "abs": 0.1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "ceiling-water-load",
+   "source_publisher": "NDSU Dickinson Research Extension Center (Llewellyn L. Manske)",
+   "source_title": "Weight of Water per Acre from One Inch of Rain",
+   "source_edition_or_year": "2005 Annual Report",
+   "source_section_or_page": "one inch of water on a square foot weighs 5.20 pounds; on 43,560 sq ft: 27,154.2876 gallons, 226,610.6763 pounds (NDSU uses 62.43 lb/ft3, the tile 62.4)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "pooled_area_ft2": 43560,
+    "avg_depth_in": 1,
+    "threshold_psf": 5
+   },
+   "outputs": {
+    "load_psf": {
+     "value": 5.2,
+     "tolerance": {
+      "abs": 0.005
+     }
+    },
+    "water_volume_gal": {
+     "value": 27154.29,
+     "tolerance": {
+      "abs": 0.05
+     }
+    },
+    "water_weight_lb": {
+     "value": 226610.7,
+     "tolerance": {
+      "pct": 0.1
      }
     }
    }
@@ -44027,6 +44152,28 @@
    }
   },
   {
+   "tile_id": "coil-length",
+   "source_publisher": "Dallan (Andrea Dallan)",
+   "source_title": "Coil-fed processing: 4 quick formulas for production planning",
+   "source_edition_or_year": "November 14, 2016",
+   "source_section_or_page": "L = 3,14/4 x (OD^2 - ID^2) / (T x 1000): OD 1600 mm, ID 508 mm, T 0.6 mm -> 3010 m (mm entered in the inch fields; the tile's length_in is then mm; Dallan uses pi = 3.14 and rounds to 10 m)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "outside_diameter_in": 1600,
+    "inside_diameter_in": 508,
+    "material_thickness_in": 0.6
+   },
+   "outputs": {
+    "length_in": {
+     "value": 3010000,
+     "tolerance": {
+      "pct": 0.2
+     }
+    }
+   }
+  },
+  {
    "tile_id": "reaming-drill-allowance",
    "source_publisher": "machine-reaming stock allowance (Machinery's Handbook)",
    "source_title": "0.500 in reamer -> 0.015 in allowance, 0.485 in prebore drill",
@@ -47191,6 +47338,50 @@
      "value": 22.39,
      "tolerance": {
       "abs": 0.02
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "duct-transition-length",
+   "source_publisher": "PMX Ductwork",
+   "source_title": "Duct Transitions: Types, Sizing, and When to Use Them",
+   "source_edition_or_year": "March 21, 2026",
+   "source_section_or_page": "14 in to 10 in, 2 in per side: 2 / tan(15 degrees) = 2 / 0.268 = 7.5 inches (tan truncated to 3 places)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "large_dim_in": 14,
+    "small_dim_in": 10,
+    "slope_deg": 15
+   },
+   "outputs": {
+    "length_concentric_in": {
+     "value": 7.5,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "duct-transition-length",
+   "source_publisher": "PMX Ductwork",
+   "source_title": "Duct Transitions: Types, Sizing, and When to Use Them",
+   "source_edition_or_year": "March 21, 2026",
+   "source_section_or_page": "same reduction at 7 degrees: 2 / tan(7 degrees) = 2 / 0.123 = 16.3 inches",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "large_dim_in": 14,
+    "small_dim_in": 10,
+    "slope_deg": 7
+   },
+   "outputs": {
+    "length_concentric_in": {
+     "value": 16.3,
+     "tolerance": {
+      "abs": 0.05
      }
     }
    }

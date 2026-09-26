@@ -6,6 +6,16 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Changed
 
+- **Six more tiles now carry a publisher's printed example.**
+  - `metal-roof-panels`: Fabral 5 Rib guide.
+  - `ridge-cap-fasteners`: GAF ArmorShield row.
+  - `mulch-topsoil-volume`: Texas A&M AgriLife.
+  - `coil-length`: Dallan.
+  - `duct-transition-length`: PMX Ductwork.
+  - `ceiling-water-load`: NDSU Dickinson REC.
+
+  README: 1,141 of 2,183 tiles are checked only against the project's own derivation; 1,042 carry an outside source.
+
 - **Three more tiles now carry a publisher's printed example.**
   - `liquefaction-screening`: the Caltrans Geotechnical Manual SPT example, which reproduces rd 0.94, CSR 0.32 and FS 0.66.
   - `coil-face-area`: Trane APP-CMC054.
