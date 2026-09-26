@@ -6,6 +6,21 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Changed
 
+- **Twelve more tiles now carry a publisher's printed example.**
+  - `stopping-sight-distance`: Illinois DOT / Green Book.
+  - `superelevation-safe-curve-speed`: Montana DOT Exhibit 3-2.
+  - `hoop-stress-mawp`: Pytel & Singer 134 and 135.
+  - `shaft-diameter-for-torsion`: Beer & Johnston Sample Problem 3.4.
+  - `thermal-stress-max-deltat`: Pytel & Singer 261.
+  - `chimney-height-for-draft`: ASHRAE Systems Handbook Ch. 30.
+  - `condenser-cop-for-heat-rejection`: PDHonline M375.
+  - `time-of-concentration`: TxDOT Hydraulic Design Manual.
+  - `screw-conveyor-rpm`: Martin worksheet.
+  - `scaffold-mudsill-bearing`: Alberta OHS guide.
+  - `uv-required-exposure`: ULTRAAQUA.
+
+  README: 1,087 of 2,183 tiles are checked only against the project's own derivation; 1,096 carry an outside source.
+
 - **Three more inverse tiles now carry a printed example, run in reverse from a sibling's:** `rc-column-steel-for-load` (StructurePoint, 8.00 in2), `sprinkler-gpm-for-precip` (Rain Bird, 2.4 gpm) and `projector-max-screen-size` (ProjectorCentral, 35.9 sq ft). README: 1,097 of 2,183 tiles are checked only against the project's own derivation; 1,086 carry an outside source.
 
 - **Ten inverse tiles now carry a printed example, each run in reverse from the example that already checks its forward sibling.** Each one returns the printed input it was solved for:
@@ -328,6 +343,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 - **wrangler 4.129.0 → 4.135.0, and the `sharp` override is gone.** Dependabot's bump failed CI on `check-dependency-overrides`. The new wrangler brings a miniflare that asks for the patched `sharp` 0.35.4 itself, so the September 9 pin no longer changed anything. This is the case the gate was written for, so the override is deleted rather than left as a second source of truth. `npm audit` reports 0 vulnerabilities. docs/threat-model.md records the change.
 
 ### Fixed
+
+- **`stopping-sight-distance` and `ssd-design-speed` now use the AASHTO Green Book braking equation.** The Green Book computes braking distance as 1.075 V²/a with a = 11.2 ft/s². The tiles used the rounded V²/(30f) with f = 0.35, which gave 288.1 ft of braking at 55 mph instead of the printed 290.3 ft (Illinois DOT BLRS Figure 28-1A, TxDOT RDM Table 4-23). That is 2.2 ft short, on the unsafe side. The formula is now 1.075 V²/(32.2 (f + G)), and the default friction is 11.2/32.2 = 0.348. The 55 mph example now gives 202.1 + 290.3 ft.
+- **`superelevation-safe-curve-speed`'s example now follows its own advice to use the side friction for the resulting speed.** It paired f 0.12, the AASHTO value for 60 mph, with a radius that gives about 67 mph. With 0.11, the 65 mph value, the 1,500 ft curve supports about 65 mph.
+- **`pool-heater-size` now says its result is the heater's input rating.** Heat-up time is energy / (rating x efficiency), so the rating it solves for is the Btu/h on a gas heater's nameplate; the heater delivers that times its efficiency. The tile had called it "output."
+- **`branch-reinforcement`'s citation formula now states what the code already applies.**
+  - Minimum walls: nominal x (1 - mill tolerance), less the corrosion allowance.
+  - The 1/sin β on the branch area.
+  - The note that weld area is not credited.
 
 - **`paint-mix-ratio` now says its ratios are by volume.** Some two-part systems print the same 4:1:1 by weight (U-POL: 200 g : 35 g : 26 g), and entering grams gives the wrong amounts of hardener and reducer.
 

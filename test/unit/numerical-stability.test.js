@@ -977,14 +977,14 @@ test("computeWindChill: bit-stable wind_chill_F at the spec example (T=10 F, win
   assert.equal(bits(r.wind_chill_F), "c021c09ffb174bc8", `wind_chill_F=${r.wind_chill_F}`);
 });
 
-test("computeStoppingSightDistance: bit-stable perception + braking + total at the spec example (55 mph, mu=0.35, t=2.5 s)", () => {
-  // Group J. AASHTO Green Book SSD = 1.47*v*t (perception) + v^2 /
-  // (30*(f +- G)) (braking). Pins both terms; complements the §10.3
+test("computeStoppingSightDistance: bit-stable perception + braking + total at the spec example (55 mph, mu=0.348, t=2.5 s)", () => {
+  // Group J. AASHTO Green Book SSD = 1.47*v*t (perception) + 1.075 v^2 /
+  // (32.2 (f +- G)) (braking). Pins both terms; complements the §10.3
   // v^2 ratio pin already in place.
   const r = computeStoppingSightDistance(stoppingSightDistanceExample.inputs);
   assert.equal(bits(r.perception_reaction_ft), "4069440000000000", `perception=${r.perception_reaction_ft}`);
-  assert.equal(bits(r.braking_distance_ft), "4072018618618618", `braking=${r.braking_distance_ft}`);
-  assert.equal(bits(r.total_ssd_ft), "407ea38618618618", `total_ssd=${r.total_ssd_ft}`);
+  assert.equal(bits(r.braking_distance_ft), "40722336cfbb47b3", `braking=${r.braking_distance_ft}`);
+  assert.equal(bits(r.total_ssd_ft), "407ec536cfbb47b3", `total_ssd=${r.total_ssd_ft}`);
 });
 
 test("computeStraightLine: bit-stable depreciation + accumulated + book at the spec example ($10k, $1k salvage, 5 yr, year 1)", () => {

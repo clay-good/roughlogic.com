@@ -757,7 +757,9 @@ export function computeSuperelevationSafeCurveSpeed({ R_ft, e, f } = {}) {
     note: "AASHTO point-mass safe-curve speed: from e + f = V^2 / (15 R), V = sqrt( 15 R (e + f) ) mph, the maximum speed the superelevation e plus the side-friction f supports on a curve of radius R. The side-friction factor f is the AASHTO design value that DECREASES with speed, so use the f for the resulting speed range (iterate once if it lands in a different band) - a higher f borrowed from a lower speed over-predicts the safe speed. This is the point-mass model; it ignores grade, the runoff/transition, and the driver comfort a full geometric design covers. A design/check aid, not a substitute for a licensed civil engineer's geometric design.",
   };
 }
-export const superelevationSafeCurveSpeedExample = { inputs: { R_ft: 1500, e: 0.08, f: 0.12 } };
+// f 0.11 is AASHTO's side-friction factor at 65 mph, the speed this radius yields (it read 0.12, the
+// 60 mph value, until 2026-09-26 -- against the tile's own advice to use the f for the resulting speed).
+export const superelevationSafeCurveSpeedExample = { inputs: { R_ft: 1500, e: 0.08, f: 0.11 } };
 
 function renderSuperelevationSafeCurveSpeed(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: AASHTO point-mass curve model e + f = V^2/(15 R) (A Policy on Geometric Design of Highways and Streets, the Green Book) solved for the speed: V = sqrt( 15 R (e + f) ) mph. The side-friction factor f is from the AASHTO design-speed table and decreases with speed. A design aid, not a substitute for a licensed civil engineer's geometric design.";

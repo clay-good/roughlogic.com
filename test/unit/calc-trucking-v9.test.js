@@ -12,15 +12,13 @@ import {
 const closePct = (a, b, pct) => Math.abs(a - b) <= Math.max(Math.abs(b) * (pct / 100), 1e-6);
 const close = (a, b, tol) => Math.abs(a - b) <= tol;
 
-test("ssd: 55 mph dry level -> 490 ft total (AASHTO worked example)", () => {
+test("ssd: 55 mph level -> 202.1 + 290.3 ft (AASHTO Green Book row)", () => {
   const r = computeStoppingSightDistance(stoppingSightDistanceExample.inputs);
   assert.ok(!r.error);
-  // d_pr = 1.47 * 55 * 2.5 = 202.125
-  // d_br = 55^2 / (30 * 0.35) = 3025 / 10.5 = 288.10
-  // total ~ 490
+  // d_pr = 1.47 * 55 * 2.5 = 202.125; d_br = 1.075 * 55^2 / (32.2 * 0.348) = 290.2 (Green Book 290.3)
   assert.ok(closePct(r.perception_reaction_ft, 202.125, 0.5));
-  assert.ok(closePct(r.braking_distance_ft, 288.10, 0.5));
-  assert.ok(closePct(r.total_ssd_ft, 490, 0.5));
+  assert.ok(closePct(r.braking_distance_ft, 290.3, 0.5));
+  assert.ok(closePct(r.total_ssd_ft, 492.4, 0.5));
 });
 
 test("ssd: 30 mph dry level -> ~110 ft + 86 ft braking", () => {
@@ -80,7 +78,7 @@ test("ssd: warns when grade magnitude exceeds 10% (extreme of AASHTO range)", ()
 });
 
 test("ssd: SSD_FRICTION_DEFAULTS exposes named dry / wet / ice with sensible values", () => {
-  assert.equal(SSD_FRICTION_DEFAULTS.dry.f, 0.35);
+  assert.ok(Math.abs(SSD_FRICTION_DEFAULTS.dry.f - 11.2 / 32.2) < 1e-12); // a = 11.2 ft/s^2
   assert.equal(SSD_FRICTION_DEFAULTS.wet.f, 0.20);
   assert.equal(SSD_FRICTION_DEFAULTS.ice.f, 0.10);
 });

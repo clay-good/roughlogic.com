@@ -2,7 +2,7 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "abf7eb7217e58c8b",
+      "sha": "c4da814df15ea6fd",
       "date": "2026-09-26"
     },
     "/tools/": {
@@ -90,8 +90,8 @@
       "date": "2026-09-18"
     },
     "/groups/water/": {
-      "sha": "42e84f2d0ea27087",
-      "date": "2026-09-18"
+      "sha": "89f2df845c75ac76",
+      "date": "2026-09-26"
     },
     "/tools/aav-install-check/": {
       "sha": "2937f47124079735",
@@ -786,8 +786,8 @@
       "date": "2026-09-01"
     },
     "/tools/branch-reinforcement/": {
-      "sha": "d7024231010bee0f",
-      "date": "2026-09-25"
+      "sha": "f9ecae0c46a01901",
+      "date": "2026-09-26"
     },
     "/tools/branch-saddle-cutback/": {
       "sha": "0dd0a765f2326c2d",
@@ -5454,8 +5454,8 @@
       "date": "2026-09-01"
     },
     "/tools/pool-heater-size/": {
-      "sha": "a9ce414a0524a15e",
-      "date": "2026-09-01"
+      "sha": "07cd44efd7fd11a5",
+      "date": "2026-09-26"
     },
     "/tools/pool-interior-finish-volume/": {
       "sha": "7dbdb1c8cba080d4",
@@ -7258,7 +7258,7 @@
       "date": "2026-09-25"
     },
     "/tools/ssd-design-speed/": {
-      "sha": "1704559801552805",
+      "sha": "4d6857dbc6c999b2",
       "date": "2026-09-26"
     },
     "/tools/stack-effect-npp/": {
@@ -7490,7 +7490,7 @@
       "date": "2026-09-01"
     },
     "/tools/stopping-sight-distance/": {
-      "sha": "d6ec7e32b3c44988",
+      "sha": "8b1039b2a858eee5",
       "date": "2026-09-26"
     },
     "/tools/storm-shelter/": {
@@ -7578,8 +7578,8 @@
       "date": "2026-09-01"
     },
     "/tools/superelevation-safe-curve-speed/": {
-      "sha": "7680aa988ef0fbd0",
-      "date": "2026-09-01"
+      "sha": "e07bebc70445f00b",
+      "date": "2026-09-26"
     },
     "/tools/superheat-subcool/": {
       "sha": "53fe8e6f63f170c5",

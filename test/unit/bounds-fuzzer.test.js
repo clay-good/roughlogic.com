@@ -4808,7 +4808,7 @@ test("bounds: calc-trucking computeIncoterm covers every published 2020 term and
   assert.ok("error" in computeIncoterm({ term: "not-a-term" }));
 });
 
-test("bounds: calc-trucking computeStoppingSightDistance pins d = 1.47*v*t + v^2 / (30*(f+g)) across the AASHTO design sweep", () => {
+test("bounds: calc-trucking computeStoppingSightDistance pins d = 1.47*v*t + 1.075 v^2 / (32.2 (f+g)) across the AASHTO design sweep", () => {
   for (const speed_mph of [25, 45, 55, 75]) {
     for (const reaction_time_s of [1.5, 2.5, 3.5]) {
       for (const friction of [0.10, 0.35, 0.60]) {
@@ -4821,7 +4821,7 @@ test("bounds: calc-trucking computeStoppingSightDistance pins d = 1.47*v*t + v^2
             `pr identity`,
           );
           assert.ok(
-            Math.abs(r.braking_distance_ft - (speed_mph * speed_mph) / (30 * (friction + grade))) < 1e-9,
+            Math.abs(r.braking_distance_ft - 1.075 * speed_mph * speed_mph / (32.2 * (friction + grade))) < 1e-9,
             `braking identity`,
           );
           assert.ok(
@@ -4832,11 +4832,13 @@ test("bounds: calc-trucking computeStoppingSightDistance pins d = 1.47*v*t + v^2
       }
     }
   }
-  // Spec example pin: 55 mph / 2.5 s / 0.35 / 0 -> pr = 1.47*55*2.5 = 202.125 ft;
-  // brake = 55^2 / (30*0.35) = 3025 / 10.5 = 288.095 ft; total ~490 ft.
-  const aashto = computeStoppingSightDistance({ speed_mph: 55, reaction_time_s: 2.5, friction: 0.35, grade: 0 });
+  // Green Book row (IDOT BLRS Fig. 28-1A, TxDOT RDM Table 4-23): 55 mph, 2.5 s, a = 11.2 ft/s^2 ->
+  // brake reaction 202.1 ft, braking 1.075 x 55^2 / 11.2 = 290.3 ft. Until 2026-09-26 the tile used
+  // V^2 / (30 x 0.35) = 288.1 ft. The default friction is now f = 11.2 / 32.2.
+  const aashto = computeStoppingSightDistance({ speed_mph: 55, reaction_time_s: 2.5, grade: 0 });
   assert.ok(Math.abs(aashto.perception_reaction_ft - 202.125) < 1e-9);
-  assert.ok(Math.abs(aashto.braking_distance_ft - 3025 / 10.5) < 1e-9);
+  assert.ok(Math.abs(aashto.braking_distance_ft - 1.075 * 3025 / 11.2) < 1e-9);
+  assert.ok(Math.abs(aashto.braking_distance_ft - 290.3) < 0.05);
 });
 
 test("bounds: calc-trucking computeStoppingSightDistance rejects non-positive speed / reaction time and impossible f + g <= 0 (documented)", () => {
@@ -4848,11 +4850,11 @@ test("bounds: calc-trucking computeStoppingSightDistance rejects non-positive sp
 });
 
 test("bounds: spec-v695 computeSsdDesignSpeed pins the SSD-quadratic positive root, round-trips through computeStoppingSightDistance, and error seams", () => {
-  const r = computeSsdDesignSpeed({ sight_distance_ft: 490.225, reaction_time_s: 2.5, friction: 0.35, grade: 0 });
+  const r = computeSsdDesignSpeed({ sight_distance_ft: 492.4, reaction_time_s: 2.5, friction: 0.348, grade: 0 });
   assert.ok(!r.error, JSON.stringify(r));
-  const a = 1 / (30 * 0.35), b = 1.47 * 2.5;
-  assert.ok(Math.abs(r.design_speed_mph - (-b + Math.sqrt(b * b + 4 * a * 490.225)) / (2 * a)) < 1e-9, `root identity: ${r.design_speed_mph}`);
-  assert.ok(Math.abs(r.design_speed_mph - 55) < 0.01, `pinned 55 mph: ${r.design_speed_mph}`);
+  const a = 1.075 / (32.2 * 0.348), b = 1.47 * 2.5;
+  assert.ok(Math.abs(r.design_speed_mph - (-b + Math.sqrt(b * b + 4 * a * 492.4)) / (2 * a)) < 1e-9, `root identity: ${r.design_speed_mph}`);
+  assert.ok(Math.abs(r.design_speed_mph - 55) < 0.01, `pinned 55 mph (Green Book 202.1 + 290.3): ${r.design_speed_mph}`);
   // A downhill grade lowers the safe speed for the same sight distance.
   const down = computeSsdDesignSpeed({ sight_distance_ft: 490.225, reaction_time_s: 2.5, friction: 0.35, grade: -0.06 });
   assert.ok(down.design_speed_mph < r.design_speed_mph, `downhill slower: ${down.design_speed_mph}`);
@@ -46922,22 +46924,23 @@ test("bounds: spec-v1608 cut -- stopping-sight-distance gains the available-dist
   // The old answer is unchanged, which is what makes this additive.
   const r = _v1608host(base);
   assert.ok(Math.abs(r.perception_reaction_ft - 202.125) < 1e-9);
-  assert.ok(Math.abs(r.braking_distance_ft - 288.095238) < 1e-6);
-  assert.ok(Math.abs(r.total_ssd_ft - 490.220238) < 1e-6);
+  // Green Book braking form 1.075 v^2 / (32.2 (f + g)) since 2026-09-26 (was v^2 / (30 f): 288.095 / 490.220).
+  assert.ok(Math.abs(r.braking_distance_ft - 288.5425909) < 1e-6);
+  assert.ok(Math.abs(r.total_ssd_ft - 490.6675909) < 1e-6);
   assert.equal(r.available_distance_ft, null);
   assert.equal(r.distance_verdict, null);
   assert.equal(r.distance_adequate, null);
   // spec-v1608's own worked example: the same zone on a 4% downgrade wants
-  // 527 ft, and a site offering 350 ft is 177 ft short.
+  // about 528 ft, and a site offering 350 ft is about 178 ft short (527 / 177 under the old 30 f form).
   const down = _v1608host({ ...base, grade: -0.04, available_distance_ft: 350 });
-  assert.ok(Math.abs(down.total_ssd_ft - 527.3938172) < 1e-6);
-  assert.ok(Math.abs(down.total_ssd_ft - r.total_ssd_ft - 37.1735792) < 1e-6);
-  assert.ok(Math.abs(down.distance_shortfall_ft - 177.3938172) < 1e-6);
+  assert.ok(Math.abs(down.total_ssd_ft - 527.8988930) < 1e-6);
+  assert.ok(Math.abs(down.total_ssd_ft - r.total_ssd_ft - 37.2313021) < 1e-6);
+  assert.ok(Math.abs(down.distance_shortfall_ft - 177.8988930) < 1e-6);
   assert.equal(down.distance_adequate, false);
-  assert.ok(down.distance_verdict.startsWith("SHORT by 177 ft"));
-  // And the spec's fix: 45 mph on that downgrade wants 383 ft.
+  assert.ok(down.distance_verdict.startsWith("SHORT by 178 ft"));
+  // And the spec's fix: 45 mph on that downgrade wants about 383 ft.
   const slower = _v1608host({ ...base, speed_mph: 45, grade: -0.04 });
-  assert.ok(Math.abs(slower.total_ssd_ft - 383.1169355) < 1e-6);
+  assert.ok(Math.abs(slower.total_ssd_ft - 383.4550441) < 1e-6);
   // An available distance at least the requirement reads adequate, and a
   // shortfall is never negative.
   const ok = _v1608host({ ...base, available_distance_ft: 600 });

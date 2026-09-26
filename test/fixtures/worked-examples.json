@@ -4335,16 +4335,16 @@
   },
   {
    "tile_id": "stopping-sight-distance",
-   "source_publisher": "AASHTO",
-   "source_title": "Stopping sight distance at 55 mph on dry level pavement (Green Book Chapter 3)",
-   "source_edition_or_year": "AASHTO Green Book 7th ed.",
-   "source_section_or_page": "d_pr = 1.47*v*t_pr; d_br = v^2 / (30*(f+g))",
+   "source_publisher": "Illinois DOT (AASHTO Green Book values)",
+   "source_title": "BLRS Manual Ch. 28 Sight Distance, Figure 28-1A",
+   "source_edition_or_year": "August 2016, p. 28-1-2",
+   "source_section_or_page": "55 mph, t 2.5 s, a 11.2 ft/s2 (f = 11.2/32.2 = 0.348): brake reaction 202.1 ft, braking 290.3 ft (1.075 V^2 / a), design SSD rounded up to 495 (TxDOT RDM Table 4-23 prints the same)",
    "verified_by": "rl",
    "verified_on": "2026-05-10",
    "inputs": {
     "speed_mph": 55,
     "reaction_time_s": 2.5,
-    "friction": 0.35
+    "friction": 0.348
    },
    "outputs": {
     "perception_reaction_ft": {
@@ -4354,15 +4354,44 @@
      }
     },
     "braking_distance_ft": {
-     "value": 288.1,
+     "value": 290.3,
      "tolerance": {
       "pct": 0.5
      }
     },
     "total_ssd_ft": {
-     "value": 490.225,
+     "value": 492.4,
      "tolerance": {
       "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "stopping-sight-distance",
+   "source_publisher": "Illinois DOT (AASHTO Green Book values)",
+   "source_title": "BLRS Manual Ch. 28 Sight Distance, Figure 28-1A",
+   "source_edition_or_year": "August 2016, p. 28-1-2",
+   "source_section_or_page": "55 mph, t 2.5 s, a 11.2 ft/s2: 202.1 ft brake reaction + 290.3 ft braking (1.075 V^2 / a), design SSD rounded up to 495 ft",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "speed_mph": 55,
+    "reaction_time_s": 2.5,
+    "friction": 0.34782608695652173,
+    "grade": 0
+   },
+   "outputs": {
+    "perception_reaction_ft": {
+     "value": 202.1,
+     "tolerance": {
+      "abs": 0.05
+     }
+    },
+    "braking_distance_ft": {
+     "value": 290.3,
+     "tolerance": {
+      "abs": 0.05
      }
     }
    }
@@ -4372,13 +4401,13 @@
    "source_publisher": "AASHTO (inverse)",
    "source_title": "v = (-b + sqrt(b^2 + 4 a SSD)) / (2 a), a = 1/(30(f+g)), b = 1.47 t",
    "source_edition_or_year": "spec-v695 worked example (machine-verified)",
-   "source_section_or_page": "490.225 ft sight distance, dry level (f 0.35, t 2.5 s) -> 55 mph (round-trips stopping-sight-distance)",
+   "source_section_or_page": "492.4 ft sight distance (the Green Book 55 mph row, 202.1 + 290.3), level, f 0.348 (a = 11.2 ft/s2), t 2.5 s -> 55 mph (round-trips stopping-sight-distance)",
    "verified_by": "rl",
    "verified_on": "2026-07-14",
    "inputs": {
-    "sight_distance_ft": 490.225,
+    "sight_distance_ft": 492.4,
     "reaction_time_s": 2.5,
-    "friction": 0.35
+    "friction": 0.348
    },
    "outputs": {
     "design_speed_mph": {
@@ -4394,18 +4423,18 @@
    "source_publisher": "AASHTO (inverse)",
    "source_title": "cross-check: a 6% downgrade lengthens the stop, so the safe speed drops",
    "source_edition_or_year": "spec-v695 cross-check (machine-verified)",
-   "source_section_or_page": "same 490.225 ft on a -6% grade -> about 51.2 mph",
+   "source_section_or_page": "same 492.4 ft on a -6% grade -> about 51.2 mph",
    "verified_by": "rl",
    "verified_on": "2026-07-14",
    "inputs": {
-    "sight_distance_ft": 490.225,
+    "sight_distance_ft": 492.4,
     "reaction_time_s": 2.5,
-    "friction": 0.35,
+    "friction": 0.348,
     "grade": -0.06
    },
    "outputs": {
     "design_speed_mph": {
-     "value": 51.25,
+     "value": 51.22,
      "tolerance": {
       "abs": 0.05
      }
@@ -18048,6 +18077,36 @@
    "outputs": {
     "rpm": {
      "value": 80,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "screw-conveyor-rpm",
+   "source_publisher": "Martin Conveyor Division",
+   "source_title": "Screw Conveyor Speed Calculation worksheet",
+   "source_edition_or_year": "Version 1.1 7/10/98, p. 1",
+   "source_section_or_page": "14 in screw, 7 in pitch, 4 in pipe, 100% trough load, 6250 cu ft/hr: CFH/RPM = 34.362, screw RPM = 181.9",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "screw_diameter_in": 14,
+    "pitch_in": 7,
+    "shaft_diameter_in": 4,
+    "loading_fraction": 1,
+    "target_ft3_hr": 6250
+   },
+   "outputs": {
+    "per_rpm": {
+     "value": 34.362,
+     "tolerance": {
+      "abs": 0.002
+     }
+    },
+    "rpm": {
+     "value": 181.9,
      "tolerance": {
       "abs": 0.05
      }
@@ -37022,6 +37081,27 @@
    }
   },
   {
+   "tile_id": "uv-required-exposure",
+   "source_publisher": "ULTRAAQUA (UV system maker)",
+   "source_title": "UV dose blog",
+   "source_edition_or_year": "2024-02-12",
+   "source_section_or_page": "UV Dose = 30 mW/cm2 x 10 seconds = 300 mJ/cm2 (run in reverse: 300 mJ/cm2 at 30 mW/cm2 -> 10 s)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "target_dose_mj_cm2": 300,
+    "intensity_mw_cm2": 30
+   },
+   "outputs": {
+    "required_time_s": {
+     "value": 10,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
    "tile_id": "population-equivalent",
    "source_publisher": "Population equivalent (organic load), standard sanitary engineering",
    "source_title": "PE_bod = MGD x BOD x 8.34 / 0.17; PE = max(PE_bod, PE_flow, PE_ss)",
@@ -53466,6 +53546,35 @@
    }
   },
   {
+   "tile_id": "scaffold-mudsill-bearing",
+   "source_publisher": "Government of Alberta",
+   "source_title": "OHS Code 2009 Explanation Guide, Part 23 Scaffolds",
+   "source_edition_or_year": "pp. 23-8 to 23-9",
+   "source_section_or_page": "a 10,000 pound leg load on a 1 foot x 4 foot mudsill under the baseplate -> 2500 pounds/square foot (allowable bearing not printed; 3000 entered only to complete the input)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "leg_load_lb": 10000,
+    "plank_width_in": 12,
+    "plank_length_in": 48,
+    "allowable_psf": 3000
+   },
+   "outputs": {
+    "mudsill_area_ft2": {
+     "value": 4,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "bearing_psf": {
+     "value": 2500,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
    "tile_id": "concrete-evaporation-rate",
    "source_publisher": "ACI 305 Hot Weather Concreting / Menzel-NRMCA equation",
    "source_title": "90 F, 40% RH, 15 mph pour -> 0.31 lb/ft^2/hr, precautions",
@@ -65949,6 +66058,27 @@
    }
   },
   {
+   "tile_id": "time-of-concentration",
+   "source_publisher": "Texas DOT",
+   "source_title": "Hydraulic Design Manual, Ch. 4 Sec. 11, Application of the Kerby-Kirpich Method",
+   "source_edition_or_year": "web manual",
+   "source_section_or_page": "channel reach: S = (750 - 700)/5,280 = 0.0095; t_ch = 0.0078 (5,280 - 500)^0.770 (0.0095)^-0.385, about 32 minutes (the 57 min total adds a Kerby overland term)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "l_ft": 4780,
+    "s_slope": 0.0095
+   },
+   "outputs": {
+    "tc_min": {
+     "value": 32,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
    "tile_id": "orifice-flow",
    "source_publisher": "Orifice discharge Q = Cd A sqrt(2 g h)",
    "source_title": "6 in sharp-edged orifice under a 4 ft head -> 1.89 cfs (849 gpm)",
@@ -68572,6 +68702,27 @@
      "value": 40000,
      "tolerance": {
       "abs": 1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "condenser-cop-for-heat-rejection",
+   "source_publisher": "PDHonline (A. Bhatia)",
+   "source_title": "Course M375, Heat Rejection Options in HVAC Systems",
+   "source_edition_or_year": "2020, pp. 5-6",
+   "source_section_or_page": "a heat rejection factor of 1.25 results in 15000 Btuh heat rejection per ton (12000 Btuh) of cooling",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "q_evap": 12000,
+    "target_thr": 15000
+   },
+   "outputs": {
+    "factor": {
+     "value": 1.25,
+     "tolerance": {
+      "abs": 0.0005
      }
     }
    }
@@ -75295,17 +75446,39 @@
    "source_publisher": "AASHTO Green Book (solved for speed)",
    "source_title": "V = sqrt( 15 R (e + f) ); R 1,500 ft, e 0.08, f 0.12 -> 67.1 mph",
    "source_edition_or_year": "spec-v756 worked example (machine-verified)",
-   "source_section_or_page": "spec-v756 section 2.1 pinned example",
+   "source_section_or_page": "R 1500 ft, e 0.08, f 0.11 (the AASHTO side-friction factor at 65 mph): V = sqrt(15 x 1500 x 0.19) = 65.4 mph",
    "verified_by": "rl",
    "verified_on": "2026-07-14",
    "inputs": {
     "R_ft": 1500,
     "e": 0.08,
+    "f": 0.11
+   },
+   "outputs": {
+    "v_mph": {
+     "value": 65.383,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "superelevation-safe-curve-speed",
+   "source_publisher": "Montana DOT",
+   "source_title": "Road Design Manual Ch. 3, Exhibit 3-2",
+   "source_edition_or_year": "January 2026, p. 3-7",
+   "source_section_or_page": "60 mph design: e 8.0%, f 0.12, minimum radius 1200 ft (R = V^2 / 15(e + f), rounded up to 10 ft); run in reverse -> 60 mph",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "R_ft": 1200,
+    "e": 0.08,
     "f": 0.12
    },
    "outputs": {
     "v_mph": {
-     "value": 67.082,
+     "value": 60,
      "tolerance": {
       "abs": 0.05
      }
@@ -79137,6 +79310,27 @@
    }
   },
   {
+   "tile_id": "shaft-diameter-for-torsion",
+   "source_publisher": "McGraw-Hill (Beer, Johnston, DeWolf, Mazurek), via Mercer University notes",
+   "source_title": "Mechanics of Materials, Sample Problem 3.4",
+   "source_edition_or_year": "6th edition, 2012",
+   "source_section_or_page": "8000 psi = T0 (0.375 in) / [pi/2 (0.375 in)^4] -> T0 = 663 lb-in; run in reverse -> d = 0.75 in",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "T_lbin": 663,
+    "tau_allow_psi": 8000
+   },
+   "outputs": {
+    "d_in": {
+     "value": 0.75,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
    "tile_id": "shaft-torsion",
    "source_publisher": "mechanics of materials",
    "source_title": "cross-check: a 2 in shaft drops stress 58% and twist to a third -> 7,640 psi, 0.91 deg",
@@ -79272,6 +79466,29 @@
    }
   },
   {
+   "tile_id": "thermal-stress-max-deltat",
+   "source_publisher": "Pytel & Singer (via MATHalino)",
+   "source_title": "Strength of Materials, Problem 261",
+   "source_edition_or_year": "textbook",
+   "source_section_or_page": "steel rod 0.25 in2 at 1200 lb (4800 psi) at 70 F, alpha 6.5e-6, E 29e6: (6.5e-6)(T - 70) = 1200 / [0.25(29e6)] -> T = 95.46 F, a 25.46 F change",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "allowable_stress_psi": 4800,
+    "E_psi": 29000000,
+    "alpha": 6.5e-06,
+    "restraint": 1
+   },
+   "outputs": {
+    "max_dT_F": {
+     "value": 25.46,
+     "tolerance": {
+      "abs": 0.005
+     }
+    }
+   }
+  },
+  {
    "tile_id": "hoop-stress-thin-wall",
    "source_publisher": "thin-wall / Barlow",
    "source_title": "12 in tank, 0.25 in wall, 150 psi -> 3,600 psi hoop, 1,800 psi long, D/t 48, DCR 0.24",
@@ -79374,6 +79591,50 @@
      "value": 833.33,
      "tolerance": {
       "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "hoop-stress-mawp",
+   "source_publisher": "Pytel & Singer (via MATHalino)",
+   "source_title": "Strength of Materials, Problem 135",
+   "source_edition_or_year": "textbook",
+   "source_section_or_page": "2 ft diameter cylinder, 1400 psi, stress limited to 12 ksi -> t = 1.4 inches (run in reverse; D/t 17 flags thick-wall)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "t_in": 1.4,
+    "D_in": 24,
+    "S_allow": 12000
+   },
+   "outputs": {
+    "p_max_psi": {
+     "value": 1400,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "hoop-stress-mawp",
+   "source_publisher": "Pytel & Singer (via MATHalino)",
+   "source_title": "Strength of Materials, Problem 134",
+   "source_edition_or_year": "textbook",
+   "source_section_or_page": "4 ft diameter spherical tank, 5/16 in wall, stress limited to 8000 psi -> p = 208.33 psi (the tile's 4tS/D longitudinal / spherical value)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "t_in": 0.3125,
+    "D_in": 48,
+    "S_allow": 8000
+   },
+   "outputs": {
+    "p_max_long_psi": {
+     "value": 208.33,
+     "tolerance": {
+      "abs": 0.01
      }
     }
    }
@@ -82753,6 +83014,30 @@
    "outputs": {
     "required_height_ft": {
      "value": 36.14,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "chimney-height-for-draft",
+   "source_publisher": "ASHRAE",
+   "source_title": "Systems and Equipment Handbook, Ch. 30 Chimney, Gas Vent, and Fireplace Systems, Example 3",
+   "source_edition_or_year": "2000, p. 30.16",
+   "source_section_or_page": "8000 ft (22.22 in. Hg = 10.914 psia), 60 F ambient, 1400 F mean flue: Dt/H = 0.00786 in. of water per ft; added height = 0.085 / 0.00786 = 10.8 ft (theoretical draft, net factor 1)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "target_draft_net_inwc": 0.085,
+    "ambient_temp_f": 60,
+    "mean_flue_temp_f": 1400,
+    "baro_psia": 10.914,
+    "net_factor": 1
+   },
+   "outputs": {
+    "required_height_ft": {
+     "value": 10.8,
      "tolerance": {
       "abs": 0.05
      }
