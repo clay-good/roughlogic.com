@@ -2,7 +2,7 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "a3b3e9b97cfc0081",
+      "sha": "7de26707b389b886",
       "date": "2026-09-26"
     },
     "/tools/": {
@@ -2254,8 +2254,8 @@
       "date": "2026-09-01"
     },
     "/tools/draft-beer-line-balance/": {
-      "sha": "7c208616066f29e5",
-      "date": "2026-09-01"
+      "sha": "7be82e00a303063d",
+      "date": "2026-09-26"
     },
     "/tools/draft-hood-dilution/": {
       "sha": "ebd9ae0c50c775a2",
@@ -4754,8 +4754,8 @@
       "date": "2026-09-07"
     },
     "/tools/motor-rms-hp/": {
-      "sha": "09d92d2ef1940aec",
-      "date": "2026-09-01"
+      "sha": "4d278b796a3770b3",
+      "date": "2026-09-26"
     },
     "/tools/motor-run-hours-for-budget/": {
       "sha": "88007241f88b9589",

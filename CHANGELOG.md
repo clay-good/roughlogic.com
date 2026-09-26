@@ -6,6 +6,20 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Changed
 
+- **Ten more tiles now carry a publisher's printed example.**
+  - `wobbe-index`: Emerson 1660AD-5a.
+  - `dp-level-hydrostatic`: Viatran.
+  - `rlc-reactance-resonance`: OpenStax College Physics 23.12.
+  - `transformer-turns-ratio`: DOE Fundamentals Handbook ES-13.
+  - `room-acoustics`: University of Illinois PHYS 406.
+  - `sacrificial-anode-life`: AUCSC 2023, magnesium.
+  - `shore-post-load`: CED formwork course.
+  - `concrete-maturity`: Nebraska DOT.
+  - `window-overhang-shade`: MTU MEEM 4200.
+  - `draft-beer-line-balance`: Brewers Association Table 4.1.
+
+  README: 1,221 of 2,183 tiles are checked only against the project's own derivation; 962 carry an outside source.
+
 - **Fourteen more tiles now carry a publisher's printed example.**
   - **Geotechnical:**
     - `at-rest-earth-pressure` and `sloped-backfill-earth-pressure`: IGNOU Foundation Engineering.
@@ -134,6 +148,9 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 - **wrangler 4.129.0 → 4.135.0, and the `sharp` override is gone.** Dependabot's bump failed CI on `check-dependency-overrides`. The new wrangler brings a miniflare that asks for the patched `sharp` 0.35.4 itself, so the September 9 pin no longer changed anything. This is the case the gate was written for, so the override is deleted rather than left as a second source of truth. `npm audit` reports 0 vulnerabilities. docs/threat-model.md records the change.
 
 ### Fixed
+
+- **`motor-rms-hp` now divides only stopped time by the cooling factor, and the factor follows the motor enclosure.** In Cowern's (Baldor) RMS-horsepower method, a motor at standstill loses its fan, so stopped seconds are divided by C: 3 for open drip-proof, 2 for totally enclosed. The tile also divided a segment where the motor still ran at light load, and it described C as "3 stopped, 2 unloaded." A 20 hp / 10 s plus 10 hp / 20 s cycle now gives 14.1 hp instead of 19.0 hp, because the light-load segment keeps full cooling.
+- **`draft-beer-line-balance` no longer subtracts a 1 psi "faucet allowance" credited to the Brewers Association.** The Draught Beer Quality Manual (4th ed., Ch. 4) balances line resistance against the full applied pressure and calls couplers and faucets negligible. The tile now has a tower/fixture resistance input, default 0; the manual puts a tower at 0-8 psi per its maker. The 12 psi / 4 ft rise example on 3/16 in vinyl is now 3.3 ft of line, up from 3.0. The manual's barrier-line rows (1/4 in 0.30, 5/16 in 0.10, 3/8 in 0.06 psi/ft) are added. The 3/16 in barrier row (2.2) is kept, but its label now says it is not in the manual's table.
 
 - **`conduit-nipple-60-fill` now rounds the maximum conductor count the way NEC Chapter 9 Note 7 requires.** For conductors all of the same size, a decimal of 0.8 or larger rounds up to the next whole conductor. That is how Annex C fits 6 #8 THHN in 3/4 in EMT (5.82). The tile always rounded down, so it reported 38 instead of 39 for #12 THHN in a 1 in EMT nipple.
 - **`dressing-percentage` now applies the cutting yield to the chilled carcass, not the hot one.** A hot carcass loses about 3.5-4% of its weight in the cooler before it is cut. UW-Madison Extension's example uses the tile's exact inputs (1,200 lb steer, 744 lb carcass, 67% yield) and prints 718 lb chilled and 481 lb of meat; the tile said 498.5 lb. A new chill-shrink input defaults to UW's 3.5%. The note also called the hot carcass "the chilled-hanging carcass," which contradicted itself.

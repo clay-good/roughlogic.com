@@ -30664,6 +30664,52 @@
    }
   },
   {
+   "tile_id": "sacrificial-anode-life",
+   "source_publisher": "Appalachian Underground Corrosion Short Course (Donlan / George)",
+   "source_title": "Design of Galvanic Anode Cathodic Protection, Calculating Anode Life - Example",
+   "source_edition_or_year": "2023",
+   "source_section_or_page": "ten pound magnesium anode, 0.1 amp, 50% efficiency, 85% consumed: 0.114 x 10 x 0.50 x 0.85 / 0.10 = 4.8 years (tile's 500 A-h/lb = 1000 x 0.50)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "anode_material": "magnesium",
+    "anode_mass_lb": 10,
+    "current_draw_a": 0.1,
+    "utilization_factor": 0.85
+   },
+   "outputs": {
+    "life_years": {
+     "value": 4.8,
+     "tolerance": {
+      "abs": 0.06
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "sacrificial-anode-life",
+   "source_publisher": "Appalachian Underground Corrosion Short Course (Donlan / George)",
+   "source_title": "Design of Galvanic Anode Cathodic Protection",
+   "source_edition_or_year": "2023",
+   "source_section_or_page": "Mg, 32 lb, 0.0509 A, E = 0.50, UF = 0.85 -> Life = 30.5 years",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "anode_material": "magnesium",
+    "anode_mass_lb": 32,
+    "current_draw_a": 0.0509,
+    "utilization_factor": 0.85
+   },
+   "outputs": {
+    "life_years": {
+     "value": 30.5,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
    "tile_id": "reserve-capacity-amp-hours",
    "source_publisher": "BCI / SAE J537 reserve capacity",
    "source_title": "amp_hours = 25 x reserve_capacity_minutes / 60",
@@ -30686,19 +30732,43 @@
   {
    "tile_id": "draft-beer-line-balance",
    "source_publisher": "Draft-beer line balancing (Brewers Association Draught Beer Quality Manual)",
-   "source_title": "line = (applied_pressure - 0.5 x rise - 1) / R",
+   "source_title": "line = (applied_pressure - 0.5 x rise - tower) / R",
    "source_edition_or_year": "spec-v787 worked example (machine-verified)",
-   "source_section_or_page": "12 psi, 4 ft rise, 3/16 in vinyl (3.0 psi/ft) -> (12 - 2 - 1)/3 = 3.0 ft of line",
+   "source_section_or_page": "12 psi, 4 ft rise, 3/16 in vinyl (3.0 psi/ft), no tower -> (12 - 2 - 0)/3 = 3.33 ft of line (the manual has no faucet allowance; until 2026-09-25 a 1 psi one gave 3.0)",
    "verified_by": "rl",
-   "verified_on": "2026-07-14",
+   "verified_on": "2026-09-25",
    "inputs": {
     "applied_pressure_psi": 12,
     "rise_ft": 4,
-    "tubing_type": "vinyl_316"
+    "tubing_type": "vinyl_316",
+    "fixture_psi": 0
    },
    "outputs": {
     "line_length_ft": {
-     "value": 3.0,
+     "value": 3.333,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "draft-beer-line-balance",
+   "source_publisher": "Brewers Association",
+   "source_title": "Draught Beer Quality Manual, Ch. 4 System Balance, Table 4.1",
+   "source_edition_or_year": "4th edition, 2019, pp. 38-39",
+   "source_section_or_page": "a 20 ft. run of 1/4 in ID vinyl beer line (0.85 lb/ft) gives a total resistance of 17 psi",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "applied_pressure_psi": 17,
+    "rise_ft": 0,
+    "tubing_type": "vinyl_14",
+    "fixture_psi": 0
+   },
+   "outputs": {
+    "line_length_ft": {
+     "value": 20,
      "tolerance": {
       "abs": 0.01
      }
@@ -31187,6 +31257,30 @@
      "value": 56.5,
      "tolerance": {
       "abs": 0.1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "room-acoustics",
+   "source_publisher": "University of Illinois (S. Errede), after Backus, The Acoustical Foundations of Music",
+   "source_title": "PHYS 406 Lecture Notes 9, Example Calculation of Reverberation Time",
+   "source_edition_or_year": "2002-2017, p. 6",
+   "source_section_or_page": "T = 0.049 x 240x10^3 / 4300 = 2.7 sec (one decimal)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "volume_ft3": 240000,
+    "total_sabins": 4300,
+    "length_ft": 20,
+    "width_ft": 15,
+    "height_ft": 10
+   },
+   "outputs": {
+    "rt60_s": {
+     "value": 2.7,
+     "tolerance": {
+      "abs": 0.05
      }
     }
    }
@@ -34476,6 +34570,48 @@
      "value": 2040.7,
      "tolerance": {
       "abs": 1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "wobbe-index",
+   "source_publisher": "Emerson Process Management (Remote Automation Solutions)",
+   "source_title": "The Wobbe Index and Natural Gas Interchangeability, Application Data 1660AD-5a",
+   "source_edition_or_year": "July 30, 2007, p. 2",
+   "source_section_or_page": "Wobbe Index = 1000 / sqrt(0.6) = 1291",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "hhv_btu_ft3": 1000,
+    "specific_gravity": 0.6
+   },
+   "outputs": {
+    "wobbe_index_btu_ft3": {
+     "value": 1291,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "wobbe-index",
+   "source_publisher": "Emerson Process Management (Remote Automation Solutions)",
+   "source_title": "The Wobbe Index and Natural Gas Interchangeability, Application Data 1660AD-5a",
+   "source_edition_or_year": "July 30, 2007, p. 2",
+   "source_section_or_page": "1050 / sqrt(0.6) = 1356",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "hhv_btu_ft3": 1050,
+    "specific_gravity": 0.6
+   },
+   "outputs": {
+    "wobbe_index_btu_ft3": {
+     "value": 1356,
+     "tolerance": {
+      "abs": 0.5
      }
     }
    }
@@ -38559,6 +38695,36 @@
      "value": 0.83632,
      "tolerance": {
       "pct": 0.1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "window-overhang-shade",
+   "source_publisher": "Michigan Technological University (MEEM 4200, after McQuiston, Parker and Spitler)",
+   "source_title": "Chapter 7 Solar Radiation, Example 7-5",
+   "source_edition_or_year": "lecture notes, pp. 33-34",
+   "source_section_or_page": "2 ft overhang, 1.5 in frame gap, 3.75 ft glazing, beta 47.0, gamma 31.6, tan(Omega) = tan(beta)/cos(gamma): y = 2.52 ft; shaded (2.52 - 0.125) x 4.75 = 11.38 ft2 (i.e. 28.75 in of the 45 in)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "projection_in": 24,
+    "gap_in": 1.5,
+    "glass_height_in": 45,
+    "solar_altitude_deg": 47,
+    "surface_solar_azimuth_deg": 31.6
+   },
+   "outputs": {
+    "shade_line_in": {
+     "value": 30.24,
+     "tolerance": {
+      "abs": 0.1
+     }
+    },
+    "shaded_height_in": {
+     "value": 28.75,
+     "tolerance": {
+      "abs": 0.1
      }
     }
    }
@@ -42968,6 +43134,50 @@
    }
   },
   {
+   "tile_id": "dp-level-hydrostatic",
+   "source_publisher": "Viatran",
+   "source_title": "Liquid Level Measurement, technical note (Vented / Open Tanks)",
+   "source_edition_or_year": "undated, pp. 2-3",
+   "source_section_or_page": "20 ft water at 0.43356 psi/ft = 8.671 PSI; kerosene SG 0.82: 16.4 ft WC x 0.43356 = 7.11 PSI (Viatran uses 4 C water, 0.43356; the tile 60 F water, 0.433)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "measured_pressure_psi": 4.33,
+    "specific_gravity": 1,
+    "max_level_ft": 20
+   },
+   "outputs": {
+    "span_psi": {
+     "value": 8.671,
+     "tolerance": {
+      "abs": 0.015
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "dp-level-hydrostatic",
+   "source_publisher": "Viatran",
+   "source_title": "Liquid Level Measurement, technical note (Vented / Open Tanks)",
+   "source_edition_or_year": "undated, pp. 2-3",
+   "source_section_or_page": "kerosene SG 0.82, 20 ft: 16.4 ft WC x 0.43356 = 7.11 PSI (0.1% constant difference)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "measured_pressure_psi": 4.33,
+    "specific_gravity": 0.82,
+    "max_level_ft": 20
+   },
+   "outputs": {
+    "span_psi": {
+     "value": 7.11,
+     "tolerance": {
+      "abs": 0.015
+     }
+    }
+   }
+  },
+  {
    "tile_id": "thermistor-steinhart-hart",
    "source_publisher": "NTC thermistor Steinhart-Hart equation (Steinhart & Hart 1968)",
    "source_title": "10 kohm on a sensor with A 1.1253e-3, B 2.3471e-4, C 8.566e-8 -> 25.00 C (spec-v1223)",
@@ -46542,6 +46752,35 @@
    }
   },
   {
+   "tile_id": "transformer-turns-ratio",
+   "source_publisher": "US DOE",
+   "source_title": "DOE Fundamentals Handbook: Electrical Science, Vol. 4 (DOE-HDBK-1011/4-92), Module ES-13, Current Ratio Example 2",
+   "source_edition_or_year": "June 1992, pp. 5-7",
+   "source_section_or_page": "480 turns primary, 60 turns secondary, primary draws 0.6 amps -> Is = 4.8 amps (run as Is 4.8 -> Ip 0.6)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "primary_voltage_v": 480,
+    "secondary_voltage_v": 60,
+    "secondary_current_a": 4.8,
+    "load_impedance_ohm": 8
+   },
+   "outputs": {
+    "turns_ratio": {
+     "value": 8,
+     "tolerance": {
+      "abs": 0.0005
+     }
+    },
+    "primary_current_a": {
+     "value": 0.6,
+     "tolerance": {
+      "abs": 0.0005
+     }
+    }
+   }
+  },
+  {
    "tile_id": "belt-hp-transmitted",
    "source_publisher": "belt-drive power relation (Machinery's Handbook / Gates)",
    "source_title": "250/100 lb tensions, 6 in sheave at 1750 rpm -> 2749 ft/min, 150 lb effective, 12.5 HP",
@@ -48063,6 +48302,88 @@
      "value": 1,
      "tolerance": {
       "abs": 0.001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "rlc-reactance-resonance",
+   "source_publisher": "OpenStax",
+   "source_title": "College Physics, Section 23.12 RLC Series AC Circuits, Examples 23.12-23.14",
+   "source_edition_or_year": "1st edition",
+   "source_section_or_page": "40.0 ohm, 3.00 mH, 5.00 uF at 60.0 Hz: XL = 1.13 ohm, XC = 531 ohm, Z = 531 ohm, f0 = 1.30 kHz, cos phi = 0.0753 (3 significant figures)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "frequency_hz": 60,
+    "resistance_ohm": 40,
+    "inductance_h": 0.003,
+    "capacitance_uf": 5
+   },
+   "outputs": {
+    "inductive_reactance_ohm": {
+     "value": 1.13,
+     "tolerance": {
+      "abs": 0.005
+     }
+    },
+    "capacitive_reactance_ohm": {
+     "value": 531,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "impedance_ohm": {
+     "value": 531,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "resonant_frequency_hz": {
+     "value": 1300,
+     "tolerance": {
+      "abs": 1
+     }
+    },
+    "power_factor": {
+     "value": 0.0753,
+     "tolerance": {
+      "abs": 0.0001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "rlc-reactance-resonance",
+   "source_publisher": "OpenStax",
+   "source_title": "College Physics, Example 23.12",
+   "source_edition_or_year": "1st edition",
+   "source_section_or_page": "same circuit at 10.0 kHz: XL = 188 ohm, XC = 3.18 ohm, Z = 190 ohm",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "frequency_hz": 10000,
+    "resistance_ohm": 40,
+    "inductance_h": 0.003,
+    "capacitance_uf": 5
+   },
+   "outputs": {
+    "inductive_reactance_ohm": {
+     "value": 188,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "capacitive_reactance_ohm": {
+     "value": 3.18,
+     "tolerance": {
+      "abs": 0.005
+     }
+    },
+    "impedance_ohm": {
+     "value": 190,
+     "tolerance": {
+      "abs": 0.5
      }
     }
    }
@@ -50771,6 +51092,39 @@
    }
   },
   {
+   "tile_id": "shore-post-load",
+   "source_publisher": "CED Engineering (Metwally)",
+   "source_title": "Structural Analysis, Design and Construction of Concrete Formwork (S03-030), Section 3.2 Example 4",
+   "source_edition_or_year": "course, p. 28",
+   "source_section_or_page": "9 in slab: 150(9/12) = 112.5 psf; forms 10, live 50 -> total design load for slab form = 173 psf (172.5 printed rounded)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "slab_in": 9,
+    "unit_weight": 150,
+    "form_load": 10,
+    "live_load": 50,
+    "spacing_x": 4,
+    "spacing_y": 4,
+    "shore_capacity": 6000,
+    "min_design_psf": 100
+   },
+   "outputs": {
+    "slab_load": {
+     "value": 112.5,
+     "tolerance": {
+      "abs": 0.05
+     }
+    },
+    "design_psf": {
+     "value": 173,
+     "tolerance": {
+      "abs": 0.6
+     }
+    }
+   }
+  },
+  {
    "tile_id": "scaffold-mudsill-bearing",
    "source_publisher": "Bearing-pressure identity / OSHA 1926.451(c)(2)",
    "source_title": "4,000 lb leg on a 2x10 (9.25 in) x 24 in mudsill, 2,000 psf allowable",
@@ -51050,6 +51404,31 @@
      "value": 5.9373711,
      "tolerance": {
       "abs": 0.0001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "concrete-maturity",
+   "source_publisher": "Nebraska Department of Transportation",
+   "source_title": "Inspector Training for Maturity Method Field Monitoring, Example 1",
+   "source_edition_or_year": "p. 2",
+   "source_section_or_page": "20 C placed, 50 C three hours later: Ta = (20 + 50)/2 = 35, datum -10 C, M(t) = (35 + 10) x 3 = 135 (entered as 95 F average, 14 F datum)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "concrete_temp_f": 95,
+    "hours": 3,
+    "datum_f": 14,
+    "q_kelvin": 5000,
+    "ref_temp_f": 68,
+    "target_ttf_c": 0
+   },
+   "outputs": {
+    "M_c": {
+     "value": 135,
+     "tolerance": {
+      "abs": 0.05
      }
     }
    }

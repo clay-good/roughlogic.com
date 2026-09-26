@@ -13661,14 +13661,14 @@ export const CITATIONS = {
     ],
   },
   "draft-beer-line-balance": {
-    formula: "line_length_ft = (applied_pressure_psi - 0.5 x rise_ft - 1) / R, where R is the tubing restriction (psi/ft): 3/16\" vinyl 3.0, 1/4\" vinyl 0.85, 3/16\" barrier 2.2, 5/16\" vinyl 0.4.",
+    formula: "line_length_ft = (applied_pressure_psi - 0.5 x rise_ft - fixture_psi) / R, where R is the tubing restriction (psi/ft, DBQM Table 4.1): 3/16\" vinyl 3.0, 1/4\" vinyl 0.85, 5/16\" vinyl 0.4, 1/4\" barrier 0.30, 5/16\" barrier 0.10, 3/8\" barrier 0.06; 3/16\" barrier 2.2 is not a table value.",
     edition: "Draft-beer line balancing (the Brewers Association Draught Beer Quality Manual system-balance equation), by name; the dispense system and the beer govern.",
     freeAccess: "The system-balance relation (applied pressure = total restriction) is published draught-beer practice; the tubing restriction is a nominal material property.",
     governance: GOVERNANCE.general,
-    editionNote: "Draft-beer line balancing: at balance the applied CO2 pressure equals the total restriction -- the line (restriction R per foot times length), plus 0.5 psi per foot of vertical rise, plus about 1 psi at the faucet -- so line = (pressure - 0.5 x rise - 1) / R. Set the applied pressure to the beer's carbonation level first (fixed by style and serving temperature); then choose the line to balance it so the pour is neither foamy (line too short/fast) nor flat and slow (too long). Restriction values are nominal for the listed tubing at cellar temperature; the actual pour rate (a 12-16 second fill of a 12 oz glass) should be measured and the line trimmed to tune it. A design aid, not a guarantee; the dispense system and the beer govern.",
+    editionNote: "Draft-beer line balancing: at balance the applied CO2 pressure equals the total restriction -- the line (restriction R per foot times length), plus 0.5 psi per foot of vertical rise, plus any tower resistance (the manual treats couplers and faucets as negligible and puts a tower at 0-8 psi per its maker) -- so line = (pressure - 0.5 x rise - tower) / R. Set the applied pressure to the beer's carbonation level first (fixed by style and serving temperature); then choose the line to balance it so the pour is neither foamy (line too short/fast) nor flat and slow (too long). Restriction values are nominal for the listed tubing at cellar temperature; the actual pour rate (a 12-16 second fill of a 12 oz glass) should be measured and the line trimmed to tune it. A design aid, not a guarantee; the dispense system and the beer govern.",
     assumptions: [
-      { name: "Tubing restriction", value: "3/16\" vinyl 3.0, 1/4\" vinyl 0.85, 3/16\" barrier 2.2, 5/16\" vinyl 0.4 psi/ft (nominal, cellar temp)", source: "Brewers Association" },
-      { name: "Rise and faucet", value: "0.5 psi per foot of vertical rise, plus ~1 psi faucet allowance", source: "Draught Beer Quality Manual" },
+      { name: "Tubing restriction", value: "3/16\" vinyl 3.0, 1/4\" vinyl 0.85, 5/16\" vinyl 0.4, 1/4\" barrier 0.30, 5/16\" barrier 0.10, 3/8\" barrier 0.06 psi/ft (nominal, cellar temp); 3/16\" barrier 2.2 is offered but is not in the table", source: "Brewers Association Draught Beer Quality Manual, 4th ed. (2019), Table 4.1" },
+      { name: "Rise and fixtures", value: "0.5 psi per foot of vertical rise (the manual's convention; water is 0.43); couplers and faucets negligible; a tower 0-8 psi per its maker, entered as the fixture resistance", source: "Draught Beer Quality Manual, Ch. 4" },
     ],
   },
   "load-profitability": {
@@ -16902,14 +16902,14 @@ export const CITATIONS = {
     ],
   },
   "motor-rms-hp": {
-    formula: "rms_hp = sqrt( (hp_run^2 x run_time_s + hp_idle^2 x idle_time_s) / (run_time_s + idle_time_s / cooling_factor) ). The idle/stopped time is divided by the cooling factor K (~3 stopped, ~2 unloaded).",
+    formula: "rms_hp = sqrt( (hp_run^2 x run_time_s + hp_idle^2 x idle_time_s) / (run_time_s + idle_time_s / cooling_factor) ). Only stopped time (hp_idle = 0) is divided by the standstill cooling factor K (3 open drip-proof, 2 totally enclosed); a segment that still runs counts at full time.",
     edition: "Motor duty-cycle RMS-horsepower sizing method (NEMA MG-1 duty-cycle practice; standard motor-application references), by name; the motor's thermal-damage curve and duty rating govern.",
     freeAccess: "The RMS-horsepower relation is public engineering practice (the root-mean-square heating equivalent); the load horsepowers, the run and idle times, and the cooling factor come from the driven-load duty cycle and the motor's cooling type.",
     governance: GOVERNANCE.general,
     editionNote: "The RMS (root-mean-square) horsepower of a repeating duty cycle is the single constant horsepower that heats the motor the same as the real varying load, so it sets the smallest CONTINUOUS-rated motor that will not overheat on that cycle. Because motor heating goes as current squared and current tracks horsepower, the equivalent is a root-mean-square, not a simple average: HP_rms = sqrt( (HP_run^2 x t_run + HP_idle^2 x t_idle) / (t_run + t_idle / K) ). The denominator is an EFFECTIVE time: the idle or stopped time is divided by the cooling factor K because a self-cooled (fan-on-shaft) motor moves less or no cooling air when it is stopped or turning slowly, so that time counts for less cooling -- K is commonly taken as ~3 for a motor stopped at standstill and ~2 for a motor running unloaded, and it is editable. A larger K (worse idle cooling) raises the required RMS horsepower. This method sizes the THERMAL (heating) duty only; the PEAK horsepower on the cycle must separately fall within the motor's breakdown-torque capability, or the motor stalls regardless of its thermal rating. A screen; the motor's thermal-damage curve, service factor, and the manufacturer's duty (S1-S10) rating govern.",
     assumptions: [
       { name: "RMS heating equivalent", value: "HP_rms = sqrt(sum(HP^2 t) / effective_time); heating goes as HP^2, so the equivalent is a root-mean-square", source: "motor-application practice" },
-      { name: "Idle cooling factor", value: "idle/stopped time divided by K (~3 stopped, ~2 unloaded) for reduced self-cooling; peak-vs-breakdown-torque is a separate check", source: "NEMA MG-1 duty-cycle practice" },
+      { name: "Standstill cooling factor", value: "stopped time divided by C = 3 (open drip-proof) or 2 (totally enclosed) because a self-cooled motor at standstill loses its fan; running time counts in full; peak-vs-breakdown-torque is a separate check", source: "E. Cowern (Baldor), Economical motor sizing for peak loads, Machine Design, 2001" },
     ],
   },
   "reduced-voltage-starter": {

@@ -565,7 +565,7 @@ export const BESPOKE_LABELS = {
   "motor-operating-cost": {"hp":"Rated horsepower","efficiency_pct":"Full-load efficiency (%)","load_factor_pct":"Average load (% of rated)","hours_per_year":"Run hours per year","rate_usd_per_kwh":"Energy rate ($/kWh)"},
   "motor-overload-sizing": {"fla_A":"Nameplate full-load current FLA (A)","sf":"Marked service factor (blank if unmarked)","rise_C":"Marked temperature rise (°C, blank if unmarked)"},
   "motor-pole-identification": {"rated_rpm":"Nameplate full-load speed (rpm)","line_freq_hz":"Line frequency (Hz)"},
-  "motor-rms-hp": {"hp_run":"Working (run) load (HP)","run_time_s":"Run time (s)","hp_idle":"Idle / light load (HP)","idle_time_s":"Idle / rest time (s)","cooling_factor":"Idle cooling factor (3 stopped, 2 unloaded)"},
+  "motor-rms-hp": {"hp_run":"Working (run) load (HP)","run_time_s":"Run time (s)","hp_idle":"Idle / light load (HP)","idle_time_s":"Idle / rest time (s)","cooling_factor":"Standstill cooling factor (3 open drip-proof, 2 totally enclosed)"},
   "motor-run-hours-for-budget": {"hp":"Rated horsepower","efficiency_pct":"Full-load efficiency (%)","load_factor_pct":"Average load (% of rated)","rate_usd_per_kwh":"Energy rate ($/kWh)","cost_budget_usd":"Annual energy budget ($)"},
   "motor-shaft-torque": {"rpm":"Shaft speed (rpm)","hp":"Horsepower (blank to solve from torque)","torque_lbft":"Torque (lb-ft; blank to solve from HP)"},
   "motor-synchronous-speed-slip": {"line_freq_hz":"Line frequency (Hz)","poles":"Poles (even integer)","rated_rpm":"Nameplate full-load speed (rpm)"},

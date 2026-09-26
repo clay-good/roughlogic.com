@@ -714,28 +714,30 @@ export function computeMotorRmsHp({ hp_run = 20, run_time_s = 10, hp_idle = 0, i
   if (!(idle_time_s >= 0)) return { error: "Idle time cannot be negative (s)." };
   if (!(cooling_factor >= 1)) return { error: "Cooling factor must be at least 1 (idle time cools no better than running)." };
   // RMS horsepower over the duty cycle: the constant HP that heats the motor the same as the varying load.
-  // The idle (stopped/unloaded) time is divided by the cooling factor because a self-cooled motor sheds heat
-  // less well when it is not running at speed.
+  // Only STOPPED time is divided by the cooling factor C, because a self-cooled motor at standstill loses its
+  // fan; C is set by the enclosure (3 open drip-proof, 2 totally enclosed; Cowern, Baldor). A second segment
+  // that still runs (hp_idle > 0) keeps full cooling and counts at full time. Until 2026-09-25 that running
+  // segment was divided by C too, and C was described as "3 stopped, 2 unloaded".
   const heat = hp_run * hp_run * run_time_s + hp_idle * hp_idle * idle_time_s;
-  const effective_time_s = run_time_s + idle_time_s / cooling_factor;
+  const effective_time_s = run_time_s + (hp_idle > 0 ? idle_time_s : idle_time_s / cooling_factor);
   const rms_hp = Math.sqrt(heat / effective_time_s);
   if (![rms_hp, effective_time_s].every(Number.isFinite)) return { error: "RMS-horsepower math is not a finite value." };
   return {
     rms_hp,
     effective_time_s,
-    note: "The RMS (root-mean-square) horsepower of a repeating duty cycle: the single constant horsepower that would heat the motor the same as the real varying load, and so the smallest CONTINUOUS-rated motor that will not overheat on that cycle. HP_rms = sqrt( (HP_run^2 x t_run + HP_idle^2 x t_idle) / (t_run + t_idle / K) ), where K is the idle-cooling factor -- the idle or stopped time is divided by K (commonly ~3 for a self-cooled motor at standstill, ~2 running unloaded) because the motor sheds heat less well when it is not turning at speed. A 20 HP load for 10 s then a 20 s rest at K = 3 gives sqrt(20^2 x 10 / (10 + 20/3)) = 15.5 HP_rms, so a 15 HP continuous motor is marginal and a 20 HP is safe. This sizes the THERMAL (heating) duty only -- the PEAK horsepower must still fall within the motor's breakdown-torque capability, a separate check. A screen; the motor's thermal-damage curve, service factor, and the manufacturer's duty rating govern.",
+    note: "The RMS (root-mean-square) horsepower of a repeating duty cycle: the single constant horsepower that would heat the motor the same as the real varying load, and so the smallest CONTINUOUS-rated motor that will not overheat on that cycle. HP_rms = sqrt( (HP_run^2 x t_run + HP_idle^2 x t_idle) / (t_run + t_idle / K) ), where K is the standstill cooling factor -- only STOPPED time (idle HP = 0) is divided by K, because a self-cooled motor at standstill loses its fan; K is about 3 for an open drip-proof motor and 2 for a totally enclosed one. A second segment that still runs at a light load keeps full cooling and counts at full time. A 20 HP load for 10 s then a 20 s rest at K = 3 gives sqrt(20^2 x 10 / (10 + 20/3)) = 15.5 HP_rms, so a 15 HP continuous motor is marginal and a 20 HP is safe. This sizes the THERMAL (heating) duty only -- the PEAK horsepower must still fall within the motor's breakdown-torque capability, a separate check. A screen; the motor's thermal-damage curve, service factor, and the manufacturer's duty rating govern.",
   };
 }
 
 export const motorRmsHpExample = { inputs: { hp_run: 20, run_time_s: 10, hp_idle: 0, idle_time_s: 20, cooling_factor: 3 } };
 
 function _v945renderMotorRmsHp(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: motor RMS horsepower for a duty-cycle load (NEMA MG-1 duty-cycle / RMS-horsepower sizing method), by name. HP_rms = sqrt( (HP_run^2 x t_run + HP_idle^2 x t_idle) / (t_run + t_idle / K) ); the idle time is divided by the cooling factor K (~3 stopped, ~2 unloaded). Sizes the thermal duty only -- check the peak against breakdown torque separately. The motor's thermal-damage curve, service factor, and the manufacturer's duty rating govern.";
+  citationEl.textContent = "Citation: motor RMS horsepower for a duty-cycle load (NEMA MG-1 duty-cycle / RMS-horsepower sizing method), by name. HP_rms = sqrt( (HP_run^2 x t_run + HP_idle^2 x t_idle) / (t_run + t_idle / K) ), dividing by K only when the motor is stopped (idle HP 0); K = 3 open drip-proof, 2 totally enclosed (Cowern, Baldor). Sizes the thermal duty only -- check the peak against breakdown torque separately. The motor's thermal-damage curve, service factor, and the manufacturer's duty rating govern.";
   const hr = makeNumber("Working (run) load (HP)", "mrh-hr", { step: "any", min: "0" });
   const tr = makeNumber("Run time (s)", "mrh-tr", { step: "any", min: "0" });
   const hi = makeNumber("Idle / light load (HP)", "mrh-hi", { step: "any", min: "0" });
   const ti = makeNumber("Idle / rest time (s)", "mrh-ti", { step: "any", min: "0" });
-  const cf = makeNumber("Idle cooling factor (3 stopped, 2 unloaded)", "mrh-cf", { step: "any", min: "1" });
+  const cf = makeNumber("Standstill cooling factor (3 open drip-proof, 2 totally enclosed)", "mrh-cf", { step: "any", min: "1" });
   for (const f of [hr, tr, hi, ti, cf]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { hr.input.value = "20"; tr.input.value = "10"; hi.input.value = "0"; ti.input.value = "20"; cf.input.value = "3"; update(); });
   const oRms = makeOutputLine(outputRegion, "RMS horsepower", "mrh-out-r");

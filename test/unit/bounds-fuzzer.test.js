@@ -25586,7 +25586,12 @@ import { computeDraftBeerLineBalance as _v787 } from "../../calc-kitchen.js";
 
 test("bounds: spec-v787 computeDraftBeerLineBalance pins the balanced line length, resistance, and error seams", () => {
   const r = _v787({ applied_pressure_psi: 12, rise_ft: 4, tubing_type: "vinyl_316" });
-  assert.ok(Math.abs(r.line_length_ft - 3.0) < 1e-9); // (12 - 0.5*4 - 1)/3.0
+  // DBQM: resistance = applied pressure, faucets negligible. Until 2026-09-25 a 1 psi faucet
+  // allowance nobody published was subtracted: (12 - 2 - 1)/3 = 3.0.
+  assert.ok(Math.abs(r.line_length_ft - 10 / 3) < 1e-9); // (12 - 0.5*4 - 0)/3.0
+  assert.ok(Math.abs(_v787({ applied_pressure_psi: 12, rise_ft: 4, tubing_type: "vinyl_316", fixture_psi: 1 }).line_length_ft - 3.0) < 1e-9);
+  // DBQM Table 4.1: 20 ft of 1/4" vinyl gives 17 psi.
+  assert.ok(Math.abs(_v787({ applied_pressure_psi: 17, rise_ft: 0, tubing_type: "vinyl_14" }).line_length_ft - 20) < 1e-9);
   assert.strictEqual(r.resistance_psi_per_ft, 3.0);
   assert.strictEqual(r.balanced, true);
   // A less-restrictive line needs more length for the same pressure; more rise shortens it.
@@ -25594,7 +25599,7 @@ test("bounds: spec-v787 computeDraftBeerLineBalance pins the balanced line lengt
   assert.ok(wide.line_length_ft > r.line_length_ft); // 0.85 psi/ft -> longer line
   assert.ok(_v787({ applied_pressure_psi: 12, rise_ft: 10, tubing_type: "vinyl_316" }).line_length_ft < r.line_length_ft);
   // Under-pressured: applied barely exceeds rise + faucet -> non-positive length, balanced false.
-  const low = _v787({ applied_pressure_psi: 3, rise_ft: 4, tubing_type: "vinyl_316" });
+  const low = _v787({ applied_pressure_psi: 3, rise_ft: 4, tubing_type: "vinyl_316", fixture_psi: 1 });
   assert.strictEqual(low.balanced, false);
   assert.ok(low.line_length_ft <= 0);
   // Error seams: bad tubing, non-finite, non-positive pressure.
@@ -29734,10 +29739,11 @@ test("bounds: spec-v945 computeMotorRmsHp pins the RMS heating equivalent, the c
   const k1 = _v945({ hp_run: 20, run_time_s: 10, hp_idle: 0, idle_time_s: 20, cooling_factor: 1 });
   assert.ok(Math.abs(k1.rms_hp - 11.547005) < 1e-4); // sqrt(4000/30)
   assert.ok(k1.rms_hp < r.rms_hp); // K=1 (full cooling) -> smaller motor than K=3
-  // A non-zero idle load adds heat and raises the RMS horsepower.
+  // A second segment that still RUNS keeps its fan cooling, so it counts at full time and is not divided by
+  // the standstill factor (Cowern, Baldor). Until 2026-09-25 it was: sqrt(6000/16.67) = 18.97.
   const withIdle = _v945({ hp_run: 20, run_time_s: 10, hp_idle: 10, idle_time_s: 20, cooling_factor: 3 });
-  assert.ok(Math.abs(withIdle.rms_hp - 18.973666) < 1e-4);
-  assert.ok(withIdle.rms_hp > r.rms_hp);
+  assert.ok(Math.abs(withIdle.rms_hp - Math.sqrt(6000 / 30)) < 1e-9); // 14.14
+  assert.ok(Math.abs(withIdle.effective_time_s - 30) < 1e-9);
   // A pure steady load (no idle) returns the run horsepower exactly.
   assert.ok(Math.abs(_v945({ hp_run: 15, run_time_s: 10, hp_idle: 0, idle_time_s: 0, cooling_factor: 3 }).rms_hp - 15) < 1e-9);
   // Error seams: non-positive run HP or run time, negative idle HP/time, cooling factor < 1, non-finite.

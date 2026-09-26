@@ -1159,36 +1159,44 @@ const renderOverrunPercent = _r({
 KITCHEN_RENDERERS["overrun-percent"] = renderOverrunPercent;
 
 // --- spec-v787 O: draft beer line balancing (`draft-beer-line-balance`) ---
-// System balance: applied CO2 pressure = line restriction (R x length) + rise (0.5 psi/ft)
-// + faucet allowance (1 psi). Solve for the balanced line length.
-// R = tubing restriction (psi/ft): 3/16" vinyl 3.0, 1/4" vinyl 0.85, 3/16" barrier 2.2, 5/16" vinyl 0.4.
+// System balance (Brewers Association Draught Beer Quality Manual, 4th ed. 2019, Ch. 4): applied CO2
+// pressure = line restriction (R x length) + rise (0.5 psi/ft) + any tower/fixture resistance. The DBQM
+// calls couplers and faucets negligible and puts a tower at 0-8 psi per its maker, so the fixture term is
+// an input defaulting to 0. Until 2026-09-25 a fixed 1 psi "faucet allowance" was subtracted and credited
+// to the DBQM, which has no such term. R values are DBQM Table 4.1 except 3/16" barrier, which the table
+// does not list.
 const BEER_LINE_RESISTANCE = {
   vinyl_316: { r: 3.0, label: '3/16" ID vinyl' },
   vinyl_14: { r: 0.85, label: '1/4" ID vinyl' },
-  barrier_316: { r: 2.2, label: '3/16" ID barrier (polyethylene)' },
+  barrier_316: { r: 2.2, label: '3/16" ID barrier (not in DBQM Table 4.1)' },
   vinyl_516: { r: 0.4, label: '5/16" ID vinyl' },
+  barrier_14: { r: 0.3, label: '1/4" ID barrier' },
+  barrier_516: { r: 0.1, label: '5/16" ID barrier' },
+  barrier_38: { r: 0.06, label: '3/8" ID barrier' },
 };
-// dims: in { applied_pressure_psi: M L^-1 T^-2, rise_ft: L, tubing_type: dimensionless } out: { line_length_ft: L, resistance_psi_per_ft: dimensionless }
-export function computeDraftBeerLineBalance({ applied_pressure_psi = 0, rise_ft = 0, tubing_type = "vinyl_316" } = {}) {
+// dims: in { applied_pressure_psi: M L^-1 T^-2, rise_ft: L, tubing_type: dimensionless, fixture_psi: M L^-1 T^-2 } out: { line_length_ft: L, resistance_psi_per_ft: dimensionless }
+export function computeDraftBeerLineBalance({ applied_pressure_psi = 0, rise_ft = 0, tubing_type = "vinyl_316", fixture_psi = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const P = Number(applied_pressure_psi) || 0;
   const rise = Number(rise_ft) || 0;
   const tube = BEER_LINE_RESISTANCE[tubing_type];
   if (!tube) return { error: "Tubing type must be one of the listed beer-line sizes." };
   if (!(P > 0)) return { error: "Applied CO2 pressure must be positive (psi)." };
+  const fixture = Number(fixture_psi) || 0;
+  if (!(fixture >= 0)) return { error: "Tower/fixture resistance cannot be negative (psi)." };
   const R = tube.r;
-  const line_length_ft = (P - 0.5 * rise - 1) / R;
+  const line_length_ft = (P - 0.5 * rise - fixture) / R;
   if (!Number.isFinite(line_length_ft)) return { error: "Line-balance math is not a finite value." };
   const balanced = line_length_ft > 0;
   return {
     line_length_ft, resistance_psi_per_ft: R, tubing_label: tube.label, balanced,
-    note: (balanced ? "" : "The applied pressure barely exceeds the rise plus the ~1 psi faucet allowance, so no positive line length balances it -- raise the applied pressure, use a less restrictive (larger) line, or shorten the rise. ")
-      + "Draft-beer line balancing (Brewers Association Draught Beer Quality Manual): at balance the applied CO2 pressure equals the total restriction -- the line (restriction R per foot times length), plus 0.5 psi per foot of vertical rise, plus about 1 psi at the faucet. Solve for length: line = (pressure - 0.5 x rise - 1) / R. Set the applied pressure to the beer's carbonation level first (that is fixed by style and temperature); then choose the line to balance it so the pour is not foamy (too short/fast) or flat and slow (too long). Restriction values are nominal for the listed tubing at cellar temperature; measure the actual pour rate (a 12-16 second fill of a 12 oz glass, about 1 gal in 60-90 s) and trim the line to tune it. A design aid; the dispense system and the beer govern.",
+    note: (balanced ? "" : "The applied pressure barely exceeds the rise plus the tower/fixture resistance, so no positive line length balances it -- raise the applied pressure, use a less restrictive (larger) line, or shorten the rise. ")
+      + "Draft-beer line balancing (Brewers Association Draught Beer Quality Manual): at balance the applied CO2 pressure equals the total restriction -- the line (restriction R per foot times length), plus 0.5 psi per foot of vertical rise, plus any tower resistance (the manual treats couplers and faucets as negligible and puts a tower at 0-8 psi per its maker). Solve for length: line = (pressure - 0.5 x rise - tower) / R. Set the applied pressure to the beer's carbonation level first (that is fixed by style and temperature); then choose the line to balance it so the pour is not foamy (too short/fast) or flat and slow (too long). Restriction values are nominal for the listed tubing at cellar temperature; measure the actual pour rate (a 12-16 second fill of a 12 oz glass, about 1 gal in 60-90 s) and trim the line to tune it. A design aid; the dispense system and the beer govern.",
   };
 }
-export const draftBeerLineBalanceExample = { inputs: { applied_pressure_psi: 12, rise_ft: 4, tubing_type: "vinyl_316" } };
+export const draftBeerLineBalanceExample = { inputs: { applied_pressure_psi: 12, rise_ft: 4, tubing_type: "vinyl_316", fixture_psi: 0 } };
 const renderDraftBeerLineBalance = _r({
-  citation: "Citation: draft-beer line balancing (Brewers Association Draught Beer Quality Manual): at balance the applied CO2 pressure = line restriction (R x length) + rise (0.5 psi/ft) + faucet (~1 psi); line = (pressure - 0.5 x rise - 1) / R. Restriction R (psi/ft): 3/16\" vinyl 3.0, 1/4\" vinyl 0.85, 3/16\" barrier 2.2, 5/16\" vinyl 0.4 (nominal, cellar temp). Set the applied pressure to the carbonation level, then balance the line; measure the pour rate and trim. A design aid; the dispense system governs.",
+  citation: "Citation: draft-beer line balancing (Brewers Association Draught Beer Quality Manual): at balance the applied CO2 pressure = line restriction (R x length) + rise (0.5 psi/ft) + tower (0-8 psi per its maker; couplers and faucets negligible); line = (pressure - 0.5 x rise - tower) / R. Restriction R (psi/ft, DBQM Table 4.1): 3/16\" vinyl 3.0, 1/4\" vinyl 0.85, 5/16\" vinyl 0.4, 1/4\" barrier 0.30, 5/16\" barrier 0.10, 3/8\" barrier 0.06; 3/16\" barrier 2.2 is not in the table (nominal, cellar temp). Set the applied pressure to the carbonation level, then balance the line; measure the pour rate and trim. A design aid; the dispense system governs.",
   example: draftBeerLineBalanceExample.inputs,
   fields: [
     { key: "applied_pressure_psi", label: "Applied CO2 pressure (psi, = carbonation level)", kind: "number" },
@@ -1198,7 +1206,11 @@ const renderDraftBeerLineBalance = _r({
       { value: "vinyl_14", label: "1/4\" ID vinyl (0.85 psi/ft)" },
       { value: "barrier_316", label: "3/16\" ID barrier (2.2 psi/ft)" },
       { value: "vinyl_516", label: "5/16\" ID vinyl (0.4 psi/ft)" },
+      { value: "barrier_14", label: "1/4\" ID barrier (0.30 psi/ft)" },
+      { value: "barrier_516", label: "5/16\" ID barrier (0.10 psi/ft)" },
+      { value: "barrier_38", label: "3/8\" ID barrier (0.06 psi/ft)" },
     ] },
+    { key: "fixture_psi", label: "Tower / fixture resistance (psi, 0 if none)", kind: "number" },
   ],
   outputs: [
     { key: "l", id: "beerbal-out-l", label: "Balanced line length", value: (r) => r.balanced ? fmt(r.line_length_ft, 1) + " ft of " + r.tubing_label : "no positive length balances (see note)" },
