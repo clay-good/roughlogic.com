@@ -2853,7 +2853,7 @@ cross-check.
 | calc-marine.js | `computeSheetPilePenetration` | `{ retained_height_ft = 0, friction_angle_deg = 0, unit_weight_pcf = 0, increa...` | _ | _ | _ |
 | calc-marine.js | `computeSlurryCriticalVelocity` | `{ pipe_diameter_in = 0, solids_specific_gravity = 0, durand_coefficient = 0, ...` | _ | _ | _ |
 | calc-marine.js | `computeWaveHeightFetch` | `{ wind_speed_mph = 0, fetch_mi = 0, alternative_fetch_mi = 0, alternative_win...` | _ | _ | _ |
-| calc-masonry.js | `computeBrickVeneerAnchorSpacing` | `{ area_ft2 = 0, area_per = 2.67, max_horiz_in = 32, max_vert_in = 24 } = {}` | _ | _ | _ |
+| calc-masonry.js | `computeBrickVeneerAnchorSpacing` | `{ area_ft2 = 0, area_per = 2.67, max_horiz_in = 32, max_vert_in = 25 } = {}` | _ | _ | _ |
 | calc-masonry.js | `computeBrickVeneerWeepCount` | `{ wall_length_ft = 30, max_spacing_in = 33, flashing_lines = 1 } = {}` | _ | _ | _ |
 | calc-masonry.js | `computeCmuShearWall` | `{ fm_psi = 1500, b_in = 0, dv_in = 0, p_lb = 0, mvd = 0.5, av_in2 = 0, s_in =...` | _ | _ | _ |
 | calc-masonry.js | `computeCmuWallAxial` | `{ fm_psi = 2000, an_in2 = 0, ast_in2 = 0, h_in = 0, r_in = 0, fs_psi = 32000 ...` | _ | _ | _ |
@@ -2861,8 +2861,8 @@ cross-check.
 | calc-masonry.js | `computeFireplaceFlueArea` | `{ opening_width_in = 0, opening_height_in = 0, flue_shape = "rectangular", fl...` | _ | _ | _ |
 | calc-masonry.js | `computeGroutLiftPourHeight` | `{ pour_height_ft = 0, lift_height_ft = 0, max_pour_height_ft = 0, max_lift_he...` | _ | _ | _ |
 | calc-masonry.js | `computeMasonryAnchorBolt` | `{ fm_psi = 1500, lbe_in = 0, ab_in2 = 0, fy_psi = 36000 } = {}` | _ | _ | _ |
-| calc-masonry.js | `computeMasonryAnchorEmbedment` | `{ required_tension_lb = 0, fm_psi = 1500, ab_in2 = 0.442, fy_psi = 36000 } = {}` | _ | _ | _ |
-| calc-masonry.js | `computeMasonryAnchorShear` | `{ fm_psi = 1500, lb_in = 5, lbe_in = 4, ab_in2 = 0.442, fy_psi = 36000 } = {}` | _ | _ | _ |
+| calc-masonry.js | `computeMasonryAnchorEmbedment` | `{ required_tension_lb = 0, fm_psi = 1500, ab_in2 = 0.334, fy_psi = 36000 } = {}` | _ | _ | _ |
+| calc-masonry.js | `computeMasonryAnchorShear` | `{ fm_psi = 1500, lb_in = 5, lbe_in = 4, ab_in2 = 0.334, fy_psi = 36000 } = {}` | _ | _ | _ |
 | calc-masonry.js | `computeMasonryCleaningDilution` | `{ area_ft2 = 0, dilution_parts_water = 0, coverage_ft2_per_gal = 0, prewet_ga...` | _ | _ | _ |
 | calc-masonry.js | `computeMasonryJointReinforcement` | `{ wall_length_ft = 40, wall_height_ft = 12, vertical_spacing_in = 16, piece_l...` | _ | _ | _ |
 | calc-masonry.js | `computeMasonryLimitedAccessZone` | `{ wall_height_ft = 0, wall_length_ft = 0, zone_width_provided_ft = 0, zone_ru...` | _ | _ | _ |
@@ -3949,8 +3949,8 @@ per spec-v14 §13.1 second paragraph.
 | `cable-reel-capacity` | Cable Reel Capacity / Length on Reel | Reel-capacity identity (first-princip...; length = 0.9*PI*(900-144)*18/(48*1) = 801 ft | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `cable-support-jhook` | J-Hook / Bridle-Ring Count and Bundle Weight | J-hook support identity (first-princi...; hooks = ceil(400/4) = 100; load = 50*0.035*4 = 7 lb/hook | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `cable-tray-fill` | Cable Tray Fill | NEC Article 392.22(A) (by name); six 1.5 in 4/0 cables in a 12 in ladder tray -> 9 in of 1... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
-| `camera-lens-fov` | Camera Lens FOV and Pixel Density (DORI) | IEC 62676-4 DORI; spec-v456 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
-| `camera-max-distance-for-ppf` | Camera Max Distance for a Pixel Density (DORI) | IEC 62676-4 DORI (solved for the dist...; spec-v741 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `camera-lens-fov` | Camera Lens FOV and Pixel Density (DORI) | IEC 62676-4 DORI; spec-v456 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
+| `camera-max-distance-for-ppf` | Camera Max Distance for a Pixel Density (DORI) | IEC 62676-4 DORI (solved for the dist...; spec-v741 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `capacitor-bank-for-resonance-order` | Max PF Capacitor Bank to Keep Resonance Off a Harmonic | parallel-resonance order of a PF capa...; 200 MVA bus, target order 4.7 (below the 5th) -> 9.05 MVA... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `capacitor-bank-voltage-rise` | Line Capacitor Bank Voltage Rise | Project (first-principles); ANSI C84.1, IEEE 1036 and a distribution power-flow study... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `capacitor-discharge-time` | Capacitor Discharge Time and Bleed Resistor (NEC 460.6) | NEC 2023 460.6; spec-v495 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -3969,7 +3969,7 @@ per spec-v14 §13.1 second paragraph.
 | `conduit-90-stub` | Conduit 90 Stub and Back-to-Back | Ugly's Electrical References (by name); 3/4 in EMT, 8 in stub, 6 in deduct -> 2 in mark | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `conduit-expansion-max-run` | PVC Conduit Max Run Before an Expansion Fitting | NFPA; spec-v665 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `conduit-fill` | Conduit Fill | NFPA; Chapter 9 Tables 1, 4, 5; 4 conductors -> 40% fill thresh... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
-| `conduit-jam-ratio` | Conduit Jam Ratio for Three Same-Size Conductors (NEC Ch. 9) | NEC (NFPA 70) Chapter 9; spec-v374 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `conduit-jam-ratio` | Conduit Jam Ratio for Three Same-Size Conductors (NEC Ch. 9) | NEC (NFPA 70) Chapter 9; spec-v374 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `conduit-nipple-60-fill` | Conduit Nipple 60% Fill (NEC Ch. 9 Note 4) | Conduit nipple 60% fill (NEC Chapter ...; fill = 20 x 0.0211 / 0.864 = 48.8%; nipple max 0.6 x 0.86... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `conduit-offset` | Conduit Offset Bend | Ugly's Electrical References / NECA b...; 6 in offset at 30 deg -> 12 in mark spacing, multiplier 2... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `conduit-saddle` | Conduit Saddle Bend | Ugly's Electrical References (by name); 3 in obstruction, 45/22.5 preset -> 7.5 in outer-mark spa... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -4338,7 +4338,7 @@ per spec-v14 §13.1 second paragraph.
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
-| `adpi-diffuser-selection` | ADPI Room Air Diffusion Selection (ASHRAE) | ASHRAE Handbook -- Fundamentals, Spac...; spec-v482 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `adpi-diffuser-selection` | ADPI Room Air Diffusion Selection (ASHRAE) | ASHRAE Handbook -- Fundamentals, Spac...; spec-v482 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `affinity-laws` | Fan Affinity Laws | ASHRAE; ratio = 1500/1750 = 0.857; CFM = 5000 * r = 4285.7; SP = ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `air-changes-hour` | Air Changes per Hour (ACH) | ASHRAE; ACH = 1000*60/10000 = 6.0, within the 4-6 classroom target | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `air-density-correction` | Air Density Correction for Altitude and Temperature (ACFM/SCFM) | ASHRAE Fundamentals; spec-v349 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
@@ -4496,7 +4496,7 @@ per spec-v14 §13.1 second paragraph.
 | `pitot-traverse-average` | Pitot Traverse Airflow from Point Readings (Velocity-Averaged) | ASHRAE Fundamentals / AABC-NEBB; Point velocities 4005 x sqrt(VP) = 1201.5, 1602, 2002.5, ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `pitot-traverse-cfm` | Pitot Traverse Airflow (Velocity Pressure to CFM) | ASHRAE Fundamentals / AABC-NEBB; spec-v385 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `plenum-return-drop` | Ceiling Plenum Return Path Pressure Drop | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
-| `product-pull-down-load` | Product Pull-Down Load | ASHRAE Refrigeration; spec-v433 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `product-pull-down-load` | Product Pull-Down Load | ASHRAE Refrigeration; spec-v433 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `product-pull-down-time` | Product Pull-Down Time | ASHRAE Refrigeration; spec-v698 section 2.1 pinned example (inverse of spec-v433) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `proportional-balance-ratio` | Proportional Balancing Ratio Method | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `pump-impeller-trim` | Pump Impeller Trim for a Balanced Flow | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -4890,9 +4890,9 @@ per spec-v14 §13.1 second paragraph.
 | `lock-backset-strike-layout` | Lock Backset, Bore, Stile, and Strike Layout | Project (first-principles); the lock manufacturer's template governs | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `lumber-spans` | Lumber Spans | Project (first-principles) over AWC N...; DF-L No.2 / 2x10 / 50 psf total / 16 in o.c. / L/360 -> 1... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `machine-room-heat` | Elevator Machine Room Heat Load and Cooling | Project (first-principles); ASME A17.1 and the manufacturer's environmental limits named | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
-| `masonry-anchor-bolt` | Masonry Headed Anchor Bolt Tension (TMS 402 ASD) | TMS 402 ASD; spec-v449 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
-| `masonry-anchor-embedment` | Masonry Anchor Embedment for a Tension (TMS 402 ASD) | TMS 402 ASD; 5,000 lb tension, 1,500 psi masonry -> 5.73 in embedment;... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
-| `masonry-anchor-shear` | Masonry Anchor Bolt in Shear (TMS 402 ASD) | TMS 402-16 ASD (Section 8.1.5.2); 3/4in A307, 1,500 psi, 5 in embed 4 in from edge: Bvb 1,2... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `masonry-anchor-bolt` | Masonry Headed Anchor Bolt Tension (TMS 402 ASD) | TMS 402 ASD; spec-v449 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
+| `masonry-anchor-embedment` | Masonry Anchor Embedment for a Tension (TMS 402 ASD) | TMS 402 ASD; 5,000 lb tension, 1,500 psi masonry -> 5.73 in embedment;... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `masonry-anchor-shear` | Masonry Anchor Bolt in Shear (TMS 402 ASD) | TMS 402-16 ASD (Section 8.1.5.2); 3/4in A307, 1,500 psi, 5 in embed 4 in from edge: Bvb 1,2... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `masonry-cleaning-dilution` | Masonry Cleaning Dilution, Coverage, and Rinse | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `masonry-control-joint-layout` | Masonry Control-Joint Layout | Masonry control-joint rule (NCMA empi...; max spacing = min(1.5*16, 25) = 24 ft; panels = ceil(80/2... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `masonry-count` | Brick and CMU Count | Project (first-principles face-area c...; 100 ft^2 wall / CMU 8x8x16 (15.625x7.625 actual) / 3/8 in... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -4902,7 +4902,7 @@ per spec-v14 §13.1 second paragraph.
 | `masonry-lintel-bearing` | Masonry Lintel Bearing Length (TMS 402) | TMS 402 (MSJC); 6-ft clear span, 8-in lintel, 500 plf, 7.625-in bearing w... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `masonry-lintel-loading` | Masonry Lintel Arching Load (Triangular Load Over an Opening) | masonry design method; spec-v370 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `masonry-prism-fm` | Masonry Compressive Strength f'm, Unit-Strength Method (TMS 602 Table 2) | TMS 602-16 (ACI 530.1 / ASCE 6) Table...; spec-v551 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+4 more) |
-| `masonry-wall-weight` | Masonry Wall Dead Load | NCMA TEK; spec-v368 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `masonry-wall-weight` | Masonry Wall Dead Load | NCMA TEK; spec-v368 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `mass-concrete-temp-rise` | Mass Concrete Adiabatic Temperature Rise Screen (ACI 207) | ACI 207 adiabatic temperature-rise sc...; rise = 600*12/100 = 72 degF; peak = 70+72 = 142 degF; 72 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `mass-haul-overhaul` | Mass Haul Balance, Free Haul, and Overhaul | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `mast-climber-platform-load` | Mast Climbing Work Platform Zone Load | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |

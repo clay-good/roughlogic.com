@@ -4840,7 +4840,7 @@ export function computeEconomizerEnthalpyChangeover({ mode = "differential_entha
     const toa = Number(t_outdoor_f);
     const sp = Number(setpoint_f);
     if (!Number.isFinite(toa) || !Number.isFinite(sp)) return { error: "Enter valid temperatures (F)." };
-    const enable = toa < sp;
+    const enable = !(toa > sp); // 90.1 shuts off when TOA > the setpoint
     return {
       mode, enable, margin: sp - toa, unit: "F",
       note: "Fixed-dry-bulb economizer high-limit: enable free cooling when the outdoor dry-bulb is below the setpoint (commonly 65-75 F by climate zone, ASHRAE 90.1 Table 6.5.1.1.3), lock out above it. Simple and reliable but it ignores humidity, so in a humid climate it can bring in muggy air that the coil must then dehumidify. The differential-enthalpy mode is the more accurate high-limit where latent load matters. A control aid; the ASHRAE 90.1 high-limit for the climate zone and the equipment sequence govern.",
@@ -4851,7 +4851,7 @@ export function computeEconomizerEnthalpyChangeover({ mode = "differential_entha
   if (!Number.isFinite(hoa) || !Number.isFinite(hra)) return { error: "Enter valid enthalpies (Btu/lb)." };
   if (mode === "differential_enthalpy_drybulb") {
     // ASHRAE 90.1-2013+ Table 6.5.1.1.3: "differential enthalpy with fixed dry-bulb" shuts off when
-    // hOA > hRA OR TOA > the fixed limit (65/70/75 F by climate zone). Added 2026-09-26 (Trane EN 44-2).
+    // hOA > hRA OR TOA > 75 F (all zones). Added 2026-09-26 (Trane EN 44-2, Table 1).
     const toa = Number(t_outdoor_f);
     const sp = Number(setpoint_f);
     if (!Number.isFinite(toa) || !Number.isFinite(sp) || !(sp > 0)) return { error: "Enter the outdoor dry-bulb and the fixed dry-bulb limit (F)." };
@@ -4860,10 +4860,10 @@ export function computeEconomizerEnthalpyChangeover({ mode = "differential_entha
     const enable = enth_ok && db_ok;
     return {
       mode, enable, margin: db_ok ? hra - hoa : sp - toa, unit: db_ok ? "Btu/lb" : "F", margin_btu: hra - hoa, margin_f: sp - toa, enth_ok, db_ok,
-      note: "Differential enthalpy with fixed dry-bulb (the ASHRAE 90.1-2013 and later prescriptive control, Table 6.5.1.1.3): free cooling shuts off when the outdoor enthalpy exceeds the return enthalpy OR the outdoor dry-bulb exceeds the fixed limit (75 F in dry and marine zones, 70 F in 5A/6A, 65 F in 1A-4A). Plain differential enthalpy was removed from the prescriptive table in 90.1-2013, because a hot, dry outdoor day can carry less enthalpy than the return yet still add sensible load. The margin shown is to the dry-bulb limit when that limit locks the economizer out, otherwise to the return enthalpy. A control aid; the 90.1 edition the jurisdiction adopted and the equipment sequence govern.",
+      note: "Differential enthalpy with fixed dry-bulb (the ASHRAE 90.1-2013 and later prescriptive control, Table 6.5.1.1.3): free cooling shuts off when the outdoor enthalpy exceeds the return enthalpy OR the outdoor dry-bulb exceeds the fixed limit (75 F in every climate zone for this combined control; the 65 / 70 / 75 F split by zone belongs to the plain fixed-dry-bulb control). Plain differential enthalpy was removed from the prescriptive table in 90.1-2013, because a hot, dry outdoor day can carry less enthalpy than the return yet still add sensible load. The margin shown is to the dry-bulb limit when that limit locks the economizer out, otherwise to the return enthalpy. A control aid; the 90.1 edition the jurisdiction adopted and the equipment sequence govern.",
     };
   }
-  const enable = hoa < hra;
+  const enable = !(hoa > hra); // 90.1 shuts off when hOA > hRA; equality still economizes
   return {
     mode, enable, margin: hra - hoa, unit: "Btu/lb",
     note: "Differential-enthalpy economizer high-limit: enable free cooling when the outdoor-air total heat content (enthalpy) is below the return-air enthalpy, lock out above it. Unlike a dry-bulb changeover this accounts for the latent (moisture) load, so a cool but humid outdoor condition that carries more total energy than the return correctly locks the economizer out - bringing that air in would add a dehumidification load. Feed the enthalpies from moist-air-enthalpy. ASHRAE 90.1-2013 and later no longer list plain differential enthalpy as a prescriptive high-limit: it must be paired with a fixed dry-bulb limit (the combined mode). A control aid; the ASHRAE 90.1 high-limit and the equipment sequence govern.",
@@ -4871,7 +4871,7 @@ export function computeEconomizerEnthalpyChangeover({ mode = "differential_entha
 }
 export const economizerEnthalpyChangeoverExample = { inputs: { mode: "differential_enthalpy", h_outdoor: 24, h_return: 28, t_outdoor_f: 70, setpoint_f: 65 } };
 function _v443renderEconomizerEnthalpyChangeover(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: Economizer high-limit changeover (ASHRAE 90.1 6.5.1.1.3): differential-enthalpy enables free cooling when outdoor enthalpy < return enthalpy (accounts for latent load); fixed-dry-bulb enables below a dry-bulb setpoint; 90.1-2013 and later require the combined form, shutting off when hOA > hRA OR TOA > the 65/70/75 F limit. A control aid; the 90.1 high-limit for the climate zone and the equipment sequence govern.";
+  citationEl.textContent = "Citation: Economizer high-limit changeover (ASHRAE 90.1 6.5.1.1.3): differential-enthalpy enables free cooling when outdoor enthalpy < return enthalpy (accounts for latent load); fixed-dry-bulb enables below a dry-bulb setpoint; 90.1-2013 and later require the combined form, shutting off when hOA > hRA OR TOA > 75 F. A control aid; the 90.1 high-limit for the climate zone and the equipment sequence govern.";
   const mode = makeSelect("Changeover type", "eco-mode", [
     { value: "differential_enthalpy", label: "Differential enthalpy (accounts for humidity)" },
     { value: "fixed_drybulb", label: "Fixed dry-bulb setpoint" },

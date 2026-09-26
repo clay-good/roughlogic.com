@@ -4994,18 +4994,20 @@ export function computeConduitJamRatio({ conduit_id_in = 0, conductor_od_in = 0,
   if (!(id > 0)) return { error: "Conduit inside diameter must be positive (in)." };
   if (!(od > 0)) return { error: "Conductor outside diameter must be positive (in)." };
   if (!(od < id)) return { error: "Conductor OD must be smaller than the conduit ID." };
-  if (!(n >= 1)) return { error: "Number of conductors must be at least 1." };
-  const ratio = id / od;
+  if (!(n >= 1 && Number.isInteger(n))) return { error: "Number of conductors must be a whole number, at least 1." };
+  // Southwire / IEEE 1185 jam ratio = 1.05 x ID / OD: a bend ovals the conduit about 5%, and that is where jams happen.
+  // Until 2026-09-26 the straight ID/OD was used, flagging EC&M's 1.05 x 5.07/1.60 = 3.33 "no jam" pull as 3.17, jam-prone.
+  const ratio = 1.05 * id / od;
   const in_band = ratio >= 2.8 && ratio <= 3.2;
   const jam_prone = n === 3 && in_band;
   return {
-    ratio, in_band, jam_prone, n,
-    note: "Conduit jamming: three same-size conductors can wedge (triangulate) in a bend when the conduit ID / conductor OD ratio falls in the narrow band from about 2.8 to 3.2 - the geometry where they lock rather than slide past each other. It applies at EXACTLY three conductors; two or four+ do not triangulate the same way, so the count matters as much as the ratio. Use the NEC Chapter 9 Table 4 conduit ID and Table 5 conductor OD. A jam-prone ratio is a caution to plan the pull (lube, feed order) or upsize the conduit, not a code violation. A design aid; the NEC and the AHJ govern.",
+    ratio, ratio_straight: id / od, in_band, jam_prone, n,
+    note: "Conduit jamming: three same-size conductors can wedge (triangulate) in a bend when the jam ratio 1.05 x conduit ID / conductor OD (the 1.05 allows for the conduit ovaling in the bend; Southwire, IEEE 1185) falls in the narrow band from about 2.8 to 3.2 - the geometry where they lock rather than slide past each other. It applies at EXACTLY three conductors; two or four+ do not triangulate the same way, so the count matters as much as the ratio. Use the NEC Chapter 9 Table 4 conduit ID and Table 5 conductor OD. A jam-prone ratio is a caution to plan the pull (lube, feed order) or upsize the conduit, not a code violation. A design aid; the NEC and the AHJ govern.",
   };
 }
 export const conduitJamRatioExample = { inputs: { conduit_id_in: 2.067, conductor_od_in: 0.65, n_conductors: 3 } };
 function _v374renderConduitJamRatio(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: conduit jam ratio = conduit ID / conductor OD; jamming risk for exactly three same-size conductors when the ratio is ~2.8-3.2, a widely-referenced NEC Chapter 9 pulling guideline (Table 4 conduit ID, Table 5 conductor OD). A caution, not a code limit; the NEC and the AHJ govern.";
+  citationEl.textContent = "Citation: conduit jam ratio = 1.05 x conduit ID / conductor OD (the 1.05 for bend ovality, Southwire / IEEE 1185; EC&M, Simple Calculations for Cable Pulling); jamming risk for exactly three same-size conductors when the ratio is ~2.8-3.2, a widely-referenced NEC Chapter 9 pulling guideline (Table 4 conduit ID, Table 5 conductor OD). A caution, not a code limit; the NEC and the AHJ govern.";
   const id = makeNumber("Conduit inside diameter (in, NEC Ch.9 Table 4)", "cjr-id", { step: "any", min: "0" });
   const od = makeNumber("Conductor outside diameter (in, Table 5)", "cjr-od", { step: "any", min: "0" });
   const n = makeNumber("Number of conductors", "cjr-n", { step: "1", min: "1" });

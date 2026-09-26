@@ -253,6 +253,7 @@ export function computeMasonryWallWeight({ hollow_psf = 0, grout_adder = 0, cell
   const h = Number(height_ft) || 0;
   if (!(hollow > 0)) return { error: "Hollow wall weight must be positive (psf)." };
   if (!(cell > 0)) return { error: "Grouted-cell spacing must be positive (in)." };
+  if (adder < 0) return { error: "Grout adder cannot be negative (psf)." };
   // Ungrouted when grout spacing is 0/blank; capped at full grout (spacing <= cell).
   let grout_term = 0;
   if (gs > 0) grout_term = adder * Math.min(cell / gs, 1);
@@ -262,10 +263,10 @@ export function computeMasonryWallWeight({ hollow_psf = 0, grout_adder = 0, cell
   const total_lb = area > 0 ? wall_psf * area : null;
   return {
     grout_term, wall_psf, line_load_plf, total_lb,
-    note: "Masonry wall dead load: the hollow (ungrouted) wall weight (NCMA table, by thickness and unit density) plus a grout adder prorated by the grout spacing - fully grouted at cell spacing, none if ungrouted, and in between for partial grout (grout_term = adder x cell/spacing, capped at the full adder). Fully grouting adds about 50% over the hollow wall (55 to 84 psf in the example; 40% over grout at 48 in o.c.) to the wall weight and its load on the footing, the trade between reinforcement/strength and dead load. Line load = wall psf x height; total = wall psf x area. A design aid; the NCMA weight tables and the engineer of record govern." ,
+    note: "Masonry wall dead load: the hollow (ungrouted) wall weight (NCMA table, by thickness and unit density) plus a grout adder prorated by the grout spacing - fully grouted at cell spacing, none if ungrouted, and in between for partial grout (grout_term = adder x cell/spacing, capped at the full adder). Fully grouting more than doubles an 8 in hollow wall (NCMA TEK 14-13B Table 4, 135 pcf units, 140 pcf grout: 39 psf hollow, 47 at 48 in o.c., 63 at 16 in, 86 solid) and its load on the footing. Enter the HOLLOW (face-shell) weight, not a partly grouted table value, or the grout is counted twice and its load on the footing, the trade between reinforcement/strength and dead load. Line load = wall psf x height; total = wall psf x area. A design aid; the NCMA weight tables and the engineer of record govern." ,
   };
 }
-export const masonryWallWeightExample = { inputs: { hollow_psf: 55, grout_adder: 29, cell_spacing: 8, grout_spacing: 48, height_ft: 10, area_ft2: 0 } };
+export const masonryWallWeightExample = { inputs: { hollow_psf: 39, grout_adder: 47, cell_spacing: 8, grout_spacing: 48, height_ft: 10, area_ft2: 0 } };
 MASONRY_RENDERERS["masonry-wall-weight"] = _simpleRenderer({
   citation: "Citation: masonry wall dead load from NCMA weight tables: wall psf = hollow weight + grout adder x (cell spacing / grout spacing, capped at full); line load = psf x height. The NCMA TEK weight tables and the engineer of record govern.",
   example: masonryWallWeightExample.inputs,
@@ -287,12 +288,13 @@ MASONRY_RENDERERS["masonry-wall-weight"] = _simpleRenderer({
 });
 
 // dims: in { area_ft2: L^2, area_per: L^2, max_horiz_in: L, max_vert_in: L } out: { anchors: dimensionless, grid_ft2: L^2 }
-export function computeBrickVeneerAnchorSpacing({ area_ft2 = 0, area_per = 2.67, max_horiz_in = 32, max_vert_in = 24 } = {}) {
+export function computeBrickVeneerAnchorSpacing({ area_ft2 = 0, area_per = 2.67, max_horiz_in = 32, max_vert_in = 25 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const area = Number(area_ft2) || 0;
   const per = Number(area_per) || 0;
   const mh = Number(max_horiz_in) > 0 ? Number(max_horiz_in) : 32;
-  const mv = Number(max_vert_in) > 0 ? Number(max_vert_in) : 24;
+  if (Number(max_horiz_in) < 0 || Number(max_vert_in) < 0) return { error: "Maximum spacings cannot be negative (in)." };
+  const mv = Number(max_vert_in) > 0 ? Number(max_vert_in) : 25;
   if (!(area > 0)) return { error: "Veneer wall area must be positive (ft^2)." };
   if (!(per > 0)) return { error: "Maximum area per anchor must be positive (ft^2)." };
   // Each anchor must satisfy BOTH the area-per-anchor limit AND the maximum
@@ -306,12 +308,12 @@ export function computeBrickVeneerAnchorSpacing({ area_ft2 = 0, area_per = 2.67,
   const spacing_governs = max_grid_ft2 < per;
   return {
     anchors, grid_ft2, max_horiz_in: mh, max_vert_in: mv, max_grid_ft2, spacing_governs,
-    note: "Brick-veneer anchor count per TMS 402 / IBC 1405: one anchor per no more than the entered wall area (2.67 ft^2 typical, 2.0 ft^2 for high wind/seismic demand), with maximum spacing of 32 in horizontal and 24 in vertical. The count = ceil(area / area-per-anchor). A tighter demand limit adds anchors on a denser grid. If the max horizontal x vertical grid (here " + ((mh * mv) / 144).toFixed(2) + " ft^2) is smaller than the area limit, the spacing caps govern the count. A detailing aid; TMS 402 / IBC and the engineer of record govern.",
+    note: "Brick-veneer anchor count per TMS 402 / IBC 1405: one anchor per no more than the entered wall area (2.67 ft^2 typical), with maximum spacing of 32 in horizontal and 25 in vertical (TMS 402 / IBC; the IRC uses 24 in). BIA Technical Note 28 (2012): under the IBC reduce the area per anchor by 30% in high wind (about 1.87 ft^2, spaced 18 x 18 in) and by 25% (2.0 ft^2) at SDC D; the IRC high-demand value is 2.0 ft^2. Extra anchors within 12 in of openings are not counted here. The count = ceil(area / area-per-anchor). A tighter demand limit adds anchors on a denser grid. If the max horizontal x vertical grid (here " + ((mh * mv) / 144).toFixed(2) + " ft^2) is smaller than the area limit, the spacing caps govern the count. A detailing aid; TMS 402 / IBC and the engineer of record govern.",
   };
 }
-export const brickVeneerAnchorSpacingExample = { inputs: { area_ft2: 200, area_per: 2.67, max_horiz_in: 32, max_vert_in: 24 } };
+export const brickVeneerAnchorSpacingExample = { inputs: { area_ft2: 200, area_per: 2.67, max_horiz_in: 32, max_vert_in: 25 } };
 MASONRY_RENDERERS["brick-veneer-anchor-spacing"] = _simpleRenderer({
-  citation: "Citation: brick-veneer anchor spacing per TMS 402 / IBC 1405: one anchor per <= 2.67 ft^2 (2.0 ft^2 high-demand), max 32 in horizontal / 24 in vertical. Count = ceil(area / area-per-anchor). TMS 402 / IBC and the engineer of record govern.",
+  citation: "Citation: brick-veneer anchor spacing per TMS 402 / IBC 1405 (BIA Technical Note 28): one anchor per <= 2.67 ft^2 (IBC high wind -30%, ~1.87 ft^2; SDC D -25%, 2.0 ft^2), max 32 in horizontal / 25 in vertical (IRC: 24 in). Count = ceil(area / area-per-anchor). TMS 402 / IBC and the engineer of record govern.",
   example: brickVeneerAnchorSpacingExample.inputs,
   fields: [
     { key: "area_ft2", label: "Veneer wall area (ft²)", kind: "number" },
@@ -394,14 +396,14 @@ export function computeMasonryAnchorBolt({ fm_psi = 1500, lbe_in = 0, ab_in2 = 0
     note: "TMS 402 allowable-stress design of a headed anchor bolt in tension in grouted masonry: the allowable is the LESSER of masonry breakout Bab = 1.25 x Apt x sqrt(f'm), with Apt = pi x lbe^2 the projected area of the 45-degree tension breakout cone, and steel Bas = 0.6 x Ab x fy. A shallow anchor pulls a cone of block out (masonry governs); a deep enough anchor makes the steel yield first (steel governs). Edge distance or overlapping cones reduce Apt (the full-cone value is an upper bound); anchor shear (pryout) is a separate check. The strength-design coefficient is 4 x Apt x sqrt(f'm). A design aid, not a substitute for a licensed engineer's design -- the engineer of record's stamped design governs.",
   };
 }
-export const masonryAnchorBoltExample = { inputs: { fm_psi: 1500, lbe_in: 4, ab_in2: 0.442, fy_psi: 36000 } };
+export const masonryAnchorBoltExample = { inputs: { fm_psi: 1500, lbe_in: 4, ab_in2: 0.334, fy_psi: 36000 } };
 MASONRY_RENDERERS["masonry-anchor-bolt"] = _simpleRenderer({
   citation: "Citation: TMS 402 ASD headed anchor bolt tension: allowable = lesser of masonry breakout Bab = 1.25 x Apt x sqrt(f'm) (Apt = pi x lbe^2, the projected cone) and steel Bas = 0.6 x Ab x fy. Edge distance reduces Apt; shear is a separate check. A design aid, not a substitute for a licensed engineer's design -- the engineer of record's stamped design governs.",
   example: masonryAnchorBoltExample.inputs,
   fields: [
     { key: "fm_psi", label: "Masonry strength f'm (psi)", kind: "number" },
-    { key: "lbe_in", label: "Effective embedment lbe (in)", kind: "number" },
-    { key: "ab_in2", label: "Bolt tensile area Ab (in², 3/4in = 0.442)", kind: "number" },
+    { key: "lbe_in", label: "Effective embedment lb (in)", kind: "number" },
+    { key: "ab_in2", label: "Bolt effective tensile area Ab (in², net: 1/2 in 0.142, 3/4 in 0.334)", kind: "number" },
     { key: "fy_psi", label: "Bolt yield fy (psi, A307 = 36000)", kind: "number" },
   ],
   outputs: [
@@ -420,7 +422,7 @@ MASONRY_RENDERERS["masonry-anchor-bolt"] = _simpleRenderer({
 // so lbe = sqrt( T / (1.25 pi sqrt(f'm)) ). The steel branch Bas = 0.6 Ab fy is
 // checked separately: if it is below the target no embedment can reach it.
 // dims: in { required_tension_lb: M L T^-2, fm_psi: M L^-1 T^-2, ab_in2: L^2, fy_psi: M L^-1 T^-2 } out: { lbe_in: L, apt_in2: L^2, bas_lb: M L T^-2, steel_adequate: dimensionless }
-export function computeMasonryAnchorEmbedment({ required_tension_lb = 0, fm_psi = 1500, ab_in2 = 0.442, fy_psi = 36000 } = {}) {
+export function computeMasonryAnchorEmbedment({ required_tension_lb = 0, fm_psi = 1500, ab_in2 = 0.334, fy_psi = 36000 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const T = Number(required_tension_lb) || 0;
   const fm = Number(fm_psi) || 0;
@@ -439,14 +441,14 @@ export function computeMasonryAnchorEmbedment({ required_tension_lb = 0, fm_psi 
     note: "The effective embedment lbe that makes the TMS 402 masonry-breakout capacity Bab = 1.25 x (pi lbe^2) x sqrt(f'm) equal the required tension, the inverse of masonry-anchor-bolt. Deeper embedment pulls a larger 45-degree cone and carries more load. The steel branch Bas = 0.6 x Ab x fy is a separate ceiling: if it is below the required tension the bolt yields no matter how deep it is set, so a larger-diameter or higher-grade bolt is needed. Edge distance or overlapping cones reduce the projected area Apt (this full-cone value is an upper bound, so the real required embedment is deeper); anchor shear (pryout) is a separate check. A design aid, not a substitute for a licensed engineer's design -- the engineer of record's stamped design governs.",
   };
 }
-export const masonryAnchorEmbedmentExample = { inputs: { required_tension_lb: 5000, fm_psi: 1500, ab_in2: 0.442, fy_psi: 36000 } };
+export const masonryAnchorEmbedmentExample = { inputs: { required_tension_lb: 5000, fm_psi: 1500, ab_in2: 0.334, fy_psi: 36000 } };
 MASONRY_RENDERERS["masonry-anchor-embedment"] = _simpleRenderer({
   citation: "Citation: TMS 402 ASD headed anchor bolt tension solved for the embedment: lbe = sqrt(T / (1.25 pi sqrt(f'm))) from the masonry breakout branch Bab = 1.25 x Apt x sqrt(f'm) (Apt = pi lbe^2). The steel branch Bas = 0.6 Ab fy is a separate ceiling. Edge distance reduces Apt; shear is a separate check. A design aid, not a substitute for a licensed engineer's design -- the engineer of record's stamped design governs.",
   example: masonryAnchorEmbedmentExample.inputs,
   fields: [
     { key: "required_tension_lb", label: "Required tension T (lb)", kind: "number" },
     { key: "fm_psi", label: "Masonry strength f'm (psi)", kind: "number" },
-    { key: "ab_in2", label: "Bolt tensile area Ab (in², 3/4in = 0.442)", kind: "number" },
+    { key: "ab_in2", label: "Bolt effective tensile area Ab (in², net: 1/2 in 0.142, 3/4 in 0.334)", kind: "number" },
     { key: "fy_psi", label: "Bolt yield fy (psi, A307 = 36000)", kind: "number" },
   ],
   outputs: [
@@ -460,15 +462,16 @@ MASONRY_RENDERERS["masonry-anchor-embedment"] = _simpleRenderer({
 
 // ===================== spec-v1232: masonry anchor bolt in SHEAR (Group E) =====================
 // The shear companion the masonry-anchor-bolt / -embedment tension pair names as "a separate
-// check." TMS 402-16 ASD (Section 8.1.5.2): the allowable shear is the LEAST of four modes --
+// check." TMS 402-13 ASD (as NCMA TEK 12-03C prints it): the allowable shear is the LEAST of four modes --
 // masonry breakout Bvb = 1.25 x Apv x sqrt(f'm) with Apv = pi x lbe^2 / 2 (the half-cone toward
 // the free edge, lbe = edge distance); masonry crushing Bvc = 350 x (f'm x Ab)^(1/4); anchor
 // pryout Bvpry = 2.0 x Bab where Bab = 1.25 x Apt x sqrt(f'm) is the tension breakout on the
 // embedment (Apt = pi x lb^2); and steel Bvs = 0.36 x Ab x fy. The crushing 350 coefficient is
-// verified directly from NCMA TEK 12-03A (stable across editions); the 0.36 shear-steel
+// verified against NCMA TEK 12-03A and 12-03C (402-13); TMS 402-16 raised crushing, so it is NOT edition-stable
+// (until 2026-09-26 this tile was labeled 402-16). The 0.36 shear-steel
 // coefficient is the edition-stable 0.6 x the tension-steel 0.6 (TEK 12-03A had 0.12 = 0.6 x 0.2).
 // dims: in { fm_psi: M L^-1 T^-2, lb_in: L, lbe_in: L, ab_in2: L^2, fy_psi: M L^-1 T^-2 } out: { apv_in2: L^2, bvb_lb: M L T^-2, bvc_lb: M L T^-2, bvpry_lb: M L T^-2, bvs_lb: M L T^-2, bv_lb: M L T^-2 }
-export function computeMasonryAnchorShear({ fm_psi = 1500, lb_in = 5, lbe_in = 4, ab_in2 = 0.442, fy_psi = 36000 } = {}) {
+export function computeMasonryAnchorShear({ fm_psi = 1500, lb_in = 5, lbe_in = 4, ab_in2 = 0.334, fy_psi = 36000 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const fm = Number(fm_psi) || 0;
   const lb = Number(lb_in) || 0;
@@ -493,18 +496,18 @@ export function computeMasonryAnchorShear({ fm_psi = 1500, lb_in = 5, lbe_in = 4
   if (![apv_in2, bvb_lb, bvc_lb, bvpry_lb, bvs_lb, bv_lb].every(Number.isFinite)) return { error: "Shear capacity is not a finite value." };
   return {
     apv_in2, bvb_lb, bvc_lb, bvpry_lb, bvs_lb, bv_lb, governing_mode,
-    note: "TMS 402-16 allowable-stress design of a headed anchor bolt in shear in grouted masonry: the allowable is the LEAST of four modes. Masonry breakout Bvb = 1.25 x Apv x sqrt(f'm), with Apv = pi x lbe^2 / 2 the projected half-cone toward the free edge (lbe = edge distance), governs only when the bolt is near an edge. Masonry crushing Bvc = 350 x (f'm x Ab)^(1/4), localized bearing of the shank on the block, usually governs away from edges. Anchor pryout Bvpry = 2.0 x Bab (Bab = the tension breakout on the embedment) governs only at very shallow embedment. Bolt steel Bvs = 0.36 x Ab x fy governs for a stout, well-embedded, interior bolt. Overlapping cones or an open cell reduce Apv (the full-half-cone value is an upper bound), and when lbe is below 12 bolt diameters TMS 402 further reduces the breakout branch toward zero at lbe = 1 in -- not applied here, so verify the edge branch separately for a shallow edge distance. Combined tension and shear use the unity check ba/Ba + bv/Bv <= 1 (a separate step). A design aid, not a substitute for a licensed engineer's design -- the engineer of record's stamped design governs.",
+    note: "TMS 402-13 allowable-stress design (as NCMA TEK 12-03C prints it) of a headed anchor bolt in shear in grouted masonry: the allowable is the LEAST of four modes. Masonry breakout Bvb = 1.25 x Apv x sqrt(f'm), with Apv = pi x lbe^2 / 2 the projected half-cone toward the free edge (lbe = edge distance), governs only when the bolt is near an edge. Masonry crushing Bvc = 350 x (f'm x Ab)^(1/4), localized bearing of the shank on the block, usually governs away from edges. Anchor pryout Bvpry = 2.0 x Bab (Bab = the tension breakout on the embedment) governs only at very shallow embedment. Bolt steel Bvs = 0.36 x Ab x fy governs for a stout, well-embedded, interior bolt. Overlapping cones or an open cell reduce Apv (the full-half-cone value is an upper bound). Combined tension and shear use the 402-13 unity check ba/Ba + bv/Bv <= 1 (a separate step). These are the TMS 402-13 coefficients NCMA TEK 12-03C prints; TMS 402-16 raised the masonry crushing capacity (about 67% at strength level, with a similar ASD increase; Bennett, STRUCTURE 2018) and replaced the linear interaction with (ba/Ba)^(5/3) + (bv/Bv)^(5/3) <= 1, so this is conservative on crushing under -16. A design aid, not a substitute for a licensed engineer's design -- the engineer of record's stamped design governs.",
   };
 }
-export const masonryAnchorShearExample = { inputs: { fm_psi: 1500, lb_in: 5, lbe_in: 4, ab_in2: 0.442, fy_psi: 36000 } };
+export const masonryAnchorShearExample = { inputs: { fm_psi: 1500, lb_in: 5, lbe_in: 4, ab_in2: 0.334, fy_psi: 36000 } };
 MASONRY_RENDERERS["masonry-anchor-shear"] = _simpleRenderer({
-  citation: "Citation: TMS 402-16 ASD headed anchor bolt shear (Section 8.1.5.2): allowable = least of masonry breakout Bvb = 1.25 x Apv x sqrt(f'm) (Apv = pi lbe^2 / 2, lbe = edge distance), masonry crushing Bvc = 350 x (f'm Ab)^(1/4), anchor pryout Bvpry = 2.0 x Bab (Bab = 1.25 x pi lb^2 x sqrt(f'm)), and bolt steel Bvs = 0.36 x Ab x fy. Crushing coefficient verified vs NCMA TEK 12-03A. A design aid, not a substitute for a licensed engineer's design -- the engineer of record's stamped design governs.",
+  citation: "Citation: TMS 402-13 ASD headed anchor bolt shear as NCMA TEK 12-03C prints it (402-16 raised crushing and uses a 5/3-power interaction): allowable = least of masonry breakout Bvb = 1.25 x Apv x sqrt(f'm) (Apv = pi lbe^2 / 2, lbe = edge distance), masonry crushing Bvc = 350 x (f'm Ab)^(1/4), anchor pryout Bvpry = 2.0 x Bab (Bab = 1.25 x pi lb^2 x sqrt(f'm)), and bolt steel Bvs = 0.36 x Ab x fy. TEK 12-03C example (f'm 2,000, 1/2 in, Ab 0.142) reproduces Bvc 1,437 lb and Bvs 3,067 lb. A design aid, not a substitute for a licensed engineer's design -- the engineer of record's stamped design governs.",
   example: masonryAnchorShearExample.inputs,
   fields: [
     { key: "fm_psi", label: "Masonry strength f'm (psi)", kind: "number" },
     { key: "lb_in", label: "Effective embedment lb (in)", kind: "number" },
     { key: "lbe_in", label: "Edge distance lbe (in)", kind: "number" },
-    { key: "ab_in2", label: "Bolt tensile area Ab (in², 3/4in = 0.442)", kind: "number" },
+    { key: "ab_in2", label: "Bolt effective tensile area Ab (in², net: 1/2 in 0.142, 3/4 in 0.334)", kind: "number" },
     { key: "fy_psi", label: "Bolt yield fy (psi, A307 = 36000)", kind: "number" },
   ],
   outputs: [

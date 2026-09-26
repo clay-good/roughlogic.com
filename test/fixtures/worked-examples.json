@@ -78105,6 +78105,53 @@
    }
   },
   {
+   "tile_id": "adpi-diffuser-selection",
+   "source_publisher": "Price Industries",
+   "source_title": "Engineering Guide - Air Distribution, Table 5 and the characteristic-length example",
+   "source_edition_or_year": "2011, p. EG-11",
+   "source_section_or_page": "circular ceiling diffuser at about 125 W/m2 (40 Btu/h-ft2): T50/L 0.8 for a maximum ADPI of 88, ADPI >= 80 from 0.5 to 1.5; a 20 ft room with a 12 ft ceiling has L = 20 + 3 = 23 ft",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "diffuser_type": "circular-ceiling",
+    "cooling_load": 40,
+    "throw_ft": 18.4,
+    "char_length_ft": 23
+   },
+   "outputs": {
+    "opt_ratio": {
+     "value": 0.8,
+     "tolerance": {
+      "abs": 0
+     }
+    },
+    "max_adpi": {
+     "value": 88,
+     "tolerance": {
+      "abs": 0
+     }
+    },
+    "band_lo": {
+     "value": 0.5,
+     "tolerance": {
+      "abs": 0
+     }
+    },
+    "band_hi": {
+     "value": 1.5,
+     "tolerance": {
+      "abs": 0
+     }
+    },
+    "target_throw_ft": {
+     "value": 18.4,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
    "tile_id": "vibration-isolation",
    "source_publisher": "ASHRAE Handbook -- Fundamentals, Sound and Vibration (single-DOF isolator)",
    "source_title": "900 rpm fan on 1 in isolators: fn 3.13 Hz, ratio 4.79, T 0.046 -> 95.4% isolation efficiency",
@@ -82143,27 +82190,27 @@
   {
    "tile_id": "masonry-wall-weight",
    "source_publisher": "NCMA TEK",
-   "source_title": "8 in CMU, hollow 55 psf, grout adder 29, grouted 48 in o.c., 10 ft -> 59.8 psf, 598 lb/ft",
+   "source_title": "8 in CMU (135 pcf units): hollow 39 psf, grout adder 47 (NCMA TEK 14-13B), grouted 48 in o.c., 10 ft -> 46.8 psf, 468 lb/ft",
    "source_edition_or_year": "spec-v368 worked example (machine-verified)",
    "source_section_or_page": "spec-v368 section 2.1 pinned example",
    "verified_by": "rl",
    "verified_on": "2026-07-03",
    "inputs": {
-    "hollow_psf": 55,
-    "grout_adder": 29,
+    "hollow_psf": 39,
+    "grout_adder": 47,
     "cell_spacing": 8,
     "grout_spacing": 48,
     "height_ft": 10
    },
    "outputs": {
     "wall_psf": {
-     "value": 59.83,
+     "value": 46.833,
      "tolerance": {
       "pct": 0.5
      }
     },
     "line_load_plf": {
-     "value": 598.3,
+     "value": 468.33,
      "tolerance": {
       "pct": 0.5
      }
@@ -82173,29 +82220,53 @@
   {
    "tile_id": "masonry-wall-weight",
    "source_publisher": "NCMA TEK",
-   "source_title": "cross-check: fully grouting (spacing 8) caps the adder -> 84 psf, 840 lb/ft, a 40% heavier wall",
+   "source_title": "cross-check: fully grouting (spacing 8) caps the adder -> 86 psf, 860 lb/ft",
    "source_edition_or_year": "spec-v368 worked example (machine-verified)",
    "source_section_or_page": "spec-v368 section 2.1 cross-check",
    "verified_by": "rl",
    "verified_on": "2026-07-03",
    "inputs": {
-    "hollow_psf": 55,
-    "grout_adder": 29,
+    "hollow_psf": 39,
+    "grout_adder": 47,
     "cell_spacing": 8,
     "grout_spacing": 8,
     "height_ft": 10
    },
    "outputs": {
     "wall_psf": {
-     "value": 84,
+     "value": 86,
      "tolerance": {
       "abs": 0.1
      }
     },
     "line_load_plf": {
-     "value": 840,
+     "value": 860,
      "tolerance": {
       "abs": 1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "masonry-wall-weight",
+   "source_publisher": "NCMA",
+   "source_title": "TEK 14-13B Concrete Masonry Wall Weights, Table 4 (8 in, 135 pcf units, 140 pcf grout)",
+   "source_edition_or_year": "2008",
+   "source_section_or_page": "hollow 39 psf; grouted 16 in o.c. 63 psf (the tile prorates the 47 psf full-grout adder: 62.5)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "hollow_psf": 39,
+    "grout_adder": 47,
+    "cell_spacing": 8,
+    "grout_spacing": 16,
+    "height_ft": 10
+   },
+   "outputs": {
+    "wall_psf": {
+     "value": 63,
+     "tolerance": {
+      "abs": 0.6
      }
     }
    }
@@ -82212,7 +82283,7 @@
     "area_ft2": 200,
     "area_per": 2.67,
     "max_horiz_in": 32,
-    "max_vert_in": 24
+    "max_vert_in": 25
    },
    "outputs": {
     "anchors": {
@@ -82522,7 +82593,7 @@
   {
    "tile_id": "conduit-jam-ratio",
    "source_publisher": "NEC (NFPA 70) Chapter 9",
-   "source_title": "three 0.65 in conductors in 2 in EMT (ID 2.067) -> ratio 3.18, jam-prone",
+   "source_title": "three 0.65 in conductors in 2 in EMT (ID 2.067) -> jam ratio 1.05 x 3.18 = 3.34, just clear of the band",
    "source_edition_or_year": "spec-v374 worked example (machine-verified)",
    "source_section_or_page": "spec-v374 section 2.1 pinned example",
    "verified_by": "rl",
@@ -82534,7 +82605,7 @@
    },
    "outputs": {
     "ratio": {
-     "value": 3.18,
+     "value": 3.339,
      "tolerance": {
       "pct": 0.5
      }
@@ -82544,21 +82615,49 @@
   {
    "tile_id": "conduit-jam-ratio",
    "source_publisher": "NEC (NFPA 70) Chapter 9",
-   "source_title": "cross-check: three 0.5 in conductors in 1-1/4 in conduit (ID 1.61) -> ratio 3.22, just clear of the band",
+   "source_title": "cross-check: three 0.70 in conductors in 2 in EMT (ID 2.067) -> jam ratio 1.05 x 2.953 = 3.10, jam-prone",
    "source_edition_or_year": "spec-v374 worked example (machine-verified)",
    "source_section_or_page": "spec-v374 section 2.1 cross-check",
    "verified_by": "rl",
    "verified_on": "2026-07-03",
    "inputs": {
-    "conduit_id_in": 1.61,
-    "conductor_od_in": 0.5,
+    "conduit_id_in": 2.067,
+    "conductor_od_in": 0.7,
     "n_conductors": 3
    },
    "outputs": {
     "ratio": {
-     "value": 3.22,
+     "value": 3.1005,
      "tolerance": {
       "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "conduit-jam-ratio",
+   "source_publisher": "EC&M (J. DeDad)",
+   "source_title": "Simple Calculations for Cable Pulling",
+   "source_edition_or_year": "November 1, 2001",
+   "source_section_or_page": "three 1.60 in cables in 5.07 in ID conduit: 1.05 x (5.07 / 1.60) = 3.33 -> you probably won't have a jamming problem",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "conduit_id_in": 5.07,
+    "conductor_od_in": 1.6,
+    "n_conductors": 3
+   },
+   "outputs": {
+    "ratio": {
+     "value": 3.33,
+     "tolerance": {
+      "abs": 0.005
+     }
+    },
+    "jam_prone": {
+     "value": 0,
+     "tolerance": {
+      "abs": 0
      }
     }
    }
@@ -83471,6 +83570,33 @@
      "value": 358800,
      "tolerance": {
       "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "product-pull-down-load",
+   "source_publisher": "Copeland",
+   "source_title": "AE103 The Refrigeration Load, product load example (veal)",
+   "source_edition_or_year": "2024, pp. 24-25",
+   "source_section_or_page": "1,000 lb of veal cooled from 42 F to 0 F: c 0.71, freezing 29 F, latent 91, c below 0.39 -> 9,230 + 91,000 + 11,310 = 111,540 Btu",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "mass_lb": 1000,
+    "cp_above": 0.71,
+    "t_enter_f": 42,
+    "t_storage_f": 0,
+    "t_freeze_f": 29,
+    "hif_btu_lb": 91,
+    "cp_below": 0.39,
+    "hours": 24
+   },
+   "outputs": {
+    "q_btu": {
+     "value": 111540,
+     "tolerance": {
+      "abs": 1
      }
     }
    }
@@ -84460,7 +84586,7 @@
    "inputs": {
     "fm_psi": 1500,
     "lbe_in": 4,
-    "ab_in2": 0.442,
+    "ab_in2": 0.334,
     "fy_psi": 36000
    },
    "outputs": {
@@ -84471,7 +84597,7 @@
      }
     },
     "bas_lb": {
-     "value": 9547.2,
+     "value": 7214.4,
      "tolerance": {
       "pct": 0.5
      }
@@ -84487,7 +84613,7 @@
   {
    "tile_id": "masonry-anchor-bolt",
    "source_publisher": "TMS 402 ASD",
-   "source_title": "8in embed doubles Apt -> Bab 9,733 lb, so 9,547 lb steel now governs",
+   "source_title": "8in embed doubles Apt -> Bab 9,733 lb, so 7,214 lb steel now governs",
    "source_edition_or_year": "spec-v449 cross-check (machine-verified)",
    "source_section_or_page": "spec-v449 section 2.1 cross-check",
    "verified_by": "rl",
@@ -84495,7 +84621,7 @@
    "inputs": {
     "fm_psi": 1500,
     "lbe_in": 8,
-    "ab_in2": 0.442,
+    "ab_in2": 0.334,
     "fy_psi": 36000
    },
    "outputs": {
@@ -84506,9 +84632,38 @@
      }
     },
     "ba_lb": {
-     "value": 9547.2,
+     "value": 7214.4,
      "tolerance": {
       "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "masonry-anchor-bolt",
+   "source_publisher": "NCMA / CMHA",
+   "source_title": "TEK 12-03C Design of Anchor Bolts Embedded in Concrete Masonry, ASD example",
+   "source_edition_or_year": "2013 (TMS 402-13)",
+   "source_section_or_page": "two 1/2 in headed anchors, f'm 2,000 psi, fy 60 ksi; overlap-reduced Apt = 90.99 in2 (entered as the equivalent single-cone lb = 5.382 in): Bab = 1.25(90.99)sqrt(2,000) = 5,087 lb; Bas = 0.6(0.142)(60,000) = 5,112 lb",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "fm_psi": 2000,
+    "lbe_in": 5.3817,
+    "ab_in2": 0.142,
+    "fy_psi": 60000
+   },
+   "outputs": {
+    "bab_lb": {
+     "value": 5087,
+     "tolerance": {
+      "abs": 1
+     }
+    },
+    "bas_lb": {
+     "value": 5112,
+     "tolerance": {
+      "abs": 0.5
      }
     }
    }
@@ -84524,7 +84679,7 @@
    "inputs": {
     "required_tension_lb": 5000,
     "fm_psi": 1500,
-    "ab_in2": 0.442,
+    "ab_in2": 0.334,
     "fy_psi": 36000
    },
    "outputs": {
@@ -84535,9 +84690,38 @@
      }
     },
     "bas_lb": {
-     "value": 9547.2,
+     "value": 7214.4,
      "tolerance": {
       "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "masonry-anchor-embedment",
+   "source_publisher": "NCMA / CMHA",
+   "source_title": "TEK 12-03C Design of Anchor Bolts Embedded in Concrete Masonry, ASD example",
+   "source_edition_or_year": "2013 (TMS 402-13)",
+   "source_section_or_page": "run in reverse: Bab 5,087 lb at f'm 2,000 psi -> Apt = 90.99 in2 (lb = 5.38 in); Bas = 0.6(0.142)(60,000) = 5,112 lb",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "required_tension_lb": 5087,
+    "fm_psi": 2000,
+    "ab_in2": 0.142,
+    "fy_psi": 60000
+   },
+   "outputs": {
+    "apt_in2": {
+     "value": 90.99,
+     "tolerance": {
+      "abs": 0.02
+     }
+    },
+    "bas_lb": {
+     "value": 5112,
+     "tolerance": {
+      "abs": 0.5
      }
     }
    }
@@ -84554,7 +84738,7 @@
     "fm_psi": 1500,
     "lb_in": 5,
     "lbe_in": 4,
-    "ab_in2": 0.442,
+    "ab_in2": 0.334,
     "fy_psi": 36000
    },
    "outputs": {
@@ -84565,7 +84749,7 @@
      }
     },
     "bvc_lb": {
-     "value": 1776.4,
+     "value": 1655.9,
      "tolerance": {
       "abs": 1
      }
@@ -84584,12 +84768,54 @@
     "fm_psi": 1500,
     "lb_in": 8,
     "lbe_in": 10,
-    "ab_in2": 0.442,
+    "ab_in2": 0.334,
     "fy_psi": 36000
    },
    "outputs": {
     "bv_lb": {
-     "value": 1776.4,
+     "value": 1655.9,
+     "tolerance": {
+      "abs": 1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "masonry-anchor-shear",
+   "source_publisher": "NCMA / CMHA",
+   "source_title": "TEK 12-03C Design of Anchor Bolts Embedded in Concrete Masonry, ASD example",
+   "source_edition_or_year": "2013 (TMS 402-13)",
+   "source_section_or_page": "1/2 in anchor (Ab 0.142), f'm 2,000, fy 60 ksi, Apt 90.99 in2, far from an edge: Bvc = 350 (2,000 x 0.142)^(1/4) = 1,437 lb, Bvpry = 2.5(90.99)sqrt(2,000) = 10,173 lb, Bvs = 0.36(0.142)(60,000) = 3,067 lb",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "fm_psi": 2000,
+    "lb_in": 5.3817,
+    "lbe_in": 12,
+    "ab_in2": 0.142,
+    "fy_psi": 60000
+   },
+   "outputs": {
+    "bvc_lb": {
+     "value": 1437,
+     "tolerance": {
+      "abs": 1
+     }
+    },
+    "bvpry_lb": {
+     "value": 10173,
+     "tolerance": {
+      "abs": 2
+     }
+    },
+    "bvs_lb": {
+     "value": 3067,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "bv_lb": {
+     "value": 1437,
      "tolerance": {
       "abs": 1
      }
@@ -84931,6 +85157,29 @@
    }
   },
   {
+   "tile_id": "camera-max-distance-for-ppf",
+   "source_publisher": "Theia Technologies (M. Peterson), via SDM",
+   "source_title": "How to Calculate Image Resolution, Table 6",
+   "source_edition_or_year": "2009, p. 8",
+   "source_section_or_page": "23 ft x 5.76 mm x 32 pix/ft / 2,560 pixels = 1.7 mm (run in reverse: 1.7 mm and 32 pix/ft -> about 23 ft; the paper rounds the lens)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "sensor_width_mm": 5.76,
+    "focal_length_mm": 1.7,
+    "h_pixels": 2560,
+    "target_ppf": 32
+   },
+   "outputs": {
+    "max_distance_ft": {
+     "value": 23,
+     "tolerance": {
+      "pct": 3
+     }
+    }
+   }
+  },
+  {
    "tile_id": "camera-lens-fov",
    "source_publisher": "IEC 62676-4 DORI",
    "source_title": "8 mm lens halves scene to 20.1 ft, doubles density to 95.3 ppf (Identify)",
@@ -84955,6 +85204,41 @@
      "value": 95.34,
      "tolerance": {
       "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "camera-lens-fov",
+   "source_publisher": "Theia Technologies (M. Peterson), via SDM",
+   "source_title": "How to Calculate Image Resolution, Tables 4-5 and 8",
+   "source_edition_or_year": "2009, p. 8",
+   "source_section_or_page": "5.76 mm chip, 1.7 mm lens, 23 ft: horizontal field about 80 ft (rounded; unrounded 77.9) and 2,560 px / 80 ft = 32 pix/ft; the SY110 lens is listed at 120 deg HFOV",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "sensor_width_mm": 5.76,
+    "focal_length_mm": 1.7,
+    "distance_ft": 23,
+    "h_pixels": 2560
+   },
+   "outputs": {
+    "scene_ft": {
+     "value": 80,
+     "tolerance": {
+      "pct": 3
+     }
+    },
+    "ppf": {
+     "value": 32,
+     "tolerance": {
+      "pct": 3
+     }
+    },
+    "fov_deg": {
+     "value": 120,
+     "tolerance": {
+      "pct": 1.5
      }
     }
    }

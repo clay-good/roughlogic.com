@@ -2,7 +2,7 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "f8f95b40fcd1c373",
+      "sha": "80832184477ef367",
       "date": "2026-09-26"
     },
     "/tools/": {
@@ -18,7 +18,7 @@
       "date": "2026-09-25"
     },
     "/groups/construction/": {
-      "sha": "c5d0a7df62ddf003",
+      "sha": "914db722cbf97606",
       "date": "2026-09-26"
     },
     "/groups/cross-trade/": {
@@ -30,7 +30,7 @@
       "date": "2026-09-18"
     },
     "/groups/electrical/": {
-      "sha": "6ae955ec134c72b4",
+      "sha": "7801fdb135f38c08",
       "date": "2026-09-26"
     },
     "/groups/field/": {
@@ -814,8 +814,8 @@
       "date": "2026-09-18"
     },
     "/tools/brick-veneer-anchor-spacing/": {
-      "sha": "f6b8d71148a0081e",
-      "date": "2026-09-01"
+      "sha": "27d4b1e83afd6c39",
+      "date": "2026-09-26"
     },
     "/tools/brick-veneer-weep-count/": {
       "sha": "5f2a8c1df97370e5",
@@ -1670,8 +1670,8 @@
       "date": "2026-09-01"
     },
     "/tools/conduit-jam-ratio/": {
-      "sha": "ce5c0fe31093f38a",
-      "date": "2026-09-01"
+      "sha": "8c5e11461244b4c5",
+      "date": "2026-09-26"
     },
     "/tools/conduit-nipple-60-fill/": {
       "sha": "3f3193ffa6eb8ea8",
@@ -2506,7 +2506,7 @@
       "date": "2026-09-01"
     },
     "/tools/economizer-enthalpy-changeover/": {
-      "sha": "c7fc65818dbb5e79",
+      "sha": "63d5a3427e8953ac",
       "date": "2026-09-26"
     },
     "/tools/economizer-savings-hours/": {
@@ -2542,8 +2542,8 @@
       "date": "2026-09-25"
     },
     "/tools/egress-lighting-check/": {
-      "sha": "e184c56f3bcee4e3",
-      "date": "2026-09-19"
+      "sha": "81eef8a67304ead8",
+      "date": "2026-09-26"
     },
     "/tools/egress-travel-distance/": {
       "sha": "18a1eeb03cacd891",
@@ -4434,16 +4434,16 @@
       "date": "2026-09-18"
     },
     "/tools/masonry-anchor-bolt/": {
-      "sha": "c702f26e97e07404",
-      "date": "2026-09-25"
+      "sha": "914cfc0901d6241e",
+      "date": "2026-09-26"
     },
     "/tools/masonry-anchor-embedment/": {
-      "sha": "340e21e44b2fba67",
-      "date": "2026-09-25"
+      "sha": "1900d331ef92ba50",
+      "date": "2026-09-26"
     },
     "/tools/masonry-anchor-shear/": {
-      "sha": "e8c7ea3cc396d082",
-      "date": "2026-09-25"
+      "sha": "41d1d83e575d09ad",
+      "date": "2026-09-26"
     },
     "/tools/masonry-cleaning-dilution/": {
       "sha": "3f5465b395ae082d",
@@ -4482,8 +4482,8 @@
       "date": "2026-09-25"
     },
     "/tools/masonry-wall-weight/": {
-      "sha": "ad05276fbef1e510",
-      "date": "2026-09-01"
+      "sha": "bf0bb92def3ecf24",
+      "date": "2026-09-26"
     },
     "/tools/mass-concrete-temp-rise/": {
       "sha": "73731d7f854e79a1",
@@ -6814,8 +6814,8 @@
       "date": "2026-09-08"
     },
     "/tools/sill-plate-anchor-count/": {
-      "sha": "a48c90aa8452b87d",
-      "date": "2026-09-01"
+      "sha": "63f5ad329e847c5b",
+      "date": "2026-09-26"
     },
     "/tools/silt-fence-drainage/": {
       "sha": "5b06773bcc3ec939",
@@ -7522,8 +7522,8 @@
       "date": "2026-09-01"
     },
     "/tools/structured-cabling-channel/": {
-      "sha": "a18756e6464cb336",
-      "date": "2026-09-01"
+      "sha": "f86dc3f39050b78c",
+      "date": "2026-09-26"
     },
     "/tools/stub-acme-thread-depth/": {
       "sha": "eda58007fd687e5b",
@@ -8394,7 +8394,7 @@
       "date": "2026-09-01"
     },
     "/tools/walk-in-cooler-load/": {
-      "sha": "01bcc7f22677b972",
+      "sha": "8ed2812ad20021a3",
       "date": "2026-09-26"
     },
     "/tools/walk-in-door-infiltration/": {

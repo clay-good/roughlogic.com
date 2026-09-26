@@ -6,11 +6,24 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Added
 
+- **`walk-in-cooler-load` reports the equipment capacity at the run time.** The box load it returned is a 24-hr average. Copeland AE103 and Heatcraft size the equipment on a 16 hr run for a 35 F room without a defrost timer, or 18 hr with one. The new output is load x 24 / run hours; Copeland's sample prints 939,039 Btu/day -> 58,690 Btu/hr at 16 hr.
 - **`economizer-enthalpy-changeover` has the ASHRAE 90.1-2013+ control: differential enthalpy with a fixed dry-bulb limit.** Plain differential enthalpy left 90.1's prescriptive table in 2013. The new mode also locks out a hot, dry day whose enthalpy is below the return: 24 Btu/lb at 80 F against a 75 F limit (Trane Engineers Newsletter 44-2).
 - **`stadia-distance` takes the stadia constant C of an external-focusing instrument.** H gains C cos(theta) and V gains C sin(theta). The NAVEDTRA 14070 example (C = 1.0) now reproduces exactly: 692.34 ft, 326.28 ft, elevation 705.98. C defaults to 0, so internal-focusing results are unchanged.
 
 ### Fixed
 
+- **`conduit-jam-ratio` uses the industry jam ratio, 1.05 x ID / OD.** The 1.05 allows for the conduit ovaling in a bend (Southwire, IEEE 1185). EC&M prints 1.05 x 5.07 / 1.60 = 3.33, "no jamming problem". The tile's straight 3.17 flagged that pull as jam-prone, and the tile's own example (3.18, "jam-prone") is really 3.34.
+- **The masonry anchor tiles use the net tensile area, and the shear tile names its real edition.**
+  - The area label and examples used the 3/4 in gross area, 0.442 in^2. NCMA TEK 12-03C uses the effective tensile area, 0.334, so the steel capacity was overstated by 32% (9,547 vs 7,214 lb).
+  - `masonry-anchor-shear` carried TMS 402-13 coefficients under a "402-16" label. It now says so, and discloses that 402-16 raised masonry crushing and adopted a 5/3-power interaction.
+  - TEK 12-03C's worked example reproduces for tension, embedment and shear.
+- **`masonry-wall-weight` example no longer counts the grout twice.** Its "hollow" 55 psf was a partly grouted value. NCMA TEK 14-13B gives 39 psf hollow and 86 solid for 8 in, 135 pcf units. At 48 in o.c. the example goes from 59.8 to 46.8 psf (printed 47). A negative grout adder is refused.
+- **`brick-veneer-anchor-spacing` uses the IBC / TMS 402 25 in vertical limit (the IRC's is 24).** It now states BIA Technical Note 28's high-wind (-30%) and SDC D (-25%) reductions.
+- **`product-pull-down-load` no longer charges latent heat to product that arrives already frozen.** Veal entering at 20 F now reads 7,800 Btu instead of 95,920. Product entering colder than storage is refused. `product-pull-down-time` inherits both fixes.
+- **`economizer-enthalpy-changeover` combined mode uses 75 F in every zone.** The 65/70/75 split added last round belongs to the plain fixed-dry-bulb control. All modes now shut off only when the outdoor value exceeds the limit, as 90.1 words it.
+- **`egress-lighting-check` citation and description state the normal-lighting rule the code already used: 1 fc at every point.** They still showed the old 1.0 average / 0.1 minimum pair, which is the emergency-initial rule.
+- **`structured-cabling-channel` enforces the TIA 10 m cord total its note stated.** Screened cable derates about 0.2%/C, less than UTP, not more.
+- **`ceiling-speaker-coverage`'s 0.7 x diameter spacing reason corrected.** It is D / sqrt 2, the geometric minimum-overlap grid in JBL's guide.
 - **`thrust-block-sizing` and `thrust-block-max-pressure` apply the customary safety factor.** DIPRA / AWWA M41 practice sizes the block face as Ab = Sf x T / soil bearing with Sf about 1.5, and EBAA Iron Connections PD-1 prints 1.5:1. The tiles had no safety factor. The forward tile's block face came out at 1/1.5 of the customary size, and the inverse overstated the pressure a block holds by 1.5x. A safety-factor input now defaults to 1.5. The example block for 100 psi on an 8 in main goes from 4.13 to 6.20 ft^2. EBAA's 12 in, 150 psi, "almost 22 square feet" now reproduces.
 - **`oil-water-separator-sizing` takes the water's specific gravity at the design temperature.** Water density was fixed at 60 F while the viscosity came from the design temperature. For hot water that overstated the oil-water density difference by about 38%, compared with Applied Mechanical Technology's 130 F sheet. The default, SG 1.0, keeps earlier results. The note's stale "F about 1.2, 50 gpm needs 24 ft^2" now matches the code: F about 1.5, 30 ft^2.
 - **Smaller fixes found against printed sources:**
@@ -50,6 +63,13 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 ### Changed
 
 - **`calc-electrical.js` size cap raised from 104,000 to 106,000 bytes gzipped.** The battery-vent and capacitor corrections took it to 104,063 B (100.1%). Splitting the module per bench is still the preferred fix.
+- **Nine more tiles now carry a publisher's printed example.**
+  - **Masonry:** `masonry-anchor-bolt`, `masonry-anchor-embedment`, `masonry-anchor-shear` (NCMA TEK 12-03C), `masonry-wall-weight` (NCMA TEK 14-13B).
+  - **Refrigeration and HVAC:** `product-pull-down-load` (Copeland AE103), `adpi-diffuser-selection` (Price Engineering Guide).
+  - **Low voltage:** `camera-lens-fov` and `camera-max-distance-for-ppf` (Theia Technologies), `conduit-jam-ratio` (EC&M).
+
+  README: 989 of 2,183 tiles are checked only against the project's own derivation; 1,194 carry an outside source.
+
 - **Twelve more tiles now carry a publisher's printed example; derived-only tiles drop below 1,000.**
   - **Building science:** `building-ua` and `degree-day-energy` (University of Washington ARCH 331), `powered-attic-ventilator` (HVI), `hydronic-fill-pressure` (RL Deppmann).
   - **Plumbing and masonry:** `thrust-block-max-pressure` (EBAA Iron), `cross-connection-air-gap` (IPC 2015 table), `masonry-control-joint-layout` (NCMA TEK 10-2C).

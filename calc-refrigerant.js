@@ -817,8 +817,8 @@ REFRIGERANT_RENDERERS["condenser-cop-for-heat-rejection"] = _renderCondenserCopF
 
 // ===================== spec-v432..v434: walk-in refrigeration trio (Group C) =====================
 
-// dims: in { u_factor: dimensionless, area_ft2: L^2, delta_t_f: T, infiltration_btuh: M L^2 T^-3, product_btuh: M L^2 T^-3, internal_btuh: M L^2 T^-3, safety: dimensionless } out: { transmission_btuh: M L^2 T^-3, total_btuh: M L^2 T^-3, tons: M }
-export function computeWalkInCoolerLoad({ u_factor = 0, area_ft2 = 0, delta_t_f = 0, infiltration_btuh = 0, product_btuh = 0, internal_btuh = 0, safety = 1.10 } = {}) {
+// dims: in { u_factor: dimensionless, area_ft2: L^2, delta_t_f: T, infiltration_btuh: M L^2 T^-3, product_btuh: M L^2 T^-3, internal_btuh: M L^2 T^-3, safety: dimensionless, run_hours: T } out: { transmission_btuh: M L^2 T^-3, total_btuh: M L^2 T^-3, tons: M, equipment_btuh: M L^2 T^-3 }
+export function computeWalkInCoolerLoad({ u_factor = 0, area_ft2 = 0, delta_t_f = 0, infiltration_btuh = 0, product_btuh = 0, internal_btuh = 0, safety = 1.10, run_hours = 16 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const u = Number(u_factor) || 0;
   const area = Number(area_ft2) || 0;
@@ -831,38 +831,47 @@ export function computeWalkInCoolerLoad({ u_factor = 0, area_ft2 = 0, delta_t_f 
   if (!(area > 0)) return { error: "Envelope area must be positive (ft^2)." };
   if (!(dt > 0)) return { error: "Temperature difference must be positive (F)." };
   if (infil < 0 || prod < 0 || internal < 0) return { error: "Load components must be non-negative (Btu/hr)." };
+  if (sf < 1) return { error: "Safety factor must be at least 1 (1.10 typical; 1.0 for none)." };
+  const run = Number(run_hours) > 0 ? Number(run_hours) : 16;
+  if (!(run <= 24)) return { error: "Run time must be at most 24 hours per day." };
   const transmission_btuh = u * area * dt;
   const subtotal_btuh = transmission_btuh + infil + prod + internal;
   const total_btuh = subtotal_btuh * sf;
+  // The box load is a 24-hour average; the equipment must remove it in its run time (Heatcraft / Copeland AE103:
+  // 16 hr for a 35 F room without a defrost timer, 18 hr with one). Added 2026-09-26; before, only the average showed.
+  const equipment_btuh = total_btuh * 24 / run;
   return {
-    transmission_btuh, subtotal_btuh, total_btuh, tons: total_btuh / 12000,
+    transmission_btuh, subtotal_btuh, total_btuh, tons: total_btuh / 12000, equipment_btuh, equipment_tons: equipment_btuh / 12000, run_hours: run,
     note: "Walk-in cooler/freezer heat load: the transmission (conduction) through the panels = U x envelope area x the ambient-to-box temperature difference, plus the infiltration/door load, the product load (see product-pull-down-load), and the internal load (lights, evaporator-fan motors, people), all times a safety factor (commonly 1.10). Thicker insulation (a lower U) shrinks the transmission and the compressor directly. The evaporator is sized for a run time: Heatcraft uses 16 hours for a 35 F room without a defrost timer and 18 hours with one, so the equipment total = load x 24/16 or 24/18. A sizing aid; the manufacturer's box-load method and the equipment ratings govern.",
   };
 }
 export const walkInCoolerLoadExample = { inputs: { u_factor: 0.05, area_ft2: 800, delta_t_f: 60, infiltration_btuh: 3000, product_btuh: 5000, internal_btuh: 1500, safety: 1.10 } };
 function _v432renderWalkInCoolerLoad(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Walk-in cooler heat load (ASHRAE Refrigeration / box-load practice): transmission = U x area x deltaT, plus infiltration + product + internal loads, times a safety factor (~1.10). Size the evaporator for a 16-hour (no defrost timer) or 18-hour (timer) run. A sizing aid; the box-load method and equipment ratings govern.";
-  const u = makeNumber("Panel U-factor (4 in ~0.05, 6 in ~0.03)", "wic-u", { step: "any", min: "0" });
+  const u = makeNumber("Panel U-factor (4 in styrene ~0.06, 4 in urethane ~0.04, Heatcraft)", "wic-u", { step: "any", min: "0" });
   const area = makeNumber("Envelope area (ft²)", "wic-a", { step: "any", min: "0" });
   const dt = makeNumber("Ambient-to-box deltaT (°F)", "wic-dt", { step: "any", min: "0" });
   const infil = makeNumber("Infiltration/door load (Btu/hr)", "wic-inf", { step: "any", min: "0" });
   const prod = makeNumber("Product load (Btu/hr)", "wic-prod", { step: "any", min: "0" });
   const internal = makeNumber("Internal load: lights/motors/people (Btu/hr)", "wic-int", { step: "any", min: "0" });
   const sf = makeNumber("Safety factor (default 1.10)", "wic-sf", { step: "any", min: "0" });
-  for (const f of [u, area, dt, infil, prod, internal, sf]) inputRegion.appendChild(f.wrap);
+  const rh = makeNumber("Equipment run time (hr/day; 16 no defrost timer, 18 with)", "wic-rh", { step: "any", min: "0" }); rh.input.value = "16";
+  for (const f of [u, area, dt, infil, prod, internal, sf, rh]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { u.input.value = "0.05"; area.input.value = "800"; dt.input.value = "60"; infil.input.value = "3000"; prod.input.value = "5000"; internal.input.value = "1500"; sf.input.value = "1.10"; update(); });
   const oT = makeOutputLine(outputRegion, "Transmission load", "wic-out-t");
-  const oTot = makeOutputLine(outputRegion, "Total load", "wic-out-tot");
+  const oTot = makeOutputLine(outputRegion, "Total load (24-hr average)", "wic-out-tot");
+  const oEq = makeOutputLine(outputRegion, "Equipment capacity at the run time", "wic-out-eq");
   const oNote = makeOutputLine(outputRegion, "Note", "wic-out-n");
   function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
   const update = debounce(() => {
-    const r = computeWalkInCoolerLoad({ u_factor: readNum(u.input), area_ft2: readNum(area.input), delta_t_f: readNum(dt.input), infiltration_btuh: readNum(infil.input), product_btuh: readNum(prod.input), internal_btuh: readNum(internal.input), safety: readNum(sf.input) });
-    if (r.error) { oT.textContent = r.error; oTot.textContent = "-"; oNote.textContent = ""; return; }
+    const r = computeWalkInCoolerLoad({ u_factor: readNum(u.input), area_ft2: readNum(area.input), delta_t_f: readNum(dt.input), infiltration_btuh: readNum(infil.input), product_btuh: readNum(prod.input), internal_btuh: readNum(internal.input), safety: readNum(sf.input), run_hours: readNum(rh.input) });
+    if (r.error) { oT.textContent = r.error; oTot.textContent = "-"; oEq.textContent = "-"; oNote.textContent = ""; return; }
     oT.textContent = fmt(r.transmission_btuh, 0) + " Btu/hr";
     oTot.textContent = fmt(r.total_btuh, 0) + " Btu/hr (" + fmt(r.tons, 2) + " tons)";
+    oEq.textContent = fmt(r.equipment_btuh, 0) + " Btu/hr (" + fmt(r.equipment_tons, 2) + " tons) at " + fmt(r.run_hours, 0) + " hr/day";
     oNote.textContent = r.note;
   }, DEBOUNCE_MS);
-  for (const f of [u, area, dt, infil, prod, internal, sf]) f.input.addEventListener("input", update);
+  for (const f of [u, area, dt, infil, prod, internal, sf, rh]) f.input.addEventListener("input", update);
 }
 REFRIGERANT_RENDERERS["walk-in-cooler-load"] = _v432renderWalkInCoolerLoad;
 
@@ -881,9 +890,15 @@ export function computeProductPullDownLoad({ mass_lb = 0, cp_above = 0, t_enter_
   if (!(cpa > 0)) return { error: "Specific heat above freezing must be positive (Btu/lb-F)." };
   if (!Number.isFinite(tEnter) || !Number.isFinite(tStore)) return { error: "Enter valid temperatures (F)." };
   if (!(hrs > 0)) return { error: "Pull-down time must be positive (hr)." };
+  if (tEnter < tStore) return { error: "The product must enter warmer than storage (this is a cooling load)." };
   const freezing = tFreeze !== 0 && tStore < tFreeze && hif > 0;
   let q_btu;
-  if (freezing) {
+  if (freezing && tEnter <= tFreeze) {
+    // Already frozen on arrival: only the frozen product's sensible cooling. Until 2026-09-26 it was still charged the
+    // full latent heat (veal entering at 20 F read 95,920 Btu where about 7,800 is right).
+    if (!(cpb > 0)) return { error: "Product enters already frozen: enter the specific heat below freezing." };
+    q_btu = mass * cpb * (tEnter - tStore);
+  } else if (freezing) {
     q_btu = mass * cpa * (tEnter - tFreeze) + mass * hif + mass * cpb * (tFreeze - tStore);
   } else {
     q_btu = mass * cpa * (tEnter - tStore);
@@ -891,7 +906,7 @@ export function computeProductPullDownLoad({ mass_lb = 0, cp_above = 0, t_enter_
   const rate_btuh = q_btu / hrs;
   return {
     q_btu, rate_btuh, freezing,
-    note: "Product pull-down (respiration and cooling) load: the heat to bring the product from its entering temperature to storage over the pull-down period. Above freezing it is a single sensible term mass x cp x deltaT; for a freezer it is the sensible cooling to the freezing point, plus the latent heat of fusion (the bulk of the load), plus the sensible cooling of the frozen product to storage. The rate = total heat / the pull-down hours (commonly 24) is the product contribution to the box load. Respiration heat of live produce is a separate, smaller add. A sizing aid; the product property tables (ASHRAE Refrigeration) govern.",
+    note: "Product pull-down (cooling) load: the heat to bring the product from its entering temperature to storage over the pull-down period. Above freezing it is a single sensible term mass x cp x deltaT; for a freezer it is the sensible cooling to the freezing point, plus the latent heat of fusion (the bulk of the load), plus the sensible cooling of the frozen product to storage. The rate = total heat / the pull-down hours (commonly 24) is the product contribution to the box load. Respiration heat of live produce is a separate, smaller add. A sizing aid; the product property tables (ASHRAE Refrigeration) govern.",
   };
 }
 export const productPullDownLoadExample = { inputs: { mass_lb: 2000, cp_above: 0.9, t_enter_f: 80, t_storage_f: 35, t_freeze_f: 0, hif_btu_lb: 0, cp_below: 0, hours: 24 } };

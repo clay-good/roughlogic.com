@@ -875,7 +875,7 @@ export function computeCeilingSpeakerCoverage({ ceiling_ft = 0, ear_ft = 0, cove
   const count = Math.ceil(area / (spacing_ft * spacing_ft));
   return {
     diameter_ft, spacing_ft, count, overlap: layout === "minimum_overlap",
-    note: "Ceiling speaker coverage and spacing: a ceiling speaker covers a cone whose diameter at the listener plane = 2 x (ceiling - ear height) x tan(coverage angle / 2). Spacing edge-to-edge (speakers just touching, spacing = diameter) gives minimum count but the level dips between speakers; minimum-overlap spacing = 0.7 x diameter (each covers where its neighbor is at -6 dB) gives even coverage for more speakers. Count = ceil(room area / spacing^2). A layout aid; verify with the speaker's coverage-angle spec at the design frequency (angle narrows at high frequency) and the target SPL.",
+    note: "Ceiling speaker coverage and spacing: a ceiling speaker covers a cone whose diameter at the listener plane = 2 x (ceiling - ear height) x tan(coverage angle / 2). Spacing edge-to-edge (speakers just touching, spacing = diameter) gives minimum count but the level dips between speakers; minimum-overlap spacing = 0.7 x diameter (D / sqrt 2: the -6 dB circles just leave no uncovered spot on a square grid, JBL) gives even coverage for more speakers. Count = ceil(room area / spacing^2). A layout aid; verify with the speaker's coverage-angle spec at the design frequency (angle narrows at high frequency) and the target SPL.",
   };
 }
 export const ceilingSpeakerCoverageExample = { inputs: { ceiling_ft: 10, ear_ft: 4, coverage_deg: 90, room_area_ft2: 1200, layout: "edge_to_edge" } };
@@ -959,18 +959,21 @@ export function computeStructuredCablingChannel({ permanent_link_m = 0, cords_m 
   if (!(pl > 0)) return { error: "Permanent-link length must be positive (m)." };
   if (cords < 0) return { error: "Cord length must be non-negative (m)." };
   if (derate < 0) return { error: "De-rate factor must be non-negative." };
-  const max_pl_m = 90 * (1 - Math.max(temp - 20, 0) * derate);
+  const max_pl_m = Math.max(0, 90 * (1 - Math.max(temp - 20, 0) * derate));
   const channel_m = pl + cords;
   const pl_ok = pl <= max_pl_m;
   const chan_ok = channel_m <= 100;
+  // TIA-568: patch + equipment + work-area cords total at most 10 m. Until 2026-09-26 the note said so but the code
+  // never checked it, so 60 m of link and 30 m of cords passed.
+  const cords_ok = cords <= 10;
   return {
-    max_pl_m, channel_m, pl_ok, chan_ok, ok: pl_ok && chan_ok,
-    note: "Structured cabling channel length (TIA-568): a horizontal channel is limited to 100 m total = a 90 m permanent link (the fixed horizontal cable) plus up to 10 m of patch and equipment cords. Above 20 deg C the maximum permanent-link length de-rates (about 0.4% per deg C for UTP, more for screened cable) because warmer copper has higher resistance and insertion loss, so a hot ceiling or plenum shortens the allowed run. The channel passes only if the permanent link is within its de-rated maximum AND the total channel is within 100 m. A design aid; the specific cable's published de-rating and the TIA-568 edition adopted govern.",
+    max_pl_m, channel_m, pl_ok, chan_ok, cords_ok, ok: pl_ok && chan_ok && cords_ok,
+    note: "Structured cabling channel length (TIA-568): a horizontal channel is limited to 100 m total = a 90 m permanent link (the fixed horizontal cable) plus up to 10 m of patch and equipment cords. Above 20 deg C the maximum permanent-link length de-rates (about 0.4% per deg C for UTP from 20 to 40 deg C and 0.6% above 40, about 0.2% for screened cable; Fluke Networks prints 90 m falling to about 84 m at 40 deg C) because warmer copper has higher resistance and insertion loss, so a hot ceiling or plenum shortens the allowed run. The channel passes only if the permanent link is within its de-rated maximum, the cords total no more than 10 m, AND the total channel is within 100 m (longer cords need the TIA zone-cabling formula, not checked here). A design aid; the specific cable's published de-rating and the TIA-568 edition adopted govern.",
   };
 }
 export const structuredCablingChannelExample = { inputs: { permanent_link_m: 85, cords_m: 8, temp_c: 20, derate_per_c: 0.004 } };
 function _renderStructuredCablingChannel(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: Structured cabling channel (TIA-568): 100 m total = 90 m permanent link + up to 10 m cords; above 20 deg C the max permanent link de-rates ~0.4%/deg C (UTP). Passes if the link is within its de-rated max and the channel is within 100 m. A design aid; the cable's published de-rating and the adopted TIA-568 edition govern.";
+  citationEl.textContent = "Citation: Structured cabling channel (TIA-568): 100 m total = 90 m permanent link + up to 10 m cords; above 20 deg C the max permanent link de-rates ~0.4%/deg C (UTP). Passes if the link is within its de-rated max, cords total <= 10 m, and the channel is within 100 m. A design aid; the cable's published de-rating and the adopted TIA-568 edition govern.";
   const pl = makeNumber("Permanent-link length (m)", "scc-pl", { step: "any", min: "0" });
   const cd = makeNumber("Total patch + equipment cords (m)", "scc-cd", { step: "any", min: "0" });
   const tc = makeNumber("Installed cable temperature (°C)", "scc-tc", { step: "any" });
@@ -984,7 +987,7 @@ function _renderStructuredCablingChannel(inputRegion, outputRegion, citationEl) 
     const r = computeStructuredCablingChannel({ permanent_link_m: Number(pl.input.value) || 0, cords_m: Number(cd.input.value) || 0, temp_c: Number(tc.input.value) || 0, derate_per_c: Number(dr.input.value) || 0 });
     if (r.error) { oPl.textContent = r.error; oCh.textContent = "-"; oNote.textContent = ""; return; }
     oPl.textContent = fmt(r.max_pl_m, 1) + " m max -- link " + (r.pl_ok ? "OK" : "TOO LONG");
-    oCh.textContent = fmt(r.channel_m, 1) + " m -- channel " + (r.chan_ok ? "OK" : "OVER 100 m");
+    oCh.textContent = fmt(r.channel_m, 1) + " m -- channel " + (r.chan_ok ? "OK" : "OVER 100 m") + (r.cords_ok ? "" : "; cords over the 10 m TIA total");
     oNote.textContent = r.note;
   }, DEBOUNCE_MS);
   for (const f of [pl, cd, tc, dr]) f.input.addEventListener("input", update);

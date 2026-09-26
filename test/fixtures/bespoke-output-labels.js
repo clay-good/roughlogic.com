@@ -1008,7 +1008,7 @@ export const BESPOKE_OUTPUT_LABELS = {
   "voltage-drop-reactance": {"drop_v":"Voltage drop (V)","drop_percent":"Percent drop","voltage_at_load_v":"Voltage at load (V)","advisory":"Advisory","warnings":"Notes"},
   "voltage-imbalance": {"average_V":"Average","imbalance_percent":"Percent imbalance","derate_factor":"Motor derate factor"},
   "volumetric-efficiency": {"theoretical_cfm":"Theoretical CFM","note":"Note"},
-  "walk-in-cooler-load": {"transmission_btuh":"Transmission load","total_btuh":"Total load","note":"Note"},
+  "walk-in-cooler-load": {"transmission_btuh":"Transmission load","total_btuh":"Total load (24-hr average)","equipment_btuh":"Equipment capacity at the run time","note":"Note"},
   "water-for-compaction": {"dry_weight_lb":"Dry soil weight"},
   "water-hammer-arrestor": {"designation":"Designation","long_branch_flag":"Long-branch note","precharge_psi":"Pre-charge (set air side, system depressurized)","placement_note":"Placement"},
   "water-hammer-surge": {"celerity_fps":"Wave celerity","surge_psi":"Surge ΔP","reflection_time_s":"Reflection time 2L/a","rapid_closure":"Closure category"},

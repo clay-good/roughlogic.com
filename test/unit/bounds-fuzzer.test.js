@@ -21021,13 +21021,16 @@ test("bounds: spec-v367 computeEgressLightingCheck pins the mode thresholds and 
 import { computeMasonryWallWeight as _v368, computeBrickVeneerAnchorSpacing as _v369, computeMasonryLintelLoading as _v370 } from "../../calc-masonry.js";
 
 test("bounds: spec-v368 computeMasonryWallWeight pins the grout proration, the cap, and error seams", () => {
-  const r = _v368({ hollow_psf: 55, grout_adder: 29, cell_spacing: 8, grout_spacing: 48, height_ft: 10 });
-  assert.ok(Math.abs(r.grout_term - 29 * 8 / 48) < 1e-9);
-  assert.ok(Math.abs(r.wall_psf - 59.833) < 0.01);
+  // NCMA TEK 14-13B Table 4 (8 in, 135 pcf units): hollow 39, grouted 48 in o.c. 47, 16 in 63, solid 86 psf.
+  const r = _v368({ hollow_psf: 39, grout_adder: 47, cell_spacing: 8, grout_spacing: 48, height_ft: 10 });
+  assert.ok(Math.abs(r.grout_term - 47 * 8 / 48) < 1e-9);
+  assert.ok(Math.abs(r.wall_psf - 46.833) < 0.01);
+  assert.ok(Math.abs(_v368({ hollow_psf: 39, grout_adder: 47, cell_spacing: 8, grout_spacing: 16 }).wall_psf - 62.5) < 1e-9);
+  assert.ok("error" in _v368({ hollow_psf: 39, grout_adder: -47, cell_spacing: 8, grout_spacing: 16 }));
   assert.ok(Math.abs(r.line_load_plf - r.wall_psf * 10) < 1e-9);
   // Fully grouting caps the adder.
-  const full = _v368({ hollow_psf: 55, grout_adder: 29, cell_spacing: 8, grout_spacing: 8, height_ft: 10 });
-  assert.ok(Math.abs(full.wall_psf - 84) < 1e-9 && Math.abs(full.grout_term - 29) < 1e-9);
+  const full = _v368({ hollow_psf: 39, grout_adder: 47, cell_spacing: 8, grout_spacing: 8, height_ft: 10 });
+  assert.ok(Math.abs(full.wall_psf - 86) < 1e-9 && Math.abs(full.grout_term - 47) < 1e-9);
   // Ungrouted (spacing 0) adds no grout.
   assert.ok(Math.abs(_v368({ hollow_psf: 55, grout_adder: 29, cell_spacing: 8, grout_spacing: 0 }).wall_psf - 55) < 1e-9);
   // Error seams.
@@ -21123,16 +21126,19 @@ test("bounds: spec-v373 computeBernoulliHead pins the three-term sum and error s
 import { computeConduitJamRatio as _v374 } from "../../calc-electrical.js";
 
 test("bounds: spec-v374 computeConduitJamRatio pins the jam band, the three-conductor rule, and error seams", () => {
-  const r = _v374({ conduit_id_in: 2.067, conductor_od_in: 0.65, n_conductors: 3 });
-  assert.ok(Math.abs(r.ratio - 3.18) < 0.01);
+  // Jam ratio = 1.05 x ID / OD (Southwire / IEEE 1185; EC&M prints 1.05 x 5.07/1.60 = 3.33, no jam).
+  const r = _v374({ conduit_id_in: 2.067, conductor_od_in: 0.70, n_conductors: 3 });
+  assert.ok(Math.abs(r.ratio - 3.100) < 0.01);
   assert.strictEqual(r.in_band, true);
   assert.strictEqual(r.jam_prone, true);
-  // Just above 3.2 is not jam-prone.
-  const clear = _v374({ conduit_id_in: 1.61, conductor_od_in: 0.5, n_conductors: 3 });
-  assert.ok(Math.abs(clear.ratio - 3.22) < 0.01 && clear.jam_prone === false);
+  // 0.65 in conductors: 1.05 x 3.18 = 3.34, just clear (straight 3.18 used to read jam-prone).
+  const clear = _v374({ conduit_id_in: 2.067, conductor_od_in: 0.65, n_conductors: 3 });
+  assert.ok(Math.abs(clear.ratio - 3.339) < 0.01 && clear.jam_prone === false);
+  assert.ok(Math.abs(_v374({ conduit_id_in: 5.07, conductor_od_in: 1.6, n_conductors: 3 }).ratio - 3.33) < 0.01);
   // Two conductors at the same jam-band ratio are not flagged (needs exactly 3).
-  assert.strictEqual(_v374({ conduit_id_in: 2.067, conductor_od_in: 0.65, n_conductors: 2 }).jam_prone, false);
-  assert.strictEqual(_v374({ conduit_id_in: 2.067, conductor_od_in: 0.65, n_conductors: 4 }).jam_prone, false);
+  assert.strictEqual(_v374({ conduit_id_in: 2.067, conductor_od_in: 0.70, n_conductors: 2 }).jam_prone, false);
+  assert.strictEqual(_v374({ conduit_id_in: 2.067, conductor_od_in: 0.70, n_conductors: 4 }).jam_prone, false);
+  assert.ok("error" in _v374({ conduit_id_in: 2.067, conductor_od_in: 0.70, n_conductors: 2.5 }));
   // Error seams.
   assert.ok("error" in _v374({ conduit_id_in: 0, conductor_od_in: 0.65 }));
   assert.ok("error" in _v374({ conduit_id_in: 2.067, conductor_od_in: 0 }));
@@ -55975,4 +55981,28 @@ test("bounds: batch-35 fixes -- air-gap string flag, wheel backspacing guards, p
   const hot = _b35ows({ flow_gpm: 100, oil_sg: 0.95, droplet_micron: 150, water_viscosity_cp: 0.52, water_sg: 0.986 });
   assert.ok(Math.abs(hot.rise_velocity_ftmin / cold.rise_velocity_ftmin - 0.036 / 0.05) < 1e-9);
   assert.ok("error" in _b35ows({ flow_gpm: 100, oil_sg: 0.95, water_sg: 0.9 }));
+});
+
+import { computeStructuredCablingChannel as _b36scc } from "../../calc-lowvoltage.js";
+test("bounds: computeStructuredCablingChannel enforces the TIA 10 m cord total and never returns a negative max link", () => {
+  // 60 m of link and 30 m of cords is a 90 m channel but 3x the cord allowance; until 2026-09-26 it passed.
+  const r = _b36scc({ permanent_link_m: 60, cords_m: 30, temp_c: 20 });
+  assert.equal(r.chan_ok, true);
+  assert.equal(r.cords_ok, false);
+  assert.equal(r.ok, false);
+  assert.equal(_b36scc({ permanent_link_m: 85, cords_m: 8, temp_c: 20 }).ok, true);
+  assert.ok(_b36scc({ permanent_link_m: 10, cords_m: 2, temp_c: 300 }).max_pl_m >= 0);
+});
+
+import { computeProductPullDownLoad as _b36ppd, computeWalkInCoolerLoad as _b36wic } from "../../calc-refrigerant.js";
+test("bounds: batch-36 refrigeration fixes -- already-frozen product, colder-than-storage entry, walk-in equipment load", () => {
+  const veal = { mass_lb: 1000, cp_above: 0.71, t_storage_f: 0, t_freeze_f: 29, hif_btu_lb: 91, cp_below: 0.39, hours: 24 };
+  assert.ok(Math.abs(_b36ppd({ ...veal, t_enter_f: 42 }).q_btu - 111540) < 1e-6); // Copeland AE103
+  // Entering at 20 F it is already frozen: sensible only, 1000 x 0.39 x 20 = 7,800 (was 95,920 with the latent heat).
+  assert.ok(Math.abs(_b36ppd({ ...veal, t_enter_f: 20 }).q_btu - 7800) < 1e-6);
+  assert.ok("error" in _b36ppd({ ...veal, t_enter_f: -5 }));
+  // Walk-in: the 24-hr average box load becomes the equipment load over the run time (16 hr default).
+  const w = _b36wic({ u_factor: 0.05, area_ft2: 800, delta_t_f: 60, infiltration_btuh: 3000, product_btuh: 5000, internal_btuh: 1500, safety: 1.1 });
+  assert.ok(Math.abs(w.equipment_btuh - w.total_btuh * 24 / 16) < 1e-9);
+  assert.ok("error" in _b36wic({ u_factor: 0.05, area_ft2: 800, delta_t_f: 60, safety: 0.5 }));
 });
