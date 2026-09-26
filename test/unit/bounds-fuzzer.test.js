@@ -31221,7 +31221,7 @@ test("bounds: spec-v1007 computeFlywheelEnergy pins the rotational KE and speed 
 
 import { computeRcOneWayShear as _v1008 } from "../../calc-concrete.js";
 
-test("bounds: spec-v1008 computeRcOneWayShear pins the ACI 318-19 22.5.5.1(b) Vc, the size-effect factor, the sqrt(f'c) cap, and error seams", () => {
+test("bounds: spec-v1008 computeRcOneWayShear pins the ACI 318-19 22.5.5.1(c) Vc, the size-effect factor, the sqrt(f'c) cap, and error seams", () => {
   const base = { fc_psi: 4000, bw_in: 12, d_in: 16, as_in2: 1.0, vu_kip: 0, lambda: 1.0 };
   const r = _v1008(base);
   assert.ok(Math.abs(r.rho_w - 1.0 / (12 * 16)) < 1e-9); // 0.0052083

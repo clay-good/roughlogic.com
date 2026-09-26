@@ -254,13 +254,17 @@ export function computeRcColumnAxial({ b_in = 0, h_in = 0, fc_psi = 4000, fy_psi
   if (!(ast_in2 < ag_in2)) return { error: "The steel area must be less than the gross section." };
   const rho_g = ast_in2 / ag_in2;
   const rho_flag = rho_g < 0.01 ? "below the ACI 10.6.1 1% minimum" : (rho_g > 0.08 ? "above the ACI 10.6.1 8% maximum" : "within the ACI 10.6.1 1-8% range");
-  const po_lb = 0.85 * fc_psi * (ag_in2 - ast_in2) + fy_psi * ast_in2;
+  // ACI 318-19 22.4.2.1 limits fy to 80,000 psi in Po: high-strength bar cannot be credited past
+  // the strain concrete reaches in pure compression. Until 2026-09-25 a Grade 100 bar was taken
+  // at 100 ksi (StructurePoint's 18x18, 4 in^2 Grade 100 column: 1,488 kip here vs 1,408).
+  const fy_used = Math.min(fy_psi, 80000);
+  const po_lb = 0.85 * fc_psi * (ag_in2 - ast_in2) + fy_used * ast_in2;
   const phi_pn_lb = 0.80 * 0.65 * po_lb;
   const po_kip = po_lb / 1000;
   const phi_pn_kip = phi_pn_lb / 1000;
   return {
     ag_in2, rho_g, rho_flag, po_kip, phi_pn_kip,
-    note: "ACI 318-19 22.4.2: nominal axial strength Po = 0.85 f'c (Ag - Ast) + fy Ast, with the 22.4.2.1 tied-column design cap phi Pn,max = 0.80 phi Po (phi = 0.65, compression-controlled tied) covering the accidental eccentricity a concentric load never truly avoids. Longitudinal steel belongs in the 10.6.1 1-8% ratio band. Concentric short tied column only - no P-M interaction diagram, no slenderness or second-order effects, and the spiral (0.85 / phi = 0.75) variant and tie detailing are separate. A design aid, not a substitute for the structural engineer of record's stamped design.",
+    note: "ACI 318-19 22.4.2: nominal axial strength Po = 0.85 f'c (Ag - Ast) + fy Ast, with fy not more than 80,000 psi (22.4.2.1), with the 22.4.2.1 tied-column design cap phi Pn,max = 0.80 phi Po (phi = 0.65, compression-controlled tied) covering the accidental eccentricity a concentric load never truly avoids. Longitudinal steel belongs in the 10.6.1 1-8% ratio band. Concentric short tied column only - no P-M interaction diagram, no slenderness or second-order effects, and the spiral (0.85 / phi = 0.75) variant and tie detailing are separate. A design aid, not a substitute for the structural engineer of record's stamped design.",
   };
 }
 export const rcColumnAxialExample = { inputs: { b_in: 16, h_in: 16, fc_psi: 4000, fy_psi: 60000, ast_in2: 6.32 } };
@@ -282,7 +286,8 @@ export function computeRcColumnSteelForLoad({ target_load_kip = 0, b_in = 0, h_i
   if (!(fc > 0) || !(fy > 0)) return { error: "Concrete and steel strengths must be positive (psi)." };
   if (!(fy > 0.85 * fc)) return { error: "Steel yield must exceed 0.85 f'c." };
   const ag_in2 = b * h;
-  const ast_strength = (target * 1000 / 0.52 - 0.85 * fc * ag_in2) / (fy - 0.85 * fc);
+  const fyc = Math.min(fy, 80000); // ACI 318-19 22.4.2.1 caps fy at 80 ksi in Po, as the forward tile does
+  const ast_strength = (target * 1000 / 0.52 - 0.85 * fc * ag_in2) / (fyc - 0.85 * fc);
   const ast_min = 0.01 * ag_in2;
   const ast_max = 0.08 * ag_in2;
   const ast_required_in2 = Math.max(ast_strength, ast_min);
@@ -415,13 +420,13 @@ export function computeRcOneWayShear({ fc_psi = 4000, bw_in = 0, d_in = 0, as_in
   const adequate = vu_kip > 0 ? vu_kip <= phi_vc_kip : null;
   return {
     rho_w, lambda_s, vc_psi, vc_kip, phi_vc_kip, vc_simplified_kip, adequate,
-    note: "ACI 318-19 Table 22.5.5.1(b) one-way (beam-action) shear for a member WITHOUT at least minimum shear reinforcement and no axial load: Vc = 8 lambda_s lambda (rho_w)^(1/3) sqrt(f'c) bw d, where rho_w = As/(bw d) is the longitudinal tension-steel ratio and lambda_s = sqrt(2 / (1 + d/10)) capped at 1.0 is the 22.5.5.1.3 size-effect factor (new in the 2019 edition), phi = 0.75. This is the check that governs footings, one-way slabs, and shallow beams with no stirrups; the size-effect penalty and the (rho_w)^(1/3) term make a deep, lightly reinforced section carry noticeably less than the old 2 sqrt(f'c) rule of thumb (shown for comparison). sqrt(f'c) is capped at 100 psi per 22.5.3.1. If the member has at least Av,min stirrups, lambda_s = 1.0 and the simplified 2 lambda sqrt(f'c) (or the (a) expressions) applies instead - see rc-beam-shear. Normalweight unless lambda is set. A design aid, not a substitute for the structural engineer of record's stamped design.",
+    note: "ACI 318-19 Table 22.5.5.1(c) one-way (beam-action) shear for a member WITHOUT at least minimum shear reinforcement and no axial load: Vc = 8 lambda_s lambda (rho_w)^(1/3) sqrt(f'c) bw d, where rho_w = As/(bw d) is the longitudinal tension-steel ratio and lambda_s = sqrt(2 / (1 + d/10)) capped at 1.0 is the 22.5.5.1.3 size-effect factor (new in the 2019 edition), phi = 0.75. This is the check that governs footings, one-way slabs, and shallow beams with no stirrups; the size-effect penalty and the (rho_w)^(1/3) term make a deep, lightly reinforced section carry noticeably less than the old 2 sqrt(f'c) rule of thumb (shown for comparison). sqrt(f'c) is capped at 100 psi per 22.5.3.1. If the member has at least Av,min stirrups, lambda_s = 1.0 and the simplified 2 lambda sqrt(f'c) (or the (a) expressions) applies instead - see rc-beam-shear. Normalweight unless lambda is set. A design aid, not a substitute for the structural engineer of record's stamped design.",
   };
 }
 export const rcOneWayShearExample = { inputs: { fc_psi: 4000, bw_in: 12, d_in: 16, as_in2: 1.0, vu_kip: 0, lambda: 1.0 } };
 
 CONCRETE_RENDERERS["rc-one-way-shear"] = _simpleRenderer({
-  citation: "Citation: ACI 318-19 Table 22.5.5.1(b) one-way shear Vc = 8 lambda_s lambda (rho_w)^(1/3) sqrt(f'c) bw d for a member without at least minimum shear reinforcement, the 22.5.5.1.3 size-effect factor lambda_s = sqrt(2/(1 + d/10)) <= 1.0, the 22.5.3.1 sqrt(f'c) <= 100 psi cap, and phi = 0.75, by name. No axial load; the stirrup-reinforced case is rc-beam-shear. A design aid, not a substitute for the engineer of record.",
+  citation: "Citation: ACI 318-19 Table 22.5.5.1(c) one-way shear Vc = 8 lambda_s lambda (rho_w)^(1/3) sqrt(f'c) bw d for a member without at least minimum shear reinforcement, the 22.5.5.1.3 size-effect factor lambda_s = sqrt(2/(1 + d/10)) <= 1.0, the 22.5.3.1 sqrt(f'c) <= 100 psi cap, and phi = 0.75, by name. No axial load; the stirrup-reinforced case is rc-beam-shear. A design aid, not a substitute for the engineer of record.",
   example: rcOneWayShearExample.inputs,
   fields: [
     { key: "fc_psi", label: "Concrete strength f'c (psi)", kind: "number" },

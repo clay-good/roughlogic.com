@@ -53883,6 +53883,80 @@
    }
   },
   {
+   "tile_id": "diaphragm-shear",
+   "source_publisher": "WoodWorks (Tim Strasser)",
+   "source_title": "Wood-Frame Shear Wall and Diaphragm Design (slides)",
+   "source_edition_or_year": "2018 (ASCE 7-10, 2015 SDPWS)",
+   "source_section_or_page": "Retail restaurant diaphragm: w 150.6 plf, L 84 ft, b 34 ft -> V 6,325 lb, v 186 plf, M 132,829 lb-ft, T = C = 3,907 lb",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "w_plf": 150.6,
+    "l_ft": 84,
+    "b_ft": 34
+   },
+   "outputs": {
+    "v_end_lb": {
+     "value": 6325,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "v_plf": {
+     "value": 186,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "m_ftlb": {
+     "value": 132829,
+     "tolerance": {
+      "abs": 1
+     }
+    },
+    "chord_lb": {
+     "value": 3907,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "diaphragm-shear",
+   "source_publisher": "FEMA",
+   "source_title": "FEMA P-2192-V1, 2020 NEHRP Design Examples",
+   "source_edition_or_year": "2020 edition (ASCE/SEI 7-22)",
+   "source_section_or_page": "Ch. 7 one-story RWFD building, Step 6 (pp. 288-289): w 2.85 klf over 600 ft, depth 360 ft -> V 856 kips (w rounded from 1,712/600), v 2.37 klf, M 128,250 kip-ft, chord 356 kips",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "w_plf": 2850,
+    "l_ft": 600,
+    "b_ft": 360
+   },
+   "outputs": {
+    "v_end_lb": {
+     "value": 856000,
+     "tolerance": {
+      "pct": 0.2
+     }
+    },
+    "m_ftlb": {
+     "value": 128250000,
+     "tolerance": {
+      "pct": 0.05
+     }
+    },
+    "chord_lb": {
+     "value": 356000,
+     "tolerance": {
+      "pct": 0.1
+     }
+    }
+   }
+  },
+  {
    "tile_id": "shearwall-overturning",
    "source_publisher": "AWC SDPWS segmented shear wall + ASCE 7 0.6D ASD overturning (AWC/APA design guides)",
    "source_title": "8 ft wall, 8 kip story shear at 10 ft, 3,000 lb dead -> 1,000 plf unit shear, 9.1 kip net holdown tension",
@@ -54034,6 +54108,32 @@
     },
     "delta_in": {
      "value": 1.0716,
+     "tolerance": {
+      "abs": 0.0005
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "shearwall-deflection",
+   "source_publisher": "WoodWorks (Tim Strasser)",
+   "source_title": "Wood-Frame Shear Wall and Diaphragm Design (slides)",
+   "source_edition_or_year": "2018 (ASCE 7-10, 2015 SDPWS)",
+   "source_section_or_page": "Shear walls in a line, SW2: v 630 plf, h 10 ft, b 9 ft, E 1,400,000, A 16.5 in^2, Ga 14, anchor slip 0.087 in. -> SDPWS Eq. 4.3-1 total 0.571 in.",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "v_plf": 630,
+    "h_ft": 10,
+    "b_ft": 9,
+    "e_psi": 1400000,
+    "a_in2": 16.5,
+    "ga_kin": 14,
+    "da_in": 0.087
+   },
+   "outputs": {
+    "delta_in": {
+     "value": 0.571,
      "tolerance": {
       "abs": 0.0005
      }
@@ -55276,6 +55376,104 @@
    }
   },
   {
+   "tile_id": "steel-beam-ltb",
+   "source_publisher": "AISC",
+   "source_title": "Companion to the AISC Steel Construction Manual, Vol. 1: Design Examples",
+   "source_edition_or_year": "v15.1 (AISC 360-16)",
+   "source_section_or_page": "Example F.1-2B (pp. F-10 to F-11): W18x50 braced at third points, Lb 11.7 ft, Cb 1.01 -> Lp 5.83 ft, Lr 16.9 ft, Mn 339 kip-ft, phi Mn 305, Mn/Omega 203",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "fy": 50,
+    "zx": 101,
+    "sx": 88.9,
+    "ry": 1.65,
+    "rts": 1.98,
+    "j": 1.24,
+    "ho": 17.4,
+    "lb_ft": 11.7,
+    "cb": 1.01
+   },
+   "outputs": {
+    "lp_ft": {
+     "value": 5.83,
+     "tolerance": {
+      "abs": 0.005
+     }
+    },
+    "lr_ft": {
+     "value": 16.9,
+     "tolerance": {
+      "abs": 0.05
+     }
+    },
+    "mn_kipft": {
+     "value": 339,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "phi_mn": {
+     "value": 305,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "ma_kipft": {
+     "value": 203,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "steel-beam-ltb",
+   "source_publisher": "AISC",
+   "source_title": "Companion to the AISC Steel Construction Manual, Vol. 1: Design Examples",
+   "source_edition_or_year": "v15.1 (AISC 360-16)",
+   "source_section_or_page": "Example F.1-3B (pp. F-14 to F-15): W18x50 braced at midspan, Lb 17.5 ft, Cb 1.30 -> Fcr 43.2 ksi, Mn 320 kip-ft, phi Mn 288, Mn/Omega 192",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "fy": 50,
+    "zx": 101,
+    "sx": 88.9,
+    "ry": 1.65,
+    "rts": 1.98,
+    "j": 1.24,
+    "ho": 17.4,
+    "lb_ft": 17.5,
+    "cb": 1.3
+   },
+   "outputs": {
+    "fcr_ksi": {
+     "value": 43.2,
+     "tolerance": {
+      "abs": 0.05
+     }
+    },
+    "mn_kipft": {
+     "value": 320,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "phi_mn": {
+     "value": 288,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "ma_kipft": {
+     "value": 192,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
    "tile_id": "steel-block-shear",
    "source_publisher": "AISC 360-22 Section J4.3",
    "source_title": "1/2 in A36 plate, three 3/4 in bolts -> gross-shear-yield cap governs, Rn 111.8 kip (ASD 55.9)",
@@ -55363,6 +55561,70 @@
      "value": 54.56,
      "tolerance": {
       "pct": 0.1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "steel-block-shear",
+   "source_publisher": "AISC",
+   "source_title": "Companion to the AISC Steel Construction Manual, Vol. 1: Design Examples",
+   "source_edition_or_year": "v15.1 (AISC 360-16)",
+   "source_section_or_page": "Example II.D-3 plate check (pp. IID-23 to IID-24): 1/2 in. A36 plate, six bolts at 3 in., lev 1-1/2, leh 3, 15/16 in. holes (+1/16) -> Agv 8.25, Anv 5.50, Ant 1.25 in^2; 264 > 251 kips; phi Rn 188, Rn/Omega 126",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "t_in": 0.5,
+    "fy": 36,
+    "fu": 58,
+    "n": 6,
+    "s_in": 3,
+    "end_in": 1.5,
+    "edge_in": 3,
+    "dh_in": 1.0,
+    "ubs": 1
+   },
+   "outputs": {
+    "agv": {
+     "value": 8.25,
+     "tolerance": {
+      "abs": 0.005
+     }
+    },
+    "anv": {
+     "value": 5.5,
+     "tolerance": {
+      "abs": 0.005
+     }
+    },
+    "ant": {
+     "value": 1.25,
+     "tolerance": {
+      "abs": 0.005
+     }
+    },
+    "rupture": {
+     "value": 264,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "rn_kip": {
+     "value": 251,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "lrfd_kip": {
+     "value": 188,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "asd_kip": {
+     "value": 126,
+     "tolerance": {
+      "abs": 1
      }
     }
    }
@@ -55457,6 +55719,69 @@
      "value": 121.5,
      "tolerance": {
       "pct": 0.1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "steel-tension-member",
+   "source_publisher": "AISC",
+   "source_title": "Companion to the AISC Steel Construction Manual, Vol. 1: Design Examples",
+   "source_edition_or_year": "v15.1 (AISC 360-16)",
+   "source_section_or_page": "Example D.2 (pp. D-5 to D-7): L4x4x1/2 A36, four 3/4 in. bolts at 3 in. (l = 9 in.) -> An 3.31, U 0.869, Ae 2.88 in^2; yield 135 / 122 / 80.8 kips; rupture 167 / 125 / 83.5 kips",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "ag_in2": 3.75,
+    "fy": 36,
+    "fu": 58,
+    "t_in": 0.5,
+    "dh_in": 0.875,
+    "nh": 1,
+    "xbar_in": 1.18,
+    "l_in": 9
+   },
+   "outputs": {
+    "an_in2": {
+     "value": 3.31,
+     "tolerance": {
+      "abs": 0.005
+     }
+    },
+    "u": {
+     "value": 0.869,
+     "tolerance": {
+      "abs": 0.0005
+     }
+    },
+    "ae_in2": {
+     "value": 2.88,
+     "tolerance": {
+      "abs": 0.005
+     }
+    },
+    "pn_yield_kip": {
+     "value": 135,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "pn_rupt_kip": {
+     "value": 167,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "p_lrfd_kip": {
+     "value": 122,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "p_asd_kip": {
+     "value": 80.8,
+     "tolerance": {
+      "abs": 0.05
      }
     }
    }
@@ -55564,6 +55889,66 @@
    }
   },
   {
+   "tile_id": "rc-column-axial",
+   "source_publisher": "StructurePoint",
+   "source_title": "Interaction Diagram, Tied Reinforced Concrete Column Design Strength (ACI 318-19)",
+   "source_edition_or_year": "May 24, 2022",
+   "source_section_or_page": "Section 1: 16 x 16, f'c 5,000, eight #9 (8.00 in^2) -> Po 1,534.0 kips, phi Pn,max 0.80 x 997 = 797.7 kips",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "b_in": 16,
+    "h_in": 16,
+    "fc_psi": 5000,
+    "fy_psi": 60000,
+    "ast_in2": 8
+   },
+   "outputs": {
+    "po_kip": {
+     "value": 1534,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "phi_pn_kip": {
+     "value": 797.7,
+     "tolerance": {
+      "abs": 0.1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "rc-column-axial",
+   "source_publisher": "StructurePoint",
+   "source_title": "Tied Column with High-Strength Reinforcing Bars, fy = 100 ksi (ACI 318-19), spColumn",
+   "source_edition_or_year": "v1100",
+   "source_section_or_page": "Section 2.1: 18 x 18, f'c 4,000, 4.00 in^2 of Grade 100 bar with fy limited to 80 ksi (22.4.2.1) -> Po 1,408.0 kips, phi Pn,max 732.2 kips",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "b_in": 18,
+    "h_in": 18,
+    "fc_psi": 4000,
+    "fy_psi": 100000,
+    "ast_in2": 4
+   },
+   "outputs": {
+    "po_kip": {
+     "value": 1408,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "phi_pn_kip": {
+     "value": 732.2,
+     "tolerance": {
+      "abs": 0.1
+     }
+    }
+   }
+  },
+  {
    "tile_id": "concrete-bearing-strength",
    "source_publisher": "ACI 318-19 22.8.3",
    "source_title": "12x12 in column (144 in^2) on a 36x36 in footing (1296 in^2), 4000 psi -> sqrt ratio capped 2.0, phiBn 636.5 kip, DCR 0.79 at 500 kip",
@@ -55640,6 +56025,35 @@
    }
   },
   {
+   "tile_id": "concrete-bearing-strength",
+   "source_publisher": "American Concrete Institute",
+   "source_title": "Footings Example 1, Design of a square spread footing (Reinforced Concrete Design Handbook)",
+   "source_edition_or_year": "ACI 318-14 references",
+   "source_section_or_page": "Step 8: 24 x 24 in. column on a 12 ft footing, f'c 4,000, sqrt(A2/A1) capped at 2 -> phi Bn 2,546 kip",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "loaded_area_in2": 576,
+    "support_area_in2": 20736,
+    "fc_psi": 4000,
+    "factored_load_kip": 960
+   },
+   "outputs": {
+    "sqrt_ratio": {
+     "value": 2,
+     "tolerance": {
+      "abs": 0.0005
+     }
+    },
+    "phibn_kip": {
+     "value": 2546,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
    "tile_id": "rc-compression-dev-length",
    "source_publisher": "ACI 318-19 25.4.9.2",
    "source_title": "#8 Grade 60 dowel, 4000 psi, normalweight, no ties -> term1 18.97 in governs, ldc 19.0 in",
@@ -55701,6 +56115,42 @@
      "value": 18.0,
      "tolerance": {
       "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "rc-compression-dev-length",
+   "source_publisher": "American Concrete Institute",
+   "source_title": "Footings Example 1, Design of a square spread footing (Reinforced Concrete Design Handbook)",
+   "source_edition_or_year": "ACI 318-14 references",
+   "source_section_or_page": "Step 8: #6 dowel, fy 60,000, f'c 4,000 -> 14.3 in. (0.0003 fy db = 13.5 in.); ldc = 14.3 in. controls (ACI rounds the 14.23 up)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "bar_diameter_in": 0.75,
+    "fy_psi": 60000,
+    "fc_psi": 4000,
+    "lambda": 1,
+    "psi_r": 1
+   },
+   "outputs": {
+    "term1_in": {
+     "value": 14.3,
+     "tolerance": {
+      "abs": 0.1
+     }
+    },
+    "term2_in": {
+     "value": 13.5,
+     "tolerance": {
+      "abs": 0.05
+     }
+    },
+    "ldc_in": {
+     "value": 14.3,
+     "tolerance": {
+      "abs": 0.1
      }
     }
    }
@@ -56074,8 +56524,107 @@
    }
   },
   {
+   "tile_id": "rc-punching-shear",
+   "source_publisher": "StructurePoint",
+   "source_title": "Two-Way Flat Plate Concrete Floor System Analysis and Design (ACI 318-14), spSlab",
+   "source_edition_or_year": "May 7, 2025 (d = 5.75 in. <= 10, so the 318-19 lambda_s = 1)",
+   "source_section_or_page": "pp. 41-42, interior 16 x 16 column: bo 87 in., terms 252.98 / 379.47 / 293.69 psi -> vc 252.98 psi, phi Vc 0.75 x 126.55 = 94.92 kips",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "c1_in": 16,
+    "c2_in": 16,
+    "d_in": 5.75,
+    "fc_psi": 4000,
+    "position": "interior",
+    "lambda": 1
+   },
+   "outputs": {
+    "bo_in": {
+     "value": 87,
+     "tolerance": {
+      "abs": 0.005
+     }
+    },
+    "vc_psi": {
+     "value": 252.98,
+     "tolerance": {
+      "abs": 0.005
+     }
+    },
+    "phi_vc_kip": {
+     "value": 94.92,
+     "tolerance": {
+      "abs": 0.005
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "rc-punching-shear",
+   "source_publisher": "StructurePoint",
+   "source_title": "Two-Way Flat Plate Concrete Floor System Analysis and Design (ACI 318-14), spSlab",
+   "source_edition_or_year": "May 7, 2025",
+   "source_section_or_page": "edge column (alpha_s 30): bo 59.50 in., third term 309.85 psi, vc 252.98 psi",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "c1_in": 16,
+    "c2_in": 16,
+    "d_in": 5.75,
+    "fc_psi": 4000,
+    "position": "edge",
+    "lambda": 1
+   },
+   "outputs": {
+    "bo_in": {
+     "value": 59.5,
+     "tolerance": {
+      "abs": 0.005
+     }
+    },
+    "vc_psi": {
+     "value": 252.98,
+     "tolerance": {
+      "abs": 0.005
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "rc-punching-shear",
+   "source_publisher": "StructurePoint",
+   "source_title": "Two-Way Flat Plate Concrete Floor System Analysis and Design (ACI 318-14), spSlab",
+   "source_edition_or_year": "May 7, 2025",
+   "source_section_or_page": "corner column (alpha_s 20): bo 37.75 in., third term 319.16 psi, vc 252.98 psi",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "c1_in": 16,
+    "c2_in": 16,
+    "d_in": 5.75,
+    "fc_psi": 4000,
+    "position": "corner",
+    "lambda": 1
+   },
+   "outputs": {
+    "bo_in": {
+     "value": 37.75,
+     "tolerance": {
+      "abs": 0.005
+     }
+    },
+    "vc_psi": {
+     "value": 252.98,
+     "tolerance": {
+      "abs": 0.005
+     }
+    }
+   }
+  },
+  {
    "tile_id": "rc-one-way-shear",
-   "source_publisher": "ACI 318-19 Table 22.5.5.1(b)",
+   "source_publisher": "ACI 318-19 Table 22.5.5.1(c)",
    "source_title": "12 in strip, d = 16 in, 4,000 psi, As = 1.0 in^2 -> lambda_s 0.877, vc 77 psi, phi Vc 11.1 kip",
    "source_edition_or_year": "spec-v1008 worked example (machine-verified)",
    "source_section_or_page": "spec-v1008 section 2.1 pinned example",
@@ -56111,7 +56660,7 @@
   },
   {
    "tile_id": "rc-one-way-shear",
-   "source_publisher": "ACI 318-19 Table 22.5.5.1(b)",
+   "source_publisher": "ACI 318-19 Table 22.5.5.1(c)",
    "source_title": "cross-check: d = 10 in -> lambda_s = 1.0 (size effect off), phi Vc 9.2 kip",
    "source_edition_or_year": "spec-v1008 worked example (machine-verified)",
    "source_section_or_page": "spec-v1008 section 2.1 cross-check",
@@ -56141,6 +56690,36 @@
      "value": 9.232,
      "tolerance": {
       "pct": 0.1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "rc-one-way-shear",
+   "source_publisher": "StructurePoint",
+   "source_title": "Cantilever Retaining Wall Analysis and Design (ACI 318-19), spWall",
+   "source_edition_or_year": "March 3, 2026",
+   "source_section_or_page": "Section 5 wall shear check (p. 10): f'c 4,500, bw 12, d 13.5, As 0.90 in^2 -> rho_w 0.0056, lambda_s 0.92 (Table 22.5.5.1(c)); the printed Vc adds an axial term the tile does not take",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "fc_psi": 4500,
+    "bw_in": 12,
+    "d_in": 13.5,
+    "as_in2": 0.9,
+    "lambda": 1
+   },
+   "outputs": {
+    "rho_w": {
+     "value": 0.0056,
+     "tolerance": {
+      "abs": 5e-05
+     }
+    },
+    "lambda_s": {
+     "value": 0.92,
+     "tolerance": {
+      "abs": 0.005
      }
     }
    }
@@ -56287,6 +56866,58 @@
      "value": 7.386,
      "tolerance": {
       "pct": 0.1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "rc-hook-development",
+   "source_publisher": "PCI Journal (S. K. Ghosh)",
+   "source_title": "The most notable changes from ACI 318-14 to ACI 318-19",
+   "source_edition_or_year": "March-April 2024",
+   "source_section_or_page": "hooked-bar table, #8 Grade 60 in 6,000 psi concrete: ldh 14.1 in. (psi_r 1.0, psi_o 1.0)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "db_in": 1,
+    "fy_psi": 60000,
+    "fc_psi": 6000,
+    "psi_e": 1,
+    "psi_r": 1,
+    "psi_o": 1,
+    "lambda": 1
+   },
+   "outputs": {
+    "ldh_in": {
+     "value": 14.1,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "rc-hook-development",
+   "source_publisher": "PCI Journal (S. K. Ghosh)",
+   "source_title": "The most notable changes from ACI 318-14 to ACI 318-19",
+   "source_edition_or_year": "March-April 2024",
+   "source_section_or_page": "hooked-bar table, #8 Grade 60 in 6,000 psi concrete: ldh 28.2 in. (psi_r 1.6, psi_o 1.25)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "db_in": 1,
+    "fy_psi": 60000,
+    "fc_psi": 6000,
+    "psi_e": 1,
+    "psi_r": 1.6,
+    "psi_o": 1.25,
+    "lambda": 1
+   },
+   "outputs": {
+    "ldh_in": {
+     "value": 28.2,
+     "tolerance": {
+      "abs": 0.05
      }
     }
    }
@@ -56776,6 +57407,30 @@
    }
   },
   {
+   "tile_id": "wood-bearing-perpendicular",
+   "source_publisher": "CED Engineering (R. Nolan), reproducing NDS Table 3.10.4",
+   "source_title": "Determining Allowable Design Values for Wood (S02-004)",
+   "source_edition_or_year": "course text",
+   "source_section_or_page": "p. 22, bearing area factor Cb: lb 1.5 in. -> 1.25",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "r_lb": 800,
+    "b_in": 1.5,
+    "lb_in": 1.5,
+    "fcperp_psi": 625,
+    "near_end": "no"
+   },
+   "outputs": {
+    "cb_f": {
+     "value": 1.25,
+     "tolerance": {
+      "abs": 0.005
+     }
+    }
+   }
+  },
+  {
    "tile_id": "wood-tension-member",
    "source_publisher": "NDS 2018 3.8.1",
    "source_title": "2x6 DF-L chord, 3,000 lb through one 3/4 in bolt -> An 7.125, ft 421 psi, DCR 0.56",
@@ -56853,6 +57508,78 @@
      "value": 0.423,
      "tolerance": {
       "abs": 0.001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "wood-tension-member",
+   "source_publisher": "Purdue University CE 479 (J. A. Ramirez)",
+   "source_title": "CE 479 Wood Design Notes, tension members",
+   "source_edition_or_year": "Fall 2006 (NDS 2001)",
+   "source_section_or_page": "2x8 SP No. 1, one 3/4 in. bolt (hole 7/8 in.): An = 9.56 in^2, ft = 464 psi, F't = 825 x 1.15 = 949 psi",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "t_lb": 4440,
+    "b_in": 1.5,
+    "d_in": 7.25,
+    "dh_in": 0.875,
+    "nh": 1,
+    "ft_psi": 825,
+    "cd_f": 1.15,
+    "cf_f": 1.0
+   },
+   "outputs": {
+    "an_in2": {
+     "value": 9.56,
+     "tolerance": {
+      "abs": 0.005
+     }
+    },
+    "ft_applied_psi": {
+     "value": 464,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "ft_adj_psi": {
+     "value": 949,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "wood-tension-member",
+   "source_publisher": "WoodWorks (Tim Strasser)",
+   "source_title": "Wood-Frame Shear Wall and Diaphragm Design (slides)",
+   "source_edition_or_year": "2018 (ASCE 7-10, 2015 SDPWS)",
+   "source_section_or_page": "Diaphragm chord 2x6: T 3,907 lb, Ft 450 x CD 1.6 = 720 psi -> ft = 3,907/(1.5 x 5.5) = 474 psi",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "t_lb": 3907,
+    "b_in": 1.5,
+    "d_in": 5.5,
+    "dh_in": 0,
+    "nh": 0,
+    "ft_psi": 450,
+    "cd_f": 1.6,
+    "cf_f": 1.0
+   },
+   "outputs": {
+    "ft_applied_psi": {
+     "value": 474,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "ft_adj_psi": {
+     "value": 720,
+     "tolerance": {
+      "abs": 0.5
      }
     }
    }
@@ -57014,6 +57741,38 @@
    }
   },
   {
+   "tile_id": "steel-web-local-strength",
+   "source_publisher": "AISC",
+   "source_title": "Companion to the AISC Steel Construction Manual, Vol. 1: Design Examples",
+   "source_edition_or_year": "v15.1 (AISC 360-16)",
+   "source_section_or_page": "Example II.D-3 (p. IID-24): W16x26, tw 0.250, kdes 0.747, lb 6 in., interior -> web local yielding Rn = 50(0.250)[5(0.747) + 6] = 122 kips, Rn/Omega 81.3",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "fy": 50,
+    "tw": 0.25,
+    "tf": 0.345,
+    "k_in": 0.747,
+    "d_in": 15.7,
+    "lb_in": 6,
+    "location": "interior"
+   },
+   "outputs": {
+    "wly_rn": {
+     "value": 122,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "wly_asd": {
+     "value": 81.3,
+     "tolerance": {
+      "abs": 0.25
+     }
+    }
+   }
+  },
+  {
    "tile_id": "steel-bolt-slip-critical",
    "source_publisher": "AISC 360-22 J3.8 / Table J3.1",
    "source_title": "3/4 in A325, Class A, one slip plane -> 9.49 kip/bolt (ASD 6.33); 4 bolts -> 38.0 kip LRFD",
@@ -57082,6 +57841,43 @@
    }
   },
   {
+   "tile_id": "steel-bolt-slip-critical",
+   "source_publisher": "AISC",
+   "source_title": "Companion to the AISC Steel Construction Manual, Vol. 1: Design Examples",
+   "source_edition_or_year": "v15.1 (AISC 360-16)",
+   "source_section_or_page": "Example J.4A (pp. J-8 to J-9): Class A (mu 0.30), Du 1.13, hf 1.0, Tb 28 kips, two slip planes -> rn 19.0 kips/bolt, phi rn 19.0, rn/Omega 12.7",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "mu": 0.3,
+    "tb_kip": 28,
+    "ns": 2,
+    "n": 6,
+    "hf": 1,
+    "du": 1.13
+   },
+   "outputs": {
+    "rn_bolt_kip": {
+     "value": 19.0,
+     "tolerance": {
+      "abs": 0.05
+     }
+    },
+    "lrfd_bolt_kip": {
+     "value": 19.0,
+     "tolerance": {
+      "abs": 0.05
+     }
+    },
+    "asd_bolt_kip": {
+     "value": 12.7,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
    "tile_id": "steel-fillet-weld-size",
    "source_publisher": "AISC 360-22 Table J2.4 / J2.2b",
    "source_title": "1/2 in to 3/8 in plates, chosen 1/4 in weld -> window 3/16 to 5/16, throat 0.177 in, 1 in min length",
@@ -57145,6 +57941,34 @@
      "value": 0.1875,
      "tolerance": {
       "abs": 0.0001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "steel-fillet-weld-size",
+   "source_publisher": "AISC",
+   "source_title": "Companion to the AISC Steel Construction Manual, Vol. 1: Design Examples",
+   "source_edition_or_year": "v15.1 (AISC 360-16)",
+   "source_section_or_page": "Example J.1 (p. J-2): 1/4 in. plate lapped on 3/8 in. -> minimum fillet 1/8 in. (Table J2.4), maximum 3/16 in. (J2.2b, edge of a 1/4 in. plate)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "t1_in": 0.25,
+    "t2_in": 0.375,
+    "w_in": 0.1875
+   },
+   "outputs": {
+    "min_leg_in": {
+     "value": 0.125,
+     "tolerance": {
+      "abs": 0.0005
+     }
+    },
+    "max_leg_in": {
+     "value": 0.1875,
+     "tolerance": {
+      "abs": 0.0005
      }
     }
    }
@@ -57288,6 +58112,28 @@
    }
   },
   {
+   "tile_id": "snow-drift-load",
+   "source_publisher": "SK&A Engineers (M. Crandall)",
+   "source_title": "Snow Drift Loads: ASCE 7-16 vs 7-22",
+   "source_edition_or_year": "web article",
+   "source_section_or_page": "ASCE 7-22 case, pg 63 psf: snow density 0.13 pg + 14 = 22.19 pcf",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "lu_ft": 40,
+    "pg_psf": 63,
+    "w2": 0.45
+   },
+   "outputs": {
+    "gamma_pcf": {
+     "value": 22.19,
+     "tolerance": {
+      "abs": 0.005
+     }
+    }
+   }
+  },
+  {
    "tile_id": "wind-mwfrs-pressure",
    "source_publisher": "ASCE 7-22 Chapter 27",
    "source_title": "115 mph, qz = qh = 25.9 psf, enclosed -> +22.3 / -15.7 walls, net 28.6 psf (internal cancels)",
@@ -57351,6 +58197,43 @@
      "value": 32.8,
      "tolerance": {
       "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "wind-mwfrs-pressure",
+   "source_publisher": "Struware (ASCE wind guide Chapter 5 examples)",
+   "source_title": "ASCE 7-10 Example, Wind Chapter 5, MWFRS sheet",
+   "source_edition_or_year": "ASCE 7-10",
+   "source_section_or_page": "qz = qh 29.5 psf, G 0.85, Cp 0.8 / -0.5, GCpi 0.18: windward 25.4 psf (with -GCpi), leeward -17.8 (with +GCpi), walls combined 32.6 psf",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "qz_psf": 29.5,
+    "qh_psf": 29.5,
+    "cp_ww": 0.8,
+    "cp_lw": -0.5,
+    "g_f": 0.85,
+    "gcpi": 0.18
+   },
+   "outputs": {
+    "p_ww_psf": {
+     "value": 25.4,
+     "tolerance": {
+      "abs": 0.05
+     }
+    },
+    "p_lw_psf": {
+     "value": -17.8,
+     "tolerance": {
+      "abs": 0.05
+     }
+    },
+    "p_net_psf": {
+     "value": 32.6,
+     "tolerance": {
+      "abs": 0.05
      }
     }
    }
