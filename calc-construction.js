@@ -7128,16 +7128,21 @@ CONSTRUCTION_RENDERERS["wind-velocity-pressure-exposure-coefficient"] = _renderW
 // only tabulates: the nail (12.2.3), the lag screw (12.2.1), and the wood screw
 // (12.2.2), each with its own empirical constant and diameter/penetration law.
 
-// dims: in { g: dimensionless, d_in: L, p_in: L, cd: dimensionless, toenail: dimensionless } out: { w_lbin: M T^-2, z_w: M L T^-2 }
-export function computeWoodNailWithdrawal({ g = 0, d_in = 0, p_in = 0, cd = 1.0, toenail = "no" } = {}) {
+// dims: in { g: dimensionless, d_in: L, p_in: L, cd: dimensionless, toenail: dimensionless, cm: dimensionless } out: { w_lbin: M T^-2, z_w: M L T^-2 }
+export function computeWoodNailWithdrawal({ g = 0, d_in = 0, p_in = 0, cd = 1.0, toenail = "no", cm = 1.0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(g > 0)) return { error: "Specific gravity must be positive (0.50 DF-L, 0.42 SPF)." };
   if (!(d_in > 0)) return { error: "Nail diameter must be positive (in)." };
   if (!(p_in > 0)) return { error: "Penetration must be positive (in)." };
   if (!(cd > 0)) return { error: "The load-duration factor CD must be positive." };
+  // NDS Table 11.3.3 wet service factor for nail withdrawal: 1.0 when the wood stays dry (or stays wet),
+  // 0.25 when its moisture changes after nailing (driven green then dries, or dry then wet). Until
+  // 2026-09-26 the tile had no CM, so a nail driven in green lumber read four times its capacity.
+  const cmv = Number(cm);
+  if (!(cmv > 0 && cmv <= 1)) return { error: "The wet service factor CM must be between 0 and 1 (0.25 or 1.0 for nail withdrawal)." };
   const w_lbin = 1380 * Math.pow(g, 2.5) * d_in;
   const ctn = toenail === "yes" ? 0.67 : 1.0;
-  const z_w = w_lbin * p_in * cd * ctn;
+  const z_w = w_lbin * p_in * cd * cmv * ctn;
   return {
     w_lbin, ctn, z_w,
     note: "NDS 12.2.3 nail/spike reference withdrawal design value W = 1,380 G^(5/2) D (lb/in), with G the specific gravity of the holding member and D the fastener diameter, and the total capacity W x p_pen times the load-duration CD and the toenail factor Ctn = 0.67 (12.5.4). Withdrawal from side grain only - withdrawal from end grain is not permitted (12.2.3.4). The toenail penalty nearly cancels the wind-duration bump, which is why toenailed uplift connections are weak and framing hardware replaces them. This does not cover lateral (shear) loading (the yield-limit model), the head pull-through, or combined withdrawal-plus-lateral. A design aid, not a substitute for the structural engineer of record's stamped design.",
@@ -7146,7 +7151,7 @@ export function computeWoodNailWithdrawal({ g = 0, d_in = 0, p_in = 0, cd = 1.0,
 export const woodNailWithdrawalExample = { inputs: { g: 0.50, d_in: 0.162, p_in: 1.5, cd: 1.0, toenail: "no" } };
 
 const _renderWoodNailWithdrawal = _simpleRenderer({
-  citation: "Citation: NDS 2018 12.2.3 nail withdrawal W = 1,380 G^(5/2) D (lb/in), capacity W x p x CD x Ctn (Ctn = 0.67 toenailed), side grain only (no end-grain withdrawal), by name. A design aid, not a substitute for the engineer of record.",
+  citation: "Citation: NDS 2018 12.2.3 nail withdrawal W = 1,380 G^(5/2) D (lb/in), capacity W x p x CD x CM x Ctn (Ctn = 0.67 toenailed; CM 0.25 when the moisture changes after nailing), side grain only (no end-grain withdrawal), by name. A design aid, not a substitute for the engineer of record.",
   example: woodNailWithdrawalExample.inputs,
   fields: [
     { key: "g", label: "Specific gravity G (0.50 DF-L, 0.42 SPF)", kind: "number" },
@@ -7154,6 +7159,7 @@ const _renderWoodNailWithdrawal = _simpleRenderer({
     { key: "p_in", label: "Penetration into holding member (in)", kind: "number" },
     { key: "cd", label: "Load-duration factor CD (1.6 wind/seismic)", kind: "number" },
     { key: "toenail", label: "Toenailed? (Ctn = 0.67)", kind: "select", options: [{ value: "no", label: "No (face-nailed)" }, { value: "yes", label: "Yes (toenailed)" }], default: "no" },
+    { key: "cm", label: "Wet service factor CM (1.0; 0.25 if the wood's moisture changes after nailing, NDS Table 11.3.3)", kind: "number", default: 1 },
   ],
   outputs: [
     { key: "w", id: "wnw-out-w", label: "Reference withdrawal W", value: (r) => fmt(r.w_lbin, 1) + " lb/in" },

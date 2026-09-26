@@ -67469,6 +67469,57 @@
    }
   },
   {
+   "tile_id": "differential-leveling",
+   "source_publisher": "Pearson (Ghilani), via University of Utah CVEEN 2410",
+   "source_title": "Elementary Surveying, Instructor's Solution Manual, Chapter 5",
+   "source_edition_or_year": "14th edition, 2015",
+   "source_section_or_page": "Problem 5.14, p. 28: BM 323.48; BS 3.18, 2.44, 6.63, 2.35; FS 4.76, 3.05, 3.64, 3.07 -> page check 323.48 + 14.60 - 14.52 = 323.56; misclosure 323.56 - 323.48 = 0.08",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "bm_elev": 323.48,
+    "bs": [
+     3.18,
+     2.44,
+     6.63,
+     2.35
+    ],
+    "fs": [
+     4.76,
+     3.05,
+     3.64,
+     3.07
+    ],
+    "known_close": 323.48
+   },
+   "outputs": {
+    "sum_bs": {
+     "value": 14.6,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "sum_fs": {
+     "value": 14.52,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "final_elev": {
+     "value": 323.56,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "misclosure": {
+     "value": 0.08,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
    "tile_id": "level-loop-adjustment",
    "source_publisher": "Compass-rule level-loop adjustment (Ghilani/Wolf)",
    "source_title": "3-leg loop 0.05 ft high over 2,000 ft -> distance-weighted corrections, last point closes to 100.00 ft",
@@ -67542,6 +67593,44 @@
      "value": 100.0,
      "tolerance": {
       "abs": 0.0005
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "level-loop-adjustment",
+   "source_publisher": "Pearson (Ghilani), via University of Utah CVEEN 2410",
+   "source_title": "Elementary Surveying, Instructor's Solution Manual, Chapter 5",
+   "source_edition_or_year": "14th edition, 2015",
+   "source_section_or_page": "Problem 5.14, p. 28: equal per-setup corrections -0.02, -0.04, -0.06, -0.08 give adjusted elevations 321.88, 321.25, 324.22, 323.48 (setups entered as equal distances)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "elevs": [
+     321.9,
+     321.29,
+     324.28,
+     323.56
+    ],
+    "dists": [
+     1,
+     1,
+     1,
+     1
+    ],
+    "known_close": 323.48
+   },
+   "outputs": {
+    "misclosure": {
+     "value": 0.08,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "last_adjusted": {
+     "value": 323.48,
+     "tolerance": {
+      "abs": 0.001
      }
     }
    }
@@ -67953,6 +68042,68 @@
    }
   },
   {
+   "tile_id": "steel-b2-amplifier",
+   "source_publisher": "AISC",
+   "source_title": "Design Examples, Companion to the AISC Steel Construction Manual",
+   "source_edition_or_year": "v15.1 (2019)",
+   "source_section_or_page": "Example C.1C, pp. C-15 to C-16, LRFD: Pmf 144, Pstory 288 kips, RM 0.925, delta H 0.304 in, H 1.21 kips, L 240 in -> Pe story 884 kips, B2 = 1.48 (first-order stiffness in this example)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "pstory_kip": 288,
+    "pmf_kip": 144,
+    "h_kip": 1.21,
+    "l_ft": 20,
+    "drift_in": 0.304,
+    "method": "LRFD"
+   },
+   "outputs": {
+    "pe_story_kip": {
+     "value": 884,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "b2": {
+     "value": 1.48,
+     "tolerance": {
+      "abs": 0.005
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "steel-b2-amplifier",
+   "source_publisher": "AISC",
+   "source_title": "Design Examples, Companion to the AISC Steel Construction Manual",
+   "source_edition_or_year": "v15.1 (2019)",
+   "source_section_or_page": "Example C.1C ASD: Pmf 96.0, Pstory 192, delta H 0.203 in, H 0.800 kip, alpha 1.6 -> Pe story 875 kips, B2 = 1.54",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "pstory_kip": 192,
+    "pmf_kip": 96,
+    "h_kip": 0.8,
+    "l_ft": 20,
+    "drift_in": 0.203,
+    "method": "ASD"
+   },
+   "outputs": {
+    "pe_story_kip": {
+     "value": 875,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "b2": {
+     "value": 1.54,
+     "tolerance": {
+      "abs": 0.005
+     }
+    }
+   }
+  },
+  {
    "tile_id": "steel-b1-amplifier",
    "source_publisher": "AISC 360-22 Appendix 8.2.1 moment amplifier",
    "source_title": "W10x49 (I 272), Pr 400 kip, 16 ft braced, transverse load, LRFD -> B1 1.234 (spec-v1216)",
@@ -68065,6 +68216,37 @@
    }
   },
   {
+   "tile_id": "steel-h1-interaction",
+   "source_publisher": "AISC",
+   "source_title": "Design Examples, Companion to the AISC Steel Construction Manual",
+   "source_edition_or_year": "v15.1 (2019)",
+   "source_section_or_page": "Example H.1B, pp. H-4 to H-5, W14x99 LRFD: Pr 400 / Pc 1,130 = 0.354; Mrx 250 / Mcx 642, Mry 80.0 / Mcy 311 kip-ft -> 0.928 <= 1.0 o.k.",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "pr_kip": 400,
+    "pc_kip": 1130,
+    "mrx_kft": 250,
+    "mcx_kft": 642,
+    "mry_kft": 80,
+    "mcy_kft": 311
+   },
+   "outputs": {
+    "ratio": {
+     "value": 0.354,
+     "tolerance": {
+      "abs": 0.0005
+     }
+    },
+    "interaction": {
+     "value": 0.928,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
    "tile_id": "steel-effective-length-k",
    "source_publisher": "AISC alignment chart (Dumonteil fit)",
    "source_title": "GA 1.0, GB 2.0, sway frame -> K 1.47",
@@ -68104,6 +68286,28 @@
      "value": 0.82,
      "tolerance": {
       "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "steel-effective-length-k",
+   "source_publisher": "AISC",
+   "source_title": "Design Examples, Companion to the AISC Steel Construction Manual",
+   "source_edition_or_year": "v15.1 (2019)",
+   "source_section_or_page": "Example E.4A, p. E-25, column B-C: Gtop 1.38, Gbottom 1.63 -> K is slightly less than 1.5 (alignment chart; the tile's closed-form sway approximation gives 1.484)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "ga": 1.38,
+    "gb": 1.63,
+    "frame": "sway"
+   },
+   "outputs": {
+    "k_factor": {
+     "value": 1.5,
+     "tolerance": {
+      "abs": 0.02
      }
     }
    }
@@ -68168,6 +68372,29 @@
      "value": 0.8,
      "tolerance": {
       "abs": 0.0001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "steel-tau-b-stiffness-reduction",
+   "source_publisher": "AISC",
+   "source_title": "Design Examples, Companion to the AISC Steel Construction Manual",
+   "source_edition_or_year": "v15.1 (2019)",
+   "source_section_or_page": "Example E.4A, p. E-26, column A-B ASD: Pa 400 kips, Ag 24.0 in2, Fy 50 -> Pa/Ag 16.7 ksi, tau b = 0.994 (Manual Table 4-13 lookup; the closed form gives 0.996)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "pr_kip": 400,
+    "fy_ksi": 50,
+    "ag_in2": 24,
+    "method": "ASD"
+   },
+   "outputs": {
+    "tau_b": {
+     "value": 0.994,
+     "tolerance": {
+      "abs": 0.003
      }
     }
    }
@@ -68301,6 +68528,36 @@
      "value": 29.8,
      "tolerance": {
       "pct": 0.3
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "steel-bolt-tension-shear",
+   "source_publisher": "AISC",
+   "source_title": "Design Examples, Companion to the AISC Steel Construction Manual",
+   "source_edition_or_year": "v15.1 (2019)",
+   "source_section_or_page": "Example J.3, pp. J-6 to J-7, 3/4 in Group A-N, LRFD: Fnt 90, Fnv 54 ksi, Ab 0.442 in2, frv 18.1 ksi -> F'nt 76.8 ksi, phi Rn = 25.5 kips",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "fnt_ksi": 90,
+    "fnv_ksi": 54,
+    "ab_in2": 0.442,
+    "frv_ksi": 18.1,
+    "method": "LRFD"
+   },
+   "outputs": {
+    "fpnt_ksi": {
+     "value": 76.8,
+     "tolerance": {
+      "abs": 0.05
+     }
+    },
+    "avail_tension_kip": {
+     "value": 25.5,
+     "tolerance": {
+      "abs": 0.05
      }
     }
    }
@@ -74947,6 +75204,34 @@
    }
   },
   {
+   "tile_id": "soil-phase-relations",
+   "source_publisher": "University of Tennessee at Chattanooga (Warrington)",
+   "source_title": "ENCE 361 Soil Mechanics",
+   "source_edition_or_year": "2020",
+   "source_section_or_page": "Lecture 4, p. 15: unit weight 109 pcf, water content 8.6%, Gs 2.6 -> Ws = 100.4 lbs per ft3, e = 0.616",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "gamma_pcf": 109,
+    "w_pct": 8.6,
+    "gs": 2.6
+   },
+   "outputs": {
+    "gamma_d_pcf": {
+     "value": 100.4,
+     "tolerance": {
+      "abs": 0.05
+     }
+    },
+    "e_ratio": {
+     "value": 0.616,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
    "tile_id": "atterberg-indices",
    "source_publisher": "Atterberg limits / USCS A-line",
    "source_title": "LL 45, PL 22, w 30 -> PI 23, A-line 18.3, CL (lean clay), LI 0.35",
@@ -75010,6 +75295,34 @@
      "value": 0.6,
      "tolerance": {
       "pct": 1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "atterberg-indices",
+   "source_publisher": "University of Tennessee at Chattanooga (Warrington)",
+   "source_title": "ENCE 361 Soil Mechanics",
+   "source_edition_or_year": "2020",
+   "source_section_or_page": "Lecture 2, p. 32: LL = 63, PL = 42, PI = 21; PI = 0.73(LL - 20) = 31.39 > 21, so below the A-line (MH on the fines chart)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "ll": 63,
+    "pl": 42,
+    "w_pct": 0
+   },
+   "outputs": {
+    "pi": {
+     "value": 21,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "aline": {
+     "value": 31.39,
+     "tolerance": {
+      "abs": 0.005
      }
     }
    }
@@ -75308,6 +75621,37 @@
      "value": 64,
      "tolerance": {
       "pct": 1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "wood-nail-withdrawal",
+   "source_publisher": "Jonathan Ochshorn",
+   "source_title": "Structural Elements for Architects and Builders, Example 3.17",
+   "source_edition_or_year": "3rd edition (online)",
+   "source_section_or_page": "16d common in DF-L (G 0.50, D 0.162 in), penetration 3.5 - (1/2 + 1/8) = 2.875 in: W = 40 lb/in (NDS table, rounded), W' = 40(0.9)(1.0) = 36, each nail resists 103.5 lb (the unrounded 1,380 G^2.5 D gives 39.5 lb/in)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "g": 0.5,
+    "d_in": 0.162,
+    "p_in": 2.875,
+    "cd": 0.9,
+    "toenail": "no",
+    "cm": 1
+   },
+   "outputs": {
+    "w_lbin": {
+     "value": 40,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "z_w": {
+     "value": 103.5,
+     "tolerance": {
+      "abs": 1.5
      }
     }
    }
@@ -77395,6 +77739,34 @@
    }
   },
   {
+   "tile_id": "coil-bypass-factor",
+   "source_publisher": "CED Engineering (A. Bhatia)",
+   "source_title": "Course M05-005, Air Conditioning Psychrometrics",
+   "source_edition_or_year": "p. 46",
+   "source_section_or_page": "air enters at 90 F, coil at 55 F, BF 0.2: T2 = 0.2(90 - 55) + 55 = 62 F (run in reverse: 90 / 55 / 62 -> BF 0.2)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "t_ent_f": 90,
+    "t_adp_f": 55,
+    "t_lvg_f": 62
+   },
+   "outputs": {
+    "bf": {
+     "value": 0.2,
+     "tolerance": {
+      "abs": 0.0005
+     }
+    },
+    "cf": {
+     "value": 0.8,
+     "tolerance": {
+      "abs": 0.0005
+     }
+    }
+   }
+  },
+  {
    "tile_id": "fan-affinity-laws",
    "source_publisher": "AMCA / ASHRAE Fundamentals",
    "source_title": "10,000 CFM / 1.0 in wg / 5.0 BHP, 900 -> 1200 rpm -> 13,333 CFM, 1.78 in wg, 11.85 BHP",
@@ -77456,6 +77828,42 @@
      "value": 2.109,
      "tolerance": {
       "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "fan-affinity-laws",
+   "source_publisher": "Twin City Fan",
+   "source_title": "Engineering Resource Guide ERG-100",
+   "source_edition_or_year": "May 2024, p. 3",
+   "source_section_or_page": "33,120 CFM at 3 in SP, 648 RPM, 22.81 BHP; at 812 RPM -> 4.71 in SP2, 44.88 BHP2 (RPM2 was rounded from a 41,500 CFM target)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "q1_cfm": 33120,
+    "sp1_inwg": 3,
+    "bhp1_hp": 22.81,
+    "n1": 648,
+    "n2": 812
+   },
+   "outputs": {
+    "sp2_inwg": {
+     "value": 4.71,
+     "tolerance": {
+      "abs": 0.005
+     }
+    },
+    "bhp2_hp": {
+     "value": 44.88,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "q2_cfm": {
+     "value": 41500,
+     "tolerance": {
+      "abs": 5
      }
     }
    }
@@ -77820,6 +78228,27 @@
      "value": 0.04267,
      "tolerance": {
       "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "colebrook-friction-factor",
+   "source_publisher": "CED Engineering (H. Bengtson)",
+   "source_title": "Course C03-022, Pipe Flow-Friction Factor Calculations with Excel, Examples 4-5",
+   "source_edition_or_year": "pp. 15-17",
+   "source_section_or_page": "Re = 1.08 x 10^5, e/D = 0.0005/0.5 = 0.001 -> f = 0.0220 (iterated Colebrook; the tile's Swamee-Jain fit agrees within about 1%)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "reynolds": 108000,
+    "rel_roughness": 0.001
+   },
+   "outputs": {
+    "f": {
+     "value": 0.022,
+     "tolerance": {
+      "abs": 0.0003
      }
     }
    }
@@ -78501,6 +78930,36 @@
      "value": 32,
      "tolerance": {
       "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "t-beam-effective-flange-width",
+   "source_publisher": "StructurePoint (after Wang & Salmon Example 4.4.1)",
+   "source_title": "Flexural Strength of Flanged Reinforced Concrete Beam (T-Beam Section), ACI 318-14",
+   "source_edition_or_year": "version June 7, 2021, p. 2",
+   "source_section_or_page": "bw 13 in, tf 4.5 in, clear span 24 ft x 12 - 28 = 260 in, beams 13 ft on center: candidates 85, 78, 156 in -> bf = 78 in (ln/8 per side governs)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "bw_in": 13,
+    "hf_in": 4.5,
+    "ln_in": 260,
+    "sw_in": 143,
+    "beam_type": "interior"
+   },
+   "outputs": {
+    "overhang_in": {
+     "value": 32.5,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "be_in": {
+     "value": 78,
+     "tolerance": {
+      "abs": 0.01
      }
     }
    }
@@ -79676,6 +80135,47 @@
      "value": 0.4267,
      "tolerance": {
       "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "seismic-design-spectral-acceleration",
+   "source_publisher": "FEMA",
+   "source_title": "P-1051, 2015 NEHRP Provisions: Design Examples, 3.2.2 (ASCE 7-16 case)",
+   "source_edition_or_year": "July 2016, pp. 3-8 to 3-9",
+   "source_section_or_page": "SS 1.397, S1 0.487, Site Class C, Fa 1.2, Fv 1.5 -> SMS 1.676, SM1 0.731, SDS 1.118, SD1 0.487 (each step rounded to 3 decimals)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "ss": 1.397,
+    "s1": 0.487,
+    "fa": 1.2,
+    "fv": 1.5
+   },
+   "outputs": {
+    "sms": {
+     "value": 1.676,
+     "tolerance": {
+      "abs": 0.0005
+     }
+    },
+    "sm1": {
+     "value": 0.731,
+     "tolerance": {
+      "abs": 0.0006
+     }
+    },
+    "sds": {
+     "value": 1.118,
+     "tolerance": {
+      "abs": 0.0006
+     }
+    },
+    "sd1": {
+     "value": 0.487,
+     "tolerance": {
+      "abs": 0.0005
      }
     }
    }

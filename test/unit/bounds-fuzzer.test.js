@@ -55803,3 +55803,24 @@ test("bounds: computeStairCodeCheck applies IBC 1011.2's 36 in width where the o
   assert.equal(_v481({ ...base, occupant_load: 50 }).min_width, 44);
   assert.ok("error" in _v481({ ...base, occupant_load: -1 }));
 });
+
+test("bounds: computeWoodNailWithdrawal applies the NDS Table 11.3.3 wet service factor CM", () => {
+  // 16d common in DF-L (Ochshorn Ex. 3.17 inputs): CM 1.0 keeps the old answer; a nail driven in green
+  // lumber that then dries (CM 0.25) holds a quarter of it. Until 2026-09-26 there was no CM input.
+  const base = { g: 0.5, d_in: 0.162, p_in: 2.875, cd: 0.9, toenail: "no" };
+  const dry = _v332(base);
+  const wet = _v332({ ...base, cm: 0.25 });
+  assert.ok(Math.abs(wet.z_w - 0.25 * dry.z_w) < 1e-9);
+  assert.ok("error" in _v332({ ...base, cm: 0 }));
+  assert.ok("error" in _v332({ ...base, cm: 1.5 }));
+});
+
+test("bounds: computeAtterbergIndices follows ASTM D2487 fine-grained groups (CL-ML band, PI < 4 is ML, on the line counts)", () => {
+  // ENCE 361 Lecture 2 p. 19: LL 23, PL 18, PI 5 plots above the A-line (2.19) in the 4-7 band -> CL-ML.
+  // Until 2026-09-26 anything strictly above the line read CL.
+  assert.equal(_v328({ ll: 23, pl: 18 }).group, "CL-ML (silty clay)");
+  assert.equal(_v328({ ll: 45, pl: 22 }).group, "CL (lean clay)"); // PI 23 > 7, above 18.25
+  assert.equal(_v328({ ll: 22, pl: 19 }).group, "ML (silt)"); // PI 3 < 4, even though above the line
+  assert.equal(_v328({ ll: 63, pl: 42 }).group, "MH (elastic silt)"); // ENCE 361: PI 21 < 31.39
+  assert.equal(_v328({ ll: 40, pl: 25.4 }).above_a, true); // PI 14.6 = A-line 14.6: on the line counts
+});

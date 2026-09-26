@@ -6,6 +6,20 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Changed
 
+- **Fifteen more tiles now carry a publisher's printed example.** Apart from the Atterberg classification, no formula errors were found.
+  - **AISC Design Examples v15.1:** `steel-b2-amplifier` (C.1C), `steel-h1-interaction` (H.1B), `steel-effective-length-k` and `steel-tau-b-stiffness-reduction` (E.4A), `steel-bolt-tension-shear` (J.3).
+  - **StructurePoint / Wang & Salmon:** `t-beam-effective-flange-width`.
+  - **Psychrometrics, fluids and fans:**
+    - `coil-bypass-factor`: CED M05-005.
+    - `colebrook-friction-factor`: CED C03-022.
+    - `fan-affinity-laws`: Twin City Fan ERG-100.
+  - **Wood:** `wood-nail-withdrawal`, from Ochshorn.
+  - **Seismic:** `seismic-design-spectral-acceleration`, from FEMA P-1051.
+  - **Surveying:** `differential-leveling` and `level-loop-adjustment`, from Ghilani.
+  - **Soils:** `soil-phase-relations` and `atterberg-indices`, from UTC ENCE 361.
+
+  README: 1,072 of 2,183 tiles are checked only against the project's own derivation; 1,111 carry an outside source.
+
 - **Twelve more tiles now carry a publisher's printed example.**
   - `stopping-sight-distance`: Illinois DOT / Green Book.
   - `superelevation-safe-curve-speed`: Montana DOT Exhibit 3-2.
@@ -343,6 +357,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 - **wrangler 4.129.0 → 4.135.0, and the `sharp` override is gone.** Dependabot's bump failed CI on `check-dependency-overrides`. The new wrangler brings a miniflare that asks for the patched `sharp` 0.35.4 itself, so the September 9 pin no longer changed anything. This is the case the gate was written for, so the override is deleted rather than left as a second source of truth. `npm audit` reports 0 vulnerabilities. docs/threat-model.md records the change.
 
 ### Fixed
+
+- **`atterberg-indices` now classifies fine-grained soils by ASTM D2487.**
+  - **CL-ML:** below LL 50, a PI of 4-7 on or above the A-line is the dual group CL-ML, silty clay.
+  - **ML:** a PI under 4 is ML even when it plots above the line.
+  - **On the line:** a point exactly on the A-line counts as clay.
+
+  The tile called anything strictly above the line lean clay (CL). ENCE 361's LL 23 / PL 18 soil (PI 5) was labeled CL; it is now CL-ML.
+- **`wood-nail-withdrawal` now has the NDS Table 11.3.3 wet service factor CM.** CM is 0.25 when the wood's moisture changes after nailing, for example a nail driven in green lumber that then dries. Without the factor, the tile reported four times the capacity in that case. CM defaults to 1.0, so existing answers do not change.
 
 - **`stopping-sight-distance` and `ssd-design-speed` now use the AASHTO Green Book braking equation.** The Green Book computes braking distance as 1.075 V²/a with a = 11.2 ft/s². The tiles used the rounded V²/(30f) with f = 0.35, which gave 288.1 ft of braking at 55 mph instead of the printed 290.3 ft (Illinois DOT BLRS Figure 28-1A, TxDOT RDM Table 4-23). That is 2.2 ft short, on the unsafe side. The formula is now 1.075 V²/(32.2 (f + G)), and the default friction is 11.2/32.2 = 0.348. The 55 mph example now gives 202.1 + 290.3 ft.
 - **`superelevation-safe-curve-speed`'s example now follows its own advice to use the side friction for the resulting speed.** It paired f 0.12, the AASHTO value for 60 mph, with a radius that gives about 67 mph. With 0.11, the 65 mph value, the 1,500 ft curve supports about 65 mph.

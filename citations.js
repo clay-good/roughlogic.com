@@ -17407,11 +17407,11 @@ export const CITATIONS = {
     ],
   },
   "wood-nail-withdrawal": {
-    formula: "W = 1,380 G^(5/2) D (lb/in); Ctn = toenailed ? 0.67 : 1.0; Z_w = W x p x CD x Ctn.",
+    formula: "W = 1,380 G^(5/2) D (lb/in); Ctn = toenailed ? 0.67 : 1.0; CM = 1.0, or 0.25 when the wood's moisture changes after nailing (NDS Table 11.3.3); Z_w = W x p x CD x CM x Ctn.",
     edition: "The NDS 2018 12.2.3 reference nail/spike withdrawal design value and the toenail factor, by name; the 1,380 empirical constant is named.",
     freeAccess: "The NDS is free to view at awc.org (ANSI/AWC NDS); the 12.2.3 withdrawal equation and the 12.5.4 toenail factor are in the published standard.",
     governance: GOVERNANCE.general,
-    editionNote: "The NDS 2018 12.2.3 reference withdrawal W = 1,380 G^(5/2) D (lb/in) with G the holding member's specific gravity and D the fastener diameter, the capacity W x p_pen, the toenail factor Ctn = 0.67 (12.5.4), and the rule that withdrawal from end grain is not permitted (12.2.3.4). This returns the reference nail-withdrawal design value and capacity - it applies to a nail loaded in withdrawal from side grain (not end grain), uses the holding member's specific gravity, multiplies by the entered CD and Ctn, and does not cover lateral (shear) loading, the head pull-through, or combined withdrawal-plus-lateral. A design aid, not a substitute for the structural engineer of record's stamped design.",
+    editionNote: "The NDS 2018 12.2.3 reference withdrawal W = 1,380 G^(5/2) D (lb/in) with G the holding member's specific gravity and D the fastener diameter, the capacity W x p_pen, the toenail factor Ctn = 0.67 (12.5.4), the wet service factor CM (Table 11.3.3: 0.25 when nails are driven in green lumber that then dries, or in dry lumber that then gets wet), and the rule that withdrawal from end grain is not permitted (12.2.3.4). This returns the reference nail-withdrawal design value and capacity - it applies to a nail loaded in withdrawal from side grain (not end grain), uses the holding member's specific gravity, multiplies by the entered CD and Ctn, and does not cover lateral (shear) loading, the head pull-through, or combined withdrawal-plus-lateral. A design aid, not a substitute for the structural engineer of record's stamped design.",
     assumptions: [
       { name: "Withdrawal value", value: "W = 1,380 G^(5/2) D per inch of penetration into the holding member", source: "NDS 2018 12.2.3" },
       { name: "Toenail factor", value: "Ctn = 0.67 for a toenailed connection (12.5.4)", source: "NDS 2018 12.5.4" },
@@ -17767,7 +17767,7 @@ export const CITATIONS = {
     ],
   },
   "atterberg-indices": {
-    formula: "PI = LL - PL; LI = (w - PL)/PI; A-line PI = 0.73(LL - 20); above A-line -> clay (CL/CH), below -> silt (ML/MH), split at LL = 50.",
+    formula: "PI = LL - PL; LI = (w - PL)/PI; A-line PI = 0.73(LL - 20); on or above A-line -> clay (CL/CH), below -> silt (ML/MH), split at LL = 50; below LL 50, PI 4-7 on or above the line -> CL-ML and PI < 4 -> ML (ASTM D2487).",
     edition: "The Atterberg-limit indices (plasticity index, liquidity index) and the USCS A-line classification, with the ASTM D4318 limit tests, by name.",
     freeAccess: "The Atterberg-limit definitions and the USCS A-line are public geotechnical results; ASTM D4318 defines the limit tests.",
     governance: GOVERNANCE.general,

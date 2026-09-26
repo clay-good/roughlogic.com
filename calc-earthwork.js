@@ -1877,12 +1877,17 @@ export function computeAtterbergIndices({ ll = 0, pl = 0, w_pct = 0 } = {}) {
   if (!(ll > pl)) return { error: "The liquid limit must exceed the plastic limit (a soil with PL >= LL is nonplastic)." };
   const pi = ll - pl;
   const aline = 0.73 * (ll - 20);
-  const above_a = pi > aline;
-  const group = above_a ? (ll < 50 ? "CL (lean clay)" : "CH (fat clay)") : (ll < 50 ? "ML (silt)" : "MH (elastic silt)");
+  // ASTM D2487 fine-grained groups: "on or above" the A-line counts as clay. With LL < 50, PI > 7 is CL,
+  // PI 4-7 is the dual CL-ML, and PI < 4 is ML even above the line. Until 2026-09-26 any point strictly
+  // above the line read CL, so a PI 5 silty clay (LL 23, PL 18) was labeled lean clay.
+  const above_a = pi >= aline;
+  const group = ll >= 50
+    ? (above_a ? "CH (fat clay)" : "MH (elastic silt)")
+    : (above_a && pi > 7 ? "CL (lean clay)" : above_a && pi >= 4 ? "CL-ML (silty clay)" : "ML (silt)");
   const li = w_pct > 0 ? (w_pct - pl) / pi : null;
   return {
     pi, aline, above_a, group, li,
-    note: "Atterberg limits: the plasticity index PI = LL - PL (liquid minus plastic limit), the liquidity index LI = (w - PL)/PI (where the in-situ water content sits between the limits), and the USCS A-line PI = 0.73(LL - 20). A soil plotting above the A-line is a clay (CL/CH), below it a silt (ML/MH), with the LL = 50 line splitting low from high plasticity - and in the low-PI range the A-line, not PI alone, separates a silt from a lean clay. Classification by the A-line/LL=50 chart (the full USCS also needs the fines content and gradation for a coarse or dual classification), limits from ASTM D4318; it does not compute the shrink-swell potential, the activity, or the coarse-fraction sieve classification. An engineering aid; the soil test data and the geotechnical engineer govern.",
+    note: "Atterberg limits: the plasticity index PI = LL - PL (liquid minus plastic limit), the liquidity index LI = (w - PL)/PI (where the in-situ water content sits between the limits), and the USCS A-line PI = 0.73(LL - 20). A soil plotting on or above the A-line is a clay (CL/CH), below it a silt (ML/MH), with the LL = 50 line splitting low from high plasticity; below LL 50 a PI of 4-7 on or above the line is the dual CL-ML, and a PI under 4 is ML (ASTM D2487). Classification by the A-line/LL=50 chart (the full USCS also needs the fines content and gradation for a coarse or dual classification), limits from ASTM D4318; it does not compute the shrink-swell potential, the activity, or the coarse-fraction sieve classification. An engineering aid; the soil test data and the geotechnical engineer govern.",
   };
 }
 export const atterbergIndicesExample = { inputs: { ll: 45, pl: 22, w_pct: 30 } };
