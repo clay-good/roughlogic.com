@@ -2507,6 +2507,8 @@ export function computeSellerNetSheet({ price = 0, payoff = 0, commission_pct = 
   const otherN = Number(other) || 0;
   if (!(P > 0 && Number.isFinite(P))) return { error: "Sale price must be positive ($)." };
   if (![payoffN, commPct, ttPct, feesN, conc, annualTax, days, otherN].every(Number.isFinite)) return { error: "All inputs must be finite numbers." };
+  // "other" may be a credit; the rest are charges. Until 2026-09-26 a negative commission returned a negative cost of sale.
+  if ([payoffN, commPct, ttPct, feesN, conc, annualTax, days].some((v) => v < 0)) return { error: "Payoff, commission, transfer tax, fees, concessions, property tax, and days cannot be negative." };
   const commission = P * commPct / 100;
   const transferTax = P * ttPct / 100;
   const taxProration = annualTax * days / 365; // seller owes this share (debit)

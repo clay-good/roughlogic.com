@@ -158,6 +158,8 @@ const STRETCH_TENSILE_AREA_IN2 = {
 // material categorical and dimensionless k-factor.)
 export function computeBoltStretch({ diameter_in = 0, grip_length_in = 0, stretch_thou = 0, material = "steel", k_factor = 0.18 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // Until 2026-09-26 a negative entry here returned a negative quantity with no error.
+  if (["diameter_in", "grip_length_in", "k_factor"].some((k) => Number(arguments[0]?.[k]) < 0)) return { error: "Bolt diameter, grip length, and nut factor cannot be negative." };
   const E = FASTENER_MODULUS_PSI[material];
   if (!Number.isFinite(E)) return { error: "Unknown fastener material." };
   if (!(diameter_in > 0)) return { error: "Diameter must be positive." };

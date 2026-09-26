@@ -10,12 +10,22 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **`sliding-snow-load` no longer says a narrow lower roof concentrates the load.** The code was fixed on September 19 so that a roof narrower than 15 ft takes only its width/15 share. The note, citation, description and output label still said the whole load packs into a heavier surcharge. All four now match the code and O'Rourke's ASCE 7-05 Example 2: a 12 ft garage takes 133 plf at 11.1 psf.
+- **`capacitor-discharge-time` asks for the peak voltage on an ac bank.** The bleed resistor is sized from V0, and an ac capacitor can be cut off at its peak, 1.414 x rms. Entering 480 V rms instead of 679 V returns a resistor too large to meet the 460.6 limit. The label, note and citation now say so; the continuous burn on an ac bank is about half the V0^2/R shown.
+- **Twenty-two tiles now refuse a negative entry instead of returning a negative quantity.** A sweep flipped the sign of every input in each tile's first fixture row. Before this fix, a negative slab length returned -81 bags of concrete; a negative coat count, -4 gallons of paint; a negative module Voc, a -14-module string. The same happened for area, pipe volume, board footage, box fill, water-heater recovery, trap primer, rainwater yield, combustion air, battery runtime, mortar, nail pullout, vehicle axle loads, bolt nut factor, weld cost, pallet weight, SRT/F:M, seller net sheet, sector area and rooftop-curb fasteners. Inputs that really can be signed (a cooling delta-T, a downhill grade, temperatures, a datum arm) were left alone.
 - **`combined-stress-axial-bending` now reports the same fibers when the moment is entered as negative.** The extreme fibers are P/A +/- |M c/I|. A negative M used to swap them: Pytel & Singer's Problem 912 section read +2,250 psi "all compression" over a face that is actually at -750 psi.
 - **`glulam-volume-factor` no longer credits the loading factor KL to NDS 2018.** NDS 2018 Eq. 5.3-1 has no KL; that coefficient belonged to NDS 1997, and the current edition measures L between points of zero moment. KL stays as an optional legacy multiplier that defaults to 1.0. Results at the default are unchanged, and Ochshorn Example 3.7 (Cv = 0.84) still reproduces.
 
 - **`masonry-lintel-loading` now needs 8 in of wall above the triangle before it credits arching.** NCMA TEK 17-1 requires the 45-degree load triangle plus at least 8 in of masonry above its apex. The tile used to credit arching as soon as the wall reached span/2. A 6 ft opening with 3.5 ft of wall above now carries the full 1,260 lb rectangle instead of the 540 lb triangle.
 
 ### Changed
+
+- **Nine more tiles now carry a publisher's printed example.** No formula errors were found beyond the fixes above.
+  - **Mechanics:** `shaft-torsion` (Pytel & Singer Problem 304), `thermal-stress-restrained` (DOE-HDBK-1017), `hoop-stress-thin-wall` (Hibbeler Problem 8-4).
+  - **Snow and concrete:** `sliding-snow-load` (AWC ASCE 7-05 Example 2), `mass-concrete-temp-rise` (PCA rule via Gajda and VanGeem), `concrete-crack-control-spacing` (StructurePoint).
+  - **Electrical, HVAC and marine:** `transformer-loading-efficiency` (two University of Anbar examples), `moist-air-enthalpy` (ASHRAE Fundamentals Example 1), `hull-speed` (WaveTrain).
+
+  README: 1,032 of 2,183 tiles are checked only against the project's own derivation; 1,151 carry an outside source.
 
 - **Eleven more tiles now carry a publisher's printed example.** No formula errors were found beyond the fixes above. Four other candidates were skipped because the printed method differs from the tile's (PPI HDD pullback, JM Eagle pipe deflection with live load, Ohio DOT gauge dry density, NRCS riprap with an unstated C).
   - **Surveying and roads:** `stadia-distance` (NAVEDTRA 14070), `taping-corrections` (NAVEDTRA 14069), `superelevation` (FHWA-HRT-17-098, in reverse), `sag-vertical-curve-comfort` (INDOT Fig. 55-4A).
@@ -246,7 +256,7 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
   README: 1,200 of 2,183 tiles are checked only against the project's own derivation; 983 carry an outside source.
 
-- **Ten more tiles now carry a publisher's printed example.**
+- **Nine more tiles now carry a publisher's printed example.**
   - `belt-hp-transmitted`: Shigley 17-2.
   - `tire-contact-patch`: Boeing.
   - `tailstock-setover`: Krar.
@@ -260,7 +270,7 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
   README: 1,211 of 2,183 tiles are checked only against the project's own derivation; 972 carry an outside source.
 
-- **Ten more tiles now carry a publisher's printed example.**
+- **Nine more tiles now carry a publisher's printed example.**
   - `wobbe-index`: Emerson 1660AD-5a.
   - `dp-level-hydrostatic`: Viatran.
   - `rlc-reactance-resonance`: OpenStax College Physics 23.12.
@@ -302,7 +312,7 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
   - **Concrete and building:** `fineness-modulus` and `fine-aggregate-grading` (PCA EB001 Tables 6-3 and 6-5), `blower-door-ach50` (Fine Homebuilding and BPA Journal).
 
   README: 1,245 of 2,183 tiles are checked only against the project's own derivation (785 from first principles, 460 by a named method); 938 carry an outside source.
-- **Ten more tiles now carry a publisher's printed example or table.**
+- **Nine more tiles now carry a publisher's printed example or table.**
   - **Aviation and tools:** `glidepath-descent-rate` (FAA Terminal Procedures rate-of-descent table), `torque-adapter-correction` (FAA AC 43.13-1B and Capri Tools).
   - **Farm and truck:** `tractor-ballast` (MSU Extension), `tire-load-check` (Michelin load tables), `grain-shrink-moisture` (National Corn Handbook NCH-61, SDSU iGrow).
   - **Water and wastewater:** `clarifier-surface-loading` (PA DEP operator module), `manure-application-rate` (Minnesota PCA), `chlorine-demand` (CA DPH worksheet).

@@ -56,6 +56,9 @@ export function computePVStringSizing({
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   inverter_mppt_max_V = Number(inverter_mppt_max_V);
   if (!module_voc_V || !module_vmp_V) return { error: "Module Voc and Vmp are required." };
+  // A negative voltage used to return a negative maximum string length (-14 modules) with no error.
+  if (!(module_voc_V > 0) || !(module_vmp_V > 0)) return { error: "Module Voc and Vmp must be positive (V)." };
+  if (!(Number(inverter_vdc_max_V) > 0) || !(Number(inverter_mppt_min_V) >= 0)) return { error: "Inverter maximum dc voltage must be positive and the MPPT minimum cannot be negative (V)." };
   const coeff = Math.abs(Number(voc_temp_coeff_pct_per_C) || 0);
   const cold_voc = module_voc_V * (1 + coeff * (25 - record_low_C) / 100);
   // A module in full sun runs well above the air: about 25-35 C for rack and
@@ -87,6 +90,8 @@ export const pvStringSizingExample = {
 // dims: in { amp_hours: I T, system_V: M L^2 T^-3 I^-1, dod_percent: dimensionless, load_W: M L^2 T^-3, peukert_k: dimensionless, rated_hours: T } out: { usable_wh: M L^2 T^-3 T, hours: T }
 export function computeBatteryRuntime({ amp_hours, system_V, dod_percent = 100, load_W, peukert_k = 1, inverter_efficiency_pct = 100, rated_hours = 20 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // Until 2026-09-26 a negative entry here returned a negative quantity with no error.
+  if (["amp_hours", "system_V", "dod_percent", "load_W"].some((k) => Number(arguments[0]?.[k]) < 0)) return { error: "Battery capacity, voltage, depth of discharge, and load cannot be negative." };
   const Ah = Number(amp_hours) || 0;
   const V = Number(system_V) || 0;
   const dod = (Number(dod_percent) || 0) / 100;

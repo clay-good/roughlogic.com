@@ -1740,7 +1740,7 @@ export const CITATIONS = {
     ],
   },
   "capacitor-discharge-time": {
-    formula: "V(t) = V0 e^(-t/RC); t_discharge = R C ln(V0/V_safe); R_max = t_limit / (C ln(V0/V_safe)); P_continuous = V0^2/R.",
+    formula: "V(t) = V0 e^(-t/RC); t_discharge = R C ln(V0/V_safe); R_max = t_limit / (C ln(V0/V_safe)); P_continuous = V0^2/R. V0 is the voltage at disconnect, the peak (1.414 x rms) on an ac bank.",
     edition: "The capacitor stored-energy discharge requirement of NEC 2023 460.6 and 460.28 -- residual voltage to 50 V within 1 minute at 1,000 V nominal or less, 5 minutes above 1,000 V, by a permanent or automatic discharge means -- by name. A computational aid; the AHJ-adopted NEC edition and the equipment listing govern.",
     freeAccess: "NEC is free to read at nfpa.org/freeaccess. The RC-discharge relation is first-principles; the 460.6 time limits and the permanent/automatic-connection requirement are in the published code.",
     governance: GOVERNANCE.electrical,
@@ -1748,7 +1748,8 @@ export const CITATIONS = {
     assumptions: [
       { name: "Time limit", value: "residual to 50 V within 1 minute at 1,000 V nominal or less, 5 minutes above 1,000 V (600 V was the pre-2020 threshold)", source: "NEC 2023 460.6 / 460.28" },
       { name: "Connection", value: "the discharge means must be permanently connected or connect automatically on loss of line; a manually switched bleed does not comply", source: "NEC 460.6(B)" },
-      { name: "Continuous power", value: "the resistor dissipates V0^2/R while the bank is energized; rate it with margin", source: "first-principles" },
+      { name: "Continuous power", value: "the resistor dissipates V0^2/R while the bank is energized (about half that on an ac bank with a peak V0); rate it with margin", source: "first-principles" },
+      { name: "Initial voltage", value: "an ac bank can be disconnected at its peak, sqrt(2) x rms; the rms value returns a resistor too large", source: "Lifasa TS 03-010I Discharge Resistors" },
     ],
   },
   "transformer-turns-ratio": {
@@ -10744,7 +10745,7 @@ export const CITATIONS = {
     governance: GOVERNANCE.general,
     editionNote: "This is a SCREEN, not a thermal analysis. The rise coefficient depends on the cement type and the supplementary cementitious materials (slag and fly ash lower it). The ~35 degF surface-to-core differential is the crack-control target a thermal-control plan enforces through modeling. The engineer of record governs; a wrong number means thermal cracking (repair), not injury.",
     assumptions: [
-      { name: "Rise coefficient", value: "degF per 100 lb cementitious from the mix data; SCMs (slag, fly ash) lower it (~12 default, ~8 with slag)", source: "mix data / ACI 207" },
+      { name: "Rise coefficient", value: "degF per 100 lb cementitious from the mix data; SCMs (slag, fly ash) lower it (~12 default, ~8 with slag). The published portland-cement rule of thumb is 12.8 degF per 100 lb, for 500-1,000 lb/cy and a least dimension over 6 ft", source: "mix data / PCA Design and Control (via Gajda and VanGeem, Controlling Temperatures in Mass Concrete)" },
       { name: "Differential target", value: "~35 degF surface-to-core crack-control target the thermal-control plan enforces", source: "ACI 207 / engineer of record" },
     ],
   },
@@ -17061,10 +17062,10 @@ export const CITATIONS = {
     edition: "The ASCE 7 §7.9 sliding snow load on a lower roof, by name.",
     freeAccess: "ASCE 7 is available through the ASCE Library at ascelibrary.org; the §7.9 sliding-load relation is public.",
     governance: GOVERNANCE.general,
-    editionNote: "ASCE 7 §7.9 accounts for snow sliding off a slippery upper roof onto a lower roof: the total sliding load per foot of shared eave = 0.4 x the upper roof's flat-roof snow load Pf x its horizontal eave-to-ridge length W. That load is distributed uniformly over the lower roof out to 15 ft from the upper roof's eave (or the full lower-roof width if it is less than 15 ft), so a lower roof narrower than 15 ft carries the same total spread over less area and sees a heavier per-square-foot surcharge. The sliding load is superimposed on the lower roof's own balanced snow load. It applies where the upper roof is slippery (e.g. metal, membrane) and sloped enough to shed; the engineer judges whether sliding is possible. A design aid, not a substitute for the structural engineer of record's stamped design.",
+    editionNote: "ASCE 7 §7.9 accounts for snow sliding off a slippery upper roof onto a lower roof: the total sliding load per foot of shared eave = 0.4 x the upper roof's flat-roof snow load Pf x its horizontal eave-to-ridge length W. That load is distributed uniformly over the lower roof out to 15 ft from the upper roof's eave ; a lower roof narrower than 15 ft takes only its share, total x (width/15), so its surcharge in psf is unchanged and the total drops (AWC / O'Rourke, Snow Provisions in ASCE 7-05, Example 2: a 12 ft garage takes 0.80 x 166 = 133 plf at 11.1 psf). The sliding load is superimposed on the lower roof's own balanced snow load. It applies where the upper roof is slippery (e.g. metal, membrane) and sloped enough to shed; the engineer judges whether sliding is possible. A design aid, not a substitute for the structural engineer of record's stamped design.",
     assumptions: [
       { name: "Total sliding load", value: "0.4 x upper Pf x upper eave-to-ridge W, per foot of eave", source: "ASCE 7 §7.9" },
-      { name: "Distribution", value: "uniform over the lesser of 15 ft or the lower-roof width", source: "ASCE 7 §7.9" },
+      { name: "Distribution", value: "uniform over 15 ft; a lower roof narrower than 15 ft takes total x width/15 at the same psf", source: "ASCE 7 §7.9" },
       { name: "Superimposed", value: "added to the lower roof's own balanced snow load", source: "ASCE 7 Ch. 7" },
     ],
   },

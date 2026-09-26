@@ -386,6 +386,8 @@ export const cfmPerTonExample = {
 // dims: in { btu_input: M L^2 T^-3, room_volume_ft3: L^3 } out: { required_volume_ft3: L^3, sufficient: dimensionless }
 export function computeCombustionAir({ btu_input, room_volume_ft3 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // Until 2026-09-26 a negative entry here returned a negative quantity with no error.
+  if (["btu_input", "room_volume_ft3"].some((k) => Number(arguments[0]?.[k]) < 0)) return { error: "Appliance input and room volume cannot be negative." };
   // If room volume >= 50 ft^3 per 1000 BTU/hr, combustion air is "adequate
   // by volume" (standard rule of thumb). Otherwise combustion air must be
   // supplied; opening size approx 1 in^2 per 4000 BTU/hr from outdoors (two

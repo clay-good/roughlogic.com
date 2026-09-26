@@ -300,6 +300,8 @@ export function computeSRTandFM({
   bod_load_lb_day = 0, effluent_tss_mg_l = 0, effluent_flow_mgd = 0,
 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // Until 2026-09-26 a negative entry here returned a negative quantity with no error.
+  if (["aeration_volume_gal", "mlss_mg_l", "mlvss_mg_l", "was_flow_mgd", "was_tss_mg_l", "effluent_tss_mg_l", "effluent_flow_mgd", "bod_load_lb_day"].some((k) => Number(arguments[0]?.[k]) < 0)) return { error: "Volumes, flows, concentrations, and loads cannot be negative." };
   if (!(aeration_volume_gal > 0)) return { error: "Aeration volume must be positive." };
   if (!(mlss_mg_l > 0)) return { error: "MLSS must be positive." };
   // Convert aeration volume to MG, then to lb of solids.

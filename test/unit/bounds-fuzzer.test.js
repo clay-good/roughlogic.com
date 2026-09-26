@@ -55861,3 +55861,70 @@ test("bounds: computeStadiaDistance takes an external-focusing stadia constant C
   assert.ok(Math.abs(_v312(base).h_ft - (r.h_ft - Math.cos((base.theta_deg * Math.PI) / 180))) < 1e-9);
   assert.ok("error" in _v312({ ...base, c_ft: -1 }));
 });
+
+test("bounds: computePVStringSizing rejects negative module and inverter voltages", () => {
+  // Until 2026-09-26 a negative Voc returned a maximum string of -14 modules with no error.
+  const base = { module_voc_V: 40, module_vmp_V: 33, voc_temp_coeff_pct_per_C: 0.30, record_low_C: -10, record_high_C: 45, inverter_mppt_min_V: 200, inverter_mppt_max_V: 480, inverter_vdc_max_V: 600 };
+  assert.ok(!("error" in computePVStringSizing(base)));
+  assert.ok("error" in computePVStringSizing({ ...base, module_voc_V: -40 }));
+  assert.ok("error" in computePVStringSizing({ ...base, module_vmp_V: -33 }));
+  assert.ok("error" in computePVStringSizing({ ...base, inverter_vdc_max_V: -600 }));
+  assert.ok("error" in computePVStringSizing({ ...base, inverter_mppt_min_V: -200 }));
+});
+
+import { computeConcreteVolume as _neg1, computeArea as _neg2, computeBoardFootage as _neg3, computePaintCoverage as _neg4, computeMortarMix as _neg5, computePullout as _neg6 } from "../../calc-construction.js";
+import { computePipeVolume as _neg7, computeWaterHeaterRecovery as _neg8, computeTrapPrimer as _neg9 } from "../../calc-plumbing.js";
+import { computeRainwaterYield as _neg10, computeVehicleLoad as _neg11, computeGeometry as _neg12 } from "../../calc-cross.js";
+import { computeCombustionAir as _neg13 } from "../../calc-hvac.js";
+import { computeBatteryRuntime as _neg14 } from "../../calc-solar.js";
+import { computeBoltStretch as _neg15 } from "../../calc-mechanic.js";
+import { computeWeldCostPerFoot as _neg16 } from "../../calc-fab.js";
+import { computePalletLoadout as _neg17 } from "../../calc-trucking.js";
+import { computeSRTandFM as _neg18 } from "../../calc-water.js";
+import { computeSellerNetSheet as _neg19 } from "../../calc-realestate.js";
+import { computeRooftopCurbUplift as _neg20 } from "../../calc-hvacsystems.js";
+import { computeBoxFill as _neg21 } from "../../calc-electrical.js";
+
+test("bounds: a negative dimension, count, rate or efficiency is refused instead of returning a negative quantity", () => {
+  // Found 2026-09-26 by flipping the sign of each input of every tile's first fixture row: these returned
+  // negative bags, gallons, areas or costs with no error. Each case is [fn, the fixture-row inputs, key to negate].
+  const cases = [
+    [_neg1, { shape: "slab", length_ft: 10, width_ft: 10, thickness_in: 4 }, "length_ft"],
+    [_neg2, { shape: "rectangle", length_ft: 10, width_ft: 12 }, "width_ft"],
+    [_neg3, { thickness_in: 2, width_in: 4, length_ft: 8, count: 10 }, "count"],
+    [_neg4, { area_ft2: 700, coats: 2, primer_needed: true, surface_porosity: "smooth" }, "coats"],
+    [_neg5, { unit_count: 600, unit_kind: "brick", joint_in: 0.375, mortar_type: "N" }, "joint_in"],
+    [_neg6, { fastener_type: "nail", fastener_size: "16d_common", species: "DF-L", penetration_in: 1.5 }, "penetration_in"],
+    [_neg7, { internal_diameter_in: 1.049, length_ft: 100 }, "length_ft"],
+    [_neg8, { heater_type: "gas_atmospheric", input_btu_hr: 40000, efficiency: 0.8, incoming_F: 50, setpoint_F: 120, tank_gal: 40 }, "tank_gal"],
+    [_neg9, { floor_drain_count: 6, zone: "occupied", prime_method: "electronic", prime_volume_oz: 8, cycles_per_day: 1 }, "cycles_per_day"],
+    [_neg10, { catchment_ft2: 1000, annual_in: 30, efficiency: 0.62 }, "efficiency"],
+    [_neg11, { wheelbase_in: 140, payload_lb: 1000, payload_position_from_cab_in: 60, gvwr_lb: 8800, front_gawr_lb: 4400, rear_gawr_lb: 5500, curb_front_lb: 2500, curb_rear_lb: 2300 }, "curb_front_lb"],
+    [_neg12, { shape: "circle", radius: 10, sector_deg: 90 }, "sector_deg"],
+    [_neg13, { btu_input: 100000, room_volume_ft3: 4000 }, "btu_input"],
+    [_neg14, { amp_hours: 100, system_V: 12, dod_percent: 80, load_W: 120, peukert_k: 1 }, "dod_percent"],
+    [_neg15, { diameter_in: 0.5, grip_length_in: 3, stretch_thou: 5, material: "steel", k_factor: 0.18 }, "k_factor"],
+    [_neg16, { deposit_lb_per_ft: 0.1, deposition_eff_pct: 95, filler_cost_per_lb: 2.5, deposition_rate_lb_hr: 8, operating_factor_pct: 30, labor_rate_per_hr: 65, gas_cost_per_ft: 0.05 }, "labor_rate_per_hr"],
+    [_neg17, { case_length_in: 12, case_width_in: 10, case_height_in: 8, case_weight_lb: 25, cases_per_pallet: 48 }, "case_weight_lb"],
+    [_neg18, { aeration_volume_gal: 1000000, mlss_mg_l: 2500, mlvss_mg_l: 2000, was_flow_mgd: 0.05, was_tss_mg_l: 8000, effluent_tss_mg_l: 10, effluent_flow_mgd: 0.95, bod_load_lb_day: 5000 }, "mlvss_mg_l"],
+    [_neg19, { price: 400000, payoff: 250000, commission_pct: 5.5, transfer_tax_pct: 0.5, fees: 2500 }, "commission_pct"],
+    [_neg21, { box_volume_in3: 22.5, conductors_by_size: { 12: 6 }, devices: 1, internal_clamps: true, largest_awg_for_clamp_and_device: "12" }, "box_volume_in3"],
+  ];
+  for (const [fn, inp, k] of cases) {
+    assert.ok(!("error" in fn(inp)), `${fn.name} base case`);
+    assert.ok("error" in fn({ ...inp, [k]: -inp[k] }), `${fn.name} negative ${k}`);
+  }
+  const curb = { unit_length_ft: 8, unit_width_ft: 4, unit_height_ft: 4, unit_weight_lb: 1000, uplift_psf: 40, lateral_psf: 22, fastener_count: 8, windward_fastener_count: 4, fastener_capacity_lb: 400 };
+  assert.ok(!("error" in _neg20(curb)));
+  assert.ok("error" in _neg20({ ...curb, lateral_psf: -22 }));
+  assert.ok("error" in _neg20({ ...curb, fastener_capacity_lb: -400 }));
+});
+
+import { computeSlidingSnowLoad as _v469ss } from "../../calc-construction.js";
+test("bounds: computeSlidingSnowLoad's note says a narrow lower roof takes only its share (AWC ASCE 7-05 Example 2)", () => {
+  // 23.1 psf, W 18 ft, 12 ft garage: 133 plf at 11.1 psf. Until 2026-09-26 the note (fixed in code 2026-09-19)
+  // still said a narrow roof "concentrates the same total into a heavier surcharge".
+  const r = _v469ss({ pf_upper_psf: 23.1, eave_ridge_ft: 18, lower_width_ft: 12 });
+  assert.ok(Math.abs(r.total_lb_ft - 133.056) < 1e-9);
+  assert.doesNotMatch(r.note, /concentrates the same total/);
+});

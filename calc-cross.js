@@ -782,6 +782,8 @@ export const perDiemExample = {
 // dims: in { shape: dimensionless, args: dimensionless } out: { area: L^2, volume: L^3, perimeter: L }
 export function computeGeometry({ shape, ...args }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // Until 2026-09-26 a negative entry here returned a negative quantity with no error.
+  if (["sector_deg"].some((k) => Number(arguments[0]?.[k]) < 0)) return { error: "Sector angle cannot be negative (deg)." };
   if (shape === "circle") {
     const r = Number(args.radius) || 0;
     if (r <= 0) return { error: "Radius must be positive." };
@@ -1401,6 +1403,8 @@ export const rampSlopeExample = { inputs: { rise_in: 6, run_in: 72 } };
 // dims: in { catchment_ft2: L^2, monthly_in: L, annual_in: L, efficiency: dimensionless } out: { gallons: L^3 }
 export function computeRainwaterYield({ catchment_ft2 = 0, monthly_in = [], annual_in = null, efficiency = 0.62 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // Until 2026-09-26 a negative entry here returned a negative quantity with no error.
+  if (["catchment_ft2", "annual_in", "efficiency"].some((k) => Number(arguments[0]?.[k]) < 0)) return { error: "Catchment area, rainfall, and efficiency cannot be negative." };
   if (!(catchment_ft2 > 0)) return { error: "Catchment area must be positive." };
   // gallons = area_ft2 * rainfall_in * 0.6233 (rainfall * area conversion at 100% efficiency).
   // Adjusting: 1 inch over 1 ft^2 ~ 0.6233 gal; multiply by efficiency.
@@ -1489,6 +1493,8 @@ export const timesheetExample = {
 // dims: in { wheelbase_in: L, payload_lb: M, payload_position_from_cab_in: L, gvwr_lb: M, front_gawr_lb: M, rear_gawr_lb: M, curb_front_lb: M, curb_rear_lb: M } out: { front_axle_lb: M, rear_axle_lb: M, gvw_lb: M, pass: dimensionless }
 export function computeVehicleLoad({ wheelbase_in = 0, payload_lb = 0, payload_position_from_cab_in = 0, gvwr_lb = null, front_gawr_lb = null, rear_gawr_lb = null, curb_front_lb = 0, curb_rear_lb = 0 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // Until 2026-09-26 a negative entry here returned a negative quantity with no error.
+  if (["wheelbase_in", "payload_lb", "gvwr_lb", "front_gawr_lb", "rear_gawr_lb", "curb_front_lb", "curb_rear_lb"].some((k) => Number(arguments[0]?.[k]) < 0)) return { error: "Wheelbase, weights, and ratings cannot be negative." };
   curb_front_lb = Number(curb_front_lb); curb_rear_lb = Number(curb_rear_lb);
   if (!(wheelbase_in > 0)) return { error: "Wheelbase must be positive." };
   if (!(payload_lb >= 0)) return { error: "Payload must be non-negative." };

@@ -123,6 +123,8 @@ export const rafterExample = {
 // dims: in { shape: dimensionless, dims: dimensionless } out: { area: L^2 }
 export function computeArea({ shape, ...dims }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // Until 2026-09-26 a negative entry here returned a negative quantity with no error.
+  if (["length_ft", "width_ft", "base_ft", "height_ft", "base1_ft", "base2_ft", "radius_ft"].some((k) => Number(arguments[0]?.[k]) < 0)) return { error: "Dimensions cannot be negative (ft)." };
   if (shape === "rectangle") return { area_ft2: (dims.length_ft || 0) * (dims.width_ft || 0) };
   if (shape === "triangle") return { area_ft2: 0.5 * (dims.base_ft || 0) * (dims.height_ft || 0) };
   if (shape === "trapezoid") return { area_ft2: 0.5 * ((dims.base1_ft || 0) + (dims.base2_ft || 0)) * (dims.height_ft || 0) };
@@ -140,6 +142,8 @@ export const areaExample = {
 // dims: in { thickness_in: L, width_in: L, length_ft: L, count: dimensionless } out: { board_feet: L^3, total_board_feet: L^3 }
 export function computeBoardFootage({ thickness_in, width_in, length_ft, count = 1 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // Until 2026-09-26 a negative entry here returned a negative quantity with no error.
+  if (["thickness_in", "width_in", "length_ft", "count"].some((k) => Number(arguments[0]?.[k]) < 0)) return { error: "Board dimensions and count cannot be negative." };
   count = Number(count);
   // BF = (T * W * L_in) / 144, where L_in = length_ft * 12. Equivalent: (T * W * L_ft) / 12.
   const bf_each = (thickness_in * width_in * length_ft) / 12;
@@ -157,6 +161,8 @@ export const boardFootageExample = {
 // dims: in { shape: dimensionless, waste_factor: dimensionless, d: dimensionless } out: { volume_yd3: L^3, bags_60: dimensionless, bags_80: dimensionless }
 export function computeConcreteVolume({ shape, waste_factor = 0.10, ...d }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // Until 2026-09-26 a negative entry here returned a negative quantity with no error.
+  if (["length_ft", "width_ft", "thickness_in", "diameter_in", "height_ft", "footing_thickness_in", "footing_width_ft", "stem_thickness_in", "stem_height_ft", "waste_factor"].some((k) => Number(arguments[0]?.[k]) < 0)) return { error: "Concrete dimensions and waste cannot be negative." };
   waste_factor = Number(waste_factor);
   let cubic_ft = 0;
   if (shape === "slab") {
@@ -353,6 +359,8 @@ const SCREW_SHANK_DIA_IN = {
 // dims: in { fastener_type: dimensionless, fastener_size: dimensionless, species: dimensionless, penetration_in: L } out: { withdrawal_lb: M L T^-2 }
 export function computePullout({ fastener_type, fastener_size, species, penetration_in }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // Until 2026-09-26 a negative entry here returned a negative quantity with no error.
+  if (["penetration_in"].some((k) => Number(arguments[0]?.[k]) < 0)) return { error: "Penetration cannot be negative (in)." };
   const G = WOOD_SPECIFIC_GRAVITY[species];
   if (!G) return { error: "Unknown species." };
   let D;
@@ -919,6 +927,8 @@ export const PAINT_COVERAGE_FT2_PER_GAL = { smooth: 350, textured: 250, rough: 1
 // dims: in { area_ft2: L^2, coats: dimensionless, primer_needed: dimensionless, surface_porosity: dimensionless } out: { gallons: L^3 }
 export function computePaintCoverage({ area_ft2, coats = 2, primer_needed = false, surface_porosity = "smooth" }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // Until 2026-09-26 a negative entry here returned a negative quantity with no error.
+  if (["area_ft2", "coats"].some((k) => Number(arguments[0]?.[k]) < 0)) return { error: "Area and number of coats cannot be negative." };
   const a = Number(area_ft2) || 0;
   const c = Number(coats) || 1;
   const cov = PAINT_COVERAGE_FT2_PER_GAL[surface_porosity];
@@ -1615,6 +1625,8 @@ export const MORTAR_TYPES = ["N", "S", "M"];
 // dims: in { unit_count: dimensionless, unit_kind: dimensionless, joint_in: L, mortar_type: dimensionless } out: { bags_70: dimensionless, sand_ft3: L^3 }
 export function computeMortarMix({ unit_count = 0, unit_kind = "brick", joint_in = 0.375, mortar_type = "N" }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // Until 2026-09-26 a negative entry here returned a negative quantity with no error.
+  if (["unit_count", "joint_in"].some((k) => Number(arguments[0]?.[k]) < 0)) return { error: "Unit count and joint thickness cannot be negative." };
   if (!(unit_count > 0)) return { error: "Unit count must be positive." };
   if (!MORTAR_TYPES.includes(mortar_type)) return { error: "Unknown mortar type." };
   // Joint thickness adjustment vs 3/8 baseline.
@@ -8493,7 +8505,7 @@ export function computeSlidingSnowLoad({ pf_upper_psf = 0, eave_ridge_ft = 0, lo
   const surcharge_psf = total_lb_ft / dist_width;
   return {
     total_lb_ft, dist_width, surcharge_psf, narrow: lower < 15,
-    note: "Sliding snow load on a lower roof (ASCE 7 §7.9): snow that slides off a slippery upper roof piles on the lower roof below. The total sliding load per foot of shared eave = 0.4 x the upper roof's flat snow load Pf x its horizontal eave-to-ridge length W. That load is distributed uniformly over the lower roof out to 15 ft from the upper roof's eave (or the full lower-roof width if it is narrower than 15 ft), so a narrower catch roof concentrates the same total into a heavier surcharge. It adds to the lower roof's own balanced snow load, and applies where the upper roof is slippery and sloped enough to shed. A design aid, not a substitute for the engineer of record.",
+    note: "Sliding snow load on a lower roof (ASCE 7 §7.9): snow that slides off a slippery upper roof piles on the lower roof below. The total sliding load per foot of shared eave = 0.4 x the upper roof's flat snow load Pf x its horizontal eave-to-ridge length W. That load is distributed uniformly over the lower roof out to 15 ft from the upper roof's eave ; a lower roof narrower than 15 ft catches only its share, total x (width/15), because the snow that would land past its edge falls off, so the surcharge in psf stays the same while the total drops (O'Rourke's ASCE 7-05 Example 2: a 12 ft garage takes 0.80 x 166 = 133 plf at 11.1 psf). It adds to the lower roof's own balanced snow load, and applies where the upper roof is slippery and sloped enough to shed. A design aid, not a substitute for the engineer of record.",
   };
 }
 export const slidingSnowLoadExample = { inputs: { pf_upper_psf: 20, eave_ridge_ft: 40, lower_width_ft: 15 } };
@@ -8507,7 +8519,7 @@ const _v469renderSlidingSnowLoad = _simpleRenderer({
   ],
   outputs: [
     { key: "tot", id: "sls-out-tot", label: "Total sliding load", value: (r) => fmt(r.total_lb_ft, 0) + " lb/ft over " + fmt(r.dist_width, 0) + " ft" },
-    { key: "sur", id: "sls-out-sur", label: "Surcharge on lower roof", value: (r) => fmt(r.surcharge_psf, 1) + " psf" + (r.narrow ? " (narrow roof concentrates it)" : "") },
+    { key: "sur", id: "sls-out-sur", label: "Surcharge on lower roof", value: (r) => fmt(r.surcharge_psf, 1) + " psf" + (r.narrow ? " (narrow roof: only its share of the total, the rest falls off)" : "") },
     { key: "n", id: "sls-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeSlidingSnowLoad,

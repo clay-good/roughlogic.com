@@ -153,6 +153,8 @@ export function computePalletLoadout({
   trailer = "dry_van_53", pinwheel = false,
 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // Until 2026-09-26 a negative entry here returned a negative quantity with no error.
+  if (["case_length_in", "case_width_in", "case_height_in", "case_weight_lb", "cases_per_pallet"].some((k) => Number(arguments[0]?.[k]) < 0)) return { error: "Case dimensions, weight, and count cannot be negative." };
   const tr = TRAILER_DIMENSIONS_IN[trailer];
   if (!tr) return { error: "Unknown trailer." };
   if (!(case_length_in > 0 && case_width_in > 0 && case_height_in > 0)) return { error: "Case dimensions must be positive." };

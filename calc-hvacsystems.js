@@ -2863,6 +2863,9 @@ export function computeRooftopCurbUplift({
   if (!(uplift_psf > 0)) return { error: "The design uplift pressure must be greater than zero." };
   if (!(fastener_count > 0)) return { error: "The fastener count must be greater than zero." };
   if (windward_fastener_count < 0 || windward_fastener_count > fastener_count) return { error: "The windward fastener count must be between zero and the total fastener count." };
+  // Until 2026-09-26 a negative lateral pressure or fastener capacity passed and turned the shares negative.
+  if (lateral_psf < 0) return { error: "Enter the lateral wind pressure as a magnitude (psf, zero or more)." };
+  if (fastener_capacity_lb < 0) return { error: "Fastener capacity cannot be negative (lb)." };
 
   const plan_area_ft2 = unit_length_ft * unit_width_ft;
   const uplift_lb = plan_area_ft2 * uplift_psf;

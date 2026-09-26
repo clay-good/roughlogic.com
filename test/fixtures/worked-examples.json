@@ -71123,6 +71123,29 @@
    }
   },
   {
+   "tile_id": "mass-concrete-temp-rise",
+   "source_publisher": "B. Gajda and M. VanGeem (after PCA Design and Control, 13th ed.)",
+   "source_title": "Controlling Temperatures in Mass Concrete",
+   "source_edition_or_year": "p. 2",
+   "source_section_or_page": "12.8 F per 100 lb of cement: 900 lb/cy cast at 60 F reaches approximately 175 F",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "cementitious_lb_per_cy": 900,
+    "rise_f_per_100lb": 12.8,
+    "placing_temp_f": 60,
+    "diff_limit_f": 35
+   },
+   "outputs": {
+    "peak_temp_f": {
+     "value": 175,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
    "tile_id": "concrete-washout-volume",
    "source_publisher": "Washout-containment identity (first-principles)",
    "source_title": "20 ready-mix trucks, 50 gal/truck washout, 15% freeboard, 2 ft pit",
@@ -78162,6 +78185,27 @@
    }
   },
   {
+   "tile_id": "moist-air-enthalpy",
+   "source_publisher": "ASHRAE",
+   "source_title": "Handbook - Fundamentals (I-P), Ch. 1 Psychrometrics, Example 1",
+   "source_edition_or_year": "2025",
+   "source_section_or_page": "100 F dry bulb, W = 0.00523 lb/lb (read from the chart) -> h = 29.80 Btu/lb da (chart reading; Eq. 32 gives 29.78)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "t_db_f": 100,
+    "w_lb_lb": 0.00523
+   },
+   "outputs": {
+    "h": {
+     "value": 29.8,
+     "tolerance": {
+      "abs": 0.03
+     }
+    }
+   }
+  },
+  {
    "tile_id": "drybulb-from-enthalpy",
    "source_publisher": "ASHRAE Fundamentals (moist-air enthalpy inverted for dry-bulb)",
    "source_title": "h 31.48 Btu/lb at W 0.0112 -> 80 F dry-bulb (round-trips the moist-air-enthalpy example)",
@@ -79680,6 +79724,39 @@
    }
   },
   {
+   "tile_id": "concrete-crack-control-spacing",
+   "source_publisher": "StructurePoint",
+   "source_title": "One-Way Slab Analysis and Design (ACI 318-14)",
+   "source_edition_or_year": "version May 8, 2024, p. 14",
+   "source_section_or_page": "fs = 2/3 x 60,000 = 40,000 psi, cc 0.75 in: s = 15(40,000/fs) - 2.5(0.75) = 13.13 in <= 12(40,000/fs) = 12 in -> 12 in maximum",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "fs_psi": 40000,
+    "cc_in": 0.75
+   },
+   "outputs": {
+    "s1_in": {
+     "value": 13.13,
+     "tolerance": {
+      "abs": 0.006
+     }
+    },
+    "s2_in": {
+     "value": 12,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "s_max_in": {
+     "value": 12,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
    "tile_id": "pv-cell-temperature-power",
    "source_publisher": "PV design practice / NREL",
    "source_title": "400 W module, 30 C air, 800 W/m^2, NOCT 45 -> 55 C cell, 358 W (10.5% loss)",
@@ -80462,6 +80539,35 @@
    }
   },
   {
+   "tile_id": "shaft-torsion",
+   "source_publisher": "Pytel & Singer (via MATHalino)",
+   "source_title": "Strength of Materials, Problem 304",
+   "source_edition_or_year": "4th ed.",
+   "source_section_or_page": "4 in solid shaft, 3 ft long, 15 kip-ft, G 12 x 10^6 psi -> tau max = 14,324 psi, theta = 0.0215 rad = 1.23 deg",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "T_lbin": 180000,
+    "d_in": 4,
+    "L_in": 36,
+    "G_psi": 12000000
+   },
+   "outputs": {
+    "tau_psi": {
+     "value": 14324,
+     "tolerance": {
+      "abs": 1
+     }
+    },
+    "theta_deg": {
+     "value": 1.23,
+     "tolerance": {
+      "abs": 0.005
+     }
+    }
+   }
+  },
+  {
    "tile_id": "thermal-stress-restrained",
    "source_publisher": "mechanics of materials",
    "source_title": "structural steel, +100 F, fully restrained, A 5 in^2 -> 18,850 psi, 94,250 lb",
@@ -80517,6 +80623,29 @@
      "value": 13000,
      "tolerance": {
       "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "thermal-stress-restrained",
+   "source_publisher": "US DOE",
+   "source_title": "DOE-HDBK-1017/2-93 Material Science Vol. 2, Module 3 Thermal Shock",
+   "source_edition_or_year": "January 1993, p. 3",
+   "source_section_or_page": "alpha 5.8 x 10^-6 /F, E 3.0 x 10^7 psi, 60 F to 540 F fully restrained -> thermal stress = 8.4 x 10^4 psi",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "E_psi": 30000000,
+    "alpha": 5.8e-06,
+    "dT_F": 480,
+    "restraint": 1
+   },
+   "outputs": {
+    "sigma_psi": {
+     "value": 84000,
+     "tolerance": {
+      "pct": 0.6
      }
     }
    }
@@ -80643,6 +80772,34 @@
      "value": 2000,
      "tolerance": {
       "abs": 1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "hoop-stress-thin-wall",
+   "source_publisher": "R. C. Hibbeler",
+   "source_title": "Mechanics of Materials, Problem 8-4 (air-compressor tank)",
+   "source_edition_or_year": "10th ed.",
+   "source_section_or_page": "90 psi, 22 in inner diameter, 0.25 in wall -> hoop 3,960 psi, longitudinal 1,980 psi",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "P_psi": 90,
+    "D_in": 22,
+    "t_in": 0.25
+   },
+   "outputs": {
+    "sigma_h_psi": {
+     "value": 3960,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "sigma_l_psi": {
+     "value": 1980,
+     "tolerance": {
+      "abs": 0.5
      }
     }
    }
@@ -85190,6 +85347,26 @@
    }
   },
   {
+   "tile_id": "hull-speed",
+   "source_publisher": "Charles Doane (WaveTrain)",
+   "source_title": "Crunching Numbers: Hull Speed and Boat Length",
+   "source_edition_or_year": "March 26, 2010",
+   "source_section_or_page": "HS = 1.34 x sqrt(LWL): 28 ft waterline -> 1.34 x sqrt(28) = 7.09 knots",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "lwl_ft": 28
+   },
+   "outputs": {
+    "hull_speed_kn": {
+     "value": 7.09,
+     "tolerance": {
+      "abs": 0.005
+     }
+    }
+   }
+  },
+  {
    "tile_id": "anchor-rode-scope",
    "source_publisher": "anchor rode scope and swing radius (seamanship convention)",
    "source_title": "15 ft water, 3 ft bow roller, 7:1 scope, 30 ft boat -> 18 ft vertical, 126 ft rode, 154.7 ft swing",
@@ -85961,6 +86138,34 @@
    }
   },
   {
+   "tile_id": "sliding-snow-load",
+   "source_publisher": "AWC / M. O'Rourke, R. Mazikins, J. Showalter",
+   "source_title": "Snow Provisions in ASCE 7-05, Example Problem 2",
+   "source_edition_or_year": "June 2006, p. 5",
+   "source_section_or_page": "upper pf 23.1 psf, W 18 ft: 0.4 x 23.1 x 18 = 166.3 plf over 15 ft = 11.1 psf; a 12 ft garage receives 11.1 psf x 12 = 133 plf = 0.80 x 166",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "pf_upper_psf": 23.1,
+    "eave_ridge_ft": 18,
+    "lower_width_ft": 12
+   },
+   "outputs": {
+    "total_lb_ft": {
+     "value": 133,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "surcharge_psf": {
+     "value": 11.1,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
    "tile_id": "minimum-roof-snow",
    "source_publisher": "ASCE 7-22 \u00a77.3.3",
    "source_title": "Pg 15, risk category II -> Pm 15 psf (Pg <= pm,max 30 branch)",
@@ -86145,6 +86350,54 @@
      "value": 98.55,
      "tolerance": {
       "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "transformer-loading-efficiency",
+   "source_publisher": "University of Anbar (Alheety)",
+   "source_title": "Chapter Three Transformers, Example 8",
+   "source_edition_or_year": "course notes, pp. 15-16",
+   "source_section_or_page": "200 kVA, full-load copper loss 1.5 kW, iron loss 1 kW, half load at 0.85 pf -> efficiency 98.41%",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "kva_rating": 200,
+    "noload_w": 1000,
+    "loadloss_w": 1500,
+    "load": 0.5,
+    "pf": 0.85
+   },
+   "outputs": {
+    "efficiency": {
+     "value": 98.41,
+     "tolerance": {
+      "abs": 0.005
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "transformer-loading-efficiency",
+   "source_publisher": "University of Anbar (Alheety)",
+   "source_title": "Chapter Three Transformers, Example 9",
+   "source_edition_or_year": "course notes, p. 16",
+   "source_section_or_page": "150 kVA, core 1.4 kW, full-load copper 1.6 kW: maximum efficiency at 150 x sqrt(1.4/1.6) = 140 kVA (load 0.935), 98% at unity pf",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "kva_rating": 150,
+    "noload_w": 1400,
+    "loadloss_w": 1600,
+    "load": 1,
+    "pf": 1
+   },
+   "outputs": {
+    "max_eff_load": {
+     "value": 0.935,
+     "tolerance": {
+      "abs": 0.001
      }
     }
    }

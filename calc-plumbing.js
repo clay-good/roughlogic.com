@@ -265,6 +265,8 @@ export const frictionLossExample = {
 // dims: in { internal_diameter_in: L, length_ft: L, nominal_size: L } out: { volume_gal: L^3 }
 export function computePipeVolume({ internal_diameter_in, length_ft, nominal_size }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // Until 2026-09-26 a negative entry here returned a negative quantity with no error.
+  if (["internal_diameter_in", "length_ft"].some((k) => Number(arguments[0]?.[k]) < 0)) return { error: "Pipe diameter and length cannot be negative." };
   const d = internal_diameter_in || SCH40_ID_IN[String(nominal_size)];
   if (!d) return { error: "Unknown nominal size; provide internal diameter directly." };
   // V (in^3) = pi/4 * d^2 * L_in. 1 gal = 231 in^3.
@@ -2212,6 +2214,8 @@ export function computeWaterHeaterRecovery({
   peak_demand_gph = 0,
 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // Until 2026-09-26 a negative entry here returned a negative quantity with no error.
+  if (["input_btu_hr", "input_kw", "efficiency", "tank_gal", "peak_demand_gph"].some((k) => Number(arguments[0]?.[k]) < 0)) return { error: "Heater input, efficiency, tank size, and demand cannot be negative." };
   const isElectric = heater_type === "electric";
   const eff = efficiency != null && Number.isFinite(Number(efficiency))
     ? Number(efficiency)
@@ -2767,6 +2771,8 @@ export function computeTrapPrimer({
   cycles_per_day = 1,
 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // Until 2026-09-26 a negative entry here returned a negative quantity with no error.
+  if (["floor_drain_count", "prime_volume_oz", "cycles_per_day"].some((k) => Number(arguments[0]?.[k]) < 0)) return { error: "Drain count, prime volume, and cycles cannot be negative." };
   const drains = Math.floor(Number(floor_drain_count) || 0);
   if (!(drains > 0)) return { error: "Enter the number of floor drains (1 or more)." };
   const perUnit = TRAP_PRIMER_DRAINS_PER_UNIT[prime_method] ?? 1;

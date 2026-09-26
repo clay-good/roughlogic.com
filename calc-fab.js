@@ -687,6 +687,8 @@ export function computeWeldPreheatFuel({ steel_lb, start_temp_F, preheat_temp_F,
 // dims: in { deposit_lb_per_ft: M, deposition_eff_pct: dimensionless, filler_cost_per_lb: dimensionless, deposition_rate_lb_hr: dimensionless, operating_factor_pct: dimensionless, labor_rate_per_hr: dimensionless, gas_cost_per_ft: dimensionless } out: { consumable_lb_per_ft: M, filler_cost_ft: dimensionless, labor_hr_per_ft: T, labor_cost_ft: dimensionless, total_cost_ft: dimensionless }
 export function computeWeldCostPerFoot({ deposit_lb_per_ft, deposition_eff_pct = 95, filler_cost_per_lb = 0, deposition_rate_lb_hr, operating_factor_pct = 30, labor_rate_per_hr = 0, gas_cost_per_ft = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // Until 2026-09-26 a negative entry here returned a negative quantity with no error.
+  if (["deposit_lb_per_ft", "filler_cost_per_lb", "deposition_rate_lb_hr", "labor_rate_per_hr", "gas_cost_per_ft"].some((k) => Number(arguments[0]?.[k]) < 0)) return { error: "Deposit, costs, and rates cannot be negative." };
   const deposit = Number(deposit_lb_per_ft);
   const eff = Number(deposition_eff_pct);
   const fillerCost = Number(filler_cost_per_lb) || 0;
