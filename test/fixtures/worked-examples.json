@@ -62495,6 +62495,30 @@
    }
   },
   {
+   "tile_id": "elastic-settlement-allowable-pressure",
+   "source_publisher": "US Army Corps of Engineers",
+   "source_title": "EM 1110-1-1904 Settlement Analysis, para. 3-10 and Table 3-4 (Perloff)",
+   "source_edition_or_year": "September 30, 1990, p. 3-26",
+   "source_section_or_page": "10 ft square footing, Es 175 tsf (350 ksf), nu 0.4, Ic 0.7: 0.7 x 2.0 x 10 x (1 - 0.16) / 175 = 0.067 ft or 0.81 inch at q = 2 tsf (4 ksf) -- run in reverse from the 0.81 in",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "settlement_limit_in": 0.81,
+    "b_ft": 10,
+    "es_ksf": 350,
+    "nu": 0.4,
+    "is_f": 0.7
+   },
+   "outputs": {
+    "allowable_pressure_ksf": {
+     "value": 4,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
    "tile_id": "soil-settlement-elastic",
    "source_publisher": "Theory-of-elasticity immediate settlement (Bowles)",
    "source_title": "cross-check: half the modulus (Es 125) doubles it to 1.29 in - over the 1 in limit",
@@ -64216,6 +64240,38 @@
    }
   },
   {
+   "tile_id": "rc-doubly-reinforced",
+   "source_publisher": "University of Memphis",
+   "source_title": "CIVL 4135 Chapter 6, Compression Reinforcement, 6.7",
+   "source_edition_or_year": "2008, p. 125",
+   "source_section_or_page": "b 12, d 22.2, d' 2.5, As 8.00, A's 2.37, f'c 5,000, fy 60,000: compression steel yields; a = (8.00 - 2.37)60 / 0.85(5)(12) = 6.62 in, c = 6.62/0.80 = 8.28 in",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "b_in": 12,
+    "d_in": 22.2,
+    "dp_in": 2.5,
+    "as_in2": 8,
+    "asp_in2": 2.37,
+    "fc_psi": 5000,
+    "fy_psi": 60000
+   },
+   "outputs": {
+    "a_in": {
+     "value": 6.62,
+     "tolerance": {
+      "abs": 0.005
+     }
+    },
+    "c_in": {
+     "value": 8.28,
+     "tolerance": {
+      "abs": 0.005
+     }
+    }
+   }
+  },
+  {
    "tile_id": "rc-shear-friction",
    "source_publisher": "ACI 318-19 22.9",
    "source_title": "2.0 in^2 Grade 60 dowels, roughened cold joint, 12x16 in, 4,000 psi -> Vn 120, phi Vn 90 kip",
@@ -64302,6 +64358,31 @@
    }
   },
   {
+   "tile_id": "rc-shear-friction",
+   "source_publisher": "Portland Cement Association",
+   "source_title": "Notes on ACI 318-08, Example 14.2 Shear-Friction Design",
+   "source_edition_or_year": "pp. 14-9 to 14-11",
+   "source_section_or_page": "f'c 3500, Ac 234 in.2, monolithic (mu 1.4): Vn(max) = 0.2(3500)(234)/1000 = 164 kips governs (same caps as 318-19 Table 22.9.4.4(a); the printed reinforcement is for an inclined plane, so only the cap is compared)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "avf_in2": 2,
+    "fy_psi": 60000,
+    "ac_in2": 234,
+    "fc_psi": 3500,
+    "iface": "monolithic",
+    "lambda": 1
+   },
+   "outputs": {
+    "cap_kip": {
+     "value": 164,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
    "tile_id": "concrete-elastic-modulus",
    "source_publisher": "ACI 318-19 19.2.2",
    "source_title": "4000 psi normalweight, 145 pcf -> Ec 3,644,000 psi (3644 ksi)",
@@ -64371,6 +64452,27 @@
    }
   },
   {
+   "tile_id": "concrete-elastic-modulus",
+   "source_publisher": "StructurePoint",
+   "source_title": "Simply Supported Reinforced Concrete Beam Analysis and Design (ACI 318-14)",
+   "source_edition_or_year": "version April-08-2021, pp. 10-11",
+   "source_section_or_page": "Ec = wc^1.5 x 33 x sqrt(fc') = 150^1.5 x 33 x sqrt(4350) = 3998.5 ksi (318-14 19.2.2.1.a, same in 318-19)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "fc_psi": 4350,
+    "wc_pcf": 150
+   },
+   "outputs": {
+    "ec_psi": {
+     "value": 3998500,
+     "tolerance": {
+      "abs": 100
+     }
+    }
+   }
+  },
+  {
    "tile_id": "concrete-modulus-of-rupture",
    "source_publisher": "ACI 318-19 19.2.3",
    "source_title": "4000 psi normalweight, lambda 1.0 -> fr 474 psi (~0.119 f'c)",
@@ -64435,6 +64537,27 @@
      "value": 355.8,
      "tolerance": {
       "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "concrete-modulus-of-rupture",
+   "source_publisher": "Expanded Shale, Clay and Slate Institute (ESCSI)",
+   "source_title": "Technical Sheet 7900.082, What About Deflection?",
+   "source_edition_or_year": "2022",
+   "source_section_or_page": "lightweight: fr = 7.5 x 0.75 x sqrt(5000) = 397.75 psi",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "fc_psi": 5000,
+    "lambda": 0.75
+   },
+   "outputs": {
+    "fr_psi": {
+     "value": 397.75,
+     "tolerance": {
+      "abs": 0.01
      }
     }
    }
@@ -64545,6 +64668,38 @@
    }
   },
   {
+   "tile_id": "concrete-effective-inertia",
+   "source_publisher": "StructurePoint",
+   "source_title": "Simply Supported Reinforced Concrete Beam Analysis and Design (ACI 318-14)",
+   "source_edition_or_year": "version April-08-2021, pp. 10-11",
+   "source_section_or_page": "Ig = 12 x 20^3 / 12 = 8000 in.4; Mcr = 32.98 kip-ft (the printed Ie 4337 in.4 is the 318-14 Branson form with Ec from wc = 150; the tile uses 318-19 Bischoff, so only Ig and Mcr are compared)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "b_in": 12,
+    "h_in": 20,
+    "d_in": 17.56,
+    "as_in2": 3,
+    "fc_psi": 4350,
+    "ma_kipft": 64.06,
+    "lambda": 1
+   },
+   "outputs": {
+    "ig_in4": {
+     "value": 8000,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "mcr_kipft": {
+     "value": 32.98,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
    "tile_id": "concrete-depth-for-cracking-moment",
    "source_publisher": "ACI 318-19 (Mcr = fr b h^2/6, solved for depth)",
    "source_title": "target Mcr 31.62 kip-ft, b 12 in, 4000 psi normalweight -> 20.0 in depth",
@@ -64592,6 +64747,35 @@
      "value": 45.54,
      "tolerance": {
       "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "concrete-cracking-moment",
+   "source_publisher": "StructurePoint",
+   "source_title": "Simply Supported Reinforced Concrete Beam Analysis and Design (ACI 318-14)",
+   "source_edition_or_year": "version April-08-2021, pp. 10-11",
+   "source_section_or_page": "12 x 20 in, fc' 4350 psi: fr = 7.5 x 1.0 x sqrt(4350) = 494.66 psi; Ig = 8000 in.4, yt = 10 in; Mcr = 494.66 x 8000 / 10 / 12000 = 32.98 kip-ft",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "b_in": 12,
+    "h_in": 20,
+    "fc_psi": 4350,
+    "lambda": 1
+   },
+   "outputs": {
+    "fr_psi": {
+     "value": 494.66,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "mcr_kipft": {
+     "value": 32.98,
+     "tolerance": {
+      "abs": 0.01
      }
     }
    }
@@ -65271,6 +65455,29 @@
    }
   },
   {
+   "tile_id": "tank-drain-time",
+   "source_publisher": "Hayward Flow Control",
+   "source_title": "Calculating the Time Required to Empty a Vessel, Example One",
+   "source_edition_or_year": "p. 14",
+   "source_section_or_page": "12 ft diameter vertical tank (113.1 ft2), 2 in outlet (0.0218 ft2 rounded), Cd 0.81, 20 ft of water -> 7,139 sec, about 2 hours (Hayward rounds the orifice area; exact 0.021817 gives 7,133)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "tank_area_ft2": 113.097,
+    "d_in": 2,
+    "cd": 0.81,
+    "h1_ft": 20
+   },
+   "outputs": {
+    "t_s": {
+     "value": 7139,
+     "tolerance": {
+      "abs": 8
+     }
+    }
+   }
+  },
+  {
    "tile_id": "channel-froude-number",
    "source_publisher": "Chow, Open-Channel Hydraulics",
    "source_title": "4 ft channel, 50 cfs, 2 ft deep -> V 6.25 ft/s, Fr 0.78 subcritical, yc 1.69 ft",
@@ -65322,6 +65529,40 @@
      "value": 2.2,
      "tolerance": {
       "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "channel-froude-number",
+   "source_publisher": "FHWA",
+   "source_title": "HDS-4 Introduction to Highway Hydraulics, FHWA-NHI-08-090",
+   "source_edition_or_year": "4th edition, June 2008 (with the 2012 errata)",
+   "source_section_or_page": "Example Problem 4.8 (English), pp. 4-43/4-44: 16 ft wide, 875 ft3/s at 1.0 ft -> velocity 54.7 ft/s, Froude number 9.64 (errata), yc = 4.52 ft (truncated)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "b_ft": 16,
+    "q_cfs": 875,
+    "y_ft": 1
+   },
+   "outputs": {
+    "v_fps": {
+     "value": 54.7,
+     "tolerance": {
+      "abs": 0.05
+     }
+    },
+    "fr": {
+     "value": 9.64,
+     "tolerance": {
+      "abs": 0.005
+     }
+    },
+    "yc_ft": {
+     "value": 4.52,
+     "tolerance": {
+      "abs": 0.01
      }
     }
    }
@@ -65391,6 +65632,41 @@
    }
   },
   {
+   "tile_id": "channel-normal-depth",
+   "source_publisher": "FHWA",
+   "source_title": "HEC-14 Hydraulic Design of Energy Dissipators, FHWA-NHI-06-086, Design Example: Stilling Basin with Free Hydraulic Jump (CU)",
+   "source_edition_or_year": "3rd edition, July 2006, p. 8-9",
+   "source_section_or_page": "10.0 ft box, n 0.015, So 0.065, Q 417 ft3/s -> Vo = 27.8 ft/s, yo = 1.50 ft, Fro 4.0 (flow far below the 6 ft rise, so it acts as an open rectangle; solved by trial)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "b_ft": 10,
+    "q_cfs": 417,
+    "n": 0.015,
+    "s_slope": 0.065
+   },
+   "outputs": {
+    "yn_ft": {
+     "value": 1.5,
+     "tolerance": {
+      "abs": 0.005
+     }
+    },
+    "v_fps": {
+     "value": 27.8,
+     "tolerance": {
+      "abs": 0.05
+     }
+    },
+    "fr": {
+     "value": 4.0,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
    "tile_id": "hydraulic-jump",
    "source_publisher": "Belanger sequent depth (Chow, Open-Channel Hydraulics)",
    "source_title": "10 ft channel, 100 cfs, 0.8 ft (Fr1 2.46) -> sequent depth 2.42 ft, 0.55 ft head lost",
@@ -65448,6 +65724,46 @@
      "value": 5.1871,
      "tolerance": {
       "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "hydraulic-jump",
+   "source_publisher": "FHWA",
+   "source_title": "HDS-4 Introduction to Highway Hydraulics, FHWA-NHI-08-090",
+   "source_edition_or_year": "4th edition, June 2008 (with the 2012 errata)",
+   "source_section_or_page": "Example Problem 4.6 (English), pp. 4-34/4-35: 16.4 ft wide, 700 ft3/s at 1.64 ft -> V1 = 26.03 ft/s, Fr = 3.58, y2 = 7.52 ft, hL = 4.12 ft (rounded Fr and y2 carried forward in print)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "b_ft": 16.4,
+    "q_cfs": 700,
+    "y1_ft": 1.64
+   },
+   "outputs": {
+    "v1_fps": {
+     "value": 26.03,
+     "tolerance": {
+      "abs": 0.005
+     }
+    },
+    "fr1": {
+     "value": 3.58,
+     "tolerance": {
+      "abs": 0.005
+     }
+    },
+    "y2_ft": {
+     "value": 7.52,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "de_ft": {
+     "value": 4.12,
+     "tolerance": {
+      "abs": 0.015
      }
     }
    }
@@ -65520,6 +65836,62 @@
     },
     "y_alt_ft": {
      "value": 0.6651,
+     "tolerance": {
+      "abs": 0.005
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "specific-energy",
+   "source_publisher": "McGraw-Hill (V. T. Chow), via SDSU",
+   "source_title": "Open-Channel Hydraulics, Example 3-4 and Table 3-1",
+   "source_edition_or_year": "1959, pp. 57-58",
+   "source_section_or_page": "8 ft wide, 100 cfs at 0.5 ft -> E = 10.207 ft, F = 6.24 (g = 32.2 gives 10.205 / 6.23)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "b_ft": 8,
+    "q_cfs": 100,
+    "y_ft": 0.5
+   },
+   "outputs": {
+    "e_ft": {
+     "value": 10.207,
+     "tolerance": {
+      "abs": 0.003
+     }
+    },
+    "fr": {
+     "value": 6.24,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "specific-energy",
+   "source_publisher": "McGraw-Hill (V. T. Chow), via SDSU",
+   "source_title": "Open-Channel Hydraulics, Example 3-4 and Table 3-1",
+   "source_edition_or_year": "1959, pp. 57-58",
+   "source_section_or_page": "10 ft wide, 100 cfs at 4 ft -> E = 4.097 ft, F = 0.22",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "b_ft": 10,
+    "q_cfs": 100,
+    "y_ft": 4
+   },
+   "outputs": {
+    "e_ft": {
+     "value": 4.097,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "fr": {
+     "value": 0.22,
      "tolerance": {
       "abs": 0.005
      }
@@ -65661,6 +66033,28 @@
      "value": 3500,
      "tolerance": {
       "pct": 0.2
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "pump-specific-speed",
+   "source_publisher": "Purdue University (C. Wassgren)",
+   "source_title": "Notes on Thermodynamics, Fluid Mechanics, and Gas Dynamics, 12.7 Specific Speed, problem pump_06",
+   "source_edition_or_year": "2021-12-15, pp. 1134-1135",
+   "source_section_or_page": "2875 rpm, 252 gpm, 138 ft at BEP -> Nsd = 1130 (3 significant figures), radial impeller",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "n_rpm": 2875,
+    "q_gpm": 252,
+    "h_ft": 138
+   },
+   "outputs": {
+    "ns": {
+     "value": 1130,
+     "tolerance": {
+      "abs": 5
      }
     }
    }
@@ -65877,6 +66271,36 @@
      "value": 4.75,
      "tolerance": {
       "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "soil-consolidation-settlement",
+   "source_publisher": "FHWA",
+   "source_title": "NHI-06-088 Soils and Foundations Reference Manual, Volume I, Example 7-3",
+   "source_edition_or_year": "December 2006, pp. 7-36 to 7-37",
+   "source_section_or_page": "Cc = 0.5, eo = 1.0, 10 ft clay, po 600 psf, delta p 2,400 psf -> 1.75 ft = 21 inches",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "cc": 0.5,
+    "h_ft": 10,
+    "e0": 1,
+    "sig0_psf": 600,
+    "dsig_psf": 2400
+   },
+   "outputs": {
+    "sc_ft": {
+     "value": 1.75,
+     "tolerance": {
+      "abs": 0.005
+     }
+    },
+    "sc_in": {
+     "value": 21,
+     "tolerance": {
+      "abs": 0.5
      }
     }
    }

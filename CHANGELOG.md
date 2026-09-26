@@ -6,6 +6,24 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Changed
 
+- **Fourteen more tiles now carry a publisher's printed example.** No formula errors were found. Every gap traces to rounding in the published example.
+  - **Concrete:**
+    - StructurePoint's simply-supported beam: `concrete-elastic-modulus`, `concrete-cracking-moment`, `concrete-effective-inertia` (Ig and Mcr).
+    - ESCSI: `concrete-modulus-of-rupture`.
+    - University of Memphis CIVL 4135: `rc-doubly-reinforced`.
+    - PCA Notes on ACI 318-08: `rc-shear-friction` (cap).
+  - **Hydraulics:**
+    - FHWA HDS-4: `channel-froude-number` and `hydraulic-jump`.
+    - FHWA HEC-14: `channel-normal-depth`.
+    - Chow, Open-Channel Hydraulics: `specific-energy`.
+    - Purdue: `pump-specific-speed`.
+    - Hayward: `tank-drain-time`.
+  - **Geotechnical:**
+    - FHWA NHI-06-088: `soil-consolidation-settlement`.
+    - USACE EM 1110-1-1904: `elastic-settlement-allowable-pressure`.
+
+  README: 1,124 of 2,183 tiles are checked only against the project's own derivation; 1,059 carry an outside source.
+
 - **Three more tiles now carry a publisher's printed example.**
   - `ev-range-per-hour`: NREL TP-5R00-91571.
   - `battery-peak-shaving`: Yale Clean Energy Forum and Wattmore.
