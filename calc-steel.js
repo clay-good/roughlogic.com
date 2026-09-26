@@ -1295,16 +1295,19 @@ export function computeSteelCamber({ w_kip_ft = 0, span_ft = 0, moi_in4 = 0, e_k
   const L = span * 12;
   const defl_in = 5 * (w / 12) * Math.pow(L, 4) / (384 * e * moi);
   const camber_raw = frac * defl_in;
-  const camber_in = Math.round(camber_raw / 0.25) * 0.25;
+  // AISC rounds the specified camber DOWN to the 1/4 in (Design Examples v15.1 I.1: 0.8 x 2.59 = 2.07 -> 2 in;
+  // III-26: 1.68 -> 1-1/2 in) and does not specify camber below about 3/4 in (0.640 in -> none). Until
+  // 2026-09-25 this rounded to the NEAREST 1/4 in, so 0.640 became 3/4 in and was cambered.
+  const camber_in = Math.floor(camber_raw / 0.25 + 1e-9) * 0.25;
   const cambered = camber_in >= 0.75;
   return {
     defl_in, camber_raw, camber_in, cambered,
-    note: "Steel beam camber from the dead-load deflection: the simple-span midspan deflection delta = 5 w L^4 / (384 E I) under the deflection-causing (dead) load, cambered at a fraction (commonly 75-80%) of it, rounded to the nearest 1/4 in. Fabricators do not camber below about 3/4 in (the mill tolerance and cost are not worth it), so a stiff or short beam is left flat. Camber removes the dead-load sag so the floor is level after the concrete cures; the live-load deflection is not cambered out. A detailing aid; the structural drawings govern the specified camber.",
+    note: "Steel beam camber from the dead-load deflection: the simple-span midspan deflection delta = 5 w L^4 / (384 E I) under the deflection-causing (dead) load, cambered at a fraction (commonly 75-80%) of it, rounded DOWN to the 1/4 in (AISC). Fabricators do not camber below about 3/4 in (the mill tolerance and cost are not worth it), so a stiff or short beam is left flat. Camber removes the dead-load sag so the floor is level after the concrete cures; the live-load deflection is not cambered out. A detailing aid; the structural drawings govern the specified camber.",
   };
 }
 export const steelCamberExample = { inputs: { w_kip_ft: 1.0, span_ft: 40, moi_in4: 2100, e_ksi: 29000, fraction: 0.80 } };
 STEEL_RENDERERS["steel-camber"] = _simpleRenderer({
-  citation: "Citation: Steel beam camber from the dead-load deflection: delta = 5 w L^4 / (384 E I), camber = a fraction (commonly 75-80%) of delta rounded to the nearest 1/4 in; fabricators leave a beam flat below about 3/4 in (AISC / fabrication practice). A detailing aid; the structural drawings govern the specified camber.",
+  citation: "Citation: Steel beam camber from the dead-load deflection: delta = 5 w L^4 / (384 E I), camber = a fraction (commonly 75-80%) of delta rounded DOWN to the 1/4 in (AISC); fabricators leave a beam flat below about 3/4 in (AISC / fabrication practice). A detailing aid; the structural drawings govern the specified camber.",
   example: steelCamberExample.inputs,
   fields: [
     { key: "w_kip_ft", label: "Uniform dead load (kip/ft)", kind: "number" },

@@ -6,6 +6,24 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Changed
 
+- **Four more tiles now carry a publisher's printed example.**
+  - `steel-camber`: AISC v15.1 Example I.1.
+  - `required-section-modulus`: AISC v15.1 Example A-6.2, LRFD and ASD.
+  - `shear-flow-connector-spacing`: FAMU-FSU Mechanics of Materials.
+  - `cmu-wall-axial`: TMS ASD Night School, untied wall steel not counted.
+
+  README: 1,190 of 2,183 tiles are checked only against the project's own derivation; 993 carry an outside source.
+
+- **Six more tiles now carry a publisher's printed example.**
+  - `steam-prv-area-for-capacity`: PDHonline M112.
+  - `pv-inverter-ratio`: EIA.
+  - `heat-pump-seasonal-energy`: NYSERDA Compare Heating Fuels.
+  - `fire-alarm-nac-voltage-drop`: Fire Alarms Online.
+  - `pulse-flowmeter-k-factor`: FLOMEC.
+  - `motor-fault-contribution`: Bussmann SPD.
+
+  README: 1,194 of 2,183 tiles are checked only against the project's own derivation; 989 carry an outside source.
+
 - **Eleven more tiles now carry a publisher's printed example.**
   - `as-purchased-quantity`: USDA Food Buying Guide.
   - `overrun-percent`: Goff, University of Guelph.
@@ -177,6 +195,12 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 - **wrangler 4.129.0 → 4.135.0, and the `sharp` override is gone.** Dependabot's bump failed CI on `check-dependency-overrides`. The new wrangler brings a miniflare that asks for the patched `sharp` 0.35.4 itself, so the September 9 pin no longer changed anything. This is the case the gate was written for, so the override is deleted rather than left as a second source of truth. `npm audit` reports 0 vulnerabilities. docs/threat-model.md records the change.
 
 ### Fixed
+
+- **`steel-camber` now rounds the camber down to the 1/4 in, as AISC does, instead of to the nearest 1/4 in.** In AISC Design Examples v15.1, Example I.1 takes 0.8 × 2.59 = 2.07 in down to 2 in, and Part III takes 1.68 in down to 1-1/2 in. Part III also says not to specify camber when 80% of the deflection is only 0.640 in. The tile rounded that 0.640 in up to 3/4 in and cambered the beam; it now rounds to 1/2 in, below the 3/4 in floor, and leaves the beam flat.
+
+- **`steam-prv-napier` and `steam-prv-area-for-capacity` now use 51.5, the steam constant in API 520 and ASME, which their citations name.** They used 51.43, Napier's original A·P/70 lb/s. It is 0.14% apart. With 51.5, PDHonline M112's worked example (40,000 lb/hr at 168.7 psia, Kd 0.975) comes out to exactly its printed 4.72 in².
+- **`fire-alarm-nac-voltage-drop` can now start from the panel's listed minimum NAC output.** The voltage drop has to be taken from the output the panel's installation manual lists, for example 19.9 V or 20.4 V. The tile always used 85% of nominal and credited that to NFPA 72, which does not state it. A new input takes the listed value; 0 keeps the 85% convention.
+- **`capacitor-bank-for-resonance-order`: the short-circuit input now says it is the combined utility and transformer MVA at the capacitor bus.** A transformer-only MVA overstates the resonant order and the allowed bank.
 
 - **`internal-heat-gains` now defaults to 250 Btu/h sensible and 200 latent per person, ASHRAE's moderately-active office row.** The old 245 / 200 default mixed two rows of ASHRAE Fundamentals Table 1: 245 sensible belongs to seated very light work, whose latent is 155. The note now names the rows (and ACCA Manual J's residential 230 / 200) instead of calling 245 / 200 "a seated office occupant."
 

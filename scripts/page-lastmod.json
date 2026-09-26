@@ -2,7 +2,7 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "7de26707b389b886",
+      "sha": "b5886347ebf215c2",
       "date": "2026-09-26"
     },
     "/tools/": {
@@ -18,8 +18,8 @@
       "date": "2026-09-25"
     },
     "/groups/construction/": {
-      "sha": "dcacf2ccda95f0f1",
-      "date": "2026-09-25"
+      "sha": "1c1436b7d6fce25b",
+      "date": "2026-09-26"
     },
     "/groups/cross-trade/": {
       "sha": "27bdaea9afb010ca",
@@ -926,8 +926,8 @@
       "date": "2026-09-01"
     },
     "/tools/capacitor-bank-for-resonance-order/": {
-      "sha": "276e25b9280d56df",
-      "date": "2026-09-01"
+      "sha": "d6a96fcf2db21b35",
+      "date": "2026-09-26"
     },
     "/tools/capacitor-bank-voltage-rise/": {
       "sha": "7e620a7f11e1a362",
@@ -2890,8 +2890,8 @@
       "date": "2026-09-01"
     },
     "/tools/fire-alarm-nac-voltage-drop/": {
-      "sha": "da7ecc440e3cbc46",
-      "date": "2026-09-25"
+      "sha": "6b2dc1d1870378f2",
+      "date": "2026-09-26"
     },
     "/tools/fire-door-clearance/": {
       "sha": "cdb40b705ce2d60a",
@@ -7366,12 +7366,12 @@
       "date": "2026-09-01"
     },
     "/tools/steam-prv-area-for-capacity/": {
-      "sha": "74be04dc252960c7",
-      "date": "2026-09-01"
+      "sha": "b1f2a7126629d115",
+      "date": "2026-09-26"
     },
     "/tools/steam-prv-napier/": {
-      "sha": "7edaf496598e135d",
-      "date": "2026-09-04"
+      "sha": "8fa093ea1737bd0a",
+      "date": "2026-09-26"
     },
     "/tools/steam-trap-sizing/": {
       "sha": "6c9649032064d0e8",
@@ -7410,8 +7410,8 @@
       "date": "2026-09-25"
     },
     "/tools/steel-camber/": {
-      "sha": "780e6bd480089d65",
-      "date": "2026-09-01"
+      "sha": "33654b376f0a137f",
+      "date": "2026-09-26"
     },
     "/tools/steel-cb/": {
       "sha": "9ec5ba962e885c44",

@@ -1000,7 +1000,8 @@ function _renderExpansionGuideSpacing(inputRegion, outputRegion, citationEl) {
 PIPEFIT_RENDERERS["expansion-guide-spacing"] = _renderExpansionGuideSpacing;
 
 // ===================== spec-v588 B: steam orifice / PRV capacity (Napier) =====================
-// choked = P2 < 0.58*P1. W = 51.43*Cd*A*P1 (saturated, choked).
+// choked = P2 < 0.58*P1. W = 51.5*Cd*A*P1 (saturated, choked). 51.5 is the API 520 / ASME steam
+// constant the citation names; Napier's own AP/70 lb/s is 51.43 lb/hr, which this used until 2026-09-25.
 // dims: in { orifice_area_in2: L^2, upstream_p_psia: M L^-1 T^-2, downstream_p_psia: M L^-1 T^-2, discharge_coeff: dimensionless } out: { steam_capacity_lb_hr: M T^-1 }
 export function computeSteamPrvNapier({ orifice_area_in2 = 0, upstream_p_psia = 0, downstream_p_psia = 0, discharge_coeff = 0.9 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
@@ -1015,7 +1016,7 @@ export function computeSteamPrvNapier({ orifice_area_in2 = 0, upstream_p_psia = 
   if (!(Cd > 0 && Cd <= 1)) return { error: "Discharge coefficient must be over 0 and at most 1." };
   const choke_threshold_psia = 0.58 * P1;
   const choked = P2 < choke_threshold_psia;
-  const steam_capacity_lb_hr = 51.43 * Cd * A * P1;
+  const steam_capacity_lb_hr = 51.5 * Cd * A * P1;
   return {
     steam_capacity_lb_hr, choked, choke_threshold_psia,
     note: "Flow chokes when the downstream absolute pressure is below 58% of the upstream, and the capacity then depends only on the upstream pressure - dropping the downstream further does not increase it. Napier is for saturated steam (superheat needs a Ksh factor). A liquid Cv (which scales with the square root of pressure drop) is wrong for choked steam, which is linear in the upstream pressure. The discharge coefficient (about 0.6 for a sharp-edged orifice, near 1 for a nozzle) must be applied. ASME/API and the valve manufacturer govern - a sizing aid, not a relief-valve certification.",
@@ -1023,7 +1024,7 @@ export function computeSteamPrvNapier({ orifice_area_in2 = 0, upstream_p_psia = 
 }
 export const steamPrvNapierExample = { inputs: { orifice_area_in2: 0.5, upstream_p_psia: 100, downstream_p_psia: 30, discharge_coeff: 0.9 } };
 function _renderSteamPrvNapier(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Notice: A sizing aid, not a relief-valve certification; ASME/API and the valve manufacturer govern. Citation: Napier's formula / ASME/API 520 / Grashof steam orifice / PRV capacity, by name. Choked when P2 < 0.58 x P1; capacity W = 51.43 x Cd x A x P1 (saturated, choked). When choked the capacity depends only on the upstream pressure. Napier is for saturated steam (superheat needs a Ksh factor); a liquid Cv (square-root in pressure drop) is wrong for choked steam, which is linear in P1. Apply the discharge coefficient (~0.6 sharp orifice, ~1 nozzle).";
+  citationEl.textContent = "Notice: A sizing aid, not a relief-valve certification; ASME/API and the valve manufacturer govern. Citation: Napier's formula / ASME/API 520 / Grashof steam orifice / PRV capacity, by name. Choked when P2 < 0.58 x P1; capacity W = 51.5 x Cd x A x P1 (saturated, choked). When choked the capacity depends only on the upstream pressure. Napier is for saturated steam (superheat needs a Ksh factor); a liquid Cv (square-root in pressure drop) is wrong for choked steam, which is linear in P1. Apply the discharge coefficient (~0.6 sharp orifice, ~1 nozzle).";
   const A = makeNumber("Orifice / seat area (in²)", "spn-a", { step: "any", min: "0" });
   const P1 = makeNumber("Upstream absolute pressure (psia)", "spn-p1", { step: "any", min: "0" });
   const P2 = makeNumber("Downstream absolute pressure (psia)", "spn-p2", { step: "any", min: "0" });
@@ -1047,7 +1048,7 @@ PIPEFIT_RENDERERS["steam-prv-napier"] = _renderSteamPrvNapier;
 
 // steam-prv-area-for-capacity: inverse of steam-prv-napier. The forward tile gives the relief capacity from the orifice
 // area; the inverse recovers the orifice / seat area a required relief capacity needs, so a sizer picks an API orifice
-// letter. From the choked Napier capacity W = 51.43 Cd A P1, A = W / (51.43 Cd P1). Assumes choked flow (the standard
+// letter. From the choked Napier capacity W = 51.5 Cd A P1, A = W / (51.5 Cd P1). Assumes choked flow (the standard
 // relief condition, P2 < 0.58 P1); the choke threshold is reported for the check.
 // dims: in { required_capacity_lb_hr: M T^-1, upstream_p_psia: M L^-1 T^-2, discharge_coeff: dimensionless } out: { required_area_in2: L^2, choke_threshold_psia: M L^-1 T^-2 }
 export function computeSteamPrvAreaForCapacity({ required_capacity_lb_hr = 0, upstream_p_psia = 0, discharge_coeff = 0.9 } = {}) {
@@ -1058,17 +1059,17 @@ export function computeSteamPrvAreaForCapacity({ required_capacity_lb_hr = 0, up
   if (!(W > 0)) return { error: "Required relief capacity must be positive (lb/hr)." };
   if (!(P1 > 0)) return { error: "Upstream pressure must be positive (psia)." };
   if (!(Cd > 0 && Cd <= 1)) return { error: "Discharge coefficient must be over 0 and at most 1." };
-  const required_area_in2 = W / (51.43 * Cd * P1);
+  const required_area_in2 = W / (51.5 * Cd * P1);
   const choke_threshold_psia = 0.58 * P1;
   if (![required_area_in2, choke_threshold_psia].every(Number.isFinite)) return { error: "Orifice-area math is not a finite value." };
   return {
     required_area_in2, choke_threshold_psia,
-    note: "Orifice / seat area for a required steam relief capacity: from the choked Napier capacity W = 51.43 Cd A P1, A = W / (51.43 Cd P1). Round UP to a standard API 526 orifice letter (D, E, F, ... which are areas of 0.110, 0.196, 0.307 in^2 and up). This assumes CHOKED flow - the standard relief condition where the downstream absolute pressure is below 58% of the upstream (threshold shown); the capacity then depends only on the upstream pressure, and a liquid Cv (which scales with the square root of the pressure drop) is wrong. Napier is for saturated steam; superheat needs a Ksh correction. The discharge coefficient (~0.6 sharp orifice, ~1 nozzle) must match the device. A sizing aid, not a relief-valve certification; ASME/API and the valve manufacturer govern.",
+    note: "Orifice / seat area for a required steam relief capacity: from the choked Napier capacity W = 51.5 Cd A P1, A = W / (51.5 Cd P1). Round UP to a standard API 526 orifice letter (D, E, F, ... which are areas of 0.110, 0.196, 0.307 in^2 and up). This assumes CHOKED flow - the standard relief condition where the downstream absolute pressure is below 58% of the upstream (threshold shown); the capacity then depends only on the upstream pressure, and a liquid Cv (which scales with the square root of the pressure drop) is wrong. Napier is for saturated steam; superheat needs a Ksh correction. The discharge coefficient (~0.6 sharp orifice, ~1 nozzle) must match the device. A sizing aid, not a relief-valve certification; ASME/API and the valve manufacturer govern.",
   };
 }
 export const steamPrvAreaForCapacityExample = { inputs: { required_capacity_lb_hr: 5000, upstream_p_psia: 100, discharge_coeff: 0.9 } };
 function _renderSteamPrvAreaForCapacity(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Notice: A sizing aid, not a relief-valve certification; ASME/API and the valve manufacturer govern. Citation: Napier's formula / ASME/API 520 choked steam capacity W = 51.43 x Cd x A x P1 solved for the area: A = W / (51.43 x Cd x P1). Assumes choked flow (P2 < 0.58 x P1); round up to a standard API 526 orifice letter. Saturated steam (superheat needs Ksh); apply the discharge coefficient (~0.6 orifice, ~1 nozzle).";
+  citationEl.textContent = "Notice: A sizing aid, not a relief-valve certification; ASME/API and the valve manufacturer govern. Citation: Napier's formula / ASME/API 520 choked steam capacity W = 51.5 x Cd x A x P1 solved for the area: A = W / (51.5 x Cd x P1). Assumes choked flow (P2 < 0.58 x P1); round up to a standard API 526 orifice letter. Saturated steam (superheat needs Ksh); apply the discharge coefficient (~0.6 orifice, ~1 nozzle).";
   const W = makeNumber("Required relief capacity (lb/hr)", "spa-w", { step: "any", min: "0" });
   const P1 = makeNumber("Upstream absolute pressure (psia)", "spa-p1", { step: "any", min: "0" });
   const Cd = makeNumber("Discharge coefficient Cd (~0.6 orifice, ~1 nozzle)", "spa-cd", { step: "any", min: "0", max: "1" });

@@ -491,7 +491,7 @@ export function computeCapacitorBankForResonanceOrder({ short_circuit_mva = 0, t
 export const capacitorBankForResonanceOrderExample = { inputs: { short_circuit_mva: 200, target_resonant_order: 4.7 } };
 function _v717renderCapacitorBankForResonanceOrder(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: parallel-resonance order of a PF capacitor bank (IEEE 519 / IEEE 1531) solved for the bank: MVAR_cap = MVA_sc / h_target^2, the largest bank that keeps the resonant order at or above the target (a bigger bank lowers the order toward the low harmonics). A screening aid; a harmonic study governs.";
-  const sc = makeNumber("Short-circuit power at the bus (MVA)", "cbr-sc", { step: "any", min: "0" });
+  const sc = makeNumber("Short-circuit power at the capacitor bus, utility + transformer combined (MVA)", "cbr-sc", { step: "any", min: "0" });
   const h = makeNumber("Target min resonant order (e.g. 4.7 to stay below the 5th)", "cbr-h", { step: "any", min: "0" });
   for (const f of [sc, h]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { sc.input.value = "200"; h.input.value = "4.7"; update(); });

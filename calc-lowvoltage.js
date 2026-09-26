@@ -1137,8 +1137,8 @@ function _v929renderAccessControlPowerSupply(inputRegion, outputRegion, citation
 LOWVOLTAGE_RENDERERS["access-control-power-supply"] = _v929renderAccessControlPowerSupply;
 
 // ===================== spec-v937: fire-alarm NAC circuit voltage drop (end-of-line) =====================
-// dims: in { nominal_voltage_v: M L^2 T^-3 I^-1, total_current_a: I, run_length_ft: L, resistance_per_1000ft: M L T^-3 I^-2, device_min_v: M L^2 T^-3 I^-1 } out: { available_voltage_v: M L^2 T^-3 I^-1, voltage_drop_v: M L^2 T^-3 I^-1, eol_voltage_v: M L^2 T^-3 I^-1, margin_v: M L^2 T^-3 I^-1 }
-export function computeFireAlarmNacVoltageDrop({ nominal_voltage_v = 24, total_current_a = 0.8, run_length_ft = 250, resistance_per_1000ft = 3.14, device_min_v = 16 } = {}) {
+// dims: in { nominal_voltage_v: M L^2 T^-3 I^-1, total_current_a: I, run_length_ft: L, resistance_per_1000ft: M L T^-3 I^-2, device_min_v: M L^2 T^-3 I^-1, panel_min_output_v: M L^2 T^-3 I^-1 } out: { available_voltage_v: M L^2 T^-3 I^-1, voltage_drop_v: M L^2 T^-3 I^-1, eol_voltage_v: M L^2 T^-3 I^-1, margin_v: M L^2 T^-3 I^-1 }
+export function computeFireAlarmNacVoltageDrop({ nominal_voltage_v = 24, total_current_a = 0.8, run_length_ft = 250, resistance_per_1000ft = 3.14, device_min_v = 16, panel_min_output_v = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(nominal_voltage_v > 0)) return { error: "Nominal panel voltage must be positive (V)." };
   if (!(total_current_a > 0)) return { error: "Total appliance current must be positive (A)." };
@@ -1147,8 +1147,11 @@ export function computeFireAlarmNacVoltageDrop({ nominal_voltage_v = 24, total_c
   if (!(device_min_v > 0)) return { error: "Device minimum voltage must be positive (V)." };
   // Default conductor: #14 stranded copper, 3.14 ohm/1000 ft at 75 C (NEC Ch 9 Table 8; 3.07 solid).
   // Until 2026-09-24 this was 2.525, the 20 C handbook value, which understated the drop by about 20%.
-  // The panel's regulated minimum output (CUSTV) is 85% of nominal per NFPA 72; Class B is out-and-back, so 2x length.
-  const available_voltage_v = 0.85 * nominal_voltage_v;
+  // Start from the panel's listed minimum NAC output when the maker gives one (19.9 V, 20.4 V ...); otherwise
+  // the common 85%-of-nominal convention (20.4 V on 24 V). Until 2026-09-25 the 85% was fixed and credited to
+  // NFPA 72, which does not state it. Class B is out-and-back, so 2x length.
+  if (!(panel_min_output_v >= 0)) return { error: "Panel minimum NAC output cannot be negative (V); enter 0 to use 85% of nominal." };
+  const available_voltage_v = panel_min_output_v > 0 ? panel_min_output_v : 0.85 * nominal_voltage_v;
   const loop_resistance = 2 * run_length_ft * (resistance_per_1000ft / 1000);
   const voltage_drop_v = total_current_a * loop_resistance;
   const eol_voltage_v = available_voltage_v - voltage_drop_v;
@@ -1162,21 +1165,22 @@ export function computeFireAlarmNacVoltageDrop({ nominal_voltage_v = 24, total_c
     margin_v,
     within_spec,
     verdict: within_spec ? "PASS" : "FAIL",
-    note: "Fire-alarm notification-appliance-circuit (NAC) end-of-line voltage check. The panel's usable output is its regulated minimum (CUSTV), about 85% of nominal per NFPA 72 -- 20.4 V on a 24 V panel, not 24 V. On a Class B circuit the current runs out and back, so the loop resistance is 2 x length x the conductor ohms/1000 ft (from NEC Chapter 9 Table 8). Lumping the total appliance current at the end of the line is the worst case: V_EOL = CUSTV - I x loop_R, and every horn/strobe must still see at least its listed minimum (about 16 V for a 24 V device) with margin. If it fails, use heavier wire, shorten the run, split the circuit, or add a power booster / NAC extender. The panel's actual regulated voltage, the appliance current draws and listed minimums, and the wire table govern; a signed fire-alarm design and the AHJ approve the final circuit.",
+    note: "Fire-alarm notification-appliance-circuit (NAC) end-of-line voltage check. The panel's usable output is its listed minimum NAC output (CUSTV) from the panel's installation manual -- 19.9 V or 20.4 V on a 24 V panel, not 24 V; with no listed value the common convention is 85% of nominal. On a Class B circuit the current runs out and back, so the loop resistance is 2 x length x the conductor ohms/1000 ft (from NEC Chapter 9 Table 8). Lumping the total appliance current at the end of the line is the worst case: V_EOL = CUSTV - I x loop_R, and every horn/strobe must still see at least its listed minimum (about 16 V for a 24 V device) with margin. If it fails, use heavier wire, shorten the run, split the circuit, or add a power booster / NAC extender. The panel's actual regulated voltage, the appliance current draws and listed minimums, and the wire table govern; a signed fire-alarm design and the AHJ approve the final circuit.",
   };
 }
 
-export const fireAlarmNacVoltageDropExample = { inputs: { nominal_voltage_v: 24, total_current_a: 0.8, run_length_ft: 250, resistance_per_1000ft: 3.14, device_min_v: 16 } };
+export const fireAlarmNacVoltageDropExample = { inputs: { nominal_voltage_v: 24, total_current_a: 0.8, run_length_ft: 250, resistance_per_1000ft: 3.14, device_min_v: 16, panel_min_output_v: 0 } };
 
 function _v937renderFireAlarmNacVoltageDrop(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: fire-alarm NAC end-of-line voltage drop by name (NFPA 72). CUSTV = 0.85 x nominal; loop R = 2 x length x (ohm/1000 ft)/1000 (Class B out-and-back; NEC Ch 9 Table 8 at 75 C, #14 stranded 3.14 and solid 3.07 ohm/1000 ft); V_EOL = CUSTV - I x loop R, must be >= the device's listed minimum. The panel voltage, appliance draws, and the wire table govern.";
+  citationEl.textContent = "Citation: fire-alarm NAC end-of-line voltage drop by name (NFPA 72). CUSTV = the panel's listed minimum NAC output, else 0.85 x nominal; loop R = 2 x length x (ohm/1000 ft)/1000 (Class B out-and-back; NEC Ch 9 Table 8 at 75 C, #14 stranded 3.14 and solid 3.07 ohm/1000 ft); V_EOL = CUSTV - I x loop R, must be >= the device's listed minimum. The panel voltage, appliance draws, and the wire table govern.";
   const nv = makeNumber("Panel nominal voltage (V)", "nac-nv", { step: "any", min: "0" });
   const ic = makeNumber("Total appliance current at EOL (A)", "nac-ic", { step: "any", min: "0" });
   const rl = makeNumber("Run length (ft, one way)", "nac-rl", { step: "any", min: "0" });
   const rr = makeNumber("Conductor resistance (ohm/1000 ft)", "nac-rr", { step: "any", min: "0" });
   const dm = makeNumber("Device minimum voltage (V)", "nac-dm", { step: "any", min: "0" });
-  for (const f of [nv, ic, rl, rr, dm]) inputRegion.appendChild(f.wrap);
-  attachExampleButton(inputRegion, () => { nv.input.value = "24"; ic.input.value = "0.8"; rl.input.value = "250"; rr.input.value = "3.14"; dm.input.value = "16"; update(); });
+  const po = makeNumber("Panel listed minimum NAC output (V, 0 = 85% of nominal)", "nac-po", { step: "any", min: "0" });
+  for (const f of [nv, ic, rl, rr, dm, po]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { nv.input.value = "24"; ic.input.value = "0.8"; rl.input.value = "250"; rr.input.value = "3.14"; dm.input.value = "16"; po.input.value = "0"; update(); });
   const oV = makeOutputLine(outputRegion, "Verdict", "nac-out-v");
   const oEol = makeOutputLine(outputRegion, "End-of-line voltage", "nac-out-eol");
   const oDrop = makeOutputLine(outputRegion, "Voltage drop (from CUSTV)", "nac-out-drop");
@@ -1184,14 +1188,14 @@ function _v937renderFireAlarmNacVoltageDrop(inputRegion, outputRegion, citationE
     const r = computeFireAlarmNacVoltageDrop({
       nominal_voltage_v: nv.input.value === "" ? 24 : Number(nv.input.value), total_current_a: ic.input.value === "" ? 0.8 : Number(ic.input.value),
       run_length_ft: rl.input.value === "" ? 250 : Number(rl.input.value), resistance_per_1000ft: rr.input.value === "" ? 3.14 : Number(rr.input.value),
-      device_min_v: dm.input.value === "" ? 16 : Number(dm.input.value),
+      device_min_v: dm.input.value === "" ? 16 : Number(dm.input.value), panel_min_output_v: Number(po.input.value) || 0,
     });
     if (r.error) { oV.textContent = r.error; oEol.textContent = "-"; oDrop.textContent = "-"; return; }
     oV.textContent = r.verdict + " (" + (r.margin_v >= 0 ? "+" : "") + fmt(r.margin_v, 2) + " V margin)";
     oEol.textContent = fmt(r.eol_voltage_v, 2) + " V (need " + fmt(Number(dm.input.value) || 16, 1) + " V)";
     oDrop.textContent = fmt(r.voltage_drop_v, 2) + " V of " + fmt(r.available_voltage_v, 1) + " V available";
   }, DEBOUNCE_MS);
-  for (const f of [nv, ic, rl, rr, dm]) f.input.addEventListener("input", update);
+  for (const f of [nv, ic, rl, rr, dm, po]) f.input.addEventListener("input", update);
 }
 LOWVOLTAGE_RENDERERS["fire-alarm-nac-voltage-drop"] = _v937renderFireAlarmNacVoltageDrop;
 

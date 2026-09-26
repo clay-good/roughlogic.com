@@ -26911,7 +26911,7 @@ import { computeSteamPrvNapier as _v588 } from "../../calc-pipefit.js";
 test("bounds: spec-v588 computeSteamPrvNapier pins the choke test, the Napier capacity, the linear-in-P1 behavior, and error seams", () => {
   const r = _v588({ orifice_area_in2: 0.5, upstream_p_psia: 100, downstream_p_psia: 30, discharge_coeff: 0.9 });
   assert.equal(r.choked, true); // 30 < 0.58*100 = 58
-  assert.ok(Math.abs(r.steam_capacity_lb_hr - 51.43 * 0.9 * 0.5 * 100) < 1e-6);
+  assert.ok(Math.abs(r.steam_capacity_lb_hr - 51.5 * 0.9 * 0.5 * 100) < 1e-6);
   // Capacity is linear in upstream pressure (a liquid Cv would be square-root).
   const hi = _v588({ orifice_area_in2: 0.5, upstream_p_psia: 150, downstream_p_psia: 30, discharge_coeff: 0.9 });
   assert.ok(Math.abs(hi.steam_capacity_lb_hr - r.steam_capacity_lb_hr * 1.5) < 1e-6);
@@ -26928,7 +26928,7 @@ test("bounds: spec-v588 computeSteamPrvNapier pins the choke test, the Napier ca
 import { computeSteamPrvAreaForCapacity as _v759 } from "../../calc-pipefit.js";
 test("bounds: spec-v759 steam PRV orifice area for a required capacity (inverse of steam-prv-napier)", () => {
   const p = _v759({ required_capacity_lb_hr: 5000, upstream_p_psia: 100, discharge_coeff: 0.9 });
-  assert.ok(Math.abs(p.required_area_in2 - 1.0802) < 0.001);
+  assert.ok(Math.abs(p.required_area_in2 - 5000 / (51.5 * 0.9 * 100)) < 1e-9); // 1.0787 at the API 520 constant (1.0802 at Napier's 51.43)
   assert.ok(Math.abs(p.choke_threshold_psia - 58) < 1e-9);
   // round-trip: the recovered area fed to steam-prv-napier (choked) reproduces the required capacity
   for (const [W, P1, Cd] of [[5000, 100, 0.9], [12000, 250, 0.975], [800, 60, 0.6], [30000, 400, 0.9]]) {
@@ -55753,4 +55753,27 @@ test("bounds: computeConduitNipple60Fill max counts follow NEC Ch. 9 Note 7 (a d
   const p = _v989({ conduit_area_sqin: 3.408, conductor_area_sqin: 0.119, conductor_count: 17 });
   assert.equal(p.nipple_max_conductors, 17);
   assert.equal(p.normal_max_conductors, 11);
+});
+
+test("bounds: computeFireAlarmNacVoltageDrop starts from the panel's listed minimum NAC output when given", () => {
+  // Fire Alarms Online (Schuler, 2019): 19.9 V panel minimum, 0.375 A, 445 ft one way, 1.98 ohm/1000 ft.
+  const r = _v937({ nominal_voltage_v: 24, total_current_a: 0.375, run_length_ft: 445, resistance_per_1000ft: 1.98, device_min_v: 16, panel_min_output_v: 19.9 });
+  assert.ok(Math.abs(r.voltage_drop_v - 0.660825) < 1e-9);
+  assert.ok(Math.abs(r.eol_voltage_v - 19.239175) < 1e-9);
+  // 0 keeps the 85%-of-nominal convention.
+  assert.ok(Math.abs(_v937({ nominal_voltage_v: 24, total_current_a: 0.8, run_length_ft: 250, resistance_per_1000ft: 3.14, device_min_v: 16 }).available_voltage_v - 20.4) < 1e-9);
+  assert.ok("error" in _v937({ nominal_voltage_v: 24, total_current_a: 0.8, run_length_ft: 250, resistance_per_1000ft: 3.14, device_min_v: 16, panel_min_output_v: -1 }));
+});
+
+test("bounds: computeSteelCamber rounds DOWN to the 1/4 in and leaves a sub-3/4 in camber flat (AISC v15.1)", () => {
+  // AISC I.1: 0.8 x 2.59 = 2.07 -> 2 in (nearest would also be 2); III-26: 1.68 -> 1-1/2 in (nearest: 1-3/4).
+  const i1 = _v413({ w_kip_ft: 0.8, span_ft: 45, moi_in4: 984, e_ksi: 29000, fraction: 0.8 });
+  assert.equal(i1.camber_in, 2);
+  // A raw camber of 0.640 in (AISC III-26 "do not specify a camber"): nearest-1/4 gave 0.75 and cambered it
+  // until 2026-09-25; rounding down gives 0.5, under the 3/4 in floor.
+  const I = 2100 * 0.9458 / 0.8; // defl ~0.80 in at w 1.0, 40 ft
+  const low = _v413({ w_kip_ft: 1.0, span_ft: 40, moi_in4: I, e_ksi: 29000, fraction: 0.8 });
+  assert.ok(Math.abs(low.camber_raw - 0.64) < 0.002);
+  assert.equal(low.camber_in, 0.5);
+  assert.equal(low.cambered, false);
 });

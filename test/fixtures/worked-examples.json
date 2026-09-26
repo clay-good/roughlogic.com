@@ -38588,6 +38588,28 @@
    }
   },
   {
+   "tile_id": "pv-inverter-ratio",
+   "source_publisher": "US EIA",
+   "source_title": "Today in Energy: inverter loading ratio of utility-scale solar",
+   "source_edition_or_year": "March 16, 2018",
+   "source_section_or_page": "20.3 GW AC and a DC module rating of 25.4 GW -> capacity-weighted average ILR of 1.25 (GW entered in the kW fields; the ratio is unit-free)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "dc_kw": 25.4,
+    "ac_kw": 20.3,
+    "inv_eff": 0.96
+   },
+   "outputs": {
+    "ilr": {
+     "value": 1.25,
+     "tolerance": {
+      "abs": 0.005
+     }
+    }
+   }
+  },
+  {
    "tile_id": "rain-load-ponding",
    "source_publisher": "ASCE 7 Ch. 8 + IPC drainage",
    "source_title": "2 in + 1 in head, 2,000 ft2, 3 in/hr -> 15.6 psf, 62.4 gpm",
@@ -40413,9 +40435,9 @@
   {
    "tile_id": "steam-prv-napier",
    "source_publisher": "Napier's formula / ASME/API 520",
-   "source_title": "choked when P2 < 0.58 x P1; W = 51.43 x Cd x A x P1",
+   "source_title": "choked when P2 < 0.58 x P1; W = 51.5 x Cd x A x P1 (API 520)",
    "source_edition_or_year": "Napier / ASME-API 520",
-   "source_section_or_page": "0.5 in2 orifice, 100 psia upstream, 30 psia downstream, Cd 0.9 -> choked, 2,314 lb/hr",
+   "source_section_or_page": "0.5 in2 orifice, 100 psia upstream, 30 psia downstream, Cd 0.9 -> choked, 2,318 lb/hr",
    "verified_by": "rl",
    "verified_on": "2026-07-10",
    "inputs": {
@@ -40426,7 +40448,7 @@
    },
    "outputs": {
     "steam_capacity_lb_hr": {
-     "value": 2314.35,
+     "value": 2317.5,
      "tolerance": {
       "abs": 1
      }
@@ -40436,7 +40458,7 @@
   {
    "tile_id": "steam-prv-area-for-capacity",
    "source_publisher": "Napier's formula / ASME/API 520 (solved for area)",
-   "source_title": "A = W / (51.43 x Cd x P1); 5,000 lb/hr, 100 psia, Cd 0.9 -> 1.08 in^2",
+   "source_title": "A = W / (51.5 x Cd x P1); 5,000 lb/hr, 100 psia, Cd 0.9 -> 1.08 in^2",
    "source_edition_or_year": "Napier / ASME-API 520",
    "source_section_or_page": "spec-v759 section 2.1 pinned example",
    "verified_by": "rl",
@@ -40448,7 +40470,7 @@
    },
    "outputs": {
     "required_area_in2": {
-     "value": 1.0802,
+     "value": 1.0787,
      "tolerance": {
       "abs": 0.005
      }
@@ -40462,11 +40484,33 @@
    }
   },
   {
+   "tile_id": "steam-prv-area-for-capacity",
+   "source_publisher": "PDHonline (Whitesides)",
+   "source_title": "Course M112, Selection and Sizing of Pressure Relief Valves, Example 2",
+   "source_edition_or_year": "2005 / 2008, p. 18",
+   "source_section_or_page": "A = 40,000 / ((51.5)(140 + 14 + 14.7)(0.975)(1.0)(1.0)) = 4.72 in2 (P1 = set 140 + 10% overpressure 14 + 14.7 atmospheric)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "required_capacity_lb_hr": 40000,
+    "upstream_p_psia": 168.7,
+    "discharge_coeff": 0.975
+   },
+   "outputs": {
+    "required_area_in2": {
+     "value": 4.72,
+     "tolerance": {
+      "abs": 0.005
+     }
+    }
+   }
+  },
+  {
    "tile_id": "steam-prv-napier",
    "source_publisher": "Napier's formula / ASME/API 520",
    "source_title": "more upstream pressure raises the choked capacity linearly",
    "source_edition_or_year": "Napier / ASME-API 520",
-   "source_section_or_page": "Raise upstream to 150 psia (still choked at 30) -> 51.43 x 0.9 x 0.5 x 150 = 3,472 lb/hr (50% more for 50% more P1)",
+   "source_section_or_page": "Raise upstream to 150 psia (still choked at 30) -> 51.5 x 0.9 x 0.5 x 150 = 3,476 lb/hr (50% more for 50% more P1)",
    "verified_by": "rl",
    "verified_on": "2026-07-10",
    "inputs": {
@@ -40477,7 +40521,7 @@
    },
    "outputs": {
     "steam_capacity_lb_hr": {
-     "value": 3471.53,
+     "value": 3476.25,
      "tolerance": {
       "abs": 1
      }
@@ -43794,6 +43838,27 @@
    }
   },
   {
+   "tile_id": "pulse-flowmeter-k-factor",
+   "source_publisher": "FLOMEC",
+   "source_title": "Turbine Flow Meter Frequency and K-Factor",
+   "source_edition_or_year": "web tech note",
+   "source_section_or_page": "500 Hz x 60 sec. / 100 ppg = 300 gpm",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "frequency_hz": 500,
+    "k_factor_pulses_per_gal": 100
+   },
+   "outputs": {
+    "flow_gpm": {
+     "value": 300,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
    "tile_id": "rtd-resistance-to-temp",
    "source_publisher": "IEC 60751 platinum RTD (Callendar-Van Dusen)",
    "source_title": "Pt100 reading 119.397 ohms -> 50 C (122 F)",
@@ -44048,7 +44113,8 @@
     "total_current_a": 0.8,
     "run_length_ft": 250,
     "resistance_per_1000ft": 3.14,
-    "device_min_v": 16
+    "device_min_v": 16,
+    "panel_min_output_v": 0
    },
    "outputs": {
     "available_voltage_v": {
@@ -44091,6 +44157,37 @@
      "value": 17.888,
      "tolerance": {
       "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "fire-alarm-nac-voltage-drop",
+   "source_publisher": "Fire Alarms Online (Kyle Schuler)",
+   "source_title": "Voltage Drop For Fire Alarm Circuits",
+   "source_edition_or_year": "April 22, 2019",
+   "source_section_or_page": "19.9 V listed panel minimum, 890 ft loop (445 ft one way) of 1.98 ohm/1000 ft, 0.375 A: 1.7622 ohm x 0.375 A = 0.660825 V; 19.9 - 0.660825 = 19.239175 VDC",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "nominal_voltage_v": 24,
+    "total_current_a": 0.375,
+    "run_length_ft": 445,
+    "resistance_per_1000ft": 1.98,
+    "device_min_v": 16,
+    "panel_min_output_v": 19.9
+   },
+   "outputs": {
+    "voltage_drop_v": {
+     "value": 0.660825,
+     "tolerance": {
+      "abs": 1e-06
+     }
+    },
+    "eol_voltage_v": {
+     "value": 19.239175,
+     "tolerance": {
+      "abs": 1e-06
      }
     }
    }
@@ -50569,6 +50666,42 @@
    }
   },
   {
+   "tile_id": "heat-pump-seasonal-energy",
+   "source_publisher": "NYSERDA / New York State",
+   "source_title": "Compare Heating Fuels (cost per million Btu)",
+   "source_edition_or_year": "filed with 2022 comments",
+   "source_section_or_page": "per MMBtu: heat pump $0.18/kWh at HSPF 8.2 -> $21.95; electric baseboard -> $52.75; gas $1.25/therm at 95% AFUE -> $13.16",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "seasonal_load_mmbtu": 1,
+    "hspf": 8.2,
+    "rate_kwh": 0.18,
+    "afue": 0.95,
+    "rate_therm": 1.25
+   },
+   "outputs": {
+    "hp_cost": {
+     "value": 21.95,
+     "tolerance": {
+      "abs": 0.005
+     }
+    },
+    "resistance_cost": {
+     "value": 52.75,
+     "tolerance": {
+      "abs": 0.005
+     }
+    },
+    "gas_cost": {
+     "value": 13.16,
+     "tolerance": {
+      "abs": 0.005
+     }
+    }
+   }
+  },
+  {
    "tile_id": "dual-fuel-balance-point",
    "source_publisher": "Delivered-Btu fuel-cost comparison",
    "source_title": "COP 2.5 -> $17.58 HP vs $15.79 gas, switchover 2.78, switch to gas",
@@ -53217,6 +53350,50 @@
    }
   },
   {
+   "tile_id": "required-section-modulus",
+   "source_publisher": "AISC",
+   "source_title": "Design Examples, Companion to the AISC Steel Construction Manual",
+   "source_edition_or_year": "v15.1",
+   "source_section_or_page": "Example A-6.2, p. A6-8: Z req = Mbr/(phi Fy) = (1.50 kips)(12.0 ft)(12 in./ft)/[0.90(50 ksi)(4)] = 1.20 in.3 (Mbr = 1.50 x 12.0 / 4 = 4.5 kip-ft)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "fy": 50,
+    "moment_kipft": 4.5,
+    "method": "lrfd"
+   },
+   "outputs": {
+    "zx_req": {
+     "value": 1.2,
+     "tolerance": {
+      "abs": 0.005
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "required-section-modulus",
+   "source_publisher": "AISC",
+   "source_title": "Design Examples, Companion to the AISC Steel Construction Manual",
+   "source_edition_or_year": "v15.1",
+   "source_section_or_page": "Example A-6.2 ASD: 1.67(1.00 kip)(12.0 ft)(12 in./ft)/[(50 ksi)(4)] = 1.20 in.3 (Mbr = 3.0 kip-ft)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "fy": 50,
+    "moment_kipft": 3.0,
+    "method": "asd"
+   },
+   "outputs": {
+    "zx_req": {
+     "value": 1.2,
+     "tolerance": {
+      "abs": 0.005
+     }
+    }
+   }
+  },
+  {
    "tile_id": "shear-flow-connector-spacing",
    "source_publisher": "Mechanics of materials (shear flow q = VQ/I; Hibbeler / Gere)",
    "source_title": "6 in^2 plate at y_bar 8 in, I 800 in^4, V 50 kip -> q 3.0 kip/in, s 6.67 in (two 10 kip bolts)",
@@ -53274,6 +53451,37 @@
      "value": 3.3333,
      "tolerance": {
       "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "shear-flow-connector-spacing",
+   "source_publisher": "FAMU-FSU College of Engineering (W. Oates)",
+   "source_title": "Mechanics of Materials I, Chapter 13 slides, Problem 13",
+   "source_edition_or_year": "2006, slide 27",
+   "source_section_or_page": "Qt = 84.375 in3, I = 1196.4375 in4, V = 4.9718 kip -> qt = 350.62 lb/in; St = 400/350.62 = 1.14 in (Q entered as area 84.375 x ybar 1)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "shear_kip": 4.9718,
+    "area_in2": 84.375,
+    "ybar_in": 1,
+    "inertia_in4": 1196.4375,
+    "connector_kip": 0.4,
+    "connectors_per_row": 1
+   },
+   "outputs": {
+    "q_kip_in": {
+     "value": 0.35062,
+     "tolerance": {
+      "abs": 1e-05
+     }
+    },
+    "spacing_in": {
+     "value": 1.14,
+     "tolerance": {
+      "abs": 0.005
      }
     }
    }
@@ -54195,6 +54403,36 @@
    "outputs": {
     "camber_in": {
      "value": 0,
+     "tolerance": {
+      "abs": 0
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "steel-camber",
+   "source_publisher": "AISC",
+   "source_title": "Design Examples, Companion to the AISC Steel Construction Manual",
+   "source_edition_or_year": "v15.1",
+   "source_section_or_page": "Example I.1, pp. I-7 to I-8: 0.800 kip/ft, 45 ft, I = 984 in.4 -> delta nc = 2.59 in.; Camber = 0.8(2.59 in.) = 2.07 in., rounding down to the nearest 1/4 in. -> 2 in.",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "w_kip_ft": 0.8,
+    "span_ft": 45,
+    "moi_in4": 984,
+    "e_ksi": 29000,
+    "fraction": 0.8
+   },
+   "outputs": {
+    "defl_in": {
+     "value": 2.59,
+     "tolerance": {
+      "abs": 0.005
+     }
+    },
+    "camber_in": {
+     "value": 2,
      "tolerance": {
       "abs": 0
      }
@@ -57123,6 +57361,37 @@
    }
   },
   {
+   "tile_id": "cmu-wall-axial",
+   "source_publisher": "The Masonry Society",
+   "source_title": "ASD Night School #3: Design for Axial Load and Out-of-Plane Loads, Example 1 (Masonry Designers' Guide 2016)",
+   "source_edition_or_year": "2022 handout, slides 24-25",
+   "source_section_or_page": "f'm 2000, h 16.67 ft, r 2.20 in -> h/r 90.9, R 0.578; untied wall steel is not counted (Ast 0)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "fm_psi": 2000,
+    "an_in2": 91.5,
+    "ast_in2": 0,
+    "h_in": 200,
+    "r_in": 2.2,
+    "fs_psi": 32000
+   },
+   "outputs": {
+    "hr": {
+     "value": 90.9,
+     "tolerance": {
+      "abs": 0.05
+     }
+    },
+    "r_factor": {
+     "value": 0.578,
+     "tolerance": {
+      "abs": 0.0005
+     }
+    }
+   }
+  },
+  {
    "tile_id": "masonry-prism-fm",
    "source_publisher": "TMS 602-16 (ACI 530.1 / ASCE 6) Table 2 unit-strength method, concrete masonry",
    "source_title": "2,000 psi net-area concrete unit in Type S mortar -> assumed f'm 2,000 psi",
@@ -58221,6 +58490,34 @@
      "value": 2000,
      "tolerance": {
       "abs": 2
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "motor-fault-contribution",
+   "source_publisher": "Cooper Bussmann",
+   "source_title": "Selecting Protective Devices (SPD), Short Circuit Current Calculations",
+   "source_edition_or_year": "2005, pp. 193-194",
+   "source_section_or_page": "IS.C. motor contrib = 4 x 1,804 = 7,216A; fault X1 = 49,803 + 7,216 = 57,019A (Bussmann's flat 4 x FLA entered as X'' = 0.25)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "motor_fla_a": 1804,
+    "x_subtransient_pu": 0.25,
+    "utility_fault_a": 49803
+   },
+   "outputs": {
+    "contribution_a": {
+     "value": 7216,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "total_a": {
+     "value": 57019,
+     "tolerance": {
+      "abs": 0.5
      }
     }
    }

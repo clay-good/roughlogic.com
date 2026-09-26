@@ -10264,13 +10264,13 @@ export const CITATIONS = {
     ],
   },
   "fire-alarm-nac-voltage-drop": {
-    formula: "available_voltage_v = 0.85 x nominal_voltage_v (CUSTV); loop_R = 2 x run_length_ft x (resistance_per_1000ft / 1000); voltage_drop_v = total_current_a x loop_R; eol_voltage_v = available_voltage_v - voltage_drop_v; within_spec when eol >= device_min_v.",
+    formula: "available_voltage_v = panel_min_output_v when given, else 0.85 x nominal_voltage_v (CUSTV); loop_R = 2 x run_length_ft x (resistance_per_1000ft / 1000); voltage_drop_v = total_current_a x loop_R; eol_voltage_v = available_voltage_v - voltage_drop_v; within_spec when eol >= device_min_v.",
     edition: "NFPA 72 (National Fire Alarm and Signaling Code) notification-appliance-circuit power / voltage provisions with the NEC Chapter 9 Table 8 conductor resistance, by name; the listed panel and appliances and the AHJ govern.",
-    freeAccess: "The Ohm's-law voltage-drop relation is public physics; the 0.85 regulated-minimum (CUSTV) factor is NFPA 72, and the conductor ohms/1000 ft come from NEC Chapter 9 Table 8 (the appliance draws and listed minimums are on the datasheets).",
+    freeAccess: "The Ohm's-law voltage-drop relation is public physics; the starting voltage is the panel's listed minimum NAC output (0.85 x nominal is a common convention when none is listed), and the conductor ohms/1000 ft come from NEC Chapter 9 Table 8 (the appliance draws and listed minimums are on the datasheets).",
     governance: GOVERNANCE.general,
-    editionNote: "A fire-alarm notification-appliance circuit (NAC) must deliver at least each horn/strobe's listed minimum voltage at the end of the line. The panel's usable output is not its nominal voltage but its regulated minimum output, the CUSTV, which NFPA 72 takes as about 85% of nominal (20.4 V on a 24 V system). On a Class B (out-and-back) circuit the loop resistance is 2 x the one-way length x the conductor resistance per 1000 ft from NEC Chapter 9 Table 8. Lumping ALL the appliance current at the end of the line is the conservative worst case, giving V_EOL = CUSTV - I x loop_R, which must exceed the device's listed minimum (about 16 V for a 24 V appliance) with margin. When it fails the remedy is heavier conductors, a shorter run, splitting the circuit, or a NAC power extender / booster near the load. This is a design screen; the panel's actual regulated voltage, the appliance current draws and listed minimums, the wire table, and a stamped fire-alarm design and the AHJ govern the final circuit.",
+    editionNote: "A fire-alarm notification-appliance circuit (NAC) must deliver at least each horn/strobe's listed minimum voltage at the end of the line. The panel's usable output is not its nominal voltage but its regulated minimum output, the CUSTV, which the panel's installation manual lists (19.9 V or 20.4 V on a 24 V panel), or by common convention about 85% of nominal (20.4 V on a 24 V system). On a Class B (out-and-back) circuit the loop resistance is 2 x the one-way length x the conductor resistance per 1000 ft from NEC Chapter 9 Table 8. Lumping ALL the appliance current at the end of the line is the conservative worst case, giving V_EOL = CUSTV - I x loop_R, which must exceed the device's listed minimum (about 16 V for a 24 V appliance) with margin. When it fails the remedy is heavier conductors, a shorter run, splitting the circuit, or a NAC power extender / booster near the load. This is a design screen; the panel's actual regulated voltage, the appliance current draws and listed minimums, the wire table, and a stamped fire-alarm design and the AHJ govern the final circuit.",
     assumptions: [
-      { name: "CUSTV and Class B", value: "usable voltage = 0.85 x nominal (NFPA 72 regulated minimum); Class B loop = 2 x length x ohms/1000 ft", source: "NFPA 72 / NEC Ch 9 Table 8" },
+      { name: "CUSTV and Class B", value: "usable voltage = the panel's listed minimum NAC output, else 0.85 x nominal by convention; Class B loop = 2 x length x ohms/1000 ft", source: "panel installation manual / NEC Ch 9 Table 8" },
       { name: "Worst-case load", value: "total appliance current lumped at the end of the line; each device must still see its listed minimum", source: "NAC design practice" },
       { name: "Default conductor", value: "#14 stranded copper, 3.14 ohm/1000 ft at 75 C (3.07 solid)", source: "NEC Chapter 9 Table 8" },
     ],
@@ -20426,14 +20426,14 @@ export const CITATIONS = {
     ],
   },
   "steel-camber": {
-    formula: "delta = 5 w L^4 / (384 E I); camber = round(fraction x delta to nearest 1/4 in).",
+    formula: "delta = 5 w L^4 / (384 E I); camber = fraction x delta rounded DOWN to the 1/4 in (AISC Design Examples v15.1 I.1).",
     edition: "Steel beam camber from the dead-load deflection, standard AISC / fabrication practice, by name.",
     freeAccess: "The simple-span deflection and the fractional-camber rounding are standard published structural results.",
     governance: GOVERNANCE.general,
-    editionNote: "Steel beam camber from the dead-load deflection: the simple-span midspan deflection delta = 5 w L^4 / (384 E I) under the deflection-causing (dead) load, cambered at a fraction (commonly 75-80%) of it and rounded to the nearest 1/4 in. Fabricators do not camber below about 3/4 in (the mill tolerance and cost are not worth it), so a stiff or short beam is left flat. Camber removes the dead-load sag so the floor finishes level after the concrete cures; the live-load deflection is not cambered out. This returns the deflection and the rounded camber; the structural drawings govern the specified value. A detailing aid, not a substitute for the engineer of record's stamped design.",
+    editionNote: "Steel beam camber from the dead-load deflection: the simple-span midspan deflection delta = 5 w L^4 / (384 E I) under the deflection-causing (dead) load, cambered at a fraction (commonly 75-80%) of it and rounded down to the 1/4 in (AISC). Fabricators do not camber below about 3/4 in (the mill tolerance and cost are not worth it), so a stiff or short beam is left flat. Camber removes the dead-load sag so the floor finishes level after the concrete cures; the live-load deflection is not cambered out. This returns the deflection and the rounded camber; the structural drawings govern the specified value. A detailing aid, not a substitute for the engineer of record's stamped design.",
     assumptions: [
       { name: "Deflection", value: "delta = 5 w L^4 / (384 E I) simple span", source: "beam theory" },
-      { name: "Camber", value: "fraction (75-80%) of delta, rounded to nearest 1/4 in", source: "AISC / fabrication practice" },
+      { name: "Camber", value: "fraction (75-80%) of delta, rounded DOWN to the 1/4 in; none specified below about 3/4 in", source: "AISC Design Examples v15.1, Example I.1 and Part III" },
       { name: "Practical minimum", value: "not cambered below about 3/4 in", source: "fabrication practice" },
     ],
   },
@@ -21437,11 +21437,11 @@ export const CITATIONS = {
     ],
   },
   "steam-prv-area-for-capacity": {
-    formula: "required_area_in2 = required_capacity_lb_hr / (51.43 x discharge_coeff x upstream_p_psia), the inverse of the choked Napier capacity W = 51.43 x Cd x A x P1; choke_threshold = 0.58 x upstream_p_psia.",
+    formula: "required_area_in2 = required_capacity_lb_hr / (51.5 x discharge_coeff x upstream_p_psia), the inverse of the choked Napier capacity W = 51.5 x Cd x A x P1; choke_threshold = 0.58 x upstream_p_psia.",
     edition: "Napier's formula / ASME/API 520 choked steam capacity, solved for the orifice area, by name.",
     freeAccess: "Napier's formula is a classical, published steam-flow relation; ASME/API and the valve manufacturer govern the actual certification.",
     governance: GOVERNANCE.general,
-    editionNote: "The orifice / seat area a required steam relief capacity needs, the inverse of the choked Napier capacity: A = W / (51.43 Cd P1). Round up to a standard API 526 orifice letter (D, E, F ... = 0.110, 0.196, 0.307 in^2 and up). This assumes choked flow (the standard relief condition, downstream absolute pressure below 58% of the upstream, threshold reported); the capacity then depends only on the upstream pressure, and a liquid Cv (which scales with the square root of the pressure drop) is wrong. Napier is for saturated steam (superheat needs a Ksh factor). The discharge coefficient (about 0.6 sharp-edged orifice, near 1 nozzle) must match the device. ASME/API and the valve manufacturer govern - a sizing aid, not a relief-valve certification.",
+    editionNote: "The orifice / seat area a required steam relief capacity needs, the inverse of the choked Napier capacity: A = W / (51.5 Cd P1). Round up to a standard API 526 orifice letter (D, E, F ... = 0.110, 0.196, 0.307 in^2 and up). This assumes choked flow (the standard relief condition, downstream absolute pressure below 58% of the upstream, threshold reported); the capacity then depends only on the upstream pressure, and a liquid Cv (which scales with the square root of the pressure drop) is wrong. Napier is for saturated steam (superheat needs a Ksh factor). The discharge coefficient (about 0.6 sharp-edged orifice, near 1 nozzle) must match the device. ASME/API and the valve manufacturer govern - a sizing aid, not a relief-valve certification.",
     assumptions: [
       { name: "Choked flow", value: "assumes choked flow (P2 < 0.58 x P1); capacity depends only on the upstream pressure", source: "Napier / Grashof" },
       { name: "Round up to API letter", value: "round A up to a standard API 526 orifice letter", source: "API 526" },
@@ -21449,7 +21449,7 @@ export const CITATIONS = {
     ],
   },
   "steam-prv-napier": {
-    formula: "choked = downstream_p_psia < 0.58 x upstream_p_psia; capacity W = 51.43 x discharge_coeff x orifice_area_in2 x upstream_p_psia [lb/hr] (saturated, choked).",
+    formula: "choked = downstream_p_psia < 0.58 x upstream_p_psia; capacity W = 51.5 x discharge_coeff x orifice_area_in2 x upstream_p_psia [lb/hr] (saturated, choked).",
     edition: "Napier's formula / ASME/API 520 / Grashof steam orifice / PRV capacity, by name.",
     freeAccess: "Napier's formula is a classical, published steam-flow relation; ASME/API and the valve manufacturer govern the actual certification.",
     governance: GOVERNANCE.general,
