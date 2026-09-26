@@ -6,6 +6,24 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Changed
 
+- **Fourteen more tiles now carry a publisher's printed example.** No formula errors were found.
+  - **Structural:**
+    - StructurePoint one-way slab and simply-supported beam: `rc-slab-min-thickness`, `concrete-shrinkage-temperature-steel`, `rc-min-shear-reinforcement`.
+    - Meca Enterprises: `wind-cc-pressure`.
+    - FEMA P-2192 Table 5-4: `seismic-overturning-moment` (k 1.6, 217,217 kip-ft over 18 levels).
+  - **Geotechnical, fluids and HVAC:**
+    - Murthy: `slope-failure-depth-for-fs`.
+    - Fayetteville Drainage Criteria Manual: `orifice-diameter-for-flow`.
+    - PDHonline M476: `reynolds-number-pipe`.
+    - Engineering ToolBox: `pump-suction-specific-speed`.
+    - Bell & Gossett TEH-908A: `hydronic-gpm-deltat`.
+  - **Electrical and AV:**
+    - EC&M: `insulation-resistance-pi` and `motor-max-hp-for-starting-current`.
+    - FOA: `fiber-max-length`.
+    - ProjectorCentral: `projector-brightness`.
+
+  README: 1,110 of 2,183 tiles are checked only against the project's own derivation; 1,073 carry an outside source.
+
 - **Fourteen more tiles now carry a publisher's printed example.** No formula errors were found. Every gap traces to rounding in the published example.
   - **Concrete:**
     - StructurePoint's simply-supported beam: `concrete-elastic-modulus`, `concrete-cracking-moment`, `concrete-effective-inertia` (Ig and Mcr).

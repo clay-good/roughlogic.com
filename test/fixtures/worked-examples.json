@@ -26529,6 +26529,31 @@
    }
   },
   {
+   "tile_id": "fiber-max-length",
+   "source_publisher": "The Fiber Optic Association",
+   "source_title": "Calculating Fiber Optic Loss Budgets",
+   "source_edition_or_year": "2004-18",
+   "source_section_or_page": "0.2 km multimode at 850 nm, TIA-568 maximums: 3.5 dB/km, 3 connectors x 0.75 dB = 2.25 dB, 1 splice 0.3 dB -> total 3.25 dB (run in reverse from the 3.25 dB budget)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "max_channel_loss_db": 3.25,
+    "attenuation_db_km": 3.5,
+    "connector_count": 3,
+    "loss_per_connector_db": 0.75,
+    "splice_count": 1,
+    "loss_per_splice_db": 0.3
+   },
+   "outputs": {
+    "max_length_m": {
+     "value": 200,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
    "tile_id": "cable-tray-fill",
    "source_publisher": "NEC Article 392.22(A) (by name)",
    "source_title": "cables 4/0 and larger: sum of diameters <= tray inside width",
@@ -31765,6 +31790,36 @@
      "value": 24,
      "tolerance": {
       "abs": 0.1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "projector-brightness",
+   "source_publisher": "ProjectorCentral (M. David Stone)",
+   "source_title": "A Simple Guide to Calculating Lumens",
+   "source_edition_or_year": "October 11, 2019",
+   "source_section_or_page": "110-inch 16:9 screen, 35.9 square feet: Lumens = 16 ft-L x 35.9 / gain 1.0 = 574 (screen entered as 7.99 x 4.493 ft)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "screen_w_ft": 7.99,
+    "screen_h_ft": 4.493,
+    "screen_gain": 1,
+    "target_foot_lamberts": 16,
+    "throw_ratio": 1.5
+   },
+   "outputs": {
+    "area_sqft": {
+     "value": 35.9,
+     "tolerance": {
+      "abs": 0.05
+     }
+    },
+    "required_lumens": {
+     "value": 574,
+     "tolerance": {
+      "abs": 1
      }
     }
    }
@@ -53746,6 +53801,107 @@
    }
   },
   {
+   "tile_id": "seismic-overturning-moment",
+   "source_publisher": "FEMA",
+   "source_title": "P-2192-V1, 2020 NEHRP Recommended Seismic Provisions: Design Examples, Table 5-4",
+   "source_edition_or_year": "2020, p. 193",
+   "source_section_or_page": "18-level building, V = 1,238 kips, T = 1.70 s -> k = 1.6; total overturning moment 217,217 kip-ft (FEMA sums per-level values it has rounded)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "base_shear_kip": 1238,
+    "period_s": 1.7,
+    "stories": [
+     {
+      "w": 1555,
+      "h": 17
+     },
+     {
+      "w": 1440,
+      "h": 30
+     },
+     {
+      "w": 1440,
+      "h": 43
+     },
+     {
+      "w": 1440,
+      "h": 56
+     },
+     {
+      "w": 1440,
+      "h": 69
+     },
+     {
+      "w": 1440,
+      "h": 82
+     },
+     {
+      "w": 1440,
+      "h": 95
+     },
+     {
+      "w": 1440,
+      "h": 108
+     },
+     {
+      "w": 1440,
+      "h": 121
+     },
+     {
+      "w": 1440,
+      "h": 134
+     },
+     {
+      "w": 1440,
+      "h": 147
+     },
+     {
+      "w": 1440,
+      "h": 160
+     },
+     {
+      "w": 1440,
+      "h": 173
+     },
+     {
+      "w": 1440,
+      "h": 186
+     },
+     {
+      "w": 1440,
+      "h": 199
+     },
+     {
+      "w": 1440,
+      "h": 212
+     },
+     {
+      "w": 1440,
+      "h": 225
+     },
+     {
+      "w": 1263,
+      "h": 238
+     }
+    ]
+   },
+   "outputs": {
+    "k": {
+     "value": 1.6,
+     "tolerance": {
+      "abs": 0.0005
+     }
+    },
+    "m_base_kipft": {
+     "value": 217217,
+     "tolerance": {
+      "abs": 20
+     }
+    }
+   }
+  },
+  {
    "tile_id": "snowmelt-load",
    "source_publisher": "ASHRAE snow-melting flux / Chapman IP forms via Lund (Geo-Heat Center)",
    "source_title": "Class II walk, 0.1 in/hr WE at 20 F, 10 mph, 80% RH -> 110.7 Btu/hr-ft^2, 66.4 MBH over 500 ft^2",
@@ -59867,6 +60023,35 @@
    }
   },
   {
+   "tile_id": "motor-max-hp-for-starting-current",
+   "source_publisher": "EC&M (James Stallcup Jr.)",
+   "source_title": "Quizzes on the Code, Question 5 (NEC Table 430-7(b))",
+   "source_edition_or_year": "March 1, 2000",
+   "source_section_or_page": "40 hp, 230 V, 3-phase, code letter G: 6.29 kVA x 40 hp x 1,000 / (230 V x 1.732) = 632 A (run in reverse from 632 A)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "max_starting_current_a": 632,
+    "code_letter": "G",
+    "voltage_v": 230,
+    "phase": 3
+   },
+   "outputs": {
+    "max_horsepower": {
+     "value": 40,
+     "tolerance": {
+      "abs": 0.05
+     }
+    },
+    "kva_per_hp": {
+     "value": 6.29,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
    "tile_id": "motor-locked-rotor-kva",
    "source_publisher": "NEC 2023 Table 430.7(B)",
    "source_title": "cross-check: same 25 hp / 460 V as code J (7.99 kVA/hp) -> 250.7 A LRA, 7.4x FLA",
@@ -60199,6 +60384,28 @@
      "value": 1,
      "tolerance": {
       "abs": 0.001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "insulation-resistance-pi",
+   "source_publisher": "EC&M",
+   "source_title": "Understanding Insulation Resistance Testing",
+   "source_edition_or_year": "January 1, 1996",
+   "source_section_or_page": "one min. IR 50 megohms, 10 min. IR 125 megohms: PI = 125 / 50 = 2.5 (no 30 s reading printed; 40 entered only to satisfy the input, DAR not compared)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "ir_30s_mohm": 40,
+    "ir_1min_mohm": 50,
+    "ir_10min_mohm": 125
+   },
+   "outputs": {
+    "polarization_index": {
+     "value": 2.5,
+     "tolerance": {
+      "abs": 0.0005
      }
     }
    }
@@ -62331,6 +62538,44 @@
    }
   },
   {
+   "tile_id": "rc-min-shear-reinforcement",
+   "source_publisher": "StructurePoint",
+   "source_title": "Simply Supported Reinforced Concrete Beam Analysis and Design (ACI 318-14)",
+   "source_edition_or_year": "pp. 8-9",
+   "source_section_or_page": "f'c 4.35 ksi, fyt 60 ksi, bw 12, d 17.56, Av 0.22, Vu 28.52 kips: (Av/s)min = 0.0100 in.2/in.; phi Vc / 2 = 10.42 kips; smax = min(d/2, 24) = 8.78 in",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "fc_psi": 4350,
+    "fyt_psi": 60000,
+    "bw_in": 12,
+    "d_in": 17.56,
+    "av_in2": 0.22,
+    "vu_kip": 28.52,
+    "lambda": 1
+   },
+   "outputs": {
+    "av_min_per_s": {
+     "value": 0.01,
+     "tolerance": {
+      "abs": 5e-05
+     }
+    },
+    "trigger_kip": {
+     "value": 10.42,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "s_max_in": {
+     "value": 8.78,
+     "tolerance": {
+      "abs": 0.005
+     }
+    }
+   }
+  },
+  {
    "tile_id": "rc-hook-development",
    "source_publisher": "ACI 318-19 Eq. 25.4.3.1a",
    "source_title": "#8 Grade 60 in 4,000 psi, base factors -> psi_c 0.867, ldh 14.9 in",
@@ -62832,6 +63077,30 @@
      "value": 1.238,
      "tolerance": {
       "abs": 0.005
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "slope-failure-depth-for-fs",
+   "source_publisher": "Marcel Dekker (V. N. S. Murthy)",
+   "source_title": "Geotechnical Engineering: Principles and Practices, Ch. 10, Example 10.4(i)",
+   "source_edition_or_year": "2003, p. 375",
+   "source_section_or_page": "SI: beta 25, c' 30 kN/m2, phi' 20, gamma 16.05 kN/m3 -> N = cos^2 25 (tan 25 - tan 20) = 0.084, H = 30 / (16.05 x 0.084) = 22.25 m at FS = 1 (c / gamma is unit-free in the ratio; Murthy applies FS to cohesion only, which equals the tile at FS = 1)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "beta_deg": 25,
+    "phi_deg": 20,
+    "c_psf": 30,
+    "gamma_pcf": 16.05,
+    "target_fs": 1
+   },
+   "outputs": {
+    "critical_depth_ft": {
+     "value": 22.25,
+     "tolerance": {
+      "abs": 0.05
      }
     }
    }
@@ -63640,6 +63909,38 @@
    }
   },
   {
+   "tile_id": "wind-cc-pressure",
+   "source_publisher": "Meca Enterprises (C. Rosencutter)",
+   "source_title": "Components and Cladding Example (ASCE 7-16)",
+   "source_edition_or_year": "June 26, 2020",
+   "source_section_or_page": "150 mph, Exposure C, Kh 1.044, Kd 0.85: qh = 51.1 psf; roof zone 1 GCp -1.1, GCpi +/-0.18 -> p2 = 51.1 x (-1.1 - 0.18) = -65.41 psf (qh rounded to 0.1 in print; Kd placement differs between 7-16 and 7-22 but the product is the same)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "v_mph": 150,
+    "kz": 1.044,
+    "gcp": -1.1,
+    "kzt": 1,
+    "kd": 0.85,
+    "ke": 1,
+    "gcpi": 0.18
+   },
+   "outputs": {
+    "qh_psf": {
+     "value": 51.1,
+     "tolerance": {
+      "abs": 0.05
+     }
+    },
+    "p_gov_psf": {
+     "value": -65.41,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
    "tile_id": "snow-drift-load",
    "source_publisher": "ASCE 7-22 Chapter 7",
    "source_title": "leeward drift, 100 ft upwind roof, pg 30 psf, W2 0.5 -> gamma 17.9, hd 3.47 ft, pd 62.1 psf (ASCE 7-22 Eq. 7.6-1)",
@@ -64159,6 +64460,52 @@
      "value": 4.114,
      "tolerance": {
       "pct": 0.1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "rc-slab-min-thickness",
+   "source_publisher": "StructurePoint",
+   "source_title": "One-Way Slab Analysis and Design (ACI 318-14)",
+   "source_edition_or_year": "version October-07-2025",
+   "source_section_or_page": "p. 4, end bay: l/24 = (15 x 12 - 16/2)/24 = 172/24 = 7.17 in (Table 7.3.1.1 is unchanged in 318-19; span entered as 172 in)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "l_ft": 14.3333333,
+    "support": "one-end",
+    "fy_psi": 60000,
+    "wc_pcf": 150
+   },
+   "outputs": {
+    "hmin_in": {
+     "value": 7.17,
+     "tolerance": {
+      "abs": 0.005
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "rc-slab-min-thickness",
+   "source_publisher": "StructurePoint",
+   "source_title": "One-Way Slab Analysis and Design (ACI 318-14)",
+   "source_edition_or_year": "version October-07-2025",
+   "source_section_or_page": "p. 4, interior bays: l/28 = 180/28 = 6.43 in",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "l_ft": 15,
+    "support": "both-ends",
+    "fy_psi": 60000,
+    "wc_pcf": 150
+   },
+   "outputs": {
+    "hmin_in": {
+     "value": 6.43,
+     "tolerance": {
+      "abs": 0.005
      }
     }
    }
@@ -64843,6 +65190,34 @@
    }
   },
   {
+   "tile_id": "concrete-shrinkage-temperature-steel",
+   "source_publisher": "StructurePoint",
+   "source_title": "One-Way Slab Analysis and Design (ACI 318-14)",
+   "source_edition_or_year": "version October-07-2025",
+   "source_section_or_page": "p. 10: As,S&T = 0.0018 x 12 x 7 = 0.151 in.2/ft; smax = lesser of 5h = 35 in and 18 in = 18 in",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "h_in": 7,
+    "b_in": 12,
+    "grade_ksi": 60
+   },
+   "outputs": {
+    "as_min_in2": {
+     "value": 0.151,
+     "tolerance": {
+      "abs": 0.0005
+     }
+    },
+    "s_max_in": {
+     "value": 18,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
    "tile_id": "tr55-time-of-concentration",
    "source_publisher": "USDA NRCS TR-55 (1986), Chapter 3",
    "source_title": "TR-55 Ch. 3 velocity-method example: sheet + shallow + channel -> 61.0 min (spec-v1200)",
@@ -65402,6 +65777,34 @@
    }
   },
   {
+   "tile_id": "orifice-diameter-for-flow",
+   "source_publisher": "City of Fayetteville, AR (after the Georgia Stormwater Manual)",
+   "source_title": "Drainage Criteria Manual, Appendix G Outlet Structures, Method 1",
+   "source_edition_or_year": "p. G-16",
+   "source_section_or_page": "A = 0.76 / 0.6[(2)(32.2)(5.0)]^0.5 = 0.071; D = [4(0.071)/3.14]^0.5 = 0.30 ft = 3.61 in (pi taken as 3.14, A rounded)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "q_cfs": 0.76,
+    "h_ft": 5,
+    "cd": 0.6
+   },
+   "outputs": {
+    "a_ft2": {
+     "value": 0.071,
+     "tolerance": {
+      "abs": 0.0005
+     }
+    },
+    "d_in": {
+     "value": 3.61,
+     "tolerance": {
+      "abs": 0.02
+     }
+    }
+   }
+  },
+  {
    "tile_id": "tank-drain-time",
    "source_publisher": "Falling-head (Torricelli) orifice drain time",
    "source_title": "100 ft^2 tank, 6 in orifice, Cd 0.60, 9 ft to empty -> 634.6 s (10.6 min)",
@@ -65943,6 +66346,28 @@
    }
   },
   {
+   "tile_id": "reynolds-number-pipe",
+   "source_publisher": "PDHonline (L. A. Sequeira)",
+   "source_title": "Course M476, The Reynolds Number",
+   "source_edition_or_year": "pp. 5 and 20",
+   "source_section_or_page": "benzene, d = 11.3736 in, v = 12.06 ft/sec, nu = 7.3825 x 10^-6 ft2/sec -> Re = 1.55 x 10^6 (spreadsheet run: 1.548 x 10^6)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "v_fps": 12.06,
+    "d_in": 11.3736,
+    "nu": 7.3825e-06
+   },
+   "outputs": {
+    "re": {
+     "value": 1548000,
+     "tolerance": {
+      "pct": 0.1
+     }
+    }
+   }
+  },
+  {
    "tile_id": "hydronic-gpm-deltat",
    "source_publisher": "Water-side heat transport Q = 500 GPM dT",
    "source_title": "10-ton chilled-water coil, 10 F delta-T, water -> 24 GPM",
@@ -65989,6 +66414,29 @@
      "value": 10,
      "tolerance": {
       "pct": 0.1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "hydronic-gpm-deltat",
+   "source_publisher": "Bell & Gossett (Xylem)",
+   "source_title": "TEH-908A Hydronic System Design with the System Syzer, Design Example No. 1, Step 3",
+   "source_edition_or_year": "p. 8",
+   "source_section_or_page": "total load 76,000 BTUH; Flow = 76,000 / 500 x 20 = 7.6 gpm (500 is water at 60 F)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "load": 76000,
+    "unit_tons": 0,
+    "dt_f": 20,
+    "factor": 500
+   },
+   "outputs": {
+    "gpm": {
+     "value": 7.6,
+     "tolerance": {
+      "abs": 0.005
      }
     }
    }
@@ -66099,6 +66547,28 @@
      "value": 9782.8,
      "tolerance": {
       "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "pump-suction-specific-speed",
+   "source_publisher": "Engineering ToolBox",
+   "source_title": "Pumps - Suction Specific Speed",
+   "source_edition_or_year": "web reference",
+   "source_section_or_page": "Nss = (1750 rpm)(500 gpm)^1/2 / (20 ft)^3/4 = 4138",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "n_rpm": 1750,
+    "q_gpm": 500,
+    "npshr_ft": 20
+   },
+   "outputs": {
+    "nss": {
+     "value": 4138,
+     "tolerance": {
+      "abs": 1
      }
     }
    }
