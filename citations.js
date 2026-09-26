@@ -300,7 +300,7 @@ export const CITATIONS = {
     ],
   },
   "rental-total-return": {
-    formula: "total = cash_flow + principal_paydown + appreciation + tax_savings; each% = component/cash; total% = total/cash.",
+    formula: "total = cash_flow + principal_paydown + appreciation + tax_savings; each component % = component / cash x 100; total % = total / cash x 100 (all returned as percents).",
     edition: "The four-component rental total return (cash flow, paydown, appreciation, tax shield) used by real-estate investors, by name.",
     freeAccess: "The four-component total return of a rental is a widely-published real-estate-investing framework.",
     governance: GOVERNANCE.general,
@@ -538,12 +538,12 @@ export const CITATIONS = {
   },
   "change-order-markup": {
     formula: "price = direct x (1 + OH%) x (1 + profit%); markup = price - direct; margin% = markup/price x 100.",
-    edition: "The change-order overhead-and-profit markup (compounded) from construction estimating practice / AIA G701, by name.",
+    edition: "The change-order overhead-and-profit markup (compounded) from construction estimating practice, by name (AIA G701 is the change-order form and prescribes no markup method; many public contracts set one markup per cost category, e.g. Caltrans labor 35% / equipment 15%, or cap a single markup, e.g. 10%).",
     freeAccess: "Overhead-and-profit markup on a change order is standard construction estimating; the allowed rate and method are in the contract.",
     governance: GOVERNANCE.general,
-    editionNote: "The change-order price with overhead and profit compounded: price = direct cost x (1 + overhead%) x (1 + profit%), where direct cost is labor + material + equipment for the added scope. The compounded method (overhead first, then profit) is standard and yields slightly more than the additive direct x (1 + overhead% + profit%); which applies is set by the contract's general conditions. The reported margin is markup / price (gross margin), not the markup rate. This prices the change only; it does not evaluate schedule impact or a claim, and the contract terms and the owner's written approval govern.",
+    editionNote: "The change-order price with overhead and profit compounded: price = direct cost x (1 + overhead%) x (1 + profit%), where direct cost is labor + material + equipment for the added scope. The compounded method (overhead first, then profit) is common and yields slightly more than the additive direct x (1 + overhead% + profit%); which applies is set by the contract's general conditions. The reported margin is markup / price (gross margin), not the markup rate. This prices the change only; it does not evaluate schedule impact or a claim, and the contract terms and the owner's written approval govern.",
     assumptions: [
-      { name: "Compounded markup", value: "price = direct x (1 + OH%) x (1 + profit%)", source: "AIA G701 / estimating practice" },
+      { name: "Compounded markup", value: "price = direct x (1 + OH%) x (1 + profit%)", source: "estimating practice; the contract governs (Caltrans CCO training 2020: per-category markups)" },
       { name: "Additive alternative", value: "direct x (1 + OH% + profit%) is slightly less; the contract decides", source: "construction accounting" },
       { name: "Contract governs", value: "the general conditions set the allowed markup and method", source: "scope of this tile" },
     ],
@@ -556,7 +556,7 @@ export const CITATIONS = {
     editionNote: "Retainage on a progress payment (AIA G702 Application and Certificate for Payment with the G703 Continuation Sheet): retention this period = work completed and stored x the retainage rate, net payment = work - retention, cumulative retention = prior retained + this period. Retainage is money earned but withheld as security until the work is accepted (commonly released at substantial completion, sometimes reduced to a lower rate at 50% complete); a lower rate frees the contractor's cash flow. This tracks the withholding from the entered figures; the contract terms, any statutory retainage cap, and the owner's certified payment govern.",
     assumptions: [
       { name: "Retention", value: "retention this period = work x retainage rate", source: "AIA G702/G703" },
-      { name: "Net and cumulative", value: "net = work - retention; cumulative = prior + this period", source: "construction billing" },
+      { name: "Net and cumulative", value: "net = work - retention; cumulative = prior + this period (per-period method; AIA G702 and DOT progress estimates compute retainage on work to date and subtract prior retainage, which is what releases money when the rate drops at 50% complete)", source: "construction billing" },
       { name: "Contract governs", value: "release terms, statutory caps, and the certified payment govern", source: "scope of this tile" },
     ],
   },
@@ -565,7 +565,7 @@ export const CITATIONS = {
     edition: "A tiered surety-bond premium on a performance/payment bond, priced per $1,000 of contract value on a declining-rate schedule, by name.",
     freeAccess: "The tiered per-$1,000 bond-rate structure is a standard published surety-pricing method; the specific rates are user-supplied defaults.",
     governance: GOVERNANCE.general,
-    editionNote: "A performance and payment bond is priced as a premium per $1,000 of contract value on a declining tiered schedule: the first $100,000 at a higher rate, the next $400,000 lower, and everything above $500,000 lower still, so the blended rate falls as the contract grows. The rates shown are common defaults; a contractor's actual rate depends on the surety's rate schedule, the bond class, and the underwriting of the contractor's financials and experience. The premium is a real bid cost that belongs in the markup. The surety's filed rate schedule and underwriting govern.",
+    editionNote: "A performance and payment bond is priced as a premium per $1,000 of contract value on a declining tiered schedule: the first $100,000 at a higher rate, the next $400,000 lower, and everything above $500,000 lower still, so the blended rate falls as the contract grows (a published schedule such as Axcess Surety's ends the $10 band at $2.5 million and prices larger bonds lower still; the tile applies the last band without limit). The rates shown are common defaults; a contractor's actual rate depends on the surety's rate schedule, the bond class, and the underwriting of the contractor's financials and experience. The premium is a real bid cost that belongs in the markup. The surety's filed rate schedule and underwriting govern.",
     assumptions: [
       { name: "Tiered rate", value: "premium = sum of (band amount / 1000) x band rate", source: "surety rate schedule" },
       { name: "Default bands", value: "$25 / $15 / $10 per $1,000 on first $100k / next $400k / above $500k", source: "common surety pricing" },
@@ -14531,27 +14531,27 @@ export const CITATIONS = {
     ],
   },
   "crouch-planing-speed": {
-    formula: "speed_mph = C / sqrt(weight_lb / hp), with the hull constant C ~150 heavy cruiser / ~190 runabout / ~210 race.",
+    formula: "speed_mph = C / sqrt(weight_lb / hp), with the hull constant C ~150 average runabout-cruiser / ~190 high-speed runabout / ~210 race.",
     edition: "Crouch's planing-speed formula (naval-architecture back-of-envelope for planing top speed), by name; the actual hull, propeller, and conditions govern.",
     freeAccess: "Crouch's formula is a published naval-architecture estimate; the displacement, horsepower, and hull constant come from the boat and its class.",
     governance: GOVERNANCE.general,
-    editionNote: "Crouch's planing-speed formula. speed_mph = C / sqrt(weight / hp). The result is MILES PER HOUR, not knots, for the conventional hull constant C. Speed rises only with the square root of the power-to-weight ratio, so doubling the horsepower (or halving the weight) buys about 41% more speed, not double. The hull constant C (about 150 heavy cruiser, 190 runabout, 210 race) is chosen by hull type and dominates the estimate. The formula assumes the boat is already on plane; below the planing threshold it does not apply -- use the displacement hull speed. A planning estimate, not a performance prediction; the actual hull, propeller, and conditions govern.",
+    editionNote: "Crouch's planing-speed formula. speed_mph = C / sqrt(weight / hp). The result is taken as miles per hour for these hull constants C. Units are disputed in print: this tile treats the result as mph, as most US quotations of Crouch do, but Dave Gerr's Propeller Handbook gives the same C values with speed in knots (a 15% difference), so check which convention a C value came from. Speed rises only with the square root of the power-to-weight ratio, so doubling the horsepower (or halving the weight) buys about 41% more speed, not double. The hull constant C (about 150 average runabout / cruiser, 190 high-speed runabout, 210 race) is chosen by hull type and dominates the estimate. The formula assumes the boat is already on plane; below the planing threshold it does not apply -- use the displacement hull speed. A planning estimate, not a performance prediction; the actual hull, propeller, and conditions govern.",
     assumptions: [
       { name: "Units", value: "the result is mph, not knots; do not compare directly to a displacement hull speed in knots", source: "Crouch's formula convention" },
       { name: "Square-root return", value: "speed scales with sqrt(hp/weight), so doubling power gains about 41%", source: "Crouch's formula" },
-      { name: "Hull constant", value: "C ~150 heavy cruiser, ~190 runabout, ~210 race; it dominates the estimate", source: "naval-architecture practice" },
+      { name: "Hull constant", value: "C ~150 average runabout / cruiser, ~190 high-speed runabout, ~210 race; it dominates the estimate", source: "naval-architecture practice" },
     ],
   },
   "crouch-hp-for-speed": {
-    formula: "hp = weight_lb x (speed_mph / C)^2, with the hull constant C ~150 heavy cruiser / ~190 runabout / ~210 race; the inverse of speed_mph = C / sqrt(weight / hp).",
+    formula: "hp = weight_lb x (speed_mph / C)^2, with the hull constant C ~150 average runabout-cruiser / ~190 high-speed runabout / ~210 race; the inverse of speed_mph = C / sqrt(weight / hp).",
     edition: "Crouch's planing-speed formula (naval-architecture back-of-envelope) solved for the power, by name; the actual hull, propeller, and conditions govern.",
     freeAccess: "Crouch's formula is a published naval-architecture estimate; the displacement, target speed, and hull constant come from the boat and its class.",
     governance: GOVERNANCE.general,
-    editionNote: "The horsepower Crouch's formula says a planing hull needs for a target speed, the inverse of crouch-planing-speed: hp = weight x (speed / C)^2. Because speed rises only with the square root of the power-to-weight ratio, the horsepower rises with the SQUARE of the target speed - going 40% faster needs about twice the power, and the last few mph are the most expensive. The speed is MILES PER HOUR, not knots, for the conventional hull constant C (about 150 heavy cruiser, 190 runabout, 210 race), chosen by hull type. The formula assumes the boat is on plane; below the planing threshold it does not apply. A planning estimate, not a performance prediction; the actual hull, propeller, and conditions govern.",
+    editionNote: "The horsepower Crouch's formula says a planing hull needs for a target speed, the inverse of crouch-planing-speed: hp = weight x (speed / C)^2. Because speed rises only with the square root of the power-to-weight ratio, the horsepower rises with the SQUARE of the target speed - going 40% faster needs about twice the power, and the last few mph are the most expensive. The speed is taken as miles per hour for the hull constant C; units are disputed in print: this tile treats the result as mph, as most US quotations of Crouch do, but Dave Gerr's Propeller Handbook gives the same C values with speed in knots (a 15% difference), so check which convention a C value came from (about 150 average runabout / cruiser, 190 high-speed runabout, 210 race), chosen by hull type. The formula assumes the boat is on plane; below the planing threshold it does not apply. A planning estimate, not a performance prediction; the actual hull, propeller, and conditions govern.",
     assumptions: [
       { name: "Square-law power", value: "horsepower scales with the square of the target speed, since speed scales with sqrt(hp/weight)", source: "Crouch's formula" },
       { name: "Units", value: "the target speed is mph, not knots; do not enter a displacement hull speed in knots", source: "Crouch's formula convention" },
-      { name: "Hull constant", value: "C ~150 heavy cruiser, ~190 runabout, ~210 race; it dominates the estimate", source: "naval-architecture practice" },
+      { name: "Hull constant", value: "C ~150 average runabout / cruiser, ~190 high-speed runabout, ~210 race; it dominates the estimate", source: "naval-architecture practice" },
     ],
   },
   "turbo-pressure-ratio": {

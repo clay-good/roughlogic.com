@@ -2575,6 +2575,8 @@ export function computeDebtYield({ mode = "yield", noi = 0, loan = 0, dy_target 
   if (mode === "maxloan") {
     const t = Number(dy_target) || 0;
     if (!(t > 0)) return { error: "Enter a positive target debt yield (%)." };
+    // A percent (8 for 8%); a fraction such as 0.08 used to size a loan 100x too large with no warning.
+    if (t < 1) return { error: "Enter the target debt yield as a percent (8 for 8%), not a fraction." };
     const max_loan = n / (t / 100);
     if (!Number.isFinite(max_loan)) return { error: "Maximum loan is not valid." };
     return { mode: "maxloan", max_loan, debt_yield_pct: null };
@@ -2638,6 +2640,8 @@ export function computeBreakEvenOccupancy({ opex = 0, debt_svc = 0, pgi = 0, tar
   const beo = (o + d) / p * 100;
   if (!Number.isFinite(beo)) return { error: "Break-even occupancy is not valid." };
   const t = Number(target_occ) || 0;
+  // A target is a percent from 0 to 100; until 2026-09-26 150 or a fraction (0.92) passed with a nonsense cushion.
+  if (t < 0 || t > 100) return { error: "Target occupancy is a percent from 0 to 100 (enter 92 for 92%)." };
   const cushion = t > 0 ? t - beo : null;
   return { beo_pct: beo, cushion_pts: cushion, target_occ: t };
 }
@@ -2825,7 +2829,8 @@ export function computeRentalTotalReturn({ cash_invested_usd = 0, annual_cash_fl
     // A PERCENT, not a fraction -- the key says pct. Was 0.29 for a 29%
     // return, which an agent reading the result would report as 0.29%.
     total_usd, total_pct: (total_usd / cash) * 100,
-    cf_pct: cf / cash, paydown_pct: paydown / cash, appr_pct: appr / cash, tax_pct: tax / cash,
+    // The components are percents too (until 2026-09-26 they were fractions under pct keys, 0.06 for 6%).
+    cf_pct: (cf / cash) * 100, paydown_pct: (paydown / cash) * 100, appr_pct: (appr / cash) * 100, tax_pct: (tax / cash) * 100,
     note: "Rental total return, all four components as a percent of cash invested: cash flow (the money in hand), principal paydown (the tenant retiring your loan), appreciation (the value gain), and the depreciation tax shield. The cash-on-cash number alone (cash flow / cash) understates the real return, often by half or more, because it ignores equity buildup and the tax benefit. Appreciation is a projection, not a guarantee; the other three are realized. A screening aid; the actual results govern.",
   };
 }
@@ -2847,7 +2852,7 @@ function renderRentalTotalReturn(inputRegion, outputRegion, citationEl) {
     const r = computeRentalTotalReturn({ cash_invested_usd: readNum(cash.input), annual_cash_flow_usd: readNum(cf.input), principal_paydown_usd: readNum(pay.input), appreciation_usd: readNum(appr.input), tax_savings_usd: readNum(tax.input) });
     if (r.error) { oTotal.textContent = r.error; oBreak.textContent = "-"; oNote.textContent = ""; return; }
     oTotal.textContent = "$" + fmt(r.total_usd, 0) + " (" + fmt(r.total_pct, 1) + "% of cash)";
-    oBreak.textContent = "cash " + fmt(r.cf_pct * 100, 1) + "% + paydown " + fmt(r.paydown_pct * 100, 1) + "% + appreciation " + fmt(r.appr_pct * 100, 1) + "% + tax " + fmt(r.tax_pct * 100, 1) + "%";
+    oBreak.textContent = "cash " + fmt(r.cf_pct, 1) + "% + paydown " + fmt(r.paydown_pct, 1) + "% + appreciation " + fmt(r.appr_pct, 1) + "% + tax " + fmt(r.tax_pct, 1) + "%";
     oNote.textContent = r.note;
   }, DEBOUNCE_MS);
   for (const f of [cash, cf, pay, appr, tax]) f.input.addEventListener("input", update);
@@ -2867,6 +2872,7 @@ export function computeNetEffectiveRent({ face_rent = 0, term_periods = 0, free_
   if (!(free >= 0 && free < term)) return { error: "Free-rent periods must be 0 or more and below the term." };
   if (credit < 0) return { error: "One-time credit cannot be negative." };
   const paid = face * (term - free);
+  if (credit > paid) return { error: "The one-time credit exceeds all the rent paid over the term." };
   const ner = (paid - credit) / term;
   const total_saving = face * term - (paid - credit);
   const discount_pct = (1 - ner / face) * 100;
@@ -2958,6 +2964,8 @@ export function computeCommercialLoadFactor({ usable_sf = 0, common_area_factor 
   const rent = Number(base_rent) || 0;
   if (!(usable > 0)) return { error: "Usable area must be positive (SF)." };
   if (caf < 0) return { error: "Common-area factor cannot be negative." };
+  // Entered as a fraction (0.15 for 15%); a whole-number percent (15) used to return a 16x load factor.
+  if (caf >= 1) return { error: "Enter the common-area factor as a fraction (0.15 for 15%), below 1." };
   if (rent < 0) return { error: "Base rent cannot be negative." };
   const rentable_sf = usable * (1 + caf);
   const load_factor = rentable_sf / usable;

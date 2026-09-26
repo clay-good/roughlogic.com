@@ -2,7 +2,7 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "4c4eb84364b28641",
+      "sha": "ccb7180666a470ed",
       "date": "2026-09-26"
     },
     "/tools/": {
@@ -1094,8 +1094,8 @@
       "date": "2026-09-01"
     },
     "/tools/change-order-markup/": {
-      "sha": "43ca47377d1dffb2",
-      "date": "2026-09-01"
+      "sha": "944c9e2915eec048",
+      "date": "2026-09-26"
     },
     "/tools/channel-froude-number/": {
       "sha": "9dae4e37c8b6d453",
@@ -1894,12 +1894,12 @@
       "date": "2026-09-01"
     },
     "/tools/crouch-hp-for-speed/": {
-      "sha": "4c70c48d2a008edf",
-      "date": "2026-09-01"
+      "sha": "728a6bd54b586dd3",
+      "date": "2026-09-26"
     },
     "/tools/crouch-planing-speed/": {
-      "sha": "09dd68e8dcc55be7",
-      "date": "2026-09-01"
+      "sha": "e43976f7b37c8b44",
+      "date": "2026-09-26"
     },
     "/tools/crown-pruning-dose/": {
       "sha": "3beae6dc55354ea5",
@@ -2658,8 +2658,8 @@
       "date": "2026-09-04"
     },
     "/tools/et-horsepower/": {
-      "sha": "a107b9af70e5eb1e",
-      "date": "2026-09-01"
+      "sha": "0644e10ddc6eac08",
+      "date": "2026-09-26"
     },
     "/tools/euler-johnson-column/": {
       "sha": "77b233f510b90575",
@@ -4830,8 +4830,8 @@
       "date": "2026-09-07"
     },
     "/tools/net-effective-rent/": {
-      "sha": "ee8783a1a7460a79",
-      "date": "2026-09-01"
+      "sha": "aa96adfabc35ab95",
+      "date": "2026-09-26"
     },
     "/tools/neutral-current-3ph/": {
       "sha": "5b93e52945b6a55e",
@@ -6134,8 +6134,8 @@
       "date": "2026-09-04"
     },
     "/tools/rental-total-return/": {
-      "sha": "96a23f843773b00e",
-      "date": "2026-09-01"
+      "sha": "0a1c34f1b478f991",
+      "date": "2026-09-26"
     },
     "/tools/rental-worksheet/": {
       "sha": "ec09817523662dff",
@@ -6178,8 +6178,8 @@
       "date": "2026-09-01"
     },
     "/tools/retainage-tracker/": {
-      "sha": "c04ec00d86df8d7f",
-      "date": "2026-09-01"
+      "sha": "3464cd3904487ac3",
+      "date": "2026-09-26"
     },
     "/tools/retaining-wall-block/": {
       "sha": "f619ff5cfb4e8d88",
@@ -8050,8 +8050,8 @@
       "date": "2026-09-01"
     },
     "/tools/trap-speed-horsepower/": {
-      "sha": "1ac576d40593a5a4",
-      "date": "2026-09-01"
+      "sha": "9a60963733389ba7",
+      "date": "2026-09-26"
     },
     "/tools/trapezoidal-channel-flow/": {
       "sha": "d60387b532d4965e",

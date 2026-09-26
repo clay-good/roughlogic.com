@@ -1636,6 +1636,9 @@ export function computeLaborBurdenRate({ wage = 0, payroll_pct = 9.15, wc_pct = 
   const prod = Number(productivity) || 0;
   if (!(w > 0)) return { error: "Base wage must be positive ($/hr)." };
   if (!(prod > 0 && prod <= 100)) return { error: "Productivity must be over 0 and up to 100 percent." };
+  // A fraction typed into the percent field (0.85) used to divide by 0.0085: a $25 wage read $3,975/hr.
+  if (prod < 1) return { error: "Enter productivity as a percent (85 for 85%), not a fraction." };
+  if (pr < 0 || wc < 0 || li < 0 || ben < 0) return { error: "Payroll tax, workers' comp, liability and benefits cannot be negative." };
   const burden_hr = w * (pr + wc + li) / 100 + ben;
   const burdened_hr = (w + burden_hr) / (prod / 100);
   const burden_pct = (burdened_hr - w) / w * 100;
@@ -1646,7 +1649,7 @@ export function computeLaborBurdenRate({ wage = 0, payroll_pct = 9.15, wc_pct = 
 }
 export const laborBurdenRateExample = { inputs: { wage: 25, payroll_pct: 9.15, wc_pct: 8, liab_pct: 2, benefits: 4, productivity: 85 } };
 function renderLaborBurdenRate(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: fully-burdened labor rate = (wage + payroll% + WC% + liability% + benefits) / productive fraction, standard contractor bid-rate estimating. Payroll ~9.15% (FICA 7.65 + FUTA/SUTA). The payroll service, insurer rates, and fringe package govern.";
+  citationEl.textContent = "Citation: fully-burdened labor rate = (wage x (1 + (payroll% + WC% + liability%)/100) + benefits $/hr) / productive fraction, standard contractor bid-rate estimating. Payroll ~9.15% (FICA 7.65 + FUTA/SUTA). The payroll service, insurer rates, and fringe package govern.";
   const wage = makeNumber("Base wage ($/hr)", "lbr-wage", { step: "any", min: "0" }); wage.input.value = "25";
   const pr = makeNumber("Payroll tax (%, FICA+FUTA/SUTA)", "lbr-pr", { step: "any", min: "0" }); pr.input.value = "9.15";
   const wc = makeNumber("Workers' comp (% of wage)", "lbr-wc", { step: "any", min: "0" });
@@ -1805,8 +1808,13 @@ export function computeWipPercentComplete({ contract_usd = 0, cost_to_date_usd =
   const overrun = raw_pct > 1.0;
   const earned_revenue = complete_fraction * contract;
   const over_under = earned_revenue - billed;
+  // A contract whose estimated cost exceeds its value is a loss contract: GAAP (ASC 605-35 provision, carried under
+  // ASC 606) books the WHOLE expected loss now, not just the percent-complete share. Until 2026-09-26 the tile showed
+  // an underbilling on a loss job and never mentioned the loss.
+  const projected_loss_usd = Math.max(0, est - contract);
+  const loss_contract = projected_loss_usd > 0;
   return {
-    pct_complete, earned_revenue, over_under, overrun,
+    pct_complete, earned_revenue, over_under, overrun, projected_loss_usd, loss_contract,
     underbilled: over_under >= 0,
     note: "Cost-to-cost percent-complete (POC) revenue recognition: percent complete = cost to date / estimated total cost (capped at 100%), earned revenue = percent complete x contract value, and over/under billing = earned revenue - billed to date. A positive figure is underbilled (a costs-in-excess asset - work done but not yet billed); a negative figure is overbilled (a billings-in-excess liability - cash collected against future work). Persistent overbilling can mask a job going bad. A management aid; the CPA-prepared WIP schedule governs.",
   };
@@ -1829,7 +1837,7 @@ function renderWipPercentComplete(inputRegion, outputRegion, citationEl) {
     if (r.error) { oPct.textContent = r.error; oEarn.textContent = "-"; oOU.textContent = "-"; oNote.textContent = ""; return; }
     oPct.textContent = fmt(r.pct_complete, 1) + "%" + (r.overrun ? " (cost past estimate -- overrun)" : "");
     oEarn.textContent = "$" + fmt(r.earned_revenue, 0);
-    oOU.textContent = (r.underbilled ? "+$" + fmt(r.over_under, 0) + " underbilled (asset)" : "-$" + fmt(Math.abs(r.over_under), 0) + " overbilled (liability)");
+    oOU.textContent = (r.underbilled ? "+$" + fmt(r.over_under, 0) + " underbilled (asset)" : "-$" + fmt(Math.abs(r.over_under), 0) + " overbilled (liability)") + (r.loss_contract ? " -- LOSS CONTRACT: book the full $" + fmt(r.projected_loss_usd, 0) + " projected loss now" : "") + (r.overrun ? " -- cost is past the estimate: update the estimate before trusting this" : "");
     oNote.textContent = r.note;
   }, DEBOUNCE_MS);
   for (const f of [contract, cost, est, billed]) f.input.addEventListener("input", update);
@@ -1866,7 +1874,7 @@ function renderChangeOrderMarkup(inputRegion, outputRegion, citationEl) {
   for (const f of [direct, oh, profit, current]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { direct.input.value = "10000"; oh.input.value = "10"; profit.input.value = "10"; current.input.value = "500000"; update(); });
   const oPrice = makeOutputLine(outputRegion, "Change-order price", "com-out-price");
-  const oMarkup = makeOutputLine(outputRegion, "Markup (margin)", "com-out-markup");
+  const oMarkup = makeOutputLine(outputRegion, "Markup dollars (and margin % of price)", "com-out-markup");
   const oNew = makeOutputLine(outputRegion, "New contract total", "com-out-new");
   const oNote = makeOutputLine(outputRegion, "Note", "com-out-n");
   const update = debounce(() => {
@@ -1976,6 +1984,8 @@ export function computeWorkersCompEmrPremium({ payroll_usd = 0, class_rate = 0, 
   if (!(payroll > 0)) return { error: "Payroll must be positive (USD)." };
   if (!(rate > 0)) return { error: "Class rate must be positive (USD per $100)." };
   if (!(mod > 0)) return { error: "Experience mod (EMR) must be positive." };
+  // An EMR is a multiplier near 1 (0.85, 1.25); a whole number such as 85 used to price the premium 85x.
+  if (mod > 5) return { error: "Enter the EMR as a multiplier (0.85), not a whole number (85)." };
   const manual_premium = payroll / 100 * rate;
   const modified_premium = manual_premium * mod;
   const emr_swing = manual_premium * (1 - mod);
@@ -2001,7 +2011,7 @@ function renderWorkersCompEmrPremium(inputRegion, outputRegion, citationEl) {
     const r = computeWorkersCompEmrPremium({ payroll_usd: readNum(p.input), class_rate: readNum(rate.input), emr: readNum(emr.input) });
     if (r.error) { oM.textContent = r.error; oS.textContent = "-"; oNote.textContent = ""; return; }
     oM.textContent = "$" + fmt(r.manual_premium, 0) + " -> $" + fmt(r.modified_premium, 0) + " ($" + fmt(r.cost_per_100, 2) + "/$100)";
-    oS.textContent = (r.credit ? "$" + fmt(r.emr_swing, 0) + " credit (EMR < 1.0)" : "$" + fmt(-r.emr_swing, 0) + " debit (EMR > 1.0)");
+    oS.textContent = r.emr_swing === 0 ? "none (EMR 1.0)" : (r.credit ? "$" + fmt(r.emr_swing, 0) + " credit (EMR < 1.0)" : "$" + fmt(-r.emr_swing, 0) + " debit (EMR > 1.0)");
     oNote.textContent = r.note;
   }, DEBOUNCE_MS);
   for (const f of [p, rate, emr]) f.input.addEventListener("input", update);

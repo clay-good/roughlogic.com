@@ -69502,6 +69502,29 @@
    }
   },
   {
+   "tile_id": "injector-size",
+   "source_publisher": "Summit Racing",
+   "source_title": "Help Center SR-04807, fuel injector sizing",
+   "source_edition_or_year": "web article",
+   "source_section_or_page": "(300 x 0.5) / (8 x 0.8) = 23.4 lb/hr",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "hp": 300,
+    "bsfc": 0.5,
+    "n_cyl": 8,
+    "duty": 0.8
+   },
+   "outputs": {
+    "inj_lbh": {
+     "value": 23.4,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
    "tile_id": "injector-max-hp",
    "source_publisher": "Fuel injector power capacity (inverse of injector-size)",
    "source_title": "eight 31.25 lb/h injectors at 80% duty, BSFC 0.50 -> 400 hp (round-trips the injector-size example)",
@@ -69545,6 +69568,30 @@
      "value": 333.3,
      "tolerance": {
       "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "injector-max-hp",
+   "source_publisher": "Holley",
+   "source_title": "How To: Properly Size Fuel Injectors For Your Engine",
+   "source_edition_or_year": "Motor Life article",
+   "source_section_or_page": "42 lb/hr x 8 = 336 lb/hr / 0.5 BSFC = 672 hp at 100%; x 0.7 duty = 470.4 hp",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "inj_flow": 42,
+    "flow_unit": "lbh",
+    "n_cyl": 8,
+    "duty": 0.7,
+    "bsfc": 0.5
+   },
+   "outputs": {
+    "hp_max": {
+     "value": 470.4,
+     "tolerance": {
+      "abs": 0.05
      }
     }
    }
@@ -69682,6 +69729,27 @@
    }
   },
   {
+   "tile_id": "max-rpm-from-piston-speed",
+   "source_publisher": "CarTech (Performance Automotive Engine Math)",
+   "source_title": "Tech Tips: piston speed",
+   "source_edition_or_year": "November 15, 2011",
+   "source_section_or_page": "3 x 6,000 / 6 = 3,000 fpm (run in reverse: a 3 in stroke at 3,000 fpm -> 6,000 rpm)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "stroke_in": 3,
+    "mps_limit_fpm": 3000
+   },
+   "outputs": {
+    "rpm_max": {
+     "value": 6000,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
    "tile_id": "trap-speed-horsepower",
    "source_publisher": "Hale quarter-mile trap-speed relation",
    "source_title": "3,200 lb car trapping 108 mph -> 315 hp (companion ET 12.6 s)",
@@ -69730,6 +69798,33 @@
    }
   },
   {
+   "tile_id": "trap-speed-horsepower",
+   "source_publisher": "Stealth 316 (Hale 1986 formula)",
+   "source_title": "HP, ET and MPH calculator",
+   "source_edition_or_year": "web page",
+   "source_section_or_page": "3,900 lb vehicle with 500 hp (flywheel): Hale prediction 11.552 s ET, 117.99 mph (run in reverse: 117.99 mph -> 500 hp)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "weight_lb": 3900,
+    "trap_mph": 117.99
+   },
+   "outputs": {
+    "hp": {
+     "value": 500,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "et_s": {
+     "value": 11.552,
+     "tolerance": {
+      "abs": 0.005
+     }
+    }
+   }
+  },
+  {
    "tile_id": "et-horsepower",
    "source_publisher": "Hale quarter-mile ET relation (inverse for power)",
    "source_title": "3,200 lb car running a 12.63 s quarter -> ~314 hp",
@@ -69767,6 +69862,27 @@
      "value": 416,
      "tolerance": {
       "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "et-horsepower",
+   "source_publisher": "Stealth 316 (Hale 1986 formula)",
+   "source_title": "HP, ET and MPH calculator",
+   "source_edition_or_year": "web page",
+   "source_section_or_page": "3,900 lb vehicle, 11.552 s ET -> 500 hp (flywheel)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "weight_lb": 3900,
+    "et_s": 11.552
+   },
+   "outputs": {
+    "hp": {
+     "value": 500,
+     "tolerance": {
+      "abs": 0.5
      }
     }
    }
@@ -77490,6 +77606,50 @@
    }
   },
   {
+   "tile_id": "debt-yield",
+   "source_publisher": "Wall Street Prep",
+   "source_title": "Debt Yield (DY)",
+   "source_edition_or_year": "modified February 27, 2024",
+   "source_section_or_page": "NOI $400k / loan $8 million = 5.0% debt yield",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "mode": "yield",
+    "noi": 400000,
+    "loan": 8000000
+   },
+   "outputs": {
+    "debt_yield_pct": {
+     "value": 5,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "debt-yield",
+   "source_publisher": "Wall Street Prep",
+   "source_title": "Debt Yield (DY)",
+   "source_edition_or_year": "modified February 27, 2024",
+   "source_section_or_page": "loan sizing: $400k / 8.0% = $5 million",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "mode": "maxloan",
+    "noi": 400000,
+    "dy_target": 8
+   },
+   "outputs": {
+    "max_loan": {
+     "value": 5000000,
+     "tolerance": {
+      "abs": 1
+     }
+    }
+   }
+  },
+  {
    "tile_id": "break-even-occupancy",
    "source_publisher": "CRE underwriting",
    "source_title": "OpEx $60,000, debt service $90,000, PGI $200,000 -> 75% break-even, 17-pt cushion to 92%",
@@ -77537,6 +77697,29 @@
      "value": 90,
      "tolerance": {
       "abs": 0.1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "break-even-occupancy",
+   "source_publisher": "Wall Street Prep",
+   "source_title": "Breakeven Occupancy Ratio",
+   "source_edition_or_year": "web article",
+   "source_section_or_page": "($12,000 opex + $18,000 debt service) / $50,000 potential gross income = 60%",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "opex": 12000,
+    "debt_svc": 18000,
+    "pgi": 50000,
+    "target_occ": 0
+   },
+   "outputs": {
+    "beo_pct": {
+     "value": 60,
+     "tolerance": {
+      "abs": 0.001
      }
     }
    }
@@ -77838,6 +78021,29 @@
    }
   },
   {
+   "tile_id": "net-effective-rent",
+   "source_publisher": "Wall Street Prep",
+   "source_title": "Net Effective Rent",
+   "source_edition_or_year": "web article",
+   "source_section_or_page": "$4,000 per month face, 12-month lease, 2 months free -> net effective rent $3,333",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "face_rent": 4000,
+    "term_periods": 12,
+    "free_periods": 2,
+    "one_time_credit": 0
+   },
+   "outputs": {
+    "ner": {
+     "value": 3333,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
    "tile_id": "required-face-rent",
    "source_publisher": "required face rent (inverse of the net-effective-rent spread)",
    "source_title": "net $30/SF over 120 months with 20 free months, no credit -> $36.00/SF face (16.7% above effective)",
@@ -77945,6 +78151,34 @@
    }
   },
   {
+   "tile_id": "commercial-load-factor",
+   "source_publisher": "CARR",
+   "source_title": "Understanding the Difference Between Usable and Rentable Square Footage",
+   "source_edition_or_year": "web article",
+   "source_section_or_page": "3,000 usable square feet x 1.20 (20% common area factor) = 3,600 rentable square feet",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "usable_sf": 3000,
+    "common_area_factor": 0.2,
+    "base_rent": 0
+   },
+   "outputs": {
+    "rentable_sf": {
+     "value": 3600,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "load_factor": {
+     "value": 1.2,
+     "tolerance": {
+      "abs": 0.0001
+     }
+    }
+   }
+  },
+  {
    "tile_id": "blended-mortgage-rate",
    "source_publisher": "blended mortgage rate (weighted-average cost of debt)",
    "source_title": "$300K at 4% + $100K at 8% -> 5.00% blended on $400K, $1,667/mo interest",
@@ -77998,6 +78232,29 @@
      "value": 4.47,
      "tolerance": {
       "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "blended-mortgage-rate",
+   "source_publisher": "Corporate Finance Institute",
+   "source_title": "Blended Rate",
+   "source_edition_or_year": "web article",
+   "source_section_or_page": "($300,000 x 6.5%) + ($75,000 x 7.75%) / $375,000 = 6.75%",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "balance_1": 300000,
+    "rate_1": 6.5,
+    "balance_2": 75000,
+    "rate_2": 7.75
+   },
+   "outputs": {
+    "blended_rate": {
+     "value": 6.75,
+     "tolerance": {
+      "abs": 0.001
      }
     }
    }
@@ -79923,6 +80180,64 @@
    }
   },
   {
+   "tile_id": "wip-percent-complete",
+   "source_publisher": "Pease Bell CPAs",
+   "source_title": "Reading a WIP Schedule: Over and Under Billings Explained",
+   "source_edition_or_year": "September 5, 2026",
+   "source_section_or_page": "$1,000,000 contract, $800,000 estimated cost, $400,000 cost to date -> 50% complete, $500,000 earned; billed $560,000 -> overbilling $60,000",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "contract_usd": 1000000,
+    "cost_to_date_usd": 400000,
+    "est_total_cost_usd": 800000,
+    "billed_to_date_usd": 560000
+   },
+   "outputs": {
+    "pct_complete": {
+     "value": 50,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "earned_revenue": {
+     "value": 500000,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "over_under": {
+     "value": -60000,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "wip-percent-complete",
+   "source_publisher": "Pease Bell CPAs",
+   "source_title": "Reading a WIP Schedule: Over and Under Billings Explained",
+   "source_edition_or_year": "September 5, 2026",
+   "source_section_or_page": "same job billed $450,000 -> underbilling $50,000",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "contract_usd": 1000000,
+    "cost_to_date_usd": 400000,
+    "est_total_cost_usd": 800000,
+    "billed_to_date_usd": 450000
+   },
+   "outputs": {
+    "over_under": {
+     "value": 50000,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
    "tile_id": "change-order-markup",
    "source_publisher": "construction estimating (AIA G701)",
    "source_title": "$10,000 direct, 10% and 10% compounded -> $12,100 (markup $2,100, 17.4% margin)",
@@ -79975,6 +80290,29 @@
      "value": 12000,
      "tolerance": {
       "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "change-order-markup",
+   "source_publisher": "Caltrans Division of Local Assistance",
+   "source_title": "Contract Change Orders training, Tab 9",
+   "source_edition_or_year": "December 1, 2020, p. 23",
+   "source_section_or_page": "$45.28/hr x 1.12 (labor surcharge) x 1.35 (labor markup) = $68.46 (entered as direct cost 45.28 x 1.12 with a single 35% markup)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "direct_cost_usd": 50.71360000000001,
+    "overhead_pct": 35,
+    "profit_pct": 0,
+    "current_contract_usd": 0
+   },
+   "outputs": {
+    "price": {
+     "value": 68.46,
+     "tolerance": {
+      "abs": 0.01
      }
     }
    }
@@ -80037,6 +80375,34 @@
      "value": 95000,
      "tolerance": {
       "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "retainage-tracker",
+   "source_publisher": "M. Purdy, Public Contracting Blog (WA RCW 60.28)",
+   "source_title": "Calculating Retainage on Public Works",
+   "source_edition_or_year": "June 30, 2008",
+   "source_section_or_page": "$100,000 earned, 5% retainage $5,000, $95,000 due (before sales tax)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "work_this_period_usd": 100000,
+    "retainage_pct": 5,
+    "prior_retained_usd": 0
+   },
+   "outputs": {
+    "retention_this": {
+     "value": 5000,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "net_payment": {
+     "value": 95000,
+     "tolerance": {
+      "abs": 0.5
      }
     }
    }
@@ -84323,6 +84689,29 @@
      "value": 0.017,
      "tolerance": {
       "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "surety-bond-premium",
+   "source_publisher": "Axcess Surety (J. Carson)",
+   "source_title": "Performance and Payment Bond Costs",
+   "source_edition_or_year": "web article (2024 or later)",
+   "source_section_or_page": "first $100,000 at $25 per $1,000 = $2,500 plus the next $400,000 at $15 = $6,000 -> $8,500 on a $500,000 project",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "contract_usd": 500000,
+    "rate1_per_k": 25,
+    "rate2_per_k": 15,
+    "rate3_per_k": 10
+   },
+   "outputs": {
+    "premium_usd": {
+     "value": 8500,
+     "tolerance": {
+      "abs": 0.5
      }
     }
    }

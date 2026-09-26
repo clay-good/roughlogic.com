@@ -2297,7 +2297,7 @@ export function computeMaxRpmFromPistonSpeed({ stroke_in = 0, mps_limit_fpm = 40
   if (!(mps_limit_fpm > 0)) return { error: "Mean-piston-speed limit must be positive (ft/min)." };
   const rpm_max = 6 * mps_limit_fpm / stroke_in;
   const mps_limit_ms = mps_limit_fpm * 0.00508;
-  const band = mps_limit_fpm < 4000 ? "a conservative street / endurance ceiling" : (mps_limit_fpm <= 4500 ? "a performance-build ceiling" : "a race-only ceiling that needs exotic parts");
+  const band = mps_limit_fpm <= 4000 ? "a conservative street / endurance ceiling" : (mps_limit_fpm <= 4500 ? "a performance-build ceiling" : "a race-only ceiling that needs exotic parts");
   return {
     rpm_max, mps_limit_ms, band,
     note: "The maximum engine speed for a mean-piston-speed ceiling, the inverse of the mean-piston-speed tile: from MPS = stroke x RPM / 6 (ft/min), the RPM cap is 6 x MPS_limit / stroke. Mean piston speed sets the inertial load on the rods, pins, and bearings independent of bore, so a chosen ceiling gives a safe redline for the stroke - street and endurance builds cap around 4,000 ft/min, well-built performance engines 4,000-4,500, and only race engines with exotic parts exceed 4,500. A longer stroke lowers the RPM cap for the same piston-speed limit (the trade a stroker accepts). This is the AVERAGE (not peak) piston speed; the bands are guidance for typical materials, and a specific assembly's limit depends on the rods, pistons, and pins. A shop aid; the component makers' rpm ratings govern.",
@@ -2345,7 +2345,7 @@ function renderTrapSpeedHorsepower(inputRegion, outputRegion, citationEl) {
   const update = debounce(() => {
     const r = computeTrapSpeedHorsepower({ weight_lb: Number(w.input.value) || 0, trap_mph: Number(trap.input.value) || 0 });
     if (r.error) { oHp.textContent = r.error; oEt.textContent = "-"; oNote.textContent = "-"; return; }
-    oHp.textContent = fmt(r.hp, 0) + " hp (at the wheels)";
+    oHp.textContent = fmt(r.hp, 0) + " hp (flywheel / crank; Hale)";
     oEt.textContent = fmt(r.et_s, 1) + " s";
     oNote.textContent = r.note;
   }, DEBOUNCE_MS);
@@ -2375,7 +2375,7 @@ MECHANIC_RENDERERS["et-horsepower"] = _simpleRenderer({
     { key: "et_s", label: "Quarter-mile elapsed time (s)", kind: "number" },
   ],
   outputs: [
-    { key: "hp", id: "eth-out-hp", label: "Estimated horsepower", value: (r) => fmt(r.hp, 0) + " hp (at the wheels)" },
+    { key: "hp", id: "eth-out-hp", label: "Estimated horsepower", value: (r) => fmt(r.hp, 0) + " hp (flywheel / crank; Hale)" },
     { key: "n", id: "eth-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeEtHorsepower,
@@ -3073,13 +3073,13 @@ export function computeCrouchPlaningSpeed({ displacement_lb = 0, shaft_hp = 0, h
   if (![weight_to_power, speed_mph].every(Number.isFinite)) return { error: "Crouch-speed math is not a finite value." };
   return {
     weight_to_power, speed_mph,
-    note: "Crouch's planing-speed formula: speed_mph = C / sqrt(weight / hp). The answer is in MILES PER HOUR, not knots, for the conventional hull constant C, so do not compare it directly to a displacement hull speed in knots. Speed rises only with the square root of the power-to-weight ratio, so doubling the horsepower (or halving the weight) buys about 41% more speed, not double -- the diminishing return that makes the last few mph so expensive. The hull constant C (about 150 heavy cruiser, 190 runabout, 210 race) is chosen by hull type and dominates the estimate. The formula assumes the boat is already ON PLANE; below the planing threshold it does not apply -- use the displacement hull speed. A planning estimate, not a performance prediction; the actual hull, propeller, and conditions govern.",
+    note: "Crouch's planing-speed formula: speed_mph = C / sqrt(weight / hp). The answer is taken as miles per hour for these hull constants C (most US quotations; Dave Gerr's Propeller Handbook gives the same C with knots, a 15% difference), so do not compare it directly to a displacement hull speed in knots. Speed rises only with the square root of the power-to-weight ratio, so doubling the horsepower (or halving the weight) buys about 41% more speed, not double -- the diminishing return that makes the last few mph so expensive. The hull constant C (about 150 average runabout / cruiser, 190 high-speed runabout, 210 race) is chosen by hull type and dominates the estimate. The formula assumes the boat is already ON PLANE; below the planing threshold it does not apply -- use the displacement hull speed. A planning estimate, not a performance prediction; the actual hull, propeller, and conditions govern.",
   };
 }
 export const crouchPlaningSpeedExample = { inputs: { displacement_lb: 6000, shaft_hp: 200, hull_constant: 190 } };
 
 MECHANIC_RENDERERS["crouch-planing-speed"] = _simpleRenderer({
-  citation: "Citation: Crouch's planing-speed formula (naval-architecture back-of-envelope): speed_mph = C / sqrt(weight / hp), with the hull constant C about 150 heavy cruiser / 190 runabout / 210 race. The answer is mph, not knots; speed rises with the square root of the power-to-weight ratio. Assumes the boat is on plane. A planning estimate; the hull, propeller, and conditions govern.",
+  citation: "Citation: Crouch's planing-speed formula (naval-architecture back-of-envelope): speed_mph = C / sqrt(weight / hp), with the hull constant C about 150 average runabout-cruiser / 190 high-speed runabout / 210 race. The answer is taken as mph (Gerr quotes knots for the same C); speed rises with the square root of the power-to-weight ratio. Assumes the boat is on plane. A planning estimate; the hull, propeller, and conditions govern.",
   example: crouchPlaningSpeedExample.inputs,
   fields: [
     { key: "displacement_lb", label: "Loaded displacement (lb)", kind: "number" },
@@ -3111,13 +3111,13 @@ export function computeCrouchHpForSpeed({ target_speed_mph = 0, displacement_lb 
   if (![required_hp, weight_to_power].every(Number.isFinite) || !(required_hp > 0)) return { error: "Crouch-power math is not a finite value." };
   return {
     required_hp, weight_to_power,
-    note: "The shaft horsepower Crouch's formula says a planing hull needs for a target speed, the inverse of the crouch-planing-speed tile: from speed_mph = C / sqrt(weight / hp), hp = weight x (speed / C)^2. Because speed rises only with the square root of the power-to-weight ratio, the horsepower rises with the SQUARE of the target speed - going 40% faster needs about twice the power, and the last few mph are the most expensive. The answer is for speed in MILES PER HOUR (not knots) with the conventional hull constant C (about 150 heavy cruiser, 190 runabout, 210 race), chosen by hull type. The formula assumes the boat is on plane; below the planing threshold it does not apply. A planning estimate, not a performance prediction; the actual hull, propeller, and conditions govern.",
+    note: "The shaft horsepower Crouch's formula says a planing hull needs for a target speed, the inverse of the crouch-planing-speed tile: from speed_mph = C / sqrt(weight / hp), hp = weight x (speed / C)^2. Because speed rises only with the square root of the power-to-weight ratio, the horsepower rises with the SQUARE of the target speed - going 40% faster needs about twice the power, and the last few mph are the most expensive. The answer is for speed in miles per hour with the hull constant C (about 150 average runabout / cruiser, 190 high-speed runabout, 210 race), chosen by hull type. The formula assumes the boat is on plane; below the planing threshold it does not apply. A planning estimate, not a performance prediction; the actual hull, propeller, and conditions govern.",
   };
 }
 export const crouchHpForSpeedExample = { inputs: { target_speed_mph: 34.7, displacement_lb: 6000, hull_constant: 190 } };
 
 MECHANIC_RENDERERS["crouch-hp-for-speed"] = _simpleRenderer({
-  citation: "Citation: Crouch's planing-speed formula solved for the power: hp = weight x (speed / C)^2, from speed_mph = C / sqrt(weight / hp), with the hull constant C about 150 heavy cruiser / 190 runabout / 210 race. Speed is mph, not knots; horsepower rises with the square of the target speed. Assumes the boat is on plane. A planning estimate; the hull, propeller, and conditions govern.",
+  citation: "Citation: Crouch's planing-speed formula solved for the power: hp = weight x (speed / C)^2, from speed_mph = C / sqrt(weight / hp), with the hull constant C about 150 average runabout-cruiser / 190 high-speed runabout / 210 race. Speed is taken as mph (Gerr quotes knots for the same C); horsepower rises with the square of the target speed. Assumes the boat is on plane. A planning estimate; the hull, propeller, and conditions govern.",
   example: crouchHpForSpeedExample.inputs,
   fields: [
     { key: "target_speed_mph", label: "Target planing speed (mph)", kind: "number" },

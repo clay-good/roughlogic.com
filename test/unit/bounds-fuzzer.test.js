@@ -22573,7 +22573,7 @@ test("bounds: spec-v404 computeRentalTotalReturn pins the four-component sum and
   const r = _v404({ cash_invested_usd: 50000, annual_cash_flow_usd: 3000, principal_paydown_usd: 2500, appreciation_usd: 7500, tax_savings_usd: 1500 });
   assert.ok(Math.abs(r.total_usd - 14500) < 1e-6);
   assert.ok(Math.abs(r.total_pct - 29) < 1e-9); // a PERCENT, not a fraction
-  assert.ok(Math.abs(r.cf_pct - 0.06) < 1e-9 && Math.abs(r.appr_pct - 0.15) < 1e-9);
+  assert.ok(Math.abs(r.cf_pct - 6) < 1e-9 && Math.abs(r.appr_pct - 15) < 1e-9); // percents, like total_pct
   // Zeroing appreciation still leaves the paydown + tax shield.
   const flat = _v404({ cash_invested_usd: 50000, annual_cash_flow_usd: 3000, principal_paydown_usd: 2500, appreciation_usd: 0, tax_savings_usd: 1500 });
   assert.ok(Math.abs(flat.total_usd - 7000) < 1e-6 && flat.total_pct < r.total_pct);
@@ -56033,4 +56033,21 @@ test("bounds: batch-37 fixes -- pitot zero point, BF above 1, grille bands, damp
   assert.ok("error" in _b37wpa({ ...w, op_factor: 40 }));
   assert.ok("error" in _b37wpa({ ...w, op_factor: 0.4, density: -0.283 }));
   assert.ok("error" in _b37rmc({ volume_yd3: 20, load_yd3: -10 }));
+});
+
+import { computeNetEffectiveRent as _b38ner, computeBreakEvenOccupancy as _b38beo, computeCommercialLoadFactor as _b38clf, computeDebtYield as _b38dy } from "../../calc-realestate.js";
+import { computeWipPercentComplete as _b38wip, computeWorkersCompEmrPremium as _b38emr, computeLaborBurdenRate as _b38lbr } from "../../calc-accounting.js";
+test("bounds: batch-38 fixes -- percent-vs-fraction guards, loss contracts, NER credit cap", () => {
+  assert.ok("error" in _b38ner({ face_rent: 4000, term_periods: 12, free_periods: 2, one_time_credit: 1e6 }));
+  assert.ok("error" in _b38beo({ opex: 12000, debt_svc: 18000, pgi: 50000, target_occ: 150 }));
+  assert.ok("error" in _b38clf({ usable_sf: 3000, common_area_factor: 15 }));
+  assert.ok("error" in _b38dy({ mode: "maxloan", noi: 400000, dy_target: 0.08 }));
+  assert.ok("error" in _b38emr({ payroll_usd: 500000, class_rate: 8, emr: 85 }));
+  assert.ok("error" in _b38lbr({ wage: 25, productivity: 0.85 }));
+  assert.ok("error" in _b38lbr({ wage: 25, wc_pct: -8 }));
+  // A $300k contract estimated at $400k is a $100k loss contract, flagged in full.
+  const loss = _b38wip({ contract_usd: 300000, cost_to_date_usd: 300000, est_total_cost_usd: 400000, billed_to_date_usd: 200000 });
+  assert.equal(loss.loss_contract, true);
+  assert.equal(loss.projected_loss_usd, 100000);
+  assert.equal(_b38wip({ contract_usd: 1000000, cost_to_date_usd: 400000, est_total_cost_usd: 800000, billed_to_date_usd: 560000 }).loss_contract, false);
 });

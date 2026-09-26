@@ -13,6 +13,23 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **`wip-percent-complete` flags a loss contract.** When the estimated cost exceeds the contract, GAAP books the whole projected loss now. The tile used to show an ordinary under- or overbilling and never mention the loss. A cost past the estimate is flagged as a stale estimate.
+- **`rental-total-return` returns every component as a percent.** The cash-flow, paydown, appreciation and tax keys ended in `_pct` but held fractions (0.06 for 6%).
+- **Percent-versus-fraction guards on the finance tiles.** Each of these used to return a nonsense result with no warning:
+  - `debt-yield` target entered as 0.08 (a loan 100x too large)
+  - `break-even-occupancy` target over 100
+  - `commercial-load-factor` entered as 15 (a 16x factor)
+  - `workers-comp-emr-premium` EMR entered as 85
+  - `labor-burden-rate` productivity entered as 0.85 ($3,975/hr on a $25 wage)
+  - `net-effective-rent` credit larger than all the rent
+- **Prose corrected against printed sources:**
+  - `trap-speed-horsepower` and `et-horsepower` give flywheel (crank) power, as Hale's formula and Wallace Racing define it, not wheel power.
+  - `crouch-planing-speed` and `crouch-hp-for-speed` now say the unit is disputed: Gerr's Propeller Handbook quotes knots for the same C. C = 150 is an average runabout / cruiser.
+  - `max-rpm-from-piston-speed` calls 4,000 fpm the street ceiling its description names.
+  - `net-effective-rent` desc arithmetic fixed.
+  - `change-order-markup` no longer calls compounding "standard" or credits a method to AIA G701.
+  - `surety-bond-premium` and `retainage-tracker` state their band and cumulative-retainage limits.
+  - `workers-comp-emr-premium` prints "none" at EMR 1.0.
 - **`pitot-traverse-average` keeps a zero reading in the average.** MSHA's 2009 traverse grid includes a 0.0 point and averages all 20 velocities to 3,520 fpm. The tile refused the zero, which forced the 5% over-read MSHA warns about.
 - **`lighting-light-loss-factor` accepts a ballast factor above 1**, since high-output ballasts run 1.15-1.2. The prose now separates the recoverable factors (LLD, LDD, RSDD, LBO) from the non-recoverable ballast factor.
 - **`grille-face-velocity` bands follow Hart & Cooley.** Supply runs 500-800 fpm with 700 a common target, and returns run 400-600 fpm maximum. The tile had called anything over 700 "high". The ratio input now asks for the manufacturer's effective area Ak / gross.
@@ -77,6 +94,13 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 ### Changed
 
 - **`calc-electrical.js` size cap raised from 104,000 to 106,000 bytes gzipped.** The battery-vent and capacitor corrections took it to 104,063 B (100.1%). Splitting the module per bench is still the preferred fix.
+- **Fourteen more tiles now carry a publisher's printed example.**
+  - **Real-estate finance:** `debt-yield`, `break-even-occupancy` and `net-effective-rent` (Wall Street Prep), `commercial-load-factor` (CARR), `blended-mortgage-rate` (CFI).
+  - **Engines:** `injector-size` (Summit Racing), `injector-max-hp` (Holley), `trap-speed-horsepower` and `et-horsepower` (Hale, via Stealth 316), `max-rpm-from-piston-speed` (CarTech).
+  - **Construction business:** `wip-percent-complete` (Pease Bell CPAs), `change-order-markup` (Caltrans), `retainage-tracker` (WA RCW 60.28 example), `surety-bond-premium` (Axcess Surety).
+
+  README: 965 of 2,183 tiles are checked only against the project's own derivation; 1,218 carry an outside source.
+
 - **Ten more tiles now carry a publisher's printed example.**
   - **HVAC and lighting:** `vibration-isolation` (Kinetics isolator sample), `pitot-traverse-average` (MSHA), `lighting-light-loss-factor` (Peerless / Acuity), `grille-face-velocity` (Hart & Cooley).
   - **Fabrication and machining:** `countersink-diameter-from-depth` (GoEngineer), `multi-bend-flat-pattern` (SendCutSend), `boring-bar-max-overhang` (Cutting Tool Engineering), `weld-passes-arc-time` (NAVEDTRA 14251A).
