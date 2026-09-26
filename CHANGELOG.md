@@ -241,6 +241,8 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **`joist-cantilever-check`'s citation now describes what the tile computes.** The compute moved to the IRC 2021 Table R507.6 cantilever columns, capped at backspan / 4, but the published formula, edition and notes still gave a bare "backspan / 4" rule and credited R502.3.3 for it. The citation now names the table, and uses the Southern pine 2x10 case on a 14 ft backspan (3 ft 4 in, not the bare-rule 3 ft 6 in) as its example.
+
 - **`masonry-joint-reinforcement` now counts the lap between wire pieces.** Each added piece laps the last by at least 6 in, or 9 in for 3/16 in wire, so a 10 ft piece adds only 9.5 ft. The tile divided the wall length by the piece length. A 40 ft wall now takes 5 pieces per course, not 4, and the example's 12 ft wall goes from 36 pieces to 45. The lap is a new input.
 - **`ev-range-per-hour` and `ev-charge-cost` now say their mi/kWh is measured at the battery.** EPA's window-sticker kWh/100 mi is measured from the wall and already includes charging losses. Entering it with a charging efficiency counts those losses twice, so the labels now say to set the efficiency to 100% with a sticker figure.
 - **`reducer-offset`: the example's lay length is now ASME B16.9's 5.5 in for a 6 x 4 reducer, not 7 in.** The tile only displays the lay length, so no computed value changes.

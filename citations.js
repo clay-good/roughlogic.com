@@ -4922,13 +4922,13 @@ export const CITATIONS = {
     ],
   },
   "joist-cantilever-check": {
-    formula: "cantilever_max_ft = backspan_ft / 4; within_limit when overhang_ft <= cantilever_max_ft; margin_ft = cantilever_max_ft - overhang_ft.",
-    edition: "IRC R507.6 (decks) and R502.3.3 (floors) joist-cantilever provisions, by name; the 1:4 backspan ratio. The AHJ-adopted IRC edition governs.",
-    freeAccess: "The 1:4 cantilever ratio is a prescriptive IRC value (many jurisdictions post the adopted IRC); the tile applies it to the entered backspan and overhang.",
+    formula: "table_limit_ft = IRC 2021 Table R507.6 maximum cantilever for the joist size and species at the tabulated backspan column at or above backspan_ft (NP = not permitted); ratio_limit_ft = backspan_ft / 4; cantilever_max_ft = min(table_limit_ft, ratio_limit_ft); within_limit when overhang_ft <= cantilever_max_ft; margin_ft = cantilever_max_ft - overhang_ft.",
+    edition: "IRC 2021 Table R507.6 (deck joist spans and cantilevers, 40 psf live load), by name; backspan columns 4 to 18 ft. The AHJ-adopted IRC edition governs.",
+    freeAccess: "IRC Table R507.6 is a prescriptive table (many jurisdictions post the adopted IRC); the tile reads its cantilever columns for the entered joist size, species, and backspan.",
     governance: GOVERNANCE.general,
-    editionNote: "The prescriptive joist-cantilever ratio: a joist may overhang its support by no more than one quarter of its backspan (the span from that support back to the next support), per IRC R507.6 for decks and R502.3.3 for floors. So the maximum cantilever = backspan / 4, and the overhang must not exceed it. Beyond this ratio the prescriptive tables also set an absolute overhang cap and require the cantilever to be checked for uplift at the backspan support and for the load it carries. A joist cantilever that supports a beam, a wall, or a roof at its tip is NOT a prescriptive case -- it is an engineered condition. This is the ratio screen; the prescriptive span tables, the tip load, the connection at the backspan support (uplift), and the AHJ-adopted code govern.",
+    editionNote: "Deck-joist cantilever per IRC 2021 Table R507.6: the table lets a joist overhang by about a quarter of its backspan at short backspans, then caps the overhang or marks it NP (not permitted) by joist size and species as the backspan grows -- a Southern pine 2x10 on a 14 ft backspan may cantilever 3 ft 4 in, less than the 3 ft 6 in a bare 1:4 rule would allow. Between tabulated columns the tile reads the longer (more restrictive) column. A floor cantilever is a different check: R502.3.3 limits it to the nominal joist depth unless its own tables apply. Until 2026-09-25 this citation still described a bare backspan / 4 rule after the code had moved to the table.",
     assumptions: [
-      { name: "1:4 ratio", value: "max cantilever = backspan / 4; the prescriptive tables also cap the absolute overhang", source: "IRC R507.6 / R502.3.3" },
+      { name: "Table R507.6 cantilever", value: "maximum cantilever by joist size, species, and backspan column (4-18 ft), never more than backspan / 4; NP where the table forbids one", source: "IRC 2021 Table R507.6" },
       { name: "Tip load is engineered", value: "a beam / wall / roof bearing on the cantilever tip is an engineered condition, not prescriptive", source: "IRC / engineering" },
     ],
   },
