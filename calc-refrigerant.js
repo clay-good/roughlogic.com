@@ -738,13 +738,13 @@ export function computeCondenserHeatRejection({ q_evap = 0, unit_tons = 0, cop =
   const thr_tons = thr_btuh / 12000;
   return {
     w_comp_btuh, thr_btuh, thr_tons, factor,
-    note: "Total heat of rejection THR = Q_evap + W_comp = Q_evap (1 + 1/COP), the compressor work W_comp = Q_evap/COP added to the evaporator load - the number that sizes the condenser, the cooling tower, or the air-cooled coil. The heat-rejection factor 1 + 1/COP is about 1.25 for comfort cooling and higher at lower COP / low-temperature refrigeration, so a struggling (low-COP) system overloads its own condenser and drives head pressure higher still. Uses the compressor work implied by the COP; the condenser is assumed to reject the full evaporator-plus-compressor heat (no desuperheater/heat-recovery split), and motor heat rejected outside the refrigerant (a hermetic compressor adds it) is not included. An engineering aid; the equipment's rated heat-of-rejection data govern.",
+    note: "Total heat of rejection THR = Q_evap + W_comp = Q_evap (1 + 1/COP), the compressor work W_comp = Q_evap/COP added to the evaporator load - the number that sizes the condenser, the cooling tower, or the air-cooled coil. The heat-rejection factor 1 + 1/COP is about 1.25 for comfort cooling and higher at lower COP / low-temperature refrigeration, so a struggling (low-COP) system overloads its own condenser and drives head pressure higher still. Uses the compressor work implied by the COP; the condenser is assumed to reject the full evaporator-plus-compressor heat (no desuperheater/heat-recovery split), and it counts all of the compressor input as reaching the condenser, which is right for a hermetic or suction-cooled compressor (its motor heat goes into the refrigerant); an open or belt-drive compressor rejects its motor losses to the room, so its THR is slightly lower. An engineering aid; the equipment's rated heat-of-rejection data govern.",
   };
 }
 export const condenserHeatRejectionExample = { inputs: { q_evap: 5, unit_tons: 1, cop: 2.4 } };
 
 function _v322renderCondenserHeatRejection(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: total heat of rejection THR = Q_evap (1 + 1/COP), compressor work W_comp = Q_evap/COP, and the ~1.25 comfort-cooling heat-rejection factor, by name. No heat-recovery split or hermetic motor heat. An engineering aid; the rated heat-of-rejection data govern.";
+  citationEl.textContent = "Citation: total heat of rejection THR = Q_evap (1 + 1/COP), compressor work W_comp = Q_evap/COP, and the ~1.25 comfort-cooling heat-rejection factor, by name. No heat-recovery split; hermetic / suction-cooled basis (an open-drive motor rejects its losses to the room). An engineering aid; the rated heat-of-rejection data govern.";
   const q = makeNumber("Evaporator capacity (tons, or Btu/h if unit set to 0)", "chr-q", { step: "any", min: "0" });
   const unit = makeSelect("Capacity unit", "chr-unit", [{ value: "1", label: "Tons" }, { value: "0", label: "Btu/h" }]);
   const cop = makeNumber("Coefficient of performance COP", "chr-cop", { step: "any", min: "0" });
@@ -786,7 +786,7 @@ export function computeCondenserCopForHeatRejection({ q_evap = 0, target_thr = 0
   if (![cop, w_comp_btuh, factor].every(Number.isFinite)) return { error: "COP math is not a finite value." };
   return {
     cop, w_comp_btuh, factor,
-    note: "Implied COP from the heat of rejection: from THR = Q_evap + W_comp = Q_evap (1 + 1/COP), the compressor work is W_comp = THR - Q_evap and COP = Q_evap / (THR - Q_evap). This reads the operating efficiency off the condenser duty and the cooling capacity - a low COP means a large heat-rejection factor (THR/Q_evap), so a struggling system overloads its own condenser and drives head pressure higher still. This uses the compressor work implied by the heat balance; motor heat rejected outside the refrigerant (a hermetic compressor adds it) inflates the measured THR and lowers the apparent COP, and any desuperheater / heat-recovery split must be added back. An engineering aid; the equipment's rated data govern.",
+    note: "Implied COP from the heat of rejection: from THR = Q_evap + W_comp = Q_evap (1 + 1/COP), the compressor work is W_comp = THR - Q_evap and COP = Q_evap / (THR - Q_evap). This reads the operating efficiency off the condenser duty and the cooling capacity - a low COP means a large heat-rejection factor (THR/Q_evap), so a struggling system overloads its own condenser and drives head pressure higher still. This uses the compressor work implied by the heat balance. A hermetic or suction-cooled compressor puts its motor heat into the refrigerant, so the measured THR includes it and the implied COP is the electrical COP; an open or belt-drive compressor rejects its motor losses to the room, so the COP implied from its THR reads high (the motor losses never reach the condenser); any desuperheater / heat-recovery split must be added back. An engineering aid; the equipment's rated data govern.",
   };
 }
 export const condenserCopForHeatRejectionExample = { inputs: { q_evap: 60000, target_thr: 100000, unit_tons: 0 } };
@@ -836,12 +836,12 @@ export function computeWalkInCoolerLoad({ u_factor = 0, area_ft2 = 0, delta_t_f 
   const total_btuh = subtotal_btuh * sf;
   return {
     transmission_btuh, subtotal_btuh, total_btuh, tons: total_btuh / 12000,
-    note: "Walk-in cooler/freezer heat load: the transmission (conduction) through the panels = U x envelope area x the ambient-to-box temperature difference, plus the infiltration/door load, the product load (see product-pull-down-load), and the internal load (lights, evaporator-fan motors, people), all times a safety factor (commonly 1.10). Thicker insulation (a lower U) shrinks the transmission and the compressor directly. The evaporator is usually sized for an 18-hour run so the equipment total = load x 24/18. A sizing aid; the manufacturer's box-load method and the equipment ratings govern.",
+    note: "Walk-in cooler/freezer heat load: the transmission (conduction) through the panels = U x envelope area x the ambient-to-box temperature difference, plus the infiltration/door load, the product load (see product-pull-down-load), and the internal load (lights, evaporator-fan motors, people), all times a safety factor (commonly 1.10). Thicker insulation (a lower U) shrinks the transmission and the compressor directly. The evaporator is sized for a run time: Heatcraft uses 16 hours for a 35 F room without a defrost timer and 18 hours with one, so the equipment total = load x 24/16 or 24/18. A sizing aid; the manufacturer's box-load method and the equipment ratings govern.",
   };
 }
 export const walkInCoolerLoadExample = { inputs: { u_factor: 0.05, area_ft2: 800, delta_t_f: 60, infiltration_btuh: 3000, product_btuh: 5000, internal_btuh: 1500, safety: 1.10 } };
 function _v432renderWalkInCoolerLoad(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: Walk-in cooler heat load (ASHRAE Refrigeration / box-load practice): transmission = U x area x deltaT, plus infiltration + product + internal loads, times a safety factor (~1.10). Size the evaporator for an ~18-hour run. A sizing aid; the box-load method and equipment ratings govern.";
+  citationEl.textContent = "Citation: Walk-in cooler heat load (ASHRAE Refrigeration / box-load practice): transmission = U x area x deltaT, plus infiltration + product + internal loads, times a safety factor (~1.10). Size the evaporator for a 16-hour (no defrost timer) or 18-hour (timer) run. A sizing aid; the box-load method and equipment ratings govern.";
   const u = makeNumber("Panel U-factor (4 in ~0.05, 6 in ~0.03)", "wic-u", { step: "any", min: "0" });
   const area = makeNumber("Envelope area (ft²)", "wic-a", { step: "any", min: "0" });
   const dt = makeNumber("Ambient-to-box deltaT (°F)", "wic-dt", { step: "any", min: "0" });
@@ -977,10 +977,13 @@ export function computeEvaporatorTdDtd({ box_temp_f = 0, sst_f = 0, design_load_
   const dtd = box - sst;
   if (!(dtd > 0)) return { error: "Saturated suction must be below the box temperature (a positive TD is required)." };
   let band;
-  if (dtd <= 10) band = "~90% RH (produce, flowers, cut greens)";
-  else if (dtd <= 12) band = "~80-85% RH (general walk-in cooler)";
-  else if (dtd <= 16) band = "~75-80% RH (meat, packaged goods)";
-  else band = "<70% RH (low-humidity / frozen storage)";
+  // Heatcraft Engineering Manual H-ENGM0408 p. 21 classes: 7-9 F TD ~90% RH, 10-12 F 80-85% (packaged meats),
+  // 12-16 F 65-80%, 17-22 F 50-65%. Until 2026-09-26 a 10 F TD read "~90% RH (produce)" and 12-16 F "75-80% (meat)".
+  if (dtd < 10) band = "~90% RH (7-9 F TD: produce, flowers, cut greens)";
+  else if (dtd <= 12) band = "~80-85% RH (10-12 F TD: general cooler, packaged meats)";
+  else if (dtd <= 16) band = "~65-80% RH (12-16 F TD)";
+  else if (dtd <= 22) band = "~50-65% RH (17-22 F TD: low-humidity storage)";
+  else band = "<50% RH (TD above the 22 F coil-selection classes)";
   // spec-v1486 (CUT to this tile): coil capacity is very nearly LINEAR in TD,
   // Q = UA x TD, which is the arithmetic behind the humidity band above. That
   // linearity is what makes a low-TD coil expensive: halving the TD doubles the
@@ -1014,7 +1017,7 @@ export function computeEvaporatorTdDtd({ box_temp_f = 0, sst_f = 0, design_load_
     has_ua, capacity_at_dtd_btuh, has_rating_td, capacity_at_rating_btuh, capacity_ratio,
     has_load, load_met, ua_required_btuh_f, td_required_f, ua_ratio_vs_rating,
     capacity_verdict, rating_verdict,
-    note: "Evaporator design TD (DTD) = box temperature - the saturated suction temperature at the coil, the single number that sets the resulting box humidity. A small TD (a coil running close to the box temperature) holds a high relative humidity for produce and flowers; a large TD dries the air, which suits packaged or frozen goods but wilts produce. Common bands: <=10 F ~90% RH, 10-12 F ~80-85%, 12-16 F ~75-80%, >16 F <70%. Coil selection trades TD (humidity) against coil size (a smaller TD needs more coil). A selection aid; the coil manufacturer's rating at the design TD governs. Capacity is the other half of the same choice and it is very nearly LINEAR in TD: Q = UA x TD, so halving the TD roughly doubles the coil surface needed for the same load. That is why the cheap design is a high TD, and what it costs is water -- a colder coil surface condenses and freezes more moisture out of the room air, the room's relative humidity falls, and the product loses weight. For a produce cooler that weight loss is the revenue. In a freezer the same physics appears as frost: a high TD frosts the coil faster, which drives more defrost cycles, and each defrost puts heat into the room that the plant then removes again. Entering a coil UA and a design load reports the capacity at this TD, the capacity at the coil's own published rating TD for comparison, and the TD the coil would need to carry the load -- so the capital cost of a lower TD sits next to what it buys. Those three inputs are optional and default to zero; with them empty this is the TD and humidity band alone.",
+    note: "Evaporator design TD (DTD) = box temperature - the saturated suction temperature at the coil, the single number that sets the resulting box humidity. A small TD (a coil running close to the box temperature) holds a high relative humidity for produce and flowers; a large TD dries the air, which suits packaged or frozen goods but wilts produce. Heatcraft's coil-selection classes: 7-9 F TD ~90% RH, 10-12 F ~80-85% (packaged meats), 12-16 F ~65-80%, 17-22 F ~50-65%. Coil selection trades TD (humidity) against coil size (a smaller TD needs more coil). A selection aid; the coil manufacturer's rating at the design TD governs. Capacity is the other half of the same choice and it is very nearly LINEAR in TD: Q = UA x TD, so halving the TD roughly doubles the coil surface needed for the same load. That is why the cheap design is a high TD, and what it costs is water -- a colder coil surface condenses and freezes more moisture out of the room air, the room's relative humidity falls, and the product loses weight. For a produce cooler that weight loss is the revenue. In a freezer the same physics appears as frost: a high TD frosts the coil faster, which drives more defrost cycles, and each defrost puts heat into the room that the plant then removes again. Entering a coil UA and a design load reports the capacity at this TD, the capacity at the coil's own published rating TD for comparison, and the TD the coil would need to carry the load -- so the capital cost of a lower TD sits next to what it buys. Those three inputs are optional and default to zero; with them empty this is the TD and humidity band alone.",
   };
 }
 export const evaporatorTdDtdExample = { inputs: { box_temp_f: 35, sst_f: 25, design_load_btuh: 24000, coil_ua_btuh_f: 2600, rating_td_f: 12 } };

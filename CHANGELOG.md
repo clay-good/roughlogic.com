@@ -11,6 +11,15 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **`battery-hydrogen-vent` and `battery-vent-max-current` use the IEEE 1635 hydrogen rate and say which limit they hold.** Each ampere through each cell evolves 0.000269 cfm of hydrogen (IEEE 1635-2018 / ASHRAE Guideline 21 Annex A, and Faraday's law), so the 1% limit of the IFC and NFPA 1 takes 0.0269 x I x N cfm. The tiles used 0.054 x I x N and called it 1%; that constant holds 0.5%, twice the airflow. A new hydrogen-limit input defaults to 1%. IEEE's own example, 72 cells at 66.7 A held to 2%, now reproduces at 64.6 cfm. The current input is now labeled as the current through each cell (charger current / parallel strings). The example exhaust goes from 25.9 to 12.9 cfm; the inverse's supportable current doubles.
+- **`evaporator-td-dtd` humidity bands follow Heatcraft's coil-selection classes.** A 10 F TD is the 80-85% RH class (packaged meats), not ~90% (produce). The classes are 7-9 F ~90%, 10-12 F ~80-85%, 12-16 F ~65-80%, 17-22 F ~50-65%. Heatcraft's beef-cooler example is now a fixture.
+- **`condenser-heat-rejection` and its COP inverse had the motor-heat cases reversed.** A hermetic or suction-cooled compressor puts its motor heat into the refrigerant, so it reaches the condenser. An open or belt-drive compressor rejects its losses to the room.
+- **More prose fixed against printed sources:**
+  - `walk-in-cooler-load` run time: Heatcraft uses 16 hr without a defrost timer, 18 hr with one.
+  - Compressed-air specific power: CAC Sourcebook ranges, 16-19 kW/100 cfm lubricant-injected, 17-22 lubricant-free.
+  - `intermittent-fillet-weld` spacing: AISC D4/E6, not the J3.5 bolt clause.
+  - `anchor-rode-scope`: all-chain at about 5:1; 3:1 is short scope.
+  - `concrete-vibrator-spacing` desc: an 8 in radius of action, not an 8 in head.
 - **`dyno-correction-sae` uses the SAE J1349 AUG2004 constants, 1.176 and 0.176.** It had the JUN90 1.180 and 0.180 under the AUG2004 validity window. The example's CF moves from 1.0220 to 1.0219.
 - **`pool-chlorine-dose` liquid pounds follow from the gallons.** The fluid ounces already used trade percent, but the pounds were lb Cl / 0.125, so 128 fl oz of 12.5% read 8.34 lb where a gallon weighs about 10 lb. The note's "about six times the weight of cal-hypo" is now what the tile returns.
 - **Prose corrections found against printed sources:**
@@ -29,6 +38,16 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 - **`masonry-lintel-loading` now needs 8 in of wall above the triangle before it credits arching.** NCMA TEK 17-1 requires the 45-degree load triangle plus at least 8 in of masonry above its apex. The tile used to credit arching as soon as the wall reached span/2. A 6 ft opening with 3.5 ft of wall above now carries the full 1,260 lb rectangle instead of the 540 lb triangle.
 
 ### Changed
+
+- **`calc-electrical.js` size cap raised from 104,000 to 106,000 bytes gzipped.** The battery-vent and capacitor corrections took it to 104,063 B (100.1%). Splitting the module per bench is still the preferred fix.
+- **Twelve more tiles now carry a publisher's printed example.**
+  - **Energy:** `power-factor-billing-savings` (DOE Motor Challenge), `air-leak-cost` (DOE Compressed Air Tip Sheet #3).
+  - **Refrigeration:** `condenser-heat-rejection` (ACHR News), `evaporator-td-dtd` (Heatcraft).
+  - **Welding and rigging:** `weld-travel-speed` (two Lincoln Electric cases), `wire-rope-diameter-for-wll` (NAVEDTRA 14043).
+  - **Electrical:** `transformer-inrush-point` (Cooper Bussmann), `neutral-grounding-resistor` (I-Gard), `battery-hydrogen-vent` (IEEE 1635 Annex A).
+  - **Marine, automotive and heating:** `anchor-rode-scope` (The Ensign), `turbo-pressure-ratio` (Garrett), `oil-burner-firing-rate` (HVAC School).
+
+  README: 1,010 of 2,183 tiles are checked only against the project's own derivation; 1,173 carry an outside source.
 
 - **Ten more tiles now carry a publisher's printed example.** No formula errors were found beyond the fixes above.
   - **Inventory and accounting:** `eoq-order-quantity` (LibreTexts), `reorder-point` (Pressbooks), `units-of-production-depr` (OpenStax).

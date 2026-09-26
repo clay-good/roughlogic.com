@@ -57,7 +57,7 @@ export const BESPOKE_OUTPUT_LABELS = {
   "battery-runtime": {"hours":"Runtime (hours)","minutes":"Runtime (minutes)","usable_Wh":"Usable energy"},
   "battery-series-parallel": {"series_count":"Configuration","usable_kwh":"Usable energy"},
   "battery-tou-arbitrage": {"usable_kwh":"Usable energy per cycle","daily_value":"Daily arbitrage value","annual_value":"Annual value","breakeven_ratio":"Break-even price ratio","note":"Note"},
-  "battery-vent-max-current": {"max_charge_current_a":"Max charge current","note":"Note"},
+  "battery-vent-max-current": {"max_charge_current_a":"Max charge current per cell (x parallel strings = charger total)","note":"Note"},
   "beam-clamp-side-pull": {"vertical_lb":"Vertical component","horizontal_lb":"Horizontal (side pull)","needs_rerig":"Verdict"},
   "beam-loading": {"M_lbft":"Maximum moment","delta_in":"Maximum deflection"},
   "beam-reactions": {"max_shear_lb":"Max shear","m_max_ftlb":"Max bending moment"},

@@ -2942,13 +2942,13 @@ export function computeAnchorRodeScope({ water_depth_ft = 0, bow_height_ft = 0, 
   if (![vertical_ft, rode_ft, actual_scope, swing_radius_ft].every(Number.isFinite)) return { error: "Anchor-scope math is not a finite value." };
   return {
     vertical_ft, rode_ft, actual_scope, swing_radius_ft,
-    note: "Anchor rode scope and swing radius: scope is the ratio of rode paid out to the VERTICAL rise from the seabed to the bow roller -- depth PLUS the bow-roller height, and figured at HIGH tide, not the instantaneous sounder depth. Skip the bow height and the rising tide and the real scope falls short, the anchor breaks out, and the boat drags. rode = scope x vertical, and the swing radius = sqrt(rode^2 - vertical^2) + boat length is the circle the boat sweeps around a set anchor, governing spacing to neighbors and hazards. An all-chain rode holds at a lower ratio (about 5:1 or even 3:1) while rope-and-chain wants 7:1. A planning aid, not a guarantee the anchor holds; local conditions, bottom type, and skipper judgment govern.",
+    note: "Anchor rode scope and swing radius: scope is the ratio of rode paid out to the VERTICAL rise from the seabed to the bow roller -- depth PLUS the bow-roller height, and figured at HIGH tide, not the instantaneous sounder depth. Skip the bow height and the rising tide and the real scope falls short, the anchor breaks out, and the boat drags. rode = scope x vertical, and the swing radius = sqrt(rode^2 - vertical^2) + boat length is the circle the boat sweeps around a set anchor, governing spacing to neighbors and hazards. An all-chain rode holds at a lower ratio (about 5:1; 3:1 is short scope, a calm-weather lunch stop) while rope-and-chain wants 7:1. A planning aid, not a guarantee the anchor holds; local conditions, bottom type, and skipper judgment govern.",
   };
 }
 export const anchorRodeScopeExample = { inputs: { water_depth_ft: 15, bow_height_ft: 3, scope_ratio: 7, boat_loa_ft: 30 } };
 
 MECHANIC_RENDERERS["anchor-rode-scope"] = _simpleRenderer({
-  citation: "Citation: anchor rode scope and swing radius (seamanship convention -- Chapman Piloting, US Sailing, ABYC ground-tackle references): vertical = depth + bow height (at high tide); rode = scope x vertical; swing_radius = sqrt(rode^2 - vertical^2) + boat length. All-chain holds at a lower ratio (5:1 or 3:1); rope-and-chain wants 7:1. A planning aid; local conditions, bottom type, and skipper judgment govern.",
+  citation: "Citation: anchor rode scope and swing radius (seamanship convention -- Chapman Piloting, US Sailing, ABYC ground-tackle references): vertical = depth + bow height (at high tide); rode = scope x vertical; swing_radius = sqrt(rode^2 - vertical^2) + boat length. All-chain holds at about 5:1 (3:1 is short scope); rope-and-chain wants 7:1. A planning aid; local conditions, bottom type, and skipper judgment govern.",
   example: anchorRodeScopeExample.inputs,
   fields: [
     { key: "water_depth_ft", label: "Water depth at high tide (ft)", kind: "number" },

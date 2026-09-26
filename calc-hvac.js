@@ -3598,12 +3598,12 @@ export function computeAirLeakCost({ compressor_cfm = 0, load_min = 0, unload_mi
   const annual_cost = annual_kwh * rate_kwh;
   return {
     leak_fraction, leak_cfm, leak_kw, annual_kwh, annual_cost,
-    note: "US DOE Compressed Air Challenge load/unload leak test: leak fraction = t_load / (t_load + t_unload), leak flow = fraction x compressor cfm, with the compressed-air specific-power convention (18-22 kW per 100 cfm at 100 psig for a rotary-screw system). The test is run with all production draw off so the only demand is the leaks; the loaded capacity is the compressor's actual delivered cfm at the operating pressure (not the nameplate); the specific power is the whole system's wire-to-air figure at its pressure; the run hours are the hours the compressor is energized. An estimate from a stopwatch test, not a metered audit.",
+    note: "US DOE Compressed Air Challenge load/unload leak test: leak fraction = t_load / (t_load + t_unload), leak flow = fraction x compressor cfm, with the compressed-air specific-power convention (about 16-22 kW per 100 cfm at 100 psig (Compressed Air Challenge Sourcebook: 16-19 single-stage lubricant-injected screw, 15-17 two-stage, 17-22 lubricant-free; DOE Tip Sheet 3 uses 18)). The test is run with all production draw off so the only demand is the leaks; the loaded capacity is the compressor's actual delivered cfm at the operating pressure (not the nameplate); the specific power is the whole system's wire-to-air figure at its pressure; the run hours are the hours the compressor is energized. An estimate from a stopwatch test, not a metered audit.",
   };
 }
 export const airLeakCostExample = { inputs: { compressor_cfm: 500, load_min: 3, unload_min: 12, specific_power: 22, run_hours: 8760, rate_kwh: 0.10 } };
 HVAC_RENDERERS["air-leak-cost"] = _rEnv({
-  citation: "Citation: US DOE Compressed Air Challenge load/unload leak test (leak fraction = t_load / (t_load + t_unload), leak flow = fraction x cfm) and the 18-22 kW per 100 cfm specific-power convention (by name). Run with production off. An estimate from a stopwatch test, not a metered audit.",
+  citation: "Citation: US DOE Compressed Air Challenge load/unload leak test (leak fraction = t_load / (t_load + t_unload), leak flow = fraction x cfm) and the ~16-22 kW per 100 cfm specific-power convention (CAC Sourcebook) (by name). Run with production off. An estimate from a stopwatch test, not a metered audit.",
   example: airLeakCostExample.inputs,
   fields: [
     { key: "compressor_cfm", label: "Compressor delivered capacity (cfm)", kind: "number" },

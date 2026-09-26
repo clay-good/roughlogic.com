@@ -23249,13 +23249,14 @@ test("bounds: spec-v698 computeProductPullDownTime pins hours = Q / capacity, ro
 
 test("bounds: spec-v434 computeEvaporatorTdDtd pins the TD, the humidity band, and error seams", () => {
   const r = _v434({ box_temp_f: 35, sst_f: 25 });
-  assert.ok(Math.abs(r.dtd - 10) < 1e-9 && /90% RH/.test(r.band));
+  assert.ok(Math.abs(r.dtd - 10) < 1e-9 && /80-85% RH/.test(r.band)); // Heatcraft: 10 F TD is the 80-85% class
+  assert.ok(/90% RH/.test(_v434({ box_temp_f: 35, sst_f: 27 }).band)); // TD 8
   // A larger TD dries the air.
   const dry = _v434({ box_temp_f: 35, sst_f: 17 });
-  assert.ok(Math.abs(dry.dtd - 18) < 1e-9 && /< ?70% RH/.test(dry.band));
+  assert.ok(Math.abs(dry.dtd - 18) < 1e-9 && /50-65% RH/.test(dry.band));
   // Band boundaries.
   assert.ok(/80-85% RH/.test(_v434({ box_temp_f: 35, sst_f: 24 }).band)); // TD 11
-  assert.ok(/75-80% RH/.test(_v434({ box_temp_f: 35, sst_f: 21 }).band)); // TD 14
+  assert.ok(/65-80% RH/.test(_v434({ box_temp_f: 35, sst_f: 21 }).band)); // TD 14
   // Error seams: SST >= box, non-finite.
   assert.ok("error" in _v434({ box_temp_f: 35, sst_f: 40 }));
   assert.ok("error" in _v434({ box_temp_f: 35, sst_f: 35 }));
@@ -24622,10 +24623,10 @@ test("bounds: spec-v517 computeAbycDcWire pins the round-trip circular mils, the
 
 import { computeBatteryHydrogenVent as _v518, computeBatteryVentMaxCurrent as _v666 } from "../../calc-electrical.js";
 
-test("bounds: spec-v666 computeBatteryVentMaxCurrent pins I_max = Q/(0.054 N), the cells-not-jars scaling, round-trips through computeBatteryHydrogenVent, and error seams", () => {
+test("bounds: spec-v666 computeBatteryVentMaxCurrent pins I_max = Q/(0.0269 N) at 1%, the cells-not-jars scaling, round-trips through computeBatteryHydrogenVent, and error seams", () => {
   const r = _v666({ available_cfm: 100, cell_count: 24 });
   assert.ok(!r.error, JSON.stringify(r));
-  assert.ok(Math.abs(r.max_charge_current_a - 100 / (0.054 * 24)) < 1e-9, `I_max identity: ${r.max_charge_current_a}`);
+  assert.ok(Math.abs(r.max_charge_current_a - 100 * 0.01 / (0.000269 * 24)) < 1e-9, `I_max identity: ${r.max_charge_current_a}`);
   // Counting jars (6x the cells) cuts the safe current to one-sixth.
   const jars = _v666({ available_cfm: 100, cell_count: 144 });
   assert.ok(Math.abs(jars.max_charge_current_a - r.max_charge_current_a / 6) < 1e-9, `jars sixth: ${jars.max_charge_current_a}`);
@@ -24645,13 +24646,16 @@ test("bounds: spec-v666 computeBatteryVentMaxCurrent pins I_max = Q/(0.054 N), t
   assert.ok("error" in _v666({ available_cfm: 100, cell_count: 0 }));
 });
 
-test("bounds: spec-v518 computeBatteryHydrogenVent pins the 0.054 I N rate, the cells-not-jars scaling, the ACH, and error seams", () => {
+test("bounds: spec-v518 computeBatteryHydrogenVent pins the IEEE 1635 0.000269 I N / limit rate, the cells-not-jars scaling, the ACH, and error seams", () => {
   const r = _v518({ cell_count: 24, charge_current_a: 20, room_volume_ft3: 800 });
-  assert.ok(Math.abs(r.q_cfm - 25.92) < 0.01); // 0.054 x 20 x 24
-  assert.ok(Math.abs(r.ach - 1.944) < 0.01);
+  assert.ok(Math.abs(r.q_cfm - 12.912) < 0.001); // 0.0269 x 20 x 24 at 1% (was 0.054, which holds 0.5%)
+  assert.ok(Math.abs(r.ach - 0.9684) < 0.001);
+  // IEEE 1635-2018 Annex A.3.5: 72 cells at 66.7 A held to 2% -> 64.6 cfm.
+  assert.ok(Math.abs(_v518({ cell_count: 72, charge_current_a: 66.7, room_volume_ft3: 8000, h2_limit_pct: 2 }).q_cfm - 64.6) < 0.05);
+  assert.ok("error" in _v518({ cell_count: 24, charge_current_a: 20, room_volume_ft3: 800, h2_limit_pct: 4 }));
   // Counting jars (6x the cells) sextuples the airflow.
   const jars = _v518({ cell_count: 144, charge_current_a: 20, room_volume_ft3: 800 });
-  assert.ok(Math.abs(jars.q_cfm - 6 * r.q_cfm) < 1e-6 && Math.abs(jars.q_cfm - 155.52) < 0.01);
+  assert.ok(Math.abs(jars.q_cfm - 6 * r.q_cfm) < 1e-6 && Math.abs(jars.q_cfm - 77.472) < 0.001);
   // Airflow scales linearly with cells and current; ACH inversely with room volume.
   assert.ok(Math.abs(_v518({ cell_count: 24, charge_current_a: 40, room_volume_ft3: 800 }).q_cfm - 2 * r.q_cfm) < 1e-6);
   assert.ok(Math.abs(_v518({ cell_count: 24, charge_current_a: 20, room_volume_ft3: 400 }).ach - 2 * r.ach) < 1e-6);
@@ -48903,7 +48907,7 @@ test("bounds: spec-v1486 cut -- evaporator-td-dtd gains capacity, TD and band un
   // must be exactly what it was -- the test that makes a cut safe to land.
   const before = _v1486host({ box_temp_f: 35, sst_f: 25 });
   assert.ok(Math.abs(before.dtd - 10) < 1e-12);
-  assert.equal(before.band, "~90% RH (produce, flowers, cut greens)");
+  assert.equal(before.band, "~80-85% RH (10-12 F TD: general cooler, packaged meats)"); // Heatcraft class, 2026-09-26
   assert.equal(before.has_ua, false);
   assert.equal(before.has_load, false);
   assert.equal(before.capacity_at_dtd_btuh, 0);

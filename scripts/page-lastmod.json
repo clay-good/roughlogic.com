@@ -2,7 +2,7 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "2601a2a968eeba01",
+      "sha": "bdebe149745b7fdf",
       "date": "2026-09-26"
     },
     "/tools/": {
@@ -218,8 +218,8 @@
       "date": "2026-09-07"
     },
     "/tools/air-leak-cost/": {
-      "sha": "9841298e70d8cd8f",
-      "date": "2026-09-01"
+      "sha": "31fd16042b06e015",
+      "date": "2026-09-26"
     },
     "/tools/air-movers/": {
       "sha": "db8f538d6e710590",
@@ -282,8 +282,8 @@
       "date": "2026-09-01"
     },
     "/tools/anchor-rode-scope/": {
-      "sha": "1c83c4f23c2855b3",
-      "date": "2026-09-01"
+      "sha": "b4e1bb9e09c76671",
+      "date": "2026-09-26"
     },
     "/tools/anhydrous-ammonia-rate/": {
       "sha": "3c76f7ea84a18b8a",
@@ -510,8 +510,8 @@
       "date": "2026-09-01"
     },
     "/tools/battery-hydrogen-vent/": {
-      "sha": "fa9273e0f8014512",
-      "date": "2026-09-01"
+      "sha": "9856f282c8c53476",
+      "date": "2026-09-26"
     },
     "/tools/battery-inverter-dc-conductor/": {
       "sha": "a2b645a806a7c1e6",
@@ -534,8 +534,8 @@
       "date": "2026-09-01"
     },
     "/tools/battery-vent-max-current/": {
-      "sha": "d8facc38938d668c",
-      "date": "2026-09-01"
+      "sha": "c2bffb99bd4c2e27",
+      "date": "2026-09-26"
     },
     "/tools/beam-clamp-side-pull/": {
       "sha": "f034fc20be55092c",
@@ -1590,8 +1590,8 @@
       "date": "2026-09-01"
     },
     "/tools/concrete-vibrator-spacing/": {
-      "sha": "d00581e61444e27a",
-      "date": "2026-09-01"
+      "sha": "19a98cdfa1e6a70a",
+      "date": "2026-09-26"
     },
     "/tools/concrete-washout-volume/": {
       "sha": "75986973aad31881",
@@ -1618,12 +1618,12 @@
       "date": "2026-09-01"
     },
     "/tools/condenser-cop-for-heat-rejection/": {
-      "sha": "b5091e34e2925461",
-      "date": "2026-09-01"
+      "sha": "4c012b2435dbbfb0",
+      "date": "2026-09-26"
     },
     "/tools/condenser-heat-rejection/": {
-      "sha": "d6a7b40abd98cb49",
-      "date": "2026-09-01"
+      "sha": "c56535b355ff38a0",
+      "date": "2026-09-26"
     },
     "/tools/condenser-td-head-pressure/": {
       "sha": "128039383e4b3a98",
@@ -2706,8 +2706,8 @@
       "date": "2026-09-01"
     },
     "/tools/evaporator-td-dtd/": {
-      "sha": "66e25e5b8c2e929d",
-      "date": "2026-09-01"
+      "sha": "4e3431cfbda84570",
+      "date": "2026-09-26"
     },
     "/tools/excavation/": {
       "sha": "d8eedc1ff4a6b1e7",
@@ -3910,8 +3910,8 @@
       "date": "2026-09-01"
     },
     "/tools/intermittent-fillet-weld/": {
-      "sha": "332459fd7fbc3cb9",
-      "date": "2026-09-01"
+      "sha": "f8b1cd53418eef8d",
+      "date": "2026-09-26"
     },
     "/tools/internal-heat-gains/": {
       "sha": "d65f7d003bd00deb",
@@ -8394,8 +8394,8 @@
       "date": "2026-09-01"
     },
     "/tools/walk-in-cooler-load/": {
-      "sha": "6ccb77b6193b08da",
-      "date": "2026-09-08"
+      "sha": "01bcc7f22677b972",
+      "date": "2026-09-26"
     },
     "/tools/walk-in-door-infiltration/": {
       "sha": "1868c5834f8ebfd0",

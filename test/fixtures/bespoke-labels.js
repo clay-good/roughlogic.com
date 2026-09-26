@@ -53,7 +53,7 @@ export const BESPOKE_LABELS = {
   "baseboard-length-for-load": {"target_btuhr":"Target room load (BTU/hr)","water_temp_F":"Avg water temp (°F)","flow_gpm":"Flow (gpm)","model":"Model"},
   "baseboard-output": {"water_temp_F":"Avg water temp (°F)","flow_gpm":"Flow (gpm)","length_ft":"Length (ft)","model":"Model"},
   "battery-c-rate": {"nameplate_kwh":"Battery nameplate (kWh)","c_rate":"Continuous C-rate (0.5 = 0.5C)","dod":"Depth of discharge (0-1)","inverter_kw":"Inverter rating (kW, 0 = no limit)"},
-  "battery-hydrogen-vent": {"cell_count":"Cell count (individual 2 V cells, NOT jars)","charge_current_a":"Maximum charge current (A)","room_volume_ft3":"Room volume (ft³)"},
+  "battery-hydrogen-vent": {"cell_count":"Cell count (individual 2 V cells, NOT jars)","charge_current_a":"Charge current through each cell (A; charger current / parallel strings)","room_volume_ft3":"Room volume (ft³)","h2_limit_pct":"Hydrogen limit (% by volume; IFC / NFPA 1 = 1)"},
   "battery-inverter-dc-conductor": {"inverter_power_w":"Inverter continuous power (W)","battery_voltage_v":"Battery bank voltage (V)","efficiency_pct":"Inverter efficiency (%)"},
   "battery-peak-shaving": {"nameplate_kwh":"Battery nameplate (kWh)","dod":"Depth of discharge (0-1)","event_duration_h":"Peak-event duration (h)","target_shave_kw":"Target demand reduction (kW)","demand_per_kw_mo":"Demand charge ($/kW-month)"},
   "battery-runtime": {"amp_hours":"Battery capacity (Ah)","system_V":"System voltage (V)","dod_percent":"Depth of discharge (%)","load_W":"Load (W)","peukert_k":"Peukert exponent k (1 if unknown)","inverter_efficiency_pct":"Inverter efficiency (%, 100 for a DC load)","rated_hours":"Capacity rating time (h; the C/20 rate is 20)"},

@@ -37638,6 +37638,28 @@
    }
   },
   {
+   "tile_id": "wire-rope-diameter-for-wll",
+   "source_publisher": "US Navy (NAVEDTRA)",
+   "source_title": "NAVEDTRA 14043 Builder 3 and 2 Vol. 1, Safe Working Load",
+   "source_edition_or_year": "web edition",
+   "source_section_or_page": "SWL (tons) = D^2 x 8: a 2 in rope -> 32 tons (run in reverse; the Navy's 8 = construction factor / design factor, entered as 40 / 5)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "wll_required_tons": 32,
+    "construction_factor": 40,
+    "design_factor": 5
+   },
+   "outputs": {
+    "diameter_in": {
+     "value": 2,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
    "tile_id": "wire-rope-strength",
    "source_publisher": "Wire Rope Users Manual rule-of-thumb (by name)",
    "source_title": "3/4 in same construction -> 25.9 ton MBS, 5.2 ton WLL",
@@ -52205,6 +52227,42 @@
    }
   },
   {
+   "tile_id": "power-factor-billing-savings",
+   "source_publisher": "US DOE Motor Challenge (after BPA)",
+   "source_title": "Reducing Power Factor Cost, DOE/GO-10096-286",
+   "source_edition_or_year": "fact sheet, p. 2",
+   "source_section_or_page": "100 kW with 100 kVAR (pf 100/141.4 = 0.707): a 67 kVAR capacitor cuts apparent power from 142 (rounded up) to 105 kVA at pf 0.95",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "real_power_kw": 100,
+    "pf_existing": 0.70711,
+    "pf_target": 0.95,
+    "demand_per_kva_mo": 0,
+    "capacitor_cost": 0
+   },
+   "outputs": {
+    "kvar_needed": {
+     "value": 67,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "kva_existing": {
+     "value": 142,
+     "tolerance": {
+      "abs": 1
+     }
+    },
+    "kva_target": {
+     "value": 105,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
    "tile_id": "heat-pump-seasonal-energy",
    "source_publisher": "AHRI 210/240 HSPF / fuel-cost comparison",
    "source_title": "60 MMBtu HSPF 9 -> 6,667 kWh, $1,000 (vs $2,638 resistance, $947 gas)",
@@ -52898,6 +52956,31 @@
      "value": 6424,
      "tolerance": {
       "pct": 0.1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "air-leak-cost",
+   "source_publisher": "US DOE Industrial Technologies Program",
+   "source_title": "Compressed Air Tip Sheet #3, Minimize Compressed Air Leaks, DOE/GO-102004-1964",
+   "source_edition_or_year": "August 2004",
+   "source_section_or_page": "ten 1/4 in leaks x 100.9 cfm x 0.61 = 615.5 cfm; 615.5 x 0.18 kW/cfm x 7,000 hr x $0.05 = $38,776 (entered as a fully loaded leak flow)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "compressor_cfm": 615.49,
+    "load_min": 1,
+    "unload_min": 0,
+    "specific_power": 18,
+    "run_hours": 7000,
+    "rate_kwh": 0.05
+   },
+   "outputs": {
+    "annual_cost": {
+     "value": 38776,
+     "tolerance": {
+      "abs": 1
      }
     }
    }
@@ -69237,6 +69320,34 @@
    }
   },
   {
+   "tile_id": "condenser-heat-rejection",
+   "source_publisher": "ACHR News (J. Marchese)",
+   "source_title": "Choosing the Right Air-Cooled Condenser",
+   "source_edition_or_year": "March 4, 2021",
+   "source_section_or_page": "225,000 Btuh net refrigeration, R-404A semi-hermetic suction-cooled at -20 F / 110 F, factor 1.55 -> THR 348,750 Btuh (entered as COP 1/0.55)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "q_evap": 225000,
+    "unit_tons": 0,
+    "cop": 1.8181818181818181
+   },
+   "outputs": {
+    "factor": {
+     "value": 1.55,
+     "tolerance": {
+      "abs": 0.0001
+     }
+    },
+    "thr_btuh": {
+     "value": 348750,
+     "tolerance": {
+      "abs": 1
+     }
+    }
+   }
+  },
+  {
    "tile_id": "injector-size",
    "source_publisher": "Fuel injector sizing (HP x BSFC / (n x duty))",
    "source_title": "400 hp V8, NA gas (BSFC 0.50), 80% duty -> 31.3 lb/h (328 cc/min) per injector",
@@ -80565,6 +80676,52 @@
    }
   },
   {
+   "tile_id": "weld-travel-speed",
+   "source_publisher": "Lincoln Electric",
+   "source_title": "Weld Distortion (Welding How-To's)",
+   "source_edition_or_year": "web article",
+   "source_section_or_page": "175 amp, 25 volts and 3 ipm requires 87,500 joules per linear inch (run in reverse: 87.5 kJ/in -> 3 ipm)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "V_volts": 25,
+    "I_amps": 175,
+    "eta": 1,
+    "HI_kjin": 87.5
+   },
+   "outputs": {
+    "travel_speed_ipm": {
+     "value": 3,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "weld-travel-speed",
+   "source_publisher": "Lincoln Electric",
+   "source_title": "Weld Distortion (Welding How-To's)",
+   "source_edition_or_year": "web article",
+   "source_section_or_page": "310 amp, 35 volts and 8 ipm -> 81,400 joules per inch (rounded from 81,375; run in reverse -> 8.0 ipm)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "V_volts": 35,
+    "I_amps": 310,
+    "eta": 1,
+    "HI_kjin": 81.4
+   },
+   "outputs": {
+    "travel_speed_ipm": {
+     "value": 8,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
    "tile_id": "shaft-torsion",
    "source_publisher": "mechanics of materials",
    "source_title": "1.5 in solid steel shaft, 1,000 lb-ft, 24 in, G 11.5e6 -> 18,100 psi, 2.9 deg",
@@ -81732,6 +81889,34 @@
      "value": 55426,
      "tolerance": {
       "abs": 50
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "neutral-grounding-resistor",
+   "source_publisher": "I-Gard (D. Mohla)",
+   "source_title": "Electrical System Grounding (presentation), slide 24",
+   "source_edition_or_year": "2019",
+   "source_section_or_page": "480 V system, ground fault limited to 5 A: 277 V / 5 A = 55.4 ohms",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "system_voltage_ll_v": 480,
+    "target_fault_a": 5,
+    "duty": "hrg"
+   },
+   "outputs": {
+    "v_ln_v": {
+     "value": 277,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "r_ohm": {
+     "value": 55.4,
+     "tolerance": {
+      "abs": 0.05
      }
     }
    }
@@ -83150,7 +83335,7 @@
   {
    "tile_id": "evaporator-td-dtd",
    "source_publisher": "ASHRAE Refrigeration",
-   "source_title": "35 F box, 25 F SST -> 10 F TD, ~90% RH (produce)",
+   "source_title": "35 F box, 25 F SST -> 10 F TD, ~80-85% RH (Heatcraft 10-12 F class)",
    "source_edition_or_year": "spec worked example (machine-verified)",
    "source_section_or_page": "spec-v434 section 2.1 pinned example",
    "verified_by": "rl",
@@ -83171,7 +83356,7 @@
   {
    "tile_id": "evaporator-td-dtd",
    "source_publisher": "ASHRAE Refrigeration",
-   "source_title": "cross-check: a 17 F suction gives 18 F TD, <70% RH (drying coil)",
+   "source_title": "cross-check: a 17 F suction gives 18 F TD, ~50-65% RH (drying coil)",
    "source_edition_or_year": "spec worked example (machine-verified)",
    "source_section_or_page": "spec-v434 section 2.1 cross-check",
    "verified_by": "rl",
@@ -83185,6 +83370,34 @@
      "value": 18,
      "tolerance": {
       "abs": 0
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "evaporator-td-dtd",
+   "source_publisher": "Heatcraft Refrigeration Products",
+   "source_title": "Engineering Manual H-ENGM0408, 35 F beef cooler example",
+   "source_edition_or_year": "April 2008, p. 21",
+   "source_section_or_page": "35 F box at a 10 F TD (80-85% RH class for packaged meats); unit cooler capacity 12,696 / 10 F TD = 1,270 Btu per F TD",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "box_temp_f": 35,
+    "sst_f": 25,
+    "design_load_btuh": 12696
+   },
+   "outputs": {
+    "dtd": {
+     "value": 10,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "ua_required_btuh_f": {
+     "value": 1270,
+     "tolerance": {
+      "abs": 0.5
      }
     }
    }
@@ -85721,6 +85934,35 @@
    }
   },
   {
+   "tile_id": "anchor-rode-scope",
+   "source_publisher": "The Ensign (America's Boating Club, J. Schwab)",
+   "source_title": "Preplan for Anchoring Success",
+   "source_edition_or_year": "September 28, 2016 (updated May 17, 2021)",
+   "source_section_or_page": "10 ft of water plus 5 ft to the bow roller -> 45 ft of rode for a 3-to-1 scope (swing radius not printed)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "water_depth_ft": 10,
+    "bow_height_ft": 5,
+    "scope_ratio": 3,
+    "boat_loa_ft": 30
+   },
+   "outputs": {
+    "vertical_ft": {
+     "value": 15,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "rode_ft": {
+     "value": 45,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
    "tile_id": "turbo-pressure-ratio",
    "source_publisher": "turbocharger pressure-ratio and charge-air-temperature model",
    "source_title": "15 psi at sea level (14.7 psia), 80 F inlet, 70% eff -> PR 2.02, outlet 252 F (172 F rise; exponent (gamma-1)/gamma = 2/7)",
@@ -85803,6 +86045,29 @@
      "value": 2.23,
      "tolerance": {
       "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "turbo-pressure-ratio",
+   "source_publisher": "Garrett Motion",
+   "source_title": "Turbo Tech 103 (Expert)",
+   "source_edition_or_year": "2019, p. 2",
+   "source_section_or_page": "12 psig boost at sea level: 26.7 psia / 14.7 psia = 1.82 (ignoring intake depression; Garrett's 13.7 psia inlet gives 1.95)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "boost_psi": 12,
+    "ambient_psia": 14.7,
+    "inlet_temp_f": 80,
+    "compressor_eff_pct": 70
+   },
+   "outputs": {
+    "pr": {
+     "value": 1.82,
+     "tolerance": {
+      "abs": 0.005
      }
     }
    }
@@ -86951,7 +87216,7 @@
   {
    "tile_id": "battery-hydrogen-vent",
    "source_publisher": "IEEE 1635 battery-room hydrogen ventilation",
-   "source_title": "24 cells at 20 A in an 800 ft^3 room -> 25.9 cfm, 1.9 ACH",
+   "source_title": "24 cells at 20 A in an 800 ft^3 room -> 12.9 cfm, 0.97 ACH at the 1% limit (0.0269 I N; was 0.054 I N, which holds 0.5%)",
    "source_edition_or_year": "spec-v518 worked example (machine-verified)",
    "source_section_or_page": "spec-v518 section 2.1 pinned example",
    "verified_by": "rl",
@@ -86963,13 +87228,13 @@
    },
    "outputs": {
     "q_cfm": {
-     "value": 25.9,
+     "value": 12.912,
      "tolerance": {
       "abs": 0.1
      }
     },
     "ach": {
-     "value": 1.9,
+     "value": 0.9684,
      "tolerance": {
       "abs": 0.05
      }
@@ -86979,7 +87244,7 @@
   {
    "tile_id": "battery-hydrogen-vent",
    "source_publisher": "IEEE 1635 battery-room hydrogen ventilation",
-   "source_title": "cross-check: counting jars is really 144 cells -> 155.5 cfm, six times the airflow",
+   "source_title": "cross-check: twenty-four 12 V jars are really 144 cells -> 77.47 cfm, six times the airflow",
    "source_edition_or_year": "spec-v518 worked example (machine-verified)",
    "source_section_or_page": "spec-v518 section 2.1 cross-check",
    "verified_by": "rl",
@@ -86991,7 +87256,7 @@
    },
    "outputs": {
     "q_cfm": {
-     "value": 155.5,
+     "value": 77.472,
      "tolerance": {
       "abs": 0.1
      }
@@ -86999,9 +87264,32 @@
    }
   },
   {
+   "tile_id": "battery-hydrogen-vent",
+   "source_publisher": "IEEE / ASHRAE",
+   "source_title": "IEEE Std 1635-2018 / ASHRAE Guideline 21-2018, Annex A.3.5",
+   "source_edition_or_year": "2018, p. 59",
+   "source_section_or_page": "72 cells, 66.7 A per string (200 A of chargers on 3 strings): 1.27e-7 x 66.7 x 72 = 0.000610 m3/s (1.29 cfm) of hydrogen; held to 2% -> 64.6 cfm",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "cell_count": 72,
+    "charge_current_a": 66.7,
+    "room_volume_ft3": 8000,
+    "h2_limit_pct": 2
+   },
+   "outputs": {
+    "q_cfm": {
+     "value": 64.6,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
    "tile_id": "battery-vent-max-current",
    "source_publisher": "IEEE 1635 battery-room hydrogen ventilation (inverse)",
-   "source_title": "100 cfm over a 24-cell string supports 77.2 A max charge current",
+   "source_title": "100 cfm over a 24-cell string supports 154.9 A per cell at the 1% limit",
    "source_edition_or_year": "spec-v666 worked example (machine-verified)",
    "source_section_or_page": "spec-v666 section 2.1 pinned example",
    "verified_by": "rl",
@@ -87012,7 +87300,7 @@
    },
    "outputs": {
     "max_charge_current_a": {
-     "value": 77.16,
+     "value": 154.89,
      "tolerance": {
       "abs": 0.05
      }
@@ -87022,7 +87310,7 @@
   {
    "tile_id": "battery-vent-max-current",
    "source_publisher": "IEEE 1635 battery-room hydrogen ventilation (inverse)",
-   "source_title": "cross-check: counting jars as 144 cells drops the safe current to 12.86 A, one-sixth",
+   "source_title": "cross-check: counting jars as 144 cells drops the safe current to 25.82 A, one-sixth",
    "source_edition_or_year": "spec-v666 worked example (machine-verified)",
    "source_section_or_page": "spec-v666 section 2.1 cross-check",
    "verified_by": "rl",
@@ -87033,7 +87321,7 @@
    },
    "outputs": {
     "max_charge_current_a": {
-     "value": 12.86,
+     "value": 25.82,
      "tolerance": {
       "abs": 0.05
      }
@@ -87090,6 +87378,36 @@
      "value": 2255,
      "tolerance": {
       "abs": 5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "transformer-inrush-point",
+   "source_publisher": "Cooper Bussmann (Eaton)",
+   "source_title": "Transformers - 600V or Less (protection application guide)",
+   "source_edition_or_year": "2005, p. 63",
+   "source_section_or_page": "800 VA 2400 V single-phase potential transformer, 12x inrush for 0.1 s: IFL = 800/2400 = 0.333 A, inrush = 12 x 0.333 = 4 A",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "kva": 0.8,
+    "primary_voltage_v": 2400,
+    "phase": 1,
+    "inrush_multiple": 12,
+    "duration_s": 0.1
+   },
+   "outputs": {
+    "fla_a": {
+     "value": 0.333,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "inrush_point_a": {
+     "value": 4,
+     "tolerance": {
+      "abs": 0.01
      }
     }
    }
@@ -88439,6 +88757,34 @@
      "value": 1.057,
      "tolerance": {
       "abs": 0.005
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "oil-burner-firing-rate",
+   "source_publisher": "HVAC School (J. Skinner)",
+   "source_title": "Oil Nozzles",
+   "source_edition_or_year": "January 27, 2017",
+   "source_section_or_page": "a 1 GPH nozzle at 100 psi is a 140,000 BTU burner input; at 80% efficient it is around 112,000 BTU output (run in reverse at 140,000 BTU/gal)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "output_btu_hr": 112000,
+    "steady_state_efficiency_pct": 80,
+    "heating_value_btu_gal": 140000
+   },
+   "outputs": {
+    "input_btu_hr": {
+     "value": 140000,
+     "tolerance": {
+      "abs": 1
+     }
+    },
+    "firing_rate_gph": {
+     "value": 1,
+     "tolerance": {
+      "abs": 0.001
      }
     }
    }
