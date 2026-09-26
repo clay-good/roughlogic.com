@@ -16154,20 +16154,26 @@ test("bounds: spec-v247 computeConcreteStrengthGain pins the fraction, developed
 });
 
 test("bounds: spec-v251 computeAllowableArea pins the frontage factor, allowable, boundaries, and error seams", () => {
+  // IBC 2021 Table 506.3.3: 50% of the perimeter on 30 ft of open space -> 0.50 (the 2018
+  // equation, used until 2026-09-25, gave (0.5 - 0.25) x 30/30 = 0.25).
   const r = _v251({ tabular_area: 27000, ns_area: 9000, frontage_ft: 200, perimeter_ft: 400, open_width_ft: 30, actual_area: 25000 });
-  assert.ok(Math.abs(r.frontage_if - 0.25) < 1e-9);
-  assert.strictEqual(r.allowable, 29250);
+  assert.ok(Math.abs(r.frontage_if - 0.5) < 1e-9);
+  assert.strictEqual(r.allowable, 31500);
+  // AWC/ICC 2024 Code Conforming Wood Design, 2021 IBC: F/P 625/815, W 27 ft -> 0.678 interpolated.
+  assert.ok(Math.abs(_v251({ tabular_area: 9000, ns_area: 9000, frontage_ft: 625, perimeter_ft: 815, open_width_ft: 27 }).frontage_if - 0.678) < 1e-9);
+  // Open space 20 to 25 ft interpolates the first two columns; 20 ft on the 25-50% row is 0.17.
+  assert.ok(Math.abs(_v251({ tabular_area: 10000, ns_area: 10000, frontage_ft: 120, perimeter_ft: 400, open_width_ft: 20 }).frontage_if - 0.17) < 1e-9);
   assert.strictEqual(r.pass, true);
   // Interior lot below the 25% frontage floor -> no increase, fails.
   const r2 = _v251({ tabular_area: 9500, ns_area: 9500, frontage_ft: 50, perimeter_ft: 400, actual_area: 12000 });
   assert.strictEqual(r2.frontage_if, 0);
   assert.strictEqual(r2.allowable, 9500);
   assert.strictEqual(r2.pass, false);
-  // F/P exactly 0.25 -> still no increase.
-  assert.strictEqual(_v251({ tabular_area: 10000, ns_area: 10000, frontage_ft: 100, perimeter_ft: 400 }).frontage_if, 0);
-  // W capped at 30 ft.
+  // F/P exactly 0.25 enters the 25-50% row (Table 506.3.3: 0.25 at 30 ft).
+  assert.ok(Math.abs(_v251({ tabular_area: 10000, ns_area: 10000, frontage_ft: 100, perimeter_ft: 400 }).frontage_if - 0.25) < 1e-9);
+  // Open space over 30 ft takes the last column.
   const rw = _v251({ tabular_area: 10000, ns_area: 10000, frontage_ft: 200, perimeter_ft: 400, open_width_ft: 60 });
-  assert.ok(Math.abs(rw.frontage_if - 0.25) < 1e-9);
+  assert.ok(Math.abs(rw.frontage_if - 0.5) < 1e-9);
   // Error seams.
   assert.ok("error" in _v251({ tabular_area: 0, perimeter_ft: 400 }));
   assert.ok("error" in _v251({ tabular_area: 27000, perimeter_ft: 0 }));

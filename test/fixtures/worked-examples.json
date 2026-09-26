@@ -49518,13 +49518,13 @@
    },
    "outputs": {
     "frontage_if": {
-     "value": 0.25,
+     "value": 0.5,
      "tolerance": {
       "abs": 0.0001
      }
     },
     "allowable": {
-     "value": 29250,
+     "value": 31500,
      "tolerance": {
       "abs": 0.01
      }
@@ -49576,31 +49576,62 @@
   },
   {
    "tile_id": "allowable-area",
-   "source_publisher": "International Code Council (Thornburg)",
-   "source_title": "2012 IBC Handbook, Application Example 506-3",
-   "source_edition_or_year": "2012 (equation form, 2015/2018 IBC 506.3.3)",
-   "source_section_or_page": "F 220, P 360, W 40 (30 max): If = [0.61 - 0.25] x 30/30 = 0.36",
+   "source_publisher": "American Wood Council / International Code Council",
+   "source_title": "2024 Code Conforming Wood Design, Allowable Building Area Example",
+   "source_edition_or_year": "2021 IBC (Table 506.3.3)",
+   "source_section_or_page": "p. 14: Type V-B, Group B; qualifying perimeter 625 of 815 ft, smallest open space 27 ft -> If 0.63 from the table, 0.678 interpolated; Aa = 9,000 + 9,000 x 0.678 = 15,102 sf",
    "verified_by": "rl",
    "verified_on": "2026-09-25",
    "inputs": {
-    "tabular_area": 27000,
+    "tabular_area": 9000,
     "ns_area": 9000,
-    "frontage_ft": 220,
-    "perimeter_ft": 360,
-    "open_width_ft": 40,
-    "actual_area": 25000
+    "frontage_ft": 625,
+    "perimeter_ft": 815,
+    "open_width_ft": 27,
+    "actual_area": 41013
    },
    "outputs": {
-    "w_eff": {
-     "value": 30,
+    "frontage_if": {
+     "value": 0.678,
      "tolerance": {
-      "abs": 0.005
+      "abs": 0.0005
      }
     },
-    "frontage_if": {
-     "value": 0.36,
+    "allowable": {
+     "value": 15102,
      "tolerance": {
-      "abs": 0.005
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "allowable-area",
+   "source_publisher": "American Wood Council / International Code Council",
+   "source_title": "2024 Code Conforming Wood Design, Allowable Building Area Example",
+   "source_edition_or_year": "2021 IBC (Table 506.3.3)",
+   "source_section_or_page": "p. 14, sprinklered one story (At 36,000 sf): Aa = 36,000 + 9,000 x 0.678 = 42,102 sf",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "tabular_area": 36000,
+    "ns_area": 9000,
+    "frontage_ft": 625,
+    "perimeter_ft": 815,
+    "open_width_ft": 27,
+    "actual_area": 41013
+   },
+   "outputs": {
+    "frontage_if": {
+     "value": 0.678,
+     "tolerance": {
+      "abs": 0.0005
+     }
+    },
+    "allowable": {
+     "value": 42102,
+     "tolerance": {
+      "abs": 0.5
      }
     }
    }

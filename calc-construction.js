@@ -6371,9 +6371,19 @@ export function computeAllowableArea({ tabular_area = 0, ns_area = 0, frontage_f
   if (frontage_ft > perimeter_ft) return { error: "Frontage F cannot exceed the perimeter P." };
   const w_eff = Math.min(open_width_ft, 30);
   const ratio = frontage_ft / perimeter_ft;
-  // §506.3.1: no increase unless 25% or more of the perimeter fronts open space, and that
-  // open space must be at least 20 ft wide to count at all.
-  const frontage_if = ratio < 0.25 || open_width_ft < 20 ? 0 : (ratio - 0.25) * (w_eff / 30);
+  // IBC 2021 Table 506.3.3 (and 2024): the row is the bracket of qualifying perimeter
+  // (25-50%, 50-75%, 75-100%) and the column the smallest open space (20, 25, 30+ ft);
+  // interpolation is permitted (footnote a), taken here across the open-space columns
+  // between the printed values. Until 2026-09-25 this used the 2018 equation
+  // If = (F/P - 0.25) W/30, which the 2021 code replaced: AWC/ICC's 2021 example
+  // (F/P 0.767, W 27 ft) reads 0.678 from the table and 0.465 from the old equation.
+  const IF_ROWS = [[0.25, [0.17, 0.21, 0.25]], [0.50, [0.33, 0.42, 0.50]], [0.75, [0.50, 0.63, 0.75]]];
+  let frontage_if = 0;
+  if (ratio >= 0.25 && open_width_ft >= 20) {
+    const vals = IF_ROWS.filter(([lo]) => ratio >= lo).pop()[1];
+    const W = Math.min(open_width_ft, 30);
+    frontage_if = W <= 25 ? vals[0] + (vals[1] - vals[0]) * (W - 20) / 5 : vals[1] + (vals[2] - vals[1]) * (W - 25) / 5;
+  }
   const allowable = tabular_area + ns_area * frontage_if;
   return { w_eff, ratio, frontage_if, allowable, pass: actual_area <= allowable, margin: allowable - actual_area };
 }
@@ -6383,7 +6393,7 @@ export const allowableAreaExample = {
 };
 
 const _renderAllowableArea = _simpleRenderer({
-  citation: "Citation: IBC 2021 §506.2 (Aa = At + NS x If), §506.3.1 (If = 0 unless F/P >= 0.25 on open space 20 ft or wider), §506.3.2 (If = [F/P - 0.25] x W/30), §506.3.3 (W capped at 30 ft in the equation). At and NS come from Table 506.2 for the actual occupancy group and construction type in the correct sprinkler column (NS nonsprinklered, S1 single-story sprinklered, SM multistory). A mixed-occupancy or multistory building uses the §506.2.2 / §508.4 sum-of-ratios and the §506.2.3 story multiplier instead of this single-occupancy single-story form. A feasibility aid, not a code-official determination.",
+  citation: "Citation: IBC 2021 §506.2 (Aa = At + NS x If), §506.3.1 (If = 0 unless F/P >= 0.25 on open space 20 ft or wider), Table 506.3.3 (If by the percentage of qualifying perimeter, 25 / 50 / 75%, and the smallest open space, 20 / 25 / 30+ ft, interpolated across the open-space columns as footnote a permits; the 2018 equation [F/P - 0.25] x W/30 no longer applies). At and NS come from Table 506.2 for the actual occupancy group and construction type in the correct sprinkler column (NS nonsprinklered, S1 single-story sprinklered, SM multistory). A mixed-occupancy or multistory building uses the §506.2.2 / §508.4 sum-of-ratios and the §506.2.3 story multiplier instead of this single-occupancy single-story form. A feasibility aid, not a code-official determination.",
   example: allowableAreaExample.inputs,
   fields: [
     { key: "tabular_area", label: "Tabular area At (ft², correct column)", kind: "number" },
