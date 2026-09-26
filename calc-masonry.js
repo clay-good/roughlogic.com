@@ -338,7 +338,11 @@ export function computeMasonryLintelLoading({ span_ft = 0, wall_psf = 0, wall_h_
   if (!(psf > 0)) return { error: "Wall weight must be positive (psf)." };
   if (!(hAbove > 0)) return { error: "Height of wall above the opening must be positive (ft)." };
   const tri_h_ft = span / 2;
-  const arching = hAbove >= tri_h_ft;
+  // NCMA TEK 17-1: arching needs the 45-degree triangle PLUS at least 8 in of wall above its apex; the
+  // load triangle itself is still span/2 tall. Until 2026-09-26 arching was assumed once the wall reached
+  // span/2, so a wall 0-8 in short of the rule got the triangle load instead of its full weight.
+  const arch_h_ft = tri_h_ft + 8 / 12;
+  const arching = hAbove >= arch_h_ft;
   const W_lb = arching ? 0.5 * span * tri_h_ft * psf : span * hAbove * psf;
   // Moment-equivalent UDL. The arched triangle (total W, peak at midspan)
   // gives M = W L / 6; a UDL gives w L^2 / 8, so w = 4 W / (3 L). Until
@@ -346,13 +350,13 @@ export function computeMasonryLintelLoading({ span_ft = 0, wall_psf = 0, wall_h_
   // moment by 25%. The full rectangle is already uniform: w = W / L.
   const w_udl_plf = arching ? 4 * W_lb / (3 * span) : W_lb / span;
   return {
-    tri_h_ft, arching, W_lb, w_udl_plf,
-    note: "Masonry lintel arching load: for masonry above an opening, the lintel carries only the triangular dead load within a 45-degree triangle (height = span/2) IF enough wall is above (wall above >= span/2). W = 0.5 x span x (span/2) x wall psf; the UDL giving the same midspan moment (W L/6) is 4W/(3 x span), while the end shear is W/2. If the wall above is shorter than the triangle (a lintel near the top of the wall or under a beam bearing), arching is not developed and the lintel carries the full rectangle span x height x psf - MORE load than the arched case, which is why the arching reduction is not always available. Dead load only; add the floor/roof/superimposed loads separately. A design aid; the engineer of record governs.",
+    tri_h_ft, arch_h_ft, arching, W_lb, w_udl_plf,
+    note: "Masonry lintel arching load: for masonry above an opening, the lintel carries only the triangular dead load within a 45-degree triangle (height = span/2) IF enough wall is above (wall above >= span/2 + 8 in, NCMA TEK 17-1: the triangle plus 8 in above its apex). W = 0.5 x span x (span/2) x wall psf; the UDL giving the same midspan moment (W L/6) is 4W/(3 x span), while the end shear is W/2. If the wall above is shorter than the triangle plus 8 in (a lintel near the top of the wall or under a beam bearing), arching is not developed and the lintel carries the full rectangle span x height x psf - MORE load than the arched case, which is why the arching reduction is not always available. Dead load only; add the floor/roof/superimposed loads separately. A design aid; the engineer of record governs.",
   };
 }
 export const masonryLintelLoadingExample = { inputs: { span_ft: 6, wall_psf: 60, wall_h_above: 5 } };
 MASONRY_RENDERERS["masonry-lintel-loading"] = _simpleRenderer({
-  citation: "Citation: masonry lintel arching load: the triangular dead load in a 45-degree triangle (height span/2) when the wall above >= span/2, else the full rectangle. W = 0.5 x span x (span/2) x wall psf. Dead load only; the engineer of record governs.",
+  citation: "Citation: masonry lintel arching load (NCMA TEK 17-1): the triangular dead load in a 45-degree triangle (height span/2) when the wall above >= span/2 + 8 in, else the full rectangle. W = 0.5 x span x (span/2) x wall psf. Dead load only; the engineer of record governs.",
   example: masonryLintelLoadingExample.inputs,
   fields: [
     { key: "span_ft", label: "Opening (clear) span (ft)", kind: "number" },

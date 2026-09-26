@@ -4,7 +4,19 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### Fixed
+
+- **`masonry-lintel-loading` now needs 8 in of wall above the triangle before it credits arching.** NCMA TEK 17-1 requires the 45-degree load triangle plus at least 8 in of masonry above its apex. The tile used to credit arching as soon as the wall reached span/2. A 6 ft opening with 3.5 ft of wall above now carries the full 1,260 lb rectangle instead of the 540 lb triangle.
+
 ### Changed
+
+- **Eight more tiles now carry a publisher's printed example.** Apart from the lintel rule above, no formula errors were found.
+  - **FEMA P-751 (Ch. 4, 12-story steel frame):** `seismic-story-drift` (Table 4.1-7) and `seismic-pdelta-stability` (Table 4.1-11).
+  - **Wood and concrete:** `glulam-volume-factor` (Ochshorn Example 3.7), `concrete-torsion-threshold` (StructurePoint).
+  - **Fluids and traffic:** `velocity-head` (USBR Water Measurement Manual), `flow-continuity` (DOE-HDBK-1012), `traffic-taper-length` (ATSSA / VDOT).
+  - **HVAC:** `erv-total-enthalpy-recovery` (York Form 102.20-AG6).
+
+  README: 1,052 of 2,183 tiles are checked only against the project's own derivation; 1,131 carry an outside source.
 
 - **Twelve more tiles now carry a publisher's printed example.** No formula errors were found.
   - **Wood:**

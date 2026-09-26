@@ -55824,3 +55824,12 @@ test("bounds: computeAtterbergIndices follows ASTM D2487 fine-grained groups (CL
   assert.equal(_v328({ ll: 63, pl: 42 }).group, "MH (elastic silt)"); // ENCE 361: PI 21 < 31.39
   assert.equal(_v328({ ll: 40, pl: 25.4 }).above_a, true); // PI 14.6 = A-line 14.6: on the line counts
 });
+
+test("bounds: computeMasonryLintelLoading requires 8 in of wall above the triangle's apex before arching (NCMA TEK 17-1)", () => {
+  // 6 ft opening: the triangle is 3 ft tall, so arching needs 3 ft 8 in. Until 2026-09-26 a 3.5 ft wall arched.
+  const base = { span_ft: 6, wall_psf: 60 };
+  assert.equal(_v370({ ...base, wall_h_above: 3.5 }).arching, false);
+  assert.equal(_v370({ ...base, wall_h_above: 3.5 }).W_lb, 1260);
+  assert.equal(_v370({ ...base, wall_h_above: 3 + 8 / 12 }).arching, true);
+  assert.equal(_v370({ ...base, wall_h_above: 5 }).W_lb, 540);
+});

@@ -73294,6 +73294,28 @@
    }
   },
   {
+   "tile_id": "traffic-taper-length",
+   "source_publisher": "ATSSA (FHWA work-zone grant) / Virginia DOT",
+   "source_title": "Temporary Traffic Control for Short-Duration, Short-Term Stationary, and Mobile Operations / Work Zone Safety Guidelines",
+   "source_edition_or_year": "2025 (MUTCD 11th ed.) pp. 4-5 / Rev. Sept 2019 p. 18",
+   "source_section_or_page": "for 45 mph or more L = WS: 55 mph, 12 ft offset -> 660 ft (device count not compared; neither source prints one)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "offset_width_ft": 12,
+    "speed_mph": 55,
+    "device_spacing_ft": 40
+   },
+   "outputs": {
+    "taper_length_ft": {
+     "value": 660,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
    "tile_id": "siding-takeoff",
    "source_publisher": "Siding-takeoff identity (first-principles)",
    "source_title": "2,000 sf wall, 200 sf openings, 12% waste, 4 in exposure -> 20.16 squares, 5,400 LF",
@@ -80549,6 +80571,60 @@
    }
   },
   {
+   "tile_id": "seismic-story-drift",
+   "source_publisher": "FEMA / BSSC",
+   "source_title": "FEMA P-751 NEHRP Recommended Provisions: Design Examples, Ch. 4 (12-story steel frame), Table 4.1-7",
+   "source_edition_or_year": "2012 (ASCE 7-10)",
+   "source_section_or_page": "level 12: story drift 0.45 in x Cd 5.5 -> 2.48 in amplified; allowable 0.020 x 150 in = 3.00 in",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "delta_xe_in": 0.45,
+    "cd": 5.5,
+    "ie": 1,
+    "hsx_in": 150,
+    "drift_ratio": 0.02
+   },
+   "outputs": {
+    "delta_x": {
+     "value": 2.48,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "delta_a": {
+     "value": 3.0,
+     "tolerance": {
+      "abs": 0.005
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "seismic-story-drift",
+   "source_publisher": "FEMA / BSSC",
+   "source_title": "FEMA P-751 NEHRP Recommended Provisions: Design Examples, Ch. 4 (12-story steel frame), Table 4.1-7",
+   "source_edition_or_year": "2012 (ASCE 7-10)",
+   "source_section_or_page": "level 11: story drift 0.56 in x Cd 5.5 -> 3.07 in (printed from the unrounded drift)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "delta_xe_in": 0.56,
+    "cd": 5.5,
+    "ie": 1,
+    "hsx_in": 150,
+    "drift_ratio": 0.02
+   },
+   "outputs": {
+    "delta_x": {
+     "value": 3.07,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
    "tile_id": "seismic-pdelta-stability",
    "source_publisher": "ASCE 7-22 12.8.7",
    "source_title": "Px 400 kip, Delta 2.75 in, Vx 80 kip, 144 in, Cd 5.5 -> theta 0.017, neglect P-delta",
@@ -80602,6 +80678,64 @@
      "value": 0.1894,
      "tolerance": {
       "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "seismic-pdelta-stability",
+   "source_publisher": "FEMA / BSSC",
+   "source_title": "FEMA P-751 NEHRP Recommended Provisions: Design Examples, Ch. 4, Sec. 4.1.5.3.2 and Table 4.1-11",
+   "source_edition_or_year": "2012 (ASCE 7-10)",
+   "source_section_or_page": "roof level: Px 1,971.5 kip, drift 1.74 in, Vx 186.9 kip, hsx 150 in, Cd 5.5 -> theta 0.022; theta max 0.091 (beta 1.0)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "px_kip": 1971.5,
+    "delta_in": 1.74,
+    "ie": 1,
+    "vx_kip": 186.9,
+    "hsx_in": 150,
+    "cd": 5.5,
+    "beta": 1
+   },
+   "outputs": {
+    "theta": {
+     "value": 0.022,
+     "tolerance": {
+      "abs": 0.0005
+     }
+    },
+    "theta_max": {
+     "value": 0.091,
+     "tolerance": {
+      "abs": 0.0005
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "seismic-pdelta-stability",
+   "source_publisher": "FEMA / BSSC",
+   "source_title": "FEMA P-751 NEHRP Recommended Provisions: Design Examples, Ch. 4, Table 4.1-11",
+   "source_edition_or_year": "2012 (ASCE 7-10)",
+   "source_section_or_page": "level 12: Px 3,882.3 kip, drift 2.48 in, Vx 340.9 kip -> theta 0.034",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "px_kip": 3882.3,
+    "delta_in": 2.48,
+    "ie": 1,
+    "vx_kip": 340.9,
+    "hsx_in": 150,
+    "cd": 5.5,
+    "beta": 1
+   },
+   "outputs": {
+    "theta": {
+     "value": 0.034,
+     "tolerance": {
+      "abs": 0.0005
      }
     }
    }
@@ -81327,6 +81461,50 @@
    }
   },
   {
+   "tile_id": "velocity-head",
+   "source_publisher": "US Bureau of Reclamation",
+   "source_title": "Water Measurement Manual, Ch. 2 Sec. 7 Velocity Head Concept",
+   "source_edition_or_year": "web edition",
+   "source_section_or_page": "g = 32.2 ft/s2: dropping 1 foot reaches 8.02 feet per second (run in reverse: 8.02 ft/s -> 1.0 ft of velocity head)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "V_fps": 8.02,
+    "gamma": 62.4,
+    "rho": 1.94
+   },
+   "outputs": {
+    "h_v_ft": {
+     "value": 1,
+     "tolerance": {
+      "abs": 0.005
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "velocity-head",
+   "source_publisher": "US Bureau of Reclamation",
+   "source_title": "Water Measurement Manual, Ch. 2 Sec. 7 Velocity Head Concept",
+   "source_edition_or_year": "web edition",
+   "source_section_or_page": "dropping 8 feet reaches 22.70 ft/s (run in reverse: 22.70 ft/s -> 8.0 ft)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "V_fps": 22.7,
+    "gamma": 62.4,
+    "rho": 1.94
+   },
+   "outputs": {
+    "h_v_ft": {
+     "value": 8,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
    "tile_id": "flow-continuity",
    "source_publisher": "fluid mechanics",
    "source_title": "water at 6 ft/s, 4 in reduced to 2 in -> 24 ft/s (a four-fold jump)",
@@ -81366,6 +81544,28 @@
      "value": 10.67,
      "tolerance": {
       "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "flow-continuity",
+   "source_publisher": "US DOE",
+   "source_title": "DOE-HDBK-1012/3-92 Thermodynamics, Heat Transfer, and Fluid Flow, Module HT-03, Continuity Equation - Piping Expansion",
+   "source_edition_or_year": "June 1992, pp. 10-11",
+   "source_section_or_page": "6 in to 8 in expansion, 22.4 ft/sec in the 6 in section -> 12.6 ft/sec (via (3 in)^2/(4 in)^2)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "V1_fps": 22.4,
+    "D1_in": 6,
+    "D2_in": 8
+   },
+   "outputs": {
+    "V2_fps": {
+     "value": 12.6,
+     "tolerance": {
+      "abs": 0.01
      }
     }
    }
@@ -82547,6 +82747,35 @@
    }
   },
   {
+   "tile_id": "erv-total-enthalpy-recovery",
+   "source_publisher": "York (Johnson Controls)",
+   "source_title": "Energy Recovery Wheels Application Guide, Form 102.20-AG6, total heat example",
+   "source_edition_or_year": "Form 102.20-AG6 (305)",
+   "source_section_or_page": "12,000 cfm, 60% total effectiveness, outdoor 40.38 Btu/lb, return 28.15 Btu/lb -> supply 33.04 Btu/lb, 396,252 Btu/h recovered",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "cfm": 12000,
+    "effectiveness": 0.6,
+    "h_outdoor": 40.38,
+    "h_return": 28.15
+   },
+   "outputs": {
+    "h_supply": {
+     "value": 33.04,
+     "tolerance": {
+      "abs": 0.005
+     }
+    },
+    "q_total_btuh": {
+     "value": 396252,
+     "tolerance": {
+      "pct": 0.1
+     }
+    }
+   }
+  },
+  {
    "tile_id": "radiant-floor-output",
    "source_publisher": "EN 1264 basic characteristic (8.92 W/m^2 per K^1.1)",
    "source_title": "85 F floor, 70 F room -> 29.1 Btu/hr-ft^2 (at the comfort limit)",
@@ -82968,6 +83197,41 @@
    }
   },
   {
+   "tile_id": "concrete-torsion-threshold",
+   "source_publisher": "StructurePoint",
+   "source_title": "Equilibrium Torsion in Beams (ACI 318-14) design example",
+   "source_edition_or_year": "Version February 26, 2026",
+   "source_section_or_page": "14 x 24 in beam (Acp 336 in2, pcp 76 in), fc 4,000 psi, normalweight: phi Tth = 5.87 kip-ft = 70,440 in-lb, below which torsion may be neglected",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "fc_psi": 4000,
+    "b_in": 14,
+    "h_in": 24,
+    "lambda": 1
+   },
+   "outputs": {
+    "acp_in2": {
+     "value": 336,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "pcp_in": {
+     "value": 76,
+     "tolerance": {
+      "abs": 0.05
+     }
+    },
+    "neglect_inlb": {
+     "value": 70440,
+     "tolerance": {
+      "pct": 0.1
+     }
+    }
+   }
+  },
+  {
    "tile_id": "glulam-volume-factor",
    "source_publisher": "NDS 2018 \u00a75.3.6",
    "source_title": "5.125x18 in, 20 ft, softwood -> Cv 0.965 (3.5% reduction)",
@@ -83011,6 +83275,30 @@
      "value": 0.87,
      "tolerance": {
       "pct": 0.6
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "glulam-volume-factor",
+   "source_publisher": "Jonathan Ochshorn",
+   "source_title": "Structural Elements for Architects and Builders, Example 3.7 (glulam roof girder)",
+   "source_edition_or_year": "2nd ed. (web edition), NDS 2018",
+   "source_section_or_page": "32 ft span, 8-3/4 x 27 in Western Species glulam: CV = (21/32)^0.1 (12/27)^0.1 (5.125/8.75)^0.1 = 0.84",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "span_ft": 32,
+    "depth_in": 27,
+    "width_in": 8.75,
+    "x": 10,
+    "kl": 1
+   },
+   "outputs": {
+    "cv": {
+     "value": 0.84,
+     "tolerance": {
+      "abs": 0.005
      }
     }
    }
