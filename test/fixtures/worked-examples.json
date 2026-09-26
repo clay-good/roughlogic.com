@@ -12699,9 +12699,57 @@
   },
   {
    "tile_id": "duct-leakage",
+   "source_publisher": "SMACNA HVAC Air Duct Leakage Test Manual + ASHRAE 90.1",
+   "source_title": "Leakage normalization: leak_per_100ft2 = leak at 1 in WC / (surface/100); class match against SMACNA 2 / 3 / 4 / 6 / 8 / 12 / 16 / 24 / 48",
+   "source_edition_or_year": "SMACNA 2nd ed. (2012); ASHRAE 90.1-2022 6.4.4.2.2 leakage class 4",
+   "source_section_or_page": "1000 design cfm / 990 measured / 300 ft^2 / 1.0 in WC -> 10 cfm leak -> 3.33 cfm/100 ft^2 -> Class 4 / target Class 4 / pass",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "design_cfm": 1000,
+    "measured_cfm": 990,
+    "duct_surface_ft2": 300,
+    "test_pressure_inwc": 1,
+    "design_class": 4
+   },
+   "outputs": {
+    "leak_at_1inwc": {
+     "value": 10,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "leak_per_100ft2": {
+     "value": 3.333,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "effective_class": {
+     "value": 4,
+     "tolerance": {
+      "abs": 0
+     }
+    },
+    "target_label": {
+     "value": "Class 4 - ASHRAE 90.1 limit (all duct)",
+     "tolerance": {
+      "abs": 0
+     }
+    },
+    "pass": {
+     "value": 1,
+     "tolerance": {
+      "abs": 0
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "duct-leakage",
    "source_publisher": "ACCA Manual D + SMACNA HVAC Duct Construction Standards leakage classes",
-   "source_title": "Leakage normalization: leak_per_100ft2 = measured_cfm / (surface/100); class match against SMACNA 3 / 6 / 12 / 24 / 48",
-   "source_edition_or_year": "SMACNA Class 6 = sealed metal duct (measured 6 cfm/100 ft^2 at 1 in WC)",
+   "source_title": "cross-check against a 1985 class: a gross shortfall lands past every class",
+   "source_edition_or_year": "SMACNA HVAC Air Duct Leakage Test Manual 1985 class 6 (6 cfm/100 ft^2 at 1 in WC)",
    "source_section_or_page": "1000 design cfm / 60 measured / 300 ft^2 / 1.0 in WC -> normalized 313.33 cfm/100 ft^2 / Class 48 / target Class 6 / fail",
    "verified_by": "rl",
    "verified_on": "2026-05-11",
@@ -12709,7 +12757,8 @@
     "design_cfm": 1000,
     "measured_cfm": 60,
     "duct_surface_ft2": 300,
-    "test_pressure_inwc": 1
+    "test_pressure_inwc": 1,
+    "design_class": 6
    },
    "outputs": {
     "leak_at_1inwc": {
@@ -12731,7 +12780,7 @@
      }
     },
     "target_label": {
-     "value": "Class 6 - sealed metal duct",
+     "value": "Class 6 - SMACNA 1985 rectangular",
      "tolerance": {
       "abs": 0
      }

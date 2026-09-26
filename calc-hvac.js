@@ -2277,22 +2277,29 @@ HVAC_RENDERERS["insulation-heat-loss"] = _v7h_renderInsulationHeatLoss;
 // v8 Phase E.3 (utility 255): Duct Leakage Test-and-Balance
 // =====================================================================
 
-// SMACNA Duct Leakage Test Manual leakage classes (cfm per 100 ft^2 of
-// duct surface at 1 in WC). Class numbers are the SMACNA-published
-// constants; lower class = tighter duct.
+// SMACNA leakage classes (cfm per 100 ft^2 of duct surface at 1 in WC); the
+// class number is the allowance, lower = tighter. The 2012 HVAC Air Duct
+// Leakage Test Manual (2nd ed.) moved rectangular duct from 24/12/6 to 16/8/4
+// and round/flat-oval from 12/6/3 to 8/4/2, and ASHRAE 90.1 requires CL 4 for
+// all duct. Until 2026-09-25 only the 1985 set (3/6/12/24/48) was offered, so
+// the 90.1 limit could not be tested against.
 export const SMACNA_LEAKAGE_CLASSES = {
-  3:  { cfm_per_100ft2_at_1inwc: 3,  description: "Class 3 - new sealed metal duct (best practice)" },
-  6:  { cfm_per_100ft2_at_1inwc: 6,  description: "Class 6 - sealed metal duct" },
-  12: { cfm_per_100ft2_at_1inwc: 12, description: "Class 12 - sealed flexible / fibrous-glass duct" },
-  24: { cfm_per_100ft2_at_1inwc: 24, description: "Class 24 - unsealed metal / unsealed flex" },
-  48: { cfm_per_100ft2_at_1inwc: 48, description: "Class 48 - severely-leaking duct (failure)" },
+  2:  { cfm_per_100ft2_at_1inwc: 2,  description: "Class 2 - SMACNA 2012 round / flat-oval" },
+  3:  { cfm_per_100ft2_at_1inwc: 3,  description: "Class 3 - SMACNA 1985 round" },
+  4:  { cfm_per_100ft2_at_1inwc: 4,  description: "Class 4 - ASHRAE 90.1 limit (all duct)" },
+  6:  { cfm_per_100ft2_at_1inwc: 6,  description: "Class 6 - SMACNA 1985 rectangular" },
+  8:  { cfm_per_100ft2_at_1inwc: 8,  description: "Class 8 - SMACNA 2012" },
+  12: { cfm_per_100ft2_at_1inwc: 12, description: "Class 12 - SMACNA 1985" },
+  16: { cfm_per_100ft2_at_1inwc: 16, description: "Class 16 - SMACNA 2012 rectangular" },
+  24: { cfm_per_100ft2_at_1inwc: 24, description: "Class 24 - SMACNA 1985 rectangular" },
+  48: { cfm_per_100ft2_at_1inwc: 48, description: "Class 48 - SMACNA 1985 unsealed rectangular" },
 };
 
 // dims: in { design_cfm: L^3 T^-1, measured_cfm: L^3 T^-1, duct_surface_ft2: L^2, test_pressure_inwc: M L^-1 T^-2, design_class: dimensionless } out: { leakage_cfm: L^3 T^-1, leakage_percent: dimensionless }
 export function computeDuctLeakage({
   design_cfm = 0, measured_cfm = 0,
   duct_surface_ft2 = 0, test_pressure_inwc = 1.0,
-  design_class = 6,
+  design_class = 4,
 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(design_cfm > 0)) return { error: "Design CFM must be positive." };
@@ -2300,7 +2307,7 @@ export function computeDuctLeakage({
   if (!(duct_surface_ft2 > 0)) return { error: "Duct surface area must be positive." };
   if (!(test_pressure_inwc > 0)) return { error: "Test pressure must be positive." };
   const target = SMACNA_LEAKAGE_CLASSES[design_class];
-  if (!target) return { error: "Unknown SMACNA leakage class. Valid: 3, 6, 12, 24, 48." };
+  if (!target) return { error: "Unknown SMACNA leakage class. Valid: 2, 3, 4, 6, 8, 12, 16, 24, 48." };
   const leakage_cfm = Math.max(0, design_cfm - measured_cfm);
   const leakage_pct = (leakage_cfm / design_cfm) * 100;
   // Normalize to the SMACNA reference at 1 in WC. The SMACNA leakage-class
@@ -2326,11 +2333,11 @@ export function computeDuctLeakage({
 }
 
 export const ductLeakageExample = {
-  inputs: { design_cfm: 1000, measured_cfm: 60, duct_surface_ft2: 300, test_pressure_inwc: 1, design_class: 6 },
+  inputs: { design_cfm: 1000, measured_cfm: 990, duct_surface_ft2: 300, test_pressure_inwc: 1, design_class: 4 },
 };
 
 function _v8h_renderDuctLeakage(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: SMACNA Duct Leakage Test Manual (3rd ed.) by name. ASHRAE 90.1-2022 §6.4.4.2 references the leakage-class system. Leakage scales with P^0.65 (the SMACNA leakage-class flow exponent).";
+  citationEl.textContent = "Citation: SMACNA HVAC Air Duct Leakage Test Manual (2nd ed., 2012) by name; its classes replaced the 1985 set (rectangular 24/12/6 became 16/8/4, round 12/6/3 became 8/4/2). ASHRAE 90.1-2022 §6.4.4.2.2 limits tested duct to leakage class 4. Leakage scales with P^0.65 (the SMACNA leakage-class flow exponent).";
   _v7h_attachEx(inputRegion, () => fillExample(ductLeakageExample.inputs));
   const dc = _v7h_makeNumber("Design CFM", "dl-dc", { step: "any", min: "0" });
   const mc = _v7h_makeNumber("Measured CFM at registers", "dl-mc", { step: "any", min: "0" });
@@ -2338,7 +2345,7 @@ function _v8h_renderDuctLeakage(inputRegion, outputRegion, citationEl) {
   const tp = _v7h_makeNumber("Test pressure (in WC)", "dl-tp", { step: "any", min: "0" });
   tp.input.value = "1.0";
   const cl = _v7h_makeSelect("Design class", "dl-cl", Object.keys(SMACNA_LEAKAGE_CLASSES).map((k) => ({ value: k, label: SMACNA_LEAKAGE_CLASSES[k].description })));
-  cl.select.value = "6";
+  cl.select.value = "4";
   for (const f of [dc, mc, sf, tp, cl]) inputRegion.appendChild(f.wrap);
   const oL = _v7h_makeOut(outputRegion, "Leakage", "dl-out-l");
   const oP = _v7h_makeOut(outputRegion, "Leakage % of design", "dl-out-p");

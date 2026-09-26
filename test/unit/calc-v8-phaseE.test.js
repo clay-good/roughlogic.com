@@ -43,14 +43,15 @@ test("255 FAIL when leak exceeds the design class", () => {
   assert.equal(r.pass, false);
 });
 
-test("255 zero leak case yields effective class 3 (tightest)", () => {
+test("255 zero leak case yields effective class 2 (tightest, SMACNA 2012)", () => {
   const r = computeDuctLeakage({ design_cfm: 1000, measured_cfm: 1000, duct_surface_ft2: 500, test_pressure_inwc: 1.0, design_class: 6 });
-  assert.equal(r.effective_class, 3);
+  assert.equal(r.effective_class, 2);
   assert.equal(r.pass, true);
 });
 
-test("255 SMACNA_LEAKAGE_CLASSES has 5 expected classes with value === class number (SMACNA definition)", () => {
-  const keys = [3, 6, 12, 24, 48];
+test("255 SMACNA_LEAKAGE_CLASSES has the 1985 and 2012 classes with value === class number (SMACNA definition)", () => {
+  // 2012 2nd ed.: 2 / 4 / 8 / 16 (4 is also the ASHRAE 90.1 limit); 1985: 3 / 6 / 12 / 24 / 48.
+  const keys = [2, 3, 4, 6, 8, 12, 16, 24, 48];
   for (const k of keys) {
     assert.ok(SMACNA_LEAKAGE_CLASSES[k], "missing SMACNA class " + k);
     // The leakage class NUMBER is by definition the allowable cfm per 100 ft^2 at
@@ -183,4 +184,16 @@ test("257 COAGULANT_PRODUCTS includes alum dry/liquid, ferric, PAC", () => {
 
 test("257 WATER_RENDERERS exposes coagulant-dose", () => {
   assert.equal(typeof WATER_RENDERERS["coagulant-dose"], "function");
+});
+
+test("255 ASHRAE 90.1 class 4 is testable: 3.33 cfm/100 ft2 passes, 5 fails", () => {
+  // Until 2026-09-25 only the 1985 classes were offered, so the 90.1 limit
+  // (class 4) returned "Unknown SMACNA leakage class".
+  const ok = computeDuctLeakage({ design_cfm: 1000, measured_cfm: 990, duct_surface_ft2: 300, test_pressure_inwc: 1, design_class: 4 });
+  assert.ok(close(ok.leak_per_100ft2, 10 / 3, 1e-9));
+  assert.equal(ok.effective_class, 4);
+  assert.equal(ok.pass, true);
+  const bad = computeDuctLeakage({ design_cfm: 1000, measured_cfm: 985, duct_surface_ft2: 300, test_pressure_inwc: 1, design_class: 4 });
+  assert.equal(bad.effective_class, 6);
+  assert.equal(bad.pass, false);
 });

@@ -2070,14 +2070,14 @@ export const CITATIONS = {
   // --- v8 Phase E.3 / E.4 / E.5 (utilities 255 through 257) ---
 
   "duct-leakage": {
-    formula: "leakage_cfm = design_cfm - measured_cfm. leak_at_1inwc = leakage_cfm / (test_pressure_inwc)^0.65 (SMACNA leakage-class flow exponent). leak_per_100ft2 = leak_at_1inwc / duct_surface_ft2 × 100. Effective class = smallest SMACNA class (3, 6, 12, 24, 48) whose limit ≥ leak_per_100ft2.",
-    edition: "SMACNA Duct Leakage Test Manual (3rd ed.) by name. " + ASHRAE_62_1.replace("ASHRAE 62.1", "ASHRAE 90.1-2022 §6.4.4.2") + " (referenced for the leakage-class system).",
+    formula: "leakage_cfm = design_cfm - measured_cfm. leak_at_1inwc = leakage_cfm / (test_pressure_inwc)^0.65 (SMACNA leakage-class flow exponent). leak_per_100ft2 = leak_at_1inwc / duct_surface_ft2 × 100. Effective class = smallest SMACNA class (2, 3, 4, 6, 8, 12, 16, 24, 48) whose limit ≥ leak_per_100ft2.",
+    edition: "SMACNA HVAC Air Duct Leakage Test Manual (2nd ed., 2012) by name. " + ASHRAE_62_1.replace("ASHRAE 62.1", "ASHRAE 90.1-2022 §6.4.4.2.2") + " (leakage class 4 for tested duct).",
     freeAccess: "SMACNA standards licensed; class-system overview free at smacna.org outreach. " + ASHRAE_FREE,
     governance: GOVERNANCE.mechanical,
-    editionNote: "Single-edition (SMACNA Duct Leakage Test Manual 3rd ed.; class numbers stable across editions).",
+    editionNote: "The 2012 2nd edition changed the class numbers: rectangular 24/12/6 became 16/8/4 and round/flat-oval 12/6/3 became 8/4/2. Both sets are offered, and a spec written to the 1985 manual still names the old class. ASHRAE 90.1 requires class 4 for all duct.",
     assumptions: [
       { name: "Leakage scales with P^0.65", value: "SMACNA leakage-class flow exponent", source: "SMACNA Duct Leakage Test Manual" },
-      { name: "Leakage classes", value: "3 / 6 / 12 / 24 / 48 cfm per 100 ft² at 1 in WC", source: "SMACNA Duct Leakage Test Manual" },
+      { name: "Leakage classes", value: "2 / 4 / 8 / 16 (2012) and 3 / 6 / 12 / 24 / 48 (1985) cfm per 100 ft² at 1 in WC; ASHRAE 90.1 limit is class 4", source: "SMACNA HVAC Air Duct Leakage Test Manual 2012 / ASHRAE 90.1-2022 §6.4.4.2.2" },
     ],
   },
   "chimney-draft": {
