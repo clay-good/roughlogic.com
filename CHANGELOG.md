@@ -6,6 +6,24 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Changed
 
+- **Twelve more tiles now carry a publisher's printed example.** No formula errors were found.
+  - **Wood:**
+    - `wood-lag-withdrawal`: Ochshorn Example 3.16.
+    - `wood-screw-withdrawal`: PDHonline S168.
+    - `section-properties`: AWC NDS Supplement Table 1B.
+  - **Mechanics (Pytel & Singer):** `cantilever-beam` and `combined-stress-axial-bending`.
+  - **Concrete:** `concrete-beam-min-flexural-steel`, from StructurePoint.
+  - **HVAC and refrigeration:**
+    - `air-density-correction`: Greenheck FA/102-99.
+    - `cooling-coil-total-load`: PDHonline M378.
+    - `refrigeration-cop`: Purdue ME 200.
+    - `refrigerant-mass-flow`: Berg.
+  - **Stormwater:**
+    - `sediment-basin-volume`: SC DHEC.
+    - `stormwater-detention-volume`: Iowa SUDAS 2G-1.
+
+  README: 1,060 of 2,183 tiles are checked only against the project's own derivation; 1,123 carry an outside source.
+
 - **Fifteen more tiles now carry a publisher's printed example.** Apart from the Atterberg classification, no formula errors were found.
   - **AISC Design Examples v15.1:** `steel-b2-amplifier` (C.1C), `steel-h1-interaction` (H.1B), `steel-effective-length-k` and `steel-tau-b-stiffness-reduction` (E.4A), `steel-bolt-tension-shear` (J.3).
   - **StructurePoint / Wang & Salmon:** `t-beam-effective-flange-width`.
@@ -357,6 +375,8 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 - **wrangler 4.129.0 → 4.135.0, and the `sharp` override is gone.** Dependabot's bump failed CI on `check-dependency-overrides`. The new wrangler brings a miniflare that asks for the patched `sharp` 0.35.4 itself, so the September 9 pin no longer changed anything. This is the case the gate was written for, so the override is deleted rather than left as a second source of truth. `npm audit` reports 0 vulnerabilities. docs/threat-model.md records the change.
 
 ### Fixed
+
+- **`wood-lag-withdrawal` now defines its penetration input as the threaded length less the tapered tip.** That is how the NDS and Ochshorn's worked example measure it. The label said only "thread penetration."
 
 - **`atterberg-indices` now classifies fine-grained soils by ASTM D2487.**
   - **CL-ML:** below LL 50, a PI of 4-7 on or above the A-line is the dual group CL-ML, silty clay.

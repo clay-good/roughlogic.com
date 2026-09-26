@@ -7193,7 +7193,7 @@ const _renderWoodLagWithdrawal = _simpleRenderer({
   fields: [
     { key: "g", label: "Specific gravity G (0.50 DF-L, 0.42 SPF)", kind: "number" },
     { key: "d_in", label: "Lag shank diameter D (in)", kind: "number" },
-    { key: "p_thread_in", label: "Thread penetration (in)", kind: "number" },
+    { key: "p_thread_in", label: "Thread penetration (in; threaded length less the tapered tip)", kind: "number" },
     { key: "cd", label: "Load-duration factor CD", kind: "number" },
     { key: "end_grain", label: "Into end grain? (Ceg = 0.75)", kind: "select", options: [{ value: "no", label: "No (side grain)" }, { value: "yes", label: "Yes (end grain)" }], default: "no" },
   ],

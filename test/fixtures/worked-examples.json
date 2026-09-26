@@ -68831,6 +68831,35 @@
    }
   },
   {
+   "tile_id": "refrigerant-mass-flow",
+   "source_publisher": "Berg Chilling Systems",
+   "source_title": "Refrigeration Principles (the science behind refrigeration)",
+   "source_edition_or_year": "web page",
+   "source_section_or_page": "R-12 at 0 F / 100 F: net refrigerating effect 49.06 Btu/lb; 200 Btu/min / 49.06 = 4.077 lb/min for one ton (h1 - h4 entered as 149.06 - 100)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "q": 1,
+    "unit_tons": 1,
+    "h1_btulb": 149.06,
+    "h4_btulb": 100
+   },
+   "outputs": {
+    "re_btulb": {
+     "value": 49.06,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "m_dot_lbmin": {
+     "value": 4.077,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
    "tile_id": "refrigeration-cop",
    "source_publisher": "Refrigeration COP and Carnot limit",
    "source_title": "RE 60, W 25 Btu/lb; 40/120 F lift -> COP 2.40 (EER 8.19), Carnot 6.25, 38% of ideal",
@@ -68892,6 +68921,30 @@
      "value": 6.73,
      "tolerance": {
       "pct": 0.3
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "refrigeration-cop",
+   "source_publisher": "Purdue University (C. Wassgren)",
+   "source_title": "ME 200 notes 3.8.3, ammonia refrigeration cycle",
+   "source_edition_or_year": "2021-12-15, pp. 307-308",
+   "source_section_or_page": "h1 = 1415.08, h2 = 1798.45, h4 = h3 = 376.46 kJ/kg -> COPref = 2.71 (SI enthalpies; COP is a ratio, so the units cancel)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "h1_btulb": 1415.08,
+    "h2_btulb": 1798.45,
+    "h4_btulb": 376.46,
+    "tevap_f": -7.6,
+    "tcond_f": 105.85
+   },
+   "outputs": {
+    "cop": {
+     "value": 2.71,
+     "tolerance": {
+      "abs": 0.005
      }
     }
    }
@@ -69862,6 +69915,28 @@
      "value": 36000,
      "tolerance": {
       "abs": 0.1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "sediment-basin-volume",
+   "source_publisher": "South Carolina DHEC",
+   "source_title": "Stormwater BMP Handbook, Sediment Basins, Design Example",
+   "source_edition_or_year": "March 2014, p. SB-16",
+   "source_section_or_page": "drainage area 14 acres, entire area disturbed: 3600 ft3 / acre x 14 acres = 50,400 ft3",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "disturbed_ac": 14,
+    "storage_rule_cf_per_ac": 3600,
+    "basin_depth_ft": 3
+   },
+   "outputs": {
+    "required_cf": {
+     "value": 50400,
+     "tolerance": {
+      "abs": 0.5
      }
     }
    }
@@ -75711,6 +75786,36 @@
    }
   },
   {
+   "tile_id": "wood-lag-withdrawal",
+   "source_publisher": "Jonathan Ochshorn",
+   "source_title": "Structural Elements for Architects and Builders, Example 3.16",
+   "source_edition_or_year": "3rd edition (online)",
+   "source_section_or_page": "1/2 in lag in SPF (G 0.42), threaded penetration less the tip 1.6875 in, CD = CM = 1.0: W = 291 lb/in (NDS table), (291)(1.6875) = 491 lb",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "g": 0.42,
+    "d_in": 0.5,
+    "p_thread_in": 1.6875,
+    "cd": 1,
+    "end_grain": "no"
+   },
+   "outputs": {
+    "w_lbin": {
+     "value": 291,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "z_w": {
+     "value": 491,
+     "tolerance": {
+      "abs": 1
+     }
+    }
+   }
+  },
+  {
    "tile_id": "wood-screw-withdrawal",
    "source_publisher": "NDS 2018 12.2.2",
    "source_title": "#10 screw in DF-L, 1 in penetration -> 135 lb/in, 135 lb",
@@ -75758,6 +75863,29 @@
      "value": 95.5,
      "tolerance": {
       "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "wood-screw-withdrawal",
+   "source_publisher": "PDHonline",
+   "source_title": "Course S168, Design Nailed and Wood Screwed Connections with Spreadsheet, Example Problem 5",
+   "source_edition_or_year": "NDS-2001 basis, p. 15",
+   "source_section_or_page": "one #14 screw (D .242) in southern pine (G .55), 2 2/3 in thread penetration, CD .9 -> the answer given is 501 pounds",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "g": 0.55,
+    "d_in": 0.242,
+    "p_in": 2.67,
+    "cd": 0.9
+   },
+   "outputs": {
+    "z_w": {
+     "value": 501,
+     "tolerance": {
+      "abs": 1
      }
     }
    }
@@ -76449,6 +76577,36 @@
    }
   },
   {
+   "tile_id": "cantilever-beam",
+   "source_publisher": "Pytel & Singer (via MATHalino)",
+   "source_title": "Strength of Materials",
+   "source_edition_or_year": "textbook",
+   "source_section_or_page": "Problem 637: 80 lb/ft over an 8 ft cantilever -> reaction 640 lb, wall moment 2,560 lb-ft (the printed deflection is at 6 ft, not the tip, so it is not compared)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "w_plf": 80,
+    "L_ft": 8,
+    "E_psi": 1500000,
+    "I_in4": 40,
+    "P_lb": 0
+   },
+   "outputs": {
+    "V_lb": {
+     "value": 640,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "M_lbft": {
+     "value": 2560,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
    "tile_id": "section-properties",
    "source_publisher": "mechanics of materials",
    "source_title": "nominal 2x8 (1.5 x 7.25), strong axis -> A 10.9, I 47.6, S 13.1, r 2.09",
@@ -76522,6 +76680,40 @@
    }
   },
   {
+   "tile_id": "section-properties",
+   "source_publisher": "American Wood Council",
+   "source_title": "NDS Supplement, Table 1B Section Properties of Standard Dressed Sawn Lumber",
+   "source_edition_or_year": "2018, p. 14",
+   "source_section_or_page": "2x8 (1-1/2 x 7-1/4): A 10.88 in2, Sxx 13.14 in3, Ixx 47.63 in4",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "shape": "rectangle",
+    "b_in": 1.5,
+    "h_in": 7.25
+   },
+   "outputs": {
+    "A_in2": {
+     "value": 10.88,
+     "tolerance": {
+      "abs": 0.006
+     }
+    },
+    "S_in3": {
+     "value": 13.14,
+     "tolerance": {
+      "abs": 0.005
+     }
+    },
+    "I_in4": {
+     "value": 47.63,
+     "tolerance": {
+      "abs": 0.005
+     }
+    }
+   }
+  },
+  {
    "tile_id": "combined-stress-axial-bending",
    "source_publisher": "mechanics of materials",
    "source_title": "6x6 post, P 20,000 lb, M 30,000 lb-in -> sigma_max 1,743, sigma_min -421 (net tension)",
@@ -76577,6 +76769,48 @@
      "value": 120,
      "tolerance": {
       "pct": 5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "combined-stress-axial-bending",
+   "source_publisher": "Pytel & Singer (via MATHalino)",
+   "source_title": "Strength of Materials",
+   "source_edition_or_year": "textbook",
+   "source_section_or_page": "Problem 912: 2 x 6 in section, P 9000 lb, M 18,000 lb-in -> sigma a = 750 psi, sigma f = 1500 psi, extreme fibers 2250 and -750 psi (I = 36, c = 3 from the section)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "P_lb": 9000,
+    "M_lbin": 18000,
+    "A_in2": 12,
+    "I_in4": 36,
+    "c_in": 3
+   },
+   "outputs": {
+    "sigma_axial": {
+     "value": 750,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "sigma_bend": {
+     "value": 1500,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "sigma_max": {
+     "value": 2250,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "sigma_min": {
+     "value": -750,
+     "tolerance": {
+      "abs": 0.01
      }
     }
    }
@@ -77524,6 +77758,35 @@
    }
   },
   {
+   "tile_id": "air-density-correction",
+   "source_publisher": "Greenheck",
+   "source_title": "Understanding Temperature and Altitude Corrections, Product Application Guide FA/102-99, Example 2",
+   "source_edition_or_year": "2005, p. 2",
+   "source_section_or_page": "6,000 ft elevation, 100 F air: correction factor 1.32 (0.25 in wg x 1.32 = 0.33 in wg); the tile's density factor is its reciprocal, 1 / 1.32 = 0.758",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "elev_ft": 6000,
+    "T_F": 100,
+    "acfm": 1000,
+    "rated_sp": 0.33
+   },
+   "outputs": {
+    "DF": {
+     "value": 0.7576,
+     "tolerance": {
+      "abs": 0.003
+     }
+    },
+    "sp_corr": {
+     "value": 0.25,
+     "tolerance": {
+      "abs": 0.005
+     }
+    }
+   }
+  },
+  {
    "tile_id": "moist-air-enthalpy",
    "source_publisher": "ASHRAE Fundamentals",
    "source_title": "return air 80 F, W 0.0112 -> h 31.48 Btu/lb dry air",
@@ -77678,6 +77941,28 @@
      "value": -27000,
      "tolerance": {
       "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "cooling-coil-total-load",
+   "source_publisher": "PDHonline (J. Primo)",
+   "source_title": "Course M378, HVAC - Practical Basic Calculations",
+   "source_edition_or_year": "2026, p. 21",
+   "source_section_or_page": "Qtotal = 4.5 x 1,582 x (43.5 - 31.2) = 87,564 Btu/h",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "cfm": 1582,
+    "h_ent_btu": 43.5,
+    "h_lvg_btu": 31.2
+   },
+   "outputs": {
+    "q_btuh": {
+     "value": 87564,
+     "tolerance": {
+      "abs": 1
      }
     }
    }
@@ -79006,6 +79291,29 @@
      "value": 0.85,
      "tolerance": {
       "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "concrete-beam-min-flexural-steel",
+   "source_publisher": "StructurePoint",
+   "source_title": "Simply Supported Reinforced Concrete Beam Analysis and Design (ACI 318-14)",
+   "source_edition_or_year": "version April-08-2021, p. 8",
+   "source_section_or_page": "f'c 4350, fy 60000, bw 12, d 17.56: 0.695 in2 by 9.6.1.2(a) and 0.702 in2 by 9.6.1.2(b), which governs (same equations in 318-19)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "fc_psi": 4350,
+    "fy_psi": 60000,
+    "bw_in": 12,
+    "d_in": 17.56
+   },
+   "outputs": {
+    "as_min_in2": {
+     "value": 0.702,
+     "tolerance": {
+      "abs": 0.0005
      }
     }
    }
@@ -81688,6 +81996,36 @@
      "value": 8640,
      "tolerance": {
       "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "stormwater-detention-volume",
+   "source_publisher": "Iowa SUDAS",
+   "source_title": "Design Manual Section 2G-1 Detention, Tables 2G-1.01 and 2G-1.02",
+   "source_edition_or_year": "2013 edition (revised 2025), pp. 6-7",
+   "source_section_or_page": "C 0.9, 4.0 acre, 1-hr intensity 3.25 in/hr, release 3.3 cfs: inflow 11.7 cfs, 42,100 - 11,900 = 30,200 cu ft (volumes rounded to 100 before subtracting)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "runoff_c": 0.9,
+    "intensity_in_hr": 3.25,
+    "area_ac": 4,
+    "q_allow_cfs": 3.3,
+    "duration_min": 60
+   },
+   "outputs": {
+    "q_in_cfs": {
+     "value": 11.7,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "storage_cf": {
+     "value": 30200,
+     "tolerance": {
+      "abs": 60
      }
     }
    }
