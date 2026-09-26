@@ -1776,7 +1776,7 @@ cross-check.
 | calc-construction.js | `computeProtrudingObject` | `{ mounting = "wall", leading_edge_height_in = 0, projection_in = 0, corridor_...` | _ | _ | _ |
 | calc-construction.js | `computePullout` | `{ fastener_type, fastener_size, species, penetration_in }` | _ | _ | _ |
 | calc-construction.js | `computeRafter` | `{ horizontal_span_ft, pitch_rise_per_12, overhang_ft = 0 }` | _ | _ | _ |
-| calc-construction.js | `computeRainLoadPonding` | `{ static_head_in = 0, hydraulic_head_in = 0, roof_area_ft2 = 0, rainfall_in_h...` | _ | _ | _ |
+| calc-construction.js | `computeRainLoadPonding` | `{ static_head_in = 0, hydraulic_head_in = 0, ponding_head_in = 0, roof_area_f...` | _ | _ | _ |
 | calc-construction.js | `computeRainOnSnowSurcharge` | `{ pf_psf = 0, pg_psf = 0, slope_deg = 0, eave_to_ridge_ft = 0, surcharge_psf ...` | _ | _ | _ |
 | calc-construction.js | `computeRampDetailCheck` | `{ cross_slope_ratio = 48, clear_width_in = 0, handrails = "yes", handrail_int...` | _ | _ | _ |
 | calc-construction.js | `computeReachRange` | `{ approach = "forward", obstructed = "yes", obstruction_depth_in = 0, obstruc...` | _ | _ | _ |
@@ -4133,8 +4133,8 @@ per spec-v14 §13.1 second paragraph.
 | `solar-egc-690-45` | PV Equipment Grounding Conductor (NEC 690.45) | NFPA; 20 A OCPD -> 12 AWG copper EGC (above the 14 AWG floor) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `speaker-70v-line` | 70-Volt Distributed Speaker Line | constant-voltage distributed audio pr...; sixteen 8 W taps (128 W) on a 200 W amp at 20% headroom -... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `splice-loss-mismatch` | Fusion Splice Loss from Fiber and Geometry Mismatch | Project (first-principles); splicer and fiber data and acceptance standards govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
-| `standby-battery-runtime` | Standby Battery Runtime from Capacity | NFPA 72 §10.6 (by name), inverse; 14.6 Ah, 0.5 A standby, 2 A / 5 min alarm, derate 1.2 -> ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
-| `standby-battery-sizing` | Fire-Alarm / Security Standby Battery | NFPA 72 §10.6 (by name); 0.5 A x 24 h + 2.0 A x 5 min, derate 1.2 -> (12 + 0.1667)... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `standby-battery-runtime` | Standby Battery Runtime from Capacity | NFPA 72 §10.6 (by name), inverse; 18 Ah, 0.5 A standby, 2 A / 5 min alarm, 1.25 aging corre... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
+| `standby-battery-sizing` | Fire-Alarm / Security Standby Battery | NFPA 72 §10.6 (by name); 0.5 A x 24 h + 2.0 A x 5 min, x 1.25 -> (12 + 0.1667) x 1... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `step-touch-voltage` | Tolerable Step and Touch Voltage (IEEE 80) | IEEE Std 80 (tolerable step and touch...; 0.5 s, 3000 ohm-m rock over 100, 0.1 m, 50 kg -> Cs 0.70,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `structured-cabling-channel` | Structured Cabling Channel Length (TIA-568) | ANSI/TIA-568; spec-v458 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `support-spacing` | Raceway / Cable Support-Spacing Lookup (NEC Chapter 3) | NEC 2023 (NFPA 70); EMT secure within 36 in of each box; support every 10 ft | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |

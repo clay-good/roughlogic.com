@@ -4740,7 +4740,7 @@ export const CITATIONS = {
   // wording. The structural governance variant from spec §2.5 applies.
 
   "stairs": {
-    formula: "Riser height and tread depth from total rise / number of risers; standard 7" + "″" + " max riser, 11" + "″" + " min tread per IRC 2021 §R311.7.",
+    formula: "Riser height and tread depth from total rise / number of risers; IRC 2021 §R311.7.5 residential limits 7-3/4" + "″" + " max riser, 10" + "″" + " min tread (the 7" + "″" + " / 11" + "″" + " pair is the commercial IBC §1011.5.2 rule).",
     edition: IRC_2021 + " §R311.7.",
     freeAccess: ICC_FREE,
     governance: GOVERNANCE.structural,
@@ -4808,14 +4808,14 @@ export const CITATIONS = {
     ],
   },
   "rebar": {
-    formula: "Bars per direction = floor((dimension - 2 × cover) / spacing) + 1; total length = bars × dimension + lap-splice allowance per ACI 318 §25.5.",
+    formula: "Bars per direction = floor((dimension - 2 × cover) / spacing) + 1; total length = bars × (dimension - 2 × cover). No lap-splice allowance is added; bars longer than stock length need laps per ACI 318 §25.5.",
     edition: "ACI 318-19 (Building Code Requirements for Structural Concrete) by name. " + IBC_2021 + " §1905 references ACI 318.",
     freeAccess: "ACI 318 licensed; principles free in published engineering texts.",
     governance: GOVERNANCE.structural,
     editionNote: IBC_DISCLOSURE,
     assumptions: [
-      { name: "Default cover", value: "2 in (concrete cast against earth) unless user supplies", source: "ACI 318 §20.5.1.3" },
-      { name: "Default lap splice", value: "40 × bar diameter for #5 and smaller (Class B)", source: "ACI 318 §25.5" },
+      { name: "Default cover", value: "3 in (concrete cast against and permanently in contact with earth) unless user supplies", source: "ACI 318-19 Table 20.6.1.3.1" },
+      { name: "Lap splices", value: "not included in the total; add laps where a run exceeds the stock bar length (Class B tension lap per ACI 318 §25.5)", source: "ACI 318 §25.5" },
     ],
   },
   "lumber-spans": {
@@ -13399,7 +13399,7 @@ export const CITATIONS = {
     governance: GOVERNANCE.fire,
     editionNote: "NFPA 72 §10.6. The standby hours and alarm minutes are unit-locked so the two are never added in mixed units; a derate below 1 is flagged.",
     assumptions: [
-      { name: "Derate factor", value: "aging/derate factor 1.2 default (>= 1.0 expected); user-supplied", source: "NFPA 72 / panel worksheet" },
+      { name: "Aging correction", value: "1.25 default, the NFPA 72-2022 10.6.7.2.1 battery aging correction (editions through 2019 used a 20% margin, 1.2); user-supplied", source: "NFPA 72-2022 / panel worksheet" },
     ],
   },
   "standby-battery-runtime": {
@@ -13409,7 +13409,7 @@ export const CITATIONS = {
     governance: GOVERNANCE.fire,
     editionNote: "The standby (supervisory) time an installed battery supports before the alarm load, the inverse of standby-battery-sizing: Hs = (battery_Ah/derate - alarm_Ah) / I_standby. The derate (aging) factor is applied to the battery capacity, not credited, so the usable Ah is the nameplate divided by the derate (NFPA 72 expects >= 1.0, commonly 1.2). The alarm reserve is subtracted first, then the remainder divides by the standby current; a battery too small to cover even the alarm reserve leaves no standby time and is rejected. A design check against a required standby period (commonly 24 h with 5 or 15 min alarm); the AHJ-adopted edition, the listed panel, and the battery manufacturer's derating govern.",
     assumptions: [
-      { name: "Derate on capacity", value: "the aging/derate factor divides the usable capacity (not credited); 1.2 default, >= 1.0 expected", source: "NFPA 72 / panel worksheet" },
+      { name: "Derate on capacity", value: "the aging correction divides the usable capacity (not credited); 1.25 default per NFPA 72-2022 (1.2 through 2019)", source: "NFPA 72-2022 / panel worksheet" },
       { name: "Alarm reserve first", value: "the alarm amp-hour reserve is subtracted before dividing by the standby current", source: "NFPA 72 secondary-power method" },
     ],
   },
@@ -19815,15 +19815,15 @@ export const CITATIONS = {
     ],
   },
   "rain-load-ponding": {
-    formula: "rain_load_psf = 5.2 x (static_head_in + hydraulic_head_in); design_flow_gpm = (roof_area > 0 && rainfall > 0) ? 0.0104 x roof_area_ft2 x rainfall_in_hr : null.",
-    edition: "ASCE 7 Ch. 8 rain load (R = 5.2 x (ds + dh)) and the IPC roof-drainage design flow (Q = 0.0104 x A x i), by name; the 5.2 psf/in (62.4 pcf / 12) and 0.0104 gpm/(ft^2 in/hr) are named constants.",
+    formula: "rain_load_psf = 5.2 x (static_head_in + hydraulic_head_in + ponding_head_in); design_flow_gpm = (roof_area > 0 && rainfall > 0) ? 0.0104 x roof_area_ft2 x rainfall_in_hr : null.",
+    edition: "ASCE 7-22 Ch. 8 rain load (R = 5.2 x (ds + dh + dp), Eq. 8.2-1) and the IPC roof-drainage design flow (Q = 0.0104 x A x i), by name; the 5.2 psf/in (62.4 pcf / 12) and 0.0104 gpm/(ft^2 in/hr) are named constants.",
     freeAccess: "The rain-load relation is in the published ASCE 7 Ch. 8; the roof-drainage design flow is the IPC relation; the constants are public. The arithmetic is public.",
     governance: GOVERNANCE.general,
-    editionNote: "ASCE 7 Ch. 8 gives the rain load R = 5.2 x (ds + dh), the static head ds to the secondary (overflow) inlet plus the hydraulic head dh above it at design flow; the IPC roof-drainage design flow is Q = 0.0104 x A x i. The hydraulic head dh comes from the secondary drain or scupper's flow capacity at the design flow (a manufacturer or weir relation this tile takes as an input, not a bundled chart); the design rainfall is the 100-year hourly intensity for the site; a roof too flexible to shed the water must also pass the ASCE 7 §8.4 ponding-instability check. A load and flow aid, not a stamped roof-drainage design.",
+    editionNote: "ASCE 7-22 Ch. 8 gives the rain load R = 5.2 x (ds + dh + dp): the static head ds to the secondary (overflow) inlet, the hydraulic head dh above it at design flow, and the ponding head dp the roof's deflection under the unfactored rain load collects (ASCE 7-16 had R = 5.2 x (ds + dh) with a separate ponding-instability check). ASCE 7-22 sizes the secondary drainage for a 15-minute storm at a return period set by the risk category (100 / 100 / 200 / 500 years for I to IV), where IPC primary drainage uses the 100-year hourly rate; the IPC roof-drainage design flow is Q = 0.0104 x A x i. The hydraulic head dh comes from the secondary drain or scupper's flow capacity at the design flow (a manufacturer or weir relation this tile takes as an input, not a bundled chart); the design rainfall is the 100-year hourly intensity for the site; a roof too flexible to shed the water must also pass the ASCE 7 §8.4 ponding-instability check. A load and flow aid, not a stamped roof-drainage design.",
     assumptions: [
-      { name: "Rain load", value: "R = 5.2 psf per inch x (static head ds to the secondary inlet + hydraulic head dh above it at design flow)", source: "ASCE 7 Ch. 8" },
-      { name: "Design flow", value: "optional Q = 0.0104 x tributary area x design rainfall (100-year hourly intensity) sizes the secondary drainage", source: "IPC" },
-      { name: "Ponding", value: "a flat or near-flat roof must also pass the ASCE 7 §8.4 ponding-instability check", source: "ASCE 7 §8.4" },
+      { name: "Rain load", value: "R = 5.2 psf per inch x (static head ds + hydraulic head dh + ponding head dp)", source: "ASCE 7-22 Eq. 8.2-1" },
+      { name: "Design flow", value: "optional Q = 0.0104 x tributary area x design rainfall; enter the 15-minute intensity at the risk-category return period for ASCE 7-22 secondary drainage, the 100-year hourly rate for IPC primary drains", source: "IPC / ASCE 7-22 §8.3" },
+      { name: "Ponding", value: "ASCE 7-22 carries ponding as the dp term in R rather than as a separate instability check", source: "ASCE 7-22 Ch. 8" },
     ],
   },
   "asce7-load-combinations": {

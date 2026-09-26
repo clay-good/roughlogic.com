@@ -610,7 +610,7 @@ LOWVOLTAGE_RENDERERS["speaker-70v-line"] = _renderSpeaker70vLine;
 // ---------------------------------------------------------------------
 const _BATTERY_STANDARD_AH = [4, 7, 8, 12, 18, 26, 33, 40, 55, 75, 100];
 // dims: in { standby_current_a: I, standby_hours: T, alarm_current_a: I, alarm_minutes: T, derate: dimensionless } out: { required_ah: dimensionless, next_standard_ah: dimensionless }
-export function computeStandbyBatterySizing({ standby_current_a = 0, standby_hours = 0, alarm_current_a = 0, alarm_minutes = 0, derate = 1.2 } = {}) {
+export function computeStandbyBatterySizing({ standby_current_a = 0, standby_hours = 0, alarm_current_a = 0, alarm_minutes = 0, derate = 1.25 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const Is = Number(standby_current_a), Hs = Number(standby_hours);
   const Ia = Number(alarm_current_a), Ma = Number(alarm_minutes);
@@ -621,14 +621,15 @@ export function computeStandbyBatterySizing({ standby_current_a = 0, standby_hou
   const alarm_ah = Ia * (Ma / 60);
   const required_ah = (standby_ah + alarm_ah) * d;
   let next_standard_ah = null;
-  for (const s of _BATTERY_STANDARD_AH) { if (s >= required_ah) { next_standard_ah = s; break; } }
+  // 1e-9: 0.4 A x 24 h + 4.8 A x 5 min at 1.2 is 12.000000000000002 in floating point and must still pick 12 Ah.
+  for (const s of _BATTERY_STANDARD_AH) { if (s >= required_ah - 1e-9) { next_standard_ah = s; break; } }
   const notes = [];
-  if (d < 1) notes.push("Derate factor below 1 credits the battery rather than de-rating it (NFPA 72 expects an aging/derate >= 1.0; commonly 1.2).");
+  if (d < 1) notes.push("Derate factor below 1 credits the battery rather than de-rating it (NFPA 72-2022 10.6.7.2.1 requires a 1.25 aging correction; editions through 2019 used a 20% margin, 1.2).");
   if (next_standard_ah === null) notes.push("Required capacity exceeds the bundled standard-size list; enter a larger battery size.");
   notes.push("Per NFPA 72 §10.6 (secondary power) and the panel manufacturer's worksheet. The AHJ-adopted NFPA 72 edition, the listed panel, and the battery manufacturer's derating govern.");
   return { standby_ah, alarm_ah, required_ah, next_standard_ah, derate: d, notes };
 }
-export const standbyBatterySizingExample = { inputs: { standby_current_a: 0.5, standby_hours: 24, alarm_current_a: 2.0, alarm_minutes: 5, derate: 1.2 } };
+export const standbyBatterySizingExample = { inputs: { standby_current_a: 0.5, standby_hours: 24, alarm_current_a: 2.0, alarm_minutes: 5, derate: 1.25 } };
 
 function _renderStandbyBatterySizing(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Secondary (standby) battery sizing for a fire-alarm or security control unit - standby amp-hours plus alarm amp-hours times the aging/derate factor - per NFPA 72 National Fire Alarm and Signaling Code §10.6 (secondary power supply) and the panel manufacturer's battery-calculation worksheet, by name. The AHJ-adopted NFPA 72 edition, the listed panel, and the battery manufacturer's derating govern.";
@@ -636,10 +637,10 @@ function _renderStandbyBatterySizing(inputRegion, outputRegion, citationEl) {
   const hs = makeNumber("Standby period (h)", "sb-hs", { step: "any", min: "0", value: "24" });
   const ia = makeNumber("Alarm current (A)", "sb-ia", { step: "any", min: "0" });
   const ma = makeNumber("Alarm period (min)", "sb-ma", { step: "any", min: "0", value: "5" });
-  const d = makeNumber("Derate / aging factor", "sb-d", { step: "any", min: "0", value: "1.2" });
-  hs.input.value = "24"; ma.input.value = "5"; d.input.value = "1.2";
+  const d = makeNumber("Aging correction factor (1.25 per NFPA 72-2022)", "sb-d", { step: "any", min: "0", value: "1.25" });
+  hs.input.value = "24"; ma.input.value = "5"; d.input.value = "1.25";
   for (const f of [is, hs, ia, ma, d]) inputRegion.appendChild(f.wrap);
-  attachExampleButton(inputRegion, () => { is.input.value = "0.5"; hs.input.value = "24"; ia.input.value = "2.0"; ma.input.value = "5"; d.input.value = "1.2"; update(); });
+  attachExampleButton(inputRegion, () => { is.input.value = "0.5"; hs.input.value = "24"; ia.input.value = "2.0"; ma.input.value = "5"; d.input.value = "1.25"; update(); });
   const oReq = makeOutputLine(outputRegion, "Required capacity (Ah)", "sb-out-req");
   const oParts = makeOutputLine(outputRegion, "Standby / alarm contributions", "sb-out-parts");
   const oStd = makeOutputLine(outputRegion, "Next standard battery", "sb-out-std");
@@ -657,7 +658,7 @@ function _renderStandbyBatterySizing(inputRegion, outputRegion, citationEl) {
 LOWVOLTAGE_RENDERERS["standby-battery-sizing"] = _renderStandbyBatterySizing;
 
 // dims: in { battery_ah: I T, standby_current_a: I, alarm_current_a: I, alarm_minutes: T, derate: dimensionless } out: { standby_hours: T }
-export function computeStandbyBatteryRuntime({ battery_ah = 0, standby_current_a = 0, alarm_current_a = 0, alarm_minutes = 0, derate = 1.2 } = {}) {
+export function computeStandbyBatteryRuntime({ battery_ah = 0, standby_current_a = 0, alarm_current_a = 0, alarm_minutes = 0, derate = 1.25 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const Ah = Number(battery_ah), Is = Number(standby_current_a);
   const Ia = Number(alarm_current_a), Ma = Number(alarm_minutes);
@@ -674,10 +675,10 @@ export function computeStandbyBatteryRuntime({ battery_ah = 0, standby_current_a
   if (!(standby_hours > 0)) return { error: "Battery is too small to cover even the alarm load after derating; no standby time remains." };
   return {
     standby_hours, alarm_ah, usable_ah, derate: d,
-    note: "The standby (supervisory) time an installed battery supports before the alarm load, the inverse of the standby-battery-sizing tile: from required_Ah = (Is x Hs + Ia x Ma/60) x derate, Hs = (battery_Ah/derate - alarm_Ah) / Is. The derate (aging) factor is applied to the battery capacity, not credited, so the usable Ah is the nameplate divided by the derate (NFPA 72 expects >= 1.0, commonly 1.2). The alarm reserve (alarm current x alarm minutes) is subtracted first, then the remainder divides by the standby current. This is a design check against an NFPA 72 required standby period (commonly 24 h with 5 or 15 min of alarm); the AHJ-adopted edition, the listed panel, and the battery manufacturer's derating govern."
+    note: "The standby (supervisory) time an installed battery supports before the alarm load, the inverse of the standby-battery-sizing tile: from required_Ah = (Is x Hs + Ia x Ma/60) x derate, Hs = (battery_Ah/derate - alarm_Ah) / Is. The derate (aging) factor is applied to the battery capacity, not credited, so the usable Ah is the nameplate divided by the derate (NFPA 72-2022 10.6.7.2.1 sets a 1.25 aging correction; through the 2019 edition the margin was 20%, 1.2). The alarm reserve (alarm current x alarm minutes) is subtracted first, then the remainder divides by the standby current. This is a design check against an NFPA 72 required standby period (commonly 24 h with 5 or 15 min of alarm); the AHJ-adopted edition, the listed panel, and the battery manufacturer's derating govern."
   };
 }
-export const standbyBatteryRuntimeExample = { inputs: { battery_ah: 14.6, standby_current_a: 0.5, alarm_current_a: 2.0, alarm_minutes: 5, derate: 1.2 } };
+export const standbyBatteryRuntimeExample = { inputs: { battery_ah: 18, standby_current_a: 0.5, alarm_current_a: 2.0, alarm_minutes: 5, derate: 1.25 } };
 
 function _renderStandbyBatteryRuntime(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: secondary (standby) battery runtime for a fire-alarm or security control unit, the inverse of the sizing worksheet: Hs = (battery_Ah/derate - alarm_Ah) / standby_current, per NFPA 72 §10.6 (secondary power supply), by name. The AHJ-adopted NFPA 72 edition, the listed panel, and the battery manufacturer's derating govern.";
@@ -685,10 +686,10 @@ function _renderStandbyBatteryRuntime(inputRegion, outputRegion, citationEl) {
   const is = makeNumber("Standby (supervisory) current (A)", "sbr-is", { step: "any", min: "0" });
   const ia = makeNumber("Alarm current (A)", "sbr-ia", { step: "any", min: "0" });
   const ma = makeNumber("Alarm period (min)", "sbr-ma", { step: "any", min: "0", value: "5" });
-  const d = makeNumber("Derate / aging factor", "sbr-d", { step: "any", min: "0", value: "1.2" });
-  ma.input.value = "5"; d.input.value = "1.2";
+  const d = makeNumber("Aging correction factor (1.25 per NFPA 72-2022)", "sbr-d", { step: "any", min: "0", value: "1.25" });
+  ma.input.value = "5"; d.input.value = "1.25";
   for (const f of [ah, is, ia, ma, d]) inputRegion.appendChild(f.wrap);
-  attachExampleButton(inputRegion, () => { ah.input.value = "14.6"; is.input.value = "0.5"; ia.input.value = "2.0"; ma.input.value = "5"; d.input.value = "1.2"; update(); });
+  attachExampleButton(inputRegion, () => { ah.input.value = "18"; is.input.value = "0.5"; ia.input.value = "2.0"; ma.input.value = "5"; d.input.value = "1.25"; update(); });
   const oHrs = makeOutputLine(outputRegion, "Standby time supported", "sbr-out-hrs");
   const oNote = makeOutputLine(outputRegion, "Note", "sbr-out-note");
   const update = debounce(() => {

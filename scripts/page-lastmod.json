@@ -2,7 +2,7 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "24af2e0795fcfbbd",
+      "sha": "076581e53256ff26",
       "date": "2026-09-26"
     },
     "/tools/": {
@@ -30,8 +30,8 @@
       "date": "2026-09-18"
     },
     "/groups/electrical/": {
-      "sha": "66d2f35cb5e39dfd",
-      "date": "2026-09-25"
+      "sha": "6ae955ec134c72b4",
+      "date": "2026-09-26"
     },
     "/groups/field/": {
       "sha": "a12d41e8f437d804",
@@ -5858,8 +5858,8 @@
       "date": "2026-09-08"
     },
     "/tools/rain-load-ponding/": {
-      "sha": "01a5cd8e5101dec2",
-      "date": "2026-09-01"
+      "sha": "8c4d78483f8d19c7",
+      "date": "2026-09-26"
     },
     "/tools/rain-on-snow-surcharge/": {
       "sha": "74315c8c8022a449",
@@ -5982,8 +5982,8 @@
       "date": "2026-09-01"
     },
     "/tools/rebar/": {
-      "sha": "6b60928d632b51b7",
-      "date": "2026-09-01"
+      "sha": "4420140d235ba703",
+      "date": "2026-09-26"
     },
     "/tools/rebar-chair-count/": {
       "sha": "0ecf7671627c5d68",
@@ -7298,8 +7298,8 @@
       "date": "2026-09-01"
     },
     "/tools/stairs/": {
-      "sha": "63b968ede23ff455",
-      "date": "2026-09-01"
+      "sha": "1797591e7691299e",
+      "date": "2026-09-26"
     },
     "/tools/stairwell-pressurization/": {
       "sha": "77562858657a8cff",
@@ -7310,12 +7310,12 @@
       "date": "2026-09-04"
     },
     "/tools/standby-battery-runtime/": {
-      "sha": "0f8541b70b427b92",
-      "date": "2026-09-01"
+      "sha": "af217420a1788591",
+      "date": "2026-09-26"
     },
     "/tools/standby-battery-sizing/": {
-      "sha": "a353bb9b40179bbe",
-      "date": "2026-09-01"
+      "sha": "6f0b1724bf868c45",
+      "date": "2026-09-26"
     },
     "/tools/standing-seam-takeoff/": {
       "sha": "0933daea6bc654b9",

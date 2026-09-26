@@ -5119,28 +5119,32 @@ CONSTRUCTION_RENDERERS["ridge-cap-fasteners"] = renderRidgeCapFasteners;
 
 // ===================== spec-v224: roof rain load and ponding head (ASCE 7 Ch. 8) =====================
 
-// dims: in { static_head_in: L, hydraulic_head_in: L, roof_area_ft2: L^2, rainfall_in_hr: L T^-1 } out: { rain_load_psf: M L^-1 T^-2, design_flow_gpm: L^3 T^-1 }
-export function computeRainLoadPonding({ static_head_in = 0, hydraulic_head_in = 0, roof_area_ft2 = 0, rainfall_in_hr = 0 } = {}) {
+// dims: in { static_head_in: L, hydraulic_head_in: L, ponding_head_in: L, roof_area_ft2: L^2, rainfall_in_hr: L T^-1 } out: { rain_load_psf: M L^-1 T^-2, design_flow_gpm: L^3 T^-1 }
+export function computeRainLoadPonding({ static_head_in = 0, hydraulic_head_in = 0, ponding_head_in = 0, roof_area_ft2 = 0, rainfall_in_hr = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
-  if (static_head_in < 0 || hydraulic_head_in < 0) return { error: "Head cannot be negative (in)." };
+  if (static_head_in < 0 || hydraulic_head_in < 0 || ponding_head_in < 0) return { error: "Head cannot be negative (in)." };
   if (roof_area_ft2 < 0) return { error: "Roof area cannot be negative (ft^2)." };
   if (rainfall_in_hr < 0) return { error: "Rainfall cannot be negative (in/hr)." };
-  const rain_load_psf = 5.2 * (static_head_in + hydraulic_head_in);
+  // ASCE 7-22 Eq. 8.2-1 adds the ponding head dp, the water the roof's own deflection under the
+  // unfactored rain load collects; it replaced 7-16's separate ponding-instability check. Until
+  // 2026-09-25 the tile computed the 7-16 R = 5.2 (ds + dh). dp defaults to 0, a rigid roof.
+  const rain_load_psf = 5.2 * (static_head_in + hydraulic_head_in + ponding_head_in);
   const design_flow_gpm = roof_area_ft2 > 0 && rainfall_in_hr > 0
     ? 0.0104 * roof_area_ft2 * rainfall_in_hr
     : null;
   return {
     rain_load_psf, design_flow_gpm,
-    note: "ASCE 7 Ch. 8: rain load R = 5.2 x (ds + dh), where ds is the static head to the secondary (overflow) inlet and dh is the hydraulic head above it at design flow (5.2 psf per inch of water). The hydraulic head dh comes from the secondary drain or scupper's flow capacity at the design flow (a manufacturer or weir relation, entered here, not a bundled chart). The optional design flow Q = 0.0104 x area x rainfall (IPC) uses the 100-year hourly intensity for the site. A roof too flexible to shed the water must also pass the ASCE 7 §8.4 ponding-instability check. A load and flow aid, not a stamped roof-drainage design.",
+    note: "ASCE 7-22 Ch. 8: rain load R = 5.2 x (ds + dh + dp), where ds is the static head to the secondary (overflow) inlet, dh is the hydraulic head above it at design flow, and dp is the ponding head from the roof's deflection under the unfactored rain load (5.2 psf per inch of water; ASCE 7-16 omitted dp and checked ponding instability separately). The hydraulic head dh comes from the secondary drain or scupper's flow capacity at the design flow (a manufacturer or weir relation, entered here, not a bundled chart). The optional design flow Q = 0.0104 x area x rainfall (IPC) uses the 100-year hourly intensity for the site. A roof too flexible to shed the water must also pass the ASCE 7 §8.4 ponding-instability check. A load and flow aid, not a stamped roof-drainage design.",
   };
 }
-export const rainLoadPondingExample = { inputs: { static_head_in: 2, hydraulic_head_in: 1, roof_area_ft2: 2000, rainfall_in_hr: 3 } };
+export const rainLoadPondingExample = { inputs: { static_head_in: 2, hydraulic_head_in: 1, ponding_head_in: 0, roof_area_ft2: 2000, rainfall_in_hr: 3 } };
 CONSTRUCTION_RENDERERS["rain-load-ponding"] = _simpleRenderer({
-  citation: "Citation: ASCE 7 Ch. 8 rain load R = 5.2 x (ds + dh), the static head ds to the secondary inlet plus the hydraulic head dh above it at design flow, and the IPC roof-drainage design flow Q = 0.0104 x area x rainfall (by name). The hydraulic head comes from the secondary drain/scupper capacity; the design rainfall is the 100-year hourly intensity. A flat roof must also pass the §8.4 ponding-instability check. A load and flow aid, not a stamped design.",
+  citation: "Citation: ASCE 7-22 Ch. 8 rain load R = 5.2 x (ds + dh + dp), the static head ds to the secondary inlet, the hydraulic head dh above it at design flow, and the ponding head dp from roof deflection (7-16 omitted dp), and the IPC roof-drainage design flow Q = 0.0104 x area x rainfall (by name). The hydraulic head comes from the secondary drain/scupper capacity; the design rainfall is the 100-year hourly intensity. A flat roof must also pass the §8.4 ponding-instability check. A load and flow aid, not a stamped design.",
   example: rainLoadPondingExample.inputs,
   fields: [
     { key: "static_head_in", label: "Static head to secondary inlet ds (in)", kind: "number" },
     { key: "hydraulic_head_in", label: "Hydraulic head at design flow dh (in)", kind: "number" },
+    { key: "ponding_head_in", label: "Ponding head from roof deflection dp (in, ASCE 7-22)", kind: "number", default: 0 },
     { key: "roof_area_ft2", label: "Tributary roof area (ft², optional)", kind: "number", default: 0 },
     { key: "rainfall_in_hr", label: "Design rainfall (in/hr, optional)", kind: "number", default: 0 },
   ],

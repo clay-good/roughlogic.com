@@ -25706,6 +25706,36 @@
   {
    "tile_id": "standby-battery-sizing",
    "source_publisher": "NFPA 72 \u00a710.6 (by name)",
+   "source_title": "Ah = [(I_standby * h_standby) + (I_alarm * h_alarm)] * 1.25 aging correction",
+   "source_edition_or_year": "NFPA 72-2022 10.6.7.2.1 (machine-verified)",
+   "source_section_or_page": "0.5 A x 24 h + 2.0 A x 5 min, x 1.25 -> (12 + 0.1667) x 1.25 = 15.21 Ah -> 18 Ah",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "standby_current_a": 0.5,
+    "standby_hours": 24,
+    "alarm_current_a": 2,
+    "alarm_minutes": 5,
+    "derate": 1.25
+   },
+   "outputs": {
+    "required_ah": {
+     "value": 15.2083,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "next_standard_ah": {
+     "value": 18,
+     "tolerance": {
+      "abs": 0
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "standby-battery-sizing",
+   "source_publisher": "NFPA 72 \u00a710.6 (by name)",
    "source_title": "Ah = [(I_standby * h_standby) + (I_alarm * h_alarm)] * derate",
    "source_edition_or_year": "NFPA 72 (AHJ-adopted edition governs)",
    "source_section_or_page": "0.5 A x 24 h + 2.0 A x 5 min, derate 1.2 -> (12 + 0.1667) * 1.2 = 14.6 Ah",
@@ -25727,6 +25757,30 @@
     },
     "next_standard_ah": {
      "value": 18,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "standby-battery-runtime",
+   "source_publisher": "NFPA 72 \u00a710.6 (by name), inverse",
+   "source_title": "Hs = (battery_Ah/1.25 - alarm_Ah) / I_standby",
+   "source_edition_or_year": "NFPA 72-2022 10.6.7.2.1 (machine-verified)",
+   "source_section_or_page": "18 Ah, 0.5 A standby, 2 A / 5 min alarm, 1.25 aging correction -> 28.47 h (round-trips standby-battery-sizing)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "battery_ah": 18,
+    "standby_current_a": 0.5,
+    "alarm_current_a": 2,
+    "alarm_minutes": 5,
+    "derate": 1.25
+   },
+   "outputs": {
+    "standby_hours": {
+     "value": 28.4667,
      "tolerance": {
       "abs": 0.001
      }

@@ -15451,6 +15451,9 @@ test("bounds: spec-v224 computeRainLoadPonding pins rain load, design flow, the 
   assert.strictEqual(r2.design_flow_gpm, null);
   // Zero total head is allowed.
   assert.strictEqual(_v224({ static_head_in: 0, hydraulic_head_in: 0 }).rain_load_psf, 0);
+  // ASCE 7-22 Eq. 8.2-1 adds the ponding head dp: 2 + 1 + 0.5 in -> 5.2 x 3.5 = 18.2 psf.
+  assert.ok(Math.abs(_v224({ static_head_in: 2, hydraulic_head_in: 1, ponding_head_in: 0.5 }).rain_load_psf - 18.2) < 1e-9);
+  assert.ok("error" in _v224({ static_head_in: 2, hydraulic_head_in: 1, ponding_head_in: -0.5 }));
   // Error seams.
   assert.ok("error" in _v224({ static_head_in: -1, hydraulic_head_in: 1 }));
   assert.ok("error" in _v224({ static_head_in: 2, hydraulic_head_in: -1 }));
