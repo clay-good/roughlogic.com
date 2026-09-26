@@ -31938,6 +31938,36 @@
    }
   },
   {
+   "tile_id": "projector-max-screen-size",
+   "source_publisher": "ProjectorCentral (M. David Stone)",
+   "source_title": "A Simple Guide to Calculating Lumens",
+   "source_edition_or_year": "October 11, 2019",
+   "source_section_or_page": "run in reverse: 16 ft-L x 35.9 sq ft / gain 1 = 574 lumens; 574 lumens returns a 35.9 sq ft 16:9 screen (the 110-inch diagonal)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "available_lumens": 574,
+    "screen_gain": 1,
+    "target_foot_lamberts": 16,
+    "aspect_w": 16,
+    "aspect_h": 9
+   },
+   "outputs": {
+    "max_area_sqft": {
+     "value": 35.9,
+     "tolerance": {
+      "abs": 0.05
+     }
+    },
+    "max_diagonal_ft": {
+     "value": 9.167,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
    "tile_id": "eyring-reverberation",
    "source_publisher": "C.F. Eyring reverberation equation (J. Acoust. Soc. Am. 1930, public domain)",
    "source_title": "5,000 ft^3, 1,300 ft^2, a_bar 0.30 -> 0.53 s (Eyring) vs 0.63 s (Sabine) (spec-v1224)",
@@ -38145,6 +38175,27 @@
      "value": 18.692,
      "tolerance": {
       "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "sprinkler-gpm-for-precip",
+   "source_publisher": "Rain Bird",
+   "source_title": "Irrigation Design Tip: Calculating Precipitation Rates, Example 3",
+   "source_edition_or_year": "web design tip",
+   "source_section_or_page": "run in reverse: four corner spray heads, 2.4 gpm over 11 x 12 ft -> 1.75 in/h; 1.75 in/h over 132 ft2 returns 2.4 gpm",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "target_precip_in_hr": 1.75,
+    "zone_ft2": 132
+   },
+   "outputs": {
+    "required_gpm": {
+     "value": 2.4,
+     "tolerance": {
+      "abs": 0.005
      }
     }
    }
@@ -61695,6 +61746,30 @@
      "value": 0.0247,
      "tolerance": {
       "abs": 0.0002
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "rc-column-steel-for-load",
+   "source_publisher": "StructurePoint",
+   "source_title": "reinforced concrete column axial capacity example (ACI 318), Section 1",
+   "source_edition_or_year": "web publication",
+   "source_section_or_page": "run in reverse: 16 x 16, f'c 5,000, eight #9 (8.00 in2) -> phi Pn,max 797.7 kips; 797.7 kips returns Ast = 8.00 in2",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "target_load_kip": 797.7,
+    "b_in": 16,
+    "h_in": 16,
+    "fc_psi": 5000,
+    "fy_psi": 60000
+   },
+   "outputs": {
+    "ast_required_in2": {
+     "value": 8,
+     "tolerance": {
+      "abs": 0.005
      }
     }
    }

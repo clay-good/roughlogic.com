@@ -6,6 +6,8 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Changed
 
+- **Three more inverse tiles now carry a printed example, run in reverse from a sibling's:** `rc-column-steel-for-load` (StructurePoint, 8.00 in2), `sprinkler-gpm-for-precip` (Rain Bird, 2.4 gpm) and `projector-max-screen-size` (ProjectorCentral, 35.9 sq ft). README: 1,097 of 2,183 tiles are checked only against the project's own derivation; 1,086 carry an outside source.
+
 - **Ten inverse tiles now carry a printed example, each run in reverse from the example that already checks its forward sibling.** Each one returns the printed input it was solved for:
   - `concrete-strength-from-modulus` and `concrete-strength-from-rupture`: 4,350 psi.
   - `concrete-depth-for-cracking-moment`: 20 in.
