@@ -39333,6 +39333,60 @@
    }
   },
   {
+   "tile_id": "hanger-rod-sizing",
+   "source_publisher": "National Pipe Hanger Corp. (per MSS SP-58)",
+   "source_title": "Fig. 755 Continuous Threaded Rod",
+   "source_edition_or_year": "March 20, 2025",
+   "source_section_or_page": "max recommended loads: 3/8 in. 730 lb (the MSS SP-58 minimum size), 1/2 in. 1350 lb, 3/4 in. 3230 lb",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "load_lb": 1300,
+    "temp_derate": 1
+   },
+   "outputs": {
+    "rod_dia": {
+     "value": "1/2",
+     "tolerance": {
+      "abs": 0
+     }
+    },
+    "rated_lb": {
+     "value": 1350,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "hanger-rod-sizing",
+   "source_publisher": "National Pipe Hanger Corp. (per MSS SP-58)",
+   "source_title": "Fig. 755 Continuous Threaded Rod",
+   "source_edition_or_year": "March 20, 2025",
+   "source_section_or_page": "3000 lb -> 3/4 in. rod at 3230 lb",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "load_lb": 3000,
+    "temp_derate": 1
+   },
+   "outputs": {
+    "rod_dia": {
+     "value": "3/4",
+     "tolerance": {
+      "abs": 0
+     }
+    },
+    "rated_lb": {
+     "value": 3230,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
    "tile_id": "radiant-loop-sizing",
    "source_publisher": "First-principles; ASHRAE HVAC Systems and Equipment / Radiant Panel Association (by name)",
    "source_title": "300 ft^2 at 6 in o.c., 9,000 Btu/hr, 1/2 in PEX (300 ft), 20 F dT -> 600 ft, 2 loops, 0.45 GPM/loop",
@@ -39785,6 +39839,34 @@
      "value": 33.25,
      "tolerance": {
       "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "expansion-guide-spacing",
+   "source_publisher": "Metraflex",
+   "source_title": "Expansion Joint Design Guide (Catalog MEJ09)",
+   "source_edition_or_year": "2004",
+   "source_section_or_page": "p. 17 example, 6 in. pipe: 1st guide 4 x pipe dia. = 24 in.; 2nd guide 14 x pipe dia. = 7 ft beyond the first (Metraflex multiplies the nominal size)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "pipe_od_in": 6,
+    "d1_mult": 4,
+    "d2_mult": 14
+   },
+   "outputs": {
+    "first_guide_in": {
+     "value": 24,
+     "tolerance": {
+      "abs": 0.005
+     }
+    },
+    "second_guide_in": {
+     "value": 84,
+     "tolerance": {
+      "abs": 0.005
      }
     }
    }
@@ -40397,6 +40479,52 @@
      "value": 0.2434,
      "tolerance": {
       "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "conduit-thermal-expansion",
+   "source_publisher": "Mike Holt Enterprises",
+   "source_title": "Understanding the 2020 NEC, Vol. 1, Table 352.44 (reproduced)",
+   "source_edition_or_year": "2020 NEC",
+   "source_section_or_page": "PVC expansion per 100 ft: 50 F -> 2.03 in.",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "run_length_ft": 100,
+    "temp_change_f": 50,
+    "coeff_in_per_in_f": 3.38e-05,
+    "trigger_in": 0.25
+   },
+   "outputs": {
+    "delta_l_in": {
+     "value": 2.03,
+     "tolerance": {
+      "abs": 0.005
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "conduit-thermal-expansion",
+   "source_publisher": "Mike Holt Enterprises",
+   "source_title": "Understanding the 2020 NEC, Vol. 1, Table 352.44 (reproduced)",
+   "source_edition_or_year": "2020 NEC",
+   "source_section_or_page": "PVC expansion per 100 ft: 90 F -> 3.65 in.",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "run_length_ft": 100,
+    "temp_change_f": 90,
+    "coeff_in_per_in_f": 3.38e-05,
+    "trigger_in": 0.25
+   },
+   "outputs": {
+    "delta_l_in": {
+     "value": 3.65,
+     "tolerance": {
+      "abs": 0.005
      }
     }
    }
@@ -42880,6 +43008,28 @@
    }
   },
   {
+   "tile_id": "motor-acceleration-time",
+   "source_publisher": "Twin City Fan",
+   "source_title": "FE-1800, Selecting AC Motors Capable of Overcoming Fan Inertia",
+   "source_edition_or_year": "2021",
+   "source_section_or_page": "Example 3: t = 541.5 x 1780 / (308 x 177 x 1.5) = 11.79 seconds",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "inertia_lbft2": 541.5,
+    "speed_change_rpm": 1780,
+    "net_accel_torque_lbft": 265.5
+   },
+   "outputs": {
+    "accel_time_s": {
+     "value": 11.79,
+     "tolerance": {
+      "abs": 0.005
+     }
+    }
+   }
+  },
+  {
    "tile_id": "motor-rms-hp",
    "source_publisher": "Motor duty-cycle RMS horsepower (NEMA MG-1 practice)",
    "source_title": "20 HP run 10 s, 0 HP idle 20 s, cooling factor 3 -> 15.49 HP_rms",
@@ -43120,6 +43270,48 @@
    }
   },
   {
+   "tile_id": "soil-resistivity-wenner",
+   "source_publisher": "Megger",
+   "source_title": "Getting Down to Earth (GDTE2020)",
+   "source_edition_or_year": "2018",
+   "source_section_or_page": "Wenner example: A = 4 ft = 122 cm, 2 x 3.14 x 122 = 766, R 60 ohm -> 45,960 ohm-cm (rounded intermediates)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "probe_spacing_ft": 4,
+    "meter_resistance_ohm": 60
+   },
+   "outputs": {
+    "resistivity_ohm_cm": {
+     "value": 45960,
+     "tolerance": {
+      "pct": 0.1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "soil-resistivity-wenner",
+   "source_publisher": "AEMC (via itm.com)",
+   "source_title": "Understanding Soil Resistivity Testing",
+   "source_edition_or_year": "web reproduction",
+   "source_section_or_page": "A = 10 ft (305 cm), R 3.4 ohm -> 2 pi (305)(3.4) = 6515 ohm-cm (AEMC rounds to 30.5 cm/ft)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "probe_spacing_ft": 10,
+    "meter_resistance_ohm": 3.4
+   },
+   "outputs": {
+    "resistivity_ohm_cm": {
+     "value": 6515,
+     "tolerance": {
+      "pct": 0.1
+     }
+    }
+   }
+  },
+  {
    "tile_id": "pv-ac-output-circuit",
    "source_publisher": "inverter AC output sizing (NEC 690.8(B))",
    "source_title": "9.6 kW inverter, 240 V single-phase -> 40 A, 50 A conductor, 50 A OCPD",
@@ -43182,6 +43374,74 @@
    }
   },
   {
+   "tile_id": "pv-ac-output-circuit",
+   "source_publisher": "IAEI Magazine (John Wiles)",
+   "source_title": "Making the AC Utility Connection",
+   "source_edition_or_year": "November 2009 (2008 NEC 690.8)",
+   "source_section_or_page": "3500 W / 240 V = 14.58 A; 125% of 14.58 = 18.2 A -> 20 A breaker",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "ac_power_w": 3500,
+    "ac_voltage_v": 240,
+    "phases": 1
+   },
+   "outputs": {
+    "continuous_current_a": {
+     "value": 14.58,
+     "tolerance": {
+      "abs": 0.005
+     }
+    },
+    "min_conductor_ampacity_a": {
+     "value": 18.2,
+     "tolerance": {
+      "abs": 0.05
+     }
+    },
+    "ocpd_a": {
+     "value": 20,
+     "tolerance": {
+      "abs": 0
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "pv-ac-output-circuit",
+   "source_publisher": "IAEI Magazine (John Wiles)",
+   "source_title": "Making the AC Utility Connection",
+   "source_edition_or_year": "November 2009 (2008 NEC 690.8)",
+   "source_section_or_page": "4500 W / 240 V = 18.75 A; 1.25 x 18.75 = 23.43 A -> 25 A breaker",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "ac_power_w": 4500,
+    "ac_voltage_v": 240,
+    "phases": 1
+   },
+   "outputs": {
+    "continuous_current_a": {
+     "value": 18.75,
+     "tolerance": {
+      "abs": 0.005
+     }
+    },
+    "min_conductor_ampacity_a": {
+     "value": 23.43,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "ocpd_a": {
+     "value": 25,
+     "tolerance": {
+      "abs": 0
+     }
+    }
+   }
+  },
+  {
    "tile_id": "battery-inverter-dc-conductor",
    "source_publisher": "battery-inverter DC sizing (NEC 690.8(B) / 706)",
    "source_title": "4 kW inverter, 48 V bank, 90% eff -> 92.6 A DC, 115.7 A conductor, 125 A OCPD",
@@ -43239,6 +43499,28 @@
      "value": 250,
      "tolerance": {
       "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "battery-inverter-dc-conductor",
+   "source_publisher": "IAEI Magazine (John Wiles)",
+   "source_title": "Perspectives on PV: Conductor Sizing and Overcurrent Device Ratings",
+   "source_edition_or_year": "January/February 2011",
+   "source_section_or_page": "4000 W / 44 V (lowest battery voltage at full power) / 0.85 = 107 A",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "inverter_power_w": 4000,
+    "battery_voltage_v": 44,
+    "efficiency_pct": 85
+   },
+   "outputs": {
+    "dc_current_a": {
+     "value": 107,
+     "tolerance": {
+      "abs": 0.5
      }
     }
    }
@@ -43421,6 +43703,69 @@
    }
   },
   {
+   "tile_id": "microinverter-branch-count",
+   "source_publisher": "Enphase Energy",
+   "source_title": "IQ8 Series Microinverters data sheet (DSH-00207-5.0)",
+   "source_edition_or_year": "2025-08-14",
+   "source_section_or_page": "IQ8-60-2-US, 1.0 A max continuous output -> 16 units per 20 A branch",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "branch_ocpd_a": 20,
+    "unit_max_current_a": 1.0
+   },
+   "outputs": {
+    "max_microinverters": {
+     "value": 16,
+     "tolerance": {
+      "abs": 0
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "microinverter-branch-count",
+   "source_publisher": "Enphase Energy",
+   "source_title": "IQ8 Series Microinverters data sheet (DSH-00412-5.0)",
+   "source_edition_or_year": "2025-10-10",
+   "source_section_or_page": "IQ8M-72-2-US, 1.35 A -> 11 units; IQ8HC 1.58 A at 240 V -> 10",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "branch_ocpd_a": 20,
+    "unit_max_current_a": 1.35
+   },
+   "outputs": {
+    "max_microinverters": {
+     "value": 11,
+     "tolerance": {
+      "abs": 0
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "microinverter-branch-count",
+   "source_publisher": "Enphase Energy",
+   "source_title": "IQ8 Series Microinverters data sheet (DSH-00412-5.0)",
+   "source_edition_or_year": "2025-10-10",
+   "source_section_or_page": "IQ8HC at 208 V, 1.73 A -> 9 units per 20 A branch",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "branch_ocpd_a": 20,
+    "unit_max_current_a": 1.73
+   },
+   "outputs": {
+    "max_microinverters": {
+     "value": 9,
+     "tolerance": {
+      "abs": 0
+     }
+    }
+   }
+  },
+  {
    "tile_id": "joist-cantilever-check",
    "source_publisher": "IRC 2021 Table R507.6 deck-joist cantilever",
    "source_title": "10 ft backspan, 3 ft overhang -> max 2.5 ft, EXCEEDS",
@@ -43529,6 +43874,44 @@
    }
   },
   {
+   "tile_id": "joist-notch-bore-limit",
+   "source_publisher": "City of Richmond, KY (building inspection)",
+   "source_title": "Cutting, Drilling, and Notching (handout)",
+   "source_edition_or_year": "2018 Kentucky Residential Code (IRC R502.8.1 / R602.6)",
+   "source_section_or_page": "p. 1 table, 2x10: max notch depth 1-1/2 in., max end notch 2-5/16 in., max bored hole 3-1/16 in. (rounded down to 1/16 in.)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "joist_depth_in": 9.25
+   },
+   "outputs": {
+    "notch_depth_max_in": {
+     "value": 1.5,
+     "tolerance": {
+      "abs": 0.07
+     }
+    },
+    "end_notch_max_in": {
+     "value": 2.3125,
+     "tolerance": {
+      "abs": 0.07
+     }
+    },
+    "bore_dia_max_in": {
+     "value": 3.0625,
+     "tolerance": {
+      "abs": 0.07
+     }
+    },
+    "bore_edge_min_in": {
+     "value": 2,
+     "tolerance": {
+      "abs": 0.005
+     }
+    }
+   }
+  },
+  {
    "tile_id": "stud-notch-bore-limit",
    "source_publisher": "wall stud notch/bore limits (IRC R602.6)",
    "source_title": "2x6 stud (5.5 in) -> notch 1.375 bearing, bore 2.20 single, 3.30 doubled",
@@ -43582,6 +43965,70 @@
      "value": 1.4,
      "tolerance": {
       "abs": 0.001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "stud-notch-bore-limit",
+   "source_publisher": "City of Richmond, KY (building inspection)",
+   "source_title": "Cutting, Drilling, and Notching (handout)",
+   "source_edition_or_year": "2018 Kentucky Residential Code (IRC R502.8.1 / R602.6)",
+   "source_section_or_page": "p. 2 table, 2x4: bearing notch 7/8 in. (25%), nonbearing notch 1-3/8 in. (40%), bearing bore 1-7/16 in. (40%), nonbearing bore 2-1/8 in. (60%); fractions to 1/16 in.",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "stud_width_in": 3.5
+   },
+   "outputs": {
+    "notch_max_bearing_in": {
+     "value": 0.875,
+     "tolerance": {
+      "abs": 0.07
+     }
+    },
+    "notch_max_nonbearing_in": {
+     "value": 1.375,
+     "tolerance": {
+      "abs": 0.07
+     }
+    },
+    "bore_single_max_in": {
+     "value": 1.4375,
+     "tolerance": {
+      "abs": 0.07
+     }
+    },
+    "bore_doubled_max_in": {
+     "value": 2.125,
+     "tolerance": {
+      "abs": 0.07
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "stud-notch-bore-limit",
+   "source_publisher": "City of Richmond, KY (building inspection)",
+   "source_title": "Cutting, Drilling, and Notching (handout)",
+   "source_edition_or_year": "2018 Kentucky Residential Code (IRC R502.8.1 / R602.6)",
+   "source_section_or_page": "p. 2 table, 2x6: bearing notch 1-3/8 in., nonbearing bore 3-5/16 in. (60%)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "stud_width_in": 5.5
+   },
+   "outputs": {
+    "notch_max_bearing_in": {
+     "value": 1.375,
+     "tolerance": {
+      "abs": 0.07
+     }
+    },
+    "bore_doubled_max_in": {
+     "value": 3.3125,
+     "tolerance": {
+      "abs": 0.07
      }
     }
    }
@@ -43750,6 +44197,54 @@
      "value": 59,
      "tolerance": {
       "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "slab-dowel-schedule",
+   "source_publisher": "American Concrete Institute",
+   "source_title": "ACI 302.1R-04 Guide for Concrete Floor and Slab Construction, Table 3.1",
+   "source_edition_or_year": "2004",
+   "source_section_or_page": "p. 302.1R-13: 5 to 6 in. slab -> 3/4 x 14 in. round dowels at 12 in.",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "joint_length_ft": 40,
+    "slab_thickness_in": 6,
+    "dowel_spacing_in": 12,
+    "edge_clearance_in": 12,
+    "num_joints": 1
+   },
+   "outputs": {
+    "dowel_diameter_in": {
+     "value": 0.75,
+     "tolerance": {
+      "abs": 0.0005
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "slab-dowel-schedule",
+   "source_publisher": "American Concrete Institute",
+   "source_title": "ACI 302.1R-04 Guide for Concrete Floor and Slab Construction, Table 3.1",
+   "source_edition_or_year": "2004",
+   "source_section_or_page": "7 to 8 in. slab -> 1 x 16 in. round dowels at 12 in.",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "joint_length_ft": 40,
+    "slab_thickness_in": 8,
+    "dowel_spacing_in": 12,
+    "edge_clearance_in": 12,
+    "num_joints": 1
+   },
+   "outputs": {
+    "dowel_diameter_in": {
+     "value": 1,
+     "tolerance": {
+      "abs": 0.0005
      }
     }
    }
@@ -53638,6 +54133,34 @@
    }
   },
   {
+   "tile_id": "consolidation-time-rate",
+   "source_publisher": "University of the West of England (GeoCal)",
+   "source_title": "Consolidation: prediction of time for given settlement",
+   "source_edition_or_year": "web course notes",
+   "source_section_or_page": "example (a): d = 2.5 m, cv 0.955 mm^2/min, T90 0.848 -> t90 = 5.55 x 10^6 min = 10.55 yr (entered as cv 0.014802 ft^2/day, Hdr 8.2021 ft)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "u_percent": 90,
+    "cv_ft2_day": 0.0148025,
+    "hdr_ft": 8.2021
+   },
+   "outputs": {
+    "tv": {
+     "value": 0.848,
+     "tolerance": {
+      "abs": 0.0005
+     }
+    },
+    "t_years": {
+     "value": 10.55,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
    "tile_id": "coefficient-of-consolidation",
    "source_publisher": "Das, Principles of Geotechnical Engineering / Holtz-Kovacs / Terzaghi",
    "source_title": "Casagrande log-time: 1 in specimen, two-way drainage (Hdr 0.5 in), t50 5 min -> cv 0.0985 ft^2/day (spec-v1207)",
@@ -58124,6 +58647,66 @@
      "value": 1.2894,
      "tolerance": {
       "pct": 0.1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "soil-settlement-elastic",
+   "source_publisher": "US Army Corps of Engineers",
+   "source_title": "EM 1110-1-1904, Settlement Analysis",
+   "source_edition_or_year": "30 September 1990",
+   "source_section_or_page": "Section 3-10 / Table 3-4: q 2 tsf (4 ksf), B 10 ft, Es 175 tsf (350 ksf), nu 0.4, Ic 0.7 -> 0.067 ft or 0.81 inch at the center",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "q_ksf": 4,
+    "b_ft": 10,
+    "es_ksf": 350,
+    "nu": 0.4,
+    "is_f": 0.7
+   },
+   "outputs": {
+    "se_ft": {
+     "value": 0.067,
+     "tolerance": {
+      "abs": 0.0005
+     }
+    },
+    "se_in": {
+     "value": 0.81,
+     "tolerance": {
+      "abs": 0.005
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "soil-settlement-elastic",
+   "source_publisher": "US Army Corps of Engineers",
+   "source_title": "EM 1110-1-1904, Settlement Analysis",
+   "source_edition_or_year": "30 September 1990",
+   "source_section_or_page": "same footing at the edge, Ie 0.4 -> 0.038 ft or 0.46 inch",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "q_ksf": 4,
+    "b_ft": 10,
+    "es_ksf": 350,
+    "nu": 0.4,
+    "is_f": 0.4
+   },
+   "outputs": {
+    "se_ft": {
+     "value": 0.038,
+     "tolerance": {
+      "abs": 0.0005
+     }
+    },
+    "se_in": {
+     "value": 0.46,
+     "tolerance": {
+      "abs": 0.005
      }
     }
    }

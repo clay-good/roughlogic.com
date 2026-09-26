@@ -4900,14 +4900,14 @@ export const CITATIONS = {
     ],
   },
   "stud-notch-bore-limit": {
-    formula: "notch_max_bearing = 0.25 x stud_width; notch_max_nonbearing = 0.40 x stud_width; bore_single_max = 0.40 x stud_width; bore_doubled_max = 0.60 x stud_width; edge_min = 0.625 in (5/8 in).",
+    formula: "notch_max_bearing = 0.25 x stud_width; notch_max_nonbearing = 0.40 x stud_width; bore_single_max = 0.40 x stud_width (a single stud in an exterior wall or bearing partition); bore_doubled_max = 0.60 x stud_width (any stud; an exterior or bearing stud bored past 40% must be doubled); edge_min = 0.625 in (5/8 in).",
     edition: "IRC R602.6 wall-stud notching and boring limits, by name; the percentages apply to the actual stud width. The AHJ-adopted IRC edition governs.",
     freeAccess: "The percentage limits are prescriptive IRC R602.6 values (many jurisdictions post the adopted IRC); the tile applies them to the entered actual stud width.",
     governance: GOVERNANCE.general,
-    editionNote: "IRC R602.6 limits on notching and boring wall studs, applied to the ACTUAL stud width (a 2x4 is 3.5 in, a 2x6 is 5.5 in). A notch may not exceed 25% of the width in a bearing or exterior wall, or 40% in a nonbearing wall. A bored hole may not exceed 40% of the width in a single stud, or 60% if the stud is doubled (and no more than two successive doubled studs are bored to 60%). The edge of the hole must be at least 5/8 in from the edge of the stud, and a bored hole may not be located in the same cross section as a cut or notch. These are the prescriptive limits for conventional light-frame construction; a designated plumbing or mechanical wall, an engineered stud, a tall wall, or a braced/shear wall may be more restrictive, and the AHJ-adopted code and any engineering govern.",
+    editionNote: "IRC R602.6 limits on notching and boring wall studs, applied to the ACTUAL stud width (a 2x4 is 3.5 in, a 2x6 is 5.5 in). A notch may not exceed 25% of the width in a bearing or exterior wall, or 40% in a nonbearing wall. A bored hole may not exceed 60% of the width in any stud, and a stud in an exterior wall or bearing partition bored over 40% must be doubled (and no more than two successive doubled studs are bored to 60%). The edge of the hole must be at least 5/8 in from the edge of the stud, and a bored hole may not be located in the same cross section as a cut or notch. These are the prescriptive limits for conventional light-frame construction; a designated plumbing or mechanical wall, an engineered stud, a tall wall, or a braced/shear wall may be more restrictive, and the AHJ-adopted code and any engineering govern.",
     assumptions: [
       { name: "Actual width", value: "percentages apply to the actual dressed width (2x4 = 3.5 in, 2x6 = 5.5 in), not the nominal", source: "IRC R602.6" },
-      { name: "Doubled stud / edge", value: "bore up to 60% only on a doubled stud (<=2 successive); hole edge >= 5/8 in; not in the same section as a notch", source: "IRC R602.6" },
+      { name: "Doubled stud / edge", value: "bore up to 60% in any stud; an exterior or bearing stud bored over 40% is doubled (<=2 successive); hole edge >= 5/8 in; not in the same section as a notch", source: "IRC R602.6" },
     ],
   },
   "joist-notch-bore-limit": {

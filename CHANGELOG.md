@@ -6,6 +6,13 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Changed
 
+- **Thirteen more tiles now carry a publisher's printed example or table.**
+  - **Electrical:** `conduit-thermal-expansion` (NEC Table 352.44, via Mike Holt); `soil-resistivity-wenner` (Megger and AEMC); `pv-ac-output-circuit` and `battery-inverter-dc-conductor` (IAEI, John Wiles); `microinverter-branch-count` (Enphase IQ8 datasheets); `motor-acceleration-time` (Twin City Fan FE-1800).
+  - **Framing and concrete:** `stud-notch-bore-limit` and `joist-notch-bore-limit` (an IRC notching handout from the City of Richmond, KY); `slab-dowel-schedule` (ACI 302.1R Table 3.1).
+  - **Piping:** `hanger-rod-sizing` (MSS SP-58 loads, National Pipe Hanger Fig. 755); `expansion-guide-spacing` (Metraflex).
+  - **Geotechnical:** `soil-settlement-elastic` (USACE EM 1110-1-1904); `consolidation-time-rate` (UWE GeoCal, converted to US units).
+
+  README: 1,270 of 2,183 tiles are checked only against the project's own derivation (785 from first principles, 485 by a named method); 913 carry an outside source. Cross-validation tolerance checks: 4,239.
 - **Eleven more tiles now carry a publisher's printed worked example or table.**
   - **Instrumentation:** `rtd-resistance-to-temp` (IEC 60751 Pt100 table, Pyromation/WIKA), `loop-signal-scaling` (Kuphaldt, *Lessons in Industrial Instrumentation*), `pid-tuning-ziegler-nichols` (Haugen, TechTeach; Zhu, *Mechatronics*).
   - **Wire and power transmission:** `awg-wire-geometry` (ASTM B258 Table 1); `sprocket-pitch-diameter` and `roller-chain-length` (Martin Sprocket engineering data).
@@ -92,6 +99,7 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **`stud-notch-bore-limit` said a single stud may be bored only to 40%.** IRC R602.6 sets 60% of the stud depth as the limit for every stud. The 40% figure is the point above which a stud in an exterior wall or bearing partition must be doubled. A single stud in a nonbearing wall may therefore be bored to 60%. The tile's numbers were right, but its labels and text applied the 40% bearing-wall limit to every single stud. They now say which wall each limit governs.
 - **The fire-alarm battery tiles used the pre-2022 NFPA 72 margin.** NFPA 72-2022 (10.6.7.2.1) replaced the 20% battery safety margin with a 1.25 correction factor for aging. `standby-battery-sizing` and `standby-battery-runtime` defaulted to 1.2. They now default to 1.25; the older factor is still an input for an AHJ on an earlier edition. At the same loads, a 14.6 Ah battery that showed 24 h now shows 23 h. The runtime example now uses the 18 Ah battery the sizing tile selects, which holds 28.5 h. The sizing tile also chose 18 Ah for a requirement of exactly 12 Ah, because the sum came out 12.000000000000002 in floating point; it now picks 12 Ah.
 - **`rain-load-ponding` computed the ASCE 7-16 rain load.** ASCE 7-22 Eq. 8.2-1 adds the ponding head dp, R = 5.2(ds + dh + dp), in place of 7-16's separate ponding-instability check, and it sizes secondary drainage for a 15-minute storm at a return period set by the risk category. The tile takes dp as a new input; it defaults to 0, which leaves existing results unchanged. The citations now describe the 7-22 method.
 - **Two citations stated the wrong code values.**
