@@ -2,7 +2,7 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "2e8f5f4e906e8e97",
+      "sha": "1b3d18d1e84e6040",
       "date": "2026-09-26"
     },
     "/tools/": {
@@ -3334,8 +3334,8 @@
       "date": "2026-09-01"
     },
     "/tools/glulam-volume-factor/": {
-      "sha": "ec40eb6a0017e294",
-      "date": "2026-09-01"
+      "sha": "93a5b4ea46f6d15b",
+      "date": "2026-09-26"
     },
     "/tools/glycol-mix/": {
       "sha": "2f172b6f6253c554",
@@ -7274,8 +7274,8 @@
       "date": "2026-09-18"
     },
     "/tools/stadia-distance/": {
-      "sha": "6a3286252fdf99c4",
-      "date": "2026-09-04"
+      "sha": "a72611de42224a57",
+      "date": "2026-09-26"
     },
     "/tools/stage-deck-live-load/": {
       "sha": "c7b89a4d643a5844",

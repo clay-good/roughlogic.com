@@ -326,47 +326,51 @@ function renderLevelLoopAdjustment(inputRegion, outputRegion, citationEl) {
 }
 SURVEY_RENDERERS["level-loop-adjustment"] = renderLevelLoopAdjustment;
 
-// dims: in { s_ft: L, theta_deg: dimensionless, k_f: dimensionless, hi_ft: L, rod_ft: L, sta_elev: L } out: { h_ft: L, v_ft: L, elev_ft: L }
-export function computeStadiaDistance({ s_ft = 0, theta_deg = 0, k_f = 100, hi_ft = 0, rod_ft = 0, sta_elev = 0 } = {}) {
+// dims: in { s_ft: L, theta_deg: dimensionless, k_f: dimensionless, hi_ft: L, rod_ft: L, sta_elev: L, c_ft: L } out: { h_ft: L, v_ft: L, elev_ft: L }
+export function computeStadiaDistance({ s_ft = 0, theta_deg = 0, k_f = 100, hi_ft = 0, rod_ft = 0, sta_elev = 0, c_ft = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(s_ft > 0)) return { error: "Stadia interval must be positive (ft)." };
   if (!(theta_deg > -90 && theta_deg < 90)) return { error: "Vertical angle must be between -90 and 90 degrees." };
   if (!(k_f > 0)) return { error: "The stadia interval factor K must be positive (100 typical)." };
+  if (!(c_ft >= 0)) return { error: "The stadia constant C cannot be negative (ft; 0 for an internal-focusing instrument)." };
   const t = (theta_deg * Math.PI) / 180;
-  const h_ft = k_f * s_ft * Math.cos(t) * Math.cos(t);
-  const v_ft = k_f * s_ft * Math.cos(t) * Math.sin(t);
+  // External-focusing instruments add the stadia constant C = f + c (about 1 ft): H gains C cos(theta), V gains
+  // C sin(theta) (NAVEDTRA 14070 p. 8-6). C = 0 (the default) is the internal-focusing form.
+  const h_ft = k_f * s_ft * Math.cos(t) * Math.cos(t) + c_ft * Math.cos(t);
+  const v_ft = k_f * s_ft * Math.cos(t) * Math.sin(t) + c_ft * Math.sin(t);
   const has_elev = hi_ft !== 0 || rod_ft !== 0 || sta_elev !== 0;
   const elev_ft = has_elev ? sta_elev + hi_ft + v_ft - rod_ft : null;
   return {
     h_ft, v_ft, elev_ft,
-    note: "Stadia tacheometry with the interval factor K (default 100): the horizontal distance H = K s cos^2(theta), the vertical distance V = K s cos(theta) sin(theta) = (K s/2) sin(2 theta), and the target elevation = station elevation + HI + V - rod center. On a level sight (theta = 0) this reduces to the bare H = K s with no rise. Assumes an internal-focusing instrument (stadia constant C ~ 0; add C cos theta / C for an external-focusing constant), takes the vertical angle from the horizontal, and does not correct for earth curvature/refraction over long sights or a rod not held plumb. A computational aid; the instrument's stadia constants and the field procedure govern.",
+    note: "Stadia tacheometry with the interval factor K (default 100): the horizontal distance H = K s cos^2(theta), the vertical distance V = K s cos(theta) sin(theta) = (K s/2) sin(2 theta), and the target elevation = station elevation + HI + V - rod center. On a level sight (theta = 0) this reduces to the bare H = K s with no rise. C defaults to 0 (an internal-focusing instrument); an external-focusing instrument adds its stadia constant C (about 1 ft) as C cos(theta) to H and C sin(theta) to V, takes the vertical angle from the horizontal, and does not correct for earth curvature/refraction over long sights or a rod not held plumb. A computational aid; the instrument's stadia constants and the field procedure govern.",
   };
 }
 export const stadiaDistanceExample = { inputs: { s_ft: 1.50, theta_deg: 5, k_f: 100, hi_ft: 4.50, rod_ft: 5.20, sta_elev: 500.00 } };
 
 function renderStadiaDistance(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: stadia horizontal distance H = K s cos^2(theta), vertical V = (K s/2) sin(2 theta), elevation = HI + V - rod, K = 100, per the standard surveying references, by name. Internal-focusing instrument, no curvature/refraction. A computational aid; the instrument constants govern.";
+  citationEl.textContent = "Citation: stadia horizontal distance H = K s cos^2(theta), vertical V = (K s/2) sin(2 theta), elevation = HI + V - rod, K = 100, per the standard surveying references, by name. Plus C cos(theta) and C sin(theta) for an external-focusing stadia constant C (default 0), no curvature/refraction. A computational aid; the instrument constants govern.";
   const s = makeNumber("Stadia interval (upper - lower, ft)", "sd-s", { step: "any", min: "0" });
   const th = makeNumber("Vertical angle from horizontal (deg, + up)", "sd-th", { step: "any" });
   const k = makeNumber("Stadia interval factor K", "sd-k", { step: "any", min: "0" }); k.input.value = "100";
   const hi = makeNumber("Height of instrument (ft, optional)", "sd-hi", { step: "any" });
   const rod = makeNumber("Rod center reading (ft, optional)", "sd-rod", { step: "any" });
   const sta = makeNumber("Station elevation (ft, optional)", "sd-sta", { step: "any" });
-  for (const f of [s, th, k, hi, rod, sta]) inputRegion.appendChild(f.wrap);
+  const cc = makeNumber("Stadia constant C (ft; 0 internal-focusing, ~1 external)", "sd-c", { step: "any", min: "0" });
+  for (const f of [s, th, k, hi, rod, sta, cc]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { s.input.value = "1.50"; th.input.value = "5"; k.input.value = "100"; hi.input.value = "4.50"; rod.input.value = "5.20"; sta.input.value = "500.00"; update(); });
   const oH = makeOutputLine(outputRegion, "Horizontal distance", "sd-out-h");
   const oV = makeOutputLine(outputRegion, "Vertical distance", "sd-out-v");
   const oElev = makeOutputLine(outputRegion, "Target elevation", "sd-out-elev");
   const oNote = makeOutputLine(outputRegion, "Note", "sd-out-note");
   const update = debounce(() => {
-    const r = computeStadiaDistance({ s_ft: Number(s.input.value) || 0, theta_deg: Number(th.input.value) || 0, k_f: Number(k.input.value) || 0, hi_ft: Number(hi.input.value) || 0, rod_ft: Number(rod.input.value) || 0, sta_elev: Number(sta.input.value) || 0 });
+    const r = computeStadiaDistance({ s_ft: Number(s.input.value) || 0, theta_deg: Number(th.input.value) || 0, k_f: Number(k.input.value) || 0, hi_ft: Number(hi.input.value) || 0, rod_ft: Number(rod.input.value) || 0, sta_elev: Number(sta.input.value) || 0, c_ft: Number(cc.input.value) || 0 });
     if (r.error) { oH.textContent = r.error; oV.textContent = "-"; oElev.textContent = "-"; oNote.textContent = "-"; return; }
     oH.textContent = fmt(r.h_ft, 2) + " ft";
     oV.textContent = fmt(r.v_ft, 2) + " ft";
     oElev.textContent = r.elev_ft === null ? "- (enter station elev / HI / rod)" : fmt(r.elev_ft, 2) + " ft";
     oNote.textContent = r.note;
   }, DEBOUNCE_MS);
-  for (const f of [s.input, th.input, k.input, hi.input, rod.input, sta.input]) f.addEventListener("input", update);
+  for (const f of [s.input, th.input, k.input, hi.input, rod.input, sta.input, cc.input]) f.addEventListener("input", update);
 }
 SURVEY_RENDERERS["stadia-distance"] = renderStadiaDistance;
 

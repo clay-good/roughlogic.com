@@ -4,11 +4,26 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### Added
+
+- **`stadia-distance` takes the stadia constant C of an external-focusing instrument.** H gains C cos(theta) and V gains C sin(theta). The NAVEDTRA 14070 example (C = 1.0) now reproduces exactly: 692.34 ft, 326.28 ft, elevation 705.98. C defaults to 0, so internal-focusing results are unchanged.
+
 ### Fixed
+
+- **`combined-stress-axial-bending` now reports the same fibers when the moment is entered as negative.** The extreme fibers are P/A +/- |M c/I|. A negative M used to swap them: Pytel & Singer's Problem 912 section read +2,250 psi "all compression" over a face that is actually at -750 psi.
+- **`glulam-volume-factor` no longer credits the loading factor KL to NDS 2018.** NDS 2018 Eq. 5.3-1 has no KL; that coefficient belonged to NDS 1997, and the current edition measures L between points of zero moment. KL stays as an optional legacy multiplier that defaults to 1.0. Results at the default are unchanged, and Ochshorn Example 3.7 (Cv = 0.84) still reproduces.
 
 - **`masonry-lintel-loading` now needs 8 in of wall above the triangle before it credits arching.** NCMA TEK 17-1 requires the 45-degree load triangle plus at least 8 in of masonry above its apex. The tile used to credit arching as soon as the wall reached span/2. A 6 ft opening with 3.5 ft of wall above now carries the full 1,260 lb rectangle instead of the 540 lb triangle.
 
 ### Changed
+
+- **Eleven more tiles now carry a publisher's printed example.** No formula errors were found beyond the fixes above. Four other candidates were skipped because the printed method differs from the tile's (PPI HDD pullback, JM Eagle pipe deflection with live load, Ohio DOT gauge dry density, NRCS riprap with an unstated C).
+  - **Surveying and roads:** `stadia-distance` (NAVEDTRA 14070), `taping-corrections` (NAVEDTRA 14069), `superelevation` (FHWA-HRT-17-098, in reverse), `sag-vertical-curve-comfort` (INDOT Fig. 55-4A).
+  - **Geotechnical:** `settlement-limit-load` (FHWA NHI-06-088 Example 7-3, in reverse), `soil-activity` (Sivakugan), `footing-eccentric-pressure` (PDHonline C155).
+  - **Machining and engines:** `boring-bar-deflection` (Cutting Tool Engineering), `ballnose-scallop-height` (Mitsubishi Materials), `mean-piston-speed` (Engine Builder).
+  - **Solar:** `pv-string-fusing` (NABCEP Installer Resource Guide; its 14 A step was a NEC 2011 1-A increment, and the guide lands on the same 15 A fuse the tile picks).
+
+  README: 1,041 of 2,183 tiles are checked only against the project's own derivation; 1,142 carry an outside source.
 
 - **Eight more tiles now carry a publisher's printed example.** Apart from the lintel rule above, no formula errors were found.
   - **FEMA P-751 (Ch. 4, 12-story steel frame):** `seismic-story-drift` (Table 4.1-7) and `seismic-pdelta-stability` (Table 4.1-11).

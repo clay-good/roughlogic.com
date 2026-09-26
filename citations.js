@@ -18133,15 +18133,15 @@ export const CITATIONS = {
     ],
   },
   "stadia-distance": {
-    formula: "H = K s cos^2(theta); V = K s cos(theta) sin(theta) = (K s/2) sin(2 theta); elevation = station_elev + HI + V - rod_center. (K = 100)",
+    formula: "H = K s cos^2(theta) + C cos(theta); V = K s cos(theta) sin(theta) + C sin(theta); elevation = station_elev + HI + V - rod_center. (K = 100; stadia constant C = 0 for internal focusing)",
     edition: "The stadia-tacheometry distance and elevation reduction with the standard interval factor K = 100, as compiled in the standard surveying references, by name.",
     freeAccess: "The stadia-reduction formulas are public surveying results in any elementary-surveying reference.",
     governance: GOVERNANCE.general,
-    editionNote: "The stadia horizontal distance H = K s cos^2(theta), the vertical distance V = K s cos(theta) sin(theta) = (K s/2) sin(2 theta), the elevation = HI + V - rod-center, and the standard interval factor K = 100 (stadia constant C ~ 0 for internal-focusing instruments). This returns the reduced horizontal distance, vertical distance, and elevation from a stadia reading - it assumes an internal-focusing instrument (C = 0; add C cos theta / C for an external-focusing stadia constant), takes the vertical angle from the horizontal, and does not correct for earth curvature/refraction over long sights or for a rod not held plumb. A computational aid; the instrument's stadia constants and the field procedure govern.",
+    editionNote: "The stadia horizontal distance H = K s cos^2(theta), the vertical distance V = K s cos(theta) sin(theta) = (K s/2) sin(2 theta), the elevation = HI + V - rod-center, and the standard interval factor K = 100 (stadia constant C ~ 0 for internal-focusing instruments). This returns the reduced horizontal distance, vertical distance, and elevation from a stadia reading - it defaults to an internal-focusing instrument (C = 0) and takes an external-focusing stadia constant C (about 1 ft) as the input c_ft, adding C cos theta to H and C sin theta to V as NAVEDTRA 14070 p. 8-6 prints; it takes the vertical angle from the horizontal, and does not correct for earth curvature/refraction over long sights or for a rod not held plumb. A computational aid; the instrument's stadia constants and the field procedure govern.",
     assumptions: [
       { name: "Horizontal distance", value: "H = K s cos^2(theta) with K = 100 for an internal-focusing instrument", source: "stadia tacheometry" },
       { name: "Vertical distance", value: "V = (K s/2) sin(2 theta); elevation = HI + V - rod center", source: "stadia tacheometry" },
-      { name: "Internal focusing", value: "stadia constant C ~ 0; external-focusing instruments add a C term", source: "instrument convention" },
+      { name: "Stadia constant", value: "C = 0 by default (internal focusing); an external-focusing C adds C cos theta to H and C sin theta to V", source: "NAVEDTRA 14070 Engineering Aid Basic, p. 8-6" },
     ],
   },
   "azimuth-bearing-conversion": {
@@ -20248,13 +20248,13 @@ export const CITATIONS = {
     ],
   },
   "glulam-volume-factor": {
-    formula: "Cv = min( KL x (21/L)^(1/x) x (12/d)^(1/x) x (5.125/b)^(1/x), 1.0 ); allowable bending uses the lesser of Cv and CL.",
+    formula: "Cv = min( (21/L)^(1/x) x (12/d)^(1/x) x (5.125/b)^(1/x), 1.0 ), L between points of zero moment; allowable bending uses the lesser of Cv and CL. The optional KL multiplier (default 1.0) is the NDS 1997 loading factor, absent from the current NDS.",
     edition: "NDS 2018 (National Design Specification for Wood Construction) §5.3.6, the glulam volume factor Cv, by name; the reference bending value and factors come from the NDS Supplement.",
     freeAccess: "The Cv equation is stated in NDS 5.3.6, published free read-only by AWC at awc.org; the (21/L)^(1/x) arithmetic is public.",
     governance: GOVERNANCE.general,
-    editionNote: "NDS 2018 §5.3.6 gives the glued-laminated volume factor Cv = KL x (21/L)^(1/x) x (12/d)^(1/x) x (5.125/b)^(1/x), capped at 1.0, where L is the span in feet, d and b the depth and width in inches, x = 10 for all species except Southern Pine (x = 20), and KL is the loading-condition factor (1.0 for a uniformly loaded simple span, other values in the NDS for concentrated or cantilever loads). A larger stressed volume is more likely to contain a strength-limiting defect, so the reference bending value Fb is reduced. The allowable bending value uses the LESSER of Cv and the beam-stability factor CL (NDS 3.3.3) - they are not multiplied together. Cv applies to glulam bending about the x-x (strong) axis, not to sawn lumber and not to weak-axis bending. A design aid, not a substitute for the engineer of record.",
+    editionNote: "NDS 2018 §5.3.6 gives the glued-laminated volume factor Cv = (21/L)^(1/x) x (12/d)^(1/x) x (5.125/b)^(1/x), capped at 1.0, where L is the length between points of zero moment in feet, d and b the depth and width in inches, and x = 10 for all species except Southern Pine (x = 20). The loading-condition factor KL of NDS 1997 is not in the current equation; the tile keeps it as an optional multiplier that defaults to 1.0. Until 2026-09-26 this note credited KL to NDS 2018. A larger stressed volume is more likely to contain a strength-limiting defect, so the reference bending value Fb is reduced. The allowable bending value uses the LESSER of Cv and the beam-stability factor CL (NDS 3.3.3) - they are not multiplied together. Cv applies to glulam bending about the x-x (strong) axis, not to sawn lumber and not to weak-axis bending. A design aid, not a substitute for the engineer of record.",
     assumptions: [
-      { name: "Volume factor", value: "Cv = KL x (21/L)^(1/x) x (12/d)^(1/x) x (5.125/b)^(1/x), capped at 1.0", source: "NDS 2018 §5.3.6" },
+      { name: "Volume factor", value: "Cv = (21/L)^(1/x) x (12/d)^(1/x) x (5.125/b)^(1/x), capped at 1.0; L between points of zero moment", source: "NDS 2018 §5.3.6 (Eq. 5.3-1)" },
       { name: "Species exponent", value: "x = 10 for all species except Southern Pine, where x = 20", source: "NDS 2018 §5.3.6" },
       { name: "Lesser of Cv or CL", value: "the allowable bending uses the lesser of Cv and the stability factor CL, not their product", source: "NDS 2018 §5.3.6 / §3.3.3" },
     ],

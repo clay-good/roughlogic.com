@@ -67266,6 +67266,30 @@
    }
   },
   {
+   "tile_id": "settlement-limit-load",
+   "source_publisher": "FHWA",
+   "source_title": "NHI-06-088 Soils and Foundations Reference Manual Vol. I, Example 7-3",
+   "source_edition_or_year": "December 2006",
+   "source_section_or_page": "normally consolidated clay 10 ft thick, Cc 0.5, e0 1.0, p0 600 psf, dp 2,400 psf -> 1.75 ft = 21 in (run in reverse: 21 in -> dp ~2,400 psf; the 21 in is rounded)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "sc_allow_in": 21,
+    "cc": 0.5,
+    "h_ft": 10,
+    "e0": 1.0,
+    "sig0_psf": 600
+   },
+   "outputs": {
+    "dsig_psf": {
+     "value": 2400,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
    "tile_id": "footing-eccentric-pressure",
    "source_publisher": "Eccentric footing bearing pressure (kern rule)",
    "source_title": "60 kip on 8x8 ft footing, e 1 ft (inside kern 1.33) -> 0.23 to 1.64 ksf",
@@ -67331,6 +67355,41 @@
      "value": 6,
      "tolerance": {
       "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "footing-eccentric-pressure",
+   "source_publisher": "PDHonline (R. P. Weber)",
+   "source_title": "Course C155 Earth Pressure and Retaining Wall Basics for Non-Geotechnical Engineers, Example (2.0)",
+   "source_edition_or_year": "2012, p. 19",
+   "source_section_or_page": "base 6 ft wide per foot of wall, sum V 6,100 lb, e = 0.4 ft (< B/6) -> qmax 1,423.4 psf, qmin 610 psf (M entered as V x e = 2.44 kip-ft)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "p_kip": 6.1,
+    "m_kft": 2.44,
+    "b_ft": 6,
+    "l_ft": 1
+   },
+   "outputs": {
+    "e_ft": {
+     "value": 0.4,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "q_max_ksf": {
+     "value": 1.4234,
+     "tolerance": {
+      "abs": 0.0005
+     }
+    },
+    "q_min_ksf": {
+     "value": 0.61,
+     "tolerance": {
+      "abs": 0.0005
      }
     }
    }
@@ -67700,6 +67759,44 @@
    }
   },
   {
+   "tile_id": "stadia-distance",
+   "source_publisher": "US Navy (NAVEDTRA)",
+   "source_title": "NAVEDTRA 14070 Engineering Aid Basic, Distance and Elevation for Inclined Sights",
+   "source_edition_or_year": "p. 8-6",
+   "source_section_or_page": "stadia interval 8.45, elevation angle 25 deg 14 min, instrument constant 1.0, HI elevation 384.20, center hair 4.50 -> h = 692.34 (692 ft), v = 326.28, ground elevation 705.98",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "s_ft": 8.45,
+    "theta_deg": 25.233333333333334,
+    "k_f": 100,
+    "hi_ft": 0,
+    "rod_ft": 4.5,
+    "sta_elev": 384.2,
+    "c_ft": 1
+   },
+   "outputs": {
+    "h_ft": {
+     "value": 692.34,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "v_ft": {
+     "value": 326.28,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "elev_ft": {
+     "value": 705.98,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
    "tile_id": "taping-corrections",
    "source_publisher": "Steel-tape corrections (Ghilani/Wolf)",
    "source_title": "100 ft at 95 F down a 3 ft grade -> Ct +0.017, Ch -0.045, corrected 99.972 ft",
@@ -67758,6 +67855,29 @@
      "value": 99.982,
      "tolerance": {
       "abs": 0.002
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "taping-corrections",
+   "source_publisher": "US Navy (NAVEDTRA)",
+   "source_title": "NAVEDTRA 14069 Engineering Aid 3, Solving Surveying Problems by Tape, Fig. 12-17",
+   "source_edition_or_year": "pp. 12-20 to 12-21",
+   "source_section_or_page": "slope distance 100.00 ft, elevation difference 6.0 ft -> slope correction 36.00/200.00 = -0.180 ft (the temperature and tape-standard corrections use the book's rule of thumb and a tape error, not compared)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "l_ft": 100,
+    "t_f": 78,
+    "t0_f": 68,
+    "h_ft": 6
+   },
+   "outputs": {
+    "ch_ft": {
+     "value": -0.18,
+     "tolerance": {
+      "abs": 0.0005
      }
     }
    }
@@ -68677,6 +68797,35 @@
    }
   },
   {
+   "tile_id": "boring-bar-deflection",
+   "source_publisher": "Cutting Tool Engineering (E. Isakov)",
+   "source_title": "Boring: Calculating deflection, Example 1",
+   "source_edition_or_year": "July 15, 2019",
+   "source_section_or_page": "1 in steel bar, 4 in overhang, F 207.8 lbf, E 30 x 10^6 psi: I = pi x 1^4/64 = 0.0491 in^4, y = F L^3/(3 E I) = 0.003 in",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "d_in": 1,
+    "l_in": 4,
+    "f_lb": 207.8,
+    "e_psi": 30000000
+   },
+   "outputs": {
+    "i_in4": {
+     "value": 0.0491,
+     "tolerance": {
+      "abs": 5e-05
+     }
+    },
+    "delta_in": {
+     "value": 0.003,
+     "tolerance": {
+      "abs": 5e-05
+     }
+    }
+   }
+  },
+  {
    "tile_id": "boring-bar-max-overhang",
    "source_publisher": "Cantilever tool deflection (inverse)",
    "source_title": "L_max = (3 E I delta / F)^(1/3)",
@@ -68768,6 +68917,28 @@
      "value": 0.03,
      "tolerance": {
       "pct": 1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "ballnose-scallop-height",
+   "source_publisher": "Mitsubishi Materials USA",
+   "source_title": "Pitch Selection of Pick Feed, cusp-height table",
+   "source_edition_or_year": "web table (metric-converted)",
+   "source_section_or_page": "ball radius R 6 mm (0.236 in), pick feed .031 in (0.8 mm) -> cusp .0005 in, printed to 4 decimals",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "r_in": 0.23622,
+    "mode": "scallop-from-stepover",
+    "s_in": 0.031496
+   },
+   "outputs": {
+    "out_in": {
+     "value": 0.0005,
+     "tolerance": {
+      "abs": 5e-05
      }
     }
    }
@@ -69215,6 +69386,48 @@
      "value": 4060,
      "tolerance": {
       "pct": 0.2
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "mean-piston-speed",
+   "source_publisher": "Engine Builder magazine (Wiseco)",
+   "source_title": "How a Stroker Crankshaft Affects Piston Speed and Inertia",
+   "source_edition_or_year": "March 2018",
+   "source_section_or_page": "4 in stroke at 6,500 rpm: (4 x 2 x 6,500)/12 = 4,333 fpm",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "stroke_in": 4,
+    "rpm": 6500
+   },
+   "outputs": {
+    "mps_fpm": {
+     "value": 4333,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "mean-piston-speed",
+   "source_publisher": "Engine Builder magazine (Wiseco)",
+   "source_title": "How a Stroker Crankshaft Affects Piston Speed and Inertia",
+   "source_edition_or_year": "March 2018",
+   "source_section_or_page": "4.5 in stroker at 6,500 rpm: (4.5 x 6,500)/6 = 4,875 fpm",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "stroke_in": 4.5,
+    "rpm": 6500
+   },
+   "outputs": {
+    "mps_fpm": {
+     "value": 4875,
+     "tolerance": {
+      "abs": 0.5
      }
     }
    }
@@ -75453,6 +75666,34 @@
    }
   },
   {
+   "tile_id": "soil-activity",
+   "source_publisher": "N. Sivakugan, James Cook University",
+   "source_title": "Chapter 3 Soil Classification course notes, Example 1(c)",
+   "source_edition_or_year": "2000",
+   "source_section_or_page": "LL 46, PL 24, PI 22, clay fraction 26% -> activity = 22/26 = 0.85 (normal)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "ll": 46,
+    "pl": 24,
+    "clay_fraction_pct": 26
+   },
+   "outputs": {
+    "pi": {
+     "value": 22,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "activity": {
+     "value": 0.85,
+     "tolerance": {
+      "abs": 0.005
+     }
+    }
+   }
+  },
+  {
    "tile_id": "building-ua",
    "source_publisher": "Whole-building UA (ASHRAE / RESNET)",
    "source_title": "four assemblies + 50 cfm -> UA 309.7 Btu/h-F, 21,700 Btu/h at dT 70",
@@ -76003,6 +76244,29 @@
    }
   },
   {
+   "tile_id": "superelevation",
+   "source_publisher": "FHWA",
+   "source_title": "FHWA-HRT-17-098 Self-Enforcing Roadways, Appendix B, Fig. 79 (2011 Green Book Eq. 3-9)",
+   "source_edition_or_year": "January 2018",
+   "source_section_or_page": "R 955 ft, 50 mph: f = 50^2/14,325 - 0.061 = 0.11352 (run in reverse: f 0.11352 -> e 0.061)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "mode": "e",
+    "V_mph": 50,
+    "R_ft": 955,
+    "f": 0.11352
+   },
+   "outputs": {
+    "e_req": {
+     "value": 0.061,
+     "tolerance": {
+      "abs": 0.0005
+     }
+    }
+   }
+  },
+  {
    "tile_id": "vertical-curve-sight-distance",
    "source_publisher": "AASHTO Green Book",
    "source_title": "+2% to -3% crest (A 5) at 570 ft SSD -> L 753 ft (S<=L branch)",
@@ -76197,6 +76461,27 @@
     },
     "K_ft_per_pct": {
      "value": 105.376,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "sag-vertical-curve-comfort",
+   "source_publisher": "Indiana DOT",
+   "source_title": "Indiana Design Manual, Figure 55-4A, K Value for Sag Vertical Curve (Comfort Criteria, 3R Project)",
+   "source_edition_or_year": "2011",
+   "source_section_or_page": "60 mph: calculated K = V^2/46.5 = 77.4 (rounded up to 78 for design)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "A_pct": 4,
+    "V_mph": 60
+   },
+   "outputs": {
+    "K_ft_per_pct": {
+     "value": 77.4,
      "tolerance": {
       "abs": 0.05
      }
@@ -79592,6 +79877,34 @@
      "value": 25,
      "tolerance": {
       "abs": 0
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "pv-string-fusing",
+   "source_publisher": "NABCEP",
+   "source_title": "PV Installer Resource Guide (William Brooks, PE), Appendix system example",
+   "source_edition_or_year": "March 2012, v. 5.3 (NEC 2011)",
+   "source_section_or_page": "module Isc 8.41 A: 1.25 x 1.25 x 8.41 = 13.1 A minimum OCPD; the guide chooses a 15 A fuse, the module's maximum (its 14 A step was a 2011 690.9(C) 1-A increment, removed in NEC 2014)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "Isc_A": 8.41,
+    "max_fuse_A": 15,
+    "n_strings": 3
+   },
+   "outputs": {
+    "req_A": {
+     "value": 13.1,
+     "tolerance": {
+      "abs": 0.05
+     }
+    },
+    "fuse_A": {
+     "value": 15,
+     "tolerance": {
+      "abs": 0.01
      }
     }
    }

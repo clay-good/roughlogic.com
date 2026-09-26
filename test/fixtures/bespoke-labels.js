@@ -868,7 +868,7 @@ export const BESPOKE_LABELS = {
   "spur-gear-geometry": {"diametral_pitch":"Diametral pitch Pd (teeth/in)","teeth":"Number of teeth N","mating_teeth":"Mating gear teeth (optional)"},
   "square-footage": {"shape":"Shape"},
   "ssd-design-speed": {"sight_distance_ft":"Available sight distance (ft)","reaction_time_s":"Perception-reaction time (s; default 2.5)","friction":"Friction coefficient f (set from condition or enter directly)","grade":"Grade (decimal; + uphill, - downhill)"},
-  "stadia-distance": {"s_ft":"Stadia interval (upper - lower, ft)","theta_deg":"Vertical angle from horizontal (deg, + up)","k_f":"Stadia interval factor K","hi_ft":"Height of instrument (ft, optional)","rod_ft":"Rod center reading (ft, optional)","sta_elev":"Station elevation (ft, optional)"},
+  "stadia-distance": {"s_ft":"Stadia interval (upper - lower, ft)","theta_deg":"Vertical angle from horizontal (deg, + up)","k_f":"Stadia interval factor K","hi_ft":"Height of instrument (ft, optional)","rod_ft":"Rod center reading (ft, optional)","sta_elev":"Station elevation (ft, optional)","c_ft":"Stadia constant C (ft; 0 internal-focusing, ~1 external)"},
   "stair-stringer": {"total_rise_in":"Total rise (in)","total_run_in":"Total run (in)"},
   "stair-stringer-layout": {"total_rise_in":"Total rise (in)","target_rise_in":"Target rise (in)","target_tread_in":"Target tread (in)","nosing_in":"Nosing (in)","stringer_thickness_in":"Stringer thickness (in)","code_max_rise_in":"Code max rise (in, your AHJ)","code_min_tread_in":"Code min tread (in, your AHJ)"},
   "stairs": {"total_rise_in":"Total rise (in)","preferred_riser_height_in":"Preferred riser height (in)"},

@@ -55833,3 +55833,31 @@ test("bounds: computeMasonryLintelLoading requires 8 in of wall above the triang
   assert.equal(_v370({ ...base, wall_h_above: 3 + 8 / 12 }).arching, true);
   assert.equal(_v370({ ...base, wall_h_above: 5 }).W_lb, 540);
 });
+
+test("bounds: computeGlulamVolumeFactor follows NDS 2018 Eq. 5.3-1 (no KL) and says so", () => {
+  // Ochshorn Example 3.7 prints (21/32)^0.1 (12/27)^0.1 (5.125/8.75)^0.1 = 0.84 with no loading factor.
+  // Until 2026-09-26 the note credited KL to NDS 2018; KL was an NDS 1997 term.
+  const r = _v448({ span_ft: 32, depth_in: 27, width_in: 8.75, x: 10 });
+  assert.ok(Math.abs(r.cv - 0.838) < 0.001);
+  assert.match(r.note, /no loading factor KL/);
+  assert.doesNotMatch(r.note, /Cv = KL x/);
+});
+
+test("bounds: computeCombinedStressAxialBending reports the same fibers for a negative moment", () => {
+  // Pytel & Singer Problem 912 section, moment entered as -18,000 lb-in: the fibers are still 2250 and -750 psi.
+  // Until 2026-09-26 a negative M swapped them and reported "all compression" over a -750 psi face.
+  const r = _v343({ P_lb: 9000, M_lbin: -18000, A_in2: 12, I_in4: 36, c_in: 3 });
+  assert.equal(r.sigma_max, 2250);
+  assert.equal(r.sigma_min, -750);
+  assert.equal(r.no_tension, false);
+});
+
+test("bounds: computeStadiaDistance takes an external-focusing stadia constant C (NAVEDTRA 14070 p. 8-6)", () => {
+  // 8.45 ft interval at +25 deg 14 min with C = 1.0 prints h 692.34, v 326.28; C = 0 keeps the internal-focusing form.
+  const base = { s_ft: 8.45, theta_deg: 25 + 14 / 60, k_f: 100 };
+  const r = _v312({ ...base, c_ft: 1 });
+  assert.ok(Math.abs(r.h_ft - 692.34) < 0.01);
+  assert.ok(Math.abs(r.v_ft - 326.28) < 0.01);
+  assert.ok(Math.abs(_v312(base).h_ft - (r.h_ft - Math.cos((base.theta_deg * Math.PI) / 180))) < 1e-9);
+  assert.ok("error" in _v312({ ...base, c_ft: -1 }));
+});

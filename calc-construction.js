@@ -7359,13 +7359,15 @@ export function computeCombinedStressAxialBending({ P_lb = 0, M_lbin = 0, A_in2 
   const M = e_in > 0 ? P_lb * e_in : M_lbin;
   const sigma_axial = P_lb / A_in2;
   const sigma_bend = M * c_in / I_in4;
-  const sigma_max = sigma_axial + sigma_bend;
-  const sigma_min = sigma_axial - sigma_bend;
+  // The moment's sign only says which face is which; the extreme fibers are P/A +/- |M c/I|. Until
+  // 2026-09-26 a negative M swapped them, so min fiber read +2250 psi "all compression" over a -750 psi face.
+  const sigma_max = sigma_axial + Math.abs(sigma_bend);
+  const sigma_min = sigma_axial - Math.abs(sigma_bend);
   const S_in3 = I_in4 / c_in;
   return {
     sigma_axial, sigma_bend, sigma_max, sigma_min, M_used: M, S_in3,
     no_tension: sigma_min >= 0,
-    note: "Combined axial-plus-bending fiber stress on a short (non-buckling) member: sigma = P/A +/- M c/I, with the extreme compression fiber at P/A + M c/I and the other fiber at P/A - M c/I (tension where negative). Enter a moment directly, or an eccentricity e to set M = P e. The far face stays in compression only while M c/I <= P/A - the kern limit e <= r^2/c, the same no-tension threshold the eccentric-footing tile enforces. Short member: this does NOT include the P-delta / column amplification of a slender member (use a beam-column interaction check). A design aid, not a substitute for the engineer of record.",
+    note: "Combined axial-plus-bending fiber stress on a short (non-buckling) member: sigma = P/A +/- M c/I, with one extreme fiber at P/A + |M c/I| and the other at P/A - |M c/I| (tension where negative; the moment's sign only says which face is which). Enter a moment directly, or an eccentricity e to set M = P e. The far face stays in compression only while M c/I <= P/A - the kern limit e <= r^2/c, the same no-tension threshold the eccentric-footing tile enforces. Short member: this does NOT include the P-delta / column amplification of a slender member (use a beam-column interaction check). A design aid, not a substitute for the engineer of record.",
   };
 }
 export const combinedStressAxialBendingExample = { inputs: { P_lb: 20000, M_lbin: 30000, A_in2: 30.25, c_in: 2.75, I_in4: 76.3, e_in: 0 } };
@@ -8283,24 +8285,26 @@ export function computeGlulamVolumeFactor({ span_ft = 0, depth_in = 0, width_in 
   if (!(b > 0)) return { error: "Width must be positive (in)." };
   if (!(xExp > 0)) return { error: "Species exponent x must be positive (10 softwood, 20 Southern Pine)." };
   if (!(kL > 0)) return { error: "Loading factor KL must be positive." };
+  // NDS 2018 Eq. 5.3-1 has no KL: the loading-condition coefficient was an NDS 1997 term, dropped when L became
+  // the distance between points of zero moment. KL stays as a legacy multiplier (default 1.0 = the current NDS).
   const raw = kL * Math.pow(21 / span, 1 / xExp) * Math.pow(12 / d, 1 / xExp) * Math.pow(5.125 / b, 1 / xExp);
   const cv = Math.min(raw, 1.0);
   const reduction_pct = (1 - cv) * 100;
   return {
     cv, reduction_pct, capped: raw > 1.0,
-    note: "NDS 2018 §5.3.6 glulam volume factor Cv = KL x (21/L)^(1/x) x (12/d)^(1/x) x (5.125/b)^(1/x), capped at 1.0, where L is the span (ft), d and b the depth and width (in), x = 10 for softwoods (20 for Southern Pine), and KL = 1.0 for a uniformly loaded simple span. A larger stressed volume is more likely to contain a strength-limiting defect, so the reference bending value is reduced. The allowable bending uses the LESSER of Cv and the beam-stability factor CL; Cv applies to glulam bending about the x-x axis, not sawn lumber. A design aid, not a substitute for a licensed engineer's design -- the engineer of record's stamped design governs.",
+    note: "NDS 2018 §5.3.6 glulam volume factor Cv = (21/L)^(1/x) x (12/d)^(1/x) x (5.125/b)^(1/x), capped at 1.0, where L is the length between points of zero moment (the span, for a simple beam; ft), d and b the depth and width (in), and x = 10 for softwoods (20 for Southern Pine). The current NDS has no loading factor KL (an NDS 1997 term); leave KL at 1.0 unless reproducing a pre-2001 design. A larger stressed volume is more likely to contain a strength-limiting defect, so the reference bending value is reduced. The allowable bending uses the LESSER of Cv and the beam-stability factor CL; Cv applies to glulam bending about the x-x axis, not sawn lumber. A design aid, not a substitute for a licensed engineer's design -- the engineer of record's stamped design governs.",
   };
 }
 export const glulamVolumeFactorExample = { inputs: { span_ft: 20, depth_in: 18, width_in: 5.125, x: 10, kl: 1.0 } };
 const _v448renderGlulamVolumeFactor = _simpleRenderer({
-  citation: "Citation: NDS 2018 §5.3.6 glulam volume factor Cv = KL x (21/L)^(1/x) x (12/d)^(1/x) x (5.125/b)^(1/x) <= 1.0, with x = 10 (softwood) or 20 (Southern Pine) and KL = 1.0 for a uniformly loaded simple span. The allowable bending uses the lesser of Cv and the stability factor CL. A design aid, not a substitute for a licensed engineer's design -- the engineer of record's stamped design governs.",
+  citation: "Citation: NDS 2018 §5.3.6 glulam volume factor Cv = (21/L)^(1/x) x (12/d)^(1/x) x (5.125/b)^(1/x) <= 1.0, with L between points of zero moment and x = 10 (softwood) or 20 (Southern Pine); the optional KL multiplier is the NDS 1997 loading factor, 1.0 under the current NDS. The allowable bending uses the lesser of Cv and the stability factor CL. A design aid, not a substitute for a licensed engineer's design -- the engineer of record's stamped design governs.",
   example: glulamVolumeFactorExample.inputs,
   fields: [
-    { key: "span_ft", label: "Beam span L (ft)", kind: "number" },
+    { key: "span_ft", label: "Length between points of zero moment L (ft; the span of a simple beam)", kind: "number" },
     { key: "depth_in", label: "Beam depth d (in)", kind: "number" },
     { key: "width_in", label: "Beam width b (in)", kind: "number" },
     { key: "x", label: "Species exponent x", kind: "select", default: "10", options: [{ value: "10", label: "10 (softwood, DF/SPF)" }, { value: "20", label: "20 (Southern Pine)" }] },
-    { key: "kl", label: "Loading factor KL (1.0 uniform simple span)", kind: "number" },
+    { key: "kl", label: "Legacy NDS 1997 loading factor KL (1.0 = current NDS)", kind: "number" },
   ],
   outputs: [
     { key: "cv", id: "gvf-out-cv", label: "Volume factor Cv", value: (r) => fmt(r.cv, 3) + (r.capped ? " (capped at 1.0)" : "") },
