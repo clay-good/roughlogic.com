@@ -14791,6 +14791,11 @@ test("bounds: spec-v180 commercial-lighting-load pins the over-10kVA demand, the
   assert.ok(Math.abs(ex.lighting_va - 15000) < 1e-9);
   assert.ok(Math.abs(ex.recep_demand_va - 10400) < 1e-9 && Math.abs(ex.total_va - 25400) < 1e-9);
   assert.ok(Math.abs(ex.total_a - 25400 / (Math.sqrt(3) * 208)) < 1e-9); // 208Y/120 three-phase line current
+  // NEC 2023 Table 220.42(A) footnote: the unit loads already include the 210.20(A)
+  // 125% continuous multiplier. Until 2026-09-25 the note told the reader to add
+  // 125% at the OCPD, counting it twice.
+  assert.match(ex.note, /already include the 125%/);
+  assert.doesNotMatch(ex.note, /applied at the OCPD/);
   const under = _cv180({ floor_area_ft2: 5000, unit_load_va_ft2: 3, receptacle_count: 40, supply_v: 208 });
   assert.ok(Math.abs(under.recep_va - 7200) < 1e-9 && Math.abs(under.recep_demand_va - 7200) < 1e-9);
   assert.ok("error" in _cv180({ floor_area_ft2: -1, unit_load_va_ft2: 3, receptacle_count: 10, supply_v: 208 }));

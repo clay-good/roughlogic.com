@@ -568,13 +568,13 @@ export function computeCommercialLightingLoad({ floor_area_ft2 = 0, unit_load_va
     recep_demand_va,
     total_va,
     total_a,
-    note: "NEC 2023 220.42 sets the general-lighting unit load by occupancy (Table 220.42(A), Table 220.12 before 2023); 220.14(I) counts each general-use receptacle strap at 180 VA; 220.47 (220.44 before 2023) applies a 100%/50% demand to the receptacle load above 10 kVA. The continuous-lighting 125% factor (210.20(A)) is applied at the OCPD, not here, and the energy code may set the lighting unit load. The AHJ governs.",
+    note: "NEC 2023 220.42 sets the general-lighting unit load by occupancy (Table 220.42(A), Table 220.12 before 2023); 220.14(I) counts each general-use receptacle strap at 180 VA; 220.47 (220.44 before 2023) applies a 100%/50% demand to the receptacle load above 10 kVA. The Table 220.42(A) unit loads already include the 125% continuous-load multiplier of 210.20(A) (the table footnote), so no second 125% is added to this lighting load; the energy code may set the lighting unit load. The AHJ governs.",
   };
 }
-export const commercialLightingLoadExample = { inputs: { floor_area_ft2: 5000, unit_load_va_ft2: 3, receptacle_count: 60, supply_v: 208 } };
+export const commercialLightingLoadExample = { inputs: { floor_area_ft2: 5000, unit_load_va_ft2: 1.3, receptacle_count: 60, supply_v: 208 } };
 
 function _v180renderCommercialLightingLoad(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: NEC 2023 Table 220.42(A) (general-lighting unit load), 220.14(I) (180 VA per receptacle strap), and 220.47 (receptacle demand factor over 10 kVA). The 125% continuous factor is applied at the OCPD; the energy code may set the lighting load. The AHJ governs. Free at nfpa.org/freeaccess.";
+  citationEl.textContent = "Citation: NEC 2023 Table 220.42(A) (general-lighting unit load), 220.14(I) (180 VA per receptacle strap), and 220.47 (receptacle demand factor over 10 kVA). The table unit loads already include the 125% continuous multiplier, so no second 125% is added; the energy code may set the lighting load. The AHJ governs. Free at nfpa.org/freeaccess.";
   const area = makeNumber("Gross floor area (ft²)", "cll-area", { step: "any", min: "0" });
   const unit = makeNumber("Unit load (VA/ft², Table 220.42(A))", "cll-unit", { step: "any", min: "0" });
   const count = makeNumber("General-use receptacle straps", "cll-count", { step: "1", min: "0" });
@@ -583,7 +583,7 @@ function _v180renderCommercialLightingLoad(inputRegion, outputRegion, citationEl
     { value: "3", label: "3-phase", selected: true }, { value: "1", label: "Single-phase" },
   ]);
   for (const f of [area, unit, count, volt, phase]) inputRegion.appendChild(f.wrap);
-  attachExampleButton(inputRegion, () => { area.input.value = "5000"; unit.input.value = "3"; count.input.value = "60"; volt.input.value = "208"; phase.select.value = "3"; update(); });
+  attachExampleButton(inputRegion, () => { area.input.value = "5000"; unit.input.value = "1.3"; count.input.value = "60"; volt.input.value = "208"; phase.select.value = "3"; update(); });
 
   const oLight = makeOutputLine(outputRegion, "Lighting load (VA)", "cll-out-light");
   const oRecep = makeOutputLine(outputRegion, "Receptacle connected (VA)", "cll-out-recep");

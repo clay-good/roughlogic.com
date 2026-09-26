@@ -8961,11 +8961,12 @@ export const CITATIONS = {
   "commercial-lighting-load": {
     formula: "lighting_va = area x unit load (Table 220.42(A)); recep_va = straps x 180 VA (220.14(I)); recep_demand = recep_va <= 10 kVA ? recep_va : 10000 + 0.50 x (recep_va - 10000) (220.47); total = lighting + recep_demand; amps = total / (sqrt(3) x V line-to-line) three-phase, total / V single-phase.",
     edition: "Commercial general-lighting and receptacle load, NEC 2023 Table 220.42(A), 220.14(I), and 220.47 (Table 220.12 and 220.44 in 2020 and earlier), by name.",
-    freeAccess: "NEC is free to read at nfpa.org/freeaccess. The 125% continuous-lighting factor is applied at the OCPD (210.20(A)), not here; the energy code may set the lighting unit load.",
+    freeAccess: "NEC is free to read at nfpa.org/freeaccess. The Table 220.42(A) unit loads already include the 125% continuous-load multiplier of 210.20(A) (the table footnote), so no second 125% is added; the energy code may set the lighting unit load.",
     governance: GOVERNANCE.electrical,
     editionNote: NEC_DISCLOSURE,
     assumptions: [
-      { name: "Unit and strap loads", value: "the general-lighting unit load is from Table 220.42(A) by occupancy; each general-use receptacle strap counts at 180 VA", source: "NEC Table 220.12, 220.14(I)" },
+      { name: "Unit and strap loads", value: "the general-lighting unit load is from Table 220.42(A) by occupancy; each general-use receptacle strap counts at 180 VA", source: "NEC 2023 Table 220.42(A), 220.14(I)" },
+      { name: "Continuous multiplier", value: "the 125% continuous-load multiplier (210.20(A)) is already in the Table 220.42(A) unit loads, so it is not applied again (an office is 1.3 VA/ft2)", source: "NEC 2023 Table 220.42(A) footnote" },
       { name: "Receptacle demand", value: "100% of the first 10 kVA of receptacle load plus 50% of the remainder", source: "NEC 2023 220.47" },
     ],
   },
