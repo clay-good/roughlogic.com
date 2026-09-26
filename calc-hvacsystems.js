@@ -1068,7 +1068,7 @@ export function computeWindowSolarHeatGain({ area_ft2 = 0, shgc = 0, psf = 0, u_
   const q_total = q_solar + q_cond;
   return {
     q_solar, q_cond, q_total,
-    note: "ASHRAE / ACCA Manual J fenestration cooling load: solar Q = A x SHGC x PSF and conduction Q = A x U x CLTD. The peak solar factor (PSF / SHGF) is read from the ASHRAE/ACCA table for the window's orientation and the site latitude (a west or east wall in summer runs far higher than a north wall; entered, not a bundled chart). The SHGC and U come from the NFRC label; the glass CLTD is the design temperature difference adjusted for the daily cycle. Interior shades and overhangs reduce the solar term by a separate shade factor. One cooling-load component, not a Manual J.",
+    note: "ASHRAE / ACCA Manual J fenestration cooling load: solar Q = A x SHGC x PSF and conduction Q = A x U x CLTD. The peak solar factor (PXI, or an older SHGF) is read from the ASHRAE/ACCA table for the window's orientation and the site latitude (a west or east wall in summer runs far higher than a north wall; entered, not a bundled chart). Match the multiplier to the table: SHGC goes with peak exterior irradiance (PXI, the current ASHRAE residential method); an older SHGF or CLTD/SCL table value is referenced to clear double-strength glass and takes the shading coefficient SC = SHGC / 0.87 instead, so SHGC x SHGF understates that load by about 13%. The SHGC and U come from the NFRC label; the glass CLTD is the design temperature difference adjusted for the daily cycle. Interior shades and overhangs reduce the solar term by a separate shade factor. One cooling-load component, not a Manual J.",
   };
 }
 function _v16h_renderWindowSolarHeatGain(inputRegion, outputRegion, citationEl) {

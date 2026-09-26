@@ -1198,6 +1198,28 @@
    }
   },
   {
+   "tile_id": "rainwater-catchment-area",
+   "source_publisher": "Texas Water Development Board",
+   "source_title": "The Texas Manual on Rainwater Harvesting, Ch. 4, Calculations using Monthly Average Rainfall Data",
+   "source_edition_or_year": "3rd edition, 2005",
+   "source_section_or_page": "1.97 in x 2,500 sq ft x 0.62 gal/in/sq ft x 0.85 = 2,595 gallons (run in reverse; TWDB rounds the 0.6233 constant to 0.62)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "target_annual_gal": 2595,
+    "annual_in": 1.97,
+    "efficiency": 0.85
+   },
+   "outputs": {
+    "catchment_ft2": {
+     "value": 2500,
+     "tolerance": {
+      "abs": 15
+     }
+    }
+   }
+  },
+  {
    "tile_id": "henderson-hasselbalch",
    "source_publisher": "Project (first-principles)",
    "source_title": "At pH = pKa the base:acid ratio is 1:1",
@@ -1981,6 +2003,37 @@
      "value": 6.02,
      "tolerance": {
       "abs": 0.1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "acoustic-gain-pag-nag",
+   "source_publisher": "Rane Corporation (Mike Slattery)",
+   "source_title": "RaneNote 140, Introduction to Speech Reinforcement with Conferencing",
+   "source_edition_or_year": "1997, revised 9/05",
+   "source_section_or_page": "D0 20 ft, D1 10 ft, D2 6 ft, Dn 4 ft, Ds 2 ft, NOM 1 -> PAG = 18 dB (to nearest whole dB), NAG = 14 dB",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "ds_ft": 2,
+    "d0_ft": 20,
+    "d1_ft": 10,
+    "d2_ft": 6,
+    "open_mics": 1,
+    "ead_ft": 4
+   },
+   "outputs": {
+    "pag_db": {
+     "value": 18,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "nag_db": {
+     "value": 14,
+     "tolerance": {
+      "abs": 0.05
      }
     }
    }
@@ -3696,6 +3749,28 @@
      "value": 55.56,
      "tolerance": {
       "abs": 0.1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "asphalt-tack-coat-quantity",
+   "source_publisher": "National Asphalt Pavement Association",
+   "source_title": "Asphalt Paving Handbook, 5.5.2 Tack Coat",
+   "source_edition_or_year": "web handbook",
+   "source_section_or_page": "(0.040) / (2/3) = 0.060 gal/yd2 undiluted emulsion (residue 2/3)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "area_sf": 10000,
+    "residual_rate_gal_sy": 0.04,
+    "residue_pct": 66.6667
+   },
+   "outputs": {
+    "undiluted_gal_sy": {
+     "value": 0.06,
+     "tolerance": {
+      "abs": 0.0005
      }
     }
    }
@@ -5485,6 +5560,50 @@
     },
     "measured_current_a": {
      "value": 200,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "dc-shunt-sizing",
+   "source_publisher": "Murata Power Solutions",
+   "source_title": "DMS Accessories: 50mV and 100mV Base-mounted DC Shunts, selection guide",
+   "source_edition_or_year": "MPM_DMS Accessories.C01, pp. 1-3",
+   "source_section_or_page": "100A/50mV shunt: 0.0005 ohm",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "rated_current_a": 100,
+    "rated_millivolt": 50,
+    "measured_millivolt": 25
+   },
+   "outputs": {
+    "shunt_resistance_ohm": {
+     "value": 0.0005,
+     "tolerance": {
+      "abs": 1e-07
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "dc-shunt-sizing",
+   "source_publisher": "Murata Power Solutions",
+   "source_title": "DMS Accessories: 50mV and 100mV Base-mounted DC Shunts",
+   "source_edition_or_year": "MPM_DMS Accessories.C01, p. 2",
+   "source_section_or_page": "a 500A/50mV shunt dissipates 25 Watts (500A x 0.050V = 25 Watts); Murata derates continuous use to 2/3 of this",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "rated_current_a": 500,
+    "rated_millivolt": 50,
+    "measured_millivolt": 25
+   },
+   "outputs": {
+    "power_dissipation_w": {
+     "value": 25,
      "tolerance": {
       "abs": 0.01
      }
@@ -19070,6 +19189,33 @@
    }
   },
   {
+   "tile_id": "stub-acme-thread-depth",
+   "source_publisher": "Engineers Edge, reproducing ASME/ANSI B1.8-1988 (R2001)",
+   "source_title": "ACME Stub Threads Size Designation Table",
+   "source_edition_or_year": "web table",
+   "source_section_or_page": "1 in - 5 TPI internal thread: Pitch Dia. Min 0.9400, Minor Dia. Min 0.8800 (the basic dimensions; the external minor max is 0.8600)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "major_dia_in": 1,
+    "tpi": 5
+   },
+   "outputs": {
+    "pitch_dia_in": {
+     "value": 0.94,
+     "tolerance": {
+      "abs": 5e-05
+     }
+    },
+    "minor_dia_in": {
+     "value": 0.88,
+     "tolerance": {
+      "abs": 5e-05
+     }
+    }
+   }
+  },
+  {
    "tile_id": "acme-thread-depth",
    "source_publisher": "General-purpose Acme thread (coarser cross-check)",
    "source_title": "cross-check: a 1.5-4 Acme -> 0.250 in pitch, 0.135 in depth, 1.230 in minor",
@@ -29966,6 +30112,27 @@
    }
   },
   {
+   "tile_id": "winch-fleet-angle",
+   "source_publisher": "Ingersoll Rand Lifting Solutions",
+   "source_title": "Fleet Angle Calculations",
+   "source_edition_or_year": "web resource",
+   "source_section_or_page": "DCF = 20 inches (1.66 ft) at a 1-1/2 degree fleet angle: DLS = 1.66 x 38 = approximately 63 feet (IR's ratio rule; run forward for the angle)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "lateral_offset": 1.66,
+    "lead_distance": 63
+   },
+   "outputs": {
+    "fleet_angle_deg": {
+     "value": 1.5,
+     "tolerance": {
+      "abs": 0.02
+     }
+    }
+   }
+  },
+  {
    "tile_id": "floor-area-ratio",
    "source_publisher": "Floor area ratio (municipal zoning intensity measure)",
    "source_title": "FAR = building_floor_area / lot_area; max_buildable = FAR_limit x lot_area",
@@ -33092,6 +33259,29 @@
      "value": 1.09,
      "tolerance": {
       "abs": 0.02
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "cutting-fluid-concentration",
+   "source_publisher": "Coolant Consultants, Inc.",
+   "source_title": "Refractometers Explained",
+   "source_edition_or_year": "web article",
+   "source_section_or_page": "a refractometer reading of 5 multiplied by a multiplier of 1.75 = 8.75% concentration",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "brix_reading": 5,
+    "refractometer_factor": 1.75,
+    "sump_volume_gal": 50,
+    "target_pct": 10
+   },
+   "outputs": {
+    "current_pct": {
+     "value": 8.75,
+     "tolerance": {
+      "abs": 0.005
      }
     }
    }
@@ -38941,6 +39131,35 @@
    }
   },
   {
+   "tile_id": "rain-load-ponding",
+   "source_publisher": "STRUCTURE magazine (Sandra Hyde, P.E.)",
+   "source_title": "Calculating Rain Loads per 2021 IBC",
+   "source_edition_or_year": "ASCE 7-16 basis",
+   "source_section_or_page": "5,000 sq ft at 6.88 in/hr: Q = 0.0104 x A x i = 358 gal/min; R = 5.2(6 in. + 3 in.) = 46.8 psf (no ponding head; 7-16 has no dp term)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "static_head_in": 6,
+    "hydraulic_head_in": 3,
+    "roof_area_ft2": 5000,
+    "rainfall_in_hr": 6.88
+   },
+   "outputs": {
+    "rain_load_psf": {
+     "value": 46.8,
+     "tolerance": {
+      "abs": 0.05
+     }
+    },
+    "design_flow_gpm": {
+     "value": 358,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
    "tile_id": "asce7-load-combinations",
    "source_publisher": "ASCE 7 \u00a72.4.1 basic ASD combinations",
    "source_title": "roof D15/S30 (ASCE 7-22 snow, 0.7S)/W-25 -> 36 psf governing, 6 psf net uplift",
@@ -41188,6 +41407,41 @@
    }
   },
   {
+   "tile_id": "condensate-return-sizing",
+   "source_publisher": "Fluid Controls Institute",
+   "source_title": "Tech Sheet ST 108, Condensate Line Sizing for Gravity Returns, Example 1",
+   "source_edition_or_year": "5/12/16, pp. 3-4",
+   "source_section_or_page": "Fs = 5,000 x 0.132 = 660 lb/hr; Pa = (2.4 x 660 x 26.8) / 3,000 = 14.15 sq inch; a 5 in schedule 40 (FCI adds 0.4% for the liquid)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "condensate_lbhr": 5000,
+    "flash_fraction": 0.132,
+    "spec_vol_ft3lb": 26.8,
+    "vel_ceiling_fpm": 3000
+   },
+   "outputs": {
+    "flash_lbhr": {
+     "value": 660,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "req_area_in2": {
+     "value": 14.15,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "chosen_nps": {
+     "value": "5",
+     "tolerance": {
+      "abs": 0
+     }
+    }
+   }
+  },
+  {
    "tile_id": "branch-saddle-cutback",
    "source_publisher": "Cylinder-intersection geometry; Pipe Fabrication Institute layout (by name)",
    "source_title": "2 in branch (OD 2.375) on a 6 in run (OD 6.625), 90 deg -> 0.22 in max cutback",
@@ -43352,6 +43606,26 @@
      "value": 0.73,
      "tolerance": {
       "abs": 0.0001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "reaming-drill-allowance",
+   "source_publisher": "Gammons Hoaglund",
+   "source_title": "Reaming Guide, Stock Allowance in Reaming",
+   "source_edition_or_year": "web guide",
+   "source_section_or_page": "Machine reaming: 0.010 for 1/4 in holes, 0.015 for 1/2 in, up to 0.025 for 1.5 in holes",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "reamer_diameter_in": 0.5
+   },
+   "outputs": {
+    "allowance_used_in": {
+     "value": 0.015,
+     "tolerance": {
+      "abs": 0.0005
      }
     }
    }
@@ -55304,6 +55578,38 @@
      "value": 36.03430348877187,
      "tolerance": {
       "abs": 0.001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "sprinkler-pressure-demand",
+   "source_publisher": "AXA XL Risk Consulting",
+   "source_title": "PRC.12.1.1.1 Sprinkler System Hydraulics",
+   "source_edition_or_year": "2020, pp. 6-10",
+   "source_section_or_page": "one K5.6 head at 20 gpm: 12.76 psi; 1 in Sch 40 (1.049 in), C 120, 20 gpm: Fp = 0.130 psi/ft, 10 ft -> 1.3 psi (single segment; AXA balances node by node)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "q_head_gpm": 20,
+    "k_factor": 5.6,
+    "q_total_gpm": 20,
+    "pipe_id_in": 1.049,
+    "c_factor": 120,
+    "equiv_length_ft": 10,
+    "elevation_ft": 0
+   },
+   "outputs": {
+    "start_pressure_psi": {
+     "value": 12.76,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "friction_psi": {
+     "value": 1.3,
+     "tolerance": {
+      "abs": 0.01
      }
     }
    }

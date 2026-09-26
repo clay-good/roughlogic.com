@@ -448,7 +448,7 @@ FINISH_RENDERERS["glass-weight"] = _simpleRenderer({
   fields: [
     { key: "width_in", label: "Width (in)", kind: "number" },
     { key: "height_in", label: "Height (in)", kind: "number" },
-    { key: "thickness_in", label: "Thickness (in, e.g. 0.25 for 1/4\")", kind: "number" },
+    { key: "thickness_in", label: "Actual thickness (in; 1/4\" nominal float is 6 mm = 0.236 in)", kind: "number" },
     { key: "panes", label: "Identical panes (1 lite; 2 for an equal IGU)", kind: "number" },
   ],
   outputs: [

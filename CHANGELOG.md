@@ -6,6 +6,21 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Changed
 
+- **Eleven more tiles now carry a publisher's printed example.**
+  - `reaming-drill-allowance`: Gammons.
+  - `stub-acme-thread-depth`: ASME B1.8 table.
+  - `winch-fleet-angle`: Ingersoll Rand.
+  - `cutting-fluid-concentration`: Coolant Consultants.
+  - `dc-shunt-sizing`: Murata.
+  - `acoustic-gain-pag-nag`: RaneNote 140.
+  - `rainwater-catchment-area`: TWDB manual.
+  - `asphalt-tack-coat-quantity`: NAPA Asphalt Paving Handbook.
+  - `condensate-return-sizing`: FCI ST 108.
+  - `sprinkler-pressure-demand`: AXA XL PRC.12.1.1.1.
+  - `rain-load-ponding`: STRUCTURE magazine.
+
+  README: 1,167 of 2,183 tiles are checked only against the project's own derivation; 1,016 carry an outside source.
+
 - **Twelve more tiles now carry a publisher's printed example.** More than 1,000 tiles now have an outside source.
   - **Hydraulics:**
     - `hydraulic-pump-horsepower` and `hydraulic-pump-flow`: Denison T6.
@@ -213,6 +228,10 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 - **wrangler 4.129.0 → 4.135.0, and the `sharp` override is gone.** Dependabot's bump failed CI on `check-dependency-overrides`. The new wrangler brings a miniflare that asks for the patched `sharp` 0.35.4 itself, so the September 9 pin no longer changed anything. This is the case the gate was written for, so the override is deleted rather than left as a second source of truth. `npm audit` reports 0 vulnerabilities. docs/threat-model.md records the change.
 
 ### Fixed
+
+- **`stub-acme-thread-depth` no longer calls D − 0.6P the "external minor" diameter.** ASME B1.8 makes that the basic minor diameter, which is the internal (nut) thread's minimum minor. The external thread's maximum minor is smaller: 0.8600 in against 0.8800 in at 1-5.
+- **`window-solar-heat-gain` now says which multiplier goes with which solar table.** Use SHGC with peak exterior irradiance, as in the current ASHRAE residential method. An older SHGF or CLTD/SCL value is referenced to clear double-strength glass and takes the shading coefficient, SHGC / 0.87; using SHGC with those tables understates the load by about 13%.
+- **`glass-weight` now asks for the actual thickness.** A "1/4 in" float lite is 6 mm, or 0.236 in, and typing the nominal 0.25 overstates the weight by about 6%.
 
 - **`reeving-parts-of-line` now counts the sheave the hauling line leaves the block over, as Crosby's line-parts ratio does.** Crosby's anti-friction ratios are 0.98 for 1 part, 3.81 for 4 parts and 7.32 for 8 parts, which is k + k² + ... + kᴺ. The tile's formula left out the lead sheave, so 20,000 lb on 4 parts gave 5,152 lb instead of about 5,258 lb. A new "lead line leaves the block" input defaults to "over a sheave." "Straight off a part" gives the old result.
 - **`food-cost-percentage` can deduct employee meals and transfers out.** Dopson & Hayes (Food and Beverage Cost Control, Ch. 5) take cost of food sold as cost of food consumed less the food that left without a sale. Their example now reproduces: $66,500 consumed, less $1,500 in meals, is $65,000, or 34.2% of $190,000.
