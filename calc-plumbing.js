@@ -3263,12 +3263,15 @@ PLUMBING_RENDERERS["vent-sizing-stack"] = renderVentSizingStack;
 export function computeMixedWaterTemp({ mode = "find-blend", hot_temp_F = 0, cold_temp_F = 0, hot_gpm = 0, cold_gpm = 0, target_temp_F = 0 } = {}) {
   const _g = _finiteGuard({ hot_temp_F, cold_temp_F, hot_gpm, cold_gpm, target_temp_F }); if (_g) return _g;
   const Th = Number(hot_temp_F), Tc = Number(cold_temp_F);
-  // ASSE scald-guard delivery limits.
-  const FIXTURE_LIMIT_F = 120, SHOWER_LIMIT_F = 110;
+  // IPC scald limits: 120 F for shower and tub-shower valves (424.3) and tub
+  // fillers (424.5); 110 F for public hand-washing (416.5, ASSE 1070). Until
+  // 2026-09-25 the 110 F figure was labeled the shower/tub-fill limit, so any
+  // shower blend from 110 to 120 F, which the code allows, was flagged.
+  const SHOWER_TUB_LIMIT_F = 120, PUBLIC_LAV_LIMIT_F = 110;
   function scaldFlag(T) {
     const flags = [];
-    if (T > FIXTURE_LIMIT_F) flags.push("Delivered temperature exceeds the 120 F fixture scald limit (ASSE 1017/1016/1070).");
-    else if (T > SHOWER_LIMIT_F) flags.push("Delivered temperature exceeds the 110 F shower/tub-fill limit (ASSE 1016/1070).");
+    if (T > SHOWER_TUB_LIMIT_F) flags.push("Delivered temperature exceeds the 120 F scald limit for shower, tub-shower and tub-filler valves (IPC 424.3 / 424.5; ASSE 1016 / 1070).");
+    else if (T > PUBLIC_LAV_LIMIT_F) flags.push("Delivered temperature exceeds the 110 F public hand-washing scald limit (IPC 416.5, ASSE 1070); it is within the 120 F shower and tub limit.");
     return flags;
   }
 

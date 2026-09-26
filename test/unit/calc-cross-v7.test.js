@@ -77,3 +77,11 @@ test("253 status without actual clearance flags '(actual clearance not entered)'
 test("CROSS_RENDERERS exposes fall-protection-clearance", () => {
   assert.equal(typeof CROSS_RENDERERS["fall-protection-clearance"], "function");
 });
+
+test("253 overhead SRL arrests in the ANSI/ASSP Z359.14-2021 42 in maximum, not 1 ft", () => {
+  // Until 2026-09-25 the overhead SRL used 1.0 ft of arrest, under even the
+  // 2012 Class A 24 in, so the required clearance was 2.5 ft short.
+  const r = computeFallProtectionClearance({ connector: "self-retracting-overhead", worker_height_ft: 5, harness_stretch_ft: 1, safety_factor_ft: 1 });
+  assert.equal(r.decel_ft, 3.5);
+  assert.equal(r.required_clearance_ft, 2 + 3.5 + 5 + 1 + 1);
+});

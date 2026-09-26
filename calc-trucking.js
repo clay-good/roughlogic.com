@@ -130,7 +130,11 @@ export const TRAILER_DIMENSIONS_IN = {
   dry_van_48: { L: 576, W: 100, H: 110, weight_max_lb: 44000 },
   pup_28:     { L: 336, W: 100, H: 110, weight_max_lb: 22500 },
   reefer_40:  { L: 480, W: 96,  H: 102, weight_max_lb: 43500 },
-  ocean_20:   { L: 232, W: 92,  H: 94,  weight_max_lb: 47500 },
+  // Ocean payloads are the ISO 668 max gross (30,480 kg for both 20 ft and
+  // 40 ft since Amendment 1, 2005) less a typical tare. Until 2026-09-25 the
+  // 20 ft row kept the pre-2005 24,000 kg gross (47,500 lb payload), so a
+  // weigh-out 20 ft load counted about 30% too few pallets.
+  ocean_20:   { L: 232, W: 92,  H: 94,  weight_max_lb: 62000 },
   ocean_40:   { L: 472, W: 92,  H: 94,  weight_max_lb: 59500 },
 };
 

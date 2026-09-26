@@ -55718,3 +55718,14 @@ test("bounds: calc-gas ifgcLowPressureFlow reproduces IFGC Table 402.4(2) and gu
   assert.ok(_ifgcQ({ d_in: 0.824, dP_in_wc: 0.5, cr: 1.2462, L_ft: 50 }) < q);
   for (const bad of [{ L_ft: 0 }, { d_in: 0 }, { dP_in_wc: 0 }]) assert.strictEqual(_ifgcQ({ d_in: 0.824, dP_in_wc: 0.5, cr: 0.6094, L_ft: 50, ...bad }), 0);
 });
+
+test("bounds: computeMixedWaterTemp scald flags follow IPC 424.3 / 416.5 (120 F shower/tub, 110 F public lavatory)", () => {
+  // Until 2026-09-25 a 115 F shower blend was flagged as over a "110 F shower/tub-fill limit".
+  const r = _cv26b1({ mode: "find-blend", hot_temp_F: 140, cold_temp_F: 50, hot_gpm: 65, cold_gpm: 25 });
+  assert.ok(Math.abs(r.blend_temp_F - 115) < 1e-9);
+  assert.equal(r.notes.length, 1);
+  assert.match(r.notes[0], /110 F public hand-washing scald limit/);
+  assert.match(r.notes[0], /within the 120 F shower and tub limit/);
+  const hot = _cv26b1({ mode: "find-blend", hot_temp_F: 140, cold_temp_F: 50, hot_gpm: 80, cold_gpm: 10 });
+  assert.match(hot.notes[0], /120 F scald limit for shower, tub-shower and tub-filler valves/);
+});

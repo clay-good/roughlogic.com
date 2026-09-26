@@ -44,7 +44,7 @@
     {
       "file": "fall-protection-benchmarks.json",
       "name": "Manufacturer connector-decel benchmarks for personal fall arrest",
-      "gzip_size_bytes": 485
+      "gzip_size_bytes": 527
     }
   ],
   "hashes": {
@@ -55,6 +55,6 @@
     "niosh-coupling.json": "ceb2d1f4928d6c077f568fcff517b7c561899e932e93f9aad23d6097547f2cc5",
     "heat-cold-stress.json": "b869cc9f7ecbeeaaca5f30cdab7d24cbb5e88f0d5b70564585089398dc2a2243",
     "osha-trench.json": "48a2a605c8b94cba381b5df1280eef6ecf643eef16d6a0055ac84192b6a01f2b",
-    "fall-protection-benchmarks.json": "df335342bf6a498794d5c8a2c5a790e4e1ef05f5969a06df8c22872538759fdd"
+    "fall-protection-benchmarks.json": "859170f7d732f801bbacdb8b8080084bb1641c043dbaba92f7f0d3c2029fcb34"
   }
 }

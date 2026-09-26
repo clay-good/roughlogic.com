@@ -116,3 +116,13 @@ test("Incoterm: FCA risk transfers at carrier", () => { const r = computeIncoter
 
 // Renderer registry
 test("TRUCKING_RENDERERS: includes all 7 ids", () => { for (const id of ["dim-weight", "freight-density", "pallet-loadout", "hos-math", "bridge-formula", "reefer-burn", "incoterm-decoder"]) assert.equal(typeof TRUCKING_RENDERERS[id], "function", id); });
+
+test("Pallet: 20 ft ocean box uses the ISO 668 (2005+) 30,480 kg gross, same as 40 ft", () => {
+  // Until 2026-09-25 the 20 ft row kept the pre-2005 24,000 kg gross (47,500 lb
+  // payload) while the 40 ft row used 30,480 kg, so a heavy 20 ft load weighed
+  // out about 30% early.
+  assert.equal(TRAILER_DIMENSIONS_IN.ocean_20.weight_max_lb, 62000);
+  assert.ok(TRAILER_DIMENSIONS_IN.ocean_20.weight_max_lb > TRAILER_DIMENSIONS_IN.ocean_40.weight_max_lb);
+  const r = computePalletLoadout({ case_length_in: 12, case_width_in: 10, case_height_in: 12, case_weight_lb: 100, cases_per_pallet: 40, trailer: "ocean_20" });
+  assert.equal(r.pallets_by_weight, 15); // floor(62,000 / 4,000); the old row gave floor(47,500 / 4,000) = 11
+});

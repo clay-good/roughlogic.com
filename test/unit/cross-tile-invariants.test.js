@@ -10994,7 +10994,7 @@ test("monotonicity: computeFallProtectionClearance required_clearance_ft = free_
     `more worker height should reduce remaining: ${plusWh.remaining_clearance_ft} vs ${baseR.remaining_clearance_ft}`);
   // Connector free-fall ordering pin (SRL 2 < 6 ft lanyard 6 < 12 ft lanyard 12).
   const srl = computeFallProtectionClearance({ connector: "self-retracting-overhead", worker_height_ft: 5, harness_stretch_ft: 1, safety_factor_ft: 1, actual_clearance_ft: 30 });
-  // A leading-edge SRL anchored at the feet free-falls up to 5 ft and arrests in up to 60 in (Z359.14 Class 2).
+  // A leading-edge SRL anchored at the feet free-falls up to 5 ft; the row keeps 5 ft of arrest, above the Z359.14-2021 42 in cap, for over-edge deflection.
   const srlLe = computeFallProtectionClearance({ connector: "self-retracting-leading-edge", worker_height_ft: 5, harness_stretch_ft: 1, safety_factor_ft: 1, actual_clearance_ft: 30 });
   assert.equal(srlLe.required_clearance_ft, 5 + 5 + 5 + 1 + 1);
   // Z359.13: a 12 ft free-fall lanyard may decelerate up to 60 in.

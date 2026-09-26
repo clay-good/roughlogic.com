@@ -2058,7 +2058,7 @@ export const CITATIONS = {
     edition: "OSHA 29 CFR 1926.502 (Fall protection systems criteria) by section. ANSI Z359 (Fall Protection and Fall Restraint) by name. Manufacturer connector-decel benchmarks from data/crosswalks/fall-protection-benchmarks.json.",
     freeAccess: "29 CFR 1926.502 free at ecfr.gov. ANSI Z359 licensed; manufacturer guides free at each manufacturer site.",
     governance: GOVERNANCE.engineer_of_record,
-    editionNote: "Single-edition (29 CFR 1926.502 + manufacturer connector specs; quarterly recheck of manufacturer attribution per spec-v7 §8).",
+    editionNote: "29 CFR 1926.502 plus the ANSI/ASSP Z359 maxima: Z359.13-2013 lanyard deployment (48 in for a 6 ft free fall, 60 in for 12 ft) and Z359.14-2021 self-retracting arrest distance (42 in for Class 1 and Class 2; the 2012 edition allowed 24 in Class A / 54 in Class B). Manufacturer clearance charts govern the device in use.",
     assumptions: [
       { name: "Default free-fall", value: "6 ft for personal fall arrest (PFAS)", source: "29 CFR 1926.502(d)(16)" },
       { name: "Default decel", value: "4.0 ft for a 6 ft free-fall shock-absorbing lanyard (48 in maximum deployment; OSHA's 3.5 ft is the system limit, not the labeled stroke) / 1.0 ft for an overhead SRL", source: "ANSI/ASSP Z359.13-2013; manufacturer typical for the SRL" },
@@ -5265,7 +5265,7 @@ export const CITATIONS = {
     edition: "Carrier published trailer specs (Wabash National, Great Dane, Utility Trailer Manufacturing) by name; ISO 668 ocean-container specs by name.",
     freeAccess: "Trailer specs free at each manufacturer site. ISO 668 licensed; principles free in carrier rate guides.",
     governance: GOVERNANCE.trucking,
-    editionNote: "Single-edition (trailer manufacturer + ISO 668 specs).",
+    editionNote: "Trailer figures are manufacturer specs. The ocean payloads follow ISO 668 as amended in 2005, which raised the 20 ft maximum gross from 24,000 kg to 30,480 kg (the 40 ft rating); payload is that gross less a typical tare (about 2,300 kg for 20 ft, 3,700 kg for 40 ft). A loaded box on a US chassis is usually capped lower by road weight limits.",
     assumptions: [
       { name: "Standard pallet footprint", value: "48 in × 40 in (GMA) unless user supplies", source: "GMA pallet specification" },
       { name: "Trailer dimensions", value: "53 ft = 630 in × 100 in × 110 in interior typical", source: "trailer-manufacturer spec" },
@@ -9491,7 +9491,7 @@ export const CITATIONS = {
     edition: "First-principles mixing energy balance for blending hot and cold potable water; the delivery-temperature limits follow the ASSE 1017 (master tempering) and ASSE 1016/1070 (point-of-use scald-guard) device standards and the IPC/UPC scald provisions, by name.",
     freeAccess: "Public first-principles energy balance. The listed mixing valve and the AHJ govern the installed setpoint.",
     governance: GOVERNANCE.plumbing,
-    editionNote: "Single-edition (first-principles mixing). Scald limits: <= 120 F at the fixture, <= 110 F for showers/tub fills (ASSE guards).",
+    editionNote: "Single-edition (first-principles mixing). Scald limits: <= 120 F for shower, tub-shower and tub-filler valves (IPC 424.3 / 424.5), <= 110 F at public hand-washing fixtures (IPC 416.5, ASSE 1070).",
     assumptions: [
       { name: "Same fluid", value: "hot and cold are the same fluid (water); the balance is by flow-weighted temperature", source: "first principles" },
     ],

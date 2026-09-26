@@ -1863,14 +1863,18 @@ export const FALL_PROTECTION_DECEL = {
   // (4 ft). 3.5 ft is OSHA 1926.502(d)(16)(iv)'s system limit, not the stroke
   // a Z359.13-labeled lanyard may use; until 2026-09-25 this read 3.5 ft.
   "shock-absorbing-lanyard-6ft":  { decel_ft: 4.0, free_fall_ft: 6, description: "6 ft shock-absorbing lanyard" },
-  // ANSI/ASSP Z359.13 lets a 12 ft free-fall lanyard decelerate up to 60 in;
-  // a leading-edge SRL (Z359.14 Class 2) is anchored as low as the feet, so
-  // up to 5 ft of free fall, and may arrest in up to 60 in -- before any edge
-  // deflection. Until 2026-09-19 these read 4 ft and 2 + 1 ft, understating
-  // the clearance by 1 ft and by 7 ft.
+  // ANSI/ASSP Z359.13 lets a 12 ft free-fall lanyard decelerate up to 60 in.
+  // A leading-edge SRL (Z359.14-2021 Class 2) may be anchored up to 5 ft below
+  // the D-ring, so up to 5 ft of free fall. Z359.14-2021 caps the arrest
+  // distance of both Class 1 and Class 2 at 42 in (it was 24 in Class A /
+  // 54 in Class B in 2012); the leading-edge row keeps 5 ft, above that cap,
+  // because an over-edge fall adds lifeline deflection this tile does not
+  // model. Until 2026-09-19 these read 4 ft and 2 + 1 ft, understating the
+  // clearance by 1 ft and by 7 ft. The overhead SRL read 1.0 ft until
+  // 2026-09-25, under even the 2012 Class A 24 in; it is now the 42 in cap.
   "shock-absorbing-lanyard-12ft": { decel_ft: 5.0, free_fall_ft: 12, description: "12 ft shock-absorbing lanyard" },
   "self-retracting-leading-edge": { decel_ft: 5.0, free_fall_ft: 5, description: "Leading-edge SRL (foot-level anchor)" },
-  "self-retracting-overhead":     { decel_ft: 1.0, free_fall_ft: 2, description: "Overhead SRL" },
+  "self-retracting-overhead":     { decel_ft: 3.5, free_fall_ft: 2, description: "Overhead SRL" },
 };
 
 // dims: in { connector: dimensionless, free_fall_ft_override: L, decel_ft_override: L, worker_height_ft: L, harness_stretch_ft: L, safety_factor_ft: L, actual_clearance_ft: L } out: { clearance_ft: L, pass: dimensionless }
