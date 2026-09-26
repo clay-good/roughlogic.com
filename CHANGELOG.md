@@ -6,6 +6,18 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Changed
 
+- **Eight more tiles now carry a publisher's printed example.**
+  - `battery-c-rate`: SimpliPhi.
+  - `battery-series-parallel`: Battle Born.
+  - `ev-charge-time`: Hypercharge.
+  - `ev-charge-cost`: DOE AFDC.
+  - `bifacial-pv-gain`: IEC TS 60904-1-2.
+  - `joist-cantilever-check`: 2021 IRC Table R507.6 via JLC.
+  - `rotary-phase-converter-sizing`: American Rotary.
+  - `recovery-cylinder`: ACHR News / AHRI Guideline K.
+
+  README: 1,159 of 2,183 tiles are checked only against the project's own derivation; 1,024 carry an outside source.
+
 - **Eleven more tiles now carry a publisher's printed example.**
   - `reaming-drill-allowance`: Gammons.
   - `stub-acme-thread-depth`: ASME B1.8 table.
@@ -228,6 +240,10 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 - **wrangler 4.129.0 → 4.135.0, and the `sharp` override is gone.** Dependabot's bump failed CI on `check-dependency-overrides`. The new wrangler brings a miniflare that asks for the patched `sharp` 0.35.4 itself, so the September 9 pin no longer changed anything. This is the case the gate was written for, so the override is deleted rather than left as a second source of truth. `npm audit` reports 0 vulnerabilities. docs/threat-model.md records the change.
 
 ### Fixed
+
+- **`masonry-joint-reinforcement` now counts the lap between wire pieces.** Each added piece laps the last by at least 6 in, or 9 in for 3/16 in wire, so a 10 ft piece adds only 9.5 ft. The tile divided the wall length by the piece length. A 40 ft wall now takes 5 pieces per course, not 4, and the example's 12 ft wall goes from 36 pieces to 45. The lap is a new input.
+- **`ev-range-per-hour` and `ev-charge-cost` now say their mi/kWh is measured at the battery.** EPA's window-sticker kWh/100 mi is measured from the wall and already includes charging losses. Entering it with a charging efficiency counts those losses twice, so the labels now say to set the efficiency to 100% with a sticker figure.
+- **`reducer-offset`: the example's lay length is now ASME B16.9's 5.5 in for a 6 x 4 reducer, not 7 in.** The tile only displays the lay length, so no computed value changes.
 
 - **`stub-acme-thread-depth` no longer calls D − 0.6P the "external minor" diameter.** ASME B1.8 makes that the basic minor diameter, which is the internal (nut) thread's minimum minor. The external thread's maximum minor is smaller: 0.8600 in against 0.8800 in at 1-5.
 - **`window-solar-heat-gain` now says which multiplier goes with which solar table.** Use SHGC with peak exterior irradiance, as in the current ASHRAE residential method. An older SHGF or CLTD/SCL value is referenced to clear double-strength glass and takes the shading coefficient, SHGC / 0.87; using SHGC with those tables understates the load by about 13%.

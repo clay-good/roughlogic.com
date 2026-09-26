@@ -623,34 +623,39 @@ MASONRY_RENDERERS["brick-veneer-weep-count"] = _simpleRenderer({
 });
 
 // ===================== spec-v922: masonry horizontal joint-reinforcement takeoff =====================
-// dims: in { wall_length_ft: L, wall_height_ft: L, vertical_spacing_in: L, piece_length_ft: L } out: { reinforced_courses: dimensionless, pieces_per_course: dimensionless, total_pieces: dimensionless }
-export function computeMasonryJointReinforcement({ wall_length_ft = 40, wall_height_ft = 12, vertical_spacing_in = 16, piece_length_ft = 10 } = {}) {
+// dims: in { wall_length_ft: L, wall_height_ft: L, vertical_spacing_in: L, piece_length_ft: L, lap_in: L } out: { reinforced_courses: dimensionless, pieces_per_course: dimensionless, total_pieces: dimensionless }
+export function computeMasonryJointReinforcement({ wall_length_ft = 40, wall_height_ft = 12, vertical_spacing_in = 16, piece_length_ft = 10, lap_in = 6 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(wall_length_ft > 0)) return { error: "Wall length must be positive (ft)." };
   if (!(wall_height_ft > 0)) return { error: "Wall height must be positive (ft)." };
   if (!(vertical_spacing_in > 0)) return { error: "Vertical spacing must be positive (in)." };
   if (!(piece_length_ft > 0)) return { error: "Piece length must be positive (ft)." };
   const reinforced_courses = Math.ceil(wall_height_ft * 12 / vertical_spacing_in);
-  const pieces_per_course = Math.ceil(wall_length_ft / piece_length_ft);
+  // Each added piece laps the last by at least 6 in (9 in for 3/16 in wire), so it adds only piece - lap.
+  // Until 2026-09-25 the lap was ignored: a 40 ft wall took 4 ten-foot pieces instead of 5.
+  const lap_ft = (Number(lap_in) || 0) / 12;
+  if (!(lap_ft >= 0 && lap_ft < piece_length_ft)) return { error: "Lap must be at least 0 and shorter than a piece (in)." };
+  const pieces_per_course = wall_length_ft <= piece_length_ft ? 1 : 1 + Math.ceil((wall_length_ft - piece_length_ft) / (piece_length_ft - lap_ft) - 1e-9);
   const total_pieces = reinforced_courses * pieces_per_course;
   if (![reinforced_courses, pieces_per_course, total_pieces].every(Number.isFinite)) return { error: "Joint-reinforcement math is not a finite value." };
   return {
     reinforced_courses,
     pieces_per_course,
     total_pieces,
-    note: "Horizontal joint reinforcement (ladder or truss wire) laid in the bed joints of a masonry wall: reinforced courses = ceil(height / vertical spacing), pieces per course = ceil(length / piece length), total = courses x pieces. IRC R606.12.2 / TMS 402 set the maximum vertical spacing at 16 in (every other 8 in course); some specs tighten it to 8 in or add wire at bond beams, lintels, and above and below openings. Wire comes in ~10 ft lengths lapped at least 6 in (the lap is not added here). A 40 x 12 ft CMU wall at 16 in is 9 courses x 4 pieces = 36. A material count; the spacing, the lap, and the extra wire at openings come from the structural spec and the adopted code.",
+    note: "Horizontal joint reinforcement (ladder or truss wire) laid in the bed joints of a masonry wall: reinforced courses = ceil(height / vertical spacing), pieces per course = 1 + ceil((length - piece) / (piece - lap)) because each added piece laps the last by at least 6 in (9 in for 3/16 in wire), total = courses x pieces. IRC R606.12.2 / TMS 402 set the maximum vertical spacing at 16 in (every other 8 in course); some specs tighten it to 8 in or add wire at bond beams, lintels, and above and below openings. Wire comes in ~10 ft lengths lapped at least 6 in (the lap is not added here). A 40 x 12 ft CMU wall at 16 in is 9 courses x 4 pieces = 36. A material count; the spacing, the lap, and the extra wire at openings come from the structural spec and the adopted code.",
   };
 }
-export const masonryJointReinforcementExample = { inputs: { wall_length_ft: 40, wall_height_ft: 12, vertical_spacing_in: 16, piece_length_ft: 10 } };
+export const masonryJointReinforcementExample = { inputs: { wall_length_ft: 40, wall_height_ft: 12, vertical_spacing_in: 16, piece_length_ft: 10, lap_in: 6 } };
 
 MASONRY_RENDERERS["masonry-joint-reinforcement"] = _simpleRenderer({
-  citation: "Citation: masonry joint-reinforcement takeoff by name. reinforced courses = ceil(height in / vertical spacing); pieces per course = ceil(length / piece length); total = courses x pieces. IRC R606.12.2 / TMS 402 cap the vertical spacing at 16 in; wire laps >= 6 in. The structural spec and the adopted code govern.",
+  citation: "Citation: masonry joint-reinforcement takeoff by name. reinforced courses = ceil(height in / vertical spacing); pieces per course = 1 + ceil((length - piece) / (piece - lap)); total = courses x pieces. IRC R606.12.2 / TMS 402 cap the vertical spacing at 16 in; wire laps >= 6 in. The structural spec and the adopted code govern.",
   example: masonryJointReinforcementExample.inputs,
   fields: [
     { key: "wall_length_ft", label: "Wall length (ft)", kind: "number" },
     { key: "wall_height_ft", label: "Wall height (ft)", kind: "number" },
     { key: "vertical_spacing_in", label: "Vertical spacing (in, code cap 16)", kind: "number" },
     { key: "piece_length_ft", label: "Wire piece length (ft)", kind: "number" },
+    { key: "lap_in", label: "Lap between pieces (in, 6 min; 9 for 3/16 in wire)", kind: "number" },
   ],
   outputs: [
     { key: "c", id: "mjr-out-c", label: "Reinforced courses", value: (r) => fmt(r.reinforced_courses, 0) },

@@ -2666,8 +2666,8 @@
       "date": "2026-09-07"
     },
     "/tools/ev-charge-cost/": {
-      "sha": "4be858cf75d4e213",
-      "date": "2026-09-08"
+      "sha": "536dda7b3a4cf814",
+      "date": "2026-09-26"
     },
     "/tools/ev-charge-time/": {
       "sha": "a50fa8e0e406fb7d",
@@ -2690,8 +2690,8 @@
       "date": "2026-09-01"
     },
     "/tools/ev-range-per-hour/": {
-      "sha": "d8d9970a144e998a",
-      "date": "2026-09-01"
+      "sha": "6ee685c7d8128f92",
+      "date": "2026-09-26"
     },
     "/tools/evaporation-load/": {
       "sha": "13fe60242691f4b1",
@@ -4462,8 +4462,8 @@
       "date": "2026-09-01"
     },
     "/tools/masonry-joint-reinforcement/": {
-      "sha": "d7dd697fbd9b821d",
-      "date": "2026-09-01"
+      "sha": "f1e5e1e17349daff",
+      "date": "2026-09-26"
     },
     "/tools/masonry-limited-access-zone/": {
       "sha": "a9ff8ed0736e0a7f",
@@ -6038,8 +6038,8 @@
       "date": "2026-09-01"
     },
     "/tools/reducer-offset/": {
-      "sha": "d4cc4018aab39b2d",
-      "date": "2026-09-01"
+      "sha": "db734a2024567716",
+      "date": "2026-09-26"
     },
     "/tools/reefer-burn/": {
       "sha": "a65fe3858176d36f",

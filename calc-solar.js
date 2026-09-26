@@ -1337,7 +1337,7 @@ function renderEvChargeCost(inputRegion, outputRegion, citationEl) {
   const target = makeNumber("Target state of charge (%)", "ecc-target", { step: "any", min: "0", max: "100" });
   const rate = makeNumber("Electricity rate ($/kWh)", "ecc-rate", { step: "any", min: "0" });
   const eff = makeNumber("Charging efficiency (%)", "ecc-eff", { step: "any", min: "0", max: "100" });
-  const mpk = makeNumber("Vehicle efficiency (mi/kWh, 0 = skip)", "ecc-mpk", { step: "any", min: "0" });
+  const mpk = makeNumber("Vehicle efficiency at the battery (mi/kWh, 0 = skip; an EPA sticker figure is wall-based, so set charging efficiency to 100% with it)", "ecc-mpk", { step: "any", min: "0" });
   for (const f of [cap, start, target, rate, eff, mpk]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { cap.input.value = "75"; start.input.value = "20"; target.input.value = "80"; rate.input.value = "0.15"; eff.input.value = "88"; mpk.input.value = "3.5"; update(); });
   const oEnergy = makeOutputLine(outputRegion, "Energy to battery", "ecc-out-energy");
@@ -1803,7 +1803,7 @@ function _v968renderEvRangePerHour(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: EV range added per hour of AC charging, by name. range/hr = EVSE power (kW) x charge efficiency x vehicle efficiency (mi/kWh); hours = target range / range per hr. Steady AC Level 2; the vehicle's onboard-charger limit caps the AC rate (see ev-charge-time), DC fast charging tapers, and the actual efficiency governs.";
   const pw = makeNumber("EVSE power (kW, e.g. 7.7)", "evr-pw", { step: "any", min: "0" });
   const ef = makeNumber("Charge efficiency (0-1, ~0.88)", "evr-ef", { step: "any", min: "0" });
-  const ve = makeNumber("Vehicle efficiency (mi/kWh)", "evr-ve", { step: "any", min: "0" });
+  const ve = makeNumber("Vehicle efficiency at the battery (mi/kWh; an EPA sticker figure is wall-based, so set charge efficiency to 1 with it)", "evr-ve", { step: "any", min: "0" });
   const tr = makeNumber("Target range to add (mi)", "evr-tr", { step: "any", min: "0" });
   for (const f of [pw, ef, ve, tr]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { pw.input.value = "7.7"; ef.input.value = "0.88"; ve.input.value = "3.5"; tr.input.value = "100"; update(); });

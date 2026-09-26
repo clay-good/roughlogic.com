@@ -4645,6 +4645,29 @@
    }
   },
   {
+   "tile_id": "bifacial-pv-gain",
+   "source_publisher": "IEC (draft posted by Sandia PVPMC)",
+   "source_title": "IEC TS 60904-1-2, single-side illumination, Eq. (4)-(5)",
+   "source_edition_or_year": "Draft A",
+   "source_section_or_page": "bifaciality 80%, rear 200 W/m2: front equivalent G_E2 = 1000 + 0.8 x 200 = 1160 W/m2, a 16% gain",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "front_poa_wm2": 1000,
+    "rear_poa_wm2": 200,
+    "bifaciality": 0.8,
+    "front_power_w": 400
+   },
+   "outputs": {
+    "bifacial_gain_pct": {
+     "value": 16,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
    "tile_id": "battery-series-parallel",
    "source_publisher": "Battery bank series/parallel configuration",
    "source_title": "48 V bus, 12.8 V / 100 Ah LFP, 2 parallel, 80% DoD -> 4S2P, 51.2 V, 200 Ah, 8.19 kWh",
@@ -4712,6 +4735,48 @@
      "value": 400,
      "tolerance": {
       "abs": 0.1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "battery-series-parallel",
+   "source_publisher": "Battle Born Batteries",
+   "source_title": "What's The Difference Between Wiring Batteries In Series Vs. Parallel?",
+   "source_edition_or_year": "web article",
+   "source_section_or_page": "two 12-volt batteries with 100 Ah capacities in series -> a 24-volt system with a 100 Ah capacity, total available energy of 2400 watt-hours (12 V nominal, no depth of discharge)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "target_bus_v": 24,
+    "module_v": 12,
+    "module_ah": 100,
+    "parallel_strings": 1,
+    "depth_of_discharge": 1
+   },
+   "outputs": {
+    "series_count": {
+     "value": 2,
+     "tolerance": {
+      "abs": 0
+     }
+    },
+    "actual_bus_v": {
+     "value": 24,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "total_ah": {
+     "value": 100,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "usable_kwh": {
+     "value": 2.4,
+     "tolerance": {
+      "abs": 0.001
      }
     }
    }
@@ -4994,6 +5059,37 @@
    }
   },
   {
+   "tile_id": "ev-charge-time",
+   "source_publisher": "Hypercharge",
+   "source_title": "How Much Does It Cost to Charge an Electric Vehicle?",
+   "source_edition_or_year": "updated Feb 24, 2026",
+   "source_section_or_page": "75 kWh battery, 7.2 kW onboard charger on an 11.5 kW station: 75 kWh / 7.2 kWh per hour = 10.4 hours (no loss term: efficiency 100%)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "battery_capacity_kwh": 75,
+    "start_soc_pct": 0,
+    "target_soc_pct": 100,
+    "evse_power_kw": 11.5,
+    "onboard_charger_kw": 7.2,
+    "efficiency_pct": 100
+   },
+   "outputs": {
+    "charge_power_kw": {
+     "value": 7.2,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "time_hr": {
+     "value": 10.4,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
    "tile_id": "ev-charge-cost",
    "source_publisher": "EV charge-cost-at-the-meter model (energy metered = energy stored / efficiency)",
    "source_title": "75 kWh, 20-80% (45 kWh), $0.15/kWh, 88%, 3.5 mi/kWh -> 51.1 kWh metered, $7.67, $0.170/kWh, $0.049/mi",
@@ -5074,6 +5170,31 @@
      "value": 0.4891,
      "tolerance": {
       "abs": 0.001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "ev-charge-cost",
+   "source_publisher": "US DOE Alternative Fuels Data Center",
+   "source_title": "Charging Electric Vehicles at Home",
+   "source_edition_or_year": "web page",
+   "source_section_or_page": "a fully depleted 54 kWh battery at 10.7 cents per kWh will cost about $6 (no loss term: efficiency 100%)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "battery_capacity_kwh": 54,
+    "start_soc_pct": 0,
+    "target_soc_pct": 100,
+    "electricity_rate": 0.107,
+    "efficiency_pct": 100,
+    "miles_per_kwh": 0
+   },
+   "outputs": {
+    "cost": {
+     "value": 6,
+     "tolerance": {
+      "abs": 0.25
      }
     }
    }
@@ -33758,6 +33879,35 @@
    }
   },
   {
+   "tile_id": "recovery-cylinder",
+   "source_publisher": "ACHR News (Chris J. Ludwig), after AHRI Guideline K",
+   "source_title": "On the Level: Filling Cylinders",
+   "source_edition_or_year": "October 26, 2009",
+   "source_section_or_page": "R-22 specific gravity 1.197 at 77 F: 80 percent x 1,000 x 1.197 = 957.60 pounds (density entered as 1.197 x 8.34 = 9.98298 lb/gal)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "water_capacity_lb": 1000,
+    "refrig_density_lb_gal": 9.98298,
+    "current_net_lb": 0,
+    "fill_fraction": 0.8
+   },
+   "outputs": {
+    "specific_gravity": {
+     "value": 1.197,
+     "tolerance": {
+      "abs": 0.0005
+     }
+    },
+    "max_net_lb": {
+     "value": 957.6,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
    "tile_id": "hvac-equipment-circuit",
    "source_publisher": "NEC 2023 (NFPA 70) 440.33 / 440.22(A) / 240.6(A) (by name).",
    "source_title": "MCA = 1.25 x largest RLA + others; MOCP = 1.75 x largest RLA + others rounded down to a 240.6(A) standard size; 225% is the start ceiling.",
@@ -41496,7 +41646,7 @@
    "inputs": {
     "large_od_in": 6.625,
     "small_od_in": 4.5,
-    "lay_length_in": 7,
+    "lay_length_in": 5.5,
     "type": "eccentric-flat-bottom"
    },
    "outputs": {
@@ -45160,6 +45310,34 @@
    }
   },
   {
+   "tile_id": "rotary-phase-converter-sizing",
+   "source_publisher": "American Rotary",
+   "source_title": "A Beginners Guide to Sizing a Rotary Phase Converter for a Machine Shop",
+   "source_edition_or_year": "web guide",
+   "source_section_or_page": "if you have a 10 HP motor then a 20 HP phase converter is needed (2x the largest motor)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "largest_motor_hp": 10,
+    "total_running_hp": 10,
+    "start_factor": 2
+   },
+   "outputs": {
+    "start_demand_hp": {
+     "value": 20,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "idler_hp_min": {
+     "value": 20,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
    "tile_id": "motor-acceleration-time",
    "source_publisher": "Motor across-the-line acceleration time (rotational F = m a)",
    "source_title": "100 lb-ft^2 inertia, 1750 rpm, 50 lb-ft net torque -> 11.36 s",
@@ -46045,6 +46223,29 @@
    }
   },
   {
+   "tile_id": "joist-cantilever-check",
+   "source_publisher": "Journal of Light Construction (reposted by Marvel Builders)",
+   "source_title": "Making Sense of the Maximum Deck Joist Span Table in the 2021 IRC",
+   "source_edition_or_year": "2023-04-07",
+   "source_section_or_page": "2021 IRC Table R507.6: Southern pine 2x10, 14-foot joist back span column -> 3 feet 4 inches maximum cantilever",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "backspan_ft": 14,
+    "overhang_ft": 3,
+    "joist_size": "2x10",
+    "species": "southern_pine"
+   },
+   "outputs": {
+    "cantilever_max_ft": {
+     "value": 3.3333,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
    "tile_id": "joist-notch-bore-limit",
    "source_publisher": "floor joist notch/bore limits (IRC R502.8.1)",
    "source_title": "2x10 joist (9.25 in) -> end notch 2.31, notch 1.54 deep x 3.08 long, bore 3.08",
@@ -46261,14 +46462,15 @@
    "source_publisher": "masonry joint-reinforcement takeoff (IRC R606.12.2)",
    "source_title": "40 x 12 ft CMU wall, 16 in vertical, 10 ft pieces -> 9 courses, 4 per course, 36 total",
    "source_edition_or_year": "spec-v922 worked example (machine-verified)",
-   "source_section_or_page": "courses = ceil(144/16) = 9; per course = ceil(40/10) = 4; total = 36",
+   "source_section_or_page": "courses = ceil(144/16) = 9; per course = 1 + ceil((40 - 10)/(10 - 0.5)) = 5 with a 6 in lap; total = 45 (36 until 2026-09-25, when the lap was ignored)",
    "verified_by": "rl",
    "verified_on": "2026-07-18",
    "inputs": {
     "wall_length_ft": 40,
     "wall_height_ft": 12,
     "vertical_spacing_in": 16,
-    "piece_length_ft": 10
+    "piece_length_ft": 10,
+    "lap_in": 6
    },
    "outputs": {
     "reinforced_courses": {
@@ -46278,7 +46480,7 @@
      }
     },
     "total_pieces": {
-     "value": 36,
+     "value": 45,
      "tolerance": {
       "abs": 0.01
      }
@@ -46290,7 +46492,7 @@
    "source_publisher": "masonry joint-reinforcement takeoff (IRC R606.12.2)",
    "source_title": "cross-check: 30 x 10 ft wall, 16 in vertical, 10 ft pieces -> 8 courses, 24 total",
    "source_edition_or_year": "spec-v922 worked example (machine-verified)",
-   "source_section_or_page": "courses = ceil(120/16) = 8; per course = ceil(30/10) = 3; total = 24",
+   "source_section_or_page": "courses = ceil(120/16) = 8; per course = 1 + ceil(20/9.5) = 4 with the default 6 in lap; total = 32",
    "verified_by": "rl",
    "verified_on": "2026-07-18",
    "inputs": {
@@ -46301,7 +46503,7 @@
    },
    "outputs": {
     "total_pieces": {
-     "value": 24,
+     "value": 32,
      "tolerance": {
       "abs": 0.01
      }
@@ -51673,6 +51875,29 @@
      "value": 0,
      "tolerance": {
       "abs": 0
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "battery-c-rate",
+   "source_publisher": "SimpliPhi Power",
+   "source_title": "PHI Battery Integration Guide: Victron, 2.1 Discharge Calculation",
+   "source_edition_or_year": "REV202103041456, p. 5",
+   "source_section_or_page": "PHI Battery is rated at 3.8 kWh, therefore the C/2 load rating is 1.9 kW",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "nameplate_kwh": 3.8,
+    "c_rate": 0.5,
+    "dod": 1,
+    "inverter_kw": 100
+   },
+   "outputs": {
+    "c_rate_power_kw": {
+     "value": 1.9,
+     "tolerance": {
+      "abs": 0.0005
      }
     }
    }

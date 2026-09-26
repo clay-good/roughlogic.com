@@ -14109,7 +14109,7 @@ test("bounds: spec-v201 branch-saddle-cutback pins the max cutback + flatter on 
 });
 
 test("bounds: spec-v202 reducer-offset pins the offset + all three type branches + rejects bad inputs", () => {
-  const a = _v202({ large_od_in: 6.625, small_od_in: 4.5, lay_length_in: 7, type: "eccentric-flat-bottom" });
+  const a = _v202({ large_od_in: 6.625, small_od_in: 4.5, lay_length_in: 5.5, type: "eccentric-flat-bottom" });
   assert.ok(Math.abs(a.centerline_offset_in - 1.0625) < 0.0005);
   assert.equal(a.continuous_surface, "invert (bottom)");
   assert.ok(Math.abs(a.bop_shift_in) < 1e-9); // invert continuous
@@ -29398,11 +29398,14 @@ import { computeMasonryJointReinforcement as _v922 } from "../../calc-masonry.js
 test("bounds: spec-v922 computeMasonryJointReinforcement pins the courses, pieces, and error seams", () => {
   const r = _v922({ wall_length_ft: 40, wall_height_ft: 12, vertical_spacing_in: 16, piece_length_ft: 10 });
   assert.equal(r.reinforced_courses, 9); // ceil(144/16)
-  assert.equal(r.pieces_per_course, 4); // ceil(40/10)
-  assert.equal(r.total_pieces, 36); // 9 * 4
+  // Each added 10 ft piece laps 6 in, so it adds 9.5 ft: 1 + ceil(30/9.5) = 5 (4 until 2026-09-25, lap ignored).
+  assert.equal(r.pieces_per_course, 5);
+  assert.equal(r.total_pieces, 45); // 9 * 5
+  assert.equal(_v922({ wall_length_ft: 40, wall_height_ft: 12, vertical_spacing_in: 16, piece_length_ft: 10, lap_in: 0 }).pieces_per_course, 4);
+  assert.equal(_v922({ wall_length_ft: 8, wall_height_ft: 12, vertical_spacing_in: 16, piece_length_ft: 10 }).pieces_per_course, 1);
   const s = _v922({ wall_length_ft: 30, wall_height_ft: 10, vertical_spacing_in: 16, piece_length_ft: 10 });
   assert.equal(s.reinforced_courses, 8); // ceil(120/16)
-  assert.equal(s.total_pieces, 24); // 8 * 3
+  assert.equal(s.total_pieces, 32); // 8 * (1 + ceil(20/9.5)) = 8 * 4
   // Error seams: non-positive length / height / spacing / piece, non-finite.
   assert.ok("error" in _v922({ wall_length_ft: 0, wall_height_ft: 12, vertical_spacing_in: 16, piece_length_ft: 10 }));
   assert.ok("error" in _v922({ wall_length_ft: 40, wall_height_ft: 0, vertical_spacing_in: 16, piece_length_ft: 10 }));

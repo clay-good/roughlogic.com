@@ -20834,7 +20834,7 @@ export const CITATIONS = {
     ],
   },
   "masonry-joint-reinforcement": {
-    formula: "reinforced_courses = ceil(wall_height_ft x 12 / vertical_spacing_in); pieces_per_course = ceil(wall_length_ft / piece_length_ft); total_pieces = reinforced_courses x pieces_per_course.",
+    formula: "reinforced_courses = ceil(wall_height_ft x 12 / vertical_spacing_in); pieces_per_course = 1 + ceil((wall_length_ft - piece_length_ft) / (piece_length_ft - lap_in / 12)), each added piece lapping the last by lap_in (6 in minimum, 9 in for 3/16 in wire); total_pieces = reinforced_courses x pieces_per_course.",
     edition: "IRC R606.12.2 and TMS 402 masonry horizontal joint-reinforcement provisions, by name; the spacing and lap come from the adopted code and the structural spec.",
     freeAccess: "The count arithmetic is public first-principles; the 16 in maximum vertical spacing and 6 in minimum lap are in IRC R606.12.2 (many jurisdictions post the adopted IRC).",
     governance: GOVERNANCE.general,

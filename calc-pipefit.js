@@ -763,7 +763,8 @@ export function computeReducerOffset({ large_od_in = 0, small_od_in = 0, lay_len
   }
   return { centerline_offset_in, continuous_surface, bop_shift_in, top_shift_in, lay_length_in: Number(lay_length_in) || 0, type, note };
 }
-export const reducerOffsetExample = { inputs: { large_od_in: 6.625, small_od_in: 4.5, lay_length_in: 7, type: "eccentric-flat-bottom" } };
+// ASME B16.9 standard-weight 6 x 4 reducer length H = 5.5 in (the example read 7 in until 2026-09-25).
+export const reducerOffsetExample = { inputs: { large_od_in: 6.625, small_od_in: 4.5, lay_length_in: 5.5, type: "eccentric-flat-bottom" } };
 
 function _renderReducerOffset(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Reducer centerline offset = (large OD - small OD) / 2, and which surface stays continuous by type - concentric holds the centerline, eccentric flat-on-bottom holds the invert, eccentric flat-on-top holds the crown - first-principles geometry, with the standard lay lengths per ASME B16.9 (bundled value entered by the user; a non-standard reducer overrides). Flat-on-bottom keeps a drain self-cleaning and flat-on-top keeps a pump suction free of air. The lay length is a fitting dimension, not a code minimum.";
@@ -776,7 +777,7 @@ function _renderReducerOffset(inputRegion, outputRegion, citationEl) {
     { value: "eccentric-flat-top", label: "Eccentric flat-on-top (crown)" },
   ]);
   for (const f of [D, d, lay, type]) inputRegion.appendChild(f.wrap);
-  attachExampleButton(inputRegion, () => { D.input.value = "6.625"; d.input.value = "4.5"; lay.input.value = "7"; type.select.value = "eccentric-flat-bottom"; update(); });
+  attachExampleButton(inputRegion, () => { D.input.value = "6.625"; d.input.value = "4.5"; lay.input.value = "5.5"; type.select.value = "eccentric-flat-bottom"; update(); });
   const oOff = makeOutputLine(outputRegion, "Centerline offset", "ro-out-off");
   const oCont = makeOutputLine(outputRegion, "Continuous surface", "ro-out-cont");
   const oNote = makeOutputLine(outputRegion, "Note", "ro-out-note");
