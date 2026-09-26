@@ -6,6 +6,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Changed
 
+- **Fifteen more tiles now carry a publisher's printed example or table.**
+  - **Machine design:** `keyseat-key-size` (ANSI B17.1 via *Machinery's Handbook*), `spur-gear-geometry` (Boston Gear catalog and ANSI B6.1), `press-fit-pressure` (Shigley Example T4.17.1, which confirms the tile takes diametral interference).
+  - **Farm and food:** `corn-yield-estimate` (NDSU), `cattle-heart-girth-weight` (University of Arizona Extension), `abv-from-gravity` (Brew Your Own, attenuation), `dough-water-temperature` (King Arthur Baking).
+  - **Pools:** `pool-calcium-hardness-dose`, `pool-alkalinity-adjust`, `pool-cya-dose` (NSPF dosing tables via Indiana DOH and Lucas County).
+  - **Irrigation:** `sprinkler-precip-rate` (Rain Bird), `fertigation-injection-rate` (WSU Extension FS035E).
+  - **Concrete and building:** `fineness-modulus` and `fine-aggregate-grading` (PCA EB001 Tables 6-3 and 6-5), `blower-door-ach50` (Fine Homebuilding and BPA Journal).
+
+  README: 1,245 of 2,183 tiles are checked only against the project's own derivation (785 from first principles, 460 by a named method); 938 carry an outside source.
 - **Ten more tiles now carry a publisher's printed example or table.**
   - **Aviation and tools:** `glidepath-descent-rate` (FAA Terminal Procedures rate-of-descent table), `torque-adapter-correction` (FAA AC 43.13-1B and Capri Tools).
   - **Farm and truck:** `tractor-ballast` (MSU Extension), `tire-load-check` (Michelin load tables), `grain-shrink-moisture` (National Corn Handbook NCH-61, SDSU iGrow).

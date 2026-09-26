@@ -16440,6 +16440,28 @@
    }
   },
   {
+   "tile_id": "fertigation-injection-rate",
+   "source_publisher": "Washington State University Extension (Peters, Neibling, Hoffmann)",
+   "source_title": "FS035E, Calculating Chemigation Injection Rates",
+   "source_edition_or_year": "2011",
+   "source_section_or_page": "Equation 3 fungicide example: 0.25 gal/acre x 125 acres / 21 h = 1.5 gallons of product per hour",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "product_rate_gal_per_acre": 0.25,
+    "area_acres": 125,
+    "set_time_hours": 21
+   },
+   "outputs": {
+    "injection_rate_gph": {
+     "value": 1.5,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
    "tile_id": "mad-irrigation-trigger",
    "source_publisher": "FAO-56 / NRCS soil-water reservoir (MAD)",
    "source_title": "silt loam FC 0.30, PWP 0.12, 24 in root, MAD 0.5, ETc 0.25 -> TAW 4.32, RAW 2.16, 8.64-day interval",
@@ -16645,6 +16667,29 @@
    }
   },
   {
+   "tile_id": "corn-yield-estimate",
+   "source_publisher": "North Dakota State University Extension (Clair Keene)",
+   "source_title": "Estimating Corn Grain Yield",
+   "source_edition_or_year": "2021",
+   "source_section_or_page": "(24 x 16 x 30) / 90 = 128 bu/ac",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "ears_per_thousandth_acre": 24,
+    "kernel_rows_around": 16,
+    "kernels_per_row": 30,
+    "kernel_factor": 90
+   },
+   "outputs": {
+    "bushels_per_acre": {
+     "value": 128,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
    "tile_id": "cattle-heart-girth-weight",
    "source_publisher": "Cattle live weight from heart girth (Schaeffer's formula)",
    "source_title": "70 in heart girth, 55 in body length -> 898 lb estimated live weight",
@@ -16682,6 +16727,27 @@
      "value": 576,
      "tolerance": {
       "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "cattle-heart-girth-weight",
+   "source_publisher": "University of Arizona Cooperative Extension (Susan Pater)",
+   "source_title": "How Much Does Your Animal Weigh?, Backyards & Beyond",
+   "source_edition_or_year": "Winter 2007",
+   "source_section_or_page": "beef: 76 in. girth, 66 in. length -> 5,776 x 66 = 381,216 / 300 = 1,270 pounds (printed truncated)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "heart_girth_in": 76,
+    "body_length_in": 66
+   },
+   "outputs": {
+    "live_weight_lb": {
+     "value": 1270,
+     "tolerance": {
+      "abs": 1
      }
     }
    }
@@ -20329,6 +20395,52 @@
    }
   },
   {
+   "tile_id": "spur-gear-geometry",
+   "source_publisher": "Boston Gear (catalog P-1930-BG) / Machinery's Handbook Table 2 (ANSI B6.1)",
+   "source_title": "10 diametral pitch spur gears",
+   "source_edition_or_year": "catalog / 27th ed. pp. 2004-2005",
+   "source_section_or_page": "NF40 (40T) pitch dia 4.000, NF20B (20T) 2.000; outside dia = pitch dia + .200; addendum 1/P, dedendum 1.25/P, whole depth 2.25/P",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "diametral_pitch": 10,
+    "teeth": 40,
+    "mating_teeth": 20
+   },
+   "outputs": {
+    "pitch_dia_in": {
+     "value": 4,
+     "tolerance": {
+      "abs": 0.0005
+     }
+    },
+    "outside_dia_in": {
+     "value": 4.2,
+     "tolerance": {
+      "abs": 0.0005
+     }
+    },
+    "addendum_in": {
+     "value": 0.1,
+     "tolerance": {
+      "abs": 0.0005
+     }
+    },
+    "dedendum_in": {
+     "value": 0.125,
+     "tolerance": {
+      "abs": 0.0005
+     }
+    },
+    "whole_depth_in": {
+     "value": 0.225,
+     "tolerance": {
+      "abs": 0.0005
+     }
+    }
+   }
+  },
+  {
    "tile_id": "gear-identification",
    "source_publisher": "Machinery's Handbook / AGMA (inverse of OD = (N+2)/Pd)",
    "source_title": "40 teeth on a measured 4.200 in OD -> Pd 10 teeth/in, pitch dia 4.000 in, module 2.54 mm (round-trips the gear-geometry example)",
@@ -20643,6 +20755,68 @@
      "value": 8000,
      "tolerance": {
       "abs": 2
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "keyseat-key-size",
+   "source_publisher": "Industrial Press",
+   "source_title": "Machinery's Handbook, Table 1, Key Size Versus Shaft Diameter (ANSI B17.1-1967 R1998)",
+   "source_edition_or_year": "27th edition, p. 2342",
+   "source_section_or_page": "shaft over 7/16 to 9/16 in.: key 1/8 x 1/8 in., keyseat depth 1/16 in.",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "shaft_diameter_in": 0.5,
+    "torque_in_lb": 100,
+    "key_length_in": 1
+   },
+   "outputs": {
+    "key_width_in": {
+     "value": 0.125,
+     "tolerance": {
+      "abs": 0.0005
+     }
+    },
+    "shaft_keyseat_depth_in": {
+     "value": 0.0625,
+     "tolerance": {
+      "abs": 0.0005
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "keyseat-key-size",
+   "source_publisher": "Industrial Press",
+   "source_title": "Machinery's Handbook, Table 1, Key Size Versus Shaft Diameter (ANSI B17.1-1967 R1998)",
+   "source_edition_or_year": "27th edition, p. 2342",
+   "source_section_or_page": "shaft over 1-3/4 to 2-1/4 in.: key 1/2 x 1/2 in., keyseat depth 1/4 in.",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "shaft_diameter_in": 2,
+    "torque_in_lb": 1000,
+    "key_length_in": 2
+   },
+   "outputs": {
+    "key_width_in": {
+     "value": 0.5,
+     "tolerance": {
+      "abs": 0.0005
+     }
+    },
+    "key_height_in": {
+     "value": 0.5,
+     "tolerance": {
+      "abs": 0.0005
+     }
+    },
+    "shaft_keyseat_depth_in": {
+     "value": 0.25,
+     "tolerance": {
+      "abs": 0.0005
      }
     }
    }
@@ -22352,6 +22526,29 @@
      "value": 4,
      "tolerance": {
       "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "dough-water-temperature",
+   "source_publisher": "King Arthur Baking",
+   "source_title": "Dough Temperature (Pro reference)",
+   "source_edition_or_year": "web reference",
+   "source_section_or_page": "straight dough: 76 F x 3 = 228, less flour 72, room 74, friction 24 -> 58 F water",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "desired_dough_temp_f": 76,
+    "flour_temp_f": 72,
+    "room_temp_f": 74,
+    "friction_factor_f": 24
+   },
+   "outputs": {
+    "water_temp_f": {
+     "value": 58,
+     "tolerance": {
+      "abs": 0.05
      }
     }
    }
@@ -29254,6 +29451,27 @@
    }
   },
   {
+   "tile_id": "abv-from-gravity",
+   "source_publisher": "Brew Your Own (Bill Pierce)",
+   "source_title": "Calculating Alcohol Content, Attenuation, Extract, and Calories",
+   "source_edition_or_year": "web article",
+   "source_section_or_page": "an OG of 1.048 and FG of 1.012 represents an apparent attenuation of 75 percent",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "original_gravity": 1.048,
+    "final_gravity": 1.012
+   },
+   "outputs": {
+    "apparent_attenuation_pct": {
+     "value": 75,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
    "tile_id": "drink-abv-dilution",
    "source_publisher": "Cocktail dilution model (Dave Arnold, Liquid Intelligence)",
    "source_title": "final_abv = pure_alcohol / (total_volume + dilution_water) x 100",
@@ -29740,6 +29958,31 @@
    }
   },
   {
+   "tile_id": "fineness-modulus",
+   "source_publisher": "Portland Cement Association",
+   "source_title": "Design and Control of Concrete Mixtures (EB001)",
+   "source_edition_or_year": "15th edition, 2011",
+   "source_section_or_page": "Table 6-5 (p. 106): cumulative % retained 2 / 15 / 35 / 55 / 79 / 97 on #4 to #100 -> 283 / 100 = 2.83",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "r4": 2,
+    "r8": 15,
+    "r16": 35,
+    "r30": 55,
+    "r50": 79,
+    "r100": 97
+   },
+   "outputs": {
+    "fm": {
+     "value": 2.83,
+     "tolerance": {
+      "abs": 0.005
+     }
+    }
+   }
+  },
+  {
    "tile_id": "fine-aggregate-grading",
    "source_publisher": "ASTM C33/C33M \u00a76 (fine-aggregate grading)",
    "source_title": "each sieve within its \u00a76.1 band; <=45% retained between consecutive sieves; FM 2.3-3.1",
@@ -29767,6 +30010,32 @@
      "value": 27,
      "tolerance": {
       "abs": 0.001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "fine-aggregate-grading",
+   "source_publisher": "Portland Cement Association",
+   "source_title": "Design and Control of Concrete Mixtures (EB001)",
+   "source_edition_or_year": "15th edition, 2011",
+   "source_section_or_page": "Table 6-5 sand, percent passing 100 / 98 / 85 / 65 / 45 / 21 / 3 -> FM 2.83 (Table 6-3 ASTM C33 limits)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "p38": 100,
+    "p4": 98,
+    "p8": 85,
+    "p16": 65,
+    "p30": 45,
+    "p50": 21,
+    "p100": 3
+   },
+   "outputs": {
+    "fm": {
+     "value": 2.83,
+     "tolerance": {
+      "abs": 0.005
      }
     }
    }
@@ -31018,6 +31287,28 @@
    }
   },
   {
+   "tile_id": "pool-alkalinity-adjust",
+   "source_publisher": "Lucas County (OH) Health Department",
+   "source_title": "Pool Chemistry Adjustments",
+   "source_edition_or_year": "2025",
+   "source_section_or_page": "10 ppm per 10,000 gal: add approx 1.5 lbs sodium bicarbonate",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "gallons": 10000,
+    "current_ta_ppm": 60,
+    "target_ta_ppm": 70
+   },
+   "outputs": {
+    "bicarb_lb": {
+     "value": 1.5,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
    "tile_id": "pool-cya-dose",
    "source_publisher": "NSPF CPO Handbook / ANSI-APSP-ICC",
    "source_title": "Raise: ~0.81 lb (~13 oz) cyanuric acid per 10,000 gal per 10 ppm; lower: drained fraction = 1 - target/current.",
@@ -31041,6 +31332,28 @@
      "value": 2.43,
      "tolerance": {
       "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "pool-cya-dose",
+   "source_publisher": "Indiana State Department of Health (adapted from the NSPF Pool & Spa Operator Handbook)",
+   "source_title": "Adjusting Chemical Levels in a Swimming Pool, Water Chemistry Adjustment Guide",
+   "source_edition_or_year": "2009",
+   "source_section_or_page": "p. 5: cyanuric acid per 10,000 gal: 13 oz for +10 ppm (amounts rounded)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "gallons": 10000,
+    "current_cya_ppm": 0,
+    "target_cya_ppm": 10
+   },
+   "outputs": {
+    "cya_oz": {
+     "value": 13,
+     "tolerance": {
+      "abs": 0.5
      }
     }
    }
@@ -31085,6 +31398,28 @@
      "value": 3.935,
      "tolerance": {
       "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "pool-calcium-hardness-dose",
+   "source_publisher": "Indiana State Department of Health (adapted from the NSPF Pool & Spa Operator Handbook)",
+   "source_title": "Adjusting Chemical Levels in a Swimming Pool, Water Chemistry Adjustment Guide",
+   "source_edition_or_year": "2009",
+   "source_section_or_page": "p. 5: calcium chloride (77%) per 10,000 gal: 1.2 lb for +10 ppm",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "gallons": 10000,
+    "ppm_increase": 10,
+    "product_purity_pct": 77
+   },
+   "outputs": {
+    "calcium_chloride_lb": {
+     "value": 1.2,
+     "tolerance": {
+      "abs": 0.05
      }
     }
    }
@@ -36128,6 +36463,27 @@
    }
   },
   {
+   "tile_id": "sprinkler-precip-rate",
+   "source_publisher": "Rain Bird",
+   "source_title": "Irrigation Design Tip: Calculating Precipitation Rates (Irrigation Design Manual)",
+   "source_edition_or_year": "web design tip",
+   "source_section_or_page": "Example 3: four corner spray heads, 2.4 gpm over 11 x 12 ft -> 1.75 in/h",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "zone_gpm": 2.4,
+    "zone_ft2": 132
+   },
+   "outputs": {
+    "precip_in_hr": {
+     "value": 1.75,
+     "tolerance": {
+      "abs": 0.005
+     }
+    }
+   }
+  },
+  {
    "tile_id": "irrigation-zone-runtime",
    "source_publisher": "Irrigation Association scheduling references",
    "source_title": "0.75 in at 1.20 in/hr, DU 0.75, 10 min cycle -> 50 min, 5 cycles",
@@ -37075,6 +37431,64 @@
      "value": 35.294118,
      "tolerance": {
       "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "blower-door-ach50",
+   "source_publisher": "Fine Homebuilding / GreenBuildingAdvisor (Randy Williams)",
+   "source_title": "Using a Blower-Door Test and Interpreting the Results",
+   "source_edition_or_year": "web article",
+   "source_section_or_page": "1000 CFM x 60 minutes per hour / 15,000 cubic feet gives 4 ACH50",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "cfm50": 1000,
+    "volume_ft3": 15000,
+    "n_factor": 17,
+    "target_ach50": 3
+   },
+   "outputs": {
+    "ach50": {
+     "value": 4,
+     "tolerance": {
+      "abs": 0.005
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "blower-door-ach50",
+   "source_publisher": "Building Performance Association (Randy Williams)",
+   "source_title": "Measuring Natural Air Leakage, BPA Journal",
+   "source_edition_or_year": "May 15, 2023",
+   "source_section_or_page": "12,000 ft^3, 550 CFM50 (2.75 ACH50), N 18.5 -> .15 ACHnat; 550 CFM50 / 18.5 = 30 CFMnat",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "cfm50": 550,
+    "volume_ft3": 12000,
+    "n_factor": 18.5,
+    "target_ach50": 3
+   },
+   "outputs": {
+    "ach50": {
+     "value": 2.75,
+     "tolerance": {
+      "abs": 0.005
+     }
+    },
+    "ach_nat": {
+     "value": 0.15,
+     "tolerance": {
+      "abs": 0.005
+     }
+    },
+    "cfm_nat": {
+     "value": 30,
+     "tolerance": {
+      "abs": 0.5
      }
     }
    }
@@ -41494,6 +41908,68 @@
      "value": 24600,
      "tolerance": {
       "abs": 1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "press-fit-pressure",
+   "source_publisher": "McGraw-Hill (Shigley, Mischke, Budynas)",
+   "source_title": "Mechanical Engineering Design, Tutorial 4-17 Press and Shrink Fits, Example T4.17.1",
+   "source_edition_or_year": "7th edition",
+   "source_section_or_page": "steel hub 1 in. bore x 2 in. OD on a solid steel shaft, 0.0010 in. diametral interference (radial 0.0005, loosest fit) -> p 11 250 psi, hub hoop 18 750 psi",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "shaft_dia_in": 1,
+    "interference_in": 0.001,
+    "hub_od_in": 2,
+    "modulus_psi": 30000000,
+    "friction_coeff": 0.12,
+    "engagement_in": 1
+   },
+   "outputs": {
+    "p_psi": {
+     "value": 11250,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "hub_stress_psi": {
+     "value": 18750,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "press-fit-pressure",
+   "source_publisher": "McGraw-Hill (Shigley, Mischke, Budynas)",
+   "source_title": "Mechanical Engineering Design, Tutorial 4-17 Press and Shrink Fits, Example T4.17.1",
+   "source_edition_or_year": "7th edition",
+   "source_section_or_page": "tightest fit, 0.0023 in. diametral (radial 0.00115) -> p 25 875 psi, hub hoop 43 125 psi",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "shaft_dia_in": 1,
+    "interference_in": 0.0023,
+    "hub_od_in": 2,
+    "modulus_psi": 30000000,
+    "friction_coeff": 0.12,
+    "engagement_in": 1
+   },
+   "outputs": {
+    "p_psi": {
+     "value": 25875,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "hub_stress_psi": {
+     "value": 43125,
+     "tolerance": {
+      "abs": 0.5
      }
     }
    }
