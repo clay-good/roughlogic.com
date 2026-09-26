@@ -1175,7 +1175,7 @@ HVACSYSTEMS_RENDERERS["window-overhang-shade"] = _v1012renderWindowOverhangShade
 // ===================== spec-v228: internal heat gains (people, lighting, equipment) =====================
 
 // dims: in { occupants: dimensionless, sens_per_person: M L^2 T^-3, lat_per_person: M L^2 T^-3, lighting_w: M L^2 T^-3, equipment_w: M L^2 T^-3, use_factor: dimensionless } out: { q_sensible: M L^2 T^-3, q_latent: M L^2 T^-3, q_total: M L^2 T^-3 }
-export function computeInternalHeatGains({ occupants = 0, sens_per_person = 245, lat_per_person = 200, lighting_w = 0, equipment_w = 0, use_factor = 1.0 } = {}) {
+export function computeInternalHeatGains({ occupants = 0, sens_per_person = 250, lat_per_person = 200, lighting_w = 0, equipment_w = 0, use_factor = 1.0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (occupants < 0) return { error: "Occupant count cannot be negative." };
   if (sens_per_person < 0 || lat_per_person < 0) return { error: "Per-person gain cannot be negative (Btu/h)." };
@@ -1190,7 +1190,7 @@ export function computeInternalHeatGains({ occupants = 0, sens_per_person = 245,
   const q_total = q_sensible + q_latent;
   return {
     q_people_sensible, q_people_latent, q_lighting, q_equipment, q_sensible, q_latent, q_total,
-    note: "ASHRAE / ACCA Manual J internal-gain method: occupant sensible and latent from the activity table (a seated office occupant is roughly 245 Btu/h sensible and 200 latent; heavier activity is far higher), and lighting and equipment at 3.412 Btu/h per watt. The use factor accounts for the fraction actually on (and a ballast factor for the fixture type). Recessed lighting vented to a return plenum delivers part of its heat to the plenum rather than the room. The latent term is moisture a sensible-only 'more airflow' fix never removes. One cooling-load component, not a Manual J.",
+    note: "ASHRAE / ACCA Manual J internal-gain method: occupant sensible and latent from the activity table (ASHRAE Fundamentals Table 1: moderately active office work 250 Btu/h sensible and 200 latent, seated very light work 245 and 155; ACCA Manual J residential uses 230 and 200; heavier activity is far higher. Until 2026-09-25 the default was 245 / 200, which pairs two different rows), and lighting and equipment at 3.412 Btu/h per watt. The use factor accounts for the fraction actually on (and a ballast factor for the fixture type). Recessed lighting vented to a return plenum delivers part of its heat to the plenum rather than the room. The latent term is moisture a sensible-only 'more airflow' fix never removes. One cooling-load component, not a Manual J.",
   };
 }
 function _v16h_renderInternalHeatGains(inputRegion, outputRegion, citationEl) {
@@ -1202,7 +1202,7 @@ function _v16h_renderInternalHeatGains(inputRegion, outputRegion, citationEl) {
   const equip = makeNumber("Equipment power (W)", "ihg-equip", { step: "any", min: "0" });
   const use = makeNumber("Use factor (0-1)", "ihg-use", { step: "any", min: "0" });
   for (const f of [occ, sens, lat, light, equip, use]) inputRegion.appendChild(f.wrap);
-  attachExampleButton(inputRegion, () => { occ.input.value = "6"; sens.input.value = "245"; lat.input.value = "200"; light.input.value = "800"; equip.input.value = "1200"; use.input.value = "1.0"; update(); });
+  attachExampleButton(inputRegion, () => { occ.input.value = "6"; sens.input.value = "250"; lat.input.value = "200"; light.input.value = "800"; equip.input.value = "1200"; use.input.value = "1.0"; update(); });
   const oSensible = makeOutputLine(outputRegion, "Sensible load", "ihg-out-sensible");
   const oLatent = makeOutputLine(outputRegion, "Latent load", "ihg-out-latent");
   const oTotal = makeOutputLine(outputRegion, "Total cooling load", "ihg-out-total");

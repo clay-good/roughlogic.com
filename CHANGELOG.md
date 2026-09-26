@@ -6,6 +6,21 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Changed
 
+- **Eleven more tiles now carry a publisher's printed example.**
+  - `as-purchased-quantity`: USDA Food Buying Guide.
+  - `overrun-percent`: Goff, University of Guelph.
+  - `fuel-surcharge`: OOIDA.
+  - `internal-heat-gains`: RVCC HVAC text.
+  - `smooth-bore-flow`: Fire Engineering.
+  - `multi-leg-sling`: ASSP Professional Safety.
+  - `spanline-sag-tension`: TU Delft.
+  - `ujoint-operating-angle`: Machinery's Handbook.
+  - `cone-flat-pattern`: Alloprof.
+  - `tolerance-stack-rss`: University of Washington STAT 498B.
+  - `bend-springback`: MIT 2.810.
+
+  README: 1,200 of 2,183 tiles are checked only against the project's own derivation; 983 carry an outside source.
+
 - **Ten more tiles now carry a publisher's printed example.**
   - `belt-hp-transmitted`: Shigley 17-2.
   - `tire-contact-patch`: Boeing.
@@ -162,6 +177,8 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 - **wrangler 4.129.0 → 4.135.0, and the `sharp` override is gone.** Dependabot's bump failed CI on `check-dependency-overrides`. The new wrangler brings a miniflare that asks for the patched `sharp` 0.35.4 itself, so the September 9 pin no longer changed anything. This is the case the gate was written for, so the override is deleted rather than left as a second source of truth. `npm audit` reports 0 vulnerabilities. docs/threat-model.md records the change.
 
 ### Fixed
+
+- **`internal-heat-gains` now defaults to 250 Btu/h sensible and 200 latent per person, ASHRAE's moderately-active office row.** The old 245 / 200 default mixed two rows of ASHRAE Fundamentals Table 1: 245 sensible belongs to seated very light work, whose latent is 155. The note now names the rows (and ACCA Manual J's residential 230 / 200) instead of calling 245 / 200 "a seated office occupant."
 
 - **`welder-resistance-circuit-conductor` now uses the NEC Table 630.31(A)(2) multipliers at the duty cycles the table lists.** The table prints 0.71 at 50%, 0.63 at 40%, 0.55 at 30%, 0.50 at 25%, 0.45 at 20%, 0.39 at 15%, 0.32 at 10% and 0.27 at 7.5%. The tile used the unrounded square root at those rows, so a 100 A welder at 50% duty got 70.7 A instead of the code's 71 A. Between rows it still uses the square root the table rounds.
 - **Two input labels now say what they mean.** `static-rollover-threshold` track width is the average of front and rear, per the CPSC convention. `loop-voltage-budget` wire resistance counts both conductors, out and back.

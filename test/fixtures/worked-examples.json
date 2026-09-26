@@ -9321,6 +9321,27 @@
    }
   },
   {
+   "tile_id": "as-purchased-quantity",
+   "source_publisher": "USDA Food and Nutrition Service",
+   "source_title": "Food Buying Guide for Child Nutrition Programs, Appendix B (Determine the amount of food to purchase)",
+   "source_edition_or_year": "web edition",
+   "source_section_or_page": "watermelon: 2 lb edible portion / 0.61 yield = 3.28 lb as purchased (USDA then rounds the order up to 3.5 lb)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "ep_quantity_needed": 2,
+    "yield_pct": 61
+   },
+   "outputs": {
+    "ap_quantity": {
+     "value": 3.28,
+     "tolerance": {
+      "abs": 0.005
+     }
+    }
+   }
+  },
+  {
    "tile_id": "yield-ep",
    "source_publisher": "Project (first-principles) over Culinary Institute / National Restaurant Association EP yield identity",
    "source_title": "Edible portion yield: yield% = (1 - trim/AP) * (1 - cook_loss%); EP cost = AP cost / yield%",
@@ -11791,6 +11812,27 @@
      "value": 5,
      "tolerance": {
       "abs": 0.001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "ujoint-operating-angle",
+   "source_publisher": "Industrial Press (via Engineers Edge)",
+   "source_title": "Machinery's Handbook, Variation in Angular Velocity of Driven Shaft",
+   "source_edition_or_year": "30th edition",
+   "source_section_or_page": "100 rpm driver, 25 degree shaft angle: 110.34 - 90.63 = 19.71 rpm extreme variation (sec and cos to 4 places)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "input_angle_deg": 25,
+    "output_angle_deg": 25
+   },
+   "outputs": {
+    "first_joint_variation_pct": {
+     "value": 19.71,
+     "tolerance": {
+      "abs": 0.005
      }
     }
    }
@@ -20306,6 +20348,44 @@
    }
   },
   {
+   "tile_id": "tolerance-stack-rss",
+   "source_publisher": "University of Washington (Fritz Scholz)",
+   "source_title": "STAT 498B Statistical Tolerancing, slides 17-29",
+   "source_edition_or_year": "Spring 2007",
+   "source_section_or_page": "10 disks 0.125 +/- 0.001 in: worst case [1.2400, 1.2600]; RSS 1.2500 +/- .0031600 = sqrt(10) x .00100",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "nominal_gap_in": 1.25,
+    "tolerances": [
+     0.001,
+     0.001,
+     0.001,
+     0.001,
+     0.001,
+     0.001,
+     0.001,
+     0.001,
+     0.001,
+     0.001
+    ]
+   },
+   "outputs": {
+    "tol_wc": {
+     "value": 0.01,
+     "tolerance": {
+      "abs": 1e-05
+     }
+    },
+    "tol_rss": {
+     "value": 0.00316,
+     "tolerance": {
+      "abs": 5e-06
+     }
+    }
+   }
+  },
+  {
    "tile_id": "cone-flat-pattern",
    "source_publisher": "sheet-metal radial-line layout",
    "source_title": "R 6 in, h 8 in -> slant 10 in, 216-degree sector",
@@ -20355,6 +20435,33 @@
      "value": 126.4,
      "tolerance": {
       "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "cone-flat-pattern",
+   "source_publisher": "Alloprof",
+   "source_title": "Constructing the Nets of Cones",
+   "source_edition_or_year": "web lesson",
+   "source_section_or_page": "apothem 5 cm, base radius 3 cm: (3 x 360)/5 = 216 degrees (height 4 entered so the slant is the printed 5)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "base_radius_in": 3,
+    "height_in": 4
+   },
+   "outputs": {
+    "slant_L_in": {
+     "value": 5,
+     "tolerance": {
+      "abs": 0.0005
+     }
+    },
+    "sweep_deg": {
+     "value": 216,
+     "tolerance": {
+      "abs": 0.01
      }
     }
    }
@@ -30803,6 +30910,27 @@
    }
   },
   {
+   "tile_id": "overrun-percent",
+   "source_publisher": "University of Guelph (H. D. Goff)",
+   "source_title": "Ice Cream Technology e-Book, Ch. 20 Overrun calculations, package overrun by weight",
+   "source_edition_or_year": "Pressbooks",
+   "source_section_or_page": "1 L of mix 1090 g, 1 L of ice cream 560 g: (1090 - 560)/560 x 100% = 94.6% overrun (grams entered in the weight fields; the ratio is unit-free)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "mix_weight_lb": 1090,
+    "finished_weight_lb": 560
+   },
+   "outputs": {
+    "overrun_pct": {
+     "value": 94.6,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
    "tile_id": "load-profitability",
    "source_publisher": "First-principles owner-operator load economics; consumes the cost-per-mile structure.",
    "source_title": "Net = revenue - (total miles/MPG x fuel + total miles x variable cpm + fixed/day x days + tolls + other); profit per loaded mile = net / loaded miles.",
@@ -30867,6 +30995,29 @@
      "value": 187.5,
      "tolerance": {
       "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "fuel-surcharge",
+   "source_publisher": "OOIDA (Owner-Operator Independent Drivers Association)",
+   "source_title": "Fuel Surcharge Calculator, worked example",
+   "source_edition_or_year": "web tool page",
+   "source_section_or_page": "baseline $2.50, current $5.25, difference $2.75 / 6.0 mpg = $0.46 per mile (rounded to the cent)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "current_fuel_price": 5.25,
+    "base_fuel_price": 2.5,
+    "mpg_peg": 6,
+    "loaded_miles": 1000
+   },
+   "outputs": {
+    "fsc_per_mile": {
+     "value": 0.46,
+     "tolerance": {
+      "abs": 0.005
      }
     }
    }
@@ -35066,6 +35217,27 @@
    }
   },
   {
+   "tile_id": "smooth-bore-flow",
+   "source_publisher": "Fire Engineering (Paul Spurgeon)",
+   "source_title": "Every Pump Operator's Basic Equation",
+   "source_edition_or_year": "2012, updated 2020",
+   "source_section_or_page": "1-inch tip at 50 psi: 29.72 x 1^2 x 7.07 = 210 gpm (sqrt 50 printed as 7.07)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "bore_in": 1,
+    "nozzle_pressure_psi": 50
+   },
+   "outputs": {
+    "gpm": {
+     "value": 210,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
    "tile_id": "gcwr-check",
    "source_publisher": "23 CFR 658.17 / 49 CFR 393.75 + GCWR plate",
    "source_title": "combination within both the GCWR and the federal cap",
@@ -36239,6 +36411,28 @@
    }
   },
   {
+   "tile_id": "multi-leg-sling",
+   "source_publisher": "ASSP Professional Safety (Mitch Ricketts)",
+   "source_title": "The Case of the Overloaded Sling, Math Toolbox",
+   "source_edition_or_year": "July 2020",
+   "source_section_or_page": "T = W / (N sin theta): W 8,000 lb, N 2, theta 35 degrees -> 6,973.79 lb per leg",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "total_load_lb": 8000,
+    "num_legs": 2,
+    "horizontal_angle_deg": 35
+   },
+   "outputs": {
+    "tension_per_leg_lb": {
+     "value": 6973.79,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
    "tile_id": "wire-rope-strength",
    "source_publisher": "Wire Rope Users Manual rule-of-thumb (by name)",
    "source_title": "1/2 in IPS 6x19 -> 11.5 ton MBS, 2.3 ton WLL at 5:1",
@@ -36380,6 +36574,34 @@
      "value": 2500,
      "tolerance": {
       "abs": 0.001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "spanline-sag-tension",
+   "source_publisher": "TU Delft (Alderliesten), via LibreTexts",
+   "source_title": "Introduction to Aerospace Structures and Materials, 6.2 Cables, Example 6.8",
+   "source_edition_or_year": "open textbook",
+   "source_section_or_page": "SI: w 240 N/m, L 20 m, sag 4 m -> T0 = 3000 N; Tmax = sqrt(3000^2 + (240 x 10)^2) = 3841.87 N (length not compared: the book keeps a 4th-order term)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "span_ft": 20,
+    "load_lb_per_ft": 240,
+    "sag_ft": 4
+   },
+   "outputs": {
+    "horizontal_tension_lb": {
+     "value": 3000,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "support_tension_lb": {
+     "value": 3841.87,
+     "tolerance": {
+      "abs": 0.01
      }
     }
    }
@@ -38886,7 +39108,7 @@
    "verified_on": "2026-06-30",
    "inputs": {
     "occupants": 6,
-    "sens_per_person": 245,
+    "sens_per_person": 250,
     "lat_per_person": 200,
     "lighting_w": 800,
     "equipment_w": 1200,
@@ -38894,7 +39116,7 @@
    },
    "outputs": {
     "q_sensible": {
-     "value": 8294,
+     "value": 8324,
      "tolerance": {
       "abs": 0
      }
@@ -38906,7 +39128,7 @@
      }
     },
     "q_total": {
-     "value": 9494,
+     "value": 9524,
      "tolerance": {
       "abs": 0
      }
@@ -38923,7 +39145,7 @@
    "verified_on": "2026-06-30",
    "inputs": {
     "occupants": 20,
-    "sens_per_person": 245,
+    "sens_per_person": 250,
     "lat_per_person": 200,
     "lighting_w": 600,
     "equipment_w": 300,
@@ -38931,7 +39153,7 @@
    },
    "outputs": {
     "q_sensible": {
-     "value": 7970.8,
+     "value": 8070.8,
      "tolerance": {
       "pct": 0.5
      }
@@ -38943,9 +39165,40 @@
      }
     },
     "q_total": {
-     "value": 11970.8,
+     "value": 12070.8,
      "tolerance": {
       "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "internal-heat-gains",
+   "source_publisher": "Raritan Valley Community College",
+   "source_title": "The Illustrated Book of Basic Heating, Ventilating, and Air Conditioning, 6.8 Internal Heat Gains",
+   "source_edition_or_year": "Pressbooks",
+   "source_section_or_page": "42 people x 245 BTUH = 10,290 BTUH sensible; 42 people x 205 BTUH = 8,610 BTUH latent (people only)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "occupants": 42,
+    "sens_per_person": 245,
+    "lat_per_person": 205,
+    "lighting_w": 0,
+    "equipment_w": 0,
+    "use_factor": 1
+   },
+   "outputs": {
+    "q_sensible": {
+     "value": 10290,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "q_latent": {
+     "value": 8610,
+     "tolerance": {
+      "abs": 0.5
      }
     }
    }
@@ -42185,6 +42438,29 @@
      "value": 0.8803,
      "tolerance": {
       "abs": 0.0005
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "bend-springback",
+   "source_publisher": "MIT 2.810 Manufacturing Processes and Systems",
+   "source_title": "Homework 4 Solutions, Problem 2(f)",
+   "source_edition_or_year": "October 7, 2015",
+   "source_section_or_page": "Ri = 1.5(0.18 in) = 0.27 in, T = 0.1 in, steel Y/E = 1/909 -> Rf = 0.2724 in (Y/E entered as 1 / 909)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "tool_radius_in": 0.27,
+    "thickness_in": 0.1,
+    "yield_strength_psi": 1,
+    "modulus_psi": 909
+   },
+   "outputs": {
+    "final_radius_in": {
+     "value": 0.2724,
+     "tolerance": {
+      "abs": 5e-05
      }
     }
    }
