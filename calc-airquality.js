@@ -733,6 +733,8 @@ export function computeEspDeutschEfficiency({
   plate_area_ft2 = 0, gas_acfm = 0, migration_velocity_fps = 0, target_efficiency_pct = 0,
 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // An efficiency is a percent; 0 < value < 1 is a fraction typed into a percent field (added 2026-09-26).
+  if (["target_efficiency_pct"].some((k) => { const v = Number(arguments[0]?.[k]); return v > 0 && v < 1; })) return { error: "Enter efficiencies as a percent (85 for 85%), not a fraction." };
   if (!(plate_area_ft2 > 0)) return { error: "Collecting plate area must be positive (sq ft)." };
   if (!(gas_acfm > 0)) return { error: "Gas flow must be positive (acfm)." };
   if (!(migration_velocity_fps > 0)) return { error: "Migration velocity must be positive (ft/s)." };

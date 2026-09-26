@@ -779,6 +779,8 @@ export function computeRiserModulusFeeding({
   modulus_ratio = 1.2, shrinkage_pct = 0, riser_efficiency_pct = 0, sleeve_factor = 1,
 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // An efficiency is a percent; 0 < value < 1 is a fraction typed into a percent field (added 2026-09-26).
+  if (["riser_efficiency_pct"].some((k) => { const v = Number(arguments[0]?.[k]); return v > 0 && v < 1; })) return { error: "Enter efficiencies as a percent (85 for 85%), not a fraction." };
   if (!(section_length_in > 0) || !(section_width_in > 0) || !(section_thickness_in > 0)) return { error: "All three section dimensions must be positive (in)." };
   if (!(modulus_ratio > 0)) return { error: "The riser-to-casting modulus ratio must be positive." };
   if (shrinkage_pct < 0 || shrinkage_pct >= 100) return { error: "Solidification shrinkage must be at least 0 and below 100 percent." };
@@ -947,6 +949,8 @@ export function computeMeltFurnaceEnergy({
   energy_cost_per_kwh = 0, alt_efficiency_pct = 0, alt_theoretical_btu_lb = 0, casting_yield_pct = 0,
 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // An efficiency is a percent; 0 < value < 1 is a fraction typed into a percent field (added 2026-09-26).
+  if (["alt_efficiency_pct", "furnace_efficiency_pct"].some((k) => { const v = Number(arguments[0]?.[k]); return v > 0 && v < 1; })) return { error: "Enter efficiencies as a percent (85 for 85%), not a fraction." };
   if (!(charge_weight_lb > 0)) return { error: "Charge weight must be positive (lb)." };
   if (!(theoretical_btu_lb > 0)) return { error: "Theoretical melt energy must be positive (BTU/lb)." };
   if (!(furnace_efficiency_pct > 0) || furnace_efficiency_pct > 100) return { error: "Furnace efficiency must be above 0 and no more than 100 percent." };

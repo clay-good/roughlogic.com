@@ -1018,6 +1018,8 @@ function renderBatteryCRate(inputRegion, outputRegion, citationEl) {
 // dims: in { battery_capacity_kwh: M L^2 T^-2, start_soc_pct: dimensionless, target_soc_pct: dimensionless, evse_power_kw: M L^2 T^-3, onboard_charger_kw: M L^2 T^-3, efficiency_pct: dimensionless } out: { energy_needed_kwh: M L^2 T^-2, charge_power_kw: M L^2 T^-3, time_hr: T }
 export function computeEvChargeTime({ battery_capacity_kwh = 0, start_soc_pct = 0, target_soc_pct = 80, evse_power_kw = 0, onboard_charger_kw = 0, efficiency_pct = 88 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // An efficiency is a percent; 0 < value < 1 is a fraction typed into a percent field (added 2026-09-26).
+  if (["efficiency_pct"].some((k) => { const v = Number(arguments[0]?.[k]); return v > 0 && v < 1; })) return { error: "Enter efficiencies as a percent (85 for 85%), not a fraction." };
   const cap = Number(battery_capacity_kwh) || 0;
   const start = Number(start_soc_pct) || 0;
   const target = Number(target_soc_pct) || 0;
@@ -1312,6 +1314,8 @@ SOLAR_RENDERERS["pv-string-fusing"] = renderPvStringFusing;
 // dims: in { battery_capacity_kwh: M L^2 T^-2, start_soc_pct: dimensionless, target_soc_pct: dimensionless, electricity_rate: dimensionless, efficiency_pct: dimensionless, miles_per_kwh: dimensionless } out: { energy_to_battery_kwh: M L^2 T^-2, grid_energy_kwh: M L^2 T^-2, cost: dimensionless, cost_per_stored_kwh: dimensionless, cost_per_mile: dimensionless }
 export function computeEvChargeCost({ battery_capacity_kwh = 0, start_soc_pct = 0, target_soc_pct = 80, electricity_rate = 0, efficiency_pct = 88, miles_per_kwh = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // An efficiency is a percent; 0 < value < 1 is a fraction typed into a percent field (added 2026-09-26).
+  if (["efficiency_pct"].some((k) => { const v = Number(arguments[0]?.[k]); return v > 0 && v < 1; })) return { error: "Enter efficiencies as a percent (85 for 85%), not a fraction." };
   const cap = Number(battery_capacity_kwh) || 0;
   const start = Number(start_soc_pct) || 0;
   const target = Number(target_soc_pct) || 0;

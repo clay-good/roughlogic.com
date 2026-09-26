@@ -173,6 +173,8 @@ GREENHOUSE_RENDERERS["greenhouse-vent-area"] = _simpleRenderer({
 // dims: in { floor_area_sqft: L^2, airflow_per_sqft_cfm: L T^-1, pad_face_velocity_fpm: L T^-1, pad_height_ft: L, outdoor_dry_bulb_f: T, outdoor_wet_bulb_f: T, pad_efficiency_pct: dimensionless, solar_gain_btuh_per_sqft: M T^-3, latent_fraction: dimensionless } out: { total_airflow_cfm: L^3 T^-1, pad_area_sqft: L^2, pad_length_ft: L, pad_outlet_temp_f: T, temp_rise_f: T, fan_end_temp_f: T, empty_house_rise_f: T }
 export function computeFanPadEvaporativeCooling({ floor_area_sqft = 0, airflow_per_sqft_cfm = 0, pad_face_velocity_fpm = 0, pad_height_ft = 0, outdoor_dry_bulb_f = 0, outdoor_wet_bulb_f = 0, pad_efficiency_pct = 0, solar_gain_btuh_per_sqft = 0, latent_fraction = 0 } = {}) {
   const guard = _finiteGuard(arguments[0]); if (guard) return { error: guard.error };
+  // An efficiency is a percent; 0 < value < 1 is a fraction typed into a percent field (added 2026-09-26).
+  if (["pad_efficiency_pct"].some((k) => { const v = Number(arguments[0]?.[k]); return v > 0 && v < 1; })) return { error: "Enter efficiencies as a percent (85 for 85%), not a fraction." };
   if (!(floor_area_sqft > 0) || !(airflow_per_sqft_cfm > 0)) return { error: "Floor area and airflow per square foot must be positive." };
   if (!(pad_face_velocity_fpm > 0) || !(pad_height_ft > 0)) return { error: "Pad face velocity and height must be positive." };
   if (!(outdoor_dry_bulb_f > outdoor_wet_bulb_f)) return { error: "The dry bulb must exceed the wet bulb; the pad cannot cool below the wet bulb." };
@@ -598,6 +600,8 @@ GREENHOUSE_RENDERERS["greenhouse-transpiration-water"] = _simpleRenderer({
 // dims: in { house_width_ft: L, house_length_ft: L, gutter_height_ft: L, ridge_height_ft: L, glazing_u_factor: M T^-4, screen_ua_reduction_pct: dimensionless, season_nights: T, night_hours: T, night_temp_difference_f: T, plant_efficiency_pct: dimensionless, fuel_price_per_therm: dimensionless, screen_cost_per_sqft: dimensionless } out: { envelope_sqft: L^2, base_ua: M L^2 T^-3, screened_ua: M L^2 T^-3, heat_saved_btu: M L^2 T^-2, therms_saved: M L^2 T^-2, annual_saving: dimensionless, payback_years: T }
 export function computeThermalScreenEnergySaving({ house_width_ft = 0, house_length_ft = 0, gutter_height_ft = 0, ridge_height_ft = 0, glazing_u_factor = 0, screen_ua_reduction_pct = 0, season_nights = 0, night_hours = 0, night_temp_difference_f = 0, plant_efficiency_pct = 0, fuel_price_per_therm = 0, screen_cost_per_sqft = 0 } = {}) {
   const guard = _finiteGuard(arguments[0]); if (guard) return { error: guard.error };
+  // An efficiency is a percent; 0 < value < 1 is a fraction typed into a percent field (added 2026-09-26).
+  if (["plant_efficiency_pct"].some((k) => { const v = Number(arguments[0]?.[k]); return v > 0 && v < 1; })) return { error: "Enter efficiencies as a percent (85 for 85%), not a fraction." };
   if (!(house_width_ft > 0) || !(house_length_ft > 0)) return { error: "House width and length must be positive." };
   if (!(gutter_height_ft > 0) || !(ridge_height_ft > gutter_height_ft)) return { error: "The ridge must be above the gutter." };
   if (!(glazing_u_factor > 0)) return { error: "The glazing U-factor must be positive." };

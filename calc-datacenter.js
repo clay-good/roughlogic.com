@@ -189,6 +189,8 @@ DATACENTER_RENDERERS["rack-power-density-airflow"] = _simpleRenderer({
 // dims: in { it_load_kw: L^2 M T^-3, power_factor: dimensionless, module_rating_kva: L^2 M T^-3, n_plus_one_efficiency_pct: dimensionless, two_n_efficiency_pct: dimensionless, tariff_per_kwh: dimensionless, cooling_cop: dimensionless } out: { apparent_power_kva: L^2 M T^-3, required_modules: dimensionless, n_plus_one_loss_kw: L^2 M T^-3, annual_total_penalty_delta: dimensionless }
 export function computeUpsModuleRedundancy({ it_load_kw = 0, power_factor = 0, module_rating_kva = 0, n_plus_one_efficiency_pct = 0, two_n_efficiency_pct = 0, tariff_per_kwh = 0, cooling_cop = 0 } = {}) {
   const guard = _finiteGuard(arguments[0]); if (guard) return { error: guard.error };
+  // An efficiency is a percent; 0 < value < 1 is a fraction typed into a percent field (added 2026-09-26).
+  if (["n_plus_one_efficiency_pct", "two_n_efficiency_pct"].some((k) => { const v = Number(arguments[0]?.[k]); return v > 0 && v < 1; })) return { error: "Enter efficiencies as a percent (85 for 85%), not a fraction." };
   if (!(it_load_kw > 0) || !(module_rating_kva > 0) || !(tariff_per_kwh > 0) || !(cooling_cop > 0)) return { error: "IT load, module rating, tariff, and cooling COP must be positive." };
   if (!(power_factor > 0 && power_factor <= 1)) return { error: "Power factor must be greater than 0 and no more than 1." };
   if (![n_plus_one_efficiency_pct, two_n_efficiency_pct].every((v) => v > 0 && v <= 100)) return { error: "UPS efficiencies must be greater than 0 and no more than 100 percent." };

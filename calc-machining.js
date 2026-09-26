@@ -266,6 +266,8 @@ MACHINING_RENDERERS["cutting-fluid-concentration"] = renderCuttingFluidConcentra
 // dims: in { mrr_in3_min: L^3 T^-1, unit_power_hp: M L^2 T^-3, efficiency_pct: dimensionless, rpm: T^-1 } out: { cutting_hp: M L^2 T^-3, motor_hp: M L^2 T^-3, spindle_torque_lbft: M L^2 T^-2 }
 export function computeSpindlePowerTorque({ mrr_in3_min = 0, unit_power_hp = 1.0, efficiency_pct = 80, rpm = 0 } = {}) {
   const _g = _finiteGuard({ mrr_in3_min, unit_power_hp, efficiency_pct, rpm }); if (_g) return _g;
+  // An efficiency is a percent; 0 < value < 1 is a fraction typed into a percent field (added 2026-09-26).
+  if (["efficiency_pct"].some((k) => { const v = Number(arguments[0]?.[k]); return v > 0 && v < 1; })) return { error: "Enter efficiencies as a percent (85 for 85%), not a fraction." };
   const mrr = Number(mrr_in3_min);
   const unitPower = Number(unit_power_hp);
   const eff = Number(efficiency_pct);
@@ -322,6 +324,8 @@ MACHINING_RENDERERS["spindle-power-torque"] = renderSpindlePowerTorque;
 // dims: in { available_motor_hp: M L^2 T^-3, unit_power_hp: M L^2 T^-3, efficiency_pct: dimensionless } out: { max_mrr_in3_min: L^3 T^-1, cutting_hp: M L^2 T^-3 }
 export function computeSpindleMaxMrr({ available_motor_hp = 0, unit_power_hp = 1.0, efficiency_pct = 80 } = {}) {
   const _g = _finiteGuard({ available_motor_hp, unit_power_hp, efficiency_pct }); if (_g) return _g;
+  // An efficiency is a percent; 0 < value < 1 is a fraction typed into a percent field (added 2026-09-26).
+  if (["efficiency_pct"].some((k) => { const v = Number(arguments[0]?.[k]); return v > 0 && v < 1; })) return { error: "Enter efficiencies as a percent (85 for 85%), not a fraction." };
   const motor = Number(available_motor_hp);
   const unitPower = Number(unit_power_hp);
   const eff = Number(efficiency_pct);

@@ -662,6 +662,8 @@ export function computeOxyfuelCuttingGas({ oxygen_cfh, fuel_cfh, cut_length_in, 
 // dims: in { steel_lb: M, start_temp_F: T, preheat_temp_F: T, efficiency_pct: dimensionless, c_steel: dimensionless, propane_btu_lb: dimensionless } out: { heat_needed_btu: M L^2 T^-2, fuel_btu: M L^2 T^-2, propane_lb: M, propane_gal: L^3 }
 export function computeWeldPreheatFuel({ steel_lb, start_temp_F, preheat_temp_F, efficiency_pct = 25, c_steel = 0.11, propane_btu_lb = 21600 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // An efficiency is a percent; 0 < value < 1 is a fraction typed into a percent field (added 2026-09-26).
+  if (["efficiency_pct"].some((k) => { const v = Number(arguments[0]?.[k]); return v > 0 && v < 1; })) return { error: "Enter efficiencies as a percent (85 for 85%), not a fraction." };
   const steel = Number(steel_lb);
   const start = Number(start_temp_F);
   const preheat = Number(preheat_temp_F);
@@ -687,6 +689,8 @@ export function computeWeldPreheatFuel({ steel_lb, start_temp_F, preheat_temp_F,
 // dims: in { deposit_lb_per_ft: M, deposition_eff_pct: dimensionless, filler_cost_per_lb: dimensionless, deposition_rate_lb_hr: dimensionless, operating_factor_pct: dimensionless, labor_rate_per_hr: dimensionless, gas_cost_per_ft: dimensionless } out: { consumable_lb_per_ft: M, filler_cost_ft: dimensionless, labor_hr_per_ft: T, labor_cost_ft: dimensionless, total_cost_ft: dimensionless }
 export function computeWeldCostPerFoot({ deposit_lb_per_ft, deposition_eff_pct = 95, filler_cost_per_lb = 0, deposition_rate_lb_hr, operating_factor_pct = 30, labor_rate_per_hr = 0, gas_cost_per_ft = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // An efficiency is a percent; 0 < value < 1 is a fraction typed into a percent field (added 2026-09-26).
+  if (["deposition_eff_pct"].some((k) => { const v = Number(arguments[0]?.[k]); return v > 0 && v < 1; })) return { error: "Enter efficiencies as a percent (85 for 85%), not a fraction." };
   // Until 2026-09-26 a negative entry here returned a negative quantity with no error.
   if (["deposit_lb_per_ft", "filler_cost_per_lb", "deposition_rate_lb_hr", "labor_rate_per_hr", "gas_cost_per_ft"].some((k) => Number(arguments[0]?.[k]) < 0)) return { error: "Deposit, costs, and rates cannot be negative." };
   const deposit = Number(deposit_lb_per_ft);

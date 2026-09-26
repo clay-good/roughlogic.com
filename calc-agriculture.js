@@ -956,6 +956,8 @@ export function computeIrrigationRequirement({
   rainfall_in = 0,
 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // An efficiency is a percent; 0 < value < 1 is a fraction typed into a percent field (added 2026-09-26).
+  if (["efficiency_pct"].some((k) => { const v = Number(arguments[0]?.[k]); return v > 0 && v < 1; })) return { error: "Enter efficiencies as a percent (85 for 85%), not a fraction." };
   const kc = FAO56_CROP_KC[crop];
   if (kc === undefined) return { error: "Unknown crop '" + crop + "'." };
   const et0 = Number(et_ref_in_per_day);
@@ -2197,6 +2199,8 @@ export function computeSprayDriftBuffer({ base_buffer_ft = 0, droplet_class = "m
 // dims: in { boom_width_ft: L, speed_mph: L T^-1, field_efficiency_pct: dimensionless, field_acres: dimensionless, tank_gal: L^3, gpa: dimensionless } out: { theoretical_ac_hr: dimensionless, effective_ac_hr: dimensionless, spray_time_hr: dimensionless, acres_per_tank: L^2, tanks_needed: dimensionless }
 export function computeSprayerFieldCapacity({ boom_width_ft, speed_mph, field_efficiency_pct = 70, field_acres, tank_gal, gpa } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // An efficiency is a percent; 0 < value < 1 is a fraction typed into a percent field (added 2026-09-26).
+  if (["field_efficiency_pct"].some((k) => { const v = Number(arguments[0]?.[k]); return v > 0 && v < 1; })) return { error: "Enter efficiencies as a percent (85 for 85%), not a fraction." };
   const boom = Number(boom_width_ft);
   const speed = Number(speed_mph);
   const eff = Number(field_efficiency_pct);
@@ -2906,6 +2910,8 @@ AGRICULTURE_RENDERERS["manure-nutrient-application"] = renderManureNutrientAppli
 // dims: in { system_flow_gpm: L^3 T^-1, area_acres: L^2, target_depth_in: L, efficiency_pct: dimensionless } out: { hours: T, gross_gpm_per_acre: dimensionless, net_depth_in: L }
 export function computeCenterPivotRuntime({ system_flow_gpm = 0, area_acres = 0, target_depth_in = 0, efficiency_pct = 85 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // An efficiency is a percent; 0 < value < 1 is a fraction typed into a percent field (added 2026-09-26).
+  if (["efficiency_pct"].some((k) => { const v = Number(arguments[0]?.[k]); return v > 0 && v < 1; })) return { error: "Enter efficiencies as a percent (85 for 85%), not a fraction." };
   const flow = Number(system_flow_gpm) || 0;
   const area = Number(area_acres) || 0;
   const depth = Number(target_depth_in) || 0;

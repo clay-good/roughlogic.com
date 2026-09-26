@@ -99,6 +99,8 @@ export function computePoolCoverEvaporation({
   cover_hours_per_day = 0, heater_efficiency_pct = 82, fuel_cost_per_mmbtu = 0, season_days = 180,
 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // An efficiency is a percent; 0 < value < 1 is a fraction typed into a percent field (added 2026-09-26).
+  if (["heater_efficiency_pct"].some((k) => { const v = Number(arguments[0]?.[k]); return v > 0 && v < 1; })) return { error: "Enter efficiencies as a percent (85 for 85%), not a fraction." };
   if (!(surface_area_ft2 > 0)) return { error: "Pool surface area must be positive (ft^2)." };
   if (!(evaporation_in_day > 0)) return { error: "The evaporation rate must be positive (in/day)." };
   if (cover_effectiveness_pct < 0 || cover_effectiveness_pct > 100) return { error: "Cover effectiveness must be between 0 and 100 percent." };

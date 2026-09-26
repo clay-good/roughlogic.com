@@ -172,6 +172,8 @@ CORROSION_RENDERERS["anode-bed-resistance"] = _simpleRenderer({
 // dims: in { design_current_a: I, bed_resistance_ohm: M L^2 T^-3 I^-2, header_length_ft: L, negative_length_ft: L, cable_ohm_per_kft: M L T^-3 I^-2, back_emf_v: M L^2 T^-3 I^-1, design_margin_pct: dimensionless, rectifier_efficiency_pct: dimensionless, energy_rate_per_kwh: dimensionless } out: { cable_resistance_ohm: M L^2 T^-3 I^-2, total_resistance_ohm: M L^2 T^-3 I^-2, required_voltage_v: M L^2 T^-3 I^-1, design_voltage_v: M L^2 T^-3 I^-1, dc_output_w: M L^2 T^-3, ac_input_w: M L^2 T^-3, annual_kwh: M L^2 T^-2 }
 export function computeCpRectifierSizing({ design_current_a = 0, bed_resistance_ohm = 0, header_length_ft = 0, negative_length_ft = 0, cable_ohm_per_kft = 0, back_emf_v = 0, design_margin_pct = 0, rectifier_efficiency_pct = 0, energy_rate_per_kwh = 0 } = {}) {
   const guard = _finiteGuard(arguments[0]); if (guard) return { error: guard.error };
+  // An efficiency is a percent; 0 < value < 1 is a fraction typed into a percent field (added 2026-09-26).
+  if (["rectifier_efficiency_pct"].some((k) => { const v = Number(arguments[0]?.[k]); return v > 0 && v < 1; })) return { error: "Enter efficiencies as a percent (85 for 85%), not a fraction." };
   if (!(design_current_a > 0)) return { error: "The design current must be positive." };
   if (!(bed_resistance_ohm > 0)) return { error: "The anode bed resistance must be positive." };
   if (!(header_length_ft >= 0) || !(negative_length_ft >= 0)) return { error: "Cable lengths cannot be negative." };

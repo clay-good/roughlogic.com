@@ -2285,6 +2285,8 @@ export function computeStepDrawdownEfficiency({
   operating_gpm = 0, efficiency_threshold_pct = 65, previous_efficiency_pct = 0,
 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // An efficiency is a percent; 0 < value < 1 is a fraction typed into a percent field (added 2026-09-26).
+  if (["efficiency_threshold_pct", "previous_efficiency_pct"].some((k) => { const v = Number(arguments[0]?.[k]); return v > 0 && v < 1; })) return { error: "Enter efficiencies as a percent (85 for 85%), not a fraction." };
   const steps = [[q1_gpm, s1_ft], [q2_gpm, s2_ft], [q3_gpm, s3_ft]].filter(([q, s]) => q > 0 && s > 0);
   if (steps.length < 2) return { error: "At least two steps with a positive rate and drawdown are needed to separate aquifer loss from well loss." };
   if (!(operating_gpm > 0)) return { error: "The operating rate must be positive (gpm)." };

@@ -2110,6 +2110,8 @@ EARTHWORK_RENDERERS["fine-aggregate-grading"] = _v1195renderFineAggregateGrading
 // dims: in { d10_mm: L, d30_mm: L, d60_mm: L, pct_coarse_passing_no4: dimensionless, pct_fines: dimensionless } out: { cu: dimensionless, cc: dimensionless, hazen_k_cm_s: L T^-1 }
 export function computeSoilGradationCoefficients({ d10_mm = 0, d30_mm = 0, d60_mm = 0, pct_coarse_passing_no4 = 60, pct_fines = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // An efficiency is a percent; 0 < value < 1 is a fraction typed into a percent field (added 2026-09-26).
+  if (["pct_coarse_passing_no4", "pct_fines"].some((k) => { const v = Number(arguments[0]?.[k]); return v > 0 && v < 1; })) return { error: "Enter efficiencies as a percent (85 for 85%), not a fraction." };
   if (!(d10_mm > 0)) return { error: "D10 (effective size) must be positive (mm)." };
   if (!(d30_mm > 0)) return { error: "D30 must be positive (mm)." };
   if (!(d60_mm > 0)) return { error: "D60 must be positive (mm)." };

@@ -371,6 +371,8 @@ ELEVATOR_RENDERERS["hoistway-venting"] = _simpleRenderer({
 // dims: in { input_power_kw: M L^2 T^-3, efficiency_pct: dimensionless, duty_cycle_pct: dimensionless, controller_standby_w: M L^2 T^-3, other_gains_btuh: M L^2 T^-3, room_volume_cuft: L^3, ambient_limit_f: T, starting_temp_f: T } out: { heat_running_btuh: M L^2 T^-3, heat_average_btuh: M L^2 T^-3, total_btuh: M L^2 T^-3, cooling_tons: M L^2 T^-3, temp_rise_f_per_hr: T }
 export function computeMachineRoomHeat({ input_power_kw = 0, efficiency_pct = 85, duty_cycle_pct = 40, controller_standby_w = 0, other_gains_btuh = 0, room_volume_cuft = 0, ambient_limit_f = 104, starting_temp_f = 80 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // An efficiency is a percent; 0 < value < 1 is a fraction typed into a percent field (added 2026-09-26).
+  if (["efficiency_pct"].some((k) => { const v = Number(arguments[0]?.[k]); return v > 0 && v < 1; })) return { error: "Enter efficiencies as a percent (85 for 85%), not a fraction." };
   if (!(input_power_kw > 0)) return { error: "Machine and drive input power must be positive." };
   if (!(efficiency_pct > 0 && efficiency_pct < 100)) return { error: "Efficiency must be in (0, 100) percent." };
   if (!(duty_cycle_pct > 0 && duty_cycle_pct <= 100)) return { error: "Duty cycle must be in (0, 100] percent." };

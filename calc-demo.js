@@ -432,6 +432,8 @@ DEMO_RENDERERS["lead-dust-clearance"] = _simpleRenderer({
 // dims: in { measured_concentration_ug_m3: M L^-3, sample_minutes: T, shift_minutes: T, pel_ug_m3: M L^-3, action_level_ug_m3: M L^-3, control_efficiency_pct: dimensionless } out: { twa_ug_m3: M L^-3, pel_ratio: dimensionless, over_pel_by_ug_m3: M L^-3, controlled_twa_ug_m3: M L^-3, required_efficiency_pct: dimensionless, max_task_minutes: T }
 export function computeSilicaVentilationScreen({ measured_concentration_ug_m3 = 0, sample_minutes = 0, shift_minutes = 480, pel_ug_m3 = 50, action_level_ug_m3 = 25, control_efficiency_pct = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // An efficiency is a percent; 0 < value < 1 is a fraction typed into a percent field (added 2026-09-26).
+  if (["control_efficiency_pct"].some((k) => { const v = Number(arguments[0]?.[k]); return v > 0 && v < 1; })) return { error: "Enter efficiencies as a percent (85 for 85%), not a fraction." };
   if (!(measured_concentration_ug_m3 >= 0)) return { error: "The measured concentration cannot be negative (micrograms per cubic metre)." };
   if (!(sample_minutes > 0)) return { error: "The sampled time must be positive (min)." };
   if (!(shift_minutes > 0)) return { error: "The shift length must be positive (min) -- the PEL is an 8-hour time-weighted average, so 480 min is the reference." };

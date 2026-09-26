@@ -2973,6 +2973,8 @@ const _AIR_ISENTROPIC_EXP = (1.4 - 1) / 1.4;
 // dims: in { boost_psi: M L^-1 T^-2, ambient_psia: M L^-1 T^-2, inlet_temp_f: T, compressor_eff_pct: dimensionless } out: { pr: dimensionless, t_out_f: T, temp_rise_f: T }
 export function computeTurboPressureRatio({ boost_psi = 0, ambient_psia = 14.7, inlet_temp_f = 0, compressor_eff_pct = 70 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // An efficiency is a percent; 0 < value < 1 is a fraction typed into a percent field (added 2026-09-26).
+  if (["compressor_eff_pct"].some((k) => { const v = Number(arguments[0]?.[k]); return v > 0 && v < 1; })) return { error: "Enter efficiencies as a percent (85 for 85%), not a fraction." };
   const boost = Number(boost_psi) || 0;
   const amb = Number(ambient_psia) || 0;
   const tinF = Number(inlet_temp_f);
@@ -3019,6 +3021,8 @@ MECHANIC_RENDERERS["turbo-pressure-ratio"] = _simpleRenderer({
 // dims: in { max_charge_temp_f: T, inlet_temp_f: T, compressor_eff_pct: dimensionless, ambient_psia: M L^-1 T^-2 } out: { max_boost_psi: M L^-1 T^-2, pressure_ratio: dimensionless }
 export function computeTurboMaxBoostForChargeTemp({ max_charge_temp_f = 0, inlet_temp_f = 0, compressor_eff_pct = 70, ambient_psia = 14.7 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // An efficiency is a percent; 0 < value < 1 is a fraction typed into a percent field (added 2026-09-26).
+  if (["compressor_eff_pct"].some((k) => { const v = Number(arguments[0]?.[k]); return v > 0 && v < 1; })) return { error: "Enter efficiencies as a percent (85 for 85%), not a fraction." };
   const tout = Number(max_charge_temp_f);
   const tin = Number(inlet_temp_f);
   const eff = Number(compressor_eff_pct) || 0;

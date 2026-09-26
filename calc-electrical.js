@@ -5960,6 +5960,8 @@ const _V941_STD_OCPD = [15, 20, 25, 30, 35, 40, 45, 50, 60, 70, 80, 90, 100, 110
 // dims: in { inverter_power_w: M L^2 T^-3, battery_voltage_v: M L^2 T^-3 I^-1, efficiency_pct: dimensionless } out: { dc_current_a: I, min_conductor_ampacity_a: I, ocpd_a: I }
 export function computeBatteryInverterDcConductor({ inverter_power_w = 4000, battery_voltage_v = 48, efficiency_pct = 90 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // An efficiency is a percent; 0 < value < 1 is a fraction typed into a percent field (added 2026-09-26).
+  if (["efficiency_pct"].some((k) => { const v = Number(arguments[0]?.[k]); return v > 0 && v < 1; })) return { error: "Enter efficiencies as a percent (85 for 85%), not a fraction." };
   if (!(inverter_power_w > 0)) return { error: "Inverter power must be positive (W)." };
   if (!(battery_voltage_v > 0)) return { error: "Battery bank voltage must be positive (V)." };
   if (!(efficiency_pct > 0 && efficiency_pct <= 100)) return { error: "Efficiency must be between 0 and 100 percent." };

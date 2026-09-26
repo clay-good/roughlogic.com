@@ -471,6 +471,8 @@ export function computeCathodicAnodeCountLife({
   current_per_anode_a = 0, degraded_efficiency_pct = 0, target_life_years = 0,
 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // An efficiency is a percent; 0 < value < 1 is a fraction typed into a percent field (added 2026-09-26).
+  if (["coating_efficiency_pct", "degraded_efficiency_pct"].some((k) => { const v = Number(arguments[0]?.[k]); return v > 0 && v < 1; })) return { error: "Enter efficiencies as a percent (85 for 85%), not a fraction." };
   if (!(od_in > 0)) return { error: "Pipe outside diameter must be positive (in)." };
   if (!(length_mi > 0)) return { error: "Length must be positive (miles)." };
   if (!(coating_efficiency_pct >= 0 && coating_efficiency_pct < 100)) return { error: "Coating efficiency must be at least 0 and below 100 percent -- a perfect coating needs no protection and is not a design case." };

@@ -689,6 +689,8 @@ MINING_RENDERERS["dust-deflagration-vent-area"] = _simpleRenderer({
 // dims: in { heading_width_ft: L, heading_height_ft: L, fan_airflow_cfm: L^3 T^-1, tubing_efficiency_pct: dimensionless, diesel_units: dimensionless, diesel_cfm_each: L^3 T^-1, min_face_velocity_fpm: L T^-1 } out: { heading_area_sqft: L^2, delivered_cfm: L^3 T^-1, face_velocity_fpm: L T^-1, velocity_required_cfm: L^3 T^-1, diesel_required_cfm: L^3 T^-1, leakage_cfm: L^3 T^-1 }
 export function computeMineFaceVentilation({ heading_width_ft = 0, heading_height_ft = 0, fan_airflow_cfm = 0, tubing_efficiency_pct = 70, diesel_units = 1, diesel_cfm_each = 0, min_face_velocity_fpm = 60 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // An efficiency is a percent; 0 < value < 1 is a fraction typed into a percent field (added 2026-09-26).
+  if (["tubing_efficiency_pct"].some((k) => { const v = Number(arguments[0]?.[k]); return v > 0 && v < 1; })) return { error: "Enter efficiencies as a percent (85 for 85%), not a fraction." };
   if (!(heading_width_ft > 0)) return { error: "Heading width must be positive." };
   if (!(heading_height_ft > 0)) return { error: "Heading height must be positive." };
   if (!(fan_airflow_cfm > 0)) return { error: "Fan airflow must be positive." };
@@ -749,6 +751,8 @@ MINING_RENDERERS["mine-face-ventilation"] = _simpleRenderer({
 // dims: in { static_lift_ft: L, friction_head_ft: L, discharge_pressure_ft: L, head_per_pump_ft: L, suction_lift_ft: L, practical_suction_limit_ft: L, flow_gpm: L^3 T^-1, pump_efficiency_pct: dimensionless } out: { total_head_ft: L, stages: dimensionless, head_per_stage_ft: L, water_hp: M L^2 T^-3, brake_hp: M L^2 T^-3 }
 export function computePitDewateringStaging({ static_lift_ft = 0, friction_head_ft = 0, discharge_pressure_ft = 0, head_per_pump_ft = 0, suction_lift_ft = 0, practical_suction_limit_ft = 25, flow_gpm = 0, pump_efficiency_pct = 65 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // An efficiency is a percent; 0 < value < 1 is a fraction typed into a percent field (added 2026-09-26).
+  if (["pump_efficiency_pct"].some((k) => { const v = Number(arguments[0]?.[k]); return v > 0 && v < 1; })) return { error: "Enter efficiencies as a percent (85 for 85%), not a fraction." };
   if (!(static_lift_ft > 0)) return { error: "Static lift must be positive." };
   if (!(friction_head_ft >= 0)) return { error: "Friction head cannot be negative." };
   if (!(discharge_pressure_ft >= 0)) return { error: "Discharge pressure head cannot be negative." };

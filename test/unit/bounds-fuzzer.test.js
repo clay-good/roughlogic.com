@@ -56073,3 +56073,16 @@ test("bounds: batch-39 fixes -- percent-vs-fraction and range guards, ADA landin
   // Required face rent: the effective rent sits 16.7% below a $36 face ($30 NER); the discount is not "above".
   assert.ok(Math.abs(_b39rfr({ target_ner: 30, term_periods: 120, free_periods: 20 }).discount_pct - 100 / 6) < 1e-9);
 });
+
+import { computeMotorOperatingCost as _effMot } from "../../calc-motor.js";
+import { computeFurnaceTempRise as _effFur } from "../../calc-hvacservice.js";
+test("bounds: every efficiency-percent input refuses a fraction (0.85 for 85%)", () => {
+  // Found 2026-09-26 by dividing each *efficiency*_pct fixture input by 100: 37 functions silently computed with a
+  // 0.85% efficiency. Two representatives here; scratchpad pctscan covers the rest.
+  const m = { hp: 25, efficiency_pct: 93, load_factor_pct: 100, hours_per_year: 4000, rate_usd_per_kwh: 0.12 };
+  assert.ok(!("error" in _effMot(m)));
+  assert.ok("error" in _effMot({ ...m, efficiency_pct: 0.93 }));
+  const f = { return_air_F: 70, supply_air_F: 120, input_btuh: 100000, efficiency_pct: 80, rise_min_F: 40, rise_max_F: 70 };
+  assert.ok(!("error" in _effFur(f)));
+  assert.ok("error" in _effFur({ ...f, efficiency_pct: 0.8 }));
+});

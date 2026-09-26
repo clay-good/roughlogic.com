@@ -13,6 +13,7 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **37 tiles refuse an efficiency typed as a fraction.** A sweep divided each efficiency-percent input by 100. Every such tile (motor cost, furnace rise, EV charging, spindle power, landfill gas, UPS redundancy and others) silently ran at a 0.85% efficiency when 0.85 was typed for 85%. The rest of the percent inputs (waste, humidity, grade and so on) can legitimately fall below 1, so they are left for per-tile review.
 - **`irrigation-zone-runtime` uses the Irrigation Association run-time multiplier its citation names.** The IA Recommended Audit Guidelines (2009, Eq. 3-11) give RTM = 1 / (0.4 + 0.6 x DU_LQ), which is 1.18 at DU 0.75. The tile divided by DU (1.33), over-watering by about 13% while crediting IA. The example's gross runtime goes from 50 to 44.1 minutes.
 - **`required-face-rent` says which way the discount runs.** The effective rent sits 16.7% below a $36 face; the face is 20% above a $30 effective rent. The tile had called the 16.7% "above".
 - **More input guards found by probing each tile.** Each of these was accepted before and returned a nonsense result:

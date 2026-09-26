@@ -229,6 +229,8 @@ BREWING_RENDERERS["sparge-water-volume"] = _simpleRenderer({
 // dims: in { grain_weight_lb: M, extract_potential_ppg: L^3 M^-1, volume_gal: L^3, original_gravity: dimensionless, transfer_loss_gal: L^3, strong_grain_weight_lb: M, assumed_efficiency_pct: dimensionless, achieved_efficiency_pct: dimensionless } out: { kettle_efficiency_pct: dimensionless, fermenter_efficiency_pct: dimensionless, assumed_og_points: dimensionless, achieved_og_points: dimensionless, shortfall_point_gallons: L^3, shortfall_malt_equivalent_lb: M, malt_to_recover_lb: M }
 export function computeBrewhouseEfficiency({ grain_weight_lb = 0, extract_potential_ppg = 0, volume_gal = 0, original_gravity = 0, transfer_loss_gal = 0, strong_grain_weight_lb = 0, assumed_efficiency_pct = 0, achieved_efficiency_pct = 0 } = {}) {
   const guard = _finiteGuard(arguments[0]); if (guard) return { error: guard.error };
+  // An efficiency is a percent; 0 < value < 1 is a fraction typed into a percent field (added 2026-09-26).
+  if (["achieved_efficiency_pct", "assumed_efficiency_pct"].some((k) => { const v = Number(arguments[0]?.[k]); return v > 0 && v < 1; })) return { error: "Enter efficiencies as a percent (85 for 85%), not a fraction." };
   if (!(grain_weight_lb > 0) || !(strong_grain_weight_lb > 0)) return { error: "Grain weights must be positive." };
   if (!(extract_potential_ppg > 0)) return { error: "The extract potential must be positive (about 37 points per pound per gallon for base malt)." };
   if (!(volume_gal > 0)) return { error: "The volume must be positive." };
@@ -847,6 +849,8 @@ BREWING_RENDERERS["packaging-yield-loss"] = _simpleRenderer({
 // dims: in { tun_diameter_ft: L, grain_weight_lb: M, mash_thickness_qt_per_lb: L^3 M^-1, grain_displacement_gal_per_lb: L^3 M^-1, max_bed_depth_in: L, batch_volume_gal: L^3, efficiency_pct: dimensionless, extract_potential_ppg: L^3 M^-1, alternative_diameter_ft: L } out: { bed_area_sqft: L^2, mash_volume_gal: L^3, bed_depth_in: L, max_grain_lb: M, max_og_points: dimensionless, alternative_bed_depth_in: L, alternative_max_grain_lb: M }
 export function computeMashTunGrainBed({ tun_diameter_ft = 0, grain_weight_lb = 0, mash_thickness_qt_per_lb = 0, grain_displacement_gal_per_lb = 0, max_bed_depth_in = 0, batch_volume_gal = 0, efficiency_pct = 0, extract_potential_ppg = 0, alternative_diameter_ft = 0 } = {}) {
   const guard = _finiteGuard(arguments[0]); if (guard) return { error: guard.error };
+  // An efficiency is a percent; 0 < value < 1 is a fraction typed into a percent field (added 2026-09-26).
+  if (["efficiency_pct"].some((k) => { const v = Number(arguments[0]?.[k]); return v > 0 && v < 1; })) return { error: "Enter efficiencies as a percent (85 for 85%), not a fraction." };
   if (!(tun_diameter_ft > 0) || !(alternative_diameter_ft > 0)) return { error: "Tun diameters must be positive." };
   if (!(grain_weight_lb > 0)) return { error: "Grain weight must be positive." };
   if (!(mash_thickness_qt_per_lb > 0)) return { error: "Mash thickness must be positive." };

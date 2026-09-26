@@ -462,6 +462,8 @@ const _SENSIBLE_HEAT_FACTOR = 1.08; // BTU/hr per CFM per F, sea level.
 // dims: in { return_air_F: T, supply_air_F: T, input_btuh: M L^2 T^-3, efficiency_pct: dimensionless, rise_min_F: T, rise_max_F: T } out: { delta_T_F: T, output_btuh: M L^2 T^-3, cfm: L^3 T^-1 }
 export function computeFurnaceTempRise({ return_air_F = 0, supply_air_F = 0, input_btuh = 0, efficiency_pct = 80, rise_min_F = 40, rise_max_F = 70 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // An efficiency is a percent; 0 < value < 1 is a fraction typed into a percent field (added 2026-09-26).
+  if (["efficiency_pct"].some((k) => { const v = Number(arguments[0]?.[k]); return v > 0 && v < 1; })) return { error: "Enter efficiencies as a percent (85 for 85%), not a fraction." };
   if (!(input_btuh > 0)) return { error: "Furnace input must be positive (BTU/hr)." };
   if (!(efficiency_pct > 0)) return { error: "Efficiency must be positive (percent)." };
   if (rise_min_F < 0 || rise_max_F < 0) return { error: "Rating-plate rise limits must be non-negative." };
@@ -506,6 +508,8 @@ HVACSERVICE_RENDERERS["furnace-temp-rise"] = _simpleRenderer({
 // dims: in { input_btuh: M L^2 T^-3, efficiency_pct: dimensionless, cfm: L^3 T^-1, return_air_F: T, rise_min_F: T, rise_max_F: T } out: { output_btuh: M L^2 T^-3, delta_T_F: T, supply_air_F: T }
 export function computeFurnaceAirflowToRise({ input_btuh = 0, efficiency_pct = 80, cfm = 0, return_air_F = 70, rise_min_F = 40, rise_max_F = 70 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // An efficiency is a percent; 0 < value < 1 is a fraction typed into a percent field (added 2026-09-26).
+  if (["efficiency_pct"].some((k) => { const v = Number(arguments[0]?.[k]); return v > 0 && v < 1; })) return { error: "Enter efficiencies as a percent (85 for 85%), not a fraction." };
   return_air_F = Number(return_air_F);
   if (!(input_btuh > 0)) return { error: "Furnace input must be positive (BTU/hr)." };
   if (!(efficiency_pct > 0)) return { error: "Efficiency must be positive (percent)." };
@@ -1103,6 +1107,8 @@ HVACSERVICE_RENDERERS["combustion-lambda"] = _v609renderCombustionLambda;
 // dims: in { output_btu_hr: M L^2 T^-3, steady_state_efficiency_pct: dimensionless, heating_value_btu_gal: M L^-1 T^-2 } out: { input_btu_hr: M L^2 T^-3, firing_rate_gph: L^3 T^-1 }
 export function computeOilBurnerFiringRate({ output_btu_hr = 88000, steady_state_efficiency_pct = 85, heating_value_btu_gal = 138500 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // An efficiency is a percent; 0 < value < 1 is a fraction typed into a percent field (added 2026-09-26).
+  if (["steady_state_efficiency_pct"].some((k) => { const v = Number(arguments[0]?.[k]); return v > 0 && v < 1; })) return { error: "Enter efficiencies as a percent (85 for 85%), not a fraction." };
   if (!(output_btu_hr > 0)) return { error: "Design output must be positive (BTU/hr)." };
   if (!(steady_state_efficiency_pct > 0 && steady_state_efficiency_pct <= 100)) return { error: "Steady-state efficiency must be between 0 and 100 percent." };
   if (!(heating_value_btu_gal > 0)) return { error: "Heating value must be positive (BTU/gal)." };

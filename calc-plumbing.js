@@ -3715,6 +3715,8 @@ PLUMBING_RENDERERS["supply-pressure-budget"] = renderSupplyPressureBudget;
 // dims: in { tank_gal: L^3, input_btuh: M L^2 T^-3, efficiency_pct: dimensionless, rise_F: T, usable_fraction: dimensionless, peak_hour_gal: L^3 } out: { recovery_gph: L^3 T^-1, fhr_gph: L^3 T^-1, short_by_gph: L^3 T^-1 }
 export function computeWaterHeaterStorageSizing({ tank_gal = 0, input_btuh = 0, efficiency_pct = 80, rise_F = 90, usable_fraction = 0.70, peak_hour_gal = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // An efficiency is a percent; 0 < value < 1 is a fraction typed into a percent field (added 2026-09-26).
+  if (["efficiency_pct"].some((k) => { const v = Number(arguments[0]?.[k]); return v > 0 && v < 1; })) return { error: "Enter efficiencies as a percent (85 for 85%), not a fraction." };
   if (!(tank_gal > 0)) return { error: "Tank capacity must be positive (gal)." };
   if (!(input_btuh > 0)) return { error: "Input rate must be positive (BTU/hr)." };
   if (!(efficiency_pct > 0)) return { error: "Recovery efficiency must be positive (%)." };

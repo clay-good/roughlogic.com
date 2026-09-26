@@ -161,6 +161,8 @@ WASTE_RENDERERS["landfill-airspace-density"] = _simpleRenderer({
 // dims: in { annual_tons: M, placement_years: T, methane_yield_m3_per_mg: L^3, decay_constant_per_year: T^-1, methane_fraction_pct: dimensionless, collection_efficiency_pct: dimensionless, methane_heating_value_btu_per_cf: M L^-1 T^-2, generator_efficiency_pct: dimensionless } out: { methane_m3_per_year: L^3, methane_cfm: L^3 T^-1, landfill_gas_cfm: L^3 T^-1, heat_rate_mmbtu_per_hr: M L^2 T^-3, gross_capacity_kw: M L^2 T^-3, collected_capacity_kw: M L^2 T^-3 }
 export function computeLandfillGasGeneration({ annual_tons = 0, placement_years = 0, methane_yield_m3_per_mg = 0, decay_constant_per_year = 0, methane_fraction_pct = 0, collection_efficiency_pct = 0, methane_heating_value_btu_per_cf = 0, generator_efficiency_pct = 0 } = {}) {
   const guard = _finiteGuard(arguments[0]); if (guard) return { error: guard.error };
+  // An efficiency is a percent; 0 < value < 1 is a fraction typed into a percent field (added 2026-09-26).
+  if (["collection_efficiency_pct", "generator_efficiency_pct"].some((k) => { const v = Number(arguments[0]?.[k]); return v > 0 && v < 1; })) return { error: "Enter efficiencies as a percent (85 for 85%), not a fraction." };
   if (!(annual_tons > 0)) return { error: "Annual tonnage must be positive." };
   if (!(placement_years >= 1)) return { error: "There must be at least one year of placement." };
   if (!(methane_yield_m3_per_mg > 0)) return { error: "The methane yield must be positive." };
@@ -493,6 +495,8 @@ WASTE_RENDERERS["transfer-station-throughput"] = _simpleRenderer({
 // dims: in { peak_lfg_cfm: L^3 T^-1, methane_fraction_pct: dimensionless, design_margin_pct: dimensionless, turndown_ratio: dimensionless, methane_heating_value_btu_per_cf: M L^-1 T^-2, destruction_efficiency_pct: dimensionless, global_warming_potential: dimensionless, reduced_methane_fraction_pct: dimensionless, methane_density_lb_per_cf: M L^-3 } out: { rated_capacity_scfm: L^3 T^-1, heat_release_mmbtu_per_hr: M L^2 T^-3, minimum_stable_scfm: L^3 T^-1, design_btu_per_cf: M L^-1 T^-2, methane_destroyed_tons: M, co2e_tons: M L T^-2 }
 export function computeLfgFlareCapacity({ peak_lfg_cfm = 0, methane_fraction_pct = 0, design_margin_pct = 0, turndown_ratio = 0, methane_heating_value_btu_per_cf = 0, destruction_efficiency_pct = 0, global_warming_potential = 0, reduced_methane_fraction_pct = 0, methane_density_lb_per_cf = 0 } = {}) {
   const guard = _finiteGuard(arguments[0]); if (guard) return { error: guard.error };
+  // An efficiency is a percent; 0 < value < 1 is a fraction typed into a percent field (added 2026-09-26).
+  if (["destruction_efficiency_pct"].some((k) => { const v = Number(arguments[0]?.[k]); return v > 0 && v < 1; })) return { error: "Enter efficiencies as a percent (85 for 85%), not a fraction." };
   if (!(peak_lfg_cfm > 0)) return { error: "The peak landfill gas flow must be positive." };
   if (!(methane_fraction_pct > 0 && methane_fraction_pct <= 100)) return { error: "The methane fraction must be above 0 and at most 100%." };
   if (!(reduced_methane_fraction_pct > 0 && reduced_methane_fraction_pct <= 100)) return { error: "The reduced methane fraction must be above 0 and at most 100%." };

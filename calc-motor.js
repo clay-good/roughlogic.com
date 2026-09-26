@@ -163,6 +163,8 @@ MOTOR_RENDERERS["motor-shaft-torque"] = renderMotorShaftTorque;
 // dims: in { hp: M L^2 T^-3, efficiency_pct: dimensionless, load_factor_pct: dimensionless, hours_per_year: T, rate_usd_per_kwh: dimensionless } out: { input_kw: M L^2 T^-3, annual_kwh: M L^2 T^-2, annual_cost: dimensionless }
 export function computeMotorOperatingCost({ hp = 0, efficiency_pct = 93, load_factor_pct = 100, hours_per_year = 0, rate_usd_per_kwh = 0.12 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // An efficiency is a percent; 0 < value < 1 is a fraction typed into a percent field (added 2026-09-26).
+  if (["efficiency_pct"].some((k) => { const v = Number(arguments[0]?.[k]); return v > 0 && v < 1; })) return { error: "Enter efficiencies as a percent (85 for 85%), not a fraction." };
   if (!(hp > 0)) return { error: "Horsepower must be positive." };
   if (!(hours_per_year > 0)) return { error: "Annual run hours must be positive." };
   if (!(efficiency_pct > 0 && efficiency_pct <= 100)) return { error: "Efficiency must be in (0, 100] percent." };
@@ -214,6 +216,8 @@ MOTOR_RENDERERS["motor-operating-cost"] = renderMotorOperatingCost;
 // dims: in { hp: M L^2 T^-3, efficiency_pct: dimensionless, load_factor_pct: dimensionless, rate_usd_per_kwh: dimensionless, cost_budget_usd: dimensionless } out: { max_hours_per_year: T, input_kw: M L^2 T^-3, annual_kwh: M L^2 T^-2 }
 export function computeMotorRunHoursForBudget({ hp = 0, efficiency_pct = 93, load_factor_pct = 100, rate_usd_per_kwh = 0.12, cost_budget_usd = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // An efficiency is a percent; 0 < value < 1 is a fraction typed into a percent field (added 2026-09-26).
+  if (["efficiency_pct"].some((k) => { const v = Number(arguments[0]?.[k]); return v > 0 && v < 1; })) return { error: "Enter efficiencies as a percent (85 for 85%), not a fraction." };
   if (!(hp > 0)) return { error: "Horsepower must be positive." };
   if (!(cost_budget_usd > 0)) return { error: "Cost budget must be positive ($)." };
   if (!(efficiency_pct > 0 && efficiency_pct <= 100)) return { error: "Efficiency must be in (0, 100] percent." };
