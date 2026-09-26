@@ -13,6 +13,29 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **`shaft-alignment-reverse-dial` moves the feet the right way.** Plane B's offset kept the sign of the reading, and the foot moves were not negated, so the tile could say "raise" where the feet had to come down. The planes are now labeled by which shaft carries the indicator. Rexnord 538-214's example (-0.020 / +0.010 in, planes 10-1/2 in apart) now reproduces: raise the front feet 3.8 mils and the rear feet 1.3 mils.
+- **`train-brake-reduction` stops at the equalization point.** The full-service point used to be a fixed 26 psi at any charge, so a 70 psi or 30 psi brake pipe still showed 65 psi in the cylinder. It is now the charge / (1 + cylinder ratio): a 90 psi charge and a 2.5 ratio equalize at 64 psi, the figure the air-brake texts print.
+- **`vacuum-evacuation-time` counts the leak in the time, and gives no time for a target the leak blocks.** When the verdict said the target was unreachable, the tile still printed a pump-down time. The time is now (V/S) ln((p0 - pu)/(pt - pu)), and it reads "not reached" when pu is at or above the target. With the example's 5 torr-cfm leak, 760 to 1 torr is 4.11 minutes, not 3.98.
+- **`blast-scaled-distance-ppv` defaults to the worst-case site constant (K 242).** K 160 is the average curve, which the PA DEP blaster's manual says should never be used for a first-time estimate. The example's predicted PPV rises from 0.20 to 0.30 in/s.
+- **`crusher-reduction-ratio` checks each downstream stage, not all of them together.** With three stages, a jaw at 3:1 left 8.33:1 for the rest, and the tile flagged that as outside a 3-4 range even though Metso's 3 x 3 = 9 fits. An intermediate size larger than the feed is now refused. The machine ranges quoted in the prose now match Metso's handbook (jaw 3-5, gyratory 6-8, cone 3-4 secondary / 2-3.5 tertiary).
+- **Rail, mining and millwright unit guards.** Each of these used to return nonsense silently:
+  - an expansion coefficient typed as 6.5 (CWR force, thermal growth)
+  - a modulus in ksi
+  - a turnout separation in inches, or a frog number below 4
+  - an unbalance above 6 in
+  - a curve ordinate implying a radius under 50 ft
+  - leak and growth allowances as fractions
+  - a PPV limit above 5 in/s
+  - stemming more than three burdens
+  - a bag diameter in feet
+  - a rock density in g/cc
+- **Prose from printed sources:**
+  - FRA 213.57(a) allows 8 in of elevation on Classes 1-2 and 7 in on Classes 3-5; the 6 in cap is railroad practice.
+  - The bearing tile notes that a ball defect shows at 2 x BSF, which is the figure CWRU prints.
+  - Pulse-jet air-to-cloth ratios run 6-15 in EPA's table.
+  - Emulsion, not ANFO, is 1.25 SG.
+  - A tenth of the bags out raises the ratio 11%.
+
 - **`endurance-limit-marin` uses the Shigley 11th-edition surface constants.** The tile carried the 9th/10th-edition Table 6-2 values (machined 2.70 / -0.265). These read ka up to about 8% high, on the unsafe side of a fatigue design. The 11th edition's machined 2.00 / -0.217, hot-rolled 11.0 / -0.650, forged 12.7 / -0.758 and ground 1.21 / -0.067 are now used. Shigley 11e Problem 6-8 (Se 33.4 kpsi) reproduces; the tile's example Se moves from 29,548 to 27,366 psi.
 - **`corroded-pipe-b31g` and `guy-anchor-holding-capacity` refuse a safety factor below 1.** Entering the design factor 0.72 as B31G's safety factor used to report a safe pressure above the predicted failure pressure as ACCEPTABLE. An anchor factor of safety of 0.5 put the allowable above the ultimate.
 - **Unit guards found by probing each tile.** Each of these used to return nonsense silently:
@@ -147,6 +170,13 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 - **`calc-agriculture.js` size cap raised from 64,000 to 66,000 bytes gzipped.** The irrigation and livestock corrections took it to 64,110 B (100.2%).
 - **`calc-electrical.js` size cap raised from 104,000 to 106,000 bytes gzipped.** The battery-vent and capacitor corrections took it to 104,063 B (100.1%). Splitting the module per bench is still the preferred fix.
+- **Ten more tiles now carry a publisher's printed example.**
+  - **Blasting and aggregate:** `blast-powder-factor` (OSMRE Module 3), `blast-scaled-distance-ppv` and `blast-burden-spacing` (PA DEP Blaster's License Training Manual), `crusher-reduction-ratio` (Metso Crushing and Screening Handbook 7th ed.), `dust-collector-air-to-cloth` (EPA APTI Lesson 5).
+  - **Track:** `degree-of-curve` (US Army TR0671), `turnout-frog-lead` (SCRRA Standard 2800).
+  - **Millwright:** `bearing-defect-frequencies` (CWRU Bearing Data Center, SKF 6205), `receiver-pump-up-time` (Best Aire), `shaft-alignment-reverse-dial` (Rexnord 538-214).
+
+  README: 916 of 2,183 tiles are checked only against the project's own derivation (761 of them first-principles); 1,267 carry an outside source.
+
 - **Fourteen more tiles now carry a publisher's printed example, the first batch from the first-principles pool.**
   - **Overhead lines:** `ruling-span` (RUS 1724E-200 Example 9-1), `meter-ct-pt-multiplier` (City of Banning).
   - **Drilling and pipelines:** `kill-mud-weight`, `mud-hydrostatic-pressure`, `annular-velocity-cleaning` and `casing-cement-volume` (DrillingFormulas.com); `pipeline-mao-barlow` (Ohio Gas Association seminar); `corroded-pipe-b31g` (ASME B31G-1991 Appendix A).

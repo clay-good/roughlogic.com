@@ -110354,6 +110354,42 @@
    }
   },
   {
+   "tile_id": "degree-of-curve",
+   "source_publisher": "US Army Transportation School",
+   "source_title": "Subcourse TR0671, Railway Track Maintenance II",
+   "source_edition_or_year": "determining track curvature",
+   "source_section_or_page": "a curve of 1.5 degrees has a radius of 3,820 ft (R = 5730/D); on a 62 ft stringline the middle ordinate in inches equals the degree",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "degree_of_curve": 1.5,
+    "radius_ft": 3820,
+    "chord_length_ft": 62,
+    "central_angle_deg": 20,
+    "measured_ordinate_in": 1.5
+   },
+   "outputs": {
+    "radius_chord_ft": {
+     "value": 3820,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "radius_arc_ft": {
+     "value": 3820,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "middle_ordinate_in": {
+     "value": 1.5,
+     "tolerance": {
+      "abs": 0.02
+     }
+    }
+   }
+  },
+  {
    "tile_id": "cwr-neutral-temperature",
    "source_publisher": "Project (first-principles)",
    "source_title": "13.0 sq in rail at 30,000,000 psi and 0.0000065 per degF, 95 degF neutral, 95 degF air with a 25 degF sun adder",
@@ -110587,6 +110623,29 @@
      "value": 160.9167,
      "tolerance": {
       "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "turnout-frog-lead",
+   "source_publisher": "Southern California Regional Rail Authority (Metrolink)",
+   "source_title": "Engineering Standard 2800, No. 10 Turnout",
+   "source_edition_or_year": "03/31/2011",
+   "source_section_or_page": "No. 10 frog: frog angle 5 deg 43 min 29 sec (5.7248 deg); lead 80 ft 5 in entered",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "frog_number": 10,
+    "distance_beyond_frog_ft": 150,
+    "required_separation_ft": 13,
+    "lead_ft": 80.41666666666667
+   },
+   "outputs": {
+    "frog_angle_deg": {
+     "value": 5.7248,
+     "tolerance": {
+      "abs": 0.0001
      }
     }
    }
@@ -111832,6 +111891,34 @@
    }
   },
   {
+   "tile_id": "blast-powder-factor",
+   "source_publisher": "OSMRE (US Department of the Interior)",
+   "source_title": "Blaster Training Module 3, Surface-Blast Design, Review Question 1",
+   "source_edition_or_year": "undated",
+   "source_section_or_page": "ANFO 0.8 g/cc, burden 28 ft, spacing 33 ft, bench 135 ft, 11 in hole, stemming 30 ft -> 0.7491 lb per bank cubic yard (OSMRE rounds K to 0.34; rock density is not part of the per-yard answer)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "burden_ft": 28,
+    "spacing_ft": 33,
+    "bench_height_ft": 135,
+    "hole_diameter_in": 11,
+    "subdrill_ft": 0,
+    "stemming_ft": 30,
+    "explosive_sg": 0.8,
+    "rock_density_pcf": 165,
+    "hole_count": 1
+   },
+   "outputs": {
+    "powder_factor_lb_per_cy": {
+     "value": 0.7491,
+     "tolerance": {
+      "abs": 0.002
+     }
+    }
+   }
+  },
+  {
    "tile_id": "blast-burden-spacing",
    "source_publisher": "Project (first-principles)",
    "source_title": "3.5 in hole at a burden ratio of 25 on a 30 ft bench",
@@ -111887,9 +111974,46 @@
    }
   },
   {
+   "tile_id": "blast-burden-spacing",
+   "source_publisher": "Pennsylvania DEP",
+   "source_title": "Blaster's License Training Manual 5600-MN-DEP4778",
+   "source_edition_or_year": "8/2017",
+   "source_section_or_page": "p. 13, Blast Design Rules of Thumb (OSM): 6 in borehole -> burden typical 15 ft, spacing 22.5 ft, stemming 10.5 ft",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "hole_diameter_in": 6,
+    "burden_ratio": 30,
+    "bench_height_ft": 30,
+    "spacing_ratio": 1.5,
+    "subdrill_ratio": 0.3,
+    "stemming_ratio": 0.7
+   },
+   "outputs": {
+    "burden_ft": {
+     "value": 15,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "spacing_ft": {
+     "value": 22.5,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "stemming_ft": {
+     "value": 10.5,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
    "tile_id": "blast-scaled-distance-ppv",
    "source_publisher": "Project (first-principles)",
-   "source_title": "house 1,200 ft away, 340 lb on the largest delay, generic constants",
+   "source_title": "house 1,200 ft away, 340 lb on the largest delay, worst-case K 242 (PA DEP)",
    "source_edition_or_year": "SD = D / sqrt(W); PPV = K x SD^-b",
    "source_section_or_page": "site constants entered; a seismograph regression is the defensible basis",
    "verified_by": "rl",
@@ -111897,7 +112021,7 @@
    "inputs": {
     "distance_ft": 1200,
     "charge_per_delay_lb": 340,
-    "site_k": 160,
+    "site_k": 242,
     "site_b": 1.6,
     "ppv_limit_in_s": 1,
     "required_scaled_distance": 55
@@ -111910,7 +112034,7 @@
      }
     },
     "predicted_ppv_in_s": {
-     "value": 0.20073,
+     "value": 0.30360,
      "tolerance": {
       "pct": 0.5
      }
@@ -111922,9 +112046,34 @@
      }
     },
     "compliant_distance_ft": {
-     "value": 439.86,
+     "value": 569.67,
      "tolerance": {
       "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "blast-scaled-distance-ppv",
+   "source_publisher": "Pennsylvania DEP",
+   "source_title": "Blaster's License Training Manual 5600-MN-DEP4778",
+   "source_edition_or_year": "8/2017",
+   "source_section_or_page": "pp. 7-8: CW 125 lb, D 663 ft -> SD = 59.3",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "distance_ft": 663,
+    "charge_per_delay_lb": 125,
+    "site_k": 242,
+    "site_b": 1.6,
+    "ppv_limit_in_s": 1,
+    "required_scaled_distance": 55
+   },
+   "outputs": {
+    "scaled_distance": {
+     "value": 59.3,
+     "tolerance": {
+      "abs": 0.05
      }
     }
    }
@@ -112089,6 +112238,37 @@
    }
   },
   {
+   "tile_id": "crusher-reduction-ratio",
+   "source_publisher": "Metso",
+   "source_title": "Crushing and Screening Handbook",
+   "source_edition_or_year": "7th ed., pp. 48-49",
+   "source_section_or_page": "F80 400 mm, P80 16 mm: 400/16 = 25; two stages at 3 x 4 = 12 are not enough, a third stage is needed (sizes entered in inches)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "feed_size_in": 15.748031496062993,
+    "product_size_in": 0.6299212598425197,
+    "stages": 3,
+    "machine_ratio_low": 3,
+    "machine_ratio_high": 4,
+    "actual_intermediate_in": 5.249343832020998
+   },
+   "outputs": {
+    "total_ratio": {
+     "value": 25,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "stages_required": {
+     "value": 3,
+     "tolerance": {
+      "abs": 0
+     }
+    }
+   }
+  },
+  {
    "tile_id": "screen-deck-capacity",
    "source_publisher": "Project (first-principles)",
    "source_title": "8 by 20 ft second deck at 3.5 TPH per sq ft with five correction factors, fed 400 TPH",
@@ -112247,6 +112427,38 @@
      "value": 12566.4,
      "tolerance": {
       "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "dust-collector-air-to-cloth",
+   "source_publisher": "US EPA Air Pollution Training Institute",
+   "source_title": "Lesson 5, Fabric Filter Design Review (2.0-3/95)",
+   "source_edition_or_year": "1995, pp. 5-8 to 5-10",
+   "source_section_or_page": "100,000 cfm, 1,328 bags 6 in x 12 ft, A/C 4; with one of 8 compartments (166 bags) out the net A/C is 4.57 (EPA uses pi = 3.14)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "airflow_cfm": 100000,
+    "bag_count": 1328,
+    "bag_diameter_in": 6,
+    "bag_length_ft": 12,
+    "range_low": 3,
+    "range_high": 5,
+    "bags_out_of_service": 166
+   },
+   "outputs": {
+    "air_to_cloth": {
+     "value": 4,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "derated_air_to_cloth": {
+     "value": 4.57,
+     "tolerance": {
+      "abs": 0.01
      }
     }
    }
@@ -115300,33 +115512,63 @@
      }
     },
     "offset_b_in": {
-     "value": 0.011,
+     "value": -0.011,
      "tolerance": {
       "pct": 0.5
      }
     },
     "slope_in_per_in": {
-     "value": 0.0018,
+     "value": -0.0004,
      "tolerance": {
       "pct": 0.5
      }
     },
     "front_move_in": {
-     "value": 0.0038,
+     "value": 0.0094,
      "tolerance": {
       "pct": 0.5
      }
     },
     "rear_move_in": {
-     "value": 0.0362,
+     "value": 0.0166,
      "tolerance": {
       "pct": 0.5
      }
     },
     "coupling_center_offset_in": {
-     "value": 0.002,
+     "value": -0.009,
      "tolerance": {
       "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "shaft-alignment-reverse-dial",
+   "source_publisher": "Rexnord",
+   "source_title": "Coupling Alignment Fundamentals 538-214",
+   "source_edition_or_year": "February 2014, pp. 10-12",
+   "source_section_or_page": "planes 10-1/2 in apart, front feet 13 in and rear feet 18-1/4 in from plane A; readings -0.020 and +0.010 -> raise the front feet 3.8 mils and the rear feet 1.3 mils",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "tir_a_in": -0.02,
+    "tir_b_in": 0.01,
+    "plane_spacing_in": 10.5,
+    "front_foot_distance_in": 13,
+    "rear_foot_distance_in": 18.25
+   },
+   "outputs": {
+    "front_move_in": {
+     "value": 0.0038,
+     "tolerance": {
+      "abs": 5e-05
+     }
+    },
+    "rear_move_in": {
+     "value": 0.0013,
+     "tolerance": {
+      "abs": 5e-05
      }
     }
    }
@@ -115638,6 +115880,42 @@
      "value": 5.43759,
      "tolerance": {
       "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "bearing-defect-frequencies",
+   "source_publisher": "Case Western Reserve University Bearing Data Center",
+   "source_title": "Bearing Specifications, SKF 6205-2RS JEM",
+   "source_edition_or_year": "web page",
+   "source_section_or_page": "ball dia 0.3126 in, pitch dia 1.537 in: BPFI 5.4152, BPFO 3.5848, FTF 0.39828 x shaft speed (ball count 9; the printed 4.7135 is the 2 x BSF ball-defect rate)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "rpm": 1797,
+    "ball_count": 9,
+    "ball_diameter_in": 0.3126,
+    "pitch_diameter_in": 1.537,
+    "contact_angle_deg": 0
+   },
+   "outputs": {
+    "bpfi_order": {
+     "value": 5.4152,
+     "tolerance": {
+      "abs": 0.0005
+     }
+    },
+    "bpfo_order": {
+     "value": 3.5848,
+     "tolerance": {
+      "abs": 0.0005
+     }
+    },
+    "ftf_order": {
+     "value": 0.39828,
+     "tolerance": {
+      "abs": 0.0001
      }
     }
    }
@@ -115958,10 +116236,33 @@
    }
   },
   {
+   "tile_id": "receiver-pump-up-time",
+   "source_publisher": "Best Aire",
+   "source_title": "How Long Will It Take to Fill Our Compressed Air Receiver Tank?",
+   "source_edition_or_year": "April 5, 2023",
+   "source_section_or_page": "240 gal / 7.48 = 32.1 cu ft, 84 cfm, 0 to 175 psig -> T = 4.55 minutes",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "receiver_volume_ft3": 32.1,
+    "fill_start_psig": 0,
+    "fill_end_psig": 175,
+    "compressor_scfm": 84
+   },
+   "outputs": {
+    "pump_up_minutes": {
+     "value": 4.55,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
    "tile_id": "vacuum-evacuation-time",
    "source_publisher": "Project (first-principles)",
    "source_title": "15 cu ft chamber on a 25 cfm pump from 760 torr to 1 torr, with a 5 torr-cfm leak",
-   "source_edition_or_year": "t = (V / S) ln(p1 / p2); per decade = 2.303 V / S; ultimate = leak rate / effective speed",
+   "source_edition_or_year": "t = (V / S) ln((p1 - pu) / (p2 - pu)); per decade = 2.303 V / S; ultimate = leak rate / effective speed",
    "source_section_or_page": "the pump manufacturer speed curve and the system designer govern",
    "verified_by": "rl",
    "verified_on": "2026-09-07",
@@ -115975,7 +116276,7 @@
    },
    "outputs": {
     "evacuation_minutes": {
-     "value": 3.97999,
+     "value": 4.11372,
      "tolerance": {
       "pct": 0.5
      }
@@ -117248,7 +117549,7 @@
      }
     },
     "cylinder_psi": {
-     "value": 65,
+     "value": 64.286,
      "tolerance": {
       "pct": 0.5
      }
@@ -117260,13 +117561,13 @@
      }
     },
     "full_service_cylinder_psi": {
-     "value": 65,
+     "value": 64.286,
      "tolerance": {
       "pct": 0.5
      }
     },
     "wasted_reduction_psi": {
-     "value": 4,
+     "value": 4.286,
      "tolerance": {
       "pct": 0.5
      }

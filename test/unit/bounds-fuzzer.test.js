@@ -42586,7 +42586,7 @@ test("bounds: spec-v1545 computeTurnoutFrogGeometry pins the clearance point", (
   // The small-angle rule of thumb: the exact angle is very close to 1/N rad.
   assert.ok(Math.abs(r.frog_angle_deg - (1 / 10) * (180 / Math.PI)) < 0.02);
   // A number 1 frog is a steep crossing, 2 atan(1/2) = 53.13 degrees, and it is legal.
-  assert.ok(Math.abs(_v1545({ ...base, frog_number: 1 }).frog_angle_deg - 2 * Math.atan(0.5) * 180 / Math.PI) < 1e-9);
+  assert.ok(Math.abs(_v1545({ ...base, frog_number: 4 }).frog_angle_deg - 2 * Math.atan(0.125) * 180 / Math.PI) < 1e-9);
   assert.ok("error" in _v1545({ ...base, frog_number: 0.5 }));
   assert.ok("error" in _v1545({ ...base, distance_beyond_frog_ft: 0 }));
   assert.ok("error" in _v1545({ ...base, required_separation_ft: 0 }));
@@ -46031,21 +46031,25 @@ import { computeShaftAlignmentReverseDial as _v1470 } from "../../calc-millwrigh
 test("bounds: spec-v1470 computeShaftAlignmentReverseDial -- the feet are the SAME way, not opposite", () => {
   const base = { tir_a_in: -0.014, tir_b_in: 0.022, plane_spacing_in: 10, front_foot_distance_in: 6, rear_foot_distance_in: 24, coupling_center_distance_in: 5 };
   const r = _v1470(base);
+  // Movable position +TIR_A/2 at A, -TIR_B/2 at B (each indicator reads the other shaft); move = -position.
   assert.ok(Math.abs(r.offset_a_in + 0.007) < 1e-12);
-  assert.ok(Math.abs(r.offset_b_in - 0.011) < 1e-12);
-  assert.ok(Math.abs(r.slope_in_per_in - 0.0018) < 1e-12);
-  assert.ok(Math.abs(r.slope_mils_per_in - 1.8) < 1e-9);
-  assert.ok(Math.abs(r.front_move_in - 0.0038) < 1e-12);
-  assert.ok(Math.abs(r.rear_move_in - 0.0362) < 1e-12);
+  assert.ok(Math.abs(r.offset_b_in + 0.011) < 1e-12);
+  assert.ok(Math.abs(r.slope_in_per_in + 0.0004) < 1e-12);
+  assert.ok(Math.abs(r.slope_mils_per_in + 0.4) < 1e-9);
+  assert.ok(Math.abs(r.front_move_in - 0.0094) < 1e-12);
+  assert.ok(Math.abs(r.rear_move_in - 0.0166) < 1e-12);
+  // Rexnord 538-214: -.020 / +.010 over 10.5 in -> add .004 front (13 in), .001 rear (18.25 in).
+  const rex = _v1470({ tir_a_in: -0.020, tir_b_in: 0.010, plane_spacing_in: 10.5, front_foot_distance_in: 13, rear_foot_distance_in: 18.25 });
+  assert.ok(Math.abs(rex.front_move_in - 0.0038) < 1e-4 && Math.abs(rex.rear_move_in - 0.0013) < 1e-4);
   // THE CORRECTION: both moves are positive, so both feet come UP. The spec
   // called them opposite directions.
   assert.ok(r.front_move_in > 0 && r.rear_move_in > 0);
   assert.strictEqual(r.same_direction, true);
   assert.ok(/RAISE/.test(r.front_move_words) && /RAISE/.test(r.rear_move_words));
   // IDENTITY: the line passes through both measured planes exactly.
-  assert.ok(Math.abs(_v1470({ ...base, front_foot_distance_in: 1e-9, rear_foot_distance_in: 10 }).rear_move_in - r.offset_b_in) < 1e-9);
+  assert.ok(Math.abs(_v1470({ ...base, front_foot_distance_in: 1e-9, rear_foot_distance_in: 10 }).rear_move_in + r.offset_b_in) < 1e-9);
   // Equal readings mean a pure offset: zero slope, both feet move alike.
-  const pure = _v1470({ ...base, tir_a_in: 0.012, tir_b_in: 0.012 });
+  const pure = _v1470({ ...base, tir_a_in: 0.012, tir_b_in: -0.012 });
   assert.ok(Math.abs(pure.slope_in_per_in) < 1e-15);
   assert.ok(Math.abs(pure.front_move_in - pure.rear_move_in) < 1e-15);
   assert.ok(Math.abs(pure.coupling_center_offset_in - 0.006) < 1e-12);
@@ -46417,7 +46421,7 @@ import { computeVacuumEvacuationTime as _v1483 } from "../../calc-millwright.js"
 test("bounds: spec-v1483 computeVacuumEvacuationTime -- a 0.20 torr ultimate DOES reach 1 torr", () => {
   const base = { chamber_volume_ft3: 15, pump_speed_cfm: 25, start_pressure_torr: 760, target_pressure_torr: 1, leak_rate_torr_cfm: 5, conductance_efficiency: 1 };
   const r = _v1483(base);
-  assert.ok(Math.abs(r.evacuation_minutes - 3.98) < 1e-2);
+  assert.ok(Math.abs(r.evacuation_minutes - 4.114) < 1e-2);
   assert.ok(Math.abs(r.minutes_per_decade - 1.38155) < 1e-4);
   assert.ok(Math.abs(r.decades - 2.88081) < 1e-4);
   assert.ok(Math.abs(r.ultimate_pressure_torr - 0.2) < 1e-12);
@@ -46432,16 +46436,17 @@ test("bounds: spec-v1483 computeVacuumEvacuationTime -- a 0.20 torr ultimate DOE
   const blocked = _v1483({ ...base, leak_rate_torr_cfm: 30 });
   assert.strictEqual(blocked.reaches_target, false);
   assert.ok(/NO amount/.test(blocked.leak_verdict));
-  // IDENTITY: the total time is exactly the decades times the per-decade time.
-  assert.ok(Math.abs(r.evacuation_minutes - r.decades * r.minutes_per_decade) < 1e-9);
+  // IDENTITY: with no leak the total time is exactly the decades times the per-decade time.
+  const tight = _v1483({ ...base, leak_rate_torr_cfm: 0 });
+  assert.ok(Math.abs(tight.evacuation_minutes - tight.decades * tight.minutes_per_decade) < 1e-9);
   // Each decade costs the same: 760 -> 76 takes as long as 76 -> 7.6.
   const first = _v1483({ ...base, start_pressure_torr: 760, target_pressure_torr: 76, leak_rate_torr_cfm: 0 });
   const second = _v1483({ ...base, start_pressure_torr: 76, target_pressure_torr: 7.6, leak_rate_torr_cfm: 0 });
   assert.ok(Math.abs(first.evacuation_minutes - second.evacuation_minutes) < 1e-12);
   assert.ok(Math.abs(first.evacuation_minutes - r.minutes_per_decade) < 1e-9);
-  // Halving the line conductance doubles the time and doubles the ultimate.
+  // Halving the line conductance doubles the leak-free time and doubles the ultimate.
   const choked = _v1483({ ...base, conductance_efficiency: 0.5 });
-  assert.ok(Math.abs(choked.evacuation_minutes - 2 * r.evacuation_minutes) < 1e-9);
+  assert.ok(Math.abs(_v1483({ ...base, leak_rate_torr_cfm: 0, conductance_efficiency: 0.5 }).evacuation_minutes - 2 * tight.evacuation_minutes) < 1e-9);
   assert.ok(Math.abs(choked.ultimate_pressure_torr - 2 * r.ultimate_pressure_torr) < 1e-12);
   assert.ok("error" in _v1483({ ...base, target_pressure_torr: 800 }));
 });
@@ -47317,13 +47322,14 @@ test("bounds: spec-v1548 computeTrainBrakeReduction -- past full service the air
   const base = { charged_pressure_psi: 90, reduction_psi: 30, cylinder_ratio: 2.5, full_service_reduction_psi: 26, car_count: 100, propagation_rate_cars_per_second: 10 };
   const r = _v1548(base);
   assert.ok(Math.abs(r.brake_pipe_psi - 60) < 1e-12);
-  assert.ok(Math.abs(r.cylinder_psi - 65) < 1e-12);
-  assert.ok(Math.abs(r.wasted_reduction_psi - 4) < 1e-12);
+  // Equalization at 90 psi: 90 / 3.5 = 25.71 psi of reduction, 64.29 psi in the cylinder (WP manual: "about 64").
+  assert.ok(Math.abs(r.cylinder_psi - 2.5 * 90 / 3.5) < 1e-9);
+  assert.ok(Math.abs(r.wasted_reduction_psi - (30 - 90 / 3.5)) < 1e-9);
   assert.equal(r.at_or_past_full_service, true);
   assert.ok(r.verdict.startsWith("PAST FULL SERVICE"));
   assert.ok(Math.abs(r.propagation_seconds - 10) < 1e-12);
   // The spec's own ladder, each rung at 2.5 psi of cylinder per psi of pipe.
-  for (const [red, cyl] of [[6, 15], [10, 25], [20, 50], [26, 65]]) {
+  for (const [red, cyl] of [[6, 15], [10, 25], [20, 50], [26, 2.5 * 90 / 3.5]]) {
     const x = _v1548({ ...base, reduction_psi: red });
     assert.ok(Math.abs(x.cylinder_psi - cyl) < 1e-9, "reduction " + red);
     assert.ok(Math.abs(x.brake_pipe_psi - (90 - red)) < 1e-12);
@@ -47332,13 +47338,15 @@ test("bounds: spec-v1548 computeTrainBrakeReduction -- past full service the air
   // reduction give the identical cylinder pressure, and the excess is waste.
   const forty = _v1548({ ...base, reduction_psi: 40 });
   assert.ok(Math.abs(forty.cylinder_psi - r.cylinder_psi) < 1e-12);
-  assert.ok(Math.abs(forty.wasted_reduction_psi - 14) < 1e-12);
+  assert.ok(Math.abs(forty.wasted_reduction_psi - (40 - 90 / 3.5)) < 1e-9);
+  // The full-service point scales with the charge: a 70 psi pipe equalizes at 20 psi of reduction, 50 psi cylinder.
+  assert.ok(Math.abs(_v1548({ ...base, charged_pressure_psi: 70, reduction_psi: 30 }).cylinder_psi - 50) < 1e-9);
   assert.ok(Math.abs(forty.remaining_reduction_psi) < 1e-12);
   // Inside the service range the remaining reduction is what is left to give.
   const light = _v1548({ ...base, reduction_psi: 10 });
   assert.equal(light.at_or_past_full_service, false);
-  assert.ok(Math.abs(light.remaining_reduction_psi - 16) < 1e-12);
-  assert.ok(Math.abs(light.remaining_cylinder_psi - 40) < 1e-12);
+  assert.ok(Math.abs(light.remaining_reduction_psi - (90 / 3.5 - 10)) < 1e-9);
+  assert.ok(Math.abs(light.remaining_cylinder_psi - 2.5 * (90 / 3.5 - 10)) < 1e-9);
   assert.ok(Math.abs(light.wasted_reduction_psi) < 1e-12);
   assert.ok(light.verdict.startsWith("IN SERVICE RANGE"));
   // A longer train takes proportionally longer to propagate.
@@ -56129,4 +56137,24 @@ test("bounds: batch-41 guards -- B31G and anchor safety factors below 1, unit mi
   assert.ok("error" in _b41col({ modulus_psi: 30000, yield_strength_psi: 37500, moment_of_inertia_in4: 0.05, area_in2: 1, length_in: 20 }));
   assert.ok("error" in _b41scr({ axial_load_lbf: 2500, mean_diameter_in: 1.875, lead_in: 0.25, thread_friction: 15, collar_friction: 0.08, collar_diameter_in: 3.5 }));
   assert.ok("error" in _b41clu({ clamp_force_lbf: 1885, friction_coefficient: 30, outer_radius_in: 3.25, inner_radius_in: 2, friction_surfaces: 6 }));
+});
+
+import { computeCwrThermalForce as _b42cwr, computeTurnoutFrogGeometry as _b42to, computeTrackSuperelevation as _b42se, computeDegreeOfCurve as _b42dc } from "../../calc-rail.js";
+import { computeVacuumEvacuationTime as _b42vac, computeAlignmentThermalGrowth as _b42atg, computeAirCompressorCfmSizing as _b42acs } from "../../calc-millwright.js";
+test("bounds: batch-42 -- an unreachable vacuum target has no time; rail and alignment unit guards", () => {
+  // A leak whose ultimate sits above the target used to still report 5.36 minutes.
+  const blocked = _b42vac({ chamber_volume_ft3: 15, pump_speed_cfm: 25, start_pressure_torr: 760, target_pressure_torr: 0.1, leak_rate_torr_cfm: 5 });
+  assert.equal(blocked.reaches_target, false);
+  assert.equal(blocked.evacuation_minutes, null);
+  // With a reachable leak the time is (V/S) ln((p0 - pu)/(pt - pu)): 0.6 ln(759.8/0.8) = 4.114.
+  const leaky = _b42vac({ chamber_volume_ft3: 15, pump_speed_cfm: 25, start_pressure_torr: 760, target_pressure_torr: 1, leak_rate_torr_cfm: 5 });
+  assert.ok(Math.abs(leaky.evacuation_minutes - 0.6 * Math.log(759.8 / 0.8)) < 1e-9);
+  assert.ok("error" in _b42cwr({ rail_area_in2: 13, modulus_psi: 30000000, alpha_per_degf: 6.5, neutral_temp_f: 95, air_temp_f: 95, sun_adder_f: 25 }));
+  assert.ok("error" in _b42cwr({ rail_area_in2: 13, modulus_psi: 30000, alpha_per_degf: 0.0000065, neutral_temp_f: 95, air_temp_f: 95, sun_adder_f: 25 }));
+  assert.ok("error" in _b42to({ frog_number: 10, distance_beyond_frog_ft: 150, required_separation_ft: 156, lead_ft: 78 }));
+  assert.ok("error" in _b42to({ frog_number: 1, distance_beyond_frog_ft: 150, required_separation_ft: 13, lead_ft: 78 }));
+  assert.ok("error" in _b42se({ degree_of_curve: 4, speed_mph: 50, actual_elevation_in: 4, allowable_unbalance_in: 30, max_elevation_in: 6, target_speed_mph: 57 }));
+  assert.ok("error" in _b42dc({ degree_of_curve: 4, radius_ft: 1432.4, chord_length_ft: 62, central_angle_deg: 20, measured_ordinate_in: 200 }));
+  assert.ok("error" in _b42atg({ stationary_support_height_in: 14, movable_support_height_in: 18, movable_alpha_per_f: 6.5, movable_operating_temp_f: 160, ambient_temp_f: 70 }));
+  assert.ok("error" in _b42acs({ tool1_qty: 2, tool1_cfm: 5, tool1_duty: 0.5, leak_allowance_pct: 0.15 }));
 });

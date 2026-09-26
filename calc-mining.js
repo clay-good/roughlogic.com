@@ -104,6 +104,7 @@ export function computeBlastPowderFactor({ burden_ft = 0, spacing_ft = 0, bench_
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(burden_ft > 0)) return { error: "Burden must be positive." };
   if (!(spacing_ft > 0)) return { error: "Spacing must be positive." };
+  if (Number(rock_density_pcf) > 0 && Number(rock_density_pcf) < 50) return { error: "Enter rock density in lb per cu ft (about 150-180), not g/cc." };
   if (!(bench_height_ft > 0)) return { error: "Bench height must be positive." };
   if (!(hole_diameter_in > 0)) return { error: "Hole diameter must be positive." };
   if (!(subdrill_ft >= 0)) return { error: "Subdrill cannot be negative." };
@@ -196,7 +197,7 @@ MINING_RENDERERS["blast-burden-spacing"] = _simpleRenderer({
   example: burdenSpacingExample.inputs,
   fields: [
     { key: "hole_diameter_in", label: "Hole diameter (in)", kind: "number", default: 3.5 },
-    { key: "burden_ratio", label: "Burden ratio (burden per inch of diameter)", kind: "number", default: 25 },
+    { key: "burden_ratio", label: "Burden ratio B / D (same units; 25-35, e.g. 30 = 2.5 ft per inch of hole)", kind: "number", default: 25 },
     { key: "bench_height_ft", label: "Bench height (ft)", kind: "number", default: 30 },
     { key: "spacing_ratio", label: "Spacing-to-burden ratio", kind: "number", default: 1.15 },
     { key: "subdrill_ratio", label: "Subdrill-to-burden ratio", kind: "number", default: 0.3 },
@@ -216,13 +217,15 @@ MINING_RENDERERS["blast-burden-spacing"] = _simpleRenderer({
 // ===================== spec-v1509: scaled distance and peak particle velocity =====================
 
 // dims: in { distance_ft: L, charge_per_delay_lb: M L T^-2, site_k: dimensionless, site_b: dimensionless, ppv_limit_in_s: L T^-1, required_scaled_distance: dimensionless } out: { scaled_distance: dimensionless, predicted_ppv_in_s: L T^-1, max_charge_lb: M L T^-2, compliant_distance_ft: L }
-export function computeBlastScaledDistancePPV({ distance_ft = 0, charge_per_delay_lb = 0, site_k = 160, site_b = 1.6, ppv_limit_in_s = 1, required_scaled_distance = 55 } = {}) {
+export function computeBlastScaledDistancePPV({ distance_ft = 0, charge_per_delay_lb = 0, site_k = 242, site_b = 1.6, ppv_limit_in_s = 1, required_scaled_distance = 55 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(distance_ft > 0)) return { error: "Distance to the structure must be positive." };
   if (!(charge_per_delay_lb > 0)) return { error: "Charge weight per delay must be positive." };
   if (!(site_k > 0)) return { error: "Site constant K must be positive." };
   if (!(site_b > 0)) return { error: "Site exponent b must be positive." };
   if (!(ppv_limit_in_s > 0)) return { error: "PPV limit must be positive." };
+  // Regulatory PPV limits are 0.5-2.0 in/s; a limit in mm/s (25) used to call a 1.16 in/s shot "under the limit".
+  if (ppv_limit_in_s > 5) return { error: "Enter the PPV limit in inches per second (1.0), not mm/s." };
   if (!(required_scaled_distance > 0)) return { error: "Required scaled distance must be positive." };
   const scaled_distance = distance_ft / Math.sqrt(charge_per_delay_lb);
   const predicted_ppv_in_s = site_k * Math.pow(scaled_distance, -site_b);
@@ -244,7 +247,7 @@ export function computeBlastScaledDistancePPV({ distance_ft = 0, charge_per_dela
     note: "Vibration scales with charge weight per DELAY, not per shot, which is the whole reason delay initiation exists. A 10,000 lb shot fired on forty delays of 250 lb each produces the vibration of a 250 lb shot, and that single fact is what lets a quarry work near a town at all. Reading the charge weight per shot into this relation instead of per delay overstates the vibration enormously and is the most common misuse of it. The propagation constants are site-specific and vary widely with geology; the generic values are a starting point, and a site-specific regression from actual seismograph records is what a serious operation uses -- generic constants can be wrong by a factor of two in either direction. That is why most regulations offer two compliance paths: monitor every shot with a seismograph, or stay above a prescribed minimum scaled distance and skip the monitoring. The second path is conservative by design, and both are computed here. What this does NOT evaluate is frequency, and every modern vibration limit is frequency-dependent: the same peak particle velocity is acceptable at 40 Hz and not at 6 Hz, because low frequencies couple into structures. It does not address airblast, which is a separate limit and a separate calculation, or flyrock, and it does not perform a preblast survey, which is what actually resolves damage claims. Where a regulation requires monitoring this calculation does not substitute for it. Blasting is a licensed activity: the blaster in charge, the state and federal explosives regulations, MSHA or OSHA jurisdiction as applicable, and the site's blast plan govern.",
   };
 }
-const scaledDistanceExample = { inputs: { distance_ft: 1200, charge_per_delay_lb: 340, site_k: 160, site_b: 1.6, ppv_limit_in_s: 1, required_scaled_distance: 55 } };
+const scaledDistanceExample = { inputs: { distance_ft: 1200, charge_per_delay_lb: 340, site_k: 242, site_b: 1.6, ppv_limit_in_s: 1, required_scaled_distance: 55 } };
 // 30 CFR 816.67(d)(2)(i): 301 to 5,000 ft -> 1.00 in/s and a scaled distance of 55 (50 is the 0-300 ft
 // row, which pairs with 1.25 in/s). Until 2026-09-25 the example paired 1.00 with 50, allowing 576 lb per
 // delay at 1,200 ft where the table allows 476.
@@ -254,7 +257,7 @@ MINING_RENDERERS["blast-scaled-distance-ppv"] = _simpleRenderer({
   fields: [
     { key: "distance_ft", label: "Distance to the nearest protected structure (ft)", kind: "number", default: 1200 },
     { key: "charge_per_delay_lb", label: "Charge weight per DELAY (lb)", kind: "number", default: 340 },
-    { key: "site_k", label: "Site propagation constant K", kind: "number", default: 160 },
+    { key: "site_k", label: "Site constant K (242 = PA DEP worst case for a first blast; 160 = average, only from your own monitoring)", kind: "number", default: 242 },
     { key: "site_b", label: "Site propagation exponent b", kind: "number", default: 1.6 },
     { key: "ppv_limit_in_s", label: "Regulatory PPV limit (in/s)", kind: "number", default: 1 },
     { key: "required_scaled_distance", label: "Minimum scaled distance for the no-monitoring path (30 CFR 816.67: 50 to 300 ft, 55 to 5,000 ft, 65 beyond)", kind: "number", default: 55 },
@@ -345,6 +348,8 @@ export function computeBlastStemmingLength({ burden_ft = 0, hole_diameter_in = 0
   if (!(burden_ft > 0)) return { error: "Burden must be positive." };
   if (!(hole_diameter_in > 0)) return { error: "Hole diameter must be positive." };
   if (!(proposed_stemming_ft > 0)) return { error: "Proposed stemming length must be positive." };
+  // Stemming is a few feet, never several burdens: 48 (inches typed as feet) used to pass as meeting the length.
+  if (proposed_stemming_ft > 3 * burden_ft) return { error: "Proposed stemming is more than 3 burdens long; enter it in feet (4), not inches." };
   if (!(burden_ratio_low > 0)) return { error: "Low stemming ratio must be positive." };
   if (!(burden_ratio_high >= burden_ratio_low)) return { error: "High stemming ratio cannot be below the low one." };
   if (!(diameter_multiple > 0)) return { error: "Diameter multiple must be positive." };
@@ -377,7 +382,7 @@ MINING_RENDERERS["blast-stemming-length"] = _simpleRenderer({
   fields: [
     { key: "burden_ft", label: "Burden (ft)", kind: "number", default: 8 },
     { key: "hole_diameter_in", label: "Hole diameter (in)", kind: "number", default: 3.5 },
-    { key: "proposed_stemming_ft", label: "Proposed (or shortest measured) stemming (ft)", kind: "number", default: 4 },
+    { key: "proposed_stemming_ft", label: "Proposed (or shortest measured) stemming (FEET)", kind: "number", default: 4 },
     { key: "burden_ratio_low", label: "Low stemming-to-burden ratio", kind: "number", default: 0.7 },
     { key: "burden_ratio_high", label: "High stemming-to-burden ratio", kind: "number", default: 1.0 },
     { key: "diameter_multiple", label: "Minimum stemming in hole diameters", kind: "number", default: 20 },
@@ -405,6 +410,7 @@ export function computeCrusherReductionRatio({ feed_size_in = 0, product_size_in
   if (!(machine_ratio_low > 1)) return { error: "The low end of the machine ratio range must exceed 1." };
   if (!(machine_ratio_high >= machine_ratio_low)) return { error: "The high end of the machine ratio range cannot be below the low end." };
   if (!(actual_intermediate_in > product_size_in)) return { error: "The measured intermediate size must exceed the product size." };
+  if (!(actual_intermediate_in < feed_size_in)) return { error: "The measured intermediate size must be smaller than the feed." };
   const total_ratio = feed_size_in / product_size_in;
   const per_stage_ratio = Math.pow(total_ratio, 1 / stages);
   const in_range = per_stage_ratio >= machine_ratio_low && per_stage_ratio <= machine_ratio_high;
@@ -416,10 +422,14 @@ export function computeCrusherReductionRatio({ feed_size_in = 0, product_size_in
   // The diagnostic: what the downstream machine is actually being asked for
   // when the upstream one is not reducing as planned.
   const actual_downstream_ratio = actual_intermediate_in / product_size_in;
-  const downstream_in_range = actual_downstream_ratio <= machine_ratio_high;
+  // That ratio is shared by every stage after the first: with 3 stages, two machines split it. Until 2026-09-26 the
+  // whole downstream ratio was checked against ONE machine's range (Metso's 3 x 3 = 9 read as out of range).
+  const downstream_stages = Math.max(1, stages - 1);
+  const downstream_per_stage_ratio = Math.pow(actual_downstream_ratio, 1 / downstream_stages);
+  const downstream_in_range = downstream_per_stage_ratio <= machine_ratio_high;
   return {
     total_ratio, per_stage_ratio, in_range, first_intermediate_in, second_intermediate_in,
-    stages_required, comfortable_ratio, actual_downstream_ratio, downstream_in_range,
+    stages_required, comfortable_ratio, actual_downstream_ratio, downstream_per_stage_ratio, downstream_in_range,
     stage_verdict: in_range
       ? "each stage sits inside the entered machine range"
       : per_stage_ratio > machine_ratio_high
@@ -565,6 +575,7 @@ export function computeDustCollectorAirToCloth({ airflow_cfm = 0, bag_count = 0,
   if (!(airflow_cfm > 0)) return { error: "System airflow must be positive." };
   if (!(bag_count >= 1)) return { error: "Bag count must be at least 1." };
   if (!(bag_diameter_in > 0)) return { error: "Bag diameter must be positive." };
+  if (bag_diameter_in < 2) return { error: "Enter the bag diameter in inches (6), not feet." };
   if (!(bag_length_ft > 0)) return { error: "Bag length must be positive." };
   if (!(range_low > 0)) return { error: "The low end of the range must be positive." };
   if (!(range_high >= range_low)) return { error: "The high end of the range cannot be below the low end." };
@@ -588,7 +599,7 @@ export function computeDustCollectorAirToCloth({ airflow_cfm = 0, bag_count = 0,
       : air_to_cloth > range_high
         ? "ABOVE the entered range -- the dust cake is being driven into the weave rather than sitting on it, and the blinding that follows is not recoverable by cleaning"
         : "below the entered range, which is conservative rather than harmful",
-    note: "The ratio is a velocity: how fast air is being pushed through the fabric. Push too fast and the dust cake is driven into the weave instead of sitting on it, the cleaning pulse can no longer release it, and the collector blinds permanently -- a failure that shows up as rising differential pressure over weeks and is not recoverable by cleaning. Push slowly enough and the cake stays on the surface where it belongs and does most of the filtering. Two things make this a field check rather than a design one. First, a plant that adds a hood or a pickup point to an existing collector raises the airflow without raising the cloth area, and the ratio silently moves outside range; computing it after the change is a thirty-second check that predicts a failure months in advance. Second, bags out of service change the denominator directly -- a collector running with a tenth of its bags plugged or blanked off is running at a ratio a tenth higher than its design, and that is often exactly why the remaining bags are failing too, which is how bag failures cascade once they start. The typical ranges are broad conventions, and the correct ratio for a specific dust depends on particle size, shape, cohesiveness, moisture, temperature, and loading; a fine cohesive dust may need a ratio well below the generic range for its cleaning type. This does not select fabric or media treatment, size the cleaning system, evaluate can velocity (the upward velocity between bags, which independently causes re-entrainment on tall collectors), size the hopper and discharge, or address the interstitial and inlet velocities that cause bag abrasion. It does not evaluate explosion protection, which is mandatory for combustible dust and is a separate calculation, and it does not size hoods or ductwork or verify capture velocity at the source, which is where dust control actually succeeds or fails. The collector manufacturer's data, ACGIH Industrial Ventilation, and NFPA 652 where the dust is combustible govern.",
+    note: "The ratio is a velocity: how fast air is being pushed through the fabric. Push too fast and the dust cake is driven into the weave instead of sitting on it, the cleaning pulse can no longer release it, and the collector blinds permanently -- a failure that shows up as rising differential pressure over weeks and is not recoverable by cleaning. Push slowly enough and the cake stays on the surface where it belongs and does most of the filtering. Two things make this a field check rather than a design one. First, a plant that adds a hood or a pickup point to an existing collector raises the airflow without raising the cloth area, and the ratio silently moves outside range; computing it after the change is a thirty-second check that predicts a failure months in advance. Second, bags out of service change the denominator directly -- a collector running with a tenth of its bags plugged or blanked off is running at a ratio about 11% higher than its design (1 / 0.9), and that is often exactly why the remaining bags are failing too, which is how bag failures cascade once they start. The typical ranges are broad conventions, and the correct ratio for a specific dust depends on particle size, shape, cohesiveness, moisture, temperature, and loading; a fine cohesive dust may need a ratio well below the generic range for its cleaning type. This does not select fabric or media treatment, size the cleaning system, evaluate can velocity (the upward velocity between bags, which independently causes re-entrainment on tall collectors), size the hopper and discharge, or address the interstitial and inlet velocities that cause bag abrasion. It does not evaluate explosion protection, which is mandatory for combustible dust and is a separate calculation, and it does not size hoods or ductwork or verify capture velocity at the source, which is where dust control actually succeeds or fails. The collector manufacturer's data, ACGIH Industrial Ventilation, and NFPA 652 where the dust is combustible govern.",
   };
 }
 const airToClothExample = { inputs: { airflow_cfm: 12000, bag_count: 200, bag_diameter_in: 6, bag_length_ft: 8, range_low: 3, range_high: 5, bags_out_of_service: 30 } };

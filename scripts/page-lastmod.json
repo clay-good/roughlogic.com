@@ -2,7 +2,7 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "03a7f0ef2d891c6e",
+      "sha": "a08076039197eee9",
       "date": "2026-09-26"
     },
     "/tools/": {
@@ -646,24 +646,24 @@
       "date": "2026-09-05"
     },
     "/tools/blast-burden-spacing/": {
-      "sha": "bca6961ad69eb70c",
-      "date": "2026-09-05"
+      "sha": "2eaa3f0f36b25ff3",
+      "date": "2026-09-26"
     },
     "/tools/blast-fume-clearance-time/": {
       "sha": "b5f5ec6726fd7d4e",
       "date": "2026-09-05"
     },
     "/tools/blast-powder-factor/": {
-      "sha": "16996b4a4e01a9f3",
-      "date": "2026-09-05"
+      "sha": "5bec42bee6a392a1",
+      "date": "2026-09-26"
     },
     "/tools/blast-scaled-distance-ppv/": {
-      "sha": "b43ea824eeaabcd7",
-      "date": "2026-09-25"
+      "sha": "166b6ed38b9f1b7b",
+      "date": "2026-09-26"
     },
     "/tools/blast-stemming-length/": {
-      "sha": "0272226583f1511e",
-      "date": "2026-09-05"
+      "sha": "56125ef9d7bea271",
+      "date": "2026-09-26"
     },
     "/tools/blended-mortgage-rate/": {
       "sha": "0e3e1b1a41031e8a",
@@ -1910,8 +1910,8 @@
       "date": "2026-09-08"
     },
     "/tools/crusher-reduction-ratio/": {
-      "sha": "113578524386f1d2",
-      "date": "2026-09-05"
+      "sha": "2332a8734237fde5",
+      "date": "2026-09-26"
     },
     "/tools/cryogenic-boiloff/": {
       "sha": "6a28356a1eb4f62c",
@@ -2474,8 +2474,8 @@
       "date": "2026-09-01"
     },
     "/tools/dust-collector-air-to-cloth/": {
-      "sha": "3de7498f9933e68f",
-      "date": "2026-09-05"
+      "sha": "d65f968e89085121",
+      "date": "2026-09-26"
     },
     "/tools/dust-control-water/": {
       "sha": "7b973fc14eb46598",
@@ -6694,8 +6694,8 @@
       "date": "2026-09-01"
     },
     "/tools/shaft-alignment-reverse-dial/": {
-      "sha": "7b59e3ae357fa58d",
-      "date": "2026-09-07"
+      "sha": "24bd305c41a5543b",
+      "date": "2026-09-26"
     },
     "/tools/shaft-alignment-rim-face/": {
       "sha": "c584dc9063929031",
@@ -7962,8 +7962,8 @@
       "date": "2026-09-01"
     },
     "/tools/track-superelevation/": {
-      "sha": "826a9f49ca5f66eb",
-      "date": "2026-09-05"
+      "sha": "f55f6d92ed5748e8",
+      "date": "2026-09-26"
     },
     "/tools/track-warp-fra-class/": {
       "sha": "f1e2ec8a53b0c0d9",
@@ -7986,8 +7986,8 @@
       "date": "2026-09-01"
     },
     "/tools/train-brake-reduction/": {
-      "sha": "a5e20d59701de466",
-      "date": "2026-09-08"
+      "sha": "7c0e177a414d0c29",
+      "date": "2026-09-26"
     },
     "/tools/transfer-station-throughput/": {
       "sha": "046cce74d57d2ed1",
@@ -8266,8 +8266,8 @@
       "date": "2026-09-01"
     },
     "/tools/vacuum-evacuation-time/": {
-      "sha": "5a63bd57e2190c33",
-      "date": "2026-09-07"
+      "sha": "72a995a6f83518aa",
+      "date": "2026-09-26"
     },
     "/tools/vacuum-excavation-spoil/": {
       "sha": "ae1e0ad4d2ec778a",

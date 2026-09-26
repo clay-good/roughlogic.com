@@ -94,6 +94,8 @@ const _RAD = Math.PI / 180;
 // dims: in { degree_of_curve: dimensionless, speed_mph: L T^-1, actual_elevation_in: L, allowable_unbalance_in: L, max_elevation_in: L, target_speed_mph: L T^-1 } out: { equilibrium_in: L, unbalance_in: L, max_speed_mph: L T^-1, equilibrium_at_target_in: L, required_elevation_in: L }
 export function computeTrackSuperelevation({ degree_of_curve = 0, speed_mph = 0, actual_elevation_in = 0, allowable_unbalance_in = 3, max_elevation_in = 6, target_speed_mph = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // Unit / range guard added 2026-09-26 after printed-example probing.
+  if (Number(arguments[0]?.allowable_unbalance_in) > 6) return { error: "Unbalance above 6 in is outside FRA 213.57 practice (3 in qualified, up to 5-6 in with approval)." };
   if (!(degree_of_curve > 0)) return { error: "Degree of curve must be positive." };
   if (!(speed_mph > 0)) return { error: "Operating speed must be positive." };
   if (!(actual_elevation_in >= 0)) return { error: "Actual superelevation cannot be negative." };
@@ -117,7 +119,7 @@ export function computeTrackSuperelevation({ degree_of_curve = 0, speed_mph = 0,
     flag: over_elevation ? "OVER the entered elevation cap"
       : over_unbalance ? "OVER the allowable unbalance at this speed"
         : "within both entered caps",
-    note: "Equilibrium elevation is the bank at which nothing pushes sideways on either rail. Freight track is deliberately underelevated, because a curve elevated for the fastest train punishes the slowest one, so the operating rule is written on UNBALANCE rather than on elevation. Actual elevation is commonly capped near 6 in and unbalance near 3 in, with more only by specific approval for specific equipment. Elevation cannot be applied without adequate spiral transitions to run it in and out, which usually governs whether a given elevation is achievable at all. The FRA Track Safety Standards at 49 CFR 213, the railroad's engineering instructions and timetable special instructions, and the track owner govern.",
+    note: "Equilibrium elevation is the bank at which nothing pushes sideways on either rail. Freight track is deliberately underelevated, because a curve elevated for the fastest train punishes the slowest one, so the operating rule is written on UNBALANCE rather than on elevation. Actual elevation is commonly capped near 6 in in railroad practice (FRA 213.57(a) allows up to 8 in on Classes 1-2 and 7 in on Classes 3-5) and unbalance near 3 in, with more only by specific approval for specific equipment. Elevation cannot be applied without adequate spiral transitions to run it in and out, which usually governs whether a given elevation is achievable at all. The FRA Track Safety Standards at 49 CFR 213, the railroad's engineering instructions and timetable special instructions, and the track owner govern.",
   };
 }
 const trackSuperelevationExample = { inputs: { degree_of_curve: 4, speed_mph: 50, actual_elevation_in: 4, allowable_unbalance_in: 3, max_elevation_in: 6, target_speed_mph: 57 } };
@@ -167,6 +169,7 @@ export function computeDegreeOfCurve({ degree_of_curve = 0, radius_ft = 0, chord
   // nearly the degree of curve. Exact inverse for the entered ordinate.
   const m_ft = measured_ordinate_in / 12;
   const r_from_ord = (62 * 62) / (8 * m_ft) + m_ft / 2;
+  if (!(r_from_ord > 50)) return { error: "That middle ordinate implies a radius under 50 ft; enter the 62 ft chord ordinate in inches (about 1 in per degree)." };
   const degree_from_ordinate = 2 * Math.asin(50 / r_from_ord) * _DEG;
   const curve_length_ft = 100 * central_angle_deg / degree_of_curve;
   return {
@@ -204,6 +207,8 @@ RAIL_RENDERERS["degree-of-curve"] = _simpleRenderer({
 // dims: in { rail_area_in2: L^2, modulus_psi: M L^-1 T^-2, alpha_per_degf: dimensionless, neutral_temp_f: T, air_temp_f: T, sun_adder_f: T } out: { force_per_degf_lb: M L T^-2, rail_temp_f: T, differential_f: T, force_per_rail_lb: M L T^-2, force_track_lb: M L T^-2 }
 export function computeCwrThermalForce({ rail_area_in2 = 0, modulus_psi = 30000000, alpha_per_degf = 0.0000065, neutral_temp_f = 95, air_temp_f = 95, sun_adder_f = 25 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // Unit / range guard added 2026-09-26 after printed-example probing.
+  if (Number(arguments[0]?.alpha_per_degf) > 1e-4) return { error: "Enter the expansion coefficient as 0.0000065 per F, not 6.5." }; if (Number(arguments[0]?.modulus_psi) > 0 && Number(arguments[0]?.modulus_psi) < 1e6) return { error: "Enter the modulus in psi (30,000,000), not ksi." };
   if (!(rail_area_in2 > 0)) return { error: "Rail section area must be positive." };
   if (!(modulus_psi > 0)) return { error: "Modulus of elasticity must be positive." };
   if (!(alpha_per_degf > 0)) return { error: "Coefficient of thermal expansion must be positive." };
@@ -406,6 +411,8 @@ const _TRACK_GAUGE_FT = 56.5 / 12; // standard gauge, 4 ft 8-1/2 in
 // dims: in { frog_number: dimensionless, distance_beyond_frog_ft: L, required_separation_ft: L, lead_ft: L } out: { frog_angle_deg: dimensionless, frog_angle_min: dimensionless, separation_at_distance_ft: L, clearance_point_ft: L, total_from_switch_point_ft: L }
 export function computeTurnoutFrogGeometry({ frog_number = 0, distance_beyond_frog_ft = 0, required_separation_ft = 0, lead_ft = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // Unit / range guard added 2026-09-26 after printed-example probing.
+  if (Number(arguments[0]?.frog_number) > 0 && Number(arguments[0]?.frog_number) < 4) return { error: "Railroad frog numbers run about 4 to 32; check the frog number." }; if (Number(arguments[0]?.required_separation_ft) > 50) return { error: "Enter the required separation in feet (about 13), not inches." };
   if (!(frog_number >= 1)) return { error: "Frog number must be at least 1." };
   if (!(distance_beyond_frog_ft > 0)) return { error: "Distance beyond the frog must be positive." };
   if (!(required_separation_ft > 0)) return { error: "Required separation must be positive." };
@@ -649,12 +656,18 @@ export function computeTrainBrakeReduction({ charged_pressure_psi = 90, reductio
   // Cylinder pressure rises with the reduction until the auxiliary reservoir
   // and the cylinder equalize, which is what full service means. Past that
   // point further reduction is air spent for nothing.
-  const effective_reduction_psi = Math.min(reduction_psi, full_service_reduction_psi);
+  // Equalization sets full service: the auxiliary reservoir and cylinder meet where the pipe pressure left, p - r,
+  // equals the cylinder pressure, ratio x r, so r_fs = p / (1 + ratio): 25.7 psi and 64 psi at 90 (WP training
+  // manual: "equalize at about 64"). Until 2026-09-26 the 26 psi point did not scale with the charge, so a 30 psi pipe
+  // still showed 65 psi in the cylinder.
+  const equalizing_reduction_psi = charged_pressure_psi / (1 + cylinder_ratio);
+  const fs_reduction_psi = Math.min(full_service_reduction_psi, equalizing_reduction_psi);
+  const effective_reduction_psi = Math.min(reduction_psi, fs_reduction_psi);
   const cylinder_psi = effective_reduction_psi * cylinder_ratio;
-  const full_service_cylinder_psi = full_service_reduction_psi * cylinder_ratio;
-  const at_or_past_full_service = reduction_psi >= full_service_reduction_psi;
-  const remaining_reduction_psi = Math.max(0, full_service_reduction_psi - reduction_psi);
-  const wasted_reduction_psi = Math.max(0, reduction_psi - full_service_reduction_psi);
+  const full_service_cylinder_psi = fs_reduction_psi * cylinder_ratio;
+  const at_or_past_full_service = reduction_psi >= fs_reduction_psi;
+  const remaining_reduction_psi = Math.max(0, fs_reduction_psi - reduction_psi);
+  const wasted_reduction_psi = Math.max(0, reduction_psi - fs_reduction_psi);
   const remaining_cylinder_psi = full_service_cylinder_psi - cylinder_psi;
   const equalizing_reservoir_psi = brake_pipe_psi;
   const propagation_seconds = car_count > 0 ? car_count / propagation_rate_cars_per_second : null;
@@ -662,12 +675,12 @@ export function computeTrainBrakeReduction({ charged_pressure_psi = 90, reductio
   if (!outs.every(Number.isFinite)) return { error: "Brake reduction math is not a finite value." };
   const verdict = at_or_past_full_service
     ? (wasted_reduction_psi > 0
-      ? "PAST FULL SERVICE: the last " + fmt(wasted_reduction_psi, 1) + " psi of reduction bought NOTHING -- the cylinders were already at " + fmt(full_service_cylinder_psi, 1) + " psi at " + fmt(full_service_reduction_psi, 0) + " psi of reduction, and that air still has to be pumped back before the brakes will release"
+      ? "PAST FULL SERVICE: the last " + fmt(wasted_reduction_psi, 1) + " psi of reduction bought NOTHING -- the cylinders were already at " + fmt(full_service_cylinder_psi, 1) + " psi at " + fmt(fs_reduction_psi, 1) + " psi of reduction, and that air still has to be pumped back before the brakes will release"
       : "AT FULL SERVICE: " + fmt(cylinder_psi, 1) + " psi in the cylinders, and there is no more service braking available. Anything further is emergency")
     : "IN SERVICE RANGE: " + fmt(cylinder_psi, 1) + " psi in the cylinders, with " + fmt(remaining_reduction_psi, 1) + " psi of reduction still available -- worth " + fmt(remaining_cylinder_psi, 1) + " psi more in the cylinders";
   return {
     charged_pressure_psi, reduction_psi, brake_pipe_psi, cylinder_ratio,
-    effective_reduction_psi, cylinder_psi, full_service_reduction_psi,
+    effective_reduction_psi, cylinder_psi, full_service_reduction_psi: fs_reduction_psi, equalizing_reduction_psi,
     full_service_cylinder_psi, at_or_past_full_service, remaining_reduction_psi,
     remaining_cylinder_psi, wasted_reduction_psi, equalizing_reservoir_psi,
     car_count, propagation_rate_cars_per_second, propagation_seconds, verdict,

@@ -40,8 +40,9 @@ test("tonnage: 20 lb per ton per percent is a ton's weight times the grade", () 
 
 test("brakes and load limits: cylinder pressure is the reduction times 2.5, and load limit is GRL less light weight", () => {
   const b = computeTrainBrakeReduction({ charged_pressure_psi: 90, reduction_psi: 30, cylinder_ratio: 2.5, full_service_reduction_psi: 26, car_count: 100, propagation_rate_cars_per_second: 10 });
-  close(b.cylinder_psi, 65, "capped at full service");
-  close(b.wasted_reduction_psi, 4, "past full service");
+  // Full service is the equalization point 90 / (1 + 2.5) = 25.71 psi, so the cylinder tops out at 64.29 psi.
+  close(b.cylinder_psi, 90 * 2.5 / 3.5, "capped at equalization");
+  close(b.wasted_reduction_psi, 30 - 90 / 3.5, "past equalization");
   const l = computeRailcarLoadLimit({ gross_rail_load_lb: 286000, light_weight_lb: 63000, lading_net_lb: 200000, cubic_capacity_ft3: 5200, lading_density_pcf: 30, route_gross_rail_load_lb: 263000 });
   close(l.governing_load_limit_lb, 200000, "the route governs");
 });
