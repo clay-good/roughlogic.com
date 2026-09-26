@@ -2909,6 +2909,52 @@
    }
   },
   {
+   "tile_id": "drawbar-pull",
+   "source_publisher": "Kansas State University Cooperative Extension (Taylor, Schrock, Wertz)",
+   "source_title": "Getting the Most from Your Tractor",
+   "source_edition_or_year": "revised April 1991, pp. 1-2",
+   "source_section_or_page": "112 drawbar horsepower at 6 mph can generate about 7,000 pounds of pull; at 4 mph about 10,500 pounds (entered on a drawbar basis; KSU's PTO-to-drawbar chain differs from the ASABE D497 ratio)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "power_hp": 112,
+    "power_basis": "drawbar",
+    "speed_mph": 6,
+    "surface": "firm_soil"
+   },
+   "outputs": {
+    "pull_lb": {
+     "value": 7000,
+     "tolerance": {
+      "abs": 1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "drawbar-pull",
+   "source_publisher": "Kansas State University Cooperative Extension (Taylor, Schrock, Wertz)",
+   "source_title": "Getting the Most from Your Tractor",
+   "source_edition_or_year": "revised April 1991, p. 2",
+   "source_section_or_page": "same 112 drawbar hp at 4 mph -> draft about 10,500 pounds",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "power_hp": 112,
+    "power_basis": "drawbar",
+    "speed_mph": 4,
+    "surface": "firm_soil"
+   },
+   "outputs": {
+    "pull_lb": {
+     "value": 10500,
+     "tolerance": {
+      "abs": 1
+     }
+    }
+   }
+  },
+  {
    "tile_id": "chamber-turnover",
    "source_publisher": "IICRC",
    "source_title": "1500 ft^3 drying chamber, 60 ACH target, 1200 air-mover CFM + 250 dehu CFM",
@@ -29930,6 +29976,35 @@
    }
   },
   {
+   "tile_id": "prime-cost",
+   "source_publisher": "Johnson & Wales University Online",
+   "source_title": "Menu Pricing: How to Price a Restaurant Menu",
+   "source_edition_or_year": "Feb 25, 2022 (updated 2026)",
+   "source_section_or_page": "CoGS $6,000 and labor $500 -> prime cost $6,500; on $15,600 of food sales, prime cost is 42% (rounded to a whole percent)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "food_cost": 6000,
+    "beverage_cost": 0,
+    "labor_cost": 500,
+    "total_sales": 15600
+   },
+   "outputs": {
+    "prime_cost": {
+     "value": 6500,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "prime_cost_pct": {
+     "value": 42,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
    "tile_id": "pour-cost",
    "source_publisher": "First-principles bar cost control; US fluid-ounce 29.5735 mL.",
    "source_title": "Pours per bottle = bottle size mL / (pour oz x 29.5735); cost per pour = bottle cost / pours; suggested price = (cost per pour + add) / target pour cost.",
@@ -30283,6 +30358,34 @@
      "value": 10000,
      "tolerance": {
       "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "floor-area-ratio",
+   "source_publisher": "Metropolitan Council (MN) / Portland Permitting & Development",
+   "source_title": "Local Planning Handbook, Calculating Floor Area Ratio / FAR zoning code information guide",
+   "source_edition_or_year": "June 2015 / 2024",
+   "source_section_or_page": "FAR = 20,000 ft2 / 20,000 ft2 = 1.0 (Met Council); a 3:1 FAR for a 20,000 square foot site would allow a 60,000 square foot building (Portland)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "building_floor_area_sf": 20000,
+    "lot_area_sf": 20000,
+    "far_limit": 3
+   },
+   "outputs": {
+    "far": {
+     "value": 1,
+     "tolerance": {
+      "abs": 0.0001
+     }
+    },
+    "max_buildable_sf": {
+     "value": 60000,
+     "tolerance": {
+      "abs": 0.5
      }
     }
    }
@@ -31962,6 +32065,35 @@
    }
   },
   {
+   "tile_id": "room-absorption-target",
+   "source_publisher": "Commercial Acoustics",
+   "source_title": "How Much Sound Absorption Do You Need? Calculation Guide (yoga studio)",
+   "source_edition_or_year": "web guide",
+   "source_section_or_page": "V 6,400 cubic feet, existing 208 sabins: A = 0.049 x 6,400 / 0.5 = 627 sabins; treatment required +419 sabins",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "volume_ft3": 6400,
+    "target_rt60_s": 0.5,
+    "existing_sabins": 208,
+    "sabine_coeff": 0.049
+   },
+   "outputs": {
+    "required_sabins": {
+     "value": 627,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "additional_sabins": {
+     "value": 419,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
    "tile_id": "counterweight-arbor-load",
    "source_publisher": "Theatrical counterweight rigging (single / double purchase)",
    "source_title": "required = (batten + load) x purchase_ratio; out_of_weight = required - existing",
@@ -32513,6 +32645,29 @@
    }
   },
   {
+   "tile_id": "thinset-coverage",
+   "source_publisher": "Custom Building Products",
+   "source_title": "VersaBond Professional TDS-119, Square foot coverage per 50 lb bag",
+   "source_edition_or_year": "12/12/2023",
+   "source_section_or_page": "1/4 x 1/4 x 1/4 in square notch: 85-95 sq ft per 50 lb bag (the tile uses the printed maximum)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "area_sqft": 200,
+    "trowel": "quarter",
+    "bag_weight_lb": 50,
+    "waste_pct": 0
+   },
+   "outputs": {
+    "cov_per_bag": {
+     "value": 90,
+     "tolerance": {
+      "abs": 5
+     }
+    }
+   }
+  },
+  {
    "tile_id": "flooring-takeoff",
    "source_publisher": "Published flooring waste rules of thumb and the standard last-row balancing rule.",
    "source_title": "Boxes = ceil(area x (1 + pattern waste) / box coverage); last row from full_rows = floor(width / plank), rip if the remainder is under a third of a plank.",
@@ -33011,6 +33166,41 @@
      "value": 709.8,
      "tolerance": {
       "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "paint-mix-ratio",
+   "source_publisher": "AutoRestorer (L. Lyles)",
+   "source_title": "How-to Mixing Paint",
+   "source_edition_or_year": "July 1, 2011",
+   "source_section_or_page": "4:1:1 clear: a gallon of clear takes a quart of hardener and a quart of reducer, one gallon-and-a-half total (by volume)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "paint_volume_oz": 128,
+    "part_paint": 4,
+    "part_hardener": 1,
+    "part_reducer": 1
+   },
+   "outputs": {
+    "hardener_oz": {
+     "value": 32,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "reducer_oz": {
+     "value": 32,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "total_oz": {
+     "value": 192,
+     "tolerance": {
+      "abs": 0.01
      }
     }
    }
@@ -38029,6 +38219,35 @@
    }
   },
   {
+   "tile_id": "sod-takeoff",
+   "source_publisher": "Tri-Turf Sod Farms",
+   "source_title": "How Much Sod Do I Need?",
+   "source_edition_or_year": "Feb 28, 2026",
+   "source_section_or_page": "2,800 x 1.10 = 3,080 sq ft; divide by 450 = 6.8 pallets; round up to 7",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "lawn_ft2": 2800,
+    "waste_pct": 10,
+    "slab_ft2": 9,
+    "pallet_ft2": 450
+   },
+   "outputs": {
+    "order_ft2": {
+     "value": 3080,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "pallets": {
+     "value": 7,
+     "tolerance": {
+      "abs": 0
+     }
+    }
+   }
+  },
+  {
    "tile_id": "cmu-grout-volume",
    "source_publisher": "TMS 602 / ACI 530.1, NCMA TEK",
    "source_title": "20x8 wall, 24 in oc, 24 in^2 cores, 30 in^2 bond -> 0.70 yd^3",
@@ -38250,6 +38469,34 @@
     },
     "on_module": {
      "value": 0,
+     "tolerance": {
+      "abs": 0
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "masonry-coursing",
+   "source_publisher": "Brick Industry Association",
+   "source_title": "Technical Note 10, Dimensioning and Estimating Brick Masonry, Table 3 Vertical Coursing",
+   "source_edition_or_year": "February 2009",
+   "source_section_or_page": "3 courses = 8 in. column: 36 courses = 8 ft 0 in (joint entered as the 0.4167 in that makes 3 courses = 8 in; the table rounds to 1/16 in)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "target_in": 96,
+    "unit_in": 2.25,
+    "joint_in": 0.416667
+   },
+   "outputs": {
+    "courses": {
+     "value": 36,
+     "tolerance": {
+      "abs": 0
+     }
+    },
+    "on_module": {
+     "value": 1,
      "tolerance": {
       "abs": 0
      }
@@ -38984,6 +39231,28 @@
      "value": 1779.375,
      "tolerance": {
       "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "pv-energy-yield",
+   "source_publisher": "University of Arizona Cooperative Extension",
+   "source_title": "az1782, Calculations for a Grid-Connected Solar Energy System, Another Example",
+   "source_edition_or_year": "June 2019, pp. 3-4",
+   "source_section_or_page": "4,000 kWh/yr / 365 = 10.96 kWh/day; / 6.5 sun-hours = 1.69 kW; / 0.66 = 2.55 kW array (run forward: 2.55 kW gives about 4,000 kWh/yr; intermediates rounded to 2 decimals)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "dc_kw": 2.55,
+    "psh": 6.5,
+    "perf_ratio": 0.66
+   },
+   "outputs": {
+    "annual_kwh": {
+     "value": 4000,
+     "tolerance": {
+      "abs": 10
      }
     }
    }

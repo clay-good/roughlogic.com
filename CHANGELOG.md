@@ -6,6 +6,19 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Changed
 
+- **Nine more tiles now carry a publisher's printed example.**
+  - `prime-cost`: Johnson & Wales.
+  - `floor-area-ratio`: Metropolitan Council and Portland.
+  - `drawbar-pull`: Kansas State Extension.
+  - `pv-energy-yield`: Arizona Extension az1782.
+  - `room-absorption-target`: Commercial Acoustics.
+  - `masonry-coursing`: BIA Technical Note 10.
+  - `thinset-coverage`: Custom Building Products TDS-119.
+  - `sod-takeoff`: Tri-Turf.
+  - `paint-mix-ratio`: AutoRestorer.
+
+  README: 1,150 of 2,183 tiles are checked only against the project's own derivation; 1,033 carry an outside source.
+
 - **Eight more tiles now carry a publisher's printed example.**
   - `battery-c-rate`: SimpliPhi.
   - `battery-series-parallel`: Battle Born.
@@ -240,6 +253,8 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 - **wrangler 4.129.0 → 4.135.0, and the `sharp` override is gone.** Dependabot's bump failed CI on `check-dependency-overrides`. The new wrangler brings a miniflare that asks for the patched `sharp` 0.35.4 itself, so the September 9 pin no longer changed anything. This is the case the gate was written for, so the override is deleted rather than left as a second source of truth. `npm audit` reports 0 vulnerabilities. docs/threat-model.md records the change.
 
 ### Fixed
+
+- **`paint-mix-ratio` now says its ratios are by volume.** Some two-part systems print the same 4:1:1 by weight (U-POL: 200 g : 35 g : 26 g), and entering grams gives the wrong amounts of hardener and reducer.
 
 - **Fifty-seven tiles had a published citation or description that still described the method a fix had replaced.** Fixes this month changed the code but, in these tiles, not the text readers see: the citation formula, edition note, assumptions or one-line description. A sweep of every tile whose code carries an "Until 2026-…" fix comment compared that text against the code, and all 57 now state what the tile computes.
   - **Safety and code examples:**

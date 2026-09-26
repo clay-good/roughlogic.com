@@ -2155,7 +2155,7 @@ const renderPaintMixRatio = _simpleRenderer({
   citation: "Citation: Paint manufacturer technical data sheet (mix ratio by volume; induction and pot life off the TDS, by name). 29.5735295625 mL per US fluid ounce.",
   example: paintMixRatioExample.inputs,
   fields: [
-    { key: "paint_volume_oz", label: "Base / color volume (fl oz)", kind: "number" },
+    { key: "paint_volume_oz", label: "Base / color volume (fl oz; mix ratios are by volume, not weight)", kind: "number" },
     { key: "part_paint", label: "Paint parts", kind: "number" },
     { key: "part_hardener", label: "Hardener parts", kind: "number" },
     { key: "part_reducer", label: "Reducer parts (0 = two-part)", kind: "number", default: 0 },
