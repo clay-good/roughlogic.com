@@ -346,7 +346,7 @@ export const CITATIONS = {
     edition: "Per the FDA Bacteriological Analytical Manual (BAM) Chapter 3 (Aerobic Plate Count) and APHA Standard Methods, by name; both public/free.",
     freeAccess: "Free at fda.gov/food/science-research-food/laboratory-methods-food.",
     governance: GOVERNANCE.general,
-    editionNote: "Countable range 25-250 (FDA BAM) or 30-300 (APHA); counts outside are statistically unreliable (TNTC/TFTC).",
+    editionNote: "Countable range defaults to 15-300 per plate (FDA BAM Chapter 3 since March 2025, as ISO does); APHA uses 25-250, USDA and AOAC 30-300. Counts outside are statistically unreliable (TNTC/TFTC).",
     assumptions: [
       { name: "Plated volume", value: "spread/pour/spiral methods change the effective plated volume", source: "FDA BAM Ch. 3" },
     ],
@@ -1881,7 +1881,7 @@ export const CITATIONS = {
     ],
   },
   "cable-bend-radius": {
-    formula: "Min bend radius = multiplier × cable OD; multipliers per cable type (THHN/XHHW 8x, MC 7x, control 6x, coax 10x, fiber 20x).",
+    formula: "Min bend radius = multiplier × cable OD; multipliers per cable type (THHN/XHHW 4x to 1 in OD, 5x to 2 in, 6x above; MC 7x, control 6x, coax 10x, fiber 20x).",
     edition: "Manufacturer minimums (Southwire, AFC, Belden, Corning); NEC 300.34 by name.",
     freeAccess: NEC_FREE + " Manufacturer guides free at each manufacturer site.",
     governance: GOVERNANCE.electrical,
@@ -2061,7 +2061,7 @@ export const CITATIONS = {
     editionNote: "29 CFR 1926.502 plus the ANSI/ASSP Z359 maxima: Z359.13-2013 lanyard deployment (48 in for a 6 ft free fall, 60 in for 12 ft) and Z359.14-2021 self-retracting arrest distance (42 in for Class 1 and Class 2; the 2012 edition allowed 24 in Class A / 54 in Class B). Manufacturer clearance charts govern the device in use.",
     assumptions: [
       { name: "Default free-fall", value: "6 ft for personal fall arrest (PFAS)", source: "29 CFR 1926.502(d)(16)" },
-      { name: "Default decel", value: "4.0 ft for a 6 ft free-fall shock-absorbing lanyard (48 in maximum deployment; OSHA's 3.5 ft is the system limit, not the labeled stroke) / 1.0 ft for an overhead SRL", source: "ANSI/ASSP Z359.13-2013; manufacturer typical for the SRL" },
+      { name: "Default decel", value: "4.0 ft for a 6 ft free-fall shock-absorbing lanyard (48 in maximum deployment; OSHA's 3.5 ft is the system limit, not the labeled stroke) / 3.5 ft for an overhead SRL (the 42 in arrest-distance cap)", source: "ANSI/ASSP Z359.13-2013; ANSI/ASSP Z359.14-2021 for the SRL" },
       { name: "Default worker height", value: "5 ft from D-ring to feet", source: "engineering practice" },
       { name: "Default safety factor", value: "1 ft margin", source: "engineering practice" },
     ],
@@ -2275,12 +2275,12 @@ export const CITATIONS = {
     edition: "OSHA 29 CFR 1926.1153 Table 1 and 1926.1153(c)(1) and (d). A US federal regulation in the public domain, quoted directly.",
     freeAccess: "29 CFR is published in full at no cost by OSHA and the eCFR.",
     governance: GOVERNANCE.general,
-    editionNote: "Table 1 is the shortcut the silica standard offers: implement the specified controls for a listed task and you skip exposure assessment entirely. Three things about it get missed. It is ALL OR NOTHING - 1926.1153(c)(1) requires the engineering controls, work practices AND respiratory protection to be fully and properly implemented, so doing part of the row does not buy part of the benefit; the job falls to 1926.1153(d), which is an obligation to assess exposure and keep it below 50 micrograms per cubic meter as an 8-hour TWA. That is monitoring, not a respirator choice, and it is the expensive path Table 1 exists to avoid. The duration column is a CLIFF at four hours rather than a ramp: handheld grinders for mortar removal take APF 10 at four hours or less and APF 25 above it, and that step is a half mask becoming a PAPR or a full facepiece - a different purchase, a different fit test, and a different training record, all turning on one minute. Several rows also change or disappear indoors. A walk-behind saw needs no respirator outdoors and APF 10 indoors; drivable saws, dowel drilling rigs, fiber-cement saws, and large drivable milling machines have no indoor entry at all, so taking them into an enclosed area leaves Table 1 and lands in exposure assessment. In the other direction, some rows require a respirator at any duration - dowel drilling rigs and tuckpointing grinders both do - which is the assumption people get wrong when they treat a short task as a free one. This tile reproduces the respiratory protection column only. The engineering controls and work practices are specified row by row and are ASSUMED here rather than reproduced, so the row itself has to be read before the respirator answer means anything. Not checked: whether the material actually contains crystalline silica; the written exposure control plan and the competent person the standard requires; respirator fit testing, medical evaluation, and the written respiratory protection program under 1910.134; housekeeping restrictions on dry sweeping and compressed air; medical surveillance and its 30-day-per-year trigger; multiple tasks in one shift, which are not added together here; and state plans with more stringent requirements. A Table 1 lookup, not an exposure assessment.",
+    editionNote: "Table 1 is the shortcut the silica standard offers: implement the specified controls for a listed task and you skip exposure assessment entirely. Three things about it get missed. It is ALL OR NOTHING - 1926.1153(c)(1) requires the engineering controls, work practices AND respiratory protection to be fully and properly implemented, so doing part of the row does not buy part of the benefit; the job falls to 1926.1153(d), which is an obligation to assess exposure and keep it below 50 micrograms per cubic meter as an 8-hour TWA. That is monitoring, not a respirator choice, and it is the expensive path Table 1 exists to avoid. The duration column is a CLIFF at four hours rather than a ramp: handheld grinders for mortar removal take APF 10 at four hours or less and APF 25 above it, and that step is a half mask becoming a PAPR or a full facepiece - a different purchase, a different fit test, and a different training record, all turning on one minute. Several rows also change or disappear indoors. A walk-behind saw needs no respirator outdoors and APF 10 indoors; drivable saws, dowel drilling rigs, and fiber-cement saws have no indoor entry at all, so taking them into an enclosed area leaves Table 1 and lands in exposure assessment. In the other direction, some rows require a respirator at any duration - dowel drilling rigs and tuckpointing grinders both do - which is the assumption people get wrong when they treat a short task as a free one. This tile reproduces the respiratory protection column only. The engineering controls and work practices are specified row by row and are ASSUMED here rather than reproduced, so the row itself has to be read before the respirator answer means anything. Not checked: whether the material actually contains crystalline silica; the written exposure control plan and the competent person the standard requires; respirator fit testing, medical evaluation, and the written respiratory protection program under 1910.134; housekeeping restrictions on dry sweeping and compressed air; medical surveillance and its 30-day-per-year trigger; multiple tasks in one shift, which are not added together here; and state plans with more stringent requirements. A Table 1 lookup, not an exposure assessment.",
     assumptions: [
       { name: "Table 1 is all or nothing", value: "controls, work practices, and respiratory protection fully and properly implemented", source: "29 CFR 1926.1153(c)(1)" },
       { name: "Duration split", value: "four hours or less per shift, versus more than four hours", source: "29 CFR 1926.1153 Table 1" },
       { name: "Tuckpointing grinders", value: "APF 10 at four hours or less, APF 25 above", source: "29 CFR 1926.1153 Table 1 (xi)" },
-      { name: "Outdoor-only rows", value: "fiber-cement saws, drivable saws, dowel drilling rigs, and large drivable milling machines", source: "29 CFR 1926.1153 Table 1" },
+      { name: "Outdoor-only rows", value: "fiber-cement saws, drivable saws, and dowel drilling rigs", source: "29 CFR 1926.1153 Table 1" },
       { name: "Fallback", value: "50 ug/m3 respirable crystalline silica as an 8-hour TWA", source: "29 CFR 1926.1153(d)" },
       { name: "Control methods", value: "assumed in place, not reproduced; read the Table 1 row", source: "roughlogic scope limit, stated" },
     ],
@@ -2451,7 +2451,7 @@ export const CITATIONS = {
     ],
   },
   "cooling-water-makeup": {
-    formula: "Evaporation (GPM) = recirculation x delta-T / 1000. Blowdown (GPM) = evaporation / (COC - 1). Drift (GPM) = recirculation x drift fraction. Makeup (GPM) = evaporation + blowdown + drift.",
+    formula: "Evaporation (GPM) = recirculation x delta-T / 1000. Drift (GPM) = recirculation x drift fraction. Blowdown (GPM) = evaporation / (COC - 1) - drift, not less than 0 (blowdown and drift together carry the concentrated water, so makeup = evaporation x COC / (COC - 1)). Makeup (GPM) = evaporation + blowdown + drift.",
     edition: "Cooling Technology Institute (CTI) publications; ASHRAE Systems and Equipment 2020 Chapter 40 (cooling towers).",
     freeAccess: "cti.org and ashrae.org for the TOCs.",
     governance: GOVERNANCE.water,
@@ -2543,7 +2543,7 @@ export const CITATIONS = {
     governance: GOVERNANCE.general,
     editionNote: "Reference ET0 is user-supplied from the local CIMIS / Mesonet / NOAA station; the bundled Kc values are representative mid-season single values (the full FAO 56 dual-Kc method varies by growth stage). Verify against the local extension recommendation.",
     assumptions: [
-      { name: "Crop coefficient Kc", value: "alfalfa 1.15, corn 1.20, cotton 1.15, wheat 1.15, pasture 0.95, turfgrass 0.80, vegetables 1.05", source: "FAO 56 Table 12 mid-season" },
+      { name: "Crop coefficient Kc", value: "alfalfa 0.95 season average (1.20 within one cutting), corn 1.20, cotton 1.15, wheat 1.15, pasture 0.95, turfgrass 0.95 cool season / 0.85 warm season, vegetables 1.05", source: "FAO 56 Table 12 mid-season" },
       { name: "Application efficiency", value: "drip 90%, sprinkler 75%, flood 50%", source: "NRCS Irrigation Guide" },
       { name: "Acre-foot conversion", value: "1 acre-foot = 325,851 US gallons", source: "physical fact" },
     ],
@@ -2582,14 +2582,14 @@ export const CITATIONS = {
     ],
   },
   "cattle-stocking-rate": {
-    formula: "Available forage = production (lb/acre) x area (acres) x utilization. AUMs = available forage / 780 lb (one animal-unit-month). Head supported for 30 days = AUMs / AU-equivalent. Grazing days for a herd = available forage / (herd x AU-equivalent x 26 lb/day).",
+    formula: "Available forage = production (lb/acre) x area (acres) x utilization. AUMs = available forage / 790 lb (one animal-unit-month). Head supported for 30 days = AUMs / AU-equivalent. Grazing days for a herd = available forage / (herd x AU-equivalent x 26 lb/day).",
     edition: "USDA NRCS National Range and Pasture Handbook Chapter 6 (stocking rate) by name.",
     freeAccess: "Free at nrcs.usda.gov for the handbook.",
     governance: GOVERNANCE.general,
-    editionNote: "One animal unit (AU) = a 1,000 lb cow consuming ~26 lb dry matter/day; one AUM = 780 lb. Drought and climate adjustments are essential and not modeled. Forage production from a clip-and-weigh sample or the NRCS Ecological Site Description governs.",
+    editionNote: "One animal unit (AU) = a 1,000 lb cow consuming ~26 lb dry matter/day; one AUM = 790 lb (26 lb x 30.4 days). Drought and climate adjustments are essential and not modeled. Forage production from a clip-and-weigh sample or the NRCS Ecological Site Description governs.",
     assumptions: [
-      { name: "AUM dry matter", value: "780 lb (26 lb/day x 30 days)", source: "NRCS National Range and Pasture Handbook" },
-      { name: "Animal-unit equivalents", value: "cow-calf 1.0, yearling 0.7, sheep 0.2, horse 1.25", source: "NRCS NRPH Ch. 6 typical" },
+      { name: "AUM dry matter", value: "790 lb (26 lb/day x 30.4 days)", source: "NRCS National Range and Pasture Handbook" },
+      { name: "Animal-unit equivalents", value: "cow-calf 1.0, yearling 0.6, 2-year-old 0.8, bull 1.35, sheep 0.2, horse 1.25", source: "NRCS NRPH Table 6-5" },
       { name: "Utilization guideline", value: "25-50% arid range, 50-70% tame pasture (take-half-leave-half)", source: "NRCS range management practice" },
     ],
   },
@@ -2736,7 +2736,7 @@ export const CITATIONS = {
     editionNote: "AASHTO design SSD tables round these numbers; this tile outputs the underlying physics. State DOT governs roadway design.",
     assumptions: [
       { name: "Perception-reaction time", value: "2.5 s default", source: "AASHTO Green Book Chapter 3" },
-      { name: "Friction coefficient", value: "0.35 dry / 0.20 wet / 0.10 ice", source: "engineering practice; AASHTO design values" },
+      { name: "Friction coefficient", value: "0.35 AASHTO design (11.2 ft/s^2, already a wet-pavement basis) / 0.20 poor wet surface or worn tires (not an AASHTO value) / 0.10 ice or packed snow", source: "AASHTO Green Book Chapter 3 for 0.35; engineering practice for 0.20 and 0.10" },
       { name: "Grade", value: "decimal; + uphill, - downhill", source: "standard convention" },
     ],
   },
@@ -2748,7 +2748,7 @@ export const CITATIONS = {
     editionNote: "The fastest design speed a stretch of road can safely allow given the available stopping sight distance, the inverse of stopping-sight-distance: the speed is the positive root of the SSD quadratic. Use it to set a curve/crest advisory speed or to check whether a design speed is safe for the sight line to an intersection or over a hill. Braking distance grows with the square of speed while reaction distance grows linearly, so a modest sight-distance shortfall forces a larger speed cut than it seems; a downhill (negative) grade and wet/icy friction lower the safe speed further. This tile outputs the underlying physics; AASHTO design SSD tables round these numbers. A design aid, not a posted-speed determination; the state DOT governs roadway design.",
     assumptions: [
       { name: "Quadratic inverse", value: "v = (-b + sqrt(b^2 + 4 a SSD))/(2 a), a = 1/(30(f+g)), b = 1.47 t_pr", source: "AASHTO Green Book Chapter 3" },
-      { name: "Friction coefficient", value: "0.35 dry / 0.20 wet / 0.10 ice", source: "engineering practice; AASHTO design values" },
+      { name: "Friction coefficient", value: "0.35 AASHTO design (11.2 ft/s^2, already a wet-pavement basis) / 0.20 poor wet surface or worn tires (not an AASHTO value) / 0.10 ice or packed snow", source: "AASHTO Green Book Chapter 3 for 0.35; engineering practice for 0.20 and 0.10" },
       { name: "Grade", value: "decimal; + uphill, - downhill lowers the safe speed", source: "standard convention" },
     ],
   },
@@ -2867,7 +2867,7 @@ export const CITATIONS = {
   },
 
   "grounding-electrode": {
-    formula: "Driven rod (Dwight 1936): R = (rho / (2*pi*L)) * (ln(8L/d) - 1). Ring: R = (rho / (4*pi^2*D)) * (ln(8D/d) + ln(4D/s)). Plate: R = (rho / 4) * sqrt(pi / A). Ufer: rod formula with concrete-cylinder effective diameter, times 0.5 empirical reduction.",
+    formula: "Driven rod (Dwight 1936): R = (rho / (2*pi*L)) * (ln(8L/d) - 1). Ring: R = (rho / (2*pi^2*D)) * (ln(8D/d) + ln(4D/s)), with s = 2 x burial depth (the distance to the image ring). Plate: R = (rho / 4) * sqrt(pi / A). Ufer: rod formula with concrete-cylinder effective diameter, times 0.5 empirical reduction.",
     edition: "IEEE 142-2007 (Green Book) §4. " + NEC_2023 + " §250.53 governs adoption.",
     freeAccess: "standards.ieee.org for IEEE 142 bibliographic data; " + NEC_FREE + " for NEC 250.",
     governance: GOVERNANCE.electrical,
@@ -3191,7 +3191,7 @@ export const CITATIONS = {
   },
 
   "service-load-optional": {
-    formula: "General load demand = first 10 kVA at 100% + remainder at 40%, where general load = 3 VA/ft^2 + 1500 VA per small-appliance and laundry circuit + nameplate of fixed appliances, range, dryer, water heater. HVAC larger of heating vs cooling added at 100% (220.82(C)).",
+    formula: "General load demand = first 10 kVA at 100% + remainder at 40%, where general load = 3 VA/ft^2 + 1500 VA per small-appliance and laundry circuit + nameplate of fixed appliances, range, dryer, water heater. HVAC is the larger of cooling at 100% and heating at 100% (heat pump), 65% (central resistance or fewer than 4 separately controlled units) or 40% (4 or more separately controlled units) (220.82(C)).",
     edition: NEC_2023 + " 220.82 (optional dwelling load calculation); the Part III standard method (Table 220.45 lighting demand) for the comparison.",
     freeAccess: NEC_FREE,
     governance: GOVERNANCE.electrical,
@@ -3398,7 +3398,7 @@ export const CITATIONS = {
   },
 
   "cargo-securement-wll": {
-    formula: "Aggregate WLL = number of tiedowns x per-tiedown WLL; required >= 0.5 x cargo weight; minimum tiedown count from the length/weight rule (>= 1 per 10 ft, >= 2 for articles over 5 ft or 1100 lb).",
+    formula: "Aggregate WLL = number of tiedowns x per-tiedown WLL x path credit (1.0 over the cargo to the other side, 0.5 direct or same-side, per 49 CFR 393.106(d)); required >= 0.5 x cargo weight; minimum tiedown count from the length/weight rule (>= 1 per 10 ft, >= 2 for articles over 5 ft or 1100 lb).",
     edition: "FMCSA 49 CFR 393.100-393.136 cargo securement (aggregate-WLL and tiedown-count rules), by name.",
     freeAccess: "Free at ecfr.gov; FMCSA enforces.",
     governance: GOVERNANCE.trucking,
@@ -3623,7 +3623,7 @@ export const CITATIONS = {
     ],
   },
   "helical-pile": {
-    formula: "Ultimate axial capacity = Kt × installation_torque (lb-ft). Allowable = ultimate / factor_of_safety. Kt by shaft type (engineering-practice values): 1.5 in solid 10, 1.75 in solid 9, 2.875 in pipe 7, 3.5 in pipe 5.",
+    formula: "Ultimate axial capacity = Kt × installation_torque (lb-ft). Allowable = ultimate / factor_of_safety. Kt by shaft type (ICC-ES AC358 defaults): 1.5 in solid 10, 1.75 in solid 10, 2.875 in pipe 9, 3.5 in pipe 7.",
     edition: "ICC-ES Acceptance Criteria AC358 (helical foundation systems) by name; manufacturer technical bulletins (CHANCE, Magnum, Ram Jack, AB Chance) by name.",
     freeAccess: "ICC-ES AC358 free at icc-es.org. Manufacturer Kt values free in each manufacturer's published evaluation report.",
     governance: GOVERNANCE.engineer_of_record,
@@ -3634,7 +3634,7 @@ export const CITATIONS = {
     ],
   },
   "helical-pile-torque": {
-    formula: "Installation torque = ultimate / Kt = (allowable × factor_of_safety) / Kt (lb-ft). Kt by shaft type: 1.5 in solid 10, 1.75 in solid 9, 2.875 in pipe 7, 3.5 in pipe 5.",
+    formula: "Installation torque = ultimate / Kt = (allowable × factor_of_safety) / Kt (lb-ft). Kt by shaft type (ICC-ES AC358 defaults): 1.5 in solid 10, 1.75 in solid 10, 2.875 in pipe 9, 3.5 in pipe 7.",
     edition: "ICC-ES Acceptance Criteria AC358 (helical foundation systems) by name; manufacturer technical bulletins (CHANCE, Magnum, Ram Jack, AB Chance) by name.",
     freeAccess: "ICC-ES AC358 free at icc-es.org. Manufacturer Kt values free in each manufacturer's published evaluation report.",
     governance: GOVERNANCE.engineer_of_record,
@@ -3989,7 +3989,7 @@ export const CITATIONS = {
     edition: "ASPE Plumbing Engineering Design Handbook (2nd ed.) Chapter 6; ASME B40.1 steam tables. IPC 2021 §604.8 (PRV) and §607 (thermal expansion control).",
     freeAccess: "Free at aspe.org for table-of-contents excerpts; codes.iccsafe.org for the IPC TOC.",
     governance: GOVERNANCE.plumbing,
-    editionNote: "Densities interpolated from bundled steam-table values (40-180 F). Acceptance factor defaults to 0.46 for diaphragm types; the manufacturer's value governs. AHJ governs.",
+    editionNote: "Densities interpolated from bundled steam-table values (40-212 F). Acceptance factor defaults to 0.46 for diaphragm types; the manufacturer's value governs. AHJ governs.",
     assumptions: [
       { name: "Acceptance factor", value: "0.46 for diaphragm-type tanks unless the user enters the manufacturer value", source: "Amtrol / Watts diaphragm-tank cut sheets" },
       { name: "Standard tank sizes", value: "2 / 4.4 / 8.5 / 14 / 20 gal diaphragm potable-expansion tanks", source: "common North American residential sizes" },
@@ -4021,7 +4021,7 @@ export const CITATIONS = {
     ],
   },
   "septic-tank": {
-    formula: "Tank capacity from EPA on-site wastewater treatment manual sizing rules and state minimum-volume tables; required volume = bedrooms × per-bedroom rule + safety reserve.",
+    formula: "By bedrooms: EPA/625/R-00/008 Table 4-13 volumes (750 / 750 / 1,000 / 1,200 / 1,425 / 1,650 / 1,875 / 2,100 gal for 1-8 bedrooms, plus 225 gal per bedroom past 8), not less than 1,000 gal. By daily flow: 2 x design flow (gpd), not less than 1,000 gal.",
     edition: "U.S. EPA Onsite Wastewater Treatment Systems Manual (EPA/625/R-00/008); state-published per-bedroom rules.",
     freeAccess: "Free at epa.gov/septic. State rules free on each state department of health / DEQ site.",
     governance: GOVERNANCE.plumbing,
@@ -4819,7 +4819,7 @@ export const CITATIONS = {
     ],
   },
   "lumber-spans": {
-    formula: "Allowable simple-beam span: deflection-limited L = sqrt(48 × E × I × Δ_allow / (5 × w × n)); strength-limited from M_allow = Fb × S. F_b and E from AWC NDS-2018 design values; deflection limit L/360 (live) or L/240 (total) per IRC §R301.7.",
+    formula: "Allowable simple-beam span: deflection-limited L = sqrt(48 × E × I × Δ_allow / (5 × w × n)); strength-limited from M_allow = Fb' × S, with Fb' = Fb × C_F × C_r (C_F the size factor, 1.0 for Southern Pine; C_r = 1.15 at 24 in on center or closer). F_b and E from AWC NDS-2018 design values; deflection limit L/360 (live) or L/240 (total) per IRC §R301.7.",
     edition: AWC_NDS + " " + IRC_2021 + " §R301.7, R502.3, R802.4.",
     freeAccess: "AWC NDS free at awc.org/codes-standards. " + ICC_FREE,
     governance: GOVERNANCE.structural,
@@ -5853,13 +5853,13 @@ export const CITATIONS = {
     ],
   },
   "dehumidifier": {
-    formula: "Required dehumidifier capacity (PPD = pints per day) sized from affected cubic feet, water class (1-4 per IICRC S500), and category (1-3 per IICRC S500). AHAM-rated capacity is the published rating at 80 °F / 60% RH; field-rating at 75 °F / 50% RH is typically 60-70% of AHAM.",
+    formula: "Required dehumidifier capacity (PPD = pints per day) sized from affected cubic feet, water class (1-4 per IICRC S500), and category (1-3 per IICRC S500). Required AHAM pints per day = affected cubic feet / IICRC LGR factor (100 ft³ per pint for Class 1, 50 for Class 2, 40 for Classes 3 and 4). AHAM-rated capacity is the published rating at 80 °F / 60% RH; the IICRC chart is already the field recommendation in AHAM pints, so the field figure equals it.",
     edition: "IICRC S500-2021 §10 (Equipment); AHAM DH-1-2008 (Dehumidifier rating standard) by name.",
     freeAccess: "AHAM standards licensed; rating principles free at AHAM (aham.org) outreach.",
     governance: GOVERNANCE.general,
     editionNote: "Single-edition (IICRC S500-2021 + AHAM DH-1-2008).",
     assumptions: [
-      { name: "AHAM-to-field derate", value: "0.65 (field-rated) unless user supplies", source: "engineering practice" },
+      { name: "Field figure", value: "equal to the AHAM figure; no derate is applied", source: "IICRC S500 LGR sizing chart" },
     ],
   },
   "air-movers": {
@@ -7113,7 +7113,7 @@ export const CITATIONS = {
     editionNote: "Single-edition (USDA NRCS).",
     assumptions: [
       { name: "Particle density", value: "2.65 g/cm³ for mineral soils unless user supplies", source: "USDA NRCS SSM" },
-      { name: "Compaction threshold", value: "varies by texture class (coarse 1.80 / medium 1.55 / fine 1.40 g/cm³)", source: "USDA NRCS Soil Quality Indicators" },
+      { name: "Compaction threshold", value: "bulk density that restricts root growth, by texture: sand, sandy loam, loam 1.80; silt loam, clay loam 1.75; silty clay loam 1.65; clay 1.47 g/cm³ (root growth already affected at 1.63 / 1.60 / 1.55 / 1.39)", source: "USDA NRCS Soil Quality Indicators" },
     ],
   },
   "crop-yield": {
@@ -7287,7 +7287,7 @@ export const CITATIONS = {
     editionNote: "Kelvin is not a perceptually even scale. Going from three thousand to three thousand two hundred kelvin is a visible correction, while going from nine thousand to nine thousand two hundred is invisible. Mireds -- reciprocal color temperature times a million -- are even, which is why every correction filter on the market is specified as a mired shift rather than as a pair of kelvin values, and why a full CTB is the same shift no matter what it is placed in front of. Once a crew is thinking in mireds, the question of what gel gets from here to there is a subtraction, and the question of what a given gel does to a given source is an addition. Negative shifts are blue and raise color temperature; positive shifts are orange and lower it. The failure of kelvin arithmetic is easy to demonstrate: the same sheet applied to two different sources produces two different results, because a fixed mired shift is a different kelvin difference at every starting point, and only the mired scale predicts where it lands. The nominal shifts here are the conventional figures; a specific manufacturer's sheet has its own published value, and a color meter settles a critical match.",
     assumptions: [
       { name: "Mired scale", value: "1,000,000 / kelvin; perceptually even, which kelvin is not", source: "public colorimetry" },
-      { name: "Nominal sheet shifts", value: "full CTB about -131 and full CTO about +131 mireds, with half, quarter, and eighth in proportion", source: "conventional correction-filter figures" },
+      { name: "Nominal sheet shifts", value: "CTB full / half / quarter / eighth -131 / -68 / -30 / -12 mireds; CTO full / 3/4 / half / quarter / eighth +167 / +131 / +81 / +42 / +20 (CTB and CTO are not mirror images)", source: "conventional correction-filter figures" },
       { name: "Critical match", value: "the filter manufacturer's published mired shift for the specific sheet, and a color meter, govern", source: "filter manufacturer data" },
     ],
   },
@@ -7375,7 +7375,7 @@ export const CITATIONS = {
     ],
   },
   "rigging-check": {
-    formula: "WLL at angle: leg tension L = W / (n × cos(θ/2)) for basket / bridle slings at included (apex) angle θ (W/n with legs vertical, diverging as they open toward horizontal); choker derate 0.75. WLL by component class (shackles per ASME B30.26; slings per ASME B30.9; span sets / hoists per manufacturer specs).",
+    formula: "WLL at angle: leg tension L = W / (n × cos(θ/2)) for basket slings and W / (min(n, 2) × cos(θ/2)) for bridles (a bridle of three or more legs is taken as two carrying the load) at included (apex) angle θ (W/n with legs vertical, diverging as they open toward horizontal); choker derate 0.75. WLL by component class (shackles per ASME B30.26; slings per ASME B30.9; span sets / hoists per manufacturer specs).",
     edition: "ASME B30.9 (Slings) + ASME B30.26 (Rigging Hardware) + ASME B30.16 (Overhead Underhung and Stationary Hoists) by name and section. Manufacturer hoist data sheets (CM Lodestar, Columbus McKinnon, Chain Master) by name.",
     freeAccess: "ASME B30 series licensed; principles free at most rigging-manufacturer training pages.",
     governance: GOVERNANCE.rigging,
@@ -8802,13 +8802,13 @@ export const CITATIONS = {
     ],
   },
   "working-space-110-26": {
-    formula: "depth from Table 110.26(A)(1) by nominal voltage to ground and Condition 1/2/3 (0-150 V: 3/3/3 ft; 151-600 V: 3/3.5/4 ft); width = max(30 in, equipment width); headroom = 6.5 ft, with a 90-degree door swing.",
+    formula: "depth from Table 110.26(A)(1) by nominal voltage to ground and Condition 1/2/3 (0-150 V: 3/3/3 ft; 151-600 V: 3/3.5/4 ft; 601-1000 V: 3/4/5 ft); width = max(30 in, equipment width); headroom = 6.5 ft, with a 90-degree door swing.",
     edition: "Working space about electrical equipment, NEC 2023 110.26(A), and dedicated equipment space 110.26(E), by name.",
     freeAccess: "NEC is free to read at nfpa.org/freeaccess. Condition 1/2/3 describe what is across from the live parts; the width is the greater of 30 in or the equipment width.",
     governance: GOVERNANCE.electrical,
     editionNote: NEC_DISCLOSURE,
     assumptions: [
-      { name: "Depth table", value: "0-150 V to ground is 3 ft for all conditions; 151-600 V is 3 / 3.5 / 4 ft for Conditions 1 / 2 / 3", source: "NEC Table 110.26(A)(1)" },
+      { name: "Depth table", value: "0-150 V to ground is 3 ft for all conditions; 151-600 V is 3 / 3.5 / 4 ft and 601-1000 V is 3 / 4 / 5 ft for Conditions 1 / 2 / 3", source: "NEC Table 110.26(A)(1)" },
       { name: "Width and headroom", value: "width is the greater of 30 in or the equipment width; headroom 6.5 ft or equipment height; a 90-degree door swing is required", source: "NEC 110.26(A)(2),(3)" },
     ],
   },
@@ -8819,7 +8819,7 @@ export const CITATIONS = {
     governance: GOVERNANCE.electrical,
     editionNote: NEC_DISCLOSURE,
     assumptions: [
-      { name: "Column C series", value: "the bundled 1-through-16-range Column C demand series (1 range -> 8 kW)", source: "NEC Table 220.55 Column C" },
+      { name: "Column C series", value: "8 / 11 / 14 / 17 / 20 kW for 1-5 ranges, 15 kW + 1 kW per range for 6-40, 25 kW + 0.75 kW per range for 41 and over", source: "NEC Table 220.55 Column C" },
       { name: "Note 1 increase", value: "a range over 12 kW adds 5% of Column C per kW (or major fraction) above 12 kW", source: "NEC Table 220.55 Note 1" },
     ],
   },
@@ -9518,12 +9518,12 @@ export const CITATIONS = {
   },
   "wsfu-demand": {
     formula: "gpm = interpolate(curve, wsfu): piecewise-linear between published [WSFU, GPM] breakpoints for the selected system type (flush tank or flush valve). Flush-valve systems peak higher at low WSFU.",
-    edition: "Hunter's curve (NBS BMS65, Methods of Estimating Loads in Plumbing Systems) and IPC 2021 Appendix E (Table E103.3(2)) by name; the curve ships as editable breakpoints, not a transcribed table.",
-    freeAccess: "IPC 2021 free read-only at codes.iccsafe.org; NBS BMS65 is public-domain (US government). The bundled curve is an editable approximation to tune to the published table.",
+    edition: "Hunter's curve (NBS BMS65, Methods of Estimating Loads in Plumbing Systems) and IPC 2021 Appendix E (Table E103.3(3)) by name; the curve ships as editable breakpoints read from that table.",
+    freeAccess: "IPC 2021 free read-only at codes.iccsafe.org; NBS BMS65 is public-domain (US government). The bundled curve carries the Table E103.3(3) values as editable breakpoints.",
     governance: GOVERNANCE.general,
-    editionNote: "The bundled flush-tank and flush-valve curves are editable approximations of Hunter's curve; tune to IPC Table E103.3(2). The output is the design demand, not a metered actual.",
+    editionNote: "The bundled flush-tank and flush-valve curves carry the IPC Table E103.3(3) values (Hunter's curve) as editable breakpoints, linearly interpolated between rows. The output is the design demand, not a metered actual.",
     assumptions: [
-      { name: "Demand curve", value: "editable [WSFU, GPM] breakpoints per system type; tune to IPC Appendix E", source: "Hunter's curve / IPC 2021 Appendix E" },
+      { name: "Demand curve", value: "editable [WSFU, GPM] breakpoints per system type, read from IPC Table E103.3(3)", source: "Hunter's curve / IPC 2021 Appendix E" },
     ],
   },
   "supply-pressure-budget": {
@@ -9539,13 +9539,13 @@ export const CITATIONS = {
   },
   "roof-drain-sizing": {
     formula: "gpm = roof_area x rainfall_rate x 0.0104 (GPM per ft^2 per in/hr); leader_in = smallest pipe in the vertical-leader table with capacity >= gpm; horiz_in = smallest pipe in the slope table with capacity >= gpm.",
-    edition: "IPC 2021 Section 1106 (Tables 1106.2 vertical conductors, 1106.3 horizontal storm drains by slope, 1106.6 roof drains) by name; the capacity tables ship as editable conservative breakpoints, not a transcribed table.",
-    freeAccess: "IPC 2021 free read-only at codes.iccsafe.org; the 0.0104 GPM-per-(ft^2 x in/hr) constant is public. The bundled capacity tables are editable approximations to tune to the published edition.",
+    edition: "IPC 2021 Section 1106 (Table 1106.3 vertical leaders, with the vertical-drain column of Table 1106.2 for 10-15 in; Table 1106.2 horizontal storm drains by slope) by name; the capacity tables carry the published values as editable breakpoints.",
+    freeAccess: "IPC 2021 free read-only at codes.iccsafe.org; the 0.0104 GPM-per-(ft^2 x in/hr) constant is public. The bundled capacity tables carry the published IPC 2021 values as editable breakpoints.",
     governance: GOVERNANCE.general,
     editionNote: "Rainfall rate is the locale-specific 100-year / 1-hour value from IPC Figure 1106.1, not a national default. Sloped, vertical, and parapet walls add contributing area per IPC 1106.4. Overflow drains and scuppers (IPC 1107) are a separate required path this tile does not size.",
     assumptions: [
       { name: "Storm-flow constant", value: "0.0104 GPM per ft^2 per in/hr of design rainfall", source: "IPC 2021 Section 1106 basis" },
-      { name: "Capacity tables", value: "editable [size, GPM] breakpoints for the vertical leader and the horizontal storm drain at each slope; tune to IPC Tables 1106.2 / 1106.3 / 1106.6", source: "IPC 2021 Section 1106" },
+      { name: "Capacity tables", value: "editable [size, GPM] breakpoints for the vertical leader (Table 1106.3) and the horizontal storm drain at each slope (Table 1106.2), at the published values", source: "IPC 2021 Section 1106" },
     ],
   },
   "scupper-width-for-flow": {
@@ -9710,7 +9710,7 @@ export const CITATIONS = {
     ],
   },
   "sling-d-d-efficiency": {
-    formula: "ratio = bend_dia / sling_dia; efficiency interpolated from the WRTB 6x19 / 6x37 D/d curve (1->0.50 ... 25+ ->0.95, plateauing below full strength); reduced_wll = rated_wll x efficiency.",
+    formula: "ratio = bend_dia / sling_dia; efficiency interpolated from the WRTB 6x19 / 6x37 D/d curve (1->0.50 ... 25->0.93, 40+ ->0.95, plateauing below full strength); reduced_wll = rated_wll x efficiency.",
     edition: "Wire Rope Technical Board Wire Rope Users Manual (D/d bend efficiency) and ASME B30.9 by name; the curve ships as editable breakpoints.",
     freeAccess: "The WRTB D/d efficiency curve is published guidance; ASME B30.9 is a consensus standard.",
     governance: GOVERNANCE.rigging,
@@ -9847,13 +9847,13 @@ export const CITATIONS = {
     ],
   },
   "reeving-parts-of-line": {
-    formula: "frictionless_pull_lb = load_lb / parts_of_line; hauling_line_pull_lb = load_lb x (1 - k) / (1 - k^N) with k = sheave_efficiency, N = parts_of_line (= load/N when k = 1); reeving_efficiency = load_lb / (parts_of_line x hauling_line_pull_lb).",
+    formula: "frictionless_pull_lb = load_lb / parts_of_line; hauling_line_pull_lb = load_lb / (k + k^2 + ... + k^N) = load_lb x (1 - k) / (k (1 - k^N)) when the lead line leaves over a sheave (lead_sheave = 1, the default), or load_lb x (1 - k) / (1 - k^N) without one, with k = sheave_efficiency, N = parts_of_line (= load/N when k = 1, no lead sheave); reeving_efficiency = load_lb / (parts_of_line x hauling_line_pull_lb).",
     edition: "Block-and-tackle / hoist reeving efficiency (Wire Rope Users Manual / Crosby reeving practice; ASME B30 hoisting), by name; the block and rope ratings, the actual sheave friction, and a qualified rigger and the lift plan govern.",
     freeAccess: "The reeving-efficiency relation is public rigging mechanics; the per-sheave efficiency (~0.98 roller, 0.96 plain) is a standard published figure and the load and parts are the rig's values.",
     governance: GOVERNANCE.general,
-    editionNote: "When a load is lifted through a block and tackle -- a fixed block and a moving block reeved with several parts of line -- the mechanical advantage divides the load among the parts, but sheave friction makes the hauling line work harder than the ideal. In a frictionless system each of the N parts carries an equal share, load divided by N, and that share is what the hauling line must pull. Real sheaves each lose a few percent of the tension passing over them to bearing friction and the work of bending the rope, and crucially that loss stacks from part to part: the tension is highest in the part closest to the hauling end and falls by the per-sheave efficiency factor k across each successive sheave. Setting the sum of all the parts' tensions equal to the load and solving gives the hauling-line pull as the load times (1 minus k) divided by (1 minus k raised to the N). For a 20,000-pound load reeved on four parts with roller-bearing sheaves at k = 0.98, the pull is 20,000 times 0.02 divided by (1 minus 0.98 to the fourth), or 5,152 pounds, noticeably above the frictionless 5,000 pounds; the reeving efficiency, defined as the load divided by N times the pull, is 97.0%. Plain bronze-bushed sheaves run closer to k = 0.96 and cost more efficiency. Adding parts of line multiplies the load advantage but also stacks more friction, so doubling the number of parts never quite halves the required pull. Two cautions: this is the steady pull to hold or slowly haul the load, not the larger force needed to overcome inertia and start it moving, and it is the tension in the lead (hauling) line only. This is a rigging screen; the rated capacities of the blocks and rope, the true sheave friction for the specific hardware, the reeving pattern, and a qualified rigger working to the lift plan govern the actual rig.",
+    editionNote: "When a load is lifted through a block and tackle -- a fixed block and a moving block reeved with several parts of line -- the mechanical advantage divides the load among the parts, but sheave friction makes the hauling line work harder than the ideal. In a frictionless system each of the N parts carries an equal share, load divided by N, and that share is what the hauling line must pull. Real sheaves each lose a few percent of the tension passing over them to bearing friction and the work of bending the rope, and crucially that loss stacks from part to part: the tension is highest in the part closest to the hauling end and falls by the per-sheave efficiency factor k across each successive sheave. Setting the sum of all the parts' tensions equal to the load and solving gives the load times (1 minus k) divided by (1 minus k raised to the N), and when the hauling line leaves the block over one more sheave, the usual case, that sheave costs another factor k, so the pull is the load divided by (k + k^2 + ... + k^N), the Crosby line-parts ratio. For a 20,000-pound load reeved on four parts with roller-bearing sheaves at k = 0.98, the pull over a lead sheave is 20,000 divided by (0.98 + 0.98^2 + 0.98^3 + 0.98^4), or about 5,258 pounds, noticeably above the frictionless 5,000 pounds; the reeving efficiency, defined as the load divided by N times the pull, is about 95.1%. Plain bronze-bushed sheaves run closer to k = 0.96 and cost more efficiency. Adding parts of line multiplies the load advantage but also stacks more friction, so doubling the number of parts never quite halves the required pull. Two cautions: this is the steady pull to hold or slowly haul the load, not the larger force needed to overcome inertia and start it moving, and it is the tension in the lead (hauling) line only. This is a rigging screen; the rated capacities of the blocks and rope, the true sheave friction for the specific hardware, the reeving pattern, and a qualified rigger working to the lift plan govern the actual rig.",
     assumptions: [
-      { name: "Reeving pull", value: "pull = load x (1 - k) / (1 - k^N); frictionless share = load/N; efficiency = load/(N x pull)", source: "block-and-tackle reeving mechanics" },
+      { name: "Reeving pull", value: "pull = load / (k + k^2 + ... + k^N) with a lead sheave, load x (1 - k) / (1 - k^N) without; frictionless share = load/N; efficiency = load/(N x pull)", source: "block-and-tackle reeving mechanics" },
       { name: "Per-sheave efficiency", value: "k ~0.98 roller-bearing, ~0.96 plain-bronze sheaves; loss stacks part to part; steady pull on the lead line only (not inertia to start)", source: "Wire Rope Users Manual / Crosby / ASME B30" },
     ],
   },
@@ -10303,7 +10303,7 @@ export const CITATIONS = {
     edition: "IEC 60751 platinum RTD Callendar-Van Dusen resistance-temperature relation with the standard A/B coefficients, by name (not reproduced from a table); the sensor calibration and tolerance class govern.",
     freeAccess: "The Callendar-Van Dusen equation and its standard coefficients (A = 3.9083e-3, B = -5.775e-7) are public, reproduced on every RTD datasheet and by NIST; the measured resistance and R0 come from the sensor and the reading.",
     governance: GOVERNANCE.general,
-    editionNote: "A platinum resistance temperature detector (RTD) changes resistance with temperature along the IEC 60751 Callendar-Van Dusen curve R = R0 (1 + A T + B T^2) for T at or above 0 C, where R0 is the ice-point resistance -- 100 ohms for a Pt100, 1000 ohms for a Pt1000 (the same curve, scaled). Inverting the quadratic gives the temperature from a measured resistance, T = (-A + sqrt(A^2 - 4 B (1 - R/R0))) / (2 B), which is what a tech reads off an ohmmeter: 119.40 ohms on a Pt100 is 50 C, 138.51 ohms is 100 C, 100.00 ohms is 0 C. Below 0 C the full standard adds a C (T - 100) T^3 term (C = -4.183e-12); dropping it, as this screen does, keeps the error within about 0.02 C down to -40 C and grows slowly below that. The reading must be the RTD ELEMENT alone: a 3- or 4-wire connection (or a lead-resistance-compensated 2-wire) removes the lead resistance, while an uncompensated 2-wire measurement adds the round-trip lead resistance to R and therefore reads high (hotter than actual). Self-heating from the excitation current, the tolerance class (Class A vs B), and the sensor's own calibration set the real field accuracy.",
+    editionNote: "A platinum resistance temperature detector (RTD) changes resistance with temperature along the IEC 60751 Callendar-Van Dusen curve R = R0 (1 + A T + B T^2) for T at or above 0 C, where R0 is the ice-point resistance -- 100 ohms for a Pt100, 1000 ohms for a Pt1000 (the same curve, scaled). Inverting the quadratic gives the temperature from a measured resistance, T = (-A + sqrt(A^2 - 4 B (1 - R/R0))) / (2 B), which is what a tech reads off an ohmmeter: 119.40 ohms on a Pt100 is 50 C, 138.51 ohms is 100 C, 100.00 ohms is 0 C. Below 0 C the full standard adds a C (T - 100) T^3 term (C = -4.183e-12), which this tile includes, solving by Newton iteration; dropping it would read 0.2 C off at -100 C and about 2.5 C off at -200 C. The reading must be the RTD ELEMENT alone: a 3- or 4-wire connection (or a lead-resistance-compensated 2-wire) removes the lead resistance, while an uncompensated 2-wire measurement adds the round-trip lead resistance to R and therefore reads high (hotter than actual). Self-heating from the excitation current, the tolerance class (Class A vs B), and the sensor's own calibration set the real field accuracy.",
     assumptions: [
       { name: "Callendar-Van Dusen (T >= 0 C)", value: "R = R0(1 + A T + B T^2); inverse T = (-A + sqrt(A^2 - 4B(1 - R/R0)))/(2B); A = 3.9083e-3, B = -5.775e-7", source: "IEC 60751" },
       { name: "Sub-zero + lead resistance", value: "below 0 C includes the C(T-100)T^3 term (C = -4.183e-12), solved numerically; assumes a lead-compensated 3/4-wire reading", source: "IEC 60751 / RTD wiring practice" },
@@ -10480,9 +10480,9 @@ export const CITATIONS = {
     edition: "API Publication 421 (Design and Operation of Oil-Water Separators) gravity-separator method with Stokes' law, by name; the manufacturer and the engineer / AHJ govern.",
     freeAccess: "Stokes' law is public physics; the API 421 turbulence factor (~1.2), the 150 micron design droplet, and the horizontal-velocity limits are the API 421 method, and the flow, oil SG, and viscosity come from the waste stream.",
     governance: GOVERNANCE.water,
-    editionNote: "The minimum horizontal (plan) surface area of a rectangular gravity oil/water separator per API Publication 421. The design oil droplet (commonly 150 micron) rises through the water at the Stokes terminal velocity Vt = g (rho_w - rho_o) d^2 / (18 mu); the separator must give that droplet enough surface residence to reach the top before the flow carries it out, so the required horizontal area is the flow divided by the rise velocity, multiplied by a turbulence / short-circuit factor F of about 1.2. The horizontal velocity is also held below about 15 times Vt and under about 3 ft/min. Colder water raises the viscosity and slows the rise, and a smaller design droplet demands much more area (the velocity goes as the diameter squared). Critically, only FREE oil separates by gravity: an emulsified or dissolved oil fraction will pass a gravity separator and needs coalescing media, dissolved-air flotation, or downstream treatment. This is a screening estimate, not a design; API 421, the separator manufacturer, and the engineer of record / AHJ govern the unit and the discharge permit.",
+    editionNote: "The minimum horizontal (plan) surface area of a rectangular gravity oil/water separator per API Publication 421. The design oil droplet (commonly 150 micron) rises through the water at the Stokes terminal velocity Vt = g (rho_w - rho_o) d^2 / (18 mu); the separator must give that droplet enough surface residence to reach the top before the flow carries it out, so the required horizontal area is the flow divided by the rise velocity, multiplied by F = Ft x 1.2, the short-circuit factor 1.2 times the API 421 turbulence factor Ft read at vH / Vt (1.07 / 1.14 / 1.27 / 1.37 / 1.45 at 3 / 6 / 10 / 15 / 20). The horizontal velocity is also held below about 15 times Vt and under about 3 ft/min. Colder water raises the viscosity and slows the rise, and a smaller design droplet demands much more area (the velocity goes as the diameter squared). Critically, only FREE oil separates by gravity: an emulsified or dissolved oil fraction will pass a gravity separator and needs coalescing media, dissolved-air flotation, or downstream treatment. This is a screening estimate, not a design; API 421, the separator manufacturer, and the engineer of record / AHJ govern the unit and the discharge permit.",
     assumptions: [
-      { name: "Stokes rise", value: "Vt = g(rho_w - rho_o)d^2/(18 mu) for a 150 micron droplet; area = F x Q / Vt with F ~ 1.2", source: "API 421" },
+      { name: "Stokes rise", value: "Vt = g(rho_w - rho_o)d^2/(18 mu) for a 150 micron droplet; area = F x Q / Vt with F = Ft x 1.2", source: "API 421" },
       { name: "Free oil only", value: "emulsified / dissolved oil does not gravity-separate; needs coalescing / DAF / downstream treatment", source: "API 421 / practice" },
     ],
   },
@@ -10892,13 +10892,13 @@ export const CITATIONS = {
     ],
   },
   "welder-arc-circuit-conductor": {
-    formula: "duty_multiplier = sqrt(duty_pct / 100) (NEC Table 630.11(A)); effective_current_a = primary_current_a x duty_multiplier; ocpd_max_a = 2.0 x primary_current_a (630.12(A)).",
+    formula: "duty_multiplier = sqrt(duty_pct / 100) above 20% duty, 0.45 at 20% or less (NEC Table 630.11(A), transformer / rectifier column); effective_current_a = primary_current_a x duty_multiplier; ocpd_max_a = 2.0 x primary_current_a (630.12(A)).",
     edition: "NEC 630.11 (conductors) and 630.12 (overcurrent protection) for arc-welding equipment, with the Table 630.11(A) duty-cycle multipliers, by name; the welder nameplate and the adopted NEC edition govern.",
     freeAccess: "The duty-cycle multiplier (square root of the duty) and the 200% OCPD limit are public NEC (many jurisdictions post the adopted NEC); the rated primary current and duty come from the welder nameplate.",
     governance: GOVERNANCE.general,
-    editionNote: "An arc-welder branch circuit is sized on an EFFECTIVE current rather than the nameplate primary. NEC 630.11(A) and Table 630.11(A) set the conductor at the rated primary current times a duty-cycle multiplier equal to the square root of the duty cycle (a 50%-duty welder draws its rated current only half the time, so its I^2 t heating is halved and the conductor need only carry sqrt(0.5) = 0.71 of the primary). The conductor's ampacity must be at least this effective current. NEC 630.12(A) permits the overcurrent device to be up to 200% of the rated primary current (using the next standard size down if 200% does not land on one). This covers arc welders (transformer / rectifier / motor-generator); resistance (spot / seam) welders use the separate 630.31 / 630.32 method with a 300% OCPD limit. Use the welder's rated primary current and duty cycle; the AHJ, the welder nameplate, and the adopted NEC edition govern.",
+    editionNote: "An arc-welder branch circuit is sized on an EFFECTIVE current rather than the nameplate primary. NEC 630.11(A) and Table 630.11(A) set the conductor at the rated primary current times a duty-cycle multiplier equal to the square root of the duty cycle, held at 0.45 for a duty of 20% or less where the table stops (a 50%-duty welder draws its rated current only half the time, so its I^2 t heating is halved and the conductor need only carry sqrt(0.5) = 0.71 of the primary). The conductor's ampacity must be at least this effective current. NEC 630.12(A) permits the overcurrent device to be up to 200% of the rated primary current (using the next standard size down if 200% does not land on one). This covers arc welders (transformer / rectifier / motor-generator); resistance (spot / seam) welders use the separate 630.31 / 630.32 method with a 300% OCPD limit. Use the welder's rated primary current and duty cycle; the AHJ, the welder nameplate, and the adopted NEC edition govern.",
     assumptions: [
-      { name: "Duty multiplier", value: "conductor at I_primary x sqrt(duty) per Table 630.11(A); a low-duty welder heats the wire less", source: "NEC 630.11(A)" },
+      { name: "Duty multiplier", value: "conductor at I_primary x sqrt(duty) above 20% duty, x 0.45 at 20% or less, per Table 630.11(A) (transformer / rectifier column; motor-generator welders use a higher column not modeled); a low-duty welder heats the wire less", source: "NEC 630.11(A)" },
       { name: "OCPD 200%", value: "arc-welder overcurrent device up to 200% of the rated primary (630.12(A)); resistance welders use 630.31/32 (300%)", source: "NEC 630.12" },
     ],
   },
@@ -10907,9 +10907,9 @@ export const CITATIONS = {
     edition: "NEC 630.31 (conductors) and 630.32 (overcurrent protection) for resistance welding equipment, by name; the welder nameplate and the adopted NEC edition govern.",
     freeAccess: "The duty-cycle conductor derating and the 300% OCPD limit are public NEC (many jurisdictions post the adopted NEC); the rated primary current and duty come from the welder nameplate.",
     governance: GOVERNANCE.general,
-    editionNote: "A resistance (spot / seam / projection) welder fires in brief, high-current pulses. NEC 630.31(A)(2) sizes the conductor for a specific nonrepetitive welder at the rated primary current times the square root of the duty cycle -- the same duty derating as an arc welder, because the brief pulses heat the conductor far less than the peak current would suggest. NEC 630.32(A) then permits the overcurrent device up to 300% of the rated primary current, HIGHER than the 200% allowed for arc welders (630.12), so the inrush of the weld pulses does not nuisance-trip the device. This is the resistance-welder method; arc welders (transformer / rectifier / motor-generator) use the separate 630.11 / 630.12 (200%) method. Use the welder's rated primary current and duty cycle; the AHJ, the welder nameplate, and the adopted NEC edition govern.",
+    editionNote: "A resistance (spot / seam / projection) welder fires in brief, high-current pulses. NEC 630.31(A)(2) sizes the conductor for a specific nonrepetitive welder at the rated primary current times the Table 630.31(A)(2) multiplier: the printed two-place value at a listed duty (0.71 at 50%), the square root of the duty between rows, and 0.22 at 5% or less -- the same duty derating as an arc welder, because the brief pulses heat the conductor far less than the peak current would suggest. NEC 630.32(A) then permits the overcurrent device up to 300% of the rated primary current, HIGHER than the 200% allowed for arc welders (630.12), so the inrush of the weld pulses does not nuisance-trip the device. This is the resistance-welder method; arc welders (transformer / rectifier / motor-generator) use the separate 630.11 / 630.12 (200%) method. Use the welder's rated primary current and duty cycle; the AHJ, the welder nameplate, and the adopted NEC edition govern.",
     assumptions: [
-      { name: "Duty multiplier", value: "conductor at I_primary x sqrt(duty) per 630.31(A)(2) for a specific nonrepetitive welder", source: "NEC 630.31" },
+      { name: "Duty multiplier", value: "conductor at I_primary x the Table 630.31(A)(2) value at a listed duty, sqrt(duty) between rows, 0.22 at 5% or less, for a specific nonrepetitive welder", source: "NEC 630.31" },
       { name: "OCPD 300%", value: "resistance-welder overcurrent device up to 300% of the rated primary (630.32(A)); arc welders are 200%", source: "NEC 630.32" },
     ],
   },
@@ -10980,7 +10980,7 @@ export const CITATIONS = {
     ],
   },
   "heat-trace-sizing": {
-    formula: "cable_ft = pipe_ft x (1 + allowance_pct/100) + num_valves x valve_allow_ft; watts = rated_w_per_ft x cable_ft; amps = watts / voltage; breaker_ok = amps <= 0.8 x breaker_a.",
+    formula: "cable_ft = pipe_ft x (1 + allowance_pct/100) + num_valves x valve_allow_ft; watts = rated_w_per_ft x cable_ft; amps = watts / voltage; start_amps = amps x start_factor; breaker_ok = amps <= 0.8 x breaker_a and start_amps <= breaker_a.",
     edition: "Heat-trace sizing identity by name (cable length with allowances; wattage and current from the rated W/ft); first-principles electrical arithmetic.",
     freeAccess: "The cable-length and circuit arithmetic is public first-principles; the required W/ft and max circuit length come from the manufacturer's design tables.",
     governance: GOVERNANCE.general,
@@ -11862,14 +11862,14 @@ export const CITATIONS = {
     ],
   },
   "bearing-equivalent-load": {
-    formula: "P = X Fr + Y Fa. Single-row deep-groove ball: interpolate e and Y from the ISO 281 / SKF table on Fa/C0 ([0.025,0.22,2.0]...[0.50,0.44,1.0]); if Fa/Fr <= e then X = 1, Y = 0 (P = Fr), else X = 0.56.",
+    formula: "P = X Fr + Y Fa. Single-row deep-groove ball: interpolate e and Y from the ISO 281 / SKF table on Fa/C0 ([Fa/C0, e, Y]: [0.014,0.19,2.30], [0.021,0.21,2.15], [0.028,0.22,1.99], [0.042,0.24,1.85], [0.056,0.26,1.71], [0.070,0.27,1.63], [0.084,0.28,1.55], [0.110,0.30,1.45], [0.17,0.34,1.31], [0.28,0.38,1.15], [0.42,0.42,1.04], [0.56,0.44,1.00], clamped at the ends); if Fa/Fr <= e then X = 1, Y = 0 (P = Fr), else X = 0.56.",
     edition: "The ISO 281 dynamic equivalent load P = X Fr + Y Fa with the standard single-row deep-groove ball-bearing X/Y/e table vs Fa/C0 (ISO 281; SKF General Catalogue; Shigley's Mechanical Engineering Design), by name; feeds the bearing-l10-life and bearing-max-load tiles.",
     freeAccess: "The equivalent-load relation and the deep-groove ball X/Y/e table are published ISO 281 / catalogue data; the radial and thrust loads and the static rating C0 come from the application and the bearing catalog.",
     governance: GOVERNANCE.general,
     editionNote: "The ISO 281 dynamic equivalent load for a single-row deep-groove ball bearing, P = X Fr + Y Fa, the input the bearing-l10-life and bearing-max-load tiles need but do not compute. The thrust factor Y and the e-ratio are interpolated from the standard ISO 281 / SKF table on Fa/C0, C0 the basic static load rating. If the thrust-to-radial ratio Fa/Fr is at or below e the pure radial load governs (X = 1, Y = 0, so P = Fr); above e the bearing carries the thrust as extra equivalent load with X = 0.56 and the interpolated Y. With Fa = 0 the result is exactly P = Fr, which feeds bearing-l10-life directly. Single-row radial deep-groove ball bearings, rotating inner ring (V = 1); angular-contact, tapered-, and spherical-roller bearings use the maker's bearing-specific factors. A planning estimate; ISO 281 and the bearing maker's catalogue govern.",
     assumptions: [
       { name: "Equivalent load", value: "P = X Fr + Y Fa; X = 0.56 for Fa/Fr > e, else X = 1 and Y = 0", source: "ISO 281" },
-      { name: "X/Y/e table", value: "single-row deep-groove ball, e and Y interpolated on Fa/C0 (0.025->0.50)", source: "ISO 281 / SKF catalogue" },
+      { name: "X/Y/e table", value: "single-row deep-groove ball, e and Y interpolated on Fa/C0 over the 12 published rows (0.014->0.56)", source: "ISO 281 / SKF catalogue" },
       { name: "Scope", value: "deep-groove ball, rotating inner ring V = 1; other bearing types use maker factors", source: "scope of this tile" },
     ],
   },
@@ -11986,7 +11986,7 @@ export const CITATIONS = {
     edition: "The SAE J429 inch-series bolt strength model (tensile stress area x grade strength), with the ASME B1.1 tensile stress area, by name; the joint design, torque method, and preload requirement govern.",
     freeAccess: "The tensile-stress-area formula and the SAE J429 grade strengths are published in standard fastener references; the grade is read from the bolt head markings.",
     governance: GOVERNANCE.general,
-    editionNote: "SAE J429 bolt strength model. The strength acts on the tensile stress area at the thread root, At = 0.7854 x (D - 0.9743/n)^2 (roughly 20-35% smaller than the nominal shank area, 28% for a 1/2-13, so a nominal-area estimate over-predicts). Proof, yield, and tensile loads are At times the grade's proof, yield, and tensile strengths (Grade 2: 55/57/74 ksi; Grade 5 and A325: 85/92/120; Grade 8 and A490: 120/130/150). The grade, read from the head markings, sets every number. The recommended clamp of about 75% of proof leaves margin for torque scatter and service loads. A design aid, not the engineer of record; the joint design, torque method, and any preload requirement govern.",
+    editionNote: "SAE J429 bolt strength model. The strength acts on the tensile stress area at the thread root, At = 0.7854 x (D - 0.9743/n)^2 (roughly 20-35% smaller than the nominal shank area, 28% for a 1/2-13, so a nominal-area estimate over-predicts). Proof, yield, and tensile loads are At times the grade's proof, yield, and tensile strengths (Grade 2: 55/57/74 ksi through 3/4 in, 33/36/60 over 3/4 to 1-1/2 in; Grade 5 and A325: 85/92/120 through 1 in, 74/81/105 over 1 in; Grade 8 and A490: 120/130/150 through 1-1/2 in). The grade, read from the head markings, sets every number. The recommended clamp of about 75% of proof leaves margin for torque scatter and service loads. A design aid, not the engineer of record; the joint design, torque method, and any preload requirement govern.",
     assumptions: [
       { name: "Stress area", value: "At = 0.7854 x (D - 0.9743/n)^2 at the thread root, ~15% under the nominal shank area", source: "ASME B1.1 / SAE J429" },
       { name: "Grade sets strength", value: "the grade read from the head markings sets proof, yield, and tensile strength", source: "SAE J429" },
@@ -13526,8 +13526,8 @@ export const CITATIONS = {
     ],
   },
   "groove-weld-strength": {
-    formula: "Effective throat: CJP = thinner connected part thickness, PJP = WPS effective throat; weld-metal shear (AISC Table J2.5) Fnw = 0.60*FEXX; ASD allowable 0.30*FEXX, LRFD design 0.75*0.60*FEXX; capacity = stress * throat * length.",
-    edition: "Groove weld (CJP / PJP) shear capacity - the AISC 360 Table J2.5 weld-metal shear strength 0.60*FEXX on the effective throat - per AWS D1.1 Structural Welding Code and AISC 360 §J2, by name; first-principles.",
+    formula: "Effective throat: CJP = thinner connected part thickness, PJP = WPS effective throat. PJP weld-metal shear (AISC Table J2.5) Fnw = 0.60*FEXX; ASD allowable 0.30*FEXX, LRFD design 0.75*0.60*FEXX. CJP shear is controlled by the base metal (J4.2): the smaller of 0.60 Fy (phi 1.00, Omega 1.50) and 0.60 Fu (phi 0.75, Omega 2.00). capacity = stress * throat * length.",
+    edition: "Groove weld (CJP / PJP) shear capacity - the AISC 360 Table J2.5 weld-metal shear strength 0.60*FEXX on the PJP effective throat, and the J4.2 base-metal shear for CJP - per AWS D1.1 Structural Welding Code and AISC 360 §J2, by name; first-principles.",
     freeAccess: "First-principles AISC J2 shear. A CJP weld with matching filler develops the base metal in tension/compression; the PJP effective throat is read off the qualified WPS. The WPS, weld inspector, and engineer of record govern.",
     governance: GOVERNANCE.structural,
     editionNote: "AWS D1.1 / AISC 360 §J2 Table J2.5. ASD vs LRFD is a labeled toggle; the resistance factors match the fillet-weld-strength tile, which it complements (groove throat vs fillet 0.707*leg).",
@@ -13854,14 +13854,14 @@ export const CITATIONS = {
     ],
   },
   "pool-chlorine-dose": {
-    formula: "lb_cl = ppm x (gallons/1e6) x 8.34; lb_prod = lb_cl / (avail/100); dry_oz = lb_prod x 16; liq_floz = (lb_prod/10) x 128.",
+    formula: "lb_cl = ppm x (gallons/1e6) x 8.34; lb_prod = lb_cl / (avail/100); dry_oz = lb_prod x 16; liq_floz = lb_cl / (avail/100 x 8.34) x 128 (liquid sold by trade percent, grams of available chlorine per 100 mL).",
     edition: "The standard pool free-chlorine dose mass balance and product available-chlorine fractions, by name.",
     freeAccess: "The 8.34 lb/gal water constant and product available-chlorine strengths are published free by pool-care references and product labels. The product label directions govern.",
     governance: GOVERNANCE.general,
-    editionNote: "The free-chlorine dose: pounds of chlorine = ppm x (gallons/1,000,000) x 8.34, divided by the product's available-chlorine fraction (liquid 12.5%, cal-hypo 65%, dichlor 56%, trichlor 90%, or a custom %) for the product weight, then dry ounces or (liquid ~10 lb/gal) fluid ounces. A weaker product needs proportionally more weight. This returns the dose to raise free chlorine by the target: it does not subtract the pool's existing chlorine demand and does not model the CYA (stabilizer) effect on effective chlorine. Dose to a target and retest; the product label directions govern.",
+    editionNote: "The free-chlorine dose: pounds of chlorine = ppm x (gallons/1,000,000) x 8.34, divided by the product's available-chlorine fraction (liquid 12.5%, cal-hypo 65%, dichlor 56%, trichlor 90%, or a custom %) for the product weight, then dry ounces, or for liquid (sold by trade percent, grams of available chlorine per 100 mL) fluid ounces from gallons = lb chlorine / (percent x 8.34). A weaker product needs proportionally more weight. This returns the dose to raise free chlorine by the target: it does not subtract the pool's existing chlorine demand and does not model the CYA (stabilizer) effect on effective chlorine. Dose to a target and retest; the product label directions govern.",
     assumptions: [
       { name: "Mass balance", value: "lb chlorine = ppm x (gal/1e6) x 8.34; product weight = /available fraction", source: "pool-care practice" },
-      { name: "Product strengths", value: "liquid 12.5%, cal-hypo 65%, dichlor 56%, trichlor 90%; liquid ~10 lb/gal", source: "product labels" },
+      { name: "Product strengths", value: "liquid 12.5% trade, cal-hypo 65%, dichlor 56%, trichlor 90%; liquid volume = lb chlorine / (trade percent x 8.34) gal", source: "product labels" },
       { name: "No demand/CYA", value: "does not subtract chlorine demand or model the CYA effect", source: "scope of this tile" },
     ],
   },
@@ -14089,7 +14089,7 @@ export const CITATIONS = {
     ],
   },
   "gutter-downspout": {
-    formula: "Adjusted area = plan area x pitch factor x (rainfall / 5 in/hr); downspouts = ceil((adjusted / 100) / downspout sq in); gutter 5 in K-style up to ~5,520 sq ft else 6 in.",
+    formula: "Adjusted area = plan area x pitch factor x (rainfall / 5 in/hr); downspouts = ceil((adjusted / 100) / downspout sq in); gutter design area = plan area x pitch factor x rainfall (in/hr): 5 in K-style up to 5,520, 6 in K-style up to 7,960, else split the run or go larger.",
     edition: "SMACNA / standard residential gutter method (by name).",
     freeAccess: "SMACNA licensed; rainfall intensity free from NOAA Atlas 14 at hdsc.nws.noaa.gov.",
     governance: GOVERNANCE.general,
@@ -14294,15 +14294,15 @@ export const CITATIONS = {
   },
   // spec-v1377..v1385: the 2026-08-26 trade-expansion Group J band.
   "tiedown-count": {
-    formula: "min_tiedowns = 1 if (length <= 5 ft and weight <= 1,100 lb), 2 if (length <= 5 ft and weight > 1,100 lb), 2 if (5 ft < length <= 10 ft), otherwise 2 + ceil((length - 10) / 10); required_wll_lb = 0.5 x weight_lb; provided_wll_lb = tiedowns x (full WLL if secured at both ends, half otherwise).",
+    formula: "min_tiedowns = 1 if (length <= 5 ft and weight <= 1,100 lb), 2 if (length <= 5 ft and weight > 1,100 lb), 2 if (5 ft < length <= 10 ft), otherwise 2 + ceil((length - 10) / 10); required_wll_lb = 0.5 x weight_lb; provided_wll_lb = tiedowns x (full WLL for a tiedown over the cargo to an anchor on the other side of the vehicle, half for one that runs direct from vehicle to cargo or over the cargo back to the same side).",
     edition: "49 CFR 393.110 minimum tiedown count by article length and 49 CFR 393.106 aggregate working load limit at half the cargo weight, cited by section and not reproduced; both rules apply and the controlling one is named. 49 CFR 393 in full, the working load limits marked on the actual hardware, and the driver's inspection govern.",
     freeAccess: "The federal securement rules are public law, cited by section rather than mirrored. The article's length and weight and the hardware's marked working load limits are the driver's own values.",
     governance: GOVERNANCE.general,
-    editionNote: "Cargo securement is governed by two independent rules and the securement has to satisfy both, which is the fact a crew that has learned only one of them will be wrong about half the time. The count rule is about the article's length. An article of five feet or less weighing eleven hundred pounds or less takes one tiedown, and a heavier short article takes two. Anything over five feet and up to ten takes two regardless of weight. Past ten feet the requirement is two plus one more for each additional ten feet or fraction of it, because long cargo needs more attachment points so that it cannot rotate or shift within the securement, and that count keeps climbing no matter how light the piece is. The aggregate working load limit rule is about weight: the sum of the tiedowns' working load limits must be at least half the cargo weight, on the reasoning that a tiedown restrains in more than one direction. How a tiedown is rigged changes what it contributes, because one that passes over the load and is secured at both ends counts its full working load limit while one anchored at a single end counts half. Long light cargo is a count problem and short heavy cargo is a working-load-limit problem, so both numbers and the controlling one are reported together.",
+    editionNote: "Cargo securement is governed by two independent rules and the securement has to satisfy both, which is the fact a crew that has learned only one of them will be wrong about half the time. The count rule is about the article's length. An article of five feet or less weighing eleven hundred pounds or less takes one tiedown, and a heavier short article takes two. Anything over five feet and up to ten takes two regardless of weight. Past ten feet the requirement is two plus one more for each additional ten feet or fraction of it, because long cargo needs more attachment points so that it cannot rotate or shift within the securement, and that count keeps climbing no matter how light the piece is. The aggregate working load limit rule is about weight: the sum of the tiedowns' working load limits must be at least half the cargo weight, on the reasoning that a tiedown restrains in more than one direction. How a tiedown is rigged changes what it contributes, because one that passes over or around the load to an anchor on the other side of the vehicle counts its full working load limit, while one that runs direct from the vehicle to the cargo, or over the cargo back to the same side, counts half. Long light cargo is a count problem and short heavy cargo is a working-load-limit problem, so both numbers and the controlling one are reported together.",
     assumptions: [
       { name: "Count rule", value: "by article LENGTH: 1 or 2 up to 5 ft by weight, 2 through 10 ft, then 2 + one per additional 10 ft or fraction", source: "49 CFR 393.110" },
       { name: "Aggregate WLL rule", value: "the sum of tiedown working load limits must be at least half the cargo weight", source: "49 CFR 393.106" },
-      { name: "Both ends", value: "a tiedown secured at both ends counts full WLL; anchored at one end it counts half", source: "49 CFR 393.106" },
+      { name: "Tiedown path", value: "over the cargo to the other side counts full WLL; direct from vehicle to cargo, or over the cargo back to the same side, counts half", source: "49 CFR 393.106(d)" },
     ],
   },
   "kingpin-to-axle": {
@@ -14469,13 +14469,13 @@ export const CITATIONS = {
     ],
   },
   "sacrificial-anode-life": {
-    formula: "life_hours = anode_mass_lb x capacity_Ah_per_lb x utilization / current_A; life_years = life_hours / 8760. Capacity: zinc 354, aluminum (Al-Zn-In) 1150, magnesium 500 A-h/lb.",
+    formula: "life_hours = anode_mass_lb x capacity_Ah_per_lb x utilization / current_A; life_years = life_hours / 8760. Capacity: zinc 354, aluminum (Al-Zn-In) 907, magnesium 500 A-h/lb.",
     edition: "Sacrificial-anode life by Faraday's law of electrolysis (ABYC E-2 cathodic protection; DNV-RP-B401 anode capacities), by name; a corrosion survey and reference-cell reading govern.",
     freeAccess: "Faraday's law is public; the electrochemical capacities are published anode-material properties. The protective current comes from a reference-electrode measurement of the boat.",
     governance: GOVERNANCE.general,
-    editionNote: "Sacrificial-anode life by Faraday's law: the charge an anode can deliver (net mass x electrochemical capacity x utilization) divided by the charge the protective current draws per year (current x 8760 h). Electrochemical capacity is a material property -- zinc ~354 A-h/lb, aluminum Al-Zn-In ~1150, magnesium ~500 -- so an aluminum anode of equal mass lasts far longer per amp and works in brackish water where zinc passivates, which is why aluminum has largely replaced zinc on modern boats. The utilization factor (~0.85 for a slender standoff anode) accounts for the anode becoming ineffective before it is fully consumed. The protective current depends on the wetted area, coating, and water, so it must be measured with a reference electrode or bonding-system meter. Replace an anode at about half consumed. A planning estimate, not a corrosion survey; the reference-cell reading governs.",
+    editionNote: "Sacrificial-anode life by Faraday's law: the charge an anode can deliver (net mass x electrochemical capacity x utilization) divided by the charge the protective current draws per year (current x 8760 h). Electrochemical capacity is a material property -- zinc ~354 A-h/lb, aluminum Al-Zn-In ~907 (the DNV-RP-B401 seawater design values), magnesium ~500 -- so an aluminum anode of equal mass lasts far longer per amp and works in brackish water where zinc passivates, which is why aluminum has largely replaced zinc on modern boats. The utilization factor (~0.85 for a slender standoff anode) accounts for the anode becoming ineffective before it is fully consumed. The protective current depends on the wetted area, coating, and water, so it must be measured with a reference electrode or bonding-system meter. Replace an anode at about half consumed. A planning estimate, not a corrosion survey; the reference-cell reading governs.",
     assumptions: [
-      { name: "Electrochemical capacity", value: "zinc ~354, aluminum (Al-Zn-In) ~1150, magnesium ~500 A-h/lb", source: "DNV-RP-B401 / ABYC E-2" },
+      { name: "Electrochemical capacity", value: "zinc ~354, aluminum (Al-Zn-In) ~907, magnesium ~500 A-h/lb (zinc and aluminum are the DNV-RP-B401 seawater design values; magnesium is the common design figure)", source: "DNV-RP-B401 / ABYC E-2" },
       { name: "Utilization factor", value: "~0.85 for a slender standoff anode (the anode is ineffective before fully consumed)", source: "DNV-RP-B401" },
     ],
   },
@@ -15234,7 +15234,7 @@ export const CITATIONS = {
     ],
   },
   "master-key-bitting-capacity": {
-    formula: "theoretical combinations = usable depths raised to the number of cut positions; a two-step progression yields about half the usable depths per mastered position, so change keys = that raised to the number of mastered positions.",
+    formula: "theoretical combinations = usable depths raised to the number of cut positions; a two-step progression yields floor(usable depths / 2) - 1 per mastered position (every other depth, less the one the master claims), so change keys = that raised to the number of mastered positions.",
     edition: "The progression capacity relation as standard master keying practice, by name, with the lock manufacturer's system specification named as governing the usable depth count, the cut rules, and the keyway restrictions.",
     freeAccess: "A power and a product on counts the user supplies; no manufacturer bitting specification is reproduced.",
     governance: GOVERNANCE.general,
@@ -16330,13 +16330,13 @@ export const CITATIONS = {
     ],
   },
   "winch-drum-line-pull": {
-    formula: "Dn = drum_dia + (2n - 1) x rope_dia; Pn = rated_pull x drum_dia / Dn; Vn = drum_speed x Dn / drum_dia; wraps_per_layer = floor(barrel_width / rope_dia).",
+    formula: "Dn = drum_dia + (2n - 1) x rope_dia; Pn = rated_pull x (drum_dia + rope_dia) / Dn (the rating is the first-layer figure at the first wrap's centerline); Vn = first-layer speed x Dn / (drum_dia + rope_dia); wraps_per_layer = floor(barrel_width / rope_dia).",
     edition: "Wire-rope drum mechanics / SAE winch rating convention, by name.",
     freeAccess: "Drum line-pull mechanics are a public engineering result; the winch manufacturer's layer ratings govern.",
     governance: GOVERNANCE.rigging,
     editionNote: "The rated line pull is a bare-drum figure for the first wrap and it falls layer by layer as the growing moment arm works against the motor (outer layers can be 30-40% weaker) while the line speed rises in proportion; the rope must also fit the drum capacity. A planning aid, not the winch's certified capacity.",
     assumptions: [
-      { name: "Mean-diameter model", value: "Dn = drum + (2n-1) x rope_dia; pull inversely proportional to mean diameter", source: "drum mechanics" },
+      { name: "Mean-diameter model", value: "Dn = drum + (2n-1) x rope_dia; pull inversely proportional to mean diameter, referenced to the first layer at drum + rope_dia", source: "drum mechanics" },
       { name: "Layer ratings govern", value: "the winch manufacturer's published per-layer ratings are authoritative", source: "SAE winch rating" },
     ],
   },
@@ -16554,13 +16554,13 @@ export const CITATIONS = {
   },
   "ashrae-622-ventilation": {
     formula: "q_tot = 0.03 x floor_area_ft2 + 7.5 x (bedrooms + 1); q_fan = max(0, q_tot - Phi x infil_credit_cfm x Aext), Phi = 1 balanced or infil_credit / q_tot unbalanced (ASHRAE 62.2 Eq. 4.2); verdict = q_fan > 0 (fan required) else (credit meets Qtot).",
-    edition: "ASHRAE 62.2-2019 §4.1 whole-house ventilation rate (Qtot = 0.03 x Afloor + 7.5 x (Nbr + 1)) and the fan flow Qfan = Qtot - Qinf, by name; the 0.03 cfm/ft^2 and 7.5 cfm/person are the standard's rate coefficients.",
+    edition: "ASHRAE 62.2-2019 §4.1 whole-house ventilation rate (Qtot = 0.03 x Afloor + 7.5 x (Nbr + 1)) and the fan flow Qfan = Qtot - Phi (Qinf x Aext) (Eq. 4.2), by name; the 0.03 cfm/ft^2 and 7.5 cfm/person are the standard's rate coefficients.",
     freeAccess: "The whole-house ventilation rate and the fan-flow relation are stated in ASHRAE 62.2-2019 §4.1; the arithmetic is public. The infiltration credit comes from the measured air-tightness.",
     governance: GOVERNANCE.general,
-    editionNote: "ASHRAE 62.2-2019 §4.1 gives Qtot = 0.03 x Afloor + 7.5 x (Nbr + 1) and the fan flow Qfan = Qtot - Qinf, where Qinf is the infiltration credit. The bedroom count is the standard's occupancy proxy (occupants assumed = Nbr + 1); the infiltration credit comes from the measured air-tightness per the 62.2 infiltration method (the conservative default is zero credit, sizing the fan to the full Qtot); local exhaust (kitchen and bath) is a separate 62.2 requirement this tile does not cover. A sizing aid, not a 62.2 compliance certificate.",
+    editionNote: "ASHRAE 62.2-2019 §4.1 gives Qtot = 0.03 x Afloor + 7.5 x (Nbr + 1) and the fan flow Qfan = Qtot - Phi (Qinf x Aext) (Eq. 4.2), where Qinf is the infiltration credit, Phi = 1 for a balanced system and Qinf / Qtot for an exhaust- or supply-only one, and Aext = 1 for a detached house or the exterior share of the envelope for an attached unit. The bedroom count is the standard's occupancy proxy (occupants assumed = Nbr + 1); the infiltration credit comes from the measured air-tightness per the 62.2 infiltration method (the conservative default is zero credit, sizing the fan to the full Qtot); local exhaust (kitchen and bath) is a separate 62.2 requirement this tile does not cover. A sizing aid, not a 62.2 compliance certificate.",
     assumptions: [
       { name: "Total required Qtot", value: "Qtot = 0.03 x conditioned floor area + 7.5 x (bedrooms + 1); occupants assumed Nbr + 1", source: "ASHRAE 62.2-2019 §4.1" },
-      { name: "Fan flow", value: "Qfan = max(0, Qtot - infiltration credit); the tighter the house, the smaller the credit and the larger the fan", source: "ASHRAE 62.2-2019" },
+      { name: "Fan flow", value: "Qfan = max(0, Qtot - Phi x infiltration credit x Aext), Phi = 1 balanced or Qinf / Qtot unbalanced; the tighter the house, the smaller the credit and the larger the fan", source: "ASHRAE 62.2-2019" },
       { name: "Infiltration credit", value: "the credit is the blower-door natural infiltration; the conservative default is zero", source: "first principles" },
     ],
   },
@@ -16845,7 +16845,7 @@ export const CITATIONS = {
     ],
   },
   "compressed-air-power": {
-    formula: "p2_abs = discharge_psig + 14.7; theo_hp = 0.004364 x inlet_psia x free_air_cfm x (k/(k-1)) x ((p2_abs/inlet_psia)^((k-1)/k) - 1); input_kw = theo_hp x 0.746 / overall_eff; annual_kwh = input_kw x run_hours; annual_cost = annual_kwh x rate_kwh. (k = 1.4)",
+    formula: "p2_abs = discharge_psig + inlet_psia (gauge pressure is read against the local atmosphere at the inlet); theo_hp = 0.004364 x inlet_psia x free_air_cfm x (k/(k-1)) x ((p2_abs/inlet_psia)^((k-1)/k) - 1); input_kw = theo_hp x 0.746 / overall_eff; annual_kwh = input_kw x run_hours; annual_cost = annual_kwh x rate_kwh. (k = 1.4)",
     edition: "The standard single-stage adiabatic (isentropic) compression power (hp = 0.004364 x P1 x Q x (k/(k-1)) x [(P2/P1)^((k-1)/k) - 1], P in psia, Q in cfm free air, k = 1.4), by name; the 0.004364 = 144/33,000 unit constant and 0.746 kW/hp are named.",
     freeAccess: "The isentropic compression-power relation is a public closed-form thermodynamic result; the DOE compressed-air sourcebook is free at energy.gov.",
     governance: GOVERNANCE.general,
@@ -16906,7 +16906,7 @@ export const CITATIONS = {
     edition: "Motor duty-cycle RMS-horsepower sizing method (NEMA MG-1 duty-cycle practice; standard motor-application references), by name; the motor's thermal-damage curve and duty rating govern.",
     freeAccess: "The RMS-horsepower relation is public engineering practice (the root-mean-square heating equivalent); the load horsepowers, the run and idle times, and the cooling factor come from the driven-load duty cycle and the motor's cooling type.",
     governance: GOVERNANCE.general,
-    editionNote: "The RMS (root-mean-square) horsepower of a repeating duty cycle is the single constant horsepower that heats the motor the same as the real varying load, so it sets the smallest CONTINUOUS-rated motor that will not overheat on that cycle. Because motor heating goes as current squared and current tracks horsepower, the equivalent is a root-mean-square, not a simple average: HP_rms = sqrt( (HP_run^2 x t_run + HP_idle^2 x t_idle) / (t_run + t_idle / K) ). The denominator is an EFFECTIVE time: the idle or stopped time is divided by the cooling factor K because a self-cooled (fan-on-shaft) motor moves less or no cooling air when it is stopped or turning slowly, so that time counts for less cooling -- K is commonly taken as ~3 for a motor stopped at standstill and ~2 for a motor running unloaded, and it is editable. A larger K (worse idle cooling) raises the required RMS horsepower. This method sizes the THERMAL (heating) duty only; the PEAK horsepower on the cycle must separately fall within the motor's breakdown-torque capability, or the motor stalls regardless of its thermal rating. A screen; the motor's thermal-damage curve, service factor, and the manufacturer's duty (S1-S10) rating govern.",
+    editionNote: "The RMS (root-mean-square) horsepower of a repeating duty cycle is the single constant horsepower that heats the motor the same as the real varying load, so it sets the smallest CONTINUOUS-rated motor that will not overheat on that cycle. Because motor heating goes as current squared and current tracks horsepower, the equivalent is a root-mean-square, not a simple average: HP_rms = sqrt( (HP_run^2 x t_run + HP_idle^2 x t_idle) / (t_run + t_idle / K) ). The denominator is an EFFECTIVE time: only the STOPPED time (hp_idle = 0) is divided by the standstill cooling factor K, because a self-cooled (fan-on-shaft) motor loses its fan at standstill -- K = 3 for an open drip-proof motor and 2 for a totally enclosed one, editable; a segment that still runs counts at full time. A larger K (worse standstill cooling) raises the required RMS horsepower. This method sizes the THERMAL (heating) duty only; the PEAK horsepower on the cycle must separately fall within the motor's breakdown-torque capability, or the motor stalls regardless of its thermal rating. A screen; the motor's thermal-damage curve, service factor, and the manufacturer's duty (S1-S10) rating govern.",
     assumptions: [
       { name: "RMS heating equivalent", value: "HP_rms = sqrt(sum(HP^2 t) / effective_time); heating goes as HP^2, so the equivalent is a root-mean-square", source: "motor-application practice" },
       { name: "Standstill cooling factor", value: "stopped time divided by C = 3 (open drip-proof) or 2 (totally enclosed) because a self-cooled motor at standstill loses its fan; running time counts in full; peak-vs-breakdown-torque is a separate check", source: "E. Cowern (Baldor), Economical motor sizing for peak loads, Machine Design, 2001" },
@@ -19037,7 +19037,7 @@ export const CITATIONS = {
     ],
   },
   "rc-column-steel-for-load": {
-    formula: "Ag = b x h; Ast = (phi Pn / 0.52 - 0.85 f'c Ag) / (fy - 0.85 f'c), the inverse of phi Pn = 0.80 x 0.65 x [0.85 f'c (Ag - Ast) + fy Ast]; reported Ast = max(strength, 0.01 Ag); flag over 0.08 Ag.",
+    formula: "Ag = b x h; Ast = (phi Pn / 0.52 - 0.85 f'c Ag) / (fy - 0.85 f'c), with fy capped at 80,000 psi (ACI 318-19 22.4.2.1), the inverse of phi Pn = 0.80 x 0.65 x [0.85 f'c (Ag - Ast) + fy Ast]; reported Ast = max(strength, 0.01 Ag); flag over 0.08 Ag.",
     edition: "The ACI 318-19 22.4.2 concentric tied-column axial strength (22.4.2.1 cap 0.80 phi Po, phi = 0.65) with the 10.6.1 ratio limits, solved for the longitudinal steel, by name.",
     freeAccess: "ACI 318 is readable free through the ACI online reading room at concrete.org; the 22.4 axial provisions and 10.6.1 limits are in the published code.",
     governance: GOVERNANCE.general,
@@ -19049,7 +19049,7 @@ export const CITATIONS = {
     ],
   },
   "rc-column-axial": {
-    formula: "Ag = b x h; rho_g = Ast / Ag (flagged outside 0.01..0.08); Po = 0.85 f'c (Ag - Ast) + fy Ast; phi Pn,max = 0.80 x 0.65 x Po.",
+    formula: "Ag = b x h; rho_g = Ast / Ag (flagged outside 0.01..0.08); Po = 0.85 f'c (Ag - Ast) + fy Ast with fy not more than 80,000 psi (22.4.2.1); phi Pn,max = 0.80 x 0.65 x Po.",
     edition: "The ACI 318-19 22.4.2 nominal axial strength of a non-prestressed compression member and the 22.4.2.1 tied-column maximum (0.80 phi Po, phi = 0.65 compression-controlled tied), with the 10.6.1 longitudinal-reinforcement ratio limits, by name.",
     freeAccess: "ACI 318 is readable free through the ACI online reading room at concrete.org; the 22.4 axial provisions and 10.6.1 limits are in the published code.",
     governance: GOVERNANCE.general,
@@ -19121,11 +19121,11 @@ export const CITATIONS = {
     ],
   },
   "rc-slender-column-magnify": {
-    formula: "Cm = max(0.6 + 0.4 M1/M2, 0.4); Pc = pi^2 EI / (k lu)^2; delta_ns = max(Cm/(1 - Pu/(0.75 Pc)), 1.0); Mc = max(delta_ns M2, M2,min), M2,min = Pu(0.6 + 0.03 h).",
+    formula: "Cm = 0.6 - 0.4 M1/M2 (ACI 318-19 Eq. 6.6.4.5.3a; M1/M2 negative for single curvature, positive for double, no lower bound); Pc = pi^2 EI / (k lu)^2; delta_ns = max(Cm/(1 - Pu/(0.75 Pc)), 1.0); Mc = max(delta_ns M2, M2,min), M2,min = Pu(0.6 + 0.03 h).",
     edition: "The ACI 318-19 Section 6.6.4.5 nonsway (braced) slender-column moment magnifier, by name.",
     freeAccess: "ACI 318 is readable free through the ACI online reading room at concrete.org; the Section 6.6.4 slenderness provisions are in the published code.",
     governance: GOVERNANCE.general,
-    editionNote: "The critical buckling load Pc carries a 0.75 stiffness reduction in the magnifier denominator; the design moment is floored at M2,min = Pu(0.6 + 0.03h); a column just over the slenderness limit k lu/r <= 34 - 12(M1/M2) picks up an amplifier the flexure check never applies; M1/M2 is negative for double curvature (lowering Cm). This is the nonsway (braced-frame) magnifier only. A design aid, not the engineer of record.",
+    editionNote: "The critical buckling load Pc carries a 0.75 stiffness reduction in the magnifier denominator; the design moment is floored at M2,min = Pu(0.6 + 0.03h); a column just over the slenderness limit k lu/r <= 34 + 12(M1/M2) (ACI 318-19 Eq. 6.2.5.1b) picks up an amplifier the flexure check never applies; in ACI 318-19, M1/M2 is negative for single curvature (Cm up to 1.0) and positive for double curvature (lowering Cm, to 0.2 at M1 = M2), the reverse of the pre-2014 sign convention. This is the nonsway (braced-frame) magnifier only. A design aid, not the engineer of record.",
     assumptions: [
       { name: "Nonsway frame", value: "braced (nonsway) 6.6.4.5 magnifier; a sway frame uses the 6.6.4.6 delta_s procedure", source: "ACI 318-19 6.6.4.5" },
       { name: "0.75 stiffness factor", value: "Pc appears as 0.75 Pc in the denominator (the stiffness-reduction factor)", source: "ACI 318-19 6.6.4.5.2" },
@@ -19341,12 +19341,12 @@ export const CITATIONS = {
     edition: "IRC R1003.15.1 (Option 1), Flue area (masonry fireplace), with the identical text at IBC 2113.16.1. Option 1 states no height condition (this tile advises a check below 15 ft) high measured from the firebox floor to the top of the chimney flue.",
     freeAccess: "The three ratios are short prescriptive sentences in a widely adopted model code and are quoted in state amendments and code-viewer sites. The code's Option 2 sizing FIGURE (R1003.15.2) and the clay flue liner area tables (R1003.14) are not reproduced here.",
     governance: GOVERNANCE.general,
-    editionNote: "Shape drives the allowance because a round flue moves smoke with the least loss and gets the smallest required fraction, while a narrow rectangle wastes part of its cross section in the corners and boundary layer and is held to the largest. The two traps this tile exists to catch: a clay flue liner's NOMINAL size is its outside size, and its net inside area is meaningfully smaller, so sizing off the nominal number silently overstates the flue - this tile takes the ACTUAL inside dimensions; and every one of these ratios is conditional on a chimney at least 15 ft tall from the firebox FLOOR to the top of the flue, so a short chimney has to be sized by the code's height-versus-opening figure instead and will want a larger flue. Flue AREA only. A flue that passes this test can still smoke, because draft also depends on chimney height and termination, the throat and smoke-chamber geometry, and whether the room has a combustion-air path; the chimney-draft and chimney-height-for-draft tiles cover the pressure side. A screen; the adopted code, the liner manufacturer's net-area data, and the AHJ govern.",
+    editionNote: "Shape drives the allowance because a round flue moves smoke with the least loss and gets the smallest required fraction, while a narrow rectangle wastes part of its cross section in the corners and boundary layer and is held to the largest. The two traps this tile exists to catch: a clay flue liner's NOMINAL size is its outside size, and its net inside area is meaningfully smaller, so sizing off the nominal number silently overstates the flue - this tile takes the ACTUAL inside dimensions; and Option 1 states no chimney height condition, so the tile's 15 ft check (firebox FLOOR to the top of the flue) is an advisory drawn from Option 2's height-versus-opening figure: a short chimney will want a larger flue. Flue AREA only. A flue that passes this test can still smoke, because draft also depends on chimney height and termination, the throat and smoke-chamber geometry, and whether the room has a combustion-air path; the chimney-draft and chimney-height-for-draft tiles cover the pressure side. A screen; the adopted code, the liner manufacturer's net-area data, and the AHJ govern.",
     assumptions: [
       { name: "Round flue ratio", value: "net area at least 1/12 of the fireplace opening", source: "IRC R1003.15.1 / IBC 2113.16.1" },
       { name: "Square and under-2:1 rectangular ratio", value: "net area at least 1/10 of the opening", source: "IRC R1003.15.1 / IBC 2113.16.1" },
       { name: "2:1 or greater rectangular ratio", value: "net area at least 1/8 of the opening", source: "IRC R1003.15.1 / IBC 2113.16.1" },
-      { name: "Minimum chimney height", value: "15 ft, firebox floor to top of flue; below that, Option 2 governs", source: "IRC R1003.15.1 condition" },
+      { name: "Chimney height advisory", value: "a chimney under 15 ft, firebox floor to top of flue, is flagged as advisory; Option 1 itself states no height condition", source: "IRC R1003.15.1 Option 2 figure" },
       { name: "Liner net area", value: "user-entered ACTUAL inside dimensions; nominal size is the outside size", source: "stated scope limit; liner tables not reproduced" },
       { name: "Area check only", value: "not a draft, throat, smoke-chamber, or termination check", source: "stated scope limit" },
     ],
@@ -19573,13 +19573,13 @@ export const CITATIONS = {
     ],
   },
   "slip-critical-with-tension": {
-    formula: "ksc = 1 - Tu/(Du Tb nb) (Eq. J3-5a, LRFD), floored at 0; reduced slip resistance = ksc x Rn where Rn = mu Du hf Tb ns; phi = 1.00, Omega = 1.50 for standard holes.",
+    formula: "ksc = 1 - Tu/(Du Tb nb) (Eq. J3-5a, LRFD), floored at 0; reduced slip resistance = ksc x Rn where Rn = mu Du hf Tb ns; LRFD phi = 1.00; ASD uses its own ksc = 1 - 1.5 Ta/(Du Tb nb) (Eq. J3-5b, the entered tension read as the service-level Ta), floored at 0, with Omega = 1.50; standard holes.",
     edition: "AISC 360 Section J3.9, slip-critical connections subject to combined tension and shear, by section number; the unreduced resistance comes from this catalog's landed slip-critical tile rather than being recomputed.",
     freeAccess: "AISC 360 is available through AISC; the J3.9 interaction expression is a published code equation.",
     governance: GOVERNANCE.structural,
     editionNote: "Applied tension relieves part of the clamping force a slip-critical joint runs on, so the slip resistance is scaled by ksc. Note the denominator uses Du Tb - the MEAN installed pretension, not the specified minimum - because the reduction is measured against the pretension actually present, which is why Du appears here as well as in the base resistance. Past Tu = Du Tb nb the factor reaches zero and the joint has NO slip resistance left: the bolts may be intact but the faying surfaces are free to move. THIS IS THE SLIP CHECK ONLY, and slip is a SERVICEABILITY limit - the strength-level bolt shear and bearing check (bolt-shear-bearing) and the J3.7 combined tension-shear rupture check (steel-bolt-tension-shear) are separate, and a joint can pass all three or fail any one independently. Prying action increases the tension the bolts actually see beyond the applied load and is NOT modeled; it matters most on thin end plates and tees. Standard holes assumed. AISC 360 and the engineer of record govern.",
     assumptions: [
-      { name: "ksc interaction", value: "1 - Tu/(Du Tb nb), floored at zero", source: "AISC 360 Eq. J3-5a" },
+      { name: "ksc interaction", value: "LRFD 1 - Tu/(Du Tb nb); ASD 1 - 1.5 Ta/(Du Tb nb); each floored at zero", source: "AISC 360 Eq. J3-5a / J3-5b" },
       { name: "Mean pretension", value: "Du Tb, not the specified minimum, is the clamping force the tension is measured against", source: "AISC 360 J3.9" },
       { name: "Slip only", value: "serviceability limit; shear/bearing and J3.7 rupture are separate checks", source: "AISC 360 J3.7, J3.10" },
       { name: "No prying", value: "prying action raises the actual bolt tension and is not modeled", source: "stated scope limit" },
@@ -19670,11 +19670,11 @@ export const CITATIONS = {
     ],
   },
   "rc-punching-shear": {
-    formula: "bo = 2(c1 + d) + 2(c2 + d); beta = max(c1,c2)/min(c1,c2); vc = min(4, 2 + 4/beta, 2 + alpha_s d/bo) x lambda sqrt(f'c); phi Vc = 0.75 vc bo d. (alpha_s = 40/30/20 interior/edge/corner)",
+    formula: "bo = 2(c1 + d) + 2(c2 + d) interior, 2(c1 + d/2) + (c2 + d) edge, (c1 + d/2) + (c2 + d/2) corner (c1 perpendicular to the edge); beta = max(c1,c2)/min(c1,c2); vc = min(4, 2 + 4/beta, 2 + alpha_s d/bo) x lambda sqrt(f'c); phi Vc = 0.75 vc bo d. (alpha_s = 40/30/20 interior/edge/corner)",
     edition: "The ACI 318-19 Table 22.6.5.2 two-way (punching) shear stress (least of the three terms) on the 22.6.4.1 critical section at d/2 from the column face, with alpha_s = 40/30/20 and phi = 0.75, by name.",
     freeAccess: "ACI 318 is readable free through the ACI online reading room at concrete.org; Table 22.6.5.2 and the 22.6.4.1 critical-section definition are in the published code.",
     governance: GOVERNANCE.general,
-    editionNote: "The ACI 318-19 Table 22.6.5.2 two-way shear stress as the least of 4 lambda sqrt(f'c), (2 + 4/beta) lambda sqrt(f'c), and (2 + alpha_s d/bo) lambda sqrt(f'c), the d/2 critical perimeter, alpha_s = 40/30/20 for an interior/edge/corner column, and phi = 0.75. This returns the concrete two-way shear capacity on the d/2 critical section for a rectangular column - it assumes shear without unbalanced-moment transfer (no gamma_v eccentric-shear amplification), no shear reinforcement or shear-cap/drop panel, and a rectangular column with the full perimeter available. A design aid, not a substitute for the structural engineer of record's stamped design.",
+    editionNote: "The ACI 318-19 Table 22.6.5.2 two-way shear stress as the least of 4 lambda sqrt(f'c), (2 + 4/beta) lambda sqrt(f'c), and (2 + alpha_s d/bo) lambda sqrt(f'c), the d/2 critical perimeter, alpha_s = 40/30/20 for an interior/edge/corner column, and phi = 0.75. This returns the concrete two-way shear capacity on the d/2 critical section for a rectangular column - it assumes shear without unbalanced-moment transfer (no gamma_v eccentric-shear amplification), no shear reinforcement or shear-cap/drop panel, and a rectangular column; the edge column takes a three-sided perimeter and the corner column a two-sided one, with the slab edge flush with the column face. A design aid, not a substitute for the structural engineer of record's stamped design.",
     assumptions: [
       { name: "Critical section", value: "the perimeter bo at d/2 from the column faces; capacity phi vc bo d", source: "ACI 318-19 22.6.4.1" },
       { name: "Three-term least", value: "4, 2 + 4/beta, and 2 + alpha_s d/bo, each x lambda sqrt(f'c); the least governs", source: "ACI 318-19 Table 22.6.5.2" },
@@ -19944,8 +19944,8 @@ export const CITATIONS = {
     ],
   },
   "cleanout-layout": {
-    formula: "spacing cleanouts = max(0, ceil(run / max spacing) - 1), assuming the run begins at one; change cleanouts = min(changes - grouped away, ceil(run / 40)); stack cleanouts = one per waste or soil stack; total = the sum of the three. Access passes when a cleanout 6 in and smaller has at least 18 in of clear space at the opening and, in a crawl space, at least 24 in of unobstructed pathway height.",
-    edition: "IPC 708 - horizontal drains provided with cleanouts not more than 100 ft apart; a cleanout at each change of horizontal direction greater than 45 degrees, with the cleanout at the first change serving all changes occurring within 40 ft of developed length; a cleanout at the base of each waste or soil stack; not less than 18 in of clear space at the opening of cleanouts 6 in and smaller; and not less than 24 in of unobstructed pathway height where a cleanout is located in a crawl space.",
+    formula: "spacing cleanouts = max(0, ceil(run / max spacing) - 1), assuming the run begins at one; change cleanouts = min(changes - grouped away, ceil(run / 40)); stack cleanouts = one per waste or soil stack, reported as practice only; total = spacing + change cleanouts (stacks are left out). Access passes when a cleanout 6 in and smaller has at least 18 in of clear space at the opening and, in a crawl space, at least 24 in of unobstructed pathway height.",
+    edition: "IPC 708 - horizontal drains provided with cleanouts not more than 100 ft apart; a cleanout at each change of horizontal direction greater than 45 degrees, with the cleanout at the first change serving all changes occurring within 40 ft of developed length; not less than 18 in of clear space at the opening of cleanouts 6 in and smaller; and not less than 24 in of unobstructed pathway height where a cleanout is located in a crawl space.",
     freeAccess: "All four provisions are short prescriptive sentences reproduced in state and municipal adoptions and trade commentary. No table is reproduced and the spacing limit is an editable input.",
     governance: GOVERNANCE.general,
     editionNote: "The two code triggers are additive and independent, which is the arithmetic people get wrong: a run counted only by the 100 ft spacing rule misses the bends, and a run counted bend-by-bend overshoots. IPC 2021 section 708 has no base-of-stack cleanout rule; stack bases are reported separately as practice. The grouping allowance is the interesting one. Because the cleanout at the FIRST change of direction over 45 degrees serves every such change within 40 ft of developed length, the change-driven count can never exceed ceil(run / 40) however many elbows appear on the drawing - so a 240 ft run is capped at six change cleanouts even with nine bends, and the tile reports the cap next to the entered count and says which governed. That allowance is what keeps a tightly routed drain from needing a fitting at every elbow, and it is routinely forgotten in both directions. The spacing count assumes the run BEGINS at a cleanout - a stack base, an upstream cleanout, or wherever the code otherwise puts one - and the note says to add one at the head if it does not. Access is treated as a requirement rather than a courtesy because it is where cleanouts get value-engineered into uselessness: an 18 in clear space at the opening for cleanouts 6 in and smaller, and a 24 in unobstructed pathway height in a crawl space. A cleanout that cannot be reached and turned does not count as one, and the tile says so. Cleanouts larger than 6 in carry their own larger clearance requirement, which is not checked. Also not checked: cleanout SIZE relative to the pipe, whether a fitting or a fixture may serve as the cleanout, the building drain and building sewer junction, manholes on large sewers, the direction the cleanout must face, concealed piping and access covers, and cleanout material and thread type. A screen; the adopted code and the AHJ govern.",
@@ -20048,11 +20048,11 @@ export const CITATIONS = {
     ],
   },
   "plumbing-fixture-count": {
-    formula: "per_sex = ol x distribution; wc(sex) = ceil(min(per_sex, wc_tier) / wc_ratio) + (wc_ratio_over > 0 ? ceil(max(per_sex - wc_tier, 0) / wc_ratio_over) : 0); lav(sex) = ceil(per_sex / lav_ratio); fountains = ceil(ol / fountain_ratio); service = 1.",
+    formula: "per_sex = ol x distribution; wc(sex) = ceil(min(per_sex, wc_tier) / wc_ratio) + (wc_ratio_over > 0 ? ceil(max(per_sex - wc_tier, 0) / wc_ratio_over) : 0); lav(sex) = ceil(min(per_sex, lav_tier) / lav_ratio) + (lav_tier > 0 and lav_ratio_over > 0 ? ceil(max(per_sex - lav_tier, 0) / lav_ratio_over) : 0); fountains = ceil(ol / fountain_ratio); service = 1.",
     edition: "IBC 2021 §2902 and Table 2902.1 (minimum plumbing fixtures by occupancy, mirrored in IPC Table 403.1) and §2902.1.1 (round each ratio up), by name.",
     freeAccess: "The fixture-count relation is stated in the published IBC §2902 / Table 2902.1; the arithmetic is public. The ratios are the table values for the occupancy.",
     governance: GOVERNANCE.general,
-    editionNote: "IBC 2021 §2902 and Table 2902.1: per sex, fixtures = ceil(occupants-per-sex / ratio), each rounded up per §2902.1.1, with a two-tier business water-closet schedule; drinking fountains and service sinks are counted on the total load. Bundled representative ratios (editable): business water closet 1:25 first-50 then 1:50 and lavatory 1:40; assembly-restaurant water closet 1:75 and lavatory 1:200; drinking fountain 1:100 business / 1:500 assembly; service sink minimum 1. The ratios, the net-vs-gross basis, the even-sex-split assumption, and any single-user / family-restroom or reduction allowances come from the AHJ-adopted code edition and the actual occupancy; employee and customer loads may be counted separately. A design aid, not a code-official determination.",
+    editionNote: "IBC 2021 §2902 and Table 2902.1: per sex, fixtures = ceil(occupants-per-sex / ratio), each rounded up per §2902.1.1, with two-tier business water-closet and lavatory schedules; drinking fountains and service sinks are counted on the total load. Bundled representative ratios (editable): business water closet 1:25 first-50 then 1:50 and lavatory 1:40 first-80 then 1:80; assembly-restaurant water closet 1:75 and lavatory 1:200; drinking fountain 1:100 business / 1:500 assembly; service sink minimum 1. The ratios, the net-vs-gross basis, the even-sex-split assumption, and any single-user / family-restroom or reduction allowances come from the AHJ-adopted code edition and the actual occupancy; employee and customer loads may be counted separately. A design aid, not a code-official determination.",
     assumptions: [
       { name: "Per sex", value: "the occupant load splits evenly between two sexes (0.5 each) unless a distribution override is supplied", source: "IBC 2021 §2902.2" },
       { name: "Round up", value: "each fixture ratio rounds up per §2902.1.1, so the 1:25 first tier undercounts on a naive per-50 read", source: "IBC 2021 §2902.1.1" },
@@ -20450,13 +20450,13 @@ export const CITATIONS = {
   },
   "steel-doubler-plate": {
     formula: "phiRn_bare = 0.90 x 0.60 Fy dc tw; t_strength = max(0, Vu - phiRn_bare) / (0.90 x 0.60 Fy dc); t_stability = (dz + wz)/90 (the AISC 341 Seismic Provisions panel-zone limit; not in AISC 360, whose Eq. J10-12 is the high-axial panel-zone strength); t_required = max(t_strength, t_stability) when a doubler is needed.",
-    edition: "The AISC 360-16 Section J10.6 panel-zone doubler-plate provisions, Eq. J10-9 and Eq. J10-12, by name.",
+    edition: "The AISC 360-16 Section J10.6 panel-zone doubler-plate strength, Eq. J10-9, with the (dz + wz)/90 stability limit from the AISC 341 Seismic Provisions, by name.",
     freeAccess: "AISC 360 is available through AISC; the J10.6 panel-zone and doubler-plate provisions are published design equations.",
     governance: GOVERNANCE.general,
-    editionNote: "The stability minimum (Eq. J10-12) applies per individual doubler plate when it is not plug-welded to the web; a plug-welded doubler lets the combined thickness resist buckling. The basic bare strength (J10-9) is used for the shortfall - the flange-stiffened bonus (J10-11) is only allowed when panel-zone deformation is modeled. A high column axial load (Pr > 0.4 Pc) reduces the strength further and is not applied. Above roughly a half-inch shortfall the engineer often chooses a heavier column or a pair of plates. AISC 360 and the engineer of record govern - a detailing aid, not a stamped connection design.",
+    editionNote: "The (dz + wz)/90 stability minimum (AISC 341) applies per individual doubler plate when it is not plug-welded to the web; a plug-welded doubler lets the combined thickness resist buckling. The basic bare strength (J10-9) is used for the shortfall - the flange-stiffened bonus (J10-11) is only allowed when panel-zone deformation is modeled. A high column axial load (Pr > 0.4 Pc) reduces the strength further and is not applied. Above roughly a half-inch shortfall the engineer often chooses a heavier column or a pair of plates. AISC 360 and the engineer of record govern - a detailing aid, not a stamped connection design.",
     assumptions: [
       { name: "Two limits", value: "the doubler is the greater of the strength thickness (shortfall / 0.90 x 0.60 Fy dc) and the stability minimum (dz + wz)/90", source: "AISC 360-16 J10.6 (strength) / AISC 341 (the /90 stability limit)" },
-      { name: "Not plug-welded", value: "Eq. J10-12 governs per plate unless the doubler is plug-welded to the web, when the combined thickness resists buckling", source: "AISC 360-16 J10.6" },
+      { name: "Not plug-welded", value: "the (dz + wz)/90 limit governs per plate unless the doubler is plug-welded to the web, when the combined thickness resists buckling", source: "AISC 360-16 J10.6" },
     ],
   },
   "steel-panel-zone-shear": {
@@ -20726,11 +20726,11 @@ export const CITATIONS = {
     ],
   },
   "liquefaction-screening": {
-    formula: "rd = 1 - 0.00233172 z (z <= 30.02 ft) else 1.174 - 0.00813816 z; CSR = 0.65 amax (sigma_v/sigma'_v) rd; FS = (CRR/CSR) MSF; liquefiable if FS < 1.",
+    formula: "rd = 1 - 0.00233172 z (z <= 30.02 ft), 1.174 - 0.00813816 z (to 75.46 ft), 0.744 - 0.0024384 z (to 98.43 ft), else 0.5; CSR = 0.65 amax (sigma_v/sigma'_v) rd; FS = (CRR/CSR) MSF; liquefiable if FS < 1.",
     edition: "The Seed-Idriss simplified liquefaction-triggering procedure (NCEER/NSF workshop consensus), by name.",
     freeAccess: "The Seed-Idriss simplified CSR/CRR procedure and the rd relation are standard published earthquake-geotechnical results.",
     governance: GOVERNANCE.general,
-    editionNote: "The Seed-Idriss simplified liquefaction-triggering screen: the stress-reduction coefficient rd = 1 - 0.00233172 z for a depth z <= 30.02 ft (else 1.174 - 0.00813816 z; the published per-meter constants 0.00765 and 0.0267 and the 9.15 m breakpoint restated per foot via 0.3048, spec-v593), the earthquake-induced cyclic stress ratio CSR = 0.65 amax (sigma_v / sigma'_v) rd, and the factor of safety FS = (CRR / CSR) x MSF, with liquefaction triggered when FS < 1. The cyclic resistance ratio CRR is read from the (N1)60 or CPT charts for the sand, and the magnitude scaling factor MSF adjusts from the Mw 7.5 reference event. This is a screening tool for level ground; a site-specific triggering analysis, the fines-content correction, the overburden correction, and the post-liquefaction settlement/lateral-spread evaluation are the geotechnical engineer's work. A design aid; the geotechnical engineer of record governs.",
+    editionNote: "The Seed-Idriss simplified liquefaction-triggering screen: the stress-reduction coefficient rd = 1 - 0.00233172 z for a depth z <= 30.02 ft, 1.174 - 0.00813816 z to 75.46 ft, 0.744 - 0.0024384 z to 98.43 ft, and 0.5 below that (Youd et al. 2001; the published per-meter constants 0.00765, 0.0267 and 0.008 and the 9.15, 23 and 30 m breakpoints restated per foot via 0.3048), the earthquake-induced cyclic stress ratio CSR = 0.65 amax (sigma_v / sigma'_v) rd, and the factor of safety FS = (CRR / CSR) x MSF, with liquefaction triggered when FS < 1. The cyclic resistance ratio CRR is read from the (N1)60 or CPT charts for the sand, and the magnitude scaling factor MSF adjusts from the Mw 7.5 reference event. This is a screening tool for level ground; a site-specific triggering analysis, the fines-content correction, the overburden correction, and the post-liquefaction settlement/lateral-spread evaluation are the geotechnical engineer's work. A design aid; the geotechnical engineer of record governs.",
     assumptions: [
       { name: "Cyclic stress ratio", value: "CSR = 0.65 amax (sigma_v/sigma'_v) rd", source: "Seed-Idriss" },
       { name: "Factor of safety", value: "FS = (CRR/CSR) x MSF; liquefiable if FS < 1", source: "Seed-Idriss / NCEER" },
@@ -21168,14 +21168,14 @@ export const CITATIONS = {
     ],
   },
   "class-of-loss-screen": {
-    formula: "top-down (first match wins): Class 4 if low-evaporation materials wet; else Class 3 if wick_height_ft > 2.0 or wall_wet_fraction >= 0.40; else Class 2 if floor_wet_fraction >= 0.40; else Class 1. Output carries the matching per-class evaporation factor (gal/ft^2).",
-    edition: "ANSI/IICRC S500 Class-of-loss definitions and the 24 in (2 ft) wick threshold, by name; thresholds are deterministic where S500 leaves a judgment band.",
-    freeAccess: "S500 keys the Class to affected surface area, the wick height above 24 in, and the presence of low-evaporation assemblies. The four Class definitions are public.",
+    formula: "wet_share = (floor x floor area + wall x wall area + ceiling x ceiling area) / total area (a 12 x 12 x 8 ft room's proportions when no areas are entered); top-down: Class 4 if low-evaporation materials wet; else Class 3 if wet_share > 40%; else Class 2 if wet_share >= 5%; else Class 1. Output carries the matching per-class evaporation factor (gal/ft^2).",
+    edition: "ANSI/IICRC S500 (4th ed. 2015 / 5th ed. 2021) Class-of-loss definitions by name, keyed to the wet share of the combined floor, wall and ceiling surface; the pre-2015 floor and 24 in wick rules no longer define the class.",
+    freeAccess: "S500 keys the Class to the wet share of the combined floor, wall and ceiling surface and the presence of low-evaporation assemblies. The four Class definitions are public.",
     governance: GOVERNANCE.general,
-    editionNote: "Single-edition (the Class definitions and the 24 in threshold are stable). The inspector's classification GOVERNS and a moisture map must confirm it - this is a screen that proposes a Class and states the rationale, it does not certify one. ANSI/IICRC S500 names the framework.",
+    editionNote: "The 2015 and 2021 editions define the Class by the wet share of the combined surface (under 5% Class 1, 5-40% Class 2, over 40% Class 3); the older floor and 24 in wick rules are not used. The inspector's classification GOVERNS and a moisture map must confirm it - this is a screen that proposes a Class and states the rationale, it does not certify one. ANSI/IICRC S500 names the framework.",
     assumptions: [
-      { name: "Class framework", value: "the four S500 Classes keyed to wetted surface, the 24 in wick threshold, and low-evaporation materials (hardwood / plaster / lightweight concrete / masonry -> Class 4)", source: "ANSI/IICRC S500" },
-      { name: "Thresholds", value: "the 40% surface fractions are deterministic, editable screens where S500 leaves a judgment band", source: "ANSI/IICRC S500" },
+      { name: "Class framework", value: "the four S500 Classes keyed to the combined wet share (under 5% / 5-40% / over 40%) and low-evaporation materials (hardwood / plaster / lightweight concrete / masonry -> Class 4)", source: "ANSI/IICRC S500" },
+      { name: "Thresholds", value: "the 5% and 40% combined wet-share breaks as published in trade summaries of S500", source: "ANSI/IICRC S500" },
       { name: "Scope", value: "a screen that proposes a Class and feeds the per-class evaporation factor; the inspector and a moisture map govern", source: "ANSI/IICRC S500" },
     ],
   },
@@ -22068,11 +22068,11 @@ export const CITATIONS = {
     ],
   },
   "transverse-wind-load-conductor": {
-    formula: "wind pressure p = 0.00256 V^2 where a speed is entered; force on a conductor = p x (diameter / 12) x wind span x conductor count; force on a pole = p x its tapered projected area with the resultant at mid-height; groundline moment = the sum of each force times its height.",
+    formula: "wind pressure p = 0.00256 V^2 where a speed is entered; force on a conductor = p x (diameter / 12) x wind span x conductor count; force on a pole = p x its tapered projected area with the resultant at the trapezoid centroid, h/3 x (B + 2T)/(B + T) above the groundline (B groundline, T top diameter); groundline moment = the sum of each force times its height.",
     edition: "The transverse wind load relations by name, with the ASCE 7 velocity-pressure constant 0.00256 -- the same relation the wind-pressure calculator uses. Round shape factor 1.0; NO gust response, height adjustment, or terrain exposure factor is applied, so this is a screen rather than a design. The applicable NESC edition, the utility's construction standards, and a qualified line designer govern.",
     freeAccess: "Pressure times projected area on dimensions the user supplies; no wind map or exposure table is reproduced.",
     governance: GOVERNANCE.general,
-    editionNote: "The load that governs a distribution structure on a windy day is not the conductor tension, it is the wind on the conductors and on the pole, and both land at different heights and become a moment. The projected area of a cylinder is diameter times length, so a conductor's wind load per foot is its diameter in inches over twelve times the pressure and nothing else. THE LENGTH THAT COUNTS IS THE WIND SPAN, half the span on each side of the structure, which is not the ruling span and not the weight span -- confusing wind span with weight span is the standard error on an angle or hillside structure. The pole carries its own wind on a tapered area with the resultant at mid-height, and while that force is small next to the conductors its moment arm is not: a 9 psf wind on one Drake at a 400 ft wind span gives 332 lb at 38 ft against the pole's 293 lb at 19.5 ft, which is 31% of an 18,335 ft-lb total. Under ice the diameter grows and so does the wind area, which is why the district cases combine ice AND wind.",
+    editionNote: "The load that governs a distribution structure on a windy day is not the conductor tension, it is the wind on the conductors and on the pole, and both land at different heights and become a moment. The projected area of a cylinder is diameter times length, so a conductor's wind load per foot is its diameter in inches over twelve times the pressure and nothing else. THE LENGTH THAT COUNTS IS THE WIND SPAN, half the span on each side of the structure, which is not the ruling span and not the weight span -- confusing wind span with weight span is the standard error on an angle or hillside structure. The pole carries its own wind on a tapered area with the resultant at the trapezoid centroid, a little below mid-height because the pole is wider at the bottom, and while that force is small next to the conductors its moment arm is not: a 9 psf wind on one Drake at a 400 ft wind span gives 332 lb at 38 ft against the pole's 293 lb at 18.2 ft, which is 30% of a 17,955 ft-lb total. Under ice the diameter grows and so does the wind area, which is why the district cases combine ice AND wind.",
     assumptions: [
       { name: "Wind span, not ruling span or weight span", value: "the standard error on an angle or hillside structure", source: "overhead line practice" },
       { name: "No gust, height, or exposure factor", value: "a screen, not a grade-of-construction design", source: "the applicable NESC edition" },
@@ -22635,7 +22635,7 @@ export const CITATIONS = {
     edition: "Fixed ladder requirements as 29 CFR 1910.28 structures them. The threshold, the rest platform interval and the phase-out dates are ENTERED because they differ between jurisdictions and have changed over time.",
     freeAccess: "Two threshold comparisons.",
     governance: GOVERNANCE.general,
-    editionNote: "A CAGE IS NOT FALL PROTECTION UNDER THE CURRENT RULE, and that is the finding this exists to surface. Cages were accepted historically and are not accepted on new ladders, because a cage does not ARREST a fall -- it may keep a falling climber roughly within the ladder's plane while they fall the full height inside it. Existing caged ladders are subject to a phase-out, after which a ladder safety system or a personal fall arrest arrangement is required; the cage may remain, it simply does not satisfy the requirement. REST PLATFORMS ARE A DIFFERENT QUESTION and belong to the older provisions -- a ladder with rest platforms and no fall protection is a ladder with no fall protection. The facility-level finding is the useful one: a plant with older fixed ladders almost certainly has several in this condition and they are non-compliant NOW rather than after a phase-out passes, because a caged ladder reads as a protected ladder to almost everyone who walks past it.",
+    editionNote: "A CAGE IS NOT FALL PROTECTION UNDER THE CURRENT RULE, and that is the finding this exists to surface. Cages were accepted historically and are not accepted on new ladders, because a cage does not ARREST a fall -- it may keep a falling climber roughly within the ladder's plane while they fall the full height inside it. Existing caged ladders are subject to a phase-out, after which a ladder safety system or a personal fall arrest arrangement is required; the cage may remain, it simply does not satisfy the requirement. REST PLATFORMS ARE A DIFFERENT QUESTION and belong to the older provisions -- a ladder with rest platforms and no fall protection is a ladder with no fall protection. The facility-level finding is the useful one: a plant with older fixed ladders almost certainly has several in this condition and a caged ladder reads as a protected ladder to almost everyone who walks past it. A cage on a ladder installed before November 19, 2018 is accepted until November 18, 2036 (29 CFR 1910.28(b)(9)(i)(A), (D)); a cage on a newer ladder, or on a section replaced before then, does not satisfy the requirement now.",
     assumptions: [
       { name: "Thresholds are entered", value: "they differ between jurisdictions and have changed", source: "29 CFR 1910.28 or the state plan" },
       { name: "Height only", value: "rung spacing, clearances, climbing space and landing extensions are separate requirements", source: "29 CFR 1910.23" },
@@ -23721,7 +23721,7 @@ export const CITATIONS = {
     ],
   },
   "suspended-scaffold-counterweight": {
-    formula: "rated load x outboard arm = counterweight x inboard arm, so the required counterweight = rated load x (outboard / inboard) x the factor of safety; the achieved factor is the resisting moment over the overturning moment.",
+    formula: "rated load x outboard arm = counterweight x inboard arm, so the required counterweight = the greater of rated load x (outboard / inboard) x the factor of safety and hoist stall load x (outboard / inboard) x 1.5 (29 CFR 1926.451(a)(2)); the achieved factor is the resisting moment over the overturning moment.",
     edition: "The outrigger moment balance by name, with 4:1 against overturning the common requirement. The load used is the platform's RATED load, not its empty weight and not what happens to be on it. Counterweights must be non-flowable and secured to the outrigger, and a TIEBACK to independent structural anchorage is required IN ADDITION and is not a substitute. OSHA 29 CFR 1926 Subpart L, the manufacturer's instructions, and the qualified person who designs the rigging govern.",
     freeAccess: "One lever ratio and one multiplication; no manufacturer rigging table is reproduced.",
     governance: GOVERNANCE.general,
@@ -25222,7 +25222,7 @@ export const CITATIONS = {
   },
   "brine-batch-salinity": {
     formula: "batch weight = gallons x brine density; salt = batch weight x concentration; water is the balance by weight, converted at 8.345 lb per gallon; salometer = concentration / saturation concentration x 100; the freezing point is read off the published NaCl curve.",
-    edition: "The sodium chloride eutectic at 23.3% by weight and about -6 degF, and the NaCl freezing-point curve linearly interpolated between 0, 5, 10, 15, 20 and 23.3%. Brine density is ENTERED and nominal.",
+    edition: "The sodium chloride eutectic at 23.3% by weight and about -6 degF, and the NaCl freezing-point curve linearly interpolated between 0, 5, 10, 15, 20 and 23.3%, then up the hydrohalite branch to the 26.3% peritectic at +32.2 degF (linear between those two points). Brine density is ENTERED and nominal.",
     freeAccess: "A weight balance and a published phase-diagram interpolation.",
     governance: GOVERNANCE.general,
     editionNote: "23.3% IS THE EUTECTIC, NOT A PREFERENCE -- moving away from it in EITHER direction raises the freezing point, which is why every brine operation mixes to the same number. THE TWO FAILURE DIRECTIONS LOOK NOTHING ALIKE: over-concentrated brine crystallises in tanks, lines, screens and nozzles and takes the truck out of service; under-concentrated brine sprays perfectly and FREEZES ON THE ROAD, which is worse because nothing about the application looked wrong. A 3,000 gal batch mixed at 20% instead saves 970 lb of salt and gives away about 8 degF of freezing point, landing near +2 -- a temperature the road reaches on any clear night. VERIFY WITH A SALOMETER, NOT BY COUNTING BAGS, and remember the scale is referenced to a stated temperature: a hydrometer dropped into cold brine READS HIGH, which is exactly when a crew is most likely to check it. The comparison case is computed at the same entered density, because density actually varies with concentration and temperature. And brine is ANTI-ICING: applied to snow already on the ground it is adding water to the problem.",

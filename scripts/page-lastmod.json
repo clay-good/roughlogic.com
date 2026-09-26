@@ -2,7 +2,7 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "28938b4a106873fe",
+      "sha": "abf7eb7217e58c8b",
       "date": "2026-09-26"
     },
     "/tools/": {
@@ -342,8 +342,8 @@
       "date": "2026-09-25"
     },
     "/tools/ashrae-622-ventilation/": {
-      "sha": "9b61513b71a5419b",
-      "date": "2026-09-19"
+      "sha": "bce0431387565213",
+      "date": "2026-09-26"
     },
     "/tools/asme-head-thickness/": {
       "sha": "8c36038a2fb596dd",
@@ -558,8 +558,8 @@
       "date": "2026-09-07"
     },
     "/tools/bearing-equivalent-load/": {
-      "sha": "59fa236c32cd9b84",
-      "date": "2026-09-25"
+      "sha": "a9176dc8f227eeb7",
+      "date": "2026-09-26"
     },
     "/tools/bearing-l10-life/": {
       "sha": "0f523b90bf1f1174",
@@ -714,8 +714,8 @@
       "date": "2026-09-01"
     },
     "/tools/bolt-proof-load/": {
-      "sha": "240977e7df7d40c9",
-      "date": "2026-09-01"
+      "sha": "43cb059ccc09ac9e",
+      "date": "2026-09-26"
     },
     "/tools/bolt-shear-bearing/": {
       "sha": "8a5f9d679035c958",
@@ -834,8 +834,8 @@
       "date": "2026-09-01"
     },
     "/tools/brine-batch-salinity/": {
-      "sha": "c973cb58263f7e3c",
-      "date": "2026-09-11"
+      "sha": "6059e443a1152f27",
+      "date": "2026-09-26"
     },
     "/tools/brine-cure/": {
       "sha": "a659fbdee3d7bce7",
@@ -874,8 +874,8 @@
       "date": "2026-09-01"
     },
     "/tools/bulk-density/": {
-      "sha": "a555ca25d169594c",
-      "date": "2026-09-25"
+      "sha": "e7744472fcf1d59b",
+      "date": "2026-09-26"
     },
     "/tools/bunker-silo-capacity/": {
       "sha": "2c93466e0602c131",
@@ -890,8 +890,8 @@
       "date": "2026-09-01"
     },
     "/tools/cable-bend-radius/": {
-      "sha": "be370419e7480431",
-      "date": "2026-09-25"
+      "sha": "c0227d877749eec1",
+      "date": "2026-09-26"
     },
     "/tools/cable-jetting-distance/": {
       "sha": "c4b40adb02a8125c",
@@ -962,8 +962,8 @@
       "date": "2026-09-01"
     },
     "/tools/cargo-securement-wll/": {
-      "sha": "d7e6aaef744877f6",
-      "date": "2026-09-01"
+      "sha": "83cb1770b9cc6bd3",
+      "date": "2026-09-26"
     },
     "/tools/carpet-restore-replace/": {
       "sha": "8b78cf368643db9e",
@@ -1010,8 +1010,8 @@
       "date": "2026-09-01"
     },
     "/tools/cattle-stocking-rate/": {
-      "sha": "5816dc39cc23c1fe",
-      "date": "2026-09-25"
+      "sha": "a57aad41ec691aeb",
+      "date": "2026-09-26"
     },
     "/tools/cavity-drying-system/": {
       "sha": "6793fb166747ae4c",
@@ -1218,16 +1218,16 @@
       "date": "2026-09-26"
     },
     "/tools/class-of-loss-screen/": {
-      "sha": "53b7f9824c0bd031",
-      "date": "2026-09-08"
+      "sha": "b5167287b9bcc967",
+      "date": "2026-09-26"
     },
     "/tools/clausius-clapeyron/": {
       "sha": "91b7fefc21b955be",
       "date": "2026-09-01"
     },
     "/tools/cleanout-layout/": {
-      "sha": "7ee3e699e755f16e",
-      "date": "2026-09-25"
+      "sha": "9913f1b13da5dcfa",
+      "date": "2026-09-26"
     },
     "/tools/clearance-plate-envelope/": {
       "sha": "9d44a85a5da50bce",
@@ -1426,8 +1426,8 @@
       "date": "2026-09-25"
     },
     "/tools/compressed-air-power/": {
-      "sha": "7332521fcf6105fe",
-      "date": "2026-09-01"
+      "sha": "41ddb70e64446e9b",
+      "date": "2026-09-26"
     },
     "/tools/compressed-air-pressure-drop/": {
       "sha": "e57f389a961e5e59",
@@ -1774,8 +1774,8 @@
       "date": "2026-09-01"
     },
     "/tools/cooling-water-makeup/": {
-      "sha": "84470f11388d0527",
-      "date": "2026-09-19"
+      "sha": "a7b43e434856acb6",
+      "date": "2026-09-26"
     },
     "/tools/copper-resistance/": {
       "sha": "b458c792c9bd137f",
@@ -2074,8 +2074,8 @@
       "date": "2026-09-05"
     },
     "/tools/dehumidifier/": {
-      "sha": "cf4452505c674562",
-      "date": "2026-09-19"
+      "sha": "6be4ee71ec78211a",
+      "date": "2026-09-26"
     },
     "/tools/dehumidifier-derate/": {
       "sha": "a4c99e55577e6b78",
@@ -2770,8 +2770,8 @@
       "date": "2026-09-25"
     },
     "/tools/fall-protection-clearance/": {
-      "sha": "e3d37014348d990c",
-      "date": "2026-09-25"
+      "sha": "f88761a6429196bf",
+      "date": "2026-09-26"
     },
     "/tools/fan-affinity-laws/": {
       "sha": "774c6c7d4a44563a",
@@ -2914,8 +2914,8 @@
       "date": "2026-09-01"
     },
     "/tools/fireplace-flue-area/": {
-      "sha": "23f4d5b75ba8e7c5",
-      "date": "2026-09-25"
+      "sha": "c33c59d891796ec2",
+      "date": "2026-09-26"
     },
     "/tools/firewood-cord/": {
       "sha": "9a282defa57b6d2a",
@@ -3430,8 +3430,8 @@
       "date": "2026-09-01"
     },
     "/tools/groove-weld-strength/": {
-      "sha": "5258749b1eb52f32",
-      "date": "2026-09-01"
+      "sha": "df1746eb8120b191",
+      "date": "2026-09-26"
     },
     "/tools/gross-rent-multiplier/": {
       "sha": "010614718681bbb0",
@@ -3446,8 +3446,8 @@
       "date": "2026-09-01"
     },
     "/tools/grounding-electrode/": {
-      "sha": "5d7f08f96ccb7b9e",
-      "date": "2026-09-08"
+      "sha": "d09def4a7b0b6e64",
+      "date": "2026-09-26"
     },
     "/tools/grounding-electrode-conductor/": {
       "sha": "e2a16cf000ea16a3",
@@ -3486,8 +3486,8 @@
       "date": "2026-09-05"
     },
     "/tools/gutter-downspout/": {
-      "sha": "0c33dcf6cbbeab36",
-      "date": "2026-09-01"
+      "sha": "afb45f48bb012d99",
+      "date": "2026-09-26"
     },
     "/tools/gutter-downspout-takeoff/": {
       "sha": "2086e9ec80e4873a",
@@ -3594,20 +3594,20 @@
       "date": "2026-09-01"
     },
     "/tools/heat-trace-sizing/": {
-      "sha": "171b941420c68acd",
-      "date": "2026-09-01"
+      "sha": "faa5935f12d665ca",
+      "date": "2026-09-26"
     },
     "/tools/heat-treat-soak-time/": {
       "sha": "1aa6c6456be08049",
       "date": "2026-09-01"
     },
     "/tools/helical-pile/": {
-      "sha": "649467c3b143618c",
-      "date": "2026-09-01"
+      "sha": "2ba7e0eb1db02306",
+      "date": "2026-09-26"
     },
     "/tools/helical-pile-torque/": {
-      "sha": "a7781d467e96f3a9",
-      "date": "2026-09-01"
+      "sha": "d2b239f576825994",
+      "date": "2026-09-26"
     },
     "/tools/helical-spring-rate/": {
       "sha": "512bafb6e91d5082",
@@ -3942,8 +3942,8 @@
       "date": "2026-09-01"
     },
     "/tools/irrigation-requirement/": {
-      "sha": "6fd1d6f1ac141659",
-      "date": "2026-09-04"
+      "sha": "20ff452cbec02768",
+      "date": "2026-09-26"
     },
     "/tools/irrigation-uniformity/": {
       "sha": "b9867220484a6957",
@@ -4218,8 +4218,8 @@
       "date": "2026-09-01"
     },
     "/tools/liquefaction-screening/": {
-      "sha": "df3d18db7be4c76d",
-      "date": "2026-09-25"
+      "sha": "705351a4baafdfdb",
+      "date": "2026-09-26"
     },
     "/tools/liquid-pipeline-station-spacing/": {
       "sha": "96dc823b66feb552",
@@ -4306,8 +4306,8 @@
       "date": "2026-09-19"
     },
     "/tools/lumber-spans/": {
-      "sha": "345d5f953156090c",
-      "date": "2026-09-19"
+      "sha": "231a58ba2c2e2d8a",
+      "date": "2026-09-26"
     },
     "/tools/lumen-method/": {
       "sha": "3b6d56ee087789cc",
@@ -4502,8 +4502,8 @@
       "date": "2026-09-08"
     },
     "/tools/master-key-bitting-capacity/": {
-      "sha": "25dcbaab3f178327",
-      "date": "2026-09-19"
+      "sha": "073d8920dbd08d86",
+      "date": "2026-09-26"
     },
     "/tools/master-stream/": {
       "sha": "36ddd95afc66e671",
@@ -4634,8 +4634,8 @@
       "date": "2026-09-25"
     },
     "/tools/mired-gel-shift/": {
-      "sha": "401ce11f8d178554",
-      "date": "2026-09-01"
+      "sha": "52054ce1c3e7dc12",
+      "date": "2026-09-26"
     },
     "/tools/mixed-water-temp/": {
       "sha": "a7d83571a879ac3b",
@@ -4930,8 +4930,8 @@
       "date": "2026-09-01"
     },
     "/tools/oil-water-separator-sizing/": {
-      "sha": "8e954fbe7d40f336",
-      "date": "2026-09-19"
+      "sha": "3cd07dd3dac9b03e",
+      "date": "2026-09-26"
     },
     "/tools/one-sample-t-test/": {
       "sha": "4151a2f844691d62",
@@ -5362,8 +5362,8 @@
       "date": "2026-09-18"
     },
     "/tools/plumbing-fixture-count/": {
-      "sha": "f680117d8fd2fb85",
-      "date": "2026-09-25"
+      "sha": "d5ae48ae2ea4b28e",
+      "date": "2026-09-26"
     },
     "/tools/plume-rise-briggs/": {
       "sha": "49d06f3ad2c6db36",
@@ -5434,8 +5434,8 @@
       "date": "2026-09-01"
     },
     "/tools/pool-chlorine-dose/": {
-      "sha": "eba257a425eb71a4",
-      "date": "2026-09-25"
+      "sha": "932782111cc70d08",
+      "date": "2026-09-26"
     },
     "/tools/pool-cover-evaporation/": {
       "sha": "d83af95a55336bda",
@@ -5886,8 +5886,8 @@
       "date": "2026-09-01"
     },
     "/tools/range-demand-220-55/": {
-      "sha": "d0a9b6dcaf65a986",
-      "date": "2026-09-04"
+      "sha": "ac26b8268f707fa2",
+      "date": "2026-09-26"
     },
     "/tools/ras-flow-rate/": {
       "sha": "24f31d2e0c6e6b5f",
@@ -5906,12 +5906,12 @@
       "date": "2026-09-25"
     },
     "/tools/rc-column-axial/": {
-      "sha": "26b59df76a7b51ca",
-      "date": "2026-09-01"
+      "sha": "b139f1d32496bb2f",
+      "date": "2026-09-26"
     },
     "/tools/rc-column-steel-for-load/": {
-      "sha": "1770e374761fcddb",
-      "date": "2026-09-01"
+      "sha": "226966605ac18c13",
+      "date": "2026-09-26"
     },
     "/tools/rc-compression-dev-length/": {
       "sha": "f2eb105e5b48fadc",
@@ -5938,8 +5938,8 @@
       "date": "2026-09-26"
     },
     "/tools/rc-punching-shear/": {
-      "sha": "27d55e3f061e32c7",
-      "date": "2026-09-01"
+      "sha": "f906aa9da9ec7fc9",
+      "date": "2026-09-26"
     },
     "/tools/rc-shear-friction/": {
       "sha": "a56aeda6939a2cc5",
@@ -5954,8 +5954,8 @@
       "date": "2026-09-19"
     },
     "/tools/rc-slender-column-magnify/": {
-      "sha": "5dc0a2d990a75283",
-      "date": "2026-09-25"
+      "sha": "d9bb0a54d312b7ee",
+      "date": "2026-09-26"
     },
     "/tools/rc-tbeam-flexure/": {
       "sha": "e2a43eeb93d6e5ad",
@@ -6046,7 +6046,7 @@
       "date": "2026-09-01"
     },
     "/tools/reeving-parts-of-line/": {
-      "sha": "a98ff92578f3df67",
+      "sha": "02073eddee286d40",
       "date": "2026-09-26"
     },
     "/tools/reference-et0/": {
@@ -6218,8 +6218,8 @@
       "date": "2026-09-01"
     },
     "/tools/rigging-check/": {
-      "sha": "d5a548c835cbe3d3",
-      "date": "2026-09-01"
+      "sha": "cb1b368b06778d13",
+      "date": "2026-09-26"
     },
     "/tools/rigid-foam-board-count/": {
       "sha": "a851f2d0b55f6efd",
@@ -6286,8 +6286,8 @@
       "date": "2026-09-01"
     },
     "/tools/roof-drain-sizing/": {
-      "sha": "7b5f6752aaf10990",
-      "date": "2026-09-25"
+      "sha": "e61d56d0ce3e462b",
+      "date": "2026-09-26"
     },
     "/tools/roof-insulation-fasteners/": {
       "sha": "9d7a91bf90f113db",
@@ -6362,7 +6362,7 @@
       "date": "2026-09-18"
     },
     "/tools/rtd-resistance-to-temp/": {
-      "sha": "f970eddbe430950b",
+      "sha": "eb639791baa64456",
       "date": "2026-09-26"
     },
     "/tools/rtk-error-budget/": {
@@ -6382,8 +6382,8 @@
       "date": "2026-09-01"
     },
     "/tools/sacrificial-anode-life/": {
-      "sha": "eeab2aa4b9032fad",
-      "date": "2026-09-25"
+      "sha": "a3d35cfb90d6020c",
+      "date": "2026-09-26"
     },
     "/tools/safe-descent-speed/": {
       "sha": "0ce46ac628542205",
@@ -6634,8 +6634,8 @@
       "date": "2026-09-01"
     },
     "/tools/septic-tank/": {
-      "sha": "826eccbe28fde546",
-      "date": "2026-09-01"
+      "sha": "116ca0326c18ded5",
+      "date": "2026-09-26"
     },
     "/tools/septic-tank-for-interval/": {
       "sha": "eee0c2d70ace0031",
@@ -6658,8 +6658,8 @@
       "date": "2026-09-19"
     },
     "/tools/service-load-optional/": {
-      "sha": "c77c687c7ac355ab",
-      "date": "2026-09-19"
+      "sha": "c54de82252584f91",
+      "date": "2026-09-26"
     },
     "/tools/service-load-standard/": {
       "sha": "867850020564b6e2",
@@ -6806,8 +6806,8 @@
       "date": "2026-09-09"
     },
     "/tools/silica-table-1/": {
-      "sha": "abbb09dd9325729d",
-      "date": "2026-09-01"
+      "sha": "85d0c3f62ecffa1d",
+      "date": "2026-09-26"
     },
     "/tools/silica-ventilation-screen/": {
       "sha": "dcc2406d40eec0df",
@@ -6850,12 +6850,12 @@
       "date": "2026-09-01"
     },
     "/tools/sling-d-d-efficiency/": {
-      "sha": "d3a582db9f6f79ea",
-      "date": "2026-09-01"
+      "sha": "7b397e8d80b61df5",
+      "date": "2026-09-26"
     },
     "/tools/slip-critical-with-tension/": {
-      "sha": "3a3fa3d7b6ecf2bd",
-      "date": "2026-09-01"
+      "sha": "1894007599c8d382",
+      "date": "2026-09-26"
     },
     "/tools/slope/": {
       "sha": "cdc8fb28473b376f",
@@ -7258,8 +7258,8 @@
       "date": "2026-09-25"
     },
     "/tools/ssd-design-speed/": {
-      "sha": "f38894ed2921006f",
-      "date": "2026-09-01"
+      "sha": "1704559801552805",
+      "date": "2026-09-26"
     },
     "/tools/stack-effect-npp/": {
       "sha": "44b0e4d97d9e0e6b",
@@ -7426,8 +7426,8 @@
       "date": "2026-09-08"
     },
     "/tools/steel-doubler-plate/": {
-      "sha": "a273888b8dc62807",
-      "date": "2026-09-25"
+      "sha": "c10e30fd0dacfadd",
+      "date": "2026-09-26"
     },
     "/tools/steel-effective-length-k/": {
       "sha": "a1667a2c2a984f97",
@@ -7490,8 +7490,8 @@
       "date": "2026-09-01"
     },
     "/tools/stopping-sight-distance/": {
-      "sha": "0d7a86ccc62ed3fa",
-      "date": "2026-09-01"
+      "sha": "d6ec7e32b3c44988",
+      "date": "2026-09-26"
     },
     "/tools/storm-shelter/": {
       "sha": "0ca4f4bd77de665b",
@@ -7610,8 +7610,8 @@
       "date": "2026-09-01"
     },
     "/tools/suspended-scaffold-counterweight/": {
-      "sha": "d9e9c898eb825d92",
-      "date": "2026-09-25"
+      "sha": "d24990ce1a044513",
+      "date": "2026-09-26"
     },
     "/tools/svi-sludge-index/": {
       "sha": "a4ae1712f0a5d6ce",
@@ -7858,8 +7858,8 @@
       "date": "2026-09-09"
     },
     "/tools/tiedown-count/": {
-      "sha": "ddf1cfea8dc8d294",
-      "date": "2026-09-25"
+      "sha": "00799fdf9d195f36",
+      "date": "2026-09-26"
     },
     "/tools/tile-count/": {
       "sha": "17dbda1572618f3f",
@@ -8034,8 +8034,8 @@
       "date": "2026-09-11"
     },
     "/tools/transverse-wind-load-conductor/": {
-      "sha": "b1237f5a15247a47",
-      "date": "2026-09-19"
+      "sha": "cfad20e31112b163",
+      "date": "2026-09-26"
     },
     "/tools/trap-arm/": {
       "sha": "d64ecccb3b377e41",
@@ -8570,11 +8570,11 @@
       "date": "2026-09-01"
     },
     "/tools/welder-arc-circuit-conductor/": {
-      "sha": "491c5f797008328d",
-      "date": "2026-09-01"
+      "sha": "7613d0635540b5ce",
+      "date": "2026-09-26"
     },
     "/tools/welder-resistance-circuit-conductor/": {
-      "sha": "76f550a4bc1009f0",
+      "sha": "6f65e10b753b4ddb",
       "date": "2026-09-26"
     },
     "/tools/well-casing-purge-volume/": {
@@ -8618,8 +8618,8 @@
       "date": "2026-09-01"
     },
     "/tools/winch-drum-line-pull/": {
-      "sha": "b33aad87b41e6df7",
-      "date": "2026-09-19"
+      "sha": "96f617fffa194331",
+      "date": "2026-09-26"
     },
     "/tools/winch-fleet-angle/": {
       "sha": "2bd3f543acd9edea",
@@ -8798,16 +8798,16 @@
       "date": "2026-09-18"
     },
     "/tools/working-space-110-26/": {
-      "sha": "1ba6926b8fce29de",
-      "date": "2026-09-01"
+      "sha": "2695444fba0df7d0",
+      "date": "2026-09-26"
     },
     "/tools/worm-gear-geometry/": {
       "sha": "9593b4b7dc4d3e42",
       "date": "2026-09-04"
     },
     "/tools/wsfu-demand/": {
-      "sha": "5a931dc43c3ce4d6",
-      "date": "2026-09-18"
+      "sha": "aea336dd64813412",
+      "date": "2026-09-26"
     },
     "/tools/yaw-error-loss/": {
       "sha": "d278320185dfe702",

@@ -27241,7 +27241,7 @@ test("bounds: spec-v603 computeSteelDoublerPlate pins the two limits, the govern
   assert.ok(Math.abs(r.shortfall_kip - (300 - r.phi_rn_bare_kip)) < 1e-9);
   assert.ok(Math.abs(r.t_strength_in - 0.3086508) < 1e-6);
   assert.ok(Math.abs(r.t_stability_in - (22.64 + 12.44) / 90) < 1e-9);
-  assert.equal(r.governed_by, "stability (Eq. J10-12)");
+  assert.equal(r.governed_by, "stability (AISC 341, (dz + wz) / 90)"); // AISC 360 has no such limit
   assert.ok(Math.abs(r.t_required_in - r.t_stability_in) < 1e-9);
   assert.ok(Math.abs(r.t_plate_in - 0.4375) < 1e-9); // 7/16
   // Cross-check: 600-kip demand -> strength governs.

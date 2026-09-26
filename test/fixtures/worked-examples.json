@@ -83750,7 +83750,7 @@
   {
    "tile_id": "steel-doubler-plate",
    "source_publisher": "AISC 360-16 Section J10.6 (panel-zone doubler plate)",
-   "source_title": "t_required = max(strength, stability Eq. J10-12) (spec-v555's named follow-on)",
+   "source_title": "t_required = max(strength, AISC 341 stability (dz + wz) / 90) (spec-v555's named follow-on)",
    "source_edition_or_year": "AISC 360-16",
    "source_section_or_page": "W14 column, 300-kip demand: phiRn_bare 183 kip, shortfall 117 kip, t_strength 0.309 in, t_stability 0.390 in governs -> 7/16 in plate",
    "verified_by": "rl",

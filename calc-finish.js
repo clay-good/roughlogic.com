@@ -341,7 +341,7 @@ export function computeGutterDownspout({ roof_area_sqft = 0, pitch_factor = "1.0
 }
 export const gutterDownspoutExample = { inputs: { roof_area_sqft: 1200, pitch_factor: "1.10", rainfall_in_hr: 5, downspout_sqin: 12 } };
 FINISH_RENDERERS["gutter-downspout"] = _simpleRenderer({
-  citation: "Citation: SMACNA / standard residential gutter method (by name). Adjusted area = plan area x pitch factor x (rainfall / 5 in/hr); 1 sq in of downspout per ~100 sq ft of roof.",
+  citation: "Citation: SMACNA / standard residential gutter method (by name). Gutter size from the design area = plan area x pitch factor x rainfall (in/hr): 5 in K-style up to 5,520, 6 in K-style up to 7,960. Downspouts from the adjusted area = plan area x pitch factor x (rainfall / 5 in/hr), 1 sq in of downspout per ~100 sq ft of roof.",
   example: gutterDownspoutExample.inputs,
   fields: [
     { key: "roof_area_sqft", label: "Plan roof area (sq ft)", kind: "number" },

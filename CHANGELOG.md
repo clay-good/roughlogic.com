@@ -241,6 +241,29 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **Fifty-seven tiles had a published citation or description that still described the method a fix had replaced.** Fixes this month changed the code but, in these tiles, not the text readers see: the citation formula, edition note, assumptions or one-line description. A sweep of every tile whose code carries an "Until 2026-…" fix comment compared that text against the code, and all 57 now state what the tile computes.
+  - **Safety and code examples:**
+    - `fall-protection-clearance`: the overhead self-retracting lifeline assumption still said 1.0 ft; the tile uses 3.5 ft.
+    - `tiedown-count` and `cargo-securement-wll`: credit each tiedown by its path under 49 CFR 393.106(d), not by "both ends."
+    - `dehumidifier`: no longer shows a 0.65 derate the code dropped.
+    - `helical-pile`: uses the AC358 Kt values 10 / 10 / 9 / 7.
+    - `grounding-electrode`: the ring formula uses 2π²D.
+    - `welder-arc-circuit-conductor` and `welder-resistance-circuit-conductor`: their duty-cycle rules.
+    - `reeving-parts-of-line`: counts the lead sheave.
+    - `motor-rms-hp`: divides only stopped time by the cooling factor.
+    - `steel-doubler-plate`: credits the (dz + wz)/90 limit to AISC 341 instead of AISC 360 Eq. J10-12, in its output and note as well.
+    - `class-of-loss-screen`: uses the 4th/5th-edition wet-share classes.
+    - `rc-punching-shear`: uses edge and corner perimeters.
+    - `rc-slender-column-magnify`: uses the ACI 318-19 sign convention.
+    - `liquefaction-screening`: uses the four-segment rd.
+    - `sacrificial-anode-life`: aluminum at 907 A-h/lb.
+  - **Descriptions whose worked numbers moved:**
+    - `oil-water-separator-sizing`: 30 and 61 ft², was 24 and 49.
+    - `mired-gel-shift`: a full CTO lands 5,600 K at about 2,894 K.
+    - `bolt-proof-load`: the strength steps down with diameter.
+    - `master-key-bitting-capacity`: uses floor(depths / 2) - 1.
+  - Several of these were fixes made earlier the same day: the code changed, and the citation fields beyond the formula line did not.
+
 - **`joist-cantilever-check`'s citation now describes what the tile computes.** The compute moved to the IRC 2021 Table R507.6 cantilever columns, capped at backspan / 4, but the published formula, edition and notes still gave a bare "backspan / 4" rule and credited R502.3.3 for it. The citation now names the table, and uses the Southern pine 2x10 case on a 14 ft backspan (3 ft 4 in, not the bare-rule 3 ft 6 in) as its example.
 
 - **`masonry-joint-reinforcement` now counts the lap between wire pieces.** Each added piece laps the last by at least 6 in, or 9 in for 3/16 in wire, so a 10 ft piece adds only 9.5 ft. The tile divided the wall length by the piece length. A 40 ft wall now takes 5 pieces per course, not 4, and the example's 12 ft wall goes from 36 pieces to 45. The lap is a new input.

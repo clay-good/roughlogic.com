@@ -1470,7 +1470,7 @@ STEEL_RENDERERS["steel-panel-zone-shear"] = _simpleRenderer({
   compute: computeSteelPanelZoneShear,
 });
 
-// --- spec-v603 E: Panel-zone doubler-plate thickness sizer (AISC 360-16 J10.6 / Eq. J10-12) ---
+// --- spec-v603 E: Panel-zone doubler-plate thickness sizer (AISC 360-16 J10.6; AISC 341 stability limit) ---
 // phiRn_bare = 0.90*0.6*Fy*dc*tw. shortfall = max(0, Vu - phiRn_bare). t_strength = shortfall/(0.90*0.6*Fy*dc).
 // t_stability = (dz+wz)/90 (AISC 341 Seismic Provisions; AISC 360 has no such limit -- until 2026-09-25 this was credited to 360 Eq. J10-12). t_required = shortfall>0 ? max(t_strength, t_stability) : 0. t_plate = ceil to 1/16 in.
 // dims: in { required_shear_kip: M L T^-2, fy_ksi: M L^-1 T^-2, col_depth_dc_in: L, col_web_tw_in: L, pz_depth_dz_in: L, pz_width_wz_in: L } out: { phi_rn_bare_kip: M L T^-2, shortfall_kip: M L T^-2, t_strength_in: L, t_stability_in: L, t_required_in: L, t_plate_in: L }
@@ -1496,10 +1496,10 @@ export function computeSteelDoublerPlate({ required_shear_kip = 0, fy_ksi = 50, 
   const needs_doubler = shortfall_kip > 0;
   const t_required_in = needs_doubler ? Math.max(t_strength_in, t_stability_in) : 0;
   const t_plate_in = needs_doubler ? Math.ceil(t_required_in * 16) / 16 : 0;
-  const governed_by = !needs_doubler ? "none" : (t_stability_in > t_strength_in ? "stability (Eq. J10-12)" : "strength (J10-9 shortfall)");
+  const governed_by = !needs_doubler ? "none" : (t_stability_in > t_strength_in ? "stability (AISC 341, (dz + wz) / 90)" : "strength (J10-9 shortfall)");
   return {
     phi_rn_bare_kip, shortfall_kip, t_strength_in, t_stability_in, t_required_in, t_plate_in, needs_doubler, governed_by,
-    note: "The stability minimum (Eq. J10-12) applies per individual doubler plate when it is not plug-welded to the web; a plug-welded doubler lets the combined thickness resist buckling. The basic bare strength (J10-9) is used for the shortfall - the flange-stiffened bonus (J10-11) is only allowed when panel-zone deformation is modeled. A high column axial load (Pr > 0.4 Pc) reduces the strength further and is not applied here. Above roughly a half-inch shortfall the engineer often chooses a heavier column or a pair of plates. AISC 360 and the engineer of record govern - a detailing aid, not a stamped connection design.",
+    note: "The stability minimum (AISC 341 Seismic Provisions, t >= (dz + wz) / 90; AISC 360 has no such limit) applies per individual doubler plate when it is not plug-welded to the web; a plug-welded doubler lets the combined thickness resist buckling. The basic bare strength (J10-9) is used for the shortfall - the flange-stiffened bonus (J10-11) is only allowed when panel-zone deformation is modeled. A high column axial load (Pr > 0.4 Pc) reduces the strength further and is not applied here. Above roughly a half-inch shortfall the engineer often chooses a heavier column or a pair of plates. AISC 360 and the engineer of record govern - a detailing aid, not a stamped connection design.",
   };
 }
 export const steelDoublerPlateExample = { inputs: { required_shear_kip: 300, fy_ksi: 50, col_depth_dc_in: 14, col_web_tw_in: 0.485, pz_depth_dz_in: 22.64, pz_width_wz_in: 12.44 } };
@@ -1635,7 +1635,7 @@ export function computeSlipCriticalWithTension({ mu = 0.30, tb_kip = 0, ns = 1, 
 }
 export const slipCriticalWithTensionExample = { inputs: { mu: 0.30, tb_kip: 28, ns: 1, n: 4, hf: 1.0, du: 1.13, applied_tension_kip: 30 } };
 STEEL_RENDERERS["slip-critical-with-tension"] = _simpleRenderer({
-  citation: "Citation: AISC 360 Section J3.9, slip-critical connections subject to combined tension and shear. The slip resistance is multiplied by ksc = 1 - Tu/(Du Tb nb) (Eq. J3-5a, LRFD), where Du = 1.13 is the mean-to-specified pretension multiplier, Tb is the Table J3.1 minimum pretension, and nb is the number of bolts carrying the applied tension. The unreduced resistance Rn = mu Du hf Tb ns comes from this catalog's landed slip-critical tile rather than being recomputed. Slip is a SERVICEABILITY limit: the strength-level shear and bearing check and the J3.7 combined tension-shear rupture check are separate and must also pass. Prying action is not modeled. Standard holes. AISC 360 and the engineer of record govern.",
+  citation: "Citation: AISC 360 Section J3.9, slip-critical connections subject to combined tension and shear. The slip resistance is multiplied by ksc = 1 - Tu/(Du Tb nb) (Eq. J3-5a, LRFD) or ksc = 1 - 1.5 Ta/(Du Tb nb) (Eq. J3-5b, ASD, with Omega = 1.50), where Du = 1.13 is the mean-to-specified pretension multiplier, Tb is the Table J3.1 minimum pretension, and nb is the number of bolts carrying the applied tension. The unreduced resistance Rn = mu Du hf Tb ns comes from this catalog's landed slip-critical tile rather than being recomputed. Slip is a SERVICEABILITY limit: the strength-level shear and bearing check and the J3.7 combined tension-shear rupture check are separate and must also pass. Prying action is not modeled. Standard holes. AISC 360 and the engineer of record govern.",
   example: slipCriticalWithTensionExample.inputs,
   fields: [
     { key: "mu", label: "Slip coefficient mu (0.30 A / 0.50 B)", kind: "number" },
