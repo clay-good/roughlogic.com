@@ -164,6 +164,8 @@ export function computeTimeAlignment({ d_main_ft = 0, d_delay_ft = 0, ambient_C 
   // form is in deg C. The US key wins when present, so the page's own numbers
   // run through the agent door unchanged.
   const t_c = (ambient_F !== null && ambient_F !== undefined) ? (Number(ambient_F) - 32) * 5 / 9 : Number(ambient_C);
+  if (!(haas_offset_ms >= 0)) return { error: "The Haas offset cannot be negative; it is the extra delay that keeps the image on the main." };
+  if (!(t_c >= -30 && t_c <= 50)) return { error: "Air temperature must be between -30 and 50 deg C (-22 to 122 deg F); check the unit." };
   const c_m_s = 331.3 + 0.606 * t_c;
   const ms_difference = ((d_main_m - d_delay_m) / c_m_s) * 1000;
   const recommended_delay_ms = ms_difference + haas_offset_ms;
@@ -770,6 +772,7 @@ export function computePowerDistro({ watts = 0, voltage_v = 208, phase = "three"
   const rating = Number(rating_a) || 0;
   const PF = Number(pf) || 0;
   const der = Number(derate) || 0;
+  if (phase !== "three" && phase !== "single") return { error: "Phase must be single or three." };
   if (!(W > 0 && Number.isFinite(W))) return { error: "Connected load must be positive (W)." };
   if (!(V > 0 && Number.isFinite(V))) return { error: "Service voltage must be positive (V)." };
   if (!(rating > 0 && Number.isFinite(rating))) return { error: "Service rating must be positive (A per leg)." };
@@ -995,6 +998,7 @@ export function computeAmpPowerSpl({ sensitivity_db, power_w, distance_m, crest_
   if (typeof sensitivity_db !== "number") return { error: "Enter speaker sensitivity (dB @ 1 W / 1 m)." };
   if (!(power_w > 0)) return { error: "Amplifier power must be greater than zero (W)." };
   if (!(distance_m > 0)) return { error: "Listening distance must be greater than zero." };
+  if (typeof crest_db === "number" && crest_db < 0) return { error: "Crest factor cannot be negative (a peak is never below the average)." };
   const spl_db = sensitivity_db + 10 * Math.log10(power_w) - 20 * Math.log10(distance_m);
   if (!Number.isFinite(spl_db)) return { error: "Computed SPL is not finite." };
   let peak_spl_db = null;
@@ -1066,6 +1070,7 @@ export function computeLightingBeam({ beam_angle_deg = 0, throw_distance = 0, di
   const thr = Number(throw_distance) || 0;
   if (!(ang > 0) || !(ang < 180)) return { error: "Beam angle must be between 0 and 180 degrees." };
   if (!(thr > 0)) return { error: "Throw distance must be positive." };
+  if (distance_unit !== "ft" && distance_unit !== "m") return { error: "Distance unit must be ft or m." };
   const FT_PER_M = 3.280839895013123, M_PER_FT = 0.3048, LUX_PER_FC = 1 / (0.3048 * 0.3048);
   const isFt = String(distance_unit) !== "m";
   const d_ft = isFt ? thr : thr * FT_PER_M;
@@ -1655,6 +1660,8 @@ STAGE_RENDERERS["led-tape-max-run"] = renderLedTapeMaxRun;
 // dims: in { L1_dB: dimensionless, d1: L, target_L2_dB: dimensionless, mode: dimensionless, n_sources: dimensionless } out: { d2: L, delta_dB: dimensionless }
 export function computeSPLDistanceForLevel({ L1_dB = 0, d1 = 1, target_L2_dB = 0, mode = "free_field", n_sources = 1 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // Unit / range guard added 2026-09-26 after printed-example probing.
+  if (!(Number(arguments[0]?.target_L2_dB) > 0)) return { error: "The target level must be a positive dB SPL." };
   const m = SPL_MODES[mode];
   if (!m) return { error: "Unknown mode." };
   const ref = Number(d1) || 0;
@@ -1700,6 +1707,7 @@ export function computeLightingThrowForPool({ target_pool_diameter = 0, beam_ang
   const D = Number(target_pool_diameter) || 0;
   const ang = Number(beam_angle_deg) || 0;
   if (!(D > 0)) return { error: "Target pool diameter must be positive." };
+  if (distance_unit !== "ft" && distance_unit !== "m") return { error: "Distance unit must be ft or m." };
   if (!(ang > 0) || !(ang < 180)) return { error: "Beam angle must be between 0 and 180 degrees." };
   const isFt = String(distance_unit) !== "m";
   const half = (ang / 2) * Math.PI / 180;
@@ -1841,10 +1849,10 @@ STAGE_RENDERERS["acoustic-gain-pag-nag"] = _v1003renderAcousticGainPagNag;
 // See specs/scope-trade-expansion.md. Thirteen tiles, no new dependency.
 // ===========================================================================
 
-// Speed of sound in dry air, ft/s, from the 1125 ft/s reference at 70 F scaled
-// by the square root of absolute temperature (Rankine). Shared by the four
+// Speed of sound in dry air, ft/s: 49.03 x sqrt(Rankine), about 1,128 ft/s at 70 F (QSC prints
+// 1,128 ft/s; until 2026-09-26 this used a 1,125 ft/s reference, 0.3% slow). Shared by the four
 // acoustic tiles below; non-exported, so it adds no v14 derivation-corpus row.
-const _speedOfSound = (temp_f) => 1125 * Math.sqrt((temp_f + 459.67) / 529.67);
+const _speedOfSound = (temp_f) => 49.03 * Math.sqrt(temp_f + 459.67);
 
 // ===================== spec-v1364: line array vertical coverage and splay =====================
 // dims: in { trim_height_ft: L, ear_height_ft: L, near_throw_ft: L, far_throw_ft: L, cabinets: dimensionless } out: { coverage_deg: dimensionless, avg_splay_deg: dimensionless, level_taper_db: dimensionless }
@@ -1924,14 +1932,14 @@ export function computeDelayTowerAlignment({ distance_ft = 0, temp_f = 70, haas_
     compare_geometric_ms,
     drift_ms,
     haas_distance_ft,
-    note: "The delay time to set on a delay tower or under-balcony loudspeaker, and how far that setting moves when the air temperature does. The geometric half is the easy half: sound from the main array reaches the delay position some milliseconds after the delay speaker could fire, and delaying the tower by that time puts the two arrivals on top of each other. But two coincident arrivals from two directions do not localize, so the audience hears the delay speaker sitting right above them and the show appears to come from the wrong place. The Haas offset is the fix: adding 10 to 20 milliseconds beyond the geometric time makes the main array arrive FIRST by a margin the ear reads as the source direction, while the delay speaker, arriving inside the precedence window, still adds level without being heard separately. Fifteen milliseconds is the common starting point. Temperature is the trap, because the speed of sound rises with the square root of absolute temperature: a tower 180 ft downfield aligned at 70 F takes 160.0 ms of geometric delay, and on a 90 F afternoon the air carries sound at 1146 ft/s instead of 1125 and the geometric time falls to 157.1 ms. Three milliseconds is small, but the same twenty-degree swing on a 400 ft throw is 6.5 ms, which is audible, and outdoor shows re-check delay times when the air moves. An alignment starting point; a measurement system and the system engineer's ears govern the final setting.",
+    note: "The delay time to set on a delay tower or under-balcony loudspeaker, and how far that setting moves when the air temperature does. The geometric half is the easy half: sound from the main array reaches the delay position some milliseconds after the delay speaker could fire, and delaying the tower by that time puts the two arrivals on top of each other. But two coincident arrivals from two directions do not localize, so the audience hears the delay speaker sitting right above them and the show appears to come from the wrong place. The Haas offset is the fix: adding 10 to 20 milliseconds beyond the geometric time makes the main array arrive FIRST by a margin the ear reads as the source direction, while the delay speaker, arriving inside the precedence window, still adds level without being heard separately. Fifteen milliseconds is the common starting point. Temperature is the trap, because the speed of sound rises with the square root of absolute temperature: a tower 180 ft downfield aligned at 70 F takes 159.5 ms of geometric delay, and on a 90 F afternoon the air carries sound at 1,150 ft/s instead of 1,128 and the geometric time falls to 156.6 ms. Three milliseconds is small, but the same twenty-degree swing on a 400 ft throw is 6.5 ms, which is audible, and outdoor shows re-check delay times when the air moves. An alignment starting point; a measurement system and the system engineer's ears govern the final setting.",
   };
 }
 
 export const delayTowerAlignmentExample = { inputs: { distance_ft: 180, temp_f: 70, haas_offset_ms: 15, compare_temp_f: 90 } };
 
 STAGE_RENDERERS["delay-tower-alignment"] = _r({
-  citation: "Citation: delay-loudspeaker alignment time from the geometric propagation delay plus a Haas (precedence-effect) offset, with the speed of sound scaled as the square root of absolute temperature from 1125 ft/s at 70 F, by name. The precedence effect is Haas's published result, cited not reproduced. A measurement system and the system engineer govern the final setting.",
+  citation: "Citation: delay-loudspeaker alignment time from the geometric propagation delay plus a Haas (precedence-effect) offset, with the speed of sound scaled as the square root of absolute temperature, about 1,128 ft/s at 70 F, by name. The precedence effect is Haas's published result, cited not reproduced. A measurement system and the system engineer govern the final setting.",
   example: delayTowerAlignmentExample.inputs,
   fields: [
     { key: "distance_ft", label: "Main array to delay position (ft)", kind: "number" },
@@ -1954,6 +1962,8 @@ STAGE_RENDERERS["delay-tower-alignment"] = _r({
 // dims: in { spacing_ft: L, elements: dimensionless, temp_f: T, target_freq_hz: T^-1 } out: { delay_per_element_ms: T, optimum_freq_hz: T^-1, wavelength_ft: L }
 export function computeCardioidSubArray({ spacing_ft = 0, elements = 4, temp_f = 70, target_freq_hz = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // Unit / range guard added 2026-09-26 after printed-example probing.
+  if (!Number.isInteger(Number(arguments[0]?.elements ?? 4))) return { error: "The element count must be a whole number." };
   if (!(spacing_ft > 0)) return { error: "Element spacing must be positive." };
   if (!(elements >= 2)) return { error: "An end-fire array needs at least 2 elements." };
   if (!(temp_f > -459.67)) return { error: "Air temperature must be above absolute zero." };
@@ -1977,7 +1987,7 @@ export function computeCardioidSubArray({ spacing_ft = 0, elements = 4, temp_f =
     array_depth_ft,
     spacing_for_target_ft,
     speed_ft_s,
-    note: "The per-element delay for an end-fire subwoofer array and the frequency at which its rearward rejection is deepest. An end-fire array puts subwoofers in a line pointed at the audience and delays each one behind the one in front by exactly the time sound takes to travel the spacing. Forward, every cabinet's output arrives together and adds; backward, the electronic delay and the acoustic travel time add rather than cancel, so the rear arrivals spread out and the level collapses. The rejection is deepest where the spacing is a QUARTER wavelength, because that puts the rear arrivals a half wavelength -- a full polarity flip -- apart, which makes the optimum frequency the speed of sound divided by four times the spacing. That quarter-wave relationship is the whole design, and it also sets the band: an array tuned for deep rejection at 90 Hz is progressively less directional as frequency falls, and above roughly twice the tuning frequency the pattern breaks up. Adding elements deepens and broadens the rejection without moving where it is centered. Four cabinets on 3.0 ft centers at 70 F want 2.667 ms per element, with the deepest rejection at 1125 / 12 = 93.75 Hz, right in the kick-drum band, and a 12.0 ft wavelength there of which the spacing is one quarter. Moving the tuning down to 60 Hz opens the spacing to 4.69 ft, which puts over fourteen feet of stage depth behind four cabinets -- and that trade, stage depth against depth of rejection, is the real constraint. The reverse-stack cardioid variant works on the same arithmetic with the spacing set by cabinet depth rather than chosen. A design relation; a measurement system and the room govern the deployed result.",
+    note: "The per-element delay for an end-fire subwoofer array and the frequency at which its rearward rejection is deepest. An end-fire array puts subwoofers in a line pointed at the audience and delays each one behind the one in front by exactly the time sound takes to travel the spacing. Forward, every cabinet's output arrives together and adds; backward, the electronic delay and the acoustic travel time add rather than cancel, so the rear arrivals spread out and the level collapses. The rejection is deepest where the spacing is a QUARTER wavelength, because that puts the rear arrivals a half wavelength -- a full polarity flip -- apart, which makes the optimum frequency the speed of sound divided by four times the spacing. That quarter-wave relationship is the whole design, and it also sets the band: an array tuned for deep rejection at 90 Hz is progressively less directional as frequency falls, and above roughly twice the tuning frequency the pattern breaks up. Adding elements deepens and broadens the rejection without moving where it is centered. Four cabinets on 3.0 ft centers at 70 F want 2.659 ms per element, with the deepest rejection at 1128 / 12 = 94.0 Hz, right in the kick-drum band, and a 12.0 ft wavelength there of which the spacing is one quarter. Moving the tuning down to 60 Hz opens the spacing to 4.69 ft, which puts over fourteen feet of stage depth behind four cabinets -- and that trade, stage depth against depth of rejection, is the real constraint. The reverse-stack cardioid variant works on the same arithmetic with the spacing set by cabinet depth rather than chosen. A design relation; a measurement system and the room govern the deployed result.",
   };
 }
 
@@ -2029,7 +2039,7 @@ export function computeDriverSpacingLobing({ spacing_ft = 0, test_freq_hz = 0, t
     max_spacing_ft,
     verdict,
     speed_ft_s,
-    note: "The highest frequency two sources on a given center-to-center spacing can share before the pattern acquires a null, and where that null sits when they are crossed above it. Two sources radiating the same signal are in phase everywhere on their perpendicular bisector and progressively out of phase off it, because the path lengths differ by the spacing times the sine of the off-axis angle. When that path difference reaches half a wavelength they cancel. Below the frequency at which even the WORST case -- the full spacing, at 90 degrees off axis -- is under half a wavelength, no null can exist anywhere and the pair behaves as one source, which puts the crossover ceiling at the speed of sound divided by twice the spacing. Cross two drivers below it and the array is coherent through the crossover region; cross above it and a null sits in the pattern at the crossover, moving with frequency, audible as the audience walks past it. Two 15 in woofers on 18 in centers at 70 F have a ceiling of 1125 / 3 = 375 Hz: crossed at 250 Hz the ratio exceeds one and there is no null anywhere, while crossed at 500 Hz the ratio is 0.75 and the null lands 48.6 degrees off axis. Run it backward and keeping 500 Hz clean would need the spacing in to 1.13 ft, about thirteen and a half inches center to center, which two 15 in drivers physically cannot do -- which is why large-format two-way boxes cross low, and why the spacing constraint is a cabinet design decision long before it is a system tuning one. The same arithmetic answers how far apart two subwoofers can be spread before the center of the room gets a hole. A geometric screen; measured polar data governs a real cabinet.",
+    note: "The highest frequency two sources on a given center-to-center spacing can share before the pattern acquires a null, and where that null sits when they are crossed above it. Two sources radiating the same signal are in phase everywhere on their perpendicular bisector and progressively out of phase off it, because the path lengths differ by the spacing times the sine of the off-axis angle. When that path difference reaches half a wavelength they cancel. Below the frequency at which even the WORST case -- the full spacing, at 90 degrees off axis -- is under half a wavelength, no null can exist anywhere and the pair behaves as one source, which puts the crossover ceiling at the speed of sound divided by twice the spacing. Cross two drivers below it and the array is coherent through the crossover region; cross above it and a null sits in the pattern at the crossover, moving with frequency, audible as the audience walks past it. Two 15 in woofers on 18 in centers at 70 F have a ceiling of 1128 / 3 = 376 Hz: crossed at 250 Hz the ratio exceeds one and there is no null anywhere, while crossed at 500 Hz the ratio is 0.75 and the null lands 48.8 degrees off axis. Run it backward and keeping 500 Hz clean would need the spacing in to 1.13 ft, about thirteen and a half inches center to center, which two 15 in drivers physically cannot do -- which is why large-format two-way boxes cross low, and why the spacing constraint is a cabinet design decision long before it is a system tuning one. The same arithmetic answers how far apart two subwoofers can be spread before the center of the room gets a hole. A geometric screen; measured polar data governs a real cabinet.",
   };
 }
 
@@ -2059,6 +2069,8 @@ export function computeWirelessIntermod({ f1_mhz = 0, f2_mhz = 0, test_freq_mhz 
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(f1_mhz > 0) || !(f2_mhz > 0)) return { error: "Both carrier frequencies must be positive." };
   if (f1_mhz === f2_mhz) return { error: "The two carriers must be on different frequencies." };
+  if (f1_mhz < 30 || f2_mhz < 30 || f1_mhz > 6000 || f2_mhz > 6000) return { error: "Enter carrier frequencies in MHz (wireless mics sit about 470 to 2,400 MHz), not kHz or GHz." };
+  if (Math.max(f1_mhz, f2_mhz) >= 2 * Math.min(f1_mhz, f2_mhz)) return { error: "Carriers an octave or more apart put a third-order product at or below zero; these are not two channels of one band." };
   if (!(test_freq_mhz >= 0)) return { error: "Test frequency cannot be negative." };
   // An evenly spaced channel plan is the WORST possible plan: the third-order product of
   // one pair lands exactly on the next channel.
@@ -2113,6 +2125,8 @@ STAGE_RENDERERS["wireless-intermod"] = _r({
 // dims: in { length_ft: L, loss_per_100ft_db: dimensionless, connectors: dimensionless, loss_per_connector_db: dimensionless, splitter_loss_db: dimensionless, amplifier_gain_db: dimensionless } out: { cable_loss_db: dimensionless, total_loss_db: dimensionless, net_gain_db: dimensionless }
 export function computeRfAntennaCableLoss({ length_ft = 0, loss_per_100ft_db = 0, connectors = 0, loss_per_connector_db = 0.25, splitter_loss_db = 0, amplifier_gain_db = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // Unit / range guard added 2026-09-26 after printed-example probing.
+  if (!Number.isInteger(Number(arguments[0]?.connectors ?? 0))) return { error: "The connector count must be a whole number." };
   if (!(length_ft > 0)) return { error: "Cable length must be positive." };
   if (!(loss_per_100ft_db > 0)) return { error: "Loss per 100 ft must be positive." };
   if (!(connectors >= 0)) return { error: "Connector count cannot be negative." };
@@ -2136,7 +2150,7 @@ export function computeRfAntennaCableLoss({ length_ft = 0, loss_per_100ft_db = 0
     total_loss_db,
     net_gain_db,
     verdict,
-    note: "The loss between a wireless antenna and its receiver, and whether the inline amplifier makes it up or overshoots. Coax loss is quoted per hundred feet at a stated frequency and rises with frequency, so a run that is fine for a 200 MHz intercom is lossy for a 600 MHz microphone. Every decibel lost between the antenna and the receiver comes straight off the system's range and cannot be recovered downstream, because an amplifier at the receiver end amplifies the noise the cable added along with the signal. The target is UNITY gain, not maximum gain: an inline amplifier is there to replace the cable's loss, not to exceed it, and a net meaningfully above zero pushes the receiver front end toward overload and intermodulation, whose symptom looks exactly like a weak signal. Aim for a net between about -3 and +3 dB, and put the amplifier at the antenna end where it amplifies signal before the cable degrades it. A 150 ft run on RG-8X-class coax at 600 MHz, about 8.8 dB per 100 ft, loses 13.2 dB, so a 12 dB inline amplifier lands at -1.2 dB net and the system will work. Change one thing -- the same 150 ft on LMR-400-class coax at about 3.9 dB per 100 ft -- and the loss is 5.85 dB, close enough to unity that no amplifier is needed at all and there is one less active device in the path. Better cable is almost always the better answer. A budget estimate; the cable manufacturer's published loss at the operating frequency and a measured RF level govern.",
+    note: "The loss between a wireless antenna and its receiver, and whether the inline amplifier makes it up or overshoots. Coax loss is quoted per hundred feet at a stated frequency and rises with frequency, so a run that is fine for a 200 MHz intercom is lossy for a 600 MHz microphone. Every decibel lost between the antenna and the receiver comes straight off the system's range and cannot be recovered downstream, because an amplifier at the receiver end amplifies the noise the cable added along with the signal. The target is UNITY gain, not maximum gain: an inline amplifier is there to replace the cable's loss, not to exceed it, and a net meaningfully above zero pushes the receiver front end toward overload and intermodulation, whose symptom looks exactly like a weak signal. Aim for a net between about -3 and +3 dB, and put the amplifier at the antenna end where it amplifies signal before the cable degrades it. A 150 ft run on RG-8X-class coax at 600 MHz, about 8.8 dB per 100 ft, loses 13.2 dB, so a 12 dB inline amplifier lands at -1.2 dB net and the system will work. Change one thing -- the same 150 ft on LMR-400-class coax at about 3.2 dB per 100 ft at 600 MHz (Times Microwave prints 2.7 at 450 MHz and 3.9 at 900) -- and the loss is about 4.7 dB, close enough to unity that no amplifier is needed at all and there is one less active device in the path. Better cable is almost always the better answer. A budget estimate; the cable manufacturer's published loss at the operating frequency and a measured RF level govern.",
   };
 }
 
@@ -2167,6 +2181,8 @@ STAGE_RENDERERS["rf-antenna-cable-loss"] = _r({
 // dims: in { lift_height_ft: L, hoist_speed_fpm: L T^-1, load_lb: M L T^-2, duty_cycle: dimensionless, rating_period_min: T, hoists: dimensionless } out: { lift_time_min: T, hoisting_hp: M L^2 T^-3, allowed_on_time_min: T, lifts_per_period: dimensionless }
 export function computeChainHoistLiftTime({ lift_height_ft = 0, hoist_speed_fpm = 16, load_lb = 0, duty_cycle = 0.4, rating_period_min = 10, hoists = 1 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // Unit / range guard added 2026-09-26 after printed-example probing.
+  if (!Number.isInteger(Number(arguments[0]?.hoists ?? 1))) return { error: "The hoist count must be a whole number." };
   if (!(lift_height_ft > 0)) return { error: "Lift height must be positive." };
   if (!(hoist_speed_fpm > 0)) return { error: "Hoist speed must be positive." };
   if (!(load_lb > 0)) return { error: "Load must be positive." };
@@ -2259,7 +2275,7 @@ export function computeGoboImageSize({ throw_ft = 0, field_angle_deg = 0, incide
 export const goboImageSizeExample = { inputs: { throw_ft: 30, field_angle_deg: 36, incidence_deg: 45, gobo_image_mm: 0, gate_diameter_mm: 0 } };
 
 STAGE_RENDERERS["gobo-image-size"] = _r({
-  citation: "Citation: gobo image size from the field-angle cone (diameter = 2 x throw x tan(field/2)) with the 1/cos keystone stretch and cos illuminance falloff for a non-perpendicular hit, by name. Public projection geometry. The fixture's published field angle and a focus check in the room govern.",
+  citation: "Citation: gobo image size from the field-angle cone (diameter = 2 x throw x tan(field/2)) with the exact edge-ray keystone stretch and cos illuminance falloff for a non-perpendicular hit, by name. Public projection geometry. The fixture's published field angle and a focus check in the room govern.",
   example: goboImageSizeExample.inputs,
   fields: [
     { key: "throw_ft", label: "Throw distance (ft)", kind: "number" },
@@ -2302,6 +2318,8 @@ export const MIRED_CORRECTIONS = [
 // dims: in { source_k: T, target_k: T, applied_shift: T^-1 } out: { source_mired: T^-1, target_mired: T^-1, shift_needed: T^-1, resulting_k: T }
 export function computeMiredGelShift({ source_k = 3200, target_k = 5600, applied_shift = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // Unit / range guard added 2026-09-26 after printed-example probing.
+  if ([arguments[0]?.source_k, arguments[0]?.target_k].some((v) => Number(v) > 0 && Number(v) < 1000)) return { error: "Enter color temperatures in kelvin (3200), not thousands of kelvin (3.2)." };
   if (!(source_k > 0)) return { error: "Source color temperature must be positive." };
   if (!(target_k > 0)) return { error: "Target color temperature must be positive." };
   if (!Number.isFinite(applied_shift)) return { error: "Applied mired shift must be a finite number." };
@@ -2476,6 +2494,8 @@ STAGE_RENDERERS["stage-deck-live-load"] = _r({
 // dims: in { width_px: dimensionless, height_px: dimensionless, bit_depth: dimensionless, refresh_hz: T^-1, pixels_per_port: dimensionless } out: { total_pixels: dimensionless, data_rate_gbps: dimensionless, ports_needed: dimensionless, spare_pixels: dimensionless }
 export function computeVideoWallDataRate({ width_px = 0, height_px = 0, bit_depth = 8, refresh_hz = 60, pixels_per_port = 650000 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // Unit / range guard added 2026-09-26 after printed-example probing.
+  if (Number(arguments[0]?.bit_depth) > 16) return { error: "Enter the bit depth per color channel (8 or 10), not per pixel (24)." };
   if (!(width_px > 0 && height_px > 0)) return { error: "Wall width and height in pixels must be positive." };
   if (!(bit_depth > 0)) return { error: "Bit depth per channel must be positive." };
   if (!(refresh_hz > 0)) return { error: "Refresh rate must be positive." };
@@ -2494,7 +2514,7 @@ export function computeVideoWallDataRate({ width_px = 0, height_px = 0, bit_dept
     ports_needed,
     spare_pixels,
     last_port_used,
-    note: "The pixel count, uncompressed data rate, and processor port count for an LED wall. A wall's processor budget is counted in pixels per output port, not in resolution. A gigabit sending-card port carries a fixed pixel budget -- commonly around 650,000 pixels at 60 Hz, and proportionally fewer as refresh rate or bit depth rises -- and the wall is divided among however many ports that takes. The consequence is that two walls with the same physical size but different pixel pitches need very different amounts of processing, and the finer wall may need a second processor entirely. That is a fact about the processor rather than about the panels, which is exactly why it is missed when a wall is quoted by panel count. The data-rate line is the sanity check on the source side, and it says whether the incoming signal format can actually carry the wall. A wall built out to 3,840 by 2,160 is 8,294,400 pixels, which at 8-bit color and 60 Hz is 8,294,400 x 24 x 60 / 1e9 = 11.94 Gbps and takes thirteen 650,000-pixel ports -- more than one sending card carries, so this wall needs two. The same 11.94 Gbps sits right at the edge of what a single HDMI 2.0 or 12G-SDI link will pass, so moving to 10-bit takes the rate to 14.93 Gbps and the single-link source format has to change. A planning estimate; the processor manufacturer's published per-port capacity at the operating refresh and bit depth, and the panel maker's own mapping, govern the build.",
+    note: "The pixel count, uncompressed data rate, and processor port count for an LED wall. A wall's processor budget is counted in pixels per output port, not in resolution. A gigabit sending-card port carries a fixed pixel budget -- commonly around 650,000 pixels at 60 Hz, and proportionally fewer as refresh rate or bit depth rises -- and the wall is divided among however many ports that takes. The consequence is that two walls with the same physical size but different pixel pitches need very different amounts of processing, and the finer wall may need a second processor entirely. That is a fact about the processor rather than about the panels, which is exactly why it is missed when a wall is quoted by panel count. The data-rate line is the sanity check on the source side, and it says whether the incoming signal format can actually carry the wall. A wall built out to 3,840 by 2,160 is 8,294,400 pixels, which at 8-bit color and 60 Hz is 8,294,400 x 24 x 60 / 1e9 = 11.94 Gbps and takes thirteen 650,000-pixel ports -- more than one sending card carries, so this wall needs two. The same 11.94 Gbps fits HDMI 2.0 (14.4 Gbps of video data) but is just over a 12G-SDI link's 11.88 Gbps, which is why 12G-SDI carries 4K60 as 10-bit 4:2:2 rather than full RGB; moving to 10-bit RGB takes the rate to 14.93 Gbps, past HDMI 2.0 as well, and the source format has to change. A planning estimate; the processor manufacturer's published per-port capacity at the operating refresh and bit depth, and the panel maker's own mapping, govern the build.",
   };
 }
 

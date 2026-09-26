@@ -7148,7 +7148,7 @@ export const CITATIONS = {
     formula: "Speed of sound c = 331.3 + 0.606 × T_C (m/s). Delay-tower delay (ms) = distance_m / c × 1000. Haas-window offset 10-30 ms recommended for delayed system natural-source perception.",
     edition: "Classical acoustics; AES (Audio Engineering Society) information documents on time-alignment by name.",
     freeAccess: "AES information documents free at aes.org/standards/blog.",
-    governance: GOVERNANCE.rigging,
+    governance: GOVERNANCE.general,
     editionNote: "Single-edition (physics).",
     assumptions: [
       { name: "Default temperature", value: "68 °F (20 °C) unless user supplies", source: "engineering practice" },
@@ -7166,7 +7166,7 @@ export const CITATIONS = {
     formula: "Three-phase neutral current (balanced linear loads) I_N = sqrt(I_A² + I_B² + I_C² − I_A·I_B − I_B·I_C − I_A·I_C). Harmonic-load warning: triplen (3rd) harmonic currents add in phase, so the neutral carries three times the per-phase 3rd-harmonic current and can exceed the phase current.",
     edition: "IEEE 519 (Standard for Harmonic Control in Electric Power Systems) by name; classical three-phase electrical theory.",
     freeAccess: "IEEE 519 licensed; principles free in published power-engineering texts and at IEEE-USA outreach.",
-    governance: GOVERNANCE.rigging,
+    governance: GOVERNANCE.electrical,
     editionNote: "Single-edition (physics + IEEE 519 by name).",
     assumptions: [
       { name: "Linear-load assumption", value: "true (closed-form holds; non-linear / triplen-harmonic loads can drive neutral current above the worst phase)", source: "IEEE 519 §5" },
@@ -7197,19 +7197,19 @@ export const CITATIONS = {
     ],
   },
   "delay-tower-alignment": {
-    formula: "c = 1125 x sqrt((temp_f + 459.67) / 529.67); geometric_ms = distance_ft / c x 1000; set_delay_ms = geometric_ms + haas_offset_ms.",
-    edition: "Geometric propagation delay plus a Haas (precedence-effect) offset, with the speed of sound scaled as the square root of absolute temperature from the 1125 ft/s reference at 70 F, by name; the precedence effect is Haas's published result, cited not reproduced, and a measurement system and the system engineer govern the final setting.",
+    formula: "c = 49.03 x sqrt(temp_f + 459.67), about 1,128 ft/s at 70 F; geometric_ms = distance_ft / c x 1000; set_delay_ms = geometric_ms + haas_offset_ms.",
+    edition: "Geometric propagation delay plus a Haas (precedence-effect) offset, with the speed of sound scaled as the square root of absolute temperature as 49.03 x sqrt(Rankine), about 1,128 ft/s at 70 F, by name; the precedence effect is Haas's published result, cited not reproduced, and a measurement system and the system engineer govern the final setting.",
     freeAccess: "Propagation delay and the temperature scaling of the speed of sound are public physics. The distance, temperature, and chosen Haas offset are the engineer's own values.",
     governance: GOVERNANCE.general,
     editionNote: "The geometric half of a delay setting is straightforward: sound from the main array reaches the delay position some milliseconds after the delay speaker could fire, and delaying the tower by that time puts the two arrivals on top of each other. But two coincident arrivals from two directions do not localize, and the audience under the tower hears the tower, so the show appears to come from the wrong place. The Haas offset is the fix. Adding ten to twenty milliseconds beyond the geometric time makes the main array arrive first by a margin the ear reads as the source direction, while the delay speaker, still arriving inside the precedence window, adds level without being heard as a separate sound. Fifteen milliseconds is the common starting point and is worth roughly seventeen feet of apparent distance. Temperature is the part that gets missed. The speed of sound rises with the square root of absolute temperature, so an alignment set on a cool morning is wrong by a warm showtime, and the error grows with distance, which is exactly where the long throws are: a twenty-degree swing moves a 180 ft alignment by about three milliseconds and a 400 ft alignment by more than six, which is audible. Outdoor shows re-check delay times when the air moves.",
     assumptions: [
-      { name: "Speed of sound", value: "1125 ft/s at 70 F, scaled as the square root of absolute temperature (Rankine)", source: "physical acoustics" },
+      { name: "Speed of sound", value: "about 1,128 ft/s at 70 F: 49.03 x the square root of absolute temperature (Rankine)", source: "physical acoustics" },
       { name: "Haas offset", value: "10 to 20 ms beyond the geometric time; 15 ms is the common starting point", source: "the precedence effect (Haas)" },
       { name: "Temperature drift", value: "the error scales with distance, so long throws re-check when the air moves", source: "outdoor system-engineering practice" },
     ],
   },
   "cardioid-sub-array": {
-    formula: "c = 1125 x sqrt((temp_f + 459.67) / 529.67); delay_per_element_ms = spacing_ft / c x 1000; optimum_freq_hz = c / (4 x spacing_ft); wavelength_ft = c / optimum_freq_hz; spacing_for_target_ft = c / (4 x target_freq_hz).",
+    formula: "c = 49.03 x sqrt(temp_f + 459.67), about 1,128 ft/s at 70 F; delay_per_element_ms = spacing_ft / c x 1000; optimum_freq_hz = c / (4 x spacing_ft); wavelength_ft = c / optimum_freq_hz; spacing_for_target_ft = c / (4 x target_freq_hz).",
     edition: "End-fire and reverse-stack cardioid subwoofer arrays from the quarter-wavelength spacing relation, by name; standard live-sound system design practice built on public acoustics. A measurement system and the room govern the deployed result.",
     freeAccess: "The quarter-wave rear-cancellation geometry is public acoustics; the spacing, element count, and temperature are the designer's own values.",
     governance: GOVERNANCE.general,
@@ -7221,7 +7221,7 @@ export const CITATIONS = {
     ],
   },
   "driver-spacing-lobing": {
-    formula: "c = 1125 x sqrt((temp_f + 459.67) / 529.67); crossover_ceiling_hz = c / (2 x spacing_ft); ratio = c / (2 x spacing_ft x test_freq_hz); null_angle = asin(ratio) when ratio <= 1, otherwise no null; max_spacing_ft = c / (2 x test_freq_hz).",
+    formula: "c = 49.03 x sqrt(temp_f + 459.67), about 1,128 ft/s at 70 F; crossover_ceiling_hz = c / (2 x spacing_ft); ratio = c / (2 x spacing_ft x test_freq_hz); null_angle = asin(ratio) when ratio <= 1, otherwise no null; max_spacing_ft = c / (2 x test_freq_hz).",
     edition: "Two-source interference geometry -- path difference = spacing x sin(angle), with the first null where that difference reaches half a wavelength -- giving the crossover ceiling c / (2 x spacing), by name; public acoustics, standard in the loudspeaker-design literature. Measured polar data for the real cabinet governs.",
     freeAccess: "Two-source interference is public physics. The spacing, test frequency, and temperature are the user's own values.",
     governance: GOVERNANCE.general,
@@ -7321,7 +7321,7 @@ export const CITATIONS = {
     edition: "Uncompressed video data rate = pixels x bit depth x 3 channels x refresh, and processor port count = ceil(pixels / pixels per port), by name; public arithmetic, with the per-port pixel budget the processor manufacturer's published figure at the operating refresh and bit depth, cited not reproduced. The processor maker's capacity and the panel maker's mapping govern the build.",
     freeAccess: "The data rate is arithmetic on the raster. The per-port pixel budget is the processor manufacturer's published figure, entered by the user rather than bundled.",
     governance: GOVERNANCE.general,
-    editionNote: "An LED wall's processor budget is counted in pixels per output port, not in resolution. A gigabit sending-card port carries a fixed pixel budget, and proportionally fewer pixels as refresh rate or bit depth rises, and the wall is divided among however many ports that takes. The consequence is that two walls of identical physical size but different pixel pitches need very different amounts of processing, and the finer wall may need a second processor entirely. That is a fact about the processor rather than about the panels, which is exactly why it is missed when a wall is quoted by panel count and priced by square footage. The data-rate line is the sanity check on the source side and it says whether the incoming signal format can actually carry the wall: three channels at eight bits and sixty hertz over an ultra-high-definition raster sits right at the edge of what a single HDMI 2.0 or 12G-SDI link will pass, so moving to ten-bit color or to a higher refresh crosses it and the source format has to change. Both numbers belong in the quote rather than in the load-in.",
+    editionNote: "An LED wall's processor budget is counted in pixels per output port, not in resolution. A gigabit sending-card port carries a fixed pixel budget, and proportionally fewer pixels as refresh rate or bit depth rises, and the wall is divided among however many ports that takes. The consequence is that two walls of identical physical size but different pixel pitches need very different amounts of processing, and the finer wall may need a second processor entirely. That is a fact about the processor rather than about the panels, which is exactly why it is missed when a wall is quoted by panel count and priced by square footage. The data-rate line is the sanity check on the source side and it says whether the incoming signal format can actually carry the wall: three channels at eight bits and sixty hertz over an ultra-high-definition raster fits HDMI 2.0's 14.4 Gbps of video data but is just over a 12G-SDI link's 11.88 Gbps, and moving to ten-bit color or a higher refresh crosses HDMI 2.0 as well, so the source format has to change. Both numbers belong in the quote rather than in the load-in.",
     assumptions: [
       { name: "Ports, not resolution", value: "the processor budget is pixels per port; two walls of the same size and different pitch need different processing", source: "LED processing practice" },
       { name: "Per-port budget", value: "the manufacturer's published pixel capacity at the operating refresh and bit depth; it falls as either rises", source: "processor manufacturer data" },
@@ -7344,21 +7344,21 @@ export const CITATIONS = {
     formula: "L2 = L1 − 20 × log10(d2 / d1). Free-field (−6 dB per doubling of distance), hemispherical (ground-coupled), or indoor (less attenuation due to reflection).",
     edition: "Classical acoustics (inverse-square law); ISO 9613-2 (Acoustics - Attenuation of sound during propagation outdoors) by name.",
     freeAccess: "Inverse-square principle free in physics texts; ISO 9613-2 licensed.",
-    governance: GOVERNANCE.rigging,
+    governance: GOVERNANCE.general,
     editionNote: "Single-edition (physics).",
     assumptions: [
-      { name: "Mode adjustments", value: "free-field 0 dB / hemispherical −3 dB / indoor user-supplied", source: "ISO 9613-2 typical" },
+      { name: "Mode adjustments", value: "free-field 0 dB / hemispherical +3 dB (half-space) / indoors +6 dB (a rough quarter-space approximation)", source: "ISO 9613-2 typical" },
     ],
   },
   "spl-distance-for-level": {
     formula: "d2 = d1 x 10^((L1 + mode_factor + 10 log10(N) - L2) / 20); the inverse of L2 = L1 - 20 log10(d2/d1).",
     edition: "Classical acoustics (inverse-square law); ISO 9613-2 (Acoustics - Attenuation of sound during propagation outdoors) by name.",
     freeAccess: "Inverse-square principle free in physics texts; ISO 9613-2 licensed.",
-    governance: GOVERNANCE.rigging,
+    governance: GOVERNANCE.general,
     editionNote: "The distance at which the sound pressure level falls to a target, the inverse of spl-distance: d2 = d1 x 10^((L1 + mode_factor + 10 log10(N) - L2) / 20). Every doubling of distance drops the free-field level 6 dB. The target must be below the mode- and source-adjusted reference level (a louder target is only reached closer than the reference distance and is rejected). The mode factor approximates surface reinforcement (free-field 0 dB, hemispherical +3 dB reinforcement, indoor more) and N is the count of identical incoherent sources (+3 dB per doubling). Single-edition (physics). A planning estimate; the room and the measurement govern the real level.",
     assumptions: [
       { name: "Inverse-square inverse", value: "d2 = d1 x 10^((L1 + mode_factor + 10 log10(N) - L2)/20); the target must be below the adjusted reference level or it is rejected", source: "inverse-square law" },
-      { name: "Mode adjustments", value: "free-field 0 dB / hemispherical -3 dB / indoor user-supplied", source: "ISO 9613-2 typical" },
+      { name: "Mode adjustments", value: "free-field 0 dB / hemispherical +3 dB (half-space) / indoors +6 dB (a rough quarter-space approximation)", source: "ISO 9613-2 typical" },
     ],
   },
   "spl-atmospheric": {
@@ -8578,7 +8578,7 @@ export const CITATIONS = {
     formula: "SPL(d) = sensitivity + 10*log10(P) - 20*log10(d / 1 m); peak = SPL + crest factor; inverse power P = 10^((target - sensitivity + 20*log10(d)) / 10).",
     edition: "First-principles loudspeaker SPL from the 1 W / 1 m sensitivity reference, the 10*log power term, and the inverse-square distance term (public; ANSI S1.1 decibel basis), by name.",
     freeAccess: "Public first-principles acoustics. A free-field estimate; the manufacturer's max-SPL spec governs.",
-    governance: GOVERNANCE.rigging,
+    governance: GOVERNANCE.general,
     editionNote: "Single-edition (physics). Free-field estimate; room gain, power compression, and driver excursion limits are not modeled.",
     assumptions: [
       { name: "Free field", value: "no room gain or boundary reinforcement modeled", source: "method" },
@@ -8589,7 +8589,7 @@ export const CITATIONS = {
     formula: "Beam (pool) diameter = 2 x throw x tan(beam angle / 2); center illuminance E = candela / distance^2 (inverse-square). Candela from lumens = lumens / (2*pi*(1 - cos(beam angle / 2))). 1 fc = 10.764 lux.",
     edition: "First-principles theatrical photometry - beam spread and the inverse-square illuminance the form fixture photometric charts (manufacturer cut sheets) publish, by name; public domain.",
     freeAccess: "Public first-principles photometry. The center-beam candela / field-vs-beam angle come from the fixture's photometric data; a real beam is brighter at center than the edge.",
-    governance: GOVERNANCE.rigging,
+    governance: GOVERNANCE.general,
     editionNote: "Single-edition (physics). Point-source / single-fixture model; for room or area average illuminance (lumen method) use the lux-to-footcandle tile. The lumens-to-candela conversion is an average-over-the-cone estimate.",
     assumptions: [
       { name: "Point source", value: "single aimed fixture, inverse-square from the photometric center; no field falloff or atmospheric loss modeled", source: "method" },
@@ -8599,7 +8599,7 @@ export const CITATIONS = {
     formula: "throw = target_pool_diameter / (2 x tan(beam angle / 2)); the inverse of beam_diameter = 2 x throw x tan(beam angle / 2).",
     edition: "First-principles theatrical photometry - the beam-spread geometry the form fixture photometric charts (manufacturer cut sheets) publish, solved for the throw, by name; public domain.",
     freeAccess: "Public first-principles photometry. The beam / field angle comes from the fixture's photometric data.",
-    governance: GOVERNANCE.rigging,
+    governance: GOVERNANCE.general,
     editionNote: "The throw distance a fixture needs to cast a target beam (pool) diameter, the inverse of lighting-beam: throw = D / (2 x tan(beam angle / 2)), in the entered unit. A wider beam angle reaches the same pool from a shorter throw. This is the geometry only; the center-beam illuminance still falls off with the square of the throw, so a farther hang for a larger pool is also a dimmer one (check the level with the lighting-beam tile). Enter the beam angle you are designing to (beam angle to 50% intensity, or the wider field angle to 10%). Single-edition (physics); the fixture cut sheet governs.",
     assumptions: [
       { name: "Geometry only", value: "throw from beam spread; the illuminance still falls with the square of the throw (use lighting-beam for the level)", source: "method" },
@@ -22808,7 +22808,7 @@ export const CITATIONS = {
     ],
   },
   "shot-size-residence-time": {
-    formula: "residence time = (barrel capacity / shot size) x cycle time; the usable shot window is commonly 20 to 80% of barrel capacity, and the barrel range for a given shot inverts it.",
+    formula: "residence time = (barrel capacity / shot size) x cycle time; the usable shot window is commonly 20 to 65% of barrel capacity (Basilius; Plastics Technology gives 25 to 65%), and the barrel range for a given shot inverts it.",
     edition: "Shot size and residence time as injection moulding practice states them, with the material's maximum residence ENTERED from the resin supplier's processing data because it is a material property rather than a machine one.",
     freeAccess: "One ratio and one multiplication.",
     governance: GOVERNANCE.general,
@@ -22844,7 +22844,7 @@ export const CITATIONS = {
     ],
   },
   "extrusion-output-rate": {
-    formula: "output = cross-sectional area x line speed x melt density, with the EXACT annular area pi/4 x (OD^2 - ID^2); line speed inverts it, and draw-down is die opening over product size.",
+    formula: "output = cross-sectional area x line speed x the product's solid density (the dimensions are the cooled product's), with the EXACT annular area pi/4 x (OD^2 - ID^2); line speed inverts it, and draw-down is die opening over product size.",
     edition: "The extrusion mass balance. The exact annulus is used rather than the thin-wall approximation pi x OD x wall, which runs several percent high on a heavy wall and puts that error directly onto the output figure. Melt density is ENTERED because it differs from solid density and varies with temperature.",
     freeAccess: "One mass balance on entered geometry.",
     governance: GOVERNANCE.general,
@@ -24805,7 +24805,7 @@ export const CITATIONS = {
     governance: GOVERNANCE.general,
     editionNote: "The makeup rate is proportional to the air change rate, so a controller that keeps the injector open when the vents crack pays that multiple to enrich the outdoors. Interlocking the injector to vent position is the whole control strategy.",
     assumptions: [
-      { name: "Mixing", value: "a well-mixed house at steady state is assumed; crop uptake is not deducted", source: "spec-v1755 scope" },
+      { name: "Mixing", value: "a well-mixed house at steady state is assumed; the crop's own CO2 use is entered separately and ADDED to the leak makeup (Bartok: about 11.5 cu ft per hour for a 30 x 128 ft house)", source: "spec-v1755 scope" },
       { name: "Combustion", value: "an unvented burner adds water and combustion products; its own safety requirements apply", source: "equipment listing" },
     ],
   },
@@ -24822,13 +24822,13 @@ export const CITATIONS = {
   },
   "greenhouse-transpiration-water": {
     formula: "transpiration = solar energy through the glazing x the crop's latent fraction / 1,050 Btu per pound of water; applied = transpiration / (1 - leaching fraction).",
-    edition: "An energy balance. The crop's own stage and the irrigation designer govern; 0.05 to 0.15 gal per square foot per day is the band growers quote.",
+    edition: "An energy balance. The crop's own stage and the irrigation designer govern; UMass Extension sizes the water supply itself at 0.3 to 0.4 gal per square foot of bench per day at peak.",
     freeAccess: "Public energy balance; the grower band is widely published.",
     governance: GOVERNANCE.general,
     editionNote: "Irrigation must deliver the PEAK hour, not the daily total divided by the day length. Every pound transpired enters the house air: a ventilated house blows it outside, while a sealed house must remove it, which is why closed rooms fail on humidity first.",
     assumptions: [
       { name: "Latent fraction", value: "entered; roughly half for a well-watered crop and much lower for a sparse or stressed one", source: "grower observation" },
-      { name: "Check", value: "the 0.05 to 0.15 gal/sq ft/day band is the sanity check on the energy route", source: "industry practice" },
+      { name: "Supply sizing", value: "0.3 to 0.4 gal per sq ft of bench per day at peak sizes the supply; crop transpiration is a smaller figure", source: "UMass Extension, Sizing the Greenhouse Water System (Bartok, 2009)" },
     ],
   },
   "thermal-screen-energy-saving": {

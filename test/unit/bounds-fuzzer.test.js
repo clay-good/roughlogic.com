@@ -39587,18 +39587,19 @@ test("bounds: spec-v1364 computeLineArraySplay pins the coverage angle, the spla
 
 import { computeDelayTowerAlignment as _v1365 } from "../../calc-stage.js";
 test("bounds: spec-v1365 computeDelayTowerAlignment pins the delay and the temperature drift", () => {
-  // 180 ft at 70 F: 160.0 ms geometric, 175.0 ms set. At 90 F, c = 1146.0 and geometric = 157.1.
+  // 180 ft at 70 F: c = 49.03 sqrt(529.67) = 1128.4 ft/s, 159.5 ms geometric, 174.5 ms set. At 90 F, c = 1149.5 and geometric = 156.6.
   const base = { distance_ft: 180, temp_f: 70, haas_offset_ms: 15, compare_temp_f: 90 };
   const r = _v1365(base);
-  assert.ok(Math.abs(r.speed_ft_s - 1125) < 1e-9);
-  assert.ok(Math.abs(r.geometric_ms - 160.0) < 1e-9);
-  assert.ok(Math.abs(r.set_delay_ms - 175.0) < 1e-9);
-  assert.ok(Math.abs(r.compare_speed_ft_s - 1146.04) < 1e-2);
-  assert.ok(Math.abs(r.compare_geometric_ms - 157.06) < 1e-2);
-  assert.ok(Math.abs(r.drift_ms + 2.94) < 1e-2);
+  const c70 = 49.03 * Math.sqrt(529.67);
+  assert.ok(Math.abs(r.speed_ft_s - c70) < 1e-9);
+  assert.ok(Math.abs(r.geometric_ms - 180 / c70 * 1000) < 1e-9);
+  assert.ok(Math.abs(r.set_delay_ms - (180 / c70 * 1000 + 15)) < 1e-9);
+  assert.ok(Math.abs(r.compare_speed_ft_s - 1149.51) < 1e-2);
+  assert.ok(Math.abs(r.compare_geometric_ms - 156.59) < 1e-2);
+  assert.ok(Math.abs(r.drift_ms + 2.93) < 1e-2);
   // The drift scales with distance: the same 20 F swing on a 400 ft throw is 6.5 ms.
   const far = _v1365({ ...base, distance_ft: 400 });
-  assert.ok(Math.abs(far.drift_ms + 6.53) < 1e-2);
+  assert.ok(Math.abs(far.drift_ms + 6.51) < 1e-2);
   assert.ok(Math.abs(far.drift_ms - r.drift_ms * 400 / 180) < 1e-9);
   assert.ok("error" in _v1365({ ...base, distance_ft: 0 }));
   assert.ok("error" in _v1365({ ...base, temp_f: -500 }));
@@ -39609,19 +39610,20 @@ test("bounds: spec-v1365 computeDelayTowerAlignment pins the delay and the tempe
 
 import { computeCardioidSubArray as _v1366 } from "../../calc-stage.js";
 test("bounds: spec-v1366 computeCardioidSubArray pins the quarter-wave relation", () => {
-  // 3.0 ft centers at 70 F: 2.667 ms per element, deepest rejection at 93.75 Hz, 12.0 ft wavelength.
+  // 3.0 ft centers at 70 F: 2.659 ms per element, deepest rejection at 94.0 Hz, 12.0 ft wavelength.
   const base = { spacing_ft: 3.0, elements: 4, temp_f: 70, target_freq_hz: 60 };
   const r = _v1366(base);
-  assert.ok(Math.abs(r.delay_per_element_ms - 2.6667) < 1e-3);
-  assert.ok(Math.abs(r.optimum_freq_hz - 93.75) < 1e-9);
+  const c70 = 49.03 * Math.sqrt(529.67);
+  assert.ok(Math.abs(r.delay_per_element_ms - 3 / c70 * 1000) < 1e-9);
+  assert.ok(Math.abs(r.optimum_freq_hz - c70 / 12) < 1e-9);
   assert.ok(Math.abs(r.wavelength_ft - 12.0) < 1e-9);
   // The spacing IS one quarter of the wavelength at the optimum -- the whole design.
   assert.ok(Math.abs(r.wavelength_ft / 4 - base.spacing_ft) < 1e-9);
-  assert.ok(Math.abs(r.total_delay_ms - 8.0) < 1e-3);
+  assert.ok(Math.abs(r.total_delay_ms - 9 / c70 * 1000) < 1e-9);
   assert.ok(Math.abs(r.array_depth_ft - 9.0) < 1e-9);
   // Tuning an octave lower doubles the spacing, and the stage depth with it.
-  assert.ok(Math.abs(r.spacing_for_target_ft - 4.6875) < 1e-4);
-  const octave = _v1366({ ...base, target_freq_hz: 46.875 });
+  assert.ok(Math.abs(r.spacing_for_target_ft - c70 / 240) < 1e-9);
+  const octave = _v1366({ ...base, target_freq_hz: c70 / 24 });
   assert.ok(Math.abs(octave.spacing_for_target_ft - 6.0) < 1e-9);
   // Without a target the spacing output is null, not zero.
   assert.strictEqual(_v1366({ ...base, target_freq_hz: 0 }).spacing_for_target_ft, null);
@@ -39634,19 +39636,20 @@ test("bounds: spec-v1366 computeCardioidSubArray pins the quarter-wave relation"
 
 import { computeDriverSpacingLobing as _v1367 } from "../../calc-stage.js";
 test("bounds: spec-v1367 computeDriverSpacingLobing pins the ceiling and the null angle", () => {
-  // 18 in centers at 70 F: ceiling 375 Hz. At 500 Hz the ratio is 0.75 -> null at 48.6 deg.
+  // 18 in centers at 70 F: ceiling 376 Hz. At 500 Hz the ratio is 0.752 -> null at 48.8 deg.
   const base = { spacing_ft: 1.5, test_freq_hz: 500, temp_f: 70 };
   const r = _v1367(base);
-  assert.ok(Math.abs(r.crossover_ceiling_hz - 375) < 1e-9);
-  assert.ok(Math.abs(r.null_angle_deg - 48.59) < 1e-2);
-  assert.ok(Math.abs(r.wavelength_ft - 2.25) < 1e-9);
-  assert.ok(Math.abs(r.max_spacing_ft - 1.125) < 1e-9);
+  const c70 = 49.03 * Math.sqrt(529.67);
+  assert.ok(Math.abs(r.crossover_ceiling_hz - c70 / 3) < 1e-9);
+  assert.ok(Math.abs(r.null_angle_deg - 48.79) < 1e-2);
+  assert.ok(Math.abs(r.wavelength_ft - c70 / 500) < 1e-9);
+  assert.ok(Math.abs(r.max_spacing_ft - c70 / 1000) < 1e-9);
   // At 250 Hz the ratio exceeds 1 and no null exists anywhere.
   const low = _v1367({ ...base, test_freq_hz: 250 });
   assert.strictEqual(low.null_angle_deg, null);
   assert.ok(low.verdict.startsWith("clean"));
   // Exactly at the ceiling the null sits at 90 degrees -- the worst-case path difference.
-  const atCeiling = _v1367({ ...base, test_freq_hz: 375 });
+  const atCeiling = _v1367({ ...base, test_freq_hz: c70 / 3 });
   assert.ok(Math.abs(atCeiling.null_angle_deg - 90) < 1e-9);
   assert.ok("error" in _v1367({ ...base, spacing_ft: 0 }));
   assert.ok("error" in _v1367({ ...base, test_freq_hz: 0 }));
@@ -56211,4 +56214,43 @@ test("bounds: batch-43 elevator and corrosion -- 2:1 roping, IBC per-car vent fl
   assert.ok("error" in _b43pol({ on_potential_v: -1050, instant_off_potential_v: -780, native_potential_v: -650, depolarized_potential_v: -670, criterion_v: -0.85, polarization_criterion_mv: 100 }));
   assert.ok("error" in _b43coke({ hole_diameter_in: 8, hole_depth_ft: 10, anode_diameter_in: 2, anode_length_ft: 5, anode_count: 10.5, backfill_density_pcf: 70, bag_weight_lb: 50, waste_pct: 10, soil_resistivity_ohm_cm: 5000 }));
   assert.ok("error" in _b43att({ pipe_od_in: 12.75, wall_thickness_in: 0.25, steel_resistivity_ohm_in: 18, coating_resistance_ohm_sqft: 100000, drain_shift_v: 1, distance_mi: 10, degraded_coating_resistance_ohm_sqft: 10000 }));
+});
+
+import { computeTimeAlignment as _b44ta, computePowerDistro as _b44pd, computeLightingBeam as _b44lb, computeWirelessIntermod as _b44im, computeMiredGelShift as _b44mg, computeVideoWallDataRate as _b44vw, computeSPLDistanceForLevel as _b44sdl, computeAmpPowerSpl as _b44amp } from "../../calc-stage.js";
+import { computeCo2EnrichmentRate as _b44co2, computeVaporPressureDeficit as _b44vpd, computePhotoperiodBlackoutSchedule as _b44pp, computeGrowLightFixtureCount as _b44gl, computeThermalScreenEnergySaving as _b44ts } from "../../calc-greenhouse.js";
+import { computeShotSizeResidenceTime as _b44shot, computeInjectionClampTonnage as _b44clamp, computeInjectionCoolingTime as _b44cool, computeMoldShrinkageDimension as _b44mold, computeExtrusionOutputRate as _b44ext, computeRiserModulusFeeding as _b44riser, computeSandPermeabilityVent as _b44sand } from "../../calc-process.js";
+test("bounds: batch-44 stage, greenhouse and process -- crop CO2 use adds, shot window, unit and fraction guards", () => {
+  const ta = { d_main_ft: 80, d_delay_ft: 30, ambient_C: 22, haas_offset_ms: 15 };
+  assert.ok("error" in _b44ta({ ...ta, haas_offset_ms: -5 }));
+  assert.ok("error" in _b44ta({ ...ta, ambient_C: -600 }));
+  assert.ok("error" in _b44pd({ watts: 12000, voltage_v: 208, phase: "Single", rating_a: 100 }));
+  assert.ok("error" in _b44lb({ beam_angle_deg: 20, throw_distance: 30, distance_unit: "meters", source: "candela", candela: 100000 }));
+  assert.ok("error" in _b44im({ f1_mhz: 590000, f2_mhz: 595000, test_freq_mhz: 0 }));
+  assert.ok("error" in _b44im({ f1_mhz: 100, f2_mhz: 300, test_freq_mhz: 0 }));
+  assert.ok("error" in _b44mg({ source_k: 3.2, target_k: 5600, applied_shift: 0 }));
+  assert.ok("error" in _b44vw({ width_px: 3840, height_px: 2160, bit_depth: 24, refresh_hz: 60, pixels_per_port: 650000 }));
+  assert.ok("error" in _b44sdl({ L1_dB: 110, d1: 1, target_L2_dB: -84, mode: "free_field", n_sources: 1 }));
+  assert.ok("error" in _b44amp({ sensitivity_db: 90, power_w: 100, distance_m: 1, crest_db: -6 }));
+  // Bartok: crop use ADDS to the leak makeup.
+  const co2 = { house_volume_ft3: 43200, ambient_ppm: 400, target_ppm: 1000, air_changes_per_hour: 1, gas_price_per_lb: 0.1, vented_air_changes_per_hour: 30, floor_area_sqft: 2880, enrichment_hours_per_day: 10 };
+  assert.ok(Math.abs(_b44co2({ ...co2, crop_use_ft3_per_hour: 11.5 }).makeup_ft3_per_hour - _b44co2(co2).makeup_ft3_per_hour - 11.5) < 1e-9);
+  assert.ok("error" in _b44co2({ ...co2, vented_air_changes_per_hour: 0.5 }));
+  assert.ok("error" in _b44vpd({ air_temp_f: 68, relative_humidity_pct: 0.6, leaf_offset_f: -3.6, alternative_leaf_offset_f: 3.6, alternative_humidity_pct: 60 }));
+  assert.ok("error" in _b44vpd({ air_temp_f: 68, relative_humidity_pct: 60, leaf_offset_f: -30, alternative_leaf_offset_f: 3.6, alternative_humidity_pct: 60 }));
+  assert.ok("error" in _b44pp({ blackout_pull_hour: 17, blackout_open_hour: 8, critical_dark_hours: 13, long_photoperiod_hours: 11, short_photoperiod_hours: 16, ppfd_umol_m2_s: 400, interruption_hours: 4, interruption_ppfd_umol_m2_s: 2 }));
+  assert.ok("error" in _b44gl({ growing_area_sqft: 3000, target_ppfd_umol_m2_s: 200, fixture_ppf_umol_s: 2.7, fixture_watts: 700, on_target_fraction: 1, photoperiod_hours: 16, season_days: 180, energy_rate_per_kwh: 0.1 }));
+  assert.ok("error" in _b44ts({ house_width_ft: 30, house_length_ft: 96, gutter_height_ft: 8, ridge_height_ft: 14, glazing_u_factor: 0.7, screen_ua_reduction_pct: 0.35, season_nights: 180, night_hours: 12, night_temp_difference_f: 40, plant_efficiency_pct: 80, fuel_price_per_therm: 1.2, screen_cost_per_sqft: 1 }));
+  const shot = { barrel_capacity_oz: 12, shot_weight_oz: 4.2, cycle_time_s: 32, min_pct: 20, max_pct: 65, max_residence_min: 4, alt_cycle_time_s: 45 };
+  assert.ok("error" in _b44shot({ ...shot, shot_weight_oz: 51 }));
+  assert.ok(_b44shot({ ...shot, shot_weight_oz: 9 }).shot_pct > 65);
+  assert.ok("error" in _b44clamp({ cavities: 4, part_projected_area_in2: 12, runner_projected_area_in2: 6, cavity_pressure_tsi: 6000, safety_factor_pct: 15, machine_rating_tons: 150 }));
+  assert.ok("error" in _b44clamp({ cavities: 4, part_projected_area_in2: 12, runner_projected_area_in2: 6, cavity_pressure_tsi: 2.5, safety_factor_pct: 0.15, machine_rating_tons: 150 }));
+  assert.ok("error" in _b44cool({ wall_thickness_in: 0.06, alpha_in2_s: 0.0827, melt_temp_f: 446, mould_temp_f: 122, eject_temp_f: 194 }));
+  assert.ok("error" in _b44mold({ part_dimension_in: 4, shrinkage_flow_in_in: 0.25, shrinkage_cross_in_in: 0.012, shrinkage_low_in_in: 0.015, shrinkage_high_in_in: 0.022, existing_cavity_in: 4.02 }));
+  assert.ok("error" in _b44ext({ product_od_in: 2.5, wall_thickness_in: 0.1, line_speed_ft_min: 45, melt_density_lb_in3: 0.955, extruder_output_lb_h: 400, die_opening_in: 3, cooling_capacity_lb_h: 500, shift_hours: 8 }));
+  // Cooling capacity with no extruder output entered no longer claims to cover "the entered output".
+  assert.ok(!/covers the entered output/.test(_b44ext({ product_od_in: 2.5, wall_thickness_in: 0.1, line_speed_ft_min: 45, melt_density_lb_in3: 0.0347, extruder_output_lb_h: 0, die_opening_in: 3, cooling_capacity_lb_h: 500, shift_hours: 8 }).cooling_verdict));
+  assert.ok("error" in _b44riser({ section_length_in: 8, section_width_in: 6, section_thickness_in: 1.5, modulus_ratio: 0.5, shrinkage_pct: 4, riser_efficiency_pct: 15, sleeve_factor: 1 }));
+  assert.ok("error" in _b44riser({ section_length_in: 8, section_width_in: 6, section_thickness_in: 1.5, modulus_ratio: 1.2, shrinkage_pct: 0.04, riser_efficiency_pct: 15, sleeve_factor: 1 }));
+  assert.ok("error" in _b44sand({ mould_sand_lb: 500, moisture_pct: 3.5, binder_lb: 5, binder_gas_cm3_g: 20, pour_temp_f: -400, vent_area_in2: 2, permeability_number: 100 }));
 });

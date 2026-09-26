@@ -2,7 +2,7 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "4fa4721069310056",
+      "sha": "7c33fdce65ee25ab",
       "date": "2026-09-26"
     },
     "/tools/": {
@@ -270,8 +270,8 @@
       "date": "2026-09-01"
     },
     "/tools/amp-power-spl/": {
-      "sha": "c188b66ae6d93b7d",
-      "date": "2026-09-01"
+      "sha": "f1365e8066cab742",
+      "date": "2026-09-26"
     },
     "/tools/anchor-embedment/": {
       "sha": "5b48192226a2645b",
@@ -958,8 +958,8 @@
       "date": "2026-09-19"
     },
     "/tools/cardioid-sub-array/": {
-      "sha": "3f1755158321e872",
-      "date": "2026-09-01"
+      "sha": "e24da956fad7e7e8",
+      "date": "2026-09-26"
     },
     "/tools/cargo-securement-wll/": {
       "sha": "83cb1770b9cc6bd3",
@@ -990,8 +990,8 @@
       "date": "2026-09-08"
     },
     "/tools/casting-pour-yield/": {
-      "sha": "594994d596e6f26a",
-      "date": "2026-09-19"
+      "sha": "87c61c3ce1de3b6a",
+      "date": "2026-09-26"
     },
     "/tools/category-deterioration/": {
       "sha": "eef7af5b0e1adbcd",
@@ -1274,8 +1274,8 @@
       "date": "2026-09-01"
     },
     "/tools/co2-enrichment-rate/": {
-      "sha": "796e6e79e5ecc5a0",
-      "date": "2026-09-18"
+      "sha": "e6ca2791e90df6fc",
+      "date": "2026-09-26"
     },
     "/tools/co2-transcritical-pressure/": {
       "sha": "c97386d32751eee7",
@@ -2082,8 +2082,8 @@
       "date": "2026-09-01"
     },
     "/tools/delay-tower-alignment/": {
-      "sha": "3765593c838d0245",
-      "date": "2026-09-01"
+      "sha": "8c5afaf95a9b9c77",
+      "date": "2026-09-26"
     },
     "/tools/delta-wye-line-phase/": {
       "sha": "9d2867cd748f75e7",
@@ -2322,8 +2322,8 @@
       "date": "2026-09-01"
     },
     "/tools/driver-spacing-lobing/": {
-      "sha": "c6ece8d29b509511",
-      "date": "2026-09-01"
+      "sha": "3fa4995913eef526",
+      "date": "2026-09-26"
     },
     "/tools/driveshaft-crit/": {
       "sha": "344fd2c33590ca42",
@@ -2754,8 +2754,8 @@
       "date": "2026-09-01"
     },
     "/tools/extrusion-output-rate/": {
-      "sha": "1c5b0fe5fb69f928",
-      "date": "2026-09-09"
+      "sha": "731d839fde49dccf",
+      "date": "2026-09-26"
     },
     "/tools/eyring-reverberation/": {
       "sha": "d3a073ceb844a3e0",
@@ -3402,8 +3402,8 @@
       "date": "2026-09-01"
     },
     "/tools/greenhouse-transpiration-water/": {
-      "sha": "d9824adc15349a71",
-      "date": "2026-09-18"
+      "sha": "6dccff2926b9be99",
+      "date": "2026-09-26"
     },
     "/tools/greenhouse-vent-area/": {
       "sha": "00611fcb2a192c3c",
@@ -4170,8 +4170,8 @@
       "date": "2026-09-01"
     },
     "/tools/lighting-beam/": {
-      "sha": "2cf90bba4be2a7d3",
-      "date": "2026-09-01"
+      "sha": "f08c1a61d6d66520",
+      "date": "2026-09-26"
     },
     "/tools/lighting-density/": {
       "sha": "28305bfa5e7ece39",
@@ -4186,8 +4186,8 @@
       "date": "2026-09-26"
     },
     "/tools/lighting-throw-for-pool/": {
-      "sha": "7511345c15a3166d",
-      "date": "2026-09-01"
+      "sha": "5cebe49c6f873932",
+      "date": "2026-09-26"
     },
     "/tools/lighting-uniformity-ratio/": {
       "sha": "2becd4ebc8396ab5",
@@ -4846,8 +4846,8 @@
       "date": "2026-09-01"
     },
     "/tools/neutral-imbalance/": {
-      "sha": "487f58e57c8c5585",
-      "date": "2026-09-19"
+      "sha": "f7d16bb6ec9e5141",
+      "date": "2026-09-26"
     },
     "/tools/nfa-fireground-flow/": {
       "sha": "f742f2bcea617905",
@@ -6210,8 +6210,8 @@
       "date": "2026-09-01"
     },
     "/tools/rf-antenna-cable-loss/": {
-      "sha": "cf76e29016443158",
-      "date": "2026-09-01"
+      "sha": "b5ad94a71dd427b3",
+      "date": "2026-09-26"
     },
     "/tools/ridge-cap-fasteners/": {
       "sha": "dee4815fb8a4070c",
@@ -6762,8 +6762,8 @@
       "date": "2026-09-01"
     },
     "/tools/shot-size-residence-time/": {
-      "sha": "3b6b7c792942d2d3",
-      "date": "2026-09-09"
+      "sha": "0e0a0c02f2352752",
+      "date": "2026-09-26"
     },
     "/tools/shotcrete-rebound-quantity/": {
       "sha": "da0959706fce3540",
@@ -7126,12 +7126,12 @@
       "date": "2026-09-04"
     },
     "/tools/spl-distance/": {
-      "sha": "1b2d9a78b20147fd",
-      "date": "2026-09-01"
+      "sha": "7f603b34ddaf9882",
+      "date": "2026-09-26"
     },
     "/tools/spl-distance-for-level/": {
-      "sha": "bf1bd30549c1790e",
-      "date": "2026-09-01"
+      "sha": "fc416e4f4dcb2d3f",
+      "date": "2026-09-26"
     },
     "/tools/splice-loss-mismatch/": {
       "sha": "9ce8667e61395496",
@@ -7778,8 +7778,8 @@
       "date": "2026-09-08"
     },
     "/tools/thermal-screen-energy-saving/": {
-      "sha": "065de2d14932cc97",
-      "date": "2026-09-18"
+      "sha": "ddad5d3cc8dd2d75",
+      "date": "2026-09-26"
     },
     "/tools/thermal-stress-max-deltat/": {
       "sha": "cb35d37f05cdeb0a",
@@ -7878,8 +7878,8 @@
       "date": "2026-09-25"
     },
     "/tools/time-alignment/": {
-      "sha": "867b9ef4330cbaa1",
-      "date": "2026-09-01"
+      "sha": "be9b877b2452a0b9",
+      "date": "2026-09-26"
     },
     "/tools/time-and-materials/": {
       "sha": "187b4473f69d7060",
@@ -8374,8 +8374,8 @@
       "date": "2026-09-07"
     },
     "/tools/video-wall-data-rate/": {
-      "sha": "db9c2de24996fcb0",
-      "date": "2026-09-01"
+      "sha": "6a2fda12c4ec1e3b",
+      "date": "2026-09-26"
     },
     "/tools/voltage-drop/": {
       "sha": "3e2e419e6e824ef6",

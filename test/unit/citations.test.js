@@ -164,9 +164,14 @@ test("Group N audit coverage: every stage tile has a CITATIONS entry", async () 
   for (const id of ids) assert.ok(CITATIONS[id], "Group N tile '" + id + "' missing CITATIONS entry");
 });
 
-test("Group N all 6 tiles use the rigging governance variant", () => {
-  for (const id of ["truss-capacity", "time-alignment", "dmx-planner", "neutral-imbalance", "spl-distance", "rigging-check"]) {
+test("Group N governance fits the tile: rigging text on rigging tiles, electrical on power, general on audio and lighting", () => {
+  // Until 2026-09-26 SPL, time-alignment, lighting and neutral tiles carried "Head rigger ... working-load-limit charts govern".
+  for (const id of ["truss-capacity", "dmx-planner", "rigging-check"]) {
     assert.equal(CITATIONS[id].governance, GOVERNANCE.rigging, id + " should use rigging governance");
+  }
+  assert.equal(CITATIONS["neutral-imbalance"].governance, GOVERNANCE.electrical);
+  for (const id of ["time-alignment", "spl-distance", "spl-distance-for-level", "amp-power-spl", "lighting-beam", "lighting-throw-for-pool"]) {
+    assert.equal(CITATIONS[id].governance, GOVERNANCE.general, id + " should use general governance");
   }
 });
 

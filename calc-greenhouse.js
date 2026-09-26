@@ -101,6 +101,8 @@ export const GREENHOUSE_RENDERERS = {};
 // dims: in { house_width_ft: L, house_length_ft: L, gutter_height_ft: L, ridge_height_ft: L, roof_vent_pct: dimensionless, side_vent_pct: dimensionless, design_temp_difference_f: T, discharge_coefficient: dimensionless, mild_temp_difference_f: T } out: { floor_area_sqft: L^2, roof_vent_area_sqft: L^2, side_vent_area_sqft: L^2, effective_area_sqft: L^2, airflow_cfm: L^3 T^-1, air_changes_per_minute: T^-1, mild_airflow_cfm: L^3 T^-1 }
 export function computeGreenhouseVentArea({ house_width_ft = 0, house_length_ft = 0, gutter_height_ft = 0, ridge_height_ft = 0, roof_vent_pct = 0, side_vent_pct = 0, design_temp_difference_f = 0, discharge_coefficient = 0, mild_temp_difference_f = 0 } = {}) {
   const guard = _finiteGuard(arguments[0]); if (guard) return { error: guard.error };
+  // Unit / range guard added 2026-09-26 after printed-example probing.
+  if ([arguments[0]?.roof_vent_pct, arguments[0]?.side_vent_pct].some((v) => Number(v) > 0 && Number(v) < 1)) return { error: "Enter vent areas as a percent of floor area (18 for 18%), not fractions." };
   if (!(house_width_ft > 0) || !(house_length_ft > 0)) return { error: "House width and length must be positive." };
   if (!(gutter_height_ft > 0) || !(ridge_height_ft > gutter_height_ft)) return { error: "The ridge must be above the gutter; buoyancy ventilation needs a height difference." };
   if (!(roof_vent_pct > 0) || !(side_vent_pct > 0)) return { error: "Roof and side vent percentages must be positive." };
@@ -243,6 +245,8 @@ GREENHOUSE_RENDERERS["fan-pad-evaporative-cooling"] = _simpleRenderer({
 // dims: in { ppfd_umol_m2_s: dimensionless, photoperiod_hours: T, outdoor_dli: dimensionless, transmission_pct: dimensionless, target_dli: dimensionless } out: { dli: dimensionless, inside_dli: dimensionless, shortfall_dli: dimensionless, supplemental_ppfd_umol_m2_s: dimensionless }
 export function computePpfdDailyLightIntegral({ ppfd_umol_m2_s = 0, photoperiod_hours = 0, outdoor_dli = 0, transmission_pct = 0, target_dli = 0 } = {}) {
   const guard = _finiteGuard(arguments[0]); if (guard) return { error: guard.error };
+  // Unit / range guard added 2026-09-26 after printed-example probing.
+  if ([arguments[0]?.transmission_pct].some((v) => Number(v) > 0 && Number(v) < 1)) return { error: "Enter the transmission as a percent (65 for 65%), not a fraction." };
   if (!(ppfd_umol_m2_s > 0)) return { error: "PPFD must be positive." };
   if (!(photoperiod_hours > 0 && photoperiod_hours <= 24)) return { error: "The photoperiod must be above 0 and at most 24 hours." };
   if (!(outdoor_dli > 0)) return { error: "The outdoor daily light integral must be positive." };
@@ -293,6 +297,8 @@ GREENHOUSE_RENDERERS["ppfd-daily-light-integral"] = _simpleRenderer({
 // dims: in { growing_area_sqft: L^2, target_ppfd_umol_m2_s: dimensionless, fixture_ppf_umol_s: dimensionless, fixture_watts: M L^2 T^-3, on_target_fraction: dimensionless, photoperiod_hours: T, season_days: T, energy_rate_per_kwh: dimensionless } out: { growing_area_m2: L^2, photons_required_umol_s: dimensionless, fixture_count: dimensionless, connected_load_w: M L^2 T^-3, efficacy_umol_per_joule: dimensionless, season_kwh: M L^2 T^-2, heat_btuh: M L^2 T^-3 }
 export function computeGrowLightFixtureCount({ growing_area_sqft = 0, target_ppfd_umol_m2_s = 0, fixture_ppf_umol_s = 0, fixture_watts = 0, on_target_fraction = 0, photoperiod_hours = 0, season_days = 0, energy_rate_per_kwh = 0 } = {}) {
   const guard = _finiteGuard(arguments[0]); if (guard) return { error: guard.error };
+  // Unit / range guard added 2026-09-26 after printed-example probing.
+  if (Number(arguments[0]?.fixture_ppf_umol_s) > 0 && Number(arguments[0]?.fixture_ppf_umol_s) < 50) return { error: "Enter the fixture output in umol/s (about 1,000 for a 700 W LED), not its efficacy in umol/J." }; if (Number(arguments[0]?.energy_rate_per_kwh) > 2) return { error: "Enter the energy rate in dollars per kWh (0.12), not cents." };
   if (!(growing_area_sqft > 0) || !(target_ppfd_umol_m2_s > 0)) return { error: "Growing area and target PPFD must be positive." };
   if (!(fixture_ppf_umol_s > 0) || !(fixture_watts > 0)) return { error: "Fixture PPF and input watts must be positive." };
   if (!(on_target_fraction > 0 && on_target_fraction <= 1)) return { error: "The on-target fraction must be above 0 and at most 1." };
@@ -357,6 +363,8 @@ GREENHOUSE_RENDERERS["grow-light-fixture-count"] = _simpleRenderer({
 // dims: in { air_temp_f: T, relative_humidity_pct: dimensionless, leaf_offset_f: T, alternative_leaf_offset_f: T, alternative_humidity_pct: dimensionless } out: { air_saturation_kpa: M L^-1 T^-2, leaf_saturation_kpa: M L^-1 T^-2, actual_vapor_pressure_kpa: M L^-1 T^-2, leaf_vpd_kpa: M L^-1 T^-2, air_vpd_kpa: M L^-1 T^-2 }
 export function computeVaporPressureDeficit({ air_temp_f = 0, relative_humidity_pct = 0, leaf_offset_f = 0, alternative_leaf_offset_f = 0, alternative_humidity_pct = 0 } = {}) {
   const guard = _finiteGuard(arguments[0]); if (guard) return { error: guard.error };
+  // Unit / range guard added 2026-09-26 after printed-example probing.
+  if ([arguments[0]?.relative_humidity_pct, arguments[0]?.alternative_humidity_pct].some((v) => Number(v) > 0 && Number(v) < 1)) return { error: "Enter relative humidity as a percent (65 for 65%), not a fraction." }; if ([arguments[0]?.leaf_offset_f, arguments[0]?.alternative_leaf_offset_f].some((v) => Math.abs(Number(v)) > 20)) return { error: "A leaf runs within about 20 deg F of the air; check the leaf offset." };
   if (!(relative_humidity_pct > 0 && relative_humidity_pct <= 100)) return { error: "Relative humidity must be above 0 and at most 100%." };
   if (!(alternative_humidity_pct > 0 && alternative_humidity_pct <= 100)) return { error: "The alternative humidity must be above 0 and at most 100%." };
   const air_c = _fToC(air_temp_f);
@@ -413,7 +421,7 @@ GREENHOUSE_RENDERERS["vapor-pressure-deficit"] = _simpleRenderer({
 // the gas goes straight outside.
 
 // dims: in { house_volume_ft3: L^3, ambient_ppm: dimensionless, target_ppm: dimensionless, air_changes_per_hour: T^-1, gas_price_per_lb: dimensionless, vented_air_changes_per_hour: T^-1, floor_area_sqft: L^2, enrichment_hours_per_day: T } out: { initial_charge_ft3: L^3, makeup_ft3_per_hour: L^3 T^-1, makeup_lb_per_hour: M T^-1, hourly_cost: dimensionless, vented_makeup_ft3_per_hour: L^3 T^-1, vented_hourly_cost: dimensionless }
-export function computeCo2EnrichmentRate({ house_volume_ft3 = 0, ambient_ppm = 0, target_ppm = 0, air_changes_per_hour = 0, gas_price_per_lb = 0, vented_air_changes_per_hour = 0, floor_area_sqft = 0, enrichment_hours_per_day = 0 } = {}) {
+export function computeCo2EnrichmentRate({ house_volume_ft3 = 0, ambient_ppm = 0, target_ppm = 0, air_changes_per_hour = 0, gas_price_per_lb = 0, vented_air_changes_per_hour = 0, floor_area_sqft = 0, enrichment_hours_per_day = 0, crop_use_ft3_per_hour = 0 } = {}) {
   const guard = _finiteGuard(arguments[0]); if (guard) return { error: guard.error };
   if (!(house_volume_ft3 > 0)) return { error: "House volume must be positive." };
   if (!(ambient_ppm > 0) || !(target_ppm > ambient_ppm)) return { error: "The target concentration must exceed ambient." };
@@ -421,9 +429,14 @@ export function computeCo2EnrichmentRate({ house_volume_ft3 = 0, ambient_ppm = 0
   if (!(gas_price_per_lb >= 0)) return { error: "The gas price cannot be negative." };
   if (!(floor_area_sqft > 0)) return { error: "Floor area must be positive." };
   if (!(enrichment_hours_per_day > 0 && enrichment_hours_per_day <= 24)) return { error: "Enrichment hours must be above 0 and at most 24." };
+  if (!(crop_use_ft3_per_hour >= 0)) return { error: "Crop CO2 use cannot be negative." };
+  if (!(vented_air_changes_per_hour >= air_changes_per_hour)) return { error: "The venting air change rate should be at least the closed-house rate." };
+  if (ambient_ppm < 100) return { error: "Enter concentrations in ppm (about 420 outdoors), not percent." };
   const lift_ppm = target_ppm - ambient_ppm;
   const initial_charge_ft3 = house_volume_ft3 * lift_ppm / 1e6;
-  const makeupFor = (ach) => house_volume_ft3 * ach * lift_ppm / 1e6;
+  // Bartok's method is crop use PLUS the infiltration loss (about 11.5 + 13.8 cfh for a 30 x 128 ft house);
+  // until 2026-09-26 the tile had only the infiltration term and said crop uptake was "not deducted".
+  const makeupFor = (ach) => house_volume_ft3 * ach * lift_ppm / 1e6 + crop_use_ft3_per_hour;
   const makeup_ft3_per_hour = makeupFor(air_changes_per_hour);
   const makeup_lb_per_hour = makeup_ft3_per_hour * CO2_LB_PER_CU_FT;
   const vented_makeup_ft3_per_hour = makeupFor(vented_air_changes_per_hour);
@@ -455,6 +468,7 @@ GREENHOUSE_RENDERERS["co2-enrichment-rate"] = _simpleRenderer({
     { key: "vented_air_changes_per_hour", label: "Air changes per hour, venting" },
     { key: "floor_area_sqft", label: "Floor area (sq ft)" },
     { key: "enrichment_hours_per_day", label: "Enrichment hours per day", attrs: { step: "any", min: "0", max: "24" } },
+    { key: "crop_use_ft3_per_hour", label: "Crop CO2 use (cu ft per hour; Bartok: about 11.5 for a 30 x 128 ft house)", default: 0 },
   ],
   outputs: [
     { key: "initial_charge_ft3", id: "cer-charge", label: "Initial charge", value: (r) => fmt(r.initial_charge_ft3, 1) + " cu ft (" + fmt(r.initial_charge_lb, 2) + " lb), a one-time fill" },
@@ -477,6 +491,8 @@ GREENHOUSE_RENDERERS["co2-enrichment-rate"] = _simpleRenderer({
 // dims: in { outdoor_dli: dimensionless, glazing_transmission_pct: dimensionless, shade_pct: dimensionless, target_dli: dimensionless, outdoor_peak_btuh_per_sqft: M T^-3, floor_area_sqft: L^2 } out: { system_transmission: dimensionless, inside_dli: dimensionless, two_layer_dli: dimensionless, required_shade_pct: dimensionless, solar_removed_btuh: M L^2 T^-3 }
 export function computeShadeClothTransmission({ outdoor_dli = 0, glazing_transmission_pct = 0, shade_pct = 0, target_dli = 0, outdoor_peak_btuh_per_sqft = 0, floor_area_sqft = 0 } = {}) {
   const guard = _finiteGuard(arguments[0]); if (guard) return { error: guard.error };
+  // Unit / range guard added 2026-09-26 after printed-example probing.
+  if ([arguments[0]?.glazing_transmission_pct, arguments[0]?.shade_pct].some((v) => Number(v) > 0 && Number(v) < 1)) return { error: "Enter transmission and shade as percents (50 for 50%), not fractions." };
   if (!(outdoor_dli > 0)) return { error: "The outdoor daily light integral must be positive." };
   if (!(glazing_transmission_pct > 0 && glazing_transmission_pct <= 100)) return { error: "Glazing transmission must be above 0 and at most 100%." };
   if (!(shade_pct >= 0 && shade_pct < 100)) return { error: "The shade percentage must be at least 0 and below 100%." };
@@ -564,7 +580,7 @@ export function computeGreenhouseTranspirationWater({ floor_area_sqft = 0, daily
     peak_lb_per_hour, peak_gal_per_hour, average_gal_per_hour,
     peak_to_average_ratio: peak_gal_per_hour / average_gal_per_hour,
     moisture_pints_per_day: transpiration_gal_per_day * PINTS_PER_GAL,
-    note: "The energy route is a check on the water route and vice versa: 0.05 to 0.15 gallons per square foot per day is the band growers quote, and a result outside it means one of the inputs is wrong. Irrigation must deliver the PEAK hour, not the daily average divided by the day length -- a system sized on the average is short by exactly that factor when the crop needs it most. And every pound transpired enters the house air: a ventilated house blows it outside without anyone noticing, while a sealed house has to REMOVE it, which is a dehumidification load larger than most people size for and the reason closed and indoor growing rooms fail on humidity before they fail on anything else. The crop's own stage and the irrigation designer govern.",
+    note: "The energy route is a check on the water route and vice versa: UMass Extension sizes a greenhouse water SUPPLY at 0.3 to 0.4 gallons per square foot of bench per day at peak, which covers runoff, hand watering and the hottest days, so crop transpiration by the energy route normally lands well under it -- size a supply on the extension figure, not on this one. Irrigation must deliver the PEAK hour, not the daily average divided by the day length -- a system sized on the average is short by exactly that factor when the crop needs it most. And every pound transpired enters the house air: a ventilated house blows it outside without anyone noticing, while a sealed house has to REMOVE it, which is a dehumidification load larger than most people size for and the reason closed and indoor growing rooms fail on humidity before they fail on anything else. The crop's own stage and the irrigation designer govern.",
   };
 }
 
@@ -600,6 +616,8 @@ GREENHOUSE_RENDERERS["greenhouse-transpiration-water"] = _simpleRenderer({
 // dims: in { house_width_ft: L, house_length_ft: L, gutter_height_ft: L, ridge_height_ft: L, glazing_u_factor: M T^-4, screen_ua_reduction_pct: dimensionless, season_nights: T, night_hours: T, night_temp_difference_f: T, plant_efficiency_pct: dimensionless, fuel_price_per_therm: dimensionless, screen_cost_per_sqft: dimensionless } out: { envelope_sqft: L^2, base_ua: M L^2 T^-3, screened_ua: M L^2 T^-3, heat_saved_btu: M L^2 T^-2, therms_saved: M L^2 T^-2, annual_saving: dimensionless, payback_years: T }
 export function computeThermalScreenEnergySaving({ house_width_ft = 0, house_length_ft = 0, gutter_height_ft = 0, ridge_height_ft = 0, glazing_u_factor = 0, screen_ua_reduction_pct = 0, season_nights = 0, night_hours = 0, night_temp_difference_f = 0, plant_efficiency_pct = 0, fuel_price_per_therm = 0, screen_cost_per_sqft = 0 } = {}) {
   const guard = _finiteGuard(arguments[0]); if (guard) return { error: guard.error };
+  // Unit / range guard added 2026-09-26 after printed-example probing.
+  if ([arguments[0]?.screen_ua_reduction_pct].some((v) => Number(v) > 0 && Number(v) < 1)) return { error: "Enter the UA reduction as a percent (35 for 35%), not a fraction." }; if (Number(arguments[0]?.glazing_u_factor) > 2) return { error: "Enter the glazing U-factor in Btu/hr-sq ft-F (about 0.7 for double poly), not W/m2-K." };
   // An efficiency is a percent; 0 < value < 1 is a fraction typed into a percent field (added 2026-09-26).
   if (["plant_efficiency_pct"].some((k) => { const v = Number(arguments[0]?.[k]); return v > 0 && v < 1; })) return { error: "Enter efficiencies as a percent (85 for 85%), not a fraction." };
   if (!(house_width_ft > 0) || !(house_length_ft > 0)) return { error: "House width and length must be positive." };
@@ -652,7 +670,7 @@ GREENHOUSE_RENDERERS["thermal-screen-energy-saving"] = _simpleRenderer({
     { key: "gutter_height_ft", label: "Gutter height (ft)" },
     { key: "ridge_height_ft", label: "Ridge height (ft)" },
     { key: "glazing_u_factor", label: "Glazing U-factor (Btu/h-sq ft-deg F)" },
-    { key: "screen_ua_reduction_pct", label: "Screen UA reduction (%)", attrs: { step: "any", min: "0", max: "99" } },
+    { key: "screen_ua_reduction_pct", label: "Whole-house UA reduction from the screen (%; not the fabric rating -- UW Extension's 52% curtain saved 32% of a house)", attrs: { step: "any", min: "0", max: "99" } },
     { key: "season_nights", label: "Heating-season nights" },
     { key: "night_hours", label: "Hours deployed per night", attrs: { step: "any", min: "0", max: "24" } },
     { key: "night_temp_difference_f", label: "Average night difference (deg F)" },
@@ -682,6 +700,8 @@ GREENHOUSE_RENDERERS["thermal-screen-energy-saving"] = _simpleRenderer({
 // dims: in { plants_required: dimensionless, cells_per_tray: dimensionless, germination_pct: dimensionless, cull_pct: dimensionless, seeds_per_cell: dimensionless, tray_footprint_sqft: L^2 } out: { usable_per_tray: dimensionless, trays_to_sow: dimensionless, cells_sown: dimensionless, seed_required: dimensionless, finished_yield: dimensionless, bench_area_sqft: L^2, naive_trays: dimensionless }
 export function computePlugTrayCellCount({ plants_required = 0, cells_per_tray = 0, germination_pct = 0, cull_pct = 0, seeds_per_cell = 0, tray_footprint_sqft = 0 } = {}) {
   const guard = _finiteGuard(arguments[0]); if (guard) return { error: guard.error };
+  // Unit / range guard added 2026-09-26 after printed-example probing.
+  if ([arguments[0]?.germination_pct].some((v) => Number(v) > 0 && Number(v) < 1)) return { error: "Enter germination as a percent (92 for 92%), not a fraction." };
   if (!(plants_required > 0)) return { error: "The number of finished plants required must be positive." };
   if (!(cells_per_tray >= 1)) return { error: "Cells per tray must be at least 1." };
   if (!(germination_pct > 0 && germination_pct <= 100)) return { error: "The germination rate must be above 0 and at most 100%." };
@@ -744,6 +764,8 @@ GREENHOUSE_RENDERERS["plug-tray-cell-count"] = _simpleRenderer({
 // dims: in { container_count: dimensionless, filled_volume_in3: L^3, allowance_pct: dimensionless, bale_label_ft3: L^3, bale_loose_yield_ft3: L^3, true_gallon_in3: L^3 } out: { loose_volume_ft3: L^3, loose_volume_yd3: L^3, ordered_volume_ft3: L^3, ordered_volume_yd3: L^3, bale_count: dimensionless, true_gallon_volume_yd3: L^3 }
 export function computeSubstrateContainerVolume({ container_count = 0, filled_volume_in3 = 0, allowance_pct = 0, bale_label_ft3 = 0, bale_loose_yield_ft3 = 0, true_gallon_in3 = 0 } = {}) {
   const guard = _finiteGuard(arguments[0]); if (guard) return { error: guard.error };
+  // Unit / range guard added 2026-09-26 after printed-example probing.
+  if ([arguments[0]?.allowance_pct].some((v) => Number(v) > 0 && Number(v) < 1)) return { error: "Enter the allowance as a percent (10 for 10%), not a fraction." };
   if (!(container_count > 0)) return { error: "The container count must be positive." };
   if (!(filled_volume_in3 > 0)) return { error: "The filled volume per container must be positive." };
   if (!(allowance_pct >= 0)) return { error: "The compaction and spill allowance cannot be negative." };
@@ -812,6 +834,7 @@ export function computePhotoperiodBlackoutSchedule({ blackout_pull_hour = 0, bla
     return { error: "Photoperiods must be above 0 and at most 24 hours." };
   }
   if (!(ppfd_umol_m2_s > 0) || !(interruption_ppfd_umol_m2_s > 0)) return { error: "Light intensities must be positive." };
+  if (!(short_photoperiod_hours < long_photoperiod_hours)) return { error: "The short-day photoperiod must be shorter than the long-day one." };
   if (!(interruption_hours > 0 && interruption_hours < 24)) return { error: "The night interruption must be above 0 and below 24 hours." };
   // The blackout runs from the pull time forward to the open time, wrapping
   // midnight when the pull is later in the day than the open.

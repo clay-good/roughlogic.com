@@ -100,6 +100,8 @@ export function computeInjectionClampTonnage({
   cavity_pressure_tsi = 0, safety_factor_pct = 15, machine_rating_tons = 0,
 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // Unit / range guard added 2026-09-26 after printed-example probing.
+  if ([arguments[0]?.safety_factor_pct].some((v) => Number(v) > 0 && Number(v) < 1)) return { error: "Enter the safety factor as a percent (15 for 15%), not a fraction." }; if (Number(arguments[0]?.cavity_pressure_tsi) > 20) return { error: "Enter cavity pressure in tons per square inch (about 2 to 5), not psi." }; if (!Number.isInteger(Number(arguments[0]?.cavities ?? 1))) return { error: "The cavity count must be a whole number." };
   if (!(cavities > 0)) return { error: "Number of cavities must be positive." };
   if (!(part_projected_area_in2 > 0)) return { error: "Part projected area must be positive (in^2)." };
   if (runner_projected_area_in2 < 0) return { error: "Runner projected area cannot be negative." };
@@ -169,7 +171,7 @@ PROCESS_RENDERERS["injection-clamp-tonnage"] = _simpleRenderer({
 // dims: in { barrel_capacity_oz: M, shot_weight_oz: M, cycle_time_s: T, min_pct: dimensionless, max_pct: dimensionless, max_residence_min: T, alt_cycle_time_s: T } out: { shot_pct: dimensionless, shots_in_barrel: dimensionless, residence_min: T, min_barrel_oz: M, max_barrel_oz: M, alt_residence_min: T }
 export function computeShotSizeResidenceTime({
   barrel_capacity_oz = 0, shot_weight_oz = 0, cycle_time_s = 0,
-  min_pct = 20, max_pct = 80, max_residence_min = 0, alt_cycle_time_s = 0,
+  min_pct = 20, max_pct = 65, max_residence_min = 0, alt_cycle_time_s = 0,
 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(barrel_capacity_oz > 0)) return { error: "Barrel capacity must be positive (oz)." };
@@ -177,6 +179,7 @@ export function computeShotSizeResidenceTime({
   if (!(cycle_time_s > 0)) return { error: "Cycle time must be positive (s)." };
   if (!(min_pct > 0) || !(max_pct > min_pct) || max_pct >= 100) return { error: "The usable window must run from a positive percentage up to a higher one below 100." };
   if (max_residence_min < 0 || alt_cycle_time_s < 0) return { error: "Residence limit and alternative cycle time cannot be negative." };
+  if (shot_weight_oz > barrel_capacity_oz) return { error: "The shot is larger than the barrel's capacity; no screw can deliver it in one stroke. Check the two weights." };
   const shot_pct = shot_weight_oz / barrel_capacity_oz * 100;
   const shots_in_barrel = barrel_capacity_oz / shot_weight_oz;
   const residence_min = shots_in_barrel * cycle_time_s / 60;
@@ -210,19 +213,19 @@ export function computeShotSizeResidenceTime({
     shot_pct, shots_in_barrel, residence_min, too_small, too_large, in_window,
     window_verdict, residence_verdict, has_limit, over_limit, limit_verdict,
     min_barrel_oz, max_barrel_oz, machine_verdict, has_alt, alt_residence_min, alt_verdict,
-    note: "How much of the barrel a shot uses, and how long the melt sits there before it is injected. Residence time is the barrel capacity divided by the shot, multiplied by the cycle time -- so a small shot in a large barrel is not merely inefficient, it is a material problem. The usable window runs roughly 20 to 80 percent of capacity and it has a reason at BOTH ends, which is why it is a window rather than a minimum. Below the floor the melt makes too many cycles in a hot barrel before it is used; above the ceiling the screw has too little stroke and too little time to melt and homogenise the charge, and shot-to-shot consistency suffers. The consequence at the low end is what makes this worth running before a job is scheduled rather than after it has run. On a polyolefin a long residence is survivable. On PVC it is not -- the material degrades and evolves hydrogen chloride, and the damage is to the screw and barrel as much as to the parts. On acetal it is a decomposition risk, and on polycarbonate and many flame-retardant grades the properties fall away well before anything is visible. The failure mode that matters is that degraded parts often pass dimensional inspection and fail on properties, so the defect is not caught at the press and SHIPS. The residence limit is therefore a material property and is entered from the resin supplier's processing data rather than assumed. The practical use of this is machine selection: running a small part on whatever large machine is free is a decision about the material, not about the schedule, and the usable barrel range reported here is the answer to it. Where a large machine is the only one available, shortening the cycle is the lever that remains, because residence scales directly with cycle time. This is a capacity and time calculation on entered weights. It does not convert between the machine's rating basis and the material actually run (machines are commonly rated in ounces of general-purpose polystyrene, and a different density changes the figure), size the injection unit for pressure or plasticising rate, model degradation kinetics, account for the residence distribution within a screw (some material sits far longer than the average), or address purging, colour change, or barrel temperature profile. The resin supplier's processing data and the machine manufacturer's ratings govern.",
+    note: "How much of the barrel a shot uses, and how long the melt sits there before it is injected. Residence time is the barrel capacity divided by the shot, multiplied by the cycle time -- so a small shot in a large barrel is not merely inefficient, it is a material problem. The usable window runs roughly 20 to 65 percent of capacity (Basilius prints 20-65%, Plastics Technology 25-65%; some machine builders allow 80) and it has a reason at BOTH ends, which is why it is a window rather than a minimum. Below the floor the melt makes too many cycles in a hot barrel before it is used; above the ceiling the screw has too little stroke and too little time to melt and homogenise the charge, and shot-to-shot consistency suffers. The consequence at the low end is what makes this worth running before a job is scheduled rather than after it has run. On a polyolefin a long residence is survivable. On PVC it is not -- the material degrades and evolves hydrogen chloride, and the damage is to the screw and barrel as much as to the parts. On acetal it is a decomposition risk, and on polycarbonate and many flame-retardant grades the properties fall away well before anything is visible. The failure mode that matters is that degraded parts often pass dimensional inspection and fail on properties, so the defect is not caught at the press and SHIPS. The residence limit is therefore a material property and is entered from the resin supplier's processing data rather than assumed. The practical use of this is machine selection: running a small part on whatever large machine is free is a decision about the material, not about the schedule, and the usable barrel range reported here is the answer to it. Where a large machine is the only one available, shortening the cycle is the lever that remains, because residence scales directly with cycle time. This is a capacity and time calculation on entered weights. It does not convert between the machine's rating basis and the material actually run (machines are commonly rated in ounces of general-purpose polystyrene, and a different density changes the figure), size the injection unit for pressure or plasticising rate, model degradation kinetics, account for the residence distribution within a screw (some material sits far longer than the average), or address purging, colour change, or barrel temperature profile. The resin supplier's processing data and the machine manufacturer's ratings govern.",
   };
 }
-export const shotSizeResidenceTimeExample = { inputs: { barrel_capacity_oz: 12, shot_weight_oz: 4.2, cycle_time_s: 32, min_pct: 20, max_pct: 80, max_residence_min: 4, alt_cycle_time_s: 45 } };
+export const shotSizeResidenceTimeExample = { inputs: { barrel_capacity_oz: 12, shot_weight_oz: 4.2, cycle_time_s: 32, min_pct: 20, max_pct: 65, max_residence_min: 4, alt_cycle_time_s: 45 } };
 PROCESS_RENDERERS["shot-size-residence-time"] = _simpleRenderer({
-  citation: "Citation: residence time = (barrel capacity / shot size) x cycle time, against a usable shot window commonly 20 to 80% of barrel capacity -- a window at BOTH ends, because below the floor the melt makes too many cycles in a hot barrel and above the ceiling the screw cannot homogenise the charge. The material's maximum residence is ENTERED from the resin supplier's processing data, because it is a material property: a long residence is survivable on a polyolefin and a degradation risk on PVC, acetal or polycarbonate. It does not convert between the machine's rating basis and the material actually run, model degradation kinetics, or account for the residence DISTRIBUTION within a screw. The resin supplier's data and the machine ratings govern.",
+  citation: "Citation: residence time = (barrel capacity / shot size) x cycle time, against a usable shot window commonly 20 to 65% of barrel capacity (Basilius; Plastics Technology gives 25 to 65%) -- a window at BOTH ends, because below the floor the melt makes too many cycles in a hot barrel and above the ceiling the screw cannot homogenise the charge. The material's maximum residence is ENTERED from the resin supplier's processing data, because it is a material property: a long residence is survivable on a polyolefin and a degradation risk on PVC, acetal or polycarbonate. It does not convert between the machine's rating basis and the material actually run, model degradation kinetics, or account for the residence DISTRIBUTION within a screw. The resin supplier's data and the machine ratings govern.",
   example: shotSizeResidenceTimeExample.inputs,
   fields: [
     { key: "barrel_capacity_oz", label: "Barrel rated capacity (oz)", kind: "number", attrs: { step: "any" } },
     { key: "shot_weight_oz", label: "Shot weight, parts plus runner (oz)", kind: "number", attrs: { step: "any" } },
     { key: "cycle_time_s", label: "Cycle time (s)", kind: "number", attrs: { step: "any" } },
     { key: "min_pct", label: "Usable window floor (% of capacity)", kind: "number", default: 20, attrs: { step: "any" } },
-    { key: "max_pct", label: "Usable window ceiling (% of capacity)", kind: "number", default: 80, attrs: { step: "any" } },
+    { key: "max_pct", label: "Usable window ceiling (% of capacity)", kind: "number", default: 65, attrs: { step: "any" } },
     { key: "max_residence_min", label: "Material residence limit (min, 0 to skip)", kind: "number", attrs: { step: "any" } },
     { key: "alt_cycle_time_s", label: "Alternative cycle time (s, 0 to skip)", kind: "number", attrs: { step: "any" } },
   ],
@@ -256,6 +259,8 @@ export function computeInjectionCoolingTime({
   alt_wall_thickness_in = 0, non_cooling_cycle_s = 0, annual_parts = 0,
 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // Unit / range guard added 2026-09-26 after printed-example probing.
+  if (Number(arguments[0]?.alpha_in2_s) > 0.01) return { error: "Enter the thermal diffusivity in in^2/s (about 0.00013), not mm^2/s." };
   if (!(wall_thickness_in > 0)) return { error: "Wall thickness must be positive (in)." };
   if (!(alpha_in2_s > 0)) return { error: "Thermal diffusivity must be positive (in^2/s)." };
   if (!(melt_temp_f > mould_temp_f)) return { error: "Melt temperature must exceed mould temperature." };
@@ -301,7 +306,7 @@ export function computeInjectionCoolingTime({
 }
 export const injectionCoolingTimeExample = { inputs: { wall_thickness_in: 0.1, alpha_in2_s: 0.00015, melt_temp_f: 450, mould_temp_f: 100, eject_temp_f: 180, alt_wall_thickness_in: 0.125, non_cooling_cycle_s: 8, annual_parts: 1000000 } };
 PROCESS_RENDERERS["injection-cooling-time"] = _simpleRenderer({
-  citation: "Citation: the one-dimensional plate cooling solution t = h² / (π² α) × ln[(4/π) × (T_melt − T_mould) / (T_eject − T_mould)], with thermal diffusivity α ENTERED because it varies with material and temperature -- roughly 0.00013 to 0.00023 in²/s for common thermoplastics, which is what k/(ρ·cp) gives for ABS, polypropylene, polycarbonate and HDPE. Cooling goes with the SQUARE of the wall and only the LOGARITHM of the temperatures, which is why thickness is the lever and mould temperature is not. It does not handle three-dimensional heat flow, corners or ribs, model the mould cooling circuit, account for crystallisation heat, or compute the injection and hold portions of the cycle. The resin supplier's data and a mould cooling analysis govern.",
+  citation: "Citation: the one-dimensional plate cooling solution t = h² / (π² α) × ln[(4/π) × (T_melt − T_mould) / (T_eject − T_mould)] -- the CENTERLINE criterion, the wall's middle at the ejection temperature; the average-temperature form with 8/π² in place of 4/π (MISUMI's worked example) reads about a quarter shorter -- with thermal diffusivity α ENTERED because it varies with material and temperature -- roughly 0.00013 to 0.00023 in²/s for common thermoplastics, which is what k/(ρ·cp) gives for ABS, polypropylene, polycarbonate and HDPE. Cooling goes with the SQUARE of the wall and only the LOGARITHM of the temperatures, which is why thickness is the lever and mould temperature is not. It does not handle three-dimensional heat flow, corners or ribs, model the mould cooling circuit, account for crystallisation heat, or compute the injection and hold portions of the cycle. The resin supplier's data and a mould cooling analysis govern.",
   example: injectionCoolingTimeExample.inputs,
   fields: [
     { key: "wall_thickness_in", label: "Maximum wall thickness (in)", kind: "number", attrs: { step: "any" } },
@@ -333,6 +338,8 @@ export function computeMoldShrinkageDimension({
   shrinkage_low_in_in = 0, shrinkage_high_in_in = 0, existing_cavity_in = 0,
 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // Unit / range guard added 2026-09-26 after printed-example probing.
+  if ([arguments[0]?.shrinkage_flow_in_in, arguments[0]?.shrinkage_cross_in_in, arguments[0]?.shrinkage_low_in_in, arguments[0]?.shrinkage_high_in_in].some((v) => Number(v) > 0.1)) return { error: "Enter shrinkage in in/in (0.0025 for 0.25%), not percent." };
   if (!(part_dimension_in > 0)) return { error: "Nominal part dimension must be positive (in)." };
   if (!(shrinkage_flow_in_in > 0) || shrinkage_flow_in_in >= 1) return { error: "Flow-direction shrinkage must be positive and below 1 in/in." };
   if (shrinkage_cross_in_in < 0 || shrinkage_cross_in_in >= 1) return { error: "Cross-flow shrinkage must be at least 0 and below 1 in/in." };
@@ -408,7 +415,8 @@ export function computeExtrusionOutputRate({
   if (!(product_od_in > 0)) return { error: "Product outside diameter must be positive (in)." };
   if (!(wall_thickness_in > 0)) return { error: "Wall thickness must be positive (in)." };
   if (!(wall_thickness_in * 2 < product_od_in)) return { error: "Twice the wall thickness must be less than the outside diameter." };
-  if (!(melt_density_lb_in3 > 0)) return { error: "Melt density must be positive (lb/in^3)." };
+  if (!(melt_density_lb_in3 > 0)) return { error: "Product density must be positive (lb/in^3)." };
+  if (melt_density_lb_in3 > 0.2) return { error: "Enter the density in lb/in^3 (about 0.034 for HDPE), not g/cc." };
   if (line_speed_ft_min < 0 || extruder_output_lb_h < 0 || die_opening_in < 0 || cooling_capacity_lb_h < 0) return { error: "Line speed, output, die opening and cooling capacity cannot be negative." };
   if (!(shift_hours > 0)) return { error: "Shift hours must be positive." };
   // The exact annulus, not the thin-wall approximation the spec used.
@@ -439,7 +447,9 @@ export function computeExtrusionOutputRate({
     ? "(no cooling capacity entered -- and cooling is usually what governs)"
     : cooling_governs
       ? "COOLING GOVERNS: the bath supports " + fmt(cooling_capacity_lb_h, 0) + " lb/h (" + fmt(cooling_speed_ft_min, 1) + " ft/min) against the extruder's " + fmt(extruder_output_lb_h, 0) + " lb/h. Pushing the screw to its rating delivers product that has not solidified by the haul-off: it leaves the bath soft, ovalises under the puller, and the dimensions drift. Adding extruder output to a cooling-limited line buys NOTHING, and the operator's instinct to slow the line without slowing the screw makes it worse by putting more material in every foot"
-      : "the bath supports " + fmt(cooling_capacity_lb_h, 0) + " lb/h (" + fmt(cooling_speed_ft_min, 1) + " ft/min), which covers the entered output -- so the screw governs here rather than the cooling";
+      : !has_output
+        ? "the bath supports " + fmt(cooling_capacity_lb_h, 0) + " lb/h (" + fmt(cooling_speed_ft_min, 1) + " ft/min); enter the extruder output to see which one governs"
+        : "the bath supports " + fmt(cooling_capacity_lb_h, 0) + " lb/h (" + fmt(cooling_speed_ft_min, 1) + " ft/min), which covers the entered output -- so the screw governs here rather than the cooling";
   const shift_pounds = has_speed ? output_at_speed_lb_h * shift_hours : 0;
   const consumption_verdict = !has_speed
     ? "(no line speed entered)"
@@ -457,13 +467,13 @@ export function computeExtrusionOutputRate({
 }
 export const extrusionOutputRateExample = { inputs: { product_od_in: 2.5, wall_thickness_in: 0.1, line_speed_ft_min: 45, melt_density_lb_in3: 0.0347, extruder_output_lb_h: 400, die_opening_in: 3.0, cooling_capacity_lb_h: 500, shift_hours: 8 } };
 PROCESS_RENDERERS["extrusion-output-rate"] = _simpleRenderer({
-  citation: "Citation: the extrusion mass balance -- output = cross-sectional area × line speed × melt density -- using the EXACT annular area π/4 × (OD² − ID²) rather than the thin-wall approximation π × OD × wall, which runs several percent high on a heavy wall and puts that error straight onto the output figure. Melt density is ENTERED because it differs from solid density and varies with temperature. It does not size an extruder or screw, model die swell, compute the cooling required or the bath length providing it, or handle profile shapes other than a round annulus. The extruder and die manufacturers' data and the line's own production records govern.",
+  citation: "Citation: the extrusion mass balance -- output = cross-sectional area × line speed × the product's SOLID density (the dimensions are the cooled product's, so the melt density would read about 20% low) -- using the EXACT annular area π/4 × (OD² − ID²) rather than the thin-wall approximation π × OD × wall, which runs several percent high on a heavy wall and puts that error straight onto the output figure. Melt density is ENTERED because it differs from solid density and varies with temperature. It does not size an extruder or screw, model die swell, compute the cooling required or the bath length providing it, or handle profile shapes other than a round annulus. The extruder and die manufacturers' data and the line's own production records govern.",
   example: extrusionOutputRateExample.inputs,
   fields: [
     { key: "product_od_in", label: "Product outside diameter (in)", kind: "number", attrs: { step: "any" } },
     { key: "wall_thickness_in", label: "Wall thickness (in)", kind: "number", attrs: { step: "any" } },
     { key: "line_speed_ft_min", label: "Line speed (ft/min, 0 to skip)", kind: "number", attrs: { step: "any" } },
-    { key: "melt_density_lb_in3", label: "Melt density (lb/in³)", kind: "number", attrs: { step: "any" } },
+    { key: "melt_density_lb_in3", label: "Product density, solid (lb/in³; about 0.0343 for HDPE -- not the melt density)", kind: "number", attrs: { step: "any" } },
     { key: "extruder_output_lb_h", label: "Extruder rated output (lb/h, 0 to skip)", kind: "number", attrs: { step: "any" } },
     { key: "die_opening_in", label: "Die opening (in, 0 to skip)", kind: "number", attrs: { step: "any" } },
     { key: "cooling_capacity_lb_h", label: "Cooling capacity (lb/h, 0 to skip)", kind: "number", attrs: { step: "any" } },
@@ -634,6 +644,8 @@ export function computeThermoplasticTemperatureDerate({
   operating_pressure_psi = 0, max_rated_temp_f = 0, alt_derating_factor = 0,
 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // Unit / range guard added 2026-09-26 after printed-example probing.
+  if (Number(arguments[0]?.operating_temp_f) < -40) return { error: "Operating temperature below -40 deg F is outside the thermoplastic derating tables; check the unit." };
   if (!(rated_pressure_psi > 0)) return { error: "The pressure rating at 73 degF must be positive (psi)." };
   if (!(derating_factor > 0) || derating_factor > 1) return { error: "The derating factor must be above 0 and no more than 1." };
   if (operating_pressure_psi < 0) return { error: "Operating pressure cannot be negative." };
@@ -709,6 +721,8 @@ export function computeCastingPourYield({
   melt_energy_btu_lb = 0, target_yield_pct = 0, annual_castings = 0,
 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // Unit / range guard added 2026-09-26 after printed-example probing.
+  if ([arguments[0]?.target_yield_pct].some((v) => Number(v) > 0 && Number(v) < 1)) return { error: "Enter the target yield as a percent (65 for 65%), not a fraction." };
   if (!(casting_weight_lb > 0)) return { error: "Casting weight must be positive (lb)." };
   if (gating_weight_lb < 0) return { error: "Gating and riser weight cannot be negative." };
   if (!(castings_per_mould > 0)) return { error: "Castings per mould must be positive." };
@@ -744,7 +758,7 @@ export function computeCastingPourYield({
     has_energy, poured_btu, btu_per_saleable_lb, energy_penalty_pct, energy_verdict,
     has_target, target_poured_lb, target_btu_per_lb, saving_btu_per_lb, target_verdict,
     has_annual, annual_btu_saved, annual_verdict, caution_verdict,
-    note: "How much metal a mould takes against how much of it ships, and what the difference costs to melt. Yield is the casting weight over the poured weight, and 60 to 70 percent is normal for sand casting -- which means roughly 30 to 40 percent of everything melted is gating and risers. The metal in them is not lost, because they are cut off and remelted, so the yield is not a materials loss. It is an ENERGY loss, and that is the part that is paid again on every cycle: a 62 percent yield turns 500 BTU per pound of melting into about 800 BTU per pound of saleable casting, and that penalty is permanent for the life of the pattern. THE TENSION THIS SITS IN IS REAL AND IT DOES NOT RESOLVE BY PUSHING THE YIELD UP. The risers that lower the yield are the risers that feed solidification shrinkage, and cutting them to hit a yield target puts shrinkage porosity in the casting. One scrap casting costs more than the energy saved on many sound ones, and porosity is often found late -- after machining, sometimes after assembly. So riser sizing is a feeding calculation done on the casting's own geometry, and yield is the OUTCOME of that calculation rather than an input to it. Reading it the other way round is the error this makes visible. The lever that genuinely moves both at once is an insulating or exothermic sleeve. It raises the riser's effective modulus so the same feeding is achieved from a smaller riser, which raises the yield without giving up soundness -- and that is the move that resolves the tension rather than trading one side against the other. Improving the gating design and pouring more castings per mould do the same thing from different directions. This is a weight and energy ratio on entered figures. It does not size risers or gating, evaluate whether a casting will be sound, model solidification, account for melting loss, slag, or dross (which are real material losses on top of the yield), include the energy in remelting the returns as a separate line, or address sand, moulding, or finishing costs -- which on many castings exceed the melt energy. The foundry's own melt records, a solidification analysis, and the methods engineer govern.",
+    note: "How much metal a mould takes against how much of it ships, and what the difference costs to melt. Yield is the casting weight over the poured weight, and 50 to 65 percent is typical for sand casting (DOE, Energy Use in U.S. Metalcasting, 2004) -- which means roughly 35 to 50 percent of everything melted is gating and risers. The metal in them is not lost, because they are cut off and remelted, so the yield is not a materials loss. It is an ENERGY loss, and that is the part that is paid again on every cycle: a 62 percent yield turns 500 BTU per pound of melting into about 800 BTU per pound of saleable casting, and that penalty is permanent for the life of the pattern. THE TENSION THIS SITS IN IS REAL AND IT DOES NOT RESOLVE BY PUSHING THE YIELD UP. The risers that lower the yield are the risers that feed solidification shrinkage, and cutting them to hit a yield target puts shrinkage porosity in the casting. One scrap casting costs more than the energy saved on many sound ones, and porosity is often found late -- after machining, sometimes after assembly. So riser sizing is a feeding calculation done on the casting's own geometry, and yield is the OUTCOME of that calculation rather than an input to it. Reading it the other way round is the error this makes visible. The lever that genuinely moves both at once is an insulating or exothermic sleeve. It raises the riser's effective modulus so the same feeding is achieved from a smaller riser, which raises the yield without giving up soundness -- and that is the move that resolves the tension rather than trading one side against the other. Improving the gating design and pouring more castings per mould do the same thing from different directions. This is a weight and energy ratio on entered figures. It does not size risers or gating, evaluate whether a casting will be sound, model solidification, account for melting loss, slag, or dross (which are real material losses on top of the yield), include the energy in remelting the returns as a separate line, or address sand, moulding, or finishing costs -- which on many castings exceed the melt energy. The foundry's own melt records, a solidification analysis, and the methods engineer govern.",
   };
 }
 export const castingPourYieldExample = { inputs: { casting_weight_lb: 280, gating_weight_lb: 170, castings_per_mould: 1, melt_energy_btu_lb: 500, target_yield_pct: 70, annual_castings: 5000 } };
@@ -779,6 +793,9 @@ export function computeRiserModulusFeeding({
   modulus_ratio = 1.2, shrinkage_pct = 0, riser_efficiency_pct = 0, sleeve_factor = 1,
 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // Unit / range guard added 2026-09-26 after printed-example probing.
+  if ([arguments[0]?.shrinkage_pct].some((v) => Number(v) > 0 && Number(v) < 1)) return { error: "Enter shrinkage as a percent (4 for 4%), not a fraction." };
+  if (Number(arguments[0]?.modulus_ratio ?? 1.2) < 1 || Number(arguments[0]?.sleeve_factor ?? 1) < 1) return { error: "The riser modulus ratio and the sleeve factor must be at least 1 (a riser that freezes before the casting cannot feed it)." };
   // An efficiency is a percent; 0 < value < 1 is a fraction typed into a percent field (added 2026-09-26).
   if (["riser_efficiency_pct"].some((k) => { const v = Number(arguments[0]?.[k]); return v > 0 && v < 1; })) return { error: "Enter efficiencies as a percent (85 for 85%), not a fraction." };
   if (!(section_length_in > 0) || !(section_width_in > 0) || !(section_thickness_in > 0)) return { error: "All three section dimensions must be positive (in)." };
@@ -791,7 +808,8 @@ export function computeRiserModulusFeeding({
   const section_surface_in2 = 2 * (L * W + L * T + W * T);
   const casting_modulus_in = section_volume_in3 / section_surface_in2;
   const riser_modulus_in = casting_modulus_in * modulus_ratio;
-  // A cylindrical riser of height equal to its diameter has a modulus of d/6.
+  // A cylindrical riser of height equal to its diameter has a modulus of d/6 when every surface cools;
+  // a riser sitting on the casting loses its bottom face and is d/5, which the note names.
   const riser_diameter_in = 6 * riser_modulus_in / sleeve_factor;
   const modulus_verdict = "the section is " + fmt(section_volume_in3, 1) + " in3 over " + fmt(section_surface_in2, 1) + " in2, a modulus of " + fmt(casting_modulus_in, 4) + " in. At a " + fmt(modulus_ratio, 2) + " ratio the riser needs " + fmt(riser_modulus_in, 4) + " in of modulus, which a cylinder of height equal to its diameter reaches at " + fmt(riser_diameter_in, 2) + " in"
     + (sleeve_factor !== 1 ? " with the " + fmt(sleeve_factor, 2) + "x sleeve" : "");
@@ -869,6 +887,8 @@ export function computeSandPermeabilityVent({
   pour_temp_f = 2600, vent_area_in2 = 0, permeability_number = 0, fineness_change_pct = 0,
 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // Unit / range guard added 2026-09-26 after printed-example probing.
+  if ([arguments[0]?.moisture_pct].some((v) => Number(v) > 0 && Number(v) < 1)) return { error: "Enter moisture as a percent (3.5 for 3.5%), not a fraction." }; if (Number(arguments[0]?.pour_temp_f ?? 2600) < 1000) return { error: "Enter the pour temperature in deg F (about 2,600 for iron); below 1,000 F is not a metal pour." }; if (Number(arguments[0]?.fineness_change_pct) <= -100) return { error: "A fineness change of -100% or less is not possible." };
   if (!(mould_sand_lb > 0)) return { error: "Mould sand weight must be positive (lb)." };
   if (moisture_pct < 0 || moisture_pct >= 100) return { error: "Moisture must be at least 0 and below 100 percent." };
   if (binder_lb < 0 || binder_gas_cm3_g < 0) return { error: "Binder weight and gas evolution rate cannot be negative." };
@@ -949,6 +969,8 @@ export function computeMeltFurnaceEnergy({
   energy_cost_per_kwh = 0, alt_efficiency_pct = 0, alt_theoretical_btu_lb = 0, casting_yield_pct = 0,
 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // Unit / range guard added 2026-09-26 after printed-example probing.
+  if ([arguments[0]?.casting_yield_pct].some((v) => Number(v) > 0 && Number(v) < 1)) return { error: "Enter the casting yield as a percent (65 for 65%), not a fraction." };
   // An efficiency is a percent; 0 < value < 1 is a fraction typed into a percent field (added 2026-09-26).
   if (["alt_efficiency_pct", "furnace_efficiency_pct"].some((k) => { const v = Number(arguments[0]?.[k]); return v > 0 && v < 1; })) return { error: "Enter efficiencies as a percent (85 for 85%), not a fraction." };
   if (!(charge_weight_lb > 0)) return { error: "Charge weight must be positive (lb)." };

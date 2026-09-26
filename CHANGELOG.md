@@ -6,6 +6,8 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Added
 
+- **`co2-enrichment-rate` takes the crop's own CO2 use.** Bartok's method is crop use plus the infiltration loss (about 11.5 + 13.8 cu ft per hour for a 30 x 128 ft house). The tile had only the infiltration term, understating demand by about 45%, and its assumption said crop uptake was "not deducted" when it adds. Crop use defaults to 0.
+
 - **`rope-safety-factor` takes the roping ratio.** ASME A17.1 2.20.3 counts N as twice the rope count on 2:1 roping; without the input the tile read half the factor of safety on every 2:1 installation.
 - **`cp-rectifier-sizing` takes the structure-to-electrolyte resistance.** TM 5-811-7 / UFC 3-570-02A adds Rc to the circuit; its example (RT 1.75 ohms, 6.2 V) now reproduces. Rc defaults to 0, so earlier results are unchanged.
 - **`hoistway-venting` takes the closer force, the knob position and the number of cars.** See Fixed.
@@ -16,6 +18,24 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 - **`stadia-distance` takes the stadia constant C of an external-focusing instrument.** H gains C cos(theta) and V gains C sin(theta). The NAVEDTRA 14070 example (C = 1.0) now reproduces exactly: 692.34 ft, 326.28 ft, elevation 705.98. C defaults to 0, so internal-focusing results are unchanged.
 
 ### Fixed
+
+- **The stage acoustics tiles use about 1,128 ft/s at 70 F.** `delay-tower-alignment`, `cardioid-sub-array` and `driver-spacing-lobing` scaled from a 1,125 ft/s reference, 0.3% slow against QSC's 1,128 and the `time-alignment` tile's own 344 m/s. The speed is now 49.03 x sqrt(Rankine).
+- **`shot-size-residence-time` defaults to a 20-65% shot window and refuses a shot larger than the barrel.** Basilius prints 20-65% and Plastics Technology 25-65%; the tile's ceiling was 80%. A shot of 425% of the barrel used to pass with only a warning.
+- **`extrusion-output-rate` asks for the product's solid density.** The field and prose asked for the melt density, but the dimensions are the cooled product's; the melt density reads about 20% low. GF's IPS chart (6 in DR 11, 5.00 lb/ft) now reproduces. With cooling capacity entered and no extruder output, the verdict no longer claims the bath "covers the entered output".
+- **Prose corrected from printed sources:**
+  - `spl-distance` and `spl-distance-for-level`: the modes add +3 dB (hemispherical) and +6 dB (indoors), as the code does; the assumption text said -3 dB and "user-supplied".
+  - `rf-antenna-cable-loss`: LMR-400 at 600 MHz loses about 3.2 dB per 100 ft (Times Microwave prints 2.7 at 450 MHz and 3.9 at 900), not 3.9.
+  - `video-wall-data-rate`: 11.94 Gbps fits HDMI 2.0 but is just over 12G-SDI's 11.88 Gbps.
+  - `gobo-image-size`: its citation now names the exact edge-ray keystone form the code uses.
+  - `greenhouse-transpiration-water`: UMass sizes a water supply at 0.3-0.4 gal per sq ft of bench per day at peak. The unsourced "0.05 to 0.15 band growers quote" is gone.
+  - `thermal-screen-energy-saving`: the UA reduction is the whole-house figure, not the fabric rating (UW Extension: a 52% curtain saved 32% of a house).
+  - `casting-pour-yield`: sand casting yield typically runs 50-65% (DOE 2004), not 60-70%.
+  - `injection-cooling-time`: the citation names the centerline criterion; the average-temperature form reads about a quarter shorter.
+- **Stage governance text fits the tile.** SPL, time-alignment and lighting tiles said "Head rigger and manufacturer working-load-limit charts govern". They now carry the general text, and `neutral-imbalance` carries the electrical text.
+- **Unit and range guards found by probing.** Each of these used to return nonsense silently:
+  - stage: a negative Haas offset; -600 C; an unknown phase or distance unit treated as the default; carriers in kHz or an octave apart; kelvin in thousands; bit depth per pixel; a negative target SPL; a negative crest factor; fractional element, hoist and connector counts
+  - greenhouse: transmission, shade, humidity, UA reduction, germination, vent area and allowance typed as fractions; a leaf 30 F off the air; a short day longer than the long day; PPF typed as efficacy; an energy rate in cents; an SI U-factor
+  - process: safety factor, yields, moisture and shrinkage as fractions; cavity pressure in psi; diffusivity in mm2/s; shrinkage in percent; density in g/cc; a riser modulus ratio or sleeve factor below 1; a -400 F pour
 
 - **`buffer-stroke-speed` sizes the stroke on 115% of the rated speed, as A17.1 2.22.4.1.1 does.** It used the governor tripping speed, which at 500 fpm can reach 625 fpm and demanded 20.2 in against the code's 17. The requirement now matches Table 2.22.4.1 to the quarter inch (500 fpm -> 17.00 in, 200 fpm -> 2.75 in). A buffer exactly at the table value no longer reads SHORT. The stroke a strike at the governor trip would take is still shown.
 - **`hoistway-venting` door force is felt at the knob, on top of the closer.** The tile compared the whole pressure force at the door's center to the opening-force limit, with no closer and no lever arm. It now uses the NFPA 92 relation F = Fdc + A dP W / (2 (W - d)); Klote's table value (36 in door, 6 lbf closer, 30 lbf limit -> 0.40 in wg) reproduces. The vent area is at least 3 sq ft per car, the floor in the legacy IBC rule.
@@ -193,6 +213,13 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 - **`calc-agriculture.js` size cap raised from 64,000 to 66,000 bytes gzipped.** The irrigation and livestock corrections took it to 64,110 B (100.2%).
 - **`calc-electrical.js` size cap raised from 104,000 to 106,000 bytes gzipped.** The battery-vent and capacitor corrections took it to 104,063 B (100.1%). Splitting the module per bench is still the preferred fix.
+- **Twenty-seven more tiles now carry a publisher's printed example.**
+  - **Stage:** `amp-power-spl`, `spl-distance` and `spl-distance-for-level` (QSC); `lighting-beam`, `lighting-throw-for-pool` and `gobo-image-size` (ETC Source Four); `wireless-intermod` and `rf-antenna-cable-loss` (Shure); `mired-gel-shift` (IATSE 728); `neutral-imbalance` (IEE-Business); `cardioid-sub-array` (ProSoundWeb).
+  - **Greenhouse:** `ppfd-daily-light-integral`, `shade-cloth-transmission` and `leaching-fraction-runoff-ec` (Virginia Extension); `grow-light-fixture-count` and `vapor-pressure-deficit` (e-GRO); `fan-pad-evaporative-cooling` and `photoperiod-blackout-schedule` (UMass).
+  - **Plastics and foundry:** `hdpe-fusion-pressure-time` (Dura-Line), `thermoplastic-temperature-derate` (Spears), `injection-clamp-tonnage` (NPC), `shot-size-residence-time` (Basilius), `mold-shrinkage-dimension` (Keyence), `extrusion-output-rate` (GF), `thermoforming-draw-ratio` (Amcor patent), `riser-modulus-feeding` (Groover), `casting-pour-yield` (DOE).
+
+  README: 867 of 2,183 tiles are checked only against the project's own derivation (712 of them first-principles); 1,316 carry an outside source.
+
 - **Twenty-two more tiles now carry a publisher's printed example.**
   - **Brewing:** `mash-strike-water`, `brewhouse-efficiency`, `ibu-tinseth` and `mash-tun-grain-bed` (Palmer, How to Brew); `sparge-water-volume` and `kettle-boil-off` (Brew Your Own); `beer-color-srm` (Beer Maverick); `yeast-pitch-rate` (Colorado Brewers Guild); `carbonation-volumes-pressure` (Brewers Association / ASBC table); `proof-gallon-yield` (TTB).
   - **Elevator:** `buffer-stroke-speed` (A17.1 Table 2.22.4.1, both 500 and 200 fpm rows), `counterweight-balance` (Elevator World), `traction-roping-ratio` and `step-chain-tension` (Al-Sharif), `hoistway-venting` (Budnick and Klote).
