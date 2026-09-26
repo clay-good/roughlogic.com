@@ -97,6 +97,7 @@ export function computeMashStrikeWater({ grain_weight_lb = 0, mash_thickness_qt_
   if (!(target_mash_temp_f > grain_temp_f)) return { error: "The target mash temperature must be above the grain temperature." };
   if (!(grain_specific_heat > 0 && grain_specific_heat < 1)) return { error: "Grain specific heat must be between 0 and 1 Btu/lb-degF (about 0.4 for malt)." };
   if (!(tun_weight_lb >= 0) || !(tun_specific_heat >= 0)) return { error: "Tun weight and specific heat cannot be negative (enter 0 to leave the tun out)." };
+  if (!(tun_temp_f >= -20) || !(grain_temp_f >= -20)) return { error: "Grain and tun temperatures below -20 deg F are outside a brewhouse; check the units (deg F)." };
   if (!(tun_temp_f <= target_mash_temp_f)) return { error: "The tun temperature should be at or below the mash temperature; a hotter tun is a preheated one." };
   const mash_water_gal = grain_weight_lb * mash_thickness_qt_per_lb / QT_PER_GAL;
   const water_lb = mash_water_gal * LB_PER_GAL_WATER;
@@ -211,7 +212,7 @@ BREWING_RENDERERS["sparge-water-volume"] = _simpleRenderer({
   outputs: [
     { key: "mash_water_gal", id: "swv-mash", label: "Mash water", unit: "gal", value: (r) => fmt(r.mash_water_gal, 1) + " gal" },
     { key: "absorbed_gal", id: "swv-abs", label: "Kept by the grain", unit: "gal", value: (r) => fmt(r.absorbed_gal, 1) + " gal -- " + fmt(r.absorbed_share_pct, 0) + "% of every gallon heated" },
-    { key: "first_runnings_gal", id: "swv-first", label: "First runnings", unit: "gal", value: (r) => fmt(r.first_runnings_gal, 1) + " gal" },
+    { key: "first_runnings_gal", id: "swv-first", label: "First runnings (before the tun deadspace)", unit: "gal", value: (r) => fmt(r.first_runnings_gal, 1) + " gal" },
     { key: "sparge_gal", id: "swv-sparge", label: "Sparge water", unit: "gal", value: (r) => fmt(r.sparge_gal, 1) + " gal -- " + fmt(r.sparge_share_pct, 0) + "% of the runoff arrives after the mash drains" },
     { key: "total_water_gal", id: "swv-total", label: "Total water", unit: "gal", value: (r) => fmt(r.total_water_gal, 1) + " gal" },
     { key: "alternative_sparge_gal", id: "swv-alt", label: "At the stronger grain bill", value: (r) => "grain up " + fmt(r.grain_change_pct, 0) + "%, sparge " + (r.sparge_change_pct < 0 ? "DOWN " : "up ") + fmt(Math.abs(r.sparge_change_pct), 0) + "% to " + fmt(r.alternative_sparge_gal, 1) + " gal, and " + fmt(r.extra_absorbed_gal, 1) + " gal more lost to the grain" },
@@ -234,7 +235,7 @@ export function computeBrewhouseEfficiency({ grain_weight_lb = 0, extract_potent
   if (!(grain_weight_lb > 0) || !(strong_grain_weight_lb > 0)) return { error: "Grain weights must be positive." };
   if (!(extract_potential_ppg > 0)) return { error: "The extract potential must be positive (about 37 points per pound per gallon for base malt)." };
   if (!(volume_gal > 0)) return { error: "The volume must be positive." };
-  if (!(original_gravity > 1)) return { error: "The original gravity must be above 1.000." };
+  if (!(original_gravity > 1 && original_gravity < 1.2)) return { error: "Enter the original gravity as a specific gravity between 1.000 and 1.200 (1.038), not in points." };
   if (!(transfer_loss_gal >= 0 && transfer_loss_gal < volume_gal)) return { error: "Kettle and whirlpool losses must be at least 0 and below the volume." };
   if (!(assumed_efficiency_pct > 0 && assumed_efficiency_pct <= 100) || !(achieved_efficiency_pct > 0 && achieved_efficiency_pct <= 100)) {
     return { error: "Efficiencies must be above 0 and at most 100%." };
@@ -246,6 +247,8 @@ export function computeBrewhouseEfficiency({ grain_weight_lb = 0, extract_potent
   const fermenter_point_gallons = og_points * fermenter_volume_gal;
   const kettle_efficiency_pct = 100 * kettle_point_gallons / available_point_gallons;
   const fermenter_efficiency_pct = 100 * fermenter_point_gallons / available_point_gallons;
+  // More extract in the kettle than the grain holds is an input error (a ppg typed as a gravity, or the wrong volume), not a result.
+  if (kettle_efficiency_pct > 100) return { error: "That gravity and volume hold more extract than the grain can give (over 100% efficiency); check the extract potential (about 37 ppg) and the volume." };
   const strong_available = strong_grain_weight_lb * extract_potential_ppg;
   const assumed_og_points = strong_available * assumed_efficiency_pct / 100 / volume_gal;
   const achieved_og_points = strong_available * achieved_efficiency_pct / 100 / volume_gal;
@@ -310,6 +313,8 @@ BREWING_RENDERERS["brewhouse-efficiency"] = _simpleRenderer({
 // dims: in { batch_volume_gal: L^3, hop_weight_lb: M, alpha_acid_pct: dimensionless, boil_minutes: T, boil_gravity: dimensionless, short_boil_minutes: T, strong_boil_gravity: dimensionless } out: { alpha_acid_mg_per_l: M L^-3, utilization: dimensionless, ibu: dimensionless, short_boil_ibu: dimensionless, strong_gravity_ibu: dimensionless, hops_to_match_lb: M }
 export function computeIbuTinseth({ batch_volume_gal = 0, hop_weight_lb = 0, alpha_acid_pct = 0, boil_minutes = 0, boil_gravity = 0, short_boil_minutes = 0, strong_boil_gravity = 0 } = {}) {
   const guard = _finiteGuard(arguments[0]); if (guard) return { error: guard.error };
+  // Unit / range guard added 2026-09-26 after printed-example probing.
+  if ([arguments[0]?.alpha_acid_pct].some((v) => Number(v) > 0 && Number(v) < 1)) return { error: "Enter the alpha acid as a percent (6.4 for 6.4%), not a fraction." }; if ([arguments[0]?.boil_gravity, arguments[0]?.strong_boil_gravity].some((v) => Number(v) > 1.2)) return { error: "Enter the boil gravity as a specific gravity (1.050), not in points or degrees Plato." };
   if (!(batch_volume_gal > 0)) return { error: "The batch volume must be positive." };
   if (!(hop_weight_lb > 0)) return { error: "The hop weight must be positive." };
   if (!(alpha_acid_pct > 0 && alpha_acid_pct <= 30)) return { error: "Alpha acid must be above 0 and at most 30%." };
@@ -438,6 +443,8 @@ BREWING_RENDERERS["beer-color-srm"] = _simpleRenderer({
 // dims: in { batch_volume_gal: L^3, original_gravity: dimensionless, pitch_rate_million_per_ml_plato: dimensionless, slurry_cells_per_ml: L^-3, viability_pct: dimensionless, aged_viability_pct: dimensionless, strong_original_gravity: dimensionless } out: { plato: dimensionless, cells_required: dimensionless, slurry_ml: L^3, slurry_gal: L^3, aged_slurry_gal: L^3, strong_cells_required: dimensionless }
 export function computeYeastPitchRate({ batch_volume_gal = 0, original_gravity = 0, pitch_rate_million_per_ml_plato = 0, slurry_cells_per_ml = 0, viability_pct = 0, aged_viability_pct = 0, strong_original_gravity = 0 } = {}) {
   const guard = _finiteGuard(arguments[0]); if (guard) return { error: guard.error };
+  // Unit / range guard added 2026-09-26 after printed-example probing.
+  if ([arguments[0]?.viability_pct, arguments[0]?.aged_viability_pct].some((v) => Number(v) > 0 && Number(v) < 1)) return { error: "Enter viability as a percent (94 for 94%), not a fraction." }; if (Number(arguments[0]?.slurry_cells_per_ml) > 0 && Number(arguments[0]?.slurry_cells_per_ml) < 1e6) return { error: "Enter the slurry count in cells per mL (2,200,000,000), not in billions." };
   if (!(batch_volume_gal > 0)) return { error: "The batch volume must be positive." };
   if (!(original_gravity > 1) || !(strong_original_gravity > 1)) return { error: "Original gravities must be above 1.000." };
   if (!(pitch_rate_million_per_ml_plato > 0)) return { error: "The pitch rate must be positive (0.75 ale, 1.5 lager, in million cells per mL per degP)." };
@@ -504,6 +511,8 @@ BREWING_RENDERERS["yeast-pitch-rate"] = _simpleRenderer({
 // dims: in { preboil_volume_gal: L^3, preboil_gravity: dimensionless, boiloff_pct_per_hour: dimensionless, boil_hours: T, shrinkage_pct: dimensionless, hard_boiloff_pct_per_hour: dimensionless } out: { evaporated_gal: L^3, hot_volume_gal: L^3, cooled_volume_gal: L^3, cooled_og_points: dimensionless, hard_cooled_volume_gal: L^3, hard_og_points: dimensionless }
 export function computeKettleBoilOff({ preboil_volume_gal = 0, preboil_gravity = 0, boiloff_pct_per_hour = 0, boil_hours = 0, shrinkage_pct = 0, hard_boiloff_pct_per_hour = 0 } = {}) {
   const guard = _finiteGuard(arguments[0]); if (guard) return { error: guard.error };
+  // Unit / range guard added 2026-09-26 after printed-example probing.
+  if ([arguments[0]?.boiloff_pct_per_hour, arguments[0]?.hard_boiloff_pct_per_hour].some((v) => Number(v) > 0 && Number(v) < 1)) return { error: "Enter the boil-off rate as a percent per hour (10 for 10%), not a fraction." };
   if (!(preboil_volume_gal > 0)) return { error: "The pre-boil volume must be positive." };
   if (!(preboil_gravity > 1)) return { error: "The pre-boil gravity must be above 1.000." };
   if (!(boiloff_pct_per_hour >= 0) || !(hard_boiloff_pct_per_hour >= 0)) return { error: "Boil-off rates cannot be negative." };
@@ -590,6 +599,8 @@ export function computeCarbonationVolumesPressure({ beer_temp_f = 0, gauge_psig 
   const pressure_for_target_psig = pressureFor(target_volumes, beer_temp_f);
   const warm_co2_volumes = volumesAt(gauge_psig, warm_temp_f);
   const warm_pressure_for_target_psig = pressureFor(target_volumes, warm_temp_f);
+  // A target the beer holds with the vent open has no gauge setting; the fit would report a vacuum.
+  if (pressure_for_target_psig < 0 || warm_pressure_for_target_psig < 0) return { error: "The beer holds that many volumes at atmospheric pressure at this temperature; no positive gauge pressure is needed. Check the target volumes (2.2 to 2.8 for most beer)." };
   return {
     beer_temp_f, warm_temp_f, gauge_psig, target_volumes,
     solubility_factor: k(beer_temp_f),
@@ -633,6 +644,8 @@ BREWING_RENDERERS["carbonation-volumes-pressure"] = _simpleRenderer({
 // dims: in { batch_volume_gal: L^3, original_gravity: dimensionless, final_gravity: dimensionless, heat_of_fermentation_btu_per_lb: L^2 T^-2, peak_day_share_pct: dimensionless, crash_start_temp_f: T, crash_target_temp_f: T, crash_hours: T, tank_surface_sqft: L^2, tank_u_factor: M T^-4, cellar_temp_f: T, glycol_delta_t_f: T } out: { fermentation_heat_btu: M L^2 T^-2, adiabatic_rise_f: T, fermentation_load_btuh: M L^2 T^-3, crash_load_btuh: M L^2 T^-3, glycol_gpm: L^3 T^-1 }
 export function computeFermenterGlycolLoad({ batch_volume_gal = 0, original_gravity = 0, final_gravity = 0, heat_of_fermentation_btu_per_lb = 0, peak_day_share_pct = 0, crash_start_temp_f = 0, crash_target_temp_f = 0, crash_hours = 0, tank_surface_sqft = 0, tank_u_factor = 0, cellar_temp_f = 0, glycol_delta_t_f = 0 } = {}) {
   const guard = _finiteGuard(arguments[0]); if (guard) return { error: guard.error };
+  // Unit / range guard added 2026-09-26 after printed-example probing.
+  if ([arguments[0]?.peak_day_share_pct].some((v) => Number(v) > 0 && Number(v) < 1)) return { error: "Enter the peak-day share as a percent (40 for 40%), not a fraction." };
   if (!(batch_volume_gal > 0)) return { error: "The batch volume must be positive." };
   if (!(original_gravity > final_gravity) || !(final_gravity >= 1)) return { error: "The original gravity must exceed the final gravity, and both be at least 1.000." };
   if (!(heat_of_fermentation_btu_per_lb > 0)) return { error: "The heat of fermentation must be positive (about 280 Btu per lb of extract)." };
@@ -722,6 +735,8 @@ BREWING_RENDERERS["fermenter-glycol-load"] = _simpleRenderer({
 // dims: in { wash_volume_gal: L^3, wash_abv_pct: dimensionless, recovery_pct: dimensionless, collection_proof: dimensionless, alternative_proof: dimensionless, hearts_share_pct: dimensionless, excise_rate_per_pg: dimensionless } out: { absolute_alcohol_gal: L^3, recovered_alcohol_gal: L^3, wine_gallons: L^3, proof_gallons: L^3, hearts_proof_gallons: L^3, excise: dimensionless }
 export function computeProofGallonYield({ wash_volume_gal = 0, wash_abv_pct = 0, recovery_pct = 0, collection_proof = 0, alternative_proof = 0, hearts_share_pct = 0, excise_rate_per_pg = 0 } = {}) {
   const guard = _finiteGuard(arguments[0]); if (guard) return { error: guard.error };
+  // Unit / range guard added 2026-09-26 after printed-example probing.
+  if ([arguments[0]?.wash_abv_pct, arguments[0]?.recovery_pct, arguments[0]?.hearts_share_pct].some((v) => Number(v) > 0 && Number(v) < 1)) return { error: "Enter ABV, recovery and hearts share as percents (40 for 40%), not fractions." };
   if (!(wash_volume_gal > 0)) return { error: "The wash volume must be positive." };
   if (!(wash_abv_pct > 0 && wash_abv_pct < 100)) return { error: "Wash alcohol by volume must be above 0 and below 100%." };
   if (!(recovery_pct > 0 && recovery_pct <= 100)) return { error: "Still recovery must be above 0 and at most 100%." };
@@ -852,6 +867,7 @@ export function computeMashTunGrainBed({ tun_diameter_ft = 0, grain_weight_lb = 
   // An efficiency is a percent; 0 < value < 1 is a fraction typed into a percent field (added 2026-09-26).
   if (["efficiency_pct"].some((k) => { const v = Number(arguments[0]?.[k]); return v > 0 && v < 1; })) return { error: "Enter efficiencies as a percent (85 for 85%), not a fraction." };
   if (!(tun_diameter_ft > 0) || !(alternative_diameter_ft > 0)) return { error: "Tun diameters must be positive." };
+  if (tun_diameter_ft > 30 || alternative_diameter_ft > 30) return { error: "Enter the tun diameter in feet (a 10 bbl tun is about 5 ft), not inches." };
   if (!(grain_weight_lb > 0)) return { error: "Grain weight must be positive." };
   if (!(mash_thickness_qt_per_lb > 0)) return { error: "Mash thickness must be positive." };
   if (!(grain_displacement_gal_per_lb >= 0)) return { error: "Grain displacement cannot be negative." };

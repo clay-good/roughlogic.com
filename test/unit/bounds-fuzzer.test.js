@@ -42707,26 +42707,28 @@ test("bounds: spec-v1651 computeBufferStroke pins the square law and the governo
   const base = { contract_speed_fpm: 500, governor_trip_fpm: 575, permitted_retardation_g: 1, buffer_rated_stroke_in: 21, buffer_rated_speed_fpm: 600 };
   const r = _v1651(base);
   assert.ok(Math.abs(r.impact_speed_fps - 9.5833) < 1e-3);
-  assert.ok(Math.abs(r.stroke_required_in - 17.127) < 1e-2);
+  // A17.1 2.22.4.1.1: 115% of 500 fpm at 32.2 ft/s2 is 17.11 in, which Table 2.22.4.1 prints as 17.00.
+  assert.ok(Math.abs(r.stroke_required_in - 17.113) < 1e-2);
+  assert.strictEqual(r.table_stroke_in, 17);
   assert.ok(Math.abs(r.stroke_at_1g_in - r.stroke_required_in) < 1e-12);
   // Double the speed, QUADRUPLE the stroke -- exactly.
   const fast = _v1651({ ...base, contract_speed_fpm: 1000, governor_trip_fpm: 1150, buffer_rated_stroke_in: 72, buffer_rated_speed_fpm: 1200 });
   assert.ok(Math.abs(fast.stroke_required_in - 4 * r.stroke_required_in) < 1e-9);
-  assert.ok(Math.abs(fast.stroke_required_in - 68.508) < 1e-2);
-  // The dependency the spec exists to name: a 10 percent governor bump is a
-  // 21 percent stroke increase, so the correct buffer is now short.
+  assert.ok(Math.abs(fast.stroke_required_in - 68.45) < 1e-2);
+  // A 10 percent governor bump is a 21 percent increase in the stroke a strike at the trip would take,
+  // but the code stroke is sized on 115% of the rated speed and does not move.
   const bumped = _v1651({ ...base, governor_trip_fpm: 632.5 });
-  assert.ok(Math.abs(bumped.stroke_required_in / r.stroke_required_in - 1.21) < 1e-9);
-  // The stroke is sized on the GOVERNOR trip, so contract speed alone moves
-  // nothing.
-  assert.ok(Math.abs(_v1651({ ...base, contract_speed_fpm: 400 }).stroke_required_in - r.stroke_required_in) < 1e-12);
+  assert.ok(Math.abs(bumped.stroke_at_governor_trip_in / r.stroke_at_governor_trip_in - 1.21) < 1e-9);
+  assert.ok(Math.abs(bumped.stroke_required_in - r.stroke_required_in) < 1e-12);
+  // Contract speed drives the requirement: 400 fpm is (0.8)^2 of the 500 fpm stroke.
+  assert.ok(Math.abs(_v1651({ ...base, contract_speed_fpm: 400 }).stroke_required_in - 0.64 * r.stroke_required_in) < 1e-9);
   // The installed 21 in buffer covers a 17.1 in requirement, at 0.82 g.
   assert.strictEqual(r.stroke_ok, true);
   assert.strictEqual(r.speed_ok, true);
-  assert.ok(Math.abs(r.retardation_installed_g - 0.8156) < 1e-3);
+  assert.ok(Math.abs(r.retardation_installed_g - 0.8149) < 1e-3);
   assert.ok(r.retardation_installed_g < base.permitted_retardation_g);
   // Run the tile at the speed it names and the retardation lands on the limit.
-  const atLimit = _v1651({ ...base, governor_trip_fpm: r.max_speed_for_buffer_fpm, buffer_rated_speed_fpm: 700 });
+  const atLimit = _v1651({ ...base, contract_speed_fpm: r.max_speed_for_buffer_fpm / 1.15, governor_trip_fpm: r.max_speed_for_buffer_fpm, buffer_rated_speed_fpm: 700 });
   assert.ok(Math.abs(atLimit.retardation_installed_g - 1) < 1e-9);
   assert.strictEqual(_v1651({ ...base, buffer_rated_stroke_in: 12 }).stroke_ok, false);
   assert.strictEqual(_v1651({ ...base, buffer_rated_speed_fpm: 550 }).speed_ok, false);
@@ -42744,18 +42746,20 @@ test("bounds: spec-v1652 computeHoistwayVenting pins the door as the ceiling", (
   const r = _v1652(base);
   assert.ok(Math.abs(r.vent_area_sqft - 3.15) < 1e-9);
   assert.ok(Math.abs(r.door_area_sqft - 21) < 1e-9);
-  assert.ok(Math.abs(r.door_force_added_lbf - 10.92) < 1e-9);
+  // 10.92 lbf at the door's centroid is 10.92 x 36 / (2 x 33) = 5.956 lbf at a knob 3 in from the latch edge.
+  assert.ok(Math.abs(r.door_force_added_lbf - 10.92 * 36 / 66) < 1e-9);
   assert.strictEqual(r.force_ok, true);
   assert.ok(Math.abs(r.supply_airflow_cfm - 1650.71) < 1e-1);
-  // Door force is exactly linear in the pressure: 0.25 in wc is 27.3 lbf,
-  // still inside a 30 lbf limit but most of it.
+  // Door force is exactly linear in the pressure: 0.25 in wc is 27.3 x 36 / 66 = 14.9 lbf at the knob.
   const higher = _v1652({ ...base, pressure_diff_inwc: 0.25 });
-  assert.ok(Math.abs(higher.door_force_added_lbf - 27.3) < 1e-9);
+  assert.ok(Math.abs(higher.door_force_added_lbf - 27.3 * 36 / 66) < 1e-9);
   assert.strictEqual(higher.force_ok, true);
-  assert.strictEqual(_v1652({ ...base, pressure_diff_inwc: 0.30 }).force_ok, false);
+  assert.strictEqual(_v1652({ ...base, pressure_diff_inwc: 0.55 }).force_ok, false);
+  // A closer takes its share of the limit first.
+  assert.strictEqual(_v1652({ ...base, pressure_diff_inwc: 0.45, closer_force_lbf: 6 }).force_ok, false);
   // Run the tile at the pressure it names and the door lands on its limit.
   const atLimit = _v1652({ ...base, pressure_diff_inwc: r.max_pressure_inwc });
-  assert.ok(Math.abs(atLimit.door_force_added_lbf - base.door_force_limit_lbf) < 1e-9);
+  assert.ok(Math.abs(atLimit.door_force_total_lbf - base.door_force_limit_lbf) < 1e-9);
   // Flow goes as the SQUARE ROOT of pressure, so holding four times the
   // pressure takes only twice the air.
   assert.ok(Math.abs(_v1652({ ...base, pressure_diff_inwc: 0.40 }).supply_airflow_cfm - 2 * r.supply_airflow_cfm) < 1e-6);
@@ -56157,4 +56161,54 @@ test("bounds: batch-42 -- an unreachable vacuum target has no time; rail and ali
   assert.ok("error" in _b42dc({ degree_of_curve: 4, radius_ft: 1432.4, chord_length_ft: 62, central_angle_deg: 20, measured_ordinate_in: 200 }));
   assert.ok("error" in _b42atg({ stationary_support_height_in: 14, movable_support_height_in: 18, movable_alpha_per_f: 6.5, movable_operating_temp_f: 160, ambient_temp_f: 70 }));
   assert.ok("error" in _b42acs({ tool1_qty: 2, tool1_cfm: 5, tool1_duty: 0.5, leak_allowance_pct: 0.15 }));
+});
+
+import { computeBrewhouseEfficiency as _b43eff, computeIbuTinseth as _b43ibu, computeYeastPitchRate as _b43yp, computeCarbonationVolumesPressure as _b43co2, computeProofGallonYield as _b43pg, computeKettleBoilOff as _b43bo, computeMashTunGrainBed as _b43tun } from "../../calc-brewing.js";
+test("bounds: batch-43 brewing -- over-100% efficiency, fractions for percents, gravity in points, a vacuum carbonation setting", () => {
+  const eff = { grain_weight_lb: 8.5, extract_potential_ppg: 37, volume_gal: 6, original_gravity: 1.038, transfer_loss_gal: 0, strong_grain_weight_lb: 850, assumed_efficiency_pct: 85, achieved_efficiency_pct: 75 };
+  // A ppg typed as a gravity (1.037) used to report 2,587% efficiency.
+  assert.ok("error" in _b43eff({ ...eff, extract_potential_ppg: 1.037 }));
+  assert.ok("error" in _b43eff({ ...eff, original_gravity: 38 }));
+  const ibu = { batch_volume_gal: 5, hop_weight_lb: 0.09375, alpha_acid_pct: 6.4, boil_minutes: 60, boil_gravity: 1.08, short_boil_minutes: 15, strong_boil_gravity: 1.08 };
+  assert.ok("error" in _b43ibu({ ...ibu, alpha_acid_pct: 0.064 }));
+  assert.ok("error" in _b43ibu({ ...ibu, boil_gravity: 80 }));
+  const yp = { batch_volume_gal: 465, original_gravity: 1.05, pitch_rate_million_per_ml_plato: 1, slurry_cells_per_ml: 2.2e9, viability_pct: 94, aged_viability_pct: 60, strong_original_gravity: 1.08 };
+  assert.ok("error" in _b43yp({ ...yp, viability_pct: 0.94 }));
+  assert.ok("error" in _b43yp({ ...yp, slurry_cells_per_ml: 2.2 }));
+  assert.ok("error" in _b43co2({ beer_temp_f: 38, gauge_psig: 12, target_volumes: 0.1, warm_temp_f: 45 }));
+  assert.ok("error" in _b43pg({ wash_volume_gal: 500, wash_abv_pct: 0.08, recovery_pct: 85, collection_proof: 140, alternative_proof: 80, hearts_share_pct: 75, excise_rate_per_pg: 2.7 }));
+  assert.ok("error" in _b43bo({ preboil_volume_gal: 350, preboil_gravity: 1.049, boiloff_pct_per_hour: 0.08, boil_hours: 1, shrinkage_pct: 4, hard_boiloff_pct_per_hour: 12 }));
+  assert.ok("error" in _b43tun({ tun_diameter_ft: 72, grain_weight_lb: 542, mash_thickness_qt_per_lb: 1.25, grain_displacement_gal_per_lb: 0.08, max_bed_depth_in: 18, batch_volume_gal: 310, efficiency_pct: 78, extract_potential_ppg: 37, alternative_diameter_ft: 8 }));
+});
+
+import { computeElevatorRopeSafetyFactor as _b43rope, computeHoistwayVenting as _b43hw, computeStepChainTension as _b43step, computeCounterweightBalance as _b43cw, computeMachineRoomHeat as _b43mr, computeHydraulicJackPressure as _b43jack, computeGuideRailBracketSpan as _b43rail, computeDoorClosingEnergy as _b43door, computeBufferStroke as _b43buf } from "../../calc-elevator.js";
+import { computeAnodeBedResistance as _b43bed, computeCpRectifierSizing as _b43rect, computeInstantOffIrDrop as _b43ir, computePolarizationDecayCriterion as _b43pol, computeCokeBreezeBackfill as _b43coke, computePipelinePotentialAttenuation as _b43att } from "../../calc-corrosion.js";
+test("bounds: batch-43 elevator and corrosion -- 2:1 roping, IBC per-car vent floor, Sunde at close spacing, Rc in the rectifier circuit, unit guards", () => {
+  const rope = { car_weight_lb: 12000, rated_load_lb: 3500, travelling_cable_lb: 200, rope_count: 5, rope_weight_per_ft: 0.68, rope_breaking_strength_lb: 17900, rise_ft: 220, code_minimum_fs: 7.6 };
+  // A17.1 2.20.3: on 2:1 roping N is twice the rope count; the rope weight doubles too.
+  const two = _b43rope({ ...rope, roping_ratio: 2 });
+  assert.ok(Math.abs(two.factor_of_safety - 10 * 17900 / (15700 + 5 * 2 * 220 * 0.68)) < 1e-9);
+  assert.ok("error" in _b43rope({ ...rope, roping_ratio: 1.5 }));
+  const hw = { hoistway_plan_area_sqft: 40, vent_fraction_pct: 3.5, door_width_in: 36, door_height_in: 84, pressure_diff_inwc: 0.1, door_force_limit_lbf: 30, leakage_area_sqft: 2 };
+  assert.equal(_b43hw(hw).vent_area_sqft, 3);
+  assert.equal(_b43hw({ ...hw, car_count: 2 }).vent_area_sqft, 6);
+  assert.ok("error" in _b43hw({ ...hw, vent_fraction_pct: 0.035 }));
+  assert.ok("error" in _b43step({ total_load_lb: 12000, incline_deg: 0.5236, friction_coefficient: 0.03, chain_speed_fpm: 100, chain_count: 2, alternative_incline_deg: 6 }));
+  assert.ok("error" in _b43step({ total_load_lb: 12000, incline_deg: 30, friction_coefficient: 3, chain_speed_fpm: 100, chain_count: 2, alternative_incline_deg: 6 }));
+  assert.ok("error" in _b43cw({ car_weight_lb: 8000, rated_capacity_lb: 3500, overbalance_pct: 0.45, actual_counterweight_lb: 9575, added_car_weight_lb: 400 }));
+  assert.ok("error" in _b43mr({ input_power_kw: 15, efficiency_pct: 85, duty_cycle_pct: 0.4, controller_standby_w: 400, other_gains_btuh: 6000, room_volume_cuft: 2000, ambient_limit_f: 104, starting_temp_f: 80 }));
+  assert.ok("error" in _b43jack({ bore_in: 305, total_load_lb: 14000, car_speed_fpm: 125, pump_flow_gpm: 734.4, relief_setting_psi: 150, alternative_bore_in: 10 }));
+  assert.ok("error" in _b43rail({ span_ft: 14, horizontal_load_lb: 900, section_modulus_in3: 4, moment_of_inertia_in4: 9.3, modulus_psi: 29000, allowable_stress_psi: 15000, deflection_limit_in: 0.25, safety_application_load_lb: 4500 }));
+  assert.ok("error" in _b43door({ door_mass_lb: 140, closing_speed_fps: 12, ke_limit_normal_ftlb: 7.37, ke_limit_reduced_ftlb: 2.5, measured_force_lbf: 25, force_limit_lbf: 30, opening_width_in: 42, added_mass_lb: 20 }));
+  assert.ok("error" in _b43buf({ contract_speed_fpm: 2.5, governor_trip_fpm: 2.875, permitted_retardation_g: 1, buffer_rated_stroke_in: 17, buffer_rated_speed_fpm: 575 }));
+  const bed = { soil_resistivity_ohm_cm: 5000, column_length_ft: 10, column_diameter_in: 8, anode_count: 10, spacing_ft: 15, alternative_spacing_ft: 30, alternative_length_ft: 20, alternative_diameter_in: 6 };
+  // At 1 ft spacing Sunde read a 10-anode bed worse than one anode.
+  assert.ok("error" in _b43bed({ ...bed, spacing_ft: 1 }));
+  assert.ok("error" in _b43bed({ ...bed, anode_count: 2.5 }));
+  const rect = { design_current_a: 2.36, bed_resistance_ohm: 1.46, header_length_ft: 500, negative_length_ft: 0, cable_ohm_per_kft: 0.159, back_emf_v: 0, design_margin_pct: 50, rectifier_efficiency_pct: 80, energy_rate_per_kwh: 0.1 };
+  assert.ok(_b43rect({ ...rect, structure_resistance_ohm: 0.212 }).design_voltage_v - _b43rect(rect).design_voltage_v > 0.7);
+  assert.ok("error" in _b43ir({ on_potential_v: -1150, instant_off_potential_v: -880, native_potential_v: -620, criterion_v: -0.85, polarization_criterion_mv: 100 }));
+  assert.ok("error" in _b43pol({ on_potential_v: -1050, instant_off_potential_v: -780, native_potential_v: -650, depolarized_potential_v: -670, criterion_v: -0.85, polarization_criterion_mv: 100 }));
+  assert.ok("error" in _b43coke({ hole_diameter_in: 8, hole_depth_ft: 10, anode_diameter_in: 2, anode_length_ft: 5, anode_count: 10.5, backfill_density_pcf: 70, bag_weight_lb: 50, waste_pct: 10, soil_resistivity_ohm_cm: 5000 }));
+  assert.ok("error" in _b43att({ pipe_od_in: 12.75, wall_thickness_in: 0.25, steel_resistivity_ohm_in: 18, coating_resistance_ohm_sqft: 100000, drain_shift_v: 1, distance_mi: 10, degraded_coating_resistance_ohm_sqft: 10000 }));
 });

@@ -147,7 +147,7 @@ ELEVATOR_RENDERERS["traction-roping-ratio"] = _simpleRenderer({
     { key: "t", id: "trr-out-t", label: "Sheave torque", value: (r) => fmt(r.sheave_torque_ftlb, 0) + " ft-lb" },
     { key: "g", id: "trr-out-g", label: "Against the machine rating", value: (r) => (r.torque_ok ? "within rating, " : "OVER rating, ") + fmt(r.torque_margin_pct, 0) + "% margin" },
     { key: "r", id: "trr-out-r", label: "Tension per rope", value: (r) => fmt(r.tension_per_rope_lb, 0) + " lb" },
-    { key: "p", id: "trr-out-p", label: "Power at the entered load and speed", value: (r) => fmt(r.power_hp, 1) + " hp" },
+    { key: "p", id: "trr-out-p", label: "Power at the sheave for the entered load and speed (before drive and gear efficiency)", value: (r) => fmt(r.power_hp, 1) + " hp" },
     { key: "a", id: "trr-out-a", label: "At the alternative ratio", value: (r) => fmt(r.alt_sheave_torque_ftlb, 0) + " ft-lb torque, " + fmt(r.alt_sheave_rpm, 1) + " rpm, " + fmt(r.alt_tension_per_rope_lb, 0) + " lb per rope" },
     { key: "n", id: "trr-out-n", label: "Note", value: (r) => r.note },
   ],
@@ -159,6 +159,8 @@ ELEVATOR_RENDERERS["traction-roping-ratio"] = _simpleRenderer({
 // dims: in { car_weight_lb: M L T^-2, rated_capacity_lb: M L T^-2, overbalance_pct: dimensionless, actual_counterweight_lb: M L T^-2, added_car_weight_lb: M L T^-2 } out: { counterweight_required_lb: M L T^-2, unbalanced_empty_lb: M L T^-2, unbalanced_full_lb: M L T^-2, balance_point_lb: M L T^-2, overbalance_actual_pct: dimensionless }
 export function computeCounterweightBalance({ car_weight_lb = 0, rated_capacity_lb = 0, overbalance_pct = 45, actual_counterweight_lb = 0, added_car_weight_lb = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // Unit / range guard added 2026-09-26 after printed-example probing.
+  if ([arguments[0]?.overbalance_pct].some((v) => Number(v) > 0 && Number(v) < 1)) return { error: "Enter the overbalance as a percent (45 for 45%), not a fraction." };
   if (!(car_weight_lb > 0)) return { error: "Car weight must be positive." };
   if (!(rated_capacity_lb > 0)) return { error: "Rated capacity must be positive." };
   if (!(overbalance_pct > 0 && overbalance_pct <= 100)) return { error: "Overbalance must be in (0, 100] percent." };
@@ -207,7 +209,7 @@ ELEVATOR_RENDERERS["counterweight-balance"] = _simpleRenderer({
 // ===================== spec-v1650: suspension rope factor of safety =====================
 
 // dims: in { car_weight_lb: M L T^-2, rated_load_lb: M L T^-2, travelling_cable_lb: M L T^-2, rope_count: dimensionless, rope_weight_per_ft: M T^-2, rope_breaking_strength_lb: M L T^-2, rise_ft: L, code_minimum_fs: dimensionless } out: { rope_weight_lb: M L T^-2, suspended_load_lb: M L T^-2, breaking_total_lb: M L T^-2, factor_of_safety: dimensionless, max_rated_load_lb: M L T^-2 }
-export function computeElevatorRopeSafetyFactor({ car_weight_lb = 0, rated_load_lb = 0, travelling_cable_lb = 0, rope_count = 0, rope_weight_per_ft = 0, rope_breaking_strength_lb = 0, rise_ft = 0, code_minimum_fs = 0 } = {}) {
+export function computeElevatorRopeSafetyFactor({ car_weight_lb = 0, rated_load_lb = 0, travelling_cable_lb = 0, rope_count = 0, rope_weight_per_ft = 0, rope_breaking_strength_lb = 0, rise_ft = 0, code_minimum_fs = 0, roping_ratio = 1 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(car_weight_lb > 0)) return { error: "Car weight must be positive." };
   if (!(rated_load_lb > 0)) return { error: "Rated load must be positive." };
@@ -217,10 +219,13 @@ export function computeElevatorRopeSafetyFactor({ car_weight_lb = 0, rated_load_
   if (!(rope_breaking_strength_lb > 0)) return { error: "Rope breaking strength must be positive." };
   if (!(rise_ft > 0)) return { error: "Rise must be positive." };
   if (!(code_minimum_fs > 0)) return { error: "Code minimum factor of safety must be positive." };
-  const rope_weight_lb = rope_count * rise_ft * rope_weight_per_ft;
+  if (!(roping_ratio === 1 || roping_ratio === 2 || roping_ratio === 3 || roping_ratio === 4)) return { error: "Roping ratio must be 1, 2, 3 or 4 (1 for 1:1, 2 for 2:1)." };
+  // A17.1 2.20.3: f = S x N / W, and for 2:1 roping N is twice the number of ropes. Each rope also runs about
+  // twice the rise below the sheave. Until 2026-09-26 the tile had no roping input and read half the factor on 2:1.
+  const rope_weight_lb = rope_count * roping_ratio * rise_ft * rope_weight_per_ft;
   const load_without_ropes_lb = car_weight_lb + rated_load_lb + travelling_cable_lb;
   const suspended_load_lb = load_without_ropes_lb + rope_weight_lb;
-  const breaking_total_lb = rope_count * rope_breaking_strength_lb;
+  const breaking_total_lb = rope_count * roping_ratio * rope_breaking_strength_lb;
   const factor_of_safety = breaking_total_lb / suspended_load_lb;
   const fs_without_rope_weight = breaking_total_lb / load_without_ropes_lb;
   const overstatement = fs_without_rope_weight - factor_of_safety;
@@ -249,7 +254,8 @@ ELEVATOR_RENDERERS["rope-safety-factor"] = _simpleRenderer({
     { key: "rope_weight_per_ft", label: "Rope weight (lb per ft, each)", kind: "number", default: 0.68 },
     { key: "rope_breaking_strength_lb", label: "Rope breaking strength (lb, each)", kind: "number", default: 17900 },
     { key: "rise_ft", label: "Rise (ft)", kind: "number", default: 220 },
-    { key: "code_minimum_fs", label: "Code minimum factor of safety for the speed", kind: "number", default: 7.6 },
+    { key: "code_minimum_fs", label: "Code minimum factor of safety for the rope speed (A17.1 Table 2.20.3; 7.6 is the 50 fpm passenger row)", kind: "number", default: 7.6 },
+    { key: "roping_ratio", label: "Roping ratio (1 for 1:1, 2 for 2:1)", kind: "number", default: 1 },
   ],
   outputs: [
     { key: "w", id: "ersf-out-w", label: "Rope weight below the sheave", value: (r) => fmt(r.rope_weight_lb, 0) + " lb" },
@@ -267,34 +273,44 @@ ELEVATOR_RENDERERS["rope-safety-factor"] = _simpleRenderer({
 // dims: in { contract_speed_fpm: L T^-1, governor_trip_fpm: L T^-1, permitted_retardation_g: dimensionless, buffer_rated_stroke_in: L, buffer_rated_speed_fpm: L T^-1 } out: { impact_speed_fps: L T^-1, stroke_required_in: L, stroke_at_1g_in: L, retardation_installed_g: dimensionless, max_speed_for_buffer_fpm: L T^-1 }
 export function computeBufferStroke({ contract_speed_fpm = 0, governor_trip_fpm = 0, permitted_retardation_g = 1, buffer_rated_stroke_in = 0, buffer_rated_speed_fpm = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // Unit / range guard added 2026-09-26 after printed-example probing.
+  if (Number(arguments[0]?.contract_speed_fpm) > 0 && Number(arguments[0]?.contract_speed_fpm) < 25) return { error: "Enter speeds in feet per minute (500), not meters per second." }; if (Number(arguments[0]?.permitted_retardation_g) > 3) return { error: "Enter the retardation in gravities (1), not ft/s2." };
   if (!(contract_speed_fpm > 0)) return { error: "Contract speed must be positive." };
   if (!(governor_trip_fpm > 0)) return { error: "Governor tripping speed must be positive." };
   if (!(governor_trip_fpm >= contract_speed_fpm)) return { error: "Governor tripping speed cannot be below the contract speed." };
   if (!(permitted_retardation_g > 0)) return { error: "Permitted average retardation must be positive." };
   if (!(buffer_rated_stroke_in > 0)) return { error: "Buffer rated stroke must be positive." };
   if (!(buffer_rated_speed_fpm > 0)) return { error: "Buffer rated striking speed must be positive." };
-  const impact_speed_fps = governor_trip_fpm / 60;
+  // ASME A17.1 2.22.4.1.1 sizes the stroke at 115% of the rated speed and 32.2 ft/s2, and Table 2.22.4.1
+  // prints it to the quarter inch (500 fpm -> 575 fpm -> 17.00 in). Until 2026-09-26 the tile sized it on the
+  // governor tripping speed, which can reach 625 fpm at 500 fpm rated and then demanded 20.2 in against the code's 17.
+  const g_code = 32.2;
+  const striking_speed_fpm = 1.15 * contract_speed_fpm;
+  const impact_speed_fps = striking_speed_fpm / 60;
   const v2 = impact_speed_fps * impact_speed_fps;
-  const stroke_required_ft = v2 / (2 * permitted_retardation_g * _G_FPS2);
+  const stroke_required_ft = v2 / (2 * permitted_retardation_g * g_code);
   const stroke_required_in = stroke_required_ft * 12;
-  const stroke_at_1g_in = v2 / (2 * _G_FPS2) * 12;
+  const stroke_at_1g_in = v2 / (2 * g_code) * 12;
+  const table_stroke_in = Math.round(stroke_at_1g_in * 4) / 4;
+  const trip_fps = governor_trip_fpm / 60;
+  const stroke_at_governor_trip_in = trip_fps * trip_fps / (2 * g_code) * 12;
   const rated_stroke_ft = buffer_rated_stroke_in / 12;
-  const retardation_installed_g = v2 / (2 * rated_stroke_ft) / _G_FPS2;
-  const max_speed_for_buffer_fpm = Math.sqrt(2 * permitted_retardation_g * _G_FPS2 * rated_stroke_ft) * 60;
-  const stroke_ok = buffer_rated_stroke_in >= stroke_required_in;
-  const speed_ok = buffer_rated_speed_fpm >= governor_trip_fpm;
+  const retardation_installed_g = v2 / (2 * rated_stroke_ft) / g_code;
+  const max_speed_for_buffer_fpm = Math.sqrt(2 * permitted_retardation_g * g_code * rated_stroke_ft) * 60;
+  const stroke_ok = buffer_rated_stroke_in >= (permitted_retardation_g === 1 ? table_stroke_in : stroke_required_in);
+  const speed_ok = buffer_rated_speed_fpm >= striking_speed_fpm;
   return {
-    impact_speed_fps, stroke_required_in, stroke_at_1g_in, retardation_installed_g,
+    striking_speed_fpm, impact_speed_fps, stroke_required_in, stroke_at_1g_in, table_stroke_in, stroke_at_governor_trip_in, retardation_installed_g,
     max_speed_for_buffer_fpm, stroke_ok, speed_ok,
     verdict: stroke_ok && speed_ok ? "the rated buffer covers this impact"
       : !speed_ok ? "OVER the buffer's rated striking speed"
         : "SHORT of the stroke this impact needs",
-    note: "Stroke grows with the SQUARE of the impact speed, so doubling the speed quadruples the stroke. That is what separates buffer types: a slow car needs a short stroke and a spring will do, and doubling the speed quickly exceeds what a spring can practically provide, which is why the code permits spring buffers only up to a stated car speed and pushes faster cars to oil buffers that dissipate the energy rather than storing it. The speed that matters is not the contract speed. A car reaching the buffer has already overspeeded past the governor's mechanical trip, so the buffer is sized on the GOVERNOR tripping speed -- which is why raising a governor setting to stop nuisance trips invalidates a buffer selection made beneath it, and why the two are designed as a pair. The retardation limit is a human limit rather than a structural one: the buffer could stop the car in a much shorter distance and the code does not allow it, because the occupants have to survive the stop. An average of about one gravity with a bounded peak is what sets the stroke, and it is why an oil buffer's orifice profile matters -- a buffer that stops the car in the right distance with a spike at the start fails the peak criterion even though the average is correct. Buffer selection is governed by the code's tables and the manufacturer's rated stroke and striking speed, not by this arithmetic, and an oil buffer applied outside its rated load range does not produce its rated retardation. ASME A17.1 and A17.2, the buffer manufacturer's ratings, the elevator authority having jurisdiction, and a licensed elevator mechanic govern.",
+    note: "Stroke grows with the SQUARE of the impact speed, so doubling the speed quadruples the stroke. That is what separates buffer types: a slow car needs a short stroke and a spring will do, and doubling the speed quickly exceeds what a spring can practically provide, which is why the code permits spring buffers only up to a stated car speed and pushes faster cars to oil buffers that dissipate the energy rather than storing it. The speed that matters is not the contract speed. ASME A17.1 2.22.4.1.1 sizes the stroke at 115% of the rated speed and 32.2 ft/s2, and Table 2.22.4.1 prints it to the quarter inch (500 fpm, 575 fpm, 17.00 in). The governor may trip higher than that -- up to 625 fpm at 500 fpm rated -- and the stroke a strike at the trip speed would take is shown alongside, because raising a governor setting moves the car's real worst case away from the buffer's rating. The retardation limit is a human limit rather than a structural one: the buffer could stop the car in a much shorter distance and the code does not allow it, because the occupants have to survive the stop. An average of about one gravity with a bounded peak is what sets the stroke, and it is why an oil buffer's orifice profile matters -- a buffer that stops the car in the right distance with a spike at the start fails the peak criterion even though the average is correct. Buffer selection is governed by the code's tables and the manufacturer's rated stroke and striking speed, not by this arithmetic, and an oil buffer applied outside its rated load range does not produce its rated retardation. ASME A17.1 and A17.2, the buffer manufacturer's ratings, the elevator authority having jurisdiction, and a licensed elevator mechanic govern.",
   };
 }
 const bufferStrokeExample = { inputs: { contract_speed_fpm: 500, governor_trip_fpm: 575, permitted_retardation_g: 1, buffer_rated_stroke_in: 21, buffer_rated_speed_fpm: 600 } };
 ELEVATOR_RENDERERS["buffer-stroke-speed"] = _simpleRenderer({
-  citation: "Citation: the kinematic stroke relation s = v squared / (2 a) at the governor tripping speed, with the ASME A17.1 average retardation limit of about one gravity and its bounded short-duration peak named. Buffer type, required stroke, and rated striking speed come from the code tables and the manufacturer, not from this calculation.",
+  citation: "Citation: the kinematic stroke relation s = v squared / (2 a) at 115% of the rated speed and 32.2 ft/s2 (ASME A17.1 2.22.4.1.1, Table 2.22.4.1 to the quarter inch), with the ASME A17.1 average retardation limit of about one gravity and its bounded short-duration peak named. Buffer type, required stroke, and rated striking speed come from the code tables and the manufacturer, not from this calculation.",
   example: bufferStrokeExample.inputs,
   fields: [
     { key: "contract_speed_fpm", label: "Contract car speed (fpm)", kind: "number", default: 500 },
@@ -304,8 +320,9 @@ ELEVATOR_RENDERERS["buffer-stroke-speed"] = _simpleRenderer({
     { key: "buffer_rated_speed_fpm", label: "Installed buffer rated striking speed (fpm)", kind: "number", default: 600 },
   ],
   outputs: [
-    { key: "v", id: "bss-out-v", label: "Impact speed at the governor trip", value: (r) => fmt(r.impact_speed_fps, 2) + " ft/s" },
-    { key: "s", id: "bss-out-s", label: "Stroke required at the entered retardation", value: (r) => fmt(r.stroke_required_in, 1) + " in" },
+    { key: "v", id: "bss-out-v", label: "Striking speed, 115% of the contract speed (A17.1 2.22.4.1.1)", value: (r) => fmt(r.striking_speed_fpm, 0) + " fpm (" + fmt(r.impact_speed_fps, 2) + " ft/s)" },
+    { key: "s", id: "bss-out-s", label: "Stroke required at the entered retardation", value: (r) => fmt(r.stroke_required_in, 2) + " in (table value at one gravity: " + fmt(r.table_stroke_in, 2) + " in)" },
+    { key: "g", id: "bss-out-g", label: "Stroke a strike at the governor tripping speed would take", value: (r) => fmt(r.stroke_at_governor_trip_in, 1) + " in" },
     { key: "o", id: "bss-out-o", label: "Stroke at a one-gravity average", value: (r) => fmt(r.stroke_at_1g_in, 1) + " in" },
     { key: "b", id: "bss-out-b", label: "Installed buffer against the requirement", value: (r) => r.verdict },
     { key: "r", id: "bss-out-r", label: "Retardation the installed buffer imposes", value: (r) => fmt(r.retardation_installed_g, 2) + " gravities" },
@@ -318,7 +335,7 @@ ELEVATOR_RENDERERS["buffer-stroke-speed"] = _simpleRenderer({
 // ===================== spec-v1652: hoistway venting and pressurization =====================
 
 // dims: in { hoistway_plan_area_sqft: L^2, vent_fraction_pct: dimensionless, door_width_in: L, door_height_in: L, pressure_diff_inwc: M L^-1 T^-2, door_force_limit_lbf: M L T^-2, leakage_area_sqft: L^2 } out: { vent_area_sqft: L^2, door_area_sqft: L^2, door_force_added_lbf: M L T^-2, max_pressure_inwc: M L^-1 T^-2, supply_airflow_cfm: L^3 T^-1 }
-export function computeHoistwayVenting({ hoistway_plan_area_sqft = 0, vent_fraction_pct = 3.5, door_width_in = 0, door_height_in = 0, pressure_diff_inwc = 0, door_force_limit_lbf = 0, leakage_area_sqft = 0 } = {}) {
+export function computeHoistwayVenting({ hoistway_plan_area_sqft = 0, vent_fraction_pct = 3.5, door_width_in = 0, door_height_in = 0, pressure_diff_inwc = 0, door_force_limit_lbf = 0, leakage_area_sqft = 0, closer_force_lbf = 0, knob_offset_in = 3, car_count = 1 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(hoistway_plan_area_sqft > 0)) return { error: "Hoistway plan area must be positive." };
   if (!(vent_fraction_pct > 0 && vent_fraction_pct <= 100)) return { error: "Vent fraction must be in (0, 100] percent." };
@@ -327,16 +344,26 @@ export function computeHoistwayVenting({ hoistway_plan_area_sqft = 0, vent_fract
   if (!(pressure_diff_inwc > 0)) return { error: "Pressure difference must be positive." };
   if (!(door_force_limit_lbf > 0)) return { error: "Door opening force limit must be positive." };
   if (!(leakage_area_sqft > 0)) return { error: "Shaft leakage area must be positive." };
-  const vent_area_sqft = hoistway_plan_area_sqft * vent_fraction_pct / 100;
+  if (vent_fraction_pct < 1) return { error: "Enter the vent fraction as a percent (3.5 for 3.5%), not a fraction." };
+  if (!(closer_force_lbf >= 0 && closer_force_lbf < door_force_limit_lbf)) return { error: "The door closer force must be at least 0 and below the opening force limit." };
+  if (!(knob_offset_in >= 0 && knob_offset_in < door_width_in / 2)) return { error: "The knob offset from the latch edge must be at least 0 and under half the door width." };
+  if (!(Number.isInteger(car_count) && car_count >= 1)) return { error: "Number of cars in the hoistway must be a whole number of at least 1." };
+  // The legacy IBC venting rule (3004.3 through the 2018 edition) took 3.5% of the plan area but not less than
+  // 3 sq ft per car; until 2026-09-26 the tile left out the floor.
+  const vent_area_sqft = Math.max(hoistway_plan_area_sqft * vent_fraction_pct / 100, 3 * car_count);
   const door_area_sqft = door_width_in * door_height_in / 144;
-  const door_force_added_lbf = door_area_sqft * pressure_diff_inwc * _LBF_PER_SQFT_PER_INWC;
-  const max_pressure_inwc = door_force_limit_lbf / (door_area_sqft * _LBF_PER_SQFT_PER_INWC);
+  // The pressure acts at the door's centroid and the user pushes at the knob: NFPA 92 / Klote F = Fdc + A dP W / (2 (W - d)).
+  // Until 2026-09-26 the tile compared A x dP alone to the whole limit, with no closer and no lever arm.
+  const knob_factor = door_width_in / (2 * (door_width_in - knob_offset_in));
+  const door_force_added_lbf = door_area_sqft * pressure_diff_inwc * _LBF_PER_SQFT_PER_INWC * knob_factor;
+  const door_force_total_lbf = closer_force_lbf + door_force_added_lbf;
+  const max_pressure_inwc = (door_force_limit_lbf - closer_force_lbf) / (door_area_sqft * _LBF_PER_SQFT_PER_INWC * knob_factor);
   // NFPA 92 orifice flow: 2,610 cfm per square foot of leakage at one inch
   // water column, scaling with the square root of the pressure difference.
   const supply_airflow_cfm = 2610 * leakage_area_sqft * Math.sqrt(pressure_diff_inwc);
-  const force_ok = door_force_added_lbf <= door_force_limit_lbf;
+  const force_ok = door_force_total_lbf <= door_force_limit_lbf;
   return {
-    vent_area_sqft, door_area_sqft, door_force_added_lbf, max_pressure_inwc, supply_airflow_cfm,
+    vent_area_sqft, door_area_sqft, knob_factor, door_force_added_lbf, door_force_total_lbf, max_pressure_inwc, supply_airflow_cfm,
     force_ok,
     verdict: force_ok ? "within the entered door force limit" : "OVER the entered door force limit",
     note: "The two approaches solve the same problem in opposite directions and the code has moved between them. Venting accepts that smoke enters the shaft and gives it somewhere to go, through an opening at the top sized as a fraction of the plan area. Pressurization supplies air to the shaft to keep smoke out in the first place. Energy codes disliked permanent open vents on every hoistway and smoke control practice preferred a clean shaft, so pressurization became the common answer -- but which is REQUIRED depends entirely on the adopted code and the authority having jurisdiction, and buildings exist with both. The constraint that bounds pressurization is the door. Too little pressure and smoke migrates in; too much and the difference across the hoistway and stairwell doors makes them hard to open, which fails the egress force limits. That band is narrow, and narrower in tall buildings where the shaft's own stack effect adds a season-dependent pressure of its own that the fan has to work with rather than against, and that reverses between summer and winter -- so a system commissioned in one season can behave quite differently in the other. This is a screen with supporting arithmetic, not a smoke control design: that needs leakage areas for the shaft and the building, stack and wind effects across the seasons, the behaviour with doors open, the interaction with stairwell pressurization and the building HVAC, and a commissioning test. Elevators used for occupant evacuation or firefighter operations carry additional requirements. The adopted building and fire codes, NFPA 92, ASME A17.1 where elevator operation is affected, a smoke control engineer, and the authority having jurisdiction govern.",
@@ -354,12 +381,15 @@ ELEVATOR_RENDERERS["hoistway-venting"] = _simpleRenderer({
     { key: "pressure_diff_inwc", label: "Target pressure difference (in wc)", kind: "number", default: 0.10 },
     { key: "door_force_limit_lbf", label: "Permitted door opening force (lbf)", kind: "number", default: 30 },
     { key: "leakage_area_sqft", label: "Shaft leakage area (sq ft)", kind: "number", default: 2.0 },
+    { key: "closer_force_lbf", label: "Door closer force at the knob (lbf)", kind: "number", default: 0 },
+    { key: "knob_offset_in", label: "Knob distance from the latch edge (in)", kind: "number", default: 3 },
+    { key: "car_count", label: "Cars in the hoistway", kind: "number", default: 1 },
   ],
   outputs: [
-    { key: "v", id: "hwv-out-v", label: "Vent area under a venting requirement", value: (r) => fmt(r.vent_area_sqft, 2) + " sq ft" },
+    { key: "v", id: "hwv-out-v", label: "Vent area under a venting requirement (at least 3 sq ft per car)", value: (r) => fmt(r.vent_area_sqft, 2) + " sq ft" },
     { key: "q", id: "hwv-out-q", label: "Supply air to hold the target pressure", value: (r) => fmt(r.supply_airflow_cfm, 0) + " cfm" },
     { key: "d", id: "hwv-out-d", label: "Door area", value: (r) => fmt(r.door_area_sqft, 1) + " sq ft" },
-    { key: "f", id: "hwv-out-f", label: "Force the pressure adds to the door", value: (r) => fmt(r.door_force_added_lbf, 1) + " lbf -- " + r.verdict },
+    { key: "f", id: "hwv-out-f", label: "Opening force at the knob, closer plus pressure", value: (r) => fmt(r.door_force_total_lbf, 1) + " lbf (pressure adds " + fmt(r.door_force_added_lbf, 1) + ") -- " + r.verdict },
     { key: "m", id: "hwv-out-m", label: "Pressure at which the door reaches its limit", value: (r) => fmt(r.max_pressure_inwc, 3) + " in wc" },
     { key: "n", id: "hwv-out-n", label: "Note", value: (r) => r.note },
   ],
@@ -371,6 +401,8 @@ ELEVATOR_RENDERERS["hoistway-venting"] = _simpleRenderer({
 // dims: in { input_power_kw: M L^2 T^-3, efficiency_pct: dimensionless, duty_cycle_pct: dimensionless, controller_standby_w: M L^2 T^-3, other_gains_btuh: M L^2 T^-3, room_volume_cuft: L^3, ambient_limit_f: T, starting_temp_f: T } out: { heat_running_btuh: M L^2 T^-3, heat_average_btuh: M L^2 T^-3, total_btuh: M L^2 T^-3, cooling_tons: M L^2 T^-3, temp_rise_f_per_hr: T }
 export function computeMachineRoomHeat({ input_power_kw = 0, efficiency_pct = 85, duty_cycle_pct = 40, controller_standby_w = 0, other_gains_btuh = 0, room_volume_cuft = 0, ambient_limit_f = 104, starting_temp_f = 80 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // Unit / range guard added 2026-09-26 after printed-example probing.
+  if ([arguments[0]?.duty_cycle_pct].some((v) => Number(v) > 0 && Number(v) < 1)) return { error: "Enter the duty cycle as a percent (40 for 40%), not a fraction." };
   // An efficiency is a percent; 0 < value < 1 is a fraction typed into a percent field (added 2026-09-26).
   if (["efficiency_pct"].some((k) => { const v = Number(arguments[0]?.[k]); return v > 0 && v < 1; })) return { error: "Enter efficiencies as a percent (85 for 85%), not a fraction." };
   if (!(input_power_kw > 0)) return { error: "Machine and drive input power must be positive." };
@@ -426,6 +458,8 @@ ELEVATOR_RENDERERS["machine-room-heat"] = _simpleRenderer({
 // dims: in { bore_in: L, total_load_lb: M L T^-2, car_speed_fpm: L T^-1, pump_flow_gpm: L^3 T^-1, relief_setting_psi: M L^-1 T^-2, alternative_bore_in: L } out: { jack_area_sqin: L^2, working_pressure_psi: M L^-1 T^-2, flow_required_gpm: L^3 T^-1, speed_from_pump_fpm: L T^-1, alt_working_pressure_psi: M L^-1 T^-2 }
 export function computeHydraulicJackPressure({ bore_in = 0, total_load_lb = 0, car_speed_fpm = 0, pump_flow_gpm = 0, relief_setting_psi = 0, alternative_bore_in = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // Unit / range guard added 2026-09-26 after printed-example probing.
+  if ([arguments[0]?.bore_in, arguments[0]?.alternative_bore_in].some((v) => Number(v) > 60)) return { error: "Enter the plunger bore in inches (about 4 to 24), not millimeters." };
   if (!(bore_in > 0)) return { error: "Jack bore diameter must be positive." };
   if (!(alternative_bore_in > 0)) return { error: "Alternative bore diameter must be positive." };
   if (!(total_load_lb > 0)) return { error: "Total load must be positive." };
@@ -480,7 +514,8 @@ export function computeStepChainTension({ total_load_lb = 0, incline_deg = 30, f
   if (!(total_load_lb > 0)) return { error: "Total moving load must be positive." };
   if (!(incline_deg > 0 && incline_deg < 90)) return { error: "Incline angle must be in (0, 90) degrees." };
   if (!(alternative_incline_deg > 0 && alternative_incline_deg < 90)) return { error: "Alternative incline must be in (0, 90) degrees." };
-  if (!(friction_coefficient >= 0)) return { error: "Friction coefficient cannot be negative." };
+  if (!(friction_coefficient >= 0 && friction_coefficient < 1)) return { error: "Friction coefficient must be at least 0 and below 1 (about 0.03 for a step chain)." };
+  if (incline_deg < 2 || alternative_incline_deg < 2) return { error: "Enter the incline in degrees (30), not radians." };
   if (!(chain_speed_fpm > 0)) return { error: "Chain speed must be positive." };
   if (!(chain_count >= 1)) return { error: "Number of chains must be at least 1." };
   const th = incline_deg * Math.PI / 180;
@@ -508,7 +543,7 @@ ELEVATOR_RENDERERS["step-chain-tension"] = _simpleRenderer({
   citation: "Citation: the incline force resolution -- gravity component = load x sin(angle), friction component = load x cos(angle) x coefficient, power = tension x speed / 33,000 -- with ASME A17.1 named as governing the brake, its stopping distance, and the escalator safety devices. Statics and power only.",
   example: stepChainExample.inputs,
   fields: [
-    { key: "total_load_lb", label: "Total moving load, band plus passengers (lb)", kind: "number", default: 12000 },
+    { key: "total_load_lb", label: "Passenger load on the incline (lb; the step band balances between its upper and lower runs)", kind: "number", default: 12000 },
     { key: "incline_deg", label: "Incline angle (deg)", kind: "number", default: 30 },
     { key: "friction_coefficient", label: "Roller and track friction coefficient", kind: "number", default: 0.03 },
     { key: "chain_speed_fpm", label: "Chain speed (fpm)", kind: "number", default: 100 },
@@ -532,6 +567,8 @@ ELEVATOR_RENDERERS["step-chain-tension"] = _simpleRenderer({
 // dims: in { door_mass_lb: M L T^-2, closing_speed_fps: L T^-1, ke_limit_normal_ftlb: M L^2 T^-2, ke_limit_reduced_ftlb: M L^2 T^-2, measured_force_lbf: M L T^-2, force_limit_lbf: M L T^-2, opening_width_in: L, added_mass_lb: M L T^-2 } out: { kinetic_energy_ftlb: M L^2 T^-2, speed_for_reduced_limit_fps: L T^-1, closing_time_s: T, ke_with_added_mass_ftlb: M L^2 T^-2 }
 export function computeDoorClosingEnergy({ door_mass_lb = 0, closing_speed_fps = 0, ke_limit_normal_ftlb = 0, ke_limit_reduced_ftlb = 0, measured_force_lbf = 0, force_limit_lbf = 0, opening_width_in = 0, added_mass_lb = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // Unit / range guard added 2026-09-26 after printed-example probing.
+  if (Number(arguments[0]?.closing_speed_fps) > 10) return { error: "Enter the closing speed in feet per second (about 1 to 2.5), not inches per second." };
   if (!(door_mass_lb > 0)) return { error: "Total moving door mass must be positive." };
   if (!(closing_speed_fps > 0)) return { error: "Average closing speed must be positive." };
   if (!(ke_limit_normal_ftlb > 0)) return { error: "Normal-operation kinetic energy limit must be positive." };
@@ -562,14 +599,14 @@ export function computeDoorClosingEnergy({ door_mass_lb = 0, closing_speed_fps =
     note: "Two independent limits apply and they fail differently. Closing force is a static measurement at the leading edge and catches a door operator adjusted too hard. Kinetic energy is dynamic and catches a door that is heavy rather than forceful -- a wide two-speed door with substantial panel mass can be within the force limit and well outside the energy limit, because energy carries the mass term that force does not. The square on speed is what makes it manageable: reducing closing speed by a fifth cuts kinetic energy by more than a third, so a door that fails the energy limit can usually be brought into compliance by slowing it a little rather than by lightening it -- at the cost of door time, which is the trade against the building's traffic performance. The reduced limit when the reopening device is inoperative is the provision that matters most in service. A door running with its detector edge or light curtain out of service must close under a much lower energy limit, effectively nudging closed, because the only thing preventing a strike is now the passenger. A door that closes at full speed with a failed reopening device is a defect, not an inconvenience. The applicable limits, the portion of travel over which the average speed is measured, and the measurement procedure are set by the adopted edition of the code and must be entered from it. This does not measure the door mass, which includes panels, hangers, linkage, and the moving portion of the operator and is commonly underestimated, and it does not evaluate the reopening device's own performance, door timing, dwell, nudging, or the fire operation requirements that change door behaviour. ASME A17.1 and A17.2, the door equipment manufacturer, the elevator authority having jurisdiction, and a licensed elevator mechanic govern.",
   };
 }
-const doorClosingExample = { inputs: { door_mass_lb: 140, closing_speed_fps: 1.0, ke_limit_normal_ftlb: 7.0, ke_limit_reduced_ftlb: 2.5, measured_force_lbf: 25, force_limit_lbf: 30, opening_width_in: 42, added_mass_lb: 20 } };
+const doorClosingExample = { inputs: { door_mass_lb: 140, closing_speed_fps: 1.0, ke_limit_normal_ftlb: 7.37, ke_limit_reduced_ftlb: 2.5, measured_force_lbf: 25, force_limit_lbf: 30, opening_width_in: 42, added_mass_lb: 20 } };
 ELEVATOR_RENDERERS["door-closing-energy"] = _simpleRenderer({
   citation: "Citation: the kinetic energy of the moving door, one half x (weight / 32.174) x speed squared, checked against the ASME A17.1 closing energy limits -- the normal one and the lower one that applies when the reopening device is inoperative -- with the closing force limit named as a separate, statically measured criterion. Both limits are entered from the adopted code edition.",
   example: doorClosingExample.inputs,
   fields: [
     { key: "door_mass_lb", label: "Total moving door weight (lb)", kind: "number", default: 140 },
     { key: "closing_speed_fps", label: "Average closing speed (ft/s)", kind: "number", default: 1.0 },
-    { key: "ke_limit_normal_ftlb", label: "Kinetic energy limit, normal operation (ft-lb)", kind: "number", default: 7.0 },
+    { key: "ke_limit_normal_ftlb", label: "Kinetic energy limit, normal operation (ft-lb)", kind: "number", default: 7.37 },
     { key: "ke_limit_reduced_ftlb", label: "Kinetic energy limit, reopening device out (ft-lb)", kind: "number", default: 2.5 },
     { key: "measured_force_lbf", label: "Measured closing force (lbf)", kind: "number", default: 25 },
     { key: "force_limit_lbf", label: "Closing force limit (lbf)", kind: "number", default: 30 },
@@ -592,6 +629,8 @@ ELEVATOR_RENDERERS["door-closing-energy"] = _simpleRenderer({
 // dims: in { rated_speed_fpm: L T^-1, electrical_trip_fpm: L T^-1, mechanical_trip_fpm: L T^-1, code_minimum_pct: dimensionless, code_maximum_fpm: L T^-1 } out: { minimum_trip_fpm: L T^-1, mechanical_margin_pct: dimensionless, electrical_margin_pct: dimensionless, headroom_fpm: L T^-1, implied_buffer_stroke_in: L }
 export function computeGovernorTrippingSpeed({ rated_speed_fpm = 0, electrical_trip_fpm = 0, mechanical_trip_fpm = 0, code_minimum_pct = 115, code_maximum_fpm = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // Unit / range guard added 2026-09-26 after printed-example probing.
+  if (Number(arguments[0]?.rated_speed_fpm) > 0 && Number(arguments[0]?.rated_speed_fpm) < 25) return { error: "Enter speeds in feet per minute (500), not meters per second." };
   if (!(rated_speed_fpm > 0)) return { error: "Rated car speed must be positive." };
   if (!(electrical_trip_fpm > 0)) return { error: "Electrical tripping speed must be positive." };
   if (!(mechanical_trip_fpm > 0)) return { error: "Mechanical tripping speed must be positive." };
@@ -617,7 +656,7 @@ export function computeGovernorTrippingSpeed({ rated_speed_fpm = 0, electrical_t
     note: "Two devices operate at two speeds and the order matters. The electrical overspeed switch trips first, cutting power and setting the brake, which stops most overspeed events without the safety ever engaging. Only if the car continues to accelerate does the governor mechanically grip its rope and pull the safety, which wedges the car against the guide rails -- a violent event that takes the car out of service and requires inspection afterward. A governor with the two settings inverted, or with the electrical trip inoperative, removes the gentle stop and leaves only the violent one. The margin band is bounded at both ends for good reasons. The minimum, commonly 115 percent of rated speed, keeps the governor from tripping on normal operation including the modest overspeed of a heavily loaded down run. The maximum exists because a safety must engage before the car reaches a speed at which the buffers below it cannot absorb the impact, so governor trip, safety type, and buffer stroke are a SET rather than independent choices -- which is why raising a trip speed to stop nuisance trips invalidates the buffer selection beneath it, and why governor settings are not a field adjustment. The governor rope runs at car speed regardless of the suspension roping ratio, which is worth stating because a mechanic used to thinking in 2 to 1 terms can misread what the governor is seeing. Verification is by test at the intervals the code requires: a governor is a mechanical device with springs and pivots that age, and a setting recorded on a tag is not evidence of a setting that still holds. The minimum and maximum are entered from the adopted code rather than shipped here. ASME A17.1 and A17.2, the equipment manufacturer, the elevator authority having jurisdiction, and a licensed elevator mechanic govern.",
   };
 }
-const governorTripExample = { inputs: { rated_speed_fpm: 500, electrical_trip_fpm: 550, mechanical_trip_fpm: 575, code_minimum_pct: 115, code_maximum_fpm: 690 } };
+const governorTripExample = { inputs: { rated_speed_fpm: 500, electrical_trip_fpm: 550, mechanical_trip_fpm: 575, code_minimum_pct: 115, code_maximum_fpm: 625 } };
 ELEVATOR_RENDERERS["governor-tripping-speed"] = _simpleRenderer({
   citation: "Citation: the ASME A17.1 governor tripping-speed limits by name -- a mechanical trip at least 115 percent of rated speed, under a ceiling that tightens as rated speed rises, with the electrical overspeed switch set below the mechanical trip. Both bounds are entered from the adopted code table. The elevator authority having jurisdiction and a licensed elevator mechanic govern.",
   example: governorTripExample.inputs,
@@ -626,14 +665,14 @@ ELEVATOR_RENDERERS["governor-tripping-speed"] = _simpleRenderer({
     { key: "electrical_trip_fpm", label: "Electrical overspeed switch setting (fpm)", kind: "number", default: 550 },
     { key: "mechanical_trip_fpm", label: "Mechanical tripping speed (fpm)", kind: "number", default: 575 },
     { key: "code_minimum_pct", label: "Code minimum trip (% of rated speed)", kind: "number", default: 115 },
-    { key: "code_maximum_fpm", label: "Code maximum trip for this rated speed (fpm)", kind: "number", default: 690 },
+    { key: "code_maximum_fpm", label: "Code maximum trip for this rated speed (fpm; A17.1 Table 2.18.2.1 gives 625 at 500 fpm)", kind: "number", default: 625 },
   ],
   outputs: [
     { key: "m", id: "gts-out-m", label: "Minimum permitted mechanical trip", value: (r) => fmt(r.minimum_trip_fpm, 0) + " fpm" },
     { key: "b", id: "gts-out-b", label: "Mechanical setting against the band", value: (r) => r.band_verdict + " (" + fmt(r.mechanical_margin_pct, 1) + "% over rated, " + fmt(r.headroom_fpm, 0) + " fpm of headroom)" },
     { key: "e", id: "gts-out-e", label: "Electrical setting", value: (r) => fmt(r.electrical_margin_pct, 1) + "% over rated -- " + r.order_verdict },
     { key: "s", id: "gts-out-s", label: "Buffer impact speed the mechanical trip implies", value: (r) => fmt(r.impact_speed_fps, 2) + " ft/s" },
-    { key: "k", id: "gts-out-k", label: "Buffer stroke that implies at one gravity", value: (r) => fmt(r.implied_buffer_stroke_in, 1) + " in" },
+    { key: "k", id: "gts-out-k", label: "Stroke a buffer strike at this mechanical trip would take at one gravity (A17.1 sizes the buffer itself on 115% of rated speed)", value: (r) => fmt(r.implied_buffer_stroke_in, 1) + " in" },
     { key: "n", id: "gts-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeGovernorTrippingSpeed,
@@ -644,6 +683,8 @@ ELEVATOR_RENDERERS["governor-tripping-speed"] = _simpleRenderer({
 // dims: in { span_ft: L, horizontal_load_lb: M L T^-2, section_modulus_in3: L^3, moment_of_inertia_in4: L^4, modulus_psi: M L^-1 T^-2, allowable_stress_psi: M L^-1 T^-2, deflection_limit_in: L, safety_application_load_lb: M L T^-2 } out: { moment_inlb: M L^2 T^-2, stress_psi: M L^-1 T^-2, deflection_in: L, max_span_for_deflection_ft: L, safety_stress_psi: M L^-1 T^-2 }
 export function computeGuideRailBracketSpan({ span_ft = 0, horizontal_load_lb = 0, section_modulus_in3 = 0, moment_of_inertia_in4 = 0, modulus_psi = 29000000, allowable_stress_psi = 0, deflection_limit_in = 0, safety_application_load_lb = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // Unit / range guard added 2026-09-26 after printed-example probing.
+  if (Number(arguments[0]?.modulus_psi) > 0 && Number(arguments[0]?.modulus_psi) < 1e6) return { error: "Enter the modulus in psi (29,000,000), not ksi." };
   if (!(span_ft > 0)) return { error: "Bracket span must be positive." };
   if (!(horizontal_load_lb > 0)) return { error: "Horizontal load must be positive." };
   if (!(section_modulus_in3 > 0)) return { error: "Rail section modulus must be positive." };
@@ -671,7 +712,7 @@ export function computeGuideRailBracketSpan({ span_ft = 0, horizontal_load_lb = 
     note: "A guide rail spans between brackets like any beam, carrying the horizontal load at the guide shoes as a concentrated load. For a concentrated load at midspan the moment goes as the span and the deflection as its CUBE, so halving the span halves the moment and cuts the deflection to an eighth. A rail that is marginal on deflection is therefore usually fixed by adding a bracket rather than by upsizing the rail, which matters because rails are a long-lead item and brackets are not: matching an eighth of the deflection by section alone would take eight times the moment of inertia, several sizes of rail. The governing load is safety application, not normal operation. When the car safeties set they clamp the rails and transmit a large force, and the rail and its brackets have to take it without permanent deformation; normal eccentric loading -- a heavy load in one corner of the car -- is a much smaller number that governs the deflection limit rather than the strength. A rail arrangement checked only for normal operating loads is checked for the wrong case. Seismic is what changes everything in higher-hazard regions: the code's provisions require larger sections, closer brackets, retainer plates, and additional devices, so a rail layout carried over from a low-seismic project is not transferable, which is a common source of trouble on repeat-design buildings. This is a single-span beam calculation and the code's load cases, allowable stresses and deflections, rail sections, and bracket and fastening requirements determine acceptability rather than a general beam formula. It does not determine the horizontal loads, evaluate the bracket itself or its fastening to the structure -- frequently the weak element -- or address rail joints, alignment tolerances, or the rail's function as part of the safety system. ASME A17.1 and A17.2, the equipment manufacturer, the elevator authority having jurisdiction, and a licensed elevator mechanic govern.",
   };
 }
-const guideRailExample = { inputs: { span_ft: 14, horizontal_load_lb: 900, section_modulus_in3: 4.0, moment_of_inertia_in4: 9.3, modulus_psi: 29000000, allowable_stress_psi: 22000, deflection_limit_in: 0.25, safety_application_load_lb: 4500 } };
+const guideRailExample = { inputs: { span_ft: 14, horizontal_load_lb: 900, section_modulus_in3: 4.0, moment_of_inertia_in4: 9.3, modulus_psi: 29000000, allowable_stress_psi: 15000, deflection_limit_in: 0.25, safety_application_load_lb: 4500 } };
 ELEVATOR_RENDERERS["guide-rail-bracket-span"] = _simpleRenderer({
   citation: "Citation: simple-span beam relations for a concentrated load at midspan -- moment = P L / 4, stress = moment / section modulus, deflection = P L cubed / (48 E I) -- with ASME A17.1 named as governing the load cases, allowable stresses and deflections, rail sections, and bracket requirements that determine acceptability.",
   example: guideRailExample.inputs,
@@ -681,7 +722,7 @@ ELEVATOR_RENDERERS["guide-rail-bracket-span"] = _simpleRenderer({
     { key: "section_modulus_in3", label: "Rail section modulus (cu in)", kind: "number", default: 4.0 },
     { key: "moment_of_inertia_in4", label: "Rail moment of inertia (in^4)", kind: "number", default: 9.3 },
     { key: "modulus_psi", label: "Modulus of elasticity (psi)", kind: "number", default: 29000000 },
-    { key: "allowable_stress_psi", label: "Allowable bending stress (psi)", kind: "number", default: 22000 },
+    { key: "allowable_stress_psi", label: "Allowable bending stress (psi; A17.1 2.23.5.1.1 allows 15,000 under running loads)", kind: "number", default: 15000 },
     { key: "deflection_limit_in", label: "Deflection limit (in)", kind: "number", default: 0.25 },
     { key: "safety_application_load_lb", label: "Safety application horizontal load (lb)", kind: "number", default: 4500 },
   ],

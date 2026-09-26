@@ -2,7 +2,7 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "a08076039197eee9",
+      "sha": "4fa4721069310056",
       "date": "2026-09-26"
     },
     "/tools/": {
@@ -858,8 +858,8 @@
       "date": "2026-09-04"
     },
     "/tools/buffer-stroke-speed/": {
-      "sha": "75fe1508f22fa50c",
-      "date": "2026-09-05"
+      "sha": "15db4b405ce4f840",
+      "date": "2026-09-26"
     },
     "/tools/buffer-tank-loop-credit/": {
       "sha": "3f759999ba9b97bc",
@@ -1846,8 +1846,8 @@
       "date": "2026-09-01"
     },
     "/tools/cp-rectifier-sizing/": {
-      "sha": "570f5a4db9b52be3",
-      "date": "2026-09-18"
+      "sha": "8c73509820886383",
+      "date": "2026-09-26"
     },
     "/tools/crac-sensible-derate/": {
       "sha": "2488621a2375140e",
@@ -2210,8 +2210,8 @@
       "date": "2026-09-05"
     },
     "/tools/door-closing-energy/": {
-      "sha": "472546d5b540ea17",
-      "date": "2026-09-05"
+      "sha": "7506a5fc727513f6",
+      "date": "2026-09-26"
     },
     "/tools/door-maneuvering-clearance/": {
       "sha": "89e4cf4001042488",
@@ -3346,8 +3346,8 @@
       "date": "2026-09-25"
     },
     "/tools/governor-tripping-speed/": {
-      "sha": "0e6656f5044f25f0",
-      "date": "2026-09-05"
+      "sha": "585b1596ae24db53",
+      "date": "2026-09-26"
     },
     "/tools/gpa-calculator/": {
       "sha": "6428f03b0c74c42b",
@@ -3482,8 +3482,8 @@
       "date": "2026-09-25"
     },
     "/tools/guide-rail-bracket-span/": {
-      "sha": "b119ed0a9f1d0f55",
-      "date": "2026-09-05"
+      "sha": "c032868ceb036de5",
+      "date": "2026-09-26"
     },
     "/tools/gutter-downspout/": {
       "sha": "afb45f48bb012d99",
@@ -3650,8 +3650,8 @@
       "date": "2026-09-25"
     },
     "/tools/hoistway-venting/": {
-      "sha": "1ac86ca9e9dc3cc4",
-      "date": "2026-09-05"
+      "sha": "d043a297a7908141",
+      "date": "2026-09-26"
     },
     "/tools/home-office/": {
       "sha": "0c83f503f82da5cb",
@@ -6334,8 +6334,8 @@
       "date": "2026-09-01"
     },
     "/tools/rope-safety-factor/": {
-      "sha": "9b2202f423c976d9",
-      "date": "2026-09-05"
+      "sha": "ea6cd551826dcdac",
+      "date": "2026-09-26"
     },
     "/tools/rotary-phase-converter-sizing/": {
       "sha": "d0238268d710032a",
@@ -7066,8 +7066,8 @@
       "date": "2026-09-01"
     },
     "/tools/sparge-water-volume/": {
-      "sha": "ffa5da2eb4bc472d",
-      "date": "2026-09-18"
+      "sha": "b03972186b805689",
+      "date": "2026-09-26"
     },
     "/tools/spcc-containment-volume/": {
       "sha": "76216c7f7eb79114",
@@ -7470,8 +7470,8 @@
       "date": "2026-09-01"
     },
     "/tools/step-chain-tension/": {
-      "sha": "2e9b2a386941ee50",
-      "date": "2026-09-05"
+      "sha": "bd94a088f2d0942c",
+      "date": "2026-09-26"
     },
     "/tools/step-drawdown-efficiency/": {
       "sha": "1ff5c2b143679841",
@@ -7970,8 +7970,8 @@
       "date": "2026-09-05"
     },
     "/tools/traction-roping-ratio/": {
-      "sha": "e14cc0f1cc6ebbbb",
-      "date": "2026-09-05"
+      "sha": "c69bf5d1fa76453f",
+      "date": "2026-09-26"
     },
     "/tools/tractor-ballast/": {
       "sha": "58d734b992d20225",
@@ -8698,8 +8698,8 @@
       "date": "2026-09-19"
     },
     "/tools/wire-feed-deposition/": {
-      "sha": "e8d1da5456dc62c2",
-      "date": "2026-09-08"
+      "sha": "dde0998bd65e54c6",
+      "date": "2026-09-26"
     },
     "/tools/wire-feed-speed-for-deposition/": {
       "sha": "5783c54c68df7de5",

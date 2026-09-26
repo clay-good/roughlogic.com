@@ -15076,19 +15076,19 @@ export const CITATIONS = {
     ],
   },
   "buffer-stroke-speed": {
-    formula: "impact speed = governor mechanical tripping speed; stroke = impact speed squared / (2 x retardation x 32.174); the retardation an installed buffer imposes = impact speed squared / (2 x rated stroke) / 32.174.",
-    edition: "The kinematic stroke relation at the governor tripping speed, by name, with the ASME A17.1 average retardation limit of about one gravity and its bounded short-duration peak named. Buffer type, required stroke and rated striking speed come from the code tables and the manufacturer.",
+    formula: "striking speed = 1.15 x rated speed (ASME A17.1 2.22.4.1.1); stroke = striking speed squared / (2 x retardation x 32.2), to the quarter inch at one gravity (Table 2.22.4.1); the retardation an installed buffer imposes = striking speed squared / (2 x rated stroke) / 32.2.",
+    edition: "The kinematic stroke relation at 115% of the rated speed, per ASME A17.1 2.22.4.1.1 by section, with the ASME A17.1 average retardation limit of about one gravity and its bounded short-duration peak named. Buffer type, required stroke and rated striking speed come from the code tables and the manufacturer.",
     freeAccess: "Constant-acceleration kinematics on speeds and a stroke the user supplies; no code table or manufacturer rating is reproduced.",
     governance: GOVERNANCE.general,
-    editionNote: "The square law is what separates buffer types. A slow car striking a buffer at a modest speed needs a short stroke and a spring will do; double the speed and the stroke required quadruples, which quickly exceeds what a spring can practically provide and pushes the design to an oil buffer that dissipates the energy rather than storing it. The speed that matters is not the contract speed: a car reaching the buffer has already overspeeded past the governor's mechanical trip, so the buffer is sized on the governor tripping speed, which is why raising a governor's setting invalidates a buffer selection made beneath it and why the two are designed as a pair. The retardation limit is a human limit rather than a structural one. The buffer could stop the car in a much shorter distance and the code does not allow it, because the occupants have to survive the stop, and that is also why an oil buffer's orifice profile matters: a buffer that stops the car in the right distance but with a spike at the start of the stroke fails the peak criterion even though the average is correct.",
+    editionNote: "The square law is what separates buffer types. A slow car striking a buffer at a modest speed needs a short stroke and a spring will do; double the speed and the stroke required quadruples, which quickly exceeds what a spring can practically provide and pushes the design to an oil buffer that dissipates the energy rather than storing it. ASME A17.1 2.22.4.1.1 sizes the stroke at 115% of the rated speed and 32.2 ft/s2, and Table 2.22.4.1 prints it to the quarter inch (500 fpm, 575 fpm, 17.00 in). The governor may trip higher than that -- up to 625 fpm at 500 fpm rated -- and the stroke a strike at the trip speed would take is shown alongside, because raising a governor setting moves the car's real worst case away from the buffer's rating. The retardation limit is a human limit rather than a structural one. The buffer could stop the car in a much shorter distance and the code does not allow it, because the occupants have to survive the stop, and that is also why an oil buffer's orifice profile matters: a buffer that stops the car in the right distance but with a spike at the start of the stroke fails the peak criterion even though the average is correct.",
     assumptions: [
       { name: "Stroke goes as the square of speed", value: "doubling the impact speed quadruples the stroke required", source: "kinematics" },
-      { name: "Size on the governor trip, not contract speed", value: "the car has already overspeeded before it reaches the buffer", source: "ASME A17.1" },
+      { name: "Size on 115% of the rated speed", value: "A17.1 2.22.4.1.1 and Table 2.22.4.1 (500 fpm -> 575 fpm -> 17.00 in)", source: "ASME A17.1" },
       { name: "The retardation limit is a human one", value: "about one gravity average with a bounded peak, so occupants survive the stop", source: "ASME A17.1" },
     ],
   },
   "hoistway-venting": {
-    formula: "vent area = hoistway plan area x vent fraction; door force added = door area x pressure difference x 5.2 lbf per sq ft per in wc; supply air = about 2,610 cfm per sq ft of leakage x the square root of the pressure difference in in wc.",
+    formula: "vent area = hoistway plan area x vent fraction, not less than 3 sq ft per car (the legacy IBC 3004.3 rule); opening force at the knob = closer force + door area x pressure difference x 5.2 lbf per sq ft per in wc x W / (2 (W - d)), the NFPA 92 relation with d the knob distance from the latch edge; supply air = about 2,610 cfm per sq ft of leakage x the square root of the pressure difference in in wc.",
     edition: "The historic vent-area fraction and the pressurization orifice relation, by name, with NFPA 92 and the adopted building code named as governing which approach applies. A screen with supporting arithmetic, not a smoke control design.",
     freeAccess: "Area and orifice arithmetic on the user's own shaft dimensions and an entered leakage area; no code table is reproduced.",
     governance: GOVERNANCE.general,
@@ -24477,7 +24477,7 @@ export const CITATIONS = {
     ],
   },
   "cp-rectifier-sizing": {
-    formula: "required voltage = design current x (bed + cable resistance) + back EMF; design voltage adds the margin; AC input = DC output / rectifier efficiency.",
+    formula: "required voltage = design current x (bed + cable + structure-to-electrolyte resistance) + back EMF; design voltage adds the margin; AC input = DC output / rectifier efficiency.",
     edition: "NACE SP0169 (now AMPP) and the CP designer govern. The rectifier manufacturer's rating governs the selection.",
     freeAccess: "Ohm's law; rectifier ratings are published by manufacturers.",
     governance: GOVERNANCE.general,

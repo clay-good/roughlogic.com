@@ -110708,6 +110708,33 @@
    }
   },
   {
+   "tile_id": "traction-roping-ratio",
+   "source_publisher": "Lutfi Al-Sharif",
+   "source_title": "Lift and Escalator Motor Sizing, Example 4",
+   "source_edition_or_year": "lecture notes",
+   "source_section_or_page": "78 passengers x 75 kg, 1.0 m/s, 45% counterweight balance, 68% efficiency -> 46.4 kW motor; the tile's sheave power before efficiency is 46.4 x 0.68 = 31.6 kW = 42.3 hp (load entered as 78 x 75 x 0.55 kg in lb, speed as 196.85 fpm)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "roping_ratio": 2,
+    "car_speed_fpm": 196.85,
+    "sheave_diameter_in": 30,
+    "unbalanced_load_lb": 7093.4,
+    "suspended_load_lb": 11500,
+    "rope_count": 5,
+    "machine_rated_torque_ftlb": 1500,
+    "alternative_roping_ratio": 1
+   },
+   "outputs": {
+    "power_hp": {
+     "value": 42.31,
+     "tolerance": {
+      "abs": 0.2
+     }
+    }
+   }
+  },
+  {
    "tile_id": "counterweight-balance",
    "source_publisher": "Project (first-principles)",
    "source_title": "8,000 lb car, 3,500 lb capacity, 45% overbalance, 9,575 lb counterweight",
@@ -110762,6 +110789,30 @@
    }
   },
   {
+   "tile_id": "counterweight-balance",
+   "source_publisher": "Elevator World",
+   "source_title": "Deadweight Dead Wrong? (M. Irvin)",
+   "source_edition_or_year": "December 2019",
+   "source_section_or_page": "counterweight of 4,550 lb (2,500 x 0.42 + 3,500)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "car_weight_lb": 3500,
+    "rated_capacity_lb": 2500,
+    "overbalance_pct": 42,
+    "actual_counterweight_lb": 4550,
+    "added_car_weight_lb": 0
+   },
+   "outputs": {
+    "counterweight_required_lb": {
+     "value": 4550,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
    "tile_id": "rope-safety-factor",
    "source_publisher": "Project (first-principles)",
    "source_title": "5 ropes on a 220 ft rise at 0.68 lb/ft, 12,000 lb car, 3,500 lb rated load",
@@ -110799,13 +110850,13 @@
      }
     },
     "factor_of_safety": {
-     "value": 5.4414,
+     "value": 5.44139,
      "tolerance": {
       "pct": 0.5
      }
     },
     "fs_without_rope_weight": {
-     "value": 5.7006,
+     "value": 5.70064,
      "tolerance": {
       "pct": 0.5
      }
@@ -110829,33 +110880,87 @@
    },
    "outputs": {
     "impact_speed_fps": {
-     "value": 9.5833,
+     "value": 9.58333,
      "tolerance": {
       "pct": 0.5
      }
     },
     "stroke_required_in": {
-     "value": 17.127,
+     "value": 17.1131,
      "tolerance": {
       "pct": 0.5
      }
     },
     "stroke_at_1g_in": {
-     "value": 17.127,
+     "value": 17.1131,
      "tolerance": {
       "pct": 0.5
      }
     },
     "retardation_installed_g": {
-     "value": 0.8156,
+     "value": 0.814909,
      "tolerance": {
       "pct": 0.5
      }
     },
     "max_speed_for_buffer_fpm": {
-     "value": 636.7,
+     "value": 636.962,
      "tolerance": {
       "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "buffer-stroke-speed",
+   "source_publisher": "ASME (via California Code of Regulations Title 8)",
+   "source_title": "A17.1 Table 2.22.4.1 / Cal. T8 Table 3031F, minimum oil buffer strokes",
+   "source_edition_or_year": "A17.1-2004; ccr T8 3031",
+   "source_section_or_page": "500 fpm rated -> 575 fpm (115%) -> 17.00 in minimum stroke",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "contract_speed_fpm": 500,
+    "governor_trip_fpm": 575,
+    "permitted_retardation_g": 1,
+    "buffer_rated_stroke_in": 17,
+    "buffer_rated_speed_fpm": 575
+   },
+   "outputs": {
+    "striking_speed_fpm": {
+     "value": 575,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "table_stroke_in": {
+     "value": 17,
+     "tolerance": {
+      "abs": 0
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "buffer-stroke-speed",
+   "source_publisher": "ASME (via California Code of Regulations Title 8)",
+   "source_title": "A17.1 Table 2.22.4.1 / Cal. T8 Table 3031F, minimum oil buffer strokes",
+   "source_edition_or_year": "A17.1-2004; ccr T8 3031",
+   "source_section_or_page": "200 fpm rated -> 230 fpm (115%) -> 2.75 in minimum stroke",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "contract_speed_fpm": 200,
+    "governor_trip_fpm": 230,
+    "permitted_retardation_g": 1,
+    "buffer_rated_stroke_in": 2.75,
+    "buffer_rated_speed_fpm": 230
+   },
+   "outputs": {
+    "table_stroke_in": {
+     "value": 2.75,
+     "tolerance": {
+      "abs": 0
      }
     }
    }
@@ -110891,13 +110996,13 @@
      }
     },
     "door_force_added_lbf": {
-     "value": 10.92,
+     "value": 5.95636,
      "tolerance": {
       "pct": 0.5
      }
     },
     "max_pressure_inwc": {
-     "value": 0.2747,
+     "value": 0.503663,
      "tolerance": {
       "pct": 0.5
      }
@@ -110906,6 +111011,35 @@
      "value": 1650.71,
      "tolerance": {
       "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "hoistway-venting",
+   "source_publisher": "NIST (Budnick and Klote)",
+   "source_title": "Capabilities of Smoke Control, Table 1 (NFPA 92A door-opening force)",
+   "source_edition_or_year": "ICC-hosted PDF",
+   "source_section_or_page": "36 in door, 7 ft high, 6 lbf closer, 30 lbf total -> 0.40 in wg allowed",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "hoistway_plan_area_sqft": 90,
+    "vent_fraction_pct": 3.5,
+    "door_width_in": 36,
+    "door_height_in": 84,
+    "pressure_diff_inwc": 0.4,
+    "door_force_limit_lbf": 30,
+    "leakage_area_sqft": 2,
+    "closer_force_lbf": 6,
+    "knob_offset_in": 3,
+    "car_count": 1
+   },
+   "outputs": {
+    "max_pressure_inwc": {
+     "value": 0.4,
+     "tolerance": {
+      "abs": 0.005
      }
     }
    }
@@ -111064,7 +111198,7 @@
      }
     },
     "power_hp": {
-     "value": 19.127,
+     "value": 19.1266,
      "tolerance": {
       "pct": 0.5
      }
@@ -111084,6 +111218,31 @@
    }
   },
   {
+   "tile_id": "step-chain-tension",
+   "source_publisher": "Lutfi Al-Sharif",
+   "source_title": "Lift and Escalator Motor Sizing, Example 7",
+   "source_edition_or_year": "lecture notes",
+   "source_section_or_page": "20 m rise, 2 passengers per step, 30 deg, 0.75 m/s, 4 kW handrail, 83% efficiency -> 71.3 kW; the passenger-lift term before handrail and efficiency is 71.3 x 0.83 - 4 = 55.2 kW = 74.0 hp (passenger load entered in lb, speed as 147.6 fpm, friction 0)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "total_load_lb": 33069,
+    "incline_deg": 30,
+    "friction_coefficient": 0,
+    "chain_speed_fpm": 147.6,
+    "chain_count": 2,
+    "alternative_incline_deg": 6
+   },
+   "outputs": {
+    "power_hp": {
+     "value": 73.97,
+     "tolerance": {
+      "abs": 0.3
+     }
+    }
+   }
+  },
+  {
    "tile_id": "door-closing-energy",
    "source_publisher": "Project (first-principles)",
    "source_title": "140 lb moving door assembly at 1.0 ft/s average closing speed",
@@ -111094,7 +111253,7 @@
    "inputs": {
     "door_mass_lb": 140,
     "closing_speed_fps": 1.0,
-    "ke_limit_normal_ftlb": 7.0,
+    "ke_limit_normal_ftlb": 7.37,
     "ke_limit_reduced_ftlb": 2.5,
     "measured_force_lbf": 25,
     "force_limit_lbf": 30,
@@ -111103,13 +111262,13 @@
    },
    "outputs": {
     "kinetic_energy_ftlb": {
-     "value": 2.1757,
+     "value": 2.17567,
      "tolerance": {
       "pct": 0.5
      }
     },
     "speed_for_reduced_limit_fps": {
-     "value": 1.0719,
+     "value": 1.07195,
      "tolerance": {
       "pct": 0.5
      }
@@ -111121,7 +111280,7 @@
      }
     },
     "ke_with_added_mass_ftlb": {
-     "value": 2.4865,
+     "value": 2.48648,
      "tolerance": {
       "pct": 0.5
      }
@@ -111141,7 +111300,7 @@
     "electrical_trip_fpm": 550,
     "mechanical_trip_fpm": 575,
     "code_minimum_pct": 115,
-    "code_maximum_fpm": 690
+    "code_maximum_fpm": 625
    },
    "outputs": {
     "minimum_trip_fpm": {
@@ -111163,19 +111322,19 @@
      }
     },
     "headroom_fpm": {
-     "value": 115,
+     "value": 50,
      "tolerance": {
       "pct": 0.5
      }
     },
     "impact_speed_fps": {
-     "value": 9.5833,
+     "value": 9.58333,
      "tolerance": {
       "pct": 0.5
      }
     },
     "implied_buffer_stroke_in": {
-     "value": 17.127,
+     "value": 17.1269,
      "tolerance": {
       "pct": 0.5
      }
@@ -111196,7 +111355,7 @@
     "section_modulus_in3": 4.0,
     "moment_of_inertia_in4": 9.3,
     "modulus_psi": 29000000,
-    "allowable_stress_psi": 22000,
+    "allowable_stress_psi": 15000,
     "deflection_limit_in": 0.25,
     "safety_application_load_lb": 4500
    },
@@ -111214,13 +111373,13 @@
      }
     },
     "deflection_in": {
-     "value": 0.32965,
+     "value": 0.329646,
      "tolerance": {
       "pct": 0.5
      }
     },
     "max_span_for_deflection_ft": {
-     "value": 12.767,
+     "value": 12.7671,
      "tolerance": {
       "pct": 0.5
      }
@@ -111232,7 +111391,7 @@
      }
     },
     "halved_span_deflection_in": {
-     "value": 0.041206,
+     "value": 0.0412058,
      "tolerance": {
       "pct": 0.5
      }
@@ -128391,9 +128550,71 @@
    "outputs": {"single_anode_resistance_ohm":{"value":9.86641598994723,"tolerance":{"pct":0.5}},"bed_resistance_ohm":{"value":1.6399723350881061,"tolerance":{"pct":0.5}},"parallel_resistance_ohm":{"value":0.986641598994723,"tolerance":{"pct":0.5}},"interference_penalty_pct":{"value":66.21763533577479,"tolerance":{"pct":0.5}},"alternative_spacing_bed_ohm":{"value":1.3133069670414146,"tolerance":{"pct":0.5}},"alternative_length_single_ohm":{"value":5.836032197652943,"tolerance":{"pct":0.5}},"alternative_diameter_single_ohm":{"value":10.615827788684118,"tolerance":{"pct":0.5}}}
   },
   {
+   "tile_id": "anode-bed-resistance",
+   "source_publisher": "US Department of Defense",
+   "source_title": "UFC 3-570-02A Cathodic Protection (reproducing TM 5-811-7 Appendix D)",
+   "source_edition_or_year": "2005",
+   "source_section_or_page": "D-3(c)(2), p. D-6: 1,000 ohm-cm, 7.0 ft column, 10 in backfill -> Rv = 2.39 ohms (single anode)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "soil_resistivity_ohm_cm": 1000,
+    "column_length_ft": 7,
+    "column_diameter_in": 10,
+    "anode_count": 2,
+    "spacing_ft": 20,
+    "alternative_spacing_ft": 30,
+    "alternative_length_ft": 10,
+    "alternative_diameter_in": 8
+   },
+   "outputs": {
+    "single_anode_resistance_ohm": {
+     "value": 2.39,
+     "tolerance": {
+      "abs": 0.005
+     }
+    }
+   }
+  },
+  {
    "tile_id": "cp-rectifier-sizing", "source_publisher": "Project (first-principles)", "source_title": "Cathodic Protection Rectifier Sizing -- the spec-v1764 worked example, recomputed", "source_edition_or_year": "spec-v1764 of scope-trade-expansion-3, 2026-09-18", "source_section_or_page": "NACE SP0169 and the manufacturer govern", "verified_by": "rl", "verified_on": "2026-09-18",
    "inputs": {"design_current_a":10,"bed_resistance_ohm":1.64,"header_length_ft":500,"negative_length_ft":300,"cable_ohm_per_kft":0.2485,"back_emf_v":2,"design_margin_pct":50,"rectifier_efficiency_pct":60,"energy_rate_per_kwh":0.12},
    "outputs": {"cable_resistance_ohm":{"value":0.1988,"tolerance":{"pct":0.5}},"total_resistance_ohm":{"value":1.8388,"tolerance":{"pct":0.5}},"required_voltage_v":{"value":20.387999999999998,"tolerance":{"pct":0.5}},"design_voltage_v":{"value":30.581999999999997,"tolerance":{"pct":0.5}},"cable_drop_v":{"value":1.988,"tolerance":{"pct":0.5}},"dc_output_w":{"value":203.88,"tolerance":{"pct":0.5}},"ac_input_w":{"value":339.8,"tolerance":{"pct":0.5}},"annual_kwh":{"value":2976.648,"tolerance":{"pct":0.5}},"annual_cost":{"value":357.19776,"tolerance":{"pct":0.5}}}
+  },
+  {
+   "tile_id": "cp-rectifier-sizing",
+   "source_publisher": "US Department of Defense",
+   "source_title": "UFC 3-570-02A Cathodic Protection (reproducing TM 5-811-7 Appendix D)",
+   "source_edition_or_year": "2005",
+   "source_section_or_page": "D-2(b)(9)-(10), pp. D-3 to D-4: Ra 1.46 + cable + Rc 0.212 = RT 1.75 ohms; 2.36 A x 1.75 x 1.5 -> 6.2 V (the text says a 50 ft header but computes 500 ft)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "design_current_a": 2.36,
+    "bed_resistance_ohm": 1.46,
+    "header_length_ft": 500,
+    "negative_length_ft": 0,
+    "cable_ohm_per_kft": 0.159,
+    "back_emf_v": 0,
+    "design_margin_pct": 50,
+    "rectifier_efficiency_pct": 80,
+    "energy_rate_per_kwh": 0.1,
+    "structure_resistance_ohm": 0.212
+   },
+   "outputs": {
+    "total_resistance_ohm": {
+     "value": 1.75,
+     "tolerance": {
+      "abs": 0.005
+     }
+    },
+    "design_voltage_v": {
+     "value": 6.2,
+     "tolerance": {
+      "abs": 0.02
+     }
+    }
+   }
   },
   {
    "tile_id": "pipeline-potential-attenuation", "source_publisher": "Project (first-principles)", "source_title": "Pipeline CP Potential Attenuation -- the spec-v1765 worked example, recomputed", "source_edition_or_year": "spec-v1765 of scope-trade-expansion-3, 2026-09-18", "source_section_or_page": "the pipeline's close interval survey governs", "verified_by": "rl", "verified_on": "2026-09-18",
@@ -128411,6 +128632,31 @@
    "outputs": {"initial_current_a":{"value":2,"tolerance":{"pct":0.5}},"final_current_a":{"value":62,"tolerance":{"pct":0.5}},"mean_current_a":{"value":32,"tolerance":{"pct":0.5}},"growth_ratio":{"value":31,"tolerance":{"pct":0.5}},"mean_shortfall_pct":{"value":48.38709677419355,"tolerance":{"pct":0.5}},"final_over_mean_ratio":{"value":1.9375,"tolerance":{"pct":0.5}},"years_to_bare":{"value":49,"tolerance":{"pct":0.5}},"fast_years_to_bare":{"value":24.5,"tolerance":{"pct":0.5}},"fast_final_current_a":{"value":100,"tolerance":{"pct":0.5}}}
   },
   {
+   "tile_id": "coating-breakdown-factor",
+   "source_publisher": "US Department of Defense",
+   "source_title": "UFC 3-570-02A Cathodic Protection (reproducing TM 5-811-7 Appendix D)",
+   "source_edition_or_year": "2005",
+   "source_section_or_page": "D-2(b)(2): 10,681 sq ft at 2 mA/sq ft with 90% coating efficiency -> I = 2,136 mA (the degradation rate is not part of this figure)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "surface_sqft": 10681,
+    "bare_current_density_ma_per_sqft": 2,
+    "initial_breakdown_pct": 10,
+    "annual_degradation_pct": 1,
+    "design_life_years": 30,
+    "fast_degradation_pct": 4
+   },
+   "outputs": {
+    "initial_current_a": {
+     "value": 2.136,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
    "tile_id": "stray-current-bond", "source_publisher": "Project (first-principles)", "source_title": "Stray Current Interference Bond Resistor -- the spec-v1768 worked example, recomputed", "source_edition_or_year": "spec-v1768 of scope-trade-expansion-3, 2026-09-18", "source_section_or_page": "the interference retest governs", "verified_by": "rl", "verified_on": "2026-09-18",
    "inputs": {"open_circuit_v":0.45,"solid_bond_current_a":8.5,"target_bond_current_a":3,"interference_shift_mv":250,"rating_margin_factor":5},
    "outputs": {"circuit_resistance_ohm":{"value":0.052941176470588235,"tolerance":{"pct":0.5}},"required_resistance_ohm":{"value":0.15,"tolerance":{"pct":0.5}},"resistor_ohm":{"value":0.09705882352941175,"tolerance":{"pct":0.5}},"dissipation_w":{"value":0.8735294117647058,"tolerance":{"pct":0.5}},"recommended_rating_w":{"value":4.367647058823529,"tolerance":{"pct":0.5}}}
@@ -128421,9 +128667,62 @@
    "outputs": {"corrosion_rate_mpy":{"value":0.6561099315876386,"tolerance":{"pct":0.5}},"corrosion_rate_mm_per_year":{"value":0.01666519226232602,"tolerance":{"pct":0.5}},"remaining_life_years":{"value":190.51685393258427,"tolerance":{"pct":0.5}},"alternative_rate_mpy":{"value":13.122198631752774,"tolerance":{"pct":0.5}},"alternative_life_years":{"value":9.525842696629212,"tolerance":{"pct":0.5}},"pit_rate_mpy":{"value":6.561099315876387,"tolerance":{"pct":0.5}},"pit_life_years":{"value":19.051685393258424,"tolerance":{"pct":0.5}}}
   },
   {
+   "tile_id": "corrosion-rate-weight-loss",
+   "source_publisher": "EMT",
+   "source_title": "Corrosion Coupon Calculation",
+   "source_edition_or_year": "emtpigging.my web page",
+   "source_section_or_page": "500 mg lost from 10 sq in over 720 h at 7.85 g/cc -> about 4.73 mpy",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "mass_loss_mg": 500,
+    "density_g_cm3": 7.85,
+    "exposed_area_sqin": 10,
+    "exposure_hours": 720,
+    "wall_thickness_in": 0.25,
+    "retirement_thickness_in": 0.125,
+    "pitting_factor": 10,
+    "alternative_mass_loss_mg": 2500
+   },
+   "outputs": {
+    "corrosion_rate_mpy": {
+     "value": 4.73,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
    "tile_id": "galvanic-area-ratio", "source_publisher": "Project (first-principles)", "source_title": "Galvanic Corrosion and Area Ratio -- the spec-v1770 worked example, recomputed", "source_edition_or_year": "spec-v1770 of scope-trade-expansion-3, 2026-09-18", "source_section_or_page": "the materials engineer governs", "verified_by": "rl", "verified_on": "2026-09-18",
    "inputs": {"anode_potential_v":-0.61,"cathode_potential_v":-0.36,"cathodic_current_density_ma_per_sqft":5,"cathode_area_sqin":1000,"anode_area_sqin":1,"electrochemical_equivalent_lb_per_a_yr":20.1,"anode_density_pcf":490},
    "outputs": {"driving_voltage_v":{"value":0.25,"tolerance":{"pct":0.5}},"galvanic_current_ma":{"value":34.72222222222222,"tolerance":{"pct":0.5}},"anode_current_density_a_per_sqft":{"value":5.000000000000001,"tolerance":{"pct":0.5}},"penetration_in_per_year":{"value":2.461224489795919,"tolerance":{"pct":0.5}},"reversed_penetration_mils_per_year":{"value":0.0024612244897959184,"tolerance":{"pct":0.5}},"attack_ratio":{"value":1000000.0000000002,"tolerance":{"pct":0.5}}}
+  },
+  {
+   "tile_id": "galvanic-area-ratio",
+   "source_publisher": "King Fahd University of Petroleum and Minerals",
+   "source_title": "Corrosion Engineering course notes 3.3.1",
+   "source_edition_or_year": "faculty.kfupm.edu.sa",
+   "source_section_or_page": "for iron, 1 uA/cm2 is equivalent to a corrosion rate of 0.46 mpy (equal areas; 1 uA/cm2 entered as 0.92903 mA/sq ft)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "anode_potential_v": -0.61,
+    "cathode_potential_v": -0.36,
+    "cathodic_current_density_ma_per_sqft": 0.92903,
+    "cathode_area_sqin": 1000,
+    "anode_area_sqin": 1000,
+    "electrochemical_equivalent_lb_per_a_yr": 20.1,
+    "anode_density_pcf": 490
+   },
+   "outputs": {
+    "reversed_penetration_mils_per_year": {
+     "value": 0.46,
+     "tolerance": {
+      "abs": 0.005
+     }
+    }
+   }
   },
   {
    "tile_id": "tank-bottom-anode-layout", "source_publisher": "Project (first-principles)", "source_title": "Tank Bottom CP Anode Layout -- the spec-v1771 worked example, recomputed", "source_edition_or_year": "spec-v1771 of scope-trade-expansion-3, 2026-09-18", "source_section_or_page": "API RP 651 and the ribbon rating govern", "verified_by": "rl", "verified_on": "2026-09-18",
@@ -128441,6 +128740,31 @@
    "outputs": {"holiday_diameter_mm":{"value":11.283791670955127,"tolerance":{"pct":0.5}},"ac_current_density_a_per_m2":{"value":135.4055000514615,"tolerance":{"pct":0.5}},"threshold_multiple":{"value":4.51351666838205,"tolerance":{"pct":0.5}},"voltage_for_threshold_v":{"value":3.3233509704478426,"tolerance":{"pct":0.5}},"stringency_ratio":{"value":4.51351666838205,"tolerance":{"pct":0.5}},"alternative_current_density_a_per_m2":{"value":33.851375012865375,"tolerance":{"pct":0.5}},"alternative_change_pct":{"value":-75,"tolerance":{"pct":0.5}}}
   },
   {
+   "tile_id": "ac-induced-voltage-pipeline",
+   "source_publisher": "R. Allen (Appalachian Underground Corrosion Short Course)",
+   "source_title": "AC Corrosion Issues, slide p. 7",
+   "source_edition_or_year": "AUCSC 2012",
+   "source_section_or_page": "100 A/m2 in 10 ohm-m soil through a 1 cm2 holiday (d = 0.0113 m) -> Vac = 4.4 V",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "induced_ac_v": 15,
+    "soil_resistivity_ohm_m": 10,
+    "holiday_area_cm2": 1,
+    "touch_limit_v": 15,
+    "risk_threshold_a_per_m2": 100,
+    "alternative_resistivity_ohm_m": 100
+   },
+   "outputs": {
+    "voltage_for_threshold_v": {
+     "value": 4.4,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
    "tile_id": "polarization-decay-criterion", "source_publisher": "Project (first-principles)", "source_title": "100 mV Polarization Decay Criterion -- the spec-v1774 worked example, recomputed", "source_edition_or_year": "spec-v1774 of scope-trade-expansion-3, 2026-09-18", "source_section_or_page": "NACE SP0169 governs", "verified_by": "rl", "verified_on": "2026-09-18",
    "inputs": {"on_potential_v":-1.05,"instant_off_potential_v":-0.78,"native_potential_v":-0.65,"depolarized_potential_v":-0.67,"criterion_v":-0.85,"polarization_criterion_mv":100},
    "outputs": {"ir_drop_mv":{"value":270,"tolerance":{"pct":0.5}},"formation_mv":{"value":130,"tolerance":{"pct":0.5}},"decay_mv":{"value":109.99999999999999,"tolerance":{"pct":0.5}},"absolute_margin_mv":{"value":-69.99999999999996,"tolerance":{"pct":0.5}},"decay_from_on_mv":{"value":380,"tolerance":{"pct":0.5}},"decay_overstatement_ratio":{"value":3.454545454545455,"tolerance":{"pct":0.5}}}
@@ -128451,9 +128775,64 @@
    "outputs": {"column_ft3":{"value":3.4906585039886586,"tolerance":{"pct":0.5}},"anode_ft3":{"value":0.10908307824964558,"tolerance":{"pct":0.5}},"backfill_ft3_per_anode":{"value":3.381575425739013,"tolerance":{"pct":0.5}},"backfill_lb_per_anode":{"value":236.71027980173093,"tolerance":{"pct":0.5}},"bed_backfill_lb":{"value":2367.1027980173094,"tolerance":{"pct":0.5}},"bag_count":{"value":48,"tolerance":{"pct":0.5}},"bag_count_with_waste":{"value":53,"tolerance":{"pct":0.5}},"base_resistance_ohm":{"value":9.86641598994723,"tolerance":{"pct":0.5}},"narrower_resistance_ohm":{"value":10.615827788684118,"tolerance":{"pct":0.5}},"wider_resistance_ohm":{"value":9.285127038773712,"tolerance":{"pct":0.5}},"deeper_resistance_ohm":{"value":5.836032197652943,"tolerance":{"pct":0.5}}}
   },
   {
+   "tile_id": "coke-breeze-backfill",
+   "source_publisher": "US Department of Defense",
+   "source_title": "UFC 3-570-02A Cathodic Protection (reproducing TM 5-811-7 Appendix D)",
+   "source_edition_or_year": "2005",
+   "source_section_or_page": "D-3(c)(2), p. D-6: a 10 in by 7.0 ft backfill column in 1,000 ohm-cm soil -> 2.39 ohms",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "hole_diameter_in": 10,
+    "hole_depth_ft": 7,
+    "anode_diameter_in": 2,
+    "anode_length_ft": 5,
+    "anode_count": 10,
+    "backfill_density_pcf": 70,
+    "bag_weight_lb": 50,
+    "waste_pct": 10,
+    "soil_resistivity_ohm_cm": 1000
+   },
+   "outputs": {
+    "base_resistance_ohm": {
+     "value": 2.39,
+     "tolerance": {
+      "abs": 0.005
+     }
+    }
+   }
+  },
+  {
    "tile_id": "mash-strike-water", "source_publisher": "Project (first-principles)", "source_title": "Mash Strike Water Temperature and Thickness -- the spec-v1776 worked example, recomputed", "source_edition_or_year": "spec-v1776 of scope-trade-expansion-3, 2026-09-18", "source_section_or_page": "the brewery's own measured mash temperatures govern", "verified_by": "rl", "verified_on": "2026-09-18",
    "inputs": {"grain_weight_lb":542,"mash_thickness_qt_per_lb":1.25,"grain_temp_f":68,"target_mash_temp_f":152,"grain_specific_heat":0.4,"tun_weight_lb":180,"tun_specific_heat":0.12,"tun_temp_f":68},
    "outputs": {"mash_water_gal":{"value":169.375,"tolerance":{"pct":0.5}},"water_lb":{"value":1413.434375,"tolerance":{"pct":0.5}},"mash_weight_lb":{"value":1955.434375,"tolerance":{"pct":0.5}},"strike_temp_f":{"value":164.8843618933493,"tolerance":{"pct":0.5}},"convention_strike_temp_f":{"value":165.44,"tolerance":{"pct":0.5}},"tun_drop_f":{"value":1.0984152088492527,"tolerance":{"pct":0.5}},"mash_temp_after_tun_f":{"value":150.90158479115075,"tolerance":{"pct":0.5}}}
+  },
+  {
+   "tile_id": "mash-strike-water",
+   "source_publisher": "John Palmer",
+   "source_title": "How to Brew, Chapter 16, Calculations for Boiling Water Additions",
+   "source_edition_or_year": "howtobrew.com (online edition)",
+   "source_section_or_page": "8 lb grain at 70 F, 1 qt/lb, target 104 F -> strike water 110.8 or 111 F (tun left out)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "grain_weight_lb": 8,
+    "mash_thickness_qt_per_lb": 1,
+    "grain_temp_f": 70,
+    "target_mash_temp_f": 104,
+    "grain_specific_heat": 0.4,
+    "tun_weight_lb": 0,
+    "tun_specific_heat": 0,
+    "tun_temp_f": 70
+   },
+   "outputs": {
+    "convention_strike_temp_f": {
+     "value": 110.8,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
   },
   {
    "tile_id": "sparge-water-volume", "source_publisher": "Project (first-principles)", "source_title": "Sparge Water and Pre-Boil Volume -- the spec-v1777 worked example, recomputed", "source_edition_or_year": "spec-v1777 of scope-trade-expansion-3, 2026-09-18", "source_section_or_page": "the brewery's own measured runoff governs", "verified_by": "rl", "verified_on": "2026-09-18",
@@ -128461,9 +128840,67 @@
    "outputs": {"mash_water_gal":{"value":169.375,"tolerance":{"pct":0.5}},"absorbed_gal":{"value":67.75,"tolerance":{"pct":0.5}},"first_runnings_gal":{"value":101.625,"tolerance":{"pct":0.5}},"sparge_gal":{"value":253.375,"tolerance":{"pct":0.5}},"total_water_gal":{"value":422.75,"tolerance":{"pct":0.5}},"alternative_sparge_gal":{"value":195.625,"tolerance":{"pct":0.5}}}
   },
   {
+   "tile_id": "sparge-water-volume",
+   "source_publisher": "Brew Your Own",
+   "source_title": "Calculating Water Usage",
+   "source_edition_or_year": "byo.com article",
+   "source_section_or_page": "10 lb at 1.25 qt/lb, absorption 0.5 qt/lb, 7 gal pre-boil, 1.2 qt tun and line deadspace -> sparge 21.7 qt (5.425 gal), total 34.2 qt (8.55 gal)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "grain_weight_lb": 10,
+    "mash_thickness_qt_per_lb": 1.25,
+    "absorption_gal_per_lb": 0.125,
+    "preboil_volume_gal": 7,
+    "deadspace_gal": 0.3,
+    "alternative_grain_weight_lb": 12
+   },
+   "outputs": {
+    "sparge_gal": {
+     "value": 5.425,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "total_water_gal": {
+     "value": 8.55,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
    "tile_id": "brewhouse-efficiency", "source_publisher": "Project (first-principles)", "source_title": "Brewhouse Efficiency and Grain Bill -- the spec-v1778 worked example, recomputed", "source_edition_or_year": "spec-v1778 of scope-trade-expansion-3, 2026-09-18", "source_section_or_page": "the malt analysis and measured gravities govern", "verified_by": "rl", "verified_on": "2026-09-18",
    "inputs": {"grain_weight_lb":542,"extract_potential_ppg":37,"volume_gal":310,"original_gravity":1.055,"transfer_loss_gal":15,"strong_grain_weight_lb":850,"assumed_efficiency_pct":85.02,"achieved_efficiency_pct":75},
    "outputs": {"kettle_efficiency_pct":{"value":85.0204447990425,"tolerance":{"pct":0.5}},"fermenter_efficiency_pct":{"value":80.90655230876624,"tolerance":{"pct":0.5}},"assumed_og_points":{"value":86.25416129032259,"tolerance":{"pct":0.5}},"achieved_og_points":{"value":76.08870967741936,"tolerance":{"pct":0.5}},"shortfall_point_gallons":{"value":3151.289999999999,"tolerance":{"pct":0.5}},"total_left_point_gallons":{"value":7862.5,"tolerance":{"pct":0.5}},"shortfall_malt_equivalent_lb":{"value":85.16999999999997,"tolerance":{"pct":0.5}},"malt_to_recover_lb":{"value":113.55999999999996,"tolerance":{"pct":0.5}}}
+  },
+  {
+   "tile_id": "brewhouse-efficiency",
+   "source_publisher": "John Palmer",
+   "source_title": "How to Brew, Chapter 12, Mash Efficiency",
+   "source_edition_or_year": "howtobrew.com (online edition)",
+   "source_section_or_page": "8.5 lb at 37 ppg into 6 gal at 1.038 -> 27/37 = 73%",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "grain_weight_lb": 8.5,
+    "extract_potential_ppg": 37,
+    "volume_gal": 6,
+    "original_gravity": 1.038,
+    "transfer_loss_gal": 0,
+    "strong_grain_weight_lb": 850,
+    "assumed_efficiency_pct": 85,
+    "achieved_efficiency_pct": 75
+   },
+   "outputs": {
+    "kettle_efficiency_pct": {
+     "value": 73,
+     "tolerance": {
+      "abs": 0.6
+     }
+    }
+   }
   },
   {
    "tile_id": "ibu-tinseth", "source_publisher": "Project (first-principles)", "source_title": "Hop Bitterness IBU (Tinseth) -- the spec-v1779 worked example, recomputed", "source_edition_or_year": "spec-v1779 of scope-trade-expansion-3, 2026-09-18", "source_section_or_page": "measured IBU on the brewery's own system governs", "verified_by": "rl", "verified_on": "2026-09-18",
@@ -128471,9 +128908,67 @@
    "outputs": {"alpha_acid_mg_per_l":{"value":231.92211738754185,"tolerance":{"pct":0.5}},"utilization":{"value":0.2306640772510991,"tolerance":{"pct":0.5}},"ibu":{"value":53.496101201318425,"tolerance":{"pct":0.5}},"short_boil_ibu":{"value":26.544919108090202,"tolerance":{"pct":0.5}},"strong_gravity_ibu":{"value":40.853515317392834,"tolerance":{"pct":0.5}},"hops_to_match_lb":{"value":6.547306980281227,"tolerance":{"pct":0.5}}}
   },
   {
+   "tile_id": "ibu-tinseth",
+   "source_publisher": "John Palmer",
+   "source_title": "How to Brew, Chapter 5, Hop Bittering Calculations",
+   "source_edition_or_year": "howtobrew.com (online edition)",
+   "source_section_or_page": "1.5 oz of 6.4% AA hops, 60 min, boil gravity 1.080, 5 gal -> IBU = 25 (Tinseth's own page prints utilization 0.231 at 1.050 / 60 min)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "batch_volume_gal": 5,
+    "hop_weight_lb": 0.09375,
+    "alpha_acid_pct": 6.4,
+    "boil_minutes": 60,
+    "boil_gravity": 1.08,
+    "short_boil_minutes": 15,
+    "strong_boil_gravity": 1.08
+   },
+   "outputs": {
+    "ibu": {
+     "value": 25,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
    "tile_id": "beer-color-srm", "source_publisher": "Project (first-principles)", "source_title": "Beer Color SRM from the Malt Bill -- the spec-v1780 worked example, recomputed", "source_edition_or_year": "spec-v1780 of scope-trade-expansion-3, 2026-09-18", "source_section_or_page": "a spectrophotometer reading governs", "verified_by": "rl", "verified_on": "2026-09-18",
    "inputs": {"base_malt_lb":500,"base_lovibond":2,"crystal_malt_lb":30,"crystal_lovibond":60,"roast_malt_lb":12,"roast_lovibond":500,"batch_volume_gal":310},
    "outputs": {"mcu":{"value":28.387096774193548,"tolerance":{"pct":0.5}},"srm":{"value":14.80889707453143,"tolerance":{"pct":0.5}},"roast_weight_share_pct":{"value":2.2140221402214024,"tolerance":{"pct":0.5}},"roast_mcu_share_pct":{"value":68.18181818181819,"tolerance":{"pct":0.5}},"mcu_without_roast":{"value":9.03225806451613,"tolerance":{"pct":0.5}},"srm_without_roast":{"value":6.751616153087748,"tolerance":{"pct":0.5}}}
+  },
+  {
+   "tile_id": "beer-color-srm",
+   "source_publisher": "Beer Maverick",
+   "source_title": "Understanding SRM and Lovibond Beer Color Calculations",
+   "source_edition_or_year": "beermaverick.com article",
+   "source_section_or_page": "10 lb at 1.8 L, 1.5 lb at 2.5 L, 1.25 lb at 350 L in 5 gal -> 91.85 MCU, 33.136225 SRM (Morey)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "base_malt_lb": 10,
+    "base_lovibond": 1.8,
+    "crystal_malt_lb": 1.5,
+    "crystal_lovibond": 2.5,
+    "roast_malt_lb": 1.25,
+    "roast_lovibond": 350,
+    "batch_volume_gal": 5
+   },
+   "outputs": {
+    "mcu": {
+     "value": 91.85,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "srm": {
+     "value": 33.1362,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
   },
   {
    "tile_id": "yeast-pitch-rate", "source_publisher": "Project (first-principles)", "source_title": "Yeast Pitch Rate and Cell Count -- the spec-v1781 worked example, recomputed", "source_edition_or_year": "spec-v1781 of scope-trade-expansion-3, 2026-09-18", "source_section_or_page": "a viability count on the day governs", "verified_by": "rl", "verified_on": "2026-09-18",
@@ -128481,14 +128976,94 @@
    "outputs": {"plato":{"value":13.502369668246445,"tolerance":{"pct":0.5}},"cells_required":{"value":11883546801579.24,"tolerance":{"pct":0.5}},"slurry_ml":{"value":11003.284075536334,"tolerance":{"pct":0.5}},"slurry_gal":{"value":2.906760136914165,"tolerance":{"pct":0.5}},"aged_slurry_gal":{"value":4.3601402053712475,"tolerance":{"pct":0.5}},"strong_plato":{"value":19.18518518518519,"tolerance":{"pct":0.5}},"strong_cells_required":{"value":16885039563186.672,"tolerance":{"pct":0.5}}}
   },
   {
+   "tile_id": "yeast-pitch-rate",
+   "source_publisher": "Colorado Brewers Guild",
+   "source_title": "The Methods and Math of Yeast Counting (Meehan)",
+   "source_edition_or_year": "2018",
+   "source_section_or_page": "15 bbl at 12.4 P, 1 million cells/mL/P, slurry 2.2 billion cells/mL at 94.09% viability -> about 10.54 L of slurry (OG entered as the SG of 12.4 P)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "batch_volume_gal": 465,
+    "original_gravity": 1.0502838605028386,
+    "pitch_rate_million_per_ml_plato": 1,
+    "slurry_cells_per_ml": 2200000000.0,
+    "viability_pct": 94.09,
+    "aged_viability_pct": 60,
+    "strong_original_gravity": 1.08
+   },
+   "outputs": {
+    "slurry_l": {
+     "value": 10.54,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
    "tile_id": "kettle-boil-off", "source_publisher": "Project (first-principles)", "source_title": "Kettle Boil-Off Rate and Post-Boil Gravity -- the spec-v1782 worked example, recomputed", "source_edition_or_year": "spec-v1782 of scope-trade-expansion-3, 2026-09-18", "source_section_or_page": "the kettle's measured boil-off rate governs", "verified_by": "rl", "verified_on": "2026-09-18",
    "inputs": {"preboil_volume_gal":350,"preboil_gravity":1.049,"boiloff_pct_per_hour":8,"boil_hours":1,"shrinkage_pct":4,"hard_boiloff_pct_per_hour":12},
    "outputs": {"extract_point_gallons":{"value":17149.999999999975,"tolerance":{"pct":0.5}},"evaporated_gal":{"value":28,"tolerance":{"pct":0.5}},"hot_volume_gal":{"value":322,"tolerance":{"pct":0.5}},"cooled_volume_gal":{"value":309.12,"tolerance":{"pct":0.5}},"cooled_og_points":{"value":55.48007246376803,"tolerance":{"pct":0.5}},"hard_cooled_volume_gal":{"value":295.68,"tolerance":{"pct":0.5}},"hard_og_points":{"value":58.00189393939385,"tolerance":{"pct":0.5}}}
   },
   {
+   "tile_id": "kettle-boil-off",
+   "source_publisher": "Brew Your Own",
+   "source_title": "Hitting Target Original Gravity and Volume",
+   "source_edition_or_year": "byo.com article",
+   "source_section_or_page": "1.5 gal/hr for 1.25 hr off 6.875 gal pre-boil -> 5 gal; 34.78 = (5 x 48) / 6.9 so the pre-boil 1.035 ends at 1.048 (rate entered as 21.8% of the pre-boil volume per hour)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "preboil_volume_gal": 6.875,
+    "preboil_gravity": 1.034909,
+    "boiloff_pct_per_hour": 21.818181818181817,
+    "boil_hours": 1.25,
+    "shrinkage_pct": 0,
+    "hard_boiloff_pct_per_hour": 25
+   },
+   "outputs": {
+    "cooled_volume_gal": {
+     "value": 5,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "cooled_og": {
+     "value": 1.048,
+     "tolerance": {
+      "abs": 0.0005
+     }
+    }
+   }
+  },
+  {
    "tile_id": "carbonation-volumes-pressure", "source_publisher": "Project (first-principles)", "source_title": "Carbonation Volumes and Head Pressure -- the spec-v1783 worked example, recomputed", "source_edition_or_year": "spec-v1783 of scope-trade-expansion-3, 2026-09-18", "source_section_or_page": "a dissolved-CO2 measurement governs", "verified_by": "rl", "verified_on": "2026-09-18",
    "inputs": {"beer_temp_f":38,"gauge_psig":12,"target_volumes":2.6,"warm_temp_f":45},
    "outputs": {"co2_volumes":{"value":2.5757213346035575,"tolerance":{"pct":0.5}},"pressure_for_target_psig":{"value":12.251300138334006,"tolerance":{"pct":0.5}},"warm_co2_volumes":{"value":2.262034729178603,"tolerance":{"pct":0.5}},"warm_pressure_for_target_psig":{"value":15.982553006911324,"tolerance":{"pct":0.5}},"overcarbonation_volumes":{"value":2.960484640025552,"tolerance":{"pct":0.5}}}
+  },
+  {
+   "tile_id": "carbonation-volumes-pressure",
+   "source_publisher": "Brewers Association",
+   "source_title": "Facts About Draught Beer Carbonation (table from ASBC Methods of Analysis)",
+   "source_edition_or_year": "2021 PDF",
+   "source_section_or_page": "11.3 psig maintains 2.5 volumes CO2 in beer served at 38 F",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "beer_temp_f": 38,
+    "gauge_psig": 12,
+    "target_volumes": 2.5,
+    "warm_temp_f": 45
+   },
+   "outputs": {
+    "pressure_for_target_psig": {
+     "value": 11.3,
+     "tolerance": {
+      "abs": 0.2
+     }
+    }
+   }
   },
   {
    "tile_id": "fermenter-glycol-load", "source_publisher": "Project (first-principles)", "source_title": "Fermenter Glycol Cooling Load -- the spec-v1784 worked example, recomputed with each period's shell gain at its own beer temperature", "source_edition_or_year": "spec-v1784 of scope-trade-expansion-3, 2026-09-18", "source_section_or_page": "the chiller manufacturer's capacity governs", "verified_by": "rl", "verified_on": "2026-09-18",
@@ -128501,6 +129076,32 @@
    "outputs": {"absolute_alcohol_gal":{"value":40,"tolerance":{"pct":0.5}},"recovered_alcohol_gal":{"value":34,"tolerance":{"pct":0.5}},"wine_gallons":{"value":48.57142857142858,"tolerance":{"pct":0.5}},"proof_gallons":{"value":68.00000000000001,"tolerance":{"pct":0.5}},"alternative_wine_gallons":{"value":85,"tolerance":{"pct":0.5}},"alternative_proof_gallons":{"value":68,"tolerance":{"pct":0.5}},"excise":{"value":183.60000000000005,"tolerance":{"pct":0.5}},"hearts_proof_gallons":{"value":51,"tolerance":{"pct":0.5}},"hearts_excise":{"value":137.70000000000002,"tolerance":{"pct":0.5}}}
   },
   {
+   "tile_id": "proof-gallon-yield",
+   "source_publisher": "TTB Scientific Services Division",
+   "source_title": "Definitions: proof gallon",
+   "source_edition_or_year": "ttb.gov web page",
+   "source_section_or_page": "(80 proof / 100) x 1 wine gallon = 0.8 proof gallons",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "wash_volume_gal": 1,
+    "wash_abv_pct": 40,
+    "recovery_pct": 100,
+    "collection_proof": 80,
+    "alternative_proof": 80,
+    "hearts_share_pct": 75,
+    "excise_rate_per_pg": 2.7
+   },
+   "outputs": {
+    "proof_gallons": {
+     "value": 0.8,
+     "tolerance": {
+      "abs": 0.0001
+     }
+    }
+   }
+  },
+  {
    "tile_id": "packaging-yield-loss", "source_publisher": "Project (first-principles)", "source_title": "Brewery Packaging Yield and Loss -- the spec-v1786 worked example, recomputed", "source_edition_or_year": "spec-v1786 of scope-trade-expansion-3, 2026-09-18", "source_section_or_page": "the brewery's packaging records govern", "verified_by": "rl", "verified_on": "2026-09-18",
    "inputs": {"brite_volume_gal":310,"transfer_loss_pct":2,"fill_loss_pct":1.5,"package_gal":15.5,"smallest_package_gal":5.16,"revenue_per_package":175},
    "outputs": {"packaged_volume_gal":{"value":299.243,"tolerance":{"pct":0.5}},"whole_packages":{"value":19,"tolerance":{"pct":0.5}},"saleable_gal":{"value":294.5,"tolerance":{"pct":0.5}},"remainder_gal":{"value":4.742999999999995,"tolerance":{"pct":0.5}},"total_loss_gal":{"value":15.5,"tolerance":{"pct":0.5}},"remainder_short_of_smallest_gal":{"value":0.41700000000000514,"tolerance":{"pct":0.5}}}
@@ -128509,6 +129110,34 @@
    "tile_id": "mash-tun-grain-bed", "source_publisher": "Project (first-principles)", "source_title": "Mash Tun Capacity and Grain Bed Depth -- the spec-v1787 worked example, recomputed", "source_edition_or_year": "spec-v1787 of scope-trade-expansion-3, 2026-09-18", "source_section_or_page": "the lauter tun manufacturer's rated depth governs", "verified_by": "rl", "verified_on": "2026-09-18",
    "inputs": {"tun_diameter_ft":6,"grain_weight_lb":542,"mash_thickness_qt_per_lb":1.25,"grain_displacement_gal_per_lb":0.08,"max_bed_depth_in":18,"batch_volume_gal":310,"efficiency_pct":78,"extract_potential_ppg":37,"alternative_diameter_ft":8},
    "outputs": {"bed_area_sqft":{"value":28.274333882308138,"tolerance":{"pct":0.5}},"mash_volume_gal":{"value":212.735,"tolerance":{"pct":0.5}},"bed_depth_in":{"value":12.069687425884602,"tolerance":{"pct":0.5}},"max_grain_lb":{"value":808.3059366622305,"tolerance":{"pct":0.5}},"max_og_points":{"value":75.2506752647483,"tolerance":{"pct":0.5}},"alternative_bed_depth_in":{"value":6.789199177060089,"tolerance":{"pct":0.5}},"alternative_max_grain_lb":{"value":1436.9883318439654,"tolerance":{"pct":0.5}}}
+  },
+  {
+   "tile_id": "mash-tun-grain-bed",
+   "source_publisher": "John Palmer",
+   "source_title": "How to Brew, Appendix D, Sizing the Tun",
+   "source_edition_or_year": "howtobrew.com (online edition)",
+   "source_section_or_page": "8.3 x (42 + 32) = 616.6 fl oz, or 4.8 gal, for 8.3 lb at 2 qt/lb (grain takes 10 fl oz per lb)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "tun_diameter_ft": 6,
+    "grain_weight_lb": 8.3,
+    "mash_thickness_qt_per_lb": 2,
+    "grain_displacement_gal_per_lb": 0.078125,
+    "max_bed_depth_in": 18,
+    "batch_volume_gal": 310,
+    "efficiency_pct": 78,
+    "extract_potential_ppg": 37,
+    "alternative_diameter_ft": 8
+   },
+   "outputs": {
+    "mash_volume_gal": {
+     "value": 4.8,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
   },
   {
    "tile_id": "dry-hop-beer-loss", "source_publisher": "Project (first-principles)", "source_title": "Dry Hop Absorption and Beer Loss -- the spec-v1788 worked example, recomputed", "source_edition_or_year": "spec-v1788 of scope-trade-expansion-3, 2026-09-18", "source_section_or_page": "the brewery's measured absorption governs", "verified_by": "rl", "verified_on": "2026-09-18",

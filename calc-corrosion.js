@@ -111,6 +111,7 @@ export function computeAnodeBedResistance({ soil_resistivity_ohm_cm = 0, column_
   if (!(column_length_ft > 0) || !(alternative_length_ft > 0)) return { error: "Column lengths must be positive." };
   if (!(column_diameter_in > 0) || !(alternative_diameter_in > 0)) return { error: "Column diameters must be positive." };
   if (!(anode_count >= 2)) return { error: "A bed needs at least two anodes; a single anode is the single-anode figure." };
+  if (!Number.isInteger(anode_count)) return { error: "The anode count must be a whole number." };
   if (!(spacing_ft > 0) || !(alternative_spacing_ft > 0)) return { error: "Anode spacings must be positive." };
   const diameter_ft = column_diameter_in / IN_PER_FT;
   if (!(8 * column_length_ft / diameter_ft > Math.E)) return { error: "The column is too short for its diameter; Dwight's relation needs a long slender column." };
@@ -118,6 +119,8 @@ export function computeAnodeBedResistance({ soil_resistivity_ohm_cm = 0, column_
   const bed_resistance_ohm = _sundeBed(soil_resistivity_ohm_cm, column_length_ft, diameter_ft, anode_count, spacing_ft);
   const parallel_resistance_ohm = single_anode_resistance_ohm / anode_count;
   const alternative_spacing_bed_ohm = _sundeBed(soil_resistivity_ohm_cm, column_length_ft, diameter_ft, anode_count, alternative_spacing_ft);
+  // Sunde's interference term breaks down when anodes crowd together: at 1 ft spacing a 10-anode bed read worse than one anode.
+  if (!(bed_resistance_ohm < single_anode_resistance_ohm) || !(alternative_spacing_bed_ohm < single_anode_resistance_ohm)) return { error: "At that spacing the anodes crowd each other so much that Sunde's relation reads the bed worse than a single anode; the spacing is outside the relation's range (space anodes at least a column length apart)." };
   const alternative_length_single_ohm = _dwightSingle(soil_resistivity_ohm_cm, alternative_length_ft, diameter_ft);
   const alternative_diameter_single_ohm = _dwightSingle(soil_resistivity_ohm_cm, column_length_ft, alternative_diameter_in / IN_PER_FT);
   return {
@@ -170,7 +173,7 @@ CORROSION_RENDERERS["anode-bed-resistance"] = _simpleRenderer({
 // removed from the circuit comes straight off the voltage and the bill.
 
 // dims: in { design_current_a: I, bed_resistance_ohm: M L^2 T^-3 I^-2, header_length_ft: L, negative_length_ft: L, cable_ohm_per_kft: M L T^-3 I^-2, back_emf_v: M L^2 T^-3 I^-1, design_margin_pct: dimensionless, rectifier_efficiency_pct: dimensionless, energy_rate_per_kwh: dimensionless } out: { cable_resistance_ohm: M L^2 T^-3 I^-2, total_resistance_ohm: M L^2 T^-3 I^-2, required_voltage_v: M L^2 T^-3 I^-1, design_voltage_v: M L^2 T^-3 I^-1, dc_output_w: M L^2 T^-3, ac_input_w: M L^2 T^-3, annual_kwh: M L^2 T^-2 }
-export function computeCpRectifierSizing({ design_current_a = 0, bed_resistance_ohm = 0, header_length_ft = 0, negative_length_ft = 0, cable_ohm_per_kft = 0, back_emf_v = 0, design_margin_pct = 0, rectifier_efficiency_pct = 0, energy_rate_per_kwh = 0 } = {}) {
+export function computeCpRectifierSizing({ design_current_a = 0, bed_resistance_ohm = 0, header_length_ft = 0, negative_length_ft = 0, cable_ohm_per_kft = 0, back_emf_v = 0, design_margin_pct = 0, rectifier_efficiency_pct = 0, energy_rate_per_kwh = 0, structure_resistance_ohm = 0 } = {}) {
   const guard = _finiteGuard(arguments[0]); if (guard) return { error: guard.error };
   // An efficiency is a percent; 0 < value < 1 is a fraction typed into a percent field (added 2026-09-26).
   if (["rectifier_efficiency_pct"].some((k) => { const v = Number(arguments[0]?.[k]); return v > 0 && v < 1; })) return { error: "Enter efficiencies as a percent (85 for 85%), not a fraction." };
@@ -182,8 +185,10 @@ export function computeCpRectifierSizing({ design_current_a = 0, bed_resistance_
   if (!(design_margin_pct >= 0)) return { error: "The design margin cannot be negative." };
   if (!(rectifier_efficiency_pct > 0 && rectifier_efficiency_pct <= 100)) return { error: "Rectifier efficiency must be above 0 and at most 100%." };
   if (!(energy_rate_per_kwh >= 0)) return { error: "The energy rate cannot be negative." };
+  if (!(structure_resistance_ohm >= 0)) return { error: "The structure-to-electrolyte resistance cannot be negative." };
   const cable_resistance_ohm = (header_length_ft + negative_length_ft) * cable_ohm_per_kft / 1000;
-  const total_resistance_ohm = bed_resistance_ohm + cable_resistance_ohm;
+  // TM 5-811-7 / UFC 3-570-02A eq 2-14 adds the structure-to-electrolyte resistance Rc to the circuit; until 2026-09-26 it had no input.
+  const total_resistance_ohm = bed_resistance_ohm + cable_resistance_ohm + structure_resistance_ohm;
   const required_voltage_v = design_current_a * total_resistance_ohm + back_emf_v;
   const design_voltage_v = required_voltage_v * (1 + design_margin_pct / 100);
   const cable_drop_v = design_current_a * cable_resistance_ohm;
@@ -206,7 +211,7 @@ export function computeCpRectifierSizing({ design_current_a = 0, bed_resistance_
 
 const rectifierExample = { design_current_a: 10, bed_resistance_ohm: 1.640, header_length_ft: 500, negative_length_ft: 300, cable_ohm_per_kft: 0.2485, back_emf_v: 2, design_margin_pct: 50, rectifier_efficiency_pct: 60, energy_rate_per_kwh: 0.12 };
 CORROSION_RENDERERS["cp-rectifier-sizing"] = _simpleRenderer({
-  citation: "Citation: Ohm's law around the impressed-current circuit -- required DC voltage = design current x (bed resistance + header and negative cable resistance) + the back EMF allowance, with a design margin on top and AC input = DC output / rectifier efficiency. NACE SP0169 (now AMPP), the rectifier manufacturer's rating, and the CP designer govern.",
+  citation: "Citation: Ohm's law around the impressed-current circuit -- required DC voltage = design current x (bed resistance + header and negative cable resistance + structure-to-electrolyte resistance) + the back EMF allowance, with a design margin on top and AC input = DC output / rectifier efficiency. NACE SP0169 (now AMPP), the rectifier manufacturer's rating, and the CP designer govern.",
   example: rectifierExample,
   fields: [
     { key: "design_current_a", label: "Design current (A)" },
@@ -215,6 +220,7 @@ CORROSION_RENDERERS["cp-rectifier-sizing"] = _simpleRenderer({
     { key: "negative_length_ft", label: "Negative cable length (ft)" },
     { key: "cable_ohm_per_kft", label: "Cable resistance (ohms per 1,000 ft)" },
     { key: "back_emf_v", label: "Back EMF allowance (V)" },
+    { key: "structure_resistance_ohm", label: "Structure-to-electrolyte resistance (ohm; coated pipe or tank)", default: 0 },
     { key: "design_margin_pct", label: "Design margin (%)" },
     { key: "rectifier_efficiency_pct", label: "Rectifier efficiency (%)", attrs: { step: "any", min: "0", max: "100" } },
     { key: "energy_rate_per_kwh", label: "Energy rate ($/kWh)" },
@@ -242,6 +248,8 @@ CORROSION_RENDERERS["cp-rectifier-sizing"] = _simpleRenderer({
 // dims: in { pipe_od_in: L, wall_thickness_in: L, steel_resistivity_ohm_in: M L^3 T^-3 I^-2, coating_resistance_ohm_sqft: M L^4 T^-3 I^-2, drain_shift_v: M L^2 T^-3 I^-1, distance_mi: L, degraded_coating_resistance_ohm_sqft: M L^4 T^-3 I^-2 } out: { longitudinal_ohm_per_ft: M L T^-3 I^-2, leakage_ohm_ft: M L^3 T^-3 I^-2, attenuation_per_ft: L^-1, characteristic_resistance_ohm: M L^2 T^-3 I^-2, shift_at_distance_v: M L^2 T^-3 I^-1, half_shift_mi: L }
 export function computePipelinePotentialAttenuation({ pipe_od_in = 0, wall_thickness_in = 0, steel_resistivity_ohm_in = 0, coating_resistance_ohm_sqft = 0, drain_shift_v = 0, distance_mi = 0, degraded_coating_resistance_ohm_sqft = 0 } = {}) {
   const guard = _finiteGuard(arguments[0]); if (guard) return { error: guard.error };
+  // Unit / range guard added 2026-09-26 after printed-example probing.
+  if (Number(arguments[0]?.steel_resistivity_ohm_in) > 1e-3) return { error: "Enter the steel resistivity in ohm-inches (about 7.1e-6), not micro-ohm-cm." };
   if (!(pipe_od_in > 0)) return { error: "The pipe outside diameter must be positive." };
   if (!(wall_thickness_in > 0) || !(2 * wall_thickness_in < pipe_od_in)) return { error: "The wall must be positive and less than half the outside diameter." };
   if (!(steel_resistivity_ohm_in > 0)) return { error: "Steel resistivity must be positive." };
@@ -319,6 +327,8 @@ CORROSION_RENDERERS["pipeline-potential-attenuation"] = _simpleRenderer({
 // dims: in { on_potential_v: M L^2 T^-3 I^-1, instant_off_potential_v: M L^2 T^-3 I^-1, native_potential_v: M L^2 T^-3 I^-1, criterion_v: M L^2 T^-3 I^-1, polarization_criterion_mv: M L^2 T^-3 I^-1 } out: { ir_drop_mv: M L^2 T^-3 I^-1, off_margin_mv: M L^2 T^-3 I^-1, on_margin_mv: M L^2 T^-3 I^-1, polarization_mv: M L^2 T^-3 I^-1 }
 export function computeInstantOffIrDrop({ on_potential_v = 0, instant_off_potential_v = 0, native_potential_v = 0, criterion_v = 0, polarization_criterion_mv = 0 } = {}) {
   const guard = _finiteGuard(arguments[0]); if (guard) return { error: guard.error };
+  // Unit / range guard added 2026-09-26 after printed-example probing.
+  if (["on_potential_v", "instant_off_potential_v", "native_potential_v", "depolarized_potential_v", "criterion_v"].some((k) => Math.abs(Number(arguments[0]?.[k])) > 5)) return { error: "Enter potentials in volts (-0.850), not millivolts." };
   if (!(on_potential_v < 0) || !(instant_off_potential_v < 0) || !(native_potential_v < 0) || !(criterion_v < 0)) {
     return { error: "Pipe-to-soil potentials are negative against a copper-copper sulfate reference; enter them with their sign." };
   }
@@ -697,6 +707,8 @@ CORROSION_RENDERERS["tank-bottom-anode-layout"] = _simpleRenderer({
 // dims: in { survey_length_mi: L, reading_interval_ft: L, readings_per_station: dimensionless, spool_length_ft: L, production_mi_per_day: L T^-1, seconds_per_reading: T, crew_day_hours: T, test_station_spacing_mi: L, alternative_interval_ft: L } out: { reading_count: dimensionless, data_points: dimensionless, spool_setups: dimensionless, field_days: T, reading_hours: T, alternative_reading_count: dimensionless }
 export function computeCloseIntervalSurveyReadings({ survey_length_mi = 0, reading_interval_ft = 0, readings_per_station = 0, spool_length_ft = 0, production_mi_per_day = 0, seconds_per_reading = 0, crew_day_hours = 0, test_station_spacing_mi = 0, alternative_interval_ft = 0 } = {}) {
   const guard = _finiteGuard(arguments[0]); if (guard) return { error: guard.error };
+  // Unit / range guard added 2026-09-26 after printed-example probing.
+  if (!Number.isInteger(Number(arguments[0]?.readings_per_station))) return { error: "Readings per station must be a whole number." };
   if (!(survey_length_mi > 0)) return { error: "The survey length must be positive." };
   if (!(reading_interval_ft > 0) || !(alternative_interval_ft > 0)) return { error: "Reading intervals must be positive." };
   if (!(readings_per_station >= 1)) return { error: "There must be at least one reading per station (2 for an on/off survey)." };
@@ -823,6 +835,8 @@ CORROSION_RENDERERS["ac-induced-voltage-pipeline"] = _simpleRenderer({
 // dims: in { on_potential_v: M L^2 T^-3 I^-1, instant_off_potential_v: M L^2 T^-3 I^-1, native_potential_v: M L^2 T^-3 I^-1, depolarized_potential_v: M L^2 T^-3 I^-1, criterion_v: M L^2 T^-3 I^-1, polarization_criterion_mv: M L^2 T^-3 I^-1 } out: { ir_drop_mv: M L^2 T^-3 I^-1, formation_mv: M L^2 T^-3 I^-1, decay_mv: M L^2 T^-3 I^-1, absolute_margin_mv: M L^2 T^-3 I^-1, decay_from_on_mv: M L^2 T^-3 I^-1 }
 export function computePolarizationDecayCriterion({ on_potential_v = 0, instant_off_potential_v = 0, native_potential_v = 0, depolarized_potential_v = 0, criterion_v = 0, polarization_criterion_mv = 0 } = {}) {
   const guard = _finiteGuard(arguments[0]); if (guard) return { error: guard.error };
+  // Unit / range guard added 2026-09-26 after printed-example probing.
+  if (["on_potential_v", "instant_off_potential_v", "native_potential_v", "depolarized_potential_v", "criterion_v"].some((k) => Math.abs(Number(arguments[0]?.[k])) > 5)) return { error: "Enter potentials in volts (-0.850), not millivolts." };
   if (!(on_potential_v < 0) || !(instant_off_potential_v < 0) || !(native_potential_v < 0) || !(depolarized_potential_v < 0) || !(criterion_v < 0)) {
     return { error: "Pipe-to-soil potentials are negative against a copper-copper sulfate reference; enter them with their sign." };
   }
@@ -880,6 +894,8 @@ CORROSION_RENDERERS["polarization-decay-criterion"] = _simpleRenderer({
 // dims: in { hole_diameter_in: L, hole_depth_ft: L, anode_diameter_in: L, anode_length_ft: L, anode_count: dimensionless, backfill_density_pcf: M L^-3, bag_weight_lb: M, waste_pct: dimensionless, soil_resistivity_ohm_cm: M L^3 T^-3 I^-2 } out: { column_ft3: L^3, anode_ft3: L^3, backfill_ft3_per_anode: L^3, backfill_lb_per_anode: M, bed_backfill_ft3: L^3, bed_backfill_lb: M, bag_count: dimensionless }
 export function computeCokeBreezeBackfill({ hole_diameter_in = 0, hole_depth_ft = 0, anode_diameter_in = 0, anode_length_ft = 0, anode_count = 0, backfill_density_pcf = 0, bag_weight_lb = 0, waste_pct = 0, soil_resistivity_ohm_cm = 0 } = {}) {
   const guard = _finiteGuard(arguments[0]); if (guard) return { error: guard.error };
+  // Unit / range guard added 2026-09-26 after printed-example probing.
+  if (!Number.isInteger(Number(arguments[0]?.anode_count))) return { error: "The anode count must be a whole number." };
   if (!(hole_diameter_in > 0) || !(hole_depth_ft > 0)) return { error: "Hole diameter and depth must be positive." };
   if (!(anode_diameter_in > 0) || !(anode_length_ft > 0)) return { error: "Anode diameter and length must be positive." };
   if (!(anode_diameter_in < hole_diameter_in)) return { error: "The anode must be narrower than the hole it sits in." };

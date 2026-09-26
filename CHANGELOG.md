@@ -6,12 +6,35 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Added
 
+- **`rope-safety-factor` takes the roping ratio.** ASME A17.1 2.20.3 counts N as twice the rope count on 2:1 roping; without the input the tile read half the factor of safety on every 2:1 installation.
+- **`cp-rectifier-sizing` takes the structure-to-electrolyte resistance.** TM 5-811-7 / UFC 3-570-02A adds Rc to the circuit; its example (RT 1.75 ohms, 6.2 V) now reproduces. Rc defaults to 0, so earlier results are unchanged.
+- **`hoistway-venting` takes the closer force, the knob position and the number of cars.** See Fixed.
+
 - **`foundation-waterproofing-takeoff` takes a number of coats.** Data-sheet coverage is per coat; W.R. Meadows Sealmastic's brush grade is applied in two. Without the input, a two-coat job ordered half the product.
 - **`walk-in-cooler-load` reports the equipment capacity at the run time.** The box load it returned is a 24-hr average. Copeland AE103 and Heatcraft size the equipment on a 16 hr run for a 35 F room without a defrost timer, or 18 hr with one. The new output is load x 24 / run hours; Copeland's sample prints 939,039 Btu/day -> 58,690 Btu/hr at 16 hr.
 - **`economizer-enthalpy-changeover` has the ASHRAE 90.1-2013+ control: differential enthalpy with a fixed dry-bulb limit.** Plain differential enthalpy left 90.1's prescriptive table in 2013. The new mode also locks out a hot, dry day whose enthalpy is below the return: 24 Btu/lb at 80 F against a 75 F limit (Trane Engineers Newsletter 44-2).
 - **`stadia-distance` takes the stadia constant C of an external-focusing instrument.** H gains C cos(theta) and V gains C sin(theta). The NAVEDTRA 14070 example (C = 1.0) now reproduces exactly: 692.34 ft, 326.28 ft, elevation 705.98. C defaults to 0, so internal-focusing results are unchanged.
 
 ### Fixed
+
+- **`buffer-stroke-speed` sizes the stroke on 115% of the rated speed, as A17.1 2.22.4.1.1 does.** It used the governor tripping speed, which at 500 fpm can reach 625 fpm and demanded 20.2 in against the code's 17. The requirement now matches Table 2.22.4.1 to the quarter inch (500 fpm -> 17.00 in, 200 fpm -> 2.75 in). A buffer exactly at the table value no longer reads SHORT. The stroke a strike at the governor trip would take is still shown.
+- **`hoistway-venting` door force is felt at the knob, on top of the closer.** The tile compared the whole pressure force at the door's center to the opening-force limit, with no closer and no lever arm. It now uses the NFPA 92 relation F = Fdc + A dP W / (2 (W - d)); Klote's table value (36 in door, 6 lbf closer, 30 lbf limit -> 0.40 in wg) reproduces. The vent area is at least 3 sq ft per car, the floor in the legacy IBC rule.
+- **`brewhouse-efficiency` refuses more than 100%.** A ppg typed as a gravity (1.037) read 2,587% efficiency, and an OG typed in points (38) read 70,588%.
+- **`carbonation-volumes-pressure` refuses a target the beer holds with the vent open.** It used to report a negative gauge pressure.
+- **`anode-bed-resistance` refuses a spacing where Sunde's relation breaks down.** At 1 ft spacing a 10-anode bed read worse than a single anode.
+- **Code values replace the example defaults that were not code values:**
+  - governor maximum trip at 500 fpm: 625 fpm (A17.1 Table 2.18.2.1), not 690
+  - door kinetic energy: 7.37 ft-lbf (10 J, A17.1 2.13.4.2.1), not 7.0
+  - guide-rail allowable stress: 15,000 psi (A17.1 2.23.5.1.1), not 22,000
+- **Unit and range guards found by probing.** Each of these used to return nonsense silently:
+  - brewing: alpha acid, viability, boil-off rate, peak-day share, ABV, recovery and hearts share typed as fractions; a boil gravity in points; a slurry count in billions; a tun diameter in inches; a tun temperature of -400 F
+  - elevator: speeds in m/s; retardation in ft/s2; overbalance, duty cycle and vent fraction as fractions; a plunger bore in mm; a modulus in ksi; a door speed in in/s; a step-chain incline in radians or a friction coefficient of 3
+  - corrosion: potentials in mV; steel resistivity in micro-ohm-cm; fractional anode and reading counts
+- **Labels now say what the number is:**
+  - Traction and escalator power is before the drive efficiency.
+  - The step-chain load is the passenger load; the step band balances between its runs.
+  - Sparge first runnings are measured before the tun deadspace.
+  - The rope tile's code-minimum field names the A17.1 speed row its 7.6 default comes from.
 
 - **`shaft-alignment-reverse-dial` moves the feet the right way.** Plane B's offset kept the sign of the reading, and the foot moves were not negated, so the tile could say "raise" where the feet had to come down. The planes are now labeled by which shaft carries the indicator. Rexnord 538-214's example (-0.020 / +0.010 in, planes 10-1/2 in apart) now reproduces: raise the front feet 3.8 mils and the rear feet 1.3 mils.
 - **`train-brake-reduction` stops at the equalization point.** The full-service point used to be a fixed 26 psi at any charge, so a 70 psi or 30 psi brake pipe still showed 65 psi in the cylinder. It is now the charge / (1 + cylinder ratio): a 90 psi charge and a 2.5 ratio equalize at 64 psi, the figure the air-brake texts print.
@@ -170,6 +193,13 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 - **`calc-agriculture.js` size cap raised from 64,000 to 66,000 bytes gzipped.** The irrigation and livestock corrections took it to 64,110 B (100.2%).
 - **`calc-electrical.js` size cap raised from 104,000 to 106,000 bytes gzipped.** The battery-vent and capacitor corrections took it to 104,063 B (100.1%). Splitting the module per bench is still the preferred fix.
+- **Twenty-two more tiles now carry a publisher's printed example.**
+  - **Brewing:** `mash-strike-water`, `brewhouse-efficiency`, `ibu-tinseth` and `mash-tun-grain-bed` (Palmer, How to Brew); `sparge-water-volume` and `kettle-boil-off` (Brew Your Own); `beer-color-srm` (Beer Maverick); `yeast-pitch-rate` (Colorado Brewers Guild); `carbonation-volumes-pressure` (Brewers Association / ASBC table); `proof-gallon-yield` (TTB).
+  - **Elevator:** `buffer-stroke-speed` (A17.1 Table 2.22.4.1, both 500 and 200 fpm rows), `counterweight-balance` (Elevator World), `traction-roping-ratio` and `step-chain-tension` (Al-Sharif), `hoistway-venting` (Budnick and Klote).
+  - **Cathodic protection:** `anode-bed-resistance`, `cp-rectifier-sizing`, `coating-breakdown-factor` and `coke-breeze-backfill` (UFC 3-570-02A / TM 5-811-7), `corrosion-rate-weight-loss` (EMT), `galvanic-area-ratio` (KFUPM), `ac-induced-voltage-pipeline` (AUCSC 2012).
+
+  README: 894 of 2,183 tiles are checked only against the project's own derivation (739 of them first-principles); 1,289 carry an outside source.
+
 - **Ten more tiles now carry a publisher's printed example.**
   - **Blasting and aggregate:** `blast-powder-factor` (OSMRE Module 3), `blast-scaled-distance-ppv` and `blast-burden-spacing` (PA DEP Blaster's License Training Manual), `crusher-reduction-ratio` (Metso Crushing and Screening Handbook 7th ed.), `dust-collector-air-to-cloth` (EPA APTI Lesson 5).
   - **Track:** `degree-of-curve` (US Army TR0671), `turnout-frog-lead` (SCRRA Standard 2800).
