@@ -1139,6 +1139,8 @@ HVACSERVICE_RENDERERS["oil-burner-firing-rate"] = _simpleRenderer({
 export function computeFlueGasDewPoint({ excess_air_pct = 15 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(excess_air_pct >= 0)) return { error: "Excess air cannot be negative (percent)." };
+  // Past a few hundred percent the dew point falls below the Antoine fit's range (it returned -72 F at 1,000,000%).
+  if (excess_air_pct > 400) return { error: "Excess air above 400% is outside this dew-point model (check that you entered excess air, not ppm)." };
   // Methane combustion: CH4 + 2(O2+3.76 N2) -> CO2 + 2 H2O + 7.52 N2. Wet moles = 1 + 9.52*lambda; H2O = 2.
   const lambda = 1 + excess_air_pct / 100;
   const water_fraction = 2 / (1 + 9.52 * lambda);
@@ -1160,7 +1162,7 @@ HVACSERVICE_RENDERERS["flue-gas-dew-point"] = _simpleRenderer({
   citation: "Citation: natural-gas flue-gas water dew point, by name. Methane stoichiometry (CH4 -> 2 H2O; wet moles 1 + 9.52*lambda) gives the water fraction; its partial pressure into the Antoine saturation relation (water, NIST) gives the dew point (~134 F at 15% excess air). Non-condensing appliances must keep flue gas above it or the vent corrodes. The appliance listing, the vent-sizing tables (NFPA 54), and the AHJ govern.",
   example: flueGasDewPointExample.inputs,
   fields: [
-    { key: "excess_air_pct", label: "Excess air (%)", kind: "number" },
+    { key: "excess_air_pct", label: "Excess air (%, not flue O2: 5% O2 is about 28% excess air)", kind: "number" },
   ],
   outputs: [
     { key: "w", id: "fgd-out-w", label: "Flue-gas water vapor", value: (r) => fmt(r.water_vapor_pct, 1) + " %" },
@@ -1185,7 +1187,7 @@ export function computeCondensingFlueCondensate({ input_btu_hr = 100000, water_l
   return {
     water_produced_lb_hr,
     condensate_gph,
-    note: "The condensate a high-efficiency condensing furnace, boiler, or water heater drains -- the number that sizes the drain, the condensate pump, and the neutralizer. Burning natural gas MAKES water (CH4 + 2 O2 -> CO2 + 2 H2O), about 9.4 lb of water per therm (100,000 BTU) of gas: a 100,000 BTU/hr appliance produces roughly 9.4 lb of water vapor an hour. A condensing appliance cools the flue gas below its dew point (see flue-gas-dew-point) to recover the water's latent heat, condensing a large fraction of that vapor -- typically about 0.8-0.9 at design return-water temperatures. So the drained condensate is the water produced times the condensing fraction, converted to gallons at 8.34 lb/gal: 9.4 x 0.85 / 8.34 is about 0.96 gph, so a 100,000 BTU/hr unit drains roughly a gallon an hour, and a 150,000 BTU/hr boiler about 1.5 gph. The condensate is mildly acidic (carbonic acid, pH ~3-5), so codes increasingly require a limestone/marble neutralizer before it enters cast-iron or copper drains or a septic system, and the drain must be trapped, pitched, and freeze-protected. The 9.4 lb/therm depends on the actual gas composition, and the condensing fraction on the return-water temperature (lower return = more condensate). A sizing aid; the appliance's rated condensate output, the local plumbing code (drain, trap, neutralizer), and the manufacturer's instructions govern.",
+    note: "The condensate a high-efficiency condensing furnace, boiler, or water heater drains -- the number that sizes the drain, the condensate pump, and the neutralizer. Burning natural gas MAKES water (CH4 + 2 O2 -> CO2 + 2 H2O), about 9.4 lb of water per therm (100,000 BTU) of gas: a 100,000 BTU/hr appliance produces roughly 9.4 lb of water vapor an hour. A condensing appliance cools the flue gas below its dew point (see flue-gas-dew-point) to recover the water's latent heat, condensing a fraction of that vapor that depends strongly on the return-water temperature -- high (roughly 0.8-0.9) only at low return temperatures, and much less at a 120-140 F return (Hamilton Engineering prints about 1.1 gph per 100,000 Btu at full condensing). So the drained condensate is the water produced times the condensing fraction, converted to gallons at 8.34 lb/gal: 9.4 x 0.85 / 8.34 is about 0.96 gph, so a 100,000 BTU/hr unit drains roughly a gallon an hour, and a 150,000 BTU/hr boiler about 1.5 gph. The condensate is mildly acidic (carbonic acid, pH ~3-5), so codes increasingly require a limestone/marble neutralizer before it enters cast-iron or copper drains or a septic system, and the drain must be trapped, pitched, and freeze-protected. The 9.4 lb/therm depends on the actual gas composition, and the condensing fraction on the return-water temperature (lower return = more condensate). A sizing aid; the appliance's rated condensate output, the local plumbing code (drain, trap, neutralizer), and the manufacturer's instructions govern.",
   };
 }
 

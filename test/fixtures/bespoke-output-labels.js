@@ -747,7 +747,7 @@ export const BESPOKE_OUTPUT_LABELS = {
   "rental-total-return": {"total_usd":"Total first-year return","cf_pct":"Components (of cash invested)","note":"Note"},
   "rental-worksheet": {"gross_rent_annual":"Gross rent (annual)","effective_gross_income":"Effective gross income (gross - vacancy + other)","total_expenses":"Total expenses (Schedule E lines 5-19)","NOI":"NOI (EGI - operating expenses; excludes interest and depreciation)","taxable_rental_income":"Taxable rental income (EGI - all expenses - depreciation)","cap_rate_pct":"Cap rate (NOI / property value)","cash_on_cash_pct":"Cash-on-cash ((NOI - interest) / cash invested; before principal)","expense_ratio_pct":"Expense ratio (operating expenses / EGI)","grm":"Gross rent multiplier (value / annual gross rent)","value_at_market_grm":"Value at market GRM (market GRM x gross rent)"},
   "reorder-point": {"safety_stock":"Safety stock","reorder_point":"Reorder point","note":"Note"},
-  "required-face-rent": {"face_rent":"Required face rent","paid":"Total paid over term","discount_pct":"Face sits above effective by","note":"Note"},
+  "required-face-rent": {"face_rent":"Required face rent","paid":"Total paid over term","discount_pct":"Effective rent below face by","note":"Note"},
   "required-fire-flow": {"needed_fire_flow_gpm":"Needed fire flow (ISO)","base_C_gpm":"Base C"},
   "residential-framing": {"stud_count":"Studs (count + bf)","plate_lf":"Plates (linear ft + bf)","joist_count":"Joists (count + bf)","rafter_count":"Rafters (count + bf)","total_bf":"Total board feet"},
   "restrained-pipe-length": {"length_each_side_ft":"Restrained length each side","thrust_lb":"Thrust at the bend"},

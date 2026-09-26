@@ -2681,6 +2681,8 @@ export function computeMaxOffer70Rule({ arv = 0, repairs = 0, rule_pct = 70, fee
   if (!(a > 0)) return { error: "Enter a positive after-repair value (ARV)." };
   if (!(r >= 0)) return { error: "Repairs must be zero or positive." };
   if (!(pct > 0 && pct <= 100)) return { error: "Rule percentage must be between 0 and 100." };
+  // A fraction (0.7) used to price the max offer at 0.7% of ARV and read "no deal".
+  if (pct < 1) return { error: "Enter the rule percentage as a percent (70 for 70%), not a fraction." };
   if (!(f >= 0)) return { error: "Wholesale fee must be zero or positive." };
   const mao = a * (pct / 100) - r - f;
   if (!Number.isFinite(mao)) return { error: "Maximum offer is not valid." };
@@ -2725,6 +2727,7 @@ export function computeFixFlipProfit({ arv_usd = 0, purchase_usd = 0, rehab_usd 
   if (!(arv > 0)) return { error: "After-repair value must be positive (USD)." };
   if (!(cash > 0)) return { error: "Cash invested must be positive (USD)." };
   if (!(months > 0)) return { error: "Hold period must be positive (months)." };
+  if ([purchase_usd, rehab_usd, holding_usd, financing_usd, selling_pct].some((v) => Number(v) < 0)) return { error: "Costs and the selling percent cannot be negative." };
   const selling_usd = arv * (Number(selling_pct) || 0) / 100;
   const all_in_usd = (Number(purchase_usd) || 0) + (Number(rehab_usd) || 0) + (Number(holding_usd) || 0) + (Number(financing_usd) || 0) + selling_usd;
   const profit_usd = arv - all_in_usd;
@@ -2777,6 +2780,7 @@ export function computeBrrrrRefi({ arv_usd = 0, total_invested_usd = 0, refi_ltv
   if (!(arv > 0)) return { error: "After-repair value must be positive (USD)." };
   if (!(invested > 0)) return { error: "Total invested must be positive (USD)." };
   if (!(ltv > 0 && ltv <= 100)) return { error: "Refinance LTV must be between 0 and 100%." };
+  if (ltv < 1) return { error: "Enter the refinance LTV as a percent (75 for 75%), not a fraction." };
   if (payoff < 0) return { error: "Existing payoff must be non-negative (USD)." };
   const new_loan_usd = arv * ltv / 100;
   const cash_returned_usd = new_loan_usd - payoff;
@@ -2926,7 +2930,7 @@ export function computeRequiredFaceRent({ target_ner = 0, term_periods = 0, free
   if (![face_rent, paid, discount_pct].every(Number.isFinite)) return { error: "Required-face-rent math is not a finite value." };
   return {
     face_rent, paid, discount_pct,
-    note: "The inverse of net effective rent: the FACE (quoted) rent a landlord must ask to still net a target effective rate after giving free rent and a one-time TI/concession credit. face = (target_NER x term + one_time_credit) / (term - free_periods); the quoted rate then sits discount = (1 - NER/face) x 100 above the effective rate. Giving more free months or a larger credit forces a higher face to hold the same net - the mechanic behind why concession-heavy markets quote inflated face rents. A straight-line (undiscounted) spread, the common broker convention, not a present-value rent; escalations and expense pass-throughs change the picture. A pricing aid, not lease terms; the executed lease governs.",
+    note: "The inverse of net effective rent: the FACE (quoted) rent a landlord must ask to still net a target effective rate after giving free rent and a one-time TI/concession credit. face = (target_NER x term + one_time_credit) / (term - free_periods); the effective rate then sits discount = (1 - NER/face) x 100, the percent the effective rate sits BELOW the quoted face (the face is face/NER - 1 above it: $36 vs $30 is 16.7% below, 20% above). Giving more free months or a larger credit forces a higher face to hold the same net - the mechanic behind why concession-heavy markets quote inflated face rents. A straight-line (undiscounted) spread, the common broker convention, not a present-value rent; escalations and expense pass-throughs change the picture. A pricing aid, not lease terms; the executed lease governs.",
   };
 }
 export const requiredFaceRentExample = { inputs: { target_ner: 30, term_periods: 120, free_periods: 20, one_time_credit: 0 } };
@@ -2940,7 +2944,7 @@ function renderRequiredFaceRent(inputRegion, outputRegion, citationEl) {
   attachExampleButton(inputRegion, () => { ner.input.value = "30"; term.input.value = "120"; free.input.value = "20"; credit.input.value = "0"; update(); });
   const oFace = makeOutputLine(outputRegion, "Required face rent", "rfr-out-face");
   const oPaid = makeOutputLine(outputRegion, "Total paid over term", "rfr-out-paid");
-  const oDisc = makeOutputLine(outputRegion, "Face sits above effective by", "rfr-out-disc");
+  const oDisc = makeOutputLine(outputRegion, "Effective rent below face by", "rfr-out-disc");
   const oNote = makeOutputLine(outputRegion, "Note", "rfr-out-n");
   function readNum(x) { if (x.value === "") return 0; const n = Number(x.value); return Number.isFinite(n) ? n : 0; }
   const update = debounce(() => {
@@ -2948,7 +2952,7 @@ function renderRequiredFaceRent(inputRegion, outputRegion, citationEl) {
     if (r.error) { oFace.textContent = r.error; oPaid.textContent = "-"; oDisc.textContent = "-"; oNote.textContent = ""; return; }
     oFace.textContent = "$" + fmt(r.face_rent, 2) + " per period";
     oPaid.textContent = "$" + fmt(r.paid, 2);
-    oDisc.textContent = fmt(r.discount_pct, 1) + "% above effective";
+    oDisc.textContent = fmt(r.discount_pct, 1) + "% below face (face is " + fmt((1 / (1 - r.discount_pct / 100) - 1) * 100, 1) + "% above effective)";
     oNote.textContent = r.note;
   }, DEBOUNCE_MS);
   for (const f of [ner, term, free, credit]) f.input.addEventListener("input", update);

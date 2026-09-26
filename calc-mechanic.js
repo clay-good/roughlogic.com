@@ -2654,7 +2654,7 @@ export function computeAlternatorChargingLoad({ total_load_a = 0, alternator_a =
   return {
     idle_out_a, cruise_out_a, idle_balance_a, cruise_balance_a,
     idle_ok: idle_balance_a >= 0, cruise_ok: cruise_balance_a >= 0,
-    note: "Alternator charging load balance: an alternator makes only a fraction of its rated output at engine idle (roughly 50%) and most of it at cruise (roughly 90%). The balance = output - total continuous load: a negative idle balance means the battery drains at idle or a stoplight (accessories, lights, blower, and the charging deficit come from the battery), while a positive cruise balance means it recharges on the road. If the idle balance is negative and matters (lots of idling, a stereo, a winch), step up the alternator or reduce the load. A screening aid; the alternator's actual output curve and the real duty cycle govern.",
+    note: "Alternator charging load balance: an alternator makes only a fraction of its rated output at engine idle (roughly 50% for a stock unit; it depends on the model and pulley ratio -- Balmar rates its XT-170 / 250 at about 75% at idle) and most of it at cruise (roughly 90%). The balance = output - total continuous load: a negative idle balance means the battery drains at idle or a stoplight (accessories, lights, blower, and the charging deficit come from the battery), while a positive cruise balance means it recharges on the road. If the idle balance is negative and matters (lots of idling, a stereo, a winch), step up the alternator or reduce the load. A screening aid; the alternator's actual output curve and the real duty cycle govern.",
   };
 }
 export const alternatorChargingLoadExample = { inputs: { total_load_a: 65, alternator_a: 120, idle_frac: 0.5, cruise_frac: 0.9 } };
@@ -3847,7 +3847,7 @@ MECHANIC_RENDERERS["sailboat-performance-ratios"] = _simpleRenderer({
   fields: [
     { key: "sail_area_sqft", label: "Sail area (sq ft)", kind: "number" },
     { key: "displacement_lb", label: "Displacement (lb)", kind: "number" },
-    { key: "lwl_ft", label: "Waterline length LWL (ft)", kind: "number" },
+    { key: "lwl_ft", label: "Waterline length LWL (decimal ft: 26 ft 7 in is 26.58)", kind: "number" },
   ],
   outputs: [
     { key: "s", id: "spr-out-s", label: "Sail area / displacement", value: (r) => fmt(r.sa_d_ratio, 1) + " (" + r.sa_d_class + ")" },

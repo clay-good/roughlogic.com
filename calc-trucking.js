@@ -1763,6 +1763,8 @@ export function computeInvoiceFactoringCost({ invoice_usd = 0, advance_pct = 90,
   if (!(inv > 0)) return { error: "Invoice amount must be positive (USD)." };
   if (!(adv > 0 && adv <= 100)) return { error: "Advance rate must be between 0 and 100%." };
   if (fee < 0) return { error: "Factoring fee must be non-negative (%)." };
+  if (adv < 1) return { error: "Enter the advance rate as a percent (90 for 90%), not a fraction." };
+  if (adv + fee > 100) return { error: "The advance plus the fee exceed the invoice (no reserve can be left)." };
   if (!(days > 0)) return { error: "Days to pay must be positive." };
   const advance_usd = inv * adv / 100;
   const fee_usd = inv * fee / 100;
@@ -1856,6 +1858,9 @@ export function computeDefConsumption({ diesel_gal = 0, trip_miles = 0, mpg = 0,
   const dose = Number(dose_pct) || 0;
   const tank = Number(def_tank_gal) || 0;
   if (!(dose > 0)) return { error: "DEF dose rate must be positive (percent)." };
+  // Percent, 1-10: a fraction (0.025) used to report a 338,000 mile range; 250% passed; a negative diesel fell back silently.
+  if (dose < 0.5 || dose > 15) return { error: "Enter the DEF dose as a percent of diesel (2-5), not a fraction." };
+  if (Number(diesel_gal) < 0) return { error: "Diesel gallons cannot be negative." };
   if (!(tank > 0)) return { error: "DEF tank size must be positive (gal)." };
   let diesel_gal_used;
   if (dsl > 0) {
@@ -1871,19 +1876,19 @@ export function computeDefConsumption({ diesel_gal = 0, trip_miles = 0, mpg = 0,
   if (![diesel_gal_used, def_used_gal, diesel_per_def_gal].every(Number.isFinite)) return { error: "DEF-consumption math is not a finite value." };
   return {
     diesel_gal_used, def_used_gal, diesel_per_def_gal, range_mi,
-    note: "DEF consumption and range: diesel exhaust fluid is metered into the SCR aftertreatment at only about 2 to 3% of the diesel consumed, so a DEF tank spans SEVERAL diesel fills -- def_used = diesel x dose/100, and a full DEF tank covers diesel = def_tank / (dose/100), which at the truck's mpg is the range on one DEF fill. Plan DEF per fuel stop and you either haul jugs you do not need or run it dry -- and running DEF empty forces an ECU derate to roughly a 5 mph limp-home, non-negotiable, until refilled. DEF freezes at about 12 F (the SCR system thaws it in service). The actual dose rate varies with engine, load, and duty cycle; a hard-pulling truck doses higher and pulls the refill forward. A planning estimate, not the truck's metered rate; the OEM and DEF quality govern.",
+    note: "DEF consumption and range: diesel exhaust fluid is metered into the SCR aftertreatment at only about 2 to 3% of the diesel consumed on-highway (Cummins prints 3 to 5% for Tier 4 Final off-highway engines), so a DEF tank spans SEVERAL diesel fills -- def_used = diesel x dose/100, and a full DEF tank covers diesel = def_tank / (dose/100), which at the truck's mpg is the range on one DEF fill. Plan DEF per fuel stop and you either haul jugs you do not need or run it dry -- and running DEF empty forces an ECU derate to roughly a 5 mph limp-home, non-negotiable, until refilled. DEF freezes at about 12 F (the SCR system thaws it in service). The actual dose rate varies with engine, load, and duty cycle; a hard-pulling truck doses higher and pulls the refill forward. A planning estimate, not the truck's metered rate; the OEM and DEF quality govern.",
   };
 }
 export const defConsumptionExample = { inputs: { diesel_gal: 200, trip_miles: 0, mpg: 6.5, dose_pct: 2.5, def_tank_gal: 13 } };
 
 TRUCKING_RENDERERS["def-consumption"] = _simpleRenderer({
-  citation: "Citation: DEF consumption and range model (SCR aftertreatment; ISO 22241 DEF spec): def_used = diesel x dose/100; diesel per DEF tank = def_tank / (dose/100); range = diesel_per_def x mpg. DEF runs at about 2 to 3% of diesel, so a DEF tank spans several fuel fills; running it empty forces an ECU derate to ~5 mph. DEF freezes at ~12 F. A planning estimate; the OEM and DEF quality govern.",
+  citation: "Citation: DEF consumption and range model (SCR aftertreatment; ISO 22241 DEF spec): def_used = diesel x dose/100; diesel per DEF tank = def_tank / (dose/100); range = diesel_per_def x mpg. DEF runs at about 2 to 3% of diesel on-highway (3 to 5% off-highway, Cummins), so a DEF tank spans several fuel fills; running it empty forces an ECU derate to ~5 mph. DEF freezes at ~12 F. A planning estimate; the OEM and DEF quality govern.",
   example: defConsumptionExample.inputs,
   fields: [
     { key: "diesel_gal", label: "Diesel consumed (gal, 0 = derive from miles/mpg)", kind: "number" },
     { key: "trip_miles", label: "Trip distance (mi, used if diesel is 0)", kind: "number" },
     { key: "mpg", label: "Fuel economy (mpg, for range)", kind: "number" },
-    { key: "dose_pct", label: "DEF dose (% of diesel, ~2-3)", kind: "number" },
+    { key: "dose_pct", label: "DEF dose (% of diesel; ~2-3 on-highway, 3-5 off-highway)", kind: "number" },
     { key: "def_tank_gal", label: "DEF tank size (gal)", kind: "number" },
   ],
   outputs: [

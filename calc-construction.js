@@ -8573,6 +8573,8 @@ export function computeAdaRampSlope({ rise_in = 0, slope_ratio = 12, landing_in 
   if (!(rise > 0)) return { error: "Rise must be positive (in)." };
   if (!(ratio >= 12)) return { error: "Slope ratio (run:rise) must be at least 12 (a 1:12 maximum; steeper is not accessible)." };
   if (!(landing > 0)) return { error: "Landing length must be positive (in)." };
+  // ADA 405.7.3: an intermediate landing is at least 60 in long; until 2026-09-26 a 30 in landing passed silently.
+  if (landing < 60) return { error: "ADA 405.7.3 requires a landing at least 60 in long." };
   const run_in = rise * ratio;
   const slope_pct = 100 / ratio;
   const runs = Math.ceil(rise / 30);

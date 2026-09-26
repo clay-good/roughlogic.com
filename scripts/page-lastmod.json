@@ -2,7 +2,7 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "ccb7180666a470ed",
+      "sha": "f30a34f9cb55bfbf",
       "date": "2026-09-26"
     },
     "/tools/": {
@@ -1630,8 +1630,8 @@
       "date": "2026-09-08"
     },
     "/tools/condensing-flue-condensate/": {
-      "sha": "176e799a3e047a36",
-      "date": "2026-09-08"
+      "sha": "315d4f72c764f75d",
+      "date": "2026-09-26"
     },
     "/tools/conductivity-from-tds/": {
       "sha": "48a397f8e73b2de5",
@@ -2054,8 +2054,8 @@
       "date": "2026-09-01"
     },
     "/tools/def-consumption/": {
-      "sha": "4d8f98e5a53c4dcc",
-      "date": "2026-09-01"
+      "sha": "9fff5cbc423a07e9",
+      "date": "2026-09-26"
     },
     "/tools/defensible-space/": {
       "sha": "ac9a9b7309e5e571",
@@ -3030,8 +3030,8 @@
       "date": "2026-09-01"
     },
     "/tools/flue-gas-dew-point/": {
-      "sha": "564b45bb36ec2cdc",
-      "date": "2026-09-04"
+      "sha": "dedbc827f2ab6cba",
+      "date": "2026-09-26"
     },
     "/tools/fluoride-feed-dose/": {
       "sha": "f77e0eb73bd34232",
@@ -3950,8 +3950,8 @@
       "date": "2026-09-01"
     },
     "/tools/irrigation-zone-runtime/": {
-      "sha": "111f67da7bbb6109",
-      "date": "2026-09-01"
+      "sha": "cf59d2db278d171c",
+      "date": "2026-09-26"
     },
     "/tools/irs-form-index/": {
       "sha": "6b81d2e32627d7c3",
@@ -6146,8 +6146,8 @@
       "date": "2026-09-19"
     },
     "/tools/required-face-rent/": {
-      "sha": "57b2ae07b6f1b844",
-      "date": "2026-09-01"
+      "sha": "d481b7c8e6ad01c4",
+      "date": "2026-09-26"
     },
     "/tools/required-fire-flow/": {
       "sha": "315f69eea260cf9c",
@@ -6406,8 +6406,8 @@
       "date": "2026-09-19"
     },
     "/tools/sailboat-performance-ratios/": {
-      "sha": "b5f0343100022e17",
-      "date": "2026-09-01"
+      "sha": "adeae691fcb6d37b",
+      "date": "2026-09-26"
     },
     "/tools/sales-tax/": {
       "sha": "b6a6f9bffac04d93",

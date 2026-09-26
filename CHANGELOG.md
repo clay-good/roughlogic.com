@@ -13,6 +13,23 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **`irrigation-zone-runtime` uses the Irrigation Association run-time multiplier its citation names.** The IA Recommended Audit Guidelines (2009, Eq. 3-11) give RTM = 1 / (0.4 + 0.6 x DU_LQ), which is 1.18 at DU 0.75. The tile divided by DU (1.33), over-watering by about 13% while crediting IA. The example's gross runtime goes from 50 to 44.1 minutes.
+- **`required-face-rent` says which way the discount runs.** The effective rent sits 16.7% below a $36 face; the face is 20% above a $30 effective rent. The tile had called the 16.7% "above".
+- **More input guards found by probing each tile.** Each of these was accepted before and returned a nonsense result:
+  - 70% rule, BRRRR LTV and factoring advance entered as fractions
+  - fix-and-flip negative costs
+  - a factoring advance plus fee over 100%
+  - DEF dose entered as a fraction, or over 15%
+  - livestock dry matter or intake entered as fractions, or 0 head
+  - a drip zone too short for one emitter
+  - an ADA landing under 60 in
+  - flue excess air above 400%
+- **Prose corrected against printed sources:**
+  - DEF runs 3-5% off-highway (Cummins), not only 2-3%.
+  - The condensate fraction depends on return temperature (Hamilton Engineering prints about 1.1 gph per 100,000 Btu at full condensing).
+  - Flue dew point asks for excess air, not O2.
+  - Alternator idle output varies by model (Balmar XT about 75%).
+  - Sailboat LWL takes decimal feet.
 - **`wip-percent-complete` flags a loss contract.** When the estimated cost exceeds the contract, GAAP books the whole projected loss now. The tile used to show an ordinary under- or overbilling and never mention the loss. A cost past the estimate is flagged as a stale estimate.
 - **`rental-total-return` returns every component as a percent.** The cash-flow, paydown, appreciation and tax keys ended in `_pct` but held fractions (0.06 for 6%).
 - **Percent-versus-fraction guards on the finance tiles.** Each of these used to return a nonsense result with no warning:
@@ -93,7 +110,15 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Changed
 
+- **`calc-agriculture.js` size cap raised from 64,000 to 66,000 bytes gzipped.** The irrigation and livestock corrections took it to 64,110 B (100.2%).
 - **`calc-electrical.js` size cap raised from 104,000 to 106,000 bytes gzipped.** The battery-vent and capacitor corrections took it to 104,063 B (100.1%). Splitting the module per bench is still the preferred fix.
+- **Thirteen more tiles now carry a publisher's printed example.**
+  - **Investing and trucking:** `max-offer-70-rule` (Lima One), `fix-flip-profit` (Kayak Capital), `required-face-rent` (Wall Street Prep, in reverse), `detention-demurrage-billing` (OTR Solutions), `invoice-factoring-cost` (eCapital).
+  - **Landscape and agriculture:** `irrigation-zone-runtime` (UF/IFAS), `drip-zone-flow` (UNL G1739), `plant-spacing-count` (UGA B-931), `livestock-dry-matter-intake` (UNL Beef).
+  - **Buildings and vehicles:** `ada-ramp-slope` (1991 ADAAG Fig. 16), `condensing-flue-condensate` (Hamilton Engineering, DOE Tip Sheet 26A), `def-consumption` (Cummins), `sailboat-performance-ratios` (Sailing Magazine).
+
+  README: 952 of 2,183 tiles are checked only against the project's own derivation; 1,231 carry an outside source.
+
 - **Fourteen more tiles now carry a publisher's printed example.**
   - **Real-estate finance:** `debt-yield`, `break-even-occupancy` and `net-effective-rent` (Wall Street Prep), `commercial-load-factor` (CARR), `blended-mortgage-rate` (CFI).
   - **Engines:** `injector-size` (Summit Racing), `injector-max-hp` (Holley), `trap-speed-horsepower` and `et-horsepower` (Hale, via Stealth 316), `max-rpm-from-piston-speed` (CarTech).

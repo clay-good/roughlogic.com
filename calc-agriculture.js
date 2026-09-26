@@ -2449,17 +2449,21 @@ export function computeIrrigationZoneRuntime({ target_in = 0, precip_in_hr = 0, 
   if (!(max_cycle_min > 0)) return { error: "Maximum cycle length must be positive (min)." };
   if (!(du > 0 && du <= 1)) return { error: "Distribution uniformity must be in (0, 1]." };
   const net_min = target_in / precip_in_hr * 60;
-  const gross_min = net_min / du;
+  // Irrigation Association Recommended Audit Guidelines (2009) Eq. 3-11: the scheduling (run-time) multiplier is
+  // RTM = 1 / (0.4 + 0.6 DU_LQ), 1.18 at DU 0.75 (Table 3-8). Until 2026-09-26 the tile divided by DU (1.33 at 0.75)
+  // while crediting IA, over-watering by about 13% at that DU.
+  const rtm = 1 / (0.4 + 0.6 * du);
+  const gross_min = net_min * rtm;
   const cycles = Math.ceil(gross_min / max_cycle_min);
   const per_cycle_min = gross_min / cycles;
   return {
-    net_min, gross_min, cycles, per_cycle_min,
-    note: "Net runtime = target depth / precipitation rate x 60. Gross runtime = net / distribution uniformity - the lower quarter needs the extra water so the dry corners get the target. Cycle-and-soak splits the gross time into runs no longer than the soil/slope's runoff limit (cycles = ceil(gross / max-cycle), each run = gross / cycles), with soak gaps between them so water infiltrates instead of running off. The DU comes from a catch-can audit (irrigation-uniformity), the soil intake rate that caps the cycle length comes from the soil type, and this is a scheduling estimate the controller and the site's actual runoff govern.",
+    net_min, gross_min, rtm, cycles, per_cycle_min,
+    note: "Net runtime = target depth / precipitation rate x 60. Gross runtime = net x the Irrigation Association run-time multiplier RTM = 1 / (0.4 + 0.6 x DU_LQ) (IA Audit Guidelines Eq. 3-11: 1.18 at DU 0.75), the extra water the lower quarter needs; dividing by DU alone (1.33 at 0.75) over-waters. Cycle-and-soak splits the gross time into runs no longer than the soil/slope's runoff limit (cycles = ceil(gross / max-cycle), each run = gross / cycles), with soak gaps between them so water infiltrates instead of running off. The DU comes from a catch-can audit (irrigation-uniformity), the soil intake rate that caps the cycle length comes from the soil type, and this is a scheduling estimate the controller and the site's actual runoff govern.",
   };
 }
 export const irrigationZoneRuntimeExample = { inputs: { target_in: 0.75, precip_in_hr: 1.20, du: 0.75, max_cycle_min: 10 } };
 const renderIrrigationZoneRuntime = _v23SimpleRenderer({
-  citation: "Citation: first-principles runtime and cycle-and-soak relations with the Irrigation Association scheduling references (by name). Net = depth / rate x 60; gross = net / DU; cycles = ceil(gross / max-cycle); per cycle = gross / cycles. DU from a catch-can audit, the max-cycle from the soil; this is a program aid, not a guaranteed schedule.",
+  citation: "Citation: first-principles runtime and cycle-and-soak relations with the Irrigation Association scheduling references (by name). Net = depth / rate x 60; gross = net x RTM, RTM = 1 / (0.4 + 0.6 DU_LQ) (IA Recommended Audit Guidelines, 2009, Eq. 3-11); cycles = ceil(gross / max-cycle); per cycle = gross / cycles. DU from a catch-can audit, the max-cycle from the soil; this is a program aid, not a guaranteed schedule.",
   example: irrigationZoneRuntimeExample.inputs,
   fields: [
     { key: "target_in", label: "Target depth this run (in)", kind: "number" },
@@ -2492,6 +2496,7 @@ export function computeDripZoneFlow({ mode = "inline", tubing_ft = 0, spacing_in
     if (!(spacing_in > 0)) return { error: "Emitter spacing must be positive (in)." };
     emitters = Math.floor(tubing_ft * 12 / spacing_in);
   }
+  if (!(emitters >= 1)) return { error: "The tubing and spacing (or count) give no whole emitter." };
   const zone_gph = emitters * emitter_gph;
   const zone_gpm = zone_gph / 60;
   const utilization = zone_gpm / valve_gpm * 100;
@@ -2659,11 +2664,14 @@ export function computeLivestockDryMatterIntake({ BW_lb = 0, intake = 0, feed_DM
   const BW = Number(BW_lb) || 0;
   const intk = Number(intake) || 0;
   const dm = Number(feed_DM) || 0;
-  const hd = Number(head) || 1;
+  const hd = head === undefined || head === "" ? 1 : Number(head);
   if (!(BW > 0)) return { error: "Enter a positive body weight." };
   if (!(intk > 0)) return { error: "Enter a positive dry-matter intake percentage." };
   if (!(dm > 0 && dm <= 100)) return { error: "Feed dry matter must be between 0 and 100 percent." };
-  if (!(hd > 0)) return { error: "Enter a positive number of animals." };
+  // Percents, not fractions: 0.88 dry matter used to return 3,409 lb/day as-fed; 0 head used to read as 1.
+  if (dm < 5) return { error: "Enter feed dry matter as a percent (88 for hay), not a fraction." };
+  if (intk < 0.3) return { error: "Enter intake as a percent of body weight (2.5), not a fraction." };
+  if (!(hd >= 1 && Number.isInteger(hd))) return { error: "Enter a whole number of animals, at least 1." };
   const DMI = BW * intk / 100;
   const asfed = DMI / (dm / 100);
   const herd_asfed = asfed * hd;

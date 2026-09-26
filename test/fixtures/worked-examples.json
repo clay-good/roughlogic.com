@@ -38391,7 +38391,7 @@
   {
    "tile_id": "irrigation-zone-runtime",
    "source_publisher": "Irrigation Association scheduling references",
-   "source_title": "0.75 in at 1.20 in/hr, DU 0.75, 10 min cycle -> 50 min, 5 cycles",
+   "source_title": "0.75 in at 1.20 in/hr, DU 0.75 (IA RTM 1.18), 10 min cycle -> 44.1 min, 5 cycles",
    "source_edition_or_year": "spec-v208 worked example (machine-verified)",
    "source_section_or_page": "spec-v208 section 2.1 pinned example (clay lawn zone)",
    "verified_by": "rl",
@@ -38410,7 +38410,7 @@
      }
     },
     "gross_min": {
-     "value": 50.0,
+     "value": 44.118,
      "tolerance": {
       "abs": 0.01
      }
@@ -38422,7 +38422,7 @@
      }
     },
     "per_cycle_min": {
-     "value": 10.0,
+     "value": 8.824,
      "tolerance": {
       "abs": 0.01
      }
@@ -38432,7 +38432,7 @@
   {
    "tile_id": "irrigation-zone-runtime",
    "source_publisher": "Irrigation Association scheduling references",
-   "source_title": "0.75 in at 3.85 in/hr, DU 0.75, 30 min cycle -> 15.6 min, 1 cycle",
+   "source_title": "0.75 in at 3.85 in/hr, DU 0.75 (IA RTM 1.18), 30 min cycle -> 13.8 min, 1 cycle",
    "source_edition_or_year": "spec-v208 worked example (machine-verified)",
    "source_section_or_page": "spec-v208 section 2.1 cross-check (sandy soil, one run)",
    "verified_by": "rl",
@@ -38451,7 +38451,7 @@
      }
     },
     "gross_min": {
-     "value": 15.584,
+     "value": 13.75,
      "tolerance": {
       "abs": 0.01
      }
@@ -38460,6 +38460,29 @@
      "value": 1,
      "tolerance": {
       "abs": 0
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "irrigation-zone-runtime",
+   "source_publisher": "UF/IFAS Gardening Solutions",
+   "source_title": "Irrigation System Maintenance",
+   "source_edition_or_year": "web page",
+   "source_section_or_page": "a system applying 2 inches per hour and grass needing up to 3/4 inch: about twenty-three minutes (22.5, rounded up; no DU step)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "target_in": 0.75,
+    "precip_in_hr": 2,
+    "du": 1,
+    "max_cycle_min": 60
+   },
+   "outputs": {
+    "net_min": {
+     "value": 22.5,
+     "tolerance": {
+      "abs": 0.01
      }
     }
    }
@@ -38542,6 +38565,29 @@
    }
   },
   {
+   "tile_id": "drip-zone-flow",
+   "source_publisher": "University of Nebraska-Lincoln Extension (S. Irmak)",
+   "source_title": "G1739 Drip Irrigation Design and Management Considerations for Windbreaks",
+   "source_edition_or_year": "2007",
+   "source_section_or_page": "(120 trees x 1 gph) / 60 = 2 gpm",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "mode": "point",
+    "emitter_count": 120,
+    "emitter_gph": 1,
+    "valve_gpm": 12
+   },
+   "outputs": {
+    "zone_gpm": {
+     "value": 2,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
    "tile_id": "plant-spacing-count",
    "source_publisher": "Nursery / landscape estimating references",
    "source_title": "200 ft^2 bed at 12 in on center -> 200 square, 231 triangular",
@@ -38591,6 +38637,33 @@
      "value": 257,
      "tolerance": {
       "abs": 0
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "plant-spacing-count",
+   "source_publisher": "University of Georgia Cooperative Extension",
+   "source_title": "Bulletin 931 Conversion Tables, Formulas and Suggested Guidelines for Horticultural Use, Table 31",
+   "source_edition_or_year": "reviewed November 2024, p. 33",
+   "source_section_or_page": "plants per 100 ft2 at 12 in: square 100, triangular 115 (UGA rounds to nearest; the tile rounds up)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "bed_ft2": 100,
+    "spacing_in": 12
+   },
+   "outputs": {
+    "square_n": {
+     "value": 100,
+     "tolerance": {
+      "abs": 0
+     }
+    },
+    "triangular_n": {
+     "value": 115,
+     "tolerance": {
+      "abs": 1
      }
     }
    }
@@ -77184,6 +77257,35 @@
    }
   },
   {
+   "tile_id": "livestock-dry-matter-intake",
+   "source_publisher": "University of Nebraska-Lincoln Beef (R. Rasby)",
+   "source_title": "Determining How Much Forage a Beef Cow Consumes Each Day",
+   "source_edition_or_year": "April 2, 2020",
+   "source_section_or_page": "1,200 lb cow x 0.023 = 28 lb of hay dry matter; at 88% dry matter about 32 lb as-fed (printed from the rounded 28)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "BW_lb": 1200,
+    "intake": 2.3,
+    "feed_DM": 88,
+    "head": 1
+   },
+   "outputs": {
+    "DMI_lb": {
+     "value": 27.6,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "asfed_lb": {
+     "value": 32,
+     "tolerance": {
+      "abs": 0.7
+     }
+    }
+   }
+  },
+  {
    "tile_id": "manure-application-rate",
    "source_publisher": "USDA NRCS Code 590",
    "source_title": "150 lb N/acre, solid manure 10 lb N/ton at 50% available -> 30 ton/acre",
@@ -77776,6 +77878,28 @@
    }
   },
   {
+   "tile_id": "max-offer-70-rule",
+   "source_publisher": "Lima One Capital",
+   "source_title": "Investor's Guide to the 70% Rule",
+   "source_edition_or_year": "web article",
+   "source_section_or_page": "MAO = ($300,000 x 0.70) - $45,000 = $165,000",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "arv": 300000,
+    "repairs": 45000,
+    "rule_pct": 70
+   },
+   "outputs": {
+    "mao": {
+     "value": 165000,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
    "tile_id": "fix-flip-profit",
    "source_publisher": "real-estate-investing practice",
    "source_title": "$300k ARV, $180k buy, $40k rehab, $8k hold, $12k fin, 6% sell, $114k cash, 6 mo -> $42k profit",
@@ -77843,6 +77967,45 @@
      "value": 0.1053,
      "tolerance": {
       "pct": 1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "fix-flip-profit",
+   "source_publisher": "Kayak Capital",
+   "source_title": "How to Calculate Your Fix-and-Flip ROI (With Real Examples), Typical Lender column",
+   "source_edition_or_year": "May 5, 2026",
+   "source_section_or_page": "purchase $310,000, ARV $510,000, rehab $55,000, holding $3,500, selling $35,650 (6.99% of sale), financing $23,963, cash $63,200, 5 months -> net profit $81,887, ROI 129.6%, annualized 311.0%",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "arv_usd": 510000,
+    "purchase_usd": 310000,
+    "rehab_usd": 55000,
+    "holding_usd": 3500,
+    "financing_usd": 23963,
+    "selling_pct": 6.990196078431373,
+    "cash_invested_usd": 63200,
+    "hold_months": 5
+   },
+   "outputs": {
+    "profit_usd": {
+     "value": 81887,
+     "tolerance": {
+      "abs": 1
+     }
+    },
+    "roi": {
+     "value": 1.296,
+     "tolerance": {
+      "abs": 0.0005
+     }
+    },
+    "annual_roi": {
+     "value": 3.11,
+     "tolerance": {
+      "abs": 0.001
      }
     }
    }
@@ -78088,6 +78251,28 @@
    "outputs": {
     "face_rent": {
      "value": 38.4,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "required-face-rent",
+   "source_publisher": "Wall Street Prep",
+   "source_title": "Net Effective Rent | Formula + Calculator",
+   "source_edition_or_year": "updated February 20, 2024",
+   "source_section_or_page": "($48,000 - $8,000) / 12 months = $3,333 net effective (run in reverse: $3,333.33 NER, 12 months, 2 free -> $4,000 face)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "target_ner": 3333.3333333333335,
+    "term_periods": 12,
+    "free_periods": 2
+   },
+   "outputs": {
+    "face_rent": {
+     "value": 4000,
      "tolerance": {
       "abs": 0.01
      }
@@ -83345,6 +83530,29 @@
    }
   },
   {
+   "tile_id": "detention-demurrage-billing",
+   "source_publisher": "OTR Solutions (K. Hodges)",
+   "source_title": "Detention Pay in Trucking",
+   "source_edition_or_year": "September 18, 2025",
+   "source_section_or_page": "waits 4 hours with a 2-hour grace period at $60 per hour -> $120",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "free_hours": 2,
+    "actual_hours": 4,
+    "rate_usd_hr": 60,
+    "truck_rev_usd_hr": 0
+   },
+   "outputs": {
+    "billable_usd": {
+     "value": 120,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
    "tile_id": "driver-pay-cpm-vs-percentage",
    "source_publisher": "carrier settlement practice",
    "source_title": "$0.60/mi or 25%, 1000 mi, $2,500 -> $600 vs $625 (percentage wins), break-even $2.40/mi",
@@ -83456,6 +83664,35 @@
      "value": 81.11,
      "tolerance": {
       "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "invoice-factoring-cost",
+   "source_publisher": "eCapital (B. Sayer)",
+   "source_title": "Cost Per Dollar - The Real Cost of Freight Factoring",
+   "source_edition_or_year": "July 29, 2026",
+   "source_section_or_page": "$1,000 invoice, 3% fee = $30, 85% advance = $850 (cost per dollar $30 / $850 = $0.0353; the APR annualization is the tile's own)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "invoice_usd": 1000,
+    "advance_pct": 85,
+    "fee_pct": 3,
+    "days_to_pay": 30
+   },
+   "outputs": {
+    "advance_usd": {
+     "value": 850,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "fee_usd": {
+     "value": 30,
+     "tolerance": {
+      "abs": 0.01
      }
     }
    }
@@ -83632,6 +83869,28 @@
      "value": 2816.67,
      "tolerance": {
       "abs": 2
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "def-consumption",
+   "source_publisher": "Cummins",
+   "source_title": "Bulletin 4087312, Tier 4 Final (off-highway)",
+   "source_edition_or_year": "printed 9/13, p. 3",
+   "source_section_or_page": "DEF runs 3 to 5 percent: for every 100 gallons of diesel burned, 3 to 5 gallons of DEF (the 3% end)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "diesel_gal": 100,
+    "dose_pct": 3,
+    "def_tank_gal": 10
+   },
+   "outputs": {
+    "def_used_gal": {
+     "value": 3,
+     "tolerance": {
+      "abs": 0.001
      }
     }
    }
@@ -86949,6 +87208,34 @@
    }
   },
   {
+   "tile_id": "sailboat-performance-ratios",
+   "source_publisher": "Sailing Magazine (R. H. Perry)",
+   "source_title": "J/97 Racer-cruiser review",
+   "source_edition_or_year": "September 28, 2010",
+   "source_section_or_page": "LWL 26 ft 7 in, displacement 8,600 lb, sail area 498 ft2: SA/D 18.98, D/L 204",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "sail_area_sqft": 498,
+    "displacement_lb": 8600,
+    "lwl_ft": 26.583333333333332
+   },
+   "outputs": {
+    "sa_d_ratio": {
+     "value": 18.98,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "dl_ratio": {
+     "value": 204,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
    "tile_id": "hull-displacement",
    "source_publisher": "Hull displacement (Archimedes + block coefficient)",
    "source_title": "30 ft LWL, 10 ft beam, 4 ft draft, Cb 0.5, seawater -> 600 ft^3, 38,400 lb, 17.14 long tons",
@@ -88882,6 +89169,34 @@
    }
   },
   {
+   "tile_id": "ada-ramp-slope",
+   "source_publisher": "US Department of Justice",
+   "source_title": "1991 ADAAG Fig. 16 (28 CFR 36 App. A 4.8.2)",
+   "source_edition_or_year": "1991",
+   "source_section_or_page": "slope 1:12: maximum rise 30 inches and maximum horizontal run 30 feet",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "rise_in": 30,
+    "slope_ratio": 12,
+    "landing_in": 60
+   },
+   "outputs": {
+    "run_in": {
+     "value": 360,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "runs": {
+     "value": 1,
+     "tolerance": {
+      "abs": 0
+     }
+    }
+   }
+  },
+  {
    "tile_id": "flue-gas-combustion-eff",
    "source_publisher": "Siegert stack-loss method (DIN combustion-analysis practice)",
    "source_title": "qA = dT_C x (A1 / CO2 + B); eff_net = 100 - qA; eff_gross ~ eff_net x LHV/HHV",
@@ -89954,6 +90269,50 @@
      "value": 1.522,
      "tolerance": {
       "abs": 0.005
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "condensing-flue-condensate",
+   "source_publisher": "Hamilton Engineering",
+   "source_title": "LIT91165 Condensate Neutralizer Manual",
+   "source_edition_or_year": "REV 07/2016, pp. 3-4",
+   "source_section_or_page": "condensing 100% of the products of combustion: about 1.1 gallons per hour per 100,000 Btu",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "input_btu_hr": 100000,
+    "water_lb_per_therm": 9.4,
+    "condensing_fraction": 1
+   },
+   "outputs": {
+    "condensate_gph": {
+     "value": 1.1,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "condensing-flue-condensate",
+   "source_publisher": "US DOE",
+   "source_title": "Steam Tip Sheet #26A, Consider Installing a Condensing Economizer",
+   "source_edition_or_year": "p. 2",
+   "source_section_or_page": "116 MMBtu/hr of natural gas exhausts 10,938 lb/hr of water vapor (94.3 lb per MMBtu)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "input_btu_hr": 116000000,
+    "water_lb_per_therm": 9.43,
+    "condensing_fraction": 1
+   },
+   "outputs": {
+    "water_produced_lb_hr": {
+     "value": 10938,
+     "tolerance": {
+      "abs": 1
      }
     }
    }

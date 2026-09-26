@@ -15172,10 +15172,11 @@ test("bounds: spec-v736 sprinkler zone flow for a target precip rate (inverse of
 
 test("bounds: spec-v208 irrigation-zone-runtime pins net/gross/cycles, the single-cycle path, and DU/error seams", () => {
   const a = _v208({ target_in: 0.75, precip_in_hr: 1.20, du: 0.75, max_cycle_min: 10 });
-  assert.ok(Math.abs(a.net_min - 37.5) < 1e-9 && Math.abs(a.gross_min - 50) < 1e-9 && a.cycles === 5 && Math.abs(a.per_cycle_min - 10) < 1e-9);
+  // IA RTM = 1/(0.4 + 0.6 x 0.75) = 1.176 (IA Audit Guidelines Table 3-8: 1.18); 37.5 x 1.176 = 44.1 min.
+  assert.ok(Math.abs(a.net_min - 37.5) < 1e-9 && Math.abs(a.gross_min - 37.5 / 0.85) < 1e-9 && a.cycles === 5 && Math.abs(a.per_cycle_min - 37.5 / 0.85 / 5) < 1e-9);
   // high rate + forgiving soil collapses to a single run.
   const b = _v208({ target_in: 0.75, precip_in_hr: 3.85, du: 0.75, max_cycle_min: 30 });
-  assert.ok(Math.abs(b.net_min - 11.688) < 0.01 && Math.abs(b.gross_min - 15.584) < 0.01 && b.cycles === 1);
+  assert.ok(Math.abs(b.net_min - 11.688) < 0.01 && Math.abs(b.gross_min - 11.688 / 0.85) < 0.01 && b.cycles === 1);
   assert.ok("error" in _v208({ target_in: 0, precip_in_hr: 1.2, max_cycle_min: 10 }));
   assert.ok("error" in _v208({ target_in: 0.75, precip_in_hr: 0, max_cycle_min: 10 }));
   assert.ok("error" in _v208({ target_in: 0.75, precip_in_hr: 1.2, max_cycle_min: 0 }));
@@ -56050,4 +56051,25 @@ test("bounds: batch-38 fixes -- percent-vs-fraction guards, loss contracts, NER 
   assert.equal(loss.loss_contract, true);
   assert.equal(loss.projected_loss_usd, 100000);
   assert.equal(_b38wip({ contract_usd: 1000000, cost_to_date_usd: 400000, est_total_cost_usd: 800000, billed_to_date_usd: 560000 }).loss_contract, false);
+});
+
+import { computeMaxOffer70Rule as _b39mao, computeBrrrrRefi as _b39brr, computeFixFlipProfit as _b39ffp, computeRequiredFaceRent as _b39rfr } from "../../calc-realestate.js";
+import { computeInvoiceFactoringCost as _b39ifc, computeDefConsumption as _b39def } from "../../calc-trucking.js";
+import { computeLivestockDryMatterIntake as _b39ldm, computeDripZoneFlow as _b39dzf } from "../../calc-agriculture.js";
+import { computeAdaRampSlope as _b39ada } from "../../calc-construction.js";
+import { computeFlueGasDewPoint as _b39fgd } from "../../calc-hvacservice.js";
+test("bounds: batch-39 fixes -- percent-vs-fraction and range guards, ADA landing, IA run-time multiplier prose", () => {
+  assert.ok("error" in _b39mao({ arv: 300000, repairs: 45000, rule_pct: 0.7 }));
+  assert.ok("error" in _b39brr({ arv_usd: 280000, total_invested_usd: 200000, refi_ltv_pct: 0.75 }));
+  assert.ok("error" in _b39ffp({ arv_usd: 300000, purchase_usd: 180000, rehab_usd: -40000, cash_invested_usd: 100000, hold_months: 6 }));
+  assert.ok("error" in _b39ifc({ invoice_usd: 1000, advance_pct: 0.9, fee_pct: 3, days_to_pay: 30 }));
+  assert.ok("error" in _b39ifc({ invoice_usd: 1000, advance_pct: 97, fee_pct: 5, days_to_pay: 30 }));
+  assert.ok("error" in _b39def({ diesel_gal: 100, dose_pct: 0.025, def_tank_gal: 10 }));
+  assert.ok("error" in _b39ldm({ BW_lb: 1200, intake: 2.3, feed_DM: 0.88, head: 1 }));
+  assert.ok("error" in _b39ldm({ BW_lb: 1200, intake: 2.3, feed_DM: 88, head: 0 }));
+  assert.ok("error" in _b39dzf({ mode: "inline", tubing_ft: 1, spacing_in: 18, emitter_gph: 1, valve_gpm: 12 }));
+  assert.ok("error" in _b39ada({ rise_in: 30, slope_ratio: 12, landing_in: 30 }));
+  assert.ok("error" in _b39fgd({ excess_air_pct: 1e6 }));
+  // Required face rent: the effective rent sits 16.7% below a $36 face ($30 NER); the discount is not "above".
+  assert.ok(Math.abs(_b39rfr({ target_ner: 30, term_periods: 120, free_periods: 20 }).discount_pct - 100 / 6) < 1e-9);
 });
