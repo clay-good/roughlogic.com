@@ -5037,6 +5037,35 @@
    }
   },
   {
+   "tile_id": "ev-range-per-hour",
+   "source_publisher": "NREL",
+   "source_title": "TP-5R00-91571, Electric Medium- and Heavy-Duty Vehicle Charging Infrastructure Attributes and Development",
+   "source_edition_or_year": "November 2024, p. 10",
+   "source_section_or_page": "100 kWh van with a rated range of 153 miles on a 6.6 kW charger: approximately 15 hours to fully charge, 1 hour of charging adds roughly 10 miles (1.53 mi/kWh = 153 / 100; NREL applies no charging loss)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "evse_power_kw": 6.6,
+    "charge_efficiency": 1,
+    "vehicle_efficiency_mi_per_kwh": 1.53,
+    "target_range_mi": 153
+   },
+   "outputs": {
+    "range_added_mi_per_hr": {
+     "value": 10,
+     "tolerance": {
+      "abs": 0.2
+     }
+    },
+    "hours_to_add_target": {
+     "value": 15,
+     "tolerance": {
+      "abs": 0.3
+     }
+    }
+   }
+  },
+  {
    "tile_id": "ev-charge-time",
    "source_publisher": "AC Level 2 EV charge-time model (SAE J1772 onboard limit)",
    "source_title": "75 kWh, 20-80% (45 kWh), 11.5 kW EVSE, 7.7 kW onboard, 88% -> 7.7 kW governs, 6.6 hr",
@@ -39421,6 +39450,28 @@
    }
   },
   {
+   "tile_id": "pv-array-sizing",
+   "source_publisher": "University of Arizona Cooperative Extension",
+   "source_title": "az1782, Calculations for a Grid-Connected Solar Energy System, Another Example",
+   "source_edition_or_year": "June 2019, pp. 3-4",
+   "source_section_or_page": "4,000 kWh/yr / 365 = 10.96 kWh/day; / 6.5 sun-hours = 1.69 kW; / 0.66 efficiency factor = 2.55 kW array (intermediates rounded to 2 decimals)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "target_annual_kwh": 4000,
+    "psh": 6.5,
+    "perf_ratio": 0.66
+   },
+   "outputs": {
+    "dc_kw": {
+     "value": 2.55,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
    "tile_id": "pv-row-spacing",
    "source_publisher": "NREL / Sandia row-spacing geometry",
    "source_title": "6.5 ft module, 30 deg tilt, 22 deg sun -> 13.67 ft pitch, 0.475 GCR",
@@ -52291,6 +52342,60 @@
      "value": 0,
      "tolerance": {
       "abs": 0
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "battery-peak-shaving",
+   "source_publisher": "Yale Clean Energy Forum (Kessler)",
+   "source_title": "battery demand-charge savings example",
+   "source_edition_or_year": "October 23, 2017",
+   "source_section_or_page": "$15/kW demand charge, peak cut from 125 to 60 kW (65 kW shave): close to $1,000 a month, $11,700 a year",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "nameplate_kwh": 1000,
+    "dod": 1,
+    "event_duration_h": 1,
+    "target_shave_kw": 65,
+    "demand_per_kw_mo": 15
+   },
+   "outputs": {
+    "annual_savings": {
+     "value": 11700,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "battery-peak-shaving",
+   "source_publisher": "Wattmore (J. W. Postal)",
+   "source_title": "Peak Shaving With Battery Storage",
+   "source_edition_or_year": "September 2026",
+   "source_section_or_page": "500 kW peak to 400 kW target, 100 kW / 200 kWh battery over a 2 hour event, $20/kW: $2,000 a month, $24,000 a year",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "nameplate_kwh": 200,
+    "dod": 1,
+    "event_duration_h": 2,
+    "target_shave_kw": 100,
+    "demand_per_kw_mo": 20
+   },
+   "outputs": {
+    "actual_shave_kw": {
+     "value": 100,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "annual_savings": {
+     "value": 24000,
+     "tolerance": {
+      "abs": 0.5
      }
     }
    }

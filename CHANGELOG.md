@@ -6,6 +6,13 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Changed
 
+- **Three more tiles now carry a publisher's printed example.**
+  - `ev-range-per-hour`: NREL TP-5R00-91571.
+  - `battery-peak-shaving`: Yale Clean Energy Forum and Wattmore.
+  - `pv-array-sizing`: Arizona Extension az1782.
+
+  README: 1,138 of 2,183 tiles are checked only against the project's own derivation; 1,045 carry an outside source.
+
 - **Six more tiles now carry a publisher's printed example.**
   - `metal-roof-panels`: Fabral 5 Rib guide.
   - `ridge-cap-fasteners`: GAF ArmorShield row.
