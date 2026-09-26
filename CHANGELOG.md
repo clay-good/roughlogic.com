@@ -6,6 +6,19 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Changed
 
+- **Ten inverse tiles now carry a printed example, each run in reverse from the example that already checks its forward sibling.** Each one returns the printed input it was solved for:
+  - `concrete-strength-from-modulus` and `concrete-strength-from-rupture`: 4,350 psi.
+  - `concrete-depth-for-cracking-moment`: 20 in.
+  - `rc-slab-max-span-for-thickness`: 15 ft.
+  - `pile-group-spacing-for-efficiency`: 1.2.
+  - `smooth-bore-diameter-for-flow`: 1 in.
+  - `spanline-sag-for-tension`: 4.
+  - `conductivity-from-tds`: 1413 uS.
+  - `bearing-max-load`: 2 kN.
+  - `gear-identification`: 10 DP.
+
+  README: 1,100 of 2,183 tiles are checked only against the project's own derivation; 1,083 carry an outside source.
+
 - **Fourteen more tiles now carry a publisher's printed example.** No formula errors were found.
   - **Structural:**
     - StructurePoint one-way slab and simply-supported beam: `rc-slab-min-thickness`, `concrete-shrinkage-temperature-steel`, `rc-min-shear-reinforcement`.

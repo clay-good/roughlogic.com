@@ -21074,6 +21074,33 @@
    }
   },
   {
+   "tile_id": "gear-identification",
+   "source_publisher": "Boston Gear (catalog P-1930-BG) / Machinery's Handbook (ANSI B6.1)",
+   "source_title": "10 diametral pitch spur gears",
+   "source_edition_or_year": "catalog",
+   "source_section_or_page": "run in reverse: NF40 (40T) outside dia = pitch dia 4.000 + .200 = 4.200 returns 10 DP and a 4.000 in pitch diameter",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "teeth": 40,
+    "outside_dia_in": 4.2
+   },
+   "outputs": {
+    "pd": {
+     "value": 10,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "pitch_dia_in": {
+     "value": 4,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
    "tile_id": "gear-chordal-thickness",
    "source_publisher": "Machinery's Handbook / AGMA (gear-tooth caliper)",
    "source_title": "Pd 10, N 40 -> chordal thickness 0.1570 in, chordal addendum 0.1015 in",
@@ -21229,6 +21256,29 @@
      "value": 1174.8,
      "tolerance": {
       "abs": 1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "bearing-max-load",
+   "source_publisher": "NTN Europe (Bearing Wizard)",
+   "source_title": "Lifetime calculation, calculation example",
+   "source_edition_or_year": "web reference",
+   "source_section_or_page": "run in reverse: 6206C3, Cr 21.6 kN, 2000 rpm, L10h = 10,497.6 h returns Pr = 2 kN (entered in the lbf fields; only C/P matters)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "dynamic_rating_lbf": 21.6,
+    "target_life_hr": 10497.6,
+    "speed_rpm": 2000,
+    "bearing_type": "ball"
+   },
+   "outputs": {
+    "max_equivalent_load_lbf": {
+     "value": 2,
+     "tolerance": {
+      "abs": 0.001
      }
     }
    }
@@ -23117,6 +23167,27 @@
      "value": 866.7,
      "tolerance": {
       "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "conductivity-from-tds",
+   "source_publisher": "Eutech Instruments (Thermo Fisher)",
+   "source_title": "Conductivity To TDS Conversion Factors, Tech Tip 07",
+   "source_edition_or_year": "web table",
+   "source_section_or_page": "run in reverse: TDS 442 column, 1000 ppm at factor 0.7078 returns 1413 uS",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "tds_mgl": 1000,
+    "k_factor": 0.7078
+   },
+   "outputs": {
+    "conductivity_us_cm": {
+     "value": 1413,
+     "tolerance": {
+      "abs": 0.5
      }
     }
    }
@@ -36143,6 +36214,27 @@
    }
   },
   {
+   "tile_id": "smooth-bore-diameter-for-flow",
+   "source_publisher": "Fire Engineering (Paul Spurgeon)",
+   "source_title": "Every Pump Operator's Basic Equation",
+   "source_edition_or_year": "2012, updated 2020",
+   "source_section_or_page": "run in reverse: 29.72 x 1^2 x 7.07 = 210 gpm at 50 psi returns a 1 in tip",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "target_gpm": 210,
+    "nozzle_pressure_psi": 50
+   },
+   "outputs": {
+    "bore_in": {
+     "value": 1,
+     "tolerance": {
+      "abs": 0.002
+     }
+    }
+   }
+  },
+  {
    "tile_id": "smooth-bore-flow",
    "source_publisher": "IFSTA Pumping Apparatus Driver/Operator (by name)",
    "source_title": "1-1/2 in master tip at 80 psi",
@@ -37599,6 +37691,34 @@
      "value": 0.5,
      "tolerance": {
       "abs": 0.001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "spanline-sag-for-tension",
+   "source_publisher": "TU Delft (Alderliesten), via LibreTexts",
+   "source_title": "Introduction to Aerospace Structures and Materials, 6.2 Cables, Example 6.8",
+   "source_edition_or_year": "open textbook",
+   "source_section_or_page": "run in reverse: w 240, L 20, Tmax 3841.87 returns the 4 m sag and T0 = 3000 (units consistent)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "span_ft": 20,
+    "load_lb_per_ft": 240,
+    "allowable_tension_lb": 3841.87
+   },
+   "outputs": {
+    "min_sag_ft": {
+     "value": 4,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "horizontal_tension_lb": {
+     "value": 3000,
+     "tolerance": {
+      "abs": 0.5
      }
     }
    }
@@ -58573,6 +58693,29 @@
    }
   },
   {
+   "tile_id": "pile-group-spacing-for-efficiency",
+   "source_publisher": "Middle East Technical University",
+   "source_title": "CE 366 Recitation 6, Pile Foundations (Converse-Labarre)",
+   "source_edition_or_year": "Spring 2012",
+   "source_section_or_page": "run in reverse: 3 x 4 group, D 0.4 m, E = 0.71 returns s = 1.2 m (units consistent)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "rows_n": 3,
+    "cols_m": 4,
+    "diameter_in": 0.4,
+    "target_eg": 0.71
+   },
+   "outputs": {
+    "spacing_in": {
+     "value": 1.2,
+     "tolerance": {
+      "abs": 0.005
+     }
+    }
+   }
+  },
+  {
    "tile_id": "pile-group-efficiency",
    "source_publisher": "Converse-Labarre pile-group efficiency",
    "source_title": "cross-check: tighten the same 9 piles to 2d = 24 in -> Eg 0.606, 546 kip (108 kip lost for zero added piles)",
@@ -64430,6 +64573,29 @@
    }
   },
   {
+   "tile_id": "rc-slab-max-span-for-thickness",
+   "source_publisher": "StructurePoint",
+   "source_title": "One-Way Slab Analysis and Design (ACI 318-14)",
+   "source_edition_or_year": "version October-07-2025, p. 4",
+   "source_section_or_page": "run in reverse: interior bays l/28 = 180/28 = 6.43 in, so 6.43 in both-ends continuous returns the 15 ft span",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "available_thickness_in": 6.43,
+    "support": "both-ends",
+    "fy_psi": 60000,
+    "wc_pcf": 150
+   },
+   "outputs": {
+    "max_span_ft": {
+     "value": 15,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
    "tile_id": "rc-slab-min-thickness",
    "source_publisher": "ACI 318-19 Table 7.3.1.1 / 9.3.1.1",
    "source_title": "cross-check: Grade 40 both-ends-continuous -> base 5.14, kfy 0.8, hmin 4.11 in",
@@ -64778,6 +64944,27 @@
    }
   },
   {
+   "tile_id": "concrete-strength-from-modulus",
+   "source_publisher": "StructurePoint",
+   "source_title": "Simply Supported Reinforced Concrete Beam Analysis and Design (ACI 318-14)",
+   "source_edition_or_year": "version April-08-2021, p. 10",
+   "source_section_or_page": "run in reverse: Ec = 150^1.5 x 33 x sqrt(4350) = 3998.5 ksi, so Ec 3998.5 ksi at wc 150 pcf returns f'c = 4,350 psi",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "ec_psi": 3998500,
+    "wc_pcf": 150
+   },
+   "outputs": {
+    "fc_psi": {
+     "value": 4350,
+     "tolerance": {
+      "abs": 1
+     }
+    }
+   }
+  },
+  {
    "tile_id": "concrete-elastic-modulus",
    "source_publisher": "ACI 318-19 19.2.2",
    "source_title": "cross-check: lightweight 115 pcf -> Ec 2,573,000 psi (~70% of normalweight)",
@@ -64863,6 +65050,27 @@
      "value": 4000,
      "tolerance": {
       "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "concrete-strength-from-rupture",
+   "source_publisher": "StructurePoint",
+   "source_title": "Simply Supported Reinforced Concrete Beam Analysis and Design (ACI 318-14)",
+   "source_edition_or_year": "version April-08-2021, p. 10",
+   "source_section_or_page": "run in reverse: fr = 7.5 x 1.0 x sqrt(4350) = 494.66 psi returns f'c = 4,350 psi",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "fr_psi": 494.66,
+    "lambda": 1
+   },
+   "outputs": {
+    "fc_psi": {
+     "value": 4350,
+     "tolerance": {
+      "abs": 1
      }
     }
    }
@@ -65071,6 +65279,29 @@
      "value": 474.3,
      "tolerance": {
       "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "concrete-depth-for-cracking-moment",
+   "source_publisher": "StructurePoint",
+   "source_title": "Simply Supported Reinforced Concrete Beam Analysis and Design (ACI 318-14)",
+   "source_edition_or_year": "version April-08-2021, p. 10",
+   "source_section_or_page": "run in reverse: 12 in wide, f'c 4350, Mcr 32.98 kip-ft returns the printed h = 20 in",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "target_mcr_kipft": 32.98,
+    "b_in": 12,
+    "fc_psi": 4350,
+    "lambda": 1
+   },
+   "outputs": {
+    "h_in": {
+     "value": 20,
+     "tolerance": {
+      "abs": 0.01
      }
     }
    }
