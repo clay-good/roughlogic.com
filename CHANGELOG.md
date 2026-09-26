@@ -6,6 +6,13 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Changed
 
+- **Three more tiles now carry a publisher's printed example.**
+  - `liquefaction-screening`: the Caltrans Geotechnical Manual SPT example, which reproduces rd 0.94, CSR 0.32 and FS 0.66.
+  - `coil-face-area`: Trane APP-CMC054.
+  - `cooling-system-flow`: Contracting Business.
+
+  README: 1,147 of 2,183 tiles are checked only against the project's own derivation; 1,036 carry an outside source.
+
 - **Nine more tiles now carry a publisher's printed example.**
   - `prime-cost`: Johnson & Wales.
   - `floor-area-ratio`: Metropolitan Council and Portland.

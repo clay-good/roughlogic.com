@@ -33546,6 +33546,28 @@
    }
   },
   {
+   "tile_id": "cooling-system-flow",
+   "source_publisher": "Contracting Business (Rob Doc Falke)",
+   "source_title": "Find Gallons Per Minute Using System Temperatures",
+   "source_edition_or_year": "July 26, 2019",
+   "source_section_or_page": "airside delivered 50,000 Btu / (31.1 F x 500 = 15,550) = 3.2 gpm (water)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "q_btuh": 50000,
+    "dt_f": 31.1,
+    "coolant": "water"
+   },
+   "outputs": {
+    "gpm": {
+     "value": 3.2,
+     "tolerance": {
+      "abs": 0.02
+     }
+    }
+   }
+  },
+  {
    "tile_id": "cutting-fluid-concentration",
    "source_publisher": "Metalworking-fluid refractometer method",
    "source_title": "Concentration % = Brix x refractometer factor; add concentrate = sump x (target - current) / (100 - target); add water = sump x (current - target) / target.",
@@ -40407,6 +40429,27 @@
      "value": 24,
      "tolerance": {
       "abs": 1e-06
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "coil-face-area",
+   "source_publisher": "Trane",
+   "source_title": "Engineers Newsletter Live, Coil Selection and Optimization, APP-CMC054-EN",
+   "source_edition_or_year": "2015, slide 19",
+   "source_section_or_page": "face area = airflow / face velocity = 8500 cfm / 500 fpm = 17 ft2",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "cfm": 8500,
+    "target_fpm": 500
+   },
+   "outputs": {
+    "face_area_ft2": {
+     "value": 17,
+     "tolerance": {
+      "abs": 0.001
      }
     }
    }
@@ -57971,6 +58014,43 @@
      "value": 1.28,
      "tolerance": {
       "pct": 1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "liquefaction-screening",
+   "source_publisher": "Caltrans",
+   "source_title": "Geotechnical Manual, Liquefaction Evaluation, Appendix B SPT example (Youd et al. 2001)",
+   "source_edition_or_year": "January 2026, pp. 16-21",
+   "source_section_or_page": "amax 0.4 g, sigma v0 2910 psf, sigma' v0 2225 psf, z 25 ft -> rd 0.94; CSR = 0.65 x 0.4 x (2910/2225) x 0.94 = 0.32; FS = (0.22/0.32) x 0.97 x 0.985 = 0.66 (MSF x K-sigma entered together as 0.955; intermediates rounded in print)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "amax_g": 0.4,
+    "sigma_v_psf": 2910,
+    "sigma_vp_psf": 2225,
+    "depth_ft": 25,
+    "crr": 0.22,
+    "msf": 0.95545
+   },
+   "outputs": {
+    "rd": {
+     "value": 0.94,
+     "tolerance": {
+      "abs": 0.005
+     }
+    },
+    "csr": {
+     "value": 0.32,
+     "tolerance": {
+      "abs": 0.005
+     }
+    },
+    "fs": {
+     "value": 0.66,
+     "tolerance": {
+      "abs": 0.01
      }
     }
    }
