@@ -78503,6 +78503,29 @@
    }
   },
   {
+   "tile_id": "duct-heat-gain",
+   "source_publisher": "FSEC (D. Parker and J. Sherwin)",
+   "source_title": "Comparative Summer Attic Thermal Performance of Six Roof Constructions, FSEC-PF-337-98",
+   "source_edition_or_year": "1998 ASHRAE Annual Meeting",
+   "source_section_or_page": "R-5 ducts at 25% of a 2,000 ft2 floor (500 ft2), 130 F attic, 57 F supply -> 7,300 Btu/hr",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "R_duct": 5,
+    "A_ft2": 500,
+    "dT_F": 73,
+    "cfm": 1000
+   },
+   "outputs": {
+    "Q_btuh": {
+     "value": 7300,
+     "tolerance": {
+      "abs": 1
+     }
+    }
+   }
+  },
+  {
    "tile_id": "grille-face-velocity",
    "source_publisher": "ASHRAE / SMACNA",
    "source_title": "400 CFM sized to a 500 fpm supply, ratio 0.75 -> 1.07 ft^2 (154 in^2)",
@@ -80929,6 +80952,30 @@
    }
   },
   {
+   "tile_id": "pv-cell-temperature-power",
+   "source_publisher": "Florida State University SESEC",
+   "source_title": "EML4930 Lecture 5, Photovoltaic Systems Engineering",
+   "source_edition_or_year": "Spring 2007, PDF p. 13",
+   "source_section_or_page": "G = 700 W/m2, Ta = 34 C, NOCT = 43 C -> Tc = 54.12 C (the tile's power step is a temperature derate only)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "T_amb_C": 34,
+    "G_wm2": 700,
+    "NOCT_C": 43,
+    "P_stc_W": 100,
+    "gamma": -0.4
+   },
+   "outputs": {
+    "T_cell_C": {
+     "value": 54.12,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
    "tile_id": "pv-performance-ratio",
    "source_publisher": "NREL PVWatts",
    "source_title": "typical rooftop stack (soiling 2, temp 8, wiring 2, inverter 4, mismatch 2, shading 3) -> PR 0.806, 19.4% loss",
@@ -80980,6 +81027,33 @@
      "value": 0.85,
      "tolerance": {
       "pct": 0.3
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "pv-performance-ratio",
+   "source_publisher": "NREL (A. Dobos)",
+   "source_title": "PVWatts Version 5 Manual, NREL/TP-6A20-62641, Table 6",
+   "source_edition_or_year": "September 2014, p. 10",
+   "source_section_or_page": "default losses soiling 2, shading 3, mismatch 2, wiring 2, connections 0.5, LID 1.5, nameplate 1, availability 3 (snow and age 0) -> total losses 14% (Eqn. 9)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "soiling": 2,
+    "shading": 3,
+    "mismatch": 2,
+    "wiring_dc": 2,
+    "connections": 0.5,
+    "lid": 1.5,
+    "nameplate": 1,
+    "availability": 3
+   },
+   "outputs": {
+    "total_loss_pct": {
+     "value": 14,
+     "tolerance": {
+      "abs": 0.1
      }
     }
    }
@@ -82517,13 +82591,13 @@
    },
    "outputs": {
     "owning_hr": {
-     "value": 10.4,
+     "value": 10.72,
      "tolerance": {
       "pct": 0.5
      }
     },
     "total_hr": {
-     "value": 23.4,
+     "value": 23.72,
      "tolerance": {
       "pct": 0.5
      }
@@ -82551,9 +82625,43 @@
    },
    "outputs": {
     "total_hr": {
-     "value": 22.2,
+     "value": 22.52,
      "tolerance": {
       "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "equipment-hourly-rate",
+   "source_publisher": "Caterpillar",
+   "source_title": "Performance Handbook Ed. 41, Sec. 20 Owning and Operating Costs, Example I",
+   "source_edition_or_year": "2011, pp. 20-40/41",
+   "source_section_or_page": "$135,000, 35% residual $47,250, 7 years x 1,200 hr, 18% interest/insurance/tax -> depreciation $10.45, total owning $25.06/hr",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "purchase": 135000,
+    "salvage": 47250,
+    "life_hr": 8400,
+    "annual_hr": 1200,
+    "iit_pct": 18,
+    "fuel_gph": 0,
+    "fuel_price": 0,
+    "maint_hr": 0,
+    "wear_hr": 0
+   },
+   "outputs": {
+    "deprec_hr": {
+     "value": 10.45,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "owning_hr": {
+     "value": 25.06,
+     "tolerance": {
+      "abs": 0.01
      }
     }
    }
@@ -82605,6 +82713,28 @@
      "value": 4000,
      "tolerance": {
       "abs": 1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "overhead-recovery-rate",
+   "source_publisher": "Construction Executive (S. Groo)",
+   "source_title": "Calculating the Overhead Recovery Rate Can Make or Break a Business",
+   "source_edition_or_year": "April 30, 2018",
+   "source_section_or_page": "$245,000 overhead / $529,000 cost of goods = 46.31 percent (the article rounds to 47)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "annual_overhead": 245000,
+    "basis": "markup",
+    "annual_direct": 529000
+   },
+   "outputs": {
+    "overhead_pct": {
+     "value": 46.31,
+     "tolerance": {
+      "abs": 0.01
      }
     }
    }
@@ -83606,6 +83736,35 @@
      "value": 450,
      "tolerance": {
       "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "driver-pay-cpm-vs-percentage",
+   "source_publisher": "PGT Trucking",
+   "source_title": "Top 3 Benefits of Percentage Pay",
+   "source_edition_or_year": "February 1, 2021",
+   "source_section_or_page": "1,236 miles paying $2,900: $0.56 x 1,236 = $692; $2,900 x 0.28 = $812",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "cpm_usd": 0.56,
+    "pct": 28,
+    "miles": 1236,
+    "linehaul_usd": 2900
+   },
+   "outputs": {
+    "cpm_pay_usd": {
+     "value": 692,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "pct_pay_usd": {
+     "value": 812,
+     "tolerance": {
+      "abs": 0.5
      }
     }
    }
@@ -84871,6 +85030,28 @@
      "value": 85.41,
      "tolerance": {
       "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "radiant-floor-output",
+   "source_publisher": "ASHRAE Hampton Roads chapter (G. Hayden, P.E.)",
+   "source_title": "Radiant Floor Heating, slide 11",
+   "source_edition_or_year": "2010",
+   "source_section_or_page": "85 F surface in a 70 F room -> 29.4 Btuh/ft2 (Hayden uses a linear 1.96 Btuh/ft2-F; the tile's EN 1264 power law gives 29.1)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "mode": "surface_to_q",
+    "t_surface_f": 85,
+    "t_room_f": 70
+   },
+   "outputs": {
+    "q_btuh_ft2": {
+     "value": 29.4,
+     "tolerance": {
+      "pct": 1.5
      }
     }
    }
@@ -86230,6 +86411,28 @@
    }
   },
   {
+   "tile_id": "ceiling-speaker-coverage-angle",
+   "source_publisher": "Lowell Mfg. (J. Ging)",
+   "source_title": "Distributed System Speaker Spacing for the Integrator",
+   "source_edition_or_year": "rev. July 13, 2020, p. 9",
+   "source_section_or_page": "2 (9 ft - 4 ft) tan(47.5 deg) = 10.9 ft for a 95 deg speaker (run in reverse: 10.9 ft -> 95 deg)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "ceiling_ft": 9,
+    "ear_ft": 4,
+    "target_diameter_ft": 10.9
+   },
+   "outputs": {
+    "coverage_deg": {
+     "value": 95,
+     "tolerance": {
+      "abs": 0.1
+     }
+    }
+   }
+  },
+  {
    "tile_id": "ceiling-speaker-coverage",
    "source_publisher": "commercial-audio design practice",
    "source_title": "minimum-overlap spacing 0.7x12 = 8.4 ft -> 18 speakers (exact ceil(1200/70.56))",
@@ -87337,6 +87540,27 @@
    }
   },
   {
+   "tile_id": "waterline-for-hull-speed",
+   "source_publisher": "Charles J. Doane (Wave Train / boats.com)",
+   "source_title": "Crunching Numbers: Hull Speed and Boat Length",
+   "source_edition_or_year": "March 26, 2010",
+   "source_section_or_page": "1.34 x sqrt(28) = 7.09 knots (run in reverse: 7.09 kn -> 28 ft)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "target_hull_speed_kn": 7.09,
+    "coefficient": 1.34
+   },
+   "outputs": {
+    "waterline_length_ft": {
+     "value": 28,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
    "tile_id": "hull-speed",
    "source_publisher": "displacement hull-speed relation (Froude speed-length theory)",
    "source_title": "cross-check: same 25 ft hull at 18 kn is SL 3.6 -> planing, off the displacement wall",
@@ -87528,6 +87752,29 @@
     },
     "pressure_ratio": {
      "value": 2.0086,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "turbo-max-boost-for-charge-temp",
+   "source_publisher": "GFB Performance",
+   "source_title": "Turbocharger Efficiency (tech article)",
+   "source_edition_or_year": "web article",
+   "source_section_or_page": "20 C inlet, 2 bar absolute, 65% efficient -> 119 C outlet (run in reverse at 14.5 psia ambient: 246.2 F -> pressure ratio 2.0)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "max_charge_temp_f": 246.2,
+    "inlet_temp_f": 68,
+    "compressor_eff_pct": 65,
+    "ambient_psia": 14.5
+   },
+   "outputs": {
+    "pressure_ratio": {
+     "value": 2,
      "tolerance": {
       "abs": 0.01
      }
@@ -88612,6 +88859,30 @@
    }
   },
   {
+   "tile_id": "transformer-voltage-regulation",
+   "source_publisher": "Chapman / University of Ottawa ELG3311",
+   "source_title": "Electric Machinery Fundamentals, Problem 2-8 (Assignment 1 solutions)",
+   "source_edition_or_year": "p. 5",
+   "source_section_or_page": "1.2% R, 5% X, 0.8 lagging -> VR 5.03% (the solution loads the 200 MVA unit to 200 MW, i.e. 1.25 per unit, which is the load fraction entered here)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "percent_r": 1.2,
+    "percent_x": 5,
+    "power_factor": 0.8,
+    "leading": false,
+    "load_fraction": 1.25
+   },
+   "outputs": {
+    "vr_percent": {
+     "value": 5.03,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
    "tile_id": "capacitor-discharge-time",
    "source_publisher": "NEC 2023 460.6",
    "source_title": "100 uF, 600 V, to 50 V in the 1-minute class -> R_max 241 kohm, 1.49 W continuous, meets code",
@@ -88675,6 +88946,30 @@
      "value": 300,
      "tolerance": {
       "abs": 0.001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "capacitor-discharge-time",
+   "source_publisher": "International Capacitors S.A. (Lifasa)",
+   "source_title": "TS 03-010I Discharge Resistors",
+   "source_edition_or_year": "Issue 1, p. 2",
+   "source_section_or_page": "50 kvar, 400 V 50 Hz (C 332 uF, peak 565.7 V) to 50 V in 60 s (old IEC 70 rule) -> R 74.5 kohm",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "capacitance_uf": 332,
+    "initial_voltage": 565.7,
+    "safe_voltage": 50,
+    "time_limit_s": 60,
+    "rated_voltage_v": 400
+   },
+   "outputs": {
+    "r_max_ohm": {
+     "value": 74500,
+     "tolerance": {
+      "pct": 0.1
      }
     }
    }

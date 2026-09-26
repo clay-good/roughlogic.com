@@ -5146,6 +5146,8 @@ export function computeEconomicConductorSizing({ current_a = 0, r_small_ohm = 0,
   if (!(rb > 0)) return { error: "Larger-conductor resistance must be positive (ohm)." };
   if (!(rb < rs)) return { error: "The larger conductor must have less resistance than the smaller one." };
   if (!(hr > 0)) return { error: "Annual run hours must be positive." };
+  if (hr > 8760) return { error: "Annual run hours cannot exceed 8,760." };
+  if (rate > 2) return { error: "Enter the energy rate in dollars per kWh (0.12), not cents." };
   if (rate < 0) return { error: "Electricity rate must be non-negative." };
   if (cost < 0) return { error: "Upsize cost must be non-negative." };
   const loss_small_kw = 3 * I * I * rs / 1000;
@@ -5250,6 +5252,7 @@ export function computeTransformerVoltageRegulation({ percent_r = 0, percent_x =
   if (px < 0) return { error: "%X cannot be negative." };
   if (!(pf > 0 && pf <= 1)) return { error: "Power factor must be over 0 and at most 1." };
   if (ld < 0) return { error: "Per-unit loading cannot be negative." };
+  if (ld > 3) return { error: "Enter the load as a per-unit fraction of the rating (1.0 = full load), not a percent." };
   const cos = pf;
   const sin = Math.sqrt(Math.max(0, 1 - pf * pf)) * (leading ? -1 : 1);
   const main_term = ld * (pr * cos + px * sin);
@@ -5294,7 +5297,7 @@ ELECTRICAL_RENDERERS["transformer-voltage-regulation"] = _v494renderTransformerV
 
 // ===================== spec-v495: capacitor discharge time and bleed resistor (NEC 460.6) =====================
 // dims: in { capacitance_uf: M^-1 L^-2 T^4 I^2, initial_voltage: M L^2 T^-3 I^-1, safe_voltage: M L^2 T^-3 I^-1, time_limit_s: T, resistor_ohm: M L^2 T^-3 I^-2 } out: { ln_ratio: dimensionless, r_max_ohm: M L^2 T^-3 I^-2, r_used_ohm: M L^2 T^-3 I^-2, t_discharge_s: T, p_continuous_w: M L^2 T^-3, limit_s: T, meets_code: dimensionless }
-export function computeCapacitorDischargeTime({ capacitance_uf = 0, initial_voltage = 0, safe_voltage = 50, time_limit_s = 0, resistor_ohm = 0 } = {}) {
+export function computeCapacitorDischargeTime({ capacitance_uf = 0, initial_voltage = 0, safe_voltage = 50, time_limit_s = 0, resistor_ohm = 0, rated_voltage_v = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const cuf = Number(capacitance_uf) || 0;
   const v0 = Number(initial_voltage) || 0;
@@ -5304,7 +5307,11 @@ export function computeCapacitorDischargeTime({ capacitance_uf = 0, initial_volt
   if (!(v0 > 0)) return { error: "Initial voltage must be positive (V)." };
   if (!(vsafe > 0 && vsafe < v0)) return { error: "Safe voltage must be positive and below the initial voltage." };
   if (rin < 0) return { error: "Supplied resistance must be positive (ohm; 0 = solve for the largest compliant resistor)." };
-  const limit_s = Number(time_limit_s) > 0 ? Number(time_limit_s) : (v0 <= 1000 ? 60 : 300); // NEC 2023: 460.6 (1,000 V or less, 1 min) / 460.28 (over 1,000 V, 5 min); 600 V was the pre-2020 threshold
+  if (Number(time_limit_s) < 0 || Number(rated_voltage_v) < 0) return { error: "Time limit and rated voltage cannot be negative." };
+  // NEC 460.6 / 460.28 key on the NOMINAL (rms) rating, not the peak V0; until 2026-09-26 a 750 V rms bank entered as its
+  // 1,061 V peak got the 5-minute allowance. Rated voltage defaults to V0 (a dc bank).
+  const rated = Number(rated_voltage_v) > 0 ? Number(rated_voltage_v) : v0;
+  const limit_s = Number(time_limit_s) > 0 ? Number(time_limit_s) : (rated <= 1000 ? 60 : 300); // NEC 2023: 460.6 (1,000 V or less, 1 min) / 460.28 (over 1,000 V, 5 min); 600 V was the pre-2020 threshold
   const C = cuf * 1e-6;
   const ln_ratio = Math.log(v0 / vsafe);
   const r_max_ohm = limit_s / (C * ln_ratio);
@@ -5324,9 +5331,10 @@ function _v495renderCapacitorDischargeTime(inputRegion, outputRegion, citationEl
   const cap = makeNumber("Total capacitance (uF)", "cdt-cap", { step: "any", min: "0" });
   const v0 = makeNumber("Initial voltage at disconnect (V; ac bank: the PEAK, 1.414 x rms, e.g. 679 V at 480 V)", "cdt-v0", { step: "any", min: "0" });
   const vs = makeNumber("Safe voltage target (V, 460.6 = 50)", "cdt-vs", { step: "any", min: "0" });
+  const rv = makeNumber("Rated (nominal rms) voltage (V; sets 60 s / 300 s; 0 = use V0)", "cdt-rv", { step: "any", min: "0" });
   const tl = makeNumber("Code time limit (s, 0 = auto 60/300)", "cdt-tl", { step: "any", min: "0" });
   const r = makeNumber("Bleed resistor (ohm, 0 = solve for largest)", "cdt-r", { step: "any", min: "0" });
-  for (const f of [cap, v0, vs, tl, r]) inputRegion.appendChild(f.wrap);
+  for (const f of [cap, v0, rv, vs, tl, r]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { cap.input.value = "100"; v0.input.value = "600"; vs.input.value = "50"; tl.input.value = "0"; r.input.value = "0"; update(); });
   const oR = makeOutputLine(outputRegion, "Resistor (max compliant or chosen)", "cdt-out-r");
   const oT = makeOutputLine(outputRegion, "Discharge time to safe voltage", "cdt-out-t");
@@ -5335,7 +5343,7 @@ function _v495renderCapacitorDischargeTime(inputRegion, outputRegion, citationEl
   const oNote = makeOutputLine(outputRegion, "Note", "cdt-out-n");
   function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
   const update = debounce(() => {
-    const res = computeCapacitorDischargeTime({ capacitance_uf: readNum(cap.input), initial_voltage: readNum(v0.input), safe_voltage: vs.input.value === "" ? 50 : readNum(vs.input), time_limit_s: readNum(tl.input), resistor_ohm: readNum(r.input) });
+    const res = computeCapacitorDischargeTime({ capacitance_uf: readNum(cap.input), initial_voltage: readNum(v0.input), safe_voltage: vs.input.value === "" ? 50 : readNum(vs.input), time_limit_s: readNum(tl.input), resistor_ohm: readNum(r.input), rated_voltage_v: readNum(rv.input) });
     if (res.error) { oR.textContent = res.error; oT.textContent = "-"; oP.textContent = "-"; oM.textContent = "-"; oNote.textContent = ""; return; }
     const rk = res.r_used_ohm >= 1e6 ? fmt(res.r_used_ohm / 1e6, 2) + " Mohm" : res.r_used_ohm >= 1000 ? fmt(res.r_used_ohm / 1000, 1) + " kohm" : fmt(res.r_used_ohm, 0) + " ohm";
     oR.textContent = rk + (readNum(r.input) > 0 ? " (chosen)" : " (R_max for the " + fmt(res.limit_s, 0) + " s limit)");
@@ -5344,7 +5352,7 @@ function _v495renderCapacitorDischargeTime(inputRegion, outputRegion, citationEl
     oM.textContent = res.meets_code ? "yes" : "NO -- reduce the resistor";
     oNote.textContent = res.note;
   }, DEBOUNCE_MS);
-  for (const f of [cap, v0, vs, tl, r]) f.input.addEventListener("input", update);
+  for (const f of [cap, v0, rv, vs, tl, r]) f.input.addEventListener("input", update);
 }
 ELECTRICAL_RENDERERS["capacitor-discharge-time"] = _v495renderCapacitorDischargeTime;
 

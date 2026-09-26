@@ -1723,6 +1723,9 @@ export function computeDriverPayCpmVsPercentage({ cpm_usd = 0, pct = 0, miles = 
   if (!(p > 0)) return { error: "Percentage rate must be positive (%)." };
   if (!(mi > 0)) return { error: "Miles must be positive." };
   if (!(lh > 0)) return { error: "Linehaul revenue must be positive (USD)." };
+  // Dollars per mile and a percent: 60 (cents typed as dollars) used to pay $60,000; 0.25 or 250 percent passed.
+  if (cpm > 5) return { error: "Enter the mileage rate in dollars per mile (0.56), not cents." };
+  if (p < 1 || p > 100) return { error: "Enter the percentage as a percent from 1 to 100 (28 for 28%)." };
   const cpm_pay_usd = cpm * mi;
   const pct_pay_usd = (p / 100) * lh;
   const breakeven_rate_usd_mi = cpm / (p / 100);

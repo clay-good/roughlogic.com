@@ -925,7 +925,7 @@ export function computeCeilingSpeakerCoverageAngle({ ceiling_ft = 0, ear_ft = 0,
   if (![coverage_deg, drop_ft].every(Number.isFinite)) return { error: "Coverage-angle math is not a finite value." };
   return {
     coverage_deg, drop_ft,
-    note: "Required coverage angle = 2 x atan( target diameter / (2 x (ceiling - ear)) ), the inverse of diameter = 2 x (ceiling - ear) x tan(angle/2). Spec a speaker whose rated coverage angle at the design frequency is at least this wide; the coverage angle narrows at high frequency, so a speaker rated exactly here dims the highs at the edge of the pattern. For edge-to-edge layout set the target diameter to the on-center spacing; for even (minimum-overlap) coverage set it to spacing / 0.7. A layout aid; verify with the speaker's coverage-angle spec and the target SPL.",
+    note: "Required coverage angle = 2 x atan( target diameter / (2 x (ceiling - ear)) ), the inverse of diameter = 2 x (ceiling - ear) x tan(angle/2). Spec a speaker whose coverage angle (Lowell: use the linear-dispersion angle, not the conical rating) at the design frequency is at least this wide; the coverage angle narrows at high frequency, so a speaker rated exactly here dims the highs at the edge of the pattern. For edge-to-edge layout set the target diameter to the on-center spacing; for even (minimum-overlap) coverage set it to spacing / 0.7 (JBL's square-grid D / sqrt 2; Lowell prints 0.75, spacing / 0.75). A layout aid; verify with the speaker's coverage-angle spec and the target SPL.",
   };
 }
 export const ceilingSpeakerCoverageAngleExample = { inputs: { ceiling_ft: 10, ear_ft: 4, target_diameter_ft: 8 } };

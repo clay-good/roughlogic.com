@@ -689,7 +689,7 @@ export function computeVfdEnergySavings({ full_load_kw = 0, frac_a = 1.0, hours_
   const saved_pct = full_kwh > 0 ? saved_kwh / full_kwh * 100 : 0;
   return {
     vfd_kwh, full_kwh, saved_kwh, saved_usd, saved_pct,
-    note: "Centrifugal affinity laws (P/P_full = (Q/Q_full)^3 for a fixed system curve) and the US DOE motor/pump-system energy method. The cube law holds for a centrifugal pump or fan on a friction-dominated system - a large static-head component flattens the curve and reduces the savings. The baseline here is full-speed operation for the same hours (a throttled or dampered constant-speed device already saves a little, so the VFD delta versus a throttle is smaller than versus full speed), and VFD and motor losses at low speed trim a few points off the ideal. A screening estimate, not a metered measurement-and-verification.",
+    note: "Centrifugal affinity laws (P/P_full = (Q/Q_full)^3 for a fixed system curve) and the US DOE motor/pump-system energy method. The cube law holds for a centrifugal pump or fan on a friction-dominated system - a large static-head component flattens the curve and reduces the savings. The baseline here is full-speed operation for the same hours (a throttled or dampered constant-speed device already saves a little, so the VFD delta versus a throttle is smaller than versus full speed), and VFD and motor losses at low speed trim several points off the ideal (DOE Motor Tip Sheet #11: at half speed a 16.4 kW load falls to 2.8 kW, an 82.9% cut, where the pure cube law says 87.5%). A screening estimate, not a metered measurement-and-verification.",
   };
 }
 function renderVfdEnergySavings(inputRegion, outputRegion, citationEl) {
@@ -735,6 +735,8 @@ export function computeLightingRetrofitSavings({ fixtures = 0, watts_existing = 
   if (watts_existing < 0 || watts_new < 0) return { error: "Wattages must be non-negative." };
   if (rate_kwh < 0 || demand_per_kw_mo < 0 || install_cost < 0) return { error: "Rate, demand charge, and cost must be non-negative." };
   if (!(watts_new < watts_existing)) return { error: "New wattage must be below existing wattage (no saving otherwise)." };
+  if (annual_hours > 8760) return { error: "Annual operating hours cannot exceed 8,760." };
+  if (rate_kwh > 2) return { error: "Enter the energy rate in dollars per kWh (0.12), not cents." };
   const kw_saved = fixtures * (watts_existing - watts_new) / 1000;
   const kwh_saved = kw_saved * annual_hours;
   const energy_usd = kwh_saved * rate_kwh;
@@ -752,7 +754,7 @@ function renderLightingRetrofitSavings(inputRegion, outputRegion, citationEl) {
   const we = makeNumber("Existing watts/fixture", "lrs-we", { step: "any", min: "0" });
   const wn = makeNumber("New watts/fixture", "lrs-wn", { step: "any", min: "0" });
   const hours = makeNumber("Annual operating hours", "lrs-hours", { step: "any", min: "0" });
-  const rate = makeNumber("Energy rate ($/kWh)", "lrs-rate", { step: "any", min: "0" });
+  const rate = makeNumber("Energy rate ($/kWh; energy-only if you also enter a demand charge)", "lrs-rate", { step: "any", min: "0" });
   const demand = makeNumber("Demand charge ($/kW-month, optional)", "lrs-demand", { step: "any", min: "0" });
   const cost = makeNumber("Installed cost ($, optional)", "lrs-cost", { step: "any", min: "0" });
   for (const f of [fixtures, we, wn, hours, rate, demand, cost]) inputRegion.appendChild(f.wrap);

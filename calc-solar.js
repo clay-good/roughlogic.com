@@ -1109,6 +1109,8 @@ export function computePvCellTemperaturePower({ T_amb_C = 0, G_wm2 = 0, NOCT_C =
   if (!(noct > 0)) return { error: "NOCT must be positive (C)." };
   if (!(Pstc > 0)) return { error: "Module STC power must be positive (W)." };
   if (!Number.isFinite(g)) return { error: "Enter a valid power temperature coefficient (%/C)." };
+  // Real modules lose power as they heat (about -0.26 to -0.5 %/C); +0.35 or -35 used to pass (a gain, or -3,800 W).
+  if (!(g < 0 && g > -2)) return { error: "Power temperature coefficient must be negative, in %/C (about -0.35)." };
   const T_cell_C = Ta + (noct - 20) * G / 800;
   const P_W = Pstc * (1 + (g / 100) * (T_cell_C - 25));
   const loss_pct = (1 - P_W / Pstc) * 100;
@@ -1161,6 +1163,7 @@ export function computePvMaxAmbientForPower({ target_power_W = 0, P_stc_W = 0, G
   if (!(G > 0)) return { error: "Plane-of-array irradiance must be positive (W/m^2)." };
   if (!(noct > 0)) return { error: "NOCT must be positive (C)." };
   if (!(Number.isFinite(g) && g < 0)) return { error: "Power temperature coefficient must be negative (real modules lose power as they heat)." };
+  if (g > -0.05) return { error: "Enter the power temperature coefficient in %/C (about -0.35), not as a fraction (-0.0035)." };
   const max_cell_C = 25 + (Ptgt / Pstc - 1) * 100 / g;
   const max_ambient_C = max_cell_C - (noct - 20) * G / 800;
   if (![max_cell_C, max_ambient_C].every(Number.isFinite)) return { error: "Max-ambient math is not a finite value." };

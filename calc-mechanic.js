@@ -2897,7 +2897,8 @@ MECHANIC_RENDERERS["hull-speed"] = _simpleRenderer({
 export function computeWaterlineForHullSpeed({ target_hull_speed_kn = 0, coefficient = 1.34 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const sp = Number(target_hull_speed_kn) || 0;
-  const c = Number(coefficient) > 0 ? Number(coefficient) : 1.34;
+  // Blank means the customary 1.34; a zero or negative entry is an error (it used to be replaced silently).
+  const c = coefficient === undefined || coefficient === "" ? 1.34 : Number(coefficient);
   if (!(sp > 0)) return { error: "Target hull speed must be positive (kn)." };
   if (!(c > 0)) return { error: "Speed-length coefficient must be positive." };
   const ratio = sp / c;

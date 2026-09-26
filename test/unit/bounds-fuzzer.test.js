@@ -20929,13 +20929,17 @@ test("bounds: spec-v362 computeLaborBurdenRate pins the burden build-up, the pro
 test("bounds: spec-v363 computeEquipmentHourlyRate pins owning/operating, the utilization effect, and error seams", () => {
   const r = _v363({ purchase: 50000, salvage: 10000, life_hr: 5000, annual_hr: 1000, iit_pct: 8, fuel_gph: 2, fuel_price: 4, maint_hr: 4, wear_hr: 1 });
   assert.ok(Math.abs(r.deprec_hr - 8) < 1e-9);
-  assert.ok(Math.abs(r.iit_hr - 2.4) < 1e-9);
-  assert.ok(Math.abs(r.owning_hr - 10.4) < 1e-9);
+  // CAT average annual investment [P(N+1) + S(N-1)] / 2N, N = 5 yr: 34,000; 8% / 1,000 hr = 2.72 (was 2.40 on (P+S)/2).
+  assert.ok(Math.abs(r.iit_hr - 2.72) < 1e-9);
+  assert.ok(Math.abs(r.owning_hr - 10.72) < 1e-9);
   assert.ok(Math.abs(r.operating_hr - 13) < 1e-9);
-  assert.ok(Math.abs(r.total_hr - 23.4) < 1e-9);
+  assert.ok(Math.abs(r.total_hr - 23.72) < 1e-9);
+  // Caterpillar Performance Handbook Ed. 41, Sec. 20, Example I: $135,000, 35% residual, 7 yr x 1,200 hr, 18% IIT -> owning $25.06.
+  const cat = _v363({ purchase: 135000, salvage: 47250, life_hr: 8400, annual_hr: 1200, iit_pct: 18 });
+  assert.ok(Math.abs(cat.owning_hr - 25.06) < 0.01);
   // More annual hours spread the fixed carry thinner.
   const busy = _v363({ purchase: 50000, salvage: 10000, life_hr: 5000, annual_hr: 2000, iit_pct: 8, fuel_gph: 2, fuel_price: 4, maint_hr: 4, wear_hr: 1 });
-  assert.ok(busy.total_hr < r.total_hr && Math.abs(busy.total_hr - 22.2) < 1e-9);
+  assert.ok(busy.total_hr < r.total_hr && Math.abs(busy.total_hr - 22.52) < 1e-9);
   // Error seams.
   assert.ok("error" in _v363({ purchase: 0, salvage: 0, life_hr: 5000, annual_hr: 1000 }));
   assert.ok("error" in _v363({ purchase: 50000, salvage: 60000, life_hr: 5000, annual_hr: 1000 })); // salvage >= purchase
@@ -56085,4 +56089,24 @@ test("bounds: every efficiency-percent input refuses a fraction (0.85 for 85%)",
   const f = { return_air_F: 70, supply_air_F: 120, input_btuh: 100000, efficiency_pct: 80, rise_min_F: 40, rise_max_F: 70 };
   assert.ok(!("error" in _effFur(f)));
   assert.ok("error" in _effFur({ ...f, efficiency_pct: 0.8 }));
+});
+
+import { computeCapacitorDischargeTime as _b40cap, computeEconomicConductorSizing as _b40ecs } from "../../calc-electrical.js";
+import { computePvCellTemperaturePower as _b40pvc, computePvMaxAmbientForPower as _b40pvm } from "../../calc-solar.js";
+import { computePoolHeaterBtu as _b40pool } from "../../calc-treatment.js";
+import { computeDuctHeatGain as _b40duct } from "../../calc-hvac.js";
+import { computeWaterlineForHullSpeed as _b40wl } from "../../calc-mechanic.js";
+import { computeDriverPayCpmVsPercentage as _b40drv } from "../../calc-trucking.js";
+test("bounds: batch-40 fixes -- NEC limit from the rated voltage, gamma sign and units, pool efficiency, duct linear limit, guards", () => {
+  // A 750 V rms bank entered at its 1,061 V peak keeps the 1-minute NEC 460.6 limit.
+  assert.equal(_b40cap({ capacitance_uf: 100, initial_voltage: 1061, safe_voltage: 50, rated_voltage_v: 750 }).limit_s, 60);
+  assert.equal(_b40cap({ capacitance_uf: 100, initial_voltage: 1061, safe_voltage: 50 }).limit_s, 300); // dc bank at 1,061 V
+  assert.ok("error" in _b40pvc({ T_amb_C: 30, G_wm2: 800, NOCT_C: 45, P_stc_W: 400, gamma: 0.35 }));
+  assert.ok("error" in _b40pvc({ T_amb_C: 30, G_wm2: 800, NOCT_C: 45, P_stc_W: 400, gamma: -35 }));
+  assert.ok("error" in _b40pvm({ target_power_W: 350, P_stc_W: 400, G_wm2: 800, NOCT_C: 45, gamma: -0.0035 }));
+  assert.ok("error" in _b40pool({ gallons: 20000, dT_F: 10, output: 400000, eff: 80 }));
+  assert.ok("error" in _b40duct({ R_duct: 0.1, A_ft2: 500, dT_F: 65, cfm: 100 }));
+  assert.ok("error" in _b40wl({ target_hull_speed_kn: 7, coefficient: 0 }));
+  assert.ok("error" in _b40ecs({ current_a: 100, r_small_ohm: 0.2, r_big_ohm: 0.125, hours: 4000, rate_kwh: 12, upsize_cost: 800 }));
+  assert.ok("error" in _b40drv({ cpm_usd: 60, pct: 28, miles: 1236, linehaul_usd: 2900 }));
 });

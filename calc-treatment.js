@@ -656,6 +656,8 @@ export function computePoolHeaterBtu({ gallons = 0, dT_F = 0, output = 0, eff = 
   if (!(dT > 0)) return { error: "Temperature rise must be positive (F)." };
   if (!(out > 0)) return { error: "Heater output must be positive (Btu/h)." };
   if (!(e > 0)) return { error: "Efficiency (or COP-equivalent) must be positive." };
+  // A fraction, not a percent or a COP: 80 used to give a 0.05 h heat-up, and a heat pump's COP 5 cut the time 5x.
+  if (e > 1.2) return { error: "Enter efficiency as a fraction (0.80); for a heat pump enter its heat output and 1.0, not its COP." };
   const Q_btu = gal * 8.34 * dT;
   const delivered = out * e;
   const hours = Q_btu / delivered;
@@ -672,7 +674,7 @@ TREATMENT_RENDERERS["pool-heater-btu"] = _rPool({
     { key: "gallons", label: "Pool volume (gallons)" },
     { key: "dT_F", label: "Temperature rise (°F)" },
     { key: "output", label: "Heater output (Btu/h)" },
-    { key: "eff", label: "Efficiency (0.80 gas; COP-equiv HP)" },
+    { key: "eff", label: "Efficiency as a fraction (0.80 gas; 1.0 for a heat pump entered at its heat output)" },
   ],
   outputs: [
     { key: "q", id: "phb-out-q", label: "Heat-up energy", value: (r) => fmt(r.Q_btu, 0) + " Btu" },
@@ -693,6 +695,8 @@ export function computePoolHeaterSize({ gallons = 0, dT_F = 0, target_hours = 0,
   if (!(dT > 0)) return { error: "Temperature rise must be positive (F)." };
   if (!(hrs > 0)) return { error: "Target heat-up time must be positive (h)." };
   if (!(e > 0)) return { error: "Efficiency (or COP-equivalent) must be positive." };
+  // A fraction, not a percent or a COP: 80 used to give a 0.05 h heat-up, and a heat pump's COP 5 cut the time 5x.
+  if (e > 1.2) return { error: "Enter efficiency as a fraction (0.80); for a heat pump enter its heat output and 1.0, not its COP." };
   const Q_btu = gal * 8.34 * dT;
   // Inverse of hours = (gallons x 8.34 x dT) / (output x eff): output = (gallons x 8.34 x dT) / (target_hours x eff).
   const required_output_btu = Q_btu / (hrs * e);
@@ -710,7 +714,7 @@ TREATMENT_RENDERERS["pool-heater-size"] = _rPool({
     { key: "gallons", label: "Pool volume (gallons)" },
     { key: "dT_F", label: "Temperature rise (°F)" },
     { key: "target_hours", label: "Target heat-up time (h)", default: 5.2 },
-    { key: "eff", label: "Efficiency (0.80 gas; COP-equiv HP)" },
+    { key: "eff", label: "Efficiency as a fraction (0.80 gas; 1.0 for a heat pump entered at its heat output)" },
   ],
   outputs: [
     { key: "o", id: "phs-out-o", label: "Required heater input rating", value: (r) => fmt(r.required_output_btu, 0) + " Btu/h" },

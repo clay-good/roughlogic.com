@@ -4144,6 +4144,9 @@ export function computeDuctHeatGain({ R_duct = 0, A_ft2 = 0, dT_F = 0, cfm = 0 }
   const U = 1 / R_duct;
   const Q_btuh = U * A_ft2 * dT_F;
   const dT_air = Q_btuh / (1.08 * cfm);
+  // The air cannot change by more than the driving difference; the linear U A dT model breaks down long before that
+  // (R 0.1 at 100 cfm used to report a 602 F rise against a 65 F difference).
+  if (Math.abs(dT_air) >= Math.abs(dT_F) && dT_F !== 0) return { error: "The air-temperature change would exceed the driving difference: the linear model does not apply (too little R or airflow); use an exponential leaving-temperature model." };
   return {
     U, Q_btuh, dT_air,
     note: "Conductive duct heat gain/loss through unconditioned space: U = 1/R, Q = U A dT with dT the ambient-minus-in-duct temperature (positive = the duct gains heat, e.g. a cold supply in a hot attic), and the resulting air temperature change dT_air = Q / (1.08 x cfm). Doubling the duct R-value halves the loss - the linear return that pays for attic-duct insulation - and halving the airflow doubles the per-cfm temperature swing. Steady-state conduction only; no radiant gain, air leakage, or latent transfer. A design aid; the ductwork design and the ambient conditions govern.",

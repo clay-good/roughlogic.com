@@ -1684,19 +1684,27 @@ export function computeEquipmentHourlyRate({ purchase = 0, salvage = 0, life_hr 
   if (!(sal >= 0 && sal < pur)) return { error: "Salvage must be zero or positive and less than the purchase price." };
   if (!(life > 0)) return { error: "Useful life must be positive (hours)." };
   if (!(ann > 0)) return { error: "Annual hours must be positive." };
+  if (ann > life) return { error: "Annual hours cannot exceed the useful life in hours." };
+  if (iit > 0 && iit < 1) return { error: "Enter interest + insurance + tax as a percent (18 for 18%), not a fraction." };
+  if ([fuel_gph, fuel_price, maint_hr, wear_hr].some((v) => Number(v) < 0)) return { error: "Fuel, maintenance and wear costs cannot be negative." };
   const deprec = (pur - sal) / life;
-  const iit_hr = (iit / 100) * ((pur + sal) / 2) / ann;
+  // Caterpillar Performance Handbook (Sec. 20): the average annual investment over N years is
+  // [P(N + 1) + S(N - 1)] / (2N). Until 2026-09-26 the tile used (P + S) / 2, understating the interest / insurance /
+  // tax carry (CAT Example I: 14.61 vs 13.67 $/hr).
+  const n_years = life / ann;
+  const avg_investment = (pur * (n_years + 1) + sal * (n_years - 1)) / (2 * n_years);
+  const iit_hr = (iit / 100) * avg_investment / ann;
   const owning_hr = deprec + iit_hr;
   const operating_hr = (Number(fuel_gph) || 0) * (Number(fuel_price) || 0) + (Number(maint_hr) || 0) + (Number(wear_hr) || 0);
   const total_hr = owning_hr + operating_hr;
   return {
-    deprec_hr: deprec, iit_hr, owning_hr, operating_hr, total_hr,
-    note: "Equipment owning + operating hourly rate (the CAT/AED method): owning = straight-line depreciation (purchase - salvage)/life + the interest/insurance/tax carry (% of average value / annual hours); operating = fuel (gph x price) + maintenance + tires/wear per hour. Running a machine more hours per year spreads the fixed interest-carry thinner, so an idle machine is expensive per hour. A bid-rate aid; the owner's actual costs, financing, and utilization govern.",
+    deprec_hr: deprec, iit_hr, avg_investment, owning_hr, operating_hr, total_hr,
+    note: "Equipment owning + operating hourly rate (the CAT/AED method): owning = straight-line depreciation (purchase - salvage)/life + the interest/insurance/tax carry (% of the average annual investment [P(N+1) + S(N-1)] / 2N, N = life in years, / annual hours); operating = fuel (gph x price) + maintenance + tires/wear per hour. Running a machine more hours per year spreads the fixed interest-carry thinner, so an idle machine is expensive per hour. A bid-rate aid; the owner's actual costs, financing, and utilization govern.",
   };
 }
 export const equipmentHourlyRateExample = { inputs: { purchase: 50000, salvage: 10000, life_hr: 5000, annual_hr: 1000, iit_pct: 8, fuel_gph: 2, fuel_price: 4, maint_hr: 4, wear_hr: 1 } };
 function renderEquipmentHourlyRate(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: equipment owning + operating hourly rate (CAT / AED cost-recovery method): owning = (purchase - salvage)/life + IIT% x avg value / annual hours; operating = fuel + maintenance + wear per hour. The owner's actual costs, financing, and utilization govern.";
+  citationEl.textContent = "Citation: equipment owning + operating hourly rate (CAT / AED cost-recovery method): owning = (purchase - salvage)/life + IIT% x average annual investment [P(N+1) + S(N-1)]/2N / annual hours; operating = fuel + maintenance + wear per hour. The owner's actual costs, financing, and utilization govern.";
   const pur = makeNumber("Purchase price ($)", "ehr-pur", { step: "any", min: "0" });
   const sal = makeNumber("Salvage value ($)", "ehr-sal", { step: "any", min: "0" });
   const life = makeNumber("Useful life (hours)", "ehr-life", { step: "any", min: "0" });
@@ -2027,6 +2035,8 @@ export function computePrevailingWageFringe({ base_wage_hr = 0, fringe_hr = 0, p
   if (!(base > 0)) return { error: "Base wage must be positive (USD/hr)." };
   if (fringe < 0) return { error: "Fringe rate must be non-negative (USD/hr)." };
   if (tax < 0) return { error: "Payroll-tax rate must be non-negative (%)." };
+  if (tax > 0 && tax < 1) return { error: "Enter the payroll-tax rate as a percent (7.65), not a fraction." };
+  if (tax > 50) return { error: "Payroll-tax rate above 50% is not plausible; enter it as a percent (7.65)." };
   const package_hr = base + fringe;
   const cash_cost_hr = package_hr + package_hr * tax / 100;
   const plan_cost_hr = package_hr + base * tax / 100;

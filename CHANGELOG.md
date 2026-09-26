@@ -13,6 +13,25 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **`capacitor-discharge-time` picks the NEC 1-minute or 5-minute limit from the rated (nominal rms) voltage.** The tile asks for the PEAK on an ac bank, then used that peak to choose the limit, so a 750 V rms bank entered at 1,061 V got the 5-minute allowance. A rated-voltage input now sets the limit; Lifasa's 74.5 kohm example reproduces.
+- **`equipment-hourly-rate` uses the Caterpillar average annual investment it cites, [P(N+1) + S(N-1)] / 2N.** The tile used (P + S) / 2, understating the interest / insurance / tax carry. CAT's Example I owning cost of $25.06/hr now reproduces; the tile's example goes from $23.40 to $23.72/hr.
+- **Guards found by probing each tile.** These were accepted and gave nonsense results:
+  - a positive or mis-scaled PV temperature coefficient
+  - pool-heater efficiency entered as 80 or as a heat pump's COP
+  - a duct heat gain larger than the driving temperature difference
+  - an energy rate or mileage rate in cents
+  - a driver-pay percent as a fraction or over 100
+  - payroll tax as a fraction
+  - transformer load entered as a percent
+  - more than 8,760 hours a year
+  - a zero hull-speed coefficient that was silently replaced
+- **Prose corrected against printed sources:**
+  - PVWatts models temperature and the inverter separately; its default 14% excludes them.
+  - A radiant floor at 85 F delivers about 29 Btu/hr-ft^2, not 39.
+  - VFD savings fall several points short of the cube law (DOE Tip Sheet #11: 82.9% vs 87.5% at half speed).
+  - Ceiling-speaker minimum overlap: JBL spaces at D / sqrt 2, Lowell at 0.75 D, using the linear-dispersion angle.
+  - Conductor resistances at 75 C overstate a cool conductor's loss.
+  - Transformer regulation is measured against no-load voltage, not nominal.
 - **37 tiles refuse an efficiency typed as a fraction.** A sweep divided each efficiency-percent input by 100. Every such tile (motor cost, furnace rise, EV charging, spindle power, landfill gas, UPS redundancy and others) silently ran at a 0.85% efficiency when 0.85 was typed for 85%. The rest of the percent inputs (waste, humidity, grade and so on) can legitimately fall below 1, so they are left for per-tile review.
 - **`irrigation-zone-runtime` uses the Irrigation Association run-time multiplier its citation names.** The IA Recommended Audit Guidelines (2009, Eq. 3-11) give RTM = 1 / (0.4 + 0.6 x DU_LQ), which is 1.18 at DU 0.75. The tile divided by DU (1.33), over-watering by about 13% while crediting IA. The example's gross runtime goes from 50 to 44.1 minutes.
 - **`required-face-rent` says which way the discount runs.** The effective rent sits 16.7% below a $36 face; the face is 20% above a $30 effective rent. The tile had called the 16.7% "above".
@@ -113,6 +132,13 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 - **`calc-agriculture.js` size cap raised from 64,000 to 66,000 bytes gzipped.** The irrigation and livestock corrections took it to 64,110 B (100.2%).
 - **`calc-electrical.js` size cap raised from 104,000 to 106,000 bytes gzipped.** The battery-vent and capacitor corrections took it to 104,063 B (100.1%). Splitting the module per bench is still the preferred fix.
+- **Twelve more tiles now carry a publisher's printed example.**
+  - **Solar and HVAC:** `pv-cell-temperature-power` (FSU), `pv-performance-ratio` (NREL PVWatts v5 manual), `radiant-floor-output` (ASHRAE chapter lecture), `duct-heat-gain` (FSEC).
+  - **Electrical and audio:** `transformer-voltage-regulation` (Chapman via U. Ottawa), `capacitor-discharge-time` (Lifasa), `ceiling-speaker-coverage-angle` (Lowell).
+  - **Vehicles and business:** `turbo-max-boost-for-charge-temp` (GFB), `waterline-for-hull-speed` (WaveTrain), `overhead-recovery-rate` (Construction Executive), `driver-pay-cpm-vs-percentage` (PGT Trucking), `equipment-hourly-rate` (Caterpillar Performance Handbook).
+
+  README: 940 of 2,183 tiles are checked only against the project's own derivation; 1,243 carry an outside source.
+
 - **Thirteen more tiles now carry a publisher's printed example.**
   - **Investing and trucking:** `max-offer-70-rule` (Lima One), `fix-flip-profit` (Kayak Capital), `required-face-rent` (Wall Street Prep, in reverse), `detention-demurrage-billing` (OTR Solutions), `invoice-factoring-cost` (eCapital).
   - **Landscape and agriculture:** `irrigation-zone-runtime` (UF/IFAS), `drip-zone-flow` (UNL G1739), `plant-spacing-count` (UGA B-931), `livestock-dry-matter-intake` (UNL Beef).
