@@ -117,6 +117,7 @@ function showIntegrityBanner(mismatches) {
   const banner = document.createElement("div");
   banner.id = "integrity-banner";
   banner.setAttribute("role", "alert");
+  banner.setAttribute("data-nosnippet", "");
   banner.className = "integrity-banner";
   const list = mismatches.map((m) => m.folder + " (" + m.reason + ")").join(", ");
   banner.textContent = "Data integrity check failed for: " + list + ". Calculators using these datasets may be unreliable. Reload the page; if the issue persists, file an issue at github.com/clay-good/roughlogic.com.";

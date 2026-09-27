@@ -377,8 +377,8 @@ function applyRoute() {
 // asserts the two strings are identical, which also keeps the count in this
 // one honest.
 const HOME_DESC =
-  "2,183 free calculators for the trades. Type the job the way you'd say it, and you get the number, the inputs, and the source.";
-const HOME_TITLE = "Rough Logic";
+  "Get fast, source-backed answers from 2,183 free calculators for electrical, plumbing, HVAC, construction, and more.";
+const HOME_TITLE = "Free Trade Calculators | Rough Logic";
 // Production origin for the canonical link. The SPA must emit an ABSOLUTE
 // canonical (matching the prerendered /tools/<id>/ and /groups/<slug>/
 // shells) or Lighthouse SEO flags it ("Is not an absolute URL"); a relative

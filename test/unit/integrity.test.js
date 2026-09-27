@@ -71,6 +71,7 @@ test("verifyManifestIntegrity flags mismatched manifest", async () => {
   // Banner inserted into main.
   assert.ok(main.children.length >= 1);
   assert.ok(main.children[0].textContent.includes("electrical"));
+  assert.equal(main.children[0].attributes["data-nosnippet"], "");
 });
 
 test("verifyManifestIntegrity skips when integrity.json is missing", async () => {
