@@ -25667,17 +25667,25 @@ export function renderCitationBlock(parent, toolId) {
   dl.className = "v6-reference-list";
 
   const rows = [
-    ["Formula or table cited", c.formula],
-    ["Edition / source date", c.edition],
-    ["Public free-access pointer", c.freeAccess],
-    ["What governs", c.governance],
-    ["Edition selector / disclosure", c.editionNote],
+    ["formula", "Formula or table", c.formula],
+    ["edition", "Source and edition", c.edition],
+    ["access", "Free access", c.freeAccess],
+    ["governance", "What governs", c.governance],
+    ["scope", "Scope and edition notes", c.editionNote],
   ];
-  for (const [label, value] of rows) {
+  for (const [key, label, value] of rows) {
     if (!value) continue;
-    const dt = document.createElement("dt"); dt.textContent = label;
-    const dd = document.createElement("dd"); fillCitationText(dd, value);
-    dl.appendChild(dt); dl.appendChild(dd);
+    const row = document.createElement("div");
+    row.className = "v6-reference-row v6-reference-row-" + key;
+    const dt = document.createElement("dt");
+    dt.className = "v6-reference-term";
+    dt.textContent = label;
+    const dd = document.createElement("dd");
+    dd.className = "v6-reference-value";
+    fillCitationText(dd, value);
+    row.appendChild(dt);
+    row.appendChild(dd);
+    dl.appendChild(row);
   }
   block.appendChild(dl);
 
@@ -25691,11 +25699,26 @@ export function renderCitationBlock(parent, toolId) {
     const dl2 = document.createElement("dl");
     dl2.className = "v6-assumption-list";
     for (const a of c.assumptions) {
+      const row = document.createElement("div");
+      row.className = "v6-assumption-row";
       const dt = document.createElement("dt");
+      dt.className = "v6-assumption-term";
       dt.textContent = a.name;
       const dd = document.createElement("dd");
-      fillCitationText(dd, a.value + (a.source ? "  (" + a.source + ")" : ""));
-      dl2.appendChild(dt); dl2.appendChild(dd);
+      dd.className = "v6-assumption-value";
+      fillCitationText(dd, a.value);
+      if (a.source) {
+        const source = document.createElement("small");
+        source.className = "v6-assumption-source";
+        appendPlainText(source, "Source: ");
+        const sourceValue = document.createElement("span");
+        fillCitationText(sourceValue, a.source);
+        source.appendChild(sourceValue);
+        dd.appendChild(source);
+      }
+      row.appendChild(dt);
+      row.appendChild(dd);
+      dl2.appendChild(row);
     }
     block.appendChild(dl2);
   } else {

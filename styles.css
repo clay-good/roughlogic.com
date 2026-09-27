@@ -666,9 +666,12 @@ main {
 
 .citation {
   font-size: 1rem;
-  color: var(--fg-dim);
-  font-style: italic;
+  line-height: 1.65;
+  color: var(--fg-muted);
+  font-style: normal;
   margin-bottom: var(--space-3);
+  max-width: 82ch;
+  overflow-wrap: anywhere;
 }
 
 /* Source links read in the brand accent so a tradesperson can see at a
@@ -1022,10 +1025,11 @@ input[aria-invalid="true"] {
    marker in Chromium, and the block then reads as an inert heading. */
 .proof > summary {
   cursor: pointer;
-  padding: 16px 18px;
-  font-size: 1rem;
-  font-weight: 600;
-  color: var(--fg-muted);
+  min-height: var(--touch-min);
+  padding: 16px 20px;
+  font-size: 1.0625rem;
+  font-weight: 700;
+  color: var(--fg);
   display: list-item;
   list-style-position: inside;
 }
@@ -1035,8 +1039,8 @@ input[aria-invalid="true"] {
 .proof[open] > summary { border-bottom: 1px solid var(--border); }
 
 .proof > *:not(summary) {
-  padding-left: 18px;
-  padding-right: 18px;
+  padding-left: 20px;
+  padding-right: 20px;
 }
 
 .proof > .citation { margin-top: var(--space-3); }
@@ -1069,41 +1073,82 @@ input[aria-invalid="true"] {
    above the legacy data-source-stamp. Sized at the same scale as the answer
    per spec §8 (the reference is part of the answer). */
 .v6-reference-block {
-  margin-top: var(--space-3);
-  padding-top: var(--space-3);
-  border-top: 1px dashed var(--border);
+  margin-top: 0;
 }
 .v6-reference-heading {
-  font-size: 1rem;
-  margin: 0 0 var(--space-2) 0;
+  font-size: 1.25rem;
+  line-height: 1.3;
+  margin: 0 0 var(--space-3) 0;
 }
 .v6-reference-subheading {
-  font-size: 1rem;
-  margin: var(--space-2) 0 var(--space-1) 0;
+  font-size: 1.125rem;
+  line-height: 1.35;
+  margin: var(--space-4) 0 var(--space-2) 0;
 }
 .v6-reference-list,
 .v6-assumption-list {
   margin: 0;
-  display: grid;
-  grid-template-columns: max-content 1fr;
-  gap: 4px var(--space-2);
+  display: block;
 }
-.v6-reference-list dt,
-.v6-assumption-list dt {
-  font-weight: 600;
-  white-space: nowrap;
+.v6-reference-row {
+  padding: var(--space-3) 0;
+  border-top: 1px solid var(--border);
 }
-.v6-reference-list dd,
-.v6-assumption-list dd {
+.v6-reference-row:first-child {
+  padding-top: 0;
+  border-top: 0;
+}
+.v6-reference-term,
+.v6-assumption-term {
+  margin: 0 0 var(--space-1);
+  color: var(--fg);
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1.4;
+}
+.v6-reference-value,
+.v6-assumption-value {
   margin: 0;
+  max-width: 82ch;
+  color: var(--fg-muted);
+  font-size: 1rem;
+  line-height: 1.65;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+.v6-reference-row-formula .v6-reference-value {
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg-primary);
+  color: var(--fg);
+  font-family: var(--font-mono);
+}
+.v6-assumption-list {
+  display: grid;
+  gap: var(--space-2);
+}
+.v6-assumption-row {
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg-secondary);
+}
+.v6-assumption-source {
+  display: block;
+  margin-top: var(--space-1);
+  color: var(--fg-dim);
+  font-size: 1rem;
+  line-height: 1.5;
 }
 .v6-assumption-note {
-  margin: var(--space-1) 0 0 0;
+  margin: var(--space-2) 0 0 0;
   font-size: 1rem;
+  line-height: 1.6;
   color: var(--fg-dim);
 }
 .view-copy-reference {
-  margin-top: var(--space-3);
+  margin-top: var(--space-4);
   min-height: var(--touch-min);
 }
 
@@ -1905,13 +1950,15 @@ input[aria-invalid="true"] {
   margin: var(--space-4) 0;
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  padding: 0 var(--space-3);
+  padding: 0 var(--space-4);
+  background: var(--bg-tertiary);
 }
 .shell-page .shell-proof > summary {
   cursor: pointer;
   padding: var(--space-3) 0;
   font-size: 1.0625rem;
-  font-weight: 600;
+  font-weight: 700;
+  color: var(--fg);
   display: list-item;
   list-style-position: inside;
 }
@@ -1919,10 +1966,76 @@ input[aria-invalid="true"] {
   margin-bottom: var(--space-3);
 }
 
-/* The scope prose now opens the single .shell-proof disclosure, ahead of the
-   formula. It needs the same gap the reference rows get. */
-.shell-page .shell-proof .shell-detail {
-  margin-bottom: var(--space-3);
+/* Make the static proof read like the live reference block: every long piece
+   of prose gets a short scan label and its own row instead of becoming an
+   undifferentiated wall of formula, edition, governance, and API text. */
+.shell-page .shell-proof > summary + *,
+.shell-page .shell-print-proof-title + * {
+  border-top: 0;
+}
+.shell-page .shell-proof .shell-detail,
+.shell-page .shell-proof .shell-formula,
+.shell-page .shell-proof .shell-source,
+.shell-page .shell-print-proof .shell-detail,
+.shell-page .shell-print-proof .shell-formula,
+.shell-page .shell-print-proof .shell-source {
+  margin: 0;
+  padding: var(--space-3) 0;
+  border-top: 1px solid var(--border);
+  color: var(--fg-muted);
+  font-size: 1rem;
+  line-height: 1.65;
+  max-width: 82ch;
+}
+.shell-page .shell-proof-label {
+  display: block;
+  margin-bottom: var(--space-1);
+  color: var(--fg);
+  font-family: var(--font-stack);
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1.4;
+}
+.shell-page .shell-formula {
+  font-family: var(--font-mono);
+}
+.shell-page .shell-proof .shell-formula,
+.shell-page .shell-print-proof .shell-formula {
+  color: var(--fg);
+}
+.shell-page .shell-proof .shell-assume,
+.shell-page .shell-print-proof .shell-assume {
+  gap: var(--space-2);
+  margin-top: var(--space-3);
+}
+.shell-page .shell-proof .shell-assume li,
+.shell-page .shell-print-proof .shell-assume li {
+  margin: 0;
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg-secondary);
+  color: var(--fg-muted);
+  line-height: 1.6;
+}
+.shell-page .shell-assume li > span,
+.shell-page .shell-assume li > b {
+  display: block;
+}
+.shell-page .shell-assume li > span {
+  margin-bottom: var(--space-1);
+  color: var(--fg);
+  font-weight: 700;
+}
+.shell-page .shell-assume li > b {
+  color: var(--fg-muted);
+  font-weight: 400;
+}
+.shell-page .shell-assume small {
+  margin-top: var(--space-1);
+  color: var(--fg-dim);
+  font-size: 1rem;
+  line-height: 1.5;
 }
 
 /* Printed-page copy of the proof; see the @media print block for why. */

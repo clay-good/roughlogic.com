@@ -582,8 +582,9 @@ test("renderCitationBlock: mounts a .v6-reference-block with formula and assumpt
   // Block should contain at least the heading + a dl with the §3 rows.
   const all = JSON.stringify(block, (k, v) => k === "children" ? v : v);
   assert.ok(all.includes("Reference"));
-  assert.ok(all.includes("Formula or table cited"));
+  assert.ok(all.includes("Formula or table"));
   assert.ok(all.includes("Numeric assumptions"));
+  assert.ok(all.includes("Source: "));
   assert.ok(all.includes("NEC 2023"));
 });
 
