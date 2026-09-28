@@ -3030,6 +3030,11 @@ cross-check.
 | calc-oilgas.js | `computeTankStrappingVolume` | `{ tank_diameter_ft = 0, gauge_ft = 0, gauge_in = 0, closing_gauge_ft = 0, clo...` | _ | _ | _ |
 | calc-oilgas.js | `computeTankVentApi2000` | `{ pump_in_bph = 0, pump_out_bph = 0, volatile_factor = 1, thermal_out_ft3h = ...` | _ | _ | _ |
 | calc-oilgas.js | `computeWellDeclineReserves` | `{ initial_rate_bpd = 0, decline_rate = 0, rate_is_effective = "no", economic_...` | _ | _ | _ |
+| calc-openchannel.js | `computeBroadCrestedWeir` | `{ crest_length_ft = 0, head_ft = 0, discharge_coeff = 0 } = {}` | _ | _ | _ |
+| calc-openchannel.js | `computeCipollettiWeir` | `{ crest_length_ft = 0, head_ft = 0, coeff = 0 } = {}` | _ | _ | _ |
+| calc-openchannel.js | `computeSluiceGateFlow` | `{ gate_opening_ft = 0, gate_width_ft = 0, upstream_depth_ft = 0, contraction_...` | _ | _ | _ |
+| calc-openchannel.js | `computeWeirFlow` | `{ weir_type = "vnotch90", head_ft = 0, crest_length_ft = 0, coeff = 0 } = {}` | _ | _ | _ |
+| calc-openchannel.js | `computeWeirHeadFromFlow` | `{ weir_type = "vnotch90", target_flow_cfs = 0, crest_length_ft = 0, coeff = 0...` | _ | _ | _ |
 | calc-operations-finance.js | `computeEoqOrderQuantity` | `{ annual_demand = 0, order_cost = 0, holding_cost = 0 } = {}` | _ | _ | _ |
 | calc-operations-finance.js | `computeReorderPoint` | `{ avg_daily_demand = 0, lead_time_days = 0, demand_sd = 0, service_level_pct ...` | _ | _ | _ |
 | calc-operations-finance.js | `computeUnitsOfProductionDepr` | `{ cost_basis = 0, salvage_value = 0, total_units = 0, period_units = 0, accum...` | _ | _ | _ |
@@ -3647,10 +3652,8 @@ cross-check.
 | calc-telecom.js | `computeSpliceLossMismatch` | `{ mfd_1_um = 0, mfd_2_um = 0, lateral_offset_um = 0, cleave_angle_deg = 0, wa...` | _ | _ | _ |
 | calc-treatment.js | `computeBodTssLoadingRemoval` | `{ flow_mgd = 0, influent_mgl = 0, effluent_mgl = 0 } = {}` | _ | _ | _ |
 | calc-treatment.js | `computeBreakpointChlorination` | `{ total_ppm = 0, free_ppm = 0, ratio = 10, gallons = 0, avail = 0 } = {}` | _ | _ | _ |
-| calc-treatment.js | `computeBroadCrestedWeir` | `{ crest_length_ft = 0, head_ft = 0, discharge_coeff = 0 } = {}` | _ | _ | _ |
 | calc-treatment.js | `computeChemicalFeedPump` | `{ flow_mgd = 0, dose_mgl = 0, strength_pct = 100, sg = 1, pump_max_gpd = 0 } ...` | _ | _ | _ |
 | calc-treatment.js | `computeChlorineCylinderWithdrawal` | `{ feed_rate_lb_day = 0, container_type = "cylinder", room_temp_f = 70 } = {}` | _ | _ | _ |
-| calc-treatment.js | `computeCipollettiWeir` | `{ crest_length_ft = 0, head_ft = 0, coeff = 0 } = {}` | _ | _ | _ |
 | calc-treatment.js | `computeClarifierAreaForLoading` | `{ flow_mgd = 0, target_sor_gpd_ft2 = 0 } = {}` | _ | _ | _ |
 | calc-treatment.js | `computeClarifierSurfaceLoading` | `{ flow_mgd = 0, surface_ft2 = 0, weir_len_ft = 0, mlss_mgl = 0, ras_mgd = 0 }...` | _ | _ | _ |
 | calc-treatment.js | `computeConductivityFromTds` | `{ tds_mgl = 0, k_factor = 0.65 } = {}` | _ | _ | _ |
@@ -3672,12 +3675,9 @@ cross-check.
 | calc-treatment.js | `computePoolSaltDose` | `{ gallons = 0, current_salt_ppm = 0, target_salt_ppm = 0 } = {}` | _ | _ | _ |
 | calc-treatment.js | `computePoolTileCopingPerimeter` | `{ length_ft = 32, width_ft = 16, tile_length_in = 6, courses = 1, coping_leng...` | _ | _ | _ |
 | calc-treatment.js | `computePoolVolume` | `{ shape = "rectangle", length_ft = 0, width_ft = 0, diameter_ft = 0, shallow_...` | _ | _ | _ |
-| calc-treatment.js | `computeSluiceGateFlow` | `{ gate_opening_ft = 0, gate_width_ft = 0, upstream_depth_ft = 0, contraction_...` | _ | _ | _ |
 | calc-treatment.js | `computeTaperedFlocculationG` | `{ stage1_g_per_s = 0, stage2_g_per_s = 0, stage3_g_per_s = 0, stage_volume_m3...` | _ | _ | _ |
 | calc-treatment.js | `computeTdsFromConductivity` | `{ conductivity_us_cm = 0, k_factor = 0.65 } = {}` | _ | _ | _ |
 | calc-treatment.js | `computeVaAlkalinityRatio` | `{ volatile_acids_mgl = 0, alkalinity_mgl = 0 } = {}` | _ | _ | _ |
-| calc-treatment.js | `computeWeirFlow` | `{ weir_type = "vnotch90", head_ft = 0, crest_length_ft = 0, coeff = 0 } = {}` | _ | _ | _ |
-| calc-treatment.js | `computeWeirHeadFromFlow` | `{ weir_type = "vnotch90", target_flow_cfs = 0, crest_length_ft = 0, coeff = 0...` | _ | _ | _ |
 | calc-trenchless.js | `computeCippLinerThickness` | `{ host_id_in = 0, ovality_pct = 0, groundwater_head_ft = 0, long_term_modulus...` | _ | _ | _ |
 | calc-trenchless.js | `computeHddAnnularPressure` | `{ cover_depth_ft = 0, shallow_cover_ft = 0, soil_unit_weight_pcf = 0, soil_co...` | _ | _ | _ |
 | calc-trenchless.js | `computeHddBendRadius` | `{ pipe_diameter_in = 0, radius_per_inch_ft = 100, rod_min_radius_ft = 0, entr...` | _ | _ | _ |

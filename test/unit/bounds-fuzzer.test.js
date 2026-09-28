@@ -10572,9 +10572,10 @@ test("bounds: spec-v732 cutter diameter for a spindle RPM (inverse of cutting-sp
 
 import { computeGrowingDegreeDays as _l1, computePearsonSquareRation as _l2, computeLivestockWaterRequirement as _l3, computeTwoStrokeMix as _l4 } from "../../calc-agriculture.js";
 import { computeReferenceEt0 as _v1265 } from "../../calc-agriculture.js";
-import { computeWeirFlow as _m1, computeLangelierIndex as _m2, computeChemicalFeedPump as _m3 } from "../../calc-treatment.js"; // spec-v75: v20 Phase M bench relocated out of calc-water.js
+import { computeLangelierIndex as _m2, computeChemicalFeedPump as _m3 } from "../../calc-treatment.js"; // spec-v75: v20 Phase M bench relocated out of calc-water.js
+import { computeWeirFlow as _m1 } from "../../calc-openchannel.js";
 
-import { computeWeirHeadFromFlow as _v658 } from "../../calc-treatment.js";
+import { computeWeirHeadFromFlow as _v658 } from "../../calc-openchannel.js";
 
 test("bounds: spec-v658 computeWeirHeadFromFlow inverts the weir equations (closed form + fixed-point), round-trips weir-flow, flags low head, and rejects bad inputs", () => {
   // V-notch closed form: H = (Q/2.49)^(1/2.48).
@@ -10598,8 +10599,8 @@ test("bounds: spec-v658 computeWeirHeadFromFlow inverts the weir equations (clos
   assert.ok("error" in _v658({ weir_type: "vnotch90", target_flow_cfs: Infinity }));
 });
 
-import { computeCipollettiWeir as _v1227 } from "../../calc-treatment.js";
-import { computeBroadCrestedWeir as _v1241 } from "../../calc-treatment.js";
+import { computeCipollettiWeir as _v1227 } from "../../calc-openchannel.js";
+import { computeBroadCrestedWeir as _v1241 } from "../../calc-openchannel.js";
 test("bounds: spec-v1241 computeBroadCrestedWeir pins Q = Cd (2/3)^1.5 sqrt(g) L H^1.5, the below-sharp-crested coefficient, the H^1.5 scaling, and error seams", () => {
   const g = 32.2, K = Math.pow(2 / 3, 1.5) * Math.sqrt(g);
   assert.ok(Math.abs(K - 3.0888) < 5e-4); // theoretical coefficient
@@ -10626,7 +10627,7 @@ test("bounds: spec-v1241 computeBroadCrestedWeir pins Q = Cd (2/3)^1.5 sqrt(g) L
   assert.ok("error" in _v1241({ crest_length_ft: 10, head_ft: 1, discharge_coeff: 1.5 }));
   assert.ok("error" in _v1241({ crest_length_ft: Infinity, head_ft: 1 }));
 });
-import { computeSluiceGateFlow as _v1240 } from "../../calc-treatment.js";
+import { computeSluiceGateFlow as _v1240 } from "../../calc-openchannel.js";
 test("bounds: spec-v1240 computeSluiceGateFlow pins Cd = Cc/sqrt(1+Cc a/y1), Q = Cd b a sqrt(2 g y1), the shear scaling, and error seams", () => {
   const g = 32.2, Cc = 0.61;
   // 1 ft opening, 5 ft wide, 6 ft upstream depth: Cd 0.5812, Q 57.12 cfs.
