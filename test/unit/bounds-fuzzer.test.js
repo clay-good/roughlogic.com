@@ -10571,7 +10571,7 @@ test("bounds: spec-v732 cutter diameter for a spindle RPM (inverse of cutting-sp
 });
 
 import { computeGrowingDegreeDays as _l1, computePearsonSquareRation as _l2, computeLivestockWaterRequirement as _l3, computeTwoStrokeMix as _l4 } from "../../calc-agriculture.js";
-import { computeReferenceEt0 as _v1265 } from "../../calc-agriculture.js";
+import { computeReferenceEt0 as _v1265 } from "../../calc-farmproduction.js";
 import { computeLangelierIndex as _m2, computeChemicalFeedPump as _m3 } from "../../calc-treatment.js"; // spec-v75: v20 Phase M bench relocated out of calc-water.js
 import { computeWeirFlow as _m1 } from "../../calc-openchannel.js";
 
@@ -23012,7 +23012,7 @@ test("bounds: spec-v416 computeLiquefactionScreening pins CSR/FS, the trigger, a
 });
 
 // ===================== spec-v417..v419 landscape/agriculture trio (calc-agriculture.js) =====================
-import { computeMulchTopsoilVolume as _v417, computeGrainDryingEnergy as _v418, computeManureNutrientApplication as _v419 } from "../../calc-agriculture.js";
+import { computeMulchTopsoilVolume as _v417, computeGrainDryingEnergy as _v418, computeManureNutrientApplication as _v419 } from "../../calc-farmproduction.js";
 
 test("bounds: spec-v417 computeMulchTopsoilVolume pins the volume, bags/tons/loads, and error seams", () => {
   const r = _v417({ area_ft2: 1000, depth_in: 3, bulk_density: 1.1, bag_ft3: 2, load_yd3: 10, waste_pct: 0 });
@@ -26461,7 +26461,7 @@ test("bounds: spec-v777 firewood-cord pins cords = L*H*D/128, the full-cord iden
   assert.ok("error" in _v777({ length_ft: 8, height_ft: 4, depth_ft: NaN }));
 });
 
-import { computeCenterPivotRuntime as _v568 } from "../../calc-agriculture.js";
+import { computeCenterPivotRuntime as _v568 } from "../../calc-farmproduction.js";
 
 test("bounds: spec-v568 computeCenterPivotRuntime pins the 452.6 runtime relation, the gross capacity, the net depth, and error seams", () => {
   const r = _v568({ system_flow_gpm: 800, area_acres: 125, target_depth_in: 1.0, efficiency_pct: 85 });
@@ -26483,7 +26483,7 @@ test("bounds: spec-v568 computeCenterPivotRuntime pins the 452.6 runtime relatio
   assert.ok("error" in _v568({ system_flow_gpm: 800, area_acres: 125, target_depth_in: 1.0, efficiency_pct: 101 }));
 });
 
-import { computeGrainAerationAirflow as _v569 } from "../../calc-agriculture.js";
+import { computeGrainAerationAirflow as _v569 } from "../../calc-farmproduction.js";
 
 test("bounds: spec-v569 computeGrainAerationAirflow pins the rate x bushels airflow, the cooling-time rule, the cooling-vs-drying bands, and error seams", () => {
   const r = _v569({ bin_capacity_bu: 20000, airflow_rate: 0.15 });
@@ -26783,7 +26783,7 @@ test("bounds: spec-v581 computeFoamEductorLimit pins the 65% ceiling, the Q^2 fr
   assert.ok("error" in _v581({ inlet_pressure_psi: 200, eductor_flow_gpm: 95, hose_coefficient: 15.5, nozzle_pressure_psi: -1 }));
 });
 
-import { computeManureStorageVolume as _v582 } from "../../calc-agriculture.js";
+import { computeManureStorageVolume as _v582 } from "../../calc-farmproduction.js";
 
 test("bounds: spec-v582 computeManureStorageVolume pins the manure, precipitation-storm, and freeboard volumes, the total, the manure-only undersize, and error seams", () => {
   const r = _v582({ daily_manure_ft3: 150, wastewater_ft3: 0, bedding_ft3: 20, storage_days: 120, surface_area_ft2: 8000, net_precip_in: 6, storm_in: 4, freeboard_in: 12 });
@@ -27228,7 +27228,7 @@ test("bounds: spec-v601 computeIowaRateOfFlow pins the volume-to-flow relation, 
   assert.ok("error" in _v601({ length_ft: 20, width_ft: 30, height_ft: 0 }));
 });
 
-import { computePivotApplicationRate as _v602 } from "../../calc-agriculture.js";
+import { computePivotApplicationRate as _v602 } from "../../calc-farmproduction.js";
 
 test("bounds: spec-v602 computePivotApplicationRate pins the outer-span rate, the intake check, the sensitivities, and error seams", () => {
   // Pinned worked example: 1-in pass, quarter-mile pivot, 24-hr revolution, 100-ft band, silt-loam intake.
@@ -27297,7 +27297,7 @@ test("bounds: spec-v603 computeSteelDoublerPlate pins the two limits, the govern
   assert.ok("error" in _v603({ required_shear_kip: 300, fy_ksi: 50, col_depth_dc_in: 14, col_web_tw_in: 0.485, pz_depth_dz_in: 22.64, pz_width_wz_in: 0 }));
 });
 
-import { computePivotTimerDepth as _v604 } from "../../calc-agriculture.js";
+import { computePivotTimerDepth as _v604 } from "../../calc-farmproduction.js";
 
 test("bounds: spec-v604 computePivotTimerDepth pins the revolution, depth, the inverse-timer relation, and error seams", () => {
   // Pinned worked example: 800 gpm, 125 ac, 20-hr full-speed pass, 50% timer.
@@ -27356,7 +27356,7 @@ test("bounds: spec-v605 computeTankerFleetSize pins the bottleneck, the fleet th
   assert.ok("error" in _v605({ tank_gal: 3000, fill_gpm: 1000, dump_gpm: 1000, distance_mi: 2, speed_mph: 0 }));
 });
 
-import { computeManureCoverSavings as _v606 } from "../../calc-agriculture.js";
+import { computeManureCoverSavings as _v606 } from "../../calc-farmproduction.js";
 
 test("bounds: spec-v606 computeManureCoverSavings pins the open/covered/saving, the precip-term identity, wetter-pays-more, and error seams", () => {
   // Pinned worked example: 8,000 ft2 pit, 6-in net precip + 4-in storm.
@@ -29550,7 +29550,7 @@ test("bounds: spec-v915 computeOutdoorResetRatio pins the reset ratio, supply ta
   assert.ok("error" in _v915({ supply_design_f: Infinity, supply_min_f: 80, oa_design_f: 0, oa_noheat_f: 65, oa_current_f: 30 }));
 });
 
-import { computeAnhydrousAmmoniaRate as _v940 } from "../../calc-agriculture.js";
+import { computeAnhydrousAmmoniaRate as _v940 } from "../../calc-farmproduction.js";
 
 test("bounds: spec-v940 computeAnhydrousAmmoniaRate pins the product rate, acres/tank, and error seams", () => {
   const r = _v940({ n_target_lb_per_ac: 180, tank_gal: 1000 });
@@ -29567,7 +29567,7 @@ test("bounds: spec-v940 computeAnhydrousAmmoniaRate pins the product rate, acres
   assert.ok("error" in _v940({ n_target_lb_per_ac: Infinity, tank_gal: 1000 }));
 });
 
-import { computeTractorBallast as _v914 } from "../../calc-agriculture.js";
+import { computeTractorBallast as _v914 } from "../../calc-farmproduction.js";
 
 test("bounds: spec-v914 computeTractorBallast pins the target weight, signed ballast change, and error seams", () => {
   const r = _v914({ power_hp: 180, weight_to_power_ratio: 125, current_weight_lb: 18000 });
@@ -30272,7 +30272,7 @@ test("bounds: spec-v963 computeDcShuntSizing pins the shunt Ohm's law and error 
   assert.ok("error" in _v963({ rated_current_a: Infinity, rated_millivolt: 50, measured_millivolt: 25 }));
 });
 
-import { computeMadIrrigationTrigger as _v964 } from "../../calc-agriculture.js";
+import { computeMadIrrigationTrigger as _v964 } from "../../calc-farmproduction.js";
 
 test("bounds: spec-v964 computeMadIrrigationTrigger pins TAW/RAW/interval and error seams", () => {
   const r = _v964({ field_capacity: 0.30, wilting_point: 0.12, root_depth_in: 24, mad_fraction: 0.5, etc_in_day: 0.25 });
@@ -30490,7 +30490,7 @@ test("bounds: spec-v973 computeFloatMethodFlow pins the velocity-area flow and e
   assert.ok("error" in _v973({ float_distance_ft: Infinity, travel_time_s: 10, channel_width_ft: 4, mean_depth_ft: 1.5, float_coefficient: 0.85 }));
 });
 
-import { computeFertigationInjectionRate as _v974 } from "../../calc-agriculture.js";
+import { computeFertigationInjectionRate as _v974 } from "../../calc-farmproduction.js";
 
 test("bounds: spec-v974 computeFertigationInjectionRate pins the injection rate and error seams", () => {
   const r = _v974({ product_rate_gal_per_acre: 5, area_acres: 40, set_time_hours: 6 });
@@ -30921,7 +30921,7 @@ test("bounds: spec-v992 computeTwoSourceBlend pins the flow-weighted blend and t
   assert.ok("error" in _v992({ flow1_gpm: Infinity, conc1: 4, flow2_gpm: 300, conc2: 12, target_conc: 8 }));
 });
 
-import { computeCattleHeartGirthWeight as _v993c } from "../../calc-agriculture.js";
+import { computeCattleHeartGirthWeight as _v993c } from "../../calc-farmproduction.js";
 
 test("bounds: spec-v993 computeCattleHeartGirthWeight pins Schaeffer's formula", () => {
   const r = _v993c({ heart_girth_in: 70, body_length_in: 55 });
@@ -30937,7 +30937,7 @@ test("bounds: spec-v993 computeCattleHeartGirthWeight pins Schaeffer's formula",
   assert.ok("error" in _v993c({ heart_girth_in: Infinity, body_length_in: 55 }));
 });
 
-import { computeCornYieldEstimate as _v994 } from "../../calc-agriculture.js";
+import { computeCornYieldEstimate as _v994 } from "../../calc-farmproduction.js";
 
 test("bounds: spec-v994 computeCornYieldEstimate pins the yield component method", () => {
   const r = _v994({ ears_per_thousandth_acre: 32, kernel_rows_around: 16, kernels_per_row: 35, kernel_factor: 90 });
@@ -30956,7 +30956,7 @@ test("bounds: spec-v994 computeCornYieldEstimate pins the yield component method
   assert.ok("error" in _v994({ ears_per_thousandth_acre: Infinity, kernel_rows_around: 16, kernels_per_row: 35, kernel_factor: 90 }));
 });
 
-import { computeDressingPercentage as _v995 } from "../../calc-agriculture.js";
+import { computeDressingPercentage as _v995 } from "../../calc-farmproduction.js";
 
 test("bounds: spec-v995 computeDressingPercentage pins the dressing % and freezer yield", () => {
   const r = _v995({ live_weight_lb: 1200, hot_carcass_weight_lb: 744, cutting_yield_pct: 67 });

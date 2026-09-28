@@ -1273,25 +1273,14 @@ export const TOOL_MODULES = (() => {
     // v9
     "thi-livestock", "sprayer-calibration",
     // v17
-    "irrigation-requirement", "mad-irrigation-trigger", "fertigation-injection-rate", "cattle-heart-girth-weight", "corn-yield-estimate", "dressing-percentage", "cattle-stocking-rate", "grain-bin-capacity", "grain-bin-height-for-capacity", "bunker-silo-capacity", "feed-conversion-ratio",
+    "irrigation-requirement", "cattle-stocking-rate", "grain-bin-capacity", "grain-bin-height-for-capacity", "bunker-silo-capacity", "feed-conversion-ratio",
     "grain-shrink-moisture", "livestock-dry-matter-intake", "manure-application-rate",
     "npk-blend", "tank-mix",
     // v23
     "pesticide-rei-phi",
   
     // v20
-    "growing-degree-days", "pearson-square-ration", "livestock-water-requirement", "reference-et0",
-    // spec-v417..v419 landscape/agriculture
-    "mulch-topsoil-volume", "grain-drying-energy", "manure-nutrient-application",
-    // spec-v568
-    "center-pivot-runtime",
-    "pivot-application-rate",
-    "pivot-timer-depth",
-    // spec-v569
-    "grain-aeration-airflow",
-    // spec-v582
-    "manure-storage-volume",
-    "manure-cover-savings",
+    "growing-degree-days", "pearson-square-ration", "livestock-water-requirement",
     // v35
     "two-stroke-mix", "two-stroke-mix-ratio-check",
     // v84 sprayer nozzle / drift / field capacity
@@ -1301,9 +1290,16 @@ export const TOOL_MODULES = (() => {
     // spec-v207..v211 landscape irrigation and planting install cluster.
     "sprinkler-precip-rate", "sprinkler-gpm-for-precip", "irrigation-zone-runtime", "drip-zone-flow",
     "plant-spacing-count", "sod-takeoff",
-    // spec-v914 tractor ballast for a target weight-to-power ratio
-    "tractor-ballast",
-    "anhydrous-ammonia-rate",
+  ]);
+  // spec-v1859: agricultural production, irrigation, and farm inputs split
+  // from calc-agriculture.js before that module reached its gzip cap.
+  declare("./calc-farmproduction.js", "FARMPRODUCTION_RENDERERS", [
+    "mulch-topsoil-volume", "grain-drying-energy", "manure-nutrient-application",
+    "center-pivot-runtime", "pivot-application-rate", "pivot-timer-depth",
+    "grain-aeration-airflow", "manure-storage-volume", "manure-cover-savings",
+    "tractor-ballast", "anhydrous-ammonia-rate", "mad-irrigation-trigger",
+    "fertigation-injection-rate", "cattle-heart-girth-weight", "corn-yield-estimate",
+    "dressing-percentage", "reference-et0",
   ]);
   // spec-v1717..v1726: the air quality and emissions bench (Group G). Two
   // threads: the REGULATORY number is rarely the one a plant tracks (potential

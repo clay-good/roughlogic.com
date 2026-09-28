@@ -1443,24 +1443,16 @@ cross-check.
 | calc-accounting.js | `computeSuretyBondPremium` | `{ contract_usd = 0, rate1_per_k = 25, rate2_per_k = 15, rate3_per_k = 10 } = {}` | _ | _ | _ |
 | calc-accounting.js | `computeWipPercentComplete` | `{ contract_usd = 0, cost_to_date_usd = 0, est_total_cost_usd = 0, billed_to_d...` | _ | _ | _ |
 | calc-accounting.js | `computeWorkersCompEmrPremium` | `{ payroll_usd = 0, class_rate = 0, emr = 1.0 } = {}` | _ | _ | _ |
-| calc-agriculture.js | `computeAnhydrousAmmoniaRate` | `{ n_target_lb_per_ac = 180, tank_gal = 1000 } = {}` | _ | _ | _ |
 | calc-agriculture.js | `computeBulkDensity` | `{ dry_mass_g = 0, core_volume_cc = 0, particle_density_pcc = 2.65, texture = ...` | _ | _ | _ |
 | calc-agriculture.js | `computeBunkerSiloCapacity` | `{ bottom_width_ft = 0, top_width_ft = 0, average_depth_ft = 0, length_ft = 0,...` | _ | _ | _ |
-| calc-agriculture.js | `computeCattleHeartGirthWeight` | `{ heart_girth_in = 70, body_length_in = 55 } = {}` | _ | _ | _ |
-| calc-agriculture.js | `computeCenterPivotRuntime` | `{ system_flow_gpm = 0, area_acres = 0, target_depth_in = 0, efficiency_pct = ...` | _ | _ | _ |
-| calc-agriculture.js | `computeCornYieldEstimate` | `{ ears_per_thousandth_acre = 32, kernel_rows_around = 16, kernels_per_row = 3...` | _ | _ | _ |
 | calc-agriculture.js | `computeCropYield` | `{ crop = "corn", rows_per_pass = 1, row_spacing_in, measured_length_ft = 0, w...` | _ | _ | _ |
 | calc-agriculture.js | `computeDrawbarPower` | `{ pull_lb = 0, speed_mph = 0, surface = "firm_soil", tractor_type = "2wd" }` | _ | _ | _ |
 | calc-agriculture.js | `computeDrawbarPull` | `{ power_hp = 0, power_basis = "drawbar", speed_mph = 0, surface = "firm_soil"...` | _ | _ | _ |
-| calc-agriculture.js | `computeDressingPercentage` | `{ live_weight_lb = 1200, hot_carcass_weight_lb = 744, cutting_yield_pct = 67,...` | _ | _ | _ |
 | calc-agriculture.js | `computeDripZoneFlow` | `{ mode = "inline", tubing_ft = 0, spacing_in = 0, emitter_gph = 0, emitter_co...` | _ | _ | _ |
 | calc-agriculture.js | `computeFeedConversionRatio` | `{ initial_weight_lb = 0, final_weight_lb = 0, days_on_feed = 0, total_feed_lb...` | _ | _ | _ |
-| calc-agriculture.js | `computeFertigationInjectionRate` | `{ product_rate_gal_per_acre = 5, area_acres = 40, set_time_hours = 6 } = {}` | _ | _ | _ |
 | calc-agriculture.js | `computeGPA` | `{ gpm = 0, spacing_in = 0, speed_mph = 0, target_gpa = 0 }` | _ | _ | _ |
-| calc-agriculture.js | `computeGrainAerationAirflow` | `{ bin_capacity_bu = 0, airflow_rate = 0 } = {}` | _ | _ | _ |
 | calc-agriculture.js | `computeGrainBin` | `{ diameter_ft = 0, eave_height_ft = 0, peak_height_ft = 0, grain = "corn", pa...` | _ | _ | _ |
 | calc-agriculture.js | `computeGrainBinHeightForCapacity` | `{ target_bushels = 0, diameter_ft = 0, peak_height_ft = 0, packing_factor = 1...` | _ | _ | _ |
-| calc-agriculture.js | `computeGrainDryingEnergy` | `{ bushels = 0, lb_per_bushel = 56, mi_percent = 0, mf_percent = 0, btu_per_lb...` | _ | _ | _ |
 | calc-agriculture.js | `computeGrainShrinkMoisture` | `{ W_lb = 0, M_wet_pct = 0, M_dry_pct = 0, handling = 0.5, tw_lbbu = 56 } = {}` | _ | _ | _ |
 | calc-agriculture.js | `computeGrowingDegreeDays` | `{ days_series = [], base_f = 50, cutoff_f = 0, method = "standard" } = {}` | _ | _ | _ |
 | calc-agriculture.js | `computeHayDryMatter` | `{ bale_weight_lb = 0, moisture_pct = 0, target_moisture_pct = 15, safe_thresh...` | _ | _ | _ |
@@ -1468,20 +1460,12 @@ cross-check.
 | calc-agriculture.js | `computeIrrigationZoneRuntime` | `{ target_in = 0, precip_in_hr = 0, du = 1.0, max_cycle_min = 0 } = {}` | _ | _ | _ |
 | calc-agriculture.js | `computeLivestockDryMatterIntake` | `{ BW_lb = 0, intake = 0, feed_DM = 0, head = 1 } = {}` | _ | _ | _ |
 | calc-agriculture.js | `computeLivestockWaterRequirement` | `{ method = "table", head = 1, temp_f = 0, t_low_f = 0, gal_low = 0, t_high_f ...` | _ | _ | _ |
-| calc-agriculture.js | `computeMadIrrigationTrigger` | `{ field_capacity = 0.30, wilting_point = 0.12, root_depth_in = 24, mad_fracti...` | _ | _ | _ |
 | calc-agriculture.js | `computeManureApplicationRate` | `{ crop_need = 0, total_nutr = 0, availability = 0, form = "solid" } = {}` | _ | _ | _ |
-| calc-agriculture.js | `computeManureCoverSavings` | `{ daily_manure_ft3 = 0, wastewater_ft3 = 0, bedding_ft3 = 0, storage_days = 0...` | _ | _ | _ |
-| calc-agriculture.js | `computeManureNutrientApplication` | `{ crop_n_need_lb_acre = 0, total_n_lb_ton = 0, availability_pct = 0, p2o5_lb_...` | _ | _ | _ |
-| calc-agriculture.js | `computeManureStorageVolume` | `{ daily_manure_ft3 = 0, wastewater_ft3 = 0, bedding_ft3 = 0, storage_days = 0...` | _ | _ | _ |
-| calc-agriculture.js | `computeMulchTopsoilVolume` | `{ area_ft2 = 0, depth_in = 0, bulk_density = 0, bag_ft3 = 2, load_yd3 = 10, w...` | _ | _ | _ |
 | calc-agriculture.js | `computeNozzleFlowPressure` | `{ rated_gpm, rated_psi, new_psi, target_gpm = 0 } = {}` | _ | _ | _ |
 | calc-agriculture.js | `computeNpkBlend` | `{ crop = "corn", soil_n_lb_per_acre = 0, soil_p_lb_per_acre = 0, soil_k_lb_pe...` | _ | _ | _ |
 | calc-agriculture.js | `computePearsonSquareRation` | `{ feed_a_pct = 0, feed_b_pct = 0, target_pct = 0, batch_lb = 0 } = {}` | _ | _ | _ |
 | calc-agriculture.js | `computePesticideReiPhi` | `{ rei_hours = 0, phi_days = 0, hours_since_application = 0, days_since_applic...` | _ | _ | _ |
-| calc-agriculture.js | `computePivotApplicationRate` | `{ pass_depth_in = 0, pivot_length_ft = 0, revolution_hr = 0, wetted_band_ft =...` | _ | _ | _ |
-| calc-agriculture.js | `computePivotTimerDepth` | `{ system_flow_gpm = 0, area_acres = 0, revolution_100_hr = 0, timer_pct = 0 }...` | _ | _ | _ |
 | calc-agriculture.js | `computePlantSpacingCount` | `{ bed_ft2 = 0, spacing_in = 0 } = {}` | _ | _ | _ |
-| calc-agriculture.js | `computeReferenceEt0` | `{ latitude_deg = 0, month = "jul", tmax_f = 0, tmin_f = 0 } = {}` | _ | _ | _ |
 | calc-agriculture.js | `computeSeedRate` | `{ row_width_in = 0, in_row_spacing_in = 0, target_pop_per_acre = 0, seeds_per...` | _ | _ | _ |
 | calc-agriculture.js | `computeSodTakeoff` | `{ lawn_ft2 = 0, waste_pct = 0, slab_ft2 = 10, pallet_ft2 = 450 } = {}` | _ | _ | _ |
 | calc-agriculture.js | `computeSprayDriftBuffer` | `{ base_buffer_ft = 0, droplet_class = "medium", wind_mph, boom_height_in = 20...` | _ | _ | _ |
@@ -1493,7 +1477,6 @@ cross-check.
 | calc-agriculture.js | `computeTHI` | `{ temperature = 0, unit = "F", rh_percent = 0, animal = "dairy-cow", ventilat...` | _ | _ | _ |
 | calc-agriculture.js | `computeTankMix` | `{ tank_gal = 0, spray_volume_gpa = 0, product_rate_per_acre = 0, product_unit...` | _ | _ | _ |
 | calc-agriculture.js | `computeTimberCruise` | `{ small_end_dib_in = 0, log_length_ft = 16, rule = "doyle", price_per_bf = 0 }` | _ | _ | _ |
-| calc-agriculture.js | `computeTractorBallast` | `{ power_hp = 180, weight_to_power_ratio = 125, current_weight_lb = 18000 } = {}` | _ | _ | _ |
 | calc-agriculture.js | `computeTwoStrokeMix` | `{ ratio = 50, fuel_amount = 0, fuel_unit = "gallon" } = {}` | _ | _ | _ |
 | calc-agriculture.js | `computeTwoStrokeMixRatioCheck` | `{ fuel_amount = 0, fuel_unit = "gallon", oil_amount = 0, target_ratio = 50 } ...` | _ | _ | _ |
 | calc-agriculture.js | `computeUniformity` | `{ catch_volumes = [] }` | _ | _ | _ |
@@ -2284,6 +2267,23 @@ cross-check.
 | calc-fab.js | `computeWeldTravelSpeed` | `{ V_volts = 0, I_amps = 0, eta = 1.0, HI_kjin = 0 } = {}` | _ | _ | _ |
 | calc-fab.js | `computeWireFeedDeposition` | `{ wfs_in_min = 0, wire_dia_in = 0, deposition_eff = 0.92 } = {}` | _ | _ | _ |
 | calc-fab.js | `computeWireFeedSpeedForDeposition` | `{ target_deposit_lb_hr = 0, wire_dia_in = 0, deposition_eff = 0.92 } = {}` | _ | _ | _ |
+| calc-farmproduction.js | `computeAnhydrousAmmoniaRate` | `{ n_target_lb_per_ac = 180, tank_gal = 1000 } = {}` | _ | _ | _ |
+| calc-farmproduction.js | `computeCattleHeartGirthWeight` | `{ heart_girth_in = 70, body_length_in = 55 } = {}` | _ | _ | _ |
+| calc-farmproduction.js | `computeCenterPivotRuntime` | `{ system_flow_gpm = 0, area_acres = 0, target_depth_in = 0, efficiency_pct = ...` | _ | _ | _ |
+| calc-farmproduction.js | `computeCornYieldEstimate` | `{ ears_per_thousandth_acre = 32, kernel_rows_around = 16, kernels_per_row = 3...` | _ | _ | _ |
+| calc-farmproduction.js | `computeDressingPercentage` | `{ live_weight_lb = 1200, hot_carcass_weight_lb = 744, cutting_yield_pct = 67,...` | _ | _ | _ |
+| calc-farmproduction.js | `computeFertigationInjectionRate` | `{ product_rate_gal_per_acre = 5, area_acres = 40, set_time_hours = 6 } = {}` | _ | _ | _ |
+| calc-farmproduction.js | `computeGrainAerationAirflow` | `{ bin_capacity_bu = 0, airflow_rate = 0 } = {}` | _ | _ | _ |
+| calc-farmproduction.js | `computeGrainDryingEnergy` | `{ bushels = 0, lb_per_bushel = 56, mi_percent = 0, mf_percent = 0, btu_per_lb...` | _ | _ | _ |
+| calc-farmproduction.js | `computeMadIrrigationTrigger` | `{ field_capacity = 0.30, wilting_point = 0.12, root_depth_in = 24, mad_fracti...` | _ | _ | _ |
+| calc-farmproduction.js | `computeManureCoverSavings` | `{ daily_manure_ft3 = 0, wastewater_ft3 = 0, bedding_ft3 = 0, storage_days = 0...` | _ | _ | _ |
+| calc-farmproduction.js | `computeManureNutrientApplication` | `{ crop_n_need_lb_acre = 0, total_n_lb_ton = 0, availability_pct = 0, p2o5_lb_...` | _ | _ | _ |
+| calc-farmproduction.js | `computeManureStorageVolume` | `{ daily_manure_ft3 = 0, wastewater_ft3 = 0, bedding_ft3 = 0, storage_days = 0...` | _ | _ | _ |
+| calc-farmproduction.js | `computeMulchTopsoilVolume` | `{ area_ft2 = 0, depth_in = 0, bulk_density = 0, bag_ft3 = 2, load_yd3 = 10, w...` | _ | _ | _ |
+| calc-farmproduction.js | `computePivotApplicationRate` | `{ pass_depth_in = 0, pivot_length_ft = 0, revolution_hr = 0, wetted_band_ft =...` | _ | _ | _ |
+| calc-farmproduction.js | `computePivotTimerDepth` | `{ system_flow_gpm = 0, area_acres = 0, revolution_100_hr = 0, timer_pct = 0 }...` | _ | _ | _ |
+| calc-farmproduction.js | `computeReferenceEt0` | `{ latitude_deg = 0, month = "jul", tmax_f = 0, tmin_f = 0 } = {}` | _ | _ | _ |
+| calc-farmproduction.js | `computeTractorBallast` | `{ power_hp = 180, weight_to_power_ratio = 125, current_weight_lb = 18000 } = {}` | _ | _ | _ |
 | calc-feeder.js | `computeContinuousLoadOcpd` | `{ l_cont_A = 0, l_noncont_A = 0, rated_100 = false } = {}` | _ | _ | _ |
 | calc-feeder.js | `computeEvChargerThrottle` | `{ aggregate_limit_a = 0, charger_max_a = 0, active_chargers = 0 } = {}` | _ | _ | _ |
 | calc-feeder.js | `computeEvLoadManagementEms` | `{ charger_count = 0, per_charger_a = 0, evems_limit_a = 0, apply_125_setpoint...` | _ | _ | _ |

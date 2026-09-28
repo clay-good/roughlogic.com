@@ -249,10 +249,10 @@ const MONEY_OR_RATE = /(^|_)(usd|cost|price|rate|wage|fringe|rev|fee|daily|annua
 // short, so renaming the key is the fix -- and each of these is a live field
 // key or output key, which puts it past a comment-line change.
 const UNIT_TAIL_EXEMPT = new Set([
-  "calc-agriculture.js:computeManureStorageVolume:wastewater_ft3",
-  "calc-agriculture.js:computeManureStorageVolume:bedding_ft3",
-  "calc-agriculture.js:computeManureCoverSavings:wastewater_ft3",
-  "calc-agriculture.js:computeManureCoverSavings:bedding_ft3",
+  "calc-farmproduction.js:computeManureStorageVolume:wastewater_ft3",
+  "calc-farmproduction.js:computeManureStorageVolume:bedding_ft3",
+  "calc-farmproduction.js:computeManureCoverSavings:wastewater_ft3",
+  "calc-farmproduction.js:computeManureCoverSavings:bedding_ft3",
   // BTU/hr wearing a `_btu` name: divided by a BTU/hr-per-foot soil figure.
   "calc-hvac.js:computeGeothermalLoop:heating_btu",
   "calc-hvac.js:computeGeothermalLoop:cooling_btu",
