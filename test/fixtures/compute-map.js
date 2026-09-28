@@ -1802,9 +1802,9 @@ export const COMPUTE_MAP = {
   "steel-camber": { module: "../../calc-steel.js", fn: "computeSteelCamber" },
   "steel-inertia-for-deflection": { module: "../../calc-steel.js", fn: "computeSteelInertiaForDeflection" },
   "steel-floor-vibration": { module: "../../calc-steel.js", fn: "computeSteelFloorVibration" },
-  "steel-panel-zone-shear": { module: "../../calc-steel.js", fn: "computeSteelPanelZoneShear" },
-  "steel-panel-zone-axial": { module: "../../calc-steel.js", fn: "computeSteelPanelZoneAxial" },
-  "steel-doubler-plate": { module: "../../calc-steel.js", fn: "computeSteelDoublerPlate" },
+  "steel-panel-zone-shear": { module: "../../calc-steelpanelzone.js", fn: "computeSteelPanelZoneShear" },
+  "steel-panel-zone-axial": { module: "../../calc-steelpanelzone.js", fn: "computeSteelPanelZoneAxial" },
+  "steel-doubler-plate": { module: "../../calc-steelpanelzone.js", fn: "computeSteelDoublerPlate" },
   // spec-v257..v259 ACI 318-19 reinforced-concrete member trio (3 tiles, new calc-concrete.js)
   "rc-beam-flexure": { module: "../../calc-concrete.js", fn: "computeRcBeamFlexure" },
   "rc-tbeam-flexure": { module: "../../calc-concrete.js", fn: "computeRcTBeamFlexure" },

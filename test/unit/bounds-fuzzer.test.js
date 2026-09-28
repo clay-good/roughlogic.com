@@ -26027,7 +26027,7 @@ test("bounds: spec-v554 computeLiftingLugDesign pins the three mode capacities, 
   assert.ok("error" in _v554({ applied_load_kip: 20, plate_thick_in: 1.0, hole_dia_in: 1.06, pin_dia_in: 1.0, edge_dist_in: 2.0, plate_width_in: 4.0, design_factor: 0.5 }));
 });
 
-import { computeSteelPanelZoneShear as _v555 } from "../../calc-steel.js";
+import { computeSteelPanelZoneShear as _v555 } from "../../calc-steelpanelzone.js";
 
 test("bounds: spec-v555 computeSteelPanelZoneShear pins the two branch strengths, the demand, the doubler flag flipping with pz_in_analysis, and error seams", () => {
   const base = { fy_ksi: 50, col_depth_dc_in: 14, col_web_tw_in: 0.5, col_flange_bcf_in: 14.5, col_flange_tcf_in: 0.75, beam_depth_db_in: 24, beam_flange_tf_in: 1.0, demand_moment_kin: 5500, col_shear_kip: 40 };
@@ -27261,7 +27261,7 @@ test("bounds: spec-v602 computePivotApplicationRate pins the outer-span rate, th
   assert.ok("error" in _v602({ pass_depth_in: 1, pivot_length_ft: 1320, revolution_hr: 24, wetted_band_ft: 100, soil_intake_in_hr: 0 }));
 });
 
-import { computeSteelDoublerPlate as _v603 } from "../../calc-steel.js";
+import { computeSteelDoublerPlate as _v603 } from "../../calc-steelpanelzone.js";
 
 test("bounds: spec-v603 computeSteelDoublerPlate pins the two limits, the governance switch, the no-doubler case, and error seams", () => {
   // Pinned worked example: W14, 300-kip demand -> stability governs.
@@ -27819,7 +27819,7 @@ test("bounds: spec-v617 computeConcreteAnchorBlowout pins Nsb, the corner factor
   assert.ok("error" in _v617({ edge_distance_in: 3, head_bearing_area_in2: 0.654, fc_psi: 4000, embedment_in: 10, perp_edge_in: 2 }));
 });
 
-import { computeSteelPanelZoneAxial as _v618 } from "../../calc-steel.js";
+import { computeSteelPanelZoneAxial as _v618 } from "../../calc-steelpanelzone.js";
 
 test("bounds: spec-v618 computeSteelPanelZoneAxial pins J10-10 and J10-12, the low-axial identity, the threshold seams, and error seams", () => {
   // Pinned worked example: Eq. J10-10 (not modeled, ratio 0.4528).

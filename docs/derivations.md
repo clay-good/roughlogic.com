@@ -3610,17 +3610,17 @@ cross-check.
 | calc-steel.js | `computeSteelCb` | `{ mmax = 0, ma = 0, mb = 0, mc = 0 } = {}` | _ | _ | _ |
 | calc-steel.js | `computeSteelColumnCapacity` | `{ fy = 50, e_mod = 29000, k = 1.0, l_ft = 0, r_in = 0, ag = 0, pu = 0 } = {}` | _ | _ | _ |
 | calc-steel.js | `computeSteelColumnStiffnessRatioG` | `{ ic1 = 0, lc1 = 0, ic2 = 0, lc2 = 0, ig1 = 0, lg1 = 0, ig2 = 0, lg2 = 0, gir...` | _ | _ | _ |
-| calc-steel.js | `computeSteelDoublerPlate` | `{ required_shear_kip = 0, fy_ksi = 50, col_depth_dc_in = 0, col_web_tw_in = 0...` | _ | _ | _ |
 | calc-steel.js | `computeSteelEffectiveLengthK` | `{ ga = 0, gb = 0, frame = "sway" } = {}` | _ | _ | _ |
 | calc-steel.js | `computeSteelFilletWeldSize` | `{ t1_in = 0, t2_in = 0, w_in = 0 } = {}` | _ | _ | _ |
 | calc-steel.js | `computeSteelFloorVibration` | `{ natural_freq_hz = 0, effective_wt_lb = 0, damping_ratio = 0.03, walker_forc...` | _ | _ | _ |
 | calc-steel.js | `computeSteelH1Interaction` | `{ pr_kip = 0, pc_kip = 0, mrx_kft = 0, mcx_kft = 0, mry_kft = 0, mcy_kft = 0 ...` | _ | _ | _ |
 | calc-steel.js | `computeSteelInertiaForDeflection` | `{ w_kip_ft = 0, span_ft = 0, allow_defl_in = 0, e_ksi = 29000 } = {}` | _ | _ | _ |
-| calc-steel.js | `computeSteelPanelZoneAxial` | `{ fy_ksi = 50, col_depth_dc_in = 0, col_web_tw_in = 0, col_area_ag_in2 = 0, p...` | _ | _ | _ |
-| calc-steel.js | `computeSteelPanelZoneShear` | `{ fy_ksi = 50, col_depth_dc_in = 0, col_web_tw_in = 0, col_flange_bcf_in = 0,...` | _ | _ | _ |
 | calc-steel.js | `computeSteelTauBStiffnessReduction` | `{ pr_kip = 0, fy_ksi = 50, ag_in2 = 0, method = "LRFD" } = {}` | _ | _ | _ |
 | calc-steel.js | `computeSteelTensionMember` | `{ ag_in2 = 0, fy = 36, fu = 58, t_in = 0, dh_in = 0.875, nh = 0, xbar_in = 0,...` | _ | _ | _ |
 | calc-steel.js | `computeSteelWebLocalStrength` | `{ fy = 50, tw = 0, tf = 0, k_in = 0, d_in = 0, lb_in = 0, location = "interio...` | _ | _ | _ |
+| calc-steelpanelzone.js | `computeSteelDoublerPlate` | `{ required_shear_kip = 0, fy_ksi = 50, col_depth_dc_in = 0, col_web_tw_in = 0...` | _ | _ | _ |
+| calc-steelpanelzone.js | `computeSteelPanelZoneAxial` | `{ fy_ksi = 50, col_depth_dc_in = 0, col_web_tw_in = 0, col_area_ag_in2 = 0, p...` | _ | _ | _ |
+| calc-steelpanelzone.js | `computeSteelPanelZoneShear` | `{ fy_ksi = 50, col_depth_dc_in = 0, col_web_tw_in = 0, col_flange_bcf_in = 0,...` | _ | _ | _ |
 | calc-survey.js | `computeAreaByCoordinates` | `{ points } = {}` | _ | _ | _ |
 | calc-survey.js | `computeAzimuthBearing` | `{ mode = "azimuth_to_bearing", azimuth_deg = 0, quadrant = "NE", quadrant_ang...` | _ | _ | _ |
 | calc-survey.js | `computeCogoForwardPoint` | `{ start_n = 0, start_e = 0, azimuth_deg = 0, distance_ft = 0 } = {}` | _ | _ | _ |

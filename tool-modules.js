@@ -825,11 +825,11 @@ export const TOOL_MODULES = (() => {
     "shear-stud-strength", "composite-beam-flexure", "steel-camber", "steel-inertia-for-deflection",
     // spec-v547
     "steel-floor-vibration",
-    // spec-v555
-    "steel-panel-zone-shear",
-    "steel-doubler-plate",
-    // spec-v618
-    "steel-panel-zone-axial",
+  ]);
+  // spec-v1861: the connected AISC panel-zone and doubler-plate bench split
+  // from calc-steel.js before that module reached its gzip cap.
+  declare("./calc-steelpanelzone.js", "STEELPANELZONE_RENDERERS", [
+    "steel-panel-zone-shear", "steel-doubler-plate", "steel-panel-zone-axial",
   ]);
   // spec-v257..v259 ACI 318-19 reinforced-concrete member trio: a new lazy
   // Group E cluster, the RC companion to calc-steel.js one material over.
