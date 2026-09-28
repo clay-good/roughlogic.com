@@ -1616,20 +1616,6 @@ export const TOOL_MODULES = (() => {
   declare("./calc-stage.js", "STAGE_RENDERERS", [
     "truss-capacity", "time-alignment", "dmx-planner",
     "neutral-imbalance", "spl-distance", "spl-distance-for-level", "acoustic-gain-pag-nag", "rigging-check",
-    // trade expansion v1364-v1376
-    "line-array-splay",
-    "delay-tower-alignment",
-    "cardioid-sub-array",
-    "driver-spacing-lobing",
-    "wireless-intermod",
-    "rf-antenna-cable-loss",
-    "chain-hoist-lift-time",
-    "gobo-image-size",
-    "mired-gel-shift",
-    "haze-machine-sizing",
-    "stage-deck-live-load",
-    "video-wall-data-rate",
-    "outdoor-stage-wind",
     // v9
     "spl-atmospheric",
   
@@ -1645,6 +1631,15 @@ export const TOOL_MODULES = (() => {
     "counterweight-arbor-load",
     // spec-v543
     "led-tape-run", "led-tape-max-run",
+  ]);
+  // spec-v1863: the spec-v1364..v1376 production-systems band split from
+  // calc-stage.js before that module reached its gzip cap.
+  declare("./calc-stageproduction.js", "STAGEPRODUCTION_RENDERERS", [
+    "line-array-splay", "delay-tower-alignment", "cardioid-sub-array",
+    "driver-spacing-lobing", "wireless-intermod", "rf-antenna-cable-loss",
+    "chain-hoist-lift-time", "gobo-image-size", "mired-gel-shift",
+    "haze-machine-sizing", "stage-deck-live-load", "video-wall-data-rate",
+    "outdoor-stage-wind",
   ]);
   // v4 Group O: Kitchen and Food Service.
   declare("./calc-kitchen.js", "KITCHEN_RENDERERS", [

@@ -39563,7 +39563,7 @@ test("bounds: spec-v1363 computeHotHoldingEnergy pins demand, amps, and the heat
 // spec-v1364..v1376: the 2026-08-26 trade-expansion Group N band.
 // ===========================================================================
 
-import { computeLineArraySplay as _v1364 } from "../../calc-stage.js";
+import { computeLineArraySplay as _v1364 } from "../../calc-stageproduction.js";
 test("bounds: spec-v1364 computeLineArraySplay pins the coverage angle, the splay, and the taper", () => {
   // 26 ft trim over 4 ft ears, 25 ft to 150 ft: 41.35 - 8.34 = 33.0 deg, 2.75 per box, 15.6 dB.
   const base = { trim_height_ft: 26, ear_height_ft: 4, near_throw_ft: 25, far_throw_ft: 150, cabinets: 12 };
@@ -39587,7 +39587,7 @@ test("bounds: spec-v1364 computeLineArraySplay pins the coverage angle, the spla
   assert.ok("error" in _v1364({ ...base, trim_height_ft: Infinity }));
 });
 
-import { computeDelayTowerAlignment as _v1365 } from "../../calc-stage.js";
+import { computeDelayTowerAlignment as _v1365 } from "../../calc-stageproduction.js";
 test("bounds: spec-v1365 computeDelayTowerAlignment pins the delay and the temperature drift", () => {
   // 180 ft at 70 F: c = 49.03 sqrt(529.67) = 1128.4 ft/s, 159.5 ms geometric, 174.5 ms set. At 90 F, c = 1149.5 and geometric = 156.6.
   const base = { distance_ft: 180, temp_f: 70, haas_offset_ms: 15, compare_temp_f: 90 };
@@ -39610,7 +39610,7 @@ test("bounds: spec-v1365 computeDelayTowerAlignment pins the delay and the tempe
   assert.ok("error" in _v1365({ ...base, distance_ft: Infinity }));
 });
 
-import { computeCardioidSubArray as _v1366 } from "../../calc-stage.js";
+import { computeCardioidSubArray as _v1366 } from "../../calc-stageproduction.js";
 test("bounds: spec-v1366 computeCardioidSubArray pins the quarter-wave relation", () => {
   // 3.0 ft centers at 70 F: 2.659 ms per element, deepest rejection at 94.0 Hz, 12.0 ft wavelength.
   const base = { spacing_ft: 3.0, elements: 4, temp_f: 70, target_freq_hz: 60 };
@@ -39636,7 +39636,7 @@ test("bounds: spec-v1366 computeCardioidSubArray pins the quarter-wave relation"
   assert.ok("error" in _v1366({ ...base, spacing_ft: Infinity }));
 });
 
-import { computeDriverSpacingLobing as _v1367 } from "../../calc-stage.js";
+import { computeDriverSpacingLobing as _v1367 } from "../../calc-stageproduction.js";
 test("bounds: spec-v1367 computeDriverSpacingLobing pins the ceiling and the null angle", () => {
   // 18 in centers at 70 F: ceiling 376 Hz. At 500 Hz the ratio is 0.752 -> null at 48.8 deg.
   const base = { spacing_ft: 1.5, test_freq_hz: 500, temp_f: 70 };
@@ -39659,7 +39659,7 @@ test("bounds: spec-v1367 computeDriverSpacingLobing pins the ceiling and the nul
   assert.ok("error" in _v1367({ ...base, spacing_ft: Infinity }));
 });
 
-import { computeWirelessIntermod as _v1368 } from "../../calc-stage.js";
+import { computeWirelessIntermod as _v1368 } from "../../calc-stageproduction.js";
 test("bounds: spec-v1368 computeWirelessIntermod pins the third- and fifth-order products", () => {
   // 542.000 and 545.000: third order 539.000 / 548.000, fifth order 536.000 / 551.000.
   const base = { f1_mhz: 542.0, f2_mhz: 545.0, test_freq_mhz: 539.0 };
@@ -39684,7 +39684,7 @@ test("bounds: spec-v1368 computeWirelessIntermod pins the third- and fifth-order
   assert.ok("error" in _v1368({ ...base, f1_mhz: Infinity }));
 });
 
-import { computeRfAntennaCableLoss as _v1369 } from "../../calc-stage.js";
+import { computeRfAntennaCableLoss as _v1369 } from "../../calc-stageproduction.js";
 test("bounds: spec-v1369 computeRfAntennaCableLoss pins the budget and the unity window", () => {
   // 150 ft at 8.8 dB/100 ft = 13.2 dB; a 12 dB amplifier lands at -1.2 dB, inside unity.
   const base = { length_ft: 150, loss_per_100ft_db: 8.8, connectors: 0, loss_per_connector_db: 0.25, splitter_loss_db: 0, amplifier_gain_db: 12 };
@@ -39710,7 +39710,7 @@ test("bounds: spec-v1369 computeRfAntennaCableLoss pins the budget and the unity
   assert.ok("error" in _v1369({ ...base, length_ft: Infinity }));
 });
 
-import { computeChainHoistLiftTime as _v1370 } from "../../calc-stage.js";
+import { computeChainHoistLiftTime as _v1370 } from "../../calc-stageproduction.js";
 test("bounds: spec-v1370 computeChainHoistLiftTime pins the lift time and the duty ceiling", () => {
   // 60 ft at 16 ft/min = 3.75 min; 2,000 x 16 / 33,000 = 0.97 hp; 40% of 10 min = 4.0 min; 1.07 lifts.
   const base = { lift_height_ft: 60, hoist_speed_fpm: 16, load_lb: 2000, duty_cycle: 0.40, rating_period_min: 10, hoists: 8 };
@@ -39739,7 +39739,7 @@ test("bounds: spec-v1370 computeChainHoistLiftTime pins the lift time and the du
   assert.ok("error" in _v1370({ ...base, load_lb: Infinity }));
 });
 
-import { computeGoboImageSize as _v1371 } from "../../calc-stage.js";
+import { computeGoboImageSize as _v1371 } from "../../calc-stageproduction.js";
 test("bounds: spec-v1371 computeGoboImageSize pins the image, the keystone, and the falloff", () => {
   // 36 deg at 30 ft = 19.5 ft; 45 deg off perpendicular stretches to 30.8 ft at 0.71 illuminance.
   // The long axis is the two edge rays meeting the tilted plane: throw sin(phi) [1/cos(a - phi) +
@@ -39772,7 +39772,7 @@ test("bounds: spec-v1371 computeGoboImageSize pins the image, the keystone, and 
   assert.ok("error" in _v1371({ ...base, throw_ft: Infinity }));
 });
 
-import { computeMiredGelShift as _v1372 } from "../../calc-stage.js";
+import { computeMiredGelShift as _v1372 } from "../../calc-stageproduction.js";
 test("bounds: spec-v1372 computeMiredGelShift pins the shift and the same-sheet-different-result fact", () => {
   // 3,200 K is 312.5 mireds, 5,600 K is 178.6: a -133.9 shift, and a full CTB at -131 is within 3.
   const base = { source_k: 3200, target_k: 5600, applied_shift: 0 };
@@ -39804,7 +39804,7 @@ test("bounds: spec-v1372 computeMiredGelShift pins the shift and the same-sheet-
   assert.ok("error" in _v1372({ ...base, source_k: Infinity }));
 });
 
-import { computeHazeMachineSizing as _v1373 } from "../../calc-stage.js";
+import { computeHazeMachineSizing as _v1373 } from "../../calc-stageproduction.js";
 test("bounds: spec-v1373 computeHazeMachineSizing pins the volume-times-ACH scaling", () => {
   // 200,000 cf at 4 ACH: 13,333 cfm, 4x the reference machine, 15 min to 63% and 35 to 90%.
   const base = { volume_cf: 200000, ach: 4, ref_volume_cf: 100000, ref_ach: 2, ref_output: 1 };
@@ -39830,7 +39830,7 @@ test("bounds: spec-v1373 computeHazeMachineSizing pins the volume-times-ACH scal
   assert.ok("error" in _v1373({ ...base, volume_cf: Infinity }));
 });
 
-import { computeStageDeckLiveLoad as _v1374 } from "../../calc-stage.js";
+import { computeStageDeckLiveLoad as _v1374 } from "../../calc-stageproduction.js";
 test("bounds: spec-v1374 computeStageDeckLiveLoad pins the per-leg load and the point-load check", () => {
   // 4 x 8 at 125 psf = 4,000 lb + 60 lb deck = 1,015 lb per leg: 101.5% of a 1,000 lb rating.
   const base = { length_ft: 4, width_ft: 8, legs: 4, design_psf: 125, deck_dead_lb: 60, leg_rating_lb: 1000, point_load_lb: 900, bearing_sqin: 4, deck_point_rating_lb: 1000 };
@@ -39863,7 +39863,7 @@ test("bounds: spec-v1374 computeStageDeckLiveLoad pins the per-leg load and the 
   assert.ok("error" in _v1374({ ...base, length_ft: Infinity }));
 });
 
-import { computeVideoWallDataRate as _v1375 } from "../../calc-stage.js";
+import { computeVideoWallDataRate as _v1375 } from "../../calc-stageproduction.js";
 test("bounds: spec-v1375 computeVideoWallDataRate pins the rate and the port count", () => {
   // 3,840 x 2,160 = 8,294,400 px; x 24 x 60 / 1e9 = 11.94 Gbps; 13 ports of 650,000.
   const base = { width_px: 3840, height_px: 2160, bit_depth: 8, refresh_hz: 60, pixels_per_port: 650000 };
@@ -39889,7 +39889,7 @@ test("bounds: spec-v1375 computeVideoWallDataRate pins the rate and the port cou
   assert.ok("error" in _v1375({ ...base, width_px: Infinity }));
 });
 
-import { computeOutdoorStageWind as _v1376 } from "../../calc-stage.js";
+import { computeOutdoorStageWind as _v1376 } from "../../calc-stageproduction.js";
 test("bounds: spec-v1376 computeOutdoorStageWind pins the square law and the ballast", () => {
   // 40 mph: q = 4.096 psf, F = 852 lb on 160 sq ft, M = 10,224 ft-lb, ballast 3,834 lb.
   const base = { banner_height_ft: 8, banner_width_ft: 20, centroid_height_ft: 12, wind_speed_mph: 40, drag_coefficient: 1.3, base_width_ft: 8, safety_factor: 1.5, available_ballast_lb: 2000 };
@@ -56218,7 +56218,8 @@ test("bounds: batch-43 elevator and corrosion -- 2:1 roping, IBC per-car vent fl
   assert.ok("error" in _b43att({ pipe_od_in: 12.75, wall_thickness_in: 0.25, steel_resistivity_ohm_in: 18, coating_resistance_ohm_sqft: 100000, drain_shift_v: 1, distance_mi: 10, degraded_coating_resistance_ohm_sqft: 10000 }));
 });
 
-import { computeTimeAlignment as _b44ta, computePowerDistro as _b44pd, computeLightingBeam as _b44lb, computeWirelessIntermod as _b44im, computeMiredGelShift as _b44mg, computeVideoWallDataRate as _b44vw, computeSPLDistanceForLevel as _b44sdl, computeAmpPowerSpl as _b44amp } from "../../calc-stage.js";
+import { computeTimeAlignment as _b44ta, computePowerDistro as _b44pd, computeLightingBeam as _b44lb, computeSPLDistanceForLevel as _b44sdl, computeAmpPowerSpl as _b44amp } from "../../calc-stage.js";
+import { computeWirelessIntermod as _b44im, computeMiredGelShift as _b44mg, computeVideoWallDataRate as _b44vw } from "../../calc-stageproduction.js";
 import { computeCo2EnrichmentRate as _b44co2, computeVaporPressureDeficit as _b44vpd, computePhotoperiodBlackoutSchedule as _b44pp, computeGrowLightFixtureCount as _b44gl, computeThermalScreenEnergySaving as _b44ts } from "../../calc-greenhouse.js";
 import { computeShotSizeResidenceTime as _b44shot, computeInjectionClampTonnage as _b44clamp, computeInjectionCoolingTime as _b44cool, computeMoldShrinkageDimension as _b44mold, computeExtrusionOutputRate as _b44ext, computeRiserModulusFeeding as _b44riser, computeSandPermeabilityVent as _b44sand } from "../../calc-process.js";
 test("bounds: batch-44 stage, greenhouse and process -- crop CO2 use adds, shot window, unit and fraction guards", () => {

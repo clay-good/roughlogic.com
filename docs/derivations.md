@@ -3544,30 +3544,20 @@ cross-check.
 | calc-stage.js | `_v9_atmosphericAbsorption` | `{ f_Hz, T_K, h_r, p_a_kPa }` | _ | _ | _ |
 | calc-stage.js | `computeAcousticGainPagNag` | `{ ds_ft = 2, d0_ft = 30, d1_ft = 8, d2_ft = 12, open_mics = 1, ead_ft = 6 } = {}` | _ | _ | _ |
 | calc-stage.js | `computeAmpPowerSpl` | `{ sensitivity_db, power_w, distance_m, crest_db, target_spl_db, max_spl_db }` | _ | _ | _ |
-| calc-stage.js | `computeCardioidSubArray` | `{ spacing_ft = 0, elements = 4, temp_f = 70, target_freq_hz = 0 } = {}` | _ | _ | _ |
-| calc-stage.js | `computeChainHoistLiftTime` | `{ lift_height_ft = 0, hoist_speed_fpm = 16, load_lb = 0, duty_cycle = 0.4, ra...` | _ | _ | _ |
 | calc-stage.js | `computeCounterweightArborLoad` | `{ batten_weight_lb = 0, attached_load_lb = 0, purchase_type = "single", brick...` | _ | _ | _ |
 | calc-stage.js | `computeDMX` | `{ fixtures = [] }` | _ | _ | _ |
 | calc-stage.js | `computeDecibelConverter` | `{ mode, p1, p2, v1, v2, level_db, ref_type, levels }` | _ | _ | _ |
-| calc-stage.js | `computeDelayTowerAlignment` | `{ distance_ft = 0, temp_f = 70, haas_offset_ms = 15, compare_temp_f = 90 } = {}` | _ | _ | _ |
-| calc-stage.js | `computeDriverSpacingLobing` | `{ spacing_ft = 0, test_freq_hz = 0, temp_f = 70 } = {}` | _ | _ | _ |
 | calc-stage.js | `computeEyringReverberation` | `{ volume_ft3 = 0, surface_area_ft2 = 0, avg_absorption = 0, sabine_coeff = 0....` | _ | _ | _ |
-| calc-stage.js | `computeGoboImageSize` | `{ throw_ft = 0, field_angle_deg = 0, incidence_deg = 0, gobo_image_mm = 0, ga...` | _ | _ | _ |
-| calc-stage.js | `computeHazeMachineSizing` | `{ volume_cf = 0, ach = 0, ref_volume_cf = 100000, ref_ach = 2, ref_output = 1...` | _ | _ | _ |
 | calc-stage.js | `computeLedTapeMaxRun` | `{ power_per_ft_w = 0, supply_voltage_v = 0, resistance_per_ft = 0, drop_toler...` | _ | _ | _ |
 | calc-stage.js | `computeLedTapeRun` | `{ power_per_ft_w = 0, run_length_ft = 0, supply_voltage_v = 0, resistance_per...` | _ | _ | _ |
 | calc-stage.js | `computeLedVideoWall` | `{ cab_w_px = 0, cab_h_px = 0, pixel_pitch_mm = 0, cols = 0, rows = 0, cab_wei...` | _ | _ | _ |
 | calc-stage.js | `computeLightingBeam` | `{ beam_angle_deg = 0, throw_distance = 0, distance_unit = "ft", source = "can...` | _ | _ | _ |
 | calc-stage.js | `computeLightingThrowForPool` | `{ target_pool_diameter = 0, beam_angle_deg = 0, distance_unit = "ft" } = {}` | _ | _ | _ |
-| calc-stage.js | `computeLineArraySplay` | `{ trim_height_ft = 0, ear_height_ft = 4, near_throw_ft = 0, far_throw_ft = 0,...` | _ | _ | _ |
 | calc-stage.js | `computeMassLawTL` | `{ surface_mass_psf = 0, frequency_hz = 0, incidence = "field" } = {}` | _ | _ | _ |
-| calc-stage.js | `computeMiredGelShift` | `{ source_k = 3200, target_k = 5600, applied_shift = 0 } = {}` | _ | _ | _ |
 | calc-stage.js | `computeNeutralImbalance` | `{ I_A = 0, I_B = 0, I_C = 0, harmonic_loads = false }` | _ | _ | _ |
-| calc-stage.js | `computeOutdoorStageWind` | `{ banner_height_ft = 0, banner_width_ft = 0, centroid_height_ft = 0, wind_spe...` | _ | _ | _ |
 | calc-stage.js | `computePowerDistro` | `{ watts = 0, voltage_v = 208, phase = "three", rating_a = 0, pf = 1, derate =...` | _ | _ | _ |
 | calc-stage.js | `computeProjectorBrightness` | `{ screen_w_ft = 0, screen_h_ft = 0, screen_gain = 1.0, target_foot_lamberts =...` | _ | _ | _ |
 | calc-stage.js | `computeProjectorMaxScreenSize` | `{ available_lumens = 0, screen_gain = 1.0, target_foot_lamberts = 16, aspect_...` | _ | _ | _ |
-| calc-stage.js | `computeRfAntennaCableLoss` | `{ length_ft = 0, loss_per_100ft_db = 0, connectors = 0, loss_per_connector_db...` | _ | _ | _ |
 | calc-stage.js | `computeRiggingCheck` | `{ hardware = "sling_5_8_steel", configuration = "vertical", load_lb = 0, incl...` | _ | _ | _ |
 | calc-stage.js | `computeRoomAbsorptionTarget` | `{ volume_ft3 = 0, target_rt60_s = 0, existing_sabins = 0, sabine_coeff = 0.04...` | _ | _ | _ |
 | calc-stage.js | `computeRoomAcoustics` | `{ volume_ft3 = 0, total_sabins = 0, length_ft = 0, width_ft = 0, height_ft = ...` | _ | _ | _ |
@@ -3576,12 +3566,22 @@ cross-check.
 | calc-stage.js | `computeSPLDistanceForLevel` | `{ L1_dB = 0, d1 = 1, target_L2_dB = 0, mode = "free_field", n_sources = 1 } = {}` | _ | _ | _ |
 | calc-stage.js | `computeSpeakerImpedance` | `{ topology, z_ohm, count, series_per_branch, branches, amp_min_ohm, power_w }` | _ | _ | _ |
 | calc-stage.js | `computeSpeedOfSoundAir` | `{ temperature_f = 68 } = {}` | _ | _ | _ |
-| calc-stage.js | `computeStageDeckLiveLoad` | `{ length_ft = 0, width_ft = 0, legs = 4, design_psf = 150, deck_dead_lb = 0, ...` | _ | _ | _ |
 | calc-stage.js | `computeTimeAlignment` | `{ d_main_ft = 0, d_delay_ft = 0, ambient_C = 20, ambient_F = null, haas_offse...` | _ | _ | _ |
 | calc-stage.js | `computeTrussCapacity` | `{ truss_model = "16in_box", span_ft = 0, point_loads = [] }` | _ | _ | _ |
-| calc-stage.js | `computeVideoWallDataRate` | `{ width_px = 0, height_px = 0, bit_depth = 8, refresh_hz = 60, pixels_per_por...` | _ | _ | _ |
 | calc-stage.js | `computeWinchFleetAngle` | `{ lateral_offset = 0, lead_distance = 0 } = {}` | _ | _ | _ |
-| calc-stage.js | `computeWirelessIntermod` | `{ f1_mhz = 0, f2_mhz = 0, test_freq_mhz = 0 } = {}` | _ | _ | _ |
+| calc-stageproduction.js | `computeCardioidSubArray` | `{ spacing_ft = 0, elements = 4, temp_f = 70, target_freq_hz = 0 } = {}` | _ | _ | _ |
+| calc-stageproduction.js | `computeChainHoistLiftTime` | `{ lift_height_ft = 0, hoist_speed_fpm = 16, load_lb = 0, duty_cycle = 0.4, ra...` | _ | _ | _ |
+| calc-stageproduction.js | `computeDelayTowerAlignment` | `{ distance_ft = 0, temp_f = 70, haas_offset_ms = 15, compare_temp_f = 90 } = {}` | _ | _ | _ |
+| calc-stageproduction.js | `computeDriverSpacingLobing` | `{ spacing_ft = 0, test_freq_hz = 0, temp_f = 70 } = {}` | _ | _ | _ |
+| calc-stageproduction.js | `computeGoboImageSize` | `{ throw_ft = 0, field_angle_deg = 0, incidence_deg = 0, gobo_image_mm = 0, ga...` | _ | _ | _ |
+| calc-stageproduction.js | `computeHazeMachineSizing` | `{ volume_cf = 0, ach = 0, ref_volume_cf = 100000, ref_ach = 2, ref_output = 1...` | _ | _ | _ |
+| calc-stageproduction.js | `computeLineArraySplay` | `{ trim_height_ft = 0, ear_height_ft = 4, near_throw_ft = 0, far_throw_ft = 0,...` | _ | _ | _ |
+| calc-stageproduction.js | `computeMiredGelShift` | `{ source_k = 3200, target_k = 5600, applied_shift = 0 } = {}` | _ | _ | _ |
+| calc-stageproduction.js | `computeOutdoorStageWind` | `{ banner_height_ft = 0, banner_width_ft = 0, centroid_height_ft = 0, wind_spe...` | _ | _ | _ |
+| calc-stageproduction.js | `computeRfAntennaCableLoss` | `{ length_ft = 0, loss_per_100ft_db = 0, connectors = 0, loss_per_connector_db...` | _ | _ | _ |
+| calc-stageproduction.js | `computeStageDeckLiveLoad` | `{ length_ft = 0, width_ft = 0, legs = 4, design_psf = 150, deck_dead_lb = 0, ...` | _ | _ | _ |
+| calc-stageproduction.js | `computeVideoWallDataRate` | `{ width_px = 0, height_px = 0, bit_depth = 8, refresh_hz = 60, pixels_per_por...` | _ | _ | _ |
+| calc-stageproduction.js | `computeWirelessIntermod` | `{ f1_mhz = 0, f2_mhz = 0, test_freq_mhz = 0 } = {}` | _ | _ | _ |
 | calc-steamplant.js | `computeBlowdownHeatRecovery` | `{ steam_rate_lb_hr = 0, cycles_of_concentration = 0, alt_cycles_of_concentrat...` | _ | _ | _ |
 | calc-steamplant.js | `computeDeaeratorSteamDemand` | `{ feedwater_lb_hr = 0, condensate_fraction = 0.6, alt_condensate_fraction = 0...` | _ | _ | _ |
 | calc-steamplant.js | `computeFuelOilAtomizingViscosity` | `{ v1_ssu = 0, t1_f = 0, v2_ssu = 0, t2_f = 0, target_ssu = 150, pumping_limit...` | _ | _ | _ |
