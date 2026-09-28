@@ -1,4 +1,4 @@
-// The placement and tilt-up tiles of calc-concrete.js (spec-v1609..v1613)
+// The placement and tilt-up tiles of calc-concreteplacement.js (spec-v1617..v1621)
 // against references the specs did not write: the tendon's elongation by
 // integrating the force along it numerically, statics on the brace and the
 // panel, and the identities the tiles' notes claim. These tiles' only
@@ -9,7 +9,7 @@ import assert from "node:assert/strict";
 import {
   computeConcretePumpLinePressure, computeBoomPumpReach, computePostTensionElongation,
   computeTiltUpLiftStress, computeTiltUpBraceLoad,
-} from "../../calc-concrete.js";
+} from "../../calc-concreteplacement.js";
 
 const within = (got, want, tolPct, label) => {
   const tol = Math.abs(want) * tolPct / 100;

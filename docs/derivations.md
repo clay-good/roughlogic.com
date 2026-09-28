@@ -1559,7 +1559,6 @@ cross-check.
 | calc-civil.js | `computeSuperelevationSafeCurveSpeed` | `{ R_ft, e, f } = {}` | _ | _ | _ |
 | calc-civil.js | `computeVerticalCurve` | `{ g1_pct, g2_pct, length_ft, pvi_station_ft, pvi_elevation_ft, eval_station_f...` | _ | _ | _ |
 | calc-civil.js | `computeVerticalCurveSightDistance` | `{ A_pct, S_ft, C } = {}` | _ | _ | _ |
-| calc-concrete.js | `computeBoomPumpReach` | `{ boom_reach_ft = 0, required_distance_ft = 0, required_height_ft = 0, boom_c...` | _ | _ | _ |
 | calc-concrete.js | `computeConcreteAnchorBlowout` | `{ edge_distance_in = 0, head_bearing_area_in2 = 0, fc_psi = 0, embedment_in =...` | _ | _ | _ |
 | calc-concrete.js | `computeConcreteAnchorBreakout` | `{ embedment_in = 0, fc_psi = 0, edge_distance_in = 0, anchor_type = "cast-in"...` | _ | _ | _ |
 | calc-concrete.js | `computeConcreteAnchorInteraction` | `{ nua_lb = 0, vua_lb = 0, phi_nn_lb = 0, phi_vn_lb = 0 } = {}` | _ | _ | _ |
@@ -1582,7 +1581,6 @@ cross-check.
 | calc-concrete.js | `computeConcreteLongtermDefl` | `{ immediate_defl_in = 0, duration_months = 60, comp_steel_ratio = 0 } = {}` | _ | _ | _ |
 | calc-concrete.js | `computeConcreteModulusOfRupture` | `{ fc_psi = 4000, lambda = 1.0 } = {}` | _ | _ | _ |
 | calc-concrete.js | `computeConcretePremixBags` | `{ length_ft = 4, width_ft = 4, thickness_in = 4, bag_yield_ft3 = 0.60, waste_...` | _ | _ | _ |
-| calc-concrete.js | `computeConcretePumpLinePressure` | `{ horizontal_length_ft = 0, vertical_lift_ft = 0, unit_weight_pcf = 150, fric...` | _ | _ | _ |
 | calc-concrete.js | `computeConcreteShrinkageTemperatureSteel` | `{ h_in = 0, b_in = 12, grade_ksi = 60 } = {}` | _ | _ | _ |
 | calc-concrete.js | `computeConcreteStairVolume` | `{ num_risers = 4, riser_in = 7, tread_in = 11, width_in = 48, throat_in = 4 }...` | _ | _ | _ |
 | calc-concrete.js | `computeConcreteStrengthFromModulus` | `{ ec_psi = 0, wc_pcf = 145 } = {}` | _ | _ | _ |
@@ -1590,7 +1588,6 @@ cross-check.
 | calc-concrete.js | `computeConcreteTorsionThreshold` | `{ fc_psi = 4000, b_in = 0, h_in = 0, lambda = 1.0 } = {}` | _ | _ | _ |
 | calc-concrete.js | `computeCuringCompoundCoverage` | `{ slab_area_sf = 2500, coats = 1, coverage_sf_per_gal = 200, waste_pct = 0 } ...` | _ | _ | _ |
 | calc-concrete.js | `computeFreshConcreteTemp` | `{ agg_weight_lb = 0, agg_temp_f = 0, cement_weight_lb = 0, cement_temp_f = 0,...` | _ | _ | _ |
-| calc-concrete.js | `computePostTensionElongation` | `{ strand_area_in2 = 0, modulus_psi = 0, tendon_length_ft = 0, jacking_stress_...` | _ | _ | _ |
 | calc-concrete.js | `computeRcBeamFlexure` | `{ fc = 4000, fy = 60000, as_in2 = 0, b = 0, d = 0, mu = 0 } = {}` | _ | _ | _ |
 | calc-concrete.js | `computeRcBeamShear` | `{ fc = 4000, fyt = 60000, bw = 0, d = 0, av_in2 = 0, vu = 0, lambda = 1.0 } = {}` | _ | _ | _ |
 | calc-concrete.js | `computeRcColumnAxial` | `{ b_in = 0, h_in = 0, fc_psi = 4000, fy_psi = 60000, ast_in2 = 0 } = {}` | _ | _ | _ |
@@ -1609,8 +1606,11 @@ cross-check.
 | calc-concrete.js | `computeRcTBeamFlexure` | `{ fc_psi = 4000, fy_psi = 60000, as_in2 = 0, bw_in = 0, hf_in = 0, d_in = 0, ...` | _ | _ | _ |
 | calc-concrete.js | `computeSlabDowelSchedule` | `{ joint_length_ft = 40, slab_thickness_in = 6, dowel_spacing_in = 12, edge_cl...` | _ | _ | _ |
 | calc-concrete.js | `computeTBeamEffectiveFlangeWidth` | `{ bw_in = 0, hf_in = 0, ln_in = 0, sw_in = 0, beam_type = "interior" } = {}` | _ | _ | _ |
-| calc-concrete.js | `computeTiltUpBraceLoad` | `{ panel_width_ft = 0, panel_height_ft = 0, wind_pressure_psf = 0, resultant_h...` | _ | _ | _ |
-| calc-concrete.js | `computeTiltUpLiftStress` | `{ panel_width_ft = 0, panel_height_ft = 0, thickness_in = 0, unit_weight_pcf ...` | _ | _ | _ |
+| calc-concreteplacement.js | `computeBoomPumpReach` | `{ boom_reach_ft = 0, required_distance_ft = 0, required_height_ft = 0, boom_c...` | _ | _ | _ |
+| calc-concreteplacement.js | `computeConcretePumpLinePressure` | `{ horizontal_length_ft = 0, vertical_lift_ft = 0, unit_weight_pcf = 150, fric...` | _ | _ | _ |
+| calc-concreteplacement.js | `computePostTensionElongation` | `{ strand_area_in2 = 0, modulus_psi = 0, tendon_length_ft = 0, jacking_stress_...` | _ | _ | _ |
+| calc-concreteplacement.js | `computeTiltUpBraceLoad` | `{ panel_width_ft = 0, panel_height_ft = 0, wind_pressure_psf = 0, resultant_h...` | _ | _ | _ |
+| calc-concreteplacement.js | `computeTiltUpLiftStress` | `{ panel_width_ft = 0, panel_height_ft = 0, thickness_in = 0, unit_weight_pcf ...` | _ | _ | _ |
 | calc-construction.js | `computeAbrasiveBlast` | `{ nozzle_bore_in, pressure_psi = 100, area_ft2, lb_per_ft2 = 8 } = {}` | _ | _ | _ |
 | calc-construction.js | `computeAccessibleParkingCount` | `{ total_spaces = 0, facility_count = 1, provided_accessible = 0, provided_van...` | _ | _ | _ |
 | calc-construction.js | `computeAccessibleParkingGeometry` | `{ space_type = "van", space_width_in = 0, aisle_width_in = 0, space_length_in...` | _ | _ | _ |

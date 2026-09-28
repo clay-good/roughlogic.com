@@ -835,7 +835,6 @@ export const TOOL_MODULES = (() => {
   // Group E cluster, the RC companion to calc-steel.js one material over.
   // All three KEEP group "E" (module independent of group letter).
   declare("./calc-concrete.js", "CONCRETE_RENDERERS", [
-    "concrete-pump-line-pressure", "boom-pump-reach", "post-tension-elongation", "tilt-up-lift-stress", "tilt-up-brace-load",
     "rc-beam-flexure", "rc-tbeam-flexure", "rc-beam-shear", "rc-development-length",
     "concrete-torsion-threshold",
     // spec-v284..v286 member depth batch
@@ -875,6 +874,11 @@ export const TOOL_MODULES = (() => {
     "concrete-isolation-joint",
     "concrete-stair-volume",
     "slab-dowel-schedule",
+  ]);
+  // spec-v1862: concrete placement, post-tensioning, and tilt-up field operations
+  // split from calc-concrete.js before that module reached its gzip cap.
+  declare("./calc-concreteplacement.js", "CONCRETEPLACEMENT_RENDERERS", [
+    "concrete-pump-line-pressure", "boom-pump-reach", "post-tension-elongation", "tilt-up-lift-stress", "tilt-up-brace-load",
   ]);
   // spec-v260..v262 geotechnical foundation-and-earth-retaining trio: a new
   // lazy Group E cluster, where the steel / RC member load path meets the
