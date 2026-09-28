@@ -141,6 +141,7 @@ const SHELL_ASSETS = [
   "./calc-realestate.js",
   "./calc-edu.js",
   "./calc-rigging.js",
+  "./calc-riggingfield.js",
   "./v5-platform.js",
   "./citations.js",
   "./constant-notes.js",

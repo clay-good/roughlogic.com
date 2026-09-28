@@ -1814,11 +1814,11 @@ export const TOOL_MODULES = (() => {
   // Group Z (Rigging and Heavy Lift): the lift-planning core (spec-v65), a
   // new module behind RIGGING_RENDERERS. All seven carry GOVERNANCE.rigging.
   declare("./calc-rigging.js", "RIGGING_RENDERERS", [
-    "cg-load-share", "crane-net-capacity", "crane-ground-bearing", "crane-power-line-clearance",
+    "cg-load-share", "crane-net-capacity", "crane-ground-bearing",
     "sling-d-d-efficiency", "wind-on-load", "max-wind-speed-for-lift", "tagline-force", "tandem-lift-share",
     // v66 hardware and below-the-hook
     "shackle-eyebolt-wll", "spreader-beam", "spreader-beam-min-height", "forklift-capacity-derate",
-    "roller-jack-force", "chain-lever-hoist", "block-redirect-load", "block-redirect-max-angle", "reeving-parts-of-line", "guy-wire-tension",
+    "roller-jack-force", "chain-lever-hoist", "block-redirect-load", "block-redirect-max-angle",
     // spec-v117 multi-leg sling load per leg + wire-rope strength estimate.
     "multi-leg-sling", "wire-rope-strength", "wire-rope-diameter-for-wll", "wire-rope-stretch",
     // spec-v484 spanned cable sag and tension
@@ -1829,14 +1829,17 @@ export const TOOL_MODULES = (() => {
     "winch-drum-line-pull",
     // spec-v550
     "crane-outrigger-reaction",
-    "crane-load-radius-boom",
     // spec-v554
     "lifting-lug-design",
     // spec-v615
     "three-point-bridle",
     // spec-v616
     "beam-clamp-side-pull",
-    "wire-rope-clips",
+  ]);
+  // spec-v1866 split from calc-rigging.js: field-safety and setup checks.
+  declare("./calc-riggingfield.js", "RIGGINGFIELD_RENDERERS", [
+    "wire-rope-clips", "crane-load-radius-boom", "reeving-parts-of-line",
+    "guy-wire-tension", "crane-power-line-clearance",
   ]);
   return map;
 })();

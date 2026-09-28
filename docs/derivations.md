@@ -3361,16 +3361,12 @@ cross-check.
 | calc-rigging.js | `computeCgLoadShare` | `{ total_weight_lb, span_in, cg_from_p1_in } = {}` | _ | _ | _ |
 | calc-rigging.js | `computeChainLeverHoist` | `{ load_lb, rated_wll_lb, mech_adv, efficiency = 0.85, lift_ft = 1 } = {}` | _ | _ | _ |
 | calc-rigging.js | `computeCraneGroundBearing` | `{ reaction_lb, bearing_area_ft2, allowable_psf } = {}` | _ | _ | _ |
-| calc-rigging.js | `computeCraneLoadRadiusBoom` | `{ boom_length_ft = 30, boom_angle_deg = 60, boom_foot_offset_ft = 4, boom_foo...` | _ | _ | _ |
 | calc-rigging.js | `computeCraneNetCapacity` | `{ gross_chart_lb, hook_block_lb = 0, jib_attach_lb = 0, wire_rope_lb = 0, bel...` | _ | _ | _ |
 | calc-rigging.js | `computeCraneOutriggerReaction` | `{ gross_load_kip, counterweight_kip = 0, load_radius_ft, cw_radius_ft = 0, ou...` | _ | _ | _ |
-| calc-rigging.js | `computeCranePowerLineClearance` | `{ option = "default", voltage_kv = 0, actual_clearance_ft = 0, boom_length_ft...` | _ | _ | _ |
 | calc-rigging.js | `computeForkliftCapacityDerate` | `{ rated_cap_lb, rated_lc_in = 24, actual_lc_in, load_lb } = {}` | _ | _ | _ |
-| calc-rigging.js | `computeGuyWireTension` | `{ horizontal_load_lb = 500, attachment_height_ft = 20, anchor_lead_ft = 20 } ...` | _ | _ | _ |
 | calc-rigging.js | `computeLiftingLugDesign` | `{ applied_load_kip, plate_thick_in, hole_dia_in, pin_dia_in, edge_dist_in, pl...` | _ | _ | _ |
 | calc-rigging.js | `computeMaxWindSpeedForLift` | `{ max_swing_deg = 5, load_weight_lb, sail_area_ft2, shape_coef = 1.6 } = {}` | _ | _ | _ |
 | calc-rigging.js | `computeMultiLegSling` | `{ total_load_lb = 0, num_legs = 2, horizontal_angle_deg = 60 } = {}` | _ | _ | _ |
-| calc-rigging.js | `computeReevingPartsOfLine` | `{ load_lb = 20000, parts_of_line = 4, sheave_efficiency = 0.98, lead_sheave =...` | _ | _ | _ |
 | calc-rigging.js | `computeRollerJackForce` | `{ load_lb, roll_coef = 0.03, incline_deg = 0, skate_cap_lb } = {}` | _ | _ | _ |
 | calc-rigging.js | `computeShackleEyeboltWll` | `{ leg_load_lb, rated_wll_lb, angle_deg = 0, hardware = "shackle", design_fact...` | _ | _ | _ |
 | calc-rigging.js | `computeSlingDdEfficiency` | `{ rated_wll_lb, bend_dia_in, sling_dia_in } = {}` | _ | _ | _ |
@@ -3383,10 +3379,14 @@ cross-check.
 | calc-rigging.js | `computeThreePointBridle` | `{ apex_load_lb, e1_ft, n1_ft, r1_ft, e2_ft, n2_ft, r2_ft, e3_ft, n3_ft, r3_ft...` | _ | _ | _ |
 | calc-rigging.js | `computeWinchDrumLinePull` | `{ rated_pull_lb, drum_dia_in, rope_dia_in, barrel_width_in, target_layer = 1 ...` | _ | _ | _ |
 | calc-rigging.js | `computeWindOnLoad` | `{ sail_area_ft2, wind_mph, shape_coef = 1.6, load_weight_lb } = {}` | _ | _ | _ |
-| calc-rigging.js | `computeWireRopeClips` | `{ rope_diameter_in = 0.75, clip_material = "drop_forged" } = {}` | _ | _ | _ |
 | calc-rigging.js | `computeWireRopeDiameterForWll` | `{ wll_required_tons = 0, construction_factor = 46, design_factor = 5 } = {}` | _ | _ | _ |
 | calc-rigging.js | `computeWireRopeStrength` | `{ diameter_in = 0, construction_factor = 46, design_factor = 5 } = {}` | _ | _ | _ |
 | calc-rigging.js | `computeWireRopeStretch` | `{ load_lb = 0, length_ft = 0, rope_diameter_in = 0, effective_modulus_psi = 1...` | _ | _ | _ |
+| calc-riggingfield.js | `computeCraneLoadRadiusBoom` | `{ boom_length_ft = 30, boom_angle_deg = 60, boom_foot_offset_ft = 4, boom_foo...` | _ | _ | _ |
+| calc-riggingfield.js | `computeCranePowerLineClearance` | `{ option = "default", voltage_kv = 0, actual_clearance_ft = 0, boom_length_ft...` | _ | _ | _ |
+| calc-riggingfield.js | `computeGuyWireTension` | `{ horizontal_load_lb = 500, attachment_height_ft = 20, anchor_lead_ft = 20 } ...` | _ | _ | _ |
+| calc-riggingfield.js | `computeReevingPartsOfLine` | `{ load_lb = 20000, parts_of_line = 4, sheave_efficiency = 0.98, lead_sheave =...` | _ | _ | _ |
+| calc-riggingfield.js | `computeWireRopeClips` | `{ rope_diameter_in = 0.75, clip_material = "drop_forged" } = {}` | _ | _ | _ |
 | calc-safety.js | `computeHearingProtectorNrr` | `{ twa_db = 0, weighting = "A", nrr_db = 0, method = "appendix-b", dual_protec...` | _ | _ | _ |
 | calc-safety.js | `computeLifelineTension` | `{ span_ft = 0, sag_ft = 0, arrest_force_lb = 1800, workers = 1, safety_factor...` | _ | _ | _ |
 | calc-safety.js | `computePortableLadderSetup` | `{ ladder_length_ft = 0, landing_height_ft = 0, extension_above_landing_ft = 0...` | _ | _ | _ |

@@ -29584,7 +29584,7 @@ test("bounds: spec-v914 computeTractorBallast pins the target weight, signed bal
   assert.ok("error" in _v914({ power_hp: Infinity, weight_to_power_ratio: 125, current_weight_lb: 18000 }));
 });
 
-import { computeWireRopeClips as _v938 } from "../../calc-rigging.js";
+import { computeWireRopeClips as _v938 } from "../../calc-riggingfield.js";
 
 test("bounds: spec-v938 computeWireRopeClips pins the OSHA Table H-2 count, spacing, and error seams", () => {
   const r = _v938({ rope_diameter_in: 0.75 });
@@ -30001,7 +30001,7 @@ test("bounds: spec-v952 computeTaylorToolLife pins V x T^n = C both directions a
   assert.ok("error" in _v952({ taylor_c: Infinity, taylor_n: 0.2, cutting_speed_sfm: 200, target_life_min: 15 }));
 });
 
-import { computeCraneLoadRadiusBoom as _v953 } from "../../calc-rigging.js";
+import { computeCraneLoadRadiusBoom as _v953 } from "../../calc-riggingfield.js";
 
 test("bounds: spec-v953 computeCraneLoadRadiusBoom pins the boom geometry, inverse angle, and error seams", () => {
   const r = _v953({ boom_length_ft: 30, boom_angle_deg: 60, boom_foot_offset_ft: 4, boom_foot_height_ft: 6, target_radius_ft: 25 });
@@ -30869,7 +30869,7 @@ test("bounds: spec-v990 computeRadiatorEdrOutput pins the EDR heat output and bo
   assert.ok("error" in _v990({ edr_sqft: Infinity, system_k: 240, pickup_factor: 0.33 }));
 });
 
-import { computeReevingPartsOfLine as _v991 } from "../../calc-rigging.js";
+import { computeReevingPartsOfLine as _v991 } from "../../calc-riggingfield.js";
 
 test("bounds: spec-v991 computeReevingPartsOfLine pins the reeving pull and efficiency", () => {
   const r = _v991({ load_lb: 20000, parts_of_line: 4, sheave_efficiency: 0.98, lead_sheave: 0 });
@@ -30981,7 +30981,7 @@ test("bounds: spec-v995 computeDressingPercentage pins the dressing % and freeze
   assert.ok("error" in _v995({ live_weight_lb: Infinity, hot_carcass_weight_lb: 744, cutting_yield_pct: 67 }));
 });
 
-import { computeGuyWireTension as _v996 } from "../../calc-rigging.js";
+import { computeGuyWireTension as _v996 } from "../../calc-riggingfield.js";
 
 test("bounds: spec-v996 computeGuyWireTension pins the guy statics and mast download", () => {
   const r = _v996({ horizontal_load_lb: 500, attachment_height_ft: 20, anchor_lead_ft: 20 });
@@ -35961,7 +35961,7 @@ test("bounds: spec-v1156 computePortableLadderSetup pins the rail budget, the ex
   assert.ok("error" in _v1156({ ...base, ladder_length_ft: Infinity }));
 });
 
-import { computeCranePowerLineClearance as _v1157 } from "../../calc-rigging.js";
+import { computeCranePowerLineClearance as _v1157 } from "../../calc-riggingfield.js";
 
 test("bounds: spec-v1157 computeCranePowerLineClearance pins Table A, the two defaults, the dangerous-direction flag, and error seams", () => {
   const base = { option: "default", voltage_kv: 0, actual_clearance_ft: 12, boom_length_ft: 80 };
