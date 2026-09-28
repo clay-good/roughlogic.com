@@ -132,6 +132,7 @@ const FILES = [
   "calc-historical.js",
   "calc-accounting.js",
   "calc-operations-finance.js",
+  "calc-safety.js",
   "calc-lab.js",
   // v12 Group X: Real Estate.
   "calc-realestate.js",

@@ -35906,7 +35906,7 @@ test("bounds: spec-v1155 computeCylinderStorageSeparation pins the OR, the three
   assert.ok("error" in _v1155({ ...base, separation_ft: Infinity }));
 });
 
-import { computePortableLadderSetup as _v1156 } from "../../calc-cross.js";
+import { computePortableLadderSetup as _v1156 } from "../../calc-safety.js";
 
 test("bounds: spec-v1156 computePortableLadderSetup pins the rail budget, the extension alternative, the rung window, and error seams", () => {
   const base = { ladder_length_ft: 24, landing_height_ft: 22, extension_above_landing_ft: 3, rung_spacing_in: 12, clear_width_in: 12, secured_with_grasping_device: "no", base_ratio: 4 };
@@ -36575,7 +36575,7 @@ test("bounds: spec-v1165 computeDoorClearWidth pins the leaf-to-clear loss, the 
   assert.ok("error" in _v1165({ ...base, leaf_width_in: Infinity }));
 });
 
-import { computeHearingProtectorNrr as _v1166 } from "../../calc-cross.js";
+import { computeHearingProtectorNrr as _v1166 } from "../../calc-safety.js";
 
 test("bounds: spec-v1166 computeHearingProtectorNrr pins the 7 dB spectral step, the three NIOSH factors, the OSHA halving, the inverse, and error seams", () => {
   const base = { twa_db: 98, weighting: "A", nrr_db: 29, method: "niosh-other", dual_protection: "no", dual_bonus_db: 5, target_db: 85 };
@@ -36666,7 +36666,7 @@ test("bounds: spec-v1166 computeHearingProtectorNrr pins the 7 dB spectral step,
   assert.ok("error" in _v1166({ ...base, twa_db: Infinity }));
 });
 
-import { computeSilicaTable1 as _v1167 } from "../../calc-cross.js";
+import { computeSilicaTable1 as _v1167 } from "../../calc-safety.js";
 
 test("bounds: spec-v1167 computeSilicaTable1 pins all eighteen rows, the four-hour cliff, the outdoor-only rows, the all-or-nothing rule, and error seams", () => {
   const base = { task: "xi", location: "outdoors", hours_per_shift: 5, controls_fully_implemented: "yes", apf_provided: 10 };
@@ -37192,7 +37192,7 @@ test("bounds: spec-v1173 computeFloodOpeningArea pins the 1 sq in per sq ft rule
   assert.ok("error" in _v1173({ ...base, enclosed_area_sf: Infinity }));
 });
 
-import { computeLifelineTension as _v1174 } from "../../calc-cross.js";
+import { computeLifelineTension as _v1174 } from "../../calc-safety.js";
 
 test("bounds: spec-v1174 computeLifelineTension pins the midspan statics, the 1/sag behaviour, the governing anchorage, the inverse, and error seams", () => {
   const base = { span_ft: 30, sag_ft: 1, arrest_force_lb: 1800, workers: 1, safety_factor: 2, anchorage_capacity_lb: 5000, target_tension_lb: 5000 };

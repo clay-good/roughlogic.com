@@ -1008,15 +1008,13 @@ export const TOOL_MODULES = (() => {
     "loan-payment", "upgrade-roi", "mileage-cost", "overtime", "per-diem",
     "geometry", "dilution", "slope-from-level", "haversine",
     // v3 (meta-utilities 170 and 172 are registered separately below; the rest live here)
-    "trench-slope", "niosh-lifting", "heat-stress", "wind-chill", "wind-chill-wind-speed", "ladder-angle", "extension-ladder-overlap", "portable-ladder-setup", "swing-fall-geometry",
+    "trench-slope", "niosh-lifting", "heat-stress", "wind-chill", "wind-chill-wind-speed", "ladder-angle", "extension-ladder-overlap", "swing-fall-geometry",
     "pulley-ma-gen", "ramp-slope", "rainwater-yield", "rainwater-catchment-area", "timesheet", "vehicle-load",
     // v7
     "fall-protection-clearance",
     // v9
     "noise-dose",
-    "hearing-protector-nrr",
-    "silica-table-1",
-    "lifeline-tension", "radiant-heat-exchange",
+    "radiant-heat-exchange",
     // v15
     "pump-tdh", "hydraulic-cylinder", "vbelt-drive", "belt-center-distance", "belt-hp-transmitted", "gear-cascade",
     // v24 rolling offset
@@ -1029,6 +1027,10 @@ export const TOOL_MODULES = (() => {
     "cross-connection-air-gap",
     // spec-v503 bolt proof, yield, and tensile load (SAE J429)
     "bolt-proof-load",
+  ]);
+  // spec-v1855 Group G occupational-safety cap-relief split.
+  declare("./calc-safety.js", "SAFETY_RENDERERS", [
+    "portable-ladder-setup", "hearing-protector-nrr", "silica-table-1", "lifeline-tension",
   ]);
   // Group G (cont.): the pipe & conduit fabrication bench, split out of
   // calc-cross.js into calc-fab.js (spec-v36) once calc-cross hit its cap.

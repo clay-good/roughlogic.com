@@ -1931,11 +1931,9 @@ cross-check.
 | calc-cross.js | `computeGearCascade` | `{ stages = [], input_rpm = 0, input_torque = 0, efficiency = 0.97, } = {}` | _ | _ | _ |
 | calc-cross.js | `computeGeometry` | `{ shape, ...args }` | _ | _ | _ |
 | calc-cross.js | `computeHaversineDistance` | `{ lat1, lon1, lat2, lon2 }` | _ | _ | _ |
-| calc-cross.js | `computeHearingProtectorNrr` | `{ twa_db = 0, weighting = "A", nrr_db = 0, method = "appendix-b", dual_protec...` | _ | _ | _ |
 | calc-cross.js | `computeHeatStress` | `{ T_F = 0, RH_percent = 0, solar = false }` | _ | _ | _ |
 | calc-cross.js | `computeHydraulicCylinder` | `{ bore_in = 0, rod_in = 0, pressure_psi = 0, flow_gpm = 0, direction = "exten...` | _ | _ | _ |
 | calc-cross.js | `computeLadderAngle` | `{ ladder_length_ft = 0, working_height_ft = 0 }` | _ | _ | _ |
-| calc-cross.js | `computeLifelineTension` | `{ span_ft = 0, sag_ft = 0, arrest_force_lb = 1800, workers = 1, safety_factor...` | _ | _ | _ |
 | calc-cross.js | `computeLinearInterpolation` | `{ x1 = 0, y1 = 0, x2 = 0, y2 = 0, x = 0 } = {}` | _ | _ | _ |
 | calc-cross.js | `computeLoanPayment` | `{ principal, apr_percent, term_months }` | _ | _ | _ |
 | calc-cross.js | `computeMarkup` | `{ cost, mode, value }` | _ | _ | _ |
@@ -1945,7 +1943,6 @@ cross-check.
 | calc-cross.js | `computeNoiseDose` | `{ rows = [] } = {}` | _ | _ | _ |
 | calc-cross.js | `computeOvertime` | `{ total_hours, regular_rate, overtime_multiplier = 1.5, double_time_multiplie...` | _ | _ | _ |
 | calc-cross.js | `computePerDiem` | `{ state, type = "lodging", as_of = "" }` | _ | _ | _ |
-| calc-cross.js | `computePortableLadderSetup` | `{ ladder_length_ft = 0, landing_height_ft = 0, extension_above_landing_ft = 0...` | _ | _ | _ |
 | calc-cross.js | `computePulleyMA` | `{ rig = "block_2", efficiency = 0.95 }` | _ | _ | _ |
 | calc-cross.js | `computePumpTdh` | `{ flow_gpm = 0, internal_diameter_in = 0, hw_c = 150, static_suction_lift_ft ...` | _ | _ | _ |
 | calc-cross.js | `computeRadiantHeatExchange` | `{ area_ft2 = 0, emissivity = 0.9, surface_temp_f = 0, surroundings_temp_f = 0...` | _ | _ | _ |
@@ -1954,7 +1951,6 @@ cross-check.
 | calc-cross.js | `computeRampSlope` | `{ rise_in = 0, run_in = 0 }` | _ | _ | _ |
 | calc-cross.js | `computeRollingOffset` | `{ rise_in, roll_in, angle_deg }` | _ | _ | _ |
 | calc-cross.js | `computeSalesTax` | `{ state, subtotal, custom_rate_percent = null, as_of = "" }` | _ | _ | _ |
-| calc-cross.js | `computeSilicaTable1` | `{ task = "xi", location = "outdoors", hours_per_shift = 0, controls_fully_imp...` | _ | _ | _ |
 | calc-cross.js | `computeSlopeFromLevel` | `{ value, from }` | _ | _ | _ |
 | calc-cross.js | `computeSwingFallGeometry` | `{ horizontal_offset_ft = 0, anchor_height_ft = 0, base_required_clearance_ft ...` | _ | _ | _ |
 | calc-cross.js | `computeTankVolume` | `{ orientation = "horizontal", linear_unit = "in", diameter = 0, length = 0, d...` | _ | _ | _ |
@@ -3410,6 +3406,10 @@ cross-check.
 | calc-rigging.js | `computeWireRopeDiameterForWll` | `{ wll_required_tons = 0, construction_factor = 46, design_factor = 5 } = {}` | _ | _ | _ |
 | calc-rigging.js | `computeWireRopeStrength` | `{ diameter_in = 0, construction_factor = 46, design_factor = 5 } = {}` | _ | _ | _ |
 | calc-rigging.js | `computeWireRopeStretch` | `{ load_lb = 0, length_ft = 0, rope_diameter_in = 0, effective_modulus_psi = 1...` | _ | _ | _ |
+| calc-safety.js | `computeHearingProtectorNrr` | `{ twa_db = 0, weighting = "A", nrr_db = 0, method = "appendix-b", dual_protec...` | _ | _ | _ |
+| calc-safety.js | `computeLifelineTension` | `{ span_ft = 0, sag_ft = 0, arrest_force_lb = 1800, workers = 1, safety_factor...` | _ | _ | _ |
+| calc-safety.js | `computePortableLadderSetup` | `{ ladder_length_ft = 0, landing_height_ft = 0, extension_above_landing_ft = 0...` | _ | _ | _ |
+| calc-safety.js | `computeSilicaTable1` | `{ task = "xi", location = "outdoors", hours_per_shift = 0, controls_fully_imp...` | _ | _ | _ |
 | calc-sawmill.js | `computeBandmillSpeedBite` | `{ wheel_diameter_in = 0, wheel_rpm = 0, tooth_spacing_in = 0, feed_rate_fpm =...` | _ | _ | _ |
 | calc-sawmill.js | `computeKilnChargeWater` | `{ green_weight_lb = 0, mc_initial_pct = 0, mc_final_pct = 0, btu_per_lb_water...` | _ | _ | _ |
 | calc-sawmill.js | `computeKilnDryingTime` | `{ mc_initial_pct = 0, mc_final_pct = 0, fsp_mc_pct = 30, rate_above_fsp_ppd =...` | _ | _ | _ |
