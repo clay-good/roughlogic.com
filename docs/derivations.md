@@ -3020,8 +3020,6 @@ cross-check.
 | calc-operations-finance.js | `computeEoqOrderQuantity` | `{ annual_demand = 0, order_cost = 0, holding_cost = 0 } = {}` | _ | _ | _ |
 | calc-operations-finance.js | `computeReorderPoint` | `{ avg_daily_demand = 0, lead_time_days = 0, demand_sd = 0, service_level_pct ...` | _ | _ | _ |
 | calc-operations-finance.js | `computeUnitsOfProductionDepr` | `{ cost_basis = 0, salvage_value = 0, total_units = 0, period_units = 0, accum...` | _ | _ | _ |
-| calc-pipefit.js | `computeAsmeHeadThickness` | `{ design_pressure_psi = 0, inside_diameter_in = 0, allowable_stress_psi = 0, ...` | _ | _ | _ |
-| calc-pipefit.js | `computeAsmeShellThickness` | `{ design_pressure_psi = 0, inside_radius_in = 0, allowable_stress_psi = 0, jo...` | _ | _ | _ |
 | calc-pipefit.js | `computeBoilerHorsepower` | `{ output_btuhr = 0 } = {}` | _ | _ | _ |
 | calc-pipefit.js | `computeBranchReinforcement` | `{ run_od_in = 0, run_wall_in = 0, run_treq_in = 0, branch_od_in = 0, branch_w...` | _ | _ | _ |
 | calc-pipefit.js | `computeBranchSaddleCutback` | `{ branch_od_in = 0, run_od_in = 0, stations = 6 } = {}` | _ | _ | _ |
@@ -3035,13 +3033,9 @@ cross-check.
 | calc-pipefit.js | `computePipePressureRating` | `{ od_in = 0, wall_in = 0, allow_stress = 0, joint_factor = 1, y_coeff = 0.4, ...` | _ | _ | _ |
 | calc-pipefit.js | `computePipeSpacingRack` | `{ pipe_od_in = 0, insulation_thickness_in = 0, clearance_in = 1, pipe_count =...` | _ | _ | _ |
 | calc-pipefit.js | `computeRacewayExpansion` | `{ run_length_ft = 0, temp_range_f = 0, alpha_per_f = 0.0000338, fitting_trave...` | _ | _ | _ |
-| calc-pipefit.js | `computeRadiatorEdrOutput` | `{ edr_sqft = 320, system_k = 240, pickup_factor = 0.33 } = {}` | _ | _ | _ |
 | calc-pipefit.js | `computeReducerOffset` | `{ large_od_in = 0, small_od_in = 0, lay_length_in = 0, type = "concentric" } ...` | _ | _ | _ |
-| calc-pipefit.js | `computeSteamBoilerBlowdown` | `{ steam_rate_lb_hr = 10000, feedwater_tds_ppm = 100, max_boiler_tds_ppm = 350...` | _ | _ | _ |
 | calc-pipefit.js | `computeSteamPipeCapacity` | `{ nps = "2", spec_vol_ft3lb = 0, vel_ceiling_fpm = 0 } = {}` | _ | _ | _ |
 | calc-pipefit.js | `computeSteamPipeVelocity` | `{ steam_flow_lbhr = 0, spec_vol_ft3lb = 0, vel_ceiling_fpm = 0 } = {}` | _ | _ | _ |
-| calc-pipefit.js | `computeSteamPrvAreaForCapacity` | `{ required_capacity_lb_hr = 0, upstream_p_psia = 0, discharge_coeff = 0.9 } = {}` | _ | _ | _ |
-| calc-pipefit.js | `computeSteamPrvNapier` | `{ orifice_area_in2 = 0, upstream_p_psia = 0, downstream_p_psia = 0, discharge...` | _ | _ | _ |
 | calc-pipefit.js | `computeSteamTrapSizing` | `{ heat_duty_btuhr = 0, hfg_btulb = 0, safety_factor = 2 } = {}` | _ | _ | _ |
 | calc-plumbing.js | `computeBackflow` | `` | _ | _ | _ |
 | calc-plumbing.js | `computeBackflowLoss` | `{ device_class = "RP", flow_gpm = 0, pipe_size_in = "1" }` | _ | _ | _ |
@@ -3589,6 +3583,12 @@ cross-check.
 | calc-steamplant.js | `computeLaundryDryerEvaporation` | `{ dry_weight_lb_per_day = 0, retained_moisture_fraction = 0.45, improved_reta...` | _ | _ | _ |
 | calc-steamplant.js | `computeLaundryWasherTurns` | `{ machine_capacity_lb = 0, wash_cycle_min = 0, load_unload_min = 0, idle_min ...` | _ | _ | _ |
 | calc-steamplant.js | `computeSafetyValveCapacity` | `{ rated_steaming_capacity_lb_hr = 0, fuel_input_btuh = 0, boiler_efficiency =...` | _ | _ | _ |
+| calc-steampressure.js | `computeAsmeHeadThickness` | `{ design_pressure_psi = 0, inside_diameter_in = 0, allowable_stress_psi = 0, ...` | _ | _ | _ |
+| calc-steampressure.js | `computeAsmeShellThickness` | `{ design_pressure_psi = 0, inside_radius_in = 0, allowable_stress_psi = 0, jo...` | _ | _ | _ |
+| calc-steampressure.js | `computeRadiatorEdrOutput` | `{ edr_sqft = 320, system_k = 240, pickup_factor = 0.33 } = {}` | _ | _ | _ |
+| calc-steampressure.js | `computeSteamBoilerBlowdown` | `{ steam_rate_lb_hr = 10000, feedwater_tds_ppm = 100, max_boiler_tds_ppm = 350...` | _ | _ | _ |
+| calc-steampressure.js | `computeSteamPrvAreaForCapacity` | `{ required_capacity_lb_hr = 0, upstream_p_psia = 0, discharge_coeff = 0.9 } = {}` | _ | _ | _ |
+| calc-steampressure.js | `computeSteamPrvNapier` | `{ orifice_area_in2 = 0, upstream_p_psia = 0, downstream_p_psia = 0, discharge...` | _ | _ | _ |
 | calc-steel.js | `computeBoltGroupEccentric` | `{ load_kip = 0, ecc_in = 0, ncols = 2, nrows = 3, gage_in = 3, pitch_in = 3 }...` | _ | _ | _ |
 | calc-steel.js | `computeBoltShearBearing` | `{ d_in = 0.75, ab_in2 = 0.4418, fnv_ksi = 54, nplanes = 1, t_in = 0.5, fu_ksi...` | _ | _ | _ |
 | calc-steel.js | `computeColumnBasePlate` | `{ pu_kip = 0, fc_ksi = 4, fy_ksi = 36, d_in = 0, bf_in = 0, b_in = 0, n_in = ...` | _ | _ | _ |

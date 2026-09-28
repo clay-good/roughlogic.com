@@ -50,6 +50,7 @@ const SHELL_ASSETS = [
   "./calc-metalair.js",
   "./calc-gas.js",
   "./calc-pipefit.js",
+  "./calc-steampressure.js",
   "./calc-plumbing.js",
   "./calc-plumbingtakeoff.js",
   "./calc-plumbingcode.js",

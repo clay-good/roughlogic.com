@@ -197,17 +197,19 @@ export const TOOL_MODULES = (() => {
     "pipe-cold-spring", "raceway-expansion-fitting", "pipe-spacing-rack",
     // spec-v157..v162 steamfitting / pressure-piping / pipe-support bench.
     "flash-steam-pct", "steam-pipe-velocity", "steam-pipe-capacity", "steam-trap-sizing",
-    "steam-boiler-blowdown",
     "boiler-horsepower",
-    "radiator-edr-output",
-    "pipe-pressure-rating", "asme-shell-thickness", "asme-head-thickness", "pipe-filled-support-load", "hanger-rod-sizing",
+    "pipe-pressure-rating", "pipe-filled-support-load", "hanger-rod-sizing",
     // spec-v200..v203 condensate return + fabrication/process layout tiles.
     "condensate-return-sizing", "branch-saddle-cutback", "reducer-offset",
     "flange-rating",
     // spec-v204..v205 process-piping branch reinforcement + expansion guide spacing.
     "branch-reinforcement", "expansion-guide-spacing",
-    // spec-v588 steam orifice / PRV capacity (Napier)
+  ]);
+  // spec-v1864 split from calc-pipefit.js: steam pressure and vessel bench.
+  declare("./calc-steampressure.js", "STEAMPRESSURE_RENDERERS", [
     "steam-prv-napier", "steam-prv-area-for-capacity",
+    "steam-boiler-blowdown", "radiator-edr-output",
+    "asme-shell-thickness", "asme-head-thickness",
   ]);
   // spec-v30 metal / air / refrigerant bench (deepens Groups E, C per the
   // spec-v28 §7 roadmap; own module since calc-construction and calc-hvac are

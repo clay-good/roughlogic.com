@@ -26935,7 +26935,7 @@ test("bounds: spec-v587 computeHydronicBufferTank pins the buffer volume, the wo
   assert.ok("error" in _v587({ min_on_time_min: 10, source_min_btu: 60000, zone_min_load_btu: -1, delta_t_f: 20 }));
 });
 
-import { computeSteamPrvNapier as _v588 } from "../../calc-pipefit.js";
+import { computeSteamPrvNapier as _v588 } from "../../calc-steampressure.js";
 
 test("bounds: spec-v588 computeSteamPrvNapier pins the choke test, the Napier capacity, the linear-in-P1 behavior, and error seams", () => {
   const r = _v588({ orifice_area_in2: 0.5, upstream_p_psia: 100, downstream_p_psia: 30, discharge_coeff: 0.9 });
@@ -26954,7 +26954,7 @@ test("bounds: spec-v588 computeSteamPrvNapier pins the choke test, the Napier ca
   assert.ok("error" in _v588({ orifice_area_in2: 0.5, upstream_p_psia: 100, downstream_p_psia: 30, discharge_coeff: 1.5 }));
 });
 
-import { computeSteamPrvAreaForCapacity as _v759 } from "../../calc-pipefit.js";
+import { computeSteamPrvAreaForCapacity as _v759 } from "../../calc-steampressure.js";
 test("bounds: spec-v759 steam PRV orifice area for a required capacity (inverse of steam-prv-napier)", () => {
   const p = _v759({ required_capacity_lb_hr: 5000, upstream_p_psia: 100, discharge_coeff: 0.9 });
   assert.ok(Math.abs(p.required_area_in2 - 5000 / (51.5 * 0.9 * 100)) < 1e-9); // 1.0787 at the API 520 constant (1.0802 at Napier's 51.43)
@@ -30031,7 +30031,7 @@ test("bounds: spec-v953 computeCraneLoadRadiusBoom pins the boom geometry, inver
   assert.ok("error" in _v953({ boom_length_ft: Infinity, boom_angle_deg: 60, boom_foot_offset_ft: 4, boom_foot_height_ft: 6, target_radius_ft: 25 }));
 });
 
-import { computeSteamBoilerBlowdown as _v954 } from "../../calc-pipefit.js";
+import { computeSteamBoilerBlowdown as _v954 } from "../../calc-steampressure.js";
 
 test("bounds: spec-v954 computeSteamBoilerBlowdown pins the TDS mass balance and error seams", () => {
   const r = _v954({ steam_rate_lb_hr: 10000, feedwater_tds_ppm: 100, max_boiler_tds_ppm: 3500 });
@@ -30847,7 +30847,7 @@ test("bounds: spec-v989 computeConduitNipple60Fill pins the 60% nipple allowance
   assert.ok("error" in _v989({ conduit_area_sqin: Infinity, conductor_area_sqin: 0.0211, conductor_count: 20 }));
 });
 
-import { computeRadiatorEdrOutput as _v990 } from "../../calc-pipefit.js";
+import { computeRadiatorEdrOutput as _v990 } from "../../calc-steampressure.js";
 
 test("bounds: spec-v990 computeRadiatorEdrOutput pins the EDR heat output and boiler gross-up", () => {
   const r = _v990({ edr_sqft: 320, system_k: 240, pickup_factor: 0.33 });
@@ -33479,7 +33479,7 @@ test("bounds: spec-v1112 computeSlipCriticalWithTension pins the J3-5a factor, e
   assert.ok("error" in _v1112({ ...base, applied_tension_kip: Infinity }));
 });
 
-import { computeAsmeShellThickness as _v1113 } from "../../calc-pipefit.js";
+import { computeAsmeShellThickness as _v1113 } from "../../calc-steampressure.js";
 
 test("bounds: spec-v1113 computeAsmeShellThickness pins both UG-27 forms, the exact MAWP round trip, the joint-efficiency cost, both validity limits, and error seams", () => {
   const base = { design_pressure_psi: 150, inside_radius_in: 24, allowable_stress_psi: 17500, joint_efficiency: 0.85, corrosion_allowance_in: 0.0625, geometry: "cylindrical" };
@@ -33527,7 +33527,7 @@ test("bounds: spec-v1113 computeAsmeShellThickness pins both UG-27 forms, the ex
   assert.ok("error" in _v1113({ ...base, design_pressure_psi: Infinity }));
 });
 
-import { computeAsmeHeadThickness as _v1233 } from "../../calc-pipefit.js";
+import { computeAsmeHeadThickness as _v1233 } from "../../calc-steampressure.js";
 test("bounds: spec-v1233 computeAsmeHeadThickness pins the three UG-32 head forms, the MAWP round trips, the head-shape ranking, and error seams", () => {
   const base = { design_pressure_psi: 150, inside_diameter_in: 48, allowable_stress_psi: 17500, joint_efficiency: 0.85, corrosion_allowance_in: 0.0625, head_type: "ellipsoidal" };
   const ell = _v1233(base);
