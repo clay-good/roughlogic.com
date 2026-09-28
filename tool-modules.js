@@ -878,14 +878,19 @@ export const TOOL_MODULES = (() => {
     // spec-v287..v289 foundation depth batch
     "soil-settlement-elastic", "elastic-settlement-allowable-pressure", "pile-axial-capacity", "pile-length-for-capacity", "slope-stability-infinite", "slope-failure-depth-for-fs", "slope-stability-seepage",
     "frost-depth-berggren",
-    // spec-v308..v310 geotechnical depth-2 batch
-    "soil-consolidation-settlement", "overconsolidated-settlement", "secondary-compression-settlement", "settlement-limit-load", "footing-eccentric-pressure", "boussinesq-surcharge-wall",
-    // spec-v414..v416 settlement/foundation trio
-    "consolidation-time-rate", "consolidation-degree", "coefficient-of-consolidation", "spt-bearing-capacity", "spt-required-n60", "liquefaction-screening",
+    // spec-v414..v416 foundation trio (settlement time moved in spec-v1857)
+    "spt-bearing-capacity", "spt-required-n60", "liquefaction-screening",
     // spec-v1013 Terzaghi total/effective vertical stress profile
     "soil-vertical-effective-stress",
     // spec-v498 pile group efficiency (Converse-Labarre)
     "pile-group-efficiency", "pile-group-spacing-for-efficiency",
+  ]);
+  // spec-v1857 cap-relief split: the settlement, footing-pressure, and
+  // consolidation-time workflow moved out of calc-geotech.js. All 9 tiles
+  // keep Group E and their existing public behavior.
+  declare("./calc-soilsettlement.js", "SOILSETTLEMENT_RENDERERS", [
+    "soil-consolidation-settlement", "overconsolidated-settlement", "secondary-compression-settlement", "settlement-limit-load", "footing-eccentric-pressure", "boussinesq-surcharge-wall",
+    "consolidation-time-rate", "consolidation-degree", "coefficient-of-consolidation",
   ]);
   // spec-v269..v271 TMS 402-16 reinforced-masonry member trio: a new lazy
   // Group E cluster, the masonry counterpart to the steel / RC member benches;

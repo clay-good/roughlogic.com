@@ -18070,7 +18070,7 @@ test("bounds: spec-v307 computePumpSpecificSpeed pins the radial case, the H^3/4
 });
 
 // ===================== spec-v308..v310 geotechnical depth-2 batch =====================
-import { computeSoilConsolidationSettlement as _v308, computeFootingEccentricPressure as _v309, computeBoussinesqSurchargeWall as _v310 } from "../../calc-geotech.js";
+import { computeSoilConsolidationSettlement as _v308, computeFootingEccentricPressure as _v309, computeBoussinesqSurchargeWall as _v310 } from "../../calc-soilsettlement.js";
 
 test("bounds: spec-v308 computeSoilConsolidationSettlement pins the settlement, the log-ratio behavior, and error seams", () => {
   const r = _v308({ cc: 0.25, h_ft: 10, e0: 0.90, sig0_psf: 2000, dsig_psf: 1000 });
@@ -18088,7 +18088,7 @@ test("bounds: spec-v308 computeSoilConsolidationSettlement pins the settlement, 
   assert.ok("error" in _v308({ cc: Infinity, h_ft: 10, e0: 0.9, sig0_psf: 2000, dsig_psf: 1000 }));
 });
 
-import { computeSecondaryCompression as _v1206 } from "../../calc-geotech.js";
+import { computeSecondaryCompression as _v1206 } from "../../calc-soilsettlement.js";
 
 test("bounds: spec-v1206 computeSecondaryCompression pins the creep settlement, the log-time growth, the C-alpha-eps identity, and error seams", () => {
   const ex = { c_alpha: 0.02, h_ft: 10, ep: 0.85, t1_yr: 1, t2_yr: 50 };
@@ -18116,7 +18116,7 @@ test("bounds: spec-v1206 computeSecondaryCompression pins the creep settlement, 
   assert.ok("error" in _v1206({ ...ex, c_alpha: Infinity }));
 });
 
-import { computeOverconsolidatedSettlement as _v1202, computeSoilConsolidationSettlement as _v1202nc } from "../../calc-geotech.js";
+import { computeOverconsolidatedSettlement as _v1202, computeSoilConsolidationSettlement as _v1202nc } from "../../calc-soilsettlement.js";
 
 test("bounds: spec-v1202 computeOverconsolidatedSettlement pins the two branches, the NC reduction, monotonicity, and error seams", () => {
   const base = { cc: 0.25, cr: 0.05, h_ft: 10, e0: 0.90, sig0_psf: 2000, sigp_psf: 3000 };
@@ -18146,7 +18146,7 @@ test("bounds: spec-v1202 computeOverconsolidatedSettlement pins the two branches
   assert.ok("error" in _v1202({ ...base, sig0_psf: Infinity, dsig_psf: 1000 }));
 });
 
-import { computeSettlementLimitLoad as _v648 } from "../../calc-geotech.js";
+import { computeSettlementLimitLoad as _v648 } from "../../calc-soilsettlement.js";
 
 test("bounds: spec-v648 computeSettlementLimitLoad inverts the consolidation settlement, round-trips it, holds the tighter-limit-less-load property, and pins error seams", () => {
   const r = _v648({ sc_allow_in: 2, cc: 0.25, h_ft: 10, e0: 0.90, sig0_psf: 2000 });
@@ -22854,8 +22854,9 @@ test("bounds: spec-v754 required moment of inertia for a deflection limit (inver
   assert.ok("error" in _v754({ w_kip_ft: Infinity, span_ft: 40, allow_defl_in: 1.0 }));
 });
 
-// ===================== spec-v414..v416 geotechnical settlement/foundation trio (calc-geotech.js) =====================
-import { computeConsolidationTimeRate as _v414, computeSptBearingCapacity as _v415, computeLiquefactionScreening as _v416 } from "../../calc-geotech.js";
+// ===================== spec-v414..v416 geotechnical settlement/foundation trio =====================
+import { computeConsolidationTimeRate as _v414 } from "../../calc-soilsettlement.js";
+import { computeSptBearingCapacity as _v415, computeLiquefactionScreening as _v416 } from "../../calc-geotech.js";
 
 test("bounds: spec-v414 computeConsolidationTimeRate pins the piecewise Tv, the time, and error seams", () => {
   const r = _v414({ u_percent: 90, cv_ft2_day: 0.1, hdr_ft: 10 });
@@ -22873,7 +22874,7 @@ test("bounds: spec-v414 computeConsolidationTimeRate pins the piecewise Tv, the 
   assert.ok("error" in _v414({ u_percent: 90, cv_ft2_day: Infinity, hdr_ft: 10 }));
 });
 
-import { computeConsolidationDegree as _v645 } from "../../calc-geotech.js";
+import { computeConsolidationDegree as _v645 } from "../../calc-soilsettlement.js";
 
 test("bounds: spec-v645 computeConsolidationDegree inverts Terzaghi for U, round-trips the time tile across both branches, and pins error seams", () => {
   const r = _v645({ cv_ft2_day: 0.1, hdr_ft: 10, t_days: 848 });
@@ -22902,7 +22903,7 @@ test("bounds: spec-v645 computeConsolidationDegree inverts Terzaghi for U, round
   assert.ok("error" in _v645({ cv_ft2_day: 0.1, hdr_ft: 10, t_days: Infinity }));
 });
 
-import { computeCoefficientOfConsolidation as _v1207, computeConsolidationTimeRate as _v1207f } from "../../calc-geotech.js";
+import { computeCoefficientOfConsolidation as _v1207, computeConsolidationTimeRate as _v1207f } from "../../calc-soilsettlement.js";
 
 test("bounds: spec-v1207 computeCoefficientOfConsolidation pins both fitting methods, the drainage-path and unit conversions, and feeds the time-rate tile", () => {
   const r = _v1207({ method: "casagrande", t_fit_min: 5, specimen_height_in: 1.0, drainage: "double" });

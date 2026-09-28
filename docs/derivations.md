@@ -2438,33 +2438,24 @@ cross-check.
 | calc-gas.js | `renderGasPipeSizing` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-gas.js | `spitzglassFlow` | `{ d_in, dP_in_wc, specific_gravity, L_ft }` | _ | _ | _ |
 | calc-geotech.js | `computeAtRestEarthPressure` | `{ phi = 0, gamma = 120, h_ft = 0, q = 0 } = {}` | _ | _ | _ |
-| calc-geotech.js | `computeBoussinesqSurchargeWall` | `{ ql_plf = 0, h_ft = 0, x_ft = 0, z_ft = 0 } = {}` | _ | _ | _ |
-| calc-geotech.js | `computeCoefficientOfConsolidation` | `{ method = "casagrande", t_fit_min = 0, specimen_height_in = 0, drainage = "d...` | _ | _ | _ |
 | calc-geotech.js | `computeCohesiveEarthPressure` | `{ phi = 0, c_psf = 0, gamma = 120, h_ft = 0, q = 0 } = {}` | _ | _ | _ |
-| calc-geotech.js | `computeConsolidationDegree` | `{ cv_ft2_day = 0, hdr_ft = 0, t_days = 0 } = {}` | _ | _ | _ |
-| calc-geotech.js | `computeConsolidationTimeRate` | `{ u_percent = 0, cv_ft2_day = 0, hdr_ft = 0 } = {}` | _ | _ | _ |
 | calc-geotech.js | `computeCoulombEarthPressure` | `{ phi = 0, delta = 0, theta = 0, alpha = 0, gamma = 120, h_ft = 0 } = {}` | _ | _ | _ |
 | calc-geotech.js | `computeElasticSettlementAllowablePressure` | `{ settlement_limit_in = 1, b_ft = 0, es_ksf = 0, nu = 0.3, is_f = 0.82 } = {}` | _ | _ | _ |
-| calc-geotech.js | `computeFootingEccentricPressure` | `{ p_kip = 0, m_kft = 0, b_ft = 0, l_ft = 0 } = {}` | _ | _ | _ |
 | calc-geotech.js | `computeFrostDepthBerggren` | `{ freezing_index_f_days = 2000, frozen_conductivity_btu = 1.0, dry_density_pc...` | _ | _ | _ |
 | calc-geotech.js | `computeLateralEarthPressure` | `{ phi = 0, gamma = 120, h_ft = 0, q = 0 } = {}` | _ | _ | _ |
 | calc-geotech.js | `computeLiquefactionScreening` | `{ amax_g = 0, sigma_v_psf = 0, sigma_vp_psf = 0, depth_ft = 0, crr = 0, msf =...` | _ | _ | _ |
-| calc-geotech.js | `computeOverconsolidatedSettlement` | `{ cc = 0, cr = 0, h_ft = 0, e0 = 0, sig0_psf = 0, sigp_psf = 0, dsig_psf = 0 ...` | _ | _ | _ |
 | calc-geotech.js | `computePileAxialCapacity` | `{ d_ft = 0, l_ft = 0, cu_ksf = 0, alpha = 0.55, fs = 3 } = {}` | _ | _ | _ |
 | calc-geotech.js | `computePileGroupEfficiency` | `{ rows_n = 0, cols_m = 0, diameter_in = 0, spacing_in = 0, single_allow_kip =...` | _ | _ | _ |
 | calc-geotech.js | `computePileGroupSpacingForEfficiency` | `{ rows_n = 0, cols_m = 0, diameter_in = 0, target_eg = 0 } = {}` | _ | _ | _ |
 | calc-geotech.js | `computePileLengthForCapacity` | `{ qall_target_kip = 0, d_ft = 0, cu_ksf = 0, alpha = 0.55, fs = 3 } = {}` | _ | _ | _ |
 | calc-geotech.js | `computePoleEmbedmentDepth` | `{ lateral_force_lb = 0, force_height_ft = 0, post_width_ft = 0, lateral_beari...` | _ | _ | _ |
 | calc-geotech.js | `computeRetainingWallStability` | `{ h_ft = 0, b_ft = 0, t_base = 0, t_stem = 0, toe_ft = 0, gamma_s = 110, gamm...` | _ | _ | _ |
-| calc-geotech.js | `computeSecondaryCompression` | `{ c_alpha = 0, h_ft = 0, ep = 0, t1_yr = 0, t2_yr = 0 } = {}` | _ | _ | _ |
 | calc-geotech.js | `computeSeismicEarthPressure` | `{ phi = 0, delta = 0, theta = 0, alpha = 0, gamma = 120, h_ft = 0, kh = 0, kv...` | _ | _ | _ |
-| calc-geotech.js | `computeSettlementLimitLoad` | `{ sc_allow_in = 0, cc = 0, h_ft = 0, e0 = 0, sig0_psf = 0 } = {}` | _ | _ | _ |
 | calc-geotech.js | `computeSlopeFailureDepthForFs` | `{ beta_deg = 0, phi_deg = 0, c_psf = 0, gamma_pcf = 120, target_fs = 0 } = {}` | _ | _ | _ |
 | calc-geotech.js | `computeSlopeStabilityInfinite` | `{ beta_deg = 0, phi_deg = 0, c_psf = 0, gamma_pcf = 120, h_ft = 0 } = {}` | _ | _ | _ |
 | calc-geotech.js | `computeSlopeStabilitySeepage` | `{ beta_deg = 0, phi_deg = 0, c_psf = 0, gamma_sat = 125, h_ft = 0 } = {}` | _ | _ | _ |
 | calc-geotech.js | `computeSlopedBackfillEarthPressure` | `{ phi = 0, beta = 0, gamma = 120, h_ft = 0 } = {}` | _ | _ | _ |
 | calc-geotech.js | `computeSoilBearingCapacity` | `{ c = 0, phi = 0, gamma = 120, b_ft = 0, df_ft = 0, shape = "strip", fs = 3 }...` | _ | _ | _ |
-| calc-geotech.js | `computeSoilConsolidationSettlement` | `{ cc = 0, h_ft = 0, e0 = 0, sig0_psf = 0, dsig_psf = 0 } = {}` | _ | _ | _ |
 | calc-geotech.js | `computeSoilSettlementElastic` | `{ q_ksf = 0, b_ft = 0, es_ksf = 0, nu = 0.3, is_f = 0.82 } = {}` | _ | _ | _ |
 | calc-geotech.js | `computeSoilVerticalEffectiveStress` | `{ gamma_moist_pcf = 120, gamma_sat_pcf = 125, depth_ft = 0, water_table_depth...` | _ | _ | _ |
 | calc-geotech.js | `computeSptBearingCapacity` | `{ n60 = 0, b_ft = 0, d_ft = 0 } = {}` | _ | _ | _ |
@@ -3505,6 +3496,15 @@ cross-check.
 | calc-shop.js | `computeTorusVolume` | `{ center_diameter_in = 0, tube_diameter_in = 0 } = {}` | _ | _ | _ |
 | calc-shop.js | `computeTurningSurfaceFinish` | `{ feed_ipr_in = 0, nose_radius_in = 0 } = {}` | _ | _ | _ |
 | calc-shop.js | `computeWeldDutyCycle` | `{ rated_amps = 0, rated_duty_pct = 0, target_amps = 0 } = {}` | _ | _ | _ |
+| calc-soilsettlement.js | `computeBoussinesqSurchargeWall` | `{ ql_plf = 0, h_ft = 0, x_ft = 0, z_ft = 0 } = {}` | _ | _ | _ |
+| calc-soilsettlement.js | `computeCoefficientOfConsolidation` | `{ method = "casagrande", t_fit_min = 0, specimen_height_in = 0, drainage = "d...` | _ | _ | _ |
+| calc-soilsettlement.js | `computeConsolidationDegree` | `{ cv_ft2_day = 0, hdr_ft = 0, t_days = 0 } = {}` | _ | _ | _ |
+| calc-soilsettlement.js | `computeConsolidationTimeRate` | `{ u_percent = 0, cv_ft2_day = 0, hdr_ft = 0 } = {}` | _ | _ | _ |
+| calc-soilsettlement.js | `computeFootingEccentricPressure` | `{ p_kip = 0, m_kft = 0, b_ft = 0, l_ft = 0 } = {}` | _ | _ | _ |
+| calc-soilsettlement.js | `computeOverconsolidatedSettlement` | `{ cc = 0, cr = 0, h_ft = 0, e0 = 0, sig0_psf = 0, sigp_psf = 0, dsig_psf = 0 ...` | _ | _ | _ |
+| calc-soilsettlement.js | `computeSecondaryCompression` | `{ c_alpha = 0, h_ft = 0, ep = 0, t1_yr = 0, t2_yr = 0 } = {}` | _ | _ | _ |
+| calc-soilsettlement.js | `computeSettlementLimitLoad` | `{ sc_allow_in = 0, cc = 0, h_ft = 0, e0 = 0, sig0_psf = 0 } = {}` | _ | _ | _ |
+| calc-soilsettlement.js | `computeSoilConsolidationSettlement` | `{ cc = 0, h_ft = 0, e0 = 0, sig0_psf = 0, dsig_psf = 0 } = {}` | _ | _ | _ |
 | calc-solar.js | `computeBatteryCRate` | `{ nameplate_kwh = 0, c_rate = 0.5, dod = 0.90, inverter_kw = 0 } = {}` | _ | _ | _ |
 | calc-solar.js | `computeBatteryPeakShaving` | `{ nameplate_kwh = 0, dod = 0.90, event_duration_h = 0, target_shave_kw = 0, d...` | _ | _ | _ |
 | calc-solar.js | `computeBatteryRuntime` | `{ amp_hours, system_V, dod_percent = 100, load_W, peukert_k = 1, inverter_eff...` | _ | _ | _ |
