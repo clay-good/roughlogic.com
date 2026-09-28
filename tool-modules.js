@@ -182,13 +182,13 @@ export const TOOL_MODULES = (() => {
     "fiber-loss-budget", "fiber-max-length", "wireless-fspl", "fresnel-zone-clearance", "wireless-link-budget", "cable-tray-fill", "cctv-storage", "cctv-retention-days",
     "speaker-70v-line", "standby-battery-sizing", "standby-battery-runtime", "coax-rg-loss",
     "camera-lens-fov", "camera-max-distance-for-ppf", "ceiling-speaker-coverage", "ceiling-speaker-coverage-angle", "structured-cabling-channel", "lv-cable-pull-footage", "cable-support-jhook", "access-control-power-supply", "fire-alarm-nac-voltage-drop",
+  ]);
+  // spec-v1865 split from calc-lowvoltage.js: process instrumentation bench.
+  declare("./calc-instrumentation.js", "INSTRUMENTATION_RENDERERS", [
     "loop-signal-scaling", "dp-flow-signal-scaling",
-    "rtd-resistance-to-temp",
-    "pulse-flowmeter-k-factor",
-    "loop-voltage-budget",
+    "rtd-resistance-to-temp", "pulse-flowmeter-k-factor", "loop-voltage-budget",
     "thermistor-beta-temp", "thermistor-steinhart-hart",
-    "dp-level-hydrostatic",
-    "pid-tuning-ziegler-nichols",
+    "dp-level-hydrostatic", "pid-tuning-ziegler-nichols",
   ]);
   // spec-v29 pipe / raceway field-layout bench (deepens Groups B, A, G per
   // the spec-v28 §7 roadmap; lives in its own module because calc-electrical

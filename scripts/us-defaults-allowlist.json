@@ -393,10 +393,16 @@
    "justification": "A metric COMPANION: the haversine tile prints \"Distance (miles)\" directly above it. Aviation and marine plots read both, and the cited Earth radius is given in mi and km."
   },
   {
-   "module": "calc-lowvoltage.js",
+   "module": "calc-instrumentation.js",
    "match": "Temperature (°C)",
    "family": "instrumentation sensor curves",
    "justification": "RTD (IEC 60751 Callendar-Van Dusen), thermistor Beta, and Steinhart-Hart curves are DEFINED in degrees C -- the coefficients have no Fahrenheit form -- and every one of the three tiles prints \"Temperature (°F)\" on the next line. Verified 2026-09-04 when output labels were first scanned."
+  },
+  {
+   "module": "calc-lowvoltage.js",
+   "match": "Installed cable temperature (°C)",
+   "family": "structured cabling standards",
+   "justification": "TIA-568 channel-length temperature derating is defined from a 20°C baseline in degrees C; the field follows the standard's native scale."
   },
   {
    "module": "calc-survey.js",

@@ -29790,7 +29790,7 @@ test("bounds: spec-v945 computeMotorRmsHp pins the RMS heating equivalent, the c
   assert.ok("error" in _v945({ hp_run: Infinity, run_time_s: 10, hp_idle: 0, idle_time_s: 20, cooling_factor: 3 }));
 });
 
-import { computeLoopSignalScaling as _v946 } from "../../calc-lowvoltage.js";
+import { computeLoopSignalScaling as _v946 } from "../../calc-instrumentation.js";
 
 test("bounds: spec-v946 computeLoopSignalScaling pins the live-zero linear scaling, NAMUR status, and error seams", () => {
   const r = _v946({ signal_ma: 12, range_low: 0, range_high: 100 });
@@ -29818,7 +29818,7 @@ test("bounds: spec-v946 computeLoopSignalScaling pins the live-zero linear scali
   assert.ok("error" in _v946({ signal_ma: Infinity, range_low: 0, range_high: 100 }));
 });
 
-import { computeDpFlowSignalScaling as _v1226 } from "../../calc-lowvoltage.js";
+import { computeDpFlowSignalScaling as _v1226 } from "../../calc-instrumentation.js";
 
 test("bounds: spec-v1226 computeDpFlowSignalScaling pins flow% = sqrt((mA-4)/16), the vs-linear gap, the cutoff, and error seams", () => {
   // 12 mA (50% signal) -> sqrt(0.5) = 70.71% flow, 353.55 gpm; linear would be 50%/250.
@@ -29842,7 +29842,7 @@ test("bounds: spec-v1226 computeDpFlowSignalScaling pins flow% = sqrt((mA-4)/16)
   assert.ok("error" in _v1226({ signal_ma: Infinity, flow_low: 0, flow_high: 500 }));
 });
 
-import { computeRtdResistanceToTemp as _v947 } from "../../calc-lowvoltage.js";
+import { computeRtdResistanceToTemp as _v947 } from "../../calc-instrumentation.js";
 
 test("bounds: spec-v947 computeRtdResistanceToTemp pins the Callendar-Van Dusen inverse and error seams", () => {
   const r = _v947({ resistance_ohms: 119.397, r0_ohms: 100 });
@@ -29867,7 +29867,7 @@ test("bounds: spec-v947 computeRtdResistanceToTemp pins the Callendar-Van Dusen 
   assert.ok("error" in _v947({ resistance_ohms: Infinity, r0_ohms: 100 }));
 });
 
-import { computePulseFlowmeterRate as _v948 } from "../../calc-lowvoltage.js";
+import { computePulseFlowmeterRate as _v948 } from "../../calc-instrumentation.js";
 
 test("bounds: spec-v948 computePulseFlowmeterRate pins the K-factor scaling and error seams", () => {
   const r = _v948({ frequency_hz: 100, k_factor_pulses_per_gal: 200 });
@@ -29885,7 +29885,7 @@ test("bounds: spec-v948 computePulseFlowmeterRate pins the K-factor scaling and 
   assert.ok("error" in _v948({ frequency_hz: Infinity, k_factor_pulses_per_gal: 200 }));
 });
 
-import { computeLoopVoltageBudget as _v949 } from "../../calc-lowvoltage.js";
+import { computeLoopVoltageBudget as _v949 } from "../../calc-instrumentation.js";
 
 test("bounds: spec-v949 computeLoopVoltageBudget pins the max loop resistance, transmitter voltage, verdict, and error seams", () => {
   const r = _v949({ supply_v: 24, transmitter_min_v: 10.5, load_resistance_ohms: 250, wire_resistance_ohms: 50 });
@@ -29913,7 +29913,7 @@ test("bounds: spec-v949 computeLoopVoltageBudget pins the max loop resistance, t
   assert.ok("error" in _v949({ supply_v: Infinity, transmitter_min_v: 10.5, load_resistance_ohms: 250, wire_resistance_ohms: 50 }));
 });
 
-import { computeThermistorBetaTemp as _v950 } from "../../calc-lowvoltage.js";
+import { computeThermistorBetaTemp as _v950 } from "../../calc-instrumentation.js";
 
 test("bounds: spec-v950 computeThermistorBetaTemp pins the NTC beta equation and error seams", () => {
   const r = _v950({ resistance_ohms: 20000, r0_ohms: 10000, beta_k: 3950, ref_temp_c: 25 });
@@ -29936,7 +29936,7 @@ test("bounds: spec-v950 computeThermistorBetaTemp pins the NTC beta equation and
   assert.ok("error" in _v950({ resistance_ohms: Infinity, r0_ohms: 10000, beta_k: 3950, ref_temp_c: 25 }));
 });
 
-import { computeThermistorSteinhartHart as _v1223 } from "../../calc-lowvoltage.js";
+import { computeThermistorSteinhartHart as _v1223 } from "../../calc-instrumentation.js";
 
 test("bounds: spec-v1223 computeThermistorSteinhartHart pins the 3-constant equation, the NTC direction, and error seams", () => {
   const A = 0.001125308852122, B = 0.000234711863267, C = 0.000000085663516;
@@ -30134,7 +30134,7 @@ test("bounds: spec-v957 computeInsulationResistancePi pins PI/DAR, IEEE 43 verdi
   assert.ok("error" in _v957({ ir_30s_mohm: Infinity, ir_1min_mohm: 1040, ir_10min_mohm: 4160 }));
 });
 
-import { computeDpLevelHydrostatic as _v958 } from "../../calc-lowvoltage.js";
+import { computeDpLevelHydrostatic as _v958 } from "../../calc-instrumentation.js";
 
 test("bounds: spec-v958 computeDpLevelHydrostatic pins P = 0.433 SG H and error seams", () => {
   const r = _v958({ measured_pressure_psi: 4.33, specific_gravity: 1.0, max_level_ft: 20 });
@@ -30206,7 +30206,7 @@ test("bounds: spec-v960 computeDuctStaticRegain pins VP = (V/4005)^2, the regain
   assert.ok("error" in _v960({ upstream_velocity_fpm: Infinity, downstream_velocity_fpm: 1500, recovery_factor: 0.75 }));
 });
 
-import { computePidTuningZieglerNichols as _v961 } from "../../calc-lowvoltage.js";
+import { computePidTuningZieglerNichols as _v961 } from "../../calc-instrumentation.js";
 
 test("bounds: spec-v961 computePidTuningZieglerNichols pins the ZN closed-loop rules and error seams", () => {
   const r = _v961({ ultimate_gain_ku: 4, ultimate_period_tu_sec: 2 });

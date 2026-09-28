@@ -2646,6 +2646,15 @@ cross-check.
 | calc-inspection.js | `computeTemperingTemperature` | `{ target_hardness_hrc = 0, curve_temp_f = 0, section_thickness_in = 0, soak_r...` | _ | _ | _ |
 | calc-inspection.js | `computeUtThicknessVelocity` | `{ transit_time_us = 0, gauge_velocity_in_us = 0, actual_velocity_in_us = 0, n...` | _ | _ | _ |
 | calc-inspection.js | `computeWeldVisualAcceptance` | `{ nominal_leg_in = 0, measured_leg_in = 0, undersize_length_in = 0, weld_leng...` | _ | _ | _ |
+| calc-instrumentation.js | `computeDpFlowSignalScaling` | `{ signal_ma = 12, flow_low = 0, flow_high = 100, low_flow_cutoff_pct = 0 } = {}` | _ | _ | _ |
+| calc-instrumentation.js | `computeDpLevelHydrostatic` | `{ measured_pressure_psi = 4.33, specific_gravity = 1.0, max_level_ft = 20 } = {}` | _ | _ | _ |
+| calc-instrumentation.js | `computeLoopSignalScaling` | `{ signal_ma = 12, range_low = 0, range_high = 100 } = {}` | _ | _ | _ |
+| calc-instrumentation.js | `computeLoopVoltageBudget` | `{ supply_v = 24, transmitter_min_v = 10.5, load_resistance_ohms = 250, wire_r...` | _ | _ | _ |
+| calc-instrumentation.js | `computePidTuningZieglerNichols` | `{ ultimate_gain_ku = 4, ultimate_period_tu_sec = 2 } = {}` | _ | _ | _ |
+| calc-instrumentation.js | `computePulseFlowmeterRate` | `{ frequency_hz = 100, k_factor_pulses_per_gal = 200 } = {}` | _ | _ | _ |
+| calc-instrumentation.js | `computeRtdResistanceToTemp` | `{ resistance_ohms = 119.397, r0_ohms = 100 } = {}` | _ | _ | _ |
+| calc-instrumentation.js | `computeThermistorBetaTemp` | `{ resistance_ohms = 10000, r0_ohms = 10000, beta_k = 3950, ref_temp_c = 25 } ...` | _ | _ | _ |
+| calc-instrumentation.js | `computeThermistorSteinhartHart` | `{ resistance_ohms = 10000, coeff_a = 0.001125308852122, coeff_b = 0.000234711...` | _ | _ | _ |
 | calc-kitchen.js | `computeAbvFromGravity` | `{ original_gravity = 1.055, final_gravity = 1.012 } = {}` | _ | _ | _ |
 | calc-kitchen.js | `computeAsPurchasedQuantity` | `{ ep_quantity_needed = 20, yield_pct = 75, unit_weight = 0 } = {}` | _ | _ | _ |
 | calc-kitchen.js | `computeBakersPercentage` | `{ flour_g = 0, hydration_pct = 0, salt_pct = 0, yeast_pct = 0, other_pct = 0,...` | _ | _ | _ |
@@ -2757,24 +2766,15 @@ cross-check.
 | calc-lowvoltage.js | `computeCeilingSpeakerCoverage` | `{ ceiling_ft = 0, ear_ft = 0, coverage_deg = 90, room_area_ft2 = 0, layout = ...` | _ | _ | _ |
 | calc-lowvoltage.js | `computeCeilingSpeakerCoverageAngle` | `{ ceiling_ft = 0, ear_ft = 0, target_diameter_ft = 0 } = {}` | _ | _ | _ |
 | calc-lowvoltage.js | `computeCoaxRgLoss` | `{ mode = "loss", loss_per_100ft_db = 0, length_ft = 0, source_level = null, t...` | _ | _ | _ |
-| calc-lowvoltage.js | `computeDpFlowSignalScaling` | `{ signal_ma = 12, flow_low = 0, flow_high = 100, low_flow_cutoff_pct = 0 } = {}` | _ | _ | _ |
-| calc-lowvoltage.js | `computeDpLevelHydrostatic` | `{ measured_pressure_psi = 4.33, specific_gravity = 1.0, max_level_ft = 20 } = {}` | _ | _ | _ |
 | calc-lowvoltage.js | `computeFiberLossBudget` | `{ length_m = 0, attenuation_db_km = 0, connector_count = 0, loss_per_connecto...` | _ | _ | _ |
 | calc-lowvoltage.js | `computeFiberMaxLength` | `{ max_channel_loss_db = 0, attenuation_db_km = 0, connector_count = 0, loss_p...` | _ | _ | _ |
 | calc-lowvoltage.js | `computeFireAlarmNacVoltageDrop` | `{ nominal_voltage_v = 24, total_current_a = 0.8, run_length_ft = 250, resista...` | _ | _ | _ |
 | calc-lowvoltage.js | `computeFresnelZoneClearance` | `{ frequency_ghz = 0, d1_km = 0, d2_km = 0, zone_number = 1 } = {}` | _ | _ | _ |
-| calc-lowvoltage.js | `computeLoopSignalScaling` | `{ signal_ma = 12, range_low = 0, range_high = 100 } = {}` | _ | _ | _ |
-| calc-lowvoltage.js | `computeLoopVoltageBudget` | `{ supply_v = 24, transmitter_min_v = 10.5, load_resistance_ohms = 250, wire_r...` | _ | _ | _ |
 | calc-lowvoltage.js | `computeLvCablePullFootage` | `{ drops = 48, avg_run_ft = 120, slack_ft = 15, box_ft = 1000 } = {}` | _ | _ | _ |
-| calc-lowvoltage.js | `computePidTuningZieglerNichols` | `{ ultimate_gain_ku = 4, ultimate_period_tu_sec = 2 } = {}` | _ | _ | _ |
-| calc-lowvoltage.js | `computePulseFlowmeterRate` | `{ frequency_hz = 100, k_factor_pulses_per_gal = 200 } = {}` | _ | _ | _ |
-| calc-lowvoltage.js | `computeRtdResistanceToTemp` | `{ resistance_ohms = 119.397, r0_ohms = 100 } = {}` | _ | _ | _ |
 | calc-lowvoltage.js | `computeSpeaker70vLine` | `{ amp_rated_w = 0, headroom_percent = 20, tap_watts = 0, tap_count = 0, line_...` | _ | _ | _ |
 | calc-lowvoltage.js | `computeStandbyBatteryRuntime` | `{ battery_ah = 0, standby_current_a = 0, alarm_current_a = 0, alarm_minutes =...` | _ | _ | _ |
 | calc-lowvoltage.js | `computeStandbyBatterySizing` | `{ standby_current_a = 0, standby_hours = 0, alarm_current_a = 0, alarm_minute...` | _ | _ | _ |
 | calc-lowvoltage.js | `computeStructuredCablingChannel` | `{ permanent_link_m = 0, cords_m = 0, temp_c = 20, derate_per_c = 0.004 } = {}` | _ | _ | _ |
-| calc-lowvoltage.js | `computeThermistorBetaTemp` | `{ resistance_ohms = 10000, r0_ohms = 10000, beta_k = 3950, ref_temp_c = 25 } ...` | _ | _ | _ |
-| calc-lowvoltage.js | `computeThermistorSteinhartHart` | `{ resistance_ohms = 10000, coeff_a = 0.001125308852122, coeff_b = 0.000234711...` | _ | _ | _ |
 | calc-lowvoltage.js | `computeWirelessFspl` | `{ distance_km = 0, frequency_mhz = 0, tx_power_dbm = 20, tx_gain_dbi = 0, rx_...` | _ | _ | _ |
 | calc-lowvoltage.js | `computeWirelessLinkBudget` | `{ tx_power_dbm = 20, tx_gain_dbi = 0, tx_cable_loss_db = 0, distance_km = 0, ...` | _ | _ | _ |
 | calc-machining.js | `computeAcmeThreadDepth` | `{ major_dia_in = 0, tpi = 0 } = {}` | _ | _ | _ |

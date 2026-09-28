@@ -53,6 +53,7 @@ const FILES = [
   "calc-powerquality.js",
   "calc-feeder.js",
   "calc-lowvoltage.js",
+  "calc-instrumentation.js",
   "calc-metalair.js",
   "calc-gas.js",
   "calc-pipefit.js",
