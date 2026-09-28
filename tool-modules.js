@@ -24,7 +24,7 @@ export const TOOL_MODULES = (() => {
   const map = {};
   const declare = (path, exportName, ids) => { for (const id of ids) map[id] = { path, exportName }; };
   declare("./calc-electrical.js", "ELECTRICAL_RENDERERS", [
-    "ohms-law", "wire-ampacity", "voltage-drop", "mwbc-voltage-drop", "egc-parallel-raceways", "conduit-fill", "box-fill",
+    "ohms-law", "wire-ampacity", "voltage-drop", "egc-parallel-raceways", "conduit-fill", "box-fill",
     "awg-wire-geometry",
     "breaker-sizing", "motor-fla", "transformer-sizing", "three-phase",
     "copper-resistance", "egc-sizing",
@@ -32,7 +32,7 @@ export const TOOL_MODULES = (() => {
     "service-load", "generator-sizing",
     "voltage-imbalance", "gfci-afci-reference", "lighting-density",
     // v3
-    "pulling-tension", "cable-reel-capacity", "wire-pulling-lubricant", "branch-circuit-wire-footage", "microinverter-branch-count", "welder-arc-circuit-conductor", "welder-resistance-circuit-conductor", "battery-inverter-dc-conductor", "pv-ac-output-circuit", "soil-resistivity-wenner", "cable-bend-radius", "pf-correction", "phase-balance",
+    "pulling-tension", "cable-bend-radius", "pf-correction", "phase-balance",
     "multi-load-vd", "lv-dc-drop", "poe-budget",
     // v7
     "transformer-kva-sizing", "short-circuit-pp", "generator-motor-starting",
@@ -50,9 +50,6 @@ export const TOOL_MODULES = (() => {
     "lux-to-footcandle",
     // spec-v109 service grounding, bonding, and inverse voltage-drop sizing.
     "grounding-electrode-conductor", "bonding-jumper", "min-conductor-for-vd",
-    "max-circuit-length-for-vd",
-    "open-delta-transformer",
-    "conduit-nipple-60-fill",
     // spec-v121..v128 fault / raceway / grounding / three-phase
     "conductor-short-circuit-withstand", "conduit-thermal-expansion", "conduit-expansion-max-run",
     "egc-upsize-proportional", "delta-wye-line-phase",
@@ -78,6 +75,15 @@ export const TOOL_MODULES = (() => {
     "transformer-inrush-point",
     // spec-v562
     "termination-temp-ampacity",
+  ]);
+  // spec-v1860: field-installation and branch-circuit calculators split from
+  // calc-electrical.js before that module reached its gzip cap.
+  declare("./calc-electricalfield.js", "ELECTRICALFIELD_RENDERERS", [
+    "cable-reel-capacity", "wire-pulling-lubricant", "branch-circuit-wire-footage",
+    "microinverter-branch-count", "welder-arc-circuit-conductor",
+    "welder-resistance-circuit-conductor", "battery-inverter-dc-conductor",
+    "pv-ac-output-circuit", "soil-resistivity-wenner", "max-circuit-length-for-vd",
+    "open-delta-transformer", "conduit-nipple-60-fill", "mwbc-voltage-drop",
   ]);
   // spec-v129 cap-relief split: the cohesive spec-v121..v124 motor bench
   // (motor-synchronous-speed-slip, motor-shaft-torque, motor-operating-cost,

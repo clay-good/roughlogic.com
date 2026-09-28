@@ -39,6 +39,12 @@
    "justification": "ICEA P-32-382 conductor short-circuit limits are published in deg C."
   },
   {
+   "module": "calc-electricalfield.js",
+   "match": "(°C)",
+   "family": "NEC/IEEE electrical",
+   "justification": "Conductor resistance and voltage-drop calculations use the conductor temperature in deg C, matching NEC/IEEE electrical practice."
+  },
+  {
    "module": "calc-lab.js",
    "match": "*",
    "family": "lab and IH practice",

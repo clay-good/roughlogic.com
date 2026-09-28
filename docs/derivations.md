@@ -2126,23 +2126,19 @@ cross-check.
 | calc-electrical.js | `computeAsymmetricalFaultXr` | `{ isym_ka = 0, x_over_r = 0 } = {}` | _ | _ | _ |
 | calc-electrical.js | `computeAwgWireGeometry` | `{ awg = "12" } = {}` | _ | _ | _ |
 | calc-electrical.js | `computeBatteryHydrogenVent` | `{ cell_count = 0, charge_current_a = 0, room_volume_ft3 = 0, h2_limit_pct = 1...` | _ | _ | _ |
-| calc-electrical.js | `computeBatteryInverterDcConductor` | `{ inverter_power_w = 4000, battery_voltage_v = 48, efficiency_pct = 90 } = {}` | _ | _ | _ |
 | calc-electrical.js | `computeBatteryVentMaxCurrent` | `{ available_cfm = 0, cell_count = 0, h2_limit_pct = 1 } = {}` | _ | _ | _ |
 | calc-electrical.js | `computeBendRadius` | `{ cable_type, cable_od_in }` | _ | _ | _ |
 | calc-electrical.js | `computeBendsBetweenPulls` | `{ bend1_deg = 0, bend2_deg = 0, bend3_deg = 0, bend4_deg = 0, bend5_deg = 0, ...` | _ | _ | _ |
 | calc-electrical.js | `computeBondingJumper` | `{ mode = "supply-side", material = "copper", service_kcmil = 0, ocpd_A = 0, p...` | _ | _ | _ |
 | calc-electrical.js | `computeBoxFill` | `{ box_volume_in3, conductors_by_size, devices = 0, internal_clamps = false, l...` | _ | _ | _ |
-| calc-electrical.js | `computeBranchCircuitWireFootage` | `{ circuits = 20, avg_homerun_ft = 45, makeup_ft = 15, conductors_per_circuit ...` | _ | _ | _ |
 | calc-electrical.js | `computeBreakerSize` | `{ load_A, continuous, load_W = 0, voltage_V = 0, power_factor = 1, phase = "s...` | _ | _ | _ |
 | calc-electrical.js | `computeBuckBoostSizing` | `{ supply_v = 0, desired_v = 0, load_a = 0 } = {}` | _ | _ | _ |
-| calc-electrical.js | `computeCableReelCapacity` | `{ flange_dia_in = 30, drum_dia_in = 12, traverse_width_in = 18, cable_od_in =...` | _ | _ | _ |
 | calc-electrical.js | `computeCapacitorDischargeTime` | `{ capacitance_uf = 0, initial_voltage = 0, safe_voltage = 50, time_limit_s = ...` | _ | _ | _ |
 | calc-electrical.js | `computeConductorResistance` | `{ material, awg, length_ft, temperature_C }` | _ | _ | _ |
 | calc-electrical.js | `computeConductorShortCircuitWithstand` | `{ area_cmil = 0, fault_current_a = 0, clearing_time_s = 0, material = "copper...` | _ | _ | _ |
 | calc-electrical.js | `computeConduitExpansionMaxRun` | `{ temp_change_f = 0, coeff_in_per_in_f = 0.0000338, trigger_in = 0.25 } = {}` | _ | _ | _ |
 | calc-electrical.js | `computeConduitFill` | `{ conduit, trade_size, conductors }` | _ | _ | _ |
 | calc-electrical.js | `computeConduitJamRatio` | `{ conduit_id_in = 0, conductor_od_in = 0, n_conductors = 3 } = {}` | _ | _ | _ |
-| calc-electrical.js | `computeConduitNipple60Fill` | `{ conduit_area_sqin = 0.864, conductor_area_sqin = 0.0211, conductor_count = ...` | _ | _ | _ |
 | calc-electrical.js | `computeConduitThermalExpansion` | `{ run_length_ft = 0, temp_change_f = 0, coeff_in_per_in_f = 0.0000338, trigge...` | _ | _ | _ |
 | calc-electrical.js | `computeDeltaWyeLinePhase` | `{ configuration = "wye", line_voltage_v = 0, line_current_a = 0, power_factor...` | _ | _ | _ |
 | calc-electrical.js | `computeEGCSize` | `{ ocpd_A, material }` | _ | _ | _ |
@@ -2158,31 +2154,25 @@ cross-check.
 | calc-electrical.js | `computeLVDCDrop` | `{ system_V = 12, awg = "10", run_length_ft = 0, current_A = 0, application = ...` | _ | _ | _ |
 | calc-electrical.js | `computeLightingDensity` | `{ area_ft2, occupancy_class }` | _ | _ | _ |
 | calc-electrical.js | `computeLuxFootcandle` | `{ mode = "convert", lux = 0, footcandles = 0, lumens = 0, area_ft2 = 0, cu = ...` | _ | _ | _ |
-| calc-electrical.js | `computeMaxCircuitLengthForVd` | `{ source_voltage_v = 120, target_vd_pct = 3, current_a = 20, conductor_cmil =...` | _ | _ | _ |
-| calc-electrical.js | `computeMicroinverterBranchCount` | `{ branch_ocpd_a = 20, unit_max_current_a = 1.21 } = {}` | _ | _ | _ |
 | calc-electrical.js | `computeMinConductorForVd` | `{ phase = "single", material = "copper", current_A = 0, length_ft = 0, source...` | _ | _ | _ |
 | calc-electrical.js | `computeMotorBranchFromNameplate` | `{ hp = 0, voltage_V = 0, phase = 1, eta = 0.90, power_factor = 0.85, nameplat...` | _ | _ | _ |
 | calc-electrical.js | `computeMotorBranchProtection` | `{ flc_a = 0, device_type = "inverse-time breaker" } = {}` | _ | _ | _ |
 | calc-electrical.js | `computeMotorEfficiencyUpgradeSavings` | `{ hp = 0, load = 0, eff_standard = 0, eff_premium = 0, hours = 0, rate_kwh = ...` | _ | _ | _ |
 | calc-electrical.js | `computeMotorFLA` | `{ hp, voltage, phase }` | _ | _ | _ |
 | calc-electrical.js | `computeMultiLoadVoltageDrop` | `{ material = "copper", awg = "12", source_voltage_V = 120, loads = [], }` | _ | _ | _ |
-| calc-electrical.js | `computeMwbcVoltageDrop` | `{ awg = "12", material = "copper", one_way_length_ft = 0, load_a_amps = 0, lo...` | _ | _ | _ |
 | calc-electrical.js | `computeOhmsLaw` | `{ V, I, R, P }` | _ | _ | _ |
-| calc-electrical.js | `computeOpenDeltaTransformer` | `{ transformer_kva_each = 25, required_load_kva = 40 } = {}` | _ | _ | _ |
 | calc-electrical.js | `computePFCorrection` | `{ kW, pf1, pf2, system_V, phase = "single" }` | _ | _ | _ |
 | calc-electrical.js | `computePanelRebalance` | `{ circuits = [], swappable_pairs = null, } = {}` | _ | _ | _ |
 | calc-electrical.js | `computePhaseBalance` | `{ circuits = [], threshold_percent = 10 }` | _ | _ | _ |
 | calc-electrical.js | `computePoEBudget` | `{ poe_class = "at", category = "Cat6", run_length_ft = 100, ambient_C = 25 }` | _ | _ | _ |
 | calc-electrical.js | `computePowerTriangle` | `{ kw = null, kva = null, kvar = null, pf = null, angle_deg = null, sign = "la...` | _ | _ | _ |
 | calc-electrical.js | `computePullingTension` | `{ cable_weight_lb_per_ft = 0, run_length_ft = 0, lubricant = "polymer", strai...` | _ | _ | _ |
-| calc-electrical.js | `computePvAcOutputCircuit` | `{ ac_power_w = 9600, ac_voltage_v = 240, phases = 1 } = {}` | _ | _ | _ |
 | calc-electrical.js | `computeRooftopTempAdder` | `{ measured_ambient_f = 0, height_above_roof_in = 0, base_ampacity_a = 0 } = {}` | _ | _ | _ |
 | calc-electrical.js | `computeServiceLoad` | `{ area_ft2 = 0, small_appliance_circuits = 2, laundry_circuits = 1, fixed_app...` | _ | _ | _ |
 | calc-electrical.js | `computeServiceLoadOptional` | `{ area_ft2 = 0, small_appliance_circuits = 2, laundry_circuits = 1, fixed_app...` | _ | _ | _ |
 | calc-electrical.js | `computeServiceLoadStandard` | `{ area_ft2 = 0, small_appliance_circuits = 2, laundry_circuit = 1, fixed_appl...` | _ | _ | _ |
 | calc-electrical.js | `computeShockApproachBoundary` | `{ nominal_v_ac = "151-750 V" } = {}` | _ | _ | _ |
 | calc-electrical.js | `computeShortCircuitPP` | `{ utility_kVA = 0, utility_Z_pct = 0, secondary_V = 0, phase = "three", C_val...` | _ | _ | _ |
-| calc-electrical.js | `computeSoilResistivityWenner` | `{ probe_spacing_ft = 10, meter_resistance_ohm = 5 } = {}` | _ | _ | _ |
 | calc-electrical.js | `computeTerminationTempAmpacity` | `{ amp_90c = 0, amp_75c = 0, amp_60c = 0, termination_rating = 75, over_100a =...` | _ | _ | _ |
 | calc-electrical.js | `computeThreePhase` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | calc-electrical.js | `computeTransformerInrushPoint` | `{ kva = 0, primary_voltage_v = 0, phase = 3, inrush_multiple = 12, duration_s...` | _ | _ | _ |
@@ -2194,10 +2184,7 @@ cross-check.
 | calc-electrical.js | `computeVoltageDrop` | `{ phase, material, awg, length_ft, current_A, source_voltage_V }` | _ | _ | _ |
 | calc-electrical.js | `computeVoltageDropReactance` | `{ system_voltage_v = 0, current_a = 0, length_ft = 0, r_ohm_per_kft = 0, x_oh...` | _ | _ | _ |
 | calc-electrical.js | `computeVoltageImbalance` | `{ V_a, V_b, V_c }` | _ | _ | _ |
-| calc-electrical.js | `computeWelderArcCircuitConductor` | `{ primary_current_a = 40, duty_pct = 50 } = {}` | _ | _ | _ |
-| calc-electrical.js | `computeWelderResistanceCircuitConductor` | `{ primary_current_a = 100, duty_pct = 50 } = {}` | _ | _ | _ |
 | calc-electrical.js | `computeWireAmpacity` | `{ awg, material, insulation_rating_C, ambient_C, bundle_count = 1 }` | _ | _ | _ |
-| calc-electrical.js | `computeWirePullingLubricant` | `{ length_ft = 400, conduit_id_in = 3, k_factor = 0.0015, bend_factor = 1.0 } ...` | _ | _ | _ |
 | calc-electrical.js | `computeWirewayFill` | `{ width_in = 0, height_in = 0, conductor_area_in2 = 0, ccc_count = 0 } = {}` | _ | _ | _ |
 | calc-electrical.js | `computeWorkingSpace11026` | `{ nominal_v_to_ground = "0-150 V", condition = 1, equipment_width_in = 0 } = {}` | _ | _ | _ |
 | calc-electrical.js | `parseConductorShorthand` | `s` | _ | _ | _ |
@@ -2225,6 +2212,19 @@ cross-check.
 | calc-electrical.js | `renderVoltageDropReactance` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-electrical.js | `renderVoltageImbalance` | `inputRegion, outputRegion, citationEl, params` | _ | _ | _ |
 | calc-electrical.js | `renderWireAmpacity` | `inputRegion, outputRegion, citationEl, params` | _ | _ | _ |
+| calc-electricalfield.js | `computeBatteryInverterDcConductor` | `{ inverter_power_w = 4000, battery_voltage_v = 48, efficiency_pct = 90 } = {}` | _ | _ | _ |
+| calc-electricalfield.js | `computeBranchCircuitWireFootage` | `{ circuits = 20, avg_homerun_ft = 45, makeup_ft = 15, conductors_per_circuit ...` | _ | _ | _ |
+| calc-electricalfield.js | `computeCableReelCapacity` | `{ flange_dia_in = 30, drum_dia_in = 12, traverse_width_in = 18, cable_od_in =...` | _ | _ | _ |
+| calc-electricalfield.js | `computeConduitNipple60Fill` | `{ conduit_area_sqin = 0.864, conductor_area_sqin = 0.0211, conductor_count = ...` | _ | _ | _ |
+| calc-electricalfield.js | `computeMaxCircuitLengthForVd` | `{ source_voltage_v = 120, target_vd_pct = 3, current_a = 20, conductor_cmil =...` | _ | _ | _ |
+| calc-electricalfield.js | `computeMicroinverterBranchCount` | `{ branch_ocpd_a = 20, unit_max_current_a = 1.21 } = {}` | _ | _ | _ |
+| calc-electricalfield.js | `computeMwbcVoltageDrop` | `{ awg = "12", material = "copper", one_way_length_ft = 0, load_a_amps = 0, lo...` | _ | _ | _ |
+| calc-electricalfield.js | `computeOpenDeltaTransformer` | `{ transformer_kva_each = 25, required_load_kva = 40 } = {}` | _ | _ | _ |
+| calc-electricalfield.js | `computePvAcOutputCircuit` | `{ ac_power_w = 9600, ac_voltage_v = 240, phases = 1 } = {}` | _ | _ | _ |
+| calc-electricalfield.js | `computeSoilResistivityWenner` | `{ probe_spacing_ft = 10, meter_resistance_ohm = 5 } = {}` | _ | _ | _ |
+| calc-electricalfield.js | `computeWelderArcCircuitConductor` | `{ primary_current_a = 40, duty_pct = 50 } = {}` | _ | _ | _ |
+| calc-electricalfield.js | `computeWelderResistanceCircuitConductor` | `{ primary_current_a = 100, duty_pct = 50 } = {}` | _ | _ | _ |
+| calc-electricalfield.js | `computeWirePullingLubricant` | `{ length_ft = 400, conduit_id_in = 3, k_factor = 0.0015, bend_factor = 1.0 } ...` | _ | _ | _ |
 | calc-elevator.js | `computeBufferStroke` | `{ contract_speed_fpm = 0, governor_trip_fpm = 0, permitted_retardation_g = 1,...` | _ | _ | _ |
 | calc-elevator.js | `computeCounterweightBalance` | `{ car_weight_lb = 0, rated_capacity_lb = 0, overbalance_pct = 45, actual_coun...` | _ | _ | _ |
 | calc-elevator.js | `computeDoorClosingEnergy` | `{ door_mass_lb = 0, closing_speed_fps = 0, ke_limit_normal_ftlb = 0, ke_limit...` | _ | _ | _ |

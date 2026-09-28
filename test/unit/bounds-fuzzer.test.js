@@ -18903,12 +18903,12 @@ import { computeDumpTruckLoads as _v845dtl } from "../../calc-earthwork.js";
 import { computeUnitCostEarthwork as _v846uce } from "../../calc-earthwork.js";
 import { computeSoilStabilizationQuantity as _v847ssq } from "../../calc-earthwork.js";
 import { computeFlexiblePipeDeflection as _v848fpd } from "../../calc-earthwork.js";
-import { computeCableReelCapacity as _v849crc } from "../../calc-electrical.js";
+import { computeCableReelCapacity as _v849crc } from "../../calc-electricalfield.js";
 import { computeShingleNails as _v850shn } from "../../calc-construction.js";
 import { computeDuctMetalWeight as _v851dmw } from "../../calc-construction.js";
-import { computeWirePullingLubricant as _v852wpl } from "../../calc-electrical.js";
+import { computeWirePullingLubricant as _v852wpl } from "../../calc-electricalfield.js";
 import { computeDuctBankConcrete as _v853dbc } from "../../calc-construction.js";
-import { computeBranchCircuitWireFootage as _v854bcw } from "../../calc-electrical.js";
+import { computeBranchCircuitWireFootage as _v854bcw } from "../../calc-electricalfield.js";
 import { computeLvCablePullFootage as _v855lvf } from "../../calc-lowvoltage.js";
 import { computeSolderJointQuantity as _v856sjq } from "../../calc-plumbingtakeoff.js";
 import { computePipeInsulationTakeoff as _v857pit } from "../../calc-plumbingtakeoff.js";
@@ -29269,7 +29269,7 @@ test("bounds: spec-v934 computeDrypipeAirCompressor pins the volume, free-air CF
   assert.ok("error" in _v934({ dry_volume_gal: Infinity, normal_pressure_psig: 40, restore_minutes: 30 }));
 });
 
-import { computePvAcOutputCircuit as _v942 } from "../../calc-electrical.js";
+import { computePvAcOutputCircuit as _v942 } from "../../calc-electricalfield.js";
 
 test("bounds: spec-v942 computePvAcOutputCircuit pins the output current, conductor, OCPD, phase factor, and error seams", () => {
   const r = _v942({ ac_power_w: 9600, ac_voltage_v: 240, phases: 1 });
@@ -29287,7 +29287,7 @@ test("bounds: spec-v942 computePvAcOutputCircuit pins the output current, conduc
   assert.ok("error" in _v942({ ac_power_w: Infinity, ac_voltage_v: 240, phases: 1 }));
 });
 
-import { computeBatteryInverterDcConductor as _v941 } from "../../calc-electrical.js";
+import { computeBatteryInverterDcConductor as _v941 } from "../../calc-electricalfield.js";
 
 test("bounds: spec-v941 computeBatteryInverterDcConductor pins the DC current, conductor, next-standard OCPD, and error seams", () => {
   const r = _v941({ inverter_power_w: 4000, battery_voltage_v: 48, efficiency_pct: 90 });
@@ -29306,7 +29306,7 @@ test("bounds: spec-v941 computeBatteryInverterDcConductor pins the DC current, c
   assert.ok("error" in _v941({ inverter_power_w: Infinity, battery_voltage_v: 48, efficiency_pct: 90 }));
 });
 
-import { computeWelderResistanceCircuitConductor as _v933 } from "../../calc-electrical.js";
+import { computeWelderResistanceCircuitConductor as _v933 } from "../../calc-electricalfield.js";
 
 test("bounds: spec-v933 computeWelderResistanceCircuitConductor pins the conductor, 300% OCPD, and error seams", () => {
   const r = _v933({ primary_current_a: 100, duty_pct: 50 });
@@ -29327,7 +29327,7 @@ test("bounds: spec-v933 computeWelderResistanceCircuitConductor pins the conduct
   assert.ok(Math.abs(_v933({ primary_current_a: 100, duty_pct: 2 }).duty_multiplier - 0.22) < 1e-12);
 });
 
-import { computeWelderArcCircuitConductor as _v932 } from "../../calc-electrical.js";
+import { computeWelderArcCircuitConductor as _v932 } from "../../calc-electricalfield.js";
 
 test("bounds: spec-v932 computeWelderArcCircuitConductor pins the duty multiplier, effective current, OCPD, and error seams", () => {
   const r = _v932({ primary_current_a: 40, duty_pct: 50 });
@@ -29347,7 +29347,7 @@ test("bounds: spec-v932 computeWelderArcCircuitConductor pins the duty multiplie
   assert.ok("error" in _v932({ primary_current_a: Infinity, duty_pct: 50 }));
 });
 
-import { computeMicroinverterBranchCount as _v924 } from "../../calc-electrical.js";
+import { computeMicroinverterBranchCount as _v924 } from "../../calc-electricalfield.js";
 
 test("bounds: spec-v924 computeMicroinverterBranchCount pins the count, 80% limit, and error seams", () => {
   const r = _v924({ branch_ocpd_a: 20, unit_max_current_a: 1.21 });
@@ -29962,7 +29962,7 @@ test("bounds: spec-v1223 computeThermistorSteinhartHart pins the 3-constant equa
   assert.ok("error" in _v1223({ resistance_ohms: Infinity, coeff_a: A, coeff_b: B, coeff_c: C }));
 });
 
-import { computeSoilResistivityWenner as _v951 } from "../../calc-electrical.js";
+import { computeSoilResistivityWenner as _v951 } from "../../calc-electricalfield.js";
 
 test("bounds: spec-v951 computeSoilResistivityWenner pins rho = 2 pi a R and error seams", () => {
   const r = _v951({ probe_spacing_ft: 10, meter_resistance_ohm: 5 });
@@ -30636,7 +30636,7 @@ test("bounds: spec-v980 computeValveAuthority pins beta and the verdict bands, a
   assert.ok("error" in _v980({ valve_pressure_drop_psi: Infinity, controlled_circuit_drop_psi: 3 }));
 });
 
-import { computeMaxCircuitLengthForVd as _v981 } from "../../calc-electrical.js";
+import { computeMaxCircuitLengthForVd as _v981 } from "../../calc-electricalfield.js";
 
 test("bounds: spec-v981 computeMaxCircuitLengthForVd pins the length-for-VD and error seams", () => {
   const r = _v981({ source_voltage_v: 120, target_vd_pct: 3, current_a: 20, conductor_cmil: 6530, k_constant: 12.9, phases: 1 });
@@ -30726,7 +30726,7 @@ test("bounds: spec-v984 computeFluorideFeedDose pins the AFI pounds formula and 
   assert.ok("error" in _v984({ target_dose_mg_l: 0.7, raw_fluoride_mg_l: 0.1, flow_mgd: Infinity, afi_fraction: 0.792, purity_fraction: 0.25 }));
 });
 
-import { computeOpenDeltaTransformer as _v985 } from "../../calc-electrical.js";
+import { computeOpenDeltaTransformer as _v985 } from "../../calc-electricalfield.js";
 
 test("bounds: spec-v985 computeOpenDeltaTransformer pins the sqrt(3) capacity and overload seam", () => {
   const r = _v985({ transformer_kva_each: 25, required_load_kva: 40 });
@@ -30823,7 +30823,7 @@ test("bounds: spec-v988 computeDrainageBoardTakeoff pins the roll count and ceil
   assert.ok("error" in _v988({ perimeter_ft: Infinity, below_grade_height_ft: 8, roll_width_ft: 4, roll_length_ft: 50, waste_pct: 10 }));
 });
 
-import { computeConduitNipple60Fill as _v989 } from "../../calc-electrical.js";
+import { computeConduitNipple60Fill as _v989 } from "../../calc-electricalfield.js";
 
 test("bounds: spec-v989 computeConduitNipple60Fill pins the 60% nipple allowance vs the normal 40%", () => {
   const r = _v989({ conduit_area_sqin: 0.864, conductor_area_sqin: 0.0211, conductor_count: 20 });
@@ -31932,7 +31932,7 @@ test("bounds: motor OCPD rounding uses the 240.6(A) FUSE-only ratings for fuses"
   assert.strictEqual(ex.rounded_up, false);
 });
 
-import { computeWelderArcCircuitConductor as _necWeld } from "../../calc-electrical.js";
+import { computeWelderArcCircuitConductor as _necWeld } from "../../calc-electricalfield.js";
 
 test("bounds: welder tile scopes to the transformer/rectifier column and rounds the OCPD down to a standard size", () => {
   // sqrt(duty) is the Table 630.11(A) TRANSFORMER/DC-RECTIFIER column, verified
@@ -33289,7 +33289,7 @@ test("bounds: spec-v1108 computeGearUndercutBacklash reproduces the classic 32/1
   assert.ok("error" in _v1108({ ...base, pressure_angle_deg: Infinity }));
 });
 
-import { computeMwbcVoltageDrop as _v1109 } from "../../calc-electrical.js";
+import { computeMwbcVoltageDrop as _v1109 } from "../../calc-electricalfield.js";
 
 test("bounds: spec-v1109 computeMwbcVoltageDrop pins the balanced half-drop identity, the neutral-shift rise, the two-wire equivalence at full unbalance, symmetry, and error seams", () => {
   const base = { awg: "12", material: "copper", one_way_length_ft: 100, load_a_amps: 16, load_b_amps: 4, source_volts: 120, temperature_C: 75 };
