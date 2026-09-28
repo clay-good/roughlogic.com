@@ -24931,7 +24931,7 @@ test("bounds: spec-v528 computeBlendedMortgageRate pins the balance-weighted ble
   assert.ok("error" in _v528({ balance_1: 0, rate_1: 4, balance_2: 0, rate_2: 8 }));
 });
 
-import { computeEoqOrderQuantity as _v529 } from "../../calc-accounting.js";
+import { computeEoqOrderQuantity as _v529 } from "../../calc-operations-finance.js";
 
 test("bounds: spec-v529 computeEoqOrderQuantity pins the Wilson EOQ, the equal-cost identity, the scaling, and error seams", () => {
   const r = _v529({ annual_demand: 12000, order_cost: 50, holding_cost: 3 });
@@ -24950,7 +24950,7 @@ test("bounds: spec-v529 computeEoqOrderQuantity pins the Wilson EOQ, the equal-c
   assert.ok("error" in _v529({ annual_demand: 12000, order_cost: 50, holding_cost: 0 }));
 });
 
-import { computeReorderPoint as _v530 } from "../../calc-accounting.js";
+import { computeReorderPoint as _v530 } from "../../calc-operations-finance.js";
 
 test("bounds: spec-v530 computeReorderPoint pins the z-lookup, the sqrt(lead) buffer, the ROP identity, and error seams", () => {
   const r = _v530({ avg_daily_demand: 100, lead_time_days: 7, demand_sd: 20, service_level_pct: 95 });
@@ -24971,7 +24971,7 @@ test("bounds: spec-v530 computeReorderPoint pins the z-lookup, the sqrt(lead) bu
   assert.ok("error" in _v530({ avg_daily_demand: 100, lead_time_days: 7, demand_sd: 20, service_level_pct: 100 }));
 });
 
-import { computeUnitsOfProductionDepr as _v531 } from "../../calc-accounting.js";
+import { computeUnitsOfProductionDepr as _v531 } from "../../calc-operations-finance.js";
 
 test("bounds: spec-v531 computeUnitsOfProductionDepr pins the per-unit rate, the salvage floor, the idle-zero case, and error seams", () => {
   const r = _v531({ cost_basis: 50000, salvage_value: 5000, total_units: 100000, period_units: 8000, accumulated_units: 8000 });

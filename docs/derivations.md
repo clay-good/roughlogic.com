@@ -1422,7 +1422,6 @@ cross-check.
 | calc-accounting.js | `computeDecliningBalanceDepreciation` | `{ cost = 0, salvage = 0, life_yr = 0, factor = 2, year = 1, sl_switch = true ...` | _ | _ | _ |
 | calc-accounting.js | `computeEffectiveAnnualRate` | `{ apr_pct = 0, compounding = "monthly" } = {}` | _ | _ | _ |
 | calc-accounting.js | `computeEmployerPayrollTax` | `{ wages = 0, ss_base = 0, futa_base = 7000, futa_rate_pct = 0.6, suta_rate_pc...` | _ | _ | _ |
-| calc-accounting.js | `computeEoqOrderQuantity` | `{ annual_demand = 0, order_cost = 0, holding_cost = 0 } = {}` | _ | _ | _ |
 | calc-accounting.js | `computeEquipmentHourlyRate` | `{ purchase = 0, salvage = 0, life_hr = 0, annual_hr = 0, iit_pct = 0, fuel_gp...` | _ | _ | _ |
 | calc-accounting.js | `computeEstimatedTax` | `{ projected_current_tax = 0, prior_year_tax = 0, current_withholding = 0, pri...` | _ | _ | _ |
 | calc-accounting.js | `computeFutureValueOfAnnuity` | `{ payment = 0, rate_pct = 0, periods = 0, timing = "ordinary" } = {}` | _ | _ | _ |
@@ -1435,7 +1434,6 @@ cross-check.
 | calc-accounting.js | `computeOverheadRecoveryRate` | `{ annual_overhead = 0, basis = "per-hour", billable_hours = 0, annual_direct ...` | _ | _ | _ |
 | calc-accounting.js | `computePayrollWithholding` | `{ gross_per_period = 0, pay_frequency = "biweekly", filing_status = "single",...` | _ | _ | _ |
 | calc-accounting.js | `computePrevailingWageFringe` | `{ base_wage_hr = 0, fringe_hr = 0, payroll_tax = 0 } = {}` | _ | _ | _ |
-| calc-accounting.js | `computeReorderPoint` | `{ avg_daily_demand = 0, lead_time_days = 0, demand_sd = 0, service_level_pct ...` | _ | _ | _ |
 | calc-accounting.js | `computeRetainageTracker` | `{ work_this_period_usd = 0, retainage_pct = 10, prior_retained_usd = 0 } = {}` | _ | _ | _ |
 | calc-accounting.js | `computeSETax` | `{ net_se_earnings = 0, w2_ss_wages = 0, w2_medicare_wages = null, tax_year = ...` | _ | _ | _ |
 | calc-accounting.js | `computeSalesTaxCompound` | `{ pre_tax = 0, post_tax = 0, rate1_pct = 0, rate2_pct = 0, }` | _ | _ | _ |
@@ -1443,7 +1441,6 @@ cross-check.
 | calc-accounting.js | `computeStraightLine` | `{ cost = 0, salvage = 0, life_years = 0, year_of_interest = 1 }` | _ | _ | _ |
 | calc-accounting.js | `computeSumOfYearsDigitsDepreciation` | `{ cost = 0, salvage = 0, life_yr = 0, year = 1 } = {}` | _ | _ | _ |
 | calc-accounting.js | `computeSuretyBondPremium` | `{ contract_usd = 0, rate1_per_k = 25, rate2_per_k = 15, rate3_per_k = 10 } = {}` | _ | _ | _ |
-| calc-accounting.js | `computeUnitsOfProductionDepr` | `{ cost_basis = 0, salvage_value = 0, total_units = 0, period_units = 0, accum...` | _ | _ | _ |
 | calc-accounting.js | `computeWipPercentComplete` | `{ contract_usd = 0, cost_to_date_usd = 0, est_total_cost_usd = 0, billed_to_d...` | _ | _ | _ |
 | calc-accounting.js | `computeWorkersCompEmrPremium` | `{ payroll_usd = 0, class_rate = 0, emr = 1.0 } = {}` | _ | _ | _ |
 | calc-agriculture.js | `computeAnhydrousAmmoniaRate` | `{ n_target_lb_per_ac = 180, tank_gal = 1000 } = {}` | _ | _ | _ |
@@ -3037,6 +3034,9 @@ cross-check.
 | calc-oilgas.js | `computeTankStrappingVolume` | `{ tank_diameter_ft = 0, gauge_ft = 0, gauge_in = 0, closing_gauge_ft = 0, clo...` | _ | _ | _ |
 | calc-oilgas.js | `computeTankVentApi2000` | `{ pump_in_bph = 0, pump_out_bph = 0, volatile_factor = 1, thermal_out_ft3h = ...` | _ | _ | _ |
 | calc-oilgas.js | `computeWellDeclineReserves` | `{ initial_rate_bpd = 0, decline_rate = 0, rate_is_effective = "no", economic_...` | _ | _ | _ |
+| calc-operations-finance.js | `computeEoqOrderQuantity` | `{ annual_demand = 0, order_cost = 0, holding_cost = 0 } = {}` | _ | _ | _ |
+| calc-operations-finance.js | `computeReorderPoint` | `{ avg_daily_demand = 0, lead_time_days = 0, demand_sd = 0, service_level_pct ...` | _ | _ | _ |
+| calc-operations-finance.js | `computeUnitsOfProductionDepr` | `{ cost_basis = 0, salvage_value = 0, total_units = 0, period_units = 0, accum...` | _ | _ | _ |
 | calc-pipefit.js | `computeAsmeHeadThickness` | `{ design_pressure_psi = 0, inside_diameter_in = 0, allowable_stress_psi = 0, ...` | _ | _ | _ |
 | calc-pipefit.js | `computeAsmeShellThickness` | `{ design_pressure_psi = 0, inside_radius_in = 0, allowable_stress_psi = 0, jo...` | _ | _ | _ |
 | calc-pipefit.js | `computeBoilerHorsepower` | `{ output_btuhr = 0 } = {}` | _ | _ | _ |

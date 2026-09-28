@@ -11938,7 +11938,7 @@ test("monotonicity: short-circuit fault current and engine HP respond correctly 
 // holding cost. A sign/term error passes the single pinned example but not these.
 test("monotonicity: irrigation requirement and EOQ respond correctly to their inputs", async () => {
   const ag = await import("../../calc-agriculture.js");
-  const ac = await import("../../calc-accounting.js");
+  const ac = await import("../../calc-operations-finance.js");
   const ir = (o) => ag.computeIrrigationRequirement({ crop: "corn", et_ref_in_per_day: 0.25, period_days: 30, area_acres: 80, efficiency_pct: 90, rainfall_in: 1, ...o });
   assert.ok(ir({ area_acres: 160 }).gallons > ir({}).gallons, "irrigation gallons must rise with area");
   assert.ok(ir({ et_ref_in_per_day: 0.35 }).gallons > ir({}).gallons, "irrigation gallons must rise with reference ET");

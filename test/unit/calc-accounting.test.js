@@ -19,6 +19,7 @@ import {
   computeHomeOffice, homeOfficeExample,
   ACCOUNTING_RENDERERS,
 } from "../../calc-accounting.js";
+import { OPERATIONS_FINANCE_RENDERERS } from "../../calc-operations-finance.js";
 
 const close = (a, b, tol = 0.01) => Math.abs(a - b) <= tol;
 
@@ -229,9 +230,9 @@ test("HomeOffice: office exceeding home area is rejected", () => { assert.ok("er
 test("HomeOffice: non-positive areas are rejected", () => { assert.ok("error" in computeHomeOffice({ office_ft2: 0, home_ft2: 2000 })); assert.ok("error" in computeHomeOffice({ office_ft2: 100, home_ft2: 0 })); });
 
 // Renderer registry
-test("ACCOUNTING_RENDERERS exposes all 31 utilities", () => {
+test("the split accounting renderer registries expose all 31 utilities", () => {
   const ids = Object.keys(ACCOUNTING_RENDERERS);
-  assert.equal(ids.length, 31);
+  assert.equal(ids.length, 28);
   for (const id of [
     "straight-line-depreciation", "macrs-depreciation", "section-179",
     "sum-of-years-digits-depreciation", "future-value-of-annuity", "effective-annual-rate",
@@ -242,4 +243,7 @@ test("ACCOUNTING_RENDERERS exposes all 31 utilities", () => {
     "wip-percent-complete", "change-order-markup", "retainage-tracker",
     "surety-bond-premium", "workers-comp-emr-premium", "prevailing-wage-fringe",
   ]) assert.ok(typeof ACCOUNTING_RENDERERS[id] === "function", id);
+  const operationsIds = Object.keys(OPERATIONS_FINANCE_RENDERERS);
+  assert.deepEqual(operationsIds.sort(), ["eoq-order-quantity", "reorder-point", "units-of-production-depr"]);
+  for (const id of operationsIds) assert.equal(typeof OPERATIONS_FINANCE_RENDERERS[id], "function", id);
 });
