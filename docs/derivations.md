@@ -2038,7 +2038,6 @@ cross-check.
 | calc-drainage.js | `computeWaterQualityVolume` | `{ rainfall_depth_in = 0, impervious_percent = 0, area_ac = 0, alternative_imp...` | _ | _ | _ |
 | calc-drainage.js | `computeWellPointSpacing` | `{ excavation_depth_ft = 0, water_table_depth_ft = 0, subgrade_margin_ft = 3, ...` | _ | _ | _ |
 | calc-drainage.js | `renderManningSlope` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
-| calc-earthwork.js | `computeAtterbergIndices` | `{ ll = 0, pl = 0, w_pct = 0 } = {}` | _ | _ | _ |
 | calc-earthwork.js | `computeCheckDamSpacing` | `{ dam_height_ft = 0, channel_slope_pct = 0, reach_length_ft = 0 } = {}` | _ | _ | _ |
 | calc-earthwork.js | `computeCompactionRollerProduction` | `{ drum_width_ft, speed_mph, lift_in, passes, efficiency = 0.75 } = {}` | _ | _ | _ |
 | calc-earthwork.js | `computeDewateringRate` | `{ pit_len_ft, pit_wid_ft, drawdown_ft = 0, drawdown_min, inflow_gpm = 0, safe...` | _ | _ | _ |
@@ -2046,8 +2045,6 @@ cross-check.
 | calc-earthwork.js | `computeDumpTruckLoads` | `{ total_lcy = 625, box_vol_cy = 12, weight_limit_lb = 40000, material_density...` | _ | _ | _ |
 | calc-earthwork.js | `computeDustControlWater` | `{ length_ft = 2000, width_ft = 20, rate_gal_per_sy = 0.5, truck_cap_gal = 400...` | _ | _ | _ |
 | calc-earthwork.js | `computeErosionBlanketCoverage` | `{ area_sf = 0, overlap_pct = 10, roll_width_ft = 8, roll_length_ft = 112.5, s...` | _ | _ | _ |
-| calc-earthwork.js | `computeFineAggregateGrading` | `{ p38 = 100, p4 = 100, p8 = 90, p16 = 68, p30 = 45, p50 = 18, p100 = 5 } = {}` | _ | _ | _ |
-| calc-earthwork.js | `computeFinenessModulus` | `{ r4 = 0, r8 = 0, r16 = 0, r30 = 0, r50 = 0, r100 = 0 } = {}` | _ | _ | _ |
 | calc-earthwork.js | `computeFlexiblePipeDeflection` | `{ cover_ft = 12, soil_density_pcf = 120, deflection_lag = 1.5, bedding_consta...` | _ | _ | _ |
 | calc-earthwork.js | `computeHaulCycleProduction` | `{ truck_cap_lcy, load_min, haul_min = 0, dump_min = 0, return_min = 0, spot_m...` | _ | _ | _ |
 | calc-earthwork.js | `computeHaulRoadResistance` | `{ gvw_lb = 150000, grade_pct = 5, rolling_resistance_pct = 4 } = {}` | _ | _ | _ |
@@ -2056,7 +2053,6 @@ cross-check.
 | calc-earthwork.js | `computeLoaderProduction` | `{ bucket_cap_lcy, fill_factor = 0.95, cycle_min, eff_min_per_hr = 50, hours_p...` | _ | _ | _ |
 | calc-earthwork.js | `computePipeBeddingBackfill` | `{ trench_width_ft, pipe_od_in, bedding_depth_in = 0, cover_ft = 0, length_ft,...` | _ | _ | _ |
 | calc-earthwork.js | `computePipeFlotation` | `{ pipe_od_in = 48, pipe_weight_plf = 200, backfill_weight_plf = 900, target_f...` | _ | _ | _ |
-| calc-earthwork.js | `computeRelativeCompaction` | `{ wet_pcf = 0, w_pct = 0, max_pcf = 0, spec_pct = 95 } = {}` | _ | _ | _ |
 | calc-earthwork.js | `computeRestrainedPipeLength` | `{ pipe_od_in = 12, pressure_psi = 150, bend_angle_deg = 90, unit_resistance_p...` | _ | _ | _ |
 | calc-earthwork.js | `computeRipperProduction` | `{ spacing_ft, penetration_ft, speed_fpm, efficiency = 0.75 } = {}` | _ | _ | _ |
 | calc-earthwork.js | `computeRiprapD50` | `{ velocity_fps, specific_gravity = 2.65, turbulence_coeff = 0.86, safety_fact...` | _ | _ | _ |
@@ -2065,11 +2061,6 @@ cross-check.
 | calc-earthwork.js | `computeRusleSoilLoss` | `{ r_factor, k_factor, ls_factor, c_factor, p_factor, acres } = {}` | _ | _ | _ |
 | calc-earthwork.js | `computeSedimentBasinVolume` | `{ disturbed_ac = 0, storage_rule_cf_per_ac = 3600, basin_depth_ft = 3 } = {}` | _ | _ | _ |
 | calc-earthwork.js | `computeSiltFenceDrainage` | `{ tributary_area_ac = 0, fence_length_ft = 0, slope_length_ft = 0, max_slope_...` | _ | _ | _ |
-| calc-earthwork.js | `computeSoilActivity` | `{ ll = 0, pl = 0, clay_fraction_pct = 0 } = {}` | _ | _ | _ |
-| calc-earthwork.js | `computeSoilGradationCoefficients` | `{ d10_mm = 0, d30_mm = 0, d60_mm = 0, pct_coarse_passing_no4 = 60, pct_fines ...` | _ | _ | _ |
-| calc-earthwork.js | `computeSoilPermeability` | `{ method = "constant-head", q_cm3 = 0, head_cm = 0, t_s = 0, l_cm = 0, a_samp...` | _ | _ | _ |
-| calc-earthwork.js | `computeSoilPhaseRelations` | `{ gamma_pcf = 0, w_pct = 0, gs = 2.70 } = {}` | _ | _ | _ |
-| calc-earthwork.js | `computeSoilRelativeDensity` | `{ field_wet_pcf = 0, w_pct = 0, gamma_dmin_pcf = 0, gamma_dmax_pcf = 0 } = {}` | _ | _ | _ |
 | calc-earthwork.js | `computeSoilStabilizationQuantity` | `{ application_pct = 6, soil_density_pcf = 110, depth_in = 8, area_sy = 10000 ...` | _ | _ | _ |
 | calc-earthwork.js | `computeSoilSwellShrink` | `{ bank_cy, swell_pct = 25, shrink_pct = 15 } = {}` | _ | _ | _ |
 | calc-earthwork.js | `computeSpoilSetback` | `{ trench_depth_ft, spoil_height_ft, repose_deg = 34, min_setback_ft = 2 } = {}` | _ | _ | _ |
@@ -3496,6 +3487,15 @@ cross-check.
 | calc-shop.js | `computeTorusVolume` | `{ center_diameter_in = 0, tube_diameter_in = 0 } = {}` | _ | _ | _ |
 | calc-shop.js | `computeTurningSurfaceFinish` | `{ feed_ipr_in = 0, nose_radius_in = 0 } = {}` | _ | _ | _ |
 | calc-shop.js | `computeWeldDutyCycle` | `{ rated_amps = 0, rated_duty_pct = 0, target_amps = 0 } = {}` | _ | _ | _ |
+| calc-soilproperties.js | `computeAtterbergIndices` | `{ ll = 0, pl = 0, w_pct = 0 } = {}` | _ | _ | _ |
+| calc-soilproperties.js | `computeFineAggregateGrading` | `{ p38 = 100, p4 = 100, p8 = 90, p16 = 68, p30 = 45, p50 = 18, p100 = 5 } = {}` | _ | _ | _ |
+| calc-soilproperties.js | `computeFinenessModulus` | `{ r4 = 0, r8 = 0, r16 = 0, r30 = 0, r50 = 0, r100 = 0 } = {}` | _ | _ | _ |
+| calc-soilproperties.js | `computeRelativeCompaction` | `{ wet_pcf = 0, w_pct = 0, max_pcf = 0, spec_pct = 95 } = {}` | _ | _ | _ |
+| calc-soilproperties.js | `computeSoilActivity` | `{ ll = 0, pl = 0, clay_fraction_pct = 0 } = {}` | _ | _ | _ |
+| calc-soilproperties.js | `computeSoilGradationCoefficients` | `{ d10_mm = 0, d30_mm = 0, d60_mm = 0, pct_coarse_passing_no4 = 60, pct_fines ...` | _ | _ | _ |
+| calc-soilproperties.js | `computeSoilPermeability` | `{ method = "constant-head", q_cm3 = 0, head_cm = 0, t_s = 0, l_cm = 0, a_samp...` | _ | _ | _ |
+| calc-soilproperties.js | `computeSoilPhaseRelations` | `{ gamma_pcf = 0, w_pct = 0, gs = 2.70 } = {}` | _ | _ | _ |
+| calc-soilproperties.js | `computeSoilRelativeDensity` | `{ field_wet_pcf = 0, w_pct = 0, gamma_dmin_pcf = 0, gamma_dmax_pcf = 0 } = {}` | _ | _ | _ |
 | calc-soilsettlement.js | `computeBoussinesqSurchargeWall` | `{ ql_plf = 0, h_ft = 0, x_ft = 0, z_ft = 0 } = {}` | _ | _ | _ |
 | calc-soilsettlement.js | `computeCoefficientOfConsolidation` | `{ method = "casagrande", t_fit_min = 0, specimen_height_in = 0, drainage = "d...` | _ | _ | _ |
 | calc-soilsettlement.js | `computeConsolidationDegree` | `{ cv_ft2_day = 0, hdr_ft = 0, t_days = 0 } = {}` | _ | _ | _ |

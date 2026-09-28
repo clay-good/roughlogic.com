@@ -918,11 +918,13 @@ export const TOOL_MODULES = (() => {
   declare("./calc-earthwork.js", "EARTHWORK_RENDERERS", [
     "soil-swell-shrink", "haul-cycle-production", "loader-production", "dozer-production", "compaction-roller-production", "ripper-production", "rusle-soil-loss", "riprap-d50", "riprap-tonnage", "silt-fence-drainage", "check-dam-spacing", "sediment-basin-volume", "erosion-blanket-coverage", "hydroseed-mix", "rock-construction-entrance", "dewatering-rate",
     "spoil-setback", "pipe-bedding-backfill", "pipe-flotation", "restrained-pipe-length", "hdd-pullback", "dust-control-water", "haul-road-resistance", "dump-truck-loads", "unit-cost-earthwork", "soil-stabilization-quantity", "flexible-pipe-deflection",
-    // spec-v326..v328 soil characterization / QC batch
-    "relative-compaction",
-    // spec-v1014 relative density (density index) for cohesionless soil
-    "soil-relative-density",
-    "water-for-compaction", "soil-phase-relations", "soil-permeability", "atterberg-indices", "soil-activity", "fineness-modulus", "fine-aggregate-grading", "soil-gradation-coefficients",
+    "water-for-compaction",
+  ]);
+  // spec-v1858 cap-relief split: the soil-characterization, laboratory, and
+  // aggregate-grading workflow moved out of calc-earthwork.js. All 9 tiles
+  // keep Group E and their existing public behavior.
+  declare("./calc-soilproperties.js", "SOILPROPERTIES_RENDERERS", [
+    "relative-compaction", "soil-relative-density", "soil-phase-relations", "soil-permeability", "atterberg-indices", "soil-activity", "fineness-modulus", "fine-aggregate-grading", "soil-gradation-coefficients",
   ]);
   declare("./calc-fire.js", "FIRE_RENDERERS", [
     "fire-friction", "pdp", "hydrant-flow", "required-fire-flow",

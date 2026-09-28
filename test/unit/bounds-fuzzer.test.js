@@ -18873,8 +18873,8 @@ test("bounds: spec-v662 computeEtHorsepower inverts the ET relation, round-trips
 });
 
 // ===================== spec-v326..v328 soil characterization / QC batch =====================
-import { computeRelativeCompaction as _v326, computeSoilPhaseRelations as _v327, computeAtterbergIndices as _v328 } from "../../calc-earthwork.js";
-import { computeSoilPermeability as _v1260 } from "../../calc-earthwork.js";
+import { computeRelativeCompaction as _v326, computeSoilPhaseRelations as _v327, computeAtterbergIndices as _v328 } from "../../calc-soilproperties.js";
+import { computeSoilPermeability as _v1260 } from "../../calc-soilproperties.js";
 import { computeWaterForCompaction as _v821wfc } from "../../calc-earthwork.js";
 import { computeRusleSoilLoss as _v822rsl } from "../../calc-earthwork.js";
 import { computeRiprapD50 as _v823rr } from "../../calc-earthwork.js";
@@ -25378,7 +25378,7 @@ test("bounds: spec-v792 computeCompressorDisplacement pins swept volume, CFM, mo
   assert.ok("error" in _v792({ bore_in: 2.0, stroke_in: 1.5, cylinders: 4, rpm: 0 }));
 });
 
-import { computeFinenessModulus as _v799 } from "../../calc-earthwork.js";
+import { computeFinenessModulus as _v799 } from "../../calc-soilproperties.js";
 
 test("bounds: spec-v799 computeFinenessModulus pins the FM sum, the C33 band, and error seams", () => {
   const r = _v799({ r4: 2, r8: 12, r16: 32, r30: 57, r50: 82, r100: 95 });
@@ -25392,7 +25392,7 @@ test("bounds: spec-v799 computeFinenessModulus pins the FM sum, the C33 band, an
   assert.ok("error" in _v799({ r4: 2, r8: 12, r16: 32, r30: 20, r50: 82, r100: 95 })); // r30 < r16
 });
 
-import { computeFineAggregateGrading as _v1195 } from "../../calc-earthwork.js";
+import { computeFineAggregateGrading as _v1195 } from "../../calc-soilproperties.js";
 
 test("bounds: spec-v1195 computeFineAggregateGrading pins the three C33 §6 legs and error seams", () => {
   // A conforming sand: every sieve in band, widest consecutive gap 27% (#30->#50), FM 2.81.
@@ -25426,7 +25426,7 @@ test("bounds: spec-v1195 computeFineAggregateGrading pins the three C33 §6 legs
   assert.ok("error" in _v1195({ p38: 100, p4: 98, p8: 85, p16: 99, p30: 45, p50: 18, p100: 5 })); // #16 passes more than #8
 });
 
-import { computeSoilActivity as _v1196 } from "../../calc-earthwork.js";
+import { computeSoilActivity as _v1196 } from "../../calc-soilproperties.js";
 
 test("bounds: spec-v1196 computeSoilActivity pins A = PI / clay fraction, the bands, and error seams", () => {
   // PI 30 over 25% clay -> A 1.20, normal.
@@ -31763,7 +31763,7 @@ test("bounds: spec-v1013 computeSoilVerticalEffectiveStress pins the Terzaghi pr
   assert.ok("error" in _v1013({ ...base, depth_ft: Infinity }));
 });
 
-import { computeSoilRelativeDensity as _v1014 } from "../../calc-earthwork.js";
+import { computeSoilRelativeDensity as _v1014 } from "../../calc-soilproperties.js";
 
 test("bounds: spec-v1014 computeSoilRelativeDensity pins the dry-density form, its equivalence to the void-ratio definition, the exact endpoints, and error seams", () => {
   const base = { field_wet_pcf: 117.6, w_pct: 12, gamma_dmin_pcf: 90, gamma_dmax_pcf: 115 };
@@ -32071,7 +32071,7 @@ test("bounds: spec-v1017 computeCohesiveEarthPressure pins the c-phi active pres
   assert.ok("error" in _v1017({ ...base, gamma: Infinity }));
 });
 
-import { computeSoilGradationCoefficients as _v1018 } from "../../calc-earthwork.js";
+import { computeSoilGradationCoefficients as _v1018 } from "../../calc-soilproperties.js";
 
 test("bounds: spec-v1018 computeSoilGradationCoefficients pins Cu/Cc, the both-criteria-required rule, the gravel-vs-sand threshold, the fines ladder, the Hazen validity flag, and error seams", () => {
   const base = { d10_mm: 0.15, d30_mm: 0.55, d60_mm: 1.2, pct_coarse_passing_no4: 60, pct_fines: 3 };
