@@ -16,7 +16,7 @@
 //             (a tile built under another id, or a cut noted in the code).
 //             Mark it LANDED or CUT.
 //   LANDED    fails when a named id is missing from the catalog, unless the
-//             status names the as-built id in backticks ("built as `x`").
+//             status explicitly resolves one missing id with "built as `x`".
 //   CUT       fails when a named id IS in the catalog, unless the status names
 //             it (an exact id collision with an older tile, disclosed).
 // Platform specs name no tile ids and are not read.
@@ -59,7 +59,8 @@ export function specStatusErrors({ word, span }, ids, catalog, built = false) {
     return [];
   }
   if (word === "LANDED") {
-    const asBuilt = [...span.matchAll(/`([a-z0-9-]+)`/g)].some((m) => catalog.has(m[1]));
+    const asBuilt = missing.length === 1
+      && [...span.matchAll(/\bbuilt as `([a-z0-9-]+)`/g)].some((m) => catalog.has(m[1]));
     return missing.length > 0 && !asBuilt
       ? ["says LANDED but " + missing.map((i) => "`" + i + "`").join(", ") + " is not in the catalog; name the as-built id (\"built as `id`\")"]
       : [];

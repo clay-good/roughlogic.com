@@ -46,3 +46,10 @@ test("the gate passes on the tree as committed", () => {
   const out = execFileSync("node", ["scripts/check-spec-status.mjs"], { cwd: ROOT, encoding: "utf8" });
   assert.match(out, /check-spec-status OK/);
 });
+
+test("LANDED cannot use incidental live ids or one alias to hide missing tiles", () => {
+  assert.equal(errors(spec("LANDED, related to `haversine`.", "radiography-boundary")).length, 1);
+  const multiple = spec("LANDED, built as `rt-restricted-area`.", "radiography-boundary")
+    + "\n### 2.2 `another-missing-tile` -- Another tile\n";
+  assert.equal(errors(multiple).length, 1);
+});
