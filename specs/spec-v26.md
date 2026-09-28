@@ -12,7 +12,7 @@
 > `flange-bolt-torque`) moved to `calc-fab.js` (spec-v36). The original draft
 > header is preserved below for the record.
 >
-> **Implementation status: DRAFT 2026-06-09 (targets package 0.27.0).** v26 is
+> **Implementation status: LANDED 2026-06-09 (package 0.27.0).** v26 is
 > a catalog-growth spec in the lineage of v15/v16/v17/v20/v23/v24. It inherits
 > everything from spec.md through spec-v25.md and changes none of it.
 >

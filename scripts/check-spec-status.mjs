@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 // A spec's Status line must agree with the catalog.
 //
-// Every spec opens with `> **Status: PROPOSED (date). ...**`, and landing a
-// tile never touched that line. On 2026-09-24, 884 of the 1,787 specs still
+// Newer specs open with `> **Status: PROPOSED (date). ...**`, and landing a
+// tile did not always touch that line. On 2026-09-24, 884 of the 1,787 specs still
 // read PROPOSED although every one of them had shipped -- so the direct
 // question "which specs are left to build?" answered 884 when the answer was
 // zero. Thirteen of those had shipped under a different id than the spec
@@ -19,7 +19,10 @@
 //             status explicitly resolves one missing id with "built as `x`".
 //   CUT       fails when a named id IS in the catalog, unless the status names
 //             it (an exact id collision with an older tile, disclosed).
-// Platform specs name no tile ids and are not read.
+// Older specs use `Implementation status` or `Status: **SHIPPED**`. Those
+// forms are normalized too, and every numbered spec must have a recognized
+// status so a historical spelling cannot silently fall out of the tally.
+// Platform specs name no tile ids, so only their status coverage is checked.
 //
 // Pure read-and-report; no network, no mutation.
 
@@ -32,17 +35,30 @@ const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 
 // The status word and the whole bold status span, which may wrap lines.
 export function parseStatus(text) {
-  const start = text.indexOf("**Status:");
-  if (start < 0) return null;
-  const end = text.indexOf("**", start + 2);
-  const span = text.slice(start, end < 0 ? undefined : end + 2);
-  const word = (/^\*\*Status:\s*([A-Z]+)/.exec(span) || [])[1] || null;
-  return { word, span };
+  const canonical = text.match(/\*\*Status:\s*([A-Z]+)[\s\S]*?\*\*/);
+  if (canonical) return { word: canonical[1], span: canonical[0] };
+
+  const alternate = text.match(/^>\s*Status:\s*\*\*([A-Z]+)[\s\S]*?\*\*/m);
+  if (alternate) return { word: normalizeLegacyStatus(alternate[1]), span: alternate[0] };
+
+  const implementation = text.match(/^>\s*\*\*Implementation status[\s\S]*?\*\*/mi);
+  if (!implementation) return null;
+  const upper = implementation[0].toUpperCase();
+  const legacy = ["LANDED", "CLOSED", "COMPLETE", "SHIPPED", "IMPLEMENTED", "CUT", "DRAFT", "PLANNED", "PROPOSED"]
+    .find((state) => new RegExp("\\b" + state + "\\b").test(upper));
+  return legacy ? { word: normalizeLegacyStatus(legacy), span: implementation[0] } : null;
+}
+
+function normalizeLegacyStatus(word) {
+  if (["LANDED", "CLOSED", "COMPLETE", "SHIPPED", "IMPLEMENTED"].includes(word)) return "LANDED";
+  if (["DRAFT", "PLANNED"].includes(word)) return "PROPOSED";
+  return word;
 }
 
 // Tile ids named by the spec's own section headings.
 export function specTileIds(text) {
-  return [...text.matchAll(/^#{2,4} [0-9.]+\s+`([a-z0-9-]+)`/gm)].map((m) => m[1]);
+  return [...text.matchAll(/^#{2,4}\s+[A-Z0-9]+(?:\.[A-Z0-9]+)*\s+.*?(?:\(`([a-z0-9-]+)`\)|`([a-z0-9-]+)`)/gm)]
+    .map((m) => m[1] || m[2]);
 }
 
 const names = (span, id) => new RegExp("(^|[^a-z0-9-])" + id + "($|[^a-z0-9-])").test(span);
@@ -50,19 +66,30 @@ const names = (span, id) => new RegExp("(^|[^a-z0-9-])" + id + "($|[^a-z0-9-])")
 // Errors for one spec. `catalog` is a Set of live tile ids; `built` is true
 // when a calc module carries this spec's section header.
 export function specStatusErrors({ word, span }, ids, catalog, built = false) {
-  if (ids.length === 0) return [];
   const live = ids.filter((id) => catalog.has(id));
   const missing = ids.filter((id) => !catalog.has(id));
+  if (ids.length === 0) {
+    return word === "PROPOSED" && built
+      ? ["says PROPOSED but a calc module names it in a `// spec-vN` comment; mark it LANDED or CUT"]
+      : [];
+  }
   if (word === "PROPOSED") {
     if (missing.length === 0) return ["says PROPOSED but " + live.map((i) => "`" + i + "`").join(", ") + " is in the catalog; mark it LANDED"];
     if (built) return ["says PROPOSED but a calc module names it in a `// spec-vN` comment; mark it LANDED (\"built as `id`\") or CUT"];
     return [];
   }
   if (word === "LANDED") {
-    const asBuilt = missing.length === 1
-      && [...span.matchAll(/\bbuilt as `([a-z0-9-]+)`/g)].some((m) => catalog.has(m[1]));
-    return missing.length > 0 && !asBuilt
-      ? ["says LANDED but " + missing.map((i) => "`" + i + "`").join(", ") + " is not in the catalog; name the as-built id (\"built as `id`\")"]
+    const genericAlias = missing.length === 1
+      && [...span.matchAll(/\bbuilt\s+as\s+(?:>\s*)?`([a-z0-9-]+)`/g)].some((m) => catalog.has(m[1]));
+    const mapped = missing.filter((id) => {
+      const match = new RegExp("`" + id + "`\\s+built\\s+as\\s+(?:>\\s*)?`([a-z0-9-]+)`").exec(span);
+      return match && catalog.has(match[1]);
+    });
+    const laterCut = /\blater cut by `spec-v\d+`/.test(span)
+      && missing.every((id) => names(span, id));
+    const missingResolved = genericAlias || mapped.length === missing.length || laterCut;
+    return missing.length > 0 && !missingResolved
+      ? ["says LANDED but " + missing.map((i) => "`" + i + "`").join(", ") + " is not in the catalog; name each as-built id (\"`old-id` built as `live-id`\")"]
       : [];
   }
   if (word === "CUT") {
@@ -87,7 +114,10 @@ function main() {
   for (const name of specs) {
     const text = readFileSync(join(ROOT, "specs", name), "utf8");
     const status = parseStatus(text);
-    if (!status) continue;
+    if (!status) {
+      errors.push("specs/" + name + ": has no recognized Status or Implementation status line");
+      continue;
+    }
     tally[status.word] = (tally[status.word] || 0) + 1;
     const v = /\d+/.exec(name)[0];
     for (const e of specStatusErrors(status, specTileIds(text), catalog, headers.has(v))) errors.push("specs/" + name + ": " + e);

@@ -1,6 +1,6 @@
 # spec-v1346.md — Both doors, gated
 
-> Status: **PLANNED.** Part of [scope-one-box](scope-one-box.md).
+> Status: **SHIPPED (2026-08-20).** Part of [scope-one-box](scope-one-box.md).
 > One new lint gate. No tile added, no compute touched, no pixel moved. Catalog stays **1,709**.
 > Lands **early**: it is the safety net the rest of the program is built over.
 

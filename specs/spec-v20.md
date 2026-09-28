@@ -1,6 +1,10 @@
 # roughlogic.com Specification v20 — Catalog Expansion VI (55 New Tiles)
 
-> **Implementation status: CLOSED (opened 2026-06-05; closed 2026-06-06).**
+> **Implementation status: CLOSED (opened 2026-06-05; closed 2026-06-06); later cut by `spec-v107`:
+> `federal-post-judgment-interest`, `lease-rent-proration`, `vet-body-surface-area`,
+> `vet-corrected-reticulocyte`, `vet-fluid-deficit`, `vet-anion-gap`, `cockcroft-gault-crcl`,
+> `winters-expected-pco2`, `aa-gradient`, `fena`, `isa-temp-correction`, `weight-shift-cg`, and
+> `landing-takeoff-da-correction`.**
 > All **55 new tiles** have landed and the catalog advanced **460 → 515**.
 > v20 is the third of the three-spec set (v18 hardening, v19 citation
 > integrity, v20 expansion). It inherits everything from spec.md through

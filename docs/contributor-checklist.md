@@ -53,7 +53,8 @@ phase docs ([edition-rollover.md](edition-rollover.md),
 - [ ] The spec's `**Status:**` line reads `LANDED <date> (proposed <date>)`,
   with `built as \`<id>\`` when the tile shipped under a different id than
   the spec's heading names; a spec cut as a duplicate reads `CUT` and names
-  the tile that already computes it. `check-spec-status` fails a spec still
+  the tile that already computes it. `check-spec-status` accounts for every
+  numbered spec, including historical status formats, and fails a spec still
   marked PROPOSED once its tile is in the catalog. Until 2026-09-24 nothing
   checked this, and 884 shipped specs still read PROPOSED.
 - [ ] Optionally, a 3-6 id entry in

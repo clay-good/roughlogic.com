@@ -10,7 +10,7 @@
 > maintainer-approved move to Group Z is a one-line change per tile. Catalog
 > 543 -> 549, package 0.29.0. See docs/audit-trail.md.
 >
-> **Implementation status: DRAFT 2026-06-09 (targets package 0.29.0).** v28 is
+> **Implementation status: LANDED 2026-06-09 (package 0.29.0).** v28 is
 > a catalog-growth spec in the lineage of v15/v16/v17/v20/v23/v24/v25/v26/v27.
 > It inherits everything from spec.md through spec-v27.md and changes none of
 > it.

@@ -17,6 +17,17 @@ test("the status span and heading ids are read", () => {
   assert.deepEqual(specTileIds(text), ["radiography-boundary"]);
 });
 
+test("tile ids are read from numeric and lettered historical headings", () => {
+  assert.deepEqual(specTileIds("### 2.1 `haversine` -- Tile\n### G.2 Center of gravity (`cable-tray-fill`)\n"), ["haversine", "cable-tray-fill"]);
+});
+
+test("legacy status formats are normalized instead of skipped", () => {
+  assert.equal(parseStatus("> **Implementation status: CLOSED 2026-06-13.**").word, "LANDED");
+  assert.equal(parseStatus("> **Implementation status: DRAFT 2026-06-09.**").word, "PROPOSED");
+  assert.equal(parseStatus("> Status: **SHIPPED (2026-08-20).**").word, "LANDED");
+  assert.equal(parseStatus("# Spec with no status"), null);
+});
+
 test("PROPOSED fails once its tile is in the catalog -- the shape 884 specs shipped in", () => {
   assert.equal(errors(spec("PROPOSED (2026-08-26). Single-tile spec.", "haversine")).length, 1);
   // A genuinely unbuilt spec passes.
@@ -52,4 +63,17 @@ test("LANDED cannot use incidental live ids or one alias to hide missing tiles",
   const multiple = spec("LANDED, built as `rt-restricted-area`.", "radiography-boundary")
     + "\n### 2.2 `another-missing-tile` -- Another tile\n";
   assert.equal(errors(multiple).length, 1);
+  const mapped = spec("LANDED: `radiography-boundary` built as `rt-restricted-area`; `another-missing-tile` built as `haversine`.", "radiography-boundary")
+    + "\n### 2.2 `another-missing-tile` -- Another tile\n";
+  assert.deepEqual(errors(mapped), []);
+});
+
+test("a built platform spec cannot remain proposed", () => {
+  assert.equal(specStatusErrors(parseStatus("> **Status: PROPOSED.**"), [], CATALOG, true).length, 1);
+});
+
+test("LANDED can account for calculators retired by a later spec", () => {
+  const status = parseStatus("> **Status: LANDED; later cut by `spec-v107`: `retired-one`, `retired-two`.**");
+  assert.deepEqual(specStatusErrors(status, ["retired-one", "retired-two"], CATALOG), []);
+  assert.equal(specStatusErrors(status, ["retired-one", "unaccounted"], CATALOG).length, 1);
 });

@@ -1,6 +1,7 @@
 # roughlogic.com Specification v23 — Catalog Enhancement & Expansion VII (20 Enhancements + 23 New Tiles)
 
-> **Implementation status: CLOSED (opened 2026-06-05; closed 2026-06-06).**
+> **Implementation status: CLOSED (opened 2026-06-05; closed 2026-06-06); later cut by `spec-v107`:
+> `pediatric-tube-depth` and `weight-shift-fuel-burn`.**
 > All 23 new tiles AND all 20 Part I enhancements have landed; package stamps
 > **0.23.0**. Progress: **all 23 of 23 new tiles** (catalog 437 → 460) and
 > **all 20 of 20 enhancements** (EN.1–EN.20, additive, no existing correct

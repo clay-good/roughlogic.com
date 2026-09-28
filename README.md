@@ -61,7 +61,7 @@ npm test      # run the unit tests
 
 How it's built and how every answer is tested: [docs/how-it-works.md](docs/how-it-works.md). Contributing: [CONTRIBUTING.md](CONTRIBUTING.md).
 
-`npm run lint` checks spec status against the calculator catalog. A renamed calculator must use an explicit `built as` alias in its spec status; unrelated calculator references cannot hide missing work.
+`npm run lint` accounts for every numbered spec and checks its status against the calculator catalog. Historical status formats are normalized; renamed calculators need explicit `built as` mappings, and later removals must name every retired ID.
 
 ## License
 

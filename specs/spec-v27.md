@@ -13,7 +13,9 @@
 > are E.1 `fillet-weld-strength`, C.2 `round-to-rect-duct`, and G.2
 > `center-of-gravity-2point`. Catalog 540 -> 543. See docs/audit-trail.md.
 >
-> **Implementation status: DRAFT 2026-06-09 (targets package 0.28.0).** v27 is
+> **Implementation status: LANDED 2026-06-09 (package 0.28.0; `duct-sizing-friction` built as
+> `duct-sizing`; `superheat-subcooling` built as `superheat-subcool`; `sling-load-tension` built as
+> `sling-angle`).** v27 is
 > a catalog-growth spec in the lineage of v15/v16/v17/v20/v23/v24/v25/v26. It
 > inherits everything from spec.md through spec-v26.md and changes none of it.
 >
