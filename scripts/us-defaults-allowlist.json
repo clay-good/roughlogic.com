@@ -201,6 +201,12 @@
    "justification": "Plane-of-array irradiance is published in W/m^2."
   },
   {
+   "module": "calc-solarfield.js",
+   "match": "W/m²",
+   "family": "power and billing (solar datasheet)",
+   "justification": "Plane-of-array irradiance is published in W/m^2."
+  },
+  {
    "module": "calc-restoration.js",
    "match": "spores/m³",
    "family": "lab and IH practice",

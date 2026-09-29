@@ -118,28 +118,30 @@ export const TOOL_MODULES = (() => {
   declare("./calc-solar.js", "SOLAR_RENDERERS", [
     // v2
     "pv-string-sizing", "battery-runtime",
-    "dc-shunt-sizing",
     // v15
     "pv-interconnection-busbar", "off-grid-battery", "ev-charger-load",
     // spec-v182 electrician second-pass batch
     "pv-circuit-ampacity",
     // spec-v221..v223 PV system-design batch
-    "pv-energy-yield", "pv-array-sizing", "pv-row-spacing", "pv-row-shade-angle", "pv-inverter-ratio", "pv-rail-clamp-takeoff", "pv-ballast-weight",
+    "pv-energy-yield", "pv-array-sizing", "pv-row-spacing", "pv-row-shade-angle", "pv-inverter-ratio",
     "pv-cell-temperature-power", "pv-max-ambient-for-power", "pv-performance-ratio", "pv-string-fusing",
     // spec-v236..v238 grid-tied battery-economics batch
     "battery-tou-arbitrage", "battery-peak-shaving", "battery-c-rate",
     // spec-v488 EV charge time (AC Level 2)
     "ev-charge-time",
-    "ev-range-per-hour",
-    "battery-series-parallel",
-    "bifacial-pv-gain",
     // spec-v489 EV charge cost at the meter
     "ev-charge-cost",
     // spec-v492 EV DC fast-charge time with CC-CV taper
     "ev-dcfc-time",
-    // spec-v559
-    "solar-egc-690-45",
-    "shadow-length", "solar-altitude-angle", "solar-azimuth-angle",
+  ]);
+  // spec-v1868 cap-relief split: the field-design and installation workflow
+  // moved intact from calc-solar.js. All 10 tiles keep Group A and their
+  // existing public behavior.
+  declare("./calc-solarfield.js", "SOLARFIELD_RENDERERS", [
+    "solar-egc-690-45", "shadow-length", "solar-altitude-angle",
+    "solar-azimuth-angle", "pv-rail-clamp-takeoff", "pv-ballast-weight",
+    "dc-shunt-sizing", "ev-range-per-hour", "battery-series-parallel",
+    "bifacial-pv-gain",
   ]);
   // spec-v79 cap-relief split: the cohesive spec-v20 §A advanced-analysis trio
   // (parallel-conductor-derate, neutral-current-3ph, motor-vd-starting)

@@ -3502,19 +3502,14 @@ cross-check.
 | calc-solar.js | `computeBatteryCRate` | `{ nameplate_kwh = 0, c_rate = 0.5, dod = 0.90, inverter_kw = 0 } = {}` | _ | _ | _ |
 | calc-solar.js | `computeBatteryPeakShaving` | `{ nameplate_kwh = 0, dod = 0.90, event_duration_h = 0, target_shave_kw = 0, d...` | _ | _ | _ |
 | calc-solar.js | `computeBatteryRuntime` | `{ amp_hours, system_V, dod_percent = 100, load_W, peukert_k = 1, inverter_eff...` | _ | _ | _ |
-| calc-solar.js | `computeBatterySeriesParallel` | `{ target_bus_v = 48, module_v = 12.8, module_ah = 100, parallel_strings = 2, ...` | _ | _ | _ |
 | calc-solar.js | `computeBatteryTouArbitrage` | `{ nameplate_kwh = 0, dod = 0.90, rte = 0.86, peak_price = 0, offpeak_price = ...` | _ | _ | _ |
-| calc-solar.js | `computeBifacialPvGain` | `{ front_poa_wm2 = 1000, rear_poa_wm2 = 150, bifaciality = 0.75, front_power_w...` | _ | _ | _ |
-| calc-solar.js | `computeDcShuntSizing` | `{ rated_current_a = 100, rated_millivolt = 50, measured_millivolt = 25 } = {}` | _ | _ | _ |
 | calc-solar.js | `computeEvChargeCost` | `{ battery_capacity_kwh = 0, start_soc_pct = 0, target_soc_pct = 80, electrici...` | _ | _ | _ |
 | calc-solar.js | `computeEvChargeTime` | `{ battery_capacity_kwh = 0, start_soc_pct = 0, target_soc_pct = 80, evse_powe...` | _ | _ | _ |
 | calc-solar.js | `computeEvChargerLoad` | `{ charger_amps = 0, main_breaker_a = 0, existing_load_a = 0, busbar_rating_a ...` | _ | _ | _ |
 | calc-solar.js | `computeEvDcfcTime` | `{ usable_capacity_kwh = 0, start_soc_pct = 0, target_soc_pct = 80, charger_po...` | _ | _ | _ |
-| calc-solar.js | `computeEvRangePerHour` | `{ evse_power_kw = 7.7, charge_efficiency = 0.88, vehicle_efficiency_mi_per_kw...` | _ | _ | _ |
 | calc-solar.js | `computeOffGridBattery` | `{ daily_load_wh = 0, days_autonomy = 3, dod_limit = 0.5, system_voltage_v = 4...` | _ | _ | _ |
 | calc-solar.js | `computePVStringSizing` | `{ module_voc_V, module_vmp_V, voc_temp_coeff_pct_per_C, record_low_C, record_...` | _ | _ | _ |
 | calc-solar.js | `computePvArraySizing` | `{ target_annual_kwh = 0, psh = 5.0, perf_ratio = 0.77 } = {}` | _ | _ | _ |
-| calc-solar.js | `computePvBallastWeight` | `{ modules = 30, module_wt_lb = 50, ballast_per_module_lb = 40, racking_wt_lb ...` | _ | _ | _ |
 | calc-solar.js | `computePvCellTemperaturePower` | `{ T_amb_C = 0, G_wm2 = 0, NOCT_C = 45, P_stc_W = 0, gamma = -0.35 } = {}` | _ | _ | _ |
 | calc-solar.js | `computePvCircuitAmpacity` | `{ module_isc_a = 0, parallel_strings = 1, ocpd_a = 0 } = {}` | _ | _ | _ |
 | calc-solar.js | `computePvEnergyYield` | `{ dc_kw = 0, psh = 5.0, perf_ratio = 0.77 } = {}` | _ | _ | _ |
@@ -3522,19 +3517,24 @@ cross-check.
 | calc-solar.js | `computePvInverterRatio` | `{ dc_kw = 0, ac_kw = 0, inv_eff = 0.96 } = {}` | _ | _ | _ |
 | calc-solar.js | `computePvMaxAmbientForPower` | `{ target_power_W = 0, P_stc_W = 0, G_wm2 = 0, NOCT_C = 45, gamma = -0.35 } = {}` | _ | _ | _ |
 | calc-solar.js | `computePvPerformanceRatio` | `{ soiling = 0, temperature = 0, wiring_dc = 0, wiring_ac = 0, inverter = 0, m...` | _ | _ | _ |
-| calc-solar.js | `computePvRailClampTakeoff` | `{ rows = 2, modules_per_row = 12, module_width_ft = 3.42, gap_ft = 0, rails_p...` | _ | _ | _ |
 | calc-solar.js | `computePvRowShadeAngle` | `{ module_length_ft = 0, tilt_deg = 0, row_pitch_ft = 0 } = {}` | _ | _ | _ |
 | calc-solar.js | `computePvRowSpacing` | `{ module_length_ft = 0, tilt_deg = 0, profile_angle_deg = 0 } = {}` | _ | _ | _ |
 | calc-solar.js | `computePvStringFusing` | `{ Isc_A = 0, max_fuse_A = 0, n_strings = 1 } = {}` | _ | _ | _ |
-| calc-solar.js | `computeShadowLength` | `{ object_height_ft = 0, sun_altitude_deg = 0 } = {}` | _ | _ | _ |
-| calc-solar.js | `computeSolarAltitude` | `{ latitude_deg = 0, day_of_year = 355, hours_from_solar_noon = 0 } = {}` | _ | _ | _ |
-| calc-solar.js | `computeSolarAzimuth` | `{ latitude_deg = 0, day_of_year = 172, hours_from_solar_noon = 0 } = {}` | _ | _ | _ |
-| calc-solar.js | `computeSolarEgc69045` | `{ ocpd_rating_a = 0, pv_isc_a = 0, vd_upsized = "no" } = {}` | _ | _ | _ |
 | calc-solar.js | `renderBatteryRuntime` | `inputRegion, outputRegion, citationEl, params` | _ | _ | _ |
 | calc-solar.js | `renderEvChargerLoad` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-solar.js | `renderOffGridBattery` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-solar.js | `renderPVStringSizing` | `inputRegion, outputRegion, citationEl, params` | _ | _ | _ |
 | calc-solar.js | `renderPvInterconnectionBusbar` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
+| calc-solarfield.js | `computeBatterySeriesParallel` | `{ target_bus_v = 48, module_v = 12.8, module_ah = 100, parallel_strings = 2, ...` | _ | _ | _ |
+| calc-solarfield.js | `computeBifacialPvGain` | `{ front_poa_wm2 = 1000, rear_poa_wm2 = 150, bifaciality = 0.75, front_power_w...` | _ | _ | _ |
+| calc-solarfield.js | `computeDcShuntSizing` | `{ rated_current_a = 100, rated_millivolt = 50, measured_millivolt = 25 } = {}` | _ | _ | _ |
+| calc-solarfield.js | `computeEvRangePerHour` | `{ evse_power_kw = 7.7, charge_efficiency = 0.88, vehicle_efficiency_mi_per_kw...` | _ | _ | _ |
+| calc-solarfield.js | `computePvBallastWeight` | `{ modules = 30, module_wt_lb = 50, ballast_per_module_lb = 40, racking_wt_lb ...` | _ | _ | _ |
+| calc-solarfield.js | `computePvRailClampTakeoff` | `{ rows = 2, modules_per_row = 12, module_width_ft = 3.42, gap_ft = 0, rails_p...` | _ | _ | _ |
+| calc-solarfield.js | `computeShadowLength` | `{ object_height_ft = 0, sun_altitude_deg = 0 } = {}` | _ | _ | _ |
+| calc-solarfield.js | `computeSolarAltitude` | `{ latitude_deg = 0, day_of_year = 355, hours_from_solar_noon = 0 } = {}` | _ | _ | _ |
+| calc-solarfield.js | `computeSolarAzimuth` | `{ latitude_deg = 0, day_of_year = 172, hours_from_solar_noon = 0 } = {}` | _ | _ | _ |
+| calc-solarfield.js | `computeSolarEgc69045` | `{ ocpd_rating_a = 0, pv_isc_a = 0, vd_upsized = "no" } = {}` | _ | _ | _ |
 | calc-stage.js | `_v9_atmosphericAbsorption` | `{ f_Hz, T_K, h_r, p_a_kPa }` | _ | _ | _ |
 | calc-stage.js | `computeAcousticGainPagNag` | `{ ds_ft = 2, d0_ft = 30, d1_ft = 8, d2_ft = 12, open_mics = 1, ead_ft = 6 } = {}` | _ | _ | _ |
 | calc-stage.js | `computeAmpPowerSpl` | `{ sensitivity_db, power_w, distance_m, crest_db, target_spl_db, max_spl_db }` | _ | _ | _ |

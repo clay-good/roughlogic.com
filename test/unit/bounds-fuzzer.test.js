@@ -25241,7 +25241,7 @@ test("bounds: spec-v784 computeFloorAreaRatio pins FAR, the max buildable / rema
   assert.ok("error" in _v784({ building_floor_area_sf: 30000, lot_area_sf: 20000, far_limit: -1 }));
 });
 
-import { computeShadowLength as _v790 } from "../../calc-solar.js";
+import { computeShadowLength as _v790 } from "../../calc-solarfield.js";
 
 test("bounds: spec-v790 computeShadowLength pins shadow = h/tan(altitude), monotonicity, and error seams", () => {
   const r = _v790({ object_height_ft: 10, sun_altitude_deg: 30 });
@@ -25258,7 +25258,7 @@ test("bounds: spec-v790 computeShadowLength pins shadow = h/tan(altitude), monot
   assert.ok("error" in _v790({ object_height_ft: 10, sun_altitude_deg: 95 }));
 });
 
-import { computeSolarAzimuth as _v1248 } from "../../calc-solar.js";
+import { computeSolarAzimuth as _v1248 } from "../../calc-solarfield.js";
 test("bounds: spec-v1248 computeSolarAzimuth pins due-south noon, morning/afternoon symmetry, the compass label, and error seams", () => {
   // 40 N, summer solstice, solar noon -> due south (180 deg).
   const noon = _v1248({ latitude_deg: 40, day_of_year: 172, hours_from_solar_noon: 0 });
@@ -25279,7 +25279,7 @@ test("bounds: spec-v1248 computeSolarAzimuth pins due-south noon, morning/aftern
   assert.ok("error" in _v1248({ latitude_deg: 40, day_of_year: 172, hours_from_solar_noon: 20 }));
   assert.ok("error" in _v1248({ latitude_deg: Infinity, day_of_year: 172, hours_from_solar_noon: 0 }));
 });
-import { computeSolarAltitude as _v1213 } from "../../calc-solar.js";
+import { computeSolarAltitude as _v1213 } from "../../calc-solarfield.js";
 
 test("bounds: spec-v1213 computeSolarAltitude pins the noon and hour-angle altitude, the solstice extremes, the below-horizon flag, and error seams", () => {
   // 40 N, winter solstice (n=355), solar noon -> dec -23.45, altitude 26.55 = 90 - |40 - (-23.45)|.
@@ -26156,7 +26156,7 @@ test("bounds: spec-v558 computeStepTouchVoltage pins Cs, the step-vs-touch order
   assert.ok("error" in _v558({ clearing_time_s: 0.5, surface_resistivity: 3000, native_resistivity: 100, layer_thickness_m: 0.1, body_weight: "60" }));
 });
 
-import { computeSolarEgc69045 as _v559 } from "../../calc-solar.js";
+import { computeSolarEgc69045 as _v559 } from "../../calc-solarfield.js";
 
 test("bounds: spec-v559 computeSolarEgc69045 pins the OCPD-vs-Isc basis, the 14 AWG floor, the no-upsize-for-VD behavior, and error seams", () => {
   const r = _v559({ ocpd_rating_a: 20, pv_isc_a: 0, vd_upsized: "no" });
@@ -28755,7 +28755,7 @@ test("bounds: spec-v895 computeHousewrapRolls pins the rolls, cap fasteners, sea
   assert.ok("error" in _v895({ wall_area_sf: Infinity, roll_coverage_sf: 1350, overlap_waste_pct: 10, fasteners_per_sf: 0.5, roll_width_ft: 9 }));
 });
 
-import { computePvRailClampTakeoff as _v896 } from "../../calc-solar.js";
+import { computePvRailClampTakeoff as _v896 } from "../../calc-solarfield.js";
 
 test("bounds: spec-v896 computePvRailClampTakeoff pins the run, rail, clamp, splice counts, and error seams", () => {
   const r = _v896({ rows: 2, modules_per_row: 12, module_width_ft: 3.42, gap_ft: 0, rails_per_row: 2, rail_stock_ft: 14 });
@@ -28779,7 +28779,7 @@ test("bounds: spec-v896 computePvRailClampTakeoff pins the run, rail, clamp, spl
   assert.ok("error" in _v896({ rows: Infinity, modules_per_row: 12, module_width_ft: 3.42, gap_ft: 0, rails_per_row: 2, rail_stock_ft: 14 }));
 });
 
-import { computePvBallastWeight as _v897 } from "../../calc-solar.js";
+import { computePvBallastWeight as _v897 } from "../../calc-solarfield.js";
 
 test("bounds: spec-v897 computePvBallastWeight pins the total, added psf, pass flag, and error seams", () => {
   const r = _v897({ modules: 30, module_wt_lb: 50, ballast_per_module_lb: 40, racking_wt_lb: 150, array_area_sf: 630, allowable_psf: 5 });
@@ -30251,7 +30251,7 @@ test("bounds: spec-v962 computeBendSpringback pins the Machinery's Handbook spri
   assert.ok("error" in _v962({ tool_radius_in: Infinity, thickness_in: 0.1, yield_strength_psi: 50000, modulus_psi: 29000000 }));
 });
 
-import { computeDcShuntSizing as _v963 } from "../../calc-solar.js";
+import { computeDcShuntSizing as _v963 } from "../../calc-solarfield.js";
 
 test("bounds: spec-v963 computeDcShuntSizing pins the shunt Ohm's law and error seams", () => {
   const r = _v963({ rated_current_a: 100, rated_millivolt: 50, measured_millivolt: 25 });
@@ -30357,7 +30357,7 @@ test("bounds: spec-v967 computeHullDisplacement pins Archimedes displacement and
   assert.ok("error" in _v967({ lwl_ft: Infinity, bwl_ft: 10, draft_ft: 4, block_coefficient: 0.5, water_density_pcf: 64 }));
 });
 
-import { computeEvRangePerHour as _v968 } from "../../calc-solar.js";
+import { computeEvRangePerHour as _v968 } from "../../calc-solarfield.js";
 
 test("bounds: spec-v968 computeEvRangePerHour pins the range-per-hour identity and error seams", () => {
   const r = _v968({ evse_power_kw: 7.7, charge_efficiency: 0.88, vehicle_efficiency_mi_per_kwh: 3.5, target_range_mi: 100 });
@@ -30445,7 +30445,7 @@ test("bounds: spec-v971 computeDechlorinationDose pins the reagent dose and feed
   assert.ok("error" in _v971({ chlorine_residual_mg_l: Infinity, flow_mgd: 5, stoich_ratio: 1.46, purity_pct: 100 }));
 });
 
-import { computeBatterySeriesParallel as _v972 } from "../../calc-solar.js";
+import { computeBatterySeriesParallel as _v972 } from "../../calc-solarfield.js";
 
 test("bounds: spec-v972 computeBatterySeriesParallel pins the series/parallel config and error seams", () => {
   const r = _v972({ target_bus_v: 48, module_v: 12.8, module_ah: 100, parallel_strings: 2, depth_of_discharge: 0.8 });
@@ -30682,7 +30682,7 @@ test("bounds: spec-v982 computeLuminaireSpacingMh pins the spacing criterion and
   assert.ok("error" in _v982({ smh_ratio: Infinity, mounting_height_ft: 8, actual_spacing_ft: 9 }));
 });
 
-import { computeBifacialPvGain as _v983 } from "../../calc-solar.js";
+import { computeBifacialPvGain as _v983 } from "../../calc-solarfield.js";
 
 test("bounds: spec-v983 computeBifacialPvGain pins the rear-side gain and error seams", () => {
   const r = _v983({ front_poa_wm2: 1000, rear_poa_wm2: 150, bifaciality: 0.75, front_power_w: 400 });
