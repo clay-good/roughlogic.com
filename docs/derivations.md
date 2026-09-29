@@ -2343,28 +2343,22 @@ cross-check.
 | calc-fire.js | `computeAerialLadderReach` | `{ angle_deg, extension_ft }` | _ | _ | _ |
 | calc-fire.js | `computeBrakingDistance` | `{ speed_mph, friction_coefficient, grade_percent = 0, reaction_time_s = 1.5 }` | _ | _ | _ |
 | calc-fire.js | `computeConfinedSpaceVent` | `{ length_ft = 0, width_ft = 0, height_ft = 0, volume_ft3 = null, blower_cfm =...` | _ | _ | _ |
-| calc-fire.js | `computeDraftLiftMax` | `{ site_elevation_ft = 0, pump_factor = 0.667, suction_losses_ft = 0 } = {}` | _ | _ | _ |
 | calc-fire.js | `computeElevationPressureLoss` | `{ mode = "floors", value = 0, floor_height_ft = 10, direction = "up" } = {}` | _ | _ | _ |
 | calc-fire.js | `computeExtinguisherCoverage` | `{ floor_area_sf = 0, hazard_class = "A", travel_distance_ft = 0, area_cap_sf ...` | _ | _ | _ |
 | calc-fire.js | `computeFdcSupplyCheck` | `{ fdc_pressure_psi = 0, total_flow_gpm = 0, lines = 2, line_length_ft = 0, fr...` | _ | _ | _ |
 | calc-fire.js | `computeFireFriction` | `{ hose_diameter, gpm, length_ft }` | _ | _ | _ |
 | calc-fire.js | `computeFireStreamReaction` | `{ nozzle_type = "smooth", bore_in = 0, flow_gpm = 0, nozzle_pressure_psi = 0 ...` | _ | _ | _ |
 | calc-fire.js | `computeFoam` | `{ fire_area_ft2, application_rate_gpm_per_ft2 = 0.10, foam_percentage = 3, du...` | _ | _ | _ |
-| calc-fire.js | `computeFoamEductorLimit` | `{ inlet_pressure_psi = 0, eductor_flow_gpm = 0, hose_coefficient = 0, nozzle_...` | _ | _ | _ |
 | calc-fire.js | `computeFoamMaxCoverageArea` | `{ available_concentrate_gal = 0, application_rate_gpm_per_ft2 = 0.10, foam_pe...` | _ | _ | _ |
 | calc-fire.js | `computeHoseLaySectionCount` | `{ map_distance_ft = 0, slack_fraction = 0.20, section_length_ft = 50, hose_id...` | _ | _ | _ |
-| calc-fire.js | `computeHydrantAvailableFlow` | `{ static_psi = 0, residual_psi = 0, qf_gpm = 0 } = {}` | _ | _ | _ |
 | calc-fire.js | `computeHydrantFlow` | `{ pitot_psi, outlet_diameter_in, c = 0.9 }` | _ | _ | _ |
-| calc-fire.js | `computeIowaRateOfFlow` | `{ length_ft = 0, width_ft = 0, height_ft = 0 } = {}` | _ | _ | _ |
 | calc-fire.js | `computeIsoNeededFireFlow` | `{ area_ft2 = 0, stories = 1, construction_class = 3, occupancy_factor = 1.0, ...` | _ | _ | _ |
 | calc-fire.js | `computeLadderPipeReach` | `{ angle_deg, extension_ft, nozzle_type, nozzle_pressure_psi }` | _ | _ | _ |
 | calc-fire.js | `computeMasterStreamReach` | `{ nozzle_type, nozzle_pressure_psi }` | _ | _ | _ |
 | calc-fire.js | `computeNFPA1142WaterSupply` | `{ volume_ft3 = 0, occupancy_class = 7, construction_class = "V", exposure_wit...` | _ | _ | _ |
-| calc-fire.js | `computeNfaFiregroundFlow` | `{ length_ft = 0, width_ft = 0, percent_involved = 0, floors_involved = 1, exp...` | _ | _ | _ |
 | calc-fire.js | `computePDP` | `{ nozzle_pressure_psi, friction_loss_psi, elevation_ft = 0, appliance_loss_ps...` | _ | _ | _ |
 | calc-fire.js | `computePpvFanSizing` | `{ volume_cf = 0, fan_cfm = 0, entrainment_efficiency = 0.6, remaining_fractio...` | _ | _ | _ |
 | calc-fire.js | `computeRadiantExposureSeparation` | `{ heat_release_kw = 0, radiative_fraction = 0.3, target_flux_kwm2 = 12.6, eva...` | _ | _ | _ |
-| calc-fire.js | `computeRelayPumpDistance` | `{ target_flow_gpm = 0, hose_coefficient = 0, max_discharge_psi = 0, intake_re...` | _ | _ | _ |
 | calc-fire.js | `computeRequiredFireFlow` | `{ structure_area_ft2, construction_class = "ordinary", occupancy_factor = 1.0...` | _ | _ | _ |
 | calc-fire.js | `computeReverseLayFriction` | `{ hose_diameter, gpm, length_ft, n_pumps = 1 }` | _ | _ | _ |
 | calc-fire.js | `computeScbaCylinderTime` | `{ V_rated_scf = 0, P_rated_psi = 0, P_start_psi = 0, P_alarm_psi = 0, consump...` | _ | _ | _ |
@@ -2376,10 +2370,6 @@ cross-check.
 | calc-fire.js | `computeSprinklerKFactor` | `{ solve_for = "flow", flow_gpm = 0, pressure_psi = 0, k_factor = 0 } = {}` | _ | _ | _ |
 | calc-fire.js | `computeStandpipeFriction` | `{ riser_height_ft, outlet_count, gpm_per_outlet, outlet_length_ft = 50, hose_...` | _ | _ | _ |
 | calc-fire.js | `computeStandpipePDP` | `{ standpipe_class = "I", highest_outlet_elevation_ft = 0, nozzle_pressure_psi...` | _ | _ | _ |
-| calc-fire.js | `computeTankerFleetSize` | `{ tank_gal = 0, fill_gpm = 0, dump_gpm = 0, distance_mi = 0, speed_mph = 0 } ...` | _ | _ | _ |
-| calc-fire.js | `computeTankerShuttleCycle` | `{ tank_gal = 0, fill_gpm = 0, dump_gpm = 0, distance_mi = 0, speed_mph = 0 } ...` | _ | _ | _ |
-| calc-fire.js | `computeTankerShuttleFlow` | `{ nominal_tank_gal = 0, usable_fraction = 0.9, tanker_count = 0, cycle_time_m...` | _ | _ | _ |
-| calc-fire.js | `computeVacuumLiftReading` | `{ vacuum_inhg = 0, site_elevation_ft = 0, pump_factor = 0.667 } = {}` | _ | _ | _ |
 | calc-fire.js | `computeWaterSupplyDuration` | `{ volume_gal = 0, flow_gpm = 0, resupply_gpm = 0 } = {}` | _ | _ | _ |
 | calc-fire.js | `renderAerialLadder` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-fire.js | `renderBrakingDistance` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
@@ -2409,6 +2399,16 @@ cross-check.
 | calc-firesprinkler.js | `computeSprinklerProtectionAreaForSupply` | `{ available_supply_gpm = 0, density = 0.20, hose_gpm = 250 } = {}` | _ | _ | _ |
 | calc-firesprinkler.js | `computeSprinklerSystemDemand` | `{ density = 0.20, design_area = 1500, hose_gpm = 250, duration_min = 90 } = {}` | _ | _ | _ |
 | calc-firesprinkler.js | `computeStairwellPressurization` | `{ leakage_area_sqft = 0, pressure_inwg = 0.15, door_width_ft = 3, door_height...` | _ | _ | _ |
+| calc-firewater.js | `computeDraftLiftMax` | `{ site_elevation_ft = 0, pump_factor = 0.667, suction_losses_ft = 0 } = {}` | _ | _ | _ |
+| calc-firewater.js | `computeFoamEductorLimit` | `{ inlet_pressure_psi = 0, eductor_flow_gpm = 0, hose_coefficient = 0, nozzle_...` | _ | _ | _ |
+| calc-firewater.js | `computeHydrantAvailableFlow` | `{ static_psi = 0, residual_psi = 0, qf_gpm = 0 } = {}` | _ | _ | _ |
+| calc-firewater.js | `computeIowaRateOfFlow` | `{ length_ft = 0, width_ft = 0, height_ft = 0 } = {}` | _ | _ | _ |
+| calc-firewater.js | `computeNfaFiregroundFlow` | `{ length_ft = 0, width_ft = 0, percent_involved = 0, floors_involved = 1, exp...` | _ | _ | _ |
+| calc-firewater.js | `computeRelayPumpDistance` | `{ target_flow_gpm = 0, hose_coefficient = 0, max_discharge_psi = 0, intake_re...` | _ | _ | _ |
+| calc-firewater.js | `computeTankerFleetSize` | `{ tank_gal = 0, fill_gpm = 0, dump_gpm = 0, distance_mi = 0, speed_mph = 0 } ...` | _ | _ | _ |
+| calc-firewater.js | `computeTankerShuttleCycle` | `{ tank_gal = 0, fill_gpm = 0, dump_gpm = 0, distance_mi = 0, speed_mph = 0 } ...` | _ | _ | _ |
+| calc-firewater.js | `computeTankerShuttleFlow` | `{ nominal_tank_gal = 0, usable_fraction = 0.9, tanker_count = 0, cycle_time_m...` | _ | _ | _ |
+| calc-firewater.js | `computeVacuumLiftReading` | `{ vacuum_inhg = 0, site_elevation_ft = 0, pump_factor = 0.667 } = {}` | _ | _ | _ |
 | calc-gas.js | `computeGasAltitudeDerate` | `{ nameplate_input_btuh = 0, elevation_ft = 0, derate_pct_per_1000 = 4, thresh...` | _ | _ | _ |
 | calc-gas.js | `computeGasApplianceConnection` | `{ appliance = "furnace", shutoff_same_room = "yes", shutoff_distance_ft = 0, ...` | _ | _ | _ |
 | calc-gas.js | `computeGasFuelConversion` | `{ appliance_input_btuh = 0, hv_from = 1030, hv_to = 2500, sg_from = 0.60, sg_...` | _ | _ | _ |

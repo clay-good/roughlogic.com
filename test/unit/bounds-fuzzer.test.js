@@ -21550,7 +21550,7 @@ test("bounds: spec-v386 computeOutsideAirPercentTemps pins the balance, the band
 // ===================== spec-v387..v389 water-system hydraulics trio (3 modules) =====================
 import { computeColebrookFrictionFactor as _v387 } from "../../calc-hvac.js";
 import { computeThrustBlockSizing as _v388 } from "../../calc-plumbing.js";
-import { computeHydrantAvailableFlow as _v389 } from "../../calc-fire.js";
+import { computeHydrantAvailableFlow as _v389 } from "../../calc-firewater.js";
 
 test("bounds: spec-v387 computeColebrookFrictionFactor pins laminar/turbulent, the transition flag, and error seams", () => {
   const t = _v387({ reynolds: 100000, rel_roughness: 0.0003 });
@@ -26675,7 +26675,7 @@ test("bounds: spec-v576 computeChlorineCylinderWithdrawal pins the per-container
   assert.ok("error" in _v576({ feed_rate_lb_day: 100, container_type: "cylinder", room_temp_f: -30 }));
 });
 
-import { computeNfaFiregroundFlow as _v577 } from "../../calc-fire.js";
+import { computeNfaFiregroundFlow as _v577 } from "../../calc-firewater.js";
 
 test("bounds: spec-v577 computeNfaFiregroundFlow pins the base flow, the exposure addition, the floor multiply, the validity flag, and error seams", () => {
   const r = _v577({ length_ft: 40, width_ft: 60, percent_involved: 50, floors_involved: 1, exposures: 2 });
@@ -26701,7 +26701,7 @@ test("bounds: spec-v577 computeNfaFiregroundFlow pins the base flow, the exposur
   assert.ok("error" in _v577({ length_ft: 40, width_ft: 60, percent_involved: 50, exposures: -1 }));
 });
 
-import { computeRelayPumpDistance as _v578 } from "../../calc-fire.js";
+import { computeRelayPumpDistance as _v578 } from "../../calc-firewater.js";
 
 test("bounds: spec-v578 computeRelayPumpDistance pins the budget, the loss per 100 ft, the max distance, the square-law, and error seams", () => {
   const r = _v578({ target_flow_gpm: 800, hose_coefficient: 0.08, max_discharge_psi: 200, intake_residual_psi: 20, elevation_ft: 10 });
@@ -26721,7 +26721,7 @@ test("bounds: spec-v578 computeRelayPumpDistance pins the budget, the loss per 1
   assert.ok("error" in _v578({ target_flow_gpm: 800, hose_coefficient: 0.08, max_discharge_psi: 200, intake_residual_psi: 250, elevation_ft: 0 }));
 });
 
-import { computeDraftLiftMax as _v579 } from "../../calc-fire.js";
+import { computeDraftLiftMax as _v579 } from "../../calc-firewater.js";
 
 test("bounds: spec-v579 computeDraftLiftMax pins the theoretical lift, the attainable lift, the altitude correction, the suction-loss subtraction, and error seams", () => {
   const r = _v579({ site_elevation_ft: 3000, pump_factor: 0.667, suction_losses_ft: 0 });
@@ -26741,7 +26741,7 @@ test("bounds: spec-v579 computeDraftLiftMax pins the theoretical lift, the attai
   assert.ok("error" in _v579({ site_elevation_ft: 3000, pump_factor: 1.5 }));
 });
 
-import { computeTankerShuttleFlow as _v580 } from "../../calc-fire.js";
+import { computeTankerShuttleFlow as _v580 } from "../../calc-firewater.js";
 
 test("bounds: spec-v580 computeTankerShuttleFlow pins the usable credit, the shuttle flow, the cycle-time sensitivity, and error seams", () => {
   const r = _v580({ nominal_tank_gal: 3000, usable_fraction: 0.9, tanker_count: 3, cycle_time_min: 12 });
@@ -26760,7 +26760,7 @@ test("bounds: spec-v580 computeTankerShuttleFlow pins the usable credit, the shu
   assert.ok("error" in _v580({ nominal_tank_gal: 3000, usable_fraction: 0.9, tanker_count: 3, cycle_time_min: 0 }));
 });
 
-import { computeFoamEductorLimit as _v581 } from "../../calc-fire.js";
+import { computeFoamEductorLimit as _v581 } from "../../calc-firewater.js";
 
 test("bounds: spec-v581 computeFoamEductorLimit pins the 65% ceiling, the Q^2 friction, the max length, the won't-proportion case, and error seams", () => {
   const r = _v581({ inlet_pressure_psi: 200, eductor_flow_gpm: 95, hose_coefficient: 15.5, nozzle_pressure_psi: 100, elevation_ft: 30 });
@@ -27073,7 +27073,7 @@ test("bounds: spec-v596 computeDigesterGasProduction pins gas/methane/energy, th
   assert.ok("error" in _v596({ vs_fed_lb_day: 10000, vs_reduction_pct: 55, methane_pct: 101 }));
 });
 
-import { computeVacuumLiftReading as _v597 } from "../../calc-fire.js";
+import { computeVacuumLiftReading as _v597 } from "../../calc-firewater.js";
 
 test("bounds: spec-v597 computeVacuumLiftReading pins the 1.13 conversion, the altitude ceiling, the margin, and error seams", () => {
   // Pinned worked example: 10 in Hg, sea level, default factor.
@@ -27143,7 +27143,7 @@ test("bounds: spec-v598 computeQuadraticMeanDiameter pins QMD, the class-tally e
   assert.ok("error" in _v598({ tally: "10:0" }));
 });
 
-import { computeTankerShuttleCycle as _v599 } from "../../calc-fire.js";
+import { computeTankerShuttleCycle as _v599 } from "../../calc-firewater.js";
 
 test("bounds: spec-v599 computeTankerShuttleCycle pins the cycle breakdown, the round-trip doubling, the fill-site sensitivity, and error seams", () => {
   // Pinned worked example: 3,000 gal, 1,000 gpm fill and dump, 2 mi at 35 mph.
@@ -27202,7 +27202,7 @@ test("bounds: spec-v600 computeRasSviSettleability pins the Xr ceiling, the retu
   assert.ok("error" in _v600({ plant_flow_mgd: 4, mlss_mg_l: 2500, svi_ml_g: 500 }));
 });
 
-import { computeIowaRateOfFlow as _v601 } from "../../calc-fire.js";
+import { computeIowaRateOfFlow as _v601 } from "../../calc-firewater.js";
 
 test("bounds: spec-v601 computeIowaRateOfFlow pins the volume-to-flow relation, the scaling, and error seams", () => {
   // Pinned worked example: 20 x 30 x 10 ft room.
@@ -27323,7 +27323,7 @@ test("bounds: spec-v604 computePivotTimerDepth pins the revolution, depth, the i
   assert.ok("error" in _v604({ system_flow_gpm: 800, area_acres: 125, revolution_100_hr: 20, timer_pct: 101 }));
 });
 
-import { computeTankerFleetSize as _v605 } from "../../calc-fire.js";
+import { computeTankerFleetSize as _v605 } from "../../calc-firewater.js";
 
 test("bounds: spec-v605 computeTankerFleetSize pins the bottleneck, the fleet threshold, the ceiling flow, and error seams", () => {
   // Pinned worked example: 3,000 gal, 1,000 gpm fill and dump, 2 mi at 35 mph.

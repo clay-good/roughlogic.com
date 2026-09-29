@@ -964,17 +964,16 @@ export const TOOL_MODULES = (() => {
     "elevation-pressure-loss", "water-supply-duration",
     // spec-v114 smooth-bore nozzle flow (gpm = 29.7 d^2 sqrt(NP)).
     "smooth-bore-flow", "smooth-bore-diameter-for-flow",
-    "hydrant-available-flow",
-    // spec-v577
-    "nfa-fireground-flow",
-    "iowa-rate-of-flow",
-    "relay-pump-distance",
-    "draft-lift-max",
-    "vacuum-lift-reading",
-    "tanker-shuttle-flow",
-    "tanker-shuttle-cycle",
-    "tanker-fleet-size",
-    "foam-eductor-limit", "extinguisher-coverage",
+    "extinguisher-coverage",
+  ]);
+  // spec-v1867 cap-relief split: the water-supply operations workflow moved
+  // intact from calc-fire.js. All 10 tiles keep Group F and their existing
+  // public behavior.
+  declare("./calc-firewater.js", "FIREWATER_RENDERERS", [
+    "hydrant-available-flow", "nfa-fireground-flow", "iowa-rate-of-flow",
+    "relay-pump-distance", "draft-lift-max", "vacuum-lift-reading",
+    "tanker-shuttle-flow", "tanker-shuttle-cycle", "tanker-fleet-size",
+    "foam-eductor-limit",
   ]);
   // spec-v82 cap-relief split: the spec-v3 technical-rescue bench moved out
   // of calc-fire.js (it sat at 94.9% of its size cap) into its own module.
