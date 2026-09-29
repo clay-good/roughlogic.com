@@ -413,8 +413,6 @@ export const TOOL_MODULES = (() => {
     // spec-v1677, v1678: the mechanical insulation band.
     "refractory-shell-temperature", "cryogenic-boiloff",
 
-    "grille-neck-nc", "duct-breakout-noise", "silencer-insertion-loss",
-    "mechanical-room-nc", "rooftop-curb-uplift",
     // spec-v1622..v1631: the test-and-balance and hydronic systems band.
     "flow-hood-correction", "fan-system-effect", "proportional-balance-ratio",
     "pump-impeller-trim", "coil-capacity-verification", "valve-actuator-close-off",
@@ -438,6 +436,13 @@ export const TOOL_MODULES = (() => {
     "valve-authority",
     // spec-v623 buffer tank with distribution-loop credit
     "buffer-tank-loop-credit",
+  ]);
+  // spec-v1869 cap-relief split: the HVAC acoustics and rooftop-anchorage
+  // band moved intact from calc-hvacsystems.js. All five tiles keep Group C
+  // and their existing public behavior.
+  declare("./calc-hvacacoustics.js", "HVACACOUSTICS_RENDERERS", [
+    "grille-neck-nc", "duct-breakout-noise", "silencer-insertion-loss",
+    "mechanical-room-nc", "rooftop-curb-uplift",
   ]);
   // spec-v74 cap-relief split: the two spec-v23 velocity tiles relocated out of
   // calc-hvac.js (which had reached 95.9% of cap -- the tightest remaining calc

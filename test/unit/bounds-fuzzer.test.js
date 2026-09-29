@@ -52312,7 +52312,7 @@ import {
   computeSilencerInsertionLoss as _v1634,
   computeMechanicalRoomNc as _v1635,
   computeRooftopCurbUplift as _v1636,
-} from "../../calc-hvacsystems.js";
+} from "../../calc-hvacacoustics.js";
 
 test("bounds: spec-v1632 computeGrilleNeckNc -- the fifth power is what makes it fixable", () => {
   const base = { airflow_cfm: 600, neck_free_area_ft2: 1.0, rated_nc: 34, next_size_free_area_ft2: 1.4, room_nc_target: 30, room_correction_db: 0, damper_at_neck: "yes" };
@@ -55927,7 +55927,7 @@ import { computeWeldCostPerFoot as _neg16 } from "../../calc-fab.js";
 import { computePalletLoadout as _neg17 } from "../../calc-trucking.js";
 import { computeSRTandFM as _neg18 } from "../../calc-water.js";
 import { computeSellerNetSheet as _neg19 } from "../../calc-realestate.js";
-import { computeRooftopCurbUplift as _neg20 } from "../../calc-hvacsystems.js";
+import { computeRooftopCurbUplift as _neg20 } from "../../calc-hvacacoustics.js";
 import { computeBoxFill as _neg21 } from "../../calc-electrical.js";
 
 test("bounds: a negative dimension, count, rate or efficiency is refused instead of returning a negative quantity", () => {

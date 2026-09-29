@@ -1,4 +1,4 @@
-// calc-hvacsystems.js, the TAB and acoustics bench of spec-v1622..v1636, against
+// calc-hvacsystems.js and calc-hvacacoustics.js, the TAB and acoustics benches of spec-v1622..v1636, against
 // references the specs did not write: ASHRAE's duct-breakout and room
 // equations, AMCA 201's effective duct length, the affinity laws, the constants
 // behind 1.08 / 4.5 / 500, and the identities the tiles' notes claim. These 15
@@ -11,9 +11,12 @@ import {
   computeFlowHoodCorrection, computeFanSystemEffect, computeProportionalBalanceRatio,
   computePumpImpellerTrim, computeCoilCapacityVerification, computeValveActuatorCloseOff,
   computeChillerStagingPoint, computeVariablePrimaryBypass, computeLouverFreeArea,
-  computePlenumReturnDrop, computeGrilleNeckNc, computeDuctBreakoutNoise,
-  computeSilencerInsertionLoss, computeMechanicalRoomNc, computeRooftopCurbUplift,
+  computePlenumReturnDrop,
 } from "../../calc-hvacsystems.js";
+import {
+  computeGrilleNeckNc, computeDuctBreakoutNoise, computeSilencerInsertionLoss,
+  computeMechanicalRoomNc, computeRooftopCurbUplift,
+} from "../../calc-hvacacoustics.js";
 
 const within = (got, want, tolPct, label) => {
   const tol = Math.abs(want) * tolPct / 100;

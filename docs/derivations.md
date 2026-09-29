@@ -2565,6 +2565,11 @@ cross-check.
 | calc-hvac.js | `renderSeerEer` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-hvac.js | `renderStaticPressureHvac` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-hvac.js | `renderWetBulbPsychrometer` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
+| calc-hvacacoustics.js | `computeDuctBreakoutNoise` | `{ duct_width_in = 0, duct_height_in = 0, exposed_length_ft = 0, sound_power_d...` | _ | _ | _ |
+| calc-hvacacoustics.js | `computeGrilleNeckNc` | `{ airflow_cfm = 0, neck_free_area_ft2 = 0, rated_nc = 0, next_size_free_area_...` | _ | _ | _ |
+| calc-hvacacoustics.js | `computeMechanicalRoomNc` | `{ source_spl_db = 0, partition_tl_db = 0, partition_area_ft2 = 0, receiving_a...` | _ | _ | _ |
+| calc-hvacacoustics.js | `computeRooftopCurbUplift` | `{ unit_length_ft = 0, unit_width_ft = 0, unit_height_ft = 0, unit_weight_lb =...` | _ | _ | _ |
+| calc-hvacacoustics.js | `computeSilencerInsertionLoss` | `{ airflow_cfm = 0, face_width_in = 0, face_height_in = 0, reference_drop_in_w...` | _ | _ | _ |
 | calc-hvacservice.js | `computeAshrae622Ventilation` | `{ floor_area_ft2 = 0, bedrooms = 0, infil_credit_cfm = 0, system_type = "unba...` | _ | _ | _ |
 | calc-hvacservice.js | `computeBlowerDoorAch50` | `{ cfm50 = 0, volume_ft3 = 0, n_factor = 17, target_ach50 = 3, n_factor_low = ...` | _ | _ | _ |
 | calc-hvacservice.js | `computeChilledWaterDeltaT` | `{ load_btuh = 0, actual_gpm = 0, design_delta_t_f = 0 } = {}` | _ | _ | _ |
@@ -2604,26 +2609,21 @@ cross-check.
 | calc-hvacsystems.js | `computeCoilFaceVelocity` | `{ cfm = 0, face_width_in = 0, face_height_in = 0, threshold_fpm = 500 } = {}` | _ | _ | _ |
 | calc-hvacsystems.js | `computeCompressorShortCycle` | `{ system_type = "single", load_fraction_pct = 50, observed_cph = null, } = {}` | _ | _ | _ |
 | calc-hvacsystems.js | `computeCryogenicBoiloff` | `{ tank_volume_gal = 0, ner_pct_per_day = 0, liquid_density_lb_gal = 0, latent...` | _ | _ | _ |
-| calc-hvacsystems.js | `computeDuctBreakoutNoise` | `{ duct_width_in = 0, duct_height_in = 0, exposed_length_ft = 0, sound_power_d...` | _ | _ | _ |
 | calc-hvacsystems.js | `computeEnvelopeConductionLoad` | `{ area_ft2 = 0, u_factor = 0, cltd_f = 0 } = {}` | _ | _ | _ |
 | calc-hvacsystems.js | `computeFanSystemEffect` | `{ flow_cfm = 0, outlet_width_in = 0, outlet_height_in = 0, straight_duct_ft =...` | _ | _ | _ |
 | calc-hvacsystems.js | `computeFilterPressureDrop` | `{ filter_type = "merv13", face_area_ft2 = 0, face_velocity_fpm = 300, clean_d...` | _ | _ | _ |
 | calc-hvacsystems.js | `computeFlowHoodCorrection` | `{ hood_reading_cfm = 0, correction_factor = 1, reference_traverse_cfm = 0, de...` | _ | _ | _ |
-| calc-hvacsystems.js | `computeGrilleNeckNc` | `{ airflow_cfm = 0, neck_free_area_ft2 = 0, rated_nc = 0, next_size_free_area_...` | _ | _ | _ |
 | calc-hvacsystems.js | `computeHumidifierCapacity` | `{ cfm = 0, supply_db_F = 70, entering_rh_pct = 20, target_rh_pct = 40, altitu...` | _ | _ | _ |
 | calc-hvacsystems.js | `computeHxLmtdNtu` | `{ config = "counterflow", th_in_F = 0, th_out_F = 0, tc_in_F = 0, tc_out_F = ...` | _ | _ | _ |
 | calc-hvacsystems.js | `computeHydronicBufferTank` | `{ min_on_time_min = 0, source_min_btu = 0, zone_min_load_btu = 0, delta_t_f =...` | _ | _ | _ |
 | calc-hvacsystems.js | `computeHydronicInjectionMixing` | `{ secondary_gpm = 10, secondary_supply_f = 110, secondary_return_f = 90, prim...` | _ | _ | _ |
 | calc-hvacsystems.js | `computeInternalHeatGains` | `{ occupants = 0, sens_per_person = 250, lat_per_person = 200, lighting_w = 0,...` | _ | _ | _ |
 | calc-hvacsystems.js | `computeLouverFreeArea` | `{ width_ft = 0, height_ft = 0, free_area_ratio = 0.45, airflow_cfm = 0, water...` | _ | _ | _ |
-| calc-hvacsystems.js | `computeMechanicalRoomNc` | `{ source_spl_db = 0, partition_tl_db = 0, partition_area_ft2 = 0, receiving_a...` | _ | _ | _ |
 | calc-hvacsystems.js | `computeOutdoorResetRatio` | `{ supply_design_f = 180, supply_min_f = 80, oa_design_f = 0, oa_noheat_f = 65...` | _ | _ | _ |
 | calc-hvacsystems.js | `computePlenumReturnDrop` | `{ return_cfm = 0, pinch_width_ft = 0, pinch_clear_in = 0, target_velocity_fpm...` | _ | _ | _ |
 | calc-hvacsystems.js | `computeProportionalBalanceRatio` | `{ design_1_cfm = 0, measured_1_cfm = 0, design_2_cfm = 0, measured_2_cfm = 0,...` | _ | _ | _ |
 | calc-hvacsystems.js | `computePumpImpellerTrim` | `{ current_diameter_in = 0, current_flow_gpm = 0, required_flow_gpm = 0, curre...` | _ | _ | _ |
 | calc-hvacsystems.js | `computeRefractoryShellTemperature` | `{ hot_face_f = 0, ambient_f = 0, film_coeff_btu_hr_ft2_f = 2.0, layer1_thickn...` | _ | _ | _ |
-| calc-hvacsystems.js | `computeRooftopCurbUplift` | `{ unit_length_ft = 0, unit_width_ft = 0, unit_height_ft = 0, unit_weight_lb =...` | _ | _ | _ |
-| calc-hvacsystems.js | `computeSilencerInsertionLoss` | `{ airflow_cfm = 0, face_width_in = 0, face_height_in = 0, reference_drop_in_w...` | _ | _ | _ |
 | calc-hvacsystems.js | `computeValveActuatorCloseOff` | `{ seat_area_in2 = 0, design_differential_psi = 0, minimum_flow_differential_p...` | _ | _ | _ |
 | calc-hvacsystems.js | `computeValveAuthority` | `{ valve_pressure_drop_psi = 5, controlled_circuit_drop_psi = 3 } = {}` | _ | _ | _ |
 | calc-hvacsystems.js | `computeVariablePrimaryBypass` | `{ machine_design_gpm = 0, minimum_flow_fraction = 0.45, machines_running = 1,...` | _ | _ | _ |
