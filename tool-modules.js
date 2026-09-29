@@ -368,14 +368,21 @@ export const TOOL_MODULES = (() => {
     "reynolds-number-pipe", "hydronic-gpm-deltat", "pump-specific-speed", "pump-suction-specific-speed",
     // spec-v329..v331 building-energy batch
     "building-ua", "degree-day-energy", "wall-condensation-gradient",
-    "duct-heat-gain", "grille-face-velocity", "air-density-correction",
-    "adpi-diffuser-selection", "vibration-isolation", "isolator-deflection",
-    "moist-air-enthalpy", "drybulb-from-enthalpy", "cooling-coil-total-load", "coil-bypass-factor",
-    "fan-affinity-laws", "fan-sheave-for-target-cfm", "colebrook-friction-factor", "manual-d-friction-rate",
+    "fan-sheave-for-target-cfm",
     // spec-v441..v443 energy-recovery / hydronic / economizer
     "erv-total-enthalpy-recovery", "radiant-floor-output", "economizer-enthalpy-changeover",
     // spec-v478 hydronic snowmelt sizing (the v199 radiant follow-on).
     "snowmelt-load",
+  ]);
+  // spec-v1870 cap-relief split: the spec-v347..v408 HVAC airside
+  // field-method band moved intact from calc-hvac.js. All 13 tiles keep
+  // Group C and their existing public behavior.
+  declare("./calc-hvacairside.js", "HVACAIRSIDE_RENDERERS", [
+    "duct-heat-gain", "grille-face-velocity", "air-density-correction",
+    "adpi-diffuser-selection", "vibration-isolation", "isolator-deflection",
+    "moist-air-enthalpy", "drybulb-from-enthalpy", "cooling-coil-total-load",
+    "coil-bypass-factor", "fan-affinity-laws", "colebrook-friction-factor",
+    "manual-d-friction-rate",
   ]);
   // spec-v89 cap-relief split: the cohesive refrigerant-circuit bench (the v2
   // refrigerant-pt P-T lookup, superheat-subcool diagnostic, compare-refrigerants,

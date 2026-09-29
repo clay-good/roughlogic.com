@@ -20395,8 +20395,8 @@ test("bounds: spec-v346 computeMaxOffer70Rule pins the offer, the fee, the no-de
 });
 
 // ===================== spec-v347..v349 air-distribution / air-property batch =====================
-import { computeDuctHeatGain as _v347, computeGrilleFaceVelocity as _v348, computeAirDensityCorrection as _v349 } from "../../calc-hvac.js";
-import { computeAdpiSelection as _v482 } from "../../calc-hvac.js";
+import { computeDuctHeatGain as _v347, computeGrilleFaceVelocity as _v348, computeAirDensityCorrection as _v349 } from "../../calc-hvacairside.js";
+import { computeAdpiSelection as _v482 } from "../../calc-hvacairside.js";
 test("bounds: spec-v482 computeAdpiSelection pins the table lookup, the load ceiling, the band flags, and error seams", () => {
   // Pinned example: circular ceiling, 40 Btu/hr-ft^2, T0.25 = 8 ft over L = 10 -> ratio 0.8 = optimum, ADPI 88, in band.
   const a = _v482({ diffuser_type: "circular-ceiling", cooling_load: 40, throw_ft: 8, char_length_ft: 10 });
@@ -20424,7 +20424,7 @@ test("bounds: spec-v482 computeAdpiSelection pins the table lookup, the load cei
   assert.ok("error" in _v482({ diffuser_type: "circular-ceiling", throw_ft: Infinity, char_length_ft: 10 }));
 });
 
-import { computeVibrationIsolation as _v483 } from "../../calc-hvac.js";
+import { computeVibrationIsolation as _v483 } from "../../calc-hvacairside.js";
 test("bounds: spec-v483 computeVibrationIsolation pins fn, transmissibility, efficiency, the sqrt(2) threshold, and error seams", () => {
   // Pinned example: 900 rpm on 1 in deflection -> fn 3.13 Hz, ratio 4.79, T 0.0455, 95.4% efficient.
   const a = _v483({ equipment_rpm: 900, static_deflection_in: 1 });
@@ -21153,7 +21153,7 @@ test("bounds: spec-v374 computeConduitJamRatio pins the jam band, the three-cond
 });
 
 // ===================== spec-v375..v377 psychrometric coil-analysis trio =====================
-import { computeMoistAirEnthalpy as _v375, computeCoolingCoilTotalLoad as _v376, computeCoilBypassFactor as _v377 } from "../../calc-hvac.js";
+import { computeMoistAirEnthalpy as _v375, computeCoolingCoilTotalLoad as _v376, computeCoilBypassFactor as _v377 } from "../../calc-hvacairside.js";
 
 test("bounds: spec-v375 computeMoistAirEnthalpy pins h = 0.240 t + W(1061 + 0.444 t), the dry-air floor, and error seams", () => {
   const r = _v375({ t_db_f: 80, w_lb_lb: 0.0112 });
@@ -21174,7 +21174,7 @@ test("bounds: spec-v375 computeMoistAirEnthalpy pins h = 0.240 t + W(1061 + 0.44
   assert.ok("error" in _v375({ t_db_f: 80, w_lb_lb: NaN }));
 });
 
-import { computeDrybulbFromEnthalpy as _v663 } from "../../calc-hvac.js";
+import { computeDrybulbFromEnthalpy as _v663 } from "../../calc-hvacairside.js";
 
 test("bounds: spec-v663 computeDrybulbFromEnthalpy inverts the moist-air enthalpy for the dry-bulb, round-trips it, handles dry air, and pins error seams", () => {
   const r = _v663({ enthalpy_btu: 31.48, w_lb_lb: 0.0112 });
@@ -21438,7 +21438,7 @@ test("bounds: spec-v383 computeSeismicPdeltaStability pins theta, theta_max, all
 });
 
 // ===================== spec-v384..v386 HVAC airflow field-methods trio (3 modules) =====================
-import { computeFanAffinityLaws as _v384 } from "../../calc-hvac.js";
+import { computeFanAffinityLaws as _v384 } from "../../calc-hvacairside.js";
 import { computePitotTraverseCfm as _v385 } from "../../calc-velocity.js";
 import { computeDpFlowMeter as _v1267 } from "../../calc-velocity.js";
 import { computeOutsideAirPercentTemps as _v386 } from "../../calc-hvacservice.js";
@@ -21548,7 +21548,7 @@ test("bounds: spec-v386 computeOutsideAirPercentTemps pins the balance, the band
 });
 
 // ===================== spec-v387..v389 water-system hydraulics trio (3 modules) =====================
-import { computeColebrookFrictionFactor as _v387 } from "../../calc-hvac.js";
+import { computeColebrookFrictionFactor as _v387 } from "../../calc-hvacairside.js";
 import { computeThrustBlockSizing as _v388 } from "../../calc-plumbing.js";
 import { computeHydrantAvailableFlow as _v389 } from "../../calc-firewater.js";
 
@@ -22710,7 +22710,7 @@ test("bounds: spec-v657 computeConductivityFromTds inverts the TDS estimate, rou
 });
 
 // ===================== spec-v408..v410 HVAC duct-design trio (2 modules) =====================
-import { computeManualDFrictionRate as _v408 } from "../../calc-hvac.js";
+import { computeManualDFrictionRate as _v408 } from "../../calc-hvacairside.js";
 import { computeCoilFaceVelocity as _v409, computeVavBoxAirflow as _v410, computeCoilFaceArea as _v701 } from "../../calc-hvacsystems.js";
 
 test("bounds: spec-v408 computeManualDFrictionRate pins ASP/FR, the unworkable case, and error seams", () => {
@@ -28334,7 +28334,7 @@ test("bounds: spec-v637 computeSpecificEnergy pins the specific energy, critical
   assert.ok("error" in _v637({ b_ft: Infinity, q_cfs: 100, y_ft: 3 }));
 });
 
-import { computeIsolatorDeflection as _v633, computeVibrationIsolation as _v633fwd } from "../../calc-hvac.js";
+import { computeIsolatorDeflection as _v633, computeVibrationIsolation as _v633fwd } from "../../calc-hvacairside.js";
 
 test("bounds: spec-v633 computeIsolatorDeflection pins the required deflection, the exact round-trip through the forward tile, the ratio > sqrt(2) property, and error seams", () => {
   const r = _v633({ equipment_rpm: 900, target_efficiency: 90 });
@@ -33080,7 +33080,7 @@ test("bounds: spec-v1104 computeSwingFallGeometry pins the exact 30-degree case,
 });
 
 import { computeFanSheaveForTargetCfm as _v1105 } from "../../calc-hvac.js";
-import { computeFanAffinityLaws as _v1105sib } from "../../calc-hvac.js";
+import { computeFanAffinityLaws as _v1105sib } from "../../calc-hvacairside.js";
 
 test("bounds: spec-v1105 computeFanSheaveForTargetCfm pins the motor-overload example, the belt-drive round trip, exact agreement with the affinity-laws sibling, the cube law both directions, and error seams", () => {
   const base = { current_cfm: 8000, target_cfm: 9600, current_fan_rpm: 700, motor_rpm: 1750, drive_sheave_in: 4.0, current_bhp: 3.0, motor_hp: 5, current_sp_inwg: 1.5 };
@@ -56036,7 +56036,7 @@ test("bounds: batch-36 refrigeration fixes -- already-frozen product, colder-tha
 
 import { computePitotTraverseAverage as _b37pit } from "../../calc-velocity.js";
 import { computeLightingLightLossFactor as _b37llf } from "../../calc-elecdesign.js";
-import { computeGrilleFaceVelocity as _b37gfv } from "../../calc-hvac.js";
+import { computeGrilleFaceVelocity as _b37gfv } from "../../calc-hvacairside.js";
 import { computeFoundationWaterproofingTakeoff as _b37fwt, computeReadyMixConcreteOrder as _b37rmc } from "../../calc-construction.js";
 import { computeWeldPassesArcTime as _b37wpa } from "../../calc-fab.js";
 test("bounds: batch-37 fixes -- pitot zero point, BF above 1, grille bands, dampproofing coats, weld and ready-mix guards", () => {
@@ -56114,7 +56114,7 @@ test("bounds: every efficiency-percent input refuses a fraction (0.85 for 85%)",
 import { computeCapacitorDischargeTime as _b40cap, computeEconomicConductorSizing as _b40ecs } from "../../calc-electrical.js";
 import { computePvCellTemperaturePower as _b40pvc, computePvMaxAmbientForPower as _b40pvm } from "../../calc-solar.js";
 import { computePoolHeaterBtu as _b40pool } from "../../calc-treatment.js";
-import { computeDuctHeatGain as _b40duct } from "../../calc-hvac.js";
+import { computeDuctHeatGain as _b40duct } from "../../calc-hvacairside.js";
 import { computeWaterlineForHullSpeed as _b40wl } from "../../calc-mechanic.js";
 import { computeDriverPayCpmVsPercentage as _b40drv } from "../../calc-trucking.js";
 test("bounds: batch-40 fixes -- NEC limit from the rated voltage, gamma sign and units, pool efficiency, duct linear limit, guards", () => {

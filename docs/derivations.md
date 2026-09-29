@@ -2469,9 +2469,7 @@ cross-check.
 | calc-historical.js | `computePercentileBands` | `{ points = [], lookback_months = 12 } = {}` | _ | _ | _ |
 | calc-historical.js | `quantile` | `values, p` | _ | _ | _ |
 | calc-hvac.js | `bandLabel` | `value, low, high` | _ | _ | _ |
-| calc-hvac.js | `computeAdpiSelection` | `{ diffuser_type = "circular-ceiling", cooling_load = 40, throw_ft = 0, char_l...` | _ | _ | _ |
 | calc-hvac.js | `computeAffinityLaws` | `{ baseline_RPM = 0, baseline_CFM = 0, baseline_SP_in_wc = 0, baseline_kW = 0,...` | _ | _ | _ |
-| calc-hvac.js | `computeAirDensityCorrection` | `{ elev_ft = 0, T_F = 70, acfm = 0, rated_sp = 0 } = {}` | _ | _ | _ |
 | calc-hvac.js | `computeAirLeakCost` | `{ compressor_cfm = 0, load_min = 0, unload_min = 0, specific_power = 22, run_...` | _ | _ | _ |
 | calc-hvac.js | `computeAirPressureSetpointSavings` | `{ current_psig = 0, reduced_psig = 0, inlet_psia = 14.7, input_kw = 0, run_ho...` | _ | _ | _ |
 | calc-hvac.js | `computeAirReceiver` | `{ tools = [], pump_scfm = 0, p_high_psi = 0, p_low_psi = 0, drawdown_minutes ...` | _ | _ | _ |
@@ -2484,20 +2482,15 @@ cross-check.
 | calc-hvac.js | `computeBlownInsulationCoverage` | `{ area_sqft = 0, bags_per_1000 = 0, r_per_inch = 3.5, target_r = 0 } = {}` | _ | _ | _ |
 | calc-hvac.js | `computeBuildingUa` | `{ assemblies, cfm_inf = 0, dt_f = 0 } = {}` | _ | _ | _ |
 | calc-hvac.js | `computeCfmPerTon` | `{ tons, climate = "standard" }` | _ | _ | _ |
-| calc-hvac.js | `computeCoilBypassFactor` | `{ t_ent_f = 0, t_lvg_f = 0, t_adp_f = 0 } = {}` | _ | _ | _ |
-| calc-hvac.js | `computeColebrookFrictionFactor` | `{ reynolds = 0, rel_roughness = 0 } = {}` | _ | _ | _ |
 | calc-hvac.js | `computeCombustionAir` | `{ btu_input, room_volume_ft3 }` | _ | _ | _ |
 | calc-hvac.js | `computeCombustionAirMaxInput` | `{ room_volume_ft3 } = {}` | _ | _ | _ |
 | calc-hvac.js | `computeCompressedAirPower` | `{ free_air_cfm = 0, inlet_psia = 14.7, discharge_psig = 0, overall_eff = 0.75...` | _ | _ | _ |
 | calc-hvac.js | `computeCompressedAirPressureDrop` | `{ scfm = 0, pipe_id_in = 0, length_ft = 0, line_pressure_psig = 100, air_temp...` | _ | _ | _ |
-| calc-hvac.js | `computeCoolingCoilTotalLoad` | `{ cfm = 0, h_ent_btu = 0, h_lvg_btu = 0 } = {}` | _ | _ | _ |
 | calc-hvac.js | `computeCoolingTower` | `{ T_in_F = 0, T_out_F = 0, T_wb_F = 0, gpm = 0, fan_kW = 0 } = {}` | _ | _ | _ |
 | calc-hvac.js | `computeDcvCo2Ventilation` | `{ n = 0, co2_set_ppm = 0, co2_oa_ppm = 400, gen_cfm = 0.0106 } = {}` | _ | _ | _ |
 | calc-hvac.js | `computeDegreeDayEnergy` | `{ ua_btuhf = 0, hdd = 0, eff, fuel = "gas", price = 0 } = {}` | _ | _ | _ |
-| calc-hvac.js | `computeDrybulbFromEnthalpy` | `{ enthalpy_btu = 0, w_lb_lb = 0 } = {}` | _ | _ | _ |
 | calc-hvac.js | `computeDualFuelBalancePoint` | `{ rate_kwh = 0, rate_therm = 0, afue = 0.95, cop_now = 0 } = {}` | _ | _ | _ |
 | calc-hvac.js | `computeDuctFrictionStatic` | `{ shape = "round", D_in = 0, W_in = 0, H_in = 0, material = "galv_smooth", cf...` | _ | _ | _ |
-| calc-hvac.js | `computeDuctHeatGain` | `{ R_duct = 0, A_ft2 = 0, dT_F = 0, cfm = 0 } = {}` | _ | _ | _ |
 | calc-hvac.js | `computeDuctLeakage` | `{ design_cfm = 0, measured_cfm = 0, duct_surface_ft2 = 0, test_pressure_inwc ...` | _ | _ | _ |
 | calc-hvac.js | `computeDuctSize` | `{ cfm, friction_in_wc_per_100ft = 0.08, roughness_ft = DUCT_ROUGHNESS_FT }` | _ | _ | _ |
 | calc-hvac.js | `computeEconomicInsulationThickness` | `{ delta_t_f = 0, bare_r_value = 0.5, k_btu_in = 0.27, operating_hours = 8000,...` | _ | _ | _ |
@@ -2508,14 +2501,12 @@ cross-check.
 | calc-hvac.js | `computeErvTotalEnthalpyRecovery` | `{ cfm = 0, effectiveness = 0, h_outdoor = 0, h_return = 0 } = {}` | _ | _ | _ |
 | calc-hvac.js | `computeEvaporativeCoolerEffectiveness` | `{ dry_bulb_F, wet_bulb_F, effectiveness = 0.85 } = {}` | _ | _ | _ |
 | calc-hvac.js | `computeEvaporativeCooling` | `{ evaporation_rate_lb_hr, hfg_btu_per_lb = HFG_WATER_BTU_PER_LB }` | _ | _ | _ |
-| calc-hvac.js | `computeFanAffinityLaws` | `{ q1_cfm = 0, sp1_inwg = 0, bhp1_hp = 0, n1 = 0, n2 = 0 } = {}` | _ | _ | _ |
 | calc-hvac.js | `computeFanMotorBhp` | `{ cfm = 0, tsp_inwc = 0, eta_fan = 0.65, eta_drive = 1 } = {}` | _ | _ | _ |
 | calc-hvac.js | `computeFanMotorMaxAirflow` | `{ power_hp = 0, power_basis = "motor", tsp_inwc = 0, eta_fan = 0.65, eta_driv...` | _ | _ | _ |
 | calc-hvac.js | `computeFanSheaveForTargetCfm` | `{ current_cfm = 0, target_cfm = 0, current_fan_rpm = 0, motor_rpm = 1750, dri...` | _ | _ | _ |
 | calc-hvac.js | `computeFixedOrificeTargetSuperheat` | `{ indoor_wetbulb_f = 0, outdoor_drybulb_f = 0 } = {}` | _ | _ | _ |
 | calc-hvac.js | `computeFlatOvalDuct` | `{ major_axis_in = 0, minor_axis_in = 0 } = {}` | _ | _ | _ |
 | calc-hvac.js | `computeGeothermalLoop` | `{ heating_btu = 0, cooling_btu = 0, soil = "clay", loop_type = "vertical" }` | _ | _ | _ |
-| calc-hvac.js | `computeGrilleFaceVelocity` | `{ mode = "velocity", cfm = 0, ratio = 0.75, A_gross_ft2 = 0, V_target = 0 } = {}` | _ | _ | _ |
 | calc-hvac.js | `computeHeatPumpColdCapacity` | `{ cap_47_btuh = 0, cap_17_btuh = 0, design_temp_f = 0, design_load_btuh = 0 }...` | _ | _ | _ |
 | calc-hvac.js | `computeHeatPumpSeasonalEnergy` | `{ seasonal_load_mmbtu = 0, hspf = 0, rate_kwh = 0, afue = 0.95, rate_therm = ...` | _ | _ | _ |
 | calc-hvac.js | `computeHoodExhaust` | `{ hood_type = "wall-canopy", hood_class = "I", duty = "medium", length_ft = 0...` | _ | _ | _ |
@@ -2524,9 +2515,6 @@ cross-check.
 | calc-hvac.js | `computeInsulationHeatLoss` | `{ pipe_OD_in = 0, surface_T_F = 0, ambient_T_F = 0, air_velocity_fpm = 0, ins...` | _ | _ | _ |
 | calc-hvac.js | `computeInsulationThickness` | `{ pipe_od_in, surface_temp_F, ambient_F, surface_limit_F, k_btu_in_per_hr_ft2...` | _ | _ | _ |
 | calc-hvac.js | `computeInsulationThicknessForHeatLoss` | `{ od_in = 0, k_value = 0, hot_f = 0, amb_f = 0, target_q_per_ft_btuh = 0 } = {}` | _ | _ | _ |
-| calc-hvac.js | `computeIsolatorDeflection` | `{ equipment_rpm = 0, target_efficiency = 0 } = {}` | _ | _ | _ |
-| calc-hvac.js | `computeManualDFrictionRate` | `{ blower_esp_inwg = 0, component_drop_inwg = 0, tel_ft = 0 } = {}` | _ | _ | _ |
-| calc-hvac.js | `computeMoistAirEnthalpy` | `{ t_db_f = 0, w_lb_lb = 0 } = {}` | _ | _ | _ |
 | calc-hvac.js | `computeMuaTemperingLoad` | `{ cfm = 0, t_oa_F = 0, t_target_F = 0, eta = 0.80, w_oa_gr = 0, w_target_gr =...` | _ | _ | _ |
 | calc-hvac.js | `computeNPSHa` | `{ elevation_ft = 0, water_temp_F = 60, source_elevation_relative_ft = 0, // p...` | _ | _ | _ |
 | calc-hvac.js | `computeOutdoorAirMix` | `{ return_T_F, return_RH_percent, outdoor_T_F, outdoor_RH_percent, oa_fraction }` | _ | _ | _ |
@@ -2543,7 +2531,6 @@ cross-check.
 | calc-hvac.js | `computeSeerEer` | `{ value, from, cooling_load_btu_hr = 0, annual_hours = 0, electricity_rate = 0 }` | _ | _ | _ |
 | calc-hvac.js | `computeSnowmeltLoad` | `{ s_inhr = 0, t_air_f = 0, wind_mph = 0, rh_pct = 0, ar = 0.5, area_ft2 = 0, ...` | _ | _ | _ |
 | calc-hvac.js | `computeStaticPressureHvac` | `{ elements }` | _ | _ | _ |
-| calc-hvac.js | `computeVibrationIsolation` | `{ equipment_rpm = 0, static_deflection_in = 0 } = {}` | _ | _ | _ |
 | calc-hvac.js | `computeWallCondensationGradient` | `{ r_inside = 0, r_outside = 0, t_in_f = 0, t_out_f = 0, rh_in_pct = 0 } = {}` | _ | _ | _ |
 | calc-hvac.js | `computeWetBulbPsychrometer` | `{ dry_bulb_F, wet_bulb_F, P_hPa = 1013.25 }` | _ | _ | _ |
 | calc-hvac.js | `manualJCooling` | `{ floor_area_ft2, wall_area_ft2, window_area_ft2, ceiling_area_ft2, insulatio...` | _ | _ | _ |
@@ -2570,6 +2557,19 @@ cross-check.
 | calc-hvacacoustics.js | `computeMechanicalRoomNc` | `{ source_spl_db = 0, partition_tl_db = 0, partition_area_ft2 = 0, receiving_a...` | _ | _ | _ |
 | calc-hvacacoustics.js | `computeRooftopCurbUplift` | `{ unit_length_ft = 0, unit_width_ft = 0, unit_height_ft = 0, unit_weight_lb =...` | _ | _ | _ |
 | calc-hvacacoustics.js | `computeSilencerInsertionLoss` | `{ airflow_cfm = 0, face_width_in = 0, face_height_in = 0, reference_drop_in_w...` | _ | _ | _ |
+| calc-hvacairside.js | `computeAdpiSelection` | `{ diffuser_type = "circular-ceiling", cooling_load = 40, throw_ft = 0, char_l...` | _ | _ | _ |
+| calc-hvacairside.js | `computeAirDensityCorrection` | `{ elev_ft = 0, T_F = 70, acfm = 0, rated_sp = 0 } = {}` | _ | _ | _ |
+| calc-hvacairside.js | `computeCoilBypassFactor` | `{ t_ent_f = 0, t_lvg_f = 0, t_adp_f = 0 } = {}` | _ | _ | _ |
+| calc-hvacairside.js | `computeColebrookFrictionFactor` | `{ reynolds = 0, rel_roughness = 0 } = {}` | _ | _ | _ |
+| calc-hvacairside.js | `computeCoolingCoilTotalLoad` | `{ cfm = 0, h_ent_btu = 0, h_lvg_btu = 0 } = {}` | _ | _ | _ |
+| calc-hvacairside.js | `computeDrybulbFromEnthalpy` | `{ enthalpy_btu = 0, w_lb_lb = 0 } = {}` | _ | _ | _ |
+| calc-hvacairside.js | `computeDuctHeatGain` | `{ R_duct = 0, A_ft2 = 0, dT_F = 0, cfm = 0 } = {}` | _ | _ | _ |
+| calc-hvacairside.js | `computeFanAffinityLaws` | `{ q1_cfm = 0, sp1_inwg = 0, bhp1_hp = 0, n1 = 0, n2 = 0 } = {}` | _ | _ | _ |
+| calc-hvacairside.js | `computeGrilleFaceVelocity` | `{ mode = "velocity", cfm = 0, ratio = 0.75, A_gross_ft2 = 0, V_target = 0 } = {}` | _ | _ | _ |
+| calc-hvacairside.js | `computeIsolatorDeflection` | `{ equipment_rpm = 0, target_efficiency = 0 } = {}` | _ | _ | _ |
+| calc-hvacairside.js | `computeManualDFrictionRate` | `{ blower_esp_inwg = 0, component_drop_inwg = 0, tel_ft = 0 } = {}` | _ | _ | _ |
+| calc-hvacairside.js | `computeMoistAirEnthalpy` | `{ t_db_f = 0, w_lb_lb = 0 } = {}` | _ | _ | _ |
+| calc-hvacairside.js | `computeVibrationIsolation` | `{ equipment_rpm = 0, static_deflection_in = 0 } = {}` | _ | _ | _ |
 | calc-hvacservice.js | `computeAshrae622Ventilation` | `{ floor_area_ft2 = 0, bedrooms = 0, infil_credit_cfm = 0, system_type = "unba...` | _ | _ | _ |
 | calc-hvacservice.js | `computeBlowerDoorAch50` | `{ cfm50 = 0, volume_ft3 = 0, n_factor = 17, target_ach50 = 3, n_factor_low = ...` | _ | _ | _ |
 | calc-hvacservice.js | `computeChilledWaterDeltaT` | `{ load_btuh = 0, actual_gpm = 0, design_delta_t_f = 0 } = {}` | _ | _ | _ |

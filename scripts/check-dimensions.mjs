@@ -263,9 +263,9 @@ const UNIT_TAIL_EXEMPT = new Set([
   "calc-treatment.js:computePoolHeaterSize:required_output_btu",
   // BTU per POUND of dry air: the specific enthalpy of the psychrometric chart,
   // which the sibling `h1_btulb` spells out in full.
-  "calc-hvac.js:computeDrybulbFromEnthalpy:enthalpy_btu",
-  "calc-hvac.js:computeCoolingCoilTotalLoad:h_ent_btu",
-  "calc-hvac.js:computeCoolingCoilTotalLoad:h_lvg_btu",
+  "calc-hvacairside.js:computeDrybulbFromEnthalpy:enthalpy_btu",
+  "calc-hvacairside.js:computeCoolingCoilTotalLoad:h_ent_btu",
+  "calc-hvacairside.js:computeCoolingCoilTotalLoad:h_lvg_btu",
   // BTU per hour per foot per degree -- a thermal CONDUCTIVITY whose name stops
   // at the BTU. It multiplies a depth and divides a degree-day product.
   "calc-geotech.js:computeFrostDepthBerggren:frozen_conductivity_btu",
