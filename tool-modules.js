@@ -1742,6 +1742,9 @@ export const TOOL_MODULES = (() => {
   
     // v20
     "declining-balance-depreciation", "sum-of-years-digits-depreciation", "future-value-of-annuity", "effective-annual-rate", "markup-vs-margin", "employer-payroll-tax",
+  ]);
+  // spec-v1877 Group R contractor-finance cap-relief split.
+  declare("./calc-contractorfinance.js", "CONTRACTOR_FINANCE_RENDERERS", [
     "labor-burden-rate", "equipment-hourly-rate", "overhead-recovery-rate",
     "wip-percent-complete", "change-order-markup", "retainage-tracker",
     "surety-bond-premium", "workers-comp-emr-premium", "prevailing-wage-fringe",

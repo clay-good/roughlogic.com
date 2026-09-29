@@ -20,6 +20,7 @@ import {
   ACCOUNTING_RENDERERS,
 } from "../../calc-accounting.js";
 import { OPERATIONS_FINANCE_RENDERERS } from "../../calc-operations-finance.js";
+import { CONTRACTOR_FINANCE_RENDERERS } from "../../calc-contractorfinance.js";
 
 const close = (a, b, tol = 0.01) => Math.abs(a - b) <= tol;
 
@@ -232,7 +233,7 @@ test("HomeOffice: non-positive areas are rejected", () => { assert.ok("error" in
 // Renderer registry
 test("the split accounting renderer registries expose all 31 utilities", () => {
   const ids = Object.keys(ACCOUNTING_RENDERERS);
-  assert.equal(ids.length, 28);
+  assert.equal(ids.length, 19);
   for (const id of [
     "straight-line-depreciation", "macrs-depreciation", "section-179",
     "sum-of-years-digits-depreciation", "future-value-of-annuity", "effective-annual-rate",
@@ -240,9 +241,14 @@ test("the split accounting renderer registries expose all 31 utilities", () => {
     "loan-amortization", "breakeven", "sales-tax-compound",
     "inventory-turnover", "cash-conversion-cycle", "mileage-rollup",
     "home-office",
-    "wip-percent-complete", "change-order-markup", "retainage-tracker",
-    "surety-bond-premium", "workers-comp-emr-premium", "prevailing-wage-fringe",
   ]) assert.ok(typeof ACCOUNTING_RENDERERS[id] === "function", id);
+  const contractorIds = Object.keys(CONTRACTOR_FINANCE_RENDERERS);
+  assert.deepEqual(contractorIds.sort(), [
+    "change-order-markup", "equipment-hourly-rate", "labor-burden-rate",
+    "overhead-recovery-rate", "prevailing-wage-fringe", "retainage-tracker",
+    "surety-bond-premium", "wip-percent-complete", "workers-comp-emr-premium",
+  ]);
+  for (const id of contractorIds) assert.equal(typeof CONTRACTOR_FINANCE_RENDERERS[id], "function", id);
   const operationsIds = Object.keys(OPERATIONS_FINANCE_RENDERERS);
   assert.deepEqual(operationsIds.sort(), ["eoq-order-quantity", "reorder-point", "units-of-production-depr"]);
   for (const id of operationsIds) assert.equal(typeof OPERATIONS_FINANCE_RENDERERS[id], "function", id);

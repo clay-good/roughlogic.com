@@ -1418,31 +1418,22 @@ cross-check.
 | calc-accounting.js | `computeAmortization` | `{ principal = 0, annual_rate_pct = 0, term_months = 0, extra_principal = 0, f...` | _ | _ | _ |
 | calc-accounting.js | `computeBreakeven` | `{ fixed_costs = 0, variable_cost_per_unit = 0, sale_price_per_unit = 0, targe...` | _ | _ | _ |
 | calc-accounting.js | `computeCashConversionCycle` | `{ dso = 0, dio = 0, dpo = 0 }` | _ | _ | _ |
-| calc-accounting.js | `computeChangeOrderMarkup` | `{ direct_cost_usd = 0, overhead_pct = 10, profit_pct = 10, current_contract_u...` | _ | _ | _ |
 | calc-accounting.js | `computeDecliningBalanceDepreciation` | `{ cost = 0, salvage = 0, life_yr = 0, factor = 2, year = 1, sl_switch = true ...` | _ | _ | _ |
 | calc-accounting.js | `computeEffectiveAnnualRate` | `{ apr_pct = 0, compounding = "monthly" } = {}` | _ | _ | _ |
 | calc-accounting.js | `computeEmployerPayrollTax` | `{ wages = 0, ss_base = 0, futa_base = 7000, futa_rate_pct = 0.6, suta_rate_pc...` | _ | _ | _ |
-| calc-accounting.js | `computeEquipmentHourlyRate` | `{ purchase = 0, salvage = 0, life_hr = 0, annual_hr = 0, iit_pct = 0, fuel_gp...` | _ | _ | _ |
 | calc-accounting.js | `computeEstimatedTax` | `{ projected_current_tax = 0, prior_year_tax = 0, current_withholding = 0, pri...` | _ | _ | _ |
 | calc-accounting.js | `computeFutureValueOfAnnuity` | `{ payment = 0, rate_pct = 0, periods = 0, timing = "ordinary" } = {}` | _ | _ | _ |
 | calc-accounting.js | `computeHomeOffice` | `{ office_ft2 = 0, home_ft2 = 0, total_home_expenses = 0, } = {}` | _ | _ | _ |
 | calc-accounting.js | `computeInventoryTurnover` | `{ cogs = 0, beginning_inventory = 0, ending_inventory = 0, period_days = 365,...` | _ | _ | _ |
-| calc-accounting.js | `computeLaborBurdenRate` | `{ wage = 0, payroll_pct = 9.15, wc_pct = 0, liab_pct = 0, benefits = 0, produ...` | _ | _ | _ |
 | calc-accounting.js | `computeMacrs` | `{ cost = 0, class_life = 5, convention = "half_year", year_of_interest = 1 }` | _ | _ | _ |
 | calc-accounting.js | `computeMarkupVsMargin` | `{ cost = 0, price = 0, markup_pct = 0, margin_pct = 0, units = 0 } = {}` | _ | _ | _ |
 | calc-accounting.js | `computeMileageRollup` | `{ trips = [], tax_year = 2025 }` | _ | _ | _ |
-| calc-accounting.js | `computeOverheadRecoveryRate` | `{ annual_overhead = 0, basis = "per-hour", billable_hours = 0, annual_direct ...` | _ | _ | _ |
 | calc-accounting.js | `computePayrollWithholding` | `{ gross_per_period = 0, pay_frequency = "biweekly", filing_status = "single",...` | _ | _ | _ |
-| calc-accounting.js | `computePrevailingWageFringe` | `{ base_wage_hr = 0, fringe_hr = 0, payroll_tax = 0 } = {}` | _ | _ | _ |
-| calc-accounting.js | `computeRetainageTracker` | `{ work_this_period_usd = 0, retainage_pct = 10, prior_retained_usd = 0 } = {}` | _ | _ | _ |
 | calc-accounting.js | `computeSETax` | `{ net_se_earnings = 0, w2_ss_wages = 0, w2_medicare_wages = null, tax_year = ...` | _ | _ | _ |
 | calc-accounting.js | `computeSalesTaxCompound` | `{ pre_tax = 0, post_tax = 0, rate1_pct = 0, rate2_pct = 0, }` | _ | _ | _ |
 | calc-accounting.js | `computeSection179` | `{ cost = 0, business_use_pct = 100, taxable_income = 0, tax_year = 2025, bonu...` | _ | _ | _ |
 | calc-accounting.js | `computeStraightLine` | `{ cost = 0, salvage = 0, life_years = 0, year_of_interest = 1 }` | _ | _ | _ |
 | calc-accounting.js | `computeSumOfYearsDigitsDepreciation` | `{ cost = 0, salvage = 0, life_yr = 0, year = 1 } = {}` | _ | _ | _ |
-| calc-accounting.js | `computeSuretyBondPremium` | `{ contract_usd = 0, rate1_per_k = 25, rate2_per_k = 15, rate3_per_k = 10 } = {}` | _ | _ | _ |
-| calc-accounting.js | `computeWipPercentComplete` | `{ contract_usd = 0, cost_to_date_usd = 0, est_total_cost_usd = 0, billed_to_d...` | _ | _ | _ |
-| calc-accounting.js | `computeWorkersCompEmrPremium` | `{ payroll_usd = 0, class_rate = 0, emr = 1.0 } = {}` | _ | _ | _ |
 | calc-agriculture.js | `computeBulkDensity` | `{ dry_mass_g = 0, core_volume_cc = 0, particle_density_pcc = 2.65, texture = ...` | _ | _ | _ |
 | calc-agriculture.js | `computeBunkerSiloCapacity` | `{ bottom_width_ft = 0, top_width_ft = 0, average_depth_ft = 0, length_ft = 0,...` | _ | _ | _ |
 | calc-agriculture.js | `computeCropYield` | `{ crop = "corn", rows_per_pass = 1, row_spacing_in, measured_length_ft = 0, w...` | _ | _ | _ |
@@ -1874,6 +1865,15 @@ cross-check.
 | calc-containment.js | `computeLabContainmentPressure` | `{ room_volume_ft3 = 0, required_ach = 0, hood_exhaust_cfm = 0, general_exhaus...` | _ | _ | _ |
 | calc-containment.js | `computeRadonFanStatic` | `{ flow_cfm = 0, pipe_diameter_in = 4, pipe_length_ft = 0, fan_static_in_wc = ...` | _ | _ | _ |
 | calc-containment.js | `computeSubSlabSuctionField` | `{ slab_area_ft2 = 0, reaches_ft = 0, fails_ft = 0, slab_length_ft = 0, slab_w...` | _ | _ | _ |
+| calc-contractorfinance.js | `computeChangeOrderMarkup` | `{ direct_cost_usd = 0, overhead_pct = 10, profit_pct = 10, current_contract_u...` | _ | _ | _ |
+| calc-contractorfinance.js | `computeEquipmentHourlyRate` | `{ purchase = 0, salvage = 0, life_hr = 0, annual_hr = 0, iit_pct = 0, fuel_gp...` | _ | _ | _ |
+| calc-contractorfinance.js | `computeLaborBurdenRate` | `{ wage = 0, payroll_pct = 9.15, wc_pct = 0, liab_pct = 0, benefits = 0, produ...` | _ | _ | _ |
+| calc-contractorfinance.js | `computeOverheadRecoveryRate` | `{ annual_overhead = 0, basis = "per-hour", billable_hours = 0, annual_direct ...` | _ | _ | _ |
+| calc-contractorfinance.js | `computePrevailingWageFringe` | `{ base_wage_hr = 0, fringe_hr = 0, payroll_tax = 0 } = {}` | _ | _ | _ |
+| calc-contractorfinance.js | `computeRetainageTracker` | `{ work_this_period_usd = 0, retainage_pct = 10, prior_retained_usd = 0 } = {}` | _ | _ | _ |
+| calc-contractorfinance.js | `computeSuretyBondPremium` | `{ contract_usd = 0, rate1_per_k = 25, rate2_per_k = 15, rate3_per_k = 10 } = {}` | _ | _ | _ |
+| calc-contractorfinance.js | `computeWipPercentComplete` | `{ contract_usd = 0, cost_to_date_usd = 0, est_total_cost_usd = 0, billed_to_d...` | _ | _ | _ |
+| calc-contractorfinance.js | `computeWorkersCompEmrPremium` | `{ payroll_usd = 0, class_rate = 0, emr = 1.0 } = {}` | _ | _ | _ |
 | calc-controls.js | `computeDamperActuatorTorque` | `{ damper_width_in = 0, damper_height_in = 0, torque_factor_in_lb_ft2 = 5, sea...` | _ | _ | _ |
 | calc-controls.js | `computeDeadbandCyclingRate` | `{ capacitance_btu_f = 0, ua_btu_hr_f = 0, setpoint_f = 70, outdoor_f = 30, ca...` | _ | _ | _ |
 | calc-controls.js | `computeLoopErrorStackup` | `{ span_eng = 0, element_err_eng = 0, transmitter_err_pct_span = 0, input_err_...` | _ | _ | _ |

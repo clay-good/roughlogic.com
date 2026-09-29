@@ -20908,7 +20908,7 @@ test("bounds: spec-v668 computeHoopStressMawp pins P_max = 2 t S/D, the longitud
 });
 
 // ===================== spec-v362..v364 contractor cost-recovery batch =====================
-import { computeLaborBurdenRate as _v362, computeEquipmentHourlyRate as _v363, computeOverheadRecoveryRate as _v364 } from "../../calc-accounting.js";
+import { computeLaborBurdenRate as _v362, computeEquipmentHourlyRate as _v363, computeOverheadRecoveryRate as _v364 } from "../../calc-contractorfinance.js";
 
 test("bounds: spec-v362 computeLaborBurdenRate pins the burden build-up, the productivity divisor, and error seams", () => {
   const r = _v362({ wage: 25, payroll_pct: 9.15, wc_pct: 8, liab_pct: 2, benefits: 4, productivity: 85 });
@@ -21630,7 +21630,7 @@ test("bounds: spec-v389 computeHydrantAvailableFlow pins QR, the color class, an
 });
 
 // ===================== spec-v390..v392 contractor-billing trio (calc-accounting.js) =====================
-import { computeWipPercentComplete as _v390, computeChangeOrderMarkup as _v391, computeRetainageTracker as _v392 } from "../../calc-accounting.js";
+import { computeWipPercentComplete as _v390, computeChangeOrderMarkup as _v391, computeRetainageTracker as _v392 } from "../../calc-contractorfinance.js";
 
 test("bounds: spec-v390 computeWipPercentComplete pins percent complete, over/under, the overrun cap, and error seams", () => {
   const r = _v390({ contract_usd: 500000, cost_to_date_usd: 300000, est_total_cost_usd: 400000, billed_to_date_usd: 350000 });
@@ -21684,7 +21684,7 @@ test("bounds: spec-v392 computeRetainageTracker pins retention, net, cumulative,
 });
 
 // ===================== spec-v444..v446 contractor-cost trio =====================
-import { computeSuretyBondPremium as _v444, computeWorkersCompEmrPremium as _v445, computePrevailingWageFringe as _v446 } from "../../calc-accounting.js";
+import { computeSuretyBondPremium as _v444, computeWorkersCompEmrPremium as _v445, computePrevailingWageFringe as _v446 } from "../../calc-contractorfinance.js";
 
 test("bounds: spec-v444 computeSuretyBondPremium pins tiered premium, effective rate, and error seams", () => {
   const r = _v444({ contract_usd: 500000, rate1_per_k: 25, rate2_per_k: 15, rate3_per_k: 10 });
@@ -56063,7 +56063,7 @@ test("bounds: batch-37 fixes -- pitot zero point, BF above 1, grille bands, damp
 });
 
 import { computeNetEffectiveRent as _b38ner, computeBreakEvenOccupancy as _b38beo, computeCommercialLoadFactor as _b38clf, computeDebtYield as _b38dy } from "../../calc-realestate.js";
-import { computeWipPercentComplete as _b38wip, computeWorkersCompEmrPremium as _b38emr, computeLaborBurdenRate as _b38lbr } from "../../calc-accounting.js";
+import { computeWipPercentComplete as _b38wip, computeWorkersCompEmrPremium as _b38emr, computeLaborBurdenRate as _b38lbr } from "../../calc-contractorfinance.js";
 test("bounds: batch-38 fixes -- percent-vs-fraction guards, loss contracts, NER credit cap", () => {
   assert.ok("error" in _b38ner({ face_rent: 4000, term_periods: 12, free_periods: 2, one_time_credit: 1e6 }));
   assert.ok("error" in _b38beo({ opex: 12000, debt_svc: 18000, pgi: 50000, target_occ: 150 }));
