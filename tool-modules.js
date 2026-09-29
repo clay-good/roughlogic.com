@@ -1181,15 +1181,13 @@ export const TOOL_MODULES = (() => {
     "def-consumption",
     // spec-v913 static rollover threshold
     "static-rollover-threshold", "truck-startability", "hydroplaning-speed",
-    // trade expansion v1377-v1385
-    "tiedown-count",
-    "kingpin-to-axle",
-    "safe-descent-speed",
-    "air-brake-pushrod-stroke",
-    "oversize-permit-screen",
-    "hazmat-placard-threshold",
-    "idle-fuel-cost",
-    "flatbed-tarp-size",
+  ]);
+  // spec-v1874 cap-relief split: the spec-v1377..v1385 trucking field-operations
+  // band moved intact from calc-trucking.js.
+  declare("./calc-truckingfield.js", "TRUCKINGFIELD_RENDERERS", [
+    "tiedown-count", "kingpin-to-axle", "safe-descent-speed",
+    "air-brake-pushrod-stroke", "oversize-permit-screen",
+    "hazmat-placard-threshold", "idle-fuel-cost", "flatbed-tarp-size",
     "deck-point-load-dunnage",
   ]);
   // v4 Group K: Mechanic - Auto, Marine, Aviation.

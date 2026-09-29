@@ -39923,7 +39923,7 @@ test("bounds: spec-v1376 computeOutdoorStageWind pins the square law and the bal
 // spec-v1377..v1385: the 2026-08-26 trade-expansion Group J band.
 // ===========================================================================
 
-import { computeTiedownCount as _v1377 } from "../../calc-trucking.js";
+import { computeTiedownCount as _v1377 } from "../../calc-truckingfield.js";
 test("bounds: spec-v1377 computeTiedownCount pins both rules and which one governs", () => {
   // 24 ft, 12,000 lb: 2 + ceil(14/10) = 4 by count; 6,000 lb aggregate WLL; 4 x 5,400 = 21,600.
   const base = { length_ft: 24, weight_lb: 12000, tiedowns: 4, wll_per_tiedown_lb: 5400, tiedown_path: "over_other_side" };
@@ -39971,7 +39971,7 @@ test("bounds: spec-v1377 computeTiedownCount pins both rules and which one gover
   assert.ok("error" in _v1377({ ...base, weight_lb: Infinity }));
 });
 
-import { computeKingpinToAxle as _v1378 } from "../../calc-trucking.js";
+import { computeKingpinToAxle as _v1378 } from "../../calc-truckingfield.js";
 test("bounds: spec-v1378 computeKingpinToAxle pins the slide in whole holes", () => {
   // 42 ft against 40 ft is 24 in over: ceil(24/6) = 4 holes forward, landing at 40.0 ft.
   const base = { kpra_ft: 42, state_limit_ft: 40, hole_spacing_in: 6 };
@@ -39997,7 +39997,7 @@ test("bounds: spec-v1378 computeKingpinToAxle pins the slide in whole holes", ()
   assert.ok("error" in _v1378({ ...base, kpra_ft: Infinity }));
 });
 
-import { computeSafeDescentSpeed as _v1379 } from "../../calc-trucking.js";
+import { computeSafeDescentSpeed as _v1379 } from "../../calc-truckingfield.js";
 test("bounds: spec-v1379 computeSafeDescentSpeed pins the balance speed and the shortfall", () => {
   // 80,000 lb on 6%: 320 hp at 25 mph, balance at 31.25 mph, 576 hp at 45 mph.
   const base = { gcw_lb: 80000, grade_pct: 6, descent_speed_mph: 45, engine_brake_hp: 400 };
@@ -40025,7 +40025,7 @@ test("bounds: spec-v1379 computeSafeDescentSpeed pins the balance speed and the 
   assert.ok("error" in _v1379({ ...base, gcw_lb: Infinity }));
 });
 
-import { computeAirBrakePushrodStroke as _v1380 } from "../../calc-trucking.js";
+import { computeAirBrakePushrodStroke as _v1380 } from "../../calc-truckingfield.js";
 test("bounds: spec-v1380 computeAirBrakePushrodStroke pins the at-the-limit rule and 20%", () => {
   // 3 of 10 defective is 30%, at or past the 20% threshold: out of service.
   const base = { readjustment_limit_in: 2.0, measured_stroke_in: 1.75, defective_brakes: 3, total_brakes: 10 };
@@ -40054,7 +40054,7 @@ test("bounds: spec-v1380 computeAirBrakePushrodStroke pins the at-the-limit rule
   assert.ok("error" in _v1380({ ...base, measured_stroke_in: Infinity }));
 });
 
-import { computeOversizePermitScreen as _v1381 } from "../../calc-trucking.js";
+import { computeOversizePermitScreen as _v1381 } from "../../calc-truckingfield.js";
 test("bounds: spec-v1381 computeOversizePermitScreen pins the excess on each dimension", () => {
   // 12 ft wide, 14.5 ft high, 75 ft long, 90,000 lb against 8.5 / 14.0 / 75 / 80,000.
   const base = { width_ft: 12.0, height_ft: 14.5, length_ft: 75, weight_lb: 90000, width_limit_ft: 8.5, height_limit_ft: 14.0, length_limit_ft: 75, weight_limit_lb: 80000 };
@@ -40080,7 +40080,7 @@ test("bounds: spec-v1381 computeOversizePermitScreen pins the excess on each dim
   assert.ok("error" in _v1381({ ...base, width_ft: Infinity }));
 });
 
-import { computeHazmatPlacardThreshold as _v1382 } from "../../calc-trucking.js";
+import { computeHazmatPlacardThreshold as _v1382 } from "../../calc-truckingfield.js";
 test("bounds: spec-v1382 computeHazmatPlacardThreshold pins the 1,001 lb aggregate", () => {
   // 400 + 700 = 1,100 lb aggregate, at or above 1,001: placard required.
   const materials = [
@@ -40117,7 +40117,7 @@ test("bounds: spec-v1382 computeHazmatPlacardThreshold pins the 1,001 lb aggrega
   assert.ok("error" in _v1382({ materials: [{ hazard_class: "3", gross_lb: 0 }], table1_present: false }));
 });
 
-import { computeIdleFuelCost as _v1383 } from "../../calc-trucking.js";
+import { computeIdleFuelCost as _v1383 } from "../../calc-truckingfield.js";
 test("bounds: spec-v1383 computeIdleFuelCost pins the fuel, the fleet, and the wear equivalent", () => {
   // 6 x 250 = 1,500 hr; x 0.8 = 1,200 gal; x $4.10 = $4,920; x 20 = $98,400; x 7 = 10,500 mi.
   const base = { idle_hours_per_day: 6, operating_days: 250, idle_gph: 0.8, fuel_price: 4.10, trucks: 20, miles_per_engine_hour: 7, fleet_annual_miles: 2200000 };
@@ -40146,7 +40146,7 @@ test("bounds: spec-v1383 computeIdleFuelCost pins the fuel, the fleet, and the w
   assert.ok("error" in _v1383({ ...base, fuel_price: Infinity }));
 });
 
-import { computeFlatbedTarpSize as _v1384 } from "../../calc-trucking.js";
+import { computeFlatbedTarpSize as _v1384 } from "../../calc-truckingfield.js";
 test("bounds: spec-v1384 computeFlatbedTarpSize pins the both-sides width and the shingling", () => {
   // 8 + 2(6) + 2(1) = 22 ft wide; ceil((40-4)/(20-4)) = 3 tarps covering 52 ft at 195 lb.
   const base = { load_length_ft: 40, load_width_ft: 8, load_height_ft: 6, tarp_length_ft: 20, tarp_width_ft: 27, overlap_ft: 4, tuck_ft: 1, tarp_weight_lb: 65 };
@@ -40179,7 +40179,7 @@ test("bounds: spec-v1384 computeFlatbedTarpSize pins the both-sides width and th
   assert.ok("error" in _v1384({ ...base, load_height_ft: Infinity }));
 });
 
-import { computeDeckPointLoadDunnage as _v1385 } from "../../calc-trucking.js";
+import { computeDeckPointLoadDunnage as _v1385 } from "../../calc-truckingfield.js";
 test("bounds: spec-v1385 computeDeckPointLoadDunnage pins the linear conversion", () => {
   // 12,000 lb on two 8 ft timbers is 1,500 plf, 125% of a 1,200 plf deck; 10 ft is exact.
   const base = { load_lb: 12000, feet_count: 4, foot_area_sqin: 36, dunnage_bearing_ft: 8, deck_rating_plf: 1200 };

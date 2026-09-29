@@ -3685,7 +3685,6 @@ cross-check.
 | calc-trenchless.js | `computeLocateDepthOffset` | `{ instrument_depth_in = 0, half_signal_offset_in = 0, left_null_in = 0, right...` | _ | _ | _ |
 | calc-trenchless.js | `computePipeBurstingPullLoad` | `{ old_diameter_in = 0, new_diameter_in = 0, run_length_ft = 0, cover_depth_ft...` | _ | _ | _ |
 | calc-trenchless.js | `computeVacuumExcavationSpoil` | `{ pit_length_ft = 0, pit_width_ft = 0, pit_depth_ft = 0, pit_count = 1, swell...` | _ | _ | _ |
-| calc-trucking.js | `computeAirBrakePushrodStroke` | `{ readjustment_limit_in = 2.0, measured_stroke_in = 0, defective_brakes = 0, ...` | _ | _ | _ |
 | calc-trucking.js | `computeAxleLoadDistribution` | `{ drive_lb = 0, trailer_lb = 0, kingpin_to_tandem_in = 0, hole_spacing_in = 6...` | _ | _ | _ |
 | calc-trucking.js | `computeBridgeFormula` | `{ axle_weights_lb = [], axle_spacings_ft = [] }` | _ | _ | _ |
 | calc-trucking.js | `computeBridgeFormulaMinSpacing` | `{ target_weight_lb = 0, num_axles = 0 } = {}` | _ | _ | _ |
@@ -3693,32 +3692,24 @@ cross-check.
 | calc-trucking.js | `computeCostPerMile` | `{ fixed_monthly = 0, miles_month = 0, fuel_price = 0, mpg = 0, maint_cpm = 0,...` | _ | _ | _ |
 | calc-trucking.js | `computeDIM` | `{ length_in = 0, width_in = 0, height_in = 0, actual_weight_lb = 0, carrier =...` | _ | _ | _ |
 | calc-trucking.js | `computeDeadheadPercent` | `{ loaded_mi = 0, deadhead_mi = 0, revenue = 0, surcharge = 0 } = {}` | _ | _ | _ |
-| calc-trucking.js | `computeDeckPointLoadDunnage` | `{ load_lb = 0, feet_count = 4, foot_area_sqin = 0, dunnage_bearing_ft = 0, de...` | _ | _ | _ |
 | calc-trucking.js | `computeDefConsumption` | `{ diesel_gal = 0, trip_miles = 0, mpg = 0, dose_pct = 2.5, def_tank_gal = 0 }...` | _ | _ | _ |
 | calc-trucking.js | `computeDetentionDemurrageBilling` | `{ free_hours = 0, actual_hours = 0, rate_usd_hr = 0, truck_rev_usd_hr = 0 } = {}` | _ | _ | _ |
 | calc-trucking.js | `computeDriverPayCpmVsPercentage` | `{ cpm_usd = 0, pct = 0, miles = 0, linehaul_usd = 0 } = {}` | _ | _ | _ |
-| calc-trucking.js | `computeFlatbedTarpSize` | `{ load_length_ft = 0, load_width_ft = 0, load_height_ft = 0, tarp_length_ft =...` | _ | _ | _ |
 | calc-trucking.js | `computeFreightDensity` | `{ length_in = 0, width_in = 0, height_in = 0, weight_lb = 0 }` | _ | _ | _ |
 | calc-trucking.js | `computeFuelSurcharge` | `{ current_fuel_price = 0, base_fuel_price = 0, mpg_peg = 0, loaded_miles = 0 ...` | _ | _ | _ |
 | calc-trucking.js | `computeFuelTaxIFTA` | `{ miles = 0, fleet_mpg = 0, tax_rate_per_gal = 0, gallons_purchased = 0 } = {}` | _ | _ | _ |
 | calc-trucking.js | `computeGcwrCheck` | `{ gcwr_lb = 0, tractor_weight_lb = 0, trailer_weight_lb = 0, federal_max_lb =...` | _ | _ | _ |
 | calc-trucking.js | `computeHOS` | `{ profile = "property_70_8", events = [], weekly_on_duty_used_hr = 0, current...` | _ | _ | _ |
-| calc-trucking.js | `computeHazmatPlacardThreshold` | `{ materials = [], table1_present = false } = {}` | _ | _ | _ |
 | calc-trucking.js | `computeHydroplaningSpeed` | `{ tire_pressure_psi = 0 } = {}` | _ | _ | _ |
-| calc-trucking.js | `computeIdleFuelCost` | `{ idle_hours_per_day = 0, operating_days = 0, idle_gph = 0.8, fuel_price = 0,...` | _ | _ | _ |
 | calc-trucking.js | `computeIncoterm` | `{ term = "FOB" }` | _ | _ | _ |
 | calc-trucking.js | `computeInvoiceFactoringCost` | `{ invoice_usd = 0, advance_pct = 90, fee_pct = 3, days_to_pay = 30 } = {}` | _ | _ | _ |
-| calc-trucking.js | `computeKingpinToAxle` | `{ kpra_ft = 0, state_limit_ft = 40, hole_spacing_in = 6 } = {}` | _ | _ | _ |
 | calc-trucking.js | `computeLoadProfitability` | `{ linehaul_revenue = 0, loaded_miles = 0, deadhead_miles = 0, fuel_price = 0,...` | _ | _ | _ |
 | calc-trucking.js | `computeMaintenanceReserve` | `{ tire_set_cost = 0, tire_life_mi = 0, pm_cost = 0, pm_interval_mi = 0, major...` | _ | _ | _ |
-| calc-trucking.js | `computeOversizePermitScreen` | `{ width_ft = 0, height_ft = 0, length_ft = 0, weight_lb = 0, width_limit_ft =...` | _ | _ | _ |
 | calc-trucking.js | `computePalletLoadout` | `{ case_length_in = 0, case_width_in = 0, case_height_in = 0, case_weight_lb =...` | _ | _ | _ |
 | calc-trucking.js | `computeReeferBurn` | `{ unit = "thermo_king_continuous", tank_gal = 50, haul_hr = 24, ambient_band ...` | _ | _ | _ |
-| calc-trucking.js | `computeSafeDescentSpeed` | `{ gcw_lb = 0, grade_pct = 0, descent_speed_mph = 0, engine_brake_hp = 0 } = {}` | _ | _ | _ |
 | calc-trucking.js | `computeSsdDesignSpeed` | `{ sight_distance_ft = 0, reaction_time_s = 2.5, friction = SSD_AASHTO_F, grad...` | _ | _ | _ |
 | calc-trucking.js | `computeStaticRolloverThreshold` | `{ track_width_in = 72, cg_height_in = 80, curve_radius_ft = 0 } = {}` | _ | _ | _ |
 | calc-trucking.js | `computeStoppingSightDistance` | `{ speed_mph = 0, reaction_time_s = 2.5, friction = SSD_AASHTO_F, grade = 0.0,...` | _ | _ | _ |
-| calc-trucking.js | `computeTiedownCount` | `{ length_ft = 0, weight_lb = 0, tiedowns = 0, wll_per_tiedown_lb = 0, tiedown...` | _ | _ | _ |
 | calc-trucking.js | `computeTireLoadCheck` | `{ axle_weight_lb = 0, tires_on_axle = 2, tire_max_load_lb = 0 } = {}` | _ | _ | _ |
 | calc-trucking.js | `computeTrailerTongueWeight` | `{ trailer_gross_weight_lb = 0, tongue_weight_lb = 0, hitch_type = "convention...` | _ | _ | _ |
 | calc-trucking.js | `computeTruckOffTracking` | `{ turn_radius_ft = 0, wheelbase1_ft = 0, wheelbase2_ft = 0 } = {}` | _ | _ | _ |
@@ -3726,6 +3717,15 @@ cross-check.
 | calc-trucking.js | `computeTruckSweptPathWidth` | `{ turn_radius_ft = 0, wheelbase1_ft = 0, wheelbase2_ft = 0, vehicle_width_ft ...` | _ | _ | _ |
 | calc-trucking.js | `renderSsdDesignSpeed` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-trucking.js | `renderStoppingSightDistance` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
+| calc-truckingfield.js | `computeAirBrakePushrodStroke` | `{ readjustment_limit_in = 2.0, measured_stroke_in = 0, defective_brakes = 0, ...` | _ | _ | _ |
+| calc-truckingfield.js | `computeDeckPointLoadDunnage` | `{ load_lb = 0, feet_count = 4, foot_area_sqin = 0, dunnage_bearing_ft = 0, de...` | _ | _ | _ |
+| calc-truckingfield.js | `computeFlatbedTarpSize` | `{ load_length_ft = 0, load_width_ft = 0, load_height_ft = 0, tarp_length_ft =...` | _ | _ | _ |
+| calc-truckingfield.js | `computeHazmatPlacardThreshold` | `{ materials = [], table1_present = false } = {}` | _ | _ | _ |
+| calc-truckingfield.js | `computeIdleFuelCost` | `{ idle_hours_per_day = 0, operating_days = 0, idle_gph = 0.8, fuel_price = 0,...` | _ | _ | _ |
+| calc-truckingfield.js | `computeKingpinToAxle` | `{ kpra_ft = 0, state_limit_ft = 40, hole_spacing_in = 6 } = {}` | _ | _ | _ |
+| calc-truckingfield.js | `computeOversizePermitScreen` | `{ width_ft = 0, height_ft = 0, length_ft = 0, weight_lb = 0, width_limit_ft =...` | _ | _ | _ |
+| calc-truckingfield.js | `computeSafeDescentSpeed` | `{ gcw_lb = 0, grade_pct = 0, descent_speed_mph = 0, engine_brake_hp = 0 } = {}` | _ | _ | _ |
+| calc-truckingfield.js | `computeTiedownCount` | `{ length_ft = 0, weight_lb = 0, tiedowns = 0, wll_per_tiedown_lb = 0, tiedown...` | _ | _ | _ |
 | calc-velocity.js | `computeDpFlowMeter` | `{ pipe_id_in = 0, bore_in = 0, dp_psi = 0, cd = 0.61, fluid_density_lb_ft3 = ...` | _ | _ | _ |
 | calc-velocity.js | `computeDuctVelocityPressure` | `{ solve_for = "velocity", vp_inwc = 0, velocity_fpm = 0 } = {}` | _ | _ | _ |
 | calc-velocity.js | `computeGasDpFlowMeter` | `{ pipe_id_in = 0, bore_in = 0, p1_psia = 0, dp_psi = 0, temp_f = 60, gas_sg =...` | _ | _ | _ |
