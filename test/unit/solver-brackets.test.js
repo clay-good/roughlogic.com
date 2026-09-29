@@ -7,7 +7,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { computePoleEmbedmentDepth } from "../../calc-geotech.js";
-import { computeDockPilingLateral } from "../../calc-mechanic.js";
+import { computeDockPilingLateral } from "../../calc-marineaviation.js";
 import { computeInsulationThickness } from "../../calc-hvac.js";
 
 test("pole embedment solves the IBC 1807.3.2.1 relation past the old 60 ft bracket", () => {

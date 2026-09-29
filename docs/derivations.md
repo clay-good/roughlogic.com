@@ -2820,6 +2820,14 @@ cross-check.
 | calc-marine.js | `computeSheetPilePenetration` | `{ retained_height_ft = 0, friction_angle_deg = 0, unit_weight_pcf = 0, increa...` | _ | _ | _ |
 | calc-marine.js | `computeSlurryCriticalVelocity` | `{ pipe_diameter_in = 0, solids_specific_gravity = 0, durand_coefficient = 0, ...` | _ | _ | _ |
 | calc-marine.js | `computeWaveHeightFetch` | `{ wind_speed_mph = 0, fetch_mi = 0, alternative_fetch_mi = 0, alternative_win...` | _ | _ | _ |
+| calc-marineaviation.js | `computeAviationFuelWeight` | `{ gallons = 0, standard_density_lb_gal = _MEC_JET_A_LB_GAL, reference_temp_f ...` | _ | _ | _ |
+| calc-marineaviation.js | `computeControlCableTension` | `{ nominal_tension_lb = 0, reference_temp_f = 70, ambient_temp_f = 70, cable_a...` | _ | _ | _ |
+| calc-marineaviation.js | `computeDockPilingLateral` | `{ lateral_load_lb = 0, height_above_mudline_ft = 0, pile_diameter_in = 0, soi...` | _ | _ | _ |
+| calc-marineaviation.js | `computeHouseBatteryAlternator` | `{ daily_consumption_ah = 0, bank_ah = 0, usable_dod = 0.5, alternator_a = 0, ...` | _ | _ | _ |
+| calc-marineaviation.js | `computeMarineShaftDiameter` | `{ engine_hp = 0, shaft_rpm = 0, shaft_diameter_in = 0, allowable_stress_psi =...` | _ | _ | _ |
+| calc-marineaviation.js | `computeMetacentricHeight` | `{ km_ft = 0, kg_ft = 0, displacement_lb = 0, added_weight_lb = 0, added_kg_ft...` | _ | _ | _ |
+| calc-marineaviation.js | `computePropellerTrackBalance` | `{ track_in = 0, track_limit_in = 0.0625, initial_ips = 0, initial_phase_deg =...` | _ | _ | _ |
+| calc-marineaviation.js | `computeTravelLiftSlingPlacement` | `{ displacement_lb = 0, sling_spacing_ft = 0, cg_from_fwd_ft = 0, sling_wll_lb...` | _ | _ | _ |
 | calc-masonry.js | `computeBrickVeneerAnchorSpacing` | `{ area_ft2 = 0, area_per = 2.67, max_horiz_in = 32, max_vert_in = 25 } = {}` | _ | _ | _ |
 | calc-masonry.js | `computeBrickVeneerWeepCount` | `{ wall_length_ft = 30, max_spacing_in = 33, flashing_lines = 1 } = {}` | _ | _ | _ |
 | calc-masonry.js | `computeCmuShearWall` | `{ fm_psi = 1500, b_in = 0, dv_in = 0, p_lb = 0, mvd = 0.5, av_in2 = 0, s_in =...` | _ | _ | _ |
@@ -2844,7 +2852,6 @@ cross-check.
 | calc-mechanic.js | `computeAircraftWeightBalance` | `{ empty_weight_lb = 0, empty_arm_in = 0, front_weight_lb = 0, front_arm_in = ...` | _ | _ | _ |
 | calc-mechanic.js | `computeAlternatorChargingLoad` | `{ total_load_a = 0, alternator_a = 0, idle_frac = 0.5, cruise_frac = 0.9 } = {}` | _ | _ | _ |
 | calc-mechanic.js | `computeAnchorRodeScope` | `{ water_depth_ft = 0, bow_height_ft = 0, scope_ratio = 7, boat_loa_ft = 0 } = {}` | _ | _ | _ |
-| calc-mechanic.js | `computeAviationFuelWeight` | `{ gallons = 0, standard_density_lb_gal = _MEC_JET_A_LB_GAL, reference_temp_f ...` | _ | _ | _ |
 | calc-mechanic.js | `computeBandBrakeTorque` | `{ slack_tension_lbf = 0, wrap_angle_deg = 0, friction_coefficient = 0, drum_r...` | _ | _ | _ |
 | calc-mechanic.js | `computeBeltDeflectionTension` | `{ center_distance_in = 0, large_sheave_dia_in = 0, small_sheave_dia_in = 0, m...` | _ | _ | _ |
 | calc-mechanic.js | `computeBoltStretch` | `{ diameter_in = 0, grip_length_in = 0, stretch_thou = 0, material = "steel", ...` | _ | _ | _ |
@@ -2854,14 +2861,12 @@ cross-check.
 | calc-mechanic.js | `computeCentrifugalForce` | `{ weight_lb = 0, radius_in = 0, speed_rpm = 0 } = {}` | _ | _ | _ |
 | calc-mechanic.js | `computeChamberCcForCr` | `{ bore_in = 0, stroke_in = 0, target_cr = 0, gasket_bore_in = 0, gasket_thick...` | _ | _ | _ |
 | calc-mechanic.js | `computeClimbGradientRoc` | `{ climb_gradient_ft_per_nm = 0, ground_speed_kt = 0 } = {}` | _ | _ | _ |
-| calc-mechanic.js | `computeControlCableTension` | `{ nominal_tension_lb = 0, reference_temp_f = 70, ambient_temp_f = 70, cable_a...` | _ | _ | _ |
 | calc-mechanic.js | `computeCoolingSystemFlow` | `{ q_btuh = 0, dt_f = 0, coolant = "water" } = {}` | _ | _ | _ |
 | calc-mechanic.js | `computeCrosswindComponent` | `{ runway_heading_deg = 0, wind_dir_deg = 0, wind_speed_kt = 0, gust_kt = 0, m...` | _ | _ | _ |
 | calc-mechanic.js | `computeCrouchHpForSpeed` | `{ target_speed_mph = 0, displacement_lb = 0, hull_constant = 190 } = {}` | _ | _ | _ |
 | calc-mechanic.js | `computeCrouchPlaningSpeed` | `{ displacement_lb = 0, shaft_hp = 0, hull_constant = 190 } = {}` | _ | _ | _ |
 | calc-mechanic.js | `computeDensityAltitude` | `{ field_elevation_ft = 0, altimeter_in_hg = 29.92, oat_f = 59 } = {}` | _ | _ | _ |
 | calc-mechanic.js | `computeDisplacementCR` | `{ bore_in = 0, stroke_in = 0, cylinders = 0, chamber_cc = 0, gasket_bore_in =...` | _ | _ | _ |
-| calc-mechanic.js | `computeDockPilingLateral` | `{ lateral_load_lb = 0, height_above_mudline_ft = 0, pile_diameter_in = 0, soi...` | _ | _ | _ |
 | calc-mechanic.js | `computeDriveshaftCritical` | `{ od_in = 0, wall_in = 0, length_in = 0, material = "steel" }` | _ | _ | _ |
 | calc-mechanic.js | `computeDriveshaftMaxLength` | `{ target_rpm = 0, od_in = 0, wall_in = 0, material = "steel" } = {}` | _ | _ | _ |
 | calc-mechanic.js | `computeDynamicCompressionRatio` | `{ bore_in = 4.030, stroke_in = 3.75, rod_length_in = 6.0, static_cr = 10.5, i...` | _ | _ | _ |
@@ -2878,7 +2883,6 @@ cross-check.
 | calc-mechanic.js | `computeGearToothBendingStress` | `{ transmitted_load_lb = 0, diametral_pitch_1_in = 0, face_width_in = 0, numbe...` | _ | _ | _ |
 | calc-mechanic.js | `computeGlidepathDescentRate` | `{ ground_speed_kt = 0, glidepath_angle_deg = 0 } = {}` | _ | _ | _ |
 | calc-mechanic.js | `computeHelicalSpringRate` | `{ wire_diameter_in = 0, mean_coil_diameter_in = 0, active_coils = 0, material...` | _ | _ | _ |
-| calc-mechanic.js | `computeHouseBatteryAlternator` | `{ daily_consumption_ah = 0, bank_ah = 0, usable_dod = 0.5, alternator_a = 0, ...` | _ | _ | _ |
 | calc-mechanic.js | `computeHpFromTorque` | `{ solve_for = "hp", torque_lbft = 0, rpm = 0, hp = 0 } = {}` | _ | _ | _ |
 | calc-mechanic.js | `computeHullDisplacement` | `{ lwl_ft = 30, bwl_ft = 10, draft_ft = 4, block_coefficient = 0.5, water_dens...` | _ | _ | _ |
 | calc-mechanic.js | `computeHullSpeed` | `{ lwl_ft = 0, actual_speed_kn = 0 } = {}` | _ | _ | _ |
@@ -2893,16 +2897,13 @@ cross-check.
 | calc-mechanic.js | `computeInjectorFlowAtPressure` | `{ rated_flow_ccmin = 0, rated_pressure_psi = 43.5, rail_pressure_psi = 43.5, ...` | _ | _ | _ |
 | calc-mechanic.js | `computeInjectorMaxHp` | `{ inj_flow = 0, flow_unit = "lbh", n_cyl = 0, duty = 0.80, bsfc = 0.50 } = {}` | _ | _ | _ |
 | calc-mechanic.js | `computeInjectorSize` | `{ hp = 0, bsfc = 0.50, n_cyl = 0, duty = 0.80 } = {}` | _ | _ | _ |
-| calc-mechanic.js | `computeMarineShaftDiameter` | `{ engine_hp = 0, shaft_rpm = 0, shaft_diameter_in = 0, allowable_stress_psi =...` | _ | _ | _ |
 | calc-mechanic.js | `computeMaxRpmFromPistonSpeed` | `{ stroke_in = 0, mps_limit_fpm = 4000 } = {}` | _ | _ | _ |
 | calc-mechanic.js | `computeMeanPistonSpeed` | `{ stroke_in = 0, rpm = 0 } = {}` | _ | _ | _ |
-| calc-mechanic.js | `computeMetacentricHeight` | `{ km_ft = 0, kg_ft = 0, displacement_lb = 0, added_weight_lb = 0, added_kg_ft...` | _ | _ | _ |
 | calc-mechanic.js | `computePaintMixRatio` | `{ paint_volume_oz = 0, part_paint = 4, part_hardener = 1, part_reducer = 0 } ...` | _ | _ | _ |
 | calc-mechanic.js | `computePlanetaryGearRatio` | `{ sun_teeth = 0, ring_teeth = 0, input_speed_rpm = 0, configuration = "ring-f...` | _ | _ | _ |
 | calc-mechanic.js | `computeProjectileRange` | `{ velocity_fps = 0, angle_deg = 0 } = {}` | _ | _ | _ |
 | calc-mechanic.js | `computePropPitchSelection` | `{ current_pitch_in = 0, current_wot_rpm = 0, target_wot_rpm = 0, rpm_per_inch...` | _ | _ | _ |
 | calc-mechanic.js | `computePropSlip` | `{ rpm = 0, gear_ratio = 1, pitch_in = 0, gps_speed_kt = 0 }` | _ | _ | _ |
-| calc-mechanic.js | `computePropellerTrackBalance` | `{ track_in = 0, track_limit_in = 0.0625, initial_ips = 0, initial_phase_deg =...` | _ | _ | _ |
 | calc-mechanic.js | `computeReserveCapacityAmpHours` | `{ rc_minutes = 0 } = {}` | _ | _ | _ |
 | calc-mechanic.js | `computeSacrificialAnodeLife` | `{ anode_material = "zinc", anode_mass_lb = 0, current_draw_a = 0, utilization...` | _ | _ | _ |
 | calc-mechanic.js | `computeSailboatPerformanceRatios` | `{ sail_area_sqft = 500, displacement_lb = 10000, lwl_ft = 30 } = {}` | _ | _ | _ |
@@ -2920,7 +2921,6 @@ cross-check.
 | calc-mechanic.js | `computeTorqueAdapterCorrection` | `{ target_torque_ftlb = 0, wrench_length_in = 0, adapter_length_in = 0, adapte...` | _ | _ | _ |
 | calc-mechanic.js | `computeTorsionSpringRate` | `{ wire_diameter_in = 0, mean_coil_diameter_in = 0, active_coils = 0, deflecti...` | _ | _ | _ |
 | calc-mechanic.js | `computeTrapSpeedHorsepower` | `{ weight_lb = 0, trap_mph = 0 } = {}` | _ | _ | _ |
-| calc-mechanic.js | `computeTravelLiftSlingPlacement` | `{ displacement_lb = 0, sling_spacing_ft = 0, cg_from_fwd_ft = 0, sling_wll_lb...` | _ | _ | _ |
 | calc-mechanic.js | `computeTrueAirspeed` | `{ cas_kt = 0, density_altitude_ft = 0 } = {}` | _ | _ | _ |
 | calc-mechanic.js | `computeTurboMaxBoostForChargeTemp` | `{ max_charge_temp_f = 0, inlet_temp_f = 0, compressor_eff_pct = 70, ambient_p...` | _ | _ | _ |
 | calc-mechanic.js | `computeTurboPressureRatio` | `{ boost_psi = 0, ambient_psia = 14.7, inlet_temp_f = 0, compressor_eff_pct = ...` | _ | _ | _ |

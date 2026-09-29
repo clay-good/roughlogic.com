@@ -50241,6 +50241,8 @@ import {
   computeControlCableTension as _v1645,
   computePropellerTrackBalance as _v1646,
   computeAviationFuelWeight as _v1647,
+} from "../../calc-marineaviation.js";
+import {
   computeSprayTransferEfficiency as _v1659,
   computeAdhesiveBondArea as _v1663,
 } from "../../calc-mechanic.js";

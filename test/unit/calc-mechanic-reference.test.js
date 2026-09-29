@@ -7,11 +7,12 @@
 
 import { test } from "node:test";
 import assert from "node:assert/strict";
+import { computeSprayTransferEfficiency } from "../../calc-mechanic.js";
 import {
   computeMetacentricHeight, computeMarineShaftDiameter, computeHouseBatteryAlternator,
   computeTravelLiftSlingPlacement, computeDockPilingLateral, computeControlCableTension,
-  computePropellerTrackBalance, computeAviationFuelWeight, computeSprayTransferEfficiency,
-} from "../../calc-mechanic.js";
+  computePropellerTrackBalance, computeAviationFuelWeight,
+} from "../../calc-marineaviation.js";
 import { computePoleEmbedmentDepth } from "../../calc-geotech.js";
 
 const within = (got, want, tolPct, label) => {
