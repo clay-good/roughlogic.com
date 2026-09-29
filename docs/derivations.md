@@ -1631,7 +1631,6 @@ cross-check.
 | calc-construction.js | `computeAsphaltSpreadRate` | `{ thickness_in = 2, density_pcf = 145 } = {}` | _ | _ | _ |
 | calc-construction.js | `computeAsphaltTackCoatQuantity` | `{ area_sf = 0, residual_rate_gal_sy = 0.04, residue_pct = 60 } = {}` | _ | _ | _ |
 | calc-construction.js | `computeAsphaltTonnage` | `{ area_ft2 = 0, depth_in = 0, density_pcf = 145, paving_width_ft = 0 }` | _ | _ | _ |
-| calc-construction.js | `computeAwningCanopyLoad` | `{ projection_ft = 0, width_ft = 0, wind_speed_mph = 0, kz = 0.98, kzt = 1, kd...` | _ | _ | _ |
 | calc-construction.js | `computeBalusterPicketCount` | `{ rail_clear_in = 96, picket_width_in = 1.5, max_gap_in = 4 } = {}` | _ | _ | _ |
 | calc-construction.js | `computeBaseplateGroutVolume` | `{ plate_length_in = 18, plate_width_in = 18, column_area_in2 = 64, grout_thic...` | _ | _ | _ |
 | calc-construction.js | `computeBeamLoading` | `{ load_type, load_value, length_ft, E_psi, b_in, d_in }` | _ | _ | _ |
@@ -1684,8 +1683,6 @@ cross-check.
 | calc-construction.js | `computeEgressTravelDistance` | `{ travel_ft = 0, travel_limit_ft = 300, common_path_ft = 0, common_path_limit...` | _ | _ | _ |
 | calc-construction.js | `computeEgressWindowCheck` | `{ clear_width_in = 0, clear_height_in = 0, sill_height_in = 0, location = "ab...` | _ | _ | _ |
 | calc-construction.js | `computeEgressWindowWell` | `{ well_width_in = 0, well_projection_in = 0, well_depth_in = 0, has_ladder = ...` | _ | _ | _ |
-| calc-construction.js | `computeElevatorHandlingCapacity` | `{ rise_ft = 0, car_speed_fpm = 0, passengers_per_trip = 0, probable_stops = 0...` | _ | _ | _ |
-| calc-construction.js | `computeEscalatorCapacity` | `{ speed_fpm = 0, step_depth_in = 0, persons_per_step = 1, loading_factor = 0....` | _ | _ | _ |
 | calc-construction.js | `computeExcavationBenchPlan` | `{ depth_ft = 0, soil_class = "B", surcharge = false, length_ft = 0, bottom_wi...` | _ | _ | _ |
 | calc-construction.js | `computeExcavationProtectionTrigger` | `{ depth_ft = 0, trench_length_ft = 0, egress_points = 0, stable_rock = "no", ...` | _ | _ | _ |
 | calc-construction.js | `computeExcavationVolume` | `{ length_ft, width_ft, depth_ft, side_slope_angle_deg = 90 }` | _ | _ | _ |
@@ -1701,8 +1698,6 @@ cross-check.
 | calc-construction.js | `computeFormworkPressure` | `{ pour_rate_ft_per_hr = 0, concrete_temp_F = 70, weight_factor = "normal", un...` | _ | _ | _ |
 | calc-construction.js | `computeFormworkTieLoad` | `{ lateral_pressure_psf = 600, h_spacing_ft = 2, v_spacing_ft = 2, tie_swl_lb ...` | _ | _ | _ |
 | calc-construction.js | `computeFoundationWaterproofingTakeoff` | `{ perimeter_ft = 150, below_grade_height_ft = 8, coverage_sf_per_gal = 50, wa...` | _ | _ | _ |
-| calc-construction.js | `computeGarageDoorTorsionSpring` | `{ door_weight_lb = 0, door_height_in = 0, drum_radius_in = 0, springs = 1 } = {}` | _ | _ | _ |
-| calc-construction.js | `computeGlassThicknessWind` | `{ width_ft = 0, height_ft = 0, design_pressure_psf = 0, glass_type = "anneale...` | _ | _ | _ |
 | calc-construction.js | `computeGlassVacuumLift` | `{ area_sf = 32, glass_thickness_in = 0.5, safety_factor = 4, cup_wll_lb = 150...` | _ | _ | _ |
 | calc-construction.js | `computeGlulamVolumeFactor` | `{ span_ft = 0, depth_in = 0, width_in = 0, x = 10, kl = 1.0 } = {}` | _ | _ | _ |
 | calc-construction.js | `computeGuardHandrailCheck` | `{ occupancy = "residential", surface_height_in = 0, measured_guard_in = 0, me...` | _ | _ | _ |
@@ -1716,7 +1711,6 @@ cross-check.
 | calc-construction.js | `computeHoopStressThinWall` | `{ P_psi = 0, D_in = 0, t_in = 0, S_allow = 0 } = {}` | _ | _ | _ |
 | calc-construction.js | `computeHousewrapRolls` | `{ wall_area_sf = 4000, roll_coverage_sf = 1350, overlap_waste_pct = 10, faste...` | _ | _ | _ |
 | calc-construction.js | `computeIceBarrierCoverage` | `{ eave_length_ft = 0, overhang_in = 0, pitch_rise = 0, roll_width_in = 36, ro...` | _ | _ | _ |
-| calc-construction.js | `computeIguUFactor` | `{ lites = 2, r_per_lite = 0.03, r_gap = 1.02, r_indoor_film = 0.68, r_outdoor...` | _ | _ | _ |
 | calc-construction.js | `computeInsulationBattCoverage` | `{ area_ft2 = 0, coverage_per_batt = 0, coverage_per_bag = 0, waste_pct = 0 } ...` | _ | _ | _ |
 | calc-construction.js | `computeIntermittentFilletWeld` | `{ w_req_in = 0, w_intermit_in = 0, increment_in = 0 } = {}` | _ | _ | _ |
 | calc-construction.js | `computeJoistCantileverCheck` | `{ backspan_ft = 10, overhang_ft = 2, joist_size = "2x10", species = "southern...` | _ | _ | _ |
@@ -1732,7 +1726,6 @@ cross-check.
 | calc-construction.js | `computeMasonryCount` | `{ wall_area_ft2, unit_type, mortar_joint_in = 0.375, waste_factor = 0.05 }` | _ | _ | _ |
 | calc-construction.js | `computeMasonryCoursing` | `{ target_in = 0, unit_in = 7.625, joint_in = 0.375 } = {}` | _ | _ | _ |
 | calc-construction.js | `computeMassConcreteTempRise` | `{ cementitious_lb_per_cy = 600, rise_f_per_100lb = 12, placing_temp_f = 70, d...` | _ | _ | _ |
-| calc-construction.js | `computeMastClimberPlatformLoad` | `{ platform_length_ft = 0, cantilever_length_ft = 0, rated_capacity_lb = 0, zo...` | _ | _ | _ |
 | calc-construction.js | `computeMaterialQuantity` | `{ assembly, area_ft2 }` | _ | _ | _ |
 | calc-construction.js | `computeMaterialStackingLimits` | `{ material = "brick", stack_height_ft = 0, taper_provided_in = 0, block_heigh...` | _ | _ | _ |
 | calc-construction.js | `computeMembraneFastenerTakeoff` | `{ roof_area_sf = 8000, roll_width_ft = 10, sidelap_in = 6, field_spacing_in =...` | _ | _ | _ |
@@ -1780,7 +1773,6 @@ cross-check.
 | calc-construction.js | `computeScaffoldMudsillBearing` | `{ leg_load_lb = 0, plank_width_in = 0, plank_length_in = 0, allowable_psf = 0...` | _ | _ | _ |
 | calc-construction.js | `computeScaffoldPlatformCheck` | `{ plank_length_ft = 0, platform_width_in = 0, gap_between_units_in = 0, gap_t...` | _ | _ | _ |
 | calc-construction.js | `computeScaffoldTakeoff` | `{ run_length_ft = 40, bay_length_ft = 7, lifts = 1, planks_per_bay = 4 } = {}` | _ | _ | _ |
-| calc-construction.js | `computeScaffoldTieSpacing` | `{ scaffold_height_ft = 0, base_width_ft = 0, outrigger_base_ft = 0, max_ratio...` | _ | _ | _ |
 | calc-construction.js | `computeSealantJointYield` | `{ joint_lf = 500, cartridge_in3 = 20.5, joint_width_in = 0.375, joint_depth_i...` | _ | _ | _ |
 | calc-construction.js | `computeSectionProperties` | `{ shape = "rectangle", b_in = 0, h_in = 0, d_in = 0, di_in = 0 } = {}` | _ | _ | _ |
 | calc-construction.js | `computeSeismicApproximatePeriod` | `{ system = "other", hn_ft = 0, sd1 = 0 } = {}` | _ | _ | _ |
@@ -1798,7 +1790,6 @@ cross-check.
 | calc-construction.js | `computeSheathingTakeoff` | `{ area_sf = 1600, waste_pct = 8, sheet_sf = 32, nails_per_sheet = 60 } = {}` | _ | _ | _ |
 | calc-construction.js | `computeShingleNails` | `{ squares = 30, shingles_per_square = 80, nails_per_shingle = 4, nails_per_lb...` | _ | _ | _ |
 | calc-construction.js | `computeShorePostLoad` | `{ slab_in = 0, unit_weight = 150, form_load = 10, live_load = 50, spacing_x =...` | _ | _ | _ |
-| calc-construction.js | `computeShoringReshoringLoad` | `{ slab_dead_psf = 0, construction_live_psf = 0, form_dead_psf = 0, connected_...` | _ | _ | _ |
 | calc-construction.js | `computeShotcreteReboundQuantity` | `{ area_sf = 0, thickness_in = 0, rebound_pct = 20, shot_actual_cy = 0 } = {}` | _ | _ | _ |
 | calc-construction.js | `computeSidingCourseLayout` | `{ wall_height_ft = 0, wall_length_ft = 0, target_exposure_in = 7, board_heigh...` | _ | _ | _ |
 | calc-construction.js | `computeSidingTakeoff` | `{ wall_area_sf = 2000, opening_area_sf = 0, waste_pct = 12, exposure_in = 4 }...` | _ | _ | _ |
@@ -1822,7 +1813,6 @@ cross-check.
 | calc-construction.js | `computeStudNotchBoreLimit` | `{ stud_width_in = 5.5 } = {}` | _ | _ | _ |
 | calc-construction.js | `computeSubstantialImprovement` | `{ market_value = 0, improvement_cost = 0, prior_costs = 0, threshold_pct = 50...` | _ | _ | _ |
 | calc-construction.js | `computeSuspendedCeilingGrid` | `{ room_length_ft = 24, room_width_ft = 40 } = {}` | _ | _ | _ |
-| calc-construction.js | `computeSuspendedScaffoldCounterweight` | `{ rated_load_lb = 0, outboard_arm_ft = 0, inboard_arm_ft = 0, factor_of_safet...` | _ | _ | _ |
 | calc-construction.js | `computeTactileSignMounting` | `{ lowest_baseline_in = 0, tactile_block_height_in = 0, sign_position = "latch...` | _ | _ | _ |
 | calc-construction.js | `computeTaperedRoofInsulation` | `{ run_ft = 40, slope_in_per_ft = 0.25, start_thk_in = 0.5, area_sf = 2000, r_...` | _ | _ | _ |
 | calc-construction.js | `computeTemporaryStairwayCheck` | `{ riser_count = 0, total_rise_in = 0, riser_height_in = 0, tread_depth_in = 0...` | _ | _ | _ |
@@ -1847,7 +1837,6 @@ cross-check.
 | calc-construction.js | `computeWindPressure` | `{ V_mph, exposure = "C", Kz = 0, Kzt = 1.0, Kd = 0.85, G = 0.85 }` | _ | _ | _ |
 | calc-construction.js | `computeWindSolidSign` | `{ velocity_pressure_psf = 0, gust_factor = 0.85, force_coefficient = 0, solid...` | _ | _ | _ |
 | calc-construction.js | `computeWindSpeedFromVelocityPressure` | `{ velocity_pressure_psf = 0 } = {}` | _ | _ | _ |
-| calc-construction.js | `computeWindowFilmShgc` | `{ area_sqft = 0, shgc_before = 0, shgc_after = 0, peak_irradiance_btuh_sqft =...` | _ | _ | _ |
 | calc-construction.js | `computeWindrowStockpileVolume` | `{ base_width_ft = 0, ridge_length_ft = 0, repose_angle_deg = 37, density_pcf ...` | _ | _ | _ |
 | calc-construction.js | `computeWoodBeamBending` | `{ fb_star_psi = 0, emin_psi = 620000, b_in = 0, d_in = 0, le_in = 0 } = {}` | _ | _ | _ |
 | calc-construction.js | `computeWoodBeamCompressionNotch` | `{ fv_prime_psi = 0, b_in = 0, d_in = 0, dn_in = 0, e_in = 0, v_applied_lb = 0...` | _ | _ | _ |
@@ -3535,6 +3524,17 @@ cross-check.
 | calc-solarfield.js | `computeSolarAltitude` | `{ latitude_deg = 0, day_of_year = 355, hours_from_solar_noon = 0 } = {}` | _ | _ | _ |
 | calc-solarfield.js | `computeSolarAzimuth` | `{ latitude_deg = 0, day_of_year = 172, hours_from_solar_noon = 0 } = {}` | _ | _ | _ |
 | calc-solarfield.js | `computeSolarEgc69045` | `{ ocpd_rating_a = 0, pv_isc_a = 0, vd_upsized = "no" } = {}` | _ | _ | _ |
+| calc-specialtytrades.js | `computeAwningCanopyLoad` | `{ projection_ft = 0, width_ft = 0, wind_speed_mph = 0, kz = 0.98, kzt = 1, kd...` | _ | _ | _ |
+| calc-specialtytrades.js | `computeElevatorHandlingCapacity` | `{ rise_ft = 0, car_speed_fpm = 0, passengers_per_trip = 0, probable_stops = 0...` | _ | _ | _ |
+| calc-specialtytrades.js | `computeEscalatorCapacity` | `{ speed_fpm = 0, step_depth_in = 0, persons_per_step = 1, loading_factor = 0....` | _ | _ | _ |
+| calc-specialtytrades.js | `computeGarageDoorTorsionSpring` | `{ door_weight_lb = 0, door_height_in = 0, drum_radius_in = 0, springs = 1 } = {}` | _ | _ | _ |
+| calc-specialtytrades.js | `computeGlassThicknessWind` | `{ width_ft = 0, height_ft = 0, design_pressure_psf = 0, glass_type = "anneale...` | _ | _ | _ |
+| calc-specialtytrades.js | `computeIguUFactor` | `{ lites = 2, r_per_lite = 0.03, r_gap = 1.02, r_indoor_film = 0.68, r_outdoor...` | _ | _ | _ |
+| calc-specialtytrades.js | `computeMastClimberPlatformLoad` | `{ platform_length_ft = 0, cantilever_length_ft = 0, rated_capacity_lb = 0, zo...` | _ | _ | _ |
+| calc-specialtytrades.js | `computeScaffoldTieSpacing` | `{ scaffold_height_ft = 0, base_width_ft = 0, outrigger_base_ft = 0, max_ratio...` | _ | _ | _ |
+| calc-specialtytrades.js | `computeShoringReshoringLoad` | `{ slab_dead_psf = 0, construction_live_psf = 0, form_dead_psf = 0, connected_...` | _ | _ | _ |
+| calc-specialtytrades.js | `computeSuspendedScaffoldCounterweight` | `{ rated_load_lb = 0, outboard_arm_ft = 0, inboard_arm_ft = 0, factor_of_safet...` | _ | _ | _ |
+| calc-specialtytrades.js | `computeWindowFilmShgc` | `{ area_sqft = 0, shgc_before = 0, shgc_after = 0, peak_irradiance_btuh_sqft =...` | _ | _ | _ |
 | calc-stage.js | `_v9_atmosphericAbsorption` | `{ f_Hz, T_K, h_r, p_a_kPa }` | _ | _ | _ |
 | calc-stage.js | `computeAcousticGainPagNag` | `{ ds_ft = 2, d0_ft = 30, d1_ft = 8, d2_ft = 12, open_mics = 1, ead_ft = 6 } = {}` | _ | _ | _ |
 | calc-stage.js | `computeAmpPowerSpl` | `{ sensitivity_db, power_w, distance_m, crest_db, target_spl_db, max_spl_db }` | _ | _ | _ |

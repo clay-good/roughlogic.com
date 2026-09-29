@@ -10,7 +10,7 @@ import assert from "node:assert/strict";
 import {
   computeScaffoldTieSpacing, computeMastClimberPlatformLoad, computeSuspendedScaffoldCounterweight,
   computeShoringReshoringLoad,
-} from "../../calc-construction.js";
+} from "../../calc-specialtytrades.js";
 import {
   computePoolCoverEvaporation, computePoolPumpSpeedSavings, computePoolHeatPumpCapacity, computeSpaDrainInterval,
 } from "../../calc-pool.js";

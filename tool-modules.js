@@ -512,15 +512,6 @@ export const TOOL_MODULES = (() => {
     "abatement-containment",
   ]);
   declare("./calc-construction.js", "CONSTRUCTION_RENDERERS", [
-    "scaffold-tie-spacing", "mast-climber-platform-load", "suspended-scaffold-counterweight", "shoring-reshoring-load",
-    // trade expansion v1425-v1434
-    "elevator-handling-capacity",
-    "glass-thickness-wind",
-    "awning-canopy-load",
-    "garage-door-torsion-spring",
-    "window-film-shgc",
-    "igu-u-factor",
-    "escalator-capacity",
     "stairs", "roof-pitch", "rafter", "square-footage", "board-footage",
     "concrete", "shotcrete-rebound-quantity", "rebar", "lumber-spans", "fastener-pullout",
     "beam-loading", "material-quantity",
@@ -627,6 +618,15 @@ export const TOOL_MODULES = (() => {
     "wind-solid-sign",
     // spec-v553
     "snow-unbalanced-gable",
+  ]);
+  // spec-v1871 cap-relief split: the specialty-building and temporary-works
+  // tail moved intact from calc-construction.js. All 11 tiles keep Group E
+  // and their existing public behavior.
+  declare("./calc-specialtytrades.js", "SPECIALTYTRADES_RENDERERS", [
+    "elevator-handling-capacity", "glass-thickness-wind", "awning-canopy-load",
+    "garage-door-torsion-spring", "window-film-shgc", "igu-u-factor",
+    "escalator-capacity", "scaffold-tie-spacing", "mast-climber-platform-load",
+    "suspended-scaffold-counterweight", "shoring-reshoring-load",
   ]);
   // spec-v95 new finish-and-site-carpentry take-off module (the home named
   // in the spec-v94 module note); relieves the calc-construction.js cap watch.

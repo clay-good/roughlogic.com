@@ -41417,7 +41417,7 @@ test("bounds: spec-v1422 computeFuseLetThrough pins the withstand and the series
 // maximum pressure the door tolerates at that closer setting.)
 // ===========================================================================
 
-import { computeElevatorHandlingCapacity as _v1425 } from "../../calc-construction.js";
+import { computeElevatorHandlingCapacity as _v1425 } from "../../calc-specialtytrades.js";
 test("bounds: spec-v1425 computeElevatorHandlingCapacity pins RTT and shows stopping dominating", () => {
   const base = { rise_ft: 120, car_speed_fpm: 350, passengers_per_trip: 12, probable_stops: 7, stop_time_s: 10, transfer_time_s: 1.2, cars: 3, population: 500, target_interval_s: 30 };
   const r = _v1425(base);
@@ -41452,7 +41452,7 @@ test("bounds: spec-v1425 computeElevatorHandlingCapacity pins RTT and shows stop
   assert.ok("error" in _v1425({ ...base, stop_time_s: Infinity }));
 });
 
-import { computeGlassThicknessWind as _v1426 } from "../../calc-construction.js";
+import { computeGlassThicknessWind as _v1426 } from "../../calc-specialtytrades.js";
 test("bounds: spec-v1426 computeGlassThicknessWind pins load, deflection, and the type factor", () => {
   const base = { width_ft: 5, height_ft: 8, design_pressure_psf: 30, glass_type: "annealed", deflection_divisor: 175, thickness_in: 0.25, lites: 1, spacer_allowance_psf: 0.33 };
   const r = _v1426(base);
@@ -41488,7 +41488,7 @@ test("bounds: spec-v1426 computeGlassThicknessWind pins load, deflection, and th
   assert.ok("error" in _v1426({ ...base, width_ft: Infinity }));
 });
 
-import { computeAwningCanopyLoad as _v1428 } from "../../calc-construction.js";
+import { computeAwningCanopyLoad as _v1428 } from "../../calc-specialtytrades.js";
 test("bounds: spec-v1428 computeAwningCanopyLoad pins uplift governing over snow", () => {
   const base = { projection_ft: 12, width_ft: 20, wind_speed_mph: 115, kz: 0.98, kzt: 1, kd: 0.85, cn_uplift: 1.2, cn_downward: 0.7, ground_snow_psf: 30, ce: 1, ct: 1, dead_load_psf: 3.33 };
   const r = _v1428(base);
@@ -41523,7 +41523,7 @@ test("bounds: spec-v1428 computeAwningCanopyLoad pins uplift governing over snow
   assert.ok("error" in _v1428({ ...base, kz: Infinity }));
 });
 
-import { computeGarageDoorTorsionSpring as _v1429 } from "../../calc-construction.js";
+import { computeGarageDoorTorsionSpring as _v1429 } from "../../calc-specialtytrades.js";
 test("bounds: spec-v1429 computeGarageDoorTorsionSpring pins weight and height pulling opposite ways", () => {
   const base = { door_weight_lb: 150, door_height_in: 84, drum_radius_in: 2, springs: 2 };
   const r = _v1429(base);
@@ -41555,7 +41555,7 @@ test("bounds: spec-v1429 computeGarageDoorTorsionSpring pins weight and height p
   assert.ok("error" in _v1429({ ...base, door_weight_lb: Infinity }));
 });
 
-import { computeWindowFilmShgc as _v1430 } from "../../calc-construction.js";
+import { computeWindowFilmShgc as _v1430 } from "../../calc-specialtytrades.js";
 test("bounds: spec-v1430 computeWindowFilmShgc pins the peak, the kWh, and the payback", () => {
   const base = { area_sqft: 200, shgc_before: 0.7, shgc_after: 0.35, peak_irradiance_btuh_sqft: 230, full_sun_hours: 1200, eer: 12, price_per_kwh: 0.14, cost_per_sqft: 9 };
   const r = _v1430(base);
@@ -41588,7 +41588,7 @@ test("bounds: spec-v1430 computeWindowFilmShgc pins the peak, the kWh, and the p
   assert.ok("error" in _v1430({ ...base, full_sun_hours: Infinity }));
 });
 
-import { computeIguUFactor as _v1431 } from "../../calc-construction.js";
+import { computeIguUFactor as _v1431 } from "../../calc-specialtytrades.js";
 test("bounds: spec-v1431 computeIguUFactor pins the clear and low-e units against the dew point", () => {
   const base = { lites: 2, r_per_lite: 0.03, r_gap: 1.02, r_indoor_film: 0.68, r_outdoor_film: 0.17, indoor_temp_f: 70, outdoor_temp_f: 0, indoor_rh_pct: 40 };
   const clear = _v1431(base);
@@ -41636,7 +41636,7 @@ test("bounds: spec-v1431 computeIguUFactor pins the clear and low-e units agains
   assert.ok("error" in _v1431({ ...base, r_gap: Infinity }));
 });
 
-import { computeEscalatorCapacity as _v1434 } from "../../calc-construction.js";
+import { computeEscalatorCapacity as _v1434 } from "../../calc-specialtytrades.js";
 test("bounds: spec-v1434 computeEscalatorCapacity pins width beating speed", () => {
   const base = { speed_fpm: 100, step_depth_in: 16, persons_per_step: 2, loading_factor: 0.6, weight_per_person_lb: 150, design_flow_pph: 8000 };
   const r = _v1434(base);
@@ -47633,7 +47633,7 @@ test("bounds: spec-v1685 computeMasonryCleaningDilution -- one part in six, not 
   assert.ok("error" in _v1685({ ...base, coverage_ft2_per_gal: 0 }));
 });
 
-import { computeScaffoldTieSpacing as _v1686 } from "../../calc-construction.js";
+import { computeScaffoldTieSpacing as _v1686 } from "../../calc-specialtytrades.js";
 test("bounds: spec-v1686 computeScaffoldTieSpacing -- outriggers move the denominator", () => {
   const base = { scaffold_height_ft: 60, base_width_ft: 5, outrigger_base_ft: 10, max_ratio: 4, vertical_tie_spacing_ft: 20, horizontal_tie_spacing_ft: 30, scaffold_run_ft: 90, sheeted: 0 };
   const r = _v1686(base);
@@ -47670,7 +47670,7 @@ test("bounds: spec-v1686 computeScaffoldTieSpacing -- outriggers move the denomi
   assert.ok("error" in _v1686({ ...base, max_ratio: 0 }));
 });
 
-import { computeMastClimberPlatformLoad as _v1687 } from "../../calc-construction.js";
+import { computeMastClimberPlatformLoad as _v1687 } from "../../calc-specialtytrades.js";
 test("bounds: spec-v1687 computeMastClimberPlatformLoad -- the total passes and the zone does not", () => {
   const base = { platform_length_ft: 40, cantilever_length_ft: 8, rated_capacity_lb: 6000, zone_rated_capacity_lb: 1500, load_lb: 5200, load_centroid_ft: 16, tie_spacing_ft: 25, tie_capacity_lb: 4000 };
   const r = _v1687(base);
@@ -47706,7 +47706,7 @@ test("bounds: spec-v1687 computeMastClimberPlatformLoad -- the total passes and 
   assert.ok("error" in _v1687({ ...base, cantilever_length_ft: 20 }));
 });
 
-import { computeSuspendedScaffoldCounterweight as _v1688 } from "../../calc-construction.js";
+import { computeSuspendedScaffoldCounterweight as _v1688 } from "../../calc-specialtytrades.js";
 test("bounds: spec-v1688 computeSuspendedScaffoldCounterweight -- the lever ratio comes before the factor", () => {
   const base = { rated_load_lb: 1500, outboard_arm_ft: 6, inboard_arm_ft: 1.5, factor_of_safety: 4, counterweight_unit_lb: 50, target_counterweight_lb: 12000 };
   const r = _v1688(base);
@@ -47741,7 +47741,7 @@ test("bounds: spec-v1688 computeSuspendedScaffoldCounterweight -- the lever rati
   assert.ok("error" in _v1688({ ...base, inboard_arm_ft: 0 }));
 });
 
-import { computeShoringReshoringLoad as _v1689 } from "../../calc-construction.js";
+import { computeShoringReshoringLoad as _v1689 } from "../../calc-specialtytrades.js";
 test("bounds: spec-v1689 computeShoringReshoringLoad -- a backshore still carries the dead load", () => {
   const base = { slab_dead_psf: 100, construction_live_psf: 50, form_dead_psf: 10, connected_levels: 3, backshored: 0, governing_slab_capacity_psf: 200, governing_slab_strength_psi: 2500 };
   const r = _v1689(base);
