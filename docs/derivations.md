@@ -2685,32 +2685,32 @@ cross-check.
 | calc-kitchen.js | `computeYieldEP` | `{ ap_weight = 0, trim_weight = 0, cooking_loss_pct = 0, ap_cost_per_lb = 0 }` | _ | _ | _ |
 | calc-lab.js | `computeArrheniusEquation` | `{ k1 = 0, temp1_c = 0, k2 = 0, temp2_c = 0 } = {}` | _ | _ | _ |
 | calc-lab.js | `computeBeerLambert` | `{ absorbance = 0, path_length_cm = 1, epsilon = 0 }` | _ | _ | _ |
-| calc-lab.js | `computeCfuPlateCount` | `{ colonies = 0, dilution_factor = 0, volume_ml = 0, low = 15, high = 300 } = {}` | _ | _ | _ |
 | calc-lab.js | `computeClausiusClapeyron` | `{ pressure1 = 0, temp1_c = 0, pressure2 = 0, temp2_c = 0 } = {}` | _ | _ | _ |
 | calc-lab.js | `computeDilution` | `{ c1, v1, c2, v2 }` | _ | _ | _ |
-| calc-lab.js | `computeDoublingTime` | `{ initial_count = 0, final_count = 0, elapsed_time = 0 } = {}` | _ | _ | _ |
 | calc-lab.js | `computeGelPercentAgarose` | `{ target_bp_high = 0, gel_percent = 0, buffer_volume_ml = 0 } = {}` | _ | _ | _ |
-| calc-lab.js | `computeGrowthProjectedCount` | `{ initial_count = 0, doubling_time = 0, elapsed_time = 0 } = {}` | _ | _ | _ |
 | calc-lab.js | `computeHemocytometer` | `{ total_cells_counted = 0, squares_counted = 4, dilution_factor = 1, dead_cel...` | _ | _ | _ |
 | calc-lab.js | `computeHendersonHasselbalch` | `{ pKa = 0, target_pH = 0, total_buffer_concentration = 0, total_volume = 0, }` | _ | _ | _ |
 | calc-lab.js | `computeIdealGasLaw` | `{ solve_for = "moles", pressure_atm = 0, volume_l = 0, moles = 0, temperature...` | _ | _ | _ |
-| calc-lab.js | `computeLigationMolarRatio` | `{ vector_ng = 0, vector_length_bp = 0, insert_length_bp = 0, molar_ratio = 3 ...` | _ | _ | _ |
 | calc-lab.js | `computeMassMoles` | `{ mass_g, moles, molecular_weight }` | _ | _ | _ |
-| calc-lab.js | `computeMichaelisMenten` | `{ vmax = 0, km = 0, substrate = 0 } = {}` | _ | _ | _ |
-| calc-lab.js | `computeMolarityFromStock` | `{ purity_pct = 0, density_g_ml = 0, mol_weight = 0, target_m = 0, final_volum...` | _ | _ | _ |
 | calc-lab.js | `computeMolecularWeight` | `{ formula = "" }` | _ | _ | _ |
 | calc-lab.js | `computeNernstEquation` | `{ standard_potential_v = 0, electrons_n = 1, reaction_quotient = 1, temperatu...` | _ | _ | _ |
-| calc-lab.js | `computeNucleicAcidA260` | `{ a260 = 0, na_type = "dsDNA", dilution_factor = 1, a280 = 0 } = {}` | _ | _ | _ |
 | calc-lab.js | `computeOd600CellCount` | `{ od600 = 0, factor_cells_per_od = 0, dilution = 1 } = {}` | _ | _ | _ |
 | calc-lab.js | `computeOsmolarity` | `{ concentration_mol_l = 0, vant_hoff_i = 1, temperature_c = 37 } = {}` | _ | _ | _ |
 | calc-lab.js | `computePcrMix` | `{ number_of_reactions = 1, components = [], fudge_factor_pct = 10, }` | _ | _ | _ |
-| calc-lab.js | `computePrimerTm` | `{ sequence = "", method = "auto" } = {}` | _ | _ | _ |
 | calc-lab.js | `computeRcf` | `{ rotor_radius_mm = 0, rpm, rcf }` | _ | _ | _ |
 | calc-lab.js | `computeResuspension` | `{ mass_g = 0, target_concentration = 0 }` | _ | _ | _ |
 | calc-lab.js | `computeSerialDilution` | `{ starting_concentration = 0, dilution_factor = 10, volume_per_tube = 0.001, ...` | _ | _ | _ |
-| calc-lab.js | `computeSubstrateForVelocity` | `{ km = 0, target_percent = 0 } = {}` | _ | _ | _ |
 | calc-lab.js | `computeVanDerWaals` | `{ gas = "carbon-dioxide", moles = 0, volume_l = 0, temperature_c = 25 } = {}` | _ | _ | _ |
 | calc-lab.js | `renderOd600CellCount` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
+| calc-labmolecular.js | `computeCfuPlateCount` | `{ colonies = 0, dilution_factor = 0, volume_ml = 0, low = 15, high = 300 } = {}` | _ | _ | _ |
+| calc-labmolecular.js | `computeDoublingTime` | `{ initial_count = 0, final_count = 0, elapsed_time = 0 } = {}` | _ | _ | _ |
+| calc-labmolecular.js | `computeGrowthProjectedCount` | `{ initial_count = 0, doubling_time = 0, elapsed_time = 0 } = {}` | _ | _ | _ |
+| calc-labmolecular.js | `computeLigationMolarRatio` | `{ vector_ng = 0, vector_length_bp = 0, insert_length_bp = 0, molar_ratio = 3 ...` | _ | _ | _ |
+| calc-labmolecular.js | `computeMichaelisMenten` | `{ vmax = 0, km = 0, substrate = 0 } = {}` | _ | _ | _ |
+| calc-labmolecular.js | `computeMolarityFromStock` | `{ purity_pct = 0, density_g_ml = 0, mol_weight = 0, target_m = 0, final_volum...` | _ | _ | _ |
+| calc-labmolecular.js | `computeNucleicAcidA260` | `{ a260 = 0, na_type = "dsDNA", dilution_factor = 1, a280 = 0 } = {}` | _ | _ | _ |
+| calc-labmolecular.js | `computePrimerTm` | `{ sequence = "", method = "auto" } = {}` | _ | _ | _ |
+| calc-labmolecular.js | `computeSubstrateForVelocity` | `{ km = 0, target_percent = 0 } = {}` | _ | _ | _ |
 | calc-lateral.js | `computeDiaphragmCollectorForce` | `{ unit_shear_plf = 0, collector_len_ft = 0, omega0 = 2.5 } = {}` | _ | _ | _ |
 | calc-lateral.js | `computeDiaphragmShear` | `{ w_plf = 0, l_ft = 0, b_ft = 0 } = {}` | _ | _ | _ |
 | calc-lateral.js | `computeShearwallDeflection` | `{ v_plf = 0, h_ft = 0, b_ft = 0, e_psi = 1600000, a_in2 = 0, ga_kin = 0, da_i...` | _ | _ | _ |

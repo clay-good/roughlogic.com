@@ -10840,7 +10840,7 @@ test("bounds: spec-v1231 computeSumOfYearsDigitsDepreciation pins schedule, salv
   assert.ok("error" in computeSumOfYearsDigitsDepreciation({ cost: 100, salvage: 0, life_yr: 0 }));
   assert.ok("error" in computeSumOfYearsDigitsDepreciation({ cost: Infinity, salvage: 0, life_yr: 5 }));
 });
-import { computePrimerTm as _t1, computeCfuPlateCount as _t2 } from "../../calc-lab.js";
+import { computePrimerTm as _t1, computeCfuPlateCount as _t2 } from "../../calc-labmolecular.js";
 import { computeGrossRentMultiplier as _x1, computePmiCancellationDate as _x2, computeSellerNetSheet as _x3 } from "../../calc-realestate.js";
 import { computeFinalGradeNeeded as _y1, computeCategoryWeightedGrade as _y2, computeTwoSampleTTest as _y3, computePairedTTest as _v1234, computeOneSampleTTest as _v1236 } from "../../calc-educationassessment.js";
 import { computeOneWayAnova as _v1261 } from "../../calc-educationassessment.js";
@@ -24993,7 +24993,7 @@ test("bounds: spec-v531 computeUnitsOfProductionDepr pins the per-unit rate, the
   assert.ok("error" in _v531({ cost_basis: 50000, salvage_value: 5000, total_units: 100000, period_units: -1 }));
 });
 
-import { computeMolarityFromStock as _v532 } from "../../calc-lab.js";
+import { computeMolarityFromStock as _v532 } from "../../calc-labmolecular.js";
 
 test("bounds: spec-v532 computeMolarityFromStock pins the 12 M HCl stock, the volume to draw, the acetic cross-check, and error seams", () => {
   const r = _v532({ purity_pct: 37, density_g_ml: 1.19, mol_weight: 36.46, target_m: 1.0, final_volume_ml: 1000 });
@@ -25017,7 +25017,7 @@ test("bounds: spec-v532 computeMolarityFromStock pins the 12 M HCl stock, the vo
   assert.ok("error" in _v532({ purity_pct: 37, density_g_ml: 1.19, mol_weight: 36.46, target_m: 20, final_volume_ml: 1000 })); // target > stock
 });
 
-import { computeNucleicAcidA260 as _v533 } from "../../calc-lab.js";
+import { computeNucleicAcidA260 as _v533 } from "../../calc-labmolecular.js";
 
 test("bounds: spec-v533 computeNucleicAcidA260 pins the dsDNA concentration, the 260/280 ratio, the strandedness factor, and error seams", () => {
   const r = _v533({ a260: 0.6, na_type: "dsDNA", dilution_factor: 50, a280: 0.324 });
@@ -25040,7 +25040,7 @@ test("bounds: spec-v533 computeNucleicAcidA260 pins the dsDNA concentration, the
   assert.ok("error" in _v533({ a260: 0.6, na_type: "dsDNA", dilution_factor: 50, a280: -1 }));
 });
 
-import { computeLigationMolarRatio as _v534 } from "../../calc-lab.js";
+import { computeLigationMolarRatio as _v534 } from "../../calc-labmolecular.js";
 
 test("bounds: spec-v534 computeLigationMolarRatio pins the length-scaled insert mass, the pmol amounts, and error seams", () => {
   const r = _v534({ vector_ng: 50, vector_length_bp: 5000, insert_length_bp: 1000, molar_ratio: 3 });
@@ -25060,7 +25060,7 @@ test("bounds: spec-v534 computeLigationMolarRatio pins the length-scaled insert 
   assert.ok("error" in _v534({ vector_ng: 50, vector_length_bp: 5000, insert_length_bp: 1000, molar_ratio: 0 }));
 });
 
-import { computeDoublingTime as _v535 } from "../../calc-lab.js";
+import { computeDoublingTime as _v535 } from "../../calc-labmolecular.js";
 
 test("bounds: spec-v535 computeDoublingTime pins Td / mu / doublings from the fold change and error seams", () => {
   const r = _v535({ initial_count: 1e5, final_count: 8e5, elapsed_time: 24 });
@@ -25082,7 +25082,7 @@ test("bounds: spec-v535 computeDoublingTime pins Td / mu / doublings from the fo
   assert.ok("error" in _v535({ initial_count: 1e5, final_count: 8e5, elapsed_time: 0 }));
 });
 
-import { computeGrowthProjectedCount as _v762 } from "../../calc-lab.js";
+import { computeGrowthProjectedCount as _v762 } from "../../calc-labmolecular.js";
 test("bounds: spec-v762 projected cell count from doubling time (inverse of doubling-time)", () => {
   const p = _v762({ initial_count: 1e5, doubling_time: 8, elapsed_time: 24 });
   assert.ok(Math.abs(p.final_count - 8e5) < 1e-6);
@@ -25103,7 +25103,7 @@ test("bounds: spec-v762 projected cell count from doubling time (inverse of doub
   assert.ok("error" in _v762({ initial_count: Infinity, doubling_time: 8, elapsed_time: 24 }));
 });
 
-import { computeMichaelisMenten as _v536 } from "../../calc-lab.js";
+import { computeMichaelisMenten as _v536 } from "../../calc-labmolecular.js";
 
 test("bounds: spec-v536 computeMichaelisMenten pins the half-Vmax at [S]=Km, the asymptotic approach, and error seams", () => {
   const r = _v536({ vmax: 100, km: 25, substrate: 25 });
@@ -28401,7 +28401,7 @@ test("bounds: spec-v634 computeRequiredSectionModulus pins the LRFD/ASD required
   assert.ok("error" in _v634({ fy: Infinity, moment_kipft: 200 }));
 });
 
-import { computeSubstrateForVelocity as _v635, computeMichaelisMenten as _v635fwd } from "../../calc-lab.js";
+import { computeSubstrateForVelocity as _v635, computeMichaelisMenten as _v635fwd } from "../../calc-labmolecular.js";
 
 test("bounds: spec-v635 computeSubstrateForVelocity pins [S] = Km f/(1-f), the [S]=Km-at-50% identity, the exact round-trip, and error seams", () => {
   const r = _v635({ km: 25, target_percent: 90 });

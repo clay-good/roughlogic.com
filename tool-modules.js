@@ -1758,19 +1758,13 @@ export const TOOL_MODULES = (() => {
     // v23
     "od600-cell-count", "gel-percent-agarose",
   
-    // v20
-    "primer-tm", "cfu-plate-count",
-    // spec-v531
-    "molarity-from-stock",
-    // spec-v533
-    "nucleic-acid-a260",
-    // spec-v534
-    "ligation-molar-ratio",
-    // spec-v535
+  ]);
+  // spec-v1876: molecular and cell-biology lab calculators.
+  declare("./calc-labmolecular.js", "LABMOLECULAR_RENDERERS", [
+    "primer-tm", "cfu-plate-count", "molarity-from-stock",
+    "nucleic-acid-a260", "ligation-molar-ratio",
     "doubling-time", "growth-projected-count",
-    // spec-v536
-    "michaelis-menten",
-    "substrate-for-velocity",
+    "michaelis-menten", "substrate-for-velocity",
   ]);
   // v12 Group X: Real Estate (spec-v12.md §8).
   declare("./calc-realestate.js", "REALESTATE_RENDERERS", [

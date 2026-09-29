@@ -1008,7 +1008,7 @@ test("employer-payroll-tax: zero wages / base rejected", () => {
 import {
   computePrimerTm, primerTmExample,
   computeCfuPlateCount, cfuPlateCountExample,
-} from "../../calc-lab.js";
+} from "../../calc-labmolecular.js";
 
 test("primer-tm: GCGGATCCATG Wallace -> 36 C", () => {
   const r = computePrimerTm({ sequence: "GCGGATCCATG" });

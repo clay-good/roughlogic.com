@@ -15,6 +15,7 @@ import {
   computeHemocytometer, hemoExample,
   LAB_RENDERERS,
 } from "../../calc-lab.js";
+import { LABMOLECULAR_RENDERERS } from "../../calc-labmolecular.js";
 
 const close = (a, b, tol = 0.001) => Math.abs(a - b) <= tol;
 const closeRel = (a, b, tol = 0.001) => Math.abs(a - b) / Math.abs(b) <= tol;
@@ -82,13 +83,19 @@ test("Hemo: viability pct = (total - dead) / total", () => { const r = computeHe
 test("Hemo: no dead -> viability null", () => { const r = computeHemocytometer({ total_cells_counted: 100, squares_counted: 4, dilution_factor: 1 }); assert.equal(r.viability_pct, null); });
 test("Hemo: zero squares errors", () => { assert.ok(computeHemocytometer({ total_cells_counted: 100, squares_counted: 0, dilution_factor: 1 }).error); });
 
-// Renderer registry
-test("LAB_RENDERERS exposes all 12 utilities", () => {
-  const ids = Object.keys(LAB_RENDERERS);
-  assert.equal(ids.length, 27);
+// Renderer registries
+test("the lab renderer registries expose all 27 utilities", () => {
+  assert.equal(Object.keys(LAB_RENDERERS).length, 18);
+  assert.equal(Object.keys(LABMOLECULAR_RENDERERS).length, 9);
   for (const id of [
     "molarity-dilution", "serial-dilution", "molecular-weight", "mass-moles", "ideal-gas-law", "van-der-waals", "arrhenius-equation", "clausius-clapeyron", "osmolarity", "nernst-equation",
     "rcf-rpm", "resuspension-volume", "pcr-master-mix", "beer-lambert",
     "henderson-hasselbalch", "hemocytometer", "od600-cell-count", "gel-percent-agarose",
   ]) assert.ok(typeof LAB_RENDERERS[id] === "function", id);
+  for (const id of [
+    "primer-tm", "cfu-plate-count", "molarity-from-stock",
+    "nucleic-acid-a260", "ligation-molar-ratio",
+    "doubling-time", "growth-projected-count",
+    "michaelis-menten", "substrate-for-velocity",
+  ]) assert.ok(typeof LABMOLECULAR_RENDERERS[id] === "function", id);
 });

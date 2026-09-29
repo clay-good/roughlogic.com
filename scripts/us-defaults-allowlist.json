@@ -51,6 +51,12 @@
    "justification": "Module-wide: US lab practice is SI throughout (mL, uL, mg, g/mol, M, g/mL, cm cuvette paths, mm rotors). Spelled \"*\" since 2026-08-30; it was an empty string, which exempted the module by accident rather than by decision."
   },
   {
+   "module": "calc-labmolecular.js",
+   "match": "*",
+   "family": "lab and IH practice",
+   "justification": "Module-wide: US molecular and cell-biology lab practice is SI throughout (mL, g/mL, g/mol, mol/L, ng, and bp)."
+  },
+  {
    "module": "calc-kitchen.js",
    "match": "(g",
    "family": "lab and IH practice",

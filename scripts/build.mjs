@@ -152,6 +152,7 @@ const FILES = [
   "calc-operations-finance.js",
   "calc-safety.js",
   "calc-lab.js",
+  "calc-labmolecular.js",
   // v12 Group X: Real Estate.
   "calc-realestate.js",
   // v12 Group Y: Educators / K-12.
