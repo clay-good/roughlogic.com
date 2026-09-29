@@ -6,6 +6,10 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Added
 
+- **`ripper-production` takes a pass length and turn time.** With them it is Cat's timing method, volume per pass / (pass / speed + turn); the Performance Handbook's 3 x 2 ft, 88 fpm, 300 ft, 0.25 min, 45-min-hour example (820 bank cu yd/hr) reproduces. Without them the tile is continuous ripping, which Cat says runs 10 to 20% high.
+- **`coating-voc-compliance` takes the thinner's water and exempt share.** See Fixed.
+- **`pipe-flotation` reports the backfill for both factor-of-safety conventions:** FS on the whole uplift, and WSSC C-4's FS on the backfill only (1.5 x 182 = 273 lb/ft in its 48 in RCP example).
+
 - **`co2-enrichment-rate` takes the crop's own CO2 use.** Bartok's method is crop use plus the infiltration loss (about 11.5 + 13.8 cu ft per hour for a 30 x 128 ft house). The tile had only the infiltration term, understating demand by about 45%, and its assumption said crop uptake was "not deducted" when it adds. Crop use defaults to 0.
 
 - **`rope-safety-factor` takes the roping ratio.** ASME A17.1 2.20.3 counts N as twice the rope count on 2:1 roping; without the input the tile read half the factor of safety on every 2:1 installation.
@@ -18,6 +22,20 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 - **`stadia-distance` takes the stadia constant C of an external-focusing instrument.** H gains C cos(theta) and V gains C sin(theta). The NAVEDTRA 14070 example (C = 1.0) now reproduces exactly: 692.34 ft, 326.28 ft, elevation 705.98. C defaults to 0, so internal-focusing results are unchanged.
 
 ### Fixed
+
+- **`coating-voc-compliance`: a water or exempt thinner no longer lowers the regulatory VOC.** All thinner volume stayed in the less-water denominator. A zero-VOC thinner therefore diluted the figure: 1.11 fell to 0.53 lb/gal and flipped a failing coating to COMPLIES. Ohio EPA says thinning a waterborne coating with water leaves VOC less water unchanged. The thinner's water and exempt share now comes out with the coating's own, and a zero-VOC thinner must declare its share.
+- **`hot-holding-energy` applies the NEC 220.56 floor.** The demand is never less than the two largest units. Electrical Knowhow's example (60 kW x 65% = 39 kW, raised to 40 kW) now reproduces.
+- **`grease-duct-cleaning-interval` reads NFPA 96 12.6.1.1 correctly.** The tile called 50 micrometres a "designated inspection point trigger". It is the depth surfaces are cleaned TO. The triggers are 2,000 micrometres in the system and 3,175 in a fan housing, which the second trigger field now holds.
+- **`steam-kettle-heatup` counts the jacket losses in the steam.** The jacket condenses steam for the product and its losses, so the steam drawn is heat / (latent x efficiency); the tile understated the boiler load by the efficiency. The example's come-up rate is 105.8 lb/hr, not 89.9.
+- **`kitchen-makeup-air-deficit` door force is felt at the knob.** It used the whole A x dP, about 1.8 times the force at the knob. It also reports the IMC 508.1 limit of 0.02 in wc of kitchen negative pressure.
+- **`restrained-pipe-length` names DIPRA's Ff + Rs/2.** The unit resistance counts only half the bearing, and entering Ff + Rs reads 40% short. The desc also said "length = thrust / resistance" and "a 45-degree bend needs half"; the length goes as tan(bend/2), so 42 ft at 90 degrees is 18 ft at 45. Bends above 90 degrees are refused.
+- **Prose and labels:**
+  - Fryer turnover is counted in the period the product is entered in; OSU's benchmark is in frying hours.
+  - `water-for-compaction` takes the compacted volume, which FM 5-434 pairs with the Proctor dry density, not a bank volume.
+- **Unit and range guards found by probing.** Each of these used to return nonsense silently:
+  - kitchen: temperatures out of range or in C; a thickness factor of 10; a pour-cost target as a fraction; a pour in mL; a bottle in L; a serving in mL; a percent safety factor; kW typed as watts; a kettle past 250 F or rated in kW; grains of moisture; door-open time past an hour; gph as gpm; cooking loss as a fraction
+  - earthwork: efficiency as a percent; fractional passes; moisture, stabilizer rate and safety allowance as fractions; negative rolling resistance; a 500% grade; tons as pounds; riprap thickness in inches; a 30 ft check dam; a flotation factor below 1
+  - air quality: control efficiency, opacity limit, freeboard and carbon capacity as fractions; residence in ms; migration velocity in cm/s; VOC in g/L; dispersion past 100 km; a dilution factor below 1
 
 - **The stage acoustics tiles use about 1,128 ft/s at 70 F.** `delay-tower-alignment`, `cardioid-sub-array` and `driver-spacing-lobing` scaled from a 1,125 ft/s reference, 0.3% slow against QSC's 1,128 and the `time-alignment` tile's own 344 m/s. The speed is now 49.03 x sqrt(Rankine).
 - **`shot-size-residence-time` defaults to a 20-65% shot window and refuses a shot larger than the barrel.** Basilius prints 20-65% and Plastics Technology 25-65%; the tile's ceiling was 80%. A shot of 425% of the barrel used to pass with only a warning.
@@ -213,6 +231,13 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 - **`calc-agriculture.js` size cap raised from 64,000 to 66,000 bytes gzipped.** The irrigation and livestock corrections took it to 64,110 B (100.2%).
 - **`calc-electrical.js` size cap raised from 104,000 to 106,000 bytes gzipped.** The battery-vent and capacitor corrections took it to 104,063 B (100.1%). Splitting the module per bench is still the preferred fix.
+- **Twenty-six more tiles now carry a publisher's printed example.**
+  - **Kitchen:** `covers-per-labor-hour` (Chef's Resources), `dough-ball-scaling` (Pizza Today), `fryer-oil-turnover` (OSU FAPC-126), `keg-yield` and `pour-cost` (Bar Patrol), `par-level-order` (WISK), `warewasher-hot-water` (WebstaurantStore), `yield-ep` (Culinary Math), `hot-holding-energy` (Electrical Knowhow).
+  - **Earthwork:** `compaction-roller-production` and `water-for-compaction` (FM 5-434); `ripper-production`, `haul-road-resistance` and `unit-cost-earthwork` (Cat Performance Handbook); `restrained-pipe-length` (DIPRA); `pipe-flotation` (WSSC); `check-dam-spacing` (Iowa SUDAS); `soil-stabilization-quantity` (Lime Association of Texas).
+  - **Air quality:** `coating-voc-compliance` (Ohio EPA, San Diego APCD), `spcc-containment-volume` (EPA SPCC guidance), `stack-emission-pte` (Illinois EPA), `opacity-six-minute` (Ohio EPA), `community-noise-ldn` (Engineering ToolBox), and `esp-deutsch-efficiency`, `carbon-bed-life` and `scrubber-lg-ratio` (EPA Cost Manual).
+
+  README: 841 of 2,183 tiles are checked only against the project's own derivation (686 of them first-principles); 1,342 carry an outside source.
+
 - **Twenty-seven more tiles now carry a publisher's printed example.**
   - **Stage:** `amp-power-spl`, `spl-distance` and `spl-distance-for-level` (QSC); `lighting-beam`, `lighting-throw-for-pool` and `gobo-image-size` (ETC Source Four); `wireless-intermod` and `rf-antenna-cable-loss` (Shure); `mired-gel-shift` (IATSE 728); `neutral-imbalance` (IEE-Business); `cardioid-sub-array` (ProSoundWeb).
   - **Greenhouse:** `ppfd-daily-light-integral`, `shade-cloth-transmission` and `leaching-fraction-runoff-ec` (Virginia Extension); `grow-light-fixture-count` and `vapor-pressure-deficit` (e-GRO); `fan-pad-evaporative-cooling` and `photoperiod-blackout-schedule` (UMass).

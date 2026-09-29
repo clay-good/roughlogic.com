@@ -39506,15 +39506,16 @@ test("bounds: spec-v1361 computeTphcWindow pins the discard clock and the 70 F c
 
 import { computeSteamKettleHeatup as _v1362 } from "../../calc-kitchen.js";
 test("bounds: spec-v1362 computeSteamKettleHeatup pins the batch duty and the come-up steam rate", () => {
-  // 40 gal x 8.34 = 333.6 lb; x 140 F = 46,704 BTU; / 85,000 = 0.55 hr = 33 min; 49.4 lb steam; 89.9 lb/hr.
+  // 40 gal x 8.34 = 333.6 lb; x 140 F = 46,704 BTU; / 85,000 = 0.55 hr = 33 min. The jacket condenses steam for the
+  // product and its losses: 46,704 / (945.6 x 0.85) = 58.1 lb, at the burner's 100,000 / 945.6 = 105.8 lb/hr.
   const base = { gallons: 40, specific_gravity: 1.0, specific_heat: 1.0, start_temp_f: 60, final_temp_f: 200, rated_input_btuh: 100000, jacket_efficiency: 0.85, latent_heat_btu_lb: 945.6 };
   const r = _v1362(base);
   assert.ok(Math.abs(r.mass_lb - 333.6) < 1e-9);
   assert.ok(Math.abs(r.heat_btu - 46704) < 1e-6);
   assert.ok(Math.abs(r.heatup_min - 32.97) < 1e-2);
-  assert.ok(Math.abs(r.steam_per_batch_lb - 49.39) < 1e-2);
-  assert.ok(Math.abs(r.steam_rate_lb_hr - 89.89) < 1e-2);
-  assert.ok(Math.abs(r.boiler_hp - 2.606) < 1e-2);
+  assert.ok(Math.abs(r.steam_per_batch_lb - 58.11) < 1e-2);
+  assert.ok(Math.abs(r.steam_rate_lb_hr - 105.75) < 1e-2);
+  assert.ok(Math.abs(r.boiler_hp - 3.065) < 1e-2);
   // The come-up steam rate is a property of the burner, not the batch: doubling the volume
   // doubles both the steam and the time, leaving the peak rate unchanged.
   const big = _v1362({ ...base, gallons: 80 });
@@ -48147,12 +48148,14 @@ test("bounds: spec-v1639 computeKitchenMakeupAirDeficit -- a starved hood cannot
   assert.ok(Math.abs(tight.door_force_lbf - 6 * r.door_force_lbf) < 1e-6);
   // Tighter still and the door passes the egress limit, which is a life
   // safety finding before it is a comfort one.
-  const verytight = _v1639({ ...base, building_leakage_cfm_per_pa: 10 });
+  const verytight = _v1639({ ...base, building_leakage_cfm_per_pa: 5 });
   assert.ok(verytight.door_force_lbf > 30);
   assert.equal(verytight.door_force_ok, false);
   assert.ok(verytight.door_verdict.startsWith("DOOR FORCE OVER THE EGRESS LIMIT"));
-  // Door force is exactly the pressure over the door area.
-  assert.ok(Math.abs(r.door_force_lbf - r.pressure_psf * r.door_area_ft2) < 1e-9);
+  // Door force is the pressure over the door area, felt at a knob 3 in from the latch edge: x W / (2 (W - d)).
+  assert.ok(Math.abs(r.door_force_lbf - r.pressure_psf * r.door_area_ft2 * 3 / (2 * 2.75)) < 1e-9);
+  // IMC 508.1: 0.02 in wc is the most negative a kitchen may run.
+  assert.equal(verytight.negative_pressure_ok, false);
   assert.ok(Math.abs(r.door_area_ft2 - 21) < 1e-12);
   assert.ok("error" in _v1639({ ...base, hood_exhaust_cfm: 0 }));
   assert.ok("error" in _v1639({ ...base, dedicated_makeup_cfm: -1 }));
@@ -56258,4 +56261,46 @@ test("bounds: batch-44 stage, greenhouse and process -- crop CO2 use adds, shot 
   assert.ok("error" in _b44riser({ section_length_in: 8, section_width_in: 6, section_thickness_in: 1.5, modulus_ratio: 0.5, shrinkage_pct: 4, riser_efficiency_pct: 15, sleeve_factor: 1 }));
   assert.ok("error" in _b44riser({ section_length_in: 8, section_width_in: 6, section_thickness_in: 1.5, modulus_ratio: 1.2, shrinkage_pct: 0.04, riser_efficiency_pct: 15, sleeve_factor: 1 }));
   assert.ok("error" in _b44sand({ mould_sand_lb: 500, moisture_pct: 3.5, binder_lb: 5, binder_gas_cm3_g: 20, pour_temp_f: -400, vent_area_in2: 2, permeability_number: 100 }));
+});
+
+import { computeHotHoldingEnergy as _b45hh, computeGreaseDuctCleaningInterval as _b45gd, computeSteamKettleHeatup as _b45sk, computePourCost as _b45pc, computeFermentationTimeQ10 as _b45q10, computeWalkInDoorInfiltration as _b45wi } from "../../calc-kitchen.js";
+import { computeRipperProduction as _b45rip, computePipeFlotation as _b45pf, computeRestrainedPipeLength as _b45rpl, computeHaulRoadResistance as _b45hr, computeSoilStabilizationQuantity as _b45ss } from "../../calc-earthwork.js";
+import { computeCoatingVocCompliance as _b45voc, computeEspDeutschEfficiency as _b45esp, computeGaussianDispersionScreen as _b45gs, computeOdorDilutionThreshold as _b45od } from "../../calc-airquality.js";
+test("bounds: batch-45 kitchen, earthwork and air quality -- NEC 220.56 floor, NFPA 96 triggers, steam through the jacket, ripper turns, water thinner, unit guards", () => {
+  // NEC 220.56: 60 kW x 65% = 39 kW is raised to the two largest units, 40 kW.
+  const hh = _b45hh({ equipment: [{ name: "a", kw: 20, qty: 2 }, { name: "b", kw: 5, qty: 4 }], diversity_factor: 0.65, voltage: 208, phase: "three" });
+  assert.equal(hh.demand_kw, 40);
+  assert.ok("error" in _b45hh({ equipment: [{ name: "a", kw: 1500, qty: 1 }], diversity_factor: 0.65, voltage: 208, phase: "three" }));
+  // NFPA 96: 2,000 um in the system, 3,175 in a fan housing; 50 um is the cleaned-to finish.
+  const gd = { inspection_interval_months: 3, months_since_inspection: 1, measured_thickness_um: 2400, cleaning_trigger_um: 2000, inspection_point_trigger_um: 3175, is_designated_point: 1 };
+  assert.equal(_b45gd(gd).cleaning_triggered, false);
+  assert.equal(_b45gd({ ...gd, is_designated_point: 0 }).cleaning_triggered, true);
+  assert.equal(_b45gd(gd).clean_to_um, 50);
+  assert.ok("error" in _b45gd({ ...gd, measured_thickness_um: 0.1 }));
+  // Steam drawn = heat / (latent x jacket efficiency): the burner's rated input over the latent heat.
+  const sk = _b45sk({ gallons: 40, specific_gravity: 1, specific_heat: 1, start_temp_f: 60, final_temp_f: 200, rated_input_btuh: 100000, jacket_efficiency: 0.85, latent_heat_btu_lb: 945.6 });
+  assert.ok(Math.abs(sk.steam_rate_lb_hr - 100000 / 945.6) < 1e-9);
+  assert.ok("error" in _b45pc({ bottle_cost: 24, bottle_size_ml: 750, pour_size_oz: 1.5, target_pour_cost_pct: 0.2 }));
+  assert.ok("error" in _b45q10({ reference_time_hr: 2, reference_temp_f: 78, actual_temp_f: -400, q10: 2 }));
+  assert.ok("error" in _b45wi({ door_width_ft: 4, door_height_ft: 7, full_open_cfm: 1000, openings_per_hour: 60, seconds_open_each: 90, protection_factor: 1, enthalpy_difference_btu_lb: 10, moisture_difference_lb_lb: 0.005 }));
+  // Cat's timing method: 3 x 2 ft at 88 fpm, 300 ft passes, 0.25 min turns, 45-min hour -> 820 bcy/hr.
+  assert.ok(Math.abs(_b45rip({ spacing_ft: 3, penetration_ft: 2, speed_fpm: 88, efficiency: 0.75, pass_length_ft: 300, turn_min: 0.25 }).production_bcy_hr - 819.88) < 0.05);
+  assert.ok("error" in _b45rip({ spacing_ft: 3, penetration_ft: 2, speed_fpm: 88, efficiency: 75 }));
+  const pf = _b45pf({ pipe_od_in: 58, pipe_weight_plf: 963, backfill_weight_plf: 828, target_fs: 1.5, water_unit_wt_pcf: 62.4 });
+  assert.ok(Math.abs(pf.required_backfill_on_backfill_plf - 1.5 * (pf.uplift_plf - 963)) < 1e-9);
+  assert.equal(_b45pf({ pipe_od_in: 4, pipe_weight_plf: 20, backfill_weight_plf: 0, target_fs: 1.5, water_unit_wt_pcf: 62.4 }).required_backfill_plf, 0);
+  assert.ok("error" in _b45pf({ pipe_od_in: 58, pipe_weight_plf: 963, backfill_weight_plf: 828, target_fs: 0.5, water_unit_wt_pcf: 62.4 }));
+  assert.ok("error" in _b45rpl({ pipe_od_in: 12, pressure_psi: 150, bend_angle_deg: 179, unit_resistance_plf: 600 }));
+  assert.ok("error" in _b45hr({ gvw_lb: 150000, grade_pct: 5, rolling_resistance_pct: -4 }));
+  assert.ok("error" in _b45ss({ application_pct: 0.06, soil_density_pcf: 110, depth_in: 8, area_sy: 10000 }));
+  // A water thinner comes back out of the denominator: the less-water figure does not fall (Ohio EPA).
+  const voc = { coating_gal: 1, voc_lb: 0.5, water_gal: 0.55, exempt_gal: 0, thinner_gal: 0.5, thinner_voc_lb_per_gal: 0, limit_lb_per_gal: 1.0 };
+  assert.ok("error" in _b45voc(voc));
+  const wet = _b45voc({ ...voc, thinner_water_exempt_pct: 100 });
+  assert.ok(Math.abs(wet.applied_voc_less_water - wet.voc_less_water) < 1e-12);
+  assert.equal(wet.complies, false);
+  assert.ok("error" in _b45voc({ ...voc, voc_lb: 340, thinner_gal: 0 }));
+  assert.ok("error" in _b45esp({ plate_area_ft2: 10950, gas_acfm: 50000, migration_velocity_fps: 16 }));
+  assert.ok("error" in _b45gs({ emission_rate_lb_hr: 100, effective_height_ft: 300, wind_mph: 10, distance_mi: 100, stability_class: "A" }));
+  assert.ok("error" in _b45od({ source_dt: 1000, airflow_acfm: 5000, dilution_factor: 0.5, limit_dt: 7, target_dt: 7 }));
 });

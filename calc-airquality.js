@@ -135,6 +135,8 @@ export function computeStackEmissionPte({
   major_threshold_tpy = 100, control_efficiency_pct = 0, control_enforceable = "no",
 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // Unit / range guard added 2026-09-26 after printed-example probing.
+  if ([arguments[0]?.control_efficiency_pct].some((v) => Number(v) > 0 && Number(v) < 1)) return { error: "Enter control efficiency as a percent (90 for 90%), not a fraction." };
   if (!(hourly_rate_lb_h > 0)) return { error: "The uncontrolled hourly emission rate must be positive (lb/h)." };
   if (actual_hours_per_year < 0 || actual_hours_per_year > _AQ_HOURS_PER_YEAR) return { error: "Actual operating hours must be between 0 and 8,760." };
   if (permitted_hours_per_year < 0 || permitted_hours_per_year > _AQ_HOURS_PER_YEAR) return { error: "Permitted hours must be between 0 and 8,760." };
@@ -219,6 +221,8 @@ export function computeOpacitySixMinute({
   limit_pct = 20, steady_reading_pct = 0,
 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // Unit / range guard added 2026-09-26 after printed-example probing.
+  if ([arguments[0]?.limit_pct].some((v) => Number(v) > 0 && Number(v) < 1)) return { error: "Enter the opacity limit as a percent (20 for 20%), not a fraction." };
   if (!(reading_count > 0)) return { error: "The reading count must be positive." };
   if (!Number.isInteger(reading_count)) return { error: "The reading count must be a whole number of readings." };
   if (readings_sum_pct < 0) return { error: "The sum of the readings cannot be negative." };
@@ -486,6 +490,8 @@ export function computeThermalOxidizerResidence({
   required_residence_s = 0.75, chamber_volume_ft3 = 0,
 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // Unit / range guard added 2026-09-26 after printed-example probing.
+  if (Number(arguments[0]?.required_residence_s ?? 0.75) > 10) return { error: "Enter the residence time in seconds (0.75), not milliseconds." };
   if (!(inlet_scfm > 0)) return { error: "Inlet flow must be positive (scfm)." };
   if (!(required_residence_s > 0)) return { error: "Required residence time must be positive (seconds)." };
   if (chamber_volume_ft3 < 0) return { error: "Chamber volume cannot be negative (cu ft)." };
@@ -552,7 +558,7 @@ AIRQUALITY_RENDERERS["thermal-oxidizer-residence"] = _simpleRenderer({
 // dims: in { coating_gal: L^3, voc_lb: M, water_gal: L^3, exempt_gal: L^3, thinner_gal: L^3, thinner_voc_lb_per_gal: M L^-3, limit_lb_per_gal: M L^-3 } out: { voc_as_supplied: M L^-3, voc_less_water: M L^-3, applied_voc_as_supplied: M L^-3, applied_voc_less_water: M L^-3, margin_lb_per_gal: M L^-3 }
 export function computeCoatingVocCompliance({
   coating_gal = 1, voc_lb = 0, water_gal = 0, exempt_gal = 0,
-  thinner_gal = 0, thinner_voc_lb_per_gal = 0, limit_lb_per_gal = 0,
+  thinner_gal = 0, thinner_voc_lb_per_gal = 0, limit_lb_per_gal = 0, thinner_water_exempt_pct = 0,
 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(coating_gal > 0)) return { error: "Coating volume must be positive (gal)." };
@@ -560,6 +566,9 @@ export function computeCoatingVocCompliance({
   if (water_gal < 0 || exempt_gal < 0) return { error: "Water and exempt solvent volumes cannot be negative (gal)." };
   if (thinner_gal < 0 || thinner_voc_lb_per_gal < 0) return { error: "Thinner volume and its VOC content cannot be negative." };
   if (limit_lb_per_gal < 0) return { error: "The limit cannot be negative (lb/gal)." };
+  if (!(thinner_water_exempt_pct >= 0 && thinner_water_exempt_pct <= 100)) return { error: "The thinner's water and exempt share must be between 0 and 100%." };
+  if (thinner_gal > 0 && thinner_voc_lb_per_gal === 0 && thinner_water_exempt_pct === 0) return { error: "A thinner with no VOC is water or an exempt solvent; enter its water and exempt share (100 for plain water or acetone)." };
+  if (voc_lb / coating_gal > 12 || thinner_voc_lb_per_gal > 12 || limit_lb_per_gal > 12) return { error: "No coating holds more than about 7 lb of VOC per gallon; enter lb/gal, not g/L (1 lb/gal = 119.8 g/L)." };
   const non_voc_gal = water_gal + exempt_gal;
   if (!(non_voc_gal < coating_gal)) return { error: "Water plus exempt solvent must be less than the coating volume -- the less-water basis divides by what remains." };
   // As supplied is the label number; less water is the regulatory one.
@@ -575,13 +584,17 @@ export function computeCoatingVocCompliance({
   const has_thinner = thinner_gal > 0;
   const applied_voc_lb = voc_lb + thinner_gal * thinner_voc_lb_per_gal;
   const applied_gal = coating_gal + thinner_gal;
-  const applied_less_water_gal = applied_gal - non_voc_gal;
+  // The thinner's own water and exempt solvent come out of the denominator too, so thinning a waterborne coating
+  // with water leaves the less-water figure unchanged (Ohio EPA). Until 2026-09-26 all thinner volume stayed in,
+  // and a water thinner lowered the regulatory number and could flip a failing coating to COMPLIES.
+  const thinner_non_voc_gal = thinner_gal * thinner_water_exempt_pct / 100;
+  const applied_less_water_gal = applied_gal - non_voc_gal - thinner_non_voc_gal;
   const applied_voc_as_supplied = applied_voc_lb / applied_gal;
   const applied_voc_less_water = applied_voc_lb / applied_less_water_gal;
   const governing_voc = has_thinner ? applied_voc_less_water : voc_less_water;
   const thinner_verdict = !has_thinner
     ? "(no thinner entered -- the as-supplied coating is what is applied)"
-    : "adding " + fmt(thinner_gal, 2) + " gal of thinner at " + fmt(thinner_voc_lb_per_gal, 2) + " lb/gal takes the as-applied figure to " + fmt(applied_voc_less_water, 2) + " lb/gal less water, up from " + fmt(voc_less_water, 2) + " -- thinner adds VOC to the numerator and volume that is not water to the denominator, and the numerator wins";
+    : "adding " + fmt(thinner_gal, 2) + " gal of thinner at " + fmt(thinner_voc_lb_per_gal, 2) + " lb/gal takes the as-applied figure to " + fmt(applied_voc_less_water, 2) + " lb/gal less water, " + (applied_voc_less_water >= voc_less_water ? "up" : "down") + " from " + fmt(voc_less_water, 2) + " -- the thinner's VOC goes into the numerator and only its non-water, non-exempt volume into the denominator";
   // Compliance against the entered limit, on the governing basis.
   const has_limit = limit_lb_per_gal > 0;
   const complies = has_limit && governing_voc <= limit_lb_per_gal;
@@ -597,7 +610,7 @@ export function computeCoatingVocCompliance({
     voc_as_supplied, less_water_gal, voc_less_water, basis_ratio, non_voc_gal, basis_verdict,
     has_thinner, applied_voc_lb, applied_gal, applied_voc_as_supplied, applied_voc_less_water, thinner_verdict,
     governing_voc, has_limit, complies, margin_lb_per_gal, label_would_pass, limit_verdict,
-    note: "A coating's VOC content on the two bases that matter, and which one the rule is written against. VOC as supplied is pounds of VOC per gallon of the coating as it comes, and it is the number on the can. VOC LESS WATER divides the same VOC by the coating volume minus its water and minus any exempt solvents, and it is the regulatory basis in most coating rules. The less-water basis exists to prevent compliance by dilution: if VOC were measured per gallon as supplied, adding water to a solvent coating would lower the number without reducing the solvent applied per square foot of surface. So the rule subtracts the water and the exempt compounds and measures the VOC against what remains, which is roughly the material that forms the film plus the solvent in it. The consequence is that waterborne coatings can fail limits they appear to pass. A coating that is mostly water with a modest amount of coalescing solvent has a low VOC per gallon as supplied and can have a high VOC less water, because the denominator is small -- and the smaller the denominator, the larger the gap between the two numbers. That is a genuine and frequent surprise, and it is why a technical data sheet reports both and why the regulatory one governs. Thinning moves it further. Thinner adds VOC to the numerator and adds volume to the denominator, but the added volume is not water, so it does not come back out -- and a coating with comfortable margin as supplied can exceed its limit as applied. That is the number a rule is enforced against, so it is the one this reports as governing whenever a thinner is entered. Exempt solvents are compounds EPA has determined are negligibly photochemically reactive, and the list is specific and changes; treating a solvent as exempt because it seems similar to one that is will produce a wrong answer. This computes content from ENTERED volumes and masses off a technical data sheet. It does not determine which compounds are exempt, apply transfer efficiency credits that some rules allow for high-efficiency application equipment, address VOC limits expressed per gallon of SOLIDS, compute emissions from usage, or determine which rule applies. The technical data sheet, the applicable coating rule, and the permit govern.",
+    note: "A coating's VOC content on the two bases that matter, and which one the rule is written against. VOC as supplied is pounds of VOC per gallon of the coating as it comes, and it is the number on the can. VOC LESS WATER divides the same VOC by the coating volume minus its water and minus any exempt solvents, and it is the regulatory basis in most coating rules. The less-water basis exists to prevent compliance by dilution: if VOC were measured per gallon as supplied, adding water to a solvent coating would lower the number without reducing the solvent applied per square foot of surface. So the rule subtracts the water and the exempt compounds and measures the VOC against what remains, which is roughly the material that forms the film plus the solvent in it. The consequence is that waterborne coatings can fail limits they appear to pass. A coating that is mostly water with a modest amount of coalescing solvent has a low VOC per gallon as supplied and can have a high VOC less water, because the denominator is small -- and the smaller the denominator, the larger the gap between the two numbers. That is a genuine and frequent surprise, and it is why a technical data sheet reports both and why the regulatory one governs. Thinning moves it further. A solvent thinner adds VOC to the numerator and its volume to the denominator, and a coating with comfortable margin as supplied can exceed its limit as applied; a water or exempt thinner comes back out of the denominator with the coating's own water, so thinning a waterborne coating with water does not change its less-water figure (Ohio EPA). That is the number a rule is enforced against, so it is the one this reports as governing whenever a thinner is entered. Exempt solvents are compounds EPA has determined are negligibly photochemically reactive, and the list is specific and changes; treating a solvent as exempt because it seems similar to one that is will produce a wrong answer. This computes content from ENTERED volumes and masses off a technical data sheet. It does not determine which compounds are exempt, apply transfer efficiency credits that some rules allow for high-efficiency application equipment, address VOC limits expressed per gallon of SOLIDS, compute emissions from usage, or determine which rule applies. The technical data sheet, the applicable coating rule, and the permit govern.",
   };
 }
 export const coatingVocComplianceExample = { inputs: { coating_gal: 1.0, voc_lb: 0.5, water_gal: 0.55, exempt_gal: 0, thinner_gal: 0.2, thinner_voc_lb_per_gal: 7.0, limit_lb_per_gal: 2.8 } };
@@ -611,6 +624,7 @@ AIRQUALITY_RENDERERS["coating-voc-compliance"] = _simpleRenderer({
     { key: "exempt_gal", label: "Exempt solvent in it (gal)", kind: "number", attrs: { step: "any" } },
     { key: "thinner_gal", label: "Thinner added (gal, 0 if none)", kind: "number", attrs: { step: "any" } },
     { key: "thinner_voc_lb_per_gal", label: "Thinner VOC content (lb/gal)", kind: "number", attrs: { step: "any" } },
+    { key: "thinner_water_exempt_pct", label: "Thinner water and exempt share (% by volume; 100 for water or acetone)", kind: "number", default: 0, attrs: { step: "any" } },
     { key: "limit_lb_per_gal", label: "Limit, less water (lb/gal, 0 to skip)", kind: "number", attrs: { step: "any" } },
   ],
   outputs: [
@@ -639,6 +653,8 @@ export function computeSpccContainmentVolume({
   other_tank_count = 0, other_tank_diameter_ft = 0, other_equipment_ft3 = 0,
 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // Unit / range guard added 2026-09-26 after printed-example probing.
+  if ([arguments[0]?.freeboard_pct].some((v) => Number(v) > 0 && Number(v) < 1)) return { error: "Enter the freeboard allowance as a percent (10 for 10%), not a fraction." };
   if (!(largest_tank_gal > 0)) return { error: "The largest single container's capacity must be positive (gal)." };
   if (freeboard_pct < 0) return { error: "Freeboard cannot be negative (%)." };
   if (!(dike_length_ft > 0)) return { error: "Dike length must be positive (ft)." };
@@ -733,6 +749,8 @@ export function computeEspDeutschEfficiency({
   plate_area_ft2 = 0, gas_acfm = 0, migration_velocity_fps = 0, target_efficiency_pct = 0,
 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // Unit / range guard added 2026-09-26 after printed-example probing.
+  if (Number(arguments[0]?.migration_velocity_fps) > 3) return { error: "Enter the migration velocity in ft/s (about 0.1 to 0.7); the EPA tables print cm/s (16 cm/s = 0.525 ft/s)." };
   // An efficiency is a percent; 0 < value < 1 is a fraction typed into a percent field (added 2026-09-26).
   if (["target_efficiency_pct"].some((k) => { const v = Number(arguments[0]?.[k]); return v > 0 && v < 1; })) return { error: "Enter efficiencies as a percent (85 for 85%), not a fraction." };
   if (!(plate_area_ft2 > 0)) return { error: "Collecting plate area must be positive (sq ft)." };
@@ -808,6 +826,8 @@ export function computeCarbonBedLife({
   operating_hours_per_day = 8, degraded_capacity_pct = 0,
 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // Unit / range guard added 2026-09-26 after printed-example probing.
+  if ([arguments[0]?.working_capacity_pct, arguments[0]?.degraded_capacity_pct].some((v) => Number(v) > 0 && Number(v) < 1)) return { error: "Enter working capacity as a percent (16.7 for 0.167 lb/lb), not a fraction." };
   if (!(carbon_lb > 0)) return { error: "Carbon mass must be positive (lb)." };
   if (!(working_capacity_pct > 0 && working_capacity_pct <= 100)) return { error: "Working capacity must be above 0 and at most 100 percent." };
   if (!(loading_lb_h > 0)) return { error: "The solvent loading rate must be positive (lb/h)." };
@@ -957,6 +977,8 @@ export function computeGaussianDispersionScreen({
   distance_mi = 0, stability_class = "D", alt_stability_class = "",
 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // Unit / range guard added 2026-09-26 after printed-example probing.
+  if (Number(arguments[0]?.distance_mi) > 62) return { error: "The Pasquill-Gifford curves stop at about 100 km (62 mi); this screen does not extend past them." };
   if (!(emission_rate_lb_hr > 0)) return { error: "Emission rate must be positive." };
   if (!(effective_height_ft >= 0)) return { error: "Effective release height cannot be negative." };
   if (!(wind_mph > 0)) return { error: "Wind speed must be positive -- the Gaussian plume model breaks down at calm." };
@@ -1287,6 +1309,8 @@ export function computeOdorDilutionThreshold({
   limit_dt = 0, target_dt = 0,
 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // Unit / range guard added 2026-09-26 after printed-example probing.
+  if (Number(arguments[0]?.dilution_factor) > 0 && Number(arguments[0]?.dilution_factor) < 1) return { error: "A dilution factor below 1 would concentrate the odor; enter how many times the air dilutes it (at least 1)." };
   if (!(source_dt > 0)) return { error: "The source dilution-to-threshold must be positive." };
   if (!(airflow_acfm > 0)) return { error: "Exhaust airflow must be positive." };
   if (!(dilution_factor > 0)) return { error: "The dilution between source and receptor must be positive." };

@@ -151,6 +151,8 @@ export const recipeScaleExample = {
 // dimensionless per the spec-v14 §7.1 convention for monetary quantities.)
 export function computeYieldEP({ ap_weight = 0, trim_weight = 0, cooking_loss_pct = 0, ap_cost_per_lb = 0 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // Unit / range guard added 2026-09-26 after printed-example probing.
+  if ([arguments[0]?.cooking_loss_pct].some((v) => Number(v) > 0 && Number(v) < 1)) return { error: "Enter the cooking loss as a percent (15 for 15%), not a fraction." }; if (Number(arguments[0]?.ap_cost_per_lb) < 0) return { error: "The AP cost cannot be negative." };
   if (!(ap_weight > 0)) return { error: "AP weight must be positive." };
   if (!(trim_weight >= 0)) return { error: "Trim weight must be non-negative." };
   if (trim_weight > ap_weight) return { error: "Trim weight cannot exceed AP weight." };
@@ -931,6 +933,8 @@ KITCHEN_RENDERERS["prime-cost"] = renderPrimeCost;
 // dims: in { bottle_cost: dimensionless, bottle_size_ml: L, pour_size_oz: L, target_pour_cost_pct: dimensionless, other_cost_per_drink: dimensionless } out: { pours_per_bottle: dimensionless, suggested_price: dimensionless }
 export function computePourCost({ bottle_cost = 0, bottle_size_ml = 0, pour_size_oz = 0, target_pour_cost_pct = 0, other_cost_per_drink = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // Unit / range guard added 2026-09-26 after printed-example probing.
+  if (Number(arguments[0]?.target_pour_cost_pct) > 0 && (Number(arguments[0]?.target_pour_cost_pct) < 1 || Number(arguments[0]?.target_pour_cost_pct) >= 100)) return { error: "Enter the target pour cost as a percent between 1 and 100 (18 for 18%)." }; if (Number(arguments[0]?.pour_size_oz) > 10) return { error: "Enter the pour in fluid ounces (1.5), not milliliters." }; if (Number(arguments[0]?.bottle_size_ml) > 0 && Number(arguments[0]?.bottle_size_ml) < 50) return { error: "Enter the bottle size in milliliters (750), not liters." };
   other_cost_per_drink = Number(other_cost_per_drink);
   if (other_cost_per_drink < 0) return { error: "Per-drink add must be non-negative." };
   if (!(bottle_cost > 0)) return { error: "Bottle cost must be positive." };
@@ -1388,6 +1392,8 @@ KITCHEN_RENDERERS["ice-machine-sizing"] = _r({
 // dims: in { rinse_gpm: L^3 T^-1, supply_temp_f: T, rinse_temp_f: T, racks_per_hour: dimensionless, gal_per_rack: L^3, booster_efficiency: dimensionless } out: { delta_t_f: T, booster_btuh: M L^2 T^-3, booster_kw: M L^2 T^-3, gas_input_btuh: M L^2 T^-3, hourly_hot_water_gal: L^3 }
 export function computeWarewasherHotWater({ rinse_gpm = 0, supply_temp_f = 140, rinse_temp_f = 180, racks_per_hour = 0, gal_per_rack = 0, booster_efficiency = 0.8 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // Unit / range guard added 2026-09-26 after printed-example probing.
+  if (Number(arguments[0]?.rinse_gpm) > 20) return { error: "Enter the rinse flow in gallons per minute (a door machine is about 1 to 3), not gallons per hour." };
   if (!(rinse_gpm > 0)) return { error: "Final-rinse flow must be positive." };
   if (!(rinse_temp_f > supply_temp_f)) return { error: "Final-rinse temperature must exceed the supply temperature." };
   if (!(racks_per_hour > 0)) return { error: "Racks per hour must be positive." };
@@ -1575,7 +1581,7 @@ export function computeFryerOilTurnover({ vat_capacity_lb = 0, daily_product_lb 
     annual_oil_lb,
     annual_cost,
     vat_charges_per_year,
-    note: "Fryer oil turnover rate, annual consumption, and annual cost, the numbers that decide whether a filter machine pays for itself. Fried product carries oil out of the vat, roughly 8% of its weight for a naked product and 10% to 15% for a breaded or battered one, and that loss is replaced with fresh oil. The turnover rate is how many days it takes for the replacement to equal the vat's whole charge, and it is the single best predictor of oil life. It runs opposite to intuition: a busy fryer with a three-day turnover holds better oil than a slow one with a fifteen-day turnover, because the busy fryer constantly dilutes its own degradation products with fresh oil, while a slow fryer degrades on the clock whether or not anything is cooked in it. A 50 lb vat frying 120 lb/day of breaded product at 12% pickup loses 14.4 lb/day, turns over in 50 / 14.4 = 3.5 days, and consumes 14.4 x 360 = 5184 lb/yr, which at $1.10/lb is $5702 a year, a hundred vat charges. The same vat frying 30 lb/day turns over in 13.9 days, and that oil will be dark and smoking long before it has been replaced once. A cost and practice estimate; the polar-materials reading or the operator's discard test governs when oil is actually spent.",
+    note: "Fryer oil turnover rate, annual consumption, and annual cost, the numbers that decide whether a filter machine pays for itself. Fried product carries oil out of the vat, roughly 8% of its weight for a naked product and 10% to 15% for a breaded or battered one, and that loss is replaced with fresh oil. The turnover rate is how many days it takes for the replacement to equal the vat's whole charge, and it is the single best predictor of oil life. Turnover is counted in the period the product is entered in -- enter pounds per frying hour and it reads in frying hours, the unit Oklahoma State's FAPC-126 benchmark uses (5 to 12 hours is good; oil past about 20 cannot be kept in condition). It runs opposite to intuition: a busy fryer with a three-day turnover holds better oil than a slow one with a fifteen-day turnover, because the busy fryer constantly dilutes its own degradation products with fresh oil, while a slow fryer degrades on the clock whether or not anything is cooked in it. A 50 lb vat frying 120 lb/day of breaded product at 12% pickup loses 14.4 lb/day, turns over in 50 / 14.4 = 3.5 days, and consumes 14.4 x 360 = 5184 lb/yr, which at $1.10/lb is $5702 a year, a hundred vat charges. The same vat frying 30 lb/day turns over in 13.9 days, and that oil will be dark and smoking long before it has been replaced once. A cost and practice estimate; the polar-materials reading or the operator's discard test governs when oil is actually spent.",
   };
 }
 
@@ -1613,6 +1619,8 @@ export const KEG_SIZES_GAL = {
 // dims: in { keg_size: dimensionless, custom_gallons: L^3, serving_oz: L^3, loss_fraction: dimensionless, keg_cost: dimensionless, menu_price: dimensionless } out: { gross_oz: L^3, net_oz: L^3, servings: dimensionless, cost_per_serving: dimensionless, pour_cost_pct: dimensionless }
 export function computeKegYield({ keg_size = "half_barrel", custom_gallons = 0, serving_oz = 16, loss_fraction = 0.15, keg_cost = 0, menu_price = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // Unit / range guard added 2026-09-26 after printed-example probing.
+  if (Number(arguments[0]?.serving_oz) > 64) return { error: "Enter the serving in fluid ounces (16), not milliliters." };
   const preset = KEG_SIZES_GAL[keg_size];
   if (!preset) return { error: "Keg size must be a listed barrel size or custom." };
   const gallons = keg_size === "custom" ? custom_gallons : preset.gal;
@@ -1712,6 +1720,8 @@ KITCHEN_RENDERERS["beverage-co2-duration"] = _r({
 // dims: in { pan_shape: dimensionless, diameter_in: L, length_in: L, width_in: L, thickness_factor: M L^-2, reference_weight_oz: M, reference_diameter_in: L } out: { pan_area_sqin: L^2, dough_weight_oz: M, scaled_weight_oz: M }
 export function computeDoughBallScaling({ pan_shape = "round", diameter_in = 0, length_in = 0, width_in = 0, thickness_factor = 0.1, reference_weight_oz = 0, reference_diameter_in = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // Unit / range guard added 2026-09-26 after printed-example probing.
+  if (Number(arguments[0]?.thickness_factor) > 1) return { error: "The thickness factor is ounces per square inch (about 0.08 to 0.13); check the value." };
   if (pan_shape !== "round" && pan_shape !== "rectangular") return { error: "Pan shape must be round or rectangular." };
   if (!(thickness_factor > 0)) return { error: "Thickness factor must be positive." };
   let pan_area_sqin;
@@ -1769,6 +1779,8 @@ KITCHEN_RENDERERS["dough-ball-scaling"] = _r({
 // dims: in { reference_time_hr: T, reference_temp_f: T, actual_temp_f: T, q10: dimensionless } out: { predicted_time_hr: T, predicted_time_min: T, ratio: dimensionless, delta_f: T, delta_c: T }
 export function computeFermentationTimeQ10({ reference_time_hr = 0, reference_temp_f = 78, actual_temp_f = 78, q10 = 2.0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // Unit / range guard added 2026-09-26 after printed-example probing.
+  if ([arguments[0]?.reference_temp_f, arguments[0]?.actual_temp_f].some((v) => v !== undefined && (Number(v) < 32 || Number(v) > 140))) return { error: "Fermentation temperatures must be between 32 and 140 deg F; check the unit (deg F)." };
   if (!(reference_time_hr > 0)) return { error: "Reference proof or bulk time must be positive." };
   if (!(q10 > 1)) return { error: "Q10 must be greater than 1." };
   if (!Number.isFinite(reference_temp_f) || !Number.isFinite(actual_temp_f)) return { error: "Temperatures must be finite numbers." };
@@ -1862,6 +1874,8 @@ KITCHEN_RENDERERS["covers-per-labor-hour"] = _r({
 // dims: in { daily_usage: T^-1, lead_time_days: T, order_cycle_days: T, safety_factor: dimensionless, on_hand: dimensionless, on_order: dimensionless, units_per_case: dimensionless } out: { coverage_days: T, par_level: dimensionless, order_needed: dimensionless, cases: dimensionless, overshoot: dimensionless }
 export function computeParLevelOrder({ daily_usage = 0, lead_time_days = 0, order_cycle_days = 0, safety_factor = 0.25, on_hand = 0, on_order = 0, units_per_case = 1 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // Unit / range guard added 2026-09-26 after printed-example probing.
+  if (Number(arguments[0]?.safety_factor) > 3) return { error: "Enter the safety factor as a fraction of usage (0.25 for 25%), not a percent." };
   if (!(daily_usage > 0)) return { error: "Average daily usage must be positive." };
   if (!(lead_time_days >= 0)) return { error: "Lead time cannot be negative." };
   if (!(order_cycle_days > 0)) return { error: "Order cycle must be positive." };
@@ -2009,6 +2023,8 @@ KITCHEN_RENDERERS["tphc-window"] = _r({
 // dims: in { gallons: L^3, specific_gravity: dimensionless, specific_heat: L^2 T^-2, start_temp_f: T, final_temp_f: T, rated_input_btuh: M L^2 T^-3, jacket_efficiency: dimensionless, latent_heat_btu_lb: L^2 T^-2 } out: { mass_lb: M, heat_btu: M L^2 T^-2, heatup_min: T, steam_per_batch_lb: M, steam_rate_lb_hr: M T^-1 }
 export function computeSteamKettleHeatup({ gallons = 0, specific_gravity = 1.0, specific_heat = 1.0, start_temp_f = 60, final_temp_f = 200, rated_input_btuh = 0, jacket_efficiency = 0.85, latent_heat_btu_lb = 945.6 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // Unit / range guard added 2026-09-26 after printed-example probing.
+  if (Number(arguments[0]?.final_temp_f) > 250) return { error: "A steam-jacketed kettle cannot take product past about 250 deg F; check the final temperature (deg F)." }; if (Number(arguments[0]?.rated_input_btuh) > 0 && Number(arguments[0]?.rated_input_btuh) < 1000) return { error: "Enter the rated input in Btu/hr (a 40 gal kettle is about 130,000), not kW." };
   if (!(gallons > 0)) return { error: "Kettle working volume must be positive." };
   if (!(specific_gravity > 0)) return { error: "Specific gravity must be positive." };
   if (!(specific_heat > 0)) return { error: "Specific heat must be positive." };
@@ -2022,7 +2038,9 @@ export function computeSteamKettleHeatup({ gallons = 0, specific_gravity = 1.0, 
   const useful_input_btuh = rated_input_btuh * jacket_efficiency;
   const heatup_hr = heat_btu / useful_input_btuh;
   const heatup_min = heatup_hr * 60;
-  const steam_per_batch_lb = heat_btu / latent_heat_btu_lb;
+  // The jacket condenses steam for the product AND its losses, so the steam drawn is heat / (latent x efficiency);
+  // until 2026-09-26 the tile left the efficiency out and understated the boiler load by that factor.
+  const steam_per_batch_lb = heat_btu / (latent_heat_btu_lb * jacket_efficiency);
   const steam_rate_lb_hr = steam_per_batch_lb / heatup_hr;
   const boiler_hp = steam_rate_lb_hr / 34.5;
   if (![mass_lb, heat_btu, heatup_hr, heatup_min, steam_per_batch_lb, steam_rate_lb_hr, boiler_hp].every(Number.isFinite)) return { error: "Steam-kettle math is not a finite value." };
@@ -2041,7 +2059,7 @@ export function computeSteamKettleHeatup({ gallons = 0, specific_gravity = 1.0, 
 export const steamKettleHeatupExample = { inputs: { gallons: 40, specific_gravity: 1.0, specific_heat: 1.0, start_temp_f: 60, final_temp_f: 200, rated_input_btuh: 100000, jacket_efficiency: 0.85, latent_heat_btu_lb: 945.6 } };
 
 KITCHEN_RENDERERS["steam-kettle-heatup"] = _r({
-  citation: "Citation: steam-jacketed kettle heat-up from the sensible-heat relation Q = m c dT with 8.34 lb per gallon of water, and steam demand from Q divided by the latent heat of saturated steam at the operating pressure (about 945.6 BTU/lb at 15 psig per the ASME steam tables), cited by name and not reproduced. Boiler horsepower at 34.5 lb/hr of steam. The kettle's rated input and the boiler manufacturer's data govern.",
+  citation: "Citation: steam-jacketed kettle heat-up from the sensible-heat relation Q = m c dT with 8.34 lb per gallon of water, and steam demand from Q divided by the latent heat of saturated steam at the operating pressure and by the jacket efficiency (about 945.6 BTU/lb at 15 psig per the ASME steam tables), cited by name and not reproduced. Boiler horsepower at 34.5 lb/hr of steam. The kettle's rated input and the boiler manufacturer's data govern.",
   example: steamKettleHeatupExample.inputs,
   fields: [
     { key: "gallons", label: "Kettle working volume (gal)", kind: "number" },
@@ -2072,15 +2090,26 @@ export function computeHotHoldingEnergy({ equipment = [], diversity_factor = 0.6
   if (!(Number(voltage) > 0)) return { error: "Service voltage must be positive." };
   if (phase !== "single" && phase !== "three") return { error: "Phase must be single or three." };
   let connected_kw = 0;
+  const unit_kws = [];
   for (const e of equipment) {
-    const kw = Number(e.kw) || 0;
-    const qty = Number(e.qty) || 0;
+    const kw = Number(e.kw);
+    const qty = Number(e.qty);
+    if (!Number.isFinite(kw) || !Number.isFinite(qty)) return { error: "Each item needs a numeric kW and quantity." };
     if (kw < 0 || qty < 0) return { error: "Equipment kW and quantity cannot be negative." };
+    if (!Number.isInteger(qty)) return { error: "Quantities must be whole numbers." };
+    if (kw > 100) return { error: "Enter each unit's rating in kW (1.5), not watts (1,500)." };
     connected_kw += kw * qty;
+    for (let i = 0; i < Math.min(qty, 2); i++) unit_kws.push(kw);
   }
   if (!(connected_kw > 0)) return { error: "Total connected load must be positive." };
   // Every watt a holding cabinet draws comes back out as sensible heat: 3412 BTU/hr per kW.
-  const demand_kw = connected_kw * Number(diversity_factor);
+  if (Number(voltage) < 100) return { error: "Enter the service voltage in volts (208), not kV." };
+  // NEC 220.56: the demand is never less than the two largest kitchen loads (Electrical Knowhow Example 2:
+  // 60 kW x 65% = 39 kW, raised to the 40 kW of the two largest). Until 2026-09-26 the tile had no floor.
+  unit_kws.sort((a, b) => b - a);
+  const two_largest_kw = (unit_kws[0] || 0) + (unit_kws[1] || 0);
+  const diversified_kw = connected_kw * Number(diversity_factor);
+  const demand_kw = Math.max(diversified_kw, two_largest_kw);
   const denominator = phase === "three" ? Number(voltage) * Math.sqrt(3) : Number(voltage);
   const demand_amps = demand_kw * 1000 / denominator;
   const sensible_btuh = demand_kw * 3412;
@@ -2088,6 +2117,8 @@ export function computeHotHoldingEnergy({ equipment = [], diversity_factor = 0.6
   if (![connected_kw, demand_kw, demand_amps, sensible_btuh, tons].every(Number.isFinite)) return { error: "Hot-holding load math is not a finite value." };
   return {
     connected_kw,
+    diversified_kw,
+    two_largest_kw,
     demand_kw,
     demand_amps,
     sensible_btuh,
@@ -2178,17 +2209,21 @@ KITCHEN_RENDERERS["hot-holding-energy"] = renderHotHoldingEnergy;
 // ============ spec-v1637: grease duct buildup and cleaning interval ============
 
 // dims: in { inspection_interval_months: T, months_since_inspection: T, measured_thickness_um: L, cleaning_trigger_um: L, inspection_point_trigger_um: L, is_designated_point: dimensionless } out: { months_overdue: T, next_inspection_months: T, thickness_margin_um: L, applicable_trigger_um: L, thickness_ratio: dimensionless, inspections_per_year: dimensionless }
-export function computeGreaseDuctCleaningInterval({ inspection_interval_months = 0, months_since_inspection = 0, measured_thickness_um = 0, cleaning_trigger_um = 2000, inspection_point_trigger_um = 50, is_designated_point = 0 } = {}) {
+export function computeGreaseDuctCleaningInterval({ inspection_interval_months = 0, months_since_inspection = 0, measured_thickness_um = 0, cleaning_trigger_um = 2000, inspection_point_trigger_um = 3175, is_designated_point = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(inspection_interval_months > 0)) return { error: "The inspection interval must be positive (months) -- monthly for solid fuel, quarterly for high volume, semiannually for moderate, annually for low volume." };
   if (months_since_inspection < 0) return { error: "Months since the last inspection cannot be negative." };
   if (measured_thickness_um < 0) return { error: "The measured grease thickness cannot be negative (micrometres)." };
   if (!(cleaning_trigger_um > 0)) return { error: "The cleaning trigger must be positive (micrometres)." };
-  if (!(inspection_point_trigger_um > 0)) return { error: "The designated inspection point trigger must be positive (micrometres)." };
-  if (is_designated_point < 0) return { error: "The designated-point flag is 1 or 0." };
+  if (!(inspection_point_trigger_um > 0)) return { error: "The fan housing trigger must be positive (micrometres)." };
+  if (measured_thickness_um > 0 && measured_thickness_um < 1) return { error: "Enter the grease depth in micrometres (2,000 is 0.078 in), not inches." };
+  if (!(is_designated_point === 0 || is_designated_point === 1)) return { error: "The fan-housing flag is 1 or 0." };
   const MONTHS_PER_YEAR = 12;
   const UM_PER_IN = 25400;
-  const at_designated_point = is_designated_point >= 0.5;
+  // NFPA 96 12.6.1.1: clean at 2,000 um (0.078 in) in the system and 3,175 um (0.125 in) in a fan housing, and clean
+  // to 50 um (0.002 in). Until 2026-09-26 the tile read 50 um as a "designated inspection point trigger".
+  const CLEAN_TO_UM = 50;
+  const at_designated_point = is_designated_point === 1;
   const applicable_trigger_um = at_designated_point ? inspection_point_trigger_um : cleaning_trigger_um;
   const months_overdue = months_since_inspection - inspection_interval_months;
   const inspection_overdue = months_overdue > 0;
@@ -2205,34 +2240,34 @@ export function computeGreaseDuctCleaningInterval({ inspection_interval_months =
     ? "INSPECTION OVERDUE by " + fmt(months_overdue, 1) + " months: " + fmt(months_since_inspection, 1) + " months since the last one against a " + fmt(inspection_interval_months, 1) + " month interval (" + fmt(inspections_per_year, 1) + " a year)"
     : "ON SCHEDULE: " + fmt(months_since_inspection, 1) + " months since the last inspection, with " + fmt(next_inspection_months, 1) + " months to the next at a " + fmt(inspection_interval_months, 1) + " month interval";
   const measurement_verdict = cleaning_triggered
-    ? "CLEAN NOW: " + fmt(measured_thickness_um, 0) + " micrometres (" + fmt(measured_thickness_in, 4) + " in) against a " + fmt(applicable_trigger_um, 0) + " micrometre trigger" + (at_designated_point ? " at a designated inspection point" : "") + ". THE MEASUREMENT GOVERNS, whatever the schedule says"
-    : "Below the trigger at " + fmt(measured_thickness_um, 0) + " micrometres against " + fmt(applicable_trigger_um, 0) + ", with " + fmt(thickness_margin_um, 0) + " to go" + (at_designated_point ? " at a designated inspection point" : "") + " -- but a system found with ANY measurable grease is cleaned, and one found clean is still inspected again at the interval";
+    ? "CLEAN NOW: " + fmt(measured_thickness_um, 0) + " micrometres (" + fmt(measured_thickness_in, 4) + " in) against a " + fmt(applicable_trigger_um, 0) + " micrometre trigger" + (at_designated_point ? " in the fan housing" : "") + ", and the surfaces are cleaned to " + CLEAN_TO_UM + " micrometres (0.002 in). THE MEASUREMENT GOVERNS, whatever the schedule says"
+    : "Below the trigger at " + fmt(measured_thickness_um, 0) + " micrometres against " + fmt(applicable_trigger_um, 0) + ", with " + fmt(thickness_margin_um, 0) + " to go" + (at_designated_point ? " in the fan housing" : "") + " -- but a system found with ANY measurable grease is cleaned, and one found clean is still inspected again at the interval";
   return {
     inspection_interval_months, months_since_inspection, months_overdue,
     inspection_overdue, next_inspection_months, inspections_per_year,
     measured_thickness_um, measured_thickness_in, cleaning_trigger_um,
     inspection_point_trigger_um, is_designated_point: at_designated_point ? 1 : 0,
-    applicable_trigger_um, trigger_thickness_in, thickness_margin_um,
+    applicable_trigger_um, trigger_thickness_in, thickness_margin_um, clean_to_um: CLEAN_TO_UM,
     thickness_ratio, cleaning_triggered, schedule_verdict, measurement_verdict,
-    note: "NFPA 96 sets the inspection interval by COOKING VOLUME rather than by the size of the kitchen: monthly for solid fuel, quarterly for high volume operations -- twenty four hour cooking, charbroiling, wok cooking -- semiannually for moderate volume, and annually for low volume such as churches, seasonal businesses and day camps. Getting the category right is the whole scheduling decision, and a charbroiler in an otherwise moderate kitchen moves the whole system into the quarterly column. THE SCHEDULE AND THE MEASUREMENT ARE TWO SEPARATE TESTS AND THE MEASUREMENT GOVERNS. An inspection at the interval is required whatever the system looks like, and a cleaning is required whenever measurable grease is found, whatever the schedule says. A system inspected on time and found with grease is cleaned on the spot; a system found clean is still inspected again at the interval. Neither test substitutes for the other, and reporting only the schedule is how a system that needed cleaning in month two gets cleaned in month six. The depth criterion is where the two meet: a measurement at a designated inspection point carries a far tighter trigger than the general one, because that point is chosen to represent the system and a small reading there implies a large accumulation elsewhere. THE SCOPE TRAP IS THE ONE THAT LEAVES BUILDINGS ON FIRE. Cleaning means the ENTIRE system -- hood, filters, the full length of duct including horizontal runs and every access panel, the fan, and the roof discharge -- and a cleaning that addresses the hood, the filters and the first accessible section of duct has cleaned the part that is easy to reach and left the part that burns. The fan housing and the roof curb accumulate heavily and are routinely skipped, and a certificate that does not say what was cleaned has not said anything. A schedule check and a depth comparison. It does not determine the cooking volume category, which is a judgment about the operation; it does not address the access panel spacing and placement that make a full cleaning possible in the first place, which is a design and installation matter; and it does not cover the fire suppression system, its inspection interval, its nozzle placement relative to the appliances beneath, or the semiannual servicing that is a separate requirement. Cleaning method, chemicals, containment of the runoff, and the certification of the cleaning contractor are all outside it. NFPA 96 as adopted, the authority having jurisdiction, and the certified cleaning contractor govern.",
+    note: "NFPA 96 sets the inspection interval by COOKING VOLUME rather than by the size of the kitchen: monthly for solid fuel, quarterly for high volume operations -- twenty four hour cooking, charbroiling, wok cooking -- semiannually for moderate volume, and annually for low volume such as churches, seasonal businesses and day camps. Getting the category right is the whole scheduling decision, and a charbroiler in an otherwise moderate kitchen moves the whole system into the quarterly column. THE SCHEDULE AND THE MEASUREMENT ARE TWO SEPARATE TESTS AND THE MEASUREMENT GOVERNS. An inspection at the interval is required whatever the system looks like, and a cleaning is required whenever measurable grease is found, whatever the schedule says. A system inspected on time and found with grease is cleaned on the spot; a system found clean is still inspected again at the interval. Neither test substitutes for the other, and reporting only the schedule is how a system that needed cleaning in month two gets cleaned in month six. The depth criterion is where the two meet: NFPA 96 calls for cleaning at 2,000 micrometres (0.078 in) of buildup in the system and 3,175 (0.125 in) in a fan housing, and the surfaces are then cleaned down to 50 micrometres (0.002 in) -- 50 is the finish, not a trigger. THE SCOPE TRAP IS THE ONE THAT LEAVES BUILDINGS ON FIRE. Cleaning means the ENTIRE system -- hood, filters, the full length of duct including horizontal runs and every access panel, the fan, and the roof discharge -- and a cleaning that addresses the hood, the filters and the first accessible section of duct has cleaned the part that is easy to reach and left the part that burns. The fan housing and the roof curb accumulate heavily and are routinely skipped, and a certificate that does not say what was cleaned has not said anything. A schedule check and a depth comparison. It does not determine the cooking volume category, which is a judgment about the operation; it does not address the access panel spacing and placement that make a full cleaning possible in the first place, which is a design and installation matter; and it does not cover the fire suppression system, its inspection interval, its nozzle placement relative to the appliances beneath, or the semiannual servicing that is a separate requirement. Cleaning method, chemicals, containment of the runoff, and the certification of the cleaning contractor are all outside it. NFPA 96 as adopted, the authority having jurisdiction, and the certified cleaning contractor govern.",
   };
 }
-const greaseDuctCleaningIntervalExample = { inputs: { inspection_interval_months: 3, months_since_inspection: 5, measured_thickness_um: 2400, cleaning_trigger_um: 2000, inspection_point_trigger_um: 50, is_designated_point: 0 } };
+const greaseDuctCleaningIntervalExample = { inputs: { inspection_interval_months: 3, months_since_inspection: 5, measured_thickness_um: 2400, cleaning_trigger_um: 2000, inspection_point_trigger_um: 3175, is_designated_point: 0 } };
 KITCHEN_RENDERERS["grease-duct-cleaning-interval"] = _simpleRenderer({
-  citation: "Citation: the NFPA 96 inspection intervals by cooking volume, by name -- monthly for solid fuel, quarterly for high volume (24 hour, charbroiling, wok), semiannually for moderate, annually for low volume -- with the depth criterion commonly 2,000 micrometres for a general measurement and 50 micrometres at a designated inspection point. The schedule and the measurement are separate tests and the MEASUREMENT GOVERNS. Cleaning scope is the entire system: hood, filters, the full duct, the fan and the roof discharge. NFPA 96 as adopted, the authority having jurisdiction, and the certified cleaning contractor govern.",
+  citation: "Citation: the NFPA 96 inspection intervals by cooking volume, by name -- monthly for solid fuel, quarterly for high volume (24 hour, charbroiling, wok), semiannually for moderate, annually for low volume -- with the NFPA 96 12.6.1.1 depth criteria: clean at 2,000 micrometres (0.078 in) in the system or 3,175 (0.125 in) in a fan housing, and clean to 50 micrometres (0.002 in). The schedule and the measurement are separate tests and the MEASUREMENT GOVERNS. Cleaning scope is the entire system: hood, filters, the full duct, the fan and the roof discharge. NFPA 96 as adopted, the authority having jurisdiction, and the certified cleaning contractor govern.",
   example: greaseDuctCleaningIntervalExample.inputs,
   fields: [
     { key: "inspection_interval_months", label: "Inspection interval for the cooking volume (months)", kind: "number", default: 3 },
     { key: "months_since_inspection", label: "Months since the last inspection", kind: "number", default: 5 },
     { key: "measured_thickness_um", label: "Measured grease thickness (micrometres)", kind: "number", default: 2400 },
     { key: "cleaning_trigger_um", label: "General cleaning trigger (micrometres)", kind: "number", default: 2000 },
-    { key: "inspection_point_trigger_um", label: "Designated inspection point trigger (micrometres)", kind: "number", default: 50 },
-    { key: "is_designated_point", label: "Measured at a designated inspection point (1 yes, 0 no)", kind: "number", default: 0, attrs: { step: "1", min: "0", max: "1" } },
+    { key: "inspection_point_trigger_um", label: "Fan housing cleaning trigger (micrometres; NFPA 96: 3,175)", kind: "number", default: 3175 },
+    { key: "is_designated_point", label: "Measured in the exhaust fan housing (1 yes, 0 no)", kind: "number", default: 0, attrs: { step: "1", min: "0", max: "1" } },
   ],
   outputs: [
     { key: "s", id: "gdci-out-s", label: "Against the schedule", value: (r) => r.schedule_verdict },
     { key: "m", id: "gdci-out-m", label: "Against the measurement", value: (r) => r.measurement_verdict },
-    { key: "t", id: "gdci-out-t", label: "Trigger in use", value: (r) => fmt(r.applicable_trigger_um, 0) + " micrometres (" + fmt(r.trigger_thickness_in, 4) + " in), the " + (r.is_designated_point ? "designated inspection point" : "general") + " criterion -- the measurement is " + fmt(r.thickness_ratio, 2) + "x it" },
+    { key: "t", id: "gdci-out-t", label: "Trigger in use", value: (r) => fmt(r.applicable_trigger_um, 0) + " micrometres (" + fmt(r.trigger_thickness_in, 4) + " in), the " + (r.is_designated_point ? "fan housing" : "general") + " criterion -- the measurement is " + fmt(r.thickness_ratio, 2) + "x it" },
     { key: "f", id: "gdci-out-f", label: "Inspection frequency", value: (r) => fmt(r.inspections_per_year, 1) + " inspections a year at this interval" },
     { key: "n", id: "gdci-out-n", label: "Note", value: (r) => r.note },
   ],
@@ -2244,6 +2279,8 @@ KITCHEN_RENDERERS["grease-duct-cleaning-interval"] = _simpleRenderer({
 // dims: in { door_width_ft: L, door_height_ft: L, full_open_cfm: L^3 T^-1, openings_per_hour: T^-1, seconds_open_each: T, protection_factor: dimensionless, enthalpy_difference_btu_lb: L^2 T^-2, moisture_difference_lb_lb: dimensionless, air_density_lb_ft3: M L^-3 } out: { door_area_ft2: L^2, door_open_factor: dimensionless, effective_cfm: L^3 T^-1, total_load_btuh: M L^2 T^-3, latent_load_btuh: M L^2 T^-3, latent_share_pct: dimensionless, frost_lb_day: M }
 export function computeWalkInDoorInfiltration({ door_width_ft = 0, door_height_ft = 0, full_open_cfm = 0, openings_per_hour = 0, seconds_open_each = 0, protection_factor = 1, enthalpy_difference_btu_lb = 0, moisture_difference_lb_lb = 0, air_density_lb_ft3 = 0.0765 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // Unit / range guard added 2026-09-26 after printed-example probing.
+  if (Number(arguments[0]?.moisture_difference_lb_lb) > 0.05) return { error: "Enter the humidity ratio difference in lb of water per lb of dry air (about 0.005), not grains." }; if (Number(arguments[0]?.openings_per_hour) * Number(arguments[0]?.seconds_open_each) > 3600) return { error: "The door cannot be open more than 3,600 seconds an hour; check openings and seconds." };
   if (!(door_width_ft > 0)) return { error: "Door width must be positive (ft)." };
   if (!(door_height_ft > 0)) return { error: "Door height must be positive (ft)." };
   if (!(full_open_cfm > 0)) return { error: "The fully-open doorway airflow must be positive (cfm) -- from the doorway flow chart for this door size and temperature difference." };
@@ -2320,6 +2357,7 @@ KITCHEN_RENDERERS["walk-in-door-infiltration"] = _simpleRenderer({
 // dims: in { hood_exhaust_cfm: L^3 T^-1, other_exhaust_cfm: L^3 T^-1, dedicated_makeup_cfm: L^3 T^-1, intended_transfer_cfm: L^3 T^-1, building_leakage_cfm_per_pa: L^3 T^-1, door_width_ft: L, door_height_ft: L } out: { total_exhaust_cfm: L^3 T^-1, deficit_cfm: L^3 T^-1, deficit_percent: dimensionless, uncontrolled_cfm: L^3 T^-1, makeup_shortfall_cfm: L^3 T^-1, door_force_lbf: M L T^-2 }
 export function computeKitchenMakeupAirDeficit({ hood_exhaust_cfm = 0, other_exhaust_cfm = 0, dedicated_makeup_cfm = 0, intended_transfer_cfm = 0, building_leakage_cfm_per_pa = 0, door_width_ft = 3, door_height_ft = 7 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(Number(arguments[0]?.door_width_ft ?? 3) > 0.5)) return { error: "Enter the door width in feet (3), wider than the 3 in knob offset." };
   if (!(hood_exhaust_cfm > 0)) return { error: "Hood exhaust must be positive (cfm)." };
   if (other_exhaust_cfm < 0) return { error: "Other exhaust cannot be negative (cfm)." };
   if (dedicated_makeup_cfm < 0) return { error: "Dedicated makeup air cannot be negative (cfm)." };
@@ -2343,7 +2381,14 @@ export function computeKitchenMakeupAirDeficit({ hood_exhaust_cfm = 0, other_exh
   const pressure_pa = building_leakage_cfm_per_pa > 0 ? makeup_shortfall_cfm / building_leakage_cfm_per_pa : null;
   const pressure_psf = pressure_pa === null ? null : pressure_pa / PA_PER_PSF;
   const door_area_ft2 = door_width_ft * door_height_ft;
-  const door_force_lbf = pressure_psf === null ? null : pressure_psf * door_area_ft2 * LBF_PER_PSF_SQFT;
+  // The pressure acts at the door's centroid and the user pulls at the knob, about 3 in from the latch edge:
+  // F = A dP W / (2 (W - d)), the NFPA 92 / Klote relation. Until 2026-09-26 the tile used the whole A x dP,
+  // about 1.8x the force at the knob.
+  const knob_factor = door_width_ft / (2 * (door_width_ft - 0.25));
+  const door_force_lbf = pressure_psf === null ? null : pressure_psf * door_area_ft2 * LBF_PER_PSF_SQFT * knob_factor;
+  // IMC 508.1 caps the kitchen's negative pressure at 0.02 in wc (about 5 Pa).
+  const pressure_inwc = pressure_pa === null ? null : pressure_pa / 249.089;
+  const negative_pressure_ok = pressure_inwc === null ? null : pressure_inwc <= 0.02;
   const door_force_ok = door_force_lbf === null ? null : door_force_lbf <= EGRESS_DOOR_LIMIT_LBF;
   const outs = [total_exhaust_cfm, deficit_cfm, deficit_percent, uncontrolled_cfm, makeup_shortfall_cfm];
   if (!outs.every(Number.isFinite)) return { error: "Makeup air balance math is not a finite value." };
@@ -2359,7 +2404,7 @@ export function computeKitchenMakeupAirDeficit({ hood_exhaust_cfm = 0, other_exh
     hood_exhaust_cfm, other_exhaust_cfm, total_exhaust_cfm, dedicated_makeup_cfm,
     deficit_cfm, deficit_percent, intended_transfer_cfm, uncontrolled_cfm,
     makeup_shortfall_cfm, balanced, building_leakage_cfm_per_pa, pressure_pa,
-    pressure_psf, door_width_ft, door_height_ft, door_area_ft2, door_force_lbf,
+    pressure_psf, pressure_inwc, negative_pressure_ok, knob_factor, door_width_ft, door_height_ft, door_area_ft2, door_force_lbf,
     door_force_ok, egress_limit_lbf: EGRESS_DOOR_LIMIT_LBF, balance_verdict, door_verdict,
     note: "Every cubic foot a kitchen exhausts has to come back in from somewhere, and the deficit between exhaust and dedicated makeup air is the quantity that decides where. SOME DEFICIT IS INTENTIONAL: a kitchen is deliberately kept slightly negative to the dining room so odours and grease-laden air stay where they belong, and a small transfer across that boundary is design rather than fault. What matters is the part NOT accounted for, because that air comes through the building envelope, under exterior doors, and down any flue that will pass it -- and the flue is the one that matters. THE CONSEQUENCES ARRIVE IN AN ORDER. A modest deficit in a tight building produces a large negative pressure, because pressure is the deficit divided by how leaky the building is, and a well-sealed building has very little leakage to work with. That pressure shows up first as door opening force: an exterior door in a tight negative building can exceed the thirty pound egress limit, which is a life safety problem before it is a comfort one and which an inspector can measure. Next it shows up as combustion appliance backdrafting -- a water heater or a boiler in or near the kitchen can spill flue gases into the space, and the test is done at worst case with every exhaust fan running and every makeup path closed. Then other exhaust systems reverse: restroom fans stop exhausting and start blowing restroom air into the restrooms. AND THE HOOD ITSELF STOPS WORKING, which is the consequence people least expect. A hood starved of makeup air cannot move its rated exhaust -- the fan is on a system curve, and raising the resistance by making the room negative moves it back along that curve -- so capture degrades and grease-laden vapour escapes into the space. A kitchen with a capture problem is often a makeup air problem wearing a hood problem's clothes, and adding fan speed to a starved hood makes the negative pressure worse rather than better. The fix is makeup air, and the amount is the deficit less the intended transfer. An air balance, not a design. It does not size the hood or its exhaust, which follows from the appliance line-up and the hood style; it does not size or select the makeup air unit, temper it, or compute the heating and cooling that tempering requires, which on a cold day is a very large load; and it does not distribute the makeup air, which matters as much as its quantity -- makeup air delivered as a draft across the cooking surface disrupts capture as effectively as having none. The leakage coefficient is a crude single-parameter model of a building, and a measured blower-door result is the only sound source for it. It does not perform the combustion safety test, which is a field measurement. The applicable mechanical code, the hood and makeup air manufacturers' data, a measured air balance, and the mechanical designer govern.",
   };

@@ -637,7 +637,7 @@ export const BESPOKE_OUTPUT_LABELS = {
   "pipe-expansion-loop": {"delta_L_in":"Linear expansion ΔL","alpha_per_F":"Coefficient alpha","loop_leg_in":"Recommended loop leg"},
   "pipe-filled-support-load": {"filled_lbft":"Filled weight per foot","per_hanger_lb":"Load per hanger"},
   "pipe-fitting-takeout": {"cut_length_in":"Cut length (in)","dimension_in":"Deductions","notes":"Notes"},
-  "pipe-flotation": {"fs":"Factor of safety","uplift_plf":"Buoyant uplift","required_backfill_plf":"Backfill to meet the target"},
+  "pipe-flotation": {"fs":"Factor of safety","uplift_plf":"Buoyant uplift","required_backfill_plf":"Backfill to meet the target (FS on the whole uplift; FS on the backfill only, as WSSC C-4)"},
   "pipe-heat-loss-radial": {"q_per_ft_btuh":"Heat loss per linear foot","q_total_btuh":"Total heat loss","note":"Note"},
   "pipe-insulation-for-condensation": {"dew_point_F":"Ambient dew point","no_risk":"Minimum thickness (round UP to stock)","note":"Note"},
   "pipe-insulation-takeoff": {"sections":"Insulation sections","jacket_sf":"Jacket area"},

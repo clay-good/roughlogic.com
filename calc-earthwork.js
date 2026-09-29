@@ -323,6 +323,8 @@ EARTHWORK_RENDERERS["dozer-production"] = _v810renderDozerProduction;
 //  both area rates are L^2 T^-1 and the compacted-volume rate L^3 T^-1.)
 export function computeCompactionRollerProduction({ drum_width_ft, speed_mph, lift_in, passes, efficiency = 0.75 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // Unit / range guard added 2026-09-26 after printed-example probing.
+  if (Number(arguments[0]?.efficiency ?? 0.75) > 1) return { error: "Enter efficiency as a fraction of the hour (0.83 for 50 min), not a percent." }; if (!Number.isInteger(Number(arguments[0]?.passes))) return { error: "Passes must be a whole number." };
   const width = Number(drum_width_ft);
   const speed = Number(speed_mph);
   const lift = Number(lift_in);
@@ -375,10 +377,10 @@ EARTHWORK_RENDERERS["compaction-roller-production"] = _v813renderCompactionRolle
 //
 // cross_section = spacing x penetration; production_bcy/hr = cross_section x
 // speed x 60 x efficiency / 27 (60 min/hr, 27 ft^3/cy fold the units).
-// dims: in { spacing_ft: L, penetration_ft: L, speed_fpm: L T^-1, efficiency: dimensionless } out: { cross_section_ft2: L^2, production_bcy_hr: L^3 T^-1 }
+// dims: in { spacing_ft: L, penetration_ft: L, speed_fpm: L T^-1, efficiency: dimensionless, pass_length_ft: L, turn_min: T } out: { cross_section_ft2: L^2, production_bcy_hr: L^3 T^-1 }
 // (Shank spacing and penetration are L; ripping speed L T^-1; efficiency
 //  dimensionless; the ripped cross-section L^2 and the loosened rate L^3 T^-1.)
-export function computeRipperProduction({ spacing_ft, penetration_ft, speed_fpm, efficiency = 0.75 } = {}) {
+export function computeRipperProduction({ spacing_ft, penetration_ft, speed_fpm, efficiency = 0.75, pass_length_ft = 0, turn_min = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const spacing = Number(spacing_ft);
   const pen = Number(penetration_ft);
@@ -388,8 +390,16 @@ export function computeRipperProduction({ spacing_ft, penetration_ft, speed_fpm,
   if (!Number.isFinite(pen) || pen <= 0) return { error: "Penetration must be a positive finite number (ft)." };
   if (!Number.isFinite(speed) || speed <= 0) return { error: "Ripping speed must be a positive finite number (ft/min)." };
   if (!Number.isFinite(eff) || eff <= 0) return { error: "Efficiency must be a positive finite number." };
+  if (eff > 1) return { error: "Enter efficiency as a fraction of the hour (0.75 for 45 min), not a percent." };
+  if (!(Number(pass_length_ft) >= 0) || !(Number(turn_min) >= 0)) return { error: "Pass length and turn time cannot be negative." };
+  if (Number(turn_min) > 0 && !(Number(pass_length_ft) > 0)) return { error: "Enter the pass length to charge the turn time against." };
   const crossSectionFt2 = spacing * pen;
-  const productionBcyHr = (crossSectionFt2 * speed * 60 * eff) / 27;
+  // Cat's timing method: cycle = pass / speed + turn, and production = volume per pass / cycle. With no pass length
+  // the turn is ignored and production is continuous ripping, which Cat says runs 10 to 20% high.
+  const passLen = Number(pass_length_ft), turn = Number(turn_min);
+  const productionBcyHr = passLen > 0
+    ? (crossSectionFt2 * passLen / 27) * (60 / (passLen / speed + turn)) * eff
+    : (crossSectionFt2 * speed * 60 * eff) / 27;
   if (![crossSectionFt2, productionBcyHr].every(Number.isFinite)) return { error: "Production math is not a finite value." };
   return {
     cross_section_ft2: crossSectionFt2,
@@ -399,13 +409,15 @@ export function computeRipperProduction({ spacing_ft, penetration_ft, speed_fpm,
 }
 
 function _v820renderRipperProduction(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: swept-prism production identity by name. production (bank cy/hr) = shank spacing x penetration x speed x 60 / 27 x efficiency, where 60 folds minutes to the hour and 27 the cubic yard.";
+  citationEl.textContent = "Citation: swept-prism production identity by name. production (bank cy/hr) = shank spacing x penetration x speed x 60 / 27 x efficiency; with a pass length and turn time it is Cat's timing method, volume per pass / (pass / speed + turn) (Caterpillar Performance Handbook: 3 ft x 2 ft at 88 fpm, 300 ft passes, 0.25 min turns, 45-min hour -> 820 bank cy/hr). Cat notes the timing method runs 10 to 20% above actual.";
   const spacing = makeNumber("Shank spacing / pass width (ft)", "rp-spacing", { step: "any", min: "0" });
   const pen = makeNumber("Ripping depth (ft)", "rp-pen", { step: "any", min: "0" });
   const speed = makeNumber("Ripping speed (ft/min)", "rp-speed", { step: "any", min: "0" });
   const eff = makeNumber("Job efficiency", "rp-eff", { step: "any", min: "0", value: "0.75" });
   eff.input.value = "0.75";
-  for (const f of [spacing, pen, speed, eff]) inputRegion.appendChild(f.wrap);
+  const passLen = makeNumber("Pass length (ft; 0 for continuous ripping)", "rp-pass", { step: "any", min: "0" });
+  const turn = makeNumber("Turn and maneuver time per pass (min)", "rp-turn", { step: "any", min: "0" });
+  for (const f of [spacing, pen, speed, eff, passLen, turn]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { spacing.input.value = "3"; pen.input.value = "1.5"; speed.input.value = "132"; eff.input.value = "0.75"; update(); });
   const oCross = makeOutputLine(outputRegion, "Ripped cross-section", "rp-out-cross");
   const oProd = makeOutputLine(outputRegion, "Loosened production", "rp-out-prod");
@@ -413,12 +425,13 @@ function _v820renderRipperProduction(inputRegion, outputRegion, citationEl) {
     const r = computeRipperProduction({
       spacing_ft: Number(spacing.input.value) || 0, penetration_ft: Number(pen.input.value) || 0,
       speed_fpm: Number(speed.input.value) || 0, efficiency: eff.input.value === "" ? 0.75 : Number(eff.input.value),
+      pass_length_ft: Number(passLen.input.value) || 0, turn_min: Number(turn.input.value) || 0,
     });
     if (r.error) { oCross.textContent = r.error; oProd.textContent = "-"; return; }
     oCross.textContent = fmt(r.cross_section_ft2, 2) + " ft^2";
     oProd.textContent = fmt(r.production_bcy_hr, 0) + " bank cy/hr";
   }, DEBOUNCE_MS);
-  for (const f of [spacing, pen, speed, eff]) f.input.addEventListener("input", update);
+  for (const f of [spacing, pen, speed, eff, passLen, turn]) f.input.addEventListener("input", update);
 }
 EARTHWORK_RENDERERS["ripper-production"] = _v820renderRipperProduction;
 
@@ -431,6 +444,8 @@ EARTHWORK_RENDERERS["ripper-production"] = _v820renderRipperProduction;
 //  the dry and water weights M and the water gallons a volume L^3.)
 export function computeWaterForCompaction({ volume_bcy, dry_density_pcf, omc_pct, field_pct } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // Unit / range guard added 2026-09-26 after printed-example probing.
+  if (Number(arguments[0]?.omc_pct) > 0 && Number(arguments[0]?.omc_pct) < 1) return { error: "Enter moisture contents as percents (12 for 12%), not fractions." }; if (Number(arguments[0]?.field_pct) > 100 || Number(arguments[0]?.omc_pct) > 100) return { error: "A moisture content over 100% is not a soil at optimum; check the value." };
   const vol = Number(volume_bcy);
   const dd = Number(dry_density_pcf);
   const omc = Number(omc_pct);
@@ -455,7 +470,7 @@ export function computeWaterForCompaction({ volume_bcy, dry_density_pcf, omc_pct
 
 function _v821renderWaterForCompaction(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: gravimetric water-content identity by name. water to add = (optimum - field)/100 x dry soil weight; dry weight = volume x 27 x dry density; gallons = pounds / 8.34 (weight of a gallon of water).";
-  const vol = makeNumber("Lift volume, bank measure (cy)", "wfc-vol", { step: "any", min: "0" });
+  const vol = makeNumber("Compacted lift volume, in place (cy; FM 5-434 pairs it with the Proctor dry density)", "wfc-vol", { step: "any", min: "0" });
   const dd = makeNumber("Maximum dry density, Proctor (pcf)", "wfc-dd", { step: "any", min: "0" });
   const omc = makeNumber("Optimum moisture content (%)", "wfc-omc", { step: "any", min: "0" });
   const field = makeNumber("Current field moisture (%)", "wfc-field", { step: "any", min: "0" });
@@ -597,6 +612,8 @@ EARTHWORK_RENDERERS["riprap-d50"] = _v823renderRiprapD50;
 // (Plan area is L^2; thickness L; unit weight M L^-3; the volume L^3 and the tonnage M.)
 export function computeRiprapTonnage({ area_sf = 0, thickness_ft = 0, unit_wt_pcf = 165 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // Unit / range guard added 2026-09-26 after printed-example probing.
+  if (Number(arguments[0]?.thickness_ft) > 10) return { error: "Enter the riprap thickness in feet (1.5), not inches." };
   if (!(area_sf > 0)) return { error: "Area must be positive (ft^2)." };
   if (!(thickness_ft > 0)) return { error: "Thickness must be positive (ft)." };
   if (!(unit_wt_pcf > 0)) return { error: "Unit weight must be positive (pcf)." };
@@ -694,6 +711,8 @@ EARTHWORK_RENDERERS["silt-fence-drainage"] = _v825renderSiltFenceDrainage;
 //  dam count dimensionless.)
 export function computeCheckDamSpacing({ dam_height_ft = 0, channel_slope_pct = 0, reach_length_ft = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // Unit / range guard added 2026-09-26 after printed-example probing.
+  if (Number(arguments[0]?.dam_height_ft) > 3) return { error: "Rock check dams are capped at about 3 ft high (NRCS); check the height (ft)." }; if (Number(arguments[0]?.channel_slope_pct) > 50) return { error: "A channel slope over 50% is not a check-dam channel; check the value (percent)." };
   if (!(dam_height_ft > 0)) return { error: "Dam height must be positive (ft)." };
   if (!(channel_slope_pct > 0)) return { error: "Channel slope must be positive (percent)." };
   if (!(reach_length_ft > 0)) return { error: "Reach length must be positive (ft)." };
@@ -948,19 +967,23 @@ export function computePipeFlotation({ pipe_od_in = 48, pipe_weight_plf = 200, b
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(pipe_od_in > 0)) return { error: "Pipe outside diameter must be positive (in)." };
   if (!(water_unit_wt_pcf > 0)) return { error: "Water unit weight must be positive (pcf)." };
-  if (!(target_fs > 0)) return { error: "Target factor of safety must be positive." };
+  if (!(target_fs >= 1)) return { error: "Target factor of safety must be at least 1 (commonly 1.5)." };
   if (pipe_weight_plf < 0) return { error: "Pipe weight cannot be negative (lb/ft)." };
   if (backfill_weight_plf < 0) return { error: "Backfill weight cannot be negative (lb/ft)." };
   const uplift_plf = water_unit_wt_pcf * (Math.PI / 4) * Math.pow(pipe_od_in / 12, 2);
   const resisting_plf = pipe_weight_plf + backfill_weight_plf;
   const fs = resisting_plf / uplift_plf;
-  const required_backfill_plf = target_fs * uplift_plf - pipe_weight_plf;
+  // Two conventions: FS on the whole uplift (backfill >= FS x uplift - pipe), and WSSC C-4's FS on the backfill only
+  // (backfill >= FS x (uplift - pipe)). The tile reports both; until 2026-09-26 it named neither.
+  const required_backfill_plf = Math.max(0, target_fs * uplift_plf - pipe_weight_plf);
+  const required_backfill_on_backfill_plf = Math.max(0, target_fs * (uplift_plf - pipe_weight_plf));
   if (![uplift_plf, resisting_plf, fs, required_backfill_plf].every(Number.isFinite)) return { error: "Flotation math is not a finite value." };
   return {
     uplift_plf,
     resisting_plf,
     fs,
     required_backfill_plf,
+    required_backfill_on_backfill_plf,
     pass: fs >= target_fs,
     note: "Flotation is critical when the pipe is empty and the trench is flooded - a high water table or saturated backfill. Submerged backfill counts only its buoyant (effective) weight, so use the submerged unit weight for any material below the water table. The fixes are more cover, concrete anti-flotation collars, or holding the empty pipe down (ballast) until the backfill is complete. The design engineer governs.",
   };
@@ -977,7 +1000,7 @@ function _v831renderPipeFlotation(inputRegion, outputRegion, citationEl) {
   attachExampleButton(inputRegion, () => { od.input.value = "48"; pw.input.value = "200"; bw.input.value = "900"; tf.input.value = "1.5"; uw.input.value = "62.4"; update(); });
   const oFs = makeOutputLine(outputRegion, "Factor of safety", "pf-out-fs");
   const oUplift = makeOutputLine(outputRegion, "Buoyant uplift", "pf-out-uplift");
-  const oReq = makeOutputLine(outputRegion, "Backfill to meet the target", "pf-out-req");
+  const oReq = makeOutputLine(outputRegion, "Backfill to meet the target (FS on the whole uplift; FS on the backfill only, as WSSC C-4)", "pf-out-req");
   const update = debounce(() => {
     const r = computePipeFlotation({
       pipe_od_in: od.input.value === "" ? 48 : Number(od.input.value), pipe_weight_plf: pw.input.value === "" ? 200 : Number(pw.input.value),
@@ -987,7 +1010,7 @@ function _v831renderPipeFlotation(inputRegion, outputRegion, citationEl) {
     if (r.error) { oFs.textContent = r.error; oUplift.textContent = "-"; oReq.textContent = "-"; return; }
     oFs.textContent = fmt(r.fs, 2) + " - " + (r.pass ? "PASS" : "FAIL") + " (target " + fmt(Number(tf.input.value) || 1.5, 2) + ")";
     oUplift.textContent = fmt(r.uplift_plf, 0) + " lb/ft";
-    oReq.textContent = r.required_backfill_plf > 0 ? fmt(r.required_backfill_plf, 0) + " lb/ft" : "0 lb/ft (pipe self-weight alone holds it)";
+    oReq.textContent = r.required_backfill_plf > 0 ? fmt(r.required_backfill_plf, 0) + " lb/ft; " + fmt(r.required_backfill_on_backfill_plf, 0) + " lb/ft with FS on the backfill only" : "0 lb/ft (pipe self-weight alone holds it)";
   }, DEBOUNCE_MS);
   for (const f of [od, pw, bw, tf, uw]) f.input.addEventListener("input", update);
 }
@@ -1006,11 +1029,11 @@ export function computeRestrainedPipeLength({ pipe_od_in = 12, pressure_psi = 15
   if (!(pipe_od_in > 0)) return { error: "Pipe outside diameter must be positive (in)." };
   if (!(pressure_psi > 0)) return { error: "Pressure must be positive (psi)." };
   if (!(unit_resistance_plf > 0)) return { error: "Unit resistance must be positive (lb/ft)." };
-  if (!(bend_angle_deg > 0 && bend_angle_deg < 180)) return { error: "Bend angle must be between 0 and 180 degrees." };
+  if (!(bend_angle_deg > 0 && bend_angle_deg <= 90)) return { error: "Bend angle must be above 0 and at most 90 degrees (fittings run 11-1/4 to 90)." };
   const area_in2 = (Math.PI / 4) * pipe_od_in * pipe_od_in;
   const thrust_lb = 2 * pressure_psi * area_in2 * Math.sin((bend_angle_deg / 2) * (Math.PI / 180));
   // DIPRA / AWWA M41 restrained length: each leg resolves the thrust along
-  // its own axis, L = Sf P A tan(delta/2) / (Fs + Rs), with a safety factor
+  // its own axis, L = Sf P A tan(delta/2) / (Ff + Rs / 2) -- DIPRA counts only half the bearing -- with a safety factor
   // (commonly 1.5). Until 2026-09-19 the full resultant 2 P A sin(delta/2)
   // was divided by the resistance with no Sf -- 6% short at a 90-degree bend.
   const sf = Number(safety_factor);
@@ -1030,7 +1053,7 @@ function _v832renderRestrainedPipeLength(inputRegion, outputRegion, citationEl) 
   const od = makeNumber("Pipe outside diameter (in)", "rpl-od", { step: "any", min: "0" });
   const p = makeNumber("Design (test) pressure (psi)", "rpl-p", { step: "any", min: "0" });
   const ba = makeNumber("Horizontal bend angle (deg)", "rpl-ba", { step: "any", min: "0" });
-  const ur = makeNumber("Soil resistance per foot (lb/ft)", "rpl-ur", { step: "any", min: "0" });
+  const ur = makeNumber("Unit resistance per foot, Ff + Rs/2 (lb/ft; DIPRA counts half the bearing)", "rpl-ur", { step: "any", min: "0" });
   const sfx = makeNumber("Safety factor Sf (commonly 1.5)", "rpl-sf", { step: "any", min: "1", value: "1.5" });
   for (const f of [od, p, ba, ur, sfx]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { od.input.value = "12"; p.input.value = "150"; ba.input.value = "90"; ur.input.value = "600"; update(); });
@@ -1206,6 +1229,8 @@ EARTHWORK_RENDERERS["dust-control-water"] = _v836renderDustControlWater;
 // dims: in { gvw_lb: M L T^-2, grade_pct: dimensionless, rolling_resistance_pct: dimensionless } out: { total_resistance_pct: dimensionless, required_rimpull_lb: M L T^-2, rimpull_per_ton_lb: L T^-2 }
 export function computeHaulRoadResistance({ gvw_lb = 150000, grade_pct = 5, rolling_resistance_pct = 4 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // Unit / range guard added 2026-09-26 after printed-example probing.
+  if (Number(arguments[0]?.rolling_resistance_pct ?? 4) < 0) return { error: "Rolling resistance cannot be negative." }; if (Number(arguments[0]?.rolling_resistance_pct ?? 4) > 0 && Number(arguments[0]?.rolling_resistance_pct ?? 4) < 1) return { error: "Enter rolling resistance as a percent (4 for 4%, or 80 lb/ton), not a fraction." }; if (Math.abs(Number(arguments[0]?.grade_pct ?? 5)) > 60) return { error: "A haul-road grade over 60% is not a road; check the value (percent)." };
   if (!(gvw_lb > 0)) return { error: "Gross vehicle weight must be positive (lb)." };
   const total_resistance_pct = grade_pct + rolling_resistance_pct;
   const required_rimpull_lb = (total_resistance_pct / 100) * gvw_lb;
@@ -1251,6 +1276,8 @@ EARTHWORK_RENDERERS["haul-road-resistance"] = _v844renderHaulRoadResistance;
 // dims: in { total_lcy: L^3, box_vol_cy: L^3, weight_limit_lb: M L T^-2, material_density_lb_per_lcy: M L^-2 T^-2 } out: { weight_limited_cy: L^3, payload_cy: L^3, loads: dimensionless }
 export function computeDumpTruckLoads({ total_lcy = 625, box_vol_cy = 12, weight_limit_lb = 40000, material_density_lb_per_lcy = 2800 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // Unit / range guard added 2026-09-26 after printed-example probing.
+  if (Number(arguments[0]?.weight_limit_lb ?? 40000) > 0 && Number(arguments[0]?.weight_limit_lb ?? 40000) < 1000) return { error: "Enter the payload limit in pounds (40,000), not tons." };
   if (!(total_lcy > 0)) return { error: "Total volume must be positive (cy)." };
   if (!(box_vol_cy > 0)) return { error: "Box capacity must be positive (cy)." };
   if (!(weight_limit_lb > 0)) return { error: "Weight limit must be positive (lb)." };
@@ -1353,6 +1380,8 @@ EARTHWORK_RENDERERS["unit-cost-earthwork"] = _v846renderUnitCostEarthwork;
 // dims: in { application_pct: dimensionless, soil_density_pcf: M L^-3, depth_in: L, area_sy: L^2 } out: { spread_lb_per_sy: M L^-2, tons: M }
 export function computeSoilStabilizationQuantity({ application_pct = 6, soil_density_pcf = 110, depth_in = 8, area_sy = 10000 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // Unit / range guard added 2026-09-26 after printed-example probing.
+  if ([arguments[0]?.application_pct].some((v) => Number(v) > 0 && Number(v) < 1)) return { error: "Enter the application rate as a percent of dry soil weight (6 for 6%), not a fraction." }; if (Number(arguments[0]?.application_pct ?? 6) > 30) return { error: "An application rate over 30% of the soil weight is not stabilization; check the value." };
   if (!(application_pct > 0)) return { error: "Application percent must be positive." };
   if (!(soil_density_pcf > 0)) return { error: "Soil density must be positive (pcf)." };
   if (!(depth_in > 0)) return { error: "Treatment depth must be positive (in)." };
@@ -1456,6 +1485,8 @@ EARTHWORK_RENDERERS["flexible-pipe-deflection"] = _v848renderFlexiblePipeDeflect
 //  L^3; inflow and the pump rates are volume-rates L^3 T^-1.)
 export function computeDewateringRate({ pit_len_ft, pit_wid_ft, drawdown_ft = 0, drawdown_min, inflow_gpm = 0, safety_pct = 25 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // Unit / range guard added 2026-09-26 after printed-example probing.
+  if ([arguments[0]?.safety_pct].some((v) => Number(v) > 0 && Number(v) < 1)) return { error: "Enter the safety allowance as a percent (25 for 25%), not a fraction." };
   const len = Number(pit_len_ft);
   const wid = Number(pit_wid_ft);
   const draw = Number(drawdown_ft);

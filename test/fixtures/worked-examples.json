@@ -9818,6 +9818,29 @@
    }
   },
   {
+   "tile_id": "yield-ep",
+   "source_publisher": "Open Washington (Pressbooks)",
+   "source_title": "Culinary Math, Edible Portion Cost",
+   "source_edition_or_year": "pressbooks chapter",
+   "source_section_or_page": "strawberries at $3.49 per pound and an 87% yield cost $4.01 per edible pound",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "ap_weight": 1,
+    "trim_weight": 0.13,
+    "cooking_loss_pct": 0,
+    "ap_cost_per_lb": 3.49
+   },
+   "outputs": {
+    "ep_cost_per_lb": {
+     "value": 4.01,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
    "tile_id": "cooling-curve",
    "source_publisher": "FDA Food Code 2022 (project bundled time-to-temperature targets)",
    "source_title": "Two-stage cooling curve: phase 1 = 135 -> 70 F in <= 2 hr; phase 2 = 70 -> 41 F in <= 4 hr (total <= 6 hr)",
@@ -28376,6 +28399,30 @@
    }
   },
   {
+   "tile_id": "compaction-roller-production",
+   "source_publisher": "US Army",
+   "source_title": "FM 5-434 Earthmoving Operations, Chapter 11",
+   "source_edition_or_year": "p. 11-18",
+   "source_section_or_page": "16.3 x 5 ft x 6 mph x 6 in x 0.83 / 5 passes = 487 compacted cu yd per hour",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "drum_width_ft": 5,
+    "speed_mph": 6,
+    "lift_in": 6,
+    "passes": 5,
+    "efficiency": 0.83
+   },
+   "outputs": {
+    "production_ccy_hr": {
+     "value": 487,
+     "tolerance": {
+      "abs": 1
+     }
+    }
+   }
+  },
+  {
    "tile_id": "ripper-production",
    "source_publisher": "Swept-prism production identity (first-principles)",
    "source_title": "shank on 3 ft centers, 1.5 ft deep, 132 ft/min (1.5 mph), 0.75 efficiency",
@@ -28423,6 +28470,31 @@
      "value": 660,
      "tolerance": {
       "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "ripper-production",
+   "source_publisher": "Caterpillar",
+   "source_title": "Performance Handbook, Edition 29",
+   "source_edition_or_year": "pp. 1-67 to 1-68",
+   "source_section_or_page": "3 ft spacing, 2 ft depth, 88 fpm, 300 ft passes, 0.25 min turns, 45-min hour -> 820 bank cu yd per hour",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "spacing_ft": 3,
+    "penetration_ft": 2,
+    "speed_fpm": 88,
+    "efficiency": 0.75,
+    "pass_length_ft": 300,
+    "turn_min": 0.25
+   },
+   "outputs": {
+    "production_bcy_hr": {
+     "value": 820,
+     "tolerance": {
+      "abs": 1
      }
     }
    }
@@ -30414,6 +30486,36 @@
     },
     "suggested_price": {
      "value": 8.35,
+     "tolerance": {
+      "abs": 0.02
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "pour-cost",
+   "source_publisher": "Bar Patrol",
+   "source_title": "How to Determine Pricing for Your Liquor, Beer and Wine",
+   "source_edition_or_year": "barpatrol.net",
+   "source_section_or_page": "a 1 L bottle at $24.46 poured 1.5 oz gives 22.5 shots; at 17% pour cost the drink sells for $6.39",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "bottle_cost": 24.46,
+    "bottle_size_ml": 1000,
+    "pour_size_oz": 1.5,
+    "target_pour_cost_pct": 17,
+    "other_cost_per_drink": 0
+   },
+   "outputs": {
+    "pours_per_bottle": {
+     "value": 22.5,
+     "tolerance": {
+      "abs": 0.05
+     }
+    },
+    "suggested_price": {
+     "value": 6.39,
      "tolerance": {
       "abs": 0.02
      }
@@ -70295,6 +70397,29 @@
    }
   },
   {
+   "tile_id": "water-for-compaction",
+   "source_publisher": "US Army",
+   "source_title": "FM 5-434 Earthmoving Operations, Chapter 11",
+   "source_edition_or_year": "p. 11-2",
+   "source_section_or_page": "2,000 cu ft compacted at 120 pcf, from 5% to 12% moisture -> 2,017 gal (FM uses 8.33 lb/gal)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "volume_bcy": 74.07407407407408,
+    "dry_density_pcf": 120,
+    "omc_pct": 12,
+    "field_pct": 5
+   },
+   "outputs": {
+    "water_gal": {
+     "value": 2017,
+     "tolerance": {
+      "abs": 5
+     }
+    }
+   }
+  },
+  {
    "tile_id": "rusle-soil-loss",
    "source_publisher": "RUSLE (USDA Agriculture Handbook 703)",
    "source_title": "bare 5-acre site: R 150, K 0.32, LS 1.5, C 1.0, P 1.0",
@@ -70617,6 +70742,28 @@
    }
   },
   {
+   "tile_id": "check-dam-spacing",
+   "source_publisher": "Iowa SUDAS",
+   "source_title": "Design Manual 7E-7, Rock Check Dams, Table 7E-7.01",
+   "source_edition_or_year": "2024",
+   "source_section_or_page": "2 ft rock dams at 3% slope are spaced 67 ft",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "dam_height_ft": 2,
+    "channel_slope_pct": 3,
+    "reach_length_ft": 300
+   },
+   "outputs": {
+    "spacing_ft": {
+     "value": 66.7,
+     "tolerance": {
+      "abs": 0.1
+     }
+    }
+   }
+  },
+  {
    "tile_id": "sediment-basin-volume",
    "source_publisher": "Sediment-basin storage identity (construction general permit)",
    "source_title": "5-acre disturbance, 3,600 cf/acre wet storage, 3 ft depth",
@@ -70923,6 +71070,36 @@
    }
   },
   {
+   "tile_id": "pipe-flotation",
+   "source_publisher": "WSSC",
+   "source_title": "Design Guidelines C-4, Pipe Flotation",
+   "source_edition_or_year": "2008, pp. C-4.5 to C-4.6",
+   "source_section_or_page": "48 in RCP (58 in OD), pipe 963 lb/ft, uplift 1,145, backfill 828: will not float; with FS 1.5 on the backfill, the minimum backfill is 1.5 x 182 = 273 lb/ft",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "pipe_od_in": 58,
+    "pipe_weight_plf": 963,
+    "backfill_weight_plf": 828,
+    "target_fs": 1.5,
+    "water_unit_wt_pcf": 62.4
+   },
+   "outputs": {
+    "uplift_plf": {
+     "value": 1145,
+     "tolerance": {
+      "abs": 1
+     }
+    },
+    "required_backfill_on_backfill_plf": {
+     "value": 273,
+     "tolerance": {
+      "abs": 1
+     }
+    }
+   }
+  },
+  {
    "tile_id": "restrained-pipe-length",
    "source_publisher": "Thrust / restrained-length identity (first-principles)",
    "source_title": "12 in main, 150 psi, 90-degree bend, 600 lb/ft soil resistance",
@@ -70982,6 +71159,30 @@
      "value": 17.5674,
      "tolerance": {
       "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "restrained-pipe-length",
+   "source_publisher": "DIPRA",
+   "source_title": "Thrust Restraint Design for Ductile Iron Pipe, 7th ed.",
+   "source_edition_or_year": "pp. 20-21",
+   "source_section_or_page": "30 in DIP (32 in OD), 150 psi, 90 deg bend, Sf 1.5 -> L = 55.3 ft; unit resistance entered as DIPRA's Ff + Rs/2",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "pipe_od_in": 32,
+    "pressure_psi": 150,
+    "bend_angle_deg": 90,
+    "unit_resistance_plf": 3281.1,
+    "safety_factor": 1.5
+   },
+   "outputs": {
+    "length_each_side_ft": {
+     "value": 55.3,
+     "tolerance": {
+      "abs": 0.3
      }
     }
    }
@@ -71818,6 +72019,34 @@
    }
   },
   {
+   "tile_id": "haul-road-resistance",
+   "source_publisher": "Caterpillar",
+   "source_title": "Performance Handbook, Edition 29",
+   "source_edition_or_year": "p. 8-8",
+   "source_section_or_page": "171,880 lb on a 6% grade with 80 lb/ton rolling resistance (4%) is 10% total resistance; the rimpull chart reads about 17,100 lb",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "gvw_lb": 171880,
+    "grade_pct": 6,
+    "rolling_resistance_pct": 4
+   },
+   "outputs": {
+    "total_resistance_pct": {
+     "value": 10,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "required_rimpull_lb": {
+     "value": 17100,
+     "tolerance": {
+      "abs": 100
+     }
+    }
+   }
+  },
+  {
    "tile_id": "dump-truck-loads",
    "source_publisher": "Governing-payload identity (first-principles)",
    "source_title": "625 lcy, 12 cy box, 40,000 lb limit, 2,800 lb/cy (volume governs)",
@@ -71932,6 +72161,28 @@
    }
   },
   {
+   "tile_id": "unit-cost-earthwork",
+   "source_publisher": "Caterpillar",
+   "source_title": "Performance Handbook, Edition 29",
+   "source_edition_or_year": "p. 1-68",
+   "source_section_or_page": "$115.00/hr (with a $30 operator) / 875 BCY per hr = $0.131 per BCY",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "equipment_rate_per_hr": 85,
+    "operator_rate_per_hr": 30,
+    "production_cy_per_hr": 875
+   },
+   "outputs": {
+    "unit_cost_per_cy": {
+     "value": 0.131,
+     "tolerance": {
+      "abs": 0.0005
+     }
+    }
+   }
+  },
+  {
    "tile_id": "soil-stabilization-quantity",
    "source_publisher": "Stabilizer-quantity identity (first-principles)",
    "source_title": "6% lime, 110 pcf soil, 8 in deep, 10,000 sy pad",
@@ -71983,6 +72234,35 @@
     },
     "tons": {
      "value": 132,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "soil-stabilization-quantity",
+   "source_publisher": "Lime Association of Texas",
+   "source_title": "Dos and Don'ts of Lime Stabilization",
+   "source_edition_or_year": "p. 4",
+   "source_section_or_page": "1,500 x 38 ft, 6 in deep, 6% lime at 110 pcf -> 29.70 lb per sq yd and 94.05 tons",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "application_pct": 6,
+    "soil_density_pcf": 110,
+    "depth_in": 6,
+    "area_sy": 6333.333333333333
+   },
+   "outputs": {
+    "spread_lb_per_sy": {
+     "value": 29.7,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "tons": {
+     "value": 94.05,
      "tolerance": {
       "abs": 0.05
      }
@@ -105960,6 +106240,31 @@
    }
   },
   {
+   "tile_id": "warewasher-hot-water",
+   "source_publisher": "WebstaurantStore",
+   "source_title": "Booster Heater Buying Guide",
+   "source_edition_or_year": "webstaurantstore.com guide",
+   "source_section_or_page": "153 GPH at a 70 F rise: (153 x 70) / 400 = 26.775 kW; the trade's /400 rounds the exact 1 kW = 409 GPH-F conversion (the tile gives 26.2)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "rinse_gpm": 2.55,
+    "supply_temp_f": 110,
+    "rinse_temp_f": 180,
+    "racks_per_hour": 40,
+    "gal_per_rack": 1.2,
+    "booster_efficiency": 0.8
+   },
+   "outputs": {
+    "booster_kw": {
+     "value": 26.775,
+     "tolerance": {
+      "abs": 0.7
+     }
+    }
+   }
+  },
+  {
    "tile_id": "freezing-time-plank",
    "source_publisher": "ASHRAE",
    "source_title": "3 in beef slab, 65 lb/ft3, Lf 106, 28 F freezing point, -10 F blast, h 3.0, k 0.9",
@@ -106086,6 +106391,30 @@
    }
   },
   {
+   "tile_id": "fryer-oil-turnover",
+   "source_publisher": "Oklahoma State University",
+   "source_title": "FAPC-126, Frying Oil Turnover",
+   "source_edition_or_year": "fact sheet",
+   "source_section_or_page": "32 lb vat, 50 lb fries per frying hour at 8% oil pickup (4 lb of make-up oil an hour) -> turnover in 8 hours (entered per frying hour)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "vat_capacity_lb": 32,
+    "daily_product_lb": 50,
+    "absorption_fraction": 0.08,
+    "operating_days": 360,
+    "oil_price_per_lb": 1.1
+   },
+   "outputs": {
+    "turnover_days": {
+     "value": 8,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
    "tile_id": "keg-yield",
    "source_publisher": "Project (first-principles)",
    "source_title": "$150 half barrel, 16 oz pours, 15% loss, $7 menu price",
@@ -106130,6 +106459,31 @@
      "value": 20.3307,
      "tolerance": {
       "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "keg-yield",
+   "source_publisher": "Bar Patrol",
+   "source_title": "How to Determine Pricing for Your Liquor, Beer and Wine",
+   "source_edition_or_year": "barpatrol.net",
+   "source_section_or_page": "a half barrel is 1,984 oz = 124 pints; a $119 keg is $0.96 a pint, 25% pour cost at $3.84",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "keg_size": "half_barrel",
+    "custom_gallons": 0,
+    "serving_oz": 16,
+    "loss_fraction": 0,
+    "keg_cost": 119,
+    "menu_price": 3.84
+   },
+   "outputs": {
+    "servings": {
+     "value": 124,
+     "tolerance": {
+      "abs": 0.01
      }
     }
    }
@@ -106209,6 +106563,32 @@
      "value": 11.3119,
      "tolerance": {
       "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "dough-ball-scaling",
+   "source_publisher": "Pizza Today (Tom Lehmann)",
+   "source_title": "Calculating Any Size of Pizza: 3.14 Is the Magic Number",
+   "source_edition_or_year": "pizzatoday.com",
+   "source_section_or_page": "11 oz on a 12 in pan is 0.0973106 oz per sq in, so a 14 in pizza takes 15 oz (Lehmann uses 3.14 for pi)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "pan_shape": "round",
+    "diameter_in": 14,
+    "length_in": 0,
+    "width_in": 0,
+    "thickness_factor": 0.0973106,
+    "reference_weight_oz": 11,
+    "reference_diameter_in": 12
+   },
+   "outputs": {
+    "dough_weight_oz": {
+     "value": 15,
+     "tolerance": {
+      "abs": 0.05
      }
     }
    }
@@ -106302,6 +106682,29 @@
    }
   },
   {
+   "tile_id": "covers-per-labor-hour",
+   "source_publisher": "Chef's Resources",
+   "source_title": "Calculate Restaurant Productivity",
+   "source_edition_or_year": "chefs-resources.com",
+   "source_section_or_page": "3,000 covers on 1,900 back-of-house labor hours = 1.58 covers per labor hour",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "covers": 3000,
+    "labor_hours": 1900,
+    "net_sales": 12600,
+    "labor_cost": 1680
+   },
+   "outputs": {
+    "cplh": {
+     "value": 1.58,
+     "tolerance": {
+      "abs": 0.005
+     }
+    }
+   }
+  },
+  {
    "tile_id": "par-level-order",
    "source_publisher": "Project (first-principles)",
    "source_title": "24 lb/day, 2-day lead, 3-day cycle, 25% safety, 40 lb on hand, 10 lb cases",
@@ -106341,6 +106744,32 @@
      "value": 11,
      "tolerance": {
       "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "par-level-order",
+   "source_publisher": "WISK",
+   "source_title": "A WISK Guide: What Are Par Level Inventory",
+   "source_edition_or_year": "wisk.ai",
+   "source_section_or_page": "(10 cases a week + 3 cases of safety stock) / 2 deliveries = 6.5 cases (entered as 10/7 a day on a 3.5-day cycle with 30% safety stock)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "daily_usage": 1.4285714285714286,
+    "lead_time_days": 0,
+    "order_cycle_days": 3.5,
+    "safety_factor": 0.3,
+    "on_hand": 0,
+    "on_order": 0,
+    "units_per_case": 1
+   },
+   "outputs": {
+    "par_level": {
+     "value": 6.5,
+     "tolerance": {
+      "abs": 0.01
      }
     }
    }
@@ -106419,13 +106848,13 @@
      }
     },
     "steam_per_batch_lb": {
-     "value": 49.3909,
+     "value": 58.1069,
      "tolerance": {
       "pct": 0.5
      }
     },
     "steam_rate_lb_hr": {
-     "value": 89.89,
+     "value": 105.753,
      "tolerance": {
       "pct": 0.5
      }
@@ -106491,6 +106920,40 @@
      "value": 1.38613,
      "tolerance": {
       "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "hot-holding-energy",
+   "source_publisher": "Electrical Knowhow",
+   "source_title": "Commercial Kitchen Electrical Load Calculation, Example 2",
+   "source_edition_or_year": "2013",
+   "source_section_or_page": "60 kW connected x 65% = 39 kW, less than the two largest units (40 kW), so the minimum load is 40 kW (NEC 220.56); entered as two 20 kW units and four 5 kW units",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "equipment": [
+     {
+      "name": "largest",
+      "kw": 20,
+      "qty": 2
+     },
+     {
+      "name": "others",
+      "kw": 5,
+      "qty": 4
+     }
+    ],
+    "diversity_factor": 0.65,
+    "voltage": 208,
+    "phase": "three"
+   },
+   "outputs": {
+    "demand_kw": {
+     "value": 40,
+     "tolerance": {
+      "abs": 0.01
      }
     }
    }
@@ -119172,7 +119635,7 @@
     "months_since_inspection": 5,
     "measured_thickness_um": 2400,
     "cleaning_trigger_um": 2000,
-    "inspection_point_trigger_um": 50,
+    "inspection_point_trigger_um": 3175,
     "is_designated_point": 0
    },
    "outputs": {
@@ -119213,7 +119676,7 @@
      }
     },
     "measured_thickness_in": {
-     "value": 0.09449,
+     "value": 0.0944882,
      "tolerance": {
       "pct": 0.5
      }
@@ -119345,7 +119808,7 @@
      }
     },
     "door_force_lbf": {
-     "value": 2.92396,
+     "value": 1.59489,
      "tolerance": {
       "pct": 0.5
      }
@@ -119818,6 +120281,31 @@
    }
   },
   {
+   "tile_id": "stack-emission-pte",
+   "source_publisher": "Illinois EPA",
+   "source_title": "Annual Emission Reports FAQ",
+   "source_edition_or_year": "epa.illinois.gov",
+   "source_section_or_page": "10 lb/hr x 8,760 hr / 2,000 = 43.8 tons per year potential to emit",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "hourly_rate_lb_h": 10,
+    "actual_hours_per_year": 2000,
+    "permitted_hours_per_year": 0,
+    "major_threshold_tpy": 100,
+    "control_efficiency_pct": 0,
+    "control_enforceable": "no"
+   },
+   "outputs": {
+    "pte_tpy": {
+     "value": 43.8,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
    "tile_id": "opacity-six-minute",
    "source_publisher": "Project (first-principles)",
    "source_title": "Visible Emission Opacity Six-Minute Average -- the spec-v1718 worked example, recomputed",
@@ -119849,6 +120337,30 @@
      "value": 8,
      "tolerance": {
       "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "opacity-six-minute",
+   "source_publisher": "Ohio EPA",
+   "source_title": "Engineering Guide #20, Figure 1",
+   "source_edition_or_year": "guide PDF",
+   "source_section_or_page": "24 readings summing to 780 -> a six-minute average of 32.5% opacity",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "readings_sum_pct": 780,
+    "reading_count": 24,
+    "peak_reading_pct": 60,
+    "limit_pct": 20,
+    "steady_reading_pct": 22
+   },
+   "outputs": {
+    "block_average_pct": {
+     "value": 32.5,
+     "tolerance": {
+      "abs": 0.01
      }
     }
    }
@@ -119971,6 +120483,42 @@
    }
   },
   {
+   "tile_id": "scrubber-lg-ratio",
+   "source_publisher": "US EPA",
+   "source_title": "Air Pollution Control Cost Manual, 7th ed., Section 6 Chapter 2 (wet scrubbers)",
+   "source_edition_or_year": "2020, p. 2-55",
+   "source_section_or_page": "75,000 acfm at L/G 10, 40 ft head, SG 1.125, 50% pump efficiency -> 17 hp; 15 in wc at 60% fan efficiency -> 294 hp",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "gas_acfm": 75000,
+    "lg_ratio_gpm_per_1000": 10,
+    "pump_head_ft": 40,
+    "pump_efficiency": 0.5,
+    "specific_gravity": 1.125,
+    "annual_hours": 6000,
+    "energy_rate_per_kwh": 0.1,
+    "alternate_lg_ratio": 20,
+    "pressure_drop_inwc": 15,
+    "fan_efficiency": 0.6,
+    "scrubber_type": "packed_tower"
+   },
+   "outputs": {
+    "pump_bhp": {
+     "value": 17,
+     "tolerance": {
+      "abs": 0.1
+     }
+    },
+    "fan_bhp": {
+     "value": 294,
+     "tolerance": {
+      "abs": 1.2
+     }
+    }
+   }
+  },
+  {
    "tile_id": "thermal-oxidizer-residence",
    "source_publisher": "Project (first-principles)",
    "source_title": "Thermal Oxidizer Residence Time -- the spec-v1721 worked example, recomputed",
@@ -120069,6 +120617,58 @@
    }
   },
   {
+   "tile_id": "coating-voc-compliance",
+   "source_publisher": "Ohio EPA",
+   "source_title": "Calculating Emissions from Coating and Painting Operations, Example 3",
+   "source_edition_or_year": "p. 6",
+   "source_section_or_page": "a 3.47 lb/gal topcoat thinned 4:1 with a 6.5 lb/gal reducer -> 4.08 lb VOC per gallon as applied",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "coating_gal": 4,
+    "voc_lb": 13.88,
+    "water_gal": 0,
+    "exempt_gal": 0,
+    "thinner_gal": 1,
+    "thinner_voc_lb_per_gal": 6.5,
+    "limit_lb_per_gal": 4.5
+   },
+   "outputs": {
+    "applied_voc_less_water": {
+     "value": 4.08,
+     "tolerance": {
+      "abs": 0.005
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "coating-voc-compliance",
+   "source_publisher": "San Diego APCD",
+   "source_title": "How to Calculate the VOC Content of a Mixed Coating",
+   "source_edition_or_year": "compliance PDF",
+   "source_section_or_page": "a basecoat of 3 lb VOC per gallon with 25% water and exempt: VOC less water = 4 lb/gal",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "coating_gal": 1,
+    "voc_lb": 3,
+    "water_gal": 0.25,
+    "exempt_gal": 0,
+    "thinner_gal": 0,
+    "thinner_voc_lb_per_gal": 0,
+    "limit_lb_per_gal": 4.5
+   },
+   "outputs": {
+    "voc_less_water": {
+     "value": 4,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
    "tile_id": "spcc-containment-volume",
    "source_publisher": "Project (first-principles)",
    "source_title": "SPCC Secondary Containment Volume -- the spec-v1723 worked example, recomputed",
@@ -120121,6 +120721,45 @@
      "value": 7.06858,
      "tolerance": {
       "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "spcc-containment-volume",
+   "source_publisher": "US EPA",
+   "source_title": "SPCC Guidance for Regional Inspectors, Chapter 4, Figure 4-6",
+   "source_edition_or_year": "2014, p. 4-22",
+   "source_section_or_page": "20,000 gal tank in a 60 x 36 x 1.5 ft dike with two other 10 ft tanks: 24,235 gal gross, 1,762 gal displaced, 22,473 gal net (EPA uses 7.48 gal per cu ft)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "largest_tank_gal": 20000,
+    "freeboard_pct": 12,
+    "dike_length_ft": 60,
+    "dike_width_ft": 36,
+    "dike_height_ft": 1.5,
+    "other_tank_count": 2,
+    "other_tank_diameter_ft": 10,
+    "other_equipment_ft3": 0
+   },
+   "outputs": {
+    "gross_gal": {
+     "value": 24235,
+     "tolerance": {
+      "abs": 3
+     }
+    },
+    "displacement_gal": {
+     "value": 1762,
+     "tolerance": {
+      "abs": 1
+     }
+    },
+    "net_gal": {
+     "value": 22473,
+     "tolerance": {
+      "abs": 3
      }
     }
    }
@@ -120179,6 +120818,35 @@
    }
   },
   {
+   "tile_id": "esp-deutsch-efficiency",
+   "source_publisher": "US EPA",
+   "source_title": "Air Pollution Control Cost Manual, 7th ed., Section 6 Chapter 3 (ESPs)",
+   "source_edition_or_year": "2020, p. 3-51",
+   "source_section_or_page": "w = 16.0 cm/s (0.525 ft/s) at 99.9% -> SCA 219 sq ft per kacfm, 10,950 sq ft at 50,000 acfm",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "plate_area_ft2": 10950,
+    "gas_acfm": 50000,
+    "migration_velocity_fps": 0.5249,
+    "target_efficiency_pct": 99.9
+   },
+   "outputs": {
+    "specific_collection_area": {
+     "value": 219,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "efficiency_pct": {
+     "value": 99.9,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
    "tile_id": "carbon-bed-life",
    "source_publisher": "Project (first-principles)",
    "source_title": "Activated Carbon Adsorber Bed Life -- the spec-v1725 worked example, recomputed",
@@ -120228,6 +120896,30 @@
      "value": 40,
      "tolerance": {
       "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "carbon-bed-life",
+   "source_publisher": "US EPA",
+   "source_title": "Air Pollution Control Cost Manual, 7th ed., Carbon Adsorbers",
+   "source_edition_or_year": "2018, pp. 1-35 to 1-36",
+   "source_section_or_page": "0.167 lb VOC per lb carbon, 12 hour adsorption, 3,600 lb per bed with two beds sharing 100 lb/hr (50 lb/hr each)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "carbon_lb": 3600,
+    "working_capacity_pct": 16.7,
+    "loading_lb_h": 50,
+    "operating_hours_per_day": 8,
+    "degraded_capacity_pct": 10
+   },
+   "outputs": {
+    "bed_life_hours": {
+     "value": 12,
+     "tolerance": {
+      "abs": 0.05
      }
     }
    }
@@ -127162,6 +127854,31 @@
      "value": 77.23,
      "tolerance": {
       "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "community-noise-ldn",
+   "source_publisher": "Engineering ToolBox",
+   "source_title": "Sound Level: day-night average",
+   "source_edition_or_year": "engineeringtoolbox.com",
+   "source_section_or_page": "70 dB for 15 daytime hours and 50 dB for the 9 night hours -> Ldn 68.2 dB (entered as 12 day and 3 evening hours of activity over a 50 dB background)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-25",
+   "inputs": {
+    "activity_level_db": 70,
+    "activity_hours_day": 12,
+    "activity_hours_evening": 3,
+    "activity_hours_night": 0,
+    "background_level_db": 50,
+    "limit_ldn_db": 65
+   },
+   "outputs": {
+    "ldn_db": {
+     "value": 68.2,
+     "tolerance": {
+      "abs": 0.05
      }
     }
    }
