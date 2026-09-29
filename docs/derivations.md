@@ -1485,22 +1485,22 @@ cross-check.
 | calc-airquality.js | `computeSpccContainmentVolume` | `{ largest_tank_gal = 0, freeboard_pct = 10, dike_length_ft = 0, dike_width_ft...` | _ | _ | _ |
 | calc-airquality.js | `computeStackEmissionPte` | `{ hourly_rate_lb_h = 0, actual_hours_per_year = 0, permitted_hours_per_year =...` | _ | _ | _ |
 | calc-airquality.js | `computeThermalOxidizerResidence` | `{ inlet_scfm = 0, chamber_temp_f = 0, standard_temp_f = 70, required_residenc...` | _ | _ | _ |
+| calc-arboriculture.js | `computeCrownReductionLeafArea` | `{ crown_radius_ft = 0, reduction_ft = 0, outer_third_leaf_share = 0.75, live_...` | _ | _ | _ |
+| calc-arboriculture.js | `computeRootBallSizeWeight` | `{ caliper_in = 0, ball_per_caliper_in = 10, depth_ratio = 0.65, soil_density_...` | _ | _ | _ |
+| calc-arboriculture.js | `computeSoilVolumeForCanopy` | `{ canopy_diameter_ft = 0, soil_per_canopy_ft3_per_ft2 = 2, pit_length_ft = 0,...` | _ | _ | _ |
+| calc-arboriculture.js | `computeStumpGrindingVolume` | `{ stump_diameter_in = 0, grind_diameter_in = 0, grind_depth_in = 0, swell_fac...` | _ | _ | _ |
+| calc-arboriculture.js | `computeTreeCablingRating` | `{ defect_to_tips_ft = 0, placement_fraction = 0.6667, alternative_placement_f...` | _ | _ | _ |
 | calc-arborist.js | `computeBasalAreaPrism` | `{ baf = 0, in_tree_count = 0, dbh_in = 0 } = {}` | _ | _ | _ |
 | calc-arborist.js | `computeChipperDebris` | `{ green_weight_lb, chip_density_lcy = 550, box_capacity_cy } = {}` | _ | _ | _ |
 | calc-arborist.js | `computeCrownPruningDose` | `{ live_foliage = 0, removed_foliage = 0, maturity_class = "mature" } = {}` | _ | _ | _ |
-| calc-arborist.js | `computeCrownReductionLeafArea` | `{ crown_radius_ft = 0, reduction_ft = 0, outer_third_leaf_share = 0.75, live_...` | _ | _ | _ |
 | calc-arborist.js | `computeFellingNotchHinge` | `{ cut_dia_in, notch_pct = 22, open_face = 70 } = {}` | _ | _ | _ |
 | calc-arborist.js | `computeFirewoodCord` | `{ length_ft = 0, height_ft = 0, depth_ft = 0 } = {}` | _ | _ | _ |
 | calc-arborist.js | `computeLogLimbWeight` | `{ butt_dia_in, top_dia_in, length_ft, species = "generic_hardwood", density =...` | _ | _ | _ |
 | calc-arborist.js | `computePortaWrapFriction` | `{ load_lb, mu = 0.20, wraps = 3 } = {}` | _ | _ | _ |
 | calc-arborist.js | `computeQuadraticMeanDiameter` | `{ tally = "" } = {}` | _ | _ | _ |
 | calc-arborist.js | `computeReinekeSdi` | `{ trees_per_acre = 0, qmd_in = 0, sdi_max = 0 } = {}` | _ | _ | _ |
-| calc-arborist.js | `computeRootBallSizeWeight` | `{ caliper_in = 0, ball_per_caliper_in = 10, depth_ratio = 0.65, soil_density_...` | _ | _ | _ |
-| calc-arborist.js | `computeSoilVolumeForCanopy` | `{ canopy_diameter_ft = 0, soil_per_canopy_ft3_per_ft2 = 2, pit_length_ft = 0,...` | _ | _ | _ |
-| calc-arborist.js | `computeStumpGrindingVolume` | `{ stump_diameter_in = 0, grind_diameter_in = 0, grind_depth_in = 0, swell_fac...` | _ | _ | _ |
 | calc-arborist.js | `computeThinningTargetTpa` | `{ sdi_max = 0, target_pct = 0, qmd_in = 0, current_tpa = 0 } = {}` | _ | _ | _ |
 | calc-arborist.js | `computeTreeAppraisalCtla` | `{ dbh_in = 0, unit_cost_per_sq_in = 60, species_pct = 100, condition_pct = 10...` | _ | _ | _ |
-| calc-arborist.js | `computeTreeCablingRating` | `{ defect_to_tips_ft = 0, placement_fraction = 0.6667, alternative_placement_f...` | _ | _ | _ |
 | calc-arborist.js | `computeTreeCrzEncroachment` | `{ dbh_in = 0, radius_factor = 1.0, limit_distance_ft = 0, species_tolerance =...` | _ | _ | _ |
 | calc-arborist.js | `computeTreeHeightClinometer` | `{ horizontal_distance_ft = 0, top_reading_pct = 0, base_reading_pct = 0 } = {}` | _ | _ | _ |
 | calc-arborist.js | `computeTreeOpenCavity` | `{ diameter_in = 0, shell_thick_in = 0, opening_width_in = 0 } = {}` | _ | _ | _ |

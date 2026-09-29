@@ -1542,12 +1542,17 @@ export const TOOL_MODULES = (() => {
     "secondary-glycol-loop", "co2-transcritical-pressure", "refrigeration-relief-capacity",
     "machinery-room-ventilation",
   ]);
+  // spec-v1878 cap-relief split: the final five arboriculture calculators move
+  // intact from calc-arborist.js, which had reached 90.7% of its gzip cap.
+  declare("./calc-arboriculture.js", "ARBORICULTURE_RENDERERS", [
+    "crown-reduction-leaf-area", "root-ball-size-weight", "tree-cabling-rating",
+    "stump-grinding-volume", "soil-volume-for-canopy",
+  ]);
   // v87 cap-relief split: the v68 tree-care / arborist-rigging bench moved out
   // of calc-agriculture.js (95.1% of cap) into calc-arborist.js. All five KEEP
   // group "L" (a tile's group letter is independent of its module, the
   // v42/v70..v86 precedent); ids, citations, examples, and behavior unchanged.
   declare("./calc-arborist.js", "ARBORIST_RENDERERS", [
-    "crown-reduction-leaf-area", "root-ball-size-weight", "tree-cabling-rating", "stump-grinding-volume", "soil-volume-for-canopy",
     "log-limb-weight", "tree-rigging-shock", "felling-notch-hinge",
     "porta-wrap-friction", "chipper-debris",
     // spec-v563

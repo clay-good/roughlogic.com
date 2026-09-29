@@ -6,15 +6,20 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import {
+  ARBORICULTURE_RENDERERS,
   computeCrownReductionLeafArea, computeRootBallSizeWeight, computeTreeCablingRating,
   computeStumpGrindingVolume, computeSoilVolumeForCanopy,
-} from "../../calc-arborist.js";
+} from "../../calc-arboriculture.js";
 
 const within = (got, want, tolPct, label) => {
   const tol = Math.abs(want) * tolPct / 100;
   assert.ok(Math.abs(got - want) <= tol, `${label}: got ${got}, want ${want} +/- ${tolPct}%`);
 };
 const close = (got, want, label) => within(got, want, 1e-9, label);
+
+test("arboriculture split exposes all five renderers", () => {
+  assert.equal(Object.keys(ARBORICULTURE_RENDERERS).length, 5);
+});
 
 test("crown reduction: the annulus removed, by a numeric integral of 2 pi r dr", () => {
   const r = computeCrownReductionLeafArea({ crown_radius_ft: 20, reduction_ft: 4, outer_third_leaf_share: 0.75, live_crown_cap_pct: 25 });

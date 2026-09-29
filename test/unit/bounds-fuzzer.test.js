@@ -48208,7 +48208,7 @@ test("bounds: spec-v1737 cut -- well-drawdown gains storativity, Cooper-Jacob un
 //     the cube rather than in a second tile that would disagree with the first.
 // ===========================================================================
 
-import { computeCrownReductionLeafArea as _v1696 } from "../../calc-arborist.js";
+import { computeCrownReductionLeafArea as _v1696 } from "../../calc-arboriculture.js";
 test("bounds: spec-v1696 computeCrownReductionLeafArea -- the geometry compounds twice", () => {
   const base = { crown_radius_ft: 20, reduction_ft: 4, outer_third_leaf_share: 0.75, live_crown_cap_pct: 25 };
   const r = _v1696(base);
@@ -48244,7 +48244,7 @@ test("bounds: spec-v1696 computeCrownReductionLeafArea -- the geometry compounds
   assert.ok("error" in _v1696({ ...base, outer_third_leaf_share: 0 }));
 });
 
-import { computeRootBallSizeWeight as _v1697 } from "../../calc-arborist.js";
+import { computeRootBallSizeWeight as _v1697 } from "../../calc-arboriculture.js";
 test("bounds: spec-v1697 computeRootBallSizeWeight -- weight goes as the cube of caliper", () => {
   const base = { caliper_in: 6, ball_per_caliper_in: 10, depth_ratio: 0.65, soil_density_pcf: 105, handling_limit_lb: 2000 };
   const r = _v1697(base);
@@ -48273,7 +48273,7 @@ test("bounds: spec-v1697 computeRootBallSizeWeight -- weight goes as the cube of
   assert.ok("error" in _v1697({ ...base, caliper_in: 0 }));
 });
 
-import { computeTreeCablingRating as _v1698 } from "../../calc-arborist.js";
+import { computeTreeCablingRating as _v1698 } from "../../calc-arboriculture.js";
 test("bounds: spec-v1698 computeTreeCablingRating -- a low cable carries twice the force", () => {
   const base = { defect_to_tips_ft: 24, placement_fraction: 0.6667, alternative_placement_ft: 8, design_load_lb: 1200, cable_rating_lb: 4000, termination_rating_lb: 3600, anchor_rating_lb: 2800, cable_count: 1 };
   const r = _v1698(base);
@@ -48304,7 +48304,7 @@ test("bounds: spec-v1698 computeTreeCablingRating -- a low cable carries twice t
   assert.ok("error" in _v1698({ ...base, design_load_lb: 0 }));
 });
 
-import { computeStumpGrindingVolume as _v1699 } from "../../calc-arborist.js";
+import { computeStumpGrindingVolume as _v1699 } from "../../calc-arboriculture.js";
 test("bounds: spec-v1699 computeStumpGrindingVolume -- the flare is most of the job", () => {
   const base = { stump_diameter_in: 24, grind_diameter_in: 36, grind_depth_in: 12, swell_factor: 1.8, settlement_fraction: 0.3 };
   const r = _v1699(base);
@@ -48334,7 +48334,7 @@ test("bounds: spec-v1699 computeStumpGrindingVolume -- the flare is most of the 
   assert.ok("error" in _v1699({ ...base, swell_factor: 0.5 }));
 });
 
-import { computeSoilVolumeForCanopy as _v1700 } from "../../calc-arborist.js";
+import { computeSoilVolumeForCanopy as _v1700 } from "../../calc-arboriculture.js";
 test("bounds: spec-v1700 computeSoilVolumeForCanopy -- the pit provides 8 percent of it", () => {
   const base = { canopy_diameter_ft: 25, soil_per_canopy_ft3_per_ft2: 2, pit_length_ft: 5, pit_width_ft: 5, pit_depth_ft: 3, usable_fraction: 1 };
   const r = _v1700(base);
