@@ -15,6 +15,7 @@ import {
   TOOL_MAINTENANCE,
   REFERENCE_RENDERERS,
 } from "../../calc-references.js";
+import { ELECTRICALREFERENCE_RENDERERS } from "../../calc-electricalreferences.js";
 
 // --- Utility 114: Color Codes ---
 
@@ -170,12 +171,16 @@ test("Tool maintenance: actions are descriptive (>10 chars)", () => {
 
 // --- Renderer registry ---
 
-test("REFERENCE_RENDERERS exposes 18 ids (v1 5 + v3 6 + v5 4 + v177/v178 electrician 2 + v187 pool-bonding 1)", () => {
-  assert.equal(Object.keys(REFERENCE_RENDERERS).length, 18);
+test("the split reference registries expose all 18 ids", () => {
+  assert.equal(Object.keys(REFERENCE_RENDERERS).length, 15);
+  assert.equal(Object.keys(ELECTRICALREFERENCE_RENDERERS).length, 3);
 });
 
-test("REFERENCE_RENDERERS: every value is a function", () => {
-  for (const v of Object.values(REFERENCE_RENDERERS)) {
+test("reference registries: every value is a function", () => {
+  for (const v of [
+    ...Object.values(REFERENCE_RENDERERS),
+    ...Object.values(ELECTRICALREFERENCE_RENDERERS),
+  ]) {
     assert.equal(typeof v, "function");
   }
 });

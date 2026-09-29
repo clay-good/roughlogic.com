@@ -2214,6 +2214,9 @@ cross-check.
 | calc-electricalfield.js | `computeWelderArcCircuitConductor` | `{ primary_current_a = 40, duty_pct = 50 } = {}` | _ | _ | _ |
 | calc-electricalfield.js | `computeWelderResistanceCircuitConductor` | `{ primary_current_a = 100, duty_pct = 50 } = {}` | _ | _ | _ |
 | calc-electricalfield.js | `computeWirePullingLubricant` | `{ length_ft = 400, conduit_id_in = 3, k_factor = 0.0015, bend_factor = 1.0 } ...` | _ | _ | _ |
+| calc-electricalreferences.js | `computeBurialDepth3005` | `{ wiring_method = "direct burial cable/conductors", location = "general earth...` | _ | _ | _ |
+| calc-electricalreferences.js | `computePoolBonding68026` | `{ pool_type = "permanent pool/spa" } = {}` | _ | _ | _ |
+| calc-electricalreferences.js | `computeSupportSpacing` | `{ wiring_method = "EMT", trade_size_in = 0 } = {}` | _ | _ | _ |
 | calc-elevator.js | `computeBufferStroke` | `{ contract_speed_fpm = 0, governor_trip_fpm = 0, permitted_retardation_g = 1,...` | _ | _ | _ |
 | calc-elevator.js | `computeCounterweightBalance` | `{ car_weight_lb = 0, rated_capacity_lb = 0, overbalance_pct = 45, actual_coun...` | _ | _ | _ |
 | calc-elevator.js | `computeDoorClosingEnergy` | `{ door_mass_lb = 0, closing_speed_fps = 0, ke_limit_normal_ftlb = 0, ke_limit...` | _ | _ | _ |
@@ -3213,7 +3216,6 @@ cross-check.
 | calc-realestate.js | `renderRentVsBuy` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-realestate.js | `renderRentalWorksheet` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-realestate.js | `renderSection121` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
-| calc-references.js | `computeBurialDepth3005` | `{ wiring_method = "direct burial cable/conductors", location = "general earth...` | _ | _ | _ |
 | calc-references.js | `computeColorCodes` | `` | _ | _ | _ |
 | calc-references.js | `computeDefensibleSpace` | `` | _ | _ | _ |
 | calc-references.js | `computeEmergencyContacts` | `` | _ | _ | _ |
@@ -3225,10 +3227,8 @@ cross-check.
 | calc-references.js | `computeLabSafety` | `` | _ | _ | _ |
 | calc-references.js | `computeOSHATop10` | `` | _ | _ | _ |
 | calc-references.js | `computeOshaRecordkeeping` | `` | _ | _ | _ |
-| calc-references.js | `computePoolBonding68026` | `{ pool_type = "permanent pool/spa" } = {}` | _ | _ | _ |
 | calc-references.js | `computeSalesTaxNexus` | `{ state = "CA" } = {}` | _ | _ | _ |
 | calc-references.js | `computeStormShelter` | `` | _ | _ | _ |
-| calc-references.js | `computeSupportSpacing` | `{ wiring_method = "EMT", trade_size_in = 0 } = {}` | _ | _ | _ |
 | calc-references.js | `computeToolMaintenance` | `` | _ | _ | _ |
 | calc-references.js | `computeTriage` | `` | _ | _ | _ |
 | calc-references.js | `renderColorCodes` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |

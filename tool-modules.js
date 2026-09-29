@@ -1028,10 +1028,12 @@ export const TOOL_MODULES = (() => {
     "storm-shelter", "triage-quickread",
     // v5 Step 61
     "irs-form-index", "sales-tax-nexus", "osha-recordkeeping", "lab-safety-quickread",
-    // spec-v177/v178 electrician reference lookups
-    "burial-depth-300-5", "support-spacing",
-    // spec-v187 swimming-pool equipotential bonding
-    "pool-bonding-680-26",
+  ]);
+  // spec-v1872 cap-relief split: the NEC field-reference band moved intact
+  // from calc-references.js. All three tiles keep Group A and their existing
+  // public behavior.
+  declare("./calc-electricalreferences.js", "ELECTRICALREFERENCE_RENDERERS", [
+    "burial-depth-300-5", "support-spacing", "pool-bonding-680-26",
   ]);
   declare("./calc-cross.js", "CROSS_RENDERERS", [
     "unit-converter", "material-cost", "markup", "time-and-materials",

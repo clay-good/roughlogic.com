@@ -1922,8 +1922,8 @@ export const COMPUTE_MAP = {
   "lighting-light-loss-factor": { module: "../../calc-elecdesign.js", fn: "computeLightingLightLossFactor" },
   "lighting-uniformity-ratio": { module: "../../calc-elecdesign.js", fn: "computeLightingUniformityRatio" },
   "egress-lighting-check": { module: "../../calc-elecdesign.js", fn: "computeEgressLightingCheck" },
-  "burial-depth-300-5": { module: "../../calc-references.js", fn: "computeBurialDepth3005" },
-  "support-spacing": { module: "../../calc-references.js", fn: "computeSupportSpacing" },
+  "burial-depth-300-5": { module: "../../calc-electricalreferences.js", fn: "computeBurialDepth3005" },
+  "support-spacing": { module: "../../calc-electricalreferences.js", fn: "computeSupportSpacing" },
   // spec-v179..v187 electrician second-pass batch
   "motor-branch-protection": { module: "../../calc-electrical.js", fn: "computeMotorBranchProtection" },
   "commercial-lighting-load": { module: "../../calc-service.js", fn: "computeCommercialLightingLoad" },
@@ -1977,7 +1977,7 @@ export const COMPUTE_MAP = {
   "water-closet-location": { module: "../../calc-construction.js", fn: "computeWaterClosetLocation" },
   "lavatory-tub-clearance": { module: "../../calc-construction.js", fn: "computeLavatoryTubClearance" },
   "ramp-detail-check": { module: "../../calc-construction.js", fn: "computeRampDetailCheck" },
-  "pool-bonding-680-26": { module: "../../calc-references.js", fn: "computePoolBonding68026" },
+  "pool-bonding-680-26": { module: "../../calc-electricalreferences.js", fn: "computePoolBonding68026" },
   // spec-v1563..v1570 steam plant and commercial laundry band
   "laundry-washer-turns": { module: "../../calc-steamplant.js", fn: "computeLaundryWasherTurns" },
   "laundry-cost-per-pound": { module: "../../calc-steamplant.js", fn: "computeLaundryCostPerPound" },

@@ -14579,7 +14579,7 @@ import { computeMotorUnbalanceDerate as _cv172 } from "../../calc-powerquality.j
 import { computePointIlluminance as _cv175, computePointMethodRequiredCandela as _v688 } from "../../calc-elecdesign.js";
 import {
   computeBurialDepth3005 as _cv177, computeSupportSpacing as _cv178,
-} from "../../calc-references.js";
+} from "../../calc-electricalreferences.js";
 
 // ---------------------------------------------------------------------------
 // spec-v179..v187 electrician second-pass batch (9 tiles).
@@ -14595,7 +14595,7 @@ import { computePvCircuitAmpacity as _cv182 } from "../../calc-solar.js";
 import {
   computeTransformerKFactor as _cv183, computeMotorCapacitorMax as _cv184,
 } from "../../calc-powerquality.js";
-import { computePoolBonding68026 as _cv187 } from "../../calc-references.js";
+import { computePoolBonding68026 as _cv187 } from "../../calc-electricalreferences.js";
 
 test("bounds: spec-v165 buck-boost-sizing pins boost/buck paths and error seams", () => {
   const ex = _cv165({ supply_v: 208, desired_v: 230, load_a: 50 });
