@@ -296,7 +296,7 @@ const UNIT_TAIL_EXEMPT = new Set([
   // `_v` and `_w` added 2026-09-10 buy the most and cost the most. Outside the
   // electrical modules `V` is a SHEAR or a VERTICAL component and `W` is a
   // width, a web, a withdrawal or water -- never a volt or a watt.
-  "calc-edu.js:computeChiSquareIndependence:cramers_v",      // Cramer's V, a statistic
+  "calc-educationassessment.js:computeChiSquareIndependence:cramers_v", // Cramer's V, a statistic
   "calc-geotech.js:computeSlopedBackfillEarthPressure:pa_v", // vertical component of Pa
   "calc-geotech.js:computeCoulombEarthPressure:pa_v",        // vertical component of Pa
   "calc-geotech.js:computeSeismicEarthPressure:pae_v",       // vertical component of Pae

@@ -10842,11 +10842,11 @@ test("bounds: spec-v1231 computeSumOfYearsDigitsDepreciation pins schedule, salv
 });
 import { computePrimerTm as _t1, computeCfuPlateCount as _t2 } from "../../calc-lab.js";
 import { computeGrossRentMultiplier as _x1, computePmiCancellationDate as _x2, computeSellerNetSheet as _x3 } from "../../calc-realestate.js";
-import { computeFinalGradeNeeded as _y1, computeCategoryWeightedGrade as _y2, computeTwoSampleTTest as _y3, computePairedTTest as _v1234, computeOneSampleTTest as _v1236 } from "../../calc-edu.js";
-import { computeOneWayAnova as _v1261 } from "../../calc-edu.js";
-import { computeChiSquareIndependence as _v1262 } from "../../calc-edu.js";
-import { computeSpearman as _v1263 } from "../../calc-edu.js";
-import { computeTwoProportionZTest as _v1264 } from "../../calc-edu.js";
+import { computeFinalGradeNeeded as _y1, computeCategoryWeightedGrade as _y2, computeTwoSampleTTest as _y3, computePairedTTest as _v1234, computeOneSampleTTest as _v1236 } from "../../calc-educationassessment.js";
+import { computeOneWayAnova as _v1261 } from "../../calc-educationassessment.js";
+import { computeChiSquareIndependence as _v1262 } from "../../calc-educationassessment.js";
+import { computeSpearman as _v1263 } from "../../calc-educationassessment.js";
+import { computeTwoProportionZTest as _v1264 } from "../../calc-educationassessment.js";
 test("bounds: spec-v1236 computeOneSampleTTest pins t = (x_bar-mu0)/(s/sqrt(n)), df, tails, and error seams", () => {
   // mean 16.1, SD 0.3, n 25 vs target 16.0: t = 1.667, df 24, two-sided p ~ 0.1086.
   const r = _v1236({ sample_mean: 16.1, sample_sd: 0.3, n: 25, hypothesized_mean: 16.0, tail: "two" });

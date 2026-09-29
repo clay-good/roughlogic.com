@@ -1823,7 +1823,9 @@ export const TOOL_MODULES = (() => {
     // v23
     "curve-grade-scaler",
   
-    // v20
+  ]);
+  // spec-v1875: education assessment and statistical inference.
+  declare("./calc-educationassessment.js", "EDUCATIONASSESSMENT_RENDERERS", [
     "final-grade-needed", "category-weighted-grade", "two-sample-t-test", "paired-t-test", "one-sample-t-test", "one-way-anova", "chi-square-independence", "spearman-rank-correlation", "two-proportion-z-test",
   ]);
   // Group Z (Rigging and Heavy Lift): the lift-planning core (spec-v65), a

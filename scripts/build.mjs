@@ -156,6 +156,7 @@ const FILES = [
   "calc-realestate.js",
   // v12 Group Y: Educators / K-12.
   "calc-edu.js",
+  "calc-educationassessment.js",
   // v65 Group Z (Rigging and Heavy Lift)
   "calc-rigging.js",
   "calc-riggingfield.js",

@@ -1151,7 +1151,7 @@ import {
   computeFinalGradeNeeded, finalGradeNeededExample,
   computeCategoryWeightedGrade, categoryWeightedGradeExample,
   computeTwoSampleTTest, twoSampleTTestExample,
-} from "../../calc-edu.js";
+} from "../../calc-educationassessment.js";
 
 test("final-grade-needed: current 88, final 25%, target 90 -> 96%", () => {
   const r = computeFinalGradeNeeded({ current_pct: 88, final_weight_pct: 25, target_pct: 90 });

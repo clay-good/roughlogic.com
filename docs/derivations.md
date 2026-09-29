@@ -2041,19 +2041,13 @@ cross-check.
 | calc-edu.js | `computeAlternateReadability` | `{ text }` | _ | _ | _ |
 | calc-edu.js | `computeBaseConvert` | `{ value, from_base, to_base }` | _ | _ | _ |
 | calc-edu.js | `computeBellCurve` | `{ raw_score, mean, sd }` | _ | _ | _ |
-| calc-edu.js | `computeCategoryWeightedGrade` | `{ categories = [] } = {}` | _ | _ | _ |
 | calc-edu.js | `computeChiSquareGof` | `{ observed, expected, expected_type = "counts", alpha = 0.05 }` | _ | _ | _ |
-| calc-edu.js | `computeChiSquareIndependence` | `{ table_text = "" } = {}` | _ | _ | _ |
 | calc-edu.js | `computeConfidenceInterval` | `{ mode, n, proportion, mean, sd, confidence_pct }` | _ | _ | _ |
 | calc-edu.js | `computeCurveGradeScaler` | `{ method = "flat", raw_score = 0, param = 0, class_mean = 0 } = {}` | _ | _ | _ |
-| calc-edu.js | `computeFinalGradeNeeded` | `{ current_pct = 0, final_weight_pct = 0, target_pct = 0 } = {}` | _ | _ | _ |
 | calc-edu.js | `computeGPA` | `{ courses }` | _ | _ | _ |
 | calc-edu.js | `computeLexileBand` | `{ grade }` | _ | _ | _ |
 | calc-edu.js | `computeLinearRegression` | `{ x_values, y_values, predict_x = null, alpha = 0.05 }` | _ | _ | _ |
 | calc-edu.js | `computeLinearSystem2x2` | `{ a1, b1, c1, a2, b2, c2 }` | _ | _ | _ |
-| calc-edu.js | `computeOneSampleTTest` | `{ sample_mean = 0, sample_sd = 0, n = 0, hypothesized_mean = 0, tail = "two",...` | _ | _ | _ |
-| calc-edu.js | `computeOneWayAnova` | `{ groups_text = "" } = {}` | _ | _ | _ |
-| calc-edu.js | `computePairedTTest` | `{ mean_diff = 0, sd_diff = 0, n_pairs = 0, tail = "two", alpha = 0.05 } = {}` | _ | _ | _ |
 | calc-edu.js | `computePearson` | `{ x_values, y_values, alpha = 0.05 }` | _ | _ | _ |
 | calc-edu.js | `computePeriodicElement` | `{ query }` | _ | _ | _ |
 | calc-edu.js | `computeQuadratic` | `{ a, b, c }` | _ | _ | _ |
@@ -2061,11 +2055,8 @@ cross-check.
 | calc-edu.js | `computeSampleSizeForMargin` | `{ proportion, target_moe, confidence_pct }` | _ | _ | _ |
 | calc-edu.js | `computeScientificNotation` | `{ value }` | _ | _ | _ |
 | calc-edu.js | `computeSigFigs` | `{ value, target_sig_figs }` | _ | _ | _ |
-| calc-edu.js | `computeSpearman` | `{ x_values, y_values, alpha = 0.05 } = {}` | _ | _ | _ |
 | calc-edu.js | `computeStandardsBasedGrade` | `{ rows }` | _ | _ | _ |
 | calc-edu.js | `computeStatistics` | `{ values }` | _ | _ | _ |
-| calc-edu.js | `computeTwoProportionZTest` | `{ x1 = 0, n1 = 0, x2 = 0, n2 = 0, tail = "two", alpha = 0.05 } = {}` | _ | _ | _ |
-| calc-edu.js | `computeTwoSampleTTest` | `{ mean1 = 0, sd1 = 0, n1 = 0, mean2 = 0, sd2 = 0, n2 = 0, tail = "two", alpha...` | _ | _ | _ |
 | calc-edu.js | `countSentences` | `text` | _ | _ | _ |
 | calc-edu.js | `countSigFigs` | `raw` | _ | _ | _ |
 | calc-edu.js | `countSyllables` | `text` | _ | _ | _ |
@@ -2091,6 +2082,15 @@ cross-check.
 | calc-edu.js | `renderStandardsBasedGrade` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-edu.js | `renderStatistics` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-edu.js | `roundToSigFigs` | `value, n` | _ | _ | _ |
+| calc-educationassessment.js | `computeCategoryWeightedGrade` | `{ categories = [] } = {}` | _ | _ | _ |
+| calc-educationassessment.js | `computeChiSquareIndependence` | `{ table_text = "" } = {}` | _ | _ | _ |
+| calc-educationassessment.js | `computeFinalGradeNeeded` | `{ current_pct = 0, final_weight_pct = 0, target_pct = 0 } = {}` | _ | _ | _ |
+| calc-educationassessment.js | `computeOneSampleTTest` | `{ sample_mean = 0, sample_sd = 0, n = 0, hypothesized_mean = 0, tail = "two",...` | _ | _ | _ |
+| calc-educationassessment.js | `computeOneWayAnova` | `{ groups_text = "" } = {}` | _ | _ | _ |
+| calc-educationassessment.js | `computePairedTTest` | `{ mean_diff = 0, sd_diff = 0, n_pairs = 0, tail = "two", alpha = 0.05 } = {}` | _ | _ | _ |
+| calc-educationassessment.js | `computeSpearman` | `{ x_values, y_values, alpha = 0.05 } = {}` | _ | _ | _ |
+| calc-educationassessment.js | `computeTwoProportionZTest` | `{ x1 = 0, n1 = 0, x2 = 0, n2 = 0, tail = "two", alpha = 0.05 } = {}` | _ | _ | _ |
+| calc-educationassessment.js | `computeTwoSampleTTest` | `{ mean1 = 0, sd1 = 0, n1 = 0, mean2 = 0, sd2 = 0, n2 = 0, tail = "two", alpha...` | _ | _ | _ |
 | calc-elecdesign.js | `computeEgressLightingCheck` | `{ avg_fc = 0, min_fc = 0, max_fc = 0, mode = "normal" } = {}` | _ | _ | _ |
 | calc-elecdesign.js | `computeFuseLetThrough` | `{ conductor_cmil = 0, initial_temp_c = 75, damage_temp_c = 250, duration_s = ...` | _ | _ | _ |
 | calc-elecdesign.js | `computeGroundPotentialRise` | `{ grid_current_a = 0, grid_resistance_ohm = 0, tolerable_touch_v = 0 } = {}` | _ | _ | _ |
