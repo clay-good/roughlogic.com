@@ -2,8 +2,8 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "26c9ad492cbc0998",
-      "date": "2026-09-29"
+      "sha": "d426ba69def8131f",
+      "date": "2026-09-30"
     },
     "/tools/": {
       "sha": "6dfb001e52cfabf5",
@@ -2206,8 +2206,8 @@
       "date": "2026-09-29"
     },
     "/tools/door-closer-opening-force/": {
-      "sha": "1f6800f826a58f94",
-      "date": "2026-09-29"
+      "sha": "c29259706f045d32",
+      "date": "2026-09-30"
     },
     "/tools/door-closing-energy/": {
       "sha": "84e85e883cf85199",
@@ -2218,8 +2218,8 @@
       "date": "2026-09-29"
     },
     "/tools/door-undercut-transfer-air/": {
-      "sha": "9004e066cdbb0a79",
-      "date": "2026-09-29"
+      "sha": "1aedefb673e0e918",
+      "date": "2026-09-30"
     },
     "/tools/doubling-time/": {
       "sha": "c8bba11d8aaac9d8",
@@ -2562,8 +2562,8 @@
       "date": "2026-09-29"
     },
     "/tools/electric-lock-power-budget/": {
-      "sha": "6c8a54a427496840",
-      "date": "2026-09-29"
+      "sha": "d747379fddfff3ec",
+      "date": "2026-09-30"
     },
     "/tools/elevation-pressure-loss/": {
       "sha": "303f1de75f3a7ee4",
@@ -2894,8 +2894,8 @@
       "date": "2026-09-29"
     },
     "/tools/fire-door-clearance/": {
-      "sha": "b82c271e505452c4",
-      "date": "2026-09-29"
+      "sha": "bfa9cf7cabf3d016",
+      "date": "2026-09-30"
     },
     "/tools/fire-friction/": {
       "sha": "83396ae46ec7ff28",
@@ -3998,8 +3998,8 @@
       "date": "2026-09-29"
     },
     "/tools/key-cut-macs-check/": {
-      "sha": "27153d8c4055f941",
-      "date": "2026-09-29"
+      "sha": "7f98caad44b7141b",
+      "date": "2026-09-30"
     },
     "/tools/keyseat-key-size/": {
       "sha": "692411ee4938a4ca",
@@ -4502,8 +4502,8 @@
       "date": "2026-09-29"
     },
     "/tools/master-key-bitting-capacity/": {
-      "sha": "f0d704da498fa872",
-      "date": "2026-09-29"
+      "sha": "542e382de576141c",
+      "date": "2026-09-30"
     },
     "/tools/master-stream/": {
       "sha": "5b52faf45e8229a7",

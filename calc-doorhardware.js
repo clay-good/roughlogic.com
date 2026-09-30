@@ -91,8 +91,8 @@ const _SQIN_PER_SQFT = 144;
 
 // ===================== spec-v1571: door closer size and opening force =====================
 
-// dims: in { door_width_in: L, door_height_in: L, door_weight_lb: M L T^-2, measured_opening_force_lbf: M L T^-2, force_limit_lbf: M L T^-2, measured_closing_time_s: T, min_closing_time_s: T, pressure_difference_inwc: M L^-1 T^-2 } out: { closer_size: dimensionless, force_margin_lbf: M L T^-2, pressure_force_lbf: M L T^-2, closer_force_lbf: M L T^-2 }
-export function computeDoorCloserForce({ door_width_in = 0, door_height_in = 0, door_weight_lb = 0, measured_opening_force_lbf = 0, force_limit_lbf = 5, measured_closing_time_s = 0, min_closing_time_s = 5, pressure_difference_inwc = 0 } = {}) {
+// dims: in { door_width_in: L, door_height_in: L, door_weight_lb: M L T^-2, measured_opening_force_lbf: M L T^-2, force_limit_lbf: M L T^-2, measured_closing_time_s: T, min_closing_time_s: T, pressure_difference_inwc: M L^-1 T^-2, knob_offset_in: L } out: { closer_size: dimensionless, force_margin_lbf: M L T^-2, pressure_force_lbf: M L T^-2, closer_force_lbf: M L T^-2 }
+export function computeDoorCloserForce({ door_width_in = 0, door_height_in = 0, door_weight_lb = 0, measured_opening_force_lbf = 0, force_limit_lbf = 5, measured_closing_time_s = 0, min_closing_time_s = 5, pressure_difference_inwc = 0, knob_offset_in = 3 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(door_width_in > 0)) return { error: "Door width must be positive." };
   if (!(door_height_in > 0)) return { error: "Door height must be positive." };
@@ -102,6 +102,7 @@ export function computeDoorCloserForce({ door_width_in = 0, door_height_in = 0, 
   if (!(measured_closing_time_s > 0)) return { error: "Measured closing time must be positive." };
   if (!(min_closing_time_s > 0)) return { error: "Minimum closing time must be positive." };
   if (!(pressure_difference_inwc >= 0)) return { error: "Pressure difference cannot be negative." };
+  if (!(knob_offset_in >= 0 && knob_offset_in < door_width_in / 2)) return { error: "The knob offset from the latch edge must be at least 0 and under half the door width." };
   // ANSI/BHMA A156.4 size bands run 1 through 6 by door width, one size per
   // six inches from a 30 in size-1 door. A heavy leaf or a pressure
   // difference across the opening pushes the selection up a size.
@@ -111,28 +112,37 @@ export function computeDoorCloserForce({ door_width_in = 0, door_height_in = 0, 
   const closer_size = Math.min(6, width_size + heavy_bump + pressure_bump);
   const force_margin_lbf = force_limit_lbf - measured_opening_force_lbf;
   const force_ok = measured_opening_force_lbf <= force_limit_lbf;
-  // A uniform pressure on a leaf hinged at one edge resolves to half the
-  // total pressure force at the pull, because the pressure acts at the
-  // leaf's centreline and the pull is a full width from the hinge.
+  // A uniform pressure acts at the leaf's centreline and the hand pulls at
+  // the knob, a few inches in from the latch edge: NFPA 92 / Klote
+  // F = Fdc + A dP W / (2 (W - d)). Until 2026-09-30 the tile used W / 2W,
+  // exactly half, and put the pull at the latch edge; Bhatia (CED, Stairwell
+  // Pressurization, Table 3) reads a 36 in x 7 ft door with a 6 lbf closer at
+  // 30 lbf total for 0.40 in wc, which needs the knob term.
   const door_area_sqft = door_width_in * door_height_in / _SQIN_PER_SQFT;
-  const pressure_force_lbf = door_area_sqft * pressure_difference_inwc * _LBF_PER_SQFT_PER_INWC / 2;
+  const knob_factor = door_width_in / (2 * (door_width_in - knob_offset_in));
+  const pressure_force_lbf = door_area_sqft * pressure_difference_inwc * _LBF_PER_SQFT_PER_INWC * knob_factor;
   const closer_force_lbf = measured_opening_force_lbf - pressure_force_lbf;
+  // A pressure force larger than the whole gauge reading means the reading
+  // and the pressure figure cannot both be right.
+  const readings_inconsistent = closer_force_lbf < 0;
   const closing_time_ok = measured_closing_time_s >= min_closing_time_s;
   const pressure_explains = !force_ok && closer_force_lbf <= force_limit_lbf;
   return {
-    closer_size, width_size, force_margin_lbf, force_ok, door_area_sqft,
-    pressure_force_lbf, closer_force_lbf, closing_time_ok, pressure_explains,
+    closer_size, width_size, force_margin_lbf, force_ok, door_area_sqft, knob_factor,
+    pressure_force_lbf, closer_force_lbf, readings_inconsistent, closing_time_ok, pressure_explains,
     verdict: force_ok ? "within the entered opening force limit" : "OVER the entered opening force limit",
-    diagnosis: pressure_explains
+    diagnosis: readings_inconsistent
+      ? "CHECK THE READINGS -- the entered pressure difference alone would need more force than the gauge measured, so one of the two is wrong"
+      : pressure_explains
       ? "the pressure difference across the door accounts for the overage -- this is a mechanical problem, not a hardware one"
       : force_ok ? "no conflict at the entered readings"
         : "the closer itself is over the limit; check hinge bind and latch and strike alignment before turning the spring down",
     note: "A closer has to be strong enough to close and latch the door and weak enough that a person can open it, and those two requirements fight. A closer sized down until the opening force meets the limit may not have the power to close the door against its latch, its gasketing, and the building's stack pressure -- and a fire door that does not latch is a failed fire door. When both cannot be met the answer is a lower-friction hinge set, a different latch, addressing the pressure difference across the door, or a power operator, not a weaker spring. The adjustments are commonly confused. Spring power sets the opening force; sweep speed and latch speed set how fast it closes and are hydraulic rather than spring; backcheck protects the door and the closer from being thrown open into a wall. Slowing the sweep does not reduce opening force. Accessibility also imposes a minimum closing TIME, so a door tuned to slam shut fails even when its opening force is fine. This is a sizing band and a limit comparison, not a closer selection: that is a manufacturer choice based on width, weight, mounting, and the pressure condition, and the manufacturer's chart governs. Limits and how they are measured differ between the accessibility standards, the building code, and the life safety code, and fire doors are treated differently again. On a rated door the assembly MUST close and latch from any position, and adjusting below the power needed to do that defeats a life-safety device whatever the force reading says. NFPA 80, the adopted building and accessibility codes, the manufacturers' listings, and the authority having jurisdiction govern.",
   };
 }
-const doorCloserExample = { inputs: { door_width_in: 36, door_height_in: 84, door_weight_lb: 85, measured_opening_force_lbf: 6.5, force_limit_lbf: 5, measured_closing_time_s: 4.2, min_closing_time_s: 5, pressure_difference_inwc: 0.03 } };
+const doorCloserExample = { inputs: { door_width_in: 36, door_height_in: 84, door_weight_lb: 85, measured_opening_force_lbf: 6.5, force_limit_lbf: 5, measured_closing_time_s: 4.2, min_closing_time_s: 5, pressure_difference_inwc: 0.03, knob_offset_in: 3 } };
 DOORHARDWARE_RENDERERS["door-closer-opening-force"] = _simpleRenderer({
-  citation: "Citation: ANSI/BHMA A156.4 closer size bands by door width (one size per six inches from a 30 in size 1), with the accessibility and building-code opening force limits and minimum closing time named, and NFPA 80 cited for rated doors. Limits are entered from the adopted code; the closer itself is a manufacturer selection.",
+  citation: "Citation: ANSI/BHMA A156.4 closer size bands by door width (one size per six inches from a 30 in size 1); the pressure force at the knob by the NFPA 92 / Klote door-opening relation A x dP x W / (2 (W - d)); with the accessibility and building-code opening force limits and minimum closing time named, and NFPA 80 cited for rated doors. Limits are entered from the adopted code; the closer itself is a manufacturer selection.",
   example: doorCloserExample.inputs,
   fields: [
     { key: "door_width_in", label: "Door width (in)", kind: "number", default: 36 },
@@ -143,6 +153,7 @@ DOORHARDWARE_RENDERERS["door-closer-opening-force"] = _simpleRenderer({
     { key: "measured_closing_time_s", label: "Measured closing time, 90 to 12 degrees (s)", kind: "number", default: 4.2 },
     { key: "min_closing_time_s", label: "Required minimum closing time (s)", kind: "number", default: 5 },
     { key: "pressure_difference_inwc", label: "Pressure difference across the door (in wc)", kind: "number", default: 0.03 },
+    { key: "knob_offset_in", label: "Knob distance from the latch edge (in)", kind: "number", default: 3 },
   ],
   outputs: [
     { key: "s", id: "dcf-out-s", label: "Closer size band", value: (r) => "size " + fmt(r.closer_size, 0) + " (width alone gives size " + fmt(r.width_size, 0) + ")" },
@@ -248,7 +259,7 @@ export function computePanicHardwareForce({ release_force_lbf = 0, set_in_motion
     release_margin_lbf, set_in_motion_margin_lbf, swing_margin_lbf,
     release_ok, set_in_motion_ok, swing_ok, required_actuating_in, actuating_ok, height_ok,
     all_ok, points_at,
-    note: "Three separate forces are measured and they fail for different reasons. Release force is the bar itself, and a high reading points at the device: binding, a bent bar, a latch dragging on a misaligned strike, or a device that has never been lubricated. Set-in-motion and swing forces are the door, and a high reading there points at the closer, the hinges, or a pressure difference across the opening. That last cause is the one people miss. A stair door in a pressurized stairwell can be well within every hardware specification and still take far more than its limit to move, because the building is holding it shut -- and the harder the stairwell is pressurized for smoke control, the worse it gets. Release passing while set-in-motion fails is the signature of something holding the door shut rather than something wrong with the bar, and replacing the exit device would change nothing. Fire exit hardware carries an additional constraint that gets violated with good intentions: on a rated door the latch must engage, so a device dogged down to make a door swing freely for convenience has defeated a fire door, and only listed fire exit hardware without a dogging feature belongs on a rated opening. The limits, how and where the force is measured, and the exceptions differ between the building code, the life safety code, and the accessibility standards, and the adopted code governs. This does not determine whether panic hardware is required for the occupancy and occupant load, address delayed or controlled egress, evaluate the fire door assembly or its annual inspection, or compute the pressure difference across the door. Egress hardware is life-safety equipment and a door that will not open under crowd load is a fatality mechanism: the adopted building and fire codes, the hardware listings, and the authority having jurisdiction govern.",
+    note: "Three separate forces are measured and they fail for different reasons. Release force is the bar itself, and a high reading points at the device: binding, a bent bar, a latch dragging on a misaligned strike, or a device that has never been lubricated. Set-in-motion and swing forces are the door, and a high reading there points at the closer, the hinges, or a pressure difference across the opening. That last cause is the one people miss. A stair door in a pressurized stairwell can be well within every hardware specification and still take far more than its limit to move, because the building is holding it shut -- and the harder the stairwell is pressurized for smoke control, the worse it gets. Release passing while set-in-motion fails is the signature of something holding the door shut rather than something wrong with the bar, and replacing the exit device would change nothing. Fire exit hardware carries an additional constraint that gets violated with good intentions: on a rated door the latch must engage, so a device dogged down to make a door swing freely for convenience has defeated a fire door, and only listed fire exit hardware without a dogging feature belongs on a rated opening. The limits, how and where the force is measured, and the exceptions differ between the building code, the life safety code, and the accessibility standards, and the adopted code governs. Check which edition the release limit comes from: the 15 lbf latch-release figure in older egress sections moved in the 2021 building and life safety codes to an operable-force limit on the hardware itself, so the release limit entered here is the adopted edition's, not a remembered number. This does not determine whether panic hardware is required for the occupancy and occupant load, address delayed or controlled egress, evaluate the fire door assembly or its annual inspection, or compute the pressure difference across the door. Egress hardware is life-safety equipment and a door that will not open under crowd load is a fatality mechanism: the adopted building and fire codes, the hardware listings, and the authority having jurisdiction govern.",
   };
 }
 const panicHardwareExample = { inputs: { release_force_lbf: 9, set_in_motion_lbf: 34, swing_force_lbf: 12, release_limit_lbf: 15, set_in_motion_limit_lbf: 30, swing_limit_lbf: 15, door_leaf_width_in: 36, actuating_portion_in: 20, mounting_height_in: 40 } };
@@ -280,8 +291,8 @@ DOORHARDWARE_RENDERERS["panic-hardware-force"] = _simpleRenderer({
 
 // ===================== spec-v1574: electric lock power and standby budget =====================
 
-// dims: in { device_count: dimensionless, holding_current_a: I, inrush_current_a: I, standby_hours: T, battery_derate: dimensionless, supply_rating_a: I, installed_battery_ah: I T } out: { steady_current_a: I, peak_inrush_a: I, amp_hours_required: I T, amp_hours_after_derate: I T }
-export function computeElectricLockPowerBudget({ device_count = 0, holding_current_a = 0, inrush_current_a = 0, standby_hours = 24, battery_derate = 0.8, supply_rating_a = 0, installed_battery_ah = 0 } = {}) {
+// dims: in { device_count: dimensionless, holding_current_a: I, inrush_current_a: I, standby_hours: T, battery_derate: dimensionless, supply_rating_a: I, installed_battery_ah: I T, alarm_current_a: I, alarm_minutes: T } out: { steady_current_a: I, peak_inrush_a: I, amp_hours_required: I T, amp_hours_after_derate: I T }
+export function computeElectricLockPowerBudget({ device_count = 0, holding_current_a = 0, inrush_current_a = 0, standby_hours = 24, battery_derate = 0.8, supply_rating_a = 0, installed_battery_ah = 0, alarm_current_a = 0, alarm_minutes = 5 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(device_count >= 1)) return { error: "Device count must be at least 1." };
   if (!(holding_current_a > 0)) return { error: "Holding current must be positive." };
@@ -291,30 +302,37 @@ export function computeElectricLockPowerBudget({ device_count = 0, holding_curre
   if (!(battery_derate > 0 && battery_derate <= 1)) return { error: "Battery derate must be in (0, 1]." };
   if (!(supply_rating_a > 0)) return { error: "Power supply rating must be positive." };
   if (!(installed_battery_ah > 0)) return { error: "Installed battery capacity must be positive." };
+  if (!(alarm_current_a >= 0)) return { error: "Alarm-period current cannot be negative." };
+  if (!(alarm_minutes >= 0)) return { error: "Alarm duration cannot be negative." };
   const steady_current_a = device_count * holding_current_a;
   const peak_inrush_a = device_count * inrush_current_a;
   const supply_margin_a = supply_rating_a - steady_current_a;
   const supply_ok = supply_rating_a >= steady_current_a;
   const inrush_ok = supply_rating_a >= peak_inrush_a;
-  const amp_hours_required = steady_current_a * standby_hours;
+  // Standby plus the alarm period that follows it (sounders, strikes held
+  // open, the panel itself). Fail-safe maglocks draw nothing in alarm: they
+  // release by LOSING power. Until 2026-09-30 there was no alarm term.
+  const standby_amp_hours = steady_current_a * standby_hours;
+  const alarm_amp_hours = alarm_current_a * alarm_minutes / 60;
+  const amp_hours_required = standby_amp_hours + alarm_amp_hours;
   const amp_hours_after_derate = amp_hours_required / battery_derate;
   const battery_margin_ah = installed_battery_ah - amp_hours_after_derate;
   const battery_ok = installed_battery_ah >= amp_hours_after_derate;
   const batteries_needed = Math.ceil(amp_hours_after_derate / installed_battery_ah);
   return {
     steady_current_a, peak_inrush_a, supply_margin_a, supply_ok, inrush_ok,
-    amp_hours_required, amp_hours_after_derate, battery_margin_ah, battery_ok, batteries_needed,
+    standby_amp_hours, alarm_amp_hours, amp_hours_required, amp_hours_after_derate, battery_margin_ah, battery_ok, batteries_needed,
     supply_verdict: !supply_ok ? "UNDER the steady load"
-      : !inrush_ok ? "covers the steady load but NOT a simultaneous release -- it will sag on an alarm"
-        : "covers both the steady load and a simultaneous release",
+      : !inrush_ok ? "covers the steady load but NOT every lock re-energizing at once -- it will sag when the alarm resets"
+        : "covers both the steady load and every lock re-energizing at once",
     battery_verdict: battery_ok ? "the installed battery covers the standby duration"
       : "the installed battery is SHORT -- this needs an external battery cabinet or a shorter standby requirement",
-    note: "Three separate failures hide behind one power supply. Steady current is the easy one and the one everyone computes. Inrush is the second: a strike or magnet energizing draws several times its holding current for a few tens of milliseconds, and a supply sized on holding current alone browns out when every door releases at once on a fire alarm signal, which is exactly when they must all release. Standby is the third and the most commonly wrong. Batteries are sized in amp-hours against a required duration, and that duration is often set by the fire alarm interface rather than by the access control system's own needs. Sizing to nameplate ignores that a battery at end of life and at low temperature delivers considerably less, which is why a derate is applied and why battery replacement is a scheduled item rather than a failure-driven one. The quiet fourth failure is voltage drop: a magnet at the end of a long small-gauge run sees less than its rated voltage and holds with less than its rated force, and the symptom reads as a lock problem when it is a wiring problem. That calculation is the low-voltage DC drop calculator and is not repeated here. Device currents, and especially inrush, must come from the manufacturer's specifications. This does not address the fire alarm interface requirements, which govern both the standby duration and the manner in which locks must release on alarm and which are life-safety requirements rather than design choices, and it does not evaluate egress: electrically locked egress doors are heavily constrained by the building and fire codes, and a lock that fails secure on a door required for egress is a violation regardless of its power budget. The adopted building and fire codes, the device manufacturers' specifications, and the authority having jurisdiction govern.",
+    note: "Three separate failures hide behind one power supply. Steady current is the easy one and the one everyone computes. Inrush is the second: a strike or magnet energizing draws several times its holding current for a few tens of milliseconds. A fail-safe maglock releases by LOSING power, so the fire alarm itself costs the supply nothing; the inrush arrives when the alarm resets and every lock re-energizes at once, and a supply sized on holding current alone browns out then and leaves doors that should have relocked hanging open. A fail-secure strike is the reverse, drawing its current while it is released. Standby is the third and the most commonly wrong. Batteries are sized in amp-hours against a required duration -- standby hours at the quiescent load plus the alarm period at the alarm load -- and that duration is often set by the fire alarm interface rather than by the access control system's own needs. Sizing to nameplate ignores that a battery at end of life and at low temperature delivers considerably less, which is why a derate is applied and why battery replacement is a scheduled item rather than a failure-driven one. The quiet fourth failure is voltage drop: a magnet at the end of a long small-gauge run sees less than its rated voltage and holds with less than its rated force, and the symptom reads as a lock problem when it is a wiring problem. That calculation is the low-voltage DC drop calculator and is not repeated here. Device currents, and especially inrush, must come from the manufacturer's specifications. This does not address the fire alarm interface requirements, which govern both the standby duration and the manner in which locks must release on alarm and which are life-safety requirements rather than design choices, and it does not evaluate egress: electrically locked egress doors are heavily constrained by the building and fire codes, and a lock that fails secure on a door required for egress is a violation regardless of its power budget. The adopted building and fire codes, the device manufacturers' specifications, and the authority having jurisdiction govern.",
   };
 }
-const electricLockPowerExample = { inputs: { device_count: 14, holding_current_a: 0.45, inrush_current_a: 1.5, standby_hours: 24, battery_derate: 0.8, supply_rating_a: 12, installed_battery_ah: 12 } };
+const electricLockPowerExample = { inputs: { device_count: 14, holding_current_a: 0.45, inrush_current_a: 1.5, standby_hours: 24, battery_derate: 0.8, supply_rating_a: 12, installed_battery_ah: 12, alarm_current_a: 0, alarm_minutes: 5 } };
 DOORHARDWARE_RENDERERS["electric-lock-power-budget"] = _simpleRenderer({
-  citation: "Citation: the standby amp-hour and inrush sizing method by name -- steady current summed across devices, amp-hours as steady current times the required standby duration, and a derate applied for battery age and temperature -- with the fire alarm and egress interface requirements named as governing the duration and the release behaviour. Device currents come from the manufacturer.",
+  citation: "Citation: the standby amp-hour and inrush sizing method by name -- steady current summed across devices, amp-hours as steady current times the required standby duration plus the alarm-period current times the alarm duration, and a derate applied for battery age and temperature -- with the fire alarm and egress interface requirements named as governing the duration and the release behaviour. Device currents come from the manufacturer.",
   example: electricLockPowerExample.inputs,
   fields: [
     { key: "device_count", label: "Number of locking devices", kind: "number", default: 14 },
@@ -324,12 +342,14 @@ DOORHARDWARE_RENDERERS["electric-lock-power-budget"] = _simpleRenderer({
     { key: "battery_derate", label: "Battery derate factor", kind: "number", default: 0.8 },
     { key: "supply_rating_a", label: "Power supply rating (A)", kind: "number", default: 12 },
     { key: "installed_battery_ah", label: "Installed battery capacity (Ah)", kind: "number", default: 12 },
+    { key: "alarm_current_a", label: "Total current during the alarm period (A; 0 when only fail-safe locks)", kind: "number", default: 0 },
+    { key: "alarm_minutes", label: "Alarm period after standby (min)", kind: "number", default: 5 },
   ],
   outputs: [
     { key: "s", id: "elp-out-s", label: "Steady current", value: (r) => fmt(r.steady_current_a, 2) + " A" },
     { key: "i", id: "elp-out-i", label: "Peak inrush, all devices at once", value: (r) => fmt(r.peak_inrush_a, 1) + " A" },
     { key: "m", id: "elp-out-m", label: "Supply against the load", value: (r) => r.supply_verdict + " (" + fmt(r.supply_margin_a, 2) + " A of steady margin)" },
-    { key: "a", id: "elp-out-a", label: "Amp-hours for the standby duration", value: (r) => fmt(r.amp_hours_required, 1) + " Ah, " + fmt(r.amp_hours_after_derate, 1) + " Ah after derate" },
+    { key: "a", id: "elp-out-a", label: "Amp-hours for standby plus alarm", value: (r) => fmt(r.amp_hours_required, 1) + " Ah (" + fmt(r.standby_amp_hours, 1) + " standby + " + fmt(r.alarm_amp_hours, 2) + " alarm), " + fmt(r.amp_hours_after_derate, 1) + " Ah after derate" },
     { key: "b", id: "elp-out-b", label: "Installed battery", value: (r) => r.battery_verdict + " (" + fmt(r.battery_margin_ah, 1) + " Ah of margin)" },
     { key: "c", id: "elp-out-c", label: "Batteries of the installed size required", value: (r) => fmt(r.batteries_needed, 0) },
     { key: "n", id: "elp-out-n", label: "Note", value: (r) => r.note },
@@ -416,9 +436,11 @@ export function computeMasterKeyCapacity({ cut_positions = 0, usable_depths = 0,
   // A two-step progression uses every other depth at a mastered position, and
   // the master claims one of them: 10 depths give 4 per position, the
   // textbook 4^6 = 4,096 change keys on six positions. Until 2026-09-19 the
-  // master's own depth was never subtracted (5^6 = 15,625).
-  const per_mastered_position = Math.floor(usable_depths / 2) - 1;
-  if (!(per_mastered_position >= 1)) return { error: "A two-step progression needs at least 4 usable depths: the master takes one of each parity pair." };
+  // master's own depth was never subtracted (5^6 = 15,625). An odd depth
+  // count splits unevenly (7 depths: 0-2-4-6 and 1-3-5), and the master sits
+  // in the larger parity group; until 2026-09-30 the floor undercounted it.
+  const per_mastered_position = Math.ceil(usable_depths / 2) - 1;
+  if (!(per_mastered_position >= 1)) return { error: "A two-step progression needs at least 3 usable depths: the master takes one depth of its parity group." };
   const change_keys_available = Math.pow(per_mastered_position, mastered_positions);
   const alternative_change_keys = Math.pow(per_mastered_position, alternative_mastered_positions);
   const margin = change_keys_available - change_keys_required;
@@ -436,7 +458,7 @@ export function computeMasterKeyCapacity({ cut_positions = 0, usable_depths = 0,
 }
 const masterKeyExample = { inputs: { cut_positions: 6, usable_depths: 6, mastered_positions: 2, alternative_mastered_positions: 3, change_keys_required: 40 } };
 DOORHARDWARE_RENDERERS["master-key-bitting-capacity"] = _simpleRenderer({
-  citation: "Citation: the progression capacity relation as standard master keying practice by name -- theoretical combinations = usable depths raised to the number of cut positions, and the change keys a two-step progression yields = the usable depths halved, raised to the number of mastered positions. The manufacturer's system specification governs.",
+  citation: "Citation: the progression capacity relation as standard master keying practice by name -- theoretical combinations = usable depths raised to the number of cut positions, and the change keys a two-step progression yields = the depths in the master's (larger) parity group less the master's own, ceil(depths / 2) - 1, raised to the number of mastered positions. The manufacturer's system specification governs.",
   example: masterKeyExample.inputs,
   fields: [
     { key: "cut_positions", label: "Cut positions (pins)", kind: "number", default: 6 },
@@ -458,13 +480,16 @@ DOORHARDWARE_RENDERERS["master-key-bitting-capacity"] = _simpleRenderer({
 
 // ===================== spec-v1577: key cut depths and the MACS check =====================
 
-// dims: in { depth_1: dimensionless, depth_2: dimensionless, depth_3: dimensionless, depth_4: dimensionless, depth_5: dimensionless, depth_6: dimensionless, macs: dimensionless, min_depth: dimensionless, max_depth: dimensionless } out: { max_difference: dimensionless, failing_pairs: dimensionless, worst_position: dimensionless }
-export function computeKeyCutMacs({ depth_1 = 0, depth_2 = 0, depth_3 = 0, depth_4 = 0, depth_5 = 0, depth_6 = 0, macs = 7, min_depth = 0, max_depth = 9 } = {}) {
+// dims: in { depth_1: dimensionless, depth_2: dimensionless, depth_3: dimensionless, depth_4: dimensionless, depth_5: dimensionless, depth_6: dimensionless, macs: dimensionless, min_depth: dimensionless, max_depth: dimensionless, pin_count: dimensionless } out: { max_difference: dimensionless, failing_pairs: dimensionless, worst_position: dimensionless }
+export function computeKeyCutMacs({ depth_1 = 0, depth_2 = 0, depth_3 = 0, depth_4 = 0, depth_5 = 0, depth_6 = 0, macs = 7, min_depth = 0, max_depth = 9, pin_count = 6 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(macs > 0)) return { error: "MACS must be positive." };
   if (!(max_depth > min_depth)) return { error: "Maximum depth must exceed the minimum depth." };
   if (!(min_depth >= 0)) return { error: "Minimum depth cannot be negative." };
-  const bitting = [depth_1, depth_2, depth_3, depth_4, depth_5, depth_6];
+  if (!(Number.isInteger(pin_count) && pin_count >= 2 && pin_count <= 6)) return { error: "Pin count must be a whole number from 2 to 6." };
+  // Only the key's own cut positions: until 2026-09-30 a 5-pin bitting
+  // carried a phantom depth_6 = 0 into the check and could fail on it.
+  const bitting = [depth_1, depth_2, depth_3, depth_4, depth_5, depth_6].slice(0, pin_count);
   for (let i = 0; i < bitting.length; i++) {
     if (bitting[i] < min_depth || bitting[i] > max_depth) {
       return { error: "Cut " + (i + 1) + " is outside the entered depth range." };
@@ -500,10 +525,10 @@ export function computeKeyCutMacs({ depth_1 = 0, depth_2 = 0, depth_3 = 0, depth
     verdict: failing.length === 0
       ? (at_limit > 0 ? "cuttable, with " + at_limit + " transition(s) sitting exactly at MACS" : "cuttable, with margin at every transition")
       : "NOT CUTTABLE -- " + failing.length + " adjacent pair(s) exceed MACS",
-    note: "The rule exists because a key's cuts are angled flats, and two adjacent cuts at very different depths have their slopes intersect below the top of the blade. The metal that should sit between them is not there, so the cutter either breaks through or leaves a fragile ridge that fails in service -- usually inside a cylinder, which is the expensive way to find out. A violation is also a system design problem rather than only a cutting one. In a master key system the progression generates bittings automatically, and a progression that does not respect the rule will produce uncuttable change keys somewhere in the sequence, so checking the whole bitting list before any cylinder is pinned is the discipline. Two related checks travel with it and are reported alongside: a long run of identical depths produces a key that is easy to decode and to impression, and the shallowest cut at the shoulder position leaves the key weakest where it is worked hardest. Neither is a MACS matter but both are looked at in the same moment. The rule value, the depth increment, the allowable depth range, root spacing, and cut angle are all manufacturer and keyway specific, and a value used for the wrong keyway gives a confident wrong answer. This does not verify that a bitting is appropriate for a system -- that it does not conflict with a master, does not cross-key another cylinder, and follows the intended progression -- which is a bitting chart's work, and it does not address key blank selection, keyway restriction, the controls on duplicating restricted keys, or high-security, dimple, sidebar, and electronic systems. This layout covers a six-position bitting; other pin counts follow the same rule against the manufacturer's own specification. The lock manufacturer's cut specification, a qualified locksmith, and the facility's key control policy govern.",
+    note: "The rule exists because a key's cuts are angled flats, and two adjacent cuts at very different depths have their slopes intersect below the top of the blade. The metal that should sit between them is not there, so the cutter either breaks through or leaves a fragile ridge that fails in service -- usually inside a cylinder, which is the expensive way to find out. A violation is also a system design problem rather than only a cutting one. In a master key system the progression generates bittings automatically, and a progression that does not respect the rule will produce uncuttable change keys somewhere in the sequence, so checking the whole bitting list before any cylinder is pinned is the discipline. Two related checks travel with it and are reported alongside: a long run of identical depths produces a key that is easy to decode and to impression, and the shallowest cut at the shoulder position leaves the key weakest where it is worked hardest. Neither is a MACS matter but both are looked at in the same moment. The rule value, the depth increment, the allowable depth range, root spacing, and cut angle are all manufacturer and keyway specific, and a value used for the wrong keyway gives a confident wrong answer. This does not verify that a bitting is appropriate for a system -- that it does not conflict with a master, does not cross-key another cylinder, and follows the intended progression -- which is a bitting chart's work, and it does not address key blank selection, keyway restriction, the controls on duplicating restricted keys, or high-security, dimple, sidebar, and electronic systems. This layout takes up to six positions; the cuts past the entered pin count are ignored. The lock manufacturer's cut specification, a qualified locksmith, and the facility's key control policy govern.",
   };
 }
-const keyCutMacsExample = { inputs: { depth_1: 2, depth_2: 9, depth_3: 1, depth_4: 4, depth_5: 6, depth_6: 3, macs: 7, min_depth: 0, max_depth: 9 } };
+const keyCutMacsExample = { inputs: { depth_1: 2, depth_2: 9, depth_3: 1, depth_4: 4, depth_5: 6, depth_6: 3, macs: 7, min_depth: 0, max_depth: 9, pin_count: 6 } };
 DOORHARDWARE_RENDERERS["key-cut-macs-check"] = _simpleRenderer({
   citation: "Citation: the maximum adjacent cut specification rule by name -- the absolute difference between every pair of adjacent cut depths must not exceed the manufacturer's stated value -- with the manufacturer's cut specification named as governing the value, the depth increment, and the allowable range.",
   example: keyCutMacsExample.inputs,
@@ -513,7 +538,8 @@ DOORHARDWARE_RENDERERS["key-cut-macs-check"] = _simpleRenderer({
     { key: "depth_3", label: "Cut 3 depth", kind: "number", default: 1 },
     { key: "depth_4", label: "Cut 4 depth", kind: "number", default: 4 },
     { key: "depth_5", label: "Cut 5 depth", kind: "number", default: 6 },
-    { key: "depth_6", label: "Cut 6 depth (tip end)", kind: "number", default: 3 },
+    { key: "depth_6", label: "Cut 6 depth (tip end; ignored below 6 pins)", kind: "number", default: 3 },
+    { key: "pin_count", label: "Cut positions on the key (2 to 6)", kind: "number", default: 6 },
     { key: "macs", label: "Manufacturer MACS value", kind: "number", default: 7 },
     { key: "min_depth", label: "Shallowest allowable depth number", kind: "number", default: 0 },
     { key: "max_depth", label: "Deepest allowable depth number", kind: "number", default: 9 },
@@ -553,7 +579,7 @@ export function computeDoorUndercutTransferAir({ door_width_in = 0, undercut_in 
     verdict: noisy
       ? "the gap would run at " + fmt(velocity_at_required_fpm, 0) + " fpm to pass the required air -- it will whistle"
       : "the existing undercut passes the required air below the entered velocity",
-    note: "The relation is trivial and the constraint is acoustic. A door gap will pass almost any airflow if you push it hard enough, and the result is a whistle that occupants notice immediately -- so the practical limit is a face velocity around 300 fpm, and above that the answer is more free area rather than more pressure. That is the arithmetic that decides between an undercut and a transfer grille. A room needing a few hundred cfm of transfer air needs free area measured in square feet, not square inches, and no realistic undercut provides it: a door cut two or three inches to solve an airflow problem also fails its fire rating, fails its smoke and sound performance, and looks like a mistake. There is a second consequence worth flagging. The same gap is a sound path, so an undercut sized for airflow undoes much of the door's acoustic rating, which in an office or an exam room is a privacy problem rather than an airflow one -- and where privacy matters the answer is a lined transfer boot rather than a plain grille. This does not address fire and smoke doors, where the undercut is limited by the door's listing and by NFPA 80 clearance requirements and where a transfer opening is generally not permitted at all, because cutting a rated door voids its label. It does not evaluate acoustic performance, address smoke control or pressurization, or account for the pressure difference the transfer path actually operates under, which determines the real flow rather than an assumed face velocity, and it does not size the room's supply or return. The adopted mechanical code, NFPA 80 for rated doors, and the mechanical designer govern.",
+    note: "The relation is trivial and the constraint is acoustic. A door gap will pass almost any airflow if you push it hard enough, and the result is a whistle that occupants notice immediately -- so the practical limit is a face velocity around 300 fpm, and above that the answer is more free area rather than more pressure. That is the arithmetic that decides between an undercut and a transfer grille. A room needing a few hundred cfm of transfer air needs free area measured in square feet, not square inches, and no realistic undercut provides it: a door cut two or three inches to solve an airflow problem also fails its fire rating, fails its smoke and sound performance, and looks like a mistake. There is a second consequence worth flagging. The same gap is a sound path, so an undercut sized for airflow undoes much of the door's acoustic rating, which in an office or an exam room is a privacy problem rather than an airflow one -- and where privacy matters the answer is a lined transfer boot rather than a plain grille. This does not address fire and smoke doors, where the undercut is limited by the door's listing and by NFPA 80 clearance requirements and where a transfer opening is generally not permitted at all, because cutting a rated door voids its label. Over carpet the gap that passes air is the undercut less the pile, not the cut measured from the finished floor below it: a 1 in undercut over carpet passes on the order of 60 cfm at the pressures a closed bedroom door sees (FSEC field measurements), so measure the undercut from the top of the floor covering. It does not evaluate acoustic performance, address smoke control or pressurization, or account for the pressure difference the transfer path actually operates under, which determines the real flow rather than an assumed face velocity, and it does not size the room's supply or return. The adopted mechanical code, NFPA 80 for rated doors, and the mechanical designer govern.",
   };
 }
 const doorUndercutExample = { inputs: { door_width_in: 36, undercut_in: 0.75, required_cfm: 250, max_velocity_fpm: 300 } };
@@ -562,7 +588,7 @@ DOORHARDWARE_RENDERERS["door-undercut-transfer-air"] = _simpleRenderer({
   example: doorUndercutExample.inputs,
   fields: [
     { key: "door_width_in", label: "Door width (in)", kind: "number", default: 36 },
-    { key: "undercut_in", label: "Undercut height (in)", kind: "number", default: 0.75 },
+    { key: "undercut_in", label: "Undercut height above the floor covering (in)", kind: "number", default: 0.75 },
     { key: "required_cfm", label: "Required transfer airflow (cfm)", kind: "number", default: 250 },
     { key: "max_velocity_fpm", label: "Acceptable face velocity (fpm)", kind: "number", default: 300 },
   ],
@@ -615,9 +641,9 @@ export function computeFireDoorClearance({ head_in = 0, hinge_jamb_in = 0, strik
     note: "The clearance limits are the part that fails most often and the part that is easiest to check. Too much gap and the assembly does not resist the passage of smoke and flame; a door that has dropped on its hinges, a frame that has been shimmed, or a floor covering removed after installation all move the clearance out of range without anyone touching the door. The bottom clearance is measured to the FLOOR, so adding carpet or tile under a rated door reduces it -- usually fine -- while removing flooring increases it, which is not; a door with an inch and a half of gap over a threshold taken out during a renovation is a failed assembly even though nothing about the door changed. A jamb over its limit is a door that has settled or a frame that has moved, and it is corrected by adjusting the hinges or the frame, not by adding a gasket, which does not restore the assembly's listing. A bottom over its limit takes a threshold or a door bottom listed for the assembly, not a sweep chosen for draught control. The rest of the inspection is not arithmetic and belongs beside the numbers: the label has to be legible, there can be no field modifications -- a hole drilled for a card reader voids the label unless done under the listing -- and the door must close and latch from any position, every time, with nothing blocking, wedging, or dogging it. A door that fails any of those fails regardless of its clearances. Limits differ by door material, construction, the specific listing, and the adopted edition of NFPA 80; the assembly's own listing governs. This is not a fire door inspection, which must be performed by a person with knowledge of the assembly's operating components, covers items well beyond clearances, and requires written records. NFPA 80, the assembly's listing, the adopted fire code, and the authority having jurisdiction govern.",
   };
 }
-const fireDoorExample = { inputs: { head_in: 0.125, hinge_jamb_in: 0.125, strike_jamb_in: 0.1875, meeting_edge_in: 0.125, bottom_in: 1.25, perimeter_limit_in: 0.125, meeting_limit_in: 0.1875, bottom_limit_in: 0.75 } };
+const fireDoorExample = { inputs: { head_in: 0.125, hinge_jamb_in: 0.125, strike_jamb_in: 0.1875, meeting_edge_in: 0.125, bottom_in: 1.25, perimeter_limit_in: 0.125, meeting_limit_in: 0.125, bottom_limit_in: 0.75 } };
 DOORHARDWARE_RENDERERS["fire-door-clearance"] = _simpleRenderer({
-  citation: "Citation: the NFPA 80 fire door clearance limits by name -- commonly 1/8 in at the head and jambs, 3/16 in between the meeting edges of a pair, and 3/4 in maximum from the bottom of the door to the floor -- with the assembly's own listing named as governing. Limits are entered because they differ by material, construction, listing, and adopted edition.",
+  citation: "Citation: the NFPA 80 fire door clearance limits by name -- ONE limit at the head, the jambs, and between the meeting stiles of a pair (steel doors and 20-minute wood doors 1/8 in plus or minus 1/16 in, so 3/16 in maximum; wood doors rated over 20 minutes 1/8 in maximum), and 3/4 in maximum from the bottom of the door to the floor -- with the assembly's own listing named as governing. Limits are entered because they differ by material, construction, listing, and adopted edition.",
   example: fireDoorExample.inputs,
   fields: [
     { key: "head_in", label: "Measured clearance at the head (in)", kind: "number", default: 0.125 },
@@ -625,8 +651,8 @@ DOORHARDWARE_RENDERERS["fire-door-clearance"] = _simpleRenderer({
     { key: "strike_jamb_in", label: "Measured clearance at the strike jamb (in)", kind: "number", default: 0.1875 },
     { key: "meeting_edge_in", label: "Measured clearance at the meeting edges (in)", kind: "number", default: 0.125 },
     { key: "bottom_in", label: "Measured clearance at the bottom (in)", kind: "number", default: 1.25 },
-    { key: "perimeter_limit_in", label: "Head and jamb limit (in)", kind: "number", default: 0.125 },
-    { key: "meeting_limit_in", label: "Meeting edge limit (in)", kind: "number", default: 0.1875 },
+    { key: "perimeter_limit_in", label: "Head and jamb limit (in; 3/16 steel, 1/8 wood over 20 min)", kind: "number", default: 0.125 },
+    { key: "meeting_limit_in", label: "Meeting edge limit (in; the same limit as head and jambs)", kind: "number", default: 0.125 },
     { key: "bottom_limit_in", label: "Bottom clearance limit (in)", kind: "number", default: 0.75 },
   ],
   outputs: [

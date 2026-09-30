@@ -6,6 +6,9 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Added
 
+- **`door-closer-opening-force` takes the knob position.** See Fixed.
+- **`key-cut-macs-check` takes a pin count** (2 to 6). See Fixed.
+- **`electric-lock-power-budget` takes an alarm-period load.** Battery amp-hours are now standby A x h plus alarm A x min / 60, as access-control and fire-alarm battery worksheets do it (1.2 A for 24 h plus 2.5 A for 5 min is 29.0 Ah, 34.1 Ah at a 0.85 derate). The alarm current defaults to 0 (fail-safe locks are released in alarm), so earlier results are unchanged.
 - **`ripper-production` takes a pass length and turn time.** With them it is Cat's timing method, volume per pass / (pass / speed + turn); the Performance Handbook's 3 x 2 ft, 88 fpm, 300 ft, 0.25 min, 45-min-hour example (820 bank cu yd/hr) reproduces. Without them the tile is continuous ripping, which Cat says runs 10 to 20% high.
 - **`coating-voc-compliance` takes the thinner's water and exempt share.** See Fixed.
 - **`pipe-flotation` reports the backfill for both factor-of-safety conventions:** FS on the whole uplift, and WSSC C-4's FS on the backfill only (1.5 x 182 = 273 lb/ft in its 48 in RCP example).
@@ -23,6 +26,12 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **`door-closer-opening-force` puts the pressure force at the knob.** It used exactly half the force on the leaf, which is a pull at the latch edge. The NFPA 92 / Klote relation is A x dP x W / (2 (W - d)), with the knob d = 3 in from the edge. Bhatia's Stairwell Pressurization Table 3 (36 in x 7 ft door, 6 lbf closer, 0.40 in wc, 30 lbf) now reproduces. A pressure force larger than the whole gauge reading is flagged as inconsistent readings rather than printed as a negative closer.
+- **`fire-door-clearance` uses one NFPA 80 limit at the head, the jambs, and the meeting stiles.** The citation and the default said 3/16 in at the meeting edges and 1/8 in elsewhere. NFPA 80 applies the same clearance at all three: 1/8 in plus or minus 1/16 in on steel and 20-minute wood doors, 1/8 in maximum on wood rated over 20 minutes. The meeting-edge default is now 1/8 in.
+- **`key-cut-macs-check` no longer checks a cut that is not on the key.** A 5-pin bitting carried a phantom sixth cut at depth 0 into the MACS check, so a deep fifth cut could fail against it.
+- **`master-key-bitting-capacity` counts odd depth counts correctly.** The change values per mastered position are the master's parity group less the master, ceil(depths / 2) - 1; the floor undercounted 7 depths (3, not 2). The renderer citation still said "usable depths halved"; it now states the rule.
+- **`electric-lock-power-budget` says when inrush happens.** A fail-safe maglock releases by losing power, so the inrush arrives when the alarm resets and every lock re-energizes, not at release.
+- **`panic-hardware-force` and `door-undercut-transfer-air` notes.** Panic hardware names the 2021 move of the 15 lbf release figure to a hardware operable-force limit (enter the adopted edition's). The undercut is measured above the floor covering, since carpet pile takes up the gap.
 - **`coating-voc-compliance`: a water or exempt thinner no longer lowers the regulatory VOC.** All thinner volume stayed in the less-water denominator. A zero-VOC thinner therefore diluted the figure: 1.11 fell to 0.53 lb/gal and flipped a failing coating to COMPLIES. Ohio EPA says thinning a waterborne coating with water leaves VOC less water unchanged. The thinner's water and exempt share now comes out with the coating's own, and a zero-VOC thinner must declare its share.
 - **`hot-holding-energy` applies the NEC 220.56 floor.** The demand is never less than the two largest units. Electrical Knowhow's example (60 kW x 65% = 39 kW, raised to 40 kW) now reproduces.
 - **`grease-duct-cleaning-interval` reads NFPA 96 12.6.1.1 correctly.** The tile called 50 micrometres a "designated inspection point trigger". It is the depth surfaces are cleaned TO. The triggers are 2,000 micrometres in the system and 3,175 in a fan housing, which the second trigger field now holds.

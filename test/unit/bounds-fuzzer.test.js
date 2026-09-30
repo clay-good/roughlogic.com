@@ -43021,8 +43021,10 @@ test("bounds: spec-v1571 computeDoorCloserForce splits the closer from the build
   assert.strictEqual(r.closer_size, 2);
   assert.strictEqual(r.width_size, 2);
   assert.ok(Math.abs(r.door_area_sqft - 21) < 1e-9);
-  assert.ok(Math.abs(r.pressure_force_lbf - 1.638) < 1e-9);
-  assert.ok(Math.abs(r.closer_force_lbf - 4.862) < 1e-9);
+  // Knob 3 in from the latch edge: 3.276 lbf on the leaf x 36 / (2 x 33).
+  assert.ok(Math.abs(r.pressure_force_lbf - 3.276 * 36 / 66) < 1e-9);
+  assert.ok(Math.abs(r.closer_force_lbf - (6.5 - 3.276 * 36 / 66)) < 1e-9);
+  assert.strictEqual(r.readings_inconsistent, false);
   assert.ok(Math.abs(r.force_margin_lbf + 1.5) < 1e-9);
   assert.strictEqual(r.force_ok, false);
   assert.strictEqual(r.closing_time_ok, false);
@@ -43034,10 +43036,20 @@ test("bounds: spec-v1571 computeDoorCloserForce splits the closer from the build
   assert.strictEqual(still.pressure_force_lbf, 0);
   assert.ok(Math.abs(still.closer_force_lbf - base.measured_opening_force_lbf) < 1e-9);
   assert.strictEqual(still.pressure_explains, false);
-  // Pressure force is exactly linear in the pressure and in the door area,
-  // and exactly half the total force on the leaf.
+  // Pressure force is exactly linear in the pressure and in the door area;
+  // with the pull at the latch edge (offset 0) it is exactly half the leaf's.
   assert.ok(Math.abs(_v1571({ ...base, pressure_difference_inwc: 0.06 }).pressure_force_lbf - 2 * r.pressure_force_lbf) < 1e-9);
-  assert.ok(Math.abs(r.pressure_force_lbf - r.door_area_sqft * base.pressure_difference_inwc * 5.2 / 2) < 1e-12);
+  assert.ok(Math.abs(_v1571({ ...base, knob_offset_in: 0 }).pressure_force_lbf - r.door_area_sqft * base.pressure_difference_inwc * 5.2 / 2) < 1e-12);
+  // Bhatia (CED) Table 3: 36 in x 7 ft, 6 lbf closer, 0.40 in wc -> 30 lbf.
+  const bh = _v1571({ ...base, measured_opening_force_lbf: 30, force_limit_lbf: 30, pressure_difference_inwc: 0.4 });
+  assert.ok(Math.abs(bh.pressure_force_lbf + 6 - 30) < 0.25);
+  // A pressure force above the whole gauge reading is flagged, not reported
+  // as a negative closer.
+  const bad = _v1571({ ...base, pressure_difference_inwc: 0.2 });
+  assert.ok(bad.closer_force_lbf < 0);
+  assert.strictEqual(bad.readings_inconsistent, true);
+  assert.ok(/CHECK THE READINGS/.test(bad.diagnosis));
+  assert.ok("error" in _v1571({ ...base, knob_offset_in: 18 }));
   // Size bands: one per six inches of width, stepped up by a heavy leaf and
   // by a pressure difference, and capped at 6.
   assert.strictEqual(_v1571({ ...base, door_width_in: 30 }).width_size, 1);
@@ -43148,14 +43160,20 @@ test("bounds: spec-v1574 computeElectricLockPowerBudget pins the battery as the 
   assert.ok(Math.abs(r.peak_inrush_a - 21) < 1e-9);
   assert.ok(Math.abs(r.amp_hours_required - 151.2) < 1e-9);
   assert.ok(Math.abs(r.amp_hours_after_derate - 189) < 1e-9);
-  // The supply covers the steady load COMFORTABLY and cannot cover a
-  // simultaneous release -- which is the alarm case.
+  // The supply covers the steady load COMFORTABLY and cannot cover every
+  // fail-safe lock re-energizing at once -- which is the alarm reset.
   assert.strictEqual(r.supply_ok, true);
   assert.strictEqual(r.inrush_ok, false);
   assert.ok(r.supply_margin_a > 5);
   // And the battery is the real problem: sixteen of the installed size.
   assert.strictEqual(r.battery_ok, false);
   assert.strictEqual(r.batteries_needed, 16);
+  // The alarm period adds alarm A x min / 60 on top of standby; 0 A (only
+  // fail-safe locks, released in alarm) adds nothing.
+  assert.strictEqual(r.alarm_amp_hours, 0);
+  const al = _v1574({ ...base, alarm_current_a: 2.5, alarm_minutes: 5 });
+  assert.ok(Math.abs(al.amp_hours_required - (r.amp_hours_required + 2.5 * 5 / 60)) < 1e-9);
+  assert.ok("error" in _v1574({ ...base, alarm_current_a: -1 }));
   assert.ok(Math.abs(r.battery_margin_ah + 177) < 1e-9);
   // Halving the standby duration halves the battery exactly.
   assert.ok(Math.abs(_v1574({ ...base, standby_hours: 12 }).amp_hours_after_derate - r.amp_hours_after_derate / 2) < 1e-9);
@@ -43225,7 +43243,11 @@ test("bounds: spec-v1576 computeMasterKeyCapacity pins 46,656 against 4", () => 
   assert.strictEqual(r.per_mastered_position, 2);
   // The textbook total-position progression: 10 depths, 6 positions -> 4^6.
   assert.strictEqual(_v1576({ ...base, usable_depths: 10, mastered_positions: 6 }).change_keys_available, 4096);
-  assert.ok("error" in _v1576({ ...base, usable_depths: 3 }));
+  // An odd count: 7 depths split 0-2-4-6 / 1-3-5 and the master sits in the
+  // larger group, so 3 change values, not floor(7 / 2) - 1 = 2.
+  assert.strictEqual(_v1576({ ...base, usable_depths: 7 }).per_mastered_position, 3);
+  assert.strictEqual(_v1576({ ...base, usable_depths: 3 }).per_mastered_position, 1);
+  assert.ok("error" in _v1576({ ...base, usable_depths: 2 }));
   // The whole finding: 46,656 theoretical combinations, FOUR usable change
   // keys, and a building that needs forty.
   assert.strictEqual(r.change_keys_available, 4);
@@ -43271,6 +43293,13 @@ test("bounds: spec-v1577 computeKeyCutMacs pins the uncuttable bitting", () => {
   assert.strictEqual(r.failing_pairs, 1);
   assert.strictEqual(r.failing_positions, "2 to 3");
   assert.strictEqual(r.pass, false);
+  // A 5-pin key ignores cut 6: 3 next to a phantom 9 must not fail it.
+  const five = _v1577({ ...base, depth_2: 8, depth_5: 9, depth_6: 0, pin_count: 5 });
+  assert.strictEqual(five.bitting.split("-").length, 5);
+  assert.strictEqual(five.pass, true);
+  assert.strictEqual(_v1577({ ...base, depth_2: 8, depth_5: 9, depth_6: 0, pin_count: 6 }).pass, false);
+  assert.ok("error" in _v1577({ ...base, pin_count: 7 }));
+  assert.ok("error" in _v1577({ ...base, pin_count: 4.5 }));
   // The 2-to-9 transition sits EXACTLY at MACS and passes; 9-to-1 is one
   // step over and does not. The rule is inclusive at the limit.
   assert.strictEqual(r.at_limit, 1);

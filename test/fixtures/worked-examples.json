@@ -112149,7 +112149,8 @@
     "force_limit_lbf": 5,
     "measured_closing_time_s": 4.2,
     "min_closing_time_s": 5,
-    "pressure_difference_inwc": 0.03
+    "pressure_difference_inwc": 0.03,
+    "knob_offset_in": 3
    },
    "outputs": {
     "closer_size": {
@@ -112165,19 +112166,224 @@
      }
     },
     "pressure_force_lbf": {
-     "value": 1.638,
+     "value": 1.78691,
      "tolerance": {
       "pct": 0.5
      }
     },
     "closer_force_lbf": {
-     "value": 4.862,
+     "value": 4.71309,
      "tolerance": {
       "pct": 0.5
      }
     },
     "force_margin_lbf": {
      "value": -1.5,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "door-closer-opening-force",
+   "source_publisher": "CED Engineering (A. Bhatia)",
+   "source_title": "Stairwell Pressurization Systems",
+   "source_edition_or_year": "course M05-016",
+   "source_section_or_page": "Table 3: 36 in x 7 ft door, 6 lb closer, 30 lb total opening force at 0.40 in wg (door-opening relation with a 3 in knob offset; the printed 30 lb is rounded, tolerance covers it)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-30",
+   "inputs": {
+    "door_width_in": 36,
+    "door_height_in": 84,
+    "door_weight_lb": 85,
+    "measured_opening_force_lbf": 30,
+    "force_limit_lbf": 30,
+    "measured_closing_time_s": 5,
+    "min_closing_time_s": 5,
+    "pressure_difference_inwc": 0.4,
+    "knob_offset_in": 3
+   },
+   "outputs": {
+    "pressure_force_lbf": {
+     "value": 24,
+     "tolerance": {
+      "pct": 1.5
+     }
+    },
+    "closer_force_lbf": {
+     "value": 6,
+     "tolerance": {
+      "pct": 4
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "master-key-bitting-capacity",
+   "source_publisher": "Locksmith Ledger",
+   "source_title": "master keying by the numbers: two-step progression change key counts",
+   "source_edition_or_year": "trade article",
+   "source_section_or_page": "10 depths, two-step: 4 change values per position; 4^5 = 1,024 on five positions, 4^6 = 4,096 on six",
+   "verified_by": "rl",
+   "verified_on": "2026-09-30",
+   "inputs": {
+    "cut_positions": 6,
+    "usable_depths": 10,
+    "mastered_positions": 6,
+    "alternative_mastered_positions": 5,
+    "change_keys_required": 1000
+   },
+   "outputs": {
+    "per_mastered_position": {
+     "value": 4,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "change_keys_available": {
+     "value": 4096,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "alternative_change_keys": {
+     "value": 1024,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "master-key-bitting-capacity",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "7 usable depths on a two-step progression: the master's parity group is 0-2-4-6",
+   "source_edition_or_year": "ceil(7 / 2) - 1 = 3 change values per mastered position",
+   "source_section_or_page": "the manufacturer's system specification governs",
+   "verified_by": "rl",
+   "verified_on": "2026-09-30",
+   "inputs": {
+    "cut_positions": 6,
+    "usable_depths": 7,
+    "mastered_positions": 3,
+    "alternative_mastered_positions": 2,
+    "change_keys_required": 20
+   },
+   "outputs": {
+    "per_mastered_position": {
+     "value": 3,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "change_keys_available": {
+     "value": 27,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "alternative_change_keys": {
+     "value": 9,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "margin": {
+     "value": 7,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "key-cut-macs-check",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "a 5-pin 1-8-2-5-3 bitting against a MACS of 7: the sixth cut is not on the key",
+   "source_edition_or_year": "the absolute difference between adjacent cuts must not exceed MACS",
+   "source_section_or_page": "the manufacturer's cut specification governs the value",
+   "verified_by": "rl",
+   "verified_on": "2026-09-30",
+   "inputs": {
+    "depth_1": 1,
+    "depth_2": 8,
+    "depth_3": 2,
+    "depth_4": 5,
+    "depth_5": 3,
+    "depth_6": 0,
+    "macs": 7,
+    "min_depth": 0,
+    "max_depth": 9,
+    "pin_count": 5
+   },
+   "outputs": {
+    "max_difference": {
+     "value": 7,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "failing_pairs": {
+     "value": 0,
+     "tolerance": {
+      "abs": 1e-09
+     }
+    },
+    "at_limit": {
+     "value": 1,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "electric-lock-power-budget",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "1.2 A quiescent for 24 hours plus 2.5 A for a 5 minute alarm period at a 0.85 derate",
+   "source_edition_or_year": "amp-hours = standby A x h + alarm A x min / 60, divided by the derate",
+   "source_section_or_page": "the fire alarm interface governs the durations",
+   "verified_by": "rl",
+   "verified_on": "2026-09-30",
+   "inputs": {
+    "device_count": 4,
+    "holding_current_a": 0.3,
+    "inrush_current_a": 0.9,
+    "standby_hours": 24,
+    "battery_derate": 0.85,
+    "supply_rating_a": 4,
+    "installed_battery_ah": 18,
+    "alarm_current_a": 2.5,
+    "alarm_minutes": 5
+   },
+   "outputs": {
+    "steady_current_a": {
+     "value": 1.2,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "standby_amp_hours": {
+     "value": 28.8,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "alarm_amp_hours": {
+     "value": 0.208333,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "amp_hours_required": {
+     "value": 29.008333,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "amp_hours_after_derate": {
+     "value": 34.127451,
      "tolerance": {
       "pct": 0.5
      }
@@ -112556,7 +112762,7 @@
     "meeting_edge_in": 0.125,
     "bottom_in": 1.25,
     "perimeter_limit_in": 0.125,
-    "meeting_limit_in": 0.1875,
+    "meeting_limit_in": 0.125,
     "bottom_limit_in": 0.75
    },
    "outputs": {
@@ -112567,9 +112773,9 @@
      }
     },
     "meeting_margin_in": {
-     "value": 0.0625,
+     "value": 0,
      "tolerance": {
-      "pct": 0.5
+      "abs": 1e-9
      }
     },
     "bottom_margin_in": {
