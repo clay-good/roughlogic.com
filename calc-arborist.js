@@ -288,7 +288,7 @@ export function computeChipperDebris({ green_weight_lb, chip_density_lcy = 550, 
   if (!Number.isFinite(density) || density <= 0) return { error: "Chip density must be a positive finite number (lb/lcy)." };
   if (!Number.isFinite(box) || box <= 0) return { error: "Box capacity must be a positive finite number (lcy)." };
   const chipVolumeLcy = weight / density;
-  const loads = Math.ceil(chipVolumeLcy / box);
+  const loads = Math.ceil(chipVolumeLcy / box - 1e-9);
   if (![chipVolumeLcy, loads].every(Number.isFinite)) return { error: "Chip math is not a finite value." };
   return {
     chip_volume_lcy: chipVolumeLcy,

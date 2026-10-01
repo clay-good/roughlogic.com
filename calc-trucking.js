@@ -159,7 +159,7 @@ export function computePalletLoadout({
   if (!tr) return { error: "Unknown trailer." };
   if (!(case_length_in > 0 && case_width_in > 0 && case_height_in > 0)) return { error: "Case dimensions must be positive." };
   if (!(cases_per_pallet >= 1)) return { error: "Cases per pallet must be at least 1." };
-  // Pallet dimensions are denominators (Math.floor(tr.L / pallet_length_in),
+  // Pallet dimensions are denominators (Math.floor(tr.L / pallet_length_in + 1e-9),
   // tr.W / pallet_width_in); a cleared/zero pallet length or width drove
   // pallets_by_floor to Infinity, which the "By floor" field painted as
   // "Infinity" (a degenerate-input render leak invisible to the numeric-field
@@ -168,21 +168,21 @@ export function computePalletLoadout({
 
   // Floor-area pallets: lay 48x40 the long way, then pinwheel the second
   // row 40x48 if allowed.
-  const palletsByLength = Math.floor(tr.L / pallet_length_in);
-  const palletsByWidth = Math.floor(tr.W / pallet_width_in);
+  const palletsByLength = Math.floor(tr.L / pallet_length_in + 1e-9);
+  const palletsByWidth = Math.floor(tr.W / pallet_width_in + 1e-9);
   const aligned = palletsByLength * palletsByWidth;
   let pinwheelTotal = aligned;
   if (pinwheel) {
     // Approximate pinwheel layout: alternate orientations every row.
-    const rows = Math.floor(tr.W / 48);
-    const altPalletsByWidth = Math.floor(tr.W / pallet_length_in);
+    const rows = Math.floor(tr.W / 48 + 1e-9);
+    const altPalletsByWidth = Math.floor(tr.W / pallet_length_in + 1e-9);
     pinwheelTotal = palletsByLength * Math.max(palletsByWidth, altPalletsByWidth);
-    pinwheelTotal = Math.min(pinwheelTotal, Math.floor((tr.L * tr.W) / (pallet_length_in * pallet_width_in)));
+    pinwheelTotal = Math.min(pinwheelTotal, Math.floor((tr.L * tr.W) / (pallet_length_in * pallet_width_in) + 1e-9));
   }
   const pallets_by_floor = pinwheel ? pinwheelTotal : aligned;
 
   const total_pallet_weight_lb = case_weight_lb * cases_per_pallet;
-  const pallets_by_weight = total_pallet_weight_lb > 0 ? Math.floor(tr.weight_max_lb / total_pallet_weight_lb) : Infinity;
+  const pallets_by_weight = total_pallet_weight_lb > 0 ? Math.floor(tr.weight_max_lb / total_pallet_weight_lb + 1e-9) : Infinity;
 
   const pallets_total = Math.min(pallets_by_floor, pallets_by_weight);
   const pallet_cube_ft3 = (pallet_length_in * pallet_width_in * pallet_height_in) / 1728;
@@ -1193,7 +1193,7 @@ export function computeCargoSecurementWLL({ cargo_weight_lb = 0, tiedown_count =
   // 49 CFR 393.110(b) count rule: <=5 ft -> 1 tiedown (2 if >1100 lb);
   // >5 ft to 10 ft -> 2 tiedowns; >10 ft -> 2 for the first 10 ft plus 1 for
   // each additional 10 ft or fraction thereof.
-  const min_tiedowns = len <= 5 ? (W > 1100 ? 2 : 1) : len <= 10 ? 2 : 2 + Math.ceil((len - 10) / 10);
+  const min_tiedowns = len <= 5 ? (W > 1100 ? 2 : 1) : len <= 10 ? 2 : 2 + Math.ceil((len - 10) / 10 - 1e-9);
   const pass = aggregate_wll_lb >= required_wll_lb && n >= min_tiedowns;
   return { aggregate_wll_lb, required_wll_lb, min_tiedowns, tiedown_count: n, tiedown_path, pass };
 }
@@ -1397,13 +1397,13 @@ export function computeAxleLoadDistribution({ drive_lb = 0, trailer_lb = 0, king
   let holes = 0, direction = "none", driveNew = drive, trailerNew = trailer, target = 0;
   if (driveOver > 0) {
     target = driveOver;
-    holes = Math.ceil(target / shiftPerHole);
+    holes = Math.ceil(target / shiftPerHole - 1e-9);
     direction = "forward"; // slide tandems forward to move weight from drives to trailer tandems
     driveNew = drive - holes * shiftPerHole;
     trailerNew = trailer + holes * shiftPerHole;
   } else if (trailerOver > 0) {
     target = trailerOver;
-    holes = Math.ceil(target / shiftPerHole);
+    holes = Math.ceil(target / shiftPerHole - 1e-9);
     direction = "back"; // slide tandems back to move weight from trailer to drives
     trailerNew = trailer - holes * shiftPerHole;
     driveNew = drive + holes * shiftPerHole;

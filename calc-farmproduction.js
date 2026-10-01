@@ -91,9 +91,9 @@ export function computeMulchTopsoilVolume({ area_ft2 = 0, depth_in = 0, bulk_den
   if (!(dens > 0)) return { error: "Bulk density must be positive (ton/yd^3)." };
   if (waste < 0) return { error: "Waste allowance must be non-negative (%)." };
   const yd3 = area * (depth / 12) / 27 * (1 + waste / 100);
-  const bags = Math.ceil(yd3 * 27 / bag);
+  const bags = Math.ceil(yd3 * 27 / bag - 1e-9);
   const tons = yd3 * dens;
-  const loads = Math.ceil(yd3 / load);
+  const loads = Math.ceil(yd3 / load - 1e-9);
   return {
     yd3, bags, tons, loads,
     note: "Bulk landscape material: cubic yards = area x (depth/12) / 27, times a waste/compaction allowance, then bagged (ceil of yd^3 x 27 / bag ft^3), weighed (yd^3 x bulk density), and trucked (ceil of yd^3 / load). Bulk densities vary: mulch about 0.5, topsoil about 1.1, and gravel about 1.4 ton/yd^3, so the same volume weighs very differently. A quantity aid; the supplier's actual bag size, load size, and product density govern.",

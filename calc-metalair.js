@@ -561,15 +561,15 @@ export function computeStandingSeamTakeoff({ building_width_ft = 0, run_length_f
   if (waste_pct < 0) return { error: "Waste cannot be negative (%)." };
   const IN_PER_FT_MA = 12;
   const width_in = building_width_ft * IN_PER_FT_MA;
-  const panel_count = Math.ceil(width_in / coverage_width_in);
+  const panel_count = Math.ceil(width_in / coverage_width_in - 1e-9);
   // The mistake the note names: ordering on the flat sheet width instead of
   // the coverage width, which comes up SHORT on every roof.
-  const panels_if_ordered_on_sheet = sheet_width_in > 0 ? Math.ceil(width_in / sheet_width_in) : null;
+  const panels_if_ordered_on_sheet = sheet_width_in > 0 ? Math.ceil(width_in / sheet_width_in - 1e-9) : null;
   const panels_short = panels_if_ordered_on_sheet === null ? null : panel_count - panels_if_ordered_on_sheet;
   const panel_length_ft = run_length_ft + eave_ridge_allowance_in / IN_PER_FT_MA;
   const total_panel_ft = panel_count * panel_length_ft;
   const total_panel_with_waste_ft = total_panel_ft * (1 + waste_pct / 100);
-  const clipsPerPanel = (spacing_in) => Math.floor(panel_length_ft * IN_PER_FT_MA / spacing_in) + 1;
+  const clipsPerPanel = (spacing_in) => Math.floor(panel_length_ft * IN_PER_FT_MA / spacing_in + 1e-9) + 1;
   const field_panels = Math.max(0, panel_count - Math.round(perimeter_panels));
   const clips_per_field_panel = clipsPerPanel(field_clip_spacing_in);
   const clips_per_perimeter_panel = perimeter_clip_spacing_in > 0 ? clipsPerPanel(perimeter_clip_spacing_in) : clips_per_field_panel;

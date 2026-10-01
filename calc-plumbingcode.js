@@ -533,9 +533,9 @@ export function computeCleanoutLayout({ horizontal_run_ft = 0, max_spacing_ft = 
   if (crawl < 0) return { error: "Crawl-space pathway height cannot be negative (in)." };
 
   // Spacing: intermediate cleanouts along the run, assuming the run begins at one.
-  const spacing_cleanouts = Math.max(0, Math.ceil(L / spacing) - 1);
+  const spacing_cleanouts = Math.max(0, Math.ceil(L / spacing - 1e-9) - 1);
   // Changes: the 40 ft grouping allowance caps how many can ever be required.
-  const change_cap = Math.ceil(L / 40);
+  const change_cap = Math.ceil(L / 40 - 1e-9);
   const change_claimed = changes - grouped;
   const change_cleanouts = Math.min(change_claimed, change_cap);
   const cap_governs = change_claimed > change_cap;

@@ -51,7 +51,7 @@ export function computeSolderJointQuantity({ joints = 200, wire_in_per_joint = 0
   if (!(spool_lb > 0)) return { error: "Spool weight must be positive (lb)." };
   const w_per_in = (Math.PI / 4) * wire_dia_in * wire_dia_in * solder_density_lb_in3;
   const solder_lb = joints * wire_in_per_joint * w_per_in;
-  const spools = Math.ceil(solder_lb / spool_lb);
+  const spools = Math.ceil(solder_lb / spool_lb - 1e-9);
   if (![w_per_in, solder_lb, spools].every(Number.isFinite)) return { error: "Solder math is not a finite value." };
   return {
     w_per_in,
@@ -99,7 +99,7 @@ export function computePipeInsulationTakeoff({ pipe_ft = 250, waste_pct = 5, num
   if (waste_pct < 0) return { error: "Waste cannot be negative (percent)." };
   if (num_fittings < 0) return { error: "Fitting count cannot be negative." };
   const cut_ft = pipe_ft * (1 + waste_pct / 100) + num_fittings * fitting_allow_ft;
-  const sections = Math.ceil(cut_ft / section_len_ft);
+  const sections = Math.ceil(cut_ft / section_len_ft - 1e-9);
   const jacket_sf = Math.PI * (insul_od_in / 12) * cut_ft;
   // spec-v1676 (cut into this tile): the jacket OD check, the lap allowance, and
   // the fitting and valve covers counted as PIECES. All optional; zero leaves
@@ -352,7 +352,7 @@ export function computePexHomerunTakeoff({ fixtures = 8, hot_fixtures = 6, avg_r
   const total_ports = cold_ports + hot_ports;
   // (100 + waste)/100 rather than (1 + waste/100): the latter's 1.1 is not exactly
   // representable, so 770 * 1.1 = 847.0000000000001 and ceils to 848 not 847.
-  const tubing_lf = Math.ceil(total_ports * avg_run_ft * (100 + waste_pct) / 100);
+  const tubing_lf = Math.ceil(total_ports * avg_run_ft * (100 + waste_pct) / 100 - 1e-9);
   if (![cold_ports, hot_ports, total_ports, tubing_lf].every(Number.isFinite)) return { error: "Home-run math is not a finite value." };
   return {
     cold_ports,

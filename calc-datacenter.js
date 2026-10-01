@@ -195,7 +195,7 @@ export function computeUpsModuleRedundancy({ it_load_kw = 0, power_factor = 0, m
   if (!(power_factor > 0 && power_factor <= 1)) return { error: "Power factor must be greater than 0 and no more than 1." };
   if (![n_plus_one_efficiency_pct, two_n_efficiency_pct].every((v) => v > 0 && v <= 100)) return { error: "UPS efficiencies must be greater than 0 and no more than 100 percent." };
   const apparent_power_kva = it_load_kw / power_factor;
-  const required_modules = Math.ceil(apparent_power_kva / module_rating_kva);
+  const required_modules = Math.ceil(apparent_power_kva / module_rating_kva - 1e-9);
   const n_plus_one_modules = required_modules + 1;
   const two_n_modules = 2 * required_modules;
   const n_plus_one_loss_kw = it_load_kw * (100 / n_plus_one_efficiency_pct - 1);
@@ -359,9 +359,9 @@ export function computePduBranchLoading({ line_voltage_v = 0, phase_configuratio
   const usable_current_a = breaker_rating_a * continuous_load_pct / 100;
   const branch_capacity_va = phaseFactor * line_voltage_v * usable_current_a;
   const branch_capacity_kw = branch_capacity_va * power_factor / 1000;
-  const supported_device_count = Math.floor(branch_capacity_kw * 1000 / device_draw_w);
+  const supported_device_count = Math.floor(branch_capacity_kw * 1000 / device_draw_w + 1e-9);
   const naive_capacity_kw = phaseFactor * line_voltage_v * breaker_rating_a * power_factor / 1000;
-  const naive_device_count = Math.floor(naive_capacity_kw * 1000 / device_draw_w);
+  const naive_device_count = Math.floor(naive_capacity_kw * 1000 / device_draw_w + 1e-9);
   const connected_load_w = supported_device_count * device_draw_w;
   const failover_current_a = connected_load_w / (phaseFactor * line_voltage_v * power_factor);
   return {

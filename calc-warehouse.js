@@ -245,8 +245,8 @@ export function computeRackBasePlateAnchorage({ frame_weight_lb = 0, frame_depth
   const resisting_moment_ftlb = 0.6 * frame_weight_lb * frame_depth_ft / 2;
   const net_moment_ftlb = overturning_moment_ftlb - resisting_moment_ftlb;
   const net_uplift_lb = Math.max(0, net_moment_ftlb / frame_depth_ft);
-  const anchors_required = Math.ceil(net_uplift_lb / allowable_anchor_tension_lb);
-  const anchors_required_improved = Math.ceil(net_uplift_lb / improved_anchor_tension_lb);
+  const anchors_required = Math.ceil(net_uplift_lb / allowable_anchor_tension_lb - 1e-9);
+  const anchors_required_improved = Math.ceil(net_uplift_lb / improved_anchor_tension_lb - 1e-9);
   return {
     frame_depth_ft, effective_height_ft, lateral_force_lb, overturning_moment_ftlb, resisting_moment_ftlb,
     resisting_share_pct: 100 * resisting_moment_ftlb / overturning_moment_ftlb,
@@ -311,9 +311,9 @@ export function computeStackingAisleWidth({ load_length_in = 0, operating_cleara
   const counterbalanced_module_in = moduleOf(counterbalanced_aisle_in);
   const reach_module_in = moduleOf(reach_aisle_in);
   const turret_module_in = moduleOf(turret_aisle_in);
-  const counterbalanced_modules = Math.floor(building_width_in / counterbalanced_module_in);
-  const reach_modules = Math.floor(building_width_in / reach_module_in);
-  const turret_modules = Math.floor(building_width_in / turret_module_in);
+  const counterbalanced_modules = Math.floor(building_width_in / counterbalanced_module_in + 1e-9);
+  const reach_modules = Math.floor(building_width_in / reach_module_in + 1e-9);
+  const turret_modules = Math.floor(building_width_in / turret_module_in + 1e-9);
   const turret_gain = turret_modules - counterbalanced_modules;
   const reach_gain = reach_modules - counterbalanced_modules;
   return {
@@ -384,7 +384,7 @@ export function computeWarehouseCubeUtilization({ building_width_ft = 0, buildin
   const building_floor_ft2 = building_width_ft * building_depth_ft;
   const building_cube_ft3 = building_floor_ft2 * clear_height_ft;
   const aisle_width_in = module_pitch_in - 2 * rack_row_depth_in;
-  const modules = Math.floor(building_width_ft * IN_PER_FT / module_pitch_in);
+  const modules = Math.floor(building_width_ft * IN_PER_FT / module_pitch_in + 1e-9);
   const rack_rows = modules * 2;
   const aisle_floor_ft2 = modules * (aisle_width_in / IN_PER_FT) * rack_run_length_ft;
   const rack_floor_ft2 = rack_rows * (rack_row_depth_in / IN_PER_FT) * rack_run_length_ft;
@@ -601,13 +601,13 @@ export function computeDockDoorCountThroughput({ trucks_per_day = 0, operating_h
   const utilization = utilization_pct / 100;
   const door_hours = trucks_per_day * turn_time_min / 60;
   const doors_at_full_utilization = door_hours / operating_hours;
-  const doors_required = Math.ceil(doors_at_full_utilization / utilization);
+  const doors_required = Math.ceil(doors_at_full_utilization / utilization - 1e-9);
   const peak_trucks = trucks_per_day * peak_arrival_share_pct / 100;
   const peak_door_hours = peak_trucks * turn_time_min / 60;
   const peak_doors_at_full_utilization = peak_door_hours / peak_window_hours;
-  const peak_doors_required = Math.ceil(peak_doors_at_full_utilization / utilization);
+  const peak_doors_required = Math.ceil(peak_doors_at_full_utilization / utilization - 1e-9);
   const improved_peak_door_hours = peak_trucks * improved_turn_time_min / 60;
-  const improved_peak_doors_required = Math.ceil(improved_peak_door_hours / peak_window_hours / utilization);
+  const improved_peak_doors_required = Math.ceil(improved_peak_door_hours / peak_window_hours / utilization - 1e-9);
   return {
     door_hours, doors_at_full_utilization, doors_required,
     peak_trucks, peak_door_hours, peak_doors_at_full_utilization, peak_doors_required,

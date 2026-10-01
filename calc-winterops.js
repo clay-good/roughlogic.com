@@ -238,11 +238,11 @@ export function computePlowRouteCycleTime({ route_lane_miles = 0, plow_speed_mph
   const cycle_time_min = cycle_time_hr * 60;
   const accumulation_in = snowfall_in_hr * cycle_time_hr;
   const lane_miles_per_truck = effective_speed_lane_miles_hr * cycle_target_hr;
-  const trucks_required = Math.ceil(system_lane_miles / lane_miles_per_truck);
+  const trucks_required = Math.ceil(system_lane_miles / lane_miles_per_truck - 1e-9);
   const target_accumulation_in = snowfall_in_hr * cycle_target_hr;
   const compared = alt_cycle_target_hr > 0;
   const alt_lane_miles_per_truck = compared ? effective_speed_lane_miles_hr * alt_cycle_target_hr : null;
-  const alt_trucks_required = compared ? Math.ceil(system_lane_miles / alt_lane_miles_per_truck) : null;
+  const alt_trucks_required = compared ? Math.ceil(system_lane_miles / alt_lane_miles_per_truck - 1e-9) : null;
   const alt_target_accumulation_in = compared ? snowfall_in_hr * alt_cycle_target_hr : null;
   const extra_trucks = compared ? alt_trucks_required - trucks_required : null;
   const extra_trucks_pct = compared ? 100 * extra_trucks / trucks_required : null;
@@ -303,12 +303,12 @@ export function computeSnowStackingArea({ lot_area_ft2 = 0, accumulation_in = 0,
   const windrow_length_ft = pile_volume_ft3 / cross_section_ft2;
   const footprint_ft2 = windrow_length_ft * base_width_ft;
   const footprint_pct_of_lot = 100 * footprint_ft2 / lot_area_ft2;
-  const spaces_lost = Math.ceil(footprint_ft2 / area_per_space_ft2);
+  const spaces_lost = Math.ceil(footprint_ft2 / area_per_space_ft2 - 1e-9);
   const season_pile_volume_ft3 = pile_volume_ft3 * n;
   const season_length_ft = season_pile_volume_ft3 / cross_section_ft2;
   const season_footprint_ft2 = season_length_ft * base_width_ft;
   const season_footprint_pct_of_lot = 100 * season_footprint_ft2 / lot_area_ft2;
-  const season_spaces_lost = Math.ceil(season_footprint_ft2 / area_per_space_ft2);
+  const season_spaces_lost = Math.ceil(season_footprint_ft2 / area_per_space_ft2 - 1e-9);
   const allocated_area_ft2 = lot_area_ft2 * (allocated_pct / 100);
   const allocated_volume_ft3 = allocated_area_ft2 / base_width_ft * cross_section_ft2;
   const haul_volume_ft3 = Math.max(0, season_pile_volume_ft3 - allocated_volume_ft3);
@@ -440,7 +440,7 @@ export function computeWalkwayClearingProductivity({ total_area_ft2 = 0, hand_ar
   // names a governing operation the arithmetic does not actually single out.
   const governing_operation = balanced ? "balanced" : (blower_hr > hand_hr ? "machine work" : "hand work");
   const meets_window = crew_hr <= service_window_hr;
-  const crews_required = Math.ceil(crew_hr / service_window_hr);
+  const crews_required = Math.ceil(crew_hr / service_window_hr - 1e-9);
   const icemelt_per_application_lb = total_area_ft2 / 1000 * icemelt_lb_per_1000ft2;
   const icemelt_event_lb = icemelt_per_application_lb * apps;
   const balance_verdict = balanced

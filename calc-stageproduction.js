@@ -736,7 +736,7 @@ export function computeVideoWallDataRate({ width_px = 0, height_px = 0, bit_dept
   // two walls of the same physical size need very different amounts of processing.
   const total_pixels = width_px * height_px;
   const data_rate_gbps = total_pixels * bit_depth * 3 * refresh_hz / 1e9;
-  const ports_needed = Math.ceil(total_pixels / pixels_per_port);
+  const ports_needed = Math.ceil(total_pixels / pixels_per_port - 1e-9);
   const spare_pixels = ports_needed * pixels_per_port - total_pixels;
   const last_port_used = pixels_per_port - spare_pixels;
   if (![total_pixels, data_rate_gbps, ports_needed, spare_pixels, last_port_used].every(Number.isFinite)) return { error: "Video-wall data-rate math is not a finite value." };

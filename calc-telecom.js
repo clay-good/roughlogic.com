@@ -190,7 +190,7 @@ export function computeFiberSlackStorage({ route_length_ft = 0, usable_reel_leng
   if (!(route_length_ft > 0) || !(usable_reel_length_ft > 0)) return { error: "Route and reel lengths must be positive." };
   if (!(slack_per_splice_ft > 0) || !(terminal_slack_ft > 0) || !(restoration_slack_each_side_ft > 0)) return { error: "Splice, terminal, and restoration slack allowances must be positive." };
   if (!(waste_pct >= 0 && waste_pct < 100)) return { error: "Waste and routing allowance must be from 0 up to 100 percent." };
-  const splice_points = Math.max(0, Math.ceil(route_length_ft / usable_reel_length_ft) - 1);
+  const splice_points = Math.max(0, Math.ceil(route_length_ft / usable_reel_length_ft - 1e-9) - 1);
   const splice_slack_ft = splice_points * slack_per_splice_ft;
   const terminal_slack_total_ft = 2 * terminal_slack_ft;
   const total_slack_ft = splice_slack_ft + terminal_slack_total_ft;
@@ -313,12 +313,12 @@ export function computeFiberStrandCountPlanning({ living_units = 0, split_ratio 
   const standards = _parseStandardCounts(standard_counts);
   if (standards.length === 0) return { error: "Enter at least one positive standard cable count." };
   const roundUp = (required) => standards.find((count) => count >= required) ?? null;
-  const feeder_fibers_required = Math.ceil(living_units / split_ratio);
+  const feeder_fibers_required = Math.ceil(living_units / split_ratio - 1e-9);
   const feeder_with_spare = Math.ceil(feeder_fibers_required * (1 + spare_pct / 100));
   const standard_without_spare = roundUp(feeder_fibers_required);
   const selected_standard_count = roundUp(feeder_with_spare);
   if (standard_without_spare === null || selected_standard_count === null) return { error: "The available standard cable counts do not reach the required fiber count." };
-  const drop_terminals = Math.ceil(living_units / terminal_ports);
+  const drop_terminals = Math.ceil(living_units / terminal_ports - 1e-9);
   const distribution_fibers_required = drop_terminals;
   const distribution_with_spare = Math.ceil(distribution_fibers_required * (1 + spare_pct / 100));
   const lower_installed_cost = route_length_ft * (lower_material_cost_per_ft + placement_cost_per_ft);

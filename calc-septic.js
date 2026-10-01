@@ -120,7 +120,7 @@ export function computeSepticDrainfieldCapacity({
   if (!(perBed > 0)) return { error: "Design flow per bedroom must be positive (gpd)." };
   const absorption_area_ft2 = len * w;
   const design_flow_gpd = absorption_area_ft2 * rate;
-  const bedrooms = Math.floor(design_flow_gpd / perBed);
+  const bedrooms = Math.floor(design_flow_gpd / perBed + 1e-9);
   return { design_flow_gpd, absorption_area_ft2, bedrooms, gpd_per_bedroom: perBed };
 }
 

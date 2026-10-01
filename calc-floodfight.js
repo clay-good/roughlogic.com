@@ -546,12 +546,12 @@ export function computeStormPanelPlywood({ opening_width_in = 0, opening_height_
   const fasteners_per_edge = Math.ceil((fastened_edge_in - 2 * edge_distance_in) / fastener_spacing_in - 1e-9) + 1;
   const fasteners_per_panel = 2 * fasteners_per_edge;
   const total_fasteners = fasteners_per_panel * opening_count;
-  const fitsAs = (w, h) => Math.floor(48 / w) * Math.floor(96 / h);
+  const fitsAs = (w, h) => Math.floor(48 / w + 1e-9) * Math.floor(96 / h + 1e-9);
   const per_sheet = Math.max(fitsAs(panel_width_in, panel_height_in), fitsAs(panel_height_in, panel_width_in));
   const needs_splice = per_sheet === 0;
   const sheets = needs_splice
-    ? opening_count * Math.min(Math.ceil(panel_width_in / 48) * Math.ceil(panel_height_in / 96), Math.ceil(panel_height_in / 48) * Math.ceil(panel_width_in / 96))
-    : Math.ceil(opening_count / per_sheet);
+    ? opening_count * Math.min(Math.ceil(panel_width_in / 48 - 1e-9) * Math.ceil(panel_height_in / 96 - 1e-9), Math.ceil(panel_height_in / 48 - 1e-9) * Math.ceil(panel_width_in / 96 - 1e-9))
+    : Math.ceil(opening_count / per_sheet - 1e-9);
   const table_column = span_ft <= 4 ? "panel span <= 4 ft" : span_ft <= 6 ? "4 ft < panel span <= 6 ft" : "6 ft < panel span <= 8 ft";
   const fastener_label = FASTENERS[fastener_type];
   return {
@@ -637,7 +637,7 @@ export function computeManufacturedHomeAnchorCount({ wind_zone = "I", floor_widt
   const vertical_required = wind_zone !== "I";
   const vertical_ties = vertical_required ? total_anchors : 0;
   const spacing_used_ft = run_ft / spaces_per_side;
-  const spacing_label = Math.floor(max_spacing_in / 12) + " ft " + (max_spacing_in % 12) + " in";
+  const spacing_label = Math.floor(max_spacing_in / 12 + 1e-9) + " ft " + (max_spacing_in % 12) + " in";
   return {
     max_spacing_in, max_spacing_ft, spacing_label, run_ft, spaces_per_side, anchors_per_side, total_anchors,
     vertical_required, vertical_ties, spacing_used_ft, cell: cellName, sections,

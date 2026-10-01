@@ -213,8 +213,8 @@ export function computeSprinklerHeadLayout({ room_length = 0, room_width = 0, ar
   if (!(area_per_head > 0)) return { error: "Protection area per head must be positive (ft^2)." };
   if (!(max_spacing > 0)) return { error: "Maximum spacing must be positive (ft)." };
   const spacing = Math.min(max_spacing, Math.sqrt(area_per_head));
-  const heads_per_line = Math.ceil(room_length / spacing);
-  const num_lines = Math.ceil(room_width / spacing);
+  const heads_per_line = Math.ceil(room_length / spacing - 1e-9);
+  const num_lines = Math.ceil(room_width / spacing - 1e-9);
   const total_heads = heads_per_line * num_lines;
   const room_area = room_length * room_width;
   const achieved_area_per_head = room_area / total_heads;
@@ -295,8 +295,8 @@ export function computeSmokeDetectorSpacingCount({ room_length_ft = 60, room_wid
   if (!(room_length_ft > 0)) return { error: "Room length must be positive (ft)." };
   if (!(room_width_ft > 0)) return { error: "Room width must be positive (ft)." };
   if (!(listed_spacing_ft > 0)) return { error: "Listed spacing must be positive (ft)." };
-  const rows = Math.ceil(room_length_ft / listed_spacing_ft);
-  const cols = Math.ceil(room_width_ft / listed_spacing_ft);
+  const rows = Math.ceil(room_length_ft / listed_spacing_ft - 1e-9);
+  const cols = Math.ceil(room_width_ft / listed_spacing_ft - 1e-9);
   const detectors = rows * cols;
   const wall_max_ft = listed_spacing_ft / 2;
   if (![rows, cols, detectors, wall_max_ft].every(Number.isFinite)) return { error: "Detector-count math is not a finite value." };
@@ -589,8 +589,8 @@ export function computeHydrantSpacingCount({ required_flow_gpm = 0, credited_flo
   if (!(max_distance_ft > 0)) return { error: "Maximum distance to a hydrant must be positive." };
   // Two INDEPENDENT requirements: a site can have all the water it needs and still be
   // short a hydrant on geometry.
-  const hydrants_by_flow = Math.ceil(required_flow_gpm / credited_flow_per_hydrant_gpm);
-  const hydrants_by_frontage = Math.ceil(frontage_ft / average_spacing_ft) + 1;
+  const hydrants_by_flow = Math.ceil(required_flow_gpm / credited_flow_per_hydrant_gpm - 1e-9);
+  const hydrants_by_frontage = Math.ceil(frontage_ft / average_spacing_ft - 1e-9) + 1;
   const governing_count = Math.max(hydrants_by_flow, hydrants_by_frontage);
   const actual_spacing_ft = governing_count > 1 ? frontage_ft / (governing_count - 1) : frontage_ft;
   const worst_distance_ft = actual_spacing_ft / 2;

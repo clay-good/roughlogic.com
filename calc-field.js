@@ -187,7 +187,7 @@ export const backcountryExample = { inputs: { body_weight_lb: 170, ambient_band:
 const WGS84 = { a: 6378137.0, f: 1 / 298.257223563 };
 
 function utmZone(lon_deg) {
-  return Math.floor((lon_deg + 180) / 6) + 1;
+  return Math.floor((lon_deg + 180) / 6 + 1e-9) + 1;
 }
 
 // dims: in { lat_deg: dimensionless, lon_deg: dimensionless }
@@ -345,7 +345,7 @@ export function computeSolarTimes({ lat_deg = 0, lon_deg = 0, date_iso = "", tz_
   function fmtTime(utcMinutes) {
     if (utcMinutes === null) return null;
     const local = ((utcMinutes + tz_offset_hours * 60) % 1440 + 1440) % 1440;
-    const h = Math.floor(local / 60);
+    const h = Math.floor(local / 60 + 1e-9);
     const m = Math.floor(local - h * 60);
     return String(h).padStart(2, "0") + ":" + String(m).padStart(2, "0");
   }
@@ -672,7 +672,7 @@ export function timerRemainingSeconds(t, now_s) {
 //  mm:ss display string is categorical (dimensionless).)
 export function formatTimerMMSS(seconds) {
   const s = Math.max(0, Math.floor(Number(seconds) || 0));
-  const m = Math.floor(s / 60);
+  const m = Math.floor(s / 60 + 1e-9);
   const r = s % 60;
   return String(m).padStart(2, "0") + ":" + String(r).padStart(2, "0");
 }
@@ -761,7 +761,7 @@ function renderLightning(inputRegion, outputRegion, citationEl) {
     { key: "b",  id: "lc-out-b",  label: "Advisory" },
   ]) outs[o.key] = makeOutputLine(outputRegion, o.label, o.id);
 
-  function nowSec() { return Math.floor(Date.now() / 1000); }
+  function nowSec() { return Math.floor(Date.now() / 1000 + 1e-9); }
 
   function renderTimerUi() {
     const t = parseTimerState(timerHidden.value);
@@ -1225,7 +1225,7 @@ export function computeHikingTime({ distance = 0, distance_unit = "km", ascent =
   return {
     distance_km: dist_km, ascent_m, speed_kmh, defaulted_speed, factor: fac,
     base_hours, ascent_hours, subtotal_hours, total_hours,
-    total_h: Math.floor(total_minutes / 60), total_min: total_minutes % 60,
+    total_h: Math.floor(total_minutes / 60 + 1e-9), total_min: total_minutes % 60,
     notes,
   };
 }
@@ -1450,7 +1450,7 @@ export function computeLitterCarryTeam({ distance_mi = 0, pace_mph = 1.0, carrie
   // provide it. It is by far the most sensitive input and the one guessed optimistically.
   const carry_time_hr = distance_mi / pace_mph;
   const carry_time_min = carry_time_hr * 60;
-  const teams_needed = Math.ceil(1 / duty_fraction);
+  const teams_needed = Math.ceil(1 / duty_fraction - 1e-9);
   const carriers_needed = carriers_per_litter * teams_needed;
   const total_personnel = carriers_needed + support_personnel;
   const person_hours = total_personnel * carry_time_hr;

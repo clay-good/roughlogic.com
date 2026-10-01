@@ -363,13 +363,13 @@ export function computeCollectionRouteProductivity({ stop_count = 0, seconds_per
   if (!(shift_hours > 0)) return { error: "The shift must be positive." };
   const collection_hours = stop_count * seconds_per_stop / SEC_PER_HOUR;
   const route_tons = stop_count * setout_weight_lb / LB_PER_TON;
-  const disposal_loads = Math.ceil(route_tons / truck_payload_tons);
+  const disposal_loads = Math.ceil(route_tons / truck_payload_tons - 1e-9);
   const haul_hours = disposal_loads * round_trip_min / MIN_PER_HOUR;
   const tipping_hours = disposal_loads * tipping_min / MIN_PER_HOUR;
   const overhead_hours = fixed_time_hr + break_time_hr;
   const route_day_hours = collection_hours + haul_hours + tipping_hours + overhead_hours;
   const available_hours = shift_hours - haul_hours - tipping_hours - overhead_hours;
-  const max_stops = Math.floor(available_hours * SEC_PER_HOUR / seconds_per_stop);
+  const max_stops = Math.floor(available_hours * SEC_PER_HOUR / seconds_per_stop + 1e-9);
   // The cliff: one more load is a whole haul cycle, added in a single step.
   const next_load_hours = (disposal_loads + 1) * (round_trip_min + tipping_min) / MIN_PER_HOUR;
   const next_load_route_day_hours = collection_hours + next_load_hours + overhead_hours;
@@ -435,13 +435,13 @@ export function computeTransferStationThroughput({ daily_tons = 0, operating_hou
   if (!(loadout_delay_hr > 0)) return { error: "The loadout delay must be positive." };
   const peak_hour_tons = daily_tons * peak_hour_share_pct / 100;
   const peak_arrivals_per_hour = peak_hour_tons / collection_payload_tons;
-  const unloading_positions = Math.ceil(peak_arrivals_per_hour * floor_time_min / MIN_PER_HOUR);
+  const unloading_positions = Math.ceil(peak_arrivals_per_hour * floor_time_min / MIN_PER_HOUR - 1e-9);
   const average_tons_per_hour = daily_tons / operating_hours;
   const average_arrivals_per_hour = average_tons_per_hour / collection_payload_tons;
-  const average_positions = Math.ceil(average_arrivals_per_hour * floor_time_min / MIN_PER_HOUR);
-  const trailer_loads_per_day = Math.ceil(daily_tons / trailer_payload_tons);
+  const average_positions = Math.ceil(average_arrivals_per_hour * floor_time_min / MIN_PER_HOUR - 1e-9);
+  const trailer_loads_per_day = Math.ceil(daily_tons / trailer_payload_tons - 1e-9);
   const loads_per_trailer = operating_hours / trailer_round_trip_hr;
-  const trailer_fleet = Math.ceil(trailer_loads_per_day / loads_per_trailer);
+  const trailer_fleet = Math.ceil(trailer_loads_per_day / loads_per_trailer - 1e-9);
   const surge_tons = average_tons_per_hour * loadout_delay_hr;
   const surge_cy = surge_tons * LB_PER_TON / loose_density_lb_per_cy;
   const surge_footprint_sqft = surge_cy * CU_FT_PER_CU_YD / pile_depth_ft;

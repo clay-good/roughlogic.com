@@ -414,7 +414,7 @@ export function computeTankerFleetSize({ tank_gal = 0, fill_gpm = 0, dump_gpm = 
   const cycle_min = fill_min + dump_min + travel_min;
   const bottleneck_min = Math.max(fill_min, dump_min);
   const bottleneck_site = fill_min >= dump_min ? "fill" : "dump";
-  const fleet_for_max = Math.ceil(cycle_min / bottleneck_min);
+  const fleet_for_max = Math.ceil(cycle_min / bottleneck_min - 1e-9);
   const site_limited_flow_gpm = tank / bottleneck_min;
   return {
     fill_min, dump_min, travel_min, cycle_min, bottleneck_min, bottleneck_site, fleet_for_max, site_limited_flow_gpm,

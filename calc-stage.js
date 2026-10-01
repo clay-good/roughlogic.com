@@ -1536,7 +1536,7 @@ export function computeCounterweightArborLoad({ batten_weight_lb = 0, attached_l
   if (purchase_ratio === null) return { error: "Purchase type must be single or double." };
   const required_cw_lb = (batten + load) * purchase_ratio;
   const out_of_weight_lb = required_cw_lb - existing;
-  const bricks = Math.ceil(Math.abs(out_of_weight_lb) / brick);
+  const bricks = Math.ceil(Math.abs(out_of_weight_lb) / brick - 1e-9);
   const action = out_of_weight_lb > 0 ? "add" : out_of_weight_lb < 0 ? "remove" : "balanced";
   return {
     required_cw_lb, out_of_weight_lb, bricks, purchase_ratio, action,

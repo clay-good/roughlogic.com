@@ -370,7 +370,7 @@ export function computeVacuumExcavationSpoil({ pit_length_ft = 0, pit_width_ft =
   const swelled_cy = bank_cy_total * (1 + swell_pct / 100);
   const water_cy = water_added_gal / _GAL_PER_CUFT / _CUFT_PER_CY;
   const loose_cy_total = swelled_cy + water_cy;
-  const tank_fills = Math.ceil(loose_cy_total / tank_capacity_cy);
+  const tank_fills = Math.ceil(loose_cy_total / tank_capacity_cy - 1e-9);
   const pits_per_fill = tank_capacity_cy / (loose_cy_total / pit_count);
   const first_pit_tank_pct = (bank_cy_each * (1 + swell_pct / 100) + water_cy / pit_count) / tank_capacity_cy * 100;
   const haul_time_min = tank_fills * haul_round_trip_min;
@@ -378,7 +378,7 @@ export function computeVacuumExcavationSpoil({ pit_length_ft = 0, pit_width_ft =
     bank_cy_each, bank_cy_total, swelled_cy, water_cy, loose_cy_total,
     tank_fills, pits_per_fill, first_pit_tank_pct, haul_time_min,
     haul_time_hr: haul_time_min / 60,
-    bank_only_fills: Math.ceil(bank_cy_total / tank_capacity_cy),
+    bank_only_fills: Math.ceil(bank_cy_total / tank_capacity_cy - 1e-9),
     note: "The individual pothole is small and the day's total is not. A keyhole to five feet is a fraction of a cubic yard, but a day of potholing a corridor is thirty of them plus the test pits, and the tank fills up in the middle of the afternoon a long way from the dump site. SWELL IS WHAT MAKES THE TANK FILL SOONER than the arithmetic suggests. Soil excavated from a compacted bank occupies substantially more volume loose -- twenty to forty percent for most soils -- and a wet vacuum system adds the water used to cut, so the material going into the tank can be well over half again the in-place volume. Planning on bank volume produces a schedule that is optimistic by exactly that margin, and the tank-fill count computed both ways is printed so the difference is visible rather than discovered. Disposal is the variable that changes the number most. Spoil that can go back in the hole is a short cycle; spoil that must be hauled because it is slurry, because it is contaminated, or because the jurisdiction does not permit returning it, is a haul cycle per tank and a completely different day -- which is why the haul time is reported against the fills rather than left implicit. This is volume arithmetic on prismatic pits. It does not evaluate whether spoil may be returned to the excavation or must be hauled, which is a jurisdictional and contamination question, and it does not address the classification, containment, or disposal of slurry, which in many places is a regulated waste stream. It does not size the vacuum unit, address water supply and pressure for wet cutting, or evaluate the soil's suitability for vacuum excavation. It does not replace exposing a utility as the way to establish its position, nor the one-call notification that must precede any of it. The utility owner, the one-call system, the applicable damage prevention law, and the disposal jurisdiction govern.",
   };
 }

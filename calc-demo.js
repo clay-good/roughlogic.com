@@ -172,7 +172,7 @@ export function computeFloodCutQuantity({ wall_run_lf, cut_height_in = 24, two_s
   if (!(cut > 0)) return { error: "Cut height must be positive (in)." };
   const faces = two_sided ? 2 : 1;
   const drywallFt2 = run * (cut / 12) * faces;
-  const sheets = Math.ceil(drywallFt2 / 32);
+  const sheets = Math.ceil(drywallFt2 / 32 - 1e-9);
   const baseboardLf = run;
   const insulationFt2 = insulated ? run * (cut / 12) : 0;
   return {
@@ -254,11 +254,11 @@ export function computeAbatementContainment({ room_len_ft, room_wid_ft, room_ht_
   const wallSf = 2 * (len + wid) * ht;
   const polySf = (floorSf * floorLayers + wallSf * wallLayers) * 1.10;
   const reqCfm = volumeCf * ach / 60;
-  const namCount = Math.ceil(reqCfm / nam);
+  const namCount = Math.ceil(reqCfm / nam - 1e-9);
   // A 33-gal bag holds 4.4 ft^3 brim-full; abatement bags are not filled to
   // capacity (abatement-waste-containers defaults to 0.7), so about 3.1 ft^3
   // each. Until 2026-09-19 the full 4.4 was used, 30% short on bags.
-  const wasteBags = Math.ceil(debris * 27 / (4.4 * 0.7));
+  const wasteBags = Math.ceil(debris * 27 / (4.4 * 0.7) - 1e-9);
   if (![polySf, reqCfm, namCount, wasteBags].every(Number.isFinite)) return { error: "Containment math is not a finite value." };
   return {
     poly_sf: polySf,
@@ -336,8 +336,8 @@ export function computeAbatementWasteContainers({ area_ft2 = 0, thickness_in = 0
   // nothing. Estimating weight on the bulked volume overstates it badly.
   const waste_weight_lb = in_place_volume_ft3 * material_density_pcf;
   const waste_weight_tons = waste_weight_lb / 2000;
-  const container_count = container_volume_yd3 > 0 ? Math.ceil(bulked_volume_yd3 / container_volume_yd3) : null;
-  const naive_bag_count = Math.ceil(in_place_volume_ft3 / bag_volume_ft3);
+  const container_count = container_volume_yd3 > 0 ? Math.ceil(bulked_volume_yd3 / container_volume_yd3 - 1e-9) : null;
+  const naive_bag_count = Math.ceil(in_place_volume_ft3 / bag_volume_ft3 - 1e-9);
   const bag_multiple = naive_bag_count > 0 ? bag_count / naive_bag_count : null;
   const outs = [in_place_volume_ft3, bulked_volume_ft3, bag_count, waste_weight_lb];
   if (!outs.every(Number.isFinite)) return { error: "Abatement waste math is not a finite value." };

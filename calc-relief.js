@@ -201,7 +201,7 @@ export function computePodSiteConfiguration({ people_per_day = 0, household_size
   const lanes_required = _ceil(vehicles_per_hour / lane_rate_vph);
   // Fewest sites with exactly the required lanes: as many four-lane Type I
   // as fit, then the remainder as a Type II and/or a Type III.
-  const type_i_count = Math.floor(lanes_required / 4);
+  const type_i_count = Math.floor(lanes_required / 4 + 1e-9);
   const rem = lanes_required % 4;
   const type_ii_count = rem >= 2 ? 1 : 0;
   const type_iii_count = rem % 2;
@@ -347,20 +347,20 @@ export function computeSafeRoomCapacity({ room_type = "community_tornado", gross
     // (at least one); the rest stand. Required area rises with T, so the
     // largest T that fits is found by bisection.
     const need = (T) => {
-      const W = Math.ceil(T / 200);
+      const W = Math.ceil(T / 200 - 1e-9);
       return (T - W - bed_spaces_count) * t.standing + W * t.wheelchair + bed_spaces_count * t.bed;
     };
-    const minT = bed_spaces_count + Math.ceil((bed_spaces_count + 1) / 200);
+    const minT = bed_spaces_count + Math.ceil((bed_spaces_count + 1) / 200 - 1e-9);
     if (need(minT) > usable_area_sqft + 1e-9) return { error: "The usable area cannot hold the bed or stretcher spaces plus the required wheelchair space." };
     let lo = minT;
     let hi = Math.max(minT, Math.floor(usable_area_sqft / Math.min(t.standing, t.wheelchair)) + 1);
     while (hi - lo > 1) {
-      const mid = Math.floor((lo + hi) / 2);
+      const mid = Math.floor((lo + hi) / 2 + 1e-9);
       if (need(mid) <= usable_area_sqft + 1e-9) lo = mid; else hi = mid;
     }
     if (need(hi) <= usable_area_sqft + 1e-9) lo = hi;
     occupant_capacity_count = lo;
-    wheelchair_spaces_count = Math.ceil(lo / 200);
+    wheelchair_spaces_count = Math.ceil(lo / 200 - 1e-9);
     area_used_sqft = need(lo);
   } else {
     occupant_capacity_count = simple_capacity_count;

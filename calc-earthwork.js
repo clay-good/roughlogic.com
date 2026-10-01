@@ -142,7 +142,7 @@ export function computeHaulCycleProduction({ truck_cap_lcy, load_min, haul_min =
   const cycleMin = load + haul + dump + ret + spot;
   const loadsPerHour = eff / cycleMin;
   const productionLcyHr = cap * loadsPerHour;
-  const trucksToMatch = Math.ceil(cycleMin / load);
+  const trucksToMatch = Math.ceil(cycleMin / load - 1e-9);
   const fleetProductionLcyHr = productionLcyHr * trucksToMatch;
   if (![cycleMin, loadsPerHour, productionLcyHr, trucksToMatch, fleetProductionLcyHr].every(Number.isFinite)) return { error: "Production math is not a finite value." };
   return {
@@ -717,7 +717,7 @@ export function computeCheckDamSpacing({ dam_height_ft = 0, channel_slope_pct = 
   if (!(channel_slope_pct > 0)) return { error: "Channel slope must be positive (percent)." };
   if (!(reach_length_ft > 0)) return { error: "Reach length must be positive (ft)." };
   const spacing_ft = dam_height_ft / (channel_slope_pct / 100);
-  const dams = Math.ceil(reach_length_ft / spacing_ft);
+  const dams = Math.ceil(reach_length_ft / spacing_ft - 1e-9);
   if (![spacing_ft, dams].every(Number.isFinite)) return { error: "Check-dam math is not a finite value." };
   return {
     spacing_ft,
@@ -809,7 +809,7 @@ export function computeErosionBlanketCoverage({ area_sf = 0, overlap_pct = 10, r
   if (!(overlap_pct >= 0)) return { error: "Overlap must be non-negative (%)." };
   const coverage_sy = area_sf / 9;
   const roll_sy = (roll_width_ft * roll_length_ft) / 9;
-  const rolls = Math.ceil((coverage_sy * (1 + overlap_pct / 100)) / roll_sy);
+  const rolls = Math.ceil((coverage_sy * (1 + overlap_pct / 100)) / roll_sy - 1e-9);
   const staples = Math.ceil(coverage_sy * staples_per_sy);
   if (![coverage_sy, roll_sy, rolls, staples].every(Number.isFinite)) return { error: "Blanket-takeoff math is not a finite value." };
   return {
@@ -867,7 +867,7 @@ export function computeHydroseedMix({ area_ac = 0, seed_rate_lb_ac = 5, mulch_ra
   const mulch_lb = area_ac * mulch_rate_lb_ac;
   const tackifier_lb = area_ac * tackifier_rate_lb_ac;
   const total_solids_lb = seed_lb + mulch_lb + tackifier_lb;
-  const tanks = Math.ceil(total_solids_lb / (tank_gal * max_load_lb_per_gal));
+  const tanks = Math.ceil(total_solids_lb / (tank_gal * max_load_lb_per_gal) - 1e-9);
   if (![seed_lb, mulch_lb, tackifier_lb, total_solids_lb, tanks].every(Number.isFinite)) return { error: "Hydroseed math is not a finite value." };
   return {
     seed_lb,
@@ -1180,7 +1180,7 @@ export function computeDustControlWater({ length_ft = 2000, width_ft = 20, rate_
   if (!(applications_per_day > 0)) return { error: "Applications per day must be positive." };
   const area_sy = (length_ft * width_ft) / 9;
   const gal_per_app = area_sy * rate_gal_per_sy;
-  const trips_per_app = Math.ceil(gal_per_app / truck_cap_gal);
+  const trips_per_app = Math.ceil(gal_per_app / truck_cap_gal - 1e-9);
   const daily_gal = gal_per_app * applications_per_day;
   const daily_trips = trips_per_app * applications_per_day;
   if (![area_sy, gal_per_app, trips_per_app, daily_gal, daily_trips].every(Number.isFinite)) return { error: "Watering math is not a finite value." };
@@ -1285,7 +1285,7 @@ export function computeDumpTruckLoads({ total_lcy = 625, box_vol_cy = 12, weight
   const weight_limited_cy = weight_limit_lb / material_density_lb_per_lcy;
   const payload_cy = Math.min(weight_limited_cy, box_vol_cy);
   const governs = weight_limited_cy < box_vol_cy ? "weight" : "volume";
-  const loads = Math.ceil(total_lcy / payload_cy);
+  const loads = Math.ceil(total_lcy / payload_cy - 1e-9);
   if (![weight_limited_cy, payload_cy, loads].every(Number.isFinite)) return { error: "Load-count math is not a finite value." };
   return {
     weight_limited_cy,

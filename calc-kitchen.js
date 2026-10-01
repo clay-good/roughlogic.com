@@ -267,8 +267,8 @@ export function computePanConversion({ target_qt = 0, target_servings = 0, porti
     total_qt = (target_servings * portion_oz) / 32; // 32 oz per quart
   }
   if (!(total_qt > 0)) return { error: "Provide target volume or servings + portion." };
-  const pans_needed = Math.ceil(total_qt / cap);
-  const servings_per_pan = portion_oz > 0 ? Math.floor((cap * 32) / portion_oz) : null;
+  const pans_needed = Math.ceil(total_qt / cap - 1e-9);
+  const servings_per_pan = portion_oz > 0 ? Math.floor((cap * 32) / portion_oz + 1e-9) : null;
   const cooling_warning = pan_depth_in >= 4 ? "Warning: pan depth >= 4 in slows cooling. Verify with utility 224." : null;
   return { total_qt, capacity_qt: cap, pans_needed, servings_per_pan, cooling_warning };
 }
@@ -1887,7 +1887,7 @@ export function computeParLevelOrder({ daily_usage = 0, lead_time_days = 0, orde
   const coverage_days = lead_time_days + order_cycle_days;
   const par_level = daily_usage * coverage_days * (1 + safety_factor);
   const order_needed = Math.max(0, par_level - on_hand - on_order);
-  const cases = Math.ceil(order_needed / units_per_case);
+  const cases = Math.ceil(order_needed / units_per_case - 1e-9);
   const ordered_quantity = cases * units_per_case;
   const overshoot = ordered_quantity - order_needed;
   if (![coverage_days, par_level, order_needed, cases, ordered_quantity, overshoot].every(Number.isFinite)) return { error: "Par-level math is not a finite value." };
@@ -1954,7 +1954,7 @@ function _parseClock(s) {
 
 function _formatClock(minutes) {
   const wrapped = ((minutes % 1440) + 1440) % 1440;
-  const h24 = Math.floor(wrapped / 60);
+  const h24 = Math.floor(wrapped / 60 + 1e-9);
   const min = Math.round(wrapped % 60);
   const ampm = h24 < 12 ? "am" : "pm";
   const h12 = h24 % 12 === 0 ? 12 : h24 % 12;

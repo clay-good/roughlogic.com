@@ -172,8 +172,8 @@ export function computeAirMovers({ affected_area_ft2, water_class = "2", rooms =
   if (!(nRooms >= 1) || !Number.isInteger(nRooms)) return { error: "Affected rooms must be a whole number, at least 1." };
   if (nInsets < 0 || !Number.isInteger(nInsets)) return { error: "Insets and offsets must be a whole number, 0 or more." };
   const floor = Number(affected_area_ft2) || 0;
-  const count = nRooms + Math.ceil(floor / 70) + Math.ceil(wc / 150) + nInsets;
-  const count_high = nRooms + Math.ceil(floor / 50) + Math.ceil(wc / 100) + nInsets;
+  const count = nRooms + Math.ceil(floor / 70 - 1e-9) + Math.ceil(wc / 150 - 1e-9) + nInsets;
+  const count_high = nRooms + Math.ceil(floor / 50 - 1e-9) + Math.ceil(wc / 100 - 1e-9) + nInsets;
   // Typical air mover ~ 2500 CFM at low setting. Coverage in CFM/ft^2.
   const cfm_per_unit = 2500;
   const total_cfm = count * cfm_per_unit;
@@ -554,8 +554,8 @@ export function computeNAMSizing({ room_volume_ft3, target_ach = 6, filter_loadi
   // size up. We pick the smallest unit count that meets demand.
   const recommendations = NAM_UNIT_SIZES_CFM.map((unit) => ({
     unit_cfm: unit,
-    units_needed: Math.ceil(required_cfm / unit),
-    total_cfm: Math.ceil(required_cfm / unit) * unit,
+    units_needed: Math.ceil(required_cfm / unit - 1e-9),
+    total_cfm: Math.ceil(required_cfm / unit - 1e-9) * unit,
   }));
   // spec-v1690 negative-air-ach was CUT here rather than built: the airflow
   // above IS its relation, and the machine count is these recommendations.
@@ -621,7 +621,7 @@ export function computeHEPALife({ cfm, hours_per_day, particulate_category = "me
   const grams_per_day = c * h * rate;
   const days = cap / grams_per_day;
   // v8 §C.6: full-job filter count + optional cost.
-  const filters_for_job = job_days > 0 && days > 0 ? Math.ceil(job_days / days) : null;
+  const filters_for_job = job_days > 0 && days > 0 ? Math.ceil(job_days / days - 1e-9) : null;
   const total_cost_usd = filters_for_job !== null && filter_cost_usd > 0
     ? filters_for_job * filter_cost_usd : null;
   return {
@@ -816,8 +816,8 @@ export function computeContainmentAirBalance({
   // Recommend NAM count from typical 500 / 1000 / 2000 CFM units (reuse u87 logic).
   const recommendations = NAM_UNIT_SIZES_CFM.map((unit) => ({
     unit_cfm: unit,
-    units_needed: Math.ceil(required_cfm / unit),
-    total_cfm: Math.ceil(required_cfm / unit) * unit,
+    units_needed: Math.ceil(required_cfm / unit - 1e-9),
+    total_cfm: Math.ceil(required_cfm / unit - 1e-9) * unit,
   }));
   return { required_cfm, recommendations };
 }
@@ -1168,7 +1168,7 @@ export function computeEquipmentCircuitLoad({
   if (total_amps <= 0) return { error: "Enter at least one piece of equipment (or an other-load amperage)." };
 
   const continuous_limit_A = _V16D_CONTINUOUS_FACTOR * breaker;
-  const circuits_required = Math.ceil(total_amps / continuous_limit_A);
+  const circuits_required = Math.ceil(total_amps / continuous_limit_A - 1e-9);
   const total_va = total_amps * volts;
   // Utilization if every unit shared one breaker (the field shortcut to avoid).
   const single_circuit_utilization = total_amps / breaker;
@@ -1591,7 +1591,7 @@ export function computeAntimicrobialDilution({ affected_area_ft2, coverage_ft2_p
   const finishedGal = area / cov;
   const concentrateOz = finishedGal * concPerGal;
   const waterGal = finishedGal - concentrateOz / 128;
-  const tanksNeeded = Math.ceil(finishedGal / tank);
+  const tanksNeeded = Math.ceil(finishedGal / tank - 1e-9);
   const perTankConcOz = concPerGal * tank;
   return {
     finished_gal: finishedGal,
@@ -1784,7 +1784,7 @@ export function computeFloodCutTakeoff({ wall_perimeter_ft = 0, cut_height_in = 
   const cut_height_ft = cut / 12;
   const cut_line_lf = perim;
   const drywall_sf = perim * cut_height_ft * faces;
-  const drywall_sheets = Math.ceil(drywall_sf / 32); // standard 4x8 sheet = 32 ft^2
+  const drywall_sheets = Math.ceil(drywall_sf / 32 - 1e-9); // standard 4x8 sheet = 32 ft^2
   const insulation_sf = ins ? perim * cut_height_ft : 0;
   const baseboard_lf = base ? perim : 0;
   return { cut_line_lf, drywall_sf, drywall_sheets, insulation_sf, baseboard_lf };
@@ -1893,8 +1893,8 @@ export function computeDehumidifierDerate({ aham_pints_per_day = 0, derate_facto
   if (!(demand > 0)) return { error: "Required removal must be positive (pints/day)." };
   if (!(derate > 0 && derate <= 1)) return { error: "Derate factor must be in (0, 1]." };
   const effective_pints = aham * derate;
-  const units_by_nameplate = Math.ceil(demand / aham);
-  const units_by_field = Math.ceil(demand / effective_pints);
+  const units_by_nameplate = Math.ceil(demand / aham - 1e-9);
+  const units_by_field = Math.ceil(demand / effective_pints - 1e-9);
   const shortfall_units = units_by_field - units_by_nameplate;
   return { effective_pints, units_by_nameplate, units_by_field, shortfall_units };
 }
@@ -2031,7 +2031,7 @@ export function computeDesiccantAirflow({ required_pints_per_day = 0, design_gra
   // 1.043 lb/pint water; 4.5 = 60 min/hr * 0.075 lb/ft^3 standard air; 7000 grains/lb.
   const lb_per_hr = (demand * 1.043) / 24;
   const process_cfm = (lb_per_hr * 7000) / (4.5 * depression);
-  const units_needed = Math.ceil(process_cfm / nameplate);
+  const units_needed = Math.ceil(process_cfm / nameplate - 1e-9);
   return { lb_per_hr, process_cfm, units_needed };
 }
 export const desiccantAirflowExample = { inputs: { required_pints_per_day: 300, design_grain_depression: 60, nameplate_process_cfm: 2000 } };
@@ -2357,7 +2357,7 @@ export function computeHydroxylSizing({ structure_volume_ft3 = 0, unit_coverage_
   if (!Number.isFinite(vol) || !Number.isFinite(coverage) || !Number.isFinite(days)) return { error: "Inputs must be finite numbers." };
   if (!(vol > 0)) return { error: "Structure volume must be positive (ft^3)." };
   if (!(coverage > 0)) return { error: "Unit coverage rating must be positive (ft^3/unit)." };
-  const units = Math.ceil(vol / coverage);
+  const units = Math.ceil(vol / coverage - 1e-9);
   return {
     units,
     expected_days: days > 0 ? days : null,
@@ -2399,9 +2399,9 @@ export function computeCavityDryingSystem({ affected_wall_ft = 0, stud_spacing_i
   if (!(spacing > 0)) return { error: "Stud spacing must be positive (in)." };
   if (!(perBay > 0)) return { error: "Ports per bay must be positive." };
   if (!(perSystem > 0)) return { error: "Ports per system must be positive." };
-  const bays = Math.ceil(wall * 12 / spacing);
+  const bays = Math.ceil(wall * 12 / spacing - 1e-9);
   const ports = bays * perBay;
-  const systems = Math.ceil(ports / perSystem);
+  const systems = Math.ceil(ports / perSystem - 1e-9);
   return {
     bays,
     ports,
@@ -2612,7 +2612,7 @@ export function computeSootCleaningTakeoff({ affected_sf = 0, sponge_coverage_sf
   if (!(cov > 0)) return { error: "Sponge coverage must be positive." };
   if (!(prod > 0)) return { error: "Production rate must be positive." };
   if (seal && !(primer > 0)) return { error: "Primer coverage must be positive when a seal coat is included." };
-  const sponges = Math.ceil(area / cov);
+  const sponges = Math.ceil(area / cov - 1e-9);
   const labor = area / prod;
   const sealer = seal ? area / primer : 0;
   return {
@@ -2660,7 +2660,7 @@ export function computeOzoneShockTreatment({ structure_volume_ft3 = 0, rated_vol
   if (!(vol > 0)) return { error: "Structure volume must be positive." };
   if (!(rated > 0)) return { error: "Rated treatable volume must be positive." };
   if (!(time > 0)) return { error: "Treatment time must be positive." };
-  const generators = Math.ceil(vol / rated);
+  const generators = Math.ceil(vol / rated - 1e-9);
   return {
     generators_needed: generators,
     treatment_time_hr: time,
@@ -2785,9 +2785,9 @@ export function computeContentsPackoutInventory({ floor_area_ft2 = 0, contents_f
   if (!(stack > 0)) return { error: "Stacking factor must be positive." };
   if (!(truck > 0)) return { error: "Truck volume must be positive." };
   const contents = area * density;
-  const boxes = Math.ceil(contents / box);
+  const boxes = Math.ceil(contents / box - 1e-9);
   const storage = contents * stack;
-  const truckLoads = Math.ceil(storage / truck);
+  const truckLoads = Math.ceil(storage / truck - 1e-9);
   return {
     contents_volume_ft3: contents,
     boxes,
@@ -2935,8 +2935,8 @@ export function computeHardwoodFloorDryingMat({ floor_area_ft2 = 0, mat_coverage
   if (!(area > 0)) return { error: "Floor area must be positive." };
   if (!(cov > 0)) return { error: "Mat coverage must be positive." };
   if (!(per > 0)) return { error: "Mats per unit must be positive." };
-  const mats = Math.ceil(area / cov);
-  const units = Math.ceil(mats / per);
+  const mats = Math.ceil(area / cov - 1e-9);
+  const units = Math.ceil(mats / per - 1e-9);
   return {
     mats_needed: mats,
     suction_units: units,
@@ -3087,7 +3087,7 @@ export function computeWaterExtractionRate({ area_sqft = 0, standing_depth_in = 
   const absorbed_gal = area_sqft * absorption_gal_per_sqft;
   const total_gal = standing_gal + absorbed_gal;
   const wand_time_min = total_gal / extraction_rate_gpm;
-  const tank_dumps = Math.ceil(total_gal / waste_tank_gal);
+  const tank_dumps = Math.ceil(total_gal / waste_tank_gal - 1e-9);
   const water_weight_lb = total_gal * 8.3454;
   // The comparison that justifies every extra pass: a gallon extracted is a
   // gallon the dehumidifiers never have to evaporate.
@@ -3144,7 +3144,7 @@ export function computeSewageLossDisposal({ soft_area_sqft = 0, soft_thickness_i
   // particular bulk enormously once cut out and rolled.
   const loose_cf = in_place_cf * bulking_factor;
   const bag_cf = bag_capacity_gal / (1728 / 231);
-  const bag_count = Math.ceil(loose_cf / bag_cf);
+  const bag_count = Math.ceil(loose_cf / bag_cf - 1e-9);
   const container_cf = container_cy * 27;
   const container_utilization_pct = loose_cf / container_cf * 100;
   const liquid_weight_lb = extracted_gal * 8.3454;

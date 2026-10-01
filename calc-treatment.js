@@ -266,7 +266,7 @@ export function computePoolSaltDose({ gallons = 0, current_salt_ppm = 0, target_
   if (!(target_salt_ppm > 0)) return { error: "Target salt must be positive." };
   const delta_ppm = target_salt_ppm - current_salt_ppm;
   let action = "none", salt_lb = null, salt_bags = null, drain_fraction = null, drain_gallons = null;
-  if (delta_ppm > 0) { action = "add"; salt_lb = gallons * 8.34 * delta_ppm / 1000000; salt_bags = Math.ceil(salt_lb / 40); }
+  if (delta_ppm > 0) { action = "add"; salt_lb = gallons * 8.34 * delta_ppm / 1000000; salt_bags = Math.ceil(salt_lb / 40 - 1e-9); }
   else if (delta_ppm < 0) { action = "dilute"; drain_fraction = 1 - target_salt_ppm / current_salt_ppm; drain_gallons = drain_fraction * gallons; }
   return {
     action, delta_ppm, salt_lb, salt_bags, drain_fraction, drain_gallons,
@@ -1094,7 +1094,7 @@ export function computeChlorineCylinderWithdrawal({ feed_rate_lb_day = 0, contai
   const derate = Math.min(1, Math.max(0, (temp + 29) / 99)); // linear from the -29 F boiling point to the 70 F reference
   const per_container_lb_day = base * derate;
   if (!(per_container_lb_day > 0)) return { error: "The derated withdrawal ceiling is zero at this temperature - warm the room or use an evaporator." };
-  const containers = Math.ceil(feed / per_container_lb_day);
+  const containers = Math.ceil(feed / per_container_lb_day - 1e-9);
   const per_container_draw = feed / containers;
   const frost_warn = temp < 60 || per_container_draw >= 0.9 * per_container_lb_day;
   return {
@@ -1142,8 +1142,8 @@ export function computePoolTileCopingPerimeter({ length_ft = 32, width_ft = 16, 
   if (!(coping_length_in > 0)) return { error: "Coping length must be positive (in)." };
   if (waste_pct < 0) return { error: "Waste cannot be negative (percent)." };
   const perimeter_ft = 2 * (length_ft + width_ft);
-  const waterline_tiles = Math.ceil(perimeter_ft / (tile_length_in / 12) * courses * (1 + waste_pct / 100));
-  const coping_units = Math.ceil(perimeter_ft / (coping_length_in / 12) * (1 + waste_pct / 100));
+  const waterline_tiles = Math.ceil(perimeter_ft / (tile_length_in / 12) * courses * (1 + waste_pct / 100) - 1e-9);
+  const coping_units = Math.ceil(perimeter_ft / (coping_length_in / 12) * (1 + waste_pct / 100) - 1e-9);
   if (![perimeter_ft, waterline_tiles, coping_units].every(Number.isFinite)) return { error: "Perimeter-takeoff math is not a finite value." };
   return {
     perimeter_ft,

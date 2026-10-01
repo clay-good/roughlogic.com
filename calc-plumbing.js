@@ -2776,7 +2776,7 @@ export function computeTrapPrimer({
   const drains = Math.floor(Number(floor_drain_count) || 0);
   if (!(drains > 0)) return { error: "Enter the number of floor drains (1 or more)." };
   const perUnit = TRAP_PRIMER_DRAINS_PER_UNIT[prime_method] ?? 1;
-  const primers_needed = Math.ceil(drains / perUnit);
+  const primers_needed = Math.ceil(drains / perUnit - 1e-9);
   const ozPerCycle = Number(prime_volume_oz) || 0;
   const cyclesPerYear = (Number(cycles_per_day) || 0) * 365;
   // 128 fluid ounces per US gallon.
@@ -3865,7 +3865,7 @@ export function computeRadiantLoopSizing({ floor_area_ft2 = 0, spacing_in = 0, l
   if (!(maxLoop > 0)) return { error: "Maximum loop length must be positive (ft)." };
   if (!(dt > 0)) return { error: "Design delta-T must be positive (F)." };
   const tube_ft = (area * 12) / spacing;
-  const loops = Math.ceil(tube_ft / maxLoop);
+  const loops = Math.ceil(tube_ft / maxLoop - 1e-9);
   const per_loop_ft = tube_ft / loops;
   const total_gpm = load / (500 * dt);
   const per_loop_gpm = total_gpm / loops;

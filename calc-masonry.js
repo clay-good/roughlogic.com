@@ -303,7 +303,7 @@ export function computeBrickVeneerAnchorSpacing({ area_ft2 = 0, area_per = 2.67,
   // citation say govern would never actually reduce the count.
   const max_grid_ft2 = (mh * mv) / 144;
   const eff_per = Math.min(per, max_grid_ft2);
-  const anchors = Math.ceil(area / eff_per);
+  const anchors = Math.ceil(area / eff_per - 1e-9);
   const grid_ft2 = area / anchors;
   const spacing_governs = max_grid_ft2 < per;
   return {
@@ -602,7 +602,7 @@ export function computeBrickVeneerWeepCount({ wall_length_ft = 30, max_spacing_i
   if (!(flashing_lines > 0)) return { error: "Flashing lines must be positive." };
   const length_in = wall_length_ft * 12;
   // Weeps at the ends plus one every max_spacing: count = ceil(length / spacing) + 1.
-  const weeps_per_line = Math.ceil(length_in / max_spacing_in) + 1;
+  const weeps_per_line = Math.ceil(length_in / max_spacing_in - 1e-9) + 1;
   const total_weeps = weeps_per_line * Math.round(flashing_lines);
   if (![weeps_per_line, total_weeps].every(Number.isFinite)) return { error: "Weep-count math is not a finite value." };
   return {
@@ -637,7 +637,7 @@ export function computeMasonryJointReinforcement({ wall_length_ft = 40, wall_hei
   if (!(wall_height_ft > 0)) return { error: "Wall height must be positive (ft)." };
   if (!(vertical_spacing_in > 0)) return { error: "Vertical spacing must be positive (in)." };
   if (!(piece_length_ft > 0)) return { error: "Piece length must be positive (ft)." };
-  const reinforced_courses = Math.ceil(wall_height_ft * 12 / vertical_spacing_in);
+  const reinforced_courses = Math.ceil(wall_height_ft * 12 / vertical_spacing_in - 1e-9);
   // Each added piece laps the last by at least 6 in (9 in for 3/16 in wire), so it adds only piece - lap.
   // Until 2026-09-25 the lap was ignored: a 40 ft wall took 4 ten-foot pieces instead of 5.
   const lap_ft = (Number(lap_in) || 0) / 12;
@@ -1006,7 +1006,7 @@ export function computeGroutLiftPourHeight({ pour_height_ft = 0, lift_height_ft 
   if (!(grout_unit_weight_pcf > 0)) return { error: "Grout unit weight must be positive (pcf); fluid grout runs about 140." };
   if (cleanout_threshold_ft < 0) return { error: "The cleanout threshold height cannot be negative (ft)." };
   const SQIN_PER_SQFT_MAS = 144;
-  const lifts_in_pour = Math.ceil(pour_height_ft / lift_height_ft);
+  const lifts_in_pour = Math.ceil(pour_height_ft / lift_height_ft - 1e-9);
   const actual_lift_ft = pour_height_ft / lifts_in_pour;
   // The wall is holding back a column of liquid while its joints are hours old.
   const base_pressure_psf = grout_unit_weight_pcf * pour_height_ft;

@@ -236,7 +236,7 @@ export function computePvRailClampTakeoff({ rows = 2, modules_per_row = 12, modu
   const rail_lf = rows * rails_per_row * run_len_ft;
   const mid_clamps = rails_per_row * rows * (modules_per_row - 1);
   const end_clamps = 2 * rails_per_row * rows;
-  const splices = (Math.ceil(run_len_ft / rail_stock_ft) - 1) * rails_per_row * rows;
+  const splices = (Math.ceil(run_len_ft / rail_stock_ft - 1e-9) - 1) * rails_per_row * rows;
   if (![run_len_ft, rail_lf, mid_clamps, end_clamps, splices].every(Number.isFinite)) return { error: "Racking-takeoff math is not a finite value." };
   return {
     run_len_ft,

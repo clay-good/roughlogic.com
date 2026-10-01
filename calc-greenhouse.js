@@ -710,10 +710,10 @@ export function computePlugTrayCellCount({ plants_required = 0, cells_per_tray =
   if (!(tray_footprint_sqft > 0)) return { error: "The tray footprint must be positive." };
   const survival = (germination_pct / 100) * (1 - cull_pct / 100);
   const usable_per_tray = cells_per_tray * survival;
-  const trays_to_sow = Math.ceil(plants_required / usable_per_tray);
+  const trays_to_sow = Math.ceil(plants_required / usable_per_tray - 1e-9);
   const cells_sown = trays_to_sow * cells_per_tray;
   const finished_yield = cells_sown * survival;
-  const naive_trays = Math.ceil(plants_required / cells_per_tray);
+  const naive_trays = Math.ceil(plants_required / cells_per_tray - 1e-9);
   const naive_yield = naive_trays * cells_per_tray * survival;
   return {
     survival, cells_per_tray, usable_per_tray, trays_to_sow, cells_sown,
@@ -774,15 +774,15 @@ export function computeSubstrateContainerVolume({ container_count = 0, filled_vo
   if (!(true_gallon_in3 > 0)) return { error: "The true gallon volume must be positive." };
   const loose_volume_ft3 = container_count * filled_volume_in3 / CU_IN_PER_CU_FT;
   const ordered_volume_ft3 = loose_volume_ft3 * (1 + allowance_pct / 100);
-  const bale_count = Math.ceil(ordered_volume_ft3 / bale_loose_yield_ft3);
-  const label_bale_count = Math.ceil(ordered_volume_ft3 / bale_label_ft3);
+  const bale_count = Math.ceil(ordered_volume_ft3 / bale_loose_yield_ft3 - 1e-9);
+  const label_bale_count = Math.ceil(ordered_volume_ft3 / bale_label_ft3 - 1e-9);
   const true_gallon_volume_ft3 = container_count * true_gallon_in3 / CU_IN_PER_CU_FT * (1 + allowance_pct / 100);
   return {
     loose_volume_ft3,
     loose_volume_yd3: loose_volume_ft3 / CU_FT_PER_CU_YD,
     ordered_volume_ft3,
     ordered_volume_yd3: ordered_volume_ft3 / CU_FT_PER_CU_YD,
-    order_yd3: Math.ceil(ordered_volume_ft3 / CU_FT_PER_CU_YD),
+    order_yd3: Math.ceil(ordered_volume_ft3 / CU_FT_PER_CU_YD - 1e-9),
     bale_count, label_bale_count,
     bales_the_label_overorders: label_bale_count - bale_count,
     true_gallon_volume_ft3,

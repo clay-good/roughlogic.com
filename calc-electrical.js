@@ -3138,7 +3138,7 @@ export function computeGroundingElectrodeResistance({
   if (R === null || !Number.isFinite(R)) return { error: "Resistance could not be computed; check inputs." };
 
   // Supplemental electrode count to reach 25 ohms (NEC 250.53(A)(2)).
-  const supplemental_count = R <= 25 ? 0 : Math.ceil(R / 25);
+  const supplemental_count = R <= 25 ? 0 : Math.ceil(R / 25 - 1e-9);
   const meets_25_ohm = R <= 25;
 
   return {

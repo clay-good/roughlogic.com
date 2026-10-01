@@ -252,7 +252,7 @@ export function computeOpacitySixMinute({
   // Run backwards: how many readings at the peak a block could carry and still
   // comply, if the rest were clear.
   const readings_at_peak_allowed = has_peak && peak_reading_pct > 0
-    ? Math.floor(limit_pct * reading_count / peak_reading_pct)
+    ? Math.floor(limit_pct * reading_count / peak_reading_pct + 1e-9)
     : 0;
   const capacity_verdict = !has_peak
     ? "(no peak reading entered)"

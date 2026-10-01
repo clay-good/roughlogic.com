@@ -435,7 +435,7 @@ export function computePicketAnchorSoil({ required_force_lb = 1520, picket_dia =
   if (!(soil in _PICKET_LB[picket_dia])) return { error: "Soil class must be poor, average, or good cohesive, or loose, medium, or dense cohesionless." };
   if (!(embedment_in > 0)) return { error: "Embedment depth must be positive." };
   const design_load_per_picket_lb = _PICKET_LB[picket_dia][soil];
-  const pickets_required = Math.ceil(required_force_lb / design_load_per_picket_lb);
+  const pickets_required = Math.ceil(required_force_lb / design_load_per_picket_lb - 1e-9);
   const group_capacity_lb = pickets_required * design_load_per_picket_lb;
   const standard_pattern_capacity_lb = _STANDARD_PATTERN_PICKETS * design_load_per_picket_lb;
   const shallow = embedment_in < _PICKET_TABLE_EMBED_IN;
@@ -720,9 +720,9 @@ export function computeReliefStorageFloorLoad({ pallet_weight_lb = 2300, footpri
   const average_psf = footprint_psf * coverage_fraction;
   const footprint_ratio = footprint_psf / design_live_load_psf;
   const average_ratio = average_psf / design_live_load_psf;
-  const pallets_allowed = Math.floor(floor_area_sqft * design_live_load_psf / pallet_weight_lb);
-  const stacks_allowed = Math.floor(floor_area_sqft * design_live_load_psf / stack_weight_lb);
-  const stack_positions = Math.floor(floor_area_sqft * coverage_fraction / footprint_area_sqft);
+  const pallets_allowed = Math.floor(floor_area_sqft * design_live_load_psf / pallet_weight_lb + 1e-9);
+  const stacks_allowed = Math.floor(floor_area_sqft * design_live_load_psf / stack_weight_lb + 1e-9);
+  const stack_positions = Math.floor(floor_area_sqft * coverage_fraction / footprint_area_sqft + 1e-9);
   return {
     footprint_area_sqft, stack_weight_lb, footprint_psf, average_psf, footprint_ratio, average_ratio,
     pallets_allowed, stacks_allowed, stack_positions, tiers,

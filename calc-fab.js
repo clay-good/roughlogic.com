@@ -515,9 +515,9 @@ export function computeConduit90Stub({ mode = "stub-up", height_in = 0, deduct_i
     const perShot = Number(per_shot_deg) || 0;
     if (!(radius > 0)) return { error: "Bend radius must be greater than zero (in)." };
     if (!(perShot > 0)) return { error: "Per-shot angle must be greater than zero (deg)." };
-    const n_shots = Math.ceil(90 / perShot);
+    const n_shots = Math.ceil(90 / perShot - 1e-9);
     const arc_per_shot_in = radius * (perShot * Math.PI / 180);
-    const residual_deg = 90 - perShot * Math.floor(90 / perShot);
+    const residual_deg = 90 - perShot * Math.floor(90 / perShot + 1e-9);
     return {
       mode: "segment-90",
       n_shots: Number.isFinite(n_shots) ? n_shots : null,
@@ -620,7 +620,7 @@ export function computeShieldingGasRuntime({ flow_cfh, arc_on_min, cylinder_ft3,
   if (!(cyl > 0)) return { error: "Cylinder volume must be positive (ft3)." };
   const gasUsed = flow * arcOn / 60;
   const runtimePerCyl = cyl / flow;
-  const cylindersNeeded = Math.ceil(gasUsed / cyl);
+  const cylindersNeeded = Math.ceil(gasUsed / cyl - 1e-9);
   const jobGasCost = cost > 0 ? (gasUsed / cyl) * cost : null;
   return {
     gas_used_ft3: gasUsed,
@@ -887,7 +887,7 @@ export function computeWeldMetalVolume({ joint_type = "fillet", fillet_leg_in = 
   const depositIn3 = weldArea * length;
   const depositLb = depositIn3 * 0.2836;
   const fillerLb = depositLb / eff;
-  const passes = Math.ceil(weldArea / maxPass);
+  const passes = Math.ceil(weldArea / maxPass - 1e-9);
   return {
     weld_area_in2: weldArea,
     deposit_in3: depositIn3,
@@ -1113,7 +1113,7 @@ export function computeWeldGroupEccentric({ load_lb = 0, ecc_in = 0, weld_len_in
   const ftx = T * (D / 2) / J;
   const fty = T * (B / 2) / J;
   const fr = Math.sqrt(ftx * ftx + (fd + fty) * (fd + fty));
-  const reqLeg16 = Math.ceil(fr / allow);
+  const reqLeg16 = Math.ceil(fr / allow - 1e-9);
   return {
     total_weld_len_in: Lw,
     polar_moment_in3: J,
@@ -1363,7 +1363,7 @@ export function computeWeldPassesArcTime({ A_groove = 0, length_in = 0, a_pass =
   if (!(len > 0)) return { error: "Weld length must be positive (in)." };
   if (!(ap > 0)) return { error: "Area per pass must be positive (in^2)." };
   if (!(dr > 0)) return { error: "Deposition rate must be positive (lb/h)." };
-  const passes = Math.ceil(ag / ap);
+  const passes = Math.ceil(ag / ap - 1e-9);
   const weight_lb = ag * len * dens;
   const arc_h = weight_lb / dr;
   const total_h = of > 0 ? arc_h / of : null;
@@ -1504,11 +1504,11 @@ export function computeBarstockCutlist({ stock_length_in = 240, piece_length_in 
   if (!(pieces_needed > 0)) return { error: "Pieces needed must be positive." };
   // N pieces from one stick take N-1 internal saw cuts, so N pieces + (N-1) kerfs must fit:
   // N (piece + kerf) - kerf <= stock, i.e. N <= (stock + kerf) / (piece + kerf).
-  const pieces_per_stick = Math.floor((stock_length_in + kerf_in) / (piece_length_in + kerf_in));
+  const pieces_per_stick = Math.floor((stock_length_in + kerf_in) / (piece_length_in + kerf_in) + 1e-9);
   if (pieces_per_stick < 1) return { error: "Piece plus kerf is longer than the stock: no piece fits." };
   const material_per_stick = pieces_per_stick * piece_length_in + (pieces_per_stick - 1) * kerf_in;
   const drop_per_stick_in = stock_length_in - material_per_stick;
-  const sticks_needed = Math.ceil(pieces_needed / pieces_per_stick);
+  const sticks_needed = Math.ceil(pieces_needed / pieces_per_stick - 1e-9);
   const total_stock_in = sticks_needed * stock_length_in;
   const yield_pct = (pieces_needed * piece_length_in) / total_stock_in * 100;
   if (![pieces_per_stick, drop_per_stick_in, sticks_needed, total_stock_in, yield_pct].every(Number.isFinite)) return { error: "Cut-list math is not a finite value." };

@@ -1193,13 +1193,13 @@ export function computeDroneGsdOverlap({ flight_height_ft = 0, focal_length_mm =
   const line_spacing_ft = footprint_width_ft * (1 - side_overlap_pct / 100);
   const shot_interval_ft = footprint_height_ft * (1 - forward_overlap_pct / 100);
   const effective_area_ft2 = line_spacing_ft * shot_interval_ft;
-  const image_count = area_acres > 0 ? Math.ceil(area_acres * SQFT_PER_ACRE / effective_area_ft2) : null;
-  const line_count = area_acres > 0 ? Math.ceil(Math.sqrt(area_acres * SQFT_PER_ACRE) / line_spacing_ft) : null;
+  const image_count = area_acres > 0 ? Math.ceil(area_acres * SQFT_PER_ACRE / effective_area_ft2 - 1e-9) : null;
+  const line_count = area_acres > 0 ? Math.ceil(Math.sqrt(area_acres * SQFT_PER_ACRE) / line_spacing_ft - 1e-9) : null;
   // Halving the height halves the GSD and quadruples the images, because both
   // footprint dimensions halve at once.
   const half_height_gsd_cm_px = gsd_cm_px / 2;
   // From the unrounded coverage, not 4 x an already-rounded count (88 for 85 at 1 ac; fixed 2026-10-01).
-  const half_height_image_count = image_count === null ? null : Math.ceil(4 * area_acres * SQFT_PER_ACRE / effective_area_ft2);
+  const half_height_image_count = image_count === null ? null : Math.ceil(4 * area_acres * SQFT_PER_ACRE / effective_area_ft2 - 1e-9);
   const outs = [gsd_cm_px, footprint_width_ft, footprint_height_ft, line_spacing_ft, shot_interval_ft];
   if (!outs.every(Number.isFinite)) return { error: "Flight planning math is not a finite value." };
   return {
@@ -1265,7 +1265,7 @@ export function computeLidarPointDensity({ pulse_rate_khz = 0, scan_angle_deg = 
   const half_height_density = densityFor(flight_height_m / 2, ground_speed_ms);
   const half_height_line_multiple = swath_width_m / half_height_swath_m;
   const area_m2 = area_acres > 0 ? area_acres * M2_PER_ACRE : null;
-  const line_count = area_m2 === null ? null : Math.ceil(Math.sqrt(area_m2) / line_spacing_m);
+  const line_count = area_m2 === null ? null : Math.ceil(Math.sqrt(area_m2) / line_spacing_m - 1e-9);
   const outs = [swath_width_m, point_density_per_m2, point_spacing_m, line_spacing_m, half_speed_density, half_height_density];
   if (!outs.every(Number.isFinite)) return { error: "LiDAR density math is not a finite value." };
   return {

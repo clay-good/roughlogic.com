@@ -1760,7 +1760,7 @@ export function computeWellPointSpacing({ excavation_depth_ft = 0, water_table_d
   const drawdown_per_stage_ft = total_drawdown_ft / stages_required;
   const single_stage_sufficient = stages_required <= 1;
   const perimeter_ft = 2 * (excavation_length_ft + excavation_width_ft);
-  const points_per_stage = Math.ceil(perimeter_ft / point_spacing_ft);
+  const points_per_stage = Math.ceil(perimeter_ft / point_spacing_ft - 1e-9);
   const point_count = points_per_stage * stages_required;
   const system_capacity_gpm = point_capacity_gpm > 0 ? points_per_stage * point_capacity_gpm : null;
   const header_length_ft = perimeter_ft * stages_required;

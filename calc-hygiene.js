@@ -217,7 +217,7 @@ export function computeRespiratorCartridgeLife({
   if (humidity_pct < 0 || humidity_pct > 100) return { error: "Relative humidity must be between 0 and 100 percent." };
   if (!(humidity_derate_above_65 > 0) || humidity_derate_above_65 > 1) return { error: "The humidity derate must be above 0 and no more than 1." };
   const schedule_hr = estimated_life_hr * safety_fraction;
-  const changes_per_shift = Math.ceil(shift_hours / schedule_hr) - 1;
+  const changes_per_shift = Math.ceil(shift_hours / schedule_hr - 1e-9) - 1;
   const schedule_verdict = "an estimated " + fmt(estimated_life_hr, 1) + " hour service life at a " + fmt(safety_fraction * 100, 0) + "% safety fraction gives a " + fmt(schedule_hr, 1) + " hour change schedule -- "
     + (changes_per_shift <= 0
       ? "one cartridge covers a " + fmt(shift_hours, 1) + " hour shift"
@@ -378,7 +378,7 @@ export function computeFixedLadderFallProtection({
         : isPfas
           ? "a personal fall arrest arrangement satisfies the requirement, provided the anchorage is adequate for it"
           : "NO FALL PROTECTION IS PRESENT on a ladder that requires it. A ladder safety system or a personal fall arrest arrangement is needed";
-  const rest_platforms_required = Math.max(0, Math.ceil(ladder_height_ft / rest_platform_interval_ft) - 1);
+  const rest_platforms_required = Math.max(0, Math.ceil(ladder_height_ft / rest_platform_interval_ft - 1e-9) - 1);
   const longest_unbroken_climb_ft = rest_platforms_required > 0
     ? ladder_height_ft / (rest_platforms_required + 1)
     : ladder_height_ft;

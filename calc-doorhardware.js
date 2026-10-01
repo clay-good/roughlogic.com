@@ -106,7 +106,7 @@ export function computeDoorCloserForce({ door_width_in = 0, door_height_in = 0, 
   // ANSI/BHMA A156.4 size bands run 1 through 6 by door width, one size per
   // six inches from a 30 in size-1 door. A heavy leaf or a pressure
   // difference across the opening pushes the selection up a size.
-  const width_size = Math.min(6, Math.max(1, Math.ceil((door_width_in - 24) / 6)));
+  const width_size = Math.min(6, Math.max(1, Math.ceil((door_width_in - 24) / 6 - 1e-9)));
   const heavy_bump = door_weight_lb > 100 ? 1 : 0;
   const pressure_bump = pressure_difference_inwc >= 0.05 ? 1 : 0;
   const closer_size = Math.min(6, width_size + heavy_bump + pressure_bump);
@@ -318,7 +318,7 @@ export function computeElectricLockPowerBudget({ device_count = 0, holding_curre
   const amp_hours_after_derate = amp_hours_required / battery_derate;
   const battery_margin_ah = installed_battery_ah - amp_hours_after_derate;
   const battery_ok = installed_battery_ah >= amp_hours_after_derate;
-  const batteries_needed = Math.ceil(amp_hours_after_derate / installed_battery_ah);
+  const batteries_needed = Math.ceil(amp_hours_after_derate / installed_battery_ah - 1e-9);
   return {
     steady_current_a, peak_inrush_a, supply_margin_a, supply_ok, inrush_ok,
     standby_amp_hours, alarm_amp_hours, amp_hours_required, amp_hours_after_derate, battery_margin_ah, battery_ok, batteries_needed,
@@ -439,7 +439,7 @@ export function computeMasterKeyCapacity({ cut_positions = 0, usable_depths = 0,
   // master's own depth was never subtracted (5^6 = 15,625). An odd depth
   // count splits unevenly (7 depths: 0-2-4-6 and 1-3-5), and the master sits
   // in the larger parity group; until 2026-09-30 the floor undercounted it.
-  const per_mastered_position = Math.ceil(usable_depths / 2) - 1;
+  const per_mastered_position = Math.ceil(usable_depths / 2 - 1e-9) - 1;
   if (!(per_mastered_position >= 1)) return { error: "A two-step progression needs at least 3 usable depths: the master takes one depth of its parity group." };
   const change_keys_available = Math.pow(per_mastered_position, mastered_positions);
   const alternative_change_keys = Math.pow(per_mastered_position, alternative_mastered_positions);
@@ -749,11 +749,11 @@ export function computeRevolvingDoorThroughput({ rpm = 0, wings = 0, people_per_
   const total_per_hour = effective_per_hour * device_count;
   const peak_people = building_population * peak_fraction_pct / 100;
   const peak_rate_per_hour = peak_people / (peak_window_min / 60);
-  const devices_required = Math.ceil(peak_rate_per_hour / effective_per_hour);
+  const devices_required = Math.ceil(peak_rate_per_hour / effective_per_hour - 1e-9);
   const cleared_in_peak = total_per_hour * (peak_window_min / 60);
   const queue_at_peak = Math.max(0, peak_people - cleared_in_peak);
   const average_rate_per_hour = building_population / operating_hours;
-  const devices_by_average = Math.ceil(average_rate_per_hour / effective_per_hour);
+  const devices_by_average = Math.ceil(average_rate_per_hour / effective_per_hour - 1e-9);
   return {
     theoretical_per_hour, effective_per_hour, total_per_hour, peak_people, peak_rate_per_hour,
     devices_required, cleared_in_peak, queue_at_peak, average_rate_per_hour, devices_by_average,

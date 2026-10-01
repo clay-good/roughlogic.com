@@ -101,7 +101,7 @@ export const SCRIBNER_TABLE_16FT = { 6: 20, 7: 30, 8: 30, 9: 40, 10: 60, 11: 70,
 // section at the small-end diameter (59.6 bf; 24% low at 6 in).
 function _international14Bf(D, L) {
   const sec = (d) => 0.905 * (0.22 * d * d - 0.71 * d);
-  const n = Math.floor(L / 4);
+  const n = Math.floor(L / 4 + 1e-9);
   let bf = 0;
   for (let i = 0; i < n; i++) bf += sec(D + 0.5 * i);
   const rem = L - 4 * n;
@@ -278,7 +278,7 @@ export function computeUniformity({ catch_volumes = [] }) {
   const cu = 100 * (1 - sumAbs / (vals.length * mean));
   // DU = 100 * mean(low quartile) / mean.
   const sorted = [...vals].sort((a, b) => a - b);
-  const lowQ = sorted.slice(0, Math.max(1, Math.floor(sorted.length / 4)));
+  const lowQ = sorted.slice(0, Math.max(1, Math.floor(sorted.length / 4 + 1e-9)));
   const lowMean = lowQ.reduce((a, b) => a + b, 0) / lowQ.length;
   const du = (lowMean / mean) * 100;
   return { mean, CU: cu, DU: du, pass_CU_85: cu >= 85, pass_DU_75: du >= 75 };
@@ -829,7 +829,7 @@ export function computeSprayerCalibration({
     if (Number.isFinite(v)) total_volume_gal = v;
   }
   if (tank > 0 && Number.isFinite(tank)) {
-    if (total_volume_gal != null) tank_loads = Math.ceil(total_volume_gal / tank);
+    if (total_volume_gal != null) tank_loads = Math.ceil(total_volume_gal / tank - 1e-9);
     if (gpa_actual > 0) { const a = tank / gpa_actual; if (Number.isFinite(a)) acres_per_tank = a; }
   }
 
@@ -1545,7 +1545,7 @@ function _npkBags(totalLb, bagLb) {
   const bw = (Number(bagLb) > 0 && Number.isFinite(Number(bagLb))) ? Number(bagLb) : 50;
   const t = Number(totalLb);
   if (!Number.isFinite(t) || t <= 0) return 0;
-  return Math.ceil(t / bw);
+  return Math.ceil(t / bw - 1e-9);
 }
 
 function cap(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
@@ -1666,7 +1666,7 @@ export function computeTankMix({
 
   if (area > 0) {
     out.field_area_acres = area;
-    out.tanks_needed = Math.ceil(area / acres_per_tank);
+    out.tanks_needed = Math.ceil(area / acres_per_tank - 1e-9);
     out.total_product_unit = area * rate;
     out.total_carrier_water_gal = area * gpa;
     if (isLiquid) {
@@ -2217,7 +2217,7 @@ export function computeSprayerFieldCapacity({ boom_width_ft, speed_mph, field_ef
   const effective = theoretical * (eff / 100);
   const sprayTime = acres / effective;
   const acresPerTank = tank / gpaVal;
-  const tanksNeeded = Math.ceil(acres / acresPerTank);
+  const tanksNeeded = Math.ceil(acres / acresPerTank - 1e-9);
   return {
     theoretical_ac_hr: theoretical,
     effective_ac_hr: effective,
@@ -2458,7 +2458,7 @@ export function computeIrrigationZoneRuntime({ target_in = 0, precip_in_hr = 0, 
   // while crediting IA, over-watering by about 13% at that DU.
   const rtm = 1 / (0.4 + 0.6 * du);
   const gross_min = net_min * rtm;
-  const cycles = Math.ceil(gross_min / max_cycle_min);
+  const cycles = Math.ceil(gross_min / max_cycle_min - 1e-9);
   const per_cycle_min = gross_min / cycles;
   return {
     net_min, gross_min, rtm, cycles, per_cycle_min,
@@ -2498,7 +2498,7 @@ export function computeDripZoneFlow({ mode = "inline", tubing_ft = 0, spacing_in
   } else {
     if (!(tubing_ft > 0)) return { error: "Tubing length must be positive (ft)." };
     if (!(spacing_in > 0)) return { error: "Emitter spacing must be positive (in)." };
-    emitters = Math.floor(tubing_ft * 12 / spacing_in);
+    emitters = Math.floor(tubing_ft * 12 / spacing_in + 1e-9);
   }
   if (!(emitters >= 1)) return { error: "The tubing and spacing (or count) give no whole emitter." };
   const zone_gph = emitters * emitter_gph;
@@ -2539,8 +2539,8 @@ export function computePlantSpacingCount({ bed_ft2 = 0, spacing_in = 0 } = {}) {
   if (!(bed_ft2 > 0)) return { error: "Bed area must be positive (ft^2)." };
   if (!(spacing_in > 0)) return { error: "On-center spacing must be positive (in)." };
   const s_ft = spacing_in / 12;
-  const square_n = Math.ceil(bed_ft2 / (s_ft * s_ft));
-  const triangular_n = Math.ceil(bed_ft2 / (0.866 * s_ft * s_ft));
+  const square_n = Math.ceil(bed_ft2 / (s_ft * s_ft) - 1e-9);
+  const triangular_n = Math.ceil(bed_ft2 / (0.866 * s_ft * s_ft) - 1e-9);
   return {
     square_n, triangular_n,
     note: "Square grid: plants = bed area / spacing^2 (rows and columns square). Triangular (staggered 60-degree) grid: plants = bed area / (0.866 x spacing^2) - the 0.866 = sqrt(3)/2 row offset packs about 15% more plants into the same bed because the offset rows sit closer, the way groundcover is actually planted. The spacing comes from the plant's mature spread or the planting plan, edge plants are rounded up so the bed is covered, and this is a planting-density count, not a horticultural plan.",
@@ -2573,8 +2573,8 @@ export function computeSodTakeoff({ lawn_ft2 = 0, waste_pct = 0, slab_ft2 = 10, 
   if (!(pallet_ft2 > 0)) return { error: "Pallet coverage must be positive (ft^2)." };
   const order_ft2 = lawn_ft2 * (1 + waste_pct / 100);
   const order_syd = order_ft2 / 9;
-  const slabs = Math.ceil(order_ft2 / slab_ft2);
-  const pallets = Math.ceil(order_ft2 / pallet_ft2);
+  const slabs = Math.ceil(order_ft2 / slab_ft2 - 1e-9);
+  const pallets = Math.ceil(order_ft2 / pallet_ft2 - 1e-9);
   return {
     order_ft2, order_syd, slabs, pallets,
     note: "Ordered area = lawn area x (1 + waste/100), restated in square yards (/9); slabs = ceil(order / slab coverage); pallets = ceil(order / pallet coverage). The waste allowance covers the cuts and edges of a curvy lawn. Slab and pallet sizes vary by farm and grass (defaults ~10 ft^2 per slab, ~450 ft^2 per pallet, both editable); the supplier's published piece and skid sizes govern. This is a material takeoff, not a site-prep or establishment plan.",

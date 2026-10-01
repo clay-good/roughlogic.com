@@ -653,14 +653,14 @@ export function computeTankBottomAnodeLayout({ tank_diameter_ft = 0, current_den
   // line, and the line just across the centreline can be nearest.
   const s = grid_spacing_ft;
   const toChord = (x, y, ly) => Math.hypot(Math.max(0, Math.abs(x) - Math.sqrt(radius_ft * radius_ft - ly * ly)), y - ly);
-  const last_line = Math.ceil((radius_ft - s / 2) / s) - 1;
+  const last_line = Math.ceil((radius_ft - s / 2) / s - 1e-9) - 1;
   let grid_to_farthest_ft = s / 2;
   const RIM_STEPS = 16384;
   for (let i = 0; i <= RIM_STEPS; i++) {
     const a = (Math.PI / 2) * i / RIM_STEPS;
     const x = radius_ft * Math.cos(a);
     const y = radius_ft * Math.sin(a);
-    const k = Math.min(last_line, Math.max(0, Math.floor((y - s / 2) / s)));
+    const k = Math.min(last_line, Math.max(0, Math.floor((y - s / 2) / s + 1e-9)));
     const candidates = [-s / 2, s / 2 + k * s, s / 2 + (k + 1) * s].filter((ly) => Math.abs(ly) < radius_ft);
     grid_to_farthest_ft = Math.max(grid_to_farthest_ft, Math.min(...candidates.map((ly) => toChord(x, y, ly))));
   }
@@ -734,12 +734,12 @@ export function computeCloseIntervalSurveyReadings({ survey_length_mi = 0, readi
     length_ft, reading_count, data_points,
     test_station_readings,
     readings_between_stations: reading_count - test_station_readings,
-    spool_setups: Math.ceil(length_ft / spool_length_ft),
+    spool_setups: Math.ceil(length_ft / spool_length_ft - 1e-9),
     field_days,
     field_hours: field_days * crew_day_hours,
     reading_hours,
     meter_busy_pct: 100 * reading_hours / (field_days * crew_day_hours),
-    alternative_reading_count: Math.floor(length_ft / alternative_interval_ft),
+    alternative_reading_count: Math.floor(length_ft / alternative_interval_ft + 1e-9),
     alternative_field_days: field_days * reading_interval_ft / alternative_interval_ft,
     note: "The survey's whole value is the readings BETWEEN the test stations, because that is where a coating holiday lives and where nothing else looks. The meter is busy for a small share of the field time; the rest is walking, access, wire, and terrain -- which is why production rate, not reading rate, is the number to quote a survey from. Doubling the interval halves the count and roughly halves the field time, and it also steps over half the holidays: a survey that misses the feature it was commissioned to find has not saved money, it has bought a clean report on an unprotected line. The alternative field time here scales linearly with the interval, which overstates the saving because walking does not shrink. NACE SP0207 (now AMPP) governs close interval survey practice.",
   };
@@ -929,8 +929,8 @@ export function computeCokeBreezeBackfill({ hole_diameter_in = 0, hole_depth_ft 
     anode_share_pct: 100 * anode_ft3 / column_ft3,
     bed_backfill_ft3, bed_backfill_lb,
     bed_backfill_tons: bed_backfill_lb / 2000,
-    bag_count: Math.ceil(bed_backfill_lb / bag_weight_lb),
-    bag_count_with_waste: Math.ceil(bed_backfill_lb * (1 + waste_pct / 100) / bag_weight_lb),
+    bag_count: Math.ceil(bed_backfill_lb / bag_weight_lb - 1e-9),
+    bag_count_with_waste: Math.ceil(bed_backfill_lb * (1 + waste_pct / 100) / bag_weight_lb - 1e-9),
     base_resistance_ohm,
     narrower_resistance_ohm,
     narrower_change_pct: 100 * (narrower_resistance_ohm - base_resistance_ohm) / base_resistance_ohm,

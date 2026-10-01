@@ -1493,7 +1493,7 @@ export function computeRefrigerantRecoveryTime({ total_charge_lb = 0, liquid_cha
   const all_vapor_min = total_charge_lb / vapor_rate_lb_min;
   const speedup_factor = all_vapor_min / recovery_min;
   const minutes_saved = all_vapor_min - recovery_min;
-  const cylinders = cylinder_net_lb > 0 ? Math.ceil(total_charge_lb / cylinder_net_lb) : null;
+  const cylinders = cylinder_net_lb > 0 ? Math.ceil(total_charge_lb / cylinder_net_lb - 1e-9) : null;
   if (![vapor_charge_lb, liquid_min, vapor_min, recovery_min, total_min, all_vapor_min, speedup_factor].every(Number.isFinite)) return { error: "Recovery-time math is not a finite value." };
   return {
     liquid_min,

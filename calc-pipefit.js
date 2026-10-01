@@ -147,7 +147,7 @@ export function computeRacewayExpansion({ run_length_ft = 0, temp_range_f = 0, a
   const per_100ft_in = alpha * 1200 * dT;
   const requires_fitting = length_change_in >= threshold;
   let fittings_needed = 0;
-  if (requires_fitting) fittings_needed = (travel > 0) ? Math.ceil(length_change_in / travel) : null;
+  if (requires_fitting) fittings_needed = (travel > 0) ? Math.ceil(length_change_in / travel - 1e-9) : null;
   const notes = [];
   if (!requires_fitting) notes.push("Computed movement " + fmt(length_change_in, 3) + " in is below the " + fmt(threshold, 2) + " in threshold; NEC 352.44 does not require an expansion fitting for this straight run.");
   if (fittings_needed === null) notes.push("Enter the fitting's rated travel to size the fitting count.");
@@ -196,7 +196,7 @@ export function computePipeSpacingRack({ pipe_od_in = 0, insulation_thickness_in
   let pipes_that_fit = null, remaining_in = null;
   const W = Number(rack_width_in) || 0;
   if (W > 0) {
-    pipes_that_fit = Math.max(0, Math.floor((W + gap) / center_to_center_in));
+    pipes_that_fit = Math.max(0, Math.floor((W + gap) / center_to_center_in + 1e-9));
     remaining_in = W - total_bundle_width_in;
     if (remaining_in < 0) notes.push("The " + n + "-pipe bundle (" + fmt(total_bundle_width_in, 2) + " in) is wider than the " + fmt(W, 1) + " in rack; only " + pipes_that_fit + " of these pipes fit.");
   }

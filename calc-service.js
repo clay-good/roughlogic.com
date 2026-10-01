@@ -226,7 +226,7 @@ export function computePipeSupportSpacing({ material = "copper", pipe_size, run_
   const tbl = Array.isArray(table) ? table : SUPPORT_SPACING_TABLE;
   const spacing = _supportLookup(tbl, material, size, orientation);
   if (!Number.isFinite(spacing) || spacing <= 0) return { error: "No support-spacing entry for that material and size." };
-  const hangers = Math.ceil(run / spacing) + 1;
+  const hangers = Math.ceil(run / spacing - 1e-9) + 1;
   if (!Number.isFinite(hangers)) return { error: "Hanger count is not a finite value." };
   return {
     max_spacing_ft: spacing,
@@ -295,7 +295,7 @@ export function computeSoftenerSizing({ people, use_per_cap = 75, hardness_gpg, 
   const dailyGal = ppl * use;
   const grainLoad = dailyGal * compHardness;
   if (!(grainLoad > 0)) return { error: "Grain load must be positive; raise hardness or usage." };
-  const daysBetween = Math.floor(cap / grainLoad);
+  const daysBetween = Math.floor(cap / grainLoad + 1e-9);
   const annualSalt = salt * 365 / Math.max(daysBetween, 1);
   if (![compHardness, dailyGal, grainLoad, daysBetween, annualSalt].every(Number.isFinite)) return { error: "Softener math is not a finite value." };
   return {

@@ -2150,7 +2150,7 @@ export function computeCuringCompoundCoverage({ slab_area_sf = 2500, coats = 1, 
   if (waste_pct < 0) return { error: "Waste cannot be negative (percent)." };
   const gallons_exact = slab_area_sf * coats / coverage_sf_per_gal * (100 + waste_pct) / 100;
   const gallons_needed = Math.ceil(gallons_exact);
-  const pails_5gal = Math.ceil(gallons_needed / 5);
+  const pails_5gal = Math.ceil(gallons_needed / 5 - 1e-9);
   if (![gallons_exact, gallons_needed, pails_5gal].every(Number.isFinite)) return { error: "Coverage math is not a finite value." };
   return {
     gallons_exact,
@@ -2190,7 +2190,7 @@ export function computeConcreteIsolationJoint({ slab_length_ft = 40, slab_width_
   const slab_perimeter_ft = 2 * (slab_length_ft + slab_width_ft);
   const column_isolation_ft = Math.round(num_columns) * column_perimeter_ft;
   const filler_lf = slab_perimeter_ft + column_isolation_ft;
-  const strips = Math.ceil(filler_lf / strip_length_ft);
+  const strips = Math.ceil(filler_lf / strip_length_ft - 1e-9);
   if (![slab_perimeter_ft, column_isolation_ft, filler_lf, strips].every(Number.isFinite)) return { error: "Isolation-joint math is not a finite value." };
   return {
     slab_perimeter_ft,
@@ -2276,7 +2276,7 @@ export function computeSlabDowelSchedule({ joint_length_ft = 40, slab_thickness_
   if (!(num_joints >= 1)) return { error: "Number of joints must be at least 1." };
   // One dowel every spacing along the joint, inset from each edge, plus one to start.
   const usable_in = joint_length_ft * 12 - 2 * edge_clearance_in;
-  const dowels_per_joint = usable_in <= 0 ? 1 : Math.floor(usable_in / dowel_spacing_in) + 1;
+  const dowels_per_joint = usable_in <= 0 ? 1 : Math.floor(usable_in / dowel_spacing_in + 1e-9) + 1;
   const total_dowels = dowels_per_joint * Math.round(num_joints);
   const dowel_diameter_in = slab_thickness_in / 8;
   if (![dowels_per_joint, total_dowels, dowel_diameter_in].every(Number.isFinite)) return { error: "Dowel-schedule math is not a finite value." };

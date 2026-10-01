@@ -2425,7 +2425,7 @@ export function computeVbeltDrive({
   const belt_length_in = 2 * C + (Math.PI / 2) * (d1 + d2) + ((d2 - d1) ** 2) / (4 * C);
   const design_hp = hp * sf;
   const hp_per_belt = _VBELT_HP_PER_BELT[belt_section];
-  const belts = Math.max(1, Math.ceil(design_hp / hp_per_belt));
+  const belts = Math.max(1, Math.ceil(design_hp / hp_per_belt - 1e-9));
 
   const warnings = [];
   if (ratio > 7) warnings.push("Speed ratio above 7:1 is outside the typical single-belt range; consider a two-stage or geared drive.");

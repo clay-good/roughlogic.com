@@ -253,7 +253,7 @@ export function computeStatistics({ values }) {
   const sum = nums.reduce((a, b) => a + b, 0);
   const mean = sum / n;
   // Median
-  const mid = Math.floor(n / 2);
+  const mid = Math.floor(n / 2 + 1e-9);
   const median = n % 2 === 0 ? (sorted[mid - 1] + sorted[mid]) / 2 : sorted[mid];
   // Mode (all values tied for highest frequency; empty array if all values are unique).
   const freq = new Map();

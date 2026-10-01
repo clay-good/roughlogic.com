@@ -189,8 +189,8 @@ export function computeConcreteVolume({ shape, waste_factor = 0.10, ...d }) {
   // 60 lb bag yields ~ 0.45 ft³; 80 lb bag yields ~ 0.60 ft³ of mixed concrete.
   // Use the with-waste cubic-foot total so the count covers a job's actual purchase.
   const cubic_ft_with_waste = with_waste * 27;
-  const bags_60lb = Math.ceil(cubic_ft_with_waste / 0.45);
-  const bags_80lb = Math.ceil(cubic_ft_with_waste / 0.60);
+  const bags_60lb = Math.ceil(cubic_ft_with_waste / 0.45 - 1e-9);
+  const bags_80lb = Math.ceil(cubic_ft_with_waste / 0.60 - 1e-9);
   return {
     cubic_feet: cubic_ft, cubic_yards, cubic_yards_with_waste: with_waste, waste_factor,
     bags_60lb, bags_80lb,
@@ -212,8 +212,8 @@ export function computeRebar({ length_ft, width_ft, spacing_in, edge_clearance_i
   const width_in = width_ft * 12;
   const usable_l = Math.max(0, length_in - 2 * edge_clearance_in);
   const usable_w = Math.max(0, width_in - 2 * edge_clearance_in);
-  const bars_along_width = Math.floor(usable_l / spacing_in) + 1;
-  const bars_along_length = Math.floor(usable_w / spacing_in) + 1;
+  const bars_along_width = Math.floor(usable_l / spacing_in + 1e-9) + 1;
+  const bars_along_length = Math.floor(usable_w / spacing_in + 1e-9) + 1;
   const total_length_in = bars_along_width * (width_in - 2 * edge_clearance_in) + bars_along_length * (length_in - 2 * edge_clearance_in);
   const total_length_ft = total_length_in / 12;
   return {
@@ -862,7 +862,7 @@ export function computeFootingArea({ column_load_lb, soil_class, applied_moment_
   const side_ft = Math.sqrt(required_area_ft2);
   // Round side up to next 6-inch increment.
   const side_in = side_ft * 12;
-  const rounded_side_in = Math.ceil(side_in / 6) * 6;
+  const rounded_side_in = Math.ceil(side_in / 6 - 1e-9) * 6;
   const b_ft = rounded_side_in / 12;
   // v23 EN.10: actual bearing pressure check vs allowable, with the eccentric
   // (non-uniform) case flagged when a moment is entered. For a square pad of
@@ -1481,7 +1481,7 @@ export function computeDrywall({ wall_area_ft2 = 0, ceiling_area_ft2 = 0, sheet_
   if (!sheetA) return { error: "Unknown sheet size." };
   const total_ft2 = wall_area_ft2 + ceiling_area_ft2;
   if (total_ft2 === 0) return { error: "Provide a wall or ceiling area." };
-  const sheets = Math.ceil((total_ft2 * (1 + waste_percent / 100)) / sheetA);
+  const sheets = Math.ceil((total_ft2 * (1 + waste_percent / 100)) / sheetA - 1e-9);
   // The rates the citation states (USG / GA-216 practice): about 1 gal of
   // ready-mix per 70 ft^2 and 0.4 lf of tape per ft^2. Until 2026-09-18 the
   // code used 0.053 gal and 1.0 lf per ft^2, 3.7x and 2.5x its own citation.
@@ -1519,7 +1519,7 @@ export function computeRoofingSquares({ roof_area_ft2 = 0, pitch_rise = 0, shing
   const squares = (roof_area_ft2 / 100) * (1 + waste);
   const bundles = Math.ceil(squares * bundlesPerSquare);
   // Underlayment: 4 squares per roll (typical 15 lb felt or synthetic).
-  const underlayment_rolls = Math.ceil(squares / 4);
+  const underlayment_rolls = Math.ceil(squares / 4 - 1e-9);
   return {
     squares,
     bundles,
@@ -1544,7 +1544,7 @@ export function computeAsphaltTonnage({ area_ft2 = 0, depth_in = 0, density_pcf 
   if (!(density_pcf > 0)) return { error: "Density must be positive." };
   const volume_ft3 = area_ft2 * (depth_in / 12);
   const tons = (volume_ft3 * density_pcf) / 2000;
-  const truck_loads_at_20T = Math.ceil(tons / 20);
+  const truck_loads_at_20T = Math.ceil(tons / 20 - 1e-9);
   // v8 §C.4: paving distance at the entered paving width. Lets the foreman
   // see "this much asphalt = X feet of road at Y ft wide".
   const paving_distance_ft = paving_width_ft > 0
@@ -2351,7 +2351,7 @@ export function computeStairStringerV7({
   if (!(target_rise_in > 0)) return { error: "Target rise must be positive." };
   if (!(target_tread_in > 0)) return { error: "Target tread must be positive." };
   if (!(stringer_thickness_in > 0)) return { error: "Stringer thickness must be positive." };
-  const riser_count = Math.ceil(total_rise_in / target_rise_in);
+  const riser_count = Math.ceil(total_rise_in / target_rise_in - 1e-9);
   const exact_rise_in = total_rise_in / riser_count;
   const tread_count = Math.max(1, riser_count - 1);
   const total_run_in = tread_count * target_tread_in;
@@ -2393,7 +2393,7 @@ export function computeHipValleyRafter({
   // A non-positive jack spacing would make `n * dx_oc_ft < run_ft` loop
   // forever and exhaust memory (v18 C-6/D-6).
   if (!(dx_oc_ft > 0)) return { error: "Jack spacing must be positive." };
-  const jack_count = Math.max(0, Math.ceil(run_ft / dx_oc_ft) - 1);
+  const jack_count = Math.max(0, Math.ceil(run_ft / dx_oc_ft - 1e-9) - 1);
   if (jack_count > 10000) return { error: "Jack schedule exceeds the 10,000-row safety limit." };
   const jacks = [];
   let n = 1;
@@ -2886,20 +2886,20 @@ export function computeResidentialFraming({
   if (!(building_run_ft > 0)) return { error: "Building run must be positive." };
   // Stud count: every wall stud plus per-corner / per-T extras (engineering practice ~ 1 stud per linear ft for 16 OC).
   const stud_oc_ft = stud_oc_in / 12;
-  const stud_count = Math.ceil(perimeter_ft / stud_oc_ft) + 2 * 4; // approx 8 corner / T allowance for a simple rectangle
+  const stud_count = Math.ceil(perimeter_ft / stud_oc_ft - 1e-9) + 2 * 4; // approx 8 corner / T allowance for a simple rectangle
   // Plates: 1 sole + 2 top = 3 lengths × perimeter + ~ 10% waste.
   const plate_lf = Math.ceil(perimeter_ft * 3 * 1.10);
   // Joists: count = ceil(footprint span_ft / oc_ft) + 1.
   const joist_oc_ft = joist_oc_in / 12;
   // Approximate joist count: 2 × footprint area / (joist_span × joist_oc).
-  const joist_count = Math.ceil(footprint_ft2 / (joist_span_ft * joist_oc_ft)) + 2;
+  const joist_count = Math.ceil(footprint_ft2 / (joist_span_ft * joist_oc_ft) - 1e-9) + 2;
   // Rafters per side: pairs along the building length; common rafter run multiplier from utility 247.
   const m_common = Math.sqrt(pitch * pitch + 144) / 12;
   const rafter_length_ft = building_run_ft * m_common;
   const rafter_oc_ft = rafter_oc_in / 12;
   // Rafter count assuming the building length equals the longer footprint dimension; conservative 2 rafters per OC unit.
   const approx_length_ft = footprint_ft2 / (2 * building_run_ft);
-  const rafter_count = Math.ceil(approx_length_ft / rafter_oc_ft) * 2 + 2; // both sides + ridge ends
+  const rafter_count = Math.ceil(approx_length_ft / rafter_oc_ft - 1e-9) * 2 + 2; // both sides + ridge ends
   // Board feet rollup. 2x4 = 0.667 bf/ft; 2x6 = 1.0; 2x8 = 1.333; 2x10 = 1.667; 2x12 = 2.0.
   const BF_PER_FT = { "2x4": 0.667, "2x6": 1.0, "2x8": 1.333, "2x10": 1.667, "2x12": 2.0 };
   if (!BF_PER_FT[stud_size]) return { error: "Unknown stud size." };
@@ -3051,7 +3051,7 @@ export function computeExcavationBenchPlan({
   // Bench-step layout (Type A / B only).
   let bench_layout = null;
   if (soil_class === "A" || soil_class === "B") {
-    const bench_count = Math.ceil(D / BENCH_HEIGHT_FT);
+    const bench_count = Math.ceil(D / BENCH_HEIGHT_FT - 1e-9);
     const last_bench_height_ft = D - (bench_count - 1) * BENCH_HEIGHT_FT;
     const step_per_bench_ft = BENCH_HEIGHT_FT * ratio;
     bench_layout = {
@@ -3312,7 +3312,7 @@ export function computeHeaderSizing({
   const reaction_lb = w_plf * span / 2;
   const fcp = LUMBER_FC_PERP_PSI[_v15cSpeciesPrefix(species_grade)] || 425;
   const jack_capacity_lb = fcp * 5.25;
-  const jack_studs_each_end = Math.max(1, Math.ceil(reaction_lb / jack_capacity_lb));
+  const jack_studs_each_end = Math.max(1, Math.ceil(reaction_lb / jack_capacity_lb - 1e-9));
 
   const ply_label = member.plies === 1 ? "single" : member.plies === 2 ? "double" : "triple";
   const member_label = "(" + member.plies + ") " + member.size + " " + species_grade.replace("_", " ");
@@ -3687,7 +3687,7 @@ export function computeDeckLedgerFasteners({ joist_span_ft = 0, spacing_in = 0, 
   // here undercounts by one on a non-even ledger (a 15 ft ledger at 16 in would
   // give 12, implying a 16.4 in gap that exceeds the IRC max) -- it only matched
   // when the length was an even multiple of the spacing.
-  const fastener_count = Math.ceil((len * 12) / spacing) + 1;
+  const fastener_count = Math.ceil((len * 12) / spacing - 1e-9) + 1;
   return { spacing_in: spacing, fastener_count, joist_span_ft: span, within_table, pass: within_table, fastener: String(fastener || "") };
 }
 
@@ -4574,10 +4574,10 @@ export function computeFenceEstimate({ length_ft = 0, post_spacing_ft = 8, rails
   if (!(length_ft > 0)) return { error: "Fence run must be positive." };
   if (!(post_spacing_ft > 0)) return { error: "Post spacing must be positive." };
   if (!(rails_per_section > 0)) return { error: "Rails per section must be positive." };
-  const sections = Math.ceil(length_ft / post_spacing_ft);
+  const sections = Math.ceil(length_ft / post_spacing_ft - 1e-9);
   const posts = sections + 1;
   const rails = sections * rails_per_section;
-  const pickets = picket_width_in > 0 ? Math.ceil(length_ft * 12 / (picket_width_in + picket_gap_in)) : null;
+  const pickets = picket_width_in > 0 ? Math.ceil(length_ft * 12 / (picket_width_in + picket_gap_in) - 1e-9) : null;
   return {
     sections, posts, rails, pickets,
     note: "For a straight run the posts are the sections plus one; every corner, end, and gate post is an extra you add by eye from the layout. Rails are the sections times the rails per section (2 for most privacy and picket fence, 3 for tall or ranch rail). Pickets divide the run by the picket width plus the gap. Add a waste allowance and order full bundles - this is the material count, post-hole-concrete sizes the footing.",
@@ -4622,7 +4622,7 @@ export function computePostHoleConcrete({ num_posts = 0, hole_diameter_in = 0, h
     concrete_each_cuft: concrete_each,
     total_cuft,
     total_cuyd: total_cuft / 27,
-    bags: Math.ceil(total_cuft / bag_yield_cuft),
+    bags: Math.ceil(total_cuft / bag_yield_cuft - 1e-9),
     note: "The concrete per hole is the cylinder volume less what the post displaces, so set the post side to net it out. A 60-lb bag yields about 0.45 cu ft and an 80-lb bag about 0.60 cu ft of mixed concrete - match the yield to the bag you buy. The rule of thumb sets the hole depth at about a third of the post's above-grade height and below the frost line, with the diameter about three times the post width. Round bags up and add a bag or two for spillage.",
   };
 }
@@ -4667,8 +4667,8 @@ export function computeControlJointSpacing({ slab_thickness_in = 0, spacing_fact
   if (!(max_spacing_ft > 0)) return { error: "Maximum spacing must be positive." };
   const spacing_ft = Math.min(spacing_factor * slab_thickness_in, max_spacing_ft);
   const depth_in = 0.25 * slab_thickness_in;
-  const panels_long = slab_length_ft > 0 ? Math.ceil(slab_length_ft / spacing_ft) : null;
-  const panels_wide = slab_width_ft > 0 ? Math.ceil(slab_width_ft / spacing_ft) : null;
+  const panels_long = slab_length_ft > 0 ? Math.ceil(slab_length_ft / spacing_ft - 1e-9) : null;
+  const panels_wide = slab_width_ft > 0 ? Math.ceil(slab_width_ft / spacing_ft - 1e-9) : null;
   const panels = (panels_long && panels_wide) ? panels_long * panels_wide : null;
   let aspect = null;
   if (panels_long && panels_wide) {
@@ -4713,7 +4713,7 @@ export function computeRebarLapSplice({ bar_size = "#5", lap_factor = 48, min_la
   if (!(min_lap_in > 0)) return { error: "Minimum lap must be positive." };
   const byDiameter = lap_factor * db;
   const lap_in = Math.max(byDiameter, min_lap_in);
-  const ft = Math.floor(lap_in / 12);
+  const ft = Math.floor(lap_in / 12 + 1e-9);
   const inch = lap_in - ft * 12;
   return {
     db, lap_in, lap_ft: ft, lap_in_rem: inch,
@@ -4867,7 +4867,7 @@ export function computeCmuGroutVolume({ wall_len_ft = 0, wall_ht_ft = 0, core_sp
   if (!(core_spacing_in > 0)) return { error: "Core spacing must be positive (in)." };
   if (!(core_area_in2 > 0)) return { error: "Core cross-section must be positive (in^2)." };
   if (bond_area_in2 < 0) return { error: "Bond-beam cross-section must be zero or positive (in^2)." };
-  const cores = Math.floor(wall_len_ft * 12 / core_spacing_in) + 1;
+  const cores = Math.floor(wall_len_ft * 12 / core_spacing_in + 1e-9) + 1;
   const vert_ft3 = cores * wall_ht_ft * (core_area_in2 / 144);
   const bond_ft3 = wall_len_ft * (bond_area_in2 / 144);
   const total_ft3 = vert_ft3 + bond_ft3;
@@ -4948,9 +4948,9 @@ export function computeWallpaperRolls({ perimeter_in = 0, height_in = 0, roll_wi
   if (repeat_in < 0) return { error: "Pattern repeat must be zero or positive (in)." };
   const strip_len_in = height_in + repeat_in;
   if (strip_len_in > roll_len_in) return { error: "Pattern repeat plus wall height exceeds the roll length - no full strip fits this roll." };
-  const strips_needed = Math.ceil(perimeter_in / roll_width_in);
-  const strips_per_roll = Math.floor(roll_len_in / strip_len_in);
-  const rolls = Math.ceil(strips_needed / strips_per_roll);
+  const strips_needed = Math.ceil(perimeter_in / roll_width_in - 1e-9);
+  const strips_per_roll = Math.floor(roll_len_in / strip_len_in + 1e-9);
+  const rolls = Math.ceil(strips_needed / strips_per_roll - 1e-9);
   return {
     strips_needed, strip_len_in, strips_per_roll, rolls,
     note: "Strips needed = ceil(perimeter / roll width). Strip length = wall height + one pattern repeat (one repeat wasted per strip to match the run). Strips per roll = floor(roll length / strip length). Rolls = ceil(strips needed / strips per roll). A large repeat drops the strips-per-roll yield and can nearly double the order for the same wall area - the area is identical, the repeat is what costs. The roll dimensions are the product's stated bolt size (single/double/Euro rolls vary), door and window openings are a manual strip credit on the perimeter, and this is a material takeoff, not a hang plan.",
@@ -5005,9 +5005,9 @@ export function computeIceBarrierCoverage({ eave_length_ft = 0, overhang_in = 0,
   const effective_course = roll_width_in - side_lap_in; // net width each course beyond the first adds
   const courses = coverage_in <= roll_width_in
     ? 1
-    : 1 + Math.ceil((coverage_in - roll_width_in) / effective_course);
+    : 1 + Math.ceil((coverage_in - roll_width_in) / effective_course - 1e-9);
   const roll_lf = courses * eave_length_ft;
-  const rolls = Math.ceil(roll_lf / roll_len_ft);
+  const rolls = Math.ceil(roll_lf / roll_len_ft - 1e-9);
   return { slope_factor, coverage_in, courses, roll_lf, rolls };
 }
 
@@ -5047,7 +5047,7 @@ export function computeMetalRoofPanels({ eave_width_ft = 0, panel_length_ft = 0,
   if (!(panel_net_in > 0)) return { error: "Panel net coverage width must be positive." };
   if (!(fasteners_per_sq > 0)) return { error: "Fasteners per square must be positive." };
   // Panel count turns on the product's net coverage width, not the sheet width.
-  const panels = Math.ceil((eave_width_ft * 12) / panel_net_in);
+  const panels = Math.ceil((eave_width_ft * 12) / panel_net_in - 1e-9);
   const total_panel_lf = panels * panel_length_ft;
   // panel_length is the on-slope length, so width x length is slope (plane) area.
   const plane_area_ft2 = eave_width_ft * panel_length_ft;
@@ -5096,13 +5096,13 @@ export function computeRidgeCapFasteners({ ridge_lf = 0, hip_lf = 0, cap_lf_per_
   if (!(squares >= 0)) return { error: "Squares cannot be negative." };
   const cap_len_lf = ridge_lf + hip_lf;
   if (cap_len_lf === 0 && squares === 0) return { error: "Nothing to order: cap length and field squares are both zero." };
-  const cap_bundles = Math.ceil(cap_len_lf / cap_lf_per_bundle);
+  const cap_bundles = Math.ceil(cap_len_lf / cap_lf_per_bundle - 1e-9);
   // IRC R905.2.6: four nails standard, six in the high-wind / steep rows.
   const field_nails = squares * shingles_per_sq * nails_per_shingle;
-  const cap_pieces = Math.ceil((cap_len_lf * 12) / cap_exposure_in);
+  const cap_pieces = Math.ceil((cap_len_lf * 12) / cap_exposure_in - 1e-9);
   const cap_nails = cap_pieces * 2; // two nails per cap piece
   const total_nails = field_nails + cap_nails;
-  const nail_lbs = Math.ceil(total_nails / nails_per_lb);
+  const nail_lbs = Math.ceil(total_nails / nails_per_lb - 1e-9);
   return { cap_len_lf, cap_bundles, field_nails, cap_pieces, cap_nails, total_nails, nail_lbs };
 }
 
@@ -5535,7 +5535,7 @@ export function computeOccupantLoad({ spaces = [] } = {}) {
     if (!(olf > 0)) return { error: "Each occupant-load factor must be positive (ft^2/occupant)." };
     // A fraction of a person is counted as a whole person (conservative practice; IBC 2021
     // §1004.2 is cumulative occupant loads and states no rounding rule).
-    const load = Math.ceil(area / olf);
+    const load = Math.ceil(area / olf - 1e-9);
     per_space.push({ area, olf, load });
     total_load += load;
   }
@@ -5679,7 +5679,7 @@ export function computePlumbingFixtureCount({ occupant_load = 0, wc_ratio = 25, 
   const wcFor = (n) => {
     const tierN = Math.min(n, wc_tier);
     const over = Math.max(n - wc_tier, 0);
-    return Math.ceil(tierN / wc_ratio) + (wc_ratio_over > 0 ? Math.ceil(over / wc_ratio_over) : 0);
+    return Math.ceil(tierN / wc_ratio - 1e-9) + (wc_ratio_over > 0 ? Math.ceil(over / wc_ratio_over - 1e-9) : 0);
   };
   const per_sex_a = occupant_load * distribution;
   const per_sex_b = occupant_load * (1 - distribution);
@@ -5689,7 +5689,7 @@ export function computePlumbingFixtureCount({ occupant_load = 0, wc_ratio = 25, 
   const lav_b = tiered(per_sex_b, lav_ratio, lav_ratio_over, lav_tier);
   const wc_total = wc_a + wc_b;
   const lav_total = lav_a + lav_b;
-  const fountains = Math.ceil(occupant_load / fountain_ratio);
+  const fountains = Math.ceil(occupant_load / fountain_ratio - 1e-9);
   return { per_sex_a, per_sex_b, wc_a, wc_b, lav_a, lav_b, wc_total, lav_total, fountains, service_sinks: 1 };
 }
 
@@ -5886,7 +5886,7 @@ export function computeScaffoldTakeoff({ run_length_ft = 40, bay_length_ft = 7, 
   if (!(bay_length_ft > 0)) return { error: "Bay length must be positive (ft)." };
   if (!(lifts > 0)) return { error: "Lifts must be positive." };
   if (!(planks_per_bay > 0)) return { error: "Planks per bay must be positive." };
-  const bays = Math.ceil(run_length_ft / bay_length_ft);
+  const bays = Math.ceil(run_length_ft / bay_length_ft - 1e-9);
   const frames = (bays + 1) * lifts;
   const braces = 2 * bays * lifts;
   const planks = bays * planks_per_bay;
@@ -6073,7 +6073,7 @@ export function computeConcreteVibratorSpacing({ radius_of_action_in = 12, lift_
   if (!(lift_length_ft > 0)) return { error: "Lift length must be positive (ft)." };
   const max_spacing_in = 1.5 * radius_of_action_in;
   const edge_max_in = 0.75 * radius_of_action_in;
-  const insertions = Math.ceil((lift_length_ft * 12) / max_spacing_in);
+  const insertions = Math.ceil((lift_length_ft * 12) / max_spacing_in - 1e-9);
   if (![max_spacing_in, edge_max_in, insertions].every(Number.isFinite)) return { error: "Vibrator-spacing math is not a finite value." };
   return {
     max_spacing_in,
@@ -7844,7 +7844,7 @@ export function computeReadyMixConcreteOrder({ volume_yd3 = 0, waste_pct = 8, lo
   if (!(load > 0)) return { error: "Truck capacity must be positive (yd^3)." };
   if (min < 0) return { error: "Plant minimum must be non-negative (yd^3)." };
   const ordered_yd3 = vol * (1 + waste / 100);
-  const trucks = Math.ceil(ordered_yd3 / load);
+  const trucks = Math.ceil(ordered_yd3 / load - 1e-9);
   const last_load_yd3 = ordered_yd3 - (trucks - 1) * load;
   const short_load = ordered_yd3 < min;
   const cost_usd = price > 0 ? ordered_yd3 * price : null;
@@ -8126,7 +8126,7 @@ export function computeWeldedWireMesh({ slab_area_sf = 0, sheet_width_ft = 5, sh
   if (!(eff_w > 0) || !(eff_l > 0)) return { error: "Lap must be smaller than the sheet dimension (a positive effective sheet)." };
   const effective_sheet_sf = eff_w * eff_l;
   const gross_area_sf = slab_area_sf * (1 + waste_pct / 100);
-  const sheets = Math.ceil(gross_area_sf / effective_sheet_sf);
+  const sheets = Math.ceil(gross_area_sf / effective_sheet_sf - 1e-9);
   const purchased_sf = sheets * sheet_width_ft * sheet_length_ft;
   if (![effective_sheet_sf, gross_area_sf, sheets, purchased_sf].every(Number.isFinite)) return { error: "Mesh-takeoff math is not a finite value." };
   return {
@@ -8215,8 +8215,8 @@ export function computeInsulationBattCoverage({ area_ft2 = 0, coverage_per_batt 
   if (waste < 0) return { error: "Waste allowance must be non-negative (%)." };
   if (!(covBatt > 0) && !(covBag > 0)) return { error: "Enter the coverage per batt and/or per bag (ft^2)." };
   const net_ft2 = area * (1 + waste / 100);
-  const batts = covBatt > 0 ? Math.ceil(net_ft2 / covBatt) : null;
-  const bags = covBag > 0 ? Math.ceil(net_ft2 / covBag) : null;
+  const batts = covBatt > 0 ? Math.ceil(net_ft2 / covBatt - 1e-9) : null;
+  const bags = covBag > 0 ? Math.ceil(net_ft2 / covBag - 1e-9) : null;
   return {
     net_ft2, batts, bags,
     note: "Batt insulation takeoff: the net cavity area (wall or ceiling, less window and door openings) times a waste allowance, divided by the coverage of one batt (a piece) and by the coverage per bag from the label, each rounded up. Coverage depends on the R-value and cavity width: an R-13 15 x 93 in batt for 16 in on-center 2x4 framing covers about 9.69 ft^2 (Owens Corning: 125.94 ft^2 per bag), and a deeper R-value packs fewer square feet per bag. Buy by the bag but count the batts to confirm the wall is fully filled. A quantity aid; the manufacturer's label coverage governs.",
@@ -8255,7 +8255,7 @@ export function computeTrimLinearFootage({ perimeter_ft = 0, openings_ft = 0, wa
   if (waste < 0) return { error: "Waste allowance must be non-negative (%)." };
   const trimmed_ft = perim - openings;
   const net_ft = trimmed_ft * (1 + waste / 100);
-  const pieces = Math.ceil(net_ft / stock);
+  const pieces = Math.ceil(net_ft / stock - 1e-9);
   const crown = spring > 0 && spring < 90;
   const sr = spring * Math.PI / 180;
   const miter_deg = crown ? Math.atan(Math.sin(sr) * Math.tan(Math.PI / 4)) * 180 / Math.PI : 45;
@@ -8577,7 +8577,7 @@ export function computeAdaRampSlope({ rise_in = 0, slope_ratio = 12, landing_in 
   if (landing < 60) return { error: "ADA 405.7.3 requires a landing at least 60 in long." };
   const run_in = rise * ratio;
   const slope_pct = 100 / ratio;
-  const runs = Math.ceil(rise / 30);
+  const runs = Math.ceil(rise / 30 - 1e-9);
   const landings_in = (runs - 1) * landing;
   const total_len_in = run_in + landings_in;
   const handrails = rise > 6;
@@ -9045,7 +9045,7 @@ export function computeDuctWrapTakeoff({ width_in = 20, height_in = 12, length_f
   if (!(roll_coverage_sf > 0)) return { error: "Roll coverage must be positive (ft^2)." };
   const perimeter_ft = (2 * (width_in + height_in)) / 12;
   const wrap_sf = perimeter_ft * length_ft * overlap_waste_factor;
-  const rolls = Math.ceil(wrap_sf / roll_coverage_sf);
+  const rolls = Math.ceil(wrap_sf / roll_coverage_sf - 1e-9);
   if (![perimeter_ft, wrap_sf, rolls].every(Number.isFinite)) return { error: "Duct-wrap math is not a finite value." };
   return {
     perimeter_ft,
@@ -9091,7 +9091,7 @@ export function computeDuctHangerLoad({ duct_lb_per_ft = 5.5, spacing_ft = 8, ru
   if (!(run_ft > 0)) return { error: "Run length must be positive (ft)." };
   if (hanger_swl_lb < 0) return { error: "Hanger SWL cannot be negative (lb)." };
   const load_per_hanger_lb = duct_lb_per_ft * spacing_ft;
-  const count = Math.ceil(run_ft / spacing_ft) + 1;
+  const count = Math.ceil(run_ft / spacing_ft - 1e-9) + 1;
   if (![load_per_hanger_lb, count].every(Number.isFinite)) return { error: "Hanger math is not a finite value." };
   const utilization = hanger_swl_lb > 0 ? load_per_hanger_lb / hanger_swl_lb : null;
   return {
@@ -9133,7 +9133,7 @@ export function computeRoofUnderlaymentRolls({ roof_area_sf = 2500, roll_coverag
   if (!(roof_area_sf > 0)) return { error: "Roof area must be positive (ft^2)." };
   if (!(roll_coverage_sf > 0)) return { error: "Roll coverage must be positive (ft^2)." };
   if (lap_waste_pct < 0) return { error: "Lap/waste cannot be negative (percent)." };
-  const rolls = Math.ceil((roof_area_sf * (1 + lap_waste_pct / 100)) / roll_coverage_sf);
+  const rolls = Math.ceil((roof_area_sf * (1 + lap_waste_pct / 100)) / roll_coverage_sf - 1e-9);
   if (!Number.isFinite(rolls)) return { error: "Underlayment-roll math is not a finite value." };
   return {
     rolls,
@@ -9175,7 +9175,7 @@ export function computeMembraneRoofTakeoff({ roof_area_sf = 8000, roll_width_ft 
   if (waste_pct < 0) return { error: "Waste cannot be negative (percent)." };
   const usable_w_ft = roll_width_ft - sidelap_in / 12;
   if (!(usable_w_ft > 0)) return { error: "Side lap exceeds the roll width (no usable width)." };
-  const rolls = Math.ceil((roof_area_sf * (1 + waste_pct / 100)) / (usable_w_ft * roll_length_ft));
+  const rolls = Math.ceil((roof_area_sf * (1 + waste_pct / 100)) / (usable_w_ft * roll_length_ft) - 1e-9);
   const seam_lf = roof_area_sf / usable_w_ft;
   if (![usable_w_ft, rolls, seam_lf].every(Number.isFinite)) return { error: "Membrane-takeoff math is not a finite value." };
   return {
@@ -9266,7 +9266,7 @@ export function computeSheathingTakeoff({ area_sf = 1600, waste_pct = 8, sheet_s
   if (!(sheet_sf > 0)) return { error: "Panel area must be positive (ft^2)." };
   if (!(nails_per_sheet > 0)) return { error: "Nails per sheet must be positive." };
   if (waste_pct < 0) return { error: "Waste cannot be negative (percent)." };
-  const sheets = Math.ceil((area_sf * (1 + waste_pct / 100)) / sheet_sf);
+  const sheets = Math.ceil((area_sf * (1 + waste_pct / 100)) / sheet_sf - 1e-9);
   const nails = sheets * nails_per_sheet;
   if (![sheets, nails].every(Number.isFinite)) return { error: "Sheathing-takeoff math is not a finite value." };
   return {
@@ -9311,7 +9311,7 @@ export function computeConstructionAdhesiveTubes({ total_lf = 1200, tube_volume_
   if (!(bead_dia_in > 0)) return { error: "Bead diameter must be positive (in)." };
   const bead_area_in2 = (Math.PI / 4) * bead_dia_in * bead_dia_in;
   const lf_per_tube = tube_volume_in3 / bead_area_in2 / 12;
-  const tubes = Math.ceil(total_lf / lf_per_tube);
+  const tubes = Math.ceil(total_lf / lf_per_tube - 1e-9);
   if (![bead_area_in2, lf_per_tube, tubes].every(Number.isFinite)) return { error: "Adhesive-tube math is not a finite value." };
   return {
     bead_area_in2,
@@ -9354,7 +9354,7 @@ export function computeSillPlateAnchorCount({ wall_length_ft = 40, max_spacing_f
   if (end_distance_in < 0) return { error: "End distance cannot be negative (in)." };
   const effective_len_ft = wall_length_ft - 2 * (end_distance_in / 12);
   if (!(effective_len_ft > 0)) return { error: "End distances exceed the wall length (no span for bolts)." };
-  const bolts = Math.max(2, Math.ceil(effective_len_ft / max_spacing_ft) + 1);
+  const bolts = Math.max(2, Math.ceil(effective_len_ft / max_spacing_ft - 1e-9) + 1);
   if (![effective_len_ft, bolts].every(Number.isFinite)) return { error: "Anchor-count math is not a finite value." };
   return {
     effective_len_ft,
@@ -9394,7 +9394,7 @@ export function computeMetalStudTakeoff({ wall_length_ft = 50, spacing_in = 16, 
   if (!(spacing_in > 0)) return { error: "Stud spacing must be positive (in)." };
   if (openings < 0) return { error: "Opening count cannot be negative." };
   if (extra_per_opening < 0) return { error: "Extra studs per opening cannot be negative." };
-  const studs = Math.ceil(wall_length_ft / (spacing_in / 12)) + 1 + openings * extra_per_opening;
+  const studs = Math.ceil(wall_length_ft / (spacing_in / 12) - 1e-9) + 1 + openings * extra_per_opening;
   const track_lf = 2 * wall_length_ft;
   if (![studs, track_lf].every(Number.isFinite)) return { error: "Metal-stud math is not a finite value." };
   return {
@@ -9436,11 +9436,11 @@ export function computeSuspendedCeilingGrid({ room_length_ft = 24, room_width_ft
   if (!(room_length_ft > 0)) return { error: "Room length must be positive (ft)." };
   if (!(room_width_ft > 0)) return { error: "Room width must be positive (ft)." };
   const area_sf = room_length_ft * room_width_ft;
-  const panels = Math.ceil(area_sf / 8);
+  const panels = Math.ceil(area_sf / 8 - 1e-9);
   const main_tee_lf = area_sf / 4;
   const cross_tee_lf = area_sf / 2;
   const wall_angle_lf = 2 * (room_length_ft + room_width_ft);
-  const hangers = Math.ceil(area_sf / 16);
+  const hangers = Math.ceil(area_sf / 16 - 1e-9);
   if (![area_sf, panels, main_tee_lf, cross_tee_lf, wall_angle_lf, hangers].every(Number.isFinite)) return { error: "Ceiling-grid math is not a finite value." };
   return {
     area_sf,
@@ -9486,7 +9486,7 @@ export function computeMasonryControlJointLayout({ wall_length_ft = 80, wall_hei
   if (!(wall_height_ft > 0)) return { error: "Wall height must be positive (ft)." };
   if (!(max_spacing_cap_ft > 0)) return { error: "Spacing cap must be positive (ft)." };
   const max_spacing_ft = Math.min(1.5 * wall_height_ft, max_spacing_cap_ft);
-  const panels = Math.ceil(wall_length_ft / max_spacing_ft);
+  const panels = Math.ceil(wall_length_ft / max_spacing_ft - 1e-9);
   const joints = panels - 1;
   const panel_length_ft = wall_length_ft / panels;
   if (![max_spacing_ft, panels, joints, panel_length_ft].every(Number.isFinite)) return { error: "Control-joint math is not a finite value." };
@@ -9532,8 +9532,8 @@ export function computeDumpsterCount({ debris_cy = 60, debris_tons = 45, contain
   if (!(container_cy > 0)) return { error: "Container volume must be positive (cy)." };
   if (!(fill_efficiency > 0)) return { error: "Fill efficiency must be positive." };
   if (!(weight_cap_tons > 0)) return { error: "Weight cap must be positive (tons)." };
-  const by_vol = Math.ceil(debris_cy / (container_cy * fill_efficiency));
-  const by_wt = Math.ceil(debris_tons / weight_cap_tons);
+  const by_vol = Math.ceil(debris_cy / (container_cy * fill_efficiency) - 1e-9);
+  const by_wt = Math.ceil(debris_tons / weight_cap_tons - 1e-9);
   const hauls = Math.max(by_vol, by_wt);
   const governs = by_wt > by_vol ? "weight" : "volume";
   if (![by_vol, by_wt, hauls].every(Number.isFinite)) return { error: "Haul-count math is not a finite value." };
@@ -9583,7 +9583,7 @@ export function computeSealantJointYield({ joint_lf = 500, cartridge_in3 = 20.5,
   if (!(joint_depth_in > 0)) return { error: "Joint depth must be positive (in)." };
   const cross_in2 = joint_width_in * joint_depth_in;
   const lf_per_cart = cartridge_in3 / cross_in2 / 12;
-  const cartridges = Math.ceil(joint_lf / lf_per_cart);
+  const cartridges = Math.ceil(joint_lf / lf_per_cart - 1e-9);
   if (![cross_in2, lf_per_cart, cartridges].every(Number.isFinite)) return { error: "Sealant-yield math is not a finite value." };
   return {
     cross_in2,
@@ -9760,7 +9760,7 @@ export function computeSprayFoamBoardFeet({ area_sf = 2000, thickness_in = 3, yi
   if (!(yield_bd_ft_per_set > 0)) return { error: "Set yield must be positive (board-feet)." };
   if (waste_pct < 0) return { error: "Waste cannot be negative (percent)." };
   const board_feet = area_sf * thickness_in;
-  const sets = Math.ceil((board_feet * (1 + waste_pct / 100)) / yield_bd_ft_per_set);
+  const sets = Math.ceil((board_feet * (1 + waste_pct / 100)) / yield_bd_ft_per_set - 1e-9);
   if (![board_feet, sets].every(Number.isFinite)) return { error: "Board-feet math is not a finite value." };
   return {
     board_feet,
@@ -9803,7 +9803,7 @@ export function computeMetalDeckTakeoff({ area_sf = 10000, cover_width_in = 36, 
   if (!(sheet_length_ft > 0)) return { error: "Sheet length must be positive (ft)." };
   if (waste_pct < 0) return { error: "Waste cannot be negative (percent)." };
   const cover_sf = (cover_width_in / 12) * sheet_length_ft;
-  const sheets = Math.ceil((area_sf * (1 + waste_pct / 100)) / cover_sf);
+  const sheets = Math.ceil((area_sf * (1 + waste_pct / 100)) / cover_sf - 1e-9);
   const sidelap_lf = area_sf / (cover_width_in / 12);
   if (![cover_sf, sheets, sidelap_lf].every(Number.isFinite)) return { error: "Deck-takeoff math is not a finite value." };
   return {
@@ -9850,8 +9850,8 @@ export function computeRebarTieWire({ length_ft = 30, width_ft = 20, spacing_in 
   if (!(tie_length_in > 0)) return { error: "Tie length must be positive (in)." };
   if (!(wire_lb_per_ft > 0)) return { error: "Wire weight per foot must be positive (lb/ft)." };
   if (!(tie_fraction >= 0 && tie_fraction <= 1)) return { error: "Tie fraction must be between 0 and 1." };
-  const bars_along_length = Math.floor((width_ft * 12) / spacing_in) + 1;
-  const bars_along_width = Math.floor((length_ft * 12) / spacing_in) + 1;
+  const bars_along_length = Math.floor((width_ft * 12) / spacing_in + 1e-9) + 1;
+  const bars_along_width = Math.floor((length_ft * 12) / spacing_in + 1e-9) + 1;
   const intersections = bars_along_length * bars_along_width;
   const ties = Math.round(intersections * tie_fraction);
   const wire_ft = (ties * tie_length_in) / 12;
@@ -9906,7 +9906,7 @@ export function computeAnchorEpoxyVolume({ holes = 40, hole_dia_in = 0.75, bar_d
   if (!(hole_dia_in > bar_dia_in)) return { error: "Bar diameter exceeds the hole (no annulus to fill)." };
   const per_hole_in3 = (Math.PI / 4) * (hole_dia_in * hole_dia_in - bar_dia_in * bar_dia_in) * embed_in;
   const total_in3 = holes * per_hole_in3 * (1 + waste_pct / 100);
-  const cartridges = Math.ceil(total_in3 / cartridge_in3);
+  const cartridges = Math.ceil(total_in3 / cartridge_in3 - 1e-9);
   if (![per_hole_in3, total_in3, cartridges].every(Number.isFinite)) return { error: "Epoxy-volume math is not a finite value." };
   return {
     per_hole_in3,
@@ -9957,7 +9957,7 @@ export function computeBaseplateGroutVolume({ plate_length_in = 18, plate_width_
   if (!(net_area_in2 > 0)) return { error: "Column area exceeds the plate area (no net grout)." };
   const grout_in3 = net_area_in2 * grout_thickness_in;
   const grout_ft3 = (grout_in3 / 1728) * (1 + waste_pct / 100);
-  const bags = Math.ceil(grout_ft3 / bag_yield_ft3);
+  const bags = Math.ceil(grout_ft3 / bag_yield_ft3 - 1e-9);
   if (![grout_in3, grout_ft3, bags].every(Number.isFinite)) return { error: "Grout-volume math is not a finite value." };
   return {
     grout_in3,
@@ -10001,7 +10001,7 @@ export function computeBalusterPicketCount({ rail_clear_in = 96, picket_width_in
   if (!(picket_width_in > 0)) return { error: "Picket width must be positive (in)." };
   if (!(max_gap_in > 0)) return { error: "Max gap must be positive (in)." };
   if (!(picket_width_in < rail_clear_in)) return { error: "Picket width exceeds the clear span." };
-  const pickets = Math.ceil((rail_clear_in - max_gap_in) / (picket_width_in + max_gap_in));
+  const pickets = Math.ceil((rail_clear_in - max_gap_in) / (picket_width_in + max_gap_in) - 1e-9);
   const gaps = pickets + 1;
   const actual_gap_in = (rail_clear_in - pickets * picket_width_in) / gaps;
   if (![pickets, gaps, actual_gap_in].every(Number.isFinite)) return { error: "Picket-count math is not a finite value." };
@@ -10043,7 +10043,7 @@ export function computeTrafficTaperLength({ offset_width_ft = 12, speed_mph = 55
   if (!(speed_mph > 0)) return { error: "Speed must be positive (mph)." };
   if (!(device_spacing_ft > 0)) return { error: "Device spacing must be positive (ft)." };
   const taper_length_ft = speed_mph <= 40 ? offset_width_ft * speed_mph * speed_mph / 60 : offset_width_ft * speed_mph;
-  const devices = Math.ceil(taper_length_ft / device_spacing_ft) + 1;
+  const devices = Math.ceil(taper_length_ft / device_spacing_ft - 1e-9) + 1;
   const branch = speed_mph <= 40 ? "low speed (W x S^2 / 60)" : "high speed (W x S)";
   if (![taper_length_ft, devices].every(Number.isFinite)) return { error: "Taper math is not a finite value." };
   return {
@@ -10168,7 +10168,7 @@ export function computeVaporBarrierRolls({ area_sf = 3000, roll_coverage_sf = 10
   if (!(roll_coverage_sf > 0)) return { error: "Roll coverage must be positive (ft^2)." };
   if (!(roll_width_ft > 0)) return { error: "Roll width must be positive (ft)." };
   if (overlap_waste_pct < 0) return { error: "Overlap / waste cannot be negative (percent)." };
-  const rolls = Math.ceil(area_sf * (1 + overlap_waste_pct / 100) / roll_coverage_sf);
+  const rolls = Math.ceil(area_sf * (1 + overlap_waste_pct / 100) / roll_coverage_sf - 1e-9);
   const seam_tape_lf = area_sf / roll_width_ft;
   if (![rolls, seam_tape_lf].every(Number.isFinite)) return { error: "Vapor-barrier math is not a finite value." };
   return {
@@ -10209,8 +10209,8 @@ export function computeConcreteSawcutFootage({ length_ft = 60, width_ft = 40, sp
   if (!(length_ft > 0)) return { error: "Slab length must be positive (ft)." };
   if (!(width_ft > 0)) return { error: "Slab width must be positive (ft)." };
   if (!(spacing_ft > 0)) return { error: "Joint spacing must be positive (ft)." };
-  const panels_l = Math.ceil(length_ft / spacing_ft);
-  const panels_w = Math.ceil(width_ft / spacing_ft);
+  const panels_l = Math.ceil(length_ft / spacing_ft - 1e-9);
+  const panels_w = Math.ceil(width_ft / spacing_ft - 1e-9);
   const panels = panels_l * panels_w;
   const joint_lf = (panels_l - 1) * width_ft + (panels_w - 1) * length_ft;
   if (![panels, joint_lf].every(Number.isFinite)) return { error: "Saw-cut math is not a finite value." };
@@ -10253,7 +10253,7 @@ export function computeJoistHangerCount({ run_width_ft = 16, spacing_in = 16, en
   if (!(spacing_in > 0)) return { error: "Joist spacing must be positive (in)." };
   if (ends_per_joist < 0) return { error: "Ends per joist cannot be negative." };
   if (nails_per_hanger < 0) return { error: "Nails per hanger cannot be negative." };
-  const joists = Math.ceil(run_width_ft * 12 / spacing_in) + 1;
+  const joists = Math.ceil(run_width_ft * 12 / spacing_in - 1e-9) + 1;
   const hangers = joists * ends_per_joist;
   const hanger_nails = hangers * nails_per_hanger;
   if (![joists, hangers, hanger_nails].every(Number.isFinite)) return { error: "Hanger-count math is not a finite value." };
@@ -10298,8 +10298,8 @@ export function computeDrywallFastenerTakeoff({ sheets = 100, sheet_length_ft = 
   if (!(sheet_width_ft > 0)) return { error: "Sheet width must be positive (ft)." };
   if (!(stud_spacing_in > 0)) return { error: "Stud spacing must be positive (in)." };
   if (!(field_screw_spacing_in > 0)) return { error: "Field screw spacing must be positive (in)." };
-  const studs_per_sheet = Math.floor(sheet_width_ft * 12 / stud_spacing_in) + 1;
-  const screws_per_stud = Math.floor(sheet_length_ft * 12 / field_screw_spacing_in) + 1;
+  const studs_per_sheet = Math.floor(sheet_width_ft * 12 / stud_spacing_in + 1e-9) + 1;
+  const screws_per_stud = Math.floor(sheet_length_ft * 12 / field_screw_spacing_in + 1e-9) + 1;
   const screws_per_sheet = studs_per_sheet * screws_per_stud;
   const total_screws = sheets * screws_per_sheet;
   if (![screws_per_sheet, total_screws].every(Number.isFinite)) return { error: "Fastener math is not a finite value." };
@@ -10346,7 +10346,7 @@ export function computeGlassVacuumLift({ area_sf = 32, glass_thickness_in = 0.5,
   if (!(cup_wll_lb > 0)) return { error: "Cup working load must be positive (lb)." };
   if (!(glass_density_psf_in > 0)) return { error: "Glass density must be positive (lb/ft^2 per in)." };
   const weight_lb = area_sf * glass_thickness_in * glass_density_psf_in;
-  const cups = Math.ceil(weight_lb * safety_factor / cup_wll_lb);
+  const cups = Math.ceil(weight_lb * safety_factor / cup_wll_lb - 1e-9);
   if (![weight_lb, cups].every(Number.isFinite)) return { error: "Glass-lift math is not a finite value." };
   return {
     weight_lb,
@@ -10425,7 +10425,7 @@ export function computeRigidFoamBoardCount({ area_sf = 1600, board_area_sf = 32,
   if (!(board_area_sf > 0)) return { error: "Board area must be positive (ft^2)." };
   if (!(layers > 0)) return { error: "Layer count must be positive." };
   if (waste_pct < 0) return { error: "Waste cannot be negative (percent)." };
-  const boards_per_layer = Math.ceil(area_sf * (1 + waste_pct / 100) / board_area_sf);
+  const boards_per_layer = Math.ceil(area_sf * (1 + waste_pct / 100) / board_area_sf - 1e-9);
   const boards = boards_per_layer * layers;
   if (![boards_per_layer, boards].every(Number.isFinite)) return { error: "Board-count math is not a finite value." };
   return {
@@ -10507,7 +10507,7 @@ export function computeHousewrapRolls({ wall_area_sf = 4000, roll_coverage_sf = 
   if (!(fasteners_per_sf > 0)) return { error: "Fasteners per ft^2 must be positive." };
   if (!(roll_width_ft > 0)) return { error: "Roll width must be positive (ft)." };
   if (overlap_waste_pct < 0) return { error: "Overlap / waste cannot be negative (percent)." };
-  const rolls = Math.ceil(wall_area_sf * (1 + overlap_waste_pct / 100) / roll_coverage_sf);
+  const rolls = Math.ceil(wall_area_sf * (1 + overlap_waste_pct / 100) / roll_coverage_sf - 1e-9);
   const cap_fasteners = Math.ceil(wall_area_sf * fasteners_per_sf);
   const seam_tape_lf = wall_area_sf / roll_width_ft;
   if (![rolls, cap_fasteners, seam_tape_lf].every(Number.isFinite)) return { error: "Housewrap math is not a finite value." };
@@ -10557,7 +10557,7 @@ export function computeChainLinkFenceTakeoff({ perimeter_ft = 200, height_ft = 4
   const fabric_lf = perimeter_ft - gate_width_ft;
   const rail_wire_lf = perimeter_ft;
   const terminals = corners + (gate_width_ft > 0 ? 2 : 0);
-  const total_posts = Math.ceil(perimeter_ft / line_post_spacing_ft);
+  const total_posts = Math.ceil(perimeter_ft / line_post_spacing_ft - 1e-9);
   const line_posts = Math.max(0, total_posts - terminals);
   const tension_bands = terminals * (height_ft - 1);
   if (![fabric_lf, rail_wire_lf, terminals, total_posts, line_posts, tension_bands].every(Number.isFinite)) return { error: "Chain-link math is not a finite value." };
@@ -10850,12 +10850,12 @@ export function computeFoundationWaterproofingTakeoff({ perimeter_ft = 150, belo
   // Below-grade wall area to coat; the data-sheet coverage is per coat (W.R. Meadows Sealmastic). Until 2026-09-26
   // there was no coats input, so a two-coat dampproofing job ordered half the product.
   const wall_area_sf = perimeter_ft * below_grade_height_ft;
-  const gallons = Math.ceil(wall_area_sf * nc * (1 + waste_pct / 100) / coverage_sf_per_gal);
+  const gallons = Math.ceil(wall_area_sf * nc * (1 + waste_pct / 100) / coverage_sf_per_gal - 1e-9);
   if (![wall_area_sf, gallons].every(Number.isFinite)) return { error: "Waterproofing takeoff math is not a finite value." };
   return {
     wall_area_sf,
     gallons,
-    pails_5gal: Math.ceil(gallons / 5),
+    pails_5gal: Math.ceil(gallons / 5 - 1e-9),
     note: "The fluid-applied waterproofing or dampproofing to coat a below-grade foundation wall: area = perimeter x the average below-grade height, and gallons = ceil(area x (1 + waste) / the product's coverage rate). A 150 ft perimeter, 8 ft below grade is 1,200 sf, so at a 50 sf/gal spray-applied rate with 10% waste it takes 27 gallons (6 five-gallon pails). The coverage rate is the LEVER and it varies widely: an emulsion DAMPPROOFing runs ~70-100 sf/gal PER COAT for a spray grade and 40-50 for a brush/trowel grade applied in two coats (W.R. Meadows Sealmastic Type I / II; a moisture barrier, IRC R406.1), so enter the coats, while a true fluid-applied WATERPROOFing membrane built to a wet-mil thickness (a below-grade-with-hydrostatic-pressure requirement, IRC R406.2) covers far fewer sf/gal per coat and often needs two coats and reinforcing fabric at cracks and cold joints -- read the coverage off the product data sheet, not a default. Foundation dampproofing vs waterproofing is a code distinction (waterproofing where a high water table or hydrostatic head exists). Sheet (peel-and-stick) membrane is ordered by the roll instead (see the roll coverage). A material-ordering estimate; the product data sheet, the assembly detail (with the drainage board and footing drain), and the AHJ / IRC R406 govern.",
   };
 }
@@ -10932,7 +10932,7 @@ export function computeDrainageBoardTakeoff({ perimeter_ft = 150, below_grade_he
   // Below-grade wall area; rolls from the roll's coverage with waste; top-edge termination bar per perimeter.
   const wall_area_sf = perimeter_ft * below_grade_height_ft;
   const roll_coverage_sf = roll_width_ft * roll_length_ft;
-  const rolls = Math.ceil(wall_area_sf * (1 + waste_pct / 100) / roll_coverage_sf);
+  const rolls = Math.ceil(wall_area_sf * (1 + waste_pct / 100) / roll_coverage_sf - 1e-9);
   const termination_lf = perimeter_ft;
   if (![wall_area_sf, roll_coverage_sf, rolls].every(Number.isFinite)) return { error: "Drainage-board takeoff math is not a finite value." };
   return {
@@ -10988,9 +10988,9 @@ export function computeCornerBeadTakeoff({ outside_corners = 0, corner_height_ft
   const corner_lf = corners * ch;
   const wrap_lf = wraps * (2 * oh + ow);
   const total_lf = (corner_lf + wrap_lf) * (1 + waste / 100);
-  const pieces_by_lf = Math.ceil(total_lf / stock);
+  const pieces_by_lf = Math.ceil(total_lf / stock - 1e-9);
   // Sticks are not spliced mid-run: each corner leg is one piece minimum, and a wrap is 3.
-  const pieces_by_runs = corners * Math.ceil(ch / stock) + wraps * (2 * Math.ceil(oh / stock) + Math.ceil(ow / stock));
+  const pieces_by_runs = corners * Math.ceil(ch / stock - 1e-9) + wraps * (2 * Math.ceil(oh / stock - 1e-9) + Math.ceil(ow / stock - 1e-9));
   const pieces = Math.max(pieces_by_lf, pieces_by_runs);
   if (![corner_lf, wrap_lf, total_lf, pieces].every(Number.isFinite)) return { error: "Bead-takeoff math did not produce a finite value." };
   return {
@@ -11045,9 +11045,9 @@ export function computeSidingCourseLayout({ wall_height_ft = 0, wall_length_ft =
   if (!(max_exposure_in > 0)) return { error: "Minimum overlap leaves no exposure - it must be less than the board height." };
   if (target > max_exposure_in) return { error: "Target exposure exceeds the board height minus the minimum overlap - lower the exposure or use a taller board." };
   const h_in = hft * 12;
-  const courses = Math.ceil(h_in / target);
+  const courses = Math.ceil(h_in / target - 1e-9);
   const adjusted_exposure_in = h_in / courses;
-  const sliver_in = h_in - Math.floor(h_in / target) * target;
+  const sliver_in = h_in - Math.floor(h_in / target + 1e-9) * target;
   const starter_lf = lft;
   const total_course_lf = courses * lft;
   if (![courses, adjusted_exposure_in, starter_lf, total_course_lf].every(Number.isFinite)) return { error: "Course-layout math did not produce a finite value." };
@@ -11414,14 +11414,14 @@ export function computeCarpetSeamLayout({ room_length_ft = 0, room_width_ft = 0,
 
   // One orientation: drops run the length of the room, laid across its width.
   const lay = (runLen, acrossW) => {
-    const drops = Math.ceil(acrossW / RW);
+    const drops = Math.ceil(acrossW / RW - 1e-9);
     const covered = drops * RW;
     // The last drop's width. When it comes out full width the drops divide evenly and
     // there is no fill strip at all, so report 0 rather than the roll width.
     const last_in = drops > 1 ? (acrossW - (drops - 1) * RW) * 12 : 0;
     const fill_in = Math.abs(last_in - RW * 12) < 1e-9 ? 0 : last_in;
     // Each drop must be cut to a whole number of repeats so the pattern matches across a seam.
-    const cut_len_ft = rep > 0 ? Math.ceil(runLen * 12 / rep) * rep / 12 : runLen;
+    const cut_len_ft = rep > 0 ? Math.ceil(runLen * 12 / rep - 1e-9) * rep / 12 : runLen;
     const running_ft = drops * cut_len_ft;
     return { drops, covered, fill_in, cut_len_ft, running_ft, seam_count: Math.max(0, drops - 1), seam_length_ft: Math.max(0, drops - 1) * runLen };
   };
@@ -11615,8 +11615,8 @@ export function computeMembraneFastenerTakeoff({ roof_area_sf = 8000, roll_width
 
   const perimeter_lf = seam_lf * (pf / 100);
   const field_lf = seam_lf - perimeter_lf;
-  const field_fasteners = Math.ceil(field_lf * 12 / sf);
-  const perimeter_fasteners = Math.ceil(perimeter_lf * 12 / sp);
+  const field_fasteners = Math.ceil(field_lf * 12 / sf - 1e-9);
+  const perimeter_fasteners = Math.ceil(perimeter_lf * 12 / sp - 1e-9);
   const base_fasteners = field_fasteners + perimeter_fasteners;
   const total_fasteners = Math.ceil(base_fasteners * (1 + waste / 100));
   const plates = total_fasteners;
@@ -12425,7 +12425,7 @@ export function computeExcavationProtectionTrigger({ depth_ft = 0, trench_length
   const max_lateral_travel_ft = LATERAL;
   // Each point covers 25 ft each way, so 50 ft of run, and the ends must be reachable.
   const has_length = L > 0;
-  const egress_points_needed = egress_required && has_length ? Math.max(1, Math.ceil(L / (2 * LATERAL))) : egress_required ? 1 : 0;
+  const egress_points_needed = egress_required && has_length ? Math.max(1, Math.ceil(L / (2 * LATERAL) - 1e-9)) : egress_required ? 1 : 0;
   const egress_ok = egress_required ? pts >= egress_points_needed : null;
   const worst_travel_ft = egress_required && has_length && pts > 0 ? L / (2 * pts) : null;
 
@@ -12688,8 +12688,8 @@ export function computeFlammableCabinetStorage({ cat123_gallons = 0, cat4_gallon
   // the two counts would let one cabinet hold 60 + 120 = 180 gal. NFPA 30 9.5.3 (and
   // 1910.106(d)(3)) supplies the blend: the Category 4 figure is the cabinet's TOTAL, of which
   // no more than the Category 1-3 figure may be Category 1-3.
-  const cabinets_for_123 = q123 > 0 ? Math.ceil(q123 / cap123) : 0;
-  const cabinets_for_4 = q4 > 0 ? Math.ceil((q123 + q4) / cap4) : 0;
+  const cabinets_for_123 = q123 > 0 ? Math.ceil(q123 / cap123 - 1e-9) : 0;
+  const cabinets_for_4 = q4 > 0 ? Math.ceil((q123 + q4) / cap4 - 1e-9) : 0;
   const cabinets_needed = Math.max(cabinets_for_123, cabinets_for_4, (q123 > 0 || q4 > 0) ? 1 : 0);
   const mixed = q123 > 0 && q4 > 0;
 
@@ -12789,7 +12789,7 @@ export function computeMaterialStackingLimits({ material = "brick", stack_height
   } else if (material === "block") {
     max_height_ft = null; // the standard states no ceiling for block, only the taper
     threshold_ft = BLOCK_THRESHOLD;
-    tiers_above_threshold = h > BLOCK_THRESHOLD ? Math.ceil((h - BLOCK_THRESHOLD) * 12 / bh) : 0;
+    tiers_above_threshold = h > BLOCK_THRESHOLD ? Math.ceil((h - BLOCK_THRESHOLD) * 12 / bh - 1e-9) : 0;
     taper_required_in = tiers_above_threshold * (bl / 2);
     rule = "block: tapered back one-half block per tier above " + BLOCK_THRESHOLD + " ft";
   } else {
@@ -12886,7 +12886,7 @@ export function computeAccessibleParkingCount({ total_spaces = 0, facility_count
   }
 
   const VAN_EVERY = 6;
-  const required_van = Math.ceil(required_accessible / VAN_EVERY);
+  const required_van = Math.ceil(required_accessible / VAN_EVERY - 1e-9);
   const required_car = required_accessible - required_van;
 
   const site_required_accessible = required_accessible * lots;
@@ -12914,7 +12914,7 @@ export function computeAccessibleParkingCount({ total_spaces = 0, facility_count
     + n + " spaces in one facility -> " + required_accessible + " accessible (" + branch + "), of which " + required_van + " must be van and " + required_car + " may be car. "
     + (percent_raw !== null ? "The 2% comes to " + percent_raw.toFixed(2) + ", rounded up to " + required_accessible + " - a count of spaces cannot be fractional, and rounding down would provide fewer than the standard requires. " : "")
     + (n >= 495 && n <= 520 ? "NOTE THE STEP AT 500: the last table row (401-500) gives 9, and at 501 the rule switches to 2% - 10.02 for 501, so 11. One space added to a 500-space lot adds TWO accessible spaces. " : "")
-    + "FRACTION OF SIX is the trap: " + required_accessible + " accessible spaces need " + required_van + " van, not " + Math.floor(required_accessible / VAN_EVERY) + ". Four accessible spaces still owe one van; seven owe two. And a van space is one OF the accessible spaces, not an extra one beyond them. "
+    + "FRACTION OF SIX is the trap: " + required_accessible + " accessible spaces need " + required_van + " van, not " + Math.floor(required_accessible / VAN_EVERY + 1e-9) + ". Four accessible spaces still owe one van; seven owe two. And a van space is one OF the accessible spaces, not an extra one beyond them. "
     + (lots > 1 ? "PER FACILITY, NOT PER SITE: the table is applied to each parking facility separately, so " + lots + " lots of " + n + " owe " + site_required_accessible + " accessible spaces and " + site_required_van + " van, while the same " + site_total_spaces + " spaces in ONE lot would owe " + combined_required + ". " + (split_penalty > 0 ? "Splitting the parking RAISES the requirement by " + split_penalty + ". " : split_penalty === 0 ? "Here the split happens to cost nothing. " : "") : "Counted for one parking facility. Where a site has several separate lots or structures, the table is applied to EACH one, and the totals rarely match what the combined count would have been. ")
     + "Provided " + provA + " accessible / " + provV + " van: " + (passes ? "meets both. " : (accessible_ok ? "" : "SHORT " + accessible_short + " accessible. ") + (van_ok ? "" : "SHORT " + van_short + " van. "))
     + (van_only_failure ? "The total is right and the MIX is wrong - the most common finding on a restripe, because the count gets checked and the van share does not. " : "")
@@ -13268,7 +13268,7 @@ export function computeAccessibleRouteWidth({ clear_width_in = 0, pinch_present 
 
   // Passing spaces: triggered by width alone, spaced so no stretch exceeds 200 ft.
   const passing_required = w < PASSING_TRIGGER;
-  const passing_spaces_required = passing_required ? Math.max(0, Math.ceil(L / PASSING_INTERVAL_FT) - 1) : 0;
+  const passing_spaces_required = passing_required ? Math.max(0, Math.ceil(L / PASSING_INTERVAL_FT - 1e-9) - 1) : 0;
   const longest_stretch_ft = passing_required ? L / (passing_spaces_required + 1) : L;
 
   const passes = width_ok && (pinch_ok !== false) && (turn_ok !== false);
@@ -13883,7 +13883,7 @@ export function computeFloodOpeningArea({ enclosed_area_sf = 0, opening_type = "
   const required_net_area_sqin = engineered ? null : area * SQIN_PER_SF;
   const provided_net_area_sqin = engineered ? null : provided * nfa;
   const net_area_deficit_sqin = engineered ? null : Math.max(0, required_net_area_sqin - provided_net_area_sqin);
-  const openings_for_area = engineered ? Math.ceil(area / cov) : Math.ceil(required_net_area_sqin / nfa);
+  const openings_for_area = engineered ? Math.ceil(area / cov - 1e-9) : Math.ceil(required_net_area_sqin / nfa - 1e-9);
   const openings_required = Math.max(MIN_OPENINGS, openings_for_area);
   const count_governed_by_minimum = openings_for_area < MIN_OPENINGS;
   const count_ok = provided >= openings_required;
@@ -13980,7 +13980,7 @@ export function computeAdaStairCheck({ riser_height_in = 0, tread_depth_in = 0, 
 
   // What holding the same total rise costs once the riser comes down to 7 in.
   const risers_as_built = Math.round(total / rise);
-  const risers_required = Math.ceil(total / RISER_MAX);
+  const risers_required = Math.ceil(total / RISER_MAX - 1e-9);
   const compliant_riser_in = total / risers_required;
   const treads_as_built = Math.max(0, risers_as_built - 1);
   const treads_required = Math.max(0, risers_required - 1);

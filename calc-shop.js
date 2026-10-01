@@ -2661,8 +2661,8 @@ export function computePlasmaCutSpeed({ cut_length_in = 0, cut_speed_ipm = 0, pi
   // pierces; a long straight rip burns hours. Which arrives first depends on the part.
   const cut_time_min = cut_length_in / cut_speed_ipm;
   const arc_hours_per_part = cut_time_min / 60;
-  const parts_by_pierces = Math.floor(rated_pierces / pierces_per_part);
-  const parts_by_arc_hours = Math.floor(rated_arc_hours / arc_hours_per_part);
+  const parts_by_pierces = Math.floor(rated_pierces / pierces_per_part + 1e-9);
+  const parts_by_arc_hours = Math.floor(rated_arc_hours / arc_hours_per_part + 1e-9);
   const parts_per_set = Math.min(parts_by_pierces, parts_by_arc_hours);
   if (!(parts_per_set >= 1)) return { error: "A single part exhausts a consumable set at these ratings -- check the cut length, the pierce count, and the set's rating." };
   const governing = parts_by_arc_hours < parts_by_pierces

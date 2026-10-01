@@ -1199,7 +1199,7 @@ export function computeShearStudStrength({ asc_in2 = 0, fc_psi = 4000, ec_psi = 
   const qn_cap_kip = Rg * Rp * asc * fu;
   const qn_kip = Math.min(qn_calc_kip, qn_cap_kip);
   const cap_governs = qn_cap_kip <= qn_calc_kip;
-  const studs_each_side = vprime > 0 ? Math.ceil(vprime / qn_kip) : null;
+  const studs_each_side = vprime > 0 ? Math.ceil(vprime / qn_kip - 1e-9) : null;
   return {
     qn_calc_kip, qn_cap_kip, qn_kip, cap_governs, studs_each_side,
     note: "AISC 360-22 §I8.2a nominal strength of one steel headed stud anchor: Qn = 0.5 Asc sqrt(f'c Ec) but not more than Rg Rp Asc Fu, where Rg is the group factor and Rp the position factor from Table I8.1 (deck orientation, number of studs per rib, weak vs strong position). The upper bound (Rg Rp Asc Fu) usually governs. The number of studs each side of the maximum-moment point = the horizontal shear V' for full composite action / Qn, rounded up. A design aid; the engineer of record's stamped design governs.",

@@ -120,7 +120,7 @@ export function computeBranchCircuitWireFootage({ circuits = 20, avg_homerun_ft 
   if (!(roll_ft > 0)) return { error: "Roll length must be positive (ft)." };
   if (makeup_ft < 0) return { error: "Makeup cannot be negative (ft)." };
   const total_ft = circuits * (avg_homerun_ft + makeup_ft) * conductors_per_circuit;
-  const rolls = Math.ceil(total_ft / roll_ft);
+  const rolls = Math.ceil(total_ft / roll_ft - 1e-9);
   if (![total_ft, rolls].every(Number.isFinite)) return { error: "Footage math is not a finite value." };
   return {
     total_ft,
@@ -164,7 +164,7 @@ export function computeMicroinverterBranchCount({ branch_ocpd_a = 20, unit_max_c
   if (!(unit_max_current_a > 0)) return { error: "Microinverter max current must be positive (A)." };
   // NEC 705.60 / 690.8(B) / 240.4: continuous inverter output is limited to 80% of the branch OCPD.
   const continuous_limit_a = branch_ocpd_a * 0.80;
-  const max_microinverters = Math.floor(continuous_limit_a / unit_max_current_a);
+  const max_microinverters = Math.floor(continuous_limit_a / unit_max_current_a + 1e-9);
   const branch_load_a = max_microinverters * unit_max_current_a;
   if (![max_microinverters, branch_load_a, continuous_limit_a].every(Number.isFinite)) return { error: "Branch-count math is not a finite value." };
   return {

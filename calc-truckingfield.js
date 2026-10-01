@@ -98,7 +98,7 @@ export function computeTiedownCount({ length_ft = 0, weight_lb = 0, tiedowns = 0
   let min_tiedowns;
   if (length_ft <= 5) min_tiedowns = weight_lb <= 1100 ? 1 : 2;
   else if (length_ft <= 10) min_tiedowns = 2;
-  else min_tiedowns = 2 + Math.ceil((length_ft - 10) / 10);
+  else min_tiedowns = 2 + Math.ceil((length_ft - 10) / 10 - 1e-9);
   const required_wll_lb = 0.5 * weight_lb;
   // 49 CFR 393.106(d) credits by PATH: full WLL only for a tiedown that goes over or around
   // the cargo to an anchor on the OTHER side of the vehicle; half for one that runs direct
@@ -115,7 +115,7 @@ export function computeTiedownCount({ length_ft = 0, weight_lb = 0, tiedowns = 0
   const wll_margin_lb = provided_wll_lb - required_wll_lb;
   // Which rule GOVERNS is a property of the cargo and the hardware, not of the plan:
   // it is whichever rule demands more tiedowns of this rating.
-  const tiedowns_by_wll = Math.ceil(required_wll_lb / effective_wll_each);
+  const tiedowns_by_wll = Math.ceil(required_wll_lb / effective_wll_each - 1e-9);
   const governing = min_tiedowns > tiedowns_by_wll
     ? "the count rule (length)"
     : tiedowns_by_wll > min_tiedowns
@@ -180,7 +180,7 @@ export function computeKingpinToAxle({ kpra_ft = 0, state_limit_ft = 40, hole_sp
   // Sliding the tandems FORWARD to fix KPRA moves weight onto the drives: run the
   // axle-weight check before pulling the pin, not after crossing the scale.
   const excess_ft = kpra_ft - state_limit_ft;
-  const holes_needed = excess_ft > 0 ? Math.ceil(excess_ft * 12 / hole_spacing_in) : 0;
+  const holes_needed = excess_ft > 0 ? Math.ceil(excess_ft * 12 / hole_spacing_in - 1e-9) : 0;
   const resulting_kpra_ft = kpra_ft - holes_needed * hole_spacing_in / 12;
   const slide_in = holes_needed * hole_spacing_in;
   const compliant = resulting_kpra_ft <= state_limit_ft;
@@ -566,7 +566,7 @@ export function computeFlatbedTarpSize({ load_length_ft = 0, load_width_ft = 0, 
   const width_needed_ft = load_width_ft + 2 * load_height_ft + 2 * tuck_ft;
   const width_ok = tarp_width_ft >= width_needed_ft;
   const width_spare_ft = tarp_width_ft - width_needed_ft;
-  const tarps_needed = Math.max(1, Math.ceil((load_length_ft - overlap_ft) / (tarp_length_ft - overlap_ft)));
+  const tarps_needed = Math.max(1, Math.ceil((load_length_ft - overlap_ft) / (tarp_length_ft - overlap_ft) - 1e-9));
   const covered_length_ft = tarps_needed * tarp_length_ft - (tarps_needed - 1) * overlap_ft;
   const total_weight_lb = tarps_needed * tarp_weight_lb;
   const length_ok = covered_length_ft >= load_length_ft;

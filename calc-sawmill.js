@@ -90,7 +90,7 @@ const _HOURS_PER_DAY = 24;
 // section at the small-end diameter (59.6 bf; 24% low at 6 in).
 function _international14Bf(D, L) {
   const sec = (d) => 0.905 * (0.22 * d * d - 0.71 * d);
-  const n = Math.floor(L / 4);
+  const n = Math.floor(L / 4 + 1e-9);
   let bf = 0;
   for (let i = 0; i < n; i++) bf += sec(D + 0.5 * i);
   const rem = L - 4 * n;

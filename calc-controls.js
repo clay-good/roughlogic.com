@@ -373,12 +373,12 @@ export function computeDamperActuatorTorque({ damper_width_in = 0, damper_height
   const required_torque_in_lb = damper_area_ft2 * torque_factor_in_lb_ft2;
   const design_torque_in_lb = required_torque_in_lb * safety_factor;
   const selected_actuator_in_lb = select(design_torque_in_lb);
-  const actuator_count = selected_actuator_in_lb === null ? Math.ceil(design_torque_in_lb / largest) : 1;
+  const actuator_count = selected_actuator_in_lb === null ? Math.ceil(design_torque_in_lb / largest - 1e-9) : 1;
   const sealed_used = sealed_torque_factor_in_lb_ft2 > 0;
   const sealed_required_torque_in_lb = sealed_used ? damper_area_ft2 * sealed_torque_factor_in_lb_ft2 : null;
   const sealed_design_torque_in_lb = sealed_used ? sealed_required_torque_in_lb * safety_factor : null;
   const sealed_selected_actuator_in_lb = sealed_used ? select(sealed_design_torque_in_lb) : null;
-  const sealed_actuator_count = sealed_used ? (sealed_selected_actuator_in_lb === null ? Math.ceil(sealed_design_torque_in_lb / largest) : 1) : null;
+  const sealed_actuator_count = sealed_used ? (sealed_selected_actuator_in_lb === null ? Math.ceil(sealed_design_torque_in_lb / largest - 1e-9) : 1) : null;
   const seals_move_the_selection = sealed_used && (sealed_selected_actuator_in_lb !== selected_actuator_in_lb || sealed_actuator_count !== actuator_count);
   const selection_verdict = selected_actuator_in_lb !== null
     ? "One " + selected_actuator_in_lb + " in-lb actuator covers the " + design_torque_in_lb.toFixed(0) + " in-lb design torque."

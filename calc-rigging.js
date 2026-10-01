@@ -417,7 +417,7 @@ export function computeTaglineForce({ lateral_force_lb, tagline_angle_deg, per_p
   if (!Number.isFinite(angle) || angle <= 0 || angle >= 90) return { error: "Tag-line angle must be greater than 0 and less than 90 degrees." };
   if (!Number.isFinite(perPerson) || perPerson <= 0) return { error: "Per-person pull must be a positive finite number (lb)." };
   const tagTension = force / Math.cos(angle * Math.PI / 180);
-  const handlers = Math.ceil(tagTension / perPerson);
+  const handlers = Math.ceil(tagTension / perPerson - 1e-9);
   if (![tagTension, handlers].every(Number.isFinite)) return { error: "Tag-line math is not a finite value." };
   return {
     tag_tension_lb: tagTension,
@@ -792,7 +792,7 @@ export function computeRollerJackForce({ load_lb, roll_coef = 0.03, incline_deg 
   const gradeForce = load * Math.sin(inclineRad);
   const pushSteady = rollForce + gradeForce;
   const pushBreakaway = pushSteady * 1.5;
-  const skatesNeeded = Math.ceil(load / skateCap);
+  const skatesNeeded = Math.ceil(load / skateCap - 1e-9);
   if (![rollForce, gradeForce, pushSteady, pushBreakaway, skatesNeeded].every(Number.isFinite)) return { error: "Roller math is not a finite value." };
   return {
     roll_force_lb: rollForce,
@@ -1334,7 +1334,7 @@ export function computeWinchDrumLinePull({ rated_pull_lb, drum_dia_in, rope_dia_
   const first_layer_dia_in = D1 + dr;
   const pull_at_layer_lb = P1 * first_layer_dia_in / mean_dia_in;
   const speed_ratio = mean_dia_in / first_layer_dia_in;
-  const wraps_per_layer = Math.floor(bw / dr);
+  const wraps_per_layer = Math.floor(bw / dr + 1e-9);
   const derate_pct = (1 - pull_at_layer_lb / P1) * 100;
   return {
     mean_dia_in, pull_at_layer_lb, speed_ratio, wraps_per_layer, derate_pct,

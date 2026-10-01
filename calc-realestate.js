@@ -1015,7 +1015,7 @@ export function computeAmortizationSchedule({ principal, apr_percent, term_years
     actual_months = k;
     if (bal <= 1e-6) { bal = 0; break; }
   }
-  const sample = [rows[0], rows[Math.floor(actual_months / 2) - 1], rows[actual_months - 1]].filter(Boolean);
+  const sample = [rows[0], rows[Math.floor(actual_months / 2 + 1e-9) - 1], rows[actual_months - 1]].filter(Boolean);
   return {
     monthly_principal_and_interest: pi,
     extra_monthly_principal: extra,
@@ -2456,7 +2456,7 @@ export function computePmiCancellationDate({ value = 0, loan = 0, rate_pct = 0, 
     if (month80 === null && b <= target80) month80 = m;
     if (month78 === null && b <= target78) { month78 = m; break; }
   }
-  const midpoint = Math.ceil(n / 2);
+  const midpoint = Math.ceil(n / 2 - 1e-9);
   return {
     month_80: month80,
     month_78: month78,

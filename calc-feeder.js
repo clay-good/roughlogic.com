@@ -572,7 +572,7 @@ export function computeEvChargerThrottle({ aggregate_limit_a = 0, charger_max_a 
   if (!(active >= 1)) return { error: "Active-charger count must be at least 1." };
   const share_a = limit / active;
   const throttled_a = Math.min(cmax, share_a);
-  const full_rate_count = Math.floor(limit / cmax);
+  const full_rate_count = Math.floor(limit / cmax + 1e-9);
   const all_full = active * cmax <= limit;
   return {
     throttled_a, full_rate_count, all_full, share_a,

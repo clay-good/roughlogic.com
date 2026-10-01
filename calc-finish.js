@@ -104,7 +104,7 @@ export function computeThinsetCoverage({ area_sqft = 0, trowel = "quarter_three_
   if (!(cov_per_bag > 0)) return { error: "Choose a trowel size or enter a per-bag coverage." };
   const order_area = area_sqft * (1 + waste_pct / 100);
   return {
-    cov_per_bag, order_area, bags: Math.ceil(order_area / cov_per_bag),
+    cov_per_bag, order_area, bags: Math.ceil(order_area / cov_per_bag - 1e-9),
     note: "Thin-set coverage is set by the trowel notch, not the tile - a 1/4 in square notch spreads about 95 sq ft per 50-lb bag, a 1/4 x 3/8 in notch about 63, and a 1/2 in notch about 45. Large or uneven tile wants a deeper notch and back-buttering, which cuts coverage further. The code wants about 80% mortar contact in dry areas and 95% in wet or exterior, so do not stretch a bag. This is the setting mortar - tile-count gives the tile and grout, mortar-mix is masonry mortar.",
   };
 }
@@ -143,7 +143,7 @@ export function computeFlooringTakeoff({ room_length_ft = 0, room_width_ft = 0, 
   const waste = waste_pct > 0 ? waste_pct : _FLOORING_WASTE[pattern];
   if (!(waste > 0)) return { error: "Choose an install pattern or enter a waste percent." };
   const order_area = field_area * (1 + waste / 100);
-  const boxes = Math.ceil(order_area / box_coverage_sqft);
+  const boxes = Math.ceil(order_area / box_coverage_sqft - 1e-9);
   if (expansion_gap_in < 0) return { error: "Expansion gap cannot be negative." };
   let full_rows = null, remainder = null, rip_needed = null, start_width = null, usable_width_in = null;
   if (plank_width_in > 0) {
@@ -154,7 +154,7 @@ export function computeFlooringTakeoff({ room_length_ft = 0, room_width_ft = 0, 
     // is exactly the sliver this check exists to catch.
     usable_width_in = room_width_ft * 12 - 2 * expansion_gap_in;
     if (!(usable_width_in > 0)) return { error: "The expansion gaps leave no room across the floor." };
-    full_rows = Math.floor(usable_width_in / plank_width_in);
+    full_rows = Math.floor(usable_width_in / plank_width_in + 1e-9);
     remainder = usable_width_in - full_rows * plank_width_in;
     rip_needed = remainder > 0 && remainder < plank_width_in / 3;
     start_width = rip_needed ? (remainder + plank_width_in) / 2 : plank_width_in;
@@ -238,8 +238,8 @@ export function computeRetainingWallBlock({ wall_length_ft = 0, exposed_height_f
   if (!(block_length_in > 0) || !(block_height_in > 0)) return { error: "Block dimensions must be positive." };
   const buried_in = Math.max(exposed_height_ft * 1.0, block_height_in); // 1 in per ft, >= one course
   const total_height_in = exposed_height_ft * 12 + buried_in;
-  const courses = Math.ceil(total_height_in / block_height_in);
-  const blocks_per_row = Math.ceil(wall_length_ft * 12 / block_length_in);
+  const courses = Math.ceil(total_height_in / block_height_in - 1e-9);
+  const blocks_per_row = Math.ceil(wall_length_ft * 12 / block_length_in - 1e-9);
   return {
     blocks_per_row, courses,
     total_blocks: courses * blocks_per_row,
@@ -287,7 +287,7 @@ export function computeAtticVentilation({ attic_floor_area_sqft = 0, ratio = "15
   const exhaust_sqin = nfa_sqin / 2;
   return {
     nfa_sqft, nfa_sqin, intake_sqin, exhaust_sqin,
-    intake_vents: intake_vent_nfa_sqin > 0 ? Math.ceil(intake_sqin / intake_vent_nfa_sqin) : null,
+    intake_vents: intake_vent_nfa_sqin > 0 ? Math.ceil(intake_sqin / intake_vent_nfa_sqin - 1e-9) : null,
     ridge_lf: ridge_nfa_per_lf_sqin > 0 ? exhaust_sqin / ridge_nfa_per_lf_sqin : null,
     note: "The IRC wants a net free vent area of 1/150 of the attic floor, dropping to 1/300 only when intake and exhaust are balanced (about half and half, with 40-50% of the area as upper vents near the ridge) and a vapor retarder is present. Split the area evenly between low intake (soffit) and high exhaust (ridge), and never let exhaust exceed intake or it will pull air from the house. Vents are rated in net free area (sq in) on the label, far less than the gross opening. 144 sq in per sq ft.",
   };
@@ -328,7 +328,7 @@ export function computeGutterDownspout({ roof_area_sqft = 0, pitch_factor = "1.0
   const downspout_total_sqin = adjusted_area / 100;
   return {
     adjusted_area, downspout_total_sqin,
-    downspouts: Math.ceil(downspout_total_sqin / downspout_sqin),
+    downspouts: Math.ceil(downspout_total_sqin / downspout_sqin - 1e-9),
     // The 5,520 / 7,960 sq ft capacities are for plan area x pitch factor x
     // rainfall in in/hr (5,520 sq ft at 1 in/hr is 0.13 cfs, a level 5 in K
     // gutter). Until 2026-09-19 they were compared against area scaled to a
@@ -384,9 +384,9 @@ export function computeDeckBoardTakeoff({ deck_width_ft = 0, deck_length_ft = 0,
   if (!(spacing > 0)) return { error: "Joist spacing must be positive (in)." };
   if (waste < 0) return { error: "Waste percent cannot be negative." };
   const width_in = W * 12;
-  const boards = Math.ceil((width_in + gap) / (face + gap));
+  const boards = Math.ceil((width_in + gap) / (face + gap) - 1e-9);
   const lineal_ft = boards * L * (1 + waste / 100);
-  const joists = Math.ceil(L * 12 / spacing) + 1;
+  const joists = Math.ceil(L * 12 / spacing - 1e-9) + 1;
   const screws = boards * joists * 2;
   if (![boards, lineal_ft, joists, screws].every(Number.isFinite)) return { error: "Deck-takeoff math is not a finite value." };
   return {
@@ -470,9 +470,9 @@ export function computeGutterDownspoutTakeoff({ eave_length_ft = 140, roof_area_
   if (!(wall_height_ft > 0)) return { error: "Wall height must be positive (ft)." };
   if (!(hanger_spacing_ft > 0)) return { error: "Hanger spacing must be positive (ft)." };
   const gutter_lf = eave_length_ft;
-  const downspouts = Math.ceil(roof_area_sf / max_area_per_downspout_sf);
+  const downspouts = Math.ceil(roof_area_sf / max_area_per_downspout_sf - 1e-9);
   const downspout_pipe_lf = downspouts * wall_height_ft;
-  const hangers = Math.ceil(eave_length_ft / hanger_spacing_ft);
+  const hangers = Math.ceil(eave_length_ft / hanger_spacing_ft - 1e-9);
   if (![gutter_lf, downspouts, downspout_pipe_lf, hangers].every(Number.isFinite)) return { error: "Gutter-takeoff math is not a finite value." };
   return {
     gutter_lf,
@@ -514,8 +514,8 @@ export function computeSoffitRidgeVentCount({ attic_area_sf = 1500, vent_ratio =
   const total_nfa_in2 = attic_area_sf / vent_ratio * 144;
   const intake_nfa_in2 = total_nfa_in2 / 2;
   const exhaust_nfa_in2 = total_nfa_in2 / 2;
-  const soffit_vents = Math.ceil(intake_nfa_in2 / soffit_vent_nfa_in2);
-  const ridge_lf = Math.ceil(exhaust_nfa_in2 / ridge_nfa_per_ft_in2);
+  const soffit_vents = Math.ceil(intake_nfa_in2 / soffit_vent_nfa_in2 - 1e-9);
+  const ridge_lf = Math.ceil(exhaust_nfa_in2 / ridge_nfa_per_ft_in2 - 1e-9);
   if (![total_nfa_in2, intake_nfa_in2, exhaust_nfa_in2, soffit_vents, ridge_lf].every(Number.isFinite)) return { error: "Vent-count math is not a finite value." };
   return {
     total_nfa_in2,
@@ -554,7 +554,7 @@ export function computeCementBoardTakeoff({ area_sf = 120, sheet_area_sf = 15, w
   if (!(sheet_area_sf > 0)) return { error: "Sheet area must be positive (sf)." };
   if (waste_pct < 0) return { error: "Waste cannot be negative (percent)." };
   if (!(screws_per_sheet > 0)) return { error: "Screws per sheet must be positive." };
-  const sheets = Math.ceil(area_sf * (100 + waste_pct) / 100 / sheet_area_sf);
+  const sheets = Math.ceil(area_sf * (100 + waste_pct) / 100 / sheet_area_sf - 1e-9);
   const screws = sheets * Math.round(screws_per_sheet);
   if (![sheets, screws].every(Number.isFinite)) return { error: "Takeoff math is not a finite value." };
   return {
@@ -590,7 +590,7 @@ export function computeStepFlashingCount({ wall_run_ft = 20, shingle_exposure_in
   if (!(shingle_exposure_in > 0)) return { error: "Shingle exposure must be positive (in)." };
   if (!(waste_pct >= 0)) return { error: "Waste percent cannot be negative." };
   // One step-flashing piece per shingle course along a roof-to-wall intersection, plus one to start.
-  const step_flashing_pieces = Math.ceil(wall_run_ft * 12 / shingle_exposure_in) + 1;
+  const step_flashing_pieces = Math.ceil(wall_run_ft * 12 / shingle_exposure_in - 1e-9) + 1;
   const order_pieces = Math.ceil(step_flashing_pieces * (1 + waste_pct / 100));
   if (![step_flashing_pieces, order_pieces].every(Number.isFinite)) return { error: "Step-flashing count math is not a finite value." };
   return {
@@ -690,10 +690,10 @@ export function computeClosetShelfTakeoff({ single_hang_ft = 0, double_hang_ft =
   if (!(stock > 0)) return { error: "Stock length must be positive (ft)." };
   const rod_lf = s + 2 * d;
   const shelf_lf = s + d + lw * (lw > 0 ? lc : 0);
-  const perRun = (ft) => (ft > 0 ? Math.ceil((ft * 12) / spacing) + 1 : 0);
+  const perRun = (ft) => (ft > 0 ? Math.ceil((ft * 12) / spacing - 1e-9) + 1 : 0);
   const brackets = perRun(s) + 2 * perRun(d) + (lw > 0 ? lc * perRun(lw) : 0);
-  const rod_sticks = Math.ceil(rod_lf / stock);
-  const shelf_boards = Math.ceil(shelf_lf / stock);
+  const rod_sticks = Math.ceil(rod_lf / stock - 1e-9);
+  const shelf_boards = Math.ceil(shelf_lf / stock - 1e-9);
   const longest_run_ft = Math.max(s, d, lw);
   const splice_needed = longest_run_ft > stock;
   if (![rod_lf, shelf_lf, rod_sticks, shelf_boards, brackets].every(Number.isFinite)) return { error: "Closet-takeoff math did not produce a finite value." };
@@ -757,7 +757,7 @@ export function computeCountertopOverhangSupport({ overhang_in = 0, total_depth_
   const psf = dens * thickness_in / 12;
   const overhang_weight_plf = psf * oh / 12;
   const overhang_weight_lb = overhang_weight_plf * run;
-  const brackets = supported ? 0 : Math.ceil((run * 12) / spacing) + 1;
+  const brackets = supported ? 0 : Math.ceil((run * 12) / spacing - 1e-9) + 1;
   const bracket_depth_in = supported ? 0 : (2 / 3) * oh;
   if (![governing_limit_in, overhang_weight_plf, overhang_weight_lb, brackets].every(Number.isFinite)) return { error: "Overhang-support math did not produce a finite value." };
   return {
@@ -823,9 +823,9 @@ export function computeCabinetLinearFeet({ base_wall_ft = 0, wall_cab_ft = 0, ta
   const wall_lf = wallRun;
   const tall_lf = tallRun;
   const total_lf = base_lf + wall_lf + tall_lf;
-  const base_cabinets = Math.ceil(base_lf * 12 / stdW);
-  const wall_cabinets = Math.ceil(wall_lf * 12 / stdW);
-  const tall_cabinets = Math.ceil(tall_lf * 12 / stdW);
+  const base_cabinets = Math.ceil(base_lf * 12 / stdW - 1e-9);
+  const wall_cabinets = Math.ceil(wall_lf * 12 / stdW - 1e-9);
+  const tall_cabinets = Math.ceil(tall_lf * 12 / stdW - 1e-9);
   const countertop_lf = base_lf + corner_loss_ft;
   const toe_kick_lf = base_lf + tall_lf;
   const toe_kick_sf = toe_kick_lf * toe / 12;
@@ -893,9 +893,9 @@ export function computeDripEdgeTakeoff({ eave_length_ft = 0, rake_run_ft = 0, ra
   const total_lf = eave_lf + rake_lf;
   const total_with_waste_lf = total_lf * (1 + waste / 100);
   const effective_piece_ft = stock - lap / 12;
-  const pieces = Math.ceil(total_with_waste_lf / effective_piece_ft);
-  const eave_pieces = eave_lf > 0 ? Math.ceil(eave_lf * (1 + waste / 100) / effective_piece_ft) : 0;
-  const rake_pieces = rake_lf > 0 ? Math.ceil(rake_lf * (1 + waste / 100) / effective_piece_ft) : 0;
+  const pieces = Math.ceil(total_with_waste_lf / effective_piece_ft - 1e-9);
+  const eave_pieces = eave_lf > 0 ? Math.ceil(eave_lf * (1 + waste / 100) / effective_piece_ft - 1e-9) : 0;
+  const rake_pieces = rake_lf > 0 ? Math.ceil(rake_lf * (1 + waste / 100) / effective_piece_ft - 1e-9) : 0;
   if (![slope_factor, rake_lf, total_lf, pieces].every(Number.isFinite)) return { error: "Drip-edge math did not produce a finite value." };
   return {
     slope_factor, eave_lf, rake_plan_lf, rake_lf, rake_slope_gain_lf, total_lf,
@@ -960,7 +960,7 @@ export function computeValleyFlashingTakeoff({ valley_run_ft = 0, valley_count =
   const total_valley_lf = n * valley_length_ft;
   const total_with_waste_lf = total_valley_lf * (1 + waste / 100);
   const effective_piece_ft = stock - lap / 12;
-  const pieces = Math.ceil(total_with_waste_lf / effective_piece_ft);
+  const pieces = Math.ceil(total_with_waste_lf / effective_piece_ft - 1e-9);
   const metal_area_sf = total_valley_lf * width / 12;
   const ice_barrier_sf = metal_area_sf;
   if (![valley_multiplier, valley_length_ft, pieces, metal_area_sf].every(Number.isFinite)) return { error: "Valley-flashing math did not produce a finite value." };
@@ -1034,15 +1034,15 @@ export function computeSrwGeogridSpacing({ wall_height_ft = 0, block_depth_in = 
     : "the 32 in absolute ceiling (NCMA/FHWA; AASHTO's 2.7 ft is 32.4 in)";
 
   // Grid lands on a course JOINT, so the usable spacing is a whole number of courses.
-  const courses_per_layer = Math.floor(spacing_limit_in / hb);
+  const courses_per_layer = Math.floor(spacing_limit_in / hb + 1e-9);
   if (courses_per_layer < 1) return { error: "The block is taller than the spacing limit - a single course already exceeds " + spacing_limit_in.toFixed(1) + " in, so this unit cannot be reinforced to these rules." };
   const actual_spacing_in = courses_per_layer * hb;
 
   // Levels are counted upward from the joint above the base course. The crest above the top
   // layer is left unreinforced and is the height AASHTO asks the designer to evaluate.
-  const total_courses = Math.floor(H_in / hb);
+  const total_courses = Math.floor(H_in / hb + 1e-9);
   const first_layer_height_in = hb;
-  const layer_count = total_courses >= 1 ? Math.floor((total_courses - 1) / courses_per_layer) + 1 : 0;
+  const layer_count = total_courses >= 1 ? Math.floor((total_courses - 1) / courses_per_layer + 1e-9) + 1 : 0;
   const top_layer_height_in = layer_count > 0 ? first_layer_height_in + (layer_count - 1) * actual_spacing_in : 0;
   const unreinforced_crest_in = H_in - top_layer_height_in;
   // FHWA NHI-10-024 4.4.7.d (quoting AASHTO 11.10.2.3.1): "The top row of reinforcement should be
@@ -1055,7 +1055,7 @@ export function computeSrwGeogridSpacing({ wall_height_ft = 0, block_depth_in = 
   const grid_length_ft = Math.max(basis * H_ft, 4);
   const length_governed_by_minimum = basis * H_ft < 4;
   const grid_sf_per_lf = layer_count * grid_length_ft;
-  const compaction_lifts = Math.ceil(actual_spacing_in / 8);
+  const compaction_lifts = Math.ceil(actual_spacing_in / 8 - 1e-9);
   const exposed_ft = Math.max(0, H_ft - buried / 12);
 
   const note = "Spacing limit " + spacing_limit_in.toFixed(1) + " in, set by " + governing_rule
@@ -1124,7 +1124,7 @@ export function computeCrawlSpaceVentilation({ floor_area_sf = 0, base_ratio_den
   const ratio_used = retarder ? 1500 : den;
   const required_sf = area / ratio_used;
   const required_sqin = required_sf * 144;
-  const vents_by_area = Math.ceil(required_sqin / per);
+  const vents_by_area = Math.ceil(required_sqin / per - 1e-9);
   // R408.1 also wants an opening within 3 ft of each corner, so the corner count is a floor
   // on the vent count no matter how little area the ratio asks for.
   const vents_required = Math.max(vents_by_area, corners);
@@ -1134,7 +1134,7 @@ export function computeCrawlSpaceVentilation({ floor_area_sf = 0, base_ratio_den
   // What the same crawl space would need the other way, so the trade is visible.
   const alt_ratio = retarder ? den : 1500;
   const alt_required_sqin = (area / alt_ratio) * 144;
-  const alt_vents = Math.ceil(alt_required_sqin / per);
+  const alt_vents = Math.ceil(alt_required_sqin / per - 1e-9);
 
   const note = "A " + area.toFixed(0) + " sq ft under-floor area at 1/" + ratio_used + " needs " + required_sf.toFixed(2) + " sq ft = " + required_sqin.toFixed(0) + " sq in of NET FREE ventilation area. "
     + "At " + per + " sq in per vent that is " + vents_by_area + " vent" + (vents_by_area === 1 ? "" : "s") + " by area"
@@ -1198,7 +1198,7 @@ export function computeSprayTipSelection({ tip_number = 0, pressure_psi = 0, wet
   if (!(ref_pressure_psi > 0)) return { error: "The calibration pressure must be positive." };
   // The tip number is two facts in three digits: fan width is the first digit
   // doubled (at 12 in from the surface), orifice is the last two in thousandths.
-  const fan_width_in = Math.floor(tip_number / 100) * 2;
+  const fan_width_in = Math.floor(tip_number / 100 + 1e-9) * 2;
   const orifice_in = orifice_thou / 1000;
   // Flow goes as the SQUARE of the orifice and only the square root of pressure.
   const flow_gpm = ref_flow_gpm * (orifice_in / ref_orifice_in) ** 2 * Math.sqrt(pressure_psi / ref_pressure_psi);
@@ -1257,7 +1257,7 @@ export function computeTextureMaterialTakeoff({ gross_area_sqft = 0, openings_sq
   const net_area_sqft = gross_area_sqft - openings_sqft;
   const order_area_sqft = net_area_sqft * (1 + waste_pct / 100);
   const bags_before_waste = net_area_sqft / coverage_per_bag_sqft;
-  const bags_required = Math.ceil(order_area_sqft / coverage_per_bag_sqft);
+  const bags_required = Math.ceil(order_area_sqft / coverage_per_bag_sqft - 1e-9);
   const dry_weight_lb = bags_required * bag_weight_lb;
   const mix_water_gal = bags_required * water_gal_per_bag;
   if (![net_area_sqft, order_area_sqft, bags_before_waste, dry_weight_lb, mix_water_gal].every(Number.isFinite)) return { error: "Texture takeoff math is not a finite value." };

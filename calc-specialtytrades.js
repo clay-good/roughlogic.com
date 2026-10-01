@@ -121,7 +121,7 @@ export function computeElevatorHandlingCapacity({ rise_ft = 0, car_speed_fpm = 0
   const hc_per_car = 300 * passengers_per_trip / rtt_s;
   const hc_total = hc_per_car * cars;
   const hc_percent = hc_total / population * 100;
-  const cars_for_target = Math.ceil(rtt_s / target_interval_s);
+  const cars_for_target = Math.ceil(rtt_s / target_interval_s - 1e-9);
   const dominant = stopping_s >= travel_s && stopping_s >= transfer_s ? "stopping" : travel_s >= transfer_s ? "travel" : "transfer";
   if (![travel_s, stopping_s, transfer_s, rtt_s, interval_s, hc_per_car, hc_total, hc_percent].every(Number.isFinite)) return { error: "Elevator round-trip math is not a finite value." };
   return {
@@ -469,8 +469,8 @@ export function computeEscalatorCapacity({ speed_fpm = 0, step_depth_in = 0, per
   // Nobody stands on every step: real throughput is commonly half to two thirds
   // of theoretical, and theoretical is nonetheless what gets quoted.
   const practical_pph = theoretical_pph * loading_factor;
-  const units_needed = design_flow_pph > 0 ? Math.ceil(design_flow_pph / practical_pph) : 0;
-  const units_theoretical = design_flow_pph > 0 ? Math.ceil(design_flow_pph / theoretical_pph) : 0;
+  const units_needed = design_flow_pph > 0 ? Math.ceil(design_flow_pph / practical_pph - 1e-9) : 0;
+  const units_theoretical = design_flow_pph > 0 ? Math.ceil(design_flow_pph / theoretical_pph - 1e-9) : 0;
   const step_load_lb = persons_per_step * weight_per_person_lb;
   if (![steps_per_hour, theoretical_pph, practical_pph, step_load_lb].every(Number.isFinite)) return { error: "Escalator capacity math is not a finite value." };
   return {
@@ -540,7 +540,7 @@ export function computeScaffoldTieSpacing({ scaffold_height_ft = 0, base_width_f
   // scaffold with its first tie higher has unbraced length past the limit.
   const first_tie_height_ft = ties_required ? max_free_standing_ft : null;
   const tie_rows = (ties_required && vertical_tie_spacing_ft > 0)
-    ? Math.ceil((scaffold_height_ft - max_free_standing_ft) / vertical_tie_spacing_ft) + 1
+    ? Math.ceil((scaffold_height_ft - max_free_standing_ft) / vertical_tie_spacing_ft - 1e-9) + 1
     : (ties_required ? null : 0);
   const ties_per_row = (scaffold_run_ft > 0 && horizontal_tie_spacing_ft > 0)
     // 1926.451(c)(1)(ii): a tie at each end and intervals not over the spacing,
@@ -707,7 +707,7 @@ export function computeSuspendedScaffoldCounterweight({ rated_load_lb = 0, outbo
   const stall_counterweight_lb = hoist_stall_load_lb * lever_ratio * 1.5;
   const stall_governs = stall_counterweight_lb > balance_counterweight_lb * factor_of_safety;
   const required_counterweight_lb = Math.max(balance_counterweight_lb * factor_of_safety, stall_counterweight_lb);
-  const counterweight_units = counterweight_unit_lb > 0 ? Math.ceil(required_counterweight_lb / counterweight_unit_lb) : null;
+  const counterweight_units = counterweight_unit_lb > 0 ? Math.ceil(required_counterweight_lb / counterweight_unit_lb - 1e-9) : null;
   const provided_counterweight_lb = counterweight_units === null ? required_counterweight_lb : counterweight_units * counterweight_unit_lb;
   const resisting_moment_ft_lb = provided_counterweight_lb * inboard_arm_ft;
   const achieved_fos = overturning_moment_ft_lb > 0 ? resisting_moment_ft_lb / overturning_moment_ft_lb : null;
@@ -785,7 +785,7 @@ export function computeShoringReshoringLoad({ slab_dead_psf = 0, construction_li
   // dead load no number of levels helps, which is a different problem.
   const headroom_psf = governing_slab_capacity_psf - slab_dead_psf;
   const levels_required = (governing_slab_capacity_psf > 0 && headroom_psf > 0)
-    ? Math.max(1, Math.ceil(redistributed_load_psf / headroom_psf))
+    ? Math.max(1, Math.ceil(redistributed_load_psf / headroom_psf - 1e-9))
     : null;
   const capacity_below_dead = governing_slab_capacity_psf > 0 && headroom_psf <= 0;
   // The same stack read the other way, so the distinction is visible.

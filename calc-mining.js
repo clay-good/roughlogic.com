@@ -417,7 +417,7 @@ export function computeCrusherReductionRatio({ feed_size_in = 0, product_size_in
   const first_intermediate_in = feed_size_in / per_stage_ratio;
   const second_intermediate_in = first_intermediate_in / per_stage_ratio;
   // Stages needed to keep every machine at the top of its range.
-  const stages_required = Math.ceil(Math.log(total_ratio) / Math.log(machine_ratio_high));
+  const stages_required = Math.ceil(Math.log(total_ratio) / Math.log(machine_ratio_high) - 1e-9);
   const comfortable_ratio = Math.pow(total_ratio, 1 / stages_required);
   // The diagnostic: what the downstream machine is actually being asked for
   // when the upstream one is not reducing as planned.
@@ -720,7 +720,7 @@ export function computeMineFaceVentilation({ heading_width_ft = 0, heading_heigh
   const velocity_ok = face_velocity_fpm >= min_face_velocity_fpm;
   const diesel_ok = delivered_cfm >= diesel_required_cfm;
   const meets_governing = delivered_cfm >= governing_cfm;
-  const max_diesel_units = Math.floor(delivered_cfm / diesel_cfm_each);
+  const max_diesel_units = Math.floor(delivered_cfm / diesel_cfm_each + 1e-9);
   const efficiency_needed_pct = governing_cfm / fan_airflow_cfm * 100;
   return {
     heading_area_sqft, delivered_cfm, leakage_cfm, face_velocity_fpm,
@@ -773,7 +773,7 @@ export function computePitDewateringStaging({ static_lift_ft = 0, friction_head_
   if (!(flow_gpm > 0)) return { error: "Flow must be positive." };
   if (!(pump_efficiency_pct > 0 && pump_efficiency_pct <= 100)) return { error: "Pump efficiency must be in (0, 100] percent." };
   const total_head_ft = static_lift_ft + friction_head_ft + discharge_pressure_ft;
-  const stages = Math.ceil(total_head_ft / head_per_pump_ft);
+  const stages = Math.ceil(total_head_ft / head_per_pump_ft - 1e-9);
   const head_per_stage_ft = total_head_ft / stages;
   const suction_ok = suction_lift_ft <= practical_suction_limit_ft;
   const suction_excess_ft = Math.max(0, suction_lift_ft - practical_suction_limit_ft);

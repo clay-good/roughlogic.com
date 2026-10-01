@@ -246,7 +246,7 @@ export function computeSubSlabSuctionField({
     ? "the communication test brackets the field between " + fmt(reaches_ft, 0) + " and " + fmt(fails_ft, 0) + " ft: vacuum was measurable at " + fmt(reaches_ft, 0) + " ft and not at " + fmt(fails_ft, 0) + ". Designing on the CONFIRMED radius of " + fmt(effective_radius_ft, 0) + " ft is the conservative reading, and the difference between the two is how much more testing would buy"
     : "vacuum was measurable at " + fmt(reaches_ft, 0) + " ft, with no failing hole entered -- so the field reaches AT LEAST that far and the true radius is unknown. A hole that fails is worth more than another that succeeds, because it is the one that bounds the design";
   const area_per_point_ft2 = Math.PI * effective_radius_ft * effective_radius_ft;
-  const points_required = Math.max(1, Math.ceil(slab_area_ft2 / area_per_point_ft2));
+  const points_required = Math.max(1, Math.ceil(slab_area_ft2 / area_per_point_ft2 - 1e-9));
   const coverage_ratio = slab_area_ft2 / area_per_point_ft2;
   const area_verdict = "a confirmed radius of " + fmt(effective_radius_ft, 0) + " ft covers " + fmt(area_per_point_ft2, 0) + " sq ft per point, so a " + fmt(slab_area_ft2, 0) + " sq ft slab needs " + fmt(points_required, 0) + " suction point" + (points_required > 1 ? "s" : "") + " on area alone (" + fmt(coverage_ratio, 2) + " slab areas per point)";
   // Area alone is not enough: a long narrow slab needs more than a compact one.

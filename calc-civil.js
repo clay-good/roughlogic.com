@@ -1007,7 +1007,7 @@ export function computeSkipLineLayout({ stripe_length_ft = 0, gap_length_ft = 0,
   const usable_ft = run_length_ft - start_offset_ft;
   if (!(usable_ft >= stripe_length_ft)) return { error: "The offset leaves less than one stripe of room in the run." };
   const FT_PER_MILE = 5280;
-  const stripes_in_run = Math.floor((usable_ft - stripe_length_ft) / cycle_length_ft) + 1;
+  const stripes_in_run = Math.floor((usable_ft - stripe_length_ft) / cycle_length_ft + 1e-9) + 1;
   const stripes_per_mile = FT_PER_MILE / cycle_length_ft;
   const painted_length_ft = stripes_in_run * stripe_length_ft;
   const painted_per_mile_ft = stripes_per_mile * stripe_length_ft;

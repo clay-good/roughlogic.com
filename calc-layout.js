@@ -331,14 +331,14 @@ export function computeDecimalToFraction({ value_in = 0, denominator = 16 } = {}
   const sign = v < 0 ? -1 : 1;
   const av = Math.abs(v);
   const totalTicks = Math.round(av * den);
-  const wholeInBase = Math.floor(totalTicks / den);
+  const wholeInBase = Math.floor(totalTicks / den + 1e-9);
   const remTicks = totalTicks - wholeInBase * den;
   const g = _bcGcd(remTicks, den);
   const numerator = remTicks === 0 ? 0 : remTicks / g;
   const reduced_denominator = remTicks === 0 ? 1 : den / g;
   const decimal_value_in = sign * (totalTicks / den);
   const error_in = decimal_value_in - v;
-  const feet = Math.floor(wholeInBase / 12);
+  const feet = Math.floor(wholeInBase / 12 + 1e-9);
   const inch_in_ft = wholeInBase - feet * 12;
   const sgn = sign < 0 ? "-" : "";
   const fracPart = numerator === 0 ? "" : numerator + "/" + reduced_denominator;
@@ -810,7 +810,7 @@ export function computeEqualSpacing({ run_in = 0, item_width_in = 0, mode = "max
   } else {
     const gmax = Number(max_gap_in) || 0;
     if (!(gmax > 0)) return { error: "Maximum gap must be positive (in)." };
-    N = Math.ceil((run - gmax) / (w + gmax));
+    N = Math.ceil((run - gmax) / (w + gmax) - 1e-9);
     if (!(N >= 0)) N = 0;
   }
   const gap_in = (run - N * w) / (N + 1);

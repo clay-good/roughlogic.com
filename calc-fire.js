@@ -1092,7 +1092,7 @@ export function renderScbaCylinder(inputRegion, outputRegion, citationEl) {
   }
   function formatMinSec(min) {
     const totalSec = Math.max(0, Math.round(min * 60));
-    const m = Math.floor(totalSec / 60);
+    const m = Math.floor(totalSec / 60 + 1e-9);
     const s = totalSec % 60;
     return m + ":" + (s < 10 ? "0" + s : String(s));
   }
@@ -1191,7 +1191,7 @@ export function computeNFPA1142WaterSupply({
   // satisfies the volume in N apparatus trips with N round up).
   const tanker_count = {};
   for (const sz of NFPA1142_TANKER_SIZES_GAL) {
-    tanker_count[sz] = Math.ceil(Q / sz);
+    tanker_count[sz] = Math.ceil(Q / sz - 1e-9);
   }
 
   const warnings = [];
@@ -1567,7 +1567,7 @@ export function computeSmokeEjector({
   if (!(fan > 0)) return { error: "Fan CFM rating must be positive." };
 
   const cfm_required = (volume_ft3 * ach) / 60;
-  const fans = Math.ceil(cfm_required / fan);
+  const fans = Math.ceil(cfm_required / fan - 1e-9);
   const cfm_actual = fans * fan;
   const time_to_one_change_min = volume_ft3 / cfm_actual;
   const opening_ratio = entry > 0 ? exhaust / entry : null;
@@ -1966,8 +1966,8 @@ export function computeExtinguisherCoverage({ floor_area_sf = 0, hazard_class = 
   // Idealised square grid: worst case is the centre of a square, at s x sqrt(2)/2.
   const grid_spacing_ft = travel_used_ft * Math.SQRT2;
   const area_per_unit_sf = 2 * travel_used_ft * travel_used_ft;
-  const by_travel = Math.ceil(area / area_per_unit_sf);
-  const by_area_cap = Math.ceil(area / cap);
+  const by_travel = Math.ceil(area / area_per_unit_sf - 1e-9);
+  const by_area_cap = Math.ceil(area / cap - 1e-9);
   const required_extinguishers = Math.max(by_travel, by_area_cap);
   const travel_governs = by_travel >= by_area_cap;
   // The identity that ties the two limits together, checked rather than asserted.
@@ -2140,8 +2140,8 @@ export function computeHoseLaySectionCount({ map_distance_ft = 0, slack_fraction
   // A hose lay never runs the straight-line distance. Undercounting by one section at the
   // end of a long lay is a break in the line at the worst possible moment.
   const lay_length_ft = map_distance_ft * (1 + slack_fraction);
-  const sections = Math.ceil(lay_length_ft / section_length_ft);
-  const sections_by_map = Math.ceil(map_distance_ft / section_length_ft);
+  const sections = Math.ceil(lay_length_ft / section_length_ft - 1e-9);
+  const sections_by_map = Math.ceil(map_distance_ft / section_length_ft - 1e-9);
   const actual_reach_ft = sections * section_length_ft;
   const gal_per_ft = Math.PI * (hose_id_in / 2) ** 2 * 12 / 231;
   const gallons = gal_per_ft * actual_reach_ft;

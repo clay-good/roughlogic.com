@@ -550,7 +550,7 @@ RELIEFWATER_RENDERERS["lift-station-outage-storage"] = _simpleRenderer({
 
 // 29 CFR 1910.141 Table J-1 rows to 150 employees: [upper bound, water closets].
 const _J1 = [[15, 1], [35, 2], [55, 3], [80, 4], [110, 5], [150, 6]];
-const _j1WaterClosets = (n) => { if (!(n > 0)) return 0; const row = _J1.find(([upper]) => n <= upper); return row ? row[1] : 6 + Math.ceil((n - 150) / 40); };
+const _j1WaterClosets = (n) => { if (!(n > 0)) return 0; const row = _J1.find(([upper]) => n <= upper); return row ? row[1] : 6 + Math.ceil((n - 150) / 40 - 1e-9); };
 
 // dims: in { industry: dimensionless, worker_count: dimensionless, used_by_women: dimensionless, women_count: dimensionless } out: { toilet_seats: dimensionless, urinals: dimensionless, water_closets_min: dimensionless, water_closets_men: dimensionless, water_closets_women: dimensionless, water_closet_floor: dimensionless, urinals_substitutable: dimensionless, handwash_facilities: dimensionless }
 export function computeOshaToiletCount({ industry = "construction", worker_count = 0, used_by_women = "yes", women_count = 0 } = {}) {
@@ -569,14 +569,14 @@ export function computeOshaToiletCount({ industry = "construction", worker_count
       toilet_seats = 1;
       rule = "29 CFR 1926.51(c)(1) Table D-1: 20 or less -> 1 facility";
     } else if (worker_count < 200) {
-      toilet_seats = Math.ceil(worker_count / 40);
+      toilet_seats = Math.ceil(worker_count / 40 - 1e-9);
       urinals = toilet_seats;
       rule = "29 CFR 1926.51(c)(1) Table D-1: 20 or more -> 1 toilet seat and 1 urinal per 40 workers";
     } else {
-      toilet_seats = Math.ceil(worker_count / 50);
+      toilet_seats = Math.ceil(worker_count / 50 - 1e-9);
       urinals = toilet_seats;
       rule = "29 CFR 1926.51(c)(1) Table D-1: 200 or more -> 1 toilet seat and 1 urinal per 50 workers";
-      const per40 = Math.ceil(worker_count / 40);
+      const per40 = Math.ceil(worker_count / 40 - 1e-9);
       if (per40 > toilet_seats) boundary_note = "At 199 workers the per-40 row asked for more: this count would be " + per40 + " and " + per40 + " at one per 40. The table steps DOWN at 200; a site at the line should not read the drop as permission to remove units.";
     }
     if (worker_count === 20) boundary_note = "Table D-1's \"20 or less\" and \"20 or more\" rows overlap at exactly 20: the first gives 1 facility, the per-40 row 1 seat and 1 urinal. The larger reading is shown.";
@@ -603,7 +603,7 @@ export function computeOshaToiletCount({ industry = "construction", worker_count
     // 29 CFR 1928.110(a): the section applies where 11 or more employees do
     // hand labor in the field on a given day.
     if (worker_count >= 11) {
-      toilet_seats = Math.ceil(worker_count / 20);
+      toilet_seats = Math.ceil(worker_count / 20 - 1e-9);
       handwash_facilities = toilet_seats;
       rule = "29 CFR 1928.110(c)(2)(i): 1 toilet and 1 handwashing facility per 20 employees or fraction, within a 1/4-mile walk (c)(2)(iii)";
       boundary_note = "Not required for employees whose field work, including travel to and from the field, lasts 3 hours or less in the day (1928.110(c)(2)(v)).";
@@ -651,17 +651,17 @@ export function computeResponderCampSanitation({ men_count = 0, women_count = 0,
   const total = men_count + women_count;
   // 1910.142(d)(5): per sex, 1 per 15 of the maximum of that sex, minimum of
   // two units for any shared facility; a sex the camp does not house gets none.
-  const perSex = (n) => (n > 0 ? Math.max(2, Math.ceil(n / 15)) : 0);
+  const perSex = (n) => (n > 0 ? Math.max(2, Math.ceil(n / 15 - 1e-9)) : 0);
   const toilets_men = perSex(men_count);
   const toilets_women = perSex(women_count);
   const toilets_total = toilets_men + toilets_women;
-  const whole_camp_ratio = Math.ceil(total / 15);
-  const urinals = Math.ceil(men_count / 25);
+  const whole_camp_ratio = Math.ceil(total / 15 - 1e-9);
+  const urinals = Math.ceil(men_count / 25 - 1e-9);
   const urinal_trough_ft = 2 * urinals;
-  const handwash_basins = Math.ceil(total / 6);
-  const showerheads = Math.ceil(total / 10);
-  const laundry_trays = Math.ceil(total / 30);
-  const drinking_fountains = pressure_water === "yes" ? Math.ceil(total / 100) : 0;
+  const handwash_basins = Math.ceil(total / 6 - 1e-9);
+  const showerheads = Math.ceil(total / 10 - 1e-9);
+  const laundry_trays = Math.ceil(total / 30 - 1e-9);
+  const drinking_fountains = pressure_water === "yes" ? Math.ceil(total / 100 - 1e-9) : 0;
   const water_gal_per_day = 35 * total;
   const average_gph = water_gal_per_day / 24;
   const peak_gph = 2.5 * average_gph;

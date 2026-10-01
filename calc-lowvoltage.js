@@ -556,7 +556,7 @@ export function computeSpeaker70vLine({ amp_rated_w = 0, headroom_percent = 20, 
   if (total_tap_w > 0) reflected_impedance_ohm = (V * V) / total_tap_w;
   else notes.push("No tap load entered: line impedance is suppressed (open line).");
   const remaining_w = budget_limit_w - total_tap_w;
-  const max_additional_taps = (tw > 0 && remaining_w > 0) ? Math.floor(remaining_w / tw) : 0;
+  const max_additional_taps = (tw > 0 && remaining_w > 0) ? Math.floor(remaining_w / tw + 1e-9) : 0;
   if (!within_budget) notes.push("Tap load " + fmt(total_tap_w, 1) + " W exceeds the amplifier budget (" + fmt(budget_limit_w, 1) + " W at " + headroom + "% headroom).");
   // Line loss over the run (optional).
   let line_loss_db = null;
@@ -872,7 +872,7 @@ export function computeCeilingSpeakerCoverage({ ceiling_ft = 0, ear_ft = 0, cove
   if (!(area > 0)) return { error: "Room area must be positive (ft^2)." };
   const diameter_ft = 2 * (ceiling - ear) * Math.tan((cov / 2) * Math.PI / 180);
   const spacing_ft = layout === "minimum_overlap" ? 0.7 * diameter_ft : diameter_ft;
-  const count = Math.ceil(area / (spacing_ft * spacing_ft));
+  const count = Math.ceil(area / (spacing_ft * spacing_ft) - 1e-9);
   return {
     diameter_ft, spacing_ft, count, overlap: layout === "minimum_overlap",
     note: "Ceiling speaker coverage and spacing: a ceiling speaker covers a cone whose diameter at the listener plane = 2 x (ceiling - ear height) x tan(coverage angle / 2). Spacing edge-to-edge (speakers just touching, spacing = diameter) gives minimum count but the level dips between speakers; minimum-overlap spacing = 0.7 x diameter (D / sqrt 2: the -6 dB circles just leave no uncovered spot on a square grid, JBL) gives even coverage for more speakers. Count = ceil(room area / spacing^2). A layout aid; verify with the speaker's coverage-angle spec at the design frequency (angle narrows at high frequency) and the target SPL.",
@@ -1003,7 +1003,7 @@ export function computeLvCablePullFootage({ drops = 48, avg_run_ft = 120, slack_
   if (!(box_ft > 0)) return { error: "Box length must be positive (ft)." };
   if (slack_ft < 0) return { error: "Slack cannot be negative (ft)." };
   const total_ft = drops * (avg_run_ft + slack_ft);
-  const boxes = Math.ceil(total_ft / box_ft);
+  const boxes = Math.ceil(total_ft / box_ft - 1e-9);
   if (![total_ft, boxes].every(Number.isFinite)) return { error: "Footage math is not a finite value." };
   return {
     total_ft,
@@ -1046,7 +1046,7 @@ export function computeCableSupportJhook({ run_ft = 400, spacing_ft = 4, num_cab
   if (!(num_cables > 0)) return { error: "Cable count must be positive." };
   if (!(cable_lb_per_ft > 0)) return { error: "Cable weight must be positive (lb/ft)." };
   if (hook_wll_lb < 0) return { error: "Hook working load cannot be negative (lb)." };
-  const hooks = Math.ceil(run_ft / spacing_ft);
+  const hooks = Math.ceil(run_ft / spacing_ft - 1e-9);
   const load_per_hook_lb = num_cables * cable_lb_per_ft * spacing_ft;
   const utilization = hook_wll_lb > 0 ? load_per_hook_lb / hook_wll_lb : null;
   if (![hooks, load_per_hook_lb].every(Number.isFinite)) return { error: "J-hook math is not a finite value." };

@@ -3437,7 +3437,7 @@ export function computeBlownInsulationCoverage({ area_sqft = 0, bags_per_1000 = 
   if (!(r_per_inch > 0)) return { error: "R per inch must be positive." };
   if (!(target_r > 0)) return { error: "Target R must be positive." };
   return {
-    bags: Math.ceil(area_sqft / 1000 * bags_per_1000),
+    bags: Math.ceil(area_sqft / 1000 * bags_per_1000 - 1e-9),
     coverage_per_bag: 1000 / bags_per_1000,
     min_thickness_in: target_r / r_per_inch,
     note: "Blown-insulation coverage is brand-specific, so read the bag's own bags per 1,000 sq ft at this R-value and its minimum settled thickness - both must be met, because a machine can hit the thickness while blowing too few bags (under-dense, and it will settle short). Cellulose runs about R-3.5 per inch and blown fiberglass about R-2.5, so a target R sets the depth. Settling is already in the chart's settled-thickness column. Mark the joists to the target depth so the crew blows it even.",

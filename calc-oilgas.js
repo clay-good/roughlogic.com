@@ -490,7 +490,7 @@ export function computeCathodicAnodeCountLife({
   const current_required_a = bare_area_ft2 * current_density_ma_per_ft2 / _OG_MA_PER_AMP;
   // The count, and the life, each gated on the input they need.
   const has_anode_output = current_per_anode_a > 0;
-  const anode_count = has_anode_output ? Math.ceil(current_required_a / current_per_anode_a) : 0;
+  const anode_count = has_anode_output ? Math.ceil(current_required_a / current_per_anode_a - 1e-9) : 0;
   const has_life_basis = anode_weight_lb > 0 && consumption_lb_per_a_yr > 0 && current_per_anode_a > 0;
   const anode_life_years = has_life_basis ? anode_weight_lb * utilization / (consumption_lb_per_a_yr * current_per_anode_a) : 0;
   const has_target_life = target_life_years > 0 && consumption_lb_per_a_yr > 0;
@@ -675,7 +675,7 @@ export function computeCasingCementVolume({
   const slurry_volume_bbl = annular_volume_bbl * (1 + excess_pct / 100);
   const slurry_volume_ft3 = slurry_volume_bbl * _OG_CUFT_PER_BBL;
   const has_yield = slurry_yield_ft3_per_sack > 0;
-  const sacks = has_yield ? Math.ceil(slurry_volume_ft3 / slurry_yield_ft3_per_sack) : 0;
+  const sacks = has_yield ? Math.ceil(slurry_volume_ft3 / slurry_yield_ft3_per_sack - 1e-9) : 0;
   // Displacement is the casing capacity to the float, and getting it wrong is
   // the more dangerous error in either direction.
   const has_float = float_collar_ft > 0;
