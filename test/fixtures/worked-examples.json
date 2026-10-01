@@ -118920,7 +118920,7 @@
    "source_publisher": "Project (first-principles)",
    "source_title": "Mortar Batch Proportions by Volume (ASTM C270) -- the spec-v1683 worked example, recomputed",
    "source_edition_or_year": "spec-v1683 of scope-trade-expansion-2, 2026-09-08",
-   "source_section_or_page": "the standards named in the tile citation govern",
+   "source_section_or_page": "the standards named in the tile citation govern; recomputed 2026-10-01 at a #2 shovel of 0.2 cu ft (National Lime Association: 30-36 shovels for 6-7 cu ft)",
    "verified_by": "rl",
    "verified_on": "2026-09-08",
    "inputs": {
@@ -118975,7 +118975,7 @@
      }
     },
     "sand_shovels": {
-     "value": 7.5,
+     "value": 18.75,
      "tolerance": {
       "pct": 0.5
      }
@@ -119024,13 +119024,13 @@
      }
     },
     "base_pressure_psi": {
-     "value": 4.86111,
+     "value": 4.861111111111111,
      "tolerance": {
       "pct": 0.5
      }
     },
     "pressure_at_limit_psi": {
-     "value": 5.18194,
+     "value": 5.1819444444444445,
      "tolerance": {
       "pct": 0.5
      }
@@ -120741,7 +120741,7 @@
    },
    "outputs": {
     "expansion_factor": {
-     "value": 3.88859,
+     "value": 3.8885910094964786,
      "tolerance": {
       "pct": 0.5
      }
@@ -120753,19 +120753,19 @@
      }
     },
     "volume_required_ft3": {
-     "value": 388.8591,
+     "value": 388.8591009496479,
      "tolerance": {
       "pct": 0.5
      }
     },
     "actual_residence_s": {
-     "value": 0.75027,
+     "value": 0.7502717546985682,
      "tolerance": {
       "pct": 0.5
      }
     },
     "standard_basis_residence_s": {
-     "value": 0.19287,
+     "value": 0.19287191637495327,
      "tolerance": {
       "pct": 0.5
      }
@@ -123084,13 +123084,13 @@
    "source_publisher": "Project (first-principles)",
    "source_title": "Tree Root Ball Diameter and Weight (ANSI Z60.1) -- the spec-v1697 worked example, recomputed",
    "source_edition_or_year": "spec-v1697 of scope-trade-expansion-2, 2026-09-08",
-   "source_section_or_page": "the standards named in the tile citation govern",
+   "source_section_or_page": "the standards named in the tile citation govern; recomputed 2026-10-01 at ANSI Z60.1's 0.60 depth ratio for balls 20 in and over",
    "verified_by": "rl",
    "verified_on": "2026-09-08",
    "inputs": {
     "caliper_in": 6,
     "ball_per_caliper_in": 10,
-    "depth_ratio": 0.65,
+    "depth_ratio": 0.6,
     "soil_density_pcf": 105,
     "handling_limit_lb": 2000
    },
@@ -123108,31 +123108,31 @@
      }
     },
     "ball_depth_ft": {
-     "value": 3.25,
+     "value": 3,
      "tolerance": {
       "pct": 0.5
      }
     },
     "ball_volume_ft3": {
-     "value": 63.8136,
+     "value": 58.90486225480862,
      "tolerance": {
       "pct": 0.5
      }
     },
     "ball_weight_lb": {
-     "value": 6700.42808,
+     "value": 6185.010536754905,
      "tolerance": {
       "pct": 0.5
      }
     },
     "ball_weight_tons": {
-     "value": 3.35021,
+     "value": 3.0925052683774523,
      "tolerance": {
       "pct": 0.5
      }
     },
     "caliper_for_limit_in": {
-     "value": 4.00984,
+     "value": 4.118266378680771,
      "tolerance": {
       "pct": 0.5
      }
@@ -125969,7 +125969,7 @@
    "source_publisher": "Project (first-principles)",
    "source_title": "Pool Pump Speed Reduction Energy Savings -- the spec-v1702 worked example, recomputed",
    "source_edition_or_year": "spec-v1702 of scope-trade-expansion-2, 2026-09-09",
-   "source_section_or_page": "the standards named in the tile citation govern",
+   "source_section_or_page": "the standards named in the tile citation govern; recomputed 2026-10-01 at DOE's typical draw per nameplate hp (1-1/2 hp draws about 2,000 W)",
    "verified_by": "rl",
    "verified_on": "2026-09-09",
    "inputs": {
@@ -125982,13 +125982,13 @@
    },
    "outputs": {
     "full_kw": {
-     "value": 1.4914,
+     "value": 2.6666666666666665,
      "tolerance": {
       "pct": 0.5
      }
     },
     "reduced_kw": {
-     "value": 0.186425,
+     "value": 0.3333333333333333,
      "tolerance": {
       "pct": 0.5
      }
@@ -126006,25 +126006,25 @@
      }
     },
     "full_kwh_day": {
-     "value": 11.9312,
+     "value": 21.333333333333332,
      "tolerance": {
       "pct": 0.5
      }
     },
     "reduced_kwh_day": {
-     "value": 2.9828,
+     "value": 5.333333333333333,
      "tolerance": {
       "pct": 0.5
      }
     },
     "saving_kwh_day": {
-     "value": 8.9484,
+     "value": 16,
      "tolerance": {
       "pct": 0.5
      }
     },
     "annual_saving_cost": {
-     "value": 522.58656,
+     "value": 934.4,
      "tolerance": {
       "pct": 0.5
      }
@@ -138547,6 +138547,1733 @@
      "value": 12.5,
      "tolerance": {
       "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "water-quality-volume",
+   "source_publisher": "New York City Department of Environmental Protection",
+   "source_title": "NYC Stormwater Manual, Appendix D: Stormwater Management Practice Sizing Examples",
+   "source_edition_or_year": "2024 (PDF dated 2024-07-03)",
+   "source_section_or_page": "Water Quality Volume Sizing Examples, Stormwater Planter, Step 1: 3,000 sf impervious, I = 100%, Rv = 0.05 + 0.009(I) = 0.95, WQV = (1.5 in/12) x 3,000 sf x 0.95 = 356.25 cf. Area entered as 3,000/43,560 ac (exact unit conversion of the printed sf). alternative_impervious_percent and drawdown_hours are placeholders (0 = skip).",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "rainfall_depth_in": 1.5,
+    "impervious_percent": 100,
+    "area_ac": 0.06887052341597796,
+    "alternative_impervious_percent": 0,
+    "drawdown_hours": 0
+   },
+   "outputs": {
+    "runoff_coefficient": {
+     "value": 0.95,
+     "tolerance": {
+      "abs": 0.0005
+     }
+    },
+    "wqv_cf": {
+     "value": 356.25,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "water-quality-volume",
+   "source_publisher": "New York City Department of Environmental Protection",
+   "source_title": "NYC Stormwater Manual, Appendix D: Stormwater Management Practice Sizing Examples",
+   "source_edition_or_year": "2024 (PDF dated 2024-07-03)",
+   "source_section_or_page": "Water Quality Volume Sizing Examples, Subsurface Gallery, Step 1: 90,000 sf impervious, I = 100%, Rv = 0.95, WQV = (1.5/12) x 90,000 x 0.95 = 10,687.5 cf. Area entered as 90,000/43,560 ac. alternative_impervious_percent and drawdown_hours are placeholders.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "rainfall_depth_in": 1.5,
+    "impervious_percent": 100,
+    "area_ac": 2.0661157024793386,
+    "alternative_impervious_percent": 0,
+    "drawdown_hours": 0
+   },
+   "outputs": {
+    "wqv_cf": {
+     "value": 10687.5,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "water-quality-volume",
+   "source_publisher": "Maryland Department of the Environment",
+   "source_title": "2000 Maryland Stormwater Design Manual, Volume II, Appendix C.2: Design Example 2 - Water Quality BMPs (Comstock Commercial Center)",
+   "source_edition_or_year": "2000 (copy hosted by the California SF Bay Regional Water Quality Control Board)",
+   "source_section_or_page": "C.2.2 Step 1a/1b: P = 1 in (Eastern Rainfall Zone), I = 0.36 ac / 0.77 ac = 46.8%, Rv = 0.471, WQv = (1)(0.471)(0.77)/12 = 0.0302 ac-ft (1,316.5 cf). impervious_percent entered as 0.36/0.77 x 100 (the printed ratio, unrounded); printed values rounded to 3 decimals / 0.0001 ac-ft / 0.1 cf. alternative_impervious_percent and drawdown_hours are placeholders.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "rainfall_depth_in": 1,
+    "impervious_percent": 46.75324675324675,
+    "area_ac": 0.77,
+    "alternative_impervious_percent": 0,
+    "drawdown_hours": 0
+   },
+   "outputs": {
+    "runoff_coefficient": {
+     "value": 0.471,
+     "tolerance": {
+      "abs": 0.0005
+     }
+    },
+    "wqv_ac_ft": {
+     "value": 0.0302,
+     "tolerance": {
+      "abs": 5e-05
+     }
+    },
+    "wqv_cf": {
+     "value": 1316.5,
+     "tolerance": {
+      "pct": 0.1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "water-quality-volume",
+   "source_publisher": "Maryland Department of the Environment",
+   "source_title": "2000 Maryland Stormwater Design Manual, Volume II, Appendix C.2: Design Example 2 - Water Quality BMPs (Comstock Commercial Center)",
+   "source_edition_or_year": "2000 (copy hosted by the California SF Bay Regional Water Quality Control Board)",
+   "source_section_or_page": "C.2 Step 4, DA-1: P = 1 in, I = 0.16/0.20 = 80%, Rv = 0.77, WQv = (1)(0.77)(0.20)/12 = 0.0128 ac-ft (557.5 cf). The printed cf is the rounded 0.0128 ac-ft x 43,560, so the cf tolerance covers that 0.26% rounding. alternative_impervious_percent and drawdown_hours are placeholders.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "rainfall_depth_in": 1,
+    "impervious_percent": 80,
+    "area_ac": 0.2,
+    "alternative_impervious_percent": 0,
+    "drawdown_hours": 0
+   },
+   "outputs": {
+    "runoff_coefficient": {
+     "value": 0.77,
+     "tolerance": {
+      "abs": 0.0005
+     }
+    },
+    "wqv_ac_ft": {
+     "value": 0.0128,
+     "tolerance": {
+      "abs": 5e-05
+     }
+    },
+    "wqv_cf": {
+     "value": 557.5,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "water-quality-volume",
+   "source_publisher": "Maryland Department of the Environment",
+   "source_title": "2000 Maryland Stormwater Design Manual, Volume II, Appendix C.2: Design Example 2 - Water Quality BMPs (Comstock Commercial Center)",
+   "source_edition_or_year": "2000 (copy hosted by the California SF Bay Regional Water Quality Control Board)",
+   "source_section_or_page": "C.2 Step 4, DA-2: P = 1 in, I = 0.20/0.22 = 91% (printed rounded), Rv = 0.87, WQv = (1)(0.87)(0.22)/12 = 0.0160 ac-ft (694.8 cf). impervious_percent entered as the unrounded ratio 0.20/0.22 x 100 = 90.91; tolerances cover the publisher's rounding of I to 91% and Rv to 0.87. alternative_impervious_percent and drawdown_hours are placeholders.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "rainfall_depth_in": 1,
+    "impervious_percent": 90.90909090909092,
+    "area_ac": 0.22,
+    "alternative_impervious_percent": 0,
+    "drawdown_hours": 0
+   },
+   "outputs": {
+    "runoff_coefficient": {
+     "value": 0.87,
+     "tolerance": {
+      "abs": 0.0025
+     }
+    },
+    "wqv_ac_ft": {
+     "value": 0.016,
+     "tolerance": {
+      "pct": 0.6
+     }
+    },
+    "wqv_cf": {
+     "value": 694.8,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "water-quality-volume",
+   "source_publisher": "Iowa Department of Natural Resources",
+   "source_title": "Iowa Storm Water Management Manual, Chapter 3 Section 6: Small Storm Hydrology",
+   "source_edition_or_year": "December 2023",
+   "source_section_or_page": "Item 3, example: 5-ac commercial site, 4.6 ac impervious, I = 92%, Rv = 0.05 + 0.009(92) = 0.878 (printed, then rounded to 0.88). P = 1.25 in. ONLY Rv is carried: the printed WQv of 19,995 cf does not follow from its own expression (1.25 x 0.88 x 5 / 12 x 43,560 = 19,965 cf), so it is omitted. alternative_impervious_percent and drawdown_hours are placeholders.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "rainfall_depth_in": 1.25,
+    "impervious_percent": 92,
+    "area_ac": 5,
+    "alternative_impervious_percent": 0,
+    "drawdown_hours": 0
+   },
+   "outputs": {
+    "runoff_coefficient": {
+     "value": 0.878,
+     "tolerance": {
+      "abs": 0.0005
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "water-quality-volume",
+   "source_publisher": "North Central Texas Council of Governments",
+   "source_title": "iSWM Technical Manual: Water Quality",
+   "source_edition_or_year": "April 2010",
+   "source_section_or_page": "Water quality protection volume Example Problem: 50 ac, 18 ac impervious (I = 36%), P = 1.5 in, Rv printed 0.37, WQv = 1.5(0.37)(50)/12 = 2.31 ac-ft. The tile's unrounded Rv is 0.374, so the tolerances cover the publisher's rounding of Rv to two places (about 1.1%). alternative_impervious_percent and drawdown_hours are placeholders.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "rainfall_depth_in": 1.5,
+    "impervious_percent": 36,
+    "area_ac": 50,
+    "alternative_impervious_percent": 0,
+    "drawdown_hours": 0
+   },
+   "outputs": {
+    "runoff_coefficient": {
+     "value": 0.37,
+     "tolerance": {
+      "abs": 0.005
+     }
+    },
+    "wqv_ac_ft": {
+     "value": 2.31,
+     "tolerance": {
+      "pct": 1.3
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "water-quality-volume",
+   "source_publisher": "North Central Texas Council of Governments",
+   "source_title": "iSWM Technical Manual: Water Quality",
+   "source_edition_or_year": "April 2010",
+   "source_section_or_page": "Natural conservation area example, residential subdivision: 38 ac, 13.8 ac impervious (I = 36.3%), P = 1.5 in, Rv printed 0.38, WQv before reduction = (1.5)(0.38)(38)/12 = 1.81 ac-ft. impervious_percent entered as 13.8/38 x 100; tolerances cover the rounding of Rv 0.3768 to 0.38 (about 0.8%) plus the 0.01 ac-ft print. alternative_impervious_percent and drawdown_hours are placeholders.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "rainfall_depth_in": 1.5,
+    "impervious_percent": 36.31578947368421,
+    "area_ac": 38,
+    "alternative_impervious_percent": 0,
+    "drawdown_hours": 0
+   },
+   "outputs": {
+    "runoff_coefficient": {
+     "value": 0.38,
+     "tolerance": {
+      "abs": 0.005
+     }
+    },
+    "wqv_ac_ft": {
+     "value": 1.81,
+     "tolerance": {
+      "pct": 1.3
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "seepage-travel-time",
+   "source_publisher": "Washington State Department of Ecology",
+   "source_title": "Implementation Memorandum No. 15: Frequently Asked Questions (FAQs) Regarding Empirical Demonstrations and Related Issues, Publication 16-09-047, Appendix 2: Example Groundwater Travel Time Calculation",
+   "source_edition_or_year": "June 2016",
+   "source_section_or_page": "Attachment pages A-23/A-24: K = 1x10^-5 cm/s, i = 0.05, porosity 0.43, Vgw = (K)(i)(2834.646)/n = 0.0033 ft/day; well 15 ft from source, t = 15/0.0033 = 4551 days or 12.5 years (the 4551 is computed from the unrounded velocity). hydraulic_conductivity_ft_day entered as 1e-5 x 2834.646 (the publisher's own conversion factor); head_difference_ft 0.05 over flow_path_ft 1 is a placeholder pair carrying the printed gradient 0.05; retardation_factor 1 (the example states no retardation). The publisher uses the WAC 173-340-747 porosity 0.43 as n.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "hydraulic_conductivity_ft_day": 0.028346460000000004,
+    "head_difference_ft": 0.05,
+    "flow_path_ft": 1,
+    "effective_porosity": 0.43,
+    "travel_distance_ft": 15,
+    "retardation_factor": 1
+   },
+   "outputs": {
+    "gradient": {
+     "value": 0.05,
+     "tolerance": {
+      "abs": 1e-09
+     }
+    },
+    "seepage_velocity_ft_day": {
+     "value": 0.0033,
+     "tolerance": {
+      "abs": 5e-05
+     }
+    },
+    "travel_time_days": {
+     "value": 4551,
+     "tolerance": {
+      "abs": 1
+     }
+    },
+    "travel_time_years": {
+     "value": 12.5,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "drone-gsd-overlap",
+   "source_publisher": "Pix4D",
+   "source_title": "PIX4Dmapper support: Step 1. Before Starting a Project > 1. Designing the Image Acquisition Plan > b. Computing the Flight Height for a given GSD (article 202557469)",
+   "source_edition_or_year": "web page, accessed 2026-10-01",
+   "source_section_or_page": "Example: GSD 5 cm/pixel, real focal length 5 mm, real sensor width 6.17 mm, image width 4000 px gives H = (4000 x 5 x 5)/(6.17 x 100) = 162.07 m. Run in reverse: flight_height_ft = 162.07/0.3048, pixel_pitch_um = 6.17 mm / 4000 px = 1.5425; the printed 5 cm/px is the output. Tolerance covers H printed to 0.01 m. sensor_height_px 3000 (4:3 implied, not printed), overlaps and area_acres are placeholders.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "flight_height_ft": 531.7257217847769,
+    "focal_length_mm": 5,
+    "pixel_pitch_um": 1.5425,
+    "sensor_width_px": 4000,
+    "sensor_height_px": 3000,
+    "forward_overlap_pct": 75,
+    "side_overlap_pct": 65,
+    "area_acres": 0
+   },
+   "outputs": {
+    "gsd_cm_px": {
+     "value": 5,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "drone-gsd-overlap",
+   "source_publisher": "Penn State University, College of Earth and Mineral Sciences (Q. Abdullah)",
+   "source_title": "GEOG 892: Geospatial Applications of Unmanned Aerial Systems, Lesson 4: Designing a Flight Route",
+   "source_edition_or_year": "online course text, accessed 2026-10-01",
+   "source_section_or_page": "Flight Altitude Computations: f = 50 mm, CCD 0.010 mm (10 um), GSD 0.30 m gives H = 1,500 m above ground. Run in reverse: flight_height_ft = 1500/0.3048; the printed 0.30 m GSD (30 cm/px) is the output. sensor_width_px, sensor_height_px (4000 x 3000), overlaps (60/30, the lesson's stated endlap/sidelap) and area_acres are placeholders.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "flight_height_ft": 4921.259842519685,
+    "focal_length_mm": 50,
+    "pixel_pitch_um": 10,
+    "sensor_width_px": 4000,
+    "sensor_height_px": 3000,
+    "forward_overlap_pct": 60,
+    "side_overlap_pct": 30,
+    "area_acres": 0
+   },
+   "outputs": {
+    "gsd_cm_px": {
+     "value": 30,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "lidar-point-density",
+   "source_publisher": "Inertial Labs",
+   "source_title": "Knowledge Base: How Can I Estimate the LiDAR Point Density for My Flight?",
+   "source_edition_or_year": "Last updated September 2024",
+   "source_section_or_page": "Worked example (Livox AVIA): AGL 100 m, FOV 70 deg, swath = 100 x 2 x tan(35) = 140 m; 240,000 pts/s at 5 m/s, density = 240,000/(140 x 5) = 343 pts/m2. pulse_rate_khz 240 = 240,000 pts/s. side_overlap_pct and area_acres are placeholders. NOTE: the same page's RESEPI AVIA table rows are a factor of 2 off this example (342.76 at 50 m) and are NOT used.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "pulse_rate_khz": 240,
+    "scan_angle_deg": 70,
+    "flight_height_m": 100,
+    "ground_speed_ms": 5,
+    "side_overlap_pct": 20,
+    "area_acres": 0
+   },
+   "outputs": {
+    "swath_width_m": {
+     "value": 140,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "point_density_per_m2": {
+     "value": 343,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "lidar-point-density",
+   "source_publisher": "Inertial Labs",
+   "source_title": "Knowledge Base: How Can I Estimate the LiDAR Point Density for My Flight?",
+   "source_edition_or_year": "Last updated September 2024",
+   "source_section_or_page": "Table, RESEPI XT-32, FOV 90 deg, pulse rate 640,000 pts/s: at 10 m/s and 70 m AGL density = 457.1429 pts/m2 (printed to 4 decimals). side_overlap_pct and area_acres are placeholders.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "pulse_rate_khz": 640,
+    "scan_angle_deg": 90,
+    "flight_height_m": 70,
+    "ground_speed_ms": 10,
+    "side_overlap_pct": 20,
+    "area_acres": 0
+   },
+   "outputs": {
+    "point_density_per_m2": {
+     "value": 457.1429,
+     "tolerance": {
+      "abs": 0.0001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "lidar-point-density",
+   "source_publisher": "Inertial Labs",
+   "source_title": "Knowledge Base: How Can I Estimate the LiDAR Point Density for My Flight?",
+   "source_edition_or_year": "Last updated September 2024",
+   "source_section_or_page": "Table, RESEPI M2X, FOV 90 deg, pulse rate 640,000 pts/s: at 5 m/s and 50 m AGL density = 1280 pts/m2. side_overlap_pct and area_acres are placeholders.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "pulse_rate_khz": 640,
+    "scan_angle_deg": 90,
+    "flight_height_m": 50,
+    "ground_speed_ms": 5,
+    "side_overlap_pct": 20,
+    "area_acres": 0
+   },
+   "outputs": {
+    "point_density_per_m2": {
+     "value": 1280,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "rtk-error-budget",
+   "source_publisher": "RTKdata",
+   "source_title": "RTK GPS Accuracy: What 1-2 cm Actually Means in the Field (blog, K. Grub)",
+   "source_edition_or_year": "January 18, 2026",
+   "source_section_or_page": "How baseline distance affects RTK accuracy: a receiver quoted at 8 mm + 1 ppm horizontal (Trimble R12i: 8 mm + 1 ppm H, 15 mm + 1 ppm V) -- 'at 10 km the ppm term adds 10 mm to the 8 mm floor'. base_position_error_mm 0 and target_vertical_mm 0 are placeholders.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "baseline_km": 10,
+    "horizontal_fixed_mm": 8,
+    "horizontal_ppm": 1,
+    "vertical_fixed_mm": 15,
+    "vertical_ppm": 1,
+    "base_position_error_mm": 0,
+    "target_vertical_mm": 0
+   },
+   "outputs": {
+    "horizontal_ppm_mm": {
+     "value": 10,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "mass-haul-overhaul",
+   "source_publisher": "Institute of Transportation and Traffic Engineering, University of California (F. S. Foote)",
+   "source_title": "Information Circular No. 24 (Revised): Notes on the Mass Diagram as Applied to Earthwork Distribution",
+   "source_edition_or_year": "May 1955",
+   "source_section_or_page": "Sec. 16, Fig. 6 test strip AB 2,600 ft: haul of one cu yd costs 2(26-5) = 42 cents. Unit prices: free haul 500 ft, overhaul 2 cents per station yard, one cu yd test strip. overhaul_rate_per_station_yard entered as 2 so overhaul_cost is in CENTS. cut_volume_cy, shrinkage_factor, fill_required_cy (1, 1, 1) and borrow_haul_ft 0 are placeholders. (Fig. 9's printed 'Haul C to B 10 cents' for 1,200 ft does not follow 2(12-5) = 14 and is not used.)",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "cut_volume_cy": 1,
+    "shrinkage_factor": 1,
+    "fill_required_cy": 1,
+    "free_haul_ft": 500,
+    "overhaul_volume_cy": 1,
+    "average_overhaul_distance_ft": 2600,
+    "overhaul_rate_per_station_yard": 2,
+    "borrow_haul_ft": 0
+   },
+   "outputs": {
+    "overhaul_cost": {
+     "value": 42,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "mass-haul-overhaul",
+   "source_publisher": "Institute of Transportation and Traffic Engineering, University of California (F. S. Foote)",
+   "source_title": "Information Circular No. 24 (Revised): Notes on the Mass Diagram as Applied to Earthwork Distribution",
+   "source_edition_or_year": "May 1955",
+   "source_section_or_page": "Sec. 16, Fig. 6 test strip CD 3,300 ft: overhaul 2(33-5) = 56 cents. Unit prices: free haul 500 ft, overhaul 2 cents per station yard, one cu yd test strip. overhaul_rate_per_station_yard entered as 2 so overhaul_cost is in CENTS. cut_volume_cy, shrinkage_factor, fill_required_cy (1, 1, 1) and borrow_haul_ft 0 are placeholders. (Fig. 9's printed 'Haul C to B 10 cents' for 1,200 ft does not follow 2(12-5) = 14 and is not used.)",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "cut_volume_cy": 1,
+    "shrinkage_factor": 1,
+    "fill_required_cy": 1,
+    "free_haul_ft": 500,
+    "overhaul_volume_cy": 1,
+    "average_overhaul_distance_ft": 3300,
+    "overhaul_rate_per_station_yard": 2,
+    "borrow_haul_ft": 0
+   },
+   "outputs": {
+    "overhaul_cost": {
+     "value": 56,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "mass-haul-overhaul",
+   "source_publisher": "Institute of Transportation and Traffic Engineering, University of California (F. S. Foote)",
+   "source_title": "Information Circular No. 24 (Revised): Notes on the Mass Diagram as Applied to Earthwork Distribution",
+   "source_edition_or_year": "May 1955",
+   "source_section_or_page": "Sec. 16, Fig. 7 strip ABC, AB 2,500 ft: haul 40 cents. Unit prices: free haul 500 ft, overhaul 2 cents per station yard, one cu yd test strip. overhaul_rate_per_station_yard entered as 2 so overhaul_cost is in CENTS. cut_volume_cy, shrinkage_factor, fill_required_cy (1, 1, 1) and borrow_haul_ft 0 are placeholders. (Fig. 9's printed 'Haul C to B 10 cents' for 1,200 ft does not follow 2(12-5) = 14 and is not used.)",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "cut_volume_cy": 1,
+    "shrinkage_factor": 1,
+    "fill_required_cy": 1,
+    "free_haul_ft": 500,
+    "overhaul_volume_cy": 1,
+    "average_overhaul_distance_ft": 2500,
+    "overhaul_rate_per_station_yard": 2,
+    "borrow_haul_ft": 0
+   },
+   "outputs": {
+    "overhaul_cost": {
+     "value": 40,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "mass-haul-overhaul",
+   "source_publisher": "Institute of Transportation and Traffic Engineering, University of California (F. S. Foote)",
+   "source_title": "Information Circular No. 24 (Revised): Notes on the Mass Diagram as Applied to Earthwork Distribution",
+   "source_edition_or_year": "May 1955",
+   "source_section_or_page": "Sec. 16, Fig. 7 strip ABC, BC 1,800 ft: haul C 26 cents. Unit prices: free haul 500 ft, overhaul 2 cents per station yard, one cu yd test strip. overhaul_rate_per_station_yard entered as 2 so overhaul_cost is in CENTS. cut_volume_cy, shrinkage_factor, fill_required_cy (1, 1, 1) and borrow_haul_ft 0 are placeholders. (Fig. 9's printed 'Haul C to B 10 cents' for 1,200 ft does not follow 2(12-5) = 14 and is not used.)",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "cut_volume_cy": 1,
+    "shrinkage_factor": 1,
+    "fill_required_cy": 1,
+    "free_haul_ft": 500,
+    "overhaul_volume_cy": 1,
+    "average_overhaul_distance_ft": 1800,
+    "overhaul_rate_per_station_yard": 2,
+    "borrow_haul_ft": 0
+   },
+   "outputs": {
+    "overhaul_cost": {
+     "value": 26,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "mass-haul-overhaul",
+   "source_publisher": "Institute of Transportation and Traffic Engineering, University of California (F. S. Foote)",
+   "source_title": "Information Circular No. 24 (Revised): Notes on the Mass Diagram as Applied to Earthwork Distribution",
+   "source_edition_or_year": "May 1955",
+   "source_section_or_page": "Sec. 16, Fig. 8 strip ABCD, BC 700 ft: haul C to B 4 cents. Unit prices: free haul 500 ft, overhaul 2 cents per station yard, one cu yd test strip. overhaul_rate_per_station_yard entered as 2 so overhaul_cost is in CENTS. cut_volume_cy, shrinkage_factor, fill_required_cy (1, 1, 1) and borrow_haul_ft 0 are placeholders. (Fig. 9's printed 'Haul C to B 10 cents' for 1,200 ft does not follow 2(12-5) = 14 and is not used.)",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "cut_volume_cy": 1,
+    "shrinkage_factor": 1,
+    "fill_required_cy": 1,
+    "free_haul_ft": 500,
+    "overhaul_volume_cy": 1,
+    "average_overhaul_distance_ft": 700,
+    "overhaul_rate_per_station_yard": 2,
+    "borrow_haul_ft": 0
+   },
+   "outputs": {
+    "overhaul_cost": {
+     "value": 4,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "mass-haul-overhaul",
+   "source_publisher": "North Dakota Department of Transportation (hosted by UGPTI, NDSU)",
+   "source_title": "NDDOT Construction Conference 2011: Earthwork / Mass Diagrams / How a Mass Diagram is Used",
+   "source_edition_or_year": "March 2011",
+   "source_section_or_page": "Earthwork summary table TOTALS: Calculated Embankment Available (Cut) 10,658 CY, Required (Fill) 2,809 CY, Excess +7,849 CY. NDDOT adds the shrinkage percent to the EMBANKMENT quantity (compacted converted to bank yards), so the cut is compared at shrinkage_factor 1 (the factor is already inside the 2,809). Overhaul inputs (free_haul_ft, overhaul_volume_cy, average_overhaul_distance_ft, rate, borrow_haul_ft = 0) are placeholders.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "cut_volume_cy": 10658,
+    "shrinkage_factor": 1,
+    "fill_required_cy": 2809,
+    "free_haul_ft": 0,
+    "overhaul_volume_cy": 0,
+    "average_overhaul_distance_ft": 0,
+    "overhaul_rate_per_station_yard": 0,
+    "borrow_haul_ft": 0
+   },
+   "outputs": {
+    "balance_cy": {
+     "value": 7849,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "waste_cy": {
+     "value": 7849,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "dilution-ventilation-solvent",
+   "source_publisher": "NIOSH (CDC)",
+   "source_title": "The Industrial Environment -- Its Evaluation and Control, Chapter 39: Principles of Ventilation (J. E. Mutchler)",
+   "source_edition_or_year": "1973 (NIOSH; CDC Stacks cdc_178833)",
+   "source_section_or_page": "Ch. 39, 'Calculating Dilution Ventilation' worked example: methylene chloride lost from a tank at 1.5 pints/hr, SG 1.336, MW 84.94, TLV 500 ppm, K = 5, Q = (6.71e6)(1.336)(1.5)(5)/((84.94)(500)) = 1583 cfm (printed). INPUT CONVERTED: the tile takes lb/h, so 1.5 pt/h x 1.336 x (403/387 = 1.04134 lb/pint, the water-pint weight the printed 6.71 = 403/60 constant embeds) = 2.086853 lb/h. Tile gives 1584.2 cfm; the residual 0.07% is the printed constant truncated to 6.71 (403/60 = 6.7167). lel_pct, room_volume_ft3 and alt_mixing_factor set to 0 (not in the printed example); lel_safety_fraction is the tile default placeholder.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "evaporation_lb_hr": 2.086853,
+    "molecular_weight": 84.94,
+    "tlv_ppm": 500,
+    "mixing_factor": 5,
+    "lel_pct": 0,
+    "lel_safety_fraction": 0.25,
+    "room_volume_ft3": 0,
+    "alt_mixing_factor": 0
+   },
+   "outputs": {
+    "health_cfm": {
+     "value": 1583,
+     "tolerance": {
+      "pct": 0.2
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "silica-ventilation-screen",
+   "source_publisher": "OSHA",
+   "source_title": "Occupational Exposure to Respirable Crystalline Silica -- Review of the Construction Standard FAQs (SilicaConstructionFAQs.pdf)",
+   "source_edition_or_year": "2017 (OSHA, current on osha.gov 2024)",
+   "source_section_or_page": "FAQ on short-duration tasks: an employee exposed for only 15 minutes would need a concentration higher than 800 ug/m3 for the 8-hour TWA to reach 25 ug/m3 (printed: 800 ug/m3 x 15 min -> 25 ug/m3 8-hr TWA, citing 81 FR 16706). Exact, no rounding. shift_minutes 480, pel 50 and action level 25 are the standard's values; control_efficiency_pct 0 is a placeholder. NOTE: OSHA calls this TWA 'at or above' the action level; the tile's over_action_level reads false at exactly 25 (see report lead), so only the TWA is asserted.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "measured_concentration_ug_m3": 800,
+    "sample_minutes": 15,
+    "shift_minutes": 480,
+    "pel_ug_m3": 50,
+    "action_level_ug_m3": 25,
+    "control_efficiency_pct": 0
+   },
+   "outputs": {
+    "twa_ug_m3": {
+     "value": 25,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "lead-dust-clearance",
+   "source_publisher": "Angstrom Mold Testing (Angstrom Environmental)",
+   "source_title": "Lead Dust Testing: Dust Wipes & NYC/EPA Standards",
+   "source_edition_or_year": "2022-11-14 (web article)",
+   "source_section_or_page": "'Simple Example': a wipe containing 10 ug of lead from a sill measuring 3 in x 24 in = 72 sq in / 144 = 0.5 sq ft; 10 ug / 0.5 sq ft = 20 ug/ft2 (printed, exact). clearance_limit_ug_ft2 = 40 is a placeholder (EPA 40 CFR 745.227(e)(8)(viii) interior sill level on or after 2026-01-12); rooms 0 skips the sample count.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "lab_result_ug": 10,
+    "wipe_area_ft2": 0.5,
+    "clearance_limit_ug_ft2": 40,
+    "rooms": 0,
+    "surfaces_per_room": 3,
+    "blanks_per_job": 1
+   },
+   "outputs": {
+    "dust_loading_ug_ft2": {
+     "value": 20,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "respirator-cartridge-life",
+   "source_publisher": "Navy and Marine Corps Force Health Protection Command (NMCPHC)",
+   "source_title": "Chemical Cartridge Change Schedules (technical guidance)",
+   "source_edition_or_year": "Mar 2024",
+   "source_section_or_page": "Sec. 1.c: 'assume breakthrough occurs after 380 minutes. After applying the safety factor, the service life is 342 minutes (380 min X 90%)' (printed). INPUT CONVERTED min -> h: 380/60 = 6.333333 h; printed 342 min = 5.7 h. safety_fraction 0.9 is the printed 90%. shift_hours 8, concentrations 0, humidity 50 and derate 0.5 are placeholders (not part of the printed example).",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "estimated_life_hr": 6.333333,
+    "safety_fraction": 0.9,
+    "shift_hours": 8,
+    "concentration_ppm": 0,
+    "worst_case_ppm": 0,
+    "humidity_pct": 50,
+    "humidity_derate_above_65": 0.5
+   },
+   "outputs": {
+    "schedule_hr": {
+     "value": 5.7,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "respirator-cartridge-life",
+   "source_publisher": "Navy and Marine Corps Force Health Protection Command (NMCPHC)",
+   "source_title": "Chemical Cartridge Change Schedules (technical guidance)",
+   "source_edition_or_year": "Mar 2024",
+   "source_section_or_page": "Sec. 1.c: 'for an estimated breakthrough time of 100 minutes, change cartridges by at least 90 minutes of use' (printed, 90% safety factor). INPUT CONVERTED: 100 min = 1.666667 h; printed 90 min = 1.5 h. shift_hours, concentrations, humidity and derate are placeholders.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "estimated_life_hr": 1.666667,
+    "safety_fraction": 0.9,
+    "shift_hours": 8,
+    "concentration_ppm": 0,
+    "worst_case_ppm": 0,
+    "humidity_pct": 50,
+    "humidity_derate_above_65": 0.5
+   },
+   "outputs": {
+    "schedule_hr": {
+     "value": 1.5,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "respirator-cartridge-life",
+   "source_publisher": "Navy and Marine Corps Force Health Protection Command (NMCPHC)",
+   "source_title": "Chemical Cartridge Change Schedules (technical guidance)",
+   "source_edition_or_year": "Mar 2024",
+   "source_section_or_page": "Sec. 2.d(2), mixture worked example: shortest mixture-component breakthrough (n-hexane) 9.02 h; 'Ten percent of 9.02 hours is 0.9 hour ... 9.02 hours minus 0.9 hours, which is 8.12 hours' (printed). The publisher rounded 0.902 h to 0.9 before subtracting, so the exact 90% figure is 8.118 h; tolerance abs 0.005 covers that printed rounding. shift_hours 8 matches the printed shift; concentrations, humidity and derate are placeholders.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "estimated_life_hr": 9.02,
+    "safety_fraction": 0.9,
+    "shift_hours": 8,
+    "concentration_ppm": 0,
+    "worst_case_ppm": 0,
+    "humidity_pct": 40,
+    "humidity_derate_above_65": 0.5
+   },
+   "outputs": {
+    "schedule_hr": {
+     "value": 8.12,
+     "tolerance": {
+      "abs": 0.005
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "arc-rated-clothing-selection",
+   "source_publisher": "OSHA",
+   "source_title": "29 CFR 1910.269 Appendix E, Protection From Flames and Electric Arcs -- Section III (Table 6 usage example)",
+   "source_edition_or_year": "eCFR current as of 2026-09-01",
+   "source_section_or_page": "App. E worked example: a 12,470 V line, 8 kA maximum fault current, 10-cycle clearing; Table 6 gives available heat energy of 4 cal/cm2 or less, 'and the employer could select protection with a 5-cal/cm2 rating to meet 1910.269(l)(8)(v)', which requires an arc rating greater than or equal to the estimated heat energy (printed: exposure 4, minimum required rating 4, selected 5). garment_ratings_sum_cal_cm2 0 and meltable_underlayer 'no' are placeholders.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "incident_energy_cal_cm2": 4,
+    "system_arc_rating_cal_cm2": 5,
+    "garment_ratings_sum_cal_cm2": 0,
+    "meltable_underlayer": "no"
+   },
+   "outputs": {
+    "minimum_rating_cal_cm2": {
+     "value": 4,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "spa-drain-interval",
+   "source_publisher": "Pool & Spa News (Joe Sweazy, AquaChek/Hach)",
+   "source_title": "Spa Water Testing (Ultimate Tech Manual), sidebar 'To drain or not to drain?'",
+   "source_edition_or_year": "web article, retrieved 2026-10-01",
+   "source_section_or_page": "Sidebar states the industry formula gallons / 3 / average daily bathers = days between drainings and works 500 gal with 2 daily bathers: 500/3 = 166.66, /2 = 83 days (printed truncated; exact 83.33, tolerance covers the truncation). days_since_drain, alternative_bathers and the TDS inputs are placeholders (0 = skip; 1500 default limit).",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "spa_gallons": 500,
+    "daily_bathers": 2,
+    "days_since_drain": 0,
+    "alternative_bathers": 0,
+    "fill_tds_ppm": 0,
+    "current_tds_ppm": 0,
+    "tds_limit_ppm": 1500
+   },
+   "outputs": {
+    "interval_days": {
+     "value": 83,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "spa-drain-interval",
+   "source_publisher": "Jacuzzi",
+   "source_title": "How Often to Change Hot Tub Water: Best Practices and Tips, 'The Water Change Formula'",
+   "source_edition_or_year": "web article, retrieved 2026-10-01",
+   "source_section_or_page": "Divide gallons by three, then by average daily users: a 300 gallon hot tub with three daily users is changed every 33 days, (300/3)/3 (printed whole days; exact 33.33). days_since_drain, alternative_bathers and TDS inputs are placeholders.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "spa_gallons": 300,
+    "daily_bathers": 3,
+    "days_since_drain": 0,
+    "alternative_bathers": 0,
+    "fill_tds_ppm": 0,
+    "current_tds_ppm": 0,
+    "tds_limit_ppm": 1500
+   },
+   "outputs": {
+    "interval_days": {
+     "value": 33,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "thermal-oxidizer-residence",
+   "source_publisher": "Clean Harbors Deer Park (posted by US EPA)",
+   "source_title": "Appendix B, Combustion Chamber Residence Time Calculations (Train I afterburner chamber)",
+   "source_edition_or_year": "dated 2026-01-06 (EPA file appendix-b-residence-time-calculations-06-jan-26.pdf)",
+   "source_section_or_page": "Train I ABC: total volume for DRE 8,183 ft3; hot duct exit flow = (48,892 - 1,610) dscfm x 100/(100-16) x (2,100+460)/520 = 277,111 acfm = 4,619 acfs; residence = 8,183/4,619 = 1.77 s. inlet_scfm is the printed wet-standard flow (48,892-1,610)x100/84 = 56,288.095 scfm; temperatures are entered as 2,100.33 and 60.33 degF so the tile's 459.67 offset reproduces the publisher's printed absolute temperatures 2,560 and 520 degR exactly. required_residence_s is a placeholder (no regulatory limit; 1.0 s).",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "inlet_scfm": 56288.09523809524,
+    "chamber_temp_f": 2100.33,
+    "standard_temp_f": 60.33,
+    "required_residence_s": 1,
+    "chamber_volume_ft3": 8183
+   },
+   "outputs": {
+    "actual_acfm": {
+     "value": 277111,
+     "tolerance": {
+      "abs": 1
+     }
+    },
+    "actual_residence_s": {
+     "value": 1.77,
+     "tolerance": {
+      "abs": 0.005
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "noise-barrier-insertion-loss",
+   "source_publisher": "ST-LINE",
+   "source_title": "Maekawa diffraction (Wiki), section 'An example: the same barrier, eight bands'",
+   "source_edition_or_year": "published 2026-05-21, updated 2026-08-25",
+   "source_section_or_page": "Source 10 m from barrier, receiver 20 m beyond, edge 2 m above line of sight: delta = sqrt(10^2+2^2)+sqrt(20^2+2^2)-30 ~ 0.30 m; table A = 10 log10(3+20N): 500 Hz lambda 0.69 m, N 0.87, 13.1 dB; 250 Hz 10.7 dB. Geometry legs converted exactly to ft (sqrt(104) m, sqrt(404) m, 30 m). Publisher uses c ~ 343 m/s, tile 1,130 ft/s (344.4 m/s); N is not asserted because that 0.4% constant difference exceeds N's printed rounding. practical_ceiling_db 20 is the tile default and does not bind.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "source_to_top_ft": 33.45813329129123,
+    "top_to_receiver_ft": 65.94406575538642,
+    "source_to_receiver_ft": 98.42519685039369,
+    "path_difference_ft": 0,
+    "frequency_hz": 500,
+    "second_frequency_hz": 250,
+    "practical_ceiling_db": 20
+   },
+   "outputs": {
+    "path_difference_ft": {
+     "value": 0.9842519685039369,
+     "tolerance": {
+      "abs": 0.016404199475065617
+     }
+    },
+    "wavelength_ft": {
+     "value": 2.2637795275590546,
+     "tolerance": {
+      "abs": 0.016404199475065617
+     }
+    },
+    "raw_insertion_loss_db": {
+     "value": 13.1,
+     "tolerance": {
+      "abs": 0.05
+     }
+    },
+    "insertion_loss_db": {
+     "value": 13.1,
+     "tolerance": {
+      "abs": 0.05
+     }
+    },
+    "second_insertion_loss_db": {
+     "value": 10.7,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "noise-barrier-insertion-loss",
+   "source_publisher": "ST-LINE",
+   "source_title": "Maekawa diffraction (Wiki), section 'An example: the same barrier, eight bands'",
+   "source_edition_or_year": "published 2026-05-21, updated 2026-08-25",
+   "source_section_or_page": "Same printed geometry (delta ~ 0.30 m); table rows 2000 Hz N 3.47, 18.6 dB and 4000 Hz N 6.95, 21.5 dB from A = 10 log10(3+20N). Geometry legs converted exactly to ft. N and lambda not asserted (speed-of-sound basis differs 0.4% from the tile's 1,130 ft/s). practical_ceiling_db 25 is the publisher's own tool cap (stated on the page) and does not bind at 21.5 dB.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "source_to_top_ft": 33.45813329129123,
+    "top_to_receiver_ft": 65.94406575538642,
+    "source_to_receiver_ft": 98.42519685039369,
+    "path_difference_ft": 0,
+    "frequency_hz": 2000,
+    "second_frequency_hz": 4000,
+    "practical_ceiling_db": 25
+   },
+   "outputs": {
+    "raw_insertion_loss_db": {
+     "value": 18.6,
+     "tolerance": {
+      "abs": 0.05
+     }
+    },
+    "second_insertion_loss_db": {
+     "value": 21.5,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "noise-barrier-insertion-loss",
+   "source_publisher": "FIRGELLI Automations",
+   "source_title": "Noise Reduction Barrier Interactive Calculator, 'Simple Example'",
+   "source_edition_or_year": "web page, retrieved 2026-10-01",
+   "source_section_or_page": "f = 1000 Hz, c = 343 m/s, path length difference 2.5 m: lambda 0.343 m, N = 2 x 2.5/0.343 = 14.6, IL = 10 log10(3 + 20 x 14.6) = 10 log10(295) ~ 24.7 dB. 2.5 m entered as 8.2021 ft. practical_ceiling_db 30 is a placeholder (the publisher applies no ceiling); second frequency 0 = skip. N and lambda not asserted (speed-of-sound basis differs 0.4%).",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "source_to_top_ft": 0,
+    "top_to_receiver_ft": 0,
+    "source_to_receiver_ft": 0,
+    "path_difference_ft": 8.202099737532809,
+    "frequency_hz": 1000,
+    "second_frequency_hz": 0,
+    "practical_ceiling_db": 30
+   },
+   "outputs": {
+    "raw_insertion_loss_db": {
+     "value": 24.7,
+     "tolerance": {
+      "abs": 0.05
+     }
+    },
+    "insertion_loss_db": {
+     "value": 24.7,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "plume-rise-briggs",
+   "source_publisher": "US EPA (OAQPS)",
+   "source_title": "SCREEN3 Model User's Guide, EPA-454/B-95-004, Figure 2 'SCREEN Point Source Example for Complex Terrain'",
+   "source_edition_or_year": "September 1995",
+   "source_section_or_page": "Printed run: stack 100 m, diameter 2.5 m, velocity 25 m/s, gas 450 K, ambient 293 K -> 'BUOY. FLUX = 133.643 M**4/S**3'. Inputs converted exactly (450 K = 350.33 degF, 293 K = 67.73 degF). wind_mph 10 is a placeholder (no neutral final rise is printed for this run). Tolerance 0.01% covers the model's gravity constant (SCREEN3 prints 133.643; tile with g = 9.80665 gives 133.650).",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "stack_height_ft": 328.0839895013123,
+    "stack_diameter_ft": 8.202099737532809,
+    "exit_velocity_fps": 82.02099737532808,
+    "exit_temp_f": 350.33,
+    "ambient_temp_f": 67.73,
+    "wind_mph": 10
+   },
+   "outputs": {
+    "buoyancy_flux": {
+     "value": 133.643,
+     "tolerance": {
+      "pct": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "plume-rise-briggs",
+   "source_publisher": "US EPA (OAQPS)",
+   "source_title": "SCREEN3 Model User's Guide, EPA-454/B-95-004, Figure 3 'SCREEN Point Source Example with Building Downwash'",
+   "source_edition_or_year": "September 1995",
+   "source_section_or_page": "Printed run: stack 100 m, inside diameter 2.0 m, exit velocity 15 m/s, gas 450 K, ambient 293 K -> 'BUOY. FLUX = 51.319 M**4/S**3' (below the 55 break). Inputs converted exactly. wind_mph 10 is a placeholder (the printed plume heights are downwash/stable/transitional values the tile does not compute). Tolerance 0.01% covers the model's gravity constant.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "stack_height_ft": 328.0839895013123,
+    "stack_diameter_ft": 6.561679790026246,
+    "exit_velocity_fps": 49.212598425196845,
+    "exit_temp_f": 350.33,
+    "ambient_temp_f": 67.73,
+    "wind_mph": 10
+   },
+   "outputs": {
+    "buoyancy_flux": {
+     "value": 51.319,
+     "tolerance": {
+      "pct": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "gaussian-dispersion-screen",
+   "source_publisher": "US Public Health Service (D. Bruce Turner)",
+   "source_title": "Workbook of Atmospheric Dispersion Estimates, PHS Publication 999-AP-26, Chapter 7 Problem 4",
+   "source_edition_or_year": "1970 (revised)",
+   "source_section_or_page": "Power plant 151 g/s SO2 (printed from 10 t/h coal at 3% S), effective height 150 m, wind 4 m/s, sunny summer afternoon -> class B; Figure 3-9 gives the maximum at 1 km, sigma_z = 110 m there, max chi u/Q 7.5e-6, so chi max = 2.8 x 10^-4 g/m3 (280 ug/m3, 2 significant figures). The 1,500 m mixing lid is stated not to affect this distance. alt_stability_class blank. max_distance_km not asserted ('1 km' is one significant figure).",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "emission_rate_lb_hr": 1198.4328572369946,
+    "effective_height_ft": 492.1259842519685,
+    "wind_mph": 8.947745168217608,
+    "distance_mi": 0.621371192237334,
+    "stability_class": "B",
+    "alt_stability_class": ""
+   },
+   "outputs": {
+    "sigma_z_m": {
+     "value": 110,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "concentration_ug_m3": {
+     "value": 280,
+     "tolerance": {
+      "abs": 5
+     }
+    },
+    "max_concentration_ug_m3": {
+     "value": 280,
+     "tolerance": {
+      "abs": 5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "gaussian-dispersion-screen",
+   "source_publisher": "US Public Health Service (D. Bruce Turner)",
+   "source_title": "Workbook of Atmospheric Dispersion Estimates, PHS Publication 999-AP-26, Chapter 7 Problem 1",
+   "source_edition_or_year": "1970 (revised)",
+   "source_section_or_page": "Burning dump 3 g/s NOx, ground-level source with no rise, overcast night, 7 m/s -> class D; at 3 km sigma_z = 65 m from Figure 3-3. Only sigma_z is asserted: the printed sigma_y (190 m, Figure 3-2) and the printed 1.1e-5 g/m3 differ from the tile's Martin fit (181.6 m, 11.5 ug/m3) by about 4.4%, beyond the 2% cap. alt_stability_class blank.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "emission_rate_lb_hr": 23.80992431596678,
+    "effective_height_ft": 0,
+    "wind_mph": 15.658554044380816,
+    "distance_mi": 1.8641135767120018,
+    "stability_class": "D",
+    "alt_stability_class": ""
+   },
+   "outputs": {
+    "sigma_z_m": {
+     "value": 65,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "injection-cooling-time",
+   "source_publisher": "Boothroyd Dewhurst, Inc. (Nicholas P. Dewhurst)",
+   "source_title": "DFMA Forum presentation, 'Polymer Processing Data' table and 'Injection Molding example' slides",
+   "source_edition_or_year": "2019",
+   "source_section_or_page": "Cooling time kh^2 with k = ln[4(Ti-Tm)/(pi(Tx-Tm))]/(pi^2 alpha), h = maximum wall thickness: HDPE (alpha 0.11 mm2/s, Ti 232 C, Tm 27 C, Tx 52 C) k = 2.16 s/mm2; equal-stiffness example 3.7 mm -> 29.6 s ('cooling time only'). Converted exactly to in, in2/s and degF. Alternative wall, non-cooling time and annual parts are placeholders (0).",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "wall_thickness_in": 0.1456692913385827,
+    "alpha_in2_s": 0.000170500341000682,
+    "melt_temp_f": 449.6,
+    "mould_temp_f": 80.6,
+    "eject_temp_f": 125.60000000000001,
+    "alt_wall_thickness_in": 0,
+    "non_cooling_cycle_s": 0,
+    "annual_parts": 0
+   },
+   "outputs": {
+    "cooling_time_s": {
+     "value": 29.6,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "injection-cooling-time",
+   "source_publisher": "Boothroyd Dewhurst, Inc. (Nicholas P. Dewhurst)",
+   "source_title": "DFMA Forum presentation, 'Polymer Processing Data' table and 'Injection Molding example' slides",
+   "source_edition_or_year": "2019",
+   "source_section_or_page": "Same method: ABS (alpha 0.13 mm2/s, Ti 260 C, Tm 54 C, Tx 82 C) k = 1.74 s/mm2; 2.8 mm -> 13.6 s. The publisher multiplies its ROUNDED k (1.74 x 7.84 = 13.64); unrounded k = 1.7438 gives 13.67, so the tolerance covers k's printed rounding (+/-0.005 x 7.84) plus the final digit. Converted exactly to US units; other inputs placeholders.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "wall_thickness_in": 0.11023622047244094,
+    "alpha_in2_s": 0.00020150040300080603,
+    "melt_temp_f": 500.0,
+    "mould_temp_f": 129.2,
+    "eject_temp_f": 179.6,
+    "alt_wall_thickness_in": 0,
+    "non_cooling_cycle_s": 0,
+    "annual_parts": 0
+   },
+   "outputs": {
+    "cooling_time_s": {
+     "value": 13.6,
+     "tolerance": {
+      "abs": 0.1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "injection-cooling-time",
+   "source_publisher": "Boothroyd Dewhurst, Inc. (Nicholas P. Dewhurst)",
+   "source_title": "DFMA Forum presentation, 'Polymer Processing Data' table and 'Injection Molding example' slides",
+   "source_edition_or_year": "2019",
+   "source_section_or_page": "Same method: PC 30% glass (alpha 0.13 mm2/s, Ti 329 C, Tm 102 C, Tx 141 C) k = 1.56 s/mm2; 2.0 mm -> 6.2 s. Converted exactly to US units; other inputs placeholders.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "wall_thickness_in": 0.07874015748031496,
+    "alpha_in2_s": 0.00020150040300080603,
+    "melt_temp_f": 624.2,
+    "mould_temp_f": 215.6,
+    "eject_temp_f": 285.8,
+    "alt_wall_thickness_in": 0,
+    "non_cooling_cycle_s": 0,
+    "annual_parts": 0
+   },
+   "outputs": {
+    "cooling_time_s": {
+     "value": 6.2,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "injection-cooling-time",
+   "source_publisher": "Calcady",
+   "source_title": "Plastic Injection Molding Cooling Time Calculator, worked example (ABS switch housings)",
+   "source_edition_or_year": "web page, retrieved 2026-10-01",
+   "source_section_or_page": "ABS, wall 3 mm, melt 240 C, mold 60 C, ejection 100 C, alpha 0.09 mm2/s; tc = h^2/(pi^2 alpha) x ln[(4/pi)(Tm-Tw)/(Te-Tw)] = 17.69 s. Converted exactly to in, in2/s and degF; other inputs placeholders.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "wall_thickness_in": 0.11811023622047245,
+    "alpha_in2_s": 0.000139500279000558,
+    "melt_temp_f": 464.0,
+    "mould_temp_f": 140.0,
+    "eject_temp_f": 212.0,
+    "alt_wall_thickness_in": 0,
+    "non_cooling_cycle_s": 0,
+    "annual_parts": 0
+   },
+   "outputs": {
+    "cooling_time_s": {
+     "value": 17.69,
+     "tolerance": {
+      "abs": 0.005
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "pool-heat-pump-capacity",
+   "source_publisher": "INYO Pools",
+   "source_title": "How Long Does It Take to Heat a Pool? (DIY article), 'Calculating Heat Run Time' EXAMPLE",
+   "source_edition_or_year": "web article, retrieved 2026-10-01",
+   "source_section_or_page": "20,000 gal pool, 125,000 BTU heater, 70 to 80 degF: 20,000 x 8.34 = 166,800 lb; 166,800/125,000 = 1.33 h per degree; 10 x 1.33 = 13.34 h (13.34 is the unrounded 13.344 to two places). Derate factors 1 (no derate, the publisher uses the rating), rated_cop, cover and surface loss are placeholders (0).",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "rated_capacity_btuh": 125000,
+    "air_derate_factor": 1,
+    "humidity_derate_factor": 1,
+    "water_derate_factor": 1,
+    "rated_cop": 0,
+    "cop_derate_factor": 1,
+    "pool_gallons": 20000,
+    "temperature_rise_f": 10,
+    "cover_loss_reduction_pct": 0,
+    "surface_loss_btuh": 0
+   },
+   "outputs": {
+    "heat_up_hours": {
+     "value": 13.34,
+     "tolerance": {
+      "abs": 0.005
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "pool-cover-evaporation",
+   "source_publisher": "PoolDial",
+   "source_title": "Free Pool Evaporation Calculator, 'Calculating Water Loss in Gallons'",
+   "source_edition_or_year": "web page, retrieved 2026-10-01",
+   "source_section_or_page": "Gallons lost = (drop in inches / 12) x 7.48 x surface area: a 20 x 40 ft pool (800 sq ft) dropping 0.25 in a day loses 125 gallons per day (printed whole gallons; exact 124.68 at 7.4805). Cover, heater, fuel and season inputs are placeholders (no cover hours).",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "surface_area_ft2": 800,
+    "evaporation_in_day": 0.25,
+    "cover_effectiveness_pct": 90,
+    "cover_hours_per_day": 0,
+    "heater_efficiency_pct": 82,
+    "fuel_cost_per_mmbtu": 0,
+    "season_days": 180
+   },
+   "outputs": {
+    "gallons_per_day": {
+     "value": 125,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "scaffold-tie-spacing",
+   "source_publisher": "U.S. Department of Labor, OSHA",
+   "source_title": "Whether a mobile scaffold outrigger design meets the requirements of 29 CFR 1926.451(c)(1)",
+   "source_edition_or_year": "2004-03-10 letter of interpretation",
+   "source_section_or_page": "Sec. II table 'not using outriggers': 4-foot model 26 in wide -> restraint required 'over 8.668 feet' (4 x 26/12 = 8.6667; OSHA printed 3 decimals, rounded up). Placeholders: scaffold_height_ft 8 (any height), spacings/run 0.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "scaffold_height_ft": 8,
+    "base_width_ft": 2.1666666666666665,
+    "outrigger_base_ft": 0,
+    "max_ratio": 4,
+    "vertical_tie_spacing_ft": 0,
+    "horizontal_tie_spacing_ft": 0,
+    "scaffold_run_ft": 0,
+    "sheeted": 0
+   },
+   "outputs": {
+    "max_free_standing_ft": {
+     "value": 8.668,
+     "tolerance": {
+      "pct": 0.1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "scaffold-tie-spacing",
+   "source_publisher": "U.S. Department of Labor, OSHA",
+   "source_title": "Whether a mobile scaffold outrigger design meets the requirements of 29 CFR 1926.451(c)(1)",
+   "source_edition_or_year": "2004-03-10 letter of interpretation",
+   "source_section_or_page": "Sec. II table 'not using outriggers': 6-foot model 29 in wide -> 'over 9.668 feet' (4 x 29/12 = 9.6667, printed rounded up). Placeholders: scaffold_height_ft 9, spacings/run 0.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "scaffold_height_ft": 9,
+    "base_width_ft": 2.4166666666666665,
+    "outrigger_base_ft": 0,
+    "max_ratio": 4,
+    "vertical_tie_spacing_ft": 0,
+    "horizontal_tie_spacing_ft": 0,
+    "scaffold_run_ft": 0,
+    "sheeted": 0
+   },
+   "outputs": {
+    "max_free_standing_ft": {
+     "value": 9.668,
+     "tolerance": {
+      "pct": 0.1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "scaffold-tie-spacing",
+   "source_publisher": "U.S. Department of Labor, OSHA",
+   "source_title": "Whether a mobile scaffold outrigger design meets the requirements of 29 CFR 1926.451(c)(1)",
+   "source_edition_or_year": "2004-03-10 letter of interpretation",
+   "source_section_or_page": "Sec. II table 'not using outriggers': 7-foot model 40 in wide -> 'over 13.332 feet' (4 x 40/12 = 13.3333, printed rounded down). Placeholders: scaffold_height_ft 13, spacings/run 0.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "scaffold_height_ft": 13,
+    "base_width_ft": 3.3333333333333335,
+    "outrigger_base_ft": 0,
+    "max_ratio": 4,
+    "vertical_tie_spacing_ft": 0,
+    "horizontal_tie_spacing_ft": 0,
+    "scaffold_run_ft": 0,
+    "sheeted": 0
+   },
+   "outputs": {
+    "max_free_standing_ft": {
+     "value": 13.332,
+     "tolerance": {
+      "pct": 0.1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "scaffold-tie-spacing",
+   "source_publisher": "U.S. Department of Labor, OSHA",
+   "source_title": "Whether a mobile scaffold outrigger design meets the requirements of 29 CFR 1926.451(c)(1)",
+   "source_edition_or_year": "2004-03-10 letter of interpretation",
+   "source_section_or_page": "Sec. II 'using outriggers': 2-ft outriggers make the 4-foot model 4 ft x 6.167 ft; OSHA takes the LEAST dimension, 4 ft, -> restraint 'over 16 feet' (exact). outrigger_base_ft is entered as the printed least dimension 4 ft (NOT 6.167, which the tile's max() would accept -- see lead). Placeholders: scaffold_height_ft 16, spacings/run 0.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "scaffold_height_ft": 16,
+    "base_width_ft": 2.1666666666666665,
+    "outrigger_base_ft": 4,
+    "max_ratio": 4,
+    "vertical_tie_spacing_ft": 0,
+    "horizontal_tie_spacing_ft": 0,
+    "scaffold_run_ft": 0,
+    "sheeted": 0
+   },
+   "outputs": {
+    "max_free_standing_ft": {
+     "value": 16,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "effective_base_ft": {
+     "value": 4,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "scaffold-tie-spacing",
+   "source_publisher": "U.S. Department of Labor, OSHA",
+   "source_title": "Tie-in requirements for supported scaffolds; 1926.451(c)(1)(ii); errors in Non-Mandatory Appendix E",
+   "source_edition_or_year": "2005-04-08 letter of interpretation (to D. Holman)",
+   "source_section_or_page": "Question 1(a), restated and answered by OSHA: a supported scaffold 2 ft wide and 40 ft high is tied 'at approximately the 8-foot level' then every 20 ft (4 x 2 = 8, exact). Inputs: height 40, base 2, vertical spacing 20 printed; run/horizontal spacing placeholders 0. Tie row count is not printed and is not asserted.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "scaffold_height_ft": 40,
+    "base_width_ft": 2,
+    "outrigger_base_ft": 0,
+    "max_ratio": 4,
+    "vertical_tie_spacing_ft": 20,
+    "horizontal_tie_spacing_ft": 0,
+    "scaffold_run_ft": 0,
+    "sheeted": 0
+   },
+   "outputs": {
+    "max_free_standing_ft": {
+     "value": 8,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "first_tie_height_ft": {
+     "value": 8,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "height_to_base_ratio": {
+     "value": 20,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "suspended-scaffold-counterweight",
+   "source_publisher": "Infrastructure Health & Safety Association (IHSA, Ontario)",
+   "source_title": "Safety Talk 31: Suspended access equipment -- Counterweights",
+   "source_edition_or_year": "safety talk PDF, retrieved 2026-10-01 (ihsa.ca/pdfs/safety_talks/suspended_access_equipment_calculating_counterweights.pdf)",
+   "source_section_or_page": "Worked example steps 1-5: 18 ft beam, L = 16 ft to counterweight centre, X = 1 ft overhang, SAE capacity 1,000 lb; 1,000 lb x 1 ft = 1,000 ft-lb; x 4 SF = 4,000 ft-lb; / 16 ft = 250 lb; 250 / 55 lb = '5 counterweights' (rounded up from 4.55). All values exact. Placeholders: target_counterweight_lb 0, hoist_stall_load_lb 0 (stall test not in the source).",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "rated_load_lb": 1000,
+    "outboard_arm_ft": 1,
+    "inboard_arm_ft": 16,
+    "factor_of_safety": 4,
+    "counterweight_unit_lb": 55,
+    "target_counterweight_lb": 0,
+    "hoist_stall_load_lb": 0
+   },
+   "outputs": {
+    "overturning_moment_ft_lb": {
+     "value": 1000,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "required_counterweight_lb": {
+     "value": 250,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "counterweight_units": {
+     "value": 5,
+     "tolerance": {
+      "abs": 0
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "shoring-reshoring-load",
+   "source_publisher": "American Concrete Institute",
+   "source_title": "ACI 347.2R-05 Guide for Shoring/Reshoring of Concrete Multistory Buildings (CEU excerpt)",
+   "source_edition_or_year": "2005",
+   "source_section_or_page": "Ch. 5.1 construction example, simplified method: slab self weight 112.5 psf, form and shore 6.5 psf, placement live load 50 psf. 'maximum shore/reshore construction load is 1.5D, or 169 lb/ft2' (exact sum); two-reshore system (1/3 pro-rata share, 3 interconnected slabs): 'maximum slab construction load is ... 1.5D, or 169 lb/ft2' (tile 168.83; printed rounded to whole psf). Placeholders: governing_slab_capacity_psf 0, governing_slab_strength_psi 0.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "slab_dead_psf": 112.5,
+    "construction_live_psf": 50,
+    "form_dead_psf": 6.5,
+    "connected_levels": 3,
+    "backshored": 0,
+    "governing_slab_capacity_psf": 0,
+    "governing_slab_strength_psi": 0
+   },
+   "outputs": {
+    "new_pour_load_psf": {
+     "value": 169,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "governing_level_load_psf": {
+     "value": 169,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "shoring-reshoring-load",
+   "source_publisher": "American Concrete Institute",
+   "source_title": "ACI 347.2R-05 Guide for Shoring/Reshoring of Concrete Multistory Buildings (CEU excerpt)",
+   "source_edition_or_year": "2005",
+   "source_section_or_page": "Ch. 5.1.2 and 5.1.4.2: three-reshore system (1/4 pro-rata share, 4 interconnected slabs): max slab load on Level 4 'is 1.38D or 155 lb/ft2' (Dc 142.5 + Lc 12.5; tile 154.75; printed rounded to whole psf). Same loads as the 3-level row. Placeholders: capacity 0, strength 0.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "slab_dead_psf": 112.5,
+    "construction_live_psf": 50,
+    "form_dead_psf": 6.5,
+    "connected_levels": 4,
+    "backshored": 0,
+    "governing_slab_capacity_psf": 0,
+    "governing_slab_strength_psi": 0
+   },
+   "outputs": {
+    "governing_level_load_psf": {
+     "value": 155,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "shoring-reshoring-load",
+   "source_publisher": "SunCam (M. B. Tanck, PE)",
+   "source_title": "Shoring and Reshoring Fundamentals, course 289",
+   "source_edition_or_year": "2017",
+   "source_section_or_page": "pp. 13-14 example: 8 in flat plate 100 psf + construction dead (forms) 10 psf + construction live 50 psf = 160 psf; floor capacity 45 psf (40 LL + 5 SDL); 160/45 = 3.6 -> '4 interconnected slabs'. The tile's capacity field is the slab's TOTAL capacity, so 145 = the slab's own 100 psf + the printed 45 psf. Placeholders: connected_levels 3 (any), strength 0.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "slab_dead_psf": 100,
+    "construction_live_psf": 50,
+    "form_dead_psf": 10,
+    "connected_levels": 3,
+    "backshored": 0,
+    "governing_slab_capacity_psf": 145,
+    "governing_slab_strength_psi": 0
+   },
+   "outputs": {
+    "new_pour_load_psf": {
+     "value": 160,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "levels_required": {
+     "value": 4,
+     "tolerance": {
+      "abs": 0
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "metal-roof-thermal-movement",
+   "source_publisher": "Metal Sales Manufacturing Corporation",
+   "source_title": "Learn about thermal expansion and contraction with metal panels (blog)",
+   "source_edition_or_year": "2021-03-29",
+   "source_section_or_page": "Thermal Expansion and Contraction: 'e for steel is 0.0000065 / F' and 'A 100' long steel panel experiencing a 100F temperature change will increase in length by 0.78\"' (exact). The same page's aluminium figure (1.56 in) is arithmetically wrong (1200 x 100 x 0.0000128 = 1.536) and is NOT used. Placeholders: fixed_point_fraction 0, clip_travel_in 0.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "panel_length_ft": 100,
+    "alpha_per_f": 6.5e-06,
+    "temp_swing_f": 100,
+    "fixed_point_fraction": 0,
+    "clip_travel_in": 0
+   },
+   "outputs": {
+    "total_movement_in": {
+     "value": 0.78,
+     "tolerance": {
+      "abs": 0.005
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "soil-volume-for-canopy",
+   "source_publisher": "Minnesota Pollution Control Agency",
+   "source_title": "Minnesota Stormwater Manual: Design guidelines for soil characteristics - tree trenches and tree boxes",
+   "source_edition_or_year": "web page, archived 2024 (web.archive.org/web/2024id_)",
+   "source_section_or_page": "Minimum soil volume section: 'a tree with 2 cubic feet of soil per square foot of canopy would need 1413 cubic feet of soil to grow 30 feet wide' (pi/4 x 30^2 x 2 = 1413.7, printed truncated). Placeholders: pit dims 0, usable_fraction 1.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "canopy_diameter_ft": 30,
+    "soil_per_canopy_ft3_per_ft2": 2,
+    "pit_length_ft": 0,
+    "pit_width_ft": 0,
+    "pit_depth_ft": 0,
+    "usable_fraction": 1
+   },
+   "outputs": {
+    "soil_required_ft3": {
+     "value": 1413,
+     "tolerance": {
+      "abs": 1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "soil-volume-for-canopy",
+   "source_publisher": "Minnesota Pollution Control Agency",
+   "source_title": "Minnesota Stormwater Manual: Design guidelines for soil characteristics - tree trenches and tree boxes",
+   "source_edition_or_year": "web page, archived 2024 (web.archive.org/web/2024id_)",
+   "source_section_or_page": "Same section: 'Assuming 2 cubic feet of soil per square foot of canopy, 1,500 cubic feet of soil would be able to support a 31 foot wide tree' (tile 30.90, printed rounded to whole ft). Placeholders: pit 50 x 10 x 3 ft is any geometry giving the printed 1,500 cu ft; canopy_diameter_ft 31; usable_fraction 1.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "canopy_diameter_ft": 31,
+    "soil_per_canopy_ft3_per_ft2": 2,
+    "pit_length_ft": 50,
+    "pit_width_ft": 10,
+    "pit_depth_ft": 3,
+    "usable_fraction": 1
+   },
+   "outputs": {
+    "pit_volume_ft3": {
+     "value": 1500,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "supported_canopy_ft": {
+     "value": 31,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "mortar-batch-c270",
+   "source_publisher": "Portland Cement Association (Masonry Information series, via Florida Concrete & Products Assn.)",
+   "source_title": "Masonry Mortars",
+   "source_edition_or_year": "PCA IS040 reprint, retrieved 2026-10-01 (floridamasonry.com section_vi_-_pca_masonry_mortars.pdf)",
+   "source_section_or_page": "p. 11 Measuring sand: 'To obtain a mortar having a 3 to 1 volume proportion of sand to cementitious materials, 4 1/2 buckets of sand' = '3 cu ft of sand' per 'bag of masonry cement or cubic foot of cement plus lime' (exact). Inputs: one cementitious volume (lime 0), sand ratio 3. Placeholders: unit/mortar strength 0.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "cement_volumes": 1,
+    "lime_volumes": 0,
+    "sand_ratio": 3,
+    "cement_bags": 1,
+    "unit_strength_psi": 0,
+    "mortar_strength_psi": 0
+   },
+   "outputs": {
+    "cementitious_cuft": {
+     "value": 1,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "sand_cuft": {
+     "value": 3,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "sand_max_cuft": {
+     "value": 3,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "mortar-batch-c270",
+   "source_publisher": "Portland Cement Association (Masonry Information series, via Florida Concrete & Products Assn.)",
+   "source_title": "Masonry Mortars",
+   "source_edition_or_year": "PCA IS040 reprint, retrieved 2026-10-01 (floridamasonry.com section_vi_-_pca_masonry_mortars.pdf)",
+   "source_section_or_page": "p. 5 Table 1A (United States - ASTM C270) proportion specification, Type M portland-lime row: portland 1 : hydrated lime 1/4 : aggregate '2 13/16 to 3 3/4' parts (= 2.25x and 3x of 1.25, exact); footnote 'not less than 2 1/4 and not more than 3 times the sum of the volumes of the cement and lime'. Parts read as cu ft at one 1-cu-ft bag (PCA p. 11 convention). Placeholders: sand_ratio 2.5 (any in range), strengths 0.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "cement_volumes": 1,
+    "lime_volumes": 0.25,
+    "sand_ratio": 2.5,
+    "cement_bags": 1,
+    "unit_strength_psi": 0,
+    "mortar_strength_psi": 0
+   },
+   "outputs": {
+    "cementitious_cuft": {
+     "value": 1.25,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "sand_min_cuft": {
+     "value": 2.8125,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "sand_max_cuft": {
+     "value": 3.75,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "grout-lift-pour-height",
+   "source_publisher": "National Concrete Masonry Association",
+   "source_title": "TEK 3-2A Grouting Concrete Masonry Walls",
+   "source_edition_or_year": "2005 (MSJC 2005 basis)",
+   "source_section_or_page": "Fig. 4 'Grouting with cleanouts (High-lift)': 12 ft 8 in wall built full height, 'Three grout lifts' of 5 ft (text: high-lift 'lifts are placed in increments of 5 ft', max pour 24 ft per Table 1; no cleanouts up to 5 ft). Inputs pour 12.667, lift 5, max pour 24, max lift 5, threshold 5 are the 2005 edition's numbers (TMS 602-2013+ uses 5 ft 4 in / 12 ft 8 in). Placeholder: grout_unit_weight_pcf 140.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "pour_height_ft": 12.666666666666666,
+    "lift_height_ft": 5,
+    "max_pour_height_ft": 24,
+    "max_lift_height_ft": 5,
+    "grout_unit_weight_pcf": 140,
+    "cleanout_threshold_ft": 5
+   },
+   "outputs": {
+    "lifts_in_pour": {
+     "value": 3,
+     "tolerance": {
+      "abs": 0
      }
     }
    }

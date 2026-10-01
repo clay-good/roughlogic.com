@@ -2,7 +2,7 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "12b393f29d0b53ee",
+      "sha": "1f4bbf7c8ce28d1c",
       "date": "2026-10-01"
     },
     "/tools/": {
@@ -2370,8 +2370,8 @@
       "date": "2026-09-29"
     },
     "/tools/drone-gsd-overlap/": {
-      "sha": "4d506c03e77c4432",
-      "date": "2026-09-29"
+      "sha": "fb415f51abe0b33a",
+      "date": "2026-10-01"
     },
     "/tools/dry-hop-beer-loss/": {
       "sha": "f0a0d340761a85fa",
@@ -2974,8 +2974,8 @@
       "date": "2026-09-29"
     },
     "/tools/fixed-ladder-fall-protection/": {
-      "sha": "e5940a6120a3548c",
-      "date": "2026-09-29"
+      "sha": "32fee9817f559092",
+      "date": "2026-10-01"
     },
     "/tools/fixed-orifice-target-superheat/": {
       "sha": "6cf86c9fe06ae9b2",
@@ -4782,8 +4782,8 @@
       "date": "2026-10-01"
     },
     "/tools/mortar-batch-c270/": {
-      "sha": "cec0bd7efdcdfda4",
-      "date": "2026-09-29"
+      "sha": "adab52ca481be0f3",
+      "date": "2026-10-01"
     },
     "/tools/mortar-mix/": {
       "sha": "9c935c60da062a30",
@@ -5582,8 +5582,8 @@
       "date": "2026-09-29"
     },
     "/tools/pool-pump-speed-savings/": {
-      "sha": "b4cb789e992f2907",
-      "date": "2026-09-29"
+      "sha": "344b3edbd8378d25",
+      "date": "2026-10-01"
     },
     "/tools/pool-salt-dose/": {
       "sha": "7df76a6389d80f0c",
@@ -6302,8 +6302,8 @@
       "date": "2026-09-29"
     },
     "/tools/respirator-cartridge-life/": {
-      "sha": "5da1ca03133a7189",
-      "date": "2026-09-29"
+      "sha": "b8da5d717e4acd9d",
+      "date": "2026-10-01"
     },
     "/tools/responder-camp-sanitation/": {
       "sha": "267246e6e1ab3f3b",
@@ -6330,8 +6330,8 @@
       "date": "2026-09-29"
     },
     "/tools/retrieval-winch-force/": {
-      "sha": "85e0ae067f183a3c",
-      "date": "2026-09-30"
+      "sha": "3e0d411ffc42d67c",
+      "date": "2026-10-01"
     },
     "/tools/reverse-curve/": {
       "sha": "cbb2fdd0d23a65ea",
@@ -6470,8 +6470,8 @@
       "date": "2026-09-29"
     },
     "/tools/root-ball-size-weight/": {
-      "sha": "4d4b68b4960e0390",
-      "date": "2026-09-29"
+      "sha": "d26b6aba1e04b4ce",
+      "date": "2026-10-01"
     },
     "/tools/rope-ma/": {
       "sha": "912005d051077a37",
@@ -6514,8 +6514,8 @@
       "date": "2026-09-29"
     },
     "/tools/rtk-error-budget/": {
-      "sha": "f54528bd2af0dbec",
-      "date": "2026-09-29"
+      "sha": "6bdbe07e11b21ade",
+      "date": "2026-10-01"
     },
     "/tools/ruling-span/": {
       "sha": "3bd9125dda33b5e9",
@@ -6618,8 +6618,8 @@
       "date": "2026-09-29"
     },
     "/tools/scaffold-tie-spacing/": {
-      "sha": "70d77f6e9794ab2b",
-      "date": "2026-09-29"
+      "sha": "c8ec2a070c363f76",
+      "date": "2026-10-01"
     },
     "/tools/scba-cylinder-time/": {
       "sha": "ec9c65b1f4ea0108",
@@ -7954,8 +7954,8 @@
       "date": "2026-09-29"
     },
     "/tools/thermal-oxidizer-residence/": {
-      "sha": "dced30d503031006",
-      "date": "2026-09-29"
+      "sha": "ff6d75743e0985ad",
+      "date": "2026-10-01"
     },
     "/tools/thermal-screen-energy-saving/": {
       "sha": "a8fbc8e6c81e3468",
@@ -8250,8 +8250,8 @@
       "date": "2026-09-29"
     },
     "/tools/tree-cabling-rating/": {
-      "sha": "e733fed8bee5befb",
-      "date": "2026-09-29"
+      "sha": "255bc3bdc3cc5d7d",
+      "date": "2026-10-01"
     },
     "/tools/tree-crz-encroachment/": {
       "sha": "09b563ceeb8cd931",
@@ -8786,8 +8786,8 @@
       "date": "2026-09-29"
     },
     "/tools/well-point-spacing/": {
-      "sha": "55bd1f3654470fb8",
-      "date": "2026-09-29"
+      "sha": "302f975e56e1f626",
+      "date": "2026-10-01"
     },
     "/tools/well-shock-chlorination/": {
       "sha": "2c2d7273cb6cbe4a",

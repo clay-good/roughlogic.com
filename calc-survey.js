@@ -1198,7 +1198,8 @@ export function computeDroneGsdOverlap({ flight_height_ft = 0, focal_length_mm =
   // Halving the height halves the GSD and quadruples the images, because both
   // footprint dimensions halve at once.
   const half_height_gsd_cm_px = gsd_cm_px / 2;
-  const half_height_image_count = image_count === null ? null : image_count * 4;
+  // From the unrounded coverage, not 4 x an already-rounded count (88 for 85 at 1 ac; fixed 2026-10-01).
+  const half_height_image_count = image_count === null ? null : Math.ceil(4 * area_acres * SQFT_PER_ACRE / effective_area_ft2);
   const outs = [gsd_cm_px, footprint_width_ft, footprint_height_ft, line_spacing_ft, shot_interval_ft];
   if (!outs.every(Number.isFinite)) return { error: "Flight planning math is not a finite value." };
   return {
@@ -1328,10 +1329,14 @@ export function computeRtkErrorBudget({ baseline_km = 0, horizontal_fixed_mm = 8
   const base_error_multiple = horizontal_error_mm > 0 ? base_position_error_mm / horizontal_error_mm : null;
   // The baseline at which the vertical reaches a target, which is what sets
   // how far a rover can work from one base.
-  const baseline_for_target_km = (target_vertical_mm > vertical_fixed_mm && vertical_ppm > 0)
-    ? (target_vertical_mm - vertical_fixed_mm) / vertical_ppm
+  // Judged on the TOTAL, base error included: until 2026-10-01 a 25 mm receiver
+  // figure "met" a 30 mm target while the total with the base was 1,525 mm.
+  // The 1e-9 keeps a target equal to the total from failing on rounding.
+  const fixed_floor_mm = vertical_fixed_mm + base_position_error_mm;
+  const baseline_for_target_km = (target_vertical_mm > fixed_floor_mm && vertical_ppm > 0)
+    ? (target_vertical_mm - fixed_floor_mm) / vertical_ppm
     : null;
-  const meets_target = target_vertical_mm > 0 ? vertical_error_mm <= target_vertical_mm : null;
+  const meets_target = target_vertical_mm > 0 ? total_vertical_mm <= target_vertical_mm + 1e-9 : null;
   const outs = [horizontal_error_mm, vertical_error_mm, total_horizontal_mm, total_vertical_mm];
   if (!outs.every(Number.isFinite)) return { error: "RTK error budget math is not a finite value." };
   const base_verdict = base_position_error_mm === 0
@@ -1342,15 +1347,15 @@ export function computeRtkErrorBudget({ baseline_km = 0, horizontal_fixed_mm = 8
   const target_verdict = meets_target === null
     ? "Enter a target vertical uncertainty to find the working baseline."
     : meets_target
-      ? "MEETS the " + fmt(target_vertical_mm, 1) + " mm vertical target at " + fmt(vertical_error_mm, 1) + " mm on this baseline"
-      : "MISSES the " + fmt(target_vertical_mm, 1) + " mm vertical target at " + fmt(vertical_error_mm, 1) + " mm" + (baseline_for_target_km === null ? " -- and the fixed component alone exceeds it, so no baseline reaches it with this receiver" : ", which needs a baseline under " + fmt(baseline_for_target_km, 2) + " km");
+      ? "MEETS the " + fmt(target_vertical_mm, 1) + " mm vertical target at " + fmt(total_vertical_mm, 1) + " mm, base error included, on this baseline"
+      : "MISSES the " + fmt(target_vertical_mm, 1) + " mm vertical target at " + fmt(total_vertical_mm, 1) + " mm with the base error" + (baseline_for_target_km === null ? " -- and the fixed component plus the base error alone exceed it, so no baseline reaches it with this receiver and base" : ", which needs a baseline under " + fmt(baseline_for_target_km, 2) + " km");
   return {
     baseline_km, baseline_mm, horizontal_fixed_mm, horizontal_ppm, horizontal_ppm_mm,
     vertical_fixed_mm, vertical_ppm, vertical_ppm_mm, horizontal_error_mm,
     vertical_error_mm, vertical_ratio, base_position_error_mm, total_horizontal_mm,
     total_vertical_mm, base_error_dominates, base_error_multiple,
     target_vertical_mm, baseline_for_target_km, meets_target, base_verdict, target_verdict,
-    note: "An RTK specification is written as a fixed component plus a parts-per-million term, and both halves matter for different reasons. The fixed part is the receiver's own floor and it does not improve with a shorter baseline; the ppm part grows with distance from the base, because the atmosphere the correction models diverges between the two receivers as they separate. Eight millimetres plus one ppm means eight millimetres at the base and eighteen at ten kilometres. THE VERTICAL IS ROUGHLY TWICE THE HORIZONTAL AND THE REASON IS GEOMETRIC RATHER THAN ELECTRONIC. Satellites are all above the receiver and none below it, so the intersection geometry that fixes a horizontal position from many directions has only one side to work with in the vertical. That ratio holds at every baseline and with every receiver, and it means a job whose result depends on elevation should know before it relies on RTK heights. THE FAILURE THAT DWARFS BOTH IS THE BASE POSITION, and it is not a precision problem at all. If the base was set on an autonomous position rather than on a known control point, its coordinate can be off by a metre or more -- and every rover observation of that session inherits that error EXACTLY. It is systematic, not random: it does not average out over occupations, it does not shrink with a better receiver, and it does not show up in the internal quality figures the data collector displays, which describe the vector from the base and not the base itself. This adds it directly rather than combining it in quadrature for that reason. A float solution is not survey grade. Only a fixed integer solution carries the precision a specification quotes, and a data collector that reports float has not resolved the carrier ambiguities -- the coordinates it stores look identical to fixed ones in the file. And the check that costs two minutes: occupy a known point at the start and at the end of every session. It catches a wrong base coordinate, a wrong antenna height, a wrong datum, and a solution that drifted, and none of those is visible any other way. Antenna height is worth naming on its own, because a mis-measured or mis-typed antenna height is a pure vertical blunder of exactly that size on every point of the session. A precision budget, not an accuracy statement. It does not address multipath, which is site-dependent and can exceed everything here; satellite geometry and its dilution of precision, which varies through the day; ionospheric activity, which degrades long baselines badly during solar maxima; the network RTK case, where the correction is interpolated and the baseline concept differs; or datum and geoid model errors, which are systematic and often larger than any of it. Geoid models convert ellipsoid heights to orthometric ones and carry their own uncertainty, which this does not include. The receiver manufacturer's specification, the project's accuracy requirements, the control network, and the surveyor of record govern.",
+    note: "An RTK specification is written as a fixed component plus a parts-per-million term, and both halves matter for different reasons. The fixed part is the receiver's own floor and it does not improve with a shorter baseline; the ppm part grows with distance from the base, because the atmosphere the correction models diverges between the two receivers as they separate. Eight millimetres plus one ppm means eight millimetres at the base and eighteen at ten kilometres. THE VERTICAL IS ROUGHLY TWICE THE HORIZONTAL AND THE REASON IS GEOMETRIC RATHER THAN ELECTRONIC. Satellites are all above the receiver and none below it, so the intersection geometry that fixes a horizontal position from many directions has only one side to work with in the vertical. The 2:1 is in the fixed terms (NGS single-base RT guidelines: 1 cm + 1 ppm horizontal, 2 cm + 1 ppm vertical); on a long baseline the shared ppm term pulls the ratio toward 1. It means a job whose result depends on elevation should know before it relies on RTK heights. THE FAILURE THAT DWARFS BOTH IS THE BASE POSITION, and it is not a precision problem at all. If the base was set on an autonomous position rather than on a known control point, its coordinate can be off by a metre or more -- and every rover observation of that session inherits that error EXACTLY. It is systematic, not random: it does not average out over occupations, it does not shrink with a better receiver, and it does not show up in the internal quality figures the data collector displays, which describe the vector from the base and not the base itself. This adds it directly rather than combining it in quadrature for that reason. A float solution is not survey grade. Only a fixed integer solution carries the precision a specification quotes, and a data collector that reports float has not resolved the carrier ambiguities -- the coordinates it stores look identical to fixed ones in the file. And the check that costs two minutes: occupy a known point at the start and at the end of every session. It catches a wrong base coordinate, a wrong antenna height, a wrong datum, and a solution that drifted, and none of those is visible any other way. Antenna height is worth naming on its own, because a mis-measured or mis-typed antenna height is a pure vertical blunder of exactly that size on every point of the session. A precision budget, not an accuracy statement. It does not address multipath, which is site-dependent and can exceed everything here; satellite geometry and its dilution of precision, which varies through the day; ionospheric activity, which degrades long baselines badly during solar maxima; the network RTK case, where the correction is interpolated and the baseline concept differs; or datum and geoid model errors, which are systematic and often larger than any of it. Geoid models convert ellipsoid heights to orthometric ones and carry their own uncertainty, which this does not include. The receiver manufacturer's specification, the project's accuracy requirements, the control network, and the surveyor of record govern.",
   };
 }
 const rtkErrorBudgetExample = { inputs: { baseline_km: 10, horizontal_fixed_mm: 8, horizontal_ppm: 1, vertical_fixed_mm: 15, vertical_ppm: 1, base_position_error_mm: 1500, target_vertical_mm: 30 } };
@@ -1368,7 +1373,7 @@ SURVEY_RENDERERS["rtk-error-budget"] = _simpleRenderer({
   ],
   outputs: [
     { key: "h", id: "reb-out-h", label: "Horizontal precision", value: (r) => fmt(r.horizontal_error_mm, 1) + " mm -- " + fmt(r.horizontal_fixed_mm, 1) + " fixed plus " + fmt(r.horizontal_ppm_mm, 1) + " over " + fmt(r.baseline_km, 2) + " km" },
-    { key: "v", id: "reb-out-v", label: "Vertical precision", value: (r) => fmt(r.vertical_error_mm, 1) + " mm -- " + fmt(r.vertical_ratio, 2) + " times the horizontal, and that ratio holds at every baseline because there are no satellites below the receiver" },
+    { key: "v", id: "reb-out-v", label: "Vertical precision", value: (r) => fmt(r.vertical_error_mm, 1) + " mm -- " + fmt(r.vertical_ratio, 2) + " times the horizontal -- worse because there are no satellites below the receiver, and closest to 2 on short baselines where the fixed terms dominate" },
     { key: "b", id: "reb-out-b", label: "The base", value: (r) => r.base_verdict },
     { key: "t", id: "reb-out-t", label: "With the base error included", value: (r) => fmt(r.total_horizontal_mm, 1) + " mm horizontal and " + fmt(r.total_vertical_mm, 1) + " mm vertical, added directly because a base shift is systematic rather than random" },
     { key: "g", id: "reb-out-g", label: "Against the target", value: (r) => r.target_verdict },
@@ -1395,7 +1400,8 @@ export function computeMassHaulOverhaul({ cut_volume_cy = 0, shrinkage_factor = 
   // be corrected before the two can be compared at all.
   const compacted_from_cut_cy = cut_volume_cy * shrinkage_factor;
   const balance_cy = compacted_from_cut_cy - fill_required_cy;
-  const balanced = Math.abs(balance_cy) < 1e-9;
+  // Relative: an absolute 1e-9 printed "DEFICIT of 0 cy" on 10M cy jobs (fixed 2026-10-01).
+  const balanced = Math.abs(balance_cy) < 1e-9 * Math.max(1, fill_required_cy, compacted_from_cut_cy);
   const surplus = balance_cy > 0;
   const borrow_needed_cy = balance_cy < 0 ? -balance_cy : 0;
   const waste_cy = balance_cy > 0 ? balance_cy : 0;

@@ -47565,7 +47565,8 @@ test("bounds: spec-v1683 computeMortarBatchC270 -- a mortar harder than the unit
   assert.equal(r.sand_in_range, true);
   assert.equal(r.compatible, true);
   assert.ok(Math.abs(r.lime_bags - 0.4) < 1e-12);
-  assert.ok(Math.abs(r.sand_shovels - 7.5) < 1e-12);
+  // A #2 shovel is about 0.2 cu ft (NLA: 30-36 shovels for 6-7 cu ft); was 0.5.
+  assert.ok(Math.abs(r.sand_shovels - 18.75) < 1e-9);
   // Sand is always the entered multiple of the cementitious total, and the
   // range bounds bracket it when it is in range.
   assert.ok(Math.abs(r.sand_cuft - base.sand_ratio * r.cementitious_cuft) < 1e-12);
@@ -47967,7 +47968,8 @@ test("bounds: spec-v1741 computeDroneGsdOverlap -- four times the images for twi
   assert.ok(Math.abs(lower.footprint_width_ft - r.footprint_width_ft / 2) < 1e-9);
   assert.ok(Math.abs(lower.footprint_height_ft - r.footprint_height_ft / 2) < 1e-9);
   assert.ok(Math.abs(lower.effective_area_ft2 - r.effective_area_ft2 / 4) < 1e-6);
-  assert.equal(r.half_height_image_count, r.image_count * 4);
+  // Four times the coverage, rounded once -- never more than 4 x the rounded count.
+  assert.ok(r.half_height_image_count <= r.image_count * 4 && r.half_height_image_count > (r.image_count - 1) * 4);
   // Zero overlap makes the spacing the whole footprint, exactly.
   const none = _v1741({ ...base, forward_overlap_pct: 0, side_overlap_pct: 0 });
   assert.ok(Math.abs(none.line_spacing_ft - none.footprint_width_ft) < 1e-9);
@@ -48028,12 +48030,17 @@ test("bounds: spec-v1743 computeRtkErrorBudget -- a base error adds, it does not
   assert.ok(Math.abs(atBase.vertical_error_mm - base.vertical_fixed_mm) < 1e-6);
   // The ppm term is exactly linear in the baseline.
   assert.ok(Math.abs(_v1743({ ...base, baseline_km: 20 }).horizontal_ppm_mm - 2 * r.horizontal_ppm_mm) < 1e-12);
+  // The verdict judges the TOTAL with the base error: the 25 mm receiver figure
+  // does not "meet" a 30 mm target when the base adds 1,500 mm (fixed 2026-10-01).
+  assert.equal(r.meets_target, false);
   // The baseline that just meets a target, fed back in, meets it exactly.
-  const target = _v1743({ ...base, target_vertical_mm: 20 });
+  const target = _v1743({ ...base, base_position_error_mm: 0, target_vertical_mm: 20 });
   assert.ok(target.baseline_for_target_km > 0);
-  const at = _v1743({ ...base, baseline_km: target.baseline_for_target_km, target_vertical_mm: 20 });
+  const at = _v1743({ ...base, base_position_error_mm: 0, baseline_km: target.baseline_for_target_km, target_vertical_mm: 20 });
   assert.ok(Math.abs(at.vertical_error_mm - 20) < 1e-9);
   assert.equal(at.meets_target, true);
+  // A total exactly at the target meets it despite float rounding (5 + 0.1 x 3.1).
+  assert.equal(_v1743({ ...base, base_position_error_mm: 0, vertical_fixed_mm: 5, vertical_ppm: 0.1, baseline_km: 3.1, target_vertical_mm: 5.31 }).meets_target, true);
   // A target below the fixed component is unreachable at any baseline.
   const impossible = _v1743({ ...base, target_vertical_mm: 10 });
   assert.equal(impossible.baseline_for_target_km, null);
@@ -48440,10 +48447,11 @@ test("bounds: spec-v1692 computeLeadDustClearance -- the limit is a startlingly 
   assert.equal(doubleArea.passes, true);
   // And the laboratory result a wipe can carry scales with it too.
   assert.ok(Math.abs(doubleArea.max_lab_result_ug - 2 * r.max_lab_result_ug) < 1e-12);
-  // The max result, fed back in, lands exactly on the limit and passes.
+  // The max result, fed back in, lands exactly on the limit -- and a result AT
+  // the limit FAILS (40 CFR 745.227: loadings "must be below"; fixed 2026-10-01).
   const at = _v1692({ ...base, lab_result_ug: r.max_lab_result_ug });
   assert.ok(Math.abs(at.dust_loading_ug_ft2 - base.clearance_limit_ug_ft2) < 1e-12);
-  assert.equal(at.passes, true);
+  assert.equal(at.passes, false);
   assert.ok(Math.abs(at.loading_ratio - 1) < 1e-12);
   // A tighter limit fails the same wipe, which is what a superseded number
   // hides.
@@ -48483,7 +48491,7 @@ test("bounds: spec-v1693 computeSilicaVentilationScreen -- task time is a contro
   const between = _v1693({ ...base, sample_minutes: 100 });
   assert.equal(between.over_pel, false);
   assert.equal(between.over_action_level, true);
-  assert.ok(between.verdict.startsWith("OVER THE ACTION LEVEL, UNDER THE PEL"));
+  assert.ok(between.verdict.startsWith("AT OR OVER THE ACTION LEVEL, UNDER THE PEL"));
   // Under both, nothing is triggered.
   const low = _v1693({ ...base, sample_minutes: 40 });
   assert.equal(low.over_action_level, false);
@@ -51702,14 +51710,16 @@ test("bounds: spec-v1702 computePoolPumpSpeedSavings -- energy goes with the SQU
   assert.ok(Math.abs(r.energy_fraction - 0.25) < 1e-12);
   assert.ok(Math.abs(r.energy_fraction - Math.pow(0.5, 2)) < 1e-12);
   assert.ok(r.energy_fraction > r.power_fraction);
-  // Derived from the exact kW/hp (550 ft-lbf/s), not the spec's rounded 1.49 kW.
-  const exactFullKw = 2 * (550 * 0.3048 * 4.4482216152605 / 1000);
+  // Electrical draw at DOE's typical 2,000 W for a 1-1/2 hp pump, not the shaft
+  // conversion (0.746 kW/hp read every kWh about 44% low; fixed 2026-10-01).
+  const exactFullKw = 2 * (2.0 / 1.5);
   assert.ok(Math.abs(r.full_kw - exactFullKw) < 1e-12);
   const exactSaving = exactFullKw * 8 - exactFullKw * 0.125 * 16;
   assert.ok(Math.abs(r.saving_kwh_day - exactSaving) < 1e-12);
   assert.ok(Math.abs(r.annual_saving_cost - exactSaving * 365 * 0.16) < 1e-9);
-  // spec-v1702's unrendered placeholder ${8.9*365*0.16:,.0f} is about $520.
-  assert.ok(r.annual_saving_cost > 500 && r.annual_saving_cost < 540);
+  // spec-v1702 put this near $520 on the shaft conversion; at DOE's electrical
+  // draw (2 kW per 1-1/2 hp) the same 2 hp pump saves about $930 a year.
+  assert.ok(r.annual_saving_cost > 900 && r.annual_saving_cost < 960);
   // The equipment minimum is what stops "as slow as possible".
   assert.equal(r.below_minimum, false);
   const slow = _v1702({ ...base, speed_fraction: 0.3 });

@@ -331,7 +331,7 @@ export function computeAbatementWasteContainers({ area_ft2 = 0, thickness_in = 0
   const bulked_volume_ft3 = in_place_volume_ft3 * bulking_factor;
   const bulked_volume_yd3 = bulked_volume_ft3 / CF_PER_CY;
   const usable_bag_volume_ft3 = bag_volume_ft3 * bag_fill_fraction;
-  const bag_count = Math.ceil(bulked_volume_ft3 / usable_bag_volume_ft3);
+  const bag_count = Math.ceil(bulked_volume_ft3 / usable_bag_volume_ft3 - 1e-9);
   // Weight follows the IN-PLACE volume: bulking is air, and air weighs
   // nothing. Estimating weight on the bulked volume overstates it badly.
   const waste_weight_lb = in_place_volume_ft3 * material_density_pcf;
@@ -387,8 +387,11 @@ export function computeLeadDustClearance({ lab_result_ug = 0, wipe_area_ft2 = 1,
   const dust_loading_ug_ft2 = lab_result_ug / wipe_area_ft2;
   const limit_margin_ug_ft2 = clearance_limit_ug_ft2 - dust_loading_ug_ft2;
   const loading_ratio = dust_loading_ug_ft2 / clearance_limit_ug_ft2;
-  const passes = dust_loading_ug_ft2 <= clearance_limit_ug_ft2;
-  // The laboratory result the wiped area can carry and still pass, which is
+  // 40 CFR 745.227(h): loadings "must be below" the levels, and (e)(8)(vii)
+  // recleans a sample that "equals or exceeds" one. Until 2026-10-01 a result AT
+  // the limit passed; the relative 1e-9 also catches 0.7 / 0.1 = 6.999999999999999.
+  const passes = dust_loading_ug_ft2 < clearance_limit_ug_ft2 * (1 - 1e-9);
+  // The laboratory result the wiped area must stay BELOW to pass, which is
   // the number that tells a supervisor how little dust the limit represents.
   const max_lab_result_ug = clearance_limit_ug_ft2 * wipe_area_ft2;
   const wipe_count = rooms > 0 ? Math.round(rooms) * Math.round(surfaces_per_room) : null;
@@ -420,7 +423,7 @@ DEMO_RENDERERS["lead-dust-clearance"] = _simpleRenderer({
   outputs: [
     { key: "l", id: "ldc-out-l", label: "Dust loading", value: (r) => fmt(r.dust_loading_ug_ft2, 2) + " micrograms per sq ft -- " + fmt(r.lab_result_ug, 1) + " micrograms over " + fmt(r.wipe_area_ft2, 2) + " sq ft" },
     { key: "v", id: "ldc-out-v", label: "Against the limit", value: (r) => r.verdict },
-    { key: "m", id: "ldc-out-m", label: "What the limit actually allows", value: (r) => fmt(r.max_lab_result_ug, 1) + " micrograms on this wipe -- which is why surfaces that look and feel clean routinely fail" },
+    { key: "m", id: "ldc-out-m", label: "What the limit actually allows", value: (r) => "under " + fmt(r.max_lab_result_ug, 1) + " micrograms on this wipe -- which is why surfaces that look and feel clean routinely fail" },
     { key: "c", id: "ldc-out-c", label: "Samples", value: (r) => r.wipe_count === null ? "(no room count entered)" : fmt(r.wipe_count, 0) + " wipes across " + fmt(r.rooms, 0) + " rooms at " + fmt(r.surfaces_per_room, 0) + " surface types, plus " + fmt(r.blanks_per_job, 0) + " field blank" + (r.blanks_per_job === 1 ? "" : "s") + " -- " + fmt(r.total_samples, 0) + " to the laboratory" },
     { key: "n", id: "ldc-out-n", label: "Note", value: (r) => r.note },
   ],
@@ -447,7 +450,10 @@ export function computeSilicaVentilationScreen({ measured_concentration_ug_m3 = 
   const twa_ug_m3 = measured_concentration_ug_m3 * sample_minutes / REFERENCE_MINUTES;
   const pel_ratio = twa_ug_m3 / pel_ug_m3;
   const over_pel = twa_ug_m3 > pel_ug_m3;
-  const over_action_level = twa_ug_m3 > action_level_ug_m3;
+  // 1926.1153(d)(2)(iii)(C): repeat monitoring at exposures "at or above" the
+  // action level; OSHA's own FAQ case (800 x 15 min) lands exactly on 25. Until
+  // 2026-10-01 a TWA AT the action level read as under it.
+  const over_action_level = twa_ug_m3 >= action_level_ug_m3 * (1 - 1e-9);
   const over_pel_by_ug_m3 = twa_ug_m3 - pel_ug_m3;
   const controlled_twa_ug_m3 = twa_ug_m3 * (1 - control_efficiency_pct / 100);
   const controlled_over_pel = controlled_twa_ug_m3 > pel_ug_m3;
@@ -465,7 +471,7 @@ export function computeSilicaVentilationScreen({ measured_concentration_ug_m3 = 
   const verdict = over_pel
     ? "OVER THE PEL: " + fmt(twa_ug_m3, 1) + " micrograms per cubic metre as an 8-hour TWA against " + fmt(pel_ug_m3, 0) + ", " + fmt(pel_ratio, 2) + "x it. Controls to " + fmt(required_efficiency_pct, 0) + "% efficiency, or " + (max_task_minutes === null ? "less task time" : fmt(max_task_minutes, 0) + " min of the task instead of " + fmt(sample_minutes, 0)) + ", brings it to the limit"
     : over_action_level
-      ? "OVER THE ACTION LEVEL, UNDER THE PEL: " + fmt(twa_ug_m3, 1) + " against an action level of " + fmt(action_level_ug_m3, 0) + " and a PEL of " + fmt(pel_ug_m3, 0) + ". The action level triggers monitoring obligations of its own -- it is not a safe-and-done line"
+      ? "AT OR OVER THE ACTION LEVEL, UNDER THE PEL: " + fmt(twa_ug_m3, 1) + " against an action level of " + fmt(action_level_ug_m3, 0) + " and a PEL of " + fmt(pel_ug_m3, 0) + ". The action level triggers monitoring obligations of its own -- it is not a safe-and-done line"
       : "UNDER THE ACTION LEVEL at " + fmt(twa_ug_m3, 1) + " against " + fmt(action_level_ug_m3, 0) + ", and under the " + fmt(pel_ug_m3, 0) + " PEL";
   const control_verdict = control_efficiency_pct === 0
     ? "No control efficiency entered. Water suppression and local exhaust ventilation at the airflow the table specifies are the engineering controls, and they come before respirators."

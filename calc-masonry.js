@@ -909,12 +909,14 @@ MASONRY_RENDERERS["masonry-limited-access-zone"] = _simpleRenderer({
 
 // Water weighs 62.4 lb per cubic foot; a bag of portland cement is one cubic
 // foot loose and 94 lb; a bag of hydrated lime is 50 lb and about 1.25 cu ft
-// loose. A mason's shovel of damp sand runs about 0.5 cu ft.
+// loose. A #2 shovel of damp sand runs about 0.2 cu ft: the National Lime
+// Association prints 30-36 shovels for 6-7 cu ft. Until 2026-10-01 this was
+// 0.5, which counted a Type S batch at 9 shovels instead of about 22.
 const _CUFT_PER_CEMENT_BAG = 1.0;
 const _LB_PER_CEMENT_BAG = 94;
 const _CUFT_PER_LIME_BAG = 1.25;
 const _LB_PER_LIME_BAG = 50;
-const _CUFT_PER_SHOVEL = 0.5;
+const _CUFT_PER_SHOVEL = 0.2;
 const _GAL_PER_CUFT = 1728 / 231;
 
 // ============ spec-v1683: ASTM C270 mortar batch proportions ============
@@ -965,7 +967,7 @@ export function computeMortarBatchC270({ cement_volumes = 1, lime_volumes = 0.5,
     lime_bags, sand_shovels, batch_yield_cuft, cement_weight_lb, lime_weight_lb,
     unit_strength_psi, mortar_strength_psi, compatible, strength_ratio,
     sand_verdict, compat_verdict,
-    note: "ASTM C270 gives mortar as VOLUME PROPORTIONS of cementitious material and sand, and the batch scales from the cement: one bag of portland is one cubic foot, so a Type S at one part cement to half a part lime is a bag and about half a bag-equivalent of lime, with sand between 2.25 and 3 times the sum of the two. THE COUNTERINTUITIVE RULE IS THE IMPORTANT ONE: a stronger mortar is often a worse mortar. Mortar is meant to be the sacrificial element, so that movement and stress crack the joint -- which is repointable -- rather than the masonry unit, which is not. Repointing soft historic brick with a hard Type S or M mortar is a well documented way to destroy the brick, because the hard mortar transfers stress into the unit and the unit spalls. Type O, or a lime mortar, exists for exactly that case, and the strength comparison here is the check that catches it before the wall does. THE PROPORTION VERSUS PROPERTY DISTINCTION MATTERS AT THE MIXER. C270 allows a mortar to be specified either by proportion or by laboratory-tested properties, and the two are not interchangeable: a proportion-specified mortar is batched to the volumes and is not tested for strength at all. Field-tested mortar is tested to a different standard with different acceptance than laboratory mortar, and field results routinely come in below the laboratory values for the same mortar -- treating that as a failure is a common and expensive misunderstanding. SAND VOLUME IS THE TERM MOST OFTEN ABUSED, because it is measured by shovel rather than by box. The allowable range is broad, and running at the high end produces a harsh, unworkable mortar that masons then correct with water, which changes the water-cement ratio, the strength, the shrinkage and the bond all at once. The shovel count here is a working figure at about half a cubic foot per shovel of damp sand and is no substitute for a measured batch box. Proportions the reader supplies for the type in question. NO TYPE TABLE IS SHIPPED: the cement and lime volumes for M, S, N and O come from C270 itself, they differ between the portland-lime and the masonry-cement and mortar-cement systems, and a project specification can require something else entirely. It does not compute water, which is added to workability rather than to a ratio and is the mason's judgment; it does not address air content, retempering, board life, colour or admixtures; and it does not evaluate bond strength, water penetration, or freeze-thaw durability, which are properties of the assembly rather than of the batch. ASTM C270, the project specification, and the mason of record govern.",
+    note: "ASTM C270 gives mortar as VOLUME PROPORTIONS of cementitious material and sand, and the batch scales from the cement: one bag of portland is one cubic foot, so a Type S at one part cement to half a part lime is a bag of cement and half a cubic foot of lime (0.4 of a 50 lb bag), with sand between 2.25 and 3 times the sum of the two. THE COUNTERINTUITIVE RULE IS THE IMPORTANT ONE: a stronger mortar is often a worse mortar. Mortar is meant to be the sacrificial element, so that movement and stress crack the joint -- which is repointable -- rather than the masonry unit, which is not. Repointing soft historic brick with a hard Type S or M mortar is a well documented way to destroy the brick, because the hard mortar transfers stress into the unit and the unit spalls. Type O, or a lime mortar, exists for exactly that case, and the strength comparison here is the check that catches it before the wall does. THE PROPORTION VERSUS PROPERTY DISTINCTION MATTERS AT THE MIXER. C270 allows a mortar to be specified either by proportion or by laboratory-tested properties, and the two are not interchangeable: a proportion-specified mortar is batched to the volumes and is not tested for strength at all. Field-tested mortar is tested to a different standard with different acceptance than laboratory mortar, and field results routinely come in below the laboratory values for the same mortar -- treating that as a failure is a common and expensive misunderstanding. SAND VOLUME IS THE TERM MOST OFTEN ABUSED, because it is measured by shovel rather than by box. The allowable range is broad, and running at the high end produces a harsh, unworkable mortar that masons then correct with water, which changes the water-cement ratio, the strength, the shrinkage and the bond all at once. The shovel count here is a working figure at about half a cubic foot per shovel of damp sand and is no substitute for a measured batch box. Proportions the reader supplies for the type in question. NO TYPE TABLE IS SHIPPED: the cement and lime volumes for M, S, N and O come from C270 itself, they differ between the portland-lime and the masonry-cement and mortar-cement systems, and a project specification can require something else entirely. It does not compute water, which is added to workability rather than to a ratio and is the mason's judgment; it does not address air content, retempering, board life, colour or admixtures; and it does not evaluate bond strength, water penetration, or freeze-thaw durability, which are properties of the assembly rather than of the batch. ASTM C270, the project specification, and the mason of record govern.",
   };
 }
 const mortarBatchC270Example = { inputs: { cement_volumes: 1, lime_volumes: 0.5, sand_ratio: 2.5, cement_bags: 1, unit_strength_psi: 3000, mortar_strength_psi: 1800 } };
@@ -994,7 +996,7 @@ MASONRY_RENDERERS["mortar-batch-c270"] = _simpleRenderer({
 // ============ spec-v1684: CMU grout lift and pour height ============
 
 // dims: in { pour_height_ft: L, lift_height_ft: L, max_pour_height_ft: L, max_lift_height_ft: L, grout_unit_weight_pcf: M L^-3, cleanout_threshold_ft: L } out: { lifts_in_pour: dimensionless, base_pressure_psi: M L^-1 T^-2, base_pressure_psf: M L^-1 T^-2, pour_margin_ft: L, lift_margin_ft: L, pressure_at_limit_psi: M L^-1 T^-2 }
-export function computeGroutLiftPourHeight({ pour_height_ft = 0, lift_height_ft = 0, max_pour_height_ft = 0, max_lift_height_ft = 0, grout_unit_weight_pcf = 140, cleanout_threshold_ft = 5.33 } = {}) {
+export function computeGroutLiftPourHeight({ pour_height_ft = 0, lift_height_ft = 0, max_pour_height_ft = 0, max_lift_height_ft = 0, grout_unit_weight_pcf = 140, cleanout_threshold_ft = 5.333 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(pour_height_ft > 0)) return { error: "The proposed pour height must be positive (ft)." };
   if (!(lift_height_ft > 0)) return { error: "The proposed lift height must be positive (ft)." };
@@ -1012,9 +1014,13 @@ export function computeGroutLiftPourHeight({ pour_height_ft = 0, lift_height_ft 
   const pressure_at_limit_psi = grout_unit_weight_pcf * max_pour_height_ft / SQIN_PER_SQFT_MAS;
   const pour_margin_ft = max_pour_height_ft - pour_height_ft;
   const lift_margin_ft = max_lift_height_ft - lift_height_ft;
-  const pour_ok = pour_height_ft <= max_pour_height_ft;
-  const lift_ok = lift_height_ft <= max_lift_height_ft;
-  const cleanouts_required = pour_height_ft > cleanout_threshold_ft;
+  // TMS 602's limits are in feet and inches (5 ft 4 in = 5.333... ft), so a
+  // limit typed as 5.33 or 5.333 must not fail a pour of exactly 5 ft 4 in; the
+  // comparison carries 0.005 ft (1/16 in). Until 2026-10-01 it was exact.
+  const LIMIT_TOL_FT = 0.005;
+  const pour_ok = pour_height_ft <= max_pour_height_ft + LIMIT_TOL_FT;
+  const lift_ok = lift_height_ft <= max_lift_height_ft + LIMIT_TOL_FT;
+  const cleanouts_required = pour_height_ft > cleanout_threshold_ft + LIMIT_TOL_FT;
   const outs = [lifts_in_pour, base_pressure_psi, base_pressure_psf, pour_margin_ft, lift_margin_ft];
   if (!outs.every(Number.isFinite)) return { error: "Grout lift math is not a finite value." };
   const pour_verdict = pour_ok
@@ -1035,17 +1041,17 @@ export function computeGroutLiftPourHeight({ pour_height_ft = 0, lift_height_ft 
     note: "Two limits control two different failures and they are constantly confused. THE LIFT LIMIT IS ABOUT CONSOLIDATION: grout placed deeper than it can be properly vibrated leaves voids, and a void in a grouted cell means the reinforcement is not embedded and the wall does not have the strength the drawings assume. THE POUR LIMIT IS ABOUT THE WALL'S OWN STRENGTH WHILE THE GROUT IS FLUID: freshly grouted masonry is holding back a column of liquid at roughly 140 pounds per cubic foot, and a pour higher than the wall can resist blows it out. A pour is made up of one or more lifts, so the two limits are checked separately and the lift count falls out of them. The pressure arithmetic is worth carrying because it is the whole reason for the pour limit: a five foot pour puts about five pounds per square inch on the inside of joints that are hours old, and doubling the pour doubles it. Blowouts are exactly what happens when a crew decides to grout a full storey in one go because the pump is already there, and the wall gives no warning before it goes. CLEANOUTS ARE THE PROVISION THAT GETS OMITTED AND THEN REQUIRED. Above a threshold pour height the code requires openings at the base of every grouted cell so mortar droppings can be removed and the space inspected before grouting, and they are closed only after that inspection. A wall built without them and discovered at inspection has to be opened at the base -- cutting units out of completed work -- which is far more expensive than building them in, and entirely avoidable by checking the pour height before laying. CONSOLIDATION IS A TWO-STEP REQUIREMENT rather than one. Grout is vibrated when placed and again after initial water loss, because it settles as the masonry absorbs water, and reconsolidation closes the void that leaves at the top of the lift -- which in many walls sits directly over a reinforcement lap. THE CODE LIMITS ARE ENTERED AND NO TABLE IS SHIPPED. Maximum lift and pour heights depend on the grout space least dimension, the unit type, whether the grout is fine or coarse, and whether cleanouts are provided, and the table that governs is the one in the adopted edition. This does not compute grout volume, design the wall, evaluate whether a specific wall can resist a specific pour pressure -- which depends on the units, the mortar, the joints' age and the bracing -- or address grout demand, aggregate, slump, admixtures, or self-consolidating grout, whose placement rules differ. TMS 602 as adopted, the project specification, and the inspector govern.",
   };
 }
-const groutLiftPourHeightExample = { inputs: { pour_height_ft: 5, lift_height_ft: 5, max_pour_height_ft: 5.33, max_lift_height_ft: 5.33, grout_unit_weight_pcf: 140, cleanout_threshold_ft: 5.33 } };
+const groutLiftPourHeightExample = { inputs: { pour_height_ft: 5, lift_height_ft: 5, max_pour_height_ft: 5.333, max_lift_height_ft: 5.333, grout_unit_weight_pcf: 140, cleanout_threshold_ft: 5.333 } };
 MASONRY_RENDERERS["grout-lift-pour-height"] = _simpleRenderer({
   citation: "Citation: the TMS 602 grout placement limits by name -- the LIFT limit governs consolidation and the POUR limit governs the wall's resistance to fluid grout pressure, with a pour made up of one or more lifts and cleanouts required at the base of every grouted cell above a threshold pour height. The fluid pressure at the base is unit weight x pour height, about 140 pcf for grout. NO LIMIT TABLE IS SHIPPED: the maximum lift and pour heights depend on the grout space least dimension, the unit type, fine or coarse grout, and whether cleanouts are provided, and come from the adopted edition. TMS 602 as adopted, the project specification, and the inspector govern.",
   example: groutLiftPourHeightExample.inputs,
   fields: [
     { key: "pour_height_ft", label: "Proposed pour height (ft)", kind: "number", default: 5 },
     { key: "lift_height_ft", label: "Proposed lift height (ft)", kind: "number", default: 5 },
-    { key: "max_pour_height_ft", label: "Code maximum pour height (ft)", kind: "number", default: 5.33 },
-    { key: "max_lift_height_ft", label: "Code maximum lift height (ft)", kind: "number", default: 5.33 },
+    { key: "max_pour_height_ft", label: "Code maximum pour height (ft)", kind: "number", default: 5.333 },
+    { key: "max_lift_height_ft", label: "Code maximum lift height (ft)", kind: "number", default: 5.333 },
     { key: "grout_unit_weight_pcf", label: "Fluid grout unit weight (pcf)", kind: "number", default: 140 },
-    { key: "cleanout_threshold_ft", label: "Cleanout threshold pour height (ft)", kind: "number", default: 5.33 },
+    { key: "cleanout_threshold_ft", label: "Cleanout threshold pour height (ft)", kind: "number", default: 5.333 },
   ],
   outputs: [
     { key: "p", id: "glp-out-p", label: "Pour", value: (r) => r.pour_verdict },

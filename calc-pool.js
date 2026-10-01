@@ -175,7 +175,12 @@ POOL_RENDERERS["pool-cover-evaporation"] = _simpleRenderer({
 // an eighth. Same affinity relation, different binding constraint, and the
 // difference is the number an owner is quoted.
 // =====================================================================
-const _POOL_KW_PER_HP = 550 * 0.3048 * 4.4482216152605 / 1000;
+// Electrical draw per NAMEPLATE horsepower, not the 0.746 kW shaft conversion:
+// a pool motor runs on a service factor and at a motor efficiency, and DOE's
+// Building America guide prints a typical 1-1/2 hp pump drawing about 2,000 W
+// (1,500 to 2,500 W by service factor). Until 2026-10-01 this was the shaft
+// conversion, and every kW, kWh and dollar read about 44% low.
+const _POOL_DRAW_KW_PER_NAMEPLATE_HP = 2.0 / 1.5;
 // dims: in { pump_hp: L^2 M T^-3, full_speed_hours: T, speed_fraction: dimensionless, electricity_rate_per_kwh: dimensionless, days_per_year: dimensionless, minimum_flow_fraction: dimensionless } out: { full_kw: L^2 M T^-3, reduced_kw: L^2 M T^-3, reduced_hours: T, full_kwh_day: L^2 M T^-2, reduced_kwh_day: L^2 M T^-2, saving_kwh_day: L^2 M T^-2, annual_saving_cost: dimensionless, energy_fraction: dimensionless }
 export function computePoolPumpSpeedSavings({
   pump_hp = 0, full_speed_hours = 0, speed_fraction = 0.5,
@@ -187,7 +192,7 @@ export function computePoolPumpSpeedSavings({
   if (!(speed_fraction > 0) || speed_fraction >= 1) return { error: "The speed fraction must be above 0 and below 1." };
   if (electricity_rate_per_kwh < 0 || days_per_year < 0) return { error: "Electricity rate and days per year cannot be negative." };
   if (minimum_flow_fraction < 0 || minimum_flow_fraction > 1) return { error: "The minimum flow fraction must be between 0 and 1." };
-  const full_kw = pump_hp * _POOL_KW_PER_HP;
+  const full_kw = pump_hp * _POOL_DRAW_KW_PER_NAMEPLATE_HP;
   // Affinity: flow with N, power with N^3.
   const power_fraction = Math.pow(speed_fraction, 3);
   const reduced_kw = full_kw * power_fraction;
@@ -228,7 +233,7 @@ POOL_RENDERERS["pool-pump-speed-savings"] = _simpleRenderer({
   citation: "Citation: the pump affinity laws -- flow ∝ speed, power ∝ speed³ -- with the TURNOVER held constant, so the run time extends inversely with flow and the energy per turnover is speed³/speed = speed². Half speed is ⅛ the power but 2× the hours, giving ¼ the energy, not ⅛. Equipment minimum flow (heater, salt cell, cleaner, solar) is ENTERED because it is what stops the answer being 'as slow as possible'. It does not model the pump or system curve (static head from solar or a spillway flattens it), determine the required turnover or the filter's rated flow, size a pump, or account for motor and drive efficiency changing with speed. The pump manufacturer's curve and the pool professional govern.",
   example: poolPumpSpeedSavingsExample.inputs,
   fields: [
-    { key: "pump_hp", label: "Pump horsepower", kind: "number", attrs: { step: "any" } },
+    { key: "pump_hp", label: "Pump nameplate horsepower (draw taken at DOE's ~1.33 kW per hp)", kind: "number", attrs: { step: "any" } },
     { key: "full_speed_hours", label: "Full-speed run hours per day", kind: "number", attrs: { step: "any" } },
     { key: "speed_fraction", label: "Reduced speed (fraction of full)", kind: "number", default: 0.5, attrs: { step: "any" } },
     { key: "electricity_rate_per_kwh", label: "Electricity rate per kWh (0 to skip)", kind: "number", attrs: { step: "any" } },

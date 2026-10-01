@@ -109,3 +109,11 @@ test("abatement: OSHA silica 8-hour TWA, lead loading per square foot, waste bul
   close(l.dust_loading_ug_ft2, 12, "ug per sq ft");
   assert.ok(!computeAbatementWasteContainers({ area_ft2: 2000, thickness_in: 1, bulking_factor: 2, bag_volume_ft3: 3, bag_fill_fraction: 0.7, material_density_pcf: 30, container_volume_yd3: 20 }).error);
 });
+
+test("scaffold ties: a tie at each end and gaps no longer than the spacing (1926.451(c)(1)(ii))", () => {
+  const ties = (run) => computeScaffoldTieSpacing({ scaffold_height_ft: 60, base_width_ft: 5, outrigger_base_ft: 10, max_ratio: 4, vertical_tie_spacing_ft: 20, horizontal_tie_spacing_ft: 30, scaffold_run_ft: run, sheeted: 0 }).ties_per_row;
+  // A 119 ft run at 30 ft needs 5 ties (gaps of 29.75 ft); floor read 4 with 39.7 ft gaps.
+  assert.equal(ties(90), 4);
+  assert.equal(ties(90.01), 5);
+  assert.equal(ties(119), 5);
+});

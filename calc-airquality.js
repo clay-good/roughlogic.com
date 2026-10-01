@@ -512,7 +512,9 @@ export function computeThermalOxidizerResidence({
   // Against an entered chamber.
   const has_chamber = chamber_volume_ft3 > 0;
   const actual_residence_s = has_chamber && actual_acfm > 0 ? chamber_volume_ft3 * 60 / actual_acfm : 0;
-  const residence_adequate = has_chamber && actual_residence_s >= required_residence_s;
+  // Relative 1e-9: the tile's own required volume, fed back as the chamber, gave
+  // 0.49999999999999994 s and read SHORT of 0.50 (fixed 2026-10-01).
+  const residence_adequate = has_chamber && actual_residence_s >= required_residence_s * (1 - 1e-9);
   const chamber_verdict = !has_chamber
     ? "(no chamber volume entered)"
     : residence_adequate

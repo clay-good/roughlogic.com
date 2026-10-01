@@ -543,7 +543,10 @@ export function computeScaffoldTieSpacing({ scaffold_height_ft = 0, base_width_f
     ? Math.ceil((scaffold_height_ft - max_free_standing_ft) / vertical_tie_spacing_ft) + 1
     : (ties_required ? null : 0);
   const ties_per_row = (scaffold_run_ft > 0 && horizontal_tie_spacing_ft > 0)
-    ? Math.floor(scaffold_run_ft / horizontal_tie_spacing_ft) + 1
+    // 1926.451(c)(1)(ii): a tie at each end and intervals not over the spacing,
+    // measured from one end -- ceil, not floor. Until 2026-10-01 a 119 ft run at
+    // 30 ft read 4 ties with 39.7 ft gaps; OSHA requires 5.
+    ? Math.ceil(scaffold_run_ft / horizontal_tie_spacing_ft - 1e-9) + 1
     : null;
   const tie_count = (tie_rows !== null && ties_per_row !== null) ? tie_rows * ties_per_row : null;
   // The base outriggers would have to reach for this height to stand alone.
@@ -582,7 +585,7 @@ SPECIALTYTRADES_RENDERERS["scaffold-tie-spacing"] = _simpleRenderer({
   fields: [
     { key: "scaffold_height_ft", label: "Scaffold height (ft)", kind: "number", default: 60 },
     { key: "base_width_ft", label: "Minimum base dimension (ft)", kind: "number", default: 5 },
-    { key: "outrigger_base_ft", label: "Effective base with outriggers (ft, 0 for none)", kind: "number", default: 10 },
+    { key: "outrigger_base_ft", label: "Least base dimension with outriggers -- the frame length if that is now shorter (ft, 0 for none; OSHA 2004-03-10)", kind: "number", default: 10 },
     { key: "max_ratio", label: "Height-to-base limit", kind: "number", default: 4 },
     { key: "vertical_tie_spacing_ft", label: "Vertical tie spacing (ft, 0 to skip the count)", kind: "number", default: 20 },
     { key: "horizontal_tie_spacing_ft", label: "Horizontal tie spacing (ft, 0 to skip)", kind: "number", default: 30 },
