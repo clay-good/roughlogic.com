@@ -154,6 +154,11 @@ const SOFT_404 = /^\/(?:common\/)?(?:notfound|not-found|404|pagenotfound|page-no
 //   publications.iupac.org   2026-09-09  Cloudflare "performing security
 //                                        verification" interstitial -- the host
 //                                        is up and gating bots, not down
+//   fda.gov, www.fda.gov     2026-10-01  all three cited pages (home, lab
+//                                        methods, Food Code) serve 200 from a
+//                                        residential connection with any UA;
+//                                        the GitHub runner gets 404, so the
+//                                        wall here is the datacenter address
 // Re-open any of these in a browser rather than trusting the list: a host that
 // has genuinely gone away looks exactly the same from here.
 const BOT_WALLED = new Set([
@@ -162,7 +167,12 @@ const BOT_WALLED = new Set([
   "beckman.com",
   "iupac.org",
   "publications.iupac.org",
+  "fda.gov",
+  "www.fda.gov",
 ]);
+// Most walls answer 403; FDA answers a datacenter fetch with 404 instead, so
+// the status that counts as the wall is per host.
+const WALL_STATUS = { "fda.gov": 404, "www.fda.gov": 404 };
 
 function hostOf(url) {
   try {
@@ -261,7 +271,7 @@ async function main() {
       let walled = false;
       if (r.soft404) {
         detail = " (SOFT 404: answered " + r.status + " but landed on " + r.finalUrl + ")";
-      } else if ((r.status === 403 || r.status === 0) && BOT_WALLED.has(hostOf(r.url))) {
+      } else if ((r.status === 403 || r.status === 0 || r.status === WALL_STATUS[hostOf(r.url)]) && BOT_WALLED.has(hostOf(r.url))) {
         walled = true;
         detail += " (known bot wall on this host: it 403s any automated fetch. Confirm in a browser" +
           " before treating this as a broken link -- and if the browser also fails, it is real.)";
