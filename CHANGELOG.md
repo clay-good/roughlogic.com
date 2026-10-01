@@ -6,6 +6,7 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Added
 
+- **The first curated collection: `/collections/disaster-response/` (spec-v1926).** "Disaster Response and Recovery" gathers tiles from every trade in seven sections, in the order the work happens: emergency water, temporary power, collapse shoring, flood fight, debris, relief logistics, and buildings in an outage. Each row shows its trade group. It lists 137 tiles; the 90 that are live today render, and the 47 still being built are omitted (and logged by the build) rather than linked to a 404. Member tiles carry an "Also in" line, `/tools/` gains a Collections line, and the sitemap gains one URL. A new lint gate, `check-collections`, rejects an unknown id, a duplicate, and an empty section.
 - **`door-closer-opening-force` takes the knob position.** See Fixed.
 - **`key-cut-macs-check` takes a pin count** (2 to 6). See Fixed.
 - **`electric-lock-power-budget` takes an alarm-period load.** Battery amp-hours are now standby A x h plus alarm A x min / 60, as access-control and fire-alarm battery worksheets do it (1.2 A for 24 h plus 2.5 A for 5 min is 29.0 Ah, 34.1 Ah at a 0.85 derate). The alarm current defaults to 0 (fail-safe locks are released in alarm), so earlier results are unchanged.

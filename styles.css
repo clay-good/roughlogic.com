@@ -2047,6 +2047,19 @@ input[aria-invalid="true"] {
   color: var(--fg-muted);
   font-size: 0.9375rem;
 }
+/* spec-v1926: a collection row's trade label, the "Also in" line on a
+   member tile, and the collections line on /tools/. Existing tokens only. */
+.shell-page .shell-group-tag {
+  color: var(--fg-dim);
+  font-size: 0.8125rem;
+  white-space: nowrap;
+}
+.shell-page .shell-also-in,
+.tools-index .ti-collections {
+  color: var(--fg-muted);
+  font-size: 0.9375rem;
+  overflow-wrap: anywhere;
+}
 .shell-page .shell-disclaimer {
   max-width: 72ch;
   margin: var(--space-3) auto 0;

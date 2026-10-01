@@ -33,7 +33,7 @@
 import { readFile, readdir } from "node:fs/promises";
 import { execFileSync } from "node:child_process";
 import { resolve, dirname } from "node:path";
-import { fileURLToPath } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 import { assertFullCatalogParse } from "./catalog-size.mjs";
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
@@ -53,14 +53,17 @@ async function liveCounts() {
   const groups = new Set([...toolsData.matchAll(/group: "([A-Z])"/g)].map((m) => m[1])).size;
   const files = await readdir(ROOT);
   const modules = files.filter((f) => /^calc-.*\.js$/.test(f)).length;
+  // spec-v1926: one URL per curated collection (collections.js).
+  const { COLLECTIONS } = await import(pathToFileURL(resolve(ROOT, "collections.js")).href);
+  const collections = COLLECTIONS.length;
   // sitemap = one URL per tile + one per active group + home + the
-  // spec-v1345 catalog hub at /tools/.
-  const sitemap = tiles + groups + 2;
+  // spec-v1345 catalog hub at /tools/ + one per spec-v1926 collection.
+  const sitemap = tiles + groups + 2 + collections;
   // The static shells themselves: every sitemap URL except home, which is the
   // SPA and not a generated shell. docs/architecture.md and docs/deployment.md
   // both state this to explain why the service worker does not precache them,
   // and it moves with every tile added.
-  const shells = tiles + groups + 1;
+  const shells = tiles + groups + 1 + collections;
   // The README tells a reader how many gates stand between a change and a
   // landing. That is the `npm run lint` chain itself, so read it rather than
   // trusting a number someone typed once.

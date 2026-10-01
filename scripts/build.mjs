@@ -224,6 +224,8 @@ async function checkRuntimeFilesEnumerated() {
   const skip = new Set([
     "package.json", "package-lock.json",
     "wrangler.jsonc", "lighthouserc.json",
+    // spec-v1926: build-time data for scripts/build-shells.mjs; never shipped.
+    "collections.js",
   ]);
   const missing = [];
   for (const name of await readdir(ROOT)) {

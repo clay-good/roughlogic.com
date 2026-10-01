@@ -47,6 +47,16 @@ export async function hashPages() {
 
   pages.set("/tools/", sha(await read(resolve(DIST, "tools", "index.html"))));
 
+  // spec-v1926: curated collections at /collections/<slug>/.
+  if (existsSync(resolve(DIST, "collections"))) {
+    for (const slug of (await readdir(resolve(DIST, "collections"), { withFileTypes: true }))
+      .filter((d) => d.isDirectory())
+      .map((d) => d.name)
+      .sort()) {
+      pages.set(`/collections/${slug}/`, sha(await read(resolve(DIST, "collections", slug, "index.html"))));
+    }
+  }
+
   for (const slug of (await readdir(resolve(DIST, "groups"), { withFileTypes: true }))
     .filter((d) => d.isDirectory())
     .map((d) => d.name)

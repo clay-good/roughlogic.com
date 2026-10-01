@@ -1,6 +1,6 @@
 # spec-v1926.md -- A Disaster Response and Recovery collection page
 
-> **Status: PROPOSED 2026-09-25.** Part of [scope-disaster-response](scope-disaster-response.md). Depends on the
+> **Status: LANDED 2026-09-30 (proposed 2026-09-25).** Part of [scope-disaster-response](scope-disaster-response.md). Depends on the
 > 47 tile specs v1879-v1925 for its new entries; can ship first with the existing entries alone.
 > One new page type (a curated cross-group collection), one data module, one gate. **Pure addition: no group letter,
 > no URL change, no tile moves group.** Catalog count is unchanged by this spec.

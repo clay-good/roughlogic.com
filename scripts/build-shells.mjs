@@ -28,6 +28,7 @@ import { CITATIONS } from "../citations.js";
 import { leadSentence, restOfDescription } from "../text-lead.js";
 import { normalizeQuery, rankTools } from "../search-discovery.js";
 import { humanizeKey } from "../key-labels.js";
+import { COLLECTIONS } from "../collections.js";
 // The tile <title> and <meta name="description"> rules moved to the repo root
 // so app.js can import the SAME code on a tile route. See shell-meta.js: the
 // SPA claimed since spec-v13 §5.5 to match this shell's head and diverged on
@@ -394,6 +395,9 @@ const booleanKeys = new Map();
 let formatWithUnit = () => null;
 let withoutRepeat = (suffix) => suffix || "";
 let outputBooleans = () => ({});
+// spec-v1926: tile id -> the collections that list it, filled in main() from
+// the landed subset. Read by tileShell for its "Also in" line.
+let collectionsByTile = new Map();
 
 export function exampleRows(obj, labels, displays, units, bools, flags) {
   return Object.entries(obj || {})
@@ -915,6 +919,7 @@ function tileShell(tool, tools, groupNames, relatedByTile, examples, labels, out
     `      <li aria-current="page">${escapeHtml(tool.name)}</li>`,
     '    </ol>',
     '  </nav>',
+    ...(alsoInLine(tool.id) ? [alsoInLine(tool.id)] : []),
     `  <h1 class="shell-h1">${escapeHtml(tool.name)}</h1>`,
     `  <p class="shell-lead">${escapeHtml(leadSentence(tool.desc))}</p>`,
     '  <p class="shell-run">',
@@ -1298,6 +1303,9 @@ function toolsIndexShell(tools, groupNames) {
     `  <h1 class="shell-h1">All ${commaNumber(tools.length)} calculators</h1>`,
     '  <p class="shell-lede">Every calculator on Rough Logic, grouped by trade. If you already know what you need, asking is faster.</p>',
     '  <p class="ti-cta"><a class="shell-run-link" href="../">Ask for it instead</a></p>',
+    // spec-v1926: curated cross-group collections, above the trade list.
+    ...(COLLECTIONS.length ? ['  <p class="ti-collections">Collections: ' + COLLECTIONS.map((c) =>
+      `<a href="../collections/${escapeHtml(c.slug)}/">${escapeHtml(c.title)}</a>`).join(", ") + '</p>'] : []),
     '  <nav class="ti-jump" aria-label="Jump to a trade">',
     '    <ul>',
     jump,
@@ -1311,6 +1319,110 @@ function toolsIndexShell(tools, groupNames) {
     '',
   ].join("\n");
   return [head, styles, jsonld, '</head>', body].join("\n");
+}
+
+// spec-v1926: the one-line "Also in" link on a tile shell that a collection
+// lists. Empty (and so filtered out of the page) for every other tile, which
+// keeps non-member shells byte-identical.
+function alsoInLine(id) {
+  const cs = collectionsByTile.get(id);
+  if (!cs || !cs.length) return "";
+  return '  <p class="shell-also-in">Also in: ' + cs.map((c) =>
+    `<a href="../../collections/${escapeHtml(c.slug)}/">${escapeHtml(c.title)}</a>`).join(", ") + '</p>';
+}
+
+// spec-v1926: a curated collection at /collections/<slug>/ -- tiles from many
+// trade groups, hand-ordered in sections by the order the work happens. Each
+// row carries its group as a label, so a reader sees that the shoring tile is a
+// construction tile. An id that has not landed is OMITTED (and logged by the
+// caller), never linked to a 404.
+export function collectionShell(collection, tools, groupNames) {
+  const byId = new Map(tools.map((t) => [t.id, t]));
+  const canonical = `${SITE_URL}/collections/${collection.slug}/`;
+  const sections = collection.sections
+    .map((s) => ({ heading: s.heading, tiles: s.ids.map((id) => byId.get(id)).filter(Boolean) }))
+    .filter((s) => s.tiles.length > 0);
+  const count = sections.reduce((n, s) => n + s.tiles.length, 0);
+  const title = `${collection.title}: ${count} Calculators - Rough Logic`;
+  let description = `${collection.title}: ${count} free calculators from every trade, in the order the work happens -- ` +
+    sections.map((s) => s.heading.toLowerCase()).slice(0, 3).join(", ") + ", and more.";
+  if (escapeHtml(description).length > DESCRIPTION_CAP) description = capDescription(description);
+  const labelFor = (g) => groupNames[g] || ("Group " + g);
+  const sectionId = (i) => "c-" + (i + 1);
+  const jsonld = jsonLdBlock([
+    { "@context": "https://schema.org", "@type": "CollectionPage", name: title, description, url: canonical },
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        { "@type": "ListItem", position: 1, name: "Home", item: SITE_URL + "/" },
+        { "@type": "ListItem", position: 2, name: "All calculators", item: SITE_URL + "/tools/" },
+        { "@type": "ListItem", position: 3, name: collection.title, item: canonical },
+      ],
+    },
+    ...sections.map((s) => ({
+      "@context": "https://schema.org",
+      "@type": "ItemList",
+      name: s.heading,
+      numberOfItems: s.tiles.length,
+      itemListElement: s.tiles.map((t, i) => ({
+        "@type": "ListItem", position: i + 1, name: t.name, url: `${SITE_URL}/tools/${t.id}/`,
+      })),
+    })),
+  ]);
+  const head = shellHead({ title, description, canonical, ogType: "website" });
+  const styles = shellStylesAndIcons(2);
+  const jump = sections.map((s, i) =>
+    `      <li><a href="#${sectionId(i)}">${escapeHtml(s.heading)}</a></li>`).join("\n");
+  const blocks = sections.map((s, i) => [
+    `  <section class="shell-section" aria-labelledby="${sectionId(i)}">`,
+    `    <h2 id="${sectionId(i)}">${escapeHtml(s.heading)}</h2>`,
+    '    <ul class="shell-related shell-tile-list">',
+    s.tiles.map((t) => (
+      `      <li><a href="../../tools/${escapeHtml(t.id)}/">${escapeHtml(t.name)}</a>` +
+      ` <span class="shell-group-tag">${escapeHtml(labelFor(t.group))}</span>` +
+      `<span class="shell-related-desc"> - ${escapeHtml(rowSummary(t.desc))}</span></li>`
+    )).join("\n"),
+    '    </ul>',
+    '  </section>',
+  ].join("\n")).join("\n");
+  const body = [
+    '<body class="shell-page">',
+    shellHeader(2),
+    '<main id="main" class="shell-main">',
+    '  <nav class="shell-breadcrumb" aria-label="Breadcrumb">',
+    '    <ol>',
+    '      <li><a href="../../">Home</a></li>',
+    '      <li><a href="../../tools/">All calculators</a></li>',
+    `      <li aria-current="page">${escapeHtml(collection.title)}</li>`,
+    '    </ol>',
+    '  </nav>',
+    `  <h1 class="shell-h1">${escapeHtml(collection.title)}</h1>`,
+    `  <p class="shell-lead">${escapeHtml(collection.lead)}</p>`,
+    `  <p class="shell-run"><a class="shell-run-link" href="../../">Search all ${commaNumber(tools.length)} calculators</a></p>`,
+    '  <nav class="ti-jump" aria-label="Jump to a section">',
+    '    <ul>',
+    jump,
+    '    </ul>',
+    '  </nav>',
+    blocks,
+    '</main>',
+    shellFooter(),
+    '</body>',
+    '</html>',
+    '',
+  ].join("\n");
+  return [head, styles, jsonld, '</head>', body].join("\n");
+}
+
+// The landed subset of each collection, and the ids it had to leave out.
+export function landedCollections(collections, tools) {
+  const live = new Set(tools.map((t) => t.id));
+  return collections.map((c) => ({
+    collection: c,
+    landed: c.sections.flatMap((s) => s.ids).filter((id) => live.has(id)),
+    omitted: c.sections.flatMap((s) => s.ids).filter((id) => !live.has(id)),
+  }));
 }
 
 // Per-URL <lastmod>. Every URL used to carry the build timestamp, so a crawler
@@ -1352,6 +1464,15 @@ function buildSitemap(tools, groups, builtIso, lastmodByPath) {
   lines.push('    <changefreq>weekly</changefreq>');
   lines.push('    <priority>0.9</priority>');
   lines.push('  </url>');
+  // spec-v1926: curated collections.
+  for (const c of COLLECTIONS) {
+    lines.push('  <url>');
+    lines.push(`    <loc>${SITE_URL}/collections/${c.slug}/</loc>`);
+    lines.push(`    <lastmod>${lastmodFor(`/collections/${c.slug}/`)}</lastmod>`);
+    lines.push('    <changefreq>monthly</changefreq>');
+    lines.push('    <priority>0.8</priority>');
+    lines.push('  </url>');
+  }
   // Tiles.
   for (const t of tools) {
     lines.push('  <url>');
@@ -1398,6 +1519,19 @@ async function main() {
   formatWithUnit = catalog.formatWithUnit;
   withoutRepeat = catalog.withoutRepeat;
   outputBooleans = catalog.outputBooleans;
+
+  // spec-v1926: which landed tiles each collection lists; an unlanded id is
+  // omitted from the page and logged, so a partly landed collection reads as
+  // partly landed rather than linking a 404.
+  const collections = landedCollections(COLLECTIONS, tools);
+  collectionsByTile = new Map();
+  for (const { collection, landed, omitted } of collections) {
+    for (const id of landed) {
+      if (!collectionsByTile.has(id)) collectionsByTile.set(id, []);
+      collectionsByTile.get(id).push(collection);
+    }
+    if (omitted.length) console.log(`build-shells: collection ${collection.slug} omits ${omitted.length} unlanded tile(s): ${omitted.join(", ")}`);
+  }
 
   let shellCount = 0;
   // Per-tile shells.
@@ -1446,6 +1580,13 @@ async function main() {
   await mkdir(dirname(toolsIndexOut), { recursive: true });
   await writeFile(toolsIndexOut, toolsIndexShell(tools, groupNames), "utf8");
 
+  // spec-v1926: one page per curated collection.
+  for (const { collection } of collections) {
+    const out = resolve(DIST, "collections", collection.slug, "index.html");
+    await mkdir(dirname(out), { recursive: true });
+    await writeFile(out, collectionShell(collection, tools, groupNames), "utf8");
+  }
+
   // Regenerate sitemap.xml at dist/ root from the live TOOLS + groups.
   const stampPath = resolve(DIST, "build-info.json");
   let builtIso = new Date().toISOString();
@@ -1464,8 +1605,8 @@ async function main() {
 
   console.log(
     "build-shells: " + shellCount + " tile shells, " +
-    groupCount + " group shells, 1 catalog hub, sitemap with " +
-    (2 + groups.length + tools.length) + " URLs."
+    groupCount + " group shells, 1 catalog hub, " + COLLECTIONS.length + " collection(s), sitemap with " +
+    (2 + COLLECTIONS.length + groups.length + tools.length) + " URLs."
   );
 }
 

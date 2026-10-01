@@ -105,7 +105,12 @@ async function main() {
       .filter((d) => d.isDirectory()).map((d) => `/tools/${d.name}/`);
     const groups = (await readdir("dist/groups", { withFileTypes: true }))
       .filter((d) => d.isDirectory()).map((d) => `/groups/${d.name}/`);
-    const routes = [...tools, ...groups, "/"];
+    // spec-v1926: curated collection pages are listing shells too.
+    const collections = (await exists("dist/collections"))
+      ? (await readdir("dist/collections", { withFileTypes: true }))
+        .filter((d) => d.isDirectory()).map((d) => `/collections/${d.name}/`)
+      : [];
+    const routes = [...tools, ...groups, ...collections, "/"];
 
     // The prerendered shells are generated from one template, so the 320px
     // portrait floor over EVERY shell already proves the template handles every

@@ -882,6 +882,25 @@ async function main() {
     errors.push("groups/: missing group shells directory.");
   }
 
+  // spec-v1926: curated collections at dist/collections/<slug>/. This walk
+  // only covers tools/ and groups/, so without these lines the collection page
+  // ships with no gate watching it. Linted under the GROUP cap (a listing page),
+  // and every tile it links must have a built shell -- the build omits an
+  // unlanded tile rather than linking a 404, and this holds it to that.
+  const collectionsDir = resolve(DIST, "collections");
+  const collectionSlugs = existsSync(collectionsDir) ? (await readdir(collectionsDir)).sort() : [];
+  for (const slug of collectionSlugs) {
+    const p = resolve(collectionsDir, slug, "index.html");
+    if (!existsSync(p)) continue;
+    await lintShell(p, "group", errors);
+    const html = await readFile(p, "utf8");
+    for (const m of html.matchAll(/href="\.\.\/\.\.\/tools\/([a-z0-9-]+)\/"/g)) {
+      if (!existsSync(resolve(DIST, "tools", m[1], "index.html"))) {
+        errors.push("collections/" + slug + "/index.html links tools/" + m[1] + "/, which has no shell (an unlanded tile must be omitted).");
+      }
+    }
+  }
+
   // The sitemap and the shells are generated from the same TOOLS list, one
   // after the other, which is exactly the reasoning that let a tampered data
   // shard through: generated together is not the same as checked together. A
@@ -905,6 +924,9 @@ async function main() {
       if (!listed.has("/tools/" + t.id + "/")) errors.push("tools/" + t.id + "/ is built but absent from sitemap.xml.");
     }
     if (!listed.has("/tools/")) errors.push("the catalog hub /tools/ is absent from sitemap.xml.");
+    for (const slug of collectionSlugs) {
+      if (!listed.has("/collections/" + slug + "/")) errors.push("collections/" + slug + "/ is built but absent from sitemap.xml.");
+    }
     if (existsSync(groupsDir)) {
       for (const slug of await readdir(groupsDir)) {
         if (!existsSync(resolve(groupsDir, slug, "index.html"))) continue;
@@ -922,7 +944,7 @@ async function main() {
   const tileCount = tools.length;
   const groupCount = existsSync(groupsDir) ? (await readdir(groupsDir)).length : 0;
   console.log(
-    "check-shells OK: " + tileCount + " tile shells + " + groupCount + " group shells + 1 catalog hub + 1 not-found page + the home page; " +
+    "check-shells OK: " + tileCount + " tile shells + " + groupCount + " group shells + 1 catalog hub + " + collectionSlugs.length + " collection page(s) + 1 not-found page + the home page; " +
     "every one of the " + documentedParts + " shell parts docs/seo.md documents present on a 40-shell sample, " +
     "all titles <= " + TITLE_CAP + " chars, descriptions <= " + DESCRIPTION_CAP + " chars and never " +
     "cut mid-word, " +

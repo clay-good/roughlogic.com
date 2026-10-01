@@ -421,14 +421,14 @@ than sitting here misinforming a reader for three months.
 | Calculators (tiles) in `TOOLS` | **2183 live tiles** |
 | Active catalog groups | **21 live groups** |
 | `calc-*.js` modules | **114 live calc modules** |
-| Sitemap URLs (one per tile, one per group hub, home, catalog hub) | **2206 live sitemap URLs** |
+| Sitemap URLs (one per tile, one per group hub, home, catalog hub) | **2207 live sitemap URLs** |
 
 ### Gates
 
 | Figure | Live |
 | --- | --- |
-| Static gates in the `npm run lint` chain | **61 live lint gates** |
-| Unit-test suite files under `test/unit/` | **203 live unit suites** |
+| Static gates in the `npm run lint` chain | **62 live lint gates** |
+| Unit-test suite files under `test/unit/` | **204 live unit suites** |
 | Playwright spec files under `test/integration/` | **24 live integration specs** |
 
 CI runs three jobs per push: `test` (lint, unit tests, data-integrity
