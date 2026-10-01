@@ -70,8 +70,8 @@ export function computePVStringSizing({
   if (!(rise >= 0)) return { error: "Cell temperature rise above ambient cannot be negative (C)." };
   const hot_cell_C = record_high_C + rise;
   const warm_vmp = module_vmp_V * (1 - coeff * (hot_cell_C - 25) / 100);
-  const max_series = Math.floor((Number(inverter_vdc_max_V) || 0) / cold_voc);
-  const min_series = Math.ceil((Number(inverter_mppt_min_V) || 0) / warm_vmp);
+  const max_series = Math.floor((Number(inverter_vdc_max_V) || 0) / cold_voc + 1e-9);
+  const min_series = Math.ceil((Number(inverter_mppt_min_V) || 0) / warm_vmp - 1e-9);
   const flag = min_series > max_series;
   return { cold_voc_V: cold_voc, warm_vmp_V: warm_vmp, hot_cell_C, max_series, min_series, mppt_max_V: inverter_mppt_max_V, flag };
 }

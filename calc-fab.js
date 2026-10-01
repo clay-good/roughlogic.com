@@ -1724,7 +1724,7 @@ export function computeBarNesting({ cut_list = "", stock_length_in = 240, kerf_i
   const longest_drop_in = drops.reduce((a, b) => Math.max(a, b), 0);
   const patterns = bins.map((b, i) => ({ stick: i + 1, parts: b.parts.slice(), drop_in: usable - b.used }));
   // Every stick must hold at least the longest piece, so this is a hard floor no packing beats.
-  const theoretical_min_sticks = Math.ceil((total_piece_in + Math.max(0, total_pieces - sticks) * kerf) / usable);
+  const theoretical_min_sticks = Math.ceil((total_piece_in + Math.max(0, total_pieces - sticks) * kerf) / usable - 1e-9);
   const at_theoretical_min = sticks <= theoretical_min_sticks;
 
   const patternSummary = patterns.slice(0, 12).map((p) => {

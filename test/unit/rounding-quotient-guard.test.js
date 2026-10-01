@@ -3,8 +3,8 @@
 // On 2026-10-01 a differential fuzz found 63 tiles reading one unit off at
 // round inputs, and every simple Math.ceil / Math.floor of a quotient in the
 // calc modules gained a 1e-9 guard. This holds the line: a NEW unguarded one
-// fails here. The budget is the complex expressions (ternaries, commas) the
-// codemod left for review -- lower it as they are guarded, never raise it.
+// fails here. The budget started at the complex expressions the codemod left;
+// all were guarded 2026-10-01. Keep it at zero.
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync, readdirSync } from "node:fs";
@@ -12,7 +12,7 @@ import { fileURLToPath } from "node:url";
 import { dirname, resolve } from "node:path";
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..", "..");
-const BUDGET = 39;
+const BUDGET = 0;
 
 function unguarded(src) {
   const found = [];

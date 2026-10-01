@@ -3430,7 +3430,7 @@ function _v15cLedgerSpacing(joist_ft, load_psf) {
   const lo = [40, 50, 60, 70].filter((x) => x <= L).pop();
   const hi = [40, 50, 60, 70].find((x) => x >= L);
   const a = _V15C_LEDGER_BY_LOAD[lo][col], b = _V15C_LEDGER_BY_LOAD[hi][col];
-  return Math.floor(hi === lo ? a : a + (b - a) * (L - lo) / (hi - lo));
+  return Math.floor((hi === lo ? a : a + (b - a) * (L - lo) / (hi - lo)) + 1e-9);
 }
 
 function _v15cPostColumnCapacity({ d_in, height_ft, F_c, E_min }) {
@@ -5674,7 +5674,7 @@ export function computePlumbingFixtureCount({ occupant_load = 0, wc_ratio = 25, 
   // handed business's 1:80 above 80.
   const tiered = (n, ratio, over, tier) => {
     const t = tier > 0 && over > 0 ? tier : Infinity;
-    return Math.ceil(Math.min(n, t) / ratio) + (t < Infinity ? Math.ceil(Math.max(n - t, 0) / over) : 0);
+    return Math.ceil(Math.min(n, t) / ratio - 1e-9) + (t < Infinity ? Math.ceil(Math.max(n - t, 0) / over - 1e-9) : 0);
   };
   const wcFor = (n) => {
     const tierN = Math.min(n, wc_tier);

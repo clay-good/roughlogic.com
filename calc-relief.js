@@ -353,7 +353,7 @@ export function computeSafeRoomCapacity({ room_type = "community_tornado", gross
     const minT = bed_spaces_count + Math.ceil((bed_spaces_count + 1) / 200 - 1e-9);
     if (need(minT) > usable_area_sqft + 1e-9) return { error: "The usable area cannot hold the bed or stretcher spaces plus the required wheelchair space." };
     let lo = minT;
-    let hi = Math.max(minT, Math.floor(usable_area_sqft / Math.min(t.standing, t.wheelchair)) + 1);
+    let hi = Math.max(minT, Math.floor(usable_area_sqft / Math.min(t.standing, t.wheelchair) + 1e-9) + 1);
     while (hi - lo > 1) {
       const mid = Math.floor((lo + hi) / 2 + 1e-9);
       if (need(mid) <= usable_area_sqft + 1e-9) lo = mid; else hi = mid;
