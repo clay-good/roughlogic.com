@@ -164,7 +164,13 @@ export function computeAmmoniaChargeInventory({
   const additional_cuft_to_cross = over_threshold || !(piping_liquid_fraction > 0) || !(piping_density_lb_ft3 > 0)
     ? 0
     : margin_lb / (piping_liquid_fraction * piping_density_lb_ft3);
-  const verdict = over_threshold
+  // OSHA PSM applies AT or above the threshold (1910.119(a)(1)(i)), EPA RMP only
+  // above it (40 CFR 68.115(a)); exactly at the line is PSM and not RMP. Until
+  // 2026-10-01 it read "UNDER ... 0 lb of headroom" there.
+  const at_threshold = Math.abs(total_lb - threshold_lb) <= 1e-9 * threshold_lb;
+  const verdict = at_threshold
+    ? "AT the " + fmt(threshold_lb, 0) + " lb threshold: OSHA PSM applies at or above it, so this IS a PSM-covered process; EPA RMP applies only above it"
+    : over_threshold
     ? "OVER the " + fmt(threshold_lb, 0) + " lb threshold by " + fmt(-margin_lb, 0) + " lb: this is a PSM-covered process and an RMP-covered process"
     : "UNDER the " + fmt(threshold_lb, 0) + " lb threshold with " + fmt(margin_lb, 0) + " lb of headroom (" + fmt(pct_of_threshold, 1) + "% of it)";
   const piping_verdict = piping_beats_vessels
@@ -172,7 +178,7 @@ export function computeAmmoniaChargeInventory({
     : "the vessels hold more than the piping; the piping is " + fmt(piping_share_pct, 0) + "% of the charge";
   if (![receiver_lb, recirculator_lb, piping_lb, total_lb, margin_lb, pct_of_threshold, additional_cuft_to_cross].every(Number.isFinite)) return { error: "Charge inventory math is not a finite value." };
   return {
-    receiver_lb, recirculator_lb, piping_lb, vessel_total_lb, total_lb,
+    receiver_lb, recirculator_lb, piping_lb, vessel_total_lb, total_lb, at_threshold,
     margin_lb, over_threshold, pct_of_threshold, piping_share_pct,
     piping_beats_vessels, additional_cuft_to_cross, threshold_lb,
     verdict, piping_verdict,
@@ -745,10 +751,11 @@ REFRIGERATION_RENDERERS["co2-transcritical-pressure"] = _simpleRenderer({
 // fire case is heat absorbed through the shell boiling the contents. That is
 // why a long thin vessel and a short fat one of the same VOLUME need different
 // relief, and why relief sizing never asks how much refrigerant is inside.
-// dims: in { vessel_diameter_ft: L, vessel_length_ft: L, f_constant: dimensionless, valve_rated_lb_min: M T^-1, pipe_straight_length_ft: L, fitting_equivalent_length_ft: L, max_allowable_equivalent_length_ft: L } out: { required_lb_min: M T^-1, margin_ratio: dimensionless, dl_product_ft2: L^2, equivalent_length_ft: L, length_margin_ft: L }
+// dims: in { vessel_diameter_ft: L, vessel_length_ft: L, f_constant: dimensionless, valve_rated_lb_min: M T^-1, pipe_straight_length_ft: L, fitting_equivalent_length_ft: L, max_allowable_equivalent_length_ft: L, combustibles_within_20ft: dimensionless } out: { required_lb_min: M T^-1, margin_ratio: dimensionless, dl_product_ft2: L^2, equivalent_length_ft: L, length_margin_ft: L }
 export function computeRefrigerationReliefCapacity({
   vessel_diameter_ft = 0, vessel_length_ft = 0, f_constant = 0, valve_rated_lb_min = 0,
   pipe_straight_length_ft = 0, fitting_equivalent_length_ft = 0, max_allowable_equivalent_length_ft = 0,
+  combustibles_within_20ft = "no",
 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(vessel_diameter_ft > 0)) return { error: "Vessel diameter must be positive (ft)." };
@@ -757,9 +764,16 @@ export function computeRefrigerationReliefCapacity({
   if (valve_rated_lb_min < 0) return { error: "The valve's rated capacity cannot be negative (lb/min of air)." };
   if (pipe_straight_length_ft < 0 || fitting_equivalent_length_ft < 0 || max_allowable_equivalent_length_ft < 0) return { error: "Piping lengths cannot be negative (ft)." };
   const dl_product_ft2 = vessel_diameter_ft * vessel_length_ft;
-  const required_lb_min = f_constant * dl_product_ft2;
+  if (!["no", "yes"].includes(combustibles_within_20ft)) return { error: "Combustibles within 20 ft must be yes or no." };
+  // The legacy C = f D L (UMC 1113.5; ASHRAE 15 before its 2019 Addendum a)
+  // multiplies f by 2.5 where combustible materials are within 20 ft of the
+  // vessel; current ASHRAE 15-2022 uses C = f A with its own f and a 375 Btu/min
+  // heat flux there. Until 2026-10-01 the multiplier was missing.
+  const combustibles_multiplier = combustibles_within_20ft === "yes" ? 2.5 : 1;
+  const required_lb_min = f_constant * combustibles_multiplier * dl_product_ft2;
   const has_valve = valve_rated_lb_min > 0;
   const margin_ratio = has_valve ? valve_rated_lb_min / required_lb_min : 0;
+  const relief_basis = "legacy C = f D L (UMC 1113.5 / ASHRAE 15 before 2019)";
   const valve_adequate = has_valve && valve_rated_lb_min >= required_lb_min;
   const valve_verdict = !has_valve
     ? "(no valve rating entered)"
@@ -782,17 +796,19 @@ export function computeRefrigerationReliefCapacity({
   const system_adequate = valve_adequate && (piping_adequate || !has_piping_check);
   if (![required_lb_min, margin_ratio, dl_product_ft2, equivalent_length_ft, length_margin_ft].every(Number.isFinite)) return { error: "Relief capacity math is not a finite value." };
   return {
+    combustibles_multiplier, relief_basis,
     dl_product_ft2, required_lb_min, has_valve, margin_ratio, valve_adequate, valve_verdict,
     equivalent_length_ft, has_piping_check, length_margin_ft, piping_adequate, piping_verdict,
     system_adequate,
     note: "The relieving capacity a refrigerant pressure vessel requires, and whether the valve and its discharge piping together actually deliver it. ASHRAE 15 and IIAR write the requirement as C = f x D x L in pounds per minute of air, with D the vessel diameter and L the length in feet and f a constant that depends on the refrigerant. The D x L term is the vessel's external surface in disguise, because the governing case is a fire heating the shell and boiling the contents -- which is why a long thin vessel and a short fat one of the same VOLUME need different relief, and why relief sizing never asks how much refrigerant is inside. The constant f carries the refrigerant's latent heat and vapor properties, so ammonia, R-22, and CO2 give different answers for identical vessels; it is entered from the standard's own table rather than assumed here. The second half is the discharge piping, and it fails more often than the valve does. A relief valve's rated capacity is achievable only if the downstream piping does not build enough back pressure to choke it, and on a plant where several reliefs share a header the equivalent-length arithmetic decides whether the valve can pass what it is stamped for. A correctly sized valve on undersized discharge piping is an undersized relief system -- with a valve that is stamped correctly, inspected annually, and still will not do its job. That check belongs in the sizing rather than after it, which is why both verdicts are reported and the system passes only if both do. The maximum equivalent length is ENTERED from the valve manufacturer's published table at the set pressure. This does not select the valve, size the header for simultaneous relief of several vessels, compute back pressure from first principles, or address the hydrostatic relief a liquid-full line needs. ASHRAE 15, IIAR 2, the applicable pressure-vessel code, and the valve manufacturer govern.",
   };
 }
-export const refrigerationReliefCapacityExample = { inputs: { vessel_diameter_ft: 4, vessel_length_ft: 16, f_constant: 0.5, valve_rated_lb_min: 45, pipe_straight_length_ft: 60, fitting_equivalent_length_ft: 25, max_allowable_equivalent_length_ft: 120 } };
+export const refrigerationReliefCapacityExample = { inputs: { vessel_diameter_ft: 4, vessel_length_ft: 16, f_constant: 0.5, valve_rated_lb_min: 45, pipe_straight_length_ft: 60, fitting_equivalent_length_ft: 25, max_allowable_equivalent_length_ft: 120, combustibles_within_20ft: "no" } };
 REFRIGERATION_RENDERERS["refrigeration-relief-capacity"] = _simpleRenderer({
-  citation: "Citation: the required relieving capacity C = f x D x L in lb/min of air as ANSI/ASHRAE 15 and IIAR 2 write it, with D the vessel diameter and L the length in feet -- the D x L product standing for the shell area the fire case heats -- and f the refrigerant constant taken from the standard's own table and ENTERED. The maximum discharge equivalent length the valve supports at its set pressure is ENTERED from the valve manufacturer's published table. It does not select the valve, size a common header for simultaneous relief, compute back pressure from first principles, or address hydrostatic relief. ASHRAE 15, IIAR 2, and the applicable pressure-vessel code govern.",
+  citation: "Citation: the required relieving capacity C = f x D x L in lb/min of air in its LEGACY form (UMC 1113.5; ASHRAE 15 before 2019 Addendum a, which moved to C = f A with refrigerant- and pressure-dependent f), with f x 2.5 where combustibles are within 20 ft, with D the vessel diameter and L the length in feet -- the D x L product standing for the shell area the fire case heats -- and f the refrigerant constant taken from the standard's own table and ENTERED. The maximum discharge equivalent length the valve supports at its set pressure is ENTERED from the valve manufacturer's published table. It does not select the valve, size a common header for simultaneous relief, compute back pressure from first principles, or address hydrostatic relief. ASHRAE 15, IIAR 2, and the applicable pressure-vessel code govern.",
   example: refrigerationReliefCapacityExample.inputs,
   fields: [
+    { key: "combustibles_within_20ft", label: "Combustible materials within 20 ft (f x 2.5)", kind: "select", options: [{ value: "no", label: "No" }, { value: "yes", label: "Yes" }], default: "no" },
     { key: "vessel_diameter_ft", label: "Vessel outside diameter (ft)", kind: "number" },
     { key: "vessel_length_ft", label: "Vessel length (ft)", kind: "number" },
     { key: "f_constant", label: "Refrigerant constant f (from the standard's table)", kind: "number" },
@@ -821,10 +837,11 @@ REFRIGERATION_RENDERERS["refrigeration-relief-capacity"] = _simpleRenderer({
 // survivable concentration rather than handling the entire charge. And it is
 // the LARGEST SINGLE SYSTEM that governs, not the sum in the room, because the
 // design event is one system failing rather than all of them.
-// dims: in { largest_system_charge_lb: M, room_length_ft: L, room_width_ft: L, room_height_ft: L, louver_face_velocity_fpm: L T^-1, louver_free_area_fraction: dimensionless, installed_fan_cfm: L^3 T^-1 } out: { required_exhaust_cfm: L^3 T^-1, room_volume_ft3: L^3, air_changes_per_hour: T^-1, louver_free_area_ft2: L^2, gross_louver_area_ft2: L^2, charge_covered_lb: M }
+// dims: in { largest_system_charge_lb: M, room_length_ft: L, room_width_ft: L, room_height_ft: L, louver_face_velocity_fpm: L T^-1, louver_free_area_fraction: dimensionless, installed_fan_cfm: L^3 T^-1, refrigerant_class: dimensionless } out: { required_exhaust_cfm: L^3 T^-1, room_volume_ft3: L^3, air_changes_per_hour: T^-1, louver_free_area_ft2: L^2, gross_louver_area_ft2: L^2, charge_covered_lb: M }
 export function computeMachineryRoomVentilation({
   largest_system_charge_lb = 0, room_length_ft = 0, room_width_ft = 0, room_height_ft = 0,
   louver_face_velocity_fpm = 500, louver_free_area_fraction = 0.5, installed_fan_cfm = 0,
+  refrigerant_class = "a1",
 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(largest_system_charge_lb > 0)) return { error: "The largest single system's refrigerant charge must be positive (lb)." };
@@ -832,11 +849,20 @@ export function computeMachineryRoomVentilation({
   if (!(louver_face_velocity_fpm > 0)) return { error: "Louver face velocity must be positive (fpm)." };
   if (!(louver_free_area_fraction > 0 && louver_free_area_fraction <= 1)) return { error: "Louver free-area fraction must be above 0 and at most 1." };
   if (installed_fan_cfm < 0) return { error: "Installed fan capacity cannot be negative (cfm)." };
-  // ASHRAE 15: Q = 100 x sqrt(G), G the mass of the largest single system's
-  // charge in pounds, Q in cfm.
-  const required_exhaust_cfm = 100 * Math.sqrt(largest_system_charge_lb);
+  if (!["a1", "ammonia", "a2l"].includes(refrigerant_class)) return { error: "Refrigerant class must be a1, ammonia, or a2l." };
+  // ASHRAE 15 has excluded ammonia since 15-2016 Addendum a, and IIAR 2 (2014,
+  // 2021 6.14.7.1) sizes an ammonia room at 30 air changes per hour on the gross
+  // volume; A2L rooms use ASHRAE 15-2022 Table 8-3's own method. Until
+  // 2026-10-01 every refrigerant got 100 sqrt(G), half of IIAR 2 on the worked
+  // ammonia room.
+  if (refrigerant_class === "a2l") return { error: "A2L refrigerants size the machinery room by ASHRAE 15-2022 Table 8-3, which this does not compute; Q = 100 x sqrt(G) can be several times too small for them." };
   const room_volume_ft3 = room_length_ft * room_width_ft * room_height_ft;
   const has_room = room_volume_ft3 > 0;
+  const is_ammonia = refrigerant_class === "ammonia";
+  if (is_ammonia && !has_room) return { error: "An ammonia machinery room is sized at 30 air changes per hour on its gross volume (IIAR 2): enter the room dimensions." };
+  // ASHRAE 15: Q = 100 x sqrt(G), G the mass of the largest single system's
+  // charge in pounds, Q in cfm.
+  const required_exhaust_cfm = is_ammonia ? 30 * room_volume_ft3 / 60 : 100 * Math.sqrt(largest_system_charge_lb);
   const air_changes_per_hour = has_room ? required_exhaust_cfm * 60 / room_volume_ft3 : 0;
   // Makeup air. A large exhaust fan in a tight room does not move its rated
   // flow: it depressurizes the room, the fan rides up its curve, and the
@@ -847,26 +873,30 @@ export function computeMachineryRoomVentilation({
   const has_fan = installed_fan_cfm > 0;
   const fan_adequate = has_fan && installed_fan_cfm >= required_exhaust_cfm;
   // Run backwards: the charge the installed fan actually covers.
-  const charge_covered_lb = has_fan ? (installed_fan_cfm / 100) ** 2 : 0;
-  const fan_verdict = !has_fan
+  const charge_covered_lb = has_fan && !is_ammonia ? (installed_fan_cfm / 100) ** 2 : 0;
+  const fan_verdict = is_ammonia && has_fan
+    ? "the installed " + fmt(installed_fan_cfm, 0) + " cfm " + (fan_adequate ? "meets" : "is SHORT of") + " the " + fmt(required_exhaust_cfm, 0) + " cfm IIAR 2 asks (30 air changes per hour)"
+    : !has_fan
     ? "(no installed fan capacity entered)"
     : fan_adequate
       ? "the installed " + fmt(installed_fan_cfm, 0) + " cfm covers a charge of up to " + fmt(charge_covered_lb, 0) + " lb, so it is adequate for the entered " + fmt(largest_system_charge_lb, 0) + " lb"
       : "the installed " + fmt(installed_fan_cfm, 0) + " cfm covers a charge of only " + fmt(charge_covered_lb, 0) + " lb, SHORT of the entered " + fmt(largest_system_charge_lb, 0) + " lb by " + fmt(required_exhaust_cfm - installed_fan_cfm, 0) + " cfm";
-  const ach_verdict = has_room
+  const ach_verdict = is_ammonia
+    ? "IIAR 2 sizes an ammonia room by air changes: 30 per hour on " + fmt(room_volume_ft3, 0) + " cu ft; 100 x sqrt(G) would give " + fmt(100 * Math.sqrt(largest_system_charge_lb), 0) + " cfm, which ASHRAE 15 no longer applies to ammonia"
+    : has_room
     ? "that is " + fmt(air_changes_per_hour, 1) + " air changes per hour in a " + fmt(room_volume_ft3, 0) + " cu ft room -- reported because sizing this room by air changes instead of by charge gives a different and usually much smaller fan"
     : "(no room dimensions entered)";
   if (![required_exhaust_cfm, room_volume_ft3, air_changes_per_hour, louver_free_area_ft2, gross_louver_area_ft2, charge_covered_lb].every(Number.isFinite)) return { error: "Machinery room ventilation math is not a finite value." };
   return {
     required_exhaust_cfm, room_volume_ft3, has_room, air_changes_per_hour, ach_verdict,
     louver_free_area_ft2, gross_louver_area_ft2,
-    has_fan, fan_adequate, charge_covered_lb, fan_verdict,
-    note: "The emergency exhaust a refrigerating machinery room requires, from ASHRAE 15's Q = 100 x sqrt(G) with G the mass of the LARGEST SINGLE SYSTEM's refrigerant charge in pounds. Two features of that relation carry the engineering. The square root means doubling the charge multiplies the requirement by 1.41 rather than 2, because the rate is aimed at diluting a credible release to a survivable concentration rather than at handling the entire charge. And it is the largest single system that governs rather than the sum of everything in the room, because the design event is one system failing, not all of them at once. The number that actually fails inspections is makeup air. A large exhaust fan in a tight room simply does not move its rated flow: it depressurizes the room, the fan rides up its curve, and the delivered cfm is a fraction of the design. Louver free area sized for the exhaust rate is part of the ventilation system rather than a detail, so the free area and the gross louver it implies at the entered free-area fraction are reported next to the fan. Detection is the other half and it is not computed here -- ventilation that has to be started by a person who has already been overcome is not a safety system, so the refrigerant detector, its setpoint, and the alarm are part of the same design. The air-change figure is reported only for contrast: sizing a machinery room by air changes rather than by charge is the common error, and it usually gives a much smaller fan. This does not size the continuous ventilation rate, which is a separate and much smaller requirement for occupied heat removal, and it does not set detector locations or setpoints, evaluate the discharge location, or determine whether a machinery room is required at all. ANSI/ASHRAE 15, IIAR 2, and the mechanical code in force govern.",
+    has_fan, fan_adequate, charge_covered_lb, fan_verdict, refrigerant_class, is_ammonia,
+    note: "The emergency exhaust a refrigerating machinery room requires, from ASHRAE 15's Q = 100 x sqrt(G) with G the mass of the LARGEST SINGLE SYSTEM's refrigerant charge in pounds. Two features of that relation carry the engineering. The square root means doubling the charge multiplies the requirement by 1.41 rather than 2, because the rate is aimed at diluting a credible release to a survivable concentration rather than at handling the entire charge. And it is the largest single system that governs rather than the sum of everything in the room, because the design event is one system failing, not all of them at once. The number that actually fails inspections is makeup air. A large exhaust fan in a tight room simply does not move its rated flow: it depressurizes the room, the fan rides up its curve, and the delivered cfm is a fraction of the design. Louver free area sized for the exhaust rate is part of the ventilation system rather than a detail, so the free area and the gross louver it implies at the entered free-area fraction are reported next to the fan. Detection is the other half and it is not computed here -- ventilation that has to be started by a person who has already been overcome is not a safety system, so the refrigerant detector, its setpoint, and the alarm are part of the same design. For an A1 room the air-change figure is reported for contrast; for AMMONIA, IIAR 2 sizes the room by air changes, 30 per hour on the gross volume, which on a typical room is about twice 100 x sqrt(G). This does not size the continuous ventilation rate, which is a separate and much smaller requirement for occupied heat removal, and it does not set detector locations or setpoints, evaluate the discharge location, or determine whether a machinery room is required at all. ANSI/ASHRAE 15, IIAR 2, and the mechanical code in force govern.",
   };
 }
-export const machineryRoomVentilationExample = { inputs: { largest_system_charge_lb: 2400, room_length_ft: 40, room_width_ft: 30, room_height_ft: 16, louver_face_velocity_fpm: 500, louver_free_area_fraction: 0.5, installed_fan_cfm: 5000 } };
+export const machineryRoomVentilationExample = { inputs: { largest_system_charge_lb: 2400, room_length_ft: 40, room_width_ft: 30, room_height_ft: 16, louver_face_velocity_fpm: 500, louver_free_area_fraction: 0.5, installed_fan_cfm: 5000, refrigerant_class: "a1" } };
 REFRIGERATION_RENDERERS["machinery-room-ventilation"] = _simpleRenderer({
-  citation: "Citation: the emergency mechanical ventilation rate Q = 100 x sqrt(G) in cfm, with G the mass in pounds of the LARGEST SINGLE refrigerating system's charge in the room, as ANSI/ASHRAE 15 states it (and as IIAR 2 carries it for ammonia machinery rooms). Louver face velocity and free-area fraction are ENTERED. It does not size the separate continuous ventilation rate for occupied heat removal, set refrigerant-detector locations or setpoints, evaluate the discharge location, or determine whether a machinery room is required. ASHRAE 15, IIAR 2, and the mechanical code in force govern.",
+  citation: "Citation: the emergency mechanical ventilation rate Q = 100 x sqrt(G) in cfm, with G the mass in pounds of the LARGEST SINGLE refrigerating system's charge in the room, as ANSI/ASHRAE 15 states it (for A1 refrigerants; ammonia rooms are sized by IIAR 2 at 30 air changes per hour on the gross volume, and A2L rooms by ASHRAE 15-2022 Table 8-3). Louver face velocity and free-area fraction are ENTERED. It does not size the separate continuous ventilation rate for occupied heat removal, set refrigerant-detector locations or setpoints, evaluate the discharge location, or determine whether a machinery room is required. ASHRAE 15, IIAR 2, and the mechanical code in force govern.",
   example: machineryRoomVentilationExample.inputs,
   fields: [
     { key: "largest_system_charge_lb", label: "Largest single system charge in the room (lb)", kind: "number" },
@@ -876,6 +906,7 @@ REFRIGERATION_RENDERERS["machinery-room-ventilation"] = _simpleRenderer({
     { key: "louver_face_velocity_fpm", label: "Louver face velocity (fpm)", kind: "number", default: 500 },
     { key: "louver_free_area_fraction", label: "Louver free-area fraction (0-1)", kind: "number", default: 0.5 },
     { key: "installed_fan_cfm", label: "Installed exhaust fan capacity (cfm, 0 to skip)", kind: "number" },
+    { key: "refrigerant_class", label: "Refrigerant", kind: "select", options: [{ value: "a1", label: "A1 halocarbon (ASHRAE 15, 100 x sqrt(G))" }, { value: "ammonia", label: "Ammonia (IIAR 2, 30 air changes per hour)" }, { value: "a2l", label: "A2L (ASHRAE 15-2022 Table 8-3, not computed)" }], default: "a1" },
   ],
   outputs: [
     { key: "q", id: "mrv-out-q", label: "Required emergency exhaust", value: (r) => fmt(r.required_exhaust_cfm, 0) + " cfm" },

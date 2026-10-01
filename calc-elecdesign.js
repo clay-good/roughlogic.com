@@ -716,7 +716,8 @@ export function computeLuminaireSpacingMh({ smh_ratio = 1.3, mounting_height_ft 
   // IES spacing criterion: max center-to-center spacing = SMH x mounting height above the work plane.
   const max_spacing_ft = smh_ratio * mounting_height_ft;
   if (!Number.isFinite(max_spacing_ft)) return { error: "Spacing math is not a finite value." };
-  const ok = actual_spacing_ft <= max_spacing_ft;
+  // Relative 1e-9: 1.2 x 6 is 7.199999999999999, and a 7.2 ft layout read TOO WIDE (fixed 2026-10-01).
+  const ok = actual_spacing_ft <= max_spacing_ft * (1 + 1e-9);
   const verdict = ok
     ? "OK: the proposed spacing is at or below the maximum, so the illuminance stays reasonably uniform."
     : "TOO WIDE: the proposed spacing exceeds the maximum -- expect scalloping / dark spots between fixtures. Tighten the layout or add a row.";

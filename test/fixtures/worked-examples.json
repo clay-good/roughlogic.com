@@ -122995,19 +122995,19 @@
      }
     },
     "air_changes_per_hour": {
-     "value": 15.30931,
+     "value": 15.309310892394864,
      "tolerance": {
       "pct": 0.5
      }
     },
     "louver_free_area_ft2": {
-     "value": 9.79796,
+     "value": 9.797958971132712,
      "tolerance": {
       "pct": 0.5
      }
     },
     "gross_louver_area_ft2": {
-     "value": 19.59592,
+     "value": 19.595917942265423,
      "tolerance": {
       "pct": 0.5
      }
@@ -142397,6 +142397,349 @@
      "value": 834.1,
      "tolerance": {
       "pct": 1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "refrigeration-relief-capacity",
+   "source_publisher": "Mueller Refrigeration",
+   "source_title": "Pressure Relief Valves Selection Process",
+   "source_edition_or_year": "2022-08-30",
+   "source_section_or_page": "p.1 'Example of relief valve selection': R-22 vessel, D = 1.33 ft, L = 3.33 ft, f = 1.6 from the ASHRAE 15 table; C = (1.6)(3.33)(1.33) printed as 7.1 lb air/min (exact product 7.086; publisher rounds to 0.1). Valve rating and discharge piping not part of the example (entered 0 = skipped).",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "vessel_diameter_ft": 1.33,
+    "vessel_length_ft": 3.33,
+    "f_constant": 1.6,
+    "valve_rated_lb_min": 0,
+    "pipe_straight_length_ft": 0,
+    "fitting_equivalent_length_ft": 0,
+    "max_allowable_equivalent_length_ft": 0
+   },
+   "outputs": {
+    "required_lb_min": {
+     "value": 7.1,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "refrigeration-relief-capacity",
+   "source_publisher": "Hansen Technologies",
+   "source_title": "Refrigerant Pressure-Relief Valve with POP-EYE (Bulletin K109m)",
+   "source_edition_or_year": "July 2023",
+   "source_section_or_page": "C=fDL sidebar example: ammonia vessel 16 ft long, 6 ft OD, f = 0.5 -> '0.5 x 6 x 16 = 48 lb/min' (exact, integer printed). Bulletin footnote: factor not suitable when combustible materials are within 20 ft. Valve rating and discharge piping not in the example (entered 0 = skipped).",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "vessel_diameter_ft": 6,
+    "vessel_length_ft": 16,
+    "f_constant": 0.5,
+    "valve_rated_lb_min": 0,
+    "pipe_straight_length_ft": 0,
+    "fitting_equivalent_length_ft": 0,
+    "max_allowable_equivalent_length_ft": 0
+   },
+   "outputs": {
+    "required_lb_min": {
+     "value": 48,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "machinery-room-ventilation",
+   "source_publisher": "Continuing Education and Development, Inc. (A. Bhatia)",
+   "source_title": "Refrigerant Safety in HVAC Systems, Course No. M05-027",
+   "source_edition_or_year": "undated (current download 2026)",
+   "source_section_or_page": "Sec. 5.2.4 Purge Ventilation, pp. 46-47: chiller with an 800-lb refrigerant charge, Q = 100 x 800^0.5 printed as 2800 cfm (exact 2,828; the publisher carried sqrt(800) as 28, so 1.0% rounding). Room dimensions, louver, and installed fan are not in the example (room 0 = skipped; louver 500 fpm / 0.5 are the tile defaults; fan 0 = skipped).",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "largest_system_charge_lb": 800,
+    "room_length_ft": 0,
+    "room_width_ft": 0,
+    "room_height_ft": 0,
+    "louver_face_velocity_fpm": 500,
+    "louver_free_area_fraction": 0.5,
+    "installed_fan_cfm": 0
+   },
+   "outputs": {
+    "required_exhaust_cfm": {
+     "value": 2800,
+     "tolerance": {
+      "pct": 1.2
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "condenser-td-head-pressure",
+   "source_publisher": "Oregon State University Energy Efficiency Center (US DOE Industrial Assessment Center)",
+   "source_title": "AR No. 3 - Refrigeration Discharge Pressure (ammonia, evaporative condenser)",
+   "source_edition_or_year": "2018",
+   "source_section_or_page": "AR No. 3 Analysis: approach TAC = TDM - TWB = 78.6 - 63.0 = 15.6 degF (Eq. 1, evaporative basis); Compressor Summary bin table, Eq. 7 current discharge TDC = TWB + TAC: TWB 73.0 -> 88.6 degF and TWB 72.0 -> 87.6 degF (printed to 0.1). Power sensitivity 1.0%/degF is the report's F%S; hp, hours, rate are not used (0).",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "condenser_type": "evaporative",
+    "ambient_f": 73,
+    "design_td_f": 15.6,
+    "alternate_ambient_f": 72,
+    "alternate_td_f": 0,
+    "power_pct_per_deg_f": 1.0,
+    "compressor_hp": 0,
+    "annual_hours": 0,
+    "energy_rate_per_kwh": 0
+   },
+   "outputs": {
+    "condensing_f": {
+     "value": 88.6,
+     "tolerance": {
+      "abs": 0.05
+     }
+    },
+    "alternate_condensing_f": {
+     "value": 87.6,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "secondary-glycol-loop",
+   "source_publisher": "R. L. Deppmann Company (Norm Hall)",
+   "source_title": "BTUH Correction Factors when using Ethylene Glycol in Hydronic HVAC Systems (Monday Morning Minutes)",
+   "source_edition_or_year": "2019-09-30",
+   "source_section_or_page": "Example 2: 4,000,000 BTUH, 30 degF delta-T, 35% Dowtherm SR-1 correction factor (SG x cp) 0.91: GPM = 4,000,000 / (30 x 500 x .91) = 293 GPM; 'compares with 267 GPM for water' (both printed to integer). Only the PRODUCT 0.91 is printed, so glycol_sg = 1 and glycol_cp = 0.91 is a placeholder split; head, approaches, hours, rate not in the example (0 / tile defaults).",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "load_btuh": 4000000,
+    "delta_t_f": 30,
+    "glycol_cp": 0.91,
+    "glycol_sg": 1,
+    "head_ft": 0,
+    "pump_efficiency": 0.7,
+    "chiller_approach_f": 0,
+    "coil_approach_f": 0,
+    "compressor_pct_per_deg_f": 2.2,
+    "annual_hours": 0,
+    "energy_rate_per_kwh": 0
+   },
+   "outputs": {
+    "water_gpm": {
+     "value": 267,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "glycol_gpm": {
+     "value": 293,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "hull-displacement",
+   "source_publisher": "U.S. Naval Academy, Department of Naval Architecture and Ocean Engineering",
+   "source_title": "EN400 Principles of Ship Performance, Chapter 2: Hull Form and Geometry (02.02_Ch_2_AY23)",
+   "source_edition_or_year": "AY23 course notes",
+   "source_section_or_page": "p. 2-5, Example 2.1: a small boat with a submerged volume of 20 ft^3 in seawater (rho = 1.99 lb-s^2/ft^4, g = 32.17 ft/s^2) has FB = rho g V = 1,280 lb (printed to 3 significant figures). Water density input 64.0183 pcf = 1.99 x 32.17 (the printed constants). The 20 ft^3 is entered as a 20 x 1 x 1 ft box with Cb 1.0 - those dimensions are PLACEHOLDERS; only the volume is printed.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "lwl_ft": 20,
+    "bwl_ft": 1,
+    "draft_ft": 1,
+    "block_coefficient": 1,
+    "water_density_pcf": 64.0183
+   },
+   "outputs": {
+    "displacement_lb": {
+     "value": 1280,
+     "tolerance": {
+      "abs": 5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "hull-displacement",
+   "source_publisher": "U.S. Naval Academy, Department of Naval Architecture and Ocean Engineering",
+   "source_title": "EN400 Principles of Ship Performance, Chapter 2: Hull Form and Geometry (02.02_Ch_2_AY23)",
+   "source_edition_or_year": "AY23 course notes",
+   "source_section_or_page": "p. 2-5, Example 2.2: a ship with a buoyant force of 4,000 LT in fresh water (rho = 1.94 lb-s^2/ft^4, g = 32.17, 1 LT = 2,240 lb) has a submerged volume of 143,570 ft^3. Run forward here: the printed 143,570 ft^3 volume at 62.4098 pcf (= 1.94 x 32.17) returns the printed 4,000 LT. Box dimensions 143,570 x 1 x 1 ft with Cb 1.0 are PLACEHOLDERS for the printed volume.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "lwl_ft": 143570,
+    "bwl_ft": 1,
+    "draft_ft": 1,
+    "block_coefficient": 1,
+    "water_density_pcf": 62.4098
+   },
+   "outputs": {
+    "displacement_long_tons": {
+     "value": 4000,
+     "tolerance": {
+      "abs": 1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "hull-displacement",
+   "source_publisher": "U.S. Naval Academy, Department of Naval Architecture and Ocean Engineering",
+   "source_title": "EN400 Principles of Ship Performance, Chapter 3: Hydrostatics (02.03_Ch_3_AY23)",
+   "source_edition_or_year": "AY23 course notes",
+   "source_section_or_page": "pp. 3-4 to 3-5, Example 3.1: DDG51 at 21.0 ft draft displaces 8,640 LT in seawater (rho = 1.99, g = 32.17, 1 LT = 2,240 lb), so the submerged volume is 302,300 ft^3 (printed to 4 significant figures, +/- about 1.4 LT). Run forward: 302,300 ft^3 at 64.0183 pcf returns 8,640 LT. Box dimensions 302,300 x 1 x 1 ft with Cb 1.0 are PLACEHOLDERS for the printed volume.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "lwl_ft": 302300,
+    "bwl_ft": 1,
+    "draft_ft": 1,
+    "block_coefficient": 1,
+    "water_density_pcf": 64.0183
+   },
+   "outputs": {
+    "displacement_long_tons": {
+     "value": 8640,
+     "tolerance": {
+      "abs": 2
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "concrete-premix-bags",
+   "source_publisher": "Sakrete (Oldcastle APG)",
+   "source_title": "Estimating Bagged Concrete Jobs (Sakrete blog)",
+   "source_edition_or_year": "web page, accessed 2026-10-01",
+   "source_section_or_page": "Prints that 1 cubic yard of concrete placed 4 in deep covers 81 sq ft (about a 9 ft x 9 ft slab) and that it takes 45 bags of 80 lb mix to make a cubic yard (so 0.60 ft^3 per 80 lb bag, the same yield Quikrete 1101 TDS prints). 9 x 9 ft x 4 in = 27 ft^3 -> 45 bags with NO waste allowance (waste_pct 0; Sakrete's separate 0.6-bags-per-sq-ft shortcut that 'includes 10% waste' gives 48.6 and is a rounded rule of thumb, not used here).",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "length_ft": 9,
+    "width_ft": 9,
+    "thickness_in": 4,
+    "bag_yield_ft3": 0.6,
+    "waste_pct": 0
+   },
+   "outputs": {
+    "volume_ft3": {
+     "value": 27,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "bags": {
+     "value": 45,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "flue-gas-dew-point",
+   "source_publisher": "U.S. EPA Air Pollution Training Institute (APTI)",
+   "source_title": "APTI Course 427 Combustion Source Evaluation, Student Manual, Chapter 4",
+   "source_edition_or_year": "March 2004",
+   "source_section_or_page": "p. 4-8 to 4-9, Table 4-2 'Water Saturation Temperature vs. Concentration': 120 F <-> 11.5% water vapor by volume (printed to 0.1%, about +/-0.25 F). The excess-air input 72.1776% is BACK-SOLVED so the tile's methane water fraction 2/(1 + 9.52 lambda) equals the printed 11.5% - it is a placeholder, not a printed excess-air value; the row checks the saturation (Antoine) half of the tile.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "excess_air_pct": 72.1776
+   },
+   "outputs": {
+    "dew_point_f": {
+     "value": 120,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "flue-gas-dew-point",
+   "source_publisher": "U.S. EPA Air Pollution Training Institute (APTI)",
+   "source_title": "APTI Course 427 Combustion Source Evaluation, Student Manual, Chapter 4",
+   "source_edition_or_year": "March 2004",
+   "source_section_or_page": "p. 4-8 to 4-9, Table 4-2: 100 F <-> 6.5% water vapor by volume (printed to 0.1%, about +/-0.3 F). Excess-air input 212.702% is BACK-SOLVED so the methane water fraction equals the printed 6.5% (placeholder).",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "excess_air_pct": 212.702
+   },
+   "outputs": {
+    "dew_point_f": {
+     "value": 100,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "duct-static-regain",
+   "source_publisher": "McGill AirFlow",
+   "source_title": "Duct System Design Guide, Chapter 1 (Design Advisory #1) and Chapter 2 (Design Advisory #2, CAS-DA2-2003)",
+   "source_edition_or_year": "2003",
+   "source_section_or_page": "Ch. 1 Sample Problem 1-19 (straight-through of a straight tee): Vc 1,592 fpm -> VPc 0.16 in wg; Vs 955 fpm; Ch. 2 sec. 2.5.1 item 3: 'the velocity was reduced from 1,592 fpm to 955 fpm, resulting in a velocity pressure reduction of 0.10 inches wg' (VP = (V/4,005)^2, Eq 1.5). recovery_factor 1.0 is a PLACEHOLDER so static_regain_inwc equals the printed velocity-pressure reduction; McGill's own regain (0.09) subtracts a fitting total-pressure loss instead of applying a recovery factor. Printed to 2 decimals; VPs 0.06 omitted (its rounding exceeds 2%).",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "upstream_velocity_fpm": 1592,
+    "downstream_velocity_fpm": 955,
+    "recovery_factor": 1
+   },
+   "outputs": {
+    "vp_upstream_inwc": {
+     "value": 0.16,
+     "tolerance": {
+      "pct": 2
+     }
+    },
+    "static_regain_inwc": {
+     "value": 0.1,
+     "tolerance": {
+      "pct": 2
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "wood-beam-compression-notch",
+   "source_publisher": "WoodWorks - Wood Products Council",
+   "source_title": "Introduction to Wood: Structural Gravity Framing Design (webinar slides, Harvey and Kinder)",
+   "source_edition_or_year": "January 14, 2025 (cites AWC NDS 2018 / NDS Supplement 2018)",
+   "source_section_or_page": "'Design Example: Shear' slides: (3) 2x12 Douglas-Fir Larch No. 2 beam (b = 4.5 in, d = 11.25 in), w = 960 lb/ft, V = 2,940 lb, fv = 3V/(2bd) = 87 psi vs Fv' = 180 psi. UNNOTCHED member: dn = d = 11.25 and e = 0 are PLACEHOLDERS that make de = d, so this row checks only the fv = 3V/(2 b de) path. Printed to the whole psi.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "fv_prime_psi": 180,
+    "b_in": 4.5,
+    "d_in": 11.25,
+    "dn_in": 11.25,
+    "e_in": 0,
+    "v_applied_lb": 2940
+   },
+   "outputs": {
+    "fv_psi": {
+     "value": 87,
+     "tolerance": {
+      "abs": 0.5
      }
     }
    }

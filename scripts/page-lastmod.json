@@ -2,7 +2,7 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "a23642b7720e6b80",
+      "sha": "c4f90174563e20e5",
       "date": "2026-10-01"
     },
     "/tools/": {
@@ -2438,8 +2438,8 @@
       "date": "2026-09-29"
     },
     "/tools/duct-bank-ampacity-derate/": {
-      "sha": "9a9af59a217b518d",
-      "date": "2026-09-29"
+      "sha": "2f70fc64bf998069",
+      "date": "2026-10-01"
     },
     "/tools/duct-bank-concrete/": {
       "sha": "f413e35492a70860",
@@ -4430,8 +4430,8 @@
       "date": "2026-09-29"
     },
     "/tools/machinery-room-ventilation/": {
-      "sha": "f07c388db9f7cb61",
-      "date": "2026-09-29"
+      "sha": "72db127e50d19c76",
+      "date": "2026-10-01"
     },
     "/tools/machining-time/": {
       "sha": "26c756c56d0db213",
@@ -6230,8 +6230,8 @@
       "date": "2026-10-01"
     },
     "/tools/refrigeration-relief-capacity/": {
-      "sha": "6f6727813ec8b47a",
-      "date": "2026-09-29"
+      "sha": "5f96aec54371e505",
+      "date": "2026-10-01"
     },
     "/tools/regular-polygon/": {
       "sha": "82eb6e2bf156a75a",

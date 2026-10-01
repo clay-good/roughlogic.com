@@ -2320,7 +2320,9 @@ export function computeConcretePremixBags({ length_ft = 4, width_ft = 4, thickne
   if (!(waste_pct >= 0)) return { error: "Waste percent cannot be negative." };
   // Slab/pad volume, then bags at the mix's per-bag yield with a waste allowance.
   const volume_ft3 = length_ft * width_ft * (thickness_in / 12);
-  const bags = Math.ceil(volume_ft3 * (1 + waste_pct / 100) / bag_yield_ft3);
+  // - 1e-9: a 6 x 6 ft, 4 in pad at 10% waste is exactly 22 bags but computed
+  // 22.000000000000004 and read 23 (fixed 2026-10-01).
+  const bags = Math.ceil(volume_ft3 * (1 + waste_pct / 100) / bag_yield_ft3 - 1e-9);
   if (![volume_ft3, bags].every(Number.isFinite)) return { error: "Bag-count math is not a finite value." };
   return {
     volume_ft3,

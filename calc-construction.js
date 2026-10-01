@@ -6646,7 +6646,7 @@ export function computeWoodBeamCompressionNotch({ fv_prime_psi = 0, b_in = 0, d_
   const e_eff = Math.min(e_in, dn_in);
   const de = d_in - ((d_in - dn_in) / dn_in) * e_eff;
   const vr = (2 / 3) * fv_prime_psi * b_in * de;
-  // The same notch on the TENSION side (NDS 3.4-4), for contrast.
+  // The same notch on the TENSION side (NDS 2018 Eq 3.4-3; 3.4-4 in NDS 2024), for contrast.
   const ratio = dn_in / d_in;
   const vr_tension = (2 / 3) * fv_prime_psi * b_in * dn_in * ratio * ratio;
   const relief_factor = vr_tension > 0 ? vr / vr_tension : null;
@@ -6660,7 +6660,7 @@ export const woodBeamCompressionNotchExample = {
 };
 
 const _renderWoodBeamCompressionNotch = _simpleRenderer({
-  citation: "Citation: NDS 3.4.3.2(e) compression-side end-notch rule (2018 Eq 3.4-5): Vr' = (2/3) Fv' b [d - ((d - dn)/dn) e], the adjusted design shear for a bending member notched on the compression face at the end, with e the distance the notch extends from the inner edge of the support and e <= dn (if e > dn, the net depth dn governs per Eq 3.4-2). Fv' is the reference shear value already multiplied by every applicable adjustment factor (the user supplies it; the reference Fv and the factors come from the NDS Supplement for the actual species, grade, and service condition). The tension-side value shown for contrast is Eq 3.4-4, V' = (2/3) Fv' b dn (dn/d)^2. Compression-side end-notch case only; does not cover tension-side notches (the wood-beam-shear tile), notches away from the end, sloped / bevel / round notches, or the Cvr factor for members with connections in the shear zone. Loads within a distance d of the support may be neglected in V per NDS 3.4.3.1 (the user applies that to the input). A design aid, not a substitute for the engineer of record.",
+  citation: "Citation: NDS 3.4.3.2(e) compression-side end-notch rule (2018 Eq 3.4-5): Vr' = (2/3) Fv' b [d - ((d - dn)/dn) e], the adjusted design shear for a bending member notched on the compression face at the end, with e the distance the notch extends from the inner edge of the support and e <= dn (if e > dn, the net depth dn governs per Eq 3.4-2). Fv' is the reference shear value already multiplied by every applicable adjustment factor (the user supplies it; the reference Fv and the factors come from the NDS Supplement for the actual species, grade, and service condition). The tension-side value shown for contrast is Eq 3.4-3 (NDS 2018; 3.4-4 in NDS 2024), V' = (2/3) Fv' b dn (dn/d)^2. Compression-side end-notch case only; does not cover tension-side notches (the wood-beam-shear tile), notches away from the end, sloped / bevel / round notches, or the Cvr factor for members with connections in the shear zone. Loads within a distance d of the support may be neglected in V per NDS 3.4.3.1 (the user applies that to the input). A design aid, not a substitute for the engineer of record.",
   example: woodBeamCompressionNotchExample.inputs,
   fields: [
     { key: "fv_prime_psi", label: "Adjusted shear value Fv' (psi)", kind: "number" },
