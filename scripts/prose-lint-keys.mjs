@@ -48,3 +48,60 @@ export const PROSE_LINT_EXEMPT_KEYS = new Set([
   // paste-ins; each is one sentence authored by the project.
   "note", "free_access",
 ]);
+
+// The shard scan itself lives here too, so test/unit/prose-lint-shards.test.js
+// runs it on every `npm test`. Until 2026-10-01 it ran only inside
+// build-data.mjs -- the monthly Data Refresh -- so two over-long strings hand-
+// edited into shards on 2026-09-25 passed every local gate and failed the
+// refresh a week later.
+// Shard paths whose entire bodies are intentionally prose (original
+// plain-English summary shards). The lint scans these files only for
+// the prose-length signal already exempted via PROSE_LINT_EXEMPT_KEYS;
+// no full-shard skip is needed today, but the hook is here for future
+// summary shards added by audit PRs.
+export const PROSE_LINT_EXEMPT_SHARDS = new Set([
+  // v5 utility 271 glossary: every value under `terms` is intentionally a
+  // one-paragraph plain-English definition by the project author. The
+  // tooltip rendering depends on the prose form. MIT-licensed creative work.
+  "cross/glossary.json",
+]);
+
+export function lintProseInShard(folder, file, body) {
+  const errors = [];
+  const shardPath = folder + "/" + file;
+  if (PROSE_LINT_EXEMPT_SHARDS.has(shardPath)) return errors;
+  // Any string under a parent named "summaries" (the dictionary of
+  // per-tile original plain-English summaries) is exempt. The
+  // immediate-parent check below covers most fields; the ancestor-aware
+  // check here covers the summaries object whose own keys are tile ids.
+  const ancestorIsSummaries = (path) => {
+    for (let i = path.length - 2; i >= 0; i--) {
+      if (path[i] === "summaries") return true;
+    }
+    return false;
+  };
+  const walk = (val, path) => {
+    if (val === null || val === undefined) return;
+    if (typeof val === "string") {
+      if (val.length > PROSE_LINT_THRESHOLD) {
+        const lastKey = path[path.length - 1];
+        if (typeof lastKey === "string" && PROSE_LINT_EXEMPT_KEYS.has(lastKey)) return;
+        if (ancestorIsSummaries(path)) return;
+        // Tolerate concatenated tokens: anything with no whitespace is not
+        // prose (e.g., a long base64 hash, a long URL, a long enum string).
+        if (!/\s/.test(val)) return;
+        errors.push(folder + "/" + file + " at " + path.join(".") + ": string of length " + val.length + " (threshold " + PROSE_LINT_THRESHOLD + ") - looks like prose paste-in: " + JSON.stringify(val.slice(0, 80)) + "...");
+      }
+      return;
+    }
+    if (Array.isArray(val)) {
+      for (let i = 0; i < val.length; i++) walk(val[i], path.concat([i]));
+      return;
+    }
+    if (typeof val === "object") {
+      for (const k of Object.keys(val)) walk(val[k], path.concat([k]));
+    }
+  };
+  walk(body, []);
+  return errors;
+}

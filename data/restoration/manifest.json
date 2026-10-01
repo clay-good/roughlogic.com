@@ -14,7 +14,7 @@
     {
       "file": "water-classes.json",
       "name": "Water classes and categories",
-      "gzip_size_bytes": 525
+      "gzip_size_bytes": 517
     },
     {
       "file": "drying-times.json",
@@ -34,7 +34,7 @@
   ],
   "hashes": {
     "psychrometrics.json": "077cbd12541565200b9c12c27535dfe6b6468013a9c168a9bb7f55aaff9bb24e",
-    "water-classes.json": "09524d86c43dce47b154b1355c78a24f3c31cc3c8211e5b57aede431130e5ca3",
+    "water-classes.json": "fc092bcf7ae3ebb79b650447ad38f8e7ba6ee3af557dc90eb6232fa895a78d4c",
     "drying-times.json": "7b74eda4574af0aa378ce7bbbbb50ad1933e5a760f348ae843cc678b4cc26562",
     "mold-conditions.json": "023951c9bc1c0c01aab36dcfad4393fc5ae4aa61b2bfd7c3eb8c98e4437e0067",
     "hepa-loading.json": "a8e75891c9f2184749f6ae057b163216327dd9bef223035bd99d5fe3a7000b4c"

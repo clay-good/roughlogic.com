@@ -14,7 +14,7 @@
     {
       "file": "v2-references.json",
       "name": "v2 reference summaries (GFCI/AFCI and others)",
-      "gzip_size_bytes": 688
+      "gzip_size_bytes": 679
     },
     {
       "file": "v3-references.json",
@@ -24,7 +24,7 @@
   ],
   "hashes": {
     "summaries.json": "9034915769ced61e3bcefc8a0078c17f8f2150e73ae4ea422283d558a90260ce",
-    "v2-references.json": "f57f7cb8bcbf7855d3a741bfbda1ac1c1dd34e2af29d1c897d5e2797775a0172",
+    "v2-references.json": "bfca065b89dac5735a55d296482c4119ac9732e880fd199c24816e8c6fff86f4",
     "v3-references.json": "8e42d88b1e5b0dc2fa979ad343d91c4358b1f2aa780c241d1e74caac92d8f71a"
   }
 }

@@ -701,7 +701,7 @@ const WATER_CLASSES = {
     "3": "Grossly contaminated water. May contain pathogens, sewage, or harmful chemicals. Sometimes called black water.",
   },
   classes: {
-    "1": "Least amount of water absorption and evaporation load: less than about 5% of the combined floor, wall and ceiling surface in the area is wet.",
+    "1": "Least water absorption and evaporation load: under about 5% of the combined floor, wall and ceiling surface in the area is wet.",
     "2": "Significant water absorption and evaporation load: about 5 to 40% of the combined floor, wall and ceiling surface is wet.",
     "3": "Greatest water absorption and evaporation load: more than about 40% of the combined floor, wall and ceiling surface is wet.",
     "4": "Specialty drying situations. Materials with low porosity (hardwood, plaster, masonry) holding bound water.",
@@ -982,7 +982,7 @@ const SUMMARIES = {
 const V2_REFERENCES = {
   source: "Original plain-English summaries by the project author. MIT-licensed creative work. Code documents (NEC, IPC, etc.) referenced by section number only; no code text reproduced.",
   gfci_afci_by_area: {
-    kitchen: { gfci: "Required for all receptacles in dwelling-unit kitchens (NEC 2023 210.8(A)(6); 2020 covered only countertop receptacles) and within 6 ft of a sink (210.8(A)(7)), 125-250 V on circuits 150 V or less to ground.", afci: "Required for branch circuits supplying outlets in dwelling-unit kitchens.", nec_ref: "NEC 2023 210.8(A)(6)/(7) and 210.12(A)" },
+    kitchen: { gfci: "All dwelling-unit kitchen receptacles (NEC 2023 210.8(A)(6)) and any within 6 ft of a sink (210.8(A)(7)); 125-250 V, 150 V max to ground.", afci: "Required for branch circuits supplying outlets in dwelling-unit kitchens.", nec_ref: "NEC 2023 210.8(A)(6)/(7) and 210.12(A)" },
     bathroom: { gfci: "Required for all 125-250 V receptacles on single-phase circuits rated 150 V or less to ground (NEC 2020 onward).", afci: "Not generally required.", nec_ref: "NEC 210.8(A)(1)" },
     garage: { gfci: "Required for receptacles installed in garages and accessory buildings.", afci: "Not generally required outside dwelling-unit habitable rooms.", nec_ref: "NEC 210.8(A)(2)" },
     outdoor: { gfci: "Required for all 125-250 V receptacles in outdoor locations on circuits rated 150 V or less to ground (NEC 2020 onward).", afci: "Not generally required.", nec_ref: "NEC 210.8(A)(3)" },
@@ -1676,7 +1676,7 @@ const GLOSSARY_DATA_V5 = {
 
 import { SALES_TAX_NEXUS } from "../calc-references.js";
 import { stalenessNote, collectRowStamps } from "./staleness-notes.mjs";
-import { PROSE_LINT_THRESHOLD, PROSE_LINT_EXEMPT_KEYS } from "./prose-lint-keys.mjs";
+import { lintProseInShard } from "./prose-lint-keys.mjs";
 
 function buildSalesTaxNexusShard() {
   // CF-05: this aggregate stamp read TODAY while all 47 per-state entries
@@ -1892,57 +1892,6 @@ async function ensureDir(path) {
 // and put the rest in docs/. Eleven nexus citations hit the cap the day the
 // claim was noticed, and each one was better for being cut.
 
-// Shard paths whose entire bodies are intentionally prose (original
-// plain-English summary shards). The lint scans these files only for
-// the prose-length signal already exempted via PROSE_LINT_EXEMPT_KEYS;
-// no full-shard skip is needed today, but the hook is here for future
-// summary shards added by audit PRs.
-const PROSE_LINT_EXEMPT_SHARDS = new Set([
-  // v5 utility 271 glossary: every value under `terms` is intentionally a
-  // one-paragraph plain-English definition by the project author. The
-  // tooltip rendering depends on the prose form. MIT-licensed creative work.
-  "cross/glossary.json",
-]);
-
-function lintProseInShard(folder, file, body) {
-  const errors = [];
-  const shardPath = folder + "/" + file;
-  if (PROSE_LINT_EXEMPT_SHARDS.has(shardPath)) return errors;
-  // Any string under a parent named "summaries" (the dictionary of
-  // per-tile original plain-English summaries) is exempt. The
-  // immediate-parent check below covers most fields; the ancestor-aware
-  // check here covers the summaries object whose own keys are tile ids.
-  const ancestorIsSummaries = (path) => {
-    for (let i = path.length - 2; i >= 0; i--) {
-      if (path[i] === "summaries") return true;
-    }
-    return false;
-  };
-  const walk = (val, path) => {
-    if (val === null || val === undefined) return;
-    if (typeof val === "string") {
-      if (val.length > PROSE_LINT_THRESHOLD) {
-        const lastKey = path[path.length - 1];
-        if (typeof lastKey === "string" && PROSE_LINT_EXEMPT_KEYS.has(lastKey)) return;
-        if (ancestorIsSummaries(path)) return;
-        // Tolerate concatenated tokens: anything with no whitespace is not
-        // prose (e.g., a long base64 hash, a long URL, a long enum string).
-        if (!/\s/.test(val)) return;
-        errors.push(folder + "/" + file + " at " + path.join(".") + ": string of length " + val.length + " (threshold " + PROSE_LINT_THRESHOLD + ") - looks like prose paste-in: " + JSON.stringify(val.slice(0, 80)) + "...");
-      }
-      return;
-    }
-    if (Array.isArray(val)) {
-      for (let i = 0; i < val.length; i++) walk(val[i], path.concat([i]));
-      return;
-    }
-    if (typeof val === "object") {
-      for (const k of Object.keys(val)) walk(val[k], path.concat([k]));
-    }
-  };
-  walk(body, []);
-  return errors;
-}
 
 async function buildAll() {
   const expected = {};
