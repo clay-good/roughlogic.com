@@ -2598,8 +2598,8 @@
       "date": "2026-09-29"
     },
     "/tools/electric-lock-power-budget/": {
-      "sha": "d747379fddfff3ec",
-      "date": "2026-09-30"
+      "sha": "77f649da360a1119",
+      "date": "2026-10-01"
     },
     "/tools/elevation-pressure-loss/": {
       "sha": "303f1de75f3a7ee4",
@@ -3802,7 +3802,7 @@
       "date": "2026-09-29"
     },
     "/tools/hurricane-debris-estimate/": {
-      "sha": "e8ebe2b61c9d3254",
+      "sha": "0d525f5e2a5dd1de",
       "date": "2026-10-01"
     },
     "/tools/hvac-equipment-circuit/": {
@@ -4598,8 +4598,8 @@
       "date": "2026-09-29"
     },
     "/tools/master-key-bitting-capacity/": {
-      "sha": "542e382de576141c",
-      "date": "2026-09-30"
+      "sha": "ffad3b9cb9fcd249",
+      "date": "2026-10-01"
     },
     "/tools/master-stream/": {
       "sha": "5b52faf45e8229a7",

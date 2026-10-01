@@ -112221,34 +112221,46 @@
   },
   {
    "tile_id": "master-key-bitting-capacity",
-   "source_publisher": "Locksmith Ledger",
-   "source_title": "master keying by the numbers: two-step progression change key counts",
-   "source_edition_or_year": "trade article",
-   "source_section_or_page": "10 depths, two-step: 4 change values per position; 4^5 = 1,024 on five positions, 4^6 = 4,096 on six",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "6-pin system, 6 usable depths, two positions mastered on a two-step progression",
+   "source_edition_or_year": "theoretical = depths ^ positions; change keys = (depths / 2 - 1) ^ mastered, the master taking one depth of each parity",
+   "source_section_or_page": "the manufacturer's system specification governs",
    "verified_by": "rl",
-   "verified_on": "2026-09-30",
+   "verified_on": "2026-09-05",
    "inputs": {
     "cut_positions": 6,
-    "usable_depths": 10,
-    "mastered_positions": 6,
-    "alternative_mastered_positions": 5,
-    "change_keys_required": 1000
+    "usable_depths": 6,
+    "mastered_positions": 2,
+    "alternative_mastered_positions": 3,
+    "change_keys_required": 40
    },
    "outputs": {
+    "theoretical_total": {
+     "value": 46656,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
     "per_mastered_position": {
-     "value": 4,
+     "value": 2,
      "tolerance": {
       "pct": 0.5
      }
     },
     "change_keys_available": {
-     "value": 4096,
+     "value": 4,
      "tolerance": {
       "pct": 0.5
      }
     },
     "alternative_change_keys": {
-     "value": 1024,
+     "value": 8,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "margin": {
+     "value": -36,
      "tolerance": {
       "pct": 0.5
      }
@@ -112341,49 +112353,47 @@
   {
    "tile_id": "electric-lock-power-budget",
    "source_publisher": "Project (first-principles)",
-   "source_title": "1.2 A quiescent for 24 hours plus 2.5 A for a 5 minute alarm period at a 0.85 derate",
-   "source_edition_or_year": "amp-hours = standby A x h + alarm A x min / 60, divided by the derate",
-   "source_section_or_page": "the fire alarm interface governs the durations",
+   "source_title": "14 maglocks at 0.45 A holding and 1.5 A inrush, 24 hours of standby at a 0.80 derate",
+   "source_edition_or_year": "amp-hours = steady current x standby hours, divided by the derate",
+   "source_section_or_page": "the fire alarm interface governs the duration",
    "verified_by": "rl",
-   "verified_on": "2026-09-30",
+   "verified_on": "2026-09-05",
    "inputs": {
-    "device_count": 4,
-    "holding_current_a": 0.3,
-    "inrush_current_a": 0.9,
+    "device_count": 14,
+    "holding_current_a": 0.45,
+    "inrush_current_a": 1.5,
     "standby_hours": 24,
-    "battery_derate": 0.85,
-    "supply_rating_a": 4,
-    "installed_battery_ah": 18,
-    "alarm_current_a": 2.5,
-    "alarm_minutes": 5
+    "battery_derate": 0.8,
+    "supply_rating_a": 12,
+    "installed_battery_ah": 12
    },
    "outputs": {
     "steady_current_a": {
-     "value": 1.2,
+     "value": 6.3,
      "tolerance": {
       "pct": 0.5
      }
     },
-    "standby_amp_hours": {
-     "value": 28.8,
-     "tolerance": {
-      "pct": 0.5
-     }
-    },
-    "alarm_amp_hours": {
-     "value": 0.208333,
+    "peak_inrush_a": {
+     "value": 21,
      "tolerance": {
       "pct": 0.5
      }
     },
     "amp_hours_required": {
-     "value": 29.008333,
+     "value": 151.2,
      "tolerance": {
       "pct": 0.5
      }
     },
     "amp_hours_after_derate": {
-     "value": 34.127451,
+     "value": 189,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "batteries_needed": {
+     "value": 16,
      "tolerance": {
       "pct": 0.5
      }
@@ -112490,47 +112500,49 @@
   {
    "tile_id": "electric-lock-power-budget",
    "source_publisher": "Project (first-principles)",
-   "source_title": "14 maglocks at 0.45 A holding and 1.5 A inrush, 24 hours of standby at a 0.80 derate",
-   "source_edition_or_year": "amp-hours = steady current x standby hours, divided by the derate",
-   "source_section_or_page": "the fire alarm interface governs the duration",
+   "source_title": "1.2 A quiescent for 24 hours plus 2.5 A for a 5 minute alarm period at a 0.85 derate",
+   "source_edition_or_year": "amp-hours = standby A x h + alarm A x min / 60, divided by the derate",
+   "source_section_or_page": "the fire alarm interface governs the durations",
    "verified_by": "rl",
-   "verified_on": "2026-09-05",
+   "verified_on": "2026-09-30",
    "inputs": {
-    "device_count": 14,
-    "holding_current_a": 0.45,
-    "inrush_current_a": 1.5,
+    "device_count": 4,
+    "holding_current_a": 0.3,
+    "inrush_current_a": 0.9,
     "standby_hours": 24,
-    "battery_derate": 0.8,
-    "supply_rating_a": 12,
-    "installed_battery_ah": 12
+    "battery_derate": 0.85,
+    "supply_rating_a": 4,
+    "installed_battery_ah": 18,
+    "alarm_current_a": 2.5,
+    "alarm_minutes": 5
    },
    "outputs": {
     "steady_current_a": {
-     "value": 6.3,
+     "value": 1.2,
      "tolerance": {
       "pct": 0.5
      }
     },
-    "peak_inrush_a": {
-     "value": 21,
+    "standby_amp_hours": {
+     "value": 28.8,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "alarm_amp_hours": {
+     "value": 0.208333,
      "tolerance": {
       "pct": 0.5
      }
     },
     "amp_hours_required": {
-     "value": 151.2,
+     "value": 29.008333,
      "tolerance": {
       "pct": 0.5
      }
     },
     "amp_hours_after_derate": {
-     "value": 189,
-     "tolerance": {
-      "pct": 0.5
-     }
-    },
-    "batteries_needed": {
-     "value": 16,
+     "value": 34.127451,
      "tolerance": {
       "pct": 0.5
      }
@@ -112596,46 +112608,34 @@
   },
   {
    "tile_id": "master-key-bitting-capacity",
-   "source_publisher": "Project (first-principles)",
-   "source_title": "6-pin system, 6 usable depths, two positions mastered on a two-step progression",
-   "source_edition_or_year": "theoretical = depths ^ positions; change keys = (depths / 2 - 1) ^ mastered, the master taking one depth of each parity",
-   "source_section_or_page": "the manufacturer's system specification governs",
+   "source_publisher": "Locksmith Ledger",
+   "source_title": "master keying by the numbers: two-step progression change key counts",
+   "source_edition_or_year": "trade article",
+   "source_section_or_page": "10 depths, two-step: 4 change values per position; 4^5 = 1,024 on five positions, 4^6 = 4,096 on six",
    "verified_by": "rl",
-   "verified_on": "2026-09-05",
+   "verified_on": "2026-09-30",
    "inputs": {
     "cut_positions": 6,
-    "usable_depths": 6,
-    "mastered_positions": 2,
-    "alternative_mastered_positions": 3,
-    "change_keys_required": 40
+    "usable_depths": 10,
+    "mastered_positions": 6,
+    "alternative_mastered_positions": 5,
+    "change_keys_required": 1000
    },
    "outputs": {
-    "theoretical_total": {
-     "value": 46656,
-     "tolerance": {
-      "pct": 0.5
-     }
-    },
     "per_mastered_position": {
-     "value": 2,
-     "tolerance": {
-      "pct": 0.5
-     }
-    },
-    "change_keys_available": {
      "value": 4,
      "tolerance": {
       "pct": 0.5
      }
     },
-    "alternative_change_keys": {
-     "value": 8,
+    "change_keys_available": {
+     "value": 4096,
      "tolerance": {
       "pct": 0.5
      }
     },
-    "margin": {
-     "value": -36,
+    "alternative_change_keys": {
+     "value": 1024,
      "tolerance": {
       "pct": 0.5
      }
@@ -134555,39 +134555,6 @@
   },
   {
    "tile_id": "hurricane-debris-estimate",
-   "source_publisher": "FEMA / USACE",
-   "source_title": "Public Assistance Debris Management Guide (FEMA-325)",
-   "source_edition_or_year": "2007",
-   "source_section_or_page": "Appendix B, USACE Hurricane Debris Estimating Model, Step 1 example: Harrison County, MS, population 165,500, category 4, heavy vegetation, heavy commercial, wet storm; printed 55,167 households and 6,992,374 cy (the unrounded count gives 6,992,375; tolerance covers the printed rounding)",
-   "verified_by": "rl",
-   "verified_on": "2026-09-30",
-   "inputs": {
-    "population": 165500,
-    "persons_per_household": 3,
-    "storm_category": 4,
-    "vegetation": "heavy",
-    "commercial": "heavy",
-    "precipitation": "medium_heavy",
-    "woody_fraction": 0.3,
-    "wood_type": "hardwood"
-   },
-   "outputs": {
-    "households": {
-     "value": 55167,
-     "tolerance": {
-      "pct": 0.5
-     }
-    },
-    "debris_cy": {
-     "value": 6992374,
-     "tolerance": {
-      "pct": 0.5
-     }
-    }
-   }
-  },
-  {
-   "tile_id": "hurricane-debris-estimate",
    "source_publisher": "Project (first-principles)",
    "source_title": "County of 45,000, category 3, medium vegetation, light commercial, wet storm, 30% woody hardwood",
    "source_edition_or_year": "USACE model factors, FEMA-325 (2007) Appendix B; FEMA 329 (2010) conversions",
@@ -134667,6 +134634,39 @@
     },
     "cd_landfill_cy": {
      "value": 175320.6,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "hurricane-debris-estimate",
+   "source_publisher": "FEMA / USACE",
+   "source_title": "Public Assistance Debris Management Guide (FEMA-325)",
+   "source_edition_or_year": "2007",
+   "source_section_or_page": "Appendix B, USACE Hurricane Debris Estimating Model, Step 1 example: Harrison County, MS, population 165,500, category 4, heavy vegetation, heavy commercial, wet storm; printed 55,167 households and 6,992,374 cy (the unrounded count gives 6,992,375; tolerance covers the printed rounding)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-30",
+   "inputs": {
+    "population": 165500,
+    "persons_per_household": 3,
+    "storm_category": 4,
+    "vegetation": "heavy",
+    "commercial": "heavy",
+    "precipitation": "medium_heavy",
+    "woody_fraction": 0.3,
+    "wood_type": "hardwood"
+   },
+   "outputs": {
+    "households": {
+     "value": 55167,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "debris_cy": {
+     "value": 6992374,
      "tolerance": {
       "pct": 0.5
      }
