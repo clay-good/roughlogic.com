@@ -209,6 +209,9 @@ async function main() {
     // other HTML / JS / CSS asset. Exempt them from the orphan warning.
     if (rel.startsWith("tools/") && rel.endsWith("/index.html")) continue;
     if (rel.startsWith("groups/") && rel.endsWith("/index.html")) continue;
+    // spec-v1926: curated collection pages, sitemap-listed shells like the hubs
+    // (check-shells lints them and checks every tile link resolves).
+    if (rel.startsWith("collections/") && rel.endsWith("/index.html")) continue;
     if (!referenced.has(rel)) orphans.push(rel);
   }
   if (orphans.length > 0) {

@@ -505,6 +505,12 @@
    "match": "/mL",
    "family": "commercial brewing and distilling",
    "justification": "Brewery yeast management counts cells per milliliter -- a hemocytometer or cell counter reads cells/mL, and the customary pitch rates (0.75 ale, 1.5 lager) are defined in million cells per mL per degree Plato; US craft brewers and every yeast supplier use these units, and there is no US-customary form of either."
+  },
+  {
+   "module": "calc-reliefwater.js",
+   "match": "Drop volume (mL",
+   "family": "emergency drinking water disinfection",
+   "justification": "A dropper's volume is stated in milliliters on every US pharmacy and medicine dropper (0.05 mL is the pharmacopeial drop); the EPA table's drop is 1/96 tsp, which the label also states. There is no customary unit small enough to read a drop in."
   }
  ]
 }

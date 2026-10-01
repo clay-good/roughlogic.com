@@ -130790,6 +130790,943 @@
    "tile_id": "dry-hop-beer-loss", "source_publisher": "Project (first-principles)", "source_title": "Dry Hop Absorption and Beer Loss -- the spec-v1788 worked example, recomputed", "source_edition_or_year": "spec-v1788 of scope-trade-expansion-3, 2026-09-18", "source_section_or_page": "the brewery's measured absorption governs", "verified_by": "rl", "verified_on": "2026-09-18",
    "inputs": {"batch_volume_gal":310,"dry_hop_lb_per_bbl":2,"absorption_gal_per_lb":1,"package_gal":15.5,"revenue_per_package":175,"heavy_dry_hop_lb_per_bbl":4},
    "outputs": {"hop_weight_lb":{"value":20,"tolerance":{"pct":0.5}},"absorbed_gal":{"value":20,"tolerance":{"pct":0.5}},"loss_pct":{"value":6.451612903225806,"tolerance":{"pct":0.5}},"packages_lost":{"value":1.2903225806451613,"tolerance":{"pct":0.5}},"heavy_absorbed_gal":{"value":40,"tolerance":{"pct":0.5}},"heavy_loss_pct":{"value":12.903225806451612,"tolerance":{"pct":0.5}},"heavy_packages_lost":{"value":2.5806451612903225,"tolerance":{"pct":0.5}}}
+  },
+  {
+   "tile_id": "emergency-water-bleach-dose",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "55 gal drum of cloudy well water, 8.25% bleach, EPA table rate doubled",
+   "source_edition_or_year": "EPA Emergency Disinfection of Drinking Water table rates (read 2026-09-30)",
+   "source_section_or_page": "1 drop = 1/96 tsp as the table rows imply",
+   "verified_by": "rl",
+   "verified_on": "2026-09-30",
+   "inputs": {
+    "water_volume": 55,
+    "volume_unit": "gal",
+    "bleach_strength_pct": 8.25,
+    "water_condition": "cloudy",
+    "drop_volume_ml": 0.05134293326822917
+   },
+   "outputs": {
+    "base_drops": {
+     "value": 330,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "base_tsp": {
+     "value": 3.44,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "base_ml": {
+     "value": 16.9,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "base_dose_mg_l": {
+     "value": 6.7,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "applied_drops": {
+     "value": 660,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "applied_tsp": {
+     "value": 6.88,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "applied_ml": {
+     "value": 33.9,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "applied_dose_mg_l": {
+     "value": 13.4,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "table_counted_dose_mg_l": {
+     "value": 6.5,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "table_measured_dose_mg_l": {
+     "value": 9.8,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "table_measured_ratio": {
+     "value": 1.5,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "emergency-water-bleach-dose",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "55 gal drum, clear water, 6% bleach, base rate",
+   "source_edition_or_year": "EPA Emergency Disinfection of Drinking Water table rates (read 2026-09-30)",
+   "source_section_or_page": "8 drops per gallon of 6%",
+   "verified_by": "rl",
+   "verified_on": "2026-09-30",
+   "inputs": {
+    "water_volume": 55,
+    "volume_unit": "gal",
+    "bleach_strength_pct": 6,
+    "water_condition": "clear",
+    "drop_volume_ml": 0.05134293326822917
+   },
+   "outputs": {
+    "base_drops": {
+     "value": 440,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "base_tsp": {
+     "value": 4.58,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "double_tsp": {
+     "value": 9.17,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "base_dose_mg_l": {
+     "value": 6.5,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "boil-water-altitude",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Relief camp at 6,000 ft",
+   "source_edition_or_year": "U.S. Standard Atmosphere (1976); NIST WebBook Antoine constants for water; EPA and CDC boil guidance",
+   "source_section_or_page": "EPA 3 min above 5,000 ft, CDC above 6,500 ft",
+   "verified_by": "rl",
+   "verified_on": "2026-09-30",
+   "inputs": {
+    "elevation": 6000,
+    "elevation_unit": "ft"
+   },
+   "outputs": {
+    "pressure_kpa": {
+     "value": 81.2,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "pressure_psia": {
+     "value": 11.78,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "boiling_point_k": {
+     "value": 367.06,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "boiling_point_c": {
+     "value": 93.9,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "boiling_point_f": {
+     "value": 201,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "epa_boil_min": {
+     "value": 3,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "cdc_boil_min": {
+     "value": 1,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "recommended_boil_min": {
+     "value": 3,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "boil-water-altitude",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Sea level check that the constants are right",
+   "source_edition_or_year": "U.S. Standard Atmosphere (1976); NIST WebBook Antoine constants for water",
+   "source_section_or_page": "sea level reproduces 212.0 degF",
+   "verified_by": "rl",
+   "verified_on": "2026-09-30",
+   "inputs": {
+    "elevation": 0,
+    "elevation_unit": "ft"
+   },
+   "outputs": {
+    "pressure_kpa": {
+     "value": 101.325,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "boiling_point_f": {
+     "value": 212,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "epa_boil_min": {
+     "value": 1,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "cdc_boil_min": {
+     "value": 1,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "recommended_boil_min": {
+     "value": 1,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "boil-water-altitude",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "10,000 ft, both agencies at 3 minutes",
+   "source_edition_or_year": "U.S. Standard Atmosphere (1976); NIST WebBook Antoine constants for water",
+   "source_section_or_page": "elevation table row",
+   "verified_by": "rl",
+   "verified_on": "2026-09-30",
+   "inputs": {
+    "elevation": 10000,
+    "elevation_unit": "ft"
+   },
+   "outputs": {
+    "pressure_kpa": {
+     "value": 69.68,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "boiling_point_f": {
+     "value": 193.7,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "epa_boil_min": {
+     "value": 3,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "cdc_boil_min": {
+     "value": 3,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "contact-time-baffling",
+   "source_publisher": "U.S. EPA",
+   "source_title": "Disinfection Profiling and Benchmarking Technical Guidance Manual (EPA 815-R-20-003)",
+   "source_edition_or_year": "June 2020",
+   "source_section_or_page": "Section 4.4, Example 4-1, pp. 28-29 (printed with pi = 3.14 and 7.48 gal/ft3; 0.5% covers the rounding)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-30",
+   "inputs": {
+    "vessel_shape": "round",
+    "volume_gal": 0,
+    "diameter_ft": 40,
+    "length_ft": 0,
+    "width_ft": 0,
+    "min_depth_ft": 30,
+    "peak_flow_gpm": 347,
+    "baffling_condition": "unbaffled",
+    "custom_baffling_factor": 0,
+    "residual_mg_l": 0
+   },
+   "outputs": {
+    "vessel_volume_gal": {
+     "value": 282000,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "tdt_min": {
+     "value": 813,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "baffling_factor": {
+     "value": 0.1,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "t10_min": {
+     "value": 81.3,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "contact-time-baffling",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "20,000 gal pillow bladder, one inlet and one outlet, 50 gpm, 1.0 mg/L at the outlet",
+   "source_edition_or_year": "EPA 815-R-20-003 Table 4-2 factors",
+   "source_section_or_page": "poor baffling, 0.3",
+   "verified_by": "rl",
+   "verified_on": "2026-09-30",
+   "inputs": {
+    "vessel_shape": "volume",
+    "volume_gal": 20000,
+    "diameter_ft": 0,
+    "length_ft": 0,
+    "width_ft": 0,
+    "min_depth_ft": 0,
+    "peak_flow_gpm": 50,
+    "baffling_condition": "poor",
+    "custom_baffling_factor": 0,
+    "residual_mg_l": 1
+   },
+   "outputs": {
+    "tdt_min": {
+     "value": 400,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "t10_min": {
+     "value": 120,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "t_unbaffled_min": {
+     "value": 40,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "ct_mg_min_l": {
+     "value": 120,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "rtcr-coliform-samples",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Town of 15,000 with 2 TC-positive routine samples",
+   "source_edition_or_year": "40 CFR 141.857(b), 141.858, 141.859 (read at law.cornell.edu 2026-09-30)",
+   "source_section_or_page": "12,901-17,200 band; count rule",
+   "verified_by": "rl",
+   "verified_on": "2026-09-30",
+   "inputs": {
+    "population_served": 15000,
+    "tc_positive_count": 2,
+    "positive_repeat_count": 0,
+    "routine_samples_taken": 0
+   },
+   "outputs": {
+    "routine_samples_per_month": {
+     "value": 15,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "repeat_samples_required": {
+     "value": 6,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "ecoli_analyses_required": {
+     "value": 2,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "tc_positive_pct_routine": {
+     "value": 13.3,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "rtcr-coliform-samples",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "City of 45,000 with 3 TC-positive routine samples",
+   "source_edition_or_year": "40 CFR 141.857(b), 141.858, 141.859 (read at law.cornell.edu 2026-09-30)",
+   "source_section_or_page": "41,001-50,000 band; percentage rule",
+   "verified_by": "rl",
+   "verified_on": "2026-09-30",
+   "inputs": {
+    "population_served": 45000,
+    "tc_positive_count": 3,
+    "positive_repeat_count": 0,
+    "routine_samples_taken": 0
+   },
+   "outputs": {
+    "routine_samples_per_month": {
+     "value": 50,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "repeat_samples_required": {
+     "value": 9,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "ecoli_analyses_required": {
+     "value": 3,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "tc_positive_pct_routine": {
+     "value": 6,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "tc_positive_pct": {
+     "value": 5.08,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "solar-water-pump-sizing",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "NRCS ND Technical Note 1 example inputs: 1,000 gpd, 2.52 PSH, 150 ft TDH, 60% pump",
+   "source_edition_or_year": "USDA NRCS North Dakota Technical Note No. 1 (July 2017) Eq. 5.1, 7.1, 7.3, 7.5",
+   "source_section_or_page": "the note reads 310 W off its pump curve; these are the flat-efficiency results",
+   "verified_by": "rl",
+   "verified_on": "2026-09-30",
+   "inputs": {
+    "daily_demand_gpd": 1000,
+    "peak_sun_hours": 2.52,
+    "tdh_ft": 150,
+    "pump_efficiency": 0.6,
+    "panel_derate": 0.85,
+    "storage_days": 3
+   },
+   "outputs": {
+    "design_flow_gpm": {
+     "value": 6.61,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "pump_input_w": {
+     "value": 311.7,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "array_min_w": {
+     "value": 366.7,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "workload_m4": {
+     "value": 173.1,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "storage_gal": {
+     "value": 3000,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "solar-water-pump-sizing",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Field clinic well: 600 gpd, 4.5 PSH, 180 ft TDH, 45% DC pump",
+   "source_edition_or_year": "USDA NRCS North Dakota Technical Note No. 1 (July 2017)",
+   "source_section_or_page": "Eq. 5.1, 7.1, 7.3, 7.5",
+   "verified_by": "rl",
+   "verified_on": "2026-09-30",
+   "inputs": {
+    "daily_demand_gpd": 600,
+    "peak_sun_hours": 4.5,
+    "tdh_ft": 180,
+    "pump_efficiency": 0.45,
+    "panel_derate": 0.85,
+    "storage_days": 3
+   },
+   "outputs": {
+    "design_flow_gpm": {
+     "value": 2.22,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "pump_input_w": {
+     "value": 167.6,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "array_min_w": {
+     "value": 197.1,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "workload_m4": {
+     "value": 124.6,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "storage_gal": {
+     "value": 1800,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "first-flush-diverter",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "1,500 sq ft footprint to one downspout, 6 in standpipe",
+   "source_edition_or_year": "TWDB Texas Manual on Rainwater Harvesting, 3rd ed. (2005)",
+   "source_section_or_page": "Chapter 2, First-Flush Diverters",
+   "verified_by": "rl",
+   "verified_on": "2026-09-30",
+   "inputs": {
+    "roof_footprint_sqft": 1500,
+    "diversion_rate_gal_per_100sqft": 1,
+    "standpipe_diameter_in": 6
+   },
+   "outputs": {
+    "diversion_gal": {
+     "value": 15,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "minimum_rule_gal": {
+     "value": 15,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "rain_depth_in": {
+     "value": 0.016,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "in_per_gal": {
+     "value": 8.17,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "standpipe_length_in": {
+     "value": 122.5,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "standpipe_length_ft": {
+     "value": 10.2,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "high_rate_gal": {
+     "value": 30,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "high_length_ft": {
+     "value": 20.4,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "first-flush-diverter",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Same roof, 4 in standpipe",
+   "source_edition_or_year": "TWDB Texas Manual on Rainwater Harvesting, 3rd ed. (2005)",
+   "source_section_or_page": "Chapter 2, First-Flush Diverters",
+   "verified_by": "rl",
+   "verified_on": "2026-09-30",
+   "inputs": {
+    "roof_footprint_sqft": 1500,
+    "diversion_rate_gal_per_100sqft": 1,
+    "standpipe_diameter_in": 4
+   },
+   "outputs": {
+    "in_per_gal": {
+     "value": 18.38,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "standpipe_length_in": {
+     "value": 275.7,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "standpipe_length_ft": {
+     "value": 23,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "high_length_ft": {
+     "value": 46,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "lift-station-outage-storage",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "8 ft wet well, 3 ft to the lowest basement, 1,200 ft of 8 in sewer, 100 gpm, 105 min response, 8 h outage, 3,000 gal trucks",
+   "source_edition_or_year": "Ten States Standards Sections 47.1, 47.2, 47.433 (requirement named)",
+   "source_section_or_page": "mass balance",
+   "verified_by": "rl",
+   "verified_on": "2026-09-30",
+   "inputs": {
+    "wet_well_shape": "round",
+    "wet_well_diameter_ft": 8,
+    "wet_well_length_ft": 0,
+    "wet_well_width_ft": 0,
+    "storage_depth_ft": 3,
+    "sewer_length_ft": 1200,
+    "sewer_diameter_in": 8,
+    "inflow_gpm": 100,
+    "detection_min": 20,
+    "travel_min": 60,
+    "hookup_min": 25,
+    "outage_hr": 8,
+    "truck_capacity_gal": 3000
+   },
+   "outputs": {
+    "wet_well_gal": {
+     "value": 1128,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "sewer_gal": {
+     "value": 3133,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "storage_gal": {
+     "value": 4261,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "time_to_overflow_min": {
+     "value": 42.6,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "response_min": {
+     "value": 105,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "shortfall_gal": {
+     "value": 6239,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "truck_loads": {
+     "value": 15,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "osha-toilet-count",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Debris-removal contractor, 85 workers (construction)",
+   "source_edition_or_year": "29 CFR 1926.51(c)(1) Table D-1 (read at law.cornell.edu 2026-09-30)",
+   "source_section_or_page": "20 or more row, 1 per 40",
+   "verified_by": "rl",
+   "verified_on": "2026-09-30",
+   "inputs": {
+    "industry": "construction",
+    "worker_count": 85,
+    "used_by_women": "yes"
+   },
+   "outputs": {
+    "toilet_seats": {
+     "value": 3,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "urinals": {
+     "value": 3,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "osha-toilet-count",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Construction at the 200 line",
+   "source_edition_or_year": "29 CFR 1926.51(c)(1) Table D-1",
+   "source_section_or_page": "200 or more row, 1 per 50",
+   "verified_by": "rl",
+   "verified_on": "2026-09-30",
+   "inputs": {
+    "industry": "construction",
+    "worker_count": 200,
+    "used_by_women": "yes"
+   },
+   "outputs": {
+    "toilet_seats": {
+     "value": 4,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "urinals": {
+     "value": 4,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "osha-toilet-count",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Relief distribution warehouse, 230 employees, facilities not used by women",
+   "source_edition_or_year": "29 CFR 1910.141(c)(1)(i) Table J-1 and footnote 1 (read at law.cornell.edu 2026-09-30)",
+   "source_section_or_page": "over 150 row; 2/3 floor",
+   "verified_by": "rl",
+   "verified_on": "2026-09-30",
+   "inputs": {
+    "industry": "general",
+    "worker_count": 230,
+    "used_by_women": "no"
+   },
+   "outputs": {
+    "water_closets_min": {
+     "value": 8,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "water_closet_floor": {
+     "value": 6,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "urinals_substitutable": {
+     "value": 2,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "osha-toilet-count",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "45-person crew clearing storm-damaged orchards",
+   "source_edition_or_year": "29 CFR 1928.110(c)(2) (read at law.cornell.edu 2026-09-30)",
+   "source_section_or_page": "1 per 20 or fraction",
+   "verified_by": "rl",
+   "verified_on": "2026-09-30",
+   "inputs": {
+    "industry": "agriculture",
+    "worker_count": 45,
+    "used_by_women": "yes"
+   },
+   "outputs": {
+    "toilet_seats": {
+     "value": 3,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "handwash_facilities": {
+     "value": 3,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "responder-camp-sanitation",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Utility restoration camp, 90 men and 30 women, water under pressure",
+   "source_edition_or_year": "29 CFR 1910.142 (read at law.cornell.edu 2026-09-30)",
+   "source_section_or_page": "(b)(2), (c)(2), (c)(4), (d)(5), (d)(6), (f)(1)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-30",
+   "inputs": {
+    "men_count": 90,
+    "women_count": 30,
+    "pressure_water": "yes"
+   },
+   "outputs": {
+    "toilets_men": {
+     "value": 6,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "toilets_women": {
+     "value": 2,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "toilets_total": {
+     "value": 8,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "urinals": {
+     "value": 4,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "handwash_basins": {
+     "value": 20,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "showerheads": {
+     "value": 12,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "laundry_trays": {
+     "value": 4,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "drinking_fountains": {
+     "value": 2,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "water_gal_per_day": {
+     "value": 4200,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "average_gph": {
+     "value": 175,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "peak_gph": {
+     "value": 437.5,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "peak_gpm": {
+     "value": 7.29,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "sleeping_area_sqft": {
+     "value": 6000,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
   }
  ]
 }

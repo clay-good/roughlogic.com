@@ -56333,3 +56333,271 @@ test("bounds: batch-45 kitchen, earthwork and air quality -- NEC 220.56 floor, N
   assert.ok("error" in _b45gs({ emission_rate_lb_hr: 100, effective_height_ft: 300, wind_mph: 10, distance_mi: 100, stability_class: "A" }));
   assert.ok("error" in _b45od({ source_dt: 1000, airflow_acfm: 5000, dilution_factor: 0.5, limit_dt: 7, target_dt: 7 }));
 });
+
+// ===========================================================================
+// spec-v1879..v1887: disaster response emergency water and sanitation band (calc-reliefwater.js)
+// ===========================================================================
+
+// ===========================================================================
+// spec-v1879..v1887: the 2026-09-25 disaster-response program, band 1,
+// emergency water and sanitation (calc-reliefwater.js). Seven tiles keep group
+// "M"; the two sanitation-count tiles keep group "G".
+// ===========================================================================
+
+import { computeEmergencyWaterBleachDose as _v1879 } from "../../calc-reliefwater.js";
+test("bounds: spec-v1879 computeEmergencyWaterBleachDose pins the drum and the table's 1.5x row", () => {
+  const base = { water_volume: 55, volume_unit: "gal", bleach_strength_pct: 8.25, water_condition: "cloudy" };
+  const r = _v1879(base);
+  assert.strictEqual(r.drops_per_gal, 6);
+  assert.ok(Math.abs(r.base_drops - 330) < 1e-9);
+  assert.ok(Math.abs(r.base_tsp - 330 / 96) < 1e-9);
+  assert.ok(Math.abs(r.base_ml - 16.94) < 0.01);
+  assert.ok(Math.abs(r.base_dose_mg_l - 6.714) < 0.001);
+  assert.ok(Math.abs(r.applied_drops - 660) < 1e-9);
+  assert.ok(Math.abs(r.applied_tsp - 6.875) < 1e-9);
+  assert.ok(Math.abs(r.applied_dose_mg_l - 2 * r.base_dose_mg_l) < 1e-12);
+  assert.strictEqual(r.stand_min, 30);
+  assert.strictEqual(r.retest_min, 15);
+  // The finding: measuring the printed 1/4 tsp for 2 gal of 6% is exactly 1.5x the count.
+  assert.ok(Math.abs(r.table_measured_ratio - 1.5) < 1e-12);
+  assert.ok(Math.abs(r.table_counted_dose_mg_l - 6.51) < 0.01);
+  assert.ok(Math.abs(r.table_measured_dose_mg_l - 9.77) < 0.01);
+  // 6% bottle: 440 drops, 4.58 tsp base; the dose is the same as the table's counted row.
+  const six = _v1879({ ...base, bleach_strength_pct: 6, water_condition: "clear" });
+  assert.ok(Math.abs(six.base_drops - 440) < 1e-9);
+  assert.ok(Math.abs(six.applied_tsp - 440 / 96) < 1e-9);
+  assert.ok(Math.abs(six.double_tsp - 880 / 96) < 1e-9);
+  // Clear water is the base rate; quarts and litres convert.
+  assert.strictEqual(_v1879({ ...base, water_condition: "clear" }).applied_drops, 330);
+  assert.ok(Math.abs(_v1879({ ...base, water_volume: 4, volume_unit: "qt" }).base_drops - 6) < 1e-9);
+  assert.ok(Math.abs(_v1879({ ...base, water_volume: 3.785411784, volume_unit: "L" }).base_drops - 6) < 1e-9);
+  // Drops are linear in volume; the dose is independent of volume.
+  const dbl = _v1879({ ...base, water_volume: 110 });
+  assert.ok(Math.abs(dbl.base_drops - 2 * r.base_drops) < 1e-9);
+  assert.ok(Math.abs(dbl.base_dose_mg_l - r.base_dose_mg_l) < 1e-12);
+  // Error seams.
+  for (const bad of [{ water_volume: 0 }, { water_volume: -1 }, { bleach_strength_pct: 0 }, { bleach_strength_pct: 15.01 }, { drop_volume_ml: 0 }, { volume_unit: "bbl" }, { water_condition: "muddy" }, { water_volume: Infinity }, { bleach_strength_pct: NaN }]) {
+    assert.ok(_v1879({ ...base, ...bad }).error, JSON.stringify(bad));
+  }
+  assert.ok(!_v1879({ ...base, bleach_strength_pct: 15 }).error);
+});
+
+import { computeBoilWaterAltitude as _v1880 } from "../../calc-reliefwater.js";
+test("bounds: spec-v1880 computeBoilWaterAltitude pins the EPA/CDC split and 212 degF at sea level", () => {
+  const r = _v1880({ elevation: 6000, elevation_unit: "ft" });
+  assert.ok(Math.abs(r.pressure_kpa - 81.20) < 0.01);
+  assert.ok(Math.abs(r.pressure_psia - 11.78) < 0.01);
+  assert.ok(Math.abs(r.boiling_point_k - 367.06) < 0.01);
+  assert.ok(Math.abs(r.boiling_point_f - 201.04) < 0.01);
+  assert.strictEqual(r.epa_boil_min, 3);
+  assert.strictEqual(r.cdc_boil_min, 1);
+  assert.strictEqual(r.recommended_boil_min, 3);
+  assert.strictEqual(r.agencies_disagree, true);
+  const sea = _v1880({ elevation: 0 });
+  assert.ok(Math.abs(sea.boiling_point_f - 212) < 0.01);
+  assert.ok(Math.abs(sea.pressure_kpa - 101.325) < 1e-12);
+  // The lines are exclusive: at exactly 5,000 and 6,500 ft the lower rule still holds.
+  assert.strictEqual(_v1880({ elevation: 5000 }).epa_boil_min, 1);
+  assert.strictEqual(_v1880({ elevation: 5001 }).epa_boil_min, 3);
+  assert.strictEqual(_v1880({ elevation: 6500 }).cdc_boil_min, 1);
+  assert.strictEqual(_v1880({ elevation: 6501 }).cdc_boil_min, 3);
+  const high = _v1880({ elevation: 10000 });
+  assert.ok(Math.abs(high.boiling_point_f - 193.71) < 0.01);
+  assert.strictEqual(high.agencies_disagree, false);
+  // Metres convert exactly; the boiling point falls monotonically with elevation.
+  assert.ok(Math.abs(_v1880({ elevation: 1828.8, elevation_unit: "m" }).boiling_point_f - r.boiling_point_f) < 1e-9);
+  let prev = Infinity;
+  for (let h = -1500; h <= 20000; h += 500) { const bp = _v1880({ elevation: h }).boiling_point_f; assert.ok(bp < prev && Number.isFinite(bp)); prev = bp; }
+  for (const bad of [{ elevation: -1501 }, { elevation: 20001 }, { elevation: 7000, elevation_unit: "m" }, { elevation: 0, elevation_unit: "yd" }, { elevation: NaN }]) {
+    assert.ok(_v1880(bad).error, JSON.stringify(bad));
+  }
+});
+
+import { computeContactTimeBaffling as _v1881 } from "../../calc-reliefwater.js";
+test("bounds: spec-v1881 computeContactTimeBaffling reproduces EPA Example 4-1 and the bladder", () => {
+  const r = _v1881({ vessel_shape: "round", diameter_ft: 40, min_depth_ft: 30, peak_flow_gpm: 347, baffling_condition: "unbaffled" });
+  assert.ok(Math.abs(r.vessel_volume_gal - 282009) < 1);
+  assert.ok(Math.abs(r.tdt_min - 812.7) < 0.05);
+  assert.ok(Math.abs(r.t10_min - 81.27) < 0.01);
+  assert.strictEqual(r.has_residual, false);
+  assert.strictEqual(r.ct_mg_min_l, 0);
+  const bag = _v1881({ vessel_shape: "volume", volume_gal: 20000, peak_flow_gpm: 50, baffling_condition: "poor", residual_mg_l: 1 });
+  assert.ok(Math.abs(bag.tdt_min - 400) < 1e-9);
+  assert.ok(Math.abs(bag.t10_min - 120) < 1e-9);
+  assert.ok(Math.abs(bag.ct_mg_min_l - 120) < 1e-9);
+  assert.ok(Math.abs(bag.t_unbaffled_min - 40) < 1e-9);
+  assert.ok(Math.abs(bag.t_perfect_min - 400) < 1e-9);
+  // Rectangular volume and the custom factor; T is linear in the factor.
+  const rect = _v1881({ vessel_shape: "rectangular", length_ft: 10, width_ft: 10, min_depth_ft: 2.31, peak_flow_gpm: 1728, baffling_condition: "perfect" });
+  assert.ok(Math.abs(rect.t10_min - 1) < 1e-12);
+  assert.ok(Math.abs(_v1881({ volume_gal: 20000, peak_flow_gpm: 50, baffling_condition: "custom", custom_baffling_factor: 0.6 }).t10_min - 240) < 1e-9);
+  for (const bad of [{ volume_gal: 0, peak_flow_gpm: 50 }, { volume_gal: 100, peak_flow_gpm: 0 }, { vessel_shape: "round", diameter_ft: 0, min_depth_ft: 3, peak_flow_gpm: 5 }, { vessel_shape: "rectangular", length_ft: 5, width_ft: 0, min_depth_ft: 3, peak_flow_gpm: 5 }, { vessel_shape: "cone", peak_flow_gpm: 5 }, { volume_gal: 100, peak_flow_gpm: 5, baffling_condition: "custom", custom_baffling_factor: 0.09 }, { volume_gal: 100, peak_flow_gpm: 5, baffling_condition: "custom", custom_baffling_factor: 1.01 }, { volume_gal: 100, peak_flow_gpm: 5, baffling_condition: "great" }, { volume_gal: 100, peak_flow_gpm: 5, residual_mg_l: -0.1 }, { volume_gal: Infinity, peak_flow_gpm: 5 }]) {
+    assert.ok(_v1881(bad).error, JSON.stringify(bad));
+  }
+});
+
+import { computeRtcrColiformSamples as _v1882 } from "../../calc-reliefwater.js";
+test("bounds: spec-v1882 computeRtcrColiformSamples reads all 33 bands and both Level 1 rules", () => {
+  const town = _v1882({ population_served: 15000, tc_positive_count: 2 });
+  assert.strictEqual(town.routine_samples_per_month, 15);
+  assert.strictEqual(town.repeat_samples_required, 6);
+  assert.strictEqual(town.ecoli_analyses_required, 2);
+  assert.strictEqual(town.percent_basis, false);
+  assert.strictEqual(town.level1_triggered, true);
+  assert.ok(Math.abs(town.tc_positive_pct_routine - 40 / 3) < 1e-9);
+  const city = _v1882({ population_served: 45000, tc_positive_count: 3 });
+  assert.strictEqual(city.routine_samples_per_month, 50);
+  assert.strictEqual(city.repeat_samples_required, 9);
+  assert.strictEqual(city.percent_basis, true);
+  assert.strictEqual(city.level1_triggered, true);
+  assert.ok(Math.abs(city.tc_positive_pct_routine - 6) < 1e-12);
+  assert.ok(Math.abs(city.tc_positive_pct - 300 / 59) < 1e-12);
+  assert.strictEqual(_v1882({ population_served: 45000, tc_positive_count: 2 }).level1_triggered, false);
+  assert.strictEqual(_v1882({ population_served: 15000, tc_positive_count: 1 }).level1_triggered, false);
+  // Every band edge of 40 CFR 141.857(b), 33 rows.
+  const rows = [[2500, 2], [3300, 3], [4100, 4], [4900, 5], [5800, 6], [6700, 7], [7600, 8], [8500, 9], [12900, 10], [17200, 15], [21500, 20], [25000, 25], [33000, 30], [41000, 40], [50000, 50], [59000, 60], [70000, 70], [83000, 80], [96000, 90], [130000, 100], [220000, 120], [320000, 150], [450000, 180], [600000, 210], [780000, 240], [970000, 270], [1230000, 300], [1520000, 330], [1850000, 360], [2270000, 390], [3020000, 420], [3960000, 450]];
+  let lower = 1001;
+  for (const [upper, n] of rows) {
+    assert.strictEqual(_v1882({ population_served: lower }).routine_samples_per_month, n, "at " + lower);
+    assert.strictEqual(_v1882({ population_served: upper }).routine_samples_per_month, n, "at " + upper);
+    lower = upper + 1;
+  }
+  assert.strictEqual(_v1882({ population_served: 3960001 }).routine_samples_per_month, 480);
+  assert.strictEqual(_v1882({ population_served: 50000000 }).routine_samples_per_month, 480);
+  // 1,000 or fewer: a routing note, not a count and not an error.
+  const small = _v1882({ population_served: 1000, tc_positive_count: 0 });
+  assert.strictEqual(small.applies, false);
+  assert.ok(!small.error && small.routing.includes("141.854"));
+  for (const bad of [{ population_served: 0 }, { population_served: 1500.5 }, { population_served: 5000, tc_positive_count: -1 }, { population_served: 5000, tc_positive_count: 7 }, { population_served: 5000, tc_positive_count: 1, positive_repeat_count: 4 }, { population_served: 5000, routine_samples_taken: -1 }, { population_served: NaN }]) {
+    assert.ok(_v1882(bad).error, JSON.stringify(bad));
+  }
+});
+
+import { computeSolarWaterPumpSizing as _v1883 } from "../../calc-reliefwater.js";
+test("bounds: spec-v1883 computeSolarWaterPumpSizing pins the NRCS inputs and the workload screen", () => {
+  const base = { daily_demand_gpd: 1000, peak_sun_hours: 2.52, tdh_ft: 150, pump_efficiency: 0.6, panel_derate: 0.85, storage_days: 3 };
+  const r = _v1883(base);
+  assert.ok(Math.abs(r.design_flow_gpm - 6.614) < 0.001);
+  assert.ok(Math.abs(r.pump_input_w - 311.6) < 0.1);
+  assert.ok(Math.abs(r.array_min_w - 366.6) < 0.1);
+  assert.ok(Math.abs(r.workload_m4 - 173.07) < 0.01);
+  assert.strictEqual(r.storage_gal, 3000);
+  const clinic = _v1883({ ...base, daily_demand_gpd: 600, peak_sun_hours: 4.5, tdh_ft: 180, pump_efficiency: 0.45 });
+  assert.ok(Math.abs(clinic.array_min_w - 197.08) < 0.01);
+  assert.ok(Math.abs(clinic.workload_m4 - 124.61) < 0.01);
+  // Array is linear in head and inverse in sun hours and efficiency.
+  assert.ok(Math.abs(_v1883({ ...base, tdh_ft: 300 }).array_min_w - 2 * r.array_min_w) < 1e-9);
+  assert.ok(Math.abs(_v1883({ ...base, peak_sun_hours: 5.04 }).array_min_w - r.array_min_w / 2) < 1e-9);
+  assert.ok(_v1883({ ...base, daily_demand_gpd: 3000, tdh_ft: 1000 }).suitability.startsWith("generally NOT"));
+  assert.ok(_v1883({ ...base, daily_demand_gpd: 3000, tdh_ft: 500 }).suitability.startsWith("marginal"));
+  for (const bad of [{ daily_demand_gpd: 0 }, { peak_sun_hours: 0 }, { peak_sun_hours: 25 }, { tdh_ft: 0 }, { pump_efficiency: 0 }, { pump_efficiency: 1.01 }, { panel_derate: 0 }, { panel_derate: 1.01 }, { storage_days: -1 }, { tdh_ft: Infinity }]) {
+    assert.ok(_v1883({ ...base, ...bad }).error, JSON.stringify(bad));
+  }
+});
+
+import { computeFirstFlushDiverter as _v1884 } from "../../calc-reliefwater.js";
+test("bounds: spec-v1884 computeFirstFlushDiverter pins 15 gal and the standpipe lengths", () => {
+  const r = _v1884({ roof_footprint_sqft: 1500, diversion_rate_gal_per_100sqft: 1, standpipe_diameter_in: 6 });
+  assert.ok(Math.abs(r.diversion_gal - 15) < 1e-12);
+  assert.ok(Math.abs(r.minimum_rule_gal - r.low_rate_gal) < 1e-12);
+  assert.ok(Math.abs(r.rain_depth_in - 231 / 14400) < 1e-12);
+  assert.ok(Math.abs(r.in_per_gal - 8.17) < 0.001);
+  assert.ok(Math.abs(r.standpipe_length_ft - 10.21) < 0.01);
+  assert.ok(Math.abs(r.high_length_ft - 20.42) < 0.01);
+  const four = _v1884({ roof_footprint_sqft: 1500, diversion_rate_gal_per_100sqft: 2, standpipe_diameter_in: 4 });
+  assert.ok(Math.abs(four.standpipe_length_ft - 45.96) < 0.01);
+  assert.ok(Math.abs(four.low_length_ft - 22.98) < 0.01);
+  assert.ok(Math.abs(_v1884({ roof_footprint_sqft: 1500, standpipe_diameter_in: 3 }).in_per_gal - 32.68) < 0.01);
+  // Length scales as 1/d^2; depth is independent of footprint.
+  assert.ok(Math.abs(_v1884({ roof_footprint_sqft: 1500, standpipe_diameter_in: 12 }).standpipe_length_in - r.standpipe_length_in / 4) < 1e-9);
+  assert.ok(Math.abs(_v1884({ roof_footprint_sqft: 3000 }).rain_depth_in - r.rain_depth_in) < 1e-15);
+  assert.strictEqual(_v1884({ roof_footprint_sqft: 1500, diversion_rate_gal_per_100sqft: 0.5 }).in_range, false);
+  for (const bad of [{ roof_footprint_sqft: 0 }, { roof_footprint_sqft: 100, diversion_rate_gal_per_100sqft: 0 }, { roof_footprint_sqft: 100, standpipe_diameter_in: 0 }, { roof_footprint_sqft: NaN }]) {
+    assert.ok(_v1884(bad).error, JSON.stringify(bad));
+  }
+});
+
+import { computeLiftStationOutageStorage as _v1885 } from "../../calc-reliefwater.js";
+test("bounds: spec-v1885 computeLiftStationOutageStorage pins 42.6 min, the shortfall, and 15 loads", () => {
+  const base = { wet_well_shape: "round", wet_well_diameter_ft: 8, storage_depth_ft: 3, sewer_length_ft: 1200, sewer_diameter_in: 8, inflow_gpm: 100, detection_min: 20, travel_min: 60, hookup_min: 25, outage_hr: 8, truck_capacity_gal: 3000 };
+  const r = _v1885(base);
+  assert.ok(Math.abs(r.wet_well_gal - 1128.0) < 0.1);
+  assert.ok(Math.abs(r.sewer_gal - 3133.4) < 0.1);
+  assert.ok(Math.abs(r.time_to_overflow_min - 42.61) < 0.01);
+  assert.strictEqual(r.response_min, 105);
+  assert.strictEqual(r.response_wins, false);
+  assert.ok(Math.abs(r.shortfall_gal - 6238.5) < 0.1);
+  assert.strictEqual(r.truck_loads, 15);
+  assert.ok(r.sewer_share_pct > 73 && r.sewer_share_pct < 74);
+  // A fast crew wins and the shortfall is zero; a short outage within storage needs no truck.
+  const fast = _v1885({ ...base, travel_min: 10, hookup_min: 10 });
+  assert.strictEqual(fast.response_wins, true);
+  assert.strictEqual(fast.shortfall_gal, 0);
+  assert.strictEqual(_v1885({ ...base, outage_hr: 0.5 }).truck_loads, 0);
+  // Rectangular well of equal area gives equal storage; time is inverse in inflow.
+  assert.ok(Math.abs(_v1885({ ...base, wet_well_shape: "rectangular", wet_well_length_ft: Math.PI * 16, wet_well_width_ft: 1 }).storage_gal - r.storage_gal) < 1e-9);
+  assert.ok(Math.abs(_v1885({ ...base, inflow_gpm: 200 }).time_to_overflow_min - r.time_to_overflow_min / 2) < 1e-9);
+  assert.ok(!_v1885({ ...base, storage_depth_ft: 0, sewer_length_ft: 0, sewer_diameter_in: 0 }).error);
+  for (const bad of [{ wet_well_diameter_ft: 0 }, { wet_well_shape: "rectangular", wet_well_length_ft: 5, wet_well_width_ft: 0 }, { wet_well_shape: "oval" }, { storage_depth_ft: -1 }, { sewer_length_ft: -1 }, { sewer_diameter_in: 0 }, { inflow_gpm: 0 }, { travel_min: -1 }, { outage_hr: -1 }, { truck_capacity_gal: 0 }, { inflow_gpm: Infinity }]) {
+    assert.ok(_v1885({ ...base, ...bad }).error, JSON.stringify(bad));
+  }
+});
+
+import { computeOshaToiletCount as _v1886 } from "../../calc-reliefwater.js";
+test("bounds: spec-v1886 computeOshaToiletCount pins three tables and the D-1 step down at 200", () => {
+  const c85 = _v1886({ industry: "construction", worker_count: 85 });
+  assert.strictEqual(c85.toilet_seats, 3);
+  assert.strictEqual(c85.urinals, 3);
+  assert.strictEqual(_v1886({ industry: "construction", worker_count: 199 }).toilet_seats, 5);
+  const c200 = _v1886({ industry: "construction", worker_count: 200 });
+  assert.strictEqual(c200.toilet_seats, 4);
+  assert.ok(c200.boundary_note.includes("steps DOWN"));
+  assert.strictEqual(_v1886({ industry: "construction", worker_count: 19 }).urinals, 0);
+  const c20 = _v1886({ industry: "construction", worker_count: 20 });
+  assert.strictEqual(c20.urinals, 1);
+  assert.ok(c20.boundary_note.includes("overlap"));
+  const g230 = _v1886({ industry: "general", worker_count: 230, used_by_women: "no" });
+  assert.strictEqual(g230.water_closets_min, 8);
+  assert.strictEqual(g230.water_closet_floor, 6);
+  assert.strictEqual(g230.urinals_substitutable, 2);
+  assert.strictEqual(_v1886({ industry: "general", worker_count: 230 }).urinals_substitutable, 0);
+  // Every Table J-1 edge.
+  for (const [n, wc] of [[1, 1], [15, 1], [16, 2], [35, 2], [36, 3], [55, 3], [56, 4], [80, 4], [81, 5], [110, 5], [111, 6], [150, 6], [151, 7], [190, 7], [191, 8]]) {
+    assert.strictEqual(_v1886({ industry: "general", worker_count: n }).water_closets_min, wc, "J-1 at " + n);
+  }
+  const a45 = _v1886({ industry: "agriculture", worker_count: 45 });
+  assert.strictEqual(a45.toilet_seats, 3);
+  assert.strictEqual(a45.handwash_facilities, 3);
+  assert.strictEqual(_v1886({ industry: "agriculture", worker_count: 10 }).toilet_seats, 0);
+  assert.strictEqual(_v1886({ industry: "agriculture", worker_count: 11 }).toilet_seats, 1);
+  for (const bad of [{ worker_count: 0 }, { worker_count: 2.5 }, { worker_count: 10, industry: "mining" }, { worker_count: 10, used_by_women: "maybe" }, { worker_count: NaN }]) {
+    assert.ok(_v1886({ industry: "construction", ...bad }).error, JSON.stringify(bad));
+  }
+});
+
+import { computeResponderCampSanitation as _v1887 } from "../../calc-reliefwater.js";
+test("bounds: spec-v1887 computeResponderCampSanitation pins the camp and the per-sex minimum", () => {
+  const r = _v1887({ men_count: 90, women_count: 30, pressure_water: "yes" });
+  assert.strictEqual(r.toilets_men, 6);
+  assert.strictEqual(r.toilets_women, 2);
+  assert.strictEqual(r.toilets_total, 8);
+  assert.strictEqual(r.urinals, 4);
+  assert.strictEqual(r.handwash_basins, 20);
+  assert.strictEqual(r.showerheads, 12);
+  assert.strictEqual(r.laundry_trays, 4);
+  assert.strictEqual(r.drinking_fountains, 2);
+  assert.strictEqual(r.water_gal_per_day, 4200);
+  assert.ok(Math.abs(r.peak_gph - 437.5) < 1e-12);
+  assert.ok(Math.abs(r.peak_gpm - 437.5 / 60) < 1e-12);
+  assert.strictEqual(r.sleeping_area_sqft, 6000);
+  // The minimum sets the small side: 100 men and 5 women need 9, not 7.
+  const lop = _v1887({ men_count: 100, women_count: 5 });
+  assert.strictEqual(lop.toilets_total, 9);
+  assert.strictEqual(lop.whole_camp_ratio, 7);
+  assert.strictEqual(_v1887({ men_count: 90, women_count: 10 }).toilets_women, 2);
+  assert.strictEqual(_v1887({ men_count: 40, women_count: 0 }).toilets_women, 0);
+  assert.strictEqual(_v1887({ men_count: 90, women_count: 30, pressure_water: "no" }).drinking_fountains, 0);
+  for (const bad of [{ men_count: -1, women_count: 5 }, { men_count: 5, women_count: -1 }, { men_count: 0, women_count: 0 }, { men_count: 5, pressure_water: "maybe" }, { men_count: NaN }]) {
+    assert.ok(_v1887(bad).error, JSON.stringify(bad));
+  }
+});

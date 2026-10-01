@@ -1860,5 +1860,11 @@ export const TOOL_MODULES = (() => {
     "wire-rope-clips", "crane-load-radius-boom", "reeving-parts-of-line",
     "guy-wire-tension", "crane-power-line-clearance",
   ]);
+  // spec-v1879..v1887: disaster response emergency water and sanitation band.
+  declare("./calc-reliefwater.js", "RELIEFWATER_RENDERERS", [
+    "emergency-water-bleach-dose", "boil-water-altitude", "contact-time-baffling",
+    "rtcr-coliform-samples", "solar-water-pump-sizing", "first-flush-diverter",
+    "lift-station-outage-storage", "osha-toilet-count", "responder-camp-sanitation",
+  ]);
   return map;
 })();

@@ -1431,6 +1431,16 @@ const _TILES = [
   ["packaging-yield-loss", "O"],
   ["mash-tun-grain-bed", "O"],
   ["dry-hop-beer-loss", "O"],
+  // spec-v1879..v1887 disaster response emergency water and sanitation band.
+  ["emergency-water-bleach-dose", "M"],
+  ["boil-water-altitude", "M"],
+  ["contact-time-baffling", "M"],
+  ["rtcr-coliform-samples", "M"],
+  ["solar-water-pump-sizing", "M"],
+  ["first-flush-diverter", "M"],
+  ["lift-station-outage-storage", "M"],
+  ["osha-toilet-count", "G"],
+  ["responder-camp-sanitation", "G"],
 ];
 
 

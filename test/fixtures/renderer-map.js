@@ -2191,4 +2191,13 @@ export const RENDERER_MAP = {
   "reeving-parts-of-line": { module: "../../calc-riggingfield.js", exportName: "RIGGINGFIELD_RENDERERS" },
   "guy-wire-tension": { module: "../../calc-riggingfield.js", exportName: "RIGGINGFIELD_RENDERERS" },
   "crane-power-line-clearance": { module: "../../calc-riggingfield.js", exportName: "RIGGINGFIELD_RENDERERS" },
+  "emergency-water-bleach-dose": { module: "../../calc-reliefwater.js", exportName: "RELIEFWATER_RENDERERS" },
+  "boil-water-altitude": { module: "../../calc-reliefwater.js", exportName: "RELIEFWATER_RENDERERS" },
+  "contact-time-baffling": { module: "../../calc-reliefwater.js", exportName: "RELIEFWATER_RENDERERS" },
+  "rtcr-coliform-samples": { module: "../../calc-reliefwater.js", exportName: "RELIEFWATER_RENDERERS" },
+  "solar-water-pump-sizing": { module: "../../calc-reliefwater.js", exportName: "RELIEFWATER_RENDERERS" },
+  "first-flush-diverter": { module: "../../calc-reliefwater.js", exportName: "RELIEFWATER_RENDERERS" },
+  "lift-station-outage-storage": { module: "../../calc-reliefwater.js", exportName: "RELIEFWATER_RENDERERS" },
+  "osha-toilet-count": { module: "../../calc-reliefwater.js", exportName: "RELIEFWATER_RENDERERS" },
+  "responder-camp-sanitation": { module: "../../calc-reliefwater.js", exportName: "RELIEFWATER_RENDERERS" },
 };

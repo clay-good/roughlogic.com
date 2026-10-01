@@ -2,100 +2,100 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "d426ba69def8131f",
-      "date": "2026-09-30"
+      "sha": "e97fcd31554cf198",
+      "date": "2026-10-01"
     },
     "/tools/": {
-      "sha": "cd107190a543849f",
-      "date": "2026-09-30"
+      "sha": "6277b1868dadb4c0",
+      "date": "2026-10-01"
     },
     "/collections/disaster-response/": {
-      "sha": "0a2d21d15696b29c",
-      "date": "2026-09-30"
+      "sha": "5698cebcf7e9519b",
+      "date": "2026-10-01"
     },
     "/groups/accounting/": {
-      "sha": "eff1d3219407ffc2",
-      "date": "2026-09-26"
+      "sha": "8f43bd1c2b3cbb49",
+      "date": "2026-10-01"
     },
     "/groups/agriculture/": {
-      "sha": "f09fbb57121c6362",
-      "date": "2026-09-25"
+      "sha": "a04ee10126b5ff52",
+      "date": "2026-10-01"
     },
     "/groups/construction/": {
-      "sha": "914db722cbf97606",
-      "date": "2026-09-26"
+      "sha": "e7ea72a56f078d52",
+      "date": "2026-10-01"
     },
     "/groups/cross-trade/": {
-      "sha": "27bdaea9afb010ca",
-      "date": "2026-09-18"
+      "sha": "33f1ff3f95b1490d",
+      "date": "2026-10-01"
     },
     "/groups/educators/": {
-      "sha": "e75f27a857044b00",
-      "date": "2026-09-18"
+      "sha": "8655bdb3411139bf",
+      "date": "2026-10-01"
     },
     "/groups/electrical/": {
-      "sha": "c796c107a1901155",
-      "date": "2026-09-26"
+      "sha": "c076a0e1653a4699",
+      "date": "2026-10-01"
     },
     "/groups/field/": {
-      "sha": "a12d41e8f437d804",
-      "date": "2026-09-18"
+      "sha": "703be397264af530",
+      "date": "2026-10-01"
     },
     "/groups/fire-ground/": {
-      "sha": "5bfa582a3d9f42c3",
-      "date": "2026-09-25"
+      "sha": "0947f233d18f12c3",
+      "date": "2026-10-01"
     },
     "/groups/historical/": {
-      "sha": "f684977ded26381d",
-      "date": "2026-09-18"
+      "sha": "16a170e840402959",
+      "date": "2026-10-01"
     },
     "/groups/hvac/": {
-      "sha": "d646e437dcb2209e",
-      "date": "2026-09-26"
+      "sha": "790c6a621e2d5153",
+      "date": "2026-10-01"
     },
     "/groups/kitchen/": {
-      "sha": "7230950d03793989",
-      "date": "2026-09-18"
+      "sha": "13ab78cc5ae70b6e",
+      "date": "2026-10-01"
     },
     "/groups/lab/": {
-      "sha": "371818b547bf4247",
-      "date": "2026-09-18"
+      "sha": "002dc5c158b823fb",
+      "date": "2026-10-01"
     },
     "/groups/mechanic/": {
-      "sha": "4d6288078f2d9f71",
-      "date": "2026-09-19"
+      "sha": "e613559105e1f482",
+      "date": "2026-10-01"
     },
     "/groups/plumbing/": {
-      "sha": "60af6bf758427094",
-      "date": "2026-09-26"
+      "sha": "fd54feccef460926",
+      "date": "2026-10-01"
     },
     "/groups/real-estate/": {
-      "sha": "001ba823b2b55944",
-      "date": "2026-09-18"
+      "sha": "609b97243c9b34dd",
+      "date": "2026-10-01"
     },
     "/groups/references/": {
-      "sha": "0962e5c151e23752",
-      "date": "2026-09-18"
+      "sha": "01fe52269a55d3aa",
+      "date": "2026-10-01"
     },
     "/groups/restoration/": {
-      "sha": "08d979534ad6eb62",
-      "date": "2026-09-25"
+      "sha": "68f899280f62aa69",
+      "date": "2026-10-01"
     },
     "/groups/rigging-and-heavy-lift/": {
-      "sha": "c2c39e40c5a86dc1",
-      "date": "2026-09-18"
+      "sha": "df3c456533d2c7b0",
+      "date": "2026-10-01"
     },
     "/groups/stage/": {
-      "sha": "c803abe582c7d2a6",
-      "date": "2026-09-18"
+      "sha": "84800abef29f9368",
+      "date": "2026-10-01"
     },
     "/groups/trucking/": {
-      "sha": "0d21c4996f157591",
-      "date": "2026-09-18"
+      "sha": "a3a916765eeef2ab",
+      "date": "2026-10-01"
     },
     "/groups/water/": {
-      "sha": "89f2df845c75ac76",
-      "date": "2026-09-26"
+      "sha": "01b65b14a2e6337a",
+      "date": "2026-10-01"
     },
     "/tools/aav-install-check/": {
       "sha": "6ec55d7604fdc163",
@@ -700,6 +700,10 @@
     "/tools/bod-tss-loading-removal/": {
       "sha": "49a1f041279bc8b8",
       "date": "2026-09-29"
+    },
+    "/tools/boil-water-altitude/": {
+      "sha": "6f09efc571976442",
+      "date": "2026-10-01"
     },
     "/tools/boiler-horsepower/": {
       "sha": "905046baae2210a6",
@@ -1729,6 +1733,10 @@
       "sha": "422b52664cc1c077",
       "date": "2026-09-29"
     },
+    "/tools/contact-time-baffling/": {
+      "sha": "f9ec13fad7527cf9",
+      "date": "2026-10-01"
+    },
     "/tools/containment-air-balance/": {
       "sha": "03a2415a6d38bd55",
       "date": "2026-09-29"
@@ -2589,6 +2597,10 @@
       "sha": "d41533c680cc848e",
       "date": "2026-09-29"
     },
+    "/tools/emergency-water-bleach-dose/": {
+      "sha": "c6b0fb52c24ed104",
+      "date": "2026-10-01"
+    },
     "/tools/employer-payroll-tax/": {
       "sha": "eab8ce8310f4744f",
       "date": "2026-09-29"
@@ -2874,8 +2886,8 @@
       "date": "2026-09-29"
     },
     "/tools/filter-loading/": {
-      "sha": "730ae3bf45f08877",
-      "date": "2026-09-29"
+      "sha": "7e5b36b3208f9111",
+      "date": "2026-10-01"
     },
     "/tools/filter-pressure-drop/": {
       "sha": "4d0e699ffabaac4d",
@@ -2924,6 +2936,10 @@
     "/tools/firewood-cord/": {
       "sha": "936373228568bac4",
       "date": "2026-09-29"
+    },
+    "/tools/first-flush-diverter/": {
+      "sha": "7c7a4ca063bbc4ab",
+      "date": "2026-10-01"
     },
     "/tools/fix-flip-profit/": {
       "sha": "814902b06f15770b",
@@ -4165,6 +4181,10 @@
       "sha": "ab6f705309461992",
       "date": "2026-09-29"
     },
+    "/tools/lift-station-outage-storage/": {
+      "sha": "15b407716f2c883e",
+      "date": "2026-10-01"
+    },
     "/tools/lifting-lug-design/": {
       "sha": "203581349be2ff5b",
       "date": "2026-09-29"
@@ -4370,8 +4390,8 @@
       "date": "2026-09-30"
     },
     "/tools/main-flushing-volume/": {
-      "sha": "7c50e5ddd1a66a2c",
-      "date": "2026-09-30"
+      "sha": "365622607786dc93",
+      "date": "2026-10-01"
     },
     "/tools/maintenance-reserve/": {
       "sha": "13189f235145c101",
@@ -4976,6 +4996,10 @@
     "/tools/osha-recordkeeping/": {
       "sha": "bdd671f8b1673eb4",
       "date": "2026-09-29"
+    },
+    "/tools/osha-toilet-count/": {
+      "sha": "19d4564eb700c36d",
+      "date": "2026-10-01"
     },
     "/tools/osha-top10/": {
       "sha": "46574a69e911d989",
@@ -5682,8 +5706,8 @@
       "date": "2026-09-29"
     },
     "/tools/pump-eff-w2w/": {
-      "sha": "014a8fbb6f8c57be",
-      "date": "2026-09-29"
+      "sha": "e41693a257e8efbd",
+      "date": "2026-10-01"
     },
     "/tools/pump-impeller-trim/": {
       "sha": "550d1867850c8a3a",
@@ -6173,6 +6197,10 @@
       "sha": "5da1ca03133a7189",
       "date": "2026-09-29"
     },
+    "/tools/responder-camp-sanitation/": {
+      "sha": "267246e6e1ab3f3b",
+      "date": "2026-10-01"
+    },
     "/tools/restrained-pipe-length/": {
       "sha": "f7b78d7eedac1a2e",
       "date": "2026-09-29"
@@ -6364,6 +6392,10 @@
     "/tools/rt-restricted-area/": {
       "sha": "a43198c016531623",
       "date": "2026-09-29"
+    },
+    "/tools/rtcr-coliform-samples/": {
+      "sha": "c5bd975e1e2342bf",
+      "date": "2026-10-01"
     },
     "/tools/rtd-resistance-to-temp/": {
       "sha": "27ef8476c5b65afd",
@@ -7044,6 +7076,10 @@
     "/tools/solar-times/": {
       "sha": "b4bd662c3858bfac",
       "date": "2026-09-29"
+    },
+    "/tools/solar-water-pump-sizing/": {
+      "sha": "db5789508f313c13",
+      "date": "2026-10-01"
     },
     "/tools/solder-joint-quantity/": {
       "sha": "beb065a336b9113e",
@@ -8258,8 +8294,8 @@
       "date": "2026-09-30"
     },
     "/tools/uv-required-exposure/": {
-      "sha": "a6da0b32199981aa",
-      "date": "2026-09-29"
+      "sha": "77d9278e9a1ab35d",
+      "date": "2026-10-01"
     },
     "/tools/va-alkalinity-ratio/": {
       "sha": "7053ee4d61498825",
@@ -8582,8 +8618,8 @@
       "date": "2026-09-29"
     },
     "/tools/well-casing-purge-volume/": {
-      "sha": "e275522ad1a7d9a5",
-      "date": "2026-09-30"
+      "sha": "d97572f0f236fb99",
+      "date": "2026-10-01"
     },
     "/tools/well-decline-reserves/": {
       "sha": "19fe7a5a20b158cf",
@@ -8610,8 +8646,8 @@
       "date": "2026-09-29"
     },
     "/tools/wet-well-cycle-time/": {
-      "sha": "162aa87c1c53a89c",
-      "date": "2026-09-30"
+      "sha": "891d112a29246cbc",
+      "date": "2026-10-01"
     },
     "/tools/wh-expansion-tank/": {
       "sha": "ad583c1721172b92",

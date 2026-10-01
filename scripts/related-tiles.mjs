@@ -2331,6 +2331,15 @@ const RELATED = {
   "packaging-yield-loss": ["keg-yield","dry-hop-beer-loss","carbonation-volumes-pressure"],
   "mash-tun-grain-bed": ["mash-strike-water","brewhouse-efficiency","sparge-water-volume"],
   "dry-hop-beer-loss": ["packaging-yield-loss","ibu-tinseth","keg-yield"],
+  "emergency-water-bleach-dose": ["well-shock-chlorination","kitchen-sanitizer-ppm","chlorine-demand","boil-water-altitude","main-disinfection-chlorine"],
+  "boil-water-altitude": ["emergency-water-bleach-dose","rtcr-coliform-samples","disinfection-ct"],
+  "contact-time-baffling": ["disinfection-ct","chlorine-demand","chlorine-decay","emergency-water-bleach-dose"],
+  "rtcr-coliform-samples": ["boil-water-altitude","main-disinfection-chlorine","disinfection-ct"],
+  "solar-water-pump-sizing": ["pump-tdh","friction-loss","well-drawdown","pv-array-sizing","cistern-storage-days"],
+  "first-flush-diverter": ["rainwater-yield","rainwater-catchment-area","cistern-storage-days"],
+  "lift-station-outage-storage": ["wet-well-cycle-time","sump-basin-sizing","generator-fuel-runtime","generator-motor-starting","pump-tdh"],
+  "osha-toilet-count": ["plumbing-fixture-count","responder-camp-sanitation","heat-stress"],
+  "responder-camp-sanitation": ["osha-toilet-count","cistern-storage-days","generator-sizing","drinking-fountain-check"],
 };
 
 export { RELATED };

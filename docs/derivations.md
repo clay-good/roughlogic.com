@@ -3272,6 +3272,15 @@ cross-check.
 | calc-refrigeration.js | `computeRefrigerationReliefCapacity` | `{ vessel_diameter_ft = 0, vessel_length_ft = 0, f_constant = 0, valve_rated_l...` | _ | _ | _ |
 | calc-refrigeration.js | `computeSecondaryGlycolLoop` | `{ load_btuh = 0, delta_t_f = 0, glycol_cp = 1, glycol_sg = 1, head_ft = 0, pu...` | _ | _ | _ |
 | calc-refrigeration.js | `computeTwoStageInterstagePressure` | `{ low_psig = 0, high_psig = 0, intermediate_load_psig = 0 } = {}` | _ | _ | _ |
+| calc-reliefwater.js | `computeBoilWaterAltitude` | `{ elevation = 0, elevation_unit = "ft" } = {}` | _ | _ | _ |
+| calc-reliefwater.js | `computeContactTimeBaffling` | `{ vessel_shape = "volume", volume_gal = 0, diameter_ft = 0, length_ft = 0, wi...` | _ | _ | _ |
+| calc-reliefwater.js | `computeEmergencyWaterBleachDose` | `{ water_volume = 0, volume_unit = "gal", bleach_strength_pct = 8.25, water_co...` | _ | _ | _ |
+| calc-reliefwater.js | `computeFirstFlushDiverter` | `{ roof_footprint_sqft = 0, diversion_rate_gal_per_100sqft = 1, standpipe_diam...` | _ | _ | _ |
+| calc-reliefwater.js | `computeLiftStationOutageStorage` | `{ wet_well_shape = "round", wet_well_diameter_ft = 0, wet_well_length_ft = 0,...` | _ | _ | _ |
+| calc-reliefwater.js | `computeOshaToiletCount` | `{ industry = "construction", worker_count = 0, used_by_women = "yes" } = {}` | _ | _ | _ |
+| calc-reliefwater.js | `computeResponderCampSanitation` | `{ men_count = 0, women_count = 0, pressure_water = "yes" } = {}` | _ | _ | _ |
+| calc-reliefwater.js | `computeRtcrColiformSamples` | `{ population_served = 0, tc_positive_count = 0, positive_repeat_count = 0, ro...` | _ | _ | _ |
+| calc-reliefwater.js | `computeSolarWaterPumpSizing` | `{ daily_demand_gpd = 0, peak_sun_hours = 0, tdh_ft = 0, pump_efficiency = 0, ...` | _ | _ | _ |
 | calc-rescue.js | `computeConfinedSpacePurge` | `{ volume_ft3 = 0, blower_cfm = 0, target_purges = 7 }` | _ | _ | _ |
 | calc-rescue.js | `computeFallArrestAnchorage` | `{ workers_attached = 1, anchorage_capacity_lb = 0, design_route = "prescripti...` | _ | _ | _ |
 | calc-rescue.js | `computeFallArrestClearance` | `{ free_fall_distance_ft = 0, deceleration_distance_ft = 0, worker_height_ft =...` | _ | _ | _ |
@@ -3851,7 +3860,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 2435.
+Row count: 2444.
 
 <!-- END function-corpus-v14 -->
 
@@ -5282,7 +5291,7 @@ per spec-v14 §13.1 second paragraph.
 | `vacuum-lift-reading` | Vacuum Gauge to Drafting Lift Readout | IFSTA / NWCG fire-pump drafting practice; 10 in Hg at sea level -> 11.3 ft of head, 50% of the ~22.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `water-supply-duration` | Water-Supply Duration | Volume/flow continuity + NFPA 1142 co...; 3000 gal, 250 GPM, no resupply -> 12 min | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group G Cross-trade (159 tiles)
+### Group G Cross-trade (161 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -5366,6 +5375,7 @@ per spec-v14 §13.1 second paragraph.
 | `noise-dose` | OSHA 1910.95 Noise Dose and TWA | OSHA; T = 8 / 2^((L-90)/5); D = sum(C/T)*100; TWA = 16.61 log10... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `odor-dilution-threshold` | Odour Dilution to Threshold and the Reduction a Target Requires | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `opacity-six-minute` | Visible Emission Opacity Six-Minute Average (Method 9) | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `osha-toilet-count` | Worksite Toilet and Handwash Count | Project (first-principles); 20 or more row, 1 per 40 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+3 more) |
 | `oval-tank-volume` | Oval (Obround) Tank Volume from Dipstick | Project (first-principles); stadium cross-section, piecewise segment fill | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `overtime` | Overtime Hours | Project (first-principles); Standard FLSA / state DOL overtime schedule | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `parabolic-segment` | Parabolic Segment Area and Arc Length | Project (first-principles); area (2/3)bh; parabolic arc | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -5398,6 +5408,7 @@ per spec-v14 §13.1 second paragraph.
 | `ramp-slope` | Ramp Slope (ADA) | Project (first-principles); ADA 4.8.2 1:12 maximum running slope (cited by name) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `regular-polygon` | Regular Polygon (Apothem, Across Flats/Corners, Area) | Project (first-principles); apothem/across-flats/area | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `respirator-cartridge-life` | Respirator Cartridge Change Schedule | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `responder-camp-sanitation` | Responder Base Camp Sanitation and Water | Project (first-principles); (b)(2), (c)(2), (c)(4), (d)(5), (d)(6), (f)(1) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `retrieval-winch-force` | Confined Space Retrieval Winch Force | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `riser-modulus-feeding` | Riser Modulus and the Feeding Volume Check | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `rolled-blank` | Rolled Plate Blank Length | First-principles arc-length geometry ...; OD 12 in, T 0.25 in, k 0.5 -> neutral 11.75 in, L 36.9137... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -5794,13 +5805,14 @@ per spec-v14 §13.1 second paragraph.
 | `two-stroke-mix-ratio-check` | Two-Stroke Mix Ratio Check | First-principles volume arithmetic (i...; spec-v653 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `vapor-pressure-deficit` | Vapor Pressure Deficit at the Leaf | Project (first-principles); the crop's published VPD band governs | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group M Water and wastewater (83 tiles)
+### Group M Water and wastewater (90 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
 | `aeration-oxygen-demand` | Activated-Sludge Oxygen and Blower Air Demand | WEF aeration design; 2000 lb BOD, factor 1.1, 200 lb NH3, 20% SOTE, alpha 0.5,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `backflow-test-psi` | Backflow Assembly Test Pass Criteria | USC FCCCHR Manual / AWWA C511; #1 check 8 psid, relief 4 psid -> buffer 4 psid, pass | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `bod-tss-loading-removal` | BOD/TSS Mass Loading and Percent Removal | wastewater operations (pounds formula); spec-v406 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
+| `boil-water-altitude` | Boil-Water Time and Boiling Point at Altitude | Project (first-principles); EPA 3 min above 5,000 ft, CDC above 6,500 ft | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `breakpoint-chlorination` | Breakpoint Chlorination Dose | Standard Methods 4500-Cl; spec-v355 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `broad-crested-weir` | Broad-Crested (Critical-Flow) Weir Discharge | Critical-flow hydraulics / USBR Water...; K = (2/3)^1.5 sqrt(32.2) = 3.0888; Q = 0.90 x 3.0888 x 10... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `chemical-feed-pump` | Chemical Metering-Pump Setting | Pounds formula (AWWA / EPA water-oper...; 0.5 MGD, 8 mg/L, 12.5% NaOCl, SG 1.16, 50 GPD pump -> ~55... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -5815,6 +5827,7 @@ per spec-v14 §13.1 second paragraph.
 | `coagulant-dose` | Coagulant Dose from Jar Test | USEPA / WEF; pure_lb_day = 5 * 20 * 8.34 = 834; product_lb_day = 834 /... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `conductivity-from-tds` | Conductivity from Total Dissolved Solids | Standard Methods 2510 (inverse of tds...; spec-v657 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `constant-pressure-well-vfd` | Constant-Pressure Well VFD Setpoint and Speed | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `contact-time-baffling` | Disinfection Contact Time from a Baffling Factor | U.S. EPA; Section 4.4, Example 4-1, pp. 28-29 (printed with pi = 3.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `cooling-water-makeup` | Cooling Water Makeup (Cycles of Concentration) | CTI / ASHRAE; evap = 1000*10/1000 = 10; blowdown + drift = 10/(4-1) = 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `daily-cover-volume` | Landfill Daily Cover Soil Volume | Project (first-principles); the permit and regulator govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `dechlorination-dose` | Dechlorination Chemical Dose | Dechlorination stoichiometry + pounds...; dose = 1.46*2.0 = 2.92; feed = 2.92*5*8.34/1.0 = 121.76 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
@@ -5825,8 +5838,10 @@ per spec-v14 §13.1 second paragraph.
 | `digester-vs-loading` | Anaerobic Digester Volatile Solids Loading | WEF / university operator courses; 15000 gpd, 4% TS, 75% VS, 20000 ft^3 -> 3753 lb/day, 188 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `disinfection-ct` | Disinfection CT (USEPA SWTR) | USEPA; Table A-1 (<=0.4 mg/L band): CT_required = 139 mg-min/L a... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `diversion-rate-contamination` | Recycling Diversion Rate and Residual Contamination | Project (first-principles); the jurisdiction's diversion definition governs | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `emergency-water-bleach-dose` | Emergency Drinking Water Bleach Dose | Project (first-principles); 1 drop = 1/96 tsp as the table rows imply | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `filter-area-for-loading` | Filter Area for a Target Loading Rate | USEPA / AWWA general practice; Rapid-sand band 2-5 gpm/ft^2 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `filter-loading` | Filter Loading Rate and Backwash | USEPA; Rapid-sand band 2-5 gpm/ft^2 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `first-flush-diverter` | Rainwater First-Flush Diversion Volume and Standpipe Length | Project (first-principles); Chapter 2, First-Flush Diverters | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `float-method-flow` | Float-Method (Velocity-Area) Open-Channel Flow | Float (velocity-area) open-channel fl...; V = 20/10 = 2.0; A = 4*1.5 = 6; Q = 0.85*2.0*6 = 10.2 cfs... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `flocculation-g-value` | Mixing Velocity Gradient (G / Gt) | Camp & Stein / Ten States Standards; 300 W, 100 m^3, 10 C, 1200 s -> G 48/s, Gt 57492 (floccul... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `flocculator-paddle-power` | Paddle Flocculator Power from Geometry | Camp paddle flocculator power (water-...; 6-ft wheel, 3 rpm, 40 ft2, Cd 1.8, slip 0.25 -> v_tip 1.8... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -5838,6 +5853,7 @@ per spec-v14 §13.1 second paragraph.
 | `landfill-settlement-airspace` | Waste Settlement and Recovered Airspace | Project (first-principles); the closure plan and permit govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `langelier-index` | Langelier Saturation Index | Langelier (1936) / Standard Methods (...; pH 7.5, 25 C, Ca 200, alk 150, TDS 320 -> LSI ~+0.04 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `leachate-water-balance` | Leachate Generation from a Water Balance | Project (first-principles); HELP modelling and the permit govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `lift-station-outage-storage` | Lift Station Outage: Time to Overflow and Pump-and-Haul Loads | Project (first-principles); mass balance | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `main-flushing-volume` | Water Main Flushing Volume, Duration, and Velocity | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `oil-water-separator-sizing` | Gravity Oil/Water Separator Surface Area (API 421) | API Publication 421 (gravity oil/wate...; Vt=9.81*(rho_w-rho_o)*d^2/(18*mu) SI -> 0.3285 ft/min; vH... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `particle-settling-velocity` | Discrete-Particle Settling Velocity (Stokes' Law) | Stokes' law (Davis & Cornwell, Introd...; mu=2.414e-5*10^(247.8/(293.15-140))=1.0019e-3; rho_w=998.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -5862,7 +5878,9 @@ per spec-v14 §13.1 second paragraph.
 | `ras-flow-rate` | Return Activated Sludge (RAS) Flow Rate | WEF / Sacramento activated-sludge man...; 5 MGD, 2500 MLSS, 8000 RAS_SS -> 2.27 MGD, 45% return | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `ras-svi-settleability` | Settleability-Based RAS Rate (from SVI) | WEF / Sacramento activated-sludge ope...; 4 MGD, 2,500 mg/L MLSS, SVI 100 -> Xr 10,000 mg/L, 33% re... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `ro-recovery-concentration` | RO Recovery, Concentrate Flow, and Concentration Factor | RO mass balance (AMTA / AWWA); R = 7.5/10 = 0.75; reject = 2.5; CF = 1/(1-0.75) = 4; rej... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+3 more) |
+| `rtcr-coliform-samples` | Total Coliform Routine and Repeat Sample Count | Project (first-principles); 12,901-17,200 band; count rule | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `sluice-gate-flow` | Sluice-Gate (Underflow) Free-Flow Discharge | Open-channel hydraulics (Henderson) /...; Cd = 0.61/sqrt(1 + 0.61 x 1/6) = 0.5812; Q = 0.5812 x 5 x... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `solar-water-pump-sizing` | Solar Water Pump Array Sizing | Project (first-principles); the note reads 310 W off its pump curve; these are the fl... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `spa-drain-interval` | Spa Drain Interval and Refill Volume | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `srt-fm-ratio` | SRT and F/M Ratio | WEF MOP 11 + Metcalf & Eddy activated...; 1 MG aeration / 2500 mg/L MLSS / 2000 mg/L MLVSS / 0.05 M... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `step-drawdown-efficiency` | Step-Drawdown Test and Well Efficiency | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -6207,6 +6225,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `wire-rope-stretch` | Wire Rope Elastic Stretch Under Load | Project (first-principles); dL = P L /(A_m E_r) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 2183. Fixture-covered or reference-cadence: 2183 / 2183.
+Tile count: 2192. Fixture-covered or reference-cadence: 2192 / 2192.
 
 <!-- END tile-index-v14 -->

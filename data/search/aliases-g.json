@@ -1281,6 +1281,16 @@
     {"term":"sidewalk snow removal crew size","target":"walkway-clearing-productivity","kind":"industry"},
     {"term":"snow blower square feet per hour","target":"walkway-clearing-productivity","kind":"industry"},
     {"term":"shovel productivity snow","target":"walkway-clearing-productivity","kind":"industry"},
-    {"term":"ice melt application walkways","target":"walkway-clearing-productivity","kind":"industry"}
+    {"term":"ice melt application walkways","target":"walkway-clearing-productivity","kind":"industry"},
+    {"term":"portable toilets per worker","target":"osha-toilet-count","kind":"industry"},
+    {"term":"osha toilet requirements construction","target":"osha-toilet-count","kind":"industry"},
+    {"term":"how many porta potties jobsite","target":"osha-toilet-count","kind":"industry"},
+    {"term":"jobsite sanitation count","target":"osha-toilet-count","kind":"industry"},
+    {"term":"field sanitation toilets handwashing","target":"osha-toilet-count","kind":"industry"},
+    {"term":"base camp sanitation","target":"responder-camp-sanitation","kind":"industry"},
+    {"term":"temporary labor camp osha","target":"responder-camp-sanitation","kind":"industry"},
+    {"term":"responder camp toilets showers","target":"responder-camp-sanitation","kind":"industry"},
+    {"term":"tent city water supply","target":"responder-camp-sanitation","kind":"industry"},
+    {"term":"crew camp planning","target":"responder-camp-sanitation","kind":"industry"}
   ]
 }

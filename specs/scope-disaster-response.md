@@ -1,6 +1,6 @@
 # Scope: Disaster Response and Recovery (specs v1879-v1926, 47 New Tiles and One Collection Page)
 
-> **Status: PROPOSED (2026-09-25). 0 of 47 tiles wired; catalog stays 2,183 until tiles land.**
+> **Status: IN PROGRESS (proposed 2026-09-25). 9 of 47 tiles wired (band 1, 2026-09-30); the collection page (v1926) is live.**
 > All 48 spec files exist: `spec-v1879.md` through `spec-v1925.md` (one tile each) and `spec-v1926.md` (the
 > collection page). Inherits the spec-v106 trades-only charter and every convention through spec-v1878.
 

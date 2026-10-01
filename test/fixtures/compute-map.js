@@ -2290,6 +2290,15 @@ export const COMPUTE_MAP = {
   "air-dryer-sizing": { module: "../../calc-millwright.js", fn: "computeAirDryerSizing" },
   "receiver-pump-up-time": { module: "../../calc-millwright.js", fn: "computeReceiverPumpUpTime" },
   "vacuum-evacuation-time": { module: "../../calc-millwright.js", fn: "computeVacuumEvacuationTime" },
+  "emergency-water-bleach-dose": { module: "../../calc-reliefwater.js", fn: "computeEmergencyWaterBleachDose" },
+  "boil-water-altitude": { module: "../../calc-reliefwater.js", fn: "computeBoilWaterAltitude" },
+  "contact-time-baffling": { module: "../../calc-reliefwater.js", fn: "computeContactTimeBaffling" },
+  "rtcr-coliform-samples": { module: "../../calc-reliefwater.js", fn: "computeRtcrColiformSamples" },
+  "solar-water-pump-sizing": { module: "../../calc-reliefwater.js", fn: "computeSolarWaterPumpSizing" },
+  "first-flush-diverter": { module: "../../calc-reliefwater.js", fn: "computeFirstFlushDiverter" },
+  "lift-station-outage-storage": { module: "../../calc-reliefwater.js", fn: "computeLiftStationOutageStorage" },
+  "osha-toilet-count": { module: "../../calc-reliefwater.js", fn: "computeOshaToiletCount" },
+  "responder-camp-sanitation": { module: "../../calc-reliefwater.js", fn: "computeResponderCampSanitation" },
 };
 
 // Resolve a COMPUTE_MAP module path (relative to this file) and import it.

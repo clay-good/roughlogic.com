@@ -1,6 +1,6 @@
 # roughlogic.com Specification v1884 -- Rainwater First-Flush Diversion Volume and Standpipe Length (`calc-reliefwater.js`, Group M Water and Wastewater Operations, emergency water supply, 1 New Tile)
 
-> **Status: PROPOSED 2026-09-25. Single-tile spec.** Part of [scope-disaster-response](scope-disaster-response.md).
+> **Status: LANDED 2026-09-30 (proposed 2026-09-25). Single-tile spec.** Part of [scope-disaster-response](scope-disaster-response.md).
 > In-scope catalog expansion under the spec-v106 trades-only charter. Adds one tile to **`calc-reliefwater.js`**
 > (Group M Water and Wastewater Operations, hub `/groups/water/`), no new dependency and no new network call. Inherits spec.md through spec-v1878.md.
 >
