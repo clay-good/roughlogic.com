@@ -133655,6 +133655,903 @@
      }
     }
    }
+  },
+  {
+   "tile_id": "sandbag-levee-quantity",
+   "source_publisher": "USACE St. Paul District",
+   "source_title": "Flood Fight Handbook",
+   "source_edition_or_year": "2016",
+   "source_section_or_page": "Table 2.1, 3 ft levee row (45 bags per linear foot; 4,500 per 100 ft), extended to 500 ft at 40 lb per bag",
+   "verified_by": "rl",
+   "verified_on": "2026-09-30",
+   "inputs": {
+    "height_ft": 3,
+    "length_ft": 500,
+    "fill_weight_lb": 40
+   },
+   "outputs": {
+    "bags_per_ft": {
+     "value": 45,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "total_bags": {
+     "value": 22500,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "sand_tons": {
+     "value": 450,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "base_width_ft": {
+     "value": 9,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "sandbag-levee-quantity",
+   "source_publisher": "USACE St. Paul District",
+   "source_title": "Flood Fight Handbook",
+   "source_edition_or_year": "2016",
+   "source_section_or_page": "Table 2.1, 2 ft levee row (21 bags per linear foot), extended to 500 ft at 40 lb per bag",
+   "verified_by": "rl",
+   "verified_on": "2026-09-30",
+   "inputs": {
+    "height_ft": 2,
+    "length_ft": 500,
+    "fill_weight_lb": 40
+   },
+   "outputs": {
+    "bags_per_ft": {
+     "value": 21,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "total_bags": {
+     "value": 10500,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "sand_tons": {
+     "value": 210,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "base_width_ft": {
+     "value": 6,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "emergency-earth-levee-section",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "4 ft sand-fill emergency levee, 100 ft long",
+   "source_edition_or_year": "USACE Flood Fight Handbook (2016) Section 3.3 slopes",
+   "source_section_or_page": "spec-v1905 worked example",
+   "verified_by": "rl",
+   "verified_on": "2026-09-30",
+   "inputs": {
+    "height_ft": 4,
+    "fill": "sand",
+    "foundation": "fine_sand",
+    "top_width_ft": 10,
+    "length_ft": 100
+   },
+   "outputs": {
+    "base_width_ft": {
+     "value": 42,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "area_sqft": {
+     "value": 104,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "fill_cy": {
+     "value": 385.2,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "berm_shortfall_ft": {
+     "value": 0,
+     "tolerance": {
+      "abs": 1e-09
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "emergency-earth-levee-section",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "4 ft clay-fill emergency levee on fine sand, 100 ft long",
+   "source_edition_or_year": "USACE Flood Fight Handbook (2016) Section 3.3 slopes and creep ratio C = 15",
+   "source_section_or_page": "spec-v1905 worked example",
+   "verified_by": "rl",
+   "verified_on": "2026-09-30",
+   "inputs": {
+    "height_ft": 4,
+    "fill": "clay",
+    "foundation": "fine_sand",
+    "top_width_ft": 10,
+    "length_ft": 100
+   },
+   "outputs": {
+    "base_width_ft": {
+     "value": 30,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "area_sqft": {
+     "value": 80,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "fill_cy": {
+     "value": 296.3,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "required_path_ft": {
+     "value": 60,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "berm_shortfall_ft": {
+     "value": 30,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "emergency-earth-levee-section",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "4 ft clay-fill emergency levee on fine gravel",
+   "source_edition_or_year": "USACE Flood Fight Handbook (2016) Section 3.3 creep ratio C = 9",
+   "source_section_or_page": "spec-v1905 worked example",
+   "verified_by": "rl",
+   "verified_on": "2026-09-30",
+   "inputs": {
+    "height_ft": 4,
+    "fill": "clay",
+    "foundation": "fine_gravel",
+    "top_width_ft": 10,
+    "length_ft": 100
+   },
+   "outputs": {
+    "required_path_ft": {
+     "value": 36,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "berm_shortfall_ft": {
+     "value": 6,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "flood-lateral-load",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Fresh floodwater 4 ft deep against a 10 ft wide wall",
+   "source_edition_or_year": "FEMA P-55 Vol. II Eq. 8.2, 8.3, 8.8, Table 8-2",
+   "source_section_or_page": "spec-v1906 worked example",
+   "verified_by": "rl",
+   "verified_on": "2026-09-30",
+   "inputs": {
+    "depth_ft": 4,
+    "width_ft": 10,
+    "water": "fresh",
+    "velocity_basis": "lower",
+    "entered_velocity_fps": 0,
+    "obstruction": "wall"
+   },
+   "outputs": {
+    "hydrostatic_lb_per_ft": {
+     "value": 499.2,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "hydrostatic_lb": {
+     "value": 4992,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "hydrostatic_height_ft": {
+     "value": 1.333,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "velocity_lower_fps": {
+     "value": 4,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "velocity_upper_fps": {
+     "value": 11.35,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "drag_coefficient": {
+     "value": 1.25,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "hydrodynamic_lower_lb": {
+     "value": 776,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "hydrodynamic_upper_lb": {
+     "value": 6247,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "hydrodynamic_height_ft": {
+     "value": 2,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "flood-lateral-load",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Saltwater 6 ft deep against a 20 ft wall",
+   "source_edition_or_year": "FEMA P-55 Vol. II Eq. 8.3",
+   "source_section_or_page": "spec-v1906 worked example",
+   "verified_by": "rl",
+   "verified_on": "2026-09-30",
+   "inputs": {
+    "depth_ft": 6,
+    "width_ft": 20,
+    "water": "salt",
+    "velocity_basis": "lower",
+    "entered_velocity_fps": 0,
+    "obstruction": "wall"
+   },
+   "outputs": {
+    "hydrostatic_lb": {
+     "value": 23040,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "flood-debris-impact",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "1,000 lb debris on a reinforced concrete foundation wall, Zone A, 4 ft still water, no screening",
+   "source_edition_or_year": "FEMA P-55 Vol. II Eq. 8.9, Tables 8-3 and 8-4",
+   "source_section_or_page": "spec-v1907 worked example",
+   "verified_by": "rl",
+   "verified_on": "2026-09-30",
+   "inputs": {
+    "debris_weight_lb": 1000,
+    "zone": "a",
+    "depth_ft": 4,
+    "velocity_basis": "eq89",
+    "entered_velocity_fps": 0,
+    "screening": "none",
+    "structure": "rc_wall"
+   },
+   "outputs": {
+    "velocity_used_fps": {
+     "value": 5.67,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "depth_coefficient": {
+     "value": 0.75,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "blockage_coefficient": {
+     "value": 1,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "structure_coefficient_s_per_ft": {
+     "value": 0.8,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "impact_force_lb": {
+     "value": 3405,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "impact_elevation_ft": {
+     "value": 4,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "flood-debris-impact",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "The same debris against a timber-pile house",
+   "source_edition_or_year": "FEMA P-55 Vol. II Eq. 8.9",
+   "source_section_or_page": "spec-v1907 worked example",
+   "verified_by": "rl",
+   "verified_on": "2026-09-30",
+   "inputs": {
+    "debris_weight_lb": 1000,
+    "zone": "a",
+    "depth_ft": 4,
+    "velocity_basis": "eq89",
+    "entered_velocity_fps": 0,
+    "screening": "none",
+    "structure": "timber_masonry"
+   },
+   "outputs": {
+    "impact_force_lb": {
+     "value": 851,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "flood-debris-impact",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Pile-supported house in Zone V, 8 ft still water",
+   "source_edition_or_year": "FEMA P-55 Vol. II Eq. 8.9",
+   "source_section_or_page": "spec-v1907 worked example",
+   "verified_by": "rl",
+   "verified_on": "2026-09-30",
+   "inputs": {
+    "debris_weight_lb": 1000,
+    "zone": "v_floodway",
+    "depth_ft": 8,
+    "velocity_basis": "eq89",
+    "entered_velocity_fps": 0,
+    "screening": "none",
+    "structure": "timber_masonry"
+   },
+   "outputs": {
+    "velocity_used_fps": {
+     "value": 8.02,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "depth_coefficient": {
+     "value": 1,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "impact_force_lb": {
+     "value": 1605,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "flood-uplift-cover-slab",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "4 in basement slab, 1,200 sq ft, 3 ft of groundwater head",
+   "source_edition_or_year": "FEMA P-55 Vol. II Eq. 8.4; 150 pcf concrete",
+   "source_section_or_page": "spec-v1908 worked example",
+   "verified_by": "rl",
+   "verified_on": "2026-09-30",
+   "inputs": {
+    "head_ft": 3,
+    "water": "fresh",
+    "element": "slab",
+    "slab_thickness_in": 4,
+    "slab_area_sqft": 1200,
+    "cover_diameter_ft": 2,
+    "cover_weight_lb": 0
+   },
+   "outputs": {
+    "uplift_psf": {
+     "value": 187.2,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "resisting_psf": {
+     "value": 50,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "net_psf": {
+     "value": 137.2,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "floating_head_ft": {
+     "value": 0.8,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "uplift_lb": {
+     "value": 224640,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "flood-uplift-cover-slab",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "6 in basement slab floating head",
+   "source_edition_or_year": "FEMA P-55 Vol. II Eq. 8.4; 150 pcf concrete",
+   "source_section_or_page": "spec-v1908 worked example",
+   "verified_by": "rl",
+   "verified_on": "2026-09-30",
+   "inputs": {
+    "head_ft": 3,
+    "water": "fresh",
+    "element": "slab",
+    "slab_thickness_in": 6,
+    "slab_area_sqft": 1200,
+    "cover_diameter_ft": 2,
+    "cover_weight_lb": 0
+   },
+   "outputs": {
+    "floating_head_ft": {
+     "value": 1.2,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "flood-uplift-cover-slab",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "2 ft manhole cover under a 10 ft head, fresh water (the handbook's printed 2,060 lb implies 65.6 pcf; 62.4 pcf gives 1,960 lb)",
+   "source_edition_or_year": "USACE Flood Fight Handbook (2016) Section 5.7 case, recomputed at 62.4 pcf",
+   "source_section_or_page": "spec-v1908 worked example",
+   "verified_by": "rl",
+   "verified_on": "2026-09-30",
+   "inputs": {
+    "head_ft": 10,
+    "water": "fresh",
+    "element": "cover",
+    "slab_thickness_in": 4,
+    "slab_area_sqft": 0,
+    "cover_diameter_ft": 2,
+    "cover_weight_lb": 0
+   },
+   "outputs": {
+    "uplift_psf": {
+     "value": 624,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "uplift_lb": {
+     "value": 1960,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "counterweight_lb": {
+     "value": 1960,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "basement-flood-pumpdown",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "30 x 40 ft basement, 6 ft of water, 2.5 ft/day after the test days, 50 gpm pump",
+   "source_edition_or_year": "FEMA staged pump-down; 1,728 / 231 gal per cu ft",
+   "source_section_or_page": "spec-v1909 worked example",
+   "verified_by": "rl",
+   "verified_on": "2026-09-30",
+   "inputs": {
+    "floor_area_sqft": 1200,
+    "water_depth_ft": 6,
+    "daily_drawdown_ft": 2.5,
+    "pump_gpm": 50
+   },
+   "outputs": {
+    "gal_per_ft": {
+     "value": 8977,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "total_gal": {
+     "value": 53860,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "days": {
+     "value": 4,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "largest_day_gal": {
+     "value": 22442,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "largest_day_run_min": {
+     "value": 449,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "roof-snow-ice-weight",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "18 in wet, heavy snow over 2 in ice on a 30 psf roof",
+   "source_edition_or_year": "FEMA P-957 (2013) Section 2.2 unit weights",
+   "source_section_or_page": "spec-v1910 worked example",
+   "verified_by": "rl",
+   "verified_on": "2026-09-30",
+   "inputs": {
+    "layer1_depth_in": 18,
+    "layer1_type": "wet",
+    "layer2_depth_in": 2,
+    "layer2_type": "ice",
+    "layer3_depth_in": 0,
+    "layer3_type": "dry",
+    "entered_weight_pcf": 15,
+    "ground_snow_psf": 0,
+    "override_range": "no",
+    "design_snow_psf": 30
+   },
+   "outputs": {
+    "layer1_psf": {
+     "value": 31.5,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "layer2_psf": {
+     "value": 9.5,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "total_psf": {
+     "value": 41,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "design_ratio": {
+     "value": 1.367,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "roof-snow-ice-weight",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "18 in light, dry snow over 2 in ice on a 30 psf roof",
+   "source_edition_or_year": "FEMA P-957 (2013) Section 2.2 unit weights",
+   "source_section_or_page": "spec-v1910 worked example",
+   "verified_by": "rl",
+   "verified_on": "2026-09-30",
+   "inputs": {
+    "layer1_depth_in": 18,
+    "layer1_type": "dry",
+    "layer2_depth_in": 2,
+    "layer2_type": "ice",
+    "layer3_depth_in": 0,
+    "layer3_type": "dry",
+    "entered_weight_pcf": 15,
+    "ground_snow_psf": 0,
+    "override_range": "no",
+    "design_snow_psf": 30
+   },
+   "outputs": {
+    "layer1_psf": {
+     "value": 4.5,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "total_psf": {
+     "value": 14,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "design_ratio": {
+     "value": 0.4667,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "storm-panel-plywood",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "36 x 60 in window, 4 in overlap, 7/16 in OSB fastened on the long sides at an entered 16 in spacing",
+   "source_edition_or_year": "IRC R301.2.1.2 exception (spacing entered from the adopted table)",
+   "source_section_or_page": "spec-v1911 worked example",
+   "verified_by": "rl",
+   "verified_on": "2026-09-30",
+   "inputs": {
+    "opening_width_in": 36,
+    "opening_height_in": 60,
+    "overlap_in": 4,
+    "thickness_in": 0.4375,
+    "fastened_edges": "long",
+    "fastener_type": "wood_screw_8",
+    "fastener_spacing_in": 16,
+    "edge_distance_in": 1,
+    "opening_count": 1
+   },
+   "outputs": {
+    "panel_width_in": {
+     "value": 44,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "panel_height_in": {
+     "value": 68,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "span_in": {
+     "value": 44,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "span_ft": {
+     "value": 3.667,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "fasteners_per_edge": {
+     "value": 6,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "fasteners_per_panel": {
+     "value": 12,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "sheets": {
+     "value": 1,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "storm-panel-plywood",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "The same panel fastened on the short sides",
+   "source_edition_or_year": "IRC R301.2.1.2 exception",
+   "source_section_or_page": "spec-v1911 worked example",
+   "verified_by": "rl",
+   "verified_on": "2026-09-30",
+   "inputs": {
+    "opening_width_in": 36,
+    "opening_height_in": 60,
+    "overlap_in": 4,
+    "thickness_in": 0.4375,
+    "fastened_edges": "short",
+    "fastener_type": "wood_screw_8",
+    "fastener_spacing_in": 16,
+    "edge_distance_in": 1,
+    "opening_count": 1
+   },
+   "outputs": {
+    "span_in": {
+     "value": 68,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "span_ft": {
+     "value": 5.667,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "manufactured-home-anchor-count",
+   "source_publisher": "U.S. Department of Housing and Urban Development (24 CFR)",
+   "source_title": "Model Manufactured Home Installation Standards, 24 CFR 3285.402",
+   "source_edition_or_year": "2014 amendment (79 FR 53614), current eCFR text",
+   "source_section_or_page": "Table 1 to 3285.402, 14/28 ft width, 25 in strap height, 82.5 in I-beam spacing: 18 ft 2 in; applied to a 66 ft single-section home",
+   "verified_by": "rl",
+   "verified_on": "2026-09-30",
+   "inputs": {
+    "wind_zone": "I",
+    "floor_width_row": "14",
+    "home_length_ft": 66,
+    "strap_height_row": "25",
+    "beam_spacing_row": "82.5",
+    "method": "near",
+    "sections": 1
+   },
+   "outputs": {
+    "max_spacing_in": {
+     "value": 218,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "anchors_per_side": {
+     "value": 5,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "total_anchors": {
+     "value": 10,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "vertical_ties": {
+     "value": 0,
+     "tolerance": {
+      "abs": 1e-09
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "manufactured-home-anchor-count",
+   "source_publisher": "U.S. Department of Housing and Urban Development (24 CFR)",
+   "source_title": "Model Manufactured Home Installation Standards, 24 CFR 3285.402",
+   "source_edition_or_year": "2014 amendment (79 FR 53614), current eCFR text",
+   "source_section_or_page": "Table 2 to 3285.402, 14/28 ft width, 25 in strap height, 82.5 in I-beam spacing, near beam method: 7 ft 7 in; applied to a 66 ft single-section home",
+   "verified_by": "rl",
+   "verified_on": "2026-09-30",
+   "inputs": {
+    "wind_zone": "II",
+    "floor_width_row": "14",
+    "home_length_ft": 66,
+    "strap_height_row": "25",
+    "beam_spacing_row": "82.5",
+    "method": "near",
+    "sections": 1
+   },
+   "outputs": {
+    "max_spacing_in": {
+     "value": 91,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "anchors_per_side": {
+     "value": 10,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "total_anchors": {
+     "value": 20,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "vertical_ties": {
+     "value": 20,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "manufactured-home-anchor-count",
+   "source_publisher": "U.S. Department of Housing and Urban Development (24 CFR)",
+   "source_title": "Model Manufactured Home Installation Standards, 24 CFR 3285.402",
+   "source_edition_or_year": "2014 amendment (79 FR 53614), current eCFR text",
+   "source_section_or_page": "Table 3 to 3285.402, 14/28 ft width, 25 in strap height, 82.5 in I-beam spacing, near beam method: 6 ft 2 in; applied to a 66 ft single-section home",
+   "verified_by": "rl",
+   "verified_on": "2026-09-30",
+   "inputs": {
+    "wind_zone": "III",
+    "floor_width_row": "14",
+    "home_length_ft": 66,
+    "strap_height_row": "25",
+    "beam_spacing_row": "82.5",
+    "method": "near",
+    "sections": 1
+   },
+   "outputs": {
+    "max_spacing_in": {
+     "value": 74,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "anchors_per_side": {
+     "value": 12,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "total_anchors": {
+     "value": 24,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "vertical_ties": {
+     "value": 24,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
   }
  ]
 }

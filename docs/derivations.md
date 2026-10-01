@@ -2401,6 +2401,15 @@ cross-check.
 | calc-firewater.js | `computeTankerShuttleCycle` | `{ tank_gal = 0, fill_gpm = 0, dump_gpm = 0, distance_mi = 0, speed_mph = 0 } ...` | _ | _ | _ |
 | calc-firewater.js | `computeTankerShuttleFlow` | `{ nominal_tank_gal = 0, usable_fraction = 0.9, tanker_count = 0, cycle_time_m...` | _ | _ | _ |
 | calc-firewater.js | `computeVacuumLiftReading` | `{ vacuum_inhg = 0, site_elevation_ft = 0, pump_factor = 0.667 } = {}` | _ | _ | _ |
+| calc-floodfight.js | `computeBasementFloodPumpdown` | `{ floor_area_sqft = 0, water_depth_ft = 0, daily_drawdown_ft = 2.5, pump_gpm ...` | _ | _ | _ |
+| calc-floodfight.js | `computeEmergencyEarthLeveeSection` | `{ height_ft = 0, fill = "sand", foundation = "fine_sand", top_width_ft = 10, ...` | _ | _ | _ |
+| calc-floodfight.js | `computeFloodDebrisImpact` | `{ debris_weight_lb = 1000, zone = "a", depth_ft = 0, velocity_basis = "eq89",...` | _ | _ | _ |
+| calc-floodfight.js | `computeFloodLateralLoad` | `{ depth_ft = 0, width_ft = 0, water = "fresh", velocity_basis = "lower", ente...` | _ | _ | _ |
+| calc-floodfight.js | `computeFloodUpliftCoverSlab` | `{ head_ft = 0, water = "fresh", element = "slab", slab_thickness_in = 4, slab...` | _ | _ | _ |
+| calc-floodfight.js | `computeManufacturedHomeAnchorCount` | `{ wind_zone = "I", floor_width_row = "14", home_length_ft = 0, strap_height_r...` | _ | _ | _ |
+| calc-floodfight.js | `computeRoofSnowIceWeight` | `{ layer1_depth_in = 0, layer1_type = "wet", layer2_depth_in = 0, layer2_type ...` | _ | _ | _ |
+| calc-floodfight.js | `computeSandbagLeveeQuantity` | `{ height_ft = 0, length_ft = 0, fill_weight_lb = 40 } = {}` | _ | _ | _ |
+| calc-floodfight.js | `computeStormPanelPlywood` | `{ opening_width_in = 0, opening_height_in = 0, overlap_in = 4, thickness_in =...` | _ | _ | _ |
 | calc-gas.js | `computeGasAltitudeDerate` | `{ nameplate_input_btuh = 0, elevation_ft = 0, derate_pct_per_1000 = 4, thresh...` | _ | _ | _ |
 | calc-gas.js | `computeGasApplianceConnection` | `{ appliance = "furnace", shutoff_same_room = "yes", shutoff_distance_ft = 0, ...` | _ | _ | _ |
 | calc-gas.js | `computeGasFuelConversion` | `{ appliance_input_btuh = 0, hv_from = 1030, hv_to = 2500, sg_from = 0.60, sg_...` | _ | _ | _ |
@@ -3876,7 +3885,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 2460.
+Row count: 2469.
 
 <!-- END function-corpus-v14 -->
 
@@ -4586,7 +4595,7 @@ per spec-v14 §13.1 second paragraph.
 | `window-solar-heat-gain` | Window Solar Heat Gain and Conduction Cooling Load | ASHRAE / ACCA Manual J fenestration; spec-v227 section 2.1 pinned example (west window) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `zonal-pressure-diagnostics` | Zonal Pressure Diagnostics (Series Leakage Split for Attics and Crawlspaces) | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group D Restoration (56 tiles)
+### Group D Restoration (57 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -4595,6 +4604,7 @@ per spec-v14 §13.1 second paragraph.
 | `air-movers` | Air Mover Placement | IICRC Airmover and Gallons Calculatio...; 600 ft^2 floor, 1 room -> 1 + ceil(600/70) = 10 low, 1 + ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `air-sample-volume` | Air Sample Run Time and Volume | ASTM D7391 spore-trap method; cassett...; 15 L/min, 75 L, 3 cassettes -> 5.0 min (300 s) each, 225 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `antimicrobial-dilution` | Antimicrobial Mix and Coverage | FIFRA / EPA-registered product label;...; 400 ft2 at 200 ft2/gal, 4 oz/gal, 1.5 gal tank -> 2.0 gal... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `basement-flood-pumpdown` | Flooded Basement Staged Pump-Down Schedule | Project (first-principles); spec-v1909 worked example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `bound-water` | Bound Water in Wet Materials | ANSI/IICRC S500 gravimetric water-mas...; 10 ft^3 softwood at 32 lb/ft^3, 40%->12% -> 320 lb dry ma... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `carpet-restore-replace` | Carpet / Cushion Restore-vs-Replace Decision (IICRC S500) | ANSI/IICRC S500 carpet/cushion restor...; Category 1 carpet, not delaminated -> dry in place / floa... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `category-deterioration` | Water Category Deterioration Over Time (IICRC S500) | ANSI/IICRC S500 category-at-time-of-r...; Category 1, 72 h, warm -> reclassified to Category 2 (gray) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -4647,7 +4657,7 @@ per spec-v14 §13.1 second paragraph.
 | `water-extraction-rate` | Water Extraction Volume, Time, and Waste-Tank Dumps | Project (first-principles); standing + absorbed; wand time = total / gpm | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wood-emc` | Equilibrium Moisture Content of Wood | USDA Forest Products Laboratory Wood ...; spec-v119 section 2.1 pinned example (textbook ~9.1%) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+4 more) |
 
-### Group E Construction (605 tiles)
+### Group E Construction (611 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -4848,7 +4858,10 @@ per spec-v14 §13.1 second paragraph.
 | `flammable-cabinet-storage` | Flammable Liquid Cabinet Storage (OSHA 1926.152(b)) | Occupational Safety and Health Admini...; 'Not more than 60 gallons of Category 1, 2 and/or 3 flamm... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `flat-top-stockpile-volume` | Flat-Top (Truncated-Cone) Stockpile Volume and Tonnage | Project (first-principles); truncated cone (frustum) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `flexible-pipe-deflection` | Buried Flexible Pipe Deflection (Modified Iowa) | Modified Iowa (Spangler) deflection f...; Wc = 12*120/144 = 10 psi; deflection = 1.5*0.1*10/(0.149*... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `flood-debris-impact` | FEMA Flood Debris Impact Load | Project (first-principles); spec-v1907 worked example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
+| `flood-lateral-load` | Flood Hydrostatic and Hydrodynamic Load on a Wall | Project (first-principles); spec-v1906 worked example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `flood-opening-area` | NFIP Flood Opening Area (44 CFR 60.3) | Federal Emergency Management Agency; 'A minimum of two openings having a total net area of not... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `flood-uplift-cover-slab` | Flood-Head Uplift on a Slab, Hatch, or Manhole Cover | Project (first-principles); spec-v1908 worked example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `floor-level-change` | Changes in Level and Floor Surfaces (2010 ADA Standards 302, 303) | US Department of Justice / US Access ...; 303.3: 'Changes in level between 1/4 inch high minimum an... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `flooring-takeoff` | Resilient / LVP Flooring Takeoff | Published flooring waste rules of thu...; spec-v95 section 2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `footing-area` | Footing Area for Soil Bearing | Project (first-principles); ASCE 7 / IRC R401 conceptual basis; bundled allowable bea... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -4924,6 +4937,7 @@ per spec-v14 §13.1 second paragraph.
 | `lock-backset-strike-layout` | Lock Backset, Bore, Stile, and Strike Layout | Project (first-principles); the lock manufacturer's template governs | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `lumber-spans` | Lumber Spans | Project (first-principles) over AWC N...; DF-L No.2 / 2x10 / 50 psf total / 16 in o.c. / L/360 -> 1... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `machine-room-heat` | Elevator Machine Room Heat Load and Cooling | Project (first-principles); ASME A17.1 and the manufacturer's environmental limits named | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `manufactured-home-anchor-count` | Manufactured Home Diagonal Tie-Down Anchor Count | U.S. Department of Housing and Urban ...; Table 1 to 3285.402, 14/28 ft width, 25 in strap height, ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `masonry-anchor-bolt` | Masonry Headed Anchor Bolt Tension (TMS 402 ASD) | TMS 402 ASD; spec-v449 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `masonry-anchor-embedment` | Masonry Anchor Embedment for a Tension (TMS 402 ASD) | TMS 402 ASD; 5,000 lb tension, 1,500 psi masonry -> 5.73 in embedment;... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `masonry-anchor-shear` | Masonry Anchor Bolt in Shear (TMS 402 ASD) | TMS 402-16 ASD (Section 8.1.5.2); 3/4in A307, 1,500 psi, 5 in embed 4 in from edge: Bvb 1,2... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
@@ -5045,6 +5059,7 @@ per spec-v14 §13.1 second paragraph.
 | `roof-ballast-weight` | Ballasted Roof Ballast Weight and Order | Ballasted single-ply roof ballast wei...; lb = 5000 x 12 = 60,000; tons = 30; cy = 60000/100/27 = 2... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `roof-insulation-fasteners` | Roof Board Fastener and Plate Count by Zone | Roof-board fastener identity (first-p...; fasteners = 100*8 + 20*12 + 5*16 = 800 + 240 + 80 = 1120;... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `roof-pitch` | Roof Pitch | Project (first-principles); Pitch (rise / 12 run); angle = atan(rise/run) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `roof-snow-ice-weight` | Existing Roof Snow and Ice Weight Against Design Load | Project (first-principles); spec-v1910 worked example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `roof-underlayment-rolls` | Roof Underlayment Roll Count | Roofing underlayment roll-count ident...; rolls = ceil(2500*1.10/1000) = ceil(2.75) = 3 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `roofing-squares` | Roofing Squares and Bundles | Project (industry rule of thumb); 2200 ft^2 roof / 6:12 pitch (12% waste) / architectural s... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `rope-safety-factor` | Elevator Suspension Rope Factor of Safety | Project (first-principles); ASME A17.1 speed-dependent minimums named; the minimum is... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -5168,6 +5183,7 @@ per spec-v14 §13.1 second paragraph.
 | `step-chain-tension` | Escalator Step Chain Tension, Drive Power, and Brake Load | Project (first-principles); ASME A17.1 governs the brake and its stopping distance | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `step-flashing-count` | Roof Step-Flashing Piece Count | Roof step-flashing takeoff (one per s...; pieces = ceil(20*12/5) + 1 = 48 + 1 = 49; order = ceil(49... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `stockpile-volume` | Conical Stockpile Volume and Tonnage | Right-circular-cone identity (first-p...; radius = 30; height = 30*tan(37) = 22.6 ft; volume = (1/3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `storm-panel-plywood` | Wood Structural Panel Opening Protection Takeoff | Project (first-principles); spec-v1911 worked example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `stray-current-bond` | Stray Current Interference Bond Resistor | Project (first-principles); the interference retest governs | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `striping-paint-quantity` | Pavement Marking Paint and Glass Bead Quantity | Pavement-marking quantity identity (f...; area = 5280*4/12 = 1,760 sf; paint = 1760/320 = 5.5 gal; ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `stucco-coverage` | Portland-Cement Plaster (Stucco) Material Takeoff | Portland-cement plaster bag-count ide...; bags = ceil(1000*0.875/10.1*1.10) = ceil(95.30) = 96 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -5320,7 +5336,7 @@ per spec-v14 §13.1 second paragraph.
 | `vacuum-lift-reading` | Vacuum Gauge to Drafting Lift Readout | IFSTA / NWCG fire-pump drafting practice; 10 in Hg at sea level -> 11.3 ft of head, 50% of the ~22.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `water-supply-duration` | Water-Supply Duration | Volume/flow continuity + NFPA 1142 co...; 3000 gal, 250 GPM, no resupply -> 12 min | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group G Cross-trade (162 tiles)
+### Group G Cross-trade (164 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -5358,6 +5374,7 @@ per spec-v14 §13.1 second paragraph.
 | `dust-collection-duct` | Dust Collection Duct Velocity, Diameter, and Branch Balance | Project (first-principles); area = airflow / velocity, rounded DOWN to a standard size | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `ellipse-area-perimeter` | Ellipse Area and Perimeter | Project (first-principles); area pi a b; Ramanujan perimeter | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `ellipsoid-volume` | Ellipsoid Volume (Oblong / Oval Solid) | Project (first-principles); V=(4/3)pi abc | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `emergency-earth-levee-section` | USACE Emergency Earth Levee Section and Seepage Creep Check | Project (first-principles); spec-v1905 worked example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `equal-spacing` | Equal Spacing Layout | First-principles equal-spacing layout...; 60 in run, 1.5 in balusters, 4 in max gap -> 11 balusters... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `esp-deutsch-efficiency` | Electrostatic Precipitator Collection Efficiency (Deutsch) | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `extension-ladder-overlap` | Extension Ladder Overlap and True Working Height | OCWR extension-ladder fast facts (OSH...; 24 ft, 2 sections -> 3 ft overlap, 21.0 ft working length... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -5447,6 +5464,7 @@ per spec-v14 §13.1 second paragraph.
 | `sales-tax` | Sales Tax | Texas Comptroller of Public Accounts; $1,000 subtotal in TX (6.25%) -> $62.50 tax / $1062.50 total | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `salt-application-rate` | Deicing Salt Application Rate and Coverage per Load | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `sand-permeability-vent` | Moulding Sand Gas Evolution, Permeability, and Venting | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `sandbag-levee-quantity` | USACE Sandbag Levee Bags and Sand | USACE St. Paul District; Table 2.1, 3 ft levee row (45 bags per linear foot; 4,500... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `scrubber-lg-ratio` | Wet Scrubber Liquid-to-Gas Ratio and Removal | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `shot-size-residence-time` | Injection Shot Size, Barrel Capacity, and Residence Time | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `shrink-fit` | Interference Shrink-Fit Temperature | first-principles thermal-expansion re...; 4 in fit, 0.004 in interference, 0.002 in clearance, stee... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -6257,6 +6275,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `wire-rope-stretch` | Wire Rope Elastic Stretch Under Load | Project (first-principles); dL = P L /(A_m E_r) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 2208. Fixture-covered or reference-cadence: 2208 / 2208.
+Tile count: 2217. Fixture-covered or reference-cadence: 2217 / 2217.
 
 <!-- END tile-index-v14 -->

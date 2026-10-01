@@ -57158,3 +57158,309 @@ test("bounds: spec-v1903 computeReliefStorageFloorLoad pins average and local pr
     assert.ok("error" in _v1903({ ...base, ...bad }), JSON.stringify(bad));
   }
 });
+
+// ===========================================================================
+// spec-v1904..v1912: disaster response flood fight and storm damage band (calc-floodfight.js)
+// ===========================================================================
+
+// ===========================================================================
+// spec-v1904..v1912: the disaster-response program's flood fight, flood load,
+// and storm-damage band (calc-floodfight.js). Groups G (v1904, v1905), E
+// (v1906-v1908, v1910-v1912), and D (v1909).
+// ===========================================================================
+
+import { computeSandbagLeveeQuantity as _v1904 } from "../../calc-floodfight.js";
+test("bounds: spec-v1904 computeSandbagLeveeQuantity pins the USACE table and the square of the height", () => {
+  const base = { height_ft: 3, length_ft: 500, fill_weight_lb: 40 };
+  const r = _v1904(base);
+  assert.strictEqual(r.bags_per_ft, 45);
+  assert.strictEqual(r.total_bags, 22500);
+  assert.strictEqual(r.sand_tons, 450);
+  assert.strictEqual(r.base_width_ft, 9);
+  // USACE Table 2.1 rows, exactly.
+  [[1, 6], [2, 21], [3, 45], [4, 78], [5, 120]].forEach(([h, n]) => assert.ok(Math.abs(_v1904({ ...base, height_ft: h }).bags_per_ft - n) < 1e-12));
+  // The finding: one foot less saves more than half the bags.
+  const two = _v1904({ ...base, height_ft: 2 });
+  assert.strictEqual(two.total_bags, 10500);
+  assert.ok(two.total_bags < r.total_bags / 2);
+  // Linear in length and in fill weight; flags at 3 and 5 ft.
+  assert.strictEqual(_v1904({ ...base, length_ft: 1000 }).total_bags, 45000);
+  assert.strictEqual(_v1904({ ...base, fill_weight_lb: 35 }).sand_tons, 22500 * 35 / 2000);
+  assert.strictEqual(r.over_preferred, false);
+  assert.strictEqual(_v1904({ ...base, height_ft: 4 }).over_preferred, true);
+  assert.strictEqual(_v1904({ ...base, height_ft: 4 }).over_practical, false);
+  assert.ok(/ABOVE the 5 ft/.test(_v1904({ ...base, height_ft: 5.5 }).height_flag));
+  for (const k of ["height_ft", "length_ft", "fill_weight_lb"]) {
+    assert.ok("error" in _v1904({ ...base, [k]: 0 }));
+    assert.ok("error" in _v1904({ ...base, [k]: -1 }));
+  }
+  assert.ok("error" in _v1904({ ...base, height_ft: Infinity }));
+});
+
+import { computeEmergencyEarthLeveeSection as _v1905 } from "../../calc-floodfight.js";
+test("bounds: spec-v1905 computeEmergencyEarthLeveeSection pins the sections and the creep shortfall", () => {
+  const base = { height_ft: 4, fill: "sand", foundation: "fine_sand", top_width_ft: 10, length_ft: 100 };
+  const s = _v1905(base);
+  assert.strictEqual(s.base_width_ft, 42);
+  assert.strictEqual(s.area_sqft, 104);
+  assert.ok(Math.abs(s.fill_cy - 10400 / 27) < 1e-9);
+  assert.strictEqual(s.creep_applies, false);
+  const c = _v1905({ ...base, fill: "clay" });
+  assert.strictEqual(c.base_width_ft, 30);
+  assert.strictEqual(c.area_sqft, 80);
+  assert.ok(Math.abs(c.fill_cy - 8000 / 27) < 1e-9);
+  // The finding: the clay base is half the seepage path fine sand needs.
+  assert.strictEqual(c.required_path_ft, 60);
+  assert.strictEqual(c.berm_shortfall_ft, 30);
+  const g = _v1905({ ...base, fill: "clay", foundation: "fine_gravel" });
+  assert.strictEqual(g.required_path_ft, 36);
+  assert.strictEqual(g.berm_shortfall_ft, 6);
+  const imp = _v1905({ ...base, fill: "clay", foundation: "impervious" });
+  assert.strictEqual(imp.creep_applies, false);
+  assert.strictEqual(imp.berm_shortfall_ft, 0);
+  // A short clay levee on gravel passes: 1 ft -> base 15 ft vs 9 ft path.
+  assert.strictEqual(_v1905({ ...base, height_ft: 1, fill: "clay", foundation: "fine_gravel" }).berm_shortfall_ft, 0);
+  // Fill is linear in length; top width below 10 ft on sand is flagged.
+  assert.ok(Math.abs(_v1905({ ...base, length_ft: 200 }).fill_cy - 2 * s.fill_cy) < 1e-9);
+  assert.strictEqual(_v1905({ ...base, top_width_ft: 8 }).top_below_handbook, true);
+  for (const k of ["height_ft", "top_width_ft", "length_ft"]) assert.ok("error" in _v1905({ ...base, [k]: 0 }));
+  assert.ok("error" in _v1905({ ...base, fill: "rock" }));
+  assert.ok("error" in _v1905({ ...base, foundation: "silt" }));
+  assert.ok("error" in _v1905({ ...base, height_ft: NaN }));
+});
+
+import { computeFloodLateralLoad as _v1906 } from "../../calc-floodfight.js";
+test("bounds: spec-v1906 computeFloodLateralLoad pins FEMA P-55 loads and the velocity bounds", () => {
+  const base = { depth_ft: 4, width_ft: 10, water: "fresh", velocity_basis: "lower", entered_velocity_fps: 0, obstruction: "wall" };
+  const r = _v1906(base);
+  assert.ok(Math.abs(r.hydrostatic_lb_per_ft - 499.2) < 1e-9);
+  assert.ok(Math.abs(r.hydrostatic_lb - 4992) < 1e-9);
+  assert.ok(Math.abs(r.hydrostatic_height_ft - 4 / 3) < 1e-12);
+  assert.strictEqual(r.velocity_lower_fps, 4);
+  assert.ok(Math.abs(r.velocity_upper_fps - Math.sqrt(128.8)) < 1e-12);
+  assert.strictEqual(r.drag_coefficient, 1.25);
+  assert.ok(Math.abs(r.hydrodynamic_lower_lb - 776) < 1e-9);
+  assert.ok(Math.abs(r.hydrodynamic_upper_lb - 0.5 * 1.25 * 1.94 * 128.8 * 40) < 1e-9);
+  assert.strictEqual(r.hydrodynamic_height_ft, 2);
+  assert.ok(Math.abs(r.combined_lateral_lb - (4992 + 776)) < 1e-9);
+  // The finding: at the upper bound drag exceeds the still-water load.
+  assert.strictEqual(r.drag_exceeds_static, false);
+  assert.strictEqual(_v1906({ ...base, velocity_basis: "upper" }).drag_exceeds_static, true);
+  // Saltwater, 6 ft, 20 ft wall.
+  assert.ok(Math.abs(_v1906({ ...base, depth_ft: 6, width_ft: 20, water: "salt" }).hydrostatic_lb - 23040) < 1e-9);
+  // Hydrostatic grows with the square of depth; drag with velocity squared.
+  assert.ok(Math.abs(_v1906({ ...base, depth_ft: 8 }).hydrostatic_lb_per_ft - 4 * r.hydrostatic_lb_per_ft) < 1e-9);
+  assert.ok(Math.abs(_v1906({ ...base, velocity_basis: "entered", entered_velocity_fps: 8 }).hydrodynamic_lb - 4 * r.hydrodynamic_lb) < 1e-9);
+  assert.strictEqual(_v1906({ ...base, velocity_basis: "entered", entered_velocity_fps: 20 }).entered_outside_bounds, true);
+  // Table 8-2 bands and pile values.
+  [[48, 1.25], [52, 1.3], [128, 1.4], [160, 1.5], [320, 1.75], [480, 1.8], [500, 2.0]].forEach(([w, cd]) => assert.strictEqual(_v1906({ ...base, width_ft: w }).drag_coefficient, cd));
+  assert.strictEqual(_v1906({ ...base, obstruction: "round_pile" }).drag_coefficient, 1.2);
+  assert.strictEqual(_v1906({ ...base, obstruction: "square_pile" }).drag_coefficient, 2.0);
+  assert.ok("error" in _v1906({ ...base, depth_ft: 0 }));
+  assert.ok("error" in _v1906({ ...base, width_ft: -1 }));
+  assert.ok("error" in _v1906({ ...base, entered_velocity_fps: -1 }));
+  assert.ok("error" in _v1906({ ...base, water: "brackish" }));
+  assert.ok("error" in _v1906({ ...base, velocity_basis: "mean" }));
+  assert.ok("error" in _v1906({ ...base, obstruction: "fence" }));
+  assert.ok("error" in _v1906({ ...base, depth_ft: Infinity }));
+});
+
+import { computeFloodDebrisImpact as _v1907 } from "../../calc-floodfight.js";
+test("bounds: spec-v1907 computeFloodDebrisImpact pins Eq. 8.9 and the stiffness finding", () => {
+  const base = { debris_weight_lb: 1000, zone: "a", depth_ft: 4, velocity_basis: "eq89", entered_velocity_fps: 0, screening: "none", structure: "rc_wall" };
+  const r = _v1907(base);
+  assert.ok(Math.abs(r.velocity_used_fps - 0.5 * Math.sqrt(128.8)) < 1e-12);
+  assert.strictEqual(r.depth_coefficient, 0.75);
+  assert.ok(Math.abs(r.impact_force_lb - 1000 * 0.5 * Math.sqrt(128.8) * 0.75 * 0.8) < 1e-9);
+  assert.ok(Math.abs(r.impact_force_lb - 3405) < 1);
+  assert.strictEqual(r.impact_elevation_ft, 4);
+  // The finding: the stiff wall takes four times the timber pile's force.
+  const t = _v1907({ ...base, structure: "timber_masonry" });
+  assert.ok(Math.abs(r.impact_force_lb / t.impact_force_lb - 4) < 1e-12);
+  assert.ok(Math.abs(_v1907({ ...base, structure: "concrete_frame" }).impact_force_lb * 2 - r.impact_force_lb) < 1e-9);
+  const v = _v1907({ ...base, zone: "v_floodway", depth_ft: 8, structure: "timber_masonry" });
+  assert.strictEqual(v.depth_coefficient, 1);
+  assert.ok(Math.abs(v.impact_force_lb - 1605) < 1);
+  // Table 8-3 rows on the line, clamped.
+  [[0.5, 0], [1, 0], [2, 0.25], [2.5, 0.375], [3, 0.5], [5, 1], [7, 1]].forEach(([d, cd]) => assert.ok(Math.abs(_v1907({ ...base, depth_ft: d }).depth_coefficient - cd) < 1e-12));
+  [["limited", 0.6], ["moderate", 0.2], ["dense", 0]].forEach(([s, cb]) => assert.strictEqual(_v1907({ ...base, screening: s }).blockage_coefficient, cb));
+  assert.strictEqual(_v1907({ ...base, screening: "dense" }).impact_force_lb, 0);
+  // Linear in weight and in entered velocity.
+  assert.ok(Math.abs(_v1907({ ...base, debris_weight_lb: 2000 }).impact_force_lb - 2 * r.impact_force_lb) < 1e-9);
+  assert.ok(Math.abs(_v1907({ ...base, velocity_basis: "entered", entered_velocity_fps: 5 }).impact_force_lb - 1000 * 5 * 0.75 * 0.8) < 1e-9);
+  assert.strictEqual(_v1907({ ...base, velocity_basis: "entered", entered_velocity_fps: 2 }).entered_outside_bounds, true);
+  assert.ok("error" in _v1907({ ...base, debris_weight_lb: 0 }));
+  assert.ok("error" in _v1907({ ...base, depth_ft: 0 }));
+  assert.ok("error" in _v1907({ ...base, entered_velocity_fps: -1 }));
+  assert.ok("error" in _v1907({ ...base, zone: "x" }));
+  assert.ok("error" in _v1907({ ...base, velocity_basis: "upper" }));
+  assert.ok("error" in _v1907({ ...base, screening: "some" }));
+  assert.ok("error" in _v1907({ ...base, structure: "steel" }));
+  assert.ok("error" in _v1907({ ...base, depth_ft: NaN }));
+});
+
+import { computeFloodUpliftCoverSlab as _v1908 } from "../../calc-floodfight.js";
+test("bounds: spec-v1908 computeFloodUpliftCoverSlab pins the floating slab and the ton on the cover", () => {
+  const base = { head_ft: 3, water: "fresh", element: "slab", slab_thickness_in: 4, slab_area_sqft: 1200, cover_diameter_ft: 2, cover_weight_lb: 0 };
+  const r = _v1908(base);
+  assert.ok(Math.abs(r.uplift_psf - 187.2) < 1e-9);
+  assert.strictEqual(r.resisting_psf, 50);
+  assert.ok(Math.abs(r.net_psf - 137.2) < 1e-9);
+  assert.ok(Math.abs(r.floating_head_ft - 50 / 62.4) < 1e-12);
+  assert.ok(Math.abs(r.uplift_lb - 224640) < 1e-6);
+  assert.strictEqual(r.lifts, true);
+  assert.ok(Math.abs(_v1908({ ...base, slab_thickness_in: 6 }).floating_head_ft - 75 / 62.4) < 1e-12);
+  // Below the floating head the slab holds.
+  const low = _v1908({ ...base, head_ft: 0.5 });
+  assert.strictEqual(low.lifts, false);
+  assert.strictEqual(low.counterweight_lb, 0);
+  // Manhole cover: 62.4 x 10 x pi = 1,960 lb (handbook prints 2,060).
+  const cov = _v1908({ ...base, head_ft: 10, element: "cover" });
+  assert.ok(Math.abs(cov.uplift_lb - 624 * Math.PI) < 1e-9);
+  assert.ok(Math.abs(cov.uplift_lb - 1960) < 1);
+  assert.ok(Math.abs(_v1908({ ...base, head_ft: 10, element: "cover", cover_weight_lb: 300 }).counterweight_lb - (624 * Math.PI - 300)) < 1e-9);
+  // Linear in head; salt is heavier.
+  assert.ok(Math.abs(_v1908({ ...base, head_ft: 6 }).uplift_psf - 2 * r.uplift_psf) < 1e-9);
+  assert.ok(Math.abs(_v1908({ ...base, water: "salt" }).uplift_psf - 192) < 1e-9);
+  assert.ok("error" in _v1908({ ...base, head_ft: 0 }));
+  assert.ok("error" in _v1908({ ...base, slab_thickness_in: 0 }));
+  assert.ok("error" in _v1908({ ...base, slab_area_sqft: 0 }));
+  assert.ok("error" in _v1908({ ...base, element: "cover", cover_diameter_ft: 0 }));
+  assert.ok("error" in _v1908({ ...base, element: "cover", cover_weight_lb: -1 }));
+  assert.ok("error" in _v1908({ ...base, element: "hatch" }));
+  assert.ok("error" in _v1908({ ...base, water: "oil" }));
+  assert.ok("error" in _v1908({ ...base, head_ft: Infinity }));
+});
+
+import { computeBasementFloodPumpdown as _v1909 } from "../../calc-floodfight.js";
+test("bounds: spec-v1909 computeBasementFloodPumpdown pins the staged schedule and the FEMA limit", () => {
+  const base = { floor_area_sqft: 1200, water_depth_ft: 6, daily_drawdown_ft: 2.5, pump_gpm: 50 };
+  const r = _v1909(base);
+  assert.ok(Math.abs(r.gal_per_ft - 1200 * 1728 / 231) < 1e-9);
+  assert.ok(Math.abs(r.total_gal - 53860) < 1);
+  assert.strictEqual(r.days, 4);
+  assert.strictEqual(r.largest_day_ft, 2.5);
+  assert.ok(Math.abs(r.largest_day_gal - 22442) < 1);
+  assert.ok(Math.abs(r.largest_day_run_min - 449) < 1);
+  assert.strictEqual(r.pump_keeps_up, true);
+  // days = 2 + ceil((depth - 2) / rate) above 2 ft; 1 and 2 days below.
+  [[0.5, 1], [1, 1], [2, 2], [3, 3], [7, 4], [8, 5]].forEach(([d, n]) => assert.strictEqual(_v1909({ ...base, water_depth_ft: d }).days, n));
+  assert.strictEqual(_v1909({ ...base, daily_drawdown_ft: 3 }).days, 4);
+  assert.strictEqual(_v1909({ ...base, daily_drawdown_ft: 2 }).days, 4);
+  assert.strictEqual(_v1909({ ...base, daily_drawdown_ft: 1.5 }).below_fema_rate, true);
+  // Volume linear in area; a small pump is flagged.
+  assert.ok(Math.abs(_v1909({ ...base, floor_area_sqft: 2400 }).total_gal - 2 * r.total_gal) < 1e-6);
+  assert.strictEqual(_v1909({ ...base, pump_gpm: 10 }).pump_keeps_up, false);
+  assert.ok("error" in _v1909({ ...base, daily_drawdown_ft: 3.5 }));
+  for (const k of ["floor_area_sqft", "water_depth_ft", "daily_drawdown_ft", "pump_gpm"]) assert.ok("error" in _v1909({ ...base, [k]: 0 }));
+  assert.ok("error" in _v1909({ ...base, pump_gpm: Infinity }));
+});
+
+import { computeRoofSnowIceWeight as _v1910 } from "../../calc-floodfight.js";
+test("bounds: spec-v1910 computeRoofSnowIceWeight pins the layered load and the ratio", () => {
+  const base = { layer1_depth_in: 18, layer1_type: "wet", layer2_depth_in: 2, layer2_type: "ice", layer3_depth_in: 0, layer3_type: "dry", entered_weight_pcf: 15, ground_snow_psf: 0, override_range: "no", design_snow_psf: 30 };
+  const r = _v1910(base);
+  assert.ok(Math.abs(r.layer1_psf - 31.5) < 1e-9);
+  assert.ok(Math.abs(r.layer2_psf - 9.5) < 1e-9);
+  assert.ok(Math.abs(r.total_psf - 41) < 1e-9);
+  assert.ok(Math.abs(r.design_ratio - 41 / 30) < 1e-12);
+  assert.ok(/AT OR OVER/.test(r.action));
+  // The finding: the same depth dry is under half the design load.
+  const dry = _v1910({ ...base, layer1_type: "dry" });
+  assert.ok(Math.abs(dry.total_psf - 14) < 1e-9);
+  assert.ok(dry.design_ratio < 0.5);
+  assert.ok(/APPROACHING/.test(_v1910({ ...base, layer1_depth_in: 8 }).action));
+  // Linear in depth; settled 12.5; ASCE 7 density capped at 30.
+  assert.ok(Math.abs(_v1910({ ...base, layer1_depth_in: 36 }).layer1_psf - 63) < 1e-9);
+  assert.ok(Math.abs(_v1910({ ...base, layer1_type: "settled", layer1_depth_in: 12 }).layer1_psf - 12.5) < 1e-9);
+  assert.ok(Math.abs(_v1910({ ...base, layer1_type: "asce7", ground_snow_psf: 40, layer1_depth_in: 12 }).layer1_psf - 19.2) < 1e-9);
+  assert.strictEqual(_v1910({ ...base, layer1_type: "asce7", ground_snow_psf: 200 }).asce7_weight_pcf, 30);
+  assert.ok(Math.abs(_v1910({ ...base, layer1_type: "entered", entered_weight_pcf: 18, layer1_depth_in: 12 }).layer1_psf - 18) < 1e-9);
+  // Entered weight outside 3-21 needs the override.
+  assert.ok("error" in _v1910({ ...base, layer1_type: "entered", entered_weight_pcf: 25 }));
+  const ov = _v1910({ ...base, layer1_type: "entered", entered_weight_pcf: 25, override_range: "yes" });
+  assert.strictEqual(ov.range_overridden, true);
+  assert.ok("error" in _v1910({ ...base, layer1_type: "entered", entered_weight_pcf: 70, override_range: "yes" }));
+  assert.ok("error" in _v1910({ ...base, layer1_type: "asce7", ground_snow_psf: 0 }));
+  assert.ok("error" in _v1910({ ...base, layer1_depth_in: -1 }));
+  assert.ok("error" in _v1910({ ...base, design_snow_psf: 0 }));
+  assert.ok("error" in _v1910({ ...base, layer2_type: "slush" }));
+  assert.ok("error" in _v1910({ ...base, layer1_depth_in: Infinity }));
+});
+
+import { computeStormPanelPlywood as _v1911 } from "../../calc-floodfight.js";
+test("bounds: spec-v1911 computeStormPanelPlywood pins the panel, span, and fastener count", () => {
+  const base = { opening_width_in: 36, opening_height_in: 60, overlap_in: 4, thickness_in: 0.4375, fastened_edges: "long", fastener_type: "wood_screw_8", fastener_spacing_in: 16, edge_distance_in: 1, opening_count: 1 };
+  const r = _v1911(base);
+  assert.strictEqual(r.panel_width_in, 44);
+  assert.strictEqual(r.panel_height_in, 68);
+  assert.strictEqual(r.span_in, 44);
+  assert.strictEqual(r.fasteners_per_edge, 6);
+  assert.strictEqual(r.fasteners_per_panel, 12);
+  assert.strictEqual(r.sheets, 1);
+  assert.strictEqual(r.table_column, "panel span <= 4 ft");
+  // The finding: fastening the short edges moves the span into the 4-6 ft column.
+  const sh = _v1911({ ...base, fastened_edges: "short" });
+  assert.strictEqual(sh.span_in, 68);
+  assert.strictEqual(sh.table_column, "4 ft < panel span <= 6 ft");
+  // Exact edge fit: (98 - 2) / 16 = 6 spaces -> 7 fasteners.
+  assert.strictEqual(_v1911({ ...base, opening_height_in: 90 }).fasteners_per_edge, 7);
+  // Nesting: two 22 x 40 panels on a sheet; an oversize panel needs a splice.
+  const small = _v1911({ ...base, opening_width_in: 14, opening_height_in: 32, opening_count: 5 });
+  assert.strictEqual(small.per_sheet, 4);
+  assert.strictEqual(small.sheets, 2);
+  const big = _v1911({ ...base, opening_width_in: 60, opening_height_in: 70 });
+  assert.strictEqual(big.needs_splice, true);
+  assert.strictEqual(_v1911({ ...base, opening_count: 3 }).total_fasteners, 36);
+  assert.ok("error" in _v1911({ ...base, thickness_in: 0.375 }));
+  assert.ok("error" in _v1911({ ...base, opening_width_in: 92, fastened_edges: "short" }));
+  assert.ok(!("error" in _v1911({ ...base, opening_width_in: 88, fastened_edges: "short" })));
+  for (const k of ["opening_width_in", "opening_height_in", "overlap_in", "fastener_spacing_in", "edge_distance_in"]) assert.ok("error" in _v1911({ ...base, [k]: 0 }));
+  assert.ok("error" in _v1911({ ...base, opening_count: 1.5 }));
+  assert.ok("error" in _v1911({ ...base, fastened_edges: "all" }));
+  assert.ok("error" in _v1911({ ...base, fastener_type: "nail" }));
+  assert.ok("error" in _v1911({ ...base, edge_distance_in: 40 }));
+  assert.ok("error" in _v1911({ ...base, overlap_in: Infinity }));
+});
+
+import { computeManufacturedHomeAnchorCount as _v1912 } from "../../calc-floodfight.js";
+test("bounds: spec-v1912 computeManufacturedHomeAnchorCount pins the 24 CFR 3285.402 cells and the zone step", () => {
+  const base = { wind_zone: "I", floor_width_row: "14", home_length_ft: 66, strap_height_row: "25", beam_spacing_row: "82.5", method: "near", sections: 1 };
+  const z1 = _v1912(base);
+  assert.strictEqual(z1.max_spacing_in, 218);
+  assert.strictEqual(z1.run_ft, 62);
+  assert.strictEqual(z1.anchors_per_side, 5);
+  assert.strictEqual(z1.total_anchors, 10);
+  assert.strictEqual(z1.vertical_ties, 0);
+  const z2 = _v1912({ ...base, wind_zone: "II" });
+  assert.strictEqual(z2.max_spacing_in, 91);
+  assert.strictEqual(z2.total_anchors, 20);
+  assert.strictEqual(z2.vertical_ties, 20);
+  const z3 = _v1912({ ...base, wind_zone: "III" });
+  assert.strictEqual(z3.max_spacing_in, 74);
+  assert.strictEqual(z3.total_anchors, 24);
+  assert.strictEqual(z3.vertical_ties, 24);
+  // The finding: Zone II more than halves the Zone I spacing.
+  assert.ok(z2.max_spacing_in < z1.max_spacing_in / 2);
+  // Spot cells from each table.
+  assert.strictEqual(_v1912({ ...base, floor_width_row: "16", strap_height_row: "25", beam_spacing_row: "99.5" }).max_spacing_in, 233);
+  assert.strictEqual(_v1912({ ...base, wind_zone: "II", floor_width_row: "12", strap_height_row: "67", method: "second", beam_spacing_row: "99.5" }).max_spacing_in, 75);
+  assert.strictEqual(_v1912({ ...base, wind_zone: "III", floor_width_row: "16", strap_height_row: "67" }).max_spacing_in, 53);
+  // Sections multiply; the spacing used never exceeds the maximum.
+  assert.strictEqual(_v1912({ ...base, sections: 2 }).total_anchors, 20);
+  assert.ok(z2.spacing_used_ft <= z2.max_spacing_ft + 1e-12);
+  assert.strictEqual(_v1912({ ...base, home_length_ft: 10 }).anchors_per_side, 2);
+  // N/A cells are refused by name.
+  const na = _v1912({ ...base, floor_width_row: "12", strap_height_row: "67" });
+  assert.ok("error" in na && /N\/A/.test(na.error));
+  assert.ok("error" in _v1912({ ...base, wind_zone: "III", floor_width_row: "12", strap_height_row: "46" }));
+  assert.ok("error" in _v1912({ ...base, home_length_ft: 0 }));
+  assert.ok("error" in _v1912({ ...base, home_length_ft: 4 }));
+  assert.ok("error" in _v1912({ ...base, wind_zone: "IV" }));
+  assert.ok("error" in _v1912({ ...base, floor_width_row: "18" }));
+  assert.ok("error" in _v1912({ ...base, strap_height_row: "30" }));
+  assert.ok("error" in _v1912({ ...base, beam_spacing_row: "90" }));
+  assert.ok("error" in _v1912({ ...base, wind_zone: "II", method: "far" }));
+  assert.ok("error" in _v1912({ ...base, sections: 0 }));
+  assert.ok("error" in _v1912({ ...base, home_length_ft: Infinity }));
+});

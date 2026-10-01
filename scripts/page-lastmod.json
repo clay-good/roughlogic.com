@@ -2,99 +2,99 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "1b974a6b563c6a7d",
+      "sha": "ef6e80dc8d35f0b0",
       "date": "2026-10-01"
     },
     "/tools/": {
-      "sha": "3dff78af1d02381d",
+      "sha": "3ff2d92b6ae5bd74",
       "date": "2026-10-01"
     },
     "/collections/disaster-response/": {
-      "sha": "a949145cb05272aa",
+      "sha": "b4b0f9ab8a05f286",
       "date": "2026-10-01"
     },
     "/groups/accounting/": {
-      "sha": "57be5c772092031e",
+      "sha": "5342435df9ffeb8a",
       "date": "2026-10-01"
     },
     "/groups/agriculture/": {
-      "sha": "2093d99136c01b73",
+      "sha": "72c887526e377fd8",
       "date": "2026-10-01"
     },
     "/groups/construction/": {
-      "sha": "b34329babdc9d311",
+      "sha": "d72e9dc22f63b15b",
       "date": "2026-10-01"
     },
     "/groups/cross-trade/": {
-      "sha": "aef471afed80cc35",
+      "sha": "8b2d64a07c2d4884",
       "date": "2026-10-01"
     },
     "/groups/educators/": {
-      "sha": "903a7a41652d6a29",
+      "sha": "c740da50cd82317c",
       "date": "2026-10-01"
     },
     "/groups/electrical/": {
-      "sha": "7528d21718b0feb6",
+      "sha": "53f2863fb4143a35",
       "date": "2026-10-01"
     },
     "/groups/field/": {
-      "sha": "02fc0160f4959e03",
+      "sha": "901c0c0da969dc9b",
       "date": "2026-10-01"
     },
     "/groups/fire-ground/": {
-      "sha": "b5d6f04f69f362f3",
+      "sha": "ebada6a505c8d29f",
       "date": "2026-10-01"
     },
     "/groups/historical/": {
-      "sha": "7bd0cb7552331682",
+      "sha": "c17854efc219829b",
       "date": "2026-10-01"
     },
     "/groups/hvac/": {
-      "sha": "20bf2e6efe101f29",
+      "sha": "9fa9266788bd2827",
       "date": "2026-10-01"
     },
     "/groups/kitchen/": {
-      "sha": "b2dd6fe2f0c1343d",
+      "sha": "ec45e6a9b6763c6a",
       "date": "2026-10-01"
     },
     "/groups/lab/": {
-      "sha": "018069e99b81b431",
+      "sha": "641662784fc3f3eb",
       "date": "2026-10-01"
     },
     "/groups/mechanic/": {
-      "sha": "d24132ff75f94b63",
+      "sha": "c88c738f7d4c2c1c",
       "date": "2026-10-01"
     },
     "/groups/plumbing/": {
-      "sha": "e683fcdf414a3049",
+      "sha": "3c38e427747c34cd",
       "date": "2026-10-01"
     },
     "/groups/real-estate/": {
-      "sha": "7d9a71029db12184",
+      "sha": "b00c83c1f0f0a18b",
       "date": "2026-10-01"
     },
     "/groups/references/": {
-      "sha": "a1aeffb24294c25a",
+      "sha": "3b17db4a43564074",
       "date": "2026-10-01"
     },
     "/groups/restoration/": {
-      "sha": "7359810748426fe5",
+      "sha": "629127c4f3452668",
       "date": "2026-10-01"
     },
     "/groups/rigging-and-heavy-lift/": {
-      "sha": "34b7883d3035534b",
+      "sha": "b05fb50bd932f538",
       "date": "2026-10-01"
     },
     "/groups/stage/": {
-      "sha": "b2c0ce1a83177bdc",
+      "sha": "4041e4f08a4d36c2",
       "date": "2026-10-01"
     },
     "/groups/trucking/": {
-      "sha": "c9da4a61c7ce9b6a",
+      "sha": "c9014b188ef083c8",
       "date": "2026-10-01"
     },
     "/groups/water/": {
-      "sha": "526b55ad415bc38d",
+      "sha": "87462f453509f136",
       "date": "2026-10-01"
     },
     "/tools/aav-install-check/": {
@@ -505,6 +505,10 @@
       "sha": "5435e772f9d7125b",
       "date": "2026-09-29"
     },
+    "/tools/basement-flood-pumpdown/": {
+      "sha": "f2c3342df7ac851c",
+      "date": "2026-10-01"
+    },
     "/tools/baseplate-grout-volume/": {
       "sha": "0b4cd05ed2bd66c6",
       "date": "2026-09-29"
@@ -822,8 +826,8 @@
       "date": "2026-09-29"
     },
     "/tools/brick-veneer-anchor-spacing/": {
-      "sha": "ebeb33ee32f255af",
-      "date": "2026-09-29"
+      "sha": "96c782b2f485538d",
+      "date": "2026-10-01"
     },
     "/tools/brick-veneer-weep-count/": {
       "sha": "1d173ce4c6af87be",
@@ -862,8 +866,8 @@
       "date": "2026-09-29"
     },
     "/tools/bucket-elevator-capacity/": {
-      "sha": "48f2f3d7845d43c2",
-      "date": "2026-09-29"
+      "sha": "c976b0ccc6a92b39",
+      "date": "2026-10-01"
     },
     "/tools/buffer-stroke-speed/": {
       "sha": "91e71668a37298d5",
@@ -2605,6 +2609,10 @@
       "sha": "d41533c680cc848e",
       "date": "2026-09-29"
     },
+    "/tools/emergency-earth-levee-section/": {
+      "sha": "82bdb841a2eba95e",
+      "date": "2026-10-01"
+    },
     "/tools/emergency-water-bleach-dose/": {
       "sha": "c6b0fb52c24ed104",
       "date": "2026-10-01"
@@ -2718,8 +2726,8 @@
       "date": "2026-09-29"
     },
     "/tools/evaporation-load/": {
-      "sha": "18101527c664fda8",
-      "date": "2026-09-29"
+      "sha": "48c9db1d2ff306d9",
+      "date": "2026-10-01"
     },
     "/tools/evaporative-cooler-effectiveness/": {
       "sha": "0bf1673ca4864c79",
@@ -3029,9 +3037,21 @@
       "sha": "8b5cc8d54502aff1",
       "date": "2026-09-30"
     },
+    "/tools/flood-debris-impact/": {
+      "sha": "9a7407be971ea5d8",
+      "date": "2026-10-01"
+    },
+    "/tools/flood-lateral-load/": {
+      "sha": "4645741685d148bd",
+      "date": "2026-10-01"
+    },
     "/tools/flood-opening-area/": {
       "sha": "1f362f352d3c3849",
       "date": "2026-09-30"
+    },
+    "/tools/flood-uplift-cover-slab/": {
+      "sha": "b2a1f3c0bbb1c50c",
+      "date": "2026-10-01"
     },
     "/tools/floor-area-ratio/": {
       "sha": "404790e785d0bcc8",
@@ -3610,8 +3630,8 @@
       "date": "2026-09-29"
     },
     "/tools/hdd-pullback/": {
-      "sha": "ae93279884b8990e",
-      "date": "2026-09-29"
+      "sha": "32269c6dbf0bffdd",
+      "date": "2026-10-01"
     },
     "/tools/hdpe-fusion-pressure-time/": {
       "sha": "862a592b7495c87a",
@@ -4444,6 +4464,10 @@
     "/tools/manual-j-heating/": {
       "sha": "9366813f3fbd1134",
       "date": "2026-09-29"
+    },
+    "/tools/manufactured-home-anchor-count/": {
+      "sha": "99c67c777de8ab4b",
+      "date": "2026-10-01"
     },
     "/tools/manure-application-rate/": {
       "sha": "bca16cdee1a51db8",
@@ -6377,6 +6401,10 @@
       "sha": "92714ae50280c9dd",
       "date": "2026-09-29"
     },
+    "/tools/roof-snow-ice-weight/": {
+      "sha": "d2726b18d70c9de3",
+      "date": "2026-10-01"
+    },
     "/tools/roof-underlayment-rolls/": {
       "sha": "cca1365841af7118",
       "date": "2026-09-29"
@@ -6516,6 +6544,10 @@
     "/tools/sand-permeability-vent/": {
       "sha": "5799e778565bfb91",
       "date": "2026-09-29"
+    },
+    "/tools/sandbag-levee-quantity/": {
+      "sha": "bf9471da986418b5",
+      "date": "2026-10-01"
     },
     "/tools/sanitary-dfu/": {
       "sha": "b0bc8f768aaf8881",
@@ -7022,8 +7054,8 @@
       "date": "2026-09-29"
     },
     "/tools/snow-load/": {
-      "sha": "1d6679c72a16e02e",
-      "date": "2026-09-30"
+      "sha": "df66caaf1d3dbc81",
+      "date": "2026-10-01"
     },
     "/tools/snow-stacking-area/": {
       "sha": "f5ae61994a778ed1",
@@ -7584,6 +7616,10 @@
     "/tools/stopping-sight-distance/": {
       "sha": "c05b4bd2c1b00f31",
       "date": "2026-09-29"
+    },
+    "/tools/storm-panel-plywood/": {
+      "sha": "87e1da1884fd8c6d",
+      "date": "2026-10-01"
     },
     "/tools/storm-shelter/": {
       "sha": "006236e3f766c869",

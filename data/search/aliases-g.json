@@ -1296,6 +1296,16 @@
     {"term":"bottled water pallet weight floor","target":"relief-storage-floor-load","kind":"industry"},
     {"term":"relief supply storage floor capacity","target":"relief-storage-floor-load","kind":"industry"},
     {"term":"gym floor pallet load","target":"relief-storage-floor-load","kind":"industry"},
-    {"term":"how many pallets can the floor hold","target":"relief-storage-floor-load","kind":"industry"}
+    {"term":"how many pallets can the floor hold","target":"relief-storage-floor-load","kind":"industry"},
+    {"term":"how many sandbags","target":"sandbag-levee-quantity","kind":"industry"},
+    {"term":"sandbag wall calculator","target":"sandbag-levee-quantity","kind":"industry"},
+    {"term":"sandbag levee quantity","target":"sandbag-levee-quantity","kind":"industry"},
+    {"term":"tons of sand for sandbags","target":"sandbag-levee-quantity","kind":"industry"},
+    {"term":"flood sandbags per foot","target":"sandbag-levee-quantity","kind":"industry"},
+    {"term":"emergency levee design","target":"emergency-earth-levee-section","kind":"industry"},
+    {"term":"earth levee cross section","target":"emergency-earth-levee-section","kind":"industry"},
+    {"term":"levee fill yards","target":"emergency-earth-levee-section","kind":"industry"},
+    {"term":"levee creep ratio","target":"emergency-earth-levee-section","kind":"industry"},
+    {"term":"flood fight levee","target":"emergency-earth-levee-section","kind":"industry"}
   ]
 }

@@ -92,15 +92,16 @@ test("bucketFor is stable and agrees with allBuckets", () => {
   assert.equal(bucketFor("k", "belt-length"), "k");
   // A split group divides alphabetically on the tile id, so adding a tile
   // never relocates an existing one.
-  assert.equal(SPLIT_GROUPS.e, 3);
+  assert.equal(SPLIT_GROUPS.e, 4);
   assert.equal(bucketFor("E", "ampacity"), "e-1");
   assert.equal(bucketFor("E", "joist-span"), "e-2");
-  assert.equal(bucketFor("E", "voltage-drop"), "e-3");
+  assert.equal(bucketFor("E", "roof-pitch"), "e-3");
+  assert.equal(bucketFor("E", "voltage-drop"), "e-4");
   // A tile id that does not start with a letter lands in the first shard,
   // where an alphabetical listing would put it.
   assert.equal(bucketFor("E", "3-phase-load"), "e-1");
   const all = allBuckets(["E", "K", "E"]);
-  assert.deepEqual(all, ["e-1", "e-2", "e-3", "k"]);
+  assert.deepEqual(all, ["e-1", "e-2", "e-3", "e-4", "k"]);
 });
 
 test("every shard on disk parses, is well-formed, and lands in its own bucket", async () => {

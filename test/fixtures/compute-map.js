@@ -2315,6 +2315,15 @@ export const COMPUTE_MAP = {
   "picket-anchor-soil": { module: "../../calc-usar.js", fn: "computePicketAnchorSoil" },
   "osha-timber-trench-shoring": { module: "../../calc-usar.js", fn: "computeOshaTimberTrenchShoring" },
   "relief-storage-floor-load": { module: "../../calc-usar.js", fn: "computeReliefStorageFloorLoad" },
+  "sandbag-levee-quantity": { module: "../../calc-floodfight.js", fn: "computeSandbagLeveeQuantity" },
+  "emergency-earth-levee-section": { module: "../../calc-floodfight.js", fn: "computeEmergencyEarthLeveeSection" },
+  "flood-lateral-load": { module: "../../calc-floodfight.js", fn: "computeFloodLateralLoad" },
+  "flood-debris-impact": { module: "../../calc-floodfight.js", fn: "computeFloodDebrisImpact" },
+  "flood-uplift-cover-slab": { module: "../../calc-floodfight.js", fn: "computeFloodUpliftCoverSlab" },
+  "basement-flood-pumpdown": { module: "../../calc-floodfight.js", fn: "computeBasementFloodPumpdown" },
+  "roof-snow-ice-weight": { module: "../../calc-floodfight.js", fn: "computeRoofSnowIceWeight" },
+  "storm-panel-plywood": { module: "../../calc-floodfight.js", fn: "computeStormPanelPlywood" },
+  "manufactured-home-anchor-count": { module: "../../calc-floodfight.js", fn: "computeManufacturedHomeAnchorCount" },
 };
 
 // Resolve a COMPUTE_MAP module path (relative to this file) and import it.

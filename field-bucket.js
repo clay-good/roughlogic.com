@@ -19,7 +19,9 @@
 //
 // e (Electrical) holds 2,305 field descriptors, a third of the catalog's, and
 // gzips to 31.7 KB as a single shard. Split in two it is well under the cap.
-export const SPLIT_GROUPS = { e: 3 };
+// 2026-09-30: four shards -- the disaster response bands pushed e-1 to
+// 24.2 KB gzip, over the 24 KB cap.
+export const SPLIT_GROUPS = { e: 4 };
 
 const A = "a".charCodeAt(0);
 

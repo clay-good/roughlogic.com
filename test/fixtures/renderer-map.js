@@ -2216,4 +2216,13 @@ export const RENDERER_MAP = {
   "picket-anchor-soil": { module: "../../calc-usar.js", exportName: "USAR_RENDERERS" },
   "osha-timber-trench-shoring": { module: "../../calc-usar.js", exportName: "USAR_RENDERERS" },
   "relief-storage-floor-load": { module: "../../calc-usar.js", exportName: "USAR_RENDERERS" },
+  "sandbag-levee-quantity": { module: "../../calc-floodfight.js", exportName: "FLOODFIGHT_RENDERERS" },
+  "emergency-earth-levee-section": { module: "../../calc-floodfight.js", exportName: "FLOODFIGHT_RENDERERS" },
+  "flood-lateral-load": { module: "../../calc-floodfight.js", exportName: "FLOODFIGHT_RENDERERS" },
+  "flood-debris-impact": { module: "../../calc-floodfight.js", exportName: "FLOODFIGHT_RENDERERS" },
+  "flood-uplift-cover-slab": { module: "../../calc-floodfight.js", exportName: "FLOODFIGHT_RENDERERS" },
+  "basement-flood-pumpdown": { module: "../../calc-floodfight.js", exportName: "FLOODFIGHT_RENDERERS" },
+  "roof-snow-ice-weight": { module: "../../calc-floodfight.js", exportName: "FLOODFIGHT_RENDERERS" },
+  "storm-panel-plywood": { module: "../../calc-floodfight.js", exportName: "FLOODFIGHT_RENDERERS" },
+  "manufactured-home-anchor-count": { module: "../../calc-floodfight.js", exportName: "FLOODFIGHT_RENDERERS" },
 };

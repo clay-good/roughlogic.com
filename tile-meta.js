@@ -1459,6 +1459,16 @@ const _TILES = [
   ["picket-anchor-soil", "Z"],
   ["osha-timber-trench-shoring", "E"],
   ["relief-storage-floor-load", "G"],
+  // spec-v1904..v1912 disaster response flood fight and storm damage band.
+  ["sandbag-levee-quantity", "G"],
+  ["emergency-earth-levee-section", "G"],
+  ["flood-lateral-load", "E"],
+  ["flood-debris-impact", "E"],
+  ["flood-uplift-cover-slab", "E"],
+  ["basement-flood-pumpdown", "D"],
+  ["roof-snow-ice-weight", "E"],
+  ["storm-panel-plywood", "E"],
+  ["manufactured-home-anchor-count", "E"],
 ];
 
 

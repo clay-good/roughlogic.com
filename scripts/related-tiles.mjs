@@ -2356,6 +2356,15 @@ const RELATED = {
   "picket-anchor-soil": ["usr-raker-shore","guy-anchor-holding-capacity","rigging-check"],
   "osha-timber-trench-shoring": ["excavation-protection-trigger","trench-slope","excavation-bench-plan","soil-vertical-effective-stress"],
   "relief-storage-floor-load": ["rack-upright-capacity-derate","asce-live-load-reduction","pallet-loadout","collapse-floor-load"],
+  "sandbag-levee-quantity": ["emergency-earth-levee-section","flood-lateral-load","dump-truck-loads","windrow-stockpile-volume"],
+  "emergency-earth-levee-section": ["sandbag-levee-quantity","windrow-stockpile-volume","dump-truck-loads","flood-lateral-load"],
+  "flood-lateral-load": ["flood-debris-impact","flood-uplift-cover-slab","flood-opening-area","submerged-earth-pressure"],
+  "flood-debris-impact": ["flood-lateral-load","impact-load-factor","flood-opening-area"],
+  "flood-uplift-cover-slab": ["basement-flood-pumpdown","pipe-flotation","flood-lateral-load","sump-basin-sizing"],
+  "basement-flood-pumpdown": ["standing-water","flood-uplift-cover-slab","pump-tdh","sewage-loss-disposal","drying-balance","dehumidifier"],
+  "roof-snow-ice-weight": ["snow-load","snow-drift-load","sliding-snow-load","rain-on-snow-surcharge"],
+  "storm-panel-plywood": ["sheathing-takeoff","wind-cc-pressure","wind-pressure"],
+  "manufactured-home-anchor-count": ["wind-pressure","sill-plate-anchor-count","storm-panel-plywood"],
 };
 
 export { RELATED };

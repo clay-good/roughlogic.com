@@ -24,22 +24,27 @@
     {
       "file": "d.json",
       "name": "Field descriptors, d runtime shard (generated)",
-      "gzip_size_bytes": 4135
+      "gzip_size_bytes": 4211
     },
     {
       "file": "e-1.json",
       "name": "Field descriptors, e-1 runtime shard (generated)",
-      "gzip_size_bytes": 24414
+      "gzip_size_bytes": 21945
     },
     {
       "file": "e-2.json",
       "name": "Field descriptors, e-2 runtime shard (generated)",
-      "gzip_size_bytes": 14886
+      "gzip_size_bytes": 9011
     },
     {
       "file": "e-3.json",
       "name": "Field descriptors, e-3 runtime shard (generated)",
-      "gzip_size_bytes": 18657
+      "gzip_size_bytes": 23493
+    },
+    {
+      "file": "e-4.json",
+      "name": "Field descriptors, e-4 runtime shard (generated)",
+      "gzip_size_bytes": 4794
     },
     {
       "file": "f.json",
@@ -49,7 +54,7 @@
     {
       "file": "g.json",
       "name": "Field descriptors, g runtime shard (generated)",
-      "gzip_size_bytes": 14756
+      "gzip_size_bytes": 14888
     },
     {
       "file": "h.json",
@@ -126,12 +131,13 @@
     "a.json": "3d5854d2e8ec6ac0a91d5cc81cf3509c974478068cfa860df13751189641dac1",
     "b.json": "0e412c0bbb1fcf5a61752604a08830aa8089c46b079fbefed48049162d0a6f69",
     "c.json": "d923c09b6513f6c1e09c179717864a016eedb08f4f998f10338992bbdeb5e80f",
-    "d.json": "e78b89fe01112b331f40d45b5750e2c213f2e9bcbb9b0e3d1d748a5b7be2253a",
-    "e-1.json": "5d8a84d1f13c36078f59f131be0fe4a8d72e6d178c4c3e12e3adaf5f546aafb1",
-    "e-2.json": "1abc8c94ea8d0e4d775c99247d29fe3360ef23c0ef7e74fa3ed4f50dee8f9869",
-    "e-3.json": "373d0d85a23376bf756fe37bdf709a9ddffe56f46cdfacdd093b634d76dc7252",
+    "d.json": "846136ae3032b1f85bedaf41d92569c30b1f99bc7a11540bc3566c9cf35f2d12",
+    "e-1.json": "522c0e9222cdc44de0c491de3319b76f6c600a7c1a672f494a1acdf786a470af",
+    "e-2.json": "99f6d61f528a8c1d772787eac6ea3f7697ccbe5e6ecc4ae79b4092068ae4b30f",
+    "e-3.json": "a58d0ecdbae3f162041ca0c9048f86df5474bc087138e95f829f326c424f6cad",
+    "e-4.json": "a31fbe97e04631be50276bc32faf652dd049f5e7ae429aa3fcad53f059cdf220",
     "f.json": "1bfc9287ac24e53f401946670e60f5830adcf03ce4c0829547e6291e471ee56a",
-    "g.json": "9092445aaf12e02d4284b4f8d8a723bf6d48c75041c41cfb06e8f52d825b258f",
+    "g.json": "e24a4b16e1634d8f9b975b9f72aaa50d5b4416fde5c71220f0dbf07fd4837a2d",
     "h.json": "492450310773cfd07c08de94568b08c9d15638251c728b0e70a001aa7fc85358",
     "j.json": "32040e467f63f03553a9dfd12df00c1019a766ced8774aecd612fa5a90a927c7",
     "k.json": "e1c95781c0a3962f8bf5c15195c52ba4b7688aeac821b798093beadc7e6904fe",

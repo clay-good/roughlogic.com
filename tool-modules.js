@@ -1878,5 +1878,11 @@ export const TOOL_MODULES = (() => {
     "collapse-floor-load", "usr-vertical-shore-capacity", "usr-crib-capacity", "usr-raker-shore",
     "picket-anchor-soil", "osha-timber-trench-shoring", "relief-storage-floor-load",
   ]);
+  // spec-v1904..v1912: disaster response flood fight and storm damage band.
+  declare("./calc-floodfight.js", "FLOODFIGHT_RENDERERS", [
+    "sandbag-levee-quantity", "emergency-earth-levee-section", "flood-lateral-load",
+    "flood-debris-impact", "flood-uplift-cover-slab", "basement-flood-pumpdown",
+    "roof-snow-ice-weight", "storm-panel-plywood", "manufactured-home-anchor-count",
+  ]);
   return map;
 })();
