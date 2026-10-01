@@ -1358,9 +1358,10 @@ HVACSERVICE_RENDERERS["condensate-overflow-pan"] = _simpleRenderer({
 // ===========================================================================
 
 // ===================== spec-v1415: control damper authority and leakage =====================
-// dims: in { damper_dp_inwg: M L^-1 T^-2, branch_dp_inwg: M L^-1 T^-2, face_area_sqft: L^2, leakage_class_cfm_sqft: L T^-1, closed_dp_inwg: M L^-1 T^-2, design_cfm: L^3 T^-1 } out: { authority: dimensionless, leakage_1in_cfm: L^3 T^-1, leakage_actual_cfm: L^3 T^-1, leakage_pct: dimensionless }
-export function computeDamperAuthority({ damper_dp_inwg = 0, branch_dp_inwg = 0, face_area_sqft = 0, leakage_class_cfm_sqft = 0, closed_dp_inwg = 0, design_cfm = 0 } = {}) {
+// dims: in { damper_dp_inwg: M L^-1 T^-2, branch_dp_inwg: M L^-1 T^-2, face_area_sqft: L^2, leakage_class_cfm_sqft: L T^-1, closed_dp_inwg: M L^-1 T^-2, design_cfm: L^3 T^-1, blade_type: dimensionless } out: { authority: dimensionless, leakage_1in_cfm: L^3 T^-1, leakage_actual_cfm: L^3 T^-1, leakage_pct: dimensionless }
+export function computeDamperAuthority({ damper_dp_inwg = 0, branch_dp_inwg = 0, face_area_sqft = 0, leakage_class_cfm_sqft = 0, closed_dp_inwg = 0, design_cfm = 0, blade_type = "parallel" } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (blade_type !== "parallel" && blade_type !== "opposed") return { error: "Blade type must be parallel or opposed." };
   if (!(damper_dp_inwg > 0)) return { error: "Damper pressure drop wide open must be positive." };
   if (!(branch_dp_inwg > 0)) return { error: "Total branch pressure drop must be positive." };
   if (!(damper_dp_inwg <= branch_dp_inwg)) return { error: "The damper's own drop cannot exceed the branch total it is part of." };
@@ -1372,17 +1373,23 @@ export function computeDamperAuthority({ damper_dp_inwg = 0, branch_dp_inwg = 0,
   // authority makes the installed characteristic effectively on/off, and no amount of
   // controller tuning fixes it, because the problem is hydraulic.
   const authority = damper_dp_inwg / branch_dp_inwg;
-  const in_band = authority >= 0.3 && authority <= 0.5;
+  // JCI Damper & Actuator Manual 268.1 p. 6 (temperature and mixed-air
+  // control): parallel blades 20-25% of the system drop, opposed 8-10%.
+  // Until 2026-10-01 one 0.3-0.5 band (a valve-authority figure) applied to
+  // both, and its remedy -- opposed blades to RAISE authority -- was backwards.
+  const band_low = blade_type === "opposed" ? 0.08 : 0.20;
+  const band_high = blade_type === "opposed" ? 0.10 : 0.25;
+  const in_band = authority >= band_low * (1 - 1e-9) && authority <= band_high * (1 + 1e-9);
   // Leakage scales as the square root of pressure, like any other orifice.
   const leakage_1in_cfm = leakage_class_cfm_sqft * face_area_sqft;
   const leakage_actual_cfm = leakage_1in_cfm * Math.sqrt(closed_dp_inwg / 1.0);
   const leakage_pct = leakage_actual_cfm / design_cfm * 100;
-  const dp_for_target = 0.4 * branch_dp_inwg;
+  const dp_for_target = (band_low + band_high) / 2 * branch_dp_inwg;
   const verdict = in_band
-    ? "authority " + fmt(authority, 2) + " is inside the 0.3 to 0.5 target band"
-    : authority < 0.3
-      ? "authority " + fmt(authority, 2) + " is BELOW the 0.3 target: closing the damper barely changes the branch total until it is nearly shut, and then the flow falls off a cliff. Raise the damper's own resistance -- a smaller damper, or opposed blades instead of parallel -- toward about " + fmt(dp_for_target, 2) + " in w.g., which is usually the answer, because a damper sized to the duct is oversized for control"
-      : "authority " + fmt(authority, 2) + " is ABOVE the 0.5 band: the damper is carrying most of the branch resistance, which costs fan energy for control it does not need";
+    ? "authority " + fmt(authority, 2) + " is inside the " + fmt(band_low, 2) + " to " + fmt(band_high, 2) + " band JCI recommends for " + blade_type + " blades"
+    : authority < band_low
+      ? "authority " + fmt(authority, 2) + " is BELOW the " + fmt(band_low, 2) + " JCI recommends for " + blade_type + " blades: closing the damper barely changes the branch total until it is nearly shut, and then the flow falls off a cliff. Raise the damper's own resistance -- a smaller damper at higher face velocity -- toward about " + fmt(dp_for_target, 2) + " in w.g., which is usually the answer, because a damper sized to the duct is oversized for control" + (blade_type === "parallel" ? "; or use opposed blades, which control well at 8 to 10%" : "")
+      : "authority " + fmt(authority, 2) + " is ABOVE the " + fmt(band_high, 2) + " JCI recommends for " + blade_type + " blades: the damper carries more of the branch resistance than control needs, which costs fan energy";
   if (![authority, leakage_1in_cfm, leakage_actual_cfm, leakage_pct].every(Number.isFinite)) return { error: "Damper-authority math is not a finite value." };
   return {
     authority,
@@ -1392,14 +1399,14 @@ export function computeDamperAuthority({ damper_dp_inwg = 0, branch_dp_inwg = 0,
     leakage_pct,
     dp_for_target,
     verdict,
-    note: "Whether a control damper has enough authority to modulate, and how much a closed one leaks. Authority is the fraction of the branch's resistance that belongs to the damper itself. When it is high, closing the damper changes the branch's total resistance a lot, so flow tracks position and control is smooth; when it is low -- a small damper drop in a branch full of coil, filter, and duct resistance -- closing the damper barely changes the total until it is nearly shut, and then the flow falls off a cliff. The installed characteristic becomes effectively on/off, and no amount of controller tuning fixes it, because the problem is hydraulic and not a control-loop setting. A band of 0.3 to 0.5 is the usual target. The leakage half matters for a different reason entirely: a closed damper that leaks is a closed damper that does not close. On an outside-air damper in a cold climate that is a freeze-stat trip and a burst coil; on a smoke damper it is a life-safety failure; on a VAV box minimum it is a comfort complaint and an energy penalty that runs all year. Leakage is classified as cubic feet per minute per square foot at 1 in w.g., and it scales as the square root of pressure like any other orifice. A damper with 0.15 in w.g. of drop in a 0.60 in w.g. branch has an authority of 0.25 -- poor control -- while leaking only 11.3 cfm of 2,000 at half an inch, which is excellent. Fixing the authority means raising the damper's own resistance or reducing the rest of the branch, and the first is almost always the answer because a damper sized to the duct is usually oversized for control. This is the air-side companion to the hydronic control valve authority question. A design screen; the damper manufacturer's published leakage class and pressure-drop data, and AMCA's classifications in full, govern.",
+    note: "Whether a control damper has enough authority to modulate, and how much a closed one leaks. Authority is the fraction of the branch's resistance that belongs to the damper itself. When it is high, closing the damper changes the branch's total resistance a lot, so flow tracks position and control is smooth; when it is low -- a small damper drop in a branch full of coil, filter, and duct resistance -- closing the damper barely changes the total until it is nearly shut, and then the flow falls off a cliff. The installed characteristic becomes effectively on/off, and no amount of controller tuning fixes it, because the problem is hydraulic and not a control-loop setting. The target depends on the blade: the Johnson Controls Damper and Actuator Manual (268.1) recommends the damper take 20 to 25% of the system drop for a parallel-blade damper and only 8 to 10% for an opposed-blade one in temperature and mixed-air control, because opposed blades have the more linear inherent characteristic. The leakage half matters for a different reason entirely: a closed damper that leaks is a closed damper that does not close. On an outside-air damper in a cold climate that is a freeze-stat trip and a burst coil; on a smoke damper it is a life-safety failure; on a VAV box minimum it is a comfort complaint and an energy penalty that runs all year. Leakage is classified as cubic feet per minute per square foot at 1 in w.g., and it scales as the square root of pressure like any other orifice. A damper with 0.15 in w.g. of drop in a 0.60 in w.g. branch has an authority of 0.25 -- on target for a parallel-blade damper, and more than an opposed-blade one needs -- while leaking only 11.3 cfm of 2,000 at half an inch, which is excellent. Fixing the authority means raising the damper's own resistance or reducing the rest of the branch, and the first is almost always the answer because a damper sized to the duct is usually oversized for control. This is the air-side companion to the hydronic control valve authority question. A design screen; the damper manufacturer's published leakage class and pressure-drop data, and AMCA's classifications in full, govern.",
   };
 }
 
-export const damperAuthorityExample = { inputs: { damper_dp_inwg: 0.15, branch_dp_inwg: 0.60, face_area_sqft: 4, leakage_class_cfm_sqft: 4, closed_dp_inwg: 0.5, design_cfm: 2000 } };
+export const damperAuthorityExample = { inputs: { damper_dp_inwg: 0.15, branch_dp_inwg: 0.60, face_area_sqft: 4, leakage_class_cfm_sqft: 4, closed_dp_inwg: 0.5, design_cfm: 2000, blade_type: "parallel" } };
 
 HVACSERVICE_RENDERERS["damper-authority"] = _simpleRenderer({
-  citation: "Citation: control damper authority as the damper's wide-open pressure drop over the total variable-branch drop, with a 0.3 to 0.5 target band, and AMCA-classified leakage in cfm per square foot at 1 in w.g. scaled as the square root of the actual pressure, by name. The leakage class rate is entered rather than bundled. The damper manufacturer's published leakage class and pressure-drop data, and AMCA's classifications in full, govern.",
+  citation: "Citation: control damper authority as the damper's wide-open pressure drop over the total variable-branch drop, with the JCI 268.1 target band by blade type (parallel 20 to 25%, opposed 8 to 10% of the system drop), and AMCA-classified leakage in cfm per square foot at 1 in w.g. scaled as the square root of the actual pressure, by name. The leakage class rate is entered rather than bundled. The damper manufacturer's published leakage class and pressure-drop data, and AMCA's classifications in full, govern.",
   example: damperAuthorityExample.inputs,
   fields: [
     { key: "damper_dp_inwg", label: "Damper pressure drop wide open (in w.g.)", kind: "number" },
@@ -1408,6 +1415,7 @@ HVACSERVICE_RENDERERS["damper-authority"] = _simpleRenderer({
     { key: "leakage_class_cfm_sqft", label: "Leakage class rate (cfm per sq ft at 1 in w.g.)", kind: "number" },
     { key: "closed_dp_inwg", label: "Pressure across the closed damper (in w.g.)", kind: "number" },
     { key: "design_cfm", label: "Design airflow (cfm)", kind: "number" },
+    { key: "blade_type", label: "Blade type", kind: "select", default: "parallel", options: [{ value: "parallel", label: "Parallel blade" }, { value: "opposed", label: "Opposed blade" }] },
   ],
   outputs: [
     { key: "a", id: "dmpa-out-a", label: "Authority", value: (r) => fmt(r.authority, 3) },
@@ -1448,7 +1456,7 @@ export function computeChilledWaterDeltaT({ load_btuh = 0, actual_gpm = 0, desig
     pump_penalty,
     tons,
     verdict,
-    note: "Whether a chilled-water plant is achieving its design delta-T, and what the excess flow is costing in pumping power. Five hundred is 8.34 lb per gallon times 60 minutes per hour times water's specific heat of one, so a circuit's delta-T is fixed once the load and the flow are known -- a plant designed for a 12 degree delta-T and running 9 is moving a third more water than it needs to, and the water is doing the same job either way. The consequences compound. Pump power follows the CUBE of flow, so 25% excess flow is nearly double the pumping energy, and that line is usually the largest number in the whole conversation. Beyond the pumping cost, a low delta-T means the chillers see a warmer return than they were selected for, so the plant has to run more machines at part load to serve the same tons and each one runs less efficiently: a plant with a chronic low delta-T is short of capacity long before it is short of chillers. A 240 ton plant at a measured 600 gpm against a 12 degree design is running 9.6 degrees, 120 gpm over the 480 it needs, with the pumps drawing 1.95 times design power -- roughly 20 hp of continuous waste on a 40 hp pump, spent to move water that is not picking up heat. The causes are all downstream: three-way valves left in place, coil control valves that never fully close, coils fouled or selected for a low delta-T, and a bypass that was supposed to be temporary. This does not find them, but it quantifies why finding them is worth doing. A diagnostic screen; the plant's own instrumentation, a calibrated flow measurement, and the chiller selection govern.",
+    note: "Whether a chilled-water plant is achieving its design delta-T, and what the excess flow is costing in pumping power. Five hundred is 8.34 lb per gallon times 60 minutes per hour times water's specific heat of one, so a circuit's delta-T is fixed once the load and the flow are known -- a plant designed for a 12 degree delta-T and running 9 is moving a third more water than it needs to, and the water is doing the same job either way. The consequences compound. By the pump affinity laws power follows the CUBE of flow, so 25% excess flow is nearly double the pumping energy -- an upper bound, since real systems with static head and fixed control setpoints save less (Taylor, ASHRAE Transactions 2002) -- and that line is usually the largest number in the whole conversation. Beyond the pumping cost, a low delta-T means the chillers see a warmer return than they were selected for, so the plant has to run more machines at part load to serve the same tons and each one runs less efficiently: a plant with a chronic low delta-T is short of capacity long before it is short of chillers. A 240 ton plant at a measured 600 gpm against a 12 degree design is running 9.6 degrees, 120 gpm over the 480 it needs, with the pumps drawing 1.95 times design power -- roughly 20 hp of continuous waste on a 40 hp pump, spent to move water that is not picking up heat. The causes are all downstream: three-way valves left in place, coil control valves that never fully close, coils fouled or selected for a low delta-T, and a bypass that was supposed to be temporary. This does not find them, but it quantifies why finding them is worth doing. A diagnostic screen; the plant's own instrumentation, a calibrated flow measurement, and the chiller selection govern.",
   };
 }
 

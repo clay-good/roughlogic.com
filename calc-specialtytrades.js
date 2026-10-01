@@ -295,41 +295,48 @@ SPECIALTYTRADES_RENDERERS["awning-canopy-load"] = _simpleRenderer({
 });
 
 // ===================== spec-v1429: garage door torsion spring =====================
-// dims: in { door_weight_lb: M L T^-2, door_height_in: L, drum_radius_in: L, springs: dimensionless } out: { required_torque_inlb: M L^2 T^-2, turns: dimensionless, required_ippt: M L^2 T^-2 }
-export function computeGarageDoorTorsionSpring({ door_weight_lb = 0, door_height_in = 0, drum_radius_in = 0, springs = 1 } = {}) {
+// dims: in { door_weight_lb: M L T^-2, door_height_in: L, drum_radius_in: L, springs: dimensionless, extra_turns: dimensionless } out: { required_torque_inlb: M L^2 T^-2, turns: dimensionless, lift_turns: dimensionless, required_ippt: M L^2 T^-2 }
+export function computeGarageDoorTorsionSpring({ door_weight_lb = 0, door_height_in = 0, drum_radius_in = 0, springs = 1, extra_turns = 1 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(door_weight_lb > 0)) return { error: "Door weight must be positive." };
   if (!(door_height_in > 0)) return { error: "Door height must be positive." };
   if (!(drum_radius_in > 0)) return { error: "Cable drum radius must be positive." };
   if (!(springs >= 1)) return { error: "There must be at least one spring." };
+  if (!(extra_turns >= 0 && extra_turns <= 3)) return { error: "Extra turns must be 0 to 3 (about 1 is usual; the drum maker's chart governs)." };
   // Torque is weight through the drum radius; turns are pure geometry -- the
   // cable has to wind the full door height onto the drum's circumference.
   const required_torque_inlb = door_weight_lb * drum_radius_in;
   const travel_per_turn_in = 2 * Math.PI * drum_radius_in;
-  const turns = door_height_in / travel_per_turn_in;
+  // The lift turns wind the door height onto the drum; the spring also needs
+  // torque left with the door OPEN, so it is wound about one turn more
+  // (Canimex drum charts run about 1.15). Until 2026-10-01 the turns were the
+  // lift turns alone, which leaves the spring slack at the top of travel.
+  const lift_turns = door_height_in / travel_per_turn_in;
+  const turns = lift_turns + extra_turns;
   const required_ippt = required_torque_inlb / turns;
   const ippt_per_spring = required_ippt / springs;
   if (![required_torque_inlb, travel_per_turn_in, turns, required_ippt, ippt_per_spring].every(Number.isFinite)) return { error: "Torsion-spring math is not a finite value." };
   return {
-    required_torque_inlb, travel_per_turn_in, turns, required_ippt, ippt_per_spring,
-    note: "What a garage door torsion spring has to do: the torque it must produce is the door's weight acting through the cable drum radius, the turns come from the door height, and the required spring rate is one divided by the other. A torsion spring balances a door by storing exactly as much torque at the closed position as the door weight exerts through the drum, so torque is weight times drum radius and that is the target. The number of turns is pure geometry -- the cable has to wind the full door height onto the drum, and one turn takes up the drum's circumference. Spring rate in inch-pounds per turn, IPPT, is what a supplier is given, and it is the target torque divided by the turns. Note what that means: two doors of the same weight but different heights need springs of DIFFERENT rate, because the taller door gets more turns to reach the same torque, and two springs share the rate with each carrying half. A 7 ft door weighing 150 lb on a 2 in effective cable radius wants 300 in-lb over 6.68 turns, which is 44.9 IPPT total or 22.4 IPPT per spring in a pair. Add an insulated panel that brings it to 190 lb and the required rate rises 27 percent with the weight; raise the door to 8 ft at the original weight and the rate FALLS to 39.3, because the same torque is reached over more turns. Weight and height pull in opposite directions. The balance is exact at only one position, because the spring is linear and the door's demand is not once it starts breaking over the radius, which is why a properly balanced door still needs a few pounds of hand force mid-travel. TORSION SPRINGS ARE STORED ENERGY AND THEY INJURE PEOPLE. Winding, unwinding, and replacing them is done with proper winding bars by someone trained to do it, and a broken cable or a slipping drum turns a wound spring into a projectile. This calculates what a spring must do; it does not tell anyone how to install one and no one should learn that here. It does not select a spring from wire size, inside diameter, and length -- that is the manufacturer's table, which also sets the cycle life most owners actually care about -- and the helical torsion spring rate calculation here is the one that goes the other way, from wire geometry to rate. It assumes a linear spring pair on a standard-lift door with matched drums; high-lift, vertical-lift, and low-headroom conversions change the drum geometry. The door and hardware manufacturers and a qualified installer govern.",
+    required_torque_inlb, travel_per_turn_in, lift_turns, extra_turns, turns, required_ippt, ippt_per_spring,
+    note: "What a garage door torsion spring has to do: the torque it must produce is the door's weight acting through the cable drum radius, the turns come from the door height, and the required spring rate is one divided by the other. A torsion spring balances a door by storing exactly as much torque at the closed position as the door weight exerts through the drum, so torque is weight times drum radius and that is the target. The number of turns is pure geometry -- the cable has to wind the full door height onto the drum, and one turn takes up the drum's circumference. Spring rate in inch-pounds per turn, IPPT, is what a supplier is given, and it is the target torque divided by the turns. Note what that means: two doors of the same weight but different heights need springs of DIFFERENT rate, because the taller door gets more turns to reach the same torque, and two springs share the rate with each carrying half. A 7 ft door weighing 150 lb on a 2 in effective cable radius wants 300 in-lb; the cable takes 6.68 turns to wind the door height, and the spring carries about one turn more so it still holds the door at the top (Canimex's drum charts run about 1.15), so 7.68 turns and 39.0 IPPT total, or 19.5 IPPT per spring in a pair. Winding only the 6.68 lift turns leaves no spring torque with the door open, and an open door that drifts down is the hazard. Add an insulated panel that brings it to 190 lb and the required rate rises 27 percent with the weight; raise the door to 8 ft at the original weight and the rate FALLS to 39.3, because the same torque is reached over more turns. Weight and height pull in opposite directions. The balance is exact at only one position, because the spring is linear and the door's demand is not once it starts breaking over the radius, which is why a properly balanced door still needs a few pounds of hand force mid-travel. TORSION SPRINGS ARE STORED ENERGY AND THEY INJURE PEOPLE. Winding, unwinding, and replacing them is done with proper winding bars by someone trained to do it, and a broken cable or a slipping drum turns a wound spring into a projectile. This calculates what a spring must do; it does not tell anyone how to install one and no one should learn that here. It does not select a spring from wire size, inside diameter, and length -- that is the manufacturer's table, which also sets the cycle life most owners actually care about -- and the helical torsion spring rate calculation here is the one that goes the other way, from wire geometry to rate. It assumes a linear spring pair on a standard-lift door with matched drums; high-lift, vertical-lift, and low-headroom conversions change the drum geometry. The door and hardware manufacturers and a qualified installer govern.",
   };
 }
 
-export const garageDoorTorsionSpringExample = { inputs: { door_weight_lb: 150, door_height_in: 84, drum_radius_in: 2, springs: 2 } };
+export const garageDoorTorsionSpringExample = { inputs: { door_weight_lb: 150, door_height_in: 84, drum_radius_in: 2, springs: 2, extra_turns: 1 } };
 
 SPECIALTYTRADES_RENDERERS["garage-door-torsion-spring"] = _simpleRenderer({
-  citation: "Citation: the torsion-spring balance relation -- required torque equals door weight times cable drum radius, turns equal door height divided by the drum circumference, and required rate equals torque divided by turns -- with the inch-pounds-per-turn (IPPT) rate convention used by overhead door manufacturers, by name. Torsion springs are stored energy: this states what a spring must do and is not installation instruction. The door and hardware manufacturers, their spring tables and cycle-life ratings, and a qualified installer govern.",
+  citation: "Citation: the torsion-spring balance relation -- required torque equals door weight times cable drum radius, turns equal door height divided by the drum circumference plus about one turn to hold the door open, and required rate equals torque divided by turns -- with the inch-pounds-per-turn (IPPT) rate convention used by overhead door manufacturers, by name. Torsion springs are stored energy: this states what a spring must do and is not installation instruction. The door and hardware manufacturers, their spring tables and cycle-life ratings, and a qualified installer govern.",
   example: garageDoorTorsionSpringExample.inputs,
   fields: [
     { key: "door_weight_lb", label: "Door weight (lb)", kind: "number" },
     { key: "door_height_in", label: "Door height (in)", kind: "number" },
     { key: "drum_radius_in", label: "Effective cable drum radius (in)", kind: "number" },
     { key: "springs", label: "Number of springs", kind: "number" },
+    { key: "extra_turns", label: "Turns beyond the lift that hold the door open (about 1; the drum maker's chart governs)", kind: "number", default: 1 },
   ],
   outputs: [
     { key: "t", id: "gdts-out-t", label: "Required torque at the closed position", value: (r) => fmt(r.required_torque_inlb, 0) + " in-lb" },
-    { key: "u", id: "gdts-out-u", label: "Turns of the spring", value: (r) => fmt(r.turns, 2) + " turns at " + fmt(r.travel_per_turn_in, 2) + " in of cable per turn" },
+    { key: "u", id: "gdts-out-u", label: "Turns of the spring", value: (r) => fmt(r.turns, 2) + " turns: " + fmt(r.lift_turns, 2) + " to wind the door height at " + fmt(r.travel_per_turn_in, 2) + " in of cable per turn, plus " + fmt(r.extra_turns, 2) + " to hold it open" },
     { key: "r", id: "gdts-out-r", label: "Required rate", value: (r) => fmt(r.required_ippt, 1) + " IPPT total" },
     { key: "p", id: "gdts-out-p", label: "Rate per spring", value: (r) => fmt(r.ippt_per_spring, 1) + " IPPT each across " + fmt(r.required_ippt / r.ippt_per_spring, 0) + " springs" },
     { key: "n", id: "gdts-out-n", label: "Note", value: (r) => r.note },

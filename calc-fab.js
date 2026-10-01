@@ -2024,15 +2024,18 @@ export function computeInterpassTemperatureControl({ tau_min = 0, ambient_f = 70
   if (!(preheat_min_f > ambient_f)) return { error: "The preheat minimum must be above ambient, or the joint never falls below it." };
   if (!(interpass_max_f > preheat_min_f)) return { error: "The interpass maximum must be above the preheat minimum -- they are the two ends of one window." };
   if (!(current_temp_f > ambient_f)) return { error: "The current joint temperature must be above ambient." };
-  if (!(restart_temp_f > ambient_f)) return { error: "The restart temperature must be above ambient." };
+  if (!(restart_temp_f >= preheat_min_f && restart_temp_f <= interpass_max_f)) return { error: "The restart temperature must sit inside the window, from the preheat minimum up to the interpass maximum -- the procedure forbids welding outside it." };
   if (!(elapsed_min >= 0)) return { error: "Elapsed time cannot be negative." };
   // Newtonian cooling toward ambient. tau is a property of THIS joint -- its mass, its
   // section, its exposure -- and it has to be measured, not assumed.
   const idle_allowance_min = current_temp_f > preheat_min_f
     ? tau_min * Math.log((current_temp_f - ambient_f) / (preheat_min_f - ambient_f))
     : 0;
-  const required_wait_min = interpass_max_f > restart_temp_f
-    ? tau_min * Math.log((interpass_max_f - ambient_f) / (restart_temp_f - ambient_f))
+  // The wait runs from where the joint IS. Until 2026-10-01 it ran from the
+  // interpass maximum whatever the joint read, so 800 F and 500 F got the same
+  // wait and a joint already inside the window was told to wait.
+  const required_wait_min = current_temp_f > restart_temp_f && current_temp_f > interpass_max_f
+    ? tau_min * Math.log((current_temp_f - ambient_f) / (restart_temp_f - ambient_f))
     : 0;
   const temp_at_elapsed_f = ambient_f + (current_temp_f - ambient_f) * Math.exp(-elapsed_min / tau_min);
   const inside_window = current_temp_f >= preheat_min_f && current_temp_f <= interpass_max_f;
@@ -2048,7 +2051,7 @@ export function computeInterpassTemperatureControl({ tau_min = 0, ambient_f = 70
     temp_at_elapsed_f,
     inside_window,
     status,
-    note: "How long a welder can stop before a joint needs reheating, and how long to wait after a pass that ran hot. Preheat and interpass are a window rather than two separate rules, and the welder lives inside it: below the preheat minimum, hydrogen cracking risk rises and the procedure is violated, and above the interpass maximum the cooling time stretches, grain growth costs toughness, and the procedure is violated in the other direction. Both limits come from the welding procedure specification. The two outputs answer the two questions that actually arise on a heavy weldment. The idle allowance is how long a welder can stop -- for a fit-up, for a grind, for a break -- before the joint drops below preheat, and it is usually shorter than people expect. The required wait is the other case: a pass ran hot, the joint is at or over the interpass maximum, and welding cannot resume until it comes down. A joint with a measured time constant of 12 min in a 70 F shop, on a procedure calling for 200 F preheat and a 500 F interpass maximum, gives about 6.9 min of idle after a pass that ended at 300 F, and about 14.4 min of waiting after a pass that ended at 500 F. Seven minutes is shorter than a lot of fit-up interruptions, which is why heavy weldments get blankets and why a torch stays lit next to the work; and fourteen minutes of standing still, on a joint with twenty passes, is nearly five hours of lost production if it happens every time. The time constant is a property of the specific joint -- its mass, its section, its exposure -- and it must be measured rather than assumed: timing one cooling interval with a contact pyrometer gives it, and the whole schedule follows. A scheduling aid; the welding procedure specification and a measured joint temperature govern.",
+    note: "How long a welder can stop before a joint needs reheating, and how long to wait after a pass that ran hot. Preheat and interpass are a window rather than two separate rules, and the welder lives inside it: below the preheat minimum, hydrogen cracking risk rises and the procedure is violated, and above the interpass maximum the cooling time stretches, grain growth costs toughness, and the procedure is violated in the other direction. Both limits come from the welding procedure specification. The two outputs answer the two questions that actually arise on a heavy weldment. The idle allowance is how long a welder can stop -- for a fit-up, for a grind, for a break -- before the joint drops below preheat, and it is usually shorter than people expect. The required wait is the other case: a pass ran hot, the joint is at or over the interpass maximum, and welding cannot resume until it comes down. A joint with a measured time constant of 12 min in a 70 F shop, on a procedure calling for 200 F preheat and a 500 F interpass maximum, gives about 6.9 min of idle after a pass that ended at 300 F, and a pass that ended at 600 F, over the 500 F maximum, waits about 2.5 min to come back to 500 F -- waiting all the way to the 200 F preheat floor would take 16.9 min and then need reheating. Seven minutes is shorter than a lot of fit-up interruptions, which is why heavy weldments get blankets and why a torch stays lit next to the work; and fourteen minutes of standing still, on a joint with twenty passes, is nearly five hours of lost production if it happens every time. The time constant is a property of the specific joint -- its mass, its section, its exposure -- and it must be measured rather than assumed: timing one cooling interval with a contact pyrometer gives it, and the whole schedule follows. A scheduling aid; the welding procedure specification and a measured joint temperature govern.",
   };
 }
 
@@ -2063,7 +2066,7 @@ FAB_RENDERERS["interpass-temperature-control"] = _simpleRenderer({
     { key: "preheat_min_f", label: "Preheat minimum from the WPS (F)", kind: "number" },
     { key: "interpass_max_f", label: "Interpass maximum from the WPS (F)", kind: "number" },
     { key: "current_temp_f", label: "Current or post-pass joint temperature (F)", kind: "number" },
-    { key: "restart_temp_f", label: "Target restart temperature (F)", kind: "number" },
+    { key: "restart_temp_f", label: "Restart temperature to wait down to (F, between the preheat minimum and the interpass maximum)", kind: "number" },
     { key: "elapsed_min", label: "Elapsed time to project (min, 0 to skip)", kind: "number" },
   ],
   outputs: [

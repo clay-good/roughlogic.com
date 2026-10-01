@@ -1124,12 +1124,12 @@ export function computeWireRopeStretch({ load_lb = 0, length_ft = 0, rope_diamet
   if (![metallic_area_in2, stretch_in, stretch_pct].every(Number.isFinite) || !(stretch_in > 0)) return { error: "Wire-rope-stretch math is not a finite value; check the inputs." };
   return {
     stretch_in, stretch_pct, metallic_area_in2,
-    note: "ELASTIC (recoverable) stretch of a wire rope under a line load, dL = P L / (A_m E_r), with the metallic (steel) area A_m = F d^2 (fill factor F ~ 0.40 for 6x19 or 6x37 IWRC), the effective rope modulus E_r (about 12,000,000 psi for a seated 6-strand rope - lower than solid steel because the rope is a bundle of helixes), and the length L in inches. A rope at its rated working load (a 5:1 design factor) stretches about 5 in per 100 ft, and twice that past it, which matters on a level pick or when two cranes share a load. Separately, a BRAND-NEW rope also takes an initial constructional (seating) stretch of roughly 0.5-0.75% of length the first time it is loaded as the strands nest, which is permanent and not included here. Thermal change, rotation/torque effects, and the true per-construction modulus and fill factor (use the maker's data) are separate. Never exceed the rope's rated load. A rigging estimate; the wire rope maker and the qualified rigger govern.",
+    note: "ELASTIC (recoverable) stretch of a wire rope under a line load, dL = P L / (A_m E_r), with the metallic (steel) area A_m = F d^2 (fill factor F ~ 0.40 for 6x19 or 6x37 IWRC), the effective rope modulus E_r (about 12,000,000 psi for a seated 6-strand rope - lower than solid steel because the rope is a bundle of helixes), and the length L in inches. A rope at its rated working load (a 5:1 design factor) stretches about 5 in per 100 ft, and twice that past it, which matters on a level pick or when two cranes share a load. Separately, a BRAND-NEW rope also takes an initial constructional (seating) stretch the first time it is loaded as the strands nest -- for the steel-core (IWRC) rope modeled here Bridon gives about 0.125% lightly loaded, 0.25% at a normal 5:1 and 0.50% heavily loaded (fibre core is double) -- which is permanent and not included here. Thermal change, rotation/torque effects, and the true per-construction modulus and fill factor (use the maker's data) are separate. Never exceed the rope's rated load. A rigging estimate; the wire rope maker and the qualified rigger govern.",
   };
 }
 export const wireRopeStretchExample = { inputs: { load_lb: 10000, length_ft: 100, rope_diameter_in: 0.5, effective_modulus_psi: 12000000, metallic_area_factor: 0.40 } };
 function renderWireRopeStretch(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: wire-rope elastic elongation dL = P L / (A_m E_r) with the metallic area A_m = F d^2 (fill factor F ~ 0.40 for 6x19/6x37 IWRC) and the effective rope modulus E_r ~ 12e6 psi for a seated rope (Wire Rope Users Manual). Elastic stretch only; the initial constructional (seating) stretch (~0.5-0.75%) is separate. A rigging estimate; the rope maker governs.";
+  citationEl.textContent = "Citation: wire-rope elastic elongation dL = P L / (A_m E_r) with the metallic area A_m = F d^2 (fill factor F ~ 0.40 for 6x19/6x37 IWRC) and the effective rope modulus E_r ~ 12e6 psi for a seated rope (Wire Rope Users Manual). Elastic stretch only; the initial constructional (seating) stretch (~0.25% for IWRC at normal load, Bridon) is separate. A rigging estimate; the rope maker governs.";
   const P = makeNumber("Line load (lb)", "wrs-p", { step: "any", min: "0" });
   const L = makeNumber("Rope length under load (ft)", "wrs-l", { step: "any", min: "0" });
   const d = makeNumber("Rope diameter (in)", "wrs-d", { step: "any", min: "0" });
@@ -1144,7 +1144,7 @@ function renderWireRopeStretch(inputRegion, outputRegion, citationEl) {
     const r = computeWireRopeStretch({ load_lb: Number(P.input.value) || 0, length_ft: Number(L.input.value) || 0, rope_diameter_in: Number(d.input.value) || 0, effective_modulus_psi: Number(E.input.value) || 0, metallic_area_factor: Number(F.input.value) || 0 });
     if (r.error) { oS.textContent = r.error; oP.textContent = "-"; oN.textContent = "-"; return; }
     oS.textContent = fmt(r.stretch_in, 2) + " in (metallic area " + fmt(r.metallic_area_in2, 4) + " in^2)";
-    oP.textContent = fmt(r.stretch_pct, 3) + "% (plus ~0.5-0.75% one-time seating on new rope)";
+    oP.textContent = fmt(r.stretch_pct, 3) + "% (plus ~0.25% one-time seating on new IWRC rope at normal load)";
     oN.textContent = r.note;
   }, DEBOUNCE_MS);
   for (const f of [P, L, d, E, F]) f.input.addEventListener("input", update);

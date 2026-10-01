@@ -40843,11 +40843,18 @@ test("bounds: spec-v1410 computeWeldCoolingRateT85 pins both regimes and the tra
 
 import { computeInterpassTemperatureControl as _v1412 } from "../../calc-fab.js";
 test("bounds: spec-v1412 computeInterpassTemperatureControl pins the window and both waits", () => {
-  // tau 12 min, ambient 70: 300 F gives 6.85 min of idle; 500 F down to 200 F is 14.36 min.
+  // tau 12 min, ambient 70: 300 F gives 6.85 min of idle and, being inside the
+  // window, no wait. The wait runs from the joint's own temperature: 600 F
+  // back to the 500 F maximum is 12 ln(530/430) = 2.51 min.
   const base = { tau_min: 12, ambient_f: 70, preheat_min_f: 200, interpass_max_f: 500, current_temp_f: 300, restart_temp_f: 200, elapsed_min: 10 };
   const r = _v1412(base);
   assert.ok(Math.abs(r.idle_allowance_min - 6.8465) < 1e-3);
-  assert.ok(Math.abs(r.required_wait_min - 14.355) < 1e-3);
+  assert.strictEqual(r.required_wait_min, 0);
+  assert.ok(Math.abs(_v1412({ ...base, current_temp_f: 600, restart_temp_f: 500 }).required_wait_min - 12 * Math.log(530 / 430)) < 1e-9);
+  // 800 F waits longer than 600 F; until 2026-10-01 both read the same.
+  assert.ok(_v1412({ ...base, current_temp_f: 800, restart_temp_f: 450 }).required_wait_min > _v1412({ ...base, current_temp_f: 600, restart_temp_f: 450 }).required_wait_min);
+  // A restart below the preheat minimum is outside the procedure.
+  assert.ok("error" in _v1412({ ...base, restart_temp_f: 120 }));
   assert.ok(Math.abs(r.temp_at_elapsed_f - 169.96) < 1e-2);
   assert.strictEqual(r.inside_window, true);
   // The projection agrees with the idle allowance: at that elapsed time the joint is AT preheat.
@@ -41118,8 +41125,11 @@ test("bounds: spec-v1415 computeDamperAuthority pins authority and square-root l
   const base = { damper_dp_inwg: 0.15, branch_dp_inwg: 0.60, face_area_sqft: 4, leakage_class_cfm_sqft: 4, closed_dp_inwg: 0.5, design_cfm: 2000 };
   const r = _v1415(base);
   assert.ok(Math.abs(r.authority - 0.25) < 1e-12);
-  assert.strictEqual(r.in_band, false);
-  assert.ok(r.verdict.includes("BELOW"));
+  // JCI 268.1: parallel blades 0.20-0.25 (the default), opposed 0.08-0.10.
+  assert.strictEqual(r.in_band, true);
+  assert.ok(_v1415({ ...base, blade_type: "opposed" }).verdict.includes("ABOVE"));
+  assert.ok(_v1415({ ...base, damper_dp_inwg: 0.09 }).verdict.includes("BELOW"));
+  assert.ok("error" in _v1415({ ...base, blade_type: "butterfly" }));
   assert.ok(Math.abs(r.leakage_1in_cfm - 16) < 1e-9);
   assert.ok(Math.abs(r.leakage_actual_cfm - 11.314) < 1e-3);
   assert.ok(Math.abs(r.leakage_pct - 0.566) < 1e-3);
@@ -41132,7 +41142,7 @@ test("bounds: spec-v1415 computeDamperAuthority pins authority and square-root l
   // The reported drop for the target band lands inside it.
   const fixed = _v1415({ ...base, damper_dp_inwg: r.dp_for_target });
   assert.strictEqual(fixed.in_band, true);
-  assert.ok(Math.abs(fixed.authority - 0.4) < 1e-9);
+  assert.ok(Math.abs(fixed.authority - 0.225) < 1e-9);
   // Too much authority is its own fault: fan energy spent on control it does not need.
   const stiff = _v1415({ ...base, damper_dp_inwg: 0.45 });
   assert.ok(stiff.verdict.includes("ABOVE"));
@@ -41534,21 +41544,24 @@ test("bounds: spec-v1429 computeGarageDoorTorsionSpring pins weight and height p
   const r = _v1429(base);
   assert.ok(Math.abs(r.required_torque_inlb - 300) < 1e-9);
   assert.ok(Math.abs(r.travel_per_turn_in - 12.566) < 1e-3);
-  assert.ok(Math.abs(r.turns - 6.685) < 1e-3);
-  assert.ok(Math.abs(r.required_ippt - 44.88) < 1e-2);
-  assert.ok(Math.abs(r.ippt_per_spring - 22.44) < 1e-2);
+  // 6.685 lift turns plus the default 1 that holds the door open.
+  assert.ok(Math.abs(r.lift_turns - 6.685) < 1e-3);
+  assert.ok(Math.abs(r.turns - 7.685) < 1e-3);
+  assert.ok(Math.abs(r.required_ippt - 39.04) < 1e-2);
+  assert.ok(Math.abs(r.ippt_per_spring - 19.52) < 1e-2);
+  assert.ok(Math.abs(_v1429({ ...base, extra_turns: 0 }).required_ippt - 44.88) < 1e-2);
   // Heavier door, same height: the rate rises in proportion to the weight.
   const heavy = _v1429({ ...base, door_weight_lb: 190 });
   assert.ok(Math.abs(heavy.turns - r.turns) < 1e-12);
   assert.ok(Math.abs(heavy.required_torque_inlb - 380) < 1e-9);
   assert.ok(Math.abs(heavy.required_ippt / r.required_ippt - 190 / 150) < 1e-9);
-  assert.ok(Math.abs(heavy.required_ippt - 56.85) < 1e-2);
+  assert.ok(Math.abs(heavy.required_ippt - 49.45) < 1e-2);
   // Taller door, same weight: the rate FALLS, because the same torque is reached
   // over more turns. Weight and height pull in opposite directions.
   const tall = _v1429({ ...base, door_height_in: 96 });
   assert.ok(Math.abs(tall.required_torque_inlb - r.required_torque_inlb) < 1e-12);
   assert.ok(tall.required_ippt < r.required_ippt);
-  assert.ok(Math.abs(tall.required_ippt - 39.27) < 1e-2);
+  assert.ok(Math.abs(tall.required_ippt - 34.73) < 1e-2);
   // Springs only divide the rate; they never change the required torque.
   const four = _v1429({ ...base, springs: 4 });
   assert.ok(Math.abs(four.required_torque_inlb - r.required_torque_inlb) < 1e-12);
@@ -45649,7 +45662,7 @@ test("bounds: spec-v1570 computeFuelOilAtomizingViscosity fits ASTM D341 (205 de
   assert.ok(Math.abs(r.viscosity_at_check_ssu - 297.983) < 1e-2);
   assert.ok(Math.abs(r.slope_b - 3.9757) < 1e-3);
   assert.ok(Math.abs(r.setpoint_spread_f - (r.temp_for_target_f - r.temp_for_pumping_f)) < 1e-12);
-  assert.strictEqual(r.check_verdict.includes("outside the atomizing band"), true);
+  assert.strictEqual(r.check_verdict.startsWith("ABOVE the 150 SSU atomizing target"), true);
   // The fit passes exactly through its own two data points.
   const at1 = _v1570({ ...base, check_temp_f: 100 });
   assert.ok(Math.abs(at1.viscosity_at_check_ssu - 7000) < 1e-6);

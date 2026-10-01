@@ -73,6 +73,9 @@ which is 116% of the summer value -- so the same wind makes
 The IEC form, correcting speed instead: a measured 20 mph on the summer day reads as
 `20 x 0.9173` = 18.3 mph against the standard curve.
 
+
+**Amended 2026-10-01.** The code uses the standard-atmosphere pressure ratio (1 - 6.8754e-6 z)^5.2559, not exp(-z/27,000); the two agree to about 0.1% at 5,200 ft. NREL's 1997 handbook uses a constant-temperature form that gives a density ratio of 0.785 at 5,200 ft and 95 F against 0.772 here, a method difference of 1.7%. The verdict now says "within 3%" for a machine at 97 to 100% of the corrected curve, rather than "at or above".
+
 ## 4. Scope and non-goals
 
 A density correction using an approximate barometric relation. Where a measured barometric pressure is

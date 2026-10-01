@@ -79,6 +79,9 @@ blowdown = 20,000 x 1 / (10 - 1) = 2,222 lb/h
 $82,500 a year on its own, before any heat exchanger is installed. Treatment
 first, recovery second.
 
+
+**Amended 2026-10-01.** Saturated liquid at 150 psig carries 338.5 BTU/lb, 310.5 above 60 degF makeup at 28 -- not 330 -- so the blowdown carries 1.5525 MMBTU/h, $139,725 a year. The flash-plus-exchanger recovery the tile models recovers about 93%, $130,054 a year, and going to 10 cycles is worth $77,625 on its own.
+
 ## 4. Scope and non-goals
 
 A blowdown and heat recovery estimate. The achievable cycles of concentration are set by the boiler water

@@ -59,6 +59,9 @@ is why heavy weldments get blankets and why a torch stays lit next to the work. 
 running hot: fourteen minutes of the welder standing still, which on a joint with twenty passes is nearly five
 hours of lost production if it happens every time.
 
+
+**Amended 2026-10-01.** The second line above times a cool-down from the interpass maximum to the preheat floor, which no welder needs: a joint AT 500 F is inside the window and may be welded. The wait now runs from the measured joint temperature to a restart temperature inside the window: a pass that ended at 600 F waits 12 x ln(530/430) = 2.5 min to come back to 500 F, and the restart temperature must lie between the preheat minimum and the interpass maximum.
+
 ## 4. Scope and non-goals
 
 A single-lump cooling model with one time constant, which is a reasonable approximation for a compact joint and a

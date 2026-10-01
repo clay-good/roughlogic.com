@@ -108889,7 +108889,7 @@
    "source_publisher": "Project (first-principles)",
    "source_title": "tau 12 min, ambient 70 F, preheat 200 F, interpass max 500 F, joint at 300 F",
    "source_edition_or_year": "Newtonian cooling",
-   "source_section_or_page": "tau x ln((T1 - ambient)/(T2 - ambient))",
+   "source_section_or_page": "tau x ln((T1 - ambient)/(T2 - ambient)); recomputed 2026-10-01 after the batch-56 fixes",
    "verified_by": "rl",
    "verified_on": "2026-08-26",
    "inputs": {
@@ -108909,7 +108909,7 @@
      }
     },
     "required_wait_min": {
-     "value": 14.355,
+     "value": 0,
      "tolerance": {
       "pct": 0.5
      }
@@ -109768,7 +109768,7 @@
    "source_publisher": "Project (first-principles)",
    "source_title": "7 ft, 150 lb door on a 2.0 in effective cable radius with two springs",
    "source_edition_or_year": "overhead door IPPT convention",
-   "source_section_or_page": "torque = weight x drum radius; rate = torque / turns",
+   "source_section_or_page": "torque = weight x drum radius; rate = torque / turns; recomputed 2026-10-01 after the batch-56 fixes",
    "verified_by": "rl",
    "verified_on": "2026-08-27",
    "inputs": {
@@ -109791,19 +109791,19 @@
      }
     },
     "turns": {
-     "value": 6.68451,
+     "value": 7.684507609859605,
      "tolerance": {
       "pct": 0.5
      }
     },
     "required_ippt": {
-     "value": 44.8799,
+     "value": 39.03958655920714,
      "tolerance": {
       "pct": 0.5
      }
     },
     "ippt_per_spring": {
-     "value": 22.4399,
+     "value": 19.51979327960357,
      "tolerance": {
       "pct": 0.5
      }
@@ -114943,7 +114943,7 @@
    "tile_id": "turbine-density-correction",
    "source_publisher": "Project (first-principles)",
    "source_title": "5,200 ft at 95 degF against a curve warranted at 0.0765 lb/cu ft, 1,850 kW measured where the curve says 2,200",
-   "source_edition_or_year": "ISA: rho = rho_ref x 518.67/(459.67+F) x (1 - 6.73e-6 z)^5.258; IEC speed factor = cube root of the ratio",
+   "source_edition_or_year": "ISA: rho = rho_ref x 518.67/(459.67+F) x (1 - 6.8754e-6 z)^5.2559; IEC speed factor = cube root of the ratio",
    "source_section_or_page": "the manufacturer's power curve and IEC 61400-12 govern",
    "verified_by": "rl",
    "verified_on": "2026-09-05",
@@ -116673,7 +116673,7 @@
    "source_publisher": "Project (first-principles)",
    "source_title": "pump on an 18 in cast steel pedestal at 160 degF beside a motor on 14 in at 75 degF, ambient 70",
    "source_edition_or_year": "growth = alpha x support height x temperature rise; cold target = -(movable growth - stationary growth)",
-   "source_section_or_page": "hot alignment verification and the machine manufacturer data govern",
+   "source_section_or_page": "hot alignment verification and the machine manufacturer data govern; recomputed 2026-10-01 to the published short-coupling table",
    "verified_by": "rl",
    "verified_on": "2026-09-07",
    "inputs": {
@@ -116684,7 +116684,7 @@
     "movable_alpha_per_f": 6.5e-06,
     "movable_operating_temp_f": 160,
     "ambient_temp_f": 70,
-    "tolerance_offset_mils": 2
+    "tolerance_offset_mils": 1.5
    },
    "outputs": {
     "stationary_growth_in": {
@@ -116712,7 +116712,7 @@
      }
     },
     "tolerance_multiple": {
-     "value": 5.0375,
+     "value": 6.716666666666666,
      "tolerance": {
       "pct": 0.5
      }
@@ -116770,31 +116770,31 @@
   {
    "tile_id": "coupling-alignment-tolerance",
    "source_publisher": "Project (first-principles)",
-   "source_title": "3,600 rpm machine at 0.0035 in offset and 0.8 mils/in against 0.003 in and 1.0 mils/in acceptable",
+   "source_title": "3,600 rpm machine at 0.002 in offset and 0.25 mils/in against the VibrAlign short-coupling table, 0.0015 in and 0.3 mils/in acceptable",
    "source_edition_or_year": "measured as a percent of the entered acceptable and excellent tolerances for the speed",
-   "source_section_or_page": "the plant precision maintenance standard governs",
+   "source_section_or_page": "the plant precision maintenance standard governs; recomputed 2026-10-01 to the published short-coupling table",
    "verified_by": "rl",
    "verified_on": "2026-09-07",
    "inputs": {
     "rpm": 3600,
-    "measured_offset_in": 0.0035,
-    "measured_angularity_mils_per_in": 0.8,
-    "offset_excellent_in": 0.0015,
-    "offset_acceptable_in": 0.003,
-    "angularity_excellent_mils_per_in": 0.5,
-    "angularity_acceptable_mils_per_in": 1,
+    "measured_offset_in": 0.002,
+    "measured_angularity_mils_per_in": 0.25,
+    "offset_excellent_in": 0.001,
+    "offset_acceptable_in": 0.0015,
+    "angularity_excellent_mils_per_in": 0.2,
+    "angularity_acceptable_mils_per_in": 0.3,
     "spacer_length_in": 0,
     "spacer_end_offset_in": 0
    },
    "outputs": {
     "offset_pct_of_acceptable": {
-     "value": 116.667,
+     "value": 133.33333333333331,
      "tolerance": {
       "pct": 0.5
      }
     },
     "angularity_pct_of_acceptable": {
-     "value": 80,
+     "value": 83.33333333333334,
      "tolerance": {
       "pct": 0.5
      }
@@ -116806,7 +116806,7 @@
      }
     },
     "offset_pct_of_excellent": {
-     "value": 233.333,
+     "value": 200,
      "tolerance": {
       "pct": 0.5
      }
@@ -146146,6 +146146,1543 @@
      "value": 0.766667,
      "tolerance": {
       "abs": 0.008333
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "txv-capacity-check",
+   "source_publisher": "Sporlan Division, Parker Hannifin",
+   "source_title": "Bulletin 10-9, Thermostatic Expansion Valves: Theory of Operation, Application, and Selection",
+   "source_edition_or_year": "March 2011",
+   "source_section_or_page": "Page 16-17, Selection Procedure / Selection Example: R-22 air conditioning, 40 F evaporator, 105 F condensing, 90 F liquid, 2 ton system; net drop 211 - 69 - 7 - 35 = 100 psi; liquid correction factor 1.06; 'The SVE-2 has valve capacity of: 2.00 x 1.06 = 2.12 tons at 40 F evaporating temperature, 100 psi pressure drop, and 90 F liquid temperature.' Rated drop 100 psi is the table's rating column, so the pressure factor is 1. Printed to 0.01 ton.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "nominal_tons": 2,
+    "rated_dp_psi": 100,
+    "actual_dp_psi": 100,
+    "liquid_temp_factor": 1.06,
+    "evaporator_load_tons": 2
+   },
+   "outputs": {
+    "installed_capacity_tons": {
+     "value": 2.12,
+     "tolerance": {
+      "abs": 0.005
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "head-pressure-control",
+   "source_publisher": "Sporlan Division, Parker Hannifin",
+   "source_title": "Bulletin 90-30-1, Head Pressure Control Charging Recommendations ORI, ORD, OROA and LAC",
+   "source_edition_or_year": "supersedes July 2012 edition (current bulletin)",
+   "source_section_or_page": "Pages 2-3, Determining Amount of Charge, Example (R-22 roof-top unit, 40 F evaporator, -20 F minimum ambient, 1170 equivalent ft of 1/2 in tubing, Table 1 density factor 0.102 lb/ft): completely flooded: 1170 feet x .102 pounds/foot = 119 pounds. UNIT NOTE: Sporlan's product is length x lb-per-foot, so condenser_volume_cf carries the 1170 equivalent feet and liquid_density_pcf carries 0.102 lb per foot of tube; the product is the same multiplication the tile does (volume x density x flooded fraction). Evaporator 69 psig, valve 100 psi, line losses 0, receiver and summer charge are placeholders (min_head/winter outputs not checked). Printed to 1 lb.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "refrigerant": "R_22",
+    "evaporator_psig": 69,
+    "valve_dp_psi": 100,
+    "line_losses_psi": 0,
+    "condenser_volume_cf": 1170,
+    "flooded_fraction": 1,
+    "liquid_density_pcf": 0.102,
+    "receiver_capacity_lb": 0,
+    "summer_charge_lb": 0
+   },
+   "outputs": {
+    "flooding_charge_lb": {
+     "value": 119,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "head-pressure-control",
+   "source_publisher": "Sporlan Division, Parker Hannifin",
+   "source_title": "Bulletin 90-30-1, Head Pressure Control Charging Recommendations ORI, ORD, OROA and LAC",
+   "source_edition_or_year": "supersedes July 2012 edition (current bulletin)",
+   "source_section_or_page": "Pages 2-3, Determining Amount of Charge, Example (R-22 roof-top unit, 40 F evaporator, -20 F minimum ambient, 1170 equivalent ft of 1/2 in tubing, Table 1 density factor 0.102 lb/ft): partially flooded multiplier .95 (Tables 2 and 3, unloaders to 33-1/3%): 119 x .95 = 113 pounds. UNIT NOTE: Sporlan's product is length x lb-per-foot, so condenser_volume_cf carries the 1170 equivalent feet and liquid_density_pcf carries 0.102 lb per foot of tube; the product is the same multiplication the tile does (volume x density x flooded fraction). Evaporator 69 psig, valve 100 psi, line losses 0, receiver and summer charge are placeholders (min_head/winter outputs not checked). Printed to 1 lb.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "refrigerant": "R_22",
+    "evaporator_psig": 69,
+    "valve_dp_psi": 100,
+    "line_losses_psi": 0,
+    "condenser_volume_cf": 1170,
+    "flooded_fraction": 0.95,
+    "liquid_density_pcf": 0.102,
+    "receiver_capacity_lb": 0,
+    "summer_charge_lb": 0
+   },
+   "outputs": {
+    "flooding_charge_lb": {
+     "value": 113,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "damper-authority",
+   "source_publisher": "Johnson Controls",
+   "source_title": "Damper and Actuator Manual 268.1, Damper Design Section, Engineering Report: Damper Application Engineering",
+   "source_edition_or_year": "Issue Date 0991 (September 1991)",
+   "source_section_or_page": "Page 3 Eq. 1 (Damper Authority = dPd / dPt x 100) and page 6, Authority Recommendations (Static Pressure Control): 'if a fan generates 2 in. W.G. of static pressure at design and the desired damper authority is 20%, then the damper should be selected for a wide open pressure drop of (2 in. W.G.)(0.2) or 0.4 in. W.G.' Run inverse: 0.4 / 2.0 -> 0.20. Leakage inputs are placeholders. Exact.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "damper_dp_inwg": 0.4,
+    "branch_dp_inwg": 2,
+    "face_area_sqft": 1,
+    "leakage_class_cfm_sqft": 4,
+    "closed_dp_inwg": 1,
+    "design_cfm": 1000
+   },
+   "outputs": {
+    "authority": {
+     "value": 0.2,
+     "tolerance": {
+      "abs": 0.0005
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "damper-authority",
+   "source_publisher": "Air Movement and Control Association International (AMCA)",
+   "source_title": "Damper Leakage Rates - More Important Than Ever (John Knapp), AMCA supplement to HPAC Engineering",
+   "source_edition_or_year": "Fall 2007",
+   "source_section_or_page": "Page 19: 'if a damper leaks 10 cfm/sq.ft. at 1.0-in. w.g. pressure, to find the leakage at 4.0-in. w.g. pressure, simply multiply 10 times the square root of four (two) ... approximately 20 cfm/sq.ft. at 4.0-in. w.g.' Face area 1 sq ft so cfm = cfm/sq ft. Authority inputs and design cfm are placeholders. Exact.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "damper_dp_inwg": 0.15,
+    "branch_dp_inwg": 0.6,
+    "face_area_sqft": 1,
+    "leakage_class_cfm_sqft": 10,
+    "closed_dp_inwg": 4,
+    "design_cfm": 2000
+   },
+   "outputs": {
+    "leakage_1in_cfm": {
+     "value": 10,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "leakage_actual_cfm": {
+     "value": 20,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "damper-authority",
+   "source_publisher": "Pottorff",
+   "source_title": "Model TICD-51, TICD-52 Thermally Insulated Control Damper catalog (AMCA CRP listing), Leakage Class Definitions",
+   "source_edition_or_year": "February 2015",
+   "source_section_or_page": "Page 1, '* Leakage Class Definitions': Leakage Class 1 - 4 cfm/ft2 @ 1 in. wg; 8 cfm/ft2 @ 4 in. wg; 11 cfm/ft2 @ 8 in. wg; 12.6 cfm/ft2 @ 10 in. wg. This row checks the 4 in. wg figure (8 cfm/ft2, exact). NOTE the same table's 8 in. wg figure (11) is 2.8% below the square-root value 11.31 and is deliberately NOT used. Face area 1 sq ft; authority inputs and design cfm are placeholders.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "damper_dp_inwg": 0.15,
+    "branch_dp_inwg": 0.6,
+    "face_area_sqft": 1,
+    "leakage_class_cfm_sqft": 4,
+    "closed_dp_inwg": 4,
+    "design_cfm": 2000
+   },
+   "outputs": {
+    "leakage_actual_cfm": {
+     "value": 8,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "damper-authority",
+   "source_publisher": "Pottorff",
+   "source_title": "Model TICD-51, TICD-52 Thermally Insulated Control Damper catalog (AMCA CRP listing), Leakage Class Definitions",
+   "source_edition_or_year": "February 2015",
+   "source_section_or_page": "Page 1, '* Leakage Class Definitions': Leakage Class 1 - 4 cfm/ft2 @ 1 in. wg; 8 cfm/ft2 @ 4 in. wg; 11 cfm/ft2 @ 8 in. wg; 12.6 cfm/ft2 @ 10 in. wg. This row checks the 10 in. wg figure (12.6 cfm/ft2, printed to 0.1; tile 12.65). NOTE the same table's 8 in. wg figure (11) is 2.8% below the square-root value 11.31 and is deliberately NOT used. Face area 1 sq ft; authority inputs and design cfm are placeholders.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "damper_dp_inwg": 0.15,
+    "branch_dp_inwg": 0.6,
+    "face_area_sqft": 1,
+    "leakage_class_cfm_sqft": 4,
+    "closed_dp_inwg": 10,
+    "design_cfm": 2000
+   },
+   "outputs": {
+    "leakage_actual_cfm": {
+     "value": 12.6,
+     "tolerance": {
+      "abs": 0.06
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "chilled-water-delta-t",
+   "source_publisher": "JMP (jmpco.com) HVAC blog",
+   "source_title": "Variable Primary Chilled Water Systems Part 4: Compensate for Low Delta-T! (Chad Edmondson)",
+   "source_edition_or_year": "December 14, 2020",
+   "source_section_or_page": "Body text: BTUH = 500 x GPM x dT; 'Our system is demanding 1200 gpm of flow at a 10 degree dT whereas our design was for a 12 degree dT' while delivering 'our rated 500 tons of cooling'. Load entered as 500 tons x 12,000 = 6,000,000 BTU/hr. Exact.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "load_btuh": 6000000,
+    "actual_gpm": 1200,
+    "design_delta_t_f": 12
+   },
+   "outputs": {
+    "actual_delta_t_f": {
+     "value": 10,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "blowdown-heat-recovery",
+   "source_publisher": "Spirax Sarco",
+   "source_title": "Learn About Steam, Block 3 The Boiler House: Heat Recovery from Boiler Blowdown (TDS control only)",
+   "source_edition_or_year": "web edition, retrieved 2026-10-01",
+   "source_section_or_page": "Examples 3.13.1-3.13.2 (with 3.12.5 data). Boiler 10,000 kg/h at 10 bar g, max boiler TDS 2,500 ppm, feedwater 250 ppm -> blowdown 1,111 kg/h (cycles = 2500/250 = 10; same 1/(cycles-1) balance as the tile); h_f at 10 bar g 782 kJ/kg, h_f at 0.5 bar g 468 kJ/kg, h_fg at 0.5 bar g 2,226 kJ/kg. SI converted: kg x 2.20462 = lb, kJ/kg / 2.326 = BTU/lb, kW x 3,412.142 = BTU/hr. Printed: blowdown 1,111 kg/h (2,449.3 lb/h); % flash steam = (782 - 468)/2,226 = 14.1%; flash 1,111 x 14.1% = 157 kg/h (346.1 lb/h); energy blown down 0.31 kg/s x 782 kJ/kg = 241 kW with 0 C datum, entered as makeup_temp_f 32 so the tile's makeup enthalpy is 0. Alt cycles, HX effectiveness, boiler efficiency, fuel cost and hours are placeholders.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "steam_rate_lb_hr": 22046.2,
+    "cycles_of_concentration": 10,
+    "alt_cycles_of_concentration": 10,
+    "blowdown_liquid_enthalpy_btu_lb": 336.2,
+    "flash_liquid_enthalpy_btu_lb": 201.2,
+    "flash_latent_btu_lb": 957.01,
+    "makeup_temp_f": 32,
+    "heat_exchanger_effectiveness": 0.85,
+    "boiler_efficiency": 0.8,
+    "fuel_cost_per_mmbtu": 0,
+    "hours_per_year": 8000
+   },
+   "outputs": {
+    "blowdown_lb_hr": {
+     "value": 2449.3,
+     "tolerance": {
+      "pct": 0.1
+     }
+    },
+    "flash_fraction": {
+     "value": 0.141,
+     "tolerance": {
+      "abs": 0.0005
+     }
+    },
+    "flash_steam_lb_hr": {
+     "value": 346.1,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "heat_in_blowdown_btuh": {
+     "value": 822326,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "blowdown-heat-recovery",
+   "source_publisher": "Spirax Sarco",
+   "source_title": "Learn About Steam, Block 3 The Boiler House: Heat Recovery from Boiler Blowdown (TDS control only)",
+   "source_edition_or_year": "web edition, retrieved 2026-10-01",
+   "source_section_or_page": "Text after Example 3.13.1: 'if the make-up water were at 10 C the energy blown down would be 228 kW.' Boiler 10,000 kg/h at 10 bar g, max boiler TDS 2,500 ppm, feedwater 250 ppm -> blowdown 1,111 kg/h (cycles = 2500/250 = 10; same 1/(cycles-1) balance as the tile); h_f at 10 bar g 782 kJ/kg, h_f at 0.5 bar g 468 kJ/kg, h_fg at 0.5 bar g 2,226 kJ/kg. SI converted: kg x 2.20462 = lb, kJ/kg / 2.326 = BTU/lb, kW x 3,412.142 = BTU/hr. Makeup entered as 50 F (10 C). Other non-blowdown inputs are placeholders. Printed to 1 kW.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "steam_rate_lb_hr": 22046.2,
+    "cycles_of_concentration": 10,
+    "alt_cycles_of_concentration": 10,
+    "blowdown_liquid_enthalpy_btu_lb": 336.2,
+    "flash_liquid_enthalpy_btu_lb": 201.2,
+    "flash_latent_btu_lb": 957.01,
+    "makeup_temp_f": 50,
+    "heat_exchanger_effectiveness": 0.85,
+    "boiler_efficiency": 0.8,
+    "fuel_cost_per_mmbtu": 0,
+    "hours_per_year": 8000
+   },
+   "outputs": {
+    "heat_in_blowdown_btuh": {
+     "value": 777968,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "blowdown-heat-recovery",
+   "source_publisher": "Spirax Sarco",
+   "source_title": "Learn About Steam, Block 3 The Boiler House: Heat Recovery from Boiler Blowdown (TDS control only)",
+   "source_edition_or_year": "web edition, retrieved 2026-10-01",
+   "source_section_or_page": "Example 3.13.4: water flowrate 1,111 - 157 = 954 kg/h; energy available to heat make-up 468 - 84 (water at 20 C) = 384 kJ/kg; energy recovered 954 x 384 / 3600 = 102 kW. Boiler 10,000 kg/h at 10 bar g, max boiler TDS 2,500 ppm, feedwater 250 ppm -> blowdown 1,111 kg/h (cycles = 2500/250 = 10; same 1/(cycles-1) balance as the tile); h_f at 10 bar g 782 kJ/kg, h_f at 0.5 bar g 468 kJ/kg, h_fg at 0.5 bar g 2,226 kJ/kg. SI converted: kg x 2.20462 = lb, kJ/kg / 2.326 = BTU/lb, kW x 3,412.142 = BTU/hr. Makeup 68 F (20 C, tile enthalpy 36 BTU/lb = 83.7 kJ/kg) and exchanger effectiveness 1.0 (Spirax cools the liquid fully to 20 C). NOT checked: Spirax's 199 kW total, which credits the flash stage only with the 314 kJ/kg excess rather than the flash steam's full enthalpy above makeup (the tile's accounting); method differs.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "steam_rate_lb_hr": 22046.2,
+    "cycles_of_concentration": 10,
+    "alt_cycles_of_concentration": 10,
+    "blowdown_liquid_enthalpy_btu_lb": 336.2,
+    "flash_liquid_enthalpy_btu_lb": 201.2,
+    "flash_latent_btu_lb": 957.01,
+    "makeup_temp_f": 68,
+    "heat_exchanger_effectiveness": 1,
+    "boiler_efficiency": 0.8,
+    "fuel_cost_per_mmbtu": 0,
+    "hours_per_year": 8000
+   },
+   "outputs": {
+    "residual_liquid_lb_hr": {
+     "value": 2103.2,
+     "tolerance": {
+      "pct": 0.3
+     }
+    },
+    "exchanger_heat_btuh": {
+     "value": 348038,
+     "tolerance": {
+      "pct": 0.6
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "steam-kettle-heatup",
+   "source_publisher": "Spirax Sarco",
+   "source_title": "Learn About Steam, Block 2 Steam Engineering Principles and Heat Transfer: Methods of Estimating Steam Consumption",
+   "source_edition_or_year": "web edition, retrieved 2026-10-01",
+   "source_section_or_page": "Example 2.6.2: tank of 400 kg kerosene, cp 2.0 kJ/kg C, 10 C to 40 C in 20 minutes (1,200 s), 4 bar g steam, hfg 2,108.1 kJ/kg, 'well insulated and heat losses are negligible' (jacket_efficiency 1). Printed: Q = 400 x 2.0 x 30 / 1200 = 20 kJ/s; ms = 20/2108.1 = 0.095 kg/s = 34.2 kg/h (75.40 lb/h). Inputs converted: gallons = 400 kg / 3.783 kg per gal-at-8.34-lb (a placeholder that makes the tile's 8.34 lb/gal x SG 1 equal the printed 400 kg, so mass_lb is not checked); cp 2.0/4.1868 = 0.47769 BTU/lb-F; 50 F to 104 F; rated input = the printed 20 kW = 68,242.8 BTU/hr, so heat-up time checks the printed 1,200 s; hfg 906.32 BTU/lb.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "gallons": 105.7372,
+    "specific_gravity": 1,
+    "specific_heat": 0.477692,
+    "start_temp_f": 50,
+    "final_temp_f": 104,
+    "rated_input_btuh": 68242.8,
+    "jacket_efficiency": 1,
+    "latent_heat_btu_lb": 906.32
+   },
+   "outputs": {
+    "heatup_min": {
+     "value": 20,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "steam_rate_lb_hr": {
+     "value": 75.4,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "steam-kettle-heatup",
+   "source_publisher": "Spirax Sarco",
+   "source_title": "Learn About Steam, Block 2 Steam Engineering Principles and Heat Transfer: Methods of Estimating Steam Consumption",
+   "source_edition_or_year": "web edition, retrieved 2026-10-01",
+   "source_section_or_page": "Example 2.6.1: 35 litres of oil, SG 0.9, cp 1.9 kJ/kg C, 35 C to 120 C over 600 s. Printed: m = 0.9 x 35 = 31.5 kg (69.45 lb); Q = 31.5 x 1.9 x 85 / 600 = 8.48 kW. Inputs: 35 L = 9.2460 gal; cp 1.9/4.1868 = 0.45381 BTU/lb-F; 95 F to 248 F; rated input = printed 8.48 kW = 28,934.4 BTU/hr with efficiency 1, so heat-up time checks the printed 600 s (10 min). Latent heat is a placeholder (no steam figure printed). Tile's 8.34 lb/gal vs 1 kg/L differs by 0.07%.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "gallons": 9.246,
+    "specific_gravity": 0.9,
+    "specific_heat": 0.453807,
+    "start_temp_f": 95,
+    "final_temp_f": 248,
+    "rated_input_btuh": 28935,
+    "jacket_efficiency": 1,
+    "latent_heat_btu_lb": 945.6
+   },
+   "outputs": {
+    "mass_lb": {
+     "value": 69.45,
+     "tolerance": {
+      "pct": 0.2
+     }
+    },
+    "heatup_min": {
+     "value": 10,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "hydraulic-reservoir-cooler",
+   "source_publisher": "Machinery Lubrication (Noria Corporation)",
+   "source_title": "Controlling Hydraulic Oil Temperatures (Al Smiley, GPM Hydraulic Consulting)",
+   "source_edition_or_year": "October 2016",
+   "source_section_or_page": "'Assuming the pump is bypassing 0.9 GPM and the compensator is set to 1,200 PSI, the amount of heat generation is: HP = 0.9 x 1,200 x 0.000583 or 0.6296.' (0.000583 = 1/1715; tile 1/1714 gives 0.6301) All bypass/relief flow is heat, so pump_efficiency 1 and heat_fraction 1 make heat_hp equal hydraulic_hp. Reservoir multiplier and dissipation are placeholders.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "pump_gpm": 0.9,
+    "pressure_psi": 1200,
+    "pump_efficiency": 1,
+    "heat_fraction": 1,
+    "reservoir_multiplier": 3,
+    "reservoir_dissipation_btu_hr": 0
+   },
+   "outputs": {
+    "hydraulic_hp": {
+     "value": 0.6296,
+     "tolerance": {
+      "pct": 0.2
+     }
+    },
+    "heat_hp": {
+     "value": 0.6296,
+     "tolerance": {
+      "pct": 0.2
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "hydraulic-reservoir-cooler",
+   "source_publisher": "Machinery Lubrication (Noria Corporation)",
+   "source_title": "Controlling Hydraulic Oil Temperatures (Al Smiley, GPM Hydraulic Consulting)",
+   "source_edition_or_year": "October 2016",
+   "source_section_or_page": "'If the bypassing increases to 5 GPM, the heat load increases to 3.5 horsepower (HP = 5 x 1,200 x 0.000583 or 3.5).' All bypass/relief flow is heat, so pump_efficiency 1 and heat_fraction 1 make heat_hp equal hydraulic_hp. Reservoir multiplier and dissipation are placeholders.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "pump_gpm": 5,
+    "pressure_psi": 1200,
+    "pump_efficiency": 1,
+    "heat_fraction": 1,
+    "reservoir_multiplier": 3,
+    "reservoir_dissipation_btu_hr": 0
+   },
+   "outputs": {
+    "hydraulic_hp": {
+     "value": 3.5,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "heat_hp": {
+     "value": 3.5,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "hydraulic-reservoir-cooler",
+   "source_publisher": "Machinery Lubrication (Noria Corporation)",
+   "source_title": "Controlling Hydraulic Oil Temperatures (Al Smiley, GPM Hydraulic Consulting)",
+   "source_edition_or_year": "October 2016",
+   "source_section_or_page": "'Assuming the maximum pump volume is 30 GPM and the relief valve is set to 1,450 PSI ... (HP = 30 x 1,450 x 0.000583 or 25), then 25 horsepower will be converted to heat when in the idle mode.' Printed rounded to whole hp (exact 25.36). All bypass/relief flow is heat, so pump_efficiency 1 and heat_fraction 1 make heat_hp equal hydraulic_hp. Reservoir multiplier and dissipation are placeholders.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "pump_gpm": 30,
+    "pressure_psi": 1450,
+    "pump_efficiency": 1,
+    "heat_fraction": 1,
+    "reservoir_multiplier": 3,
+    "reservoir_dissipation_btu_hr": 0
+   },
+   "outputs": {
+    "hydraulic_hp": {
+     "value": 25,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "heat_hp": {
+     "value": 25,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "punch-force",
+   "source_publisher": "Mate Precision Technologies",
+   "source_title": "Punching & Forming Guide: Punch Press Technical Solutions (LIT00682)",
+   "source_edition_or_year": "Rev E, 2021",
+   "source_section_or_page": "p. 8 'Calculating Punching Force', Inch Example: 1.000 in round in 0.118 in mild steel, Tonnage = 3.14 x 0.118 x 25 x 1.0 = 9.27 Imperial Tons. Material tonnage value 25 imperial tons/in^2 entered as 50,000 psi (Mate's own conversion: imperial tons = lb / 2000). Printed 9.27 rounds to 0.01 ton (the printed 3.14 for pi would give 9.26; 9.27 is the pi value rounded). Side/perimeter inputs are unused placeholders for the round shape.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "shape": "round",
+    "diameter_in": 1,
+    "side_a_in": 0,
+    "side_b_in": 0,
+    "perimeter_in": 0,
+    "thickness_in": 0.118,
+    "shear_strength_psi": 50000
+   },
+   "outputs": {
+    "force_tons": {
+     "value": 9.27,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "punch-force",
+   "source_publisher": "Mate Precision Technologies",
+   "source_title": "Punching & Forming Guide: Punch Press Technical Solutions (LIT00682)",
+   "source_edition_or_year": "Rev E, 2021",
+   "source_section_or_page": "p. 8 'Punch Without Shear', Example of punching force problem: 20.0 mm square punch (perimeter 80.0 mm) in 3.0 mm mild steel, shear strength 0.3447 kN/mm^2 -> 80.0 x 3.0 x 0.3447 = 82.7 kN. Inputs converted to inch units (80 mm = 3.14961 in, 3.0 mm = 0.11811 in, 0.3447 kN/mm^2 = 49,994.5 psi); printed 82.7 kN converted to 18,591.7 lb (1 kN = 224.809 lbf); tolerance 12 lb = the +/-0.05 kN printed rounding. Shape entered as a direct perimeter; diameter/sides are placeholders.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "shape": "perimeter",
+    "diameter_in": 0,
+    "side_a_in": 0,
+    "side_b_in": 0,
+    "perimeter_in": 3.149606,
+    "thickness_in": 0.11811,
+    "shear_strength_psi": 49994.5
+   },
+   "outputs": {
+    "force_lb": {
+     "value": 18591.7,
+     "tolerance": {
+      "abs": 12
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "wire-rope-stretch",
+   "source_publisher": "Mazzella Companies",
+   "source_title": "Wire Rope Technical Information (Properties of Extension of Steel Wire Ropes)",
+   "source_edition_or_year": "web page, (c) 2026, fetched 2026-10-01",
+   "source_section_or_page": "Phase 2 Elastic Extension example: 200 ft of 1-1/8 in Blue Strand 6x41 IWRC at 20,000 lb, Elastic Extension = WL / EA = 20,000 x 200 x 12 / (13,500,000 x .62) = 5.73 in. The printed metallic area 0.62 in^2 is entered through the fill factor F = 0.62 / 1.125^2 = 0.489877 (the tile's A_m = F d^2). Printed 5.73 rounds to 0.01 in. (The same example's 0.25% constructional and thermal terms are outside this tile.)",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "load_lb": 20000,
+    "length_ft": 200,
+    "rope_diameter_in": 1.125,
+    "effective_modulus_psi": 13500000,
+    "metallic_area_factor": 0.489877
+   },
+   "outputs": {
+    "stretch_in": {
+     "value": 5.73,
+     "tolerance": {
+      "abs": 0.005
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "fatigue-safety-factor",
+   "source_publisher": "New Jersey Institute of Technology (Sengupta, MET 301)",
+   "source_title": "MET 301: Design for Cyclic Loading",
+   "source_edition_or_year": "course notes, fetched 2026-10-01",
+   "source_section_or_page": "pp. 5-6, Example 2: AISI 1020, Syp 350 MPa, Su 420 MPa, Se 190 MPa; Savg 32.3 MPa, Sr 9.2 MPa, Kf = 1.48 -> modified Goodman Nfs1 = 420/(32.3 + 9.2 x 1.48 x 420/190) = 6.7, yield Nfs2 = 350/(32.3 + 9.2 x 1.48) = 7.62, Nfs = 6.7 (lesser). Alternating stress entered as Sr x Kf = 13.616 MPa; all MPa values converted to psi (x145.0377; n is unitless). Printed 6.7 rounds to 0.1, 7.62 to 0.01.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "alternating_stress_psi": 1974.83,
+    "mean_stress_psi": 4684.72,
+    "endurance_limit_psi": 27557.17,
+    "ultimate_strength_psi": 60915.85,
+    "yield_strength_psi": 50763.21,
+    "criterion": "goodman"
+   },
+   "outputs": {
+    "fatigue_n": {
+     "value": 6.7,
+     "tolerance": {
+      "abs": 0.05
+     }
+    },
+    "langer_ny": {
+     "value": 7.62,
+     "tolerance": {
+      "abs": 0.005
+     }
+    },
+    "governing_n": {
+     "value": 6.7,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "fatigue-safety-factor",
+   "source_publisher": "Michigan State University (P. Kwon, ME 471)",
+   "source_title": "Quantifying Fatigue Failure: Stress-Life Method for Non-Zero Mean (Lect 6.3)",
+   "source_edition_or_year": "course notes, fetched 2026-10-01",
+   "source_section_or_page": "E.g. 3 and 'Revisit E.g. 3 ... Test for First-Cycle Yield': torsion of 1010 HR shaft, tau_a 34.9 MPa, tau_m 58.1 MPa, Ses 77.9 MPa, Sus 214.4 MPa, Sys 103.9 MPa -> nGoodman = 1.39, nLanger = 1.12 (Langer governs). Shear values entered in the stress fields (the criteria are the same lines on the shear axes); MPa converted to psi (x145.0377; n is unitless). Printed to 0.01.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "alternating_stress_psi": 5061.82,
+    "mean_stress_psi": 8426.69,
+    "endurance_limit_psi": 11298.44,
+    "ultimate_strength_psi": 31096.09,
+    "yield_strength_psi": 15069.42,
+    "criterion": "goodman"
+   },
+   "outputs": {
+    "fatigue_n": {
+     "value": 1.39,
+     "tolerance": {
+      "abs": 0.005
+     }
+    },
+    "langer_ny": {
+     "value": 1.12,
+     "tolerance": {
+      "abs": 0.005
+     }
+    },
+    "governing_n": {
+     "value": 1.12,
+     "tolerance": {
+      "abs": 0.005
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "plain-bearing-pressure-pv",
+   "source_publisher": "Anchor Bronze & Metals",
+   "source_title": "PV Data (PV Calculation)",
+   "source_edition_or_year": "data sheet, fetched 2026-10-01",
+   "source_section_or_page": "PV Calculation example: 3/4 in shaft @ 341 RPM, 90 lb total load, bearing length 1 in; V = .262 x 341 x .750 = 67 sfpm; P = 90 / .75 = 120 psi; PV = 120 x 67 = 8040. V printed to whole sfpm (tile 66.95); PV printed from the rounded 67 (tile 8,035), so PV tolerance 0.1%.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "radial_load_lbf": 90,
+    "journal_diameter_in": 0.75,
+    "bearing_length_in": 1,
+    "speed_rpm": 341
+   },
+   "outputs": {
+    "projected_pressure_psi": {
+     "value": 120,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "surface_velocity_fpm": {
+     "value": 67,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "pv_factor": {
+     "value": 8040,
+     "tolerance": {
+      "pct": 0.1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "spring-natural-frequency",
+   "source_publisher": "Vibrationdata (Tom Irvine)",
+   "source_title": "Spring Surge",
+   "source_edition_or_year": "2026-08-18",
+   "source_section_or_page": "'A racing spring': d 0.185 in, D 1.05 in, 4 active coils, G 11.5e6 psi, 0.283 lbm/in^3 -> rate 363.6 lbf/in, active-coil mass 0.1004 lbm, surge modes fixed-fixed 591, 1183, 1774 Hz. Entered as hard-drawn (G 11.5e6). NOTE: the tile's steel density is 0.284 (source 0.283), which lowers fn by 0.18% (tile 590.4 Hz); the abs 1 Hz tolerance covers the +/-0.5 Hz print rounding PLUS that 0.1 Hz constant difference -- drop the fn output if only print rounding is allowed. Rate is density-independent.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "wire_diameter_in": 0.185,
+    "mean_coil_diameter_in": 1.05,
+    "active_coils": 4,
+    "material": "hard-drawn"
+   },
+   "outputs": {
+    "spring_rate_lb_in": {
+     "value": 363.6,
+     "tolerance": {
+      "abs": 0.05
+     }
+    },
+    "natural_frequency_hz": {
+     "value": 591,
+     "tolerance": {
+      "abs": 1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "impact-load-factor",
+   "source_publisher": "University of Illinois Urbana-Champaign (MechRef)",
+   "source_title": "Impact (Mechanics Reference, Solid Mechanics: Design considerations)",
+   "source_edition_or_year": "web page, fetched 2026-10-01",
+   "source_section_or_page": "Example: Impact Load Spring: 20 lb ball dropped 6 in onto a platform on a 20 lb/in spring, delta_st = 1.000002 in -> IF = 1 + sqrt(1 + 2(6)/1.000002) = 4.61, Fe = 4.61(20) = 92.2 lb. Printed IF to 0.01; Fe is the product of the ROUNDED IF (exact 92.11), tolerance 0.1 lb.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "weight_lb": 20,
+    "drop_height_in": 6,
+    "static_deflection_in": 1.000002
+   },
+   "outputs": {
+    "impact_factor": {
+     "value": 4.61,
+     "tolerance": {
+      "abs": 0.005
+     }
+    },
+    "impact_force_lbf": {
+     "value": 92.2,
+     "tolerance": {
+      "abs": 0.1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "impact-load-factor",
+   "source_publisher": "University of Illinois Urbana-Champaign (MechRef)",
+   "source_title": "Impact (Mechanics Reference, Solid Mechanics: Design considerations)",
+   "source_edition_or_year": "web page, fetched 2026-10-01",
+   "source_section_or_page": "Same example with the stiffer 80 lb/in spring: delta_st = 0.250002 in -> IF = 8.00, Fe = 160 lb. Printed to 0.01 / whole lb.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "weight_lb": 20,
+    "drop_height_in": 6,
+    "static_deflection_in": 0.250002
+   },
+   "outputs": {
+    "impact_factor": {
+     "value": 8,
+     "tolerance": {
+      "abs": 0.005
+     }
+    },
+    "impact_force_lbf": {
+     "value": 160,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "flange-coupling-torque",
+   "source_publisher": "MATHalino",
+   "source_title": "Solution to Problem 327 | Flanged bolt couplings (Strength of Materials review; problem after Singer & Pytel)",
+   "source_edition_or_year": "web page, fetched 2026-10-01",
+   "source_section_or_page": "Problem 327: ten steel 1/2 in bolts on a 14 in bolt circle, allowable shear 6000 psi -> T = (1/4)pi(1/2)^2(6000)(7)(10) = 26250 pi lb-in = 2187.5 pi lb-ft = 6872.23 lb-ft. Printed to 0.01 lb-ft.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "bolt_count": 10,
+    "bolt_diameter_in": 0.5,
+    "allowable_shear_psi": 6000,
+    "bolt_circle_diameter_in": 14
+   },
+   "outputs": {
+    "torque_capacity_ft_lb": {
+     "value": 6872.23,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "hydraulic-accumulator-volume",
+   "source_publisher": "Hydraulics & Pneumatics / Power & Motion (Rob Walter, Tobul Accumulator)",
+   "source_title": "Improving systems with Accumulators means big savings",
+   "source_edition_or_year": "Aug. 12, 2008",
+   "source_section_or_page": "'Learning by example' / 'Sequence of events': 25 gal piston accumulator, precharge 1900 psi (100 psi below the 2000 psi minimum), max 3000 psi; full charge holds 9.12 gal, at the cycle low of 2026 psi it holds 1.54 gal, 'it has provided 7.58 gal'. The article does not name the gas process; the printed 9.12/1.54/7.58 all reproduce isothermal Boyle with gauge + 14.7 psia. Printed to 0.01 gal.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "accumulator_size_gal": 25,
+    "precharge_psig": 1900,
+    "min_pressure_psig": 2026,
+    "max_pressure_psig": 3000,
+    "gas_process": "isothermal"
+   },
+   "outputs": {
+    "usable_volume_gal": {
+     "value": 7.58,
+     "tolerance": {
+      "abs": 0.005
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "press-fit-interference-for-force",
+   "source_publisher": "McGraw-Hill Higher Education",
+   "source_title": "Mechanical Engineering Design Tutorial 4-17: Press and Shrink Fits (supplement to Shigley, Mischke & Budynas 7th ed.)",
+   "source_edition_or_year": "7th ed. online supplement",
+   "source_section_or_page": "Example T4.17.1, loosest FN4 fit: steel hub, 1 in hole, 2 in OD (ro/R = 2), solid steel shaft, E 30e6, diametral interference 1.0018 - 1.0008 = 0.0010 in -> p = 11 250 psi, hub sigma_t = p Co = 18 750 psi. The tutorial gives no holding force: friction 0.12 and length 1 in are PLACEHOLDERS and the target holding force is the derived input p x pi x D x L x mu = 11,250 x pi x 0.12 = 4,241.150 lb, so the row tests that the inverse returns the printed interference, pressure and hoop stress.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "target_holding_lb": 4241.15,
+    "shaft_dia_in": 1,
+    "hub_od_in": 2,
+    "modulus_psi": 30000000,
+    "friction_coeff": 0.12,
+    "engagement_in": 1,
+    "hub_yield_psi": 0
+   },
+   "outputs": {
+    "interference_in": {
+     "value": 0.001,
+     "tolerance": {
+      "abs": 1e-06
+     }
+    },
+    "p_psi": {
+     "value": 11250,
+     "tolerance": {
+      "abs": 1
+     }
+    },
+    "hub_stress_psi": {
+     "value": 18750,
+     "tolerance": {
+      "abs": 1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "press-fit-interference-for-force",
+   "source_publisher": "McGraw-Hill Higher Education",
+   "source_title": "Mechanical Engineering Design Tutorial 4-17: Press and Shrink Fits (supplement to Shigley, Mischke & Budynas 7th ed.)",
+   "source_edition_or_year": "7th ed. online supplement",
+   "source_section_or_page": "Example T4.17.1, tightest FN4 fit: diametral interference 1.0023 - 1.0000 = 0.0023 in -> p = 25 875 psi, hub sigma_t = 43 125 psi. Friction 0.12 and length 1 in are PLACEHOLDERS; target holding is the derived input 25,875 x pi x 0.12 = 9,754.645 lb.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "target_holding_lb": 9754.645,
+    "shaft_dia_in": 1,
+    "hub_od_in": 2,
+    "modulus_psi": 30000000,
+    "friction_coeff": 0.12,
+    "engagement_in": 1,
+    "hub_yield_psi": 0
+   },
+   "outputs": {
+    "interference_in": {
+     "value": 0.0023,
+     "tolerance": {
+      "abs": 1e-06
+     }
+    },
+    "p_psi": {
+     "value": 25875,
+     "tolerance": {
+      "abs": 1
+     }
+    },
+    "hub_stress_psi": {
+     "value": 43125,
+     "tolerance": {
+      "abs": 1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "single-plane-field-balance",
+   "source_publisher": "Texas A&M Turbomachinery Laboratory (Turbomachinery & Pump Symposia)",
+   "source_title": "Rotor Balancing Tutorial (Pavelek et al.), Single Plane Influence Coefficient Balancing Math",
+   "source_edition_or_year": "2016",
+   "source_section_or_page": "p.7-8, ID fan example: O = 5.6 mils pk-pk @135 deg, 74 oz-in trial at 315 deg, O+T = 3.3 mils @238 deg; printed T = 7.11 mils @288.1 deg, trial rotated 26.9 deg (graphical text says 26), CW = 58.24 oz-in @341.9 deg (58.24 = 5.6 x rounded IC 10.4, so 0.5% tolerance on the weight). Trial weight entered in oz-in in the grams field: the solve is unit-agnostic (weight ratio). Angles opposite rotation for both phase and weight, matching the tile's same-convention assumption.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "original_amplitude": 5.6,
+    "original_phase_deg": 135,
+    "trial_weight_g": 74,
+    "trial_weight_angle_deg": 315,
+    "trial_amplitude": 3.3,
+    "trial_phase_deg": 238
+   },
+   "outputs": {
+    "effect_magnitude": {
+     "value": 7.11,
+     "tolerance": {
+      "abs": 0.006
+     }
+    },
+    "effect_angle_deg": {
+     "value": 288.1,
+     "tolerance": {
+      "abs": 0.06
+     }
+    },
+    "correction_weight_g": {
+     "value": 58.24,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "correction_angle_deg": {
+     "value": 341.9,
+     "tolerance": {
+      "abs": 0.06
+     }
+    },
+    "rotation_deg": {
+     "value": 26.9,
+     "tolerance": {
+      "abs": 0.06
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "gin-pole-uptower-lift",
+   "source_publisher": "The Crosby Group",
+   "source_title": "Tackle Block and Sheave catalog section, Loads on Blocks / Angle Factor Multipliers",
+   "source_edition_or_year": "2013 (catalog pp. 375-382)",
+   "source_section_or_page": "p.377-378: Example A: gin pole truck lifting 1,000 lb, 50 deg between lines at snatch block A: A = 1,000 x 1.81 = 1,810 lb. Crosby's angle is between the incoming and departing lines; with the load hanging plumb that is the haul line's angle from vertical (tile input). Factors printed to 2 decimals (2cos(angle/2)); a few table cells (45, 130, 135 deg) are truncated rather than rounded, so only cells that round correctly are used. pole_length_ft, mount_rated_lb and hauled_line_angle_deg are placeholders.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "component_weight_lb": 1000,
+    "haul_angle_deg": 50,
+    "pole_length_ft": 12,
+    "mount_rated_lb": 6000,
+    "hauled_line_angle_deg": 15
+   },
+   "outputs": {
+    "resultant_multiple": {
+     "value": 1.81,
+     "tolerance": {
+      "abs": 0.006
+     }
+    },
+    "head_resultant_lb": {
+     "value": 1810,
+     "tolerance": {
+      "pct": 0.3
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "gin-pole-uptower-lift",
+   "source_publisher": "The Crosby Group",
+   "source_title": "Tackle Block and Sheave catalog section, Loads on Blocks / Angle Factor Multipliers",
+   "source_edition_or_year": "2013 (catalog pp. 375-382)",
+   "source_section_or_page": "p.377-378: Angle Factor Multipliers table: 90 deg -> 1.41. Crosby's angle is between the incoming and departing lines; with the load hanging plumb that is the haul line's angle from vertical (tile input). Factors printed to 2 decimals (2cos(angle/2)); a few table cells (45, 130, 135 deg) are truncated rather than rounded, so only cells that round correctly are used. pole_length_ft, mount_rated_lb and hauled_line_angle_deg are placeholders.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "component_weight_lb": 1000,
+    "haul_angle_deg": 90,
+    "pole_length_ft": 12,
+    "mount_rated_lb": 6000,
+    "hauled_line_angle_deg": 15
+   },
+   "outputs": {
+    "resultant_multiple": {
+     "value": 1.41,
+     "tolerance": {
+      "abs": 0.006
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "gin-pole-uptower-lift",
+   "source_publisher": "The Crosby Group",
+   "source_title": "Tackle Block and Sheave catalog section, Loads on Blocks / Angle Factor Multipliers",
+   "source_edition_or_year": "2013 (catalog pp. 375-382)",
+   "source_section_or_page": "p.377-378: Angle Factor Multipliers table: 30 deg -> 1.93. Crosby's angle is between the incoming and departing lines; with the load hanging plumb that is the haul line's angle from vertical (tile input). Factors printed to 2 decimals (2cos(angle/2)); a few table cells (45, 130, 135 deg) are truncated rather than rounded, so only cells that round correctly are used. pole_length_ft, mount_rated_lb and hauled_line_angle_deg are placeholders.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "component_weight_lb": 1000,
+    "haul_angle_deg": 30,
+    "pole_length_ft": 12,
+    "mount_rated_lb": 6000,
+    "hauled_line_angle_deg": 15
+   },
+   "outputs": {
+    "resultant_multiple": {
+     "value": 1.93,
+     "tolerance": {
+      "abs": 0.006
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "gin-pole-uptower-lift",
+   "source_publisher": "The Crosby Group",
+   "source_title": "Tackle Block and Sheave catalog section, Loads on Blocks / Angle Factor Multipliers",
+   "source_edition_or_year": "2013 (catalog pp. 375-382)",
+   "source_section_or_page": "p.377-378: Angle Factor Multipliers table: 120 deg -> 1.00. Crosby's angle is between the incoming and departing lines; with the load hanging plumb that is the haul line's angle from vertical (tile input). Factors printed to 2 decimals (2cos(angle/2)); a few table cells (45, 130, 135 deg) are truncated rather than rounded, so only cells that round correctly are used. pole_length_ft, mount_rated_lb and hauled_line_angle_deg are placeholders.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "component_weight_lb": 1000,
+    "haul_angle_deg": 120,
+    "pole_length_ft": 12,
+    "mount_rated_lb": 6000,
+    "hauled_line_angle_deg": 15
+   },
+   "outputs": {
+    "resultant_multiple": {
+     "value": 1.0,
+     "tolerance": {
+      "abs": 0.006
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "alignment-thermal-growth",
+   "source_publisher": "PRUFTECHNIK LTD (Ludeca)",
+   "source_title": "A Practical Guide to Shaft Alignment, Thermal growth calculations",
+   "source_edition_or_year": "Edition 4, 2002",
+   "source_section_or_page": "p.61: DL = L c DT; pump with liquid at 300 degF, base-to-center 26 in, ambient 50 degF, cast iron 0.0000059 -> 26 x 0.0000059 x 250 = .038 in (printed to 3 decimals). Pump entered as the movable machine; the stationary machine is a placeholder held at ambient (zero growth); tolerance placeholder.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "stationary_support_height_in": 10,
+    "stationary_alpha_per_f": 5.9e-06,
+    "stationary_operating_temp_f": 50,
+    "movable_support_height_in": 26,
+    "movable_alpha_per_f": 5.9e-06,
+    "movable_operating_temp_f": 300,
+    "ambient_temp_f": 50,
+    "tolerance_offset_mils": 2
+   },
+   "outputs": {
+    "movable_growth_in": {
+     "value": 0.038,
+     "tolerance": {
+      "abs": 0.0005
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "alignment-thermal-growth",
+   "source_publisher": "Maintenance World",
+   "source_title": "Understanding Shaft Alignment: Thermal Growth",
+   "source_edition_or_year": "2013-07-12",
+   "source_section_or_page": "Example: motor 70 -> 120 degF, cast iron end bell 0.0000059, feet to shaft center 15 in, pump temperature unchanged: (120-70) x 15 x 0.0000059 = 0.0044 in (4.4 mils); motor 'should be aligned 4.4 mils lower than the pump'. Printed to 0.1 mil. Pump (stationary) support height is a placeholder at ambient; tolerance placeholder.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "stationary_support_height_in": 15,
+    "stationary_alpha_per_f": 5.9e-06,
+    "stationary_operating_temp_f": 70,
+    "movable_support_height_in": 15,
+    "movable_alpha_per_f": 5.9e-06,
+    "movable_operating_temp_f": 120,
+    "ambient_temp_f": 70,
+    "tolerance_offset_mils": 2
+   },
+   "outputs": {
+    "movable_growth_in": {
+     "value": 0.0044,
+     "tolerance": {
+      "abs": 5e-05
+     }
+    },
+    "relative_growth_in": {
+     "value": 0.0044,
+     "tolerance": {
+      "abs": 5e-05
+     }
+    },
+    "cold_target_offset_in": {
+     "value": -0.0044,
+     "tolerance": {
+      "abs": 5e-05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "shaft-alignment-rim-face",
+   "source_publisher": "Acoem (VibrAlign)",
+   "source_title": "Rim and Face method overview",
+   "source_edition_or_year": "web article (accessed 2026-10-01)",
+   "source_section_or_page": "Interpreting Vertical Misalignment: rim dial TIR -34 mils -> coupling offset -17 mils (17 mils low); face TIR +24 mils over A = 4 in -> 6.0 mils per inch. Only offset and angularity are asserted: the same article's foot equations treat offset + slope x distance as the foot POSITION (positive = high, remove shims), opposite to the tile's 'positive raises the foot, add shim' wording, so the foot moves are not fixtured. Foot distances are placeholders.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "rim_tir_in": -0.034,
+    "face_tir_in": 0.024,
+    "face_diameter_in": 4,
+    "front_foot_distance_in": 7,
+    "rear_foot_distance_in": 31
+   },
+   "outputs": {
+    "offset_in": {
+     "value": -0.017,
+     "tolerance": {
+      "abs": 5e-07
+     }
+    },
+    "angularity_mils_per_in": {
+     "value": 6.0,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "escalator-capacity",
+   "source_publisher": "Electrical Knowhow (after CIBSE Guide D)",
+   "source_title": "Vertical Transportation Design and Traffic Calculations - Part Four, Escalator handling capacity",
+   "source_edition_or_year": "2019",
+   "source_section_or_page": "Ce = 60 V k s with 400 mm step (s = 2.5/m), Table-9: 0.50 m/s, 1000 mm step (k=2): 150/min (9000/h). Speed converted m/s -> fpm and 400 mm -> in; loading_factor, weight_per_person_lb and design_flow_pph are placeholders.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "speed_fpm": 98.425197,
+    "step_depth_in": 15.748031,
+    "persons_per_step": 2,
+    "loading_factor": 0.6,
+    "weight_per_person_lb": 150,
+    "design_flow_pph": 0
+   },
+   "outputs": {
+    "theoretical_pph": {
+     "value": 9000,
+     "tolerance": {
+      "abs": 0.6
+     }
+    },
+    "steps_per_hour": {
+     "value": 4500,
+     "tolerance": {
+      "abs": 0.6
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "escalator-capacity",
+   "source_publisher": "Electrical Knowhow (after CIBSE Guide D)",
+   "source_title": "Vertical Transportation Design and Traffic Calculations - Part Four, Escalator handling capacity",
+   "source_edition_or_year": "2019",
+   "source_section_or_page": "Ce = 60 V k s with 400 mm step (s = 2.5/m), Table-9: 0.75 m/s, 800 mm step (k=1.5): 169/min (10125/h). Speed converted m/s -> fpm and 400 mm -> in; loading_factor, weight_per_person_lb and design_flow_pph are placeholders.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "speed_fpm": 147.637795,
+    "step_depth_in": 15.748031,
+    "persons_per_step": 1.5,
+    "loading_factor": 0.6,
+    "weight_per_person_lb": 150,
+    "design_flow_pph": 0
+   },
+   "outputs": {
+    "theoretical_pph": {
+     "value": 10125,
+     "tolerance": {
+      "abs": 0.6
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "escalator-capacity",
+   "source_publisher": "Electrical Knowhow (after CIBSE Guide D)",
+   "source_title": "Vertical Transportation Design and Traffic Calculations - Part Four, Escalator handling capacity",
+   "source_edition_or_year": "2019",
+   "source_section_or_page": "Ce = 60 V k s with 400 mm step (s = 2.5/m), Table-9: 0.65 m/s, 600 mm step (k=1): 98/min (5850/h). Speed converted m/s -> fpm and 400 mm -> in; loading_factor, weight_per_person_lb and design_flow_pph are placeholders.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "speed_fpm": 127.952756,
+    "step_depth_in": 15.748031,
+    "persons_per_step": 1,
+    "loading_factor": 0.6,
+    "weight_per_person_lb": 150,
+    "design_flow_pph": 0
+   },
+   "outputs": {
+    "theoretical_pph": {
+     "value": 5850,
+     "tolerance": {
+      "abs": 0.6
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "escalator-capacity",
+   "source_publisher": "Electrical Knowhow (after CIBSE Guide D)",
+   "source_title": "Vertical Transportation Design and Traffic Calculations - Part Four, Escalator handling capacity",
+   "source_edition_or_year": "2019",
+   "source_section_or_page": "Ce = 60 V k s with 400 mm step (s = 2.5/m), Table-9: London Underground Example 2: 1000 mm at 0.75 m/s, actual K = 5/6 taken as 0.83: 150 x 0.75 x 0.83 = 93.375/min = 5603/h. Speed converted m/s -> fpm and 400 mm -> in; loading_factor, weight_per_person_lb and design_flow_pph are placeholders.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "speed_fpm": 147.637795,
+    "step_depth_in": 15.748031,
+    "persons_per_step": 0.83,
+    "loading_factor": 0.6,
+    "weight_per_person_lb": 150,
+    "design_flow_pph": 0
+   },
+   "outputs": {
+    "theoretical_pph": {
+     "value": 5603,
+     "tolerance": {
+      "abs": 0.6
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "hydraulic-jack-pressure",
+   "source_publisher": "Elevator Equipment Corporation (EECO)",
+   "source_title": "EECO Control Valve Catalog, Valve Sizing & Engineering Data",
+   "source_edition_or_year": "Revision 03/22/21",
+   "source_section_or_page": "Table 1A (pressure psi for one jack, = load / (.7854 d^2)): 14000 lb on 6 in -> 495 psi, on 5 in -> 713 psi; Table 3 piston area 6 in = 28.274 sq in, 5 in = 19.635 sq in; Table 2A flow at 100 fpm for 6 in = 147 gpm. Pressures and flows printed as integers. pump_flow_gpm (set to the printed flow) and relief_setting_psi are placeholders.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "bore_in": 6,
+    "total_load_lb": 14000,
+    "car_speed_fpm": 100,
+    "pump_flow_gpm": 147,
+    "relief_setting_psi": 1000,
+    "alternative_bore_in": 5
+   },
+   "outputs": {
+    "jack_area_sqin": {
+     "value": 28.274,
+     "tolerance": {
+      "abs": 0.0006
+     }
+    },
+    "working_pressure_psi": {
+     "value": 495,
+     "tolerance": {
+      "abs": 0.6
+     }
+    },
+    "flow_required_gpm": {
+     "value": 147,
+     "tolerance": {
+      "abs": 0.6
+     }
+    },
+    "alt_area_sqin": {
+     "value": 19.635,
+     "tolerance": {
+      "abs": 0.0006
+     }
+    },
+    "alt_working_pressure_psi": {
+     "value": 713,
+     "tolerance": {
+      "abs": 0.6
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "hydraulic-jack-pressure",
+   "source_publisher": "Elevator Equipment Corporation (EECO)",
+   "source_title": "EECO Control Valve Catalog, Valve Sizing & Engineering Data",
+   "source_edition_or_year": "Revision 03/22/21",
+   "source_section_or_page": "Table 1A (pressure psi for one jack, = load / (.7854 d^2)): 10000 lb on 12.625 in -> 80 psi, on 9.5 in -> 141 psi; Table 3 piston area 12.625 in = 125.185 sq in, 9.5 in = 70.882 sq in; Table 2A flow at 100 fpm for 12.625 in = 650 gpm. Pressures and flows printed as integers. pump_flow_gpm (set to the printed flow) and relief_setting_psi are placeholders.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "bore_in": 12.625,
+    "total_load_lb": 10000,
+    "car_speed_fpm": 100,
+    "pump_flow_gpm": 650,
+    "relief_setting_psi": 1000,
+    "alternative_bore_in": 9.5
+   },
+   "outputs": {
+    "jack_area_sqin": {
+     "value": 125.185,
+     "tolerance": {
+      "abs": 0.0006
+     }
+    },
+    "working_pressure_psi": {
+     "value": 80,
+     "tolerance": {
+      "abs": 0.6
+     }
+    },
+    "flow_required_gpm": {
+     "value": 650,
+     "tolerance": {
+      "abs": 0.6
+     }
+    },
+    "alt_area_sqin": {
+     "value": 70.882,
+     "tolerance": {
+      "abs": 0.0006
+     }
+    },
+    "alt_working_pressure_psi": {
+     "value": 141,
+     "tolerance": {
+      "abs": 0.6
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "wind-power-density-betz",
+   "source_publisher": "Danish Wind Industry Association",
+   "source_title": "Wind Energy Reference Manual Part 1: Wind Energy Concepts, Power of the Wind table",
+   "source_edition_or_year": "2003 (updated 12 May 2003)",
+   "source_section_or_page": "Power of the Wind table at 1.225 kg/m3: 8 m/s -> 313.6 W/m2 (0.5 x 1.225 x v^3). Converted to tile units: speed x 2.23694 mph, density 1.225 kg/m3 = 0.0764742 lb/cu ft, W/m2 / 10.7639 = W/sq ft. rotor_diameter_ft, power_coefficient and alt_wind_speed_mph are placeholders.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "wind_speed_mph": 17.8954903,
+    "air_density_pcf": 0.07647425,
+    "rotor_diameter_ft": 100,
+    "power_coefficient": 0.45,
+    "alt_wind_speed_mph": 25
+   },
+   "outputs": {
+    "power_density_w_ft2": {
+     "value": 29.13439,
+     "tolerance": {
+      "pct": 0.1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "wind-power-density-betz",
+   "source_publisher": "Danish Wind Industry Association",
+   "source_title": "Wind Energy Reference Manual Part 1: Wind Energy Concepts, Power of the Wind table",
+   "source_edition_or_year": "2003 (updated 12 May 2003)",
+   "source_section_or_page": "Power of the Wind table at 1.225 kg/m3: 10 m/s -> 612.5 W/m2 (0.5 x 1.225 x v^3). Converted to tile units: speed x 2.23694 mph, density 1.225 kg/m3 = 0.0764742 lb/cu ft, W/m2 / 10.7639 = W/sq ft. rotor_diameter_ft, power_coefficient and alt_wind_speed_mph are placeholders.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "wind_speed_mph": 22.3693629,
+    "air_density_pcf": 0.07647425,
+    "rotor_diameter_ft": 100,
+    "power_coefficient": 0.45,
+    "alt_wind_speed_mph": 25
+   },
+   "outputs": {
+    "power_density_w_ft2": {
+     "value": 56.90311,
+     "tolerance": {
+      "pct": 0.1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "wind-power-density-betz",
+   "source_publisher": "Danish Wind Industry Association",
+   "source_title": "Wind Energy Reference Manual Part 1: Wind Energy Concepts, Power of the Wind table",
+   "source_edition_or_year": "2003 (updated 12 May 2003)",
+   "source_section_or_page": "Power of the Wind table at 1.225 kg/m3: 20 m/s -> 4900.0 W/m2 (0.5 x 1.225 x v^3). Converted to tile units: speed x 2.23694 mph, density 1.225 kg/m3 = 0.0764742 lb/cu ft, W/m2 / 10.7639 = W/sq ft. rotor_diameter_ft, power_coefficient and alt_wind_speed_mph are placeholders.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "wind_speed_mph": 44.7387258,
+    "air_density_pcf": 0.07647425,
+    "rotor_diameter_ft": 100,
+    "power_coefficient": 0.45,
+    "alt_wind_speed_mph": 25
+   },
+   "outputs": {
+    "power_density_w_ft2": {
+     "value": 455.2249,
+     "tolerance": {
+      "pct": 0.1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "wind-power-density-betz",
+   "source_publisher": "National Renewable Energy Laboratory (AWS Scientific, Inc.)",
+   "source_title": "Wind Resource Assessment Handbook, Ch. 9 wind power density example",
+   "source_edition_or_year": "April 1997 (NREL Subcontract TAT-5-15283-01)",
+   "source_section_or_page": "p.9-7: at 101,325 Pa and 288 K (rho = P/RT, R = 287 -> 1.22586 kg/m3 = 0.0765279 lb/cu ft), 8.9 m/s (20 mph) -> 438 W/m2 (= 40.69 W/sq ft). Integer W/m2. Rotor, Cp and alt speed are placeholders.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "wind_speed_mph": 20,
+    "air_density_pcf": 0.07652818,
+    "rotor_diameter_ft": 100,
+    "power_coefficient": 0.45,
+    "alt_wind_speed_mph": 25
+   },
+   "outputs": {
+    "power_density_w_ft2": {
+     "value": 40.69153,
+     "tolerance": {
+      "pct": 0.15
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "turbine-density-correction",
+   "source_publisher": "Danish Wind Industry Association",
+   "source_title": "Wind Energy Reference Manual Part 1, Density of Air at Standard Atmospheric Pressure",
+   "source_edition_or_year": "2003 (updated 12 May 2003)",
+   "source_section_or_page": "Table: 15 degC (59 degF) 1.225 kg/m3 (wind-industry standard), 40 degC (104 degF) 1.127, 0 degC (32 degF) 1.292 (3 decimals). Sea level so the altitude factor is 1; reference 1.225 kg/m3 = 0.0764742 lb/cu ft. Values converted kg/m3 -> lb/cu ft. Measured/curve power and wind speed are placeholders. (Other table cells, e.g. -25, 30, 35 degC, sit 0.04-0.05% off the tile's ideal-gas ratio from DWIA's own constants and are not used.)",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "elevation_ft": 0,
+    "air_temp_f": 104,
+    "reference_density_pcf": 0.07647425,
+    "measured_power_kw": 1000,
+    "curve_power_kw": 1000,
+    "wind_speed_mph": 20,
+    "alt_air_temp_f": 32
+   },
+   "outputs": {
+    "site_density_pcf": {
+     "value": 0.0703563,
+     "tolerance": {
+      "abs": 4e-05
+     }
+    },
+    "alt_density_pcf": {
+     "value": 0.0806569,
+     "tolerance": {
+      "abs": 4e-05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "wind-shear-hub-height",
+   "source_publisher": "U.S. DOE / Pacific Northwest Laboratory (NREL RReDC)",
+   "source_title": "Wind Energy Resource Atlas of the United States (Elliott et al.), Table 1-1 Classes of wind power density at 10 m and 50 m",
+   "source_edition_or_year": "1986 (DOE/CH 10093-4)",
+   "source_section_or_page": "Table 1-1, class 2: 10 m speed 5.1 m/s -> 50 m speed 6.4 m/s, footnote (a) 'vertical extrapolation ... based on the 1/7 power law'; Ch.1 text: the 1/7 law gives 50 m power densities 'twice those at 10 m' (table: 100 -> 200 W/m2). Speeds printed to 0.1 m/s at BOTH heights, so tolerance 0.1 m/s (0.23 mph). Heights 10 m/50 m entered in ft (32.8084/164.042); speeds converted to mph. alt_shear_exponent and the second-level reading are placeholders.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "measured_speed_mph": 11.408375,
+    "measured_height_ft": 32.8084,
+    "hub_height_ft": 164.042,
+    "shear_exponent": 0.14285714285714285,
+    "alt_shear_exponent": 0.2,
+    "second_speed_mph": 10.267538,
+    "second_height_ft": 20
+   },
+   "outputs": {
+    "hub_speed_mph": {
+     "value": 14.3164,
+     "tolerance": {
+      "abs": 0.23
+     }
+    },
+    "energy_ratio": {
+     "value": 2,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "wind-shear-hub-height",
+   "source_publisher": "U.S. DOE / Pacific Northwest Laboratory (NREL RReDC)",
+   "source_title": "Wind Energy Resource Atlas of the United States (Elliott et al.), Table 1-1 Classes of wind power density at 10 m and 50 m",
+   "source_edition_or_year": "1986 (DOE/CH 10093-4)",
+   "source_section_or_page": "Table 1-1, class 6: 10 m speed 7.0 m/s -> 50 m speed 8.8 m/s, footnote (a) 'vertical extrapolation ... based on the 1/7 power law'; Ch.1 text: the 1/7 law gives 50 m power densities 'twice those at 10 m' (table: 100 -> 200 W/m2). Speeds printed to 0.1 m/s at BOTH heights, so tolerance 0.1 m/s (0.23 mph). Heights 10 m/50 m entered in ft (32.8084/164.042); speeds converted to mph. alt_shear_exponent and the second-level reading are placeholders.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "measured_speed_mph": 15.658554,
+    "measured_height_ft": 32.8084,
+    "hub_height_ft": 164.042,
+    "shear_exponent": 0.14285714285714285,
+    "alt_shear_exponent": 0.2,
+    "second_speed_mph": 14.092699,
+    "second_height_ft": 20
+   },
+   "outputs": {
+    "hub_speed_mph": {
+     "value": 19.685,
+     "tolerance": {
+      "abs": 0.23
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "wind-shear-hub-height",
+   "source_publisher": "U.S. DOE / Pacific Northwest Laboratory (NREL RReDC)",
+   "source_title": "Wind Energy Resource Atlas of the United States (Elliott et al.), Table 1-1 Classes of wind power density at 10 m and 50 m",
+   "source_edition_or_year": "1986 (DOE/CH 10093-4)",
+   "source_section_or_page": "Table 1-1, class 7: 10 m speed 9.4 m/s -> 50 m speed 11.9 m/s, footnote (a) 'vertical extrapolation ... based on the 1/7 power law'; Ch.1 text: the 1/7 law gives 50 m power densities 'twice those at 10 m' (table: 100 -> 200 W/m2). Speeds printed to 0.1 m/s at BOTH heights, so tolerance 0.1 m/s (0.23 mph). Heights 10 m/50 m entered in ft (32.8084/164.042); speeds converted to mph. alt_shear_exponent and the second-level reading are placeholders.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "measured_speed_mph": 21.027201,
+    "measured_height_ft": 32.8084,
+    "hub_height_ft": 164.042,
+    "shear_exponent": 0.14285714285714285,
+    "alt_shear_exponent": 0.2,
+    "second_speed_mph": 18.924481,
+    "second_height_ft": 20
+   },
+   "outputs": {
+    "hub_speed_mph": {
+     "value": 26.6195,
+     "tolerance": {
+      "abs": 0.23
      }
     }
    }

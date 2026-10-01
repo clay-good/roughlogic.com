@@ -60,6 +60,9 @@ So one kettle wants roughly 90 lb/hr of steam while it is coming up -- about 3 b
 starting together want about 10 boiler horsepower for half an hour, and a boiler sized on average load will lose
 pressure across the whole kitchen at 6 am. Stagger the starts and the peak halves.
 
+
+**Amended 2026-10-01.** The steam draw above leaves out the jacket efficiency (the tile added it 2026-09-26): the jacket condenses steam for its own losses too, so steam = 46,704 / (945.6 x 0.85) = 58.1 lb per batch, about 106 lb/hr or 3.1 boiler horsepower per kettle, and four starting together want about 12.3 bhp.
+
 ## 4. Scope and non-goals
 
 Come-up only. The tile does not compute the much smaller steam rate needed to hold a simmer, the evaporation loss

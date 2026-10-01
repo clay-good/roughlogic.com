@@ -74,6 +74,9 @@ $70,000 a year. Condensate return pays twice: once for the water and treatment, 
 The vent, at 0.3% of 25,000 lb/h, is 75 lb/h -- about $7,800 a year. Worth setting correctly and never worth
 closing.
 
+
+**Amended 2026-10-01.** The heating steam is 2,317 and 1,640 lb/h at 960.2 BTU/lb (the figures above divided by 960). Steam is valued from feedwater already at saturation (the tile's valuation fix), so the 677 lb/h saving is about $58,500 a year and the 75 lb/h vent about $6,500, not $70,000 and $7,800. Spirax Sarco divides by the supply steam's enthalpy above the deaerator water; the latent heat at deaerator pressure used here is about 4% conservative from 150 psig supply.
+
 ## 4. Scope and non-goals
 
 A heat balance for a deaerating feedwater heater. It does not size the deaerator, its storage section, or the

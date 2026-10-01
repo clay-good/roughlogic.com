@@ -60,6 +60,9 @@ Both feet come UP, the rear one by 0.0100 in and the front by -0.0020 in -- a di
 0.0100 in, only -0.0100 in is offset and 0.0200 in is the projected angle. A crew that shimmed both
 feet equally to the offset would leave the entire angular error in place.
 
+
+**Amended 2026-10-01.** "Both feet come UP" above is wrong for its own numbers: the rear foot comes up 0.0100 in and the front foot goes DOWN 0.0020 in. The moves also assume readings zeroed at 12 o'clock and taken at 6 (Pruftechnik), where positive means the foot is low; under the Acoem/VibrAlign convention (zero at 6, read at 12) the same formula's positive result means the foot is high. The tile now states the convention on its inputs and in its note.
+
 ## 4. Scope and non-goals
 
 Vertical (shim) correction for a two-machine train with a single coupling, rim-and-face bracket setup. It does

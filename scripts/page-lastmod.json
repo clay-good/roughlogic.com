@@ -2,7 +2,7 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "993ecce8a7aba142",
+      "sha": "eef2d1b1ef924ff9",
       "date": "2026-10-01"
     },
     "/tools/": {
@@ -246,8 +246,8 @@
       "date": "2026-09-29"
     },
     "/tools/alignment-thermal-growth/": {
-      "sha": "cda310bfcecfae6d",
-      "date": "2026-09-29"
+      "sha": "092314f6c05204b6",
+      "date": "2026-10-01"
     },
     "/tools/allowable-area/": {
       "sha": "7b4252b6950c2e27",
@@ -1142,8 +1142,8 @@
       "date": "2026-09-29"
     },
     "/tools/chilled-water-delta-t/": {
-      "sha": "bca889424481ec3c",
-      "date": "2026-09-29"
+      "sha": "ad78ec10b1468acf",
+      "date": "2026-10-01"
     },
     "/tools/chilled-water-ride-through/": {
       "sha": "54fc593833a8c117",
@@ -1862,8 +1862,8 @@
       "date": "2026-09-29"
     },
     "/tools/coupling-alignment-tolerance/": {
-      "sha": "517589a3e9525901",
-      "date": "2026-09-29"
+      "sha": "aaeede7d294b35f3",
+      "date": "2026-10-01"
     },
     "/tools/covers-per-labor-hour/": {
       "sha": "5cdcbd20646555fd",
@@ -2018,8 +2018,8 @@
       "date": "2026-10-01"
     },
     "/tools/damper-authority/": {
-      "sha": "b9c303787c60d640",
-      "date": "2026-09-29"
+      "sha": "776c84bc8227ae5a",
+      "date": "2026-10-01"
     },
     "/tools/datacenter-pue/": {
       "sha": "bfc0b936bc715db3",
@@ -2042,8 +2042,8 @@
       "date": "2026-09-29"
     },
     "/tools/deaerator-steam-demand/": {
-      "sha": "4be678353306b66a",
-      "date": "2026-09-29"
+      "sha": "5dcc1789353e5d3d",
+      "date": "2026-10-01"
     },
     "/tools/debris-load-ticket/": {
       "sha": "ed9e6b0522e4d435",
@@ -2098,8 +2098,8 @@
       "date": "2026-09-29"
     },
     "/tools/defrost-cycle-sizing/": {
-      "sha": "ff402519d8f2594c",
-      "date": "2026-09-29"
+      "sha": "1f8ce4c57671afa8",
+      "date": "2026-10-01"
     },
     "/tools/degree-day-energy/": {
       "sha": "3b65dcc0ede04401",
@@ -3234,8 +3234,8 @@
       "date": "2026-09-29"
     },
     "/tools/garage-door-torsion-spring/": {
-      "sha": "2df565e3a970adb3",
-      "date": "2026-09-29"
+      "sha": "39ae394169c230d7",
+      "date": "2026-10-01"
     },
     "/tools/gas-altitude-derate/": {
       "sha": "977bfee01278d504",
@@ -3562,8 +3562,8 @@
       "date": "2026-09-29"
     },
     "/tools/guide-rail-bracket-span/": {
-      "sha": "60369ef86c89e92f",
-      "date": "2026-09-29"
+      "sha": "e1aab63cbdc00a27",
+      "date": "2026-10-01"
     },
     "/tools/gutter-downspout/": {
       "sha": "683e356015bf8a70",
@@ -4006,8 +4006,8 @@
       "date": "2026-09-29"
     },
     "/tools/interpass-temperature-control/": {
-      "sha": "c1eb06ef9242cf74",
-      "date": "2026-09-29"
+      "sha": "06c418ef03c75ca9",
+      "date": "2026-10-01"
     },
     "/tools/intersection-sight-triangle/": {
       "sha": "67369aff240fdf98",
@@ -5674,8 +5674,8 @@
       "date": "2026-09-29"
     },
     "/tools/press-fit-interference-for-force/": {
-      "sha": "51f427ff14d83d2e",
-      "date": "2026-09-29"
+      "sha": "54b8723712827ecd",
+      "date": "2026-10-01"
     },
     "/tools/press-fit-pressure/": {
       "sha": "fc56afad1a33fcce",
@@ -6634,8 +6634,8 @@
       "date": "2026-09-29"
     },
     "/tools/scotch-yoke-motion/": {
-      "sha": "1b84fe0821b85c2c",
-      "date": "2026-09-29"
+      "sha": "39d6a772378f2fad",
+      "date": "2026-10-01"
     },
     "/tools/screen-deck-capacity/": {
       "sha": "f24da3472b2488b4",
@@ -6854,8 +6854,8 @@
       "date": "2026-09-29"
     },
     "/tools/shaft-alignment-rim-face/": {
-      "sha": "c62c1d22ccdccf9f",
-      "date": "2026-09-29"
+      "sha": "b5527ccaaa0aa7db",
+      "date": "2026-10-01"
     },
     "/tools/shaft-diameter-for-torsion/": {
       "sha": "28f37eaf9993a2cb",
@@ -7350,8 +7350,8 @@
       "date": "2026-09-29"
     },
     "/tools/spring-natural-frequency/": {
-      "sha": "3a90bbf361fc4938",
-      "date": "2026-09-29"
+      "sha": "a4e3a4339ec0f72e",
+      "date": "2026-10-01"
     },
     "/tools/spring-wire-stress/": {
       "sha": "78f8e88758ab0563",
@@ -7522,8 +7522,8 @@
       "date": "2026-09-29"
     },
     "/tools/steam-kettle-heatup/": {
-      "sha": "be0e5b7316fd4422",
-      "date": "2026-09-29"
+      "sha": "700f6747b089bf70",
+      "date": "2026-10-01"
     },
     "/tools/steam-pipe-capacity/": {
       "sha": "3ac9444572ffa3d3",
@@ -8850,8 +8850,8 @@
       "date": "2026-09-30"
     },
     "/tools/wind-shear-hub-height/": {
-      "sha": "e8e490986333f812",
-      "date": "2026-09-29"
+      "sha": "e530f5ed0ce1290d",
+      "date": "2026-10-01"
     },
     "/tools/wind-solid-sign/": {
       "sha": "16ceeabf08d6e2de",
@@ -8914,8 +8914,8 @@
       "date": "2026-09-29"
     },
     "/tools/wire-rope-stretch/": {
-      "sha": "e4f09f5c598f642f",
-      "date": "2026-09-29"
+      "sha": "fd04aadc7e7c5853",
+      "date": "2026-10-01"
     },
     "/tools/wireless-fspl/": {
       "sha": "de82b98913da3f77",

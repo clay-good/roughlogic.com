@@ -59,6 +59,9 @@ The angle is fine and the offset is not, by 0.0005 in -- half a thousandth. That
 rather than eyeballing the readings: at 3600 rpm half a thousandth is the difference between inside and outside
 tolerance, and the same 0.0035 in offset at 1,200 rpm would sit comfortably inside "excellent".
 
+
+**Amended 2026-10-01.** The "typical field tolerances" above (0.003 in and 1.0 mils/in at 3,600 rpm) are about twice the published short-coupling table, which VibrAlign gives as 1.5 mils offset and 0.3 mils/in angularity acceptable at 3,600 rpm (1.0 and 0.2 excellent), 3.0 / 0.5 at 1,800 and 4.0 / 0.8 at 1,200. A 3.5 mil offset at 1,200 rpm is acceptable, not excellent (2.5). The example now uses the table: 2 mils and 0.25 mils/in at 3,600 rpm, offset failing at 133% and angularity passing. Spacer slope is judged against the angularity tolerance; Pruftechnik's Practical Guide allows spacers more (about 0.6 mils/in at 1,800 rpm).
+
 ## 4. Scope and non-goals
 
 A comparison of measured values against tolerance values the user supplies. It does not ship a tolerance

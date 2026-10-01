@@ -62,6 +62,9 @@ turns are unchanged at 6.68, and the required rate rises to 56.8 IPPT -- a 27% s
 door, which is the linear part. But raise the door to 8 ft instead at the original weight and the rate *falls* to
 39.3 IPPT, because the same torque is reached over more turns. Weight and height pull in opposite directions.
 
+
+**Amended 2026-10-01.** The turns above are the lift turns only. The spring is wound about one turn more so it still holds the door open (Canimex drum charts run about 1.15 extra); without it the spring is slack at the top of travel and an open door can drift down. With one extra turn the example is 7.68 turns, 39.0 IPPT total and 19.5 IPPT per spring; the 190 lb door wants 49.5 IPPT total (380 / 7.68 = 49.45).
+
 ## 4. Scope and non-goals
 
 **Torsion springs are stored energy and they injure people.** Winding, unwinding, and replacing them is done with

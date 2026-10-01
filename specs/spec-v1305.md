@@ -53,6 +53,9 @@ A 100 ft rope stretches 10 in under a 10,000 lb line pull -- nearly a foot, enou
 two cranes share a load. On top of that, a brand-new rope will seat another ~0.5-0.75% (roughly 6-9 in on 100 ft)
 the first time it is loaded, which does not come back.
 
+
+**Amended 2026-10-01.** The 0.5-0.75% seating figure is the FIBRE-core value. For the steel-core (IWRC) rope this tile models, Bridon's Crane Technical Information gives about 0.125% lightly loaded, 0.25% at a normal 5:1 and 0.50% heavily loaded -- about 3 in on 100 ft at normal load, and Mazzella's printed IWRC example uses 0.25%.
+
 ## 4. Scope and non-goals
 
 The recoverable elastic stretch of a single rope by Hooke's law with an effective rope modulus; the initial

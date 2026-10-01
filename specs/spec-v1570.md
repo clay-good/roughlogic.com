@@ -71,6 +71,9 @@ which is well outside the atomizing band and will show at the stack.
 
 That is the case for computing the setpoint per delivery rather than setting it once.
 
+
+**Amended 2026-10-01.** These temperatures predate the fix that converts SSU to centistokes before the Walther (ASTM D341) form. On the current code the first oil reaches 150 SSU at 214.9 degF and the 4,000 SSU pumping limit at 111.3 degF, and a heater left at 185 degF leaves it at about 298 SSU. The setpoint-per-delivery argument stands; the numbers above do not.
+
 ## 4. Scope and non-goals
 
 A viscosity-temperature interpolation from two data points the user supplies. It requires the actual oil's

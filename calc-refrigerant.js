@@ -1354,8 +1354,8 @@ REFRIGERANT_RENDERERS["txv-capacity-check"] = _simpleRenderer({
 });
 
 // ===================== spec-v1414: evaporator defrost heat and cycle time =====================
-// dims: in { frost_lb: M, coil_temp_f: T, coil_mass_lb: M, coil_specific_heat: L^2 T^-2, coil_temp_rise_f: T, heater_btuh: M L^2 T^-3, defrost_efficiency: dimensionless } out: { sensible_btu: M L^2 T^-2, latent_btu: M L^2 T^-2, total_btu: M L^2 T^-2, defrost_min: T }
-export function computeDefrostCycleSizing({ frost_lb = 0, coil_temp_f = -10, coil_mass_lb = 0, coil_specific_heat = 0.10, coil_temp_rise_f = 0, heater_btuh = 0, defrost_efficiency = 0.8 } = {}) {
+// dims: in { frost_lb: M, coil_temp_f: T, coil_mass_lb: M, coil_specific_heat: L^2 T^-2, coil_temp_rise_f: T, heater_btuh: M L^2 T^-3, defrost_efficiency: dimensionless, drain_temp_f: T } out: { sensible_btu: M L^2 T^-2, latent_btu: M L^2 T^-2, meltwater_btu: M L^2 T^-2, total_btu: M L^2 T^-2, defrost_min: T }
+export function computeDefrostCycleSizing({ frost_lb = 0, coil_temp_f = -10, coil_mass_lb = 0, coil_specific_heat = 0.10, coil_temp_rise_f = 0, heater_btuh = 0, defrost_efficiency = 0.8, drain_temp_f = 32 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(frost_lb > 0)) return { error: "Frost mass per cycle must be positive." };
   if (!(coil_temp_f < 32)) return { error: "The coil must start below 32 F, or there is no frost to melt." };
@@ -1364,12 +1364,16 @@ export function computeDefrostCycleSizing({ frost_lb = 0, coil_temp_f = -10, coi
   if (!(coil_temp_rise_f >= 0)) return { error: "Coil temperature rise cannot be negative." };
   if (!(heater_btuh > 0)) return { error: "Defrost heater rating must be positive." };
   if (!(defrost_efficiency > 0 && defrost_efficiency <= 1)) return { error: "Defrost efficiency must be between 0 and 1." };
+  if (!(drain_temp_f >= 32)) return { error: "Melt-water drain temperature cannot be below 32 F." };
   // Three terms and they are NOT the same size: latent dominates at 144 BTU/lb, and the
   // coil warm-up term is the one that gets forgotten.
   const sensible_btu = frost_lb * 0.5 * (32 - coil_temp_f);
   const latent_btu = frost_lb * 144;
+  // ORNL (Fricke & Sharma) Eq. 1 also warms the melt water to the drain
+  // temperature; 32 F (the default) leaves that term out.
+  const meltwater_btu = frost_lb * 1.0 * (drain_temp_f - 32);
   const coil_warmup_btu = coil_mass_lb * coil_specific_heat * coil_temp_rise_f;
-  const useful_btu = sensible_btu + latent_btu + coil_warmup_btu;
+  const useful_btu = sensible_btu + latent_btu + meltwater_btu + coil_warmup_btu;
   const total_btu = useful_btu / defrost_efficiency;
   const defrost_hr = total_btu / heater_btuh;
   const defrost_min = defrost_hr * 60;
@@ -1380,13 +1384,14 @@ export function computeDefrostCycleSizing({ frost_lb = 0, coil_temp_f = -10, coi
   return {
     sensible_btu,
     latent_btu,
+    meltwater_btu,
     coil_warmup_btu,
     total_btu,
     defrost_hr,
     defrost_min,
     box_gain_btu,
     latent_share_pct,
-    note: "How much heat a defrost takes and how long it runs, from the three terms that make it up. They are not the same size: melting the ice costs 144 BTU per pound against about 21 to warm that same ice from a freezer coil's temperature up to 32 F, so the latent term dominates -- but the coil warm-up term is the one that gets forgotten, and on a large coil with heavy fin stock it is real. Defrost efficiency captures everything that is NOT melting frost: heat going into the box instead of the coil, into the drain pan, and out through the insulation, and on electric defrost it is commonly only 60% to 80%. The last relation closes the loop, because frost accumulates at the coil's moisture removal rate, which is set by the box's latent load -- door openings, product respiration, infiltration. That determines how much frost is on the coil when defrost initiates, which determines how long defrost takes, so a box with heavy traffic needs more defrosts and each one is longer, and every minute of defrost is a minute of heat going into a freezer. A freezer coil at -10 F with 20 lb of frost, 60 lb of coil warmed 60 F, a 3 kW heater and 80% efficiency needs 4,575 BTU and runs 26.8 minutes, which lines up with the 20 to 30 minute terminations most controllers are set to. But halve the frost by fixing a door gasket and it falls to 14.7 minutes; double it and it climbs to 51.0. A fixed termination time is right for exactly one frost load, which is the argument for demand defrost. A sizing estimate; the manufacturer's defrost data and a measured coil temperature at termination govern.",
+    note: "How much heat a defrost takes and how long it runs, from the three terms that make it up. They are not the same size: melting the ice costs 144 BTU per pound against about 21 to warm that same ice from a freezer coil's temperature up to 32 F, so the latent term dominates -- but the coil warm-up term is the one that gets forgotten, and on a large coil with heavy fin stock it is real. Defrost efficiency captures everything that is NOT melting frost: heat going into the box instead of the coil, into the drain pan, and out through the insulation, and it varies so widely with coil, case and termination that it has to be entered -- the 80% default is optimistic, and ORNL's display-case study implies far lower for electric defrost. The last relation closes the loop, because frost accumulates at the coil's moisture removal rate, which is set by the box's latent load -- door openings, product respiration, infiltration. That determines how much frost is on the coil when defrost initiates, which determines how long defrost takes, so a box with heavy traffic needs more defrosts and each one is longer, and every minute of defrost is a minute of heat going into a freezer. A freezer coil at -10 F with 20 lb of frost, 60 lb of coil warmed 60 F, a 3 kW heater and 80% efficiency needs 4,575 BTU and runs 26.8 minutes, which lines up with the 20 to 30 minute terminations most controllers are set to. But halve the frost by fixing a door gasket and it falls to 14.7 minutes; double it and it climbs to 51.0. A fixed termination time is right for exactly one frost load, which is the argument for demand defrost. A sizing estimate; the manufacturer's defrost data and a measured coil temperature at termination govern.",
   };
 }
 
@@ -1402,7 +1407,8 @@ REFRIGERANT_RENDERERS["defrost-cycle-sizing"] = _simpleRenderer({
     { key: "coil_specific_heat", label: "Coil specific heat (BTU/lb-F)", kind: "number" },
     { key: "coil_temp_rise_f", label: "Coil temperature rise during defrost (F)", kind: "number" },
     { key: "heater_btuh", label: "Defrost heater rating (BTU/hr)", kind: "number" },
-    { key: "defrost_efficiency", label: "Defrost efficiency (0.6-0.8 electric)", kind: "number" },
+    { key: "defrost_efficiency", label: "Defrost efficiency (0-1; entered -- it varies widely)", kind: "number" },
+    { key: "drain_temp_f", label: "Melt-water drain temperature (F; 32 to leave out)", kind: "number", default: 32 },
   ],
   outputs: [
     { key: "s", id: "dfrc-out-s", label: "Sensible heat to bring the ice to 32 F", value: (r) => fmt(r.sensible_btu, 0) + " BTU" },
@@ -1552,7 +1558,7 @@ export function computeHeadPressureControl({ refrigerant = "R_410A", evaporator_
   if (!Number.isFinite(min_condensing_f)) return { error: "The minimum head pressure is outside the bundled saturation table for this refrigerant." };
   const flooding_charge_lb = condenser_volume_cf * flooded_fraction * liquid_density_pcf;
   const winter_charge_lb = summer_charge_lb + flooding_charge_lb;
-  const receiver_ok = receiver_capacity_lb >= flooding_charge_lb;
+  const receiver_ok = receiver_capacity_lb >= flooding_charge_lb * (1 - 1e-9);
   const receiver_verdict = receiver_capacity_lb === 0
     ? "no receiver capacity entered"
     : receiver_ok

@@ -63,6 +63,9 @@ the charge was set. Note also what the minimum head figure means for equipment s
 cannot be allowed to condense below the saturation temperature corresponding to that pressure, no matter how cold
 the day is, which is what the head-pressure-control valve enforces.
 
+
+**Amended 2026-10-01.** The tile computes total winter charge = summer charge + flooding charge; the receiver working charge in the formula block above is not a separate term (the receiver check compares the receiver's capacity against the flooding charge it must hold in summer).
+
 ## 4. Scope and non-goals
 
 A sizing screen. Saturation temperatures must be read from the pressure-temperature relationship for the specific

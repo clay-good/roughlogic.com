@@ -86,6 +86,9 @@ normal operating loads is checked for the wrong case.
 And in a higher seismic design category, the required section and spacing both tighten, along with retainer
 plates and additional bracing -- so a rail layout carried over from a low-seismic project is not transferable.
 
+
+**Amended 2026-10-01.** The fourth-power scaling above is the uniform-load case. The guide-shoe load is concentrated at midspan, where moment goes as the span and deflection as its CUBE: halving the span halves the moment and cuts deflection to an eighth (0.32 in to 0.040 in), and matching that by upsizing the rail takes eight times the moment of inertia, not sixteen. The tile computes the concentrated case. Its safety-application line is a bending screen; A17.1 checks safety application by Fig. 2.23.4.1-1 or a 0.25 in rail deflection with the rail as a column, allows 27,500 psi for emergency braking (2.23.5.3), and limits bracket deflection to 0.125 in (2.23.5.2).
+
 ## 4. Scope and non-goals
 
 A beam calculation for a single span. Guide rail design is governed by ASME A17.1, which specifies the load
