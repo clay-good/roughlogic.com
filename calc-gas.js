@@ -882,7 +882,7 @@ export function computePropaneVaporizationRate({
   }
   const never_short = limit_percent_full === null;
   const already_short = !meets_load;
-  const tanks_required = Math.max(1, Math.ceil(connected_load_btuh / capacity_btuh));
+  const tanks_required = Math.max(1, Math.ceil(connected_load_btuh / capacity_btuh - 1e-9));
 
   const areaVerdict = "at " + fmt(percent_full, 0) + "% full a " + fmt(tank_diameter_ft, 1) + " by " + fmt(tank_length_ft, 1) + " ft tank has " + fmt(wetted_area_ft2, 0) + " sq ft of wetted surface, against " + fmt(reference_wetted_area_ft2, 0) + " sq ft at the " + fmt(reference_percent_full, 0) + "% reference level -- a factor of " + fmt(area_ratio, 2);
   const capacityVerdict = "scaling the table's " + fmt(reference_capacity_btuh, 0) + " BTU/h by that area factor and by the temperature factor of " + fmt(temperature_ratio, 2) + " (" + fmt(deltaT, 0) + " degF of drive against the reference " + fmt(referenceDeltaT, 0) + ") gives " + fmt(capacity_btuh, 0) + " BTU/h against a " + fmt(connected_load_btuh, 0) + " BTU/h load, which is " + fmt(load_pct_of_capacity, 0) + "% of it";
@@ -1092,12 +1092,12 @@ export function computeLpContainerSeparation({
     ? "no next-size requirement was entered. The distances STEP at capacity breakpoints rather than scaling, so the requirement for the next container size up is worth reading before the size is chosen"
     : next_size_fits
       ? "the next container size up requires " + fmt(next_size_required_building_ft, 1) + " ft to the building and this location gives " + fmt(measured_building_ft, 1) + " -- the yard takes the larger tank"
-      : "AND THE YARD DOES NOT TAKE THE NEXT SIZE UP. It requires " + fmt(next_size_required_building_ft, 1) + " ft to the building and this location has " + fmt(measured_building_ft, 1) + ", short by " + fmt(next_size_shortfall_ft, 1) + " ft. THE DISTANCES STEP RATHER THAN SCALE, so doubling capacity can move the tank across the yard -- which is worth knowing before the customer is told they can have a bigger tank";
+      : "AND THE YARD DOES NOT TAKE THE NEXT SIZE UP. It requires " + fmt(next_size_required_building_ft, 1) + " ft to the building and this location has " + fmt(measured_building_ft, 1) + ", short by " + fmt(next_size_shortfall_ft, 1) + " ft. THE DISTANCES STEP RATHER THAN SCALE -- though a SINGLE container of 1,200 gal or less may come in to 10 ft if it is 25 ft from any other container over 125 gal (OSHA 1910.110 Table H-23 note 2; NFPA 58 has the same note), so check that before moving it -- which is worth knowing before the customer is told they can have a bigger tank";
   const openingVerdict = relief_flag
     ? "THE RELIEF DISCHARGE POINTS AT AN OPENING, and no horizontal distance addresses that. Propane is heavier than air, so a relief discharge above a basement window well puts flammable vapour into a confined space and leaves it there. This is a DIRECTIONAL requirement: where the relief points matters, not only how far the container sits"
     : "the relief discharge is not directed at an opening. THAT IS A DIRECTIONAL CHECK WITH NO DISTANCE IN THE TABLE, and it is the clearance people forget -- propane is heavier than air, and a discharge above a window well or a below-grade opening fills a confined space that no horizontal measurement sees";
   const transferVerdict = "AND THE POINT OF TRANSFER HAS ITS OWN SEPARATION REQUIREMENTS, frequently more restrictive than the container's. A tank that complies while the truck is absent can be non-compliant while it is being filled, which is the quiet one -- the compliant condition is the one nobody is standing next to";
-  const manifoldVerdict = "TWO SMALLER CONTAINERS MANIFOLDED may be treated differently from one large one, and manifolding also adds wetted area and therefore vaporization capacity. It is a genuine option rather than a workaround, and the propane vaporization capacity calculation is where the second half of that case is made";
+  const manifoldVerdict = "TWO SMALLER CONTAINERS MANIFOLDED are NOT a siting workaround: at 501 gal or more an installation is sited on its AGGREGATE capacity (Table H-23 note 1), and the single-container reduction to 10 ft cannot apply to it. Manifolding does add wetted area and therefore vaporization capacity, which the propane vaporization capacity calculation makes the case for";
 
   return {
     checked_count: checked.length, failure_count: failures.length, all_pass,

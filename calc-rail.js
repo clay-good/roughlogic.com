@@ -587,15 +587,22 @@ export function computeTonnageRatingGrade({ tractive_effort_lb = 0, ruling_grade
   const adhesion_limited_te_lb = weight_on_drivers_lb > 0 ? weight_on_drivers_lb * adhesion_factor : null;
   const adhesion_governs = adhesion_limited_te_lb !== null && adhesion_limited_te_lb < tractive_effort_lb;
   const governing_te_lb = adhesion_governs ? adhesion_limited_te_lb : tractive_effort_lb;
-  const tonnage_rating_tons = governing_te_lb / total_resistance_lb_per_ton;
-  const rating_on_te_alone_tons = tractive_effort_lb / total_resistance_lb_per_ton;
+  // The rating is TRAILING tons: the locomotives climb the same hill, so their
+  // own weight comes off (GE Locomotive Application Guide: trailing tons = TE /
+  // total resistance - loco weight; 38,700 / 26.1 - 130 = 1,350). Until
+  // 2026-10-01 the whole train weight was reported, about 14% high on the
+  // worked consist. The locomotive weight is taken as the weight on drivers.
+  const loco_tons = weight_on_drivers_lb / 2000;
+  const train_tons_total = governing_te_lb / total_resistance_lb_per_ton;
+  const tonnage_rating_tons = Math.max(0, train_tons_total - loco_tons);
+  const rating_on_te_alone_tons = Math.max(0, tractive_effort_lb / total_resistance_lb_per_ton - loco_tons);
   const level_resistance_lb_per_ton = rolling_resistance_lb_per_ton + curve_resistance_lb_per_ton;
-  const level_tonnage_tons = governing_te_lb / level_resistance_lb_per_ton;
-  const grade_penalty_x = level_tonnage_tons > 0 ? level_tonnage_tons / tonnage_rating_tons : null;
+  const level_tonnage_tons = Math.max(0, governing_te_lb / level_resistance_lb_per_ton - loco_tons);
+  const grade_penalty_x = level_tonnage_tons > 0 && tonnage_rating_tons > 0 ? level_tonnage_tons / tonnage_rating_tons : null;
   const alternate_resistance_lb_per_ton = alternate_grade_pct > 0
     ? _GRADE_RESISTANCE_LB_PER_TON_PER_PCT * alternate_grade_pct + rolling_resistance_lb_per_ton + curve_resistance_lb_per_ton
     : null;
-  const alternate_tonnage_tons = alternate_resistance_lb_per_ton === null ? null : governing_te_lb / alternate_resistance_lb_per_ton;
+  const alternate_tonnage_tons = alternate_resistance_lb_per_ton === null ? null : Math.max(0, governing_te_lb / alternate_resistance_lb_per_ton - loco_tons);
   const drivers_needed_for_te_lb = tractive_effort_lb / adhesion_factor;
   const outs = [grade_resistance_lb_per_ton, total_resistance_lb_per_ton, tonnage_rating_tons, level_tonnage_tons];
   if (!outs.every(Number.isFinite)) return { error: "Tonnage rating math is not a finite value." };
@@ -608,7 +615,7 @@ export function computeTonnageRatingGrade({ tractive_effort_lb = 0, ruling_grade
     tractive_effort_lb, ruling_grade_pct, rolling_resistance_lb_per_ton, curve_degrees,
     grade_resistance_lb_per_ton, curve_resistance_lb_per_ton, total_resistance_lb_per_ton,
     weight_on_drivers_lb, adhesion_factor, adhesion_limited_te_lb, adhesion_governs,
-    governing_te_lb, tonnage_rating_tons, rating_on_te_alone_tons,
+    governing_te_lb, loco_tons, train_tons_total, tonnage_rating_tons, rating_on_te_alone_tons,
     level_resistance_lb_per_ton, level_tonnage_tons, grade_penalty_x,
     alternate_grade_pct, alternate_resistance_lb_per_ton, alternate_tonnage_tons,
     drivers_needed_for_te_lb, adhesion_verdict,
@@ -630,7 +637,7 @@ RAIL_RENDERERS["tonnage-rating-grade"] = _simpleRenderer({
   ],
   outputs: [
     { key: "r", id: "trg-out-r", label: "Resistance", value: (r) => fmt(r.total_resistance_lb_per_ton, 2) + " lb/ton -- grade " + fmt(r.grade_resistance_lb_per_ton, 1) + ", rolling " + fmt(r.rolling_resistance_lb_per_ton, 1) + ", curve " + fmt(r.curve_resistance_lb_per_ton, 1) },
-    { key: "t", id: "trg-out-t", label: "Tonnage rating", value: (r) => fmt(r.tonnage_rating_tons, 0) + " tons over that hill" },
+    { key: "t", id: "trg-out-t", label: "Trailing tonnage rating", value: (r) => fmt(r.tonnage_rating_tons, 0) + " trailing tons over that hill, behind " + fmt(r.loco_tons, 0) + " tons of locomotives" },
     { key: "a", id: "trg-out-a", label: "Adhesion", value: (r) => r.adhesion_verdict },
     { key: "l", id: "trg-out-l", label: "The hill, not the railroad", value: (r) => "on level track the same power moves " + fmt(r.level_tonnage_tons, 0) + " tons at " + fmt(r.level_resistance_lb_per_ton, 2) + " lb/ton -- " + fmt(r.grade_penalty_x, 1) + "x as much" },
     { key: "c", id: "trg-out-c", label: "At the comparison grade", value: (r) => r.alternate_tonnage_tons === null ? "(no comparison grade entered)" : fmt(r.alternate_tonnage_tons, 0) + " tons at " + fmt(r.alternate_grade_pct, 2) + "%, " + fmt(r.alternate_resistance_lb_per_ton, 2) + " lb/ton" },
@@ -643,13 +650,13 @@ RAIL_RENDERERS["tonnage-rating-grade"] = _simpleRenderer({
 // ============ spec-v1548: train air brake reduction ============
 
 // dims: in { charged_pressure_psi: M L^-1 T^-2, reduction_psi: M L^-1 T^-2, cylinder_ratio: dimensionless, full_service_reduction_psi: M L^-1 T^-2, car_count: dimensionless, propagation_rate_cars_per_second: dimensionless } out: { brake_pipe_psi: M L^-1 T^-2, cylinder_psi: M L^-1 T^-2, remaining_reduction_psi: M L^-1 T^-2, full_service_cylinder_psi: M L^-1 T^-2, wasted_reduction_psi: M L^-1 T^-2, propagation_seconds: T }
-export function computeTrainBrakeReduction({ charged_pressure_psi = 90, reduction_psi = 0, cylinder_ratio = 2.5, full_service_reduction_psi = 26, car_count = 0, propagation_rate_cars_per_second = 10 } = {}) {
+export function computeTrainBrakeReduction({ charged_pressure_psi = 90, reduction_psi = 0, cylinder_ratio = 2.5, full_service_reduction_psi = 0, car_count = 0, propagation_rate_cars_per_second = 10 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(charged_pressure_psi > 0)) return { error: "Brake pipe charged pressure must be positive (psi)." };
   if (reduction_psi < 0) return { error: "The service reduction cannot be negative (psi)." };
   if (!(reduction_psi <= charged_pressure_psi)) return { error: "The reduction cannot exceed the charged pressure; that is a complete venting, not a service reduction." };
   if (!(cylinder_ratio > 0)) return { error: "The cylinder-to-reduction ratio must be positive." };
-  if (!(full_service_reduction_psi > 0)) return { error: "The full-service reduction point must be positive (psi)." };
+  if (full_service_reduction_psi < 0) return { error: "The full-service reduction point cannot be negative (psi); 0 takes it from equalization." };
   if (car_count < 0) return { error: "Car count cannot be negative." };
   if (car_count > 0 && !(propagation_rate_cars_per_second > 0)) return { error: "Enter a propagation rate in cars per second to estimate the delay to the rear." };
   const brake_pipe_psi = charged_pressure_psi - reduction_psi;
@@ -661,13 +668,18 @@ export function computeTrainBrakeReduction({ charged_pressure_psi = 90, reductio
   // manual: "equalize at about 64"). Until 2026-09-26 the 26 psi point did not scale with the charge, so a 30 psi pipe
   // still showed 65 psi in the cylinder.
   const equalizing_reduction_psi = charged_pressure_psi / (1 + cylinder_ratio);
-  const fs_reduction_psi = Math.min(full_service_reduction_psi, equalizing_reduction_psi);
+  // An entered valve figure can only LOWER the point; 0 takes it from equalization.
+  // Until 2026-10-01 a fixed 26 psi capped it, so a 100 psi charge (full service
+  // at 71 psi, Krug) read full service at 74 and 28 psi of reduction as waste.
+  const fs_reduction_psi = full_service_reduction_psi > 0 ? Math.min(full_service_reduction_psi, equalizing_reduction_psi) : equalizing_reduction_psi;
   const effective_reduction_psi = Math.min(reduction_psi, fs_reduction_psi);
   const cylinder_psi = effective_reduction_psi * cylinder_ratio;
   const full_service_cylinder_psi = fs_reduction_psi * cylinder_ratio;
   const at_or_past_full_service = reduction_psi >= fs_reduction_psi;
   const remaining_reduction_psi = Math.max(0, fs_reduction_psi - reduction_psi);
-  const wasted_reduction_psi = Math.max(0, reduction_psi - fs_reduction_psi);
+  // Within half a psi of equalization is full service, not waste: the WP manual's
+  // own "26 psi" at 90 sits 0.3 past the computed 25.7.
+  const wasted_reduction_psi = reduction_psi - fs_reduction_psi > 0.5 ? reduction_psi - fs_reduction_psi : 0;
   const remaining_cylinder_psi = full_service_cylinder_psi - cylinder_psi;
   const equalizing_reservoir_psi = brake_pipe_psi;
   const propagation_seconds = car_count > 0 ? car_count / propagation_rate_cars_per_second : null;
@@ -695,7 +707,7 @@ RAIL_RENDERERS["train-brake-reduction"] = _simpleRenderer({
     { key: "charged_pressure_psi", label: "Brake pipe charged pressure (psi)", kind: "number", default: 90 },
     { key: "reduction_psi", label: "Service reduction made (psi)", kind: "number", default: 30 },
     { key: "cylinder_ratio", label: "Cylinder pressure per psi of reduction", kind: "number", default: 2.5 },
-    { key: "full_service_reduction_psi", label: "Full-service reduction point (psi)", kind: "number", default: 26 },
+    { key: "full_service_reduction_psi", label: "Full-service reduction point (psi; 0 takes it from equalization, charge / (1 + ratio))", kind: "number", default: 0 },
     { key: "car_count", label: "Cars in the train (0 to skip propagation)", kind: "number", default: 100 },
     { key: "propagation_rate_cars_per_second", label: "Propagation rate (cars per second)", kind: "number", default: 10 },
   ],

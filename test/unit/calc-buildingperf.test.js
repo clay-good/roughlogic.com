@@ -26,11 +26,11 @@ test("normalized leakage: ASHRAE 119 in consistent units lands on its A-to-J sca
   // NL = 1000 (ELA / A_floor) (H / 2.5 m)^0.3, ELA and A_floor in the same
   // units. spec-v1495 divided square inches by square feet and got 40.
   const r = computeEffectiveLeakageArea({ cfm50: 1850, floor_area_ft2: 2400, ceiling_height_ft: 8, storeys: 1 });
-  const elaFt2 = 1850 / 18.9 / 144;
+  const elaFt2 = 1850 / 18.2 / 144;
   close(r.normalized_leakage, 1000 * elaFt2 / 2400 * Math.pow(8 / 8.2, 0.3), "ASHRAE 119");
   assert.ok(r.normalized_leakage > 0.1 && r.normalized_leakage < 1.5, "a real house");
   // In metric: the same house, 2,400 sq ft and 97.9 sq in, gives the same NL.
-  const elaM2 = (1850 / 18.9) * 0.0254 ** 2, floorM2 = 2400 * 0.3048 ** 2;
+  const elaM2 = (1850 / 18.2) * 0.0254 ** 2, floorM2 = 2400 * 0.3048 ** 2;
   within(r.normalized_leakage, 1000 * elaM2 / floorM2 * Math.pow(8 * 0.3048 / 2.5, 0.3), 0.1, "SI, H0 = 2.5 m");
   // A leaky house: 5,000 CFM50 on 1,200 sq ft is past class J.
   assert.ok(computeEffectiveLeakageArea({ cfm50: 5000, floor_area_ft2: 1200, ceiling_height_ft: 8, storeys: 1 }).normalized_leakage > 1.48);

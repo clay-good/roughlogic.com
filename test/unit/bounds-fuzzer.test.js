@@ -47326,9 +47326,12 @@ test("bounds: spec-v1547 computeTonnageRatingGrade -- adhesion does NOT govern a
   assert.ok(Math.abs(r.grade_resistance_lb_per_ton - 24) < 1e-12);
   assert.ok(Math.abs(r.curve_resistance_lb_per_ton - 2.4) < 1e-12);
   assert.ok(Math.abs(r.total_resistance_lb_per_ton - 29.4) < 1e-12);
-  assert.ok(Math.abs(r.tonnage_rating_tons - 4761.90476) < 1e-4);
-  assert.ok(Math.abs(r.level_tonnage_tons - 25925.9259) < 1e-3);
-  assert.ok(Math.abs(r.grade_penalty_x - 5.44444444) < 1e-7);
+  // TRAILING tons: the 840 tons of locomotives come off (GE Locomotive
+  // Application Guide; fixed 2026-10-01 -- the whole train weight was reported).
+  assert.ok(Math.abs(r.train_tons_total - 4761.90476) < 1e-4);
+  assert.ok(Math.abs(r.tonnage_rating_tons - (4761.90476 - 840)) < 1e-4);
+  assert.ok(Math.abs(r.level_tonnage_tons - (25925.9259 - 840)) < 1e-3);
+  assert.ok(Math.abs(r.grade_penalty_x - r.level_tonnage_tons / r.tonnage_rating_tons) < 1e-9);
   assert.ok(Math.abs(r.drivers_needed_for_te_lb - 466666.667) < 1e-2);
   // spec-v1547 says the rating "falls to 10,286 tons" on wet rail. At 30%
   // adhesion the units could put down 504,000 lb -- far MORE than the 140,000
@@ -47344,12 +47347,12 @@ test("bounds: spec-v1547 computeTonnageRatingGrade -- adhesion does NOT govern a
   assert.equal(wet.adhesion_governs, true);
   assert.ok(Math.abs(wet.adhesion_limited_te_lb - 84000) < 1e-9);
   assert.ok(wet.tonnage_rating_tons < r.tonnage_rating_tons);
-  assert.ok(Math.abs(wet.tonnage_rating_tons - 2857.14286) < 1e-4);
+  assert.ok(Math.abs(wet.tonnage_rating_tons - (2857.14286 - 840)) < 1e-4);
   assert.ok(wet.adhesion_verdict.startsWith("ADHESION GOVERNS"));
   // At exactly the consist's tractive effort the two coincide.
   const edge = _v1547({ ...base, weight_on_drivers_lb: base.tractive_effort_lb / base.adhesion_factor });
   assert.ok(Math.abs(edge.adhesion_limited_te_lb - base.tractive_effort_lb) < 1e-6);
-  assert.ok(Math.abs(edge.tonnage_rating_tons - r.tonnage_rating_tons) < 1e-6);
+  assert.ok(Math.abs(edge.train_tons_total - r.train_tons_total) < 1e-6);
   // Twenty pounds per ton per percent, exactly, and the level case drops only
   // the grade term.
   const flat = _v1547({ ...base, ruling_grade_pct: 0 });
@@ -50621,14 +50624,14 @@ test("bounds: spec-v1495 computeEffectiveLeakageArea -- two conventions, one bui
   // IDENTITY: the hole is square, so its side squared is the leakage area.
   assert.ok(Math.abs(r.hole_side_in * r.hole_side_in - r.ela_in2) < 1e-9);
   // The 4 Pa and 10 Pa conventions describe the SAME building and differ only
-  // by reference pressure -- 1.89x, which is why a figure quoted without its
+  // by reference pressure -- 1.82x (18.2 / 10), which is why a figure quoted without its
   // convention cannot be compared with one quoted under the other.
-  assert.ok(Math.abs(r.eqla_in2 / r.ela_in2 - 1.89) < 1e-9);
+  assert.ok(Math.abs(r.eqla_in2 / r.ela_in2 - 1.82) < 1e-9);
   assert.ok(r.eqla_in2 > r.ela_in2);
-  assert.ok(Math.abs(r.ela_in2 - 97.88) < 0.01);
+  assert.ok(Math.abs(r.ela_in2 - 1850 / 18.2) < 0.01);
   assert.ok(Math.abs(r.eqla_in2 - 185) < 0.01);
   // A 10 in hole in the envelope, permanently.
-  assert.ok(r.hole_side_in > 9.8 && r.hole_side_in < 10.0);
+  assert.ok(r.hole_side_in > 10.0 && r.hole_side_in < 10.2);
   // The height correction is what ACH50 lacks: a three-storey house with the
   // SAME CFM50 and volume reports a HIGHER normalized leakage.
   const tall = _v1495({ ...base, ceiling_height_ft: 8, storeys: 3, floor_area_ft2: 800 });

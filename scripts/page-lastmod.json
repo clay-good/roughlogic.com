@@ -2,7 +2,7 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "eebec4094ceb0f24",
+      "sha": "a23642b7720e6b80",
       "date": "2026-10-01"
     },
     "/tools/": {
@@ -746,8 +746,8 @@
       "date": "2026-09-29"
     },
     "/tools/boom-pump-reach/": {
-      "sha": "cd2f8fa66f4df60e",
-      "date": "2026-09-29"
+      "sha": "e1d0175a9535937c",
+      "date": "2026-10-01"
     },
     "/tools/boring-bar-deflection/": {
       "sha": "fc62ced8d732e6ad",
@@ -1018,8 +1018,8 @@
       "date": "2026-09-29"
     },
     "/tools/cathodic-anode-count-life/": {
-      "sha": "39a70910b536e1dd",
-      "date": "2026-09-29"
+      "sha": "633187ab773ddd7c",
+      "date": "2026-10-01"
     },
     "/tools/cattle-heart-girth-weight/": {
       "sha": "2e832ed257320698",
@@ -1034,8 +1034,8 @@
       "date": "2026-09-29"
     },
     "/tools/caz-depressurization-limit/": {
-      "sha": "94fc48fa3cb97869",
-      "date": "2026-09-29"
+      "sha": "4682033c1b939002",
+      "date": "2026-10-01"
     },
     "/tools/cctv-retention-days/": {
       "sha": "b5c91e16139d2eac",
@@ -1762,8 +1762,8 @@
       "date": "2026-09-29"
     },
     "/tools/continuous-insulation-ratio/": {
-      "sha": "a43f03ace8333946",
-      "date": "2026-09-29"
+      "sha": "de9dc5fb10beb033",
+      "date": "2026-10-01"
     },
     "/tools/continuous-load-ocpd/": {
       "sha": "0496f6685b1b1c4b",
@@ -2558,8 +2558,8 @@
       "date": "2026-09-29"
     },
     "/tools/effective-leakage-area/": {
-      "sha": "e637bcac213bf239",
-      "date": "2026-09-29"
+      "sha": "45ec398e527b17e3",
+      "date": "2026-10-01"
     },
     "/tools/egc-parallel-raceways/": {
       "sha": "c3206160c1e27302",
@@ -3002,8 +3002,8 @@
       "date": "2026-09-29"
     },
     "/tools/flare-radiation-distance/": {
-      "sha": "200419f794883b03",
-      "date": "2026-09-29"
+      "sha": "983e47021e948b79",
+      "date": "2026-10-01"
     },
     "/tools/flash-gas-subcool/": {
       "sha": "bf9aee8673e8d4f4",
@@ -3286,8 +3286,8 @@
       "date": "2026-09-29"
     },
     "/tools/gas-pipeline-flow/": {
-      "sha": "4ca06d37ecdec5be",
-      "date": "2026-09-29"
+      "sha": "8d25cf59364463a7",
+      "date": "2026-10-01"
     },
     "/tools/gas-strut-force/": {
       "sha": "4753b019cc826324",
@@ -3518,8 +3518,8 @@
       "date": "2026-09-29"
     },
     "/tools/ground-loop-flow-antifreeze/": {
-      "sha": "9ef60dc61a2ab814",
-      "date": "2026-09-29"
+      "sha": "9ecc8cd44f50350f",
+      "date": "2026-10-01"
     },
     "/tools/ground-potential-rise/": {
       "sha": "980c5cf1fde9ddc7",
@@ -4386,8 +4386,8 @@
       "date": "2026-10-01"
     },
     "/tools/lp-container-separation/": {
-      "sha": "95a3221d9b378550",
-      "date": "2026-09-29"
+      "sha": "aaffaad17d61e619",
+      "date": "2026-10-01"
     },
     "/tools/ltv/": {
       "sha": "2cf05ccd1904bb48",
@@ -5690,8 +5690,8 @@
       "date": "2026-09-29"
     },
     "/tools/pressure-zone-hgl/": {
-      "sha": "87f1090c51473eb6",
-      "date": "2026-09-30"
+      "sha": "de651d923d27ff0a",
+      "date": "2026-10-01"
     },
     "/tools/pretreatment-bath-dragout/": {
       "sha": "9844a3057a2dfe8f",
@@ -6762,8 +6762,8 @@
       "date": "2026-09-29"
     },
     "/tools/separator-retention-sizing/": {
-      "sha": "e40e33a7893a1aef",
-      "date": "2026-09-29"
+      "sha": "bbb11c91c961e507",
+      "date": "2026-10-01"
     },
     "/tools/septic-dose-tank/": {
       "sha": "b86cd253546365ab",
@@ -7430,8 +7430,8 @@
       "date": "2026-09-29"
     },
     "/tools/stack-effect-npp/": {
-      "sha": "8a361e9229d4cbce",
-      "date": "2026-09-29"
+      "sha": "7b71cef91b4cb9e3",
+      "date": "2026-10-01"
     },
     "/tools/stack-emission-pte/": {
       "sha": "59585bb6b94b6bd9",
@@ -7842,8 +7842,8 @@
       "date": "2026-09-29"
     },
     "/tools/tank-vent-api-2000/": {
-      "sha": "bfed45349ea0fce4",
-      "date": "2026-09-29"
+      "sha": "6e438929b3b10f43",
+      "date": "2026-10-01"
     },
     "/tools/tank-volume/": {
       "sha": "5b0f1d0a93d7fbc1",
@@ -8102,8 +8102,8 @@
       "date": "2026-09-29"
     },
     "/tools/tonnage-rating-grade/": {
-      "sha": "0e649b353b62d658",
-      "date": "2026-09-29"
+      "sha": "f9f59b020ffbd7f1",
+      "date": "2026-10-01"
     },
     "/tools/tool-maintenance/": {
       "sha": "1311f36045fa29e9",
@@ -8166,8 +8166,8 @@
       "date": "2026-09-29"
     },
     "/tools/train-brake-reduction/": {
-      "sha": "b2512e35949632a4",
-      "date": "2026-09-29"
+      "sha": "7f0657b63db4c6b4",
+      "date": "2026-10-01"
     },
     "/tools/transfer-station-throughput/": {
       "sha": "cf6bbec58d93bf5c",
@@ -8530,8 +8530,8 @@
       "date": "2026-09-29"
     },
     "/tools/ventilation-rate-procedure/": {
-      "sha": "c7f785f41f0aabc3",
-      "date": "2026-09-29"
+      "sha": "456525cc6c6dd736",
+      "date": "2026-10-01"
     },
     "/tools/vertical-curve/": {
       "sha": "385764ad18f4a8ab",
@@ -8770,7 +8770,7 @@
       "date": "2026-09-29"
     },
     "/tools/well-casing-purge-volume/": {
-      "sha": "d97572f0f236fb99",
+      "sha": "bfc3cd581a69e3e1",
       "date": "2026-10-01"
     },
     "/tools/well-decline-reserves/": {
@@ -9014,8 +9014,8 @@
       "date": "2026-09-29"
     },
     "/tools/zonal-pressure-diagnostics/": {
-      "sha": "069c4111697a53b4",
-      "date": "2026-09-29"
+      "sha": "f5ddd18370bcf01b",
+      "date": "2026-10-01"
     }
   }
 }

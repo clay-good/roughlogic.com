@@ -118373,19 +118373,19 @@
      }
     },
     "theoretical_elongation_in": {
-     "value": 9.98888,
+     "value": 9.988879984124852,
      "tolerance": {
       "pct": 0.5
      }
     },
     "expected_measured_in": {
-     "value": 9.73888,
+     "value": 9.738879984124852,
      "tolerance": {
       "pct": 0.5
      }
     },
     "elongation_difference_pct": {
-     "value": -14.26119,
+     "value": -14.261188005076935,
      "tolerance": {
       "pct": 0.5
      }
@@ -118568,7 +118568,7 @@
    "source_publisher": "Project (first-principles)",
    "source_title": "Locomotive Tonnage Rating on a Ruling Grade -- the spec-v1547 worked example, recomputed",
    "source_edition_or_year": "spec-v1547 of scope-trade-expansion-2, 2026-09-08",
-   "source_section_or_page": "the standards named in the tile citation govern",
+   "source_section_or_page": "the standards named in the tile citation govern; recomputed 2026-10-01 as TRAILING tons (GE: TE / R less locomotive weight)",
    "verified_by": "rl",
    "verified_on": "2026-09-08",
    "inputs": {
@@ -118606,13 +118606,13 @@
      }
     },
     "tonnage_rating_tons": {
-     "value": 4761.90476,
+     "value": 3921.9047619047624,
      "tolerance": {
       "pct": 0.5
      }
     },
     "level_tonnage_tons": {
-     "value": 25925.92593,
+     "value": 25085.925925925923,
      "tolerance": {
       "pct": 0.5
      }
@@ -118643,7 +118643,7 @@
      }
     },
     "cylinder_psi": {
-     "value": 64.286,
+     "value": 64.28571428571429,
      "tolerance": {
       "pct": 0.5
      }
@@ -118655,13 +118655,13 @@
      }
     },
     "full_service_cylinder_psi": {
-     "value": 64.286,
+     "value": 64.28571428571429,
      "tolerance": {
       "pct": 0.5
      }
     },
     "wasted_reduction_psi": {
-     "value": 4.286,
+     "value": 4.285714285714285,
      "tolerance": {
       "pct": 0.5
      }
@@ -121883,19 +121883,19 @@
      }
     },
     "elevation_gradient_ft_per_mi": {
-     "value": 3.33333,
+     "value": 3.3333333333333335,
      "tolerance": {
       "pct": 0.5
      }
     },
     "combined_gradient_ft_per_mi": {
-     "value": 15.33333,
+     "value": 15.333333333333334,
      "tolerance": {
       "pct": 0.5
      }
     },
     "max_spacing_mi": {
-     "value": 140.21739,
+     "value": 140.2173913043478,
      "tolerance": {
       "pct": 0.5
      }
@@ -121913,7 +121913,7 @@
      }
     },
     "alternate_spacing_mi": {
-     "value": 70.87912,
+     "value": 70.87912087912088,
      "tolerance": {
       "pct": 0.5
      }
@@ -121949,19 +121949,19 @@
      }
     },
     "velocity_mph": {
-     "value": 2.02877,
+     "value": 2.02877008623904,
      "tolerance": {
       "pct": 0.5
      }
     },
     "velocity_fps": {
-     "value": 2.97553,
+     "value": 2.975529459817259,
      "tolerance": {
       "pct": 0.5
      }
     },
     "travel_time_h": {
-     "value": 20.7022,
+     "value": 20.702197989255716,
      "tolerance": {
       "pct": 0.5
      }
@@ -123494,7 +123494,7 @@
    "source_publisher": "Project (first-principles)",
    "source_title": "Effective Leakage Area and Normalized Leakage -- the spec-v1495 worked example, recomputed with ELA and floor area in the same units (ASHRAE 119)",
    "source_edition_or_year": "spec-v1495 of scope-trade-expansion-2, 2026-09-08",
-   "source_section_or_page": "the standards named in the tile citation govern",
+   "source_section_or_page": "the standards named in the tile citation govern; recomputed 2026-10-01 at the 18.2 divisor (n = 0.65)",
    "verified_by": "rl",
    "verified_on": "2026-09-08",
    "inputs": {
@@ -123505,7 +123505,7 @@
    },
    "outputs": {
     "ela_in2": {
-     "value": 97.8836,
+     "value": 101.64835164835165,
      "tolerance": {
       "pct": 0.5
      }
@@ -123517,7 +123517,7 @@
      }
     },
     "hole_side_in": {
-     "value": 9.89361,
+     "value": 10.082080720186267,
      "tolerance": {
       "pct": 0.5
      }
@@ -123529,13 +123529,13 @@
      }
     },
     "normalized_leakage": {
-     "value": 0.281138,
+     "value": 0.2919506503296258,
      "tolerance": {
       "pct": 0.5
      }
     },
     "sla": {
-     "value": 0.000283228,
+     "value": 0.0002941213878713879,
      "tolerance": {
       "pct": 0.5
      }
@@ -123658,7 +123658,7 @@
    "source_publisher": "Project (first-principles)",
    "source_title": "Zonal Pressure Diagnostic Leakage Split -- the spec-v1498 worked example, recomputed",
    "source_edition_or_year": "spec-v1498 of scope-trade-expansion-2, 2026-09-08",
-   "source_section_or_page": "the standards named in the tile citation govern",
+   "source_section_or_page": "the standards named in the tile citation govern; recomputed 2026-10-01 at the field leakage exponent n = 0.65",
    "verified_by": "rl",
    "verified_on": "2026-09-08",
    "inputs": {
@@ -123676,7 +123676,7 @@
      }
     },
     "zone_a_path_ratio": {
-     "value": 2.29129,
+     "value": 2.9383501483188437,
      "tolerance": {
       "pct": 0.5
      }
@@ -123688,7 +123688,7 @@
      }
     },
     "zone_b_path_ratio": {
-     "value": 0.36927,
+     "value": 0.27387606099869993,
      "tolerance": {
       "pct": 0.5
      }
@@ -125871,19 +125871,19 @@
      }
     },
     "lowest_servable_ft": {
-     "value": 595.24249,
+     "value": 595.242494226328,
      "tolerance": {
       "pct": 0.5
      }
     },
     "highest_servable_ft": {
-     "value": 687.62125,
+     "value": 687.6212471131639,
      "tolerance": {
       "pct": 0.5
      }
     },
     "elevation_band_ft": {
-     "value": 92.37875,
+     "value": 92.37875288683597,
      "tolerance": {
       "pct": 0.5
      }
@@ -128204,25 +128204,25 @@
      }
     },
     "velocity_fps": {
-     "value": 3.35,
+     "value": 3.3481130026845,
      "tolerance": {
       "pct": 0.5
      }
     },
     "pump_bhp": {
-     "value": 0.3974,
+     "value": 0.39740259740259737,
      "tolerance": {
       "pct": 0.5
      }
     },
     "pump_watts": {
-     "value": 296.3,
+     "value": 296.3430660155844,
      "tolerance": {
       "pct": 0.5
      }
     },
     "watts_per_ton": {
-     "value": 74.1,
+     "value": 74.0857665038961,
      "tolerance": {
       "pct": 0.5
      }
@@ -141258,6 +141258,1145 @@
      "value": 379,
      "tolerance": {
       "abs": 1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "post-tension-elongation",
+   "source_publisher": "AMSYSCO, Inc.",
+   "source_title": "Material Properties of Post-Tension Strands",
+   "source_edition_or_year": "2010-01-29",
+   "source_section_or_page": "Worked elongation, 0.5-in strand: (28.9 kips x 1,200 in)/(0.153 sq in x 28,500 ksi) = 7.95 in, PTI +/-7% range 7.40-8.51 in. Printed method is PL/AE with P the average force, so friction, wobble and anchor set are entered as 0 and jacking_stress_ksi = 28.9/0.153 (the printed force expressed as a stress). measured_elongation_in 7.40 is the printed minimum. Printed to 0.01 in.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "strand_area_in2": 0.153,
+    "modulus_psi": 28500000,
+    "tendon_length_ft": 100,
+    "jacking_stress_ksi": 188.88888888888889,
+    "curvature_friction": 0,
+    "angular_change_rad": 0,
+    "wobble_per_ft": 0,
+    "anchor_set_in": 0,
+    "measured_elongation_in": 7.4,
+    "tolerance_pct": 7
+   },
+   "outputs": {
+    "theoretical_elongation_in": {
+     "value": 7.95,
+     "tolerance": {
+      "abs": 0.005
+     }
+    },
+    "jacking_force_lb": {
+     "value": 28900,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "wet-well-cycle-time",
+   "source_publisher": "PDH Academy (Mark Ludwigson, P.E.)",
+   "source_title": "Lift Station Design, Course 401",
+   "source_edition_or_year": "2023",
+   "source_section_or_page": "pp. 29-31, Example 2: two 700 gpm constant-speed pumps, 15 starts/hr; Tcyc = 60/15 = 4 min; Vmin = 4 x 700 / 4 = 700 gallons; Table 2 names 350 gpm (half the pump rate) as the 'Most Cycles' inflow. 8 ft wet well diameter is printed (the printed 2.0 ft float spacing uses the 750 gal the engineer then chose, so level_differential_ft is NOT asserted). inflow_gpm 0 (skip). Exact integers.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "pump_gpm": 700,
+    "well_diameter_ft": 8,
+    "min_cycle_minutes": 0,
+    "max_starts_per_hour": 15,
+    "inflow_gpm": 0
+   },
+   "outputs": {
+    "cycle_min": {
+     "value": 4,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "active_volume_gal": {
+     "value": 700,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "worst_case_inflow_gpm": {
+     "value": 350,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "well-casing-purge-volume",
+   "source_publisher": "US EPA Region 4, Science and Ecosystem Support Division",
+   "source_title": "SESD Operating Procedure: Groundwater Sampling (SESDPROC-301-R1)",
+   "source_edition_or_year": "R1, effective 2007-11-01",
+   "source_section_or_page": "Table 3.1.1 Well Casing Diameter vs. Volume, 2-in row: 0.163 gal/ft (3 decimals). Depth 11 ft and static level 10 ft are placeholders (1 ft standing column); purge_volumes 3 default; dose and rate 0 (skip).",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "casing_diameter_in": 2,
+    "well_depth_ft": 11,
+    "static_water_level_ft": 10,
+    "purge_volumes": 3,
+    "purge_rate_gpm": 0,
+    "target_dose_mg_l": 0,
+    "solution_strength_pct": 12.5,
+    "solution_lb_per_gal": 10
+   },
+   "outputs": {
+    "gal_per_ft": {
+     "value": 0.163,
+     "tolerance": {
+      "abs": 0.0005
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "well-casing-purge-volume",
+   "source_publisher": "US EPA Region 4, Science and Ecosystem Support Division",
+   "source_title": "SESD Operating Procedure: Groundwater Sampling (SESDPROC-301-R1)",
+   "source_edition_or_year": "R1, effective 2007-11-01",
+   "source_section_or_page": "Table 3.1.1, 4-in row: 0.653 gal/ft (3 decimals). Depth/static level are placeholders (1 ft column); dose and rate 0.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "casing_diameter_in": 4,
+    "well_depth_ft": 11,
+    "static_water_level_ft": 10,
+    "purge_volumes": 3,
+    "purge_rate_gpm": 0,
+    "target_dose_mg_l": 0,
+    "solution_strength_pct": 12.5,
+    "solution_lb_per_gal": 10
+   },
+   "outputs": {
+    "gal_per_ft": {
+     "value": 0.653,
+     "tolerance": {
+      "abs": 0.0005
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "well-casing-purge-volume",
+   "source_publisher": "US EPA Region 4, Science and Ecosystem Support Division",
+   "source_title": "SESD Operating Procedure: Groundwater Sampling (SESDPROC-301-R1 and -R3)",
+   "source_edition_or_year": "R1 2007-11-01; R3 2013-03-06",
+   "source_section_or_page": "R1 Table 3.1.1, 6-in row: 1.469 gal/ft; R3 Table 3.2.1, 6-in row: three water columns 4.41 gal/ft. Depth 11 / static 10 ft are placeholders giving a 1 ft standing column so purge_volume_gal equals the printed per-foot three-column factor; purge_volumes 3 is the printed triple.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "casing_diameter_in": 6,
+    "well_depth_ft": 11,
+    "static_water_level_ft": 10,
+    "purge_volumes": 3,
+    "purge_rate_gpm": 0,
+    "target_dose_mg_l": 0,
+    "solution_strength_pct": 12.5,
+    "solution_lb_per_gal": 10
+   },
+   "outputs": {
+    "gal_per_ft": {
+     "value": 1.469,
+     "tolerance": {
+      "abs": 0.0005
+     }
+    },
+    "purge_volume_gal": {
+     "value": 4.41,
+     "tolerance": {
+      "abs": 0.005
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "well-casing-purge-volume",
+   "source_publisher": "US EPA Region 4, Science and Ecosystem Support Division",
+   "source_title": "SESD Operating Procedure: Groundwater Sampling (SESDPROC-301-R1 and -R3)",
+   "source_edition_or_year": "R1 2007-11-01; R3 2013-03-06",
+   "source_section_or_page": "R1 Table 3.1.1, 8-in row: 2.611 gal/ft; R3 Table 3.2.1, 8-in row: three water columns 7.83 gal/ft. 1 ft standing column placeholder as above.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "casing_diameter_in": 8,
+    "well_depth_ft": 11,
+    "static_water_level_ft": 10,
+    "purge_volumes": 3,
+    "purge_rate_gpm": 0,
+    "target_dose_mg_l": 0,
+    "solution_strength_pct": 12.5,
+    "solution_lb_per_gal": 10
+   },
+   "outputs": {
+    "gal_per_ft": {
+     "value": 2.611,
+     "tolerance": {
+      "abs": 0.0005
+     }
+    },
+    "purge_volume_gal": {
+     "value": 7.83,
+     "tolerance": {
+      "abs": 0.005
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "well-casing-purge-volume",
+   "source_publisher": "US EPA Region 4, Science and Ecosystem Support Division",
+   "source_title": "SESD Operating Procedure: Groundwater Sampling (SESDPROC-301-R1)",
+   "source_edition_or_year": "R1, effective 2007-11-01",
+   "source_section_or_page": "Table 3.1.1, 12-in row: 5.875 gal/ft. 1 ft column placeholder. (R3's 12-in three-column 17.61 is 3 x the rounded 5.87 and is NOT used.)",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "casing_diameter_in": 12,
+    "well_depth_ft": 11,
+    "static_water_level_ft": 10,
+    "purge_volumes": 3,
+    "purge_rate_gpm": 0,
+    "target_dose_mg_l": 0,
+    "solution_strength_pct": 12.5,
+    "solution_lb_per_gal": 10
+   },
+   "outputs": {
+    "gal_per_ft": {
+     "value": 5.875,
+     "tolerance": {
+      "abs": 0.0005
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "main-flushing-volume",
+   "source_publisher": "Kentucky Energy and Environment Cabinet, Operator Certification Program",
+   "source_title": "Distribution Math Review booklet",
+   "source_edition_or_year": "undated (current download 2026)",
+   "source_section_or_page": "Problem 37 and answer: 6-in line, 600 ft, flushed at 35 gpm; .785 x .5 x .5 x 600 x 7.48 = 880.77 gal; 880.77/35 = 25.16 min. pipe_volumes 1 (one line volume, as printed); target_velocity 3 is a placeholder; available_flow_gpm 35 printed. Publisher uses 0.785 and 7.48 (tile 0.0408 exact), 0.06% apart.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "main_diameter_in": 6,
+    "run_length_ft": 600,
+    "target_velocity_fps": 3,
+    "pipe_volumes": 1,
+    "available_flow_gpm": 35,
+    "hydrant_outlets": 0,
+    "outlet_capacity_gpm": 0
+   },
+   "outputs": {
+    "pipe_volume_gal": {
+     "value": 880.77,
+     "tolerance": {
+      "pct": 0.1
+     }
+    },
+    "actual_duration_min": {
+     "value": 25.16,
+     "tolerance": {
+      "pct": 0.1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "main-flushing-volume",
+   "source_publisher": "Kentucky Energy and Environment Cabinet, Certification and Licensing Branch",
+   "source_title": "Distribution Math Study Guide",
+   "source_edition_or_year": "undated (current download 2026)",
+   "source_section_or_page": "Question 32 and solved answer: flushing an 8-in pipe, hydrant flow 350 gpm; area 0.785 x 0.67 x 0.67 = 0.35 sq ft; 350/448.8 = 0.78 cfs; V = 2.23 ft/s (answer C). run_length 400 ft and target 3 ft/s are placeholders; pipe_volumes 1.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "main_diameter_in": 8,
+    "run_length_ft": 400,
+    "target_velocity_fps": 3,
+    "pipe_volumes": 1,
+    "available_flow_gpm": 350,
+    "hydrant_outlets": 0,
+    "outlet_capacity_gpm": 0
+   },
+   "outputs": {
+    "achieved_velocity_fps": {
+     "value": 2.23,
+     "tolerance": {
+      "abs": 0.006
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "main-flushing-volume",
+   "source_publisher": "Pennsylvania Department of Environmental Protection",
+   "source_title": "DW Module 8: Distribution, Answer Key",
+   "source_edition_or_year": "Revised February 2023",
+   "source_section_or_page": "Example 3.3: 400 ft of 8-in main; 0.785 x (0.67 ft)^2 x 400 = 141 cu ft x 7.48 = 1,055 gallons. The printed figure carries the 8/12 -> 0.67 rounding (exact 1,044.5), so tolerance is 1.1%. target velocity 3, pipe_volumes 1 and flows 0 are placeholders.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "main_diameter_in": 8,
+    "run_length_ft": 400,
+    "target_velocity_fps": 3,
+    "pipe_volumes": 1,
+    "available_flow_gpm": 0,
+    "hydrant_outlets": 0,
+    "outlet_capacity_gpm": 0
+   },
+   "outputs": {
+    "pipe_volume_gal": {
+     "value": 1055,
+     "tolerance": {
+      "pct": 1.1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "pressure-zone-hgl",
+   "source_publisher": "Kentucky Energy and Environment Cabinet, Certification and Licensing Branch",
+   "source_title": "Distribution Math Study Guide",
+   "source_edition_or_year": "undated (current download 2026)",
+   "source_section_or_page": "Question 16 and solved answer: 650 ft - 525 ft = 125 ft of head x 0.433 = 54 psi (answer B). Printed to whole psi. min/max pressure 40/80 defaults; relief and fire friction 0 (skip).",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "hgl_ft": 650,
+    "service_elevation_ft": 525,
+    "min_pressure_psi": 40,
+    "max_pressure_psi": 80,
+    "service_relief_ft": 0,
+    "fire_flow_friction_ft": 0
+   },
+   "outputs": {
+    "static_psi": {
+     "value": 54,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "pressure-zone-hgl",
+   "source_publisher": "Kentucky Energy and Environment Cabinet, Certification and Licensing Branch",
+   "source_title": "Distribution Math Study Guide",
+   "source_edition_or_year": "undated (current download 2026)",
+   "source_section_or_page": "Question 25 and solved answer: pressure at overflow = (150 - 5) x 0.433 = 63 psi (answer C). Printed to whole psi. min/max 40/80 defaults; relief and fire friction 0.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "hgl_ft": 150,
+    "service_elevation_ft": 5,
+    "min_pressure_psi": 40,
+    "max_pressure_psi": 80,
+    "service_relief_ft": 0,
+    "fire_flow_friction_ft": 0
+   },
+   "outputs": {
+    "static_psi": {
+     "value": 63,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "pressure-zone-hgl",
+   "source_publisher": "Kentucky Energy and Environment Cabinet, Operator Certification Program",
+   "source_title": "Distribution Math Review booklet",
+   "source_edition_or_year": "undated (current download 2026)",
+   "source_section_or_page": "Problem 41 and answer: 75 ft standpipe, gauge 5 ft above grade: 70 ft x .433 = 30.31 psi. min/max 40/80 defaults; relief and fire friction 0.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "hgl_ft": 75,
+    "service_elevation_ft": 5,
+    "min_pressure_psi": 40,
+    "max_pressure_psi": 80,
+    "service_relief_ft": 0,
+    "fire_flow_friction_ft": 0
+   },
+   "outputs": {
+    "static_psi": {
+     "value": 30.31,
+     "tolerance": {
+      "abs": 0.005
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "tonnage-rating-grade",
+   "source_publisher": "General Electric Co., Locomotive and Car Equipment Department (Erie, PA)",
+   "source_title": "Application Guide for Diesel-Electric Locomotives: Transportation Formulae / Useful Facts & Formulae",
+   "source_edition_or_year": "undated, U25B/U18C era (c. 1960s); scan hosted by heritagerail.org",
+   "source_section_or_page": "p. 4, 'Trailing tons and running time calculations', Example 1 (one U25B, 50-ton cars, 20 mph, 1% grade, 1.5 deg curves): grade 20 x 1% = 20.0 lb/ton, curve 0.8 x 1.5 = 1.2 lb/ton, train resistance at 20 mph 4.9 lb/ton, TOTAL 26.1 lb/ton; TE 38,700 lb. Printed to 0.1 lb/ton. Only the resistance build-up is pinned: GE's 1,350 TRAILING tons = 38,700/26.1 - 130 t locomotive, and the tile's tonnage_rating_tons (1,483) does not subtract the locomotive, so it is deliberately NOT asserted. weight_on_drivers 0 (adhesion skipped), adhesion_factor and alternate_grade are placeholders.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "tractive_effort_lb": 38700,
+    "ruling_grade_pct": 1,
+    "rolling_resistance_lb_per_ton": 4.9,
+    "curve_degrees": 1.5,
+    "weight_on_drivers_lb": 0,
+    "adhesion_factor": 0.25,
+    "alternate_grade_pct": 0
+   },
+   "outputs": {
+    "grade_resistance_lb_per_ton": {
+     "value": 20,
+     "tolerance": {
+      "abs": 0.05
+     }
+    },
+    "curve_resistance_lb_per_ton": {
+     "value": 1.2,
+     "tolerance": {
+      "abs": 0.05
+     }
+    },
+    "total_resistance_lb_per_ton": {
+     "value": 26.1,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "tonnage-rating-grade",
+   "source_publisher": "General Electric Co., Locomotive and Car Equipment Department (Erie, PA)",
+   "source_title": "Application Guide for Diesel-Electric Locomotives: Transportation Formulae / Useful Facts & Formulae",
+   "source_edition_or_year": "undated, U25B/U18C era (c. 1960s); scan hosted by heritagerail.org",
+   "source_section_or_page": "p. 5, Haulage Example 1 (one U18C, 15 mph, 1% grade, 1.5 deg curve): TOTAL resistance 25.8 lb/ton (printed again as 20 grade + 1.2 curve + 4.6 train); TE 36,150 lb; and the starting example on the same spread: 30% adhesion x 200,000 lb on drivers = 60,000 lb. Printed to 0.1 lb/ton and to the pound. GE's 1,300 trailing tons subtracts the 100 t locomotive and is NOT asserted (tile gives 1,401 total). alternate_grade is a placeholder.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "tractive_effort_lb": 36150,
+    "ruling_grade_pct": 1,
+    "rolling_resistance_lb_per_ton": 4.6,
+    "curve_degrees": 1.5,
+    "weight_on_drivers_lb": 200000,
+    "adhesion_factor": 0.3,
+    "alternate_grade_pct": 0
+   },
+   "outputs": {
+    "grade_resistance_lb_per_ton": {
+     "value": 20,
+     "tolerance": {
+      "abs": 0.05
+     }
+    },
+    "curve_resistance_lb_per_ton": {
+     "value": 1.2,
+     "tolerance": {
+      "abs": 0.05
+     }
+    },
+    "total_resistance_lb_per_ton": {
+     "value": 25.8,
+     "tolerance": {
+      "abs": 0.05
+     }
+    },
+    "adhesion_limited_te_lb": {
+     "value": 60000,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "train-brake-reduction",
+   "source_publisher": "Western Pacific Railroad (Operating Department); reprinted by Western Pacific Railroad Museum",
+   "source_title": "Air Brake Principles and Specific Equipment (from the Operating Department Training Manual)",
+   "source_edition_or_year": "1974 manual (museum transcription)",
+   "source_section_or_page": "Automatic Brake Systems, A.2 'Service Reduction' (p. 19 of the transcription): with 90 lb brake pipe the maximum effective service reduction is 26 lb (FULL SERVICE) and the pressure equalizes at about 64 lb, giving about 64 lb brake cylinder pressure. Printed to the whole psi ('about'); the tile's physical equalization is 25.71 psi reduction / 64.29 psi cylinder, so the 26 is within 1.5%. cylinder_ratio 2.5 is the volume ratio (railway-technical source); car_count 0 is a placeholder.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "charged_pressure_psi": 90,
+    "reduction_psi": 26,
+    "cylinder_ratio": 2.5,
+    "full_service_reduction_psi": 26,
+    "car_count": 0,
+    "propagation_rate_cars_per_second": 10
+   },
+   "outputs": {
+    "cylinder_psi": {
+     "value": 64,
+     "tolerance": {
+      "pct": 1
+     }
+    },
+    "full_service_cylinder_psi": {
+     "value": 64,
+     "tolerance": {
+      "pct": 1
+     }
+    },
+    "full_service_reduction_psi": {
+     "value": 26,
+     "tolerance": {
+      "pct": 1.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "train-brake-reduction",
+   "source_publisher": "The Railway Technical Website (Al Krug, ed. Piers Connor and Peter Hinckley)",
+   "source_title": "North American Freight Train Brakes",
+   "source_edition_or_year": "web page, retrieved 2026-10-01",
+   "source_section_or_page": "'Brake Application' passage: a '10 pound set' lowers the brake pipe from 90 to 80 psi and, at the 2.5 reservoir-to-cylinder volume ratio, puts 25 psi (2.5 x 10) in the brake cylinder. Exact as printed. full_service_reduction_psi 26 and car_count 0 are placeholders.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "charged_pressure_psi": 90,
+    "reduction_psi": 10,
+    "cylinder_ratio": 2.5,
+    "full_service_reduction_psi": 26,
+    "car_count": 0,
+    "propagation_rate_cars_per_second": 10
+   },
+   "outputs": {
+    "brake_pipe_psi": {
+     "value": 80,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "cylinder_psi": {
+     "value": 25,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "train-brake-reduction",
+   "source_publisher": "The Railway Technical Website (Al Krug, ed. Piers Connor and Peter Hinckley)",
+   "source_title": "North American Freight Train Brakes",
+   "source_edition_or_year": "web page, retrieved 2026-10-01",
+   "source_section_or_page": "same passage, continued: a further 5 psi from 80 to 75 adds 2.5 x 5 = 12.5 psi, a total of 37.5 psi brake cylinder pressure on a 15 psi total reduction from 90. Exact as printed. full_service_reduction_psi 26 and car_count 0 are placeholders.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "charged_pressure_psi": 90,
+    "reduction_psi": 15,
+    "cylinder_ratio": 2.5,
+    "full_service_reduction_psi": 26,
+    "car_count": 0,
+    "propagation_rate_cars_per_second": 10
+   },
+   "outputs": {
+    "brake_pipe_psi": {
+     "value": 75,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "cylinder_psi": {
+     "value": 37.5,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "train-brake-reduction",
+   "source_publisher": "The Railway Technical Website (Al Krug, ed. Piers Connor and Peter Hinckley)",
+   "source_title": "North American Freight Train Brakes",
+   "source_edition_or_year": "web page, retrieved 2026-10-01",
+   "source_section_or_page": "'full service' passage: equalization of pressures occurs at 64 psi for a 90 psi system, 71 psi for 100 psi and 57 psi for an 80 psi charged system (full service reduction = 2/7 of the base pressure). This row pins the 80 psi case (tile 57.14, printed to the whole psi). The 100 psi case (71) is NOT a row: the tile returns 65 with the default 26 psi full-service input -- see lead. reduction 10, full_service_reduction_psi 26 and car_count 0 are placeholders.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "charged_pressure_psi": 80,
+    "reduction_psi": 10,
+    "cylinder_ratio": 2.5,
+    "full_service_reduction_psi": 26,
+    "car_count": 0,
+    "propagation_rate_cars_per_second": 10
+   },
+   "outputs": {
+    "full_service_cylinder_psi": {
+     "value": 57,
+     "tolerance": {
+      "pct": 1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "railcar-load-limit",
+   "source_publisher": "BNSF Railway",
+   "source_title": "Box Car 60 ft. 286 GRL, BNSF 761000-761099, General Car Info (equipment diagram)",
+   "source_edition_or_year": "diagram page I139 (cars built 2001), retrieved 2026-10-01",
+   "source_section_or_page": "Dimensions/Capacities block: gross rail load 286,000 lb, light weight 84,800 lb, load limit @ 286K 201,200 lb, load limit @ 263K 178,200 lb (volume 7,526 cu ft). Exact to the pound. lading_net_lb 0 and lading_density 0 are placeholders (no lading printed).",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "gross_rail_load_lb": 286000,
+    "light_weight_lb": 84800,
+    "lading_net_lb": 0,
+    "cubic_capacity_ft3": 7526,
+    "lading_density_pcf": 0,
+    "route_gross_rail_load_lb": 263000
+   },
+   "outputs": {
+    "load_limit_lb": {
+     "value": 201200,
+     "tolerance": {
+      "abs": 1
+     }
+    },
+    "route_load_limit_lb": {
+     "value": 178200,
+     "tolerance": {
+      "abs": 1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "propane-vaporization-rate",
+   "source_publisher": "RegO Products (Engineered Controls International)",
+   "source_title": "LP-Gas Serviceman's Manual (L-545)",
+   "source_edition_or_year": "2018 printing",
+   "source_section_or_page": "p. 8, 'Vaporizing Capacities for Other Air Temperatures (Temperature Factor)': multiplier 0.25 at -15 F against 1.00 at 0 F. Printed to 0.01. The eight printed multipliers are exactly (T + 20)/20, i.e. linear in the drive above an implied -20 F liquid; liquid_temperature_f -20 is that implied value, not a printed one. Tank dims, percent full (60 = the K=100 reference), reference capacity and connected load are placeholders.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "tank_diameter_ft": 3.5,
+    "tank_length_ft": 16,
+    "percent_full": 60,
+    "ambient_f": -15,
+    "liquid_temperature_f": -20,
+    "reference_capacity_btuh": 806400,
+    "reference_percent_full": 60,
+    "reference_ambient_f": 0,
+    "connected_load_btuh": 100000
+   },
+   "outputs": {
+    "temperature_ratio": {
+     "value": 0.25,
+     "tolerance": {
+      "abs": 0.005
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "propane-vaporization-rate",
+   "source_publisher": "RegO Products (Engineered Controls International)",
+   "source_title": "LP-Gas Serviceman's Manual (L-545)",
+   "source_edition_or_year": "2018 printing",
+   "source_section_or_page": "p. 8, temperature factor table: multiplier 2.00 at +20 F against 1.00 at 0 F. Printed to 0.01. liquid_temperature_f -20 is the value the printed table implies (see the -15 F row); tank dims, reference capacity and load are placeholders.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "tank_diameter_ft": 3.5,
+    "tank_length_ft": 16,
+    "percent_full": 60,
+    "ambient_f": 20,
+    "liquid_temperature_f": -20,
+    "reference_capacity_btuh": 806400,
+    "reference_percent_full": 60,
+    "reference_ambient_f": 0,
+    "connected_load_btuh": 100000
+   },
+   "outputs": {
+    "temperature_ratio": {
+     "value": 2,
+     "tolerance": {
+      "abs": 0.005
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "propane-vaporization-rate",
+   "source_publisher": "RegO Products (Engineered Controls International)",
+   "source_title": "LP-Gas Serviceman's Manual (L-545)",
+   "source_edition_or_year": "2018 printing",
+   "source_section_or_page": "p. 8, ASME container rule of thumb D x L x K at 0 F: K = 100 at 60% full and K = 90 at 50% full, so the capacity at 50% is 0.90 of the 60% figure (RegO: vapor-space area neglected, i.e. capacity follows wetted surface). Ratio of two printed constants, K printed to the unit. Tank 3.5 x 16 ft (the tile's own example geometry) is a placeholder; at 20% and 10% the tile's geometric ratio falls 3% (this tank) to 5-6% (500 gal, 120 gal) below RegO's K, so those levels are NOT rows. Temperatures, reference capacity and load are placeholders.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "tank_diameter_ft": 3.5,
+    "tank_length_ft": 16,
+    "percent_full": 50,
+    "ambient_f": 0,
+    "liquid_temperature_f": -20,
+    "reference_capacity_btuh": 806400,
+    "reference_percent_full": 60,
+    "reference_ambient_f": 0,
+    "connected_load_btuh": 100000
+   },
+   "outputs": {
+    "area_ratio": {
+     "value": 0.9,
+     "tolerance": {
+      "pct": 1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "propane-vaporization-rate",
+   "source_publisher": "RegO Products (Engineered Controls International)",
+   "source_title": "LP-Gas Serviceman's Manual (L-545)",
+   "source_edition_or_year": "2018 printing",
+   "source_section_or_page": "p. 8, ASME container rule of thumb D x L x K at 0 F: K = 100 at 60% full and K = 80 at 40% full, so the capacity at 40% is 0.80 of the 60% figure (RegO: vapor-space area neglected, i.e. capacity follows wetted surface). Ratio of two printed constants, K printed to the unit. Tank 3.5 x 16 ft (the tile's own example geometry) is a placeholder; at 20% and 10% the tile's geometric ratio falls 3% (this tank) to 5-6% (500 gal, 120 gal) below RegO's K, so those levels are NOT rows. Temperatures, reference capacity and load are placeholders.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "tank_diameter_ft": 3.5,
+    "tank_length_ft": 16,
+    "percent_full": 40,
+    "ambient_f": 0,
+    "liquid_temperature_f": -20,
+    "reference_capacity_btuh": 806400,
+    "reference_percent_full": 60,
+    "reference_ambient_f": 0,
+    "connected_load_btuh": 100000
+   },
+   "outputs": {
+    "area_ratio": {
+     "value": 0.8,
+     "tolerance": {
+      "pct": 1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "propane-vaporization-rate",
+   "source_publisher": "RegO Products (Engineered Controls International)",
+   "source_title": "LP-Gas Serviceman's Manual (L-545)",
+   "source_edition_or_year": "2018 printing",
+   "source_section_or_page": "p. 8, ASME container rule of thumb D x L x K at 0 F: K = 100 at 60% full and K = 70 at 30% full, so the capacity at 30% is 0.70 of the 60% figure (RegO: vapor-space area neglected, i.e. capacity follows wetted surface). Ratio of two printed constants, K printed to the unit. Tank 3.5 x 16 ft (the tile's own example geometry) is a placeholder; at 20% and 10% the tile's geometric ratio falls 3% (this tank) to 5-6% (500 gal, 120 gal) below RegO's K, so those levels are NOT rows. Temperatures, reference capacity and load are placeholders.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "tank_diameter_ft": 3.5,
+    "tank_length_ft": 16,
+    "percent_full": 30,
+    "ambient_f": 0,
+    "liquid_temperature_f": -20,
+    "reference_capacity_btuh": 806400,
+    "reference_percent_full": 60,
+    "reference_ambient_f": 0,
+    "connected_load_btuh": 100000
+   },
+   "outputs": {
+    "area_ratio": {
+     "value": 0.7,
+     "tolerance": {
+      "pct": 1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "propane-fill-outage",
+   "source_publisher": "U.S. Occupational Safety and Health Administration (29 CFR, via eCFR)",
+   "source_title": "29 CFR 1910.110 Storage and handling of liquefied petroleum gases, (b)(19) fixed liquid level gage example",
+   "source_edition_or_year": "current eCFR text, retrieved 2026-10-01",
+   "source_section_or_page": "1910.110(b)(19)(ii)(c)-(d) Example: 100 gal water capacity aboveground tank, propane SG 0.510, filling density 42% (Table H-27), correction factor 1.031 (Table H-29): (100 x 42)/(0.510 x 1.031 x 100) = 79.8 gallons, the maximum permitted. Printed to 0.1 gal. The tile takes the limit as an INPUT, so fill_limit_pct 79.8 is the printed result entered back; this row pins only the volume arithmetic. current_gauge_pct, btu_per_gal and liquid_temperature_f (40 F is OSHA's assumed aboveground liquid temperature) are placeholders.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "water_capacity_gal": 100,
+    "fill_limit_pct": 79.8,
+    "current_gauge_pct": 0,
+    "btu_per_gal": 91500,
+    "liquid_temperature_f": 40
+   },
+   "outputs": {
+    "max_fill_gal": {
+     "value": 79.8,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "well-decline-reserves",
+   "source_publisher": "Continuing Education and Development, Inc. (CED Engineering)",
+   "source_title": "Forecasting Oil and Gas Using Decline Curves, Course No. P03-004 (James R. Weaver, P.E.)",
+   "source_edition_or_year": "course PDF as served 2026-10-01 (cedengineering.com userfiles)",
+   "source_section_or_page": "p. 8, Exponential Decline example: initial rate 120 bbl/day, 8% per year (an effective annual decline, q = qi(1-d)^t); printed rate at end of year 2 = 101.6 bbl/day (rounded to 0.1). economic_limit_bpd = 10 is a PLACEHOLDER (not in the example; required by the tile, does not affect the checked output).",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "initial_rate_bpd": 120,
+    "decline_rate": 0.08,
+    "rate_is_effective": "yes",
+    "economic_limit_bpd": 10,
+    "years_ahead": 2
+   },
+   "outputs": {
+    "rate_at_years_bpd": {
+     "value": 101.6,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "well-decline-reserves",
+   "source_publisher": "Continuing Education and Development, Inc. (CED Engineering)",
+   "source_title": "Forecasting Oil and Gas Using Decline Curves, Course No. P03-004 (James R. Weaver, P.E.)",
+   "source_edition_or_year": "course PDF as served 2026-10-01 (cedengineering.com userfiles)",
+   "source_section_or_page": "p. 11, cumulative example: 150 bbl/day declining 15% per year (effective); printed rate at end of year 3 = 92.1 bbl/day (rounded to 0.1) and cumulative Np = 365(qi - q)/-ln(1-d) = 129,995 bbl (printed to the barrel, identical by both of the source's equations). economic_limit_bpd = 10 is a PLACEHOLDER (not in the example; does not affect the checked outputs).",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "initial_rate_bpd": 150,
+    "decline_rate": 0.15,
+    "rate_is_effective": "yes",
+    "economic_limit_bpd": 10,
+    "years_ahead": 3
+   },
+   "outputs": {
+    "rate_at_years_bpd": {
+     "value": 92.1,
+     "tolerance": {
+      "abs": 0.05
+     }
+    },
+    "cumulative_to_years_bbl": {
+     "value": 129995,
+     "tolerance": {
+      "abs": 1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "flare-radiation-distance",
+   "source_publisher": "U.S. Environmental Protection Agency",
+   "source_title": "EPA Air Pollution Control Cost Manual, Section 3.2 VOC Destruction Controls, Chapter 1 Flares (EPA/452/B-02-001)",
+   "source_edition_or_year": "Sixth edition, Section 3.2 Chapter 1 as posted 2020-07",
+   "source_section_or_page": "Sec. 1.6.2.1 example problem, pp. 1-36 to 1-37, with Eq. 1.6 (Hajek-Ludwig, p. 1-18): R = 399.3 lb/h x 5,316 Btu/lb = 2,123,000 Btu/h, f = 0.2, tau = 1, K = 500 Btu/h-ft2; printed L^2 = 68 ft2 and L = 8.2 ft (rounded to 0.1). The source's 500 is a flare-only level EXCLUDING solar, so solar_btuh_ft2 = 0 reproduces its basis. available_distance_ft = 0 skips the site check (placeholder).",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "heat_release_btuh": 2123000,
+    "radiant_fraction": 0.2,
+    "allowable_btuh_ft2": 500,
+    "solar_btuh_ft2": 0,
+    "available_distance_ft": 0
+   },
+   "outputs": {
+    "required_distance_ft": {
+     "value": 8.2,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "pig-batch-volume",
+   "source_publisher": "American Association of Petroleum Geologists (AAPG Wiki)",
+   "source_title": "Wellsite math, from Development Geology Reference Manual, Methods in Exploration (Greg Dunn)",
+   "source_edition_or_year": "AAPG Wiki page as served 2026-10-01",
+   "source_section_or_page": "Volume calculations example: pipe of 4.0 in ID in a 10,000 ft hole, capacity Vc = (4.0^2/1029.4) x 10,000 = 155.4 bbl (rounded to 0.1). length_mi = 10,000 ft / 5,280 (exact unit conversion of the printed length). flow_bpd and the tool window are 0 (placeholders; velocity outputs skipped).",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "id_in": 4,
+    "length_mi": 1.893939393939394,
+    "flow_bpd": 0,
+    "tool_min_fps": 0,
+    "tool_max_fps": 0
+   },
+   "outputs": {
+    "total_bbl": {
+     "value": 155.4,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "pig-batch-volume",
+   "source_publisher": "American Association of Petroleum Geologists (AAPG Wiki)",
+   "source_title": "Wellsite math, from Development Geology Reference Manual, Methods in Exploration (Greg Dunn)",
+   "source_edition_or_year": "AAPG Wiki page as served 2026-10-01",
+   "source_section_or_page": "Same example, hole volume of an 8.0 in diameter, 10,000 ft hole: Vh = (8.0^2/1029.4) x 10,000 = 621.7 bbl (rounded to 0.1); a full cylinder of 8.0 in diameter, the tile's line-volume relation. length_mi = 10,000 / 5,280 (exact conversion). Flow and tool window are 0 placeholders.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "id_in": 8,
+    "length_mi": 1.893939393939394,
+    "flow_bpd": 0,
+    "tool_min_fps": 0,
+    "tool_max_fps": 0
+   },
+   "outputs": {
+    "total_bbl": {
+     "value": 621.7,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "cathodic-anode-count-life",
+   "source_publisher": "U.S. Department of Defense (Unified Facilities Criteria)",
+   "source_title": "UFC 3-570-02A Cathodic Protection (reproducing TM 5-811-7)",
+   "source_edition_or_year": "2005-03-01 (archived edition)",
+   "source_section_or_page": "Appendix D-2, steel gas main (impressed current): 6 in OD, 6,800 ft, 2 mA/sq ft of bare pipe, 90% coating efficiency; printed pipe area = 6800 x pi x 6/12 = 10,681 sq ft and I = 10,681 x 2 x (1.0 - 0.9) = 2,136 mA. length_mi = 6,800/5,280 (exact conversion). Anode weight, consumption, current per anode, degraded case and target life are 0 PLACEHOLDERS (those outputs skipped); utilization left at the 0.85 default (unused by the checked outputs).",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "od_in": 6,
+    "length_mi": 1.2878787878787878,
+    "coating_efficiency_pct": 90,
+    "current_density_ma_per_ft2": 2,
+    "anode_weight_lb": 0,
+    "consumption_lb_per_a_yr": 0,
+    "utilization": 0.85,
+    "current_per_anode_a": 0,
+    "degraded_efficiency_pct": 0,
+    "target_life_years": 0
+   },
+   "outputs": {
+    "total_area_ft2": {
+     "value": 10681,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "current_required_a": {
+     "value": 2.136,
+     "tolerance": {
+      "abs": 0.0005
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "liquid-pipeline-station-spacing",
+   "source_publisher": "Continuing Education and Development, Inc. (CED Engineering)",
+   "source_title": "Liquid Pipeline Hydraulics, Course No. P06-002 (E. Shashi Menon, Ph.D., P.E.)",
+   "source_edition_or_year": "course PDF R1 as served 2026-10-01",
+   "source_section_or_page": "Sec. 4, pp. 43-46 (Fig. 4.1, Ashton-Hampton-Beaumont): 120 mi diesel line (Sg 0.85, Example 6 gradient 12.72 psi/mi at 8,000 bbl/h), MAOP 1,440 psi, 50 psi minimum suction, elevation neglected; 1,576 psi originating pressure exceeds MAOP so a SECOND station is installed, located at 60 mi; at MAOP the 60 mi gradient is (1440-50)/60 = 23.17 psi/mi, which by the square law is Q = 10,797 bbl/h. Pressures converted to head with the source's own Eq. 2.3, H = 2.31 P / Sg (Sg 0.85): MAOP 3,913.41 ft, suction 135.88 ft, gradient 34.568 ft/mi (conversions are ours, from printed values). Flows entered as bbl/day (8,000 and 10,797 bbl/h x 24); only the ratio is used. alternate_spacing tolerance covers the printed rounding of 10,797 and 23.17.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "total_length_mi": 120,
+    "friction_gradient_ft_per_mi": 34.56847058823529,
+    "elevation_change_ft": 0,
+    "maop_head_ft": 3913.411764705882,
+    "min_suction_head_ft": 135.88235294117646,
+    "flow_bpd": 192000,
+    "alternate_flow_bpd": 259128
+   },
+   "outputs": {
+    "station_count": {
+     "value": 2,
+     "tolerance": {
+      "abs": 0
+     }
+    },
+    "actual_spacing_mi": {
+     "value": 60,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "alternate_spacing_mi": {
+     "value": 60,
+     "tolerance": {
+      "pct": 0.1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "zonal-pressure-diagnostics",
+   "source_publisher": "The Energy Conservatory",
+   "source_title": "Zone Pressure Diagnostics (ZPD) Trainer Software User's Guide",
+   "source_edition_or_year": "2014 (energyconservatory.com/wp-content/uploads/2014/07/zpd_trainer_manual.pdf)",
+   "source_section_or_page": "Chapter 4, Using Charts to Calculate Air Flow Between Zones, p. 6: with the house at 50 Pa and the zone reading 25 Pa, zone-to-house and zone-to-outside are both 25 Pa, 'a 1 to 1 ratio in the relative size of the leaks' (house-to-zone leaks equal zone-to-outside leaks). Printed ratio is exact (no rounding). zone_b_pressure_pa 0 skips the second zone; labels are the tile defaults. NOTE: PR = 0.5 is the one point where the leakage ratio is independent of the flow exponent, so this row does not test the exponent (see report lead on n = 0.5 vs 0.65).",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "house_pressure_pa": 50,
+    "zone_a_pressure_pa": 25,
+    "zone_b_pressure_pa": 0,
+    "zone_a_label": "attic",
+    "zone_b_label": "crawl"
+   },
+   "outputs": {
+    "zone_a_path_ratio": {
+     "value": 1,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "stack-effect-npp",
+   "source_publisher": "Trane",
+   "source_title": "Managing Commercial Building Pressurization (Trane Engineers Newsletter, Vol. 31, No. 2)",
+   "source_edition_or_year": "2002 (cites 2001 ASHRAE Handbook-Fundamentals 26.5, Eq. 17)",
+   "source_section_or_page": "p. 2, four-story building example: H = 50 ft, Ti = 75 F (535 R), cracks evenly distributed so the neutral pressure level is at mid-height (25 ft); cold day To = 0 F (460 R): net pressures -0.058 in. wg at the ground floor and +0.058 in. wg at the top floor. Printed 0.058 in. wg (3 decimals, +/-0.86%) converted to tile Pa at 248.84 Pa/in wg = 14.433 Pa. Sign: Trane prints indoor-minus-outdoor (ground floor negative); the tile reports the winter bottom and top magnitudes as positive. tall_building_height_ft 0 skips the comparison.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "height_ft": 50,
+    "indoor_temp_f": 75,
+    "outdoor_temp_f": 0,
+    "neutral_plane_fraction": 0.5,
+    "tall_building_height_ft": 0
+   },
+   "outputs": {
+    "bottom_pressure_pa": {
+     "value": 14.433,
+     "tolerance": {
+      "pct": 1
+     }
+    },
+    "top_pressure_pa": {
+     "value": 14.433,
+     "tolerance": {
+      "pct": 1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "stack-effect-npp",
+   "source_publisher": "Trane",
+   "source_title": "Managing Commercial Building Pressurization (Trane Engineers Newsletter, Vol. 31, No. 2)",
+   "source_edition_or_year": "2002 (cites 2001 ASHRAE Handbook-Fundamentals 26.5, Eq. 17)",
+   "source_section_or_page": "p. 2, same four-story example (H = 50 ft, Ti = 75 F, NPL at 25 ft), hot day To = 95 F (555 R): +0.013 in. wg at the ground floor and -0.013 in. wg at the top floor (reverse stack). Printed 0.013 in. wg converted at 248.84 Pa/in wg = 3.235 Pa; printed rounding (+/-0.0005 in) exceeds 2%, so tolerance is capped at 2%. Sign: the tile reports the reverse (summer) case as negative bottom and top values, so the value is entered as -3.235.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "height_ft": 50,
+    "indoor_temp_f": 75,
+    "outdoor_temp_f": 95,
+    "neutral_plane_fraction": 0.5,
+    "tall_building_height_ft": 0
+   },
+   "outputs": {
+    "bottom_pressure_pa": {
+     "value": -3.235,
+     "tolerance": {
+      "pct": 2
+     }
+    },
+    "top_pressure_pa": {
+     "value": -3.235,
+     "tolerance": {
+      "pct": 2
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "ground-loop-flow-antifreeze",
+   "source_publisher": "Plumbing & Mechanical Engineer (John Siegenthaler, P.E.)",
+   "source_title": "Concepts for varying flow rate in geothermal earth loops (Renewable Heating Design: Max COP Tracking, Part 1)",
+   "source_edition_or_year": "November 2, 2023",
+   "source_section_or_page": "Worked example under Formula 1: 20% propylene glycol at 30 F through 1-inch DR-11 HDPE (ID 1.076 in) at 5 gpm; density 64.14 lb/ft3, viscosity 4.23 cP (= 0.002843 lb/ft/s); printed Reynolds number 3,560. Tolerance 0.5% covers the publisher's rounded intermediate velocity. Placeholders: tons 1 x gpm_per_ton 5 reproduces the printed 5 gpm; specific_gravity, head_ft, wire_to_water_efficiency and benchmark_w_per_ton do not affect Reynolds. NOTE: the publisher calls Re 3,560 turbulent (IGSHPA minimum 2,500); the tile labels it TRANSITIONAL (see report lead).",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "tons": 1,
+    "gpm_per_ton": 5,
+    "pipe_id_in": 1.076,
+    "fluid_density_lb_ft3": 64.14,
+    "fluid_viscosity_cp": 4.23,
+    "specific_gravity": 1.03,
+    "head_ft": 20,
+    "wire_to_water_efficiency": 0.35,
+    "benchmark_w_per_ton": 100
+   },
+   "outputs": {
+    "reynolds": {
+     "value": 3560,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "continuous-insulation-ratio",
+   "source_publisher": "Building Science Corporation",
+   "source_title": "BSD-163: Controlling Cold-Weather Condensation Using Insulation",
+   "source_edition_or_year": "buildingscience.com digest (fetched 2026-10-01)",
+   "source_section_or_page": "Toronto example: winter average 25 F, interior 70 F / 35% RH, about 37% of total insulation on the exterior; 'If R-30 were the target, 0.37*30 = R-11 of exterior sheathing and R-19 stud space insulation'. Printed R-11 is 11.1 rounded to the integer (tile 11.16, 1.4%). Inputs: r_cavity 19 and required_ratio 0.37 are printed; r_continuous 11 is the printed solution; indoor 70 F, 35% RH and outdoor 25 F are the printed conditions. Only r_continuous_min is asserted (the tile reports this printed solution as FAILING 0.37 by 0.003 -- see report).",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "r_cavity": 19,
+    "r_continuous": 11,
+    "required_ratio": 0.37,
+    "indoor_temp_f": 70,
+    "indoor_rh_pct": 35,
+    "outdoor_design_temp_f": 25
+   },
+   "outputs": {
+    "r_continuous_min": {
+     "value": 11,
+     "tolerance": {
+      "pct": 2
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "bill-disaggregation",
+   "source_publisher": "Do the Math (Tom Murphy, UC San Diego)",
+   "source_title": "Home Heating for the Hardy",
+   "source_edition_or_year": "March 2012",
+   "source_section_or_page": "Heat-tightness table: 'Typical' house 0.2 therms per F degree-day = 440 W/C ('One Therm per day equates to a power of 1.22 kW'). Converted to tile units: 440 W/C / 1.8 / 0.29307 W per BTU/h = 834.1 BTU/h-F. The publisher converts meter therms with no equipment efficiency, so equipment_efficiency 1 is a faithful setting, not a fitted one; 440 is printed to 2 significant figures. Placeholders: baseload_per_year 300, degree_days 5000, balance_point_f 65 do not affect implied_ua. Tests only the slope-to-UA unit conversion.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "baseload_per_year": 300,
+    "slope_per_degree_day": 0.2,
+    "degree_days": 5000,
+    "equipment_efficiency": 1,
+    "btu_per_unit": 100000,
+    "balance_point_f": 65
+   },
+   "outputs": {
+    "implied_ua": {
+     "value": 834.1,
+     "tolerance": {
+      "pct": 1
      }
     }
    }

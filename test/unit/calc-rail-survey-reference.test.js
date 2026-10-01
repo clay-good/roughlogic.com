@@ -35,7 +35,7 @@ test("curve clearance: R = 5,729.58 / D, and the chord offsets match the exact c
 test("tonnage: 20 lb per ton per percent is a ton's weight times the grade", () => {
   within(2000 * 0.01, 20, 1e-9, "grade resistance");
   const r = computeTonnageRatingGrade({ tractive_effort_lb: 140000, ruling_grade_pct: 1.2, rolling_resistance_lb_per_ton: 3, curve_degrees: 3, weight_on_drivers_lb: 1680000, adhesion_factor: 0.3, alternate_grade_pct: 0.5 });
-  close(r.tonnage_rating_tons, 140000 / (24 + 3 + 2.4), "rating");
+  close(r.tonnage_rating_tons, 140000 / (24 + 3 + 2.4) - 1680000 / 2000, "trailing tons (GE: TE / R - loco weight)");
 });
 
 test("brakes and load limits: cylinder pressure is the reduction times 2.5, and load limit is GRL less light weight", () => {

@@ -22239,7 +22239,7 @@ export const CITATIONS = {
     editionNote: "VELOCITY COMES FROM THE BORE, NOT THE NOMINAL SIZE -- 12 gpm is 4.2 ft/s in 1 in SDR-11 HDPE (1.075 in bore) and 2.0 ft/s in 1-1/2 in (1.554 in bore). Reynolds number then decides whether the loop works at all, because below turbulence heat transfer collapses at the pipe wall and the rated capacity no longer applies. That bites on the coldest day, when the antifreeze is thickest, so a loop comfortably turbulent in October can sit on the laminar boundary in January -- which makes glycol concentration a heat transfer decision and not only a freeze protection one. On the pumping side, wire-to-water efficiency near a third means the electrical draw is roughly three times the hydraulic work; 74 W per ton is INSIDE the 100 W per ton benchmark, and the fixes above it run in order of cheapness: larger header pipe, fewer fittings, the lowest workable glycol concentration, and only then a different pump.",
     assumptions: [
       { name: "Fluid properties are entered", value: "at the minimum loop temperature, from the antifreeze manufacturer", source: "the antifreeze manufacturer's data" },
-      { name: "Turbulence at Re 4,000", value: "a conventional boundary; the transition is a band, not a line", source: "IGSHPA design procedure" },
+      { name: "Turbulence at Re 2,500", value: "the earth-loop design criterion (below 2,300 laminar, between transitional); general pipe-flow texts use 4,000", source: "IGSHPA Design and Installation Guide, per Siegenthaler, PM Engineer (2023)" },
       { name: "Not a loop design", value: "length, ground properties and annual thermal balance are separate", source: "the designer of record" },
     ],
   },
@@ -22537,14 +22537,14 @@ export const CITATIONS = {
     ],
   },
   "well-casing-purge-volume": {
-    formula: "casing volume = 0.0408 x diameter(in)^2 gal/ft x the standing column (depth less static water level); chlorine demand = MG x 8.34 x mg/L, converted to solution volume at an entered strength and density.",
-    edition: "Well casing volumes and disinfection as AWWA A100 and C654 state them. Hypochlorite strength and density are ENTERED because available chlorine is a percentage by weight of a solution denser than water.",
+    formula: "casing volume = 0.0408 x diameter(in)^2 gal/ft x the standing column (depth less static water level); chlorine demand = MG x 8.34 x mg/L, converted to solution volume at the entered trade-percent strength (lb per gallon = strength x 8.34); the entered density gives only the solution weight.",
+    edition: "Well casing volumes and disinfection as AWWA A100 and C654 state them. Hypochlorite strength is ENTERED as trade percent (available chlorine per volume); density sets only the solution weight.",
     freeAccess: "Two standard volume relations and one dose conversion.",
     governance: GOVERNANCE.general,
-    editionNote: "The standing column -- depth below the STATIC WATER LEVEL, not the drilled depth -- is the term most often got wrong. The purge time is the useful output: three casing volumes at a modest rate turns a sampling visit from a twenty-minute job into a two-hour one. THE DISINFECTION DOSE HAS TWO TRAPS. The unit trap: converting pounds of solution to gallons at 8.34 lb/gal overstates the volume by roughly a fifth, because a hypochlorite solution is denser than water. The scope trap is larger -- a dose computed on the casing volume treats the CASING, while the gravel pack and near-well formation hold a comparable volume, so a well disinfected on the casing figure alone can return a clean sample while the source of contamination sits untouched outside the screen.",
+    editionNote: "The standing column -- depth below the STATIC WATER LEVEL, not the drilled depth -- is the term most often got wrong. The purge time is the useful output: three casing volumes at a modest rate turns a sampling visit from a twenty-minute job into a two-hour one. THE DISINFECTION DOSE HAS TWO TRAPS. The unit trap: hypochlorite is sold by trade percent, available chlorine per volume, so 12.5% carries 1.04 lb per gallon whatever its density; read as a weight fraction it comes out about 17% short on volume. The scope trap is larger -- a dose computed on the casing volume treats the CASING, while the gravel pack and near-well formation hold a comparable volume, so a well disinfected on the casing figure alone can return a clean sample while the source of contamination sits untouched outside the screen.",
     assumptions: [
       { name: "Standing column, not drilled depth", value: "the volume above the static level holds no water", source: "the well log" },
-      { name: "Solution density is entered", value: "hypochlorite is denser than water; 8.34 lb/gal overstates by ~20%", source: "the product data sheet" },
+      { name: "Solution density is entered", value: "for the weight to carry only; the volume follows the trade-percent strength", source: "the product data sheet" },
       { name: "Treats the casing only", value: "the pack and formation hold a comparable volume", source: "AWWA C654" },
     ],
   },
@@ -22943,7 +22943,7 @@ export const CITATIONS = {
   // spec-v1495..v1504: the 2026-09-08 trade-expansion building performance and
   // envelope diagnostics band. Eight tiles; spec-v1501 and spec-v1503 cut.
   "effective-leakage-area": {
-    formula: "ELA (US, 4 Pa reference) = CFM50 / 18.9 in square inches, and EqLA (Canadian, 10 Pa reference) = CFM50 / 10.0; specific leakage area = ELA / floor area, both in the same units (square feet), so it is dimensionless; normalized leakage = 1000 x SLA x (building height / 8.2 ft)^0.3, which for real houses runs about 0.1 to 1.5 (ASHRAE 119 classes A to J). The hole side is the square root of the ELA.",
+    formula: "ELA (US, 4 Pa reference) = CFM50 / 18.2 in square inches, and EqLA (Canadian, 10 Pa reference) = CFM50 / 10.0; specific leakage area = ELA / floor area, both in the same units (square feet), so it is dimensionless; normalized leakage = 1000 x SLA x (building height / 8.2 ft)^0.3, which for real houses runs about 0.1 to 1.5 (ASHRAE 119 classes A to J). The hole side is the square root of the ELA.",
     edition: "The LBL effective leakage area conversion at the 4 Pa reference and the CGSB equivalent leakage area at 10 Pa, both by name, with the ASHRAE Fundamentals normalized-leakage definition and its height correction. The two conventions describe the SAME building and differ by reference pressure AND discharge coefficient (1.0 US, 0.61 Canadian), so a figure quoted without its convention cannot be compared with one quoted under the other.",
     freeAccess: "Two published divisors and one power-law height correction.",
     governance: GOVERNANCE.general,
@@ -22969,18 +22969,18 @@ export const CITATIONS = {
   },
   "ventilation-rate-procedure": {
     formula: "per breathing zone Vbz = Rp x people + Ra x area and Voz = Vbz / Ez; Zp = Voz / primary air; Xs = Vou / Vps; Ev = 1 + Xs - max(Zp); Vot = Vou / Ev.",
-    edition: "The ASHRAE 62.1 Ventilation Rate Procedure for a multiple-zone recirculating system by name, in its simplified single-supply form. Rp, Ra and Ez are ENTERED from the standard's own occupancy-category and air-distribution tables rather than reproduced here, because those tables are the part that changes between editions.",
+    edition: "The ASHRAE 62.1 Ventilation Rate Procedure for a multiple-zone recirculating system by name, with Ev = 1 + Xs - Zp from Normative Appendix A (not the 0.88 D + 0.22 Simplified Procedure) and one primary airflow per zone serving as both minimum and design. Rp, Ra and Ez are ENTERED from the standard's own occupancy-category and air-distribution tables rather than reproduced here, because those tables are the part that changes between editions.",
     freeAccess: "The procedure's algebra; no table from the standard is reproduced.",
     governance: GOVERNANCE.general,
     editionNote: "The counterintuitive result the procedure exists to produce is that ONE zone sets the intake for the whole system. The zone with the highest ratio of required outdoor air to the primary air it receives is critical, every other zone is over-ventilated as a consequence, and the fix is to REDISTRIBUTE primary air toward the critical zone at a constant system total rather than to raise the intake -- which is cheaper than conditioning the extra outdoor air for the life of the building. Simply adding primary air to the critical zone is a different move and can lower the efficiency, because it raises the system's total primary flow and so lowers the system fraction alongside the zone fraction. Ez below 1 for overhead heating is where a design quietly loses ventilation air, because warm supply air short-circuits to the return.",
     assumptions: [
-      { name: "Single-supply simplified form", value: "multiple air handlers or systems are computed separately", source: "ASHRAE 62.1" },
+      { name: "Single air handler, one primary airflow per zone", value: "multiple air handlers are computed separately; the standard takes Zp at the zone MINIMUM primary airflow and Xs at the design system airflow", source: "ASHRAE 62.1 Normative Appendix A" },
       { name: "Rp, Ra and Ez are entered", value: "from the standard's occupancy-category and distribution tables", source: "the applicable edition" },
       { name: "Design, not measurement", value: "a measured intake is a different question", source: "a balancing report" },
     ],
   },
   "zonal-pressure-diagnostics": {
-    formula: "pressure ratio = zone pressure with reference to outdoors / house pressure with reference to outdoors, both taken during a blower door depressurization; the ratio of the two series leakage paths follows as sqrt(ratio / (1 - ratio)) on the standard n = 0.5 flow exponent.",
+    formula: "pressure ratio = zone pressure with reference to outdoors / house pressure with reference to outdoors, both taken during a blower door depressurization; the ratio of the two series leakage paths follows as (ratio / (1 - ratio))^n on the field flow exponent n = 0.65 (Energy Conservatory; JLC 2023).",
     edition: "The zonal pressure diagnostic as building-performance field practice states it, with the series-leakage interpretation on an assumed flow exponent of 0.5. It is a RATIO diagnostic: it says which of two planes is leakier, not how many cfm either passes.",
     freeAccess: "One measured ratio and one square-root relation.",
     governance: GOVERNANCE.general,
@@ -22998,13 +22998,14 @@ export const CITATIONS = {
     governance: GOVERNANCE.general,
     editionNote: "The rule the arithmetic encodes is that the zone is judged by the WEAKEST appliance in it, so a zone can contain appliances that individually pass and still fail. A natural-draft water heater with a limit of a few pascals sitting alongside an induced-draft furnace governs the whole zone, and this is the test that must be resolved before any further air sealing -- tightening a house that already fails is how backdrafting becomes carbon monoxide exposure. Reducing the exhaust that causes the depressurization comes before makeup air, and replacing the weakest appliance with a sealed-combustion unit removes the problem rather than managing it.",
     assumptions: [
+      { name: "Net of base pressure", value: "the reading is the worst case LESS the base (house at rest) reading: base +1 Pa and worst case -3 Pa is a net -4 Pa, which fails a 3 Pa limit the raw reading passes; BPI puts direct vent and sealed combustion at -50 Pa and -15 Pa on power venting alone", source: "BPI Building Analyst Standard; CT DEEP Form 5" },
       { name: "Limits are entered by appliance class", value: "they differ between protocols and jurisdictions", source: "BPI / the adopted protocol" },
       { name: "Worst case is a test condition", value: "every exhaust on, interior doors positioned to worsen it", source: "the CAZ procedure" },
       { name: "Not a spillage or CO test", value: "pressure only", source: "the full combustion safety protocol" },
     ],
   },
   "stack-effect-npp": {
-    formula: "total stack pressure difference = 0.0188 x 1898.3-equivalent constant form: dP (Pa) = 3460 x height (m) x (1/T_outdoor - 1/T_indoor) in kelvin, which in US units is 1898.3 x height (ft) x (1/T_outdoor - 1/T_indoor) in degrees Rankine; the neutral plane splits that total between the bottom and the top in proportion to its position.",
+    formula: "total stack pressure difference dP (Pa) = 3460 x height (m) x (1/T_outdoor - 1/T_indoor) in kelvin, which in US units is 1898.3 x height (ft) x (1/T_outdoor - 1/T_indoor) in degrees Rankine; the neutral plane splits that total between the bottom and the top in proportion to its position.",
     edition: "The ASHRAE Fundamentals stack-effect relation by name, in its US-unit form. The constant 1898.3 Pa per foot per reciprocal Rankine is the SI 3460 converted at 0.3048 m per foot and 1.8 Rankine per kelvin, both exact.",
     freeAccess: "One published relation and two exact conversions.",
     governance: GOVERNANCE.general,
@@ -23184,7 +23185,7 @@ export const CITATIONS = {
     editionNote: "Both say the same physical thing: flow is driven by the difference of the SQUARES of the absolute pressures, not by the pressure difference. Diameter then dominates everything else, going as roughly the 2.6 to 2.67 power, so a modest increase in size is a large increase in capacity while doubling the length costs only about 30% of the flow. That exponent is why looping a line is such an effective way to add capacity. The two equations can differ substantially on the same segment, which is why both are shown and neither is presented as the answer.",
     assumptions: [
       { name: "Absolute pressures", value: "the driving term is P1 squared minus P2 squared on psia, not on gauge", source: "the published equations" },
-      { name: "Compressibility is entered", value: "assuming 1.0 at transmission pressure overstates flow", source: "the gas analysis" },
+      { name: "Compressibility is entered", value: "flow goes as about Z^-0.5, so assuming 1.0 where Z is below 1 at transmission pressure understates flow; the base pressure is fixed at 14.73 psia", source: "the gas analysis" },
       { name: "Uniform elevation", value: "elevation change, two-phase flow and line pack are not modelled", source: "the operator's hydraulic model" },
     ],
   },
@@ -23768,7 +23769,7 @@ export const CITATIONS = {
   },
   "boom-pump-reach": {
     formula: "horizontal reach at a height = sqrt(total reach squared - height squared), the circle approximation; outrigger bearing pressure = load / pad area; power line margin = measured distance - the required clearance.",
-    edition: "The reach geometry approximation by name, with the manufacturer's reach diagram and OSHA 1926.1408 named as governing. A multi-section boom's real envelope is a published reach diagram with configuration-dependent limits and dead zones, not a circle. Sizing outrigger mats against an allowable bearing needs a geotechnical source and is a separate calculation. The pump manufacturer's reach and load charts, OSHA, and the contractor's competent person govern.",
+    edition: "The reach geometry approximation by name, with the manufacturer's reach diagram and ASME B30.27 named as governing (OSHA 1926.1400(c)(1) excludes concrete pumps from the crane subpart). A multi-section boom's real envelope is a published reach diagram with configuration-dependent limits and dead zones, not a circle. Sizing outrigger mats against an allowable bearing needs a geotechnical source and is a separate calculation. The pump manufacturer's reach and load charts, OSHA, and the contractor's competent person govern.",
     freeAccess: "One square root on two numbers off a spec sheet; no reach diagram is reproduced.",
     governance: GOVERNANCE.general,
     editionNote: "A boom pump's advertised reach is a vertical number and a horizontal number that cannot both be achieved at once. The circle gives the horizontal distance available at a working height and the amount lost to elevation, which is the figure that surprises people reading a spec sheet: a boom advertised at 110 ft gives about 100 ft at 45 ft up. THE TWO CONSTRAINTS THAT DECIDE A SETUP ARE ALMOST NEVER REACH. Outrigger loads are concentrated and large, and one outrigger over a utility vault or soft backfill is how a pump goes over; and power line clearance is absolute, so a setup that reaches beautifully and puts the boom inside the clearance envelope is not a setup.",
@@ -23783,7 +23784,7 @@ export const CITATIONS = {
     edition: "The post-tensioning elongation relation by name, with about 7% as the usual two-sided acceptance. Friction and wobble coefficients belong to the specific duct and tendon system and come from the post-tensioning supplier; strand area and modulus come from the mill certificate for the reel installed. The supplier's stressing calculations and elongation tables, ACI 318 and the PTI manuals, the mill certificates, and the engineer of record govern.",
     freeAccess: "One exponential and one division on properties from a mill certificate; no supplier elongation table is reproduced.",
     governance: GOVERNANCE.general,
-    editionNote: "Elongation measures the tendon's whole length responding to the force actually in it, which is why it catches what a gauge cannot: a gauge reads what the jack is pushing, and a tendon binding in a crushed duct shows up as elongation short of theoretical while the gauge reads exactly the specified pressure. The elongation follows the AVERAGE force along the length, not the jacking force, and using the jacking force directly overstates the expected stretch by most of a 7% allowance -- which makes a perfectly good tendon look like a failing one. The tolerance is two-sided: short means the force is not getting there, long means a wrong area, a wrong modulus, or slip. Both require investigation before grouting, because after grouting nothing can be corrected.",
+    editionNote: "Elongation measures the tendon's whole length responding to the force actually in it, which is why it catches what a gauge cannot: a gauge reads what the jack is pushing, and a tendon binding in a crushed duct shows up as elongation short of theoretical while the gauge reads exactly the specified pressure. The elongation follows the AVERAGE force along the length, not the jacking force, and using the jacking force directly overstates the expected stretch by a share of the 7% allowance that grows with friction and tendon length -- which makes a perfectly good tendon look like a failing one. The tolerance is two-sided: short means the force is not getting there, long means a wrong area, a wrong modulus, or slip. Both require investigation before grouting, because after grouting nothing can be corrected.",
     assumptions: [
       { name: "Friction and wobble are entered", value: "they belong to the specific duct and tendon system", source: "the post-tensioning supplier" },
       { name: "Strand area and modulus from the mill certificate", value: "catalogue values where a certificate exists is a way tendons appear out of tolerance", source: "the mill certificate for the reel installed" },
@@ -25452,7 +25453,7 @@ export const CITATIONS = {
     edition: "The NFPA 58 separation tables are NOT reproduced: they are indexed by container water capacity, they step at capacity breakpoints, and the adopted edition and its amendments govern.",
     freeAccess: "Comparisons only; no table is reproduced.",
     governance: GOVERNANCE.general,
-    editionNote: "THE DISTANCES STEP RATHER THAN SCALE, which is the practical point. They change at capacity breakpoints, so choosing between one container size and the next is not only a capacity decision -- it can move the tank across the yard, and a customer told they can double their capacity may be told it in a yard that will not take it. THE CLEARANCE PEOPLE FORGET IS NOT TO THE WALL BUT TO OPENINGS: the relief discharge has to be clear of windows, doors and any opening into a below-grade space, because propane is heavier than air and will find a basement window well and stay in it. That is DIRECTIONAL -- where the relief points, not only how far the container sits -- and no horizontal measurement addresses it, so it is flagged separately. THE OTHER QUIET ONE IS THE POINT OF TRANSFER, whose requirements are frequently more restrictive than the container's: a tank that complies while the truck is absent can be non-compliant while it is being filled.",
+    editionNote: "THE DISTANCES STEP RATHER THAN SCALE, which is the practical point. They change at capacity breakpoints, so choosing between one container size and the next is not only a capacity decision -- it can move the tank across the yard, unless a single container of 1,200 gal or less qualifies for OSHA Table H-23 note 2's 10 ft reduction (25 ft from any other container over 125 gal); a manifolded set of 501 gal or more is sited on its aggregate and cannot use it. THE CLEARANCE PEOPLE FORGET IS NOT TO THE WALL BUT TO OPENINGS: the relief discharge has to be clear of windows, doors and any opening into a below-grade space, because propane is heavier than air and will find a basement window well and stay in it. That is DIRECTIONAL -- where the relief points, not only how far the container sits -- and no horizontal measurement addresses it, so it is flagged separately. THE OTHER QUIET ONE IS THE POINT OF TRANSFER, whose requirements are frequently more restrictive than the container's: a tank that complies while the truck is absent can be non-compliant while it is being filled.",
     assumptions: [
       { name: "Requirements are entered", value: "no separation table is reproduced or looked up", source: "NFPA 58 as adopted" },
       { name: "Aboveground containers", value: "underground and mounded containers have their own, generally shorter distances", source: "NFPA 58 as adopted" },
@@ -25514,7 +25515,7 @@ export const CITATIONS = {
     ],
   },
   "flare-radiation-distance": {
-    formula: "the API 521 point-source relation D = sqrt(F x Q / (4 pi K)), with the solar contribution SUBTRACTED from the allowable level before the distance is taken, because solar adds to the flare's radiation at the target.",
+    formula: "the API 521 point-source relation D = sqrt(tau F Q / (4 pi K)) with the atmospheric transmissivity tau taken as 1 (conservative), and the solar contribution SUBTRACTED from the allowable level before the distance is taken, because solar adds to the flare's radiation at the target.",
     edition: "A still-air point-source screen. The radiant fraction and the criterion are ENTERED; flame length and wind tilt are not modelled.",
     freeAccess: "One square root and one subtraction.",
     governance: GOVERNANCE.general,

@@ -278,7 +278,7 @@ export function computeGasPipelineFlow({
     q_scfd, q_mscfd, q_mmscfd, equation_label,
     alternate_q_scfd, alternate_label,
     has_alternate, diameter_capacity_ratio, diameter_verdict,
-    note: "Steady-state gas transmission flow by the two equations the trade actually uses, reported side by side because the choice between them is a judgment. Both say the same physical thing: flow is driven by the difference of the SQUARES of the absolute pressures, not by the pressure difference. That squared form is the part worth carrying in the field, because it means dropping the outlet pressure buys much more additional flow on a high-pressure line than the same drop does on a low-pressure one. Weymouth suits short, smaller-diameter, high-friction and rough pipe and is generally conservative on large lines; Panhandle A suits long large-diameter transmission at higher flow. They can differ substantially on the same segment, which is why both are shown and neither is presented as the answer. Diameter dominates everything else: capacity goes as diameter to roughly the 2.6 to 2.67 power, so a modest increase in size is a large increase in capacity while doubling the length costs only about 30 percent of the flow. That exponent is why looping a line -- laying a parallel segment -- is such an effective way to add capacity, and why a small restriction anywhere in a run costs more than intuition suggests. Efficiency is where a real line differs from a calculated one: a factor near 0.92 is a clean dry line, and liquid holdup, internal corrosion product, or a partially closed valve show up here and are the usual reason measured flow falls short of predicted. Compressibility is ENTERED because it depends on pressure, temperature and composition, and assuming 1.0 at transmission pressure overstates flow. This is a steady-state, isothermal, single-phase screen at one uniform elevation: it does not handle elevation change, two-phase or liquid-bearing flow, transients and line pack, or compressor station hydraulics, and it does not select the equation for you. The operator's own hydraulic model and the pipeline engineer of record govern.",
+    note: "Steady-state gas transmission flow by the two equations the trade actually uses, reported side by side because the choice between them is a judgment. Both say the same physical thing: flow is driven by the difference of the SQUARES of the absolute pressures, not by the pressure difference. That squared form is the part worth carrying in the field, because it means dropping the outlet pressure buys much more additional flow on a high-pressure line than the same drop does on a low-pressure one. Weymouth suits short, smaller-diameter, high-friction and rough pipe and is generally conservative on large lines; Panhandle A suits long large-diameter transmission at higher flow. They can differ substantially on the same segment, which is why both are shown and neither is presented as the answer. Diameter dominates everything else: capacity goes as diameter to roughly the 2.6 to 2.67 power, so a modest increase in size is a large increase in capacity while doubling the length costs only about 30 percent of the flow. That exponent is why looping a line -- laying a parallel segment -- is such an effective way to add capacity, and why a small restriction anywhere in a run costs more than intuition suggests. Efficiency is where a real line differs from a calculated one: a factor near 0.92 is a clean dry line, and liquid holdup, internal corrosion product, or a partially closed valve show up here and are the usual reason measured flow falls short of predicted. Compressibility is ENTERED because it depends on pressure, temperature and composition, and assuming 1.0 at transmission pressure, where Z runs below 1, UNDERSTATES the flow -- the equations go as about Z^-0.5 (0.85 gives 8% more than 1.0). This is a steady-state, isothermal, single-phase screen at one uniform elevation: it does not handle elevation change, two-phase or liquid-bearing flow, transients and line pack, or compressor station hydraulics, and it does not select the equation for you. The operator's own hydraulic model and the pipeline engineer of record govern.",
   };
 }
 export const gasPipelineFlowExample = { inputs: { equation: "panhandle_a", id_in: 15.5, length_mi: 42, inlet_psig: 850, outlet_psig: 600, gravity: 0.60, flowing_temp_f: 60, z_factor: 1.0, efficiency: 0.92, alternate_id_in: 19.25 } };
@@ -331,7 +331,8 @@ export function computeLiquidPipelineStationSpacing({
   const combined_gradient_ft_per_mi = friction_gradient_ft_per_mi + elevation_gradient_ft_per_mi;
   if (!(combined_gradient_ft_per_mi > 0)) return { error: "The combined gradient is not positive -- a line falling faster than friction consumes runs slack, which is a surge problem rather than a spacing one." };
   const max_spacing_mi = available_head_ft / combined_gradient_ft_per_mi;
-  const station_count = Math.max(1, Math.ceil(total_length_mi / max_spacing_mi));
+  // - 1e-9: an exact fit (30 mi at 30 mi spacing) read 29.999999999999996 and two stations (fixed 2026-10-01).
+  const station_count = Math.max(1, Math.ceil(total_length_mi / max_spacing_mi - 1e-9));
   const actual_spacing_mi = total_length_mi / station_count;
   const head_used_per_station_ft = actual_spacing_mi * combined_gradient_ft_per_mi;
   // Elevation is head spent regardless of flow, so on a climb the static term
@@ -345,7 +346,7 @@ export function computeLiquidPipelineStationSpacing({
   const alternate_gradient_ft_per_mi = has_alternate ? friction_gradient_ft_per_mi * flow_ratio * flow_ratio : 0;
   const alternate_combined = has_alternate ? alternate_gradient_ft_per_mi + elevation_gradient_ft_per_mi : 0;
   const alternate_spacing_mi = has_alternate && alternate_combined > 0 ? available_head_ft / alternate_combined : 0;
-  const alternate_station_count = has_alternate && alternate_spacing_mi > 0 ? Math.max(1, Math.ceil(total_length_mi / alternate_spacing_mi)) : 0;
+  const alternate_station_count = has_alternate && alternate_spacing_mi > 0 ? Math.max(1, Math.ceil(total_length_mi / alternate_spacing_mi - 1e-9)) : 0;
   const alternate_verdict = !has_alternate
     ? "(no throughput comparison entered)"
     : "at " + fmt(alternate_flow_bpd, 0) + " bbl/day the friction gradient rises to " + fmt(alternate_gradient_ft_per_mi, 1) + " ft per mile (friction goes as the SQUARE of flow), spacing falls to " + fmt(alternate_spacing_mi, 0) + " miles, and the line needs " + fmt(alternate_station_count, 0) + " station" + (alternate_station_count === 1 ? "" : "s");
@@ -413,8 +414,9 @@ export function computePigBatchVolume({
   const travel_time_h = has_flow && velocity_mph > 0 ? length_mi / velocity_mph : 0;
   // The window check, as a boolean. Both ends, and neither is assumed.
   const has_window = tool_min_fps > 0 || tool_max_fps > 0;
-  const above_min = tool_min_fps > 0 ? velocity_fps >= tool_min_fps : true;
-  const below_max = tool_max_fps > 0 ? velocity_fps <= tool_max_fps : true;
+  // Relative 1e-9 at both edges: the tile's own minimum flow, entered back, read BELOW it.
+  const above_min = tool_min_fps > 0 ? velocity_fps >= tool_min_fps * (1 - 1e-9) : true;
+  const below_max = tool_max_fps > 0 ? velocity_fps <= tool_max_fps * (1 + 1e-9) : true;
   const in_window = has_flow && has_window && above_min && below_max;
   const flow_for_min_bpd = tool_min_fps > 0 ? tool_min_fps * _OG_SECONDS_PER_HOUR / _OG_FT_PER_MILE * bbl_per_mile * _OG_HOURS_PER_DAY : 0;
   const flow_for_max_bpd = tool_max_fps > 0 ? tool_max_fps * _OG_SECONDS_PER_HOUR / _OG_FT_PER_MILE * bbl_per_mile * _OG_HOURS_PER_DAY : 0;
@@ -523,7 +525,7 @@ OILGAS_RENDERERS["cathodic-anode-count-life"] = _simpleRenderer({
     { key: "coating_efficiency_pct", label: "Coating efficiency (%)", kind: "number", attrs: { step: "any" } },
     { key: "current_density_ma_per_ft2", label: "Current density (mA per sq ft of bare steel)", kind: "number" },
     { key: "anode_weight_lb", label: "Anode net weight (lb, 0 to skip life)", kind: "number" },
-    { key: "consumption_lb_per_a_yr", label: "Consumption rate (lb per A-year)", kind: "number" },
+    { key: "consumption_lb_per_a_yr", label: "ACTUAL consumption rate (lb per A-year; theoretical / current efficiency -- Mg 8.8 / 0.50 = 17.6, UFC 3-570-02A)", kind: "number" },
     { key: "utilization", label: "Utilization factor (0-1)", kind: "number", default: 0.85 },
     { key: "current_per_anode_a", label: "Current output per anode (A, 0 to skip count)", kind: "number" },
     { key: "degraded_efficiency_pct", label: "Degraded coating efficiency (%, 0 to skip)", kind: "number", attrs: { step: "any" } },
@@ -1339,7 +1341,7 @@ OILGAS_RENDERERS["tank-vent-api-2000"] = _simpleRenderer({
   fields: [
     { key: "pump_in_bph", label: "Maximum pump-in rate (bbl/h)" },
     { key: "pump_out_bph", label: "Maximum pump-out rate (bbl/h)" },
-    { key: "volatile_factor", label: "Volatile allowance on out-breathing (1.0 non-volatile)" },
+    { key: "volatile_factor", label: "Volatile allowance on out-breathing (1.0 on the API 2000 normative basis; the Annex A basis is ~1.07 at flash point 100 F and up, ~2.14 below)" },
     { key: "thermal_out_ft3h", label: "Thermal out-breathing from the table (cu ft/h)" },
     { key: "thermal_in_ft3h", label: "Thermal in-breathing from the table (cu ft/h)" },
     { key: "fire_case_ft3h", label: "Fire case from the table (cu ft/h, 0 to skip)" },
@@ -1369,7 +1371,7 @@ OILGAS_RENDERERS["separator-retention-sizing"] = _simpleRenderer({
   fields: [
     { key: "vessel_diameter_ft", label: "Vessel diameter (ft)" },
     { key: "seam_to_seam_ft", label: "Seam-to-seam length (ft)" },
-    { key: "liquid_fraction", label: "Liquid fraction of the vessel (0 to 1)", attrs: { step: "any", min: "0", max: "1" } },
+    { key: "liquid_fraction", label: "Liquid fraction of a HORIZONTAL vessel's cross-section AREA (0 to 1; a 30% level is about 25% of the area)", attrs: { step: "any", min: "0", max: "1" } },
     { key: "liquid_rate_bpd", label: "Liquid rate (bbl/day)" },
     { key: "required_retention_min", label: "Required retention (min)" },
     { key: "gas_rate_mmscfd", label: "Gas rate (MMSCFD)" },
@@ -1400,7 +1402,7 @@ OILGAS_RENDERERS["separator-retention-sizing"] = _simpleRenderer({
 OILGAS_RENDERERS["flare-radiation-distance"] = _simpleRenderer({
   compute: computeFlareRadiationDistance,
   example: flareRadiationDistanceExample.inputs,
-  citation: "Citation: the API 521 point-source relation D = sqrt(F x Q / (4 pi K)), with the solar contribution SUBTRACTED from the allowable level before the distance is taken, because solar adds to the flare's radiation at the target. The radiant fraction and the criterion are ENTERED. API 521 as adopted and the design engineer govern.",
+  citation: "Citation: the API 521 point-source relation D = sqrt(tau F Q / (4 pi K)) with the atmospheric transmissivity tau taken as 1 (conservative), and the solar contribution SUBTRACTED from the allowable level before the distance is taken, because solar adds to the flare's radiation at the target. The radiant fraction and the criterion are ENTERED. API 521 as adopted and the design engineer govern.",
   fields: [
     { key: "heat_release_btuh", label: "Total heat release (BTU/h)" },
     { key: "radiant_fraction", label: "Radiant fraction (0.1 to 0.3 by gas)" },
