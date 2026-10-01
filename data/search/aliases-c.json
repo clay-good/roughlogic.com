@@ -2398,6 +2398,16 @@
     {"term":"raised floor plenum pressure","target":"raised-floor-tile-airflow","kind":"industry"},
     {"term":"tile open area cfm","target":"raised-floor-tile-airflow","kind":"question"},
     {"term":"underfloor static pressure data center","target":"raised-floor-tile-airflow","kind":"industry"},
-    {"term":"high flow tile grate","target":"raised-floor-tile-airflow","kind":"industry"}
+    {"term":"high flow tile grate","target":"raised-floor-tile-airflow","kind":"industry"},
+    {"term":"how long will my house stay warm without power","target":"building-outage-cooldown","kind":"industry"},
+    {"term":"house temperature drop power outage","target":"building-outage-cooldown","kind":"industry"},
+    {"term":"building time constant","target":"building-outage-cooldown","kind":"industry"},
+    {"term":"hours of safety cold","target":"building-outage-cooldown","kind":"industry"},
+    {"term":"no heat how fast does house cool","target":"building-outage-cooldown","kind":"industry"},
+    {"term":"walk in cooler power outage how long","target":"refrigeration-outage-holdover","kind":"industry"},
+    {"term":"dry ice for walk in cooler","target":"refrigeration-outage-holdover","kind":"industry"},
+    {"term":"refrigerator outage holdover time","target":"refrigeration-outage-holdover","kind":"industry"},
+    {"term":"how much dry ice power outage","target":"refrigeration-outage-holdover","kind":"industry"},
+    {"term":"cooler temperature rise without power","target":"refrigeration-outage-holdover","kind":"industry"}
   ]
 }

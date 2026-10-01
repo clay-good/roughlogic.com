@@ -2,99 +2,99 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "6b8f3905957e9852",
+      "sha": "66a4891c8e8427d6",
       "date": "2026-10-01"
     },
     "/tools/": {
-      "sha": "fb4132df62651864",
+      "sha": "9f4fa71712d975ac",
       "date": "2026-10-01"
     },
     "/collections/disaster-response/": {
-      "sha": "e5a5216c9fe70282",
+      "sha": "c4cbdccd4228a88a",
       "date": "2026-10-01"
     },
     "/groups/accounting/": {
-      "sha": "ef3a89e7db1016b2",
+      "sha": "c712148ed4ce2312",
       "date": "2026-10-01"
     },
     "/groups/agriculture/": {
-      "sha": "5c1ac5ab053efba9",
+      "sha": "e73c6687d4c0f1d1",
       "date": "2026-10-01"
     },
     "/groups/construction/": {
-      "sha": "931265a785b5a0bb",
+      "sha": "db307a20c4972b07",
       "date": "2026-10-01"
     },
     "/groups/cross-trade/": {
-      "sha": "7c03ff1a43ae57bd",
+      "sha": "9576d0bccacd57d8",
       "date": "2026-10-01"
     },
     "/groups/educators/": {
-      "sha": "03a83e44171560a8",
+      "sha": "be079c92efc8d09b",
       "date": "2026-10-01"
     },
     "/groups/electrical/": {
-      "sha": "062e620e8a646348",
+      "sha": "7ae6970f5b1e9290",
       "date": "2026-10-01"
     },
     "/groups/field/": {
-      "sha": "c6d9495300aeae86",
+      "sha": "a62fdc03b995d59c",
       "date": "2026-10-01"
     },
     "/groups/fire-ground/": {
-      "sha": "68f08756f410a87b",
+      "sha": "0bdabb2ebde45bf6",
       "date": "2026-10-01"
     },
     "/groups/historical/": {
-      "sha": "6ae29446594e29eb",
+      "sha": "584a6c8aeca1d70b",
       "date": "2026-10-01"
     },
     "/groups/hvac/": {
-      "sha": "d14e38e49d799ca8",
+      "sha": "c65b237976d6f89e",
       "date": "2026-10-01"
     },
     "/groups/kitchen/": {
-      "sha": "553abd0a22fcc905",
+      "sha": "d728c493b8be6e73",
       "date": "2026-10-01"
     },
     "/groups/lab/": {
-      "sha": "7a8ee5d09e8274dc",
+      "sha": "357f8e1532812b3d",
       "date": "2026-10-01"
     },
     "/groups/mechanic/": {
-      "sha": "be582f8d7608da53",
+      "sha": "8aa4d2d3a5df69fe",
       "date": "2026-10-01"
     },
     "/groups/plumbing/": {
-      "sha": "7f5b239bdf8c300d",
+      "sha": "9ea65522726043a5",
       "date": "2026-10-01"
     },
     "/groups/real-estate/": {
-      "sha": "97a36ab926eabb83",
+      "sha": "40ad4828614e3535",
       "date": "2026-10-01"
     },
     "/groups/references/": {
-      "sha": "2663a1a2133d4eb4",
+      "sha": "4becd90caa83849d",
       "date": "2026-10-01"
     },
     "/groups/restoration/": {
-      "sha": "6a72f86b011ff8bf",
+      "sha": "5d0124ec3c707cc0",
       "date": "2026-10-01"
     },
     "/groups/rigging-and-heavy-lift/": {
-      "sha": "0d54f13786120901",
+      "sha": "6c4ee77e0121c1f9",
       "date": "2026-10-01"
     },
     "/groups/stage/": {
-      "sha": "f916afc5b6d7e841",
+      "sha": "be1140b0ed2611bf",
       "date": "2026-10-01"
     },
     "/groups/trucking/": {
-      "sha": "3fc00f6ff5c52cca",
+      "sha": "f405d67f2f09c226",
       "date": "2026-10-01"
     },
     "/groups/water/": {
-      "sha": "c9dbe88b2764835f",
+      "sha": "4211a0f28952b918",
       "date": "2026-10-01"
     },
     "/tools/aav-install-check/": {
@@ -876,6 +876,10 @@
     "/tools/buffer-tank-loop-credit/": {
       "sha": "1ca3a3fc350eb228",
       "date": "2026-09-29"
+    },
+    "/tools/building-outage-cooldown/": {
+      "sha": "365a677e8ec88cf8",
+      "date": "2026-10-01"
     },
     "/tools/building-tightness-limit/": {
       "sha": "5d998c0b683a692a",
@@ -3938,8 +3942,8 @@
       "date": "2026-09-29"
     },
     "/tools/indirect-evaporative-cooling/": {
-      "sha": "3226b845d0125e1c",
-      "date": "2026-09-29"
+      "sha": "078d388fde489f82",
+      "date": "2026-10-01"
     },
     "/tools/infiltration-load/": {
       "sha": "f56f4cbccda13e7e",
@@ -5349,6 +5353,10 @@
       "sha": "eb123ee27696c10f",
       "date": "2026-09-30"
     },
+    "/tools/pipe-freeze-time/": {
+      "sha": "70df49d1a17d3070",
+      "date": "2026-10-01"
+    },
     "/tools/pipe-heat-loss-radial/": {
       "sha": "436f48b506233dcf",
       "date": "2026-09-29"
@@ -6216,6 +6224,10 @@
     "/tools/refrigeration-cop/": {
       "sha": "717aa70616fea8b5",
       "date": "2026-09-29"
+    },
+    "/tools/refrigeration-outage-holdover/": {
+      "sha": "7caabf8a1a09f4c5",
+      "date": "2026-10-01"
     },
     "/tools/refrigeration-relief-capacity/": {
       "sha": "6f6727813ec8b47a",

@@ -2334,6 +2334,9 @@ export const COMPUTE_MAP = {
   "shelter-capacity-sanitation": { module: "../../calc-relief.js", fn: "computeShelterCapacitySanitation" },
   "safe-room-capacity": { module: "../../calc-relief.js", fn: "computeSafeRoomCapacity" },
   "temp-housing-park-feeder-demand": { module: "../../calc-relief.js", fn: "computeTempHousingParkDemand" },
+  "building-outage-cooldown": { module: "../../calc-outage.js", fn: "computeBuildingOutageCooldown" },
+  "refrigeration-outage-holdover": { module: "../../calc-outage.js", fn: "computeRefrigerationOutageHoldover" },
+  "pipe-freeze-time": { module: "../../calc-outage.js", fn: "computePipeFreezeTime" },
 };
 
 // Resolve a COMPUTE_MAP module path (relative to this file) and import it.

@@ -1,6 +1,6 @@
 # roughlogic.com Specification v1925 -- Water Pipe Freeze Time (`calc-outage.js`, Group B Plumbing and Gas, building performance in an outage, 1 New Tile)
 
-> **Status: PROPOSED 2026-09-25. Single-tile spec.** Part of [scope-disaster-response](scope-disaster-response.md).
+> **Status: LANDED 2026-09-30 (proposed 2026-09-25). Single-tile spec.** Part of [scope-disaster-response](scope-disaster-response.md).
 > In-scope catalog expansion under the spec-v106 trades-only charter. Adds one tile to **`calc-outage.js`**
 > (Group B Plumbing and Gas, hub `/groups/plumbing/`), no new dependency and no new network call. Inherits spec.md through spec-v1878.md.
 >

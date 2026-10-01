@@ -2375,6 +2375,9 @@ const RELATED = {
   "shelter-capacity-sanitation": ["occupant-load","plumbing-fixture-count","safe-room-capacity","septic-tank","relief-commodity-truckloads"],
   "safe-room-capacity": ["storm-shelter","occupant-load","shelter-capacity-sanitation","wind-mwfrs-pressure"],
   "temp-housing-park-feeder-demand": ["service-load","service-conductor-sizing","voltage-drop","generator-sizing"],
+  "building-outage-cooldown": ["building-ua","internal-heat-gains","pipe-freeze-time","degree-day-energy","infiltration-load","generator-fuel-runtime"],
+  "refrigeration-outage-holdover": ["walk-in-cooler-load","product-pull-down-load","generator-fuel-runtime","building-outage-cooldown"],
+  "pipe-freeze-time": ["heat-trace-sizing","pipe-heat-loss-radial","insulation-heat-loss","building-outage-cooldown","pipe-insulation-takeoff"],
 };
 
 export { RELATED };

@@ -135617,6 +135617,343 @@
      }
     }
    }
+  },
+  {
+   "tile_id": "building-outage-cooldown",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Small house from building-ua (UA 309.7 Btu/h-degF), 10,000 Btu/degF, 68 degF at power loss, 10 degF outside, nobody home",
+   "source_edition_or_year": "lumped-capacitance (Newton cooling) model; LBNL hours-of-safety metric (OSTI 1984644)",
+   "source_section_or_page": "spec-v1923 worked example",
+   "verified_by": "rl",
+   "verified_on": "2026-09-30",
+   "inputs": {
+    "envelope_ua_btuh_per_degf": 309.7,
+    "capacitance_btu_per_degf": 10000,
+    "gypsum_lb": 0,
+    "wood_lb": 0,
+    "concrete_lb": 0,
+    "water_lb": 0,
+    "indoor_start_degf": 68,
+    "outdoor_degf": 10,
+    "occupants": 0,
+    "other_gains_btuh": 0,
+    "first_threshold_degf": 50,
+    "second_threshold_degf": 40
+   },
+   "outputs": {
+    "time_constant_hours": {
+     "value": 32.289,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "equilibrium_degf": {
+     "value": 10,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "hours_to_first": {
+     "value": 11.998,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "hours_to_second": {
+     "value": 21.287,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "temp_after_24h_degf": {
+     "value": 37.582,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "building-outage-cooldown",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Same house with four people at home (1,000 Btu/h)",
+   "source_edition_or_year": "lumped-capacitance (Newton cooling) model; about 250 Btu/h sensible per person",
+   "source_section_or_page": "spec-v1923 worked example, occupied case",
+   "verified_by": "rl",
+   "verified_on": "2026-09-30",
+   "inputs": {
+    "envelope_ua_btuh_per_degf": 309.7,
+    "capacitance_btu_per_degf": 10000,
+    "gypsum_lb": 0,
+    "wood_lb": 0,
+    "concrete_lb": 0,
+    "water_lb": 0,
+    "indoor_start_degf": 68,
+    "outdoor_degf": 10,
+    "occupants": 4,
+    "other_gains_btuh": 0,
+    "first_threshold_degf": 50,
+    "second_threshold_degf": 40
+   },
+   "outputs": {
+    "internal_gain_btuh": {
+     "value": 1000,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "equilibrium_degf": {
+     "value": 13.229,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "hours_to_second": {
+     "value": 23.114,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "building-outage-cooldown",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Same house after the 17% UA reduction of building-ua's example (UA 257.051 Btu/h-degF), nobody home",
+   "source_edition_or_year": "lumped-capacitance (Newton cooling) model",
+   "source_section_or_page": "spec-v1923 worked example, upgraded envelope",
+   "verified_by": "rl",
+   "verified_on": "2026-09-30",
+   "inputs": {
+    "envelope_ua_btuh_per_degf": 257.051,
+    "capacitance_btu_per_degf": 10000,
+    "gypsum_lb": 0,
+    "wood_lb": 0,
+    "concrete_lb": 0,
+    "water_lb": 0,
+    "indoor_start_degf": 68,
+    "outdoor_degf": 10,
+    "occupants": 0,
+    "other_gains_btuh": 0,
+    "first_threshold_degf": 50,
+    "second_threshold_degf": 40
+   },
+   "outputs": {
+    "hours_to_second": {
+     "value": 25.646,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "refrigeration-outage-holdover",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "8 x 10 x 8 ft walk-in, U 0.04 panels, 90 degF kitchen, 38 degF box, 3,000 lb produce (cp 0.9) from 35 to 41 degF, 72 h outage",
+   "source_edition_or_year": "energy balance; FDA Food Code 3-501.16 (41 degF); dry ice 246 Btu/lb",
+   "source_section_or_page": "spec-v1924 worked example",
+   "verified_by": "rl",
+   "verified_on": "2026-09-30",
+   "inputs": {
+    "entered_heat_gain_btuh": 0,
+    "box_length_ft": 8,
+    "box_width_ft": 10,
+    "box_height_ft": 8,
+    "panel_u_btuh_per_sqft_degf": 0.04,
+    "ambient_degf": 90,
+    "box_degf": 38,
+    "infiltration_pct": 10,
+    "product_lb": 3000,
+    "product_cp_btu_per_lb_degf": 0.9,
+    "product_start_degf": 35,
+    "allowable_degf": 41,
+    "outage_hours": 72
+   },
+   "outputs": {
+    "surface_sqft": {
+     "value": 448,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "transmission_btuh": {
+     "value": 931.84,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "heat_gain_btuh": {
+     "value": 1025.024,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "reserve_btu": {
+     "value": 16200,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "holdover_hours": {
+     "value": 15.805,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "dry_ice_lb_per_hour": {
+     "value": 4.1668,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "dry_ice_lb_per_day": {
+     "value": 100.002,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "outage_dry_ice_lb": {
+     "value": 234.153,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "usda_check_leak_btuh": {
+     "value": 256.25,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "pipe-freeze-time",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "3/4 in type L copper (0.875 in OD, 0.785 in ID, 0.455 lb/ft), 1/2 in foam k 0.25, h 1.5, 55 degF water, 0 degF crawl space",
+   "source_edition_or_year": "radial conduction plus surface film; latent heat of fusion 143.5 Btu/lb; ASHRAE Handbook -- Fundamentals insulation chapter approach",
+   "source_section_or_page": "spec-v1925 worked example",
+   "verified_by": "rl",
+   "verified_on": "2026-09-30",
+   "inputs": {
+    "pipe_od_in": 0.875,
+    "pipe_id_in": 0.785,
+    "pipe_lb_per_ft": 0.455,
+    "pipe_cp_btu_per_lb_degf": 0.092,
+    "insulation_thickness_in": 0.5,
+    "insulation_k": 0.25,
+    "surface_h_btuh_per_sqft_degf": 1.5,
+    "water_start_degf": 55,
+    "space_degf": 0
+   },
+   "outputs": {
+    "water_lb_per_ft": {
+     "value": 0.20973,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "heat_capacity_btu_per_degf_ft": {
+     "value": 0.25159,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "ua_insulated_btuh_per_degf_ft": {
+     "value": 0.13927,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "ua_bare_btuh_per_degf_ft": {
+     "value": 0.34361,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "tau_insulated_hours": {
+     "value": 1.8065,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "tau_bare_hours": {
+     "value": 0.73218,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "onset_insulated_hours": {
+     "value": 0.97839,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "freeze_stage_insulated_hours": {
+     "value": 6.7531,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "solid_insulated_hours": {
+     "value": 7.7315,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "onset_bare_hours": {
+     "value": 0.39655,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "solid_bare_hours": {
+     "value": 3.1336,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "pipe-freeze-time",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Same insulated copper line at 20 degF instead of 0 degF",
+   "source_edition_or_year": "radial conduction plus surface film; latent heat of fusion 143.5 Btu/lb",
+   "source_section_or_page": "spec-v1925 worked example, mild-freeze case (the spec's 18 h is the freezing stage alone; solid is about 20 h)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-30",
+   "inputs": {
+    "pipe_od_in": 0.875,
+    "pipe_id_in": 0.785,
+    "pipe_lb_per_ft": 0.455,
+    "pipe_cp_btu_per_lb_degf": 0.092,
+    "insulation_thickness_in": 0.5,
+    "insulation_k": 0.25,
+    "surface_h_btuh_per_sqft_degf": 1.5,
+    "water_start_degf": 55,
+    "space_degf": 20
+   },
+   "outputs": {
+    "onset_insulated_hours": {
+     "value": 1.9337,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "freeze_stage_insulated_hours": {
+     "value": 18.008,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "solid_insulated_hours": {
+     "value": 19.942,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
   }
  ]
 }

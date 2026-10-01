@@ -57926,3 +57926,159 @@ test("bounds: spec-v1922 computeTempHousingParkDemand pins 820 A against 656 A a
   assert.ok("error" in _v1922({ ...base, phase: "two_phase" }));
   assert.ok("error" in _v1922({ ...base, service_voltage_v: Infinity }));
 });
+
+// ===========================================================================
+// spec-v1923..v1925: disaster response buildings in an outage band (calc-outage.js)
+// ===========================================================================
+
+
+// ===========================================================================
+// spec-v1923..v1925: the 2026-09-30 disaster response band, buildings in an
+// outage (calc-outage.js). Two tiles keep group "C"; pipe-freeze-time keeps
+// group "B".
+// ===========================================================================
+
+import { computeBuildingOutageCooldown as _v1923 } from "../../calc-outage.js";
+test("bounds: spec-v1923 computeBuildingOutageCooldown pins the time constant and never returns Infinity", () => {
+  const base = { envelope_ua_btuh_per_degf: 309.7, capacitance_btu_per_degf: 10000, indoor_start_degf: 68, outdoor_degf: 10, occupants: 0, other_gains_btuh: 0, first_threshold_degf: 50, second_threshold_degf: 40 };
+  const r = _v1923(base);
+  assert.ok(Math.abs(r.time_constant_hours - 10000 / 309.7) < 1e-9);
+  assert.ok(Math.abs(r.equilibrium_degf - 10) < 1e-12);
+  assert.ok(Math.abs(r.hours_to_first - 12.0) < 0.05);
+  assert.ok(Math.abs(r.hours_to_second - 21.29) < 0.05);
+  assert.ok(Math.abs(r.temp_after_24h_degf - 37.58) < 0.01);
+  // The curve passes back through its own threshold.
+  assert.ok(Math.abs(r.equilibrium_degf + 58 * Math.exp(-r.hours_to_second / r.time_constant_hours) - 40) < 1e-9);
+  // Four people raise the settling point and buy about two hours to 40 degF.
+  const four = _v1923({ ...base, occupants: 4 });
+  assert.ok(Math.abs(four.equilibrium_degf - (10 + 1000 / 309.7)) < 1e-9);
+  assert.ok(Math.abs(four.hours_to_second - 23.11) < 0.05);
+  assert.ok(four.hours_to_second > r.hours_to_second);
+  // The 17% UA cut stretches 40 degF to about 25.6 h; hours scale linearly with C.
+  assert.ok(Math.abs(_v1923({ ...base, envelope_ua_btuh_per_degf: 309.7 * 0.83 }).hours_to_second - 25.65) < 0.05);
+  assert.ok(Math.abs(_v1923({ ...base, capacitance_btu_per_degf: 20000 }).hours_to_second - 2 * r.hours_to_second) < 1e-9);
+  // The helper adds mass x cp: 10,000 lb of water is 10,000 Btu/degF.
+  const helper = _v1923({ ...base, capacitance_btu_per_degf: 0, water_lb: 10000 });
+  assert.ok(Math.abs(helper.hours_to_second - r.hours_to_second) < 1e-9);
+  assert.ok(Math.abs(_v1923({ ...base, capacitance_btu_per_degf: 0, gypsum_lb: 1000, wood_lb: 1000, concrete_lb: 1000 }).total_capacitance_btu_per_degf - 760) < 1e-9);
+  // A threshold at or below equilibrium is never reached: null, never Infinity.
+  const warm = _v1923({ ...base, outdoor_degf: 45 });
+  assert.strictEqual(warm.first_reached, true);
+  assert.strictEqual(warm.second_reached, false);
+  assert.strictEqual(warm.hours_to_second, null);
+  assert.ok(/never reaches/.test(warm.second_verdict));
+  assert.strictEqual(_v1923({ ...base, outdoor_degf: 40 }).hours_to_second, null);
+  assert.strictEqual(_v1923({ ...base, first_threshold_degf: 68 }).hours_to_first, 0);
+  for (const v of Object.values(r)) if (typeof v === "number") assert.ok(Number.isFinite(v));
+  // Error seams.
+  assert.ok("error" in _v1923({ ...base, envelope_ua_btuh_per_degf: 0 }));
+  assert.ok("error" in _v1923({ ...base, envelope_ua_btuh_per_degf: -1 }));
+  assert.ok("error" in _v1923({ ...base, capacitance_btu_per_degf: 0 }));
+  assert.ok("error" in _v1923({ ...base, capacitance_btu_per_degf: -5 }));
+  assert.ok("error" in _v1923({ ...base, wood_lb: -1 }));
+  assert.ok("error" in _v1923({ ...base, occupants: -1 }));
+  assert.ok("error" in _v1923({ ...base, other_gains_btuh: -1 }));
+  assert.ok("error" in _v1923({ ...base, first_threshold_degf: 70 }));
+  assert.ok("error" in _v1923({ ...base, second_threshold_degf: 69 }));
+  assert.ok("error" in _v1923({ ...base, outdoor_degf: Infinity }));
+  assert.ok("error" in _v1923({ ...base, indoor_start_degf: NaN }));
+});
+
+import { computeRefrigerationOutageHoldover as _v1924 } from "../../calc-outage.js";
+test("bounds: spec-v1924 computeRefrigerationOutageHoldover pins holdover, dry ice, and the USDA check", () => {
+  const base = { entered_heat_gain_btuh: 0, box_length_ft: 8, box_width_ft: 10, box_height_ft: 8, panel_u_btuh_per_sqft_degf: 0.04, ambient_degf: 90, box_degf: 38, infiltration_pct: 10, product_lb: 3000, product_cp_btu_per_lb_degf: 0.9, product_start_degf: 35, allowable_degf: 41, outage_hours: 72 };
+  const r = _v1924(base);
+  assert.strictEqual(r.surface_sqft, 448);
+  assert.ok(Math.abs(r.transmission_btuh - 931.84) < 1e-9);
+  assert.ok(Math.abs(r.heat_gain_btuh - 1025.024) < 1e-9);
+  assert.ok(Math.abs(r.reserve_btu - 16200) < 1e-9);
+  assert.ok(Math.abs(r.holdover_hours - 15.8) < 0.01);
+  assert.ok(Math.abs(r.dry_ice_lb_per_hour - 1025.024 / 246) < 1e-9);
+  assert.ok(Math.abs(r.dry_ice_lb_per_day - 100) < 0.01);
+  assert.ok(Math.abs(r.outage_dry_ice_lb - 234.15) < 0.01);
+  assert.ok(Math.abs(r.usda_check_leak_btuh - 256.25) < 1e-9);
+  // An outage inside the holdover needs no dry ice, never a negative amount.
+  const short = _v1924({ ...base, outage_hours: 10 });
+  assert.strictEqual(short.outage_dry_ice_lb, 0);
+  assert.ok(/no dry ice needed/.test(short.outage_verdict));
+  assert.strictEqual(_v1924({ ...base, outage_hours: 0 }).outage_dry_ice_lb, 0);
+  // Holdover is linear in product mass and in the allowable rise.
+  assert.ok(Math.abs(_v1924({ ...base, product_lb: 6000 }).holdover_hours - 2 * r.holdover_hours) < 1e-9);
+  assert.ok(Math.abs(_v1924({ ...base, allowable_degf: 47 }).holdover_hours - 2 * r.holdover_hours) < 1e-9);
+  // An entered gain is the whole closed-door gain; the allowance is not re-added.
+  const entered = _v1924({ ...base, entered_heat_gain_btuh: 1025.024, infiltration_pct: 50 });
+  assert.strictEqual(entered.use_entered, true);
+  assert.ok(Math.abs(entered.holdover_hours - r.holdover_hours) < 1e-9);
+  // The allowance scales the built gain.
+  assert.ok(Math.abs(_v1924({ ...base, infiltration_pct: 0 }).heat_gain_btuh - 931.84) < 1e-9);
+  for (const v of Object.values(r)) if (typeof v === "number") assert.ok(Number.isFinite(v));
+  // Error seams.
+  assert.ok("error" in _v1924({ ...base, ambient_degf: 38 }));
+  assert.ok("error" in _v1924({ ...base, panel_u_btuh_per_sqft_degf: 0 }));
+  assert.ok("error" in _v1924({ ...base, box_height_ft: 0 }));
+  assert.ok("error" in _v1924({ ...base, entered_heat_gain_btuh: -1 }));
+  assert.ok("error" in _v1924({ ...base, product_lb: 0 }));
+  assert.ok("error" in _v1924({ ...base, product_cp_btu_per_lb_degf: 0 }));
+  assert.ok("error" in _v1924({ ...base, allowable_degf: 35 }));
+  assert.ok("error" in _v1924({ ...base, allowable_degf: 30 }));
+  assert.ok("error" in _v1924({ ...base, infiltration_pct: -1 }));
+  assert.ok("error" in _v1924({ ...base, outage_hours: -1 }));
+  assert.ok("error" in _v1924({ ...base, product_lb: Infinity }));
+  // With an entered gain the box dimensions are not needed.
+  assert.ok(!("error" in _v1924({ ...base, entered_heat_gain_btuh: 500, box_length_ft: 0, panel_u_btuh_per_sqft_degf: 0 })));
+});
+
+import { computePipeFreezeTime as _v1925 } from "../../calc-outage.js";
+test("bounds: spec-v1925 computePipeFreezeTime pins onset and solid freeze, insulated and bare", () => {
+  const base = { pipe_od_in: 0.875, pipe_id_in: 0.785, pipe_lb_per_ft: 0.455, pipe_cp_btu_per_lb_degf: 0.092, insulation_thickness_in: 0.5, insulation_k: 0.25, surface_h_btuh_per_sqft_degf: 1.5, water_start_degf: 55, space_degf: 0 };
+  const r = _v1925(base);
+  assert.ok(Math.abs(r.water_lb_per_ft - 0.2097) < 0.0005);
+  assert.ok(Math.abs(r.heat_capacity_btu_per_degf_ft - 0.252) < 0.0005);
+  assert.ok(Math.abs(r.ua_insulated_btuh_per_degf_ft - 0.139) < 0.0005);
+  assert.ok(Math.abs(r.ua_bare_btuh_per_degf_ft - 0.344) < 0.0005);
+  assert.ok(Math.abs(r.tau_insulated_hours - 1.81) < 0.005);
+  assert.ok(Math.abs(r.tau_bare_hours - 0.73) < 0.005);
+  assert.ok(Math.abs(r.onset_insulated_hours - 0.98) < 0.005);
+  assert.ok(Math.abs(r.onset_bare_hours - 0.40) < 0.005);
+  assert.ok(Math.abs(r.freeze_stage_insulated_hours - 6.75) < 0.01);
+  assert.ok(Math.abs(r.solid_insulated_hours - 7.73) < 0.01);
+  assert.ok(Math.abs(r.freeze_stage_bare_hours - 2.74) < 0.01);
+  assert.ok(Math.abs(r.solid_bare_hours - 3.13) < 0.01);
+  // The finding: foam cuts the loss about three-fifths and does not prevent the freeze.
+  assert.ok(Math.abs(r.loss_reduction_pct - 59.5) < 0.1);
+  assert.ok(r.time_ratio > 2 && r.time_ratio < 3);
+  assert.ok(r.solid_insulated_hours < 8);
+  // Both stages scale with 1 / UA, so each insulated-to-bare ratio equals the UA ratio.
+  assert.ok(Math.abs(r.onset_insulated_hours / r.onset_bare_hours - r.time_ratio) < 1e-9);
+  assert.ok(Math.abs(r.freeze_stage_insulated_hours / r.freeze_stage_bare_hours - r.time_ratio) < 1e-9);
+  // Mild freeze: 1.9 h to 32 degF; the freezing stage alone is 18 h, solid about 20 h.
+  const mild = _v1925({ ...base, space_degf: 20 });
+  assert.ok(Math.abs(mild.onset_insulated_hours - 1.93) < 0.01);
+  assert.ok(Math.abs(mild.freeze_stage_insulated_hours - 18.0) < 0.05);
+  assert.ok(Math.abs(mild.solid_insulated_hours - 19.94) < 0.05);
+  // No insulation: insulated equals bare.
+  const bare = _v1925({ ...base, insulation_thickness_in: 0 });
+  assert.ok(Math.abs(bare.ua_insulated_btuh_per_degf_ft - bare.ua_bare_btuh_per_degf_ft) < 1e-12);
+  // Colder space freezes sooner.
+  assert.ok(_v1925({ ...base, space_degf: -10 }).solid_insulated_hours < r.solid_insulated_hours);
+  // At or above 32 degF the pipe does not freeze: null, never Infinity.
+  for (const t of [32, 40]) {
+    const w = _v1925({ ...base, space_degf: t });
+    assert.strictEqual(w.freezes, false);
+    assert.strictEqual(w.onset_insulated_hours, null);
+    assert.strictEqual(w.solid_bare_hours, null);
+    assert.ok(/does not freeze/.test(w.freeze_verdict));
+  }
+  for (const v of Object.values(r)) if (typeof v === "number") assert.ok(Number.isFinite(v));
+  // Error seams.
+  assert.ok("error" in _v1925({ ...base, pipe_od_in: 0 }));
+  assert.ok("error" in _v1925({ ...base, pipe_id_in: 0 }));
+  assert.ok("error" in _v1925({ ...base, pipe_id_in: 0.875 }));
+  assert.ok("error" in _v1925({ ...base, insulation_k: 0 }));
+  assert.ok("error" in _v1925({ ...base, surface_h_btuh_per_sqft_degf: 0 }));
+  assert.ok("error" in _v1925({ ...base, insulation_thickness_in: -0.5 }));
+  assert.ok("error" in _v1925({ ...base, pipe_lb_per_ft: -1 }));
+  assert.ok("error" in _v1925({ ...base, water_start_degf: 32 }));
+  assert.ok("error" in _v1925({ ...base, water_start_degf: 20 }));
+  assert.ok("error" in _v1925({ ...base, space_degf: -Infinity }));
+});

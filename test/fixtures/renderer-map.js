@@ -2235,4 +2235,7 @@ export const RENDERER_MAP = {
   "shelter-capacity-sanitation": { module: "../../calc-relief.js", exportName: "RELIEF_RENDERERS" },
   "safe-room-capacity": { module: "../../calc-relief.js", exportName: "RELIEF_RENDERERS" },
   "temp-housing-park-feeder-demand": { module: "../../calc-relief.js", exportName: "RELIEF_RENDERERS" },
+  "building-outage-cooldown": { module: "../../calc-outage.js", exportName: "OUTAGE_RENDERERS" },
+  "refrigeration-outage-holdover": { module: "../../calc-outage.js", exportName: "OUTAGE_RENDERERS" },
+  "pipe-freeze-time": { module: "../../calc-outage.js", exportName: "OUTAGE_RENDERERS" },
 };

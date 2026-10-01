@@ -26117,6 +26117,42 @@ export const CITATIONS = {
       { name: "Demand factor entered", value: "read from the adopted edition's Table 551.73(A) or 550.31 for the site count; not reproduced", source: "NEC 551.73(A), 550.31" },
     ],
   },
+  "building-outage-cooldown": {
+    formula: "tau = C / UA (h); T_eq = T_out + Q_internal / UA with about 250 Btu/h per person; T(t) = T_eq + (T_start - T_eq) x e^(-t / tau); hours to a threshold = tau x ln((T_start - T_eq) / (T_threshold - T_eq)), never reached when the threshold is at or below T_eq.",
+    edition: "The lumped-capacitance (Newton cooling) model by name, with the hours-of-safety thermal-resilience metric of Lawrence Berkeley National Laboratory, Assessing thermal resilience of an assisted living facility during heat waves and cold snaps with power outages (OSTI 1984644), and material specific heats per ASHRAE Handbook -- Fundamentals by chapter. The UA comes from building-ua; the capacitance is entered or built from masses.",
+    freeAccess: "The LBNL report is free at osti.gov (OSTI 1984644); the method is a textbook first-order decay on the user's own UA and capacitance, and no ASHRAE table is reproduced -- four round specific heats are physical data.",
+    governance: GOVERNANCE.mechanical,
+    editionNote: "A building without heat cools fast at first and slower as it nears the temperature it settles toward, and the pace is one number, the time constant: stored heat per degree over lost heat per degree. A heavy, tight building coasts for days and a light, leaky one for hours, so an envelope upgrade that lowers UA is also a resilience upgrade. People matter at the margin: at about 250 Btu/h each, a family of four in a small house raises the settling point by several degrees, and gathering in one room concentrates that heat. The single-node model errs in a known direction: the room air and light surfaces fall faster than the curve in the first hours, and pipes in exterior walls and crawl spaces freeze well before the room does. The capacitance dominates the answer and is an estimate; a measured cooldown from a previous outage is the best calibration. Carbon monoxide from improvised indoor heating kills people in every winter outage and is outside this tile.",
+    assumptions: [
+      { name: "One thermal node", value: "room air and structure share one temperature; the first hours fall faster than the curve", source: "lumped-capacitance method" },
+      { name: "Sensible heat per person", value: "about 250 Btu/h at rest", source: "ASHRAE Handbook -- Fundamentals" },
+      { name: "Helper specific heats", value: "gypsum 0.26, wood 0.3 (low end of 0.3-0.4), concrete 0.2, water 1.0 Btu/lb-degF", source: "ASHRAE Handbook -- Fundamentals" },
+    ],
+  },
+  "refrigeration-outage-holdover": {
+    formula: "Q = U x A x (T_ambient - T_box) x (1 + infiltration allowance), or the entered closed-door gain; E = product lb x cp x (T_allowable - T_start); holdover = E / Q; dry ice = Q / 246 lb/h, and for an outage of T hours max(0, Q x T - E) / 246 lb; USDA check 50 x 246 / 48 = 256 Btu/h.",
+    edition: "An energy balance by name, with the FDA Food Code Section 3-501.16 cold-holding limit (41 degF) and the USDA FSIS power-outage guidance (about 4 hours for an unopened refrigerator; a full freezer about 48 hours, half full about 24; 50 lb of dry ice holds a full 18 cu ft freezer about 2 days) cited as the limit and the check, and dry ice's heat of sublimation, about 246 Btu/lb, as physical data.",
+    freeAccess: "The FDA Food Code is free at fda.gov and the USDA FSIS power-outage guidance is free at fsis.usda.gov; the arithmetic runs on the user's own box, product, and temperatures.",
+    governance: GOVERNANCE.mechanical,
+    editionNote: "A cooler without power warms at the rate heat leaks in, and the product is what slows it. The allowable rise is what makes holdover shorter than people expect: a box at 35 degF has six degrees before the 41 degF cold-holding limit, so a full box buys less time than its weight suggests. The tile leaves out door openings, and every opening dumps the cold air, so keeping the door shut is worth more than any other action. The closed-door allowance is applied only when the gain is built from the box; an entered gain is taken as the whole closed-door gain. The USDA household figure implies a leak of about 256 Btu/h in a full 18 cu ft freezer, reported as an order-of-magnitude check on the method. Dry ice gives off carbon dioxide and must not be used in an unventilated occupied space. Whether product that has been out of temperature is safe is the food safety or pharmacy authority's decision, and pharmaceutical storage has its own limits.",
+    assumptions: [
+      { name: "Only the envelope leaks with the door shut", value: "product, people, and lighting loads stop in a shut, dark box", source: "energy balance" },
+      { name: "Cold-holding limit", value: "41 degF", source: "FDA Food Code Section 3-501.16" },
+      { name: "Dry ice absorbs about 246 Btu per pound", value: "heat of sublimation of solid carbon dioxide", source: "physical data; USDA FSIS power-outage guidance as the check" },
+    ],
+  },
+  "pipe-freeze-time": {
+    formula: "per foot: C = water lb/ft x 1.0 + pipe lb/ft x cp; UA' = 1 / (ln(r_out / r_pipe) / (2 pi k) + 1 / (h x 2 pi r_out)); t1 = (C / UA') x ln((T_start - T_amb) / (32 - T_amb)); t2 = water lb/ft x 143.5 / (UA' x (32 - T_amb)); onset t1 and solid t1 + t2 reported as bounds, with the bare pipe for comparison.",
+    edition: "Steady radial conduction through the insulation and an outside surface film, a lumped cool-down of the water and pipe wall, and the latent heat of fusion of water (143.5 Btu/lb) by name, with the ASHRAE Handbook -- Fundamentals chapter on insulation for mechanical systems cited by name for the freeze-time approach. Conductivity and surface coefficient are entered; the insulation manufacturer's data governs.",
+    freeAccess: "Textbook conduction and a latent-heat balance on the user's own pipe and insulation dimensions; no ASHRAE table or manufacturer chart is reproduced.",
+    governance: GOVERNANCE.plumbing,
+    editionNote: "Insulation slows a freeze and prevents none. Half an inch of foam on a 3/4 in copper line cuts the heat loss per foot by about three-fifths and roughly multiplies the time by two and a half, but still water in an unheated crawl space at a hard-freeze temperature reaches 32 degF within about an hour and is solid within a working day. Freezing takes longer than cooling because water gives up 143.5 Btu per pound to become ice, more than a hundred times what it gave up per degree on the way down. The onset and the solid time are bounds: where a pipe blocks or splits depends on where the ice forms and how pressure builds behind it. Keeping water moving, by a dripping faucet, is what prevents a freeze; draining the line is what prevents the burst. Heat from the structure or the soil, wind, and supercooling are not modeled.",
+    assumptions: [
+      { name: "Still water, one pipe run", value: "no flow, no heat from the structure or soil, no supercooling", source: "freeze-time method, ASHRAE Handbook -- Fundamentals" },
+      { name: "Latent heat of fusion of water", value: "143.5 Btu/lb", source: "physical data" },
+      { name: "Water density", value: "62.4 lb/cu ft for the water in the pipe", source: "physical data" },
+    ],
+  },
 };
 
 // --- Citation linkifier ---

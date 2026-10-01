@@ -1894,5 +1894,9 @@ export const TOOL_MODULES = (() => {
     "relief-commodity-truckloads", "pod-site-configuration", "shelter-capacity-sanitation",
     "safe-room-capacity", "temp-housing-park-feeder-demand",
   ]);
+  // spec-v1923..v1925: disaster response buildings in an outage band.
+  declare("./calc-outage.js", "OUTAGE_RENDERERS", [
+    "building-outage-cooldown", "refrigeration-outage-holdover", "pipe-freeze-time",
+  ]);
   return map;
 })();

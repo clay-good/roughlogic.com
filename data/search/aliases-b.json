@@ -1759,6 +1759,11 @@
     {"term":"insulation fitting cover count","target":"pipe-insulation-takeoff","kind":"redirect"},
     {"term":"metal jacket square feet","target":"pipe-insulation-takeoff","kind":"redirect"},
     {"term":"removable valve cover insulation","target":"pipe-insulation-takeoff","kind":"redirect"},
-    {"term":"insulation takeoff fittings","target":"pipe-insulation-takeoff","kind":"redirect"}
+    {"term":"insulation takeoff fittings","target":"pipe-insulation-takeoff","kind":"redirect"},
+    {"term":"how long before pipes freeze","target":"pipe-freeze-time","kind":"industry"},
+    {"term":"pipe freeze time insulated","target":"pipe-freeze-time","kind":"industry"},
+    {"term":"frozen pipes power outage","target":"pipe-freeze-time","kind":"industry"},
+    {"term":"will my pipes freeze","target":"pipe-freeze-time","kind":"industry"},
+    {"term":"pipe insulation freeze protection time","target":"pipe-freeze-time","kind":"industry"}
   ]
 }

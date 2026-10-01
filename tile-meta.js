@@ -1481,6 +1481,10 @@ const _TILES = [
   ["shelter-capacity-sanitation", "G"],
   ["safe-room-capacity", "E"],
   ["temp-housing-park-feeder-demand", "A"],
+  // spec-v1923..v1925 disaster response buildings in an outage band.
+  ["building-outage-cooldown", "C"],
+  ["refrigeration-outage-holdover", "C"],
+  ["pipe-freeze-time", "B"],
 ];
 
 

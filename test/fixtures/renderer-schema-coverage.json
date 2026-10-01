@@ -1,7 +1,7 @@
 {
   "note": "spec-v1184 coverage ratchet. Tiles whose renderer exposes a render.schema consistent with the compute function. Grow with `node scripts/check-renderer-schema.mjs --write`; regeneration is intentional.",
-  "total_tiles": 2227,
-  "covered_count": 2150,
+  "total_tiles": 2230,
+  "covered_count": 2153,
   "covered": [
     "aav-install-check",
     "abatement-containment",
@@ -190,6 +190,7 @@
     "bucket-elevator-capacity",
     "buffer-stroke-speed",
     "buffer-tank-loop-credit",
+    "building-outage-cooldown",
     "building-tightness-limit",
     "building-ua",
     "bulk-density",
@@ -1260,6 +1261,7 @@
     "pipe-filled-support-load",
     "pipe-fitting-takeout",
     "pipe-flotation",
+    "pipe-freeze-time",
     "pipe-heat-loss-radial",
     "pipe-insulation-for-condensation",
     "pipe-insulation-takeoff",
@@ -1472,6 +1474,7 @@
     "refrigerant-velocity",
     "refrigerated-case-load",
     "refrigeration-cop",
+    "refrigeration-outage-holdover",
     "refrigeration-relief-capacity",
     "regular-polygon",
     "regulator-tap-bandwidth",

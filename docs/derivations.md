@@ -3026,6 +3026,9 @@ cross-check.
 | calc-operations-finance.js | `computeEoqOrderQuantity` | `{ annual_demand = 0, order_cost = 0, holding_cost = 0 } = {}` | _ | _ | _ |
 | calc-operations-finance.js | `computeReorderPoint` | `{ avg_daily_demand = 0, lead_time_days = 0, demand_sd = 0, service_level_pct ...` | _ | _ | _ |
 | calc-operations-finance.js | `computeUnitsOfProductionDepr` | `{ cost_basis = 0, salvage_value = 0, total_units = 0, period_units = 0, accum...` | _ | _ | _ |
+| calc-outage.js | `computeBuildingOutageCooldown` | `{ envelope_ua_btuh_per_degf = 0, capacitance_btu_per_degf = 0, gypsum_lb = 0,...` | _ | _ | _ |
+| calc-outage.js | `computePipeFreezeTime` | `{ pipe_od_in = 0, pipe_id_in = 0, pipe_lb_per_ft = 0, pipe_cp_btu_per_lb_degf...` | _ | _ | _ |
+| calc-outage.js | `computeRefrigerationOutageHoldover` | `{ entered_heat_gain_btuh = 0, box_length_ft = 0, box_width_ft = 0, box_height...` | _ | _ | _ |
 | calc-pipefit.js | `computeBoilerHorsepower` | `{ output_btuhr = 0 } = {}` | _ | _ | _ |
 | calc-pipefit.js | `computeBranchReinforcement` | `{ run_od_in = 0, run_wall_in = 0, run_treq_in = 0, branch_od_in = 0, branch_w...` | _ | _ | _ |
 | calc-pipefit.js | `computeBranchSaddleCutback` | `{ branch_od_in = 0, run_od_in = 0, stations = 6 } = {}` | _ | _ | _ |
@@ -3895,7 +3898,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 2479.
+Row count: 2482.
 
 <!-- END function-corpus-v14 -->
 
@@ -4228,7 +4231,7 @@ per spec-v14 §13.1 second paragraph.
 | `working-space-110-26` | Working-Space Clearance Lookup (NEC 110.26) | NEC 2023 (NFPA 70); 480Y/277 V (151-600 V) Condition 2 -> 3.5 ft depth; width... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `yaw-error-loss` | Wind Turbine Yaw Misalignment Power Loss | Project (first-principles); the manufacturer's yaw calibration procedure governs | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group B Plumbing (154 tiles)
+### Group B Plumbing (155 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -4301,6 +4304,7 @@ per spec-v14 §13.1 second paragraph.
 | `pipe-expansion` | Pipe Thermal Expansion | ASHRAE / ASTM; Copper alpha = 9.4e-6 in/in/F; 100 ft of copper x 100 F d... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `pipe-expansion-loop` | Pipe Thermal Expansion and Loop Sizing | Project (first-principles); Carbon steel A53 4.5 in OD / 200 ft run / 100 F dT -> 1.5... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `pipe-filled-support-load` | Filled Pipe Support Load per Hanger | First-principles cross-section x dens...; spec-v161 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `pipe-freeze-time` | Water Pipe Freeze Time | Project (first-principles); spec-v1925 worked example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `pipe-insulation-takeoff` | Pipe Insulation and Jacket Material Takeoff | Mechanical-insulation takeoff identit...; cut = 250*1.05 + 12 = 274.5 ft; sections = ceil(274.5/3) ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `pipe-partial-flow-depth` | Circular Pipe Partial-Flow Depth and Velocity (Manning) | Manning applied to circular-segment g...; spec-v1011 section 2.1; re-checked by substituting the so... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `pipe-pressure-rating` | Pipe Pressure Rating and Required Wall (ASME B31.1) | ASME B31.1 Power Piping (by name); spec-v160 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
@@ -4387,7 +4391,7 @@ per spec-v14 §13.1 second paragraph.
 | `wobbe-index` | Wobbe Index (Fuel-Gas Interchangeability) | Wobbe index (fuel-gas interchangeabil...; WI = 1000 / sqrt(0.60) = 1000 / 0.77460 = 1290.99 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+3 more) |
 | `wsfu-demand` | Probable Peak Demand (WSFU to GPM) | Hunter's curve (NBS BMS65) / IPC 2021...; 120 WSFU flush-valve -> 73.0 GPM, a printed row of Table ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group C HVAC (214 tiles)
+### Group C HVAC (216 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -4412,6 +4416,7 @@ per spec-v14 §13.1 second paragraph.
 | `blown-insulation-coverage` | Blown Insulation Coverage | Manufacturer blown-insulation coverag...; spec-v99 section 2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `boiler-pipe-sizing` | Boiler Distribution Pipe Sizing | ASHRAE / Bell & Gossett; GPM = 200000/(500*20) = 20; v(1.265 in) = 5.11 > 4 -> ste... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `buffer-tank-loop-credit` | Buffer Tank with Distribution-Loop Credit | ASHRAE / Idronics (Caleffi); 60 gal gross, 1.5 in x 200 ft loop holds 18.36 gal -> 41.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `building-outage-cooldown` | Building Temperature Drift in a Heating Outage | Project (first-principles); spec-v1923 worked example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `building-tightness-limit` | Building Tightness Limit vs Minimum Ventilation (When Air Sealing Needs a Fan) | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `building-ua` | Whole-Building Heat-Loss Coefficient UA | Whole-building UA (ASHRAE / RESNET); spec-v329 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `caz-depressurization-limit` | Combustion Appliance Zone Depressurization Limit (Worst-Case Backdraft Test) | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -4572,6 +4577,7 @@ per spec-v14 §13.1 second paragraph.
 | `refrigerant-velocity` | Refrigerant Line Velocity and Oil Return | ASHRAE Refrigeration Handbook (line s...; 600 lb/hr / 0.5 ft^3/lb / 0.75 in ID -> 1629.75 fpm (suct... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `refrigerated-case-load` | Refrigerated Display Case Load and Internal Electric | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `refrigeration-cop` | Refrigeration COP and Carnot Limit | Refrigeration COP and Carnot limit; spec-v321 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
+| `refrigeration-outage-holdover` | Walk-In Cooler Outage Holdover and Dry Ice | Project (first-principles); spec-v1924 worked example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `refrigeration-relief-capacity` | Refrigeration Pressure-Relief Discharge Capacity (ASHRAE 15) | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `reynolds-number-pipe` | Pipe Flow Reynolds Number and Regime | Reynolds number Re = V D / nu; spec-v305 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `rooftop-curb-uplift` | Rooftop Equipment Wind Uplift and Anchorage | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -6295,6 +6301,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `wire-rope-stretch` | Wire Rope Elastic Stretch Under Load | Project (first-principles); dL = P L /(A_m E_r) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 2227. Fixture-covered or reference-cadence: 2227 / 2227.
+Tile count: 2230. Fixture-covered or reference-cadence: 2230 / 2230.
 
 <!-- END tile-index-v14 -->
