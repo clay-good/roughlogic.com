@@ -1866,5 +1866,12 @@ export const TOOL_MODULES = (() => {
     "rtcr-coliform-samples", "solar-water-pump-sizing", "first-flush-diverter",
     "lift-station-outage-storage", "osha-toilet-count", "responder-camp-sanitation",
   ]);
+  // spec-v1888..v1896: disaster response emergency and temporary power band.
+  declare("./calc-reliefpower.js", "RELIEFPOWER_RENDERERS", [
+    "generator-altitude-temp-derate", "generator-part-load-fuel", "generator-fleet-fuel-resupply",
+    "generator-droop-load-share", "split-phase-leg-balance", "critical-load-shed-tiers",
+    "mppt-controller-output-current", "radio-site-duty-cycle-battery",
+    "generator-battery-hybrid-fuel",
+  ]);
   return map;
 })();

@@ -2299,6 +2299,15 @@ export const COMPUTE_MAP = {
   "lift-station-outage-storage": { module: "../../calc-reliefwater.js", fn: "computeLiftStationOutageStorage" },
   "osha-toilet-count": { module: "../../calc-reliefwater.js", fn: "computeOshaToiletCount" },
   "responder-camp-sanitation": { module: "../../calc-reliefwater.js", fn: "computeResponderCampSanitation" },
+  "generator-altitude-temp-derate": { module: "../../calc-reliefpower.js", fn: "computeGeneratorAltitudeTempDerate" },
+  "generator-part-load-fuel": { module: "../../calc-reliefpower.js", fn: "computeGeneratorPartLoadFuel" },
+  "generator-fleet-fuel-resupply": { module: "../../calc-reliefpower.js", fn: "computeGeneratorFleetFuelResupply" },
+  "generator-droop-load-share": { module: "../../calc-reliefpower.js", fn: "computeGeneratorDroopLoadShare" },
+  "split-phase-leg-balance": { module: "../../calc-reliefpower.js", fn: "computeSplitPhaseLegBalance" },
+  "critical-load-shed-tiers": { module: "../../calc-reliefpower.js", fn: "computeCriticalLoadShedTiers" },
+  "mppt-controller-output-current": { module: "../../calc-reliefpower.js", fn: "computeMpptControllerOutputCurrent" },
+  "radio-site-duty-cycle-battery": { module: "../../calc-reliefpower.js", fn: "computeRadioSiteDutyCycleBattery" },
+  "generator-battery-hybrid-fuel": { module: "../../calc-reliefpower.js", fn: "computeGeneratorBatteryHybridFuel" },
 };
 
 // Resolve a COMPUTE_MAP module path (relative to this file) and import it.

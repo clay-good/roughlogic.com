@@ -2340,6 +2340,15 @@ const RELATED = {
   "lift-station-outage-storage": ["wet-well-cycle-time","sump-basin-sizing","generator-fuel-runtime","generator-motor-starting","pump-tdh"],
   "osha-toilet-count": ["plumbing-fixture-count","responder-camp-sanitation","heat-stress"],
   "responder-camp-sanitation": ["osha-toilet-count","cistern-storage-days","generator-sizing","drinking-fountain-check"],
+  "generator-altitude-temp-derate": ["generator-sizing","generator-motor-starting","gas-altitude-derate","critical-load-shed-tiers"],
+  "generator-part-load-fuel": ["engine-fuel-burn-gph","generator-fuel-runtime","generator-battery-hybrid-fuel","generator-altitude-temp-derate"],
+  "generator-fleet-fuel-resupply": ["generator-fuel-runtime","generator-part-load-fuel","tanker-shuttle-cycle","generator-sizing"],
+  "generator-droop-load-share": ["generator-sizing","generator-altitude-temp-derate","generator-motor-starting"],
+  "split-phase-leg-balance": ["power-distro","neutral-imbalance","generator-motor-starting","voltage-drop","generator-conductor-445"],
+  "critical-load-shed-tiers": ["generator-altitude-temp-derate","battery-runtime","off-grid-battery","generator-motor-starting"],
+  "mppt-controller-output-current": ["pv-circuit-ampacity","pv-string-sizing","pv-cell-temperature-power","off-grid-battery"],
+  "radio-site-duty-cycle-battery": ["off-grid-battery","standby-battery-sizing","battery-runtime"],
+  "generator-battery-hybrid-fuel": ["generator-part-load-fuel","off-grid-battery","generator-fuel-runtime","generator-sizing"],
 };
 
 export { RELATED };

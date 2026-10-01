@@ -2,99 +2,99 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "e97fcd31554cf198",
+      "sha": "cde649ea0d38fac1",
       "date": "2026-10-01"
     },
     "/tools/": {
-      "sha": "6277b1868dadb4c0",
+      "sha": "b7bef9a80c2333f6",
       "date": "2026-10-01"
     },
     "/collections/disaster-response/": {
-      "sha": "5698cebcf7e9519b",
+      "sha": "a93d0843c442c23a",
       "date": "2026-10-01"
     },
     "/groups/accounting/": {
-      "sha": "8f43bd1c2b3cbb49",
+      "sha": "9c168b49fe457126",
       "date": "2026-10-01"
     },
     "/groups/agriculture/": {
-      "sha": "a04ee10126b5ff52",
+      "sha": "a571efd929214f37",
       "date": "2026-10-01"
     },
     "/groups/construction/": {
-      "sha": "e7ea72a56f078d52",
+      "sha": "f68cc899de8196a0",
       "date": "2026-10-01"
     },
     "/groups/cross-trade/": {
-      "sha": "33f1ff3f95b1490d",
+      "sha": "a200ee00cd96bf37",
       "date": "2026-10-01"
     },
     "/groups/educators/": {
-      "sha": "8655bdb3411139bf",
+      "sha": "32524fcf739367c0",
       "date": "2026-10-01"
     },
     "/groups/electrical/": {
-      "sha": "c076a0e1653a4699",
+      "sha": "ed2ed47683b285cb",
       "date": "2026-10-01"
     },
     "/groups/field/": {
-      "sha": "703be397264af530",
+      "sha": "f9b8bbf966d7df83",
       "date": "2026-10-01"
     },
     "/groups/fire-ground/": {
-      "sha": "0947f233d18f12c3",
+      "sha": "1b61bc2eeec60b61",
       "date": "2026-10-01"
     },
     "/groups/historical/": {
-      "sha": "16a170e840402959",
+      "sha": "ad00eb3968e91cc6",
       "date": "2026-10-01"
     },
     "/groups/hvac/": {
-      "sha": "790c6a621e2d5153",
+      "sha": "49d16dacee1896f9",
       "date": "2026-10-01"
     },
     "/groups/kitchen/": {
-      "sha": "13ab78cc5ae70b6e",
+      "sha": "3e6c1db2291522d6",
       "date": "2026-10-01"
     },
     "/groups/lab/": {
-      "sha": "002dc5c158b823fb",
+      "sha": "e8dd2ebff4b0da02",
       "date": "2026-10-01"
     },
     "/groups/mechanic/": {
-      "sha": "e613559105e1f482",
+      "sha": "cea7ff0ac71d7838",
       "date": "2026-10-01"
     },
     "/groups/plumbing/": {
-      "sha": "fd54feccef460926",
+      "sha": "2c43f85568b9273c",
       "date": "2026-10-01"
     },
     "/groups/real-estate/": {
-      "sha": "609b97243c9b34dd",
+      "sha": "cb8baa5eb919da3e",
       "date": "2026-10-01"
     },
     "/groups/references/": {
-      "sha": "01fe52269a55d3aa",
+      "sha": "de57b5e579a85c1f",
       "date": "2026-10-01"
     },
     "/groups/restoration/": {
-      "sha": "68f899280f62aa69",
+      "sha": "2488beb992c494e0",
       "date": "2026-10-01"
     },
     "/groups/rigging-and-heavy-lift/": {
-      "sha": "df3c456533d2c7b0",
+      "sha": "5923918045d90cf1",
       "date": "2026-10-01"
     },
     "/groups/stage/": {
-      "sha": "84800abef29f9368",
+      "sha": "16cbd4fd13e5ba4b",
       "date": "2026-10-01"
     },
     "/groups/trucking/": {
-      "sha": "a3a916765eeef2ab",
+      "sha": "50aa7276fc48725c",
       "date": "2026-10-01"
     },
     "/groups/water/": {
-      "sha": "01b65b14a2e6337a",
+      "sha": "f0112a08ffdc9402",
       "date": "2026-10-01"
     },
     "/tools/aav-install-check/": {
@@ -538,8 +538,8 @@
       "date": "2026-09-29"
     },
     "/tools/battery-vent-max-current/": {
-      "sha": "83792faec2aa41a5",
-      "date": "2026-09-29"
+      "sha": "96aa2f1e3c18fcca",
+      "date": "2026-10-01"
     },
     "/tools/beam-clamp-side-pull/": {
       "sha": "72216676429d1b07",
@@ -1893,6 +1893,10 @@
       "sha": "8297639a9341397c",
       "date": "2026-09-29"
     },
+    "/tools/critical-load-shed-tiers/": {
+      "sha": "6ba5e523de211224",
+      "date": "2026-10-01"
+    },
     "/tools/crop-yield/": {
       "sha": "0d5eea5a71223783",
       "date": "2026-09-29"
@@ -3158,8 +3162,8 @@
       "date": "2026-09-29"
     },
     "/tools/fuel-tax-ifta/": {
-      "sha": "5c03d52595b2be09",
-      "date": "2026-09-29"
+      "sha": "27eeeafd640f5907",
+      "date": "2026-10-01"
     },
     "/tools/fume-hood-face-velocity/": {
       "sha": "c46d2195a85b8d19",
@@ -3305,9 +3309,25 @@
       "sha": "36edcfd514cdc42a",
       "date": "2026-09-29"
     },
+    "/tools/generator-altitude-temp-derate/": {
+      "sha": "820fb1a028dd174e",
+      "date": "2026-10-01"
+    },
+    "/tools/generator-battery-hybrid-fuel/": {
+      "sha": "723dfe53517a6459",
+      "date": "2026-10-01"
+    },
     "/tools/generator-conductor-445/": {
       "sha": "a8a448f9301c79ec",
       "date": "2026-09-30"
+    },
+    "/tools/generator-droop-load-share/": {
+      "sha": "63dda4655d212f4c",
+      "date": "2026-10-01"
+    },
+    "/tools/generator-fleet-fuel-resupply/": {
+      "sha": "ba1336aef293c152",
+      "date": "2026-10-01"
     },
     "/tools/generator-fuel-runtime/": {
       "sha": "8ea7ea56f6bff6b9",
@@ -3316,6 +3336,10 @@
     "/tools/generator-motor-starting/": {
       "sha": "3773ceddcd0c5291",
       "date": "2026-09-30"
+    },
+    "/tools/generator-part-load-fuel/": {
+      "sha": "6586a756321de038",
+      "date": "2026-10-01"
     },
     "/tools/generator-sizing/": {
       "sha": "5dddbf1bad009360",
@@ -3330,8 +3354,8 @@
       "date": "2026-09-29"
     },
     "/tools/gfci-afci-reference/": {
-      "sha": "a8c114a14c4c5f48",
-      "date": "2026-09-29"
+      "sha": "181aedd7f141a2d2",
+      "date": "2026-10-01"
     },
     "/tools/gin-pole-uptower-lift/": {
       "sha": "33232bf2fa7d83e2",
@@ -4778,8 +4802,8 @@
       "date": "2026-09-29"
     },
     "/tools/motor-rms-hp/": {
-      "sha": "2906384171807fef",
-      "date": "2026-09-29"
+      "sha": "09499d465aa04a39",
+      "date": "2026-10-01"
     },
     "/tools/motor-run-hours-for-budget/": {
       "sha": "c16de37ef853d341",
@@ -4800,6 +4824,10 @@
     "/tools/motor-vd-starting/": {
       "sha": "696710f0eb05e1b5",
       "date": "2026-09-29"
+    },
+    "/tools/mppt-controller-output-current/": {
+      "sha": "7b269fd7d645b315",
+      "date": "2026-10-01"
     },
     "/tools/mstp-segment-loading/": {
       "sha": "eeac7f4e5c7f71ff",
@@ -5868,6 +5896,10 @@
     "/tools/radiator-edr-output/": {
       "sha": "178290dfd35e5f9e",
       "date": "2026-09-29"
+    },
+    "/tools/radio-site-duty-cycle-battery/": {
+      "sha": "18ac9156a1505c29",
+      "date": "2026-10-01"
     },
     "/tools/radon-fan-static/": {
       "sha": "b3ca82eeab8b350f",
@@ -7177,6 +7209,10 @@
       "sha": "31571a70cc21fa89",
       "date": "2026-09-29"
     },
+    "/tools/split-phase-leg-balance/": {
+      "sha": "185bcf0e5bdc86f5",
+      "date": "2026-10-01"
+    },
     "/tools/spoil-setback/": {
       "sha": "caf13b637b36d890",
       "date": "2026-09-30"
@@ -7834,8 +7870,8 @@
       "date": "2026-09-29"
     },
     "/tools/thermistor-steinhart-hart/": {
-      "sha": "98e75c745b53ed3e",
-      "date": "2026-09-29"
+      "sha": "cff466096ef279a9",
+      "date": "2026-10-01"
     },
     "/tools/thermoforming-draw-ratio/": {
       "sha": "734f176098bd1b78",

@@ -1441,6 +1441,16 @@ const _TILES = [
   ["lift-station-outage-storage", "M"],
   ["osha-toilet-count", "G"],
   ["responder-camp-sanitation", "G"],
+  // spec-v1888..v1896 disaster response emergency and temporary power band.
+  ["generator-altitude-temp-derate", "A"],
+  ["generator-part-load-fuel", "A"],
+  ["generator-fleet-fuel-resupply", "J"],
+  ["generator-droop-load-share", "A"],
+  ["split-phase-leg-balance", "A"],
+  ["critical-load-shed-tiers", "A"],
+  ["mppt-controller-output-current", "A"],
+  ["radio-site-duty-cycle-battery", "A"],
+  ["generator-battery-hybrid-fuel", "A"],
 ];
 
 

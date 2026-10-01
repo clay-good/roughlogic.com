@@ -475,6 +475,11 @@
     {"term":"snow plow truck count","target":"plow-route-cycle-time","kind":"industry"},
     {"term":"service level cycle time snow","target":"plow-route-cycle-time","kind":"industry"},
     {"term":"lane miles per truck","target":"plow-route-cycle-time","kind":"industry"},
-    {"term":"accumulation between plow passes","target":"plow-route-cycle-time","kind":"industry"}
+    {"term":"accumulation between plow passes","target":"plow-route-cycle-time","kind":"industry"},
+    {"term":"generator fleet fuel","target":"generator-fleet-fuel-resupply","kind":"industry"},
+    {"term":"generator refueling schedule","target":"generator-fleet-fuel-resupply","kind":"industry"},
+    {"term":"diesel delivery trips generators","target":"generator-fleet-fuel-resupply","kind":"industry"},
+    {"term":"emergency generator fuel logistics","target":"generator-fleet-fuel-resupply","kind":"industry"},
+    {"term":"usace generator fuel rule of thumb","target":"generator-fleet-fuel-resupply","kind":"industry"}
   ]
 }

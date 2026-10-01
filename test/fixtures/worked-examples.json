@@ -131727,6 +131727,894 @@
      }
     }
    }
+  },
+  {
+   "tile_id": "generator-altitude-temp-derate",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "300 kW standby unit sent to a 5,000 ft site on a 110 degF design day",
+   "source_edition_or_year": "Cummins DQDAC data sheet derate statement (1,800 ft / 104 degF; 7% per 1,312 ft, 7% per 18 degF)",
+   "source_section_or_page": "spec-v1888 Section 3, first example",
+   "verified_by": "rl",
+   "verified_on": "2026-09-30",
+   "inputs": {
+    "rated_kw": 300,
+    "site_elevation_ft": 5000,
+    "site_ambient_f": 110,
+    "altitude_threshold_ft": 1800,
+    "altitude_step_ft": 1312,
+    "altitude_rate_pct": 7,
+    "temp_threshold_f": 104,
+    "temp_step_f": 18,
+    "temp_rate_pct": 7
+   },
+   "outputs": {
+    "altitude_derate_pct": {
+     "value": 17.0732,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "temperature_derate_pct": {
+     "value": 2.33333,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "total_derate_pct": {
+     "value": 19.4065,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "available_kw": {
+     "value": 241.78,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "available_multiplied_kw": {
+     "value": 242.976,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "generator-altitude-temp-derate",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "The same 300 kW unit at 7,000 ft on a 115 degF day",
+   "source_edition_or_year": "Cummins DQDAC data sheet derate statement",
+   "source_section_or_page": "spec-v1888 Section 3, second example",
+   "verified_by": "rl",
+   "verified_on": "2026-09-30",
+   "inputs": {
+    "rated_kw": 300,
+    "site_elevation_ft": 7000,
+    "site_ambient_f": 115,
+    "altitude_threshold_ft": 1800,
+    "altitude_step_ft": 1312,
+    "altitude_rate_pct": 7,
+    "temp_threshold_f": 104,
+    "temp_step_f": 18,
+    "temp_rate_pct": 7
+   },
+   "outputs": {
+    "altitude_derate_pct": {
+     "value": 27.7439,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "temperature_derate_pct": {
+     "value": 4.27778,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "total_derate_pct": {
+     "value": 32.0217,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "available_kw": {
+     "value": 203.935,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "available_multiplied_kw": {
+     "value": 207.495,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "generator-part-load-fuel",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Cummins C60D6R on its 55 kW prime rating carrying a 20 kW shelter load",
+   "source_edition_or_year": "Cummins C60D6R data sheet D-6567 fuel points; NFPA 110 Section 8.4.2 30% floor",
+   "source_section_or_page": "spec-v1889 Section 3, first example",
+   "verified_by": "rl",
+   "verified_on": "2026-09-30",
+   "inputs": {
+    "standby_kw": 60,
+    "rating_kw": 55,
+    "fuel_quarter_gph": 1.5,
+    "fuel_half_gph": 2.5,
+    "fuel_three_quarter_gph": 3.4,
+    "fuel_full_gph": 4.6,
+    "load_kw": 20
+   },
+   "outputs": {
+    "fuel_gph": {
+     "value": 1.95455,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "kwh_per_gal": {
+     "value": 10.2326,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "full_load_kwh_per_gal": {
+     "value": 11.9565,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "load_pct_of_standby": {
+     "value": 33.3333,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "load_bank_kw": {
+     "value": 0,
+     "tolerance": {
+      "abs": 1e-09
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "generator-part-load-fuel",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "The same unit at night carrying 12 kW (extrapolated below 1/4 load)",
+   "source_edition_or_year": "Cummins C60D6R data sheet D-6567 fuel points; NFPA 110 Section 8.4.2 30% floor",
+   "source_section_or_page": "spec-v1889 Section 3, second example",
+   "verified_by": "rl",
+   "verified_on": "2026-09-30",
+   "inputs": {
+    "standby_kw": 60,
+    "rating_kw": 55,
+    "fuel_quarter_gph": 1.5,
+    "fuel_half_gph": 2.5,
+    "fuel_three_quarter_gph": 3.4,
+    "fuel_full_gph": 4.6,
+    "load_kw": 12
+   },
+   "outputs": {
+    "fuel_gph": {
+     "value": 1.37273,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "kwh_per_gal": {
+     "value": 8.74172,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "full_load_kwh_per_gal": {
+     "value": 11.9565,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "load_pct_of_standby": {
+     "value": 20,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "load_bank_kw": {
+     "value": 6,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "generator-fleet-fuel-resupply",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "County fleet of 4 x 60 kW, 6 x 150 kW, and 2 x 300 kW units, 90% usable, 2,400 gal truck",
+   "source_edition_or_year": "EPA Power Resilience Guide (2023) Section 4, USACE 0.07 gph per kW",
+   "source_section_or_page": "spec-v1890 Section 3 (70% trips corrected from 2 to 1)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-30",
+   "inputs": {
+    "size1_count": 4,
+    "size1_kw": 60,
+    "size1_tank_gal": 100,
+    "size1_burn_gph": 0,
+    "size2_count": 6,
+    "size2_kw": 150,
+    "size2_tank_gal": 300,
+    "size2_burn_gph": 0,
+    "size3_count": 2,
+    "size3_kw": 300,
+    "size3_tank_gal": 500,
+    "size3_burn_gph": 0,
+    "usable_fraction": 0.9,
+    "truck_gal": 2400
+   },
+   "outputs": {
+    "fleet_kw": {
+     "value": 1740,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "fleet_fuel_gal_per_day": {
+     "value": 2923.2,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "fleet_fuel_70_gal_per_day": {
+     "value": 2046.24,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "trips_per_day": {
+     "value": 2,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "trips_per_day_70": {
+     "value": 1,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "size1_interval_hours": {
+     "value": 21.4286,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "size2_interval_hours": {
+     "value": 25.7143,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "size3_interval_hours": {
+     "value": 21.4286,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "shortest_interval_hours": {
+     "value": 21.4286,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "generator-droop-load-share",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "100 kW at 3% droop (61.8 Hz) paralleled with 200 kW at 5% droop (63.0 Hz), 180 kW load",
+   "source_edition_or_year": "Woodward Application Note 01302 straight-line droop",
+   "source_section_or_page": "spec-v1891 Section 3, first example",
+   "verified_by": "rl",
+   "verified_on": "2026-09-30",
+   "inputs": {
+    "unit1_kw": 100,
+    "unit1_droop_pct": 3,
+    "unit1_no_load_hz": 61.8,
+    "unit2_kw": 200,
+    "unit2_droop_pct": 5,
+    "unit2_no_load_hz": 63,
+    "unit3_kw": 0,
+    "unit3_droop_pct": 0,
+    "unit3_no_load_hz": 0,
+    "rated_hz": 60,
+    "load_kw": 180
+   },
+   "outputs": {
+    "unit1_kw_per_hz": {
+     "value": 55.5556,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "unit2_kw_per_hz": {
+     "value": 66.6667,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "bus_hz": {
+     "value": 60.9818,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "unit1_load_kw": {
+     "value": 45.4545,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "unit2_load_kw": {
+     "value": 134.545,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "unit1_load_pct": {
+     "value": 45.4545,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "unit2_load_pct": {
+     "value": 67.2727,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "first_full_load_kw": {
+     "value": 300,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "matched_bus_hz": {
+     "value": 60.96,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "matched_load_pct": {
+     "value": 60,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "generator-droop-load-share",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "The 200 kW unit's no-load setpoint raised to 63.5 Hz",
+   "source_edition_or_year": "Woodward Application Note 01302 straight-line droop",
+   "source_section_or_page": "spec-v1891 Section 3, second example",
+   "verified_by": "rl",
+   "verified_on": "2026-09-30",
+   "inputs": {
+    "unit1_kw": 100,
+    "unit1_droop_pct": 3,
+    "unit1_no_load_hz": 61.8,
+    "unit2_kw": 200,
+    "unit2_droop_pct": 5,
+    "unit2_no_load_hz": 63.5,
+    "unit3_kw": 0,
+    "unit3_droop_pct": 0,
+    "unit3_no_load_hz": 0,
+    "rated_hz": 60,
+    "load_kw": 180
+   },
+   "outputs": {
+    "first_full_load_kw": {
+     "value": 272.222,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "first_full_bus_hz": {
+     "value": 60.5,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "generator-droop-load-share",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Both units set to 4% droop and 62.4 Hz no load",
+   "source_edition_or_year": "Woodward Application Note 01302 straight-line droop",
+   "source_section_or_page": "spec-v1891 Section 3, third example",
+   "verified_by": "rl",
+   "verified_on": "2026-09-30",
+   "inputs": {
+    "unit1_kw": 100,
+    "unit1_droop_pct": 4,
+    "unit1_no_load_hz": 62.4,
+    "unit2_kw": 200,
+    "unit2_droop_pct": 4,
+    "unit2_no_load_hz": 62.4,
+    "unit3_kw": 0,
+    "unit3_droop_pct": 0,
+    "unit3_no_load_hz": 0,
+    "rated_hz": 60,
+    "load_kw": 180
+   },
+   "outputs": {
+    "bus_hz": {
+     "value": 60.96,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "unit1_load_kw": {
+     "value": 60,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "unit2_load_kw": {
+     "value": 120,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "unit1_load_pct": {
+     "value": 60,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "unit2_load_pct": {
+     "value": 60,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "split-phase-leg-balance",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "10,800 W portable generator after a storm: 10 A well pump, 26 A on L1, 15 A on L2",
+   "source_edition_or_year": "WINCO Portable Generator Load Balancing Guide (L-1008) method",
+   "source_section_or_page": "spec-v1892 Section 3",
+   "verified_by": "rl",
+   "verified_on": "2026-09-30",
+   "inputs": {
+    "rated_w": 10800,
+    "per_leg_rating_a": 0,
+    "load_240_a": 10,
+    "l1_load1_a": 6,
+    "l1_load2_a": 8,
+    "l1_load3_a": 12,
+    "l1_load4_a": 0,
+    "l2_load1_a": 5,
+    "l2_load2_a": 3,
+    "l2_load3_a": 7,
+    "l2_load4_a": 0
+   },
+   "outputs": {
+    "leg_rating_a": {
+     "value": 45,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "l1_a": {
+     "value": 36,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "l2_a": {
+     "value": 25,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "l1_pct": {
+     "value": 80,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "l2_pct": {
+     "value": 55.5556,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "neutral_a": {
+     "value": 11,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "total_w": {
+     "value": 7320,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "total_pct": {
+     "value": 67.7778,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "balanced_leg_a": {
+     "value": 30.5,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "critical-load-shed-tiers",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Shelter and clinic, 40 / 55 / 70 kW tiers on a 128 kW derated generator, then a 400 kWh battery",
+   "source_edition_or_year": "NFPA 70 Articles 700, 701, 702 priority order",
+   "source_section_or_page": "spec-v1893 Section 3",
+   "verified_by": "rl",
+   "verified_on": "2026-09-30",
+   "inputs": {
+    "source_kw": 128,
+    "tier1_kw": 40,
+    "tier2_kw": 55,
+    "tier3_kw": 70,
+    "tier4_kw": 0,
+    "usable_kwh": 400
+   },
+   "outputs": {
+    "served_kw": {
+     "value": 95,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "shed_kw": {
+     "value": 70,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "served_pct": {
+     "value": 57.5758,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "utilization_pct": {
+     "value": 74.2188,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "runtime_tier1_hours": {
+     "value": 10,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "runtime_tiers12_hours": {
+     "value": 4.21053,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "runtime_all_hours": {
+     "value": 2.42424,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "mppt-controller-output-current",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "3,200 W field clinic array on a 48 V bank",
+   "source_edition_or_year": "controller manufacturer rating convention; NEC 690.8 125%",
+   "source_section_or_page": "spec-v1894 Section 3, first example",
+   "verified_by": "rl",
+   "verified_on": "2026-09-30",
+   "inputs": {
+    "array_w": 3200,
+    "battery_v": 48,
+    "chosen_controller_a": 0
+   },
+   "outputs": {
+    "output_current_a": {
+     "value": 66.6667,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "controller_a": {
+     "value": 80,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "controller_count": {
+     "value": 1,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "array_ratio": {
+     "value": 0.833333,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "min_conductor_a": {
+     "value": 100,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "mppt-controller-output-current",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "The same 3,200 W array on a 12 V bank",
+   "source_edition_or_year": "controller manufacturer rating convention",
+   "source_section_or_page": "spec-v1894 Section 3, second example",
+   "verified_by": "rl",
+   "verified_on": "2026-09-30",
+   "inputs": {
+    "array_w": 3200,
+    "battery_v": 12,
+    "chosen_controller_a": 0
+   },
+   "outputs": {
+    "output_current_a": {
+     "value": 266.667,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "controller_count": {
+     "value": 3,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "mppt-controller-output-current",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "The same 3,200 W array on a 24 V bank",
+   "source_edition_or_year": "controller manufacturer rating convention",
+   "source_section_or_page": "spec-v1894 Section 3, second example (24 V line)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-30",
+   "inputs": {
+    "array_w": 3200,
+    "battery_v": 24,
+    "chosen_controller_a": 0
+   },
+   "outputs": {
+    "output_current_a": {
+     "value": 133.333,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "radio-site-duty-cycle-battery",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Temporary base station, 12 / 1.2 / 0.8 A, 72 h at 50% depth of discharge, 5-5-90 duty",
+   "source_edition_or_year": "5-5-90 convention (Motorola Solutions BPR40 data sheet)",
+   "source_section_or_page": "spec-v1895 Section 3, first example",
+   "verified_by": "rl",
+   "verified_on": "2026-09-30",
+   "inputs": {
+    "transmit_a": 12,
+    "receive_a": 1.2,
+    "standby_a": 0.8,
+    "transmit_duty_pct": 5,
+    "receive_duty_pct": 5,
+    "standby_duty_pct": 90,
+    "runtime_hours": 72,
+    "depth_of_discharge_fraction": 0.5
+   },
+   "outputs": {
+    "average_a": {
+     "value": 1.38,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "runtime_ah": {
+     "value": 99.36,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "battery_nameplate_ah": {
+     "value": 198.72,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "daily_ah": {
+     "value": 33.12,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "transmit_energy_share_pct": {
+     "value": 43.4783,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "radio-site-duty-cycle-battery",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "The same equipment as a busy repeater at 25-25-50 duty",
+   "source_edition_or_year": "site duty entered in place of the 5-5-90 convention",
+   "source_section_or_page": "spec-v1895 Section 3, second example",
+   "verified_by": "rl",
+   "verified_on": "2026-09-30",
+   "inputs": {
+    "transmit_a": 12,
+    "receive_a": 1.2,
+    "standby_a": 0.8,
+    "transmit_duty_pct": 25,
+    "receive_duty_pct": 25,
+    "standby_duty_pct": 50,
+    "runtime_hours": 72,
+    "depth_of_discharge_fraction": 0.5
+   },
+   "outputs": {
+    "average_a": {
+     "value": 3.7,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "runtime_ah": {
+     "value": 266.4,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "battery_nameplate_ah": {
+     "value": 532.8,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "generator-battery-hybrid-fuel",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "15 kW shelter load on a Cummins C60D6R run at 41.25 kW when ON, 85% round-trip battery, one cycle a day",
+   "source_edition_or_year": "Cummins C60D6R data sheet D-6567 fuel points; first-principles energy balance",
+   "source_section_or_page": "spec-v1896 Section 3, one cycle",
+   "verified_by": "rl",
+   "verified_on": "2026-09-30",
+   "inputs": {
+    "load_kw": 15,
+    "rating_kw": 55,
+    "fuel_quarter_gph": 1.5,
+    "fuel_half_gph": 2.5,
+    "fuel_three_quarter_gph": 3.4,
+    "fuel_full_gph": 4.6,
+    "setpoint_kw": 41.25,
+    "round_trip_efficiency": 0.85,
+    "cycles_per_day": 1
+   },
+   "outputs": {
+    "generator_hours_per_day": {
+     "value": 9.64824,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "hybrid_gal_per_day": {
+     "value": 32.804,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "continuous_gal_per_day": {
+     "value": 38.1818,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "saving_gal_per_day": {
+     "value": 5.3778,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "saving_pct": {
+     "value": 14.0847,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "battery_kwh_per_cycle": {
+     "value": 215.276,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "run_hour_reduction_pct": {
+     "value": 59.799,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "generator-battery-hybrid-fuel",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "The same hybrid at four charge cycles a day",
+   "source_edition_or_year": "Cummins C60D6R data sheet D-6567 fuel points; first-principles energy balance",
+   "source_section_or_page": "spec-v1896 Section 3, four cycles",
+   "verified_by": "rl",
+   "verified_on": "2026-09-30",
+   "inputs": {
+    "load_kw": 15,
+    "rating_kw": 55,
+    "fuel_quarter_gph": 1.5,
+    "fuel_half_gph": 2.5,
+    "fuel_three_quarter_gph": 3.4,
+    "fuel_full_gph": 4.6,
+    "setpoint_kw": 41.25,
+    "round_trip_efficiency": 0.85,
+    "cycles_per_day": 4
+   },
+   "outputs": {
+    "generator_hours_per_day": {
+     "value": 9.64824,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "saving_gal_per_day": {
+     "value": 5.3778,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "battery_kwh_per_cycle": {
+     "value": 53.8191,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
   }
  ]
 }

@@ -3272,6 +3272,15 @@ cross-check.
 | calc-refrigeration.js | `computeRefrigerationReliefCapacity` | `{ vessel_diameter_ft = 0, vessel_length_ft = 0, f_constant = 0, valve_rated_l...` | _ | _ | _ |
 | calc-refrigeration.js | `computeSecondaryGlycolLoop` | `{ load_btuh = 0, delta_t_f = 0, glycol_cp = 1, glycol_sg = 1, head_ft = 0, pu...` | _ | _ | _ |
 | calc-refrigeration.js | `computeTwoStageInterstagePressure` | `{ low_psig = 0, high_psig = 0, intermediate_load_psig = 0 } = {}` | _ | _ | _ |
+| calc-reliefpower.js | `computeCriticalLoadShedTiers` | `{ source_kw = 0, tier1_kw = 0, tier2_kw = 0, tier3_kw = 0, tier4_kw = 0, usab...` | _ | _ | _ |
+| calc-reliefpower.js | `computeGeneratorAltitudeTempDerate` | `{ rated_kw = 0, site_elevation_ft = 0, site_ambient_f = 0, altitude_threshold...` | _ | _ | _ |
+| calc-reliefpower.js | `computeGeneratorBatteryHybridFuel` | `{ load_kw = 0, rating_kw = 0, fuel_quarter_gph = 0, fuel_half_gph = 0, fuel_t...` | _ | _ | _ |
+| calc-reliefpower.js | `computeGeneratorDroopLoadShare` | `{ unit1_kw = 0, unit1_droop_pct = 0, unit1_no_load_hz = 0, unit2_kw = 0, unit...` | _ | _ | _ |
+| calc-reliefpower.js | `computeGeneratorFleetFuelResupply` | `{ size1_count = 0, size1_kw = 0, size1_tank_gal = 0, size1_burn_gph = 0, size...` | _ | _ | _ |
+| calc-reliefpower.js | `computeGeneratorPartLoadFuel` | `{ standby_kw = 0, rating_kw = 0, fuel_quarter_gph = 0, fuel_half_gph = 0, fue...` | _ | _ | _ |
+| calc-reliefpower.js | `computeMpptControllerOutputCurrent` | `{ array_w = 0, battery_v = 0, chosen_controller_a = 0 } = {}` | _ | _ | _ |
+| calc-reliefpower.js | `computeRadioSiteDutyCycleBattery` | `{ transmit_a = 0, receive_a = 0, standby_a = 0, transmit_duty_pct = 5, receiv...` | _ | _ | _ |
+| calc-reliefpower.js | `computeSplitPhaseLegBalance` | `{ rated_w = 0, per_leg_rating_a = 0, load_240_a = 0, l1_load1_a = 0, l1_load2...` | _ | _ | _ |
 | calc-reliefwater.js | `computeBoilWaterAltitude` | `{ elevation = 0, elevation_unit = "ft" } = {}` | _ | _ | _ |
 | calc-reliefwater.js | `computeContactTimeBaffling` | `{ vessel_shape = "volume", volume_gal = 0, diameter_ft = 0, length_ft = 0, wi...` | _ | _ | _ |
 | calc-reliefwater.js | `computeEmergencyWaterBleachDose` | `{ water_volume = 0, volume_unit = "gal", bleach_strength_pct = 8.25, water_co...` | _ | _ | _ |
@@ -3860,7 +3869,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 2444.
+Row count: 2453.
 
 <!-- END function-corpus-v14 -->
 
@@ -3928,7 +3937,7 @@ spec-v14 §12.1) record the v6 source-stamp recheck row in
 [docs/v6-audit.md](v6-audit.md) rather than a formula derivation,
 per spec-v14 §13.1 second paragraph.
 
-### Group A Electrical (251 tiles)
+### Group A Electrical (259 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3987,6 +3996,7 @@ per spec-v14 §13.1 second paragraph.
 | `copper-resistance` | Conductor Resistance at Temperature | NFPA; NEC Table 8 gives 1.93 ohm/1000 ft at 75 C uncoated coppe... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `counterpoise-resistance` | Counterpoise and Radial Ground Array Resistance | Project (first-principles); IEEE 80, IEEE 81 for measurement and the utility groundin... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `cp-rectifier-sizing` | Cathodic Protection Rectifier Sizing | Project (first-principles); NACE SP0169 and the manufacturer govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `critical-load-shed-tiers` | Critical Load Priority Shedding | Project (first-principles); spec-v1893 Section 3 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `datacenter-pue` | Data Center PUE and Cooling Overhead | Project (first-principles); The Green Grid measurement boundary and site meters govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `dc-shunt-sizing` | DC Ammeter Shunt Sizing | DC current-shunt sizing (Ohm's law); R = 0.05/100 = 0.0005 ohm; I = 100*25/50 = 50 A; P = 100*... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+3 more) |
 | `delta-wye-line-phase` | Wye / Delta Line-to-Phase Voltage and Current | First-principles three-phase theory; spec-v128 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -4017,9 +4027,13 @@ per spec-v14 §13.1 second paragraph.
 | `fire-alarm-nac-voltage-drop` | Fire-Alarm NAC Circuit Voltage Drop (End-of-Line) | fire-alarm NAC voltage drop (NFPA 72); CUSTV = 0.85*24 = 20.4; loop R = 2*250*(3.14/1000) = 1.57... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `fresnel-zone-clearance` | Fresnel Zone Radius and 60% Clearance | ITU-R P.526 / first-principles Fresne...; d1 = d2 = 2.5 km, D = 5 km; r1 = 17.32 sqrt(2.5 x 2.5 / (... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `fuse-let-through` | Current-Limiting Let-Through and Downstream Withstand | Project (first-principles); (I/A)^2 t = 0.0297 log10((T2+234)/(T1+234)): I = cmil x s... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `generator-altitude-temp-derate` | Generator Output Derate for Altitude and Temperature | Project (first-principles); spec-v1888 Section 3, first example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `generator-battery-hybrid-fuel` | Generator-Battery Hybrid Fuel Savings | Project (first-principles); spec-v1896 Section 3, one cycle | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `generator-conductor-445` | Generator Output Conductor at 115% (NEC 445.13) | NEC 2023 445.13(A); spec-v493 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
+| `generator-droop-load-share` | Paralleled Generator Droop Load Sharing | Project (first-principles); spec-v1891 Section 3, first example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `generator-fuel-runtime` | Generator Fuel Runtime and Backup Duration | generator fuel runtime (first-princip...; spec-v487 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `generator-motor-starting` | Generator Sizing for Motor Starting | NEC 430.110 + manufacturer locked-rot...; 25 hp Code G + 10 hp Code F + 5 hp Code B motors, 15 kW n... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `generator-part-load-fuel` | Generator Fuel at Part Load and Minimum-Load Check | Project (first-principles); spec-v1889 Section 3, first example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `generator-sizing` | Generator Sizing | Project (first-principles); Refrigerator (700 / 2200) + Lights (400 / 400) + Sump pum... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `gfci-afci-reference` | GFCI / AFCI Requirements Reference | NEC 2023 + project bundled GFCI/AFCI ...; Reference compute returns the per-attribute table; runner... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `gin-pole-uptower-lift` | Gin-Pole and Uptower Component Lift Load | Project (first-principles); the turbine manufacturer's uptower lifting provisions gov... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -4069,6 +4083,7 @@ per spec-v14 §13.1 second paragraph.
 | `motor-synchronous-speed-slip` | Motor Synchronous Speed, Slip, and Rotor Frequency | First-principles AC-machine theory; spec-v121 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `motor-unbalance-derate` | Motor Derating for Voltage Unbalance (NEMA MG-1) | NEMA MG-1; avg 455, max dev 5 -> 1.10% unbalance -> derate ~0.977 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `motor-vd-starting` | Motor Starting Voltage Dip | Ohm's-law voltage-drop method (first ...; 480 V 3ph, LRC 180 A, 250 ft, 250 kcmil Cu, starting pf 0... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `mppt-controller-output-current` | MPPT Charge Controller Output Current | Project (first-principles); spec-v1894 Section 3, first example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `multi-load-vd` | Branch Voltage Drop With Multiple Loads | Project (first-principles); 12 AWG copper feeder at 120 V with 5 A @ 50 ft and 10 A @... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `multi-motor-feeder` | Feeder for a Group of Motors (NEC 430.24 / 430.62) | NFPA; spec-v124 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `mwbc-voltage-drop` | Multiwire Branch Circuit (3-Wire) Voltage Drop | three-wire circuit analysis; 12 AWG copper at 75 C, 100 ft one way (R 0.19314 ohm), 16... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -4115,6 +4130,7 @@ per spec-v14 §13.1 second paragraph.
 | `pv-string-fusing` | PV Source-Circuit Fuse Sizing (NEC 690.9) | NEC 690.9; spec-v352 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `pv-string-sizing` | Solar PV String Sizing | NFPA; Module 40 V Voc / 33 V Vmp / 0.3%/C at -10 C record low a... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `raceway-expansion-fitting` | PVC Raceway Expansion Fitting | NEC Article 352.44 / Table 352.44 (by...; 100 ft PVC, dT 100 F -> 3.38e-5 * 1200 in * 100 = 4.056 i... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `radio-site-duty-cycle-battery` | Radio and Communications Site Duty-Cycle Battery | Project (first-principles); spec-v1895 Section 3, first example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `range-demand-220-55` | Household Range Demand Load (NEC Table 220.55 Col. C) | NEC 2023 (NFPA 70); 1 range Column C = 8 kW (not 12); demand 8 kW = 33.3 A at... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `recloser-fuse-coordination` | Recloser-to-Fuse Coordination Screen | Project (first-principles); the manufacturer time-current curves and the utility prot... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `reduced-voltage-starter` | Reduced-Voltage Starter Current and Torque | reduced-voltage-starter current and t...; spec-v522 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
@@ -4142,6 +4158,7 @@ per spec-v14 §13.1 second paragraph.
 | `solar-egc-690-45` | PV Equipment Grounding Conductor (NEC 690.45) | NFPA; 20 A OCPD -> 12 AWG copper EGC (above the 14 AWG floor) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `speaker-70v-line` | 70-Volt Distributed Speaker Line | constant-voltage distributed audio pr...; sixteen 8 W taps (128 W) on a 200 W amp at 20% headroom -... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `splice-loss-mismatch` | Fusion Splice Loss from Fiber and Geometry Mismatch | Project (first-principles); splicer and fiber data and acceptance standards govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `split-phase-leg-balance` | 120/240 V Generator Leg Balance | Project (first-principles); spec-v1892 Section 3 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `standby-battery-runtime` | Standby Battery Runtime from Capacity | NFPA 72 §10.6 (by name), inverse; 18 Ah, 0.5 A standby, 2 A / 5 min alarm, 1.25 aging corre... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `standby-battery-sizing` | Fire-Alarm / Security Standby Battery | NFPA 72 §10.6 (by name); 0.5 A x 24 h + 2.0 A x 5 min, x 1.25 -> (12 + 0.1667) x 1... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `step-touch-voltage` | Tolerable Step and Touch Voltage (IEEE 80) | IEEE Std 80 (tolerable step and touch...; 0.5 s, 3000 ohm-m rock over 100, 0.1 m, 50 kg -> Cs 0.70,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -5477,7 +5494,7 @@ per spec-v14 §13.1 second paragraph.
 | `tool-maintenance` | Tool Maintenance Intervals | Project bundled tool maintenance sche...; Reference compute returns the per-attribute table; runner... | [docs/v6-audit.md](v6-audit.md) (reference cadence) |
 | `triage-quickread` | Field First Aid Triage Quick-Read | START / SALT triage protocols (projec...; Returns 4 categories + notice + citation; tested on the n... | [docs/v6-audit.md](v6-audit.md) (reference cadence) |
 
-### Group J Trucking (52 tiles)
+### Group J Trucking (53 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -5503,6 +5520,7 @@ per spec-v14 §13.1 second paragraph.
 | `fuel-surcharge` | Fuel Surcharge per Mile | Standard pegged fuel-surcharge identi...; spec-v91 section 2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `fuel-tax-ifta` | IFTA Per-Jurisdiction Fuel Tax | IFTA Articles of Agreement; 1200 mi / 6 MPG = 200 gal; (200-150) x $0.30 = $15 net due | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `gcwr-check` | Gross Combination Weight Check | 23 CFR 658.17 / 49 CFR 393.75 + GCWR ...; spec-v115 section 2.1 pinned example (18k + 60k = 78k, +2... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `generator-fleet-fuel-resupply` | Generator Fleet Fuel Resupply | Project (first-principles); spec-v1890 Section 3 (70% trips corrected from 2 to 1) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `hazmat-placard-threshold` | HazMat Placarding Threshold Screen | PHMSA; 1,001 lb Table 2 aggregate | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `hos-math` | Hours of Service Math | 49 CFR 395 (FMCSA hours of service fo...; property_70_8 / 0.5 hr on-duty + 5 hr drive + 0.5 hr off-... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `hydroplaning-speed` | Dynamic Hydroplaning Speed | NASA TN D-2056 (Horne & Dreher) / FAA...; 9 x sqrt(100) = 90 kn x 1.1507794 = 103.57 mph; spin-up 7... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -6225,6 +6243,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `wire-rope-stretch` | Wire Rope Elastic Stretch Under Load | Project (first-principles); dL = P L /(A_m E_r) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 2192. Fixture-covered or reference-cadence: 2192 / 2192.
+Tile count: 2201. Fixture-covered or reference-cadence: 2201 / 2201.
 
 <!-- END tile-index-v14 -->

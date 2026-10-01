@@ -56601,3 +56601,311 @@ test("bounds: spec-v1887 computeResponderCampSanitation pins the camp and the pe
     assert.ok(_v1887(bad).error, JSON.stringify(bad));
   }
 });
+
+// ===========================================================================
+// spec-v1888..v1896: disaster response emergency and temporary power band (calc-reliefpower.js)
+// ===========================================================================
+
+// ===========================================================================
+// spec-v1888..v1896: the 2026-09-25 disaster-response program, emergency and
+// temporary power band (calc-reliefpower.js). Eight tiles keep group "A";
+// generator-fleet-fuel-resupply keeps group "J".
+// ===========================================================================
+
+import { computeGeneratorAltitudeTempDerate as _v1888 } from "../../calc-reliefpower.js";
+test("bounds: spec-v1888 computeGeneratorAltitudeTempDerate pins the 300 kW unit at 5,000 ft", () => {
+  const base = { rated_kw: 300, site_elevation_ft: 5000, site_ambient_f: 110, altitude_threshold_ft: 1800, altitude_step_ft: 1312, altitude_rate_pct: 7, temp_threshold_f: 104, temp_step_f: 18, temp_rate_pct: 7 };
+  const r = _v1888(base);
+  assert.ok(Math.abs(r.altitude_derate_pct - 7 * 3200 / 1312) < 1e-9);
+  assert.ok(Math.abs(r.temperature_derate_pct - 7 * 6 / 18) < 1e-9);
+  assert.ok(Math.abs(r.available_kw - 241.78) < 0.01);
+  assert.ok(Math.abs(r.available_multiplied_kw - 242.98) < 0.01);
+  // The finding: added is the conservative reading, always at or below multiplied.
+  assert.ok(r.available_kw < r.available_multiplied_kw);
+  assert.strictEqual(r.governing_derate, "altitude");
+  const hi = _v1888({ ...base, site_elevation_ft: 7000, site_ambient_f: 115 });
+  assert.ok(Math.abs(hi.total_derate_pct - 32.02) < 0.01);
+  assert.ok(Math.abs(hi.available_kw - 203.93) < 0.01);
+  // Inside both thresholds: no derate, nameplate available.
+  const sea = _v1888({ ...base, site_elevation_ft: 0, site_ambient_f: 77 });
+  assert.strictEqual(sea.total_derate_pct, 0);
+  assert.strictEqual(sea.available_kw, 300);
+  // Available kW is linear in the rating and falls monotonically with elevation.
+  assert.ok(Math.abs(_v1888({ ...base, rated_kw: 600 }).available_kw - 2 * r.available_kw) < 1e-9);
+  assert.ok(_v1888({ ...base, site_elevation_ft: 6000 }).available_kw < r.available_kw);
+  assert.ok("error" in _v1888({ ...base, site_elevation_ft: 30000 }));
+  assert.ok("error" in _v1888({ ...base, rated_kw: 0 }));
+  assert.ok("error" in _v1888({ ...base, altitude_step_ft: 0 }));
+  assert.ok("error" in _v1888({ ...base, temp_step_f: -1 }));
+  assert.ok("error" in _v1888({ ...base, altitude_rate_pct: 0 }));
+  assert.ok("error" in _v1888({ ...base, temp_rate_pct: 0 }));
+  assert.ok("error" in _v1888({ ...base, rated_kw: Infinity }));
+});
+
+import { computeGeneratorPartLoadFuel as _v1889 } from "../../calc-reliefpower.js";
+test("bounds: spec-v1889 computeGeneratorPartLoadFuel pins the C60D6R curve and the 30% floor", () => {
+  const base = { standby_kw: 60, rating_kw: 55, fuel_quarter_gph: 1.5, fuel_half_gph: 2.5, fuel_three_quarter_gph: 3.4, fuel_full_gph: 4.6, load_kw: 20 };
+  const r = _v1889(base);
+  assert.ok(Math.abs(r.fuel_gph - (1.5 + 6.25 / 13.75)) < 1e-12);
+  assert.ok(Math.abs(r.kwh_per_gal - 10.2326) < 1e-3);
+  assert.ok(Math.abs(r.full_load_kwh_per_gal - 55 / 4.6) < 1e-12);
+  assert.strictEqual(r.meets_minimum, true);
+  assert.strictEqual(r.load_bank_kw, 0);
+  assert.strictEqual(r.extrapolated, false);
+  // The finding: light load costs fuel per kWh and trips the floor.
+  const night = _v1889({ ...base, load_kw: 12 });
+  assert.ok(Math.abs(night.fuel_gph - 1.3727) < 1e-3);
+  assert.strictEqual(night.extrapolated, true);
+  assert.strictEqual(night.meets_minimum, false);
+  assert.ok(Math.abs(night.load_bank_kw - 6) < 1e-12);
+  assert.ok(night.kwh_per_gal < r.kwh_per_gal);
+  // Published points are reproduced exactly; fuel rises with load.
+  assert.ok(Math.abs(_v1889({ ...base, load_kw: 27.5 }).fuel_gph - 2.5) < 1e-12);
+  assert.ok(Math.abs(_v1889({ ...base, load_kw: 41.25 }).fuel_gph - 3.4) < 1e-12);
+  assert.ok(Math.abs(_v1889({ ...base, load_kw: 55 }).fuel_gph - 4.6) < 1e-12);
+  assert.ok(_v1889({ ...base, load_kw: 30 }).fuel_gph > r.fuel_gph);
+  // Floor is exactly 30% of STANDBY, not of the prime rating.
+  assert.strictEqual(_v1889({ ...base, load_kw: 18 }).meets_minimum, true);
+  assert.ok("error" in _v1889({ ...base, load_kw: 56 }));
+  assert.ok("error" in _v1889({ ...base, load_kw: 0 }));
+  // A steep first segment extended below 1/4 load reaches zero burn: refused.
+  assert.ok("error" in _v1889({ ...base, fuel_half_gph: 4, fuel_three_quarter_gph: 4.2, load_kw: 1 }));
+  assert.ok("error" in _v1889({ ...base, standby_kw: 0 }));
+  assert.ok("error" in _v1889({ ...base, rating_kw: 0 }));
+  assert.ok("error" in _v1889({ ...base, rating_kw: 61 }));
+  assert.ok("error" in _v1889({ ...base, fuel_quarter_gph: 0 }));
+  assert.ok("error" in _v1889({ ...base, fuel_three_quarter_gph: 2.4 }));
+  assert.ok("error" in _v1889({ ...base, fuel_full_gph: NaN }));
+});
+
+import { computeGeneratorFleetFuelResupply as _v1890 } from "../../calc-reliefpower.js";
+test("bounds: spec-v1890 computeGeneratorFleetFuelResupply pins the county fleet and the 21.4 h route", () => {
+  const base = { size1_count: 4, size1_kw: 60, size1_tank_gal: 100, size1_burn_gph: 0, size2_count: 6, size2_kw: 150, size2_tank_gal: 300, size2_burn_gph: 0, size3_count: 2, size3_kw: 300, size3_tank_gal: 500, size3_burn_gph: 0, usable_fraction: 0.9, truck_gal: 2400 };
+  const r = _v1890(base);
+  assert.strictEqual(r.fleet_kw, 1740);
+  assert.ok(Math.abs(r.fleet_fuel_gal_per_day - 0.07 * 1740 * 24) < 1e-9);
+  assert.strictEqual(r.trips_per_day, 2);
+  // At 70% the fleet fits one 2,400 gal truck (the spec's "still 2 trips" was wrong).
+  assert.ok(Math.abs(r.fleet_fuel_70_gal_per_day - 2046.24) < 1e-6);
+  assert.strictEqual(r.trips_per_day_70, 1);
+  assert.ok(Math.abs(r.size2_interval_hours - 270 / 10.5) < 1e-9);
+  // The finding: the smallest and largest units tie for the shortest interval.
+  assert.ok(Math.abs(r.shortest_interval_hours - 90 / 4.2) < 1e-9);
+  assert.ok(/size 1/.test(r.shortest_sizes) && /size 3/.test(r.shortest_sizes));
+  // An entered burn replaces the rule and lengthens the interval.
+  const known = _v1890({ ...base, size1_burn_gph: 2.5 });
+  assert.ok(Math.abs(known.size1_interval_hours - 36) < 1e-9);
+  assert.ok(known.fleet_fuel_gal_per_day < r.fleet_fuel_gal_per_day);
+  // Daily fuel is linear in the unit count; an unused size drops out.
+  assert.ok(Math.abs(_v1890({ ...base, size2_count: 12 }).fleet_fuel_gal_per_day - r.fleet_fuel_gal_per_day - 6 * 150 * 0.07 * 24) < 1e-9);
+  const two = _v1890({ ...base, size3_count: 0 });
+  assert.strictEqual(two.size3_interval_hours, null);
+  assert.strictEqual(two.fleet_kw, 1140);
+  assert.ok("error" in _v1890({ ...base, size1_count: 0, size2_count: 0, size3_count: 0 }));
+  assert.ok("error" in _v1890({ ...base, size1_count: -1 }));
+  assert.ok("error" in _v1890({ ...base, size1_count: 1.5 }));
+  assert.ok("error" in _v1890({ ...base, size2_kw: 0 }));
+  assert.ok("error" in _v1890({ ...base, size3_tank_gal: 0 }));
+  assert.ok("error" in _v1890({ ...base, size1_burn_gph: -1 }));
+  assert.ok("error" in _v1890({ ...base, usable_fraction: 0 }));
+  assert.ok("error" in _v1890({ ...base, usable_fraction: 1.1 }));
+  assert.ok("error" in _v1890({ ...base, truck_gal: 0 }));
+  assert.ok("error" in _v1890({ ...base, truck_gal: Infinity }));
+});
+
+import { computeGeneratorDroopLoadShare as _v1891 } from "../../calc-reliefpower.js";
+test("bounds: spec-v1891 computeGeneratorDroopLoadShare pins the mismatched pair and the early overload", () => {
+  const base = { unit1_kw: 100, unit1_droop_pct: 3, unit1_no_load_hz: 61.8, unit2_kw: 200, unit2_droop_pct: 5, unit2_no_load_hz: 63, unit3_kw: 0, unit3_droop_pct: 0, unit3_no_load_hz: 0, rated_hz: 60, load_kw: 180 };
+  const r = _v1891(base);
+  assert.ok(Math.abs(r.unit1_kw_per_hz - 100 / 1.8) < 1e-9);
+  assert.ok(Math.abs(r.unit2_kw_per_hz - 200 / 3) < 1e-9);
+  assert.ok(Math.abs(r.bus_hz - 60.9818) < 1e-3);
+  assert.ok(Math.abs(r.unit1_load_kw - 45.45) < 0.01);
+  assert.ok(Math.abs(r.unit2_load_kw - 134.55) < 0.01);
+  // Shares always add to the load.
+  assert.ok(Math.abs(r.unit1_load_kw + r.unit2_load_kw - 180) < 1e-9);
+  assert.strictEqual(r.unit3_load_kw, null);
+  assert.ok(Math.abs(r.first_full_load_kw - 300) < 1e-9);
+  // The finding: a half-hertz setpoint change puts the big unit at its rating at 272 kW.
+  const hi = _v1891({ ...base, unit2_no_load_hz: 63.5 });
+  assert.strictEqual(hi.first_full_unit, "unit 2");
+  assert.ok(Math.abs(hi.first_full_load_kw - 272.22) < 0.01);
+  assert.ok(Math.abs(hi.first_full_bus_hz - 60.5) < 1e-9);
+  const over = _v1891({ ...base, unit2_no_load_hz: 63.5, load_kw: 290 });
+  assert.strictEqual(over.unit2_overloaded, true);
+  assert.strictEqual(over.any_overloaded, true);
+  assert.ok(/OVERLOAD/.test(over.verdict));
+  // Matched settings share in proportion to rating.
+  const m = _v1891({ ...base, unit1_droop_pct: 4, unit2_droop_pct: 4, unit1_no_load_hz: 62.4, unit2_no_load_hz: 62.4 });
+  assert.ok(Math.abs(m.unit1_load_pct - 60) < 1e-9 && Math.abs(m.unit2_load_pct - 60) < 1e-9);
+  assert.ok(Math.abs(m.bus_hz - 60.96) < 1e-9);
+  assert.ok(Math.abs(r.matched_bus_hz - 60.96) < 1e-9);
+  // Bus frequency falls as load rises; a third unit joins the solve.
+  assert.ok(_v1891({ ...base, load_kw: 250 }).bus_hz < r.bus_hz);
+  const three = _v1891({ ...base, unit3_kw: 100, unit3_droop_pct: 3, unit3_no_load_hz: 61.8 });
+  assert.ok(Math.abs(three.unit1_load_kw + three.unit2_load_kw + three.unit3_load_kw - 180) < 1e-9);
+  // A low setpoint at light load drives a unit as a motor.
+  assert.strictEqual(_v1891({ ...base, unit1_no_load_hz: 60.1, load_kw: 20 }).any_motoring, true);
+  assert.ok("error" in _v1891({ ...base, load_kw: 300 }));
+  assert.ok("error" in _v1891({ ...base, load_kw: 0 }));
+  assert.ok("error" in _v1891({ ...base, unit2_kw: 0 }));
+  assert.ok("error" in _v1891({ ...base, unit3_kw: -5 }));
+  assert.ok("error" in _v1891({ ...base, unit3_kw: 100 }));
+  assert.ok("error" in _v1891({ ...base, unit1_droop_pct: 0 }));
+  assert.ok("error" in _v1891({ ...base, unit1_droop_pct: 100 }));
+  assert.ok("error" in _v1891({ ...base, unit1_no_load_hz: 60 }));
+  assert.ok("error" in _v1891({ ...base, rated_hz: 0 }));
+  assert.ok("error" in _v1891({ ...base, load_kw: Infinity }));
+});
+
+import { computeSplitPhaseLegBalance as _v1892 } from "../../calc-reliefpower.js";
+test("bounds: spec-v1892 computeSplitPhaseLegBalance pins L1 at 80% with the total at 68%", () => {
+  const base = { rated_w: 10800, per_leg_rating_a: 0, load_240_a: 10, l1_load1_a: 6, l1_load2_a: 8, l1_load3_a: 12, l1_load4_a: 0, l2_load1_a: 5, l2_load2_a: 3, l2_load3_a: 7, l2_load4_a: 0 };
+  const r = _v1892(base);
+  assert.strictEqual(r.leg_rating_a, 45);
+  assert.strictEqual(r.l1_a, 36);
+  assert.strictEqual(r.l2_a, 25);
+  assert.strictEqual(r.l1_pct, 80);
+  assert.strictEqual(r.neutral_a, 11);
+  assert.strictEqual(r.total_w, 7320);
+  assert.ok(Math.abs(r.total_pct - 67.78) < 0.01);
+  assert.strictEqual(r.balanced_leg_a, 30.5);
+  assert.strictEqual(r.heavier_leg, "L1");
+  // Moving the sump pump (8 A) to L2 gives 28 A and 33 A.
+  const moved = _v1892({ ...base, l1_load2_a: 0, l2_load4_a: 8 });
+  assert.strictEqual(moved.l1_a, 28);
+  assert.strictEqual(moved.l2_a, 33);
+  assert.strictEqual(moved.total_w, r.total_w);
+  // The finding: a leg over its rating while the total is not.
+  const lop = _v1892({ ...base, l1_load4_a: 12 });
+  assert.strictEqual(lop.leg_over_while_total_not, true);
+  assert.ok(/A LEG IS OVER/.test(lop.verdict));
+  // 240 V loads carry no neutral current; a stated per-leg rating overrides.
+  assert.strictEqual(_v1892({ ...base, load_240_a: 30 }).neutral_a, 11);
+  assert.strictEqual(_v1892({ ...base, per_leg_rating_a: 40 }).leg_rating_a, 40);
+  assert.ok(/OVER the generator/.test(_v1892({ ...base, rated_w: 5000 }).verdict));
+  assert.ok("error" in _v1892({ ...base, rated_w: 0 }));
+  assert.ok("error" in _v1892({ ...base, per_leg_rating_a: -1 }));
+  assert.ok("error" in _v1892({ ...base, load_240_a: -1 }));
+  assert.ok("error" in _v1892({ ...base, l2_load3_a: -0.5 }));
+  assert.ok("error" in _v1892({ ...base, rated_w: NaN }));
+});
+
+import { computeCriticalLoadShedTiers as _v1893 } from "../../calc-reliefpower.js";
+test("bounds: spec-v1893 computeCriticalLoadShedTiers sheds the optional tier and pins the battery hours", () => {
+  const base = { source_kw: 128, tier1_kw: 40, tier2_kw: 55, tier3_kw: 70, tier4_kw: 0, usable_kwh: 400 };
+  const r = _v1893(base);
+  assert.strictEqual(r.served_kw, 95);
+  assert.strictEqual(r.shed_kw, 70);
+  assert.strictEqual(r.tiers_served, 2);
+  assert.ok(Math.abs(r.served_pct - 100 * 95 / 165) < 1e-9);
+  assert.ok(Math.abs(r.utilization_pct - 100 * 95 / 128) < 1e-9);
+  assert.strictEqual(r.headroom_kw, 33);
+  // The finding: the emergency tier alone buys four times the hours of everything.
+  assert.strictEqual(r.runtime_tier1_hours, 10);
+  assert.ok(Math.abs(r.runtime_tiers12_hours - 400 / 95) < 1e-12);
+  assert.ok(Math.abs(r.runtime_all_hours - 400 / 165) < 1e-12);
+  // Whole tiers only: an exact fit is served, one kW more sheds the tier.
+  assert.strictEqual(_v1893({ ...base, source_kw: 165 }).tiers_served, 4);
+  assert.strictEqual(_v1893({ ...base, source_kw: 94 }).tiers_served, 1);
+  assert.strictEqual(_v1893({ ...base, source_kw: 30 }).served_kw, 0);
+  // A lower tier that would fit is still shed once a higher tier is shed.
+  assert.strictEqual(_v1893({ ...base, tier4_kw: 10 }).served_kw, 95);
+  // No stored energy: runtimes are null, never Infinity.
+  const fuel = _v1893({ ...base, usable_kwh: 0 });
+  assert.strictEqual(fuel.runtime_served_hours, null);
+  assert.strictEqual(_v1893({ ...base, tier1_kw: 0 }).runtime_tier1_hours, null);
+  assert.ok("error" in _v1893({ ...base, source_kw: 0 }));
+  assert.ok("error" in _v1893({ ...base, tier2_kw: -1 }));
+  assert.ok("error" in _v1893({ ...base, usable_kwh: -1 }));
+  assert.ok("error" in _v1893({ ...base, tier1_kw: 0, tier2_kw: 0, tier3_kw: 0 }));
+  assert.ok("error" in _v1893({ ...base, source_kw: Infinity }));
+});
+
+import { computeMpptControllerOutputCurrent as _v1894 } from "../../calc-reliefpower.js";
+test("bounds: spec-v1894 computeMpptControllerOutputCurrent pins 66.7 A on 48 V and 266.7 A on 12 V", () => {
+  const base = { array_w: 3200, battery_v: 48, chosen_controller_a: 0 };
+  const r = _v1894(base);
+  assert.ok(Math.abs(r.output_current_a - 3200 / 48) < 1e-12);
+  assert.strictEqual(r.controller_a, 80);
+  assert.strictEqual(r.controller_count, 1);
+  assert.ok(Math.abs(r.array_ratio - 3200 / 3840) < 1e-12);
+  assert.strictEqual(r.min_conductor_a, 100);
+  // The finding: quartering the battery voltage quadruples the current.
+  const low = _v1894({ ...base, battery_v: 12 });
+  assert.ok(Math.abs(low.output_current_a - 4 * r.output_current_a) < 1e-9);
+  assert.strictEqual(low.controller_count, 3);
+  assert.strictEqual(low.controller_a, 100);
+  assert.ok(Math.abs(_v1894({ ...base, battery_v: 24 }).output_current_a - 133.333) < 1e-3);
+  // Exact standard current picks that rating; a chosen smaller controller clips.
+  assert.strictEqual(_v1894({ array_w: 960, battery_v: 24 }).controller_a, 40);
+  const clip = _v1894({ ...base, chosen_controller_a: 60 });
+  assert.strictEqual(clip.controller_count, 1);
+  assert.ok(Math.abs(clip.array_ratio - 3200 / 2880) < 1e-12);
+  assert.ok(/clips/.test(clip.clipping));
+  assert.strictEqual(clip.min_conductor_a, 75);
+  assert.ok(_v1894({ array_w: 1000, battery_v: 24 }).array_ratio <= 1);
+  assert.ok("error" in _v1894({ ...base, array_w: 0 }));
+  assert.ok("error" in _v1894({ ...base, battery_v: 0 }));
+  assert.ok("error" in _v1894({ ...base, chosen_controller_a: -10 }));
+  assert.ok("error" in _v1894({ ...base, array_w: Infinity }));
+});
+
+import { computeRadioSiteDutyCycleBattery as _v1895 } from "../../calc-reliefpower.js";
+test("bounds: spec-v1895 computeRadioSiteDutyCycleBattery pins the 5-5-90 base station and the busy repeater", () => {
+  const base = { transmit_a: 12, receive_a: 1.2, standby_a: 0.8, transmit_duty_pct: 5, receive_duty_pct: 5, standby_duty_pct: 90, runtime_hours: 72, depth_of_discharge_fraction: 0.5 };
+  const r = _v1895(base);
+  assert.ok(Math.abs(r.average_a - 1.38) < 1e-12);
+  assert.ok(Math.abs(r.runtime_ah - 99.36) < 1e-9);
+  assert.ok(Math.abs(r.battery_nameplate_ah - 198.72) < 1e-9);
+  assert.ok(Math.abs(r.daily_ah - 33.12) < 1e-9);
+  // The finding: 5% of the time on transmit is 43% of the energy.
+  assert.ok(Math.abs(r.transmit_energy_share_pct - 43.48) < 0.01);
+  const rpt = _v1895({ ...base, transmit_duty_pct: 25, receive_duty_pct: 25, standby_duty_pct: 50 });
+  assert.ok(Math.abs(rpt.average_a - 3.7) < 1e-12);
+  assert.ok(Math.abs(rpt.battery_nameplate_ah - 532.8) < 1e-9);
+  // Linear in runtime; inverse in depth of discharge.
+  assert.ok(Math.abs(_v1895({ ...base, runtime_hours: 144 }).runtime_ah - 2 * r.runtime_ah) < 1e-9);
+  assert.ok(Math.abs(_v1895({ ...base, depth_of_discharge_fraction: 1 }).battery_nameplate_ah - r.runtime_ah) < 1e-9);
+  assert.strictEqual(_v1895({ ...base, transmit_a: 0, receive_a: 0, standby_a: 0 }).transmit_energy_share_pct, 0);
+  assert.ok("error" in _v1895({ ...base, standby_duty_pct: 80 }));
+  assert.ok("error" in _v1895({ ...base, transmit_duty_pct: -5, standby_duty_pct: 100 }));
+  assert.ok("error" in _v1895({ ...base, transmit_a: -1 }));
+  assert.ok("error" in _v1895({ ...base, runtime_hours: 0 }));
+  assert.ok("error" in _v1895({ ...base, depth_of_discharge_fraction: 0 }));
+  assert.ok("error" in _v1895({ ...base, depth_of_discharge_fraction: 1.2 }));
+  assert.ok("error" in _v1895({ ...base, runtime_hours: Infinity }));
+});
+
+import { computeGeneratorBatteryHybridFuel as _v1896 } from "../../calc-reliefpower.js";
+test("bounds: spec-v1896 computeGeneratorBatteryHybridFuel pins 9.65 h, a 14% saving, and the battery per cycle", () => {
+  const base = { load_kw: 15, rating_kw: 55, fuel_quarter_gph: 1.5, fuel_half_gph: 2.5, fuel_three_quarter_gph: 3.4, fuel_full_gph: 4.6, setpoint_kw: 41.25, round_trip_efficiency: 0.85, cycles_per_day: 1 };
+  const r = _v1896(base);
+  assert.ok(Math.abs(r.generator_hours_per_day - 360 / (15 + 26.25 * 0.85)) < 1e-12);
+  assert.ok(Math.abs(r.hybrid_gal_per_day - 32.80) < 0.01);
+  assert.ok(Math.abs(r.continuous_gal_per_day - 24 * (1.5 + 1.25 / 13.75)) < 1e-9);
+  assert.ok(Math.abs(r.saving_gal_per_day - 5.378) < 1e-3);
+  assert.ok(Math.abs(r.saving_pct - 14.08) < 0.01);
+  assert.ok(Math.abs(r.battery_kwh_per_cycle - 215.28) < 0.01);
+  // The finding: the cycle count changes only the battery, not the fuel.
+  const four = _v1896({ ...base, cycles_per_day: 4 });
+  assert.ok(Math.abs(four.battery_kwh_per_cycle - r.battery_kwh_per_cycle / 4) < 1e-9);
+  assert.strictEqual(four.hybrid_gal_per_day, r.hybrid_gal_per_day);
+  // Energy balance closes: stored x eta = drawn.
+  assert.ok(Math.abs((41.25 - 15) * 0.85 * r.generator_hours_per_day - 15 * (24 - r.generator_hours_per_day)) < 1e-9);
+  // A perfect battery needs fewer hours; hours fall as the set point rises.
+  assert.ok(_v1896({ ...base, round_trip_efficiency: 1 }).generator_hours_per_day < r.generator_hours_per_day);
+  assert.ok(_v1896({ ...base, setpoint_kw: 55 }).generator_hours_per_day < r.generator_hours_per_day);
+  // A very lossy battery can burn more than running continuously.
+  assert.ok(/BURNS MORE/.test(_v1896({ ...base, round_trip_efficiency: 0.2 }).fuel_verdict));
+  assert.ok("error" in _v1896({ ...base, load_kw: 0 }));
+  assert.ok("error" in _v1896({ ...base, rating_kw: 0 }));
+  assert.ok("error" in _v1896({ ...base, setpoint_kw: 15 }));
+  assert.ok("error" in _v1896({ ...base, setpoint_kw: 60 }));
+  assert.ok("error" in _v1896({ ...base, round_trip_efficiency: 0 }));
+  assert.ok("error" in _v1896({ ...base, round_trip_efficiency: 1.1 }));
+  assert.ok("error" in _v1896({ ...base, cycles_per_day: 0 }));
+  assert.ok("error" in _v1896({ ...base, fuel_half_gph: 1.4 }));
+  assert.ok("error" in _v1896({ ...base, fuel_half_gph: 4, fuel_three_quarter_gph: 4.2, load_kw: 1 }));
+  assert.ok("error" in _v1896({ ...base, cycles_per_day: Infinity }));
+});

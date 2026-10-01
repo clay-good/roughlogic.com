@@ -2200,4 +2200,13 @@ export const RENDERER_MAP = {
   "lift-station-outage-storage": { module: "../../calc-reliefwater.js", exportName: "RELIEFWATER_RENDERERS" },
   "osha-toilet-count": { module: "../../calc-reliefwater.js", exportName: "RELIEFWATER_RENDERERS" },
   "responder-camp-sanitation": { module: "../../calc-reliefwater.js", exportName: "RELIEFWATER_RENDERERS" },
+  "generator-altitude-temp-derate": { module: "../../calc-reliefpower.js", exportName: "RELIEFPOWER_RENDERERS" },
+  "generator-part-load-fuel": { module: "../../calc-reliefpower.js", exportName: "RELIEFPOWER_RENDERERS" },
+  "generator-fleet-fuel-resupply": { module: "../../calc-reliefpower.js", exportName: "RELIEFPOWER_RENDERERS" },
+  "generator-droop-load-share": { module: "../../calc-reliefpower.js", exportName: "RELIEFPOWER_RENDERERS" },
+  "split-phase-leg-balance": { module: "../../calc-reliefpower.js", exportName: "RELIEFPOWER_RENDERERS" },
+  "critical-load-shed-tiers": { module: "../../calc-reliefpower.js", exportName: "RELIEFPOWER_RENDERERS" },
+  "mppt-controller-output-current": { module: "../../calc-reliefpower.js", exportName: "RELIEFPOWER_RENDERERS" },
+  "radio-site-duty-cycle-battery": { module: "../../calc-reliefpower.js", exportName: "RELIEFPOWER_RENDERERS" },
+  "generator-battery-hybrid-fuel": { module: "../../calc-reliefpower.js", exportName: "RELIEFPOWER_RENDERERS" },
 };
