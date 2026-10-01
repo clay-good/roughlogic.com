@@ -59,6 +59,12 @@ carries a 42 hp THERMAL rating at 104 degF ambient, the thermal rating governs, 
 the fix is a cooling fan, an oil cooler, or a larger case -- not a bigger gearset. Choosing on the 25 hp motor
 nameplate would have selected a 30 hp box, 40% under the mechanical requirement and 65% under it thermally.
 
+**Amended 2026-10-01.** The thermal check above applies the service factor where the manufacturer says not to.
+Rexnord Falk 161-110 (p. 14): "It is not necessary to apply the mechanical service factor to the basic thermal
+rating"; the thermal rating must cover the power actually transmitted. A 42 hp thermal rating on a 25 hp load
+passes, and the unit carries up to 30 hp (60 / 2.0). The example now uses a 22 hp thermal rating, which is
+3 hp short of the 25 hp transmitted.
+
 ## 4. Scope and non-goals
 
 A service-factor lookup and a margin check against ratings the user reads from a catalog. It does not ship

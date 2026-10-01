@@ -287,10 +287,11 @@ LINEWORKER_RENDERERS["conductor-sag-at-temperature"] = _simpleRenderer({
 
 // ============ spec-v1452: conductor blowout and horizontal clearance ============
 
-// dims: in { conductor_diameter_in: L, weight_lb_per_ft: M / L, wind_pressure_psf: M L^-1 T^-2, wind_speed_mph: L / T, sag_ft: L, still_air_clearance_ft: L } out: { wind_load_lb_per_ft: M / L, swing_angle_deg: dimensionless, blowout_ft: L, remaining_clearance_ft: L, pressure_at_zero_clearance_psf: M L^-1 T^-2 }
-export function computeConductorBlowout({ conductor_diameter_in = 0, weight_lb_per_ft = 0, wind_pressure_psf = 0, wind_speed_mph = 0, sag_ft = 0, still_air_clearance_ft = 0 } = {}) {
+// dims: in { conductor_diameter_in: L, weight_lb_per_ft: M / L, wind_pressure_psf: M L^-1 T^-2, wind_speed_mph: L / T, sag_ft: L, still_air_clearance_ft: L, insulator_length_ft: L } out: { wind_load_lb_per_ft: M / L, swing_angle_deg: dimensionless, blowout_ft: L, remaining_clearance_ft: L, pressure_at_zero_clearance_psf: M L^-1 T^-2 }
+export function computeConductorBlowout({ conductor_diameter_in = 0, weight_lb_per_ft = 0, wind_pressure_psf = 0, wind_speed_mph = 0, sag_ft = 0, still_air_clearance_ft = 0, insulator_length_ft = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(conductor_diameter_in > 0)) return { error: "Conductor diameter must be positive (in)." };
+  if (insulator_length_ft < 0) return { error: "Insulator string length cannot be negative (ft)." };
   if (!(weight_lb_per_ft > 0)) return { error: "Conductor weight per foot must be positive (lb/ft)." };
   if (!(sag_ft > 0)) return { error: "Midspan sag must be positive (ft)." };
   if (still_air_clearance_ft < 0) return { error: "Still-air clearance cannot be negative (ft)." };
@@ -307,13 +308,17 @@ export function computeConductorBlowout({ conductor_diameter_in = 0, weight_lb_p
   // span and not on tension. The blowout DISTANCE is what carries the sag.
   const swing_angle_rad = Math.atan(wind_load_lb_per_ft / weight_lb_per_ft);
   const swing_angle_deg = swing_angle_rad * 180 / Math.PI;
-  const blowout_ft = sag_ft * Math.sin(swing_angle_rad);
+  // RUS 1724E-200 Eq. 5-1: y = (l_i + S_f) sin(phi) -- a suspension string
+  // swings through the same angle and adds its own length. Until 2026-10-01
+  // only the sag swung, about 2.5 ft short for a 5-6 ft string at 6 psf on Drake.
+  const swing_length_ft = insulator_length_ft + sag_ft;
+  const blowout_ft = swing_length_ft * Math.sin(swing_angle_rad);
   const remaining_clearance_ft = still_air_clearance_ft - blowout_ft;
   // The pressure at which the blowout exactly eats the still-air clearance:
-  // sag sin(theta) = C, so sin(theta) = C/sag, and p = w tan(theta) x 12/d.
+  // (string + sag) sin(theta) = C, so sin(theta) = C/(string + sag), and p = w tan(theta) x 12/d.
   let pressure_at_zero_clearance_psf = null;
-  if (still_air_clearance_ft > 0 && still_air_clearance_ft < sag_ft) {
-    const sinT = still_air_clearance_ft / sag_ft;
+  if (still_air_clearance_ft > 0 && still_air_clearance_ft < swing_length_ft) {
+    const sinT = still_air_clearance_ft / swing_length_ft;
     const tanT = sinT / Math.sqrt(1 - sinT * sinT);
     pressure_at_zero_clearance_psf = weight_lb_per_ft * tanT / projected_area_ft2_per_ft;
   }
@@ -323,21 +328,21 @@ export function computeConductorBlowout({ conductor_diameter_in = 0, weight_lb_p
     pressure_psf, pressure_from_speed_psf, projected_area_ft2_per_ft,
     wind_load_lb_per_ft, swing_angle_deg, blowout_ft,
     still_air_clearance_ft, remaining_clearance_ft, pressure_at_zero_clearance_psf,
-    sag_ft, clears: remaining_clearance_ft >= 0,
+    sag_ft, insulator_length_ft, swing_length_ft, clears: remaining_clearance_ft >= 0,
     clearance_verdict: still_air_clearance_ft <= 0
       ? "(no still-air clearance entered)"
       : remaining_clearance_ft >= 0
         ? fmt(remaining_clearance_ft, 2) + " ft left"
         : "the conductor reaches the object with " + fmt(-remaining_clearance_ft, 2) + " ft to spare on the wrong side",
     exhaust_verdict: pressure_at_zero_clearance_psf === null
-      ? (still_air_clearance_ft >= sag_ft ? "no wind exhausts this clearance: the sag is smaller than the clearance, so the conductor cannot reach the object however hard it blows" : "(no still-air clearance entered)")
+      ? (still_air_clearance_ft >= swing_length_ft ? "no wind exhausts this clearance: the sag plus the insulator string is smaller than the clearance, so the conductor cannot reach the object however hard it blows" : "(no still-air clearance entered)")
       : fmt(pressure_at_zero_clearance_psf, 2) + " psf exhausts it, about " + fmt(Math.sqrt(pressure_at_zero_clearance_psf / _ASCE_VELOCITY_PRESSURE), 0) + " mph",
-    note: "Ground clearance is checked straight down and nothing checks sideways, but a conductor in wind swings out of the plane of the poles like a hinged sheet, through the angle whose tangent is the wind load per foot over the weight per foot. Enter the sag under the wind load itself (RUS 1724E-200: final sag at 60 F with the 6 psf displacement wind, a little more than the still-air sag), and the horizontal displacement at midspan is the sag times the sine of that angle. Two things fall out. The swing angle is independent of span and of tension: it depends only on the ratio of wind load to weight, so it is the same for a short span and a long one in the same wind. But the blowout DISTANCE is proportional to sag, so the long, slack spans blow out furthest, and they do it on exactly the hot, sagging days when vertical clearance is also at its worst. And a light conductor blows out far further than a heavy one in the same wind: ACSR Drake at 1.108 in and 1.094 lb/ft in a 9 psf wind swings 37.2 degrees and moves 7.26 ft, and at half that weight in the same wind it swings 56.7 degrees and moves 10.0 ft. That is why small distribution conductor near buildings and tree lines is the recurring problem rather than the transmission line overhead. The pressure at which a stated clearance is exhausted is reported so a span can be judged against a design wind rather than against one arbitrary gust. This is midspan blowout on a level span with the conductor treated as swinging rigidly about the chord between attachment points. It does not model the restraint a suspension insulator string imposes near the structures, which reduces blowout there and is why midspan is the governing point; it does not evaluate conductor-to-conductor clearance under differential swing, where adjacent phases swing by different amounts and can approach each other; and it does not address galloping, aeolian vibration, or the dynamic response of a conductor in gusty wind. It does not check vertical clearance. The applicable NESC edition, the utility's construction standards, and the right-of-way requirements govern.",
+    note: "Ground clearance is checked straight down and nothing checks sideways, but a conductor in wind swings out of the plane of the poles like a hinged sheet, through the angle whose tangent is the wind load per foot over the weight per foot. Enter the sag under the wind load itself (RUS 1724E-200: final sag at 60 F with the 6 psf displacement wind, a little more than the still-air sag), and the horizontal displacement at midspan is the sag times the sine of that angle. Two things fall out. The swing angle is independent of span and of tension: it depends only on the ratio of wind load to weight, so it is the same for a short span and a long one in the same wind. But the blowout DISTANCE is proportional to sag, so the long, slack spans blow out furthest, and they do it on exactly the hot, sagging days when vertical clearance is also at its worst. And a light conductor blows out far further than a heavy one in the same wind: ACSR Drake at 1.108 in and 1.094 lb/ft in a 9 psf wind swings 37.2 degrees and moves 7.26 ft, and at half that weight in the same wind it swings 56.7 degrees and moves 10.0 ft. That is why small distribution conductor near buildings and tree lines is the recurring problem rather than the transmission line overhead. The pressure at which a stated clearance is exhausted is reported so a span can be judged against a design wind rather than against one arbitrary gust. This is midspan blowout on a level span with the conductor treated as swinging rigidly about the chord between attachment points. A suspension insulator string swings through the same angle and adds its length to the swing (RUS 1724E-200 Eq. 5-1, y = (l_i + S_f) sin phi), so enter the string length for suspension construction and 0 for pin or post insulators; near the structures the string's restraint reduces the conductor's own swing, which is why midspan governs; it does not evaluate conductor-to-conductor clearance under differential swing, where adjacent phases swing by different amounts and can approach each other; and it does not address galloping, aeolian vibration, or the dynamic response of a conductor in gusty wind. It does not check vertical clearance. The applicable NESC edition, the utility's construction standards, and the right-of-way requirements govern.",
   };
 }
 const conductorBlowoutExample = { inputs: { conductor_diameter_in: 1.108, weight_lb_per_ft: 1.094, wind_pressure_psf: 9, wind_speed_mph: 0, sag_ft: 12, still_air_clearance_ft: 10 } };
 LINEWORKER_RENDERERS["conductor-blowout"] = _simpleRenderer({
-  citation: "Citation: the transverse blowout relation by name -- wind load per foot = pressure x diameter / 12, swing angle = atan(wind load / weight per foot), and blowout = sag x sin(swing angle). A wind speed entered instead of a pressure is converted with the ASCE 7 constant 0.00256 V^2, the same relation the wind-pressure calculator uses. The applicable NESC edition, the utility's construction standards, and the right-of-way requirements govern.",
+  citation: "Citation: the transverse blowout relation by name -- wind load per foot = pressure x diameter / 12, swing angle = atan(wind load / weight per foot), and blowout = (insulator string length + sag) x sin(swing angle), RUS 1724E-200 Eq. 5-1. A wind speed entered instead of a pressure is converted with the ASCE 7 constant 0.00256 V^2, the same relation the wind-pressure calculator uses. The applicable NESC edition, the utility's construction standards, and the right-of-way requirements govern.",
   example: conductorBlowoutExample.inputs,
   fields: [
     { key: "conductor_diameter_in", label: "Conductor diameter (in)", kind: "number", default: 1.108 },
@@ -346,11 +351,12 @@ LINEWORKER_RENDERERS["conductor-blowout"] = _simpleRenderer({
     { key: "wind_speed_mph", label: "Wind speed (mph, used when no pressure is entered)", kind: "number", default: 0 },
     { key: "sag_ft", label: "Midspan sag at the condition checked (ft)", kind: "number", default: 12 },
     { key: "still_air_clearance_ft", label: "Still-air horizontal clearance to the object (ft)", kind: "number", default: 10 },
+    { key: "insulator_length_ft", label: "Suspension insulator string length (ft; 0 for pin or post)", kind: "number", default: 0 },
   ],
   outputs: [
     { key: "w", id: "cbo-out-w", label: "Wind load per foot", value: (r) => fmt(r.wind_load_lb_per_ft, 4) + " lb/ft at " + fmt(r.pressure_psf, 1) + " psf on " + fmt(r.projected_area_ft2_per_ft, 4) + " sq ft per foot of conductor" },
     { key: "a", id: "cbo-out-a", label: "Swing angle", value: (r) => fmt(r.swing_angle_deg, 1) + " degrees -- set by the load-to-weight ratio alone, the same for any span or tension" },
-    { key: "b", id: "cbo-out-b", label: "Midspan blowout", value: (r) => fmt(r.blowout_ft, 2) + " ft sideways on " + fmt(r.sag_ft, 1) + " ft of sag -- the slack spans blow out furthest" },
+    { key: "b", id: "cbo-out-b", label: "Midspan blowout", value: (r) => fmt(r.blowout_ft, 2) + " ft sideways on " + fmt(r.sag_ft, 1) + " ft of sag" + (r.insulator_length_ft > 0 ? " plus " + fmt(r.insulator_length_ft, 1) + " ft of insulator string" : "") + " -- the slack spans blow out furthest" },
     { key: "c", id: "cbo-out-c", label: "Remaining horizontal clearance", value: (r) => r.clearance_verdict },
     { key: "e", id: "cbo-out-e", label: "Wind that exhausts the clearance", value: (r) => r.exhaust_verdict },
     { key: "n", id: "cbo-out-n", label: "Note", value: (r) => r.note },
@@ -895,7 +901,7 @@ export function computeSaggingReturnWave({ elapsed_seconds = 0, return_waves = 3
     sag_from_timing_ft, target_time_seconds, period_per_wave_seconds,
     return_waves: N, stopwatch_error_seconds, sag_error_ft, sag_at_error_ft,
     single_wave_sag_error_ft, single_wave_time, error_advantage, reference_sag,
-    note: "Sagging by eye against a target works when a crew can see both structures, and often they cannot -- a hill, a curve, trees, a long span. The stopwatch method needs neither line of sight nor an instrument: strike the conductor near one support and a transverse wave runs to the far structure, reflects, and comes back. Its travel speed is set by the tension and the mass per unit length, which is exactly the same pair of quantities that set the sag, so the round-trip time and the sag are two readings of one physical state -- AND THE SPAN LENGTH CANCELS OUT OF THE RELATION ENTIRELY. That is what makes the method work with no line of sight: the crew never needs to know how far away the other pole is. The constant 12.075 carries the unit conversion for feet and seconds. Timing several return waves rather than one is the whole accuracy trick, and it is not fussiness. Because the relation is SQUARED, a tenth of a second of stopwatch error on a single wave is a large sag error while the same tenth spread over five waves is a small one: for a 12 ft sag, three waves want 2.99 seconds and two tenths of error costs 1.66 ft, while one wave wants 1.00 second and the same two tenths costs 5.30 ft -- more than three times worse for the identical stopwatch and the identical hand. Three to five waves is normal practice, and the sensitivity is reported here so a crew can see what its own timing is worth rather than taking that on faith. This is the ideal taut-string relation. It assumes a free span with the wave reflecting cleanly at both ends, so it degrades where the conductor is not free to move -- through running blocks, against a hold-down, on a span with an armour rod or damper near the end, or in a section not yet clipped in. It does not account for damping, for wind moving the conductor while the wave travels, or for the sag being unequal in adjacent spans. It says nothing about tension, clearance, or whether the resulting sag is the right one: the target sag must come from the stringing chart at the ruling span and the temperature at the moment of sagging. The utility's stringing charts and construction standards and the crew's own sagging procedure govern.",
+    note: "Sagging by eye against a target works when a crew can see both structures, and often they cannot -- a hill, a curve, trees, a long span. The stopwatch method needs neither line of sight nor an instrument: strike the conductor near one support and a transverse wave runs to the far structure, reflects, and comes back. Its travel speed is set by the tension and the mass per unit length, which is exactly the same pair of quantities that set the sag, so the round-trip time and the sag are two readings of one physical state -- AND THE SPAN LENGTH CANCELS OUT OF THE RELATION ENTIRELY. That is what makes the method work with no line of sight: the crew never needs to know how far away the other pole is. The relation is D = g t^2 / 32 per return, about 1.0054 t^2 with D in feet (RUS Bulletin 1726C-115 prints the same law in inches, D = 48.3 (T / 2N)^2, which is 12.075 per return). Timing several return waves rather than one is the whole accuracy trick, and it is not fussiness. Because the relation is SQUARED, a tenth of a second of stopwatch error on a single wave is a large sag error while the same tenth spread over five waves is a small one: for a 12 ft sag, three waves want 10.36 seconds (RUS 1726C-115 tabulates 10.4) and two tenths of error costs 0.47 ft, while one wave wants 3.45 seconds and the same two tenths costs 1.43 ft -- more than three times worse for the identical stopwatch and the identical hand. Three to five waves is normal practice, and the sensitivity is reported here so a crew can see what its own timing is worth rather than taking that on faith. This is the ideal taut-string relation. It assumes a free span with the wave reflecting cleanly at both ends, so it degrades where the conductor is not free to move -- through running blocks, against a hold-down, on a span with an armour rod or damper near the end, or in a section not yet clipped in. It does not account for damping, for wind moving the conductor while the wave travels, or for the sag being unequal in adjacent spans. It says nothing about tension, clearance, or whether the resulting sag is the right one: the target sag must come from the stringing chart at the ruling span and the temperature at the moment of sagging. The utility's stringing charts and construction standards and the crew's own sagging procedure govern.",
   };
 }
 const saggingReturnWaveExample = { inputs: { elapsed_seconds: 0, return_waves: 3, target_sag_ft: 12, stopwatch_error_seconds: 0.2 } };
@@ -977,12 +983,12 @@ export function computeTransformerDiversityLoading({ customers = 0, individual_p
   const customers_at_continuous = continuous_rating_kva / (individual_peak_kva * diversity_factor);
   const headroom_customers = customers_at_continuous - customers;
   const load_factor = average_demand_kva > 0 ? average_demand_kva / diversified_kva : null;
-  const within_continuous = continuous_loading_pct <= 100;
+  const within_continuous = continuous_loading_pct <= 100 + 1e-9;
   const within_short_time = short_time_rating_kva > 0 ? diversified_kva <= short_time_rating_kva : null;
   const outs = [connected_kva, diversified_kva, continuous_loading_pct, customers_at_continuous, headroom_customers];
   if (!outs.every(Number.isFinite)) return { error: "Diversified-loading math is not a finite value." };
   const verdict = within_continuous
-    ? "UNDER the continuous rating: " + fmt(continuous_loading_pct, 1) + "% of " + fmt(continuous_rating_kva, 0) + " kVA, with room for " + fmt(headroom_customers, 1) + " more customers at this coincidence factor"
+    ? (continuous_loading_pct >= 100 - 1e-9 ? "AT" : "UNDER") + " the continuous rating: " + fmt(continuous_loading_pct, 1) + "% of " + fmt(continuous_rating_kva, 0) + " kVA, with room for " + fmt(headroom_customers, 1) + " more customers at this coincidence factor"
     : "OVER the continuous rating: " + fmt(continuous_loading_pct, 1) + "% of " + fmt(continuous_rating_kva, 0) + " kVA, which is " + fmt(-headroom_customers, 1) + " customers past it"
       + (within_short_time === true ? " but INSIDE the entered " + fmt(short_time_rating_kva, 0) + " kVA short-time rating, so the question is duration and loss of life, not nameplate" : within_short_time === false ? " and OVER the entered " + fmt(short_time_rating_kva, 0) + " kVA short-time rating as well" : "");
   return {
@@ -1160,12 +1166,15 @@ export function computeRecloserFuseCoordination({ fault_current_a = 0, fast_curv
   if (!(fuse_total_clear_s >= fuse_min_melt_s)) return { error: "Total clearing time cannot be shorter than minimum melt for the same fuse." };
   const heated_fast_s = fast_curve_s * heating_factor;
   const coordination_ratio = fuse_min_melt_s / heated_fast_s;
-  const fuse_saving_holds = coordination_ratio > 1;
+  // Eaton TD132010EN: minimum melt "at least" the heated fast time, and total
+  // clear "no greater than" the slow curve -- equality holds. Until 2026-10-01
+  // 0.054 s against 0.04 x 1.35 (0.9999999999999999) read FAILS.
+  const fuse_saving_holds = coordination_ratio >= 1 - 1e-9;
   const margin_s = fuse_min_melt_s - heated_fast_s;
   const margin_cycles = margin_s * system_frequency_hz;
   // The other end of the band: the fuse-blowing scheme wants the fuse to
   // clear entirely before the recloser's slow curve operates.
-  const fuse_blowing_holds = fuse_total_clear_s < slow_curve_s;
+  const fuse_blowing_holds = fuse_total_clear_s <= slow_curve_s * (1 + 1e-9);
   const blowing_margin_s = slow_curve_s - fuse_total_clear_s;
   const blowing_margin_cycles = blowing_margin_s * system_frequency_hz;
   // The longest fast curve that would still coordinate, and the headroom as a
@@ -1178,7 +1187,7 @@ export function computeRecloserFuseCoordination({ fault_current_a = 0, fast_curv
     : "FUSE SAVING FAILS at " + fmt(fault_current_a, 0) + " A: the heated fast curve at " + fmt(heated_fast_s, 4) + " s is " + fmt(-margin_s, 4) + " s PAST minimum melt, so the fuse is damaged or blown by the fast operation";
   const blowing_verdict = fuse_blowing_holds
     ? "FUSE BLOWING HOLDS: total clear " + fmt(fuse_total_clear_s, 3) + " s beats the slow curve at " + fmt(slow_curve_s, 3) + " s by " + fmt(blowing_margin_s, 3) + " s"
-    : "FUSE BLOWING FAILS: total clear " + fmt(fuse_total_clear_s, 3) + " s is not inside the slow curve at " + fmt(slow_curve_s, 3) + " s, so the recloser locks out on a branch fault";
+    : "FUSE BLOWING FAILS: total clear " + fmt(fuse_total_clear_s, 3) + " s is later than the slow curve at " + fmt(slow_curve_s, 3) + " s, so the recloser locks out on a branch fault";
   return {
     fault_current_a, fast_curve_s, slow_curve_s, fuse_min_melt_s, fuse_total_clear_s,
     heating_factor, system_frequency_hz, heated_fast_s, coordination_ratio,
@@ -1213,10 +1222,11 @@ LINEWORKER_RENDERERS["recloser-fuse-coordination"] = _simpleRenderer({
 
 // ============ spec-v1465: distribution feeder I2R loss and loss factor ============
 
-// dims: in { peak_current_a: I, resistance_ohm_per_mile: M L^2 T^-3 I^-2, length_miles: L, load_factor: dimensionless, energy_cost_per_kwh: dimensionless, peak_demand_kw: M L^2 T^-3 } out: { total_resistance_ohm: M L^2 T^-3 I^-2, peak_loss_kw: M L^2 T^-3, loss_factor: dimensionless, annual_loss_kwh: M L^2 T^-2, annual_cost: dimensionless, loss_percent_of_delivered: dimensionless }
-export function computeFeederLossLoadFactor({ peak_current_a = 0, resistance_ohm_per_mile = 0, length_miles = 0, load_factor = 0, energy_cost_per_kwh = 0, peak_demand_kw = 0 } = {}) {
+// dims: in { peak_current_a: I, resistance_ohm_per_mile: M L^2 T^-3 I^-2, length_miles: L, load_factor: dimensionless, energy_cost_per_kwh: dimensionless, peak_demand_kw: M L^2 T^-3, loss_factor_k: dimensionless } out: { total_resistance_ohm: M L^2 T^-3 I^-2, peak_loss_kw: M L^2 T^-3, loss_factor: dimensionless, annual_loss_kwh: M L^2 T^-2, annual_cost: dimensionless, loss_percent_of_delivered: dimensionless }
+export function computeFeederLossLoadFactor({ peak_current_a = 0, resistance_ohm_per_mile = 0, length_miles = 0, load_factor = 0, energy_cost_per_kwh = 0, peak_demand_kw = 0, loss_factor_k = 0.3 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(peak_current_a > 0)) return { error: "Peak current per phase must be positive (A)." };
+  if (!(loss_factor_k >= 0 && loss_factor_k <= 1)) return { error: "The loss-factor weight k must be 0 to 1 (0.3 common, 0.2 in RUS 1724D-107)." };
   if (!(resistance_ohm_per_mile > 0)) return { error: "Conductor resistance must be positive (ohm per mile)." };
   if (!(length_miles > 0)) return { error: "Feeder length must be positive (miles)." };
   if (!(load_factor > 0 && load_factor <= 1)) return { error: "Load factor must be greater than zero and no more than one." };
@@ -1225,10 +1235,12 @@ export function computeFeederLossLoadFactor({ peak_current_a = 0, resistance_ohm
   const HOURS_PER_YEAR = 8760;
   const total_resistance_ohm = resistance_ohm_per_mile * length_miles;
   const peak_loss_kw = 3 * peak_current_a * peak_current_a * total_resistance_ohm / 1000;
-  // The standard 0.3 / 0.7 blend between the two bounds. A perfectly flat
-  // load loses at the load factor; a load that is either at peak or off
-  // loses at its square; every real load sits between them.
-  const loss_factor = 0.3 * load_factor + 0.7 * load_factor * load_factor;
+  // The Buller-Woodrow blend k LF + (1 - k) LF^2 between the two bounds. A
+  // perfectly flat load loses at the load factor; a load that is either at
+  // peak or off loses at its square; every real load sits between them. k is
+  // the utility's own: 0.3 is common, RUS 1724D-107 and 1724E-301 use 0.2
+  // (fixed at 0.3 until 2026-10-01).
+  const loss_factor = loss_factor_k * load_factor + (1 - loss_factor_k) * load_factor * load_factor;
   const annual_loss_kwh = peak_loss_kw * loss_factor * HOURS_PER_YEAR;
   const annual_cost = annual_loss_kwh * energy_cost_per_kwh;
   const peak_all_year_kwh = peak_loss_kw * HOURS_PER_YEAR;
@@ -1247,7 +1259,7 @@ export function computeFeederLossLoadFactor({ peak_current_a = 0, resistance_ohm
     note: "Feeder losses are not average current squared times resistance, and the gap is wide enough to change a decision. Loss is quadratic in current while the current varies all day, so the average of the square is not the square of the average, and the ratio between them is the LOSS FACTOR. It is bounded at both ends by quantities anyone can name: a perfectly flat load loses at its load factor, a load that is either at peak or entirely off loses at the square of it, and every real load sits between. The long-standing utility approximation blends the two as 0.3 times load factor plus 0.7 times its square, and that blend is what turns a peak loss into an annual energy. Take the peak loss for all 8,760 hours and the answer comes out several times too high; use the load factor alone and it is still tens of percent high. The practical consequence cuts in a direction people do not expect. A feeder with a poor load factor loses much LESS energy than its peak loss suggests, which means the savings from reconductoring, from moving a capacitor bank, or from balancing phases are smaller than a peak-based estimate promises. The economic case for any of them has to be built on the loss factor, not on the peak, and a payback computed the other way will not arrive. Conductor loss on one balanced three-phase feeder with the load treated as CONCENTRATED AT THE FAR END. A real feeder has load distributed along it, and for a uniformly distributed load the effective loss is about a third of the concentrated value -- a correction large enough to matter and one this does not apply, so read the answer as an upper bound unless the load genuinely is at the end. It does not include transformer core and copper losses, which on a distribution system are usually the larger share of total losses, nor neutral, secondary, or service losses, nor unbalance, nor the temperature dependence of the conductor's own resistance. The 0.3 and 0.7 coefficients are a widely used approximation rather than a measurement, and utilities carry their own. The utility's loss study and its metered load data govern.",
   };
 }
-const feederLossLoadFactorExample = { inputs: { peak_current_a: 180, resistance_ohm_per_mile: 0.29, length_miles: 4.2, load_factor: 0.55, energy_cost_per_kwh: 0.09, peak_demand_kw: 3887 } };
+const feederLossLoadFactorExample = { inputs: { peak_current_a: 180, resistance_ohm_per_mile: 0.29, length_miles: 4.2, load_factor: 0.55, energy_cost_per_kwh: 0.09, peak_demand_kw: 3887, loss_factor_k: 0.3 } };
 LINEWORKER_RENDERERS["feeder-loss-load-factor"] = _simpleRenderer({
   citation: "Citation: the three-phase I2R loss relation and the standard distribution loss-factor approximation by name -- loss factor = 0.3 x load factor + 0.7 x load factor squared, bounded below by the square and above by the load factor itself -- applied over 8,760 hours. The coefficients are a widely used approximation, not a measurement, and utilities carry their own. Load treated as concentrated at the far end, so the answer is an upper bound. The utility's loss study and metered load data govern.",
   example: feederLossLoadFactorExample.inputs,
@@ -1258,6 +1270,7 @@ LINEWORKER_RENDERERS["feeder-loss-load-factor"] = _simpleRenderer({
     { key: "load_factor", label: "Load factor (0 to 1)", kind: "number", default: 0.55 },
     { key: "energy_cost_per_kwh", label: "Energy cost per kWh", kind: "number", default: 0.09 },
     { key: "peak_demand_kw", label: "Feeder peak demand (kW, 0 to skip the loss percentage)", kind: "number", default: 3887 },
+    { key: "loss_factor_k", label: "Loss-factor weight k in k LF + (1 - k) LF^2 (0.3 common; RUS uses 0.2)", kind: "number", default: 0.3 },
   ],
   outputs: [
     { key: "r", id: "flf-out-r", label: "Total resistance", value: (r) => fmt(r.total_resistance_ohm, 3) + " ohms" },

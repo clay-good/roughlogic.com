@@ -113794,7 +113794,7 @@
    "source_publisher": "Project (first-principles)",
    "source_title": "4 by 4 ft pattern of 12,000 lb bolts against a 6 ft loosened zone in 165 pcf rock",
    "source_edition_or_year": "p = capacity / area per bolt; dead weight = unit weight x zone height",
-   "source_section_or_page": "a screen; a qualified geotechnical engineer governs",
+   "source_section_or_page": "a screen; a qualified geotechnical engineer governs; recomputed 2026-10-01 after the batch-55 fixes",
    "verified_by": "rl",
    "verified_on": "2026-09-05",
    "inputs": {
@@ -113844,7 +113844,7 @@
      }
     },
     "bolt_length_ft": {
-     "value": 8,
+     "value": 10,
      "tolerance": {
       "pct": 0.5
      }
@@ -114016,7 +114016,7 @@
    "source_publisher": "Project (first-principles)",
    "source_title": "900 ft bore reamed to 20 in for 12.75 in pipe at a 3x fluid multiplier",
    "source_edition_or_year": "hole and annular volume; 7.48052 gal per cu ft, 5.615 cu ft per bbl",
-   "source_section_or_page": "the mud engineer and the disposal jurisdiction govern",
+   "source_section_or_page": "the mud engineer and the disposal jurisdiction govern; recomputed 2026-10-01 after the batch-55 fixes",
    "verified_by": "rl",
    "verified_on": "2026-09-05",
    "inputs": {
@@ -114036,7 +114036,7 @@
      }
     },
     "hole_volume_bbl": {
-     "value": 349.688,
+     "value": 349.7134679320735,
      "tolerance": {
       "pct": 0.5
      }
@@ -114274,7 +114274,7 @@
    "source_publisher": "Project (first-principles)",
    "source_title": "24 in host at 3% ovality with 12 ft of groundwater, 125,000 psi long-term modulus",
    "source_edition_or_year": "ASTM F1216 X1.1 partially deteriorated buckling",
-   "source_section_or_page": "the fully deteriorated case is a different relation and is not computed",
+   "source_section_or_page": "the fully deteriorated case is a different relation and is not computed; recomputed 2026-10-01 after the batch-55 fixes",
    "verified_by": "rl",
    "verified_on": "2026-09-05",
    "inputs": {
@@ -114313,7 +114313,7 @@
      }
     },
     "short_term_thickness_in": {
-     "value": 0.360235,
+     "value": 0.3602041122790792,
      "tolerance": {
       "pct": 0.5
      }
@@ -115407,25 +115407,25 @@
       "pct": 0.5
      }
     },
-    "per_diver_acfm": {
+    "per_diver_scfm": {
      "value": 5.64242,
      "tolerance": {
       "pct": 0.5
      }
     },
-    "required_acfm": {
+    "required_scfm": {
      "value": 16.9273,
      "tolerance": {
       "pct": 0.5
      }
     },
-    "compressor_margin_acfm": {
+    "compressor_margin_scfm": {
      "value": 3.07273,
      "tolerance": {
       "pct": 0.5
      }
     },
-    "alt_required_acfm": {
+    "alt_required_scfm": {
      "value": 28.3818,
      "tolerance": {
       "pct": 0.5
@@ -117115,16 +117115,16 @@
   {
    "tile_id": "gear-reducer-service-factor",
    "source_publisher": "Project (first-principles)",
-   "source_title": "25 hp motor on a reciprocating compressor 24 hours a day at a 2.00 service factor, 60 hp mechanical and 42 hp thermal",
-   "source_edition_or_year": "required = transmitted x service factor; the lower of the mechanical and thermal catalog ratings governs",
-   "source_section_or_page": "the gear reducer manufacturer catalog and thermal derating data govern",
+   "source_title": "25 hp motor on a reciprocating compressor 24 hours a day at a 2.00 service factor, 60 hp mechanical and 22 hp thermal",
+   "source_edition_or_year": "required = transmitted x service factor against the mechanical rating; the thermal rating against transmitted power, no service factor (Rexnord Falk 161-110)",
+   "source_section_or_page": "the gear reducer manufacturer catalog and thermal derating data govern; recomputed 2026-10-01 after the batch-55 fixes",
    "verified_by": "rl",
    "verified_on": "2026-09-07",
    "inputs": {
     "transmitted_hp": 25,
     "service_factor": 2,
     "catalog_mechanical_hp": 60,
-    "catalog_thermal_hp": 42,
+    "catalog_thermal_hp": 22,
     "nameplate_selection_hp": 30
    },
    "outputs": {
@@ -117141,19 +117141,19 @@
      }
     },
     "governing_rating_hp": {
-     "value": 42,
+     "value": 22,
      "tolerance": {
       "pct": 0.5
      }
     },
     "shortfall_hp": {
-     "value": 8,
+     "value": 3,
      "tolerance": {
       "pct": 0.5
      }
     },
     "max_transmitted_hp": {
-     "value": 21,
+     "value": 22,
      "tolerance": {
       "pct": 0.5
      }
@@ -144592,6 +144592,1560 @@
      "value": 1391.7,
      "tolerance": {
       "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "nitrox-mod",
+   "source_publisher": "U.S. Navy, Naval Sea Systems Command (NAVSEA)",
+   "source_title": "U.S. Navy Diving Manual, SS521-AG-PRO-010",
+   "source_edition_or_year": "Revision 7, 01 December 2016",
+   "source_section_or_page": "Vol 1, para 2-12, Sample Problem 2 (p.2-25): max O2 at 300 fsw for a 1.3 ppO2 limit; ata = 10.09, 1.3/10.09 = 0.1288 (12.88%). oxygen_fraction 0.12 is a placeholder (the problem solves for the mix); contingency limit set equal to the 1.3 limit as a placeholder.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "oxygen_fraction": 0.12,
+    "ppo2_limit": 1.3,
+    "contingency_ppo2_limit": 1.3,
+    "planned_depth_ft": 300,
+    "feet_per_atm": 33
+   },
+   "outputs": {
+    "depth_ata": {
+     "value": 10.09,
+     "tolerance": {
+      "abs": 0.005
+     }
+    },
+    "best_mix_fraction": {
+     "value": 0.1288,
+     "tolerance": {
+      "abs": 0.0001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "nitrox-mod",
+   "source_publisher": "U.S. Navy, Naval Sea Systems Command (NAVSEA)",
+   "source_title": "U.S. Navy Diving Manual, SS521-AG-PRO-010",
+   "source_edition_or_year": "Revision 7, 01 December 2016",
+   "source_section_or_page": "Vol 1, para 2-12, Sample Problem 3 (p.2-25): max safe depth of an 11% O2 mix at a 1.3 ppO2 limit; 1.3/0.11 = 11.81 ata, (11.81 x 33) - 33 = 356.73 fsw (Navy then rounds DOWN to 356). Printed 356.73 carries the ata rounded to 11.81; pct 0.1 covers it. Mix is HeO2 but the oxygen MOD relation is diluent-independent. planned_depth_ft 100 and the equal contingency limit are placeholders.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "oxygen_fraction": 0.11,
+    "ppo2_limit": 1.3,
+    "contingency_ppo2_limit": 1.3,
+    "planned_depth_ft": 100,
+    "feet_per_atm": 33
+   },
+   "outputs": {
+    "mod_working_ft": {
+     "value": 356.73,
+     "tolerance": {
+      "pct": 0.1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "nitrox-mod",
+   "source_publisher": "U.S. Navy, Naval Sea Systems Command (NAVSEA)",
+   "source_title": "U.S. Navy Diving Manual, SS521-AG-PRO-010",
+   "source_edition_or_year": "Revision 7, 01 December 2016",
+   "source_section_or_page": "Vol 2, para 10-3 (p.10-2): on air a ppO2 of 1.6 ata is reached at 218 fsw (printed whole feet). ppo2_limit 1.4 and planned_depth_ft 60 are placeholders.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "oxygen_fraction": 0.21,
+    "ppo2_limit": 1.4,
+    "contingency_ppo2_limit": 1.6,
+    "planned_depth_ft": 60,
+    "feet_per_atm": 33
+   },
+   "outputs": {
+    "mod_contingency_ft": {
+     "value": 218,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "nitrox-mod",
+   "source_publisher": "U.S. Navy, Naval Sea Systems Command (NAVSEA)",
+   "source_title": "U.S. Navy Diving Manual, SS521-AG-PRO-010",
+   "source_edition_or_year": "Revision 7, 01 December 2016",
+   "source_section_or_page": "Vol 2, para 10-3 (p.10-2): 60% N2 / 40% O2 reaches a ppO2 of 1.6 ata at 99 fsw. ppo2_limit 1.4 and planned_depth_ft 60 are placeholders.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "oxygen_fraction": 0.4,
+    "ppo2_limit": 1.4,
+    "contingency_ppo2_limit": 1.6,
+    "planned_depth_ft": 60,
+    "feet_per_atm": 33
+   },
+   "outputs": {
+    "mod_contingency_ft": {
+     "value": 99,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "nitrox-ead",
+   "source_publisher": "U.S. Navy, Naval Sea Systems Command (NAVSEA)",
+   "source_title": "U.S. Navy Diving Manual, SS521-AG-PRO-010",
+   "source_edition_or_year": "Revision 7, 01 December 2016",
+   "source_section_or_page": "Vol 2, para 10-2.1 (p.10-2): 40% O2 at 70 fsw, EAD = (0.60)(103)/0.79 - 33 = 78.22 - 33 = 45.2 fsw. target_ead_ft 40 and ppo2_limit 1.4 are placeholders.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "oxygen_fraction": 0.4,
+    "depth_ft": 70,
+    "target_ead_ft": 40,
+    "ppo2_limit": 1.4,
+    "feet_per_atm": 33
+   },
+   "outputs": {
+    "equivalent_air_depth_ft": {
+     "value": 45.2,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "nitrox-ead",
+   "source_publisher": "U.S. Navy, Naval Sea Systems Command (NAVSEA)",
+   "source_title": "U.S. Navy Diving Manual, SS521-AG-PRO-010",
+   "source_edition_or_year": "Revision 7, 01 December 2016",
+   "source_section_or_page": "Vol 2, para 10-2 (p.10-1): nitrogen partial pressure of 68% N2 / 32% O2 at 63 fsw is 2.0 ata, the same as air at 50 fsw (the EAD). Printed to 0.1 ata and whole feet. target_ead_ft 40 and ppo2_limit 1.4 are placeholders.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "oxygen_fraction": 0.32,
+    "depth_ft": 63,
+    "target_ead_ft": 40,
+    "ppo2_limit": 1.4,
+    "feet_per_atm": 33
+   },
+   "outputs": {
+    "pn2_at_depth": {
+     "value": 2.0,
+     "tolerance": {
+      "abs": 0.05
+     }
+    },
+    "equivalent_air_depth_ft": {
+     "value": 50,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "no-decompression-limit",
+   "source_publisher": "U.S. Navy, Naval Sea Systems Command (NAVSEA)",
+   "source_title": "U.S. Navy Diving Manual, SS521-AG-PRO-010",
+   "source_edition_or_year": "Revision 7, 01 December 2016",
+   "source_section_or_page": "Vol 2, para 9-9.4 (p.9-29) with Table 9-7 (no-stop limit 63 min at 60 fsw): Group G, RNT at 60 fsw 40 min, 20 min dive, equivalent single dive time 60 min, no decompression required. alt_residual_time_min 0 and oxygen_fraction 0.21 are placeholders.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "planned_depth_ft": 60,
+    "table_ndl_min": 63,
+    "residual_nitrogen_time_min": 40,
+    "planned_bottom_time_min": 20,
+    "alt_residual_time_min": 0,
+    "oxygen_fraction": 0.21,
+    "feet_per_atm": 33
+   },
+   "outputs": {
+    "credited_bottom_time_min": {
+     "value": 60,
+     "tolerance": {
+      "abs": 0
+     }
+    },
+    "exceeds": {
+     "value": 0,
+     "tolerance": {
+      "abs": 0
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "no-decompression-limit",
+   "source_publisher": "U.S. Navy, Naval Sea Systems Command (NAVSEA)",
+   "source_title": "U.S. Navy Diving Manual, SS521-AG-PRO-010",
+   "source_edition_or_year": "Revision 7, 01 December 2016",
+   "source_section_or_page": "Vol 2, para 9-9.2 RNT exception example (p.9-28) with Table 9-7 (63 min at 60 fsw): Group H RNT 46 min + 20 min = 66 min; the 60 fsw / 70 min schedule calls for a 7 min stop (over the no-stop limit). alt_residual_time_min 0 and oxygen_fraction 0.21 are placeholders.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "planned_depth_ft": 60,
+    "table_ndl_min": 63,
+    "residual_nitrogen_time_min": 46,
+    "planned_bottom_time_min": 20,
+    "alt_residual_time_min": 0,
+    "oxygen_fraction": 0.21,
+    "feet_per_atm": 33
+   },
+   "outputs": {
+    "credited_bottom_time_min": {
+     "value": 66,
+     "tolerance": {
+      "abs": 0
+     }
+    },
+    "exceeds": {
+     "value": 1,
+     "tolerance": {
+      "abs": 0
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "no-decompression-limit",
+   "source_publisher": "U.S. Navy, Naval Sea Systems Command (NAVSEA)",
+   "source_title": "U.S. Navy Diving Manual, SS521-AG-PRO-010",
+   "source_edition_or_year": "Revision 7, 01 December 2016",
+   "source_section_or_page": "Vol 2, para 9-9.4 reverse pattern (p.9-29) with Table 9-7 (25 min at 100 fsw): Group D RNT at 100 fsw 14 min + 20 min = 34 min; a 15 min stop at 20 fsw is required. alt_residual_time_min 0 and oxygen_fraction 0.21 are placeholders.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "planned_depth_ft": 100,
+    "table_ndl_min": 25,
+    "residual_nitrogen_time_min": 14,
+    "planned_bottom_time_min": 20,
+    "alt_residual_time_min": 0,
+    "oxygen_fraction": 0.21,
+    "feet_per_atm": 33
+   },
+   "outputs": {
+    "credited_bottom_time_min": {
+     "value": 34,
+     "tolerance": {
+      "abs": 0
+     }
+    },
+    "exceeds": {
+     "value": 1,
+     "tolerance": {
+      "abs": 0
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "no-decompression-limit",
+   "source_publisher": "U.S. Navy, Naval Sea Systems Command (NAVSEA)",
+   "source_title": "U.S. Navy Diving Manual, SS521-AG-PRO-010",
+   "source_edition_or_year": "Revision 7, 01 December 2016",
+   "source_section_or_page": "Vol 2, para 10-2.1 (p.10-2): 40% O2 at 70 fsw, EAD 45.2 fsw. table_ndl_min 48 is Table 9-7 at 70 fsw; residual 0, bottom time 20 and alt residual 0 are placeholders.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "planned_depth_ft": 70,
+    "table_ndl_min": 48,
+    "residual_nitrogen_time_min": 0,
+    "planned_bottom_time_min": 20,
+    "alt_residual_time_min": 0,
+    "oxygen_fraction": 0.4,
+    "feet_per_atm": 33
+   },
+   "outputs": {
+    "equivalent_air_depth_ft": {
+     "value": 45.2,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "surface-air-consumption",
+   "source_publisher": "U.S. Navy, Naval Sea Systems Command (NAVSEA)",
+   "source_title": "U.S. Navy Diving Manual, SS521-AG-PRO-010",
+   "source_edition_or_year": "Revision 7, 01 December 2016",
+   "source_section_or_page": "Vol 2, para 7-5.1 Sample Problem (p.7-22): moderate work at 70 fsw, RMV 1.4 acfm, C = (70+33)/33 x 1.4 = 4.37 scfm; twin 72s give Va = 114 scf (already net of the 250 psig reserve); duration 114/4.37 = 26 min. cylinder_volume_cuft carries the printed Va. Bottom time 26, team 1, ascent 30 fpm, 15 ft / 3 min stop and stress rate 1.4 are placeholders.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "sac_cuft_per_min": 1.4,
+    "planned_depth_ft": 70,
+    "planned_bottom_time_min": 26,
+    "cylinder_volume_cuft": 114,
+    "team_size": 1,
+    "ascent_rate_fpm": 30,
+    "stop_depth_ft": 15,
+    "stop_time_min": 3,
+    "stress_sac_cuft_per_min": 1.4,
+    "feet_per_atm": 33
+   },
+   "outputs": {
+    "rate_at_depth_cuft_min": {
+     "value": 4.37,
+     "tolerance": {
+      "abs": 0.005
+     }
+    },
+    "naive_bottom_time_min": {
+     "value": 26,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "umbilical-air-supply",
+   "source_publisher": "U.S. Navy, Naval Sea Systems Command (NAVSEA)",
+   "source_title": "U.S. Navy Diving Manual, SS521-AG-PRO-010",
+   "source_edition_or_year": "Revision 7, 01 December 2016",
+   "source_section_or_page": "Vol 3, para 13-8.1 Example (p.13-12): two divers plus a standby at 300 fsw at 1.4 acfm (MK21): 10.09 ata, 14.13 scfm per diver, 42.39 scfm for 3 (printed as 14.13 x 3). Compressor 50 scfm, alt depth 100 ft, reserve 15 min, 8 cu ft tank at 3,000 psi are placeholders.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "diver_count": 3,
+    "depth_ft": 300,
+    "rate_per_diver_acfm": 1.4,
+    "compressor_scfm": 50,
+    "alt_depth_ft": 100,
+    "reserve_minutes": 15,
+    "volume_tank_cuft": 8,
+    "tank_pressure_psi": 3000,
+    "feet_per_atm": 33
+   },
+   "outputs": {
+    "depth_ata": {
+     "value": 10.09,
+     "tolerance": {
+      "abs": 0.005
+     }
+    },
+    "per_diver_scfm": {
+     "value": 14.13,
+     "tolerance": {
+      "abs": 0.005
+     }
+    },
+    "required_scfm": {
+     "value": 42.39,
+     "tolerance": {
+      "abs": 0.015
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "hose-lay-section-count",
+   "source_publisher": "National Wildfire Coordinating Group (NWCG)",
+   "source_title": "Firefighter Math, Table 3.1 Water Handling Unit Estimations",
+   "source_edition_or_year": "web course page, retrieved 2026-10-01",
+   "source_section_or_page": "Table 3.1 'Volume (Capacity) U.S. Measure': 1.5 in ID x 100 ft hose length holds 9.2 gal (printed to 0.1 gal). One section, no slack, dry weight 0 are placeholders.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "map_distance_ft": 100,
+    "slack_fraction": 0,
+    "section_length_ft": 100,
+    "hose_id_in": 1.5,
+    "dry_weight_per_section_lb": 0
+   },
+   "outputs": {
+    "gallons": {
+     "value": 9.2,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "hose-lay-section-count",
+   "source_publisher": "National Wildfire Coordinating Group (NWCG)",
+   "source_title": "Firefighter Math, Table 3.1 Water Handling Unit Estimations",
+   "source_edition_or_year": "web course page, retrieved 2026-10-01",
+   "source_section_or_page": "Table 3.1 'Volume (Capacity) U.S. Measure': 1.0 in ID x 100 ft hose length holds 4.1 gal (printed to 0.1 gal). One section, no slack, dry weight 0 are placeholders.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "map_distance_ft": 100,
+    "slack_fraction": 0,
+    "section_length_ft": 100,
+    "hose_id_in": 1.0,
+    "dry_weight_per_section_lb": 0
+   },
+   "outputs": {
+    "gallons": {
+     "value": 4.1,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "hose-lay-section-count",
+   "source_publisher": "National Wildfire Coordinating Group (NWCG)",
+   "source_title": "Firefighter Math, Table 3.1 Water Handling Unit Estimations",
+   "source_edition_or_year": "web course page, retrieved 2026-10-01",
+   "source_section_or_page": "Table 3.1 'Volume (Capacity) U.S. Measure': 0.625 in ID x 50 ft hose length holds 0.8 gal (printed to 0.1 gal). One section, no slack, dry weight 0 are placeholders.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "map_distance_ft": 50,
+    "slack_fraction": 0,
+    "section_length_ft": 50,
+    "hose_id_in": 0.625,
+    "dry_weight_per_section_lb": 0
+   },
+   "outputs": {
+    "gallons": {
+     "value": 0.8,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "helicopter-lz-sizing",
+   "source_publisher": "Federal Aviation Administration",
+   "source_title": "AC 150/5390-2D, Heliport Design",
+   "source_edition_or_year": "2023-01-05",
+   "source_section_or_page": "Para 2.12.2: the approach/departure surface slopes upward at 8:1 for 4,000 ft to a height of 500 ft. obstacle_height_ft = 500 and approach_ratio = 8 map to that surface; rotor 40 ft, factor 2, clear 100 ft, slope 5/8 deg are placeholders.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "rotor_diameter_ft": 40,
+    "size_factor": 2,
+    "measured_clear_ft": 100,
+    "ground_slope_deg": 5,
+    "slope_limit_deg": 8,
+    "obstacle_height_ft": 500,
+    "approach_ratio": 8
+   },
+   "outputs": {
+    "approach_length_ft": {
+     "value": 4000,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "sagging-return-wave",
+   "source_publisher": "USDA Rural Utilities Service",
+   "source_title": "RUS Bulletin 1726C-115, Checking Sag in a Conductor by the Return Wave Method",
+   "source_edition_or_year": "1998 (approved 09/24/98)",
+   "source_section_or_page": "Section 2.6 Example, p. 5: a time of 14.1 s at the 10th return wave gives a sag of 24 in (610 mm) from Eq. 1, D = 48.3 (T/2N)^2 in inches. Printed sag 24 in = 2.0 ft; printed to the whole inch, Eq. 1 gives 24.01 in. RUS's constant 48.3/4 = 12.075 in = 1.00625 ft vs the tile's 1.0054 ft (0.08%). Inputs target_sag_ft and stopwatch_error_seconds are placeholders.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "elapsed_seconds": 14.1,
+    "return_waves": 10,
+    "target_sag_ft": 0,
+    "stopwatch_error_seconds": 0.2
+   },
+   "outputs": {
+    "sag_from_timing_ft": {
+     "value": 2.0,
+     "tolerance": {
+      "pct": 1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "sagging-return-wave",
+   "source_publisher": "USDA Rural Utilities Service",
+   "source_title": "RUS Bulletin 1726C-115, Checking Sag in a Conductor by the Return Wave Method",
+   "source_edition_or_year": "1998 (approved 09/24/98)",
+   "source_section_or_page": "Time-Sag Table, p. 6: sag 144 in (12 ft), 3rd return wave 10.4 s (printed to 0.1 s; Eq. 1 gives 10.36 s). elapsed_seconds and stopwatch_error_seconds are placeholders.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "elapsed_seconds": 0,
+    "return_waves": 3,
+    "target_sag_ft": 12,
+    "stopwatch_error_seconds": 0.2
+   },
+   "outputs": {
+    "target_time_seconds": {
+     "value": 10.4,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "sagging-return-wave",
+   "source_publisher": "USDA Rural Utilities Service",
+   "source_title": "RUS Bulletin 1726C-115, Checking Sag in a Conductor by the Return Wave Method",
+   "source_edition_or_year": "1998 (approved 09/24/98)",
+   "source_section_or_page": "Time-Sag Table, p. 6: sag 144 in (12 ft), 15th return wave 51.8 s (printed to 0.1 s). elapsed_seconds and stopwatch_error_seconds are placeholders.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "elapsed_seconds": 0,
+    "return_waves": 15,
+    "target_sag_ft": 12,
+    "stopwatch_error_seconds": 0.2
+   },
+   "outputs": {
+    "target_time_seconds": {
+     "value": 51.8,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "gear-reducer-service-factor",
+   "source_publisher": "Rexnord (Falk)",
+   "source_title": "Falk Drive One Gear Drives Selection Guide 161-110",
+   "source_edition_or_year": "2001, 2009",
+   "source_section_or_page": "p. 15 Power Selection Example: draw bench, 100 HP motor, mechanical service factor 1.25, equivalent power 1.25 x 100 = 125 HP; size M1160 rated 143 HP mechanical; application adjusted thermal rating 151 THP checked against the 100 HP actually transmitted (no service factor). Only required_hp (125, exact) is asserted; nameplate_selection_hp is a placeholder (0).",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "transmitted_hp": 100,
+    "service_factor": 1.25,
+    "catalog_mechanical_hp": 143,
+    "catalog_thermal_hp": 151,
+    "nameplate_selection_hp": 0
+   },
+   "outputs": {
+    "required_hp": {
+     "value": 125,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "roller-chain-wear-elongation",
+   "source_publisher": "Diamond Chain Company",
+   "source_title": "Roller Chain Wear Gauge Instructions",
+   "source_edition_or_year": "undated (hosted by IBT Inc., 2016 upload)",
+   "source_section_or_page": "Step 4 example: ASME/ANSI #60 (0.75 in pitch), 13 pitches nominal 9.75 in; 3% maximum wear 1.03 x 9.75 = 10.0425 in. Exact. measured_length_in (9.80) and sprocket_teeth are placeholders.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "chain_pitch_in": 0.75,
+    "pitches_measured": 13,
+    "measured_length_in": 9.8,
+    "elongation_limit_pct": 3,
+    "sprocket_teeth": 0
+   },
+   "outputs": {
+    "nominal_length_in": {
+     "value": 9.75,
+     "tolerance": {
+      "abs": 0.0001
+     }
+    },
+    "allowable_length_in": {
+     "value": 10.0425,
+     "tolerance": {
+      "abs": 0.0001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "roller-chain-wear-elongation",
+   "source_publisher": "Diamond Chain Company",
+   "source_title": "Roller Chain Wear Gauge Instructions",
+   "source_edition_or_year": "undated (hosted by IBT Inc., 2016 upload)",
+   "source_section_or_page": "Step 4 example: #60 chain, 13 pitches, 1.5% maximum wear 1.015 x 9.75 = 9.896 in (printed to 0.001 in; exact 9.89625). measured_length_in (9.80) and sprocket_teeth are placeholders.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "chain_pitch_in": 0.75,
+    "pitches_measured": 13,
+    "measured_length_in": 9.8,
+    "elongation_limit_pct": 1.5,
+    "sprocket_teeth": 0
+   },
+   "outputs": {
+    "nominal_length_in": {
+     "value": 9.75,
+     "tolerance": {
+      "abs": 0.0001
+     }
+    },
+    "allowable_length_in": {
+     "value": 9.896,
+     "tolerance": {
+      "abs": 0.0005
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "conductor-blowout",
+   "source_publisher": "USDA Rural Utilities Service",
+   "source_title": "RUS Bulletin 1724E-200, Design Manual for High Voltage Transmission Lines",
+   "source_edition_or_year": "2015 (RD-GD-2015-78; replaces the August 2009 issue)",
+   "source_section_or_page": "Appendix B p. B-4, ACSR High Wind Loadings table, 6 psf columns: DRAKE 795 26/7, diameter 1.108 in, 1.0940 lb/ft -> TRANS 0.5540 lb/ft, SWING ANGLE 26.86 deg (printed to 4 and 2 decimals). sag_ft (10) and still_air_clearance_ft (0) are placeholders.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "conductor_diameter_in": 1.108,
+    "weight_lb_per_ft": 1.094,
+    "wind_pressure_psf": 6,
+    "wind_speed_mph": 0,
+    "sag_ft": 10,
+    "still_air_clearance_ft": 0
+   },
+   "outputs": {
+    "wind_load_lb_per_ft": {
+     "value": 0.554,
+     "tolerance": {
+      "abs": 5e-05
+     }
+    },
+    "swing_angle_deg": {
+     "value": 26.86,
+     "tolerance": {
+      "abs": 0.005
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "conductor-blowout",
+   "source_publisher": "USDA Rural Utilities Service",
+   "source_title": "RUS Bulletin 1724E-200, Design Manual for High Voltage Transmission Lines",
+   "source_edition_or_year": "2015 (RD-GD-2015-78; replaces the August 2009 issue)",
+   "source_section_or_page": "Appendix B p. B-4 (diameter from p. B-3): RAVEN 1/0 6/1, diameter 0.398 in, 0.1452 lb/ft -> 6 psf TRANS 0.1990 lb/ft, SWING ANGLE 53.88 deg. sag_ft (10) and still_air_clearance_ft (0) are placeholders.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "conductor_diameter_in": 0.398,
+    "weight_lb_per_ft": 0.1452,
+    "wind_pressure_psf": 6,
+    "wind_speed_mph": 0,
+    "sag_ft": 10,
+    "still_air_clearance_ft": 0
+   },
+   "outputs": {
+    "wind_load_lb_per_ft": {
+     "value": 0.199,
+     "tolerance": {
+      "abs": 5e-05
+     }
+    },
+    "swing_angle_deg": {
+     "value": 53.88,
+     "tolerance": {
+      "abs": 0.005
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "transverse-wind-load-conductor",
+   "source_publisher": "USDA Rural Utilities Service",
+   "source_title": "RUS Bulletin 1724E-200, Design Manual for High Voltage Transmission Lines",
+   "source_edition_or_year": "2015 (RD-GD-2015-78; replaces the August 2009 issue)",
+   "source_section_or_page": "Section 11.b.(7) Example of Extreme Ice/Wind, p. 11-16: Drake 1.108 in + 2 x 0.75 in ice = 2.608 in; pt = 30 psf x 2.608/12 = 6.520 lb/ft. wind_span_ft (1), conductor_height_ft (40) and the pole fields (0) are placeholders.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "wind_pressure_psf": 30,
+    "wind_speed_mph": 0,
+    "conductor_diameter_in": 2.608,
+    "wind_span_ft": 1,
+    "conductor_count": 1,
+    "conductor_height_ft": 40,
+    "pole_top_diameter_in": 0,
+    "pole_groundline_diameter_in": 0,
+    "pole_height_above_ground_ft": 0
+   },
+   "outputs": {
+    "conductor_force_per_ft_lb": {
+     "value": 6.52,
+     "tolerance": {
+      "abs": 0.0005
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "transverse-wind-load-conductor",
+   "source_publisher": "USDA Rural Utilities Service",
+   "source_title": "RUS Bulletin 1724E-200, Design Manual for High Voltage Transmission Lines",
+   "source_edition_or_year": "2015 (RD-GD-2015-78; replaces the August 2009 issue)",
+   "source_section_or_page": "Section 11.b.(6) Example of Extreme Wind, p. 11-16, and Appendix B p. B-4: Drake (1.108 in) at 21 psf pt = 1.9390 lb/ft; at 19 psf 1.7543 lb/ft (1.9390 x 19/21). This row asserts the 21 psf table value. wind_span_ft, conductor_height_ft and pole fields are placeholders. (The 0.00256 V^2 kz GRF pressures in that example are NOT used: the tile applies no kz/GRF.)",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "wind_pressure_psf": 21,
+    "wind_speed_mph": 0,
+    "conductor_diameter_in": 1.108,
+    "wind_span_ft": 1,
+    "conductor_count": 1,
+    "conductor_height_ft": 40,
+    "pole_top_diameter_in": 0,
+    "pole_groundline_diameter_in": 0,
+    "pole_height_above_ground_ft": 0
+   },
+   "outputs": {
+    "conductor_force_per_ft_lb": {
+     "value": 1.939,
+     "tolerance": {
+      "abs": 5e-05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "transverse-wind-load-conductor",
+   "source_publisher": "USDA Rural Utilities Service",
+   "source_title": "RUS Bulletin 1724E-200, Design Manual for High Voltage Transmission Lines",
+   "source_edition_or_year": "2015 (RD-GD-2015-78; replaces the August 2009 issue)",
+   "source_section_or_page": "Section 11.b.(6), p. 11-16: for 19 psf on Drake the unit load is 1.7543 lb/ft. wind_span_ft, conductor_height_ft and pole fields are placeholders.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "wind_pressure_psf": 19,
+    "wind_speed_mph": 0,
+    "conductor_diameter_in": 1.108,
+    "wind_span_ft": 1,
+    "conductor_count": 1,
+    "conductor_height_ft": 40,
+    "pole_top_diameter_in": 0,
+    "pole_groundline_diameter_in": 0,
+    "pole_height_above_ground_ft": 0
+   },
+   "outputs": {
+    "conductor_force_per_ft_lb": {
+     "value": 1.7543,
+     "tolerance": {
+      "abs": 5e-05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "cipp-liner-thickness",
+   "source_publisher": "Iowa Statewide Urban Design and Specifications (SUDAS)",
+   "source_title": "SUDAS Design Manual Chapter 14C-2 Pipeline Rehabilitation (CIPP design examples credited to Inliner Technologies)",
+   "source_edition_or_year": "2013 edition (rev.)",
+   "source_section_or_page": "Section 14C-2, item 4 'CIPP Design Examples', Figure 14C-2.02 partially deteriorated example: 12 in pipe, ~5% deflection, water table 3 ft below grade over pipe 15 ft deep -> HW 12 ft, PW = 12 x 62.4/144 = 5.2 psi; C = 0.64; EL = 0.5 x 300,000 = 150,000 psi, K 7, N 2, nu 0.3 -> t = 0.226 in. Printed C is rounded to 2 places (exact 0.6398); t printed to 3 decimals. short_term_modulus_psi 300,000 is the printed short-term value; alternative_ovality_pct 2 is a placeholder.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "host_id_in": 12,
+    "ovality_pct": 5,
+    "groundwater_head_ft": 12,
+    "long_term_modulus_psi": 150000,
+    "short_term_modulus_psi": 300000,
+    "enhancement_factor": 7,
+    "safety_factor": 2,
+    "alternative_ovality_pct": 2
+   },
+   "outputs": {
+    "external_pressure_psi": {
+     "value": 5.2,
+     "tolerance": {
+      "abs": 0.005
+     }
+    },
+    "ovality_factor": {
+     "value": 0.64,
+     "tolerance": {
+      "abs": 0.005
+     }
+    },
+    "thickness_in": {
+     "value": 0.226,
+     "tolerance": {
+      "abs": 0.0005
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "cipp-liner-thickness",
+   "source_publisher": "Iowa Statewide Urban Design and Specifications (SUDAS)",
+   "source_title": "SUDAS Design Manual Chapter 14C-2 Pipeline Rehabilitation (CIPP design examples credited to Inliner Technologies)",
+   "source_edition_or_year": "2013 edition (rev.)",
+   "source_section_or_page": "Table 14C-2.03 'Typical Plan Information for a CIPP Project (Partially deteriorated condition)': 12 in pipe, HW 12 ft, C .64, N 2.0 -> min liner thickness .240 in at EL = 125,000 psi (also .226 at 150,000 and .205 at 200,000). Ovality 5% taken from the companion worked example (C .64); K 7 per F1216. Printed to 3 decimals. short_term_modulus_psi 300,000 and alternative_ovality_pct 2 are placeholders.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "host_id_in": 12,
+    "ovality_pct": 5,
+    "groundwater_head_ft": 12,
+    "long_term_modulus_psi": 125000,
+    "short_term_modulus_psi": 300000,
+    "enhancement_factor": 7,
+    "safety_factor": 2,
+    "alternative_ovality_pct": 2
+   },
+   "outputs": {
+    "thickness_in": {
+     "value": 0.24,
+     "tolerance": {
+      "abs": 0.0005
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "cipp-liner-thickness",
+   "source_publisher": "Iowa Statewide Urban Design and Specifications (SUDAS)",
+   "source_title": "SUDAS Design Manual Chapter 14C-2 Pipeline Rehabilitation (CIPP design examples credited to Inliner Technologies)",
+   "source_edition_or_year": "2013 edition (rev.)",
+   "source_section_or_page": "Table 14C-2.03, same row as above, EL = 200,000 psi column: min liner thickness .205 in (12 in pipe, HW 12 ft, C .64, N 2.0). Ovality 5% from the companion worked example; K 7. Printed to 3 decimals. short_term_modulus_psi 300,000 and alternative_ovality_pct 2 are placeholders.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "host_id_in": 12,
+    "ovality_pct": 5,
+    "groundwater_head_ft": 12,
+    "long_term_modulus_psi": 200000,
+    "short_term_modulus_psi": 300000,
+    "enhancement_factor": 7,
+    "safety_factor": 2,
+    "alternative_ovality_pct": 2
+   },
+   "outputs": {
+    "thickness_in": {
+     "value": 0.205,
+     "tolerance": {
+      "abs": 0.0005
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "cipp-liner-thickness",
+   "source_publisher": "Electric Power Research Institute (EPRI)",
+   "source_title": "Design and Qualification of Cured-in-Place Liners for the Repair or Replacement of Buried Piping (report 1013480, public download)",
+   "source_edition_or_year": "2006",
+   "source_section_or_page": "Appendix A, A.1 Gravity Flow Partially Deteriorated Host Pipe (ASTM F1216-05 X1.1, 'Inliner Technology' parameters): D 36.5 in, q 1.918%, Hw 14 ft (printed Pwp 6.062 psi using 0.433 psi/ft), E 300,000, EL 150,000 psi, K 7, nu 0.3, N 2 -> C = 0.842, t = 0.66 in (DR 55.317). Only C and t are asserted: the printed DR and Pwp carry the publisher's rounded 0.433 psi/ft. alternative_ovality_pct 2 is a placeholder.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "host_id_in": 36.5,
+    "ovality_pct": 1.918,
+    "groundwater_head_ft": 14,
+    "long_term_modulus_psi": 150000,
+    "short_term_modulus_psi": 300000,
+    "enhancement_factor": 7,
+    "safety_factor": 2,
+    "alternative_ovality_pct": 2
+   },
+   "outputs": {
+    "ovality_factor": {
+     "value": 0.842,
+     "tolerance": {
+      "abs": 0.0005
+     }
+    },
+    "thickness_in": {
+     "value": 0.66,
+     "tolerance": {
+      "abs": 0.005
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "hdd-bend-radius",
+   "source_publisher": "Trenchless Technology",
+   "source_title": "Drill Master: Understanding Bend Radius (Andrew Farr)",
+   "source_edition_or_year": "June 1, 2002",
+   "source_section_or_page": "Steel product pipe planning rule: 'approximately 100 ft of bend radius for every inch of diameter' -- 12 in steel pipe -> 1,200 ft; the larger of the drill pipe and product pipe radii is used for planning. Exact integers. rod_min_radius_ft 150, entry angle, depth and setback are placeholders.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "pipe_diameter_in": 12,
+    "radius_per_inch_ft": 100,
+    "rod_min_radius_ft": 150,
+    "entry_angle_deg": 12,
+    "required_depth_ft": 25,
+    "available_setback_ft": 300
+   },
+   "outputs": {
+    "pipe_min_radius_ft": {
+     "value": 1200,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "governing_radius_ft": {
+     "value": 1200,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "hdd-bend-radius",
+   "source_publisher": "Trenchless Technology",
+   "source_title": "Drill Master: Understanding Bend Radius (Andrew Farr)",
+   "source_edition_or_year": "June 1, 2002",
+   "source_section_or_page": "Same rule, 3 in steel pipe -> 300 ft bend radius for planning. Exact integers. rod_min_radius_ft 150, entry angle, depth and setback are placeholders.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "pipe_diameter_in": 3,
+    "radius_per_inch_ft": 100,
+    "rod_min_radius_ft": 150,
+    "entry_angle_deg": 12,
+    "required_depth_ft": 25,
+    "available_setback_ft": 300
+   },
+   "outputs": {
+    "pipe_min_radius_ft": {
+     "value": 300,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "governing_radius_ft": {
+     "value": 300,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "hdd-fluid-volume",
+   "source_publisher": "Vermeer Corporation (Pro Tips)",
+   "source_title": "How to plan and mix your best HDD drilling fluid",
+   "source_edition_or_year": "April 23, 2018",
+   "source_section_or_page": "'Determining fluid amount needed' example: 300 ft bore in sandy clay, 4 in gas line pulled behind a 6 in reamer, 1.47 gal/ft x 3 (soil ratio) per 10 ft rod, 30 rods -> 'approximately 1320 gal' of fluid (unrounded 1,323). bentonite rate, pump rate 25 gpm (printed, but not asserted), returns fraction are placeholders.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "ream_diameter_in": 6,
+    "pipe_diameter_in": 4,
+    "bore_length_ft": 300,
+    "fluid_multiplier": 3,
+    "bentonite_lb_per_100gal": 40,
+    "pump_rate_gpm": 25,
+    "returns_fraction_pct": 70
+   },
+   "outputs": {
+    "fluid_required_gal": {
+     "value": 1320,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "hdd-fluid-volume",
+   "source_publisher": "The Driller (column by Mario Brunet, CETCO Drilling Products)",
+   "source_title": "Calculating Fluid Volumes, Pressures for Horizontal Drilling",
+   "source_edition_or_year": "June 27, 2018",
+   "source_section_or_page": "(reamer in)^2 / 24.5 = gal of soil per ft: 10 in reamer -> 4.08 gal/ft; in sand a 2:1 fluid ratio -> 8.16 gal/ft of drilling fluid. Per 1 ft of bore. pipe_diameter_in 6, bentonite, pump rate and returns are placeholders. (The same column's hydrostatic example, 8.5 x 0.052 x 60 = 26.6 psi, is arithmetically 26.52 and is NOT used.)",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "ream_diameter_in": 10,
+    "pipe_diameter_in": 6,
+    "bore_length_ft": 1,
+    "fluid_multiplier": 2,
+    "bentonite_lb_per_100gal": 40,
+    "pump_rate_gpm": 10,
+    "returns_fraction_pct": 70
+   },
+   "outputs": {
+    "hole_volume_gal": {
+     "value": 4.08,
+     "tolerance": {
+      "abs": 0.005
+     }
+    },
+    "fluid_required_gal": {
+     "value": 8.16,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "hdd-fluid-volume",
+   "source_publisher": "The Driller (column by Mario Brunet, CETCO Drilling Products)",
+   "source_title": "Calculating Fluid Volumes, Pressures for Horizontal Drilling",
+   "source_edition_or_year": "June 27, 2018",
+   "source_section_or_page": "Same rule, 5 in bit: 5^2 / 24.5 = 1.02 gal of soil per linear ft. Per 1 ft of bore. pipe_diameter_in 2, multiplier, bentonite, pump rate and returns are placeholders.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "ream_diameter_in": 5,
+    "pipe_diameter_in": 2,
+    "bore_length_ft": 1,
+    "fluid_multiplier": 2,
+    "bentonite_lb_per_100gal": 40,
+    "pump_rate_gpm": 10,
+    "returns_fraction_pct": 70
+   },
+   "outputs": {
+    "hole_volume_gal": {
+     "value": 1.02,
+     "tolerance": {
+      "abs": 0.005
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "rock-bolt-support-pressure",
+   "source_publisher": "U.S. Army Corps of Engineers",
+   "source_title": "EM 1110-1-2907 Rock Reinforcement",
+   "source_edition_or_year": "15 Feb 1980",
+   "source_section_or_page": "Para 3-10 sample problem and Table 3-4: 10 ft diameter tunnel in granite at 170 pcf, loosened zone ~2 ft; trial 2 -> spacing 3 ft, minimum length 2 x 3 = 6 ft (governing); rock load 0.2 x 10 x 170/144 = 2.4 psi (= 345.6 psf, printed to 1 decimal of psi); each anchor supports 3 x 3 = 9 sq ft (1296 sq in) x 6 psi = 7800 lb (unrounded 7,776). Bolt capacity entered as the printed 7,800 lb. target_support_psf 864 (= 6 psi) from the table.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "bolt_capacity_lb": 7800,
+    "spacing_1_ft": 3,
+    "spacing_2_ft": 3,
+    "span_ft": 10,
+    "rock_unit_weight_pcf": 170,
+    "loosened_zone_ft": 2,
+    "target_support_psf": 864
+   },
+   "outputs": {
+    "area_per_bolt_sqft": {
+     "value": 9,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "support_psi": {
+     "value": 6,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "dead_weight_required_psf": {
+     "value": 345.6,
+     "tolerance": {
+      "pct": 2
+     }
+    },
+    "length_from_spacing_ft": {
+     "value": 6,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "bolt_length_ft": {
+     "value": 6,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "highwall-bench-geometry",
+   "source_publisher": "Golder Associates for PolyMet Mining (Minnesota DNR NorthMet permit record)",
+   "source_title": "Report on Recommendations for NorthMet Open Pit Rock Slope Designs (05-1117-019A)",
+   "source_edition_or_year": "June 2006",
+   "source_section_or_page": "Table 5.1 West Pit Ultimate Slope Design Recommendations, Sector I/II/IIIa: 30 m vertical bench separation, bench face angle 65 deg, berm 10 m -> inter-ramp angle 51.4 deg (superscripts 2,3 are footnote markers); footnote 2: berm 8 m with BFA 65 -> IRA 53.8 deg. Metres converted to ft (30 m = 98.425 ft, 10 m = 32.808 ft, 8 m = 26.247 ft); angles are unit-free. Printed to 0.1 deg. bench_count 1 and target_overall_angle_deg 50 are placeholders.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "bench_height_ft": 98.425197,
+    "bench_width_ft": 32.808399,
+    "face_angle_deg": 65,
+    "bench_count": 1,
+    "alternative_bench_width_ft": 26.246719,
+    "target_overall_angle_deg": 50
+   },
+   "outputs": {
+    "overall_angle_deg": {
+     "value": 51.4,
+     "tolerance": {
+      "abs": 0.05
+     }
+    },
+    "alternative_overall_angle_deg": {
+     "value": 53.8,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "highwall-bench-geometry",
+   "source_publisher": "Golder Associates for PolyMet Mining (Minnesota DNR NorthMet permit record)",
+   "source_title": "Report on Recommendations for NorthMet Open Pit Rock Slope Designs (05-1117-019A)",
+   "source_edition_or_year": "June 2006",
+   "source_section_or_page": "Table 5.1, Sector IIIb West Wall/Footwall: 30 m bench separation, bench face angle 70 deg, berm 10 m -> inter-ramp angle 55.1 deg. Metres converted to ft. Printed to 0.1 deg. bench_count, alternative width (8 m) and target angle are placeholders.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "bench_height_ft": 98.425197,
+    "bench_width_ft": 32.808399,
+    "face_angle_deg": 70,
+    "bench_count": 1,
+    "alternative_bench_width_ft": 26.246719,
+    "target_overall_angle_deg": 50
+   },
+   "outputs": {
+    "overall_angle_deg": {
+     "value": 55.1,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "highwall-bench-geometry",
+   "source_publisher": "Kuchling (KJK Mining Consultants blog)",
+   "source_title": "Pit Wall Angles and Bench Widths - How Do They Relate?",
+   "source_edition_or_year": "May 10, 2015",
+   "source_section_or_page": "Example: inter-ramp slope 50 deg with bench face angle 70 deg -> calculated catch bench width 2.4 m for a 5 m bench (single/double/triple benching). Metres converted to ft (5 m = 16.404199 ft; printed 2.4 m = 7.874016 ft). Printed to 0.1 m, so tolerance covers +/-0.05 m. bench_width_ft 10, bench_count 1 and alternative width 5 are placeholders.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "bench_height_ft": 16.404199,
+    "bench_width_ft": 10,
+    "face_angle_deg": 70,
+    "bench_count": 1,
+    "alternative_bench_width_ft": 5,
+    "target_overall_angle_deg": 50
+   },
+   "outputs": {
+    "width_for_target_ft": {
+     "value": 7.874016,
+     "tolerance": {
+      "pct": 2
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "highwall-bench-geometry",
+   "source_publisher": "Kuchling (KJK Mining Consultants blog)",
+   "source_title": "Pit Wall Angles and Bench Widths - How Do They Relate?",
+   "source_edition_or_year": "May 10, 2015",
+   "source_section_or_page": "Example: inter-ramp slope 50 deg with bench face angle 70 deg -> calculated catch bench width 4.8 m for a 10 m bench (single/double/triple benching). Metres converted to ft (10 m = 32.808399 ft; printed 4.8 m = 15.748031 ft). Printed to 0.1 m, so tolerance covers +/-0.05 m. bench_width_ft 10, bench_count 1 and alternative width 5 are placeholders.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "bench_height_ft": 32.808399,
+    "bench_width_ft": 10,
+    "face_angle_deg": 70,
+    "bench_count": 1,
+    "alternative_bench_width_ft": 5,
+    "target_overall_angle_deg": 50
+   },
+   "outputs": {
+    "width_for_target_ft": {
+     "value": 15.748031,
+     "tolerance": {
+      "pct": 1.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "highwall-bench-geometry",
+   "source_publisher": "Kuchling (KJK Mining Consultants blog)",
+   "source_title": "Pit Wall Angles and Bench Widths - How Do They Relate?",
+   "source_edition_or_year": "May 10, 2015",
+   "source_section_or_page": "Example: inter-ramp slope 50 deg with bench face angle 70 deg -> calculated catch bench width 7.1 m for a 15 m bench (single/double/triple benching). Metres converted to ft (15 m = 49.212598 ft; printed 7.1 m = 23.293963 ft). Printed to 0.1 m, so tolerance covers +/-0.05 m. bench_width_ft 10, bench_count 1 and alternative width 5 are placeholders.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "bench_height_ft": 49.212598,
+    "bench_width_ft": 10,
+    "face_angle_deg": 70,
+    "bench_count": 1,
+    "alternative_bench_width_ft": 5,
+    "target_overall_angle_deg": 50
+   },
+   "outputs": {
+    "width_for_target_ft": {
+     "value": 23.293963,
+     "tolerance": {
+      "pct": 0.75
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "pit-dewatering-staging",
+   "source_publisher": "University of Georgia Cooperative Extension",
+   "source_title": "Circular 965, Pumping Plant Performance (field example)",
+   "source_edition_or_year": "2025 rev.",
+   "source_section_or_page": "'Calculating Pumping Plant Performance' example: Q 600 gpm, pumping lift 70 ft, discharge pressure 60 psi x 2.31 = 139 ft (printed, rounded) -> TH 209 ft; WHP = 600 x 209 / 3960 = 31.7 hp. discharge_pressure_ft entered as the printed 139 ft. friction_head_ft 0 (not in the printed head), head_per_pump_ft, suction lift/limit and efficiency are placeholders.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "static_lift_ft": 70,
+    "friction_head_ft": 0,
+    "discharge_pressure_ft": 139,
+    "head_per_pump_ft": 250,
+    "suction_lift_ft": 10,
+    "practical_suction_limit_ft": 25,
+    "flow_gpm": 600,
+    "pump_efficiency_pct": 65
+   },
+   "outputs": {
+    "total_head_ft": {
+     "value": 209,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "water_hp": {
+     "value": 31.7,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "pit-dewatering-staging",
+   "source_publisher": "U.S. EPA (NPDES Operator Webinar Series, Larry W. Moore)",
+   "source_title": "Math for Wastewater Operators (slides)",
+   "source_edition_or_year": "September 21, 2023",
+   "source_section_or_page": "Slide 10 'Water Horsepower': 3,000 gpm against a total head of 25 ft -> WHP = 3000 x 25 / 3960 = 18.94 hp. Total head entered as static lift (friction and discharge 0). head_per_pump_ft, suction and efficiency are placeholders.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "static_lift_ft": 25,
+    "friction_head_ft": 0,
+    "discharge_pressure_ft": 0,
+    "head_per_pump_ft": 100,
+    "suction_lift_ft": 10,
+    "practical_suction_limit_ft": 25,
+    "flow_gpm": 3000,
+    "pump_efficiency_pct": 65
+   },
+   "outputs": {
+    "total_head_ft": {
+     "value": 25,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "water_hp": {
+     "value": 18.94,
+     "tolerance": {
+      "abs": 0.005
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "cyclone-separator-sizing",
+   "source_publisher": "NPTEL (IIT/IISc), Chemical Engineering Design II, Module 5 (after Theodore 2008)",
+   "source_title": "Separation Equipments: Example 5.1 cyclone cut diameter",
+   "source_edition_or_year": "2012 (course module)",
+   "source_section_or_page": "Example 5.1: viscosity 0.02 cP = 0.02 x 6.72e-4 lb/ft-s, inlet width 2 ft, 5 effective turns, inlet velocity 48 ft/s, particle SG 3.0 -> 187.2 lb/ft3; d_pc = 2.92e-5 ft = 8.9 um (only the micron figure is asserted; 2.92e-5 truncates 2.928e-5). The printed calculation neglects gas density (rho_p only); gas_density_pcf 0.075 here changes d50 by 0.02%. k_velocity_heads, airflow and comparison velocity are placeholders.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "inlet_width_ft": 2,
+    "inlet_velocity_fps": 48,
+    "turns": 5,
+    "gas_viscosity_lb_ft_s": 1.344e-05,
+    "gas_density_pcf": 0.075,
+    "particle_density_pcf": 187.2,
+    "k_velocity_heads": 8,
+    "airflow_cfm": 1000,
+    "second_velocity_fps": 60
+   },
+   "outputs": {
+    "d50_micron": {
+     "value": 8.9,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "dust-collection-duct",
+   "source_publisher": "Air Handling Systems (airhand.com)",
+   "source_title": "Dust Collection Information: duct sizing guide",
+   "source_edition_or_year": "web page, accessed 2026-10-01",
+   "source_section_or_page": "Duct velocity chart: woodworking dust 4000 fpm branches, 3500 fpm main. Example: table saw and lathe on 4 in branches at 350 CFM each; the main starts where they join, 350+350 = 700 CFM at 3500 fpm -> 6 in main. Exact. machines 2, simultaneous 2 as printed (both primaries).",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "cfm_per_machine": 350,
+    "branch_velocity_fpm": 4000,
+    "main_velocity_fpm": 3500,
+    "machines": 2,
+    "simultaneous": 2
+   },
+   "outputs": {
+    "branch_size_in": {
+     "value": 4,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "main_cfm": {
+     "value": 700,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "main_size_in": {
+     "value": 6,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "air-compressor-cfm-sizing",
+   "source_publisher": "Compressed Air and Gas Institute (CAGI)",
+   "source_title": "Compressed Air and Gas Handbook, Chapter 4 Compressed Air System Design",
+   "source_edition_or_year": "2021",
+   "source_section_or_page": "Table 4.4 'How to Calculate Average System Demand': 9 tool rows; column D (cfm if all operated simultaneously) total 1,375 cfm, column E (A x B x C / 100) total 528 cfm. Entered as four load-factor groups with qty 1 and the summed column-D cfm: 25% = blowguns 100 + small screwdrivers 240 + large nutsetters 60 = 400; 50% = grinders 500 + chippers 300 = 800; 10% = hoists 70; 20% = woodborer 30 + screwdriver 35 + hoist 40 = 105. Leak and growth allowances 0 (the table adds none); cfm_per_hp 4 is a placeholder.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "tool1_qty": 1,
+    "tool1_cfm": 400,
+    "tool1_duty": 0.25,
+    "tool2_qty": 1,
+    "tool2_cfm": 800,
+    "tool2_duty": 0.5,
+    "tool3_qty": 1,
+    "tool3_cfm": 70,
+    "tool3_duty": 0.1,
+    "tool4_qty": 1,
+    "tool4_cfm": 105,
+    "tool4_duty": 0.2,
+    "leak_allowance_pct": 0,
+    "growth_allowance_pct": 0,
+    "cfm_per_hp": 4
+   },
+   "outputs": {
+    "connected_cfm": {
+     "value": 1375,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "average_cfm": {
+     "value": 528,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "vacuum-evacuation-time",
+   "source_publisher": "Milne Open Textbooks (SUNY Geneseo)",
+   "source_title": "Introduction to Vacuum Technology (Hata, Brewer et al.), Chapter 4 Rough Vacuum Regime",
+   "source_edition_or_year": "2023",
+   "source_section_or_page": "Example 4.7: 193 L/min rotary vane pump, 300 L chamber, 760 -> 1 Torr; P_ult 0.003 Torr neglected in the printed simplification -> t = 1.55 min x ln(760) = 10.31 min. Volume and speed converted L -> ft3 at 28.3168 L/ft3 (only V/S matters). leak 0, conductance 1.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "chamber_volume_ft3": 10.5944,
+    "pump_speed_cfm": 6.815731,
+    "start_pressure_torr": 760,
+    "target_pressure_torr": 1,
+    "leak_rate_torr_cfm": 0,
+    "conductance_efficiency": 1
+   },
+   "outputs": {
+    "evacuation_minutes": {
+     "value": 10.31,
+     "tolerance": {
+      "abs": 0.005
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "vacuum-evacuation-time",
+   "source_publisher": "Milne Open Textbooks (SUNY Geneseo)",
+   "source_title": "Introduction to Vacuum Technology (Hata, Brewer et al.), Chapter 4 Rough Vacuum Regime",
+   "source_edition_or_year": "2023",
+   "source_section_or_page": "Example 4.8: 40 L/min diaphragm pump, 300 L chamber, 760 -> 10 Torr with pump ultimate 3.8 Torr -> t = 7.5 min x ln(122) = 36 min. The ultimate is entered as the leak-limited ultimate: leak_rate = 3.8 Torr x speed in cfm, so ultimate_pressure_torr = 3.8. Printed to whole minutes.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "chamber_volume_ft3": 10.5944,
+    "pump_speed_cfm": 1.412587,
+    "start_pressure_torr": 760,
+    "target_pressure_torr": 10,
+    "leak_rate_torr_cfm": 5.367829,
+    "conductance_efficiency": 1
+   },
+   "outputs": {
+    "evacuation_minutes": {
+     "value": 36,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "ultimate_pressure_torr": {
+     "value": 3.8,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "vacuum-evacuation-time",
+   "source_publisher": "Milne Open Textbooks (SUNY Geneseo)",
+   "source_title": "Introduction to Vacuum Technology (Hata, Brewer et al.), Chapter 4 Rough Vacuum Regime",
+   "source_edition_or_year": "2023",
+   "source_section_or_page": "Example 4.8 note: with the ultimate pressure assumed negligible the same pump-down (300 L, 40 L/min, 760 -> 10 Torr) 'yields 32 minutes' (7.5 x ln 76 = 32.48). Printed to whole minutes.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "chamber_volume_ft3": 10.5944,
+    "pump_speed_cfm": 1.412587,
+    "start_pressure_torr": 760,
+    "target_pressure_torr": 10,
+    "leak_rate_torr_cfm": 0,
+    "conductance_efficiency": 1
+   },
+   "outputs": {
+    "evacuation_minutes": {
+     "value": 32,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "vacuum-evacuation-time",
+   "source_publisher": "Milne Open Textbooks (SUNY Geneseo)",
+   "source_title": "Introduction to Vacuum Technology (Hata, Brewer et al.), Chapter 4 Rough Vacuum Regime",
+   "source_edition_or_year": "2023",
+   "source_section_or_page": "Example 4.9, first segment: 13 L chamber, 93 L/min, 100,000 Pa -> 300 Pa with P_ult 4 Pa -> 0.81 min. Pa converted to Torr (x 760/101325); the 4 Pa ultimate entered as leak = 4 Pa x speed. Printed to 0.01 min.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "chamber_volume_ft3": 0.459091,
+    "pump_speed_cfm": 3.284264,
+    "start_pressure_torr": 750.061683,
+    "target_pressure_torr": 2.250185,
+    "leak_rate_torr_cfm": 0.098536,
+    "conductance_efficiency": 1
+   },
+   "outputs": {
+    "evacuation_minutes": {
+     "value": 0.81,
+     "tolerance": {
+      "abs": 0.005
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "vacuum-evacuation-time",
+   "source_publisher": "Milne Open Textbooks (SUNY Geneseo)",
+   "source_title": "Introduction to Vacuum Technology (Hata, Brewer et al.), Chapter 4 Rough Vacuum Regime",
+   "source_edition_or_year": "2023",
+   "source_section_or_page": "Example 4.9 comparison: constant 93 L/min over the whole range, 13 L, 100,000 Pa -> 10 Pa (P_ult 4 Pa) 'yields a pump-down time of 1.36 minutes'. Pa converted to Torr; 4 Pa ultimate entered as leak = 4 Pa x speed. Printed to 0.01 min.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "chamber_volume_ft3": 0.459091,
+    "pump_speed_cfm": 3.284264,
+    "start_pressure_torr": 750.061683,
+    "target_pressure_torr": 0.075006,
+    "leak_rate_torr_cfm": 0.098536,
+    "conductance_efficiency": 1
+   },
+   "outputs": {
+    "evacuation_minutes": {
+     "value": 1.36,
+     "tolerance": {
+      "abs": 0.005
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "vacuum-evacuation-time",
+   "source_publisher": "The Engineering ToolBox",
+   "source_title": "Vacuum - Evacuation Time",
+   "source_edition_or_year": "web page, accessed 2026-10-01",
+   "source_section_or_page": "Example: 1 m3 evacuated with 0.1 m3/s from 1000 mbar to 100 mbar -> t = (1/0.1) ln(1000/100) = 23 s (= 0.383333 min). m3 -> ft3 (35.3147) and m3/s -> cfm (2118.88 per m3/s); mbar -> torr. Printed to whole seconds. leak 0, conductance 1.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "chamber_volume_ft3": 35.314667,
+    "pump_speed_cfm": 211.888,
+    "start_pressure_torr": 750.061683,
+    "target_pressure_torr": 75.006168,
+    "leak_rate_torr_cfm": 0,
+    "conductance_efficiency": 1
+   },
+   "outputs": {
+    "evacuation_minutes": {
+     "value": 0.383333,
+     "tolerance": {
+      "abs": 0.008333
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "vacuum-evacuation-time",
+   "source_publisher": "The Engineering ToolBox",
+   "source_title": "Vacuum - Evacuation Time",
+   "source_edition_or_year": "web page, accessed 2026-10-01",
+   "source_section_or_page": "Example: 1 m3 evacuated with 0.1 m3/s from 1000 mbar to 10 mbar -> t = (1/0.1) ln(1000/10) = 46 s (= 0.766667 min). m3 -> ft3 (35.3147) and m3/s -> cfm (2118.88 per m3/s); mbar -> torr. Printed to whole seconds. leak 0, conductance 1.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "chamber_volume_ft3": 35.314667,
+    "pump_speed_cfm": 211.888,
+    "start_pressure_torr": 750.061683,
+    "target_pressure_torr": 7.500617,
+    "leak_rate_torr_cfm": 0,
+    "conductance_efficiency": 1
+   },
+   "outputs": {
+    "evacuation_minutes": {
+     "value": 0.766667,
+     "tolerance": {
+      "abs": 0.008333
      }
     }
    }

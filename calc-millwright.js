@@ -423,7 +423,7 @@ MILLWRIGHT_RENDERERS["coupling-alignment-tolerance"] = _simpleRenderer({
 // ============ spec-v1474: vibration severity zone ============
 
 // dims: in { reading: L / T, reading_is_mm_s: dimensionless, boundary_ab: L / T, boundary_bc: L / T, boundary_cd: L / T, previous_reading: L / T, interval_months: T } out: { reading_in_s: L / T, reading_mm_s: L / T, margin_to_next_zone_in_s: L / T, change_pct: dimensionless, change_per_month_in_s: L / T }
-export function computeVibrationSeverityZone({ reading = 0, reading_is_mm_s = 0, boundary_ab = 0.044, boundary_bc = 0.110, boundary_cd = 0.280, previous_reading = 0, interval_months = 0 } = {}) {
+export function computeVibrationSeverityZone({ reading = 0, reading_is_mm_s = 0, boundary_ab = 0.0441, boundary_bc = 0.1102, boundary_cd = 0.2795, previous_reading = 0, interval_months = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(reading > 0)) return { error: "The overall velocity reading must be positive." };
   if (!(boundary_ab > 0) || !(boundary_bc > boundary_ab) || !(boundary_cd > boundary_bc)) return { error: "The three zone boundaries must be positive and increasing (A/B < B/C < C/D), in in/s. ISO 20816 sets them by machine class; no table is shipped." };
@@ -433,10 +433,15 @@ export function computeVibrationSeverityZone({ reading = 0, reading_is_mm_s = 0,
   const toIns = (v) => (reading_is_mm_s > 0 ? v / MM_S_PER_IN_S : v);
   const reading_in_s = toIns(reading);
   const reading_mm_s = reading_in_s * MM_S_PER_IN_S;
+  // The ISO boundaries are mm/s values (1.12 / 2.8 / 7.1 for Class II) and any
+  // in/s figure is a rounding of them: until 2026-10-01 the 0.044 / 0.110
+  // defaults sat below 1.12 and 2.8 mm/s, so a reading AT a boundary in mm/s
+  // landed a zone high. A 0.1% band absorbs that rounding.
+  const _at = (b) => b * (1 + 1e-3);
   let zone, next_boundary;
-  if (reading_in_s <= boundary_ab) { zone = "A"; next_boundary = boundary_ab; }
-  else if (reading_in_s <= boundary_bc) { zone = "B"; next_boundary = boundary_bc; }
-  else if (reading_in_s <= boundary_cd) { zone = "C"; next_boundary = boundary_cd; }
+  if (reading_in_s <= _at(boundary_ab)) { zone = "A"; next_boundary = boundary_ab; }
+  else if (reading_in_s <= _at(boundary_bc)) { zone = "B"; next_boundary = boundary_bc; }
+  else if (reading_in_s <= _at(boundary_cd)) { zone = "C"; next_boundary = boundary_cd; }
   else { zone = "D"; next_boundary = boundary_cd; }
   const margin_to_next_zone_in_s = zone === "D" ? reading_in_s - boundary_cd : next_boundary - reading_in_s;
   const previous_in_s = previous_reading > 0 ? toIns(previous_reading) : null;
@@ -457,19 +462,19 @@ export function computeVibrationSeverityZone({ reading = 0, reading_is_mm_s = 0,
     trend_verdict: change_pct === null
       ? "(no previous reading entered -- and the CHANGE often matters more than the zone)"
       : (change_pct >= 0 ? "up " : "down ") + fmt(Math.abs(change_pct), 0) + "%" + (change_per_month_in_s === null ? "" : ", " + fmt(Math.abs(change_per_month_in_s), 4) + " in/s per month") + (crossed ? " AND it crossed a zone boundary in one interval" : " without crossing a zone boundary -- which a doubling inside zone B still makes actionable"),
-    note: "An overall vibration reading in inches per second means nothing without a class, because the same absolute velocity means different things on a 10 hp pump and a 2,000 hp compressor on a soft foundation. ISO 20816 splits machines into classes by power and mounting, and within a class the three zone boundaries are fixed velocities -- so the reading and the class together give the answer with no judgment required, which is exactly what makes it useful to a technician who is not a vibration analyst. Zone A is new-machine condition, B is acceptable for unrestricted long-term operation, C is unsatisfactory for the long term and means plan the work rather than necessarily shut down, and D is severe with damage possibly occurring. A 60 hp pump on the Class II boundaries reading 0.135 in/s sits in zone C: above the 0.110 B/C boundary and below the 0.280 C/D. THE ZONE IS A SCREEN, NOT A DIAGNOSIS. A reading in zone C says something is wrong and says nothing whatever about what; the forcing-frequency and bearing-defect calculations are what turn an overall level into a cause. Equally important is the CHANGE, which is the part a single reading cannot show: a machine that has gone from 0.062 to 0.135 in/s in six months has grown 118% and crossed a boundary in one interval, and a machine that has merely doubled from 0.06 to 0.12 is telling a clear story even though both readings sit inside zone B. The standard's own guidance treats a significant change as actionable regardless of zone, and that rate is what turns a scheduled inspection into a planned outage before it becomes an unplanned one. NO CLASS TABLE IS SHIPPED: the boundaries are entered, because they depend on the class, on the edition, and on whether the plant has adopted its own limits. This is an overall broadband velocity screen. It does not diagnose, identify a fault, or evaluate displacement or acceleration, and an overall velocity in the standard's band is insensitive to exactly the high-frequency energy that early bearing damage produces -- a bearing can be failing with the overall reading firmly in zone B. It does not address measurement quality: transducer mounting, location, direction, and the band the instrument actually integrated all change the number, and readings taken differently are not comparable, which matters most for the trend. ISO 20816, the machine manufacturer's limits, and the plant's condition monitoring programme govern.",
+    note: "An overall vibration reading in inches per second means nothing without a class, because the same absolute velocity means different things on a 10 hp pump and a 2,000 hp compressor on a soft foundation. ISO 10816-1 (Annex B, classes I to IV) and the machine-specific parts of ISO 10816 and 20816 group machines by power and mounting, and within a group the three zone boundaries are fixed velocities -- so the reading and the class together give the answer with no judgment required, which is exactly what makes it useful to a technician who is not a vibration analyst. Zone A is new-machine condition, B is acceptable for unrestricted long-term operation, C is unsatisfactory for the long term and means plan the work rather than necessarily shut down, and D is severe with damage possibly occurring. A 60 hp pump on the Class II boundaries reading 0.135 in/s sits in zone C: above the 0.110 B/C boundary and below the 0.280 C/D. THE ZONE IS A SCREEN, NOT A DIAGNOSIS. A reading in zone C says something is wrong and says nothing whatever about what; the forcing-frequency and bearing-defect calculations are what turn an overall level into a cause. Equally important is the CHANGE, which is the part a single reading cannot show: a machine that has gone from 0.062 to 0.135 in/s in six months has grown 118% and crossed a boundary in one interval, and a machine that has merely doubled from 0.06 to 0.12 is telling a clear story even though both readings sit inside zone B. The standard's own guidance treats a significant change as actionable regardless of zone, and that rate is what turns a scheduled inspection into a planned outage before it becomes an unplanned one. NO CLASS TABLE IS SHIPPED: the boundaries are entered, because they depend on the class, on the edition, and on whether the plant has adopted its own limits. This is an overall broadband velocity screen. It does not diagnose, identify a fault, or evaluate displacement or acceleration, and an overall velocity in the standard's band is insensitive to exactly the high-frequency energy that early bearing damage produces -- a bearing can be failing with the overall reading firmly in zone B. It does not address measurement quality: transducer mounting, location, direction, and the band the instrument actually integrated all change the number, and readings taken differently are not comparable, which matters most for the trend. ISO 20816, the machine manufacturer's limits, and the plant's condition monitoring programme govern.",
   };
 }
-const vibrationSeverityZoneExample = { inputs: { reading: 0.135, reading_is_mm_s: 0, boundary_ab: 0.044, boundary_bc: 0.110, boundary_cd: 0.280, previous_reading: 0.062, interval_months: 6 } };
+const vibrationSeverityZoneExample = { inputs: { reading: 0.135, reading_is_mm_s: 0, boundary_ab: 0.0441, boundary_bc: 0.1102, boundary_cd: 0.2795, previous_reading: 0.062, interval_months: 6 } };
 MILLWRIGHT_RENDERERS["vibration-severity-zone"] = _simpleRenderer({
   citation: "Citation: the ISO 20816 vibration severity zones A/B/C/D, CITED NOT MIRRORED -- the class boundaries are entered by the user because they depend on the machine class, the edition, and the plant's own adopted limits. Zone A is new-machine condition, B acceptable for unrestricted long-term operation, C unsatisfactory long-term, D severe. Conversion 1 mm/s = 0.03937 in/s. The standard's guidance treats a significant CHANGE as actionable regardless of zone. ISO 20816, the machine manufacturer's limits, and the plant's condition monitoring programme govern.",
   example: vibrationSeverityZoneExample.inputs,
   fields: [
     { key: "reading", label: "Overall velocity reading (rms)", kind: "number", default: 0.135 },
     { key: "reading_is_mm_s", label: "Reading is in mm/s (1 for mm/s, 0 for in/s)", kind: "number", default: 0 },
-    { key: "boundary_ab", label: "A/B boundary for this class (in/s)", kind: "number", default: 0.044 },
-    { key: "boundary_bc", label: "B/C boundary for this class (in/s)", kind: "number", default: 0.110 },
-    { key: "boundary_cd", label: "C/D boundary for this class (in/s)", kind: "number", default: 0.280 },
+    { key: "boundary_ab", label: "A/B boundary for this class (in/s; 1.12 mm/s = 0.0441)", kind: "number", default: 0.0441 },
+    { key: "boundary_bc", label: "B/C boundary for this class (in/s; 2.8 mm/s = 0.1102)", kind: "number", default: 0.1102 },
+    { key: "boundary_cd", label: "C/D boundary for this class (in/s; 7.1 mm/s = 0.2795)", kind: "number", default: 0.2795 },
     { key: "previous_reading", label: "Previous reading, same units (0 to skip)", kind: "number", default: 0.062 },
     { key: "interval_months", label: "Months since that reading", kind: "number", default: 6 },
   ],
@@ -705,7 +710,9 @@ export function computeRollerChainWearElongation({ chain_pitch_in = 0, pitches_m
   const per_pitch_wear_in = elongation_in / pitches_measured;
   const outs = [nominal_length_in, elongation_pct, elongation_in, allowable_length_in, remaining_allowance_in];
   if (!outs.every(Number.isFinite)) return { error: "Chain elongation math is not a finite value." };
-  const replace = elongation_pct > elongation_limit_pct;
+  // A pin "at or beyond the indicated line" is worn to the limit (Diamond Chain),
+  // so AT the limit replaces; 1e-9 absorbs the float error in the percentage.
+  const replace = elongation_pct >= elongation_limit_pct * (1 - 1e-9);
   return {
     nominal_length_in, measured_length_in, elongation_in, elongation_pct,
     allowable_length_in, remaining_allowance_in, per_pitch_wear_in,
@@ -714,7 +721,7 @@ export function computeRollerChainWearElongation({ chain_pitch_in = 0, pitches_m
       ? "REPLACE: " + fmt(elongation_pct, 2) + "% against a " + fmt(elongation_limit_pct, 2) + "% limit, " + fmt(-remaining_allowance_in, 3) + " in past the allowable length -- and inspect the sprockets, because a chain this far gone has probably hooked the teeth"
       : "keep: " + fmt(elongation_pct, 2) + "% against a " + fmt(elongation_limit_pct, 2) + "% limit, with " + fmt(remaining_allowance_in, 3) + " in of allowance left",
     span_verdict: "measuring ONE pitch would read " + fmt(per_pitch_wear_in * 1000, 1) + " thousandths of wear, which no tape in a plant resolves -- the " + fmt(pitches_measured, 0) + " pitch span is what makes it readable",
-    note: "Roller chain does not stretch, it WEARS: the pin and bushing clearances grow and the chain gets longer, so the replacement decision is a tape measure over a known number of pitches and one percentage. Measure across the run with the chain pulled taut, pin centre to pin centre, and compare against pitch times the count. MEASURING OVER TWELVE OR MORE PITCHES RATHER THAN ONE IS THE WHOLE ACCURACY TRICK -- the wear per joint is tiny and only accumulates into something a tape can read over a span. A #50 chain at 0.625 in pitch reading 7.66 in over twelve pitches is 2.13% elongated; the same chain measured over ONE pitch would show 13.3 thousandths of difference, which nothing in a plant will resolve reliably. The 1.5% figure is not arbitrary. A chain riding a sprocket is a polygon, and as the pitch grows the chain contacts fewer teeth and rides higher up the flanks; past roughly 1.5% on a normal tooth count it begins to jump, and the sprocket teeth wear into a hooked profile. Once that happens the sprocket is scrap too, and a new chain on a hooked sprocket wears out in a fraction of its life -- which is why chain and sprockets are replaced as a SET and why a replace verdict here is also an instruction to inspect the teeth. The threshold FALLS for sprockets with many teeth -- a worn chain climbs a large sprocket sooner, so the limit drops to about 200/N % above 67 teeth -- and 3.0% is accepted on ordinary drives with small sprockets; the limit is entered rather than fixed for that reason. This is one measurement against one limit. It does not inspect the sprockets, which is the other half of the decision and which no length reading reveals; it does not evaluate lubrication, which is what actually determines the wear rate and whose failure is the usual root cause; and it does not address elongation from a single overload event, chain fatigue, or plate cracking, none of which shows as elongation and any of which can fail a chain that measures fine. It does not size a chain or select a replacement. The chain and sprocket manufacturers' data and the drive designer govern.",
+    note: "Roller chain does not stretch, it WEARS: the pin and bushing clearances grow and the chain gets longer, so the replacement decision is a tape measure over a known number of pitches and one percentage. Measure across the run with the chain pulled taut, pin centre to pin centre, and compare against pitch times the count. MEASURING OVER TWELVE OR MORE PITCHES RATHER THAN ONE IS THE WHOLE ACCURACY TRICK -- the wear per joint is tiny and only accumulates into something a tape can read over a span. A #50 chain at 0.625 in pitch reading 7.66 in over twelve pitches is 2.13% elongated; the same chain measured over ONE pitch would show 13.3 thousandths of difference, which nothing in a plant will resolve reliably. The limit is a judgment band rather than one number: Diamond Chain puts the usual industrial maximum at 3%, and about 1.5% where centers are fixed, strands run in parallel or timing matters, or the drive must run smoothly -- the 1.5% default here is the strict end. A chain riding a sprocket is a polygon, and as the pitch grows the chain contacts fewer teeth and rides higher up the flanks until it begins to jump, and the sprocket teeth wear into a hooked profile. Once that happens the sprocket is scrap too, and a new chain on a hooked sprocket wears out in a fraction of its life -- which is why chain and sprockets are replaced as a SET and why a replace verdict here is also an instruction to inspect the teeth. The threshold FALLS for sprockets with many teeth -- a worn chain climbs a large sprocket sooner, so the limit drops to about 200/N % above 67 teeth -- and 3.0% is accepted on ordinary drives with small sprockets; the limit is entered rather than fixed for that reason. This is one measurement against one limit. It does not inspect the sprockets, which is the other half of the decision and which no length reading reveals; it does not evaluate lubrication, which is what actually determines the wear rate and whose failure is the usual root cause; and it does not address elongation from a single overload event, chain fatigue, or plate cracking, none of which shows as elongation and any of which can fail a chain that measures fine. It does not size a chain or select a replacement. The chain and sprocket manufacturers' data and the drive designer govern.",
   };
 }
 const rollerChainWearElongationExample = { inputs: { chain_pitch_in: 0.625, pitches_measured: 12, measured_length_in: 7.66, elongation_limit_pct: 1.5, sprocket_teeth: 19 } };
@@ -751,16 +758,23 @@ export function computeGearReducerServiceFactor({ transmitted_hp = 0, service_fa
   if (nameplate_selection_hp < 0) return { error: "The nameplate-only selection cannot be negative (hp)." };
   const required_hp = transmitted_hp * service_factor;
   const mechanical_margin = catalog_mechanical_hp / required_hp;
-  const mechanical_passes = catalog_mechanical_hp >= required_hp;
+  const mechanical_passes = catalog_mechanical_hp >= required_hp * (1 - 1e-9);
   // A gearbox has TWO independent ratings, and on a continuously running unit
   // the thermal one is frequently the lower.
   const has_thermal = catalog_thermal_hp > 0;
-  const governing_rating_hp = has_thermal ? Math.min(catalog_mechanical_hp, catalog_thermal_hp) : catalog_mechanical_hp;
-  const thermal_governs = has_thermal && catalog_thermal_hp < catalog_mechanical_hp;
-  const governing_margin = governing_rating_hp / required_hp;
-  const passes = governing_rating_hp >= required_hp;
-  const shortfall_hp = passes ? 0 : required_hp - governing_rating_hp;
-  const max_transmitted_hp = governing_rating_hp / service_factor;
+  // The two are checked against DIFFERENT powers. Rexnord Falk 161-110 p. 14:
+  // "It is not necessary to apply the mechanical service factor to the basic
+  // thermal rating"; the thermal rating must cover the power actually
+  // transmitted. Until 2026-10-01 the thermal rating was held to transmitted x
+  // SF, so a 42 hp thermal box on a 25 hp load at SF 2.0 read 8 hp short.
+  const thermal_passes = !has_thermal || catalog_thermal_hp >= transmitted_hp * (1 - 1e-9);
+  const mech_limit_hp = catalog_mechanical_hp / service_factor;
+  const thermal_governs = has_thermal && catalog_thermal_hp < mech_limit_hp;
+  const max_transmitted_hp = thermal_governs ? catalog_thermal_hp : mech_limit_hp;
+  const governing_rating_hp = thermal_governs ? catalog_thermal_hp : catalog_mechanical_hp;
+  const governing_margin = max_transmitted_hp / transmitted_hp;
+  const passes = (catalog_mechanical_hp >= required_hp * (1 - 1e-9)) && thermal_passes;
+  const shortfall_hp = Math.max(0, required_hp - catalog_mechanical_hp, has_thermal ? transmitted_hp - catalog_thermal_hp : 0);
   const nameplate_shortfall_pct = nameplate_selection_hp > 0
     ? (required_hp - nameplate_selection_hp) / required_hp * 100 : null;
   const outs = [required_hp, mechanical_margin, governing_rating_hp, max_transmitted_hp];
@@ -768,33 +782,35 @@ export function computeGearReducerServiceFactor({ transmitted_hp = 0, service_fa
   return {
     required_hp, service_factor, transmitted_hp,
     mechanical_margin, mechanical_passes, governing_rating_hp, governing_margin,
-    thermal_governs, has_thermal, passes, shortfall_hp, max_transmitted_hp,
+    thermal_governs, thermal_passes, has_thermal, passes, shortfall_hp, max_transmitted_hp,
     catalog_mechanical_hp, catalog_thermal_hp, nameplate_shortfall_pct,
     verdict: passes
-      ? "PASSES with a margin of " + fmt(governing_margin, 2) + " on the governing " + (thermal_governs ? "THERMAL" : "mechanical") + " rating"
-      : "FAILS by " + fmt(shortfall_hp, 1) + " hp on the governing " + (thermal_governs ? "THERMAL" : "mechanical") + " rating",
+      ? "PASSES with a margin of " + fmt(governing_margin, 2) + " on transmitted power, the " + (thermal_governs ? "THERMAL" : "mechanical") + " rating governing"
+      : "FAILS by " + fmt(shortfall_hp, 1) + " hp on the " + (!thermal_passes ? "THERMAL rating against the power actually transmitted" : "mechanical rating against transmitted power x the service factor"),
     thermal_verdict: !has_thermal
       ? "(no thermal rating entered -- and on a continuously running unit it is frequently the LOWER of the two, so it is worth finding)"
-      : thermal_governs
-        ? "the THERMAL rating of " + fmt(catalog_thermal_hp, 1) + " hp governs, below the " + fmt(catalog_mechanical_hp, 1) + " hp mechanical -- the fix is a cooling fan, an oil cooler, or a larger case, NOT a bigger gearset"
-        : "the mechanical rating governs; the " + fmt(catalog_thermal_hp, 1) + " hp thermal rating has room",
+      : !thermal_passes
+        ? "the THERMAL rating of " + fmt(catalog_thermal_hp, 1) + " hp is below the " + fmt(transmitted_hp, 1) + " hp actually transmitted (no service factor on thermal, per Falk) -- the fix is a cooling fan, an oil cooler, or a larger case, NOT a bigger gearset"
+        : thermal_governs
+          ? "the THERMAL rating of " + fmt(catalog_thermal_hp, 1) + " hp covers the " + fmt(transmitted_hp, 1) + " hp transmitted and is what limits the unit"
+          : "the mechanical rating governs; the " + fmt(catalog_thermal_hp, 1) + " hp thermal rating covers the " + fmt(transmitted_hp, 1) + " hp transmitted with room",
     nameplate_verdict: nameplate_shortfall_pct === null
       ? "(no nameplate-only selection entered)"
       : nameplate_shortfall_pct > 0
         ? "selecting on the motor nameplate would have bought " + fmt(nameplate_selection_hp, 1) + " hp, which is " + fmt(nameplate_shortfall_pct, 0) + "% under the " + fmt(required_hp, 1) + " hp actually required"
         : "the nameplate-only selection happens to cover the requirement here, which the service factor is what proves",
-    note: "A 25 hp motor does not need a 25 hp gearbox. It needs a gearbox whose catalog rating covers the transmitted power multiplied by a service factor, and choosing on motor nameplate alone is the standard way a reducer fails in eighteen months. The service factor is an empirical multiplier that converts an average transmitted power into the PEAK the gear teeth and bearings actually see, and it has three inputs: the character of the prime mover, since an electric motor is smooth and a single-cylinder engine is not; the shock character of the driven machine, since a centrifugal pump is uniform and a jaw crusher is heavy shock; and the duty hours, because a reducer running continuously has no time to shed heat or recover. Factors near 1.0 apply to a uniform load on short duty and climb past 2.0 for heavy shock around the clock. A 25 hp motor driving a reciprocating compressor 24 hours a day at a service factor of 2.00 needs a 50 hp catalog rating, and a 60 hp box passes with a margin of 1.20. THE TRAP IS THE THERMAL RATING. A gearbox has two INDEPENDENT ratings -- mechanical, set by the teeth and bearings, and thermal, set by how much heat the case can shed at ambient -- and on continuously running units the thermal rating is frequently the lower of the two. That same 60 hp box carrying a 42 hp thermal rating at 104 degF ambient is 8 hp short, and the fix is a cooling fan, an oil cooler, or a larger case rather than a bigger gearset, because the gears were never the problem. No service factor catches that: it is a separate check against a separate number, which is why both are entered here and the lower governs. The service factor itself is ENTERED and not derived, because published tables differ between manufacturers and between standards, and the classification of a driven machine is a judgment the manufacturer's table makes rather than a formula. This does not select a reducer, compute a ratio, or evaluate the gearing, bearings, seals, or shaft loads -- an overhung load from a chain or belt drive is a common cause of reducer failure that no power rating addresses. It does not check the thermal rating against a specific ambient, which needs the manufacturer's own derating curve, and it does not address lubrication, which is what determines whether either rating is achieved. The gear reducer manufacturer's catalog ratings, service factor tables, and thermal derating data govern.",
+    note: "A 25 hp motor does not need a 25 hp gearbox. It needs a gearbox whose catalog rating covers the transmitted power multiplied by a service factor, and choosing on motor nameplate alone is the standard way a reducer fails in eighteen months. The service factor is an empirical multiplier that converts an average transmitted power into the PEAK the gear teeth and bearings actually see, and it has three inputs: the character of the prime mover, since an electric motor is smooth and a single-cylinder engine is not; the shock character of the driven machine, since a centrifugal pump is uniform and a jaw crusher is heavy shock; and the duty hours, because a reducer running continuously has no time to shed heat or recover. Factors near 1.0 apply to a uniform load on short duty and climb past 2.0 for heavy shock around the clock. A 25 hp motor driving a reciprocating compressor 24 hours a day at a service factor of 2.00 needs a 50 hp catalog rating, and a 60 hp box passes with a margin of 1.20. THE TRAP IS THE THERMAL RATING. A gearbox has two INDEPENDENT ratings -- mechanical, set by the teeth and bearings, and thermal, set by how much heat the case can shed at ambient -- and on continuously running units the thermal rating is frequently the lower of the two. That same 60 hp box carrying a 22 hp thermal rating at 104 degF ambient is 3 hp short of the 25 hp it actually transmits -- the thermal rating is checked against the transmitted power WITHOUT the service factor (Rexnord Falk 161-110: it is not necessary to apply the mechanical service factor to the thermal rating) -- and the fix is a cooling fan, an oil cooler, or a larger case rather than a bigger gearset, because the gears were never the problem. No service factor catches that: it is a separate check against a separate number, which is why both are entered here and each is held to its own power. The service factor itself is ENTERED and not derived, because published tables differ between manufacturers and between standards, and the classification of a driven machine is a judgment the manufacturer's table makes rather than a formula. This does not select a reducer, compute a ratio, or evaluate the gearing, bearings, seals, or shaft loads -- an overhung load from a chain or belt drive is a common cause of reducer failure that no power rating addresses. It does not check the thermal rating against a specific ambient, which needs the manufacturer's own derating curve, and it does not address lubrication, which is what determines whether either rating is achieved. The gear reducer manufacturer's catalog ratings, service factor tables, and thermal derating data govern.",
   };
 }
-const gearReducerServiceFactorExample = { inputs: { transmitted_hp: 25, service_factor: 2.0, catalog_mechanical_hp: 60, catalog_thermal_hp: 42, nameplate_selection_hp: 30 } };
+const gearReducerServiceFactorExample = { inputs: { transmitted_hp: 25, service_factor: 2.0, catalog_mechanical_hp: 60, catalog_thermal_hp: 22, nameplate_selection_hp: 30 } };
 MILLWRIGHT_RENDERERS["gear-reducer-service-factor"] = _simpleRenderer({
-  citation: "Citation: the gear reducer service-factor selection by name -- required rating = transmitted power x the service factor for the driver character, driven-machine shock class, and duty hours -- with the catalog MECHANICAL and THERMAL ratings compared separately and the LOWER governing. The service factor is entered because published tables differ between manufacturers and standards. The gear reducer manufacturer's catalog ratings, service factor tables, and thermal derating data govern.",
+  citation: "Citation: the gear reducer service-factor selection by name -- required rating = transmitted power x the service factor for the driver character, driven-machine shock class, and duty hours -- with the catalog MECHANICAL rating compared against that, and the THERMAL rating against the power actually transmitted, with no service factor (Rexnord Falk 161-110, p. 14). The service factor is entered because published tables differ between manufacturers and standards. The gear reducer manufacturer's catalog ratings, service factor tables, and thermal derating data govern.",
   example: gearReducerServiceFactorExample.inputs,
   fields: [
     { key: "transmitted_hp", label: "Transmitted power (hp)", kind: "number", default: 25 },
     { key: "service_factor", label: "Service factor from the manufacturer's table", kind: "number", default: 2.0 },
     { key: "catalog_mechanical_hp", label: "Catalog mechanical rating (hp)", kind: "number", default: 60 },
-    { key: "catalog_thermal_hp", label: "Catalog thermal rating at ambient (hp, 0 to skip)", kind: "number", default: 42 },
+    { key: "catalog_thermal_hp", label: "Catalog thermal rating at ambient (hp, 0 to skip; checked against transmitted power, no service factor)", kind: "number", default: 22 },
     { key: "nameplate_selection_hp", label: "What a nameplate-only choice would buy (hp, 0 to skip)", kind: "number", default: 30 },
   ],
   outputs: [

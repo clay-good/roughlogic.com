@@ -44042,9 +44042,15 @@ test("bounds: spec-v1521 computeRockBoltSupportPressure pins the dead-weight ver
   assert.strictEqual(sized.dead_weight_ok, true);
   // Length is the longer of the spacing and span rules, and which one wins
   // switches with the geometry.
-  assert.ok(Math.abs(r.bolt_length_ft - 8) < 1e-9);
-  assert.ok(Math.abs(r.length_from_span_ft - 20 / 3) < 1e-9);
-  assert.ok(Math.abs(_v1521({ ...base, span_ft: 60 }).bolt_length_ft - 20) < 1e-9);
+  // USACE EM 1110-1-2907 Table 2-1: a 20 ft span takes 10 ft (it is the edge
+  // of the half-span rule and the start of the 10-15 ft interpolation).
+  assert.ok(Math.abs(r.bolt_length_ft - 10) < 1e-9);
+  assert.ok(Math.abs(r.length_from_span_ft - 10) < 1e-9);
+  assert.ok(Math.abs(_v1521({ ...base, span_ft: 40 }).length_from_span_ft - 12.5) < 1e-9);
+  assert.ok(Math.abs(_v1521({ ...base, span_ft: 60 }).bolt_length_ft - 15) < 1e-9);
+  assert.ok(Math.abs(_v1521({ ...base, span_ft: 80 }).bolt_length_ft - 20) < 1e-9);
+  // A narrow drift: half of 12 ft is 6, and twice the 4 ft spacing governs.
+  assert.ok(Math.abs(_v1521({ ...base, span_ft: 12 }).bolt_length_ft - 8) < 1e-9);
   assert.ok("error" in _v1521({ ...base, bolt_capacity_lb: 0 }));
   assert.ok("error" in _v1521({ ...base, spacing_1_ft: 0 }));
   assert.ok("error" in _v1521({ ...base, spacing_2_ft: 0 }));
@@ -45366,22 +45372,22 @@ test("bounds: spec-v1561 computeUmbilicalAirSupply keeps flow and reserve separa
   const base = { diver_count: 3, depth_ft: 100, rate_per_diver_acfm: 1.4, compressor_scfm: 20, alt_depth_ft: 190, reserve_minutes: 10, volume_tank_cuft: 8, tank_pressure_psi: 200, feet_per_atm: 33 };
   const r = _v1561(base);
   assert.ok(Math.abs(r.depth_ata - (1 + 100 / 33)) < 1e-12);
-  assert.ok(Math.abs(r.per_diver_acfm - 5.64242) < 1e-4);
-  assert.ok(Math.abs(r.required_acfm - 16.9273) < 1e-3);
-  assert.ok(Math.abs(r.compressor_margin_acfm - (20 - r.required_acfm)) < 1e-12);
-  assert.ok(r.compressor_margin_acfm > 0);
+  assert.ok(Math.abs(r.per_diver_scfm - 5.64242) < 1e-4);
+  assert.ok(Math.abs(r.required_scfm - 16.9273) < 1e-3);
+  assert.ok(Math.abs(r.compressor_margin_scfm - (20 - r.required_scfm)) < 1e-12);
+  assert.ok(r.compressor_margin_scfm > 0);
   assert.ok(r.flow_verdict.includes("margin"));
   // Nothing changes but depth, and the same spread stops complying.
-  assert.ok(Math.abs(r.alt_required_acfm - 28.3818) < 1e-3);
-  assert.ok(r.alt_required_acfm > 20);
+  assert.ok(Math.abs(r.alt_required_scfm - 28.3818) < 1e-3);
+  assert.ok(r.alt_required_scfm > 20);
   assert.ok(_v1561({ ...base, depth_ft: 190 }).flow_verdict.includes("SHORT"));
   // The operational limit round-trips: at exactly that depth the requirement
   // is exactly the compressor's capacity.
   assert.ok(Math.abs(r.max_depth_ft - 124.143) < 1e-2);
-  assert.ok(Math.abs(_v1561({ ...base, depth_ft: r.max_depth_ft }).required_acfm - 20) < 1e-9);
+  assert.ok(Math.abs(_v1561({ ...base, depth_ft: r.max_depth_ft }).required_scfm - 20) < 1e-9);
   // Exactly linear in diver count -- and the standby is one of them.
-  assert.ok(Math.abs(_v1561({ ...base, diver_count: 6 }).required_acfm - 2 * r.required_acfm) < 1e-9);
-  assert.ok(_v1561({ ...base, diver_count: 2 }).required_acfm < r.required_acfm);
+  assert.ok(Math.abs(_v1561({ ...base, diver_count: 6 }).required_scfm - 2 * r.required_scfm) < 1e-9);
+  assert.ok(_v1561({ ...base, diver_count: 2 }).required_scfm < r.required_scfm);
   // The reserve is a SEPARATE calculation and carries its own verdict.
   assert.ok(Math.abs(r.reserve_required_cuft - 1.4 * r.depth_ata * 10) < 1e-12);
   // Usable only down to bottom pressure: 8 x (200 - 100/33 x 14.7) / 14.7.
@@ -45391,7 +45397,7 @@ test("bounds: spec-v1561 computeUmbilicalAirSupply keeps flow and reserve separa
   // A spread that passes the flow check and fails the reserve check: the
   // exact case the tile exists to catch.
   const thin = _v1561({ ...base, volume_tank_cuft: 2 });
-  assert.ok(thin.compressor_margin_acfm > 0);
+  assert.ok(thin.compressor_margin_scfm > 0);
   assert.ok(thin.reserve_margin_cuft < 0);
   assert.ok(thin.reserve_verdict.includes("SHORT"));
   assert.ok("error" in _v1561({ ...base, diver_count: 0 }));
@@ -46194,9 +46200,13 @@ test("bounds: spec-v1474 computeVibrationSeverityZone places the reading and the
   assert.ok(Math.abs(r.margin_to_next_zone_in_s - 0.145) < 1e-9);
   assert.ok(Math.abs(r.change_pct - 117.7419) < 1e-3);
   assert.strictEqual(r.crossed_a_boundary, true);
-  // Each boundary is inclusive of the lower zone, and one hair over moves up.
+  // Each boundary is inclusive of the lower zone (with a 0.1% band for the
+  // in/s rounding of the ISO mm/s values), and past the band moves up.
   assert.strictEqual(_v1474({ ...base, reading: 0.110 }).zone, "B");
-  assert.strictEqual(_v1474({ ...base, reading: 0.1101 }).zone, "C");
+  assert.strictEqual(_v1474({ ...base, reading: 0.1102 }).zone, "C");
+  // ISO 2.8 mm/s exactly, against the 0.1102 default, is still zone B.
+  assert.strictEqual(_v1474({ ...base, boundary_ab: 0.0441, boundary_bc: 0.1102, boundary_cd: 0.2795, reading: 2.8, reading_is_mm_s: 1 }).zone, "B");
+  assert.strictEqual(_v1474({ ...base, boundary_ab: 0.0441, boundary_bc: 0.1102, boundary_cd: 0.2795, reading: 1.12, reading_is_mm_s: 1 }).zone, "A");
   assert.strictEqual(_v1474({ ...base, reading: 0.044 }).zone, "A");
   assert.strictEqual(_v1474({ ...base, reading: 0.281 }).zone, "D");
   // IDENTITY: the mm/s path and the in/s path agree on the same physical speed.
@@ -46347,7 +46357,8 @@ test("bounds: spec-v1478 computeRollerChainWearElongation -- the span is what ma
   assert.strictEqual(nom.replace, false);
   const atLimit = _v1478({ ...base, measured_length_in: 7.6125 });
   assert.ok(Math.abs(atLimit.elongation_pct - 1.5) < 1e-9);
-  assert.strictEqual(atLimit.replace, false);
+  // "At or beyond the indicated line" is worn to the limit (Diamond Chain).
+  assert.strictEqual(atLimit.replace, true);
   assert.ok(Math.abs(atLimit.remaining_allowance_in) < 1e-9);
   // A looser limit for a low-tooth-count drive keeps the same chain.
   assert.strictEqual(_v1478({ ...base, elongation_limit_pct: 3.0 }).replace, false);
@@ -46357,21 +46368,26 @@ test("bounds: spec-v1478 computeRollerChainWearElongation -- the span is what ma
 
 import { computeGearReducerServiceFactor as _v1479 } from "../../calc-millwright.js";
 test("bounds: spec-v1479 computeGearReducerServiceFactor -- the thermal rating governs", () => {
-  const base = { transmitted_hp: 25, service_factor: 2.0, catalog_mechanical_hp: 60, catalog_thermal_hp: 42, nameplate_selection_hp: 30 };
+  const base = { transmitted_hp: 25, service_factor: 2.0, catalog_mechanical_hp: 60, catalog_thermal_hp: 22, nameplate_selection_hp: 30 };
   const r = _v1479(base);
   assert.strictEqual(r.required_hp, 50);
   assert.ok(Math.abs(r.mechanical_margin - 1.2) < 1e-12);
   assert.strictEqual(r.mechanical_passes, true);
-  // It passes mechanically and FAILS overall, which is the point of the tile.
-  assert.strictEqual(r.governing_rating_hp, 42);
+  // It passes mechanically and FAILS thermally: the thermal rating is held to
+  // the 25 hp actually transmitted, no service factor (Rexnord Falk 161-110).
+  assert.strictEqual(r.governing_rating_hp, 22);
   assert.strictEqual(r.thermal_governs, true);
   assert.strictEqual(r.passes, false);
-  assert.strictEqual(r.shortfall_hp, 8);
+  assert.strictEqual(r.shortfall_hp, 3);
+  assert.strictEqual(r.max_transmitted_hp, 22);
   assert.ok(/NOT a bigger gearset/.test(r.thermal_verdict));
   assert.ok(Math.abs(r.nameplate_shortfall_pct - 40) < 1e-9);
-  // IDENTITY: the maximum transmitted power, put back through the service
-  // factor, is exactly the governing rating.
-  assert.ok(Math.abs(r.max_transmitted_hp * base.service_factor - r.governing_rating_hp) < 1e-12);
+  // The old trap case: 42 hp thermal on a 25 hp load PASSES, and the unit
+  // carries 30 hp (60 / 2.0), mechanical governing.
+  const falk = _v1479({ ...base, catalog_thermal_hp: 42 });
+  assert.strictEqual(falk.passes, true);
+  assert.strictEqual(falk.thermal_governs, false);
+  assert.strictEqual(falk.max_transmitted_hp, 30);
   // With no thermal rating entered the mechanical one governs and it passes.
   const mechOnly = _v1479({ ...base, catalog_thermal_hp: 0 });
   assert.strictEqual(mechOnly.has_thermal, false);
@@ -46637,8 +46653,9 @@ test("bounds: spec-v1464 computeRecloserFuseCoordination -- the heating factor i
   const at = _v1464({ ...base, fast_curve_s: r.longest_fast_curve_s });
   assert.ok(Math.abs(at.coordination_ratio - 1) < 1e-12);
   assert.ok(Math.abs(at.margin_s) < 1e-15);
-  assert.equal(at.fuse_saving_holds, false);
-  assert.ok(at.verdict.startsWith("FUSE SAVING FAILS"));
+  // "At least" the heated fast time: exactly at it HOLDS (Eaton TD132010EN).
+  assert.equal(at.fuse_saving_holds, true);
+  assert.ok(at.verdict.startsWith("FUSE SAVING HOLDS"));
   // Raise the fault current far enough and the curves cross: a slower fuse.
   const hot = _v1464({ ...base, fuse_min_melt_s: 0.05 });
   assert.equal(hot.fuse_saving_holds, false);

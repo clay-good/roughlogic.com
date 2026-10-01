@@ -34,7 +34,7 @@ quantities that set the sag -- so the round-trip time and the sag are two readin
 span length cancels out of the relation entirely. That is what makes the method work with no line of sight: the
 crew never needs to know how far away the other pole is.
 
-The constant 12.075 carries the unit conversion for feet and seconds. Timing several return waves rather than one
+The relation is D = g t^2 / 32 per return, about 1.0054 t^2 with D in feet (RUS Bulletin 1726C-115 prints the same law in inches, D = 48.3 (T / 2N)^2, which is 12.075 per return). Timing several return waves rather than one
 is the whole accuracy trick: because the relation is squared, a tenth of a second of stopwatch error on a single
 wave is a large sag error, while the same tenth spread over five waves is a small one. Three to five is normal
 practice, and the tile reports the sensitivity so a crew can see what its own timing is worth.
@@ -58,6 +58,11 @@ of error is 1.66 ft of sag error.
 Now do the same with ONE wave. The target time is 1.00 s, and the same two tenths of error gives
 `12.075 x (1.20)^2` = 17.30 ft -- 5.30 ft off, 3 times worse
 for the same stopwatch. Counting more waves is not fussiness, it is the method.
+
+**Amended 2026-10-01.** 12.075 is the INCH constant (RUS Bulletin 1726C-115: D = 48.3 (T / 2N)^2 in inches);
+in feet the relation is D = g t^2 / 32 = 1.0054 (t / N)^2. The tile was corrected 2026-09-19. The worked numbers
+above are sqrt(12) short: three returns on a 12 ft sag take 10.36 s (RUS tabulates 10.4 s), two tenths of error
+cost 0.47 ft, and one return takes 3.45 s with 1.43 ft of error. A crew stopping at 2.99 s leaves about 1 ft of sag.
 
 ## 4. Scope and non-goals
 

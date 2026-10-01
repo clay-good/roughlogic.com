@@ -2781,7 +2781,8 @@ export const DUST_DUCT_SIZES_IN = [3, 4, 5, 6, 7, 8, 10, 12, 14, 16];
 
 const _dustPick = (required_in) => {
   let pick = DUST_DUCT_SIZES_IN[0];
-  for (const s of DUST_DUCT_SIZES_IN) if (s <= required_in) pick = s;
+  // A required diameter that IS a standard size computes a hair either side of it.
+  for (const s of DUST_DUCT_SIZES_IN) if (s <= required_in * (1 + 1e-9)) pick = s;
   return pick;
 };
 const _dustArea = (dia_in) => Math.PI * (dia_in / 12) * (dia_in / 12) / 4;
@@ -2808,8 +2809,10 @@ export function computeDustCollectionDuct({ cfm_per_machine = 0, branch_velocity
   const branch_up_in = DUST_DUCT_SIZES_IN.find((s) => s > branch_size_in) ?? branch_size_in;
   const branch_up_velocity_fpm = cfm_per_machine / _dustArea(branch_up_in);
   const all_open_cfm = machines * cfm_per_machine;
-  const branch_ok = branch_velocity_actual_fpm >= branch_velocity_fpm;
-  const main_ok = main_velocity_actual_fpm >= main_velocity_fpm;
+  // A duct exactly at the minimum meets it: 4,000 fpm in a 6 in branch
+  // computes 3999.999... and read BELOW until 2026-10-01.
+  const branch_ok = branch_velocity_actual_fpm >= branch_velocity_fpm * (1 - 1e-9);
+  const main_ok = main_velocity_actual_fpm >= main_velocity_fpm * (1 - 1e-9);
   if (![branch_area_sqft, branch_diameter_in, branch_velocity_actual_fpm, main_diameter_in, main_velocity_actual_fpm].every(Number.isFinite)) return { error: "Dust-collection duct math is not a finite value." };
   return {
     branch_area_sqft, branch_diameter_in, branch_size_in, branch_velocity_actual_fpm,

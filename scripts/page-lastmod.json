@@ -2,7 +2,7 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "efabff1863d89c60",
+      "sha": "993ecce8a7aba142",
       "date": "2026-10-01"
     },
     "/tools/": {
@@ -1102,8 +1102,8 @@
       "date": "2026-09-29"
     },
     "/tools/chamber-gas-volume/": {
-      "sha": "2f6c37f243efef57",
-      "date": "2026-09-29"
+      "sha": "f6448658c6a49ce9",
+      "date": "2026-10-01"
     },
     "/tools/chamber-turnover/": {
       "sha": "3f3610d502d4f1b7",
@@ -1198,8 +1198,8 @@
       "date": "2026-09-29"
     },
     "/tools/cipp-liner-thickness/": {
-      "sha": "6ca6b33742185a42",
-      "date": "2026-09-29"
+      "sha": "2e5387ca2265b539",
+      "date": "2026-10-01"
     },
     "/tools/circle-from-3-points/": {
       "sha": "bbb46680f5c6ea56",
@@ -2082,8 +2082,8 @@
       "date": "2026-09-29"
     },
     "/tools/deck-point-load-dunnage/": {
-      "sha": "4250b35bc1f14bfa",
-      "date": "2026-09-29"
+      "sha": "5e4a94ea76190200",
+      "date": "2026-10-01"
     },
     "/tools/declining-balance-depreciation/": {
       "sha": "680852920490d3f6",
@@ -2862,8 +2862,8 @@
       "date": "2026-09-29"
     },
     "/tools/feeder-loss-load-factor/": {
-      "sha": "34edb63a510df8e1",
-      "date": "2026-09-29"
+      "sha": "d9d7821b8954ff5a",
+      "date": "2026-10-01"
     },
     "/tools/feeder-tap-rule/": {
       "sha": "4753731b952f99fe",
@@ -3330,8 +3330,8 @@
       "date": "2026-09-29"
     },
     "/tools/gear-reducer-service-factor/": {
-      "sha": "96bc560935ce648f",
-      "date": "2026-09-29"
+      "sha": "c6a1b37cb60e9434",
+      "date": "2026-10-01"
     },
     "/tools/gear-tooth-bending-stress/": {
       "sha": "fad305b59e05a5ea",
@@ -3638,12 +3638,12 @@
       "date": "2026-09-29"
     },
     "/tools/hdd-bend-radius/": {
-      "sha": "5f827ea46395a70a",
-      "date": "2026-09-29"
+      "sha": "ee3dc844359aaaee",
+      "date": "2026-10-01"
     },
     "/tools/hdd-fluid-volume/": {
-      "sha": "2681ca1a602f5fdc",
-      "date": "2026-09-29"
+      "sha": "e8923cf3da03582d",
+      "date": "2026-10-01"
     },
     "/tools/hdd-pullback/": {
       "sha": "32269c6dbf0bffdd",
@@ -3698,8 +3698,8 @@
       "date": "2026-09-29"
     },
     "/tools/helicopter-lz-sizing/": {
-      "sha": "c8da6241620ee784",
-      "date": "2026-09-29"
+      "sha": "8896a51ffade71af",
+      "date": "2026-10-01"
     },
     "/tools/hemocytometer/": {
       "sha": "be21cc3eb1ed1a17",
@@ -4974,8 +4974,8 @@
       "date": "2026-09-29"
     },
     "/tools/no-decompression-limit/": {
-      "sha": "8eb7f5404374b7a6",
-      "date": "2026-09-29"
+      "sha": "098af98b090d56f8",
+      "date": "2026-10-01"
     },
     "/tools/noise-barrier-insertion-loss/": {
       "sha": "ffb036429a217e7a",
@@ -5134,8 +5134,8 @@
       "date": "2026-09-29"
     },
     "/tools/oversize-permit-screen/": {
-      "sha": "68f7f623ffafd28d",
-      "date": "2026-09-29"
+      "sha": "65725b9e0def815e",
+      "date": "2026-10-01"
     },
     "/tools/overtime/": {
       "sha": "d446882f27c7ad96",
@@ -6390,8 +6390,8 @@
       "date": "2026-09-29"
     },
     "/tools/rock-bolt-support-pressure/": {
-      "sha": "872f0629015a9bf3",
-      "date": "2026-09-29"
+      "sha": "2c4cae2d89c51a5f",
+      "date": "2026-10-01"
     },
     "/tools/rock-construction-entrance/": {
       "sha": "2e5af4a50a7be2d4",
@@ -6406,8 +6406,8 @@
       "date": "2026-09-29"
     },
     "/tools/roller-chain-wear-elongation/": {
-      "sha": "de1cb8f4d26d75f8",
-      "date": "2026-09-29"
+      "sha": "324d84b824419396",
+      "date": "2026-10-01"
     },
     "/tools/roller-jack-force/": {
       "sha": "e6b02d6f73d206a8",
@@ -6554,8 +6554,8 @@
       "date": "2026-09-29"
     },
     "/tools/sagging-return-wave/": {
-      "sha": "0368692ab450ac45",
-      "date": "2026-09-29"
+      "sha": "cebdbb6bf4b2d1d2",
+      "date": "2026-10-01"
     },
     "/tools/sailboat-performance-ratios/": {
       "sha": "4cd2e08e276dff0f",
@@ -8394,8 +8394,8 @@
       "date": "2026-09-29"
     },
     "/tools/umbilical-air-supply/": {
-      "sha": "60fcacb4bc0ef7c5",
-      "date": "2026-09-29"
+      "sha": "9c07734edd15c314",
+      "date": "2026-10-01"
     },
     "/tools/unit-converter/": {
       "sha": "5246356a65222b17",
@@ -8562,8 +8562,8 @@
       "date": "2026-09-29"
     },
     "/tools/vibration-severity-zone/": {
-      "sha": "679a3af671314e0f",
-      "date": "2026-09-29"
+      "sha": "a25d9b389e300943",
+      "date": "2026-10-01"
     },
     "/tools/video-wall-data-rate/": {
       "sha": "370662e850bde0db",

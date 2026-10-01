@@ -142,7 +142,7 @@ DIVING_RENDERERS["no-decompression-limit"] = _simpleRenderer({
     { key: "a", id: "ndl-out-a", label: "Adjusted no-decompression limit", value: (r) => fmt(r.adjusted_ndl_min, 0) + " min, not the table's " + fmt(r.table_ndl_min, 0) + " -- residual nitrogen has taken " + fmt(r.residual_share_pct, 0) + "% of it" },
     { key: "c", id: "ndl-out-c", label: "Bottom time credited against the table", value: (r) => fmt(r.credited_bottom_time_min, 0) + " min -- " + r.verdict },
     { key: "s", id: "ndl-out-s", label: "After the longer surface interval", value: (r) => fmt(r.alt_adjusted_ndl_min, 0) + " min, " + fmt(r.surface_interval_gain_min, 0) + " min more bottom time bought on the surface" },
-    { key: "e", id: "ndl-out-e", label: "Equivalent air depth for this mix", value: (r) => fmt(r.equivalent_air_depth_ft, 0) + " ft -- enter the air table THERE, which is where the extra time comes from" },
+    { key: "e", id: "ndl-out-e", label: "Equivalent air depth for this mix", value: (r) => fmt(r.equivalent_air_depth_ft, 1) + " ft -- enter the air table at the next GREATER depth it lists (Navy Table 10-1), which is where the extra time comes from" },
     { key: "n", id: "ndl-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeNoDecompressionLimit,
@@ -241,7 +241,9 @@ export function computeNitroxMod({ oxygen_fraction = 0.32, ppo2_limit = 1.4, con
   // floor of it, and the ppO2 that blend actually produces is reported with
   // it. spec-v1559 rounded 0.4088 to "EAN41", which at this depth is 1.404
   // ata -- over the very limit it was solving for.
-  const best_mix_pct_floor = Math.floor(best_mix_fraction * 100);
+  // + 1e-9: 1.4 / 2.5454... is 0.55 exactly but computes 0.54999..., and an
+  // exact-limit mix is AT the limit, not past it (until 2026-10-01 it read EAN54).
+  const best_mix_pct_floor = Math.floor(best_mix_fraction * 100 + 1e-9);
   const best_mix_ppo2 = best_mix_pct_floor / 100 * depth_ata;
   const air_mod_ft = feet_per_atm * (ppo2_limit / 0.21 - 1);
   const within_working = ppo2_at_depth <= ppo2_limit;
@@ -272,7 +274,7 @@ DIVING_RENDERERS["nitrox-mod"] = _simpleRenderer({
   ],
   outputs: [
     { key: "p", id: "nmo-out-p", label: "Oxygen partial pressure at this depth", value: (r) => fmt(r.ppo2_at_depth, 3) + " ata at " + fmt(r.depth_ata, 3) + " ata ambient -- " + r.depth_verdict },
-    { key: "m", id: "nmo-out-m", label: "Maximum operating depth", value: (r) => fmt(r.mod_working_ft, 0) + " ft at the working limit, " + fmt(r.mod_contingency_ft, 0) + " ft at the contingency limit" },
+    { key: "m", id: "nmo-out-m", label: "Maximum operating depth", value: (r) => fmt(Math.floor(r.mod_working_ft + 1e-9), 0) + " ft at the working limit, " + fmt(Math.floor(r.mod_contingency_ft + 1e-9), 0) + " ft at the contingency limit, rounded DOWN as the Navy rounds 356.73 fsw to 356" },
     { key: "b", id: "nmo-out-b", label: "Best mix for the planned depth", value: (r) => "exactly " + fmt(r.best_mix_fraction * 100, 1) + "% oxygen, so blend EAN" + fmt(r.best_mix_pct_floor, 0) + " -- round a blend figure DOWN, because EAN" + fmt(r.best_mix_pct_floor + 1, 0) + " here is " + fmt((r.best_mix_pct_floor + 1) / 100 * r.depth_ata, 3) + " ata, past the limit it was solving for" },
     { key: "a", id: "nmo-out-a", label: "Where air itself reaches the limit", value: (r) => fmt(r.air_mod_ft, 0) + " ft -- past that, air diving is a decompression and oxygen-exposure problem rather than a casual one" },
     { key: "n", id: "nmo-out-n", label: "Note", value: (r) => r.note },
@@ -306,7 +308,7 @@ export function computeNitroxEad({ oxygen_fraction = 0.36, depth_ft = 0, target_
   // Floored to a blendable whole percent for the same reason as `nitrox-mod`:
   // rounding a mix UP puts the diver past the limit. spec-v1560 called EAN35
   // "a mix that works at 100 ft"; it is 1.411 ata, over the 1.4 it cites.
-  const deepest_usable_pct_floor = Math.floor(deepest_usable_mix * 100);
+  const deepest_usable_pct_floor = Math.floor(deepest_usable_mix * 100 + 1e-9);
   const deepest_usable_ppo2 = deepest_usable_pct_floor / 100 * depth_ata;
   const deepest_usable_ead_ft = ((1 - deepest_usable_pct_floor / 100) / _N2_IN_AIR) * (depth_ft + feet_per_atm) - feet_per_atm;
   return {
@@ -343,7 +345,7 @@ DIVING_RENDERERS["nitrox-ead"] = _simpleRenderer({
 
 // ============ spec-v1561: surface-supplied air supply rate ============
 
-// dims: in { diver_count: dimensionless, depth_ft: L, rate_per_diver_acfm: L^3 T^-1, compressor_scfm: L^3 T^-1, alt_depth_ft: L, reserve_minutes: T, volume_tank_cuft: L^3, tank_pressure_psi: M L^-1 T^-2, feet_per_atm: L } out: { depth_ata: dimensionless, required_acfm: L^3 T^-1, max_depth_ft: L, reserve_required_cuft: L^3, tank_free_gas_cuft: L^3 }
+// dims: in { diver_count: dimensionless, depth_ft: L, rate_per_diver_acfm: L^3 T^-1, compressor_scfm: L^3 T^-1, alt_depth_ft: L, reserve_minutes: T, volume_tank_cuft: L^3, tank_pressure_psi: M L^-1 T^-2, feet_per_atm: L } out: { depth_ata: dimensionless, required_scfm: L^3 T^-1, max_depth_ft: L, reserve_required_cuft: L^3, tank_free_gas_cuft: L^3 }
 export function computeUmbilicalAirSupply({ diver_count = 3, depth_ft = 0, rate_per_diver_acfm = 1.4, compressor_scfm = 0, alt_depth_ft = 0, reserve_minutes = 10, volume_tank_cuft = 0, tank_pressure_psi = 0, feet_per_atm = _FSW_PER_ATM } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(diver_count >= 1)) return { error: "Diver count must be at least 1, and the standby diver counts." };
@@ -358,11 +360,14 @@ export function computeUmbilicalAirSupply({ diver_count = 3, depth_ft = 0, rate_
   // The requirement scales with absolute pressure exactly as a scuba diver's
   // does, and the diver count multiplies it directly.
   const depth_ata = 1 + depth_ft / feet_per_atm;
-  const per_diver_acfm = rate_per_diver_acfm * depth_ata;
-  const required_acfm = per_diver_acfm * diver_count;
-  const compressor_margin_acfm = compressor_scfm - required_acfm;
+  // ata x acfm is the SURFACE flow, scfm (Navy Diving Manual 13-8.1: "scfm
+  // (for one diver at depth) = ata x acfm", 1.4 x 10.09 = 14.13 scfm); these
+  // keys said acfm until 2026-10-01.
+  const per_diver_scfm = rate_per_diver_acfm * depth_ata;
+  const required_scfm = per_diver_scfm * diver_count;
+  const compressor_margin_scfm = compressor_scfm - required_scfm;
   const alt_depth_ata = 1 + alt_depth_ft / feet_per_atm;
-  const alt_required_acfm = rate_per_diver_acfm * alt_depth_ata * diver_count;
+  const alt_required_scfm = rate_per_diver_acfm * alt_depth_ata * diver_count;
   // The number a supervisor wants: where this spread stops complying.
   const max_depth_ft = feet_per_atm * (compressor_scfm / (rate_per_diver_acfm * diver_count) - 1);
   // The reserve is a separate, regulatory calculation, not the flow one.
@@ -376,13 +381,13 @@ export function computeUmbilicalAirSupply({ diver_count = 3, depth_ft = 0, rate_
   const tank_free_gas_cuft = volume_tank_cuft * Math.max(0, tank_pressure_psi - bottom_psig) / _PSI_ATM;
   const reserve_margin_cuft = tank_free_gas_cuft - reserve_required_cuft;
   return {
-    depth_ata, per_diver_acfm, required_acfm, compressor_margin_acfm,
-    alt_depth_ata, alt_required_acfm, max_depth_ft,
+    depth_ata, per_diver_scfm, required_scfm, compressor_margin_scfm,
+    alt_depth_ata, alt_required_scfm, max_depth_ft,
     reserve_required_cuft, tank_free_gas_cuft, reserve_margin_cuft,
     compressor_scfm, alt_depth_ft, diver_count,
-    flow_verdict: compressor_margin_acfm >= 0
-      ? "the compressor has " + fmt(compressor_margin_acfm, 1) + " acfm of margin here"
-      : "the compressor is SHORT by " + fmt(-compressor_margin_acfm, 1) + " acfm and does not meet the requirement at this depth",
+    flow_verdict: compressor_margin_scfm >= 0
+      ? "the compressor has " + fmt(compressor_margin_scfm, 1) + " scfm of margin here"
+      : "the compressor is SHORT by " + fmt(-compressor_margin_scfm, 1) + " scfm and does not meet the requirement at this depth",
     reserve_verdict: reserve_margin_cuft >= 0
       ? "the volume tank covers it with " + fmt(reserve_margin_cuft, 0) + " cu ft to spare"
       : "the volume tank is SHORT by " + fmt(-reserve_margin_cuft, 0) + " cu ft: meeting the flow requirement is not meeting the reserve requirement",
@@ -391,7 +396,7 @@ export function computeUmbilicalAirSupply({ diver_count = 3, depth_ft = 0, rate_
 }
 const umbilicalAirSupplyExample = { inputs: { diver_count: 3, depth_ft: 100, rate_per_diver_acfm: 1.4, compressor_scfm: 20, alt_depth_ft: 190, reserve_minutes: 10, volume_tank_cuft: 8, tank_pressure_psi: 200, feet_per_atm: 33 } };
 DIVING_RENDERERS["umbilical-air-supply"] = _simpleRenderer({
-  citation: "Citation: the surface-supplied flow relation by name -- required flow = the rate per diver x the absolute pressure (1 + depth / 33 seawater) x the number of divers including the standby -- with the reserve breathing supply as a separate requirement, and the volume tank's usable gas taken as its capacity x (its pressure - the bottom pressure) / 14.7 psi, before the helmet's over-bottom pressure, which reduces it further. The rate per diver is set by the applicable regulation, not by arithmetic. The applicable commercial diving regulations, the operation's diving safety manual, and the diving supervisor govern.",
+  citation: "Citation: the surface-supplied flow relation by name -- required surface flow (scfm) = the rate per diver (acfm) x the absolute pressure (1 + depth / 33 seawater) x the number of divers including the standby -- with the reserve breathing supply as a separate requirement, and the volume tank's usable gas taken as its capacity x (its pressure - the bottom pressure) / 14.7 psi, before the helmet's over-bottom pressure, which reduces it further. The rate per diver is set by the applicable regulation, not by arithmetic. The applicable commercial diving regulations, the operation's diving safety manual, and the diving supervisor govern.",
   example: umbilicalAirSupplyExample.inputs,
   fields: [
     { key: "diver_count", label: "Divers supplied, standby included", kind: "number", default: 3 },
@@ -399,14 +404,14 @@ DIVING_RENDERERS["umbilical-air-supply"] = _simpleRenderer({
     { key: "rate_per_diver_acfm", label: "Required rate per diver (acfm)", kind: "number", default: 1.4 },
     { key: "compressor_scfm", label: "Compressor capacity (scfm)", kind: "number", default: 20 },
     { key: "alt_depth_ft", label: "Deeper job to check (ft)", kind: "number", default: 190 },
-    { key: "reserve_minutes", label: "Reserve duration required (min)", kind: "number", default: 10 },
+    { key: "reserve_minutes", label: "Reserve duration required, per diver (min; the Navy sizes stored air for every diver and the standby)", kind: "number", default: 10 },
     { key: "volume_tank_cuft", label: "Volume tank capacity (cu ft)", kind: "number", default: 8 },
     { key: "tank_pressure_psi", label: "Volume tank pressure (psi)", kind: "number", default: 200 },
     { key: "feet_per_atm", label: "Feet per atmosphere (33 seawater, 34 fresh)", kind: "number", default: 33 },
   ],
   outputs: [
-    { key: "r", id: "uas-out-r", label: "Flow required at depth", value: (r) => fmt(r.required_acfm, 1) + " acfm for " + fmt(r.diver_count, 0) + " divers (" + fmt(r.per_diver_acfm, 2) + " each at " + fmt(r.depth_ata, 2) + " ata) -- " + r.flow_verdict },
-    { key: "a", id: "uas-out-a", label: "The same spread on the deeper job", value: (r) => fmt(r.alt_required_acfm, 1) + " acfm at " + fmt(r.alt_depth_ft, 0) + " ft, with nothing changed but depth" },
+    { key: "r", id: "uas-out-r", label: "Surface flow required at depth (scfm = acfm x ata)", value: (r) => fmt(r.required_scfm, 1) + " scfm for " + fmt(r.diver_count, 0) + " divers (" + fmt(r.per_diver_scfm, 2) + " each at " + fmt(r.depth_ata, 2) + " ata) -- " + r.flow_verdict },
+    { key: "a", id: "uas-out-a", label: "The same spread on the deeper job", value: (r) => fmt(r.alt_required_scfm, 1) + " scfm at " + fmt(r.alt_depth_ft, 0) + " ft, with nothing changed but depth" },
     { key: "d", id: "uas-out-d", label: "Deepest this compressor meets the requirement", value: (r) => fmt(r.max_depth_ft, 0) + " ft -- the operational limit of the spread, worth knowing before the job" },
     { key: "v", id: "uas-out-v", label: "Reserve supply, a separate requirement", value: (r) => fmt(r.reserve_required_cuft, 0) + " cu ft needed against " + fmt(r.tank_free_gas_cuft, 0) + " cu ft of free gas in the tank -- " + r.reserve_verdict },
     { key: "n", id: "uas-out-n", label: "Note", value: (r) => r.note },
