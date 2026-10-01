@@ -25,7 +25,8 @@ test("pole embedment solves the IBC 1807.3.2.1 relation past the old 60 ft brack
 test("dock piling solves its embedment relation past the old 1,000 ft bracket", () => {
   const r = computeDockPilingLateral({ lateral_load_lb: 5e7, height_above_mudline_ft: 50, pile_diameter_in: 12, soil_lateral_bearing_psf_per_ft: 100 });
   const d = r.embedment_ft, b = 1;
-  const A = 2.34 * 5e7 / (100 * d / 3 * b);
+  // S1 takes d no deeper than 12 ft (IBC 1807.3.2.1; capped 2026-10-01).
+  const A = 2.34 * 5e7 / (100 * Math.min(d, 12) / 3 * b);
   assert.ok(d > 1000, `expected a root past 1,000 ft, got ${d}`);
   assert.ok(Math.abs(0.5 * A * (1 + Math.sqrt(1 + 4.36 * 50 / A)) - d) < 1e-6 * d);
 });

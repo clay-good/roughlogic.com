@@ -118431,19 +118431,19 @@
      }
     },
     "bending_stress_psi": {
-     "value": 186.2069,
+     "value": 186.20689655172413,
      "tolerance": {
       "pct": 0.5
      }
     },
     "modulus_of_rupture_psi": {
-     "value": 351.78118,
+     "value": 351.78118198675725,
      "tolerance": {
       "pct": 0.5
      }
     },
     "allowable_stress_psi": {
-     "value": 234.52079,
+     "value": 234.5207879911715,
      "tolerance": {
       "pct": 0.5
      }
@@ -118489,19 +118489,19 @@
      }
     },
     "anchor_vertical_lb": {
-     "value": 2467.83976,
+     "value": 2467.839755650374,
      "tolerance": {
       "pct": 0.5
      }
     },
     "anchor_offset_ft": {
-     "value": 11.20332,
+     "value": 11.203320611355357,
      "tolerance": {
       "pct": 0.5
      }
     },
     "alternate_axial_lb": {
-     "value": 2443.76104,
+     "value": 2443.761035780708,
      "tolerance": {
       "pct": 0.5
      }
@@ -118734,7 +118734,7 @@
    "source_publisher": "Project (first-principles)",
    "source_title": "Square-to-Round Transition Development -- the spec-v1679 worked example, recomputed",
    "source_edition_or_year": "spec-v1679 of scope-trade-expansion-2, 2026-09-08",
-   "source_section_or_page": "the standards named in the tile citation govern",
+   "source_section_or_page": "the standards named in the tile citation govern; recomputed 2026-10-01 with the fan's in-line element (BCcampus A-1) as the longest",
    "verified_by": "rl",
    "verified_on": "2026-09-08",
    "inputs": {
@@ -118747,43 +118747,43 @@
    },
    "outputs": {
     "plan_corner_distance_in": {
-     "value": 7.14214,
+     "value": 7.142135623730952,
      "tolerance": {
       "pct": 0.5
      }
     },
     "corner_true_length_in": {
-     "value": 17.5217,
+     "value": 17.521703720465275,
      "tolerance": {
       "pct": 0.5
      }
     },
     "midpoint_true_length_in": {
-     "value": 16.27882,
+     "value": 16.278820596099706,
      "tolerance": {
       "pct": 0.5
      }
     },
     "circumference_in": {
-     "value": 43.9823,
+     "value": 43.982297150257104,
      "tolerance": {
       "pct": 0.5
      }
     },
     "developed_arc_in": {
-     "value": 43.91168,
+     "value": 43.91167886764315,
      "tolerance": {
       "pct": 0.5
      }
     },
     "arc_shortfall_in": {
-     "value": 0.07062,
+     "value": 0.07061828261395675,
      "tolerance": {
       "pct": 0.5
      }
     },
     "sheet_length_in": {
-     "value": 58.03456,
+     "value": 61.201094924214146,
      "tolerance": {
       "pct": 0.5
      }
@@ -120008,13 +120008,13 @@
      }
     },
     "pressure_pa": {
-     "value": 6.66667,
+     "value": 6.666666666666667,
      "tolerance": {
       "pct": 0.5
      }
     },
     "door_force_lbf": {
-     "value": 1.59489,
+     "value": 1.594887705076919,
      "tolerance": {
       "pct": 0.5
      }
@@ -120246,7 +120246,7 @@
    "source_publisher": "Project (first-principles)",
    "source_title": "Dock Piling Embedment and Lateral Load -- the spec-v1644 worked example, recomputed with S1 at one third of the embedment (IBC 1807.3.2.1)",
    "source_edition_or_year": "spec-v1644 of scope-trade-expansion-2, 2026-09-08",
-   "source_section_or_page": "the standards named in the tile citation govern",
+   "source_section_or_page": "the standards named in the tile citation govern; recomputed 2026-10-01 with IBC 1807.3.2.1's 12 ft cap on d in S1",
    "verified_by": "rl",
    "verified_on": "2026-09-08",
    "inputs": {
@@ -120265,7 +120265,7 @@
      }
     },
     "embedment_ft": {
-     "value": 9.697192,
+     "value": 9.697192387049835,
      "tolerance": {
       "pct": 0.5
      }
@@ -120277,13 +120277,13 @@
      }
     },
     "scoured_embedment_ft": {
-     "value": 10.205229,
+     "value": 10.20522879841716,
      "tolerance": {
       "pct": 0.5
      }
     },
     "total_depth_needed_ft": {
-     "value": 12.205229,
+     "value": 12.20522879841716,
      "tolerance": {
       "pct": 0.5
      }
@@ -121248,7 +121248,7 @@
     "straight_duct_ft": 3,
     "inlet_condition": "elbow_with_swirl",
     "fan_curve_tp_inwg": 2.5,
-    "measured_tp_inwg": 2.9
+    "measured_tp_inwg": 2.1
    },
    "outputs": {
     "outlet_area_ft2": {
@@ -121264,19 +121264,19 @@
      }
     },
     "equivalent_diameter_ft": {
-     "value": 2.52313,
+     "value": 2.5231325220201604,
      "tolerance": {
       "pct": 0.5
      }
     },
     "effective_length_ft": {
-     "value": 6.30783,
+     "value": 6.307831305050401,
      "tolerance": {
       "pct": 0.5
      }
     },
     "length_shortfall_ft": {
-     "value": 3.30783,
+     "value": 3.307831305050401,
      "tolerance": {
       "pct": 0.5
      }
@@ -121360,31 +121360,31 @@
    },
    "outputs": {
     "required_diameter_in": {
-     "value": 7.85577,
+     "value": 7.85576923076923,
      "tolerance": {
       "pct": 0.5
      }
     },
     "trim_in": {
-     "value": 1.64423,
+     "value": 1.64423076923077,
      "tolerance": {
       "pct": 0.5
      }
     },
     "trim_pct": {
-     "value": 17.30769,
+     "value": 17.307692307692317,
      "tolerance": {
       "pct": 0.5
      }
     },
     "power_ratio": {
-     "value": 0.56545,
+     "value": 0.5654514679107874,
      "tolerance": {
       "pct": 0.5
      }
     },
     "head_at_trim_ft": {
-     "value": 64.96117,
+     "value": 64.96116863905326,
      "tolerance": {
       "pct": 0.5
      }
@@ -127365,7 +127365,7 @@
    "source_publisher": "Project (first-principles)",
    "source_title": "Rooftop Equipment Wind Uplift and Anchorage -- the spec-v1636 worked example, recomputed",
    "source_edition_or_year": "spec-v1636 of scope-trade-expansion-2, 2026-09-09",
-   "source_section_or_page": "the standards named in the tile citation govern",
+   "source_section_or_page": "the standards named in the tile citation govern; recomputed 2026-10-01 with ASCE 7 ASD's 0.6 dead load against uplift",
    "verified_by": "rl",
    "verified_on": "2026-09-09",
    "inputs": {
@@ -127393,13 +127393,13 @@
      }
     },
     "net_uplift_lb": {
-     "value": -280,
+     "value": 280,
      "tolerance": {
       "pct": 0.5
      }
     },
     "weight_reserve_lb": {
-     "value": 280,
+     "value": 0,
      "tolerance": {
       "pct": 0.5
      }
@@ -127423,13 +127423,13 @@
      }
     },
     "per_windward_lb": {
-     "value": 35.4,
+     "value": 105.4,
      "tolerance": {
       "pct": 0.5
      }
     },
     "demand_ratio": {
-     "value": 0.0885,
+     "value": 0.2635,
      "tolerance": {
       "pct": 0.5
      }
@@ -140274,6 +140274,990 @@
      "value": 3,
      "tolerance": {
       "abs": 0
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "spray-transfer-efficiency",
+   "source_publisher": "Products Finishing (Gardner Business Media)",
+   "source_title": "Questions About Transfer Efficiency (Ask the expert column, Carl Izzo)",
+   "source_edition_or_year": "2005 (published 02/01/2005), pfonline.com/articles/transfer-efficiency",
+   "source_section_or_page": "Answer, worked example: a hypothetical product needing 0.66 gal of 50% solids paint when sprayed at 30% TE needs only 0.28 gal at 70% TE, 0.38 gal less, which at $10.00/gal saves $3.80 per product. Converted to tile units at 4 qt/gal: sprayed 2.64 qt, alt 1.12 qt, saving 1.52 qt; price $2.50/qt. INPUT applied_material_qt = 0.66 gal x 0.30 x 4 = 0.792 qt is DERIVED from the printed sprayed figure and TE (so material_sprayed_qt is not asserted); jobs_per_year = 0 is a placeholder. Printed gallons are rounded to 0.01 gal (+/-0.02 qt); the $3.80 inherits the rounded 0.38 gal (tile 0.377 gal, $3.77).",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "applied_material_qt": 0.792,
+    "transfer_efficiency": 0.3,
+    "alt_transfer_efficiency": 0.7,
+    "price_per_qt": 2.5,
+    "jobs_per_year": 0
+   },
+   "outputs": {
+    "alt_material_sprayed_qt": {
+     "value": 1.12,
+     "tolerance": {
+      "abs": 0.02
+     }
+    },
+    "saving_per_job_qt": {
+     "value": 1.52,
+     "tolerance": {
+      "abs": 0.02
+     }
+    },
+    "saving_per_job_usd": {
+     "value": 3.8,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "cryogenic-boiloff",
+   "source_publisher": "NASA Kennedy Space Center (NTRS 20190028305)",
+   "source_title": "Return to service of a liquid hydrogen storage sphere (A. Krenn, D. Desenberg), Cryogenic Engineering Conference",
+   "source_edition_or_year": "2019 (CEC 2019, Hartford CT)",
+   "source_section_or_page": "Section 1 Introduction: design specification for the 850,000 gallon LH2 spheres states boiloff losses shall not exceed 0.075% of capacity (2.4 m3/day or 637.5 gallons/day). Printed 637.5 is exact. liquid_density_lb_gal 0.591 (LH2, from the companion NASA paper's 563 kg = 2,100 gal) is a placeholder that does not affect the asserted output; latent heat 0, vapour space 0 and withdrawal 0 skip the other checks.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "tank_volume_gal": 850000,
+    "ner_pct_per_day": 0.075,
+    "liquid_density_lb_gal": 0.591,
+    "latent_heat_btu_lb": 0,
+    "vapour_space_pct": 0,
+    "current_pressure_psig": 0,
+    "relief_pressure_psig": 0,
+    "molecular_weight": 0,
+    "vapour_temp_r": 0,
+    "alt_vapour_space_pct": 0,
+    "withdrawal_gal_day": 0
+   },
+   "outputs": {
+    "boil_off_gal_day": {
+     "value": 637.5,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "cryogenic-boiloff",
+   "source_publisher": "NASA Kennedy Space Center (NTRS 20190011734)",
+   "source_title": "Annular Air Leaks in a Liquid Hydrogen Storage Tank (A.G. Krenn, R.C. Youngquist, S.O. Starr)",
+   "source_edition_or_year": "NTRS 20190011734 (document dated 2019; no conference year printed in the text)",
+   "source_section_or_page": "Hypothetical problem/solution, Heating Method: the 850,000 gal LH2 tank boils off approximately 563 kg/day (2,100 gallons/day); heat of vaporization 446 kJ/kg, so 251 MJ/day (2.91 kW) is coming into the system. 2.91 kW = 9,929 BTU/hr (3,412.14 BTU/hr per kW). Inputs are CONVERSIONS/DERIVATIONS of printed numbers: ner_pct_per_day = 2,100/850,000 x 100 = 0.247059; liquid_density_lb_gal = 563 kg / 2,100 gal = 0.59105 lb/gal; latent_heat_btu_lb = 446 kJ/kg / 2.326 = 191.745. Only the heat leak (the /24 and x latent-heat step) is asserted; tolerance 0.5% covers the 3-significant-figure 2.91 kW and the rounded 563 kg.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "tank_volume_gal": 850000,
+    "ner_pct_per_day": 0.24705882352941178,
+    "liquid_density_lb_gal": 0.59105,
+    "latent_heat_btu_lb": 191.745,
+    "vapour_space_pct": 0,
+    "current_pressure_psig": 0,
+    "relief_pressure_psig": 0,
+    "molecular_weight": 0,
+    "vapour_temp_r": 0,
+    "alt_vapour_space_pct": 0,
+    "withdrawal_gal_day": 0
+   },
+   "outputs": {
+    "heat_leak_btu_hr": {
+     "value": 9929,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "adhesive-bond-area",
+   "source_publisher": "Henkel (LOCTITE), distributed by Ellsworth Adhesives",
+   "source_title": "The LOCTITE Design Guide for Bonding Metals, Volume 6",
+   "source_edition_or_year": "Volume 6",
+   "source_section_or_page": "Fixture Time Matrix, Table 2 notes (p. 9): fixture time defined as the time for the adhesive/activator to develop sufficient strength in a 0.5 in by 1.0 in bond between two steel lap shears to support a 6.6 lb weight (13.2 psi). Bond area 0.5 sq in; 13.2 psi x 0.5 sq in = 6.6 lb. required_load_lb = 6.6 is the printed weight (so margin 0 exercises the at-the-limit ADEQUATE branch and the 1.0 in printed length); elevated strength and bond-line inputs 0 are placeholders that skip those checks. Exact.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "bond_length_in": 1.0,
+    "bond_width_in": 0.5,
+    "shear_strength_psi": 13.2,
+    "required_load_lb": 6.6,
+    "elevated_shear_strength_psi": 0,
+    "bond_line_in": 0,
+    "bond_line_min_in": 0,
+    "bond_line_max_in": 0
+   },
+   "outputs": {
+    "bond_area_in2": {
+     "value": 0.5,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "capacity_lb": {
+     "value": 6.6,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "length_for_required_in": {
+     "value": 1.0,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "metacentric-height",
+   "source_publisher": "U.S. Naval Academy, Naval Architecture and Ocean Engineering Department",
+   "source_title": "EN400 Principles of Ship Performance, Chapter 4 Stability",
+   "source_edition_or_year": "course notes as posted at usna.edu (02.04 Chapter 4.pdf), retrieved 2026-10-01",
+   "source_section_or_page": "Example 4.3, page 4-24/4-25: FFG-7 displacing 3992 LT with KG 18.5 ft floods 155 LT at kg 6.6 ft; KG damaged = (3992 x 18.5 + 155 x 6.6)/(3992 + 155) = 18.06 ft (printed to 2 dp). LT converted to lb (x 2240) for the tile's lb inputs; the ratio is unit-free. km_ft 22.49 and heel_angle_deg 10 are PLACEHOLDERS (Example 4.3 gives no KM; new_kg_ft does not depend on either).",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "km_ft": 22.49,
+    "kg_ft": 18.5,
+    "displacement_lb": 8942080,
+    "added_weight_lb": 347200,
+    "added_kg_ft": 6.6,
+    "free_surface_moment_ftlb": 0,
+    "heel_angle_deg": 10
+   },
+   "outputs": {
+    "new_kg_ft": {
+     "value": 18.06,
+     "tolerance": {
+      "abs": 0.005
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "metacentric-height",
+   "source_publisher": "U.S. Naval Academy, Naval Architecture and Ocean Engineering Department",
+   "source_title": "EN400 Principles of Ship Performance, Chapter 4 Stability",
+   "source_edition_or_year": "course notes as posted at usna.edu (02.04 Chapter 4.pdf), retrieved 2026-10-01",
+   "source_section_or_page": "Example 4.4, page 4-31: FFG-7 at 4092 LT, KG 18.9 ft, KM 22.49 ft; fuel tank 30 ft wide x 60 ft long, i_t = 135,000 ft^4, rho_t 1.5924 and rho_s 1.9905 slug/ft^3; FSC = 0.75 ft and GM_eff = 22.49 - 18.9 - 0.75 = 2.84 ft (both printed to 2 dp). The tile takes a free surface MOMENT in ft-lb: entered as rho_t x g x i_t = 1.5924 x 32.17 x 135,000 ft-lb (unit conversion of printed inputs), displacement 4092 LT x 2240 lb. heel_angle_deg 10 is a PLACEHOLDER (no GZ asserted: the book's GZ comes from cross curves, not GM sin phi).",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "km_ft": 22.49,
+    "kg_ft": 18.9,
+    "displacement_lb": 9166080,
+    "added_weight_lb": 0,
+    "added_kg_ft": 0,
+    "free_surface_moment_ftlb": 6915715.56,
+    "heel_angle_deg": 10
+   },
+   "outputs": {
+    "free_surface_correction_ft": {
+     "value": 0.75,
+     "tolerance": {
+      "abs": 0.005
+     }
+    },
+    "effective_gm_ft": {
+     "value": 2.84,
+     "tolerance": {
+      "abs": 0.005
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "dock-piling-lateral",
+   "source_publisher": "PDHonline / PDH Center (John W. Andrew, PE)",
+   "source_title": "PDH Course S235: Pole Foundation Design with Spreadsheet",
+   "source_edition_or_year": "2012 (2006 IBC basis; Eq. identical to IBC 1807.3.2.1)",
+   "source_section_or_page": "Example Problem, pages 3-4: P = 1,200 lb at h = 16 ft, 32 in round footing, lateral bearing 100 psf/ft doubled to 200 psf/ft for an isolated pole; S1 = 200 d/3 iterated to d = 7.31 ft (printed to 2 dp; the book rounds b to 2.67 ft and A to 2 dp). The tile's rate input is the already-doubled 200. scour_ft 0 and existing_embedment_ft 0 are PLACEHOLDERS (skip switches).",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "lateral_load_lb": 1200,
+    "height_above_mudline_ft": 16,
+    "pile_diameter_in": 32,
+    "soil_lateral_bearing_psf_per_ft": 200,
+    "scour_ft": 0,
+    "existing_embedment_ft": 0
+   },
+   "outputs": {
+    "embedment_ft": {
+     "value": 7.31,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "a_term": {
+     "value": 2.16,
+     "tolerance": {
+      "abs": 0.005
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "propeller-track-balance",
+   "source_publisher": "Turbomachinery Laboratory, Texas A&M Engineering Experiment Station (Kelm, Kelm and Pavelek, Kelm Engineering)",
+   "source_title": "Rotor Balancing Tutorial (Turbomachinery and Pump Symposia tutorial)",
+   "source_edition_or_year": "2016",
+   "source_section_or_page": "page 7-8, single-plane influence coefficient example (ID fan): O = 5.6 mils pk-pk @ 135 deg, O+T = 3.3 mils @ 238 deg, trial weight 74 oz-in @ 315 deg; T = 7.11 mils @ 288.1 deg; IC = 10.4 oz-in/mil; correction = 58.24 oz-in @ 341.9 deg. Units differ from the tile's labels (mils not IPS, oz-in not g) but the vector arithmetic is unit-agnostic. The book's 58.24 uses IC rounded to 10.4 (exact 74 x 5.6/7.11 = 58.28), hence pct 0.2. track_in 0, track_limit_in 0.0625 and target_ips 0.2 are PLACEHOLDERS.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "track_in": 0,
+    "track_limit_in": 0.0625,
+    "initial_ips": 5.6,
+    "initial_phase_deg": 135,
+    "trial_weight_g": 74,
+    "trial_phase_deg": 315,
+    "result_ips": 3.3,
+    "result_phase_deg": 238,
+    "target_ips": 0.2
+   },
+   "outputs": {
+    "effect_ips": {
+     "value": 7.11,
+     "tolerance": {
+      "abs": 0.005
+     }
+    },
+    "effect_phase_deg": {
+     "value": 288.1,
+     "tolerance": {
+      "abs": 0.05
+     }
+    },
+    "correction_weight_g": {
+     "value": 58.24,
+     "tolerance": {
+      "pct": 0.2
+     }
+    },
+    "correction_phase_deg": {
+     "value": 341.9,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "aviation-fuel-weight",
+   "source_publisher": "Federal Aviation Administration",
+   "source_title": "Aircraft Weight and Balance Handbook (FAA-H-8083-1B)",
+   "source_edition_or_year": "2016",
+   "source_section_or_page": "Chapter 9, page 9-13/9-14, Beech 1900 passenger loading: Jet A at +25 degC weighs 6.75 lb/gal per Figure 9-44; 390 gallons weigh 2,633 lb (390 x 6.75 = 2,632.5, printed to the pound). The 6.75 is the book's density AT the fuel temperature, so reference_temp_f = fuel_temp_f = 77 (25 degC) to apply no further correction; density_change_pct_per_10f, arm_in and required_weight_lb are PLACEHOLDERS.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "gallons": 390,
+    "standard_density_lb_gal": 6.75,
+    "reference_temp_f": 77,
+    "fuel_temp_f": 77,
+    "density_change_pct_per_10f": 0.4,
+    "arm_in": 0,
+    "required_weight_lb": 0
+   },
+   "outputs": {
+    "actual_weight_lb": {
+     "value": 2633,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "aviation-fuel-weight",
+   "source_publisher": "Federal Aviation Administration",
+   "source_title": "Aircraft Weight and Balance Handbook (FAA-H-8083-1B)",
+   "source_edition_or_year": "2016",
+   "source_section_or_page": "Chapter 9, 'Determining Which Limits Are Exceeded' (Beech 1900 cargo configuration): fuel computed at 6.8 lb/gal; ramp load 340 gallons or 2,312 pounds; fuel remaining at landing 100 gallons or 680 pounds (the 680 lb -> 100 gal reverse is the tile's gallons_for_weight). Fuel at the 15 degC standard, so reference_temp_f = fuel_temp_f = 59; density_change_pct_per_10f and arm_in are PLACEHOLDERS.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "gallons": 340,
+    "standard_density_lb_gal": 6.8,
+    "reference_temp_f": 59,
+    "fuel_temp_f": 59,
+    "density_change_pct_per_10f": 0.4,
+    "arm_in": 0,
+    "required_weight_lb": 680
+   },
+   "outputs": {
+    "actual_weight_lb": {
+     "value": 2312,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "gallons_for_weight": {
+     "value": 100,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "travel-lift-sling-placement",
+   "source_publisher": "Naval Facilities Engineering Command, Navy Crane Center",
+   "source_title": "Rigging Practices Web Based Training Student Guide (NCC-RP-05.2)",
+   "source_edition_or_year": "Rev 05.2 (2021 student guide, archived copy)",
+   "source_section_or_page": "page 36 of 190, 'Weight Distribution Example': 10,000 lb object, attachment points 10 ft apart, CG 2 ft from one and 8 ft from the other; nearer attachment carries 8 / 10 x 10,000 = 8,000 lb (the 75%/25% illustration is a separate figure). Entered as cg_from_fwd_ft = 2 so the FORWARD sling is the nearer one. sling_wll_lb 0 and sling_angle_deg 90 are PLACEHOLDERS.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "displacement_lb": 10000,
+    "sling_spacing_ft": 10,
+    "cg_from_fwd_ft": 2,
+    "sling_wll_lb": 0,
+    "sling_angle_deg": 90
+   },
+   "outputs": {
+    "fwd_sling_lb": {
+     "value": 8000,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "travel-lift-sling-placement",
+   "source_publisher": "Naval Facilities Engineering Command, Navy Crane Center",
+   "source_title": "Rigging Practices Web Based Training Student Guide (NCC-RP-05.2)",
+   "source_edition_or_year": "Rev 05.2 (2021 student guide, archived copy)",
+   "source_section_or_page": "page 43 of 190, 'Angle Factor Chart Example': 45 deg sling angle, angle factor 1.414, leg carries 5,000 lb; 1.414 x 5,000 = 7,070 lb total stress in each leg (factor printed to 3 dp, so pct 0.05). Centered CG (cg 5 ft of 10 ft) and a 10,000 lb load reproduce the 5,000 lb leg; the 10 ft spacing and sling_wll_lb 0 are PLACEHOLDERS.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "displacement_lb": 10000,
+    "sling_spacing_ft": 10,
+    "cg_from_fwd_ft": 5,
+    "sling_wll_lb": 0,
+    "sling_angle_deg": 45
+   },
+   "outputs": {
+    "fwd_sling_lb": {
+     "value": 5000,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "sling_tension_lb": {
+     "value": 7070,
+     "tolerance": {
+      "pct": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "house-battery-alternator",
+   "source_publisher": "Fisheries Supply",
+   "source_title": "Sizing Your Battery Bank",
+   "source_edition_or_year": "web article, updated 2026-05-28, retrieved 2026-10-01",
+   "source_section_or_page": "worked example: 100 amp-hours per day, not depleting more than 50% -> a battery bank with a minimum of 200 amp-hours. bank_ah 200 is that printed minimum; alternator_a 0 (skip), acceptance_fraction 1 and bulk_target_soc_pct 85 are PLACEHOLDERS (the article's 'two hours' recharge figure is a rounded estimate and is NOT asserted).",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "daily_consumption_ah": 100,
+    "bank_ah": 200,
+    "usable_dod": 0.5,
+    "alternator_a": 0,
+    "acceptance_fraction": 1,
+    "bulk_target_soc_pct": 85
+   },
+   "outputs": {
+    "bank_for_one_day_ah": {
+     "value": 200,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "duct-breakout-noise",
+   "source_publisher": "McQuay International (Daikin Applied)",
+   "source_title": "Application Guide AG 31-010, HVAC Acoustic Fundamentals",
+   "source_edition_or_year": "AG 31-010 (c. 2004)",
+   "source_section_or_page": "p. 46, \"Duct Breakout Example\": 22 x 22 in rectangular duct, length 41.7 ft (the printed S line reads \"24*40*(22+22)\" but its printed S = 44,000 in2 is 24*41.7*44, so 41.7 ft is the length the arithmetic used), A = 484 in2, Lw 43 dB at 63 Hz, TLout 20 dB (Table 18, 24x24 row); printed Lwr = Lwi + 10 log(S/A) - TLout = 42.6 dB, printed to 0.1 dB. Only breakout_lw_db is asserted (the guide then subtracts plenum/ceiling attenuation and uses a line-source room equation, which the tile does not). Placeholders: room_absorption_sabins 100, room_criterion_db 0, lagging_improvement_db 0. The 1000 Hz cell (printed 12.6; 24.9 + 19.59 - 32 = 12.5) and 2000+ Hz cells (floored to 0) are not used.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "duct_width_in": 22,
+    "duct_height_in": 22,
+    "exposed_length_ft": 41.7,
+    "sound_power_db": 43,
+    "breakout_tl_db": 20,
+    "room_absorption_sabins": 100,
+    "room_criterion_db": 0,
+    "lagging_improvement_db": 0
+   },
+   "outputs": {
+    "breakout_lw_db": {
+     "value": 42.6,
+     "tolerance": {
+      "abs": 0.1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "duct-breakout-noise",
+   "source_publisher": "McQuay International (Daikin Applied)",
+   "source_title": "Application Guide AG 31-010, HVAC Acoustic Fundamentals",
+   "source_edition_or_year": "AG 31-010 (c. 2004)",
+   "source_section_or_page": "p. 46, \"Duct Breakout Example\": 22 x 22 in rectangular duct, length 41.7 ft (the printed S line reads \"24*40*(22+22)\" but its printed S = 44,000 in2 is 24*41.7*44, so 41.7 ft is the length the arithmetic used), A = 484 in2, Lw 67.8 dB at 125 Hz, TLout 23 dB (Table 18, 24x24 row); printed Lwr = Lwi + 10 log(S/A) - TLout = 64.4 dB, printed to 0.1 dB. Only breakout_lw_db is asserted (the guide then subtracts plenum/ceiling attenuation and uses a line-source room equation, which the tile does not). Placeholders: room_absorption_sabins 100, room_criterion_db 0, lagging_improvement_db 0. The 1000 Hz cell (printed 12.6; 24.9 + 19.59 - 32 = 12.5) and 2000+ Hz cells (floored to 0) are not used.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "duct_width_in": 22,
+    "duct_height_in": 22,
+    "exposed_length_ft": 41.7,
+    "sound_power_db": 67.8,
+    "breakout_tl_db": 23,
+    "room_absorption_sabins": 100,
+    "room_criterion_db": 0,
+    "lagging_improvement_db": 0
+   },
+   "outputs": {
+    "breakout_lw_db": {
+     "value": 64.4,
+     "tolerance": {
+      "abs": 0.1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "duct-breakout-noise",
+   "source_publisher": "McQuay International (Daikin Applied)",
+   "source_title": "Application Guide AG 31-010, HVAC Acoustic Fundamentals",
+   "source_edition_or_year": "AG 31-010 (c. 2004)",
+   "source_section_or_page": "p. 46, \"Duct Breakout Example\": 22 x 22 in rectangular duct, length 41.7 ft (the printed S line reads \"24*40*(22+22)\" but its printed S = 44,000 in2 is 24*41.7*44, so 41.7 ft is the length the arithmetic used), A = 484 in2, Lw 56.1 dB at 250 Hz, TLout 26 dB (Table 18, 24x24 row); printed Lwr = Lwi + 10 log(S/A) - TLout = 49.7 dB, printed to 0.1 dB. Only breakout_lw_db is asserted (the guide then subtracts plenum/ceiling attenuation and uses a line-source room equation, which the tile does not). Placeholders: room_absorption_sabins 100, room_criterion_db 0, lagging_improvement_db 0. The 1000 Hz cell (printed 12.6; 24.9 + 19.59 - 32 = 12.5) and 2000+ Hz cells (floored to 0) are not used.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "duct_width_in": 22,
+    "duct_height_in": 22,
+    "exposed_length_ft": 41.7,
+    "sound_power_db": 56.1,
+    "breakout_tl_db": 26,
+    "room_absorption_sabins": 100,
+    "room_criterion_db": 0,
+    "lagging_improvement_db": 0
+   },
+   "outputs": {
+    "breakout_lw_db": {
+     "value": 49.7,
+     "tolerance": {
+      "abs": 0.1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "duct-breakout-noise",
+   "source_publisher": "McQuay International (Daikin Applied)",
+   "source_title": "Application Guide AG 31-010, HVAC Acoustic Fundamentals",
+   "source_edition_or_year": "AG 31-010 (c. 2004)",
+   "source_section_or_page": "p. 46, \"Duct Breakout Example\": 22 x 22 in rectangular duct, length 41.7 ft (the printed S line reads \"24*40*(22+22)\" but its printed S = 44,000 in2 is 24*41.7*44, so 41.7 ft is the length the arithmetic used), A = 484 in2, Lw 46.5 dB at 500 Hz, TLout 29 dB (Table 18, 24x24 row); printed Lwr = Lwi + 10 log(S/A) - TLout = 37.1 dB, printed to 0.1 dB. Only breakout_lw_db is asserted (the guide then subtracts plenum/ceiling attenuation and uses a line-source room equation, which the tile does not). Placeholders: room_absorption_sabins 100, room_criterion_db 0, lagging_improvement_db 0. The 1000 Hz cell (printed 12.6; 24.9 + 19.59 - 32 = 12.5) and 2000+ Hz cells (floored to 0) are not used.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "duct_width_in": 22,
+    "duct_height_in": 22,
+    "exposed_length_ft": 41.7,
+    "sound_power_db": 46.5,
+    "breakout_tl_db": 29,
+    "room_absorption_sabins": 100,
+    "room_criterion_db": 0,
+    "lagging_improvement_db": 0
+   },
+   "outputs": {
+    "breakout_lw_db": {
+     "value": 37.1,
+     "tolerance": {
+      "abs": 0.1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "silencer-insertion-loss",
+   "source_publisher": "Elsevier Academic Press",
+   "source_title": "Marshall Long, Architectural Acoustics, ch. 14 \"Sound Attenuation in Ducts\", Table 14.9 HVAC System Loss Calculations",
+   "source_edition_or_year": "2006 (1st ed.)",
+   "source_section_or_page": "pp. 505-507, Table 14.9, Supply item 3 (36 x 24 in silencer, 5000 cfm, 0.25 in pd), 1000 Hz: upstream \"Sum\" 74 dB, silencer insertion loss 35 dB, printed Sum 39 dB, self noise 42 dB, printed \"Combined\" 44 dB (whole-dB printing; the table's program carries unrounded values, so tolerance is 0.5 dB). Inputs face 36x24 and airflow are printed; reference_drop_in_wc 0.25 (printed pd) at reference_velocity_fpm = airflow / 6 sq ft is a placeholder that makes the drop restate the printed pd; alt face, target velocity and fan static are 0 (skipped). The supply 2000 Hz cell (72-35=37 with 45 self noise is 45.6, printed 45) is excluded.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "airflow_cfm": 5000,
+    "face_width_in": 36,
+    "face_height_in": 24,
+    "reference_drop_in_wc": 0.25,
+    "reference_velocity_fpm": 833.3333333333334,
+    "alt_face_width_in": 0,
+    "alt_face_height_in": 0,
+    "target_velocity_fpm": 0,
+    "upstream_lw_db": 74,
+    "insertion_loss_db": 35,
+    "regenerated_lw_db": 42,
+    "fan_available_static_in_wc": 0
+   },
+   "outputs": {
+    "attenuated_lw_db": {
+     "value": 39,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "downstream_lw_db": {
+     "value": 44,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "silencer-insertion-loss",
+   "source_publisher": "Elsevier Academic Press",
+   "source_title": "Marshall Long, Architectural Acoustics, ch. 14 \"Sound Attenuation in Ducts\", Table 14.9 HVAC System Loss Calculations",
+   "source_edition_or_year": "2006 (1st ed.)",
+   "source_section_or_page": "pp. 505-507, Table 14.9, Return item 3 (36 x 24 in silencer, 4500 cfm, 0.3 in pd), 250 Hz: upstream \"Sum\" 80 dB, silencer insertion loss 35 dB, printed Sum 45 dB, self noise 53 dB, printed \"Combined\" 54 dB (whole-dB printing; the table's program carries unrounded values, so tolerance is 0.5 dB). Inputs face 36x24 and airflow are printed; reference_drop_in_wc 0.3 (printed pd) at reference_velocity_fpm = airflow / 6 sq ft is a placeholder that makes the drop restate the printed pd; alt face, target velocity and fan static are 0 (skipped). The supply 2000 Hz cell (72-35=37 with 45 self noise is 45.6, printed 45) is excluded.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "airflow_cfm": 4500,
+    "face_width_in": 36,
+    "face_height_in": 24,
+    "reference_drop_in_wc": 0.3,
+    "reference_velocity_fpm": 750,
+    "alt_face_width_in": 0,
+    "alt_face_height_in": 0,
+    "target_velocity_fpm": 0,
+    "upstream_lw_db": 80,
+    "insertion_loss_db": 35,
+    "regenerated_lw_db": 53,
+    "fan_available_static_in_wc": 0
+   },
+   "outputs": {
+    "attenuated_lw_db": {
+     "value": 45,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "downstream_lw_db": {
+     "value": 54,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "silencer-insertion-loss",
+   "source_publisher": "Elsevier Academic Press",
+   "source_title": "Marshall Long, Architectural Acoustics, ch. 14 \"Sound Attenuation in Ducts\", Table 14.9 HVAC System Loss Calculations",
+   "source_edition_or_year": "2006 (1st ed.)",
+   "source_section_or_page": "pp. 505-507, Table 14.9, Return item 3 (36 x 24 in silencer, 4500 cfm, 0.3 in pd), 500 Hz: upstream \"Sum\" 76 dB, silencer insertion loss 41 dB, printed Sum 35 dB, self noise 56 dB, printed \"Combined\" 56 dB (whole-dB printing; the table's program carries unrounded values, so tolerance is 0.5 dB). Inputs face 36x24 and airflow are printed; reference_drop_in_wc 0.3 (printed pd) at reference_velocity_fpm = airflow / 6 sq ft is a placeholder that makes the drop restate the printed pd; alt face, target velocity and fan static are 0 (skipped). The supply 2000 Hz cell (72-35=37 with 45 self noise is 45.6, printed 45) is excluded.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "airflow_cfm": 4500,
+    "face_width_in": 36,
+    "face_height_in": 24,
+    "reference_drop_in_wc": 0.3,
+    "reference_velocity_fpm": 750,
+    "alt_face_width_in": 0,
+    "alt_face_height_in": 0,
+    "target_velocity_fpm": 0,
+    "upstream_lw_db": 76,
+    "insertion_loss_db": 41,
+    "regenerated_lw_db": 56,
+    "fan_available_static_in_wc": 0
+   },
+   "outputs": {
+    "attenuated_lw_db": {
+     "value": 35,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "downstream_lw_db": {
+     "value": 56,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "rooftop-curb-uplift",
+   "source_publisher": "Meca Enterprises",
+   "source_title": "Wind on Rooftop Structures and Equipment (Chris Rosencutter)",
+   "source_edition_or_year": "2020-07-17, ASCE 7-16 29.4.1",
+   "source_section_or_page": "Worked example: 8 x 3 x 4 ft HVAC unit, qh = 53.56 psf (Eqn 26.10-1), GCr 1.9 lateral / 1.5 uplift; wind normal to the 8 ft face: Af = 32 sq ft, Fh = 53.56*1.9*32 = 3256 lb; Ar = 24 sq ft, Fv = 53.56*1.5*24 = 1928 lb (whole lb). Tile pressures are the printed products qh*GCr (101.764 and 80.34 psf). Placeholders: unit_weight_lb 500, fastener_count 8, windward 4, capacity 0 -- the article gives no weight or anchorage.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "unit_length_ft": 8,
+    "unit_width_ft": 3,
+    "unit_height_ft": 4,
+    "unit_weight_lb": 500,
+    "uplift_psf": 80.34,
+    "lateral_psf": 101.764,
+    "fastener_count": 8,
+    "windward_fastener_count": 4,
+    "fastener_capacity_lb": 0
+   },
+   "outputs": {
+    "uplift_lb": {
+     "value": 1928,
+     "tolerance": {
+      "abs": 1
+     }
+    },
+    "lateral_lb": {
+     "value": 3256,
+     "tolerance": {
+      "abs": 1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "rooftop-curb-uplift",
+   "source_publisher": "Meca Enterprises",
+   "source_title": "Wind on Rooftop Structures and Equipment (Chris Rosencutter)",
+   "source_edition_or_year": "2020-07-17, ASCE 7-16 29.4.1",
+   "source_section_or_page": "Same worked example, wind normal to the 3 ft face: Af = 12 sq ft, Fh = 53.56*1.9*12 = 1221 lb; Fv = 1928 lb. Entered with unit_length_ft = the 3 ft face so the tile side profile is 3 x 4. Placeholders as in the other row.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "unit_length_ft": 3,
+    "unit_width_ft": 8,
+    "unit_height_ft": 4,
+    "unit_weight_lb": 500,
+    "uplift_psf": 80.34,
+    "lateral_psf": 101.764,
+    "fastener_count": 8,
+    "windward_fastener_count": 4,
+    "fastener_capacity_lb": 0
+   },
+   "outputs": {
+    "uplift_lb": {
+     "value": 1928,
+     "tolerance": {
+      "abs": 1
+     }
+    },
+    "lateral_lb": {
+     "value": 1221,
+     "tolerance": {
+      "abs": 1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "kitchen-makeup-air-deficit",
+   "source_publisher": "CED Engineering (A. Bhatia)",
+   "source_title": "Stairwell Pressurization Systems, Course M05-022",
+   "source_edition_or_year": "course text (undated), citing NFPA 92 / NFPA 101",
+   "source_section_or_page": "pp. 21-22, Table 3 \"Maximum Pressure across Different Door Widths\" (total opening force 30 lb, 7 ft door, knob 3 in from the latch edge): 36 in door with a 6 lb closer, max dP 0.4 in wc. The printed relation F = Fd + 5.2 W A dP / (2(W - d)) puts the pressure share at 30 - 6 = 24 lb -- a difference of two printed numbers, the tile omits the closer. Tolerance covers dP printed to 0.01 in wc. Placeholders build the pressure: building_leakage 1 cfm/Pa, hood_exhaust_cfm = 0.4 x 249.089 (Pa), other/makeup/transfer 0.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "hood_exhaust_cfm": 99.63560000000001,
+    "other_exhaust_cfm": 0,
+    "dedicated_makeup_cfm": 0,
+    "intended_transfer_cfm": 0,
+    "building_leakage_cfm_per_pa": 1,
+    "door_width_ft": 3,
+    "door_height_ft": 7
+   },
+   "outputs": {
+    "door_force_lbf": {
+     "value": 24,
+     "tolerance": {
+      "pct": 1.3
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "kitchen-makeup-air-deficit",
+   "source_publisher": "CED Engineering (A. Bhatia)",
+   "source_title": "Stairwell Pressurization Systems, Course M05-022",
+   "source_edition_or_year": "course text (undated), citing NFPA 92 / NFPA 101",
+   "source_section_or_page": "pp. 21-22, Table 3 \"Maximum Pressure across Different Door Widths\" (total opening force 30 lb, 7 ft door, knob 3 in from the latch edge): 32 in door with a 6 lb closer, max dP 0.45 in wc. The printed relation F = Fd + 5.2 W A dP / (2(W - d)) puts the pressure share at 30 - 6 = 24 lb -- a difference of two printed numbers, the tile omits the closer. Tolerance covers dP printed to 0.01 in wc. Placeholders build the pressure: building_leakage 1 cfm/Pa, hood_exhaust_cfm = 0.45 x 249.089 (Pa), other/makeup/transfer 0.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "hood_exhaust_cfm": 112.09005,
+    "other_exhaust_cfm": 0,
+    "dedicated_makeup_cfm": 0,
+    "intended_transfer_cfm": 0,
+    "building_leakage_cfm_per_pa": 1,
+    "door_width_ft": 2.6666666666666665,
+    "door_height_ft": 7
+   },
+   "outputs": {
+    "door_force_lbf": {
+     "value": 24,
+     "tolerance": {
+      "pct": 1.2
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "kitchen-makeup-air-deficit",
+   "source_publisher": "CED Engineering (A. Bhatia)",
+   "source_title": "Stairwell Pressurization Systems, Course M05-022",
+   "source_edition_or_year": "course text (undated), citing NFPA 92 / NFPA 101",
+   "source_section_or_page": "pp. 21-22, Table 3 \"Maximum Pressure across Different Door Widths\" (total opening force 30 lb, 7 ft door, knob 3 in from the latch edge): 36 in door with a 12 lb closer, max dP 0.3 in wc. The printed relation F = Fd + 5.2 W A dP / (2(W - d)) puts the pressure share at 30 - 12 = 18 lb -- a difference of two printed numbers, the tile omits the closer. Tolerance covers dP printed to 0.01 in wc. Placeholders build the pressure: building_leakage 1 cfm/Pa, hood_exhaust_cfm = 0.3 x 249.089 (Pa), other/makeup/transfer 0.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "hood_exhaust_cfm": 74.7267,
+    "other_exhaust_cfm": 0,
+    "dedicated_makeup_cfm": 0,
+    "intended_transfer_cfm": 0,
+    "building_leakage_cfm_per_pa": 1,
+    "door_width_ft": 3,
+    "door_height_ft": 7
+   },
+   "outputs": {
+    "door_force_lbf": {
+     "value": 18,
+     "tolerance": {
+      "pct": 1.7
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "variable-primary-bypass",
+   "source_publisher": "Trane",
+   "source_title": "Engineers Newsletter vol. 43-2, Chilled-Water Systems Design Issues: Learning from past mistakes (ADM-APN051-EN)",
+   "source_edition_or_year": "2014",
+   "source_section_or_page": "Case 1, New Variable Primary Flow (two 200-ton helical rotary chillers), Issue 3 / Solution 3 and Issue 4: chiller design flow 1.5 gpm/ton and minimum 1.2 gpm/ton ('can only be reduced 20 percent before reaching minimum'); 'size the bypass line for the largest minimum flow rate: 200 tons x 1.2 gpm per ton = 240 gpm'. Inputs: machine_design_gpm 300 = 200 tons x 1.5 gpm/ton (300 gpm also printed in the loop-volume line), minimum_flow_fraction 0.8 = 1.2/1.5 (exact, the printed 20 percent turndown). Placeholders: system_flow_gpm 0 (the zero-load sizing condition the rule implies), machines_running 1 (the rule sizes for ONE largest chiller), both differentials 0 (no Cv printed). Exact arithmetic.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "machine_design_gpm": 300,
+    "minimum_flow_fraction": 0.8,
+    "machines_running": 1,
+    "system_flow_gpm": 0,
+    "bypass_differential_psi": 0,
+    "design_differential_psi": 0
+   },
+   "outputs": {
+    "minimum_per_machine_gpm": {
+     "value": 240,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "bypass_gpm": {
+     "value": 240,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "pump-impeller-trim",
+   "source_publisher": "David Sellers, Facility Dynamics Engineering (A Few Things I've Learned, av8rdas.com)",
+   "source_title": "Affinity Laws (Useful Formulas page): projecting a trimmed impeller line for a Bell & Gossett pump",
+   "source_edition_or_year": "accessed 2026-10-01",
+   "source_section_or_page": "Impeller-trim worked example: design point 1,300 gpm at 70 ft w.c.; the system curve through it meets the 13.5 in impeller line at 1,330 gpm and 73.5 ft w.c.; the projected impeller is labeled '13.195 inches' (13.5 x 1,300/1,330 = 13.1955, printed to 3 decimals). Inputs current_head_ft 73.5 and required_head_ft 70 are printed; max_diameter_in 13.5 (largest published impeller) and min_trim_fraction 0.75 are placeholders; motor/hours/rate 0 (no saving computed).",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "current_diameter_in": 13.5,
+    "current_flow_gpm": 1330,
+    "required_flow_gpm": 1300,
+    "current_head_ft": 73.5,
+    "required_head_ft": 70,
+    "max_diameter_in": 13.5,
+    "min_trim_fraction": 0.75,
+    "motor_hp": 0,
+    "annual_hours": 0,
+    "energy_rate_per_kwh": 0
+   },
+   "outputs": {
+    "required_diameter_in": {
+     "value": 13.195,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "flow-hood-correction",
+   "source_publisher": "Jim Hall, P.E., TBE, CxA (Systems Management & Balancing, Inc.), presented at the Building Commissioning Association",
+   "source_title": "Proper Use of Airflow/Air Velocity Measuring Instrumentation",
+   "source_edition_or_year": "April 24, 2018",
+   "source_section_or_page": "'Flow/Correction Factors -- Flow Hood' slide, 1 in x 4 ft linear outlet: pitot tube duct traverse measured 201 cfm; 2 ft x 2 ft hood read 216 cfm (2 readings); Ff-Cf-Kv = 201 / hood cfm = 0.93 (201/216 = 0.9306, printed to 2 decimals). Corrected flow = 201 by construction. Placeholders: correction_factor 1 (unused once a traverse is entered), design_cfm 0, system_reading_total_cfm 0.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "hood_reading_cfm": 216,
+    "correction_factor": 1,
+    "reference_traverse_cfm": 201,
+    "design_cfm": 0,
+    "system_reading_total_cfm": 0
+   },
+   "outputs": {
+    "derived_factor": {
+     "value": 0.93,
+     "tolerance": {
+      "abs": 0.005
+     }
+    },
+    "corrected_cfm": {
+     "value": 201,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "flow-hood-correction",
+   "source_publisher": "Jim Hall, P.E., TBE, CxA (Systems Management & Balancing, Inc.), presented at the Building Commissioning Association",
+   "source_title": "Proper Use of Airflow/Air Velocity Measuring Instrumentation",
+   "source_edition_or_year": "April 24, 2018",
+   "source_section_or_page": "Same slide, 1 ft x 4 ft hood on the 1 in x 4 ft outlet read 173 cfm against the 201 cfm traverse; factor printed 1.16 (201/173 = 1.1618). The hood reads LOW here, the opposite direction from the 2 ft x 2 ft row. Placeholders: correction_factor 1, design_cfm 0, system_reading_total_cfm 0.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "hood_reading_cfm": 173,
+    "correction_factor": 1,
+    "reference_traverse_cfm": 201,
+    "design_cfm": 0,
+    "system_reading_total_cfm": 0
+   },
+   "outputs": {
+    "derived_factor": {
+     "value": 1.16,
+     "tolerance": {
+      "abs": 0.005
+     }
+    },
+    "corrected_cfm": {
+     "value": 201,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "flow-hood-correction",
+   "source_publisher": "Jim Hall, P.E., TBE, CxA (Systems Management & Balancing, Inc.), presented at the Building Commissioning Association",
+   "source_title": "Proper Use of Airflow/Air Velocity Measuring Instrumentation",
+   "source_edition_or_year": "April 24, 2018",
+   "source_section_or_page": "Same slide, 2 ft x 4 ft hood read 219 cfm against the 201 cfm traverse; factor printed 0.92 (201/219 = 0.9178). Placeholders: correction_factor 1, design_cfm 0, system_reading_total_cfm 0.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "hood_reading_cfm": 219,
+    "correction_factor": 1,
+    "reference_traverse_cfm": 201,
+    "design_cfm": 0,
+    "system_reading_total_cfm": 0
+   },
+   "outputs": {
+    "derived_factor": {
+     "value": 0.92,
+     "tolerance": {
+      "abs": 0.005
+     }
+    },
+    "corrected_cfm": {
+     "value": 201,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "tilt-up-lift-stress",
+   "source_publisher": "Dayton Superior",
+   "source_title": "Tilt-Up Handbook (Perform With Precision), Panel Erection Information",
+   "source_edition_or_year": "02/17",
+   "source_section_or_page": "p. 13 Panel Analysis: at the normal 2,500 psi minimum lift strength 'the ultimate tensile stress would be 375 psi or greater with an allowable stress of 300 psi'; p. 15 Table of Allowable Concrete Stresses lists 300 psi at f'c 2,500. safety_factor 1.25 = 375/300 is DERIVED from those two printed numbers (the tile default is 1.5). Panel geometry inputs are placeholders (8 x 24 ft x 7.25 in, 2 x 2 inserts); only the strength outputs are asserted. Exact arithmetic (7.5 x sqrt(2500) = 375).",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "panel_width_ft": 8,
+    "panel_height_ft": 24,
+    "thickness_in": 7.25,
+    "unit_weight_pcf": 150,
+    "lift_day_strength_psi": 2500,
+    "insert_rows": 2,
+    "insert_columns": 2,
+    "suction_fraction": 0,
+    "safety_factor": 1.25
+   },
+   "outputs": {
+    "modulus_of_rupture_psi": {
+     "value": 375,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "allowable_stress_psi": {
+     "value": 300,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "tilt-up-lift-stress",
+   "source_publisher": "Dayton Superior",
+   "source_title": "Tilt-Up Handbook (Perform With Precision), Stress Tables and Rigging Patterns",
+   "source_edition_or_year": "02/17",
+   "source_section_or_page": "p. 15 Table of Allowable Concrete Stresses: f'c 4,000 psi -> allowable bending stress 379 psi (6 x sqrt(4000) = 379.47; the table truncates, e.g. 3,000 -> 328 for 328.6). safety_factor 1.25 is DERIVED from the handbook's 375/300 pair at 2,500 psi (p. 13), equivalent to its stated ~6 sqrt(f'c). Panel geometry inputs are placeholders; only allowable_stress_psi is asserted.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "panel_width_ft": 8,
+    "panel_height_ft": 24,
+    "thickness_in": 7.25,
+    "unit_weight_pcf": 150,
+    "lift_day_strength_psi": 4000,
+    "insert_rows": 2,
+    "insert_columns": 2,
+    "suction_fraction": 0,
+    "safety_factor": 1.25
+   },
+   "outputs": {
+    "allowable_stress_psi": {
+     "value": 379,
+     "tolerance": {
+      "abs": 1
      }
     }
    }

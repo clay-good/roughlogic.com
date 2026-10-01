@@ -157,7 +157,8 @@ test("curb uplift: net uplift less the weight, plus the overturning couple on th
   const r = computeRooftopCurbUplift({ unit_length_ft: 8, unit_width_ft: 5, unit_height_ft: 4, unit_weight_lb: 1400, uplift_psf: 28, lateral_psf: 22, fastener_count: 8, windward_fastener_count: 4, fastener_capacity_lb: 400 });
   close(r.uplift_lb, 40 * 28, "plan area x uplift");
   close(r.couple_tension_lb, r.lateral_lb * 2 / 5, "M / width");
-  close(r.per_windward_lb, (1120 - 1400) / 8 + r.couple_tension_lb / 4, "per windward fastener");
+  // ASCE 7 ASD: only 0.6 of the weight resists uplift (fixed 2026-10-01).
+  close(r.per_windward_lb, (1120 - 0.6 * 1400) / 8 + r.couple_tension_lb / 4, "per windward fastener");
 });
 
 test("pump-impeller-trim: a throttled pump (same flow, excess head) points to the head-based trim DOE Tip Sheet #7 prints (14 in -> 12.76 in)", () => {

@@ -910,23 +910,38 @@ export function renderInsulationThickness(inputRegion, outputRegion, citationEl)
   const lim = makeNumber("Outer surface limit (°F)", "it-lim", { step: "any" });
   const k = makeNumber("Insulation k (BTU*in/hr*ft²*F)", "it-k", { step: "any", min: "0", value: "0.27" });
   k.input.value = "0.27";
-  for (const f of [od, ts, amb, lim, k]) inputRegion.appendChild(f.wrap);
+  // The film coefficient and the two checks the compute already carries were
+  // not on the page until 2026-10-01; the note said the film was entered.
+  const h = makeNumber("Outside film coefficient (BTU/hr*ft²*F; 1.65 still air)", "it-h", { step: "any", min: "0", value: "1.65" });
+  h.input.value = "1.65";
+  const at = makeNumber("Stated thickness to check (in, 0 to skip)", "it-at", { step: "any", min: "0" });
+  const alt = makeNumber("Alternative film coefficient (0 to skip)", "it-alt", { step: "any", min: "0" });
+  for (const f of [od, ts, amb, lim, k, h, at, alt]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => {
-    od.input.value = "1"; ts.input.value = "250"; amb.input.value = "75"; lim.input.value = "120"; k.input.value = "0.27"; update();
+    od.input.value = "1"; ts.input.value = "250"; amb.input.value = "75"; lim.input.value = "120"; k.input.value = "0.27"; h.input.value = "1.65"; at.input.value = ""; alt.input.value = ""; update();
   });
   const oT = makeOutputLine(outputRegion, "Required thickness", "it-out-t");
+  const oA = makeOutputLine(outputRegion, "At the stated thickness", "it-out-a");
+  const oF = makeOutputLine(outputRegion, "At the alternative film", "it-out-f");
+  const oN = makeOutputLine(outputRegion, "Note", "it-out-n");
   const update = debounce(() => {
     const r = computeInsulationThickness({
       pipe_od_in: Number(od.input.value) || 0,
       surface_temp_F: Number(ts.input.value) || 0,
       ambient_F: Number(amb.input.value) || 0,
       surface_limit_F: Number(lim.input.value) || 0,
-      k_btu_in_per_hr_ft2_F: Number(k.input.value) || 0.27,
+      k_btu_in_per_hr_ft2_F: Number(k.input.value) || 0,
+      outside_film_coeff_btu_hr_ft2_F: h.input.value === "" ? 1.65 : Number(h.input.value) || 0,
+      at_thickness_in: Number(at.input.value) || 0,
+      alt_film_coeff_btu_hr_ft2_F: Number(alt.input.value) || 0,
     });
-    if (r.error) { oT.textContent = r.error; return; }
+    if (r.error) { oT.textContent = r.error; oA.textContent = ""; oF.textContent = ""; oN.textContent = ""; return; }
     oT.textContent = fmt(r.thickness_in, 3) + " in";
+    oA.textContent = r.at_thickness_verdict;
+    oF.textContent = r.alt_film_verdict;
+    oN.textContent = r.note;
   }, DEBOUNCE_MS);
-  for (const el of [od.input, ts.input, amb.input, lim.input, k.input]) el.addEventListener("input", update);
+  for (const el of [od.input, ts.input, amb.input, lim.input, k.input, h.input, at.input, alt.input]) el.addEventListener("input", update);
 }
 
 // dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
@@ -4390,7 +4405,7 @@ export function computePipeInsulationForCondensation({ pipe_od_in = 0, pipe_temp
   if (![dew_point_F, thickness_in, r2_in].every(Number.isFinite)) return { error: "Condensation-control math did not produce a finite value." };
   return {
     dew_point_F, thickness_in, r2_in, no_risk: false,
-    note: "The MINIMUM thickness that holds the outer jacket exactly at the ambient dew point - the industry practice is to round UP to the next stock wall and keep a margin, because a surface at the dew point is on the edge of sweating all day. Design-day humidity, not average, is what condensation cares about: raise the RH input to the worst sustained condition the space sees. Assumes still air (film coefficient 1.65 default), a continuous vapor retarder (a torn jacket sweats INSIDE the insulation instead), and a bare-pipe k entered for the actual material (fiberglass ~0.27, elastomeric ~0.25-0.28 BTU-in/hr-ft^2-F, from the data sheet). Energy sizing is the separate insulation-thickness tile. Manufacturer condensation tables and the mechanical code govern.",
+    note: "The MINIMUM thickness that holds the outer jacket exactly at the ambient dew point - the industry practice is to round UP to the next stock wall and keep a margin, because a surface at the dew point is on the edge of sweating all day. Design-day humidity, not average, is what condensation cares about: raise the RH input to the worst sustained condition the space sees. Assumes still air (film coefficient 1.65 default), a continuous vapor retarder (a torn jacket sweats INSIDE the insulation instead), and a bare-pipe k entered for the actual material (fiberglass ~0.27, elastomeric ~0.25-0.28 BTU-in/hr-ft^2-F, from the data sheet). Energy sizing is the separate insulation-thickness-for-heat-loss tile. Manufacturer condensation tables and the mechanical code govern.",
   };
 }
 export const pipeInsulationForCondensationExample = { inputs: { pipe_od_in: 1, pipe_temp_F: 40, ambient_F: 75, ambient_rh_pct: 50, k_btu_in_per_hr_ft2_F: 0.27, outside_film_coeff_btu_hr_ft2_F: 1.65 } };

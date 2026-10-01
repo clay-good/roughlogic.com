@@ -47204,7 +47204,7 @@ test("bounds: spec-v1619 computePostTensionElongation -- the average force, not 
 });
 
 import { computeTiltUpLiftStress as _v1620 } from "../../calc-concreteplacement.js";
-test("bounds: spec-v1620 computeTiltUpLiftStress -- one more row cuts the bending by 56%", () => {
+test("bounds: spec-v1620 computeTiltUpLiftStress -- more rows buy less than the span suggests", () => {
   const base = { panel_width_ft: 8, panel_height_ft: 24, thickness_in: 7.25, unit_weight_pcf: 150, lift_day_strength_psi: 2200, insert_rows: 2, insert_columns: 2, suction_fraction: 0, safety_factor: 1.5 };
   const r = _v1620(base);
   assert.ok(Math.abs(r.panel_weight_lb - 17400) < 1e-6);
@@ -47214,12 +47214,13 @@ test("bounds: spec-v1620 computeTiltUpLiftStress -- one more row cuts the bendin
   assert.ok(Math.abs(r.allowable_stress_psi - 234.520787) < 1e-5);
   assert.ok(Math.abs(r.bending_stress_psi - 186.206897) < 1e-5);
   assert.equal(r.within_capacity, true);
-  // The spec's headline: moment goes as the span squared, so three rows over
-  // two is 64/144 -- a 56% cut, not a third.
-  const three = _v1620({ ...base, insert_rows: 3 });
-  assert.ok(Math.abs(three.span_between_rows_ft - 8) < 1e-12);
-  assert.ok(Math.abs(three.bending_stress_psi / r.bending_stress_psi - 64 / 144) < 1e-9);
-  assert.ok(Math.abs((1 - three.bending_stress_psi / r.bending_stress_psi) * 100 - 55.5555556) < 1e-6);
+  // The spec claimed three rows cut it 56% (span squared). Dayton Superior's
+  // printed R42 tables carry 0.595 of the R22 stress, so rows scale the two-row
+  // stress by (2 / n)^0.75 (fixed 2026-10-01; four rows had read a quarter).
+  const four = _v1620({ ...base, insert_rows: 4 });
+  assert.ok(Math.abs(four.bending_stress_psi / r.bending_stress_psi - Math.pow(0.5, 0.75)) < 1e-12);
+  // Dayton R42, 4 in x 32 ft, prints 313 psi; this must not read below it.
+  assert.ok(_v1620({ ...base, panel_height_ft: 32, thickness_in: 4, insert_rows: 4 }).bending_stress_psi >= 313);
   // The strength trap: the same panel at 28 days looks 26% stronger.
   const twentyEight = _v1620({ ...base, lift_day_strength_psi: 4000 });
   assert.ok(Math.abs(twentyEight.modulus_of_rupture_psi - 474.341649) < 1e-5);
@@ -47247,7 +47248,11 @@ test("bounds: spec-v1621 computeTiltUpBraceLoad -- the resultant height, not the
   assert.ok(Math.abs(r.lateral_per_brace_lb - 1728) < 1e-9);
   assert.ok(Math.abs(r.axial_per_brace_lb - 3012.67614) < 1e-4);
   assert.ok(Math.abs(r.alternate_axial_lb - 2443.76100) < 1e-4);
-  assert.equal(r.within_capacity, true);
+  // At TCA's 1.5 factor (Kelly 2007) the 3,013 lb brace is 4,519 lb against a
+  // 4,000 lb ultimate: three braces are NOT enough (fixed 2026-10-01).
+  assert.ok(Math.abs(r.design_axial_per_brace_lb - 1.5 * r.axial_per_brace_lb) < 1e-9);
+  assert.equal(r.within_capacity, false);
+  assert.equal(r.braces_required, 4);
   // The lateral load is NOT the wind force over the brace count: the
   // resultant at 12 ft carried by braces at 16 ft scales it by 12/16.
   assert.ok(Math.abs(r.total_lateral_lb - r.wind_force_lb * 12 / 16) < 1e-9);
@@ -49503,7 +49508,7 @@ test("bounds: spec-v1622 computeFlowHoodCorrection -- the direction is computed,
 });
 
 test("bounds: spec-v1623 computeFanSystemEffect -- the effective duct length grows with velocity", () => {
-  const base = { flow_cfm: 12000, outlet_width_in: 30, outlet_height_in: 24, straight_duct_ft: 3.0, inlet_condition: "elbow_with_swirl", fan_curve_tp_inwg: 2.5, measured_tp_inwg: 2.9 };
+  const base = { flow_cfm: 12000, outlet_width_in: 30, outlet_height_in: 24, straight_duct_ft: 3.0, inlet_condition: "elbow_with_swirl", fan_curve_tp_inwg: 2.5, measured_tp_inwg: 2.1 };
   const r = _v1623(base);
   // IDENTITY: area, velocity, and the equivalent round diameter.
   assert.ok(Math.abs(r.outlet_area_ft2 - 5) < 1e-12);
@@ -49528,10 +49533,11 @@ test("bounds: spec-v1623 computeFanSystemEffect -- the effective duct length gro
   // Enough straight duct removes the outlet effect, off the boundary.
   assert.equal(_v1623({ ...base, straight_duct_ft: r.effective_length_ft * 1.001 }).length_adequate, true);
   assert.equal(_v1623({ ...base, straight_duct_ft: r.effective_length_ft * 0.999 }).length_adequate, false);
-  // The diagnostic: measured static ABOVE the curve is the signature.
-  assert.equal(r.measured_exceeds_curve, true);
+  // The diagnostic: the fan developing LESS than its curve is the signature
+  // (AMCA 201; fixed 2026-10-01 -- it had read a point above the curve).
+  assert.equal(r.measured_below_curve, true);
   assert.ok(Math.abs(r.pressure_shortfall_inwg - 0.4) < 1e-9);
-  assert.equal(_v1623({ ...base, measured_tp_inwg: 2.4 }).measured_exceeds_curve, false);
+  assert.equal(_v1623({ ...base, measured_tp_inwg: 2.6 }).measured_below_curve, false);
   // The inlet condition is a named case, not a silent default.
   assert.equal(r.inlet_is_swirl, true);
   assert.equal(_v1623({ ...base, inlet_condition: "clear" }).inlet_is_elbow, false);
@@ -49599,8 +49605,14 @@ test("bounds: spec-v1625 computePumpImpellerTrim -- power goes as the cube of th
   assert.ok(Math.abs(r.annual_kwh_saved - r.current_kwh * (1 - r.power_ratio)) < 1e-9);
   assert.ok(Math.abs(r.annual_cost_saved - r.annual_kwh_saved * 0.10) < 1e-9);
   // No trim at all is the identity case: nothing changes and nothing is saved.
-  const none = _v1625({ ...base, required_flow_gpm: 520 });
+  const none = _v1625({ ...base, required_flow_gpm: 520, required_head_ft: 95 });
   assert.ok(Math.abs(none.required_diameter_in - 9.5) < 1e-12);
+  // A THROTTLED pump (same flow, head to spare) trims on head at constant flow,
+  // DOE Tip Sheet #7: D2 / D1 = cbrt(H2 / H1). It had read no trim and $0.
+  const throttled = _v1625({ ...base, required_flow_gpm: 520, required_head_ft: 72 });
+  assert.equal(throttled.throttled, true);
+  assert.ok(Math.abs(throttled.required_diameter_in - 9.5 * Math.cbrt(72 / 95)) < 1e-12);
+  assert.ok(throttled.annual_kwh_saved > 0);
   assert.ok(Math.abs(none.power_ratio - 1) < 1e-12);
   assert.ok(Math.abs(none.annual_kwh_saved) < 1e-9);
   assert.ok(Math.abs(none.head_at_trim_ft - 95) < 1e-9);
@@ -52509,26 +52521,25 @@ test("bounds: spec-v1636 computeRooftopCurbUplift -- a negative net uplift is th
   // Every figure in the spec reproduces.
   assert.ok(Math.abs(r.plan_area_ft2 - 40) < 1e-12);
   assert.ok(Math.abs(r.uplift_lb - 1120) < 1e-12);
-  assert.ok(Math.abs(r.net_uplift_lb + 280) < 1e-12);
+  // With only 0.6 of the weight resisting (ASCE 7 ASD), the WIND wins by 280;
+  // until 2026-10-01 the full weight resisted and the weight "won" by 280.
+  assert.ok(Math.abs(r.net_uplift_lb - 280) < 1e-9);
   assert.ok(Math.abs(r.lateral_lb - 704) < 1e-12);
   assert.ok(Math.abs(r.overturning_ftlb - 1408) < 1e-12);
   assert.ok(Math.abs(r.couple_tension_lb - 281.6) < 1e-9);
-  assert.ok(Math.abs(r.per_windward_lb - 35.4) < 0.1);
-  // THE FINDING: the spec calls -280 lb "still trying to lift it". It is
-  // the WEIGHT winning by 280, and the flag says so in the right direction.
-  assert.equal(r.weight_governs, true);
-  assert.ok(Math.abs(r.weight_reserve_lb - 280) < 1e-12);
-  // ALL the windward tension comes from the couple here, not the uplift.
-  assert.ok(r.direct_share_lb < 0);
-  assert.ok(r.couple_share_lb > r.per_windward_lb);
+  assert.ok(Math.abs(r.per_windward_lb - 105.4) < 0.1);
+  assert.equal(r.weight_governs, false);
+  assert.ok(Math.abs(r.weight_reserve_lb) < 1e-12);
+  // The couple still carries most of the windward tension.
+  assert.ok(r.direct_share_lb > 0);
   assert.equal(r.couple_dominates, true);
   // A lighter unit flips the direction, and the flag flips with it.
   const light = _v1636({ ...base, unit_weight_lb: 600 });
   assert.equal(light.weight_governs, false);
-  assert.ok(Math.abs(light.net_uplift_lb - (1120 - 600)) < 1e-12);
+  assert.ok(Math.abs(light.net_uplift_lb - (1120 - 0.6 * 600)) < 1e-9);
   assert.ok(light.per_windward_lb > r.per_windward_lb);
-  // A unit exactly balanced is the weight governing, not the wind.
-  const balanced = _v1636({ ...base, unit_weight_lb: 1120 });
+  // A unit exactly balanced (0.6 W = uplift) is the weight governing, not the wind.
+  const balanced = _v1636({ ...base, unit_weight_lb: 1120 / 0.6 });
   assert.equal(balanced.weight_governs, true);
   assert.ok(Math.abs(balanced.weight_reserve_lb) < 1e-12);
   // A TALL NARROW unit is harder to anchor than a low wide one of the same

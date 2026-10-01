@@ -1683,7 +1683,7 @@ export function computeFlowHoodCorrection({
 }
 export const flowHoodCorrectionExample = { inputs: { hood_reading_cfm: 420, correction_factor: 0.94, reference_traverse_cfm: 0, design_cfm: 400, system_reading_total_cfm: 16000 } };
 HVACSYSTEMS_RENDERERS["flow-hood-correction"] = _simpleRenderer({
-  citation: "Citation: the balancing-hood correction as AABC and NEBB field practice states it -- corrected flow = reading x correction factor, with the factor best established on the actual system by comparing hood readings against a duct traverse rather than taken from a table. A hood is a resistance in series with the diffuser, so it commonly reads low, and the magnitude depends on the diffuser's available pressure. It does not model the back pressure from the hood's own resistance, select a hood or adapter, or capture placement failures (an unsealed hood, or a linear slot without the right adapter). A duct traverse is the reference measurement; the hood manufacturer's data and the balancing procedure in force govern.",
+  citation: "Citation: the balancing-hood correction as AABC and NEBB field practice states it -- corrected flow = reading x correction factor, with the factor best established on the actual system by comparing hood readings against a duct traverse rather than taken from a table. A hood is a resistance in series with the diffuser, but a size mismatch between hood and diffuser moves it as much -- Hall measured factors of 0.93, 1.16 and 0.92 from three hoods on one slot diffuser -- and the magnitude depends on the diffuser's available pressure. It does not model the back pressure from the hood's own resistance, select a hood or adapter, or capture placement failures (an unsealed hood, or a linear slot without the right adapter). A duct traverse is the reference measurement; the hood manufacturer's data and the balancing procedure in force govern.",
   example: flowHoodCorrectionExample.inputs,
   fields: [
     { key: "hood_reading_cfm", label: "Hood reading (cfm)", kind: "number" },
@@ -1748,26 +1748,28 @@ export function computeFanSystemEffect({
     : inlet_is_swirl
       ? "an inlet elbow spinning the air WITH the wheel rotation is the WORST case: the wheel does less work on air already moving with it, and this loss is invisible in any measurement taken downstream of the fan"
       : "an inlet elbow close to the fan delivers air unevenly across the wheel; the penalty depends on the clearance and the elbow geometry, and it is invisible downstream of the fan";
-  // The diagnostic: measured static above the curve at design flow is the
-  // signature. Speeding the fan up raises the loss with the flow.
+  // The diagnostic: system effect is a fan DEFICIENCY -- at the measured flow the
+  // fan develops LESS pressure than its catalog curve (AMCA 201; Aerovent FE-100's
+  // field point sat below the curve). Until 2026-10-01 this read a point ABOVE
+  // the curve as the signature, the wrong way round.
   const has_pressures = fan_curve_tp_inwg > 0 && measured_tp_inwg > 0;
-  const pressure_shortfall_inwg = has_pressures ? measured_tp_inwg - fan_curve_tp_inwg : 0;
-  const measured_exceeds_curve = has_pressures && pressure_shortfall_inwg > 0;
+  const pressure_shortfall_inwg = has_pressures ? fan_curve_tp_inwg - measured_tp_inwg : 0;
+  const measured_below_curve = has_pressures && pressure_shortfall_inwg > 0;
   const diagnostic_verdict = !has_pressures
     ? "(no fan curve and measured pressures entered)"
-    : measured_exceeds_curve
-      ? "the measured total pressure is " + fmt(pressure_shortfall_inwg, 3) + " in wg ABOVE the curve at this flow, which is the system effect signature -- speeding the fan up raises the flow AND the loss with it, so the fix is a duct modification rather than more rpm"
-      : "the measured total pressure is at or below the curve at this flow, so a system effect is not the explanation for a shortfall here";
+    : measured_below_curve
+      ? "the fan develops " + fmt(pressure_shortfall_inwg, 3) + " in wg LESS than its curve at this flow, which is the system effect signature -- speeding the fan up raises the loss with the flow, so the fix is a duct modification rather than more rpm"
+      : "the fan develops its curve pressure or more at this flow, so a system effect is not the explanation for a shortfall here";
   if (![outlet_area_ft2, outlet_velocity_fpm, equivalent_diameter_ft, effective_length_ft, length_shortfall_ft, pressure_shortfall_inwg].every(Number.isFinite)) return { error: "Fan system effect math is not a finite value." };
   return {
     outlet_area_ft2, outlet_velocity_fpm, equivalent_diameter_ft,
     diameters_required, effective_length_ft, length_shortfall_ft, length_adequate, length_fraction, outlet_verdict,
     inlet_is_elbow, inlet_is_swirl, inlet_verdict,
-    has_pressures, pressure_shortfall_inwg, measured_exceeds_curve, diagnostic_verdict,
+    has_pressures, pressure_shortfall_inwg, measured_below_curve, diagnostic_verdict,
     note: "Whether a fan installation gives the fan the inlet and outlet conditions its rated curve assumes, and what it costs when it does not. System effect exists because a catalogue curve is measured with ideal approach and discharge, and a real installation rarely provides them. The outlet case is about recovery: air leaves a centrifugal fan through a small blast area at high velocity and needs straight duct to expand and convert that velocity into static pressure. AMCA's effective duct length is about two and a half equivalent diameters at 2,500 fpm, plus one more diameter per additional 1,000 fpm; cut that short with an elbow or a transition and the recovery does not happen, so the fan delivers less static than its curve says at the same flow. The inlet case is worse and more common. An elbow directly at the inlet delivers air unevenly across the wheel, and an elbow that pre-spins the air in the DIRECTION OF ROTATION reduces the pressure the fan can develop, because the wheel is doing less work on air that is already moving with it. That loss is invisible in any measurement taken downstream of the fan, which is why it goes unfound. The reason this belongs in a balancer's hands rather than only a designer's is diagnostic. A fan running at design speed, drawing design amps, short on flow, and showing MORE static pressure than the design calculated is very often a system effect problem -- and no amount of speeding it up fixes the underlying loss, it just spends more energy on it. Speeding the fan up raises the flow and raises the loss with it. Identifying it points at a duct modification, a turning vane, or a different elbow orientation, which is the actual fix and usually the cheaper one. This computes the effective duct length and reports whether the installation meets it; it does NOT compute the system effect pressure penalty itself, because AMCA's factors depend on the specific geometry, the blast area ratio and the elbow orientation in ways no single coefficient carries. AMCA Publication 201, the fan manufacturer's rated curve, and the balancing agency's own measurements govern.",
   };
 }
-export const fanSystemEffectExample = { inputs: { flow_cfm: 12000, outlet_width_in: 30, outlet_height_in: 24, straight_duct_ft: 3.0, inlet_condition: "elbow_with_swirl", fan_curve_tp_inwg: 2.5, measured_tp_inwg: 2.9 } };
+export const fanSystemEffectExample = { inputs: { flow_cfm: 12000, outlet_width_in: 30, outlet_height_in: 24, straight_duct_ft: 3.0, inlet_condition: "elbow_with_swirl", fan_curve_tp_inwg: 2.5, measured_tp_inwg: 2.1 } };
 HVACSYSTEMS_RENDERERS["fan-system-effect"] = _simpleRenderer({
   citation: "Citation: AMCA Publication 201 (Fans and Systems) by name -- the effective duct length of about 2.5 equivalent outlet diameters at 2,500 fpm plus one diameter per additional 1,000 fpm, below which an outlet system effect applies, and the inlet conditions (an elbow close to the inlet, worst when it spins the air WITH the wheel rotation) that reduce the pressure the fan can develop. It reports whether the installation meets the effective length; it does NOT compute the system effect pressure penalty, because AMCA's factors depend on the specific geometry, blast area ratio and elbow orientation. The fan manufacturer's rated curve and the balancing agency's measurements govern.",
   example: fanSystemEffectExample.inputs,
@@ -1909,12 +1911,17 @@ export function computePumpImpellerTrim({
   if (motor_hp < 0 || annual_hours < 0 || energy_rate_per_kwh < 0) return { error: "Motor power, hours, and rate cannot be negative." };
   if (annual_hours > 8784) return { error: "Annual hours cannot exceed 8,784." };
   // Trim affinity: flow with diameter directly, head with the square, power
-  // with the cube.
-  const diameter_ratio = required_flow_gpm / current_flow_gpm;
+  // with the cube. A THROTTLED pump (flow unchanged, head to spare) is trimmed
+  // on HEAD at constant flow, DOE Pumping Systems Tip Sheet #7:
+  // (H2 Q2) / (H1 Q1) = (D2 / D1)^3. Until 2026-10-01 that case kept the full
+  // diameter in every output and read 0 kWh and $0 where DOE prints 12.76 in.
+  const flow_ratio = required_flow_gpm / current_flow_gpm;
+  const throttled_case = flow_ratio === 1 && current_head_ft > 0 && required_head_ft > 0 && required_head_ft < current_head_ft;
+  const diameter_ratio = throttled_case ? Math.cbrt(required_head_ft / current_head_ft) : flow_ratio;
   const required_diameter_in = current_diameter_in * diameter_ratio;
   const trim_in = current_diameter_in - required_diameter_in;
   const trim_pct = trim_in / current_diameter_in * 100;
-  const head_at_trim_ft = current_head_ft * diameter_ratio * diameter_ratio;
+  const head_at_trim_ft = throttled_case ? required_head_ft : current_head_ft * diameter_ratio * diameter_ratio;
   const power_ratio = diameter_ratio * diameter_ratio * diameter_ratio;
   const power_reduction_pct = (1 - power_ratio) * 100;
   // The practical limit. Below roughly three quarters of the casing's maximum
@@ -1936,7 +1943,7 @@ export function computePumpImpellerTrim({
   // DOE Pumping Systems Tip Sheet #7 estimates it at constant flow from
   // (H2 Q2)/(H1 Q1) = (D2/D1)^3; the pump curve and manufacturer trim curves
   // decide it. Until 2026-09-25 this case read "no trim, $0" with no pointer.
-  const throttled = has_head_check && diameter_ratio === 1 && required_head_ft < current_head_ft;
+  const throttled = throttled_case;
   const head_verdict = !has_head_check
     ? "(no current and required head entered)"
     : throttled
@@ -2327,7 +2334,7 @@ export function computeVariablePrimaryBypass({
     pump_flow_gpm, wasted_fraction, bypass_verdict,
     has_fewer, fewer_minimum_gpm, fewer_bypass_gpm, staging_would_fix, staging_verdict,
     has_bypass_dp, required_cv, has_design_dp, cv_at_design_differential, oversize_ratio, cv_verdict,
-    note: "The bypass a variable primary plant needs to hold its chillers above minimum flow, and the valve that passes it. The bypass exists to protect the MACHINE, not to control temperature, and that distinction explains everything about how it behaves. Below the evaporator's minimum flow the water in the tubes goes laminar, heat transfer collapses, leaving-temperature control becomes unstable, and the low-temperature safety trips -- and on some machines repeated low-flow operation damages tubes. So the bypass opens whenever system demand falls below what the running chillers require, and the pump moves water in a circle to keep the machines happy. The interaction with STAGING is the part that catches plants out, and it is arithmetic rather than judgment: two chillers running have twice the minimum flow of one. A plant that stages up at low load can find itself with a system flow far below the combined minimum and a bypass valve wide open, burning pumping energy to circulate water that does no work at all. That is an argument for staging down promptly, and it means the staging logic and the bypass logic have to be designed together rather than separately -- so what staging one machine off would do to the bypass is computed here beside the current condition. Sizing the valve is the straightforward part with one counter-intuitive turn. It must pass the largest bypass flow, which occurs at minimum system load with the maximum number of machines that could be running -- and at that condition the pumps are near shutoff, so the differential is HIGH and the required Cv is SMALLER than a sizing at design differential would suggest. Sizing on the design differential oversizes the valve, and an oversized bypass valve controls badly at the small openings it actually spends its life at. Minimum flow fractions are ENTERED from the chiller manufacturer, because they vary by machine and by evaporator design. This does not model the control sequence, the sensor location the bypass modulates from, the check valve and flow measurement a variable primary plant needs, or the transient during a stage change, which is when low-flow trips actually happen. The chiller manufacturer's minimum flow data and the plant's designer govern.",
+    note: "The bypass a variable primary plant needs to hold its chillers above minimum flow, and the valve that passes it. The bypass exists to protect the MACHINE, not to control temperature, and that distinction explains everything about how it behaves. Below the evaporator's minimum flow the water in the tubes goes laminar, heat transfer collapses, leaving-temperature control becomes unstable, and the low-temperature safety trips -- and on some machines repeated low-flow operation damages tubes. So the bypass opens whenever system demand falls below what the running chillers require, and the pump moves water in a circle to keep the machines happy. The interaction with STAGING is the part that catches plants out, and it is arithmetic rather than judgment: two chillers running have twice the minimum flow of one. A plant that stages up at low load can find itself with a system flow far below the combined minimum and a bypass valve wide open, burning pumping energy to circulate water that does no work at all. That is an argument for staging down promptly, and it means the staging logic and the bypass logic have to be designed together rather than separately -- so what staging one machine off would do to the bypass is computed here beside the current condition. Sizing the valve is the straightforward part with one counter-intuitive turn. It must pass the largest MINIMUM flow of any one chiller (Trane Engineers Newsletter 43-2; B&G TEH-910A), the case at minimum system load with one machine running -- and at that condition the pumps are near shutoff, so the differential is HIGH and the required Cv is SMALLER than a sizing at design differential would suggest. Sizing on the design differential oversizes the valve, and an oversized bypass valve controls badly at the small openings it actually spends its life at. Minimum flow fractions are ENTERED from the chiller manufacturer, because they vary by machine and by evaporator design. This does not model the control sequence, the sensor location the bypass modulates from, the check valve and flow measurement a variable primary plant needs, or the transient during a stage change, which is when low-flow trips actually happen. The chiller manufacturer's minimum flow data and the plant's designer govern.",
   };
 }
 export const variablePrimaryBypassExample = { inputs: { machine_design_gpm: 1000, minimum_flow_fraction: 0.45, machines_running: 2, system_flow_gpm: 600, bypass_differential_psi: 24, design_differential_psi: 12 } };

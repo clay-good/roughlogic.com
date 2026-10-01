@@ -461,7 +461,7 @@ METALAIR_RENDERERS["duct-static-regain"] = _v960renderDuctStaticRegain;
 
 // ============ spec-v1679: square-to-round transition development ============
 
-// dims: in { square_side_in: L, round_diameter_in: L, height_in: L, offset_in: L, elements_per_quadrant: dimensionless, seam_allowance_in: L } out: { corner_true_length_in: L, midpoint_true_length_in: L, plan_corner_distance_in: L, circumference_in: L, developed_arc_in: L, sheet_width_in: L }
+// dims: in { square_side_in: L, round_diameter_in: L, height_in: L, offset_in: L, elements_per_quadrant: dimensionless, seam_allowance_in: L } out: { corner_true_length_in: L, midpoint_true_length_in: L, fan_edge_true_length_in: L, plan_fan_edge_distance_in: L, plan_corner_distance_in: L, circumference_in: L, developed_arc_in: L, sheet_width_in: L }
 export function computeSquareToRoundDevelopment({ square_side_in = 0, round_diameter_in = 0, height_in = 0, offset_in = 0, elements_per_quadrant = 8, seam_allowance_in = 0.5 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(square_side_in > 0)) return { error: "The square side must be positive (in)." };
@@ -489,8 +489,14 @@ export function computeSquareToRoundDevelopment({ square_side_in = 0, round_diam
   // circle, which is the shortest element on a concentric transition.
   const plan_midpoint_distance_in = Math.abs(half_side - radius);
   const midpoint_true_length_in = trueLength(plan_midpoint_distance_in);
-  // The longest element on the piece, which sets the sheet.
-  const longest_true_length_in = Math.max(corner_true_length_in, midpoint_true_length_in);
+  // The longest element on the piece, which sets the sheet: the corner's fan runs
+  // from the 45-degree element (its SHORTEST) out to the circle points in line
+  // with each side (BCcampus Pattern Development, element A-1). Until 2026-10-01
+  // the diagonal element was taken as the longest and the sheet came out short
+  // (17.52 in where A-1 is 19.10 on the worked piece).
+  const plan_fan_edge_distance_in = Math.max(Math.hypot(corner_x - radius, corner_y), Math.hypot(corner_x, corner_y - radius));
+  const fan_edge_true_length_in = trueLength(plan_fan_edge_distance_in);
+  const longest_true_length_in = Math.max(corner_true_length_in, midpoint_true_length_in, fan_edge_true_length_in);
   const understatement_pct = plan_corner_distance_in > 0 ? (corner_true_length_in / plan_corner_distance_in - 1) * 100 : null;
   // The check that costs a sheet rather than a fitting: the developed curved
   // edge is the sum of the chords across each element, and it must come back
@@ -507,11 +513,11 @@ export function computeSquareToRoundDevelopment({ square_side_in = 0, round_diam
   if (!outs.every(Number.isFinite)) return { error: "Transition development math is not a finite value." };
   return {
     square_side_in, round_diameter_in, height_in, offset_in, elements_per_quadrant: n,
-    total_elements, plan_corner_distance_in, corner_true_length_in,
+    total_elements, plan_corner_distance_in, corner_true_length_in, plan_fan_edge_distance_in, fan_edge_true_length_in,
     plan_midpoint_distance_in, midpoint_true_length_in, longest_true_length_in,
     understatement_pct, circumference_in, chord_in, developed_arc_in,
     arc_shortfall_in, arc_shortfall_pct, seam_allowance_in, sheet_width_in, sheet_length_in,
-    note: "Triangulation is the method and TRUE LENGTH is the only idea in it. Any line on a square-to-round that is neither vertical nor horizontal appears shorter in every orthogonal view than it really is, so laying out from plan dimensions produces a pattern too small and a fitting that will not close. The true length is the hypotenuse of the plan distance and the height, and on an ordinary transition it is far longer than the plan view suggests: a corner element measuring nine inches on the plan can be well over eighteen once the height is in it, which is the error the whole method exists to prevent. The pattern is then built by laying those triangles down in sequence, and the corner elements and the elements to the middle of each side are the two extremes that set everything between them. THE CIRCLE IS DIVIDED INTO ELEMENTS BECAUSE A CURVE CANNOT BE TRIANGULATED DIRECTLY, and the division is where accuracy is won or lost. Each element is developed as a straight chord, so the developed curved edge is a polygon inscribed in the circle and it is always SHORT of the true circumference. More elements close that gap and cost layout time; eight to sixteen per quadrant is common practice, and the shortfall at the entered count is reported here so the choice is made with a number rather than a habit. THE CHECK AT THE END IS WORTH DOING EVERY TIME. The developed pattern's curved edge, measured along its length, should come back to the circumference of the round end. If it does not, an element true length is wrong or the division was uneven -- and finding that on the bench costs a sheet, where finding it at the fitting costs the fitting and the crew. Everything after the development is allowances: seams, laps, and the metal thickness itself on a formed edge, which are added to the developed shape rather than being part of it. This gives the governing true lengths, the element chord, the circumference check, and the sheet the pattern needs. It does not draw the pattern or emit its coordinates, and it does not lay out an eccentric transition's unequal elements individually -- an offset makes every element different and the full development needs all of them. It does not compute bend allowance for the metal thickness and forming method, address stiffening, reinforcing, or the gauge required for the duct pressure class, or select a seam type. SMACNA's duct construction standards, the shop's own layout practice, and a test piece govern.",
+    note: "Triangulation is the method and TRUE LENGTH is the only idea in it. Any line on a square-to-round that is neither vertical nor horizontal appears shorter in every orthogonal view than it really is, so laying out from plan dimensions produces a pattern too small and a fitting that will not close. The true length is the hypotenuse of the plan distance and the height, and on an ordinary transition it is far longer than the plan view suggests: a corner element measuring nine inches on the plan can be well over eighteen once the height is in it, which is the error the whole method exists to prevent. The pattern is then built by laying those triangles down in sequence, and each corner's fan runs from its 45-degree element, the shortest, out to the elements in line with the sides, the longest -- which set the sheet. THE CIRCLE IS DIVIDED INTO ELEMENTS BECAUSE A CURVE CANNOT BE TRIANGULATED DIRECTLY, and the division is where accuracy is won or lost. Each element is developed as a straight chord, so the developed curved edge is a polygon inscribed in the circle and it is always SHORT of the true circumference. More elements close that gap and cost layout time; eight to sixteen per quadrant is common practice, and the shortfall at the entered count is reported here so the choice is made with a number rather than a habit. THE CHECK AT THE END IS WORTH DOING EVERY TIME. The developed pattern's curved edge, measured along its length, should come back to the circumference of the round end. If it does not, an element true length is wrong or the division was uneven -- and finding that on the bench costs a sheet, where finding it at the fitting costs the fitting and the crew. Everything after the development is allowances: seams, laps, and the metal thickness itself on a formed edge, which are added to the developed shape rather than being part of it. This gives the governing true lengths, the element chord, the circumference check, and the sheet the pattern needs. It does not draw the pattern or emit its coordinates, and it does not lay out an eccentric transition's unequal elements individually -- an offset makes every element different and the full development needs all of them. It does not compute bend allowance for the metal thickness and forming method, address stiffening, reinforcing, or the gauge required for the duct pressure class, or select a seam type. SMACNA's duct construction standards, the shop's own layout practice, and a test piece govern.",
   };
 }
 const squareToRoundDevelopmentExample = { inputs: { square_side_in: 20, round_diameter_in: 14, height_in: 16, offset_in: 0, elements_per_quadrant: 8, seam_allowance_in: 0.5 } };
@@ -580,7 +586,7 @@ export function computeStandingSeamTakeoff({ building_width_ft = 0, run_length_f
     ? "Enter the flat sheet width to see what ordering on it would cost."
     : panels_short > 0
       ? "ORDERING ON THE SHEET WIDTH COMES UP " + fmt(panels_short, 0) + " PANEL" + (panels_short === 1 ? "" : "S") + " SHORT: " + fmt(panel_count, 0) + " panels of " + fmt(coverage_width_in, 2) + " in coverage against " + fmt(panels_if_ordered_on_sheet, 0) + " if the " + fmt(sheet_width_in, 2) + " in sheet is used, and the last panel lands well before the rake"
-      : "Coverage and sheet width give the same count here, which is the case where the seam takes nothing -- check the panel profile";
+      : "Coverage and sheet width give the same panel count here -- the seam still takes its width from every sheet, it just does not add a panel at this roof width";
   return {
     building_width_ft, run_length_ft, coverage_width_in, sheet_width_in, panel_count,
     panels_if_ordered_on_sheet, panels_short, panel_length_ft, eave_ridge_allowance_in,

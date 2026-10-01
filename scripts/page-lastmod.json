@@ -2,7 +2,7 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "1f4bbf7c8ce28d1c",
+      "sha": "eebec4094ceb0f24",
       "date": "2026-10-01"
     },
     "/tools/": {
@@ -170,8 +170,8 @@
       "date": "2026-09-29"
     },
     "/tools/adhesive-bond-area/": {
-      "sha": "a599b4d72075688a",
-      "date": "2026-09-29"
+      "sha": "f7cb5a47643a8ef1",
+      "date": "2026-10-01"
     },
     "/tools/adpi-diffuser-selection/": {
       "sha": "8b97aca3f93e7f74",
@@ -1774,8 +1774,8 @@
       "date": "2026-09-29"
     },
     "/tools/control-cable-tension/": {
-      "sha": "a121c10192b53b1a",
-      "date": "2026-09-29"
+      "sha": "f4a06104a340b78b",
+      "date": "2026-10-01"
     },
     "/tools/control-joint-spacing/": {
       "sha": "727210f4733f5096",
@@ -2838,8 +2838,8 @@
       "date": "2026-09-29"
     },
     "/tools/fan-system-effect/": {
-      "sha": "769211f246ccce90",
-      "date": "2026-09-29"
+      "sha": "45e14d7d4d37d885",
+      "date": "2026-10-01"
     },
     "/tools/fastener-pullout/": {
       "sha": "260e3c2d2b4d8bd8",
@@ -3990,8 +3990,8 @@
       "date": "2026-09-29"
     },
     "/tools/insulation-thickness/": {
-      "sha": "c97641828794ed9c",
-      "date": "2026-09-29"
+      "sha": "29a1a72698ddf3be",
+      "date": "2026-10-01"
     },
     "/tools/insulation-thickness-for-heat-loss/": {
       "sha": "843041674b44ec32",
@@ -4110,8 +4110,8 @@
       "date": "2026-09-29"
     },
     "/tools/kitchen-makeup-air-deficit/": {
-      "sha": "18fd61d029c00da8",
-      "date": "2026-09-29"
+      "sha": "9e414976624f6eea",
+      "date": "2026-10-01"
     },
     "/tools/kitchen-sanitizer-ppm/": {
       "sha": "1b3baba1ed8c7a3b",
@@ -4382,8 +4382,8 @@
       "date": "2026-09-29"
     },
     "/tools/louver-free-area/": {
-      "sha": "b4643969287eec25",
-      "date": "2026-09-29"
+      "sha": "aa27699c3cb52eb5",
+      "date": "2026-10-01"
     },
     "/tools/lp-container-separation/": {
       "sha": "95a3221d9b378550",
@@ -4510,8 +4510,8 @@
       "date": "2026-09-29"
     },
     "/tools/marine-shaft-diameter/": {
-      "sha": "18e5b05ebb871ec3",
-      "date": "2026-09-29"
+      "sha": "fcc4fdf359dc3830",
+      "date": "2026-10-01"
     },
     "/tools/markup/": {
       "sha": "7daf482a37a52103",
@@ -5802,8 +5802,8 @@
       "date": "2026-10-01"
     },
     "/tools/pump-impeller-trim/": {
-      "sha": "550d1867850c8a3a",
-      "date": "2026-09-29"
+      "sha": "d380f1239948c303",
+      "date": "2026-10-01"
     },
     "/tools/pump-operating-point/": {
       "sha": "5992f85c9568c31d",
@@ -6450,8 +6450,8 @@
       "date": "2026-09-29"
     },
     "/tools/rooftop-curb-uplift/": {
-      "sha": "44669166081aba40",
-      "date": "2026-09-29"
+      "sha": "321e825f935b94be",
+      "date": "2026-10-01"
     },
     "/tools/rooftop-temp-adder/": {
       "sha": "0c6261d5f533cedb",
@@ -7414,8 +7414,8 @@
       "date": "2026-09-29"
     },
     "/tools/square-to-round-development/": {
-      "sha": "d817e88f9b86614d",
-      "date": "2026-09-29"
+      "sha": "49b2249b7477f137",
+      "date": "2026-10-01"
     },
     "/tools/srt-fm-ratio/": {
       "sha": "4fc59ac6da3c6cae",
@@ -8046,12 +8046,12 @@
       "date": "2026-09-29"
     },
     "/tools/tilt-up-brace-load/": {
-      "sha": "cfacb937dfe468b9",
-      "date": "2026-09-29"
+      "sha": "8f6437a1ac4d8411",
+      "date": "2026-10-01"
     },
     "/tools/tilt-up-lift-stress/": {
-      "sha": "8f71841401f781d2",
-      "date": "2026-09-29"
+      "sha": "ac44cbd18478b64a",
+      "date": "2026-10-01"
     },
     "/tools/timber-cruise/": {
       "sha": "f7185441a3a2a9c8",
@@ -8498,8 +8498,8 @@
       "date": "2026-09-29"
     },
     "/tools/variable-primary-bypass/": {
-      "sha": "c3cff1992a3d29f0",
-      "date": "2026-09-29"
+      "sha": "692a4ed2b77dede6",
+      "date": "2026-10-01"
     },
     "/tools/vav-box-airflow/": {
       "sha": "0b2939c2235c9366",
@@ -8590,8 +8590,8 @@
       "date": "2026-09-30"
     },
     "/tools/walk-in-door-infiltration/": {
-      "sha": "ca7baf714d579b7d",
-      "date": "2026-09-29"
+      "sha": "4505ea64c428bf3a",
+      "date": "2026-10-01"
     },
     "/tools/walkway-clearing-productivity/": {
       "sha": "523ad00ab3676c21",

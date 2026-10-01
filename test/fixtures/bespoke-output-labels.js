@@ -471,7 +471,7 @@ export const BESPOKE_OUTPUT_LABELS = {
   "injector-size": {"total_lbh":"Total fuel demand","inj_lbh":"Per-injector flow","note":"Note"},
   "insulation-heat-loss": {"Q_bare_BTU_hr_ft":"Q bare","Q_insulated_BTU_hr_ft":"Q insulated","outer_surface_T_F":"Outer surface T","effectiveness_pct":"Effectiveness"},
   "insulation-resistance-pi": {"polarization_index":"Polarization index (PI)","dar":"Dielectric absorption ratio (DAR)"},
-  "insulation-thickness": {"thickness_in":"Required thickness"},
+  "insulation-thickness": {"thickness_in":"Required thickness","at_thickness_verdict":"At the stated thickness","alt_film_verdict":"At the alternative film","note":"Note"},
   "insulation-thickness-for-heat-loss": {"thickness_in":"Required insulation thickness","r2_in":"Outer radius over insulation","note":"Note"},
   "internal-heat-gains": {"q_sensible":"Sensible load","q_latent":"Latent load","q_total":"Total cooling load","note":"Note"},
   "inventory-turnover": {"turnover":"Turnover","days_sales_of_inventory":"Days sales of inventory","comparison":"Industry comparison"},

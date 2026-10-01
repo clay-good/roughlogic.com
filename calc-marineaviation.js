@@ -153,7 +153,9 @@ export function computeMetacentricHeight({
     ? "(no added weight entered)"
     : raises_kg
       ? "the " + fmt(added_weight_lb, 0) + " lb addition at " + fmt(added_kg_ft, 2) + " ft above the keel is " + fmt(weight_fraction_pct, 1) + "% of displacement and takes " + fmt(gm_loss_pct, 0) + "% of the metacentric height, because it went on HIGH -- the same weight low in the bilge would have RAISED GM"
-      : "the " + fmt(added_weight_lb, 0) + " lb addition sits BELOW the current centre of gravity, so it lowers KG and raises GM to " + fmt(new_gm_ft, 3) + " ft";
+      : Math.abs(added_kg_ft - kg_ft) <= 1e-9 * Math.max(1, kg_ft)
+        ? "the " + fmt(added_weight_lb, 0) + " lb addition sits AT the current centre of gravity, so KG and GM are unchanged at " + fmt(new_gm_ft, 3) + " ft"
+        : "the " + fmt(added_weight_lb, 0) + " lb addition sits BELOW the current centre of gravity, so it lowers KG and raises GM to " + fmt(new_gm_ft, 3) + " ft";
   // Free surface depends on the tank's WIDTH CUBED and not on how much liquid
   // is in it, which is the effect that surprises people.
   const has_fsm = free_surface_moment_ftlb > 0;
@@ -167,7 +169,9 @@ export function computeMetacentricHeight({
   const effective_is_positive = effective_gm_ft > 0;
   const stability_verdict = effective_is_positive
     ? "effective GM is " + fmt(effective_gm_ft, 3) + " ft, POSITIVE, giving a righting arm of " + fmt(gz_ft, 3) + " ft at " + fmt(heel_angle_deg, 0) + " degrees of heel"
-    : "effective GM is " + fmt(effective_gm_ft, 3) + " ft, NEGATIVE -- the vessel is unstable upright and will loll to an angle of heel, and the righting arm reported here has no meaning in that condition";
+    : Math.abs(effective_gm_ft) <= 1e-9
+      ? "effective GM is ZERO -- neutral stability: the vessel has no righting arm at small heel and will not return upright on its own"
+      : "effective GM is " + fmt(effective_gm_ft, 3) + " ft, NEGATIVE -- the vessel is unstable upright and will loll to an angle of heel, and the righting arm reported here has no meaning in that condition";
   if (![gm_ft, new_kg_ft, new_gm_ft, gm_loss_pct, free_surface_correction_ft, gz_ft].every(Number.isFinite)) return { error: "Stability math is not a finite value." };
   return {
     gm_ft, is_positive, has_addition, new_displacement_lb, new_kg_ft, new_gm_ft,
@@ -229,18 +233,23 @@ export function computeMarineShaftDiameter({
   const torsional_stress_psi = has_shaft ? 16 * torque_inlb / (Math.PI * Math.pow(shaft_diameter_in, 3)) : 0;
   const has_allowable = allowable_stress_psi > 0;
   const torsion_diameter_in = has_allowable ? Math.cbrt(16 * torque_inlb / (Math.PI * allowable_stress_psi)) : 0;
-  // The rule diameter: d = F x cbrt(hp / rpm), the classification-society form
-  // whose constant embeds the bending and corrosion allowance.
+  // The rule diameter: d = F x cbrt(hp / rpm). ABYC P-6 writes it as the torsion
+  // formula itself, D = cbrt(321,000 P SF / (S N)) with 321,000 = 16 x 63,025 / pi,
+  // at shear yield over a safety factor (about 5) meant to cover bending, fatigue
+  // and corrosion. Until 2026-10-01 the verdict said torsion "cannot see" bending.
   const has_rule = rule_factor > 0;
   const power_speed_root = Math.cbrt(engine_hp / shaft_rpm);
   const rule_diameter_in = has_rule ? rule_factor * power_speed_root : 0;
-  const rule_governs = has_rule && has_allowable && rule_diameter_in > torsion_diameter_in;
+  const rules_agree = has_rule && has_allowable && Math.abs(rule_diameter_in - torsion_diameter_in) <= 1e-6 * torsion_diameter_in;
+  const rule_governs = has_rule && has_allowable && !rules_agree && rule_diameter_in > torsion_diameter_in;
   const criterion_verdict = !has_rule
     ? "(no rule factor entered -- the classification society's constant is what carries the bending and corrosion allowance)"
     : !has_allowable
       ? "the rule diameter is " + fmt(rule_diameter_in, 3) + " in"
+      : rules_agree
+        ? "the rule and torsion diameters agree at " + fmt(rule_diameter_in, 3) + " in -- the rule IS the torsion formula at shear yield over its safety factor, so the entered allowable equals yield / SF"
       : rule_governs
-        ? "the rule diameter of " + fmt(rule_diameter_in, 3) + " in GOVERNS, against " + fmt(torsion_diameter_in, 3) + " in from torsion alone -- torsion under-calls it by " + fmt(rule_diameter_in - torsion_diameter_in, 3) + " in, because a torsion calculation cannot see the propeller's weight in bending or the corrosion allowance"
+        ? "the rule diameter of " + fmt(rule_diameter_in, 3) + " in GOVERNS, against " + fmt(torsion_diameter_in, 3) + " in at the entered allowable -- " + fmt(rule_diameter_in - torsion_diameter_in, 3) + " in more, because the rule's yield / safety factor (about 5 in ABYC P-6, for bending, fatigue and corrosion) is a lower stress than the entered allowable"
         : "the torsion diameter of " + fmt(torsion_diameter_in, 3) + " in exceeds the rule diameter of " + fmt(rule_diameter_in, 3) + " in, which is unusual -- check the allowable stress and the rule factor against the material and the society's table";
   const shaft_verdict = !has_shaft
     ? "(no shaft diameter entered)"
@@ -260,14 +269,14 @@ export function computeMarineShaftDiameter({
   if (![torque_inlb, torsional_stress_psi, torsion_diameter_in, rule_diameter_in, repower_diameter_in].every(Number.isFinite)) return { error: "Shaft sizing math is not a finite value." };
   return {
     torque_inlb, has_shaft, torsional_stress_psi, has_allowable, torsion_diameter_in,
-    has_rule, power_speed_root, rule_diameter_in, rule_governs, criterion_verdict, shaft_verdict,
+    has_rule, power_speed_root, rule_diameter_in, rules_agree, rule_governs, criterion_verdict, shaft_verdict,
     has_repower, power_ratio, diameter_ratio, repower_diameter_in, repower_verdict,
     note: "The diameter a marine propeller shaft needs, and why the torsion calculation everyone reaches for is not the criterion. Torque follows from power and SHAFT speed at the customary 63,025 constant, and the torsional stress in a solid shaft follows from that -- but a propeller shaft is not loaded in torsion alone. The propeller hangs on the end of an overhung shaft supported at the strut, and its weight plus the hydrodynamic side loads put bending into the shaft that a torsion-only calculation misses entirely. That is why classification societies give a rule diameter of the form d = F x cube root of (hp / rpm), whose constant embeds an allowance for that bending and for corrosion, and why the rule figure is almost always larger. Both are reported here, named, so a reader who computed the torsion number elsewhere can see what it leaves out. It is also why the tail shaft -- the outboard portion -- is sized larger than the section inside the boat. The cube root is what makes a repower interesting. Diameter scales with the cube root of power over shaft speed, so a large power increase calls for a small proportional diameter increase -- which sounds negligible and is often a whole nominal size, at which point the coupling, the stern tube, the cutless bearings and the stuffing box all change with it. That is the difference between a repower that drops an engine in and one that rebuilds the running gear. Material choice moves the answer as much as the power does: aluminium bronze, the Aquamet grades and the stainless steels have substantially different allowable stresses and very different corrosion and fatigue behaviour in seawater, which is why the rule factor is entered from the society's own table for the material rather than assumed. This is a screening calculation: it does not compute shaft whirling or critical speed, size the bearing spacing that sets them, evaluate thrust and its bearing, check the coupling or the keyway, address shaft alignment, or account for a shaft's unsupported overhang beyond the strut. ABYC P-6, the classification society's rules, the shaft manufacturer, and a marine engineer govern.",
   };
 }
 export const marineShaftDiameterExample = { inputs: { engine_hp: 350, shaft_rpm: 1200, shaft_diameter_in: 2.0, allowable_stress_psi: 12000, rule_factor: 3.4, repower_hp: 500 } };
 MARINEAVIATION_RENDERERS["marine-shaft-diameter"] = _simpleRenderer({
-  citation: "Citation: shaft torque T = 63,025 x hp / rpm and torsional stress tau = 16 T / (pi d^3) as machinery practice writes them, against the classification-society rule form d = F x cube root(hp / rpm), whose constant embeds an allowance for the propeller's BENDING and for corrosion -- which is why the rule diameter governs and torsion alone under-calls it. The rule factor is ENTERED from the society's own table for the shaft material, because bronze, Aquamet and stainless allowables differ substantially. It does not compute shaft whirling or critical speed, bearing spacing, thrust and its bearing, the coupling or keyway, or alignment. ABYC P-6, the classification society's rules, and a marine engineer govern.",
+  citation: "Citation: shaft torque T = 63,025 x hp / rpm and torsional stress tau = 16 T / (pi d^3) as machinery practice writes them, against the rule form d = F x cube root(hp / rpm), which ABYC P-6 writes as the same torsion formula, D = cube root(321,000 P SF / (S N)), at shear yield over a safety factor of about 5 that covers bending, fatigue and corrosion -- so the rule governs whenever the entered allowable is above yield / SF. The rule factor is ENTERED from the society's own table for the shaft material, because bronze, Aquamet and stainless allowables differ substantially. It does not compute shaft whirling or critical speed, bearing spacing, thrust and its bearing, the coupling or keyway, or alignment. ABYC P-6, the classification society's rules, and a marine engineer govern.",
   example: marineShaftDiameterExample.inputs,
   fields: [
     { key: "engine_hp", label: "Engine power at the shaft (hp)", kind: "number", attrs: { step: "any" } },
@@ -471,7 +480,10 @@ export function computeDockPilingLateral({
   // embedment where the code gives about 9.7.
   const embedFor = (h_ft) => {
     const req = (d) => {
-      const A = _MEC_EMBED_A_CONST * lateral_load_lb / (soil_lateral_bearing_psf_per_ft * d / 3 * b_ft);
+      // IBC 1807.3.2.1: d "but not over 12 feet for purpose of computing lateral
+      // pressure". Until 2026-10-01 S1 kept growing past 12 ft and a deep pile
+      // read about 3 ft short (15.5 ft where the capped code asks 18.6).
+      const A = _MEC_EMBED_A_CONST * lateral_load_lb / (soil_lateral_bearing_psf_per_ft * Math.min(d, 12) / 3 * b_ft);
       return 0.5 * A * (1 + Math.sqrt(1 + _MEC_EMBED_H_CONST * h_ft / A));
     };
     // req(d) falls as d rises, so the crossing is unique; grow the bracket
@@ -581,13 +593,16 @@ export function computeControlCableTension({
       : "rigging at " + fmt(ambient_temp_f, 0) + " degF, " + fmt(temp_difference_f, 0) + " degF ABOVE the reference, the chart target is about " + fmt(target_at_ambient_lb, 1) + " lb rather than the nominal " + fmt(nominal_tension_lb, 1) + " -- higher, because the system will SLACKEN by roughly " + fmt(tension_change_lb, 1) + " lb as it cools to the reference";
   // The error: rigging to nominal at this ambient, then going to a service
   // temperature.
-  const has_service = service_temp_f !== 0;
+  // 0 degF is a real cold-flight temperature, not a blank: until 2026-10-01 it
+  // skipped the check and hid 36 lb of slack. The check is skipped only when the
+  // service temperature equals the rigging temperature.
+  const has_service = service_temp_f !== ambient_temp_f;
   const service_difference_f = has_service ? service_temp_f - ambient_temp_f : 0;
   const service_change_lb = has_service ? alpha_difference * service_difference_f * cable_area_in2 * cable_modulus_psi : 0;
   const tension_when_warm_lb = nominal_tension_lb + service_change_lb;
   const over_tension = has_service && service_change_lb > 0;
   const error_verdict = !has_service
-    ? "(no service temperature entered)"
+    ? "(service temperature equals the rigging temperature -- no change to check)"
     : over_tension
       ? "rigging to the nominal " + fmt(nominal_tension_lb, 1) + " lb at " + fmt(ambient_temp_f, 0) + " degF and then sitting at " + fmt(service_temp_f, 0) + " degF takes the tension to about " + fmt(tension_when_warm_lb, 1) + " lb -- " + fmt(service_change_lb, 1) + " lb OVER, which loads pulleys and bearings and raises control forces"
       : "rigging to the nominal " + fmt(nominal_tension_lb, 1) + " lb at " + fmt(ambient_temp_f, 0) + " degF and then flying into " + fmt(service_temp_f, 0) + " degF air takes the tension to about " + fmt(tension_when_warm_lb, 1) + " lb -- " + fmt(-service_change_lb, 1) + " lb SLACK, and slack cables mean lost motion at the surface and reduced flutter margin";
@@ -611,7 +626,7 @@ MARINEAVIATION_RENDERERS["control-cable-tension"] = _simpleRenderer({
     { key: "cable_modulus_psi", label: "Cable effective modulus (psi)", kind: "number" },
     { key: "structure_alpha_per_f", label: "Structure expansion coefficient (per °F)", kind: "number", default: 0.0000128, attrs: { step: "any" } },
     { key: "cable_alpha_per_f", label: "Cable expansion coefficient (per °F)", kind: "number", default: 0.0000065, attrs: { step: "any" } },
-    { key: "service_temp_f", label: "Service temperature to check (°F, 0 to skip)", kind: "number", attrs: { step: "any" } },
+    { key: "service_temp_f", label: "Service temperature to check (°F; the rigging temperature to skip)", kind: "number", attrs: { step: "any" } },
   ],
   outputs: [
     { key: "d", id: "cct-out-d", label: "Temperature difference", value: (r) => fmt(r.temp_difference_f, 1) + " °F from the reference" },

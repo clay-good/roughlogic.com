@@ -340,27 +340,32 @@ export function computeTiltUpLiftStress({ panel_width_ft = 0, panel_height_ft = 
   const insert_count = insert_rows * insert_columns;
   const load_per_insert_lb = lift_load_lb / insert_count;
   // The panel spans between insert rows during the pick, carrying its own
-  // weight sideways. Moment grows with the SQUARE of that span, which is why
-  // insert counts on large panels climb faster than the panel grows.
-  const span_between_rows_ft = panel_height_ft / insert_rows;
+  // weight sideways. For TWO rows a simple span of H / 2 runs about 15% above
+  // Dayton Superior's printed R22 stresses (conservative). Beyond two rows the
+  // rigging does not equalize to H / n spans: Dayton's R42 tables print 0.595 of
+  // the R22 stress where H / n predicts 0.25, so the two-row stress is scaled by
+  // (2 / n)^0.75. Until 2026-10-01 a 4 in x 37 ft panel on 4 rows read 201 psi
+  // WITHIN CAPACITY where Dayton prints 418 psi, over every allowable it lists.
+  const ROW_EXPONENT = 0.75;
+  const span_between_rows_ft = panel_height_ft / 2;
   const load_per_area_psf = lift_load_lb / panel_area_ft2;
   // A one-foot-wide strip spanning between rows, treated as simply supported.
   const moment_lb_in_per_ft = load_per_area_psf * span_between_rows_ft * span_between_rows_ft / 8 * _IN_PER_FT_CONC;
   const section_modulus_in3_per_ft = _IN_PER_FT_CONC * thickness_in * thickness_in / 6;
-  const bending_stress_psi = moment_lb_in_per_ft / section_modulus_in3_per_ft;
+  const two_row_stress_psi = moment_lb_in_per_ft / section_modulus_in3_per_ft;
+  const bending_stress_psi = two_row_stress_psi * Math.pow(2 / insert_rows, ROW_EXPONENT);
   const modulus_of_rupture_psi = _MODULUS_OF_RUPTURE_COEFF * Math.sqrt(lift_day_strength_psi);
   const allowable_stress_psi = modulus_of_rupture_psi / safety_factor;
   const stress_margin_psi = allowable_stress_psi - bending_stress_psi;
   const within_capacity = bending_stress_psi <= allowable_stress_psi;
   const utilization_pct = bending_stress_psi / allowable_stress_psi * 100;
-  // Rows needed to bring the stress inside capacity. Stress falls with the
-  // square of the row count, so the requirement is a square root.
-  const rows_required = Math.max(2, Math.ceil(insert_rows * Math.sqrt(bending_stress_psi / allowable_stress_psi)));
+  // Rows needed to bring the stress inside capacity, on the same (2 / n)^0.75 fall.
+  const rows_required = Math.max(2, Math.ceil(2 * Math.pow(two_row_stress_psi / allowable_stress_psi, 1 / ROW_EXPONENT) - 1e-9));
   const outs = [panel_weight_lb, load_per_insert_lb, span_between_rows_ft, bending_stress_psi, modulus_of_rupture_psi, allowable_stress_psi];
   if (!outs.every(Number.isFinite)) return { error: "Tilt-up lifting math is not a finite value." };
   const verdict = within_capacity
     ? "WITHIN CAPACITY: " + fmt(bending_stress_psi, 0) + " psi against an allowable " + fmt(allowable_stress_psi, 0) + " psi, " + fmt(utilization_pct, 0) + "% used, on " + fmt(insert_rows, 0) + " rows"
-    : "OVER CAPACITY: " + fmt(bending_stress_psi, 0) + " psi against an allowable " + fmt(allowable_stress_psi, 0) + " psi. Go to " + fmt(rows_required, 0) + " rows, or wait for strength -- the day-of-lift break is what authorizes the pick";
+    : "OVER CAPACITY: " + fmt(bending_stress_psi, 0) + " psi against an allowable " + fmt(allowable_stress_psi, 0) + " psi. " + (rows_required <= 4 ? "Go to " + fmt(rows_required, 0) + " rows" : "More rows will not fix this -- beyond four rows the rigging is the manufacturer's design, so thicken the panel") + ", or wait for strength -- the day-of-lift break is what authorizes the pick";
   return {
     panel_width_ft, panel_height_ft, thickness_in, unit_weight_pcf, panel_area_ft2,
     panel_weight_lb, suction_fraction, suction_lb, lift_load_lb, insert_rows,
@@ -369,12 +374,12 @@ export function computeTiltUpLiftStress({ panel_width_ft = 0, panel_height_ft = 
     bending_stress_psi, lift_day_strength_psi, modulus_of_rupture_psi,
     safety_factor, allowable_stress_psi, stress_margin_psi, within_capacity,
     utilization_pct, rows_required, verdict,
-    note: "A tilt-up panel is a slab spanning between its insert rows during the pick, being asked to carry its own weight at right angles to how it will eventually work. BECAUSE BENDING MOMENT GROWS WITH THE SQUARE OF THE SPAN BETWEEN ROWS, moving from two rows to three does not cut the moment by a third -- it cuts it by more than half, which is why insert counts on large panels climb faster than the panels grow. The same square relation runs the other way for the fix: the rows needed to bring an overstressed panel inside capacity go as the square root of how far over it is. THE STRENGTH THAT MATTERS IS THE STRENGTH ON THE DAY OF LIFT, and that is the trap in this arithmetic. A mix that reaches 4,000 psi at 28 days may be at 2,200 psi on day five when the schedule wants the panel up, and the modulus of rupture scales with the square root of compressive strength -- so the panel's capacity on lift day is around three quarters of what a 28 day calculation suggests. Cylinder breaks on the day, not the mix design, are what authorize a pick, and a calculation run on 28 day strength is not a lift plan. SUCTION IS THE OTHER FORCE AND IT IS NOT SMALL. A panel cast on a slab bonds to it, and breaking that bond adds a force that can rival the panel's own weight. Bond breaker application is what controls it, and a panel that has not released cleanly is putting far more than its own weight into the inserts and into the crane at the moment of release -- so the suction allowance here multiplies the weight rather than being a rounding term. A screening calculation on a rectangular solid panel with a uniform insert grid, treated as a simply supported one-way strip between rows. IT IS NOT A LIFT DESIGN AND IT DOES NOT SELECT INSERTS. Real panels have openings, reveals, returns, and non-uniform thickness that change the moment distribution completely, and a panel with a door and two windows does not behave like a rectangle. Insert capacity, edge distance, embedment, shear cone, and the reinforcement around each insert are the insert manufacturer's design; rigging geometry, spreader bars, equalizing, and the number of lift points that actually share the load are the rigging engineer's; and the crane's capacity at radius, the strongback if one is used, and the bracing that receives the panel are all separate. Tilt-up panels kill people during erection. The insert manufacturer's engineering, ACI 551 and the TCA guidance, the specialty engineer who stamps the lift and bracing design, and the day's cylinder breaks govern.",
+    note: "A tilt-up panel is a slab spanning between its insert rows during the pick, being asked to carry its own weight at right angles to how it will eventually work. BUT MORE ROWS BUY LESS THAN THE SPAN SUGGESTS. A simple span between rows would cut the moment to a quarter going from two rows to four; real rigging does not equalize that well, and Dayton Superior's printed tables show four rows carrying about 60% of the two-row stress, so this scales the two-row stress by (2 / n)^0.75 and stays about 15% above Dayton's figures. Beyond four rows the rigging is the manufacturer's design. THE STRENGTH THAT MATTERS IS THE STRENGTH ON THE DAY OF LIFT, and that is the trap in this arithmetic. A mix that reaches 4,000 psi at 28 days may be at 2,200 psi on day five when the schedule wants the panel up, and the modulus of rupture scales with the square root of compressive strength -- so the panel's capacity on lift day is around three quarters of what a 28 day calculation suggests. Cylinder breaks on the day, not the mix design, are what authorize a pick, and a calculation run on 28 day strength is not a lift plan. SUCTION IS THE OTHER FORCE AND IT IS NOT SMALL. A panel cast on a slab bonds to it, and breaking that bond adds a force -- Dayton estimates negligible to 20 psf of panel area, about a fifth of a 7 in panel's weight. Bond breaker application is what controls it, and a panel that has not released cleanly is putting far more than its own weight into the inserts and into the crane at the moment of release -- so the suction allowance here multiplies the weight rather than being a rounding term. A screening calculation on a rectangular solid panel with a uniform insert grid, treated as a simply supported one-way strip between rows. IT IS NOT A LIFT DESIGN AND IT DOES NOT SELECT INSERTS. Real panels have openings, reveals, returns, and non-uniform thickness that change the moment distribution completely, and a panel with a door and two windows does not behave like a rectangle. Insert capacity, edge distance, embedment, shear cone, and the reinforcement around each insert are the insert manufacturer's design; rigging geometry, spreader bars, equalizing, and the number of lift points that actually share the load are the rigging engineer's; and the crane's capacity at radius, the strongback if one is used, and the bracing that receives the panel are all separate. Tilt-up panels kill people during erection. The insert manufacturer's engineering, ACI 551 and the TCA guidance, the specialty engineer who stamps the lift and bracing design, and the day's cylinder breaks govern.",
   };
 }
 const tiltUpLiftStressExample = { inputs: { panel_width_ft: 8, panel_height_ft: 24, thickness_in: 7.25, unit_weight_pcf: 150, lift_day_strength_psi: 2200, insert_rows: 2, insert_columns: 2, suction_fraction: 0, safety_factor: 1.5 } };
 CONCRETEPLACEMENT_RENDERERS["tilt-up-lift-stress"] = _simpleRenderer({
-  citation: "Citation: the tilt-up lifting stress relations by name -- panel weight = area x thickness x unit weight; the panel spans between insert rows as a simply supported one-way strip, so the moment goes as the square of that span; section modulus = b t squared / 6; and the ACI 318 modulus of rupture f_r = 7.5 sqrt(f'c) taken at the DAY-OF-LIFT strength from the day's cylinder breaks, divided by an entered safety factor. Suction from the casting slab is an entered fraction of the panel weight. A screening calculation on a solid rectangular panel: it does not select inserts, size rigging, or handle openings. The insert manufacturer's engineering, ACI 551 and TCA guidance, the specialty engineer who stamps the lift and bracing design, and the day's cylinder breaks govern.",
+  citation: "Citation: the tilt-up lifting stress relations by name -- panel weight = area x thickness x unit weight; the two-row stress is a simple span of H / 2 as a one-way strip, and n rows scale it by (2 / n)^0.75, fitted to Dayton Superior's printed R22 and R42 stress tables (02/17); section modulus = b t squared / 6; and the ACI 318 modulus of rupture f_r = 7.5 sqrt(f'c) taken at the DAY-OF-LIFT strength from the day's cylinder breaks, divided by an entered safety factor. Suction from the casting slab is an entered fraction of the panel weight. A screening calculation on a solid rectangular panel: it does not select inserts, size rigging, or handle openings. The insert manufacturer's engineering, ACI 551 and TCA guidance, the specialty engineer who stamps the lift and bracing design, and the day's cylinder breaks govern.",
   example: tiltUpLiftStressExample.inputs,
   fields: [
     { key: "panel_width_ft", label: "Panel width (ft)", kind: "number", default: 8 },
@@ -400,8 +405,8 @@ CONCRETEPLACEMENT_RENDERERS["tilt-up-lift-stress"] = _simpleRenderer({
 
 // ============ spec-v1621: tilt-up temporary brace load ============
 
-// dims: in { panel_width_ft: L, panel_height_ft: L, wind_pressure_psf: M L^-1 T^-2, resultant_height_ft: L, brace_attachment_height_ft: L, brace_angle_deg: dimensionless, brace_count: dimensionless, brace_capacity_lb: M L T^-2, alternate_angle_deg: dimensionless } out: { wind_force_lb: M L T^-2, lateral_per_brace_lb: M L T^-2, axial_per_brace_lb: M L T^-2, anchor_horizontal_lb: M L T^-2, braces_required: dimensionless, alternate_axial_lb: M L T^-2 }
-export function computeTiltUpBraceLoad({ panel_width_ft = 0, panel_height_ft = 0, wind_pressure_psf = 0, resultant_height_ft = 0, brace_attachment_height_ft = 0, brace_angle_deg = 55, brace_count = 2, brace_capacity_lb = 0, alternate_angle_deg = 45 } = {}) {
+// dims: in { panel_width_ft: L, panel_height_ft: L, wind_pressure_psf: M L^-1 T^-2, resultant_height_ft: L, brace_attachment_height_ft: L, brace_angle_deg: dimensionless, brace_count: dimensionless, brace_capacity_lb: M L T^-2, alternate_angle_deg: dimensionless, brace_safety_factor: dimensionless } out: { design_axial_per_brace_lb: M L T^-2, wind_force_lb: M L T^-2, lateral_per_brace_lb: M L T^-2, axial_per_brace_lb: M L T^-2, anchor_horizontal_lb: M L T^-2, braces_required: dimensionless, alternate_axial_lb: M L T^-2 }
+export function computeTiltUpBraceLoad({ panel_width_ft = 0, panel_height_ft = 0, wind_pressure_psf = 0, resultant_height_ft = 0, brace_attachment_height_ft = 0, brace_angle_deg = 55, brace_count = 2, brace_capacity_lb = 0, alternate_angle_deg = 45, brace_safety_factor = 1.5 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(panel_width_ft > 0)) return { error: "Panel width must be positive (ft)." };
   if (!(panel_height_ft > 0)) return { error: "Panel height must be positive (ft)." };
@@ -411,6 +416,7 @@ export function computeTiltUpBraceLoad({ panel_width_ft = 0, panel_height_ft = 0
   if (!(alternate_angle_deg > 0 && alternate_angle_deg < 90)) return { error: "The comparison angle must be between 0 and 90 degrees from horizontal." };
   if (!(brace_count >= 1)) return { error: "There must be at least one brace." };
   if (brace_capacity_lb < 0) return { error: "Brace capacity cannot be negative (lb)." };
+  if (!(brace_safety_factor >= 1)) return { error: "The brace safety factor cannot be below one." };
   const DEG_TO_RAD = Math.PI / 180;
   const panel_area_ft2 = panel_width_ft * panel_height_ft;
   const wind_force_lb = panel_area_ft2 * wind_pressure_psf;
@@ -427,18 +433,24 @@ export function computeTiltUpBraceLoad({ panel_width_ft = 0, panel_height_ft = 0
   const anchor_offset_ft = brace_attachment_height_ft / Math.tan(brace_angle_deg * DEG_TO_RAD);
   const alternate_axial_lb = lateral_per_brace_lb / Math.cos(alternate_angle_deg * DEG_TO_RAD);
   const alternate_offset_ft = brace_attachment_height_ft / Math.tan(alternate_angle_deg * DEG_TO_RAD);
+  // The TCA / Kelly (Concrete International, 2007) brace force carries a factor
+  // of 1.5 -- its 30 ft, 12.5 psf example prints 422 lb/ft where the bare statics
+  // give 281 -- and the brace makers publish ULTIMATE (buckling) loads. Until
+  // 2026-10-01 the unfactored load was checked against the rating, no margin.
+  const design_axial_per_brace_lb = axial_per_brace_lb * brace_safety_factor;
   const braces_required = brace_capacity_lb > 0
-    ? Math.max(1, Math.ceil(total_lateral_lb / Math.cos(brace_angle_deg * DEG_TO_RAD) / brace_capacity_lb))
+    ? Math.max(1, Math.ceil(total_lateral_lb * brace_safety_factor / Math.cos(brace_angle_deg * DEG_TO_RAD) / brace_capacity_lb - 1e-9))
     : null;
-  const within_capacity = brace_capacity_lb > 0 ? axial_per_brace_lb <= brace_capacity_lb : null;
+  const within_capacity = brace_capacity_lb > 0 ? design_axial_per_brace_lb <= brace_capacity_lb : null;
   const outs = [wind_force_lb, lateral_per_brace_lb, axial_per_brace_lb, anchor_vertical_lb, anchor_offset_ft, alternate_axial_lb];
   if (!outs.every(Number.isFinite)) return { error: "Brace load math is not a finite value." };
   const verdict = within_capacity === null
     ? "Enter a brace capacity to check the count."
     : within_capacity
-      ? "WITHIN CAPACITY: " + fmt(axial_per_brace_lb, 0) + " lb per brace against " + fmt(brace_capacity_lb, 0) + " lb rated, on " + fmt(brace_count, 0) + " braces"
-      : "OVER CAPACITY: " + fmt(axial_per_brace_lb, 0) + " lb per brace against " + fmt(brace_capacity_lb, 0) + " lb rated. " + fmt(braces_required, 0) + " braces are needed at this angle";
+      ? "WITHIN CAPACITY: " + fmt(design_axial_per_brace_lb, 0) + " lb per brace at a " + fmt(brace_safety_factor, 2) + " safety factor (" + fmt(axial_per_brace_lb, 0) + " lb unfactored) against " + fmt(brace_capacity_lb, 0) + " lb ultimate, on " + fmt(brace_count, 0) + " braces"
+      : "OVER CAPACITY: " + fmt(design_axial_per_brace_lb, 0) + " lb per brace at a " + fmt(brace_safety_factor, 2) + " safety factor (" + fmt(axial_per_brace_lb, 0) + " lb unfactored) against " + fmt(brace_capacity_lb, 0) + " lb ultimate. " + fmt(braces_required, 0) + " braces are needed at this angle";
   return {
+    design_axial_per_brace_lb, brace_safety_factor,
     panel_width_ft, panel_height_ft, panel_area_ft2, wind_pressure_psf, wind_force_lb,
     resultant_height_ft: resultant_ft, brace_attachment_height_ft, brace_angle_deg,
     brace_count, total_lateral_lb, lateral_per_brace_lb, axial_per_brace_lb,
@@ -448,7 +460,7 @@ export function computeTiltUpBraceLoad({ panel_width_ft = 0, panel_height_ft = 0
     note: "The temporary condition is genuinely the design case for a tilt-up building. A panel standing free is a large sail on a small base and only the braces hold it, so brace design uses a wind pressure appropriate to the erection period together with a defined shutdown wind speed above which panels are not set and, in some cases, additional bracing is added to panels already standing. The lateral load is not simply the wind force divided by the braces: the wind resultant acts at its own height and the braces attach at theirs, so the load scales by the ratio of the two, and a brace attached high on a panel carries less than one attached low. THE BRACE ANGLE TRADES TWO THINGS AND NEITHER IS UNIVERSALLY RIGHT. A steeper brace takes more axial load for the same lateral force but needs less floor area; a flatter one carries less axial load and pushes its anchor further out, where the slab may be thinner, greener, or absent. Both the axial load and the anchor offset are reported at the entered angle and at a comparison angle, because the constraint is almost always the site rather than the arithmetic. THE ELEMENT THAT GOVERNS MOST OFTEN IS NOT THE BRACE. It is the floor slab anchor, the deadman, because the slab has to have the thickness, the strength on the day, and the edge distance to develop the anchor -- and a brace anchored into slab that is too green or too thin fails at the anchor with the brace entirely intact. The horizontal and vertical components at the anchor are reported for that reason: the vertical component is the one that pulls an anchor out of a thin slab, and it is the larger of the two on a steep brace. Slab age and thickness at the anchor location deserve the same attention as the brace itself. Braces come off only when the permanent lateral system is complete, and removing them early is a recognized collapse mechanism. A screening calculation on a rectangular panel under a uniform pressure with equal braces sharing the load equally. It does not design the brace, which is a manufacturer's rated component with its own slenderness and connection limits; it does not design the anchor, which needs the slab's actual thickness, strength on the day, edge distance and the anchor manufacturer's data; and it does not set the erection design wind pressure or the shutdown wind speed, which come from the bracing design and the applicable standard. It does not address knee braces, panel-to-panel bracing, corner conditions, or the sequence in which panels are set and released. Tilt-up panels kill people during erection. The specialty engineer who stamps the bracing design, the brace manufacturer, ACI 551 and the TCA guidance, and the site's competent person govern.",
   };
 }
-const tiltUpBraceLoadExample = { inputs: { panel_width_ft: 24, panel_height_ft: 24, wind_pressure_psf: 12, resultant_height_ft: 12, brace_attachment_height_ft: 16, brace_angle_deg: 55, brace_count: 3, brace_capacity_lb: 4000, alternate_angle_deg: 45 } };
+const tiltUpBraceLoadExample = { inputs: { panel_width_ft: 24, panel_height_ft: 24, wind_pressure_psf: 12, resultant_height_ft: 12, brace_attachment_height_ft: 16, brace_angle_deg: 55, brace_count: 3, brace_capacity_lb: 4000, alternate_angle_deg: 45, brace_safety_factor: 1.5 } };
 CONCRETEPLACEMENT_RENDERERS["tilt-up-brace-load"] = _simpleRenderer({
   citation: "Citation: the temporary bracing relations by name -- wind force = panel area x the erection design wind pressure; the lateral load at the braces = wind force x (height to the resultant / brace attachment height), divided among the braces; axial brace load = lateral / cos(angle from horizontal), with the anchor components as the horizontal and the axial x sin(angle). The erection design wind pressure and the shutdown wind speed come from the bracing design, not from here. It does not design the brace or the slab anchor. The specialty engineer who stamps the bracing design, the brace manufacturer, ACI 551 and TCA guidance, and the site's competent person govern.",
   example: tiltUpBraceLoadExample.inputs,
@@ -460,7 +472,8 @@ CONCRETEPLACEMENT_RENDERERS["tilt-up-brace-load"] = _simpleRenderer({
     { key: "brace_attachment_height_ft", label: "Brace attachment height on the panel (ft)", kind: "number", default: 16 },
     { key: "brace_angle_deg", label: "Brace angle from horizontal (deg)", kind: "number", default: 55 },
     { key: "brace_count", label: "Braces on this panel", kind: "number", default: 3 },
-    { key: "brace_capacity_lb", label: "Rated brace capacity (lb, 0 to skip)", kind: "number", default: 4000 },
+    { key: "brace_capacity_lb", label: "Brace ultimate (buckling) load at this length (lb, 0 to skip)", kind: "number", default: 4000 },
+    { key: "brace_safety_factor", label: "Safety factor on the brace (TCA: 1.5)", kind: "number", default: 1.5 },
     { key: "alternate_angle_deg", label: "Comparison brace angle (deg)", kind: "number", default: 45 },
   ],
   outputs: [
