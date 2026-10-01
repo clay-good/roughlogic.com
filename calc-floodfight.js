@@ -286,8 +286,8 @@ export function computeFloodDebrisImpact({ debris_weight_lb = 1000, zone = "a", 
   if (!(structure in CSTR)) return { error: "Structure type must be timber pile or masonry column, concrete pile or moment frame, or reinforced concrete wall." };
   const velocity_eq89_fps = 0.5 * Math.sqrt(_G_FPS2 * depth_ft);
   const velocity_used_fps = velocity_basis === "eq89" ? velocity_eq89_fps : entered_velocity_fps;
-  // Table 8-3 rows (0 at 1 ft, 0.25 at 2, 0.5 at 3, 0.75 at 4, 1.0 at 5 ft
-  // and deeper) lie on 0.25 (ds - 1), clamped to [0, 1].
+  // Table 8-3 prints 0 below 1 ft, 0.375 at 2.5 ft, 0.75 at 4 ft and 1.0
+  // above 5 ft; every row lies on 0.25 (ds - 1), clamped to [0, 1].
   const depth_coefficient = zone === "v_floodway" ? 1.0 : Math.min(1, Math.max(0, 0.25 * (depth_ft - 1)));
   const blockage_coefficient = CB[screening];
   const structure_coefficient_s_per_ft = CSTR[structure];
@@ -299,7 +299,7 @@ export function computeFloodDebrisImpact({ debris_weight_lb = 1000, zone = "a", 
   return {
     velocity_eq89_fps, velocity_used_fps, velocity_lower_fps, velocity_upper_fps, entered_outside_bounds,
     depth_coefficient, blockage_coefficient, structure_coefficient_s_per_ft, impact_force_lb, impact_elevation_ft, debris_weight_lb,
-    note: "FEMA P-55's debris equation turns an impulse into a force: a mass moving with the water, stopped by a structure whose stiffness sets how quickly it stops. The structure coefficient carries that stiffness and is the counterintuitive part -- a stiff reinforced concrete wall takes four times the force of a flexible timber pile from the same object, because it stops it faster. The depth and blockage coefficients reduce the effect where shallow water or upstream trees and buildings slow the debris. The recommended 1,000 lb stands for a piece of a damaged building, a utility pole, a length of pile, or an empty tank where nothing better is known; on coasts with log debris the weight is much larger and local guidance governs. The velocity inside the equation defaults to half the shallow-water wave speed, between the Eq. 8.2 bounds. The force acts at the still-water elevation. This is FEMA's simplified method: it does not address very large debris such as logs, vessels, or containers, multiple impacts, the local strength of the element struck, tsunami loads, or ASCE 7 load factors and combinations. FEMA P-55, ASCE 7, and the engineer of record govern.",
+    note: "FEMA P-55's debris equation turns an impulse into a force: a mass moving with the water, stopped by a structure whose stiffness sets how quickly it stops. The structure coefficient carries that stiffness and is the counterintuitive part -- a stiff reinforced concrete wall takes four times the force of a flexible timber pile from the same object, because it stops it faster. The depth and blockage coefficients reduce the effect where shallow water or upstream trees and buildings slow the debris. The recommended 1,000 lb stands for a piece of a damaged building, a utility pole, a length of pile, or an empty tank where nothing better is known; on coasts with log debris the weight is much larger and local guidance governs. The velocity inside the equation defaults to half the shallow-water wave speed, between the Eq. 8.2 bounds -- but FEMA's own Example 8.4 enters the UPPER bound, sqrt(g ds), for an oceanfront building, which doubles the force; enter that velocity for an oceanfront or high-velocity site. The force acts at the still-water elevation. This is FEMA P-55's (2011) simplified method; ASCE 7-22 Supplement 2 (FEMA P-2345, 2024) replaced it with the ASCE 7-22 Chapter 6 debris approach and caps coastal velocity at 15 ft/s. It does not address very large debris such as logs, vessels, or containers, multiple impacts, the local strength of the element struck, tsunami loads, or ASCE 7 load factors and combinations. FEMA P-55, ASCE 7, and the engineer of record govern.",
   };
 }
 

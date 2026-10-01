@@ -135954,6 +135954,424 @@
      }
     }
    }
+  },
+  {
+   "tile_id": "landfill-gas-generation",
+   "source_publisher": "US EPA Landfill Methane Outreach Program",
+   "source_title": "LFG Energy Project Development Handbook, Chapter 4 Appendix 4-A, LFGcost case study \"Electricity 1\"",
+   "source_edition_or_year": "LFGcost report dated 12/15/2008 (reproduced in PDHonline course C435)",
+   "source_section_or_page": "Appendix 4-A Electricity 1: 270,000 tons/yr, 5,400,000 tons at closure (20 years), k 0.040, Lo 3,204 ft3/ton (100 m3/Mg), 50% methane -> generated maximum 1,813 ft3/min. LFGcost uses the continuous form L0 R (1 - e^-kt); the tile's whole-year sum with the newest year at age zero reads 2.0% high, as the citation discloses",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "annual_tons": 270000,
+    "placement_years": 20,
+    "methane_yield_m3_per_mg": 100,
+    "decay_constant_per_year": 0.04,
+    "methane_fraction_pct": 50,
+    "collection_efficiency_pct": 75,
+    "methane_heating_value_btu_per_cf": 1012,
+    "generator_efficiency_pct": 30
+   },
+   "outputs": {
+    "landfill_gas_cfm": {
+     "value": 1813,
+     "tolerance": {
+      "pct": 2.5,
+      "justification": "LFGcost integrates the decay continuously; the tile sums whole years with the newest at age zero, which reads k/(1 - e^-k) = 2.0% high at k 0.04 (disclosed in the citation's Time step assumption)"
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "landfill-gas-generation",
+   "source_publisher": "US EPA Landfill Methane Outreach Program",
+   "source_title": "LFG Energy Project Development Handbook, Chapter 4 Appendix 4-B, LFGcost case study \"Direct Use 1\"",
+   "source_edition_or_year": "LFGcost report (reproduced in PDHonline course C435)",
+   "source_section_or_page": "Appendix 4-B Direct Use 1: 200,000 tons/yr, 4,000,000 tons at closure (20 years), k 0.040, Lo 3,204 ft3/ton (100 m3/Mg), 50% methane -> generated maximum 1,343 ft3/min; the whole-year sum reads 2.0% high as above",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "annual_tons": 200000,
+    "placement_years": 20,
+    "methane_yield_m3_per_mg": 100,
+    "decay_constant_per_year": 0.04,
+    "methane_fraction_pct": 50,
+    "collection_efficiency_pct": 75,
+    "methane_heating_value_btu_per_cf": 1012,
+    "generator_efficiency_pct": 30
+   },
+   "outputs": {
+    "landfill_gas_cfm": {
+     "value": 1343,
+     "tolerance": {
+      "pct": 2.5,
+      "justification": "LFGcost integrates the decay continuously; the tile sums whole years with the newest at age zero, which reads k/(1 - e^-k) = 2.0% high at k 0.04 (disclosed in the citation's Time step assumption)"
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "flood-lateral-load",
+   "source_publisher": "FEMA",
+   "source_title": "Coastal Construction Manual Calculator (FEMA P-55 Chapter 8 worksheet)",
+   "source_edition_or_year": "2011",
+   "source_section_or_page": "Eq. 8.3 page: salt water 64 pcf, ds 4.60 ft, w 0.67 ft -> fsta 677.12 lb/ft, Fsta 453.67 lb; Eq. 8.2 bounds 4.60 and 12.17 ft/s",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "depth_ft": 4.6,
+    "width_ft": 0.67,
+    "water": "salt",
+    "velocity_basis": "lower",
+    "obstruction": "square_pile"
+   },
+   "outputs": {
+    "hydrostatic_lb_per_ft": {
+     "value": 677.12,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "hydrostatic_lb": {
+     "value": 453.67,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "velocity_upper_fps": {
+     "value": 12.17,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "flood-lateral-load",
+   "source_publisher": "FEMA",
+   "source_title": "FEMA P-55, Coastal Construction Manual, Volume II",
+   "source_edition_or_year": "4th edition, August 2011",
+   "source_section_or_page": "Example 8.3, p. 8-30: round pile, Cd 1.2, D 0.833 ft, ds 8 ft, salt water, V 16 ft/s -> 2,037 lb per pile",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "depth_ft": 8,
+    "width_ft": 0.833,
+    "water": "salt",
+    "velocity_basis": "entered",
+    "entered_velocity_fps": 16,
+    "obstruction": "round_pile"
+   },
+   "outputs": {
+    "hydrodynamic_lb": {
+     "value": 2037,
+     "tolerance": {
+      "abs": 1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "flood-lateral-load",
+   "source_publisher": "FEMA",
+   "source_title": "FEMA P-55, Coastal Construction Manual, Volume II",
+   "source_edition_or_year": "4th edition, August 2011",
+   "source_section_or_page": "Example 8.4, Solution #8, p. 8-42: 8 in square pile, Cd 2.0, 1.99 slugs/cu ft, ds 4.6 ft, V 12.2 ft/s -> Fdyn on one pile = 909 lb (FEMA rounds the area to 3.07 sq ft)",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "depth_ft": 4.6,
+    "width_ft": 0.6667,
+    "water": "salt",
+    "velocity_basis": "entered",
+    "entered_velocity_fps": 12.2,
+    "obstruction": "square_pile"
+   },
+   "outputs": {
+    "hydrodynamic_lb": {
+     "value": 909,
+     "tolerance": {
+      "pct": 0.2
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "flood-debris-impact",
+   "source_publisher": "FEMA",
+   "source_title": "FEMA P-55, Coastal Construction Manual, Volume II",
+   "source_edition_or_year": "4th edition, August 2011",
+   "source_section_or_page": "Example 8.4, Solution #10, p. 8-43: 1,000 lb object on a timber pile, Zone VE (CD 1.0), CB 1.0, CStr 0.2, upper-bound V 12.2 ft/s -> debris impact load = 2,440 lb",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "debris_weight_lb": 1000,
+    "zone": "v_floodway",
+    "depth_ft": 4.6,
+    "velocity_basis": "entered",
+    "entered_velocity_fps": 12.2,
+    "screening": "none",
+    "structure": "timber_masonry"
+   },
+   "outputs": {
+    "impact_force_lb": {
+     "value": 2440,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "flood-debris-impact",
+   "source_publisher": "FEMA",
+   "source_title": "FEMA P-55, Coastal Construction Manual, Volume II",
+   "source_edition_or_year": "4th edition, August 2011",
+   "source_section_or_page": "Table 8-3, p. 8-33: Zone A, stillwater flood depth = 2.5 ft -> CD 0.375",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "debris_weight_lb": 1000,
+    "zone": "a",
+    "depth_ft": 2.5,
+    "velocity_basis": "eq89",
+    "screening": "none",
+    "structure": "rc_wall"
+   },
+   "outputs": {
+    "depth_coefficient": {
+     "value": 0.375,
+     "tolerance": {
+      "abs": 0.0005
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "flood-uplift-cover-slab",
+   "source_publisher": "FEMA",
+   "source_title": "Coastal Construction Manual Calculator (FEMA P-55 Chapter 8 worksheet)",
+   "source_edition_or_year": "2011",
+   "source_section_or_page": "Eq. 8.4 page: salt water 64 pcf x 20 cu ft displaced -> Fbuoy 1,280.00 lb (entered here as 1 ft of head under 20 sq ft)",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "head_ft": 1,
+    "water": "salt",
+    "element": "slab",
+    "slab_thickness_in": 4,
+    "slab_area_sqft": 20
+   },
+   "outputs": {
+    "uplift_lb": {
+     "value": 1280,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "roof-snow-ice-weight",
+   "source_publisher": "FEMA",
+   "source_title": "FEMA P-957, Snow Load Safety Guide",
+   "source_edition_or_year": "January 2013",
+   "source_section_or_page": "Section 2.2.1: 1 foot of fresh snow is 21 psf for wet, heavy snow",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "layer1_depth_in": 12,
+    "layer1_type": "wet",
+    "design_snow_psf": 30
+   },
+   "outputs": {
+    "total_psf": {
+     "value": 21,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "roof-snow-ice-weight",
+   "source_publisher": "FEMA",
+   "source_title": "FEMA P-957, Snow Load Safety Guide",
+   "source_edition_or_year": "January 2013",
+   "source_section_or_page": "Section 2.2.2: 1 foot of ice weighs approximately 57 psf",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "layer1_depth_in": 12,
+    "layer1_type": "ice",
+    "design_snow_psf": 30
+   },
+   "outputs": {
+    "total_psf": {
+     "value": 57,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "relief-commodity-truckloads",
+   "source_publisher": "Missouri State Emergency Management Agency",
+   "source_title": "Annex C, Points of Distribution (USACE commodity planning model)",
+   "source_edition_or_year": "October 2011",
+   "source_section_or_page": "Section 1.5 truckload equivalents: 25 trucks = 1 million lb of ice (125,000 people x 8 lb)",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "impacted_population_count": 125000,
+    "planning_days": 1
+   },
+   "outputs": {
+    "ice_trucks_per_day": {
+     "value": 25,
+     "tolerance": {
+      "abs": 0
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "relief-commodity-truckloads",
+   "source_publisher": "Missouri State Emergency Management Agency",
+   "source_title": "Annex C, Points of Distribution (USACE commodity planning model)",
+   "source_edition_or_year": "October 2011",
+   "source_section_or_page": "Section 1.5 truckload equivalents: 46 truck loads = 1 million MREs (500,000 people x 2 meals, 21,744 meals a truck)",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "impacted_population_count": 500000,
+    "planning_days": 1
+   },
+   "outputs": {
+    "meal_trucks_per_day": {
+     "value": 46,
+     "tolerance": {
+      "abs": 0
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "pod-site-configuration",
+   "source_publisher": "Missouri State Emergency Management Agency",
+   "source_title": "Annex C, Points of Distribution (USACE commodity planning model)",
+   "source_edition_or_year": "October 2011",
+   "source_section_or_page": "Appendix 1, USACE pre-event commodities model run: 200,000 people requiring commodities -> 40 Type III distribution points, grand total 760 day / 160 night staff",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "people_per_day": 200000
+   },
+   "outputs": {
+    "lanes_required": {
+     "value": 40,
+     "tolerance": {
+      "abs": 0
+     }
+    },
+    "all_iii_staff_day": {
+     "value": 760,
+     "tolerance": {
+      "abs": 0
+     }
+    },
+    "all_iii_staff_night": {
+     "value": 160,
+     "tolerance": {
+      "abs": 0
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "shelter-capacity-sanitation",
+   "source_publisher": "Florida Division of Emergency Management",
+   "source_title": "Statewide Emergency Shelter Plan, Appendix G",
+   "source_edition_or_year": "2018",
+   "source_section_or_page": "p. G-13: (10,000 x 0.85) / 26 = 326 occupant spaces (gross area x 0.85 usability factor entered as 8,500 sq ft usable)",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "floor_area_sqft": 8500,
+    "shelter_type": "evacuation",
+    "space_per_person_sqft": 26
+   },
+   "outputs": {
+    "capacity_count": {
+     "value": 326,
+     "tolerance": {
+      "abs": 0
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "temp-housing-park-feeder-demand",
+   "source_publisher": "JADE Learning (J. Durham)",
+   "source_title": "Sizing RV-Park Electrical Services Using NEC Table 551.73(A)",
+   "source_edition_or_year": "2018-10-05 (2017 NEC)",
+   "source_section_or_page": "Worked park: 20 x 50 A, 15 x 30 A, 15 x 20 A and 10 tent sites, 41% demand factor -> 336,000 VA connected, 336,000 x 41% = 137,760 VA, / 240 V = 574 A",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "sites_50a_count": 20,
+    "sites_30a_count": 15,
+    "sites_20a_count": 15,
+    "tent_sites_count": 10,
+    "nec_edition": "nec_2017_and_later",
+    "rv_demand_factor": 0.41,
+    "service_voltage_v": 240
+   },
+   "outputs": {
+    "rv_connected_va": {
+     "value": 336000,
+     "tolerance": {
+      "abs": 0
+     }
+    },
+    "rv_demand_va": {
+     "value": 137760,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "rv_current_a": {
+     "value": 574,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "collapse-floor-load",
+   "source_publisher": "US Army Corps of Engineers",
+   "source_title": "US&R Shoring Operations Guide",
+   "source_edition_or_year": "Edition 5.0, 2021",
+   "source_section_or_page": "p. 1-32 quick weights: 6 in concrete slab = 75 psf",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "floor_type": "concrete",
+    "slab_thickness_in": 6,
+    "rubble_depth_in": 0,
+    "rescuer_psf": 0
+   },
+   "outputs": {
+    "self_weight_psf": {
+     "value": 75,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
   }
  ]
 }

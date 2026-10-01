@@ -24889,7 +24889,7 @@ export const CITATIONS = {
   // spec-v1789..v1799: solid waste, landfill, and transfer operations.
   "landfill-airspace-density": {
     formula: "waste airspace = tons / in-place density in tons per cubic yard; cover airspace = waste airspace x the cover ratio; airspace utilisation factor = tons placed / total airspace consumed.",
-    edition: "Volumetric bookkeeping. In-place density is commonly 1,000 to 1,600 lb per cubic yard and cover commonly adds 15 to 25%. The site's own airspace survey and its permitted capacity govern.",
+    edition: "Volumetric bookkeeping. In-place density is commonly 1,000 to 1,600 lb per cubic yard and cover commonly adds 20 to 50% of the waste volume (EPA's Decision-Maker's Guide prints waste-to-soil ratios of 2:1 to 5:1 and plans on 3:1; USACE EM 1110-3-177 plans on 4:1 to 3:1). The site's own airspace survey and its permitted capacity govern.",
     freeAccess: "Public arithmetic; the densities and cover ratios come from the site's own survey.",
     governance: GOVERNANCE.general,
     editionNote: "Density is an OPERATING result and a report card on the working face, not a property of the waste: the same stream compacts very differently with machine weight, pass count, lift thickness, and moisture.",
@@ -24900,7 +24900,7 @@ export const CITATIONS = {
   },
   "landfill-gas-generation": {
     formula: "Q = sum over placement years of k x L0 x M x e^(-k t); capacity = methane flow x heating value x generator efficiency, decayed forward as e^(-k t).",
-    edition: "First-order decay, with the Clean Air Act default methane yield of 100 cubic metres per megagram and a methane generation rate constant of roughly 0.02 arid, 0.04 conventional, and 0.05 to 0.07 wet or bioreactor.",
+    edition: "First-order decay, with the AP-42 inventory defaults of a methane yield of 100 cubic metres per megagram and a methane generation rate constant of 0.04 (roughly 0.02 arid, 0.05 to 0.07 wet or bioreactor). The Clean Air Act regulatory defaults for the NMOC calculation, 40 CFR 60.764, are higher: 170 cubic metres per megagram and 0.05 (0.02 under 25 in of annual precipitation).",
     freeAccess: "The model and its defaults are published by the EPA and are freely available.",
     governance: GOVERNANCE.general,
     editionNote: "Generation and collection are different quantities and mixing them is the usual error in a project proposal; the uncollected share is also the site's methane emission and its regulatory exposure.",
@@ -24919,6 +24919,7 @@ export const CITATIONS = {
     assumptions: [
       { name: "Coefficients", value: "entered; runoff and evapotranspiration are site and cover specific", source: "site records / HELP" },
       { name: "Scope", value: "infiltration only; it does not model the liner, the collection system, or recirculation", source: "spec-v1791 scope" },
+      { name: "Annual lump", value: "one annual balance with no soil-moisture storage term. The Fenn (EPA SW-168, 1975) method runs month by month and percolates only once the cover soil is at field capacity, so an annual lump reads high where rain and evapotranspiration peak in different seasons: Vesilind Table 13-2 prints 213 mm for Cincinnati where the annual lump gives 303 mm, and 70 mm for Orlando against 76 mm", source: "Vesilind, Worrell & Reinhart, Environmental Engineering (2003), Table 13-2" },
     ],
   },
   "daily-cover-volume": {
@@ -25917,7 +25918,7 @@ export const CITATIONS = {
     edition: "FEMA P-55, Coastal Construction Manual, Volume II, Chapter 8 -- Eq. 8.2, 8.3, 8.8 and Table 8-2; ASCE 7 Chapter 5 cited by number. The engineer of record and the floodplain administrator govern.",
     freeAccess: "FEMA P-55 is a free federal publication; ASCE 7 is cited by chapter only and no ASCE text is reproduced.",
     governance: GOVERNANCE.structural,
-    editionNote: "Still water pushes with a pressure that grows with depth, so the load is a triangle acting a third of the way up, and a wall built to keep water out has to resist all of it -- which is why enclosure walls below the flood elevation get flood openings. Moving water adds drag that grows with the square of velocity, and FEMA brackets the velocity between the depth per second and the shallow-water wave speed; the two bounds can differ eightfold in drag, and at the upper bound drag can exceed the still-water load. The bound is a design judgment by flood zone, slope, and distance from the source. Loads are unfactored; the ASCE 7 flood load combinations belong to the governing code.",
+    editionNote: "Still water pushes with a pressure that grows with depth, so the load is a triangle acting a third of the way up, and a wall built to keep water out has to resist all of it -- which is why enclosure walls below the flood elevation get flood openings. Moving water adds drag that grows with the square of velocity, and FEMA brackets the velocity between the depth per second and the shallow-water wave speed; the two bounds can differ eightfold in drag, and at the upper bound drag exceeds the still-water load on a wall. ASCE 7-22 Supplement 2 (FEMA P-2345, April 2024) halves the coastal upper bound to 0.5 sqrt(g ds) and caps it at 15 ft/s, so the P-55 upper bound here is the older, more conservative figure. The bound is a design judgment by flood zone, slope, and distance from the source. Loads are unfactored; the ASCE 7 flood load combinations belong to the governing code.",
     assumptions: [
       { name: "Water properties", value: "62.4 pcf and 1.94 slugs/cu ft fresh; 64.0 pcf and 1.99 slugs/cu ft salt; g = 32.2 ft/s^2", source: "FEMA P-55 Chapter 8" },
       { name: "Velocity bounds", value: "lower V = ds / 1 s, upper V = sqrt(g ds)", source: "FEMA P-55 Eq. 8.2" },
@@ -25929,7 +25930,7 @@ export const CITATIONS = {
     edition: "FEMA P-55, Coastal Construction Manual, Volume II, Chapter 8 -- Eq. 8.9, Tables 8-3 and 8-4, and the building structure coefficients; ASCE 7 Chapter C5 cited by number. The engineer of record governs.",
     freeAccess: "FEMA P-55 is a free federal publication; its coefficients are transcribed; ASCE 7 is cited by chapter only.",
     governance: GOVERNANCE.structural,
-    editionNote: "FEMA's debris equation turns an impulse into a force: a mass moving with the water, stopped by a structure whose stiffness sets how quickly it stops. A stiff reinforced concrete wall takes four times the force of a flexible timber pile from the same object because it stops it faster. The depth and blockage coefficients reduce the effect where shallow water or upstream screening slows the debris. The 1,000 lb default stands for a piece of a damaged building, a pole, a length of pile, or an empty tank where nothing better is known; log-debris coasts need a larger weight from local guidance. The force is concentrated at the still-water elevation, which is what an overturning or pile-bending check needs.",
+    editionNote: "FEMA's debris equation turns an impulse into a force: a mass moving with the water, stopped by a structure whose stiffness sets how quickly it stops. A stiff reinforced concrete wall takes four times the force of a flexible timber pile from the same object because it stops it faster. The depth and blockage coefficients reduce the effect where shallow water or upstream screening slows the debris. The 1,000 lb default stands for a piece of a damaged building, a pole, a length of pile, or an empty tank where nothing better is known; log-debris coasts need a larger weight from local guidance. The force is concentrated at the still-water elevation, which is what an overturning or pile-bending check needs. The default velocity is Eq. 8.9's 1/2 sqrt(g ds), but FEMA's own Example 8.4 enters the upper bound, 12.2 ft/s at 4.6 ft, for an oceanfront building (2,440 lb on a timber pile, twice the default's force). This is the P-55 (2011) method; ASCE 7-22 Supplement 2 (FEMA P-2345, April 2024) moved debris impact to the ASCE 7-22 Chapter 6 approach.",
     assumptions: [
       { name: "Debris weight", value: "1,000 lb recommended where local debris is unknown", source: "FEMA P-55 Chapter 8" },
       { name: "Depth coefficient", value: "Table 8-3 rows (0 at 1 ft to 1.0 at 5 ft) on the line 0.25 (ds - 1)", source: "FEMA P-55 Table 8-3" },
@@ -26091,6 +26092,7 @@ export const CITATIONS = {
       { name: "20 sq ft evacuation, 40-60+ sq ft longer stay", value: "personal sleeping space per person", source: "American Red Cross Mass Care Standards (Florida SESP 2018, Appendix F)" },
       { name: "1 toilet and 1 lavatory per 20, 1 shower per 25", value: "each resident gets a 15 minute shower opportunity", source: "American Red Cross Mass Care Standards (Florida SESP 2018, Appendix F)" },
       { name: "1.5 gal sewage and 5 lb solid waste per person per day", value: "one 30 gal lidded container per 10 persons", source: "American Red Cross Mass Care Standards (Florida SESP 2018, Appendix F)" },
+      { name: "Wastewater storage", value: "1.5 gal is the processing capacity; a shelter that must hold its wastewater (no sewer, a pumped reservoir) is sized on a 24-hour occupancy at 3 to 5 gal per occupant -- 1,250 gal for 250 persons -- per the same plan", source: "Florida SESP 2018, Appendix G, Section G.5.4" },
     ],
   },
   "safe-room-capacity": {

@@ -4154,12 +4154,12 @@
       "date": "2026-09-29"
     },
     "/tools/landfill-airspace-density/": {
-      "sha": "74252564a0c2afee",
-      "date": "2026-09-29"
+      "sha": "6d9c718b43e4dc3e",
+      "date": "2026-10-01"
     },
     "/tools/landfill-gas-generation/": {
-      "sha": "588003705c5b3f87",
-      "date": "2026-09-29"
+      "sha": "70b05e8bd226f465",
+      "date": "2026-10-01"
     },
     "/tools/landfill-settlement-airspace/": {
       "sha": "144e42e20dc50a06",
@@ -4202,8 +4202,8 @@
       "date": "2026-09-29"
     },
     "/tools/leachate-water-balance/": {
-      "sha": "f79172d09e3edca6",
-      "date": "2026-09-29"
+      "sha": "aac64890f258d812",
+      "date": "2026-10-01"
     },
     "/tools/leaching-fraction-runoff-ec/": {
       "sha": "a971f5a1e517ce6b",
@@ -4238,8 +4238,8 @@
       "date": "2026-09-29"
     },
     "/tools/lfg-flare-capacity/": {
-      "sha": "7e661282b6ac115b",
-      "date": "2026-09-29"
+      "sha": "bedf27eb944ee56c",
+      "date": "2026-10-01"
     },
     "/tools/lidar-point-density/": {
       "sha": "39cd13ace46e11a0",
@@ -6894,7 +6894,7 @@
       "date": "2026-09-29"
     },
     "/tools/shelter-capacity-sanitation/": {
-      "sha": "f2f84f26829d8b3e",
+      "sha": "3ce76af4dd150c8b",
       "date": "2026-10-01"
     },
     "/tools/shielding-gas-runtime/": {

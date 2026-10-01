@@ -129,7 +129,7 @@ export function computeLandfillAirspaceDensity({ annual_tons = 0, in_place_densi
 
 const airspaceExample = { annual_tons: 250000, in_place_density_lb_per_cy: 1200, cover_ratio_pct: 20, airspace_value_per_cy: 8, improved_density_lb_per_cy: 1500 };
 WASTE_RENDERERS["landfill-airspace-density"] = _simpleRenderer({
-  citation: "Citation: volumetric bookkeeping -- waste airspace = tons / in-place density in tons per cubic yard, cover airspace = waste airspace x the cover ratio, and the airspace utilisation factor = tons placed / total airspace consumed. In-place density is commonly 1,000 to 1,600 lb per cubic yard and cover commonly adds 15 to 25%. The site's own airspace survey and permitted capacity govern.",
+  citation: "Citation: volumetric bookkeeping -- waste airspace = tons / in-place density in tons per cubic yard, cover airspace = waste airspace x the cover ratio, and the airspace utilisation factor = tons placed / total airspace consumed. In-place density is commonly 1,000 to 1,600 lb per cubic yard and cover commonly adds 20 to 50% of the waste volume (EPA's Decision-Maker's Guide prints waste-to-soil ratios of 2:1 to 5:1 and plans on 3:1; USACE EM 1110-3-177 plans on 4:1 to 3:1). The site's own airspace survey and permitted capacity govern.",
   example: airspaceExample,
   fields: [
     { key: "annual_tons", label: "Tonnage placed (tons)" },
@@ -238,7 +238,7 @@ export function computeLeachateWaterBalance({ open_acres = 0, annual_precip_in =
   if (!(open_acres > 0)) return { error: "The open area must be positive." };
   if (!(annual_precip_in > 0)) return { error: "Annual precipitation must be positive." };
   if (!(runoff_coefficient >= 0) || !(evapotranspiration_coefficient >= 0)) return { error: "Runoff and evapotranspiration coefficients cannot be negative." };
-  if (!(runoff_coefficient + evapotranspiration_coefficient < 1)) return { error: "Runoff and evapotranspiration together must leave some infiltration; their sum must be below 1." };
+  if (!(runoff_coefficient + evapotranspiration_coefficient < 1)) return { error: "Runoff and evapotranspiration take all of the precipitation, so this balance predicts no percolation through the open cell (the usual result at an arid site); their sum must be below 1 for there to be leachate to size." };
   if (!(capped_infiltration_in_per_year >= 0)) return { error: "The capped-area infiltration rate cannot be negative." };
   if (!(design_storm_in > 0)) return { error: "The design storm depth must be positive." };
   const area_sqft = open_acres * SQ_FT_PER_ACRE;
@@ -549,8 +549,8 @@ WASTE_RENDERERS["lfg-flare-capacity"] = _simpleRenderer({
     { key: "minimum_stable_scfm", id: "lfc-min", label: "Minimum stable flow", unit: "scfm", value: (r) => fmt(r.minimum_stable_scfm, 0) + " scfm -- the peak is " + fmt(r.turndown_headroom_ratio, 1) + "x above it" },
     { key: "design_btu_per_cf", id: "lfc-btu", label: "Heat content of the gas", value: (r) => fmt(r.design_btu_per_cf, 0) + " Btu/cu ft at the design methane fraction" },
     { key: "reduced_btu_per_cf", id: "lfc-red", label: "At the reduced methane fraction", value: (r) => fmt(r.reduced_btu_per_cf, 0) + " Btu/cu ft -- a " + fmt(r.methane_fraction_fall_pct, 0) + "% fall in methane content, and this is what trips a flare" },
-    { key: "methane_destroyed_tons", id: "lfc-dest", label: "Methane destroyed", unit: "tons/yr", value: (r) => fmt(r.methane_destroyed_tons, 0) + " tons a year" },
-    { key: "co2e_tons", id: "lfc-co2", label: "Carbon dioxide equivalent credit", value: (r) => fmt(r.co2e_tons, 0) + " tons CO2e a year, from a flare producing no revenue at all" },
+    { key: "methane_destroyed_tons", id: "lfc-dest", label: "Methane destroyed", unit: "tons/yr", value: (r) => fmt(r.methane_destroyed_tons, 0) + " short tons a year" },
+    { key: "co2e_tons", id: "lfc-co2", label: "Carbon dioxide equivalent credit", value: (r) => fmt(r.co2e_tons, 0) + " short tons CO2e a year (" + fmt(r.co2e_tons * LB_PER_TON / LB_PER_MEGAGRAM, 0) + " metric tonnes, the unit EPA reports in), from a flare producing no revenue at all" },
     { key: "note", id: "lfc-note", label: "Use", value: (r) => r.note },
   ],
   compute: computeLfgFlareCapacity,
