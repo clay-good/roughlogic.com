@@ -185,7 +185,9 @@ TELECOM_RENDERERS["chromatic-dispersion-reach"] = _simpleRenderer({
 // dims: in { route_length_ft: L, usable_reel_length_ft: L, slack_per_splice_ft: L, terminal_slack_ft: L, waste_pct: dimensionless, restoration_slack_each_side_ft: L } out: { splice_points: dimensionless, total_slack_ft: L, cable_to_order_ft: L }
 export function computeFiberSlackStorage({ route_length_ft = 0, usable_reel_length_ft = 0, slack_per_splice_ft = 0, terminal_slack_ft = 0, waste_pct = 0, restoration_slack_each_side_ft = 0 } = {}) {
   const guard = _finiteGuard(arguments[0]); if (guard) return { error: guard.error };
-  if (!(route_length_ft > 0) || !(usable_reel_length_ft > 0) || usable_reel_length_ft > route_length_ft) return { error: "Route and reel lengths must be positive, and usable reel length cannot exceed the route." };
+  // A route shorter than one reel is one pull with no splice; until 2026-10-01
+  // it was rejected outright.
+  if (!(route_length_ft > 0) || !(usable_reel_length_ft > 0)) return { error: "Route and reel lengths must be positive." };
   if (!(slack_per_splice_ft > 0) || !(terminal_slack_ft > 0) || !(restoration_slack_each_side_ft > 0)) return { error: "Splice, terminal, and restoration slack allowances must be positive." };
   if (!(waste_pct >= 0 && waste_pct < 100)) return { error: "Waste and routing allowance must be from 0 up to 100 percent." };
   const splice_points = Math.max(0, Math.ceil(route_length_ft / usable_reel_length_ft) - 1);
@@ -412,24 +414,28 @@ TELECOM_RENDERERS["optical-return-loss"] = _simpleRenderer({
 
 // ===================== spec-v1843: microduct cable jetting =====================
 
-// dims: in { duct_id_mm: L, cable_od_mm: L, fill_min_pct: dimensionless, fill_max_pct: dimensionless, optimal_fill_pct: dimensionless, air_velocity_m_s: L T^-1, pressure_bar_absolute: M L^-1 T^-2 } out: { fill_ratio_pct: dimensionless, annulus_area_mm2: L^2, free_air_l_min: L^3 T^-1 }
-export function computeCableJettingDistance({ duct_id_mm = 0, cable_od_mm = 0, fill_min_pct = 40, fill_max_pct = 60, optimal_fill_pct = 50, air_velocity_m_s = 0, pressure_bar_absolute = 0 } = {}) {
+// dims: in { duct_id_mm: L, cable_od_mm: L, fill_min_pct: dimensionless, fill_max_pct: dimensionless, optimal_fill_pct: dimensionless, air_velocity_m_s: L T^-1, pressure_bar_absolute: M L^-1 T^-2 } out: { fill_ratio_pct: dimensionless, area_fill_pct: dimensionless, annulus_area_mm2: L^2, free_air_l_min: L^3 T^-1 }
+export function computeCableJettingDistance({ duct_id_mm = 0, cable_od_mm = 0, fill_min_pct = 50, fill_max_pct = 80, optimal_fill_pct = 65, air_velocity_m_s = 0, pressure_bar_absolute = 0 } = {}) {
   const guard = _finiteGuard(arguments[0]); if (guard) return { error: guard.error };
   if (!(duct_id_mm > 0) || !(cable_od_mm > 0) || cable_od_mm >= duct_id_mm) return { error: "Duct and cable diameters must be positive, and cable OD must be below duct ID." };
   if (!(fill_min_pct > 0 && fill_min_pct < fill_max_pct && fill_max_pct < 100) || !(optimal_fill_pct >= fill_min_pct && optimal_fill_pct <= fill_max_pct)) return { error: "Enter an ordered fill window below 100 percent and an optimum inside it." };
   if (!(air_velocity_m_s > 0) || !(pressure_bar_absolute > 0)) return { error: "Air velocity and absolute operating pressure must be positive." };
   const solve = (od) => {
-    const fill_ratio_pct = 100 * Math.pow(od / duct_id_mm, 2);
+    // Fill is the DIAMETER ratio, as Corning (AEN096: 50 to 80%) and Dura-Line
+    // (50 to 75%) state it; until 2026-10-01 it was the area ratio against a
+    // 40 to 60% window no publisher prints.
+    const fill_ratio_pct = 100 * od / duct_id_mm;
     const annulus_area_mm2 = Math.PI / 4 * (duct_id_mm * duct_id_mm - od * od);
     const duct_air_l_min = annulus_area_mm2 * air_velocity_m_s * 0.06;
-    return { fill_ratio_pct, annulus_area_mm2, duct_air_l_min, free_air_l_min: duct_air_l_min * pressure_bar_absolute };
+    return { fill_ratio_pct, area_fill_pct: 100 * Math.pow(od / duct_id_mm, 2), annulus_area_mm2, duct_air_l_min, free_air_l_min: duct_air_l_min * pressure_bar_absolute };
   };
   const base = solve(cable_od_mm);
-  const optimal_cable_od_mm = duct_id_mm * Math.sqrt(optimal_fill_pct / 100);
+  const optimal_cable_od_mm = duct_id_mm * optimal_fill_pct / 100;
   const optimal = solve(optimal_cable_od_mm);
   const fill_status = base.fill_ratio_pct < fill_min_pct ? "BELOW WINDOW" : base.fill_ratio_pct > fill_max_pct ? "ABOVE WINDOW" : "IN WINDOW";
   return {
     fill_ratio_pct: base.fill_ratio_pct,
+    area_fill_pct: base.area_fill_pct,
     annulus_area_mm2: base.annulus_area_mm2,
     duct_air_l_min: base.duct_air_l_min,
     free_air_l_min: base.free_air_l_min,
@@ -443,21 +449,21 @@ export function computeCableJettingDistance({ duct_id_mm = 0, cable_od_mm = 0, f
   };
 }
 
-const jettingExample = { duct_id_mm: 10, cable_od_mm: 8.5, fill_min_pct: 40, fill_max_pct: 60, optimal_fill_pct: 50, air_velocity_m_s: 25, pressure_bar_absolute: 10 };
+const jettingExample = { duct_id_mm: 10, cable_od_mm: 8.5, fill_min_pct: 50, fill_max_pct: 80, optimal_fill_pct: 65, air_velocity_m_s: 25, pressure_bar_absolute: 10 };
 TELECOM_RENDERERS["cable-jetting-distance"] = _simpleRenderer({
-  citation: "Citation: area fill = (cable OD / duct ID)^2; annulus area = pi/4 x (ID^2 - OD^2); nominal flow = annulus area x air velocity and free-air flow scales by absolute pressure ratio. Manufacturer jetting data and a trial shot govern distance.",
+  citation: "Citation: fill = cable OD / duct ID, the basis Corning AEN096 (50 to 80%) and Dura-Line (50 to 75%) use; annulus area = pi/4 x (ID^2 - OD^2); nominal flow = annulus area x air velocity and free-air flow scales by absolute pressure ratio. Manufacturer jetting data and a trial shot govern distance.",
   example: jettingExample,
   fields: [
     { key: "duct_id_mm", label: "Microduct inside diameter (mm)" },
     { key: "cable_od_mm", label: "Cable outside diameter (mm)" },
-    { key: "fill_min_pct", label: "Recommended minimum area fill (%)", default: 40 },
-    { key: "fill_max_pct", label: "Recommended maximum area fill (%)", default: 60 },
-    { key: "optimal_fill_pct", label: "Target area fill (%)", default: 50 },
+    { key: "fill_min_pct", label: "Recommended minimum fill, OD/ID (%)", default: 50 },
+    { key: "fill_max_pct", label: "Recommended maximum fill, OD/ID (%)", default: 80 },
+    { key: "optimal_fill_pct", label: "Target fill, OD/ID (%)", default: 65 },
     { key: "air_velocity_m_s", label: "Nominal annulus air velocity (m/s)" },
     { key: "pressure_bar_absolute", label: "Duct pressure (bar absolute)" },
   ],
   outputs: [
-    { key: "fill_ratio_pct", id: "cjd-fill", label: "Cable area fill", unit: "%", value: (r) => fmt(r.fill_ratio_pct, 1) + " % -- " + r.fill_status },
+    { key: "fill_ratio_pct", id: "cjd-fill", label: "Cable fill (OD/ID)", unit: "%", value: (r) => fmt(r.fill_ratio_pct, 1) + " % -- " + r.fill_status + " (" + fmt(r.area_fill_pct, 1) + " % by area)" },
     { key: "optimal_cable_od_mm", id: "cjd-opt", label: "Cable OD at target fill", unit: "mm", value: (r) => fmt(r.optimal_cable_od_mm, 2) + " mm" },
     { key: "annulus_area_mm2", id: "cjd-area", label: "Entered-pair annulus", unit: "mm^2", value: (r) => fmt(r.annulus_area_mm2, 1) + " sq mm" },
     { key: "duct_air_l_min", id: "cjd-flow", label: "Air at duct pressure", unit: "L/min", value: (r) => fmt(r.duct_air_l_min, 0) + " L/min" },
@@ -491,7 +497,7 @@ export function computeSpliceLossMismatch({ mfd_1_um = 0, mfd_2_um = 0, lateral_
     lateral_offset_loss_db, lateral_1um_loss_db: lateral(1), lateral_2um_loss_db: lateral(2),
     angular_loss_db, angular_0_5deg_loss_db: angular(0.5), angular_1deg_loss_db: angular(1), angular_2deg_loss_db: angular(2),
     total_loss_db: mfd_mismatch_loss_db + lateral_offset_loss_db + angular_loss_db,
-    note: "These Gaussian approximations isolate 3 mechanisms. A core-alignment splicer can drive out lateral offset but cannot repair a bad cleave; bidirectional OTDR averaging is required for dissimilar fibers. Manufacturer and acceptance-test requirements govern.",
+    note: "These Gaussian approximations isolate 3 mechanisms. A core-alignment splicer can drive out lateral offset; the angular term is axial tilt between the cores, not the cleave's end angle (under 2 degrees of cleave is acceptable); bidirectional OTDR averaging is required for dissimilar fibers. Manufacturer and acceptance-test requirements govern.",
   };
 }
 
@@ -503,7 +509,7 @@ TELECOM_RENDERERS["splice-loss-mismatch"] = _simpleRenderer({
     { key: "mfd_1_um", label: "Fiber 1 mode-field diameter (microns)" },
     { key: "mfd_2_um", label: "Fiber 2 mode-field diameter (microns)" },
     { key: "lateral_offset_um", label: "Lateral offset (microns)" },
-    { key: "cleave_angle_deg", label: "Angular misalignment / cleave angle (deg)" },
+    { key: "cleave_angle_deg", label: "Axial angular misalignment between cores (deg)" },
     { key: "wavelength_nm", label: "Operating wavelength (nm)" },
     { key: "fiber_index", label: "Fiber index of refraction" },
   ],

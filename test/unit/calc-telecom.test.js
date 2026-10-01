@@ -95,11 +95,14 @@ test("strand count: the selected cable is the smallest standard count that holds
   close(r.installed_cost_delta, 52800 * 0.3, "only the material differs");
 });
 
-test("jetting: fill is the area ratio, and free air is duct air times absolute pressure", () => {
-  const r = computeCableJettingDistance({ duct_id_mm: 10, cable_od_mm: 8.5, fill_min_pct: 40, fill_max_pct: 60, optimal_fill_pct: 50, air_velocity_m_s: 25, pressure_bar_absolute: 10 });
-  close(r.fill_ratio_pct, 72.25, "(8.5 / 10)^2");
+test("jetting: fill is OD over ID (Corning AEN096, Dura-Line), and free air is duct air times absolute pressure", () => {
+  const r = computeCableJettingDistance({ duct_id_mm: 10, cable_od_mm: 8.5, fill_min_pct: 50, fill_max_pct: 80, optimal_fill_pct: 65, air_velocity_m_s: 25, pressure_bar_absolute: 10 });
+  close(r.fill_ratio_pct, 85, "8.5 / 10 by diameter");
+  close(r.area_fill_pct, 72.25, "(8.5 / 10)^2 by area");
+  // Corning's own recommended 6.3 mm cable in an 8 mm duct sits inside its window.
+  assert.equal(computeCableJettingDistance({ duct_id_mm: 8, cable_od_mm: 6.3, air_velocity_m_s: 25, pressure_bar_absolute: 10 }).fill_status, "IN WINDOW");
   assert.equal(r.fill_status, "ABOVE WINDOW");
   close(r.duct_air_l_min, Math.PI / 4 * (100 - 72.25) * 1e-6 * 25 * 60000, "m^3/s to L/min");
   close(r.free_air_l_min, 10 * r.duct_air_l_min, "Boyle");
-  close(r.optimal_cable_od_mm, 10 * Math.sqrt(0.5), "50% fill");
+  close(r.optimal_cable_od_mm, 6.5, "65% fill");
 });

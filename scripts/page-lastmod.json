@@ -2,7 +2,7 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "91151dddab4d0b11",
+      "sha": "f22a9b964d519b32",
       "date": "2026-10-01"
     },
     "/tools/": {
@@ -34,7 +34,7 @@
       "date": "2026-10-01"
     },
     "/groups/electrical/": {
-      "sha": "7ae6970f5b1e9290",
+      "sha": "e51515b618bcfa5c",
       "date": "2026-10-01"
     },
     "/groups/field/": {
@@ -478,8 +478,8 @@
       "date": "2026-09-29"
     },
     "/tools/barge-draft-displacement/": {
-      "sha": "87b96b53567f9f0c",
-      "date": "2026-09-29"
+      "sha": "96d9d9e7e043498d",
+      "date": "2026-10-01"
     },
     "/tools/barrel-volume/": {
       "sha": "e5faff709c2e8272",
@@ -634,8 +634,8 @@
       "date": "2026-09-29"
     },
     "/tools/berthing-fender-energy/": {
-      "sha": "29c3dd08731deae0",
-      "date": "2026-09-29"
+      "sha": "cff6cfb7b8e69047",
+      "date": "2026-10-01"
     },
     "/tools/beverage-co2-duration/": {
       "sha": "a23bb32286f86f52",
@@ -846,8 +846,8 @@
       "date": "2026-09-29"
     },
     "/tools/brine-batch-salinity/": {
-      "sha": "4fa520a0acfe2006",
-      "date": "2026-09-29"
+      "sha": "2f828a61df9fb201",
+      "date": "2026-10-01"
     },
     "/tools/brine-cure/": {
       "sha": "122bcdd52843eb74",
@@ -910,8 +910,8 @@
       "date": "2026-09-29"
     },
     "/tools/cable-jetting-distance/": {
-      "sha": "37cf50c2acb6b34e",
-      "date": "2026-09-29"
+      "sha": "a998f69a7738ba05",
+      "date": "2026-10-01"
     },
     "/tools/cable-reel-capacity/": {
       "sha": "773e4cc0aae20ad9",
@@ -1146,8 +1146,8 @@
       "date": "2026-09-29"
     },
     "/tools/chilled-water-ride-through/": {
-      "sha": "415509496e774683",
-      "date": "2026-09-29"
+      "sha": "54fc593833a8c117",
+      "date": "2026-10-01"
     },
     "/tools/chiller-staging-point/": {
       "sha": "3032093fd98db773",
@@ -2014,8 +2014,8 @@
       "date": "2026-09-29"
     },
     "/tools/damper-actuator-torque/": {
-      "sha": "732e5758bff880df",
-      "date": "2026-09-29"
+      "sha": "ee7f8f516eddbe54",
+      "date": "2026-10-01"
     },
     "/tools/damper-authority/": {
       "sha": "b9c303787c60d640",
@@ -3226,8 +3226,8 @@
       "date": "2026-09-29"
     },
     "/tools/galvanize-coating-weight/": {
-      "sha": "d5e4c06cb4d0b30b",
-      "date": "2026-09-29"
+      "sha": "907bf958ceb631a6",
+      "date": "2026-10-01"
     },
     "/tools/galvanize-kettle-throughput/": {
       "sha": "5ef3609bf8a31271",
@@ -4778,8 +4778,8 @@
       "date": "2026-09-29"
     },
     "/tools/mooring-load-wind-current/": {
-      "sha": "ba796752b78b55ac",
-      "date": "2026-09-29"
+      "sha": "8a9d06499b9b0097",
+      "date": "2026-10-01"
     },
     "/tools/mortar-batch-c270/": {
       "sha": "cec0bd7efdcdfda4",
@@ -4878,8 +4878,8 @@
       "date": "2026-10-01"
     },
     "/tools/mstp-segment-loading/": {
-      "sha": "eeac7f4e5c7f71ff",
-      "date": "2026-09-29"
+      "sha": "ed26ad5e93393ff3",
+      "date": "2026-10-01"
     },
     "/tools/mt-yoke-coil-amperage/": {
       "sha": "e5e9eb1c405d4b3d",
@@ -5278,8 +5278,8 @@
       "date": "2026-09-29"
     },
     "/tools/phosphate-coating-weight/": {
-      "sha": "c1ed91d822ca2025",
-      "date": "2026-09-29"
+      "sha": "9d58ac3512cf441b",
+      "date": "2026-10-01"
     },
     "/tools/photoperiod-blackout-schedule/": {
       "sha": "6c910f29c40600e8",
@@ -5998,8 +5998,8 @@
       "date": "2026-09-30"
     },
     "/tools/raised-floor-tile-airflow/": {
-      "sha": "7fc44250aee3a539",
-      "date": "2026-09-29"
+      "sha": "5009bc99dff3b2a7",
+      "date": "2026-10-01"
     },
     "/tools/ramp-detail-check/": {
       "sha": "1c0f0b14bcd8436e",
@@ -6574,7 +6574,7 @@
       "date": "2026-09-29"
     },
     "/tools/salt-application-rate/": {
-      "sha": "f86f8daf69be107a",
+      "sha": "7bbd2277393e9052",
       "date": "2026-10-01"
     },
     "/tools/sample-size-for-margin/": {
@@ -6802,8 +6802,8 @@
       "date": "2026-09-29"
     },
     "/tools/server-inlet-envelope/": {
-      "sha": "08dcfc74792ffda0",
-      "date": "2026-09-29"
+      "sha": "dec431cc46dfcc8e",
+      "date": "2026-10-01"
     },
     "/tools/service-conductor-sizing/": {
       "sha": "52067e064364e615",
@@ -6890,8 +6890,8 @@
       "date": "2026-09-29"
     },
     "/tools/sheet-pile-penetration/": {
-      "sha": "68e1a7848bc79e43",
-      "date": "2026-09-29"
+      "sha": "a2497c64af8f604a",
+      "date": "2026-10-01"
     },
     "/tools/shelter-capacity-sanitation/": {
       "sha": "3ce76af4dd150c8b",
@@ -7298,8 +7298,8 @@
       "date": "2026-09-29"
     },
     "/tools/splice-loss-mismatch/": {
-      "sha": "31571a70cc21fa89",
-      "date": "2026-09-29"
+      "sha": "f222ca570f6e421c",
+      "date": "2026-10-01"
     },
     "/tools/split-phase-leg-balance/": {
       "sha": "185bcf0e5bdc86f5",
@@ -8278,8 +8278,8 @@
       "date": "2026-09-30"
     },
     "/tools/trend-log-storage/": {
-      "sha": "31f6d192f5d69aa3",
-      "date": "2026-09-29"
+      "sha": "9c2653c571eea785",
+      "date": "2026-10-01"
     },
     "/tools/triage-quickread/": {
       "sha": "a2a2c3f10fd6ecbc",
@@ -8682,8 +8682,8 @@
       "date": "2026-09-29"
     },
     "/tools/wave-height-fetch/": {
-      "sha": "9ce7ecdf23d6804e",
-      "date": "2026-09-29"
+      "sha": "d6c41d96e3c54e03",
+      "date": "2026-10-01"
     },
     "/tools/wedge-force/": {
       "sha": "a6812259100a69bf",

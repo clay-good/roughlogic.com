@@ -75,10 +75,13 @@ function _simpleRenderer(spec) {
 
 export const FINISHING_RENDERERS = {};
 
-// Zinc density fixed by the metal, not by the process: 1 mil of zinc over
-// 1 sq ft weighs 0.5940 oz. Microns to mils is the exact inch definition
-// (25.4 um per mil), ounces to pounds is 16, and a short ton is 2,000 lb.
-const _OZ_PER_MIL_FT2 = 0.5940;
+// The ASTM A123 / AGA conversion, oz/sq ft = um x 0.02316 (7.067 g/m^2 per
+// um), so 1 mil over 1 sq ft is 0.02316 x 25.4 = 0.5883 oz -- the factor the
+// A123 grade tables are written in (grade 75 = 1.74 oz/sq ft). Until
+// 2026-10-01 this was 0.5940 from zinc's handbook density, 1% off the tables.
+// Microns to mils is the exact inch definition (25.4 um per mil), ounces to
+// pounds is 16, and a short ton is 2,000 lb.
+const _OZ_PER_MIL_FT2 = 0.02316 * 25.4;
 const _UM_PER_MIL = 25.4;
 const _OZ_PER_LB = 16;
 const _LB_PER_TON = 2000;
@@ -111,7 +114,7 @@ export function computeGalvanizeCoatingWeight({ coating_grade_um = 0, steel_tons
 }
 const galvanizeCoatingWeightExample = { inputs: { coating_grade_um: 85, steel_tons: 5, area_per_ton_ft2: 400, alt_area_per_ton_ft2: 120 } };
 FINISHING_RENDERERS["galvanize-coating-weight"] = _simpleRenderer({
-  citation: "Citation: ASTM A123 Zinc (Hot-Dip Galvanized) Coatings on Iron and Steel Products (by name) - coating grades in microns by material category and steel thickness. The zinc density conversion 1 mil over 1 sq ft = 0.5940 oz, 25.4 microns per mil, 16 oz per lb, 2,000 lb per ton. Surface area per ton is ENTERED from the fabricator's own takeoff; ASTM A123 and the galvanizer govern.",
+  citation: "Citation: ASTM A123 Zinc (Hot-Dip Galvanized) Coatings on Iron and Steel Products (by name) - coating grades in microns by material category and steel thickness. The A123 / AGA conversion oz/sq ft = um x 0.02316 (1 mil over 1 sq ft = 0.5883 oz), 25.4 microns per mil, 16 oz per lb, 2,000 lb per ton. Surface area per ton is ENTERED from the fabricator's own takeoff; ASTM A123 and the galvanizer govern.",
   example: galvanizeCoatingWeightExample.inputs,
   fields: [
     { key: "coating_grade_um", label: "Specified coating grade (microns)", kind: "number", default: 85 },
@@ -261,7 +264,7 @@ FINISHING_RENDERERS["galvanize-kettle-throughput"] = _simpleRenderer({
 // ============ spec-v1827: phosphate conversion coating weight ============
 
 // dims: in { panel_length_in: L, panel_width_in: L, faces_coated: dimensionless, mass_before_g: M, mass_after_g: M, spec_min_mg_ft2: M L^-2, spec_max_mg_ft2: M L^-2 } out: { area_one_face_ft2: L^2, area_coated_ft2: L^2, mass_lost_mg: M, coating_mg_ft2: M L^-2, coating_g_m2: M L^-2 }
-export function computePhosphateCoatingWeight({ panel_length_in = 0, panel_width_in = 0, faces_coated = 2, mass_before_g = 0, mass_after_g = 0, spec_min_mg_ft2 = 150, spec_max_mg_ft2 = 300 } = {}) {
+export function computePhosphateCoatingWeight({ panel_length_in = 0, panel_width_in = 0, faces_coated = 2, mass_before_g = 0, mass_after_g = 0, spec_min_mg_ft2 = 150, spec_max_mg_ft2 = 500 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(panel_length_in > 0)) return { error: "Panel length must be positive (in)." };
   if (!(panel_width_in > 0)) return { error: "Panel width must be positive (in)." };
@@ -288,12 +291,12 @@ export function computePhosphateCoatingWeight({ panel_length_in = 0, panel_width
   return {
     area_one_face_ft2, area_coated_ft2, mass_lost_mg, coating_mg_ft2, coating_g_m2,
     one_sided_mg_ft2, within_spec, margin_mg_ft2, spec_verdict, faces,
-    note: "THE AREA IS BOTH FACES OF A FLAT PANEL: a 4 x 6 in panel is 48 sq in, not 24. Dividing by one face of a two-faced panel reports exactly DOUBLE the coating weight, which is enough to turn a failing coating into a passing one with a correct measurement and a correct balance -- the one-face figure is reported here so the error is visible rather than silent. Typical ranges are roughly 150 to 300 mg/sq ft for zinc phosphate as a paint base and roughly 30 to 80 for iron phosphate, but ranges are set by the coating supplier and the paint system that follows and are entered rather than assumed. BOTH FAILURE DIRECTIONS ARE REAL, which is why a specification states a range rather than a minimum: a light coating leaves bare or thinly covered areas and shows up as blistering or filiform corrosion, while a heavy coating is coarse and friable and fails within itself under a well-adhered paint film. THE STRIP SOLUTION IS WHERE A RESULT QUIETLY GOES WRONG -- it must dissolve the coating and leave the substrate alone, and one that takes metal with the coating reports a coating weight that is partly base metal. Suspect it whenever a result comes back higher than the process can plausibly produce. Coating weight is a PROXY for coverage and crystal structure, neither of which it measures; those are evaluated by microscopy and by performance testing. The applicable ASTM test method, the coating supplier's specification, and the paint system requirements govern.",
+    note: "THE AREA IS BOTH FACES OF A FLAT PANEL: a 4 x 6 in panel is 48 sq in, not 24. Dividing by one face of a two-faced panel reports exactly DOUBLE the coating weight, which is enough to turn a failing coating into a passing one with a correct measurement and a correct balance -- the one-face figure is reported here so the error is visible rather than silent. TT-C-490H prints 150 to 500 mg/sq ft for spray zinc phosphate (Type I, 300 to 500 by immersion) and a 35 minimum for iron phosphate (Type II), but ranges are set by the coating supplier and the paint system that follows and are entered rather than assumed. BOTH FAILURE DIRECTIONS ARE REAL, which is why a specification states a range rather than a minimum: a light coating leaves bare or thinly covered areas and shows up as blistering or filiform corrosion, while a heavy coating is coarse and friable and fails within itself under a well-adhered paint film. THE STRIP SOLUTION IS WHERE A RESULT QUIETLY GOES WRONG -- it must dissolve the coating and leave the substrate alone, and one that takes metal with the coating reports a coating weight that is partly base metal. Suspect it whenever a result comes back higher than the process can plausibly produce. Coating weight is a PROXY for coverage and crystal structure, neither of which it measures; those are evaluated by microscopy and by performance testing. The applicable ASTM test method, the coating supplier's specification, and the paint system requirements govern.",
   };
 }
-const phosphateCoatingWeightExample = { inputs: { panel_length_in: 4, panel_width_in: 6, faces_coated: 2, mass_before_g: 45.682, mass_after_g: 45.647, spec_min_mg_ft2: 150, spec_max_mg_ft2: 300 } };
+const phosphateCoatingWeightExample = { inputs: { panel_length_in: 4, panel_width_in: 6, faces_coated: 2, mass_before_g: 45.682, mass_after_g: 45.647, spec_min_mg_ft2: 150, spec_max_mg_ft2: 500 } };
 FINISHING_RENDERERS["phosphate-coating-weight"] = _simpleRenderer({
-  citation: "Citation: the strip-and-weigh conversion coating weight method (by name) - mass lost on stripping divided by the COATED area, both faces of a flat panel. Conversion 1 mg/sq ft = 10.7639/1,000 g/m^2. Typical zinc phosphate roughly 150 to 300 mg/sq ft and iron phosphate roughly 30 to 80, entered rather than assumed. The applicable ASTM test method and the coating supplier's specification govern.",
+  citation: "Citation: the strip-and-weigh conversion coating weight method (by name) - mass lost on stripping divided by the COATED area, both faces of a flat panel. Conversion 1 mg/sq ft = 10.7639/1,000 g/m^2. TT-C-490H: zinc phosphate 150 to 500 mg/sq ft by spray, iron phosphate 35 minimum, entered rather than assumed. The applicable ASTM test method and the coating supplier's specification govern.",
   example: phosphateCoatingWeightExample.inputs,
   fields: [
     { key: "panel_length_in", label: "Panel length (in)", kind: "number" },
@@ -302,7 +305,7 @@ FINISHING_RENDERERS["phosphate-coating-weight"] = _simpleRenderer({
     { key: "mass_before_g", label: "Mass before stripping (g)", kind: "number" },
     { key: "mass_after_g", label: "Mass after stripping (g)", kind: "number" },
     { key: "spec_min_mg_ft2", label: "Specification minimum (mg/sq ft)", kind: "number", default: 150 },
-    { key: "spec_max_mg_ft2", label: "Specification maximum (mg/sq ft)", kind: "number", default: 300 },
+    { key: "spec_max_mg_ft2", label: "Specification maximum (mg/sq ft)", kind: "number", default: 500 },
   ],
   outputs: [
     { key: "a", id: "pcw-out-a", label: "Coated area", value: (r) => fmt(r.area_coated_ft2, 4) + " sq ft (" + fmt(r.area_one_face_ft2, 4) + " sq ft per face)" },

@@ -24237,7 +24237,7 @@ export const CITATIONS = {
     edition: "A simplified model of the BACnet MS/TP master node state machine. ASHRAE Standard 135 and the controller manufacturers' documentation govern the real behaviour.",
     freeAccess: "Frame timing arithmetic.",
     governance: GOVERNANCE.general,
-    editionNote: "THE 127 MASTER ADDRESSES THE PROTOCOL PERMITS ARE A NAMING LIMIT, NOT A CAPACITY. 32 devices at 76,800 baud gives a 50 ms idle rotation and 154 ms with half the devices sending a 50 octet frame; 64 devices doubles it to 308 ms, and that is still only half the address space. A segment built to the address limit takes about 200 ms per token rotation at 76,800 baud and over 1.5 s at 9,600 on frame time alone, before each node's reply delay (up to 15 ms per node in ASHRAE 135) and before anyone adds a trend poll -- adequate for scheduled and reset sequences, not for a safety interlock, and that judgement is what the number is for. DROPPING THE BAUD RATE IS THE SAME PROBLEM FROM THE OTHER SIDE: 32 devices at 38,400 also gives 308 ms, exactly double, because every frame takes twice as long. Raising the rate is the first remedy and it is BOUNDED -- maximum cable length falls as baud rises and the bus becomes far less tolerant of stubs, missing termination and grounding faults, so on a long existing run the answer is another segment rather than another setting. TOKEN LOSS AND RECOVERY, not steady-state rotation, is what makes a marginal segment behave badly, and most MS/TP problems live in the physical layer this does not model.",
+    editionNote: "THE 128 MASTER ADDRESSES (0 TO 127) THE PROTOCOL PERMITS ARE A NAMING LIMIT, NOT A CAPACITY. 32 devices at 76,800 baud gives a 50 ms idle rotation and 154 ms with half the devices sending a 50 octet frame; 64 devices doubles it to 308 ms, and that is still only half the address space. A segment built to the address limit takes about 200 ms per token rotation at 76,800 baud and over 1.5 s at 9,600 on frame time alone, before each node's token-use delay (up to 15 ms per node to start using the token in ASHRAE 135) and before anyone adds a trend poll -- adequate for scheduled and reset sequences, not for a safety interlock, and that judgement is what the number is for. DROPPING THE BAUD RATE IS THE SAME PROBLEM FROM THE OTHER SIDE: 32 devices at 38,400 also gives 308 ms, exactly double, because every frame takes twice as long. Raising the rate is the first remedy and it is BOUNDED -- maximum cable length falls as baud rises and the bus becomes far less tolerant of stubs, missing termination and grounding faults, so on a long existing run the answer is another segment rather than another setting. TOKEN LOSS AND RECOVERY, not steady-state rotation, is what makes a marginal segment behave badly, and most MS/TP problems live in the physical layer this does not model.",
     assumptions: [
       { name: "Steady-state rotation", value: "no token loss, recovery timeout, or poll-for-master cycle", source: "ASHRAE Standard 135's state machine" },
       { name: "One frame per device per token", value: "Nmax_info_frames may permit more", source: "the controller's configuration" },
@@ -24245,7 +24245,7 @@ export const CITATIONS = {
     ],
   },
   "damper-actuator-torque": {
-    formula: "area = width x height / 144; required torque = area x the torque factor in in-lb per sq ft; design torque = required x the safety factor; the selection is the smallest standard actuator at or above it, from the 35 / 70 / 140 / 180 in-lb ladder, and beyond the largest it is multiple actuators or a jackshaft.",
+    formula: "area = width x height / 144; required torque = area x the torque factor in in-lb per sq ft; design torque = required x the safety factor; the selection is the smallest standard actuator at or above it, from the 35 / 70 / 140 / 180 / 360 in-lb ladder, and beyond the largest it is multiple actuators or a jackshaft.",
     edition: "The damper torque factor convention. Factors are ENTERED: roughly 3 to 5 in-lb per sq ft for an ordinary low-pressure damper, 5 to 7 at higher velocity and pressure, and 7 to 10 or more with blade and jamb seals.",
     freeAccess: "An area calculation and a ladder lookup.",
     governance: GOVERNANCE.general,
@@ -24254,6 +24254,7 @@ export const CITATIONS = {
       { name: "Torque factors are entered", value: "blade style, bearings, linkage, frame, velocity and seals all move them", source: "the damper manufacturer's published torque" },
       { name: "Close-off is NOT computed", value: "holding shut against fan pressure is a separate published rating", source: "the actuator datasheet" },
       { name: "Single-section damper", value: "a multi-section damper is normally sized and driven section by section", source: "the manufacturer's arrangement" },
+      { name: "Safety factor 1.5 default", value: "above the published ones: Honeywell 63-8419 prints 1.2 (49.6 to 59.5 lb-in), DEI 1.25; Belimo applies none and steps up a size. At 1.2 the 48 x 36 example selects 140 sealed or not", source: "Honeywell 63-8419; Belimo P10406" },
     ],
   },
   "loop-error-stackup": {
@@ -24341,11 +24342,11 @@ export const CITATIONS = {
     ],
   },
   "cable-jetting-distance": {
-    formula: "area fill = (cable OD/duct ID)^2; annulus = pi(ID^2 - OD^2)/4; nominal duct flow = annulus x velocity; free-air delivery scales by absolute pressure ratio.",
+    formula: "fill = cable OD / duct ID (the manufacturers' basis); area fill = (OD/ID)^2 shown beside it; annulus = pi(ID^2 - OD^2)/4; nominal duct flow = annulus x velocity; free-air delivery scales by absolute pressure ratio.",
     edition: "Microduct fill and nominal air-demand screen. Jetting distance is deliberately not calculated.",
     freeAccess: "Circle areas and a volumetric-flow conversion.",
     governance: GOVERNANCE.general,
-    editionNote: "THE ANNULUS IS THE MACHINE. The worked 8.5 mm cable occupies 72.2% of a 10 mm duct, above the entered 40% to 60% window. An exact 50% fill diameter is 7.071 mm and needs about 589 L/min free air at the entered nominal conditions. The spec rounded that cable to 7.0 mm before calculating 601 L/min and then described it as exact; this tile keeps the exact target and states that real compressor demand is manufacturer data.",
+    editionNote: "THE ANNULUS IS THE MACHINE. Fill is OD over ID, as Corning AEN096 (target 50 to 80%) and Dura-Line (50 to 75%) state it; the spec's area ratio against a 40 to 60% window matched no publisher and flagged Corning's own recommended pairs. The worked 8.5 mm cable fills a 10 mm duct to 85%, above Corning's 80%; a 65% target is a 6.5 mm cable at about 680 L/min free air. Real compressor demand is manufacturer data.",
     assumptions: [
       { name: "Nominal incompressible screen", value: "real duct flow is compressible and pressure falls along the run", source: "the jetting-equipment supplier" },
       { name: "Fill window is entered", value: "cable and duct surface and stiffness alter it", source: "the paired product data" },
@@ -24357,7 +24358,7 @@ export const CITATIONS = {
     edition: "Gaussian single-mode splice-loss approximations for mode-field mismatch and geometric misalignment.",
     freeAccess: "Three Gaussian coupling approximations.",
     governance: GOVERNANCE.general,
-    editionNote: "PREPARATION OUTWEIGHS ORDINARY FIBER MISMATCH. The worked 9.2/8.6 micron MFD mismatch costs 0.020 dB, a 1 micron offset costs 0.205 dB, and a 2 degree cleave costs 0.991 dB. Core alignment can drive out offset; it cannot repair the angle delivered by the cleaver.",
+    editionNote: "PREPARATION OUTWEIGHS ORDINARY FIBER MISMATCH. The worked 9.2/8.6 micron MFD mismatch costs 0.020 dB, a 1 micron offset costs 0.205 dB, and 2 degrees of axial tilt between the cores costs 0.991 dB. That tilt term models a mechanical joint or connector; a fusion splice does not tilt by the cleave's end angle, and STL's splice-loss note calls an end angle under 2 degrees acceptable, about 0.5 degree from a maintained cleaver.",
     assumptions: [
       { name: "Single-mode Gaussian approximation", value: "not applicable to multimode fiber", source: "the coupling model" },
       { name: "Independent small losses", value: "real fusion also depends on contamination, arc parameters and core geometry", source: "the splicer data" },
@@ -24438,6 +24439,7 @@ export const CITATIONS = {
     governance: GOVERNANCE.general,
     editionNote: "Installed volume is not necessarily usable ride-through volume: mixing, minimum pump flow, coil approach, controls, and the actual chiller restart sequence reduce it. This is a thermal inventory, not a transient hydraulic simulation.",
     assumptions: [
+      { name: "All of the volume counts", value: "a stratified tank delivers 85 to 95% of its volume; Red River sizes 1,400 tons, 10 min, 14 F at 0.90 to 26,667 gal where this gives 23,981, so divide by the stratification efficiency", source: "Red River, How Do You Size Thermal Storage for Data Centers? (2026)" },
       { name: "Water properties", value: "8.34 lb/gal and 1 Btu/lb-degF", source: "standard water properties" },
       { name: "Load transfer", value: "the full entered IT load reaches the chilled-water loop throughout the gap", source: "conservative planning case" },
     ],
@@ -24449,6 +24451,7 @@ export const CITATIONS = {
     governance: GOVERNANCE.general,
     editionNote: "Passing dry bulb does not guarantee compliance: the hot-and-humid corner can fail the upper dew-point limit. The entered envelope must match the installed equipment class and current manufacturer requirements.",
     assumptions: [
+      { name: "One humidity limit pair", value: "the entered dew point / RH ceiling is checked for both conditions; the defaults are the RECOMMENDED 59 F / 70%, while A1 ALLOWABLE is 17 C (62.6 F) dew point and 80% RH, so enter those to judge an allowable excursion. Lower humidity limits are not checked", source: "ASHRAE TC 9.9 Thermal Guidelines, 5th ed. (2021), Table 2.1" },
       { name: "Correlation range", value: "ordinary data-center air temperatures within the validated input bounds", source: "Tetens correlation" },
       { name: "Steady inlet condition", value: "rack-level spatial and temporal excursions are not averaged into compliance", source: "ASHRAE TC 9.9 / site survey" },
     ],
@@ -24460,6 +24463,7 @@ export const CITATIONS = {
     governance: GOVERNANCE.general,
     editionNote: "A raised floor distributes fan airflow; it does not create it. Opening more tiles at fixed system airflow lowers each tile's share and required pressure, while local pressure and leakage make actual distribution nonuniform.",
     assumptions: [
+      { name: "Discharge coefficient is entered", value: "a tile maker's chart is better than 0.7: Tate's DirectPerf 25% tile prints 357 CFM at 0.02 in. and 496 at 0.04, which fits about 0.62, so 0.7 reads about 13% high", source: "Tate Airflow Panels & Controls, Performance Charts" },
       { name: "Free area", value: "gross tile area times entered open-area fraction", source: "tile manufacturer" },
       { name: "Discharge coefficient", value: "entered coefficient represents the selected tile geometry", source: "manufacturer curve / field measurement" },
     ],
@@ -25040,16 +25044,17 @@ export const CITATIONS = {
     governance: GOVERNANCE.marine,
     editionNote: "Freeboard is reserve buoyancy and a regulated minimum, not spare capacity -- the load line is the limit, not the deck edge. A barge loaded to its marks in salt water floats deeper in fresh with nothing added.",
     assumptions: [
+      { name: "Wall-sided hull", value: "the waterplane is taken as L x B x Cb, so tons per inch uses the block coefficient; a raked barge's waterplane coefficient exceeds Cb and its true TPI (A_WP / 420 in long tons) is a little higher. Tons are short tons (long tons x 1.12)", source: "USNA EN400, Section 2.10.4" },
       { name: "Tons per inch", value: "treated as constant, which holds for a box-shaped hull across its working range and not for a shaped one", source: "spec-v1830 idealisation" },
       { name: "Block coefficient", value: "entered; a rake-ended deck barge runs about 0.90 to 0.97", source: "barge capacity plan" },
     ],
   },
   "sheet-pile-penetration": {
-    formula: "Ka = tan^2(45 - phi/2); Kp = tan^2(45 + phi/2); Pa = 0.5 Ka gamma H^2 at H/3; embedment from (Kp - Ka) gamma D^3 / 6 = Pa (D + H/3); max moment where net shear is zero; S = M / allowable stress.",
-    edition: "Rankine earth pressure with the cantilever net-pressure simplification, increased by the conventional 20 to 40% for that idealisation. The geotechnical report, the applicable building code, and the design engineer govern.",
+    formula: "Ka = tan^2(45 - phi/2); Kp = tan^2(45 + phi/2); Pa = 0.5 Ka gamma H^2 at H/3; embedment from moments about the toe on the gross pressures, Kp D^3 = Ka (H + D)^3; max moment where shear is zero, z = H sqrt(Ka) / (sqrt(Kp) - sqrt(Ka)); S = M / allowable stress.",
+    edition: "Rankine earth pressure with the simplified (Blum) cantilever moment balance, increased by the conventional 20 to 40% (USS Steel Sheet Piling Design Manual). The geotechnical report, the applicable building code, and the design engineer govern.",
     freeAccess: "Rankine's relations are public; the soil parameters come from the site's own investigation.",
     governance: GOVERNANCE.general,
-    editionNote: "The 20 to 40% increase is NOT a safety factor in the usual sense -- it corrects the simplification's idealised rotation point and pressure distribution, and applies on top of, not instead of, the factors of safety in the pressure coefficients.",
+    editionNote: "The 20 to 40% increase IS the margin: USS says it gives a safety factor of about 1.5 to 2.0, with a reduced passive coefficient as the alternative, so use one or the other. Until 2026-10-01 the balance dropped the retained soil's active pressure below the dredge line and read about 20% short on depth; the gross-pressure balance now matches the USS method's maximum moment.",
     assumptions: [
       { name: "Soil", value: "drained granular, no surcharge, and no water differential across the wall", source: "spec-v1831 scope" },
       { name: "Deflection", value: "NOT computed, and frequently the criterion that governs; a flexible wall can move inches while the section is well inside its capacity", source: "design engineer" },
@@ -25060,7 +25065,7 @@ export const CITATIONS = {
     edition: "The Engineering News formula, carrying an embedded factor of safety of about 6 and returning an allowable rather than an ultimate load. The project specification, a wave equation analysis, and the geotechnical engineer govern.",
     freeAccess: "A public historical relation.",
     governance: GOVERNANCE.general,
-    editionNote: "Measured against static load tests, dynamic formulas scatter by a factor of two or three in both directions. Use this as a FIELD CONTROL on a criterion someone calibrated, never as a design method: a wave equation analysis sets the criterion and a load test verifies it.",
+    editionNote: "Measured against static load tests, dynamic formulas scatter widely in both directions: Caltrans found the Engineering News factor of safety ranging from 1/2 to 20 and replaced it with the Gates formula. Use this as a FIELD CONTROL on a criterion someone calibrated, never as a design method: a wave equation analysis sets the criterion and a load test verifies it.",
     assumptions: [
       { name: "What is missing", value: "nothing about the pile's length, stiffness, or mass, nothing about the cushion, and nothing about soil behaviour under a millisecond blow", source: "spec-v1832 caveat" },
       { name: "Refusal", value: "exists to protect the PILE, not to prove capacity; a pile at refusal in a soft layer above a hard one has proven nothing", source: "project specification" },
@@ -25073,6 +25078,7 @@ export const CITATIONS = {
     governance: GOVERNANCE.marine,
     editionNote: "Approach velocity is the term that is squared and the least controlled quantity in the calculation. A vessel at twice the design speed delivers four times the energy, and the load path beyond an overwhelmed fender is the quay structure.",
     assumptions: [
+      { name: "Tolerance and accidental case", value: "normal berthing is checked against 90% of the rating (fender curves carry +/-10%); the accidental case is at least 50% more energy, absorbed by the system at or near failure", source: "UFC 4-152-01, 5-1.5.2 and 5-1.5.3" },
       { name: "Approach velocity", value: "an assumption about seamanship on a day nobody can specify; design guidance gives wide bands by vessel size and berthing condition", source: "berth designer" },
       { name: "Eccentricity", value: "a barge pushed square onto a face has Ce near 1.0 and delivers about twice the usual assumption -- an easily overlooked second design case", source: "spec-v1833 method" },
     ],
@@ -25220,7 +25226,7 @@ export const CITATIONS = {
     governance: GOVERNANCE.general,
     editionNote: "PAVEMENT TEMPERATURE IS THE CONTROLLING VARIABLE AND IT IS NOT THE AIR TEMPERATURE. A bridge deck, a shaded north-facing lot, and a pavement that has radiated to a clear sky all night each sit several degrees below the air -- one published band, and sometimes two. The bands climb steeply because salt's melting capacity COLLAPSES as it cools, not because colder ice is harder to break. And the coverage arithmetic is where that becomes an operations problem: a truck carries a fixed tonnage, so doubling the rate HALVES the coverage per load and doubles the reload trips, which come straight out of the cycle time the route was designed around. A cold event degrades service twice over. Below about 15 degF salt alone is not effective at any rate. Spreader calibration is NOT checked here and decides whether the rate on the controller is the rate on the road; it is verified by a catch test.",
     assumptions: [
-      { name: "Lane-mile basis", value: "one 12 ft lane one mile long = 63,360 sq ft", source: "the standard basis of every published rate" },
+      { name: "Lane-mile basis", value: "one 12 ft lane one mile long = 63,360 sq ft; some tables (MnDOT/LRRB Field Handbook, Ohio LTAP) print per TWO-lane mile, 24 ft, so halve those", source: "MnDOT/LRRB Field Handbook for Snowplow Operators" },
       { name: "Rate is entered, not selected", value: "from the agency's own policy against a measured pavement temperature", source: "published rate guidance" },
       { name: "Calibration is assumed", value: "the rate on the controller is taken to be the rate on the road", source: "a catch test the operation performs itself" },
     ],
@@ -25286,13 +25292,13 @@ export const CITATIONS = {
     ],
   },
   "galvanize-coating-weight": {
-    formula: "thickness in mils = microns / 25.4; coating weight in oz per sq ft = mils x 0.5940 (the fixed zinc density); total area = tonnage x surface area per ton; zinc = area x coating weight / 16; pickup = zinc / (tons x 2,000), reported as a percent of steel weight.",
+    formula: "thickness in mils = microns / 25.4; coating weight in oz per sq ft = microns x 0.02316 (the ASTM A123 / AGA conversion, 0.5883 per mil); total area = tonnage x surface area per ton; zinc = area x coating weight / 16; pickup = zinc / (tons x 2,000), reported as a percent of steel weight.",
     edition: "ASTM A123 assigns the coating grade in microns from the material category and the steel thickness; the grade is ENTERED here rather than selected. Fasteners fall under A153 and sheet under other standards.",
     freeAccess: "A material density conversion and two unit conversions.",
     governance: GOVERNANCE.general,
     editionNote: "SURFACE AREA PER TON IS THE DOMINANT INPUT and it is not a table lookup: real work spans roughly 100 to 150 sq ft per ton for heavy structural shapes and 300 to 500 for light angle, grating and fabricated assemblies, a factor of four, and it must come from the fabricator's own takeoff. That range is the whole reason galvanizing prices look strange to a fabricator -- zinc, kettle time, racking and handling all follow AREA while the purchase order is written in TONS, so two loads of identical weight can differ threefold or fourfold in what they cost to coat. The ZINC PICKUP figure is a surface-area quantity reported against a weight basis, which is exactly why it moves so much at a fixed coating grade. AND A123 THICKNESS IS AN AVERAGE WITH MINIMUMS, not a uniform value: the coating grows by reaction with the steel, so a silicon-reactive steel produces a thick dull grey coating that meets the specification and looks nothing like the bright pieces beside it. That is metallurgy, not a defect, and it is the most common galvanizing complaint.",
     assumptions: [
-      { name: "Zinc density conversion", value: "1 mil over 1 sq ft = 0.5940 oz", source: "the density of zinc" },
+      { name: "Coating weight conversion", value: "oz/sq ft = um x 0.02316, so 1 mil over 1 sq ft = 0.5883 oz (zinc's handbook density would give 0.594)", source: "American Galvanizers Association; ASTM A123" },
       { name: "Surface area per ton is entered", value: "from the fabricator's takeoff, not a table", source: "the drawings for the actual pieces" },
       { name: "Kettle losses are not counted", value: "dross, ash and skimmings are beyond what leaves on the steel", source: "the galvanizer's own consumption records" },
     ],
@@ -25326,7 +25332,7 @@ export const CITATIONS = {
     edition: "The strip-and-weigh conversion coating weight method. The stripping solution, time and temperature are prescribed by the applicable ASTM test method for the specific coating and substrate; specification ranges are ENTERED from the coating supplier.",
     freeAccess: "A division by area and one unit conversion.",
     governance: GOVERNANCE.general,
-    editionNote: "THE AREA IS BOTH FACES OF A FLAT PANEL: a 4 x 6 in panel is 48 sq in, not 24, and dividing by one face reports EXACTLY DOUBLE. On the standard case that turns a 105 mg/sq ft result which FAILS a 150 to 300 zinc phosphate range into a 210 which passes comfortably -- with a correct measurement, a correct balance and a wrong area. The one-face figure is computed and shown alongside the correct one so the error is visible rather than silent. Coating weight is a PROXY for coverage and crystal structure and measures neither; a specification states a RANGE rather than a minimum because both failure directions are real, a light coating leaving bare areas and a heavy one being coarse and friable and failing within itself under a well-adhered paint film. AND THE STRIP SOLUTION IS WHERE A RESULT QUIETLY GOES WRONG -- it must dissolve the coating and leave the substrate alone, and one that takes metal with the coating reports a coating weight that is partly base metal.",
+    editionNote: "THE AREA IS BOTH FACES OF A FLAT PANEL: a 4 x 6 in panel is 48 sq in, not 24, and dividing by one face reports EXACTLY DOUBLE. On the standard case that turns a 105 mg/sq ft result which FAILS a 150 to 500 zinc phosphate range (TT-C-490H Type I) into a 210 which passes comfortably -- with a correct measurement, a correct balance and a wrong area. The one-face figure is computed and shown alongside the correct one so the error is visible rather than silent. Coating weight is a PROXY for coverage and crystal structure and measures neither; a specification states a RANGE rather than a minimum because both failure directions are real, a light coating leaving bare areas and a heavy one being coarse and friable and failing within itself under a well-adhered paint film. AND THE STRIP SOLUTION IS WHERE A RESULT QUIETLY GOES WRONG -- it must dissolve the coating and leave the substrate alone, and one that takes metal with the coating reports a coating weight that is partly base metal.",
     assumptions: [
       { name: "Both faces are coated unless told otherwise", value: "the default is 2; the one-face figure is reported either way", source: "the geometry of a flat test panel" },
       { name: "Typical ranges are entered, not assumed", value: "zinc phosphate roughly 150 to 300 mg/sq ft, iron phosphate roughly 30 to 80", source: "the coating supplier's specification" },

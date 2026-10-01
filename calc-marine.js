@@ -197,7 +197,7 @@ export function computeSlurryCriticalVelocity({ pipe_diameter_in = 0, solids_spe
     // is expensive quadratically and is paid every hour for every foot of line.
     relative_friction_head: Math.pow(operating_velocity_fps / critical_velocity_fps, 2),
     excess_friction_pct: 100 * (Math.pow(operating_velocity_fps / critical_velocity_fps, 2) - 1),
-    note: "The whole answer is F_L, and the material is what sets it: the coefficient peaks for medium sand and falls for very fine and very coarse material, so a cut that runs into a coarser layer raises the threshold with no warning from the dredge -- the discharge pressure rises as a bed forms, and by the time it is unmistakable the line is plugging. Pipe diameter works the wrong way: V_c goes as the square root of diameter, so an upsize that increases capacity can put the line below its own critical velocity if the pump's delivery is not raised with it. Durand's curves, the material's gradation, and the dredge's own pump curve govern.",
+    note: "The whole answer is F_L, and the material is what sets it: the coefficient peaks for medium sand and falls for very fine and very coarse material, so a cut that runs from fine sand into medium or coarse sand raises the threshold with no warning from the dredge -- the discharge pressure rises as a bed forms, and by the time it is unmistakable the line is plugging. Pipe diameter works the wrong way: V_c goes as the square root of diameter, so an upsize that increases capacity can put the line below its own critical velocity if the pump's delivery is not raised with it. Durand's curves, the material's gradation, and the dredge's own pump curve govern.",
   };
 }
 
@@ -215,7 +215,7 @@ MARINE_RENDERERS["slurry-critical-velocity"] = _simpleRenderer({
     { key: "upsized_diameter_in", label: "Upsized pipe considered (in)" },
   ],
   outputs: [
-    { key: "critical_velocity_fps", id: "scv-vc", label: "Critical velocity", unit: "ft/s", value: (r) => fmt(r.critical_velocity_fps, 1) + " ft/s -- " + (r.runs ? "the line runs, " + fmt(r.margin_pct, 0) + "% of margin" : "BELOW the operating velocity; solids deposit") },
+    { key: "critical_velocity_fps", id: "scv-vc", label: "Critical velocity", unit: "ft/s", value: (r) => fmt(r.critical_velocity_fps, 1) + " ft/s -- " + (r.runs ? "the line runs, " + fmt(r.margin_pct, 0) + "% of margin" : "AT OR ABOVE the operating velocity; solids deposit") },
     { key: "root_term_fps", id: "scv-root", label: "The square-root term", value: (r) => fmt(r.root_term_fps, 2) + " ft/s -- the whole answer is then F_L times this" },
     { key: "coarser_critical_velocity_fps", id: "scv-low", label: "In a coarser layer", unit: "ft/s", value: (r) => fmt(r.coarser_critical_velocity_fps, 1) + " ft/s -- " + (r.coarser_runs ? "still runs, " + fmt(r.coarser_margin_pct, 0) + "% of margin left" : "does NOT run") },
     { key: "coarsest_critical_velocity_fps", id: "scv-high", label: "In the coarsest layer", unit: "ft/s", value: (r) => fmt(r.coarsest_critical_velocity_fps, 1) + " ft/s -- " + (r.coarsest_runs ? fmt(r.coarsest_margin_pct, 0) + "% of margin" : "does NOT run at this velocity; the solids deposit") },
@@ -282,7 +282,7 @@ MARINE_RENDERERS["barge-draft-displacement"] = _simpleRenderer({
     { key: "light_displacement_tons", id: "bdd-light", label: "Light displacement", unit: "tons", value: (r) => fmt(r.light_displacement_tons, 0) + " tons" },
     { key: "loaded_displacement_tons", id: "bdd-load", label: "Loaded displacement", unit: "tons", value: (r) => fmt(r.loaded_displacement_tons, 0) + " tons" },
     { key: "cargo_tons", id: "bdd-cargo", label: "Cargo carried", unit: "tons", value: (r) => fmt(r.cargo_tons, 0) + " tons" },
-    { key: "tons_per_inch", id: "bdd-tpi", label: "Tons per inch of immersion", value: (r) => fmt(r.tons_per_inch, 1) + " tons/in -- the loading foreman's number" },
+    { key: "tons_per_inch", id: "bdd-tpi", label: "Tons per inch of immersion", value: (r) => fmt(r.tons_per_inch, 1) + " short tons/in -- the loading foreman's number" },
     { key: "sinkage_in", id: "bdd-sink", label: "Sinkage the cargo produces", unit: "in", value: (r) => fmt(r.sinkage_in, 1) + " in (" + fmt(r.sinkage_ft, 2) + " ft), against " + fmt(r.draft_change_ft, 2) + " ft of draft change" },
     { key: "freeboard_ft", id: "bdd-free", label: "Freeboard at the loaded draft", unit: "ft", value: (r) => fmt(r.freeboard_ft, 2) + " ft -- reserve buoyancy, not spare capacity" },
     { key: "fresh_water_draft_ft", id: "bdd-fresh", label: "Same load in fresh water", unit: "ft", value: (r) => fmt(r.fresh_water_draft_ft, 2) + " ft -- " + fmt(r.fresh_water_allowance_in, 1) + " in deeper with nothing loaded" },
@@ -295,8 +295,8 @@ MARINE_RENDERERS["barge-draft-displacement"] = _simpleRenderer({
 
 // A cantilever wall has no anchor, so all of the retained load is carried by
 // rotating against the soil below the excavation. Moments balance about the toe
-// on the net-pressure simplification, and the result surprises people: a 12 ft
-// wall is a 23 ft pile, with 47% of the steel below the dredge line.
+// on the simplified (Blum) gross-pressure diagram, and the result surprises
+// people: a 12 ft wall is a 25 ft pile, with 52% of the steel below the dredge line.
 
 // dims: in { retained_height_ft: L, friction_angle_deg: dimensionless, unit_weight_pcf: M L^-3, increase_factor_pct: dimensionless, allowable_stress_psi: M L^-1 T^-2 } out: { ka: dimensionless, kp: dimensionless, active_force_plf: M T^-2, theoretical_depth_ft: L, design_depth_ft: L, total_length_ft: L, depth_to_max_moment_ft: L, max_moment_ftlb_per_ft: M L T^-2, section_modulus_in3_per_ft: L^3 }
 export function computeSheetPilePenetration({ retained_height_ft = 0, friction_angle_deg = 0, unit_weight_pcf = 0, increase_factor_pct = 0, allowable_stress_psi = 0 } = {}) {
@@ -312,25 +312,22 @@ export function computeSheetPilePenetration({ retained_height_ft = 0, friction_a
   const lever_arm_ft = retained_height_ft / 3;
   // Net passive pressure gained per foot of depth below the dredge line.
   const net_passive_rate = (kp - ka) * unit_weight_pcf;
-  // Moments about the toe: (net_passive_rate / 6) D^3 = Pa (D + H/3). Solve by
-  // bisection -- the left side grows as the cube, so the crossing is unique for
-  // D > 0 and bracketing is trivial.
-  const f = (D) => (net_passive_rate / 6) * D * D * D - active_force_plf * (D + lever_arm_ft);
-  let lo = 0, hi = 1;
-  while (f(hi) < 0 && hi < 1e6) hi *= 2;
-  if (!(hi < 1e6)) return { error: "No embedment satisfies moment equilibrium for these inputs." };
-  for (let i = 0; i < 200; i++) {
-    const mid = (lo + hi) / 2;
-    if (f(mid) < 0) lo = mid; else hi = mid;
-  }
-  const theoretical_depth_ft = (lo + hi) / 2;
+  // Moments about the toe on the gross pressures: active on the whole height
+  // H + D against passive on D, Kp D^3 = Ka (H + D)^3, so D = H r / (1 - r)
+  // with r = (Ka/Kp)^(1/3). Until 2026-10-01 this balanced (Kp - Ka) D^3 / 6
+  // against Pa (D + H/3) alone, dropping the retained soil's active pressure
+  // (gamma H Ka) that keeps acting below the dredge line (USS Steel Sheet
+  // Piling Design Manual p. 86, "PE = ... - PA1"): 20% short on depth and
+  // 21% light on moment, the unconservative side.
+  const r_cube = Math.cbrt(ka / kp);
+  const theoretical_depth_ft = retained_height_ft * r_cube / (1 - r_cube);
   const design_depth_ft = theoretical_depth_ft * (1 + increase_factor_pct / 100);
   const total_length_ft = retained_height_ft + design_depth_ft;
-  // Maximum moment sits where net shear is zero, below the dredge line.
-  const depth_to_max_moment_ft = Math.sqrt(2 * active_force_plf / net_passive_rate);
-  const max_moment_ftlb_per_ft =
-    active_force_plf * (depth_to_max_moment_ft + lever_arm_ft) -
-    (net_passive_rate / 2) * depth_to_max_moment_ft * depth_to_max_moment_ft * (depth_to_max_moment_ft / 3);
+  // Maximum moment sits where shear is zero below the dredge line, Kp z^2 =
+  // Ka (H + z)^2, so z = H sqrt(Ka) / (sqrt(Kp) - sqrt(Ka)).
+  const depth_to_max_moment_ft = retained_height_ft * Math.sqrt(ka) / (Math.sqrt(kp) - Math.sqrt(ka));
+  const hz = retained_height_ft + depth_to_max_moment_ft;
+  const max_moment_ftlb_per_ft = (unit_weight_pcf / 6) * (ka * hz * hz * hz - kp * Math.pow(depth_to_max_moment_ft, 3));
   return {
     ka, kp, active_force_plf, lever_arm_ft, net_passive_rate,
     theoretical_depth_ft, design_depth_ft, total_length_ft,
@@ -338,13 +335,13 @@ export function computeSheetPilePenetration({ retained_height_ft = 0, friction_a
     embedment_share_pct: 100 * design_depth_ft / total_length_ft,
     depth_to_max_moment_ft, max_moment_ftlb_per_ft,
     section_modulus_in3_per_ft: max_moment_ftlb_per_ft * IN_PER_FT / allowable_stress_psi,
-    note: "The 20 to 40% increase on the theoretical depth is NOT a safety factor in the usual sense -- it is the conventional correction for the net-pressure simplification's idealised rotation point and pressure distribution, applied on top of, not instead of, the factors of safety in the pressure coefficients or a modern design's load and resistance factors. DEFLECTION frequently governs instead of bending stress and this arithmetic does not compute it: a cantilever wall can move inches at the top while the section sits well inside its capacity, which is fine for a temporary cofferdam and not beside a road or a building. Where deflection governs the answer is a heavier section, deeper embedment, or an anchor -- and an anchor makes it a different structure with a different analysis. Drained granular soil, no surcharge, and no water differential are assumed; the geotechnical report and the design engineer govern.",
+    note: "The 20 to 40% increase on the theoretical depth IS the margin: the USS Steel Sheet Piling Design Manual says it gives a safety factor of about 1.5 to 2.0, and names a reduced passive coefficient as the alternative -- use one or the other, not both. DEFLECTION frequently governs instead of bending stress and this arithmetic does not compute it: a cantilever wall can move inches at the top while the section sits well inside its capacity, which is fine for a temporary cofferdam and not beside a road or a building. Where deflection governs the answer is a heavier section, deeper embedment, or an anchor -- and an anchor makes it a different structure with a different analysis. Drained granular soil, no surcharge, and no water differential are assumed; the geotechnical report and the design engineer govern.",
   };
 }
 
 const sheetPileExample = { retained_height_ft: 12, friction_angle_deg: 32, unit_weight_pcf: 120, increase_factor_pct: 30, allowable_stress_psi: 30000 };
 MARINE_RENDERERS["sheet-pile-penetration"] = _simpleRenderer({
-  citation: "Citation: Rankine earth pressure coefficients Ka = tan^2(45 - phi/2) and Kp = tan^2(45 + phi/2), with the cantilever wall's embedment from moment equilibrium about the toe on the net-pressure simplification, increased by the conventional 20 to 40% for that idealisation. Drained granular soil with no surcharge and no water differential is assumed. The geotechnical report, the applicable code, and the design engineer govern.",
+  citation: "Citation: Rankine earth pressure coefficients Ka = tan^2(45 - phi/2) and Kp = tan^2(45 + phi/2), with the cantilever wall's embedment from moment equilibrium about the toe on the simplified (Blum) gross-pressure diagram, Kp D^3 = Ka (H + D)^3, increased by the conventional 20 to 40% (USS Steel Sheet Piling Design Manual). Drained granular soil with no surcharge and no water differential is assumed. The geotechnical report, the applicable code, and the design engineer govern.",
   example: sheetPileExample,
   fields: [
     { key: "retained_height_ft", label: "Retained height above dredge line (ft)" },
@@ -408,13 +405,13 @@ export function computePileHammerBearing({ hammer_energy_ftlb = 0, loss_constant
     // The sensitivity is the first reason the formula is unreliable and it is
     // entirely visible in the arithmetic.
     set_range_capacity_ratio: refusal_capacity_lb / loose_set_capacity_lb,
-    note: "Use this as a FIELD CONTROL on a criterion someone calibrated, not as a design method: a wave equation analysis sets the criterion, a dynamic pile test or a static load test verifies it, and this arithmetic is how the crew hits it. Measured against static load tests, dynamic formulas scatter by a factor of two or three in both directions, which is why the embedded factor of safety is about six and why that is still not sufficient on its own. The relation contains nothing about the pile's length, stiffness, or mass, nothing about the cushion, and nothing about how soil behaves under a blow lasting milliseconds. Refusal exists to protect the PILE, not to prove capacity: a pile at refusal in a soft layer above a hard one has proven nothing about what it is bearing on. The project specification, the wave equation analysis, and the geotechnical engineer govern.",
+    note: "Use this as a FIELD CONTROL on a criterion someone calibrated, not as a design method: a wave equation analysis sets the criterion, a dynamic pile test or a static load test verifies it, and this arithmetic is how the crew hits it. Measured against static load tests, dynamic formulas scatter widely in both directions -- Caltrans found the Engineering News formula's true factor of safety ranging from 1/2 to 20 and replaced it with the Gates formula -- which is why the embedded factor of safety is about six and why that is still not sufficient on its own. The relation contains nothing about the pile's length, stiffness, or mass, nothing about the cushion, and nothing about how soil behaves under a blow lasting milliseconds. Refusal exists to protect the PILE, not to prove capacity: a pile at refusal in a soft layer above a hard one has proven nothing about what it is bearing on. The project specification, the wave equation analysis, and the geotechnical engineer govern.",
   };
 }
 
 const pileHammerExample = { hammer_energy_ftlb: 42000, loss_constant_in: 0.1, required_capacity_tons: 150, refusal_blows_per_inch: 10, loose_set_in: 0.3, embedded_safety_factor: 6 };
 MARINE_RENDERERS["pile-hammer-bearing"] = _simpleRenderer({
-  citation: "Citation: the Engineering News formula R_allowable = 2 E / (s + c), with E the rated hammer energy in ft-lb, s the set per blow in inches, and c a loss constant of 0.1 in for steam, air, and diesel hammers or 1.0 in for a drop hammer. The form carries an embedded factor of safety of about 6 and returns an allowable, not an ultimate, load. Dynamic formulas scatter by a factor of two or three against static load tests; the project specification, a wave equation analysis, and the geotechnical engineer govern.",
+  citation: "Citation: the Engineering News formula R_allowable = 2 E / (s + c), with E the rated hammer energy in ft-lb, s the set per blow in inches, and c a loss constant of 0.1 in for steam, air, and diesel hammers or 1.0 in for a drop hammer. The form carries an embedded factor of safety of about 6 and returns an allowable, not an ultimate, load. Dynamic formulas scatter widely against static load tests (Caltrans: the Engineering News factor of safety runs from 1/2 to 20); the project specification, a wave equation analysis, and the geotechnical engineer govern.",
   example: pileHammerExample,
   fields: [
     { key: "hammer_energy_ftlb", label: "Rated hammer energy (ft-lb)" },
@@ -442,7 +439,7 @@ MARINE_RENDERERS["pile-hammer-bearing"] = _simpleRenderer({
 // that is squared. A vessel arriving at twice the design speed does not deliver
 // twice the energy; it delivers four times.
 
-// dims: in { displacement_tons: M L T^-2, approach_velocity_fps: L T^-1, virtual_mass_factor: dimensionless, eccentricity_factor: dimensionless, softness_factor: dimensionless, configuration_factor: dimensionless, fender_rating_ftlb: M L^2 T^-2, alternative_velocity_fps: L T^-1 } out: { vessel_mass_slugs: M, kinetic_energy_ftlb: M L^2 T^-2, design_energy_ftlb: M L^2 T^-2, alternative_design_energy_ftlb: M L^2 T^-2, fender_margin_pct: dimensionless }
+// dims: in { displacement_tons: M L T^-2, approach_velocity_fps: L T^-1, virtual_mass_factor: dimensionless, eccentricity_factor: dimensionless, softness_factor: dimensionless, configuration_factor: dimensionless, fender_rating_ftlb: M L^2 T^-2, alternative_velocity_fps: L T^-1 } out: { vessel_mass_slugs: M, kinetic_energy_ftlb: M L^2 T^-2, design_energy_ftlb: M L^2 T^-2, usable_rating_ftlb: M L^2 T^-2, accidental_energy_ftlb: M L^2 T^-2, alternative_design_energy_ftlb: M L^2 T^-2, fender_margin_pct: dimensionless }
 export function computeBerthingFenderEnergy({ displacement_tons = 0, approach_velocity_fps = 0, virtual_mass_factor = 0, eccentricity_factor = 0, softness_factor = 0, configuration_factor = 0, fender_rating_ftlb = 0, alternative_velocity_fps = 0 } = {}) {
   const guard = _finiteGuard(arguments[0]); if (guard) return { error: guard.error };
   if (!(displacement_tons > 0)) return { error: "Vessel displacement must be positive." };
@@ -458,15 +455,22 @@ export function computeBerthingFenderEnergy({ displacement_tons = 0, approach_ve
   const kinetic_energy_ftlb = energyAt(approach_velocity_fps);
   const design_energy_ftlb = kinetic_energy_ftlb * combined_factor;
   const alternative_design_energy_ftlb = energyAt(alternative_velocity_fps) * combined_factor;
+  // UFC 4-152-01 5-1.5.2: fender curves carry a +/-10% tolerance, so normal
+  // berthing is checked against 90% of the rating; 5-1.5.3: the accidental case
+  // is at least 50% more energy, absorbed by the SYSTEM at or near failure.
+  // Until 2026-10-01 the full rating was used and the accidental case was absent.
+  const usable_rating_ftlb = fender_rating_ftlb * 0.9;
   return {
     vessel_mass_slugs, combined_factor, kinetic_energy_ftlb, design_energy_ftlb,
-    fender_margin_pct: 100 * (fender_rating_ftlb - design_energy_ftlb) / design_energy_ftlb,
-    fender_adequate: design_energy_ftlb <= fender_rating_ftlb,
-    fender_utilization: design_energy_ftlb / fender_rating_ftlb,
+    usable_rating_ftlb,
+    accidental_energy_ftlb: design_energy_ftlb * 1.5,
+    fender_margin_pct: 100 * (usable_rating_ftlb - design_energy_ftlb) / design_energy_ftlb,
+    fender_adequate: design_energy_ftlb <= usable_rating_ftlb,
+    fender_utilization: design_energy_ftlb / usable_rating_ftlb,
     alternative_design_energy_ftlb,
     alternative_energy_ratio: alternative_design_energy_ftlb / design_energy_ftlb,
-    alternative_fender_utilization: alternative_design_energy_ftlb / fender_rating_ftlb,
-    alternative_fender_adequate: alternative_design_energy_ftlb <= fender_rating_ftlb,
+    alternative_fender_utilization: alternative_design_energy_ftlb / usable_rating_ftlb,
+    alternative_fender_adequate: alternative_design_energy_ftlb <= usable_rating_ftlb,
     // The square is the whole reason fender design is conservative.
     velocity_ratio: alternative_velocity_fps / approach_velocity_fps,
     // A square berthing -- a barge pushed flat against a face -- has Ce near 1
@@ -482,7 +486,7 @@ MARINE_RENDERERS["berthing-fender-energy"] = _simpleRenderer({
   citation: "Citation: berthing kinetic energy E = 0.5 M V^2 with M the vessel's mass (displacement / g) and V the component of approach velocity normal to the berth, factored by virtual mass (1.3 to 1.8), eccentricity (0.4 to 0.7 for a normal quarter-point berthing), softness (0.9 to 1.0), and berth configuration (0.8 to 1.0). Published berthing guidance, the fender manufacturer's energy curves at the design deflection, and the berth designer govern.",
   example: fenderExample,
   fields: [
-    { key: "displacement_tons", label: "Vessel displacement (tons)" },
+    { key: "displacement_tons", label: "Vessel displacement (short tons; long tons x 1.12)" },
     { key: "approach_velocity_fps", label: "Approach velocity normal to berth (ft/s)" },
     { key: "virtual_mass_factor", label: "Virtual mass factor Cm" },
     { key: "eccentricity_factor", label: "Eccentricity factor Ce", attrs: { step: "any", min: "0", max: "1" } },
@@ -495,7 +499,8 @@ MARINE_RENDERERS["berthing-fender-energy"] = _simpleRenderer({
     { key: "vessel_mass_slugs", id: "bfe-mass", label: "Vessel mass", value: (r) => fmt(r.vessel_mass_slugs, 0) + " slugs" },
     { key: "kinetic_energy_ftlb", id: "bfe-ke", label: "Kinetic energy", unit: "ft-lb", value: (r) => fmt(r.kinetic_energy_ftlb, 0) + " ft-lb before the factors" },
     { key: "design_energy_ftlb", id: "bfe-de", label: "Design berthing energy", unit: "ft-lb", value: (r) => fmt(r.design_energy_ftlb, 0) + " ft-lb at a combined factor of " + fmt(r.combined_factor, 4) },
-    { key: "fender_margin_pct", id: "bfe-marg", label: "Against the fender rating", value: (r) => (r.fender_adequate ? fmt(r.fender_margin_pct, 0) + "% of margin" : "OVER -- " + fmt(r.fender_utilization, 2) + " times the rating") },
+    { key: "fender_margin_pct", id: "bfe-marg", label: "Against the fender rating less 10% tolerance", value: (r) => (r.fender_adequate ? fmt(r.fender_margin_pct, 0) + "% of margin on " + fmt(r.usable_rating_ftlb, 0) + " ft-lb" : "OVER -- " + fmt(r.fender_utilization, 2) + " times the usable rating") },
+    { key: "accidental_energy_ftlb", id: "bfe-acc", label: "Accidental berthing (UFC 4-152-01, +50%)", unit: "ft-lb", value: (r) => fmt(r.accidental_energy_ftlb, 0) + " ft-lb -- the fender SYSTEM's reserve at or near failure must absorb this, not its rated energy" },
     { key: "alternative_design_energy_ftlb", id: "bfe-alt", label: "At the alternative velocity", unit: "ft-lb", value: (r) => fmt(r.alternative_design_energy_ftlb, 0) + " ft-lb -- " + fmt(r.alternative_energy_ratio, 1) + "x the energy from " + fmt(r.velocity_ratio, 1) + "x the speed" },
     { key: "alternative_fender_utilization", id: "bfe-altf", label: "The fender at that velocity", value: (r) => fmt(r.alternative_fender_utilization, 2) + " times its rating -- " + (r.alternative_fender_adequate ? "still within it" : "OVERWHELMED; the load path beyond it is the quay") },
     { key: "square_berthing_energy_ftlb", id: "bfe-sq", label: "A square berthing", value: (r) => fmt(r.square_berthing_energy_ftlb, 0) + " ft-lb at Ce = 1.0 -- " + fmt(r.square_berthing_ratio, 1) + "x, the flat-pushed barge case" },
@@ -547,7 +552,7 @@ export function computeMooringLoadWindCurrent({ wind_area_ft2 = 0, wind_drag_coe
   };
 }
 
-const mooringExample = { wind_area_ft2: 12000, wind_drag_coefficient: 1.0, wind_speed_mph: 50, submerged_area_ft2: 3000, current_drag_coefficient: 1.2, current_speed_knots: 3, line_count: 6, line_angle_deg: 30, worst_line_share_pct: 70, safety_factor: 2 };
+const mooringExample = { wind_area_ft2: 12000, wind_drag_coefficient: 1.0, wind_speed_mph: 50, submerged_area_ft2: 3000, current_drag_coefficient: 1.2, current_speed_knots: 3, line_count: 6, line_angle_deg: 30, worst_line_share_pct: 70, safety_factor: 3 };
 MARINE_RENDERERS["mooring-load-wind-current"] = _simpleRenderer({
   citation: "Citation: wind force F = 0.00256 x Cd x A x V^2 with A the projected area above water in sq ft and V in mph, and current force F = 0.5 x rho x Cd x A x V^2 with rho 1.99 slugs/cu ft for sea water, A the submerged lateral area, and V in ft/s at 1.688 ft/s per knot. The terminal's own mooring analysis, the line manufacturer's published minimum breaking load, and the vessel's mooring arrangement govern.",
   example: mooringExample,
@@ -561,7 +566,7 @@ MARINE_RENDERERS["mooring-load-wind-current"] = _simpleRenderer({
     { key: "line_count", label: "Number of mooring lines", attrs: { step: "1", min: "1" } },
     { key: "line_angle_deg", label: "Horizontal line angle off perpendicular (degrees)", attrs: { step: "any", min: "0", max: "89" } },
     { key: "worst_line_share_pct", label: "Most-loaded line's share of the total (%)", attrs: { step: "any", min: "0", max: "100" } },
-    { key: "safety_factor", label: "Safety factor on breaking load" },
+    { key: "safety_factor", label: "Safety factor on breaking load (UFC 4-159-03: 3.0 minimum for wire rope and synthetic line)" },
   ],
   outputs: [
     { key: "wind_force_lb", id: "mlw-wind", label: "Wind force", unit: "lb", value: (r) => fmt(r.wind_force_lb, 0) + " lb at " + fmt(r.wind_speed_fps, 0) + " ft/s" },
@@ -717,7 +722,7 @@ MARINE_RENDERERS["wave-height-fetch"] = _simpleRenderer({
   citation: "Citation: the Shore Protection Manual fetch-limited deep-water growth relations -- adjusted wind U_A = 0.71 U^1.23 (U in m/s), dimensionless fetch X = g F / U_A^2, significant height H_mo = 0.0016 sqrt(X) U_A^2 / g, peak period T_p = 0.2857 X^(1/3) U_A / g, and the wind duration t = 68.8 X^(2/3) U_A / g required to reach the fetch-limited height. A hindcast over a uniform deep-water fetch; a measured wave record, and shoaling and refraction at the site, govern.",
   example: waveExample,
   fields: [
-    { key: "wind_speed_mph", label: "Wind speed (mph)" },
+    { key: "wind_speed_mph", label: "Wind speed (mph, at 10 m over water, duration-averaged -- not a raw anemometer reading)" },
     { key: "fetch_mi", label: "Fetch length (miles)" },
     { key: "alternative_fetch_mi", label: "Alternative fetch (miles)" },
     { key: "alternative_wind_speed_mph", label: "Alternative wind speed (mph)" },

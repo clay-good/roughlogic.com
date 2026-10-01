@@ -128321,7 +128321,7 @@
    "source_publisher": "Project (first-principles)",
    "source_title": "Hot-Dip Galvanized Coating Weight and Thickness -- the spec-v1824 worked example, recomputed",
    "source_edition_or_year": "spec-v1824 of scope-trade-expansion-3, 2026-09-11",
-   "source_section_or_page": "the standards named in the tile citation govern",
+   "source_section_or_page": "the standards named in the tile citation govern; recomputed 2026-10-01 on the ASTM A123 / AGA conversion (um x 0.02316)",
    "verified_by": "rl",
    "verified_on": "2026-09-11",
    "inputs": {
@@ -128332,13 +128332,13 @@
    },
    "outputs": {
     "thickness_mils": {
-     "value": 3.3464567,
+     "value": 3.346456692913386,
      "tolerance": {
       "pct": 0.5
      }
     },
     "coating_oz_ft2": {
-     "value": 1.9877953,
+     "value": 1.9686000000000001,
      "tolerance": {
       "pct": 0.5
      }
@@ -128350,37 +128350,37 @@
      }
     },
     "zinc_lb": {
-     "value": 248.47441,
+     "value": 246.07500000000002,
      "tolerance": {
       "pct": 0.5
      }
     },
     "pickup_pct": {
-     "value": 2.4847441,
+     "value": 2.46075,
      "tolerance": {
       "pct": 0.5
      }
     },
     "zinc_lb_per_ton": {
-     "value": 49.694882,
+     "value": 49.215,
      "tolerance": {
       "pct": 0.5
      }
     },
     "alt_zinc_lb_per_ton": {
-     "value": 14.908465,
+     "value": 14.764500000000002,
      "tolerance": {
       "pct": 0.5
      }
     },
     "alt_pickup_pct": {
-     "value": 0.74542323,
+     "value": 0.7382250000000001,
      "tolerance": {
       "pct": 0.5
      }
     },
     "zinc_ratio": {
-     "value": 3.3333333,
+     "value": 3.3333333333333335,
      "tolerance": {
       "pct": 0.5
      }
@@ -128558,7 +128558,7 @@
     "mass_before_g": 45.682,
     "mass_after_g": 45.647,
     "spec_min_mg_ft2": 150,
-    "spec_max_mg_ft2": 300
+    "spec_max_mg_ft2": 500
    },
    "outputs": {
     "area_one_face_ft2": {
@@ -129638,17 +129638,17 @@
   {
    "tile_id": "cable-jetting-distance",
    "source_publisher": "Project (first-principles)",
-   "source_title": "Cable Jetting Distance -- the spec-v1843 worked example, recomputed at the exact target-fill diameter",
+   "source_title": "Cable Jetting Distance -- the spec-v1843 worked example, recomputed 2026-10-01 on the OD/ID fill basis (Corning AEN096)",
    "source_edition_or_year": "spec-v1843 of scope-trade-expansion-3, 2026-09-13",
    "source_section_or_page": "manufacturer jetting data and a trial shot govern distance",
    "verified_by": "rl",
    "verified_on": "2026-09-13",
-   "inputs": { "duct_id_mm": 10, "cable_od_mm": 8.5, "fill_min_pct": 40, "fill_max_pct": 60, "optimal_fill_pct": 50, "air_velocity_m_s": 25, "pressure_bar_absolute": 10 },
+   "inputs": { "duct_id_mm": 10, "cable_od_mm": 8.5, "fill_min_pct": 50, "fill_max_pct": 80, "optimal_fill_pct": 65, "air_velocity_m_s": 25, "pressure_bar_absolute": 10 },
    "outputs": {
-    "fill_ratio_pct": { "value": 72.25, "tolerance": { "pct": 0.5 } },
+    "fill_ratio_pct": { "value": 85, "tolerance": { "pct": 0.5 } },
     "free_air_l_min": { "value": 326.92198551418784, "tolerance": { "pct": 0.5 } },
-    "optimal_cable_od_mm": { "value": 7.0710678118654755, "tolerance": { "pct": 0.5 } },
-    "optimal_free_air_l_min": { "value": 589.0486225480861, "tolerance": { "pct": 0.5 } }
+    "optimal_cable_od_mm": { "value": 6.5, "tolerance": { "pct": 0.5 } },
+    "optimal_free_air_l_min": { "value": 680.3511590430395, "tolerance": { "pct": 0.5 } }
    }
   },
   {
@@ -129774,9 +129774,9 @@
    "outputs": {"light_displacement_tons":{"value":311.22,"tolerance":{"pct":0.5}},"loaded_displacement_tons":{"value":1659.84,"tolerance":{"pct":0.5}},"cargo_tons":{"value":1348.62,"tolerance":{"pct":0.5}},"tons_per_inch":{"value":17.29,"tolerance":{"pct":0.5}},"sinkage_in":{"value":78,"tolerance":{"pct":0.5}},"sinkage_ft":{"value":6.5,"tolerance":{"pct":0.5}},"freeboard_ft":{"value":4,"tolerance":{"pct":0.5}},"fresh_water_draft_ft":{"value":8.205128205128204,"tolerance":{"pct":0.5}},"fresh_water_allowance_in":{"value":2.461538461538453,"tolerance":{"pct":0.5}}}
   },
   {
-   "tile_id": "sheet-pile-penetration", "source_publisher": "Project (first-principles)", "source_title": "Cantilever Sheet Pile Penetration -- the spec-v1831 worked example, recomputed", "source_edition_or_year": "spec-v1831 of scope-trade-expansion-3, 2026-09-18", "source_section_or_page": "the geotechnical report and design engineer govern", "verified_by": "rl", "verified_on": "2026-09-18",
+   "tile_id": "sheet-pile-penetration", "source_publisher": "Project (first-principles)", "source_title": "Cantilever Sheet Pile Penetration -- the spec-v1831 worked example, recomputed", "source_edition_or_year": "spec-v1831 of scope-trade-expansion-3, 2026-09-18", "source_section_or_page": "the geotechnical report and design engineer govern; recomputed 2026-10-01 on the gross-pressure (Blum) balance, which keeps the retained soil's active pressure below the dredge line", "verified_by": "rl", "verified_on": "2026-09-18",
    "inputs": {"retained_height_ft":12,"friction_angle_deg":32,"unit_weight_pcf":120,"increase_factor_pct":30,"allowable_stress_psi":30000},
-   "outputs": {"ka":{"value":0.3072585245224685,"tolerance":{"pct":0.5}},"kp":{"value":3.254588303299862,"tolerance":{"pct":0.5}},"active_force_plf":{"value":2654.713651874128,"tolerance":{"pct":0.5}},"theoretical_depth_ft":{"value":8.187659076403115,"tolerance":{"pct":0.5}},"design_depth_ft":{"value":10.64395679932405,"tolerance":{"pct":0.5}},"total_length_ft":{"value":22.64395679932405,"tolerance":{"pct":0.5}},"embedment_share_pct":{"value":47.00572825523932,"tolerance":{"pct":0.5}},"depth_to_max_moment_ft":{"value":3.87452841584499,"tolerance":{"pct":0.5}},"max_moment_ftlb_per_ft":{"value":17476.03026090847,"tolerance":{"pct":0.5}},"section_modulus_in3_per_ft":{"value":6.990412104363387,"tolerance":{"pct":0.5}}}
+   "outputs": {"ka":{"value":0.3072585245224685,"tolerance":{"pct":0.5}},"kp":{"value":3.254588303299862,"tolerance":{"pct":0.5}},"active_force_plf":{"value":2654.713651874128,"tolerance":{"pct":0.5}},"theoretical_depth_ft":{"value":10.032100085813232,"tolerance":{"pct":0.5}},"design_depth_ft":{"value":13.041730111557202,"tolerance":{"pct":0.5}},"total_length_ft":{"value":25.0417301115572,"tolerance":{"pct":0.5}},"embedment_share_pct":{"value":52.07998829736693,"tolerance":{"pct":0.5}},"depth_to_max_moment_ft":{"value":5.322479488799152,"tolerance":{"pct":0.5}},"max_moment_ftlb_per_ft":{"value":22127.65002582661,"tolerance":{"pct":0.5}},"section_modulus_in3_per_ft":{"value":8.851060010330643,"tolerance":{"pct":0.5}}}
   },
   {
    "tile_id": "pile-hammer-bearing", "source_publisher": "Project (first-principles)", "source_title": "Pile Driving Hammer Bearing -- the spec-v1832 worked example, recomputed", "source_edition_or_year": "spec-v1832 of scope-trade-expansion-3, 2026-09-18", "source_section_or_page": "the specification and wave equation analysis govern", "verified_by": "rl", "verified_on": "2026-09-18",
@@ -129784,14 +129784,14 @@
    "outputs": {"set_in":{"value":0.18000000000000002,"tolerance":{"pct":0.5}},"blows_per_inch":{"value":5.5555555555555545,"tolerance":{"pct":0.5}},"blows_per_foot":{"value":66.66666666666666,"tolerance":{"pct":0.5}},"ultimate_capacity_tons":{"value":900,"tolerance":{"pct":0.5}},"refusal_capacity_tons":{"value":210,"tolerance":{"pct":0.5}},"refusal_capacity_ratio":{"value":1.4,"tolerance":{"pct":0.5}},"loose_set_capacity_tons":{"value":105,"tolerance":{"pct":0.5}},"set_range_capacity_ratio":{"value":2,"tolerance":{"pct":0.5}}}
   },
   {
-   "tile_id": "berthing-fender-energy", "source_publisher": "Project (first-principles)", "source_title": "Berthing Energy and Fender Selection -- the spec-v1833 worked example, recomputed", "source_edition_or_year": "spec-v1833 of scope-trade-expansion-3, 2026-09-18", "source_section_or_page": "published berthing guidance and the berth designer govern", "verified_by": "rl", "verified_on": "2026-09-18",
+   "tile_id": "berthing-fender-energy", "source_publisher": "Project (first-principles)", "source_title": "Berthing Energy and Fender Selection -- the spec-v1833 worked example, recomputed", "source_edition_or_year": "spec-v1833 of scope-trade-expansion-3, 2026-09-18", "source_section_or_page": "published berthing guidance and the berth designer govern; recomputed 2026-10-01 against the rating less UFC 4-152-01's 10% tolerance", "verified_by": "rl", "verified_on": "2026-09-18",
    "inputs": {"displacement_tons":22000,"approach_velocity_fps":0.5,"virtual_mass_factor":1.5,"eccentricity_factor":0.5,"softness_factor":1,"configuration_factor":0.95,"fender_rating_ftlb":150000,"alternative_velocity_fps":1},
-   "outputs": {"vessel_mass_slugs":{"value":1366459.6273291924,"tolerance":{"pct":0.5}},"kinetic_energy_ftlb":{"value":170807.45341614904,"tolerance":{"pct":0.5}},"design_energy_ftlb":{"value":121700.31055900618,"tolerance":{"pct":0.5}},"fender_margin_pct":{"value":23.253588516746447,"tolerance":{"pct":0.5}},"alternative_design_energy_ftlb":{"value":486801.2422360247,"tolerance":{"pct":0.5}},"alternative_energy_ratio":{"value":4,"tolerance":{"pct":0.5}},"alternative_fender_utilization":{"value":3.2453416149068315,"tolerance":{"pct":0.5}},"square_berthing_energy_ftlb":{"value":243400.62111801235,"tolerance":{"pct":0.5}}}
+   "outputs": {"vessel_mass_slugs":{"value":1366459.6273291924,"tolerance":{"pct":0.5}},"kinetic_energy_ftlb":{"value":170807.45341614904,"tolerance":{"pct":0.5}},"design_energy_ftlb":{"value":121700.31055900618,"tolerance":{"pct":0.5}},"fender_margin_pct":{"value":10.928229665071804,"tolerance":{"pct":0.5}},"alternative_design_energy_ftlb":{"value":486801.2422360247,"tolerance":{"pct":0.5}},"alternative_energy_ratio":{"value":4,"tolerance":{"pct":0.5}},"alternative_fender_utilization":{"value":3.605935127674257,"tolerance":{"pct":0.5}},"square_berthing_energy_ftlb":{"value":243400.62111801235,"tolerance":{"pct":0.5}}}
   },
   {
-   "tile_id": "mooring-load-wind-current", "source_publisher": "Project (first-principles)", "source_title": "Mooring Line Load from Wind and Current -- the spec-v1834 worked example, recomputed", "source_edition_or_year": "spec-v1834 of scope-trade-expansion-3, 2026-09-18", "source_section_or_page": "the terminal's mooring analysis governs", "verified_by": "rl", "verified_on": "2026-09-18",
-   "inputs": {"wind_area_ft2":12000,"wind_drag_coefficient":1,"wind_speed_mph":50,"submerged_area_ft2":3000,"current_drag_coefficient":1.2,"current_speed_knots":3,"line_count":6,"line_angle_deg":30,"worst_line_share_pct":70,"safety_factor":2},
-   "outputs": {"wind_force_lb":{"value":76800.00000000001,"tolerance":{"pct":0.5}},"current_force_lb":{"value":91836.45874236191,"tolerance":{"pct":0.5}},"total_force_lb":{"value":168636.45874236192,"tolerance":{"pct":0.5}},"current_over_wind_pct":{"value":19.57874256910391,"tolerance":{"pct":0.5}},"load_per_line_lb":{"value":32454.101616695956,"tolerance":{"pct":0.5}},"required_mbl_lb":{"value":64908.203233391914,"tolerance":{"pct":0.5}},"worst_line_load_lb":{"value":136307.226790123,"tolerance":{"pct":0.5}},"worst_to_equal_ratio":{"value":4.2,"tolerance":{"pct":0.5}},"angle_cost_pct":{"value":13.397459621556129,"tolerance":{"pct":0.5}}}
+   "tile_id": "mooring-load-wind-current", "source_publisher": "Project (first-principles)", "source_title": "Mooring Line Load from Wind and Current -- the spec-v1834 worked example, recomputed", "source_edition_or_year": "spec-v1834 of scope-trade-expansion-3, 2026-09-18", "source_section_or_page": "the terminal's mooring analysis governs; recomputed 2026-10-01 at UFC 4-159-03's 3.0 minimum factor of safety", "verified_by": "rl", "verified_on": "2026-09-18",
+   "inputs": {"wind_area_ft2":12000,"wind_drag_coefficient":1,"wind_speed_mph":50,"submerged_area_ft2":3000,"current_drag_coefficient":1.2,"current_speed_knots":3,"line_count":6,"line_angle_deg":30,"worst_line_share_pct":70,"safety_factor":3},
+   "outputs": {"wind_force_lb":{"value":76800.00000000001,"tolerance":{"pct":0.5}},"current_force_lb":{"value":91836.45874236191,"tolerance":{"pct":0.5}},"total_force_lb":{"value":168636.45874236192,"tolerance":{"pct":0.5}},"current_over_wind_pct":{"value":19.57872232078371,"tolerance":{"pct":0.5}},"load_per_line_lb":{"value":32454.101616695956,"tolerance":{"pct":0.5}},"required_mbl_lb":{"value":97362.30485008786,"tolerance":{"pct":0.5}},"worst_line_load_lb":{"value":136307.226790123,"tolerance":{"pct":0.5}},"worst_to_equal_ratio":{"value":4.2,"tolerance":{"pct":0.5}},"angle_cost_pct":{"value":13.397459621556129,"tolerance":{"pct":0.5}}}
   },
   {
    "tile_id": "pier-scour-depth", "source_publisher": "Project (first-principles)", "source_title": "Local Pier Scour Depth -- the spec-v1835 worked example, recomputed", "source_edition_or_year": "spec-v1835 of scope-trade-expansion-3, 2026-09-18", "source_section_or_page": "HEC-18 and the bridge hydraulic study govern", "verified_by": "rl", "verified_on": "2026-09-18",
@@ -136751,6 +136751,1299 @@
      "value": 18,
      "tolerance": {
       "abs": 0
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "splice-loss-mismatch",
+   "source_publisher": "Corning Optical Communications",
+   "source_title": "Effects of Splicing Dissimilar Single-Mode Fibers (Application Engineering Note AEN006)",
+   "source_edition_or_year": "Revision 4, published 2002-10-18",
+   "source_section_or_page": "Page 1 of 1, worked example under eq. 1: MFDs of 8.8 um and 9.3 um give a calculated MFD-mismatch splice loss of 0.013 dB. Printed to 3 decimals (exact 0.01326); tolerance 2 percent covers that rounding. Offset and angle 0 isolate the mismatch term; wavelength and index are not printed and do not enter the mismatch term (1310 nm and SMF-28 1.4677 entered).",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "mfd_1_um": 8.8,
+    "mfd_2_um": 9.3,
+    "lateral_offset_um": 0,
+    "cleave_angle_deg": 0,
+    "wavelength_nm": 1310,
+    "fiber_index": 1.4677
+   },
+   "outputs": {
+    "mfd_mismatch_loss_db": {
+     "value": 0.013,
+     "tolerance": {
+      "pct": 2
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "otdr-event-distance",
+   "source_publisher": "Fluke Networks",
+   "source_title": "Manual Cable Settings - OptiFiber (knowledge base)",
+   "source_edition_or_year": "web page, retrieved 2026-10-01",
+   "source_section_or_page": "Index of refraction paragraph: choosing 1.466 instead of 1.470 makes a 10,000 m fiber report 10,027 m. Round-trip time is back-calculated from the printed true length and index, t = 2 x 1.470 x 10,000 m / c = 98.0678 us. Printed to the whole meter (exact 10,027.29); tolerance 0.5 m covers that rounding. No excess fiber or slack.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "round_trip_time_us": 98.06784398825671,
+    "entered_group_index": 1.466,
+    "true_group_index": 1.47,
+    "excess_fiber_pct": 0,
+    "slack_per_splice_ft": 0,
+    "splice_points": 0,
+    "comparison_span_km": 10
+   },
+   "outputs": {
+    "entered_distance_m": {
+     "value": 10027,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "corrected_distance_m": {
+     "value": 10000,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "otdr-event-distance",
+   "source_publisher": "Schneider Electric",
+   "source_title": "ArcFM Fiber Manager XI Using Guide: Fiber Cable Length and Glass Length",
+   "source_edition_or_year": "web documentation, retrieved 2026-10-01",
+   "source_section_or_page": "Glass Length section: cable length 3,500 ft x twist factor 1.04 = glass length 3,640 ft. Entered as an OTDR glass length of 3,640 ft (round-trip time back-calculated at index 1.4682 entered = true) with 4 percent excess fiber; the printed 3,500 ft cable length is 1,066.8 m. Printed figures are exact; tolerance 0.1 percent covers float conversion only.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "round_trip_time_us": 10.86702981967612,
+    "entered_group_index": 1.4682,
+    "true_group_index": 1.4682,
+    "excess_fiber_pct": 4,
+    "slack_per_splice_ft": 0,
+    "splice_points": 0,
+    "comparison_span_km": 40
+   },
+   "outputs": {
+    "cable_distance_m": {
+     "value": 1066.8,
+     "tolerance": {
+      "pct": 0.1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "chromatic-dispersion-reach",
+   "source_publisher": "Texas A&M University (S. Palermo, ECEN 689 Optical Interconnects)",
+   "source_title": "Lecture 2: Optical Channels",
+   "source_edition_or_year": "course slides, retrieved 2026-10-01",
+   "source_section_or_page": "Slide 'Chromatic Dispersion Pulse Spreading': a 1 nm spectral linewidth source spreads by 17 ps over 1 km of standard SMF with D = 17 ps/(nm km). Exact; tolerance 0.5 ps. Bit rate is not printed and does not enter the spread (10 Gb/s entered).",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "dispersion_ps_nm_km": 17,
+    "span_km": 1,
+    "bit_rate_gbps": 10,
+    "spectral_width_nm": 1,
+    "lower_bit_rate_gbps": 2.5,
+    "higher_bit_rate_gbps": 40
+   },
+   "outputs": {
+    "pulse_spread_ps": {
+     "value": 17,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "pon-split-loss-budget",
+   "source_publisher": "The Fiber Optic Association (FOA)",
+   "source_title": "The FOA Reference For Fiber Optics: FTTH design (PON loss budgets)",
+   "source_edition_or_year": "web page, retrieved 2026-10-01",
+   "source_section_or_page": "PON Loss Budgets table: 1:32 ideal loss/port 15 dB, excess loss (max) 4 dB, typical loss 19 dB; GPON budget 28 dB max with 32 split. Printed to whole dB (exact ideal 15.05); tolerance 0.5 dB covers that rounding. No components entered; attenuation 0.35 dB/km is not from this source and does not affect the splitter outputs.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "class_budget_db": 28,
+    "split_ratio": 32,
+    "splitter_excess_db": 4,
+    "connector_count": 0,
+    "connector_loss_db": 0,
+    "splice_count": 0,
+    "splice_loss_db": 0,
+    "attenuation_db_km": 0.35,
+    "design_margin_db": 0,
+    "alternative_split_ratio": 0
+   },
+   "outputs": {
+    "ideal_splitter_loss_db": {
+     "value": 15,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "splitter_loss_db": {
+     "value": 19,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "fiber-slack-storage",
+   "source_publisher": "Schneider Electric",
+   "source_title": "ArcFM Fiber Manager XI Using Guide: Fiber Cable Length and Glass Length",
+   "source_edition_or_year": "web documentation, retrieved 2026-10-01",
+   "source_section_or_page": "Cable Length, GIS Length + Slack Loop Length: a 3,000 ft cable with 2 slack loops of 75 ft each is 3,000 + 75 + 75 = 3,150 ft. Entered as one reel section (reel = route, 0 splice points) with 75 ft at each terminal and no waste; splice and restoration slack are placeholders (1 ft) that do not enter with 0 splice points. Exact; tolerance 0.5 ft.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "route_length_ft": 3000,
+    "usable_reel_length_ft": 3000,
+    "slack_per_splice_ft": 1,
+    "terminal_slack_ft": 75,
+    "waste_pct": 0,
+    "restoration_slack_each_side_ft": 1
+   },
+   "outputs": {
+    "total_slack_ft": {
+     "value": 150,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "cable_to_order_ft": {
+     "value": 3150,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "cable-jetting-distance",
+   "source_publisher": "Corning Optical Communications",
+   "source_title": "Microduct Cable Air-Assisted Installation Considerations (Application Engineering Note AEN096)",
+   "source_edition_or_year": "Revision 9, published 2024-06-04",
+   "source_section_or_page": "Page 2, Table 1 (72-fiber MiniXtend): 5.4 mm cable in 8 mm ID microduct, calculated fill ratio 68 percent, footnote: fill based on cable diameter vs duct inner diameter. Printed to whole percent; tolerance 0.5 percentage points covers that rounding. Air velocity and pressure are not from this source and do not enter the fill ratio.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "duct_id_mm": 8,
+    "cable_od_mm": 5.4,
+    "fill_min_pct": 50,
+    "fill_max_pct": 80,
+    "optimal_fill_pct": 65,
+    "air_velocity_m_s": 25,
+    "pressure_bar_absolute": 10
+   },
+   "outputs": {
+    "fill_ratio_pct": {
+     "value": 68,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "cable-jetting-distance",
+   "source_publisher": "Corning Optical Communications",
+   "source_title": "Microduct Cable Air-Assisted Installation Considerations (Application Engineering Note AEN096)",
+   "source_edition_or_year": "Revision 9, published 2024-06-04",
+   "source_section_or_page": "Page 2, Table 1 (96-fiber MiniXtend): 6.3 mm cable in 8 mm ID microduct, calculated fill ratio 79 percent, footnote: fill based on cable diameter vs duct inner diameter. Printed to whole percent; tolerance 0.5 percentage points covers that rounding. Air velocity and pressure are not from this source and do not enter the fill ratio.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "duct_id_mm": 8,
+    "cable_od_mm": 6.3,
+    "fill_min_pct": 50,
+    "fill_max_pct": 80,
+    "optimal_fill_pct": 65,
+    "air_velocity_m_s": 25,
+    "pressure_bar_absolute": 10
+   },
+   "outputs": {
+    "fill_ratio_pct": {
+     "value": 79,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "cable-jetting-distance",
+   "source_publisher": "Corning Optical Communications",
+   "source_title": "Microduct Cable Air-Assisted Installation Considerations (Application Engineering Note AEN096)",
+   "source_edition_or_year": "Revision 9, published 2024-06-04",
+   "source_section_or_page": "Page 2, Table 1 (144-fiber MiniXtend): 8.1 mm cable in 10 mm ID microduct, calculated fill ratio 81 percent, footnote: fill based on cable diameter vs duct inner diameter. Printed to whole percent; tolerance 0.5 percentage points covers that rounding. Air velocity and pressure are not from this source and do not enter the fill ratio.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "duct_id_mm": 10,
+    "cable_od_mm": 8.1,
+    "fill_min_pct": 50,
+    "fill_max_pct": 80,
+    "optimal_fill_pct": 65,
+    "air_velocity_m_s": 25,
+    "pressure_bar_absolute": 10
+   },
+   "outputs": {
+    "fill_ratio_pct": {
+     "value": 81,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "transmitter-span-scaling",
+   "source_publisher": "Pondus Instruments",
+   "source_title": "Pressure transmitter accuracy (knowledge article)",
+   "source_edition_or_year": "web page, retrieved 2026-10-01",
+   "source_section_or_page": "Worked example: PT600 max range 0-10 bar, 0.1 percent of max range gives 0.01 bar; ranged 0-1 bar (turndown 10:1) the same 0.01 bar is 1 percent of span. Exact; tolerance 0.5 percent.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "lower_range_value": 0,
+    "upper_range_value": 1,
+    "upper_range_limit": 10,
+    "loop_ma": 12,
+    "accuracy_pct": 0.1,
+    "low_reading_value": 0,
+    "alt_upper_range_value": 0
+   },
+   "outputs": {
+    "err_url_eng": {
+     "value": 0.01,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "err_url_as_pct_of_span": {
+     "value": 1,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "turndown": {
+     "value": 10,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "loop-error-stackup",
+   "source_publisher": "International Society of Automation (ISA Interchange blog, Ned Espy)",
+   "source_title": "How to Improve Industrial Productivity with Loop Calibration",
+   "source_edition_or_year": "blog post, retrieved via web.archive.org 2026-10-01",
+   "source_section_or_page": "Temperature loop example: RTD 0.5 F, transmitter 0.10 percent of span and DCS card 0.25 percent of span (span 50-250 F); worst case 0.5 + 0.2 + 0.5 = 1.2 F. The printed RSS (0.75 F) is rounded up from 0.735 and is NOT used. Exact; tolerance 0.5 percent. Deadband 1 F is a placeholder.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "span_eng": 200,
+    "element_err_eng": 0.5,
+    "transmitter_err_pct_span": 0.1,
+    "input_err_pct_span": 0.25,
+    "installation_err_eng": 0,
+    "averaging_err_eng": 0,
+    "deadband_eng": 1
+   },
+   "outputs": {
+    "transmitter_eng": {
+     "value": 0.2,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "input_eng": {
+     "value": 0.5,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "worst_case_eng": {
+     "value": 1.2,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "wave-height-fetch",
+   "source_publisher": "US Army Corps of Engineers, Coastal Engineering Research Center",
+   "source_title": "Shore Protection Manual, Volume I",
+   "source_edition_or_year": "1984 (4th ed.)",
+   "source_section_or_page": "Ch. 3 Sec. V.3, Example Problem 4, pp. 3-52 to 3-53: U = 23.5 m/s (52.6 mi/hr) gives U_A = 0.71(23.5)^1.23 = 34.5 m/s; F = 10 km gives H_mo = 1.75 m, T_m = 4.4 s; F = 100 km gives H_mo = 5.5 m. H and T are read from the Fig. 3-23 nomogram, so tolerance is 2% (U_A printed to 0.1 m/s). 5.5 m entered as 18.04 ft. Input U = 23.5 m/s = 52.568 mph exactly; fetches 10 km = 6.21371 mi, 100 km = 62.1371 mi.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "wind_speed_mph": 52.568,
+    "fetch_mi": 6.21371,
+    "alternative_fetch_mi": 62.1371,
+    "alternative_wind_speed_mph": 52.568
+   },
+   "outputs": {
+    "adjusted_wind_ms": {
+     "value": 34.5,
+     "tolerance": {
+      "abs": 0.05
+     }
+    },
+    "wave_height_m": {
+     "value": 1.75,
+     "tolerance": {
+      "pct": 2
+     }
+    },
+    "peak_period_s": {
+     "value": 4.4,
+     "tolerance": {
+      "pct": 2
+     }
+    },
+    "alternative_fetch_height_ft": {
+     "value": 18.045,
+     "tolerance": {
+      "pct": 2
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "wave-height-fetch",
+   "source_publisher": "US Army Corps of Engineers, Coastal Engineering Research Center",
+   "source_title": "Shore Protection Manual, Volume I",
+   "source_edition_or_year": "1984 (4th ed.)",
+   "source_section_or_page": "Ch. 3 Sec. V.3, Example Problem 4(h), p. 3-53: U_A = 34.5 m/s over F = 100 km gives H_mo = 5.5 m, T_m = 9.4 s (T_1/3 = 8.9 s). These are nomogram (Fig. 3-23) reads, so tolerance is 2%. Input U = 23.5 m/s = 52.568 mph; F = 100 km = 62.1371 mi; the alternative fetch is the printed 10 km case.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "wind_speed_mph": 52.568,
+    "fetch_mi": 62.1371,
+    "alternative_fetch_mi": 6.21371,
+    "alternative_wind_speed_mph": 52.568
+   },
+   "outputs": {
+    "wave_height_m": {
+     "value": 5.5,
+     "tolerance": {
+      "pct": 2
+     }
+    },
+    "peak_period_s": {
+     "value": 9.4,
+     "tolerance": {
+      "pct": 2
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "pile-hammer-bearing",
+   "source_publisher": "California Department of Transportation (Caltrans)",
+   "source_title": "Foundation Manual, Appendix E - Driven Piles",
+   "source_edition_or_year": "October 2015",
+   "source_section_or_page": "pp. E-6 and E-7, Comparison of Formulas: Delmag D36-32, maximum energy 83,880 ft-lb, set 0.844 in; ENR P = 2E/(s + 0.1) = 2(83,880)/(0.844 + 0.1) = 177,712 lb (safe load), entered as 88.856 tons (2,000 lb). The page's own conversion '\u2248 70 tons' is a publisher slip (177,712 lb = 88.9 short tons) and is not used. The required capacity is set to the printed 177,712 lb, so the set solved back is the printed 0.844 in. Tolerance 0.01% covers whole-pound rounding.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "hammer_energy_ftlb": 83880,
+    "loss_constant_in": 0.1,
+    "required_capacity_tons": 88.856,
+    "refusal_blows_per_inch": 1.184834,
+    "loose_set_in": 0.844,
+    "embedded_safety_factor": 6
+   },
+   "outputs": {
+    "refusal_capacity_tons": {
+     "value": 88.856,
+     "tolerance": {
+      "pct": 0.01
+     }
+    },
+    "set_in": {
+     "value": 0.844,
+     "tolerance": {
+      "abs": 0.0005
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "barge-draft-displacement",
+   "source_publisher": "United States Naval Academy, Naval Architecture and Ocean Engineering Department",
+   "source_title": "EN400 Principles of Ship Performance, Chapter 3 Homework Solutions",
+   "source_edition_or_year": "update 30 May 2019",
+   "source_section_or_page": "Problem 3-6 part 1: box barge 120 x 25 x 7.5 ft, empty draft 2.5 ft, max draft 5.25 ft, salt water 64 lb/cu ft gives W_cargo = 235.71 LT, entered as 264.0 short tons (x 2,240/2,000). Tolerance 0.01% covers the 0.01 LT print.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "barge_length_ft": 120,
+    "beam_ft": 25,
+    "depth_ft": 7.5,
+    "block_coefficient": 1,
+    "light_draft_ft": 2.5,
+    "water_density_pcf": 64,
+    "fresh_water_density_pcf": 62.4,
+    "loaded_draft_ft": 5.25
+   },
+   "outputs": {
+    "cargo_tons": {
+     "value": 263.995,
+     "tolerance": {
+      "pct": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "barge-draft-displacement",
+   "source_publisher": "United States Naval Academy, Naval Architecture and Ocean Engineering Department",
+   "source_title": "EN400 Principles of Ship Performance, Chapter 3 Homework Solutions",
+   "source_edition_or_year": "update 30 May 2019",
+   "source_section_or_page": "Problem 3-6 part 2: same barge loaded only to 4.5 ft to clear a shoal gives W_cargo = 171.43 LT, entered as 192.0 short tons. Tolerance 0.01% covers the 0.01 LT print.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "barge_length_ft": 120,
+    "beam_ft": 25,
+    "depth_ft": 7.5,
+    "block_coefficient": 1,
+    "light_draft_ft": 2.5,
+    "water_density_pcf": 64,
+    "fresh_water_density_pcf": 62.4,
+    "loaded_draft_ft": 4.5
+   },
+   "outputs": {
+    "cargo_tons": {
+     "value": 192.002,
+     "tolerance": {
+      "pct": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "barge-draft-displacement",
+   "source_publisher": "United States Naval Academy, Naval Architecture and Ocean Engineering Department",
+   "source_title": "EN400 Principles of Ship Performance, Chapter 3 Homework Solutions",
+   "source_edition_or_year": "update 30 May 2019",
+   "source_section_or_page": "Problem 3-6 part 3: loaded to 5 ft in salt water (64 lb/cu ft), the draft in fresh water (62.4 lb/cu ft) is T_fw = 5.13 ft. Tolerance 0.005 ft covers the 0.01 ft print.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "barge_length_ft": 120,
+    "beam_ft": 25,
+    "depth_ft": 7.5,
+    "block_coefficient": 1,
+    "light_draft_ft": 2.5,
+    "water_density_pcf": 64,
+    "fresh_water_density_pcf": 62.4,
+    "loaded_draft_ft": 5.0
+   },
+   "outputs": {
+    "fresh_water_draft_ft": {
+     "value": 5.13,
+     "tolerance": {
+      "abs": 0.005
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "slurry-critical-velocity",
+   "source_publisher": "The Australasian Institute of Mining and Metallurgy (AusIMM)",
+   "source_title": "Minerals Processing Toolbox: Slurry Pumping - Introduction (slurryp0503)",
+   "source_edition_or_year": "2005 (toolbox sheet 0503)",
+   "source_section_or_page": "Worked Example: D = 0.176 m (200 PN8 MDPE), S = 2.7, S_L = 1, F_L = 0.87 gives V_L = 0.87 sqrt(2 x 9.81 x 0.176 x (2.7 - 1)/1) = 2.11 m/s, entered as 6.923 ft/s; actual 2.8 m/s 'OK, is > 2.11'. Tolerance 0.3% covers the 2.11 print. Coarser/coarsest/upsized inputs are set to the printed values (not given separately).",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "pipe_diameter_in": 6.9291,
+    "solids_specific_gravity": 2.7,
+    "durand_coefficient": 0.87,
+    "operating_velocity_fps": 9.1864,
+    "coarser_coefficient": 0.87,
+    "coarsest_coefficient": 0.87,
+    "upsized_diameter_in": 6.9291
+   },
+   "outputs": {
+    "critical_velocity_fps": {
+     "value": 6.9226,
+     "tolerance": {
+      "pct": 0.3
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "dredge-production-rate",
+   "source_publisher": "The Australasian Institute of Mining and Metallurgy (AusIMM)",
+   "source_title": "Minerals Processing Toolbox: Slurry Pumping - Introduction (slurryp0503)",
+   "source_edition_or_year": "2005 (toolbox sheet 0503)",
+   "source_section_or_page": "Worked Example: slurry volume Q = 245 m3/h, slurry SG S_M = 1.28 t/m3, solids by volume C_V = 16.47%; pipe D = 0.176 m at V = 2.8 m/s (V = Q/A as printed). Q entered as 2.4033 cu ft/s. Tolerance 0.5% on flow covers the 3-figure 245 and 2.8 prints; 0.005 on SG covers the 1.28 print. Porosity, effective hours, and alternative concentration are not printed and do not affect these two outputs.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "pipe_diameter_in": 6.9291,
+    "velocity_fps": 9.1864,
+    "concentration_pct": 16.47,
+    "porosity": 0.4,
+    "solids_specific_gravity": 2.7,
+    "effective_hours": 20,
+    "alternative_concentration_pct": 20
+   },
+   "outputs": {
+    "flow_cfs": {
+     "value": 2.4034,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "slurry_specific_gravity": {
+     "value": 1.28,
+     "tolerance": {
+      "abs": 0.005
+     }
+    }
+   }
+  },
+  {
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "tile_id": "salt-application-rate",
+   "source_publisher": "North Dakota Local Technical Assistance Program (NDLTAP)",
+   "source_title": "Properties of Salt",
+   "source_edition_or_year": "undated handout, retrieved 2026-10-01 (ndltap.org/resources/downloads/properties-of-salt.pdf)",
+   "source_section_or_page": "Truck-load table, Straight Salt row: 10 CY load = 11.0 tons = 22,000 lb treats 220 lane miles at 100 lb/ln mi. Route entered as 1 lane-mile so passes per load = lane-miles per load. Lane-mile figures are printed as whole numbers (abs 0.5 covers that rounding).",
+   "inputs": {
+    "rate_lb_per_lane_mile": 100,
+    "route_lane_miles": 1,
+    "lot_area_ft2": 0,
+    "hopper_capacity_tons": 11,
+    "alt_rate_lb_per_lane_mile": 0
+   },
+   "outputs": {
+    "passes_per_load": {
+     "value": 220,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "hopper_lb": {
+     "value": 22000,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "tile_id": "salt-application-rate",
+   "source_publisher": "North Dakota Local Technical Assistance Program (NDLTAP)",
+   "source_title": "Properties of Salt",
+   "source_edition_or_year": "undated handout, retrieved 2026-10-01 (ndltap.org/resources/downloads/properties-of-salt.pdf)",
+   "source_section_or_page": "Truck-load table, Straight Salt row: 10 CY load = 11.0 tons = 22,000 lb treats 110 lane miles at 200 lb/ln mi. Route entered as 1 lane-mile so passes per load = lane-miles per load. Lane-mile figures are printed as whole numbers (abs 0.5 covers that rounding).",
+   "inputs": {
+    "rate_lb_per_lane_mile": 200,
+    "route_lane_miles": 1,
+    "lot_area_ft2": 0,
+    "hopper_capacity_tons": 11,
+    "alt_rate_lb_per_lane_mile": 0
+   },
+   "outputs": {
+    "passes_per_load": {
+     "value": 110,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "hopper_lb": {
+     "value": 22000,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "tile_id": "salt-application-rate",
+   "source_publisher": "North Dakota Local Technical Assistance Program (NDLTAP)",
+   "source_title": "Properties of Salt",
+   "source_edition_or_year": "undated handout, retrieved 2026-10-01 (ndltap.org/resources/downloads/properties-of-salt.pdf)",
+   "source_section_or_page": "Truck-load table, Straight Salt row: 10 CY load = 11.0 tons = 22,000 lb treats 73 lane miles at 300 lb/ln mi. Route entered as 1 lane-mile so passes per load = lane-miles per load. Lane-mile figures are printed as whole numbers (abs 0.5 covers that rounding).",
+   "inputs": {
+    "rate_lb_per_lane_mile": 300,
+    "route_lane_miles": 1,
+    "lot_area_ft2": 0,
+    "hopper_capacity_tons": 11,
+    "alt_rate_lb_per_lane_mile": 0
+   },
+   "outputs": {
+    "passes_per_load": {
+     "value": 73,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "hopper_lb": {
+     "value": 22000,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "tile_id": "salt-application-rate",
+   "source_publisher": "North Dakota Local Technical Assistance Program (NDLTAP)",
+   "source_title": "Properties of Salt",
+   "source_edition_or_year": "undated handout, retrieved 2026-10-01 (ndltap.org/resources/downloads/properties-of-salt.pdf)",
+   "source_section_or_page": "Truck-load table, Straight Salt row: 10 CY load = 11.0 tons = 22,000 lb treats 55 lane miles at 400 lb/ln mi. Route entered as 1 lane-mile so passes per load = lane-miles per load. Lane-mile figures are printed as whole numbers (abs 0.5 covers that rounding).",
+   "inputs": {
+    "rate_lb_per_lane_mile": 400,
+    "route_lane_miles": 1,
+    "lot_area_ft2": 0,
+    "hopper_capacity_tons": 11,
+    "alt_rate_lb_per_lane_mile": 0
+   },
+   "outputs": {
+    "passes_per_load": {
+     "value": 55,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "hopper_lb": {
+     "value": 22000,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "tile_id": "salt-application-rate",
+   "source_publisher": "Fortin Consulting Inc. for the Minnesota Pollution Control Agency",
+   "source_title": "Winter Parking Lot and Sidewalk Maintenance Manual",
+   "source_edition_or_year": "revised edition citing LRRB 2012 rates, retrieved 2026-10-01 (drscw.org copy)",
+   "source_section_or_page": "Fig. 14 gravity-flow calibration EXAMPLE: 0.4 lb in 10 ft over a 13 ft spread = 130 sq ft = 3.1 lb per 1,000 sq ft = 196 lb/lane mile (x 63.4). Entered 196 lb/ln mi over a 1,000 sq ft lot; printed 3.1 is rounded to 0.1 (abs 0.05).",
+   "inputs": {
+    "rate_lb_per_lane_mile": 196,
+    "route_lane_miles": 1,
+    "lot_area_ft2": 1000,
+    "hopper_capacity_tons": 1,
+    "alt_rate_lb_per_lane_mile": 0
+   },
+   "outputs": {
+    "lot_material_lb": {
+     "value": 3.1,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "tile_id": "salt-application-rate",
+   "source_publisher": "Fortin Consulting Inc. for the Minnesota Pollution Control Agency",
+   "source_title": "Winter Parking Lot and Sidewalk Maintenance Manual",
+   "source_edition_or_year": "revised edition citing LRRB 2012 rates, retrieved 2026-10-01 (drscw.org copy)",
+   "source_section_or_page": "'What if calibration is not a practice?' example: 2,000 sq ft sidewalk at 2.25 lb per 1,000 sq ft -> 'Measure about 4.5 lbs.' The 2.25 lb/1,000 sq ft rate is entered as 142.56 lb/lane mile (2.25 x 63.36, the 12 ft lane-mile). Printed 4.5 is 'about'; abs 0.05.",
+   "inputs": {
+    "rate_lb_per_lane_mile": 142.56,
+    "route_lane_miles": 1,
+    "lot_area_ft2": 2000,
+    "hopper_capacity_tons": 1,
+    "alt_rate_lb_per_lane_mile": 0
+   },
+   "outputs": {
+    "lot_material_lb": {
+     "value": 4.5,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "tile_id": "brine-batch-salinity",
+   "source_publisher": "Industrial H2O Solutions (industrialh2osolutions.com)",
+   "source_title": "Sodium Chloride Brine Tables for 60 F (15.5 C)",
+   "source_edition_or_year": "PDF uploaded 2019-04, retrieved 2026-10-01",
+   "source_section_or_page": "Row 88 salometer: SG 1.178, 23.23% NaCl by wt, 2.279 lb NaCl + 7.531 lb water per gal of brine, freezing begins -5.8 F. Density entered as 2.279 + 7.531 = 9.810 lb/gal; batch 1,000 gal. Table prints lb/gal to 3 decimals (x1000 -> abs 0.5 lb), salometer to whole degrees (abs 0.5), freeze to 0.1 F (abs 0.05).",
+   "inputs": {
+    "batch_gal": 1000,
+    "target_pct": 23.23,
+    "brine_density_lb_gal": 9.81,
+    "saturation_pct": 26.4,
+    "alt_pct": 0
+   },
+   "outputs": {
+    "salt_per_1000gal_lb": {
+     "value": 2279,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "water_lb": {
+     "value": 7531,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "salometer": {
+     "value": 88,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "freeze_point_f": {
+     "value": -5.8,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "tile_id": "ice-melt-working-temperature",
+   "source_publisher": "Minnesota Local Road Research Board / Minnesota DOT",
+   "source_title": "Minnesota Snow and Ice Control Field Handbook for Snowplow Operators",
+   "source_edition_or_year": "Manual Number 2005-01, August 2005",
+   "source_section_or_page": "p. 15 'Pounds of Ice Melted Per Pound of Salt': at 30 F one pound of NaCl melts 46.3 lbs of ice; 'It is not cost-efficient to apply salt (sodium chloride) at pavement temperatures less than 15 F.' Area set so 1 in of ice at 57.2 lb/cu ft weighs 46.3 lb, so product = 1 lb. Capacity printed to 0.1 lb; pct 0.5.",
+   "inputs": {
+    "area_ft2": 9.713286713286713,
+    "ice_thickness_in": 1,
+    "ice_density_lb_ft3": 57.2,
+    "pavement_temp_f": 30,
+    "capacity_lb_ice_per_lb": 46.3,
+    "alt_capacity_lb_ice_per_lb": 0,
+    "alt_temp_f": 20,
+    "practical_limit_f": 15,
+    "eutectic_f": -6
+   },
+   "outputs": {
+    "ice_mass_lb": {
+     "value": 46.3,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "product_lb": {
+     "value": 1,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "within_practical_limit": {
+     "value": 1,
+     "tolerance": {
+      "abs": 0
+     }
+    }
+   }
+  },
+  {
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "tile_id": "ice-melt-working-temperature",
+   "source_publisher": "Minnesota Local Road Research Board / Minnesota DOT",
+   "source_title": "Minnesota Snow and Ice Control Field Handbook for Snowplow Operators",
+   "source_edition_or_year": "Manual Number 2005-01, August 2005",
+   "source_section_or_page": "p. 15 'Pounds of Ice Melted Per Pound of Salt': at 20 F one pound of NaCl melts 8.6 lbs of ice; 'It is not cost-efficient to apply salt (sodium chloride) at pavement temperatures less than 15 F.' Area set so 1 in of ice at 57.2 lb/cu ft weighs 8.6 lb, so product = 1 lb. Capacity printed to 0.1 lb; pct 0.5.",
+   "inputs": {
+    "area_ft2": 1.8041958041958042,
+    "ice_thickness_in": 1,
+    "ice_density_lb_ft3": 57.2,
+    "pavement_temp_f": 20,
+    "capacity_lb_ice_per_lb": 8.6,
+    "alt_capacity_lb_ice_per_lb": 0,
+    "alt_temp_f": 20,
+    "practical_limit_f": 15,
+    "eutectic_f": -6
+   },
+   "outputs": {
+    "ice_mass_lb": {
+     "value": 8.6,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "product_lb": {
+     "value": 1,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "within_practical_limit": {
+     "value": 1,
+     "tolerance": {
+      "abs": 0
+     }
+    }
+   }
+  },
+  {
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "tile_id": "ice-melt-working-temperature",
+   "source_publisher": "Minnesota Local Road Research Board / Minnesota DOT",
+   "source_title": "Minnesota Snow and Ice Control Field Handbook for Snowplow Operators",
+   "source_edition_or_year": "Manual Number 2005-01, August 2005",
+   "source_section_or_page": "p. 15 'Pounds of Ice Melted Per Pound of Salt': at 10 F one pound of NaCl melts 4.9 lbs of ice; 'It is not cost-efficient to apply salt (sodium chloride) at pavement temperatures less than 15 F.' Area set so 1 in of ice at 57.2 lb/cu ft weighs 4.9 lb, so product = 1 lb. Capacity printed to 0.1 lb; pct 0.5.",
+   "inputs": {
+    "area_ft2": 1.027972027972028,
+    "ice_thickness_in": 1,
+    "ice_density_lb_ft3": 57.2,
+    "pavement_temp_f": 10,
+    "capacity_lb_ice_per_lb": 4.9,
+    "alt_capacity_lb_ice_per_lb": 0,
+    "alt_temp_f": 20,
+    "practical_limit_f": 15,
+    "eutectic_f": -6
+   },
+   "outputs": {
+    "ice_mass_lb": {
+     "value": 4.9,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "product_lb": {
+     "value": 1,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "within_practical_limit": {
+     "value": 0,
+     "tolerance": {
+      "abs": 0
+     }
+    }
+   }
+  },
+  {
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "tile_id": "walkway-clearing-productivity",
+   "source_publisher": "Duranta",
+   "source_title": "How to create an accurate snow removal estimate",
+   "source_edition_or_year": "blog post, 2025-09-02",
+   "source_section_or_page": "Step 5 example: 'Manual shoveling: $120/hr (2,000 sqft / 1,250 sqft / hr) = 1.6 hours'. All 2,000 sq ft is hand work by one shoveler; printed 1.6 h is exact (abs 0.05 for the one-decimal print).",
+   "inputs": {
+    "total_area_ft2": 2000,
+    "hand_area_ft2": 2000,
+    "blower_rate_ft2_hr": 12000,
+    "hand_rate_ft2_hr_person": 1250,
+    "crew_size": 1,
+    "service_window_hr": 2,
+    "blower_depth_factor": 1,
+    "hand_depth_factor": 1,
+    "icemelt_lb_per_1000ft2": 4,
+    "applications": 1
+   },
+   "outputs": {
+    "hand_hr": {
+     "value": 1.6,
+     "tolerance": {
+      "abs": 0.05
+     }
+    },
+    "crew_hr": {
+     "value": 1.6,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "tile_id": "walkway-clearing-productivity",
+   "source_publisher": "Fortin Consulting Inc. for the Minnesota Pollution Control Agency",
+   "source_title": "Winter Parking Lot and Sidewalk Maintenance Manual",
+   "source_edition_or_year": "revised edition citing LRRB 2012 rates, retrieved 2026-10-01 (drscw.org copy)",
+   "source_section_or_page": "'What if calibration is not a practice?' example: 20 F and rising, dry salt, sidewalk 2,000 sq ft, table rate 2.25 lb per 1,000 sq ft -> 'Measure about 4.5 lbs.' One application. Printed 4.5 is 'about'; abs 0.05.",
+   "inputs": {
+    "total_area_ft2": 2000,
+    "hand_area_ft2": 0,
+    "blower_rate_ft2_hr": 12000,
+    "hand_rate_ft2_hr_person": 1200,
+    "crew_size": 2,
+    "service_window_hr": 2,
+    "blower_depth_factor": 1,
+    "hand_depth_factor": 1,
+    "icemelt_lb_per_1000ft2": 2.25,
+    "applications": 1
+   },
+   "outputs": {
+    "icemelt_event_lb": {
+     "value": 4.5,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "tile_id": "snow-stacking-area",
+   "source_publisher": "JFS Engineering",
+   "source_title": "Flaky Logic: Snow Storage",
+   "source_edition_or_year": "blog post, undated (web.archive.org 2024 snapshot of jfs-eng.com/snow-storage/)",
+   "source_section_or_page": "Compaction ratio 5N:1C; '10 inches of snowfall with a 20 foot wide sidewalk and a 20 foot wide storefront. That's 67 cubic feet of snow.' Entered 400 sq ft, 10 in, fresh 5 / piled 25 lb/cu ft (the 5:1 ratio). Printed 67 is whole cu ft; abs 0.5.",
+   "inputs": {
+    "lot_area_ft2": 400,
+    "accumulation_in": 10,
+    "events": 1,
+    "fresh_density_lb_ft3": 5,
+    "pile_density_lb_ft3": 25,
+    "pile_height_ft": 12,
+    "side_slope_run_per_rise": 1,
+    "area_per_space_ft2": 300,
+    "allocated_pct": 5
+   },
+   "outputs": {
+    "pile_volume_ft3": {
+     "value": 67,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "tile_id": "pretreatment-bath-dragout",
+   "source_publisher": "Products Finishing (Gardner Business Media)",
+   "source_title": "The Analysis and Design of Rinsing Installations (R. A. Nagy), example borrowed from Durney",
+   "source_edition_or_year": "2000-07-01",
+   "source_section_or_page": "Multi-tank rinsing example: dragin 0.01 gpm, dilution 1/1000 -> single tank 10, counterflow two tanks 0.31, three tanks 0.10 (Eq. 5 Fn = Dp (Cp/Cn)^(1/n)). Dragout entered as 0.01 per period (0.01 gal/1,000 sq ft x 1,000 sq ft); the relation is linear so the gpm basis carries through. Bath volume 100 gal is a placeholder that no declared output uses. 0.31 is 0.316 cut to 2 decimals (abs 0.01); 0.10 abs 0.005.",
+   "inputs": {
+    "dragout_gal_per_1000ft2": 0.01,
+    "area_ft2_per_day": 1000,
+    "bath_volume_gal": 100,
+    "bath_concentrate_pct": 5,
+    "dilution_ratio": 1000,
+    "rinse_stages": 2
+   },
+   "outputs": {
+    "single_rinse_gal_day": {
+     "value": 10,
+     "tolerance": {
+      "abs": 0.05
+     }
+    },
+    "two_stage_gal_day": {
+     "value": 0.31,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "three_stage_gal_day": {
+     "value": 0.1,
+     "tolerance": {
+      "abs": 0.005
+     }
+    }
+   }
+  },
+  {
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "tile_id": "galvanize-coating-weight",
+   "source_publisher": "American Galvanizers Association",
+   "source_title": "Coating Thickness and Weight Conversions Simplified (Metric to Imperial)",
+   "source_edition_or_year": "galvanizeit.org knowledgebase, retrieved 2026-10-01",
+   "source_section_or_page": "Worked example: 75 (grade or um) x 0.03937 = 2.95 mils; 75 x 0.02316 = 1.74 oz/ft2. Steel tons and area per ton are placeholders that no declared output uses. Printed to 2 decimals; abs 0.005.",
+   "inputs": {
+    "coating_grade_um": 75,
+    "steel_tons": 1,
+    "area_per_ton_ft2": 100,
+    "alt_area_per_ton_ft2": 0
+   },
+   "outputs": {
+    "thickness_mils": {
+     "value": 2.95,
+     "tolerance": {
+      "abs": 0.005
+     }
+    },
+    "coating_oz_ft2": {
+     "value": 1.74,
+     "tolerance": {
+      "abs": 0.005
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "rack-power-density-airflow",
+   "source_publisher": "Upsite Technologies",
+   "source_title": "IT Equipment Delta T and Flow Rate: How They Impact Your Data Center (blog)",
+   "source_edition_or_year": "web page, retrieved 2026-10-01",
+   "source_section_or_page": "Worked comparison: ten 500 W pizza-box servers, 5 kW at 20 degF dT -> 790 CFM (CFM = 3.16 x W / dT); 16-blade chassis, 5 kW at 35 degF -> 451.4 CFM. Tile uses 3412/1.08 = 3.159; tolerance 0.1% covers the printed 3.16 rounding. Tile-only inputs (tile cfm) are not printed and not asserted.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "rack_load_kw": 5,
+    "equipment_delta_t_f": 20,
+    "standard_tile_cfm": 500,
+    "comparison_rack_kw": 5,
+    "high_flow_tile_cfm": 900,
+    "alternative_delta_t_f": 35
+   },
+   "outputs": {
+    "required_cfm": {
+     "value": 790,
+     "tolerance": {
+      "pct": 0.1
+     }
+    },
+    "alternative_delta_t_cfm": {
+     "value": 451.4,
+     "tolerance": {
+      "pct": 0.1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "rack-power-density-airflow",
+   "source_publisher": "Tate Access Floors",
+   "source_title": "Airflow Panels & Controls brochure (Tate Airflow Options for data center efficiency)",
+   "source_edition_or_year": "brochure, retrieved 2026-10-01",
+   "source_section_or_page": "Performance Charts footnote: cooling per rack based on CFM x capture index / 126 (CFM needed to cool 1 kW at 25 degF dT). Printed 126 is a rounded whole number; tolerance 0.5% covers it (exact 126.37). Tile cfm and comparison inputs are not printed and not asserted.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "rack_load_kw": 1,
+    "equipment_delta_t_f": 25,
+    "standard_tile_cfm": 746,
+    "comparison_rack_kw": 1,
+    "high_flow_tile_cfm": 2096,
+    "alternative_delta_t_f": 25
+   },
+   "outputs": {
+    "required_cfm": {
+     "value": 126,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "pdu-branch-loading",
+   "source_publisher": "Geist (Vertiv)",
+   "source_title": "How is the kW rating calculated for a 3 phase PDU on the products spec sheet? (FAQ)",
+   "source_edition_or_year": "web FAQ, retrieved 2026-10-01",
+   "source_section_or_page": "Example: 30A 3-phase unit at 208V: 208 x 24 (80% of 30A) x SQRT(3) = 8.6kW (printed figure is VA at unity PF, rounded to 0.1). Tolerance 1% covers the rounding (exact 8.646). Device draw is not printed and not asserted.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "line_voltage_v": 208,
+    "phase_configuration": "three_phase",
+    "breaker_rating_a": 30,
+    "continuous_load_pct": 80,
+    "power_factor": 1,
+    "device_draw_w": 450
+   },
+   "outputs": {
+    "usable_current_a": {
+     "value": 24,
+     "tolerance": {
+      "abs": 0
+     }
+    },
+    "branch_capacity_kva": {
+     "value": 8.6,
+     "tolerance": {
+      "pct": 1
+     }
+    },
+    "branch_capacity_kw": {
+     "value": 8.6,
+     "tolerance": {
+      "pct": 1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "datacenter-pue",
+   "source_publisher": "The Green Grid",
+   "source_title": "White Paper #49: PUE: A Comprehensive Examination of the Metric",
+   "source_edition_or_year": "2012 (v6)",
+   "source_section_or_page": "Section V, Figure 7 (p.37), Data Center A all-electric: 1,633,333 kWh purchased; IT 1,000,000 kWh; UPS/PDU losses 100,000 kWh; chiller plant 533,333 kWh; PUE = 1,633,333/1,000,000 = 1.63. Annual kWh entered as average kW (/8760); ratio unaffected. Tolerance abs 0.005 covers the 2-decimal rounding (exact 1.6333). Tariff, target and reduced-case inputs are not printed and not asserted.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "it_load_kw": 114.15525114155251,
+    "cooling_kw": 60.882762557077626,
+    "ups_loss_kw": 11.415525114155251,
+    "miscellaneous_kw": 0,
+    "tariff_per_kwh": 0.1,
+    "target_pue": 1.3,
+    "reduced_it_kw": 114.15525114155251,
+    "reduced_cooling_kw": 60.882762557077626,
+    "reduced_ups_loss_kw": 11.415525114155251
+   },
+   "outputs": {
+    "pue": {
+     "value": 1.63,
+     "tolerance": {
+      "abs": 0.005
+     }
+    },
+    "annual_energy_kwh": {
+     "value": 1633333,
+     "tolerance": {
+      "pct": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "damper-actuator-torque",
+   "source_publisher": "Honeywell",
+   "source_title": "Motor/Actuator Selection Guide 63-8419",
+   "source_edition_or_year": "63-8419",
+   "source_section_or_page": "Appendix A example (p.36): D640 damper 24 x 48 in = 8 sq ft x 6.2 lb-in/sq ft = 49.6 lb-in; with a 20% safety factor, 49.6 x 1.2 = 59.5 lb-in (or 60). Tolerance abs 0.05 covers the printed rounding of 59.52. Seal comparison skipped (0); selection not printed.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "damper_width_in": 24,
+    "damper_height_in": 48,
+    "torque_factor_in_lb_ft2": 6.2,
+    "sealed_torque_factor_in_lb_ft2": 0,
+    "safety_factor": 1.2
+   },
+   "outputs": {
+    "damper_area_ft2": {
+     "value": 8,
+     "tolerance": {
+      "abs": 0
+     }
+    },
+    "required_torque_in_lb": {
+     "value": 49.6,
+     "tolerance": {
+      "abs": 0.05
+     }
+    },
+    "design_torque_in_lb": {
+     "value": 59.5,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "damper-actuator-torque",
+   "source_publisher": "Belimo Aircontrols (USA)",
+   "source_title": "How to Select an Actuator for Damper Retrofit (P10406)",
+   "source_edition_or_year": "04/13",
+   "source_section_or_page": "Typical damper requirements and sizing example (p.4): square damper 24 x 12 in = 2 sq ft, opposed blade with edge seals 5 in-lb/sq ft, 2 x 5 = 10 in-lb, selects Belimo LF24-SR at 35 in-lb. No safety factor applied (SF 1). Exact arithmetic; no rounding.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "damper_width_in": 24,
+    "damper_height_in": 12,
+    "torque_factor_in_lb_ft2": 5,
+    "sealed_torque_factor_in_lb_ft2": 0,
+    "safety_factor": 1
+   },
+   "outputs": {
+    "damper_area_ft2": {
+     "value": 2,
+     "tolerance": {
+      "abs": 0
+     }
+    },
+    "required_torque_in_lb": {
+     "value": 10,
+     "tolerance": {
+      "abs": 0
+     }
+    },
+    "selected_actuator_in_lb": {
+     "value": 35,
+     "tolerance": {
+      "abs": 0
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "ups-module-redundancy",
+   "source_publisher": "American Power Conversion (Schneider Electric)",
+   "source_title": "White Paper #108: Making Large UPS Systems More Efficient",
+   "source_edition_or_year": "Rev 2007-1",
+   "source_section_or_page": "Tables 3 and 4: 300 kW load, $0.10/kWh, cooling 400 W per kW of heat (COP 2.5); delta conversion 1N at 94.9% (10-yr total $198,960 incl. cooling $56,846) vs 2N at 91.2% ($356,473 incl. cooling $101,849). Expected values are the printed 10-year differences divided by 10 (2N minus 1N): losses $11,251.4, cooling $4,500.3, total $15,751.3. The 1N slot carries the 1N efficiency. Tolerance 0.5% covers the printed efficiencies rounded to 0.1 point (tile -0.14%). Module rating and PF not printed for this comparison.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "it_load_kw": 300,
+    "power_factor": 1,
+    "module_rating_kva": 1000,
+    "n_plus_one_efficiency_pct": 94.9,
+    "two_n_efficiency_pct": 91.2,
+    "tariff_per_kwh": 0.1,
+    "cooling_cop": 2.5
+   },
+   "outputs": {
+    "annual_metered_delta": {
+     "value": 11251.4,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "annual_cooling_delta": {
+     "value": 4500.3,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "annual_total_penalty_delta": {
+     "value": 15751.3,
+     "tolerance": {
+      "pct": 0.5
      }
     }
    }

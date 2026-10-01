@@ -68,6 +68,10 @@ test("4-20 mA: 12 mA is mid-span, and the URL basis costs the turndown", () => {
   close(r.basis_ratio, r.turndown, "URL over span");
   const low = computeTransmitterSpanScaling({ lower_range_value: -50, upper_range_value: 150, upper_range_limit: 250, loop_ma: 4, accuracy_pct: 0.1, low_reading_value: 20, alt_upper_range_value: 25 });
   close(low.value_eng, -50, "4 mA is the lower range value");
+  // The low reading's place in the span counts from the LRV: 20 on -50..150
+  // is 35 % of span (until 2026-10-01 it read 10 %, counting from zero).
+  close(low.low_reading_pct_of_span, 35, "position from the LRV");
+  close(computeTransmitterSpanScaling({ lower_range_value: 50, upper_range_value: 250, upper_range_limit: 500, loop_ma: 12, accuracy_pct: 0.1, low_reading_value: 60, alt_upper_range_value: 0 }).low_reading_pct_of_span, 5, "60 on 50..250");
 });
 
 test("trend log: samples are points x rate x time, and the buffer loss is the overflow", () => {

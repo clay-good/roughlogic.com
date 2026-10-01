@@ -21,13 +21,14 @@ const rinseBase = { dragout_gal_per_1000ft2: 1.5, area_ft2_per_day: 20000, bath_
 
 // ---- independent references ----
 
-test("galvanizing: a mil of zinc on a square foot weighs what zinc's density says", () => {
-  // 0.001 in x 144 sq in = 0.144 cu in = 2.3597 cm^3; at 7.14 g/cm^3 that is
-  // 16.85 g, or 0.594 oz. ASTM A90's 1 oz/sq ft = 305 g/m^2 agrees within 0.2%.
-  const ozPerMil = 0.144 * 2.54 ** 3 * 7.14 / 28.349523125;
+test("galvanizing: the coating weight converts the way ASTM A123 and the AGA do", () => {
+  // AGA: "75 (grade or um) x 0.02316 = 1.74 oz/sq ft". Zinc's handbook density
+  // (7.14 g/cm^3, 0.594 oz per mil) runs 1% above the A123 tables.
+  const ozPerMil = 0.02316 * 25.4;
   const r = computeGalvanizeCoatingWeight({ coating_grade_um: 25.4, steel_tons: 1, area_per_ton_ft2: 400, alt_area_per_ton_ft2: 120 });
   within(r.coating_oz_ft2, ozPerMil, 0.1, "one mil");
-  const astm = 305 / 1e4 / 7.14 * 1e4 / 25.4; // g/m^2 -> um of zinc -> mils per oz/sq ft
+  within(computeGalvanizeCoatingWeight({ coating_grade_um: 75, steel_tons: 1, area_per_ton_ft2: 400, alt_area_per_ton_ft2: 120 }).coating_oz_ft2, 1.74, 0.2, "AGA grade 75");
+  const astm = 305 / 1e4 / 7.067 * 1e4 / 25.4; // g/m^2 -> um at A123's 7.067 g/m^2 per um -> mils per oz/sq ft
   within(1 / r.coating_oz_ft2, astm, 0.3, "mils per oz/sq ft");
 });
 

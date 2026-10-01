@@ -71,11 +71,12 @@ test("Rankine: Ka x Kp = 1, and Ka is one-third at 30 degrees", () => {
   within(r.ka, 1 / 3, 1e-9, "Ka");
   within(r.kp, 3, 1e-9, "Kp");
   close(r.ka * r.kp, 1, "reciprocal");
-  // The toe moment balances at the theoretical depth (spec-v1831's
-  // net-pressure simplification), and shear is zero at the maximum moment.
-  const D = r.theoretical_depth_ft;
-  within(r.net_passive_rate / 6 * D ** 3, r.active_force_plf * (D + 4), 1e-9, "toe moments");
-  close(r.net_passive_rate * r.depth_to_max_moment_ft ** 2 / 2, r.active_force_plf, "zero shear");
+  // The toe moment balances on the gross pressures (active on H + D against
+  // passive on D), and shear is zero at the maximum moment. The retained soil's
+  // active pressure keeps acting below the dredge line (USS manual p. 86).
+  const D = r.theoretical_depth_ft, z = r.depth_to_max_moment_ft;
+  within(r.kp * D ** 3, r.ka * (12 + D) ** 3, 1e-9, "toe moments");
+  within(r.kp * z ** 2, r.ka * (12 + z) ** 2, 1e-9, "zero shear");
 });
 
 // ---- balances the notes claim ----

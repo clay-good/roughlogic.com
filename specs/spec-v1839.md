@@ -11,7 +11,7 @@ Repository: github.com/clay-good/roughlogic.com -- US standards only.
 ## 1. Inheritance and conventions
 
 The v14 dimensional lint, bounds-fuzzer, worked-example registry, and reviewer signoff apply. The v18/v21
-contract: a non-positive route length, reel length, or slack allowance, a reel length exceeding the route, or a negative waste allowance returns `{ error }`; no numeric field is ever `Infinity`. Citation discipline
+contract: a non-positive route length, reel length, or slack allowance, or a negative waste allowance returns `{ error }` (a reel longer than the route is one pull with no splice point; amended 2026-10-01); no numeric field is ever `Infinity`. Citation discipline
 (v19/v22): the outside plant slack storage convention with the owner's construction standards and the cable manufacturer's handling limits named as governing, GOVERNANCE.general.
 
 The three doors are inherited, not rebuilt: the website through `renderToolView`, the local MCP server through

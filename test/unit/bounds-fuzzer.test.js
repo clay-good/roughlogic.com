@@ -53190,14 +53190,16 @@ test("bounds: spec-v1824 computeGalvanizeCoatingWeight -- pickup is an AREA quan
   // The spec's worked example, to its own printed precision.
   assert.ok(Math.abs(r.thickness_mils - 85 / 25.4) < 1e-12);
   assert.ok(Math.abs(r.thickness_mils - 3.35) < 0.005);
-  assert.ok(Math.abs(r.coating_oz_ft2 - 1.99) < 0.005);
+  // On the ASTM A123 / AGA conversion (um x 0.02316); the spec's 1.99 oz,
+  // 248 lb, 2.48%, 14.9 and 0.75 came from zinc's handbook density, 1% high.
+  assert.ok(Math.abs(r.coating_oz_ft2 - 1.9686) < 1e-9);
   assert.ok(Math.abs(r.total_area_ft2 - 2000) < 1e-9);
-  assert.ok(Math.abs(r.zinc_lb - 248) < 1);
-  assert.ok(Math.abs(r.pickup_pct - 2.48) < 0.01);
-  assert.ok(Math.abs(r.alt_zinc_lb_per_ton - 14.9) < 0.05);
-  assert.ok(Math.abs(r.alt_pickup_pct - 0.75) < 0.005);
-  // IDENTITY: the coating weight is exactly the zinc density conversion.
-  assert.ok(Math.abs(r.coating_oz_ft2 - r.thickness_mils * 0.5940) < 1e-12);
+  assert.ok(Math.abs(r.zinc_lb - 246.075) < 1e-6);
+  assert.ok(Math.abs(r.pickup_pct - 2.46075) < 1e-6);
+  assert.ok(Math.abs(r.alt_zinc_lb_per_ton - 14.7645) < 1e-6);
+  assert.ok(Math.abs(r.alt_pickup_pct - 0.738225) < 1e-6);
+  // IDENTITY: the coating weight is exactly the A123 / AGA conversion.
+  assert.ok(Math.abs(r.coating_oz_ft2 - r.thickness_mils * 0.02316 * 25.4) < 1e-12);
   // IDENTITY: zinc is area x coating weight, in pounds.
   assert.ok(Math.abs(r.zinc_lb - r.total_area_ft2 * r.coating_oz_ft2 / 16) < 1e-9);
   // IDENTITY: pickup is zinc over steel weight, and steel weight is tons x 2,000.
@@ -53213,7 +53215,7 @@ test("bounds: spec-v1824 computeGalvanizeCoatingWeight -- pickup is an AREA quan
   // 400 over 120 is 3.33, which is the spec's "3.3 times the zinc per ton".
   assert.ok(Math.abs(r.zinc_ratio - 400 / 120) < 1e-12);
   assert.ok(Math.abs(r.zinc_lb_per_ton / r.alt_zinc_lb_per_ton - r.zinc_ratio) < 1e-9);
-  assert.ok(Math.abs(r.zinc_delta_lb_per_ton - 34.8) < 0.1);
+  assert.ok(Math.abs(r.zinc_delta_lb_per_ton - 34.4505) < 1e-6);
   // IDENTITY: thickness and coating weight are both exactly linear in grade.
   const dbl = _v1824({ ...base, coating_grade_um: 170 });
   assert.ok(Math.abs(dbl.thickness_mils - 2 * r.thickness_mils) < 1e-12);
@@ -53894,7 +53896,7 @@ test("bounds: spec-v1820 computeTrendLogStorage -- the buffer overruns long befo
   // and the tile says so rather than reporting only a storage figure.
   assert.strictEqual(r.poll_overruns, true);
   assert.ok(/BUFFER OVERRUNS/.test(r.buffer_verdict));
-  assert.ok(/nothing reports an error/.test(r.buffer_verdict));
+  assert.ok(/nothing reports it/.test(r.buffer_verdict));
   // Poll exactly at the fill time loses nothing, and faster loses nothing.
   const atFill = _v1820({ ...base, poll_interval_min: 25 });
   assert.strictEqual(atFill.poll_overruns, false);
@@ -53994,16 +53996,18 @@ test("bounds: spec-v1822 computeDamperActuatorTorque -- the seals move the selec
     assert.ok(Math.abs(x.design_torque_in_lb - design) < 1e-9);
     if (x.selected_actuator_in_lb !== null) {
       assert.ok(x.selected_actuator_in_lb >= x.design_torque_in_lb - 1e-9);
-      for (const s of [35, 70, 140, 180]) {
+      for (const s of [35, 70, 140, 180, 360]) {
         if (s >= x.design_torque_in_lb - 1e-9) { assert.ok(x.selected_actuator_in_lb <= s); }
       }
     }
   }
   // A large damper exceeds every standard size and falls to multiple
   // actuators or a jackshaft rather than silently selecting the largest.
-  const big = _v1822({ ...base, damper_width_in: 96, damper_height_in: 72, sealed_torque_factor_in_lb_ft2: 0 });
-  assert.ok(Math.abs(big.damper_area_ft2 - 48) < 1e-12);
-  assert.ok(Math.abs(big.design_torque_in_lb - 360) < 1e-12);
+  // 360 in-lb is the top of the ladder (Belimo GMB), so 360 itself fits one.
+  assert.strictEqual(_v1822({ ...base, damper_width_in: 96, damper_height_in: 72, sealed_torque_factor_in_lb_ft2: 0 }).selected_actuator_in_lb, 360);
+  const big = _v1822({ ...base, damper_width_in: 96, damper_height_in: 96, sealed_torque_factor_in_lb_ft2: 0 });
+  assert.ok(Math.abs(big.damper_area_ft2 - 64) < 1e-12);
+  assert.ok(Math.abs(big.design_torque_in_lb - 480) < 1e-12);
   assert.strictEqual(big.selected_actuator_in_lb, null);
   assert.strictEqual(big.actuator_count, 2);
   assert.ok(/NO SINGLE ACTUATOR/.test(big.selection_verdict));
@@ -54129,7 +54133,9 @@ test("bounds: spec-v1839 computeFiberSlackStorage -- reel seams and restoration 
   assert.ok(Math.abs(r.total_slack_ft - 600) < 1e-9);
   assert.ok(Math.abs(r.cable_to_order_ft - 56070) < 1e-9);
   assert.ok(Math.abs(r.additional_restoration_slack_ft - r.splice_points * r.shortfall_per_splice_ft) < 1e-9);
-  for (const bad of [{ route_length_ft: 0 }, { usable_reel_length_ft: 60000 }, { slack_per_splice_ft: 0 }, { terminal_slack_ft: 0 }, { waste_pct: 100 }]) assert.ok(_v1839({ ...base, ...bad }).error);
+  for (const bad of [{ route_length_ft: 0 }, { usable_reel_length_ft: 0 }, { slack_per_splice_ft: 0 }, { terminal_slack_ft: 0 }, { waste_pct: 100 }]) assert.ok(_v1839({ ...base, ...bad }).error);
+  // A route shorter than one reel is a single pull: no splice points, not an error.
+  assert.equal(_v1839({ ...base, usable_reel_length_ft: 60000 }).splice_points, 0);
 });
 
 test("bounds: spec-v1840 computePonSplitLossBudget -- doubling the split consumes 3.0103 dB", () => {
@@ -54164,14 +54170,14 @@ test("bounds: spec-v1842 computeOpticalReturnLoss -- reflected powers add before
 });
 
 test("bounds: spec-v1843 computeCableJettingDistance -- exact target fill determines annulus and air", () => {
-  const base = { duct_id_mm: 10, cable_od_mm: 8.5, fill_min_pct: 40, fill_max_pct: 60, optimal_fill_pct: 50, air_velocity_m_s: 25, pressure_bar_absolute: 10 };
+  const base = { duct_id_mm: 10, cable_od_mm: 8.5, fill_min_pct: 50, fill_max_pct: 80, optimal_fill_pct: 65, air_velocity_m_s: 25, pressure_bar_absolute: 10 };
   const r = _v1843(base);
   assertFiniteNumericOutputs(r, "v1843");
-  assert.ok(Math.abs(r.fill_ratio_pct - 72.25) < 1e-9);
-  assert.ok(Math.abs(r.optimal_cable_od_mm - 10 * Math.sqrt(0.5)) < 1e-12);
-  assert.ok(Math.abs(r.optimal_free_air_l_min - 589.0486225480861) < 1e-9);
+  assert.ok(Math.abs(r.fill_ratio_pct - 85) < 1e-9);
+  assert.ok(Math.abs(r.optimal_cable_od_mm - 6.5) < 1e-12);
+  assert.ok(Math.abs(r.optimal_free_air_l_min - Math.PI / 4 * (100 - 42.25) * 25 * 0.06 * 10) < 1e-9);
   assert.strictEqual(r.fill_status, "ABOVE WINDOW");
-  for (const bad of [{ duct_id_mm: 0 }, { cable_od_mm: 10 }, { fill_min_pct: 70 }, { optimal_fill_pct: 70 }, { air_velocity_m_s: 0 }, { pressure_bar_absolute: 0 }]) assert.ok(_v1843({ ...base, ...bad }).error);
+  for (const bad of [{ duct_id_mm: 0 }, { cable_od_mm: 10 }, { fill_min_pct: 85 }, { optimal_fill_pct: 85 }, { air_velocity_m_s: 0 }, { pressure_bar_absolute: 0 }]) assert.ok(_v1843({ ...base, ...bad }).error);
 });
 
 test("bounds: spec-v1844 computeSpliceLossMismatch -- independent loss mechanisms add", () => {
@@ -54559,7 +54565,7 @@ test("bounds: spec-v1830 computeBargeDraftDisplacement -- tons per inch closes t
   assert.ok(_v1830({ ...base, beam_ft: Infinity }).error);
 });
 
-test("bounds: spec-v1831 computeSheetPilePenetration -- a 12 ft wall is a 23 ft pile", () => {
+test("bounds: spec-v1831 computeSheetPilePenetration -- a 12 ft wall is a 25 ft pile", () => {
   const base = { retained_height_ft: 12, friction_angle_deg: 32, unit_weight_pcf: 120, increase_factor_pct: 30, allowable_stress_psi: 30000 };
   const r = _v1831(base); assertFiniteNumericOutputs(r, "v1831");
   assert.ok(Math.abs(r.ka - 0.3072585245224685) < 1e-12);
@@ -54567,20 +54573,23 @@ test("bounds: spec-v1831 computeSheetPilePenetration -- a 12 ft wall is a 23 ft 
   // Ka and Kp are reciprocals for Rankine, which is the check on both at once.
   assert.ok(Math.abs(r.ka * r.kp - 1) < 1e-12);
   assert.ok(Math.abs(r.active_force_plf - 2654.713651874128) < 1e-9);
-  assert.ok(Math.abs(r.theoretical_depth_ft - 8.187659076403115) < 1e-7);
-  assert.ok(Math.abs(r.design_depth_ft - 10.64395679932405) < 1e-7);
-  assert.ok(Math.abs(r.total_length_ft - 22.64395679932405) < 1e-7);
-  // 47% of the steel is below the excavation and never seen -- the estimating
+  // Gross-pressure (Blum) balance; until 2026-10-01 the net-pressure version
+  // dropped gamma H Ka below the dredge line and read 8.19 ft / 17,476 ft-lb.
+  assert.ok(Math.abs(r.theoretical_depth_ft - 10.032100085813232) < 1e-7);
+  assert.ok(Math.abs(r.design_depth_ft - 13.041730111557202) < 1e-7);
+  assert.ok(Math.abs(r.total_length_ft - 25.0417301115572) < 1e-7);
+  // 52% of the steel is below the excavation and never seen -- the estimating
   // error the spec names.
-  assert.ok(Math.abs(r.embedment_share_pct - 47.00572825523932) < 1e-6);
-  // The bisection must actually satisfy the moment equation it solved.
-  const lhs = (r.net_passive_rate / 6) * Math.pow(r.theoretical_depth_ft, 3);
-  const rhs = r.active_force_plf * (r.theoretical_depth_ft + r.lever_arm_ft);
+  assert.ok(Math.abs(r.embedment_share_pct - 52.07998829736693) < 1e-6);
+  // The closed form must satisfy the toe moment balance it came from.
+  const lhs = r.kp * Math.pow(r.theoretical_depth_ft, 3);
+  const rhs = r.ka * Math.pow(12 + r.theoretical_depth_ft, 3);
   assert.ok(Math.abs(lhs - rhs) / rhs < 1e-9);
   // The moment peaks BELOW the dredge line, not at it.
   assert.ok(r.depth_to_max_moment_ft > 0);
-  assert.ok(Math.abs(r.max_moment_ftlb_per_ft - 17476.03026090847) < 1e-6);
-  assert.ok(Math.abs(r.section_modulus_in3_per_ft - 6.990412104363387) < 1e-9);
+  // Matches the USS Steel Sheet Piling Design Manual method's maximum moment.
+  assert.ok(Math.abs(r.max_moment_ftlb_per_ft - 22127.65002582661) < 1e-6);
+  assert.ok(Math.abs(r.section_modulus_in3_per_ft - 8.851060010330643) < 1e-9);
   // A zero increase leaves the design depth at the theoretical one.
   const bare = _v1831({ ...base, increase_factor_pct: 0 });
   assert.ok(Math.abs(bare.design_depth_ft - bare.theoretical_depth_ft) < 1e-9);
