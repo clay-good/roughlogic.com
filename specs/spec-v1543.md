@@ -69,6 +69,13 @@ elevation is changing between the two points, measuring against zero would repor
 defect. On a 4 in elevation running off over 200 ft, that is 1.24 in of designed change in 62 ft being read as
 warp that is not there.
 
+**Amended 2026-10-01.** The paragraph above has the regulation backwards. 49 CFR 213.63(a) limits "the
+difference in crosslevel between any two points less than 62 feet apart" -- the raw readings -- and 213.59(b)
+holds spiral runoff to those same limits, so designed runoff counts toward warp. The tile now judges the raw
+difference and reports the designed-change and deviation-from-design shares beside it. Readings 4.6 and 2.56 in
+against a design of 4.0 and 2.76 in deviate by only 0.80 in, but the warp is 2.04 in and fails a 1.5 in Class 5
+limit. A reading exactly at the limit passes ("may not be more than").
+
 ## 4. Scope and non-goals
 
 A warp calculation from readings the user supplies. It does not ship the FRA limit tables, which are set by

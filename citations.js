@@ -1630,8 +1630,8 @@ export const CITATIONS = {
     ],
   },
   "transformer-sizing": {
-    formula: "kVA = √3 × V_LL × I (three-phase) / V × I (single-phase); over-current protection per NEC 450.3.",
-    edition: NEC_2023 + " Section 450.3, Table 450.3(B).",
+    formula: "kVA = kW / power factor, rounded up to the next ANSI/IEEE C57 standard size; full-load current = kVA x 1000 / (√3 × V_LL) three-phase or kVA x 1000 / V single-phase, on each winding. Overcurrent protection (NEC 450.3) is not computed here.",
+    edition: NEC_2023 + " Article 450 by name; the standard kVA steps per ANSI/IEEE C57. Overcurrent protection per Section 450.3, Table 450.3(B), is a separate step this tile does not compute.",
     freeAccess: NEC_FREE,
     governance: GOVERNANCE.electrical,
     editionNote: NEC_DISCLOSURE,
@@ -1972,7 +1972,7 @@ export const CITATIONS = {
     governance: GOVERNANCE.electrical,
     editionNote: "Single-edition (NEMA MG-1 code-letter table; quarterly recheck).",
     assumptions: [
-      { name: "Code-letter table", value: "data/electrical/nema-mg1-code-letters.json keyed to A through V (midpoint of each range)", source: "NEMA MG-1 ranges; midpoint per Cummins T-030 Table 7" },
+      { name: "Code-letter table", value: "data/electrical/nema-mg1-code-letters.json keyed to A through V (midpoint of each range)", source: "NEMA MG-1 ranges, exact midpoints (Cummins T-030 Table 7 prints rounded averages and differs at A, 2, and S, 16)" },
       { name: "Default dip factor", value: "0.30 (30% voltage-dip criterion)", source: "engineering practice" },
       { name: "Generator transient reactance X'd", value: "0.25 per unit default (typical sets 0.15-0.30; the manufacturer's data sheet governs)", source: "engineering practice" },
       { name: "Frequent-start derate", value: "occasional 1.0 / frequent 1.15 / continuous 1.30", source: "manufacturer typical" },
@@ -1981,7 +1981,7 @@ export const CITATIONS = {
   // --- v7 Group B extensions (utilities 238 through 241) ---
 
   "water-hammer-surge": {
-    formula: "Joukowsky surge: a = sqrt(K/rho) / sqrt(1 + (K × D)/(E × t)); dP = rho × a × dV. Reflection time = 2L/a; rapid closure when t_close < 2L/a.",
+    formula: "Joukowsky surge: a = sqrt(K/rho) / sqrt(1 + (K × D)/(E × t)), D the INSIDE diameter (outside diameter less two walls); dP = rho × a × dV. Reflection time = 2L/a; rapid closure when t_close <= 2L/a.",
     edition: "Joukowsky (1898) classical-fluids result by name; ASCE Manual of Practice 49 by name; manufacturer pipe-elastic-property values from data/plumbing/pipe-elastic-properties.json.",
     freeAccess: "Joukowsky derivation free in published fluid-mechanics texts. ASCE MOP-49 licensed.",
     governance: GOVERNANCE.plumbing,
@@ -9075,7 +9075,7 @@ export const CITATIONS = {
     ],
   },
   "selective-coordination-screen": {
-    formula: "fuses: ratio = upstream_rating / downstream_rating, coordinated when ratio >= the family's published minimum, and then to the interrupting rating. breakers: pickup = upstream_rating x instantaneous_multiplier, and coordination holds only up to that current.",
+    formula: "fuses: ratio = upstream_rating / downstream_rating, coordinated when ratio >= the family's published minimum, and then to the interrupting rating. breakers: pickup = upstream_rating x instantaneous_multiplier, the low edge of its band = pickup x (1 - tolerance), and coordination holds only up to that low edge (Bussmann, Selective Coordination, 2008: a 400 A breaker at 5x can trip at 2000 x 0.75 = 1500 A).",
     edition: "Selective coordination screened by device type -- fuses against the manufacturer's published minimum ratio for the family (commonly 2:1), which holds to the interrupting rating, and breakers only up to the upstream instantaneous pickup, above which both devices open. Cited by name; the ratio and the instantaneous setting are the manufacturer's published values and are entered rather than bundled. A screen, never a study: the published time-current curves, a full coordination study, and the engineer of record govern.",
     freeAccess: "Both screens are comparisons on values the user reads off the manufacturer's published data; no ratio table or time-current curve is reproduced.",
     governance: GOVERNANCE.general,
@@ -9087,7 +9087,7 @@ export const CITATIONS = {
     ],
   },
   "fuse-let-through": {
-    formula: "withstand_a = 0.0297 x conductor_cmil x sqrt(log10((damage_temp_c + 234) / (initial_temp_c + 234)) / duration_s); withstand_i2t = withstand_a^2 x duration_s; margin = withstand_i2t / device let-through I2t; and separately, device peak let-through against equipment peak withstand.",
+    formula: "withstand_a = conductor_cmil x sqrt(0.0297 x log10((damage_temp_c + 234) / (initial_temp_c + 234)) / duration_s) (ICEA P-32-382; 0.0297 inside the root since 2026-09-19); withstand_i2t = withstand_a^2 x duration_s; margin = withstand_i2t / device let-through I2t; and separately, device peak let-through against equipment peak withstand.",
     edition: "Conductor thermal withstand by the public-domain ICEA / Onderdonk adiabatic relation (copper constants 0.0297 and 234), compared against the current-limiting device's published let-through I-squared-t and peak current, by name. The let-through values are read off the manufacturer's curve and entered. A series rating is a TESTED, listed, marked combination per NEC 240.86 and cannot be calculated from a let-through curve. The manufacturer's curves, the equipment's marked ratings, and the engineer of record govern.",
     freeAccess: "The Onderdonk relation is public domain; the let-through values come from the device manufacturer's published curve and are entered by the user.",
     governance: GOVERNANCE.general,
@@ -15000,13 +15000,13 @@ export const CITATIONS = {
     ],
   },
   "track-warp-fra-class": {
-    formula: "deviation at a point = measured cross level - designed cross level; warp = deviation at A - deviation at B; margin = entered limit - absolute warp; the same twist scaled to a 31 ft base = absolute warp x 31 / distance.",
-    edition: "The cross-level and warp definitions, referenced to the DESIGNED cross level, by name, with 49 CFR 213 named as the source of the limits by class of track. The limit tables are not reproduced; the applicable limit is entered. The qualified track inspector and the track owner govern.",
+    formula: "warp = |cross level at A - cross level at B| (49 CFR 213.63(a), the raw readings); split into designed change = designed A - designed B and deviation twist = (measured A - designed A) - (measured B - designed B); pass when warp <= the entered limit; margin = entered limit - warp; the same twist scaled to a 31 ft base = absolute warp x 31 / distance.",
+    edition: "49 CFR 213.63(a) (as amended at 91 FR 22735, April 28, 2026): warp is the difference in cross level between any two points less than 62 ft apart; 213.59(b) holds spiral runoff to the same limits. 49 CFR 213 is named as the source of the limits by class of track. The limit tables are not reproduced; the applicable limit is entered. The qualified track inspector and the track owner govern.",
     freeAccess: "49 CFR 213 is US federal regulation and public domain; this is subtraction on the user's own level-board readings against a limit they supply.",
     governance: GOVERNANCE.general,
-    editionNote: "Warp is a twist, and a twist unloads a wheel. A rigid truck bridging a section of track that rises on one rail and falls on the other has one wheel carrying much less than its share, and a lightly loaded wheel on a curve with lateral force is the wheel that climbs. That is the derailment mechanism, and it is why warp limits tighten faster with class than most other parameters. The measurement detail that decides whether a reading means anything is the reference. On a curve the track is SUPPOSED to have cross level -- that is the superelevation -- so warp is the deviation from the designed elevation profile, not from level. Measuring warp against zero on an elevated curve reads the elevation itself as a defect and produces nonsense. Equally, elevation being run in through a spiral is a designed and continuous change of cross level, which is why the runoff rate through a spiral has its own separate limit, and why measuring a spiral against zero reports the intended runoff as warp that is not there. The reading also has to be paired with the measurement length, since 31 ft and 62 ft carry different limits, which is why the same twist is reported on both bases here. The FRA limit tables themselves are set by class and by parameter in the adopted regulation and are not shipped.",
+    editionNote: "Warp is a twist, and a twist unloads a wheel. A rigid truck bridging a section of track that rises on one rail and falls on the other has one wheel carrying much less than its share, and a lightly loaded wheel on a curve with lateral force is the wheel that climbs. That is the derailment mechanism, and it is why warp limits tighten faster with class than most other parameters. The measurement detail that decides what a reading means is the reference. FRA warp is the raw difference in cross level between the two points: on a curve of constant elevation the superelevation cancels out of it, while on a spiral the designed runoff stays in it, because the wheel feels planned twist and unplanned twist alike, and 213.59(b) holds the runoff to the same limits. Until 2026-10-01 this tile judged only the deviation from the designed cross level, which passed a spiral reading 2.04 in of cross-level change against a 1.5 in limit. The deviation share is still reported, because it is the part surfacing can fix. The reading also has to be paired with the measurement length, since the rule is written per 62 ft and the pre-1998 spiral exception per 31 ft, which is why the same twist is reported on both bases here. The FRA limit tables themselves are set by class and by parameter in the adopted regulation and are not shipped.",
     assumptions: [
-      { name: "The reference is the designed cross level", value: "measuring against zero on an elevated curve reads the superelevation itself as a defect", source: "49 CFR 213" },
+      { name: "Warp is the raw cross-level difference", value: "the designed runoff on a spiral counts toward the limit; constant superelevation cancels out", source: "49 CFR 213.63(a), 213.59(b)" },
       { name: "Measurement length matters", value: "31 ft and 62 ft warp carry different limits; the length must be stated with the reading", source: "49 CFR 213" },
       { name: "Limits are entered, not shipped", value: "the class limits are set by the adopted regulation and must come from it", source: "49 CFR 213" },
     ],
@@ -15148,13 +15148,13 @@ export const CITATIONS = {
     ],
   },
   "governor-tripping-speed": {
-    formula: "minimum mechanical trip = rated speed x the code minimum percentage, commonly 115; margin = (trip - rated) / rated; the electrical overspeed switch must trip below the mechanical trip; buffer impact speed = the mechanical trip.",
-    edition: "The ASME A17.1 governor tripping-speed limits by name -- a mechanical trip at least 115% of rated speed under a ceiling that tightens as rated speed rises, with the electrical switch set below it. Both bounds are entered from the adopted code table, not reproduced.",
+    formula: "minimum mechanical trip = rated speed x the code minimum percentage, commonly 115; margin = (trip - rated) / rated; the electrical overspeed switch must open at not more than 90% of the mechanical trip above 150 fpm up to 500 fpm (and with static control), 95% above 500 fpm, 100% at 150 fpm or less or with a speed-reducing switch (A17.1 2.18.4.1.2; California Title 8 3036(d)(4)); buffer impact speed = the mechanical trip.",
+    edition: "The ASME A17.1 governor tripping-speed limits by name -- a mechanical trip at least 115% of rated speed under a ceiling that tightens as rated speed rises, with the electrical switch opening at not more than 90% or 95% of it by rated speed (A17.1 2.18.4.1.2). Both trip bounds are entered from the adopted code table, not reproduced; the switch percentages are shipped.",
     freeAccess: "Percentage comparison against code values the user supplies; no A17.1 table is reproduced.",
     governance: GOVERNANCE.general,
     editionNote: "Two devices operate at two speeds and the order matters. The electrical overspeed switch trips first, cutting power and setting the brake, which stops most overspeed events without the safety ever engaging. Only if the car continues to accelerate does the governor mechanically grip its rope and pull the safety, which wedges the car against the guide rails -- a violent event that takes the car out of service and requires inspection afterward. A governor with the two settings inverted, or with the electrical trip inoperative, removes the gentle stop and leaves only the violent one. The margin band is bounded at both ends for good reasons. The minimum ensures the governor does not trip on normal operation, including the modest overspeed that occurs on a heavily loaded down run. The maximum exists because a safety must engage before the car reaches a speed at which the buffers below it cannot absorb the impact, so governor trip, safety type, and buffer stroke are a set rather than independent choices. The governor rope runs at car speed regardless of the suspension roping, which is worth stating because a mechanic used to thinking in 2 to 1 terms can misread what the governor is seeing. Verification is by test at the intervals the code requires: a governor is a mechanical device with springs and pivots that age, and a setting recorded on a tag is not evidence of a setting that still holds.",
     assumptions: [
-      { name: "The electrical trip must come first", value: "inverted settings send every overspeed straight to a safety application", source: "ASME A17.1" },
+      { name: "The electrical trip must come first, with room", value: "not more than 90% of the trip to 500 fpm (and static control), 95% above; 100% only with a speed-reducing switch", source: "ASME A17.1 2.18.4.1.2" },
       { name: "Trip, safety and buffer are one set", value: "raising the trip invalidates the buffer selection beneath it", source: "ASME A17.1" },
       { name: "A tag is not evidence", value: "tripping speed is verified by test at the intervals the code requires", source: "ASME A17.2" },
     ],
@@ -15496,7 +15496,7 @@ export const CITATIONS = {
   },
   "hoist-rope-safety-factor": {
     formula: "rope weight = rope count x length x weight per foot; total suspended load = conveyance + payload + that rope weight; factor of safety = (count x breaking strength) / the total; the depth at which the factor reaches a minimum inverts the same relation.",
-    edition: "The suspended-load factor of safety by name, with the statutory minimum entered because it varies by service and depth and is highest for personnel hoisting, and with the rope retirement criteria named as independent of it. MSHA, the applicable ASME and state hoisting requirements, and the mine's hoisting plan govern.",
+    edition: "The suspended-load factor of safety by name, with the statutory minimum entered because it varies by drum type and rope length (MSHA 30 CFR 57.19021 and 75.1431: winding drum 7.0 - 0.001 L below 3,000 ft and 4.0 at 3,000 ft or more; friction drum 7.0 - 0.0005 L below 4,000 ft and 5.0 beyond; no separate personnel figure), and with the rope retirement criteria named as independent of it. MSHA, the applicable ASME and state hoisting requirements, and the mine's hoisting plan govern.",
     freeAccess: "Division on the user's own conveyance, rope, and payload data against a minimum they supply; no statutory table is reproduced.",
     governance: GOVERNANCE.general,
     editionNote: "On a shallow shaft the rope's own weight is a footnote; on a deep one it can exceed the payload, and because it hangs from the sheave the whole of it is carried at the top where the factor of safety is checked. A calculation that includes cage and people but not rope produces a comfortable-looking number that is simply wrong, and it is wrong in the UNSAFE direction and by more as the shaft gets deeper. Every rope hangs the full length, so the rope weight carries the rope COUNT as a multiplier, and dropping that count is the same class of error as dropping the rope entirely. Depth, not payload, is what consumes the margin: doubling the shaft on the same cage and the same people takes a substantial bite out of the factor. The second half matters more in practice. A rope with an adequate factor of safety can still be due for retirement, because ropes are retired on CONDITION and on TIME rather than on calculated stress -- broken wires per rope lay, loss of diameter, corrosion, distortion, and in many jurisdictions a maximum service life regardless of condition. A hoist rope that passes this arithmetic and fails the broken-wire count comes out of service, and no factor of safety argument changes that. This is static: it does not model dynamic loads from acceleration, deceleration, emergency braking, or shock, which the statutory factors are partly there to cover, and it does not evaluate friction hoist traction, which is a separate and governing check on a Koepe installation.",
@@ -22084,7 +22084,7 @@ export const CITATIONS = {
     ],
   },
   "nesc-district-loading": {
-    formula: "iced diameter = bare + 2 x radial ice; ice weight per foot = (pi/4)(iced^2 - bare^2)/144 x 57.3 lb/cu ft; vertical = bare weight + ice weight; horizontal = wind pressure x iced diameter / 12; resultant = sqrt(vertical^2 + horizontal^2) + k.",
+    formula: "iced diameter = bare + 2 x radial ice; ice weight per foot = (pi/4)(iced^2 - bare^2)/144 x 57 lb/cu ft (NESC Rule 230B, 913 kg/m3); vertical = bare weight + ice weight; horizontal = wind pressure x iced diameter / 12; resultant = sqrt(vertical^2 + horizontal^2) + k.",
     edition: "The NESC district loading combination CITED BY NAME, not reproduced: the Heavy, Medium, and Light district values (0.50/0.25/0.00 in radial ice, 4/4/9 psf, k of 0.30/0.20/0.05 lb/ft, at 0/15/30 degF) are the district definitions, and which district applies is geography and the adopted edition. Overload capacity factors and the separate extreme-wind and extreme-ice cases are NOT applied. The applicable NESC edition, the utility's construction standards, and a qualified line designer govern.",
     freeAccess: "Geometry and a vector sum on a conductor's own published diameter and weight; no district map is reproduced.",
     governance: GOVERNANCE.general,
@@ -23970,7 +23970,7 @@ export const CITATIONS = {
     edition: "ANSI 32-step regulator ranging and the line drop compensation relation, by name, with ANSI C57.15 named. One single-phase step regulator, steady state. The time delay is not set here and reverse power flow is out of scope. ANSI C57.15, IEEE 1783, the regulator manufacturer's control manual, and the utility's voltage regulation practice govern.",
     freeAccess: "A multiplication by the ANSI step fraction and one trigonometric term; no manufacturer control table is reproduced.",
     governance: GOVERNANCE.general,
-    editionNote: "The bandwidth is a deadband, not a target: the control does nothing while the sensed voltage stays inside it and moves one tap when it leaves. The hard rule is that the bandwidth must exceed one tap step, because a deadband narrower than the regulator's own correction overshoots on every operation and has to come straight back -- hunting, which spends a tap changer's rated operations in a fraction of its life. Practice is about one and a half to two steps, which on a 120 V base is 1.5 to 2.0 V against a 0.750 V step. Line drop compensation subtracts a synthetic drop proportional to load current so the control holds voltage at a point out on the feeder; the R and X dials are in volts at rated CT secondary current.",
+    editionNote: "The bandwidth is a deadband, not a target: the control does nothing while the sensed voltage stays inside it and moves one tap when it leaves. The hard rule is that the bandwidth must exceed one tap step, because a deadband narrower than the regulator's own correction overshoots on every operation and has to come straight back -- hunting, which spends a tap changer's rated operations in a fraction of its life. Practice is a 1.5 or 2.0 V band on a 120 V base (RUS Bulletin 1724D-114), two to about two and two-thirds steps of 0.750 V. Line drop compensation subtracts a synthetic drop proportional to load current so the control holds voltage at a point out on the feeder; the R and X dials are in volts at rated CT secondary current.",
     assumptions: [
       { name: "One single-phase regulator, steady state", value: "cascaded regulators need the time delay this does not set", source: "IEEE 1783" },
       { name: "The R and X settings are entered", value: "they should be derived from the impedance to the regulation point", source: "the utility's voltage regulation practice" },

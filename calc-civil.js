@@ -1226,8 +1226,12 @@ export function computePavementStructuralNumber({ ac_thickness_in = 0, ac_coeffi
   const sn_base = base_coefficient * base_thickness_in * base_drainage;
   const sn_subbase = subbase_coefficient * subbase_thickness_in * subbase_drainage;
   const sn_total = sn_surface + sn_base + sn_subbase;
-  const sn_margin = required_sn > 0 ? sn_total - required_sn : null;
-  const meets_required = required_sn > 0 ? sn_total >= required_sn : null;
+  // A section that exactly meets the requirement meets it: 6.5 in AC + 2 in base
+  // summed to 3.1399999999999997 against 3.14 and read SHORT by 0.00 until
+  // 2026-10-01, so the margin is snapped at float noise.
+  const _raw_margin = sn_total - required_sn;
+  const sn_margin = required_sn > 0 ? (Math.abs(_raw_margin) < 1e-9 * Math.max(1, required_sn) ? 0 : _raw_margin) : null;
+  const meets_required = required_sn > 0 ? sn_margin >= 0 : null;
   // The substitution question, which is what the coefficients exist for.
   const base_rate = base_coefficient * base_drainage;
   const base_per_inch_of_ac_in = base_rate > 0 ? ac_coefficient / base_rate : null;

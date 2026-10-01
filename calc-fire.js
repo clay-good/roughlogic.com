@@ -2279,11 +2279,11 @@ FIRE_RENDERERS["radiant-exposure-separation"] = _simpleRenderer({
     { key: "heat_release_kw", label: "Fire heat release rate (kW)", kind: "number" },
     { key: "radiative_fraction", label: "Radiative fraction (0-1)", kind: "number" },
     { key: "target_flux_kwm2", label: "Target radiant flux (kW/m2)", kind: "number" },
-    { key: "evaluate_distance_ft", label: "Distance to evaluate the flux at (ft, 0 to skip)", kind: "number" },
+    { key: "evaluate_distance_ft", label: "Distance from the fire's CENTER to the target (ft, 0 to skip; NUREG-1805 R = edge gap + fire diameter / 2)", kind: "number" },
   ],
   outputs: [
     { key: "p", id: "rdex-out-p", label: "Radiated power", value: (r) => fmt(r.radiated_power_kw, 0) + " kW" },
-    { key: "s", id: "rdex-out-s", label: "Separation for the target flux", value: (r) => fmt(r.separation_m, 2) + " m (" + fmt(r.separation_ft, 1) + " ft)" },
+    { key: "s", id: "rdex-out-s", label: "Separation for the target flux, from the fire's center (subtract half the fire diameter for the edge gap)", value: (r) => fmt(r.separation_m, 2) + " m (" + fmt(r.separation_ft, 1) + " ft)" },
     { key: "f", id: "rdex-out-f", label: "Flux at the stated distance", value: (r) => r.flux_at_distance === null ? "-" : fmt(r.flux_at_distance, 2) + " kW/m2" },
     { key: "n", id: "rdex-out-n", label: "Note", value: (r) => r.note },
   ],

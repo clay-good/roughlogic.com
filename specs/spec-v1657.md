@@ -77,6 +77,12 @@ field adjustment.
 Verification is by test, at the intervals the code requires -- a governor is a mechanical device with springs and
 pivots that age, and a setting recorded on a tag is not evidence of a setting that still holds.
 
+**Amended 2026-10-01.** "A modest margin under it" is not enough. A17.1 2.18.4.1.2 (printed the same in
+California Title 8 3036(d)(4)) has the switch open at not more than 90% of the trip speed above 150 fpm up to
+500 fpm, 95% above 500 fpm, 90% with static control at any speed, and 100% only with a speed-reducing switch.
+The worked example's 550 fpm against a 575 fpm trip is 95.7% and too close; it now uses 515 fpm. A
+`switch_limit_pct` input (0 = by rated speed) carries the static-control and speed-reducing-switch cases.
+
 ## 4. Scope and non-goals
 
 A limit comparison against code values the user supplies. The minimum and maximum tripping speeds, the

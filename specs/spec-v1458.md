@@ -68,6 +68,7 @@ The three NESC district cases and a custom case, on one bare conductor. It does 
 location -- that is the NESC district map and the jurisdiction's adoption -- and it does not apply the extreme
 wind, extreme ice, or combined ice-and-wind district cases that Rule 250C and 250D impose on taller structures,
 nor the overload capacity factors that convert these loads into design loads by grade of construction. The 57.3
-lb/cu ft ice density is the NESC value; real accreted ice varies widely and rime ice is much lighter. Bundled
+lb/cu ft ice density is the NESC value (amended 2026-10-01: NESC Rule 230B and RUS 1724E-200 use 57 lb/cu ft,
+913 kg/cu m, and the tile now does too); real accreted ice varies widely and rime ice is much lighter. Bundled
 conductors, unequal ice shedding between spans, and galloping are out of scope. The adopted NESC edition, the
 loading district for the location, and the utility's construction standard govern.

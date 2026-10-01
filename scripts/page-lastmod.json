@@ -2,7 +2,7 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "c4f90174563e20e5",
+      "sha": "efabff1863d89c60",
       "date": "2026-10-01"
     },
     "/tools/": {
@@ -2518,8 +2518,8 @@
       "date": "2026-09-29"
     },
     "/tools/dust-deflagration-vent-area/": {
-      "sha": "57d6bd6cb20288ea",
-      "date": "2026-09-29"
+      "sha": "d640f98278b7970f",
+      "date": "2026-10-01"
     },
     "/tools/dynamic-compression-ratio/": {
       "sha": "60d0fceb58c6b14b",
@@ -3214,8 +3214,8 @@
       "date": "2026-09-29"
     },
     "/tools/fuse-let-through/": {
-      "sha": "394ddfbee79866a3",
-      "date": "2026-09-29"
+      "sha": "fa63fc2676fdd757",
+      "date": "2026-10-01"
     },
     "/tools/future-value-of-annuity/": {
       "sha": "ba4ffa7bd0792f5b",
@@ -3370,8 +3370,8 @@
       "date": "2026-09-30"
     },
     "/tools/generator-motor-starting/": {
-      "sha": "3773ceddcd0c5291",
-      "date": "2026-09-30"
+      "sha": "d3e50828029349e1",
+      "date": "2026-10-01"
     },
     "/tools/generator-part-load-fuel/": {
       "sha": "6586a756321de038",
@@ -3426,8 +3426,8 @@
       "date": "2026-09-29"
     },
     "/tools/governor-tripping-speed/": {
-      "sha": "bce79f36d755d6bc",
-      "date": "2026-09-29"
+      "sha": "44aa9244a1b536b6",
+      "date": "2026-10-01"
     },
     "/tools/gpa-calculator/": {
       "sha": "34eef2664c4c077c",
@@ -3730,8 +3730,8 @@
       "date": "2026-09-29"
     },
     "/tools/hoist-rope-safety-factor/": {
-      "sha": "6e49b5d41f048071",
-      "date": "2026-09-29"
+      "sha": "cf40c85a466cb177",
+      "date": "2026-10-01"
     },
     "/tools/hoistway-venting/": {
       "sha": "b946d2e69b02b22c",
@@ -4926,8 +4926,8 @@
       "date": "2026-09-29"
     },
     "/tools/nesc-district-loading/": {
-      "sha": "5393c549d042dba9",
-      "date": "2026-09-29"
+      "sha": "cfb08c49a8ce1bc3",
+      "date": "2026-10-01"
     },
     "/tools/net-effective-rent/": {
       "sha": "bbeb715b16e6da3b",
@@ -5942,8 +5942,8 @@
       "date": "2026-09-29"
     },
     "/tools/radiant-exposure-separation/": {
-      "sha": "c4d03e742e278cac",
-      "date": "2026-09-29"
+      "sha": "dd7726073ad45c56",
+      "date": "2026-10-01"
     },
     "/tools/radiant-floor-output/": {
       "sha": "f3c3a6fd432f4ab8",
@@ -6238,8 +6238,8 @@
       "date": "2026-09-29"
     },
     "/tools/regulator-tap-bandwidth/": {
-      "sha": "eb8327775f44d0a7",
-      "date": "2026-09-29"
+      "sha": "7d6ae1eb56bd0be0",
+      "date": "2026-10-01"
     },
     "/tools/reineke-sdi/": {
       "sha": "3a44077797278c07",
@@ -6750,8 +6750,8 @@
       "date": "2026-09-29"
     },
     "/tools/selective-coordination-screen/": {
-      "sha": "ec5361ae835c69f3",
-      "date": "2026-09-29"
+      "sha": "12f6fd8548c9900c",
+      "date": "2026-10-01"
     },
     "/tools/self-leveler-bags/": {
       "sha": "05ff85cb67586e3b",
@@ -8146,8 +8146,8 @@
       "date": "2026-09-29"
     },
     "/tools/track-warp-fra-class/": {
-      "sha": "b7074c2aba7cdad3",
-      "date": "2026-09-29"
+      "sha": "3baa3c3e88abebec",
+      "date": "2026-10-01"
     },
     "/tools/traction-roping-ratio/": {
       "sha": "e983dbd4e6b6e463",
@@ -8198,8 +8198,8 @@
       "date": "2026-09-29"
     },
     "/tools/transformer-sizing/": {
-      "sha": "5d27731deb43bcdd",
-      "date": "2026-09-29"
+      "sha": "05754e8559674249",
+      "date": "2026-10-01"
     },
     "/tools/transformer-turns-ratio/": {
       "sha": "f04f8eaf522b804a",
@@ -8646,8 +8646,8 @@
       "date": "2026-09-29"
     },
     "/tools/water-hammer-surge/": {
-      "sha": "1f4992165ae97d1c",
-      "date": "2026-09-29"
+      "sha": "749d3f959e13b930",
+      "date": "2026-10-01"
     },
     "/tools/water-heater-input/": {
       "sha": "68e5005833763908",

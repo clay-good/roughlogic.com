@@ -264,7 +264,9 @@ export function computeRailWearLimit({ new_head_height_in = 0, new_head_width_in
   if (!(tonnage_mgt > 0)) return { error: "Tonnage since installation must be positive (MGT)." };
   const combined_wear_in = vertical_wear_in + gauge_face_wear_in / 2;
   const remaining_in = combined_limit_in - combined_wear_in;
-  const condemned = combined_wear_in >= combined_limit_in;
+  // "At or past" the limit condemns; 0.3 + 0.3 / 2 summed to 0.44999999999999996
+  // and read keep against 0.45 until 2026-10-01.
+  const condemned = combined_wear_in >= combined_limit_in * (1 - 1e-9);
   // Rectangular screen of the metal removed: the vertical loss across the
   // full head width, plus the gauge-face loss over what head height is left.
   const lost_area_in2 = vertical_wear_in * new_head_width_in + gauge_face_wear_in * (new_head_height_in - vertical_wear_in);
@@ -307,30 +309,39 @@ RAIL_RENDERERS["rail-wear-condemning-limit"] = _simpleRenderer({
 
 // ===================== spec-v1543: cross-level, warp, and the class limit =====================
 
-// dims: in { measured_a_in: L, designed_a_in: L, measured_b_in: L, designed_b_in: L, distance_ft: L, warp_limit_in: L } out: { deviation_a_in: L, deviation_b_in: L, warp_in: L, margin_in: L, warp_per_31ft_in: L, pct_of_limit: dimensionless }
+// dims: in { measured_a_in: L, designed_a_in: L, measured_b_in: L, designed_b_in: L, distance_ft: L, warp_limit_in: L } out: { deviation_a_in: L, deviation_b_in: L, warp_in: L, designed_change_in: L, crosslevel_difference_in: L, margin_in: L, warp_per_31ft_in: L, pct_of_limit: dimensionless }
 export function computeTrackWarp({ measured_a_in = 0, designed_a_in = 0, measured_b_in = 0, designed_b_in = 0, distance_ft = 0, warp_limit_in = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(distance_ft > 0)) return { error: "Distance between the two points must be positive." };
   if (!(warp_limit_in > 0)) return { error: "Applicable warp limit must be positive." };
   const deviation_a_in = measured_a_in - designed_a_in;
   const deviation_b_in = measured_b_in - designed_b_in;
+  // 49 CFR 213.63(a) limits "the difference in crosslevel between any two
+  // points", the raw readings with any designed runoff in them; 213.59(b)
+  // holds spiral runoff to those same surface limits. Until 2026-10-01 the
+  // verdict judged only the deviation from design, so a spiral reading 2.04 in
+  // of crosslevel change against a 1.5 in Class 5 limit passed at 0.80 in.
+  // The deviation twist is still reported: it is the share maintenance owns.
   const warp_in = deviation_a_in - deviation_b_in;
-  const warp_magnitude_in = Math.abs(warp_in);
+  const designed_change_in = designed_a_in - designed_b_in;
+  const crosslevel_difference_in = measured_a_in - measured_b_in;
+  const warp_magnitude_in = Math.abs(crosslevel_difference_in);
   const margin_in = warp_limit_in - warp_magnitude_in;
-  const pass = warp_magnitude_in <= warp_limit_in;
+  // "May not be more than": a reading AT the limit passes (1e-9 absorbs float error).
+  const pass = warp_magnitude_in <= warp_limit_in * (1 + 1e-9);
   const warp_per_31ft_in = warp_magnitude_in * 31 / distance_ft;
   const pct_of_limit = (warp_magnitude_in / warp_limit_in) * 100;
-  const against_zero_in = Math.abs(measured_a_in - measured_b_in);
+  const against_zero_in = warp_magnitude_in;
   return {
-    deviation_a_in, deviation_b_in, warp_in, warp_magnitude_in, margin_in, pass,
+    deviation_a_in, deviation_b_in, warp_in, designed_change_in, crosslevel_difference_in, warp_magnitude_in, margin_in, pass,
     warp_per_31ft_in, pct_of_limit, against_zero_in,
     verdict: pass ? "PASS -- inside the entered limit" : "FAIL -- over the entered limit",
-    note: "Warp is a twist, and a twist unloads a wheel. A rigid truck bridging track that rises on one rail and falls on the other has one wheel carrying much less than its share, and a lightly loaded wheel on a curve with lateral force is the wheel that climbs. That is why warp limits tighten faster with class than most other parameters. The reference is the whole exercise: on a curve the track is SUPPOSED to have cross level, so warp is deviation from the DESIGNED elevation profile, not from level. Measured against zero on an elevated curve the elevation itself reads as a defect, and on a spiral the intended runoff reads as warp that is not there. The FRA limit tables are not shipped here; the limit for the class and the measurement length has to be entered from 49 CFR 213 as adopted. Gauge, alignment, and surface each have their own limits and any one of them can independently restrict speed, and special limits apply near a joint, on a bridge, and through a turnout. Track geometry defects are a derailment hazard: 49 CFR 213, the qualified track inspector, and the track owner govern.",
+    note: "Warp is a twist, and a twist unloads a wheel. A rigid truck bridging track that rises on one rail and falls on the other has one wheel carrying much less than its share, and a lightly loaded wheel on a curve with lateral force is the wheel that climbs. That is why warp limits tighten faster with class than most other parameters. FRA warp is the raw difference in cross level between the two points (49 CFR 213.63(a)): on a curve of constant elevation the superelevation cancels out of it, but on a spiral the designed runoff is part of the twist the wheel feels, and 213.59(b) holds the runoff to these same limits. So the verdict judges the raw difference, and the split shows how much of it is the design (fixed only by a longer spiral or a speed restriction) and how much is deviation from design (fixed by surfacing). The FRA limit tables are not shipped here; the limit for the class and the measurement length has to be entered from 49 CFR 213 as adopted. Gauge, alignment, and surface each have their own limits and any one of them can independently restrict speed, and special limits apply near a joint, on a bridge, and through a turnout. Track geometry defects are a derailment hazard: 49 CFR 213, the qualified track inspector, and the track owner govern.",
   };
 }
 const trackWarpExample = { inputs: { measured_a_in: 4.6, designed_a_in: 4.0, measured_b_in: 3.2, designed_b_in: 4.0, distance_ft: 62, warp_limit_in: 1.75 } };
 RAIL_RENDERERS["track-warp-fra-class"] = _simpleRenderer({
-  citation: "Citation: the cross-level and warp definitions -- warp is the change in cross-level deviation between two points a stated distance apart, referenced to the DESIGNED cross level -- with 49 CFR 213 named as the source of the limits by class of track. The limit tables are not reproduced; the applicable limit is entered. The qualified track inspector and the track owner govern.",
+  citation: "Citation: 49 CFR 213.63(a) -- warp is the difference in cross level between any two points less than 62 ft apart, the raw readings, with spiral runoff held to the same limits by 213.59(b); the deviation from the designed cross level is reported as the maintenance share -- with 49 CFR 213 named as the source of the limits by class of track. The limit tables are not reproduced; the applicable limit is entered. The qualified track inspector and the track owner govern.",
   example: trackWarpExample.inputs,
   fields: [
     { key: "measured_a_in", label: "Measured cross level at A (in)", kind: "number", default: 4.6, attrs: { step: "any" } },
@@ -343,10 +354,10 @@ RAIL_RENDERERS["track-warp-fra-class"] = _simpleRenderer({
   outputs: [
     { key: "a", id: "twf-out-a", label: "Cross level deviation at A", value: (r) => fmt(r.deviation_a_in, 2) + " in" },
     { key: "b", id: "twf-out-b", label: "Cross level deviation at B", value: (r) => fmt(r.deviation_b_in, 2) + " in" },
-    { key: "w", id: "twf-out-w", label: "Warp over the entered distance", value: (r) => fmt(r.warp_magnitude_in, 2) + " in" },
+    { key: "w", id: "twf-out-w", label: "Warp: the difference in cross level over the entered distance (49 CFR 213.63)", value: (r) => fmt(r.warp_magnitude_in, 2) + " in" },
     { key: "v", id: "twf-out-v", label: "Against the entered limit", value: (r) => r.verdict + ", margin " + fmt(r.margin_in, 2) + " in (" + fmt(r.pct_of_limit, 0) + "% of limit)" },
     { key: "s", id: "twf-out-s", label: "Same twist scaled to a 31 ft base", value: (r) => fmt(r.warp_per_31ft_in, 2) + " in" },
-    { key: "z", id: "twf-out-z", label: "What measuring against zero would have read", value: (r) => fmt(r.against_zero_in, 2) + " in" },
+    { key: "z", id: "twf-out-z", label: "Of which the designed runoff / the deviation from design", value: (r) => fmt(r.designed_change_in, 2) + " in / " + fmt(r.warp_in, 2) + " in" },
     { key: "n", id: "twf-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeTrackWarp,

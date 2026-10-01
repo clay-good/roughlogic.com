@@ -315,7 +315,7 @@ export function computeBlastAirblastOverpressure({ distance_ft = 0, charge_per_d
     note: "The cube root is the physical difference from ground vibration. Airblast is an expanding spherical pressure wave in air, so it scales with the cube root of energy, while ground vibration scales with the square root -- which means charge weight has LESS leverage on airblast than on vibration, and halving a charge buys about a quarter more scaled distance where the same halving buys about forty percent on the ground side. What matters more is confinement and weather. Confinement dominates. A properly stemmed hole releases almost nothing to the air; a hole with short stemming, an exposed detonating cord trunkline, a mud seam that vents, or an unstemmed secondary charge can be tens of decibels worse for the same pounds, and because decibels are logarithmic, 20 dB is a factor of ten in pressure. No adjustment to the pattern buys that back: the fix is stemming, covered trunklines, and not shooting into a wind or an inversion. Weather is the other multiplier, and a temperature inversion or a wind toward the neighbours can focus airblast well above any flat-ground prediction, which is why blast plans carry wind and inversion restrictions that no formula replaces. The constants depend heavily on confinement and this cannot know whether a hole will vent. It does not address ground vibration, flyrock, or the structure-response question of what overpressure actually damages what, and decibel limits and their measurement weighting differ between jurisdictions. Blasting is a licensed activity: the blaster in charge, the state and federal explosives regulations, MSHA or OSHA jurisdiction, and the site's blast plan govern.",
   };
 }
-const airblastExample = { inputs: { distance_ft: 1200, charge_per_delay_lb: 340, airblast_k: 0.02, airblast_b: 1.2, limit_db: 133 } };
+const airblastExample = { inputs: { distance_ft: 1200, charge_per_delay_lb: 340, airblast_k: 0.2, airblast_b: 1.2, limit_db: 133, confinement_penalty_db: 20 } };
 MINING_RENDERERS["blast-airblast-overpressure"] = _simpleRenderer({
   citation: "Citation: the cube-root scaled distance SD = distance / cube root of the charge per delay, the overpressure relation P = K x SD raised to minus b, and the decibel conversion 20 log10(P / 2.9e-9 psi), by name. Site constants depend heavily on confinement and are entered. The blaster in charge and the site's blast plan govern.",
   example: airblastExample.inputs,
@@ -358,8 +358,8 @@ export function computeBlastStemmingLength({ burden_ft = 0, hole_diameter_in = 0
   const by_diameter_ft = diameter_multiple * hole_diameter_in / 12;
   const governing_ft = Math.max(by_burden_ft, by_diameter_ft);
   const achieved_ratio = proposed_stemming_ft / burden_ft;
-  const meets_governing = proposed_stemming_ft >= governing_ft;
-  const flyrock_risk = achieved_ratio < burden_ratio_low;
+  const meets_governing = proposed_stemming_ft >= governing_ft * (1 - 1e-9);
+  const flyrock_risk = achieved_ratio < burden_ratio_low * (1 - 1e-9);
   const shortfall_ft = Math.max(0, governing_ft - proposed_stemming_ft);
   const stone_min_in = hole_diameter_in / 20;
   const stone_max_in = hole_diameter_in / 10;
@@ -1006,16 +1006,17 @@ export function computeHoistRopeSafetyFactor({ conveyance_lb = 0, people_count =
   return {
     rope_weight_lb, payload_lb, total_load_lb, rope_share_pct, breaking_total_lb,
     factor_of_safety, fs_without_rope, overstatement, margin,
-    pass: factor_of_safety >= minimum_fs,
+    // At the minimum passes; 1e-9 absorbs float error in the quotient.
+    pass: factor_of_safety >= minimum_fs * (1 - 1e-9),
     max_payload_lb: Math.max(0, max_payload_lb),
     depth_at_limit_ft: Math.max(0, depth_at_limit_ft),
-    verdict: factor_of_safety >= minimum_fs ? "above the entered statutory minimum" : "BELOW the entered statutory minimum",
+    verdict: factor_of_safety >= minimum_fs * (1 - 1e-9) ? "at or above the entered statutory minimum" : "BELOW the entered statutory minimum",
     note: "On a shallow shaft the rope's own weight is a footnote; on a deep one it can exceed the payload, and because it hangs from the sheave the whole of it is carried at the top where the factor of safety is checked. A calculation that includes the cage and the people but not the rope produces a comfortable-looking number that is simply wrong, and it is wrong in the UNSAFE direction and by more as the shaft gets deeper. Note also that every rope hangs the full length, so the rope weight carries the rope COUNT as a multiplier -- dropping it is the same class of error as dropping the rope entirely. Depth, not payload, is what consumes the margin: doubling the shaft depth on the same cage and the same people takes a substantial bite out of the factor of safety. The second half matters more in practice. A rope with an adequate factor of safety can still be due for retirement, because ropes are retired on CONDITION and on TIME rather than on calculated stress: broken wires per rope lay, loss of diameter, corrosion, distortion, and in many jurisdictions a maximum service life regardless of condition. A hoist rope that passes this arithmetic and fails the broken-wire count comes out of service, and no factor of safety argument changes that. This is a static calculation. It does not model dynamic loads from acceleration, deceleration, emergency braking, or shock, all of which add substantially and which the statutory factors are partly there to cover; it does not evaluate friction hoist traction, which is a separate and governing check on a Koepe installation, or rope stretch, sheave and drum diameter ratios and their effect on rope life, attachments and terminations, or the brake system. It does not perform the statutory rope inspection. Hoisting people is among the most heavily regulated activities in mining: MSHA, the applicable ASME and state hoisting requirements, the hoist and rope manufacturers, and the mine's hoisting plan govern.",
   };
 }
 const hoistRopeExample = { inputs: { conveyance_lb: 4200, people_count: 8, person_weight_lb: 180, rope_length_ft: 1400, rope_weight_per_ft: 1.8, rope_count: 4, rope_breaking_lb: 128000, minimum_fs: 8 } };
 MINING_RENDERERS["hoist-rope-safety-factor"] = _simpleRenderer({
-  citation: "Citation: the suspended-load factor of safety -- (rope count x breaking strength) / (conveyance + payload + rope weight below the sheave), where rope weight = count x length x weight per foot -- with the required minimum entered because it varies by rope service and depth: for winding-drum hoist ropes MSHA 30 CFR 57.19021 and 75.1431 set 7.0 - 0.001 x the rope length in ft (5.6 at 1,400 ft), with no separate higher figure for personnel. The default 8 is stricter than that rule. MSHA and the mine's hoisting plan govern.",
+  citation: "Citation: the suspended-load factor of safety -- (rope count x breaking strength) / (conveyance + payload + rope weight below the sheave), where rope weight = count x length x weight per foot -- with the required minimum entered because it varies by rope service and depth: for winding-drum hoist ropes MSHA 30 CFR 57.19021 and 75.1431 set 7.0 - 0.001 x the rope length in ft below 3,000 ft (5.6 at 1,400 ft) and 4.0 at 3,000 ft or more, and for friction-drum ropes 7.0 - 0.0005 x the length below 4,000 ft and 5.0 beyond, with no separate higher figure for personnel. The default 8 is stricter than that rule. MSHA and the mine's hoisting plan govern.",
   example: hoistRopeExample.inputs,
   fields: [
     { key: "conveyance_lb", label: "Conveyance (cage or skip) weight (lb)", kind: "number", default: 4200 },
@@ -1025,7 +1026,7 @@ MINING_RENDERERS["hoist-rope-safety-factor"] = _simpleRenderer({
     { key: "rope_weight_per_ft", label: "Rope weight (lb per ft, each)", kind: "number", default: 1.8 },
     { key: "rope_count", label: "Number of ropes", kind: "number", default: 4 },
     { key: "rope_breaking_lb", label: "Rope breaking strength (lb, each)", kind: "number", default: 128000 },
-    { key: "minimum_fs", label: "Required factor of safety (MSHA winding drum: 7.0 - 0.001 x length ft; default 8 is stricter)", kind: "number", default: 8 },
+    { key: "minimum_fs", label: "Required factor of safety (MSHA winding drum: 7.0 - 0.001 x length ft under 3,000 ft, 4.0 at 3,000 ft or more; friction drum: 7.0 - 0.0005 x length under 4,000 ft, 5.0 beyond; default 8 is stricter)", kind: "number", default: 8 },
   ],
   outputs: [
     { key: "w", id: "hrs-out-w", label: "Rope weight below the sheave", value: (r) => fmt(r.rope_weight_lb, 0) + " lb -- " + fmt(r.rope_share_pct, 0) + "% of the suspended load" },

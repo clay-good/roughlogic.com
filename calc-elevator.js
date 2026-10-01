@@ -626,8 +626,8 @@ ELEVATOR_RENDERERS["door-closing-energy"] = _simpleRenderer({
 
 // ===================== spec-v1657: overspeed governor tripping speed =====================
 
-// dims: in { rated_speed_fpm: L T^-1, electrical_trip_fpm: L T^-1, mechanical_trip_fpm: L T^-1, code_minimum_pct: dimensionless, code_maximum_fpm: L T^-1 } out: { minimum_trip_fpm: L T^-1, mechanical_margin_pct: dimensionless, electrical_margin_pct: dimensionless, headroom_fpm: L T^-1, implied_buffer_stroke_in: L }
-export function computeGovernorTrippingSpeed({ rated_speed_fpm = 0, electrical_trip_fpm = 0, mechanical_trip_fpm = 0, code_minimum_pct = 115, code_maximum_fpm = 0 } = {}) {
+// dims: in { rated_speed_fpm: L T^-1, electrical_trip_fpm: L T^-1, mechanical_trip_fpm: L T^-1, code_minimum_pct: dimensionless, code_maximum_fpm: L T^-1, switch_limit_pct: dimensionless } out: { minimum_trip_fpm: L T^-1, switch_max_fpm: L T^-1, switch_pct_of_trip: dimensionless, mechanical_margin_pct: dimensionless, electrical_margin_pct: dimensionless, headroom_fpm: L T^-1, implied_buffer_stroke_in: L }
+export function computeGovernorTrippingSpeed({ rated_speed_fpm = 0, electrical_trip_fpm = 0, mechanical_trip_fpm = 0, code_minimum_pct = 115, code_maximum_fpm = 0, switch_limit_pct = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   // Unit / range guard added 2026-09-26 after printed-example probing.
   if (Number(arguments[0]?.rated_speed_fpm) > 0 && Number(arguments[0]?.rated_speed_fpm) < 25) return { error: "Enter speeds in feet per minute (500), not meters per second." };
@@ -641,31 +641,44 @@ export function computeGovernorTrippingSpeed({ rated_speed_fpm = 0, electrical_t
   const mechanical_margin_pct = (mechanical_trip_fpm - rated_speed_fpm) / rated_speed_fpm * 100;
   const electrical_margin_pct = (electrical_trip_fpm - rated_speed_fpm) / rated_speed_fpm * 100;
   const in_band = mechanical_trip_fpm >= minimum_trip_fpm && mechanical_trip_fpm <= code_maximum_fpm;
+  // A17.1 2.18.4.1.2 (California Title 8 3036(d)(4) prints the same rule): the
+  // overspeed switch opens at not more than 90% of the trip speed above 150 fpm
+  // up to 500 fpm, 95% above 500 fpm, 90% at any speed with static control, and
+  // up to 100% only with a speed-reducing switch. Until 2026-10-01 the tile
+  // checked only that the switch came first, and passed 620 against a 625 trip.
+  if (!(switch_limit_pct >= 0 && switch_limit_pct <= 100)) return { error: "Switch limit must be 0 (set by rated speed) to 100 percent of the trip speed." };
+  const switch_limit_used_pct = switch_limit_pct > 0 ? switch_limit_pct : rated_speed_fpm <= 150 ? 100 : rated_speed_fpm <= 500 ? 90 : 95;
+  const switch_max_fpm = mechanical_trip_fpm * switch_limit_used_pct / 100;
+  const switch_pct_of_trip = electrical_trip_fpm / mechanical_trip_fpm * 100;
+  const switch_ok = electrical_trip_fpm <= switch_max_fpm * (1 + 1e-9);
   const ordering_ok = electrical_trip_fpm < mechanical_trip_fpm;
   const headroom_fpm = code_maximum_fpm - mechanical_trip_fpm;
   const impact_speed_fps = mechanical_trip_fpm / 60;
   const implied_buffer_stroke_in = impact_speed_fps * impact_speed_fps / (2 * _G_FPS2) * 12;
   return {
     minimum_trip_fpm, mechanical_margin_pct, electrical_margin_pct, in_band, ordering_ok,
+    switch_limit_used_pct, switch_max_fpm, switch_pct_of_trip, switch_ok,
     headroom_fpm, impact_speed_fps, implied_buffer_stroke_in,
     band_verdict: in_band ? "inside the entered code band"
       : mechanical_trip_fpm < minimum_trip_fpm ? "BELOW the code minimum for this rated speed"
         : "ABOVE the code maximum for this rated speed",
-    order_verdict: ordering_ok ? "electrical trips first, as it must"
-      : "INVERTED -- the electrical trip is at or above the mechanical one, so every overspeed goes straight to a safety application",
-    note: "Two devices operate at two speeds and the order matters. The electrical overspeed switch trips first, cutting power and setting the brake, which stops most overspeed events without the safety ever engaging. Only if the car continues to accelerate does the governor mechanically grip its rope and pull the safety, which wedges the car against the guide rails -- a violent event that takes the car out of service and requires inspection afterward. A governor with the two settings inverted, or with the electrical trip inoperative, removes the gentle stop and leaves only the violent one. The margin band is bounded at both ends for good reasons. The minimum, commonly 115 percent of rated speed, keeps the governor from tripping on normal operation including the modest overspeed of a heavily loaded down run. The maximum exists because a safety must engage before the car reaches a speed at which the buffers below it cannot absorb the impact, so governor trip, safety type, and buffer stroke are a SET rather than independent choices -- which is why raising a trip speed to stop nuisance trips invalidates the buffer selection beneath it, and why governor settings are not a field adjustment. The governor rope runs at car speed regardless of the suspension roping ratio, which is worth stating because a mechanic used to thinking in 2 to 1 terms can misread what the governor is seeing. Verification is by test at the intervals the code requires: a governor is a mechanical device with springs and pivots that age, and a setting recorded on a tag is not evidence of a setting that still holds. The minimum and maximum are entered from the adopted code rather than shipped here. ASME A17.1 and A17.2, the equipment manufacturer, the elevator authority having jurisdiction, and a licensed elevator mechanic govern.",
+    order_verdict: !ordering_ok ? "INVERTED -- the electrical trip is at or above the mechanical one, so every overspeed goes straight to a safety application"
+      : switch_ok ? "electrical opens first at " + (Math.round(switch_pct_of_trip * 10) / 10) + "% of the mechanical trip, within the " + switch_limit_used_pct + "% allowed"
+      : "TOO CLOSE -- the switch opens at " + (Math.round(switch_pct_of_trip * 10) / 10) + "% of the mechanical trip, over the " + switch_limit_used_pct + "% allowed (" + (Math.round(switch_max_fpm * 10) / 10) + " fpm); the car can reach the safety before power is cut",
+    note: "Two devices operate at two speeds and the order matters. The electrical overspeed switch trips first, cutting power and setting the brake, which stops most overspeed events without the safety ever engaging. Only if the car continues to accelerate does the governor mechanically grip its rope and pull the safety, which wedges the car against the guide rails -- a violent event that takes the car out of service and requires inspection afterward. A governor with the two settings inverted, or with the electrical trip inoperative, removes the gentle stop and leaves only the violent one -- and so does a switch set just under the trip, because the car is still accelerating while the brake sets. A17.1 2.18.4.1.2 therefore has the switch open at not more than 90 percent of the trip speed above 150 fpm up to 500 fpm, 95 percent above 500 fpm, and 90 percent with static control at any speed; 100 percent is allowed only with a speed-reducing switch. A switch limit of 0 applies the rated-speed rule; enter 90 for static control or 100 with a speed-reducing switch. The margin band is bounded at both ends for good reasons. The minimum, commonly 115 percent of rated speed, keeps the governor from tripping on normal operation including the modest overspeed of a heavily loaded down run. The maximum exists because a safety must engage before the car reaches a speed at which the buffers below it cannot absorb the impact, so governor trip, safety type, and buffer stroke are a SET rather than independent choices -- which is why raising a trip speed to stop nuisance trips invalidates the buffer selection beneath it, and why governor settings are not a field adjustment. The governor rope runs at car speed regardless of the suspension roping ratio, which is worth stating because a mechanic used to thinking in 2 to 1 terms can misread what the governor is seeing. Verification is by test at the intervals the code requires: a governor is a mechanical device with springs and pivots that age, and a setting recorded on a tag is not evidence of a setting that still holds. The minimum and maximum are entered from the adopted code rather than shipped here. ASME A17.1 and A17.2, the equipment manufacturer, the elevator authority having jurisdiction, and a licensed elevator mechanic govern.",
   };
 }
-const governorTripExample = { inputs: { rated_speed_fpm: 500, electrical_trip_fpm: 550, mechanical_trip_fpm: 575, code_minimum_pct: 115, code_maximum_fpm: 625 } };
+const governorTripExample = { inputs: { rated_speed_fpm: 500, electrical_trip_fpm: 515, mechanical_trip_fpm: 575, code_minimum_pct: 115, code_maximum_fpm: 625, switch_limit_pct: 0 } };
 ELEVATOR_RENDERERS["governor-tripping-speed"] = _simpleRenderer({
-  citation: "Citation: the ASME A17.1 governor tripping-speed limits by name -- a mechanical trip at least 115 percent of rated speed, under a ceiling that tightens as rated speed rises, with the electrical overspeed switch set below the mechanical trip. Both bounds are entered from the adopted code table. The elevator authority having jurisdiction and a licensed elevator mechanic govern.",
+  citation: "Citation: the ASME A17.1 governor tripping-speed limits by name -- a mechanical trip at least 115 percent of rated speed, under a ceiling that tightens as rated speed rises, with the electrical overspeed switch opening at not more than 90 percent of the trip (150 to 500 fpm, or static control), 95 percent (above 500 fpm), or 100 percent (with a speed-reducing switch) per A17.1 2.18.4.1.2. Both trip bounds are entered from the adopted code table. The elevator authority having jurisdiction and a licensed elevator mechanic govern.",
   example: governorTripExample.inputs,
   fields: [
     { key: "rated_speed_fpm", label: "Rated (contract) car speed (fpm)", kind: "number", default: 500 },
-    { key: "electrical_trip_fpm", label: "Electrical overspeed switch setting (fpm)", kind: "number", default: 550 },
+    { key: "electrical_trip_fpm", label: "Electrical overspeed switch setting (fpm)", kind: "number", default: 515 },
     { key: "mechanical_trip_fpm", label: "Mechanical tripping speed (fpm)", kind: "number", default: 575 },
     { key: "code_minimum_pct", label: "Code minimum trip (% of rated speed)", kind: "number", default: 115 },
     { key: "code_maximum_fpm", label: "Code maximum trip for this rated speed (fpm; A17.1 Table 2.18.2.1 gives 625 at 500 fpm)", kind: "number", default: 625 },
+    { key: "switch_limit_pct", label: "Switch limit, % of the trip (0 = by rated speed: 100 to 150 fpm, 90 to 500, 95 above; 90 for static control; 100 with a speed-reducing switch)", kind: "number", default: 0 },
   ],
   outputs: [
     { key: "m", id: "gts-out-m", label: "Minimum permitted mechanical trip", value: (r) => fmt(r.minimum_trip_fpm, 0) + " fpm" },

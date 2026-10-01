@@ -1523,7 +1523,7 @@ import {
 //
 // Wave celerity:  a = sqrt(K/rho) / sqrt(1 + (K * D) / (E * t))
 // Pressure surge: dP = rho * a * dV
-// Reflection time: 2L/a (rapid closure if t_close < 2L/a)
+// Reflection time: 2L/a (rapid closure if t_close <= 2L/a)
 //
 // Bulk modulus K of water = 2.19 GPa = 318 ksi (~317 800 psi).
 // Densities and pipe moduli per material from
@@ -1604,15 +1604,20 @@ export function computeWaterHammerSurge({
   const K_psf = f.K_psi * 144;
   const E_psf = m.E_psi * 144;
   const a_unrestricted = Math.sqrt(K_psf / f.rho_slug_ft3); // pure-water celerity ~ 4720 fps
-  const compliance = (K_psf * dims.D) / (E_psf * dims.t);
+  // Korteweg's D is the INSIDE diameter (Twyman 2016: "the inner pipe
+  // diameter"). Until 2026-10-01 this took the outside diameter, which lowered
+  // the wave speed and read surge 10-13% low on PEX SDR 9 and CPVC SDR 11.
+  const D_inside_in = dims.D - 2 * dims.t;
+  const compliance = (K_psf * D_inside_in) / (E_psf * dims.t);
   const a_fps = a_unrestricted / Math.sqrt(1 + compliance);
   // dP (psi) = rho (slug/ft^3) * a (fps) * dV (fps), then / 144 to convert lb/ft² → psi.
   const dP_psi = (f.rho_slug_ft3 * a_fps * velocity_fps) / 144;
   const reflection_time_s = (2 * run_length_ft) / a_fps;
-  const rapid_closure = closure_time_s < reflection_time_s;
+  // Closing in exactly 2L/a still lets the full Joukowsky surge develop.
+  const rapid_closure = closure_time_s <= reflection_time_s * (1 + 1e-9);
   return {
     celerity_fps: a_fps, surge_psi: dP_psi, reflection_time_s,
-    rapid_closure, fluid_label: f.label, material_label: m.description, wall_basis: dims.basis, d_over_t: dims.D / dims.t,
+    rapid_closure, fluid_label: f.label, material_label: m.description, wall_basis: dims.basis, d_over_t: D_inside_in / dims.t,
   };
 }
 
@@ -1761,7 +1766,7 @@ export const pipeExpansionLoopExample = {
 // --- v7 renderers ---
 
 function _v7p_renderWaterHammer(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: Joukowsky equation by name. Pipe-fluid coupling via celerity formula. Rapid closure flagged when t_close < 2L/a.";
+  citationEl.textContent = "Citation: Joukowsky equation by name. Pipe-fluid coupling via the Korteweg celerity formula on the inside diameter. Rapid closure flagged when t_close <= 2L/a.";
   _v7p_attachEx(inputRegion, () => fillExample(waterHammerSurgeExample.inputs));
   const mat = _v7p_makeSelect("Pipe material", "wh-mat", Object.keys(PIPE_ELASTIC_PROPERTIES).map((k) => ({ value: k, label: PIPE_ELASTIC_PROPERTIES[k].description })));
   const sz = _v7p_makeSelect("Pipe size (nominal)", "wh-sz", Object.keys(SCH40_DIMS_IN).map((k) => ({ value: k, label: '"' + k + '" (D=' + SCH40_DIMS_IN[k].D + ' in)' })));

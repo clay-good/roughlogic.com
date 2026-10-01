@@ -355,7 +355,13 @@ import { roundToStandard as _v8roundToStandard, STANDARD_SIZES as _v8STANDARD_SI
 export function computeTransformerSize({ load_kW, power_factor = 1, primary_V, secondary_V, phase = "three" }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(primary_V > 0) || !(secondary_V > 0)) return { error: "Primary and secondary voltage must be positive." };
-  const kVA = power_factor > 0 ? load_kW / power_factor : load_kW;
+  // The agent door calls this directly, past the page's field limits: until
+  // 2026-10-01 a negative load returned negative kVA and a 15 kVA pick, a pf
+  // of 1.5 shrank the load, and phase "3" silently sized single-phase.
+  if (!(load_kW >= 0)) return { error: "Load cannot be negative." };
+  if (!(power_factor > 0 && power_factor <= 1)) return { error: "Power factor must be greater than 0 and no more than 1." };
+  if (phase !== "three" && phase !== "single") return { error: "Phase must be \"single\" or \"three\"." };
+  const kVA = load_kW / power_factor;
   const sqrt3 = Math.sqrt(3);
   const primary_FLA = phase === "three" ? (kVA * 1000) / (sqrt3 * primary_V) : (kVA * 1000) / primary_V;
   const secondary_FLA = phase === "three" ? (kVA * 1000) / (sqrt3 * secondary_V) : (kVA * 1000) / secondary_V;
@@ -2188,9 +2194,11 @@ export const shortCircuitPPExample = {
 // NEMA MG-1 starting kVA per HP for code letters A through V (locked-rotor
 // kVA per HP): the MIDPOINT of each code-letter range, as generator sizing
 // practice takes it (Cummins T-030 Table 7: "averages of the specified
-// ranges"; G = 5.9). Until 2026-09-24 this held each range's LOWER bound, so
-// every start read 5-12% light and a code-A motor started at 0 kVA. V is open
-// above 22.4; 23 is the Cummins figure.
+// ranges"; G = 5.9). The values here are the exact midpoints; Cummins prints
+// them rounded and differs at A (2, against 1.575) and S (16, against 17).
+// Until 2026-09-24 this held each range's LOWER bound, so every start read
+// 5-12% light and a code-A motor started at 0 kVA. V is open above 22.4; 23 is
+// the Cummins figure.
 export const NEMA_MG1_CODE_LETTERS = {
   A: 1.575, B: 3.35, C: 3.775, D: 4.25, E: 4.75, F: 5.3, G: 5.95, H: 6.7,
   J: 7.55, K: 8.5, L: 9.5, M: 10.6, N: 11.85, P: 13.25, R: 15.0, S: 17.0,

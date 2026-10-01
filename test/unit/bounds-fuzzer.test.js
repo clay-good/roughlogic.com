@@ -41335,7 +41335,8 @@ test("bounds: spec-v1421 computeSelectiveCoordinationScreen pins both device beh
   const r = _v1421(base);
   assert.ok(Math.abs(r.ratio - 4) < 1e-12);
   assert.ok(Math.abs(r.pickup_a - 4000) < 1e-9);
-  assert.ok(Math.abs(r.coordinated_to_a - 4000) < 1e-9);
+  // Coordination holds to the LOW edge of the +/- 25% pickup band (Bussmann 2008).
+  assert.ok(Math.abs(r.coordinated_to_a - 3000) < 1e-9);
   assert.strictEqual(r.coordinated, false);
   assert.ok(r.verdict.startsWith("NOT selectively coordinated"));
   // The RATIO is irrelevant for breakers above the pickup: widen it and nothing changes.
@@ -41346,14 +41347,17 @@ test("bounds: spec-v1421 computeSelectiveCoordinationScreen pins both device beh
   // Below the pickup the same pair IS coordinated.
   const lowFault = _v1421({ ...base, available_fault_a: 3000 });
   assert.strictEqual(lowFault.coordinated, true);
-  // Exactly at the pickup still coordinates.
-  assert.strictEqual(_v1421({ ...base, available_fault_a: 4000 }).coordinated, true);
+  // Exactly at the low edge still coordinates; the nominal pickup does not,
+  // unless the band is entered as zero.
+  assert.strictEqual(_v1421({ ...base, available_fault_a: 3000 }).coordinated, true);
+  assert.strictEqual(_v1421({ ...base, available_fault_a: 4000 }).coordinated, false);
+  assert.strictEqual(_v1421({ ...base, available_fault_a: 4000, pickup_tolerance_pct: 0 }).coordinated, true);
   // Fuses at or above the published ratio coordinate to the interrupting rating,
   // at the SAME 12,000 A that defeated the breakers. Same ratings, opposite answers.
   const fuse = _v1421({ ...base, device_type: "fuse" });
   assert.strictEqual(fuse.coordinated, true);
   assert.strictEqual(fuse.pickup_a, null);
-  assert.strictEqual(fuse.coordinated_to_a, Infinity);
+  assert.strictEqual(fuse.coordinated_to_a, null);
   assert.ok(fuse.verdict.startsWith("COORDINATED"));
   // A fuse pair below the family ratio is not coordinated at any current.
   const tight = _v1421({ ...base, device_type: "fuse", downstream_rating_a: 250 });
@@ -42511,11 +42515,20 @@ test("bounds: spec-v1543 computeTrackWarp pins the designed-elevation reference"
   // On a curve with CONSTANT designed elevation the reference cancels, which
   // is why this reading is the same measured against zero.
   assert.ok(Math.abs(r.against_zero_in - r.warp_magnitude_in) < 1e-9);
-  // On a SPIRAL it does not cancel, and that is the whole point: 4 in of
-  // elevation running off over 200 ft is 1.24 in of designed change in 62 ft.
+  // On a SPIRAL it does not cancel, and 49 CFR 213.63(a) limits the raw
+  // difference: 4 in running off over 200 ft is 1.24 in of designed change in
+  // 62 ft, and it counts (213.59(b)). The deviation share is zero.
   const spiral = _v1543({ ...base, measured_a_in: 4.0, designed_a_in: 4.0, measured_b_in: 2.76, designed_b_in: 2.76 });
-  assert.strictEqual(spiral.warp_magnitude_in, 0);
-  assert.ok(Math.abs(spiral.against_zero_in - 1.24) < 1e-9);
+  assert.ok(Math.abs(spiral.warp_magnitude_in - 1.24) < 1e-9);
+  assert.ok(Math.abs(spiral.designed_change_in - 1.24) < 1e-9);
+  assert.ok(Math.abs(spiral.warp_in) < 1e-9);
+  // Only 0.80 in off the design, but 2.04 in of warp: over a 1.5 in Class 5 limit.
+  const off = _v1543({ ...base, measured_b_in: 2.56, designed_b_in: 2.76, warp_limit_in: 1.5 });
+  assert.ok(Math.abs(off.warp_in - 0.8) < 1e-9);
+  assert.ok(Math.abs(off.warp_magnitude_in - 2.04) < 1e-9);
+  assert.strictEqual(off.pass, false);
+  // "May not be more than": 2.2 - 0.45 is 1.7500000000000002 and passes 1.75.
+  assert.strictEqual(_v1543({ ...base, measured_a_in: 2.2, designed_a_in: 0, measured_b_in: 0.45, designed_b_in: 0 }).pass, true);
   // The verdict flips at the limit, and the sign of the twist does not matter.
   assert.strictEqual(_v1543({ ...base, warp_limit_in: 1.4 }).pass, true);
   assert.strictEqual(_v1543({ ...base, warp_limit_in: 1.39 }).pass, false);
@@ -45939,13 +45952,14 @@ test("bounds: spec-v1458 computeNescDistrictLoading -- the ice is an annulus", (
   const base = { bare_diameter_in: 1.108, bare_weight_lb_per_ft: 1.094, district: 1, custom_ice_in: 0, custom_wind_psf: 0, custom_k_lb_per_ft: 0, custom_temp_f: 0 };
   const heavy = _v1458(base);
   assert.ok(Math.abs(heavy.iced_diameter_in - 2.108) < 1e-9);
-  assert.ok(Math.abs(heavy.ice_weight_lb_per_ft - 1.00516) < 1e-4);
-  assert.ok(Math.abs(heavy.vertical_lb_per_ft - 2.09916) < 1e-4);
+  // 57 lb/cu ft ice (NESC 230B); RUS 1724E-200 prints Drake Heavy 2.0938 / 2.5086.
+  assert.ok(Math.abs(heavy.ice_weight_lb_per_ft - 0.99981) < 1e-4);
+  assert.ok(Math.abs(heavy.vertical_lb_per_ft - 2.09381) < 1e-4);
   assert.ok(Math.abs(heavy.horizontal_lb_per_ft - 0.70267) < 1e-4);
-  assert.ok(Math.abs(heavy.resultant_lb_per_ft - 2.51365) < 1e-4);
-  assert.ok(Math.abs(heavy.ratio_to_bare - 2.2977) < 1e-3);
+  assert.ok(Math.abs(heavy.resultant_lb_per_ft - 2.50857) < 1e-4);
+  assert.ok(Math.abs(heavy.ratio_to_bare - 2.2930) < 1e-3);
   const medium = _v1458({ ...base, district: 2 });
-  assert.ok(Math.abs(medium.resultant_lb_per_ft - 1.81024) < 1e-4);
+  assert.ok(Math.abs(medium.resultant_lb_per_ft - 1.80814) < 1e-4);
   const light = _v1458({ ...base, district: 3 });
   assert.ok(Math.abs(light.resultant_lb_per_ft - 1.42383) < 1e-4);
   // The Light district has NO ice, so its whole 1.30x is wind and the constant.

@@ -8501,7 +8501,7 @@
    "source_publisher": "Project (first-principles)",
    "source_title": "Joukowsky surge: dP (psi) = rho * a * dV (Pa) / 6895 with elastic-coupling-adjusted celerity a",
    "source_edition_or_year": "n/a; classical Joukowsky identity over manufacturer copper-tube elasticity (Type L 1 in)",
-   "source_section_or_page": "Copper Type L 1 in / water at 60 F / 8 fps velocity / 0.05 s closure / 100 ft run (B88 Type L: 1.125 in OD, 0.050 in wall, D/t 22.5) -> celerity ~4075 fps, surge ~439 psi, reflection time ~0.049 s (not rapid since closure > reflection)",
+   "source_section_or_page": "Copper Type L 1 in / water at 60 F / 8 fps velocity / 0.05 s closure / 100 ft run (B88 Type L: 1.125 in OD, 0.050 in wall, D/t 22.5) -> celerity ~4075 fps, surge ~439 psi, reflection time ~0.049 s (not rapid since closure > reflection); recomputed 2026-10-01 after the batch-54 fixes",
    "verified_by": "rl",
    "verified_on": "2026-09-18",
    "inputs": {
@@ -8514,19 +8514,19 @@
    },
    "outputs": {
     "celerity_fps": {
-     "value": 4075,
+     "value": 4129.621232248003,
      "tolerance": {
       "abs": 5
      }
     },
     "surge_psi": {
-     "value": 439,
+     "value": 445.0813994756181,
      "tolerance": {
       "abs": 1
      }
     },
     "reflection_time_s": {
-     "value": 0.0491,
+     "value": 0.04843059175456822,
      "tolerance": {
       "abs": 0.001
      }
@@ -109487,7 +109487,7 @@
    "source_publisher": "Project (first-principles)",
    "source_title": "400 A upstream breaker at 10x instantaneous against a 100 A downstream, 12,000 A available",
    "source_edition_or_year": "coordination practice",
-   "source_section_or_page": "breakers coordinate only to the instantaneous pickup",
+   "source_section_or_page": "breakers coordinate only to the instantaneous pickup; recomputed 2026-10-01 after the batch-54 fixes",
    "verified_by": "rl",
    "verified_on": "2026-08-26",
    "inputs": {
@@ -109512,7 +109512,7 @@
      }
     },
     "coordinated_to_a": {
-     "value": 4000,
+     "value": 3000,
      "tolerance": {
       "pct": 0.5
      }
@@ -112019,17 +112019,18 @@
   {
    "tile_id": "governor-tripping-speed",
    "source_publisher": "Project (first-principles)",
-   "source_title": "500 fpm car, electrical trip 550 fpm, mechanical trip 575 fpm",
+   "source_title": "500 fpm car, electrical trip 515 fpm, mechanical trip 575 fpm",
    "source_edition_or_year": "minimum mechanical trip = 115 percent of rated speed",
-   "source_section_or_page": "ASME A17.1; both bounds entered from the code table",
+   "source_section_or_page": "ASME A17.1; both bounds entered from the code table; recomputed 2026-10-01 after the batch-54 fixes",
    "verified_by": "rl",
    "verified_on": "2026-09-05",
    "inputs": {
     "rated_speed_fpm": 500,
-    "electrical_trip_fpm": 550,
+    "electrical_trip_fpm": 515,
     "mechanical_trip_fpm": 575,
     "code_minimum_pct": 115,
-    "code_maximum_fpm": 625
+    "code_maximum_fpm": 625,
+    "switch_limit_pct": 0
    },
    "outputs": {
     "minimum_trip_fpm": {
@@ -112045,7 +112046,7 @@
      }
     },
     "electrical_margin_pct": {
-     "value": 10,
+     "value": 3,
      "tolerance": {
       "pct": 0.5
      }
@@ -116385,7 +116386,7 @@
    "source_publisher": "Project (first-principles)",
    "source_title": "ACSR Drake, 1.108 in bare at 1.094 lb/ft, in the NESC Heavy district",
    "source_edition_or_year": "iced d = bare + 2t; ice weight = (pi/4)(iced^2 - bare^2)/144 x 57.3; resultant = sqrt(v^2 + h^2) + k",
-   "source_section_or_page": "the applicable NESC edition and its district map govern",
+   "source_section_or_page": "the applicable NESC edition and its district map govern; recomputed 2026-10-01 after the batch-54 fixes",
    "verified_by": "rl",
    "verified_on": "2026-09-07",
    "inputs": {
@@ -116405,13 +116406,13 @@
      }
     },
     "ice_weight_lb_per_ft": {
-     "value": 1.00507,
+     "value": 0.9998118620049515,
      "tolerance": {
       "pct": 0.5
      }
     },
     "vertical_lb_per_ft": {
-     "value": 2.09907,
+     "value": 2.0938118620049515,
      "tolerance": {
       "pct": 0.5
      }
@@ -116423,13 +116424,13 @@
      }
     },
     "resultant_lb_per_ft": {
-     "value": 2.51356,
+     "value": 2.5085716103212694,
      "tolerance": {
       "pct": 0.5
      }
     },
     "ratio_to_bare": {
-     "value": 2.29759,
+     "value": 2.293027066107193,
      "tolerance": {
       "pct": 0.5
      }
@@ -142740,6 +142741,1857 @@
      "value": 87,
      "tolerance": {
       "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "stairwell-pressurization",
+   "source_publisher": "CED Engineering (A. Bhatia)",
+   "source_title": "Stairwell Pressurization Systems, Course No. M05-022",
+   "source_edition_or_year": "course text, accessed 2026-10-01",
+   "source_section_or_page": "pp. 21-23, Table 3 'Maximum Pressure across Different Doors Widths' and the 'How to read Table 3' example: 30 lb total opening force, 6 lb closer, 36 in x 7 ft hinged door, knob 3 in from the knob-side edge -> maximum allowable pressure difference 0.40 in H2O (printed to 2 decimals; tolerance 0.005). leakage_area_sqft and pressure_inwg are placeholders; only max_pressure_inwg is checked.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "leakage_area_sqft": 1,
+    "pressure_inwg": 0.1,
+    "door_width_ft": 3,
+    "door_height_ft": 7,
+    "knob_setback_in": 3,
+    "closer_force_lbf": 6,
+    "force_limit_lbf": 30
+   },
+   "outputs": {
+    "max_pressure_inwg": {
+     "value": 0.4,
+     "tolerance": {
+      "abs": 0.005
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "stairwell-pressurization",
+   "source_publisher": "CED Engineering (A. Bhatia)",
+   "source_title": "Stairwell Pressurization Systems, Course No. M05-022",
+   "source_edition_or_year": "course text, accessed 2026-10-01",
+   "source_section_or_page": "p. 22, Table 3, row '10 lb. (45 N)' column '36\" (0.91 m) Door': 0.34 in H2O at a 30 lb total opening force, 7 ft door, knob 3 in from the edge (printed to 2 decimals; tolerance 0.005). leakage_area_sqft and pressure_inwg are placeholders.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "leakage_area_sqft": 1,
+    "pressure_inwg": 0.1,
+    "door_width_ft": 3,
+    "door_height_ft": 7,
+    "knob_setback_in": 3,
+    "closer_force_lbf": 10,
+    "force_limit_lbf": 30
+   },
+   "outputs": {
+    "max_pressure_inwg": {
+     "value": 0.34,
+     "tolerance": {
+      "abs": 0.005
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "stairwell-pressurization",
+   "source_publisher": "CED Engineering (A. Bhatia)",
+   "source_title": "Stairwell Pressurization Systems, Course No. M05-022",
+   "source_edition_or_year": "course text, accessed 2026-10-01",
+   "source_section_or_page": "p. 22, Table 3, row '6 lb. (25 N)' column '32\" (0.81 m) Door': 0.45 in H2O at a 30 lb total opening force, 7 ft door, knob 3 in from the edge (printed to 2 decimals; tolerance 0.005; door width entered as 32/12 ft). leakage_area_sqft and pressure_inwg are placeholders.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "leakage_area_sqft": 1,
+    "pressure_inwg": 0.1,
+    "door_width_ft": 2.6666666666666665,
+    "door_height_ft": 7,
+    "knob_setback_in": 3,
+    "closer_force_lbf": 6,
+    "force_limit_lbf": 30
+   },
+   "outputs": {
+    "max_pressure_inwg": {
+     "value": 0.45,
+     "tolerance": {
+      "abs": 0.005
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "radiant-exposure-separation",
+   "source_publisher": "U.S. Nuclear Regulatory Commission",
+   "source_title": "NUREG-1805, Fire Dynamics Tools (FDTs), Chapter 5: Estimating Radiant Heat Flux from Fire to a Target Fuel",
+   "source_edition_or_year": "2004 (Version 1805.0 spreadsheets)",
+   "source_section_or_page": "Example Problem 5.11-1, pp. 5-21 to 5-24 (transformer-oil pool fire, 9.0 ft2 spill, target edge 10 ft away), point source sheet: Q = 771.52 kW, radiative fraction 0.30, R = L + D/2 = 3.56 m (printed to 2 decimals; entered as 3.56 m / 0.3048 = 11.6798 ft), q'' = 1.45 kW/m2 (printed to 2 decimals; tolerance 0.01). target_flux_kwm2 is a placeholder. Read from the PDHonline M312 reproduction of the NRC chapter.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "heat_release_kw": 771.52,
+    "radiative_fraction": 0.3,
+    "target_flux_kwm2": 12.6,
+    "evaluate_distance_ft": 11.67979002624672
+   },
+   "outputs": {
+    "flux_at_distance": {
+     "value": 1.45,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "fdc-supply-check",
+   "source_publisher": "Sutter County Fire Department",
+   "source_title": "Moving Water Wisely: A Guide to Fire Stream and Pump Operations",
+   "source_edition_or_year": "Revised 4/5/05",
+   "source_section_or_page": "p. 11, friction-loss example: 2 1/2 in hose (C = 2), 200 ft, 250 GPM nozzle; FL = CQ2L = 2 x 2.5^2 x 2 = 25 psi (printed whole number). fdc_pressure_psi (100) and elevation_ft (0) are placeholders; only friction_loss_psi is checked (single line).",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "fdc_pressure_psi": 100,
+    "total_flow_gpm": 250,
+    "lines": 1,
+    "line_length_ft": 200,
+    "friction_coefficient": 2,
+    "elevation_ft": 0
+   },
+   "outputs": {
+    "friction_loss_psi": {
+     "value": 25,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "selective-coordination-screen",
+   "source_publisher": "Cooper Bussmann",
+   "source_title": "Selective Coordination (SPD handbook section)",
+   "source_edition_or_year": "2008",
+   "source_section_or_page": "p. 5, 'Example of Fuse Selective Coordination': LPJ-400SP lineside to LPJ-100SP loadside, ampacity ratio 400:100 = 4:1; Selectivity Ratio Guide LPJ to LPJ = 2:1, so the pair is selectively coordinated up to 200,000 A. available_fault_a (10,000) is a placeholder.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "device_type": "fuse",
+    "upstream_rating_a": 400,
+    "downstream_rating_a": 100,
+    "published_ratio": 2,
+    "instantaneous_multiplier": 10,
+    "available_fault_a": 10000
+   },
+   "outputs": {
+    "ratio": {
+     "value": 4,
+     "tolerance": {
+      "abs": 0
+     }
+    },
+    "coordinated": {
+     "value": 1,
+     "tolerance": {
+      "abs": 0
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "selective-coordination-screen",
+   "source_publisher": "Cooper Bussmann",
+   "source_title": "Selective Coordination (SPD handbook section)",
+   "source_edition_or_year": "2008",
+   "source_section_or_page": "p. 5: KRP-C-1200SP lineside to LPJ-400SP loadside, ratio 1200:400 = 3:1 against a required 2:1, selectively coordinated. available_fault_a (10,000) is a placeholder.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "device_type": "fuse",
+    "upstream_rating_a": 1200,
+    "downstream_rating_a": 400,
+    "published_ratio": 2,
+    "instantaneous_multiplier": 10,
+    "available_fault_a": 10000
+   },
+   "outputs": {
+    "ratio": {
+     "value": 3,
+     "tolerance": {
+      "abs": 0
+     }
+    },
+    "coordinated": {
+     "value": 1,
+     "tolerance": {
+      "abs": 0
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "selective-coordination-screen",
+   "source_publisher": "Cooper Bussmann",
+   "source_title": "Selective Coordination (SPD handbook section)",
+   "source_edition_or_year": "2008",
+   "source_section_or_page": "p. 6, 'Another Fuse Selective Coordination Example': FRS-R-400 loadside of KRP-C-800SP is a 2:1 ratio while the Selectivity Ratio Guide requires at least 4:1, so the pair is NOT coordinated (Scenario A). available_fault_a (10,000) is a placeholder.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "device_type": "fuse",
+    "upstream_rating_a": 800,
+    "downstream_rating_a": 400,
+    "published_ratio": 4,
+    "instantaneous_multiplier": 10,
+    "available_fault_a": 10000
+   },
+   "outputs": {
+    "ratio": {
+     "value": 2,
+     "tolerance": {
+      "abs": 0
+     }
+    },
+    "coordinated": {
+     "value": 0,
+     "tolerance": {
+      "abs": 0
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "selective-coordination-screen",
+   "source_publisher": "Cooper Bussmann",
+   "source_title": "Selective Coordination (SPD handbook section)",
+   "source_edition_or_year": "2008",
+   "source_section_or_page": "pp. 9-10, Figures 14-15: 400 A breaker at IT = 5x, 'five times 400A = 2000A', upstream of a 90 A breaker. Only pickup_a is checked: the publisher then applies a -25% band (as low as 1500 A), which the tile does not model, so coordinated_to_a is deliberately NOT asserted. available_fault_a (1,000) is a placeholder.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "device_type": "breaker",
+    "upstream_rating_a": 400,
+    "downstream_rating_a": 90,
+    "published_ratio": 2,
+    "instantaneous_multiplier": 5,
+    "available_fault_a": 1000
+   },
+   "outputs": {
+    "pickup_a": {
+     "value": 2000,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "fuse-let-through",
+   "source_publisher": "SKM Systems Analysis, Inc.",
+   "source_title": "Equipment Damage Curves: Conductors (application guide)",
+   "source_edition_or_year": "web application guide, accessed 2026-10-01",
+   "source_section_or_page": "Example 1, 500 kcmil THWN copper, A = 500,000 cmil, T1 = 75 C, T2 = 150 C, damage point at t = 10.00 s: 8,371 A (column header misprinted as '(%)'). Printed to the whole amp; tolerance 0.5 A. let_through_i2t is a placeholder; peak inputs 0 (skipped).",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "conductor_cmil": 500000,
+    "initial_temp_c": 75,
+    "damage_temp_c": 150,
+    "duration_s": 10,
+    "let_through_i2t": 1000000,
+    "let_through_peak_a": 0,
+    "equipment_peak_withstand_a": 0
+   },
+   "outputs": {
+    "withstand_a": {
+     "value": 8371,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "fuse-let-through",
+   "source_publisher": "SKM Systems Analysis, Inc.",
+   "source_title": "Equipment Damage Curves: Conductors (application guide)",
+   "source_edition_or_year": "web application guide, accessed 2026-10-01",
+   "source_section_or_page": "Example 1, 500 kcmil THWN copper, A = 500,000 cmil, T1 = 75 C, T2 = 150 C, damage point at t = 0.01 s: 264,711 A. Printed to the whole amp; tolerance 0.5 A. let_through_i2t is a placeholder; peak inputs 0 (skipped).",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "conductor_cmil": 500000,
+    "initial_temp_c": 75,
+    "damage_temp_c": 150,
+    "duration_s": 0.01,
+    "let_through_i2t": 1000000,
+    "let_through_peak_a": 0,
+    "equipment_peak_withstand_a": 0
+   },
+   "outputs": {
+    "withstand_a": {
+     "value": 264711,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "generator-motor-starting",
+   "source_publisher": "Cummins Power Generation",
+   "source_title": "T-030 Liquid-Cooled Generator Set Application Manual",
+   "source_edition_or_year": "cummins.com upload 2024-08",
+   "source_section_or_page": "Section 3.3.3.3.5, Table 7 (p. 29): code letter K multiplying factor 8.5 kVA per hp ('multiply motor horsepower by the value in Table 7'); a 1 hp code-K motor so the printed factor is the starting kVA. Only worst_starting_kVA is checked; non_motor_kW, dip_factor, starts_per_hour are placeholders. Letters where the tile and Table 7 agree: F H K L M R T U V (A, B, C, D, E, G, J, N, P, S differ; see report).",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "motors": [
+     {
+      "hp": 1,
+      "code_letter": "K"
+     }
+    ],
+    "non_motor_kW": 0,
+    "dip_factor": 0.3,
+    "starts_per_hour": "occasional",
+    "generator_xd": 0.25
+   },
+   "outputs": {
+    "worst_starting_kVA": {
+     "value": 8.5,
+     "tolerance": {
+      "abs": 0.005
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "nesc-district-loading",
+   "source_publisher": "USDA Rural Utilities Service",
+   "source_title": "NESC Light district loading for ACSR DRAKE 795 kcmil 26/7: vertical, transverse and resultant (with K = 0.05) per foot",
+   "source_edition_or_year": "RUS Bulletin 1724E-200, Design Manual for High Voltage Transmission Lines (RD-GD-2015-78), 2015",
+   "source_section_or_page": "Appendix B, Table 'ACSR Conductors -- NESC District Loadings', p. B-3: LIGHT (.00 in ice, 9 lb wind, K=.05) for DRAKE 795 kcmil 26/7 (diam 1.108 in, 1.094 lb/ft) prints VERT 1.094, TRANS 0.831, RESULTANT 1.4238 lb/ft (4 decimals; tolerance is half a unit in the 4th place). Light district carries no ice, so the 57 vs 57.3 lb/ft3 ice-density difference does not enter. Custom-district fields are unused placeholders (0).",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "bare_diameter_in": 1.108,
+    "bare_weight_lb_per_ft": 1.094,
+    "district": 3,
+    "custom_ice_in": 0,
+    "custom_wind_psf": 0,
+    "custom_k_lb_per_ft": 0,
+    "custom_temp_f": 0
+   },
+   "outputs": {
+    "vertical_lb_per_ft": {
+     "value": 1.094,
+     "tolerance": {
+      "abs": 5e-05
+     }
+    },
+    "horizontal_lb_per_ft": {
+     "value": 0.831,
+     "tolerance": {
+      "abs": 5e-05
+     }
+    },
+    "resultant_lb_per_ft": {
+     "value": 1.4238,
+     "tolerance": {
+      "abs": 6e-05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "nesc-district-loading",
+   "source_publisher": "USDA Rural Utilities Service",
+   "source_title": "NESC Light district loading for ACSR HAWK 477 kcmil 26/7: vertical, transverse and resultant (with K = 0.05) per foot",
+   "source_edition_or_year": "RUS Bulletin 1724E-200, Design Manual for High Voltage Transmission Lines (RD-GD-2015-78), 2015",
+   "source_section_or_page": "Appendix B, Table 'ACSR Conductors -- NESC District Loadings', p. B-3: LIGHT (.00 in ice, 9 lb wind, K=.05) for HAWK 477 kcmil 26/7 (diam 0.858 in, 0.657 lb/ft) prints VERT 0.657, TRANS 0.6435, RESULTANT 0.9696 lb/ft (4 decimals; tolerance is half a unit in the 4th place). Light district carries no ice, so the 57 vs 57.3 lb/ft3 ice-density difference does not enter. Custom-district fields are unused placeholders (0).",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "bare_diameter_in": 0.858,
+    "bare_weight_lb_per_ft": 0.657,
+    "district": 3,
+    "custom_ice_in": 0,
+    "custom_wind_psf": 0,
+    "custom_k_lb_per_ft": 0,
+    "custom_temp_f": 0
+   },
+   "outputs": {
+    "vertical_lb_per_ft": {
+     "value": 0.657,
+     "tolerance": {
+      "abs": 5e-05
+     }
+    },
+    "horizontal_lb_per_ft": {
+     "value": 0.6435,
+     "tolerance": {
+      "abs": 5e-05
+     }
+    },
+    "resultant_lb_per_ft": {
+     "value": 0.9696,
+     "tolerance": {
+      "abs": 6e-05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "nesc-district-loading",
+   "source_publisher": "USDA Rural Utilities Service",
+   "source_title": "NESC Light district loading for ACSR RAVEN 1/0 6/1: vertical, transverse and resultant (with K = 0.05) per foot",
+   "source_edition_or_year": "RUS Bulletin 1724E-200, Design Manual for High Voltage Transmission Lines (RD-GD-2015-78), 2015",
+   "source_section_or_page": "Appendix B, Table 'ACSR Conductors -- NESC District Loadings', p. B-3: LIGHT (.00 in ice, 9 lb wind, K=.05) for RAVEN 1/0 6/1 (diam 0.398 in, 0.1452 lb/ft) prints VERT 0.1452, TRANS 0.2985, RESULTANT 0.3819 lb/ft (4 decimals; tolerance is half a unit in the 4th place). Light district carries no ice, so the 57 vs 57.3 lb/ft3 ice-density difference does not enter. Custom-district fields are unused placeholders (0).",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "bare_diameter_in": 0.398,
+    "bare_weight_lb_per_ft": 0.1452,
+    "district": 3,
+    "custom_ice_in": 0,
+    "custom_wind_psf": 0,
+    "custom_k_lb_per_ft": 0,
+    "custom_temp_f": 0
+   },
+   "outputs": {
+    "vertical_lb_per_ft": {
+     "value": 0.1452,
+     "tolerance": {
+      "abs": 5e-05
+     }
+    },
+    "horizontal_lb_per_ft": {
+     "value": 0.2985,
+     "tolerance": {
+      "abs": 5e-05
+     }
+    },
+    "resultant_lb_per_ft": {
+     "value": 0.3819,
+     "tolerance": {
+      "abs": 6e-05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "nesc-district-loading",
+   "source_publisher": "USDA Rural Utilities Service",
+   "source_title": "NESC Heavy district transverse load on ACSR DRAKE 795 kcmil 26/7 (4 psf on 1.108 in + 2 x 0.5 in ice)",
+   "source_edition_or_year": "RUS Bulletin 1724E-200, Design Manual for High Voltage Transmission Lines (RD-GD-2015-78), 2015",
+   "source_section_or_page": "Appendix B p. B-3 HEAVY (.5 in ice, 4 lb wind, K=.30): DRAKE TRANS 0.7027 lb/ft; repeated in Ch. 13 Fig. 13-5 'Conductor loads, Heavy, Transverse 0.7027'. Only the transverse output is pinned: the printed VERT 2.0938 and RESULTANT 2.5086 use 57 lb/ft3 ice and the tile (57.3) reads 2.0991 / 2.5136, outside printed rounding (see report lead).",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "bare_diameter_in": 1.108,
+    "bare_weight_lb_per_ft": 1.094,
+    "district": 1,
+    "custom_ice_in": 0,
+    "custom_wind_psf": 0,
+    "custom_k_lb_per_ft": 0,
+    "custom_temp_f": 0
+   },
+   "outputs": {
+    "horizontal_lb_per_ft": {
+     "value": 0.7027,
+     "tolerance": {
+      "abs": 5e-05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "nesc-district-loading",
+   "source_publisher": "USDA Rural Utilities Service",
+   "source_title": "NESC Medium district transverse load on ACSR DRAKE 795 kcmil 26/7 (4 psf on 1.108 in + 2 x 0.25 in ice)",
+   "source_edition_or_year": "RUS Bulletin 1724E-200, Design Manual for High Voltage Transmission Lines (RD-GD-2015-78), 2015",
+   "source_section_or_page": "Appendix B p. B-3 MEDIUM (.25 in ice, 4 lb wind, K=.20): DRAKE TRANS 0.5360 lb/ft. Vertical (1.5162) and resultant (1.8081) not pinned: printed with 57 lb/ft3 ice, tile uses 57.3 (reads 1.5184 / 1.8102).",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "bare_diameter_in": 1.108,
+    "bare_weight_lb_per_ft": 1.094,
+    "district": 2,
+    "custom_ice_in": 0,
+    "custom_wind_psf": 0,
+    "custom_k_lb_per_ft": 0,
+    "custom_temp_f": 0
+   },
+   "outputs": {
+    "horizontal_lb_per_ft": {
+     "value": 0.536,
+     "tolerance": {
+      "abs": 5e-05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "nesc-district-loading",
+   "source_publisher": "USDA Rural Utilities Service",
+   "source_title": "Extreme ice with concurrent wind on DRAKE: 0.75 in radial ice and 30 psf (northern Mississippi example)",
+   "source_edition_or_year": "RUS Bulletin 1724E-200, Design Manual for High Voltage Transmission Lines (RD-GD-2015-78), 2015",
+   "source_section_or_page": "Ch. 11, para 11.b.(7) 'Example of Extreme Ice/Wind Calculations', pp. 11-16/11-17: iced diameter 1.108 + (.75x2) = 2.608 in; pt = 30 x 2.608/12 = 6.520 lb/ft. Entered as custom district 0 with k = 0 (the example adds no constant); custom_temp_f is a placeholder. The printed vertical 2.8269 lb/ft uses 57 lb/ft3 ice; tile reads 2.8360 with 57.3, so it is not pinned (see report lead).",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "bare_diameter_in": 1.108,
+    "bare_weight_lb_per_ft": 1.094,
+    "district": 0,
+    "custom_ice_in": 0.75,
+    "custom_wind_psf": 30,
+    "custom_k_lb_per_ft": 0,
+    "custom_temp_f": 15
+   },
+   "outputs": {
+    "iced_diameter_in": {
+     "value": 2.608,
+     "tolerance": {
+      "abs": 0.0005
+     }
+    },
+    "horizontal_lb_per_ft": {
+     "value": 6.52,
+     "tolerance": {
+      "abs": 0.0005
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "nesc-district-loading",
+   "source_publisher": "USDA Rural Utilities Service",
+   "source_title": "Extreme ice (1 in) with concurrent 4 psf wind on DRAKE, TS-type structure example",
+   "source_edition_or_year": "RUS Bulletin 1724E-200, Design Manual for High Voltage Transmission Lines (RD-GD-2015-78), 2015",
+   "source_section_or_page": "Ch. 13, Fig. 13-5 TS Type Structure Example, p. 13-15: 'Extreme Ice with Concurrent Wind 4 psf, 1 inch radial ice'; conductor loads EI&W Transverse 1.036 lb/ft. Custom district 0, k = 0, temp placeholder. Printed EI&W vertical 3.7154 (57 lb/ft3) vs tile 3.7292 (57.3) not pinned.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "bare_diameter_in": 1.108,
+    "bare_weight_lb_per_ft": 1.094,
+    "district": 0,
+    "custom_ice_in": 1,
+    "custom_wind_psf": 4,
+    "custom_k_lb_per_ft": 0,
+    "custom_temp_f": 15
+   },
+   "outputs": {
+    "horizontal_lb_per_ft": {
+     "value": 1.036,
+     "tolerance": {
+      "abs": 0.0005
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "pole-class-groundline-moment",
+   "source_publisher": "USDA Rural Utilities Service",
+   "source_title": "Moment capacity of a 55 ft Class 3 Douglas Fir / Southern Yellow Pine pole (8,000 psi) at 0 ft from the top",
+   "source_edition_or_year": "RUS Bulletin 1724E-200, Design Manual for High Voltage Transmission Lines (RD-GD-2015-78), 2015",
+   "source_section_or_page": "Appendix F, Table 'Douglas Fir and Southern Yellow Pine, Ultimate Bending Stress -- 8000 psi', 55 ft, p. F-5: at Dist. 0 ft, Class 3 prints Dia. 7.32 in and Moment 25.7 ft-k (unfactored Fb x S). The tile takes a circumference, so the input is pi x the printed diameter (a unit conversion of a printed value, not a placeholder). Tolerance 0.3% covers the 0.01 in diameter rounding (cubed, about 0.2%) plus the 0.1 ft-k moment rounding. Loads (600 lb at 20 ft) and check height are placeholders; only moment_capacity_ftlb is pinned.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "groundline_circumference_in": 22.996458224277287,
+    "fiber_stress_psi": 8000,
+    "load_1_lb": 600,
+    "height_1_ft": 20,
+    "load_2_lb": 0,
+    "height_2_ft": 0,
+    "load_3_lb": 0,
+    "height_3_ft": 0,
+    "check_height_ft": 0
+   },
+   "outputs": {
+    "moment_capacity_ftlb": {
+     "value": 25700,
+     "tolerance": {
+      "pct": 0.3
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "pole-class-groundline-moment",
+   "source_publisher": "USDA Rural Utilities Service",
+   "source_title": "Moment capacity of a 55 ft Class 3 Douglas Fir / Southern Yellow Pine pole (8,000 psi) at 47 ft from the top",
+   "source_edition_or_year": "RUS Bulletin 1724E-200, Design Manual for High Voltage Transmission Lines (RD-GD-2015-78), 2015",
+   "source_section_or_page": "Appendix F, Table 'Douglas Fir and Southern Yellow Pine, Ultimate Bending Stress -- 8000 psi', 55 ft, p. F-5: at Dist. 47 ft, Class 3 prints Dia. 12.66 in and Moment 132.9 ft-k (unfactored Fb x S). The tile takes a circumference, so the input is pi x the printed diameter (a unit conversion of a printed value, not a placeholder). Tolerance 0.3% covers the 0.01 in diameter rounding (cubed, about 0.2%) plus the 0.1 ft-k moment rounding. Loads (600 lb at 20 ft) and check height are placeholders; only moment_capacity_ftlb is pinned.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "groundline_circumference_in": 39.77256299444678,
+    "fiber_stress_psi": 8000,
+    "load_1_lb": 600,
+    "height_1_ft": 20,
+    "load_2_lb": 0,
+    "height_2_ft": 0,
+    "load_3_lb": 0,
+    "height_3_ft": 0,
+    "check_height_ft": 0
+   },
+   "outputs": {
+    "moment_capacity_ftlb": {
+     "value": 132900,
+     "tolerance": {
+      "pct": 0.3
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "pole-class-groundline-moment",
+   "source_publisher": "USDA Rural Utilities Service",
+   "source_title": "Moment capacity of a 55 ft Class 1 Douglas Fir / Southern Yellow Pine pole (8,000 psi) at 47 ft from the top",
+   "source_edition_or_year": "RUS Bulletin 1724E-200, Design Manual for High Voltage Transmission Lines (RD-GD-2015-78), 2015",
+   "source_section_or_page": "Appendix F, Table 'Douglas Fir and Southern Yellow Pine, Ultimate Bending Stress -- 8000 psi', 55 ft, p. F-5: at Dist. 47 ft, Class 1 prints Dia. 14.55 in and Moment 201.5 ft-k (unfactored Fb x S). The tile takes a circumference, so the input is pi x the printed diameter (a unit conversion of a printed value, not a placeholder). Tolerance 0.3% covers the 0.01 in diameter rounding (cubed, about 0.2%) plus the 0.1 ft-k moment rounding. Loads (600 lb at 20 ft) and check height are placeholders; only moment_capacity_ftlb is pinned.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "groundline_circumference_in": 45.71017310973149,
+    "fiber_stress_psi": 8000,
+    "load_1_lb": 600,
+    "height_1_ft": 20,
+    "load_2_lb": 0,
+    "height_2_ft": 0,
+    "load_3_lb": 0,
+    "height_3_ft": 0,
+    "check_height_ft": 0
+   },
+   "outputs": {
+    "moment_capacity_ftlb": {
+     "value": 201500,
+     "tolerance": {
+      "pct": 0.3
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "pole-class-groundline-moment",
+   "source_publisher": "USDA Rural Utilities Service",
+   "source_title": "Moment capacity of a 55 ft Class H1 Douglas Fir / Southern Yellow Pine pole (8,000 psi) at 50 ft from the top",
+   "source_edition_or_year": "RUS Bulletin 1724E-200, Design Manual for High Voltage Transmission Lines (RD-GD-2015-78), 2015",
+   "source_section_or_page": "Appendix F, Table 'Douglas Fir and Southern Yellow Pine, Ultimate Bending Stress -- 8000 psi', 55 ft, p. F-5: at Dist. 50 ft, Class H1 prints Dia. 15.82 in and Moment 259.3 ft-k (unfactored Fb x S). The tile takes a circumference, so the input is pi x the printed diameter (a unit conversion of a printed value, not a placeholder). Tolerance 0.3% covers the 0.01 in diameter rounding (cubed, about 0.2%) plus the 0.1 ft-k moment rounding. Loads (600 lb at 20 ft) and check height are placeholders; only moment_capacity_ftlb is pinned.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "groundline_circumference_in": 49.69999577979053,
+    "fiber_stress_psi": 8000,
+    "load_1_lb": 600,
+    "height_1_ft": 20,
+    "load_2_lb": 0,
+    "height_2_ft": 0,
+    "load_3_lb": 0,
+    "height_3_ft": 0,
+    "check_height_ft": 0
+   },
+   "outputs": {
+    "moment_capacity_ftlb": {
+     "value": 259300,
+     "tolerance": {
+      "pct": 0.3
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "capacitor-bank-voltage-rise",
+   "source_publisher": "USDA Rural Utilities Service",
+   "source_title": "EXAMPLE 6: three-phase 300 kVAr capacitor station on a 12.47/7.2 kV feeder with 13.3 ohms of reactance to the source",
+   "source_edition_or_year": "RUS Bulletin 1724D-112, The Application of Capacitors on Rural Electric Systems",
+   "source_section_or_page": "Section f, Example 6, pp. 19-21: capacitor current 100 kVAr / 7.2 kV = 13.9 A; rise 13.9 x 13.3 = 184.7 V primary; / 60 = 3.08 V on a 120 V base; % rise 3.08/120 = 2.57%; the textbook form ckVAr x X / (10 kV^2) is printed alongside. Printed rounding: 13.9 A, 3.08 V, 2.57%. R = 13.4 ohm plays no part. Peak/light-load voltages and the 126 V limit are placeholders (tile defaults).",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "bank_kvar": 300,
+    "line_voltage_kv": 12.47,
+    "reactance_to_source_ohm": 13.3,
+    "peak_load_voltage_v": 118,
+    "light_load_voltage_v": 124,
+    "upper_limit_v": 126
+   },
+   "outputs": {
+    "rise_pct": {
+     "value": 2.57,
+     "tolerance": {
+      "abs": 0.005
+     }
+    },
+    "rise_volts_120_base": {
+     "value": 3.08,
+     "tolerance": {
+      "abs": 0.005
+     }
+    },
+    "leading_current_a": {
+     "value": 13.9,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "capacitor-bank-voltage-rise",
+   "source_publisher": "USDA Rural Utilities Service",
+   "source_title": "EXAMPLE 6 continued: a second 100 kVAr per phase (600 kVAr) doubles the rise",
+   "source_edition_or_year": "RUS Bulletin 1724D-112, The Application of Capacitors on Rural Electric Systems",
+   "source_section_or_page": "Example 6, p. 20: 'Adding a second 100-kVAr capacitor per phase will double the voltage rise to 6.16 volts on each phase.' 600 kVAr three-phase, 12.47 kV, 13.3 ohm. Printed to 0.01 V. Other voltages are placeholders.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "bank_kvar": 600,
+    "line_voltage_kv": 12.47,
+    "reactance_to_source_ohm": 13.3,
+    "peak_load_voltage_v": 118,
+    "light_load_voltage_v": 124,
+    "upper_limit_v": 126
+   },
+   "outputs": {
+    "rise_volts_120_base": {
+     "value": 6.16,
+     "tolerance": {
+      "abs": 0.005
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "capacitor-bank-voltage-rise",
+   "source_publisher": "USDA Rural Utilities Service",
+   "source_title": "Table 2: percent voltage rise per mile, 100 kVAr per phase on a 7,200 V line-to-neutral system, 4/0 ACSR",
+   "source_edition_or_year": "RUS Bulletin 1724D-112, The Application of Capacitors on Rural Electric Systems",
+   "source_section_or_page": "Table 2 'Conductor Impedance', p. 22: 4/0 ACSR X = 0.581 ohm/mile, '% voltage rise per mile on 120-volt base with 100 kVAr per phase', 7,200 column = 0.112. Entered as 300 kVAr three-phase at 12.47 kV line-to-line over 1 mile (X = 0.581 ohm). Tolerance: half a unit in the last printed place. The 14,400 column is NOT used: it prints exactly half the 7,200 value, but on a 120 V base the rise at twice the voltage is one quarter (half the current AND twice the PT ratio), so the publisher's own column is wrong.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "bank_kvar": 300,
+    "line_voltage_kv": 12.47,
+    "reactance_to_source_ohm": 0.581,
+    "peak_load_voltage_v": 118,
+    "light_load_voltage_v": 124,
+    "upper_limit_v": 126
+   },
+   "outputs": {
+    "rise_pct": {
+     "value": 0.112,
+     "tolerance": {
+      "abs": 0.0005
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "capacitor-bank-voltage-rise",
+   "source_publisher": "USDA Rural Utilities Service",
+   "source_title": "Table 2: percent voltage rise per mile, 100 kVAr per phase on a 7,200 V line-to-neutral system, No. 4 ACSR",
+   "source_edition_or_year": "RUS Bulletin 1724D-112, The Application of Capacitors on Rural Electric Systems",
+   "source_section_or_page": "Table 2 'Conductor Impedance', p. 22: No. 4 ACSR X = 0.655 ohm/mile, '% voltage rise per mile on 120-volt base with 100 kVAr per phase', 7,200 column = 0.126. Entered as 300 kVAr three-phase at 12.47 kV line-to-line over 1 mile (X = 0.655 ohm). Tolerance: half a unit in the last printed place. The 14,400 column is NOT used: it prints exactly half the 7,200 value, but on a 120 V base the rise at twice the voltage is one quarter (half the current AND twice the PT ratio), so the publisher's own column is wrong.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "bank_kvar": 300,
+    "line_voltage_kv": 12.47,
+    "reactance_to_source_ohm": 0.655,
+    "peak_load_voltage_v": 118,
+    "light_load_voltage_v": 124,
+    "upper_limit_v": 126
+   },
+   "outputs": {
+    "rise_pct": {
+     "value": 0.126,
+     "tolerance": {
+      "abs": 0.0005
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "capacitor-bank-voltage-rise",
+   "source_publisher": "USDA Rural Utilities Service",
+   "source_title": "Table 2: percent voltage rise per mile, 100 kVAr per phase on a 7,200 V line-to-neutral system, 477 kcmil ACSR",
+   "source_edition_or_year": "RUS Bulletin 1724D-112, The Application of Capacitors on Rural Electric Systems",
+   "source_section_or_page": "Table 2 'Conductor Impedance', p. 22: 477 kcmil ACSR X = 0.43 ohm/mile, '% voltage rise per mile on 120-volt base with 100 kVAr per phase', 7,200 column = 0.0829. Entered as 300 kVAr three-phase at 12.47 kV line-to-line over 1 mile (X = 0.43 ohm). Tolerance: half a unit in the last printed place, widened to 0.0001 because the publisher works on 7.2 kV and the tile on 12.47 kV LL (7.1996 kV LN), a 0.07% basis difference. The 14,400 column is NOT used: it prints exactly half the 7,200 value, but on a 120 V base the rise at twice the voltage is one quarter (half the current AND twice the PT ratio), so the publisher's own column is wrong.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "bank_kvar": 300,
+    "line_voltage_kv": 12.47,
+    "reactance_to_source_ohm": 0.43,
+    "peak_load_voltage_v": 118,
+    "light_load_voltage_v": 124,
+    "upper_limit_v": 126
+   },
+   "outputs": {
+    "rise_pct": {
+     "value": 0.0829,
+     "tolerance": {
+      "abs": 0.0001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "regulator-tap-bandwidth",
+   "source_publisher": "USDA Rural Utilities Service",
+   "source_title": "A 2-volt bandwidth is plus or minus 1 volt around the set voltage",
+   "source_edition_or_year": "RUS Bulletin 1724D-114, Voltage Regulator Application on Rural Distribution Systems",
+   "source_section_or_page": "Section c(5)(b) Bandwidth, pp. 21-22: 'a 2-volt bandwidth on a 122-volt setting means ... below 121 volts or above 123 volts'; recommended bandwidth '1.5 volts (+/-3/4 volt) or 2 volts (+/-1 volt)'. band_half_v does not depend on the base; base 120, tap 0 and the LDC fields are placeholders.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "base_voltage_v": 120,
+    "bandwidth_v": 2,
+    "tap_position": 0,
+    "load_current_a": 0,
+    "power_factor": 0.9,
+    "ldc_r_volts": 0,
+    "ldc_x_volts": 0,
+    "ct_rating_a": 0
+   },
+   "outputs": {
+    "band_half_v": {
+     "value": 1,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "regulator-tap-bandwidth",
+   "source_publisher": "USDA Rural Utilities Service",
+   "source_title": "A 1.5-volt bandwidth is plus or minus 3/4 volt",
+   "source_edition_or_year": "RUS Bulletin 1724D-114, Voltage Regulator Application on Rural Distribution Systems",
+   "source_section_or_page": "Section c(5)(b)(2), p. 22: 'The recommended bandwidth for RUS borrowers is 1.5 volts (+/-3/4 volt) or 2 volts (+/-1 volt).' Base, tap and LDC fields are placeholders.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "base_voltage_v": 120,
+    "bandwidth_v": 1.5,
+    "tap_position": 0,
+    "load_current_a": 0,
+    "power_factor": 0.9,
+    "ldc_r_volts": 0,
+    "ldc_x_volts": 0,
+    "ct_rating_a": 0
+   },
+   "outputs": {
+    "band_half_v": {
+     "value": 0.75,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "blast-airblast-overpressure",
+   "source_publisher": "U.S. Department of the Interior, Office of Surface Mining Reclamation and Enforcement (OSMRE)",
+   "source_title": "Record 3: 680 ft from a 426.5 lb-per-delay blast, airblast reported 126 dB",
+   "source_edition_or_year": "Blast-Induced Vibration Data Evaluation Program (BIVDEP) 2.0 Documentation, Attachment A: BIVDEP Example (review date 01/01/19)",
+   "source_section_or_page": "Attachment A data table 'OSMRE Regression Analysis of Blast-Induced Vibration Data' (U.S. units), record 3: D = 680 ft, CW = 426.5 lb, AB = 126 dB = 0.0058 lbs/in2 (4 decimals), cube root scaled distance 90.34 ft/lb^(1/3) (2 decimals). The reported dB is entered as limit_db so limit_psi exercises the same dB-to-psi conversion (2.9e-9 psi reference). airblast_k 0.220 and airblast_b 0.883 are the same document's printed best-fit line (A = 0.220, slope -0.883) but the predicted overpressure is not printed and is not pinned; confinement penalty is a placeholder.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "distance_ft": 680,
+    "charge_per_delay_lb": 426.5,
+    "airblast_k": 0.22,
+    "airblast_b": 0.883,
+    "limit_db": 126,
+    "confinement_penalty_db": 20
+   },
+   "outputs": {
+    "cube_root_scaled_distance": {
+     "value": 90.34,
+     "tolerance": {
+      "abs": 0.006
+     }
+    },
+    "limit_psi": {
+     "value": 0.0058,
+     "tolerance": {
+      "abs": 5e-05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "blast-airblast-overpressure",
+   "source_publisher": "U.S. Department of the Interior, Office of Surface Mining Reclamation and Enforcement (OSMRE)",
+   "source_title": "Record 117: 90 ft from a 293.5 lb-per-delay blast, airblast reported 138 dB",
+   "source_edition_or_year": "Blast-Induced Vibration Data Evaluation Program (BIVDEP) 2.0 Documentation, Attachment A: BIVDEP Example (review date 01/01/19)",
+   "source_section_or_page": "Attachment A data table 'OSMRE Regression Analysis of Blast-Induced Vibration Data' (U.S. units), record 117: D = 90 ft, CW = 293.5 lb, AB = 138 dB = 0.023 lbs/in2 (4 decimals), cube root scaled distance 13.54 ft/lb^(1/3) (2 decimals). The reported dB is entered as limit_db so limit_psi exercises the same dB-to-psi conversion (2.9e-9 psi reference). airblast_k 0.220 and airblast_b 0.883 are the same document's printed best-fit line (A = 0.220, slope -0.883) but the predicted overpressure is not printed and is not pinned; confinement penalty is a placeholder.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "distance_ft": 90,
+    "charge_per_delay_lb": 293.5,
+    "airblast_k": 0.22,
+    "airblast_b": 0.883,
+    "limit_db": 138,
+    "confinement_penalty_db": 20
+   },
+   "outputs": {
+    "cube_root_scaled_distance": {
+     "value": 13.54,
+     "tolerance": {
+      "abs": 0.006
+     }
+    },
+    "limit_psi": {
+     "value": 0.023,
+     "tolerance": {
+      "abs": 5e-05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "blast-airblast-overpressure",
+   "source_publisher": "U.S. Department of the Interior, Office of Surface Mining Reclamation and Enforcement (OSMRE)",
+   "source_title": "Record 158: 422 ft from a 338 lb-per-delay blast, airblast reported 131 dB",
+   "source_edition_or_year": "Blast-Induced Vibration Data Evaluation Program (BIVDEP) 2.0 Documentation, Attachment A: BIVDEP Example (review date 01/01/19)",
+   "source_section_or_page": "Attachment A data table 'OSMRE Regression Analysis of Blast-Induced Vibration Data' (U.S. units), record 158: D = 422 ft, CW = 338 lb, AB = 131 dB = 0.0103 lbs/in2 (4 decimals), cube root scaled distance 60.58 ft/lb^(1/3) (2 decimals). The reported dB is entered as limit_db so limit_psi exercises the same dB-to-psi conversion (2.9e-9 psi reference). airblast_k 0.220 and airblast_b 0.883 are the same document's printed best-fit line (A = 0.220, slope -0.883) but the predicted overpressure is not printed and is not pinned; confinement penalty is a placeholder.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "distance_ft": 422,
+    "charge_per_delay_lb": 338,
+    "airblast_k": 0.22,
+    "airblast_b": 0.883,
+    "limit_db": 131,
+    "confinement_penalty_db": 20
+   },
+   "outputs": {
+    "cube_root_scaled_distance": {
+     "value": 60.58,
+     "tolerance": {
+      "abs": 0.006
+     }
+    },
+    "limit_psi": {
+     "value": 0.0103,
+     "tolerance": {
+      "abs": 5e-05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "blast-airblast-overpressure",
+   "source_publisher": "U.S. Department of the Interior, Office of Surface Mining Reclamation and Enforcement (OSMRE)",
+   "source_title": "Record 140: 1,372 ft from a 431 lb-per-delay blast, airblast reported 127 dB",
+   "source_edition_or_year": "Blast-Induced Vibration Data Evaluation Program (BIVDEP) 2.0 Documentation, Attachment A: BIVDEP Example (review date 01/01/19)",
+   "source_section_or_page": "Attachment A data table 'OSMRE Regression Analysis of Blast-Induced Vibration Data' (U.S. units), record 140: D = 1372 ft, CW = 431 lb, AB = 127 dB = 0.0065 lbs/in2 (4 decimals), cube root scaled distance 181.63 ft/lb^(1/3) (2 decimals). The reported dB is entered as limit_db so limit_psi exercises the same dB-to-psi conversion (2.9e-9 psi reference). airblast_k 0.220 and airblast_b 0.883 are the same document's printed best-fit line (A = 0.220, slope -0.883) but the predicted overpressure is not printed and is not pinned; confinement penalty is a placeholder.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "distance_ft": 1372,
+    "charge_per_delay_lb": 431,
+    "airblast_k": 0.22,
+    "airblast_b": 0.883,
+    "limit_db": 127,
+    "confinement_penalty_db": 20
+   },
+   "outputs": {
+    "cube_root_scaled_distance": {
+     "value": 181.63,
+     "tolerance": {
+      "abs": 0.006
+     }
+    },
+    "limit_psi": {
+     "value": 0.0065,
+     "tolerance": {
+      "abs": 5e-05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "blast-airblast-overpressure",
+   "source_publisher": "U.S. Department of the Interior, Office of Surface Mining Reclamation and Enforcement (OSMRE)",
+   "source_title": "Record 130: 3,004 ft from a 334 lb-per-delay blast, airblast reported 106 dB",
+   "source_edition_or_year": "Blast-Induced Vibration Data Evaluation Program (BIVDEP) 2.0 Documentation, Attachment A: BIVDEP Example (review date 01/01/19)",
+   "source_section_or_page": "Attachment A data table 'OSMRE Regression Analysis of Blast-Induced Vibration Data' (U.S. units), record 130: D = 3004 ft, CW = 334 lb, AB = 106 dB = 0.0006 lbs/in2 (4 decimals), cube root scaled distance 432.96 ft/lb^(1/3) (2 decimals). The reported dB is entered as limit_db so limit_psi exercises the same dB-to-psi conversion (2.9e-9 psi reference). airblast_k 0.220 and airblast_b 0.883 are the same document's printed best-fit line (A = 0.220, slope -0.883) but the predicted overpressure is not printed and is not pinned; confinement penalty is a placeholder.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "distance_ft": 3004,
+    "charge_per_delay_lb": 334,
+    "airblast_k": 0.22,
+    "airblast_b": 0.883,
+    "limit_db": 106,
+    "confinement_penalty_db": 20
+   },
+   "outputs": {
+    "cube_root_scaled_distance": {
+     "value": 432.96,
+     "tolerance": {
+      "abs": 0.006
+     }
+    },
+    "limit_psi": {
+     "value": 0.0006,
+     "tolerance": {
+      "abs": 5e-05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "blast-airblast-overpressure",
+   "source_publisher": "U.S. Federal Highway Administration (National Highway Institute)",
+   "source_title": "Table 10.11 sound level limits: 136 dB linear peak = 0.018 psi",
+   "source_edition_or_year": "Konya & Walter, Rock Blasting and Overbreak Control, FHWA-HI-92-001, 1991",
+   "source_section_or_page": "Section 10.7.3, Table 10.11 'Sound Level Limits' (after Siskind and Summers, USBM TPR 78): Limit 136 dB linear peak, 0.018 psi (printed to 3 decimals). Distance, charge, K, b and penalty are placeholders; only limit_psi is pinned.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "distance_ft": 1200,
+    "charge_per_delay_lb": 340,
+    "airblast_k": 0.2,
+    "airblast_b": 1.2,
+    "limit_db": 136,
+    "confinement_penalty_db": 20
+   },
+   "outputs": {
+    "limit_psi": {
+     "value": 0.018,
+     "tolerance": {
+      "abs": 0.0005
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "blast-stemming-length",
+   "source_publisher": "U.S. Federal Highway Administration (National Highway Institute)",
+   "source_title": "Example 6.4: stemming for a 3 in blasthole in limestone at a 6.25 ft burden",
+   "source_edition_or_year": "Konya & Walter, Rock Blasting and Overbreak Control, FHWA-HI-92-001, 1991",
+   "source_section_or_page": "Section 6.2, Example 6.4, p. 96: T = 0.7 x B = 0.7 x 6.25 = 4.38 ft (crushed stone or drilling chips). Printed to 0.01 ft. Proposed stemming (4.38) is a placeholder; the 20-diameter rule is the tile's own and is not in this source, so governing_ft (5.00 ft in the tile) is NOT pinned (see report lead).",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "burden_ft": 6.25,
+    "hole_diameter_in": 3,
+    "proposed_stemming_ft": 4.38,
+    "burden_ratio_low": 0.7,
+    "burden_ratio_high": 1,
+    "diameter_multiple": 20
+   },
+   "outputs": {
+    "by_burden_ft": {
+     "value": 4.38,
+     "tolerance": {
+      "abs": 0.006
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "blast-stemming-length",
+   "source_publisher": "U.S. Federal Highway Administration (National Highway Institute)",
+   "source_title": "Chapter 11 example blasting submittal, Step 6: check stemming depth at a 5 ft burden",
+   "source_edition_or_year": "Konya & Walter, Rock Blasting and Overbreak Control, FHWA-HI-92-001, 1991",
+   "source_section_or_page": "Chapter 11, Figure 11.1B example submittal, Step 6: T = 0.7 x B = 0.7 x 5 = 3.5 ft ('Stemming depth proposed was 5 feet. Value is reasonable'). The 5 ft proposed stemming is printed; hole diameter 2 in is the printed explosive diameter De used as a placeholder (by_burden_ft does not depend on it).",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "burden_ft": 5,
+    "hole_diameter_in": 2,
+    "proposed_stemming_ft": 5,
+    "burden_ratio_low": 0.7,
+    "burden_ratio_high": 1,
+    "diameter_multiple": 20
+   },
+   "outputs": {
+    "by_burden_ft": {
+     "value": 3.5,
+     "tolerance": {
+      "abs": 0.005
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "blast-stemming-length",
+   "source_publisher": "U.S. Federal Highway Administration (National Highway Institute)",
+   "source_title": "Appendix V Chapter 6 answers, 2a: stemming for a one-inch hole at a 2.2 ft burden",
+   "source_edition_or_year": "Konya & Walter, Rock Blasting and Overbreak Control, FHWA-HI-92-001, 1991",
+   "source_section_or_page": "Appendix V Problem Solutions, Chapter 6 answers 2a: 'Stemming for one inch hole: T = 0.7 B = 0.7 x 2.2 = 1.54 ft'. Proposed stemming is a placeholder.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "burden_ft": 2.2,
+    "hole_diameter_in": 1,
+    "proposed_stemming_ft": 1.54,
+    "burden_ratio_low": 0.7,
+    "burden_ratio_high": 1,
+    "diameter_multiple": 20
+   },
+   "outputs": {
+    "by_burden_ft": {
+     "value": 1.54,
+     "tolerance": {
+      "abs": 0.005
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "blast-stemming-length",
+   "source_publisher": "U.S. Federal Highway Administration (National Highway Institute)",
+   "source_title": "Appendix V Chapter 6 answers, 2a: stemming for a five-inch hole at a 10.96 ft burden",
+   "source_edition_or_year": "Konya & Walter, Rock Blasting and Overbreak Control, FHWA-HI-92-001, 1991",
+   "source_section_or_page": "Appendix V, Chapter 6 answers 1 and 2a: five-inch hole B = 10.96 ft; 'For five inch hole: T = 7.7 ft' (0.7 x 10.96 = 7.672, printed to 0.1 ft). Proposed stemming is a placeholder.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "burden_ft": 10.96,
+    "hole_diameter_in": 5,
+    "proposed_stemming_ft": 7.7,
+    "burden_ratio_low": 0.7,
+    "burden_ratio_high": 1,
+    "diameter_multiple": 20
+   },
+   "outputs": {
+    "by_burden_ft": {
+     "value": 7.7,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "guy-anchor-holding-capacity",
+   "source_publisher": "Hubbell Power Systems, Inc.",
+   "source_title": "Table 8-2 Practical Guidelines for Foundation Selection: SS5 at 5,500 ft-lb installation torque",
+   "source_edition_or_year": "CHANCE Technical Design Manual, Section 8 Design Examples, 2014",
+   "source_section_or_page": "Section 8, Design Example 4, Step 8, Table 8-2, p. 8-14: installation torque 5500 ft-lb -> ultimate load 55 kip, design load 27.5 kip (note 1: Kt = 10 for SS, 9 for RS2875; note 2: FS 2). Qult = Kt x T (Eq. 8-19). Helix, depth, cohesion and unit weight are placeholders; only the torque-correlation outputs are pinned. Copy read from helicalpier.com (dealer host of the Hubbell manual).",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "helix_diameter_in": 12,
+    "installed_depth_ft": 7,
+    "cohesion_psf": 1000,
+    "friction_bearing_factor": 0,
+    "soil_unit_weight_pcf": 110,
+    "factor_of_safety": 2,
+    "installing_torque_ftlb": 5500,
+    "torque_factor_per_ft": 10,
+    "guy_tension_lb": 0
+   },
+   "outputs": {
+    "torque_capacity_lb": {
+     "value": 55000,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "torque_allowable_lb": {
+     "value": 27500,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "guy-anchor-holding-capacity",
+   "source_publisher": "Hubbell Power Systems, Inc.",
+   "source_title": "Table 8-2 Practical Guidelines for Foundation Selection: RS2875.203 at 5,500 ft-lb installation torque",
+   "source_edition_or_year": "CHANCE Technical Design Manual, Section 8 Design Examples, 2014",
+   "source_section_or_page": "Section 8, Design Example 4, Step 8, Table 8-2, p. 8-14: installation torque 5500 ft-lb -> ultimate load 49.5 kip, design load 24.75 kip (note 1: Kt = 10 for SS, 9 for RS2875; note 2: FS 2). Qult = Kt x T (Eq. 8-19). Helix, depth, cohesion and unit weight are placeholders; only the torque-correlation outputs are pinned. Copy read from helicalpier.com (dealer host of the Hubbell manual).",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "helix_diameter_in": 12,
+    "installed_depth_ft": 7,
+    "cohesion_psf": 1000,
+    "friction_bearing_factor": 0,
+    "soil_unit_weight_pcf": 110,
+    "factor_of_safety": 2,
+    "installing_torque_ftlb": 5500,
+    "torque_factor_per_ft": 9,
+    "guy_tension_lb": 0
+   },
+   "outputs": {
+    "torque_capacity_lb": {
+     "value": 49500,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "torque_allowable_lb": {
+     "value": 24750,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "guy-anchor-holding-capacity",
+   "source_publisher": "Hubbell Power Systems, Inc.",
+   "source_title": "Table 8-2 Practical Guidelines for Foundation Selection: SS150 at 7,000 ft-lb installation torque",
+   "source_edition_or_year": "CHANCE Technical Design Manual, Section 8 Design Examples, 2014",
+   "source_section_or_page": "Section 8, Design Example 4, Step 8, Table 8-2, p. 8-14: installation torque 7000 ft-lb -> ultimate load 70 kip, design load 35 kip (note 1: Kt = 10 for SS, 9 for RS2875; note 2: FS 2). Qult = Kt x T (Eq. 8-19). Helix, depth, cohesion and unit weight are placeholders; only the torque-correlation outputs are pinned. Copy read from helicalpier.com (dealer host of the Hubbell manual).",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "helix_diameter_in": 12,
+    "installed_depth_ft": 7,
+    "cohesion_psf": 1000,
+    "friction_bearing_factor": 0,
+    "soil_unit_weight_pcf": 110,
+    "factor_of_safety": 2,
+    "installing_torque_ftlb": 7000,
+    "torque_factor_per_ft": 10,
+    "guy_tension_lb": 0
+   },
+   "outputs": {
+    "torque_capacity_lb": {
+     "value": 70000,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "torque_allowable_lb": {
+     "value": 35000,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "guy-anchor-holding-capacity",
+   "source_publisher": "Hubbell Power Systems, Inc.",
+   "source_title": "Table 8-2 Practical Guidelines for Foundation Selection: RS2875.276 at 8,000 ft-lb installation torque",
+   "source_edition_or_year": "CHANCE Technical Design Manual, Section 8 Design Examples, 2014",
+   "source_section_or_page": "Section 8, Design Example 4, Step 8, Table 8-2, p. 8-14: installation torque 8000 ft-lb -> ultimate load 72 kip, design load 36 kip (note 1: Kt = 10 for SS, 9 for RS2875; note 2: FS 2). Qult = Kt x T (Eq. 8-19). Helix, depth, cohesion and unit weight are placeholders; only the torque-correlation outputs are pinned. Copy read from helicalpier.com (dealer host of the Hubbell manual).",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "helix_diameter_in": 12,
+    "installed_depth_ft": 7,
+    "cohesion_psf": 1000,
+    "friction_bearing_factor": 0,
+    "soil_unit_weight_pcf": 110,
+    "factor_of_safety": 2,
+    "installing_torque_ftlb": 8000,
+    "torque_factor_per_ft": 9,
+    "guy_tension_lb": 0
+   },
+   "outputs": {
+    "torque_capacity_lb": {
+     "value": 72000,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "torque_allowable_lb": {
+     "value": 36000,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "pavement-structural-number",
+   "source_publisher": "Baltimore County Department of Public Works",
+   "source_title": "Design Manual - Flexible Pavement Design (Section 9), based on AASHTO Guide for Design of Pavement Structures 1993",
+   "source_edition_or_year": "September 2010 standards and specifications",
+   "source_section_or_page": "Example #2, Step 4, p. 9-8: SN = (.44 x 1.5) + (.34 x 5.5 x 1.0) + (.14 x 8.0 x 1.0) = .66 + 1.87 + 1.12 = 3.65 against a nomograph design SN of 3.65 (p. 9-7). Printed to 2 decimals. The HMA base (a=0.34) occupies the tile's base slot and the stone base (a=0.14) the subbase slot; drainage 1.0 as printed. required_sn is the printed design SN.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "ac_thickness_in": 1.5,
+    "ac_coefficient": 0.44,
+    "base_thickness_in": 5.5,
+    "base_coefficient": 0.34,
+    "base_drainage": 1.0,
+    "subbase_thickness_in": 8,
+    "subbase_coefficient": 0.14,
+    "subbase_drainage": 1.0,
+    "required_sn": 3.65
+   },
+   "outputs": {
+    "sn_surface": {
+     "value": 0.66,
+     "tolerance": {
+      "abs": 0.005
+     }
+    },
+    "sn_base": {
+     "value": 1.87,
+     "tolerance": {
+      "abs": 0.005
+     }
+    },
+    "sn_subbase": {
+     "value": 1.12,
+     "tolerance": {
+      "abs": 0.005
+     }
+    },
+    "sn_total": {
+     "value": 3.65,
+     "tolerance": {
+      "abs": 0.005
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "esal-traffic-loading",
+   "source_publisher": "Baltimore County Department of Public Works",
+   "source_title": "Design Manual - Flexible Pavement Design (Section 9), based on AASHTO Guide for Design of Pavement Structures 1993",
+   "source_edition_or_year": "September 2010 standards and specifications",
+   "source_section_or_page": "Example #1, Step 1, p. 9-4: ADT 10,202 x 5% trucks = 510 initial significant trucks; x 24.30 growth factor (2%, 20 yr) x 365 x 0.50 truck factor x 0.50 directional = 1.13 x 10^6 design ESAL. Lane factor 1.0 (none applied in the example). Printed to 3 significant figures (tile carries 510.1 trucks unrounded). car_axle_lb and overload_axle_lb are tile-only placeholders (defaults).",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "aadt": 10202,
+    "truck_percent": 5,
+    "directional_factor": 0.5,
+    "lane_factor": 1.0,
+    "esals_per_truck": 0.5,
+    "growth_percent": 2,
+    "design_life_years": 20,
+    "car_axle_lb": 2000,
+    "overload_axle_lb": 0
+   },
+   "outputs": {
+    "design_esals": {
+     "value": 1130000,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "growth_factor": {
+     "value": 24.3,
+     "tolerance": {
+      "abs": 0.005
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "esal-traffic-loading",
+   "source_publisher": "Baltimore County Department of Public Works",
+   "source_title": "Design Manual - Flexible Pavement Design (Section 9), based on AASHTO Guide for Design of Pavement Structures 1993",
+   "source_edition_or_year": "September 2010 standards and specifications",
+   "source_section_or_page": "Appendix p. 9-ii, Traffic Growth Factors table (reproduced from AASHTO 1993 Appendix D), factor = ((1+g)^n - 1)/g: 5% for 10 years = 12.58. Printed to 2 decimals. Only growth_percent and design_life_years come from the table; aadt, truck_percent, factors and esals_per_truck are placeholders and growth_factor is the only checked output.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "aadt": 10000,
+    "truck_percent": 10,
+    "directional_factor": 0.5,
+    "lane_factor": 1.0,
+    "esals_per_truck": 1.0,
+    "growth_percent": 5,
+    "design_life_years": 10,
+    "car_axle_lb": 2000,
+    "overload_axle_lb": 0
+   },
+   "outputs": {
+    "growth_factor": {
+     "value": 12.58,
+     "tolerance": {
+      "abs": 0.005
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "esal-traffic-loading",
+   "source_publisher": "Baltimore County Department of Public Works",
+   "source_title": "Design Manual - Flexible Pavement Design (Section 9), based on AASHTO Guide for Design of Pavement Structures 1993",
+   "source_edition_or_year": "September 2010 standards and specifications",
+   "source_section_or_page": "Appendix p. 9-ii, Traffic Growth Factors table (reproduced from AASHTO 1993 Appendix D), factor = ((1+g)^n - 1)/g: 8% for 25 years = 73.11. Printed to 2 decimals. Only growth_percent and design_life_years come from the table; aadt, truck_percent, factors and esals_per_truck are placeholders and growth_factor is the only checked output.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "aadt": 10000,
+    "truck_percent": 10,
+    "directional_factor": 0.5,
+    "lane_factor": 1.0,
+    "esals_per_truck": 1.0,
+    "growth_percent": 8,
+    "design_life_years": 25,
+    "car_axle_lb": 2000,
+    "overload_axle_lb": 0
+   },
+   "outputs": {
+    "growth_factor": {
+     "value": 73.11,
+     "tolerance": {
+      "abs": 0.005
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "esal-traffic-loading",
+   "source_publisher": "Baltimore County Department of Public Works",
+   "source_title": "Design Manual - Flexible Pavement Design (Section 9), based on AASHTO Guide for Design of Pavement Structures 1993",
+   "source_edition_or_year": "September 2010 standards and specifications",
+   "source_section_or_page": "Appendix p. 9-ii, Traffic Growth Factors table (reproduced from AASHTO 1993 Appendix D), factor = ((1+g)^n - 1)/g: 4% for 30 years = 56.08. Printed to 2 decimals. Only growth_percent and design_life_years come from the table; aadt, truck_percent, factors and esals_per_truck are placeholders and growth_factor is the only checked output.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "aadt": 10000,
+    "truck_percent": 10,
+    "directional_factor": 0.5,
+    "lane_factor": 1.0,
+    "esals_per_truck": 1.0,
+    "growth_percent": 4,
+    "design_life_years": 30,
+    "car_axle_lb": 2000,
+    "overload_axle_lb": 0
+   },
+   "outputs": {
+    "growth_factor": {
+     "value": 56.08,
+     "tolerance": {
+      "abs": 0.005
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "subgrade-cbr-thickness",
+   "source_publisher": "Baltimore County Department of Public Works",
+   "source_title": "Design Manual - Flexible Pavement Design (Section 9), based on AASHTO Guide for Design of Pavement Structures 1993",
+   "source_edition_or_year": "September 2010 standards and specifications",
+   "source_section_or_page": "Example #1 and #2, Step 2, pp. 9-4 and 9-7: MR = 1500 x CBR = 5 x 1500 = 7500 (psi). Exact. Only cbr_pct is from the source; wheel_load_lb, tire_pressure_psi, coverages, geosynthetic and alternate CBR are placeholders and resilient_modulus_psi is the only checked output.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "cbr_pct": 5,
+    "wheel_load_lb": 9000,
+    "tire_pressure_psi": 80,
+    "coverages": 5000,
+    "geosynthetic_reduction_pct": 0,
+    "alternate_cbr_pct": 0
+   },
+   "outputs": {
+    "resilient_modulus_psi": {
+     "value": 7500,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "track-superelevation",
+   "source_publisher": "U.S. Federal Railroad Administration (49 CFR Part 213)",
+   "source_title": "Track Safety Standards, Appendix A to Part 213 - Maximum Allowable Curving Speeds (formula at 213.57(b))",
+   "source_edition_or_year": "eCFR current as of 2026-10-01 (78 FR 16101, 2013)",
+   "source_section_or_page": "Table 1-Three Inches Unbalance: degree of curvature 4\u00b000', elevation of outer rail 4 in -> maximum allowable operating speed 50 mph. Table speeds are whole mph rounded to nearest. speed_mph, target_speed_mph and max_elevation_in are placeholders; max_speed_mph is the only checked output.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "degree_of_curve": 4,
+    "speed_mph": 30,
+    "actual_elevation_in": 4,
+    "allowable_unbalance_in": 3,
+    "max_elevation_in": 7,
+    "target_speed_mph": 30
+   },
+   "outputs": {
+    "max_speed_mph": {
+     "value": 50,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "track-superelevation",
+   "source_publisher": "U.S. Federal Railroad Administration (49 CFR Part 213)",
+   "source_title": "Track Safety Standards, Appendix A to Part 213 - Maximum Allowable Curving Speeds (formula at 213.57(b))",
+   "source_edition_or_year": "eCFR current as of 2026-10-01 (78 FR 16101, 2013)",
+   "source_section_or_page": "Table 1-Three Inches Unbalance: degree of curvature 4\u00b000', elevation of outer rail 6 in -> maximum allowable operating speed 57 mph. Table speeds are whole mph rounded to nearest. speed_mph, target_speed_mph and max_elevation_in are placeholders; max_speed_mph is the only checked output.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "degree_of_curve": 4,
+    "speed_mph": 30,
+    "actual_elevation_in": 6,
+    "allowable_unbalance_in": 3,
+    "max_elevation_in": 7,
+    "target_speed_mph": 30
+   },
+   "outputs": {
+    "max_speed_mph": {
+     "value": 57,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "track-superelevation",
+   "source_publisher": "U.S. Federal Railroad Administration (49 CFR Part 213)",
+   "source_title": "Track Safety Standards, Appendix A to Part 213 - Maximum Allowable Curving Speeds (formula at 213.57(b))",
+   "source_edition_or_year": "eCFR current as of 2026-10-01 (78 FR 16101, 2013)",
+   "source_section_or_page": "Table 1-Three Inches Unbalance: degree of curvature 1\u00b000', elevation of outer rail 0 in -> maximum allowable operating speed 65 mph. Table speeds are whole mph rounded to nearest. speed_mph, target_speed_mph and max_elevation_in are placeholders; max_speed_mph is the only checked output.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "degree_of_curve": 1,
+    "speed_mph": 30,
+    "actual_elevation_in": 0,
+    "allowable_unbalance_in": 3,
+    "max_elevation_in": 7,
+    "target_speed_mph": 30
+   },
+   "outputs": {
+    "max_speed_mph": {
+     "value": 65,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "track-superelevation",
+   "source_publisher": "U.S. Federal Railroad Administration (49 CFR Part 213)",
+   "source_title": "Track Safety Standards, Appendix A to Part 213 - Maximum Allowable Curving Speeds (formula at 213.57(b))",
+   "source_edition_or_year": "eCFR current as of 2026-10-01 (78 FR 16101, 2013)",
+   "source_section_or_page": "Table 1-Three Inches Unbalance: degree of curvature 12\u00b000', elevation of outer rail 6 in -> maximum allowable operating speed 33 mph. Table speeds are whole mph rounded to nearest. speed_mph, target_speed_mph and max_elevation_in are placeholders; max_speed_mph is the only checked output.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "degree_of_curve": 12,
+    "speed_mph": 30,
+    "actual_elevation_in": 6,
+    "allowable_unbalance_in": 3,
+    "max_elevation_in": 7,
+    "target_speed_mph": 30
+   },
+   "outputs": {
+    "max_speed_mph": {
+     "value": 33,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "track-superelevation",
+   "source_publisher": "U.S. Federal Railroad Administration (49 CFR Part 213)",
+   "source_title": "Track Safety Standards, Appendix A to Part 213 - Maximum Allowable Curving Speeds (formula at 213.57(b))",
+   "source_edition_or_year": "eCFR current as of 2026-10-01 (78 FR 16101, 2013)",
+   "source_section_or_page": "Table 2-Four Inches Unbalance: degree of curvature 4\u00b000', elevation of outer rail 2 in -> maximum allowable operating speed 46 mph. Table speeds are whole mph rounded to nearest. speed_mph, target_speed_mph and max_elevation_in are placeholders; max_speed_mph is the only checked output.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "degree_of_curve": 4,
+    "speed_mph": 30,
+    "actual_elevation_in": 2,
+    "allowable_unbalance_in": 4,
+    "max_elevation_in": 7,
+    "target_speed_mph": 30
+   },
+   "outputs": {
+    "max_speed_mph": {
+     "value": 46,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "track-superelevation",
+   "source_publisher": "U.S. Federal Railroad Administration (49 CFR Part 213)",
+   "source_title": "Track Safety Standards, Appendix A to Part 213 - Maximum Allowable Curving Speeds (formula at 213.57(b))",
+   "source_edition_or_year": "eCFR current as of 2026-10-01 (78 FR 16101, 2013)",
+   "source_section_or_page": "Table 2-Four Inches Unbalance: degree of curvature 2\u00b000', elevation of outer rail 6 in -> maximum allowable operating speed 85 mph. Table speeds are whole mph rounded to nearest. speed_mph, target_speed_mph and max_elevation_in are placeholders; max_speed_mph is the only checked output.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "degree_of_curve": 2,
+    "speed_mph": 30,
+    "actual_elevation_in": 6,
+    "allowable_unbalance_in": 4,
+    "max_elevation_in": 7,
+    "target_speed_mph": 30
+   },
+   "outputs": {
+    "max_speed_mph": {
+     "value": 85,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "septic-drainfield",
+   "source_publisher": "University of Missouri Extension",
+   "source_title": "Septic Tank/Absorption Field Systems: A Homeowner's Guide to Installation and Maintenance (EQ401)",
+   "source_edition_or_year": "EQ401 (current web PDF)",
+   "source_section_or_page": "p. 5, 'Using soil morphology results' example: 120 gpd/bedroom x 3 bedrooms = 360 gpd; application rate 0.3 gpd/sq ft; 360 / 0.3 = 1,200 sq ft of absorption area; 1,200 / 2 ft width = 600 lineal feet of trench. Exact.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "design_flow_gpd": 360,
+    "application_rate_gpd_per_ft2": 0.3,
+    "trench_width_ft": 2
+   },
+   "outputs": {
+    "required_area_ft2": {
+     "value": 1200,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "trench_feet": {
+     "value": 600,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "septic-drainfield",
+   "source_publisher": "New York State Department of Health",
+   "source_title": "10 NYCRR Appendix 75-A, Wastewater Treatment Standards - Individual Household Systems (unofficial compilation)",
+   "source_edition_or_year": "current health.ny.gov PDF",
+   "source_section_or_page": "75-A.8(b) Table 4A Required Length of Absorption Trench (2 ft wide trench): 330 gpd at percolation 21-30 min/in -> 275 ft. Table 4B gives the application rate 0.6 gpd/sq ft for 21-30 min/in and states Required Area = Flow / Application Rate and Length = Area / 2 ft. Table entries are whole feet rounded up; required_area_ft2 is not printed for this cell.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "design_flow_gpd": 330,
+    "application_rate_gpd_per_ft2": 0.6,
+    "trench_width_ft": 2
+   },
+   "outputs": {
+    "trench_feet": {
+     "value": 275,
+     "tolerance": {
+      "abs": 1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "septic-drainfield",
+   "source_publisher": "New York State Department of Health",
+   "source_title": "10 NYCRR Appendix 75-A, Wastewater Treatment Standards - Individual Household Systems (unofficial compilation)",
+   "source_edition_or_year": "current health.ny.gov PDF",
+   "source_section_or_page": "75-A.8(b) Table 4A Required Length of Absorption Trench (2 ft wide trench): 440 gpd at percolation 46-60 min/in -> 489 ft. Table 4B gives the application rate 0.45 gpd/sq ft for 46-60 min/in and states Required Area = Flow / Application Rate and Length = Area / 2 ft. Table entries are whole feet rounded up; required_area_ft2 is not printed for this cell.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "design_flow_gpd": 440,
+    "application_rate_gpd_per_ft2": 0.45,
+    "trench_width_ft": 2
+   },
+   "outputs": {
+    "trench_feet": {
+     "value": 489,
+     "tolerance": {
+      "abs": 1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "septic-drainfield",
+   "source_publisher": "New York State Department of Health",
+   "source_title": "10 NYCRR Appendix 75-A, Wastewater Treatment Standards - Individual Household Systems (unofficial compilation)",
+   "source_edition_or_year": "current health.ny.gov PDF",
+   "source_section_or_page": "75-A.8(b) Table 4A Required Length of Absorption Trench (2 ft wide trench): 550 gpd at percolation 16-20 min/in -> 393 ft. Table 4B gives the application rate 0.7 gpd/sq ft for 16-20 min/in and states Required Area = Flow / Application Rate and Length = Area / 2 ft. Table entries are whole feet rounded up; required_area_ft2 is not printed for this cell.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "design_flow_gpd": 550,
+    "application_rate_gpd_per_ft2": 0.7,
+    "trench_width_ft": 2
+   },
+   "outputs": {
+    "trench_feet": {
+     "value": 393,
+     "tolerance": {
+      "abs": 1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "transformer-sizing",
+   "source_publisher": "Alfa Transformer",
+   "source_title": "Transformer Full Load Current Ratings - 600V Class (reference chart)",
+   "source_edition_or_year": "current web PDF",
+   "source_section_or_page": "Three Phase 600V Class table: 75 kVA -> 90.2 A at 480 V and 208.2 A at 208 V (Amps = kVA / Volts / 1.732 x 1000). Printed to 0.1 A. load_kW is entered equal to the nameplate kVA at power factor 1.0 so required_kVA equals the rating; only the FLAs are checked.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "load_kW": 75,
+    "power_factor": 1,
+    "primary_V": 480,
+    "secondary_V": 208,
+    "phase": "three"
+   },
+   "outputs": {
+    "primary_FLA_A": {
+     "value": 90.2,
+     "tolerance": {
+      "abs": 0.05
+     }
+    },
+    "secondary_FLA_A": {
+     "value": 208.2,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "transformer-sizing",
+   "source_publisher": "Alfa Transformer",
+   "source_title": "Transformer Full Load Current Ratings - 600V Class (reference chart)",
+   "source_edition_or_year": "current web PDF",
+   "source_section_or_page": "Three Phase 600V Class table: 500 kVA -> 601.4 A at 480 V and 1387.9 A at 208 V (Amps = kVA / Volts / 1.732 x 1000). Printed to 0.1 A. load_kW is entered equal to the nameplate kVA at power factor 1.0 so required_kVA equals the rating; only the FLAs are checked.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "load_kW": 500,
+    "power_factor": 1,
+    "primary_V": 480,
+    "secondary_V": 208,
+    "phase": "three"
+   },
+   "outputs": {
+    "primary_FLA_A": {
+     "value": 601.4,
+     "tolerance": {
+      "abs": 0.05
+     }
+    },
+    "secondary_FLA_A": {
+     "value": 1387.9,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "transformer-sizing",
+   "source_publisher": "Alfa Transformer",
+   "source_title": "Transformer Full Load Current Ratings - 600V Class (reference chart)",
+   "source_edition_or_year": "current web PDF",
+   "source_section_or_page": "Three Phase 600V Class table: 112.5 kVA -> 135.3 A at 480 V and 270.6 A at 240 V (Amps = kVA / Volts / 1.732 x 1000). Printed to 0.1 A. load_kW is entered equal to the nameplate kVA at power factor 1.0 so required_kVA equals the rating; only the FLAs are checked.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "load_kW": 112.5,
+    "power_factor": 1,
+    "primary_V": 480,
+    "secondary_V": 240,
+    "phase": "three"
+   },
+   "outputs": {
+    "primary_FLA_A": {
+     "value": 135.3,
+     "tolerance": {
+      "abs": 0.05
+     }
+    },
+    "secondary_FLA_A": {
+     "value": 270.6,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "transformer-sizing",
+   "source_publisher": "Alfa Transformer",
+   "source_title": "Transformer Full Load Current Ratings - 600V Class (reference chart)",
+   "source_edition_or_year": "current web PDF",
+   "source_section_or_page": "Single Phase 600V Class table: 25 kVA -> 52.1 A at 480 V and 104.2 A at 240 V (Amps = kVA / Volts x 1000). Printed to 0.1 A. load_kW is entered equal to the nameplate kVA at power factor 1.0 so required_kVA equals the rating; only the FLAs are checked.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "load_kW": 25,
+    "power_factor": 1,
+    "primary_V": 480,
+    "secondary_V": 240,
+    "phase": "single"
+   },
+   "outputs": {
+    "primary_FLA_A": {
+     "value": 52.1,
+     "tolerance": {
+      "abs": 0.05
+     }
+    },
+    "secondary_FLA_A": {
+     "value": 104.2,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "transformer-sizing",
+   "source_publisher": "Alfa Transformer",
+   "source_title": "Transformer Full Load Current Ratings - 600V Class (reference chart)",
+   "source_edition_or_year": "current web PDF",
+   "source_section_or_page": "Single Phase 600V Class table: 167 kVA -> 695.8 A at 240 V and 1391.7 A at 120 V (Amps = kVA / Volts x 1000). Printed to 0.1 A. load_kW is entered equal to the nameplate kVA at power factor 1.0 so required_kVA equals the rating; only the FLAs are checked.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "load_kW": 167,
+    "power_factor": 1,
+    "primary_V": 240,
+    "secondary_V": 120,
+    "phase": "single"
+   },
+   "outputs": {
+    "primary_FLA_A": {
+     "value": 695.8,
+     "tolerance": {
+      "abs": 0.05
+     }
+    },
+    "secondary_FLA_A": {
+     "value": 1391.7,
+     "tolerance": {
+      "abs": 0.05
      }
     }
    }
