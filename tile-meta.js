@@ -1475,6 +1475,12 @@ const _TILES = [
   ["debris-management-site-sizing", "E"],
   ["debris-load-ticket", "J"],
   ["hazard-tree-stump-screen", "L"],
+  // spec-v1918..v1922 disaster response relief logistics, shelter, and temporary housing band.
+  ["relief-commodity-truckloads", "J"],
+  ["pod-site-configuration", "J"],
+  ["shelter-capacity-sanitation", "G"],
+  ["safe-room-capacity", "E"],
+  ["temp-housing-park-feeder-demand", "A"],
 ];
 
 

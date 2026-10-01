@@ -1889,5 +1889,10 @@ export const TOOL_MODULES = (() => {
     "hurricane-debris-estimate", "structure-debris-estimate", "debris-management-site-sizing",
     "debris-load-ticket", "hazard-tree-stump-screen",
   ]);
+  // spec-v1918..v1922: disaster response relief logistics, shelter, and temporary housing band.
+  declare("./calc-relief.js", "RELIEF_RENDERERS", [
+    "relief-commodity-truckloads", "pod-site-configuration", "shelter-capacity-sanitation",
+    "safe-room-capacity", "temp-housing-park-feeder-demand",
+  ]);
   return map;
 })();

@@ -2370,6 +2370,11 @@ const RELATED = {
   "debris-management-site-sizing": ["hurricane-debris-estimate","chipper-debris","dump-truck-loads","haul-cycle-production","stockpile-volume"],
   "debris-load-ticket": ["dump-truck-loads","haul-cycle-production","hurricane-debris-estimate","structure-debris-estimate"],
   "hazard-tree-stump-screen": ["stump-grinding-volume","chipper-debris","tree-height-clinometer","log-limb-weight","debris-load-ticket"],
+  "relief-commodity-truckloads": ["pod-site-configuration","pallet-loadout","backcountry-needs","ice-machine-sizing","shelter-capacity-sanitation"],
+  "pod-site-configuration": ["relief-commodity-truckloads","dock-door-count-throughput","traffic-taper-length","accessible-parking-geometry"],
+  "shelter-capacity-sanitation": ["occupant-load","plumbing-fixture-count","safe-room-capacity","septic-tank","relief-commodity-truckloads"],
+  "safe-room-capacity": ["storm-shelter","occupant-load","shelter-capacity-sanitation","wind-mwfrs-pressure"],
+  "temp-housing-park-feeder-demand": ["service-load","service-conductor-sizing","voltage-drop","generator-sizing"],
 };
 
 export { RELATED };

@@ -116082,6 +116082,131 @@
    "term": "stump conversion table",
    "target": "hazard-tree-stump-screen",
    "kind": "industry"
+  },
+  {
+   "term": "disaster water truckloads",
+   "target": "relief-commodity-truckloads",
+   "kind": "industry"
+  },
+  {
+   "term": "how much water for disaster population",
+   "target": "relief-commodity-truckloads",
+   "kind": "industry"
+  },
+  {
+   "term": "mre truckloads",
+   "target": "relief-commodity-truckloads",
+   "kind": "industry"
+  },
+  {
+   "term": "ice truckloads disaster",
+   "target": "relief-commodity-truckloads",
+   "kind": "industry"
+  },
+  {
+   "term": "commodity distribution planning",
+   "target": "relief-commodity-truckloads",
+   "kind": "industry"
+  },
+  {
+   "term": "point of distribution size",
+   "target": "pod-site-configuration",
+   "kind": "industry"
+  },
+  {
+   "term": "pod type i ii iii",
+   "target": "pod-site-configuration",
+   "kind": "industry"
+  },
+  {
+   "term": "pod lanes staff",
+   "target": "pod-site-configuration",
+   "kind": "industry"
+  },
+  {
+   "term": "drive through distribution site",
+   "target": "pod-site-configuration",
+   "kind": "industry"
+  },
+  {
+   "term": "how many pods do we need",
+   "target": "pod-site-configuration",
+   "kind": "industry"
+  },
+  {
+   "term": "shelter capacity square feet per person",
+   "target": "shelter-capacity-sanitation",
+   "kind": "industry"
+  },
+  {
+   "term": "emergency shelter toilets",
+   "target": "shelter-capacity-sanitation",
+   "kind": "industry"
+  },
+  {
+   "term": "red cross shelter standards",
+   "target": "shelter-capacity-sanitation",
+   "kind": "industry"
+  },
+  {
+   "term": "gym shelter cots",
+   "target": "shelter-capacity-sanitation",
+   "kind": "industry"
+  },
+  {
+   "term": "evacuation shelter planning",
+   "target": "shelter-capacity-sanitation",
+   "kind": "industry"
+  },
+  {
+   "term": "tornado shelter capacity",
+   "target": "safe-room-capacity",
+   "kind": "industry"
+  },
+  {
+   "term": "safe room square feet per person",
+   "target": "safe-room-capacity",
+   "kind": "industry"
+  },
+  {
+   "term": "fema p-361 occupant density",
+   "target": "safe-room-capacity",
+   "kind": "industry"
+  },
+  {
+   "term": "hurricane shelter capacity",
+   "target": "safe-room-capacity",
+   "kind": "industry"
+  },
+  {
+   "term": "storm shelter how many people",
+   "target": "safe-room-capacity",
+   "kind": "industry"
+  },
+  {
+   "term": "rv park service size",
+   "target": "temp-housing-park-feeder-demand",
+   "kind": "industry"
+  },
+  {
+   "term": "fema travel trailer park electrical",
+   "target": "temp-housing-park-feeder-demand",
+   "kind": "industry"
+  },
+  {
+   "term": "manufactured home park demand load",
+   "target": "temp-housing-park-feeder-demand",
+   "kind": "industry"
+  },
+  {
+   "term": "nec 551 demand factor",
+   "target": "temp-housing-park-feeder-demand",
+   "kind": "industry"
+  },
+  {
+   "term": "temporary housing site electrical service",
+   "target": "temp-housing-park-feeder-demand",
+   "kind": "industry"
   }
  ]
 }

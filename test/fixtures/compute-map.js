@@ -2329,6 +2329,11 @@ export const COMPUTE_MAP = {
   "debris-management-site-sizing": { module: "../../calc-debris.js", fn: "computeDebrisSiteSizing" },
   "debris-load-ticket": { module: "../../calc-debris.js", fn: "computeDebrisLoadTicket" },
   "hazard-tree-stump-screen": { module: "../../calc-debris.js", fn: "computeHazardTreeStumpScreen" },
+  "relief-commodity-truckloads": { module: "../../calc-relief.js", fn: "computeReliefCommodityTruckloads" },
+  "pod-site-configuration": { module: "../../calc-relief.js", fn: "computePodSiteConfiguration" },
+  "shelter-capacity-sanitation": { module: "../../calc-relief.js", fn: "computeShelterCapacitySanitation" },
+  "safe-room-capacity": { module: "../../calc-relief.js", fn: "computeSafeRoomCapacity" },
+  "temp-housing-park-feeder-demand": { module: "../../calc-relief.js", fn: "computeTempHousingParkDemand" },
 };
 
 // Resolve a COMPUTE_MAP module path (relative to this file) and import it.

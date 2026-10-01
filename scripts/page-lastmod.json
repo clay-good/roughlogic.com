@@ -2,99 +2,99 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "49e83c3a1a809cdf",
+      "sha": "6b8f3905957e9852",
       "date": "2026-10-01"
     },
     "/tools/": {
-      "sha": "c76cb3261df26e69",
+      "sha": "fb4132df62651864",
       "date": "2026-10-01"
     },
     "/collections/disaster-response/": {
-      "sha": "d2de450ec7cf0d7f",
+      "sha": "e5a5216c9fe70282",
       "date": "2026-10-01"
     },
     "/groups/accounting/": {
-      "sha": "e6ae84dafa4ea322",
+      "sha": "ef3a89e7db1016b2",
       "date": "2026-10-01"
     },
     "/groups/agriculture/": {
-      "sha": "d2aeb62b8340dd9f",
+      "sha": "5c1ac5ab053efba9",
       "date": "2026-10-01"
     },
     "/groups/construction/": {
-      "sha": "285785b27e08b98e",
+      "sha": "931265a785b5a0bb",
       "date": "2026-10-01"
     },
     "/groups/cross-trade/": {
-      "sha": "e557bfa8d5c1a08d",
+      "sha": "7c03ff1a43ae57bd",
       "date": "2026-10-01"
     },
     "/groups/educators/": {
-      "sha": "f680b40254ac0179",
+      "sha": "03a83e44171560a8",
       "date": "2026-10-01"
     },
     "/groups/electrical/": {
-      "sha": "2a558bd31a31a514",
+      "sha": "062e620e8a646348",
       "date": "2026-10-01"
     },
     "/groups/field/": {
-      "sha": "c736355f9bcf2bcf",
+      "sha": "c6d9495300aeae86",
       "date": "2026-10-01"
     },
     "/groups/fire-ground/": {
-      "sha": "3486318b41e01648",
+      "sha": "68f08756f410a87b",
       "date": "2026-10-01"
     },
     "/groups/historical/": {
-      "sha": "bcbe52e473156e57",
+      "sha": "6ae29446594e29eb",
       "date": "2026-10-01"
     },
     "/groups/hvac/": {
-      "sha": "e76a06fb25d33c14",
+      "sha": "d14e38e49d799ca8",
       "date": "2026-10-01"
     },
     "/groups/kitchen/": {
-      "sha": "8aedf66351035f67",
+      "sha": "553abd0a22fcc905",
       "date": "2026-10-01"
     },
     "/groups/lab/": {
-      "sha": "b9d661826527f5ae",
+      "sha": "7a8ee5d09e8274dc",
       "date": "2026-10-01"
     },
     "/groups/mechanic/": {
-      "sha": "b2e92e90c54e2327",
+      "sha": "be582f8d7608da53",
       "date": "2026-10-01"
     },
     "/groups/plumbing/": {
-      "sha": "020eb061523facdb",
+      "sha": "7f5b239bdf8c300d",
       "date": "2026-10-01"
     },
     "/groups/real-estate/": {
-      "sha": "f8b840d69bc8b0e7",
+      "sha": "97a36ab926eabb83",
       "date": "2026-10-01"
     },
     "/groups/references/": {
-      "sha": "505ae31480d7595c",
+      "sha": "2663a1a2133d4eb4",
       "date": "2026-10-01"
     },
     "/groups/restoration/": {
-      "sha": "b02fe088af2e632e",
+      "sha": "6a72f86b011ff8bf",
       "date": "2026-10-01"
     },
     "/groups/rigging-and-heavy-lift/": {
-      "sha": "a41c3bb24f89885c",
+      "sha": "0d54f13786120901",
       "date": "2026-10-01"
     },
     "/groups/stage/": {
-      "sha": "00957d84d3aeaea9",
+      "sha": "f916afc5b6d7e841",
       "date": "2026-10-01"
     },
     "/groups/trucking/": {
-      "sha": "c3e1775def733ed3",
+      "sha": "3fc00f6ff5c52cca",
       "date": "2026-10-01"
     },
     "/groups/water/": {
-      "sha": "1ea00e3e5f1942c8",
+      "sha": "c9dbe88b2764835f",
       "date": "2026-10-01"
     },
     "/tools/aav-install-check/": {
@@ -3386,7 +3386,7 @@
       "date": "2026-09-29"
     },
     "/tools/gfci-afci-reference/": {
-      "sha": "181aedd7f141a2d2",
+      "sha": "2e4d1e6b5ccebf9b",
       "date": "2026-10-01"
     },
     "/tools/gin-pole-uptower-lift/": {
@@ -5042,8 +5042,8 @@
       "date": "2026-09-29"
     },
     "/tools/open-delta-transformer/": {
-      "sha": "eea65965388618fb",
-      "date": "2026-09-29"
+      "sha": "69e477329cbbb2c2",
+      "date": "2026-10-01"
     },
     "/tools/optical-return-loss/": {
       "sha": "0c115e9336501e69",
@@ -5488,6 +5488,10 @@
     "/tools/pneumatic-cylinder-scfm/": {
       "sha": "b3ae4cd22cf76ff6",
       "date": "2026-09-29"
+    },
+    "/tools/pod-site-configuration/": {
+      "sha": "fde86c2cc4901f38",
+      "date": "2026-10-01"
     },
     "/tools/poe-budget/": {
       "sha": "3b9e910845136e8b",
@@ -6237,6 +6241,10 @@
       "sha": "eb1f5310495ab04e",
       "date": "2026-09-29"
     },
+    "/tools/relief-commodity-truckloads/": {
+      "sha": "17b23c0a78011c09",
+      "date": "2026-10-01"
+    },
     "/tools/relief-storage-floor-load/": {
       "sha": "1b9cd794e9f3af9c",
       "date": "2026-10-01"
@@ -6516,6 +6524,10 @@
     "/tools/safe-descent-speed/": {
       "sha": "ff7c9d4810b6813e",
       "date": "2026-09-29"
+    },
+    "/tools/safe-room-capacity/": {
+      "sha": "d139aaeb1f650a45",
+      "date": "2026-10-01"
     },
     "/tools/safety-valve-capacity/": {
       "sha": "3e276d1b0686c4cb",
@@ -6868,6 +6880,10 @@
     "/tools/sheet-pile-penetration/": {
       "sha": "68e1a7848bc79e43",
       "date": "2026-09-29"
+    },
+    "/tools/shelter-capacity-sanitation/": {
+      "sha": "f2f84f26829d8b3e",
+      "date": "2026-10-01"
     },
     "/tools/shielding-gas-runtime/": {
       "sha": "e88a0f8a7c38e0a9",
@@ -7885,6 +7901,10 @@
       "sha": "4ca205da966cadb6",
       "date": "2026-09-29"
     },
+    "/tools/temp-housing-park-feeder-demand/": {
+      "sha": "0ccdecb46495be21",
+      "date": "2026-10-01"
+    },
     "/tools/tempering-temperature/": {
       "sha": "e9b7ee831857ce53",
       "date": "2026-09-29"
@@ -8278,8 +8298,8 @@
       "date": "2026-09-29"
     },
     "/tools/truck-swept-path-width/": {
-      "sha": "6a9bc412cd685f2c",
-      "date": "2026-09-29"
+      "sha": "40e681b706924e8b",
+      "date": "2026-10-01"
     },
     "/tools/true-airspeed/": {
       "sha": "5fce8072cbd5fde1",

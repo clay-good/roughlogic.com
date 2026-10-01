@@ -135133,6 +135133,490 @@
      }
     }
    }
+  },
+  {
+   "tile_id": "relief-commodity-truckloads",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "120,000 people without power after a hurricane, 40% visit factor, 72-hour planning period",
+   "source_edition_or_year": "FEMA DMP Guide 2.0 (2022) factors; USACE model truckloads (Missouri SEMA Annex C, 2011)",
+   "source_section_or_page": "spec-v1918 worked example",
+   "verified_by": "rl",
+   "verified_on": "2026-09-30",
+   "inputs": {
+    "population_without_power_count": 120000,
+    "impacted_population_count": 0,
+    "visit_factor": 0.4,
+    "water_l_per_person_day": 3,
+    "meals_per_person_day": 2,
+    "ice_lb_per_person_day": 8,
+    "planning_days": 3,
+    "water_truck_l": 18000,
+    "meals_per_truck_count": 21744,
+    "ice_truck_lb": 40000,
+    "tarps_per_truck_count": 4400,
+    "damaged_homes_count": 0,
+    "shelter_residents_count": 0
+   },
+   "outputs": {
+    "people_served_count": {
+     "value": 48000,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "water_l_per_day": {
+     "value": 144000,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "water_trucks_per_day": {
+     "value": 8,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "meals_per_day": {
+     "value": 96000,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "meal_truck_ratio": {
+     "value": 4.41501104,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "meal_trucks_per_day": {
+     "value": 5,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "ice_lb_per_day": {
+     "value": 384000,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "ice_trucks_per_day": {
+     "value": 10,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "trucks_per_day_total": {
+     "value": 23,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "water_trucks_period": {
+     "value": 24,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "meal_trucks_period": {
+     "value": 14,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "ice_trucks_period": {
+     "value": 29,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "people_per_water_truck_count": {
+     "value": 6000,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "pod-site-configuration",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "48,000 people a day, 12 operating hours, 140 vehicles per lane per hour",
+   "source_edition_or_year": "USACE POD typing; FEMA IS-26 (2008); Missouri SEMA Annex C (2011)",
+   "source_section_or_page": "spec-v1919 worked example",
+   "verified_by": "rl",
+   "verified_on": "2026-09-30",
+   "inputs": {
+    "people_per_day": 48000,
+    "household_size": 3,
+    "operating_hours": 12,
+    "lane_rate_vph": 140
+   },
+   "outputs": {
+    "vehicles_per_day": {
+     "value": 16000,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "vehicles_per_hour": {
+     "value": 1333.33333,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "lanes_required": {
+     "value": 10,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "fewest_sites": {
+     "value": 3,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "fewest_staff_day": {
+     "value": 190,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "fewest_staff_night": {
+     "value": 26,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "fewest_footprint_sqft": {
+     "value": 325000,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "fewest_footprint_acres": {
+     "value": 7.46097337,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "all_iii_sites": {
+     "value": 10,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "all_iii_staff_night": {
+     "value": 40,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "all_iii_footprint_sqft": {
+     "value": 450000,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "all_iii_footprint_acres": {
+     "value": 10.3305785,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "shelter-capacity-sanitation",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "9,600 sq ft school gym as a post-disaster shelter at 40 sq ft per person",
+   "source_edition_or_year": "American Red Cross Mass Care Standards (Florida SESP 2018, Appendix F)",
+   "source_section_or_page": "spec-v1920 worked example",
+   "verified_by": "rl",
+   "verified_on": "2026-09-30",
+   "inputs": {
+    "floor_area_sqft": 9600,
+    "shelter_type": "post_disaster",
+    "space_per_person_sqft": 0,
+    "residents_count": 0,
+    "code_occupant_load_count": 0,
+    "existing_toilets_count": 0,
+    "existing_lavatories_count": 0,
+    "existing_showers_count": 0
+   },
+   "outputs": {
+    "capacity_count": {
+     "value": 240,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "capacity_evacuation_count": {
+     "value": 480,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "capacity_60_count": {
+     "value": 160,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "toilets_count": {
+     "value": 12,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "lavatories_count": {
+     "value": 12,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "showers_count": {
+     "value": 10,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "sewage_gal_per_day": {
+     "value": 360,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "solid_waste_lb_per_day": {
+     "value": 1200,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "containers_count": {
+     "value": 24,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "shower_cycle_hours": {
+     "value": 6,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "safe-room-capacity",
+   "source_publisher": "FEMA",
+   "source_title": "FEMA P-361, Safe Rooms for Tornadoes and Hurricanes: 4,800 sq ft classroom as a community tornado safe room",
+   "source_edition_or_year": "FEMA P-361, 4th ed. (April 2021)",
+   "source_section_or_page": "Part B, Section B5.2.1 usable floor area example (955 occupants)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-30",
+   "inputs": {
+    "room_type": "community_tornado",
+    "gross_area_sqft": 4800,
+    "usable_method": "net",
+    "net_usable_area_sqft": 4800,
+    "bed_spaces_count": 0
+   },
+   "outputs": {
+    "usable_area_sqft": {
+     "value": 4800,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "simple_capacity_count": {
+     "value": 960,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "occupant_capacity_count": {
+     "value": 955,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "standing_count": {
+     "value": 950,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "wheelchair_spaces_count": {
+     "value": 5,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "safe-room-capacity",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "6,000 sq ft gross multipurpose room, unconcentrated furnishings, community tornado",
+   "source_edition_or_year": "FEMA P-361 densities and 35% usable-area reduction",
+   "source_section_or_page": "spec-v1921 worked example",
+   "verified_by": "rl",
+   "verified_on": "2026-09-30",
+   "inputs": {
+    "room_type": "community_tornado",
+    "gross_area_sqft": 6000,
+    "usable_method": "unconcentrated_35",
+    "net_usable_area_sqft": 0,
+    "bed_spaces_count": 0
+   },
+   "outputs": {
+    "usable_area_sqft": {
+     "value": 3900,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "occupant_capacity_count": {
+     "value": 776,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "standing_count": {
+     "value": 772,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "wheelchair_spaces_count": {
+     "value": 4,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "safe-room-capacity",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "6,000 sq ft gross multipurpose room, unconcentrated furnishings, community hurricane",
+   "source_edition_or_year": "FEMA P-361 densities and 35% usable-area reduction",
+   "source_section_or_page": "spec-v1921 worked example",
+   "verified_by": "rl",
+   "verified_on": "2026-09-30",
+   "inputs": {
+    "room_type": "community_hurricane",
+    "gross_area_sqft": 6000,
+    "usable_method": "unconcentrated_35",
+    "net_usable_area_sqft": 0,
+    "bed_spaces_count": 0
+   },
+   "outputs": {
+    "usable_area_sqft": {
+     "value": 3900,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "occupant_capacity_count": {
+     "value": 195,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "standing_count": {
+     "value": 194,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "wheelchair_spaces_count": {
+     "value": 1,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "temp-housing-park-feeder-demand",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "40 travel-trailer 50 A sites (factor 0.41) and 25 manufactured homes (factor 0.24), 240 V single-phase",
+   "source_edition_or_year": "NEC 551.73(A) and 550.31 per-site values; demand factors entered from the adopted tables",
+   "source_section_or_page": "spec-v1922 worked example",
+   "verified_by": "rl",
+   "verified_on": "2026-09-30",
+   "inputs": {
+    "sites_50a_count": 40,
+    "sites_30a_count": 0,
+    "sites_20a_count": 0,
+    "tent_sites_count": 0,
+    "nec_edition": "nec_2017_and_later",
+    "rv_demand_factor": 0.41,
+    "mh_lots_count": 25,
+    "mh_lot_va": 16000,
+    "mh_demand_factor": 0.24,
+    "service_voltage_v": 240,
+    "phase": "single_phase"
+   },
+   "outputs": {
+    "rv_connected_va": {
+     "value": 480000,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "rv_demand_va": {
+     "value": 196800,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "rv_current_a": {
+     "value": 820,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "rv_other_edition_demand_va": {
+     "value": 157440,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "rv_other_edition_current_a": {
+     "value": 656,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "edition_change_pct": {
+     "value": 25,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "mh_connected_va": {
+     "value": 400000,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "mh_demand_va": {
+     "value": 96000,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "mh_current_a": {
+     "value": 400,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
   }
  ]
 }

@@ -57688,3 +57688,241 @@ test("bounds: spec-v1917 computeHazardTreeStumpScreen pins the stump conversion 
   assert.ok(_v1917({ ...base, split_trunk: "maybe" }).error);
   assert.ok(_v1917({ ...base, stump_dia_in: Infinity }).error);
 });
+
+// ===========================================================================
+// spec-v1918..v1922: disaster response relief logistics, shelter, and temporary housing band (calc-relief.js)
+// ===========================================================================
+
+// ===========================================================================
+// spec-v1918..v1922: the 2026-09-25 disaster response program, relief
+// logistics, shelter, and temporary housing band (calc-relief.js). Groups
+// J, J, G, E, A.
+// ===========================================================================
+
+import { computeReliefCommodityTruckloads as _v1918 } from "../../calc-relief.js";
+test("bounds: spec-v1918 computeReliefCommodityTruckloads pins trucks per day and period rounding", () => {
+  const base = { population_without_power_count: 120000, visit_factor: 0.4, planning_days: 3 };
+  const r = _v1918(base);
+  assert.strictEqual(r.people_served_count, 48000);
+  assert.strictEqual(r.water_l_per_day, 144000);
+  assert.strictEqual(r.water_trucks_per_day, 8);
+  assert.ok(Math.abs(r.meal_truck_ratio - 96000 / 21744) < 1e-12);
+  assert.strictEqual(r.meal_trucks_per_day, 5);
+  assert.ok(Math.abs(r.ice_truck_ratio - 9.6) < 1e-12);
+  assert.strictEqual(r.ice_trucks_per_day, 10);
+  assert.strictEqual(r.trucks_per_day_total, 23);
+  // The period total rounds up once: 14 meal trucks, not 3 x 5 = 15.
+  assert.strictEqual(r.water_trucks_period, 24);
+  assert.strictEqual(r.meal_trucks_period, 14);
+  assert.strictEqual(r.ice_trucks_period, 29);
+  // Litres and gallons stay distinct: one water truck serves 6,000 people at
+  // 3 L, not 5,000, and is 4,755 gal, not 4,750.
+  assert.strictEqual(r.people_per_water_truck_count, 6000);
+  assert.ok(Math.abs(r.water_truck_gal - 18000 / 3.785411784) < 1e-9);
+  assert.ok(Math.abs(r.water_gal_per_day * 3.785411784 - 144000) < 1e-6);
+  // A million gallons is 211 trucks.
+  assert.strictEqual(_v1918({ impacted_population_count: 1e6 * 3.785411784 / 3 }).water_trucks_per_day, 211);
+  // An entered impacted population replaces the visit factor.
+  const imp = _v1918({ ...base, impacted_population_count: 10000 });
+  assert.strictEqual(imp.uses_impacted, true);
+  assert.strictEqual(imp.people_served_count, 10000);
+  // Linear in population and in days.
+  assert.ok(Math.abs(_v1918({ ...base, population_without_power_count: 240000 }).ice_lb_per_day - 2 * r.ice_lb_per_day) < 1e-6);
+  assert.ok(Math.abs(_v1918({ ...base, planning_days: 6 }).meals_period_count - 2 * r.meals_period_count) < 1e-6);
+  // Tarps and shelter loads.
+  const t = _v1918({ ...base, damaged_homes_count: 4401, shelter_residents_count: 500 });
+  assert.strictEqual(t.tarp_trucks, 2);
+  assert.strictEqual(t.shelter_mixed_loads_per_day, 1);
+  assert.strictEqual(r.tarp_trucks, 0);
+  assert.strictEqual(r.shelter_mixed_loads_per_day, 0);
+  // Error seams.
+  assert.ok("error" in _v1918({}));
+  assert.ok("error" in _v1918({ ...base, population_without_power_count: -1 }));
+  assert.ok("error" in _v1918({ ...base, visit_factor: 0 }));
+  assert.ok("error" in _v1918({ ...base, visit_factor: 1.01 }));
+  assert.ok("error" in _v1918({ ...base, water_l_per_person_day: 0 }));
+  assert.ok("error" in _v1918({ ...base, meals_per_person_day: 0 }));
+  assert.ok("error" in _v1918({ ...base, ice_lb_per_person_day: 0 }));
+  assert.ok("error" in _v1918({ ...base, planning_days: 0 }));
+  assert.ok("error" in _v1918({ ...base, water_truck_l: 0 }));
+  assert.ok("error" in _v1918({ ...base, meals_per_truck_count: 0 }));
+  assert.ok("error" in _v1918({ ...base, ice_truck_lb: 0 }));
+  assert.ok("error" in _v1918({ ...base, tarps_per_truck_count: 0 }));
+  assert.ok("error" in _v1918({ ...base, damaged_homes_count: -1 }));
+  assert.ok("error" in _v1918({ ...base, shelter_residents_count: -1 }));
+  assert.ok("error" in _v1918({ ...base, population_without_power_count: Infinity }));
+});
+
+import { computePodSiteConfiguration as _v1919 } from "../../calc-relief.js";
+test("bounds: spec-v1919 computePodSiteConfiguration pins ten lanes as three sites or ten", () => {
+  const base = { people_per_day: 48000, household_size: 3, operating_hours: 12, lane_rate_vph: 140 };
+  const r = _v1919(base);
+  assert.strictEqual(r.vehicles_per_day, 16000);
+  assert.ok(Math.abs(r.vehicles_per_hour - 16000 / 12) < 1e-9);
+  assert.strictEqual(r.lanes_required, 10);
+  assert.strictEqual(r.lane_capacity_people_per_day, 5040);
+  assert.strictEqual(r.type_i_count, 2);
+  assert.strictEqual(r.type_ii_count, 1);
+  assert.strictEqual(r.type_iii_count, 0);
+  assert.strictEqual(r.fewest_sites, 3);
+  assert.strictEqual(r.fewest_staff_day, 190);
+  assert.strictEqual(r.fewest_staff_night, 26);
+  assert.strictEqual(r.fewest_footprint_sqft, 325000);
+  assert.ok(Math.abs(r.fewest_footprint_acres - 325000 / 43560) < 1e-12);
+  assert.strictEqual(r.all_iii_sites, 10);
+  assert.strictEqual(r.all_iii_staff_day, 190);
+  assert.strictEqual(r.all_iii_staff_night, 40);
+  assert.strictEqual(r.all_iii_footprint_sqft, 450000);
+  // A lane at its rated 140 vehicles an hour is exactly one lane, one more is two.
+  assert.strictEqual(_v1919({ ...base, people_per_day: 140 * 12 * 3 }).lanes_required, 1);
+  assert.strictEqual(_v1919({ ...base, people_per_day: 140 * 12 * 3 + 1 }).lanes_required, 2);
+  // Remainders: 3 lanes -> II + III; 4 -> one Type I; 5 -> I + III.
+  const three = _v1919({ ...base, people_per_day: 3 * 5040 });
+  assert.deepStrictEqual([three.type_i_count, three.type_ii_count, three.type_iii_count], [0, 1, 1]);
+  const four = _v1919({ ...base, people_per_day: 4 * 5040 });
+  assert.deepStrictEqual([four.type_i_count, four.fewest_sites], [1, 1]);
+  const five = _v1919({ ...base, people_per_day: 5 * 5040 });
+  assert.deepStrictEqual([five.type_i_count, five.type_ii_count, five.type_iii_count], [1, 0, 1]);
+  // Lanes never fall as population rises.
+  let prev = 0;
+  for (let p = 1000; p <= 200000; p += 7919) { const l = _v1919({ ...base, people_per_day: p }).lanes_required; assert.ok(l >= prev); prev = l; }
+  assert.ok("error" in _v1919({}));
+  assert.ok("error" in _v1919({ ...base, household_size: 0 }));
+  assert.ok("error" in _v1919({ ...base, operating_hours: 0 }));
+  assert.ok("error" in _v1919({ ...base, operating_hours: 25 }));
+  assert.ok("error" in _v1919({ ...base, lane_rate_vph: 0 }));
+  assert.ok("error" in _v1919({ ...base, people_per_day: NaN }));
+});
+
+import { computeShelterCapacitySanitation as _v1920 } from "../../calc-relief.js";
+test("bounds: spec-v1920 computeShelterCapacitySanitation pins the gym at 480 and 240", () => {
+  const base = { floor_area_sqft: 9600, shelter_type: "post_disaster" };
+  const r = _v1920(base);
+  assert.strictEqual(r.capacity_count, 240);
+  assert.strictEqual(r.capacity_evacuation_count, 480);
+  assert.strictEqual(r.capacity_60_count, 160);
+  assert.strictEqual(r.toilets_count, 12);
+  assert.strictEqual(r.lavatories_count, 12);
+  assert.strictEqual(r.showers_count, 10);
+  assert.strictEqual(r.sewage_gal_per_day, 360);
+  assert.strictEqual(r.solid_waste_lb_per_day, 1200);
+  assert.strictEqual(r.containers_count, 24);
+  assert.strictEqual(r.shower_cycle_hours, 6);
+  assert.strictEqual(_v1920({ ...base, shelter_type: "evacuation" }).capacity_count, 480);
+  assert.strictEqual(_v1920({ ...base, space_per_person_sqft: 60 }).capacity_count, 160);
+  // Ratios round up per portion: 21 persons need 2 toilets, 26 need 2 showers.
+  assert.strictEqual(_v1920({ ...base, residents_count: 21 }).toilets_count, 2);
+  assert.strictEqual(_v1920({ ...base, residents_count: 26 }).showers_count, 2);
+  // Shortfall against existing fixtures, floored at zero.
+  const ex = _v1920({ ...base, existing_toilets_count: 8, existing_showers_count: 12 });
+  assert.strictEqual(ex.toilet_shortfall_count, 4);
+  assert.strictEqual(ex.shower_shortfall_count, 0);
+  // The code occupant load caps the shelter.
+  assert.strictEqual(_v1920({ ...base, code_occupant_load_count: 200 }).exceeds_code_load, true);
+  assert.strictEqual(_v1920({ ...base, code_occupant_load_count: 300 }).exceeds_code_load, false);
+  assert.strictEqual(r.code_entered, false);
+  assert.strictEqual(_v1920({ ...base, residents_count: 300 }).over_floor_capacity, true);
+  assert.ok("error" in _v1920({}));
+  assert.ok("error" in _v1920({ ...base, floor_area_sqft: 0 }));
+  assert.ok("error" in _v1920({ ...base, shelter_type: "hotel" }));
+  assert.ok("error" in _v1920({ ...base, space_per_person_sqft: 19.9 }));
+  assert.ok("error" in _v1920({ ...base, space_per_person_sqft: -1 }));
+  assert.ok("error" in _v1920({ ...base, residents_count: -1 }));
+  assert.ok("error" in _v1920({ ...base, existing_toilets_count: -1 }));
+  assert.ok("error" in _v1920({ floor_area_sqft: 10, shelter_type: "evacuation" }));
+  assert.ok("error" in _v1920({ ...base, floor_area_sqft: Infinity }));
+});
+
+import { computeSafeRoomCapacity as _v1921 } from "../../calc-relief.js";
+test("bounds: spec-v1921 computeSafeRoomCapacity reproduces FEMA's 955 and the factor of four", () => {
+  const fema = _v1921({ room_type: "community_tornado", gross_area_sqft: 4800, usable_method: "net", net_usable_area_sqft: 4800 });
+  assert.strictEqual(fema.simple_capacity_count, 960);
+  assert.strictEqual(fema.occupant_capacity_count, 955);
+  assert.strictEqual(fema.standing_count, 950);
+  assert.strictEqual(fema.wheelchair_spaces_count, 5);
+  assert.strictEqual(fema.area_used_sqft, 4800);
+  const mp = { gross_area_sqft: 6000, usable_method: "unconcentrated_35" };
+  const tor = _v1921({ ...mp, room_type: "community_tornado" });
+  assert.ok(Math.abs(tor.usable_area_sqft - 3900) < 1e-9);
+  assert.strictEqual(tor.occupant_capacity_count, 776);
+  assert.strictEqual(tor.standing_count, 772);
+  assert.strictEqual(tor.wheelchair_spaces_count, 4);
+  const hur = _v1921({ ...mp, room_type: "community_hurricane" });
+  assert.strictEqual(hur.occupant_capacity_count, 195);
+  assert.strictEqual(hur.standing_count, 194);
+  assert.strictEqual(hur.wheelchair_spaces_count, 1);
+  // Reductions: 50% and 15%.
+  assert.ok(Math.abs(_v1921({ ...mp, room_type: "community_tornado", usable_method: "concentrated_50" }).usable_area_sqft - 3000) < 1e-9);
+  assert.ok(Math.abs(_v1921({ ...mp, room_type: "community_tornado", usable_method: "open_plan_15" }).usable_area_sqft - 5100) < 1e-9);
+  // The solved count is maximal: one more occupant does not fit.
+  for (const a of [500, 999, 1000, 1005, 2010, 4800, 12345]) {
+    const x = _v1921({ room_type: "community_tornado", gross_area_sqft: a, usable_method: "net", net_usable_area_sqft: a });
+    const T = x.occupant_capacity_count + 1;
+    assert.ok(x.area_used_sqft <= a + 1e-9);
+    assert.ok((T - Math.ceil(T / 200)) * 5 + Math.ceil(T / 200) * 10 > a);
+  }
+  // Beds take 30 sq ft each and count toward the 200.
+  const beds = _v1921({ room_type: "community_tornado", gross_area_sqft: 4800, usable_method: "net", net_usable_area_sqft: 4800, bed_spaces_count: 10 });
+  assert.strictEqual(beds.occupant_capacity_count, 905);
+  // Residential: 3 sq ft one- and two-family tornado; above 16 routes to community.
+  const res = _v1921({ room_type: "residential_tornado_1_2_family", gross_area_sqft: 48, usable_method: "net", net_usable_area_sqft: 48 });
+  assert.strictEqual(res.occupant_capacity_count, 16);
+  assert.strictEqual(res.residential_limit_exceeded, false);
+  const big = _v1921({ room_type: "residential_hurricane_other", gross_area_sqft: 200, usable_method: "net", net_usable_area_sqft: 200 });
+  assert.strictEqual(big.occupant_capacity_count, 20);
+  assert.strictEqual(big.residential_limit_exceeded, true);
+  assert.ok(/community/.test(big.routing));
+  assert.ok(/NOT/.test(hur.restroom_note));
+  assert.ok("error" in _v1921({}));
+  assert.ok("error" in _v1921({ ...mp, room_type: "bunker" }));
+  assert.ok("error" in _v1921({ ...mp, room_type: "community_tornado", usable_method: "percent_25" }));
+  assert.ok("error" in _v1921({ room_type: "community_tornado", gross_area_sqft: 100, usable_method: "net", net_usable_area_sqft: 101 }));
+  assert.ok("error" in _v1921({ room_type: "community_tornado", gross_area_sqft: 100, usable_method: "net", net_usable_area_sqft: 0 }));
+  assert.ok("error" in _v1921({ ...mp, room_type: "community_tornado", bed_spaces_count: 1.5 }));
+  assert.ok("error" in _v1921({ ...mp, room_type: "residential_tornado_other", bed_spaces_count: 1 }));
+  assert.ok("error" in _v1921({ room_type: "community_tornado", gross_area_sqft: 8, usable_method: "net", net_usable_area_sqft: 8 }));
+  assert.ok("error" in _v1921({ ...mp, room_type: "community_tornado", gross_area_sqft: Infinity }));
+});
+
+import { computeTempHousingParkDemand as _v1922 } from "../../calc-relief.js";
+test("bounds: spec-v1922 computeTempHousingParkDemand pins 820 A against 656 A and 400 A", () => {
+  const base = { sites_50a_count: 40, nec_edition: "nec_2017_and_later", rv_demand_factor: 0.41, mh_lots_count: 25, mh_lot_va: 16000, mh_demand_factor: 0.24, service_voltage_v: 240, phase: "single_phase" };
+  const r = _v1922(base);
+  assert.strictEqual(r.rv_connected_va, 480000);
+  assert.ok(Math.abs(r.rv_demand_va - 196800) < 1e-6);
+  assert.ok(Math.abs(r.rv_current_a - 820) < 1e-9);
+  assert.ok(Math.abs(r.rv_other_edition_demand_va - 157440) < 1e-6);
+  assert.ok(Math.abs(r.rv_other_edition_current_a - 656) < 1e-9);
+  assert.ok(Math.abs(r.edition_change_pct - 25) < 1e-9);
+  assert.strictEqual(r.mh_connected_va, 400000);
+  assert.ok(Math.abs(r.mh_demand_va - 96000) < 1e-6);
+  assert.ok(Math.abs(r.mh_current_a - 400) < 1e-9);
+  assert.ok(r.mh_to_rv_current_pct < 50);
+  // The older edition swaps the pair.
+  const old = _v1922({ ...base, nec_edition: "nec_before_2017" });
+  assert.ok(Math.abs(old.rv_current_a - 656) < 1e-9);
+  assert.ok(Math.abs(old.rv_other_edition_current_a - 820) < 1e-9);
+  // Other site types: 3,600, 2,400, and 600 VA.
+  const mix = _v1922({ ...base, sites_50a_count: 0, sites_30a_count: 1, sites_20a_count: 1, tent_sites_count: 1, mh_lots_count: 0 });
+  assert.strictEqual(mix.rv_connected_va, 6600);
+  assert.strictEqual(mix.mh_entered, false);
+  assert.strictEqual(mix.mh_current_a, 0);
+  // 550.31 floor: a smaller calculated lot load is raised to 16,000 VA.
+  const floor = _v1922({ ...base, mh_lot_va: 12000 });
+  assert.strictEqual(floor.mh_lot_va_used, 16000);
+  assert.strictEqual(floor.mh_lot_floor_applied, true);
+  assert.strictEqual(_v1922({ ...base, mh_lot_va: 20000 }).mh_lot_va_used, 20000);
+  // Three-phase divides by sqrt(3) x V; demand is linear in the factor.
+  assert.ok(Math.abs(_v1922({ ...base, phase: "three_phase", service_voltage_v: 208 }).rv_current_a - 196800 / (Math.sqrt(3) * 208)) < 1e-9);
+  assert.ok(Math.abs(_v1922({ ...base, rv_demand_factor: 0.82 }).rv_demand_va - 2 * r.rv_demand_va) < 1e-6);
+  assert.ok("error" in _v1922({}));
+  assert.ok("error" in _v1922({ ...base, sites_50a_count: -1 }));
+  assert.ok("error" in _v1922({ ...base, rv_demand_factor: 0 }));
+  assert.ok("error" in _v1922({ ...base, rv_demand_factor: 1.1 }));
+  assert.ok("error" in _v1922({ ...base, mh_demand_factor: 1.1 }));
+  assert.ok("error" in _v1922({ ...base, mh_lot_va: 0 }));
+  assert.ok("error" in _v1922({ ...base, service_voltage_v: 0 }));
+  assert.ok("error" in _v1922({ ...base, nec_edition: "nec_2011" }));
+  assert.ok("error" in _v1922({ ...base, phase: "two_phase" }));
+  assert.ok("error" in _v1922({ ...base, service_voltage_v: Infinity }));
+});

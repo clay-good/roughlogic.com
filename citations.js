@@ -26056,6 +26056,67 @@ export const CITATIONS = {
       { name: "Extraction volume is the fill volume", value: "the documentation asks for the quantity of material needed to fill the hole", source: "FEMA-325" },
     ],
   },
+  // spec-v1918..v1922: disaster response program, relief logistics, shelter, and temporary housing band (calc-relief.js).
+  "relief-commodity-truckloads": {
+    formula: "people served = population without power x visit factor (or an entered impacted population); daily water = people x 3 L, meals = people x 2, ice = people x 8 lb; trucks per day = ceil(daily quantity / truckload), period trucks = ceil(daily quantity x days / truckload); tarp trucks = ceil(damaged homes / 4,400); shelter mixed loads = ceil(residents / 500) per day.",
+    edition: "FEMA, Distribution Management Plan Guide 2.0 (2022), Section 1.3 (two meals and three liters of water per person per day), and the USACE commodity planning model as published in Missouri SEMA, Annex C, Points of Distribution (2011): 40% visit factor, 8 lb of ice per person per day, truckloads of 18,000 L water, 21,744 meals, 40,000 lb ice, and 4,400 tarps, and a shelter mixed load per 500 residents. The state logistics plan and the incident logistics section govern.",
+    freeAccess: "Federal planning factors and truckload units from public FEMA and state emergency management documents; multiplication and rounding up only.",
+    governance: GOVERNANCE.general,
+    editionNote: "The planning factors are small and the multipliers are large, and the result decides how many trucks are staged before landfall. The USACE model applies its 40% visit factor to the population without power because most households never come to a distribution point; an entered impacted population replaces it. Period truckloads round the period total up once rather than rounding each day, so 4.42 meal trucks a day for three days is 14 trucks, not 15. The source that publishes the truckload units has two slips the tile does not repeat: it prints 1,744 meals per truck where its own case count gives 21,744, and it equates three liters with a gallon, which is 3.785 L. A water truck of 18,000 L is about 4,755 gal and serves 6,000 people a day at three liters, not the 5,000 a gallon-per-person reading gives.",
+    assumptions: [
+      { name: "Two meals and three liters a day", value: "per person of the population served, per day", source: "FEMA Distribution Management Plan Guide 2.0, Section 1.3" },
+      { name: "40% visit factor", value: "share of the population without power that comes to a distribution point", source: "USACE planning model (Missouri SEMA Annex C)" },
+      { name: "Truckload units", value: "18,000 L water, 21,744 meals, 40,000 lb ice, 4,400 tarps", source: "USACE planning model (Missouri SEMA Annex C)" },
+    ],
+  },
+  "pod-site-configuration": {
+    formula: "vehicles per day = people / household size; vehicles per hour = vehicles per day / operating hours; lanes = ceil(vehicles per hour / 140); fewest sites = floor(lanes / 4) Type I, then a Type II for a remainder of 2 or 3 and a Type III for an odd remainder; staff and footprint summed by type (I 78/10, 250 x 500 ft; II 34/6, 250 x 300 ft; III 19/4, 150 x 300 ft).",
+    edition: "FEMA IS-26, Guide to Points of Distribution (2008), with the USACE Tier II POD typing (Type III 1 lane and 3 loading points, Type II 2 lanes and 6, Type I 4 lanes and 12; one vehicle per household of 3) and Missouri SEMA, Annex C, Points of Distribution (one lane with 3 loading points serves 140 cars per hour). The local emergency management agency governs.",
+    freeAccess: "Public FEMA and state emergency management typing figures; division, rounding up, and a type mix.",
+    governance: GOVERNANCE.general,
+    editionNote: "A point of distribution is sized by throughput, not by the commodities it holds: one lane with three loading points moves about 140 cars an hour, which at a household of three and a twelve-hour day is about 5,000 people, the Type III rating. The lane count is fixed by the population and the site count is a choice that trades travel distance for staff and ground, so the fewest-sites mix and the all-Type-III option are both shown. Staff counts are for the distribution operation; state field guides that add security, medical, and public information staff print larger totals (Ohio EMA's POD guide lists 25/6, 42/8, and 85/13). The USACE typing is widely used but, as FEMA notes, not a national standard, and throughput drops with walk-up traffic, bad weather, and inexperienced crews.",
+    assumptions: [
+      { name: "140 vehicles per lane per hour", value: "one lane with three loading points", source: "Missouri SEMA Annex C; Ohio EMA POD Field Operations Guide" },
+      { name: "One vehicle per household of three", value: "12-hour distribution day", source: "USACE POD typing" },
+      { name: "Type footprints", value: "Type III 150 x 300 ft, Type II 250 x 300 ft, Type I 250 x 500 ft", source: "USACE POD typing" },
+    ],
+  },
+  "shelter-capacity-sanitation": {
+    formula: "capacity = floor(usable sleeping area / space per person) at 20 sq ft (evacuation, 24-48 h) or 40 to 60 sq ft (post-disaster); toilets = ceil(P / 20), lavatories = ceil(P / 20), showers = ceil(P / 25); sewage = 1.5 gal x P per day; solid waste = 5 lb x P per day; 30 gal containers = ceil(P / 10); shower cycle = P x 15 min / showers.",
+    edition: "American Red Cross, Mass Care Standards and Indicators, as reproduced in the Florida State Emergency Shelter Plan (2018), Appendix F. The building's code occupant load is named as a cap; the shelter manager and the AHJ govern.",
+    freeAccess: "Ratios from the Red Cross standards reproduced in a public Florida Division of Emergency Management appendix; division and rounding up only.",
+    governance: GOVERNANCE.general,
+    editionNote: "A shelter's capacity depends on how long people stay: 20 sq ft is a cot and a bag for a night or two, while a stay of weeks needs 40 to 60 or more, so the same gym holds twice as many evacuees before landfall as residents the week after, and the tile reports both. The sanitation ratios are the part of a shelter that fails first; a school built for a daytime population has too few toilets for an overnight one and usually no showers. The operational standards differ from the building code's design bases (occupant-load and plumbing-fixture-count), and the building's code occupant load is not suspended by an emergency, so an entered code load is checked and a larger shelter population is flagged.",
+    assumptions: [
+      { name: "20 sq ft evacuation, 40-60+ sq ft longer stay", value: "personal sleeping space per person", source: "American Red Cross Mass Care Standards (Florida SESP 2018, Appendix F)" },
+      { name: "1 toilet and 1 lavatory per 20, 1 shower per 25", value: "each resident gets a 15 minute shower opportunity", source: "American Red Cross Mass Care Standards (Florida SESP 2018, Appendix F)" },
+      { name: "1.5 gal sewage and 5 lb solid waste per person per day", value: "one 30 gal lidded container per 10 persons", source: "American Red Cross Mass Care Standards (Florida SESP 2018, Appendix F)" },
+    ],
+  },
+  "safe-room-capacity": {
+    formula: "usable area = gross x (1 - 0.50, 0.35, or 0.15) or the entered net area; community rooms: the largest total T with (T - W - B) x standing + W x wheelchair + B x bed <= usable area, W = ceil(T / 200); residential rooms: floor(usable area / density), routed to the community criteria above 16 occupants.",
+    edition: "FEMA P-361, Safe Rooms for Tornadoes and Hurricanes, Part B, Section B5.2.1: Table B5-1 (community tornado 5 / 10 / 30 sq ft), Table B5-2 (community hurricane 20 / 20 / 40), Table B5-3 (residential tornado 3 or 5, hurricane 7 or 10), one wheelchair space per 200 occupants, and the 50% / 35% / 15% usable-area reductions, with ICC 500 Sections 502 and 503 cited by number. The safe room designer and the AHJ govern.",
+    freeAccess: "FEMA P-361 is a free federal publication; the densities and reductions are also printed in FEMA's Safe Room Technical Review job aid. No ICC 500 text is reproduced.",
+    governance: GOVERNANCE.general,
+    editionNote: "Occupant density is set by how long people will be inside: a tornado passes in minutes and a hurricane lasts a day or more, so the same room holds about a quarter as many for a hurricane. The wheelchair rule couples the count to itself -- every 200 occupants or portion thereof need a wheelchair space at the wheelchair density -- so the tile solves for the largest total that fits, which reproduces FEMA's 4,800 sq ft classroom at 955 occupants rather than 960. Hurricane safe rooms may not count restroom area; tornado rooms may count restroom area outside the stalls only under P-361's conditions. Capacity is not qualification: the structure, siting, and ventilation are separate ICC 500 and P-361 requirements, and code occupant loads for normal use are posted alongside.",
+    assumptions: [
+      { name: "Community densities", value: "tornado 5 / 10 / 30 sq ft, hurricane 20 / 20 / 40 sq ft (standing, wheelchair, bed)", source: "FEMA P-361 Tables B5-1 and B5-2; FEMA Safe Room Technical Review (2022)" },
+      { name: "One wheelchair space per 200 occupants", value: "or portion thereof, in community safe rooms", source: "FEMA P-361 Section B5.2.1" },
+      { name: "Usable area reductions", value: "at least 50% concentrated or fixed seating, 35% unconcentrated, 15% open plan", source: "FEMA P-361 Section B5.2.1; FEMA Safe Room Technical Review (2022)" },
+    ],
+  },
+  "temp-housing-park-feeder-demand": {
+    formula: "RV park: connected VA = sum of sites x per-site VA (50 A 12,000 VA in 2017 and later or 9,600 before; 20 A + 30 A 3,600; 20 A 2,400; tent 600); demand = connected x entered Table 551.73(A) factor. MH park: demand = lots x max(16,000 VA, calculated lot load) x entered Table 550.31 factor. Current = demand / V single-phase or demand / (sqrt(3) x V) three-phase.",
+    edition: "NFPA 70 (NEC) Section 551.73(A) and Table 551.73(A), recreational vehicle park demand, and Section 550.31 and Table 550.31, manufactured home park demand, cited by number with the edition flagged. The demand factors are USER INPUTS read from the adopted edition's tables and are not reproduced.",
+    freeAccess: "Free read-only access at nfpa.org/freeaccess. The tile reproduces no NEC table; the user enters the demand factor for the site count from the adopted edition.",
+    governance: GOVERNANCE.electrical,
+    editionNote: "Temporary housing parks look alike on the ground and are calculated differently in the code: travel trailer sites under Article 551 by receptacle size with a steeply falling demand factor, manufactured housing lots under Article 550 at a larger per-lot load. FEMA group sites have used both kinds of unit, so both are computed side by side. The 50 A site value rose from 9,600 VA to 12,000 VA in the 2017 NEC, which raises a large park's calculated load by a quarter, and a park designed to the older value may not meet the newer one; the tile shows the demand under both values. It is a service and feeder estimate only; site feeders, pedestals, conductors, voltage drop, and utility requirements are separate.",
+    assumptions: [
+      { name: "50 A RV site value by edition", value: "12,000 VA in the 2017 and later NEC, 9,600 VA before", source: "NEC 551.73(A)" },
+      { name: "16,000 VA per manufactured home lot", value: "or the calculated load if larger", source: "NEC 550.31" },
+      { name: "Demand factor entered", value: "read from the adopted edition's Table 551.73(A) or 550.31 for the site count; not reproduced", source: "NEC 551.73(A), 550.31" },
+    ],
+  },
 };
 
 // --- Citation linkifier ---

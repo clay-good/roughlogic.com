@@ -1,6 +1,6 @@
 # roughlogic.com Specification v1921 -- Storm Safe Room Occupant Capacity (`calc-relief.js`, Group E Carpentry and Construction, storm refuge, 1 New Tile)
 
-> **Status: PROPOSED 2026-09-25. Single-tile spec.** Part of [scope-disaster-response](scope-disaster-response.md).
+> **Status: LANDED 2026-09-30 (proposed 2026-09-25). Single-tile spec.** Part of [scope-disaster-response](scope-disaster-response.md).
 > In-scope catalog expansion under the spec-v106 trades-only charter. Adds one tile to **`calc-relief.js`**
 > (Group E Carpentry and Construction, hub `/groups/construction/`), no new dependency and no new network call. Inherits spec.md through spec-v1878.md.
 >
@@ -12,7 +12,7 @@ Repository: github.com/clay-good/roughlogic.com -- US standards only.
 
 The v14 dimensional lint, bounds-fuzzer, worked-example registry, and reviewer signoff apply. The v18/v21
 contract: a non-positive floor area returns `{ error }`; a reduction outside the published set (or an entered usable area above the gross) returns `{ error }`; a residential safe room above 16 occupants returns a routing note to the community criteria; no numeric field is ever `Infinity`. Citation discipline
-(v19/v22): FEMA P-361, *Safe Rooms for Tornadoes and Hurricanes*, 4th ed. (December 2024), Part B, Section B5.2.1 -- Table B5-1 (community tornado), Table B5-2 (community hurricane), Table B5-3 (residential), the one-wheelchair-space-per-200-occupants rule, and the usable floor area methods -- with ICC 500 Sections 502 and 503 cited by number, named as the method, the AHJ and the safe room designer named as governing, GOVERNANCE.general.
+(v19/v22): FEMA P-361, *Safe Rooms for Tornadoes and Hurricanes*, 4th ed. (April 2021; the spec first said December 2024, corrected 2026-09-30 against the GPO listing), Part B, Section B5.2.1 -- Table B5-1 (community tornado), Table B5-2 (community hurricane), Table B5-3 (residential), the one-wheelchair-space-per-200-occupants rule, and the usable floor area methods -- with ICC 500 Sections 502 and 503 cited by number, named as the method, the AHJ and the safe room designer named as governing, GOVERNANCE.general.
 
 The three doors are inherited, not rebuilt: the website through `renderToolView`, the local MCP server through
 the shared registries, and the **Report a problem** control through the one shared report path. Aliases:

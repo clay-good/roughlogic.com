@@ -485,6 +485,16 @@
     {"term":"truck certification cubic yards","target":"debris-load-ticket","kind":"industry"},
     {"term":"debris monitor load call","target":"debris-load-ticket","kind":"industry"},
     {"term":"fema debris truck capacity","target":"debris-load-ticket","kind":"industry"},
-    {"term":"hand loaded debris 50 percent","target":"debris-load-ticket","kind":"industry"}
+    {"term":"hand loaded debris 50 percent","target":"debris-load-ticket","kind":"industry"},
+    {"term":"disaster water truckloads","target":"relief-commodity-truckloads","kind":"industry"},
+    {"term":"how much water for disaster population","target":"relief-commodity-truckloads","kind":"industry"},
+    {"term":"mre truckloads","target":"relief-commodity-truckloads","kind":"industry"},
+    {"term":"ice truckloads disaster","target":"relief-commodity-truckloads","kind":"industry"},
+    {"term":"commodity distribution planning","target":"relief-commodity-truckloads","kind":"industry"},
+    {"term":"point of distribution size","target":"pod-site-configuration","kind":"industry"},
+    {"term":"pod type i ii iii","target":"pod-site-configuration","kind":"industry"},
+    {"term":"pod lanes staff","target":"pod-site-configuration","kind":"industry"},
+    {"term":"drive through distribution site","target":"pod-site-configuration","kind":"industry"},
+    {"term":"how many pods do we need","target":"pod-site-configuration","kind":"industry"}
   ]
 }

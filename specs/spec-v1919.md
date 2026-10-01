@@ -1,6 +1,6 @@
 # roughlogic.com Specification v1919 -- Points of Distribution Lanes, Types, Staff, and Footprint (`calc-relief.js`, Group J Trucking and Logistics, relief logistics, 1 New Tile)
 
-> **Status: PROPOSED 2026-09-25. Single-tile spec.** Part of [scope-disaster-response](scope-disaster-response.md).
+> **Status: LANDED 2026-09-30 (proposed 2026-09-25). Single-tile spec.** Part of [scope-disaster-response](scope-disaster-response.md).
 > In-scope catalog expansion under the spec-v106 trades-only charter. Adds one tile to **`calc-relief.js`**
 > (Group J Trucking and Logistics, hub `/groups/trucking/`), no new dependency and no new network call. Inherits spec.md through spec-v1878.md.
 >

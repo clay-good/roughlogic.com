@@ -2230,4 +2230,9 @@ export const RENDERER_MAP = {
   "debris-management-site-sizing": { module: "../../calc-debris.js", exportName: "DEBRIS_RENDERERS" },
   "debris-load-ticket": { module: "../../calc-debris.js", exportName: "DEBRIS_RENDERERS" },
   "hazard-tree-stump-screen": { module: "../../calc-debris.js", exportName: "DEBRIS_RENDERERS" },
+  "relief-commodity-truckloads": { module: "../../calc-relief.js", exportName: "RELIEF_RENDERERS" },
+  "pod-site-configuration": { module: "../../calc-relief.js", exportName: "RELIEF_RENDERERS" },
+  "shelter-capacity-sanitation": { module: "../../calc-relief.js", exportName: "RELIEF_RENDERERS" },
+  "safe-room-capacity": { module: "../../calc-relief.js", exportName: "RELIEF_RENDERERS" },
+  "temp-housing-park-feeder-demand": { module: "../../calc-relief.js", exportName: "RELIEF_RENDERERS" },
 };

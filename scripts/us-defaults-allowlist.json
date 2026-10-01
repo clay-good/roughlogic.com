@@ -511,6 +511,12 @@
    "match": "Drop volume (mL",
    "family": "emergency drinking water disinfection",
    "justification": "A dropper's volume is stated in milliliters on every US pharmacy and medicine dropper (0.05 mL is the pharmacopeial drop); the EPA table's drop is 1/96 tsp, which the label also states. There is no customary unit small enough to read a drop in."
+  },
+  {
+   "module": "calc-relief.js",
+   "match": "(L)",
+   "family": "federal disaster relief commodity planning",
+   "justification": "FEMA and state EMA commodity planning count bottled water in liters -- 3 L per person per day, an 18,000 L tractor-trailer load -- because the product ships in liter bottles on liter-rated pallets. The tile also reports gallons."
   }
  ]
 }

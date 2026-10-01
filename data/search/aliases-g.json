@@ -1306,6 +1306,11 @@
     {"term":"earth levee cross section","target":"emergency-earth-levee-section","kind":"industry"},
     {"term":"levee fill yards","target":"emergency-earth-levee-section","kind":"industry"},
     {"term":"levee creep ratio","target":"emergency-earth-levee-section","kind":"industry"},
-    {"term":"flood fight levee","target":"emergency-earth-levee-section","kind":"industry"}
+    {"term":"flood fight levee","target":"emergency-earth-levee-section","kind":"industry"},
+    {"term":"shelter capacity square feet per person","target":"shelter-capacity-sanitation","kind":"industry"},
+    {"term":"emergency shelter toilets","target":"shelter-capacity-sanitation","kind":"industry"},
+    {"term":"red cross shelter standards","target":"shelter-capacity-sanitation","kind":"industry"},
+    {"term":"gym shelter cots","target":"shelter-capacity-sanitation","kind":"industry"},
+    {"term":"evacuation shelter planning","target":"shelter-capacity-sanitation","kind":"industry"}
   ]
 }

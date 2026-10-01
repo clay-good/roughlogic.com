@@ -2977,6 +2977,11 @@
     {"term":"generator run hours with battery","target":"generator-battery-hybrid-fuel","kind":"industry"},
     {"term":"hybrid power fuel savings","target":"generator-battery-hybrid-fuel","kind":"industry"},
     {"term":"battery to reduce generator runtime","target":"generator-battery-hybrid-fuel","kind":"industry"},
-    {"term":"generator wet stacking battery","target":"generator-battery-hybrid-fuel","kind":"industry"}
+    {"term":"generator wet stacking battery","target":"generator-battery-hybrid-fuel","kind":"industry"},
+    {"term":"rv park service size","target":"temp-housing-park-feeder-demand","kind":"industry"},
+    {"term":"fema travel trailer park electrical","target":"temp-housing-park-feeder-demand","kind":"industry"},
+    {"term":"manufactured home park demand load","target":"temp-housing-park-feeder-demand","kind":"industry"},
+    {"term":"nec 551 demand factor","target":"temp-housing-park-feeder-demand","kind":"industry"},
+    {"term":"temporary housing site electrical service","target":"temp-housing-park-feeder-demand","kind":"industry"}
   ]
 }

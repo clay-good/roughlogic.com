@@ -6354,6 +6354,11 @@
     {"term":"temporary debris storage and reduction site","target":"debris-management-site-sizing","kind":"industry"},
     {"term":"tdsrs sizing","target":"debris-management-site-sizing","kind":"industry"},
     {"term":"debris grinding time","target":"debris-management-site-sizing","kind":"industry"},
-    {"term":"debris burn volume reduction","target":"debris-management-site-sizing","kind":"industry"}
+    {"term":"debris burn volume reduction","target":"debris-management-site-sizing","kind":"industry"},
+    {"term":"tornado shelter capacity","target":"safe-room-capacity","kind":"industry"},
+    {"term":"safe room square feet per person","target":"safe-room-capacity","kind":"industry"},
+    {"term":"fema p-361 occupant density","target":"safe-room-capacity","kind":"industry"},
+    {"term":"hurricane shelter capacity","target":"safe-room-capacity","kind":"industry"},
+    {"term":"storm shelter how many people","target":"safe-room-capacity","kind":"industry"}
   ]
 }

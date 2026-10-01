@@ -3286,6 +3286,11 @@ cross-check.
 | calc-refrigeration.js | `computeRefrigerationReliefCapacity` | `{ vessel_diameter_ft = 0, vessel_length_ft = 0, f_constant = 0, valve_rated_l...` | _ | _ | _ |
 | calc-refrigeration.js | `computeSecondaryGlycolLoop` | `{ load_btuh = 0, delta_t_f = 0, glycol_cp = 1, glycol_sg = 1, head_ft = 0, pu...` | _ | _ | _ |
 | calc-refrigeration.js | `computeTwoStageInterstagePressure` | `{ low_psig = 0, high_psig = 0, intermediate_load_psig = 0 } = {}` | _ | _ | _ |
+| calc-relief.js | `computePodSiteConfiguration` | `{ people_per_day = 0, household_size = 3, operating_hours = 12, lane_rate_vph...` | _ | _ | _ |
+| calc-relief.js | `computeReliefCommodityTruckloads` | `{ population_without_power_count = 0, impacted_population_count = 0, visit_fa...` | _ | _ | _ |
+| calc-relief.js | `computeSafeRoomCapacity` | `{ room_type = "community_tornado", gross_area_sqft = 0, usable_method = "net"...` | _ | _ | _ |
+| calc-relief.js | `computeShelterCapacitySanitation` | `{ floor_area_sqft = 0, shelter_type = "post_disaster", space_per_person_sqft ...` | _ | _ | _ |
+| calc-relief.js | `computeTempHousingParkDemand` | `{ sites_50a_count = 0, sites_30a_count = 0, sites_20a_count = 0, tent_sites_c...` | _ | _ | _ |
 | calc-reliefpower.js | `computeCriticalLoadShedTiers` | `{ source_kw = 0, tier1_kw = 0, tier2_kw = 0, tier3_kw = 0, tier4_kw = 0, usab...` | _ | _ | _ |
 | calc-reliefpower.js | `computeGeneratorAltitudeTempDerate` | `{ rated_kw = 0, site_elevation_ft = 0, site_ambient_f = 0, altitude_threshold...` | _ | _ | _ |
 | calc-reliefpower.js | `computeGeneratorBatteryHybridFuel` | `{ load_kw = 0, rating_kw = 0, fuel_quarter_gph = 0, fuel_half_gph = 0, fuel_t...` | _ | _ | _ |
@@ -3890,7 +3895,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 2474.
+Row count: 2479.
 
 <!-- END function-corpus-v14 -->
 
@@ -3958,7 +3963,7 @@ spec-v14 §12.1) record the v6 source-stamp recheck row in
 [docs/v6-audit.md](v6-audit.md) rather than a formula derivation,
 per spec-v14 §13.1 second paragraph.
 
-### Group A Electrical (259 tiles)
+### Group A Electrical (260 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -4186,6 +4191,7 @@ per spec-v14 §13.1 second paragraph.
 | `structured-cabling-channel` | Structured Cabling Channel Length (TIA-568) | ANSI/TIA-568; spec-v458 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `support-spacing` | Raceway / Cable Support-Spacing Lookup (NEC Chapter 3) | NEC 2023 (NFPA 70); EMT secure within 36 in of each box; support every 10 ft | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `tdd-ieee-519` | Total Demand Distortion Limit Check (IEEE 519-2022) | IEEE 519-2022 Table 2 current-distort...; spec-v524 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
+| `temp-housing-park-feeder-demand` | Temporary Housing Park Service Demand | Project (first-principles); spec-v1922 worked example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `termination-temp-ampacity` | Termination Temperature Ampacity Limit (NEC 110.14(C)) | NEC 2023 110.14(C) with Table 310.16; 4/0 THHN: 90C 260, 75C 230, 60C 195; 75C term, over 100 A... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `thermistor-beta-temp` | NTC Thermistor Resistance to Temperature (Beta Equation) | NTC thermistor beta (B-parameter) equ...; 1/T = 1/298.15 + (1/3950) ln(20000/10000) -> T = 283.33 K... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `thermistor-steinhart-hart` | NTC Thermistor Steinhart-Hart Equation (3-Constant) | NTC thermistor Steinhart-Hart equatio...; lnR = ln(10000) = 9.21034; 1/T = 1.1253e-3 + 2.3471e-4(9.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -4662,7 +4668,7 @@ per spec-v14 §13.1 second paragraph.
 | `water-extraction-rate` | Water Extraction Volume, Time, and Waste-Tank Dumps | Project (first-principles); standing + absorbed; wand time = total / gpm | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wood-emc` | Equilibrium Moisture Content of Wood | USDA Forest Products Laboratory Wood ...; spec-v119 section 2.1 pinned example (textbook ~9.1%) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+4 more) |
 
-### Group E Construction (614 tiles)
+### Group E Construction (615 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -5075,6 +5081,7 @@ per spec-v14 §13.1 second paragraph.
 | `rt-restricted-area` | Radiography Restricted-Area Boundary Distance | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `rtk-error-budget` | RTK Baseline Error Budget and Vertical Uncertainty | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `rusle-soil-loss` | RUSLE Annual Soil Loss | RUSLE (USDA Agriculture Handbook 703); A = 150*0.32*1.5*1.0*1.0 = 72 tons/acre/yr; site = 72*5 =... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+3 more) |
+| `safe-room-capacity` | Storm Safe Room Occupant Capacity | FEMA; Part B, Section B5.2.1 usable floor area example (955 occ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `sag-vertical-curve` | Sag Vertical Curve Length for Headlight SSD (AASHTO) | AASHTO Green Book (sag headlight crit...; spec-v636 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `sag-vertical-curve-comfort` | Sag Vertical Curve Comfort and Drainage (AASHTO) | AASHTO Green Book (sag comfort criter...; spec-v638 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `scaffold-guardrail-check` | Scaffold Guardrail System Check (OSHA 1926.451(g)(4)) | Occupational Safety and Health Admini...; 'The top edge height of toprails... shall be between 38 i... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -5344,7 +5351,7 @@ per spec-v14 §13.1 second paragraph.
 | `vacuum-lift-reading` | Vacuum Gauge to Drafting Lift Readout | IFSTA / NWCG fire-pump drafting practice; 10 in Hg at sea level -> 11.3 ft of head, 50% of the ~22.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `water-supply-duration` | Water-Supply Duration | Volume/flow continuity + NFPA 1142 co...; 3000 gal, 250 GPM, no resupply -> 12 min | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group G Cross-trade (164 tiles)
+### Group G Cross-trade (165 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -5474,6 +5481,7 @@ per spec-v14 §13.1 second paragraph.
 | `sand-permeability-vent` | Moulding Sand Gas Evolution, Permeability, and Venting | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `sandbag-levee-quantity` | USACE Sandbag Levee Bags and Sand | USACE St. Paul District; Table 2.1, 3 ft levee row (45 bags per linear foot; 4,500... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `scrubber-lg-ratio` | Wet Scrubber Liquid-to-Gas Ratio and Removal | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `shelter-capacity-sanitation` | Congregate Shelter Capacity and Sanitation | Project (first-principles); spec-v1920 worked example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `shot-size-residence-time` | Injection Shot Size, Barrel Capacity, and Residence Time | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `shrink-fit` | Interference Shrink-Fit Temperature | first-principles thermal-expansion re...; 4 in fit, 0.004 in interference, 0.002 in clearance, stee... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `silica-table-1` | Silica Table 1 Respirator Lookup (OSHA 1926.1153) | Occupational Safety and Health Admini...; Row (xi), handheld grinders for mortar removal (tuckpoint... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -5533,7 +5541,7 @@ per spec-v14 §13.1 second paragraph.
 | `tool-maintenance` | Tool Maintenance Intervals | Project bundled tool maintenance sche...; Reference compute returns the per-attribute table; runner... | [docs/v6-audit.md](v6-audit.md) (reference cadence) |
 | `triage-quickread` | Field First Aid Triage Quick-Read | START / SALT triage protocols (projec...; Returns 4 categories + notice + citation; tested on the n... | [docs/v6-audit.md](v6-audit.md) (reference cadence) |
 
-### Group J Trucking (54 tiles)
+### Group J Trucking (56 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -5574,8 +5582,10 @@ per spec-v14 §13.1 second paragraph.
 | `oversize-permit-screen` | Oversize and Overweight Permit Threshold Screen | Project (first-principles); excess on each of four dimensions | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `pallet-loadout` | Pallet Cube and Trailer Loadout | GMA pallet (48 x 40 in) + 53 ft dry-v...; 12 x 10 x 8 in case @ 25 lb / 48 cases per pallet -> 26 p... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `plow-route-cycle-time` | Plow Route Cycle Time, Accumulation, and Truck Count | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `pod-site-configuration` | Points of Distribution Lanes, Types, Staff, and Footprint | Project (first-principles); spec-v1919 worked example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `railcar-load-limit` | Railcar Load Limit, Route Limit, and Cube | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `reefer-burn` | Reefer Fuel Burn and Run Time | Thermo King published technical bulle...; Continuous SB / 50 gal tank / 24 hr / moderate / 1200 mi ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `relief-commodity-truckloads` | Relief Commodity Demand and Truckloads | Project (first-principles); spec-v1918 worked example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `safe-descent-speed` | Safe Downgrade Descent Speed and Brake Load | Project (first-principles); P = W x v x grade / 550 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `ssd-design-speed` | Max Design Speed from Sight Distance | AASHTO (inverse); 492.4 ft sight distance (the Green Book 55 mph row, 202.1... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `stacking-aisle-width` | Right-Angle Stacking Aisle Width | Project (first-principles); truck manufacturer stack data and the fire code govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -6285,6 +6295,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `wire-rope-stretch` | Wire Rope Elastic Stretch Under Load | Project (first-principles); dL = P L /(A_m E_r) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 2222. Fixture-covered or reference-cadence: 2222 / 2222.
+Tile count: 2227. Fixture-covered or reference-cadence: 2227 / 2227.
 
 <!-- END tile-index-v14 -->
