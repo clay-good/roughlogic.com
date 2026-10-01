@@ -2,7 +2,7 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "66a4891c8e8427d6",
+      "sha": "91151dddab4d0b11",
       "date": "2026-10-01"
     },
     "/tools/": {
@@ -706,7 +706,7 @@
       "date": "2026-09-29"
     },
     "/tools/boil-water-altitude/": {
-      "sha": "6f09efc571976442",
+      "sha": "7562ab78e8d307d7",
       "date": "2026-10-01"
     },
     "/tools/boiler-horsepower/": {
@@ -970,8 +970,8 @@
       "date": "2026-09-29"
     },
     "/tools/carburizing-case-depth/": {
-      "sha": "06a17a67c07e0d0c",
-      "date": "2026-09-29"
+      "sha": "95f957e48d682322",
+      "date": "2026-10-01"
     },
     "/tools/cardioid-sub-array/": {
       "sha": "d7f7adc51acf37e7",
@@ -3362,7 +3362,7 @@
       "date": "2026-10-01"
     },
     "/tools/generator-fleet-fuel-resupply/": {
-      "sha": "ba1336aef293c152",
+      "sha": "83087a2d1de5f6b5",
       "date": "2026-10-01"
     },
     "/tools/generator-fuel-runtime/": {
@@ -4874,7 +4874,7 @@
       "date": "2026-09-29"
     },
     "/tools/mppt-controller-output-current/": {
-      "sha": "7b269fd7d645b315",
+      "sha": "568709ee6a8f0143",
       "date": "2026-10-01"
     },
     "/tools/mstp-segment-loading/": {
@@ -4882,8 +4882,8 @@
       "date": "2026-09-29"
     },
     "/tools/mt-yoke-coil-amperage/": {
-      "sha": "5fb41546f1ace660",
-      "date": "2026-09-29"
+      "sha": "e5e9eb1c405d4b3d",
+      "date": "2026-10-01"
     },
     "/tools/mua-tempering-load/": {
       "sha": "9ef1e45c8b0eeac2",
@@ -6502,8 +6502,8 @@
       "date": "2026-09-29"
     },
     "/tools/rt-restricted-area/": {
-      "sha": "a43198c016531623",
-      "date": "2026-09-29"
+      "sha": "39d3938bc19a5c65",
+      "date": "2026-10-01"
     },
     "/tools/rtcr-coliform-samples/": {
       "sha": "c5bd975e1e2342bf",
@@ -8434,8 +8434,8 @@
       "date": "2026-10-01"
     },
     "/tools/ut-thickness-velocity/": {
-      "sha": "2d9a0d86f9d130c6",
-      "date": "2026-09-29"
+      "sha": "287647fad9edb83b",
+      "date": "2026-10-01"
     },
     "/tools/utm-conversion/": {
       "sha": "b79c494055db70e2",
@@ -8754,8 +8754,8 @@
       "date": "2026-09-29"
     },
     "/tools/weld-visual-acceptance/": {
-      "sha": "ad19c39f77519098",
-      "date": "2026-09-29"
+      "sha": "2faf95d9cd09ad6a",
+      "date": "2026-10-01"
     },
     "/tools/welded-wire-mesh/": {
       "sha": "3113059c89a430d5",

@@ -32,7 +32,17 @@ test("MT coil: ASTM E709 -- high fill 35,000 / (L/D + 2), low fill 45,000 / (L/D
   close(computeMtYokeCoilAmperage({ ...coilBase, fill_factor: "low" }).coil_amp_turns, 45000 / 4, "low fill");
   close(computeMtYokeCoilAmperage({ ...coilBase, fill_factor: "low" }).coil_amps, 45000 / 4 / 5, "amps through 5 turns");
   // The formulae hold for L/D between 2 and 15.
-  close(computeMtYokeCoilAmperage({ ...coilBase, part_length_in: 40 }).ld_used, 15, "long parts at 15");
+  close(computeMtYokeCoilAmperage({ ...coilBase, part_diameter_in: 1, part_length_in: 40 }).ld_used, 15, "long parts at 15");
+});
+
+test("MT coil: a long part is shot in sections of at most 18 in, and 18 is the L (NRC NDE manual 7.4.3.6)", () => {
+  // Until 2026-10-01 a 36 x 6 in part read L/D 6 and 875 A; each 18 in section
+  // is L/D 3 and needs 7,000 amp-turns, 1,400 A through 5 turns.
+  const r = computeMtYokeCoilAmperage({ ...coilBase, part_diameter_in: 6, part_length_in: 36 });
+  close(r.ld_used, 3, "L/D on the 18 in section");
+  close(r.coil_amps, 1400, "1,400 A");
+  assert.equal(r.sections_count, 2);
+  assert.equal(computeMtYokeCoilAmperage(coilBase).sections_count, 1);
 });
 
 test("restricted area: the gamma constant is per foot, and Ir-192's is 0.48 R/h per Ci at one METRE", () => {

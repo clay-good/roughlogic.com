@@ -124988,7 +124988,7 @@
    "source_publisher": "Project (first-principles)",
    "source_title": "Magnetic Particle Yoke and Coil Amperage -- the spec-v1668 worked example, recomputed",
    "source_edition_or_year": "spec-v1668 of scope-trade-expansion-2, 2026-09-09",
-   "source_section_or_page": "the standards named in the tile citation govern",
+   "source_section_or_page": "the standards named in the tile citation govern; recomputed 2026-10-01 with the 36 in part shot in 18 in sections (L/D 3), per the NRC NDE manual Vol. 2, 7.4.3.6",
    "verified_by": "rl",
    "verified_on": "2026-09-09",
    "inputs": {
@@ -125008,19 +125008,19 @@
      }
     },
     "ld_used": {
-     "value": 6,
+     "value": 3,
      "tolerance": {
       "pct": 0.5
      }
     },
     "coil_amp_turns": {
-     "value": 4375,
+     "value": 7000,
      "tolerance": {
       "pct": 0.5
      }
     },
     "coil_amps": {
-     "value": 875,
+     "value": 1400,
      "tolerance": {
       "pct": 0.5
      }
@@ -136369,6 +136369,388 @@
      "value": 75,
      "tolerance": {
       "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "mt-yoke-coil-amperage",
+   "source_publisher": "US Army / US Air Force",
+   "source_title": "TM 1-1500-335-23 / T.O. 33B-1-1, Nondestructive Inspection Methods",
+   "source_edition_or_year": "technical manual",
+   "source_section_or_page": "Section 3.3.12.6.3: steel part 10 in long, 2 in diameter, in the bottom of a 12 in coil of 5 turns (K = 45,000) -> I = 1,800 amperes",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "amps_per_inch": 800,
+    "yoke_pole_spacing_in": 0,
+    "yoke_current": "ac",
+    "part_diameter_in": 2,
+    "part_length_in": 10,
+    "coil_turns": 5,
+    "fill_factor": "low"
+   },
+   "outputs": {
+    "coil_amps": {
+     "value": 1800,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "mt-yoke-coil-amperage",
+   "source_publisher": "US Army / US Air Force",
+   "source_title": "TM 1-1500-335-23 / T.O. 33B-1-1, Nondestructive Inspection Methods",
+   "source_edition_or_year": "technical manual",
+   "source_section_or_page": "Section 3.3.12.6.3: part 12 in long, 4 in diameter, 3-turn cable wrap, I = 35,000 / 3(12/4 + 2) -> 2,333 amperes",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "amps_per_inch": 800,
+    "yoke_pole_spacing_in": 0,
+    "yoke_current": "ac",
+    "part_diameter_in": 4,
+    "part_length_in": 12,
+    "coil_turns": 3,
+    "fill_factor": "high"
+   },
+   "outputs": {
+    "coil_amps": {
+     "value": 2333,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "rt-restricted-area",
+   "source_publisher": "NDT Resource Center (Iowa State University)",
+   "source_title": "Radiography: Distance and Intensity",
+   "source_edition_or_year": "nde-ed.org web course",
+   "source_section_or_page": "Worked problem: 456 R/h at one foot; the 2 mR/h boundary is at 477.5 ft",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "source_activity_ci": 1,
+    "gamma_constant_r_h_ci_ft": 456,
+    "collimator_attenuation_factor": 0,
+    "public_limit_mr_h": 0,
+    "shielding_factor": 1,
+    "boundary_limit_mr_h": 2
+   },
+   "outputs": {
+    "boundary_distance_ft": {
+     "value": 477.5,
+     "tolerance": {
+      "abs": 0.1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "rt-restricted-area",
+   "source_publisher": "NDT Resource Center (Iowa State University)",
+   "source_title": "Radiography: Distance and Intensity",
+   "source_edition_or_year": "nde-ed.org web course",
+   "source_section_or_page": "Worked problem: 456 R/h at one foot; the 100 mR/h boundary is at 67.5 ft",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "source_activity_ci": 1,
+    "gamma_constant_r_h_ci_ft": 456,
+    "collimator_attenuation_factor": 0,
+    "public_limit_mr_h": 0,
+    "shielding_factor": 1,
+    "boundary_limit_mr_h": 100
+   },
+   "outputs": {
+    "boundary_distance_ft": {
+     "value": 67.5,
+     "tolerance": {
+      "abs": 0.1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "emergency-water-bleach-dose",
+   "source_publisher": "US EPA",
+   "source_title": "Emergency Disinfection of Drinking Water (bleach table)",
+   "source_edition_or_year": "web page, accessed 2026-10-01",
+   "source_section_or_page": "Bleach table: 1 gallon of clear water, 6% bleach -> 8 drops",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "water_volume": 1,
+    "volume_unit": "gal",
+    "bleach_strength_pct": 6,
+    "water_condition": "clear",
+    "drop_volume_ml": 0.05134293326822917
+   },
+   "outputs": {
+    "base_drops": {
+     "value": 8,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "emergency-water-bleach-dose",
+   "source_publisher": "US EPA",
+   "source_title": "Emergency Disinfection of Drinking Water (bleach table)",
+   "source_edition_or_year": "web page, accessed 2026-10-01",
+   "source_section_or_page": "Bleach table: 8 gallons of clear water, 8.25% bleach -> 1/2 teaspoon",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "water_volume": 8,
+    "volume_unit": "gal",
+    "bleach_strength_pct": 8.25,
+    "water_condition": "clear",
+    "drop_volume_ml": 0.05134293326822917
+   },
+   "outputs": {
+    "base_tsp": {
+     "value": 0.5,
+     "tolerance": {
+      "abs": 0.005
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "boil-water-altitude",
+   "source_publisher": "Colorado State University Extension",
+   "source_title": "High Elevation Food Preparation Guide, Table 1",
+   "source_edition_or_year": "fact sheet",
+   "source_section_or_page": "Table 1: water boils at 203 F at 5,000 ft (printed to the whole degree)",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "elevation": 5000,
+    "elevation_unit": "ft"
+   },
+   "outputs": {
+    "boiling_point_f": {
+     "value": 203,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "boil-water-altitude",
+   "source_publisher": "Colorado State University Extension",
+   "source_title": "High Elevation Food Preparation Guide, Table 1",
+   "source_edition_or_year": "fact sheet",
+   "source_section_or_page": "Table 1: water boils at 193 F at 10,000 ft (printed to the whole degree; the tile's standard atmosphere and Antoine fit read 193.7)",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "elevation": 10000,
+    "elevation_unit": "ft"
+   },
+   "outputs": {
+    "boiling_point_f": {
+     "value": 193,
+     "tolerance": {
+      "abs": 1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "rtcr-coliform-samples",
+   "source_publisher": "US EPA",
+   "source_title": "Revised Total Coliform Rule Assessments and Corrective Actions Guidance Manual (EPA 815-R-14-006), Appendix C",
+   "source_edition_or_year": "September 2014",
+   "source_section_or_page": "Appendix C, Silver Lake: approximately 24,200 people, 25 routine samples per month",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "population_served": 24200,
+    "tc_positive_count": 0,
+    "positive_repeat_count": 0,
+    "routine_samples_taken": 0
+   },
+   "outputs": {
+    "routine_samples_per_month": {
+     "value": 25,
+     "tolerance": {
+      "abs": 0
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "rtcr-coliform-samples",
+   "source_publisher": "US EPA",
+   "source_title": "Revised Total Coliform Rule Assessments and Corrective Actions Guidance Manual (EPA 815-R-14-006), Appendix C",
+   "source_edition_or_year": "September 2014",
+   "source_section_or_page": "Appendix C, Eagle Cliff: 5,500 people, 6 routine samples per month; a TC-positive routine sample and one positive repeat triggered a Level 1 assessment",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "population_served": 5500,
+    "tc_positive_count": 1,
+    "positive_repeat_count": 1,
+    "routine_samples_taken": 0
+   },
+   "outputs": {
+    "routine_samples_per_month": {
+     "value": 6,
+     "tolerance": {
+      "abs": 0
+     }
+    },
+    "total_positives": {
+     "value": 2,
+     "tolerance": {
+      "abs": 0
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "first-flush-diverter",
+   "source_publisher": "Texas Water Development Board",
+   "source_title": "The Texas Manual on Rainwater Harvesting",
+   "source_edition_or_year": "3rd edition, 2005",
+   "source_section_or_page": "pp. 8-9: divert a minimum of 10 gallons for every 1,000 sq ft; 3 in PVC needs 33 in of pipe per gallon (printed to the inch)",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "roof_footprint_sqft": 1000,
+    "diversion_rate_gal_per_100sqft": 1,
+    "standpipe_diameter_in": 3
+   },
+   "outputs": {
+    "minimum_rule_gal": {
+     "value": 10,
+     "tolerance": {
+      "abs": 0
+     }
+    },
+    "in_per_gal": {
+     "value": 33,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "lift-station-outage-storage",
+   "source_publisher": "Emerald Coast Utilities Authority",
+   "source_title": "Engineering Manual Section 575, Lift Station Design Worksheet",
+   "source_edition_or_year": "12/18/2014",
+   "source_section_or_page": "Item 6: minimum emergency storage 1,880 gallons (5 ft of additional depth in an 8 ft diameter wet well)",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "wet_well_shape": "round",
+    "wet_well_diameter_ft": 8,
+    "wet_well_length_ft": 0,
+    "wet_well_width_ft": 0,
+    "storage_depth_ft": 5,
+    "sewer_length_ft": 1200,
+    "sewer_diameter_in": 8,
+    "inflow_gpm": 100,
+    "detection_min": 20,
+    "travel_min": 60,
+    "hookup_min": 25,
+    "outage_hr": 8,
+    "truck_capacity_gal": 3000
+   },
+   "outputs": {
+    "wet_well_gal": {
+     "value": 1880,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "generator-droop-load-share",
+   "source_publisher": "Woodward",
+   "source_title": "Application Note 01302, The Droop Curve",
+   "source_edition_or_year": "application note",
+   "source_section_or_page": "A 3% droop governor runs 61.8 Hz at no fuel and 60 Hz at max fuel: two identical 100 kW units at 3% from 61.8 Hz reach 60.0 Hz at full load (200 kW)",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "unit1_kw": 100,
+    "unit1_droop_pct": 3,
+    "unit1_no_load_hz": 61.8,
+    "unit2_kw": 100,
+    "unit2_droop_pct": 3,
+    "unit2_no_load_hz": 61.8,
+    "unit3_kw": 0,
+    "unit3_droop_pct": 0,
+    "unit3_no_load_hz": 0,
+    "rated_hz": 60,
+    "load_kw": 180
+   },
+   "outputs": {
+    "first_full_bus_hz": {
+     "value": 60,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "first_full_load_kw": {
+     "value": 200,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "split-phase-leg-balance",
+   "source_publisher": "WINCO",
+   "source_title": "Application note L-1008 Rev A, generator load balancing",
+   "source_edition_or_year": "Rev A",
+   "source_section_or_page": "WL12000VE (10,800 W running): 45 A per 240 V leg; 18 A of 240 V welders plus two 16 A 120 V welders both on one leg -> 50 A on G1 and 18 A on G3",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "rated_w": 10800,
+    "per_leg_rating_a": 0,
+    "load_240_a": 18,
+    "l1_load1_a": 16,
+    "l1_load2_a": 16,
+    "l1_load3_a": 0,
+    "l1_load4_a": 0,
+    "l2_load1_a": 0,
+    "l2_load2_a": 0,
+    "l2_load3_a": 0,
+    "l2_load4_a": 0
+   },
+   "outputs": {
+    "leg_rating_a": {
+     "value": 45,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "l1_a": {
+     "value": 50,
+     "tolerance": {
+      "abs": 0
+     }
+    },
+    "l2_a": {
+     "value": 18,
+     "tolerance": {
+      "abs": 0
      }
     }
    }

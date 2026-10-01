@@ -335,6 +335,9 @@ export function computeRtcrColiformSamples({ population_served = 0, tc_positive_
     repeat_samples_required, repeat_deadline_hr, ecoli_analyses_required,
     total_samples, total_positives, tc_positive_pct, tc_positive_pct_routine,
     percent_basis, level1_triggered, level1_basis,
+    // 141.858(a)(3): a TC-positive repeat means ANOTHER set of repeats, and the
+    // sets continue until one is clean or a 141.859 trigger is exceeded.
+    additional_repeat_set_required: applies && positive_repeat_count > 0 && !level1_triggered,
     routine_shortfall: applies && routine_samples_counted < routine_samples_per_month,
     level1_verdict: !applies ? "not evaluated" : level1_triggered ? "LEVEL 1 ASSESSMENT TRIGGERED" : "no Level 1 trigger on these results",
     routing: applies ? "" : "A system serving 1,000 or fewer people samples under 40 CFR 141.854 (at least 1 routine sample per month for community systems, quarterly options for some non-community systems) and the state's schedule, not the 141.857(b) table.",
@@ -354,7 +357,7 @@ RELIEFWATER_RENDERERS["rtcr-coliform-samples"] = _simpleRenderer({
   ],
   outputs: [
     { key: "routine", id: "rtc-out-r", label: "Routine samples per month", value: (r) => r.applies ? r.routine_samples_per_month + " per 40 CFR 141.857(b)" + (r.routine_shortfall ? " -- ONLY " + r.routine_samples_counted + " TAKEN, a monitoring violation" : "") : r.routing },
-    { key: "repeat", id: "rtc-out-p", label: "Repeat samples", value: (r) => r.applies ? r.repeat_samples_required + " repeat samples, same day, within " + r.repeat_deadline_hr + " h of notification" : "-" },
+    { key: "repeat", id: "rtc-out-p", label: "Repeat samples", value: (r) => r.applies ? r.repeat_samples_required + " repeat samples, same day, within " + r.repeat_deadline_hr + " h of notification" + (r.additional_repeat_set_required ? " -- AND, because a repeat was positive and no assessment is triggered, another set of 3 for each repeat set that had a positive, continuing until one set is clean (141.858(a)(3))" : "") : "-" },
     { key: "ecoli", id: "rtc-out-e", label: "E. coli analyses", value: (r) => r.applies ? r.ecoli_analyses_required + " (every TC-positive sample)" : "-" },
     { key: "pct", id: "rtc-out-c", label: "TC-positive share", value: (r) => r.applies ? fmt(r.total_positives, 0) + " of " + fmt(r.total_samples, 0) + " samples = " + fmt(r.tc_positive_pct, 1) + "% (routine only " + fmt(r.tc_positive_pct_routine, 1) + "%)" : "-" },
     { key: "level1", id: "rtc-out-l", label: "Level 1 trigger", value: (r) => r.level1_verdict + " -- " + r.level1_basis + "; any required repeat not taken also triggers" },
@@ -547,13 +550,16 @@ RELIEFWATER_RENDERERS["lift-station-outage-storage"] = _simpleRenderer({
 
 // 29 CFR 1910.141 Table J-1 rows to 150 employees: [upper bound, water closets].
 const _J1 = [[15, 1], [35, 2], [55, 3], [80, 4], [110, 5], [150, 6]];
+const _j1WaterClosets = (n) => { if (!(n > 0)) return 0; const row = _J1.find(([upper]) => n <= upper); return row ? row[1] : 6 + Math.ceil((n - 150) / 40); };
 
-// dims: in { industry: dimensionless, worker_count: dimensionless, used_by_women: dimensionless } out: { toilet_seats: dimensionless, urinals: dimensionless, water_closets_min: dimensionless, water_closet_floor: dimensionless, urinals_substitutable: dimensionless, handwash_facilities: dimensionless }
-export function computeOshaToiletCount({ industry = "construction", worker_count = 0, used_by_women = "yes" } = {}) {
+// dims: in { industry: dimensionless, worker_count: dimensionless, used_by_women: dimensionless, women_count: dimensionless } out: { toilet_seats: dimensionless, urinals: dimensionless, water_closets_min: dimensionless, water_closets_men: dimensionless, water_closets_women: dimensionless, water_closet_floor: dimensionless, urinals_substitutable: dimensionless, handwash_facilities: dimensionless }
+export function computeOshaToiletCount({ industry = "construction", worker_count = 0, used_by_women = "yes", women_count = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(worker_count >= 1) || !Number.isInteger(worker_count)) return { error: "Worker count must be a whole number of at least 1." };
   if (!["construction", "general", "agriculture"].includes(industry)) return { error: "Industry must be construction, general industry, or agriculture." };
   if (!["yes", "no"].includes(used_by_women)) return { error: "Used by women must be yes or no." };
+  if (!(women_count >= 0) || !Number.isInteger(women_count) || women_count > worker_count) return { error: "The number of women must be a whole number from 0 to the worker count." };
+  let water_closets_men = 0, water_closets_women = 0;
   let toilet_seats = 0, urinals = 0, water_closets_min = 0, water_closet_floor = 0, urinals_substitutable = 0, handwash_facilities = 0;
   let rule = "", boundary_note = "";
   if (industry === "construction") {
@@ -575,9 +581,15 @@ export function computeOshaToiletCount({ industry = "construction", worker_count
     }
     if (worker_count === 20) boundary_note = "Table D-1's \"20 or less\" and \"20 or more\" rows overlap at exactly 20: the first gives 1 facility, the per-40 row 1 seat and 1 urinal. The larger reading is shown.";
   } else if (industry === "general") {
-    const row = _J1.find(([upper]) => worker_count <= upper);
-    water_closets_min = row ? row[1] : 6 + Math.ceil((worker_count - 150) / 40);
-    rule = "29 CFR 1910.141(c)(1)(i) Table J-1" + (row ? "" : ": over 150 -> 6 + 1 per additional 40 employees");
+    // 1910.141(c)(1)(i): rooms separate for each sex, and "the number of
+    // facilities to be provided for each sex shall be based on the number of
+    // employees of that sex". Until 2026-10-01 the table was read on the whole
+    // workforce: 100 men and 50 women got 6, not 5 + 3 = 8.
+    const split = used_by_women === "yes" && women_count > 0 && women_count < worker_count;
+    water_closets_men = split ? _j1WaterClosets(worker_count - women_count) : 0;
+    water_closets_women = split ? _j1WaterClosets(women_count) : 0;
+    water_closets_min = split ? water_closets_men + water_closets_women : _j1WaterClosets(worker_count);
+    rule = "29 CFR 1910.141(c)(1)(i) Table J-1" + (split ? ", read separately for each sex: " + water_closets_men + " for " + (worker_count - women_count) + " men + " + water_closets_women + " for " + women_count + " women" : worker_count > 150 ? ": over 150 -> 6 + 1 per additional 40 employees" : "");
     toilet_seats = water_closets_min;
     water_closet_floor = water_closets_min;
     if (used_by_women === "no") {
@@ -586,7 +598,7 @@ export function computeOshaToiletCount({ industry = "construction", worker_count
     }
     boundary_note = used_by_women === "no"
       ? "Footnote 1: where toilet rooms will not be used by women, urinals may replace water closets, but water closets may not fall below 2/3 of the table minimum -- " + water_closet_floor + " water closets plus up to " + urinals_substitutable + " urinals."
-      : "Toilet rooms separate for each sex; urinals may not replace water closets where the facilities are used by women.";
+      : "Toilet rooms separate for each sex, each counted on its own headcount (enter the number of women); urinals may not replace water closets where the facilities are used by women. Single-occupancy rooms that lock from inside need not be separated by sex.";
   } else {
     // 29 CFR 1928.110(a): the section applies where 11 or more employees do
     // hand labor in the field on a given day.
@@ -601,14 +613,14 @@ export function computeOshaToiletCount({ industry = "construction", worker_count
     }
   }
   return {
-    industry, worker_count, used_by_women, toilet_seats, urinals, water_closets_min, water_closet_floor,
+    industry, worker_count, used_by_women, women_count, toilet_seats, urinals, water_closets_min, water_closets_men, water_closets_women, water_closet_floor,
     urinals_substitutable, handwash_facilities, rule, boundary_note,
     handwash_counted: industry === "agriculture",
     note: "Three industries, three federal tables, and they do not agree: demolition and debris work is construction (1926.51 Table D-1), a relief warehouse is general industry (1910.141 Table J-1), and field hand labor is agriculture (1928.110). Table D-1's rows overlap at exactly 20 workers and the count steps down at 200. The Table J-1 urinal footnote is a floor, not a substitution rate: urinals may stand in for water closets only where the facilities will not be used by women, and water closets cannot fall below 2/3 of the minimum. Handwashing is required alongside toilets under all three rules, but only the agricultural rule states it as a count. These are minimums; heat, shift overlap, and remote work areas commonly justify more. It does not apply the building code's fixture table, the labor camp standard for workers who sleep on site, or shelter standards; it does not set a portable-unit service interval or address the construction exemption for mobile crews, state plans, or accessibility. The cited OSHA standards, the state plan, and the competent person on site govern.",
   };
 }
 
-export const oshaToiletCountExample = { inputs: { industry: "construction", worker_count: 85, used_by_women: "yes" } };
+export const oshaToiletCountExample = { inputs: { industry: "construction", worker_count: 85, used_by_women: "yes", women_count: 0 } };
 RELIEFWATER_RENDERERS["osha-toilet-count"] = _simpleRenderer({
   citation: "Citation: 29 CFR 1926.51(c)(1) Table D-1 (construction), 29 CFR 1910.141(c)(1)(i) Table J-1 and footnote 1 (general industry), and 29 CFR 1928.110(a) and (c)(2) (agriculture) -- federal regulation, public domain, reproduced. OSHA and the state plan govern.",
   example: oshaToiletCountExample.inputs,
@@ -616,6 +628,7 @@ RELIEFWATER_RENDERERS["osha-toilet-count"] = _simpleRenderer({
     { key: "industry", label: "Industry", kind: "select", options: [{ value: "construction", label: "Construction (1926.51)" }, { value: "general", label: "General industry (1910.141)" }, { value: "agriculture", label: "Agriculture field work (1928.110)" }], default: "construction" },
     { key: "worker_count", label: "Number of workers", attrs: { step: "1", min: "1" } },
     { key: "used_by_women", label: "General industry: facilities used by women?", kind: "select", options: [{ value: "yes", label: "Yes" }, { value: "no", label: "No (urinals may substitute)" }], default: "yes" },
+    { key: "women_count", label: "General industry: of the workers, women", attrs: { step: "1", min: "0" } },
   ],
   outputs: [
     { key: "count", id: "otc-out-c", label: "Required", value: (r) => r.industry === "construction" ? r.toilet_seats + " toilet seat(s) + " + r.urinals + " urinal(s)" : r.industry === "general" ? r.water_closets_min + " water closets" + (r.urinals_substitutable > 0 ? ", or " + r.water_closet_floor + " water closets + " + r.urinals_substitutable + " urinals" : "") : r.toilet_seats + " toilets + " + r.handwash_facilities + " handwashing facilities" },

@@ -51190,8 +51190,13 @@ test("bounds: spec-v1666 computeRtExposureTime -- inverse square against linear 
   assert.ok(Math.abs(_v1666({ ...base, days_elapsed: 73.83 }).activity_pct - 50) < 1e-9);
   assert.ok(Math.abs(r.decay_factor - Math.pow(0.5, 60 / 73.83)) < 1e-12);
   assert.ok(r.decayed_exposure_s > r.new_exposure_s);
-  // IDENTITY: the distance that meets the limit produces exactly the limit.
-  assert.ok(Math.abs(0.120 * 0.75 / r.distance_for_limit_in - 0.0208) < 1e-12);
+  // IDENTITY: the distance that meets the limit produces exactly the limit --
+  // fed back as the source-to-FILM distance, so the thickness is added back.
+  assert.ok(Math.abs(0.120 * 0.75 / (r.distance_for_limit_in - 0.75) - 0.0208) < 1e-12);
+  // The reported minimum must itself pass (until 2026-10-01 it still failed).
+  const tight = _v1666({ ...base, base_distance_in: 10, source_size_in: 0.12, material_thickness_in: 2, unsharpness_limit_in: 0.02 });
+  assert.equal(tight.distance_for_limit_in, 14);
+  assert.equal(_v1666({ ...base, base_distance_in: tight.distance_for_limit_in, source_size_in: 0.12, material_thickness_in: 2, unsharpness_limit_in: 0.02 }).base_passes, true);
   // The short distance already passes, so the longer shot buys nothing.
   assert.equal(r.base_passes, true);
   assert.equal(_v1666({ ...base, unsharpness_limit_in: 0.003 }).base_passes, false);
@@ -51220,20 +51225,23 @@ test("bounds: spec-v1668 computeMtYokeCoilAmperage -- a select is a STRING, and 
   const base = { part_diameter_in: 6, amps_per_inch: 800, part_length_in: 36, coil_turns: 5, fill_factor: "high", yoke_pole_spacing_in: 6, yoke_current: "ac" };
   const r = _v1668(base);
   assert.ok(Math.abs(r.circular_amps - 4800) < 1e-12);
-  assert.ok(Math.abs(r.ld_used - 6) < 1e-12);
-  assert.ok(Math.abs(r.coil_amp_turns - 4375) < 1e-9);
-  assert.ok(Math.abs(r.coil_amps - 875) < 1e-9);
+  // The 36 in part is shot in two 18 in sections, so L/D is 18/6 = 3
+  // (NRC NDE manual 7.4.3.6); until 2026-10-01 it read 6 and 875 A.
+  assert.ok(Math.abs(r.ld_used - 3) < 1e-12);
+  assert.equal(r.sections_count, 2);
+  assert.ok(Math.abs(r.coil_amp_turns - 7000) < 1e-9);
+  assert.ok(Math.abs(r.coil_amps - 1400) < 1e-9);
   // Selects arrive as strings, so "low" must actually select the low constant
   // and "ac" must not read as DC. A 0/1 encoding would make "0" truthy.
   assert.equal(r.is_high_fill, true);
   assert.equal(r.is_dc, false);
   // Low fill is NI = 45,000 / (L/D), with no + 2 (spec-v1668, ASTM E709).
-  assert.ok(Math.abs(_v1668({ ...base, fill_factor: "low" }).coil_amp_turns - 45000 / 6) < 1e-9);
+  assert.ok(Math.abs(_v1668({ ...base, fill_factor: "low" }).coil_amp_turns - 45000 / 3) < 1e-9);
   assert.ok(Math.abs(r.yoke_lift_required_lb - 10) < 1e-12);
   assert.ok(Math.abs(_v1668({ ...base, yoke_current: "dc" }).yoke_lift_required_lb - 40) < 1e-12);
   // L/D is bounded 2 to 15 by the standard formulae.
-  assert.equal(_v1668({ ...base, part_length_in: 600 }).ld_clamped, true);
-  assert.ok(Math.abs(_v1668({ ...base, part_length_in: 600 }).ld_used - 15) < 1e-12);
+  assert.equal(_v1668({ ...base, part_diameter_in: 1, part_length_in: 600 }).ld_clamped, true);
+  assert.ok(Math.abs(_v1668({ ...base, part_diameter_in: 1, part_length_in: 600 }).ld_used - 15) < 1e-12);
   assert.equal(_v1668({ ...base, part_length_in: 6 }).ld_used, 2);
   assert.ok(_v1668({ ...base, part_diameter_in: 0 }).error);
 });
