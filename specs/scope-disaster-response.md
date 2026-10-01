@@ -92,7 +92,7 @@ rather than copying the error:
 - **US&R SOG:** its headline 4x4 at 8 ft (8,000 lb) sits at L/D 27.4, past its own no-warning limit of 25. (v1898)
 - **OSHA Table D-1:** its "20 or less" and "20 or more" rows overlap at exactly 20, and the count steps *down* at 200
   workers. (v1886)
-- **US&R guides:** the 2021 and 2006 raker ratings differ (4,000 lb axial vs 2,500 lb horizontal), and the crib
+- **US&R guides:** the 2021 and 2006 raker ratings differ (4,000 lb vs 2,500 lb, both horizontal force; corrected 2026-09-30 from "4,000 lb axial", SOG 2021 FAQ R-1), and the crib
   bearing stresses differ (500 vs 625 psi). Both are shown. (v1899, v1900)
 
 **Drafts corrected before commit, on reading:** a droop spec claimed the larger unit overloads first (both reach

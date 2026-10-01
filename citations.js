@@ -25804,6 +25804,90 @@ export const CITATIONS = {
       { name: "Four-point fuel curve", value: "gph interpolated at the set point and at the load, flagged below 1/4 load", source: "manufacturer data sheet" },
     ],
   },
+  "collapse-floor-load": {
+    formula: "floor self-weight (concrete 12.5 psf per inch of thickness, or the published wood, steel-deck, and precast weights, or entered) + contents + partitions, per collapsed floor; + rubble at 10 psf per inch of depth; + rescuer live load 10 to 15 psf = total psf; load per shore = total x shore spacing x tributary width; load per post = load per shore / posts.",
+    edition: "USACE US&R Shoring Operations Guide, Ed. 5.0 (October 2021), Disaster Site Reference Data: Design Dead Loads for Building Materials and Rescue Live Loads; USACE US&R Structures Specialist Field Operations Guide (2006) weight tables, cited by figure and named as the method.",
+    freeAccess: "Additions and multiplications on the guides' published unit weights; the SOG is distributed free by USACE and state fire marshals.",
+    governance: GOVERNANCE.structural,
+    editionNote: "A shore holds up whatever is above it, and after a collapse that is more than the floor. The US&R guides publish the weights a structures specialist adds up in the field: normal concrete at 150 pcf, 12.5 psf per inch; concrete masonry rubble at 10 psf per inch of depth; furniture at 10 psf and partitions at 10 to 15 psf per floor; wood floors 10 to 25 psf, steel deck with fill 50 to 70 psf (the tile uses 70), 8 in precast plank 60 psf; and 10 to 15 psf for rescuers. Rubble is the component that grows fastest and the one most often underestimated because it is judged by eye. Where several collapsed floors bear on the shore each floor's weight, contents, and partitions are added; the rubble depth is the measured total and the rescuers stand once. These are typical unit weights: wet materials, storage occupancies, and heavy equipment can be much heavier, and a measured weight governs.",
+    assumptions: [
+      { name: "Rubble is weighed by depth", value: "10 psf per inch of concrete and masonry rubble, so 18 in of rubble outweighs two 6 in slabs", source: "USACE US&R Shoring Operations Guide (2021)" },
+      { name: "Rescuers are a live load in every calculation", value: "10 to 15 psf (four 250 lb rescuers in 100 sq ft is 10 psf)", source: "USACE US&R Shoring Operations Guide (2021)" },
+      { name: "Tributary area is half the span to each neighbor", value: "load per shore = total psf x shore spacing x tributary width", source: "statics" },
+    ],
+  },
+  "usr-vertical-shore-capacity": {
+    formula: "L/D = shore height (in) / post least actual width (in); Fa = 480,000 psi / (L/D)^2, capped at Fc = 1,100 psi (cap governs below L/D 20.9); P = Fa x post area; shore capacity = posts x P x species factor (1.00 / 0.85 / 0.75); L/D over 25 flagged, over 50 refused; lateral bracing = 2% of vertical capacity, 10% where aftershocks are expected.",
+    edition: "USACE US&R Structures Specialist Field Operations Guide (2006), Structural Calculations -- Material Properties; USACE US&R Shoring Operations Guide, Ed. 5.0 (2021), vertical shore design loads (8,000 / 5,000 / 3,500 lb for 4x4 at 8 / 10 / 12 ft; 20,000 / 12,000 / 7,500 lb for 6x6 at 12 / 16 / 20 ft), L/D 25 limit, and species factors; DHS BIPS 08 (2011) lateral strength of 2% of vertical load, 10% desirable with aftershocks.",
+    freeAccess: "A closed-form expression and published factors; the SOG and BIPS 08 are free federal publications.",
+    governance: GOVERNANCE.structural,
+    editionNote: "The US&R method is a field-reduced column design: one Euler-shaped expression capped at the compression strength parallel to grain, taken on the shore height so the header and sole are counted. It reproduces the guide's published 4x4 design loads within 3% and its 6x6 loads within 6% (the formula gives 21,182 lb against the printed 20,000 at 12 ft). The L/D of 25 is a warning limit: below it an overloaded post crushes at its ends and creaks, giving rescuers time to leave; above it the post can buckle suddenly. The guide's own headline figure, 8,000 lb for a 4x4 in an 8 ft shore, sits at L/D 27.4, past that line, and the tile shows the flag there. The FOG permits a stress increase for US&R shores that this method does not apply. This overlaps column-buckling-wood (NDS Cp method for one member) and is kept as the distinct US&R field procedure.",
+    assumptions: [
+      { name: "Slenderness is taken on shore height", value: "sole to top of header, divided by the post's least actual width", source: "USACE US&R Structures Specialist FOG (2006)" },
+      { name: "L/D 25 is the no-warning line", value: "past it a post may buckle before its ends visibly crush; 50 is the maximum", source: "USACE US&R Shoring Operations Guide (2021)" },
+      { name: "Bracing is a fraction of capacity", value: "2% of vertical capacity minimum, 10% where aftershocks are expected", source: "DHS BIPS 08 (2011)" },
+    ],
+  },
+  "usr-crib-capacity": {
+    formula: "L = A x N x P x species factor: A = actual member width squared (12.25 sq in for 4x4, 30.25 for 6x6), N = 4 (2x2) or 9 (3x3), P = 500 psi (entered; SOG value); maximum height = min(ratio x shortest width, practical ceiling), ratio 3 (all bearing), 2 (lifting), 1.5 (two of four corners), 1 (one corner); practical ceiling 4 ft (4x4), 6 ft (6x6).",
+    edition: "USACE US&R Shoring Operations Guide, Ed. 5.0 (2021), Additional Information -- Cribbing (L = A x N x P, 500 psi for No. 1 and better Douglas Fir, 85% and 75% species factors, 4 ft and 6 ft recommended maxima) and Rescue Specialist Reference Data (height-to-width ratios, 15 degree maximum slope), cited by figure.",
+    freeAccess: "A product of three numbers and published ratios; the SOG is a free USACE publication.",
+    governance: GOVERNANCE.structural,
+    editionNote: "A crib fails by crushing across the grain where the layers cross, so its capacity counts crossings, not column strength -- nine contact points in a 3x3 against four in a 2x2. The failure is slow and audible, which is why cribbing is trusted in collapse work. The formula gives 24,500 lb for a 2x2 of 4x4s and 136,125 lb for a 3x3 of 6x6s where the SOG prints 24,000 and 135,000 (and 54,000 for a 3x3 of 4x4s, against 55,125); the guide rounds down. The 2006 Field Operations Guide lists 625 psi perpendicular to grain against the SOG's 500 psi cribbing value, so the stress is an input and the SOG value the default. Height tightens as contact is lost, and the practical ceiling often governs before the ratio does; a crib that must be taller is widened, not stacked higher.",
+    assumptions: [
+      { name: "Capacity is bearing at the crossings", value: "L = A x N x P with P = 500 psi for No. 1 and better Douglas Fir", source: "USACE US&R Shoring Operations Guide (2021)" },
+      { name: "Height ratio follows contact", value: "3:1 all bearing, 2:1 lifting, 1.5:1 two of four corners, 1:1 one corner", source: "USACE US&R Shoring Operations Guide (2021)" },
+      { name: "Practical ceilings", value: "about 4 ft for 4x4 and 6 ft for 6x6 cribbing", source: "USACE US&R Shoring Operations Guide (2021)" },
+    ],
+  },
+  "usr-raker-shore": {
+    formula: "W = wall psf x wall height x spacing + roof psf x roof depth x spacing; H = 10% of W (2% where no aftershock is expected); raker length = h_i / sin(theta) (rule 17 in per ft at 45 deg, 14 in per ft at 60); base = h_i / tan(theta); axial = H / cos(theta); vertical kick = H x tan(theta); collapse zone = 1.25 to 1.5 x wall height; H checked against 4,000 lb (SOG 2021) and 2,500 lb (FOG 2006) per raker.",
+    edition: "FEMA Structural Collapse Technician Module 2a (raker systems for about 10% of the wall and roof weight in their tributary area, 2% minimum); USACE US&R Shoring Operations Guide, Ed. 5.0 (2021), raker length rules, FAQ R-1 (4,000 lb horizontal per raker of No. 1 Douglas Fir), Shoring Numbers to Remember (8,000 lb for a braced pair), and the collapse-zone definition; USACE US&R Structures Specialist FOG (2006) raker rating of 2,500 lb.",
+    freeAccess: "Right-triangle trigonometry and a percentage of a weight; the SOG is a free USACE publication.",
+    governance: GOVERNANCE.structural,
+    editionNote: "A raker's force is a fraction of the wall's weight, not a wind load: a standing wall is near plumb and needs little to hold it, but an aftershock can shake it further out, so the guides design for a tenth. The angle is the main choice -- 45 degrees gives the smaller axial force and a longer base, 60 degrees fits a narrow street but carries more axial force and a larger upward kick at the wall plate, which a nailed plate may not resist. The field rules of 17 and 14 in per foot reproduce the trigonometry within about 2 in at a 12 ft insertion. The two guide editions rate rakers differently and both are shown: the 2021 SOG FAQ gives 4,000 lb of horizontal force per raker; the 2006 FOG gives 2,500 lb (the 2011 DHS field guide also prints 2,500 lb per 4x raker and 3,600 lb per 6x raker). The collapse zone is reported so the base and the crew stay outside it where possible.",
+    assumptions: [
+      { name: "Design force is a tenth of the tributary weight", value: "10% of wall plus roof weight per raker, 2% minimum where no aftershock is expected", source: "FEMA Structural Collapse Technician Module 2a" },
+      { name: "The kick is upward at the wall plate", value: "V = H x tan(theta); 2,633 lb at 60 degrees for a 1,520 lb design force", source: "statics" },
+      { name: "Collapse zone", value: "1.25 to 1.5 times the wall height", source: "USACE US&R Shoring Operations Guide (2021)" },
+    ],
+  },
+  "picket-anchor-soil": {
+    formula: "design load per picket from the FOG table (1 in x 48 in pin: 500 / 750 / 1,000 lb in poor / average / good cohesive soil, 50 / 55 / 63 lb in loose / medium / dense cohesionless; 3 in pin: 1,000 / 1,500 / 2,000 and 150 / 180 / 190 lb), driven 36 in; count = ceil(required force / design load); group = count x design load; embedment under 36 in and cohesionless soil flagged.",
+    edition: "USACE US&R Structures Specialist Field Operations Guide (2006), Approximate Design Load of Pickets (Pins) in Soils, based on FHWA-IP-84-11, Handbook on Design of Piles and Drilled Shafts Under Lateral Load (1984), at about 50% of capacity; USACE US&R Shoring Operations Guide, Ed. 5.0 (2021), minimum picket 1 in x 36 in driven 24 in.",
+    freeAccess: "A table lookup from a federal field guide and a ceiling division.",
+    governance: GOVERNANCE.rigging,
+    editionNote: "A driven picket resists a sideways pull by bearing on the soil in front of it, so the soil sets the load, and the published loads span a factor of twenty between good clay and loose sand. Pickets are a clay-and-firm-ground method; in granular soil the count becomes absurd -- 28 pickets for a 1,520 lb raker force in medium sand -- and the answer is a deadman, a buried timber, or a connection to paving. The table assumes a 48 in picket driven 36 in; the 2021 SOG permits a 1 in x 36 in picket driven 24 in for its prescribed standard patterns (6 per raker in cohesive soil, 3 into paving), which does not earn the tabulated load, so a shorter embedment is flagged rather than scaled. The 2011 DHS field guide's pattern is 4 pickets per raker in soil. Group spacing is assumed wide enough that pickets do not share a soil wedge.",
+    assumptions: [
+      { name: "Soil governs, not steel", value: "a 1 in picket holds 1,000 lb in good cohesive soil and 50 lb in loose sand", source: "USACE US&R Structures Specialist FOG (2006), after FHWA-IP-84-11" },
+      { name: "Table basis is 36 in of embedment", value: "a shallower picket does not earn the tabulated load and is flagged", source: "USACE US&R Structures Specialist FOG (2006)" },
+      { name: "Design load is about half of capacity", value: "about 50% of the lateral capacity from the FHWA handbook", source: "FHWA-IP-84-11 (1984)" },
+    ],
+  },
+  "osha-timber-trench-shoring": {
+    formula: "lookup: soil type (A, B, C) x depth band (5-10, 10-15, 15-20 ft) x crossbrace horizontal spacing (up to 6, 8, 10, 12 ft) x width column (up to 4, 6, 9, 12, 15 ft) -> crossbrace size and vertical spacing, wale size and vertical spacing or not required, upright size and maximum horizontal spacing or close sheeting; Pa = 25 H + 72 (A), 45 H + 72 (B), 80 H + 72 (C) psf; crossbrace load = Pa x horizontal spacing x vertical spacing.",
+    edition: "29 CFR 1926 Subpart P, Appendix C (Timber Shoring for Trenches), Tables C-1.1 to C-1.3 (actual-size mixed oak, 850 psi bending) and C-2.1 to C-2.3 (nominal S4S Douglas fir, 1,500 psi), paragraphs (d)(2) limitations, (f) examples, and (g) notes. Federal regulation, public domain, transcribed and checked against the GovInfo CFR and osha.gov.",
+    freeAccess: "The regulation is free at osha.gov and govinfo.gov; the six tables are reproduced in full because federal regulation is in the public domain.",
+    governance: GOVERNANCE.worker_safety,
+    editionNote: "Appendix C is a lookup and the tile makes it exact, listing every acceptable arrangement for a trench as OSHA's examples do, because the choice depends on the timber on hand. The printed design pressure shows why soil type matters: at 13 ft, 397 psf in Type A, 657 in Type B, 1,112 in Type C, and Type C requires close sheeting at every depth. The (d)(2)(ii) limitations must not be skipped -- adjacent loads above a 2 ft soil surcharge within a distance equal to the depth, more than 240 lb on a crossbrace, equipment over 20,000 lb, or a partly sloped trench steeper than 3H:1V -- and in disaster work one is often exceeded, which routes the reader to an engineered design. Two transcription points: Table C-1.1 prints a 6x5 crossbrace (Type A, 10 to 15 ft, 10 ft spacing, width up to 6 ft) that OSHA's own Example 1 reads as 6x6, and the osha.gov HTML copy of Table C-1.2 shows 6x8 where the CFR prints 8x8 (10 to 15 ft, 10 ft spacing, width up to 12 ft); the tile follows the CFR and the example.",
+    assumptions: [
+      { name: "Depth over 20 ft or width over 15 ft is out of scope", value: "Appendix C does not apply; a registered professional engineer designs the system", source: "29 CFR 1926.652(c) and Appendix C" },
+      { name: "Surcharge is a 2 ft soil equivalent", value: "Pa = k x H + 72 psf, with k = 25, 45, or 80 for Types A, B, and C", source: "29 CFR 1926 Subpart P, Appendix C tables" },
+      { name: "Saturated or submerged conditions need tight sheeting", value: "tongue-and-groove planks at least 3 in thick, sheet piling, or similar", source: "29 CFR 1926 Subpart P, Appendix C, Note 2" },
+    ],
+  },
+  "relief-storage-floor-load": {
+    formula: "footprint psf = pallet gross weight x tiers / (length x width / 144); area average = footprint psf x coverage fraction; each divided by the entered design live load; upper-bound pallets = floor area x design live load / pallet weight (stacks = that / tiers).",
+    edition: "Statics, with the design live load a USER INPUT from the building's structural drawings or, where unknown, the occupancy's uniform live load in ASCE 7 Table 4.3-1 / IBC Table 1607.1, cited by number and not reproduced.",
+    freeAccess: "Arithmetic on the user's pallet weight and the entered design live load; no code table is reproduced.",
+    governance: GOVERNANCE.structural,
+    editionNote: "A design live load is a uniform pressure over a whole bay, and stacked pallets are neither uniform nor spread, so the tile reports both the area average (comparable to the design load) and the pressure under a stack (what a thin slab or wood floor feels locally). Bottled water is usually the heaviest relief commodity, about a ton a pallet, and double-stacking doubles the local pressure without changing the footprint. The design live load belongs to the building and is on the structural drawings; the ASCE 7 and IBC occupancy tables are the fallback, entered by the user. Aisles lower the average and are part of the input. Storage in a space not designed for it is a change of use a structural engineer should review.",
+    assumptions: [
+      { name: "Standard pallet footprint", value: "40 x 48 in = 13.33 sq ft (entered; change for other pallets)", source: "GMA pallet dimensions, by name" },
+      { name: "Average and local pressure both matter", value: "the average is compared with the design live load; the stack pressure is a local concentration", source: "statics" },
+      { name: "Design live load is entered", value: "from the drawings, or ASCE 7 Table 4.3-1 / IBC Table 1607.1 by occupancy", source: "ASCE 7 / IBC, cited by number" },
+    ],
+  },
 };
 
 // --- Citation linkifier ---

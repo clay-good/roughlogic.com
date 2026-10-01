@@ -2349,6 +2349,13 @@ const RELATED = {
   "mppt-controller-output-current": ["pv-circuit-ampacity","pv-string-sizing","pv-cell-temperature-power","off-grid-battery"],
   "radio-site-duty-cycle-battery": ["off-grid-battery","standby-battery-sizing","battery-runtime"],
   "generator-battery-hybrid-fuel": ["generator-part-load-fuel","off-grid-battery","generator-fuel-runtime","generator-sizing"],
+  "collapse-floor-load": ["usr-vertical-shore-capacity","usr-crib-capacity","demo-debris","shore-post-load"],
+  "usr-vertical-shore-capacity": ["collapse-floor-load","usr-crib-capacity","column-buckling-wood","wood-bearing-perpendicular"],
+  "usr-crib-capacity": ["collapse-floor-load","usr-vertical-shore-capacity","wood-bearing-perpendicular","crane-ground-bearing"],
+  "usr-raker-shore": ["picket-anchor-soil","collapse-floor-load","tilt-up-brace-load"],
+  "picket-anchor-soil": ["usr-raker-shore","guy-anchor-holding-capacity","rigging-check"],
+  "osha-timber-trench-shoring": ["excavation-protection-trigger","trench-slope","excavation-bench-plan","soil-vertical-effective-stress"],
+  "relief-storage-floor-load": ["rack-upright-capacity-derate","asce-live-load-reduction","pallet-loadout","collapse-floor-load"],
 };
 
 export { RELATED };

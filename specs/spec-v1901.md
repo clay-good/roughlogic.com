@@ -1,6 +1,6 @@
 # roughlogic.com Specification v1901 -- Steel Picket Anchor Lateral Capacity and Count (`calc-usar.js`, Group Z Rigging and Heavy Lift, collapse shoring, 1 New Tile)
 
-> **Status: PROPOSED 2026-09-25. Single-tile spec.** Part of [scope-disaster-response](scope-disaster-response.md).
+> **Status: LANDED 2026-09-30 (proposed 2026-09-25). Single-tile spec.** Part of [scope-disaster-response](scope-disaster-response.md).
 > In-scope catalog expansion under the spec-v106 trades-only charter. Adds one tile to **`calc-usar.js`**
 > (Group Z Rigging and Heavy Lift, hub `/groups/rigging-and-heavy-lift/`), no new dependency and no new network call. Inherits spec.md through spec-v1878.md.
 >

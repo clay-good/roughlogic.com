@@ -115557,6 +115557,181 @@
    "term": "generator wet stacking battery",
    "target": "generator-battery-hybrid-fuel",
    "kind": "industry"
+  },
+  {
+   "term": "collapse debris load psf",
+   "target": "collapse-floor-load",
+   "kind": "industry"
+  },
+  {
+   "term": "rubble weight on floor",
+   "target": "collapse-floor-load",
+   "kind": "industry"
+  },
+  {
+   "term": "emergency shoring load estimate",
+   "target": "collapse-floor-load",
+   "kind": "industry"
+  },
+  {
+   "term": "usar floor load",
+   "target": "collapse-floor-load",
+   "kind": "industry"
+  },
+  {
+   "term": "load per shore collapsed building",
+   "target": "collapse-floor-load",
+   "kind": "industry"
+  },
+  {
+   "term": "vertical shore capacity",
+   "target": "usr-vertical-shore-capacity",
+   "kind": "industry"
+  },
+  {
+   "term": "4x4 post shore load",
+   "target": "usr-vertical-shore-capacity",
+   "kind": "industry"
+  },
+  {
+   "term": "usar post capacity",
+   "target": "usr-vertical-shore-capacity",
+   "kind": "industry"
+  },
+  {
+   "term": "emergency shoring post",
+   "target": "usr-vertical-shore-capacity",
+   "kind": "industry"
+  },
+  {
+   "term": "t-shore post load",
+   "target": "usr-vertical-shore-capacity",
+   "kind": "industry"
+  },
+  {
+   "term": "box crib capacity",
+   "target": "usr-crib-capacity",
+   "kind": "industry"
+  },
+  {
+   "term": "cribbing load capacity",
+   "target": "usr-crib-capacity",
+   "kind": "industry"
+  },
+  {
+   "term": "crib height to width ratio",
+   "target": "usr-crib-capacity",
+   "kind": "industry"
+  },
+  {
+   "term": "4x4 crib design load",
+   "target": "usr-crib-capacity",
+   "kind": "industry"
+  },
+  {
+   "term": "6x6 cribbing capacity",
+   "target": "usr-crib-capacity",
+   "kind": "industry"
+  },
+  {
+   "term": "raker shore length",
+   "target": "usr-raker-shore",
+   "kind": "industry"
+  },
+  {
+   "term": "raker shore angle 45 60",
+   "target": "usr-raker-shore",
+   "kind": "industry"
+  },
+  {
+   "term": "wall raker force",
+   "target": "usr-raker-shore",
+   "kind": "industry"
+  },
+  {
+   "term": "usar raker design",
+   "target": "usr-raker-shore",
+   "kind": "industry"
+  },
+  {
+   "term": "brace damaged masonry wall",
+   "target": "usr-raker-shore",
+   "kind": "industry"
+  },
+  {
+   "term": "picket anchor capacity",
+   "target": "picket-anchor-soil",
+   "kind": "industry"
+  },
+  {
+   "term": "steel stake anchor load",
+   "target": "picket-anchor-soil",
+   "kind": "industry"
+  },
+  {
+   "term": "picket holdfast",
+   "target": "picket-anchor-soil",
+   "kind": "industry"
+  },
+  {
+   "term": "raker sole anchor pickets",
+   "target": "picket-anchor-soil",
+   "kind": "industry"
+  },
+  {
+   "term": "how many pickets for anchor",
+   "target": "picket-anchor-soil",
+   "kind": "industry"
+  },
+  {
+   "term": "timber trench shoring",
+   "target": "osha-timber-trench-shoring",
+   "kind": "industry"
+  },
+  {
+   "term": "osha appendix c shoring",
+   "target": "osha-timber-trench-shoring",
+   "kind": "industry"
+  },
+  {
+   "term": "trench crossbrace size",
+   "target": "osha-timber-trench-shoring",
+   "kind": "industry"
+  },
+  {
+   "term": "trench shoring wales uprights",
+   "target": "osha-timber-trench-shoring",
+   "kind": "industry"
+  },
+  {
+   "term": "skip shoring spacing",
+   "target": "osha-timber-trench-shoring",
+   "kind": "industry"
+  },
+  {
+   "term": "pallet floor load psf",
+   "target": "relief-storage-floor-load",
+   "kind": "industry"
+  },
+  {
+   "term": "bottled water pallet weight floor",
+   "target": "relief-storage-floor-load",
+   "kind": "industry"
+  },
+  {
+   "term": "relief supply storage floor capacity",
+   "target": "relief-storage-floor-load",
+   "kind": "industry"
+  },
+  {
+   "term": "gym floor pallet load",
+   "target": "relief-storage-floor-load",
+   "kind": "industry"
+  },
+  {
+   "term": "how many pallets can the floor hold",
+   "target": "relief-storage-floor-load",
+   "kind": "industry"
   }
  ]
 }

@@ -1451,6 +1451,14 @@ const _TILES = [
   ["mppt-controller-output-current", "A"],
   ["radio-site-duty-cycle-battery", "A"],
   ["generator-battery-hybrid-fuel", "A"],
+  // spec-v1897..v1903 disaster response collapse shoring and rescue support band.
+  ["collapse-floor-load", "E"],
+  ["usr-vertical-shore-capacity", "E"],
+  ["usr-crib-capacity", "E"],
+  ["usr-raker-shore", "E"],
+  ["picket-anchor-soil", "Z"],
+  ["osha-timber-trench-shoring", "E"],
+  ["relief-storage-floor-load", "G"],
 ];
 
 

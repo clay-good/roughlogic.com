@@ -3744,6 +3744,13 @@ cross-check.
 | calc-truckingfield.js | `computeOversizePermitScreen` | `{ width_ft = 0, height_ft = 0, length_ft = 0, weight_lb = 0, width_limit_ft =...` | _ | _ | _ |
 | calc-truckingfield.js | `computeSafeDescentSpeed` | `{ gcw_lb = 0, grade_pct = 0, descent_speed_mph = 0, engine_brake_hp = 0 } = {}` | _ | _ | _ |
 | calc-truckingfield.js | `computeTiedownCount` | `{ length_ft = 0, weight_lb = 0, tiedowns = 0, wll_per_tiedown_lb = 0, tiedown...` | _ | _ | _ |
+| calc-usar.js | `computeCollapseFloorLoad` | `{ floor_type = "concrete", slab_thickness_in = 6, floor_self_weight_psf = 0, ...` | _ | _ | _ |
+| calc-usar.js | `computeOshaTimberTrenchShoring` | `{ soil_type = "A", depth_ft = 13, width_ft = 5, table_set = "oak", crossbrace...` | _ | _ | _ |
+| calc-usar.js | `computePicketAnchorSoil` | `{ required_force_lb = 1520, picket_dia = "1", soil = "cohesive_average", embe...` | _ | _ | _ |
+| calc-usar.js | `computeReliefStorageFloorLoad` | `{ pallet_weight_lb = 2300, footprint_length_in = 48, footprint_width_in = 40,...` | _ | _ | _ |
+| calc-usar.js | `computeUsrCribCapacity` | `{ timber_size = "6x6", layup = "3x3", species = "syp_hf_spf", bearing_stress_...` | _ | _ | _ |
+| calc-usar.js | `computeUsrRakerShore` | `{ wall_psf = 125, wall_height_ft = 14, raker_spacing_ft = 8, roof_depth_ft = ...` | _ | _ | _ |
+| calc-usar.js | `computeUsrVerticalShoreCapacity` | `{ shore_height_ft = 10, post_size = "4x4", post_width_in = 3.5, post_depth_in...` | _ | _ | _ |
 | calc-velocity.js | `computeDpFlowMeter` | `{ pipe_id_in = 0, bore_in = 0, dp_psi = 0, cd = 0.61, fluid_density_lb_ft3 = ...` | _ | _ | _ |
 | calc-velocity.js | `computeDuctVelocityPressure` | `{ solve_for = "velocity", vp_inwc = 0, velocity_fpm = 0 } = {}` | _ | _ | _ |
 | calc-velocity.js | `computeGasDpFlowMeter` | `{ pipe_id_in = 0, bore_in = 0, p1_psia = 0, dp_psi = 0, temp_f = 60, gas_sg =...` | _ | _ | _ |
@@ -3869,7 +3876,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 2453.
+Row count: 2460.
 
 <!-- END function-corpus-v14 -->
 
@@ -4640,7 +4647,7 @@ per spec-v14 §13.1 second paragraph.
 | `water-extraction-rate` | Water Extraction Volume, Time, and Waste-Tank Dumps | Project (first-principles); standing + absorbed; wand time = total / gpm | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wood-emc` | Equilibrium Moisture Content of Wood | USDA Forest Products Laboratory Wood ...; spec-v119 section 2.1 pinned example (textbook ~9.1%) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+4 more) |
 
-### Group E Construction (600 tiles)
+### Group E Construction (605 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -4722,6 +4729,7 @@ per spec-v14 §13.1 second paragraph.
 | `cohesive-earth-pressure` | Rankine Active Earth Pressure on a Cohesive (Clay) Backfill | Rankine c-phi active earth pressure /...; Ka = (1 - sin 20)/(1 + sin 20) = 0.490291, sqrt(Ka) = 0.7... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `coil-length` | Coil / Roll Stock Length | coil / roll stock annulus identity; spec-v802 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `coke-breeze-backfill` | Coke Breeze Backfill Quantity | Project (first-principles); the supplier's data and the CP designer govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `collapse-floor-load` | Collapsed or Damaged Floor Load for Shoring | Project (first-principles); Design Dead Loads for Building Materials; Rescue Live Loads | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `column-base-plate` | Column Base Plate under Axial Load (AISC Design Guide 1) | AISC Design Guide 1 §3.1 / AISC 360-2...; spec-v268 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `column-buckling-wood` | Wood Column Capacity (Slenderness) | NDS column-stability (Cp / Euler buck...; 3.5x3.5 in, le 96 in, Fc* 1150, Emin 580,000 -> capacity ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `combined-stress-axial-bending` | Combined Axial and Bending Stress (P/A +/- Mc/I) | mechanics of materials; spec-v343 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
@@ -4951,6 +4959,7 @@ per spec-v14 §13.1 second paragraph.
 | `mud-hydrostatic-pressure` | Drilling Mud Weight and Hydrostatic Pressure | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `multi-bend-flat-pattern` | Multi-Bend Flat Pattern (Developed Length) | sheet-metal layout (developed length); spec-v454 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `occupant-load` | Building Occupant Load from Area and Use (IBC Table 1004.5) | IBC 2021 Table 1004.5 occupant-load f...; spec-v242 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
+| `osha-timber-trench-shoring` | OSHA Appendix C Timber Trench Shoring Lookup | OSHA (29 CFR 1926 Subpart P); Appendix C (f)(1) Example 1: Type A soil, 13 ft deep, 5 f... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+3 more) |
 | `overconsolidated-settlement` | Primary Consolidation Settlement (Over-Consolidated Clay) | Terzaghi primary consolidation, OC cl...; Cc 0.25, Cr 0.05, H 10 ft, e0 0.90, sigma'0 2,000 psf, si... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `oxyfuel-cutting-gas` | Oxy-Fuel Cutting Gas Consumption | Torch maker's tip charts; 1/2 in tip: 55 cfh oxygen, 12 cfh acetylene, 240 in at 16... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `paint-coverage` | Paint Coverage | Project (first-principles); 700 ft^2 smooth wall, 2 coats, primer needed -> 2.0 gal/c... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -5192,6 +5201,9 @@ per spec-v14 §13.1 second paragraph.
 | `turning-clear-floor-space` | Turning Space and Clear Floor Space (2010 ADA Standards 304, 305) | US Department of Justice / US Access ...; 305.3 gives 30 in by 48 in and 305.5 requires it 'positio... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `turnout-frog-lead` | Turnout Frog Angle, Separation, and Clearance Point | Project (first-principles); lead entered from the railroad's standard plan | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `unit-cost-earthwork` | Earthwork Production Unit Cost | Production unit-cost identity (first-...; hourly = 150+65 = 215; unit cost = 215/656 = $0.328/cy | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
+| `usr-crib-capacity` | US&R Box Crib Capacity and Height Limit | Project (first-principles); Additional Information -- Cribbing; Rescue Specialist Ref... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+5 more) |
+| `usr-raker-shore` | US&R Raker Shore Geometry and Wall Force | Project (first-principles); raker length rules (17 in / 14 in per ft); collapse zone ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
+| `usr-vertical-shore-capacity` | US&R Vertical Shore Post Capacity | Project (first-principles); Structural Calculations -- Material Properties; bracing p... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+5 more) |
 | `ut-thickness-velocity` | Ultrasonic Thickness, Velocity, and the Calibration Trap | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `vacuum-excavation-spoil` | Vacuum Excavation Spoil, Swell, and Tank Fills | Project (first-principles); the disposal jurisdiction governs whether spoil may be re... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `valley-flashing-takeoff` | Valley Flashing Takeoff (Metal, Pieces, Ice Barrier) | framing-square 17-inch rule; 6:12 gives sqrt(36+288)/12 = sqrt(324)/12 = 18/12 = exact... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -5308,7 +5320,7 @@ per spec-v14 §13.1 second paragraph.
 | `vacuum-lift-reading` | Vacuum Gauge to Drafting Lift Readout | IFSTA / NWCG fire-pump drafting practice; 10 in Hg at sea level -> 11.3 ft of head, 50% of the ~22.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `water-supply-duration` | Water-Supply Duration | Volume/flow continuity + NFPA 1142 co...; 3000 gal, 250 GPM, no resupply -> 12 min | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group G Cross-trade (161 tiles)
+### Group G Cross-trade (162 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -5424,6 +5436,7 @@ per spec-v14 §13.1 second paragraph.
 | `rainwater-yield` | Rainwater Harvesting Yield | Project (first-principles); Standard 0.6233 gal-per-in-per-ft^2 conversion factor | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `ramp-slope` | Ramp Slope (ADA) | Project (first-principles); ADA 4.8.2 1:12 maximum running slope (cited by name) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `regular-polygon` | Regular Polygon (Apothem, Across Flats/Corners, Area) | Project (first-principles); apothem/across-flats/area | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `relief-storage-floor-load` | Relief Supply Pallet Floor Load | Project (first-principles); ASCE 7 Table 4.3-1 / IBC Table 1607.1 cited by number, no... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `respirator-cartridge-life` | Respirator Cartridge Change Schedule | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `responder-camp-sanitation` | Responder Base Camp Sanitation and Water | Project (first-principles); (b)(2), (c)(2), (c)(4), (d)(5), (d)(6), (f)(1) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `retrieval-winch-force` | Confined Space Retrieval Winch Force | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -6205,7 +6218,7 @@ per spec-v14 §13.1 second paragraph.
 | `two-proportion-z-test` | Two-Proportion z-Test | statsmodels proportions_ztest / scipy...; p_pool = 75/200 = 0.375; SE = sqrt(0.375*0.625*0.02) = 0.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `two-sample-t-test` | Two-Sample t-Test | OpenIntro Statistics Ch. 7 (Welch's t...; 82/6/25 vs 78/7/22 -> t ~2.09, df ~41.7, two-sided p ~0.043 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group Z (unnamed) (33 tiles)
+### Group Z (unnamed) (34 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -6225,6 +6238,7 @@ per spec-v14 §13.1 second paragraph.
 | `lifting-lug-design` | Lifting Lug / Padeye Pin-Hole Check | ASME BTH-1 Section 3-3.3 (pin-connect...; 20 kip; t 1.0, hole 1.06, pin 1.0, edge 2.0, width 4.0, A... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `max-wind-speed-for-lift` | Max Wind Speed Before a Load's Swing Limit | ASCE 7 velocity pressure / OSHA 1926 ...; 4,000 lb, 200 ft^2, shape 1.6, 5 deg swing cap -> 20.7 mph | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `multi-leg-sling` | Multi-Leg Sling Load per Leg | ASME B30.9 (Slings, by name); spec-v117 section 2.1 pinned example (4,619 lb/leg, 2,309... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
+| `picket-anchor-soil` | Steel Picket Anchor Lateral Capacity and Count | Project (first-principles); Approximate Design Load of Pickets (Pins) in Soils | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `reeving-parts-of-line` | Block-and-Tackle Reeving Line Pull | Block-and-tackle reeving line pull (W...; pull = 20000 / (0.98 + 0.98^2 + 0.98^3 + 0.98^4) = 20000 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `roller-jack-force` | Roller / Skate / Jacking Push Force | Standard machinery-moving practice; 12,000 lb on skates (coef 0.03), level, 5,000 lb skate ->... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `shackle-eyebolt-wll` | Shackle / Eye-Bolt WLL and Angular Derate | ASME B30.26 / B18.15 manufacturer data; shoulder eye bolt rated 7,000 lb, leg 3,000 lb, pull 45 d... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -6243,6 +6257,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `wire-rope-stretch` | Wire Rope Elastic Stretch Under Load | Project (first-principles); dL = P L /(A_m E_r) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 2201. Fixture-covered or reference-cadence: 2201 / 2201.
+Tile count: 2208. Fixture-covered or reference-cadence: 2208 / 2208.
 
 <!-- END tile-index-v14 -->

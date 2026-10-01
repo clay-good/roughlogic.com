@@ -2,99 +2,99 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "cde649ea0d38fac1",
+      "sha": "1b974a6b563c6a7d",
       "date": "2026-10-01"
     },
     "/tools/": {
-      "sha": "b7bef9a80c2333f6",
+      "sha": "3dff78af1d02381d",
       "date": "2026-10-01"
     },
     "/collections/disaster-response/": {
-      "sha": "a93d0843c442c23a",
+      "sha": "a949145cb05272aa",
       "date": "2026-10-01"
     },
     "/groups/accounting/": {
-      "sha": "9c168b49fe457126",
+      "sha": "57be5c772092031e",
       "date": "2026-10-01"
     },
     "/groups/agriculture/": {
-      "sha": "a571efd929214f37",
+      "sha": "2093d99136c01b73",
       "date": "2026-10-01"
     },
     "/groups/construction/": {
-      "sha": "f68cc899de8196a0",
+      "sha": "b34329babdc9d311",
       "date": "2026-10-01"
     },
     "/groups/cross-trade/": {
-      "sha": "a200ee00cd96bf37",
+      "sha": "aef471afed80cc35",
       "date": "2026-10-01"
     },
     "/groups/educators/": {
-      "sha": "32524fcf739367c0",
+      "sha": "903a7a41652d6a29",
       "date": "2026-10-01"
     },
     "/groups/electrical/": {
-      "sha": "ed2ed47683b285cb",
+      "sha": "7528d21718b0feb6",
       "date": "2026-10-01"
     },
     "/groups/field/": {
-      "sha": "f9b8bbf966d7df83",
+      "sha": "02fc0160f4959e03",
       "date": "2026-10-01"
     },
     "/groups/fire-ground/": {
-      "sha": "1b61bc2eeec60b61",
+      "sha": "b5d6f04f69f362f3",
       "date": "2026-10-01"
     },
     "/groups/historical/": {
-      "sha": "ad00eb3968e91cc6",
+      "sha": "7bd0cb7552331682",
       "date": "2026-10-01"
     },
     "/groups/hvac/": {
-      "sha": "49d16dacee1896f9",
+      "sha": "20bf2e6efe101f29",
       "date": "2026-10-01"
     },
     "/groups/kitchen/": {
-      "sha": "3e6c1db2291522d6",
+      "sha": "b2dd6fe2f0c1343d",
       "date": "2026-10-01"
     },
     "/groups/lab/": {
-      "sha": "e8dd2ebff4b0da02",
+      "sha": "018069e99b81b431",
       "date": "2026-10-01"
     },
     "/groups/mechanic/": {
-      "sha": "cea7ff0ac71d7838",
+      "sha": "d24132ff75f94b63",
       "date": "2026-10-01"
     },
     "/groups/plumbing/": {
-      "sha": "2c43f85568b9273c",
+      "sha": "e683fcdf414a3049",
       "date": "2026-10-01"
     },
     "/groups/real-estate/": {
-      "sha": "cb8baa5eb919da3e",
+      "sha": "7d9a71029db12184",
       "date": "2026-10-01"
     },
     "/groups/references/": {
-      "sha": "de57b5e579a85c1f",
+      "sha": "a1aeffb24294c25a",
       "date": "2026-10-01"
     },
     "/groups/restoration/": {
-      "sha": "2488beb992c494e0",
+      "sha": "7359810748426fe5",
       "date": "2026-10-01"
     },
     "/groups/rigging-and-heavy-lift/": {
-      "sha": "5923918045d90cf1",
+      "sha": "34b7883d3035534b",
       "date": "2026-10-01"
     },
     "/groups/stage/": {
-      "sha": "16cbd4fd13e5ba4b",
+      "sha": "b2c0ce1a83177bdc",
       "date": "2026-10-01"
     },
     "/groups/trucking/": {
-      "sha": "50aa7276fc48725c",
+      "sha": "c9da4a61c7ce9b6a",
       "date": "2026-10-01"
     },
     "/groups/water/": {
-      "sha": "f0112a08ffdc9402",
+      "sha": "526b55ad415bc38d",
       "date": "2026-10-01"
     },
     "/tools/aav-install-check/": {
@@ -1258,8 +1258,8 @@
       "date": "2026-09-29"
     },
     "/tools/cmu-grout-volume/": {
-      "sha": "55c93d951a4d3b24",
-      "date": "2026-09-29"
+      "sha": "e6824d94d71d60e4",
+      "date": "2026-10-01"
     },
     "/tools/cmu-shear-wall/": {
       "sha": "d2b82e2a90018c38",
@@ -1356,6 +1356,10 @@
     "/tools/colebrook-friction-factor/": {
       "sha": "8cb8703d71438f52",
       "date": "2026-09-29"
+    },
+    "/tools/collapse-floor-load/": {
+      "sha": "dcce271bec0d54d7",
+      "date": "2026-10-01"
     },
     "/tools/collection-route-productivity/": {
       "sha": "1ee13d7b92f1f59a",
@@ -2106,8 +2110,8 @@
       "date": "2026-09-29"
     },
     "/tools/demo-debris/": {
-      "sha": "ab23e2938a605297",
-      "date": "2026-09-30"
+      "sha": "12cc3784b8334245",
+      "date": "2026-10-01"
     },
     "/tools/density-altitude/": {
       "sha": "f767870199386d0c",
@@ -2738,8 +2742,8 @@
       "date": "2026-09-30"
     },
     "/tools/excavation-protection-trigger/": {
-      "sha": "eff919dd955f7fac",
-      "date": "2026-09-30"
+      "sha": "f84306259d617f16",
+      "date": "2026-10-01"
     },
     "/tools/excess-air-o2/": {
       "sha": "8a492727e8b64c13",
@@ -5025,6 +5029,10 @@
       "sha": "bdd671f8b1673eb4",
       "date": "2026-09-29"
     },
+    "/tools/osha-timber-trench-shoring/": {
+      "sha": "6bdb20fc6c00b63c",
+      "date": "2026-10-01"
+    },
     "/tools/osha-toilet-count/": {
       "sha": "19d4564eb700c36d",
       "date": "2026-10-01"
@@ -5232,6 +5240,10 @@
     "/tools/photoperiod-blackout-schedule/": {
       "sha": "6c910f29c40600e8",
       "date": "2026-09-29"
+    },
+    "/tools/picket-anchor-soil/": {
+      "sha": "17ed5810b95c4966",
+      "date": "2026-10-01"
     },
     "/tools/pid-tuning-ziegler-nichols/": {
       "sha": "209c47007e5c0ba4",
@@ -6185,6 +6197,10 @@
       "sha": "eb1f5310495ab04e",
       "date": "2026-09-29"
     },
+    "/tools/relief-storage-floor-load/": {
+      "sha": "1b9cd794e9f3af9c",
+      "date": "2026-10-01"
+    },
     "/tools/rent-roll-vacancy/": {
       "sha": "c6db8a9adf545f84",
       "date": "2026-09-29"
@@ -6490,8 +6506,8 @@
       "date": "2026-09-29"
     },
     "/tools/salt-application-rate/": {
-      "sha": "e958e57071831a44",
-      "date": "2026-09-29"
+      "sha": "f86f8daf69be107a",
+      "date": "2026-10-01"
     },
     "/tools/sample-size-for-margin/": {
       "sha": "ddb9feb0a893b738",
@@ -6902,8 +6918,8 @@
       "date": "2026-09-29"
     },
     "/tools/slab-dowel-schedule/": {
-      "sha": "587660e95ecc4bec",
-      "date": "2026-09-29"
+      "sha": "310759a6305e3ab0",
+      "date": "2026-10-01"
     },
     "/tools/slider-crank-piston-position/": {
       "sha": "62f21c749bef07c8",
@@ -8317,6 +8333,18 @@
       "sha": "c944ddb7b50cca33",
       "date": "2026-09-29"
     },
+    "/tools/usr-crib-capacity/": {
+      "sha": "616cbaf7259c96ba",
+      "date": "2026-10-01"
+    },
+    "/tools/usr-raker-shore/": {
+      "sha": "89b920e085dcfa9d",
+      "date": "2026-10-01"
+    },
+    "/tools/usr-vertical-shore-capacity/": {
+      "sha": "4d18dae5f9c90f44",
+      "date": "2026-10-01"
+    },
     "/tools/ut-thickness-velocity/": {
       "sha": "2d9a0d86f9d130c6",
       "date": "2026-09-29"
@@ -8862,8 +8890,8 @@
       "date": "2026-09-29"
     },
     "/tools/wood-tension-member/": {
-      "sha": "77fef134d115ea69",
-      "date": "2026-09-29"
+      "sha": "51e19d6108cbaaed",
+      "date": "2026-10-01"
     },
     "/tools/workers-comp-emr-premium/": {
       "sha": "f8b2f2b2b33c135a",

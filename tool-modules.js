@@ -1873,5 +1873,10 @@ export const TOOL_MODULES = (() => {
     "mppt-controller-output-current", "radio-site-duty-cycle-battery",
     "generator-battery-hybrid-fuel",
   ]);
+  // spec-v1897..v1903: disaster response collapse shoring and rescue support band.
+  declare("./calc-usar.js", "USAR_RENDERERS", [
+    "collapse-floor-load", "usr-vertical-shore-capacity", "usr-crib-capacity", "usr-raker-shore",
+    "picket-anchor-soil", "osha-timber-trench-shoring", "relief-storage-floor-load",
+  ]);
   return map;
 })();

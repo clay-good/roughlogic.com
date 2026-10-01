@@ -30,7 +30,7 @@ test("homepage uses one concise product pitch across search, social, structured,
   const description = content("name", "description");
   assert.equal(
     description,
-    "Get fast, source-backed answers from 2,201 free calculators for electrical, plumbing, HVAC, construction, and more.",
+    "Get fast, source-backed answers from 2,208 free calculators for electrical, plumbing, HVAC, construction, and more.",
   );
   assert.equal(content("property", "og:description"), description);
   assert.equal(content("name", "twitter:description"), description);

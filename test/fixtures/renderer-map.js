@@ -2209,4 +2209,11 @@ export const RENDERER_MAP = {
   "mppt-controller-output-current": { module: "../../calc-reliefpower.js", exportName: "RELIEFPOWER_RENDERERS" },
   "radio-site-duty-cycle-battery": { module: "../../calc-reliefpower.js", exportName: "RELIEFPOWER_RENDERERS" },
   "generator-battery-hybrid-fuel": { module: "../../calc-reliefpower.js", exportName: "RELIEFPOWER_RENDERERS" },
+  "collapse-floor-load": { module: "../../calc-usar.js", exportName: "USAR_RENDERERS" },
+  "usr-vertical-shore-capacity": { module: "../../calc-usar.js", exportName: "USAR_RENDERERS" },
+  "usr-crib-capacity": { module: "../../calc-usar.js", exportName: "USAR_RENDERERS" },
+  "usr-raker-shore": { module: "../../calc-usar.js", exportName: "USAR_RENDERERS" },
+  "picket-anchor-soil": { module: "../../calc-usar.js", exportName: "USAR_RENDERERS" },
+  "osha-timber-trench-shoring": { module: "../../calc-usar.js", exportName: "USAR_RENDERERS" },
+  "relief-storage-floor-load": { module: "../../calc-usar.js", exportName: "USAR_RENDERERS" },
 };

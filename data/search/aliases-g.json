@@ -1291,6 +1291,11 @@
     {"term":"temporary labor camp osha","target":"responder-camp-sanitation","kind":"industry"},
     {"term":"responder camp toilets showers","target":"responder-camp-sanitation","kind":"industry"},
     {"term":"tent city water supply","target":"responder-camp-sanitation","kind":"industry"},
-    {"term":"crew camp planning","target":"responder-camp-sanitation","kind":"industry"}
+    {"term":"crew camp planning","target":"responder-camp-sanitation","kind":"industry"},
+    {"term":"pallet floor load psf","target":"relief-storage-floor-load","kind":"industry"},
+    {"term":"bottled water pallet weight floor","target":"relief-storage-floor-load","kind":"industry"},
+    {"term":"relief supply storage floor capacity","target":"relief-storage-floor-load","kind":"industry"},
+    {"term":"gym floor pallet load","target":"relief-storage-floor-load","kind":"industry"},
+    {"term":"how many pallets can the floor hold","target":"relief-storage-floor-load","kind":"industry"}
   ]
 }

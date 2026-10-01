@@ -56909,3 +56909,252 @@ test("bounds: spec-v1896 computeGeneratorBatteryHybridFuel pins 9.65 h, a 14% sa
   assert.ok("error" in _v1896({ ...base, fuel_half_gph: 4, fuel_three_quarter_gph: 4.2, load_kw: 1 }));
   assert.ok("error" in _v1896({ ...base, cycles_per_day: Infinity }));
 });
+
+// ===========================================================================
+// spec-v1897..v1903: disaster response collapse shoring and rescue support band (calc-usar.js)
+// ===========================================================================
+
+// ===========================================================================
+// spec-v1897..v1903: the 2026-09-25 disaster response program, band 3,
+// collapse shoring and rescue support (calc-usar.js). Five tiles take group
+// "E", the picket anchor "Z", and the relief storage floor screen "G".
+// ===========================================================================
+
+import { computeCollapseFloorLoad as _v1897 } from "../../calc-usar.js";
+test("bounds: spec-v1897 computeCollapseFloorLoad pins the rubble-dominated shore load", () => {
+  const base = { floor_type: "concrete", slab_thickness_in: 6, floor_self_weight_psf: 0, rubble_depth_in: 18, contents_psf: 0, partitions_psf: 0, rescuer_psf: 15, floors_bearing: 1, shore_spacing_ft: 8, tributary_width_ft: 4, posts_per_shore: 3 };
+  const r = _v1897(base);
+  assert.strictEqual(r.floor_psf, 75);
+  assert.strictEqual(r.rubble_psf, 180);
+  assert.strictEqual(r.total_psf, 270);
+  assert.strictEqual(r.tributary_area_sqft, 32);
+  assert.strictEqual(r.load_per_shore_lb, 8640);
+  assert.strictEqual(r.load_per_post_lb, 2880);
+  // The finding: rubble is two-thirds of the load.
+  assert.ok(Math.abs(r.rubble_share_pct - 200 / 3) < 1e-9);
+  assert.strictEqual(r.largest_component, "rubble");
+  // 8 in slab, 36 in rubble, furniture, rescuers: 485 psf.
+  assert.strictEqual(_v1897({ ...base, slab_thickness_in: 8, rubble_depth_in: 36, contents_psf: 10 }).total_psf, 485);
+  // Linear in rubble depth and in tributary area; each extra floor adds its own slab.
+  assert.ok(Math.abs(_v1897({ ...base, rubble_depth_in: 36 }).rubble_psf - 2 * r.rubble_psf) < 1e-9);
+  assert.ok(Math.abs(_v1897({ ...base, shore_spacing_ft: 16 }).load_per_shore_lb - 2 * r.load_per_shore_lb) < 1e-9);
+  assert.strictEqual(_v1897({ ...base, floors_bearing: 2 }).total_psf, 345);
+  assert.strictEqual(_v1897({ ...base, floor_type: "precast_plank" }).floor_psf, 60);
+  assert.strictEqual(_v1897({ ...base, floor_type: "entered", floor_self_weight_psf: 42 }).floor_psf, 42);
+  // Error seams.
+  for (const bad of [{ slab_thickness_in: -1 }, { rubble_depth_in: -1 }, { contents_psf: -1 }, { partitions_psf: -1 }, { rescuer_psf: -1 }, { floor_self_weight_psf: -1 }, { floors_bearing: 0 }, { floors_bearing: 1.5 }, { shore_spacing_ft: 0 }, { tributary_width_ft: 0 }, { posts_per_shore: 0 }, { posts_per_shore: 2.5 }, { floor_type: "steel" }, { slab_thickness_in: Infinity }, { slab_thickness_in: 0, rubble_depth_in: 0, rescuer_psf: 0 }]) {
+    assert.ok("error" in _v1897({ ...base, ...bad }), JSON.stringify(bad));
+  }
+});
+
+import { computeUsrVerticalShoreCapacity as _v1898 } from "../../calc-usar.js";
+test("bounds: spec-v1898 computeUsrVerticalShoreCapacity flags the no-warning slenderness", () => {
+  const base = { shore_height_ft: 10, post_size: "4x4", post_width_in: 3.5, post_depth_in: 3.5, posts: 3, species: "df", load_per_shore_lb: 12000, aftershock_expected: "yes" };
+  const r = _v1898(base);
+  assert.ok(Math.abs(r.slenderness_ld - 120 / 3.5) < 1e-12);
+  assert.ok(Math.abs(r.fa_psi - 480000 / (120 / 3.5) ** 2) < 1e-9);
+  assert.ok(Math.abs(r.load_per_post_lb - 5002.083333333) < 1e-6);
+  assert.ok(Math.abs(r.shore_capacity_lb - 15006.25) < 1e-6);
+  assert.ok(Math.abs(r.load_ratio - 12000 / 15006.25) < 1e-12);
+  assert.strictEqual(r.passes, true);
+  assert.strictEqual(r.ld_over_25, true);
+  assert.ok(Math.abs(r.bracing_min_lb - 300.125) < 1e-6);
+  assert.ok(Math.abs(r.bracing_aftershock_lb - 1500.625) < 1e-6);
+  assert.strictEqual(r.bracing_required_lb, r.bracing_aftershock_lb);
+  assert.strictEqual(_v1898({ ...base, aftershock_expected: "no" }).bracing_required_lb, r.bracing_min_lb);
+  // Hem-Fir: 0.85 of the capacity, ratio 0.94.
+  assert.ok(Math.abs(_v1898({ ...base, species: "syp_hf_spf" }).load_ratio - 12000 / (0.85 * 15006.25)) < 1e-12);
+  // 6 ft shore: below the 20.9 crossover, the 1,100 psi cap governs.
+  const short = _v1898({ ...base, shore_height_ft: 6 });
+  assert.strictEqual(short.cap_governs, true);
+  assert.strictEqual(short.fa_psi, 1100);
+  assert.ok(Math.abs(short.load_per_post_lb - 13475) < 1e-9);
+  assert.strictEqual(short.ld_over_25, false);
+  // The guide's headline 4x4 at 8 ft sits past L/D 25.
+  assert.ok(_v1898({ ...base, shore_height_ft: 8 }).ld_over_25);
+  // Capacity falls monotonically with height.
+  let prev = Infinity;
+  for (let h = 4; h <= 14; h += 0.5) { const c = _v1898({ ...base, shore_height_ft: h }).shore_capacity_lb; assert.ok(c <= prev); prev = c; }
+  // Overload verdict.
+  assert.strictEqual(_v1898({ ...base, load_per_shore_lb: 20000 }).passes, false);
+  // Error seams: L/D above 50 (4x4 past 14.58 ft), bad inputs.
+  assert.ok(!("error" in _v1898({ ...base, shore_height_ft: 14.5 })));
+  assert.ok("error" in _v1898({ ...base, shore_height_ft: 14.6 }));
+  for (const bad of [{ shore_height_ft: 0 }, { posts: 0 }, { posts: 1.5 }, { load_per_shore_lb: 0 }, { post_size: "8x8" }, { post_size: "custom", post_width_in: 0 }, { species: "oak" }, { aftershock_expected: "maybe" }, { shore_height_ft: NaN }]) {
+    assert.ok("error" in _v1898({ ...base, ...bad }), JSON.stringify(bad));
+  }
+});
+
+import { computeUsrCribCapacity as _v1899 } from "../../calc-usar.js";
+test("bounds: spec-v1899 computeUsrCribCapacity pins L = A x N x P and the governing height", () => {
+  const base = { timber_size: "6x6", layup: "3x3", species: "syp_hf_spf", bearing_stress_psi: 500, crib_width_ft: 4, bearing_condition: "all", crib_load_lb: 0 };
+  const r = _v1899(base);
+  assert.strictEqual(r.contact_area_sqin, 30.25);
+  assert.strictEqual(r.contact_points, 9);
+  assert.strictEqual(r.base_capacity_lb, 136125);
+  assert.ok(Math.abs(r.crib_capacity_lb - 115706.25) < 1e-6);
+  assert.strictEqual(r.ratio_height_ft, 12);
+  assert.strictEqual(r.max_height_ft, 6);
+  assert.ok(/practical/.test(r.governing_limit));
+  assert.strictEqual(r.load_entered, false);
+  assert.strictEqual(_v1899({ ...base, bearing_condition: "two_corners" }).max_height_ft, 6);
+  assert.strictEqual(_v1899({ ...base, bearing_condition: "one_corner" }).max_height_ft, 4);
+  assert.strictEqual(_v1899({ ...base, bearing_condition: "lifting", crib_width_ft: 2 }).max_height_ft, 4);
+  // 2x2 of 4x4 Douglas Fir: 24,500 lb, 4 ft practical limit.
+  const small = _v1899({ ...base, timber_size: "4x4", layup: "2x2", species: "df" });
+  assert.strictEqual(small.crib_capacity_lb, 24500);
+  assert.strictEqual(small.max_height_ft, 4);
+  // Linear in bearing stress (FOG 625 psi).
+  assert.ok(Math.abs(_v1899({ ...base, bearing_stress_psi: 625 }).crib_capacity_lb - 1.25 * r.crib_capacity_lb) < 1e-6);
+  // Load check.
+  const loaded = _v1899({ ...base, crib_load_lb: 120000 });
+  assert.ok(loaded.load_ratio > 1);
+  assert.ok(/OVER/.test(loaded.load_verdict));
+  for (const bad of [{ timber_size: "8x8" }, { layup: "4x4" }, { species: "x" }, { bearing_stress_psi: 0 }, { crib_width_ft: 0 }, { bearing_condition: "none" }, { crib_load_lb: -1 }, { crib_width_ft: Infinity }]) {
+    assert.ok("error" in _v1899({ ...base, ...bad }), JSON.stringify(bad));
+  }
+});
+
+import { computeUsrRakerShore as _v1900 } from "../../calc-usar.js";
+test("bounds: spec-v1900 computeUsrRakerShore pins the kick and both edition ratings", () => {
+  const base = { wall_psf: 125, wall_height_ft: 14, raker_spacing_ft: 8, roof_depth_ft: 10, roof_psf: 15, insertion_height_ft: 12, raker_angle_deg: 45, aftershock_expected: "yes" };
+  const r = _v1900(base);
+  assert.strictEqual(r.tributary_weight_lb, 15200);
+  assert.ok(Math.abs(r.design_force_lb - 1520) < 1e-9);
+  assert.ok(Math.abs(r.raker_length_in - 144 * Math.SQRT2) < 1e-9);
+  assert.strictEqual(r.rule_length_in, 204);
+  assert.ok(Math.abs(r.base_distance_in - 144) < 1e-9);
+  assert.ok(Math.abs(r.axial_force_lb - 1520 * Math.SQRT2) < 1e-9);
+  assert.ok(Math.abs(r.vertical_kick_lb - 1520) < 1e-9);
+  assert.strictEqual(r.collapse_zone_min_ft, 17.5);
+  assert.strictEqual(r.collapse_zone_max_ft, 21);
+  assert.strictEqual(r.base_in_zone, true);
+  const s = _v1900({ ...base, raker_angle_deg: 60 });
+  assert.ok(Math.abs(s.raker_length_in - 166.2768775) < 1e-6);
+  assert.strictEqual(s.rule_length_in, 168);
+  assert.ok(Math.abs(s.base_distance_in - 83.1384388) < 1e-6);
+  assert.ok(Math.abs(s.axial_force_lb - 3040) < 1e-9);
+  assert.ok(Math.abs(s.vertical_kick_lb - 1520 * Math.sqrt(3)) < 1e-9);
+  // The finding: a steeper raker carries more axial force and a larger kick.
+  assert.ok(s.axial_force_lb > r.axial_force_lb && s.vertical_kick_lb > r.vertical_kick_lb);
+  assert.ok(r.sog_single_ok && r.fog_ok);
+  // 2% where no aftershock is expected.
+  assert.ok(Math.abs(_v1900({ ...base, aftershock_expected: "no" }).design_force_lb - 304) < 1e-9);
+  // The FOG 2,500 lb rating fails first.
+  const heavy = _v1900({ ...base, wall_psf: 250 });
+  assert.strictEqual(heavy.fog_ok, false);
+  assert.strictEqual(heavy.sog_single_ok, true);
+  for (const bad of [{ wall_psf: 0 }, { wall_height_ft: 0 }, { raker_spacing_ft: 0 }, { roof_psf: -1 }, { roof_depth_ft: -1 }, { insertion_height_ft: 0 }, { insertion_height_ft: 15 }, { raker_angle_deg: 29.9 }, { raker_angle_deg: 75.1 }, { aftershock_expected: "x" }, { wall_psf: -Infinity }]) {
+    assert.ok("error" in _v1900({ ...base, ...bad }), JSON.stringify(bad));
+  }
+  assert.ok(!("error" in _v1900({ ...base, raker_angle_deg: 30 })));
+  assert.ok(!("error" in _v1900({ ...base, raker_angle_deg: 75 })));
+});
+
+import { computePicketAnchorSoil as _v1901 } from "../../calc-usar.js";
+test("bounds: spec-v1901 computePicketAnchorSoil pins the clay-versus-sand count", () => {
+  const base = { required_force_lb: 1520, picket_dia: "1", soil: "cohesive_average", embedment_in: 36 };
+  const r = _v1901(base);
+  assert.strictEqual(r.design_load_per_picket_lb, 750);
+  assert.strictEqual(r.pickets_required, 3);
+  assert.strictEqual(r.group_capacity_lb, 2250);
+  assert.strictEqual(r.standard_pattern_capacity_lb, 3000);
+  assert.strictEqual(r.shallow, false);
+  assert.strictEqual(r.cohesionless, false);
+  // The finding: sand needs 28 pickets, or 9 three-inch pins.
+  const sand = _v1901({ ...base, soil: "cohesionless_medium" });
+  assert.strictEqual(sand.pickets_required, 28);
+  assert.strictEqual(sand.cohesionless, true);
+  assert.strictEqual(sand.beyond_standard_pattern, true);
+  assert.strictEqual(_v1901({ ...base, soil: "cohesionless_medium", picket_dia: "3" }).pickets_required, 9);
+  // Table corners.
+  assert.strictEqual(_v1901({ ...base, soil: "cohesive_good" }).design_load_per_picket_lb, 1000);
+  assert.strictEqual(_v1901({ ...base, soil: "cohesionless_loose" }).design_load_per_picket_lb, 50);
+  assert.strictEqual(_v1901({ ...base, picket_dia: "3", soil: "cohesionless_dense" }).design_load_per_picket_lb, 190);
+  // Count is a ceiling: exactly 1,500 lb is 2 pickets, 1,501 is 3.
+  assert.strictEqual(_v1901({ ...base, required_force_lb: 1500 }).pickets_required, 2);
+  assert.strictEqual(_v1901({ ...base, required_force_lb: 1501 }).pickets_required, 3);
+  // Shallow embedment is flagged, not scaled.
+  const sh = _v1901({ ...base, embedment_in: 24 });
+  assert.strictEqual(sh.shallow, true);
+  assert.strictEqual(sh.design_load_per_picket_lb, 750);
+  for (const bad of [{ required_force_lb: 0 }, { picket_dia: "2" }, { soil: "rock" }, { embedment_in: 0 }, { required_force_lb: Infinity }]) {
+    assert.ok("error" in _v1901({ ...base, ...bad }), JSON.stringify(bad));
+  }
+});
+
+import { computeOshaTimberTrenchShoring as _v1902 } from "../../calc-usar.js";
+test("bounds: spec-v1902 computeOshaTimberTrenchShoring reproduces OSHA's Appendix C examples", () => {
+  const base = { soil_type: "A", depth_ft: 13, width_ft: 5, table_set: "oak", crossbrace_spacing: "all", limitation_present: "no" };
+  const r = _v1902(base);
+  assert.strictEqual(r.design_pressure_psf, 397);
+  assert.strictEqual(r.table_name, "C-1.1");
+  assert.strictEqual(r.arrangement_count, 4);
+  assert.strictEqual(r.first_crossbrace_load_lb, 9528);
+  assert.strictEqual(r.max_crossbrace_load_lb, 397 * 12 * 4);
+  assert.deepStrictEqual(r.arrangements.map((a) => [a.crossbrace, a.crossbrace_h_ft, a.crossbrace_v_ft, a.wale, a.uprights]), [
+    ["4x4", 6, 4, "not required", "3x8 at 6 ft max"],
+    ["4x6", 8, 4, "8x8", "2x6 at 4 ft max"],
+    ["6x6", 10, 4, "8x10", "2x6 at 5 ft max"],
+    ["6x6", 12, 4, "10x10", "3x8 at 6 ft max"],
+  ]);
+  assert.ok(/6x5/.test(r.misprint_flag));
+  // Example 2 (Type B) and Example 3 (Type C).
+  const b = _v1902({ ...base, soil_type: "B" });
+  assert.strictEqual(b.design_pressure_psf, 657);
+  assert.deepStrictEqual(b.arrangements.map((a) => [a.crossbrace, a.wale, a.uprights]), [["6x6", "8x8", "2x6 at 2 ft max"], ["6x8", "10x10", "2x6 at 2 ft max"], ["8x8", "10x12", "2x6 at 2 ft max"]]);
+  const c = _v1902({ ...base, soil_type: "C" });
+  assert.strictEqual(c.design_pressure_psf, 1112);
+  assert.deepStrictEqual(c.arrangements.map((a) => [a.crossbrace, a.wale, a.uprights]), [["8x8", "10x12", "2x6 close sheeting"], ["8x10", "12x12", "2x6 close sheeting"]]);
+  // Example 4: Type C, 20 ft by 11 ft, one arrangement.
+  const d = _v1902({ ...base, soil_type: "C", depth_ft: 20, width_ft: 11 });
+  assert.strictEqual(d.arrangement_count, 1);
+  assert.deepStrictEqual([d.arrangements[0].crossbrace, d.arrangements[0].wale, d.arrangements[0].uprights], ["8x10", "12x12", "3x6 close sheeting"]);
+  // The CFR prints 8x8 where the osha.gov HTML copy shows 6x8.
+  assert.strictEqual(_v1902({ ...base, soil_type: "B", width_ft: 12, crossbrace_spacing: "10" }).arrangements[0].crossbrace, "8x8");
+  // Douglas fir set, multiple upright options.
+  const f = _v1902({ ...base, table_set: "fir", soil_type: "B", depth_ft: 8, width_ft: 4, crossbrace_spacing: "6" });
+  assert.strictEqual(f.table_name, "C-2.2");
+  assert.strictEqual(f.arrangements[0].uprights, "3x12 at 3 ft max or 4x8 at 3 ft max or 4x12 at 6 ft max");
+  // A spacing the table marks See Note 1 lists nothing, not an error.
+  assert.strictEqual(_v1902({ ...base, soil_type: "C", crossbrace_spacing: "12" }).arrangement_count, 0);
+  // Band edges: 10 ft is the 5-10 band, 10.01 the 10-15 band.
+  assert.strictEqual(_v1902({ ...base, depth_ft: 10 }).depth_band, "5-10");
+  assert.strictEqual(_v1902({ ...base, depth_ft: 10.01 }).depth_band, "10-15");
+  assert.strictEqual(_v1902({ ...base, width_ft: 15 }).width_column_ft, 15);
+  // Limitation present: no members listed.
+  const lim = _v1902({ ...base, limitation_present: "yes" });
+  assert.strictEqual(lim.arrangement_count, 0);
+  assert.ok(/NOT ADEQUATE/.test(lim.verdict));
+  // Under 5 ft routes, not errors.
+  const shallow = _v1902({ ...base, depth_ft: 4 });
+  assert.strictEqual(shallow.routed, true);
+  assert.ok(/excavation-protection-trigger/.test(shallow.verdict));
+  // Pressure is linear in depth.
+  assert.strictEqual(_v1902({ ...base, depth_ft: 20 }).design_pressure_psf - _v1902({ ...base, depth_ft: 10 }).design_pressure_psf, 250);
+  for (const bad of [{ depth_ft: 20.01 }, { depth_ft: 0 }, { width_ft: 15.01 }, { width_ft: 0 }, { soil_type: "D" }, { table_set: "pine" }, { crossbrace_spacing: "7" }, { limitation_present: "maybe" }, { depth_ft: NaN }]) {
+    assert.ok("error" in _v1902({ ...base, ...bad }), JSON.stringify(bad));
+  }
+});
+
+import { computeReliefStorageFloorLoad as _v1903 } from "../../calc-usar.js";
+test("bounds: spec-v1903 computeReliefStorageFloorLoad pins average and local pressure", () => {
+  const base = { pallet_weight_lb: 2300, footprint_length_in: 48, footprint_width_in: 40, tiers: 2, coverage_fraction: 0.6, floor_area_sqft: 4800, design_live_load_psf: 100 };
+  const r = _v1903(base);
+  assert.ok(Math.abs(r.footprint_area_sqft - 40 / 3) < 1e-12);
+  assert.ok(Math.abs(r.footprint_psf - 345) < 1e-9);
+  assert.ok(Math.abs(r.average_psf - 207) < 1e-9);
+  assert.ok(Math.abs(r.average_ratio - 2.07) < 1e-12);
+  assert.ok(Math.abs(r.footprint_ratio - 3.45) < 1e-12);
+  assert.strictEqual(r.pallets_allowed, 208);
+  assert.strictEqual(r.stacks_allowed, 104);
+  // Single-stacking halves both pressures; 40% coverage brings the average within.
+  assert.ok(Math.abs(_v1903({ ...base, tiers: 1 }).average_psf - 103.5) < 1e-9);
+  const ok = _v1903({ ...base, tiers: 1, coverage_fraction: 0.4 });
+  assert.ok(Math.abs(ok.average_psf - 69) < 1e-9);
+  assert.ok(ok.average_ratio < 1);
+  assert.strictEqual(_v1903({ ...base, coverage_fraction: 0 }).average_psf, 0);
+  for (const bad of [{ pallet_weight_lb: 0 }, { footprint_length_in: 0 }, { footprint_width_in: 0 }, { tiers: 0 }, { tiers: 1.5 }, { coverage_fraction: -0.01 }, { coverage_fraction: 1.01 }, { floor_area_sqft: 0 }, { design_live_load_psf: 0 }, { pallet_weight_lb: Infinity }]) {
+    assert.ok("error" in _v1903({ ...base, ...bad }), JSON.stringify(bad));
+  }
+});

@@ -132615,6 +132615,1046 @@
      }
     }
    }
+  },
+  {
+   "tile_id": "collapse-floor-load",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "6 in concrete slab under 18 in of masonry rubble, 15 psf rescuers, 3-post shores at 8 ft centers with a 4 ft tributary width",
+   "source_edition_or_year": "USACE US&R SOG Ed. 5.0 (2021) unit weights",
+   "source_section_or_page": "Design Dead Loads for Building Materials; Rescue Live Loads",
+   "verified_by": "rl",
+   "verified_on": "2026-09-30",
+   "inputs": {
+    "floor_type": "concrete",
+    "slab_thickness_in": 6,
+    "floor_self_weight_psf": 0,
+    "rubble_depth_in": 18,
+    "contents_psf": 0,
+    "partitions_psf": 0,
+    "rescuer_psf": 15,
+    "floors_bearing": 1,
+    "shore_spacing_ft": 8,
+    "tributary_width_ft": 4,
+    "posts_per_shore": 3
+   },
+   "outputs": {
+    "floor_psf": {
+     "value": 75,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "rubble_psf": {
+     "value": 180,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "total_psf": {
+     "value": 270,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "tributary_area_sqft": {
+     "value": 32,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "load_per_shore_lb": {
+     "value": 8640,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "load_per_post_lb": {
+     "value": 2880,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "rubble_share_pct": {
+     "value": 66.66666667,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "collapse-floor-load",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "8 in concrete slab under 36 in of rubble with furniture and 15 psf rescuers",
+   "source_edition_or_year": "USACE US&R SOG Ed. 5.0 (2021) unit weights",
+   "source_section_or_page": "Design Dead Loads for Building Materials; Rescue Live Loads",
+   "verified_by": "rl",
+   "verified_on": "2026-09-30",
+   "inputs": {
+    "floor_type": "concrete",
+    "slab_thickness_in": 8,
+    "floor_self_weight_psf": 0,
+    "rubble_depth_in": 36,
+    "contents_psf": 10,
+    "partitions_psf": 0,
+    "rescuer_psf": 15,
+    "floors_bearing": 1,
+    "shore_spacing_ft": 8,
+    "tributary_width_ft": 4,
+    "posts_per_shore": 3
+   },
+   "outputs": {
+    "floor_psf": {
+     "value": 110,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "rubble_psf": {
+     "value": 360,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "total_psf": {
+     "value": 485,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "usr-vertical-shore-capacity",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "3-post shore of No. 1 Douglas Fir 4x4s at a 10 ft shore height carrying 12,000 lb",
+   "source_edition_or_year": "US&R FOG (2006) Fa = 480,000 / (L/D)^2 capped at 1,100 psi",
+   "source_section_or_page": "Structural Calculations -- Material Properties; bracing per DHS BIPS 08 (2011)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-30",
+   "inputs": {
+    "shore_height_ft": 10,
+    "post_size": "4x4",
+    "post_width_in": 3.5,
+    "post_depth_in": 3.5,
+    "posts": 3,
+    "species": "df",
+    "load_per_shore_lb": 12000,
+    "aftershock_expected": "yes"
+   },
+   "outputs": {
+    "slenderness_ld": {
+     "value": 34.28571429,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "fa_psi": {
+     "value": 408.3333333,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "load_per_post_lb": {
+     "value": 5002.083333,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "shore_capacity_lb": {
+     "value": 15006.25,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "load_ratio": {
+     "value": 0.7996668055,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "bracing_min_lb": {
+     "value": 300.125,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "bracing_aftershock_lb": {
+     "value": 1500.625,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "usr-vertical-shore-capacity",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Same shore in Hem-Fir (0.85 species factor)",
+   "source_edition_or_year": "USACE US&R SOG Ed. 5.0 (2021) species factors",
+   "source_section_or_page": "vertical shoring notes",
+   "verified_by": "rl",
+   "verified_on": "2026-09-30",
+   "inputs": {
+    "shore_height_ft": 10,
+    "post_size": "4x4",
+    "post_width_in": 3.5,
+    "post_depth_in": 3.5,
+    "posts": 3,
+    "species": "syp_hf_spf",
+    "load_per_shore_lb": 12000,
+    "aftershock_expected": "yes"
+   },
+   "outputs": {
+    "shore_capacity_lb": {
+     "value": 12755.3125,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "load_ratio": {
+     "value": 0.9407844771,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "usr-vertical-shore-capacity",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Same posts in a 6 ft shore, below the L/D 20.9 crossover",
+   "source_edition_or_year": "US&R FOG (2006) 1,100 psi cap",
+   "source_section_or_page": "Structural Calculations -- Material Properties",
+   "verified_by": "rl",
+   "verified_on": "2026-09-30",
+   "inputs": {
+    "shore_height_ft": 6,
+    "post_size": "4x4",
+    "post_width_in": 3.5,
+    "post_depth_in": 3.5,
+    "posts": 3,
+    "species": "df",
+    "load_per_shore_lb": 12000,
+    "aftershock_expected": "yes"
+   },
+   "outputs": {
+    "slenderness_ld": {
+     "value": 20.57142857,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "fa_psi": {
+     "value": 1100,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "load_per_post_lb": {
+     "value": 13475,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "usr-vertical-shore-capacity",
+   "source_publisher": "USACE (US&R Shoring Operations Guide)",
+   "source_title": "US&R Shoring Operations Guide",
+   "source_edition_or_year": "Ed. 5.0, October 2021",
+   "source_section_or_page": "4-Post Vertical Shore, Design Load 4x4 posts: height 10 feet, 5,000 lb each post (printed to the nearest 500 lb; formula gives 5,002)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-30",
+   "inputs": {
+    "shore_height_ft": 10,
+    "post_size": "4x4",
+    "post_width_in": 3.5,
+    "post_depth_in": 3.5,
+    "posts": 3,
+    "species": "df",
+    "load_per_shore_lb": 12000,
+    "aftershock_expected": "yes"
+   },
+   "outputs": {
+    "load_per_post_lb": {
+     "value": 5000,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "usr-vertical-shore-capacity",
+   "source_publisher": "USACE (US&R Shoring Operations Guide)",
+   "source_title": "US&R Shoring Operations Guide",
+   "source_edition_or_year": "Ed. 5.0, October 2021",
+   "source_section_or_page": "4-Post Vertical Shore, Design Load 4x4 posts: height 12 feet, 3,500 lb each post (printed to the nearest 500 lb; formula gives 3,474, tolerance 1% covers the rounding)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-30",
+   "inputs": {
+    "shore_height_ft": 12,
+    "post_size": "4x4",
+    "post_width_in": 3.5,
+    "post_depth_in": 3.5,
+    "posts": 3,
+    "species": "df",
+    "load_per_shore_lb": 9000,
+    "aftershock_expected": "yes"
+   },
+   "outputs": {
+    "load_per_post_lb": {
+     "value": 3500,
+     "tolerance": {
+      "pct": 1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "usr-vertical-shore-capacity",
+   "source_publisher": "USACE (US&R Shoring Operations Guide)",
+   "source_title": "US&R Shoring Operations Guide",
+   "source_edition_or_year": "Ed. 5.0, October 2021",
+   "source_section_or_page": "4-Post Vertical Shore, Design Load 6x6 posts: height 16 feet, 12,000 lb each post (printed rounded; formula gives 11,915, tolerance 1% covers the rounding)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-30",
+   "inputs": {
+    "shore_height_ft": 16,
+    "post_size": "6x6",
+    "post_width_in": 3.5,
+    "post_depth_in": 3.5,
+    "posts": 3,
+    "species": "df",
+    "load_per_shore_lb": 30000,
+    "aftershock_expected": "yes"
+   },
+   "outputs": {
+    "load_per_post_lb": {
+     "value": 12000,
+     "tolerance": {
+      "pct": 1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "usr-crib-capacity",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "3x3 crib of 6x6 Spruce-Pine-Fir, 4 ft wide, all points bearing",
+   "source_edition_or_year": "USACE US&R SOG Ed. 5.0 (2021) L = A x N x P, P = 500 psi",
+   "source_section_or_page": "Additional Information -- Cribbing; Rescue Specialist Reference Data",
+   "verified_by": "rl",
+   "verified_on": "2026-09-30",
+   "inputs": {
+    "timber_size": "6x6",
+    "layup": "3x3",
+    "species": "syp_hf_spf",
+    "bearing_stress_psi": 500,
+    "crib_width_ft": 4,
+    "bearing_condition": "all",
+    "crib_load_lb": 0
+   },
+   "outputs": {
+    "contact_area_sqin": {
+     "value": 30.25,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "contact_points": {
+     "value": 9,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "base_capacity_lb": {
+     "value": 136125,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "crib_capacity_lb": {
+     "value": 115706.25,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "ratio_height_ft": {
+     "value": 12,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "max_height_ft": {
+     "value": 6,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "usr-crib-capacity",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Same crib bearing on one of four corners",
+   "source_edition_or_year": "USACE US&R SOG Ed. 5.0 (2021) height-to-width ratios",
+   "source_section_or_page": "Rescue Specialist Reference Data: 1 of 4 bearing 1 to 1",
+   "verified_by": "rl",
+   "verified_on": "2026-09-30",
+   "inputs": {
+    "timber_size": "6x6",
+    "layup": "3x3",
+    "species": "syp_hf_spf",
+    "bearing_stress_psi": 500,
+    "crib_width_ft": 4,
+    "bearing_condition": "one_corner",
+    "crib_load_lb": 0
+   },
+   "outputs": {
+    "ratio_height_ft": {
+     "value": 4,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "max_height_ft": {
+     "value": 4,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "usr-crib-capacity",
+   "source_publisher": "USACE (US&R Shoring Operations Guide)",
+   "source_title": "US&R Shoring Operations Guide",
+   "source_edition_or_year": "Ed. 5.0, October 2021",
+   "source_section_or_page": "Additional Information -- Cribbing: 4x4 No. 1 Douglas Fir, 2 member x 2 member system = 24,000 lbs (the guide rounds 24,500 down; tolerance 2.5% covers it)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-30",
+   "inputs": {
+    "timber_size": "4x4",
+    "layup": "2x2",
+    "species": "df",
+    "bearing_stress_psi": 500,
+    "crib_width_ft": 4,
+    "bearing_condition": "all",
+    "crib_load_lb": 0
+   },
+   "outputs": {
+    "base_capacity_lb": {
+     "value": 24000,
+     "tolerance": {
+      "pct": 2.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "usr-crib-capacity",
+   "source_publisher": "USACE (US&R Shoring Operations Guide)",
+   "source_title": "US&R Shoring Operations Guide",
+   "source_edition_or_year": "Ed. 5.0, October 2021",
+   "source_section_or_page": "Additional Information -- Cribbing: 4x4 No. 1 Douglas Fir, 3 member x 3 member system = 54,000 lbs (the guide rounds 55,125 down; tolerance 2.5% covers it)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-30",
+   "inputs": {
+    "timber_size": "4x4",
+    "layup": "3x3",
+    "species": "df",
+    "bearing_stress_psi": 500,
+    "crib_width_ft": 4,
+    "bearing_condition": "all",
+    "crib_load_lb": 0
+   },
+   "outputs": {
+    "base_capacity_lb": {
+     "value": 54000,
+     "tolerance": {
+      "pct": 2.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "usr-crib-capacity",
+   "source_publisher": "USACE (US&R Shoring Operations Guide)",
+   "source_title": "US&R Shoring Operations Guide",
+   "source_edition_or_year": "Ed. 5.0, October 2021",
+   "source_section_or_page": "Additional Information -- Cribbing: 6x6 No. 1 Douglas Fir, 2 member x 2 member system = 60,000 lbs (formula 60,500; tolerance 1% covers the rounding)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-30",
+   "inputs": {
+    "timber_size": "6x6",
+    "layup": "2x2",
+    "species": "df",
+    "bearing_stress_psi": 500,
+    "crib_width_ft": 4,
+    "bearing_condition": "all",
+    "crib_load_lb": 0
+   },
+   "outputs": {
+    "base_capacity_lb": {
+     "value": 60000,
+     "tolerance": {
+      "pct": 1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "usr-crib-capacity",
+   "source_publisher": "USACE (US&R Shoring Operations Guide)",
+   "source_title": "US&R Shoring Operations Guide",
+   "source_edition_or_year": "Ed. 5.0, October 2021",
+   "source_section_or_page": "Additional Information -- Cribbing: 6x6 No. 1 Douglas Fir, 3 member x 3 member system = 135,000 lbs (formula 136,125; tolerance 1% covers the rounding)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-30",
+   "inputs": {
+    "timber_size": "6x6",
+    "layup": "3x3",
+    "species": "df",
+    "bearing_stress_psi": 500,
+    "crib_width_ft": 4,
+    "bearing_condition": "all",
+    "crib_load_lb": 0
+   },
+   "outputs": {
+    "base_capacity_lb": {
+     "value": 135000,
+     "tolerance": {
+      "pct": 1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "usr-raker-shore",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "12 in URM wall (125 psf) 14 ft tall, rakers at 8 ft carrying 8 x 10 ft of 15 psf roof, inserted at 12 ft, 45 degrees",
+   "source_edition_or_year": "FEMA SCT Module 2a 10% design force; USACE US&R SOG Ed. 5.0 (2021) raker rules",
+   "source_section_or_page": "raker length rules (17 in / 14 in per ft); collapse zone 1.25 to 1.5 x height",
+   "verified_by": "rl",
+   "verified_on": "2026-09-30",
+   "inputs": {
+    "wall_psf": 125,
+    "wall_height_ft": 14,
+    "raker_spacing_ft": 8,
+    "roof_depth_ft": 10,
+    "roof_psf": 15,
+    "insertion_height_ft": 12,
+    "raker_angle_deg": 45,
+    "aftershock_expected": "yes"
+   },
+   "outputs": {
+    "tributary_weight_lb": {
+     "value": 15200,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "design_force_lb": {
+     "value": 1520,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "raker_length_in": {
+     "value": 203.646753,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "rule_length_in": {
+     "value": 204,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "base_distance_in": {
+     "value": 144,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "axial_force_lb": {
+     "value": 2149.604615,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "vertical_kick_lb": {
+     "value": 1520,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "collapse_zone_min_ft": {
+     "value": 17.5,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "collapse_zone_max_ft": {
+     "value": 21,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "usr-raker-shore",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "12 in URM wall (125 psf) 14 ft tall, rakers at 8 ft carrying 8 x 10 ft of 15 psf roof, inserted at 12 ft, 60 degrees",
+   "source_edition_or_year": "FEMA SCT Module 2a 10% design force; USACE US&R SOG Ed. 5.0 (2021) raker rules",
+   "source_section_or_page": "raker length rules (17 in / 14 in per ft); collapse zone 1.25 to 1.5 x height",
+   "verified_by": "rl",
+   "verified_on": "2026-09-30",
+   "inputs": {
+    "wall_psf": 125,
+    "wall_height_ft": 14,
+    "raker_spacing_ft": 8,
+    "roof_depth_ft": 10,
+    "roof_psf": 15,
+    "insertion_height_ft": 12,
+    "raker_angle_deg": 60,
+    "aftershock_expected": "yes"
+   },
+   "outputs": {
+    "tributary_weight_lb": {
+     "value": 15200,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "design_force_lb": {
+     "value": 1520,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "raker_length_in": {
+     "value": 166.2768775,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "rule_length_in": {
+     "value": 168,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "base_distance_in": {
+     "value": 83.13843876,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "axial_force_lb": {
+     "value": 3040,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "vertical_kick_lb": {
+     "value": 2632.717228,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "collapse_zone_min_ft": {
+     "value": 17.5,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "collapse_zone_max_ft": {
+     "value": 21,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "usr-raker-shore",
+   "source_publisher": "USACE (US&R Shoring Operations Guide)",
+   "source_title": "US&R Shoring Operations Guide",
+   "source_edition_or_year": "Ed. 5.0, October 2021",
+   "source_section_or_page": "Raker Length Based on Insertion Point Height: 45 degree raker at 8 ft = 8 x 17 = 136 in (trigonometry gives 135.8 in)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-30",
+   "inputs": {
+    "wall_psf": 125,
+    "wall_height_ft": 14,
+    "raker_spacing_ft": 8,
+    "roof_depth_ft": 10,
+    "roof_psf": 15,
+    "insertion_height_ft": 8,
+    "raker_angle_deg": 45,
+    "aftershock_expected": "yes"
+   },
+   "outputs": {
+    "rule_length_in": {
+     "value": 136,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "picket-anchor-soil",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Raker sole restraint for 1,520 lb in average cohesive soil, 1 in pickets driven 36 in",
+   "source_edition_or_year": "USACE US&R Structures Specialist FOG (2006), after FHWA-IP-84-11",
+   "source_section_or_page": "Approximate Design Load of Pickets (Pins) in Soils",
+   "verified_by": "rl",
+   "verified_on": "2026-09-30",
+   "inputs": {
+    "required_force_lb": 1520,
+    "picket_dia": "1",
+    "soil": "cohesive_average",
+    "embedment_in": 36
+   },
+   "outputs": {
+    "design_load_per_picket_lb": {
+     "value": 750,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "pickets_required": {
+     "value": 3,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "group_capacity_lb": {
+     "value": 2250,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "standard_pattern_capacity_lb": {
+     "value": 3000,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "picket-anchor-soil",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Same restraint in medium sand, 1 in pickets",
+   "source_edition_or_year": "USACE US&R Structures Specialist FOG (2006), after FHWA-IP-84-11",
+   "source_section_or_page": "Approximate Design Load of Pickets (Pins) in Soils",
+   "verified_by": "rl",
+   "verified_on": "2026-09-30",
+   "inputs": {
+    "required_force_lb": 1520,
+    "picket_dia": "1",
+    "soil": "cohesionless_medium",
+    "embedment_in": 36
+   },
+   "outputs": {
+    "design_load_per_picket_lb": {
+     "value": 55,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "pickets_required": {
+     "value": 28,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "picket-anchor-soil",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Same restraint in medium sand, 3 in pins",
+   "source_edition_or_year": "USACE US&R Structures Specialist FOG (2006), after FHWA-IP-84-11",
+   "source_section_or_page": "Approximate Design Load of Pickets (Pins) in Soils",
+   "verified_by": "rl",
+   "verified_on": "2026-09-30",
+   "inputs": {
+    "required_force_lb": 1520,
+    "picket_dia": "3",
+    "soil": "cohesionless_medium",
+    "embedment_in": 36
+   },
+   "outputs": {
+    "design_load_per_picket_lb": {
+     "value": 180,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "pickets_required": {
+     "value": 9,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "osha-timber-trench-shoring",
+   "source_publisher": "OSHA (29 CFR 1926 Subpart P)",
+   "source_title": "Appendix C to Subpart P of Part 1926 -- Timber Shoring for Trenches",
+   "source_edition_or_year": "29 CFR 1926 (GovInfo CFR 2024 edition)",
+   "source_section_or_page": "Appendix C (f)(1) Example 1: Type A soil, 13 ft deep, 5 ft wide, Table C-1.1 -- four arrangements; Pa from the table's printed formula; crossbrace load is the tile's Pa x 6 ft x 4 ft for #B1",
+   "verified_by": "rl",
+   "verified_on": "2026-09-30",
+   "inputs": {
+    "soil_type": "A",
+    "depth_ft": 13,
+    "width_ft": 5,
+    "table_set": "oak",
+    "crossbrace_spacing": "all",
+    "limitation_present": "no"
+   },
+   "outputs": {
+    "design_pressure_psf": {
+     "value": 397,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "arrangement_count": {
+     "value": 4,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "first_crossbrace_load_lb": {
+     "value": 9528,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "osha-timber-trench-shoring",
+   "source_publisher": "OSHA (29 CFR 1926 Subpart P)",
+   "source_title": "Appendix C to Subpart P of Part 1926 -- Timber Shoring for Trenches",
+   "source_edition_or_year": "29 CFR 1926 (GovInfo CFR 2024 edition)",
+   "source_section_or_page": "Appendix C (f)(2) Example 2: Type B soil, 13 ft deep, 5 ft wide, Table C-1.2 -- three arrangements; crossbrace load is the tile's Pa x 6 ft x 5 ft for #B1",
+   "verified_by": "rl",
+   "verified_on": "2026-09-30",
+   "inputs": {
+    "soil_type": "B",
+    "depth_ft": 13,
+    "width_ft": 5,
+    "table_set": "oak",
+    "crossbrace_spacing": "all",
+    "limitation_present": "no"
+   },
+   "outputs": {
+    "design_pressure_psf": {
+     "value": 657,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "arrangement_count": {
+     "value": 3,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "first_crossbrace_load_lb": {
+     "value": 19710,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "osha-timber-trench-shoring",
+   "source_publisher": "OSHA (29 CFR 1926 Subpart P)",
+   "source_title": "Appendix C to Subpart P of Part 1926 -- Timber Shoring for Trenches",
+   "source_edition_or_year": "29 CFR 1926 (GovInfo CFR 2024 edition)",
+   "source_section_or_page": "Appendix C (f)(3) Example 3: Type C soil, 13 ft deep, 5 ft wide, Table C-1.3 -- two arrangements; crossbrace load is the tile's Pa x 6 ft x 5 ft for #B1",
+   "verified_by": "rl",
+   "verified_on": "2026-09-30",
+   "inputs": {
+    "soil_type": "C",
+    "depth_ft": 13,
+    "width_ft": 5,
+    "table_set": "oak",
+    "crossbrace_spacing": "all",
+    "limitation_present": "no"
+   },
+   "outputs": {
+    "design_pressure_psf": {
+     "value": 1112,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "arrangement_count": {
+     "value": 2,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "first_crossbrace_load_lb": {
+     "value": 33360,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "osha-timber-trench-shoring",
+   "source_publisher": "OSHA (29 CFR 1926 Subpart P)",
+   "source_title": "Appendix C to Subpart P of Part 1926 -- Timber Shoring for Trenches",
+   "source_edition_or_year": "29 CFR 1926 (GovInfo CFR 2024 edition)",
+   "source_section_or_page": "Appendix C (f)(4) Example 4: Type C soil, 20 ft deep, 11 ft wide, Table C-1.3 -- one arrangement; crossbrace load is the tile's Pa x 6 ft x 5 ft",
+   "verified_by": "rl",
+   "verified_on": "2026-09-30",
+   "inputs": {
+    "soil_type": "C",
+    "depth_ft": 20,
+    "width_ft": 11,
+    "table_set": "oak",
+    "crossbrace_spacing": "all",
+    "limitation_present": "no"
+   },
+   "outputs": {
+    "design_pressure_psf": {
+     "value": 1672,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "arrangement_count": {
+     "value": 1,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "first_crossbrace_load_lb": {
+     "value": 50160,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "relief-storage-floor-load",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "2,300 lb pallets of bottled water double-stacked at 60% coverage of a 4,800 sq ft gym floor designed for 100 psf",
+   "source_edition_or_year": "statics; design live load entered from the drawings",
+   "source_section_or_page": "ASCE 7 Table 4.3-1 / IBC Table 1607.1 cited by number, not reproduced",
+   "verified_by": "rl",
+   "verified_on": "2026-09-30",
+   "inputs": {
+    "pallet_weight_lb": 2300,
+    "footprint_length_in": 48,
+    "footprint_width_in": 40,
+    "tiers": 2,
+    "coverage_fraction": 0.6,
+    "floor_area_sqft": 4800,
+    "design_live_load_psf": 100
+   },
+   "outputs": {
+    "footprint_area_sqft": {
+     "value": 13.33333333,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "footprint_psf": {
+     "value": 345,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "average_psf": {
+     "value": 207,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "footprint_ratio": {
+     "value": 3.45,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "average_ratio": {
+     "value": 2.07,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "pallets_allowed": {
+     "value": 208,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "stacks_allowed": {
+     "value": 104,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "relief-storage-floor-load",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Same pallets single-stacked at 40% coverage",
+   "source_edition_or_year": "statics; design live load entered from the drawings",
+   "source_section_or_page": "ASCE 7 Table 4.3-1 / IBC Table 1607.1 cited by number, not reproduced",
+   "verified_by": "rl",
+   "verified_on": "2026-09-30",
+   "inputs": {
+    "pallet_weight_lb": 2300,
+    "footprint_length_in": 48,
+    "footprint_width_in": 40,
+    "tiers": 1,
+    "coverage_fraction": 0.4,
+    "floor_area_sqft": 4800,
+    "design_live_load_psf": 100
+   },
+   "outputs": {
+    "footprint_psf": {
+     "value": 172.5,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "average_psf": {
+     "value": 69,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "average_ratio": {
+     "value": 0.69,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
   }
  ]
 }

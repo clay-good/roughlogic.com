@@ -424,6 +424,11 @@
     {"term":"how much sag to stay under wll","target":"spanline-sag-for-tension","kind":"question"},
     {"term":"least sag before the anchor overloads","target":"spanline-sag-for-tension","kind":"question"},
     {"term":"sag for a rope tension limit","target":"spanline-sag-for-tension","kind":"question"},
-    {"term":"how tight can i pull a span line","target":"spanline-sag-for-tension","kind":"question"}
+    {"term":"how tight can i pull a span line","target":"spanline-sag-for-tension","kind":"question"},
+    {"term":"picket anchor capacity","target":"picket-anchor-soil","kind":"industry"},
+    {"term":"steel stake anchor load","target":"picket-anchor-soil","kind":"industry"},
+    {"term":"picket holdfast","target":"picket-anchor-soil","kind":"industry"},
+    {"term":"raker sole anchor pickets","target":"picket-anchor-soil","kind":"industry"},
+    {"term":"how many pickets for anchor","target":"picket-anchor-soil","kind":"industry"}
   ]
 }

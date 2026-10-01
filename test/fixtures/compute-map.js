@@ -2308,6 +2308,13 @@ export const COMPUTE_MAP = {
   "mppt-controller-output-current": { module: "../../calc-reliefpower.js", fn: "computeMpptControllerOutputCurrent" },
   "radio-site-duty-cycle-battery": { module: "../../calc-reliefpower.js", fn: "computeRadioSiteDutyCycleBattery" },
   "generator-battery-hybrid-fuel": { module: "../../calc-reliefpower.js", fn: "computeGeneratorBatteryHybridFuel" },
+  "collapse-floor-load": { module: "../../calc-usar.js", fn: "computeCollapseFloorLoad" },
+  "usr-vertical-shore-capacity": { module: "../../calc-usar.js", fn: "computeUsrVerticalShoreCapacity" },
+  "usr-crib-capacity": { module: "../../calc-usar.js", fn: "computeUsrCribCapacity" },
+  "usr-raker-shore": { module: "../../calc-usar.js", fn: "computeUsrRakerShore" },
+  "picket-anchor-soil": { module: "../../calc-usar.js", fn: "computePicketAnchorSoil" },
+  "osha-timber-trench-shoring": { module: "../../calc-usar.js", fn: "computeOshaTimberTrenchShoring" },
+  "relief-storage-floor-load": { module: "../../calc-usar.js", fn: "computeReliefStorageFloorLoad" },
 };
 
 // Resolve a COMPUTE_MAP module path (relative to this file) and import it.
