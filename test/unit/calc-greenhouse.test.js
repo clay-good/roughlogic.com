@@ -119,10 +119,10 @@ test("plug trays: the trays sown cover the order, and one tray fewer would not",
 });
 
 test("substrate: a true gallon is 231 cubic inches, and the order covers the loose volume", () => {
-  const r = computeSubstrateContainerVolume({ container_count: 5000, filled_volume_in3: 231, allowance_pct: 0, bale_label_ft3: 3.8, bale_loose_yield_ft3: 2.8, true_gallon_in3: 231 });
+  const r = computeSubstrateContainerVolume({ container_count: 5000, filled_volume_in3: 231, allowance_pct: 0, bale_label_ft3: 3.8, bale_loose_yield_ft3: 8, true_gallon_in3: 231 });
   close(r.loose_volume_ft3, 5000 * 231 / 1728, "cubic feet");
   close(r.true_gallon_over_pct, 0, "a filled true gallon is a true gallon");
-  assert.ok(r.bale_count * 2.8 >= r.ordered_volume_ft3);
+  assert.ok(r.bale_count * 8 >= r.ordered_volume_ft3 && r.label_bale_count >= r.bale_count);
 });
 
 test("photoperiod: the blackout wraps midnight, and light plus dark is a day", () => {

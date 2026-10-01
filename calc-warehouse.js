@@ -89,7 +89,7 @@ export const WAREHOUSE_RENDERERS = {};
 // span and deflection with its cube, which is why the L/180 acceptance limit
 // governs an ordinary beam that passes its stress check comfortably.
 
-// dims: in { span_in: L, pallet_weight_lb: M L T^-2, pallets_per_level: dimensionless, moment_of_inertia_in4: L^4, section_modulus_in3: L^3, yield_strength_psi: M L^-1 T^-2, deflection_limit_ratio: dimensionless } out: { load_per_beam_lb: M L T^-2, moment_in_lb: M L^2 T^-2, bending_stress_psi: M L^-1 T^-2, allowable_stress_psi: M L^-1 T^-2, stress_ratio: dimensionless, deflection_in: L, deflection_limit_in: L, required_moment_of_inertia_in4: L^4 }
+// dims: in { span_in: L, pallet_weight_lb: M L T^-2, pallets_per_level: dimensionless, moment_of_inertia_in4: L^4, section_modulus_in3: L^3, yield_strength_psi: M L^-1 T^-2, deflection_limit_ratio: dimensionless } out: { load_per_beam_lb: M L T^-2, moment_in_lb: M L^2 T^-2, impact_moment_in_lb: M L^2 T^-2, design_moment_in_lb: M L^2 T^-2, bending_stress_psi: M L^-1 T^-2, allowable_stress_psi: M L^-1 T^-2, stress_ratio: dimensionless, deflection_in: L, deflection_limit_in: L, required_moment_of_inertia_in4: L^4 }
 export function computePalletRackBeamCapacity({ span_in = 0, pallet_weight_lb = 0, pallets_per_level = 0, moment_of_inertia_in4 = 0, section_modulus_in3 = 0, yield_strength_psi = 0, deflection_limit_ratio = 0 } = {}) {
   const guard = _finiteGuard(arguments[0]); if (guard) return { error: guard.error };
   if (!(span_in > 0) || !(pallet_weight_lb > 0)) return { error: "Beam span and pallet weight must be positive." };
@@ -105,7 +105,13 @@ export function computePalletRackBeamCapacity({ span_in = 0, pallet_weight_lb = 
   const load_per_beam_lb = pallet_weight_lb / 2;
   const level_load_lb = pallet_weight_lb * pallets_per_level;
   const moment_in_lb = load_per_beam_lb * span_in / 4;
-  const bending_stress_psi = moment_in_lb / section_modulus_in3;
+  // ANSI MH16.1 2.3: beams also carry a vertical impact load of 25% of ONE unit
+  // load, at the worst location and not in the deflection check; ASD combination
+  // 5 is 0.88 PL + IL. Split between the front and back beams, it is 0.125 W at a
+  // quarter point, 3 P L / 16 there. Until 2026-10-01 stress used product load alone.
+  const impact_moment_in_lb = 3 * (0.25 * pallet_weight_lb / 2) * span_in / 16;
+  const design_moment_in_lb = 0.88 * moment_in_lb + impact_moment_in_lb;
+  const bending_stress_psi = design_moment_in_lb / section_modulus_in3;
   const allowable_stress_psi = yield_strength_psi / ASD_BENDING_FACTOR;
   const stress_ratio = bending_stress_psi / allowable_stress_psi;
   const a_in = span_in / 4;
@@ -114,7 +120,7 @@ export function computePalletRackBeamCapacity({ span_in = 0, pallet_weight_lb = 
   const deflection_ratio = deflection_in / deflection_limit_in;
   const required_moment_of_inertia_in4 = moment_of_inertia_in4 * deflection_ratio;
   return {
-    load_per_beam_lb, level_load_lb, moment_in_lb,
+    load_per_beam_lb, level_load_lb, moment_in_lb, impact_moment_in_lb, design_moment_in_lb,
     bending_stress_psi, allowable_stress_psi, stress_ratio,
     stress_pass: stress_ratio <= 1,
     stress_margin_pct: 100 * (1 - stress_ratio),
@@ -130,7 +136,7 @@ export function computePalletRackBeamCapacity({ span_in = 0, pallet_weight_lb = 
 
 const beamCapacityExample = { span_in: 108, pallet_weight_lb: 2500, pallets_per_level: 2, moment_of_inertia_in4: 2.5, section_modulus_in3: 1.111, yield_strength_psi: 55000, deflection_limit_ratio: 180 };
 WAREHOUSE_RENDERERS["pallet-rack-beam-capacity"] = _simpleRenderer({
-  citation: "Citation: two equal point loads at the quarter points, M = P L / 4 and d = P a (3 L^2 - 4 a^2) / (24 E I) with a = L/4, E = 29,000,000 psi, against the rack industry's L/180 deflection acceptance limit. ANSI MH16.1, the applicable building code, and the rack manufacturer's published capacity at the installed span govern.",
+  citation: "Citation: two equal point loads at the quarter points, M = P L / 4, checked in stress at ANSI MH16.1 ASD 0.88 PL plus a 25% one-unit-load impact (2.3); d = P a (3 L^2 - 4 a^2) / (24 E I) with a = L/4, E = 29,000,000 psi, against the rack industry's L/180 deflection acceptance limit. ANSI MH16.1, the applicable building code, and the rack manufacturer's published capacity at the installed span govern.",
   example: beamCapacityExample,
   fields: [
     { key: "span_in", label: "Beam clear span (in)" },
@@ -195,7 +201,7 @@ WAREHOUSE_RENDERERS["rack-upright-capacity-derate"] = _simpleRenderer({
   fields: [
     { key: "beam_spacing_in", label: "Beam spacing / unbraced length (in)" },
     { key: "column_moment_of_inertia_in4", label: "Column moment of inertia (in^4)" },
-    { key: "effective_length_factor", label: "Effective length factor K" },
+    { key: "effective_length_factor", label: "Effective length factor K (MH16.1: 1.7 unbraced against sidesway, 1.0 braced)" },
     { key: "loaded_levels", label: "Loaded beam levels", attrs: { step: "1", min: "1" } },
     { key: "load_per_level_lb", label: "Load per level (lb)" },
     { key: "rated_frame_capacity_lb", label: "Rated frame capacity at that spacing (lb)" },
@@ -233,7 +239,10 @@ export function computeRackBasePlateAnchorage({ frame_weight_lb = 0, frame_depth
   const effective_height_ft = top_beam_height_ft * effective_height_fraction;
   const lateral_force_lb = lateral_force_coefficient * frame_weight_lb;
   const overturning_moment_ftlb = lateral_force_lb * effective_height_ft;
-  const resisting_moment_ftlb = frame_weight_lb * frame_depth_ft / 2;
+  // ANSI MH16.1 ASD uplift combination 3: only 0.6 DL + 0.6 PLapp resists
+  // (less under seismic, (0.6 - 0.11 Sds) DL). Until 2026-10-01 the full weight
+  // resisted, understating uplift by 3,000 lb on the worked frame.
+  const resisting_moment_ftlb = 0.6 * frame_weight_lb * frame_depth_ft / 2;
   const net_moment_ftlb = overturning_moment_ftlb - resisting_moment_ftlb;
   const net_uplift_lb = Math.max(0, net_moment_ftlb / frame_depth_ft);
   const anchors_required = Math.ceil(net_uplift_lb / allowable_anchor_tension_lb);
@@ -255,7 +264,7 @@ export function computeRackBasePlateAnchorage({ frame_weight_lb = 0, frame_depth
 
 const anchorageExample = { frame_weight_lb: 15000, frame_depth_in: 42, top_beam_height_ft: 20, lateral_force_coefficient: 0.2, effective_height_fraction: 0.666667, allowable_anchor_tension_lb: 1800, base_plate_holes: 2, improved_anchor_tension_lb: 2800 };
 WAREHOUSE_RENDERERS["rack-base-plate-anchorage"] = _simpleRenderer({
-  citation: "Citation: statics -- overturning moment = lateral force x its effective height, resisting moment = frame weight x half the frame depth, and net uplift = (overturning - resisting) / frame depth taken by the anchors on the uplift side. The lever arm is taken as a fraction of the frame height, two thirds being the ordinary assumption for a uniformly loaded frame. Anchor allowable tension comes from the manufacturer's evaluation report at the slab thickness, concrete strength, and edge distance actually present. ANSI MH16.1, the applicable building code, and the rack design engineer govern.",
+  citation: "Citation: statics -- overturning moment = lateral force x its effective height, resisting moment = 0.6 x frame weight x half the frame depth (MH16.1 ASD uplift combination), and net uplift = (overturning - resisting) / frame depth taken by the anchors on the uplift side. The lever arm is taken as a fraction of the frame height, two thirds being the ordinary assumption for a uniformly loaded frame. Anchor allowable tension comes from the manufacturer's evaluation report at the slab thickness, concrete strength, and edge distance actually present. ANSI MH16.1, the applicable building code, and the rack design engineer govern.",
   example: anchorageExample,
   fields: [
     { key: "frame_weight_lb", label: "Frame weight including product (lb)" },
@@ -518,8 +527,13 @@ export function computeRackFlueSpace({ pallet_width_in = 0, pallet_depth_in = 0,
   if (!(frame_depth_in > 0) || !(back_to_back_spacing_in > 0)) return { error: "Frame depth and back-to-back row spacing must be positive." };
   const pallet_run_in = pallets_per_bay * pallet_width_in;
   const transverse_gap_total_in = beam_length_in - pallet_run_in;
-  const transverse_gap_each_in = transverse_gap_total_in / transverse_gaps;
-  const required_beam_length_in = pallet_run_in + transverse_gaps * nominal_flue_in;
+  // The two end gaps sit at uprights, and each pairs with the adjoining bay's
+  // end gap to make ONE flue: Apex's compliant 92 in bay is 6 in between two
+  // 40 in loads with 3 in at each end. So n gaps hold n - 1 flue widths. Until
+  // 2026-10-01 every end gap was a full flue, asking 98 in where 92 in complies.
+  const flue_count = transverse_gaps >= 2 ? transverse_gaps - 1 : 1;
+  const transverse_gap_each_in = transverse_gap_total_in / flue_count;
+  const required_beam_length_in = pallet_run_in + flue_count * nominal_flue_in;
   const overhangOf = (depth_in) => (depth_in - frame_depth_in) / 2;
   const pallet_overhang_in = overhangOf(pallet_depth_in);
   const deeper_load_overhang_in = overhangOf(deeper_load_depth_in);
@@ -531,7 +545,7 @@ export function computeRackFlueSpace({ pallet_width_in = 0, pallet_depth_in = 0,
     transverse_flue_share_pct: 100 * transverse_gap_each_in / nominal_flue_in,
     required_beam_length_in,
     beam_shortfall_in: required_beam_length_in - beam_length_in,
-    flue_run_in: transverse_gaps * nominal_flue_in,
+    flue_run_in: flue_count * nominal_flue_in,
     pallet_overhang_in, longitudinal_flue_in,
     longitudinal_flue_pass: longitudinal_flue_in >= nominal_flue_in,
     longitudinal_flue_share_pct: 100 * longitudinal_flue_in / nominal_flue_in,
@@ -544,13 +558,13 @@ export function computeRackFlueSpace({ pallet_width_in = 0, pallet_depth_in = 0,
 
 const flueExample = { pallet_width_in: 48, pallet_depth_in: 48, pallets_per_bay: 2, transverse_gaps: 3, nominal_flue_in: 6, beam_length_in: 108, frame_depth_in: 42, back_to_back_spacing_in: 12, deeper_load_depth_in: 52 };
 WAREHOUSE_RENDERERS["rack-flue-space"] = _simpleRenderer({
-  citation: "Citation: geometry against the nominal 6 in transverse and longitudinal flue for rack storage -- required beam length = pallets x pallet width + gaps x nominal flue, and longitudinal flue = back-to-back spacing minus the overhang at each face. NFPA 13 as adopted, the commodity classification, the storage arrangement, and the fire protection engineer and authority having jurisdiction govern whether ceiling protection suffices or in-rack sprinklers are required.",
+  citation: "Citation: geometry against the nominal 6 in transverse and longitudinal flue for rack storage -- required beam length = pallets x pallet width + (gaps - 1) x nominal flue, the end gaps pairing at the uprights, and longitudinal flue = back-to-back spacing minus the overhang at each face. NFPA 13 as adopted, the commodity classification, the storage arrangement, and the fire protection engineer and authority having jurisdiction govern whether ceiling protection suffices or in-rack sprinklers are required.",
   example: flueExample,
   fields: [
     { key: "pallet_width_in", label: "Pallet width across the bay (in)" },
     { key: "pallet_depth_in", label: "Load depth into the rack (in)" },
     { key: "pallets_per_bay", label: "Pallets per bay", attrs: { step: "1", min: "1" } },
-    { key: "transverse_gaps", label: "Transverse gaps in the bay", attrs: { step: "1", min: "1" } },
+    { key: "transverse_gaps", label: "Transverse gaps in the bay (the two end gaps are half-flues at the uprights)", attrs: { step: "1", min: "1" } },
     { key: "nominal_flue_in", label: "Nominal flue width (in)" },
     { key: "beam_length_in", label: "Beam length as built (in)" },
     { key: "frame_depth_in", label: "Rack frame depth (in)" },

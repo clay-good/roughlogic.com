@@ -104,6 +104,11 @@ export const CORROSION_RENDERERS = {};
 // outside the logarithm and diameter inside it, so drill deeper, do not auger
 // wider.
 
+// Potentials differ by tenths of a volt and are compared in mV against whole-mV
+// criteria; -0.650 - -0.750 is 99.99999999999997 mV in floating point, which
+// failed a 100 mV criterion it meets (fixed 2026-10-01). Round to the microvolt.
+const _roundMv = (mv) => Math.round(mv * 1e6) / 1e6;
+
 // dims: in { soil_resistivity_ohm_cm: M L^3 T^-3 I^-2, column_length_ft: L, column_diameter_in: L, anode_count: dimensionless, spacing_ft: L, alternative_spacing_ft: L, alternative_length_ft: L, alternative_diameter_in: L } out: { single_anode_resistance_ohm: M L^2 T^-3 I^-2, bed_resistance_ohm: M L^2 T^-3 I^-2, parallel_resistance_ohm: M L^2 T^-3 I^-2, alternative_spacing_bed_ohm: M L^2 T^-3 I^-2, alternative_length_single_ohm: M L^2 T^-3 I^-2 }
 export function computeAnodeBedResistance({ soil_resistivity_ohm_cm = 0, column_length_ft = 0, column_diameter_in = 0, anode_count = 0, spacing_ft = 0, alternative_spacing_ft = 0, alternative_length_ft = 0, alternative_diameter_in = 0 } = {}) {
   const guard = _finiteGuard(arguments[0]); if (guard) return { error: guard.error };
@@ -337,9 +342,9 @@ export function computeInstantOffIrDrop({ on_potential_v = 0, instant_off_potent
   // All margins are magnitudes in mV; the direction is stated in words by the
   // renderer, because a minus sign on a margin is what a survey report misreads.
   const ir_drop_mv = 1000 * (instant_off_potential_v - on_potential_v);
-  const off_margin_mv = 1000 * (criterion_v - instant_off_potential_v);
-  const on_margin_mv = 1000 * (criterion_v - on_potential_v);
-  const polarization_mv = 1000 * (native_potential_v - instant_off_potential_v);
+  const off_margin_mv = _roundMv(1000 * (criterion_v - instant_off_potential_v));
+  const on_margin_mv = _roundMv(1000 * (criterion_v - on_potential_v));
+  const polarization_mv = _roundMv(1000 * (native_potential_v - instant_off_potential_v));
   return {
     on_potential_v, instant_off_potential_v, native_potential_v, criterion_v, polarization_criterion_mv,
     ir_drop_mv, off_margin_mv, on_margin_mv, polarization_mv,
@@ -673,7 +678,7 @@ export function computeTankBottomAnodeLayout({ tank_diameter_ft = 0, current_den
     ring_saving_pct: 100 * (grid_ribbon_ft - ring_ribbon_ft) / grid_ribbon_ft,
     ring_to_centre_ft: radius_ft,
     grid_to_farthest_ft,
-    note: "The perimeter ring passes its ribbon-loading check, uses far less anode, and costs far less to install -- and it leaves the middle of the tank the farthest from any anode, with current attenuating through the pad the whole way. Tank bottoms PERFORATE IN THE MIDDLE, where a bottom is least likely to be reached and least likely to be checked; a ring protects everywhere the problem is not. Over a containment liner the ring does not merely underperform, it does NOTHING, because the liner closes the electrolyte. The grid has to be inside the containment and installed when the tank is built, since the alternative is lifting the bottom. API RP 651, NACE SP0193, and the ribbon manufacturer's rating govern.",
+    note: "The perimeter ring passes its ribbon-loading check, uses far less anode, and costs far less to install -- and it leaves the middle of the tank the farthest from any anode, with current attenuating through the pad the whole way. Tank bottoms PERFORATE IN THE MIDDLE, where a bottom is least likely to be reached and least likely to be checked; a ring protects everywhere the problem is not. Over a plastic containment liner the ring does not merely underperform, it does NOTHING, because the liner closes the electrolyte (MATCOR notes a conductive clay liner does not). The grid has to be inside the containment and installed when the tank is built, since the alternative is lifting the bottom. API RP 651, NACE SP0193, and the ribbon manufacturer's rating govern.",
   };
 }
 
@@ -718,9 +723,10 @@ export function computeCloseIntervalSurveyReadings({ survey_length_mi = 0, readi
   if (!(crew_day_hours > 0 && crew_day_hours <= 24)) return { error: "The crew day must be above 0 and at most 24 hours." };
   if (!(test_station_spacing_mi > 0)) return { error: "Test station spacing must be positive." };
   const length_ft = survey_length_mi * FT_PER_MILE;
-  const reading_count = Math.floor(length_ft / reading_interval_ft);
+  // + 1e-9: 0.7 mi / 3.5 ft is 1055.9999999999998 in floating point (fixed 2026-10-01).
+  const reading_count = Math.floor(length_ft / reading_interval_ft + 1e-9);
   const data_points = reading_count * readings_per_station;
-  const test_station_readings = Math.floor(survey_length_mi / test_station_spacing_mi) + 1;
+  const test_station_readings = Math.floor(survey_length_mi / test_station_spacing_mi + 1e-9) + 1;
   const field_days = survey_length_mi / production_mi_per_day;
   const reading_hours = data_points / readings_per_station * seconds_per_reading / SEC_PER_HOUR;
   return {
@@ -844,9 +850,9 @@ export function computePolarizationDecayCriterion({ on_potential_v = 0, instant_
   if (!(instant_off_potential_v <= depolarized_potential_v)) return { error: "The depolarised potential should be less negative than the instant-off; the structure relaxes toward native." };
   if (!(polarization_criterion_mv > 0)) return { error: "The polarisation criterion must be positive (100 mV is customary)." };
   const ir_drop_mv = 1000 * (instant_off_potential_v - on_potential_v);
-  const formation_mv = 1000 * (native_potential_v - instant_off_potential_v);
-  const decay_mv = 1000 * (depolarized_potential_v - instant_off_potential_v);
-  const absolute_margin_mv = 1000 * (criterion_v - instant_off_potential_v);
+  const formation_mv = _roundMv(1000 * (native_potential_v - instant_off_potential_v));
+  const decay_mv = _roundMv(1000 * (depolarized_potential_v - instant_off_potential_v));
+  const absolute_margin_mv = _roundMv(1000 * (criterion_v - instant_off_potential_v));
   const decay_from_on_mv = 1000 * (depolarized_potential_v - on_potential_v);
   return {
     on_potential_v, instant_off_potential_v, criterion_v, polarization_criterion_mv,

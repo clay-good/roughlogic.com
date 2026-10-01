@@ -57,7 +57,7 @@ test("rack upright: the Euler ratio is the square of the length ratio, and the d
 test("base plate: the uplift is what the frame's weight cannot resist about the far leg", () => {
   const r = computeRackBasePlateAnchorage({ frame_weight_lb: 15000, frame_depth_in: 42, top_beam_height_ft: 20, lateral_force_coefficient: 0.2, effective_height_fraction: 0.666667, allowable_anchor_tension_lb: 1800, base_plate_holes: 2, improved_anchor_tension_lb: 2800 });
   close(r.overturning_moment_ftlb, 3000 * 20 * 0.666667, "overturning");
-  close(r.resisting_moment_ftlb, 15000 * 1.75, "W d / 2");
+  close(r.resisting_moment_ftlb, 0.6 * 15000 * 1.75, "0.6 W d / 2 (MH16.1 ASD uplift)");
   close(r.net_uplift_lb * 3.5, r.overturning_moment_ftlb - r.resisting_moment_ftlb, "uplift");
   assert.ok(r.anchors_required * 1800 >= r.net_uplift_lb);
 });
@@ -88,7 +88,10 @@ test("dock leveler: the grade is the height difference over the length, either w
 test("flue space: the beam holds the pallets and every transverse gap", () => {
   const r = computeRackFlueSpace({ pallet_width_in: 48, pallet_depth_in: 48, pallets_per_bay: 2, transverse_gaps: 3, nominal_flue_in: 6, beam_length_in: 108, frame_depth_in: 42, back_to_back_spacing_in: 12, deeper_load_depth_in: 52 });
   close(r.pallet_run_in + r.transverse_gap_total_in, 108, "beam length");
-  close(r.required_beam_length_in, 96 + 18, "pallets plus nominal flues");
+  // Three gaps are two flue widths: the end gaps pair with the next bay's at
+  // each upright (Apex: 6 in between loads, 3 in at each end).
+  close(r.required_beam_length_in, 96 + 12, "pallets plus nominal flues");
+  assert.equal(computeRackFlueSpace({ pallet_width_in: 40, pallet_depth_in: 48, pallets_per_bay: 2, transverse_gaps: 3, nominal_flue_in: 6, beam_length_in: 92, frame_depth_in: 42, back_to_back_spacing_in: 12, deeper_load_depth_in: 52 }).transverse_flue_pass, true);
   close(r.longitudinal_flue_in, 12 - 2 * 3, "overhang eats the flue from both sides");
 });
 

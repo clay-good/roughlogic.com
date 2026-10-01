@@ -72,6 +72,11 @@ test("example parity: the tiles with no example export still load what their pag
     checked++;
     await page.evaluate((hash) => { window.location.hash = hash; }, `${id}?example=1`);
     await page.locator("#view-region .input-region").waitFor({ state: "attached", timeout: 20000 });
+    // The example fills after the tile's module loads, so a fixed pause can read
+    // an empty form under CI load (abatement-containment read 8/8 absent once on
+    // 2026-10-01 and passed on the retry). Wait for the fill, then settle.
+    await page.waitForFunction(() => Array.from(document.querySelectorAll("#view-region input, #view-region textarea"))
+      .some((el) => el.value != null && String(el.value).trim() !== ""), null, { timeout: 5000 }).catch(() => {});
     await page.waitForTimeout(120);
     const shown = await page.evaluate(() =>
       Array.from(document.querySelectorAll("#view-region input, #view-region select, #view-region textarea"))

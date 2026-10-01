@@ -810,12 +810,14 @@ export function computePackagingYieldLoss({ brite_volume_gal = 0, transfer_loss_
   if (!(revenue_per_package >= 0)) return { error: "Revenue per package cannot be negative." };
   const after_transfer_gal = brite_volume_gal * (1 - transfer_loss_pct / 100);
   const packaged_volume_gal = after_transfer_gal * (1 - fill_loss_pct / 100);
-  const whole_packages = Math.floor(packaged_volume_gal / package_gal);
+  // + 1e-9: 1,000 gal less 7% is 929.9999999999999, which floored to 59 half-barrels
+  // and a phantom 15.5 gal remainder instead of 60 and none (fixed 2026-10-01).
+  const whole_packages = Math.floor(packaged_volume_gal / package_gal + 1e-9);
   const saleable_gal = whole_packages * package_gal;
-  const remainder_gal = packaged_volume_gal - saleable_gal;
+  const remainder_gal = Math.max(0, packaged_volume_gal - saleable_gal);
   const process_loss_gal = brite_volume_gal - packaged_volume_gal;
   const total_loss_gal = brite_volume_gal - saleable_gal;
-  const small_packages_from_remainder = Math.floor(remainder_gal / smallest_package_gal);
+  const small_packages_from_remainder = Math.floor(remainder_gal / smallest_package_gal + 1e-9);
   return {
     brite_volume_gal, package_gal, smallest_package_gal,
     after_transfer_gal, packaged_volume_gal,

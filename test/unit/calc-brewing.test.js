@@ -7,6 +7,7 @@
 
 import { test } from "node:test";
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 import {
   computeMashStrikeWater, computeSpargeWaterVolume, computeBrewhouseEfficiency,
   computeIbuTinseth, computeBeerColorSrm, computeYeastPitchRate, computeKettleBoilOff,
@@ -166,4 +167,11 @@ test("dry-hop loss is exactly proportional to the rate", () => {
   const r = computeDryHopBeerLoss({ batch_volume_gal: 310, dry_hop_lb_per_bbl: 2, absorption_gal_per_lb: 1, package_gal: 15.5, revenue_per_package: 175, heavy_dry_hop_lb_per_bbl: 4 });
   close(r.heavy_absorbed_gal, 2 * r.absorbed_gal, "double the rate");
   close(r.absorbed_gal, 2 * 10, "2 lb/bbl x 10 bbl x 1 gal/lb");
+});
+
+test("packaging: 1,000 gal less 7% is exactly 60 half-barrels, not 59 and a phantom remainder", () => {
+  const W = JSON.parse(readFileSync(new URL("../fixtures/worked-examples.json", import.meta.url), "utf8")).rows;
+  const r = computePackagingYieldLoss({ ...W.find((x) => x.tile_id === "packaging-yield-loss").inputs, brite_volume_gal: 1000, transfer_loss_pct: 7, fill_loss_pct: 0, package_gal: 15.5 });
+  assert.equal(r.whole_packages, 60);
+  assert.equal(r.remainder_gal, 0);
 });

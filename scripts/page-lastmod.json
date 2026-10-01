@@ -2,7 +2,7 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "f22a9b964d519b32",
+      "sha": "12b393f29d0b53ee",
       "date": "2026-10-01"
     },
     "/tools/": {
@@ -2230,8 +2230,8 @@
       "date": "2026-09-30"
     },
     "/tools/dock-leveler-slope/": {
-      "sha": "09c0006a99dc741c",
-      "date": "2026-09-29"
+      "sha": "37d91c30a1495dec",
+      "date": "2026-10-01"
     },
     "/tools/dock-piling-lateral/": {
       "sha": "2116a5eb4a26e8f3",
@@ -2882,8 +2882,8 @@
       "date": "2026-09-29"
     },
     "/tools/fermenter-glycol-load/": {
-      "sha": "058a6c80fda967a9",
-      "date": "2026-09-29"
+      "sha": "48c2096ba1e7fc72",
+      "date": "2026-10-01"
     },
     "/tools/fertigation-injection-rate/": {
       "sha": "749ad3b24a35db68",
@@ -3202,8 +3202,8 @@
       "date": "2026-10-01"
     },
     "/tools/fume-hood-face-velocity/": {
-      "sha": "c46d2195a85b8d19",
-      "date": "2026-09-29"
+      "sha": "55dcb68aef002ed4",
+      "date": "2026-10-01"
     },
     "/tools/furnace-airflow-to-rise/": {
       "sha": "77a6424f1ead27bf",
@@ -5174,8 +5174,8 @@
       "date": "2026-09-30"
     },
     "/tools/pallet-rack-beam-capacity/": {
-      "sha": "f17b5e6e703dcfce",
-      "date": "2026-09-29"
+      "sha": "0bbb47bc976bce9f",
+      "date": "2026-10-01"
     },
     "/tools/pan-conversion/": {
       "sha": "b1e6470bca80f4cf",
@@ -5518,8 +5518,8 @@
       "date": "2026-09-29"
     },
     "/tools/polarization-decay-criterion/": {
-      "sha": "fd023d2e4ebeb37b",
-      "date": "2026-09-29"
+      "sha": "41ec705b63c80360",
+      "date": "2026-10-01"
     },
     "/tools/pole-class-groundline-moment/": {
       "sha": "5cfefc66d39d9740",
@@ -5922,20 +5922,20 @@
       "date": "2026-09-29"
     },
     "/tools/rack-base-plate-anchorage/": {
-      "sha": "734fa106488535ae",
-      "date": "2026-09-29"
+      "sha": "563012eb4bac4cc5",
+      "date": "2026-10-01"
     },
     "/tools/rack-flue-space/": {
-      "sha": "722deae1a490c605",
-      "date": "2026-09-29"
+      "sha": "ffd669fdb3d812af",
+      "date": "2026-10-01"
     },
     "/tools/rack-power-density-airflow/": {
       "sha": "d4c6b25c96ee896c",
       "date": "2026-09-29"
     },
     "/tools/rack-upright-capacity-derate/": {
-      "sha": "7d946f6f67337396",
-      "date": "2026-09-29"
+      "sha": "38f1265f943cacd9",
+      "date": "2026-10-01"
     },
     "/tools/radial-chip-thinning/": {
       "sha": "1172f2bac6011a77",
@@ -5966,8 +5966,8 @@
       "date": "2026-10-01"
     },
     "/tools/radon-fan-static/": {
-      "sha": "b3ca82eeab8b350f",
-      "date": "2026-09-29"
+      "sha": "9d5787e1ee6ed96b",
+      "date": "2026-10-01"
     },
     "/tools/rafter/": {
       "sha": "36e30e5534b3b64c",
@@ -7734,8 +7734,8 @@
       "date": "2026-09-30"
     },
     "/tools/substrate-container-volume/": {
-      "sha": "0c356c2ccc294804",
-      "date": "2026-09-29"
+      "sha": "5a8d0179ed5e22ed",
+      "date": "2026-10-01"
     },
     "/tools/substrate-for-velocity/": {
       "sha": "aa23b5e616d6602b",

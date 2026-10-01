@@ -24597,6 +24597,7 @@ export const CITATIONS = {
     governance: GOVERNANCE.general,
     editionNote: "A line can fail -0.850 V and be properly protected under 100 mV, which is why the criterion exists. Measuring decay from the ON potential adds the IR drop and certifies an unprotected line.",
     assumptions: [
+      { name: "Where 100 mV does not apply", value: "not on bimetallic systems (mixed potentials) or under stray current", source: "UFC 3-570-06 (2019) 2-1.3.1; USDA NRCS SD-2003-3" },
       { name: "Reference", value: "decay and formation are always measured from the instant-off potential", source: "NACE SP0169" },
       { name: "Criterion choice", value: "which criterion applies depends on the structure and the standard", source: "CP designer" },
     ],
@@ -24702,6 +24703,7 @@ export const CITATIONS = {
     governance: GOVERNANCE.general,
     editionNote: "The adiabatic rise (20 to 40 degF observed) checks the heat figure. The crash, not fermentation, sizes the chiller. spec-v1784 states shell gain as area x U x (room - beer), then charged the fermenting tank the gain of a crashed one (70 - 34 degF) while its beer is at 68; the tile takes each period at its own beer temperature, giving a 1,395 Btu/h peak fermentation load where the spec said 2,125. The conclusion strengthens: the crash is 2.9 times the fermentation load (the spec said 1.9), and a plant sized on fermentation is 66% short (the spec said 48).",
     assumptions: [
+      { name: "Beer heat capacity", value: "8.4 lb/gal x 0.9 Btu/lb-F; chiller vendors (American Chillers, Brau Supply) size the crash on water, 8.33 x 1.0, about 10% higher, and quote heat of fermentation per degree Plato per barrel rather than per lb of extract", source: "American Chillers; Brau Supply glycol sizing guides" },
       { name: "Beer", value: "8.4 lb/gal at 0.90 Btu/lb-degF", source: "spec-v1784" },
       { name: "Glycol", value: "8.6 lb/gal at 0.90 Btu/lb-degF", source: "spec-v1784" },
     ],
@@ -24862,10 +24864,10 @@ export const CITATIONS = {
     edition: "The supplier's own loose-yield figure and a measured container fill govern.",
     freeAccess: "Public arithmetic; loose yields are published by substrate suppliers.",
     governance: GOVERNANCE.general,
-    editionNote: "A nursery trade gallon is not a US gallon, and a compressed bale's label describes the bale in the truck rather than the media on the bench. The two errors push in OPPOSITE directions, so making both may give roughly the right number for entirely the wrong reasons.",
+    editionNote: "A nursery trade gallon is not a US gallon, and a compressed bale's label is the bale still compressed: Colorado Materials' 3.8 cu ft bale opens to about 8. Both errors OVER-order; until 2026-10-01 this tile had the bale shrinking (2.8 cu ft, a loose-fill bag size) and rejected real supplier yields.",
     assumptions: [
       { name: "Filled volume", value: "varies with the container and how it is filled; a measured fill beats a nominal size", source: "yard measurement" },
-      { name: "Bale yield", value: "the loose yield, not the compressed label volume, is what fills containers", source: "supplier data" },
+      { name: "Bale yield", value: "the loose yield, not the compressed label volume, is what fills containers; it is about twice the label", source: "supplier data (Colorado Materials: 3.8 cu ft opens to about 8)" },
     ],
   },
   "photoperiod-blackout-schedule": {
@@ -25120,7 +25122,7 @@ export const CITATIONS = {
   },
   // spec-v1809..v1817: warehouse racking and material handling.
   "pallet-rack-beam-capacity": {
-    formula: "Two equal point loads at the quarter points: M = P L / 4; d = P a (3 L^2 - 4 a^2) / (24 E I) with a = L/4 and E = 29,000,000 psi; allowable bending stress = Fy / 1.67; acceptance limit L/180.",
+    formula: "Two equal point loads at the quarter points: M = P L / 4; stress on 0.88 M plus a vertical impact of 25% of one unit load at a quarter point (ANSI MH16.1 2.3, ASD combination 5), not in deflection; d = P a (3 L^2 - 4 a^2) / (24 E I) with a = L/4 and E = 29,000,000 psi; allowable bending stress = Fy / 1.67; acceptance limit L/180.",
     edition: "ANSI MH16.1 Design, Testing and Utilization of Industrial Steel Storage Racks, the applicable building code, and the rack manufacturer's published beam capacity AT the installed span.",
     freeAccess: "The beam relations and the L/180 criterion are public; ANSI MH16.1 itself is a purchased standard.",
     governance: GOVERNANCE.general,
@@ -25143,7 +25145,7 @@ export const CITATIONS = {
     ],
   },
   "rack-base-plate-anchorage": {
-    formula: "Overturning M_o = lateral force x effective height; resisting M_r = frame weight x half the frame depth; net uplift = (M_o - M_r) / frame depth; anchors = net uplift / allowable tension per anchor, rounded up.",
+    formula: "Overturning M_o = lateral force x effective height; resisting M_r = 0.6 x frame weight x half the frame depth (ANSI MH16.1 ASD uplift combination); net uplift = (M_o - M_r) / frame depth; anchors = net uplift / allowable tension per anchor, rounded up.",
     edition: "ANSI MH16.1, the applicable building code and its seismic provisions, and the post-installed anchor's evaluation report at the slab thickness, concrete strength, and edge distance actually present.",
     freeAccess: "The statics are public; ANSI MH16.1 and anchor evaluation reports are published by their own bodies.",
     governance: GOVERNANCE.general,
@@ -25154,9 +25156,9 @@ export const CITATIONS = {
     ],
   },
   "rack-flue-space": {
-    formula: "Required beam length = pallets x pallet width + transverse gaps x nominal flue; longitudinal flue = back-to-back spacing - 2 x overhang, with overhang = (load depth - frame depth) / 2.",
+    formula: "Required beam length = pallets x pallet width + (transverse gaps - 1) x nominal flue, the two end gaps being half-flues that pair at the uprights (Apex: 6 in between loads, 3 in at each end); longitudinal flue = back-to-back spacing - 2 x overhang, with overhang = (load depth - frame depth) / 2.",
     edition: "NFPA 13 Standard for the Installation of Sprinkler Systems as adopted, with the commodity classification, storage height, and arrangement.",
-    freeAccess: "NFPA publishes its standards for free read-only online access; the nominal 6 in transverse and longitudinal flue is stated there.",
+    freeAccess: "NFPA publishes its standards for free read-only online access; the nominal 6 in transverse flue is stated there; a longitudinal flue is required in double-row racks over 25 ft.",
     governance: GOVERNANCE.general,
     editionNote: "Flues are fire protection hardware that happens to look like empty space: they are the path by which ceiling sprinkler water reaches the lower levels of a rack. Solid decking blocks the flue entirely and changes the protection requirement; open wire or bar decking does not.",
     assumptions: [
@@ -25193,6 +25195,7 @@ export const CITATIONS = {
     governance: GOVERNANCE.general,
     editionNote: "Service range answers whether the leveler can REACH a bed height; grade answers whether equipment can work across it once it does. A leveler comfortably within its service range can still present a ramp too steep to run pallets over.",
     assumptions: [
+      { name: "Nominal length", value: "grade here is rise over the NOMINAL deck; manufacturers' charts use the shorter working length, so read about 17% steeper on a 6 ft leveler (Poweramp: 8 in on 6 ft = 13.3%, on 10 ft = 7.6%). Limits differ by truck: hand pallet 3%, powered pallet 7%, electric fork 10%, gas fork 15%", source: "Poweramp Grade Chart for Dock Levelers" },
       { name: "Grade guideline", value: "roughly 10% a common practical maximum for powered equipment, 7% or less preferred; a manual pallet truck struggles well before a forklift does", source: "industry practice, entered as an input" },
       { name: "Static geometry", value: "a trailer settles as it loads, rises as it empties, and can creep away from the dock; restraints and chocks address the creep", source: "spec-v1814 scope" },
     ],
@@ -25340,7 +25343,7 @@ export const CITATIONS = {
     ],
   },
   "radon-fan-static": {
-    formula: "pipe velocity = flow / area; friction by Darcy-Weisbach with the Blasius smooth-pipe factor f = 0.316 / Re^0.25, converted from feet of air to inches of water column; the share divides that loss by the fan's entered static.",
+    formula: "pipe velocity = flow / area; friction by Darcy-Weisbach with f = 64 / Re below Re 2,300, the Blasius smooth-pipe factor f = 0.316 / Re^0.25 up to 100,000, and Swamee-Jain above, converted from feet of air to inches of water column; the share divides that loss by the fan's entered static.",
     edition: "Duct friction by Darcy-Weisbach on a smooth pipe, with the sub-slab resistance ENTERED as a measured fan static rather than predicted, because it depends on the aggregate, the fines and the soil and is not calculable in advance.",
     freeAccess: "Standard duct friction relations and two unit conversions.",
     governance: GOVERNANCE.general,
@@ -25380,8 +25383,9 @@ export const CITATIONS = {
     edition: "The face-velocity airflow relation, with the 1.08 sensible heat constant at standard air. The too-fast threshold is ENTERED because the institution and the standard set it.",
     freeAccess: "One product, one difference, and the standard sensible heat relation.",
     governance: GOVERNANCE.general,
-    editionNote: "TOO FAST IS NOT SAFER, which is the part people get backwards. Face velocity has an optimum rather than a floor: above roughly 125 fpm, turbulence at the face and in the wake of a person standing at the hood can pull contaminants OUT of it, so raising a setpoint is not a safety improvement and a hood failing containment does not usually need more air. AND FACE VELOCITY IS A SURROGATE. It became the field check because an anemometer is cheap; what matters is whether the hood keeps material inside, which is what ASHRAE 110 tracer gas testing determines. A hood can pass a velocity survey and fail containment outright from a cross-draft, a person walking past, clutter on the rear baffle, or equipment set too near the face. THE TWO GOALS AGREE, which is unusual enough to tell users directly: a lower sash contains better AND exhausts less. The 6 ft hood here goes from 900 to 1,500 cfm between an 18 and a 30 in sash -- 600 cfm of conditioned air, continuously, from a sash nobody closed.",
+    editionNote: "TOO FAST IS NOT SAFER, which is the part people get backwards. Face velocity has an optimum rather than a floor: above roughly 125 fpm, turbulence at the face and in the wake of a person standing at the hood can pull contaminants OUT of it, so raising a setpoint is not a safety improvement and a hood failing containment is more often fighting room air currents than short of air (strong currents can force a higher face velocity, Siemens 149-989). AND FACE VELOCITY IS A SURROGATE. It became the field check because an anemometer is cheap; what matters is whether the hood keeps material inside, which is what ASHRAE 110 tracer gas testing determines. A hood can pass a velocity survey and fail containment outright from a cross-draft, a person walking past, clutter on the rear baffle, or equipment set too near the face. THE TWO GOALS AGREE, which is unusual enough to tell users directly: a lower sash contains better AND exhausts less. The 6 ft hood here goes from 900 to 1,500 cfm between an 18 and a 30 in sash -- 600 cfm of conditioned air, continuously, from a sash nobody closed.",
     assumptions: [
+      { name: "Sash opening only", value: "exhaust here is sash area x face velocity; total open area also includes the airfoil slot and bypass opening, so a hood exhausted at this figure runs below the target face velocity", source: "Siemens Technology Report 149-989 (2004), p. 3" },
       { name: "Face velocity is a surrogate", value: "containment is what matters and tracer gas testing is what measures it", source: "ASHRAE 110" },
       { name: "Standard air for the heat figure", value: "the 1.08 constant shifts with altitude and temperature", source: "standard psychrometric practice" },
       { name: "The required velocity is entered", value: "the standard and the institution set it, and it varies with the material", source: "ANSI/AIHA Z9.5" },

@@ -51839,10 +51839,13 @@ test("bounds: spec-v1746 computeSubSlabSuctionField -- SHAPE governs, not area",
   assert.equal(r.points_by_length, 2);
   assert.equal(r.governing_points, 2);
   assert.equal(r.shape_governs, true);
-  // IDENTITY: the same AREA laid out compactly needs only the area answer.
+  // A 40 ft square at a 25 ft radius is NOT one point: its corners sit 28.3 ft
+  // from the centre (fixed 2026-10-01; circles cannot tile a rectangle).
   const square = _v1746({ ...base, slab_length_ft: 40, slab_width_ft: 40 });
-  assert.equal(square.governing_points, 1);
-  assert.equal(square.shape_governs, false);
+  assert.equal(square.governing_points, 2);
+  // The same area laid out long and narrow needs more still.
+  const strip = _v1746({ ...base, slab_length_ft: 160, slab_width_ft: 10 });
+  assert.equal(strip.governing_points, 4);
   assert.equal(square.area_per_point_ft2, r.area_per_point_ft2);
   // A TIGHT sub-slab needs many points regardless of fan size.
   const tight = _v1746({ ...base, reaches_ft: 6, fails_ft: 10 });
@@ -54337,11 +54340,12 @@ test("bounds: spec-v1811 computeRackBasePlateAnchorage -- the anchors take what 
   const base = { frame_weight_lb: 15000, frame_depth_in: 42, top_beam_height_ft: 20, lateral_force_coefficient: 0.2, effective_height_fraction: 0.666667, allowable_anchor_tension_lb: 1800, base_plate_holes: 2, improved_anchor_tension_lb: 2800 };
   const r = _v1811(base); assertFiniteNumericOutputs(r, "v1811");
   assert.ok(Math.abs(r.lateral_force_lb - 3000) < 1e-12);
-  assert.ok(Math.abs(r.resisting_moment_ftlb - 26250) < 1e-12);
-  assert.ok(Math.abs(r.net_uplift_lb - 3928.577) < 0.01);
-  // 3 anchors into 2 holes is the finding; a better slab closes it with 2.
-  assert.deepStrictEqual([r.anchors_required, r.anchors_required_improved], [3, 2]);
-  assert.ok(!r.base_plate_sufficient && r.improved_plate_sufficient);
+  // MH16.1 ASD uplift: only 0.6 of the weight resists (was the full 26,250).
+  assert.ok(Math.abs(r.resisting_moment_ftlb - 15750) < 1e-9);
+  assert.ok(Math.abs(r.net_uplift_lb - 6928.577) < 0.01);
+  // 4 anchors into 2 holes is the finding; even a better slab needs 3.
+  assert.deepStrictEqual([r.anchors_required, r.anchors_required_improved], [4, 3]);
+  assert.ok(!r.base_plate_sufficient && !r.improved_plate_sufficient);
   // A heavy enough frame resists its own overturning and the uplift floors at
   // zero rather than going negative.
   const heavy = _v1811({ ...base, lateral_force_coefficient: 0.01 });
@@ -54415,15 +54419,18 @@ test("bounds: spec-v1814 computeDockLevelerSlope -- reaching the trailer and wor
 test("bounds: spec-v1815 computeRackFlueSpace -- the flue sets the beam, and a deeper load closes it", () => {
   const base = { pallet_width_in: 48, pallet_depth_in: 48, pallets_per_bay: 2, transverse_gaps: 3, nominal_flue_in: 6, beam_length_in: 108, frame_depth_in: 42, back_to_back_spacing_in: 12, deeper_load_depth_in: 52 };
   const r = _v1815(base); assertFiniteNumericOutputs(r, "v1815");
-  assert.ok(Math.abs(r.transverse_gap_each_in - 4) < 1e-12 && !r.transverse_flue_pass);
-  assert.ok(Math.abs(r.required_beam_length_in - 114) < 1e-12 && Math.abs(r.beam_shortfall_in - 6) < 1e-12);
+  // 108 in is exactly 6 in between the loads and 3 in at each upright.
+  assert.ok(Math.abs(r.transverse_gap_each_in - 6) < 1e-12 && r.transverse_flue_pass);
+  assert.ok(Math.abs(r.required_beam_length_in - 108) < 1e-12 && Math.abs(r.beam_shortfall_in) < 1e-12);
+  const tight = _v1815({ ...base, beam_length_in: 104 });
+  assert.ok(Math.abs(tight.transverse_gap_each_in - 4) < 1e-12 && !tight.transverse_flue_pass && Math.abs(tight.beam_shortfall_in - 4) < 1e-12);
   // The longitudinal flue is exactly nominal with no margin, and a 4 in
   // deeper load takes it to a third of nominal with nothing else changing.
   assert.ok(Math.abs(r.longitudinal_flue_in - 6) < 1e-12 && r.longitudinal_flue_pass);
   assert.ok(Math.abs(r.deeper_load_longitudinal_flue_in - 2) < 1e-12 && !r.deeper_load_flue_pass);
   assert.ok(Math.abs(r.deeper_load_flue_share_pct - 100 / 3) < 1e-9);
   // Building the bay to the required length is what makes the flue.
-  const built = _v1815({ ...base, beam_length_in: r.required_beam_length_in });
+  const built = _v1815({ ...base, beam_length_in: tight.required_beam_length_in });
   assert.ok(built.transverse_flue_pass && Math.abs(built.transverse_gap_each_in - 6) < 1e-12);
   for (const key of ["pallet_width_in", "pallet_depth_in", "pallets_per_bay", "transverse_gaps", "nominal_flue_in", "beam_length_in", "frame_depth_in", "back_to_back_spacing_in", "deeper_load_depth_in"]) {
     assert.ok(_v1815({ ...base, [key]: 0 }).error);
@@ -55266,13 +55273,15 @@ test("bounds: spec-v1759 computePlugTrayCellCount -- the naive count is found sh
 });
 
 test("bounds: spec-v1760 computeSubstrateContainerVolume -- two errors that push opposite ways", () => {
-  const base = { container_count: 5000, filled_volume_in3: 160, allowance_pct: 10, bale_label_ft3: 3.8, bale_loose_yield_ft3: 2.8, true_gallon_in3: 231 };
+  const base = { container_count: 5000, filled_volume_in3: 160, allowance_pct: 10, bale_label_ft3: 3.8, bale_loose_yield_ft3: 8, true_gallon_in3: 231 };
   const r = _v1760(base); assertFiniteNumericOutputs(r, "v1760");
   assert.ok(Math.abs(r.loose_volume_ft3 - 462.962962962963) < 1e-9);
   assert.ok(Math.abs(r.ordered_volume_ft3 - r.loose_volume_ft3 * 1.1) < 1e-9);
   assert.strictEqual(r.order_yd3, 19);
   // The label under-orders because it describes the bale in the truck.
-  assert.deepStrictEqual([r.bale_count, r.label_bale_count, r.bales_the_label_misses], [182, 135, 47]);
+  // A compressed bale EXPANDS (3.8 cu ft opens to about 8), so ordering by the
+  // label over-orders; until 2026-10-01 the tile had it shrinking (182 vs 135).
+  assert.deepStrictEqual([r.bale_count, r.label_bale_count, r.bales_the_label_overorders], [64, 135, 71]);
   // The trade-gallon error over-orders, in the other direction.
   assert.ok(r.true_gallon_volume_yd3 > r.ordered_volume_yd3);
   assert.ok(Math.abs(r.true_gallon_over_pct - 44.375) < 1e-9);
@@ -55280,7 +55289,7 @@ test("bounds: spec-v1760 computeSubstrateContainerVolume -- two errors that push
   // A bale whose loose yield equals its label needs no correction at all.
   const honest = _v1760({ ...base, bale_loose_yield_ft3: 3.8 });
   assert.strictEqual(honest.bale_count, honest.label_bale_count);
-  assert.ok(_v1760({ ...base, bale_loose_yield_ft3: 5 }).error);
+  assert.ok(_v1760({ ...base, bale_loose_yield_ft3: 3 }).error);
   for (const bad of [{ container_count: 0 }, { filled_volume_in3: 0 }, { allowance_pct: -1 }, { bale_label_ft3: 0 }, { true_gallon_in3: 0 }, { container_count: Infinity }]) {
     assert.ok(_v1760({ ...base, ...bad }).error);
   }

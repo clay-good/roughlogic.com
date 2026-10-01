@@ -756,10 +756,10 @@ GREENHOUSE_RENDERERS["plug-tray-cell-count"] = _simpleRenderer({
 
 // ========= spec-v1760: substrate and container volume takeoff =========
 
-// Two errors push in opposite directions -- the trade gallon that is not a
-// gallon, and the compressed bale label that is not the loose yield -- and a
-// yard that makes both may arrive at roughly the right number for entirely the
-// wrong reasons, which is worse than either alone.
+// Two errors, both over-ordering -- the trade gallon that is not a gallon, and
+// the compressed bale label that is not the loose yield. A compressed bale
+// EXPANDS (a 3.8 cu ft bale opens to about 8, Colorado Materials); until
+// 2026-10-01 this tile had the bale shrinking and rejected real supplier data.
 
 // dims: in { container_count: dimensionless, filled_volume_in3: L^3, allowance_pct: dimensionless, bale_label_ft3: L^3, bale_loose_yield_ft3: L^3, true_gallon_in3: L^3 } out: { loose_volume_ft3: L^3, loose_volume_yd3: L^3, ordered_volume_ft3: L^3, ordered_volume_yd3: L^3, bale_count: dimensionless, true_gallon_volume_yd3: L^3 }
 export function computeSubstrateContainerVolume({ container_count = 0, filled_volume_in3 = 0, allowance_pct = 0, bale_label_ft3 = 0, bale_loose_yield_ft3 = 0, true_gallon_in3 = 0 } = {}) {
@@ -770,7 +770,7 @@ export function computeSubstrateContainerVolume({ container_count = 0, filled_vo
   if (!(filled_volume_in3 > 0)) return { error: "The filled volume per container must be positive." };
   if (!(allowance_pct >= 0)) return { error: "The compaction and spill allowance cannot be negative." };
   if (!(bale_label_ft3 > 0) || !(bale_loose_yield_ft3 > 0)) return { error: "Bale label and loose yield volumes must be positive." };
-  if (!(bale_loose_yield_ft3 <= bale_label_ft3)) return { error: "A bale's loose yield cannot exceed its compressed label volume." };
+  if (!(bale_loose_yield_ft3 >= bale_label_ft3)) return { error: "A compressed bale expands when opened: its loose yield is at least its label volume (a 3.8 cu ft bale opens to about 8)." };
   if (!(true_gallon_in3 > 0)) return { error: "The true gallon volume must be positive." };
   const loose_volume_ft3 = container_count * filled_volume_in3 / CU_IN_PER_CU_FT;
   const ordered_volume_ft3 = loose_volume_ft3 * (1 + allowance_pct / 100);
@@ -784,16 +784,16 @@ export function computeSubstrateContainerVolume({ container_count = 0, filled_vo
     ordered_volume_yd3: ordered_volume_ft3 / CU_FT_PER_CU_YD,
     order_yd3: Math.ceil(ordered_volume_ft3 / CU_FT_PER_CU_YD),
     bale_count, label_bale_count,
-    bales_the_label_misses: bale_count - label_bale_count,
+    bales_the_label_overorders: label_bale_count - bale_count,
     true_gallon_volume_ft3,
     true_gallon_volume_yd3: true_gallon_volume_ft3 / CU_FT_PER_CU_YD,
     true_gallon_over_pct: 100 * (true_gallon_volume_ft3 - ordered_volume_ft3) / ordered_volume_ft3,
     true_gallon_excess_yd3: (true_gallon_volume_ft3 - ordered_volume_ft3) / CU_FT_PER_CU_YD,
-    note: "A nursery 'trade gallon' is not a US gallon -- a #1 container holds roughly 160 cubic inches filled against a true gallon's 231 -- and a compressed bale's label describes the bale in the truck rather than the media on the bench. THE TWO ERRORS PUSH IN OPPOSITE DIRECTIONS, so a yard that makes both at once may arrive at roughly the right number for entirely the wrong reasons, which is worse than either alone because it hides on the next order. Filled volume varies with the container and how it is filled; the supplier's own loose-yield figure and a measured fill govern.",
+    note: "A nursery 'trade gallon' is not a US gallon -- a #1 container holds roughly 160 cubic inches filled against a true gallon's 231 -- and a compressed bale's label is the bale still compressed -- it opens to about twice that. BOTH ERRORS OVER-ORDER, so a yard that makes both buys roughly twice the bales and half again the bulk the bench needs. Filled volume varies with the container and how it is filled; the supplier's own loose-yield figure and a measured fill govern.",
   };
 }
 
-const substrateExample = { container_count: 5000, filled_volume_in3: 160, allowance_pct: 10, bale_label_ft3: 3.8, bale_loose_yield_ft3: 2.8, true_gallon_in3: 231 };
+const substrateExample = { container_count: 5000, filled_volume_in3: 160, allowance_pct: 10, bale_label_ft3: 3.8, bale_loose_yield_ft3: 8, true_gallon_in3: 231 };
 GREENHOUSE_RENDERERS["substrate-container-volume"] = _simpleRenderer({
   citation: "Citation: loose volume = containers x filled volume per container, converted at 1,728 cubic inches per cubic foot and 27 cubic feet per cubic yard, plus a compaction and spill allowance. A compressed bale's loose yield, not its label volume, is what fills containers. The supplier's own loose-yield figure and a measured container fill govern.",
   example: substrateExample,
@@ -809,7 +809,7 @@ GREENHOUSE_RENDERERS["substrate-container-volume"] = _simpleRenderer({
     { key: "loose_volume_ft3", id: "scv-loose", label: "Loose volume", value: (r) => fmt(r.loose_volume_ft3, 1) + " cu ft = " + fmt(r.loose_volume_yd3, 2) + " cu yd" },
     { key: "ordered_volume_ft3", id: "scv-order", label: "With the allowance", value: (r) => fmt(r.ordered_volume_ft3, 1) + " cu ft = " + fmt(r.ordered_volume_yd3, 2) + " cu yd -- order " + fmt(r.order_yd3, 0) + " cu yd bulk" },
     { key: "bale_count", id: "scv-bales", label: "Compressed bales", value: (r) => fmt(r.bale_count, 0) + " bales at the loose yield" },
-    { key: "label_bale_count", id: "scv-label", label: "What the label volume would order", value: (r) => fmt(r.label_bale_count, 0) + " bales -- " + fmt(r.bales_the_label_misses, 0) + " short, because the label describes the bale in the truck" },
+    { key: "label_bale_count", id: "scv-label", label: "What the label volume would order", value: (r) => fmt(r.label_bale_count, 0) + " bales -- " + fmt(r.bales_the_label_overorders, 0) + " too many, because the label is the bale still compressed" },
     { key: "true_gallon_volume_yd3", id: "scv-gal", label: "The trade-gallon mistake", value: (r) => fmt(r.true_gallon_volume_yd3, 2) + " cu yd -- " + fmt(r.true_gallon_over_pct, 0) + "% over, " + fmt(r.true_gallon_excess_yd3, 1) + " cu yd with nowhere to go" },
     { key: "note", id: "scv-note", label: "Use", value: (r) => r.note },
   ],

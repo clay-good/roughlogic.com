@@ -6,6 +6,7 @@
 
 import { test } from "node:test";
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 import {
   computeAnodeBedResistance, computeCpRectifierSizing, computePipelinePotentialAttenuation,
   computeInstantOffIrDrop, computeCoatingBreakdownFactor, computeStrayCurrentBond,
@@ -176,4 +177,20 @@ test("coke breeze: the column is the anode plus the backfill", () => {
   assert.ok(r.bag_count_with_waste >= r.bag_count);
   // Doubling the depth buys more than widening the hole by a quarter.
   assert.ok(Math.abs(r.deeper_change_pct) > Math.abs(r.wider_change_pct));
+});
+
+test("floating point: exactly 100 mV of polarization meets the 100 mV criterion, and counts do not lose one", () => {
+  // -0.650 - -0.750 V is 99.99999999999997 mV unrounded, which failed the
+  // criterion UFC 3-570-06 2-1.2.4.3 says it meets ("a minimum of 100 mV").
+  const W = JSON.parse(readFileSync(new URL("../fixtures/worked-examples.json", import.meta.url), "utf8")).rows;
+  const ex = (id) => W.find((r) => r.tile_id === id).inputs;
+  const ir = computeInstantOffIrDrop({ ...ex("instant-off-ir-drop"), native_potential_v: -0.65, instant_off_potential_v: -0.75, on_potential_v: -0.9 });
+  assert.equal(ir.polarization_mv, 100);
+  assert.equal(ir.meets_polarization_criterion, true);
+  const pd = computePolarizationDecayCriterion({ ...ex("polarization-decay-criterion"), native_potential_v: -0.65, instant_off_potential_v: -0.75, on_potential_v: -0.9, depolarized_potential_v: -0.65 });
+  assert.equal(pd.formation_passes, true);
+  assert.equal(pd.decay_passes, true);
+  // 1.2 mi at 0.4 mi is 4 test stations, and 0.7 mi at 3.5 ft is 1,056 readings.
+  assert.equal(computeCloseIntervalSurveyReadings({ ...ex("close-interval-survey-readings"), survey_length_mi: 1.2, test_station_spacing_mi: 0.4 }).test_station_readings, 4);
+  assert.equal(computeCloseIntervalSurveyReadings({ ...ex("close-interval-survey-readings"), survey_length_mi: 0.7, reading_interval_ft: 3.5 }).reading_count, 1056);
 });

@@ -129714,9 +129714,9 @@
    "outputs": { "tile_airflow_cfm": { "value": 626.881657492066, "tolerance": { "pct": 0.5 } }, "high_flow_airflow_cfm": { "value": 1404.2149127822279, "tolerance": { "pct": 0.5 } }, "reduced_pressure_airflow_cfm": { "value": 396.4747722112972, "tolerance": { "pct": 0.5 } }, "required_plenum_pressure_in_wc": { "value": 0.052114530204718436, "tolerance": { "pct": 0.5 } }, "increased_count_pressure_change_pct": { "value": -43.75000000000001, "tolerance": { "pct": 0.5 } } }
   },
   {
-   "tile_id": "pallet-rack-beam-capacity", "source_publisher": "Project (first-principles)", "source_title": "Pallet Rack Beam Load and Deflection -- the spec-v1809 worked example, recomputed", "source_edition_or_year": "spec-v1809 of scope-trade-expansion-3, 2026-09-17", "source_section_or_page": "ANSI MH16.1 and the manufacturer's span capacity govern", "verified_by": "rl", "verified_on": "2026-09-17",
+   "tile_id": "pallet-rack-beam-capacity", "source_publisher": "Project (first-principles)", "source_title": "Pallet Rack Beam Load and Deflection -- the spec-v1809 worked example, recomputed", "source_edition_or_year": "spec-v1809 of scope-trade-expansion-3, 2026-09-17", "source_section_or_page": "ANSI MH16.1 and the manufacturer's span capacity govern; recomputed 2026-10-01 with ANSI MH16.1's 25% impact load in the stress check", "verified_by": "rl", "verified_on": "2026-09-17",
    "inputs": {"span_in":108,"pallet_weight_lb":2500,"pallets_per_level":2,"moment_of_inertia_in4":2.5,"section_modulus_in3":1.111,"yield_strength_psi":55000,"deflection_limit_ratio":180},
-   "outputs": {"moment_in_lb":{"value":33750,"tolerance":{"pct":0.5}},"bending_stress_psi":{"value":30378.03780378038,"tolerance":{"pct":0.5}},"allowable_stress_psi":{"value":32934.13173652695,"tolerance":{"pct":0.5}},"stress_ratio":{"value":0.922387693314786,"tolerance":{"pct":0.5}},"deflection_in":{"value":0.6221637931034483,"tolerance":{"pct":0.5}},"deflection_limit_in":{"value":0.6,"tolerance":{"pct":0.5}},"required_moment_of_inertia_in4":{"value":2.592349137931035,"tolerance":{"pct":0.5}}}
+   "outputs": {"moment_in_lb":{"value":33750,"tolerance":{"pct":0.5}},"bending_stress_psi":{"value":32428.555355535555,"tolerance":{"pct":0.5}},"allowable_stress_psi":{"value":32934.13173652695,"tolerance":{"pct":0.5}},"stress_ratio":{"value":0.984648862613534,"tolerance":{"pct":0.5}},"deflection_in":{"value":0.6221637931034483,"tolerance":{"pct":0.5}},"deflection_limit_in":{"value":0.6,"tolerance":{"pct":0.5}},"required_moment_of_inertia_in4":{"value":2.592349137931035,"tolerance":{"pct":0.5}}}
   },
   {
    "tile_id": "rack-upright-capacity-derate", "source_publisher": "Project (first-principles)", "source_title": "Rack Upright Frame Capacity and Unbraced Length -- the spec-v1810 worked example, recomputed", "source_edition_or_year": "spec-v1810 of scope-trade-expansion-3, 2026-09-17", "source_section_or_page": "ANSI MH16.1 requires tested capacities", "verified_by": "rl", "verified_on": "2026-09-17",
@@ -129724,14 +129724,14 @@
    "outputs": {"load_per_column_lb":{"value":7500,"tolerance":{"pct":0.5}},"load_per_frame_lb":{"value":15000,"tolerance":{"pct":0.5}},"utilization_pct":{"value":62.5,"tolerance":{"pct":0.5}},"euler_capacity_lb":{"value":74536.07490406025,"tolerance":{"pct":0.5}},"euler_capacity_level_removed_lb":{"value":18634.018726015063,"tolerance":{"pct":0.5}},"removed_capacity_loss_pct":{"value":75,"tolerance":{"pct":0.5}}}
   },
   {
-   "tile_id": "rack-base-plate-anchorage", "source_publisher": "Project (first-principles)", "source_title": "Pallet Rack Base Plate Anchorage and Overturning -- the spec-v1811 worked example, recomputed", "source_edition_or_year": "spec-v1811 of scope-trade-expansion-3, 2026-09-17", "source_section_or_page": "ANSI MH16.1, the building code, and the anchor evaluation report govern", "verified_by": "rl", "verified_on": "2026-09-17",
+   "tile_id": "rack-base-plate-anchorage", "source_publisher": "Project (first-principles)", "source_title": "Pallet Rack Base Plate Anchorage and Overturning -- the spec-v1811 worked example, recomputed", "source_edition_or_year": "spec-v1811 of scope-trade-expansion-3, 2026-09-17", "source_section_or_page": "ANSI MH16.1, the building code, and the anchor evaluation report govern; recomputed 2026-10-01 with MH16.1's 0.6 dead-load factor on uplift", "verified_by": "rl", "verified_on": "2026-09-17",
    "inputs": {"frame_weight_lb":15000,"frame_depth_in":42,"top_beam_height_ft":20,"lateral_force_coefficient":0.2,"effective_height_fraction":0.666667,"allowable_anchor_tension_lb":1800,"base_plate_holes":2,"improved_anchor_tension_lb":2800},
-   "outputs": {"lateral_force_lb":{"value":3000,"tolerance":{"pct":0.5}},"overturning_moment_ftlb":{"value":40000.02,"tolerance":{"pct":0.5}},"resisting_moment_ftlb":{"value":26250,"tolerance":{"pct":0.5}},"net_uplift_lb":{"value":3928.577142857142,"tolerance":{"pct":0.5}},"anchors_required":{"value":3,"tolerance":{"pct":0.5}},"anchors_required_improved":{"value":2,"tolerance":{"pct":0.5}},"arm_ratio":{"value":7.619051428571429,"tolerance":{"pct":0.5}}}
+   "outputs": {"lateral_force_lb":{"value":3000,"tolerance":{"pct":0.5}},"overturning_moment_ftlb":{"value":40000.02,"tolerance":{"pct":0.5}},"resisting_moment_ftlb":{"value":15750,"tolerance":{"pct":0.5}},"net_uplift_lb":{"value":6928.577142857142,"tolerance":{"pct":0.5}},"anchors_required":{"value":4,"tolerance":{"pct":0.5}},"anchors_required_improved":{"value":3,"tolerance":{"pct":0.5}},"arm_ratio":{"value":7.619051428571429,"tolerance":{"pct":0.5}}}
   },
   {
-   "tile_id": "rack-flue-space", "source_publisher": "Project (first-principles)", "source_title": "Rack Storage Flue Space and Beam Length -- the spec-v1815 worked example, recomputed", "source_edition_or_year": "spec-v1815 of scope-trade-expansion-3, 2026-09-17", "source_section_or_page": "NFPA 13 as adopted and the AHJ govern", "verified_by": "rl", "verified_on": "2026-09-17",
+   "tile_id": "rack-flue-space", "source_publisher": "Project (first-principles)", "source_title": "Rack Storage Flue Space and Beam Length -- the spec-v1815 worked example, recomputed", "source_edition_or_year": "spec-v1815 of scope-trade-expansion-3, 2026-09-17", "source_section_or_page": "NFPA 13 as adopted and the AHJ govern; recomputed 2026-10-01 with the end gaps as half-flues at the uprights", "verified_by": "rl", "verified_on": "2026-09-17",
    "inputs": {"pallet_width_in":48,"pallet_depth_in":48,"pallets_per_bay":2,"transverse_gaps":3,"nominal_flue_in":6,"beam_length_in":108,"frame_depth_in":42,"back_to_back_spacing_in":12,"deeper_load_depth_in":52},
-   "outputs": {"transverse_gap_each_in":{"value":4,"tolerance":{"pct":0.5}},"required_beam_length_in":{"value":114,"tolerance":{"pct":0.5}},"beam_shortfall_in":{"value":6,"tolerance":{"pct":0.5}},"pallet_overhang_in":{"value":3,"tolerance":{"pct":0.5}},"longitudinal_flue_in":{"value":6,"tolerance":{"pct":0.5}},"deeper_load_longitudinal_flue_in":{"value":2,"tolerance":{"pct":0.5}},"deeper_load_flue_share_pct":{"value":33.333333333333336,"tolerance":{"pct":0.5}}}
+   "outputs": {"transverse_gap_each_in":{"value":6,"tolerance":{"pct":0.5}},"required_beam_length_in":{"value":108,"tolerance":{"pct":0.5}},"beam_shortfall_in":{"value":0,"tolerance":{"pct":0.5}},"pallet_overhang_in":{"value":3,"tolerance":{"pct":0.5}},"longitudinal_flue_in":{"value":6,"tolerance":{"pct":0.5}},"deeper_load_longitudinal_flue_in":{"value":2,"tolerance":{"pct":0.5}},"deeper_load_flue_share_pct":{"value":33.333333333333336,"tolerance":{"pct":0.5}}}
   },
   {
    "tile_id": "stacking-aisle-width", "source_publisher": "Project (first-principles)", "source_title": "Right-Angle Stacking Aisle Width -- the spec-v1812 worked example, recomputed", "source_edition_or_year": "spec-v1812 of scope-trade-expansion-3, 2026-09-17", "source_section_or_page": "truck manufacturer stack data and the fire code govern", "verified_by": "rl", "verified_on": "2026-09-17",
@@ -130125,9 +130125,9 @@
    "outputs": {"usable_per_tray":{"value":251.712,"tolerance":{"pct":0.5}},"trays_to_sow":{"value":48,"tolerance":{"pct":0.5}},"cells_sown":{"value":13824,"tolerance":{"pct":0.5}},"finished_yield":{"value":12082.176,"tolerance":{"pct":0.5}},"surplus":{"value":82.17599999999948,"tolerance":{"pct":0.5}},"surplus_pct":{"value":0.6847999999999956,"tolerance":{"pct":0.5}},"bench_area_sqft":{"value":76.80000000000001,"tolerance":{"pct":0.5}},"naive_trays":{"value":42,"tolerance":{"pct":0.5}},"naive_yield":{"value":10571.904,"tolerance":{"pct":0.5}},"naive_shortfall":{"value":1428.0959999999995,"tolerance":{"pct":0.5}}}
   },
   {
-   "tile_id": "substrate-container-volume", "source_publisher": "Project (first-principles)", "source_title": "Substrate and Container Volume Takeoff -- the spec-v1760 worked example, recomputed", "source_edition_or_year": "spec-v1760 of scope-trade-expansion-3, 2026-09-18", "source_section_or_page": "the supplier's loose yield and a measured fill govern", "verified_by": "rl", "verified_on": "2026-09-18",
-   "inputs": {"container_count":5000,"filled_volume_in3":160,"allowance_pct":10,"bale_label_ft3":3.8,"bale_loose_yield_ft3":2.8,"true_gallon_in3":231},
-   "outputs": {"loose_volume_ft3":{"value":462.962962962963,"tolerance":{"pct":0.5}},"loose_volume_yd3":{"value":17.146776406035666,"tolerance":{"pct":0.5}},"ordered_volume_ft3":{"value":509.25925925925935,"tolerance":{"pct":0.5}},"ordered_volume_yd3":{"value":18.861454046639235,"tolerance":{"pct":0.5}},"bale_count":{"value":182,"tolerance":{"pct":0.5}},"label_bale_count":{"value":135,"tolerance":{"pct":0.5}},"true_gallon_volume_yd3":{"value":27.231224279835395,"tolerance":{"pct":0.5}},"true_gallon_over_pct":{"value":44.37499999999999,"tolerance":{"pct":0.5}}}
+   "tile_id": "substrate-container-volume", "source_publisher": "Project (first-principles)", "source_title": "Substrate and Container Volume Takeoff -- the spec-v1760 worked example, recomputed", "source_edition_or_year": "spec-v1760 of scope-trade-expansion-3, 2026-09-18", "source_section_or_page": "the supplier's loose yield and a measured fill govern; recomputed 2026-10-01 with the bale expanding (Colorado Materials: 3.8 cu ft opens to about 8)", "verified_by": "rl", "verified_on": "2026-09-18",
+   "inputs": {"container_count":5000,"filled_volume_in3":160,"allowance_pct":10,"bale_label_ft3":3.8,"bale_loose_yield_ft3":8,"true_gallon_in3":231},
+   "outputs": {"loose_volume_ft3":{"value":462.962962962963,"tolerance":{"pct":0.5}},"loose_volume_yd3":{"value":17.146776406035666,"tolerance":{"pct":0.5}},"ordered_volume_ft3":{"value":509.25925925925935,"tolerance":{"pct":0.5}},"ordered_volume_yd3":{"value":18.861454046639235,"tolerance":{"pct":0.5}},"bale_count":{"value":64,"tolerance":{"pct":0.5}},"label_bale_count":{"value":135,"tolerance":{"pct":0.5}},"true_gallon_volume_yd3":{"value":27.231224279835395,"tolerance":{"pct":0.5}},"true_gallon_over_pct":{"value":44.37499999999999,"tolerance":{"pct":0.5}}}
   },
   {
    "tile_id": "photoperiod-blackout-schedule", "source_publisher": "Project (first-principles)", "source_title": "Photoperiod Blackout and Night Interruption -- the spec-v1761 worked example, recomputed", "source_edition_or_year": "spec-v1761 of scope-trade-expansion-3, 2026-09-18", "source_section_or_page": "the crop's critical photoperiod governs", "verified_by": "rl", "verified_on": "2026-09-18",
@@ -138044,6 +138044,509 @@
      "value": 15751.3,
      "tolerance": {
       "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "dock-door-count-throughput",
+   "source_publisher": "4Front Engineered Solutions (Kelley)",
+   "source_title": "Kelley Dock Planning Standards",
+   "source_edition_or_year": "undated planning guide (PDF created 1999, file modified 2025-01-10); retrieved 2026-10-01 from kelleydocksolutions.com",
+   "source_section_or_page": "page 8, 'Calculating the Number of Dock Positions': 20 trucks per 8 h day = 2.5 trucks/h, 50 min = 0.833 h, 2.5 x 0.833 = 2.08 positions, 'provide three positions'; all 20 in the morning (4 h) = 4.17, 'or 5, positions'. Printed to 2 decimals and rounded up. Kelley applies no practical-utilization factor, so utilization_pct = 100 represents its method; improved_turn_time_min = 40 is a placeholder (no improved-turn output is checked).",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "trucks_per_day": 20,
+    "operating_hours": 8,
+    "turn_time_min": 50,
+    "utilization_pct": 100,
+    "peak_arrival_share_pct": 100,
+    "peak_window_hours": 4,
+    "improved_turn_time_min": 40
+   },
+   "outputs": {
+    "doors_at_full_utilization": {
+     "value": 2.08,
+     "tolerance": {
+      "abs": 0.005
+     }
+    },
+    "doors_required": {
+     "value": 3,
+     "tolerance": {
+      "abs": 0
+     }
+    },
+    "peak_doors_at_full_utilization": {
+     "value": 4.17,
+     "tolerance": {
+      "abs": 0.005
+     }
+    },
+    "peak_doors_required": {
+     "value": 5,
+     "tolerance": {
+      "abs": 0
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "dock-door-count-throughput",
+   "source_publisher": "W.B. McGuire (a division of Systems, LLC)",
+   "source_title": "Loading Dock Guide to Dock Design & Construction",
+   "source_edition_or_year": "2021 (footer dated 8-11-2021)",
+   "source_section_or_page": "Site Design - Phase 1, 'Calculating Number of Dock Positions': 48 trucks in 8 h = 6 trucks/h, 45 min = 0.75 h, 6 x 0.75 = 4.5 dock positions (printed unrounded). Only doors_at_full_utilization is checked; utilization_pct, the peak share/window, and the improved turn time are placeholders (McGuire states no utilization factor and no rounded door count).",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "trucks_per_day": 48,
+    "operating_hours": 8,
+    "turn_time_min": 45,
+    "utilization_pct": 65,
+    "peak_arrival_share_pct": 40,
+    "peak_window_hours": 3,
+    "improved_turn_time_min": 40
+   },
+   "outputs": {
+    "doors_at_full_utilization": {
+     "value": 4.5,
+     "tolerance": {
+      "abs": 0.0001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "rack-flue-space",
+   "source_publisher": "Apex Warehouse Systems",
+   "source_title": "Fire Safety: What You Need to Know About Transverse and Longitudinal Pallet Rack Flue Space",
+   "source_edition_or_year": "web article, retrieved 2026-10-01",
+   "source_section_or_page": "Transverse: the 92 in beam with two 40 in loads complies laid out with 6 in between the loads and 3 in at each upright (the end gaps pair with the next bay's), so the flue width is 6 in and the required beam 92 in; the article's evenly spaced 4/4/4 layout does not comply. Longitudinal: 42 in deep upright, 48 in deep loads, 3 in overhang front and rear, 3 in x 2 + 6 in flue = 12 in between rows. deeper_load_depth_in = 52 is a placeholder (no deeper-load output is checked).",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "pallet_width_in": 40,
+    "pallet_depth_in": 48,
+    "pallets_per_bay": 2,
+    "transverse_gaps": 3,
+    "nominal_flue_in": 6,
+    "beam_length_in": 92,
+    "frame_depth_in": 42,
+    "back_to_back_spacing_in": 12,
+    "deeper_load_depth_in": 52
+   },
+   "outputs": {
+    "transverse_gap_each_in": {
+     "value": 6,
+     "tolerance": {
+      "abs": 0.0001
+     }
+    },
+    "required_beam_length_in": {
+     "value": 92,
+     "tolerance": {
+      "abs": 0.0001
+     }
+    },
+    "pallet_overhang_in": {
+     "value": 3,
+     "tolerance": {
+      "abs": 0.0001
+     }
+    },
+    "longitudinal_flue_in": {
+     "value": 6,
+     "tolerance": {
+      "abs": 0.0001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "stacking-aisle-width",
+   "source_publisher": "Toyota Material Handling (Toyota Forklifts)",
+   "source_title": "Calculating Forklift Aisle Width Minimums",
+   "source_edition_or_year": "blog post dated September 18, 2017; retrieved 2026-10-01",
+   "source_section_or_page": "Worked example: Toyota Core IC Cushion Forklift, Basic Right Angle Stack 86 in + 48 in load length + 12 in clearance = 146 in minimum aisle width (exact integers). Toyota's Basic Right Angle Stack is the truck's own turning envelope to the fork face, i.e. the tile's turning radius + load-face-to-turning-centre; only their sum (86) is printed, so the 72 + 14 split is a placeholder that does not affect the checked output. Reach, turret, rack depth, and building width inputs are placeholders.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "load_length_in": 48,
+    "operating_clearance_in": 12,
+    "counterbalanced_turning_radius_in": 72,
+    "counterbalanced_load_center_in": 14,
+    "reach_turning_radius_in": 55,
+    "reach_load_center_in": 8,
+    "turret_clearance_in": 12,
+    "rack_row_depth_in": 42,
+    "building_width_ft": 300
+   },
+   "outputs": {
+    "counterbalanced_aisle_in": {
+     "value": 146,
+     "tolerance": {
+      "abs": 0.0001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "warehouse-cube-utilization",
+   "source_publisher": "Modern Commercial Real Estate",
+   "source_title": "How Much Warehouse Space Do You Need?",
+   "source_edition_or_year": "web article, retrieved 2026-10-01",
+   "source_section_or_page": "Step Three example: 10,000 sq ft usable x 24 ft clear = 240,000 cu ft; 1000 pallets of 3.5 x 4 x 4 ft = 56 cu ft; 56,000 / 240,000 = 23.33% (printed to 2 decimals). Building entered as 100 x 100 ft; pallet as 42 x 48 x 48 in (= 56 cu ft). The rack layout (module pitch 240, row depth 42, run 90 ft, 10 bays x 5 levels x 2 pallets, beam pitch 56) is a placeholder chosen only so the position count equals the printed 1000; the publisher's pallets are not described as racked.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "building_width_ft": 100,
+    "building_depth_ft": 100,
+    "clear_height_ft": 24,
+    "module_pitch_in": 240,
+    "rack_row_depth_in": 42,
+    "rack_run_length_ft": 90,
+    "bays_per_row": 10,
+    "levels_per_bay": 5,
+    "pallets_per_bay_level": 2,
+    "pallet_width_in": 42,
+    "pallet_depth_in": 48,
+    "pallet_loaded_height_in": 48,
+    "beam_pitch_in": 56
+   },
+   "outputs": {
+    "building_cube_ft3": {
+     "value": 240000,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "pallet_positions": {
+     "value": 1000,
+     "tolerance": {
+      "abs": 0
+     }
+    },
+    "pallet_cube_ft3": {
+     "value": 56,
+     "tolerance": {
+      "abs": 0.0001
+     }
+    },
+    "occupied_cube_ft3": {
+     "value": 56000,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "cube_utilization_pct": {
+     "value": 23.33,
+     "tolerance": {
+      "abs": 0.005
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "rack-upright-capacity-derate",
+   "source_publisher": "Michigan State University (A. Varma, CE 405 Design of Steel Structures)",
+   "source_title": "CE 405 Chapter 3, Compression Member Design",
+   "source_edition_or_year": "course notes, retrieved 2026-10-01 from egr.msu.edu/~harichan/classes/ce405/chap3.pdf",
+   "source_section_or_page": "Example 3.1 and Sec. 3.3: W12x50, Iy = 56.3 in^4, E = 29000 ksi, Pcr-y = pi^2 x 29000 x 56.3 / (240)^2 = 279.8 kips; 'if the unsupported length was only 10 ft, Pcr ... 1119 kips'. Entered as beam spacing 120 in (the 10 ft case) so the tile's level-removed length is 240 in. Printed to 0.1 kip / 1 kip. CAUTION: the source's problem statement says the minor axis is pinned-fixed yet its equation uses KL = 240 in (K = 1); the arithmetic itself is correct and K = 1 is entered as printed in the equation. Loaded levels, load per level, and rated frame capacity are placeholders.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "beam_spacing_in": 120,
+    "column_moment_of_inertia_in4": 56.3,
+    "effective_length_factor": 1,
+    "loaded_levels": 3,
+    "load_per_level_lb": 5000,
+    "rated_frame_capacity_lb": 24000
+   },
+   "outputs": {
+    "euler_capacity_lb": {
+     "value": 1119000,
+     "tolerance": {
+      "abs": 500
+     }
+    },
+    "euler_capacity_level_removed_lb": {
+     "value": 279800,
+     "tolerance": {
+      "abs": 50
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "tank-bottom-anode-layout",
+   "source_publisher": "MATCOR, Inc.",
+   "source_title": "Technical bulletin: Cathodic Protection for New Construction Above Ground Storage Tanks (Appendix A, Tank Bottoms Calculations Sheet)",
+   "source_edition_or_year": "web technical paper, as archived 2024",
+   "source_section_or_page": "Appendix A calculation sheet: tank diameter 120 ft, current density 1 mA/sq ft, ambient (temperature factor 1); printed surface area 11,304 sq ft and current required 11.3 A. The printed area is 3.14 x 60^2 (pi rounded to 3.14), so the tile's 11,309.7 sq ft sits 0.05% above it; tolerance 0.1% covers that rounding, and 0.05 A covers the one-decimal current. MATCOR lays concentric rings, not the tile's parallel-chord grid, so no ribbon length or loading is compared: grid_spacing_ft 10 is MATCOR's printed ring spacing and ribbon_rating_ma_per_ft 16 its printed anode selection, both used here only as valid placeholders for the grid/ring outputs, which are not checked.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "tank_diameter_ft": 120,
+    "current_density_ma_per_sqft": 1,
+    "grid_spacing_ft": 10,
+    "ribbon_rating_ma_per_ft": 16
+   },
+   "outputs": {
+    "bottom_area_sqft": {
+     "value": 11304,
+     "tolerance": {
+      "pct": 0.1
+     }
+    },
+    "current_requirement_a": {
+     "value": 11.3,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "dry-hop-beer-loss",
+   "source_publisher": "Beer Alien",
+   "source_title": "Hop Extracts vs. Whole Cone & Pellets: Advanced Hop Guide",
+   "source_edition_or_year": "web article, retrieved 2026-10-01",
+   "source_section_or_page": "Pellet absorption section: a 30 bbl batch dry-hopped at 4 lb/bbl is 120 lb of pellets; at 0.6 gal absorbed per lb, 72 gal lost (~2.32 bbl). Batch entered as 30 x 31 = 930 gal; package_gal 31 (one barrel) so packages_lost reads in the publisher's barrels. revenue_per_package 0 and heavy_dry_hop_lb_per_bbl 4 are placeholders; heavy outputs are not checked. Tolerances cover whole-number gallons/pounds and the two-decimal barrel figure.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "batch_volume_gal": 930,
+    "dry_hop_lb_per_bbl": 4,
+    "absorption_gal_per_lb": 0.6,
+    "package_gal": 31,
+    "revenue_per_package": 0,
+    "heavy_dry_hop_lb_per_bbl": 4
+   },
+   "outputs": {
+    "hop_weight_lb": {
+     "value": 120,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "absorbed_gal": {
+     "value": 72,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "packages_lost": {
+     "value": 2.32,
+     "tolerance": {
+      "abs": 0.005
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "co2-enrichment-rate",
+   "source_publisher": "Cannabis Business Times (GIE Media), article by John W. Bartok Jr., UConn emeritus extension professor",
+   "source_title": "CO2 Enrichment for Cannabis",
+   "source_edition_or_year": "2017-08-30",
+   "source_section_or_page": "Section 'How much CO2 is needed': crop use 30 ft x 128 ft (3,840 sq ft) x 0.003 cu ft/hr per sq ft = 11.52 cu ft/hr; infiltration 46,080 cu ft x 0.5 changes/hr x 0.000001 x (1,000 - 410 ppm) = 13.59 cu ft/hr; total 25.1 cu ft/hr (printed to 0.1, tolerance abs 0.05). Crop use entered as the printed 11.52. Placeholders: gas_price_per_lb 0, vented_air_changes_per_hour 0.5 (set equal to the closed rate), enrichment_hours_per_day 10. The printed 3 lb/hr is NOT carried: it uses 8.5 cu ft/lb, the tile uses 0.1138 lb/cu ft (2.86 lb/hr).",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "house_volume_ft3": 46080,
+    "ambient_ppm": 410,
+    "target_ppm": 1000,
+    "air_changes_per_hour": 0.5,
+    "gas_price_per_lb": 0,
+    "vented_air_changes_per_hour": 0.5,
+    "floor_area_sqft": 3840,
+    "enrichment_hours_per_day": 10,
+    "crop_use_ft3_per_hour": 11.52
+   },
+   "outputs": {
+    "makeup_ft3_per_hour": {
+     "value": 25.1,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "radon-fan-static",
+   "source_publisher": "Florida Department of Health, Radon Certification training",
+   "source_title": "Radon Certification, Unit 4. Mitigation Systems",
+   "source_edition_or_year": "posted 2025-12 (floridahealth.gov wp-content/uploads/2025/12)",
+   "source_section_or_page": "pp. 4-33 to 4-34, Pipe Sizing: 40 cfm in 4 in pipe, A = 12.57 sq in / 144 = 0.0873 sq ft (4 dp; tolerance abs 0.00005), velocity = 40 / 0.0873 = 458 fpm (abs 0.5); 3 in pipe would have been 814 fpm (printed truncated, tile 814.9; abs 1). 136 ft equivalent length is the printed Table 4-4 total. The printed friction (0.12 in/100 ft x 136 = 0.16 in wc; 3 in ~0.6) is read off an ASHRAE galvanized-duct chart and is NOT carried (tile Darcy-Blasius gives 0.150 / 0.586). Placeholders: fan_static_in_wc 0, measured_vacuum_in_wc 0.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "flow_cfm": 40,
+    "pipe_diameter_in": 4,
+    "pipe_length_ft": 136,
+    "fan_static_in_wc": 0,
+    "measured_vacuum_in_wc": 0,
+    "alt_pipe_diameter_in": 3
+   },
+   "outputs": {
+    "area_ft2": {
+     "value": 0.0873,
+     "tolerance": {
+      "abs": 5e-05
+     }
+    },
+    "velocity_fpm": {
+     "value": 458,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "alt_velocity_fpm": {
+     "value": 814,
+     "tolerance": {
+      "abs": 1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "radon-fan-static",
+   "source_publisher": "Florida Department of Health, Radon Certification training",
+   "source_title": "Radon Certification, Unit 4. Mitigation Systems",
+   "source_edition_or_year": "posted 2025-12 (floridahealth.gov wp-content/uploads/2025/12)",
+   "source_section_or_page": "p. 4-33 rule of thumb: velocity should not exceed 700 ft per minute (61 cfm in a 4-inch pipe); the printed pair is run forward at the printed 61 cfm (61 is the printed rounding of 61.1, tolerance pct 0.2). Placeholders: pipe_length_ft 0, fan_static_in_wc 0, measured_vacuum_in_wc 0, alt_pipe_diameter_in 0.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "flow_cfm": 61,
+    "pipe_diameter_in": 4,
+    "pipe_length_ft": 0,
+    "fan_static_in_wc": 0,
+    "measured_vacuum_in_wc": 0,
+    "alt_pipe_diameter_in": 0
+   },
+   "outputs": {
+    "velocity_fpm": {
+     "value": 700,
+     "tolerance": {
+      "pct": 0.2
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "lab-containment-pressure",
+   "source_publisher": "Siemens Industry, Inc.",
+   "source_title": "Laboratory Ventilation Codes and Standards (125-1937)",
+   "source_edition_or_year": "Rev. FA, January 2013",
+   "source_section_or_page": "Applicable Definitions, 'Air Changes per Hour (ACH)': 12 x 20 x 10 ft room = 2,400 cu ft; 2,400 cu ft/h / 60 = 40 cfm per ACH; 8 ACH = 40 x 8 = 320 cfm (exact). Placeholders: hood_exhaust_cfm, general_exhaust_cfm, supply_cfm, hood_sash_closed_cfm, supply_drift_pct all 0.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "room_volume_ft3": 2400,
+    "required_ach": 8,
+    "hood_exhaust_cfm": 0,
+    "general_exhaust_cfm": 0,
+    "supply_cfm": 0,
+    "hood_sash_closed_cfm": 0,
+    "supply_drift_pct": 0
+   },
+   "outputs": {
+    "ach_airflow_cfm": {
+     "value": 320,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "lab-containment-pressure",
+   "source_publisher": "USPTO (US 11,460,203 B2, Measured Air Performance LLC, inventor Eric Desrochers)",
+   "source_title": "Exhaust demand control system and methods",
+   "source_edition_or_year": "published 2022-10-04 (priority 2017-11-06)",
+   "source_section_or_page": "Background, room/volumetric offset example: 500 CFM supplied, 200 CFM fume hood exhaust, 400 CFM general exhaust; offset printed as -100 CFM (supply minus exhaust) with 'air will flow at a rate of 100 CFM from the corridor', i.e. 100 cfm in the tile's exhaust-minus-supply sign (exact). Placeholders: room_volume_ft3 1 and required_ach 1 (positive-required, not printed), hood_sash_closed_cfm 0, supply_drift_pct 0.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "room_volume_ft3": 1,
+    "required_ach": 1,
+    "hood_exhaust_cfm": 200,
+    "general_exhaust_cfm": 400,
+    "supply_cfm": 500,
+    "hood_sash_closed_cfm": 0,
+    "supply_drift_pct": 0
+   },
+   "outputs": {
+    "offset_cfm": {
+     "value": 100,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "acid-waste-neutralization",
+   "source_publisher": "Burt Process Equipment",
+   "source_title": "What is a pH Neutralization System? (Defining pH Neutralization Systems)",
+   "source_edition_or_year": "web page, archived 2024 (web.archive.org/web/2024id_)",
+   "source_section_or_page": "Continuous Flow pH Systems: designed for 20-30 min retention; 'a 100 gpm flow would require 100 gpm x 25 minutes = 2500 gallon tank' (exact); tank 2,500 gal entered so turnover reads back the printed 25 min. Placeholders: slug_volume_gal 0, measured_ph 0; pH window left at tile defaults 5.5/10 (not printed).",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "peak_flow_gpm": 100,
+    "retention_minutes": 25,
+    "slug_volume_gal": 0,
+    "tank_volume_gal": 2500,
+    "discharge_ph_min": 5.5,
+    "discharge_ph_max": 10,
+    "measured_ph": 0
+   },
+   "outputs": {
+    "required_volume_gal": {
+     "value": 2500,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "turnover_minutes": {
+     "value": 25,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "acid-waste-neutralization",
+   "source_publisher": "Burt Process Equipment",
+   "source_title": "What is a pH Neutralization System? (Defining pH Neutralization Systems)",
+   "source_edition_or_year": "web page, archived 2024 (web.archive.org/web/2024id_)",
+   "source_section_or_page": "Continuous Flow pH Systems, dual-stage variant of the same 100 gpm example: 'two 1250 gallon tanks, each with a 12.5 minute retention time' (exact; one stage entered). Placeholders: slug_volume_gal 0, measured_ph 0; pH window at tile defaults.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-01",
+   "inputs": {
+    "peak_flow_gpm": 100,
+    "retention_minutes": 12.5,
+    "slug_volume_gal": 0,
+    "tank_volume_gal": 1250,
+    "discharge_ph_min": 5.5,
+    "discharge_ph_max": 10,
+    "measured_ph": 0
+   },
+   "outputs": {
+    "required_volume_gal": {
+     "value": 1250,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "turnover_minutes": {
+     "value": 12.5,
+     "tolerance": {
+      "abs": 0.05
      }
     }
    }
