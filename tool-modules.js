@@ -1884,5 +1884,10 @@ export const TOOL_MODULES = (() => {
     "flood-debris-impact", "flood-uplift-cover-slab", "basement-flood-pumpdown",
     "roof-snow-ice-weight", "storm-panel-plywood", "manufactured-home-anchor-count",
   ]);
+  // spec-v1913..v1917: disaster response debris management band.
+  declare("./calc-debris.js", "DEBRIS_RENDERERS", [
+    "hurricane-debris-estimate", "structure-debris-estimate", "debris-management-site-sizing",
+    "debris-load-ticket", "hazard-tree-stump-screen",
+  ]);
   return map;
 })();

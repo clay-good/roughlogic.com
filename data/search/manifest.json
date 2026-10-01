@@ -9,7 +9,7 @@
     {
       "file": "aliases.json",
       "name": "Search aliases master (authoring source; runtime loads the per-group aliases-<letter>.json shards)",
-      "gzip_size_bytes": 332530
+      "gzip_size_bytes": 332881
     },
     {
       "file": "aliases-a.json",
@@ -34,7 +34,7 @@
     {
       "file": "aliases-e.json",
       "name": "Search aliases, group E runtime shard (generated from aliases.json)",
-      "gzip_size_bytes": 85678
+      "gzip_size_bytes": 85882
     },
     {
       "file": "aliases-f.json",
@@ -54,7 +54,7 @@
     {
       "file": "aliases-j.json",
       "name": "Search aliases, group J runtime shard (generated from aliases.json)",
-      "gzip_size_bytes": 7314
+      "gzip_size_bytes": 7393
     },
     {
       "file": "aliases-k.json",
@@ -64,7 +64,7 @@
     {
       "file": "aliases-l.json",
       "name": "Search aliases, group L runtime shard (generated from aliases.json)",
-      "gzip_size_bytes": 14707
+      "gzip_size_bytes": 14788
     },
     {
       "file": "aliases-m.json",
@@ -128,18 +128,18 @@
     }
   ],
   "hashes": {
-    "aliases.json": "e5671532e33734bc535ad8174d1457f9296b6793b431f1c921346b82d920d6dd",
+    "aliases.json": "db4c561dccd4af07e34fae44e322f4eea188c8768afe86aab3484cd100a02d2d",
     "aliases-a.json": "6088f18f21b5b05f3e9d2c2761b5a43df317567c4f554e5a00f297f040130fb0",
     "aliases-b.json": "d8a4ade3fc936a0ae1f6cb21a9ba0926f3502b56fda08de1b6b0545a994ac1ba",
     "aliases-c.json": "8ec9a8bbeb87e42446e7e4b58a1bc2b2fb8ee991b031cb4ae9b7b74cb130b6ee",
     "aliases-d.json": "1d34f4d7356d4b6a722695dfc0b6bb9b4e114de57ca4b2af73e9072ef4a92dff",
-    "aliases-e.json": "012bee8f587fdfa033d22f00bc3efb90f4d8dd35fd33cb7dd801d3ef9522f53a",
+    "aliases-e.json": "2b4a4c7c4f5ceb3c0222a883795a5a53c895c8f519411ee573f61fa1cabfc413",
     "aliases-f.json": "7005e335a42f1eda305d202405fa5d62125c44dd666bfc2138291393bf5cf984",
     "aliases-g.json": "ff67dba067cd0bc9cd430d0227934151e6b3a35f41173eec76533860b766b637",
     "aliases-h.json": "524289408a182bcf2c84dc9c2a279946a114495d11410e363cfd891e6844d812",
-    "aliases-j.json": "cad8a40f5ac19a77ad171861f803c46f520ceafc149107b7824ea70f16149f79",
+    "aliases-j.json": "36178862e0ceeb4c28d40c699f0a56ce5315b63060f5fe8e94883d883fb69ee5",
     "aliases-k.json": "08dee6bcedcae8651cdb4d6cd4c4e2afb2056761d6e53f960be12dd725c7c8c1",
-    "aliases-l.json": "4eeefd58bd92a6783df310227162bd93b4c573978d0149de23508d811926475f",
+    "aliases-l.json": "70f2dc2dbe1685c83b8c6994bbda9cf3ef4d9ac0cdde0a8732445ea6bcf76ea8",
     "aliases-m.json": "b11940c83f004f52c9201b7d197b96ca0080e9e4221a320f62b87e30741db920",
     "aliases-n.json": "f2cb6900bfd85806cd5ad61e150845e0a6850e283e905648b1bccc50f453adab",
     "aliases-o.json": "85fc5cb8b55d531922391400c05b730ca160950d48329bd8d494e5d17761bdf8",

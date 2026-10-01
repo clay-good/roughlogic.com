@@ -6339,6 +6339,21 @@
     {"term":"manufactured home anchor spacing","target":"manufactured-home-anchor-count","kind":"industry"},
     {"term":"how many anchors mobile home","target":"manufactured-home-anchor-count","kind":"industry"},
     {"term":"hud tie down wind zone","target":"manufactured-home-anchor-count","kind":"industry"},
-    {"term":"fema temporary housing unit anchoring","target":"manufactured-home-anchor-count","kind":"industry"}
+    {"term":"fema temporary housing unit anchoring","target":"manufactured-home-anchor-count","kind":"industry"},
+    {"term":"hurricane debris estimate","target":"hurricane-debris-estimate","kind":"industry"},
+    {"term":"usace debris model","target":"hurricane-debris-estimate","kind":"industry"},
+    {"term":"how much debris from hurricane","target":"hurricane-debris-estimate","kind":"industry"},
+    {"term":"debris cubic yards per household","target":"hurricane-debris-estimate","kind":"industry"},
+    {"term":"fema debris forecast","target":"hurricane-debris-estimate","kind":"industry"},
+    {"term":"house debris cubic yards","target":"structure-debris-estimate","kind":"industry"},
+    {"term":"destroyed home debris volume","target":"structure-debris-estimate","kind":"industry"},
+    {"term":"mobile home debris","target":"structure-debris-estimate","kind":"industry"},
+    {"term":"flooded house contents debris","target":"structure-debris-estimate","kind":"industry"},
+    {"term":"fema debris estimating field guide","target":"structure-debris-estimate","kind":"industry"},
+    {"term":"debris site acreage","target":"debris-management-site-sizing","kind":"industry"},
+    {"term":"temporary debris storage and reduction site","target":"debris-management-site-sizing","kind":"industry"},
+    {"term":"tdsrs sizing","target":"debris-management-site-sizing","kind":"industry"},
+    {"term":"debris grinding time","target":"debris-management-site-sizing","kind":"industry"},
+    {"term":"debris burn volume reduction","target":"debris-management-site-sizing","kind":"industry"}
   ]
 }

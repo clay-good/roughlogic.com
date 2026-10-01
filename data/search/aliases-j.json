@@ -480,6 +480,11 @@
     {"term":"generator refueling schedule","target":"generator-fleet-fuel-resupply","kind":"industry"},
     {"term":"diesel delivery trips generators","target":"generator-fleet-fuel-resupply","kind":"industry"},
     {"term":"emergency generator fuel logistics","target":"generator-fleet-fuel-resupply","kind":"industry"},
-    {"term":"usace generator fuel rule of thumb","target":"generator-fleet-fuel-resupply","kind":"industry"}
+    {"term":"usace generator fuel rule of thumb","target":"generator-fleet-fuel-resupply","kind":"industry"},
+    {"term":"debris load ticket","target":"debris-load-ticket","kind":"industry"},
+    {"term":"truck certification cubic yards","target":"debris-load-ticket","kind":"industry"},
+    {"term":"debris monitor load call","target":"debris-load-ticket","kind":"industry"},
+    {"term":"fema debris truck capacity","target":"debris-load-ticket","kind":"industry"},
+    {"term":"hand loaded debris 50 percent","target":"debris-load-ticket","kind":"industry"}
   ]
 }

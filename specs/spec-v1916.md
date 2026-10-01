@@ -1,6 +1,6 @@
 # roughlogic.com Specification v1916 -- FEMA Debris Load Ticket Eligible Cubic Yards (`calc-debris.js`, Group J Trucking and Logistics, debris management, 1 New Tile)
 
-> **Status: PROPOSED 2026-09-25. Single-tile spec.** Part of [scope-disaster-response](scope-disaster-response.md).
+> **Status: LANDED 2026-09-30 (proposed 2026-09-25). Single-tile spec.** Part of [scope-disaster-response](scope-disaster-response.md).
 > In-scope catalog expansion under the spec-v106 trades-only charter. Adds one tile to **`calc-debris.js`**
 > (Group J Trucking and Logistics, hub `/groups/trucking/`), no new dependency and no new network call. Inherits spec.md through spec-v1878.md.
 >

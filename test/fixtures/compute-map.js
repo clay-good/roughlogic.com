@@ -2324,6 +2324,11 @@ export const COMPUTE_MAP = {
   "roof-snow-ice-weight": { module: "../../calc-floodfight.js", fn: "computeRoofSnowIceWeight" },
   "storm-panel-plywood": { module: "../../calc-floodfight.js", fn: "computeStormPanelPlywood" },
   "manufactured-home-anchor-count": { module: "../../calc-floodfight.js", fn: "computeManufacturedHomeAnchorCount" },
+  "hurricane-debris-estimate": { module: "../../calc-debris.js", fn: "computeHurricaneDebrisEstimate" },
+  "structure-debris-estimate": { module: "../../calc-debris.js", fn: "computeStructureDebrisEstimate" },
+  "debris-management-site-sizing": { module: "../../calc-debris.js", fn: "computeDebrisSiteSizing" },
+  "debris-load-ticket": { module: "../../calc-debris.js", fn: "computeDebrisLoadTicket" },
+  "hazard-tree-stump-screen": { module: "../../calc-debris.js", fn: "computeHazardTreeStumpScreen" },
 };
 
 // Resolve a COMPUTE_MAP module path (relative to this file) and import it.

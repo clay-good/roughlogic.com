@@ -2365,6 +2365,11 @@ const RELATED = {
   "roof-snow-ice-weight": ["snow-load","snow-drift-load","sliding-snow-load","rain-on-snow-surcharge"],
   "storm-panel-plywood": ["sheathing-takeoff","wind-cc-pressure","wind-pressure"],
   "manufactured-home-anchor-count": ["wind-pressure","sill-plate-anchor-count","storm-panel-plywood"],
+  "hurricane-debris-estimate": ["structure-debris-estimate","debris-management-site-sizing","debris-load-ticket","demo-debris"],
+  "structure-debris-estimate": ["hurricane-debris-estimate","demo-debris","dumpster-count","debris-load-ticket"],
+  "debris-management-site-sizing": ["hurricane-debris-estimate","chipper-debris","dump-truck-loads","haul-cycle-production","stockpile-volume"],
+  "debris-load-ticket": ["dump-truck-loads","haul-cycle-production","hurricane-debris-estimate","structure-debris-estimate"],
+  "hazard-tree-stump-screen": ["stump-grinding-volume","chipper-debris","tree-height-clinometer","log-limb-weight","debris-load-ticket"],
 };
 
 export { RELATED };

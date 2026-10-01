@@ -1029,6 +1029,11 @@
     {"term":"urban tree soil volume","target":"soil-volume-for-canopy","kind":"industry"},
     {"term":"tree pit soil requirement","target":"soil-volume-for-canopy","kind":"industry"},
     {"term":"structural soil canopy","target":"soil-volume-for-canopy","kind":"industry"},
-    {"term":"soil volume per square foot canopy","target":"soil-volume-for-canopy","kind":"industry"}
+    {"term":"soil volume per square foot canopy","target":"soil-volume-for-canopy","kind":"industry"},
+    {"term":"fema hazardous tree criteria","target":"hazard-tree-stump-screen","kind":"industry"},
+    {"term":"stump extraction cubic yards","target":"hazard-tree-stump-screen","kind":"industry"},
+    {"term":"hanger limb removal fema","target":"hazard-tree-stump-screen","kind":"industry"},
+    {"term":"leaning tree 30 degrees","target":"hazard-tree-stump-screen","kind":"industry"},
+    {"term":"stump conversion table","target":"hazard-tree-stump-screen","kind":"industry"}
   ]
 }

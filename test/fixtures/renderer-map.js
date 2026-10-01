@@ -2225,4 +2225,9 @@ export const RENDERER_MAP = {
   "roof-snow-ice-weight": { module: "../../calc-floodfight.js", exportName: "FLOODFIGHT_RENDERERS" },
   "storm-panel-plywood": { module: "../../calc-floodfight.js", exportName: "FLOODFIGHT_RENDERERS" },
   "manufactured-home-anchor-count": { module: "../../calc-floodfight.js", exportName: "FLOODFIGHT_RENDERERS" },
+  "hurricane-debris-estimate": { module: "../../calc-debris.js", exportName: "DEBRIS_RENDERERS" },
+  "structure-debris-estimate": { module: "../../calc-debris.js", exportName: "DEBRIS_RENDERERS" },
+  "debris-management-site-sizing": { module: "../../calc-debris.js", exportName: "DEBRIS_RENDERERS" },
+  "debris-load-ticket": { module: "../../calc-debris.js", exportName: "DEBRIS_RENDERERS" },
+  "hazard-tree-stump-screen": { module: "../../calc-debris.js", exportName: "DEBRIS_RENDERERS" },
 };

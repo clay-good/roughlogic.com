@@ -1469,6 +1469,12 @@ const _TILES = [
   ["roof-snow-ice-weight", "E"],
   ["storm-panel-plywood", "E"],
   ["manufactured-home-anchor-count", "E"],
+  // spec-v1913..v1917 disaster response debris management band.
+  ["hurricane-debris-estimate", "E"],
+  ["structure-debris-estimate", "E"],
+  ["debris-management-site-sizing", "E"],
+  ["debris-load-ticket", "J"],
+  ["hazard-tree-stump-screen", "L"],
 ];
 
 

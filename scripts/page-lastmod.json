@@ -2,99 +2,99 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "ef6e80dc8d35f0b0",
+      "sha": "49e83c3a1a809cdf",
       "date": "2026-10-01"
     },
     "/tools/": {
-      "sha": "3ff2d92b6ae5bd74",
+      "sha": "c76cb3261df26e69",
       "date": "2026-10-01"
     },
     "/collections/disaster-response/": {
-      "sha": "b4b0f9ab8a05f286",
+      "sha": "d2de450ec7cf0d7f",
       "date": "2026-10-01"
     },
     "/groups/accounting/": {
-      "sha": "5342435df9ffeb8a",
+      "sha": "e6ae84dafa4ea322",
       "date": "2026-10-01"
     },
     "/groups/agriculture/": {
-      "sha": "72c887526e377fd8",
+      "sha": "d2aeb62b8340dd9f",
       "date": "2026-10-01"
     },
     "/groups/construction/": {
-      "sha": "d72e9dc22f63b15b",
+      "sha": "285785b27e08b98e",
       "date": "2026-10-01"
     },
     "/groups/cross-trade/": {
-      "sha": "8b2d64a07c2d4884",
+      "sha": "e557bfa8d5c1a08d",
       "date": "2026-10-01"
     },
     "/groups/educators/": {
-      "sha": "c740da50cd82317c",
+      "sha": "f680b40254ac0179",
       "date": "2026-10-01"
     },
     "/groups/electrical/": {
-      "sha": "53f2863fb4143a35",
+      "sha": "2a558bd31a31a514",
       "date": "2026-10-01"
     },
     "/groups/field/": {
-      "sha": "901c0c0da969dc9b",
+      "sha": "c736355f9bcf2bcf",
       "date": "2026-10-01"
     },
     "/groups/fire-ground/": {
-      "sha": "ebada6a505c8d29f",
+      "sha": "3486318b41e01648",
       "date": "2026-10-01"
     },
     "/groups/historical/": {
-      "sha": "c17854efc219829b",
+      "sha": "bcbe52e473156e57",
       "date": "2026-10-01"
     },
     "/groups/hvac/": {
-      "sha": "9fa9266788bd2827",
+      "sha": "e76a06fb25d33c14",
       "date": "2026-10-01"
     },
     "/groups/kitchen/": {
-      "sha": "ec45e6a9b6763c6a",
+      "sha": "8aedf66351035f67",
       "date": "2026-10-01"
     },
     "/groups/lab/": {
-      "sha": "641662784fc3f3eb",
+      "sha": "b9d661826527f5ae",
       "date": "2026-10-01"
     },
     "/groups/mechanic/": {
-      "sha": "c88c738f7d4c2c1c",
+      "sha": "b2e92e90c54e2327",
       "date": "2026-10-01"
     },
     "/groups/plumbing/": {
-      "sha": "3c38e427747c34cd",
+      "sha": "020eb061523facdb",
       "date": "2026-10-01"
     },
     "/groups/real-estate/": {
-      "sha": "b00c83c1f0f0a18b",
+      "sha": "f8b840d69bc8b0e7",
       "date": "2026-10-01"
     },
     "/groups/references/": {
-      "sha": "3b17db4a43564074",
+      "sha": "505ae31480d7595c",
       "date": "2026-10-01"
     },
     "/groups/restoration/": {
-      "sha": "629127c4f3452668",
+      "sha": "b02fe088af2e632e",
       "date": "2026-10-01"
     },
     "/groups/rigging-and-heavy-lift/": {
-      "sha": "b05fb50bd932f538",
+      "sha": "a41c3bb24f89885c",
       "date": "2026-10-01"
     },
     "/groups/stage/": {
-      "sha": "4041e4f08a4d36c2",
+      "sha": "00957d84d3aeaea9",
       "date": "2026-10-01"
     },
     "/groups/trucking/": {
-      "sha": "c9014b188ef083c8",
+      "sha": "c3e1775def733ed3",
       "date": "2026-10-01"
     },
     "/groups/water/": {
-      "sha": "87462f453509f136",
+      "sha": "1ea00e3e5f1942c8",
       "date": "2026-10-01"
     },
     "/tools/aav-install-check/": {
@@ -2041,6 +2041,14 @@
       "sha": "4be678353306b66a",
       "date": "2026-09-29"
     },
+    "/tools/debris-load-ticket/": {
+      "sha": "ed9e6b0522e4d435",
+      "date": "2026-10-01"
+    },
+    "/tools/debris-management-site-sizing/": {
+      "sha": "27c19702880d6c40",
+      "date": "2026-10-01"
+    },
     "/tools/debt-yield/": {
       "sha": "242d46c5758fe749",
       "date": "2026-09-29"
@@ -2114,7 +2122,7 @@
       "date": "2026-09-29"
     },
     "/tools/demo-debris/": {
-      "sha": "12cc3784b8334245",
+      "sha": "13515e2a6861cd9d",
       "date": "2026-10-01"
     },
     "/tools/density-altitude/": {
@@ -3609,6 +3617,10 @@
       "sha": "be8c9ea1d3d91ef3",
       "date": "2026-09-29"
     },
+    "/tools/hazard-tree-stump-screen/": {
+      "sha": "1605e3c3d261470c",
+      "date": "2026-10-01"
+    },
     "/tools/haze-machine-sizing/": {
       "sha": "c5feeec95a4a4301",
       "date": "2026-09-29"
@@ -3784,6 +3796,10 @@
     "/tools/humidifier-capacity/": {
       "sha": "4b8185854ca4203d",
       "date": "2026-09-29"
+    },
+    "/tools/hurricane-debris-estimate/": {
+      "sha": "e8ebe2b61c9d3254",
+      "date": "2026-10-01"
     },
     "/tools/hvac-equipment-circuit/": {
       "sha": "977facd59ba52cd9",
@@ -7649,6 +7665,10 @@
       "sha": "4679b65e463f86d6",
       "date": "2026-09-29"
     },
+    "/tools/structure-debris-estimate/": {
+      "sha": "94649da89ab6dd73",
+      "date": "2026-10-01"
+    },
     "/tools/structured-cabling-channel/": {
       "sha": "a3d3edaf4938f617",
       "date": "2026-09-29"
@@ -7666,8 +7686,8 @@
       "date": "2026-09-29"
     },
     "/tools/stump-grinding-volume/": {
-      "sha": "4f7b6fd1739c8bb3",
-      "date": "2026-09-30"
+      "sha": "d6ee1bd2fc8b3476",
+      "date": "2026-10-01"
     },
     "/tools/sub-slab-suction-field/": {
       "sha": "72f758d5ba58b177",

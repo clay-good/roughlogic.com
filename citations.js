@@ -25996,6 +25996,66 @@ export const CITATIONS = {
       { name: "Table limits", value: "90 in sidewall, 20 degree roof pitch, 30-60 degree strap angle, no flood or seismic hazard area", source: "24 CFR 3285.402 table notes" },
     ],
   },
+  "hurricane-debris-estimate": {
+    formula: "Q (cy) = H x C x V x B x S, with H = population / persons per household (3, carried unrounded); C = 2, 8, 26, 50, 80 cy per household for categories 1 to 5; V = 1.1, 1.3, 1.5; B = 1.0, 1.2, 1.3; S = 1.0 or 1.3; band Q x 0.7 to Q x 1.3; woody = Q x woody fraction, C&D = the rest, split 42% burnable, 5% soil, 15% metals, 38% landfill; tons = cy / (softwood 6, hardwood 4, mixed 4, C&D 2).",
+    edition: "FEMA-325, Public Assistance Debris Management Guide (July 2007), Appendix B, USACE Hurricane Debris Estimating Model, Step 1 and its stated plus-or-minus 30% accuracy, with the Hurricane Andrew composition and C&D split from the same guide; volume-to-weight factors as restated in FEMA 329, Debris Estimating Field Guide (September 2010). FEMA-325 is superseded in part by the Public Assistance Program and Policy Guide; the model's factors remain the published USACE values.",
+    freeAccess: "FEMA-325 and FEMA 329 are free federal publications on fema.gov; every factor is a public-domain USACE or FEMA figure.",
+    governance: GOVERNANCE.general,
+    editionNote: "The model is a household count times a per-household debris factor for the storm category, adjusted for trees, commercial buildings, and rain. The category factor carries most of the spread and the multipliers can add about 150% on top; the stated accuracy is 30% either way, so the band is the answer and the single figure is its middle. The guide's Harrison County example carries the household count unrounded, which is why it prints 6,992,374 rather than the 6,992,417 a rounded count gives. The composition split decides the disposal plan, and the guide's default is from one storm; another produced the reverse, so the woody fraction is an input to revisit once the first loads are seen. The model describes the wet-storm increase for category 3 and above, and the tile flags a wet multiplier on a weaker storm. It was built for hurricanes, not tornado, flood, earthquake, or wildfire debris.",
+    assumptions: [
+      { name: "Three persons per household", value: "the model's household count is population / 3 unless a local figure is entered", source: "FEMA-325 Appendix B" },
+      { name: "Plus or minus 30%", value: "a planning forecast, replaced by field estimates and load tickets as they come in", source: "FEMA-325 Appendix B" },
+      { name: "Conversion factors are defaults", value: "C&D 2 cy per ton, hardwood and mixed 4, softwood 6; field tests may be needed to confirm them", source: "FEMA 329 (2010)" },
+    ],
+  },
+  "structure-debris-estimate": {
+    formula: "single-family house = L x W x S x 0.20 + L x W x 0.20 x (VCM - 1) cy, the VCM (none 1.0, light 1.1, medium 1.3, heavy 1.5) applied to the first story only; mobile home 290 cy single-wide, 415 cy double-wide; flooded personal property 25-30 cy slab on grade, 45-50 cy with a basement; other building = L x W x H x 0.33 / 27 cy; tons = structure cy / 2 + vegetative cy / wood factor.",
+    edition: "FEMA 329, Debris Estimating Field Guide (September 2010): single-family residence formula from the Hurricane Floyd study, vegetative cover multipliers and the first-story rule for multiple-story residences, the single-story table, mobile home figures, flooded personal property figures, the general building formula, and the USACE conversion factors; FEMA-325 (2007) Chapter 6 carries the same formulas.",
+    freeAccess: "FEMA 329 is a free federal field guide on fema.gov; every figure is a public-domain FEMA or USACE value.",
+    governance: GOVERNANCE.general,
+    editionNote: "The residential formula is a destroyed house's floor area times 0.20 cubic yards per square foot per story with a multiplier for the vegetation that comes down with it, and it reproduces FEMA's single-story table exactly. The multi-story trap is in the field guide rather than the formula: the vegetation belongs to the lot, so the multiplier applies to the first story's debris only, and multiplying the whole house by it overstates every multi-story estimate. Mobile homes have their own figures because they have little air space, and a flooded house that still stands produces only its personal property. FEMA notes that the general building formula and the single-family formula give different results for the same building, and the Debris Task Force Leader chooses between them. Hazardous materials, asbestos, white goods, and electronics must be segregated and are not estimated here.",
+    assumptions: [
+      { name: "VCM on the first story only", value: "for multiple-story residences the vegetation is computed as if S = 1", source: "FEMA 329 (2010)" },
+      { name: "Floor area includes attached garages", value: "the total living space at and above ground level, measured from the foundation if the house is gone", source: "FEMA 329 (2010)" },
+      { name: "0.33 for air space", value: "the general building formula assumes a third of the building volume becomes debris", source: "FEMA 329 (2010)" },
+    ],
+  },
+  "debris-management-site-sizing": {
+    formula: "storage acres = volume / (4,840 sq yd per acre x stack height / 3); gross acres = storage acres / land-use fraction (0.60 -> x 1.66 in the guide); cross-check = 100 acres per 1,000,000 cy; cycled acres = gross acres / fills over the recovery; ground volume = woody x 0.25, burned = woody x 0.05; machine-hours = woody / rate; days = machine-hours / (machines x hours per day).",
+    edition: "FEMA-325, Public Assistance Debris Management Guide (July 2007), Appendix B, USACE model Step 2 (10 ft stack, 60% land use, factor 1.66, site cycling every 45 to 60 days) and the reduction ratios, Chapter 8 (about 100 acres per million cubic yards), and the guide's warning that contaminated debris averages 100 to 150 cy/h through a grinder; FEMA 329 (2010) for 16,133 cy per acre at 10 ft.",
+    freeAccess: "FEMA-325 and FEMA 329 are free federal publications on fema.gov; the factors are public-domain USACE and FEMA figures.",
+    governance: GOVERNANCE.general,
+    editionNote: "The guide rounds a 10 ft stack to 3.33 yards and gets 16,117 cubic yards per acre, and rounds 1 / 0.6 to 1.66; FEMA 329 prints the exact 16,133, and the tile uses 10/3 yards and the entered land-use fraction exactly, so its acreage runs about 0.4% above the guide's printed example. The Chapter 8 rule of thumb lands within a few percent and is printed as a cross-check. A site cycled during the recovery serves more than its standing capacity. Reduction is the whole strategy: grinding leaves a quarter of the woody volume and burning a twentieth (the guide's vegetative debris section says as much as 75% by grinding and 90% by burning; the Appendix B model uses 95% for burning). Manufacturers' grinder rates are engine hours at ideal feed; monitored production governs. Permits, ash testing, mulch pile fire limits, and site restoration are outside the tile.",
+    assumptions: [
+      { name: "Ten foot stack", value: "about 16,133 cubic yards per acre; the guide's rounded figure is 16,117", source: "FEMA-325 Appendix B; FEMA 329" },
+      { name: "Sixty percent of the land holds piles", value: "the rest is roads, buffers, burn pits, sorting, and household hazardous waste", source: "FEMA-325 Appendix B" },
+      { name: "Grinder rate is the guide's contaminated-debris range", value: "default 125 cy/h, the middle of 100 to 150; monitored production governs", source: "FEMA-325" },
+    ],
+  },
+  "debris-load-ticket": {
+    formula: "certified capacity = bed length x width x height (ft) / 27 cy (or the certified figure); basis = certified x 0.85 without a solid tailgate; load = basis x percent full; eligible = load x 0.5 if hand-loaded, never more than the certified capacity.",
+    edition: "FEMA, Public Assistance Debris Monitoring Guide (March 2021): trucks measured and placarded with their capacity; a truck with no tailgate or no solid tailgate limited to 85% of its certified capacity; an automatic 50% reduction for hand-loaded trucks and trailers; no credit above the measured capacity; and the guide's own illustration, 20 CY to 17 CY, 14.5 CY at 85% and 12.8 CY at 75%.",
+    freeAccess: "The Debris Monitoring Guide is a free federal publication on fema.gov.",
+    governance: GOVERNANCE.general,
+    editionNote: "A load ticket is a certified measurement times a monitor's percent-full call, and FEMA adds two reductions: 85% of certified capacity without a solid tailgate, applied before the percent-full call, and half the observed load for hand-loaded trucks and trailers. The guide's printed 14.5 and 12.8 cubic yards are 14.45 and 12.75 rounded to a tenth. A truck is never credited above its measured capacity, even with material above the sideboards. The guide also warns that a truck without a tailgate is rarely really 85% full -- more often 40% to 60% -- which is the monitor's call, not the tile's. Weight and scale tickets, unit prices, and the eligibility of the debris itself are outside the tile.",
+    assumptions: [
+      { name: "Capacity measured to the top of the sideboards", value: "the certified figure placarded on the truck; re-measure periodically", source: "FEMA Debris Monitoring Guide (2021)" },
+      { name: "Tailgate cut before the percent-full call", value: "the percent-full call applies to the 85% basis, as the guide's example shows", source: "FEMA Debris Monitoring Guide (2021)" },
+      { name: "Hand-loading halves the load", value: "a hand-loaded truck called 100% full is recorded at 50%", source: "FEMA Debris Monitoring Guide (2021); PAPPG" },
+    ],
+  },
+  "hazard-tree-stump-screen": {
+    formula: "tree: disaster-caused, immediate threat, DBH >= 6 in, and any of crown damage > 50%, split trunk or exposed heartwood, fallen or uprooted in a public-use area, lean = atan(offset / height) > 30 degrees; < 50% root ball exposed -> cut flush; hanger > 2 in at the break over a public-use area; stump >= 50% root ball exposed, > 24 in at 24 in above ground, on public property -> extract; volume = [D^2 x pi/4 x 24 + (3.6 D)^2 x pi/4 x 31] / 46,656 cy.",
+    edition: "FEMA-325, Public Assistance Debris Management Guide (July 2007), hazardous trees, hazardous limbs (hangers), and hazardous stumps, and Appendix G, DAP9523.11 Hazardous Stump Extraction and Removal Eligibility, stump conversion table (root ball 3.6 times the stump diameter, 31 in high). The current Public Assistance Program and Policy Guide carries the criteria forward and governs where they differ.",
+    freeAccess: "FEMA-325 and the Public Assistance Program and Policy Guide are free federal publications on fema.gov.",
+    governance: GOVERNANCE.general,
+    editionNote: "The criteria are applied in order so a crew documents each tree the way the reimbursement request will be reviewed. A qualifying tree with less than half its root ball exposed is cut flush and grinding its stump is not eligible. A stump over 24 in with half or more of its root ball exposed is extracted and paid as the stump and root ball; FEMA's table builds that from a root ball 3.6 times the stump diameter and 31 in deep, and although the table text does not state the stump length it includes, 24 in reproduces every row. The table uses 0.7854 for pi/4; the tile uses pi/4, a 0.0009% difference. Stumps 24 in and under are paid per cubic yard from the same table. The 2021 monitoring guide words the lean test as at least 30 degrees; the 2007 guide says greater than 30, which the tile uses.",
+    assumptions: [
+      { name: "Stump length 24 in", value: "not stated in the conversion table; it reproduces every row (36 in -> 9.3 cy, 48 in -> 16.5 cy)", source: "FEMA-325 Appendix G, DAP9523.11 (inferred)" },
+      { name: "Root ball 3.6 x the stump diameter, 31 in high", value: "the field findings behind the conversion table", source: "FEMA-325 Appendix G, DAP9523.11" },
+      { name: "Extraction volume is the fill volume", value: "the documentation asks for the quantity of material needed to fill the hole", source: "FEMA-325" },
+    ],
+  },
 };
 
 // --- Citation linkifier ---

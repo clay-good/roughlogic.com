@@ -57464,3 +57464,227 @@ test("bounds: spec-v1912 computeManufacturedHomeAnchorCount pins the 24 CFR 3285
   assert.ok("error" in _v1912({ ...base, sections: 0 }));
   assert.ok("error" in _v1912({ ...base, home_length_ft: Infinity }));
 });
+
+// ===========================================================================
+// spec-v1913..v1917: disaster response debris management band (calc-debris.js)
+// ===========================================================================
+
+// ===========================================================================
+// spec-v1913..v1917: the disaster response program's debris management band
+// (calc-debris.js). Three tiles keep group "E"; debris-load-ticket is "J" and
+// hazard-tree-stump-screen is "L".
+// ===========================================================================
+
+import { computeHurricaneDebrisEstimate as _v1913 } from "../../calc-debris.js";
+test("bounds: spec-v1913 computeHurricaneDebrisEstimate pins the USACE model and the Harrison County example", () => {
+  const base = { population: 45000, persons_per_household: 3, storm_category: 3, vegetation: "medium", commercial: "light", precipitation: "medium_heavy", woody_fraction: 0.3, wood_type: "hardwood" };
+  const r = _v1913(base);
+  assert.strictEqual(r.households, 15000);
+  assert.ok(Math.abs(r.debris_cy - 659100) < 1e-6);
+  assert.ok(Math.abs(r.debris_low_cy - 461370) < 1e-6);
+  assert.ok(Math.abs(r.debris_high_cy - 856830) < 1e-6);
+  assert.ok(Math.abs(r.woody_cy - 197730) < 1e-6);
+  assert.ok(Math.abs(r.woody_tons - 49432.5) < 1e-6);
+  assert.ok(Math.abs(r.cd_tons - 230685) < 1e-6);
+  assert.ok(Math.abs(r.cd_burnable_cy - 193775.4) < 1e-6);
+  assert.ok(Math.abs(r.cd_landfill_cy - 175320.6) < 1e-6);
+  // The finding: reversing the mix cuts the landfill share by more than half.
+  assert.ok(r.reversed_mix_landfill_cy < r.cd_landfill_cy / 2);
+  // FEMA-325 Appendix B: Harrison County, household count carried unrounded.
+  const hc = _v1913({ ...base, population: 165500, storm_category: 4, vegetation: "heavy", commercial: "heavy" });
+  assert.ok(Math.abs(hc.debris_cy - 6992375) < 1e-6);
+  assert.ok(Math.abs(hc.debris_cy - 6992374) < 2);
+  // Exactly linear in population; category 5 is 40x category 1.
+  assert.ok(Math.abs(_v1913({ ...base, population: 90000 }).debris_cy - 2 * r.debris_cy) < 1e-6);
+  assert.ok(Math.abs(_v1913({ ...base, storm_category: 5 }).debris_cy / _v1913({ ...base, storm_category: 1 }).debris_cy - 40) < 1e-12);
+  // Softwood converts at 6 cy per ton.
+  assert.ok(Math.abs(_v1913({ ...base, wood_type: "softwood" }).woody_tons - 197730 / 6) < 1e-6);
+  // A wet storm below category 3 is flagged.
+  assert.strictEqual(r.wet_below_cat3, false);
+  assert.strictEqual(_v1913({ ...base, storm_category: 2 }).wet_below_cat3, true);
+  assert.strictEqual(_v1913({ ...base, storm_category: 2, precipitation: "none_light" }).wet_below_cat3, false);
+  // Woody fraction seams are inclusive.
+  assert.strictEqual(_v1913({ ...base, woody_fraction: 0 }).woody_cy, 0);
+  assert.ok(Math.abs(_v1913({ ...base, woody_fraction: 1 }).cd_cy) < 1e-9);
+  // Error seams.
+  assert.ok(_v1913({ ...base, population: 0 }).error);
+  assert.ok(_v1913({ ...base, population: -1 }).error);
+  assert.ok(_v1913({ ...base, persons_per_household: 0 }).error);
+  assert.ok(_v1913({ ...base, storm_category: 0 }).error);
+  assert.ok(_v1913({ ...base, storm_category: 6 }).error);
+  assert.ok(_v1913({ ...base, storm_category: 3.5 }).error);
+  assert.ok(_v1913({ ...base, woody_fraction: -0.01 }).error);
+  assert.ok(_v1913({ ...base, woody_fraction: 1.01 }).error);
+  assert.ok(_v1913({ ...base, vegetation: "dense" }).error);
+  assert.ok(_v1913({ ...base, commercial: "x" }).error);
+  assert.ok(_v1913({ ...base, precipitation: "x" }).error);
+  assert.ok(_v1913({ ...base, wood_type: "x" }).error);
+  assert.ok(_v1913({ ...base, population: Infinity }).error);
+  assert.ok(_v1913({ ...base, woody_fraction: NaN }).error);
+});
+
+import { computeStructureDebrisEstimate as _v1914 } from "../../calc-debris.js";
+test("bounds: spec-v1914 computeStructureDebrisEstimate applies the VCM to the first story only", () => {
+  const base = { structure_type: "single_family", structure_count: 1, length_ft: 30, width_ft: 40, stories: 2, height_ft: 0, vegetation: "medium", wood_type: "hardwood" };
+  const r = _v1914(base);
+  assert.ok(Math.abs(r.per_structure_cy - 552) < 1e-9);
+  assert.ok(Math.abs(r.structural_cy - 480) < 1e-9);
+  assert.ok(Math.abs(r.vegetative_cy - 72) < 1e-9);
+  // The trap the tile exists for: the naive whole-house VCM is 624, 13% high.
+  assert.ok(Math.abs(r.naive_whole_house_cy - 624) < 1e-9);
+  assert.ok(Math.abs(r.naive_overstatement_pct - 100 * 72 / 552) < 1e-9);
+  assert.strictEqual(r.multi_story_trap, true);
+  // FEMA 329 table: 2,000 sq ft single story, medium, 520 cy; 2,400 sq ft heavy 720.
+  const one = _v1914({ ...base, length_ft: 40, width_ft: 50, stories: 1 });
+  assert.ok(Math.abs(one.per_structure_cy - 520) < 1e-9);
+  assert.strictEqual(one.multi_story_trap, false);
+  assert.ok(Math.abs(_v1914({ ...base, length_ft: 40, width_ft: 60, stories: 1, vegetation: "heavy" }).per_structure_cy - 720) < 1e-9);
+  // Exactly linear in structure count.
+  assert.ok(Math.abs(_v1914({ ...base, structure_count: 5 }).total_cy - 5 * r.total_cy) < 1e-9);
+  // Outbuilding: 100 x 60 x 20 x 0.33 / 27 and 2 cy per ton.
+  const ob = _v1914({ ...base, structure_type: "other_building", length_ft: 100, width_ft: 60, height_ft: 20 });
+  assert.ok(Math.abs(ob.total_cy - 39600 / 27) < 1e-9);
+  assert.ok(Math.abs(ob.debris_weight_tons - 39600 / 54) < 1e-9);
+  // Twelve flooded homes with basements: 540 to 600 cy.
+  const fl = _v1914({ ...base, structure_type: "flooded_basement", structure_count: 12 });
+  assert.strictEqual(fl.total_low_cy, 540);
+  assert.strictEqual(fl.total_high_cy, 600);
+  assert.strictEqual(_v1914({ ...base, structure_type: "flooded_slab" }).per_structure_low_cy, 25);
+  assert.strictEqual(_v1914({ ...base, structure_type: "mobile_single" }).per_structure_cy, 290);
+  assert.strictEqual(_v1914({ ...base, structure_type: "mobile_double" }).per_structure_cy, 415);
+  // Error seams.
+  assert.ok(_v1914({ ...base, length_ft: 0 }).error);
+  assert.ok(_v1914({ ...base, width_ft: -1 }).error);
+  assert.ok(_v1914({ ...base, stories: 0 }).error);
+  assert.ok(_v1914({ ...base, structure_count: 0 }).error);
+  assert.ok(_v1914({ ...base, structure_count: 1.5 }).error);
+  assert.ok(_v1914({ ...base, structure_type: "other_building", height_ft: 0 }).error);
+  assert.ok(_v1914({ ...base, structure_type: "castle" }).error);
+  assert.ok(_v1914({ ...base, vegetation: "x" }).error);
+  assert.ok(_v1914({ ...base, wood_type: "x" }).error);
+  assert.ok(_v1914({ ...base, length_ft: Infinity }).error);
+});
+
+import { computeDebrisSiteSizing as _v1915 } from "../../calc-debris.js";
+test("bounds: spec-v1915 computeDebrisSiteSizing pins the acreage, reduction, and grinding time", () => {
+  const base = { debris_volume_cy: 659100, woody_volume_cy: 197730, stack_height_ft: 10, land_use_fraction: 0.6, site_fill_count: 1, reduction_method: "grind", processing_rate_cyh: 125, machine_count: 4, operating_hours_per_day: 10 };
+  const r = _v1915(base);
+  // 4,840 sq yd x 10/3 yd exactly (FEMA 329: 16,133 cy per acre).
+  assert.ok(Math.abs(r.storage_cy_per_acre - 48400 / 3) < 1e-9);
+  assert.ok(Math.abs(r.storage_acres - 659100 * 3 / 48400) < 1e-9);
+  assert.ok(Math.abs(r.gross_site_acres - 659100 * 3 / 48400 / 0.6) < 1e-9);
+  assert.ok(Math.abs(r.ch8_check_acres - 65.91) < 1e-9);
+  assert.ok(Math.abs(r.ground_volume_cy - 49432.5) < 1e-9);
+  assert.ok(Math.abs(r.burned_volume_cy - 9886.5) < 1e-9);
+  assert.ok(Math.abs(r.processing_machine_hours - 1581.84) < 1e-9);
+  assert.ok(Math.abs(r.processing_days - 39.546) < 1e-9);
+  assert.strictEqual(r.processing_workdays, 40);
+  // Guide's published Step 2: 7,000,000 cy -> 434 acres storage, 720 gross (rounded factors).
+  const g = _v1915({ ...base, debris_volume_cy: 7000000, woody_volume_cy: 2100000 });
+  assert.ok(Math.abs(g.storage_acres - 434) / 434 < 0.005);
+  assert.ok(Math.abs(g.gross_site_acres - 720) / 720 < 0.005);
+  // Cycling twice halves the land; burning leaves a fifth of the mulch volume.
+  assert.ok(Math.abs(_v1915({ ...base, site_fill_count: 2 }).cycled_site_acres - r.gross_site_acres / 2) < 1e-9);
+  assert.ok(Math.abs(_v1915({ ...base, reduction_method: "burn" }).reduced_volume_cy - r.reduced_volume_cy / 5) < 1e-9);
+  // Doubling the stack height halves the storage acres; doubling machines halves the days.
+  assert.ok(Math.abs(_v1915({ ...base, stack_height_ft: 20 }).storage_acres - r.storage_acres / 2) < 1e-9);
+  assert.ok(Math.abs(_v1915({ ...base, machine_count: 8 }).processing_days - r.processing_days / 2) < 1e-9);
+  // Land use of exactly 1 is allowed (no allowance).
+  assert.ok(Math.abs(_v1915({ ...base, land_use_fraction: 1 }).gross_site_acres - r.storage_acres) < 1e-9);
+  // Error seams.
+  assert.ok(_v1915({ ...base, debris_volume_cy: 0 }).error);
+  assert.ok(_v1915({ ...base, woody_volume_cy: 0 }).error);
+  assert.ok(_v1915({ ...base, woody_volume_cy: 700000 }).error);
+  assert.ok(_v1915({ ...base, stack_height_ft: 0 }).error);
+  assert.ok(_v1915({ ...base, land_use_fraction: 0 }).error);
+  assert.ok(_v1915({ ...base, land_use_fraction: 1.01 }).error);
+  assert.ok(_v1915({ ...base, site_fill_count: 0.5 }).error);
+  assert.ok(_v1915({ ...base, reduction_method: "bury" }).error);
+  assert.ok(_v1915({ ...base, processing_rate_cyh: 0 }).error);
+  assert.ok(_v1915({ ...base, machine_count: 0 }).error);
+  assert.ok(_v1915({ ...base, machine_count: 2.5 }).error);
+  assert.ok(_v1915({ ...base, operating_hours_per_day: 0 }).error);
+  assert.ok(_v1915({ ...base, operating_hours_per_day: 25 }).error);
+  assert.ok(_v1915({ ...base, debris_volume_cy: Infinity }).error);
+});
+
+import { computeDebrisLoadTicket as _v1916 } from "../../calc-debris.js";
+test("bounds: spec-v1916 computeDebrisLoadTicket reproduces the monitoring guide's 14.5 and 12.8 cy", () => {
+  const base = { bed_length_ft: 16, bed_width_ft: 7.5, bed_height_ft: 4.5, certified_override_cy: 0, solid_tailgate: "no", hand_loaded: "no", observed_pct: 85 };
+  const r = _v1916(base);
+  assert.ok(Math.abs(r.certified_capacity_cy - 20) < 1e-12);
+  assert.ok(Math.abs(r.capacity_basis_cy - 17) < 1e-12);
+  assert.ok(Math.abs(r.tailgate_reduction_cy - 3) < 1e-12);
+  assert.ok(Math.abs(r.eligible_cy - 14.45) < 1e-12);
+  assert.strictEqual(Math.round(r.eligible_cy * 10) / 10, 14.5);
+  const r75 = _v1916({ ...base, observed_pct: 75 });
+  assert.ok(Math.abs(r75.eligible_cy - 12.75) < 1e-12);
+  assert.strictEqual(Math.round(r75.eligible_cy * 10) / 10, 12.8);
+  // Hand-loaded 10 cy trailer called 100% full: 5.0 cy.
+  const h = _v1916({ ...base, certified_override_cy: 10, solid_tailgate: "yes", hand_loaded: "yes", observed_pct: 100 });
+  assert.strictEqual(h.eligible_cy, 5);
+  assert.strictEqual(h.hand_load_reduction_cy, 5);
+  // Both reductions compound; linear in percent full; never above certified.
+  assert.ok(Math.abs(_v1916({ ...base, hand_loaded: "yes" }).eligible_cy - 14.45 / 2) < 1e-12);
+  assert.ok(Math.abs(_v1916({ ...base, observed_pct: 42.5 }).eligible_cy - r.eligible_cy / 2) < 1e-12);
+  assert.ok(_v1916({ ...base, solid_tailgate: "yes", observed_pct: 100 }).eligible_cy <= r.certified_capacity_cy);
+  assert.strictEqual(_v1916({ ...base, observed_pct: 0 }).eligible_cy, 0);
+  // A certified capacity overrides the bed and releases the bed dimensions.
+  assert.strictEqual(_v1916({ ...base, bed_length_ft: 0, certified_override_cy: 18 }).certified_capacity_cy, 18);
+  // Error seams.
+  assert.ok(_v1916({ ...base, bed_length_ft: 0 }).error);
+  assert.ok(_v1916({ ...base, bed_width_ft: -1 }).error);
+  assert.ok(_v1916({ ...base, bed_height_ft: 0 }).error);
+  assert.ok(_v1916({ ...base, certified_override_cy: -1 }).error);
+  assert.ok(_v1916({ ...base, observed_pct: -0.1 }).error);
+  assert.ok(_v1916({ ...base, observed_pct: 100.1 }).error);
+  assert.ok(_v1916({ ...base, solid_tailgate: "maybe" }).error);
+  assert.ok(_v1916({ ...base, hand_loaded: "maybe" }).error);
+  assert.ok(_v1916({ ...base, observed_pct: NaN }).error);
+});
+
+import { computeHazardTreeStumpScreen as _v1917 } from "../../calc-debris.js";
+test("bounds: spec-v1917 computeHazardTreeStumpScreen pins the stump conversion and the lean criterion", () => {
+  const base = { disaster_threat: "yes", dbh_in: 30, crown_damage_pct: 0, split_trunk: "no", fallen_in_public_use: "yes", lean_offset_ft: 0, lean_height_ft: 8, root_ball_exposed_pct: 70, hanger_dia_in: 0, hanger_over_public_use: "no", stump_dia_in: 36, stump_on_public_property: "yes" };
+  const r = _v1917(base);
+  assert.strictEqual(r.stump_eligible, true);
+  // DAP9523.11 table: 36 in -> 9.3 cy, 48 in -> 16.5 cy; 94% of it root ball.
+  assert.ok(Math.abs(r.extraction_volume_cy - 9.3) < 0.05);
+  assert.ok(Math.abs(_v1917({ ...base, stump_dia_in: 48 }).extraction_volume_cy - 16.5) < 0.05);
+  assert.ok(Math.abs(r.root_ball_share_pct - 100 * 31 * 12.96 / (24 + 31 * 12.96)) < 1e-9);
+  assert.strictEqual(r.fill_volume_cy, r.extraction_volume_cy);
+  // Volume scales exactly with the square of the diameter.
+  assert.ok(Math.abs(_v1917({ ...base, stump_dia_in: 72 }).extraction_volume_cy - 4 * r.extraction_volume_cy) < 1e-9);
+  // Leaning tree: atan(6/8) = 36.87 degrees, meets the lean criterion, 30% exposed -> flush cut.
+  const lean = _v1917({ ...base, fallen_in_public_use: "no", dbh_in: 14, lean_offset_ft: 6, lean_height_ft: 8, root_ball_exposed_pct: 30, stump_dia_in: 18 });
+  assert.ok(Math.abs(lean.lean_deg - Math.atan(0.75) * 180 / Math.PI) < 1e-12);
+  assert.strictEqual(lean.lean_ok, true);
+  assert.strictEqual(lean.tree_eligible, true);
+  assert.ok(/cut flush/.test(lean.tree_action));
+  assert.strictEqual(lean.stump_eligible, false);
+  // Seams: exactly 30 degrees does not qualify; 6 in DBH does; 50% crown does not; 24 in stump does not; 50% root ball does.
+  assert.strictEqual(_v1917({ ...base, lean_offset_ft: 8 * Math.tan(Math.PI / 6) - 1e-9 }).lean_ok, false);
+  assert.strictEqual(_v1917({ ...base, dbh_in: 6 }).dbh_ok, true);
+  assert.strictEqual(_v1917({ ...base, dbh_in: 5.9 }).tree_eligible, false);
+  assert.strictEqual(_v1917({ ...base, fallen_in_public_use: "no", crown_damage_pct: 50 }).tree_eligible, false);
+  assert.strictEqual(_v1917({ ...base, fallen_in_public_use: "no", crown_damage_pct: 51 }).tree_eligible, true);
+  assert.strictEqual(_v1917({ ...base, stump_dia_in: 24 }).stump_eligible, false);
+  assert.strictEqual(_v1917({ ...base, root_ball_exposed_pct: 50 }).stump_eligible, true);
+  assert.strictEqual(_v1917({ ...base, root_ball_exposed_pct: 49.9 }).stump_eligible, false);
+  assert.strictEqual(_v1917({ ...base, stump_on_public_property: "no" }).stump_eligible, false);
+  assert.strictEqual(_v1917({ ...base, disaster_threat: "no" }).tree_eligible, false);
+  assert.strictEqual(_v1917({ ...base, disaster_threat: "no" }).stump_eligible, false);
+  // Hanger: over 2 in at the break and over a public-use area.
+  assert.strictEqual(_v1917({ ...base, hanger_dia_in: 3, hanger_over_public_use: "yes" }).hanger_eligible, true);
+  assert.strictEqual(_v1917({ ...base, hanger_dia_in: 2, hanger_over_public_use: "yes" }).hanger_eligible, false);
+  // Error seams.
+  assert.ok(_v1917({ ...base, dbh_in: 0 }).error);
+  assert.ok(_v1917({ ...base, stump_dia_in: 0 }).error);
+  assert.ok(_v1917({ ...base, lean_height_ft: 0 }).error);
+  assert.ok(_v1917({ ...base, lean_offset_ft: -1 }).error);
+  assert.ok(_v1917({ ...base, hanger_dia_in: -1 }).error);
+  assert.ok(_v1917({ ...base, crown_damage_pct: 101 }).error);
+  assert.ok(_v1917({ ...base, root_ball_exposed_pct: -1 }).error);
+  assert.ok(_v1917({ ...base, split_trunk: "maybe" }).error);
+  assert.ok(_v1917({ ...base, stump_dia_in: Infinity }).error);
+});

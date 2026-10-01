@@ -134552,6 +134552,587 @@
      }
     }
    }
+  },
+  {
+   "tile_id": "hurricane-debris-estimate",
+   "source_publisher": "FEMA / USACE",
+   "source_title": "Public Assistance Debris Management Guide (FEMA-325)",
+   "source_edition_or_year": "2007",
+   "source_section_or_page": "Appendix B, USACE Hurricane Debris Estimating Model, Step 1 example: Harrison County, MS, population 165,500, category 4, heavy vegetation, heavy commercial, wet storm; printed 55,167 households and 6,992,374 cy (the unrounded count gives 6,992,375; tolerance covers the printed rounding)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-30",
+   "inputs": {
+    "population": 165500,
+    "persons_per_household": 3,
+    "storm_category": 4,
+    "vegetation": "heavy",
+    "commercial": "heavy",
+    "precipitation": "medium_heavy",
+    "woody_fraction": 0.3,
+    "wood_type": "hardwood"
+   },
+   "outputs": {
+    "households": {
+     "value": 55167,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "debris_cy": {
+     "value": 6992374,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "hurricane-debris-estimate",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "County of 45,000, category 3, medium vegetation, light commercial, wet storm, 30% woody hardwood",
+   "source_edition_or_year": "USACE model factors, FEMA-325 (2007) Appendix B; FEMA 329 (2010) conversions",
+   "source_section_or_page": "spec-v1913 worked example",
+   "verified_by": "rl",
+   "verified_on": "2026-09-30",
+   "inputs": {
+    "population": 45000,
+    "persons_per_household": 3,
+    "storm_category": 3,
+    "vegetation": "medium",
+    "commercial": "light",
+    "precipitation": "medium_heavy",
+    "woody_fraction": 0.3,
+    "wood_type": "hardwood"
+   },
+   "outputs": {
+    "households": {
+     "value": 15000,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "debris_cy": {
+     "value": 659100,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "debris_low_cy": {
+     "value": 461370,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "debris_high_cy": {
+     "value": 856830,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "woody_cy": {
+     "value": 197730,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "woody_tons": {
+     "value": 49432.5,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "cd_tons": {
+     "value": 230685,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "cd_burnable_cy": {
+     "value": 193775.4,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "cd_soil_cy": {
+     "value": 23068.5,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "cd_metals_cy": {
+     "value": 69205.5,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "cd_landfill_cy": {
+     "value": 175320.6,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "structure-debris-estimate",
+   "source_publisher": "FEMA",
+   "source_title": "Debris Estimating Field Guide (FEMA 329)",
+   "source_edition_or_year": "September 2010",
+   "source_section_or_page": "Table for Single Family, Single Story Homes: 2,000 SF, medium vegetative cover (1.3) = 520 CY",
+   "verified_by": "rl",
+   "verified_on": "2026-09-30",
+   "inputs": {
+    "structure_type": "single_family",
+    "structure_count": 1,
+    "length_ft": 40,
+    "width_ft": 50,
+    "stories": 1,
+    "height_ft": 0,
+    "vegetation": "medium",
+    "wood_type": "hardwood"
+   },
+   "outputs": {
+    "per_structure_cy": {
+     "value": 520,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "structural_cy": {
+     "value": 400,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "vegetative_cy": {
+     "value": 120,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "structure-debris-estimate",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Two-story 30 x 40 ft house, medium canopy, VCM on the first story only",
+   "source_edition_or_year": "FEMA 329 (2010) single-family formula and multi-story rule",
+   "source_section_or_page": "spec-v1914 worked example (FEMA 329 table: 2,400 SF medium = 624 CY is the naive figure)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-30",
+   "inputs": {
+    "structure_type": "single_family",
+    "structure_count": 1,
+    "length_ft": 30,
+    "width_ft": 40,
+    "stories": 2,
+    "height_ft": 0,
+    "vegetation": "medium",
+    "wood_type": "hardwood"
+   },
+   "outputs": {
+    "per_structure_cy": {
+     "value": 552,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "naive_whole_house_cy": {
+     "value": 624,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "naive_overstatement_pct": {
+     "value": 13.043478260869565,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "structure-debris-estimate",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "100 x 60 ft outbuilding 20 ft high",
+   "source_edition_or_year": "FEMA 329 (2010) general building formula, C&D 2 cy per ton",
+   "source_section_or_page": "spec-v1914 worked example",
+   "verified_by": "rl",
+   "verified_on": "2026-09-30",
+   "inputs": {
+    "structure_type": "other_building",
+    "structure_count": 1,
+    "length_ft": 100,
+    "width_ft": 60,
+    "stories": 1,
+    "height_ft": 20,
+    "vegetation": "medium",
+    "wood_type": "hardwood"
+   },
+   "outputs": {
+    "total_cy": {
+     "value": 1466.6666666666667,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "debris_weight_tons": {
+     "value": 733.3333333333334,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "structure-debris-estimate",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Twelve flooded homes with basements, personal property placed on the right-of-way",
+   "source_edition_or_year": "FEMA 329 (2010), 45-50 CY per home with a basement",
+   "source_section_or_page": "spec-v1914 worked example",
+   "verified_by": "rl",
+   "verified_on": "2026-09-30",
+   "inputs": {
+    "structure_type": "flooded_basement",
+    "structure_count": 12,
+    "length_ft": 30,
+    "width_ft": 40,
+    "stories": 2,
+    "height_ft": 0,
+    "vegetation": "medium",
+    "wood_type": "hardwood"
+   },
+   "outputs": {
+    "total_low_cy": {
+     "value": 540,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "total_high_cy": {
+     "value": 600,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "debris-management-site-sizing",
+   "source_publisher": "FEMA / USACE",
+   "source_title": "Public Assistance Debris Management Guide (FEMA-325)",
+   "source_edition_or_year": "2007",
+   "source_section_or_page": "Appendix B, USACE model Step 2 example: 7,000,000 cy / 16,117 cy per acre = 434 acres, x 1.66 = 720 acres (the guide rounds the stack to 3.33 yd and 1/0.6 to 1.66; the tile uses 10/3 yd and 1/0.6 exactly, 433.9 and 723.1 acres; tolerance covers the guide's rounding)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-30",
+   "inputs": {
+    "debris_volume_cy": 7000000,
+    "woody_volume_cy": 2100000,
+    "stack_height_ft": 10,
+    "land_use_fraction": 0.6,
+    "site_fill_count": 1,
+    "reduction_method": "grind",
+    "processing_rate_cyh": 125,
+    "machine_count": 4,
+    "operating_hours_per_day": 10
+   },
+   "outputs": {
+    "storage_acres": {
+     "value": 434,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "gross_site_acres": {
+     "value": 720,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "debris-management-site-sizing",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "659,100 cy event, 197,730 cy clean woody, ground by 4 machines 10 h a day at 125 cy/h",
+   "source_edition_or_year": "FEMA-325 (2007) Appendix B and Chapter 8; FEMA 329 (2010) 16,133 cy per acre at 10 ft",
+   "source_section_or_page": "spec-v1915 worked example (the spec's 40.9 and 67.9 acres use the guide's 16,117 and 1.66; exact factors give 40.85 and 68.09)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-30",
+   "inputs": {
+    "debris_volume_cy": 659100,
+    "woody_volume_cy": 197730,
+    "stack_height_ft": 10,
+    "land_use_fraction": 0.6,
+    "site_fill_count": 1,
+    "reduction_method": "grind",
+    "processing_rate_cyh": 125,
+    "machine_count": 4,
+    "operating_hours_per_day": 10
+   },
+   "outputs": {
+    "storage_acres": {
+     "value": 40.853305785123965,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "gross_site_acres": {
+     "value": 68.08884297520662,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "ch8_check_acres": {
+     "value": 65.91,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "ground_volume_cy": {
+     "value": 49432.5,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "burned_volume_cy": {
+     "value": 9886.5,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "processing_machine_hours": {
+     "value": 1581.84,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "processing_days": {
+     "value": 39.546,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "processing_workdays": {
+     "value": 40,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "debris-load-ticket",
+   "source_publisher": "FEMA",
+   "source_title": "Public Assistance Debris Monitoring Guide",
+   "source_edition_or_year": "March 2021",
+   "source_section_or_page": "Truck load illustrations, p. 30: no structural tailgate, 20 CY reduced to 17 CY, load 85 percent full = 14.5 CY (exact 14.45; tolerance covers the printed rounding)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-30",
+   "inputs": {
+    "bed_length_ft": 16,
+    "bed_width_ft": 7.5,
+    "bed_height_ft": 4.5,
+    "certified_override_cy": 0,
+    "solid_tailgate": "no",
+    "hand_loaded": "no",
+    "observed_pct": 85
+   },
+   "outputs": {
+    "certified_capacity_cy": {
+     "value": 20,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "capacity_basis_cy": {
+     "value": 17,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "eligible_cy": {
+     "value": 14.5,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "debris-load-ticket",
+   "source_publisher": "FEMA",
+   "source_title": "Public Assistance Debris Monitoring Guide",
+   "source_edition_or_year": "March 2021",
+   "source_section_or_page": "Truck load illustrations, p. 30: no structural tailgate, 20 CY reduced to 17 CY, load 75 percent full = 12.8 CY (exact 12.75; tolerance covers the printed rounding)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-30",
+   "inputs": {
+    "bed_length_ft": 16,
+    "bed_width_ft": 7.5,
+    "bed_height_ft": 4.5,
+    "certified_override_cy": 0,
+    "solid_tailgate": "no",
+    "hand_loaded": "no",
+    "observed_pct": 75
+   },
+   "outputs": {
+    "capacity_basis_cy": {
+     "value": 17,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "eligible_cy": {
+     "value": 12.8,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "debris-load-ticket",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "10 cy trailer, solid tailgate, hand-loaded, called 100% full",
+   "source_edition_or_year": "FEMA Debris Monitoring Guide (2021) hand-loaded 50 percent rule",
+   "source_section_or_page": "spec-v1916 worked example",
+   "verified_by": "rl",
+   "verified_on": "2026-09-30",
+   "inputs": {
+    "bed_length_ft": 16,
+    "bed_width_ft": 7.5,
+    "bed_height_ft": 4.5,
+    "certified_override_cy": 10,
+    "solid_tailgate": "yes",
+    "hand_loaded": "yes",
+    "observed_pct": 100
+   },
+   "outputs": {
+    "certified_capacity_cy": {
+     "value": 10,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "eligible_cy": {
+     "value": 5,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "hand_load_reduction_cy": {
+     "value": 5,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "hazard-tree-stump-screen",
+   "source_publisher": "FEMA",
+   "source_title": "Public Assistance Debris Management Guide (FEMA-325), DAP9523.11 Hazardous Stump Extraction and Removal Eligibility",
+   "source_edition_or_year": "2007",
+   "source_section_or_page": "Appendix G, Stump Conversion Table: 36 in stump = 9.3 CY (formula gives 9.289 with a 24 in stump length; tolerance covers the table's rounding)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-30",
+   "inputs": {
+    "disaster_threat": "yes",
+    "dbh_in": 30,
+    "crown_damage_pct": 0,
+    "split_trunk": "no",
+    "fallen_in_public_use": "yes",
+    "lean_offset_ft": 0,
+    "lean_height_ft": 8,
+    "root_ball_exposed_pct": 70,
+    "hanger_dia_in": 0,
+    "hanger_over_public_use": "no",
+    "stump_dia_in": 36,
+    "stump_on_public_property": "yes"
+   },
+   "outputs": {
+    "extraction_volume_cy": {
+     "value": 9.3,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "fill_volume_cy": {
+     "value": 9.3,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "hazard-tree-stump-screen",
+   "source_publisher": "FEMA",
+   "source_title": "Public Assistance Debris Management Guide (FEMA-325), DAP9523.11 Hazardous Stump Extraction and Removal Eligibility",
+   "source_edition_or_year": "2007",
+   "source_section_or_page": "Appendix G, Stump Conversion Table: 48 in stump = 16.5 CY (formula gives 16.513; tolerance covers the table's rounding)",
+   "verified_by": "rl",
+   "verified_on": "2026-09-30",
+   "inputs": {
+    "disaster_threat": "yes",
+    "dbh_in": 30,
+    "crown_damage_pct": 0,
+    "split_trunk": "no",
+    "fallen_in_public_use": "yes",
+    "lean_offset_ft": 0,
+    "lean_height_ft": 8,
+    "root_ball_exposed_pct": 70,
+    "hanger_dia_in": 0,
+    "hanger_over_public_use": "no",
+    "stump_dia_in": 48,
+    "stump_on_public_property": "yes"
+   },
+   "outputs": {
+    "extraction_volume_cy": {
+     "value": 16.5,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "hazard-tree-stump-screen",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Leaning tree, top displaced 6 ft at 8 ft up the trunk, 30% of the root ball exposed",
+   "source_edition_or_year": "FEMA-325 (2007) Chapter 3 hazardous tree criteria",
+   "source_section_or_page": "spec-v1917 worked example",
+   "verified_by": "rl",
+   "verified_on": "2026-09-30",
+   "inputs": {
+    "disaster_threat": "yes",
+    "dbh_in": 14,
+    "crown_damage_pct": 0,
+    "split_trunk": "no",
+    "fallen_in_public_use": "no",
+    "lean_offset_ft": 6,
+    "lean_height_ft": 8,
+    "root_ball_exposed_pct": 30,
+    "hanger_dia_in": 0,
+    "hanger_over_public_use": "no",
+    "stump_dia_in": 18,
+    "stump_on_public_property": "yes"
+   },
+   "outputs": {
+    "lean_deg": {
+     "value": 36.86989764584402,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "criteria_met_count": {
+     "value": 1,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
   }
  ]
 }

@@ -1961,6 +1961,11 @@ cross-check.
 | calc-datacenter.js | `computeRaisedFloorTileAirflow` | `{ tile_area_ft2 = 0, open_area_pct = 0, discharge_coefficient = 0, plenum_pre...` | _ | _ | _ |
 | calc-datacenter.js | `computeServerInletEnvelope` | `{ dry_bulb_f = 0, relative_humidity_pct = 0, recommended_min_f = 0, recommend...` | _ | _ | _ |
 | calc-datacenter.js | `computeUpsModuleRedundancy` | `{ it_load_kw = 0, power_factor = 0, module_rating_kva = 0, n_plus_one_efficie...` | _ | _ | _ |
+| calc-debris.js | `computeDebrisLoadTicket` | `{ bed_length_ft = 0, bed_width_ft = 0, bed_height_ft = 0, certified_override_...` | _ | _ | _ |
+| calc-debris.js | `computeDebrisSiteSizing` | `{ debris_volume_cy = 0, woody_volume_cy = 0, stack_height_ft = 10, land_use_f...` | _ | _ | _ |
+| calc-debris.js | `computeHazardTreeStumpScreen` | `{ disaster_threat = "yes", dbh_in = 0, crown_damage_pct = 0, split_trunk = "n...` | _ | _ | _ |
+| calc-debris.js | `computeHurricaneDebrisEstimate` | `{ population = 0, persons_per_household = 3, storm_category = 0, vegetation =...` | _ | _ | _ |
+| calc-debris.js | `computeStructureDebrisEstimate` | `{ structure_type = "single_family", structure_count = 1, length_ft = 0, width...` | _ | _ | _ |
 | calc-demo.js | `computeAbatementContainment` | `{ room_len_ft, room_wid_ft, room_ht_ft, ach_target = 4, nam_cfm = 1500, debri...` | _ | _ | _ |
 | calc-demo.js | `computeAbatementWasteContainers` | `{ area_ft2 = 0, thickness_in = 0, bulking_factor = 2, bag_volume_ft3 = 3, bag...` | _ | _ | _ |
 | calc-demo.js | `computeFloodCutQuantity` | `{ wall_run_lf, cut_height_in = 24, two_sided = false, insulated = false } = {}` | _ | _ | _ |
@@ -3885,7 +3890,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 2469.
+Row count: 2474.
 
 <!-- END function-corpus-v14 -->
 
@@ -4657,7 +4662,7 @@ per spec-v14 §13.1 second paragraph.
 | `water-extraction-rate` | Water Extraction Volume, Time, and Waste-Tank Dumps | Project (first-principles); standing + absorbed; wand time = total / gpm | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wood-emc` | Equilibrium Moisture Content of Wood | USDA Forest Products Laboratory Wood ...; spec-v119 section 2.1 pinned example (textbook ~9.1%) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+4 more) |
 
-### Group E Construction (611 tiles)
+### Group E Construction (614 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -4803,6 +4808,7 @@ per spec-v14 §13.1 second paragraph.
 | `curve-deflection-stakeout` | Curve Deflection-Angle Stakeout | AASHTO Green Book / FM 5-233 (by name); delta = (100/1000)(180/pi) = 5.7296 deg; chord = 1000 sin... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `cwr-neutral-temperature` | Continuous Welded Rail Thermal Force and Neutral Temperature | Project (first-principles); 49 CFR 213 CWR plan requirements named | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `cylinder-storage-separation` | Compressed Gas Cylinder Storage Separation (OSHA 1926.350) | Occupational Safety and Health Admini...; 'Oxygen cylinders in storage shall be separated from fuel... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `debris-management-site-sizing` | Debris Management Site Acreage and Volume Reduction | FEMA / USACE; Appendix B, USACE model Step 2 example: 7,000,000 cy / 16... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `deck-beam-post` | Deck Beam and Post Sizing (IRC R507) | IRC / AWC NDS; trib = 6 ft; w = 50 x 6 = 300 plf; M = 28,800 lb-in; doub... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `deck-board-takeoff` | Deck Board and Fastener Takeoff | First-principles deck-surface takeoff; 12 x 16 ft deck, 5.5 in boards, 0.25 in gap, 16 in OC, 10... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `deck-ledger-fasteners` | Deck Ledger Fastener Spacing (IRC R507.9) | IRC R507.9 (deck ledger connection); 16 ft ledger at 16 in OC -> floor(192/16)+1 = 13 fasteners | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -4908,6 +4914,7 @@ per spec-v14 §13.1 second paragraph.
 | `horizontal-curve` | Horizontal Curve Layout | AASHTO Green Book / FM 5-233 (by name); R = 1000 ft, delta = 30 deg -> T 267.95, L 523.60, LC 517... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `horizontal-sightline-offset` | Horizontal Sightline Offset on a Curve (AASHTO) | AASHTO Green Book; spec-v337 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `housewrap-rolls` | Housewrap (WRB) Rolls, Cap Fasteners, and Seam Tape | Housewrap takeoff identity (first-pri...; rolls = ceil(4000*1.10/1350) = ceil(3.26) = 4; cap = ceil... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `hurricane-debris-estimate` | USACE Hurricane Debris Estimating Model | FEMA / USACE; Appendix B, USACE Hurricane Debris Estimating Model, Step... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `hydraulic-jack-pressure` | Hydraulic Elevator Jack Pressure, Flow, and Bore Change | Project (first-principles); ASME A17.1 governs relief settings and testing | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `hydroseed-mix` | Hydroseed Slurry Mix and Tank Count | Slurry loading identity (first-princi...; solids = 3*(5+2000+50) = 6,165 lb; tanks = ceil(6165/(300... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `ice-barrier-coverage` | Eave Ice-Barrier Membrane Courses and Rolls | IRC R905.1.2 eave ice-barrier extent ...; spec-v215 section 2.1 pinned example (typical 4/12, 12 in... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -5186,6 +5193,7 @@ per spec-v14 §13.1 second paragraph.
 | `storm-panel-plywood` | Wood Structural Panel Opening Protection Takeoff | Project (first-principles); spec-v1911 worked example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `stray-current-bond` | Stray Current Interference Bond Resistor | Project (first-principles); the interference retest governs | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `striping-paint-quantity` | Pavement Marking Paint and Glass Bead Quantity | Pavement-marking quantity identity (f...; area = 5280*4/12 = 1,760 sf; paint = 1760/320 = 5.5 gal; ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `structure-debris-estimate` | FEMA Building and Contents Debris Estimate | FEMA; Table for Single Family, Single Story Homes: 2,000 SF, me... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+3 more) |
 | `stucco-coverage` | Portland-Cement Plaster (Stucco) Material Takeoff | Portland-cement plaster bag-count ide...; bags = ceil(1000*0.875/10.1*1.10) = ceil(95.30) = 96 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `stud-notch-bore-limit` | Wall Stud Notching and Boring Limits (IRC R602.6) | wall stud notch/bore limits (IRC R602.6); notch bearing = 0.25*5.5 = 1.375; bore single = 0.40*5.5 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+3 more) |
 | `subgrade-cbr-thickness` | Subgrade CBR to Aggregate Cover Thickness | Project (first-principles); the geotechnical investigation, the agency design manual ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -5525,7 +5533,7 @@ per spec-v14 §13.1 second paragraph.
 | `tool-maintenance` | Tool Maintenance Intervals | Project bundled tool maintenance sche...; Reference compute returns the per-attribute table; runner... | [docs/v6-audit.md](v6-audit.md) (reference cadence) |
 | `triage-quickread` | Field First Aid Triage Quick-Read | START / SALT triage protocols (projec...; Returns 4 categories + notice + citation; tested on the n... | [docs/v6-audit.md](v6-audit.md) (reference cadence) |
 
-### Group J Trucking (53 tiles)
+### Group J Trucking (54 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -5539,6 +5547,7 @@ per spec-v14 §13.1 second paragraph.
 | `collection-vehicle-payload` | Collection Vehicle Payload and Compaction Ratio | Project (first-principles); the weight law and manufacturer ratings govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `cost-per-mile` | Operating Cost Per Mile | ATRI cost-per-mile bucket methodology; $6000/10,000 mi, $4.00/gal at 6.5 mpg, $0.18 maint, $0.65... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `deadhead-percent` | Deadhead Percentage and Effective Rate | Freight-economics arithmetic + FMCSA ...; 800 loaded / 120 deadhead / $1840 -> 13.04% deadhead, $2.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `debris-load-ticket` | FEMA Debris Load Ticket Eligible Cubic Yards | FEMA; Truck load illustrations, p. 30: no structural tailgate, ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `deck-point-load-dunnage` | Trailer Deck Point Load and Dunnage Spread | Project (first-principles); load / bearing length along the trailer | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `def-consumption` | Diesel Exhaust Fluid (DEF) Consumption and Range | DEF consumption and range model (SCR ...; spec-v508 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `detention-demurrage-billing` | Detention Billing and Opportunity Cost | carrier tariff practice; spec-v423 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
@@ -5754,7 +5763,7 @@ per spec-v14 §13.1 second paragraph.
 | `wheel-offset-backspacing` | Wheel Offset and Backspacing | wheel offset / backspacing conversion...; spec-v510 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `worm-gear-geometry` | Worm and Worm-Wheel Geometry | Machinery's Handbook (worm gearing); lead = 0.5 x 1 = 0.5 in; lead angle = atan(0.5/(pi x 2)) ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group L Agriculture (95 tiles)
+### Group L Agriculture (96 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -5792,6 +5801,7 @@ per spec-v14 §13.1 second paragraph.
 | `grow-light-fixture-count` | Horticultural Fixture Count and Energy | Project (first-principles); the manufacturer's PPF and a photometric layout govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `growing-degree-days` | Growing Degree Days | USDA / NWS GDD method + McMaster & Wi...; corn, Tmax 92 / Tmin 64 (modified) -> 25 GDD | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `hay-dry-matter` | Hay Dry-Matter and Safe-Storage Weight | First-principles dry-matter balance +...; spec-v118 section 2.1 pinned example (over the 18% ceiling) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `hazard-tree-stump-screen` | FEMA Hazardous Tree, Hanger, and Stump Screen with Extraction Volume | FEMA; Appendix G, Stump Conversion Table: 36 in stump = 9.3 CY ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `irrigation-requirement` | Irrigation Requirement (ET-based, acre-feet) | FAO / USDA NRCS; ET_crop = 1.20*0.25*30 = 9.0 in; net = 9.0-1.0 = 8.0; gro... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `irrigation-uniformity` | Irrigation Sprinkler Uniformity | Irrigation Association / ANSI / ASABE...; 8 catch volumes around 100 mL -> mean 99.625 / CU 97.62 /... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `irrigation-zone-runtime` | Irrigation Zone Runtime and Cycle-and-Soak | Irrigation Association scheduling ref...; spec-v208 section 2.1 pinned example (clay lawn zone) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
@@ -6275,6 +6285,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `wire-rope-stretch` | Wire Rope Elastic Stretch Under Load | Project (first-principles); dL = P L /(A_m E_r) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 2217. Fixture-covered or reference-cadence: 2217 / 2217.
+Tile count: 2222. Fixture-covered or reference-cadence: 2222 / 2222.
 
 <!-- END tile-index-v14 -->
