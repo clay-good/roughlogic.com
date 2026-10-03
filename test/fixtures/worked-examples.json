@@ -71286,7 +71286,7 @@
    "source_publisher": "OSHA 1926.451(a)(1) capacity rule (first-principles)",
    "source_title": "100 lb platform, 2 workers at 250, 500 lb material, 4 legs, 2,500 lb frame",
    "source_edition_or_year": "spec-v834 worked example",
-   "source_section_or_page": "total = 100+500+500 = 1,100; leg = 1100/4 = 275; SWL = 2500/4 = 625; util = 0.44 (pass)",
+   "source_section_or_page": "total = 100+500+500 = 1,100; leg = 1100/4 = 275; SWL = 2500/4 = 625; util = (25 + 4 x 250) / 2500 = 0.41 (pass; OSHA 1926.451(a)(1) own weight + 4 x intended, recomputed 2026-10-02 from 0.44)",
    "verified_by": "rl",
    "verified_on": "2026-07-17",
    "inputs": {
@@ -71317,7 +71317,7 @@
      }
     },
     "utilization": {
-     "value": 0.44,
+     "value": 0.41,
      "tolerance": {
       "abs": 0.005
      }
@@ -71329,7 +71329,7 @@
    "source_publisher": "OSHA 1926.451(a)(1) capacity rule (first-principles)",
    "source_title": "cross-check: 4 workers and 1,500 lb material overloads the leg",
    "source_edition_or_year": "spec-v834 worked example",
-   "source_section_or_page": "total = 100+1000+1500 = 2,600; leg = 2600/4 = 650 > 625 SWL (fail)",
+   "source_section_or_page": "total = 100+1000+1500 = 2,600; leg = 2600/4 = 650; (25 + 4 x 625) / 2500 = 1.01 (fail)",
    "verified_by": "rl",
    "verified_on": "2026-07-17",
    "inputs": {
@@ -71628,13 +71628,13 @@
    "source_publisher": "Pavement-marking quantity identity (first-principles)",
    "source_title": "1 mile of 4-in line, 320 sf/gal, 6 lb/gal beads",
    "source_edition_or_year": "spec-v839 worked example",
-   "source_section_or_page": "area = 5280*4/12 = 1,760 sf; paint = 1760/320 = 5.5 gal; beads = 5.5*6 = 33 lb",
+   "source_section_or_page": "area = 5280*4/12 = 1,760 sf; paint = 1760/100 = 17.6 gal (16 wet mil); beads = 17.6*6 = 105.6 lb. Recomputed 2026-10-02: the earlier 320 sf/gal was a 5 mil film.",
    "verified_by": "rl",
    "verified_on": "2026-07-17",
    "inputs": {
     "length_ft": 5280,
     "width_in": 4,
-    "coverage_sf_per_gal": 320,
+    "coverage_sf_per_gal": 100,
     "bead_rate_lb_per_gal": 6
    },
    "outputs": {
@@ -71645,13 +71645,13 @@
      }
     },
     "paint_gal": {
-     "value": 5.5,
+     "value": 17.6,
      "tolerance": {
       "abs": 0.01
      }
     },
     "beads_lb": {
-     "value": 33,
+     "value": 105.6,
      "tolerance": {
       "abs": 0.01
      }
@@ -71663,24 +71663,24 @@
    "source_publisher": "Pavement-marking quantity identity (first-principles)",
    "source_title": "cross-check: a wide 6-in edge line scales the whole order",
    "source_edition_or_year": "spec-v839 worked example",
-   "source_section_or_page": "area = 5280*6/12 = 2,640 sf; paint = 2640/320 = 8.25 gal; beads = 49.5 lb",
+   "source_section_or_page": "area = 5280*6/12 = 2,640 sf; paint = 2640/100 = 26.4 gal; beads = 158.4 lb. Recomputed 2026-10-02 at 100 sf/gal (16 wet mil).",
    "verified_by": "rl",
    "verified_on": "2026-07-17",
    "inputs": {
     "length_ft": 5280,
     "width_in": 6,
-    "coverage_sf_per_gal": 320,
+    "coverage_sf_per_gal": 100,
     "bead_rate_lb_per_gal": 6
    },
    "outputs": {
     "paint_gal": {
-     "value": 8.25,
+     "value": 26.4,
      "tolerance": {
       "abs": 0.01
      }
     },
     "beads_lb": {
-     "value": 49.5,
+     "value": 158.4,
      "tolerance": {
       "abs": 0.01
      }
@@ -73724,12 +73724,12 @@
    "source_publisher": "Sealant cartridge-yield identity (first-principles)",
    "source_title": "500 LF joint, 10.1 oz cartridge (20.5 in^3), 3/8 x 1/4 in joint",
    "source_edition_or_year": "spec-v872 worked example",
-   "source_section_or_page": "cross = 0.375*0.25 = 0.09375 in^2; lf/cart = 20.5/0.09375/12 = 18.2 ft; cartridges = ceil(500/18.2) = 28",
+   "source_section_or_page": "cross = 0.375*0.25 = 0.09375 in^2; lf/cart = 18.23/0.09375/12 = 16.2 ft; cartridges = ceil(500/16.2) = 31. Recomputed 2026-10-02: a 10.1 fl oz cartridge is 18.23 in^3, not 20.5.",
    "verified_by": "rl",
    "verified_on": "2026-07-17",
    "inputs": {
     "joint_lf": 500,
-    "cartridge_in3": 20.5,
+    "cartridge_in3": 18.23,
     "joint_width_in": 0.375,
     "joint_depth_in": 0.25
    },
@@ -73741,13 +73741,13 @@
      }
     },
     "lf_per_cart": {
-     "value": 18.2,
+     "value": 16.2,
      "tolerance": {
       "abs": 0.1
      }
     },
     "cartridges": {
-     "value": 28,
+     "value": 31,
      "tolerance": {
       "abs": 0.01
      }
@@ -73759,18 +73759,18 @@
    "source_publisher": "Sealant cartridge-yield identity (first-principles)",
    "source_title": "cross-check: a big 1/2 x 1/2 in joint burns cartridges faster",
    "source_edition_or_year": "spec-v872 worked example",
-   "source_section_or_page": "cross = 0.25 in^2; lf/cart = 20.5/0.25/12 = 6.83 ft; cartridges = ceil(500/6.83) = 74",
+   "source_section_or_page": "cross = 0.25 in^2; lf/cart = 18.23/0.25/12 = 6.08 ft; cartridges = ceil(500/6.08) = 83 (recomputed 2026-10-02 at 18.23 in^3)",
    "verified_by": "rl",
    "verified_on": "2026-07-17",
    "inputs": {
     "joint_lf": 500,
-    "cartridge_in3": 20.5,
+    "cartridge_in3": 18.23,
     "joint_width_in": 0.5,
     "joint_depth_in": 0.5
    },
    "outputs": {
     "cartridges": {
-     "value": 74,
+     "value": 83,
      "tolerance": {
       "abs": 0.01
      }
@@ -74066,7 +74066,7 @@
    "source_publisher": "Rebar tie-wire identity (first-principles)",
    "source_title": "30 x 20 ft mat, #4 at 12 in each way, 50% tied, 8 in ties, 0.0181 lb/ft",
    "source_edition_or_year": "spec-v878 worked example",
-   "source_section_or_page": "bars = 21 x 31 = 651 intersections; ties = round(651*0.5) = 326; wire = 217 ft; weight = 3.9 lb",
+   "source_section_or_page": "bars = 21 x 31 = 651 intersections; ties = round(651*0.5) = 326; wire = 217 ft; weight = 217.3 x 0.0104 = 2.26 lb (16 ga; recomputed 2026-10-02 from the 14 ga 0.0181)",
    "verified_by": "rl",
    "verified_on": "2026-07-17",
    "inputs": {
@@ -74075,7 +74075,7 @@
     "spacing_in": 12,
     "tie_fraction": 0.5,
     "tie_length_in": 8,
-    "wire_lb_per_ft": 0.0181
+    "wire_lb_per_ft": 0.0104
    },
    "outputs": {
     "intersections": {
@@ -74091,7 +74091,7 @@
      }
     },
     "wire_lb": {
-     "value": 3.934,
+     "value": 2.26,
      "tolerance": {
       "abs": 0.02
      }
@@ -74103,7 +74103,7 @@
    "source_publisher": "Rebar tie-wire identity (first-principles)",
    "source_title": "cross-check: a full-tie spec (fraction 1.0) nearly doubles the wire",
    "source_edition_or_year": "spec-v878 worked example",
-   "source_section_or_page": "ties = 651; wire = 651*8/12 = 434 ft; weight = 434*0.0181 = 7.9 lb",
+   "source_section_or_page": "ties = 651; wire = 651*8/12 = 434 ft; weight = 434*0.0104 = 4.51 lb (16 ga; recomputed 2026-10-02)",
    "verified_by": "rl",
    "verified_on": "2026-07-17",
    "inputs": {
@@ -74112,7 +74112,7 @@
     "spacing_in": 12,
     "tie_fraction": 1.0,
     "tie_length_in": 8,
-    "wire_lb_per_ft": 0.0181
+    "wire_lb_per_ft": 0.0104
    },
    "outputs": {
     "ties": {
@@ -74122,7 +74122,7 @@
      }
     },
     "wire_lb": {
-     "value": 7.855,
+     "value": 4.514,
      "tolerance": {
       "abs": 0.02
      }
@@ -74196,26 +74196,26 @@
    "source_publisher": "Base-plate grout-volume identity (first-principles)",
    "source_title": "18 x 18 in plate, 64 in^2 column, 1.5 in grout, 0.45 ft^3/bag, 10% waste",
    "source_edition_or_year": "spec-v880 worked example",
-   "source_section_or_page": "grout = (324-64)*1.5 = 390 in^3; ft^3 = 390/1728*1.10 = 0.248; bags = ceil(0.248/0.45) = 1",
+   "source_section_or_page": "grout = 324*1.5 = 486 in^3 (no leave-out: the column sits on the plate); ft^3 = 486/1728*1.10 = 0.309; bags = ceil(0.309/0.45) = 1. Recomputed 2026-10-02 from the 64 in^2 column deduction (390 in^3).",
    "verified_by": "rl",
    "verified_on": "2026-07-17",
    "inputs": {
     "plate_length_in": 18,
     "plate_width_in": 18,
-    "column_area_in2": 64,
+    "column_area_in2": 0,
     "grout_thickness_in": 1.5,
     "bag_yield_ft3": 0.45,
     "waste_pct": 10
    },
    "outputs": {
     "grout_in3": {
-     "value": 390,
+     "value": 486,
      "tolerance": {
       "abs": 0.05
      }
     },
     "grout_ft3": {
-     "value": 0.248,
+     "value": 0.309,
      "tolerance": {
       "abs": 0.002
      }
@@ -151869,6 +151869,945 @@
      "value": 3.5,
      "tolerance": {
       "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "vessel-head-volume",
+   "source_publisher": "ProQuip, Inc.",
+   "source_title": "Vessel and Head Volumes -- Depth and Volume of Flanged and Dished Tank Heads (reference sheet)",
+   "source_edition_or_year": "2014 (proquipinc.com/wp-content/uploads/2014/04/vessel_and_head_volumes_reference.pdf)",
+   "source_section_or_page": "p.1 table, ASME 2:1 ELLIPTICAL column: Head Dia. 48 in -> Depth 12 in, Volume 63 gallons. Tile pi*48^3/24/231 = 62.67 gal, depth 12.00 in. The sheet prints whole gallons, indexes by outside head diameter and notes 'Values are approximate, varying with thickness and manufacturer', so abs 0.5 gal covers its rounding.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "inside_diameter_in": 48,
+    "head_type": "elliptical",
+    "straight_flange_in": 0
+   },
+   "outputs": {
+    "head_volume_gal": {
+     "value": 63,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "head_depth_in": {
+     "value": 12,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "vessel-head-volume",
+   "source_publisher": "ProQuip, Inc.",
+   "source_title": "Vessel and Head Volumes -- Depth and Volume of Flanged and Dished Tank Heads (reference sheet)",
+   "source_edition_or_year": "2014 (proquipinc.com/wp-content/uploads/2014/04/vessel_and_head_volumes_reference.pdf)",
+   "source_section_or_page": "p.1 table, ASME 2:1 ELLIPTICAL column: Head Dia. 96 in -> Depth 24 in, Volume 501 gallons. Tile 501.35 gal, depth 24.00 in. Whole-gallon printing; abs 1 gal covers it.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "inside_diameter_in": 96,
+    "head_type": "elliptical",
+    "straight_flange_in": 0
+   },
+   "outputs": {
+    "head_volume_gal": {
+     "value": 501,
+     "tolerance": {
+      "abs": 1
+     }
+    },
+    "head_depth_in": {
+     "value": 24,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "vessel-head-volume",
+   "source_publisher": "ProQuip, Inc.",
+   "source_title": "Vessel and Head Volumes -- Depth and Volume of Flanged and Dished Tank Heads (reference sheet)",
+   "source_edition_or_year": "2014 (proquipinc.com/wp-content/uploads/2014/04/vessel_and_head_volumes_reference.pdf)",
+   "source_section_or_page": "p.1 table, HEMISPHERICAL column: Head Dia. 96 in -> Depth 48 in, Volume 1000 gallons. Tile pi*96^3/12/231 = 1002.70 gal. The sheet rounds to 3 significant figures (1000) and calls values approximate; pct 0.5 covers it.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "inside_diameter_in": 96,
+    "head_type": "hemispherical",
+    "straight_flange_in": 0
+   },
+   "outputs": {
+    "head_volume_gal": {
+     "value": 1000,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "head_depth_in": {
+     "value": 48,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "vessel-head-volume",
+   "source_publisher": "ProQuip, Inc.",
+   "source_title": "Vessel and Head Volumes -- Depth and Volume of Flanged and Dished Tank Heads (reference sheet)",
+   "source_edition_or_year": "2014 (proquipinc.com/wp-content/uploads/2014/04/vessel_and_head_volumes_reference.pdf)",
+   "source_section_or_page": "p.2 table, ASME F & D column: Head Dia. 48 in -> Depth 8.5 in, Volume 38 gallons. Tile 0.0810*48^3/231 = 38.78 gal. Whole-gallon printing of an 'approximate' manufacturer value; abs 1 gal covers it. Depth not asserted (sheet 8.5 in vs tile 0.169 D = 8.11 in; the sheet's depth includes manufacturer variation).",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "inside_diameter_in": 48,
+    "head_type": "fd",
+    "straight_flange_in": 0
+   },
+   "outputs": {
+    "head_volume_gal": {
+     "value": 38,
+     "tolerance": {
+      "abs": 1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "smoke-detector-spacing-count",
+   "source_publisher": "Hochiki America Corporation",
+   "source_title": "Smoke and Heat Detector Application Guide",
+   "source_edition_or_year": "Version 1.00, January 2017",
+   "source_section_or_page": "pp.6-7, 0.7 rule illustration: 'd) 30 ft. x 30 ft. - 900 ft2' fits within one detector's 21 ft (30 ft x 0.7) circle; p.5: detectors 'within a distance of one-half the listed spacing' of walls. Tile: 1 detector, 15 ft wall max. Integer counts, exact.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "room_length_ft": 30,
+    "room_width_ft": 30,
+    "listed_spacing_ft": 30
+   },
+   "outputs": {
+    "detectors": {
+     "value": 1,
+     "tolerance": {
+      "abs": 0
+     }
+    },
+    "wall_max_ft": {
+     "value": 15,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "smoke-detector-spacing-count",
+   "source_publisher": "Hochiki America Corporation",
+   "source_title": "Smoke and Heat Detector Application Guide",
+   "source_edition_or_year": "Version 1.00, January 2017",
+   "source_section_or_page": "pp.6-7: 'Item a illustrates a hallway that is 10 feet x 41 feet. The length of the hallway fits within the circle' -- 'a) 10ft. X 41 ft. = 410 ft2' covered by ONE detector at 30 ft listed spacing (0.7 rule). PENDING FIX: tile currently returns 2 (ceil(41/30) x ceil(10/30)); add only after the 0.7-rule fix.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "room_length_ft": 41,
+    "room_width_ft": 10,
+    "listed_spacing_ft": 30
+   },
+   "outputs": {
+    "detectors": {
+     "value": 1,
+     "tolerance": {
+      "abs": 0
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "soffit-ridge-vent-count",
+   "source_publisher": "Lomanco, Inc.",
+   "source_title": "How Many Attic Vents Do I Need? (ventilation article)",
+   "source_edition_or_year": "lomanco.com/ventilation-articles/how-many-vents/, retrieved 2026-10-02",
+   "source_section_or_page": "'Example: A 2,000-Square-Foot Attic': '2,000 / 300 equals 6.67 square feet ... 960 square inches of total NFA ... 480 square inches for exhaust and 480 square inches for intake'; 'Deck-Air DA-4 provides 36 square inches of NFA ... round up to 14 Deck-Air vents'. Tile: 960, 480, ceil(480/36)=14 (Lomanco divides 500 installed exhaust by 36 = 13.9 -> 14; same count). Ridge input left at 18 in2/ft and not asserted (Lomanco's exhaust is box vents).",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "attic_area_sf": 2000,
+    "vent_ratio": 300,
+    "soffit_vent_nfa_in2": 36,
+    "ridge_nfa_per_ft_in2": 18
+   },
+   "outputs": {
+    "total_nfa_in2": {
+     "value": 960,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "intake_nfa_in2": {
+     "value": 480,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "soffit_vents": {
+     "value": 14,
+     "tolerance": {
+      "abs": 0
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "stucco-coverage",
+   "source_publisher": "QUIKRETE Companies",
+   "source_title": "Scratch and Brown Base Coat Stucco, Product No. 1139-60, -80 data sheet",
+   "source_edition_or_year": "quikrete.com/pdfs/data_sheet-scratch and brown base coat stucco 1139.pdf, retrieved 2026-10-02",
+   "source_section_or_page": "YIELD / COVERAGE: 'An 80 lb (36.2 kg) bag ... will yield approximately 0.75 ft3' (= 9.0 square-foot-inches); '3/8 inch (9.5 mm) 20 ft2 to 24 ft2'. Tile at 24 ft2, 3/8 in, 9.0 sf-in, 0% waste: raw 24*0.375/9.0 = 1.00 bag, 1 bag -- the printed upper coverage bound. abs 0.01 covers float.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "area_sf": 24,
+    "total_thickness_in": 0.375,
+    "bag_yield_sf_in": 9.0,
+    "waste_pct": 0
+   },
+   "outputs": {
+    "raw_bags": {
+     "value": 1,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "bags": {
+     "value": 1,
+     "tolerance": {
+      "abs": 0
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "stucco-coverage",
+   "source_publisher": "QUIKRETE Companies",
+   "source_title": "Scratch and Brown Base Coat Stucco, Product No. 1139-60, -80 data sheet",
+   "source_edition_or_year": "quikrete.com/pdfs/data_sheet-scratch and brown base coat stucco 1139.pdf, retrieved 2026-10-02",
+   "source_section_or_page": "YIELD / COVERAGE: 0.75 ft3 per 80 lb bag (9.0 sf-in); '3/4 inch (19 mm) 10 ft2 to 12 ft2'. Tile at 12 ft2, 3/4 in: raw 12*0.75/9.0 = 1.00 bag. abs 0.01 covers float.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "area_sf": 12,
+    "total_thickness_in": 0.75,
+    "bag_yield_sf_in": 9.0,
+    "waste_pct": 0
+   },
+   "outputs": {
+    "raw_bags": {
+     "value": 1,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "bags": {
+     "value": 1,
+     "tolerance": {
+      "abs": 0
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "duct-bank-ampacity-derate",
+   "source_publisher": "Southwire Company, LLC",
+   "source_title": "Underground Duct Bank Ampacity Calculation Concerns & Considerations (white paper 2104, M. Sadrzadeh)",
+   "source_edition_or_year": "2021",
+   "source_section_or_page": "p.1 'How about we use an example': '2000 / 6 = 333.3 amps ... we must apply the detrating factor of 0.886 as per CEC. 333.33/0.886 = 376.22 AMPS.' Tile required_table_ampacity_a = 333.33/0.886 = 376.22. DET6 geometry (6 cables, 190 mm = 7.48 in spacing, 760 mm = 29.92 in) entered as 2 x 3; only the inverse output is asserted and it is independent of geometry and of base_table_ampacity_a (set to the printed 376.22). NOTE: Southwire's 0.886 is the CEC 75 C termination multiplier, not a duct-geometry factor; the tile's arithmetic is the same. abs 0.01.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "ducts_across": 2,
+    "ducts_down": 3,
+    "loaded_ducts": 6,
+    "spacing_in": 7.48,
+    "depth_to_top_in": 29.92,
+    "base_table_ampacity_a": 376.22,
+    "derate_factor": 0.886,
+    "alt_derate_factor": 0,
+    "target_load_a": 333.33
+   },
+   "outputs": {
+    "required_table_ampacity_a": {
+     "value": 376.22,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "sealant-joint-yield",
+   "source_publisher": "The Dow Chemical Company",
+   "source_title": "Contractor's handbook: A contractor's guide to Dow construction products and procedures (buildsite.com/pdf/dowcorning/Contractors-guide-to-Dow-construction-products-and-procedures-2407427.pdf)",
+   "source_edition_or_year": "Form No. 62-621-01-0924 (c) 2020-2024",
+   "source_section_or_page": "p. 3 'Requirement estimator' (Linear feet sealed, Joint size D x W): '1/4 x 1/4   308' per 1 gallon. One US gallon = 231 in^3, so cartridge_in3 = 231 stands for the 1-gallon column; tile 231/0.0625/12 = 308.0 exactly; abs 0.5 covers the table's whole-foot rounding.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "joint_lf": 100,
+    "cartridge_in3": 231,
+    "joint_width_in": 0.25,
+    "joint_depth_in": 0.25
+   },
+   "outputs": {
+    "cross_in2": {
+     "value": 0.0625,
+     "tolerance": {
+      "abs": 0.0001
+     }
+    },
+    "lf_per_cart": {
+     "value": 308,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "sealant-joint-yield",
+   "source_publisher": "The Dow Chemical Company",
+   "source_title": "Contractor's handbook: A contractor's guide to Dow construction products and procedures (buildsite.com/pdf/dowcorning/Contractors-guide-to-Dow-construction-products-and-procedures-2407427.pdf)",
+   "source_edition_or_year": "Form No. 62-621-01-0924 (c) 2020-2024",
+   "source_section_or_page": "p. 3 'Requirement estimator': '1/2 x 1/2   77' linear feet per 1 gallon (231 in^3). Tile 231/0.25/12 = 77.0; abs 0.5 covers whole-foot rounding.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "joint_lf": 100,
+    "cartridge_in3": 231,
+    "joint_width_in": 0.5,
+    "joint_depth_in": 0.5
+   },
+   "outputs": {
+    "lf_per_cart": {
+     "value": 77,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "sealant-joint-yield",
+   "source_publisher": "The Dow Chemical Company",
+   "source_title": "Contractor's handbook: A contractor's guide to Dow construction products and procedures (buildsite.com/pdf/dowcorning/Contractors-guide-to-Dow-construction-products-and-procedures-2407427.pdf)",
+   "source_edition_or_year": "Form No. 62-621-01-0924 (c) 2020-2024",
+   "source_section_or_page": "p. 3 'Requirement estimator': '3/8 x 1/2   103' linear feet per 1 gallon (D 3/8 x W 1/2; 231 in^3). Tile 231/0.1875/12 = 102.67; abs 0.5 covers the printed whole-foot rounding.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "joint_lf": 100,
+    "cartridge_in3": 231,
+    "joint_width_in": 0.5,
+    "joint_depth_in": 0.375
+   },
+   "outputs": {
+    "lf_per_cart": {
+     "value": 103,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "sealant-joint-yield",
+   "source_publisher": "The Dow Chemical Company",
+   "source_title": "Contractor's handbook: A contractor's guide to Dow construction products and procedures (buildsite.com/pdf/dowcorning/Contractors-guide-to-Dow-construction-products-and-procedures-2407427.pdf)",
+   "source_edition_or_year": "Form No. 62-621-01-0924 (c) 2020-2024",
+   "source_section_or_page": "p. 3 'Requirement estimator', '10.3-fluid ounce cartridge' column: '1/4 x 1/4 ... 25'. 10.3 fl oz x 1.8047 in^3/fl oz (231/128) = 18.588 in^3; tile 18.588/0.0625/12 = 24.78; abs 0.5 covers the printed whole-foot rounding.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "joint_lf": 100,
+    "cartridge_in3": 18.5883,
+    "joint_width_in": 0.25,
+    "joint_depth_in": 0.25
+   },
+   "outputs": {
+    "lf_per_cart": {
+     "value": 25,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "sealant-joint-yield",
+   "source_publisher": "The Dow Chemical Company",
+   "source_title": "Contractor's handbook: A contractor's guide to Dow construction products and procedures (buildsite.com/pdf/dowcorning/Contractors-guide-to-Dow-construction-products-and-procedures-2407427.pdf)",
+   "source_edition_or_year": "Form No. 62-621-01-0924 (c) 2020-2024",
+   "source_section_or_page": "p. 3 'Requirement estimator', '20-fluid ounce sausage' column: '1/4 x 1/4 ... 48'. 20 fl oz x 1.8047 = 36.094 in^3; tile 36.094/0.0625/12 = 48.13; abs 0.5 covers whole-foot rounding.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "joint_lf": 100,
+    "cartridge_in3": 36.0938,
+    "joint_width_in": 0.25,
+    "joint_depth_in": 0.25
+   },
+   "outputs": {
+    "lf_per_cart": {
+     "value": 48,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "tapered-roof-insulation",
+   "source_publisher": "Johns Manville",
+   "source_title": "Tapered Polyiso Insulation chart (jm.com/content/dam/jm/global/en/commercial-roofing/Resources/Tapered-Insulation-Chart.pdf)",
+   "source_edition_or_year": "RS-5559 4-22",
+   "source_section_or_page": "Panel 'X': slope 1/4 in./ft, Thin 0.5, Thick 1.5, Square Feet per Unit 768, Board Feet per Unit 768. 4 x 4 ft panels, so the taper run is 4 ft (0.5 + 0.25 x 4 = 1.5 in, the printed thick edge). Tile avg 1 in x 768 sf = 768 board feet exactly; abs 0.5 covers float only. LTTR is not asserted (the chart's LTTR is not linear in average thickness).",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "run_ft": 4,
+    "slope_in_per_ft": 0.25,
+    "start_thk_in": 0.5,
+    "area_sf": 768,
+    "r_per_in": 5.7
+   },
+   "outputs": {
+    "avg_thk_in": {
+     "value": 1,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "board_feet": {
+     "value": 768,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "tapered-roof-insulation",
+   "source_publisher": "Johns Manville",
+   "source_title": "Tapered Polyiso Insulation chart (jm.com/content/dam/jm/global/en/commercial-roofing/Resources/Tapered-Insulation-Chart.pdf)",
+   "source_edition_or_year": "RS-5559 4-22",
+   "source_section_or_page": "Panel 'AA': slope 1/8 in./ft, Thin 0.5, Thick 1, Square Feet per Unit 1024, Board Feet per Unit 768. 4 x 4 ft panels, so the taper run is 4 ft (0.5 + 0.125 x 4 = 1 in, the printed thick edge). Tile avg 0.75 in x 1024 sf = 768 board feet exactly; abs 0.5 covers float only. LTTR is not asserted (the chart's LTTR is not linear in average thickness).",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "run_ft": 4,
+    "slope_in_per_ft": 0.125,
+    "start_thk_in": 0.5,
+    "area_sf": 1024,
+    "r_per_in": 5.7
+   },
+   "outputs": {
+    "avg_thk_in": {
+     "value": 0.75,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "board_feet": {
+     "value": 768,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "tapered-roof-insulation",
+   "source_publisher": "Johns Manville",
+   "source_title": "Tapered Polyiso Insulation chart (jm.com/content/dam/jm/global/en/commercial-roofing/Resources/Tapered-Insulation-Chart.pdf)",
+   "source_edition_or_year": "RS-5559 4-22",
+   "source_section_or_page": "Panel 'J': slope 3/16 in./ft, Thin 1, Thick 1.75, Square Feet per Unit 512, Board Feet per Unit 704. 4 x 4 ft panels, so the taper run is 4 ft (1 + 0.1875 x 4 = 1.75 in, the printed thick edge). Tile avg 1.375 in x 512 sf = 704 board feet exactly; abs 0.5 covers float only. LTTR is not asserted (the chart's LTTR is not linear in average thickness).",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "run_ft": 4,
+    "slope_in_per_ft": 0.1875,
+    "start_thk_in": 1,
+    "area_sf": 512,
+    "r_per_in": 5.7
+   },
+   "outputs": {
+    "avg_thk_in": {
+     "value": 1.375,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "board_feet": {
+     "value": 704,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "tapered-roof-insulation",
+   "source_publisher": "Johns Manville",
+   "source_title": "Tapered Polyiso Insulation chart (jm.com/content/dam/jm/global/en/commercial-roofing/Resources/Tapered-Insulation-Chart.pdf)",
+   "source_edition_or_year": "RS-5559 4-22",
+   "source_section_or_page": "Panel 'Q': slope 1/2 in./ft, Thin 0.5, Thick 2.5, Square Feet per Unit 512, Board Feet per Unit 768. 4 x 4 ft panels, so the taper run is 4 ft (0.5 + 0.5 x 4 = 2.5 in, the printed thick edge). Tile avg 1.5 in x 512 sf = 768 board feet exactly; abs 0.5 covers float only. LTTR is not asserted (the chart's LTTR is not linear in average thickness).",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "run_ft": 4,
+    "slope_in_per_ft": 0.5,
+    "start_thk_in": 0.5,
+    "area_sf": 512,
+    "r_per_in": 5.7
+   },
+   "outputs": {
+    "avg_thk_in": {
+     "value": 1.5,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "board_feet": {
+     "value": 768,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "tapered-roof-insulation",
+   "source_publisher": "Johns Manville",
+   "source_title": "Tapered Polyiso Insulation chart (jm.com/content/dam/jm/global/en/commercial-roofing/Resources/Tapered-Insulation-Chart.pdf)",
+   "source_edition_or_year": "RS-5559 4-22",
+   "source_section_or_page": "Panel '1A': slope 1/16 in./ft, Thin 0.5, Thick 0.75, Square Feet per Unit 1120, Board Feet per Unit 700. 4 x 4 ft panels, so the taper run is 4 ft (0.5 + 0.0625 x 4 = 0.75 in, the printed thick edge). Tile avg 0.625 in x 1120 sf = 700 board feet exactly; abs 0.5 covers float only. LTTR is not asserted (the chart's LTTR is not linear in average thickness).",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "run_ft": 4,
+    "slope_in_per_ft": 0.0625,
+    "start_thk_in": 0.5,
+    "area_sf": 1120,
+    "r_per_in": 5.7
+   },
+   "outputs": {
+    "avg_thk_in": {
+     "value": 0.625,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "board_feet": {
+     "value": 700,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "refrigerant-lineset-charge-adjust",
+   "source_publisher": "Goodman Manufacturing Company, L.P.",
+   "source_title": "Long Line Set Application R-410A (TP-107M), securenet.goodmanmfg.com/Toolkit/LongsetGuideLines/TP-107 LONG LINE SET APPLICATION.pdf",
+   "source_edition_or_year": "TP-107M, September 2020",
+   "source_section_or_page": "Section 5 item 4: 'All residential R-410A outdoor units are factory charged for 15 feet', 'RA (oz.) = (LA - 15) ft. x 0.6 oz./ft.'; Table 5-5 rate for 3/8\" liquid line only = 0.60 oz/ft; Table 5-6 'Additional lineal line length over 15 feet' 25 -> 15 oz. LA = 40 ft. Tile 15.00 oz; abs 0.6 covers the table's whole-ounce rounding.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "lineset_length_ft": 40,
+    "factory_charge_length_ft": 15,
+    "rate_oz_per_ft": 0.6
+   },
+   "outputs": {
+    "extra_oz": {
+     "value": 15,
+     "tolerance": {
+      "abs": 0.6
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "refrigerant-lineset-charge-adjust",
+   "source_publisher": "Goodman Manufacturing Company, L.P.",
+   "source_title": "Long Line Set Application R-410A (TP-107M), securenet.goodmanmfg.com/Toolkit/LongsetGuideLines/TP-107 LONG LINE SET APPLICATION.pdf",
+   "source_edition_or_year": "TP-107M, September 2020",
+   "source_section_or_page": "Section 5 item 4: 'All residential R-410A outdoor units are factory charged for 15 feet', 'RA (oz.) = (LA - 15) ft. x 0.6 oz./ft.'; Table 5-5 rate for 3/8\" liquid line only = 0.60 oz/ft; Table 5-6 'Additional lineal line length over 15 feet' 100 -> 60 oz. LA = 115 ft. Tile 60.00 oz; abs 0.6 covers the table's whole-ounce rounding.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "lineset_length_ft": 115,
+    "factory_charge_length_ft": 15,
+    "rate_oz_per_ft": 0.6
+   },
+   "outputs": {
+    "extra_oz": {
+     "value": 60,
+     "tolerance": {
+      "abs": 0.6
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "refrigerant-lineset-charge-adjust",
+   "source_publisher": "Goodman Manufacturing Company, L.P.",
+   "source_title": "Long Line Set Application R-410A (TP-107M), securenet.goodmanmfg.com/Toolkit/LongsetGuideLines/TP-107 LONG LINE SET APPLICATION.pdf",
+   "source_edition_or_year": "TP-107M, September 2020",
+   "source_section_or_page": "Section 5 item 4: 'All residential R-410A outdoor units are factory charged for 15 feet', 'RA (oz.) = (LA - 15) ft. x 0.6 oz./ft.'; Table 5-5 rate for 3/8\" liquid line & 3/4\" suction line = 0.67 oz/ft; Table 5-6 'Additional lineal line length over 15 feet' 100 -> 67 oz. LA = 115 ft. Tile 67.00 oz; abs 0.6 covers the table's whole-ounce rounding.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "lineset_length_ft": 115,
+    "factory_charge_length_ft": 15,
+    "rate_oz_per_ft": 0.67
+   },
+   "outputs": {
+    "extra_oz": {
+     "value": 67,
+     "tolerance": {
+      "abs": 0.6
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "refrigerant-lineset-charge-adjust",
+   "source_publisher": "Goodman Manufacturing Company, L.P.",
+   "source_title": "Long Line Set Application R-410A (TP-107M), securenet.goodmanmfg.com/Toolkit/LongsetGuideLines/TP-107 LONG LINE SET APPLICATION.pdf",
+   "source_edition_or_year": "TP-107M, September 2020",
+   "source_section_or_page": "Section 5 item 4: 'All residential R-410A outdoor units are factory charged for 15 feet', 'RA (oz.) = (LA - 15) ft. x 0.6 oz./ft.'; Table 5-5 rate for 3/8\" liquid line & 1-1/8\" suction line = 0.78 oz/ft; Table 5-6 'Additional lineal line length over 15 feet' 175 -> 137 oz. LA = 190 ft. Tile 136.50 oz; abs 0.6 covers the table's whole-ounce rounding.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "lineset_length_ft": 190,
+    "factory_charge_length_ft": 15,
+    "rate_oz_per_ft": 0.78
+   },
+   "outputs": {
+    "extra_oz": {
+     "value": 137,
+     "tolerance": {
+      "abs": 0.6
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "cable-reel-capacity",
+   "source_publisher": "Southwire Company",
+   "source_title": "Power Cable Manual, Appendix 'Capacity and Drum Diameter of Reels' (Southwire Power Cable Manual.pdf)",
+   "source_edition_or_year": "3rd Edition, (c) 2006",
+   "source_section_or_page": "p. A-1/A-2 'Typical Reel Capacity Calculation': 'A = 36 inches B = 18 inches C = 22 inches', cable diameter 1 inch, worked as (36 - 2*1 - 18)/(1.9*1.00) with 0.95 nesting and 0.95 traverse factors, result 'F = 1089 ft.' Inputs: flange = A - 2x = 34 in (the printed '36 - 2*1' clearance deduction), fill = 0.95 x 0.95 = 0.9025 (the two printed factors). Tile 1081.2 ft (-0.7%); pct 1.5 covers the rigorous method's truncation of layers (8.42 -> 8) and turns (20.90 -> 20), which the area formula does not do.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "flange_dia_in": 34,
+    "drum_dia_in": 18,
+    "traverse_width_in": 22,
+    "cable_od_in": 1,
+    "fill_factor": 0.9025
+   },
+   "outputs": {
+    "length_ft": {
+     "value": 1089,
+     "tolerance": {
+      "pct": 1.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "suspended-ceiling-grid",
+   "source_publisher": "Armstrong World Industries (AWI Licensing LLC)",
+   "source_title": "FrameAll Drywall Grid System Technical Guide: Hanging & Framing Flat Ceilings (armstrongceilings.com ... hanging-framing-flat-ceilings-technical-guide.pdf)",
+   "source_edition_or_year": "BPCS-3539-826, (c) 2026",
+   "source_section_or_page": "p. 32 'Estimating': 'Example calculation based on 5,100 sq. ft. ceiling: Main beam at 48\" O.C. 5,100 sq. ft. x 0.25 = 1,275 ln. ft.' The source prints only the area; 51 x 100 ft is one room of that area and main_tee_lf depends only on area (any L x W = 5,100 gives 1,275). Only main_tee_lf is asserted (wall angle depends on the chosen shape). abs 0.01 covers float only.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "room_length_ft": 51,
+    "room_width_ft": 100
+   },
+   "outputs": {
+    "main_tee_lf": {
+     "value": 1275,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "striping-paint-quantity",
+   "source_publisher": "Wyoming Department of Transportation",
+   "source_title": "Pavement Marking Manual",
+   "source_edition_or_year": "2012 (PDF dated 2014-01-31)",
+   "source_section_or_page": "p. 16, Paint and Bead Application Rates: 'Paint shall be applied at a wet thickness rate of 16 mils (0.016 in.). This is equal to 17.6 ... gallons of paint per pass mile for a 4\" solid ... line'. Input coverage is the printed 16 mil converted by the exact gallon (231 in^3 / 0.016 in / 144 = 100.26 sf/gal); tile gives 17.554 gal vs printed 17.6 (0.26%, WYDOT rounds to 0.1 gal); pct 0.5 covers it. NOTE: the tile's default 320 sf/gal and its note '15 mil runs about 320-360 sf/gal' are about 3x too high (see r61c report).",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "length_ft": 5280,
+    "width_in": 4,
+    "coverage_sf_per_gal": 100.2604,
+    "bead_rate_lb_per_gal": 8
+   },
+   "outputs": {
+    "stripe_sf": {
+     "value": 1760,
+     "tolerance": {
+      "abs": 0.1
+     }
+    },
+    "paint_gal": {
+     "value": 17.6,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "striping-paint-quantity",
+   "source_publisher": "Iowa Department of Transportation",
+   "source_title": "Standard Specifications for Highway and Bridge Construction, Section 2527 Pavement Marking",
+   "source_edition_or_year": "current Electronic Reference Library edition (ia.iowadot.gov/erl/current/GS/content/2527.htm)",
+   "source_section_or_page": "Table 2527.02-1 Waterborne paint: 4\" line, '14 mils' wet film, '343.7 ft. of solid line per gallon of paint', glass beads '9.0 lb./gal.' Input coverage is the printed 14 mil converted by the exact gallon (231/0.014/144 = 114.583 sf/gal); tile gives 0.99985 gal for 343.7 ft (printed: one gallon) and 8.9987 lb beads (9.0 lb per that gallon); pct 0.5 covers the 0.1 ft rounding of 343.7.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "length_ft": 343.7,
+    "width_in": 4,
+    "coverage_sf_per_gal": 114.5833,
+    "bead_rate_lb_per_gal": 9
+   },
+   "outputs": {
+    "paint_gal": {
+     "value": 1,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "beads_lb": {
+     "value": 9,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "dust-control-water",
+   "source_publisher": "Blue Line Transportation Co.",
+   "source_title": "Earthbind vs. Water for Dust Control",
+   "source_edition_or_year": "web article, read via Wayback 2024 capture",
+   "source_section_or_page": "Section 3 Volume: 'the common application rate for watering a road is approximately 1/2-gallon per square yard. This volume equates to roughly 4,700-gallons of water for each application based on a mile of road, 16 feet wide'; Section 4: 'may require 23,400-gallons per day ... if it needs to be watered five times a day at a rate of 1/2-gallon per square yard'. Tile: 4,693.3 gal/app (printed 'roughly 4,700') and 23,466.7 gal/day (printed 23,400, 0.29%); tolerances cover the source's rounding. truck_cap_gal is not printed and does not affect these outputs.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "length_ft": 5280,
+    "width_ft": 16,
+    "rate_gal_per_sy": 0.5,
+    "truck_cap_gal": 4000,
+    "applications_per_day": 5
+   },
+   "outputs": {
+    "gal_per_app": {
+     "value": 4700,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "daily_gal": {
+     "value": 23400,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "hydroseed-mix",
+   "source_publisher": "Alabama Soil and Water Conservation Committee (presentation by E. Norton, USDA-NRCS Auburn AL)",
+   "source_title": "Hydroseeding 101 (Healthy Streams for Healthy Lakes, Clearwater Alabama)",
+   "source_edition_or_year": "2021",
+   "source_section_or_page": "'Hydroseeder Working Capacities': '4,000 Gallons of water per acre of Hydromulch (Hydraulic Mulch, HM) at 2,000-pounds per acre (100-gallons per 50-pounds of Mulch)'; table row '1200 1000 gal ... HM load/ac 4.0'. 100 gal per 50 lb = 0.5 lb/gal; 1 acre, mulch only. Tile tanks = 4 exactly (integer).",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "area_ac": 1,
+    "seed_rate_lb_ac": 0,
+    "mulch_rate_lb_ac": 2000,
+    "tackifier_rate_lb_ac": 0,
+    "tank_gal": 1000,
+    "max_load_lb_per_gal": 0.5
+   },
+   "outputs": {
+    "total_solids_lb": {
+     "value": 2000,
+     "tolerance": {
+      "abs": 0.1
+     }
+    },
+    "tanks": {
+     "value": 4,
+     "tolerance": {
+      "abs": 0
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "hydroseed-mix",
+   "source_publisher": "Alabama Soil and Water Conservation Committee (presentation by E. Norton, USDA-NRCS Auburn AL)",
+   "source_title": "Hydroseeding 101 (Healthy Streams for Healthy Lakes, Clearwater Alabama)",
+   "source_edition_or_year": "2021",
+   "source_section_or_page": "'Hydroseeder Working Capacities' table row '900 800 gal ... HM load/ac 5.0' with HM at 2,000 lb/acre and '100-gallons per 50-pounds of Mulch' (0.5 lb/gal). Tile tanks = 5 exactly.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "area_ac": 1,
+    "seed_rate_lb_ac": 0,
+    "mulch_rate_lb_ac": 2000,
+    "tackifier_rate_lb_ac": 0,
+    "tank_gal": 800,
+    "max_load_lb_per_gal": 0.5
+   },
+   "outputs": {
+    "tanks": {
+     "value": 5,
+     "tolerance": {
+      "abs": 0
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "hydroseed-mix",
+   "source_publisher": "Alabama Soil and Water Conservation Committee (presentation by E. Norton, USDA-NRCS Auburn AL)",
+   "source_title": "Hydroseeding 101 (Healthy Streams for Healthy Lakes, Clearwater Alabama)",
+   "source_edition_or_year": "2021",
+   "source_section_or_page": "'6,000 Gallons of water per acre of Bonded Fiber Matrix Hydromulch (Hydraulic Erosion Control Product, HECP) at 3,000-pounds per acre (100-gallons per 50-pounds of Mulch)'; table row '1200 1000 gal ... HEC load/ac 6.0'. Tile tanks = 6 exactly.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "area_ac": 1,
+    "seed_rate_lb_ac": 0,
+    "mulch_rate_lb_ac": 3000,
+    "tackifier_rate_lb_ac": 0,
+    "tank_gal": 1000,
+    "max_load_lb_per_gal": 0.5
+   },
+   "outputs": {
+    "total_solids_lb": {
+     "value": 3000,
+     "tolerance": {
+      "abs": 0.1
+     }
+    },
+    "tanks": {
+     "value": 6,
+     "tolerance": {
+      "abs": 0
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "concrete-pour-rate",
+   "source_publisher": "U.S. Navy, Naval Education and Training Command",
+   "source_title": "Builder Advanced (NAVEDTRA 14045), Chapter 3 Formwork, Pressure from Vertical Rate of Placement",
+   "source_edition_or_year": "NAVEDTRA 14045 (tpub.com mirror)",
+   "source_section_or_page": "'you estimate 8 cubic yards or 216 cubic feet will be placed in the form per hour. In this case, the vertical rate of placement is 216 cubic feet, divide by 30 square feet of horizontal area, or about 7 feet per hour.' Tile gives 7.2 ft/hr; printed 'about 7'; abs 0.3 covers the rounding. total_volume_cy and truck_load_cy are not printed and do not affect this output.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "placement_rate_cyhr": 8,
+    "form_plan_area_ft2": 30,
+    "total_volume_cy": 8,
+    "truck_load_cy": 10
+   },
+   "outputs": {
+    "rate_of_rise_ft_hr": {
+     "value": 7,
+     "tolerance": {
+      "abs": 0.3
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "duct-metal-weight",
+   "source_publisher": "MEP Academy",
+   "source_title": "Sheet Metal Materials (HVAC ductwork estimating course chapter)",
+   "source_edition_or_year": "web article, read 2026-10-02",
+   "source_section_or_page": "Duct stretch-out example: 'a 24\" x 12\" piece of ductwork that was 5 feet long ... (12\" + 24\" + 12\" + 24\" = 72\")/12\" = 6 feet ... (6' x 5' = 30 Ft2)'; gauge table '24 ga = 1.156 Lbs/Ft2'. Seam factor 1 because the example states weights 'excluding joint material and reinforcement'. Exact match.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "width_in": 24,
+    "height_in": 12,
+    "length_ft": 5,
+    "lb_per_sf": 1.156,
+    "seam_factor": 1
+   },
+   "outputs": {
+    "perimeter_ft": {
+     "value": 6,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "area_sf": {
+     "value": 30,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "duct-metal-weight",
+   "source_publisher": "MEP Academy",
+   "source_title": "Sheet Metal Materials (HVAC ductwork estimating course chapter)",
+   "source_edition_or_year": "web article, read 2026-10-02",
+   "source_section_or_page": "'a 12\" x 12\" duct ... 12\" + 12\" + 12\" + 12\" = 48\" ... (48\" / 12\" = 4 feet) ... 4 feet x 10 feet = 40 Ft2'; '26 ga = 0.906 Lbs/Ft2'; 'excluding joint material and reinforcement' so seam factor 1. Exact match.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "width_in": 12,
+    "height_in": 12,
+    "length_ft": 10,
+    "lb_per_sf": 0.906,
+    "seam_factor": 1
+   },
+   "outputs": {
+    "perimeter_ft": {
+     "value": 4,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "area_sf": {
+     "value": 40,
+     "tolerance": {
+      "abs": 0.001
      }
     }
    }

@@ -2,7 +2,7 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "91e783a5ad5ef186",
+      "sha": "578107e99df7c43c",
       "date": "2026-10-03"
     },
     "/tools/": {
@@ -22,8 +22,8 @@
       "date": "2026-10-03"
     },
     "/groups/construction/": {
-      "sha": "db307a20c4972b07",
-      "date": "2026-10-01"
+      "sha": "fa2607f68bb18b4d",
+      "date": "2026-10-03"
     },
     "/groups/cross-trade/": {
       "sha": "9576d0bccacd57d8",
@@ -510,8 +510,8 @@
       "date": "2026-10-01"
     },
     "/tools/baseplate-grout-volume/": {
-      "sha": "0b4cd05ed2bd66c6",
-      "date": "2026-09-29"
+      "sha": "484ffe6e6501468b",
+      "date": "2026-10-03"
     },
     "/tools/battery-c-rate/": {
       "sha": "3d087a1de4a15382",
@@ -2438,8 +2438,8 @@
       "date": "2026-09-29"
     },
     "/tools/duct-bank-ampacity-derate/": {
-      "sha": "2f70fc64bf998069",
-      "date": "2026-10-01"
+      "sha": "6b20dcab2b5a1bcf",
+      "date": "2026-10-03"
     },
     "/tools/duct-bank-concrete/": {
       "sha": "f413e35492a70860",
@@ -3402,8 +3402,8 @@
       "date": "2026-09-29"
     },
     "/tools/glass-vacuum-lift/": {
-      "sha": "3179ee0f042c6db6",
-      "date": "2026-09-29"
+      "sha": "0da9c47c1987a624",
+      "date": "2026-10-03"
     },
     "/tools/glass-weight/": {
       "sha": "3f4b9dbd84d128eb",
@@ -3678,8 +3678,8 @@
       "date": "2026-09-30"
     },
     "/tools/heat-trace-sizing/": {
-      "sha": "959482bc5e65dc3b",
-      "date": "2026-09-30"
+      "sha": "78ecf990d2472710",
+      "date": "2026-10-03"
     },
     "/tools/heat-treat-soak-time/": {
       "sha": "60a3b48e86ca69ca",
@@ -6122,8 +6122,8 @@
       "date": "2026-09-29"
     },
     "/tools/rebar-tie-wire/": {
-      "sha": "c38afa82e9478c48",
-      "date": "2026-09-29"
+      "sha": "4db7df7f575b4e63",
+      "date": "2026-10-03"
     },
     "/tools/rebar-weight-takeoff/": {
       "sha": "74696179462d245f",
@@ -6602,8 +6602,8 @@
       "date": "2026-09-29"
     },
     "/tools/scaffold-leg-load/": {
-      "sha": "6a41201a8cf40de2",
-      "date": "2026-09-29"
+      "sha": "03254519abd34b9c",
+      "date": "2026-10-03"
     },
     "/tools/scaffold-mudsill-bearing/": {
       "sha": "b10f0a5427d39769",
@@ -6662,8 +6662,8 @@
       "date": "2026-09-29"
     },
     "/tools/sealant-joint-yield/": {
-      "sha": "952d9e7c3aba8f1d",
-      "date": "2026-09-29"
+      "sha": "c4b18645200f6dbf",
+      "date": "2026-10-03"
     },
     "/tools/search-probability/": {
       "sha": "abecc7fe5de67479",
@@ -7690,8 +7690,8 @@
       "date": "2026-09-29"
     },
     "/tools/striping-paint-quantity/": {
-      "sha": "4679b65e463f86d6",
-      "date": "2026-09-29"
+      "sha": "454abb3b74d5aa52",
+      "date": "2026-10-03"
     },
     "/tools/structure-debris-estimate/": {
       "sha": "94649da89ab6dd73",

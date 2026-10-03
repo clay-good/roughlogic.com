@@ -295,8 +295,21 @@ export function computeSmokeDetectorSpacingCount({ room_length_ft = 60, room_wid
   if (!(room_length_ft > 0)) return { error: "Room length must be positive (ft)." };
   if (!(room_width_ft > 0)) return { error: "Room width must be positive (ft)." };
   if (!(listed_spacing_ft > 0)) return { error: "Listed spacing must be positive (ft)." };
-  const rows = Math.ceil(room_length_ft / listed_spacing_ft - 1e-9);
-  const cols = Math.ceil(room_width_ft / listed_spacing_ft - 1e-9);
+  // A detector's cell is acceptable if it fits the listed S x S square OR every point in it lies within
+  // 0.7 S of the detector (NFPA 72 17.7.4.2.3.1). Until 2026-10-02 only the square grid was used, so a
+  // 10 x 41 ft corridor read 2 detectors where Hochiki's application guide covers it with one.
+  const S = listed_spacing_ft, R = 0.7 * S;
+  // The published rectangles (30 ft: 10 x 41, 15 x 39, 20 x 37) are the 0.7 S circle with the allowed
+  // length rounded to the whole foot (2 sqrt(21^2 - 5^2) = 40.8 -> 41), so compare against that.
+  const fitsCircle = (a, b) => b / 2 < R && a <= Math.round(2 * Math.sqrt(R * R - (b / 2) * (b / 2))) + 1e-9;
+  const cellOk = (a, b) => (a <= S * (1 + 1e-9) && b <= S * (1 + 1e-9)) || fitsCircle(a, b) || fitsCircle(b, a);
+  const rMax = Math.ceil(room_length_ft / S - 1e-9), cMax = Math.ceil(room_width_ft / S - 1e-9);
+  let rows = rMax, cols = cMax;
+  for (let r = 1; r <= rMax; r++) {
+    for (let c = 1; c <= cMax; c++) {
+      if (r * c < rows * cols && cellOk(room_length_ft / r, room_width_ft / c)) { rows = r; cols = c; }
+    }
+  }
   const detectors = rows * cols;
   const wall_max_ft = listed_spacing_ft / 2;
   if (![rows, cols, detectors, wall_max_ft].every(Number.isFinite)) return { error: "Detector-count math is not a finite value." };
@@ -305,7 +318,7 @@ export function computeSmokeDetectorSpacingCount({ room_length_ft = 60, room_wid
     cols,
     detectors,
     wall_max_ft,
-    note: "The listed spacing (about 30 ft for spot smoke on a smooth ceiling) comes from the device listing. The 0.7-times-spacing rule confirms no point is farther than that from a detector; the first detector sits within half the spacing of each wall. Beams, high ceilings, and HVAC reduce the spacing per NFPA 72. Like sprinkler-head-layout, this is an install estimate the stamped fire-alarm plan and the AHJ plan-review govern.",
+    note: "The listed spacing (about 30 ft for spot smoke on a smooth ceiling) comes from the device listing. The count is the fewest detectors whose cells either fit the listed S x S square or keep every point within 0.7 x S of a detector (NFPA 72), which lets a long narrow corridor take fewer than the square grid; the first detector sits within half the spacing of each wall. Beams, high ceilings, and HVAC reduce the spacing per NFPA 72. Like sprinkler-head-layout, this is an install estimate the stamped fire-alarm plan and the AHJ plan-review govern.",
   };
 }
 

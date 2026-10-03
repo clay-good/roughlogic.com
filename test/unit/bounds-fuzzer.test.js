@@ -19203,14 +19203,17 @@ test("bounds: spec-v833 computeHddPullback pins the pullback, the utilization (a
 });
 
 test("bounds: spec-v834 computeScaffoldLegLoad pins the total/leg load, SWL, utilization, pass flag, and error seams", () => {
-  // 100 + 2*250 + 500 = 1,100; leg 275; SWL 625; util 0.44; pass.
+  // 100 + 2*250 + 500 = 1,100; leg 275; util = (100/4 + 4 x 1000/4) / 2500 = 0.41 (own weight + 4 x intended); pass.
   const r = _v834sll({ platform_dead_lb: 100, num_workers: 2, worker_lb: 250, material_lb: 500, n_legs: 4, component_rating_lb: 2500 });
   assert.strictEqual(r.total_load_lb, 1100);
   assert.strictEqual(r.leg_load_lb, 275);
   assert.strictEqual(r.swl_lb, 625);
-  assert.ok(Math.abs(r.utilization - 0.44) < 1e-9);
+  assert.ok(Math.abs(r.utilization - 0.41) < 1e-9);
+  // A heavy dead load is not multiplied by 4 (OSHA 2013-12-06): 2,000 lb of scaffold + 400 lb intended on
+  // 4 legs at 2,500 lb is (500 + 400) / 2500 = 0.36, not (2400/4) / 625 = 0.96.
+  assert.ok(Math.abs(_v834sll({ platform_dead_lb: 2000, num_workers: 0, worker_lb: 250, material_lb: 400, n_legs: 4, component_rating_lb: 2500 }).utilization - 0.36) < 1e-9);
   assert.strictEqual(r.pass, true);
-  // 4 workers + 1,500 lb material -> 650 lb/leg, over the 625 SWL (fail).
+  // 4 workers + 1,500 lb material -> 650 lb/leg; (25 + 4 x 625) / 2500 = 1.01 (fail).
   const over = _v834sll({ platform_dead_lb: 100, num_workers: 4, worker_lb: 250, material_lb: 1500, n_legs: 4, component_rating_lb: 2500 });
   assert.strictEqual(over.leg_load_lb, 650);
   assert.strictEqual(over.pass, false);
@@ -19626,7 +19629,9 @@ test("bounds: spec-v857 computePipeInsulationTakeoff pins the cut length, sectio
 
 test("bounds: spec-v858 computeHeatTraceSizing pins the cable length, watts, amps, the ok flag, and error seams", () => {
   // 150 ft, 10% allowance, 1 valve at 3 ft, 5 W/ft, 120 V, 20 A -> 168 ft, 840 W, 7.0 A, ok.
-  const r = _v858hts({ pipe_ft: 150, allowance_pct: 10, num_valves: 1, valve_allow_ft: 3, rated_w_per_ft: 5, voltage: 120, breaker_a: 20 });
+  const r = _v858hts({ pipe_ft: 150, allowance_pct: 10, num_valves: 1, valve_allow_ft: 3, rated_w_per_ft: 5, voltage: 120, breaker_a: 20, start_factor: 2 });
+  // The default cold-start factor is 3: 7.0 A running starts at 21 A and trips a 20 A breaker.
+  assert.strictEqual(_v858hts({ pipe_ft: 150, allowance_pct: 10, num_valves: 1, valve_allow_ft: 3, rated_w_per_ft: 5, voltage: 120, breaker_a: 20 }).breaker_ok, false);
   assert.ok(Math.abs(r.cable_ft - 168) < 1e-9);
   assert.ok(Math.abs(r.watts - 840) < 1e-9);
   assert.ok(Math.abs(r.amps - 7.0) < 1e-9);
@@ -29044,6 +29049,10 @@ test("bounds: spec-v907 computeSoffitRidgeVentCount pins the NFA, soffit vents, 
 import { computeSmokeDetectorSpacingCount as _v908 } from "../../calc-firesprinkler.js";
 
 test("bounds: spec-v908 computeSmokeDetectorSpacingCount pins the grid, detector count, wall max, and error seams", () => {
+  // NFPA 72 0.7 S rule (Hochiki guide): at 30 ft one detector covers 10 x 41, 15 x 39, 20 x 37 and 30 x 30;
+  // the square grid alone read 2 for each rectangle. 10 x 42 is past the circle.
+  for (const [l, w] of [[41, 10], [39, 15], [37, 20], [30, 30]]) assert.strictEqual(_v908({ room_length_ft: l, room_width_ft: w, listed_spacing_ft: 30 }).detectors, 1);
+  assert.strictEqual(_v908({ room_length_ft: 42, room_width_ft: 10, listed_spacing_ft: 30 }).detectors, 2);
   const r = _v908({ room_length_ft: 60, room_width_ft: 40, listed_spacing_ft: 30 });
   assert.equal(r.rows, 2); // ceil(60/30)
   assert.equal(r.cols, 2); // ceil(40/30)

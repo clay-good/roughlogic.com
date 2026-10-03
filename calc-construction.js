@@ -5836,8 +5836,11 @@ export function computeScaffoldLegLoad({ platform_dead_lb = 100, num_workers = 2
   const total_load_lb = platform_dead_lb + num_workers * worker_lb + material_lb;
   const leg_load_lb = total_load_lb / n_legs;
   const swl_lb = component_rating_lb / 4;
-  const utilization = leg_load_lb / swl_lb;
-  const pass = leg_load_lb <= swl_lb;
+  // OSHA 1926.451(a)(1): a component carries its OWN weight plus 4 x the maximum INTENDED load
+  // (OSHA interpretation 2013-12-06). Until 2026-10-02 the dead load was multiplied by 4 as well.
+  const intended_per_leg_lb = (total_load_lb - platform_dead_lb) / n_legs;
+  const utilization = (platform_dead_lb / n_legs + 4 * intended_per_leg_lb) / component_rating_lb;
+  const pass = utilization <= 1 + 1e-9;
   if (![total_load_lb, leg_load_lb, swl_lb, utilization].every(Number.isFinite)) return { error: "Scaffold-load math is not a finite value." };
   return {
     total_load_lb,
@@ -5845,7 +5848,7 @@ export function computeScaffoldLegLoad({ platform_dead_lb = 100, num_workers = 2
     swl_lb,
     utilization,
     pass,
-    note: "The component rating is the manufacturer's; OSHA 1926.451(a)(1) sets the 4:1 minimum; the 250 lb per person is the non-mandatory Appendix A to Subpart L's one-person allowance. The distribution to legs depends on the configuration and any stacked lifts above - this assumes an even share. A competent person verifies the load and setup. The leg load feeds scaffold-mudsill-bearing for the foundation check.",
+    note: "The rating is the component's ULTIMATE capacity: OSHA 1926.451(a)(1) requires it to carry its own weight plus 4 times the maximum intended load (the 2013-12-06 interpretation excludes the scaffold's own weight from the intended load), so the check is dead + 4 x (workers + material) per leg against the capacity. A manufacturer's published ALLOWABLE leg load already includes the 4:1, so enter 4 times it here; the 250 lb per person is the non-mandatory Appendix A to Subpart L's one-person allowance. The distribution to legs depends on the configuration and any stacked lifts above - this assumes an even share. A competent person verifies the load and setup. The leg load feeds scaffold-mudsill-bearing for the foundation check.",
   };
 }
 
@@ -5860,12 +5863,12 @@ const _renderScaffoldLegLoad = _simpleRenderer({
     { key: "worker_lb", label: "Weight per worker with tools (lb)", kind: "number" },
     { key: "material_lb", label: "Stored material load (lb)", kind: "number" },
     { key: "n_legs", label: "Legs sharing the bay (count)", kind: "number" },
-    { key: "component_rating_lb", label: "Manufacturer leg / frame rating (lb)", kind: "number" },
+    { key: "component_rating_lb", label: "Leg / frame ULTIMATE capacity (lb; a published ALLOWABLE leg load already includes 4:1 -- enter 4x it)", kind: "number" },
   ],
   outputs: [
-    { key: "leg", id: "sll-out-leg", label: "Load per leg", value: (r) => _fmtC(r.leg_load_lb, 0) + " lb" + (r.pass ? " (OK)" : " (OVER the 4:1 SWL)") },
+    { key: "leg", id: "sll-out-leg", label: "Load per leg", value: (r) => _fmtC(r.leg_load_lb, 0) + " lb" + (r.pass ? " (OK)" : " (OVER: own weight + 4 x intended exceeds the capacity)") },
     { key: "swl", id: "sll-out-swl", label: "Safe working load per leg", value: (r) => _fmtC(r.swl_lb, 0) + " lb" },
-    { key: "u", id: "sll-out-u", label: "Utilization", value: (r) => _fmtC(r.utilization * 100, 0) + "% of SWL" },
+    { key: "u", id: "sll-out-u", label: "Utilization", value: (r) => _fmtC(r.utilization * 100, 0) + "% of capacity (own weight + 4 x intended)" },
     { key: "n", id: "sll-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeScaffoldLegLoad,
@@ -5979,6 +5982,8 @@ export function computePavementMillingProduction({ drum_width_ft = 7, speed_fpm 
   if (!(depth_in > 0)) return { error: "Cut depth must be positive (in)." };
   if (!(density_pcf > 0)) return { error: "Density must be positive (pcf)." };
   if (!(efficiency > 0)) return { error: "Efficiency must be positive." };
+  // A percent typed as 70 read 98,000 sy/hr; the job-efficiency factor is a fraction.
+  if (efficiency > 1) return { error: "Enter efficiency as a fraction (0.70), not a percent." };
   const sy_per_hr = (drum_width_ft * speed_fpm * 60 * efficiency) / 9;
   const spread_lb_per_sy = depth_in * density_pcf * 0.75;
   const rap_tph = (sy_per_hr * spread_lb_per_sy) / 2000;
@@ -6020,7 +6025,7 @@ CONSTRUCTION_RENDERERS["pavement-milling-production"] = _renderPavementMillingPr
 //   paint_gal = stripe_sf / coverage_sf_per_gal
 //   beads_lb = paint_gal x bead_rate_lb_per_gal
 // dims: in { length_ft: L, width_in: L, coverage_sf_per_gal: L^-1, bead_rate_lb_per_gal: M L^-3 } out: { stripe_sf: L^2, paint_gal: L^3, beads_lb: M }
-export function computeStripingPaintQuantity({ length_ft = 5280, width_in = 4, coverage_sf_per_gal = 320, bead_rate_lb_per_gal = 6 } = {}) {
+export function computeStripingPaintQuantity({ length_ft = 5280, width_in = 4, coverage_sf_per_gal = 100, bead_rate_lb_per_gal = 6 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(length_ft > 0)) return { error: "Length must be positive (ft)." };
   if (!(width_in > 0)) return { error: "Width must be positive (in)." };
@@ -6034,11 +6039,11 @@ export function computeStripingPaintQuantity({ length_ft = 5280, width_in = 4, c
     stripe_sf,
     paint_gal,
     beads_lb,
-    note: "The coverage (sf/gal) follows the specified wet-mil thickness - a waterborne line near 15 mil runs about 320-360 sf/gal. The glass-bead drop rate is set by the retroreflectivity spec. A skip (dashed) line applies a duty-cycle fraction of the length, so enter the painted length, not the run. Distinct from architectural wall-paint coverage.",
+    note: "The coverage (sf/gal) follows the specified wet-mil thickness - a gallon (231 in^3) covers 1,604 sf at 1 mil, so a 15 mil line runs about 107 sf/gal and 16 mil about 100 (WYDOT: 17.6 gal per mile of 4 in line at 16 mil). Until 2026-10-02 this said 320-360 sf/gal, which is a 5 mil film -- the 320-360 figure is a LINEAR feet of 4 in line per gallon (Iowa DOT 343.7 ft/gal at 14 mil), not square feet. The glass-bead drop rate is set by the retroreflectivity spec. A skip (dashed) line applies a duty-cycle fraction of the length, so enter the painted length, not the run. Distinct from architectural wall-paint coverage.",
   };
 }
 
-export const stripingPaintQuantityExample = { inputs: { length_ft: 5280, width_in: 4, coverage_sf_per_gal: 320, bead_rate_lb_per_gal: 6 } };
+export const stripingPaintQuantityExample = { inputs: { length_ft: 5280, width_in: 4, coverage_sf_per_gal: 100, bead_rate_lb_per_gal: 6 } };
 
 const _renderStripingPaintQuantity = _simpleRenderer({
   citation: "Citation: marking quantity identity by name. stripe area (sf) = length x width / 12; paint (gal) = area / coverage (sf/gal); beads (lb) = gallons x bead rate (lb/gal). The coverage follows the wet-mil thickness; the bead rate follows the retroreflectivity spec.",
@@ -9575,7 +9580,7 @@ CONSTRUCTION_RENDERERS["dumpster-count"] = _v871renderDumpsterCount;
 //   lf_per_cart = cartridge_in3 / cross_in2 / 12
 //   cartridges = ceil(joint_lf / lf_per_cart)
 // dims: in { joint_lf: L, cartridge_in3: L^3, joint_width_in: L, joint_depth_in: L } out: { cross_in2: L^2, lf_per_cart: L, cartridges: dimensionless }
-export function computeSealantJointYield({ joint_lf = 500, cartridge_in3 = 20.5, joint_width_in = 0.375, joint_depth_in = 0.25 } = {}) {
+export function computeSealantJointYield({ joint_lf = 500, cartridge_in3 = 18.23, joint_width_in = 0.375, joint_depth_in = 0.25 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(joint_lf > 0)) return { error: "Joint length must be positive (ft)." };
   if (!(cartridge_in3 > 0)) return { error: "Cartridge volume must be positive (in^3)." };
@@ -9589,18 +9594,18 @@ export function computeSealantJointYield({ joint_lf = 500, cartridge_in3 = 20.5,
     cross_in2,
     lf_per_cart,
     cartridges,
-    note: "The bead is approximated as a rectangle (a tooled concave joint uses a little less). Elastomeric sealant runs about a 2:1 width-to-depth with a backer rod setting the depth. The cartridge volume comes from the product (a 10.1 oz cartridge is ~20.5 in^3, a 20 oz sausage ~40 in^3). The joint cross-section is the lever; the manufacturer's joint design governs.",
+    note: "The bead is approximated as a rectangle (a tooled concave joint uses a little less). Elastomeric sealant runs about a 2:1 width-to-depth with a backer rod setting the depth. The cartridge volume comes from the product (a 10.1 fl oz cartridge is 18.23 in^3 and a 20 fl oz sausage 36.1 in^3, at 1.805 in^3 per fl oz; until 2026-10-02 this said ~20.5 and ~40, which under-ordered about 11%). The joint cross-section is the lever; the manufacturer's joint design governs.",
   };
 }
 
-export const sealantJointYieldExample = { inputs: { joint_lf: 500, cartridge_in3: 20.5, joint_width_in: 0.375, joint_depth_in: 0.25 } };
+export const sealantJointYieldExample = { inputs: { joint_lf: 500, cartridge_in3: 18.23, joint_width_in: 0.375, joint_depth_in: 0.25 } };
 
 const _v872renderSealantJointYield = _simpleRenderer({
   citation: "Citation: sealant-yield identity by name. cross-section = width x depth; length per cartridge = cartridge volume / cross-section / 12; cartridges = ceil(joint / length per cartridge). The bead is a rectangle; the manufacturer's joint design governs.",
   example: sealantJointYieldExample.inputs,
   fields: [
     { key: "joint_lf", label: "Joint length (ft)", kind: "number" },
-    { key: "cartridge_in3", label: "Cartridge volume (in³, ~20.5 for 10.1 oz)", kind: "number" },
+    { key: "cartridge_in3", label: "Cartridge volume (in³; 18.23 for 10.1 fl oz, 36.1 for a 20 oz sausage)", kind: "number" },
     { key: "joint_width_in", label: "Joint width (in)", kind: "number" },
     { key: "joint_depth_in", label: "Joint depth (in)", kind: "number" },
   ],
@@ -9842,7 +9847,7 @@ CONSTRUCTION_RENDERERS["metal-deck-takeoff"] = _v877renderMetalDeckTakeoff;
 //   ties = round(intersections x tie_fraction); wire_ft = ties x tie_length_in / 12
 //   wire_lb = wire_ft x wire_lb_per_ft
 // dims: in { length_ft: L, width_ft: L, spacing_in: L, tie_fraction: dimensionless, tie_length_in: L, wire_lb_per_ft: M L^-1 } out: { intersections: dimensionless, ties: dimensionless, wire_ft: L, wire_lb: M }
-export function computeRebarTieWire({ length_ft = 30, width_ft = 20, spacing_in = 12, tie_fraction = 0.5, tie_length_in = 8, wire_lb_per_ft = 0.0181 } = {}) {
+export function computeRebarTieWire({ length_ft = 30, width_ft = 20, spacing_in = 12, tie_fraction = 0.5, tie_length_in = 8, wire_lb_per_ft = 0.0104 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(length_ft > 0)) return { error: "Mat length must be positive (ft)." };
   if (!(width_ft > 0)) return { error: "Mat width must be positive (ft)." };
@@ -9862,11 +9867,11 @@ export function computeRebarTieWire({ length_ft = 30, width_ft = 20, spacing_in 
     ties,
     wire_ft,
     wire_lb,
-    note: "The tie fraction follows the spec - every intersection along the mat perimeter and about half in the field per CRSI practice. The tie length depends on the bar size (about 6-9 in), and the wire weight per foot comes from the gauge (16 to 16.5 ga annealed). Distinct from the bar rebar-weight-takeoff; the spec sets the tie fraction.",
+    note: "The tie fraction follows the spec - every intersection along the mat perimeter and about half in the field per CRSI practice. The tie length depends on the bar size (about 6-9 in), and the wire weight per foot comes from the gauge (16 ga annealed, 0.0625 in, is 0.0104 lb/ft -- 10.42 lb per 1,000 ft on wire-gauge charts; the 0.0181 used until 2026-10-02 is a 14 ga weight and read about 1.7x heavy). Distinct from the bar rebar-weight-takeoff; the spec sets the tie fraction.",
   };
 }
 
-export const rebarTieWireExample = { inputs: { length_ft: 30, width_ft: 20, spacing_in: 12, tie_fraction: 0.5, tie_length_in: 8, wire_lb_per_ft: 0.0181 } };
+export const rebarTieWireExample = { inputs: { length_ft: 30, width_ft: 20, spacing_in: 12, tie_fraction: 0.5, tie_length_in: 8, wire_lb_per_ft: 0.0104 } };
 
 const _v878renderRebarTieWire = _simpleRenderer({
   citation: "Citation: tie-wire identity by name. bars each way = floor(span / spacing) + 1; intersections = product; ties = round(intersections x fraction); wire = ties x tie length / 12; weight = wire x wire per foot. The spec sets the tie fraction.",
@@ -9877,7 +9882,7 @@ const _v878renderRebarTieWire = _simpleRenderer({
     { key: "spacing_in", label: "Bar spacing each way (in)", kind: "number" },
     { key: "tie_fraction", label: "Fraction of intersections tied (0-1)", kind: "number" },
     { key: "tie_length_in", label: "Wire per tie (in)", kind: "number" },
-    { key: "wire_lb_per_ft", label: "Tie wire weight (lb/ft, ~0.0181 for 16.5 ga)", kind: "number" },
+    { key: "wire_lb_per_ft", label: "Tie wire weight (lb/ft; 16 ga annealed, 0.0625 in, is 0.0104)", kind: "number" },
   ],
   outputs: [
     { key: "w", id: "rtw-out-w", label: "Tie wire", value: (r) => _fmtC(r.wire_lb, 1) + " lb (" + _fmtC(r.wire_ft, 0) + " ft)" },
@@ -9945,7 +9950,7 @@ CONSTRUCTION_RENDERERS["anchor-epoxy-volume"] = _v879renderAnchorEpoxyVolume;
 //   grout_in3 = (plate_length_in x plate_width_in - column_area_in2) x grout_thickness_in
 //   grout_ft3 = grout_in3 / 1728 x (1 + waste_pct/100); bags = ceil(grout_ft3 / bag_yield_ft3)
 // dims: in { plate_length_in: L, plate_width_in: L, column_area_in2: L^2, grout_thickness_in: L, bag_yield_ft3: L^3, waste_pct: dimensionless } out: { grout_in3: L^3, grout_ft3: L^3, bags: dimensionless }
-export function computeBaseplateGroutVolume({ plate_length_in = 18, plate_width_in = 18, column_area_in2 = 64, grout_thickness_in = 1.5, bag_yield_ft3 = 0.45, waste_pct = 10 } = {}) {
+export function computeBaseplateGroutVolume({ plate_length_in = 18, plate_width_in = 18, column_area_in2 = 0, grout_thickness_in = 1.5, bag_yield_ft3 = 0.45, waste_pct = 10 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(plate_length_in > 0)) return { error: "Plate length must be positive (in)." };
   if (!(plate_width_in > 0)) return { error: "Plate width must be positive (in)." };
@@ -9963,11 +9968,11 @@ export function computeBaseplateGroutVolume({ plate_length_in = 18, plate_width_
     grout_in3,
     grout_ft3,
     bags,
-    note: "The column area is the steel footprint (or the leave-out for a grout hole). The grout is placed with a head and dam so it flows fully under the plate. The bag yield comes from the product. Both the plate area and the bed thickness drive the volume. Distinct from the pipe-casing annular-grout-volume.",
+    note: "The bed under a base plate is a plain rectangular solid, length x width x thickness (Five Star grouting practice); the column stands ON the plate and displaces no grout, so the deduction is only for a real leave-out such as anchor-bolt sleeves. Until 2026-10-02 the default subtracted a 64 in^2 column footprint and read 20% low. The grout is placed with a head and dam so it flows fully under the plate. The bag yield comes from the product. Both the plate area and the bed thickness drive the volume. Distinct from the pipe-casing annular-grout-volume.",
   };
 }
 
-export const baseplateGroutVolumeExample = { inputs: { plate_length_in: 18, plate_width_in: 18, column_area_in2: 64, grout_thickness_in: 1.5, bag_yield_ft3: 0.45, waste_pct: 10 } };
+export const baseplateGroutVolumeExample = { inputs: { plate_length_in: 18, plate_width_in: 18, column_area_in2: 0, grout_thickness_in: 1.5, bag_yield_ft3: 0.45, waste_pct: 10 } };
 
 const _v880renderBaseplateGroutVolume = _simpleRenderer({
   citation: "Citation: grout-volume identity by name. grout = (plate length x plate width - column area) x thickness; bags = ceil(grout / bag yield). The column area is the steel footprint; the grout flows fully under the plate with a head and dam.",
@@ -9975,7 +9980,7 @@ const _v880renderBaseplateGroutVolume = _simpleRenderer({
   fields: [
     { key: "plate_length_in", label: "Base plate length (in)", kind: "number" },
     { key: "plate_width_in", label: "Base plate width (in)", kind: "number" },
-    { key: "column_area_in2", label: "Column steel footprint (in²)", kind: "number" },
+    { key: "column_area_in2", label: "Leave-out under the plate (in²: sleeves or a grout hole; the column sits ON the plate and takes none)", kind: "number" },
     { key: "grout_thickness_in", label: "Grout bed thickness (in)", kind: "number" },
     { key: "bag_yield_ft3", label: "Bag yield (ft³)", kind: "number" },
     { key: "waste_pct", label: "Waste allowance (percent)", kind: "number" },
@@ -10351,7 +10356,7 @@ export function computeGlassVacuumLift({ area_sf = 32, glass_thickness_in = 0.5,
   return {
     weight_lb,
     cups,
-    note: "Soda-lime glass weighs about 13 lb/ft^2 per inch of thickness; an insulated unit sums the lite thicknesses. The safety factor (typically 4:1) and the cup working load come from the lifter manufacturer (ANSI/ASME). A competent person and the rated lifter govern the pick. Distinct from glass-weight, which gives only the weight.",
+    note: "Soda-lime glass weighs about 13 lb/ft^2 per inch of thickness; an insulated unit sums the lite thicknesses. The safety factor applies to a cup's raw holding capacity; a manufacturer's RATED cup load already includes its design factor (Wood's Powr-Grip: maximum load capacity includes a 3:1 design factor; 150 lb for a 9 in hand cup), so with a rated load enter a factor of 1 -- applying 4 again would call for 6 cups where the rating needs 2. ANSI/ASME B30.20 and the lifter manufacturer govern. A competent person and the rated lifter govern the pick. Distinct from glass-weight, which gives only the weight.",
   };
 }
 
@@ -10363,8 +10368,8 @@ const _v889renderGlassVacuumLift = _simpleRenderer({
   fields: [
     { key: "area_sf", label: "Lite / unit area (ft²)", kind: "number" },
     { key: "glass_thickness_in", label: "Total glass thickness, all lites (in)", kind: "number" },
-    { key: "safety_factor", label: "Lifter safety factor", kind: "number" },
-    { key: "cup_wll_lb", label: "Per-cup working load (lb)", kind: "number" },
+    { key: "safety_factor", label: "Safety factor over the cup figure (1 if the cup figure is the maker's rated load, which already includes its design factor)", kind: "number" },
+    { key: "cup_wll_lb", label: "Per-cup capacity (lb): holding capacity, or the maker's rated load with factor 1", kind: "number" },
     { key: "glass_density_psf_in", label: "Glass weight (lb/ft² per in)", kind: "number" },
   ],
   outputs: [

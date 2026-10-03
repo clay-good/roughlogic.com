@@ -10014,14 +10014,14 @@ export const CITATIONS = {
     ],
   },
   "scaffold-leg-load": {
-    formula: "total_load_lb = platform_dead_lb + num_workers x worker_lb + material_lb; leg_load_lb = total_load_lb / n_legs; swl_lb = component_rating_lb / 4; pass = leg_load_lb <= swl_lb.",
+    formula: "total_load_lb = platform_dead_lb + num_workers x worker_lb + material_lb; leg_load_lb = total_load_lb / n_legs; swl_lb = component_rating_lb / 4; utilization = (platform_dead_lb / n_legs + 4 x intended load per leg) / component_rating_lb (component_rating_lb is the ULTIMATE capacity); pass = utilization <= 1.",
     edition: "OSHA capacity rule by name (safe working load = rating / 4; leg load = total intended load / legs); first-principles load distribution.",
     freeAccess: "The 4:1 rule and 250-lb-per-person basis are public OSHA requirements; the component rating comes from the manufacturer.",
     governance: GOVERNANCE.general,
-    editionNote: "The component rating is the manufacturer's. OSHA 1926.451(a)(1) sets the 4:1 minimum and counts 250 lb per person. The distribution to legs depends on the configuration and any stacked lifts; this assumes an even share. A competent person verifies. The leg load feeds scaffold-mudsill-bearing for the foundation check.",
+    editionNote: "The rating is the component's ULTIMATE capacity. OSHA 1926.451(a)(1) requires its own weight plus 4 times the maximum intended load, and OSHA's 2013-12-06 interpretation keeps the scaffold's own weight out of the intended load, so dead load is not multiplied by 4 (until 2026-10-02 it was). A published ALLOWABLE leg load already includes the 4:1 -- enter 4 times it. 250 lb per person is the Appendix A allowance. The distribution to legs depends on the configuration and any stacked lifts; this assumes an even share. A competent person verifies. The leg load feeds scaffold-mudsill-bearing for the foundation check.",
     assumptions: [
-      { name: "Intended load", value: "platform/scaffold dead load + 250 lb per worker (with tools) + stored material", source: "OSHA 1926.451(a)(1)" },
-      { name: "Safe working load", value: "the manufacturer component rating divided by the OSHA 4:1 safety factor, shared evenly over the legs", source: "OSHA 1926.451(a)(1) / manufacturer" },
+      { name: "Intended load", value: "250 lb per worker (with tools) + stored material; the platform/scaffold dead load is carried at 1x, not 4x", source: "OSHA 1926.451(a)(1); OSHA interpretation 2013-12-06" },
+      { name: "Capacity check", value: "dead load per leg + 4 x intended load per leg <= the component's ultimate capacity, shared evenly over the legs", source: "OSHA 1926.451(a)(1) / manufacturer" },
     ],
   },
   "scaffold-takeoff": {
@@ -10988,7 +10988,7 @@ export const CITATIONS = {
     edition: "Heat-trace sizing identity by name (cable length with allowances; wattage and current from the rated W/ft); first-principles electrical arithmetic.",
     freeAccess: "The cable-length and circuit arithmetic is public first-principles; the required W/ft and max circuit length come from the manufacturer's design tables.",
     governance: GOVERNANCE.general,
-    editionNote: "The required W/ft (the pipe heat loss) comes from insulation-heat-loss or the manufacturer; the picked cable must be rated at or above it. Valves, flanges, and supports are heat sinks that add cable. A cold start can draw two to three times the steady current on self-regulating cable. The manufacturer's design tables and maximum circuit length govern.",
+    editionNote: "The required W/ft (the pipe heat loss) comes from insulation-heat-loss or the manufacturer; the picked cable must be rated at or above it. Valves, flanges, and supports are heat sinks that add cable. A cold start can draw two to three times the steady current on self-regulating cable; the start-up factor defaults to 3, the conservative end. The manufacturer's design tables and maximum circuit length govern.",
     assumptions: [
       { name: "Rated W/ft", value: "the cable rating, at or above the pipe heat loss from insulation-heat-loss", source: "heat-trace manufacturer" },
       { name: "Continuous limit", value: "load must stay under 80% of the breaker (NEC continuous load); a cold start draws 2-3x", source: "NEC / manufacturer" },
@@ -11157,10 +11157,10 @@ export const CITATIONS = {
     edition: "Sealant cartridge-yield identity by name (cartridge volume divided by the joint cross-section gives the run per cartridge); first-principles geometry.",
     freeAccess: "The bead-volume geometry is public first-principles; the cartridge volume and joint design come from the manufacturer.",
     governance: GOVERNANCE.general,
-    editionNote: "The bead is approximated as a rectangle (a tooled concave joint uses a little less). Elastomeric sealant runs about a 2:1 width-to-depth with a backer rod setting the depth. The cartridge volume comes from the product (a 10.1 oz cartridge is ~20.5 in^3, a 20 oz sausage ~40 in^3). The manufacturer's joint design governs.",
+    editionNote: "The bead is approximated as a rectangle (a tooled concave joint uses a little less). Elastomeric sealant runs about a 2:1 width-to-depth with a backer rod setting the depth. The cartridge volume comes from the product (a 10.1 fl oz cartridge is 18.23 in^3 and a 20 fl oz sausage 36.1 in^3, at 1.805 in^3 per fl oz; Dow's contractor handbook yield table reproduces on these). The manufacturer's joint design governs.",
     assumptions: [
       { name: "Joint cross-section", value: "width x depth as a rectangle; ~2:1 width-to-depth with a backer rod for elastomeric sealant", source: "manufacturer joint design" },
-      { name: "Cartridge volume", value: "~20.5 in^3 for a 10.1 oz cartridge, ~40 in^3 for a 20 oz sausage", source: "sealant manufacturer" },
+      { name: "Cartridge volume", value: "18.23 in^3 for a 10.1 fl oz cartridge, 36.1 in^3 for a 20 fl oz sausage (231 in^3 per gallon / 128 fl oz)", source: "unit conversion; Dow contractor handbook" },
     ],
   },
   "self-leveler-bags": {
@@ -11241,7 +11241,7 @@ export const CITATIONS = {
     editionNote: "The tie fraction follows the spec - every intersection along the mat perimeter and about half in the field per CRSI practice. The tie length depends on the bar size (about 6-9 in), and the wire weight per foot comes from the gauge (16 to 16.5 ga annealed). Distinct from the bar rebar-weight-takeoff.",
     assumptions: [
       { name: "Tie fraction", value: "perimeter fully tied, ~50% in the field per CRSI practice; the spec governs", source: "CRSI / project spec" },
-      { name: "Wire", value: "~8 in per tie, ~0.0181 lb/ft for 16.5 ga annealed tie wire", source: "tie-wire gauge" },
+      { name: "Wire", value: "~8 in per tie, 0.0104 lb/ft for 16 ga (0.0625 in) annealed tie wire (10.42 lb per 1,000 ft)", source: "wire-gauge weight chart" },
     ],
   },
   "anchor-epoxy-volume": {
@@ -11256,13 +11256,13 @@ export const CITATIONS = {
     ],
   },
   "baseplate-grout-volume": {
-    formula: "grout_in3 = (plate_length_in x plate_width_in - column_area_in2) x grout_thickness_in; grout_ft3 = grout_in3 / 1728 x (1 + waste_pct/100); bags = ceil(grout_ft3 / bag_yield_ft3).",
+    formula: "grout_in3 = (plate_length_in x plate_width_in - column_area_in2) x grout_thickness_in, where column_area_in2 is only a real leave-out (default 0: the column sits on the plate); grout_ft3 = grout_in3 / 1728 x (1 + waste_pct/100); bags = ceil(grout_ft3 / bag_yield_ft3).",
     edition: "Base-plate grout-volume identity by name (net plate area x bed thickness, plus waste; bags over the bag yield); first-principles volume arithmetic.",
     freeAccess: "The grout-volume geometry is public first-principles; the bag yield comes from the product's coverage.",
     governance: GOVERNANCE.general,
-    editionNote: "The column area is the steel footprint (or the leave-out for a grout hole). The grout is placed with a head and dam so it flows fully under the plate. The bag yield comes from the product. Distinct from the pipe-casing annular-grout-volume.",
+    editionNote: "The bed under a base plate is a rectangular solid (Five Star grouting practice); the column stands on the plate and displaces no grout, so the area input is only for a real leave-out such as anchor sleeves (until 2026-10-02 it defaulted to a 64 in^2 column footprint and read 20% low). The grout is placed with a head and dam so it flows fully under the plate. The bag yield comes from the product. Distinct from the pipe-casing annular-grout-volume.",
     assumptions: [
-      { name: "Net area", value: "the plate footprint minus the column steel (or grout-hole leave-out)", source: "steel drawings" },
+      { name: "Net area", value: "the plate footprint minus any real leave-out under it (the column steel sits on top and takes none)", source: "steel drawings" },
       { name: "Bag yield", value: "the product's per-bag yield in ft^3 (~0.45 ft^3 typical for non-shrink grout)", source: "grout manufacturer" },
     ],
   },
@@ -22225,7 +22225,7 @@ export const CITATIONS = {
     edition: "The derate factor is ENTERED because it depends on the cable's own thermal resistances as well as the bank geometry, so no geometric shortcut reproduces it. It does not perform the Neher-McGrath calculation, size conductors, or address short-circuit withstand, conductor shielding and grounding, the concrete encasement's design, or duct bank separation requirements.",
     freeAccess: "One multiplication and a published geometric sum; no NEC table or Annex B figure is reproduced.",
     governance: GOVERNANCE.general,
-    editionNote: "A duct bank is a mutual-heating problem and the table value is not the answer: a cable rated 285 A can come back near 177 A in a fully loaded 3 by 3 bank, three or four conductor sizes (300 kcmil down to 2/0 or 3/0 at 75 C copper). The geometry decides WHICH duct governs -- the center duct carries about 24% more mutual heating than a corner -- so a bank sized on an average position runs its middle ducts over temperature. Soil thermal resistivity is the most sensitive input and the one most often assumed rather than measured, and a native-soil backfill is not a thermal backfill. A spare duct is only a spare until a circuit is pulled into it, so derating on today's loading is how a bank becomes overloaded without anyone changing a conductor.",
+    editionNote: "A duct bank is a mutual-heating problem and the table value is not the answer: a cable rated 285 A can come back near 177 A in a fully loaded 3 by 3 bank, three conductor sizes (300 kcmil down to 3/0 at 75 C copper; 2/0 is 175 A and falls short). The geometry decides WHICH duct governs -- the center duct carries about 24% more mutual heating than a corner -- so a bank sized on an average position runs its middle ducts over temperature. Soil thermal resistivity is the most sensitive input and the one most often assumed rather than measured, and a native-soil backfill is not a thermal backfill. A spare duct is only a spare until a circuit is pulled into it, so derating on today's loading is how a bank becomes overloaded without anyone changing a conductor.",
     assumptions: [
       { name: "The derate factor is entered", value: "it belongs to Neher-McGrath or NEC Annex B, not to this arithmetic", source: "the NEC as adopted and IEEE 835" },
       { name: "Geometry gives only the governing position", value: "the mutual-heating sum ranks ducts; it is not the derate", source: "the engineer of record" },

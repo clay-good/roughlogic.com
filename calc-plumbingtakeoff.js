@@ -177,7 +177,7 @@ PLUMBINGTAKEOFF_RENDERERS["pipe-insulation-takeoff"] = _v857renderPipeInsulation
 
 // ===================== spec-v858: freeze-protection heat-trace cable and circuit =====================
 // dims: in { pipe_ft: L, allowance_pct: dimensionless, num_valves: dimensionless, valve_allow_ft: L, rated_w_per_ft: dimensionless, voltage: dimensionless, breaker_a: I } out: { cable_ft: L, watts: M L^2 T^-3, amps: dimensionless }
-export function computeHeatTraceSizing({ pipe_ft = 150, allowance_pct = 10, num_valves = 1, valve_allow_ft = 3, rated_w_per_ft = 5, voltage = 120, breaker_a = 20, start_factor = 2 } = {}) {
+export function computeHeatTraceSizing({ pipe_ft = 150, allowance_pct = 10, num_valves = 1, valve_allow_ft = 3, rated_w_per_ft = 5, voltage = 120, breaker_a = 20, start_factor = 3 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(pipe_ft > 0)) return { error: "Pipe length must be positive (ft)." };
   if (!(rated_w_per_ft > 0)) return { error: "Rated wattage must be positive (W/ft)." };
@@ -193,6 +193,8 @@ export function computeHeatTraceSizing({ pipe_ft = 150, allowance_pct = 10, num_
   // starts cold (the note's own two to three times), and it is the START
   // current that trips a breaker. Until 2026-09-19 only the running current
   // was checked, so a run could pass at 7 A steady and trip at 14-21 A.
+  // Default 3, the conservative end of the two-to-three times the note states: Raychem XL-Trace
+  // Table 9 allows 129 ft of 5 W/ft cable on a 20 A breaker at a -20 F start, and 2x passed 240 ft.
   const sf = Number(start_factor);
   if (!(sf >= 1)) return { error: "Start-up factor must be at least 1 (the manufacturer's cold-start multiple)." };
   const start_amps = amps * sf;
@@ -204,7 +206,7 @@ export function computeHeatTraceSizing({ pipe_ft = 150, allowance_pct = 10, num_
     amps,
     start_amps,
     breaker_ok,
-    note: "The required W/ft (the pipe heat loss) comes from insulation-heat-loss or the manufacturer; the picked cable must be rated at or above it. Valves, flanges, and supports are heat sinks that add cable. A cold start can draw two to three times the steady current on self-regulating cable. The manufacturer's design tables and maximum circuit length govern.",
+    note: "The required W/ft (the pipe heat loss) comes from insulation-heat-loss or the manufacturer; the picked cable must be rated at or above it. Valves, flanges, and supports are heat sinks that add cable. A cold start can draw two to three times the steady current on self-regulating cable; the start-up factor defaults to 3, the conservative end. The manufacturer's design tables and maximum circuit length govern.",
   };
 }
 
@@ -229,7 +231,7 @@ function _v858renderHeatTraceSizing(inputRegion, outputRegion, citationEl) {
       pipe_ft: p.input.value === "" ? 150 : Number(p.input.value), allowance_pct: al.input.value === "" ? 0 : Number(al.input.value),
       num_valves: nv.input.value === "" ? 0 : Number(nv.input.value), valve_allow_ft: va.input.value === "" ? 3 : Number(va.input.value),
       rated_w_per_ft: wf.input.value === "" ? 5 : Number(wf.input.value), voltage: v.input.value === "" ? 120 : Number(v.input.value),
-      breaker_a: br.input.value === "" ? 20 : Number(br.input.value), start_factor: sf.input.value === "" ? 2 : Number(sf.input.value),
+      breaker_a: br.input.value === "" ? 20 : Number(br.input.value), start_factor: sf.input.value === "" ? 3 : Number(sf.input.value),
     });
     if (r.error) { oCable.textContent = r.error; oCircuit.textContent = "-"; return; }
     oCable.textContent = fmt(r.cable_ft, 0) + " ft (" + fmt(r.watts, 0) + " W)";
