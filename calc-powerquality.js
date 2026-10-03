@@ -345,7 +345,7 @@ export function computeTransformerKFactor({ i1 = 1, i3 = 0, i5 = 0, i7 = 0, i9 =
   return {
     k_factor,
     recommended_k_rating,
-    note: "UL 1561 / IEEE C57.110: K-factor = sum(Ih^2 x h^2) / sum(Ih^2), with the harmonic currents entered as per-unit of the fundamental. Round up to the next standard K-rating (K-1 standard, then K-4 / K-9 / K-13 / K-20 / K-30 / K-40). A near-linear load (K close to 1) needs no K-rated transformer. The measured spectrum and the manufacturer govern the final selection.",
+    note: "UL 1561 / IEEE C57.110: K-factor = sum(Ih^2 x h^2) / sum(Ih^2), with the harmonic currents entered as per-unit of the fundamental. Round up to the next standard K-rating (K-1 standard, then K-4 / K-9 / K-13 / K-20 / K-30 / K-40). A near-linear load (K close to 1) needs only the lowest K rating, K-4; only a pure sine (K exactly 1) stays at K-1. The measured spectrum and the manufacturer govern the final selection.",
   };
 }
 export const transformerKFactorExample = { inputs: { i1: 1.0, i3: 0.33, i5: 0.20, i7: 0.14, i9: 0.09, i11: 0.06, i13: 0.05 } };

@@ -12,7 +12,7 @@
 //   v255 steel-beam-shear       (AISC 360 Ch. G, web shear)
 //   v256 steel-column-capacity  (AISC 360 Ch. E, flexural buckling)
 //   v266 bolt-group-eccentric   (elastic vector method)
-//   v267 bolt-shear-bearing     (AISC 360 J3.6 / J3.10)
+//   v267 bolt-shear-bearing     (AISC 360 J3.7 / J3.11)
 //   v268 column-base-plate      (AISC Design Guide 1 / 360 J8)
 // All GOVERNANCE.general design aids; the reference design values (Zx, d, tw,
 // Fnv, etc.) are user-supplied from the AISC Manual. See spec-v254.md..v268.md.
@@ -678,7 +678,7 @@ STEEL_RENDERERS["steel-tension-member"] = _simpleRenderer({
 // ===================== spec-v293..v295: steel connection/detailing depth batch =====================
 // The checks the member tiles never touch: the beam web under a concentrated
 // force (J10 yielding + crippling), the slip-critical pretensioned bolt
-// (J3.8), and the fillet-weld detailing size limits (J2.2b / Table J2.4).
+// (360-22 J3.9), and the fillet-weld detailing size limits (J2.2b / Table J2.4).
 
 // dims: in { fy: M L^-1 T^-2, tw: L, tf: L, k_in: L, d_in: L, lb_in: L, location: dimensionless } out: { wly_rn: M L T^-2, wc_rn: M L T^-2, asd_kip: M L T^-2, lrfd_kip: M L T^-2 }
 export function computeSteelWebLocalStrength({ fy = 50, tw = 0, tf = 0, k_in = 0, d_in = 0, lb_in = 0, location = "interior" } = {}) {

@@ -1120,7 +1120,7 @@ export function computeAccessControlPowerSupply({ lock_count = 4, lock_current_a
   if (standby_hours < 0) return { error: "Standby hours cannot be negative." };
   const total_load_a = Math.round(lock_count) * lock_current_a + Math.round(reader_count) * reader_current_a + other_load_a;
   if (!(total_load_a > 0)) return { error: "Total load must be positive: enter at least one device or load." };
-  // NFPA 72 / UL 294: size the supply with 25% headroom, and the standby battery to the load for the required
+  // Design margin (neither NFPA 72 nor UL 294 sets it): size the supply with 25% headroom, and the standby battery to the load for the required
   // standby time with a 25% aging derate.
   const psu_min_a = 1.25 * total_load_a;
   const battery_ah = total_load_a * standby_hours * 1.25;
@@ -1129,7 +1129,7 @@ export function computeAccessControlPowerSupply({ lock_count = 4, lock_current_a
     total_load_a,
     psu_min_a,
     battery_ah,
-    note: "Access-control power supply and standby battery: total load = locks x hold current + readers + request-to-exit + controller; the supply is sized about 25% over the load (NFPA 72 / UL 294 continuous-load headroom); the standby battery = load x standby hours x 1.25 for aging. FAIL-SAFE maglocks draw continuously (and drop on power loss -- egress), while FAIL-SECURE strikes draw only on unlock and hold on power loss, so a fail-secure system draws far less standby. NFPA 72 sets the standby time (often 4 to 24 hr) for a system tied to the fire alarm or required for egress. A sizing estimate; the listed panel, the door hardware datasheets, the AHJ, and the fire/life-safety interface govern.",
+    note: "Access-control power supply and standby battery: total load = locks x hold current + readers + request-to-exit + controller; the supply is sized about 25% over the load (a design margin, not a figure NFPA 72 or UL 294 sets); the standby battery = load x standby hours x 1.25 for aging. FAIL-SAFE maglocks draw continuously (and drop on power loss -- egress), while FAIL-SECURE strikes draw only on unlock and hold on power loss, so a fail-secure system draws far less standby. NFPA 72 sets the standby time (often 4 to 24 hr) for a system tied to the fire alarm or required for egress. A sizing estimate; the listed panel, the door hardware datasheets, the AHJ, and the fire/life-safety interface govern.",
   };
 }
 

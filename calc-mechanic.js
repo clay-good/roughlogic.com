@@ -834,12 +834,12 @@ export function computeScrewConveyorRpm({ target_ft3_hr = 0, screw_diameter_in =
   const over_speed = rpm > 100 + 1e-9 * Math.abs(100);
   return {
     rpm, per_rpm, area_ft2, over_speed,
-    note: "The screw speed a conveyor must turn to hit a target volumetric capacity, the inverse of the screw-conveyor tile: from capacity = flight_area x (pitch/12) x (rpm x 60) x loading, rpm = target / (flight_area x (pitch/12) x 60 x loading). To hit a mass rate instead, divide the mass rate by the bulk density to get the volumetric target first. Capacity is linear in speed, so doubling the RPM doubles the throughput - but CEMA caps the speed by screw diameter (large augers run slower), and running faster than the class limit accelerates wear and can flood the trough, so a flagged high RPM means step up a screw size instead. Per the CEMA Screw Conveyor standard (Book No. 350); the loading fraction is per the material class. An estimate; CEMA and the manufacturer govern."
+    note: "The screw speed a conveyor must turn to hit a target volumetric capacity, the inverse of the screw-conveyor tile: from capacity = flight_area x (pitch/12) x (rpm x 60) x loading, rpm = target / (flight_area x (pitch/12) x 60 x loading). To hit a mass rate instead, divide the mass rate by the bulk density to get the volumetric target first. Capacity is linear in speed, so doubling the RPM doubles the throughput - but CEMA caps the speed by screw diameter (large augers run slower), and running faster than the class limit accelerates wear and can flood the trough. The high-RPM flag here is a fixed 100 RPM screen, not that limit: CEMA's maximum for the diameter and class governs, and a speed over it means step up a screw size. Per the CEMA Screw Conveyor standard (Book No. 350); the loading fraction is per the material class. An estimate; CEMA and the manufacturer govern."
   };
 }
 export const screwConveyorRpmExample = { inputs: { target_ft3_hr: 220.2, screw_diameter_in: 9, shaft_diameter_in: 2.5, pitch_in: 9, loading_fraction: 0.30 } };
 MECHANIC_RENDERERS["screw-conveyor-rpm"] = _simpleRenderer({
-  citation: "Citation: CEMA Screw Conveyor standard (Book No. 350) capacity method solved for speed: rpm = target / (flight_area x (pitch/12) x 60 x loading). Divide a mass rate by the bulk density for the volumetric target. CEMA caps speed by screw diameter. Estimate; CEMA and the manufacturer govern.",
+  citation: "Citation: CEMA Screw Conveyor standard (Book No. 350) capacity method solved for speed: rpm = target / (flight_area x (pitch/12) x 60 x loading). Divide a mass rate by the bulk density for the volumetric target. CEMA caps speed by screw diameter; the high flag here is a fixed 100 RPM screen, and CEMA's diameter-dependent maximum governs. Estimate; CEMA and the manufacturer govern.",
   example: screwConveyorRpmExample.inputs,
   fields: [
     { key: "target_ft3_hr", label: "Target capacity (ft³/hr)", kind: "number" },
@@ -849,7 +849,7 @@ MECHANIC_RENDERERS["screw-conveyor-rpm"] = _simpleRenderer({
     { key: "loading_fraction", label: "Trough loading fraction (CEMA class)", kind: "number" },
   ],
   outputs: [
-    { key: "rpm", id: "scr-out-rpm", label: "Required screw speed", value: (r) => fmt(r.rpm, 1) + " RPM" + (r.over_speed ? " (high - CEMA caps speed by diameter; step up a screw size)" : "") },
+    { key: "rpm", id: "scr-out-rpm", label: "Required screw speed", value: (r) => fmt(r.rpm, 1) + " RPM" + (r.over_speed ? " (over a fixed 100 RPM screen - CEMA's maximum for the diameter and class governs; step up a screw size if past it)" : "") },
     { key: "n", id: "scr-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeScrewConveyorRpm,

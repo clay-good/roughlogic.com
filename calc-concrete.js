@@ -164,7 +164,7 @@ export function computeRcBeamShear({ fc = 4000, fyt = 60000, bw = 0, d = 0, av_i
 export const rcBeamShearExample = { inputs: { fc: 4000, fyt: 60000, bw: 12, d: 21.5, av_in2: 0.22, vu: 40, lambda: 1.0 } };
 
 CONCRETE_RENDERERS["rc-beam-shear"] = _simpleRenderer({
-  citation: "Citation: ACI 318-19 §22.5.5.1 (Vc = 2 x lambda x sqrt(f'c) x bw x d, the simplified concrete shear for a non-prestressed member without axial load, psi units), §22.5.10.5.3 (Vs = Av x fyt x d / s for vertical stirrups), §21.2.1 (phi = 0.75 for shear), and §9.7.6.2.2 (the d/2 <= 24 in maximum stirrup spacing, halved to d/4 <= 12 in when Vs exceeds 4 x sqrt(f'c) x bw x d), §9.6.3.1 and §9.6.3.4 (Av,min = max(0.75 sqrt(f'c), 50) bw s / fyt wherever Vu > phi lambda sqrt(f'c) bw d, the condition for the simplified Vc), and §22.5.1.2 (Vs <= 8 sqrt(f'c) bw d). Uses the simplified Vc, not the detailed §22.5.5.1 expression with the reinforcement-ratio and size-effect terms; covers vertical stirrups on a member without significant axial load; does not check the §22.5.1.2 upper limit Vs <= 8 x sqrt(f'c) x bw x d on the section size, the §9.6.3 minimum shear reinforcement, or deep-beam action. Lambda is 1.0 normalweight, 0.75 lightweight (§19.2.4). A design aid, not a substitute for a licensed engineer's design -- the engineer of record's stamped design governs.",
+  citation: "Citation: ACI 318-19 §22.5.5.1 (Vc = 2 x lambda x sqrt(f'c) x bw x d, the simplified concrete shear for a non-prestressed member without axial load, psi units), §22.5.10.5.3 (Vs = Av x fyt x d / s for vertical stirrups), §21.2.1 (phi = 0.75 for shear), and §9.7.6.2.2 (the d/2 <= 24 in maximum stirrup spacing, halved to d/4 <= 12 in when Vs exceeds 4 x sqrt(f'c) x bw x d), §9.6.3.1 and §9.6.3.4 (Av,min = max(0.75 sqrt(f'c), 50) bw s / fyt wherever Vu > phi lambda sqrt(f'c) bw d, the condition for the simplified Vc), and §22.5.1.2 (Vs <= 8 sqrt(f'c) bw d). Uses the simplified Vc, not the detailed §22.5.5.1 expression with the reinforcement-ratio and size-effect terms; covers vertical stirrups on a member without significant axial load; does not check deep-beam action. Lambda is 1.0 normalweight, 0.75 lightweight (§19.2.4). A design aid, not a substitute for a licensed engineer's design -- the engineer of record's stamped design governs.",
   example: rcBeamShearExample.inputs,
   fields: [
     { key: "fc", label: "Concrete strength f'c (psi)", kind: "number" },
@@ -1150,7 +1150,7 @@ CONCRETE_RENDERERS["concrete-crack-control-spacing"] = _simpleRenderer({
   citation: "Citation: ACI 318-19 §24.3.2: maximum tension-bar spacing for flexural crack control s = 15(40000/fs) - 2.5 cc, not more than 12(40000/fs), with fs the service-load steel stress (may be taken as 2/3 fy) and cc the clear cover. A serviceability crack-control limit, not a strength check. A design aid, not a substitute for a licensed engineer's design -- the engineer of record's stamped design governs.",
   example: concreteCrackControlSpacingExample.inputs,
   fields: [
-    { key: "fs_psi", label: "Service steel stress fs (psi, default 2/3 fy)", kind: "number" },
+    { key: "fs_psi", label: "Service steel stress fs (psi; 2/3 fy is permitted, 40,000 for Grade 60)", kind: "number", default: 40000 },
     { key: "cc_in", label: "Clear cover cc (in)", kind: "number" },
   ],
   outputs: [

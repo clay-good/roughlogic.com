@@ -247,7 +247,7 @@ export const BESPOKE_LABELS = {
   "decimal-to-fraction": {"denominator":"Round to"},
   "deck-beam-post": {"joist_span_ft":"Joist span / deck depth (ft)","beam_span_ft":"Beam span / post spacing (ft)","post_height_ft":"Post height (ft)","live_load_psf":"Live load (psf)","dead_load_psf":"Dead load (psf)","species_grade":"Beam / post species and grade","soil_class":"Soil bearing","deck_height_in":"Walking-surface height (in)","ledger":"Ledger condition"},
   "declining-balance-depreciation": {"cost":"Cost ($)","salvage":"Salvage ($)","life_yr":"Useful life (yr)","factor":"DB factor","year":"Year of interest"},
-  "degree-day-energy": {"ua_btuhf":"Heat-loss coefficient UA (Btu/h-F)","hdd":"Heating degree-days (base 65 F)","eff":"System efficiency (AFUE or COP)","fuel":"Fuel","price":"Fuel unit price ($/unit, optional)"},
+  "degree-day-energy": {"ua_btuhf":"Heat-loss coefficient UA (Btu/h-F)","hdd":"Heating degree-days (base 65 F)","eff":"System efficiency (AFUE or COP; blank = 1.00 electric, 0.80 fuel)","fuel":"Fuel","price":"Fuel unit price ($/unit, optional)"},
   "dehumidifier": {"room_cubic_feet":"Room volume (ft³)","water_class":"Water class"},
   "dehumidifier-derate": {"aham_pints_per_day":"Nameplate AHAM rating (pints/day)","derate_factor":"Derate factor (0-1, off the unit's curve)","required_pints_per_day":"Required removal (pints/day)"},
   "delta-wye-line-phase": {"configuration":"Connection","line_voltage_v":"Line-to-line voltage (V)","line_current_a":"Line current (A)","power_factor":"Power factor (0-1)"},

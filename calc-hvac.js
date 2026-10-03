@@ -4094,7 +4094,9 @@ function _v330renderDegreeDayEnergy(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: degree-day annual heating energy Q = 24 x HDD x UA (base-65 degF), fuel = Q/efficiency, with 1 therm = 100,000 Btu / 1 gal oil ~ 138,500 Btu / 1 kWh = 3,412 Btu, ASHRAE degree-day / RESNET basis, by name. Steady-state, no gains, heating only. An estimate, not a calibrated model.";
   const ua = makeNumber("Heat-loss coefficient UA (Btu/h-F)", "dde-ua", { step: "any", min: "0" });
   const hdd = makeNumber("Heating degree-days (base 65 F)", "dde-hdd", { step: "any", min: "0" });
-  const eff = makeNumber("System efficiency (AFUE or COP)", "dde-eff", { step: "any", min: "0" }); eff.input.value = "0.80";
+  // Blank uses the compute's fuel default (1.00 electric resistance, 0.80 combustion); a
+  // prefilled 0.80 ran electric resistance at 80% until 2026-10-03.
+  const eff = makeNumber("System efficiency (AFUE or COP; blank = 1.00 electric, 0.80 fuel)", "dde-eff", { step: "any", min: "0" });
   const fuel = makeSelect("Fuel", "dde-fuel", [
     { value: "gas", label: "Gas (therms)" },
     { value: "oil", label: "Fuel oil (gal)" },
@@ -4108,7 +4110,7 @@ function _v330renderDegreeDayEnergy(inputRegion, outputRegion, citationEl) {
   const oCost = makeOutputLine(outputRegion, "Annual cost", "dde-out-cost");
   const oNote = makeOutputLine(outputRegion, "Note", "dde-out-note");
   const update = debounce(() => {
-    const r = computeDegreeDayEnergy({ ua_btuhf: Number(ua.input.value) || 0, hdd: Number(hdd.input.value) || 0, eff: Number(eff.input.value) || 0, fuel: fuel.select.value, price: Number(price.input.value) || 0 });
+    const r = computeDegreeDayEnergy({ ua_btuhf: Number(ua.input.value) || 0, hdd: Number(hdd.input.value) || 0, eff: eff.input.value === "" ? undefined : Number(eff.input.value), fuel: fuel.select.value, price: Number(price.input.value) || 0 });
     if (r.error) { oQ.textContent = r.error; oFuel.textContent = "-"; oCost.textContent = "-"; oNote.textContent = "-"; return; }
     oQ.textContent = fmt(r.q_mmbtu, 1) + " MMBtu/yr";
     oFuel.textContent = fmt(r.fuel_units, 0) + " " + r.unit_label + "/yr";
@@ -4347,7 +4349,7 @@ export function computeEconomizerEnthalpyChangeover({ mode = "differential_entha
 }
 export const economizerEnthalpyChangeoverExample = { inputs: { mode: "differential_enthalpy", h_outdoor: 24, h_return: 28, t_outdoor_f: 70, setpoint_f: 65 } };
 function _v443renderEconomizerEnthalpyChangeover(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: Economizer high-limit changeover (ASHRAE 90.1 6.5.1.1.3): differential-enthalpy enables free cooling when outdoor enthalpy < return enthalpy (accounts for latent load); fixed-dry-bulb enables below a dry-bulb setpoint; 90.1-2013 and later require the combined form, shutting off when hOA > hRA OR TOA > 75 F. A control aid; the 90.1 high-limit for the climate zone and the equipment sequence govern.";
+  citationEl.textContent = "Citation: Economizer high-limit changeover (ASHRAE 90.1 6.5.1.1.3): differential-enthalpy enables free cooling when outdoor enthalpy < return enthalpy (accounts for latent load); fixed-dry-bulb enables below a dry-bulb setpoint; 90.1-2013 and later require the combined form, shutting off when hOA > hRA OR TOA > the entered fixed dry-bulb limit (75 F in every climate zone). A control aid; the 90.1 high-limit for the climate zone and the equipment sequence govern.";
   const mode = makeSelect("Changeover type", "eco-mode", [
     { value: "differential_enthalpy", label: "Differential enthalpy (accounts for humidity)" },
     { value: "fixed_drybulb", label: "Fixed dry-bulb setpoint" },

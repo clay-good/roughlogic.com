@@ -205,7 +205,7 @@ export function computeGrooveWeldLengthForLoad({ applied_load_lb = 0, weld_type 
   const required_length_in = load / strength_per_in_lb;
   if (![required_length_in, stress_ksi, throat_in].every(Number.isFinite)) return { error: "Weld-length math is not a finite value." };
   const notes = [];
-  notes.push(M + " basis: weld-metal shear at " + fmt(stress_ksi, 2) + " ksi on the " + fmt(throat_in, 3) + " in effective throat (" + electrode + "), " + fmt(strength_per_in_lb, 0) + " lb per in.");
+  notes.push(M + " basis: design shear stress (weld metal for PJP; base metal per Table J2.5 for CJP) at " + fmt(stress_ksi, 2) + " ksi on the " + fmt(throat_in, 3) + " in effective throat (" + electrode + "), " + fmt(strength_per_in_lb, 0) + " lb per in.");
   notes.push("Round UP and split the length between the two sides of the joint where the detail allows; add for weld returns and any minimum-length or minimum-size rule (AWS D1.1). ");
   if (type === "CJP") notes.push("A CJP groove weld with matching filler develops the base metal in tension/compression; this shear length governs only the shear case (AISC J2.4).");
   else notes.push("Read the PJP effective throat off the qualified WPS (the groove depth less the AWS D1.1 Table 3.1 reduction, not the joint thickness).");

@@ -247,15 +247,17 @@ export function computeConductorSagAtTemperature({ span_ft = 0, area_in2 = 0, we
   const tension2_pct_rated = rated_strength_lb > 0 ? tension2_lb / rated_strength_lb * 100 : null;
   const outs = [sag1_ft, tension2_lb, sag2_ft, sag_increase_ft, tension_change_lb];
   if (!outs.every(Number.isFinite)) return { error: "Change-of-state math is not a finite value." };
+  // direction branches on the tension, not the temperature: an ice or wind load at the same
+  // temperature raises tension (until 2026-10-03 a 60 to 60 F ice case read hotter: tension falls).
   return {
     sag1_ft, sag2_ft, sag_increase_ft, sag_increase_pct,
     tension2_lb, tension_change_lb, tension_change_pct,
     thermal_term_lb, initial_curve_term, cubic_k: K, cubic_c: C, ea_lb: EA,
     tension1_lb, tension1_pct_rated, tension2_pct_rated, temp1_f, temp2_f,
     weight2_used_lb_per_ft: w2,
-    direction: temp2_f >= temp1_f
-      ? "hotter: tension falls and sag grows, and the clearance question is the one that matters"
-      : "colder: tension climbs toward the conductor's limit and the structure loading climbs with it",
+    direction: tension2_lb <= tension1_lb
+      ? (temp2_f > temp1_f ? "hotter" : "lighter") + ": tension falls and sag grows, and the clearance question is the one that matters"
+      : (temp2_f < temp1_f ? "colder" : "heavier") + ": tension climbs toward the conductor's limit and the structure loading climbs with it",
     note: "Two things fight each other when a conductor heats up. The metal grows -- alpha times the temperature change of free thermal strain -- and that growth has to go somewhere, so it goes into sag. But sagging lowers the tension, and lower tension lets the elastic stretch relax, which pulls some length back. The change-of-state equation states that total length is conserved across the two conditions once both effects are counted, and because the sag term carries the tension squared in its denominator the result is a CUBIC in the final tension. There is no closed form worth writing on a tailboard, which is precisely why this is a calculator. The magnitude is always larger than people expect and the direction is always the same. ACSR Drake on a 600 ft ruling span strung to 6,000 lb at 60 degF comes back at 4,380 lb at 120 degF: sixty degrees cost 1,620 lb of tension, 27.0%, and bought 3.03 ft of sag, taking the conductor from 8.21 ft to 11.24 ft. That is a 37% sag increase from a 27% tension drop, because sag is inversely proportional to tension and so it always moves further than the tension does. A crew that sagged that span in spring and left 3 ft of clearance margin has none left on a hot August afternoon with the line loaded. Run backwards it handles the cold case, where the concern is not clearance but tension climbing toward the conductor's limit and the structure loading that comes with it. And it takes a LOAD change as well as a temperature change: enter a different weight per foot for the second condition and it answers the ice case, where the weight climbs at the same time the metal is cold and stiff. Enter the resultant from the district loading calculator to get that case right. This is the single-span parabolic change of state with the conductor treated as one homogeneous material. It does not model ACSR as separate aluminium and steel components with their own moduli and expansion coefficients, which matters at high temperature where the aluminium goes slack and the steel takes the load -- the knee-point behaviour is real and it is not here. It does not include creep, which is permanent and additive and is handled separately, and it does not use the exact catenary, which departs from the parabola on very long or very slack spans. It does not check clearance, evaluate inclined spans, or produce a stringing chart. The conductor manufacturer's stress-strain data, the utility's sag-tension program and stringing charts, and the applicable NESC edition govern.",
   };
 }

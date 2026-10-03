@@ -1124,7 +1124,7 @@ function renderPvCellTemperaturePower(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: PV NOCT cell-temperature model T_cell = T_amb + (NOCT - 20) x G/800 and the datasheet power temperature coefficient (about -0.35%/C for crystalline silicon), by name. Temperature derate only (no soiling/wiring/inverter/shading). A design aid; the module datasheet governs.";
   const Ta = makeNumber("Ambient temperature (°C)", "pctp-ta", { step: "any" });
   const G = makeNumber("Plane-of-array irradiance (W/m²)", "pctp-g", { step: "any", min: "0" });
-  const noct = makeNumber("NOCT (C, datasheet, default 45)", "pctp-noct", { step: "any", min: "0" });
+  const noct = makeNumber("NOCT (C, datasheet, default 45)", "pctp-noct", { step: "any", min: "0", value: "45" });
   const Pstc = makeNumber("Module STC power (W)", "pctp-p", { step: "any", min: "0" });
   const g = makeNumber("Power temp coefficient (%/C, e.g. -0.35)", "pctp-gamma", { step: "any" });
   for (const f of [Ta, G, noct, Pstc, g]) inputRegion.appendChild(f.wrap);
@@ -1178,7 +1178,7 @@ function renderPvMaxAmbientForPower(inputRegion, outputRegion, citationEl) {
   const Ptgt = makeNumber("Target power (W)", "pma-pt", { step: "any", min: "0" });
   const Pstc = makeNumber("Module STC power (W)", "pma-p", { step: "any", min: "0" });
   const G = makeNumber("Plane-of-array irradiance (W/m²)", "pma-g", { step: "any", min: "0" });
-  const noct = makeNumber("NOCT (C, datasheet, default 45)", "pma-noct", { step: "any", min: "0" });
+  const noct = makeNumber("NOCT (C, datasheet, default 45)", "pma-noct", { step: "any", min: "0", value: "45" });
   const g = makeNumber("Power temp coefficient (%/C, e.g. -0.35)", "pma-gamma", { step: "any" });
   for (const f of [Ptgt, Pstc, G, noct, g]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { Ptgt.input.value = "358"; Pstc.input.value = "400"; G.input.value = "800"; noct.input.value = "45"; g.input.value = "-0.35"; update(); });

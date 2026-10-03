@@ -7192,7 +7192,7 @@ export function computeWoodNailWithdrawal({ g = 0, d_in = 0, p_in = 0, cd = 1.0,
   const z_w = w_lbin * p_in * cd * cmv * ctn;
   return {
     w_lbin, ctn, z_w,
-    note: "NDS 12.2.3 nail/spike reference withdrawal design value W = 1,380 G^(5/2) D (lb/in), with G the specific gravity of the holding member and D the fastener diameter, and the total capacity W x p_pen times the load-duration CD and the toenail factor Ctn = 0.67 (12.5.4). Withdrawal from side grain only - withdrawal from end grain is not permitted (12.2.3.4). The toenail penalty nearly cancels the wind-duration bump, which is why toenailed uplift connections are weak and framing hardware replaces them. This does not cover lateral (shear) loading (the yield-limit model), the head pull-through, or combined withdrawal-plus-lateral. A design aid, not a substitute for the structural engineer of record's stamped design.",
+    note: "NDS 12.2.3 nail/spike reference withdrawal design value W = 1,380 G^(5/2) D (lb/in), with G the specific gravity of the holding member and D the fastener diameter, and the total capacity W x p_pen times the load-duration CD, the wet service factor CM (NDS Table 11.3.3: 1.0, or 0.25 when the wood's moisture changes after nailing), and the toenail factor Ctn = 0.67 (12.5.4). Withdrawal from side grain only - withdrawal from end grain is not permitted (12.2.3.4). The toenail penalty nearly cancels the wind-duration bump, which is why toenailed uplift connections are weak and framing hardware replaces them. This does not cover lateral (shear) loading (the yield-limit model), the head pull-through, or combined withdrawal-plus-lateral. A design aid, not a substitute for the structural engineer of record's stamped design.",
   };
 }
 export const woodNailWithdrawalExample = { inputs: { g: 0.50, d_in: 0.162, p_in: 1.5, cd: 1.0, toenail: "no" } };
@@ -8684,7 +8684,7 @@ const _v546renderWindSolidSign = _simpleRenderer({
 CONSTRUCTION_RENDERERS["wind-solid-sign"] = _v546renderWindSolidSign;
 
 // --- spec-v553 E: Unbalanced snow load on gable roof (ASCE 7-22 7.6.1) ---
-// Applies for ~2.38-30.2 deg and W>20 ft. Windward 0.3 ps, leeward ps + hd*gamma/sqrt(S).
+// Applies for ~2.38-30.2 deg; W<=20 ft is windward 0 / leeward pg. Otherwise windward 0.3 ps, leeward ps + hd*gamma/sqrt(S).
 // dims: in { ground_snow_pg_psf: M L^-1 T^-2, flat_roof_ps_psf: M L^-1 T^-2, roof_rise_on_12: dimensionless, eave_to_ridge_ft: L, w2: dimensionless } out: { windward_psf: M L^-1 T^-2, leeward_peak_psf: M L^-1 T^-2, extent_ft: L }
 export function computeSnowUnbalancedGable({ ground_snow_pg_psf = 0, flat_roof_ps_psf = 0, roof_rise_on_12 = 0, eave_to_ridge_ft = 0, w2 = SNOW_W2_DEFAULT } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
@@ -8726,7 +8726,7 @@ export function computeSnowUnbalancedGable({ ground_snow_pg_psf = 0, flat_roof_p
 export const snowUnbalancedGableExample = { inputs: { ground_snow_pg_psf: 30, flat_roof_ps_psf: 25, roof_rise_on_12: 4, eave_to_ridge_ft: 30, w2: 0.5 } };
 
 const _v553renderSnowUnbalancedGable = _simpleRenderer({
-  citation: "Citation: ASCE 7-22 Section 7.6.1 unbalanced snow load on gable roofs: snow density gamma = min(0.13 pg + 14, 30); drift height hd = 1.5 sqrt(pg^0.74 W^0.70 W2^1.7 / gamma) (Eq. 7.6-1, W2 the winter wind parameter); windward slope 0.3 ps; leeward peak ps + hd gamma/sqrt(S) (S = 12/rise); surcharge extent 8 hd sqrt(S)/3. Applies only in the ~2.38-30.2 degree band with W > 20 ft. This sizes the leeward rafter and ridge the balanced case misses. ASCE 7 and the engineer of record govern.",
+  citation: "Citation: ASCE 7-22 Section 7.6.1 unbalanced snow load on gable roofs: snow density gamma = min(0.13 pg + 14, 30); drift height hd = 1.5 sqrt(pg^0.74 W^0.70 W2^1.7 / gamma) (Eq. 7.6-1, W2 the winter wind parameter); windward slope 0.3 ps; leeward peak ps + hd gamma/sqrt(S) (S = 12/rise); surcharge extent 8 hd sqrt(S)/3. Applies in the ~2.38-30.2 degree band; for W <= 20 ft the windward slope is 0 and the leeward slope carries pg uniformly. This sizes the leeward rafter and ridge the balanced case misses. ASCE 7 and the engineer of record govern.",
   example: snowUnbalancedGableExample.inputs,
   fields: [
     { key: "ground_snow_pg_psf", label: "Ground snow load pg (psf)", kind: "number" },
@@ -10580,26 +10580,28 @@ CONSTRUCTION_RENDERERS["housewrap-rolls"] = _v895renderHousewrapRolls;
 //
 // Fabric, rail/wire, posts (line vs terminal), and tension bands for a chain-link run.
 //   fabric = perimeter - gates; posts = ceil(perimeter / spacing); bands = terminals x (height - 1)
-// dims: in { perimeter_ft: L, height_ft: L, gate_width_ft: L, corners: dimensionless, line_post_spacing_ft: L } out: { fabric_lf: L, rail_wire_lf: L, terminals: dimensionless, total_posts: dimensionless, line_posts: dimensionless, tension_bands: dimensionless }
-export function computeChainLinkFenceTakeoff({ perimeter_ft = 200, height_ft = 4, gate_width_ft = 0, corners = 4, line_post_spacing_ft = 10 } = {}) {
+// dims: in { perimeter_ft: L, height_ft: L, gate_width_ft: L, corners: dimensionless, line_post_spacing_ft: L, end_posts: dimensionless } out: { fabric_lf: L, rail_wire_lf: L, terminals: dimensionless, total_posts: dimensionless, line_posts: dimensionless, tension_bands: dimensionless }
+export function computeChainLinkFenceTakeoff({ perimeter_ft = 200, height_ft = 4, gate_width_ft = 0, corners = 4, line_post_spacing_ft = 10, end_posts = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(perimeter_ft > 0)) return { error: "Perimeter must be positive (ft)." };
   if (!(height_ft > 0)) return { error: "Fence height must be positive (ft)." };
   if (!(line_post_spacing_ft > 0)) return { error: "Line post spacing must be positive (ft)." };
   if (gate_width_ft < 0) return { error: "Gate width cannot be negative (ft)." };
   if (corners < 0) return { error: "Corner count cannot be negative." };
+  if (end_posts < 0) return { error: "End post count cannot be negative." };
   if (gate_width_ft >= perimeter_ft) return { error: "Gate width meets or exceeds the perimeter." };
   const fabric_lf = perimeter_ft - gate_width_ft;
   // Top rail and bottom tension wire follow the fabric, so gate openings come off (Master Halco).
   const rail_wire_lf = fabric_lf;
-  const terminals = corners + (gate_width_ft > 0 ? 2 : 0);
+  const terminals = corners + end_posts + (gate_width_ft > 0 ? 2 : 0);
   const total_posts = Math.ceil(perimeter_ft / line_post_spacing_ft - 1e-9);
   const line_posts = Math.max(0, total_posts - terminals);
   // A corner post takes fabric from two directions and so two sets of bands; ends and gate jambs one.
   // One band per foot of height less one, rounded up (Master Halco: 3 for a 42 in fence). Until
   // 2026-10-02 every terminal took one set, so the 200 ft example read 18 bands against 30.
   const bands_per_set = Math.max(1, Math.ceil(height_ft - 1 - 1e-9));
-  const tension_bands = (2 * corners + (gate_width_ft > 0 ? 2 : 0)) * bands_per_set;
+  // End posts were entered as corners (two band sets) until 2026-10-03; they take one.
+  const tension_bands = (2 * corners + end_posts + (gate_width_ft > 0 ? 2 : 0)) * bands_per_set;
   if (![fabric_lf, rail_wire_lf, terminals, total_posts, line_posts, tension_bands].every(Number.isFinite)) return { error: "Chain-link math is not a finite value." };
   return {
     fabric_lf,
@@ -10621,7 +10623,8 @@ const _v901renderChainLinkFenceTakeoff = _simpleRenderer({
     { key: "perimeter_ft", label: "Fence run / perimeter (ft)", kind: "number" },
     { key: "height_ft", label: "Fence height (ft)", kind: "number" },
     { key: "gate_width_ft", label: "Total gate width (ft)", kind: "number", default: 0 },
-    { key: "corners", label: "Corner + end terminal posts", kind: "number" },
+    { key: "corners", label: "Corner posts (fabric from two directions)", kind: "number" },
+    { key: "end_posts", label: "End posts on an open run (one band set each)", kind: "number", default: 0 },
     { key: "line_post_spacing_ft", label: "Line post spacing (ft)", kind: "number" },
   ],
   outputs: [
@@ -10986,7 +10989,7 @@ export function computeDrainageBoardTakeoff({ perimeter_ft = 150, below_grade_he
 export const drainageBoardTakeoffExample = { inputs: { perimeter_ft: 150, below_grade_height_ft: 8, roll_width_ft: 4, roll_length_ft: 50, waste_pct: 10 } };
 
 CONSTRUCTION_RENDERERS["drainage-board-takeoff"] = _simpleRenderer({
-  citation: "Citation: foundation drainage board (dimple mat) takeoff, by name. area = perimeter x below-grade height; rolls = ceil(area x (1 + waste) / roll coverage); termination bar per perimeter. The dimples face the wall over the membrane; it relieves hydrostatic pressure to the footing drain (IRC R405). The product roll size and lap, the assembly detail, and the AHJ govern.",
+  citation: "Citation: foundation drainage board (dimple mat) takeoff, by name. area = perimeter x below-grade height; rolls = ceil(area x (1 + waste) / roll coverage); termination bar per perimeter. A plain dimple mat goes dimples to the wall, a fabric-faced composite flat side to the wall; it relieves hydrostatic pressure to the footing drain (IRC R405). The product roll size and lap, the assembly detail, and the AHJ govern.",
   example: drainageBoardTakeoffExample.inputs,
   fields: [
     { key: "perimeter_ft", label: "Foundation perimeter (ft)", kind: "number" },

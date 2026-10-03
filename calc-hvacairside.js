@@ -357,7 +357,7 @@ export function computeAirDensityCorrection({ elev_ft = 0, T_F = 70, acfm = 0, r
   const sp_corr = sp_v > 0 ? sp_v * DF : null;
   return {
     alt_factor, temp_factor, DF, SCFM, const_corr, sp_corr,
-    note: "Air density factor DF vs standard air (0.075 lb/ft^3, 70 F sea level): the altitude factor (1 - 6.8754e-6 x elev)^5.2559 and the temperature factor 530/(460 + T), multiplied. Thinner air (high altitude or hot air) carries less mass per cfm, so SCFM = ACFM x DF, the sensible constant 1.08 scales to 1.08 x DF, and a sea-level-rated fan delivers rated_sp x DF of static. A 5,000 ft site runs about 16% thinner; 120 F rooftop air is about 9% thinner even at sea level, which is why summer rooftop capacity lags the rating. A correction factor; the fan curve and the equipment ratings at the actual condition govern.",
+    note: "Air density factor DF vs standard air (0.075 lb/ft^3, 70 F sea level): the altitude factor (1 - 6.8754e-6 x elev)^5.2559 and the temperature factor 530/(460 + T), multiplied. Thinner air (high altitude or hot air) carries less mass per cfm, so SCFM = ACFM x DF, the sensible constant 1.08 scales to 1.08 x DF, and a sea-level-rated fan delivers rated_sp x DF of static. A 5,000 ft site runs about 17% thinner; 120 F rooftop air is about 9% thinner even at sea level, which is why summer rooftop capacity lags the rating. A correction factor; the fan curve and the equipment ratings at the actual condition govern.",
   };
 }
 export const airDensityCorrectionExample = { inputs: { elev_ft: 5000, T_F: 70, acfm: 1000, rated_sp: 0.5 } };

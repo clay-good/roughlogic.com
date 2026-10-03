@@ -4469,7 +4469,7 @@
   {
    "tile_id": "ssd-design-speed",
    "source_publisher": "AASHTO (inverse)",
-   "source_title": "v = (-b + sqrt(b^2 + 4 a SSD)) / (2 a), a = 1/(30(f+g)), b = 1.47 t",
+   "source_title": "v = (-b + sqrt(b^2 + 4 a SSD)) / (2 a), a = 1.075/(32.2(f+g)), b = 1.47 t",
    "source_edition_or_year": "spec-v695 worked example (machine-verified)",
    "source_section_or_page": "492.4 ft sight distance (the Green Book 55 mph row, 202.1 + 290.3), level, f 0.348 (a = 11.2 ft/s2), t 2.5 s -> 55 mph (round-trips stopping-sight-distance)",
    "verified_by": "rl",
@@ -44330,7 +44330,7 @@
   {
    "tile_id": "bend-springback",
    "source_publisher": "Machinery's Handbook sheet-metal springback",
-   "source_title": "cross-check: aluminum (E 10e6, 40 ksi) springs back much more, Ks 0.858",
+   "source_title": "cross-check: aluminum (E 10e6, 40 ksi) springs back much more, Ks 0.880",
    "source_edition_or_year": "spec-v962 worked example (machine-verified)",
    "source_section_or_page": "x = 1*40000/(10e6*0.1) = 0.04; Ks = 4*0.04^3 - 3*0.04 + 1 = 0.880256",
    "verified_by": "rl",
@@ -46828,9 +46828,9 @@
   {
    "tile_id": "soil-resistivity-wenner",
    "source_publisher": "Wenner 4-pin soil resistivity (IEEE 81 / ASTM G57)",
-   "source_title": "10 ft probe spacing, 5 ohm earth-tester reading -> 95.8 ohm-m (9575 ohm-cm)",
+   "source_title": "10 ft probe spacing, 5 ohm earth-tester reading -> 95.8 ohm-m (9576 ohm-cm)",
    "source_edition_or_year": "spec-v951 worked example (machine-verified)",
-   "source_section_or_page": "rho = 2*pi*(10*0.3048)*5 = 2*pi*3.048*5 = 95.76 ohm-m; x100 = 9575 ohm-cm",
+   "source_section_or_page": "rho = 2*pi*(10*0.3048)*5 = 2*pi*3.048*5 = 95.76 ohm-m; x100 = 9576 ohm-cm",
    "verified_by": "rl",
    "verified_on": "2026-07-18",
    "inputs": {
@@ -56178,7 +56178,7 @@
   },
   {
    "tile_id": "bolt-shear-bearing",
-   "source_publisher": "AISC 360-22 J3.6 / J3.10",
+   "source_publisher": "AISC 360-22 J3.7 / J3.11",
    "source_title": "3/4 in A325-N, 1/2 in A36, single shear, 1.5 in edge -> shear 23.9, gov 23.9, phi 17.9, ASD 11.9 kip",
    "source_edition_or_year": "spec-v267 worked example (machine-verified)",
    "source_section_or_page": "spec-v267 section 2.1 pinned example",
@@ -56230,7 +56230,7 @@
   },
   {
    "tile_id": "bolt-shear-bearing",
-   "source_publisher": "AISC 360-22 J3.6 / J3.10",
+   "source_publisher": "AISC 360-22 J3.7 / J3.11",
    "source_title": "cross-check: thin the plate to 1/4 in A36 -> tearout governs at 19.0 kip, phi 14.3 kip",
    "source_edition_or_year": "spec-v267 worked example (machine-verified)",
    "source_section_or_page": "spec-v267 section 2.1 cross-check",
@@ -64447,7 +64447,7 @@
   },
   {
    "tile_id": "steel-bolt-slip-critical",
-   "source_publisher": "AISC 360-22 J3.8 / Table J3.1",
+   "source_publisher": "AISC 360-22 J3.9 / Table J3.1",
    "source_title": "3/4 in A325, Class A, one slip plane -> 9.49 kip/bolt (ASD 6.33); 4 bolts -> 38.0 kip LRFD",
    "source_edition_or_year": "spec-v294 worked example (machine-verified)",
    "source_section_or_page": "spec-v294 section 2.1 pinned example",
@@ -64490,7 +64490,7 @@
   },
   {
    "tile_id": "steel-bolt-slip-critical",
-   "source_publisher": "AISC 360-22 J3.8",
+   "source_publisher": "AISC 360-22 J3.9",
    "source_title": "cross-check: Class B surface in double shear lifts one bolt 3.3x to 31.6 kip",
    "source_edition_or_year": "spec-v294 worked example (machine-verified)",
    "source_section_or_page": "spec-v294 section 2.1 cross-check",
@@ -73307,7 +73307,7 @@
   {
    "tile_id": "sheathing-takeoff",
    "source_publisher": "Sheathing takeoff identity (first-principles)",
-   "source_title": "cross-check: a shear-panel nailing schedule doubles the nails",
+   "source_title": "cross-check: a shear-panel nailing schedule raises the nails about 73%",
    "source_edition_or_year": "spec-v865 worked example",
    "source_section_or_page": "nails = 54*104 = 5,616 on the same 54 sheets (schedule drives the fastener order)",
    "verified_by": "rl",
@@ -75804,7 +75804,7 @@
   {
    "tile_id": "chain-link-fence-takeoff",
    "source_publisher": "Chain-link takeoff identity (first-principles)",
-   "source_title": "200 ft, 4 ft, one 4 ft gate, 4 corners, 10 ft spacing -> 196 LF fabric, 20 posts (14 line, 6 terminal), 18 bands",
+   "source_title": "200 ft, 4 ft, one 4 ft gate, 4 corners, 10 ft spacing -> 196 LF fabric, 20 posts (14 line, 6 terminal), 30 bands",
    "source_edition_or_year": "spec-v901 worked example",
    "source_section_or_page": "fabric=200-4=196; terminals=4+2=6; posts=ceil(200/10)=20; line=20-6=14; bands=(2*4+2)*(4-1)=30 (corners take two sets; recomputed 2026-10-02 from 18)",
    "verified_by": "rl",
@@ -75846,7 +75846,7 @@
   {
    "tile_id": "chain-link-fence-takeoff",
    "source_publisher": "Chain-link takeoff identity (first-principles)",
-   "source_title": "cross-check: a taller 6 ft fence raises the bands to 30 while posts and fabric hold",
+   "source_title": "cross-check: a taller 6 ft fence raises the bands to 50 while posts and fabric hold",
    "source_edition_or_year": "spec-v901 worked example",
    "source_section_or_page": "bands = (2*4+2)*(6-1) = 50; posts 20, fabric 196 unchanged",
    "verified_by": "rl",
@@ -79315,7 +79315,7 @@
   {
    "tile_id": "air-density-correction",
    "source_publisher": "ASHRAE Fundamentals",
-   "source_title": "5,000 ft, 70 F, 1,000 ACFM -> DF 0.835, SCFM 835, static 0.42 in-wc",
+   "source_title": "5,000 ft, 70 F, 1,000 ACFM -> DF 0.832, SCFM 832, static 0.42 in-wc",
    "source_edition_or_year": "spec-v349 worked example (machine-verified)",
    "source_section_or_page": "spec-v349 section 2.1 pinned example",
    "verified_by": "rl",
@@ -85953,7 +85953,7 @@
   {
    "tile_id": "concrete-torsion-threshold",
    "source_publisher": "ACI 318-19 \u00a722.7",
-   "source_title": "18x24 in, 4000 psi -> Tth 140,502 in-lb (11.7 ft-kip)",
+   "source_title": "18x24 in, 4000 psi -> Tth 140,514 in-lb (11.7 ft-kip)",
    "source_edition_or_year": "spec-v447 cross-check (machine-verified; spec prose 14.6 was a slip, 11.7 is correct)",
    "source_section_or_page": "spec-v447 section 2.1 cross-check",
    "verified_by": "rl",
@@ -85966,7 +85966,7 @@
    },
    "outputs": {
     "tth_inlb": {
-     "value": 140502.16,
+     "value": 140513.55,
      "tolerance": {
       "pct": 0.5
      }
@@ -93597,7 +93597,7 @@
    "source_publisher": "ACI 347 formwork practice",
    "source_title": "cross-check: going to a 2x10 does NOT escape shear control",
    "source_edition_or_year": "continuous beam, three or more equal spans",
-   "source_section_or_page": "same load on a 2x10 (1.5 x 9.25): bending 65.41 in, deflection 108.44 in, shear 55.50 in - shear still governs, which is the tile's whole point; note shear scales linearly with depth while bending scales with depth^1 through sqrt(S) and deflection with depth^1.5",
+   "source_section_or_page": "same load on a 2x10 (1.5 x 9.25): bending 65.41 in, deflection 108.44 in, shear 55.50 in - shear still governs, which is the tile's whole point; note shear scales linearly with depth while bending scales with depth^1 through sqrt(S) and deflection with depth^1 through cbrt(I)",
    "verified_by": "rl",
    "verified_on": "2026-07-27",
    "inputs": {

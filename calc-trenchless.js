@@ -532,7 +532,7 @@ TRENCHLESS_RENDERERS["cipp-liner-thickness"] = _simpleRenderer({
   outputs: [
     { key: "p", id: "clt-out-p", label: "External groundwater pressure", value: (r) => fmt(r.external_pressure_psi, 2) + " psi" },
     { key: "t", id: "clt-out-t", label: "Required liner thickness", value: (r) => fmt(r.thickness_in, 3) + " in at a dimension ratio of " + fmt(r.dimension_ratio, 1) },
-    { key: "c", id: "clt-out-c", label: "Designing on the short-term modulus instead", value: (r) => fmt(r.short_term_thickness_in, 3) + " in -- " + fmt(r.creep_penalty_pct, 0) + "% thinner than the creep-corrected design, which is the unconservative direction" },
+    { key: "c", id: "clt-out-c", label: "Designing on the short-term modulus instead", value: (r) => fmt(r.short_term_thickness_in, 3) + " in -- the creep-corrected design is " + fmt(r.creep_penalty_pct, 0) + "% thicker, so this is the unconservative direction" },
     { key: "o", id: "clt-out-o", label: "At the alternative ovality", value: (r) => fmt(r.alternative_thickness_in, 3) + " in" },
     { key: "r", id: "clt-out-r", label: "What ovality costs against a round host", value: (r) => fmt(r.round_thickness_in, 3) + " in round, so the measured ovality adds " + fmt(r.ovality_penalty_pct, 0) + "%" },
     { key: "n", id: "clt-out-n", label: "Note", value: (r) => r.note },
