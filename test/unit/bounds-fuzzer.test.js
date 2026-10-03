@@ -4435,8 +4435,8 @@ test("bounds: spec-v692 computeDriveshaftMaxLength pins L_max = L_ref sqrt(0.65 
 test("bounds: calc-mechanic computeFuelRange pins range = tank * mpg * load_factor and the per-fuel BTU table", () => {
   const fuels = [
     { key: "gasoline_E10", lhv: 112000 },
-    { key: "diesel_2", lhv: 128450 },
-    { key: "LPG", lhv: 84000 },
+    { key: "diesel_2", lhv: 128488 }, // AFDC
+    { key: "LPG", lhv: 84250 }, // AFDC
     { key: "jet_a", lhv: 124000 },
   ];
   for (const { key, lhv } of fuels) {

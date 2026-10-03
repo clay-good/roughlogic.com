@@ -9436,7 +9436,7 @@
    "source_publisher": "Project (first-principles)",
    "source_title": "Fuel range identity: range = tank_gal * mpg * load_factor; LHV table per fuel",
    "source_edition_or_year": "DOE/EPA fuel-economy LHV table; diesel #2 LHV 128,450 BTU/gal",
-   "source_section_or_page": "25 gal / 18 mpg diesel #2 / load 1.0 / $3.85/gal -> 450 mi, 3,211,250 BTU, $96.25 fill, $0.214/mi",
+   "source_section_or_page": "25 gal / 18 mpg diesel #2 / load 1.0 / $3.85/gal -> 450 mi, 3,212,200 BTU (AFDC 128,488 Btu/gal; recomputed 2026-10-03 from 128,450), $96.25 fill, $0.214/mi",
    "verified_by": "rl",
    "verified_on": "2026-05-11",
    "inputs": {
@@ -9455,7 +9455,7 @@
      }
     },
     "total_btu": {
-     "value": 3211250,
+     "value": 3212200,
      "tolerance": {
       "abs": 1
      }
@@ -158181,6 +158181,1551 @@
      "value": 8.774,
      "tolerance": {
       "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "inclined-plane-force",
+   "source_publisher": "Naval Education and Training Professional Development and Technology Center (US Navy)",
+   "source_title": "Basic Machines, NAVEDTRA 14037",
+   "source_edition_or_year": "1994",
+   "source_section_or_page": "Ch. 4 The Inclined Plane, p. 4-1, Fig. 4-1: printed \"L = 9ft, l = 3 ft, and R = 300 lb\" ... \"9E = 900, E = 100 pounds\" and \"the mechanical advantage is three\" (frictionless). Angle entered as asin(3/9) from the printed rise and plank length (pure geometry, not back-solved from the result). Exact match; tolerance 0.1% only covers the 6-decimal angle.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "weight_lb": 300,
+    "incline_angle_deg": 19.471221,
+    "friction_coefficient": 0
+   },
+   "outputs": {
+    "force_up_lb": {
+     "value": 100,
+     "tolerance": {
+      "pct": 0.1
+     }
+    },
+    "ideal_mechanical_advantage": {
+     "value": 3,
+     "tolerance": {
+      "pct": 0.1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "inclined-plane-force",
+   "source_publisher": "Naval Education and Training Professional Development and Technology Center (US Navy)",
+   "source_title": "Basic Machines, NAVEDTRA 14037",
+   "source_edition_or_year": "1994",
+   "source_section_or_page": "Ch. 7 Friction, p. 7-3: \"push a 400-pound crate up a 12-foot plank; the upper end is 3 feet higher\" ... \"The theoretical mechanical advantage is 4\" ... \"a 100-pound push\" (frictionless; the 150 lb with friction is a rough 'might have to' figure, not used). Angle = asin(3/12) from printed geometry. Exact; 0.1% covers the angle rounding.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "weight_lb": 400,
+    "incline_angle_deg": 14.477512,
+    "friction_coefficient": 0
+   },
+   "outputs": {
+    "force_up_lb": {
+     "value": 100,
+     "tolerance": {
+      "pct": 0.1
+     }
+    },
+    "ideal_mechanical_advantage": {
+     "value": 4,
+     "tolerance": {
+      "pct": 0.1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "gear-cascade",
+   "source_publisher": "Naval Education and Training Professional Development and Technology Center (US Navy)",
+   "source_title": "Basic Machines, NAVEDTRA 14037",
+   "source_edition_or_year": "1994",
+   "source_section_or_page": "Ch. 6 Gears used to change speed, p. 6-5, Fig. 6-9: \"Wheel A has 10 teeth that mesh with the 40 teeth on wheel B\" ... \"C has 20 teeth and meshes with wheel D, which has only 10\" ... \"turn A at a speed of four revolutions per second\" ... \"causes D to turn at two revolutions per second\". 4 rev/s = 240 rpm, 2 rev/s = 120 rpm (unit conversion). Exact integers.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "stages": [
+     {
+      "n_in": 10,
+      "n_out": 40
+     },
+     {
+      "n_in": 20,
+      "n_out": 10
+     }
+    ],
+    "input_rpm": 240,
+    "efficiency": 1
+   },
+   "outputs": {
+    "overall_ratio": {
+     "value": 2,
+     "tolerance": {
+      "abs": 0
+     }
+    },
+    "output_rpm": {
+     "value": 120,
+     "tolerance": {
+      "abs": 1e-06
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "gear-cascade",
+   "source_publisher": "Naval Education and Training Professional Development and Technology Center (US Navy)",
+   "source_title": "Basic Machines, NAVEDTRA 14037",
+   "source_edition_or_year": "1994",
+   "source_section_or_page": "Ch. 6 Anchor winch, p. 6-7, Fig. 6-14: driving gear A \"has 22 teeth, which mesh with the 88 teeth on the large wheel (B)\"; gear C \"has 30 teeth that mesh with the 90 teeth on the large gear (D)\"; \"The overall mechanical advantage of the winch is 4 x 3, or 12 to 1.\" Exact integers.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "stages": [
+     {
+      "n_in": 22,
+      "n_out": 88
+     },
+     {
+      "n_in": 30,
+      "n_out": 90
+     }
+    ],
+    "efficiency": 1
+   },
+   "outputs": {
+    "overall_ratio": {
+     "value": 12,
+     "tolerance": {
+      "abs": 0
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "gear-cascade",
+   "source_publisher": "Naval Education and Training Professional Development and Technology Center (US Navy)",
+   "source_title": "Basic Machines, NAVEDTRA 14037",
+   "source_edition_or_year": "1994",
+   "source_section_or_page": "Ch. 6 Gears used to increase mechanical advantage, p. 6-6, Fig. 6-11 cable winch: \"The small pinion gear has 10 teeth, which mesh with the 60 teeth on the internal spur gear\"; the gear pair is \"one having a mechanical advantage of 6\". Exact integer.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "stages": [
+     {
+      "n_in": 10,
+      "n_out": 60
+     }
+    ],
+    "efficiency": 1
+   },
+   "outputs": {
+    "overall_ratio": {
+     "value": 6,
+     "tolerance": {
+      "abs": 0
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "pulley-ma-gen",
+   "source_publisher": "Naval Education and Training Professional Development and Technology Center (US Navy)",
+   "source_title": "Basic Machines, NAVEDTRA 14037",
+   "source_edition_or_year": "1994",
+   "source_section_or_page": "Ch. 2 Block and Tackle, p. 2-2, Fig. 2-4 runner (single movable block): \"lifting a 200-pound cask with a 100-pound pull. The mechanical advantage is 2.\" Friction neglected, so efficiency 1. Exact.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "rig": "movable_2",
+    "efficiency": 1
+   },
+   "outputs": {
+    "theoretical_ma": {
+     "value": 2,
+     "tolerance": {
+      "abs": 0
+     }
+    },
+    "actual_ma": {
+     "value": 2,
+     "tolerance": {
+      "abs": 1e-06
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "pulley-ma-gen",
+   "source_publisher": "Naval Education and Training Professional Development and Technology Center (US Navy)",
+   "source_title": "Basic Machines, NAVEDTRA 14037",
+   "source_edition_or_year": "1994",
+   "source_section_or_page": "Ch. 2, p. 2-3, Fig. 2-7 luff tackle (double + single block = 3 sheaves): \"If the crate weighs 600 pounds, then each of the three parts of the rope supports its share - 200 pounds\" ... \"Neglecting the friction in the block, a pull of 200 pounds\". MA 600/200 = 3; efficiency 1. Exact.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "rig": "block_3",
+    "efficiency": 1
+   },
+   "outputs": {
+    "theoretical_ma": {
+     "value": 3,
+     "tolerance": {
+      "abs": 0
+     }
+    },
+    "actual_ma": {
+     "value": 3,
+     "tolerance": {
+      "abs": 1e-06
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "pulley-ma-gen",
+   "source_publisher": "Naval Education and Training Professional Development and Technology Center (US Navy)",
+   "source_title": "Basic Machines, NAVEDTRA 14037",
+   "source_edition_or_year": "1994",
+   "source_section_or_page": "Ch. 7, p. 7-3, Fig. 7-5: \"the sailor has a mechanical advantage of 5, neglecting friction. Notice that five parts of the rope go to and from the movable block. To raise the 600-pound load ... a pull of only one-fifth of 600 - or 120 pounds\". Efficiency 1. Exact.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "rig": "block_5",
+    "efficiency": 1
+   },
+   "outputs": {
+    "theoretical_ma": {
+     "value": 5,
+     "tolerance": {
+      "abs": 0
+     }
+    },
+    "actual_ma": {
+     "value": 5,
+     "tolerance": {
+      "abs": 1e-06
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "centrifugal-force",
+   "source_publisher": "OpenStax (Rice University)",
+   "source_title": "College Physics 2e",
+   "source_edition_or_year": "2e, 2022 (web edition)",
+   "source_section_or_page": "Sec. 6.2 Centripetal Acceleration, ultracentrifuge example: point \"7.50 cm from the axis of an ultracentrifuge spinning at 7.5 x 10^4 rev/min\" -> \"ac = 4.63 x 10^6 m/s^2\", \"ac/g = 4.63x10^6/9.80 = 4.72 x 10^5\". 7.50 cm = 2.952756 in. Weight 1 lb is arbitrary (a_g is weight-independent; not printed). Tile 471,760 g vs printed 472,000 (-0.05%; OpenStax g = 9.80 vs tile 9.80665 and 3-sig-fig rounding); 0.5% covers both.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "weight_lb": 1,
+    "radius_in": 2.952756,
+    "speed_rpm": 75000
+   },
+   "outputs": {
+    "acceleration_g": {
+     "value": 472000,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "projectile-range",
+   "source_publisher": "OpenStax (Rice University)",
+   "source_title": "University Physics Volume 1",
+   "source_edition_or_year": "2016 (web edition)",
+   "source_section_or_page": "Sec. 4.3 Projectile Motion, Example 4.7 fireworks: \"initial velocity of 70.0 m/s at an angle of 75.0 deg\" -> maximum height \"y = 233 m\" (level-ground apex formula). 70.0 m/s = 229.6588 ft/s; 233 m = 764.4357 ft. Tile 764.75 ft (+0.04%; OpenStax g = 9.80, 3 sig figs); 0.5% covers.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "velocity_fps": 229.6588,
+    "angle_deg": 75
+   },
+   "outputs": {
+    "max_height_ft": {
+     "value": 764.4357,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "projectile-range",
+   "source_publisher": "OpenStax (Rice University)",
+   "source_title": "University Physics Volume 1",
+   "source_edition_or_year": "2016 (web edition)",
+   "source_section_or_page": "Sec. 4.3, Example 4.9 golf shots, hole 2: range \"90.0 m\" at 30 deg needs \"v0 = 31.9 m/s\" (level ground, g = 9.8). Run forward with the printed 31.9 m/s (104.6588 ft/s); printed range 90.0 m = 295.2756 ft. Tile 294.83 ft (-0.15%, the 3-sig-fig rounding of v0 plus g 9.8 vs 9.80665); 1% covers.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "velocity_fps": 104.6588,
+    "angle_deg": 30
+   },
+   "outputs": {
+    "range_ft": {
+     "value": 295.2756,
+     "tolerance": {
+      "pct": 1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "projectile-range",
+   "source_publisher": "OpenStax (Rice University)",
+   "source_title": "University Physics Volume 1",
+   "source_edition_or_year": "2016 (web edition)",
+   "source_section_or_page": "Sec. 4.3, Example 4.9 golf shots, hole 4: range \"90.0 m\" at 70 deg needs \"v0 = 37.0 m/s\". Forward with 37.0 m/s (121.3911 ft/s); printed range 90.0 m = 295.2756 ft. Tile 294.40 ft (-0.30%, v0 rounding + g); 1% covers.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "velocity_fps": 121.3911,
+    "angle_deg": 70
+   },
+   "outputs": {
+    "range_ft": {
+     "value": 295.2756,
+     "tolerance": {
+      "pct": 1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "free-fall-drop",
+   "source_publisher": "OpenStax (Rice University)",
+   "source_title": "College Physics 2e",
+   "source_edition_or_year": "2e, 2022 (web edition)",
+   "source_section_or_page": "Sec. 2.7 Falling Objects, Check Your Understanding: ice chunk released from rest falls \"30.0 m\" -> \"2.47 s\" (a = -9.80 m/s^2). 30.0 m = 98.4252 ft. Tile 2.4735 s; abs 0.01 s covers the printed 3-sig-fig rounding and g 9.80 vs 9.80665.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "drop_height_ft": 98.4252,
+    "object_weight_lb": 0
+   },
+   "outputs": {
+    "fall_time_s": {
+     "value": 2.47,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "terminal-velocity",
+   "source_publisher": "OpenStax (Rice University)",
+   "source_title": "University Physics Volume 1",
+   "source_edition_or_year": "2016 (web edition)",
+   "source_section_or_page": "Sec. 6.4 Drag Force and Terminal Speed, skydiver: \"A 75-kg skydiver descending head first has a cross-sectional area of approximately A = 0.18 m^2 and a drag coefficient of approximately C = 0.70\", rho = 1.21 kg/m^3 -> \"vT = 98 m/s\". Converted: 75 kg -> 165.347 lbf, 0.18 m^2 -> 1.9375 ft^2, 1.21 kg/m^3 -> 0.075538 lb/ft^3; 98 m/s = 321.522 ft/s. Tile 322.26 ft/s (+0.23%; printed 2 sig figs, exact 98.2); 1% covers.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "weight_lb": 165.347,
+    "frontal_area_ft2": 1.9375,
+    "drag_coefficient": 0.7,
+    "air_density_lb_ft3": 0.075538
+   },
+   "outputs": {
+    "terminal_velocity_fps": {
+     "value": 321.5223,
+     "tolerance": {
+      "pct": 1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "terminal-velocity",
+   "source_publisher": "OpenStax (Rice University)",
+   "source_title": "University Physics Volume 1",
+   "source_edition_or_year": "2016 (web edition)",
+   "source_section_or_page": "Sec. 6.4, Example 6.17 spread-eagle skydiver: \"85-kg\", \"A = 0.70 m^2\", \"C = 1.0\", rho 1.21 kg/m^3 -> \"vT = 44 m/s\". Converted: 187.393 lbf, 7.5347 ft^2, 0.075538 lb/ft^3; 44 m/s = 144.357 ft/s. Tile 145.56 ft/s (+0.83%; printed 2 sig figs of an exact 44.35); 1.5% covers.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "weight_lb": 187.393,
+    "frontal_area_ft2": 7.53474,
+    "drag_coefficient": 1,
+    "air_density_lb_ft3": 0.075538
+   },
+   "outputs": {
+    "terminal_velocity_fps": {
+     "value": 144.357,
+     "tolerance": {
+      "pct": 1.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "belt-center-distance",
+   "source_publisher": "Lybelt (belt manufacturer)",
+   "source_title": "V-Belt Length Calculation: Formula & Worked Examples (https://www.lybelt.com/v-belt-length-calculation/)",
+   "source_edition_or_year": "accessed 2026-10-03",
+   "source_section_or_page": "Example 1 check: \"L = 1476.24 mm gives b = 1005.00 mm, the square-root term is 995.00 mm and C = 500.00 mm\" with D = 200 mm, d = 100 mm. Converted to inches: D 7.874016, d 3.937008, L 58.119685; C 500.00 mm = 19.685039 in. Tile 19.685061 in (+0.0001%); 0.1% covers the printed 2-decimal mm.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "large_pitch_diameter_in": 7.874016,
+    "small_pitch_diameter_in": 3.937008,
+    "belt_pitch_length_in": 58.119685
+   },
+   "outputs": {
+    "center_distance_in": {
+     "value": 19.685039,
+     "tolerance": {
+      "pct": 0.1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "rack-and-pinion",
+   "source_publisher": "KHK Kohara Gear Industry",
+   "source_title": "Gear Technical Reference, 4.1(3) Rack and Spur Gear, Table 4.5 (https://khkgears.net/new/gear_knowledge/gear_technical_reference/calculation_gear_dimensions.html)",
+   "source_edition_or_year": "web edition, accessed 2026-10-03",
+   "source_section_or_page": "Table 4.5: \"Module m ... 3\", \"Number of teeth z 12\", \"Reference diameter d zm 36.000\"; text: \"One rotation of the spur gear will displace the rack l one circumferential length of the gear's reference circle\". Module 3 mm = diametral pitch 25.4/3 = 8.466667/in; d 36.000 mm = 1.417323 in. Torque 1 in-lb and 1 rpm are placeholders (required inputs, do not affect pitch diameter; not printed). Exact; 0.1% covers unit conversion.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "pinion_teeth": 12,
+    "diametral_pitch_1_in": 8.466667,
+    "pinion_torque_in_lb": 1,
+    "pinion_rpm": 1
+   },
+   "outputs": {
+    "pitch_diameter_in": {
+     "value": 1.417323,
+     "tolerance": {
+      "pct": 0.1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "fuel-range",
+   "source_publisher": "US DOE Alternative Fuels Data Center",
+   "source_title": "Fuel Properties Comparison (https://afdc.energy.gov/files/u/publication/fuel_comparison_chart.pdf)",
+   "source_edition_or_year": "2024 chart (GREET 2023 values)",
+   "source_section_or_page": "Energy Content (lower heating value), Low Sulfur Diesel column: \"128,488 Btu/gal\". One gallon -> total_btu = LHV. Tile 128,450 (-0.03%); 0.05% covers the code's rounded constant.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "fuel": "diesel_2",
+    "tank_gal": 1,
+    "mpg": 1,
+    "mpg_basis": "diesel_2",
+    "load_factor": 1
+   },
+   "outputs": {
+    "total_btu": {
+     "value": 128488,
+     "tolerance": {
+      "pct": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "fuel-range",
+   "source_publisher": "US DOE Alternative Fuels Data Center",
+   "source_title": "Fuel Properties Comparison (https://afdc.energy.gov/files/u/publication/fuel_comparison_chart.pdf)",
+   "source_edition_or_year": "2024 chart (GREET 2023 values)",
+   "source_section_or_page": "(after the 2026-10-03 fix) (fails today): Energy Content (lower heating value), Propane (LPG) column: \"84,250 Btu/gal\". Tile constant is 84,000 (-0.30%), calc-mechanic.js:259; the tile's own citation already states 84,250. 0.05% tolerance.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "fuel": "LPG",
+    "tank_gal": 1,
+    "mpg": 1,
+    "mpg_basis": "LPG",
+    "load_factor": 1
+   },
+   "outputs": {
+    "total_btu": {
+     "value": 84250,
+     "tolerance": {
+      "pct": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "elevator-handling-capacity",
+   "source_publisher": "IMechE Hong Kong Branch (lecture notes)",
+   "source_title": "System Design and Lift Traffic Analysis (lecture slides, 'Only for circulation in lectures')",
+   "source_edition_or_year": "undated lecture deck, retrieved 2026",
+   "source_section_or_page": "Slides 45-46 'An Example by Conventional Hand Calculation' (https://nearyou.imeche.org/docs/default-source/Hong-Kong/4.pdf): N = 10, df = 3.3 m, tp = 1.2 s, rated speed 1.6 m/s, 'H = 9.8; S = 8.3 ; P = 21 x 0.8 = 16.8; tv = 3.3/1.6 = 2.1', 'ts = 0.8 + 3 + 6 - 2.1 = 7.7 s', 'RTT = 2 x 9.8 x 2.1 + (8.3+1) x 7.7 + 2 x 16.8 x 1.2 = 153.1', 'Need 5 cars; UPPINT = 153.1 / 5 = 30.6', 'UPPHC = (300 x 16.8) / 30.6 = 165 persons / 5-min'. Inputs: rise = H x df = 9.8 x 3.3 = 32.34 m = 106.10 ft and speed 1.6 m/s = 314.96 fpm (unit conversions of printed values; the tile's travel term 2 x rise / speed equals 2 H tv). The lecture rounds tv = 2.0625 s to 2.1, so its travel term is 41.16 s vs the tile's 40.43 s; 1% tolerance covers that rounding (tile RTT 152.36, interval 30.47, HC 165.4). Population 960 is the printed daily attendance; hc_percent and cars_for_target are not checked (the lecture accepts 5 cars at a 30.6 s interval against a 30 s target, the tile's strict ceil gives 6).",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "rise_ft": 106.102,
+    "car_speed_fpm": 314.961,
+    "passengers_per_trip": 16.8,
+    "probable_stops": 8.3,
+    "stop_time_s": 7.7,
+    "transfer_time_s": 1.2,
+    "cars": 5,
+    "population": 960,
+    "target_interval_s": 30
+   },
+   "outputs": {
+    "rtt_s": {
+     "value": 153.1,
+     "tolerance": {
+      "pct": 1
+     }
+    },
+    "interval_s": {
+     "value": 30.6,
+     "tolerance": {
+      "pct": 1
+     }
+    },
+    "hc_total": {
+     "value": 165,
+     "tolerance": {
+      "pct": 1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "tube-bend-wall-thinning",
+   "source_publisher": "Industrial Monitor Direct",
+   "source_title": "SS Tube Min Bend Radius: 0.75 OD 0.065 Wall Technical Guide (knowledge base)",
+   "source_edition_or_year": "2026-05-12",
+   "source_section_or_page": "Wall thinning section (https://industrialmonitordirect.com/blogs/knowledgebase/ss-tube-min-bend-radius-075-od-0065-wall-technical-guide): 't_min = t_original x (CLR / (CLR + OD/2))'; 'For 0.75\" OD, 0.065\" wall at 1.5\" CLR (2xOD): t_min = 0.065 x (1.5 / (1.5 + 0.375)) = 0.065 x 0.80 = 0.052\"' and 'a 20% wall reduction'. Same formula as the tile; values exact, 0.5% tolerance. Bend angle (not used by the thinning) set to 90.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "od_in": 0.75,
+    "wall_in": 0.065,
+    "clr_in": 1.5,
+    "bend_angle_deg": 90
+   },
+   "outputs": {
+    "wall_after_in": {
+     "value": 0.052,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "thinning_pct": {
+     "value": 20,
+     "tolerance": {
+      "abs": 0.1
+     }
+    },
+    "bend_ratio": {
+     "value": 2,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "drill-feed-thrust",
+   "source_publisher": "Montana State University (MET 314)",
+   "source_title": "Drilling Equations / Drilling Example (MET 314 homework notes, J. Davis)",
+   "source_edition_or_year": "course notes, retrieved 2026",
+   "source_section_or_page": "Slides 4-7 (https://www.montana.edu/jdavis/met314/documents/homework/Drilling%20Examples.pdf): 'D = 0.375\"; v = 130.50 SFPM; f = 0.002 in/rev', 'N = 1,329.3718 RPM's', 'fr = 2.6587 in/Min', 'MRR = 0.2936 in3/Min'. The tile uses 3.82 for 12/pi (1,329.36 rpm), a 0.001% difference; 0.5% tolerance. Unit power 1.0 and efficiency 0.8 are not printed and only affect the unchecked power/torque outputs.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "diameter_in": 0.375,
+    "sfm": 130.5,
+    "feed_ipr": 0.002,
+    "unit_power": 1,
+    "spindle_efficiency": 0.8
+   },
+   "outputs": {
+    "rpm": {
+     "value": 1329.3718,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "feed_ipm": {
+     "value": 2.6587,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "removal_rate_cipm": {
+     "value": 0.2936,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "carburetor-altitude-jetting",
+   "source_publisher": "BRP-Rotax (chart as republished by Ultralight News)",
+   "source_title": "Main jet correction chart for different altitudes and temperatures (Rotax 2-stroke engines)",
+   "source_edition_or_year": "undated manufacturer chart, retrieved 2026",
+   "source_section_or_page": "Chart (https://www.ultralightnews.ca/rotax503/rotax2strokepdf/mainjetcorrectionchart.pdf), base jets 'optimized for sea level operation at 15 C', factor P applied to the base main jet number (Bing jets, numbered by bore diameter). Worked example: 'a Rotax 447 UL SCDI comes shipped with a 165 main jet (B=165)... Meadow Lake Airport in Colorado (6,800ft) in the summer time (20 C) (P=0.94)... use a main jet of approx 155'; P = 0.94 is the chart cell '2000m / 6562ft' x '+20c / 68F', used here (h = 2000 m). Tile 0.9371; corrected 165 jet = 154.6 vs printed 'approx 155'. Input pressure is the ICAO standard-atmosphere pressure at the printed altitude (29.92 x (1 - 2.25577e-5 h_m)^5.25588), a unit conversion of the printed altitude, not a back-solve. The chart prints P to two decimals and the tile's diameter_ratio (density ratio ^ 0.25) lands within 0.007 of every checked cell, so abs 0.01 covers the rounding. The chart therefore confirms the tile's fourth-root diameter rule, not the square-root area rule.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "baseline_pressure_inhg": 29.92,
+    "baseline_temp_f": 59,
+    "actual_pressure_inhg": 23.4739,
+    "actual_temp_f": 68,
+    "jet_flow_number": 0,
+    "jet_diameter_in": 0.0649606
+   },
+   "outputs": {
+    "diameter_ratio": {
+     "value": 0.94,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "corrected_jet_diameter_in": {
+     "value": 0.0610236,
+     "tolerance": {
+      "pct": 1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "carburetor-altitude-jetting",
+   "source_publisher": "BRP-Rotax (chart as republished by Ultralight News)",
+   "source_title": "Main jet correction chart for different altitudes and temperatures (Rotax 2-stroke engines)",
+   "source_edition_or_year": "undated manufacturer chart, retrieved 2026",
+   "source_section_or_page": "Chart (https://www.ultralightnews.ca/rotax503/rotax2strokepdf/mainjetcorrectionchart.pdf), base jets 'optimized for sea level operation at 15 C', factor P applied to the base main jet number (Bing jets, numbered by bore diameter). Chart cell '4000m / 13,123ft' x '+15c / 59F' = .89. Tile 0.8832. Input pressure is the ICAO standard-atmosphere pressure at the printed altitude (29.92 x (1 - 2.25577e-5 h_m)^5.25588), a unit conversion of the printed altitude, not a back-solve. The chart prints P to two decimals and the tile's diameter_ratio (density ratio ^ 0.25) lands within 0.007 of every checked cell, so abs 0.01 covers the rounding. The chart therefore confirms the tile's fourth-root diameter rule, not the square-root area rule.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "baseline_pressure_inhg": 29.92,
+    "baseline_temp_f": 59,
+    "actual_pressure_inhg": 18.2016,
+    "actual_temp_f": 59,
+    "jet_flow_number": 0,
+    "jet_diameter_in": 0.0649606
+   },
+   "outputs": {
+    "diameter_ratio": {
+     "value": 0.89,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "carburetor-altitude-jetting",
+   "source_publisher": "BRP-Rotax (chart as republished by Ultralight News)",
+   "source_title": "Main jet correction chart for different altitudes and temperatures (Rotax 2-stroke engines)",
+   "source_edition_or_year": "undated manufacturer chart, retrieved 2026",
+   "source_section_or_page": "Chart (https://www.ultralightnews.ca/rotax503/rotax2strokepdf/mainjetcorrectionchart.pdf), base jets 'optimized for sea level operation at 15 C', factor P applied to the base main jet number (Bing jets, numbered by bore diameter). Chart cell '0m / 0ft' x '+50c / 122F' = .97 (temperature-only case). Tile 0.9717. Input pressure is the ICAO standard-atmosphere pressure at the printed altitude (29.92 x (1 - 2.25577e-5 h_m)^5.25588), a unit conversion of the printed altitude, not a back-solve. The chart prints P to two decimals and the tile's diameter_ratio (density ratio ^ 0.25) lands within 0.007 of every checked cell, so abs 0.01 covers the rounding. The chart therefore confirms the tile's fourth-root diameter rule, not the square-root area rule.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "baseline_pressure_inhg": 29.92,
+    "baseline_temp_f": 59,
+    "actual_pressure_inhg": 29.92,
+    "actual_temp_f": 122,
+    "jet_flow_number": 0,
+    "jet_diameter_in": 0.0649606
+   },
+   "outputs": {
+    "diameter_ratio": {
+     "value": 0.97,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "tank-volume",
+   "source_publisher": "National Bureau of Standards (U.S. Department of Commerce)",
+   "source_title": "Circular C416: Gallonage Tables for Horizontal Cylindrical Tanks with Flat Ends (E. L. Peffer)",
+   "source_edition_or_year": "1937 (issued October 29, 1937)",
+   "source_section_or_page": "Abstract, p. iii: 'a tank 120 inches long, 48 inches in diameter (inside measurements), filled to a depth of 18 inches, contains 2.683X120, or 322 gallons.' Tile 321.98 gal; abs 0.5 covers the whole-gallon rounding.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "orientation": "horizontal",
+    "linear_unit": "in",
+    "diameter": 48,
+    "length": 120,
+    "depth": 18
+   },
+   "outputs": {
+    "volume_gal": {
+     "value": 322,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "tank-volume",
+   "source_publisher": "National Bureau of Standards (U.S. Department of Commerce)",
+   "source_title": "Circular C416: Gallonage Tables for Horizontal Cylindrical Tanks with Flat Ends (E. L. Peffer)",
+   "source_edition_or_year": "1937 (issued October 29, 1937)",
+   "source_section_or_page": "p. 1 worked table for D = 18 in, L = 45 in: h = 4 in -> 8.203 gal; tile 8.2025. Printed to 3 decimals, abs 0.001 covers it.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "orientation": "horizontal",
+    "linear_unit": "in",
+    "diameter": 18,
+    "length": 45,
+    "depth": 4
+   },
+   "outputs": {
+    "volume_gal": {
+     "value": 8.203,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "tank-volume",
+   "source_publisher": "National Bureau of Standards (U.S. Department of Commerce)",
+   "source_title": "Circular C416: Gallonage Tables for Horizontal Cylindrical Tanks with Flat Ends (E. L. Peffer)",
+   "source_edition_or_year": "1937 (issued October 29, 1937)",
+   "source_section_or_page": "p. 1 worked table for D = 18 in, L = 45 in: h = 9 in -> 24.786 gal and h = 18 in -> 49.572 gal (full). Tile 24.7859 / 49.5719 (percent 50). Printed to 3 decimals, abs 0.001.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "orientation": "horizontal",
+    "linear_unit": "in",
+    "diameter": 18,
+    "length": 45,
+    "depth": 9
+   },
+   "outputs": {
+    "volume_gal": {
+     "value": 24.786,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "full_gal": {
+     "value": 49.572,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "tank-volume",
+   "source_publisher": "Highland Tank",
+   "source_title": "Tank Gauge Charts (Highland Tank chart book, highland_gauge_chart_book.pdf)",
+   "source_edition_or_year": "2018 chart book",
+   "source_section_or_page": "pdf p. 17, '240 Gallon Capacity 38\" x 4'0\" Horizontal' chart: 10 in -> 50 ga, 19 in -> 118 ga, 38 in -> 236 ga. This row is the 19 in reading plus the 38 in full reading: tile 117.83 / 235.66. Chart prints whole gallons, abs 0.5.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "orientation": "horizontal",
+    "linear_unit": "in",
+    "diameter": 38,
+    "length": 48,
+    "depth": 19
+   },
+   "outputs": {
+    "volume_gal": {
+     "value": 118,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "full_gal": {
+     "value": 236,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "tank-volume",
+   "source_publisher": "Highland Tank",
+   "source_title": "Tank Gauge Charts (Highland Tank chart book, highland_gauge_chart_book.pdf)",
+   "source_edition_or_year": "2018 chart book",
+   "source_section_or_page": "pdf p. 17, 240 gal 38 in x 48 in horizontal chart: '10 50' (10 in -> 50 ga). Tile 49.52; whole-gallon chart, abs 0.5.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "orientation": "horizontal",
+    "linear_unit": "in",
+    "diameter": 38,
+    "length": 48,
+    "depth": 10
+   },
+   "outputs": {
+    "volume_gal": {
+     "value": 50,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "tank-volume",
+   "source_publisher": "Naval Education and Training Professional Development and Technology Center (U.S. Navy)",
+   "source_title": "Steelworker, Volume 2, NAVEDTRA 14251",
+   "source_edition_or_year": "November 1996",
+   "source_section_or_page": "Appendix II p. AII-19, Volume of a Cylinder: 'Find the volume of a cylindrical tank whose diameter is 9'6\" and whose height is 11'6\". V = 3.1416(4.75)^2 x 11.5 = 815.15 cubic feet'. Tile (vertical, full) 815.145 ft^3; abs 0.01.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "orientation": "vertical",
+    "linear_unit": "ft",
+    "diameter": 9.5,
+    "length": 11.5,
+    "depth": 11.5
+   },
+   "outputs": {
+    "volume_ft3": {
+     "value": 815.15,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "frustum-volume",
+   "source_publisher": "Naval Education and Training Professional Development and Technology Center (U.S. Navy)",
+   "source_title": "Steelworker, Volume 2, NAVEDTRA 14251",
+   "source_edition_or_year": "November 1996",
+   "source_section_or_page": "Appendix II p. AII-19, Volume of the Frustum of a Right Circular Cone: h = 15, r = 6, R = 12 (in), 'V = 1/3 pi 15(6^2 + 12^2 + 6 x 12) ... V = 3956.4 cubic inches' (pi taken as 3.14; exact 1260 pi = 3958.4). Entered in ft (D = 2, d = 1, h = 1.25); printed 3956.4 in^3 / 1728 = 2.28958 ft^3, tile 2.29074 (+0.05%); pct 0.2 covers the 3.14 rounding.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "large_diameter_ft": 2,
+    "small_diameter_ft": 1,
+    "height_ft": 1.25
+   },
+   "outputs": {
+    "volume_ft3": {
+     "value": 2.28958,
+     "tolerance": {
+      "pct": 0.2
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "frustum-volume",
+   "source_publisher": "Naval Education and Training Professional Development and Technology Center (U.S. Navy)",
+   "source_title": "Steelworker, Volume 2, NAVEDTRA 14251",
+   "source_edition_or_year": "November 1996",
+   "source_section_or_page": "Appendix II p. AII-18, Volume of a Cone: 'Find the volume of a cone whose altitude is 2'6\" and whose base has a radius of 10\" ... = 3141.6 cubic inches'. d = 0 full cone, D = 20 in = 1.6667 ft, h = 2.5 ft; printed 3141.6 / 1728 = 1.81806 ft^3, tile 1.81805; pct 0.1.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "large_diameter_ft": 1.6666666666666667,
+    "small_diameter_ft": 0,
+    "height_ft": 2.5
+   },
+   "outputs": {
+    "volume_ft3": {
+     "value": 1.81806,
+     "tolerance": {
+      "pct": 0.1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "frustum-volume",
+   "source_publisher": "Naval Education and Training Professional Development and Technology Center (U.S. Navy)",
+   "source_title": "Mathematics, Basic Math and Algebra, NAVEDTRA 14139",
+   "source_edition_or_year": "June 1985 course (2003 PDF)",
+   "source_section_or_page": "Ch. 18 p. 197 practice problem 4: 'volume of a right circular cone whose base has a diameter of 14 inches, if the altitude is 21 inches' -> answer '4. 1077 cu in.' d = 0, D = 14/12 ft, h = 21/12 ft; 1077/1728 = 0.62326 ft^3, tile 0.62359 (+0.05%, book uses pi = 3.14); pct 0.2.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "large_diameter_ft": 1.1666666666666667,
+    "small_diameter_ft": 0,
+    "height_ft": 1.75
+   },
+   "outputs": {
+    "volume_ft3": {
+     "value": 0.62326,
+     "tolerance": {
+      "pct": 0.2
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "spherical-cap-volume",
+   "source_publisher": "Naval Education and Training Professional Development and Technology Center (U.S. Navy)",
+   "source_title": "Mathematics, Basic Math and Algebra, NAVEDTRA 14139",
+   "source_edition_or_year": "June 1985 course (2003 PDF)",
+   "source_section_or_page": "Ch. 18 p. 198 EXAMPLE: 'Find the volume of a sphere whose diameter is 42 inches ... = 38,776 cu in. (approximately)' (pi = 3.14). Fill depth = diameter gives the full sphere; 38,776/1728 = 22.4398 ft^3, tile 22.4493 (+0.04%); pct 0.2.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "sphere_diameter_ft": 3.5,
+    "fill_depth_ft": 3.5
+   },
+   "outputs": {
+    "full_sphere_ft3": {
+     "value": 22.4398,
+     "tolerance": {
+      "pct": 0.2
+     }
+    },
+    "cap_volume_ft3": {
+     "value": 22.4398,
+     "tolerance": {
+      "pct": 0.2
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "spherical-cap-volume",
+   "source_publisher": "Naval Education and Training Professional Development and Technology Center (U.S. Navy)",
+   "source_title": "Mathematics, Basic Math and Algebra, NAVEDTRA 14139",
+   "source_edition_or_year": "June 1985 course (2003 PDF)",
+   "source_section_or_page": "Ch. 18 p. 198 practice problem 1: 'Radius = 7 inches' -> 'Volume = 1436 cu in. (approx.)'. D = 14/12 ft, full fill; 1436/1728 = 0.83102 ft^3, tile 0.83146 (+0.05%); pct 0.2.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "sphere_diameter_ft": 1.1666666666666667,
+    "fill_depth_ft": 1.1666666666666667
+   },
+   "outputs": {
+    "full_sphere_ft3": {
+     "value": 0.83102,
+     "tolerance": {
+      "pct": 0.2
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "ellipse-area-perimeter",
+   "source_publisher": "Math Is Fun (Rod Pierce)",
+   "source_title": "Perimeter of an Ellipse (mathsisfun.com/geometry/ellipse-perimeter.html)",
+   "source_edition_or_year": "page as retrieved 2026",
+   "source_section_or_page": "Comparison table, 'Approx 2' = Ramanujan pi(3(a+b) - sqrt((3a+b)(a+3b))): a = 10, b = 5 -> 48.442. Major 20, minor 10; tile 48.44211. Printed to 3 decimals, abs 0.001.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "major_axis": 20,
+    "minor_axis": 10
+   },
+   "outputs": {
+    "perimeter": {
+     "value": 48.442,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "ellipse-area-perimeter",
+   "source_publisher": "Math Is Fun (Rod Pierce)",
+   "source_title": "Perimeter of an Ellipse (mathsisfun.com/geometry/ellipse-perimeter.html)",
+   "source_edition_or_year": "page as retrieved 2026",
+   "source_section_or_page": "Comparison table 'Approx 2' (Ramanujan I): a = 10, b = 3 -> 43.857. Major 20, minor 6; tile 43.85673; abs 0.001. (Same table, 'Approx 3'/'Series 2' give 43.859, the near-exact value: Ramanujan I is 47 ppm low here.)",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "major_axis": 20,
+    "minor_axis": 6
+   },
+   "outputs": {
+    "perimeter": {
+     "value": 43.857,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "ellipse-area-perimeter",
+   "source_publisher": "Math Is Fun (Rod Pierce)",
+   "source_title": "Perimeter of an Ellipse (mathsisfun.com/geometry/ellipse-perimeter.html)",
+   "source_edition_or_year": "page as retrieved 2026",
+   "source_section_or_page": "Comparison table 'Approx 2' (Ramanujan I): a = 10, b = 1 -> 40.606. Major 20, minor 2; tile 40.60553; abs 0.001. Same table's 'Approx 3' gives 40.639 (true perimeter 40.6397): the tile is 0.08% (842 ppm) low here.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "major_axis": 20,
+    "minor_axis": 2
+   },
+   "outputs": {
+    "perimeter": {
+     "value": 40.606,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "torus-volume",
+   "source_publisher": "Mathwords (Cazoom Maths)",
+   "source_title": "Torus (mathwords.com/t/torus.htm)",
+   "source_edition_or_year": "page as retrieved 2026",
+   "source_section_or_page": "Worked example: 'A torus has a major radius of R = 6 cm and a minor radius of r = 2 cm' -> 'V = 48 pi^2 ~ 473.7 cm^3' and surface 'A ~ 473.7 cm^2'. Entered as diameters 12 and 4 (the formula is unit-agnostic; tile labels in/in^3). Tile 473.741 both; abs 0.05 covers the 1-decimal print.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "center_diameter_in": 12,
+    "tube_diameter_in": 4
+   },
+   "outputs": {
+    "volume_in3": {
+     "value": 473.7,
+     "tolerance": {
+      "abs": 0.05
+     }
+    },
+    "surface_area_in2": {
+     "value": 473.7,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "torus-volume",
+   "source_publisher": "Mathwords (Cazoom Maths)",
+   "source_title": "Torus (mathwords.com/t/torus.htm)",
+   "source_edition_or_year": "page as retrieved 2026",
+   "source_section_or_page": "Second example: R = 10 cm, r = 3 cm -> 'V = 180 pi^2 ~ 1,776.5 cm^3'. Diameters 20 and 6; tile 1776.529; abs 0.05.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "center_diameter_in": 20,
+    "tube_diameter_in": 6
+   },
+   "outputs": {
+    "volume_in3": {
+     "value": 1776.5,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "circular-arc",
+   "source_publisher": "WOODWEB",
+   "source_title": "Knowledge Base: Calculating Radians/Chords (woodweb.com/knowledge_base/Calculating_RadiansChords.html)",
+   "source_edition_or_year": "2004 (February 28, 2004)",
+   "source_section_or_page": "Worked example: 'Chord length of the curve segment is 80\", then B = 40\" and the height ... is A at 11\" ... 22 x R = 1721 ... R = 78.227272\"'. Tile 78.2272727; abs 0.0001.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "chord_in": 80,
+    "rise_in": 11
+   },
+   "outputs": {
+    "radius_in": {
+     "value": 78.227272,
+     "tolerance": {
+      "abs": 0.0001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "circle-from-3-points",
+   "source_publisher": "National Council of Educational Research and Training (NCERT), India",
+   "source_title": "Exemplar Problems: Mathematics, Class XI, Chapter 11 Conic Sections (keep211.pdf)",
+   "source_edition_or_year": "NCERT Exemplar (current ncert.nic.in edition)",
+   "source_section_or_page": "Example 7: 'passes through the points (20, 3), (19, 8) and (2, -9) ... the centre of the circle is (7, 3) and radius is 13.' Tile center (7, 3), radius 13 exactly; abs 1e-6.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "x1": 20,
+    "y1": 3,
+    "x2": 19,
+    "y2": 8,
+    "x3": 2,
+    "y3": -9
+   },
+   "outputs": {
+    "center_x": {
+     "value": 7,
+     "tolerance": {
+      "abs": 1e-06
+     }
+    },
+    "center_y": {
+     "value": 3,
+     "tolerance": {
+      "abs": 1e-06
+     }
+    },
+    "radius": {
+     "value": 13,
+     "tolerance": {
+      "abs": 1e-06
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "bolt-circle",
+   "source_publisher": "Richard J. Daley College, City Colleges of Chicago (Ray Prendergast)",
+   "source_title": "MATH for Manufacturing Student Workbook, Version 1.43",
+   "source_edition_or_year": "December 2013",
+   "source_section_or_page": "Unit 9, Worksheet 9-3 'Hole Locations on Bolt Circles' (p. 98): 6 holes on a 2.5 bolt circle, 'hypotenuse ... equal to 1/2 the diameter of the bolt circle: 2.5/2 = 1.25' and '1/6 of 360 = 60'; the hole is then at 1.083 / .625 (tile hole at 30 deg from +X: 1.0825, 0.625, array not fixture-able). Exact values; abs 0.0005.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "bolt_circle_dia_in": 2.5,
+    "num_holes": 6,
+    "start_angle_deg": 30,
+    "center_x_in": 0,
+    "center_y_in": 0
+   },
+   "outputs": {
+    "radius_in": {
+     "value": 1.25,
+     "tolerance": {
+      "abs": 0.0005
+     }
+    },
+    "angular_spacing_deg": {
+     "value": 60,
+     "tolerance": {
+      "abs": 0.0005
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "polygon-miter",
+   "source_publisher": "Naval Education and Training Command (U.S. Navy)",
+   "source_title": "Machinery Repairman, NAVEDTRA 12204-A",
+   "source_edition_or_year": "September 1993",
+   "source_section_or_page": "Appendix II Table AII-10 'Diagonals of Squares and Hexagons' (p. AII-11): 'D = 1.1547 d'; row d = 1 -> D 1.1547 (hexagon across corners from across flats). Tile 1.15470; table prints 4 decimals, abs 0.0001.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "sides": 6,
+    "size_mode": "flats",
+    "size_in": 1
+   },
+   "outputs": {
+    "across_corners_in": {
+     "value": 1.1547,
+     "tolerance": {
+      "abs": 0.0001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "polygon-miter",
+   "source_publisher": "Naval Education and Training Command (U.S. Navy)",
+   "source_title": "Machinery Repairman, NAVEDTRA 12204-A",
+   "source_edition_or_year": "September 1993",
+   "source_section_or_page": "Table AII-10 row d = 3 -> D 3.4641 (hexagon). Tile 3.46410; abs 0.0001.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "sides": 6,
+    "size_mode": "flats",
+    "size_in": 3
+   },
+   "outputs": {
+    "across_corners_in": {
+     "value": 3.4641,
+     "tolerance": {
+      "abs": 0.0001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "polygon-miter",
+   "source_publisher": "Naval Education and Training Command (U.S. Navy)",
+   "source_title": "Machinery Repairman, NAVEDTRA 12204-A",
+   "source_edition_or_year": "September 1993",
+   "source_section_or_page": "Table AII-10 'E = 1.4142 d'; row d = 3 -> E 4.2426 (square diagonal from across flats). Tile 4.24264; abs 0.0001.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "sides": 4,
+    "size_mode": "flats",
+    "size_in": 3
+   },
+   "outputs": {
+    "across_corners_in": {
+     "value": 4.2426,
+     "tolerance": {
+      "abs": 0.0001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "triangle-sss",
+   "source_publisher": "Naval Education and Training Professional Development and Technology Center (U.S. Navy)",
+   "source_title": "Mathematics, Trigonometry, NAVEDTRA 14140",
+   "source_edition_or_year": "February 1989",
+   "source_section_or_page": "Ch. 5 p. 5-15, Case 4 All Three Sides: 'sides a = 7, b = 13, and c = 14' -> 'A = 29 45', B = 67 11', C = 83 3''. Tile 29.7577 / 67.1851 / 83.0572 deg; printed to the nearest minute (0.0083 deg), abs 0.01.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "side_a": 7,
+    "side_b": 13,
+    "side_c": 14
+   },
+   "outputs": {
+    "angle_a_deg": {
+     "value": 29.75,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "angle_b_deg": {
+     "value": 67.18333333333334,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "angle_c_deg": {
+     "value": 83.05,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "triangle-sss",
+   "source_publisher": "Naval Education and Training Professional Development and Technology Center (U.S. Navy)",
+   "source_title": "Mathematics, Trigonometry, NAVEDTRA 14140",
+   "source_edition_or_year": "February 1989",
+   "source_section_or_page": "Ch. 5 p. 5-16 EXAMPLE: 'A triangular plot of ground measures 50 meters by 70 meters by 90 meters ... A = 95 44'' (angle opposite the 90 m side). Tile angle_a 95.7392 deg; nearest-minute print, abs 0.01.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "side_a": 90,
+    "side_b": 50,
+    "side_c": 70
+   },
+   "outputs": {
+    "angle_a_deg": {
+     "value": 95.73333333333333,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "triangle-sss",
+   "source_publisher": "Naval Education and Training Professional Development and Technology Center (U.S. Navy)",
+   "source_title": "Mathematics, Trigonometry, NAVEDTRA 14140",
+   "source_edition_or_year": "February 1989",
+   "source_section_or_page": "Ch. 5 p. 5-16 practice problem 3: a = 22.2, b = 33.3, c = 44.4 -> 'A = 28 57', B = 46 34', C = 104 29''. Tile 28.9550 / 46.5675 / 104.4775; abs 0.01.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "side_a": 22.2,
+    "side_b": 33.3,
+    "side_c": 44.4
+   },
+   "outputs": {
+    "angle_a_deg": {
+     "value": 28.95,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "angle_b_deg": {
+     "value": 46.56666666666667,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "angle_c_deg": {
+     "value": 104.48333333333333,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "triangle-sss",
+   "source_publisher": "Naval Education and Training Professional Development and Technology Center (U.S. Navy)",
+   "source_title": "Mathematics, Trigonometry, NAVEDTRA 14140",
+   "source_edition_or_year": "February 1989",
+   "source_section_or_page": "Ch. 5 p. 5-16 practice problem 4: a = 15.6, b = 16.7, c = 17.8 -> 'A = 53 39', B = 59 34', C = 66 47''. Tile 53.6514 / 59.5666 / 66.7820; abs 0.01.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "side_a": 15.6,
+    "side_b": 16.7,
+    "side_c": 17.8
+   },
+   "outputs": {
+    "angle_a_deg": {
+     "value": 53.65,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "angle_b_deg": {
+     "value": 59.56666666666667,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "angle_c_deg": {
+     "value": 66.78333333333333,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "triangle-sss",
+   "source_publisher": "Naval Education and Training Professional Development and Technology Center (U.S. Navy)",
+   "source_title": "Mathematics, Trigonometry, NAVEDTRA 14140",
+   "source_edition_or_year": "February 1989",
+   "source_section_or_page": "Ch. 5 p. 5-22 additional problem 4: 'A 12-foot ladder ... reaches 10 feet up the side of the support. The foot of the ladder is 5 feet from the foot of the inclined support' -> answer (p. 5-23) '4. 24 9''. Angle between the 12 and 10 sides is opposite the 5 ft side. Tile 24.1468 deg; abs 0.01.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "side_a": 5,
+    "side_b": 12,
+    "side_c": 10
+   },
+   "outputs": {
+    "angle_a_deg": {
+     "value": 24.15,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "oval-tank-volume",
+   "source_publisher": "Highland Tank",
+   "source_title": "Tank Gauge Charts (Highland Tank chart book, highland_gauge_chart_book.pdf)",
+   "source_edition_or_year": "2018 chart book",
+   "source_section_or_page": "pdf p. 5 (chart p. 3), '275 Gallon Capacity 27\" x 44-1/4\" x 60\" Basement Oil Storage/ Vertical': '3 9' and '5 19' (in -> ga). This row 5 in -> 19; tile 19.0. Whole-gallon chart, abs 0.5.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "width_in": 27,
+    "height_in": 44.25,
+    "length_in": 60,
+    "depth_in": 5
+   },
+   "outputs": {
+    "volume_gal": {
+     "value": 19,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "oval-tank-volume",
+   "source_publisher": "Highland Tank",
+   "source_title": "Tank Gauge Charts (Highland Tank chart book, highland_gauge_chart_book.pdf)",
+   "source_edition_or_year": "2018 chart book",
+   "source_section_or_page": "pdf p. 5, same 275 gal vertical oval chart: 3 in -> 9 ga; tile 9.0; abs 0.5. (Above ~10 in the chart runs 1-2% above the stadium geometry; see report.)",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "width_in": 27,
+    "height_in": 44.25,
+    "length_in": 60,
+    "depth_in": 3
+   },
+   "outputs": {
+    "volume_gal": {
+     "value": 9,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "cone-bottom-tank-volume",
+   "source_publisher": "Naval Education and Training Professional Development and Technology Center (U.S. Navy)",
+   "source_title": "Mathematics, Basic Math and Algebra, NAVEDTRA 14139",
+   "source_edition_or_year": "June 1985 course (2003 PDF)",
+   "source_section_or_page": "Ch. 18 p. 197 practice problem 4: cone 'diameter of 14 inches ... altitude is 21 inches' -> '1077 cu in.' Entered as a cone-bottom tank with the liquid exactly at the cone height (cylinder height 1 ft is irrelevant at this depth); 1077/1728 = 0.62326 ft^3, tile 0.62359 (+0.05%, book pi = 3.14); pct 0.2. Checks the cone region only.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "diameter_ft": 1.1666666666666667,
+    "cone_height_ft": 1.75,
+    "cylinder_height_ft": 1,
+    "depth_ft": 1.75
+   },
+   "outputs": {
+    "volume_ft3": {
+     "value": 0.62326,
+     "tolerance": {
+      "pct": 0.2
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "windrow-stockpile-volume",
+   "source_publisher": "Salt Institute",
+   "source_title": "The Salt Storage Handbook",
+   "source_edition_or_year": "edition hosted by Iowa State University InTrans (L016)",
+   "source_section_or_page": "p. 6 TABLE 3 'Storing Salt in Windrowed Piles' (32 deg repose, 80 pcf), salt per running foot: width 144.67 ft, height 45.5 ft, volume 3,290 ft^3 per running foot (= the triangular cross-section). Tile cross_section_ft2 3269.5 (-0.6%): the table uses height 45.5, exact 32 deg gives 45.20. pct 1.0 covers the table's height rounding.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "base_width_ft": 144.67,
+    "ridge_length_ft": 100,
+    "repose_angle_deg": 32,
+    "density_pcf": 80
+   },
+   "outputs": {
+    "cross_section_ft2": {
+     "value": 3290,
+     "tolerance": {
+      "pct": 1
+     }
+    },
+    "height_ft": {
+     "value": 45.5,
+     "tolerance": {
+      "pct": 1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "windrow-stockpile-volume",
+   "source_publisher": "Salt Institute",
+   "source_title": "The Salt Storage Handbook",
+   "source_edition_or_year": "edition hosted by Iowa State University InTrans (L016)",
+   "source_section_or_page": "p. 6 TABLE 3: width 67.1 ft, height 21.0 ft, volume 708 ft^3 per running foot. Tile cross_section 703.4 (-0.65%), height 20.96; pct 1.0 for the table's rounding.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "base_width_ft": 67.1,
+    "ridge_length_ft": 100,
+    "repose_angle_deg": 32,
+    "density_pcf": 80
+   },
+   "outputs": {
+    "cross_section_ft2": {
+     "value": 708,
+     "tolerance": {
+      "pct": 1
+     }
+    },
+    "height_ft": {
+     "value": 21,
+     "tolerance": {
+      "pct": 1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "windrow-stockpile-volume",
+   "source_publisher": "Salt Institute",
+   "source_title": "The Salt Storage Handbook",
+   "source_edition_or_year": "edition hosted by Iowa State University InTrans (L016)",
+   "source_section_or_page": "p. 5 TABLE 2 'Storing Salt in Conical Piles' (32 deg, 80 pcf) and text: '1,000 tons ... will occupy a space 67'1\" in diameter ... height will be 21 feet ... Volume of the pile would be 25,000 cubic feet.' Ridge length 0 collapses to the cone. Tile 24,689 ft^3 / 987.6 tons / 20.96 ft (-1.25%): the table's diameter, height and volume are each rounded and not mutually exact at 32 deg; pct 1.5.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "base_width_ft": 67.08,
+    "ridge_length_ft": 0,
+    "repose_angle_deg": 32,
+    "density_pcf": 80
+   },
+   "outputs": {
+    "volume_ft3": {
+     "value": 25000,
+     "tolerance": {
+      "pct": 1.5
+     }
+    },
+    "tons": {
+     "value": 1000,
+     "tolerance": {
+      "pct": 1.5
+     }
+    },
+    "height_ft": {
+     "value": 21,
+     "tolerance": {
+      "pct": 1.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "flat-top-stockpile-volume",
+   "source_publisher": "Salt Institute",
+   "source_title": "The Salt Storage Handbook",
+   "source_edition_or_year": "edition hosted by Iowa State University InTrans (L016)",
+   "source_section_or_page": "p. 5 TABLE 2 (conical piles, 32 deg, 80 pcf): 10,000 short tons -> diameter 144.67 ft, height 45.5 ft, volume 250,000 ft^3. Top diameter 0 collapses the frustum to the cone. Tile 247,664 ft^3 / 9,906.6 tons / 45.20 ft (-0.9%); pct 1.5 covers the table's rounding (its own D and h give 249,300).",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "base_diameter_ft": 144.67,
+    "top_diameter_ft": 0,
+    "repose_angle_deg": 32,
+    "density_pcf": 80
+   },
+   "outputs": {
+    "volume_ft3": {
+     "value": 250000,
+     "tolerance": {
+      "pct": 1.5
+     }
+    },
+    "tons": {
+     "value": 10000,
+     "tolerance": {
+      "pct": 1.5
+     }
+    },
+    "height_ft": {
+     "value": 45.5,
+     "tolerance": {
+      "pct": 1.5
      }
     }
    }

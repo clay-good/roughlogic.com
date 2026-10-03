@@ -252,12 +252,15 @@ const renderDriveshaftMaxLength = _simpleRenderer({
 
 // --- 200: Fuel Energy and Range ---
 
+// Lower heating values from the DOE AFDC fuel-properties comparison (2026-10-03). Until then CNG
+// carried 33,000 Btu per "GGE" -- about 3.5x low: a GGE of CNG is 5.66 lb x 20,160 Btu/lb = 114,106
+// Btu -- and E85 81,000 sat below AFDC's 83,950-95,450 range (the low, high-ethanol end is used).
 export const FUEL_PROPERTIES = {
   gasoline_E10: { lhv_btu_gal: 112000, density_lb_gal: 6.1 },
-  gasoline_E85: { lhv_btu_gal: 81000,  density_lb_gal: 6.4 },
-  diesel_2:     { lhv_btu_gal: 128450, density_lb_gal: 7.0 },
-  LPG:          { lhv_btu_gal: 84000,  density_lb_gal: 4.2 },
-  CNG:          { lhv_btu_gal: 33000,  density_lb_gal: 1.7 },  // gasoline-gallon-equivalent
+  gasoline_E85: { lhv_btu_gal: 83950,  density_lb_gal: 6.4 },
+  diesel_2:     { lhv_btu_gal: 128488, density_lb_gal: 7.0 },
+  LPG:          { lhv_btu_gal: 84250,  density_lb_gal: 4.2 },
+  CNG:          { lhv_btu_gal: 114106, density_lb_gal: 5.66 },  // per gasoline-gallon-equivalent (5.66 lb)
   jet_a:        { lhv_btu_gal: 124000, density_lb_gal: 6.7 },
 };
 

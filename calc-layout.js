@@ -177,7 +177,9 @@ export function computeTriangleSss({ side_a = 0, side_b = 0, side_c = 0 } = {}) 
   if (!(a > 0)) return { error: "Side a must be positive." };
   if (!(b > 0)) return { error: "Side b must be positive." };
   if (!(c > 0)) return { error: "Side c must be positive." };
-  if (!(a + b > c && a + c > b && b + c > a)) return { error: "These three sides cannot form a triangle (each side must be less than the sum of the other two)." };
+  // Relative margin: 0.1 + 0.2 is 0.30000000000000004, which let the degenerate 0.1 / 0.2 / 0.3 through.
+  const _tri = (x, y, z) => x + y > z * (1 + 1e-12);
+  if (!(_tri(a, b, c) && _tri(a, c, b) && _tri(b, c, a))) return { error: "These three sides cannot form a triangle (each side must be less than the sum of the other two)." };
   const deg = (x) => (Math.acos(Math.min(1, Math.max(-1, x))) * 180) / Math.PI;
   const angle_a_deg = deg((b * b + c * c - a * a) / (2 * b * c));
   const angle_b_deg = deg((a * a + c * c - b * b) / (2 * a * c));
@@ -271,6 +273,7 @@ LAYOUT_RENDERERS["triangle-asa"] = renderTriangleAsa;
 export function computeBoltCircle({ bolt_circle_dia_in = 0, num_holes = 0, start_angle_deg = 0, center_x_in = 0, center_y_in = 0 } = {}) {
   const _g = _finiteGuard({ bolt_circle_dia_in, num_holes, start_angle_deg, center_x_in, center_y_in }); if (_g) return _g;
   const dia = Number(bolt_circle_dia_in) || 0;
+  if (!Number.isInteger(Number(num_holes))) return { error: "Number of holes must be a whole number." };
   const n = Math.floor(Number(num_holes) || 0);
   if (!(dia > 0)) return { error: "Bolt circle diameter must be positive (in)." };
   if (!(n >= 1)) return { error: "Number of holes must be at least 1." };
@@ -728,6 +731,7 @@ LAYOUT_RENDERERS["circle-from-3-points"] = renderCircleFrom3Points;
 // dims: in { sides: dimensionless, size_mode: dimensionless, size_in: L } out: { side_in: L, miter_angle_deg: dimensionless, interior_angle_deg: dimensionless, across_flats_in: L, across_corners_in: L, perimeter_in: L, area_in2: L^2 }
 export function computePolygonMiter({ sides = 0, size_mode = "side", size_in = 0 } = {}) {
   const _g = _finiteGuard({ sides, size_in }); if (_g) return _g;
+  if (!Number.isInteger(Number(sides))) return { error: "Number of sides must be a whole number." };
   const N = Math.floor(Number(sides) || 0);
   if (!(N >= 3)) return { error: "A polygon needs at least 3 sides." };
   if (N > 360) return { error: "Number of sides must be 360 or fewer." };

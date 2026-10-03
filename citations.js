@@ -5420,12 +5420,12 @@ export const CITATIONS = {
   },
   "fuel-range": {
     formula: "Energy stored (BTU) = tank_gal × LHV; range = tank × mpg × load_factor for liquid fuels; conversion to kWh via 1 BTU = 0.000293 kWh.",
-    edition: "DOE EERE Alternative Fuels Data Center fuel-property table (LHV per fuel) by name; ASTM D975 (#2 diesel), D4814 (gasoline), D2 (jet A) by name.",
+    edition: "DOE EERE Alternative Fuels Data Center fuel-property table (LHV per fuel) by name; ASTM D975 (#2 diesel), D4814 (gasoline), D1655 (jet A) by name.",
     freeAccess: "DOE AFDC free at afdc.energy.gov.",
     governance: GOVERNANCE.general,
     editionNote: "Single-edition (DOE AFDC fuel-property values; refreshed semi-annually).",
     assumptions: [
-      { name: "LHV table", value: "gasoline E10 ~ 112 000 BTU/gal; gasoline E85 ~ 81 800; diesel #2 ~ 129 500; LPG ~ 84 250; CNG ~ 33 800 BTU/cf; jet A ~ 124 000 BTU/gal", source: "DOE AFDC fuel-properties data sheet" },
+      { name: "LHV table", value: "gasoline E10 ~ 112,000 Btu/gal (AFDC 112,114-116,090); E85 83,950 (low end of AFDC 83,950-95,450); diesel #2 128,488; LPG 84,250; CNG 114,106 per gasoline-gallon-equivalent (5.66 lb x 20,160 Btu/lb; about 923 Btu/ft^3); jet A ~ 124,000 Btu/gal", source: "DOE AFDC fuel-properties data sheet" },
     ],
   },
   "tire-contact-patch": {
@@ -6654,7 +6654,7 @@ export const CITATIONS = {
     ],
   },
   "pulley-ma-gen": {
-    formula: "Theoretical MA = number of supporting rope segments. Actual MA = theoretical × pulley_efficiency^n_pulleys. Fixed pulley redirects but does not multiply force; movable pulley × 2; block-and-tackle = 2n for n sheaves.",
+    formula: "Theoretical MA = number of supporting rope segments. Actual MA = theoretical × pulley_efficiency^n_pulleys. Fixed pulley redirects but does not multiply force; movable pulley × 2; the block_n options are an n-part tackle (MA n) reeved over n sheaves, the haul line leaving the fixed block. The p^n friction model is a simple approximation: tension tracking (1 + p + ... per sheave) and the Army FM 5-125 rule (add about 10% of the load per sheave: 5,000 lb on a 4-part, 4-sheave tackle takes a 1,750 lb pull) each give a somewhat higher actual MA.",
     edition: "Classical mechanics; NFPA 1006 / 1670 by name for rescue context.",
     freeAccess: "Mechanics texts free at university OCW.",
     governance: GOVERNANCE.general,
@@ -12665,7 +12665,7 @@ export const CITATIONS = {
     edition: "The ellipse area pi a b and Ramanujan's perimeter approximation pi[3(a+b) - sqrt((3a+b)(a+3b))] (standard geometry; Ramanujan 1914), by name; public domain.",
     freeAccess: "Pure plane geometry, public; the major and minor axes are user-supplied measurements.",
     governance: GOVERNANCE.general,
-    editionNote: "Area and perimeter of an ellipse from the full major (long) and minor (short) axis lengths, with the semi-axes a = major/2 and b = minor/2. The area is exact, pi a b; the perimeter has no elementary closed form, so this uses Ramanujan's approximation pi[3(a+b) - sqrt((3a+b)(a+3b))], which is within a few parts per million for any ordinary oval. The eccentricity sqrt(1 - (b/a)^2) (with a the larger semi-axis) measures how far from round it is. When the two axes are equal the ellipse is a circle: the area becomes pi r^2 and the perimeter 2 pi r. Use it for an elliptical bed or border, a running-track lane, an oval tabletop or arch, or an elliptical head footprint. A partial (segment) area, an elliptical tank's partial-fill volume, and a true elliptic-integral perimeter are separate. Plane figure only. A shop and layout aid; verify critical dimensions on the work.",
+    editionNote: "Area and perimeter of an ellipse from the full major (long) and minor (short) axis lengths, with the semi-axes a = major/2 and b = minor/2. The area is exact, pi a b; the perimeter has no elementary closed form, so this uses Ramanujan's approximation pi[3(a+b) - sqrt((3a+b)(a+3b))], which is within a few parts per million up to about a 2:1 oval and drifts low on flat ones (54 ppm at b/a 0.3, 0.08% at 0.1, 0.34% at 0.01). The eccentricity sqrt(1 - (b/a)^2) (with a the larger semi-axis) measures how far from round it is. When the two axes are equal the ellipse is a circle: the area becomes pi r^2 and the perimeter 2 pi r. Use it for an elliptical bed or border, a running-track lane, an oval tabletop or arch, or an elliptical head footprint. A partial (segment) area, an elliptical tank's partial-fill volume, and a true elliptic-integral perimeter are separate. Plane figure only. A shop and layout aid; verify critical dimensions on the work.",
     assumptions: [
       { name: "Area exact", value: "area = pi a b, a and b the semi-axes", source: "plane geometry" },
       { name: "Ramanujan perimeter", value: "pi[3(a+b) - sqrt((3a+b)(a+3b))], a few ppm for ordinary ovals; not exact", source: "Ramanujan 1914" },
@@ -15066,7 +15066,7 @@ export const CITATIONS = {
     ],
   },
   "rope-safety-factor": {
-    formula: "suspended load = car + rated load + travelling cable + rope weight below the sheave, where rope weight = count x rise x weight per foot; factor of safety = (count x breaking strength) / suspended load.",
+    formula: "suspended load = car + rated load + travelling cable + rope weight below the sheave, where rope weight = count x roping ratio x rise x weight per foot; factor of safety = (count x roping ratio x breaking strength) / suspended load -- A17.1 2.20.3 takes N as twice the number of ropes on 2:1 roping, and each rope runs about twice the rise.",
     edition: "The suspended-load factor of safety, by name, with the ASME A17.1 speed-dependent minimums and the rope retirement criteria named. The minimum for the contract speed comes from the code table and is entered, not reproduced.",
     freeAccess: "Division on the user's own rope and car data against a minimum they supply; no code table is reproduced.",
     governance: GOVERNANCE.general,

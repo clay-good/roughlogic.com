@@ -2,7 +2,7 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "48abfde7ddebdacd",
+      "sha": "cf6d917778084240",
       "date": "2026-10-03"
     },
     "/tools/": {
@@ -1710,8 +1710,8 @@
       "date": "2026-09-29"
     },
     "/tools/cone-bottom-tank-volume/": {
-      "sha": "a426d2884389b8d0",
-      "date": "2026-09-29"
+      "sha": "850ebe9b110f6cdd",
+      "date": "2026-10-03"
     },
     "/tools/cone-flat-pattern/": {
       "sha": "daf7b11258c1e836",
@@ -2610,8 +2610,8 @@
       "date": "2026-09-29"
     },
     "/tools/ellipse-area-perimeter/": {
-      "sha": "8e2b875e10463089",
-      "date": "2026-09-29"
+      "sha": "0a635cb9f93416ea",
+      "date": "2026-10-03"
     },
     "/tools/ellipsoid-volume/": {
       "sha": "08eba95a123892bb",
@@ -3190,8 +3190,8 @@
       "date": "2026-09-29"
     },
     "/tools/fuel-range/": {
-      "sha": "9160b8520adf3229",
-      "date": "2026-09-29"
+      "sha": "35146dd3887a75c3",
+      "date": "2026-10-03"
     },
     "/tools/fuel-surcharge/": {
       "sha": "d9f967d3d45144a7",
@@ -5786,8 +5786,8 @@
       "date": "2026-09-29"
     },
     "/tools/pulley-ma-gen/": {
-      "sha": "aff62d9dfd2cd780",
-      "date": "2026-09-29"
+      "sha": "0db9f6089ce08844",
+      "date": "2026-10-03"
     },
     "/tools/pulling-tension/": {
       "sha": "c61245624430a221",
@@ -6478,8 +6478,8 @@
       "date": "2026-10-03"
     },
     "/tools/rope-safety-factor/": {
-      "sha": "7c97d8755ed49c5a",
-      "date": "2026-09-29"
+      "sha": "caae3a79e901ad21",
+      "date": "2026-10-03"
     },
     "/tools/rotary-phase-converter-sizing/": {
       "sha": "1cdad3c81d90820d",
