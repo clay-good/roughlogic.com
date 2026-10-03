@@ -37,12 +37,16 @@ const _finiteGuard = (o) => {
 // DIM = (L * W * H) / divisor (inches; lb output).
 // Divisors are the carrier's published values (cited by carrier name).
 
+// parcel: true means the carrier rounds each dimension UP to the next whole inch and bills the
+// next whole pound (FedEx 2026 Service Guide, effective Aug. 18, 2025; UPS on the same date; USPS
+// DMM 223, effective July 12, 2026, which also moved its factor from 166 to 139 and applies DIM only
+// above 1,728 cu in). DHL and LTL freight are left unrounded: their rules were not checked here.
 export const DIM_DIVISORS = {
-  UPS_Daily:    { divisor: 139, attribution: "UPS published daily-rate divisor (cited by carrier name only)" },
-  UPS_Retail:   { divisor: 139, attribution: "UPS published retail-rate divisor" },
-  FedEx_Ground: { divisor: 139, attribution: "FedEx Ground published divisor" },
-  FedEx_Express:{ divisor: 139, attribution: "FedEx Express published divisor" },
-  USPS:         { divisor: 166, attribution: "USPS published divisor (Priority Mail)" },
+  UPS_Daily:    { divisor: 139, parcel: true, attribution: "UPS published daily-rate divisor (cited by carrier name only)" },
+  UPS_Retail:   { divisor: 139, parcel: true, attribution: "UPS published retail-rate divisor" },
+  FedEx_Ground: { divisor: 139, parcel: true, attribution: "FedEx Ground published divisor" },
+  FedEx_Express:{ divisor: 139, parcel: true, attribution: "FedEx Express published divisor" },
+  USPS:         { divisor: 139, parcel: true, min_cube_in3: 1728, attribution: "USPS DIM factor 139 (Priority Mail Express, Priority Mail, Ground Advantage, Parcel Select; from July 12, 2026; above 1,728 cu in only)" },
   DHL_Express:  { divisor: 139, attribution: "DHL Express published divisor" },
   freight:      { divisor: 250, attribution: "Freight (LTL) published density divisor" },
 };
@@ -60,16 +64,22 @@ export function computeDIM({ length_in = 0, width_in = 0, height_in = 0, actual_
   if (!c) return { error: "Unknown carrier." };
   if (!(length_in > 0 && width_in > 0 && height_in > 0)) return { error: "Dimensions must be positive." };
   if (!(actual_weight_lb >= 0)) return { error: "Actual weight must be non-negative." };
-  const dim_lb = (length_in * width_in * height_in) / c.divisor;
-  const billable_lb = Math.max(dim_lb, actual_weight_lb);
+  // Parcel carriers measure each side up to the next whole inch, then bill the next whole pound.
+  const up = (x) => (c.parcel ? Math.ceil(x - 1e-9) : x);
+  const cube_in3 = up(length_in) * up(width_in) * up(height_in);
+  const dim_lb = cube_in3 / c.divisor;
+  // USPS applies dimensional weight only to a package over one cubic foot.
+  const dim_applies = !(c.min_cube_in3 && cube_in3 <= c.min_cube_in3 + 1e-9);
+  const heavier_lb = Math.max(dim_applies ? dim_lb : 0, actual_weight_lb);
+  const billable_lb = c.parcel ? Math.ceil(heavier_lb - 1e-9) : heavier_lb;
   // v8 §C.5: break-even volume - the cubic-inch volume at which DIM weight
   // equals actual weight. Above this volume the carrier bills DIM (cube-out);
   // below, actual weight (weigh-out). breakeven_in3 = actual_weight × divisor.
   const breakeven_in3 = actual_weight_lb > 0 ? actual_weight_lb * c.divisor : null;
-  const current_in3 = length_in * width_in * height_in;
-  const billing_basis = dim_lb >= actual_weight_lb ? "DIM (cube-out)" : "actual (weigh-out)";
+  const current_in3 = cube_in3;
+  const billing_basis = dim_applies && dim_lb >= actual_weight_lb ? "DIM (cube-out)" : "actual (weigh-out)";
   return {
-    dim_lb, billable_lb, divisor: c.divisor, attribution: c.attribution,
+    dim_lb, billable_lb, dim_applies, divisor: c.divisor, attribution: c.attribution,
     breakeven_in3, current_in3, billing_basis,
   };
 }

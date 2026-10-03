@@ -1619,14 +1619,14 @@ export const CITATIONS = {
     ],
   },
   "motor-fla": {
-    formula: "Typical full-load amps looked up by horsepower, voltage and phase from figures compiled across NEMA-aligned manufacturer technical bulletins. Not the NEC table values, which are licensed text this project does not reproduce.",
+    formula: "Full-load amps looked up by horsepower, voltage and phase. The bundled figures agree with NEC 2023 Table 430.248 (single-phase) and Table 430.250 (three-phase) for every size listed (checked 2026-10-03; the earlier text said they were not the table values, which was false).",
     edition: NEC_2023 + " Sections 430.6(A)(1) and 430.6(A)(2) by name; manufacturer specs as of build date.",
     freeAccess: NEC_FREE,
     governance: GOVERNANCE.electrical,
     editionNote: NEC_DISCLOSURE,
     assumptions: [
       { name: "Service factor", value: "1.0 unless nameplate states otherwise", source: "NEMA MG 1 by name" },
-      { name: "Not the sizing value", value: "NEC 430.6(A)(1) requires the Table 430.247-430.250 value for conductor and overcurrent sizing, and 430.6(A)(2) the nameplate FLA for the overload device; these typical figures are neither. Until 2026-09-02 this page said they stood in lieu of the tables, which is the opposite of what 430.6 says.", source: "NEC 2023 430.6" },
+      { name: "Which value sizes what", value: "NEC 430.6(A)(1) requires the Table 430.247-430.250 value of the adopted edition for conductor and overcurrent sizing, and 430.6(A)(2) the nameplate FLA for the overload device. These figures agree with the 2023 tables; confirm against your adopted edition. Until 2026-09-02 this page said they stood in lieu of the tables.", source: "NEC 2023 430.6" },
     ],
   },
   "transformer-sizing": {
@@ -5243,8 +5243,8 @@ export const CITATIONS = {
   // may be lower than federal."
 
   "dim-weight": {
-    formula: "DIM weight (lb) = L × W × H (in) / divisor. Billable weight = max(DIM, actual). Divisors are carrier-published per tariff (UPS, FedEx, USPS, DHL, LTL freight); cited by carrier name only.",
-    edition: "Carrier-published tariffs (UPS Daily / Retail, FedEx Ground / Express, USPS Priority Mail, DHL Express, LTL freight) as of build date. Cited by carrier name only; tariff text not reproduced.",
+    formula: "DIM weight (lb) = L × W × H (in) / divisor. Billable weight = max(DIM, actual). UPS, FedEx and USPS round each dimension up to the next whole inch and bill the next whole pound (FedEx and UPS since Aug. 18, 2025); USPS uses 139 from July 12, 2026 (166 before) and applies DIM only above 1,728 cu in. Divisors are carrier-published per tariff (UPS, FedEx, USPS, DHL, LTL freight); cited by carrier name only.",
+    edition: "Carrier-published tariffs (UPS Daily / Retail, FedEx Ground / Express per the FedEx 2026 Service Guide, USPS per the July 12, 2026 DMM change (Federal Register 2026-09785), DHL Express, LTL freight). Cited by carrier name only; tariff text not reproduced.",
     freeAccess: "Free at each carrier's published rate guide (ups.com/rates, fedex.com/rates, usps.com, dhl.com).",
     governance: GOVERNANCE.trucking,
     editionNote: "Single-edition (carrier-published divisors; semi-annual recheck per spec-v4 operations cadence; carriers update divisors at the start of each calendar year).",

@@ -4568,14 +4568,16 @@ import {
 } from "../../calc-trucking.js";
 
 test("bounds: calc-trucking computeDIM pins dim_lb = L*W*H / divisor per carrier and the breakeven_in3 = actual_weight * divisor identity", () => {
-  // Divisor table per the bundled DIM_DIVISORS: UPS / FedEx / DHL all 139, USPS 166, freight 250.
+  // Divisor table per the bundled DIM_DIVISORS: UPS / FedEx / DHL / USPS all 139, freight 250.
+  // Parcel carriers (UPS, FedEx, USPS) bill the next whole pound, and USPS applies DIM only above
+  // 1,728 cu in; integer dimensions here, so the cube is exact.
   const cases = [
-    { carrier: "UPS_Daily", divisor: 139 },
-    { carrier: "FedEx_Ground", divisor: 139 },
-    { carrier: "USPS", divisor: 166 },
-    { carrier: "freight", divisor: 250 },
+    { carrier: "UPS_Daily", divisor: 139, parcel: true },
+    { carrier: "FedEx_Ground", divisor: 139, parcel: true },
+    { carrier: "USPS", divisor: 139, parcel: true, minCube: 1728 },
+    { carrier: "freight", divisor: 250, parcel: false },
   ];
-  for (const { carrier, divisor } of cases) {
+  for (const { carrier, divisor, parcel, minCube } of cases) {
     for (const L of [6, 12, 24, 48]) {
       for (const W of [6, 12, 18]) {
         for (const H of [4, 10, 24]) {
@@ -4584,7 +4586,9 @@ test("bounds: calc-trucking computeDIM pins dim_lb = L*W*H / divisor per carrier
             assert.ok(!r.error, `${carrier} ${L}x${W}x${H} w=${actual_weight_lb}: ${JSON.stringify(r)}`);
             assert.strictEqual(r.divisor, divisor, `divisor ${carrier}`);
             assert.ok(Math.abs(r.dim_lb - (L * W * H) / divisor) < 1e-9, `dim_lb identity ${carrier}`);
-            assert.ok(Math.abs(r.billable_lb - Math.max(r.dim_lb, actual_weight_lb)) < 1e-9, `billable = max(dim, actual)`);
+            const applies = !(minCube && L * W * H <= minCube);
+            const heavier = Math.max(applies ? r.dim_lb : 0, actual_weight_lb);
+            assert.ok(Math.abs(r.billable_lb - (parcel ? Math.ceil(heavier - 1e-9) : heavier)) < 1e-9, `billable = max(dim, actual), whole pounds for parcel carriers`);
             if (actual_weight_lb > 0) {
               assert.ok(Math.abs(r.breakeven_in3 - actual_weight_lb * divisor) < 1e-9, `breakeven identity`);
             } else {

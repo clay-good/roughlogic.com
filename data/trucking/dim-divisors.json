@@ -18,8 +18,8 @@
       "attribution": "FedEx Express published divisor"
     },
     "USPS": {
-      "divisor": 166,
-      "attribution": "USPS published divisor (Priority Mail)"
+      "divisor": 139,
+      "attribution": "USPS DIM factor 139 (Priority Mail Express, Priority Mail, Ground Advantage, Parcel Select; from July 12, 2026; above 1,728 cu in only)"
     },
     "DHL_Express": {
       "divisor": 139,
@@ -30,5 +30,5 @@
       "attribution": "Freight (LTL) published density divisor"
     }
   },
-  "notes": "DIM weight (lb) = L * W * H (in) / divisor. Billable weight = max(DIM, actual). Verify divisor against the carrier's current published rate guide."
+  "notes": "DIM weight (lb) = L * W * H (in) / divisor. Billable weight = max(DIM, actual). UPS, FedEx and USPS round each dimension up to the next whole inch and bill the next whole pound; USPS applies DIM only above 1,728 cu in. Verify divisor against the carrier's current published rate guide."
 }

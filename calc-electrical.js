@@ -326,13 +326,14 @@ export const breakerSizeExample = {
 // Compiled from NEMA-aligned manufacturer technical bulletins (typical
 // published values). Refresh from data/electrical/motor-fla.json at build.
 //
-// These are NOT the NEC table values, and the difference is not cosmetic:
-// NEC 430.6(A)(1) requires the Table 430.247-430.250 value -- not the
-// nameplate and not a manufacturer figure -- for sizing conductors and
-// overcurrent protection. The tables are licensed text this project does not
-// reproduce, so the tile bundles typical published values and says so in a
-// limitation banner. Until 2026-09-02 the citation said these values stood
-// "in lieu of" the tables, which is the opposite of what 430.6 says.
+// Every value below agrees with NEC 2023 Table 430.248 (single-phase) and
+// Table 430.250 (three-phase) for the sizes bundled -- checked entry by entry
+// on 2026-10-03; until then the prose said they were NOT the table values,
+// which was false. NEC 430.6(A)(1) requires the table value of the ADOPTED
+// edition for sizing conductors and overcurrent protection, and 430.6(A)(2)
+// the nameplate FLA for the overload device, so the tile still sends the
+// reader to the table and the nameplate. Until 2026-09-02 the citation said
+// these values stood "in lieu of" the tables, the opposite of what 430.6 says.
 export const MOTOR_FLA_TABLE = {
   0.5: { single_115V: 9.8, single_230V: 4.9, three_208V: 2.4, three_230V: 2.2, three_460V: 1.1 },
   1: { single_115V: 16, single_230V: 8, three_208V: 4.6, three_230V: 4.2, three_460V: 2.1 },
@@ -350,7 +351,7 @@ export function computeMotorFLA({ hp, voltage, phase }) {
   const key = phase === "single" ? "single_" + voltage + "V" : "three_" + voltage + "V";
   const fla = row[key];
   if (fla === undefined) return { error: "Combination not in bundled table." };
-  return { fla_A: fla, source: "Compiled from NEMA-aligned manufacturer bulletins." };
+  return { fla_A: fla, source: "Agrees with NEC 2023 Table 430.248 (single-phase) / 430.250 (three-phase); confirm against your adopted edition." };
 }
 
 export const motorFLAExample = {
@@ -802,7 +803,7 @@ export function renderBreakerSize(inputRegion, outputRegion, citationEl, params)
 
 // dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderMotorFLA(inputRegion, outputRegion, citationEl, params) {
-  citationEl.textContent = "Citation: NEC 2023 430.6(A)(1) -- size conductors and overcurrent protection from the Table 430.247-430.250 value, not from the nameplate and not from these figures. 430.6(A)(2): the nameplate FLA is what sizes the overload device. The values below are typical published figures across NEMA-aligned manufacturer bulletins, for a sanity check on magnitude. Free at nfpa.org/freeaccess.";
+  citationEl.textContent = "Citation: NEC 2023 430.6(A)(1) -- size conductors and overcurrent protection from the Table 430.247-430.250 value of your adopted edition, not from the nameplate. 430.6(A)(2): the nameplate FLA is what sizes the overload device. The values below agree with NEC 2023 Table 430.248 (single-phase) and Table 430.250 (three-phase) for the sizes listed; confirm them against the edition your AHJ adopted. Free at nfpa.org/freeaccess.";
   renderLimitationBanner(inputRegion, getLimitationCopy("motor-fla"));
   attachExampleButton(inputRegion, () => fillExample({ hp: 5, voltage: "230", phase: "three" }));
 
@@ -816,7 +817,7 @@ export function renderMotorFLA(inputRegion, outputRegion, citationEl, params) {
   const phase = makeSelect("Phase", "mf-phase", [{ value: "single", label: "Single" }, { value: "three", label: "Three" }]);
   for (const f of [hp, voltage, phase]) inputRegion.appendChild(f.wrap);
 
-  const outFLA = makeOutputLine(outputRegion, "Typical FLA", "mf-out");
+  const outFLA = makeOutputLine(outputRegion, "Full-load current (NEC table value)", "mf-out");
   const outSrc = makeOutputLine(outputRegion, "Source", "mf-src");
 
   function fillExample(v) { hp.select.value = String(v.hp); voltage.select.value = v.voltage; phase.select.value = v.phase; update(); }

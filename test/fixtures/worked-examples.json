@@ -312,7 +312,7 @@
    "source_publisher": "UPS / FedEx (carrier-published)",
    "source_title": "DIM weight = L * W * H / divisor (UPS Daily divisor 139)",
    "source_edition_or_year": "2026",
-   "source_section_or_page": "UPS Service Guide divisor; FedEx Ground / Express also 139 domestic",
+   "source_section_or_page": "UPS Service Guide divisor; FedEx Ground / Express also 139 domestic. 1,728 / 139 = 12.43 lb DIM, billed at the next whole pound, 13 lb (FedEx 2026 Service Guide: any fraction of a pound is rounded up; added 2026-10-03)",
    "verified_by": "rl",
    "verified_on": "2026-05-10",
    "inputs": {
@@ -330,7 +330,7 @@
      }
     },
     "billable_lb": {
-     "value": 12.43,
+     "value": 13,
      "tolerance": {
       "abs": 0.05
      }

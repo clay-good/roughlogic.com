@@ -21,7 +21,7 @@ export const TOOLS = [
   { id: "conduit-fill", name: "Conduit Fill", group: "A", trades: ["electrical"], desc: "Percent fill by conduit type and conductor count." },
   { id: "box-fill", name: "Box Fill", group: "A", trades: ["electrical"], desc: "Cubic-inch fill by box volume and conductor count." },
   { id: "breaker-sizing", name: "Breaker Sizing", group: "A", trades: ["electrical"], desc: "Continuous-load 125 percent rule." },
-  { id: "motor-fla", name: "Motor Full Load Amps", group: "A", trades: ["electrical"], desc: "Typical FLA by horsepower, voltage, and phase." },
+  { id: "motor-fla", name: "Motor Full Load Amps", group: "A", trades: ["electrical"], desc: "Full-load amps by horsepower, voltage, and phase, matching NEC 2023 Tables 430.248 and 430.250 for the sizes listed." },
   { id: "transformer-sizing", name: "Transformer Sizing", group: "A", trades: ["electrical"], desc: "Required kVA from load and voltages." },
   { id: "three-phase", name: "Three-Phase Power", group: "A", trades: ["electrical"], desc: "kW, kVA, and kVAR from line values and power factor." },
   { id: "copper-resistance", name: "Conductor Resistance at Temperature", group: "A", trades: ["electrical"], desc: "Resistance of copper or aluminum at temperature." },

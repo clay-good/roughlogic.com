@@ -1300,11 +1300,11 @@ const DIM_DIVISORS_DATA = {
     UPS_Retail:   { divisor: 139, attribution: "UPS published retail-rate divisor" },
     FedEx_Ground: { divisor: 139, attribution: "FedEx Ground published divisor" },
     FedEx_Express:{ divisor: 139, attribution: "FedEx Express published divisor" },
-    USPS:         { divisor: 166, attribution: "USPS published divisor (Priority Mail)" },
+    USPS:         { divisor: 139, attribution: "USPS DIM factor 139 (Priority Mail Express, Priority Mail, Ground Advantage, Parcel Select; from July 12, 2026; above 1,728 cu in only)" },
     DHL_Express:  { divisor: 139, attribution: "DHL Express published divisor" },
     freight:      { divisor: 250, attribution: "Freight (LTL) published density divisor" },
   },
-  notes: "DIM weight (lb) = L * W * H (in) / divisor. Billable weight = max(DIM, actual). Verify divisor against the carrier's current published rate guide.",
+  notes: "DIM weight (lb) = L * W * H (in) / divisor. Billable weight = max(DIM, actual). UPS, FedEx and USPS round each dimension up to the next whole inch and bill the next whole pound; USPS applies DIM only above 1,728 cu in. Verify divisor against the carrier's current published rate guide.",
 };
 
 const REEFER_BURN_DATA = {
@@ -1719,7 +1719,7 @@ const EDITION_VERIFIED = {
   fire: "2026-09-02",
   crosswalks: "2026-09-02",
   summaries: "2026-09-02",
-  trucking: "2026-09-02",
+  trucking: "2026-10-03",
   accounting: "2026-09-09",
   lab: "2026-09-09",
   // The legal folder's date is the OLDEST row stamp under it, not a build date:

@@ -563,7 +563,7 @@ export const BESPOKE_OUTPUT_LABELS = {
   "motor-efficiency-upgrade-savings": {"annual_saving":"Annual saving","note":"Note"},
   "motor-fault-contribution": {"contribution_a":"Motor contribution (first cycle)","total_a":"Total first-cycle fault","note":"Note"},
   "motor-feeder-multiple": {"conductor_min_A":"Min feeder conductor ampacity (A)","feeder_ocpd_max_A":"Max feeder device (A)","largest_motor_flc_A":"Largest motor / device","notes":"Notes"},
-  "motor-fla": {"fla_A":"Typical FLA","source":"Source"},
+  "motor-fla": {"fla_A":"Full-load current (NEC table value)","source":"Source"},
   "motor-locked-rotor-kva": {"locked_rotor_kva":"Locked-rotor kVA","lra_a":"Locked-rotor amps (LRA)","note":"Note"},
   "motor-max-hp-for-starting-current": {"max_horsepower":"Max motor horsepower","lra_per_hp_a":"Starting current per hp","note":"Note"},
   "motor-operating-cost": {"input_kw":"Input power","annual_kwh":"Annual energy","annual_cost":"Annual energy cost","note":"Note"},

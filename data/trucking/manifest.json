@@ -2,14 +2,14 @@
   "name": "trucking",
   "version": "2026-09-09",
   "fetched": "2026-09-09",
-  "edition": "FMCSA 49 CFR 395 (HOS) and 23 CFR 658.17 (Federal Bridge Formula) cited by section; carrier divisors verified 2026-09-02; Thermo King and Carrier Transicold benchmarks per published technical bulletins.",
+  "edition": "FMCSA 49 CFR 395 (HOS) and 23 CFR 658.17 (Federal Bridge Formula) cited by section; carrier divisors verified 2026-10-03; Thermo King and Carrier Transicold benchmarks per published technical bulletins.",
   "asOf": "2026-09-09",
   "refresh_cadence": "annual",
   "shards": [
     {
       "file": "dim-divisors.json",
       "name": "Carrier DIM divisors (cited by carrier name only)",
-      "gzip_size_bytes": 400
+      "gzip_size_bytes": 520
     },
     {
       "file": "reefer-burn.json",
@@ -18,7 +18,7 @@
     }
   ],
   "hashes": {
-    "dim-divisors.json": "840f02d743f09736ea1dd4890d44013404f102998f3e5aefb95453b4ac208ec6",
+    "dim-divisors.json": "ddb728ff5a5897697f9fc82a348a4b6794bc3c98a2f6ce849b15e0d963dbf6ac",
     "reefer-burn.json": "0c7a826df5e857562f6a8aeb9e8d33ed56b11ea4ac80ff045ec0e7663749e0a6"
   }
 }

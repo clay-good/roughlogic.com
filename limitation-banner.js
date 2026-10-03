@@ -117,9 +117,9 @@ const CANONICAL = {
     link: "acca.org",
   },
   "motor-fla": {
-    headline: "Not the NEC table value.",
+    headline: "Confirm against your adopted NEC table.",
     replacement:
-      "NEC 430.6(A)(1) requires the Table 430.247-430.250 value, not the nameplate or a manufacturer figure, for sizing conductors and overcurrent protection. These are typical published values across manufacturers; read the table.",
+      "These values agree with NEC 2023 Tables 430.248 and 430.250 for the sizes listed. NEC 430.6(A)(1) requires the table value of your adopted edition, not the nameplate, for sizing conductors and overcurrent protection; 430.6(A)(2) uses the nameplate FLA for the overload device.",
     who_governs: "The AHJ and the NEC-adopted edition govern.",
     link: "nfpa.org/freeaccess",
   },
