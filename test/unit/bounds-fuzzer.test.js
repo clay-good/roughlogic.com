@@ -50814,7 +50814,7 @@ test("bounds: spec-v1498 computeZonalPressureDiagnostics -- a 50% zone is a bala
 });
 
 test("bounds: spec-v1499 computeCazDepressurizationLimit -- the zone is judged by the WEAKEST appliance", () => {
-  const base = { measured_depressurization_pa: 4.5, has_natural_draft_water_heater: "yes", natural_draft_wh_limit_pa: 2, has_natural_draft_furnace: "no", natural_draft_furnace_limit_pa: 3, has_induced_draft: "yes", induced_draft_limit_pa: 5, has_direct_vent: "no", direct_vent_limit_pa: 15, largest_exhaust_cfm: 200 };
+  const base = { measured_depressurization_pa: 4.5, has_natural_draft_water_heater: "yes", natural_draft_wh_limit_pa: 2, has_natural_draft_furnace: "no", natural_draft_furnace_limit_pa: 3, has_induced_draft: "yes", induced_draft_limit_pa: 5, has_direct_vent: "no", direct_vent_limit_pa: 50, largest_exhaust_cfm: 200 };
   const r = _v1499(base);
   // The induced-draft appliance PASSES at 5 Pa and the zone still FAILS,
   // because the natural-draft water heater at 2 Pa governs.
@@ -55342,7 +55342,7 @@ test("bounds: spec-v1757 computeGreenhouseTranspirationWater -- a sealed house h
   const r = _v1757(base); assertFiniteNumericOutputs(r, "v1757");
   assert.ok(Math.abs(r.transpiration_lb_per_day - 2057.142857142857) < 1e-6);
   assert.ok(Math.abs(r.transpiration_gal_per_day - 246.51202602071388) < 1e-9);
-  // The sanity band growers quote is 0.05 to 0.15 gal/sq ft/day.
+  // 1,500 Btu/sq ft at a 0.5 latent fraction caps transpiration near 0.086 gal/sq ft/day.
   assert.ok(r.gal_per_sqft_per_day > 0.05 && r.gal_per_sqft_per_day < 0.15);
   assert.ok(Math.abs(r.applied_gal_per_day - r.transpiration_gal_per_day / 0.8) < 1e-9);
   // The peak hour is what the irrigation system must deliver.

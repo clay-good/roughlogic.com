@@ -234,13 +234,13 @@ export function computeMarineShaftDiameter({
   const has_allowable = allowable_stress_psi > 0;
   const torsion_diameter_in = has_allowable ? Math.cbrt(16 * torque_inlb / (Math.PI * allowable_stress_psi)) : 0;
   // The rule diameter: d = F x cbrt(hp / rpm). ABYC P-6 writes it as the torsion
-  // formula itself, D = cbrt(321,000 P SF / (S N)) with 321,000 = 16 x 63,025 / pi,
+  // formula itself, D = cbrt(321,000 P SF / (S N)) with 321,000 ~ 16 x 63,025 / pi (320,984),
   // at shear yield over a safety factor (about 5) meant to cover bending, fatigue
   // and corrosion. Until 2026-10-01 the verdict said torsion "cannot see" bending.
   const has_rule = rule_factor > 0;
   const power_speed_root = Math.cbrt(engine_hp / shaft_rpm);
   const rule_diameter_in = has_rule ? rule_factor * power_speed_root : 0;
-  const rules_agree = has_rule && has_allowable && Math.abs(rule_diameter_in - torsion_diameter_in) <= 1e-6 * torsion_diameter_in;
+  const rules_agree = has_rule && has_allowable && Math.abs(rule_diameter_in - torsion_diameter_in) <= 1e-4 * torsion_diameter_in; // ABYC rounds 320,984 to 321,000
   const rule_governs = has_rule && has_allowable && !rules_agree && rule_diameter_in > torsion_diameter_in;
   const criterion_verdict = !has_rule
     ? "(no rule factor entered -- the classification society's constant is what carries the bending and corrosion allowance)"

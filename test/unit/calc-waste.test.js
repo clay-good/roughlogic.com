@@ -142,3 +142,12 @@ test("working face: a day's waste fills the advance, and a narrower face exposes
   assert.ok(r.narrow_exposed_sqft < r.exposed_sqft);
   close(r.total_passes, 5 * 4, "passes");
 });
+
+test("landfill settlement: a cap whose fall is used up exactly reads reversed either way the float lands", () => {
+  // 2026-10-03: the two settlements round separately, so an exact zero came out
+  // as +1.8e-15 (80/30 ft) or -1.8e-15 (120/70 ft) and the verdict split.
+  const base = { filled_acres: 10, in_place_density_lb_per_cy: 1200, tipping_fee_per_ton: 45, primary_settlement_pct: 6, secondary_settlement_pct: 12, cap_slope_pct: 3, slope_run_ft: 300 };
+  for (const [t, a] of [[80, 30], [120, 70]]) {
+    assert.equal(computeLandfillSettlementAirspace({ ...base, waste_thickness_ft: t, adjacent_thickness_ft: a }).slope_reverses, true);
+  }
+});

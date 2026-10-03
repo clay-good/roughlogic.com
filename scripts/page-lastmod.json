@@ -2,7 +2,7 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "a4dc53a6044672d8",
+      "sha": "03f08b5dcca05ef1",
       "date": "2026-10-03"
     },
     "/tools/": {
@@ -50,7 +50,7 @@
       "date": "2026-10-01"
     },
     "/groups/hvac/": {
-      "sha": "f626b77dd581c724",
+      "sha": "64c6728682172bb4",
       "date": "2026-10-03"
     },
     "/groups/kitchen/": {
@@ -798,8 +798,8 @@
       "date": "2026-09-29"
     },
     "/tools/branch-reinforcement/": {
-      "sha": "91d650ffd744b0bb",
-      "date": "2026-09-29"
+      "sha": "f14c94285fc097b0",
+      "date": "2026-10-03"
     },
     "/tools/branch-saddle-cutback/": {
       "sha": "f05b7499f1e7c977",
@@ -1034,8 +1034,8 @@
       "date": "2026-09-29"
     },
     "/tools/caz-depressurization-limit/": {
-      "sha": "4682033c1b939002",
-      "date": "2026-10-01"
+      "sha": "e7ba999d55081903",
+      "date": "2026-10-03"
     },
     "/tools/cctv-retention-days/": {
       "sha": "b5c91e16139d2eac",
@@ -3234,8 +3234,8 @@
       "date": "2026-09-29"
     },
     "/tools/garage-door-torsion-spring/": {
-      "sha": "39ae394169c230d7",
-      "date": "2026-10-01"
+      "sha": "7fefcf555b5222b4",
+      "date": "2026-10-03"
     },
     "/tools/gas-altitude-derate/": {
       "sha": "977bfee01278d504",
@@ -3482,8 +3482,8 @@
       "date": "2026-09-29"
     },
     "/tools/greenhouse-transpiration-water/": {
-      "sha": "4dcfb35ff22ee4a3",
-      "date": "2026-09-29"
+      "sha": "6b0b68045507cb69",
+      "date": "2026-10-03"
     },
     "/tools/greenhouse-vent-area/": {
       "sha": "fcacfe1947d6f12e",
@@ -3974,8 +3974,8 @@
       "date": "2026-09-29"
     },
     "/tools/instant-off-ir-drop/": {
-      "sha": "8a3864fb75bf896a",
-      "date": "2026-09-29"
+      "sha": "048d6de995a8df31",
+      "date": "2026-10-03"
     },
     "/tools/insulation-batt-coverage/": {
       "sha": "f033ce599aa1f2ff",
@@ -4558,8 +4558,8 @@
       "date": "2026-09-29"
     },
     "/tools/masonry-joint-reinforcement/": {
-      "sha": "7263e9967bf26e08",
-      "date": "2026-09-29"
+      "sha": "db2cc129fa5082ee",
+      "date": "2026-10-03"
     },
     "/tools/masonry-limited-access-zone/": {
       "sha": "71c4fb913231d568",
@@ -7110,8 +7110,8 @@
       "date": "2026-09-29"
     },
     "/tools/snowmelt-load/": {
-      "sha": "8f134afb522f0555",
-      "date": "2026-09-29"
+      "sha": "d1c647f6ef9178fc",
+      "date": "2026-10-03"
     },
     "/tools/sod-takeoff/": {
       "sha": "c746609ff7a0e5bf",

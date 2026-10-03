@@ -580,13 +580,13 @@ export function computeGreenhouseTranspirationWater({ floor_area_sqft = 0, daily
     peak_lb_per_hour, peak_gal_per_hour, average_gal_per_hour,
     peak_to_average_ratio: peak_gal_per_hour / average_gal_per_hour,
     moisture_pints_per_day: transpiration_gal_per_day * PINTS_PER_GAL,
-    note: "The energy route is a check on the water route and vice versa: UMass Extension sizes a greenhouse water SUPPLY at 0.3 to 0.4 gallons per square foot of bench per day at peak, which covers runoff, hand watering and the hottest days, so crop transpiration by the energy route normally lands well under it -- size a supply on the extension figure, not on this one. Irrigation must deliver the PEAK hour, not the daily average divided by the day length -- a system sized on the average is short by exactly that factor when the crop needs it most. And every pound transpired enters the house air: a ventilated house blows it outside without anyone noticing, while a sealed house has to REMOVE it, which is a dehumidification load larger than most people size for and the reason closed and indoor growing rooms fail on humidity before they fail on anything else. The crop's own stage and the irrigation designer govern.",
+    note: "The energy route is a check on the water route and vice versa: UMass Extension sizes a greenhouse water SUPPLY at 0.3 to 0.4 gallons per square foot of growing area per day as the peak use on the warmest day, and says that matches evapotranspiration for most of the country. Treat it as a conservative supply rule: 0.3 gal is about 2,600 Btu of latent heat per square foot, more than a sunny day puts through the glazing, so the energy route normally lands well under it -- size a supply on the extension figure, not on this one. Irrigation must deliver the PEAK hour, not the daily average divided by the day length -- a system sized on the average is short by exactly that factor when the crop needs it most. And every pound transpired enters the house air: a ventilated house blows it outside without anyone noticing, while a sealed house has to REMOVE it, which is a dehumidification load larger than most people size for and the reason closed and indoor growing rooms fail on humidity before they fail on anything else. The crop's own stage and the irrigation designer govern.",
   };
 }
 
 const transpirationExample = { floor_area_sqft: 2880, daily_solar_btu_per_sqft: 1500, latent_fraction: 0.5, leaching_fraction: 0.2, peak_solar_btuh_per_sqft: 188, irrigation_hours_per_day: 12 };
 GREENHOUSE_RENDERERS["greenhouse-transpiration-water"] = _simpleRenderer({
-  citation: "Citation: an energy balance -- transpiration = solar energy through the glazing x the crop's latent fraction / 1,050 Btu per pound of water; applied volume = transpiration / (1 - leaching fraction). A well-watered crop returns roughly half the solar gain as latent heat, and 0.05 to 0.15 gal per square foot per day is the band growers quote. The crop's own stage and the irrigation designer govern.",
+  citation: "Citation: an energy balance -- transpiration = solar energy through the glazing x the crop's latent fraction / 1,050 Btu per pound of water; applied volume = transpiration / (1 - leaching fraction). A well-watered crop returns roughly half the solar gain as latent heat. UMass Extension (Bartok, Sizing the Greenhouse Water System) puts warmest-day peak use at 0.3 to 0.4 gal per square foot of growing area per day. The crop's own stage and the irrigation designer govern.",
   example: transpirationExample,
   fields: [
     { key: "floor_area_sqft", label: "Floor or canopy area (sq ft)" },
@@ -598,7 +598,7 @@ GREENHOUSE_RENDERERS["greenhouse-transpiration-water"] = _simpleRenderer({
   ],
   outputs: [
     { key: "transpiration_gal_per_day", id: "gtw-water", label: "Crop transpiration", value: (r) => fmt(r.transpiration_gal_per_day, 0) + " gal/day (" + fmt(r.transpiration_lb_per_day, 0) + " lb/day)" },
-    { key: "gal_per_sqft_per_day", id: "gtw-per", label: "Per square foot", value: (r) => fmt(r.gal_per_sqft_per_day, 4) + " gal/sq ft/day -- check against the 0.05 to 0.15 band" },
+    { key: "gal_per_sqft_per_day", id: "gtw-per", label: "Per square foot", value: (r) => fmt(r.gal_per_sqft_per_day, 4) + " gal/sq ft/day -- the UMass warmest-day peak is 0.3 to 0.4" },
     { key: "applied_gal_per_day", id: "gtw-applied", label: "Irrigation to apply", value: (r) => fmt(r.applied_gal_per_day, 0) + " gal/day including " + fmt(r.leached_gal_per_day, 0) + " gal of leachate" },
     { key: "peak_gal_per_hour", id: "gtw-peak", label: "Peak hour demand", value: (r) => fmt(r.peak_gal_per_hour, 1) + " gal/h against a " + fmt(r.average_gal_per_hour, 1) + " gal/h average -- " + fmt(r.peak_to_average_ratio, 1) + "x" },
     { key: "moisture_pints_per_day", id: "gtw-moist", label: "Moisture into the house air", value: (r) => fmt(r.moisture_pints_per_day, 0) + " pints a day -- a sealed house has to remove all of it" },

@@ -58,7 +58,7 @@ test("ASHRAE 62.1 VRP: Vou = D sum(Rp Pz) + sum(Ra Az), and Xs = Vou / Vps", () 
 // ---- identities the notes claim ----
 
 test("CAZ: the weakest appliance present sets the limit", () => {
-  const r = computeCazDepressurizationLimit({ measured_depressurization_pa: 4.5, has_natural_draft_water_heater: "yes", natural_draft_wh_limit_pa: 2, has_natural_draft_furnace: "no", natural_draft_furnace_limit_pa: 3, has_induced_draft: "yes", induced_draft_limit_pa: 5, has_direct_vent: "no", direct_vent_limit_pa: 15, largest_exhaust_cfm: 200 });
+  const r = computeCazDepressurizationLimit({ measured_depressurization_pa: 4.5, has_natural_draft_water_heater: "yes", natural_draft_wh_limit_pa: 2, has_natural_draft_furnace: "no", natural_draft_furnace_limit_pa: 3, has_induced_draft: "yes", induced_draft_limit_pa: 5, has_direct_vent: "no", direct_vent_limit_pa: 50, largest_exhaust_cfm: 200 });
   close(r.governing_limit_pa, 2, "natural-draft water heater");
   assert.equal(r.passes, false);
 });

@@ -47720,7 +47720,7 @@
   {
    "tile_id": "masonry-joint-reinforcement",
    "source_publisher": "masonry joint-reinforcement takeoff (IRC R606.12.2)",
-   "source_title": "cross-check: 30 x 10 ft wall, 16 in vertical, 10 ft pieces -> 8 courses, 24 total",
+   "source_title": "cross-check: 30 x 10 ft wall, 16 in vertical, 10 ft pieces lapped 6 in -> 8 courses, 32 total",
    "source_edition_or_year": "spec-v922 worked example (machine-verified)",
    "source_section_or_page": "courses = ceil(120/16) = 8; per course = 1 + ceil(20/9.5) = 4 with the default 6 in lap; total = 32",
    "verified_by": "rl",
@@ -54659,7 +54659,7 @@
   {
    "tile_id": "snowmelt-load",
    "source_publisher": "ASHRAE snow-melting flux / Chapman IP forms via Lund (Geo-Heat Center)",
-   "source_title": "Class II walk, 0.1 in/hr WE at 20 F, 10 mph, 80% RH -> 110.7 Btu/hr-ft^2, 66.4 MBH over 500 ft^2",
+   "source_title": "Class II walk, 0.1 in/hr WE at 20 F, 10 mph, 80% RH -> 110.5 Btu/hr-ft^2, 66.3 MBH over 500 ft^2",
    "source_edition_or_year": "spec-v478 worked example (machine-verified)",
    "source_section_or_page": "spec-v478 section 2.1 pinned example",
    "verified_by": "rl",
@@ -54721,7 +54721,7 @@
   {
    "tile_id": "snowmelt-load",
    "source_publisher": "ASHRAE snow-melting flux / Chapman IP forms via Lund (Geo-Heat Center)",
-   "source_title": "cross-check: the same storm on a Class III (A_r = 1) surface -> 143.5 Btu/hr-ft^2, 86.1 MBH",
+   "source_title": "cross-check: the same storm on a Class III (A_r = 1) surface -> 143.2 Btu/hr-ft^2, 85.9 MBH",
    "source_edition_or_year": "spec-v478 worked example (machine-verified)",
    "source_section_or_page": "spec-v478 section 2.1 cross-check",
    "verified_by": "rl",
@@ -123714,7 +123714,7 @@
     "has_induced_draft": "yes",
     "induced_draft_limit_pa": 5,
     "has_direct_vent": "no",
-    "direct_vent_limit_pa": 15,
+    "direct_vent_limit_pa": 50,
     "largest_exhaust_cfm": 200
    },
    "outputs": {
@@ -166702,6 +166702,994 @@
     },
     "panel_length_ft": {
      "value": 14,
+     "tolerance": {
+      "abs": 0
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "thread-single-depth",
+   "source_publisher": "Mitsubishi Materials",
+   "source_title": "Standard of Depth of Cut (External Threading), tec_threading_depth_external_en-us.pdf",
+   "source_edition_or_year": "Mitsubishi Materials technical data sheet (current web edition, retrieved 2026-10-03)",
+   "source_section_or_page": "\"American UN (inch)\" table, EXTERNAL (RADIAL INFEED), row \"13\" thread/inch: Total Cutting Depth \".047\". Tile 0.6134/TPI; tolerance 0.0006 in covers the printed 3-decimal rounding (+/-0.0005). https://data.mmc-carbide.com/6116/8854/4435/tec_threading_depth_external_en-us.pdf",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "tpi": 13
+   },
+   "outputs": {
+    "single_depth_in": {
+     "value": 0.047,
+     "tolerance": {
+      "abs": 0.0006
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "thread-single-depth",
+   "source_publisher": "Mitsubishi Materials",
+   "source_title": "Standard of Depth of Cut (External Threading), tec_threading_depth_external_en-us.pdf",
+   "source_edition_or_year": "Mitsubishi Materials technical data sheet (current web edition, retrieved 2026-10-03)",
+   "source_section_or_page": "\"American UN (inch)\" table, EXTERNAL (RADIAL INFEED), row \"20\" thread/inch: Total Cutting Depth \".031\". Tile 0.6134/TPI; tolerance 0.0006 in covers the printed 3-decimal rounding (+/-0.0005). https://data.mmc-carbide.com/6116/8854/4435/tec_threading_depth_external_en-us.pdf",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "tpi": 20
+   },
+   "outputs": {
+    "single_depth_in": {
+     "value": 0.031,
+     "tolerance": {
+      "abs": 0.0006
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "thread-single-depth",
+   "source_publisher": "Mitsubishi Materials",
+   "source_title": "Standard of Depth of Cut (External Threading), tec_threading_depth_external_en-us.pdf",
+   "source_edition_or_year": "Mitsubishi Materials technical data sheet (current web edition, retrieved 2026-10-03)",
+   "source_section_or_page": "\"American UN (inch)\" table, EXTERNAL (RADIAL INFEED), row \"8\" thread/inch: Total Cutting Depth \".077\". Tile 0.6134/TPI; tolerance 0.0006 in covers the printed 3-decimal rounding (+/-0.0005). https://data.mmc-carbide.com/6116/8854/4435/tec_threading_depth_external_en-us.pdf",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "tpi": 8
+   },
+   "outputs": {
+    "single_depth_in": {
+     "value": 0.077,
+     "tolerance": {
+      "abs": 0.0006
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "thread-single-depth",
+   "source_publisher": "Mitsubishi Materials",
+   "source_title": "Standard of Depth of Cut (External Threading), tec_threading_depth_external_en-us.pdf",
+   "source_edition_or_year": "Mitsubishi Materials technical data sheet (current web edition, retrieved 2026-10-03)",
+   "source_section_or_page": "\"American UN (inch)\" table, EXTERNAL (RADIAL INFEED), row \"5\" thread/inch: Total Cutting Depth \".123\". Tile 0.6134/TPI; tolerance 0.0006 in covers the printed 3-decimal rounding (+/-0.0005). https://data.mmc-carbide.com/6116/8854/4435/tec_threading_depth_external_en-us.pdf",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "tpi": 5
+   },
+   "outputs": {
+    "single_depth_in": {
+     "value": 0.123,
+     "tolerance": {
+      "abs": 0.0006
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "cutting-diameter-for-rpm",
+   "source_publisher": "Cutting Tool Engineering magazine (Christopher Tate)",
+   "source_title": "Understanding cutting equations",
+   "source_edition_or_year": "ctemag.com article (retrieved 2026-10-03)",
+   "source_section_or_page": "Worked example: \"Let's say a 1-in.-dia. tool must run at 100 sfm ... that tool must turn at 382 rpm to achieve 100 sfm: 100 / 1 x 3.82 = 382.\" Inverted: 100 sfm at 382 rpm -> 1 in. Tile gives 0.99993; tolerance 0.002 in covers the printed rounding of 381.97 to 382 rpm. https://ctemag.com/articles/understanding-cutting-equations/",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "surface_speed_sfm": 100,
+    "target_rpm": 382
+   },
+   "outputs": {
+    "diameter_in": {
+     "value": 1,
+     "tolerance": {
+      "abs": 0.002
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "taylor-tool-life",
+   "source_publisher": "Poriyaan (Anna University Manufacturing Technology notes)",
+   "source_title": "Solved problems on tool life - Mechanics of Metal Cutting",
+   "source_edition_or_year": "mech.poriyaan.in topic 31723 (retrieved 2026-10-03)",
+   "source_section_or_page": "Problem 1.32: \"Taylor's tool life relationship is VT 0.75 = 75\"; solution \"45.24 x T 0.75 = 75 ... T = 1.962 min\" (V = pi x 100 mm x 144 rpm). Units are m/min but the relation is unit-agnostic (V and C in the same unit). Tile 1.96209; tolerance 0.002 covers the printed 3-decimal answer. target_life_min (15) only feeds the separate speed output, not asserted. https://mech.poriyaan.in/topic/solved-problems-on-tool-life-31723/",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "taylor_c": 75,
+    "taylor_n": 0.75,
+    "cutting_speed_sfm": 45.24,
+    "target_life_min": 15
+   },
+   "outputs": {
+    "tool_life_min": {
+     "value": 1.962,
+     "tolerance": {
+      "abs": 0.002
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "steam-pipe-velocity",
+   "source_publisher": "Spirax Sarco",
+   "source_title": "The Steam and Condensate Loop: Pipes and Pipe Sizing (Block 10.2)",
+   "source_edition_or_year": "Spirax Sarco Learn About Steam, web edition (retrieved 2026-10-03)",
+   "source_section_or_page": "Example 10.2.4: \"A process requires 5 000 kg/h of dry saturated steam at 7 bar g. For the flow velocity not to exceed 25 m/s ... the pipe size must be at least 130 mm; the nearest commercially available size, 150 mm, would be selected.\" Specific volume 0.240 m3/kg at 7 bar g from Spirax's own steam-table extract (\"What is steam\", row 7 bar g ... 0.240). Inputs converted exactly: 5,000 kg/h = 11,023.11 lb/hr; 0.240 m3/kg = 3.84443 ft3/lb; 25 m/s = 4,921.26 ft/min. Tile req_dia 5.1297 in = 130.3 mm; printed 130 mm = 5.118 in; tolerance 0.03 in covers rounding to whole mm; 150 mm = NPS 6. https://www.spiraxsarco.com/learn-about-steam/steam-distribution/pipes-and-pipe-sizing",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "steam_flow_lbhr": 11023.11,
+    "spec_vol_ft3lb": 3.84443,
+    "vel_ceiling_fpm": 4921.26
+   },
+   "outputs": {
+    "req_dia_in": {
+     "value": 5.118,
+     "tolerance": {
+      "abs": 0.03
+     }
+    },
+    "chosen_nps": {
+     "value": "6",
+     "tolerance": {
+      "abs": 0
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "radiator-edr-output",
+   "source_publisher": "Weil-McLain",
+   "source_title": "Boiler Replacement Guide: step-by-step procedures for properly sizing hot water and steam replacement boilers",
+   "source_edition_or_year": "Weil-McLain WM2012 web edition",
+   "source_section_or_page": "Section 2, Procedure for Sizing Steam Boilers, step 8 + EXAMPLE (Figure 7): \"Each square foot of steam radiation is based on a heat emission of 240 BTU/Hr.\" \"2 1/4 times 8 (the number of sections) equals 18 square feet of direct radiation. 18 times 240 (BTU/Hr.) equals 4,320 BTU/Hr. for this radiator.\" Weil-McLain selects on the AHRI NET rating (pickup already included), so pickup_factor 0 here; only the heat output is asserted. Exact arithmetic, tolerance 1 BTU/hr. https://www.weil-mclain.com/wp-content/uploads/Weil-McLain_BoilerReplacementGuide_WM2012-web_0-1.pdf",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "edr_sqft": 18,
+    "system_k": 240,
+    "pickup_factor": 0
+   },
+   "outputs": {
+    "heat_output_btu_hr": {
+     "value": 4320,
+     "tolerance": {
+      "abs": 1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "thermistor-beta-temp",
+   "source_publisher": "Jameco Electronics",
+   "source_title": "Temperature Measurement with NTC Thermistors (Jameco Workshop Tech Tip)",
+   "source_edition_or_year": "jameco.com Tech Tip (Wayback 2023 capture)",
+   "source_section_or_page": "Worked example: \"The beta constant for the thermistor is 3380, the thermistor resistance (R0) at 25 C is 10K ohms, and the ADC returns a value 366.\" \"1/T = 1/298.15 + 1/3380 * ln((1023 / 366) - 1)\" \"T = 283.52K - 273.15K = 10.37 C\". R from the article's own printed relation R = R0 x ((adcMax/adcVal) - 1) = 10,000 x (1023/366 - 1) = 17,950.82 ohm. Tile 10.368 C; tolerance 0.01 C covers the printed 2-decimal rounding. https://www.jameco.com/Jameco/workshop/TechTip/temperature-measurement-ntc-thermistors.html",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "resistance_ohms": 17950.82,
+    "r0_ohms": 10000,
+    "beta_k": 3380,
+    "ref_temp_c": 25
+   },
+   "outputs": {
+    "temperature_c": {
+     "value": 10.37,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "garage-door-torsion-spring",
+   "source_publisher": "Garage Door Fix Inc.",
+   "source_title": "Garage Door Torsion Spring Calculator (worked example)",
+   "source_edition_or_year": "garagedoorfix.ca spring calculator page (retrieved 2026-10-03)",
+   "source_section_or_page": "Worked example for a 180 lb, 7 ft door with two springs: \"Total torque needed = 180 lbs x 2\\\" drum radius = 360 in-lbs. Winding turns = (84\\\" / (pi x 4\\\")) + 1 pretension = 7.68 turns. Required IPPT per spring = 360 / (7.68 x 2) = 23.44 IPPT\". Tile 360 / 7.6845 / 23.424; the printed 23.44 uses the rounded 7.68 turns, so tolerance 0.03 IPPT; turns tolerance 0.01. https://garagedoorfix.ca/spring-calculator/",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "door_weight_lb": 180,
+    "door_height_in": 84,
+    "drum_radius_in": 2,
+    "springs": 2,
+    "extra_turns": 1
+   },
+   "outputs": {
+    "required_torque_inlb": {
+     "value": 360,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "turns": {
+     "value": 7.68,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "ippt_per_spring": {
+     "value": 23.44,
+     "tolerance": {
+      "abs": 0.03
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "gas-pipeline-flow",
+   "source_publisher": "CED Engineering (course text after E. S. Menon, Gas Pipeline Hydraulics)",
+   "source_title": "Gas Pipeline Hydraulics, Course No. P06-001",
+   "source_edition_or_year": "R1",
+   "source_section_or_page": "p. 38, Example 11 (Panhandle A, Eq. 2.34): NPS 18 x 0.250 in wall, D = 17.50 in, 20 miles, 150 MMSCFD, Tf = 70 F (530 R), P1 = 1000 + 14.7 = 1014.7 psia, G = 0.6, Z = 0.85, E = 0.95, Tb = 520 R, Pb = 14.7 psia; printed 'Solving, P2 = 970.81 psia'. Run forward here with P2 = 970.81 psia entered as 956.11 psig (the tile adds the same 14.7). Tile gives 149.72 MMSCFD; the 0.19% gap is the tile's fixed 14.73 psia base pressure (source uses 14.7, factor (14.7/14.73)^1.0788) and 459.67 vs 460 Rankine offset, so 0.5% covers it.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "equation": "panhandle_a",
+    "id_in": 17.5,
+    "length_mi": 20,
+    "inlet_psig": 1000,
+    "outlet_psig": 956.11,
+    "gravity": 0.6,
+    "flowing_temp_f": 70,
+    "z_factor": 0.85,
+    "efficiency": 0.95,
+    "alternate_id_in": 0
+   },
+   "outputs": {
+    "q_mmscfd": {
+     "value": 150,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "inlet_psia": {
+     "value": 1014.7,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "gas-pipeline-flow",
+   "source_publisher": "CED Engineering (course text after E. S. Menon, Gas Pipeline Hydraulics)",
+   "source_title": "Gas Pipeline Hydraulics, Course No. P06-001",
+   "source_edition_or_year": "R1",
+   "source_section_or_page": "pp. 38-39, Example 11, Weymouth Eq. (2.30): same line (D = 17.50 in, 20 mi, 150 MMSCFD, 1014.7 psia inlet, G 0.6, Tf 530 R, Z 0.85, E 0.95, Pb 14.7, Tb 520); printed 'P2 = 946.24 psia'. Entered as 931.54 psig. Tile gives 149.74 MMSCFD; 0.17% gap is the 14.73 vs 14.7 psia base pressure and 459.67 vs 460 offset; 0.5% covers it.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "equation": "weymouth",
+    "id_in": 17.5,
+    "length_mi": 20,
+    "inlet_psig": 1000,
+    "outlet_psig": 931.54,
+    "gravity": 0.6,
+    "flowing_temp_f": 70,
+    "z_factor": 0.85,
+    "efficiency": 0.95,
+    "alternate_id_in": 0
+   },
+   "outputs": {
+    "q_mmscfd": {
+     "value": 150,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "coil-capacity-verification",
+   "source_publisher": "Colmac Coil Manufacturing",
+   "source_title": "Engineering Bulletin 5050: Water Cooling Coils, 5/8 in OD Tube",
+   "source_edition_or_year": "2009 (PDF dated Dec 15, 2009)",
+   "source_section_or_page": "pp. 4-5, Chilled Water Cooling Coil Selection Example and Worksheet: 2000 SCFM, 80 F -> 58 F db, h = 31.62 - 24.29 = 7.33 Btu/lb, water 45 -> 52 F; printed 'qs = 1.08 SCFM T = 1.08 (2000) (22) = 47,520 Btuh', 'qt = 4.5 SCFM h = 4.5 (2000) (7.33) = 65,970 Btuh', 'GPM required = 65,970 / 500 (7) = 18.85 GPM'. 18.85 gpm entered as printed. Tile reproduces 47,520 and 65,970 exactly; abs 1 Btuh is rounding slack only.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "airflow_cfm": 2000,
+    "entering_air_db_f": 80,
+    "leaving_air_db_f": 58,
+    "enthalpy_drop_btu_lb": 7.33,
+    "water_gpm": 18.85,
+    "entering_water_f": 45,
+    "leaving_water_f": 52,
+    "fluid_factor": 500,
+    "design_capacity_btuh": 0,
+    "tolerance_pct": 10
+   },
+   "outputs": {
+    "air_sensible_btuh": {
+     "value": 47520,
+     "tolerance": {
+      "abs": 1
+     }
+    },
+    "air_total_btuh": {
+     "value": 65970,
+     "tolerance": {
+      "abs": 1
+     }
+    },
+    "air_dt_f": {
+     "value": 22,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "water_dt_f": {
+     "value": 7,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "two-stage-interstage-pressure",
+   "source_publisher": "Ariel Corporation",
+   "source_title": "Using Design Principles for Troubleshooting Compressors (newsroom article)",
+   "source_edition_or_year": "March 5, 2018",
+   "source_section_or_page": "worked example: inlet 100 psig, discharge 1000 psig, 14.7 psi atmosphere; printed 'The overall compression ratio is 8.84', 'The square root of 8.84 is 2.97', first-stage inlet '114.7 lbs.', first-stage outlet '340.6' (= 114.7 x 2.97). Tile: 8.8466, 2.9743, 341.15 psia. abs 0.01 covers the ratios' two-decimal printing; 0.25% covers 340.6, which the source formed from the rounded 2.97.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "low_psig": 100,
+    "high_psig": 1000,
+    "intermediate_load_psig": 0
+   },
+   "outputs": {
+    "single_stage_ratio": {
+     "value": 8.84,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "stage_ratio": {
+     "value": 2.97,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "interstage_psia": {
+     "value": 340.6,
+     "tolerance": {
+      "pct": 0.25
+     }
+    },
+    "p_low_psia": {
+     "value": 114.7,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "iron-manganese-chlorine-dose",
+   "source_publisher": "Illinois Rural Water Association",
+   "source_title": "Chlorination review (Dave McMillan, P.G.), Calculate Chlorine Demand table",
+   "source_edition_or_year": "2026 (presentation 260507)",
+   "source_section_or_page": "PDF p. 32, 'Ex #7': Fe .057 x .64 = .036; Mn .011 x 1.3 = .014; ammonia .290 x 7.6 = 2.204 (entered as the other demand); '2.254+.5= 2.754'. Tile uses 0.62 for Fe (source 0.64), a 0.001 mg/L effect here; tile 2.7536. abs 0.01 covers it. Flow is not printed and does not affect dose_mgl (flow_mgd 1 entered only to satisfy the guard).",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "fe_mgl": 0.057,
+    "mn_mgl": 0.011,
+    "extra_demand_mgl": 2.204,
+    "target_residual_mgl": 0.5,
+    "flow_mgd": 1
+   },
+   "outputs": {
+    "dose_mgl": {
+     "value": 2.754,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "iron-manganese-chlorine-dose",
+   "source_publisher": "Illinois Rural Water Association",
+   "source_title": "Chlorination review (Dave McMillan, P.G.), Calculate Chlorine Demand table",
+   "source_edition_or_year": "2026 (presentation 260507)",
+   "source_section_or_page": "PDF p. 32, 'Ex #6': Fe .222 x .64 = .142; Mn '< .015' x 1.3 = .020; ammonia .290 x 7.6 = 2.204; '2.366+.5= 2.866'. Mn entered at the .015 detection limit the source multiplied. Tile (Fe x 0.62) gives 2.8611; the 0.0044 gap is the 0.62 vs 0.64 iron factor (0.004) plus the source rounding .0195 to .020; abs 0.01 covers it.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "fe_mgl": 0.222,
+    "mn_mgl": 0.015,
+    "extra_demand_mgl": 2.204,
+    "target_residual_mgl": 0.5,
+    "flow_mgd": 1
+   },
+   "outputs": {
+    "dose_mgl": {
+     "value": 2.866,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "solar-water-pump-sizing",
+   "source_publisher": "USDA Natural Resources Conservation Service, North Dakota",
+   "source_title": "Technical Note No. 1: Design of Small Photovoltaic (PV) Solar-Powered Water Pump Systems",
+   "source_edition_or_year": "July 2017",
+   "source_section_or_page": "Section 7.5 Step 5 (p. 29): '1,000 / (2.52 x 60) = 6.6 gpm'; Section 7.7 Step 7 (pp. 30-31): pump for 6.6 gpm at 150 ft TDH 'is 0.31kW or 310W', Eq. 7.3 '0.1885 x 150ft x 6.6gpm / 310W x 100 = 60%'; Section 7.11: storage of 'at least a three-day water supply'. Inputs 1,000 gpd, 2.52 PSH, 150 ft, 60% efficiency, 0.85 derate, 3 days all printed. Tile gives 6.614 gpm (printed rounds to 6.6; abs 0.05) and 311.6 W (printed 310 W was read off the pump curve and the 60% efficiency is itself rounded from 60.2%; pct 1 covers the 0.5% gap). Storage 1,000 x 3 = 3,000 gal.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "daily_demand_gpd": 1000,
+    "peak_sun_hours": 2.52,
+    "tdh_ft": 150,
+    "pump_efficiency": 0.6,
+    "panel_derate": 0.85,
+    "storage_days": 3
+   },
+   "outputs": {
+    "design_flow_gpm": {
+     "value": 6.6,
+     "tolerance": {
+      "abs": 0.05
+     }
+    },
+    "pump_input_w": {
+     "value": 310,
+     "tolerance": {
+      "pct": 1
+     }
+    },
+    "storage_gal": {
+     "value": 3000,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "solar-water-pump-sizing",
+   "source_publisher": "USDA Natural Resources Conservation Service, North Dakota",
+   "source_title": "Technical Note No. 1: Design of Small Photovoltaic (PV) Solar-Powered Water Pump Systems, Appendix C Example 1 (well source)",
+   "source_edition_or_year": "July 2017",
+   "source_section_or_page": "Appendix C Example 1, pp. C-39 to C-43: Step 5 '1,000 gallons / (2.52 hours/day x 60 minutes/hour) = 6.6 gpm'; Step 6 TDH '269.3ft use 270ft'; Step 7 'a minimum input of 610 Watts' and Eq. 7.3 '0.1885 x 270ft x 6.6gpm / 610W x 100 = 55%'; Step 11 '1,000 gallons/day x 3 days = 3,000 gallons'. Tile at the printed 55% gives 6.614 gpm and 611.9 W; the printed 610 W is the curve reading and 55% is rounded from 55.07%, so pct 1 on power and abs 0.05 on flow cover the printed rounding.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "daily_demand_gpd": 1000,
+    "peak_sun_hours": 2.52,
+    "tdh_ft": 270,
+    "pump_efficiency": 0.55,
+    "panel_derate": 0.85,
+    "storage_days": 3
+   },
+   "outputs": {
+    "design_flow_gpm": {
+     "value": 6.6,
+     "tolerance": {
+      "abs": 0.05
+     }
+    },
+    "pump_input_w": {
+     "value": 610,
+     "tolerance": {
+      "pct": 1
+     }
+    },
+    "storage_gal": {
+     "value": 3000,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "solar-water-pump-sizing",
+   "source_publisher": "USDA Natural Resources Conservation Service, North Dakota",
+   "source_title": "Technical Note No. 1: Design of Small Photovoltaic (PV) Solar-Powered Water Pump Systems, Appendix C Example 2 (pond source)",
+   "source_edition_or_year": "July 2017",
+   "source_section_or_page": "Appendix C Example 2, pp. C-47 to C-50: Step 5 '= 6.6 gpm'; Step 6 'TDH = 12ft + 0ft + 1.06ft = 13.06ft use 14ft'; Step 7 'a minimum input of 70 Watts' and Eq. 7.3 '0.1885 x 14ft x 6.6gpm / 70W x 100 = 25%'; Step 11 '= 3,000 gallons'. Tile at the printed 25% gives 6.614 gpm and 69.8 W against the printed 70 W (25% is rounded from 24.9%); pct 1 on power covers it.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "daily_demand_gpd": 1000,
+    "peak_sun_hours": 2.52,
+    "tdh_ft": 14,
+    "pump_efficiency": 0.25,
+    "panel_derate": 0.85,
+    "storage_days": 3
+   },
+   "outputs": {
+    "design_flow_gpm": {
+     "value": 6.6,
+     "tolerance": {
+      "abs": 0.05
+     }
+    },
+    "pump_input_w": {
+     "value": 70,
+     "tolerance": {
+      "pct": 1
+     }
+    },
+    "storage_gal": {
+     "value": 3000,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "generator-part-load-fuel",
+   "source_publisher": "Cummins Inc.",
+   "source_title": "Generator set data sheet C60D6R (B3.3 Rental Product), D-6567",
+   "source_edition_or_year": "Data sheet D-6567 as published at cummins.com (Mobile Power launch)",
+   "source_section_or_page": "Fuel consumption table, p. 1: Standby 'Ratings 60 (75)', 'Load 1/4 1/2 3/4 Full', 'US gph 1.6 2.7 3.6 5.0'. On the standby rating the 3/4 load point is 45 kW, where the printed burn is 3.6 gph; the tile interpolates through the published nodes so it returns 3.6 exactly. abs 0.05 covers the one-decimal printing.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "standby_kw": 60,
+    "rating_kw": 60,
+    "fuel_quarter_gph": 1.6,
+    "fuel_half_gph": 2.7,
+    "fuel_three_quarter_gph": 3.6,
+    "fuel_full_gph": 5.0,
+    "load_kw": 45
+   },
+   "outputs": {
+    "fuel_gph": {
+     "value": 3.6,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "generator-part-load-fuel",
+   "source_publisher": "Cummins Inc.",
+   "source_title": "Generator set data sheet C60D6R (B3.3 Rental Product), D-6567",
+   "source_edition_or_year": "Data sheet D-6567 as published at cummins.com (Mobile Power launch)",
+   "source_section_or_page": "Fuel consumption table, p. 1: Prime 'Ratings 55 (68)', 'US gph 1.5 2.5 3.4 4.6' at 1/4, 1/2, 3/4, Full; standby nameplate 60 kW. The 1/2-load point of the prime rating is 27.5 kW, printed burn 2.5 gph; the tile returns 2.5. abs 0.05 covers the one-decimal printing.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "standby_kw": 60,
+    "rating_kw": 55,
+    "fuel_quarter_gph": 1.5,
+    "fuel_half_gph": 2.5,
+    "fuel_three_quarter_gph": 3.4,
+    "fuel_full_gph": 4.6,
+    "load_kw": 27.5
+   },
+   "outputs": {
+    "fuel_gph": {
+     "value": 2.5,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "concrete-strength-gain",
+   "source_publisher": "American Concrete Institute (ACI Committee 209)",
+   "source_title": "ACI 209R-92 (Reapproved 1997) Prediction of Creep, Shrinkage, and Temperature Effects in Concrete Structures",
+   "source_edition_or_year": "1992 (reapproved 1997)",
+   "source_section_or_page": "Table 2.2.1 'Values of the Constants a, B and a/B and the Time Ratio From Eqs. (2-1) and (2-2)', row Moist cured, Type I, a = 4.0, B = .85, column 3 days: printed (f'c)t/(f'c)28 = 0.46. Eq. (2-1) (f'c)t = [t/(a + Bt)](f'c)28. Ratio only: fc28 = 1 normalizes it (fc28 does not enter the fraction). Table prints two decimals, so abs 0.006 covers the printed rounding.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "fc28": 1,
+    "age_days": 3,
+    "a": 4,
+    "b": 0.85
+   },
+   "outputs": {
+    "fraction": {
+     "value": 0.46,
+     "tolerance": {
+      "abs": 0.006
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "concrete-strength-gain",
+   "source_publisher": "American Concrete Institute (ACI Committee 209)",
+   "source_title": "ACI 209R-92 (Reapproved 1997) Prediction of Creep, Shrinkage, and Temperature Effects in Concrete Structures",
+   "source_edition_or_year": "1992 (reapproved 1997)",
+   "source_section_or_page": "Table 2.2.1 'Values of the Constants a, B and a/B and the Time Ratio From Eqs. (2-1) and (2-2)', row Moist cured, Type I, a = 4.0, B = .85, column 7 days: printed (f'c)t/(f'c)28 = 0.7. Eq. (2-1) (f'c)t = [t/(a + Bt)](f'c)28. Ratio only: fc28 = 1 normalizes it (fc28 does not enter the fraction). Table prints two decimals, so abs 0.006 covers the printed rounding.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "fc28": 1,
+    "age_days": 7,
+    "a": 4,
+    "b": 0.85
+   },
+   "outputs": {
+    "fraction": {
+     "value": 0.7,
+     "tolerance": {
+      "abs": 0.006
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "concrete-strength-gain",
+   "source_publisher": "American Concrete Institute (ACI Committee 209)",
+   "source_title": "ACI 209R-92 (Reapproved 1997) Prediction of Creep, Shrinkage, and Temperature Effects in Concrete Structures",
+   "source_edition_or_year": "1992 (reapproved 1997)",
+   "source_section_or_page": "Table 2.2.1 'Values of the Constants a, B and a/B and the Time Ratio From Eqs. (2-1) and (2-2)', row Moist cured, Type I, a = 4.0, B = .85, column 14 days: printed (f'c)t/(f'c)28 = 0.88. Eq. (2-1) (f'c)t = [t/(a + Bt)](f'c)28. Ratio only: fc28 = 1 normalizes it (fc28 does not enter the fraction). Table prints two decimals, so abs 0.006 covers the printed rounding.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "fc28": 1,
+    "age_days": 14,
+    "a": 4,
+    "b": 0.85
+   },
+   "outputs": {
+    "fraction": {
+     "value": 0.88,
+     "tolerance": {
+      "abs": 0.006
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "concrete-strength-gain",
+   "source_publisher": "American Concrete Institute (ACI Committee 209)",
+   "source_title": "ACI 209R-92 (Reapproved 1997) Prediction of Creep, Shrinkage, and Temperature Effects in Concrete Structures",
+   "source_edition_or_year": "1992 (reapproved 1997)",
+   "source_section_or_page": "Table 2.2.1 'Values of the Constants a, B and a/B and the Time Ratio From Eqs. (2-1) and (2-2)', row Moist cured, Type I, a = 4.0, B = .85, column 91 days: printed (f'c)t/(f'c)28 = 1.12. Eq. (2-1) (f'c)t = [t/(a + Bt)](f'c)28. Ratio only: fc28 = 1 normalizes it (fc28 does not enter the fraction). Table prints two decimals, so abs 0.006 covers the printed rounding.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "fc28": 1,
+    "age_days": 91,
+    "a": 4,
+    "b": 0.85
+   },
+   "outputs": {
+    "fraction": {
+     "value": 1.12,
+     "tolerance": {
+      "abs": 0.006
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "concrete-strength-gain",
+   "source_publisher": "American Concrete Institute (ACI Committee 209)",
+   "source_title": "ACI 209R-92 (Reapproved 1997) Prediction of Creep, Shrinkage, and Temperature Effects in Concrete Structures",
+   "source_edition_or_year": "1992 (reapproved 1997)",
+   "source_section_or_page": "Table 2.2.1 'Values of the Constants a, B and a/B and the Time Ratio From Eqs. (2-1) and (2-2)', row Moist cured, Type I, a = 4.0, B = .85, column 1 year (t = 365 d): printed (f'c)t/(f'c)28 = 1.16. Eq. (2-1) (f'c)t = [t/(a + Bt)](f'c)28. Ratio only: fc28 = 1 normalizes it (fc28 does not enter the fraction). Table prints two decimals, so abs 0.006 covers the printed rounding.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "fc28": 1,
+    "age_days": 365,
+    "a": 4,
+    "b": 0.85
+   },
+   "outputs": {
+    "fraction": {
+     "value": 1.16,
+     "tolerance": {
+      "abs": 0.006
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "concrete-strength-gain",
+   "source_publisher": "American Concrete Institute (ACI Committee 209)",
+   "source_title": "ACI 209R-92 (Reapproved 1997) Prediction of Creep, Shrinkage, and Temperature Effects in Concrete Structures",
+   "source_edition_or_year": "1992 (reapproved 1997)",
+   "source_section_or_page": "Table 2.2.1 'Values of the Constants a, B and a/B and the Time Ratio From Eqs. (2-1) and (2-2)', row Moist cured, Type III, a = 2.3, B = .92, column 7 days: printed (f'c)t/(f'c)28 = 0.8. Eq. (2-1) (f'c)t = [t/(a + Bt)](f'c)28. Ratio only: fc28 = 1 normalizes it (fc28 does not enter the fraction). Table prints two decimals, so abs 0.006 covers the printed rounding.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "fc28": 1,
+    "age_days": 7,
+    "a": 2.3,
+    "b": 0.92
+   },
+   "outputs": {
+    "fraction": {
+     "value": 0.8,
+     "tolerance": {
+      "abs": 0.006
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "concrete-strength-gain",
+   "source_publisher": "American Concrete Institute (ACI Committee 209)",
+   "source_title": "ACI 209R-92 (Reapproved 1997) Prediction of Creep, Shrinkage, and Temperature Effects in Concrete Structures",
+   "source_edition_or_year": "1992 (reapproved 1997)",
+   "source_section_or_page": "Table 2.2.1 'Values of the Constants a, B and a/B and the Time Ratio From Eqs. (2-1) and (2-2)', row Steam cured, Type I, a = 1.0, B = .95, column 3 days: printed (f'c)t/(f'c)28 = 0.78. Eq. (2-1) (f'c)t = [t/(a + Bt)](f'c)28. Ratio only: fc28 = 1 normalizes it (fc28 does not enter the fraction). Table prints two decimals, so abs 0.006 covers the printed rounding.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "fc28": 1,
+    "age_days": 3,
+    "a": 1,
+    "b": 0.95
+   },
+   "outputs": {
+    "fraction": {
+     "value": 0.78,
+     "tolerance": {
+      "abs": 0.006
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "concrete-strength-gain",
+   "source_publisher": "American Concrete Institute (ACI Committee 209)",
+   "source_title": "ACI 209R-92 (Reapproved 1997) Prediction of Creep, Shrinkage, and Temperature Effects in Concrete Structures",
+   "source_edition_or_year": "1992 (reapproved 1997)",
+   "source_section_or_page": "Table 2.2.1 'Values of the Constants a, B and a/B and the Time Ratio From Eqs. (2-1) and (2-2)', row Steam cured, Type III, a = .70, B = .98, column 7 days: printed (f'c)t/(f'c)28 = 0.93. Eq. (2-1) (f'c)t = [t/(a + Bt)](f'c)28. Ratio only: fc28 = 1 normalizes it (fc28 does not enter the fraction). Table prints two decimals, so abs 0.006 covers the printed rounding.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "fc28": 1,
+    "age_days": 7,
+    "a": 0.7,
+    "b": 0.98
+   },
+   "outputs": {
+    "fraction": {
+     "value": 0.93,
+     "tolerance": {
+      "abs": 0.006
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "well-point-spacing",
+   "source_publisher": "Headquarters, Departments of the Army, Air Force, and Navy",
+   "source_title": "TM 5-818-5 / AFM 88-5 Chap 6 / NAVFAC P-418, Dewatering and Groundwater Control",
+   "source_edition_or_year": "1983",
+   "source_section_or_page": "Appendix D, Figure D-1 'Open excavation; two-stage wellpoint system; gravity flow' (p. D-2): ground El 50, bottom of excavation El 20, original GWL El 40 (H = 40 ft above El 0); 'lower GWL 4 ft below bottom of excavation'; 'Assume two stages of wellpoints will be required'; upper stage lowers 'the groundwater 15 ft to el 25', lower stage 'to el 16'. So depth 30 ft, water table 10 ft below grade, margin 4 ft, total drawdown 40 - 16 = 24 ft, 2 stages at the 15 ft per-stage lift of para 4-6b(1) ('about 15 feet'). Bottom 100 x 750 ft (note 2), a = 10 ft upper-stage spacing; perimeter/point counts are NOT asserted (the TM rings sit 92 ft and 62 ft off centerline on a 700 ft line source). Integer outputs, exact.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "excavation_depth_ft": 30,
+    "water_table_depth_ft": 10,
+    "subgrade_margin_ft": 4,
+    "practical_lift_ft": 15,
+    "excavation_length_ft": 750,
+    "excavation_width_ft": 100,
+    "point_spacing_ft": 10,
+    "point_capacity_gpm": 0
+   },
+   "outputs": {
+    "total_drawdown_ft": {
+     "value": 24,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "stages_required": {
+     "value": 2,
+     "tolerance": {
+      "abs": 0
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "guard-handrail-check",
+   "source_publisher": "American Wood Council",
+   "source_title": "DCA 6 Prescriptive Residential Wood Deck Construction Guide (based on the 2015 IRC)",
+   "source_edition_or_year": "2015 IRC basis (DCA6-15, rev. 1804)",
+   "source_section_or_page": "p. 19 'GUARD REQUIREMENTS': 'All decks greater than 30\" above grade are required to have a guard [R312.1]'; Figure 24: '36\" minimum' guard height, 'openings shall not allow the passage of a 4\" diameter sphere'. Surface exactly 30 in -> not 'greater than 30', so no guard required; the 36 in / 4 in limits are reported regardless. Exact code values.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "occupancy": "residential",
+    "surface_height_in": 30,
+    "measured_guard_in": 36,
+    "measured_infill_gap_in": 4,
+    "at_stairs": "no",
+    "measured_handrail_in": 0
+   },
+   "outputs": {
+    "guard_required": {
+     "value": 0,
+     "tolerance": {
+      "abs": 0
+     }
+    },
+    "min_guard": {
+     "value": 36,
+     "tolerance": {
+      "abs": 0
+     }
+    },
+    "max_infill": {
+     "value": 4,
+     "tolerance": {
+      "abs": 0
+     }
+    },
+    "infill_ok": {
+     "value": 1,
+     "tolerance": {
+      "abs": 0
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "guard-handrail-check",
+   "source_publisher": "American Wood Council",
+   "source_title": "DCA 6 Prescriptive Residential Wood Deck Construction Guide (based on the 2015 IRC)",
+   "source_edition_or_year": "2015 IRC basis (DCA6-15, rev. 1804)",
+   "source_section_or_page": "p. 21 Figure 30 'Stair Guard Requirements': 'stair guard height: 34\" min. measured from nosing of step'; 'Openings for required guards on the sides of stair treads shall not allow a sphere 4-3/8\" to pass through'; p. 22 'handrail height ... shall be not less than 34 inches and not more than 38 inches [R311.7.8.1]'. Guard 34, gap 4.375 and handrail 34 all sit exactly at their printed limits and pass. Exact code values.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "occupancy": "residential",
+    "surface_height_in": 36,
+    "measured_guard_in": 34,
+    "measured_infill_gap_in": 4.375,
+    "at_stairs": "yes",
+    "measured_handrail_in": 34
+   },
+   "outputs": {
+    "min_guard": {
+     "value": 34,
+     "tolerance": {
+      "abs": 0
+     }
+    },
+    "max_infill": {
+     "value": 4.375,
+     "tolerance": {
+      "abs": 0
+     }
+    },
+    "guard_ok": {
+     "value": 1,
+     "tolerance": {
+      "abs": 0
+     }
+    },
+    "infill_ok": {
+     "value": 1,
+     "tolerance": {
+      "abs": 0
+     }
+    },
+    "handrail_ok": {
+     "value": 1,
+     "tolerance": {
+      "abs": 0
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "guard-handrail-check",
+   "source_publisher": "American Wood Council",
+   "source_title": "DCA 6 Prescriptive Residential Wood Deck Construction Guide (based on the 2015 IRC)",
+   "source_edition_or_year": "2015 IRC basis (DCA6-15, rev. 1804)",
+   "source_section_or_page": "p. 22 'STAIR HANDRAIL REQUIREMENTS': handrail height 'not less than 34 inches and not more than 38 inches [R311.7.8.1]'. A 38 in handrail is at the printed upper limit and passes. Exact code value.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "occupancy": "residential",
+    "surface_height_in": 36,
+    "measured_guard_in": 34,
+    "measured_infill_gap_in": 4,
+    "at_stairs": "yes",
+    "measured_handrail_in": 38
+   },
+   "outputs": {
+    "handrail_ok": {
+     "value": 1,
+     "tolerance": {
+      "abs": 0
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "stair-code-check",
+   "source_publisher": "American Wood Council",
+   "source_title": "DCA 6 Prescriptive Residential Wood Deck Construction Guide (based on the 2015 IRC)",
+   "source_edition_or_year": "2015 IRC basis (DCA6-15, rev. 1804)",
+   "source_section_or_page": "p. 20 Figure 27 'Tread and Riser Detail': '7-3/4\" maximum riser', '10\" minimum tread width'; text: 'Stairs shall be a minimum of 36\" in width as shown in Figure 33 [R311.7]'. All three at their printed limits pass. Exact code values.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "occupancy": "residential",
+    "riser_height_in": 7.75,
+    "tread_depth_in": 10,
+    "stair_width_in": 36
+   },
+   "outputs": {
+    "max_riser": {
+     "value": 7.75,
+     "tolerance": {
+      "abs": 0
+     }
+    },
+    "min_tread": {
+     "value": 10,
+     "tolerance": {
+      "abs": 0
+     }
+    },
+    "min_width": {
+     "value": 36,
+     "tolerance": {
+      "abs": 0
+     }
+    },
+    "riser_ok": {
+     "value": 1,
+     "tolerance": {
+      "abs": 0
+     }
+    },
+    "tread_ok": {
+     "value": 1,
+     "tolerance": {
+      "abs": 0
+     }
+    },
+    "width_ok": {
+     "value": 1,
+     "tolerance": {
+      "abs": 0
+     }
+    },
+    "all_pass": {
+     "value": 1,
      "tolerance": {
       "abs": 0
      }

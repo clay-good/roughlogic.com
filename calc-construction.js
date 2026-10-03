@@ -4788,7 +4788,7 @@ export function computeGuardHandrailCheck({ occupancy = "residential", surface_h
   const max_infill = onStairs && !isCommercial ? 4.375 : 4.0;
   const guard_ok = !guard_required || measured_guard_in >= min_guard - 1e-9 * Math.abs(min_guard);
   const infill_ok = measured_infill_gap_in <= max_infill + 1e-9 * Math.abs(max_infill);
-  const handrail_ok = !onStairs || (measured_handrail_in >= 34 && measured_handrail_in <= 38);
+  const handrail_ok = !onStairs || (measured_handrail_in >= 34 - 1e-9 * 34 && measured_handrail_in <= 38 + 1e-9 * 38);
   const all_pass = guard_ok && infill_ok && handrail_ok;
   return {
     guard_required, min_guard, max_infill, guard_ok, infill_ok, handrail_ok, all_pass,
@@ -6339,7 +6339,7 @@ export const concreteStrengthGainExample = {
 };
 
 const _renderConcreteStrengthGain = _simpleRenderer({
-  citation: "Citation: ACI 209R strength-development model: f'c(t) = [t / (a + b x t)] x f'c(28), with the developed fraction relative to the 28-day strength. Bundled constants (editable): Type I/II moist-cured a = 4.0, b = 0.85 (steam-cured and Type III mixes take different pairs). The constants are for the cement type and curing named; other cements or accelerators shift the curve. An estimate of the mean strength trend, not a substitute for field-cured cylinder breaks or the maturity method (ASTM C1074); the engineer of record and the project specification set the actual strip / shore-removal / stressing strengths (commonly ~75% of f'c to remove shores), and cold weather slows the gain the model does not see. A scheduling estimate, not a strength acceptance.",
+  citation: "Citation: ACI 209R strength-development model: f'c(t) = [t / (a + b x t)] x f'c(28), with the developed fraction relative to the 28-day strength. Bundled constants (editable): Type I moist-cured a = 4.0, b = 0.85 (steam-cured and Type III mixes take different pairs; ACI 209R-92 says the table does not apply to Type II or Type V cement). The constants are for the cement type and curing named; other cements or accelerators shift the curve. An estimate of the mean strength trend, not a substitute for field-cured cylinder breaks or the maturity method (ASTM C1074); the engineer of record and the project specification set the actual strip / shore-removal / stressing strengths (commonly ~75% of f'c to remove shores), and cold weather slows the gain the model does not see. A scheduling estimate, not a strength acceptance.",
   example: concreteStrengthGainExample.inputs,
   fields: [
     { key: "fc28", label: "Specified 28-day strength f'c (psi)", kind: "number" },

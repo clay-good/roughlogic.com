@@ -110,7 +110,8 @@ export function computeCraneLoadRadiusBoom({ boom_length_ft = 30, boom_angle_deg
   const ratio = (target_radius_ft - boom_foot_offset_ft) / boom_length_ft;
   let angle_for_target_radius_deg = null;
   let target_reachable = true;
-  if (ratio >= -1 && ratio <= 1) angle_for_target_radius_deg = Math.acos(ratio) * 180 / Math.PI;
+  // ratio < 0 would need a boom angle past vertical, which the tile rejects as an input.
+  if (ratio >= 0 && ratio <= 1) angle_for_target_radius_deg = Math.acos(ratio) * 180 / Math.PI;
   else target_reachable = false;
   if (![load_radius_ft, boom_tip_height_ft].every(Number.isFinite)) return { error: "Crane-geometry math is not a finite value." };
   return {

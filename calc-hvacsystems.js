@@ -1845,7 +1845,7 @@ export function computeProportionalBalanceRatio({
   const branch_after_equalizing_cfm = branch_design_cfm * reference_ratio;
   const branch_adjustment_factor = reference_ratio > 0 ? 1 / reference_ratio : 0;
   const ratio_spread = Math.max(...rows.map((r) => r.ratio)) - reference_ratio;
-  const already_proportional = ratio_spread < 0.01;
+  const already_proportional = ratio_spread <= 0.01 + 1e-9; // "within a hundredth" is inclusive
   const rows_text = targets.map((t) => t.label + " " + fmt(t.ratio, 2) + (t.is_reference ? " (REFERENCE, leave wide open)" : " -> " + fmt(t.target, 0) + " cfm")).join("; ");
   const method_verdict = already_proportional
     ? "the outlets are already within a hundredth of each other in ratio, so equalizing has nothing to do -- go straight to the branch damper"
@@ -2034,7 +2034,7 @@ export function computeCoilCapacityVerification({
   const balance_difference_pct = Math.abs(water_btuh - air_used_btuh) / water_btuh * 100;
   const sensible_only_difference_pct = Math.abs(water_btuh - air_sensible_btuh) / water_btuh * 100;
   // The verdict, against the ENTERED tolerance rather than an assumed one.
-  const balances = balance_difference_pct <= tolerance_pct;
+  const balances = balance_difference_pct <= tolerance_pct + 1e-9 * Math.abs(tolerance_pct);
   const air_reads_high = air_used_btuh > water_btuh;
   const balance_verdict = balances
     ? "the two sides agree within " + fmt(balance_difference_pct, 1) + "%, inside the " + fmt(tolerance_pct, 1) + "% tolerance -- agreement between two independent measurements is strong evidence that both are right"

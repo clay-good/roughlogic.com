@@ -38,8 +38,21 @@ function splitTop(expr) {
   return terms.map((t) => t.trim());
 }
 
+// A term wrapped whole in parentheses -- `!x || (a >= 34 && a <= 38)` -- is
+// opened and checked term by term (2026-10-03: a handrail window hid there).
+function wrapped(t) {
+  if (!(t.startsWith("(") && t.endsWith(")"))) return false;
+  let d = 0;
+  for (let i = 0; i < t.length - 1; i++) { if (t[i] === "(") d++; else if (t[i] === ")") d--; if (d === 0) return false; }
+  return true;
+}
+
+function flatTerms(expr) {
+  return splitTop(expr).flatMap((t) => (wrapped(t) ? flatTerms(t.slice(1, -1)) : [t]));
+}
+
 function unguardedTerms(expr) {
-  return splitTop(expr).filter((t) => !t.includes("1e-") && singleInclusive(t));
+  return flatTerms(expr).filter((t) => !t.includes("1e-") && singleInclusive(t));
 }
 
 function singleInclusive(t) {
@@ -97,7 +110,7 @@ test("every strict failure verdict against a limit carries float slack away from
     readFileSync(resolve(ROOT, f), "utf8").split("\n").forEach((line, i) => {
       const m = FAIL.exec(line);
       if (!m) return;
-      const terms = splitTop(m[2]);
+      const terms = flatTerms(m[2]);
       for (const t of terms) if (!t.includes("1e-") && !t.startsWith("!") && !t.startsWith("(") && singleStrict(t)) bad.push(f + ":" + (i + 1) + " " + m[1] + ": " + t.slice(0, 60));
     });
   }

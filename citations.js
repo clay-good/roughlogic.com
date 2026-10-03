@@ -20115,7 +20115,7 @@ export const CITATIONS = {
     edition: "ACI 209R strength-development model f'c(t) = [t / (a + b t)] x f'c(28), by name; the constants are for the cement type and curing named.",
     freeAccess: "The strength-development model is published in ACI 209R; the arithmetic is public. The constants are the ACI 209 values for the cement type.",
     governance: GOVERNANCE.general,
-    editionNote: "ACI 209R strength-development model: f'c(t) = [t / (a + b x t)] x f'c(28), the developed fraction expressed relative to the 28-day strength. Bundled constants (editable): Type I / II moist-cured a = 4.0, b = 0.85; steam-cured and Type III mixes take different pairs. The constants are for the cement type and curing named, and other cements or accelerators shift the curve; the model estimates the mean strength trend and is not a substitute for field-cured cylinder breaks or the maturity method (ASTM C1074); the engineer of record and the project specification set the actual strip / shore-removal / stressing strengths (commonly on the order of 75% of f'c to remove shores); cold weather slows the gain the model does not see. A scheduling estimate, not a strength acceptance.",
+    editionNote: "ACI 209R strength-development model: f'c(t) = [t / (a + b x t)] x f'c(28), the developed fraction expressed relative to the 28-day strength. Bundled constants (editable): Type I moist-cured a = 4.0, b = 0.85; steam-cured and Type III mixes take different pairs, and ACI 209R-92 says the table does not apply to Type II or Type V cement. The constants are for the cement type and curing named, and other cements or accelerators shift the curve; the model estimates the mean strength trend and is not a substitute for field-cured cylinder breaks or the maturity method (ASTM C1074); the engineer of record and the project specification set the actual strip / shore-removal / stressing strengths (commonly on the order of 75% of f'c to remove shores); cold weather slows the gain the model does not see. A scheduling estimate, not a strength acceptance.",
     assumptions: [
       { name: "Developed fraction", value: "t / (a + b t) lands near 46% at 3 days, 70% at 7, and 88% at 14 for Type I moist-cured", source: "ACI 209R" },
       { name: "Inverse solve", value: "the age to a target percent is (a x f) / (1 - b x f) for f = target/100 below the 1/b asymptote", source: "ACI 209R" },
@@ -20843,10 +20843,10 @@ export const CITATIONS = {
     edition: "IRC R606.12.2 and TMS 402 masonry horizontal joint-reinforcement provisions, by name; the spacing and lap come from the adopted code and the structural spec.",
     freeAccess: "The count arithmetic is public first-principles; the 16 in maximum vertical spacing and 6 in minimum lap are in IRC R606.12.2 (many jurisdictions post the adopted IRC).",
     governance: GOVERNANCE.general,
-    editionNote: "Horizontal joint reinforcement (ladder or truss wire) laid in the mortar bed joints of a masonry wall for crack control and, where designed, flexural capacity. The reinforced courses = ceil(height / vertical spacing); IRC R606.12.2 and TMS 402 set the maximum vertical spacing at 16 in (every other 8 in course), and some specs tighten it to 8 in or add wire at bond beams, lintels, and above and below openings. Pieces per course = ceil(length / piece length), and the wire (typically ~10 ft lengths) laps at least 6 in -- the lap is NOT added into the count here. This is a material count; the required spacing, the lap, the extra wire at openings and corners, and whether the wire is structural come from the structural spec and the adopted code.",
+    editionNote: "Horizontal joint reinforcement (ladder or truss wire) laid in the mortar bed joints of a masonry wall for crack control and, where designed, flexural capacity. The reinforced courses = ceil(height / vertical spacing); IRC R606.12.2 and TMS 402 set the maximum vertical spacing at 16 in (every other 8 in course), and some specs tighten it to 8 in or add wire at bond beams, lintels, and above and below openings. Pieces per course = 1 + ceil((length - piece) / (piece - lap)), because the wire (typically ~10 ft lengths) laps at least 6 in and each added piece loses the lap. This is a material count; the required spacing, the lap, the extra wire at openings and corners, and whether the wire is structural come from the structural spec and the adopted code.",
     assumptions: [
       { name: "Vertical spacing", value: "IRC R606.12.2 / TMS 402 max 16 in o.c. (every other 8 in course); some specs tighten to 8 in", source: "IRC R606.12.2" },
-      { name: "Lap not counted", value: "wire laps >= 6 in and gets extra runs at openings/corners; not added into this count", source: "masonry practice" },
+      { name: "Lap counted", value: "wire laps >= 6 in (9 in for 3/16 in wire) and each added piece loses the lap; extra runs at openings and corners are not counted", source: "IRC R606.12.2" },
     ],
   },
   "masonry-lintel-loading": {
@@ -23000,7 +23000,7 @@ export const CITATIONS = {
     governance: GOVERNANCE.general,
     editionNote: "The rule the arithmetic encodes is that the zone is judged by the WEAKEST appliance in it, so a zone can contain appliances that individually pass and still fail. A natural-draft water heater with a limit of a few pascals sitting alongside an induced-draft furnace governs the whole zone, and this is the test that must be resolved before any further air sealing -- tightening a house that already fails is how backdrafting becomes carbon monoxide exposure. Reducing the exhaust that causes the depressurization comes before makeup air, and replacing the weakest appliance with a sealed-combustion unit removes the problem rather than managing it.",
     assumptions: [
-      { name: "Net of base pressure", value: "the reading is the worst case LESS the base (house at rest) reading: base +1 Pa and worst case -3 Pa is a net -4 Pa, which fails a 3 Pa limit the raw reading passes; BPI puts direct vent and sealed combustion at -50 Pa and -15 Pa on power venting alone", source: "BPI Building Analyst Standard; CT DEEP Form 5" },
+      { name: "Net of base pressure", value: "the reading is the worst case LESS the base (house at rest) reading: base +1 Pa and worst case -3 Pa is a net -4 Pa, which fails a 3 Pa limit the raw reading passes; BPI puts direct vent and sealed combustion at -50 Pa and a mechanically assisted draft furnace or boiler vented alone at -15 Pa", source: "BPI Building Analyst Standard; CT DEEP Form 5" },
       { name: "Limits are entered by appliance class", value: "they differ between protocols and jurisdictions", source: "BPI / the adopted protocol" },
       { name: "Worst case is a test condition", value: "every exhaust on, interior doors positioned to worsen it", source: "the CAZ procedure" },
       { name: "Not a spillage or CO test", value: "pressure only", source: "the full combustion safety protocol" },
@@ -24518,6 +24518,7 @@ export const CITATIONS = {
     assumptions: [
       { name: "Reference electrode", value: "copper-copper sulfate; other references shift every figure", source: "NACE SP0169" },
       { name: "Interruption", value: "every influencing source must be interrupted synchronously", source: "survey procedure" },
+      { name: "Where 100 mV does not apply", value: "not on bimetallic systems (mixed potentials) or under stray current; steel coupled to copper can clear 100 mV and still be unprotected", source: "UFC 3-570-06 (2019) 2-1.3.1; MPCA, Guidelines for the Evaluation of UST Cathodic Protection Systems (2012) p.14" },
     ],
   },
   "coating-breakdown-factor": {
@@ -24835,13 +24836,13 @@ export const CITATIONS = {
   },
   "greenhouse-transpiration-water": {
     formula: "transpiration = solar energy through the glazing x the crop's latent fraction / 1,050 Btu per pound of water; applied = transpiration / (1 - leaching fraction).",
-    edition: "An energy balance. The crop's own stage and the irrigation designer govern; UMass Extension sizes the water supply itself at 0.3 to 0.4 gal per square foot of bench per day at peak.",
-    freeAccess: "Public energy balance; the grower band is widely published.",
+    edition: "An energy balance. The crop's own stage and the irrigation designer govern; UMass Extension sizes the water supply itself at 0.3 to 0.4 gal per square foot of growing area per day, the warmest-day peak, which it says matches evapotranspiration.",
+    freeAccess: "Public energy balance; the UMass Extension fact sheet is free online.",
     governance: GOVERNANCE.general,
     editionNote: "Irrigation must deliver the PEAK hour, not the daily total divided by the day length. Every pound transpired enters the house air: a ventilated house blows it outside, while a sealed house must remove it, which is why closed rooms fail on humidity first.",
     assumptions: [
       { name: "Latent fraction", value: "entered; roughly half for a well-watered crop and much lower for a sparse or stressed one", source: "grower observation" },
-      { name: "Supply sizing", value: "0.3 to 0.4 gal per sq ft of bench per day at peak sizes the supply; crop transpiration is a smaller figure", source: "UMass Extension, Sizing the Greenhouse Water System (Bartok, 2009)" },
+      { name: "Supply sizing", value: "0.3 to 0.4 gal per sq ft of growing area per day is the warmest-day peak use and calls it evapotranspiration; it is a conservative supply rule, and an energy-balance transpiration runs well under it", source: "UMass Extension, Sizing the Greenhouse Water System (Bartok, 2009)" },
     ],
   },
   "thermal-screen-energy-saving": {

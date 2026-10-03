@@ -664,6 +664,8 @@ export function computeLandfillSettlementAirspace({ waste_thickness_ft = 0, fill
   const differential_settlement_ft = Math.abs(total_settlement_ft - adjacent_settlement_ft);
   const design_fall_ft = slope_run_ft * cap_slope_pct / 100;
   const remaining_fall_ft = design_fall_ft - differential_settlement_ft;
+  // Float slack: the two settlements round separately, so an exact zero lands at +/-1.8e-15.
+  const slope_reverses = remaining_fall_ft <= 1e-9 * Math.abs(design_fall_ft);
   return {
     area_sqft, primary_settlement_ft, secondary_settlement_ft, total_settlement_ft,
     total_volume_cy: volumeOf(total_settlement_ft),
@@ -675,7 +677,7 @@ export function computeLandfillSettlementAirspace({ waste_thickness_ft = 0, fill
     cap_slope_pct, design_fall_ft, remaining_fall_ft,
     remaining_slope_pct: 100 * remaining_fall_ft / slope_run_ft,
     fall_consumed_pct: 100 * differential_settlement_ft / design_fall_ft,
-    slope_reverses: remaining_fall_ft <= 0,
+    slope_reverses,
     note: "Only the PRIMARY settlement, which arrives in weeks to months while the cell is still open, is recoverable airspace -- capacity the site never permitted, never excavated, and never paid for, and the case for filling in lifts and coming back over a cell rather than closing it as soon as it reaches grade. The secondary settlement arrives over decades after the cap is on and only lowers the cover and the final grades. That is where the hazard is: a slightly deeper fill or a slightly flatter starting grade takes the remaining fall past zero and REVERSES it, and then the cap ponds, the water infiltrates, and a closed cell starts making leachate again. Final grades are designed with the settlement added back in, which is why a freshly capped landfill looks steeper than the drawing -- and why the differential, not the total, is the number that governs the cap. The site's own settlement monitoring, the closure plan, and the permit's minimum final-cover slope govern.",
   };
 }

@@ -461,7 +461,7 @@ export function computeCazDepressurizationLimit({
   has_natural_draft_water_heater = "no", natural_draft_wh_limit_pa = 2,
   has_natural_draft_furnace = "no", natural_draft_furnace_limit_pa = 3,
   has_induced_draft = "no", induced_draft_limit_pa = 5,
-  has_direct_vent = "no", direct_vent_limit_pa = 15,
+  has_direct_vent = "no", direct_vent_limit_pa = 50,
   largest_exhaust_cfm = 0,
 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
@@ -474,8 +474,8 @@ export function computeCazDepressurizationLimit({
   const present = [];
   if (has_natural_draft_water_heater === "yes") present.push({ name: "natural draft water heater", limit: natural_draft_wh_limit_pa });
   if (has_natural_draft_furnace === "yes") present.push({ name: "natural draft furnace or boiler", limit: natural_draft_furnace_limit_pa });
-  if (has_induced_draft === "yes") present.push({ name: "induced draft appliance", limit: induced_draft_limit_pa });
-  if (has_direct_vent === "yes") present.push({ name: "direct vent or power vent appliance", limit: direct_vent_limit_pa });
+  if (has_induced_draft === "yes") present.push({ name: "mechanically assisted draft appliance", limit: induced_draft_limit_pa });
+  if (has_direct_vent === "yes") present.push({ name: "direct vent or sealed combustion appliance", limit: direct_vent_limit_pa });
   if (present.length === 0) return { error: "Select at least one appliance in the zone -- with no combustion appliance there is no depressurization limit to test against." };
   // The zone is judged by the WEAKEST appliance present.
   let weakest = present[0];
@@ -504,20 +504,20 @@ export function computeCazDepressurizationLimit({
     note: "Whether a combustion appliance zone stays inside its depressurization limit under worst-case conditions. The physics is that an atmospherically vented appliance draws its combustion air from the room and relies on a weak buoyant draft to push flue gases up the chimney -- a draft worth only a few pascals. Any exhaust that pulls the room more negative than that draft can overcome reverses the flow, and the flue becomes an inlet: combustion products, including carbon monoxide, enter the house instead of leaving it. That is why the limits are small numbers and why they differ by venting type, from a couple of pascals for a natural draft water heater to well over ten for a sealed-combustion unit. The zone is judged by the WEAKEST appliance in it, and that is the part that gets misread. A basement with a natural draft water heater and an induced draft furnace is governed by the water heater, so a reading that the furnace passes comfortably can still fail the zone -- and it is reported that way here rather than as a single pass or fail, because the fix depends on which appliance is the problem. Worst case is a test condition, not an observation. It means every exhaust appliance running, interior doors positioned to maximise the depressurization, and the air handler tested both on and off, because a duct leak on the return side can depressurize the zone by itself. A CAZ test done without establishing worst case has measured something, but not the thing the limit refers to. The connection to air sealing is why this belongs in a weatherization workflow rather than only a service call. Every hole sealed makes the house tighter and the same exhaust more effective at depressurizing it, so a zone that passes today can fail after the crew leaves -- and a house that fails should not be sealed further until the appliance or the exhaust is resolved. The limits are ENTERED because they vary by protocol and by jurisdiction. This does not perform the test, establish worst case, measure spillage or draft, test for carbon monoxide (which is a separate and non-optional measurement), or evaluate the venting system, its sizing or its condition. The BPI or equivalent protocol in force, the appliance manufacturer, and the technician's own judgment govern.",
   };
 }
-export const cazDepressurizationLimitExample = { inputs: { measured_depressurization_pa: 4.5, has_natural_draft_water_heater: "yes", natural_draft_wh_limit_pa: 2, has_natural_draft_furnace: "no", natural_draft_furnace_limit_pa: 3, has_induced_draft: "yes", induced_draft_limit_pa: 5, has_direct_vent: "no", direct_vent_limit_pa: 15, largest_exhaust_cfm: 200 } };
+export const cazDepressurizationLimitExample = { inputs: { measured_depressurization_pa: 4.5, has_natural_draft_water_heater: "yes", natural_draft_wh_limit_pa: 2, has_natural_draft_furnace: "no", natural_draft_furnace_limit_pa: 3, has_induced_draft: "yes", induced_draft_limit_pa: 5, has_direct_vent: "no", direct_vent_limit_pa: 50, largest_exhaust_cfm: 200 } };
 BUILDINGPERF_RENDERERS["caz-depressurization-limit"] = _simpleRenderer({
-  citation: "Citation: the combustion appliance zone depressurization limits as BPI and weatherization practice state them -- commonly around -2 Pa for a natural draft water heater, -3 Pa for a natural draft furnace or boiler, -5 Pa induced draft, -15 Pa power vented alone and -50 Pa direct vent or sealed combustion -- with the zone judged by the WEAKEST appliance present and the reading taken NET of the base pressure under WORST CASE (every exhaust running, doors positioned to maximise it, air handler both on and off). Limits are ENTERED because they vary by protocol and jurisdiction. It does not perform the test, establish worst case, measure spillage or draft, test for carbon monoxide (a separate and non-optional measurement), or evaluate the venting system. The protocol in force and the technician's judgment govern.",
+  citation: "Citation: the combustion appliance zone depressurization limits as BPI and weatherization practice state them -- commonly around -2 Pa for a natural draft water heater, -3 Pa for a natural draft furnace or boiler sharing a vent with the water heater (-5 Pa vented alone), -5 Pa for a mechanically assisted draft furnace or boiler sharing a vent with a water heater (-15 Pa alone), and -50 Pa for direct vent or sealed combustion (BPI Building Analyst Technical Standards, CAZ Depressurization Limits table) -- with the zone judged by the WEAKEST appliance present and the reading taken NET of the base pressure under WORST CASE (every exhaust running, doors positioned to maximise it, air handler both on and off). Limits are ENTERED because they vary by protocol and jurisdiction. It does not perform the test, establish worst case, measure spillage or draft, test for carbon monoxide (a separate and non-optional measurement), or evaluate the venting system. The protocol in force and the technician's judgment govern.",
   example: cazDepressurizationLimitExample.inputs,
   fields: [
     { key: "measured_depressurization_pa", label: "NET worst-case depressurization (Pa, magnitude: worst case less the base reading, BPI)", kind: "number", attrs: { step: "any" } },
     { key: "has_natural_draft_water_heater", label: "Natural draft water heater present?", kind: "select", default: "no", options: [{ value: "no", label: "No" }, { value: "yes", label: "Yes" }] },
     { key: "natural_draft_wh_limit_pa", label: "Its limit (Pa)", kind: "number", default: 2, attrs: { step: "any" } },
-    { key: "has_natural_draft_furnace", label: "Natural draft furnace or boiler present?", kind: "select", default: "no", options: [{ value: "no", label: "No" }, { value: "yes", label: "Yes" }] },
+    { key: "has_natural_draft_furnace", label: "Natural draft furnace or boiler present? (BPI: 3 Pa when it shares a vent with the water heater, 5 Pa alone)", kind: "select", default: "no", options: [{ value: "no", label: "No" }, { value: "yes", label: "Yes" }] },
     { key: "natural_draft_furnace_limit_pa", label: "Its limit (Pa)", kind: "number", default: 3, attrs: { step: "any" } },
-    { key: "has_induced_draft", label: "Induced draft appliance present?", kind: "select", default: "no", options: [{ value: "no", label: "No" }, { value: "yes", label: "Yes" }] },
+    { key: "has_induced_draft", label: "Induced (mechanically assisted) draft furnace or boiler present? (BPI: 5 Pa sharing a vent with a water heater, 15 Pa alone)", kind: "select", default: "no", options: [{ value: "no", label: "No" }, { value: "yes", label: "Yes" }] },
     { key: "induced_draft_limit_pa", label: "Its limit (Pa)", kind: "number", default: 5, attrs: { step: "any" } },
-    { key: "has_direct_vent", label: "Direct or power vent appliance present?", kind: "select", default: "no", options: [{ value: "no", label: "No" }, { value: "yes", label: "Yes" }] },
-    { key: "direct_vent_limit_pa", label: "Its limit (Pa)", kind: "number", default: 15, attrs: { step: "any" } },
+    { key: "has_direct_vent", label: "Direct vent or sealed combustion appliance present? (BPI: 50 Pa)", kind: "select", default: "no", options: [{ value: "no", label: "No" }, { value: "yes", label: "Yes" }] },
+    { key: "direct_vent_limit_pa", label: "Its limit (Pa)", kind: "number", default: 50, attrs: { step: "any" } },
     { key: "largest_exhaust_cfm", label: "Largest single exhaust (cfm, 0 to skip)", kind: "number", attrs: { step: "any" } },
   ],
   outputs: [
