@@ -262,8 +262,8 @@ SAFETY_RENDERERS["hearing-protector-nrr"] = _simpleRendererG({
     { key: "nrr_db", label: "Noise reduction rating on the package (dB)", kind: "number" },
     { key: "method", label: "Method", kind: "select", options: [{ value: "appendix-b", label: "Appendix B as written (no derating)" }, { value: "osha-50", label: "OSHA field guidance (halve the adjusted value)" }, { value: "niosh-muff", label: "NIOSH earmuffs (NRR less 25%)" }, { value: "niosh-formable", label: "NIOSH formable earplugs (NRR less 50%)" }, { value: "niosh-other", label: "NIOSH all other earplugs (NRR less 70%)", selected: true }] },
     { key: "dual_protection", label: "Plugs and muffs worn together?", kind: "select", options: [{ value: "no", label: "No", selected: true }, { value: "yes", label: "Yes" }] },
-    { key: "dual_bonus_db", label: "Dual-protection bonus (dB; editable, not from Appendix B)", kind: "number" },
-    { key: "target_db", label: "Target exposure at the ear (dB)", kind: "number" },
+    { key: "dual_bonus_db", label: "Dual-protection bonus (dB; editable, not from Appendix B)", kind: "number", default: 5 },
+    { key: "target_db", label: "Target exposure at the ear (dB)", kind: "number", default: 85 },
   ],
   outputs: [
     { key: "s", id: "hpn-out-s", label: "Spectral adjustment", value: (r) => r.spectral_adjustment_db === 0 ? "none applied - either the measurement is C-weighted, or the NIOSH derating stands in its place" : "7 dB comes off the NRR because the measurement is A-weighted" },

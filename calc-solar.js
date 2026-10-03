@@ -721,7 +721,7 @@ function renderPvArraySizing(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: NREL PVWatts energy model E = Pdc x PSH x 365 x PR solved for the array size, Pdc = E_target / (PSH x 365 x PR) (by name). The peak-sun-hours is the plane-of-array daily irradiation from NREL NSRDB / PVWatts for the site, tilt, and azimuth; the performance ratio (default 0.77, a typical whole-system ratio that includes temperature loss; it equals the retired PVWatts V1 derate -- current PVWatts takes 14% system losses and a 96% inverter, 0.826, and models temperature separately) is the single biggest lever. A pre-design estimate, not a bankable production model.";
   const kwh = makeNumber("Target annual energy (kWh/yr)", "pas-kwh", { step: "any", min: "0" });
   const psh = makeNumber("Peak-sun-hours (kWh/m2/day)", "pas-psh", { step: "any", min: "0" });
-  const pr = makeNumber("Performance ratio (0-1)", "pas-pr", { step: "any", min: "0" });
+  const pr = makeNumber("Performance ratio (0-1)", "pas-pr", { step: "any", min: "0", value: "0.77" });
   for (const f of [kwh, psh, pr]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { kwh.input.value = "12000"; psh.input.value = "5"; pr.input.value = "0.77"; update(); });
   const oDc = makeOutputLine(outputRegion, "Required DC array size", "pas-out-dc");

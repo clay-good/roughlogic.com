@@ -287,7 +287,7 @@ export function computeGasLeakHoleDiameter({ leak_rate_cfh, upstream_psi, gas, c
     orifice_area_in2,
     discharge_coefficient: cd,
     specific_gravity: props.specific_gravity,
-    note: "Equivalent orifice diameter for a measured gas leak: from Q = 8706 c A sqrt(dP / SG) with A = pi d^2 / 4, d = sqrt( 4 Q / (8706 c pi sqrt(dP / SG)) ). This is the small-leak orifice-flow approximation (compressible, subsonic) - an ESTIMATE of the effective hole size, not a code leak-test method. The discharge coefficient (0.7 default for a rough crack; about 0.6 for a sharp-edged orifice) and the actual crack geometry, temperature, and choked-flow at high pressure ratios all shift it. Any positive leak is a hazard: find and repair it, and follow the code test and the utility's procedure.",
+    note: "Equivalent orifice diameter for a measured gas leak: from Q = 8706 c A sqrt(dP / SG) with A = pi d^2 / 4, d = sqrt( 4 Q / (8706 c pi sqrt(dP / SG)) ). This is the small-leak orifice-flow approximation (incompressible, low-pressure) - an ESTIMATE of the effective hole size, not a code leak-test method. The discharge coefficient (0.7 default for a rough crack; about 0.6 for a sharp-edged orifice) and the actual crack geometry, temperature, and choked-flow at high pressure ratios all shift it. Any positive leak is a hazard: find and repair it, and follow the code test and the utility's procedure.",
   };
 }
 export const gasLeakHoleDiameterExample = {

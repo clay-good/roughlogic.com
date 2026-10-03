@@ -91,7 +91,7 @@ export const BESPOKE_OUTPUT_LABELS = {
   "box-culvert-outlet-control": {"hw_ft":"Headwater HW (outlet control)","head_loss_ft":"Total head loss H","v_fps":"Full-barrel velocity","ho_ft":"Outlet head ho","note":"Note"},
   "box-fill": {"fill_in3":"Fill","pass":"Result"},
   "braking-distance": {"braking_distance_ft":"Braking distance","reaction_distance_ft":"Reaction distance","total_distance_ft":"Total stopping distance"},
-  "branch-circuit-wire-footage": {"total_ft":"Total conductor footage","rolls":"Rolls per color"},
+  "branch-circuit-wire-footage": {"total_ft":"Total conductor footage","rolls":"Rolls (all conductors)"},
   "branch-reinforcement": {"a_required_in2":"Area required (replacement)","a_available_in2":"Area available (run + branch)","large_branch":"Verdict"},
   "branch-saddle-cutback": {"max_cutback_in":"Maximum cutback (at the sides)","ordinates":"Ordinates (angle: cutback, in)"},
   "break-even-occupancy": {"beo_pct":"Break-even occupancy","cushion_pts":"Cushion to market occupancy"},

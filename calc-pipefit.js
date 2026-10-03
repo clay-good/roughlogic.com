@@ -612,7 +612,7 @@ function _renderHangerRodSizing(inputRegion, outputRegion, citationEl) {
   const oRod = makeOutputLine(outputRegion, "Minimum rod diameter", "hr-out-rod");
   const oUtil = makeOutputLine(outputRegion, "Rated load / utilization", "hr-out-util");
   const update = debounce(() => {
-    const r = computeHangerRodSizing({ load_lb: Number(load.input.value) || 0, temp_derate: Number(derate.input.value) || 0 });
+    const r = computeHangerRodSizing({ load_lb: Number(load.input.value) || 0, temp_derate: derate.input.value === "" ? 1 : Number(derate.input.value) });
     if (r.error) { oRod.textContent = r.error; oUtil.textContent = "-"; return; }
     oRod.textContent = r.rod_dia + " in";
     oUtil.textContent = fmt(r.rated_lb, 0) + " lb rated, " + fmt(r.utilization_pct, 0) + "% utilized";

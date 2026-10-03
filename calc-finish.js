@@ -894,9 +894,11 @@ export function computeDripEdgeTakeoff({ eave_length_ft = 0, rake_run_ft = 0, ra
   const total_lf = eave_lf + rake_lf;
   const total_with_waste_lf = total_lf * (1 + waste / 100);
   const effective_piece_ft = stock - lap / 12;
-  const pieces = Math.ceil(total_with_waste_lf / effective_piece_ft - 1e-9);
   const eave_pieces = eave_lf > 0 ? Math.ceil(eave_lf * (1 + waste / 100) / effective_piece_ft - 1e-9) : 0;
   const rake_pieces = rake_lf > 0 ? Math.ceil(rake_lf * (1 + waste / 100) / effective_piece_ft - 1e-9) : 0;
+  // Eave and rake drip are different profiles, so the order is the sum of the two counts.
+  // Until 2026-10-03 the total was figured on the combined length (16 where 9 + 8 = 17).
+  const pieces = eave_pieces + rake_pieces;
   if (![slope_factor, rake_lf, total_lf, pieces].every(Number.isFinite)) return { error: "Drip-edge math did not produce a finite value." };
   return {
     slope_factor, eave_lf, rake_plan_lf, rake_lf, rake_slope_gain_lf, total_lf,

@@ -53,7 +53,7 @@ export function computeSolarEgc69045({ ocpd_rating_a = 0, pv_isc_a = 0, vd_upsiz
 export const solarEgc69045Example = { inputs: { ocpd_rating_a: 20, pv_isc_a: 0, vd_upsized: "no" } };
 
 function renderSolarEgc69045(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: NEC 2023 690.45 equipment grounding conductors for PV systems with Table 250.122: the EGC is sized from the governing overcurrent rating (or, where there is no OCPD, from the PV short-circuit current), never smaller than 14 AWG, and 690.45 waives the 250.122(B) proportional upsize so enlarging the circuit conductors for voltage drop does not enlarge the EGC. The NEC and the AHJ govern.";
+  citationEl.textContent = "Citation: NEC 2023 690.45 equipment grounding conductors for PV systems with Table 250.122: the EGC is sized from the governing overcurrent rating (or, where there is no OCPD, from an assumed device at the PV maximum circuit current, 1.25 x Isc), never smaller than 14 AWG, and 690.45 waives the 250.122(B) proportional upsize so enlarging the circuit conductors for voltage drop does not enlarge the EGC. The NEC and the AHJ govern.";
   const ocpd = makeNumber("OCPD rating (A, 0 = no OCPD)", "segc-ocpd", { step: "1", min: "0" });
   const isc = makeNumber("PV short-circuit current (A, used if no OCPD)", "segc-isc", { step: "any", min: "0" });
   const vd = makeSelect("Conductors upsized for voltage drop?", "segc-vd", [{ value: "no", label: "No" }, { value: "yes", label: "Yes" }]);
@@ -65,7 +65,7 @@ function renderSolarEgc69045(inputRegion, outputRegion, citationEl) {
   const update = debounce(() => {
     const r = computeSolarEgc69045({ ocpd_rating_a: Number(ocpd.input.value) || 0, pv_isc_a: Number(isc.input.value) || 0, vd_upsized: vd.select.value });
     if (r.error) { oBasis.textContent = r.error; oEgc.textContent = "-"; oNote.textContent = ""; return; }
-    oBasis.textContent = fmt(r.basis_current_a, 0) + " A (" + (r.has_ocpd ? "OCPD rating" : "PV Isc - no OCPD") + ")";
+    oBasis.textContent = fmt(r.basis_current_a, 1) + " A (" + (r.has_ocpd ? "OCPD rating" : "1.25 x PV Isc - no OCPD") + ")";
     oEgc.textContent = r.egc_awg + " AWG" + (r.egc_awg === "14" ? " (14 AWG minimum)" : "");
     oNote.textContent = r.note;
   }, DEBOUNCE_MS);

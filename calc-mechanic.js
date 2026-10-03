@@ -1676,7 +1676,7 @@ export function computeInclinedPlaneForce({ weight_lb = 0, incline_angle_deg = 0
   return {
     force_up_lb, normal_force_lb, gravity_minus_friction_lb, restraint_or_push_lb, slides_on_own,
     ideal_mechanical_advantage, actual_mechanical_advantage, repose_angle_deg,
-    note: "The force to move a load along an inclined plane - the simple machine the pulley/rope/toggle MA tiles skip: skidding a crate up a loading ramp, sizing a winch or come-along pull for a ramp, or checking whether a parked load will slide. Along the incline the force to push UP at steady speed is F = W(sin theta + mu cos theta), the weight's own down-slope pull (W sin theta) plus friction (mu times the normal W cos theta); the ideal frictionless advantage is 1/sin theta, which equals the ramp length divided by its rise, so a longer, shallower ramp trades distance for force. Whether the load holds by itself is set by the angle of repose atan(mu): below it friction wins and the load is self-locking (it takes a push to send it DOWN); above it the load slides on its own and must be restrained. A 1,000 lb crate on a 20-degree ramp at mu 0.3 takes 624 lb to push up (actual advantage 1.6), sits above its 16.7-degree repose angle so it slides, and needs 60 lb to hold. Rigid load, uniform dry friction, force parallel to the incline; rolling resistance, a winch/tackle reeving (see the pulley and rope MA tiles), tipping, and dynamic starting friction are separate. A planning aid; the rigging plan and a competent person govern.",
+    note: "The force to move a load along an inclined plane - the simple machine the pulley/rope/toggle MA tiles skip: skidding a crate up a loading ramp, sizing a winch or come-along pull for a ramp, or checking whether a parked load will slide. Along the incline the force to push UP at steady speed is F = W(sin theta + mu cos theta), the weight's own down-slope pull (W sin theta) plus friction (mu times the normal W cos theta); the ideal frictionless advantage is 1/sin theta, which equals the ramp length divided by its rise, so a longer, shallower ramp trades distance for force. Whether the load holds by itself is set by the angle of repose atan(mu): below it friction wins and the load is self-locking (it takes a push to send it DOWN); above it the load slides on its own and must be restrained. A 1,000 lb crate on a 20-degree ramp at mu 0.3 takes 624 lb to push up (actual advantage 1.6), sits above its 16.7-degree repose angle so it slides, and needs 60 lb to hold. Rigid load, uniform dry friction, force parallel to the incline; rolling resistance, a winch/tackle reeving (see the pulley and rope MA tiles), tipping, and the higher static (starting) friction are separate. A planning aid; the rigging plan and a competent person govern.",
   };
 }
 export const inclinedPlaneForceExample = { inputs: { weight_lb: 1000, incline_angle_deg: 20, friction_coefficient: 0.3 } };
@@ -2706,7 +2706,7 @@ export function computeTorqueAdapterCorrection({ target_torque_ftlb = 0, wrench_
 }
 export const torqueAdapterCorrectionExample = { inputs: { target_torque_ftlb: 100, wrench_length_in: 18, adapter_length_in: 3, adapter_angle_deg: 0 } };
 MECHANIC_RENDERERS["torque-adapter-correction"] = _simpleRenderer({
-  citation: "Citation: standard torque-adapter correction (Snap-on / FAA AC 43.13.1B): wrench setting TW = TA x L / (L + E cos(angle)), with L the wrench lever length and E the crowfoot/extension length. An in-line adapter over-torques if set to the target; a 90-degree crowfoot needs no correction. A shop aid; the calibrated wrench and the fastener torque spec govern.",
+  citation: "Citation: standard torque-adapter correction (Snap-on / FAA AC 43.13-1B): wrench setting TW = TA x L / (L + E cos(angle)), with L the wrench lever length and E the crowfoot/extension length. An in-line adapter over-torques if set to the target; a 90-degree crowfoot needs no correction. A shop aid; the calibrated wrench and the fastener torque spec govern.",
   example: torqueAdapterCorrectionExample.inputs,
   fields: [
     { key: "target_torque_ftlb", label: "Target torque at fastener (ft-lb)", kind: "number" },
@@ -3482,7 +3482,7 @@ MECHANIC_RENDERERS["sacrificial-anode-life"] = _simpleRenderer({
   citation: "Citation: sacrificial-anode life by Faraday's law (ABYC E-2 cathodic protection; DNV-RP-B401 capacities): life = anode_mass x capacity x utilization / (current x 8760 h). Electrochemical capacity 354 A-h/lb zinc and 907 aluminum (DNV-RP-B401 Table 10-6 seawater design values), ~500 magnesium; utilization ~0.85 for a standoff anode. The protective current depends on wetted area, coating, and water; measure it with a reference electrode. Replace at about half consumed. A planning estimate; a corrosion survey governs.",
   example: sacrificialAnodeLifeExample.inputs,
   fields: [
-    { key: "anode_material", label: "Anode material", kind: "select", options: [{ value: "zinc", label: "Zinc (~354 A-h/lb)" }, { value: "aluminum", label: "Aluminum Al-Zn-In (~1150 A-h/lb)" }, { value: "magnesium", label: "Magnesium (~500 A-h/lb)" }] },
+    { key: "anode_material", label: "Anode material", kind: "select", options: [{ value: "zinc", label: "Zinc (~354 A-h/lb)" }, { value: "aluminum", label: "Aluminum Al-Zn-In (~907 A-h/lb)" }, { value: "magnesium", label: "Magnesium (~500 A-h/lb)" }] },
     { key: "anode_mass_lb", label: "Anode net mass (lb)", kind: "number" },
     { key: "current_draw_a", label: "Protective current draw (A)", kind: "number" },
     { key: "utilization_factor", label: "Utilization factor (0-1, ~0.85)", kind: "number" },
@@ -3624,7 +3624,7 @@ MECHANIC_RENDERERS["turn-radius-bank"] = _simpleRenderer({
 // times the gradient (ft/nm) is ft/hr; / 60 is the rate of climb in ft/min. The gradient as a percent
 // is ft_per_nm / 6076.12 x 100, and its angle is atan(ft_per_nm / 6076.12).
 // dims: in { climb_gradient_ft_per_nm: dimensionless, ground_speed_kt: L T^-1 } out: { roc_fpm: L T^-1, gradient_percent: dimensionless, gradient_deg: dimensionless }
-export function computeClimbGradientRoc({ climb_gradient_ft_per_nm = 0, ground_speed_kt = 0 } = {}) {
+export function computeClimbGradientRoc({ climb_gradient_ft_per_nm = 200, ground_speed_kt = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const grad = Number(climb_gradient_ft_per_nm) || 0;
   const gs = Number(ground_speed_kt) || 0;
@@ -3645,7 +3645,7 @@ MECHANIC_RENDERERS["climb-gradient-roc"] = _simpleRenderer({
   citation: "Citation: climb gradient to rate of climb (FAA TERPS / AIM departure procedures): ROC(fpm) = climb_gradient(ft/nm) x ground_speed(kt) / 60; gradient percent = ft_per_nm / 6076.12 x 100. The gradient is fixed (obstacle clearance) but the required rate of climb scales with ground speed, so a tailwind or a faster climb speed demands more fpm. The 200 ft/nm default is ~3.3%. A planning aid; the departure procedure and the performance charts govern.",
   example: climbGradientRocExample.inputs,
   fields: [
-    { key: "climb_gradient_ft_per_nm", label: "Climb gradient (ft/nm, 200 default)", kind: "number" },
+    { key: "climb_gradient_ft_per_nm", label: "Climb gradient (ft/nm, 200 default)", kind: "number", default: 200 },
     { key: "ground_speed_kt", label: "Ground speed (kt)", kind: "number" },
   ],
   outputs: [

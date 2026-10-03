@@ -199,7 +199,7 @@ export function computeBrineBatchSalinity({ batch_gal = 0, target_pct = 23.3, br
 }
 const brineBatchSalinityExample = { inputs: { batch_gal: 3000, target_pct: 23.3, brine_density_lb_gal: 9.8, saturation_pct: 26.4, alt_pct: 20 } };
 WINTEROPS_RENDERERS["brine-batch-salinity"] = _simpleRenderer({
-  citation: "Citation: the sodium chloride eutectic at 23.3 percent by weight and about -6 degF, the published NaCl freezing-point curve (linearly interpolated between 0, 5, 10, 15, 20 and 23.3 percent), and the salometer scale as percent of saturation at a stated temperature. Brine density is ENTERED and is nominal. The material supplier's data and a salometer or density verification of each batch govern.",
+  citation: "Citation: the sodium chloride eutectic at 23.3 percent by weight and about -6 degF, the published NaCl freezing-point curve (linearly interpolated between 0, 5, 10, 15, 20 and 23.3 percent, then up the hydrohalite branch to the 26.3 percent peritectic at +32.2 degF), and the salometer scale as percent of saturation at a stated temperature. Brine density is ENTERED and is nominal. The material supplier's data and a salometer or density verification of each batch govern.",
   example: brineBatchSalinityExample.inputs,
   fields: [
     { key: "batch_gal", label: "Batch volume (gal)", kind: "number" },

@@ -2364,7 +2364,7 @@ export function computeCounterboreDepth({ screw_diameter_in = 0, head_height_in 
   const minimum_thickness_in = in_tapped_part ? counterbore_depth_in + required_engagement_in : required_engagement_in;
   const verdict = passes
     ? "PASSES with " + fmt(available_engagement_in - required_engagement_in, 3) + " in of engagement to spare"
-    : "FAILS by " + fmt(shortfall_in, 3) + " in: the joint will strip its threads before the bolt yields. Take the tapped part to at least " + fmt(minimum_thickness_in, 3) + " in, or move the counterbore into a separate clearance plate so the tapped part keeps its full thickness";
+    : "FAILS by " + fmt(shortfall_in, 3) + " in: the joint will strip its threads before the bolt yields. Take the tapped part to at least " + fmt(minimum_thickness_in, 3) + " in" + (in_tapped_part ? ", or move the counterbore into a separate clearance plate so the tapped part keeps its full thickness" : "");
   if (![counterbore_depth_in, remaining_thickness_in, required_engagement_in, shortfall_in].every(Number.isFinite)) return { error: "Counterbore math is not a finite value." };
   return {
     counterbore_depth_in,

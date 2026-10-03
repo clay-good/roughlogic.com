@@ -146,7 +146,7 @@ export function computeDilutionVentilationSolvent({
   const lel_target_ppm = has_lel ? lel_pct * 10000 * lel_safety_fraction : 0;
   const lel_cfm_exact = has_lel ? _DV_CONSTANT * evaporation_lb_hr / (molecular_weight * lel_target_ppm) : 0;
   const lel_verdict = !has_lel
-    ? "(no lower explosive limit entered -- and flammability is a SEPARATE requirement that is frequently the larger of the two)"
+    ? "(no lower explosive limit entered -- and flammability is a SEPARATE requirement; it is usually far smaller than the exposure figure, but check it)"
     : "for flammability: " + fmt(lel_cfm_exact, 0) + " cfm to hold the room at " + fmt(lel_safety_fraction * 100, 0) + "% of the " + fmt(lel_pct, 2) + "% LEL (" + fmt(lel_target_ppm, 0) + " ppm). Note that a mixing factor is NOT applied to the flammability figure the way it is to the health one -- the fire requirement is about the room average and the bulk atmosphere";
   const governing_cfm = has_lel ? Math.max(health_cfm, lel_cfm_exact) : health_cfm;
   const health_governs = !has_lel || health_cfm >= lel_cfm_exact;

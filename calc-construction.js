@@ -3090,7 +3090,7 @@ export function computeExcavationBenchPlan({
 
   const warnings = [];
   if (D < 5) warnings.push("Under 5 ft, a protective system is not required only if a competent person's examination of the ground shows no indication of a potential cave-in (29 CFR 1926.652(a)(1)(ii)); depth alone exempts nothing.");
-  if (surcharge) warnings.push("Surcharge load near trench adds " + (SURCHARGE_BUMP * 100).toFixed(0) + "% to the H:V ratio per engineering practice; the competent person on-site governs the final plan.");
+  if (surcharge) warnings.push("Surcharge load near trench adds " + SURCHARGE_BUMP + " to the H:V ratio (additive) per engineering practice; the competent person on-site governs the final plan.");
   if (soil_class === "C") warnings.push("Type C soil cannot typically be benched; only the sloped plan is reported. Verify with the competent person.");
 
   return {
@@ -5774,13 +5774,13 @@ const _renderShorePostLoad = _simpleRenderer({
   example: shorePostLoadExample.inputs,
   fields: [
     { key: "slab_in", label: "Slab / pour thickness (in)", kind: "number" },
-    { key: "unit_weight", label: "Concrete unit weight (pcf)", kind: "number" },
+    { key: "unit_weight", label: "Concrete unit weight (pcf)", kind: "number", default: 150 },
     { key: "form_load", label: "Formwork dead load (psf)", kind: "number", default: 10 },
     { key: "live_load", label: "Construction live load (psf)", kind: "number", default: 50 },
     { key: "spacing_x", label: "Shore spacing one way (ft)", kind: "number" },
     { key: "spacing_y", label: "Shore spacing other way (ft)", kind: "number" },
     { key: "shore_capacity", label: "Rated shore capacity (lb)", kind: "number" },
-    { key: "min_design_psf", label: "Combined-load floor (psf)", kind: "number" },
+    { key: "min_design_psf", label: "Combined-load floor (psf)", kind: "number", default: 100 },
   ],
   outputs: [
     { key: "sl", id: "spl-out-sl", label: "Slab dead load", value: (r) => _fmtC(r.slab_load, 1) + " psf" },
@@ -6305,7 +6305,7 @@ const _renderConcreteEvaporationRate = _simpleRenderer({
   example: concreteEvaporationRateExample.inputs,
   fields: [
     { key: "air_temp_f", label: "Air temperature (°F)", kind: "number", default: 70, attrs: { step: "any" } },
-    { key: "concrete_temp_f", label: "Concrete temperature (°F)", kind: "number", attrs: { step: "any" } },
+    { key: "concrete_temp_f", label: "Concrete temperature (°F; enter it, or use the air temperature if unknown)", kind: "number", attrs: { step: "any" } },
     { key: "rh_pct", label: "Relative humidity (%)", kind: "number", default: 50 },
     { key: "wind_mph", label: "Wind speed (mph)", kind: "number" },
   ],
@@ -7752,7 +7752,7 @@ export function computeSeismicStoryDrift({ delta_xe_in = 0, cd = 0, ie = 1.0, hs
   const util = delta_x / delta_a;
   return {
     delta_x, delta_a, util, ok: delta_x <= delta_a,
-    note: "ASCE 7-22 Eq. 12.8-15: the amplified design story drift delta_x = Cd delta_xe / Ie, compared with the allowable delta_a = (drift coefficient) x story height (Table 12.12-1, commonly 0.020 hsx for most buildings, 0.010-0.025 by risk category and system). delta_xe is the elastic drift from the strength-level analysis. Exceeding delta_a means stiffen the frame. A design aid; the engineer of record's stamped design governs.",
+    note: "ASCE 7-22 Eq. 12.8-15: the amplified design story drift delta_x = Cd delta_xe / Ie, compared with the allowable delta_a = (drift coefficient) x story height (Table 12.12-1, commonly 0.020 hsx for most buildings, 0.007-0.025 by risk category and system). delta_xe is the elastic drift from the strength-level analysis. Exceeding delta_a means stiffen the frame. A design aid; the engineer of record's stamped design governs.",
   };
 }
 export const seismicStoryDriftExample = { inputs: { delta_xe_in: 0.5, cd: 5.5, ie: 1.0, hsx_in: 144, drift_ratio: 0.020 } };
@@ -8181,8 +8181,8 @@ const _v819renderWeldedWireMesh = _simpleRenderer({
   example: weldedWireMeshExample.inputs,
   fields: [
     { key: "slab_area_sf", label: "Slab area to reinforce (ft²)", kind: "number" },
-    { key: "sheet_width_ft", label: "Mesh sheet width (ft)", kind: "number" },
-    { key: "sheet_length_ft", label: "Mesh sheet length (ft)", kind: "number" },
+    { key: "sheet_width_ft", label: "Mesh sheet width (ft)", kind: "number", default: 5 },
+    { key: "sheet_length_ft", label: "Mesh sheet length (ft)", kind: "number", default: 10 },
     { key: "side_lap_in", label: "Side lap (in)", kind: "number", default: 6 },
     { key: "end_lap_in", label: "End lap (in)", kind: "number", default: 6 },
     { key: "waste_pct", label: "Waste / cutting allowance (%)", kind: "number", default: 5 },
@@ -12665,7 +12665,7 @@ export function computeTemporaryStairwayCheck({ riser_count = 0, total_rise_in =
   const passes = angle_ok && uniform_ok && (rail_height_ok !== false) && (landing_ok !== false) && !(rail_required && !rail_entered);
 
   const note = "ANGLE is bounded on BOTH sides: stairs shall be installed between " + ANGLE_MIN + " and " + ANGLE_MAX + " degrees from horizontal. A " + rh + " in riser on a " + td + " in tread is " + angle_deg.toFixed(1) + " degrees, " + (angle_ok ? "in range. " : too_shallow ? "TOO SHALLOW - and too shallow is a violation, not a courtesy. A run under 30 degrees is a ramp with steps in it, and people trip on it precisely because it does not read as stairs. " : "TOO STEEP. ")
-    + "STAIRRAIL TRIGGER, read the unusual way: four or more risers OR rising more than " + RISE_TRIGGER + " in, WHICHEVER IS LESS - which means whichever comes FIRST, so either condition alone catches it. Here " + n + " riser" + (n === 1 ? "" : "s") + " and " + total_rise_used_in.toFixed(1) + " in of rise trigger it via " + trigger + ". "
+    + "STAIRRAIL TRIGGER, read the unusual way: four or more risers OR rising more than " + RISE_TRIGGER + " in, WHICHEVER IS LESS - which means whichever comes FIRST, so either condition alone catches it. Here " + n + " riser" + (n === 1 ? "" : "s") + " and " + total_rise_used_in.toFixed(1) + " in of rise " + (rail_required ? "trigger it via " + trigger : "do not trigger it") + ". "
     + (rail_required
       ? "So a handrail and stairrail system is REQUIRED on unprotected sides. " + (rail_entered ? "The stairrail entered is " + rail + " in from its upper surface to the tread surface, against the " + RAIL_MIN + " in minimum for a post-1991 installation: " + (rail_height_ok ? "OK. " : "SHORT. ") : "No stairrail height entered, so this cannot be confirmed compliant. ")
       : "This " + n + "-riser flight climbing " + total_rise_used_in.toFixed(1) + " in escapes both halves" + (n === 3 ? " - but only just, and a fourth riser flips it" : "") + ". ")
@@ -13041,7 +13041,7 @@ export function computeSignCharacterHeight({ baseline_height_in = 0, viewing_dis
     + "At " + v + " in of viewing distance that is " + (distance_governs ? base_height_in + " + " + added_in.toFixed(3) + " = " + required_character_height_in.toFixed(3) + " in, and THE DISTANCE GOVERNS - the base height alone would be short. " : "just the base " + base_height_in + " in, since " + v + " in does not reach the " + threshold_in + " in threshold. ")
     + "Provided " + provided + " in: " + (ok ? "OK. " : "SHORT by " + shortfall_in.toFixed(3) + " in. ")
     + (max_viewing_distance_in !== null ? provided + " in characters serve out to " + max_viewing_distance_in.toFixed(1) + " in (" + (max_viewing_distance_in / 12).toFixed(1) + " ft) in this band. " : provided + " in is under the band's base height, so there is no viewing distance at which it complies. ")
-    + (next_band_required_in !== null ? "THE BAND BOUNDARIES ARE CLIFFS, NOT RAMPS: raise this baseline past " + (h <= 70 ? 70 : 120) + " in and the same sign at the same distance needs " + next_band_required_in.toFixed(3) + " in - " + cliff_multiple.toFixed(2) + " times as tall - because the base jumps from " + base_height_in + " to " + next_base_in + " in. A sign nudged up to clear a door head can quadruple its required letter height without moving an inch closer or further away. " : "This is the top band; there is no higher one to cross into. ")
+    + (next_band_required_in !== null ? "THE BAND BOUNDARIES ARE CLIFFS, NOT RAMPS: raise this baseline past " + (h <= 70 ? 70 : 120) + " in and the same sign at the same distance needs " + next_band_required_in.toFixed(3) + " in - " + cliff_multiple.toFixed(2) + " times as tall - because the base jumps from " + base_height_in + " to " + next_base_in + " in. A sign nudged up to clear a door head can more than triple its required letter height without moving an inch closer or further away. " : "This is the top band; there is no higher one to cross into. ")
     + "TWO MEASUREMENT RULES DO MOST OF THE DAMAGE. The height is measured to the BASELINE of the characters, not to the top or bottom of the panel - a tall panel hung low can put its lettering in a different band than the sign appears to occupy. And the viewing distance is the horizontal distance to whatever OBSTRUCTION prevents further approach toward the sign, not the distance from wherever a person happens to stand. A counter, a rail, or a planter in front of a sign is what sets the letter height; take one out and the distance gets SHORTER, not longer. Character height itself is based on the uppercase letter I, so it is the font's cap height rather than the panel, the lowercase, or the ascender. "
     + "Not checked: whether this sign is required to have visual characters at all, or tactile ones, or both, which turns on what it identifies; the raised-character and Braille requirements and their own 48 to 60 in mounting range; stroke thickness, character width, spacing, line spacing, case, and the prohibition on italic, script, and highly decorative fonts; finish, contrast, and glare; the location requirement at doors; pictograms and their fields; and state and local accessibility law. A height check, not a sign design; the 2010 ADA Standards and the authority having jurisdiction govern.";
 
@@ -14707,7 +14707,7 @@ export function computeLavatoryTubClearance({ rim_height_in = 0, counter_height_
   const note = "TWO FIXTURES WHOSE RULES ARE SHORT ENOUGH TO SKIP AND SPECIFIC ENOUGH TO FAIL A REMODEL THAT MEASURED FINE EVERYWHERE ELSE. "
     + "LAVATORY (606.3): the front of the HIGHER of the rim or the counter surface is 34 in MAXIMUM. Not the bowl, not the faucet - the higher of the two. Rim " + rim + " in, counter " + counter + " in, so " + governing_lav_height_in + " in governs" + (counter_governs ? " and it is the COUNTER, not the fixture. " : ". ")
     + (lav_ok ? "Within the 34 in maximum. " : "OVER by " + lav_excess_in.toFixed(2) + " in. ")
-    + (hidden_by_counter ? "NOTE WHAT HAPPENED: the rim alone would have passed and the counter around it does not, which is exactly how a vessel sink or a thick stone top fails a lavatory that was specified correctly. The fixture was never the problem. " : "")
+    + (hidden_by_counter ? "NOTE WHAT HAPPENED: the rim alone would have passed and the counter around it does not, which is exactly how a thick stone top or a raised counter fails a lavatory that was specified correctly. The fixture was never the problem. " : "")
     + (metering_entered ? "METERING FAUCETS (606.4) must remain open 10 SECONDS MINIMUM, which is longer than most are shipped set and is adjusted at the cartridge rather than specified at purchase. Entered " + meter + " s: " + (metering_ok ? "OK. " : "SHORT by " + metering_deficit_s.toFixed(1) + " s. ") : "No metering faucet entered; note that a hand-operated metering faucet must stay open 10 seconds minimum. ")
     + "BATHTUB (607.2): the clearance in front runs THE LENGTH OF THE TUB and is 30 in wide minimum. " + (seat ? "With a permanent seat at the head end it extends 12 in BEYOND the wall at that end, so a " + tub + " in tub needs " + required_clear_length_in + " in of clearance - the fixture is one length and the floor it needs is another, which is the part that gets drawn short. " : "With no permanent seat the clearance is the tub length, " + required_clear_length_in + " in; adding a permanent seat at the head end would push it to " + (tub + SEAT_EXTRA) + " in. ")
     + "Entered " + cl + " in long x " + cw + " in wide: " + (tub_ok ? "OK. " : (clear_length_ok ? "" : "LENGTH short by " + clear_length_deficit_in.toFixed(1) + " in. ") + (clear_width_ok ? "" : "WIDTH short by " + clear_width_deficit_in.toFixed(1) + " in. "))
@@ -14813,7 +14813,7 @@ export function computeRampDetailCheck({ cross_slope_ratio = 48, clear_width_in 
     + (rails ? "With rails taking " + intr + " in, a " + w + " in ramp leaves " + effective_width_in.toFixed(1) + " in between them: " + (width_ok ? "OK. " : "SHORT by " + width_deficit_in.toFixed(1) + " in. ") + (handrails_cost_compliance ? "NOTE WHAT HAPPENED: the ramp itself is 36 in or wider and the HANDRAILS took it under. A 36 in ramp with rails on both sides is not a 36 in ramp any more, and the fix is a wider slab rather than a different rail - " + width_needed_between_rails_in.toFixed(1) + " in of ramp to leave 36 between the rails. " : "") : "No handrails entered, so the full " + w + " in is the clear width: " + (width_ok ? "OK. " : "SHORT by " + width_deficit_in.toFixed(1) + " in. ") + "Note that adding handrails later measures BETWEEN them and can take a compliant ramp under. ")
     + "LANDING (405.7): 60 in long minimum and at least as wide as the widest run leading to it" + (turns ? " - and this ramp CHANGES DIRECTION here, so the landing must be 60 x 60 minimum" + (turn_drives_width ? ", which at a " + rw + " in run is the 60 in that governs rather than the run width. This is the rule that turns a switchback into a wider footprint than anyone drew. " : ". ") : ". ")
     + "Required " + required_landing_length_in + " x " + required_landing_width_in + " in; entered " + ll + " x " + lw + " in: " + (landing_ok ? "OK. " : (landing_length_ok ? "" : "length short by " + landing_length_deficit_in.toFixed(1) + " in. ") + (landing_width_ok ? "" : "width short by " + landing_width_deficit_in.toFixed(1) + " in. "))
-    + "EDGE PROTECTION (405.9): " + EDGES[edge_protection] + ". " + (edge_protection === "not-required" ? "Exception 1 covers a ramp that is not required to have handrails and whose sides comply with 406.3; Exception 2 covers the side of a landing serving an adjoining ramp run or stair. Confirm the exception applies before relying on it. " : "") + (edge_ok ? "" : "NONE IS PROVIDED, and a handrail is not edge protection - the hazard is at the WHEEL, not at the hand. The two ways to satisfy it are the floor surface extended 12 in beyond the handrail, or a curb or barrier that stops a 4 in sphere from passing within 4 in of the surface. ")
+    + "EDGE PROTECTION (405.9): " + EDGES[edge_protection] + ". " + (edge_protection === "not-required" ? "Exception 1 covers a ramp that is not required to have handrails and whose sides comply with 406.3; Exception 2 covers the side of a landing serving an adjoining ramp run or stair; Exception 3 covers the side of a landing with a vertical drop-off of 1/2 in maximum within 10 in horizontally of the minimum landing area. Confirm the exception applies before relying on it. " : "") + (edge_ok ? "" : "NONE IS PROVIDED, and a handrail is not edge protection - the hazard is at the WHEEL, not at the hand. The two ways to satisfy it are the floor surface extended 12 in beyond the handrail, or a curb or barrier that stops a 4 in sphere from passing within 4 in of the surface. ")
     + (passes ? "The items entered PASS. " : "The items entered DO NOT pass. ")
     + "Not checked: the running slope, the number of runs, the 30 in maximum rise per run, and the total ramp length, which are a separate tile; handrail height, grip, clearance, and extensions, which are their own tile; the surface, changes in level, and openings on the ramp and its landings; doors opening onto landings and the maneuvering clearance they need, which routinely conflicts with the 60 in landing; wet conditions and the requirement that outdoor ramps and their approaches be designed so water does not accumulate; the structure and its frost depth; curb ramps, which are section 406 and a different set of rules; and state and local accessibility law. A ramp detail screen, not a ramp design; the 2010 ADA Standards and the authority having jurisdiction govern.";
 
@@ -14834,7 +14834,7 @@ CONSTRUCTION_RENDERERS["ramp-detail-check"] = _simpleRenderer({
     { key: "landing_width_in", label: "Landing clear width (in)", kind: "number" },
     { key: "run_width_in", label: "Width of the widest run reaching the landing (in)", kind: "number" },
     { key: "changes_direction", label: "Ramp changes direction at this landing?", kind: "select", options: [{ value: "yes", label: "Yes", selected: true }, { value: "no", label: "No" }] },
-    { key: "edge_protection", label: "Edge protection", kind: "select", options: [{ value: "none", label: "None provided", selected: true }, { value: "extended-floor", label: "Floor extended 12 in beyond the handrail" }, { value: "not-required", label: "Not required (405.9 Exception 1 or 2)" }, { value: "curb-or-barrier", label: "Curb or barrier stopping a 4 in sphere" }] },
+    { key: "edge_protection", label: "Edge protection", kind: "select", options: [{ value: "none", label: "None provided", selected: true }, { value: "extended-floor", label: "Floor extended 12 in beyond the handrail" }, { value: "not-required", label: "Not required (405.9 Exception 1, 2 or 3)" }, { value: "curb-or-barrier", label: "Curb or barrier stopping a 4 in sphere" }] },
   ],
   outputs: [
     { key: "x", id: "rdc-out-x", label: "Cross slope (1:48 max)", value: (r) => fmt(r.cross_slope_pct, 2) + "% - " + (r.cross_slope_ok ? "OK" : "TOO STEEP") },

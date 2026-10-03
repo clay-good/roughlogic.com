@@ -995,9 +995,9 @@ export function computeTransformerDiversityLoading({ customers = 0, individual_p
   const outs = [connected_kva, diversified_kva, continuous_loading_pct, customers_at_continuous, headroom_customers];
   if (!outs.every(Number.isFinite)) return { error: "Diversified-loading math is not a finite value." };
   const verdict = within_continuous
-    ? (continuous_loading_pct >= 100 - 1e-9 ? "AT" : "UNDER") + " the continuous rating: " + fmt(continuous_loading_pct, 1) + "% of " + fmt(continuous_rating_kva, 0) + " kVA, with room for " + fmt(headroom_customers, 1) + " more customers at this coincidence factor"
-    : "OVER the continuous rating: " + fmt(continuous_loading_pct, 1) + "% of " + fmt(continuous_rating_kva, 0) + " kVA, which is " + fmt(-headroom_customers, 1) + " customers past it"
-      + (within_short_time === true ? " but INSIDE the entered " + fmt(short_time_rating_kva, 0) + " kVA short-time rating, so the question is duration and loss of life, not nameplate" : within_short_time === false ? " and OVER the entered " + fmt(short_time_rating_kva, 0) + " kVA short-time rating as well" : "");
+    ? (continuous_loading_pct >= 100 - 1e-9 ? "AT" : "UNDER") + " the continuous rating: " + fmt(continuous_loading_pct, 1) + "% of " + String(Math.round(continuous_rating_kva * 10) / 10) + " kVA, with room for " + fmt(headroom_customers, 1) + " more customers at this coincidence factor"
+    : "OVER the continuous rating: " + fmt(continuous_loading_pct, 1) + "% of " + String(Math.round(continuous_rating_kva * 10) / 10) + " kVA, which is " + fmt(-headroom_customers, 1) + " customers past it"
+      + (within_short_time === true ? " but INSIDE the entered " + String(Math.round(short_time_rating_kva * 10) / 10) + " kVA short-time rating, so the question is duration and loss of life, not nameplate" : within_short_time === false ? " and OVER the entered " + String(Math.round(short_time_rating_kva * 10) / 10) + " kVA short-time rating as well" : "");
   return {
     customers, individual_peak_kva, diversity_factor, continuous_rating_kva, short_time_rating_kva,
     connected_kva, diversified_kva, continuous_loading_pct, connected_loading_pct, short_time_loading_pct,

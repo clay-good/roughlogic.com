@@ -368,7 +368,7 @@ export function computePoolHeaterBtu({ gallons = 0, dT_F = 0, output = 0, eff = 
   if (!(gal > 0)) return { error: "Pool volume must be positive (gallons)." };
   if (!(dT > 0)) return { error: "Temperature rise must be positive (F)." };
   if (!(out > 0)) return { error: "Heater input must be positive (Btu/h)." };
-  if (!(e > 0)) return { error: "Efficiency (or COP-equivalent) must be positive." };
+  if (!(e > 0)) return { error: "Efficiency must be positive (a fraction, 0.80 gas; 1.0 for a heat pump entered at its heat output)." };
   // A fraction, not a percent or a COP: 80 used to give a 0.05 h heat-up, and a heat pump's COP 5 cut the time 5x.
   if (e > 1.2) return { error: "Enter efficiency as a fraction (0.80); for a heat pump enter its heat output and 1.0, not its COP." };
   const Q_btu = gal * 8.34 * dT;
@@ -407,7 +407,7 @@ export function computePoolHeaterSize({ gallons = 0, dT_F = 0, target_hours = 0,
   if (!(gal > 0)) return { error: "Pool volume must be positive (gallons)." };
   if (!(dT > 0)) return { error: "Temperature rise must be positive (F)." };
   if (!(hrs > 0)) return { error: "Target heat-up time must be positive (h)." };
-  if (!(e > 0)) return { error: "Efficiency (or COP-equivalent) must be positive." };
+  if (!(e > 0)) return { error: "Efficiency must be positive (a fraction, 0.80 gas; 1.0 for a heat pump entered at its heat output)." };
   // A fraction, not a percent or a COP: 80 used to give a 0.05 h heat-up, and a heat pump's COP 5 cut the time 5x.
   if (e > 1.2) return { error: "Enter efficiency as a fraction (0.80); for a heat pump enter its heat output and 1.0, not its COP." };
   const Q_btu = gal * 8.34 * dT;

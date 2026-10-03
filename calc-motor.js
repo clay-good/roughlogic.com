@@ -622,7 +622,7 @@ function renderVfdReflectedWave(inputRegion, outputRegion, citationEl) {
   const update = debounce(() => {
     const r = computeVfdReflectedWave({ rise_time_us: readNum(rt.input), velocity_pct: readNum(vp.input), system_voltage_v: readNum(Vll.input), run_length_ft: readNum(run.input) });
     if (r.error) { oL.textContent = r.error; oV.textContent = "-"; oLim.textContent = "-"; oNote.textContent = ""; return; }
-    oL.textContent = fmt(r.l_crit_ft, 1) + " ft (run " + (readNum(run.input) > r.l_crit_ft ? "past - reflection develops" : "under - safe") + ")";
+    oL.textContent = fmt(r.l_crit_ft, 1) + " ft (run " + (readNum(run.input) > r.l_crit_ft ? "past - reflection develops" : "under - partial reflection") + ")";
     oV.textContent = fmt(r.v_peak_v, 0) + " V (bus " + fmt(r.v_bus_v, 0) + " V)";
     oLim.textContent = (r.exceeds_invduty ? "OVER inverter-duty " : "under inverter-duty ") + fmt(r.limit_invduty_v, 0) + " V; " + (r.exceeds_genpurpose ? "OVER" : "under") + " general-purpose ~1000 V";
     oNote.textContent = r.note;

@@ -386,7 +386,7 @@ export function computeReinekeSdi({ trees_per_acre = 0, qmd_in = 0, sdi_max = 0 
     : "below the onset of competition";
   return {
     sdi, percent_max, zone,
-    note: "SDI uses the QUADRATIC mean diameter (the diameter of the tree of average basal area, always >= the arithmetic mean), not a plain average, so using the arithmetic mean understates density and can leave a stand thinned too late. The 1.605 exponent is Reineke's empirical self-thinning slope. Zones: ~35% onset of competition, 55-60% lower management zone, ~100% self-thinning. The maximum SDI is species-specific. A management aid; a qualified silvicultural prescription governs.",
+    note: "SDI uses the QUADRATIC mean diameter (the diameter of the tree of average basal area, always >= the arithmetic mean), not a plain average, so using the arithmetic mean understates density and can leave a stand thinned too late. The 1.605 exponent is Reineke's empirical self-thinning slope. Zones as reported: under 35% below the onset of competition, 35-55% lower management zone, 55-100% upper management zone (a thinning candidate), 100% and over self-thinning. The maximum SDI is species-specific. A management aid; a qualified silvicultural prescription governs.",
   };
 }
 export const reinekeSdiExample = { inputs: { trees_per_acre: 300, qmd_in: 10, sdi_max: 400 } };
@@ -914,7 +914,7 @@ ARBORIST_RENDERERS["firewood-cord"] = renderFirewoodCord;
 // condition x location. Every factor here is an INPUT: the unit cost is regional and the three
 // percentages come from a regional plant appraisal committee guide, so no table is shipped.
 // dims: in { dbh_in: L, unit_cost_per_sq_in: dimensionless, species_pct: dimensionless, condition_pct: dimensionless, location_pct: dimensionless } out: { trunk_area_sq_in: L^2, basic_value: dimensionless, appraised_value: dimensionless }
-export function computeTreeAppraisalCtla({ dbh_in = 0, unit_cost_per_sq_in = 60, species_pct = 100, condition_pct = 100, location_pct = 100 } = {}) {
+export function computeTreeAppraisalCtla({ dbh_in = 0, unit_cost_per_sq_in = 0, species_pct = 100, condition_pct = 100, location_pct = 100 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const d = Number(dbh_in) || 0;
   const unit = Number(unit_cost_per_sq_in) || 0;

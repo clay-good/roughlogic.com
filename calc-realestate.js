@@ -2693,7 +2693,7 @@ export function computeMaxOffer70Rule({ arv = 0, repairs = 0, rule_pct = 70, fee
   const spread = a - mao - r;
   return {
     mao, spread, no_deal: mao <= 0,
-    note: "The 70% rule: max allowable offer = ARV x rule% - repairs (- any wholesale fee). The 30% held back (at 70%) covers holding, financing, selling costs, and profit. A negative MAO means the numbers do not support a deal at this rule percentage.",
+    note: "The 70% rule: max allowable offer = ARV x rule% - repairs (- any wholesale fee). The 30% held back (at 70%) covers holding, financing, selling costs, and profit. A MAO at or below zero means the numbers do not support a deal at this rule percentage.",
   };
 }
 export const maxOffer70RuleExample = { inputs: { arv: 300000, repairs: 40000, rule_pct: 70, fee: 0 } };

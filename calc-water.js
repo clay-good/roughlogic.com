@@ -425,7 +425,7 @@ const renderFilterAreaForLoading = _r({
   fields: [
     { key: "flow_gpm",               label: "Design flow (GPM)", kind: "number" },
     { key: "target_loading_gpm_ft2", label: "Target loading rate (gpm/ft²)", kind: "number" },
-    { key: "backwash_rate_gpm_ft2",  label: "Backwash rate (gpm/ft²)", kind: "number" },
+    { key: "backwash_rate_gpm_ft2",  label: "Backwash rate (gpm/ft²)", kind: "number", default: 15 },
   ],
   outputs: [
     { key: "a", id: "fal-out-a", label: "Required filter area", value: (r) => fmt(r.required_area_ft2, 1) + " ft^2" },

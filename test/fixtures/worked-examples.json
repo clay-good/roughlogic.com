@@ -14860,7 +14860,7 @@
   {
    "tile_id": "irs-form-index",
    "source_publisher": "IRS form library reference (project bundled)",
-   "source_title": "Common IRS forms and their purposes (1040, W-2, 1099, etc.)",
+   "source_title": "Common IRS forms and their purposes (1040, Schedule C/SE/E, 941, W-9, 1099, etc.)",
    "source_edition_or_year": "IRS form library",
    "source_section_or_page": "Reference compute returns the per-attribute table; runner asserts non-error object only (smoke test).",
    "verified_by": "rl",
@@ -87407,7 +87407,7 @@
   },
   {
    "tile_id": "torque-adapter-correction",
-   "source_publisher": "Standard torque-adapter correction (Snap-on / FAA AC 43.13.1B)",
+   "source_publisher": "Standard torque-adapter correction (Snap-on / FAA AC 43.13-1B)",
    "source_title": "100 ft-lb target, 18 in wrench, 3 in in-line crowfoot -> dial 85.7 ft-lb; uncorrected 116.7 (17% over)",
    "source_edition_or_year": "spec-v485 worked example (machine-verified)",
    "source_section_or_page": "spec-v485 section 2.1 pinned example",
@@ -87441,7 +87441,7 @@
   },
   {
    "tile_id": "torque-adapter-correction",
-   "source_publisher": "Standard torque-adapter correction (Snap-on / FAA AC 43.13.1B)",
+   "source_publisher": "Standard torque-adapter correction (Snap-on / FAA AC 43.13-1B)",
    "source_title": "cross-check: swing the 3 in crowfoot to 90 deg -> no correction, dial 100 ft-lb",
    "source_edition_or_year": "spec-v485 worked example (machine-verified)",
    "source_section_or_page": "spec-v485 section 2.1 cross-check",
@@ -102300,7 +102300,7 @@
      }
     },
     "pieces": {
-     "value": 16,
+     "value": 17,
      "tolerance": {
       "abs": 0.001
      }
@@ -104754,7 +104754,7 @@
   {
    "tile_id": "free-fall-drop",
    "source_publisher": "Project (first-principles)",
-   "source_title": "Double the height doubles the energy",
+   "source_title": "Double the height and the weight: four times the energy (1,000 ft-lbf)",
    "source_edition_or_year": "kinematics",
    "source_section_or_page": "v=sqrt(2gh)",
    "verified_by": "rl",

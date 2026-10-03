@@ -299,7 +299,7 @@ export function computePivotApplicationRate({ pass_depth_in = 0, pivot_length_ft
 }
 export const pivotApplicationRateExample = { inputs: { pass_depth_in: 1.0, pivot_length_ft: 1320, revolution_hr: 24, wetted_band_ft: 100, soil_intake_in_hr: 0.5 } };
 function _v602renderPivotApplicationRate(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: center-pivot outer-span application rate (USDA-NRCS center-pivot design; university extension), by name. speed = 2 x pi x pivot_length / (revolution_hr x 60); wetting = wetted_band / speed; app_rate = pass_depth x 2 x pi x pivot_length / (revolution_hr x wetted_band). This is the average rate over the wetted band at the outer span (the true peak runs about 6% higher); the outer end governs because it moves fastest. Runoff is avoided only by the short wetting time and surface storage, so a slope or a tight soil runs off when the rate exceeds the intake.";
+  citationEl.textContent = "Citation: center-pivot outer-span application rate (USDA-NRCS center-pivot design; university extension), by name. speed = 2 x pi x pivot_length / (revolution_hr x 60); wetting = wetted_band / speed; app_rate = pass_depth x 2 x pi x pivot_length / (revolution_hr x wetted_band). This is the average rate over the wetted band at the outer span (the true elliptical-pattern peak runs 4/pi, about 27%, higher); the outer end governs because it moves fastest. Runoff is avoided only by the short wetting time and surface storage, so a slope or a tight soil runs off when the rate exceeds the intake.";
   const D = makeNumber("Gross pass depth (in)", "par-d", { step: "any", min: "0" });
   const L = makeNumber("Pivot length to outer tower (ft)", "par-l", { step: "any", min: "0" });
   const T = makeNumber("Revolution time (hr)", "par-t", { step: "any", min: "0" });
@@ -447,7 +447,7 @@ function _v582renderManureStorageVolume(inputRegion, outputRegion, citationEl) {
   const manure = makeNumber("Daily manure (ft3/day = head x rate)", "msv-manure", { step: "any", min: "0" });
   const ww = makeNumber("Added wastewater (ft3/day, 0 if none)", "msv-ww", { step: "any", min: "0" });
   const bed = makeNumber("Added bedding (ft3/day, 0 if none)", "msv-bed", { step: "any", min: "0" });
-  const days = makeNumber("Storage period (days, >= 120)", "msv-days", { step: "any", min: "0" });
+  const days = makeNumber("Storage period (days; under 120 flagged short)", "msv-days", { step: "any", min: "0" });
   const area = makeNumber("Surface area (ft2, 0 if roofed)", "msv-area", { step: "any", min: "0" });
   const precip = makeNumber("Net precipitation over period (in)", "msv-precip", { step: "any", min: "0" });
   const storm = makeNumber("25-yr 24-hr storm depth (in)", "msv-storm", { step: "any", min: "0" });

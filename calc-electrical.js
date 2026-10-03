@@ -4382,7 +4382,7 @@ export function computeConduitExpansionMaxRun({ temp_change_f = 0, coeff_in_per_
   const delta_l_at_max_in = coeff * (max_run_ft * 12) * dT;
   return {
     max_run_ft, delta_l_at_max_in,
-    note: "The longest straight run between anchors before a PVC expansion fitting is required: L_max = trigger / (coefficient x 12 in/ft x temperature swing), the inverse of the conduit-thermal-expansion tile. At L_max the length change equals the 1/4-inch trigger exactly; a longer run needs a fitting sized for that travel. The bundled PVC coefficient 3.38e-5 in/in/deg-F is the public property underlying NEC 352.44. The AHJ and the conduit manufacturer govern.",
+    note: "The longest straight run between anchors before a PVC expansion fitting is required: L_max = trigger / (coefficient x 12 in/ft x temperature swing), the inverse of the conduit-thermal-expansion tile. At L_max the length change equals the 1/4-inch trigger, which already requires a fitting (352.44: 1/4 in or greater); the run must be shorter than L_max to go without one. The bundled PVC coefficient 3.38e-5 in/in/deg-F is the public property underlying NEC 352.44. The AHJ and the conduit manufacturer govern.",
   };
 }
 export const conduitExpansionMaxRunExample = { inputs: { temp_change_f: 50, coeff_in_per_in_f: 0.0000338, trigger_in: 0.25 } };

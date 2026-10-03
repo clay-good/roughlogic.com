@@ -33723,7 +33723,7 @@ test("bounds: spec-v1116 computeDripEdgeTakeoff pins the slope factor on rakes o
   assert.ok(Math.abs(r.rake_slope_gain_lf - (r.rake_lf - 56)) < 1e-12);
   assert.ok(Math.abs(r.total_lf - (80 + r.rake_lf)) < 1e-12);
   assert.ok(Math.abs(r.effective_piece_ft - (10 - 2 / 12)) < 1e-12);
-  assert.ok(r.pieces === 16);
+  assert.ok(r.pieces === 17 && r.pieces === r.eave_pieces + r.rake_pieces); // two profiles, ordered separately (9 + 8)
   // THE POINT: the slope factor applies to rakes ONLY - the eave never moves with pitch.
   for (const rise of [0, 3, 6, 8, 12]) {
     const t = _v1116({ ...base, pitch_rise_per_12: rise });

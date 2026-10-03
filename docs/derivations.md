@@ -1500,7 +1500,7 @@ cross-check.
 | calc-arborist.js | `computeQuadraticMeanDiameter` | `{ tally = "" } = {}` | _ | _ | _ |
 | calc-arborist.js | `computeReinekeSdi` | `{ trees_per_acre = 0, qmd_in = 0, sdi_max = 0 } = {}` | _ | _ | _ |
 | calc-arborist.js | `computeThinningTargetTpa` | `{ sdi_max = 0, target_pct = 0, qmd_in = 0, current_tpa = 0 } = {}` | _ | _ | _ |
-| calc-arborist.js | `computeTreeAppraisalCtla` | `{ dbh_in = 0, unit_cost_per_sq_in = 60, species_pct = 100, condition_pct = 10...` | _ | _ | _ |
+| calc-arborist.js | `computeTreeAppraisalCtla` | `{ dbh_in = 0, unit_cost_per_sq_in = 0, species_pct = 100, condition_pct = 100...` | _ | _ | _ |
 | calc-arborist.js | `computeTreeCrzEncroachment` | `{ dbh_in = 0, radius_factor = 1.0, limit_distance_ft = 0, species_tolerance =...` | _ | _ | _ |
 | calc-arborist.js | `computeTreeHeightClinometer` | `{ horizontal_distance_ft = 0, top_reading_pct = 0, base_reading_pct = 0 } = {}` | _ | _ | _ |
 | calc-arborist.js | `computeTreeOpenCavity` | `{ diameter_in = 0, shell_thick_in = 0, opening_width_in = 0 } = {}` | _ | _ | _ |
@@ -2874,7 +2874,7 @@ cross-check.
 | calc-mechanic.js | `computeCarburetorAltitudeJetting` | `{ baseline_pressure_inhg = 29.92, baseline_temp_f = 59, actual_pressure_inhg ...` | _ | _ | _ |
 | calc-mechanic.js | `computeCentrifugalForce` | `{ weight_lb = 0, radius_in = 0, speed_rpm = 0 } = {}` | _ | _ | _ |
 | calc-mechanic.js | `computeChamberCcForCr` | `{ bore_in = 0, stroke_in = 0, target_cr = 0, gasket_bore_in = 0, gasket_thick...` | _ | _ | _ |
-| calc-mechanic.js | `computeClimbGradientRoc` | `{ climb_gradient_ft_per_nm = 0, ground_speed_kt = 0 } = {}` | _ | _ | _ |
+| calc-mechanic.js | `computeClimbGradientRoc` | `{ climb_gradient_ft_per_nm = 200, ground_speed_kt = 0 } = {}` | _ | _ | _ |
 | calc-mechanic.js | `computeCoolingSystemFlow` | `{ q_btuh = 0, dt_f = 0, coolant = "water" } = {}` | _ | _ | _ |
 | calc-mechanic.js | `computeCrosswindComponent` | `{ runway_heading_deg = 0, wind_dir_deg = 0, wind_speed_kt = 0, gust_kt = 0, m...` | _ | _ | _ |
 | calc-mechanic.js | `computeCrouchHpForSpeed` | `{ target_speed_mph = 0, displacement_lb = 0, hull_constant = 190 } = {}` | _ | _ | _ |
