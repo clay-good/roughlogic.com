@@ -2524,8 +2524,8 @@ function _v7renderServiceLoadStandard(inputRegion, outputRegion, citationEl) {
   const update = _v7debounce(() => {
     const r = computeServiceLoadStandard({
       area_ft2: Number(a.input.value) || 0,
-      small_appliance_circuits: Number(sa.input.value) || 0,
-      laundry_circuit: Number(lc.input.value) || 0,
+      small_appliance_circuits: (sa.input.value === "" ? 2 : Number(sa.input.value)),
+      laundry_circuit: (lc.input.value === "" ? 1 : Number(lc.input.value)),
       fixed_appliances_W: Number(fa.input.value) || 0,
       fixed_appliance_count: Number(fac.input.value) || 0,
       range_W: Number(range.input.value) || 0,

@@ -2814,8 +2814,8 @@
       "date": "2026-09-30"
     },
     "/tools/fall-protection-clearance/": {
-      "sha": "c03d2a93e5d09ad4",
-      "date": "2026-09-29"
+      "sha": "ca13b93d7a275d54",
+      "date": "2026-10-03"
     },
     "/tools/fan-affinity-laws/": {
       "sha": "8e27e8ae56e0c324",
@@ -3870,8 +3870,8 @@
       "date": "2026-09-29"
     },
     "/tools/hydronic-fill-pressure/": {
-      "sha": "72087604b6091cb5",
-      "date": "2026-09-29"
+      "sha": "86874c5ab77eefca",
+      "date": "2026-10-03"
     },
     "/tools/hydronic-gpm-deltat/": {
       "sha": "1066e6ffe0c325c0",
@@ -5342,7 +5342,7 @@
       "date": "2026-09-29"
     },
     "/tools/pipe-filled-support-load/": {
-      "sha": "f998e9e212fa7d72",
+      "sha": "5096e42954658bbf",
       "date": "2026-10-03"
     },
     "/tools/pipe-fitting-takeout/": {
@@ -6818,8 +6818,8 @@
       "date": "2026-09-29"
     },
     "/tools/service-load-standard/": {
-      "sha": "10113ee85c094547",
-      "date": "2026-09-29"
+      "sha": "255076a5453b6f77",
+      "date": "2026-10-03"
     },
     "/tools/settlement-limit-load/": {
       "sha": "eb0c306ae4f00a82",
@@ -7894,8 +7894,8 @@
       "date": "2026-09-29"
     },
     "/tools/taping-corrections/": {
-      "sha": "dca923258921d069",
-      "date": "2026-09-29"
+      "sha": "19199f23c0a08c89",
+      "date": "2026-10-03"
     },
     "/tools/taping-normal-tension/": {
       "sha": "8130b0c395bae2cd",
@@ -8670,8 +8670,8 @@
       "date": "2026-09-29"
     },
     "/tools/water-service-pressure-check/": {
-      "sha": "d678740f92edb38f",
-      "date": "2026-09-29"
+      "sha": "bb89fd4e91f1f90b",
+      "date": "2026-10-03"
     },
     "/tools/water-supply-duration/": {
       "sha": "c12180a7f2712e4a",

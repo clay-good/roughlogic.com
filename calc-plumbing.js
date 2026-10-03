@@ -4547,7 +4547,7 @@ function _v452renderHydronicFillPressure(inputRegion, outputRegion, citationEl) 
   const oStatic = makeOutputLine(outputRegion, "Static lift (height/2.31)", "hfp-out-static");
   const oNote = makeOutputLine(outputRegion, "Note", "hfp-out-n");
   const update = debounce(() => {
-    const r = computeHydronicFillPressure({ height_ft: Number(h.input.value) || 0, margin_psi: Number(m.input.value) || 0 });
+    const r = computeHydronicFillPressure({ height_ft: Number(h.input.value) || 0, margin_psi: (m.input.value === "" ? 4 : Number(m.input.value)) });
     if (r.error) { oFill.textContent = r.error; oStatic.textContent = "-"; oNote.textContent = ""; return; }
     oFill.textContent = fmt(r.fill_psi, 1) + " psi (" + fmt(r.top_static_psi, 1) + " psi left at the top)";
     oStatic.textContent = fmt(r.static_psi, 1) + " psi";

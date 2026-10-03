@@ -1953,9 +1953,9 @@ function _v7x_renderFallProtection(inputRegion, outputRegion, citationEl) {
       connector: conn.select.value,
       free_fall_ft_override: ff.input.value === "" ? null : Number(ff.input.value),
       decel_ft_override: dc.input.value === "" ? null : Number(dc.input.value),
-      worker_height_ft: Number(wh.input.value) || 0,
-      harness_stretch_ft: Number(hs.input.value) || 0,
-      safety_factor_ft: Number(sf.input.value) || 0,
+      worker_height_ft: (wh.input.value === "" ? 5 : Number(wh.input.value)),
+      harness_stretch_ft: (hs.input.value === "" ? 1 : Number(hs.input.value)),
+      safety_factor_ft: (sf.input.value === "" ? 1 : Number(sf.input.value)),
       actual_clearance_ft: Number(ac.input.value) || 0,
     });
     if (r.error) { oR.textContent = r.error; oRem.textContent = "-"; oF.textContent = "-"; return; }

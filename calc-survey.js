@@ -414,7 +414,7 @@ function renderTapingCorrections(inputRegion, outputRegion, citationEl) {
   const oBreak = makeOutputLine(outputRegion, "Corrections (temp / slope / tension / sag)", "tap-out-break");
   const oNote = makeOutputLine(outputRegion, "Note", "tap-out-note");
   const update = debounce(() => {
-    const r = computeTapingCorrections({ l_ft: Number(l.input.value) || 0, t_f: Number(t.input.value) || 0, t0_f: Number(t0.input.value) || 0, h_ft: Number(h.input.value) || 0, p_lb: Number(p.input.value) || 0, p0_lb: Number(p0.input.value) || 0, a_in2: Number(a.input.value) || 0, w_plf: Number(w.input.value) || 0 });
+    const r = computeTapingCorrections({ l_ft: Number(l.input.value) || 0, t_f: (t.input.value === "" ? 68 : Number(t.input.value)), t0_f: (t0.input.value === "" ? 68 : Number(t0.input.value)), h_ft: Number(h.input.value) || 0, p_lb: Number(p.input.value) || 0, p0_lb: Number(p0.input.value) || 0, a_in2: Number(a.input.value) || 0, w_plf: Number(w.input.value) || 0 });
     if (r.error) { oCorr.textContent = r.error; oBreak.textContent = "-"; oNote.textContent = "-"; return; }
     oCorr.textContent = fmt(r.corrected_ft, 3) + " ft";
     oBreak.textContent = fmt(r.ct_ft, 3) + " / " + fmt(r.ch_ft, 3) + " / " + fmt(r.cp_ft, 4) + " / " + fmt(r.cs_ft, 4) + " ft";

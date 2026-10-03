@@ -570,7 +570,7 @@ function _renderPipeFilledSupportLoad(inputRegion, outputRegion, citationEl) {
   const update = debounce(() => {
     const r = computePipeFilledSupportLoad({
       od_in: Number(od.input.value) || 0, wall_in: Number(wall.input.value) || 0,
-      pipe_density: Number(pd.input.value) || 0, fluid_density: Number(fd.input.value) || 0,
+      pipe_density: (pd.input.value === "" ? 490 : Number(pd.input.value)), fluid_density: (fd.input.value === "" ? 62.4 : Number(fd.input.value)),
       insul_thk_in: Number(thk.input.value) || 0, insul_density: Number(idns.input.value) || 0,
       spacing_ft: Number(spacing.input.value) || 0,
     });

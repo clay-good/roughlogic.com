@@ -673,7 +673,7 @@ function _v1146renderWaterServicePressureCheck(inputRegion, outputRegion, citati
   const oE = makeOutputLine(outputRegion, "Closed system and expansion (607.3)", "wsp-out-e");
   const oNote = makeOutputLine(outputRegion, "Note", "wsp-out-note");
   const update = debounce(() => {
-    const r = computeWaterServicePressureCheck({ static_pressure_psi: Number(sp.input.value) || 0, prv_setpoint_psi: Number(ps.input.value) || 0, min_fixture_pressure_psi: Number(mf.input.value) || 0, has_check_or_backflow: cb.select.value, has_storage_water_heater: wh.select.value, expansion_control_present: ec.select.value });
+    const r = computeWaterServicePressureCheck({ static_pressure_psi: Number(sp.input.value) || 0, prv_setpoint_psi: Number(ps.input.value) || 0, min_fixture_pressure_psi: (mf.input.value === "" ? 20 : Number(mf.input.value)), has_check_or_backflow: cb.select.value, has_storage_water_heater: wh.select.value, expansion_control_present: ec.select.value });
     if (r.error) { oV.textContent = r.error; oP.textContent = "-"; oF.textContent = "-"; oE.textContent = "-"; oNote.textContent = "-"; return; }
     oV.textContent = r.passes ? "PASSES the items entered" : "DOES NOT PASS";
     oP.textContent = r.prv_required ? "over 80 psi by " + fmt(r.over_by_psi, 1) + " - a PRV is required" + (r.setpoint_ok === false ? ", and the setpoint entered is itself over 80" : "") : "within the 80 psi cap";
