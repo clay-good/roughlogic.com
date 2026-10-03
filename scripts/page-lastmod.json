@@ -2,7 +2,7 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "2b78f15d1a2bc7e9",
+      "sha": "3fabe026abbc4f44",
       "date": "2026-10-03"
     },
     "/tools/": {
@@ -850,7 +850,7 @@
       "date": "2026-10-01"
     },
     "/tools/brine-cure/": {
-      "sha": "40d5b70226e0040b",
+      "sha": "902d20aa26233414",
       "date": "2026-10-03"
     },
     "/tools/broad-crested-weir/": {
@@ -2586,7 +2586,7 @@
       "date": "2026-09-29"
     },
     "/tools/egress-window-check/": {
-      "sha": "7296de1a571e00c5",
+      "sha": "e5b2d2a9d152f828",
       "date": "2026-10-03"
     },
     "/tools/egress-window-well/": {
@@ -3438,8 +3438,8 @@
       "date": "2026-10-03"
     },
     "/tools/grab-bar-layout/": {
-      "sha": "dbd3af92a7dc28c9",
-      "date": "2026-09-29"
+      "sha": "54c551a4eef73edf",
+      "date": "2026-10-03"
     },
     "/tools/grade-rod-cut-fill/": {
       "sha": "0a3c8dac571c3ed3",
@@ -4118,8 +4118,8 @@
       "date": "2026-09-29"
     },
     "/tools/knee-toe-clearance/": {
-      "sha": "9720501a12323a80",
-      "date": "2026-09-29"
+      "sha": "d00b48d25c728494",
+      "date": "2026-10-03"
     },
     "/tools/knot-reference/": {
       "sha": "d9baca6c54c91966",
@@ -6734,8 +6734,8 @@
       "date": "2026-09-29"
     },
     "/tools/seismic-overturning-stability/": {
-      "sha": "bfe286c3f1f71b6c",
-      "date": "2026-09-29"
+      "sha": "4aa05df53fb9dda8",
+      "date": "2026-10-03"
     },
     "/tools/seismic-pdelta-stability/": {
       "sha": "186461d6bd7c5a47",
@@ -7810,8 +7810,8 @@
       "date": "2026-09-29"
     },
     "/tools/tactile-sign-mounting/": {
-      "sha": "d2781ee1c62e3ebe",
-      "date": "2026-09-29"
+      "sha": "48d5b94f6e203976",
+      "date": "2026-10-03"
     },
     "/tools/tagline-force/": {
       "sha": "aa10cbdba14d8390",
@@ -8226,7 +8226,7 @@
       "date": "2026-09-29"
     },
     "/tools/trap-seal-loss/": {
-      "sha": "44708eda200b8b18",
+      "sha": "7ef5fd505e498fd5",
       "date": "2026-10-03"
     },
     "/tools/trap-speed-horsepower/": {

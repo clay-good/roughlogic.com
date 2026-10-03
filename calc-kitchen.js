@@ -704,7 +704,8 @@ export function computeBrineCure({ mode = "brine", water_g = 0, salt_g = 0, meat
   // chopped product (156 ppm), 1 oz per 100 lb dry cure (625 ppm); 424.22(b): bacon 120 ppm
   // pumped / massaged / immersion cured, 200 ppm dry cured. (Until 2026-09-24 every equilibrium
   // cure was held to 156 and credited to 424.22, which passed bacon at up to 155 ppm.)
-  const FSIS_INGOING_MAX_PPM = { chopped: 156, dry_cure: 625, bacon_immersion: 120, bacon_dry: 200 };
+  // chopped is 1/4 oz per 100 lb exactly (156.25 ppm; FSIS rounds it to 156).
+  const FSIS_INGOING_MAX_PPM = { chopped: 156.25, dry_cure: 625, bacon_immersion: 120, bacon_dry: 200 };
   if (!(product in FSIS_INGOING_MAX_PPM)) return { error: "Product must be chopped, dry_cure, bacon_immersion or bacon_dry." };
   const FSIS_PICKLE_MAX_PPM = 2400; // 424.21(c): 2 lb sodium nitrite per 100 gal of pickle
   let concentration, total;
@@ -729,7 +730,9 @@ export function computeBrineCure({ mode = "brine", water_g = 0, salt_g = 0, meat
   // the concentration of the pickle itself, which 424.21(c) caps at 2 lb sodium nitrite per
   // 100 gal -- about 2,400 ppm -- and the meat's ingoing figure then follows the pump level.
   const limit_ppm = mode === "equilibrium" ? FSIS_INGOING_MAX_PPM[product] : FSIS_PICKLE_MAX_PPM;
-  const over_max = nitritePpm >= limit_ppm;
+  // A maximum is reached, not exceeded, at the limit, and 120 ppm is the level pumped bacon is
+  // required to carry. Until 2026-10-03 ">=" flagged a cure exactly at each limit.
+  const over_max = nitritePpm > limit_ppm + 1e-9 * limit_ppm;
   const saltToAdd = target > 0 ? target * total / 100 - salt : null;
   return {
     concentration_pct: Number.isFinite(concentration) ? concentration : null,

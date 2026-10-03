@@ -269,8 +269,8 @@ export function computeVentTerminalCheck({ height_above_roof_in = 6, snow_accumu
   const frost_ok = frost_zone ? (diameter_ok && increase_ok !== false) : null;
 
   // Location: IPC 903.5 / IRC P3103.5
-  const clears_horizontally = horiz >= 10;
-  const clears_vertically = above >= 3;
+  const clears_horizontally = horiz >= 10 - 1e-9 * 10;
+  const clears_vertically = above >= 3 - 1e-9 * 3;
   const location_ok = clears_horizontally || clears_vertically;
 
   const passes = height_ok && (frost_ok !== false) && location_ok;
@@ -441,6 +441,11 @@ export function computeGrabBarLayout({ bar_height_in = 34, side_bar_length_in = 
   const height_ok = h >= H_MIN - 1e-9 * Math.abs(H_MIN) && h <= H_MAX + 1e-9 * Math.abs(H_MAX);
   const side_length_ok = sl >= SIDE_MIN - 1e-9 * Math.abs(SIDE_MIN);
   const side_position_ok = sf <= SIDE_FROM_REAR_MAX + 1e-9 * Math.abs(SIDE_FROM_REAR_MAX);
+  // 604.5.1 also requires the side bar to extend 54 in minimum from the rear wall. Until
+  // 2026-10-03 a 42 in bar mounted at the rear wall (reaching 42 in) passed.
+  const SIDE_REACH_MIN = 54;
+  const side_reach_in = sf + sl;
+  const side_reach_ok = side_reach_in >= SIDE_REACH_MIN - 1e-9 * SIDE_REACH_MIN;
   const rear_length_ok = rl >= REAR_MIN - 1e-9 * Math.abs(REAR_MIN);
   const rear_side_ok = rs >= REAR_SIDE_MIN - 1e-9 * Math.abs(REAR_SIDE_MIN);
   const rear_open_ok = ro >= REAR_OPEN_MIN - 1e-9 * Math.abs(REAR_OPEN_MIN);
@@ -448,7 +453,7 @@ export function computeGrabBarLayout({ bar_height_in = 34, side_bar_length_in = 
   // of the two extensions - this is the check people miss on a 36 in bar.
   const rear_span_needed_in = rs + ro;
   const rear_span_ok = rl >= rear_span_needed_in - 1e-9 * Math.abs(rear_span_needed_in);
-  const layout_ok = height_ok && side_length_ok && side_position_ok && rear_length_ok && rear_side_ok && rear_open_ok && rear_span_ok;
+  const layout_ok = height_ok && side_length_ok && side_position_ok && side_reach_ok && rear_length_ok && rear_side_ok && rear_open_ok && rear_span_ok;
 
   // 609.8: the bar AND its mounting sustain the load. Standoff turns a pull into a pry.
   const pull_out_lb = P;
@@ -457,7 +462,7 @@ export function computeGrabBarLayout({ bar_height_in = 34, side_bar_length_in = 
   const force_multiplier = fs > 0 ? off / fs : null;
 
   const note = "POSITION (609.4): horizontal, " + H_MIN + " to " + H_MAX + " in above the finish floor to the TOP of the gripping surface - this one is at " + h + " in, " + (height_ok ? "OK. " : "OUT OF RANGE. ")
-    + "SIDE WALL (604.5.1): at least " + SIDE_MIN + " in long, no more than " + SIDE_FROM_REAR_MAX + " in from the rear wall - this one is " + sl + " in at " + sf + " in, " + (side_length_ok ? "length OK" : "TOO SHORT") + " and " + (side_position_ok ? "position OK" : "TOO FAR from the rear wall") + ". "
+    + "SIDE WALL (604.5.1): at least " + SIDE_MIN + " in long, no more than " + SIDE_FROM_REAR_MAX + " in from the rear wall - this one is " + sl + " in at " + sf + " in, " + (side_length_ok ? "length OK" : "TOO SHORT") + " and " + (side_position_ok ? "position OK" : "TOO FAR from the rear wall") + ", and it must reach " + SIDE_REACH_MIN + " in from the rear wall: it reaches " + side_reach_in + " in, " + (side_reach_ok ? "OK" : "SHORT") + ". "
     + "REAR WALL: at least " + REAR_MIN + " in long, extending at least " + REAR_SIDE_MIN + " in from the water closet centerline toward the side wall and at least " + REAR_OPEN_MIN + " in toward the open side - this one is " + rl + " in reaching " + rs + " and " + ro + " in, " + (rear_length_ok ? "length OK" : "TOO SHORT") + ", " + (rear_side_ok ? "side extension OK" : "side extension SHORT") + ", " + (rear_open_ok ? "open extension OK" : "open extension SHORT") + ". "
     + "The check people miss: those two extensions have to fit ON the bar. They add to " + rear_span_needed_in + " in, so a " + REAR_MIN + " in bar only works when they total " + REAR_MIN + " or less - here the bar is " + rl + " in and " + (rear_span_ok ? "covers it. " : "does NOT cover it, so the bar has to grow even though every individual dimension reads compliant. ")
     + "LOAD (609.8): the bar and its MOUNTING must sustain " + P + " lbf. That is not a fastener count, it is a load path. A bar standing " + off + " in off the wall converts a straight " + P + " lb pull into " + prying_moment_inlb.toFixed(0) + " in-lb of prying moment at the flange"
@@ -466,7 +471,7 @@ export function computeGrabBarLayout({ bar_height_in = 34, side_bar_length_in = 
     + (layout_ok ? "The layout dimensions entered PASS. " : "The layout dimensions entered DO NOT all pass. ")
     + "Scope: the standard water-closet configuration with a side wall and a rear wall. Ambulatory-accessible stalls, bathtubs, and roll-in and transfer showers each have their own bar layouts under 604.8, 607, and 608 and are NOT this. Not checked: the clear floor space, the water closet centerline at 16-18 in, seat height, flush-control side, dispenser locations, the 1-1/4 to 2 in gripping diameter, or the 1-1/2 in clearance behind the bar. The 2010 ADA Standards and ANSI A117.1 differ in places and a state may adopt either; a screen, not a certification of accessibility - the adopted standard and the AHJ govern.";
 
-  return { height_ok, side_length_ok, side_position_ok, rear_length_ok, rear_side_ok, rear_open_ok, rear_span_needed_in, rear_span_ok, layout_ok, pull_out_lb, prying_moment_inlb, fastener_force_lb, force_multiplier, note };
+  return { height_ok, side_length_ok, side_position_ok, side_reach_in, side_reach_ok, rear_length_ok, rear_side_ok, rear_open_ok, rear_span_needed_in, rear_span_ok, layout_ok, pull_out_lb, prying_moment_inlb, fastener_force_lb, force_multiplier, note };
 }
 
 export const grabBarLayoutExample = { inputs: { bar_height_in: 34, side_bar_length_in: 42, side_bar_from_rear_in: 12, rear_bar_length_in: 36, rear_toward_side_in: 12, rear_toward_open_in: 24, load_lb: 250, standoff_in: 1.5, fastener_spacing_in: 3 } };
@@ -493,7 +498,7 @@ function _v1137renderGrabBarLayout(inputRegion, outputRegion, citationEl) {
     const r = computeGrabBarLayout({ bar_height_in: Number(h.input.value) || 0, side_bar_length_in: Number(sl.input.value) || 0, side_bar_from_rear_in: Number(sf.input.value) || 0, rear_bar_length_in: Number(rl.input.value) || 0, rear_toward_side_in: Number(rs.input.value) || 0, rear_toward_open_in: Number(ro.input.value) || 0, load_lb: Number(ld.input.value) || 0, standoff_in: Number(so.input.value) || 0, fastener_spacing_in: Number(fs.input.value) || 0 });
     if (r.error) { oV.textContent = r.error; oS.textContent = "-"; oR.textContent = "-"; oL.textContent = "-"; oNote.textContent = "-"; return; }
     oV.textContent = (r.layout_ok ? "PASSES" : "DOES NOT PASS") + "; height " + (r.height_ok ? "OK" : "out of the 33-36 in range");
-    oS.textContent = (r.side_length_ok ? "42 in length OK" : "TOO SHORT") + ", " + (r.side_position_ok ? "within 12 in of the rear wall" : "TOO FAR from the rear wall");
+    oS.textContent = (r.side_length_ok ? "42 in length OK" : "TOO SHORT") + ", " + (r.side_position_ok ? "within 12 in of the rear wall" : "TOO FAR from the rear wall") + ", " + (r.side_reach_ok ? "reaches 54 in" : "reaches only " + fmt(r.side_reach_in, 0) + " in of the 54 required");
     oR.textContent = (r.rear_length_ok ? "36 in length OK" : "TOO SHORT") + ", reaches " + (r.rear_side_ok ? "OK" : "SHORT") + " / " + (r.rear_open_ok ? "OK" : "SHORT") + ", and the two reaches need " + fmt(r.rear_span_needed_in, 0) + " in of bar - " + (r.rear_span_ok ? "covered" : "NOT covered");
     oL.textContent = fmt(r.pull_out_lb, 0) + " lb pull-out plus " + fmt(r.prying_moment_inlb, 0) + " in-lb of pry" + (r.fastener_force_lb === null ? "" : " = " + fmt(r.fastener_force_lb, 0) + " lb on the outer fastener (" + fmt(r.force_multiplier, 2) + "x)");
     oNote.textContent = r.note;
@@ -638,7 +643,9 @@ export function computeWaterServicePressureCheck({ static_pressure_psi = 0, min_
   const closed_system = prv_required || setpoint_entered || otherClosure;
   const expansion_required = closed_system && heater;
   const expansion_ok = expansion_required ? control : null;
-  const passes = (!prv_required || setpoint_ok !== false) && fixture_ok && (expansion_ok !== false);
+  // Over 80 psi a PRV is required (IPC 604.8), so "none entered" fails. Until 2026-10-03 a null
+  // setpoint slipped through !== false and 120 psi with no PRV passed.
+  const passes = (!prv_required || setpoint_ok === true) && fixture_ok && (expansion_ok !== false);
 
   const note = "STATIC PRESSURE (604.8): the cap is " + MAX + " psi, and at " + p + " psi this service is "
     + (prv_required ? over_by_psi.toFixed(1) + " psi OVER, so an approved pressure-reducing valve conforming to ASSE 1003 or CSA B356 is required on the branch main or riser at the connection to the water service pipe. High static pressure is not a comfort complaint - it is what splits supply lines, wears out fill valves and cartridges, and makes a house sound like it is being hit with a hammer every time a valve closes. " : "within the cap, so no pressure-reducing valve is required on pressure grounds. ")

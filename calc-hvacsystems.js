@@ -2476,7 +2476,7 @@ export function computePlenumReturnDrop({
   const area_for_target_ft2 = return_cfm / target_velocity_fpm;
   const width_for_target_ft = area_for_target_ft2 / (pinch_clear_in / 12);
   const bays_needed = pinch_width_ft > 0 ? width_for_target_ft / pinch_width_ft : 0;
-  const size_verdict = bays_needed <= 1
+  const size_verdict = bays_needed <= 1 + 1e-9
     ? fmt(area_for_target_ft2, 1) + " sq ft is needed at the target, which at " + fmt(pinch_clear_in, 1) + " in clear means " + fmt(width_for_target_ft, 1) + " ft of width -- which the " + fmt(pinch_width_ft, 1) + " ft entered already provides"
     : fmt(area_for_target_ft2, 1) + " sq ft is needed at the target, which at " + fmt(pinch_clear_in, 1) + " in clear means " + fmt(width_for_target_ft, 0) + " ft of width -- " + fmt(bays_needed, 1) + " times the " + fmt(pinch_width_ft, 1) + " ft entered, so the air has to come through that many bays rather than one, and the design question is whether the openings and the routing actually let it";
   // The static consequence, which is what makes this a balancing issue rather

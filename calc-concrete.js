@@ -91,7 +91,7 @@ export const CONCRETE_RENDERERS = {};
 
 // ===================== spec-v257: reinforced concrete beam flexural capacity =====================
 
-// dims: in { fc: M L^-1 T^-2, fy: M L^-1 T^-2, as_in2: L^2, b: L, d: L, mu: M L^2 T^-2 } out: { a_in: L, mn_kipft: M L^2 T^-2, phi_mn: M L^2 T^-2, util: dimensionless }
+// dims: in { fc: M L^-1 T^-2, fy: M L^-1 T^-2, as_in2: L^2, b: L, d: L, mu: M L^2 T^-2 } out: { a_in: L, mn_kipft: M L^2 T^-2, phi_mn: M L^2 T^-2, util: dimensionless, eps_t: dimensionless, tc_limit: dimensionless, tension_controlled: dimensionless }
 export function computeRcBeamFlexure({ fc = 4000, fy = 60000, as_in2 = 0, b = 0, d = 0, mu = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(fc > 0)) return { error: "Concrete strength f'c must be positive (psi)." };
@@ -104,7 +104,14 @@ export function computeRcBeamFlexure({ fc = 4000, fy = 60000, as_in2 = 0, b = 0,
   const mn_kipft = mn_kipin / 12;
   const phi_mn = 0.90 * mn_kipft;
   const util = mu > 0 ? mu / phi_mn : null;
-  return { a_in, mn_kipft, phi_mn, util };
+  // phi = 0.90 holds only for a tension-controlled section, and ACI 318-19 9.3.3.1 requires a
+  // nonprestressed beam to be one (eps_t >= eps_ty + 0.003). Until 2026-10-03 this was never
+  // checked, so an over-reinforced beam read "OK" at phi 0.90.
+  const c_in = a_in / _RC_BETA1(fc);
+  const eps_t = c_in > 0 ? 0.003 * (d - c_in) / c_in : null;
+  const tc_limit = fy / 29e6 + 0.003;
+  const tension_controlled = eps_t !== null && eps_t >= tc_limit - 1e-9 * tc_limit;
+  return { a_in, mn_kipft, phi_mn, util, eps_t, tc_limit, tension_controlled };
 }
 
 export const rcBeamFlexureExample = { inputs: { fc: 4000, fy: 60000, as_in2: 3.00, b: 12, d: 21.5, mu: 200 } };
@@ -124,7 +131,7 @@ CONCRETE_RENDERERS["rc-beam-flexure"] = _simpleRenderer({
     { key: "a", id: "rbf-out-a", label: "Stress-block depth a", value: (r) => fmt(r.a_in, 2) + " in" },
     { key: "mn", id: "rbf-out-mn", label: "Nominal moment Mn", value: (r) => fmt(r.mn_kipft, 1) + " kip-ft" },
     { key: "pm", id: "rbf-out-pm", label: "Design moment phi Mn (phi = 0.90)", value: (r) => fmt(r.phi_mn, 1) + " kip-ft" },
-    { key: "ut", id: "rbf-out-ut", label: "Demand / capacity", value: (r) => r.util === null ? "- (no Mu entered)" : fmt(r.util, 2) + (r.util <= 1 + 1e-9 ? " (OK)" : " (OVER)") },
+    { key: "ut", id: "rbf-out-ut", label: "Demand / capacity", value: (r) => r.util === null ? "- (no Mu entered)" : fmt(r.util, 2) + (r.util <= 1 + 1e-9 ? (r.tension_controlled ? " (OK)" : " (NOT tension-controlled - fails ACI 318-19 9.3.3.1)") : " (OVER)") },
   ],
   compute: computeRcBeamFlexure,
 });
@@ -1696,8 +1703,12 @@ export function computeConcreteCorbelBracket({ factored_shear_lb = 0, horiz_tens
   if (!(mu > 0)) return { error: "Shear-friction coefficient must be positive." };
   if (av < 0) return { error: "Shear span cannot be negative (in)." };
   if (av > d) return { error: "Shear span av exceeds d (av/d > 1) - outside the ACI 16.5 corbel range; design as a cantilever beam." };
+  // ACI 318-19 16.5.1.1(b): the corbel provisions apply only where Nuc <= Vu.
+  if (Nuc_in > Vu + 1e-9 * Vu) return { error: "Horizontal tension Nuc exceeds Vu - outside the ACI 16.5.1.1 corbel range." };
   const nuc_lb = Math.max(Nuc_in, 0.2 * Vu);
-  const avf_in2 = Vu / (0.75 * mu * fy);
+  // Table 20.2.2.4(a) caps fy at 60,000 psi for shear friction. Until 2026-10-03 a higher
+  // grade cut Avf in proportion (fy 100,000 took 40% off the governing steel).
+  const avf_in2 = Vu / (0.75 * mu * Math.min(fy, 60000));
   const mu_lbin = Vu * av + nuc_lb * (h - d);
   const af_in2 = mu_lbin / (0.75 * fy * 0.85 * d);
   const an_in2 = nuc_lb / (0.75 * fy);
@@ -1825,7 +1836,8 @@ export function computeConcreteAnchorBlowout({ edge_distance_in = 0, head_bearin
   if (!(lam > 0 && lam <= 1)) return { error: "Lambda must be in (0, 1] (1.0 normal weight)." };
   if (ca2 < 0) return { error: "Perpendicular edge distance must be zero (none) or positive (in)." };
   if (ca2 > 0 && ca2 < ca1) return { error: "c_a1 must be the minimum edge distance - swap the edges so c_a1 <= c_a2." };
-  const nsb_lb = 160 * ca1 * Math.sqrt(abrg) * lam * Math.sqrt(fc);
+  // 17.3.1 caps f'c at 10,000 psi for a cast-in anchor (added 2026-10-03).
+  const nsb_lb = 160 * ca1 * Math.sqrt(abrg) * lam * Math.sqrt(Math.min(fc, 10000));
   const corner_factor = ca2 > 0 && ca2 < 3 * ca1 ? (1 + ca2 / ca1) / 4 : 1.0;
   const nsbn_lb = nsb_lb * corner_factor;
   const phi_nsb_lb = 0.70 * nsbn_lb;
@@ -1893,7 +1905,9 @@ export function computeConcreteAnchorShearBreakout({ anchor_dia_in = 0, embedmen
   const le_in = Math.min(hef, 8 * da);
   const coef7 = 7 * Math.pow(le_in / da, 0.2) * Math.sqrt(da);
   const governing_form = coef7 <= 9 ? "7-form (stiffness)" : "9-cap (stiff anchor)";
-  const vb_lb = Math.min(coef7, 9) * lam * Math.sqrt(fc) * Math.pow(ca1, 1.5);
+  // ACI 318-19 17.3.1: f'c used in the anchor equations is capped at 10,000 psi for a cast-in
+  // anchor (this tile's case). Until 2026-10-03 a 12,000 psi mix read 9.5% stronger.
+  const vb_lb = Math.min(coef7, 9) * lam * Math.sqrt(Math.min(fc, 10000)) * Math.pow(ca1, 1.5);
   const AVco = 4.5 * ca1 * ca1;
   const depth_in = ha > 0 ? Math.min(1.5 * ca1, ha) : 1.5 * ca1;
   const width_in = 1.5 * ca1 + (ca2 > 0 ? Math.min(1.5 * ca1, ca2) : 1.5 * ca1);
@@ -2432,7 +2446,7 @@ export function computeRcTBeamFlexure({ fc_psi = 4000, fy_psi = 60000, as_in2 = 
     + "Mn = " + mn_kipft.toFixed(1) + " kip-ft, phi Mn = " + phi_mn_kipft.toFixed(1) + " kip-ft at phi = " + phi.toFixed(3) + ". "
     + "Net tensile strain is " + eps_t.toFixed(5) + " against a tension-controlled limit of " + tc_limit.toFixed(5) + " (eps_ty + 0.003 per 21.2.2, the 2019 edition's replacement for the old fixed 0.005 - they differ once you leave Grade 60), so the section is "
     + (tension_controlled ? "tension-controlled and phi is the full 0.90. " : compression_controlled ? "COMPRESSION-CONTROLLED, phi drops to 0.65, and a beam should be redesigned rather than accepted here. " : "in the TRANSITION zone, so phi is interpolated and this section is more heavily reinforced than good practice for a beam. ")
-    + (util !== null ? "Against the " + mu + " kip-ft demand the utilization is " + util.toFixed(2) + (util <= 1 + 1e-9 ? " - OK. " : " - OVER. ") : "")
+    + (util !== null ? "Against the " + mu + " kip-ft demand the utilization is " + util.toFixed(2) + (util <= 1 + 1e-9 ? (tension_controlled ? " - OK. " : " - within capacity, but NOT ACCEPTABLE: ACI 318-19 9.3.3.1 requires a nonprestressed beam to be tension-controlled (eps_t >= " + tc_limit.toFixed(5) + "), and this one is not - reduce As or deepen the section. ") : " - OVER. ") : "")
     + "Positive moment only: at a support the slab is in TENSION, the flange does nothing, and the section reverts to a rectangle of the WEB width - do not use this for negative moment. Singly reinforced; compression steel is the doubly-reinforced tile. Minimum steel (9.6.1.2), shear, deflection, bar spacing, and development are separate checks with their own tiles. A design aid, not a substitute for a licensed engineer's design - the engineer of record's stamped design governs.";
 
   return { be_in, be_source, be_governs, a_trial_in: a_trial, t_action, a_in, c_in, beta1, asf_in2, asw_in2, flange_fraction, eps_ty, tc_limit, eps_t, tension_controlled, compression_controlled, phi, mn_kipft, phi_mn_kipft, util, note };
@@ -2463,7 +2477,7 @@ CONCRETE_RENDERERS["rc-tbeam-flexure"] = _simpleRenderer({
     { key: "mn", id: "rtb-out-mn", label: "Nominal moment Mn", value: (r) => fmt(r.mn_kipft, 1) + " kip-ft" },
     { key: "pm", id: "rtb-out-pm", label: "Design moment phi Mn", value: (r) => fmt(r.phi_mn_kipft, 1) + " kip-ft at phi = " + fmt(r.phi, 3) },
     { key: "et", id: "rtb-out-et", label: "Net tensile strain", value: (r) => fmt(r.eps_t, 5) + " vs a " + fmt(r.tc_limit, 5) + " tension-controlled limit - " + (r.tension_controlled ? "tension-controlled" : r.compression_controlled ? "COMPRESSION-CONTROLLED" : "transition zone") },
-    { key: "ut", id: "rtb-out-ut", label: "Demand / capacity", value: (r) => r.util === null ? "- (no Mu entered)" : fmt(r.util, 2) + (r.util <= 1 + 1e-9 ? " (OK)" : " (OVER)") },
+    { key: "ut", id: "rtb-out-ut", label: "Demand / capacity", value: (r) => r.util === null ? "- (no Mu entered)" : fmt(r.util, 2) + (r.util <= 1 + 1e-9 ? (r.tension_controlled ? " (OK)" : " (NOT tension-controlled - fails ACI 318-19 9.3.3.1)") : " (OVER)") },
     { key: "n", id: "rtb-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeRcTBeamFlexure,

@@ -180,8 +180,8 @@ test("Footing: unknown soil returns error", () => {
   assert.ok(r.error);
 });
 
-test("Footing: SOIL_BEARING_PSF has 6 classes", () => {
-  assert.equal(Object.keys(SOIL_BEARING_PSF).length, 6);
+test("Footing: SOIL_BEARING_PSF has 7 classes", () => {
+  assert.equal(Object.keys(SOIL_BEARING_PSF).length, 7);
 });
 
 test("Footing: rock > sand > clay allowable", () => {

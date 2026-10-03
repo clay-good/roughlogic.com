@@ -2238,6 +2238,9 @@ export function computeWaterHeaterRecovery({
   if (!Number.isFinite(Ti) || !Number.isFinite(Ts)) return { error: "Enter incoming and set-point temperatures." };
   const delta_T_F = Ts - Ti;
   if (!(delta_T_F > 0)) return { error: "Set-point temperature must exceed incoming temperature." };
+  // A recovery efficiency above 1.05 is a percent typed into a fraction field (80 for 0.80);
+  // until 2026-10-03 it only warned, and the first-hour rating ran 66x high.
+  if (eff > 1.05) return { error: "Enter the recovery efficiency as a fraction (0.80, not 80)." };
 
   const q_useful_btu_hr = inputBtu * eff;
   // 8.33 BTU per gallon per degree F (water properties).
@@ -2254,7 +2257,7 @@ export function computeWaterHeaterRecovery({
   // entered peak demand (fixtures x draw). Default (no demand) omits it.
   const peak = Number(peak_demand_gph) || 0;
   let meets_peak = null;
-  if (peak > 0 && Number.isFinite(peak)) meets_peak = first_hour_gph >= peak;
+  if (peak > 0 && Number.isFinite(peak)) meets_peak = first_hour_gph >= peak - 1e-9 * peak;
 
   return {
     heater_type,
@@ -2364,6 +2367,7 @@ export function computeWaterHeaterInput({
   const delta_T_F = Ts - Ti;
   if (!(delta_T_F > 0)) return { error: "Set-point temperature must exceed incoming temperature." };
   if (!(eff > 0)) return { error: "Recovery efficiency must be positive." };
+  if (eff > 1.05) return { error: "Enter the recovery efficiency as a fraction (0.80, not 80)." };
   // Inverse of recovery_gph = input_btu x eff / (8.33 x delta_T):
   // input_btu = recovery_gph x 8.33 x delta_T / eff. Electric: kW = input_btu / 3412.
   const input_btu_hr = rec * 8.33 * delta_T_F / eff;
@@ -2648,9 +2652,14 @@ export function computeSanitaryDfu({
   }
   if (min_size_in == null) warnings.push("Total DFU exceeds the bundled table maximum; this is a commercial-engineered system, consult IPC Table 710.1 directly.");
   if (total_dfu > 1400) warnings.push("DFU load above 1400 is a commercial-engineered system; an engineer of record should size the drainage.");
-  if (slope_in_per_ft < 0.125 && config !== "stack") warnings.push("Slope below 1/8 in per ft is below the IPC minimum for pipe 3 in and smaller.");
-
   const proposed = proposed_size_in != null ? Number(proposed_size_in) : null;
+  // IPC Table 704.1 minimum slope by size: 1/4 in/ft for 2-1/2 in and smaller, 1/8 for 3 to 6 in,
+  // 1/16 for 8 in and larger. Until 2026-10-03 only "below 1/8" warned, so a 2 in branch at 1/8 passed.
+  const slope_size_in = proposed != null ? proposed : min_size_in;
+  if (config !== "stack" && slope_size_in != null) {
+    const min_slope = slope_size_in <= 2.5 ? 0.25 : slope_size_in < 8 ? 0.125 : 0.0625;
+    if (Number(slope_in_per_ft) < min_slope - 1e-9 * min_slope) warnings.push("Slope " + slope_in_per_ft + " in per ft is below the IPC Table 704.1 minimum of " + min_slope + " in per ft for " + slope_size_in + " in pipe.");
+  }
   const undersized = proposed != null && min_size_in != null && proposed < min_size_in - 1e-9 * Math.abs(min_size_in);
   if (undersized) warnings.push("Proposed " + proposed + " in pipe is undersized for " + total_dfu + " DFU; minimum is " + min_size_in + " in.");
 
@@ -3072,13 +3081,17 @@ export function computeTrapSealLoss({ developed_distance_ft = 0, table_max_ft = 
   // drain diameter itself is not part of this check.
   const dist = Number(developed_distance_ft) || 0;
   const max = Number(table_max_ft) || 0;
-  let seal = Number(trap_seal_in); if (!Number.isFinite(seal) || seal < 0) seal = 0;
+  const seal = Number(trap_seal_in);
+  if (!Number.isFinite(seal) || seal < 0) return { error: "Trap-seal depth cannot be negative (in)." };
   if (!(dist > 0 && Number.isFinite(dist))) return { error: "Developed vent distance must be positive (ft)." };
   if (!(max > 0 && Number.isFinite(max))) return { error: "Permitted trap-to-vent distance must be positive (ft)." };
   const percent_used = (dist / max) * 100;
   const within_limit = dist <= max + 1e-9 * Math.abs(max);
-  const siphonage_risk = !within_limit || seal < 1;
-  return { percent_used, within_limit, siphonage_risk, trap_seal_in: seal };
+  // IPC 1002: a fixture trap seal is not less than 2 in. Until 2026-10-03 only a seal under
+  // 1 in was flagged, so a 1.5 in seal read "Adequate seal protection".
+  const seal_short = seal < 2 - 1e-9 * 2;
+  const siphonage_risk = !within_limit || seal_short;
+  return { percent_used, within_limit, seal_short, siphonage_risk, trap_seal_in: seal };
 }
 export const trapSealLossExample = { inputs: { developed_distance_ft: 6, table_max_ft: 8, trap_seal_in: 2 } };
 const renderTrapSealLoss = _v23SimpleRenderer({
@@ -3092,7 +3105,7 @@ const renderTrapSealLoss = _v23SimpleRenderer({
   outputs: [
     { key: "pass", id: "tsl-out-pass", label: "Within limit", value: (r) => r.within_limit ? "PASS - within permitted distance" : "FAIL - trap arm exceeds the table maximum" },
     { key: "pct", id: "tsl-out-pct", label: "Percent of permitted used", value: (r) => fmt(r.percent_used, 0) + "%" },
-    { key: "risk", id: "tsl-out-risk", label: "Siphonage risk", value: (r) => r.siphonage_risk ? "Flag - self-/induced-siphonage risk (vent inadequate or seal < 1 in)" : "Adequate seal protection" },
+    { key: "risk", id: "tsl-out-risk", label: "Siphonage risk", value: (r) => r.siphonage_risk ? (r.seal_short ? "Flag - seal below the 2 in IPC 1002 minimum" + (r.within_limit ? "" : ", and the vent distance is over") : "Flag - self-/induced-siphonage risk (vent distance over the table)") : "Adequate seal protection" },
   ],
   compute: computeTrapSealLoss,
 });
@@ -3284,8 +3297,8 @@ export function computeMixedWaterTemp({ mode = "find-blend", hot_temp_F = 0, col
   const SHOWER_TUB_LIMIT_F = 120, PUBLIC_LAV_LIMIT_F = 110;
   function scaldFlag(T) {
     const flags = [];
-    if (T > SHOWER_TUB_LIMIT_F) flags.push("Delivered temperature exceeds the 120 F scald limit for shower, tub-shower and tub-filler valves (IPC 424.3 / 424.5; ASSE 1016 / 1070).");
-    else if (T > PUBLIC_LAV_LIMIT_F) flags.push("Delivered temperature exceeds the 110 F public hand-washing scald limit (IPC 416.5, ASSE 1070); it is within the 120 F shower and tub limit.");
+    if (T > SHOWER_TUB_LIMIT_F + 1e-9 * SHOWER_TUB_LIMIT_F) flags.push("Delivered temperature exceeds the 120 F scald limit for shower, tub-shower and tub-filler valves (IPC 424.3 / 424.5; ASSE 1016 / 1070).");
+    else if (T > PUBLIC_LAV_LIMIT_F + 1e-9 * PUBLIC_LAV_LIMIT_F) flags.push("Delivered temperature exceeds the 110 F public hand-washing scald limit (IPC 416.5, ASSE 1070); it is within the 120 F shower and tub limit.");
     return flags;
   }
 

@@ -211,7 +211,7 @@ export function computePoolPumpSpeedSavings({
     ? "(no electricity rate entered)"
     : "over " + fmt(days_per_year, 0) + " days at " + fmt(electricity_rate_per_kwh, 3) + " per kWh that is " + fmt(annual_saving_cost, 0) + " a year -- which on most pools pays for a variable speed pump inside two or three seasons, and is the reason many jurisdictions now require one";
   const has_minimum = minimum_flow_fraction > 0;
-  const below_minimum = has_minimum && speed_fraction < minimum_flow_fraction;
+  const below_minimum = has_minimum && speed_fraction < minimum_flow_fraction - 1e-9 * minimum_flow_fraction;
   const equipment_verdict = !has_minimum
     ? "(no equipment minimum flow entered -- and heaters, chlorinators, cleaners and some filters have one)"
     : below_minimum

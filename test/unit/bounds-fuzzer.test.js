@@ -27848,8 +27848,11 @@ test("bounds: spec-v617 computeConcreteAnchorBlowout pins Nsb, the corner factor
   // Nsb scales linearly with ca1 and with sqrt(f'c).
   const dblEdge = _v617({ edge_distance_in: 6, head_bearing_area_in2: 0.654, fc_psi: 4000, embedment_in: 16, perp_edge_in: 0, lambda: 1 });
   assert.ok(Math.abs(dblEdge.nsb_lb - 2 * r.nsb_lb) < 1e-6);
-  const strong = _v617({ edge_distance_in: 3, head_bearing_area_in2: 0.654, fc_psi: 16000, embedment_in: 10, perp_edge_in: 0, lambda: 1 });
-  assert.ok(Math.abs(strong.nsb_lb - 2 * r.nsb_lb) < 1e-6);
+  const strong = _v617({ edge_distance_in: 3, head_bearing_area_in2: 0.654, fc_psi: 9000, embedment_in: 10, perp_edge_in: 0, lambda: 1 });
+  assert.ok(Math.abs(strong.nsb_lb - 1.5 * r.nsb_lb) < 1e-6);
+  // ACI 318-19 17.3.1 caps f'c at 10,000 psi for a cast-in anchor: 16,000 reads as 10,000.
+  const capped = _v617({ edge_distance_in: 3, head_bearing_area_in2: 0.654, fc_psi: 16000, embedment_in: 10, perp_edge_in: 0, lambda: 1 });
+  assert.ok(Math.abs(capped.nsb_lb - Math.sqrt(10000 / 4000) * r.nsb_lb) < 1e-6);
   // Applicability seam: hef <= 2.5 ca1 flags breakout as governing (same arithmetic, flag down).
   const shallow = _v617({ edge_distance_in: 3, head_bearing_area_in2: 0.654, fc_psi: 4000, embedment_in: 7.5, perp_edge_in: 0, lambda: 1 });
   assert.ok(shallow.applicable === false);
@@ -37140,10 +37143,11 @@ test("bounds: spec-v1172 computeKneeToeClearance pins the 27 in zone gate, the t
   assert.ok(_v1172({ ...ok, knee_depth_at_9_in: 10.9 }).knee_27_ok, "the 27 in depth is unaffected");
   assert.ok(Math.abs(_v1172({ ...ok, knee_depth_at_9_in: 9 }).knee_deficit_in - 2) < 1e-9);
   assert.ok(Math.abs(_v1172({ ...ok, knee_depth_at_27_in: 5 }).knee_deficit_in - 3) < 1e-9);
-  // THE TAPER RATE IS A SEPARATE FAILURE: both depths can pass and the rate still fail.
+  // THE TAPER RATE describes the minimum envelope: a faster taper from a deeper top that meets
+  // both minimums stays above it on a straight profile, so it is reported but does not fail.
   const taper = _v1172({ ...ok, knee_depth_at_9_in: 17, knee_depth_at_27_in: 12 });
   assert.ok(taper.knee_9_ok && taper.knee_27_ok && taper.knee_deficit_in === 0);
-  assert.ok(taper.actual_taper_in === 5 && !taper.taper_ok && !taper.knee_ok && !taper.passes);
+  assert.ok(taper.actual_taper_in === 5 && !taper.taper_ok && taper.knee_ok);
   for (const [k9, k27, rateOk] of [[11, 8, true], [14, 11, true], [14, 10.9, false], [20, 17, true], [20, 16, false], [11, 11, true]]) {
     const t = _v1172({ ...ok, knee_depth_at_9_in: k9, knee_depth_at_27_in: k27 });
     assert.ok(t.taper_ok === rateOk, "taper verdict wrong at " + k9 + "/" + k27);
@@ -37530,8 +37534,10 @@ test("bounds: spec-v1178 computeAccessibleShowerCheck pins all three type geomet
     assert.ok(t.required_width_in === w && t.required_depth_in === d && t.required_entry_in === e, "inside spec wrong for " + type);
     assert.ok(t.required_clearance_width_in === cw && t.required_clearance_length_in === cl, "clearance spec wrong for " + type);
     assert.ok(t.passes, "the exact minimum of " + type + " must pass");
-    // A tenth under any one of the three inside dimensions fails.
-    for (const [k, v] of [["width_in", w - 0.1], ["depth_in", d - 0.1], ["entry_width_in", e - 0.1]]) {
+    // A tenth under any one of the three inside dimensions fails (an inch for the transfer
+    // stall's width and depth, which are held to 36 within a 1/2 in construction tolerance).
+    const dev = type === "transfer" ? 1 : 0.1;
+    for (const [k, v] of [["width_in", w - dev], ["depth_in", d - dev], ["entry_width_in", e - 0.1]]) {
       assert.ok(!_v1178({ ...base, shower_type: type, width_in: w, depth_in: d, entry_width_in: e, clearance_width_in: cw, clearance_length_in: cl, [k]: v }).passes, k + " must fail a tenth under for " + type);
     }
   }
@@ -37561,8 +37567,10 @@ test("bounds: spec-v1178 computeAccessibleShowerCheck pins all three type geomet
   const rotated = _v1178({ ...base, width_in: 60, depth_in: 36, entry_width_in: 36 });
   assert.ok(rotated.fits.some((f) => f.includes("alternate roll-in type")), "a rotated 60 x 36 should be recognised");
   assert.ok(_v1178({ ...base, width_in: 20, depth_in: 20, entry_width_in: 20 }).fits.length === 0);
-  // A generous stall satisfies more than one type at once.
-  assert.ok(_v1178({ ...base, width_in: 72, depth_in: 72, entry_width_in: 72 }).fits.length >= 3);
+  // A generous stall satisfies both roll-in types at once, but not the transfer type, which
+  // is 36 x 36 exactly (ADA 608.2.1) rather than a minimum.
+  const generous = _v1178({ ...base, width_in: 72, depth_in: 72, entry_width_in: 72 });
+  assert.ok(generous.fits.length === 2 && !generous.fits.includes("transfer type"));
   // Footprint arithmetic follows the type rather than what was entered.
   for (const [type, area, total] of [["transfer", 9, 21], ["standard-roll-in", 12.5, 25], ["alternate-roll-in", 15, 27.5]]) {
     const t = _v1178({ ...base, shower_type: type });

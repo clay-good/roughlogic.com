@@ -621,11 +621,11 @@ export function computeFireDoorClearance({ head_in = 0, hinge_jamb_in = 0, strik
   const meeting_margin_in = meeting_limit_in - meeting_edge_in;
   const bottom_margin_in = bottom_limit_in - bottom_in;
   const failures = [];
-  if (head_margin_in < 0) failures.push("head");
-  if (hinge_margin_in < 0) failures.push("hinge jamb");
-  if (strike_margin_in < 0) failures.push("strike jamb");
-  if (meeting_margin_in < 0) failures.push("meeting edges");
-  if (bottom_margin_in < 0) failures.push("bottom");
+  if (head_margin_in < -1e-9) failures.push("head");
+  if (hinge_margin_in < -1e-9) failures.push("hinge jamb");
+  if (strike_margin_in < -1e-9) failures.push("strike jamb");
+  if (meeting_margin_in < -1e-9) failures.push("meeting edges");
+  if (bottom_margin_in < -1e-9) failures.push("bottom");
   const pass = failures.length === 0;
   // The bottom limit is a MAXIMUM, so floor covering added under the door
   // reduces the clearance and helps; a shortfall is how far the bottom has to

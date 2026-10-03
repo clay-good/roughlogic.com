@@ -856,8 +856,12 @@ export const joistDeflectionExample = {
 // clay, sandy / silty clay, silt (CL, ML, MH, CH) 1,500. Until 2026-09-19
 // this table read 5,000 / 3,000 / 2,500 / 2,000 for sandy gravel, sand,
 // silty sand and silty clay -- 25 to 67% over the code it cited.
+// "rock" is the table's sedimentary and foliated rock row, 4,000 psf; only
+// crystalline bedrock takes 12,000. Until 2026-10-03 "rock" was 12,000, so a
+// pad on shale or limestone was sized at a third of the area it needs.
 export const SOIL_BEARING_PSF = {
-  rock: 12000,
+  rock: 4000,
+  crystalline_bedrock: 12000,
   sandy_gravel: 3000,
   sand: 2000,
   silty_sand: 2000,
@@ -1252,7 +1256,7 @@ export function renderJoistDeflection(inputRegion, outputRegion, citationEl) {
 export function renderFootingArea(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: per IRC 2021 §R401-R403 (foundations); allowable soil-bearing values per IBC 2021 Table 1806.2. required_area = load / allowable_bearing. AHJ governs. Free at codes.iccsafe.org.";
   const P = makeNumber("Column load (lb)", "fa-p", { step: "any", min: "0" });
-  const soil = makeSelect("Soil class", "fa-s", Object.keys(SOIL_BEARING_PSF).map((k) => ({ value: k, label: k.replace(/_/g, " ") })));
+  const soil = makeSelect("Soil class", "fa-s", Object.keys(SOIL_BEARING_PSF).map((k) => ({ value: k, label: k === "rock" ? "sedimentary or foliated rock" : k.replace(/_/g, " ") })));
   // v23 EN.10: optional applied moment for the eccentric bearing-pressure check.
   const M = makeNumber("Applied moment (lb-ft, optional)", "fa-m", { step: "any", min: "0" });
   for (const f of [P, soil, M]) inputRegion.appendChild(f.wrap);
@@ -3599,7 +3603,7 @@ function _v15c_renderDeckBeamPost(inputRegion, outputRegion, citationEl) {
   dead.input.value = "10";
   const sp = _v15c_makeSelect("Beam / post species and grade", "dk-sp", Object.keys(LUMBER_SPECIES_GRADES).map((k) => ({ value: k, label: k.replace("_", " ") })));
   sp.select.value = "SYP_No2";
-  const soil = _v15c_makeSelect("Soil bearing", "dk-soil", Object.keys(SOIL_BEARING_PSF).map((k) => ({ value: k, label: k.replace("_", " ") + " (" + SOIL_BEARING_PSF[k] + " psf)" })));
+  const soil = _v15c_makeSelect("Soil bearing", "dk-soil", Object.keys(SOIL_BEARING_PSF).map((k) => ({ value: k, label: (k === "rock" ? "sedimentary or foliated rock" : k.replace(/_/g, " ")) + " (" + SOIL_BEARING_PSF[k] + " psf)" })));
   soil.select.value = "clay";
   const deckH = _v15c_makeNumber("Walking-surface height (in)", "dk-h", { step: "any", min: "0", value: "36" });
   deckH.input.value = "36";
@@ -3763,7 +3767,7 @@ export function computePointLoadBearing({ load_lb = 0, width_in = 0, fc_perp_psi
   const aReq = P / (fc * Cb);
   const reqLen = aReq / w;
   let actualStress = null, pass = null;
-  if (prov > 0) { actualStress = P / (w * prov); pass = actualStress <= fc * Cb; }
+  if (prov > 0) { actualStress = P / (w * prov); pass = actualStress <= fc * Cb + 1e-9 * fc * Cb; }
   return {
     req_area_in2: Number.isFinite(aReq) ? aReq : null,
     req_length_in: Number.isFinite(reqLen) ? reqLen : null,
@@ -6898,6 +6902,8 @@ export function computeWoodCombinedBendingAxial({ p_lb = 0, m_inlb = 0, a_in2 = 
   const fc_psi = p_lb / a_in2;
   const fb_psi = m_inlb / s_in3;
   const slr = le_in / d_in;
+  // NDS 3.7.1.4 caps le/d at 50, as the column tiles in this module already enforce (added 2026-10-03).
+  if (slr > 50 + 1e-9 * 50) return { error: "le/d is " + slr.toFixed(1) + ", over the NDS 3.7.1.4 limit of 50 for a compression member." };
   const fce_psi = (0.822 * emin_adj_psi) / (slr * slr);
   if (!(fc_psi < fce_psi)) return { error: "The axial stress reaches the Euler buckling stress FcE - the column buckles before the interaction applies. Shorten the unbraced length or enlarge the member." };
   const amplifier = 1 / (1 - fc_psi / fce_psi);
@@ -11562,7 +11568,7 @@ CONSTRUCTION_RENDERERS["carpet-seam-layout"] = _simpleRenderer({
 // factor ASD applies to seismic - giving (0.6 - 0.7 x 0.2 SDS) D; the arithmetic is shown
 // in the note rather than presented as a memorized coefficient.
 // dims: in { overturning_moment_kipft: M L^2 T^-2, dead_load_kip: M L T^-2, footprint_width_ft: L, arm_override_ft: L, sds: dimensionless, design_method: dimensionless, apply_soil_reduction: dimensionless, required_ratio: dimensionless } out: { ev_coeff: dimensionless, dead_coeff: dimensionless, w_eff_kip: M L T^-2, arm_ft: L, m_resist_kipft: M L^2 T^-2, m_demand_kipft: M L^2 T^-2, ratio: dimensionless, eccentricity_ft: L, kern_ft: L }
-export function computeSeismicOverturningStability({ overturning_moment_kipft = 0, dead_load_kip = 0, footprint_width_ft = 0, arm_override_ft = 0, sds = 1.0, design_method = "lrfd", apply_soil_reduction = "yes", required_ratio = 1.0 } = {}) {
+export function computeSeismicOverturningStability({ overturning_moment_kipft = 0, dead_load_kip = 0, footprint_width_ft = 0, arm_override_ft = 0, sds = 1.0, design_method = "lrfd", apply_soil_reduction = "no", required_ratio = 1.0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const M0 = Number(overturning_moment_kipft) || 0;
   const D = Number(dead_load_kip) || 0;
@@ -11571,7 +11577,12 @@ export function computeSeismicOverturningStability({ overturning_moment_kipft = 
   const SDS = Number(sds) || 0;
   const req = Number(required_ratio) || 0;
   const asd = design_method === "asd";
-  const reduce = apply_soil_reduction === "yes";
+  // ASCE 7 12.13.4: 25% only for an equivalent-lateral-force design that is not an inverted
+  // pendulum or cantilevered column system; 10% for a modal design. Until 2026-10-03 the only
+  // choice was 25%, and it was on by default.
+  if (!["yes", "modal", "no"].includes(apply_soil_reduction)) return { error: "Soil-interface reduction must be yes (25%, ELF), modal (10%), or no." };
+  const reduce = apply_soil_reduction !== "no";
+  const reduce_factor = apply_soil_reduction === "yes" ? 0.75 : apply_soil_reduction === "modal" ? 0.9 : 1;
   if (!(M0 > 0)) return { error: "Overturning moment must be positive (kip-ft), at the strength (E) level." };
   if (!(D > 0)) return { error: "Resisting dead load must be positive (kips)." };
   if (!(B > 0) && !(armOv > 0)) return { error: "Enter the footprint width (ft), or a resisting lever arm directly." };
@@ -11589,7 +11600,7 @@ export function computeSeismicOverturningStability({ overturning_moment_kipft = 
   const w_eff_kip = dead_coeff * D;
   const arm_ft = armOv > 0 ? armOv : B / 2;
   const m_resist_kipft = w_eff_kip * arm_ft;
-  const m_demand_kipft = M0 * seismic_factor * (reduce ? 0.75 : 1);
+  const m_demand_kipft = M0 * seismic_factor * reduce_factor;
   const ratio = m_resist_kipft / m_demand_kipft;
   const passes = ratio >= req - 1e-9 * Math.abs(req);
 
@@ -11603,7 +11614,7 @@ export function computeSeismicOverturningStability({ overturning_moment_kipft = 
     + "The dead load available to resist is NOT D. The same vertical acceleration that pushes the building sideways also lifts it, and ASCE 7 carries that as Ev = 0.2 SDS D acting UPWARD in the overturning case. At SDS = " + SDS + " that removes " + ev_coeff.toFixed(3) + (asd ? " (0.7 x 0.2 x " + SDS + ")" : " (0.2 x " + SDS + ")") + " from the " + gravity_coeff + " gravity coefficient, leaving " + dead_coeff.toFixed(3) + " D = " + w_eff_kip.toFixed(0) + " kips of the " + D + " kips present. Skipping that term is the classic way an overturning check passes on paper and should not. "
     + "Resisting moment " + w_eff_kip.toFixed(0) + " kips x " + arm_ft.toFixed(2) + " ft arm = " + m_resist_kipft.toFixed(0) + " kip-ft"
     + (armOv > 0 ? " (arm entered directly)" : " (half the " + B + " ft footprint, which assumes the resultant dead load is centered - an eccentric building needs its own arm entered)") + ". "
-    + "Demand " + M0 + " kip-ft" + (asd ? " x 0.7 for ASD" : "") + (reduce ? " x 0.75, the reduction ASCE 7 12.13.4 permits at the SOIL-STRUCTURE INTERFACE only" : " with no 12.13.4 reduction taken") + " = " + m_demand_kipft.toFixed(0) + " kip-ft. "
+    + "Demand " + M0 + " kip-ft" + (asd ? " x 0.7 for ASD" : "") + (reduce ? " x " + reduce_factor + ", the reduction ASCE 7 12.13.4 permits at the SOIL-STRUCTURE INTERFACE only (25% for an equivalent lateral force design that is not an inverted pendulum or cantilevered column system, 10% for a modal design)" : " with no 12.13.4 reduction taken") + " = " + m_demand_kipft.toFixed(0) + " kip-ft. "
     + "Stability ratio " + ratio.toFixed(2) + " against the " + req + " required - " + (passes ? "OK. " : "FAILS; widen the footprint, add ballast, or design hold-downs for the net uplift. ")
     + (kern_ft !== null
       ? "The resultant sits " + eccentricity_ft.toFixed(2) + " ft off center against a kern of B/6 = " + kern_ft.toFixed(2) + " ft, so the base is "
@@ -11617,7 +11628,7 @@ export function computeSeismicOverturningStability({ overturning_moment_kipft = 
 export const seismicOverturningStabilityExample = { inputs: { overturning_moment_kipft: 5422, dead_load_kip: 900, footprint_width_ft: 20, arm_override_ft: 0, sds: 1.0, design_method: "lrfd", apply_soil_reduction: "yes", required_ratio: 1.0 } };
 
 CONSTRUCTION_RENDERERS["seismic-overturning-stability"] = _simpleRenderer({
-  citation: "Citation: ASCE 7 overturning stability at the foundation. The resisting dead load follows the uplift load combination - LRFD combination 7 (0.9D + 1.0E) or the ASD 0.6D + 0.7E pair - with the vertical seismic effect Ev = 0.2 SDS D acting upward, giving an effective dead-load coefficient of (0.9 - 0.2 SDS) for LRFD and, composing the separately stated 0.6D combination with the 0.7 factor ASD applies to seismic, (0.6 - 0.7 x 0.2 SDS) for ASD; the arithmetic is shown in the note rather than presented as a memorized coefficient. The 25% reduction in overturning at the SOIL-STRUCTURE INTERFACE is ASCE 7 12.13.4 and is optional here; it does not apply to the members above the foundation. Resisting moment = effective dead load x lever arm, taken as half the footprint unless an arm is entered. Eccentricity is compared to the B/6 kern to report full bearing, partial uplift, or a resultant off the base entirely. Global stability only - sliding, toe bearing pressure, hold-down forces, and pile or tiedown capacity are separate. A design aid, not a substitute for a licensed engineer's design.",
+  citation: "Citation: ASCE 7 overturning stability at the foundation. The resisting dead load follows the uplift load combination - LRFD combination 7 (0.9D + 1.0E) or the ASD 0.6D + 0.7E pair - with the vertical seismic effect Ev = 0.2 SDS D acting upward, giving an effective dead-load coefficient of (0.9 - 0.2 SDS) for LRFD and, composing the separately stated 0.6D combination with the 0.7 factor ASD applies to seismic, (0.6 - 0.7 x 0.2 SDS) for ASD; the arithmetic is shown in the note rather than presented as a memorized coefficient. The reduction in overturning at the SOIL-STRUCTURE INTERFACE is ASCE 7 12.13.4 - 25% for an equivalent lateral force design that is not an inverted pendulum or cantilevered column system, 10% for a modal design - and is off by default here; it does not apply to the members above the foundation. Resisting moment = effective dead load x lever arm, taken as half the footprint unless an arm is entered. Eccentricity is compared to the B/6 kern to report full bearing, partial uplift, or a resultant off the base entirely. Global stability only - sliding, toe bearing pressure, hold-down forces, and pile or tiedown capacity are separate. A design aid, not a substitute for a licensed engineer's design.",
   example: seismicOverturningStabilityExample.inputs,
   fields: [
     { key: "overturning_moment_kipft", label: "Overturning moment M0 (kip-ft, strength level)", kind: "number" },
@@ -11626,7 +11637,7 @@ CONSTRUCTION_RENDERERS["seismic-overturning-stability"] = _simpleRenderer({
     { key: "arm_override_ft", label: "Resisting lever arm override (ft; 0 = half the footprint)", kind: "number" },
     { key: "sds", label: "SDS", kind: "number" },
     { key: "design_method", label: "Design method", kind: "select", options: [{ value: "lrfd", label: "LRFD (0.9D + 1.0E)", selected: true }, { value: "asd", label: "ASD (0.6D + 0.7E)" }] },
-    { key: "apply_soil_reduction", label: "Take the 12.13.4 soil-interface reduction", kind: "select", options: [{ value: "yes", label: "Yes - 25% reduction", selected: true }, { value: "no", label: "No - full moment" }] },
+    { key: "apply_soil_reduction", label: "Take the 12.13.4 soil-interface reduction", kind: "select", options: [{ value: "no", label: "No - full moment", selected: true }, { value: "yes", label: "Yes - 25% (ELF design, not an inverted pendulum or cantilevered column)" }, { value: "modal", label: "Yes - 10% (modal response spectrum design)" }] },
     { key: "required_ratio", label: "Required stability ratio", kind: "number" },
   ],
   outputs: [
@@ -11823,7 +11834,9 @@ export function computeEgressWindowCheck({ clear_width_in = 0, clear_height_in =
   if (override < 0) return { error: "Minimum-area override cannot be negative (sq ft)." };
 
   const MIN_W = 20, MIN_H = 24, MAX_SILL = 44;
-  const grade_floor = location === "grade-floor";
+  // R310.2.1 Exception (2018 IRC on): "grade floor or below grade openings" take 5.0 sq ft.
+  // Until 2026-10-03 a basement opening could only be checked against 5.7.
+  const grade_floor = location === "grade-floor" || location === "below-grade";
   const required_area_sf = override > 0 ? override : (grade_floor ? 5.0 : 5.7);
   const required_area_sqin = required_area_sf * 144;
 
@@ -11844,7 +11857,7 @@ export function computeEgressWindowCheck({ clear_width_in = 0, clear_height_in =
   const minimums_shortfall_sqin = required_area_sqin - minimums_area_sqin;
 
   const note = "Net clear opening " + w + " x " + h + " = " + clear_area_sqin.toFixed(0) + " sq in (" + clear_area_sf.toFixed(2) + " sq ft) against "
-    + (override > 0 ? "your " + required_area_sf + " sq ft override" : (grade_floor ? "the 5.0 sq ft grade-floor minimum" : "the 5.7 sq ft minimum")) + " = " + required_area_sqin.toFixed(1) + " sq in. "
+    + (override > 0 ? "your " + required_area_sf + " sq ft override" : (grade_floor ? "the 5.0 sq ft grade-floor / below-grade minimum" : "the 5.7 sq ft minimum")) + " = " + required_area_sqin.toFixed(1) + " sq in. "
     + "Width " + (width_ok ? "OK" : "FAILS") + " against 20 in, height " + (height_ok ? "OK" : "FAILS") + " against 24 in, area " + (area_ok ? "OK" : "FAILS by " + area_deficit_sqin.toFixed(0) + " sq in") + ", sill " + sill + " in " + (sill_ok ? "OK" : "FAILS") + " against the 44 in maximum. " + (passes ? "PASSES all four. " : "DOES NOT PASS. ")
     + "The trap worth knowing: the three minimums cannot all be met by building to the dimensional minimums. Twenty inches by twenty-four is only " + minimums_area_sqin + " sq in, " + minimums_shortfall_sqin.toFixed(0) + " sq in short of the area requirement, so ONE dimension always has to exceed its minimum and how far depends on the other. "
     + "At this opening's " + h + " in height the width must reach " + width_needed_in.toFixed(2) + " in; at its " + w + " in width the height must reach " + height_needed_in.toFixed(2) + " in. Meeting 20 and 24 and stopping there is the most common way an egress window fails inspection. "
@@ -11857,13 +11870,13 @@ export function computeEgressWindowCheck({ clear_width_in = 0, clear_height_in =
 export const egressWindowCheckExample = { inputs: { clear_width_in: 20, clear_height_in: 24, sill_height_in: 40, location: "above-grade", min_area_override_sf: 0 } };
 
 CONSTRUCTION_RENDERERS["egress-window-check"] = _simpleRenderer({
-  citation: "Citation: IRC R310.2.1 and R310.2.3 - an emergency escape and rescue opening needs a net clear opening of not less than 5.7 sq ft (5.0 sq ft for a grade-floor opening), a net clear height of not less than 24 in, a net clear width of not less than 20 in, and the bottom of the clear opening not more than 44 in above the floor, all achieved through the normal operation of the opening from the inside. The tile reports the minimum PARTNER dimension because the three minimums are mutually unsatisfiable: 20 x 24 is 480 sq in against the 820.8 sq in the area rule demands. NET CLEAR opening only - not the rough opening, the unit size, or the glass. Dimensional criteria only; the openability requirement, window wells and their ladders, releasable bars and grilles, and which rooms require an opening are not checked. A screen, not a code-official determination; the adopted code and the AHJ govern.",
+  citation: "Citation: IRC R310.2.1 and R310.2.3 - an emergency escape and rescue opening needs a net clear opening of not less than 5.7 sq ft (5.0 sq ft for a grade-floor or below-grade opening), a net clear height of not less than 24 in, a net clear width of not less than 20 in, and the bottom of the clear opening not more than 44 in above the floor, all achieved through the normal operation of the opening from the inside. The tile reports the minimum PARTNER dimension because the three minimums are mutually unsatisfiable: 20 x 24 is 480 sq in against the 820.8 sq in the area rule demands. NET CLEAR opening only - not the rough opening, the unit size, or the glass. Dimensional criteria only; the openability requirement, window wells and their ladders, releasable bars and grilles, and which rooms require an opening are not checked. A screen, not a code-official determination; the adopted code and the AHJ govern.",
   example: egressWindowCheckExample.inputs,
   fields: [
     { key: "clear_width_in", label: "Net clear width (in)", kind: "number" },
     { key: "clear_height_in", label: "Net clear height (in)", kind: "number" },
     { key: "sill_height_in", label: "Sill height above the floor (in)", kind: "number" },
-    { key: "location", label: "Opening location", kind: "select", options: [{ value: "above-grade", label: "Upper floor / below grade (5.7 sq ft)", selected: true }, { value: "grade-floor", label: "Grade floor (5.0 sq ft)" }] },
+    { key: "location", label: "Opening location", kind: "select", options: [{ value: "above-grade", label: "Upper floor (5.7 sq ft)", selected: true }, { value: "grade-floor", label: "Grade floor (5.0 sq ft)" }, { value: "below-grade", label: "Below grade / basement (5.0 sq ft)" }] },
     { key: "min_area_override_sf", label: "Minimum-area override (sq ft; 0 = use the code value)", kind: "number" },
   ],
   outputs: [
@@ -13114,13 +13127,13 @@ export function computeReachRange({ approach = "forward", obstructed = "yes", ob
   if (!isObs) { max_height_in = 48; rule = isSide ? "unobstructed side reach (308.3.1)" : "unobstructed forward reach (308.2.1)"; }
   else if (isSide) {
     rule = "obstructed high side reach (308.3.2)";
-    if (depth <= 10) max_height_in = 48;
-    else if (depth <= 24) max_height_in = 46;
+    if (depth <= 10 + 1e-9) max_height_in = 48;
+    else if (depth <= 24 + 1e-9) max_height_in = 46;
     else { max_height_in = null; depth_permitted = false; }
   } else {
     rule = "obstructed high forward reach (308.2.2)";
-    if (depth <= 20) max_height_in = 48;
-    else if (depth <= 25) max_height_in = 44;
+    if (depth <= 20 + 1e-9) max_height_in = 48;
+    else if (depth <= 25 + 1e-9) max_height_in = 44;
     else { max_height_in = null; depth_permitted = false; }
   }
 
@@ -13366,7 +13379,7 @@ CONSTRUCTION_RENDERERS["accessible-route-width"] = _simpleRenderer({
     { key: "separation_length_in", label: "Full-width separation between reduced segments (in)", kind: "number" },
     { key: "turn_present", label: "Route makes a 180 degree turn around an element?", kind: "select", options: [{ value: "no", label: "No", selected: true }, { value: "yes", label: "Yes" }] },
     { key: "turn_element_width_in", label: "Width of the element turned around (in)", kind: "number" },
-    { key: "approach_width_in", label: "Clear width approaching and leaving the turn (in)", kind: "number" },
+    { key: "approach_width_in", label: "Clear width approaching and leaving the turn, the narrower of the two (in)", kind: "number" },
     { key: "at_turn_width_in", label: "Clear width at the turn (in)", kind: "number" },
   ],
   outputs: [
@@ -13517,8 +13530,8 @@ export function computeFloorLevelChange({ level_change_in = 0, bevel_run_in = 0,
 
   let category, needs_bevel = false, needs_ramp = false;
   if (h === 0) category = "no change in level";
-  else if (h <= VERTICAL_MAX) category = "vertical permitted";
-  else if (h <= BEVEL_MAX) { category = "must be beveled at 1:2 or flatter"; needs_bevel = true; }
+  else if (h <= VERTICAL_MAX + 1e-9) category = "vertical permitted";
+  else if (h <= BEVEL_MAX + 1e-9) { category = "must be beveled at 1:2 or flatter"; needs_bevel = true; }
   else { category = "must be a ramp under 405 or 406"; needs_ramp = true; }
 
   const required_bevel_run_in = needs_bevel ? h * BEVEL_SLOPE_RUN : null;
@@ -13851,13 +13864,16 @@ export function computeKneeToeClearance({ apron_height_in = 0, knee_depth_at_9_i
   const required_knee_depth_at_9_in = KNEE_MIN_AT_9;
   const required_knee_depth_at_27_in = KNEE_MIN_AT_27;
 
-  const knee_9_ok = has_knee_zone ? k9 >= KNEE_MIN_AT_9 : null;
-  const knee_27_ok = has_knee_zone ? k27 >= KNEE_MIN_AT_27 : null;
+  const knee_9_ok = has_knee_zone ? k9 >= KNEE_MIN_AT_9 - 1e-9 * KNEE_MIN_AT_9 : null;
+  const knee_27_ok = has_knee_zone ? k27 >= KNEE_MIN_AT_27 - 1e-9 * KNEE_MIN_AT_27 : null;
   const actual_taper_in = has_knee_zone ? k9 - k27 : null;
   const taper_ok = has_knee_zone ? actual_taper_in <= taper_allowed_in + 1e-9 : null;
   const knee_depth_over_max = has_knee_zone ? k9 > MAX_DEPTH + 1e-9 * Math.abs(MAX_DEPTH) : null;
   const knee_deficit_in = has_knee_zone ? Math.max(Math.max(0, KNEE_MIN_AT_9 - k9), Math.max(0, KNEE_MIN_AT_27 - k27)) : null;
-  const knee_ok = has_knee_zone ? (knee_9_ok && knee_27_ok && taper_ok && !knee_depth_over_max) : false;
+  // 306.3.3's rate describes the minimum envelope (11 in at 9, 8 in at 27). A straight profile
+  // that meets both ends stays above it everywhere, so a faster taper from a deeper top is
+  // compliant. Until 2026-10-03 taper_ok was part of the verdict and failed 20 in / 8 in.
+  const knee_ok = has_knee_zone ? (knee_9_ok && knee_27_ok && !knee_depth_over_max) : false;
 
   const toe_ok = toe >= TOE_MIN - 1e-9 * Math.abs(TOE_MIN);
   const toe_deficit_in = Math.max(0, TOE_MIN - toe);
@@ -13873,7 +13889,7 @@ export function computeKneeToeClearance({ apron_height_in = 0, knee_depth_at_9_i
     + (has_knee_zone ? "at or above 27 in, so a knee zone exists. " : "BELOW 27 in by " + apron_shortfall_in.toFixed(2) + " in, so there is NO knee clearance under this section at all, whatever the space below it looks like. A lavatory whose apron sits at 26 in does not have shallow knee clearance; it has none, and no depth below can rescue it. ")
     + (has_knee_zone
       ? "KNEE DEPTH IS NOT ONE NUMBER: 11 in minimum at 9 in above the floor, and 8 in minimum at 27 in. Entered " + k9 + " in at 9 in and " + k27 + " in at 27 in: " + (knee_9_ok && knee_27_ok ? "both met" : (knee_9_ok ? "" : "the 9 in depth is short") + (knee_9_ok || knee_27_ok ? "" : " and ") + (knee_27_ok ? "" : "the 27 in depth is short")) + ". "
-        + "BETWEEN THEM IT MAY TAPER AT 1 IN OF DEPTH PER 6 IN OF HEIGHT AND NO FASTER, which over the 18 in from 9 to 27 is " + taper_allowed_in.toFixed(0) + " in total - exactly the 11 to 8 the section states, so the two depths and the rate are the same rule read two ways. This one loses " + actual_taper_in.toFixed(2) + " in: " + (taper_ok ? "within the rate. " : "TOO FAST. A slanted apron or a bowl hanging down eats the depth precisely where a knee needs it, and the taper limit is what catches that. ")
+        + "BETWEEN THEM THE MINIMUM MAY TAPER AT 1 IN OF DEPTH PER 6 IN OF HEIGHT, which over the 18 in from 9 to 27 is " + taper_allowed_in.toFixed(0) + " in total - exactly the 11 to 8 the section states, so the two depths and the rate are the same envelope read two ways. This one loses " + actual_taper_in.toFixed(2) + " in: " + (taper_ok ? "within the rate. " : "faster than the rate, which is fine on a straight profile that meets both minimums, but check that no bowl or slanted apron dips below the envelope between the two measured heights. ")
         + (knee_depth_over_max ? "The knee depth entered exceeds the 25 in maximum any clearance may extend under an element. " : "")
       : "")
     + "TOE (306.2): the clearance must extend " + TOE_MIN + " in minimum under the element where toe clearance is required, and " + MAX_DEPTH + " in maximum. Entered " + toe + " in: " + (toe_over_max ? "past the 25 in maximum. " : toe_ok ? "OK. " : "SHORT by " + toe_deficit_in.toFixed(2) + " in. ")
@@ -13899,7 +13915,7 @@ CONSTRUCTION_RENDERERS["knee-toe-clearance"] = _simpleRenderer({
   outputs: [
     { key: "k", id: "ktc-out-k", label: "Is there a knee zone at all?", value: (r) => r.has_knee_zone ? "yes - the underside is at or above 27 in" : "NO - the underside is " + fmt(r.apron_shortfall_in, 2) + " in below 27 in, so no depth below can rescue it" },
     { key: "d", id: "ktc-out-d", label: "Knee depth", value: (r) => !r.has_knee_zone ? "not applicable" : "needs " + r.required_knee_depth_at_9_in + " in at 9 in and " + r.required_knee_depth_at_27_in + " in at 27 in - " + (r.knee_9_ok && r.knee_27_ok ? "both met" : "short by " + fmt(r.knee_deficit_in, 2) + " in") },
-    { key: "t", id: "ktc-out-t", label: "Taper", value: (r) => !r.has_knee_zone ? "not applicable" : "may lose " + fmt(r.taper_allowed_in, 0) + " in over the 18 in of height (1 in per 6 in); loses " + fmt(r.actual_taper_in, 2) + " in - " + (r.taper_ok ? "within the rate" : "TOO FAST") },
+    { key: "t", id: "ktc-out-t", label: "Taper", value: (r) => !r.has_knee_zone ? "not applicable" : "may lose " + fmt(r.taper_allowed_in, 0) + " in over the 18 in of height (1 in per 6 in); loses " + fmt(r.actual_taper_in, 2) + " in - " + (r.taper_ok ? "within the rate" : "faster than the rate; fine if nothing dips between the two measured heights") },
     { key: "o", id: "ktc-out-o", label: "Toe clearance", value: (r) => r.toe_over_max ? "past the 25 in maximum" : r.toe_ok ? "meets the 17 in minimum" : "short of 17 in by " + fmt(r.toe_deficit_in, 2) + " in" },
     { key: "w", id: "ktc-out-w", label: "Width", value: (r) => r.width_ok ? "meets the 30 in minimum" : "short by " + fmt(r.width_deficit_in, 2) + " in" },
     { key: "v", id: "ktc-out-v", label: "Verdict", value: (r) => r.passes ? "PASSES the items entered" : "DOES NOT PASS" },
@@ -14108,8 +14124,8 @@ export function computeTactileSignMounting({ lowest_baseline_in = 0, tactile_blo
   const w = Number(clear_space_width_in) || 0;
   const d = Number(clear_space_depth_in) || 0;
   const beyond = beyond_door_arc === "yes";
-  const POSITIONS = { "latch-side": "alongside the door at the latch side", "on-door": "on the door leaf itself", "hinge-side": "alongside the door at the hinge side", "inactive-leaf": "on the inactive leaf of a pair with one active leaf", "right-of-right": "to the right of the right-hand door of a pair with two active leaves" };
-  if (!(sign_position in POSITIONS)) return { error: "Sign position must be latch-side, on-door, hinge-side, inactive-leaf, or right-of-right." };
+  const POSITIONS = { "latch-side": "alongside the door at the latch side", "on-door": "on the door leaf itself", "hinge-side": "alongside the door at the hinge side", "inactive-leaf": "on the inactive leaf of a pair with one active leaf", "right-of-right": "to the right of the right-hand door of a pair with two active leaves", "push-side-closer": "on the push side of a door with a closer and no hold-open device" };
+  if (!(sign_position in POSITIONS)) return { error: "Sign position must be latch-side, on-door, hinge-side, inactive-leaf, right-of-right, or push-side-closer." };
   if (beyond_door_arc !== "yes" && beyond_door_arc !== "no") return { error: "State whether the clear floor space sits beyond the door swing arc (yes or no)." };
   if (!(low > 0)) return { error: "Baseline height of the lowest tactile character must be positive (in)." };
   if (!Number.isFinite(block) || block < 0) return { error: "Height of the tactile character block must be zero or more (in)." };
@@ -14129,6 +14145,8 @@ export function computeTactileSignMounting({ lowest_baseline_in = 0, tactile_blo
   const height_ok = low_ok && high_ok;
   const usable_range_in = mountable ? lowest_max_in - lowest_min_in : 0;
 
+  // 703.4.2 Exception: a tactile sign is permitted on the push side of a door with a closer and
+  // without a hold-open device (added 2026-10-03; before, every on-leaf sign failed).
   const position_ok = sign_position !== "on-door" && sign_position !== "hinge-side";
   const space_size_ok = w >= SPACE_MIN - 1e-9 * Math.abs(SPACE_MIN) && d >= SPACE_MIN - 1e-9 * Math.abs(SPACE_MIN);
   const space_ok = space_size_ok && beyond;
@@ -14142,7 +14160,7 @@ export function computeTactileSignMounting({ lowest_baseline_in = 0, tactile_blo
     + "Entered: lowest baseline " + low + " in, highest " + highest_baseline_in.toFixed(2) + " in. "
     + (height_ok ? "Both ends are satisfied. " : (low_ok ? "" : "The LOWEST baseline is " + low_deficit_in.toFixed(2) + " in under 48. ") + (high_ok ? "" : "The HIGHEST baseline is " + high_excess_in.toFixed(2) + " in over 60. "))
     + "POSITION (703.4.2): " + POSITIONS[sign_position] + ". "
-    + (sign_position === "on-door" ? "A tactile sign at a door goes ALONGSIDE the door at the latch side, not on the leaf - because a person reading it has to stand still while the door stays shut, and a sign on the door moves away the moment anyone opens it. " : sign_position === "hinge-side" ? "The latch side is specified, not either side: the hinge side puts a reader in the swing of the door. " : "")
+    + (sign_position === "on-door" ? "A tactile sign at a door goes ALONGSIDE the door at the latch side, not on the leaf - because a person reading it has to stand still while the door stays shut, and a sign on the door moves away the moment anyone opens it. The one exception (703.4.2) is the push side of a door with a closer and no hold-open device, which a reader faces while it stays shut. " : sign_position === "hinge-side" ? "The latch side is specified, not either side: the hinge side puts a reader in the swing of the door. " : "")
     + "CLEAR FLOOR SPACE: 18 x 18 in minimum, centered on the tactile characters, and BEYOND THE ARC of any door swing between the closed position and 45 degrees open. Entered " + w + " x " + d + " in, " + (beyond ? "clear of the swing. " : "INSIDE the swing arc - which is what rules out the wall a door swings back against, and it is a location problem rather than a size problem. ")
     + (space_size_ok ? "" : "The space is " + space_deficit_in.toFixed(2) + " in short on its smaller dimension. ")
     + (passes ? "The items entered PASS. " : "The items entered DO NOT pass. ")
@@ -14159,7 +14177,7 @@ CONSTRUCTION_RENDERERS["tactile-sign-mounting"] = _simpleRenderer({
   fields: [
     { key: "lowest_baseline_in", label: "Baseline of the LOWEST tactile character (in above the floor)", kind: "number" },
     { key: "tactile_block_height_in", label: "Height from the lowest baseline to the highest (in)", kind: "number" },
-    { key: "sign_position", label: "Where the sign is mounted", kind: "select", options: [{ value: "latch-side", label: "Alongside the door, latch side", selected: true }, { value: "on-door", label: "On the door leaf" }, { value: "hinge-side", label: "Alongside the door, hinge side" }, { value: "inactive-leaf", label: "On the inactive leaf (pair, one active)" }, { value: "right-of-right", label: "Right of the right-hand door (pair, two active)" }] },
+    { key: "sign_position", label: "Where the sign is mounted", kind: "select", options: [{ value: "latch-side", label: "Alongside the door, latch side", selected: true }, { value: "on-door", label: "On the door leaf" }, { value: "hinge-side", label: "Alongside the door, hinge side" }, { value: "inactive-leaf", label: "On the inactive leaf (pair, one active)" }, { value: "right-of-right", label: "Right of the right-hand door (pair, two active)" }, { value: "push-side-closer", label: "On the push side of a door with a closer, no hold-open" }] },
     { key: "clear_space_width_in", label: "Clear floor space width (in)", kind: "number" },
     { key: "clear_space_depth_in", label: "Clear floor space depth (in)", kind: "number" },
     { key: "beyond_door_arc", label: "Clear floor space beyond the door swing arc?", kind: "select", options: [{ value: "yes", label: "Yes", selected: true }, { value: "no", label: "No" }] },
@@ -14305,9 +14323,18 @@ export function computeAccessibleShowerCheck({ shower_type = "transfer", width_i
   const [type_label, reqW, reqD, reqE, reqCW, reqCL] = TYPES[shower_type];
   const is_transfer = shower_type === "transfer";
 
-  const width_ok = w >= reqW - 1e-9 * Math.abs(reqW);
-  const depth_ok = d >= reqD - 1e-9 * Math.abs(reqD);
-  const entry_ok = e >= reqE - 1e-9 * Math.abs(reqE);
+  // 608.2.1: a transfer stall is 36 x 36 in, an absolute dimension (only its entry is a
+  // minimum), held here to a 1/2 in construction tolerance (104.1.1); a bigger stall puts the
+  // seat and the control wall out of reach. The roll-in types are minimums, and either
+  // orientation is the same stall. Until 2026-10-03 a 48 x 48 "transfer" stall passed and a
+  // 60 x 30 standard roll-in failed while the tile's own fits list named it.
+  const TRANSFER_TOL_IN = 0.5;
+  const minOk = (v, req) => v >= req - 1e-9 * Math.abs(req);
+  const exactOk = (v, req) => Math.abs(v - req) <= TRANSFER_TOL_IN + 1e-9;
+  const rotated = !is_transfer && !(minOk(w, reqW) && minOk(d, reqD)) && minOk(d, reqW) && minOk(w, reqD);
+  const width_ok = is_transfer ? exactOk(w, reqW) : rotated ? true : minOk(w, reqW);
+  const depth_ok = is_transfer ? exactOk(d, reqD) : rotated ? true : minOk(d, reqD);
+  const entry_ok = minOk(e, reqE);
   const width_deficit_in = Math.max(0, reqW - w);
   const depth_deficit_in = Math.max(0, reqD - d);
   const entry_deficit_in = Math.max(0, reqE - e);
@@ -14327,6 +14354,7 @@ export function computeAccessibleShowerCheck({ shower_type = "transfer", width_i
   // Which of the three this compartment would satisfy as built, so the answer is not just "no".
   const fits = [];
   for (const [key, [label, tw, td, te]] of Object.entries(TYPES)) {
+    if (key === "transfer") { if (exactOk(w, tw) && exactOk(d, td) && minOk(e, te)) fits.push(label); continue; }
     if (w >= tw && d >= td && e >= te) fits.push(label);
     else if (d >= tw && w >= td && e >= te) fits.push(label + " rotated");
   }
@@ -14338,7 +14366,7 @@ export function computeAccessibleShowerCheck({ shower_type = "transfer", width_i
       : shower_type === "standard-roll-in" ? "THE STANDARD ROLL-IN ENTRY IS THE WHOLE LONG SIDE: 60 in wide minimum on a 60 in compartment, which means no curb, no jamb, and no door narrowing it. A 30 in deep stall reads as tight on a plan and is correct; what defeats it is anything built across the opening. "
       : "THE ALTERNATE ROLL-IN trades depth of entry for width of stall: 36 x 60 in inside with a 36 in entry on one LONG side, which is the type that fits where a 60 in tub was and a full-width opening is impossible. ")
     + "Entered " + w + " x " + d + " in with a " + e + " in entry: "
-    + (inside_ok ? "the inside dimensions and entry are met. " : (width_ok ? "" : "WIDTH short by " + width_deficit_in.toFixed(1) + " in. ") + (depth_ok ? "" : "DEPTH short by " + depth_deficit_in.toFixed(1) + " in. ") + (entry_ok ? "" : "ENTRY short by " + entry_deficit_in.toFixed(1) + " in. "))
+    + (inside_ok ? "the inside dimensions and entry are met. " : (width_ok ? "" : width_deficit_in > 0 ? "WIDTH short by " + width_deficit_in.toFixed(1) + " in. " : "WIDTH " + w + " in, but a transfer stall is 36 in, not a minimum. ") + (depth_ok ? "" : depth_deficit_in > 0 ? "DEPTH short by " + depth_deficit_in.toFixed(1) + " in. " : "DEPTH " + d + " in, but a transfer stall is 36 in, not a minimum. ") + (entry_ok ? "" : "ENTRY short by " + entry_deficit_in.toFixed(1) + " in. "))
     + (fits.length > 0 ? "AS BUILT THIS COMPARTMENT WOULD SATISFY: " + fits.join(", ") + " - worth knowing before it is torn out, because a stall that fails one type often meets another. " : "As built this compartment satisfies none of the three types in any orientation. ")
     + (clearance_entered
       ? "CLEARANCE OUTSIDE: " + reqCW + " x " + reqCL + " in required" + (is_transfer ? ", extending from the control wall" : ", adjacent to the open face") + ". Entered " + cw + " x " + cl + " in: " + (clearance_ok ? "OK. " : (clearance_width_ok ? "" : "width short by " + clearance_width_deficit_in.toFixed(1) + " in. ") + (clearance_length_ok ? "" : "length short by " + clearance_length_deficit_in.toFixed(1) + " in. "))
