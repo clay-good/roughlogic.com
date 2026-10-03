@@ -305,7 +305,7 @@ export function computeSoftenerSizing({ people, use_per_cap = 75, hardness_gpg, 
     days_between: daysBetween,
     salt_per_regen: salt,
     annual_salt: annualSalt,
-    undersized: daysBetween < 1,
+    undersized: daysBetween < 1 - 1e-9 * Math.abs(1),
     note: "Dissolved iron, manganese, and high TDS each raise the effective load and may exceed a softener's rating (pre-treatment may be required). A higher salt dose buys more capacity per cubic foot but at lower salt efficiency. The capacity used must match the dose the control valve is programmed for (NSF/ANSI 44).",
   };
 }

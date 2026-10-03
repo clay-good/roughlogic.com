@@ -383,8 +383,8 @@ export function computeOpticalReturnLoss({ connector_count = 0, connector_reflec
     connector_margin_db: connector_only_orl_db - required_orl_db,
     unmated_margin_db: with_unmated_orl_db - required_orl_db,
     good_connector_share_with_unmated_pct: 100 * connector_linear_total / with_unmated_linear,
-    connector_pass: connector_only_orl_db >= required_orl_db,
-    unmated_pass: with_unmated_orl_db >= required_orl_db,
+    connector_pass: connector_only_orl_db >= required_orl_db - 1e-9 * Math.abs(required_orl_db),
+    unmated_pass: with_unmated_orl_db >= required_orl_db - 1e-9 * Math.abs(required_orl_db),
     note: "Reflected powers add in linear units, so the worst reflector dominates. An open glass end is a fault, not a slightly worse connector; transmitter requirements and measured event reflectance govern.",
   };
 }

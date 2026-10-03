@@ -87,7 +87,8 @@ function _simpleRenderer(spec) {
 export const RELIEFPOWER_RENDERERS = {};
 
 // USACE planning rule of thumb recorded in the EPA Power Resilience Guide:
-// 0.07 gallons of diesel per hour per kW of generator rating, at full load.
+// 0.07 gallons of diesel per hour per kW of generator rating (printed with no load basis;
+// it sits near a diesel's full-load burn).
 const USACE_GPH_PER_KW = 0.07;
 // One utility manager's practice, quoted in the EPA guide, of stocking for 70% load.
 const EPA_COMPARISON_LOAD_FRACTION = 0.7;
@@ -263,7 +264,7 @@ export function computeGeneratorFleetFuelResupply({ size1_count = 0, size1_kw = 
     size1_interval_hours: interval[0], size2_interval_hours: interval[1], size3_interval_hours: interval[2],
     fleet_fuel_gal_per_day, fleet_fuel_70_gal_per_day, trips_per_day, trips_per_day_70,
     shortest_interval_hours, shortest_sizes,
-    basis: sizes.some(([n, , , burn]) => n > 0 && burn > 0) ? "entered burn rates where given, USACE 0.07 gph per kW elsewhere" : "USACE 0.07 gph per kW at full load for every size",
+    basis: sizes.some(([n, , , burn]) => n > 0 && burn > 0) ? "entered burn rates where given, USACE 0.07 gph per kW elsewhere" : "USACE 0.07 gph per kW of rating for every size",
     note: "A generator fleet is a fuel logistics problem wearing an electrical label. The USACE rule of thumb recorded in the EPA Power Resilience Guide -- 0.07 gallons an hour per kW of rating -- is printed with no load basis and is no ceiling: it sits near a modern diesel's full-load burn and a little UNDER some (Cummins data sheets run about 0.077 to 0.083 gal/h per kW at full standby load), so a plan made before the loads are known should carry margin on it or use the unit's own curve; summed across the fleet over 24 hours it is the gallons a day the fuel contractor must deliver, and dividing by the truck's deliverable volume gives the trips. The daily total is not usually the constraint that bites. The unit that runs dry first is: small units on day tanks and large units on sub-base tanks can have similar intervals, and the route must reach every one of them inside the shortest, with road closures and curfews in the way. Where a unit's actual burn at its real load is known (generator-part-load-fuel), enter it in place of the rule; the 70% line shows how far a partly loaded fleet falls below the full-load figure. This does not route trucks, account for travel time or access, or address fuel storage, spill containment, or fuel quality. The EPA guide, the fuel supplier, the manufacturers' data, and the incident's logistics section govern.",
   };
 }
@@ -472,7 +473,7 @@ export function computeCriticalLoadShedTiers({ source_kw = 0, tier1_kw = 0, tier
   let tiers_served = 0;
   let served_kw = 0;
   for (const t of tiers) {
-    if (served_kw + t > source_kw) break;
+    if (served_kw + t > source_kw + 1e-9 * Math.abs(source_kw)) break; // 1.1 + 2.2 is 3.3000000000000003
     served_kw += t;
     tiers_served += 1;
   }
@@ -648,7 +649,7 @@ export function computeGeneratorBatteryHybridFuel({ load_kw = 0, rating_kw = 0, 
     continuous_extrapolated: at_load.extrapolated,
     setpoint_extrapolated: at_set.extrapolated,
     fuel_verdict: saving_gal_per_day >= 0 ? "the hybrid saves fuel at these settings" : "the hybrid BURNS MORE fuel at these settings -- the round-trip loss outweighs the curve",
-    note: "Run the generator where it is efficient and let the battery cover the rest. During the ON hours the generator carries the load and charges the battery with its surplus; during the OFF hours the battery carries the load alone. The daily energy balance -- surplus stored, less the round-trip loss, equals the energy drawn -- gives the generator hours directly, and the manufacturer's four-point fuel curve (interpolated as in generator-part-load-fuel, and flagged below 1/4 load) converts hours to gallons for both the hybrid and continuous light-load running. The battery is sized per cycle and the cycle count is the lever: one long OFF period needs a battery covering most of a day's load, four shorter ones a quarter of that, but more cycles mean more generator starts, which manufacturers limit. The fuel saving does not depend on how the OFF hours are divided; only the battery does. The saving is often modest; the larger benefit is usually mechanical -- the generator never runs in the light-load region where it wet-stacks, its run hours fall by more than half, and the site is quiet most of the day. This assumes a constant average load and a fixed set point, and does not model load variation, charge acceptance limits, battery depth-of-discharge and temperature derating (off-grid-battery), inverter losses, start limits, or controller logic. The generator, battery, and inverter manufacturers and the AHJ govern.",
+    note: "Run the generator where it is efficient and let the battery cover the rest. During the ON hours the generator carries the load and charges the battery with its surplus; during the OFF hours the battery carries the load alone. The daily energy balance -- surplus stored, less the round-trip loss, equals the energy drawn -- gives the generator hours directly, and the manufacturer's four-point fuel curve (interpolated as in generator-part-load-fuel, and flagged below 1/4 load) converts hours to gallons for both the hybrid and continuous light-load running. The battery is sized per cycle and the cycle count is the lever: one long OFF period needs a battery covering most of a day's load, four shorter ones a quarter of that, but more cycles mean more generator starts, which manufacturers limit. The fuel saving does not depend on how the OFF hours are divided; only the battery does. The saving is often modest; the larger benefit is usually mechanical -- the generator never runs in the light-load region where it wet-stacks, its run hours fall by how far the load sits under the set point (about 60% for the worked 15 kW load, a third at 25 kW, almost nothing at 40 kW), and the site is quiet while it is off. This assumes a constant average load and a fixed set point, and does not model load variation, charge acceptance limits, battery depth-of-discharge and temperature derating (off-grid-battery), inverter losses, start limits, or controller logic. The generator, battery, and inverter manufacturers and the AHJ govern.",
   };
 }
 

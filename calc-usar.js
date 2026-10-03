@@ -380,9 +380,9 @@ export function computeUsrRakerShore({ wall_psf = 125, wall_height_ft = 14, rake
     wall_weight_lb, roof_weight_lb, tributary_weight_lb, design_fraction, design_force_lb,
     raker_length_in, rule_in_per_ft, rule_length_in, base_distance_in, axial_force_lb, vertical_kick_lb,
     collapse_zone_min_ft, collapse_zone_max_ft, base_in_zone,
-    sog_single_ok: design_force_lb <= _RAKER_SOG_SINGLE_LB,
-    sog_pair_ok: 2 * design_force_lb <= _RAKER_SOG_PAIR_LB,
-    fog_ok: design_force_lb <= _RAKER_FOG_LB,
+    sog_single_ok: design_force_lb <= _RAKER_SOG_SINGLE_LB + 1e-9 * Math.abs(_RAKER_SOG_SINGLE_LB),
+    sog_pair_ok: 2 * design_force_lb <= _RAKER_SOG_PAIR_LB + 1e-9 * Math.abs(_RAKER_SOG_PAIR_LB),
+    fog_ok: design_force_lb <= _RAKER_FOG_LB + 1e-9 * Math.abs(_RAKER_FOG_LB),
     sog_verdict: design_force_lb <= _RAKER_SOG_SINGLE_LB ? "within the SOG 2021 rating of 4,000 lb per raker" : "OVER the SOG 2021 rating of 4,000 lb per raker -- close the spacing",
     fog_verdict: design_force_lb <= _RAKER_FOG_LB ? "within the FOG 2006 rating of 2,500 lb per raker" : "OVER the FOG 2006 rating of 2,500 lb per raker",
     zone_verdict: base_in_zone ? "the raker base is INSIDE the wall's collapse zone -- the crew building it works in the zone" : "the raker base is outside the collapse zone",
@@ -425,7 +425,9 @@ const _PICKET_LB = {
   "3": { cohesive_poor: 1000, cohesive_average: 1500, cohesive_good: 2000, cohesionless_loose: 150, cohesionless_medium: 180, cohesionless_dense: 190 },
 };
 const _PICKET_TABLE_EMBED_IN = 36;
-const _STANDARD_PATTERN_PICKETS = 4;
+// US&R Shoring Operations Guide Ed. 5.0 (2021) p. 3-9: "Use 3 into Paving & 6 into Cohesive
+// Soil" per raker. The 2015 edition said 4; this used 4 until 2026-10-03.
+const _STANDARD_PATTERN_PICKETS = 6;
 
 // dims: in { required_force_lb: M L T^-2, picket_dia: dimensionless, soil: dimensionless, embedment_in: L } out: { design_load_per_picket_lb: M L T^-2, pickets_required: dimensionless, group_capacity_lb: M L T^-2, standard_pattern_capacity_lb: M L T^-2 }
 export function computePicketAnchorSoil({ required_force_lb = 1520, picket_dia = "1", soil = "cohesive_average", embedment_in = 36 } = {}) {
@@ -470,8 +472,8 @@ USAR_RENDERERS["picket-anchor-soil"] = _simpleRenderer({
   ],
   outputs: [
     { key: "per", id: "pas-out-per", label: "Design load per picket", value: (r) => fmt(r.design_load_per_picket_lb, 0) + " lb" },
-    { key: "count", id: "pas-out-count", label: "Pickets required", value: (r) => fmt(r.pickets_required, 0) + " (group " + fmt(r.group_capacity_lb, 0) + " lb)" + (r.beyond_standard_pattern ? " -- more than the standard 4-picket pattern" : "") },
-    { key: "std", id: "pas-out-std", label: "Standard 4-picket pattern", value: (r) => fmt(r.standard_pattern_capacity_lb, 0) + " lb" },
+    { key: "count", id: "pas-out-count", label: "Pickets required", value: (r) => fmt(r.pickets_required, 0) + " (group " + fmt(r.group_capacity_lb, 0) + " lb)" + (r.beyond_standard_pattern ? " -- more than the standard 6-picket pattern" : "") },
+    { key: "std", id: "pas-out-std", label: "Standard 6-picket pattern (2021 guide, cohesive soil)", value: (r) => fmt(r.standard_pattern_capacity_lb, 0) + " lb" },
     { key: "emb", id: "pas-out-emb", label: "Embedment", value: (r) => r.embedment_flag },
     { key: "soilf", id: "pas-out-soil", label: "Soil", value: (r) => r.soil_flag },
     { key: "n", id: "pas-out-n", label: "Note", value: (r) => r.note },

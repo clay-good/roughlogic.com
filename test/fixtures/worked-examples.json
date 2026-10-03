@@ -133346,7 +133346,7 @@
      }
     },
     "standard_pattern_capacity_lb": {
-     "value": 3000,
+     "value": 4500,
      "tolerance": {
       "pct": 0.5
      }
@@ -167692,6 +167692,184 @@
      "value": 1,
      "tolerance": {
       "abs": 0
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "two-stroke-mix-ratio-check",
+   "source_publisher": "Husqvarna AB",
+   "source_title": "Husqvarna 359 Operator's Manual (Fuel handling, Mixing ratio table; hosted at manualslib.com/manual/589061/Husqvarna-359.html?page=17)",
+   "source_edition_or_year": "Husqvarna 359 Operator's Manual (English), as hosted 2026",
+   "source_section_or_page": "Page 17, 'Mixing ratio -- For all engines: 1:50 (2%)'; table row 'Gasoline, litre 5' -> 'Two-stroke oil, litre 2% (1:50) 0,10'. 0,10 litre entered as 100 mL (the tile's liter mode takes oil in mL). 5000/100 = 50:1 exactly; abs 0.05 is display slack only.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "fuel_amount": 5,
+    "fuel_unit": "liter",
+    "oil_amount": 100,
+    "target_ratio": 50
+   },
+   "outputs": {
+    "ratio": {
+     "value": 50,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "two-stroke-mix-ratio-check",
+   "source_publisher": "Husqvarna AB",
+   "source_title": "Husqvarna 359 Operator's Manual (Fuel handling, Mixing ratio table; hosted at manualslib.com/manual/589061/Husqvarna-359.html?page=17)",
+   "source_edition_or_year": "Husqvarna 359 Operator's Manual (English), as hosted 2026",
+   "source_section_or_page": "Page 17, 'For all engines: 1:50 (2%)'; table row 'US gallon 1' -> 'US fl. oz. 2 1/2'. Tile: 128/2.5 = 51.2:1; the table rounds the oil to the nearest half ounce (exact 50:1 is 2.56 oz), so pct 2.5 covers the printed rounding (51.2 vs 50 = 2.4%).",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "fuel_amount": 1,
+    "fuel_unit": "gallon",
+    "oil_amount": 2.5,
+    "target_ratio": 50
+   },
+   "outputs": {
+    "ratio": {
+     "value": 50,
+     "tolerance": {
+      "pct": 2.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "two-stroke-mix-ratio-check",
+   "source_publisher": "Husqvarna AB",
+   "source_title": "Husqvarna 359 Operator's Manual (Fuel handling, Mixing ratio table; hosted at manualslib.com/manual/589061/Husqvarna-359.html?page=17)",
+   "source_edition_or_year": "Husqvarna 359 Operator's Manual (English), as hosted 2026",
+   "source_section_or_page": "Page 17, 'For all engines: 1:50 (2%)'; table row 'US gallon 2 1/2' -> 'US fl. oz. 6 1/2'. Tile: 320/6.5 = 49.23:1; exact 50:1 is 6.4 oz, the table rounds to 6 1/2, so pct 2 covers the printed rounding (1.5%).",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "fuel_amount": 2.5,
+    "fuel_unit": "gallon",
+    "oil_amount": 6.5,
+    "target_ratio": 50
+   },
+   "outputs": {
+    "ratio": {
+     "value": 50,
+     "tolerance": {
+      "pct": 2
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "two-stroke-mix-ratio-check",
+   "source_publisher": "Husqvarna AB",
+   "source_title": "Husqvarna 359 Operator's Manual (Fuel handling, Mixing ratio table; hosted at manualslib.com/manual/589061/Husqvarna-359.html?page=17)",
+   "source_edition_or_year": "Husqvarna 359 Operator's Manual (English), as hosted 2026",
+   "source_section_or_page": "Page 17, 'For all engines: 1:50 (2%)'; table row 'US gallon 5' -> 'US fl. oz. 12 7/8'. Tile: 640/12.875 = 49.71:1; exact 50:1 is 12.8 oz, the table rounds to 12 7/8, so pct 1 covers the printed rounding (0.6%).",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "fuel_amount": 5,
+    "fuel_unit": "gallon",
+    "oil_amount": 12.875,
+    "target_ratio": 50
+   },
+   "outputs": {
+    "ratio": {
+     "value": 50,
+     "tolerance": {
+      "pct": 1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "reserve-capacity-amp-hours",
+   "source_publisher": "RELiON Battery",
+   "source_title": "Battery Reserve Capacity Explained (RELiON blog, relionbattery.com/blog/battery-reserve-capacity-explained; read via Wayback 2024 capture)",
+   "source_edition_or_year": "Posted September 19, 2022",
+   "source_section_or_page": "Body text: 'a battery has a reserve capacity of 150, that means it can supply 25 amps for 150 minutes before the voltage drops to 10.5V' and 'Our RB100 has a reserve capacity of 240 minutes at 25 amps' for the 12V 100Ah RB100. Tile: 25 x 240/60 = 100.0 Ah = the printed 100Ah rating (a lithium battery, so the RC-rate and rated Ah coincide; the same article notes a 100Ah lead-acid battery gives only 170-190 RC minutes -- Peukert, as the tile note says). abs 0.5 is display slack.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "rc_minutes": 240
+   },
+   "outputs": {
+    "amp_hours": {
+     "value": 100,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "pipe-insulation-takeoff",
+   "source_publisher": "Johns Manville",
+   "source_title": "Micro-Lok HP & Micro-Lok HP Ultra High-Performance Fiberglass Pipe Insulation -- Dimensional Data Sheet (CI-214)",
+   "source_edition_or_year": "CI-214 3-07-19 (Replaces 3-08)",
+   "source_section_or_page": "Page 1, Iron Pipe Sizes table, Nominal 1\" Wall columns: nominal pipe size 4, 'Pipe O.D. (in.) 4.55', 'Actual Wall Thickness (in.) 1.01', 'Insulation O.D. (in.) 6.57'. Tile derived jacket OD = 4.55 + 2 x 1.01 = 6.57; every column is printed to 0.01 in, so abs 0.015 covers three half-hundredth roundings. Only the printed keys are entered; the length/waste/fitting keys stay at their defaults and do not enter derived_jacket_od_in.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "pipe_od_in": 4.55,
+    "insul_thickness_in": 1.01,
+    "insul_od_in": 6.57
+   },
+   "outputs": {
+    "derived_jacket_od_in": {
+     "value": 6.57,
+     "tolerance": {
+      "abs": 0.015
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "pipe-insulation-takeoff",
+   "source_publisher": "Johns Manville",
+   "source_title": "Micro-Lok HP & Micro-Lok HP Ultra High-Performance Fiberglass Pipe Insulation -- Dimensional Data Sheet (CI-214)",
+   "source_edition_or_year": "CI-214 3-07-19 (Replaces 3-08)",
+   "source_section_or_page": "Page 1, Iron Pipe Sizes table, Nominal 1\" Wall columns: nominal pipe size 6, 'Pipe O.D. (in.) 6.69', 'Actual Wall Thickness (in.) 0.94', 'Insulation O.D. (in.) 8.57'. Tile derived jacket OD = 6.69 + 2 x 0.94 = 8.57; every column is printed to 0.01 in, so abs 0.015 covers three half-hundredth roundings. Only the printed keys are entered; the length/waste/fitting keys stay at their defaults and do not enter derived_jacket_od_in.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "pipe_od_in": 6.69,
+    "insul_thickness_in": 0.94,
+    "insul_od_in": 8.57
+   },
+   "outputs": {
+    "derived_jacket_od_in": {
+     "value": 8.57,
+     "tolerance": {
+      "abs": 0.015
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "pipe-insulation-takeoff",
+   "source_publisher": "Johns Manville",
+   "source_title": "Micro-Lok HP & Micro-Lok HP Ultra High-Performance Fiberglass Pipe Insulation -- Dimensional Data Sheet (CI-214)",
+   "source_edition_or_year": "CI-214 3-07-19 (Replaces 3-08)",
+   "source_section_or_page": "Page 1, Iron Pipe Sizes table, Nominal 1\" Wall columns: nominal pipe size 2, 'Pipe O.D. (in.) 2.40', 'Actual Wall Thickness (in.) 1.03', 'Insulation O.D. (in.) 4.45'. Tile derived jacket OD = 2.40 + 2 x 1.03 = 4.46; every column is printed to 0.01 in, so abs 0.015 covers three half-hundredth roundings. Only the printed keys are entered; the length/waste/fitting keys stay at their defaults and do not enter derived_jacket_od_in.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "pipe_od_in": 2.4,
+    "insul_thickness_in": 1.03,
+    "insul_od_in": 4.45
+   },
+   "outputs": {
+    "derived_jacket_od_in": {
+     "value": 4.45,
+     "tolerance": {
+      "abs": 0.015
      }
     }
    }

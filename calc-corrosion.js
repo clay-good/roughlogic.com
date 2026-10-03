@@ -348,8 +348,8 @@ export function computeInstantOffIrDrop({ on_potential_v = 0, instant_off_potent
   return {
     on_potential_v, instant_off_potential_v, native_potential_v, criterion_v, polarization_criterion_mv,
     ir_drop_mv, off_margin_mv, on_margin_mv, polarization_mv,
-    meets_absolute_criterion: off_margin_mv >= 0,
-    meets_polarization_criterion: polarization_mv >= polarization_criterion_mv,
+    meets_absolute_criterion: off_margin_mv >= -1e-9,
+    meets_polarization_criterion: polarization_mv >= polarization_criterion_mv - 1e-9 * Math.abs(polarization_criterion_mv),
     optimism_ratio: off_margin_mv > 0 ? on_margin_mv / off_margin_mv : 0,
     note: "The ON potential includes the IR drop through the soil, which is voltage across the ground and NOT polarisation of the steel -- read against it, a thin real margin looks comfortable and a surveyor records the station as protected and moves on, while a seasonal drop in soil moisture takes it to failure. A station can satisfy one criterion narrowly and the other comfortably, which is common and entirely normal. The 100 mV criterion does not apply to a mixed-metal system: steel coupled to copper can show 100 mV of polarization and still be unprotected. And ONE rectifier left running voids all of it: its IR drop stays in the 'instant off' reading, and the number recorded is an on potential wearing an off potential's label. NACE SP0169 (now AMPP) governs the criteria and how they are applied.",
   };
@@ -414,7 +414,7 @@ export function computeCoatingBreakdownFactor({ surface_sqft = 0, bare_current_d
     years_to_bare: (1 - f0) / rate,
     fast_years_to_bare: (1 - f0) / fast_rate,
     fast_final_current_a,
-    fast_reaches_bare: f0 + fast_rate * design_life_years >= 1,
+    fast_reaches_bare: f0 + fast_rate * design_life_years >= 1 - 1e-9 * Math.abs(1),
     note: "A rectifier and anode bed sized on the commissioning current will be at a small fraction of the required output by the end of the design life, and the failure arrives gradually enough that nobody can name the day it happened. The MEAN current is what buys anode metal; the FINAL current is what buys anode COUNT and rectifier capacity -- using the mean for both leaves the system short at end of life, and using the final for both buys anode mass that will never be consumed. The breakdown factor caps at fully bare, and that bare-steel demand is the ceiling any impressed-current design is ultimately bounded by. Linear degradation is the customary design model; DNV-RP-B401, NACE practice, and the CP designer govern the factors.",
   };
 }
@@ -672,9 +672,9 @@ export function computeTankBottomAnodeLayout({ tank_diameter_ft = 0, current_den
     bottom_area_sqft,
     current_requirement_a: current_ma / 1000,
     grid_ribbon_ft, line_count, grid_loading_ma_per_ft,
-    grid_passes_rating: grid_loading_ma_per_ft <= ribbon_rating_ma_per_ft,
+    grid_passes_rating: grid_loading_ma_per_ft <= ribbon_rating_ma_per_ft + 1e-9 * Math.abs(ribbon_rating_ma_per_ft),
     ring_ribbon_ft, ring_loading_ma_per_ft,
-    ring_passes_rating: ring_loading_ma_per_ft <= ribbon_rating_ma_per_ft,
+    ring_passes_rating: ring_loading_ma_per_ft <= ribbon_rating_ma_per_ft + 1e-9 * Math.abs(ribbon_rating_ma_per_ft),
     ring_saving_pct: 100 * (grid_ribbon_ft - ring_ribbon_ft) / grid_ribbon_ft,
     ring_to_centre_ft: radius_ft,
     grid_to_farthest_ft,
@@ -800,7 +800,7 @@ export function computeAcInducedVoltagePipeline({ induced_ac_v = 0, soil_resisti
     threshold_multiple: ac_current_density_a_per_m2 / risk_threshold_a_per_m2,
     above_threshold: ac_current_density_a_per_m2 > risk_threshold_a_per_m2,
     touch_margin_v: touch_limit_v - induced_ac_v,
-    meets_touch_limit: induced_ac_v <= touch_limit_v,
+    meets_touch_limit: induced_ac_v <= touch_limit_v + 1e-9 * Math.abs(touch_limit_v),
     voltage_for_threshold_v,
     stringency_ratio: touch_limit_v / voltage_for_threshold_v,
     alternative_current_density_a_per_m2,
@@ -857,9 +857,9 @@ export function computePolarizationDecayCriterion({ on_potential_v = 0, instant_
   return {
     on_potential_v, instant_off_potential_v, criterion_v, polarization_criterion_mv,
     ir_drop_mv, formation_mv, decay_mv, absolute_margin_mv, decay_from_on_mv,
-    formation_passes: formation_mv >= polarization_criterion_mv,
-    decay_passes: decay_mv >= polarization_criterion_mv,
-    absolute_passes: absolute_margin_mv >= 0,
+    formation_passes: formation_mv >= polarization_criterion_mv - 1e-9 * Math.abs(polarization_criterion_mv),
+    decay_passes: decay_mv >= polarization_criterion_mv - 1e-9 * Math.abs(polarization_criterion_mv),
+    absolute_passes: absolute_margin_mv >= -1e-9,
     protected_under_either: formation_mv >= polarization_criterion_mv || decay_mv >= polarization_criterion_mv || absolute_margin_mv >= 0,
     decay_overstatement_ratio: decay_mv > 0 ? decay_from_on_mv / decay_mv : 0,
     decay_margin_mv: decay_mv - polarization_criterion_mv,

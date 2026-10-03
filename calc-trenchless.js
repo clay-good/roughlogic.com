@@ -258,8 +258,8 @@ export function computeHddAnnularPressure({ cover_depth_ft = 0, shallow_cover_ft
     shallow_factor_of_safety: shallow.factor_of_safety,
     max_fluid_density_ppg: Math.max(0, max_fluid_density_ppg),
     max_friction_psi,
-    deep_ok: deep.factor_of_safety >= required_fs,
-    shallow_ok: shallow.factor_of_safety >= required_fs,
+    deep_ok: deep.factor_of_safety >= required_fs - 1e-9 * Math.abs(required_fs),
+    shallow_ok: shallow.factor_of_safety >= required_fs - 1e-9 * Math.abs(required_fs),
     governing_station: "the shallow station",
     verdict: shallow.factor_of_safety >= required_fs
       ? "the shallow station holds the required factor of safety"

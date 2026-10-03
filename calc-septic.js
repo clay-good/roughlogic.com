@@ -164,7 +164,7 @@ export function computeSepticDoseTank({ daily_flow_gpd, doses_per_day = 4, drain
     pumped_per_day: pumpedPerDay,
     doses_per_day: doses,
     void_ratio: voidRatio,
-    void_ratio_ok: voidRatio === null ? true : voidRatio >= 5,
+    void_ratio_ok: voidRatio === null ? true : voidRatio >= 5 - 1e-9 * Math.abs(5),
     void_ratio_basis: network > 0 ? "network" : drainback > 0 ? "drainback (proxy; enter the network volume)" : "none",
     note: "The dose should be more than five times the volume of the distribution network (laterals plus manifold, EPA/625/R-00/008) -- a different quantity from the drainback that returns to the tank -- so the field pressurizes fully before the dose is spent; more, smaller doses spread the load and rest the soil better than one big dose; the drainback returns to the tank and is re-pumped, so it is pumping energy, not lost flow; and the dose count, dose volume, and float settings on the permit drawing govern.",
   };

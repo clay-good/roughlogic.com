@@ -2235,7 +2235,11 @@ export function computeGreaseDuctCleaningInterval({ inspection_interval_months =
   const inspections_per_year = MONTHS_PER_YEAR / inspection_interval_months;
   const thickness_margin_um = applicable_trigger_um - measured_thickness_um;
   const thickness_ratio = applicable_trigger_um > 0 ? measured_thickness_um / applicable_trigger_um : null;
-  const cleaning_triggered = measured_thickness_um >= applicable_trigger_um;
+  // NFPA 96 states each depth inch-first -- "0.078 in. (2000 um)" -- so a comb reading of
+  // exactly 0.078 in (1,981.2 um) must trigger. Judge at the trigger's inch value truncated
+  // to the thousandth, as NFPA prints it (2,000 um -> 0.078 in; 3,175 um -> 0.125 in).
+  const trigger_judged_um = Math.min(applicable_trigger_um, Math.floor(applicable_trigger_um / UM_PER_IN * 1000 + 1e-9) / 1000 * UM_PER_IN);
+  const cleaning_triggered = measured_thickness_um >= trigger_judged_um - 1e-9 * Math.abs(trigger_judged_um);
   const measured_thickness_in = measured_thickness_um / UM_PER_IN;
   const trigger_thickness_in = applicable_trigger_um / UM_PER_IN;
   const outs = [months_overdue, next_inspection_months, applicable_trigger_um, thickness_margin_um, inspections_per_year];

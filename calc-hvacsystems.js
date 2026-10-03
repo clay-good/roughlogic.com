@@ -1269,7 +1269,7 @@ export function computeCoilFaceVelocity({ cfm = 0, face_width_in = 0, face_heigh
   const face_velocity_fpm = q / face_area_ft2;
   return {
     face_area_ft2, face_velocity_fpm, threshold_fpm: thr,
-    carryover: face_velocity_fpm > thr,
+    carryover: face_velocity_fpm > thr + 1e-9 * Math.abs(thr),
     note: "Cooling-coil face velocity = airflow / coil face area, the number that governs condensate carryover: above about 500 fpm (the editable threshold) a wet cooling coil blows droplets off the fins past the drain pan, wetting the downstream duct. Keep a wet coil at or below ~500 fpm (dry heating coils tolerate more). Lower velocity means a larger coil face for the same airflow. A selection aid; the coil manufacturer's rated face velocity and moisture-carryover limit govern.",
   };
 }

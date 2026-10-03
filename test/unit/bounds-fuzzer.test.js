@@ -57213,7 +57213,7 @@ test("bounds: spec-v1901 computePicketAnchorSoil pins the clay-versus-sand count
   assert.strictEqual(r.design_load_per_picket_lb, 750);
   assert.strictEqual(r.pickets_required, 3);
   assert.strictEqual(r.group_capacity_lb, 2250);
-  assert.strictEqual(r.standard_pattern_capacity_lb, 3000);
+  assert.strictEqual(r.standard_pattern_capacity_lb, 4500); // 6 pickets per raker in cohesive soil (2021 guide)
   assert.strictEqual(r.shallow, false);
   assert.strictEqual(r.cohesionless, false);
   // The finding: sand needs 28 pickets, or 9 three-inch pins.

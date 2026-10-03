@@ -258,7 +258,7 @@ export function computePpfdDailyLightIntegral({ ppfd_umol_m2_s = 0, photoperiod_
   const supplemental_ppfd_umol_m2_s = Math.max(0, shortfall_dli) * MICROMOL_PER_MOL / (photoperiod_hours * SEC_PER_HOUR);
   return {
     dli, inside_dli, shortfall_dli,
-    meets_target: inside_dli >= target_dli,
+    meets_target: inside_dli >= target_dli - 1e-9 * Math.abs(target_dli),
     inside_share_of_target: inside_dli / target_dli,
     supplemental_ppfd_umol_m2_s,
     supplemental_share_of_entered_pct: 100 * supplemental_ppfd_umol_m2_s / ppfd_umol_m2_s,
@@ -513,7 +513,7 @@ export function computeShadeClothTransmission({ outdoor_dli = 0, glazing_transmi
     shade_pct, system_transmission, system_transmission_pct: 100 * system_transmission,
     inside_dli,
     inside_vs_target: inside_dli - target_dli,
-    meets_target: inside_dli >= target_dli,
+    meets_target: inside_dli >= target_dli - 1e-9 * Math.abs(target_dli),
     inside_share_of_target_pct: 100 * inside_dli / target_dli,
     two_layer_transmission, two_layer_dli,
     two_layer_share_of_target_pct: 100 * two_layer_dli / target_dli,

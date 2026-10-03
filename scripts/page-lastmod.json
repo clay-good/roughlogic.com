@@ -2,7 +2,7 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "03f08b5dcca05ef1",
+      "sha": "90fbc1865db0bfc4",
       "date": "2026-10-03"
     },
     "/tools/": {
@@ -3362,8 +3362,8 @@
       "date": "2026-10-01"
     },
     "/tools/generator-fleet-fuel-resupply/": {
-      "sha": "83087a2d1de5f6b5",
-      "date": "2026-10-01"
+      "sha": "c897ba61a3a11f8c",
+      "date": "2026-10-03"
     },
     "/tools/generator-fuel-runtime/": {
       "sha": "8ea7ea56f6bff6b9",
@@ -4006,8 +4006,8 @@
       "date": "2026-09-29"
     },
     "/tools/interpass-temperature-control/": {
-      "sha": "06c418ef03c75ca9",
-      "date": "2026-10-01"
+      "sha": "fcc4482a46da4c45",
+      "date": "2026-10-03"
     },
     "/tools/intersection-sight-triangle/": {
       "sha": "67369aff240fdf98",
@@ -5286,8 +5286,8 @@
       "date": "2026-09-29"
     },
     "/tools/picket-anchor-soil/": {
-      "sha": "17ed5810b95c4966",
-      "date": "2026-10-01"
+      "sha": "3b32a369642f835e",
+      "date": "2026-10-03"
     },
     "/tools/pid-tuning-ziegler-nichols/": {
       "sha": "209c47007e5c0ba4",

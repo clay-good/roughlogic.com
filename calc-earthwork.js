@@ -984,7 +984,7 @@ export function computePipeFlotation({ pipe_od_in = 48, pipe_weight_plf = 200, b
     fs,
     required_backfill_plf,
     required_backfill_on_backfill_plf,
-    pass: fs >= target_fs,
+    pass: fs >= target_fs - 1e-9 * Math.abs(target_fs),
     note: "Flotation is critical when the pipe is empty and the trench is flooded - a high water table or saturated backfill. Submerged backfill counts only its buoyant (effective) weight, so use the submerged unit weight for any material below the water table. The fixes are more cover, concrete anti-flotation collars, or holding the empty pipe down (ballast) until the backfill is complete. The design engineer governs.",
   };
 }
@@ -1122,7 +1122,7 @@ export function computeHddPullback({ eff_weight_plf = 5, length_ft = 800, fricti
     capstan_utilization,
     governing_limit_lb,
     governing_limit,
-    within_limit: governing_limit_lb === null ? null : governing_pullback_lb <= governing_limit_lb,
+    within_limit: governing_limit_lb === null ? null : governing_pullback_lb <= governing_limit_lb + 1e-9 * Math.abs(governing_limit_lb),
     note: "A first-order estimate. The effective pipe weight already accounts for buoyancy in the drilling fluid, and it is the term ballasting moves most: an empty HDPE pipe in a fluid-filled hole is strongly buoyant and presses against the top of the bore for its whole length, where filling it with water brings the net weight and the drag with it close to zero. THE LUMPED BEND FACTOR IS A STAND-IN FOR THE CAPSTAN RELATION, which multiplies tension by e raised to (friction x angle) at every curve, so drag along the straight sections compounds rather than adds at each bend. Entering the path's total bend angle computes that multiplier directly and says whether the assumed factor is generous or optimistic -- and on a curvy bore an assumed factor is usually optimistic, which is the direction that matters. That is also why entry and exit angles and the bend radius are pullback decisions rather than layout ones. The limit that governs is usually the PIPE, not the rig. HDPE has a time-dependent allowable stress: it will take a high load briefly and a much lower one for hours, so the safe pull for a pullback lasting a shift is well below any short-term rating. Exceeding it does not necessarily part the pipe on the spot -- it can stretch it, and a pipe pulled beyond its limit may fail later or fail its pressure test. This omits hydrokinetic drag, which is entered as an allowance rather than computed, and it does not model the fluid, the hole condition, or a segmented profile. The drilling contractor, the pipe manufacturer's safe pull for the duration, and the rig's rated thrust govern.",
   };
 }

@@ -99,7 +99,7 @@ export function computeChemicalFeedPump({ flow_mgd = 0, dose_mgl = 0, strength_p
     solution_gpd: Number.isFinite(gpd) ? gpd : null,
     ml_min: Number.isFinite(mlMin) ? mlMin : null,
     setting_pct: settingPct != null && Number.isFinite(settingPct) ? settingPct : null,
-    undersized: settingPct != null && settingPct > 100,
+    undersized: settingPct != null && settingPct > 100 + 1e-9 * Math.abs(100),
     note: (settingPct != null && settingPct > 100 ? "Setting above 100% - pump is undersized for this dose. " : "")
       + "Percent-by-weight differs from trade strength (12.5% trade NaOCl is ~10.8% by weight). Calibrate against a drawdown cylinder, not the dial.",
   };
@@ -580,7 +580,7 @@ export function computeClarifierSurfaceLoading({ flow_mgd = 0, surface_ft2 = 0, 
   const solids_lb_ft2_day = mlss > 0 ? (flow + ras) * mlss * 8.34 / area : null;
   return {
     sor_gpd_ft2, weir_gpd_ft, solids_lb_ft2_day,
-    sor_overloaded: sor_gpd_ft2 > 1000,
+    sor_overloaded: sor_gpd_ft2 > 1000 + 1e-9 * Math.abs(1000),
     note: "Clarifier loading checks: surface overflow rate SOR = flow / surface area (gpd/ft^2), weir overflow rate = flow / total weir length (gpd/ft), and (for a secondary clarifier) solids loading = (flow + return sludge flow) x MLSS x 8.34 / area (lb/ft^2/day). Recommended Standards for Wastewater Facilities (Ten States, 2014) limits: primary tanks 1,000 gpd/ft^2 at design average flow (700 if they receive waste activated sludge; 1,500-2,000 and 1,200 at peak hour); activated-sludge final tanks at peak hour 1,200 (conventional), 1,000 (extended aeration) or 800 (2-stage nitrification) gpd/ft^2 with 40 or 35 lb/ft^2/day peak solids (72.232); weir loading 20,000 gpd/ft for plants of 1 MGD or less and 30,000 above (72.43). The flag here trips above 1,000 gpd/ft^2; exceeding the SOR carries floc over the weir. The state design criteria govern. An operations aid; the operator of record and the primacy agency govern compliance.",
   };
 }

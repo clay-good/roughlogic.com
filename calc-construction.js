@@ -3362,10 +3362,10 @@ export function computeHeaderSizing({
     F_b_psi: Fb_allow_psi,
     F_b_base_psi: props.F_b_psi,
     c_d,
-    bending_ok: f_b_psi <= Fb_allow_psi,
+    bending_ok: f_b_psi <= Fb_allow_psi + 1e-9 * Math.abs(Fb_allow_psi),
     deflection_in,
     allowable_deflection_in,
-    deflection_ok: deflection_in <= allowable_deflection_in,
+    deflection_ok: deflection_in <= allowable_deflection_in + 1e-9 * Math.abs(allowable_deflection_in),
     reaction_lb,
     jack_studs_each_end,
     warnings,
@@ -4701,7 +4701,7 @@ export function computeControlJointSpacing({ slab_thickness_in = 0, spacing_fact
   }
   return {
     spacing_ft, depth_in, panels_long, panels_wide, panels, aspect,
-    aspect_over: aspect !== null ? aspect > 1.5 : false,
+    aspect_over: aspect !== null ? aspect > 1.5 + 1e-9 * Math.abs(1.5) : false,
     note: "Cut contraction joints at about two to three times the slab thickness in feet (a 4 in slab joints every 8-12 ft), capped near 15-18 ft so a panel does not crack mid-bay. Keep panels close to square (under about 1.5 to 1) - a long, narrow panel cracks across the middle. Cut at least a quarter of the slab depth, early (within the first few hours). This is a crack-control rule of thumb; the structural drawings govern a designed slab.",
   };
 }
@@ -7934,7 +7934,7 @@ export function computeShotcreteReboundQuantity({ area_sf = 0, thickness_in = 0,
     shortfall_cy,
     in_place_from_shot_cy,
     achieved_thickness_in,
-    thickness_ok: achieved_thickness_in >= thickness_in,
+    thickness_ok: achieved_thickness_in >= thickness_in - 1e-9 * Math.abs(thickness_in),
     note: "Rebound depends on process and orientation - roughly 5-15% for wet-mix vertical work and 15-30% for dry-mix (gunite) overhead. The value comes from the applicator's field record or the spec, not a constant. Rebound must be cleaned out and never worked back into the section - it has lost its cement fraction, and incorporating it is a known defect mechanism, so it is genuine loss that has to come off the invert. The shot volume is what you order; the in-place volume is what stays on the wall. THE CORRECTION DIVIDES. A 25% rebound does not mean ordering 25% more, it means ordering 33% more, because the rebound is a fraction of what is SHOT rather than of what stays - and the gap widens fast, so at 35% rebound the order is 54% above the in-place volume. Adding the percentage instead leaves a crew short, often by most of a truck. The reverse is the question mid-shift: given the volume actually shot, the in-place thickness is that volume less rebound spread over the area, and the thickness check should reflect it rather than the delivery ticket.",
   };
 }

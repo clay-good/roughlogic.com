@@ -391,7 +391,7 @@ export function computeMaglockLeverage({ rated_holding_lb = 0, lock_distance_fro
   return {
     lever_ratio, force_at_handle_lb, best_lock_distance_in, best_case_force_lb, improvement_factor,
     voltage_factor, gap_factor, effective_force_lb, rating_needed_lb,
-    meets_target: effective_force_lb >= target_resistance_lb,
+    meets_target: effective_force_lb >= target_resistance_lb - 1e-9 * Math.abs(target_resistance_lb),
     note: "The door is a lever and the magnet is what it works against. A magnet mounted a few inches from the hinge on a three-foot door works at a large mechanical disadvantage against someone pulling at the handle, so a four-figure rating becomes a two-figure resistance -- defeatable by one determined person. Mounting the same magnet near the strike edge changes the ratio to nearly one to one and the lock performs as rated, at no cost. Lock position is the whole design. Two further reductions apply before anyone pulls. Rated holding force assumes full face contact between the armature and the magnet with no gap, and a warped door, paint, dirt, or a misaligned armature drops it sharply -- a sixteenth of an inch is a large loss, and the derate here is entered because the real effect depends on the specific lock. And the magnet must have its rated voltage AT THE LOCK, which a long undersized run does not deliver; force follows roughly the square of the supply voltage, so a small shortfall costs more than it looks. A well-mounted magnet that is dirty and undervolted can end up back where a badly mounted one started. The egress caution is not optional. A magnet holds until it is de-energized, so on any door required for egress the release arrangement -- request to exit, motion sensing, fire alarm interface, and power failure behaviour -- is a code matter, and a magnet that stays locked when the building is on fire is a fatality mechanism regardless of its rating. This does not evaluate the door, frame, or the fasteners securing the magnet and armature, which are frequently the actual failure point, and it does not size power or wiring. The adopted building and fire codes, the lock manufacturer's listing and installation instructions, and the authority having jurisdiction govern.",
   };
 }
@@ -449,7 +449,7 @@ export function computeMasterKeyCapacity({ cut_positions = 0, usable_depths = 0,
   return {
     theoretical_total, per_mastered_position, change_keys_available, alternative_change_keys,
     margin, utilisation_pct,
-    sufficient: change_keys_available >= change_keys_required,
+    sufficient: change_keys_available >= change_keys_required - 1e-9 * Math.abs(change_keys_required),
     tight: change_keys_available >= change_keys_required && utilisation_pct > 75,
     verdict: change_keys_available >= change_keys_required
       ? (utilisation_pct > 75 ? "enough, but the requirement uses most of the capacity -- there is no room to expand" : "enough, with room to expand")

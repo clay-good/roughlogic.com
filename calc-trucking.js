@@ -416,7 +416,7 @@ export function computeBridgeFormula({ axle_weights_lb = [], axle_spacings_ft = 
   return {
     total_weight_lb: total,
     interstate_cap_lb: 80000,
-    over_interstate: total > 80000,
+    over_interstate: total > 80000 + 1e-9 * Math.abs(80000),
     axle_violations: violations,
     bridge_violations,
   };

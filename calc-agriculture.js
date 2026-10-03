@@ -2108,7 +2108,7 @@ export function computeTwoStrokeMixRatioCheck({ fuel_amount = 0, fuel_unit = "ga
     verdict = "Enter a target ratio to compare.";
   } else {
     const pct = (ratio / tr - 1) * 100;
-    if (Math.abs(pct) <= 5) verdict = "on spec - within 5% of the " + fmt(tr, 0) + ":1 target";
+    if (Math.abs(pct) <= 5 + 1e-9) verdict = "on spec - within 5% of the " + fmt(tr, 0) + ":1 target";
     else if (ratio > tr) verdict = "LEAN (too little oil) - " + fmt(ratio, 0) + ":1 vs the " + fmt(tr, 0) + ":1 target; a lean mix starves the bearings and risks scoring or seizure - add oil";
     else verdict = "RICH (too much oil) - " + fmt(ratio, 0) + ":1 vs the " + fmt(tr, 0) + ":1 target; a rich mix smokes and fouls the plug but is the safer error - thin with fuel";
   }
@@ -2508,7 +2508,7 @@ export function computeDripZoneFlow({ mode = "inline", tubing_ft = 0, spacing_in
   const utilization = zone_gpm / valve_gpm * 100;
   return {
     emitters, zone_gph, zone_gpm, utilization,
-    over_limit: utilization > 100,
+    over_limit: utilization > 100 + 1e-9 * Math.abs(100),
     note: "Total emitter flow = emitters x rated gph; convert to gpm (/60) and check it against the valve's and lateral tubing's flow limit. Inline mode derives the emitter count from the dripline length and emitter spacing (emitters = floor(length x 12 / spacing)); point-source mode takes the count directly. Keep utilization under 100% - over the valve or lateral limit, the far emitters starve. The per-emitter flow is the manufacturer's rated gph at the design pressure, the valve and lateral limits come from the product's published maximum flow, and this is a flow-budget check, not a hydraulic pressure-loss model.",
   };
 }

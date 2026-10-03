@@ -377,7 +377,7 @@ export function computeCollectionRouteProductivity({ stop_count = 0, seconds_per
     collection_hours, route_tons, disposal_loads, haul_hours, tipping_hours,
     overhead_hours, route_day_hours,
     overtime_hours: route_day_hours - shift_hours,
-    fits_shift: route_day_hours <= shift_hours,
+    fits_shift: route_day_hours <= shift_hours + 1e-9 * Math.abs(shift_hours),
     available_hours, max_stops,
     stops_over: stop_count - max_stops,
     stops_over_pct: max_stops > 0 ? 100 * (stop_count - max_stops) / max_stops : 0,
@@ -826,7 +826,8 @@ export function computeWorkingFaceCellLift({ daily_tons = 0, in_place_density_lb
   };
   const base = geometryAt(face_width_ft);
   const narrow = geometryAt(narrow_face_width_ft);
-  const layers = lift_height_ft / layer_thickness_ft;
+  // A thinner last layer still takes its full passes: a 10 ft lift in 3 ft layers is 4 layers.
+  const layers = Math.ceil(lift_height_ft / layer_thickness_ft - 1e-9);
   return {
     daily_volume_cy, daily_volume_cuft, slope_length_ft,
     advance_ft_per_day: base.advance_ft_per_day,

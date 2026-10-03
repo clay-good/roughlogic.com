@@ -787,7 +787,7 @@ export function computePowerDistro({ watts = 0, voltage_v = 208, phase = "three"
     pct_load: Number.isFinite(pct) ? pct : null,
     continuous_limit_a: Number.isFinite(continuousLimit) ? continuousLimit : null,
     headroom_a: Number.isFinite(headroom) ? headroom : null,
-    pass: amps <= continuousLimit,
+    pass: amps <= continuousLimit + 1e-9 * Math.abs(continuousLimit),
     note: "Assumes balanced legs unless per-phase entered. Ignores inrush / dimmer harmonics on the neutral. PF < 1 for LED/motor loads raises current. NEC continuous-load 80% rule and temporary-power Articles 520/525 govern.",
   };
 }

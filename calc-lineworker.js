@@ -524,7 +524,7 @@ export function computePoleClassGroundlineMoment({ groundline_circumference_in =
     groundline_diameter_in, section_modulus_in3, moment_capacity_inlb, moment_capacity_ftlb,
     applied_moment_ftlb, utilization_pct, remaining_moment_ftlb, remaining_load_lb,
     at_height_ft, load_count: acting.length, one_inch_less_capacity_ftlb, one_inch_loss_pct,
-    passes: utilization_pct <= 100,
+    passes: utilization_pct <= 100 + 1e-9 * Math.abs(100),
     verdict: utilization_pct <= 100
       ? fmt(utilization_pct, 1) + "% of bending capacity, with " + fmt(remaining_moment_ftlb, 0) + " ft-lb left"
       : "OVER capacity at " + fmt(utilization_pct, 1) + "% -- the applied moment exceeds what the stick can carry at the groundline",

@@ -190,7 +190,7 @@ export function computeCraneGroundBearing({ reaction_lb, bearing_area_ft2, allow
   if (![gbp, requiredFt2, matSideFt].every(Number.isFinite)) return { error: "Ground-bearing math is not a finite value." };
   return {
     gbp_psf: gbp,
-    pass: gbp <= allowable,
+    pass: gbp <= allowable + 1e-9 * Math.abs(allowable),
     verdict: gbp <= allowable ? "pass" : "fail - increase the bearing area",
     required_ft2: requiredFt2,
     mat_side_ft: matSideFt,
@@ -577,7 +577,7 @@ export function computeShackleEyeboltWll({ leg_load_lb, rated_wll_lb, angle_deg 
     derated_capacity_lb: deratedCapacity,
     mbs_lb: mbs,
     hardware: hardware === "shoulder_eyebolt" ? "shoulder eye bolt" : "shackle",
-    pass: deratedCapacity >= leg,
+    pass: deratedCapacity >= leg - 1e-9 * Math.abs(leg),
     verdict: deratedCapacity >= leg ? "pass" : "fail - hardware undersized at this angle",
     note: "Shackles are loaded in line through the bow and pin; a side load follows the manufacturer's reduced chart. A shoulder eye bolt keeps 30% of its rating at 45 degrees and 25% at 90 (Crosby's chart), and an angular pull on a plain (non-shoulder) eye bolt is not permitted. The 5:1 design factor is on the WLL, not a license to load to the minimum breaking strength. Inspect every piece; the manufacturer's exact chart governs.",
   };
@@ -740,7 +740,7 @@ export function computeForkliftCapacityDerate({ rated_cap_lb, rated_lc_in = 24, 
   return {
     net_capacity_lb: netCapacity,
     margin_pct: marginPct,
-    pass: load <= netCapacity,
+    pass: load <= netCapacity + 1e-9 * Math.abs(netCapacity),
     verdict: load <= netCapacity ? "pass" : "fail - over the derated capacity",
     note: "The truck's capacity plate is the legal rating, and an attachment changes the plate - a derated plate must be fitted by the dealer for any attachment. Raising the load, tilting forward, soft ground, and grade all reduce real capacity further. A load whose CG is beyond the rated load center tips the truck forward before the rear wheels can react.",
   };
@@ -854,7 +854,7 @@ export function computeChainLeverHoist({ load_lb, rated_wll_lb, mech_adv, effici
   return {
     hand_pull_lb: handPull,
     hand_chain_travel_ft: handChainTravel,
-    pass: load <= rated,
+    pass: load <= rated + 1e-9 * Math.abs(rated),
     verdict: load <= rated ? "pass" : "fail - over the rated WLL",
     note: "ASME B30.16 / B30.21 limit the effort one person may apply - a load that needs a cheater bar or a second person on the lever is overloaded, stop. The hoist's rated WLL is the ceiling regardless of the leverage available. The hand chain is long because the advantage is high, and the load drops fast if the brake is defeated. Inspect the hoist, hooks, and chain before the lift.",
   };

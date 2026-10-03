@@ -599,8 +599,8 @@ export function computeVfdReflectedWave({ rise_time_us = 0, velocity_pct = 50, s
   const limit_genpurpose_v = 1000;
   return {
     cable_velocity_ft_us, l_crit_ft, v_bus_v, v_peak_v, limit_invduty_v, limit_genpurpose_v,
-    exceeds_invduty: v_peak_v > limit_invduty_v,
-    exceeds_genpurpose: v_peak_v > limit_genpurpose_v,
+    exceeds_invduty: v_peak_v > limit_invduty_v + 1e-9 * Math.abs(limit_invduty_v),
+    exceeds_genpurpose: v_peak_v > limit_genpurpose_v + 1e-9 * Math.abs(limit_genpurpose_v),
     note: "The limit is set by the drive rise time, not the motor horsepower. Above the critical length the reflection fully develops and the peak terminal voltage reaches twice the DC bus. NEMA MG-1 Part 31 inverter-duty insulation withstands about 3.1 times the line-to-line, while a general-purpose motor is limited near 1000 V. The fix is a dV/dt or sine-wave filter or an inverter-duty motor. The drive and motor data govern.",
   };
 }

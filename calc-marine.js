@@ -465,12 +465,12 @@ export function computeBerthingFenderEnergy({ displacement_tons = 0, approach_ve
     usable_rating_ftlb,
     accidental_energy_ftlb: design_energy_ftlb * 1.5,
     fender_margin_pct: 100 * (usable_rating_ftlb - design_energy_ftlb) / design_energy_ftlb,
-    fender_adequate: design_energy_ftlb <= usable_rating_ftlb,
+    fender_adequate: design_energy_ftlb <= usable_rating_ftlb + 1e-9 * Math.abs(usable_rating_ftlb),
     fender_utilization: design_energy_ftlb / usable_rating_ftlb,
     alternative_design_energy_ftlb,
     alternative_energy_ratio: alternative_design_energy_ftlb / design_energy_ftlb,
     alternative_fender_utilization: alternative_design_energy_ftlb / usable_rating_ftlb,
-    alternative_fender_adequate: alternative_design_energy_ftlb <= usable_rating_ftlb,
+    alternative_fender_adequate: alternative_design_energy_ftlb <= usable_rating_ftlb + 1e-9 * Math.abs(usable_rating_ftlb),
     // The square is the whole reason fender design is conservative.
     velocity_ratio: alternative_velocity_fps / approach_velocity_fps,
     // A square berthing -- a barge pushed flat against a face -- has Ce near 1
@@ -538,7 +538,7 @@ export function computeMooringLoadWindCurrent({ wind_area_ft2 = 0, wind_drag_coe
     current_speed_fps,
     wind_speed_fps: wind_speed_mph * 5280 / SEC_PER_HOUR,
     current_to_wind_ratio: current_force_lb / wind_force_lb,
-    current_exceeds_wind: current_force_lb > wind_force_lb,
+    current_exceeds_wind: current_force_lb > wind_force_lb + 1e-9 * Math.abs(wind_force_lb),
     current_over_wind_pct: 100 * (current_force_lb - wind_force_lb) / wind_force_lb,
     cos_angle, angle_cost_pct: 100 * (1 - cos_angle),
     worst_line_share_pct,

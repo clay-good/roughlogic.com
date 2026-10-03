@@ -1213,7 +1213,7 @@ export function computeSprayTipSelection({ tip_number = 0, pressure_psi = 0, wet
   return {
     fan_width_in, fan_width_ft, orifice_in, flow_gpm, coverage_rate_sqft_min, travel_speed_fpm,
     gallons_per_hour: flow_gpm * 60,
-    too_fast: travel_speed_fpm > 180,
+    too_fast: travel_speed_fpm > 180 + 1e-9 * Math.abs(180),
     verdict: travel_speed_fpm > 180
       ? "faster than most people can move a gun smoothly -- this tip wants a heavier film or a wider fan, and forcing it produces runs"
       : travel_speed_fpm < 40

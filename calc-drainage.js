@@ -219,7 +219,7 @@ export function computeSumpBasinSizing({ basin_dia, drawdown_in, inflow_gpm, pum
     run_time_s: runTimeS,
     fill_time_s: fillTimeS,
     cycles_per_hr: cyclesPerHr,
-    adequate: runTimeS >= minRun,
+    adequate: runTimeS >= minRun - 1e-9 * Math.abs(minRun),
     verdict: runTimeS >= minRun ? "adequate" : "short-cycling",
     note: "The pump must out-pace the inflow (this tile errors if it does not - an undersized pump or an overwhelmed basin). A longer run time per cycle is gentler on the motor; raise the float spread or the basin size to lengthen it. A sewage ejector must pass 2 in solids and carries a vent, neither of which this tile sizes (IPC 712.3-712.4).",
   };

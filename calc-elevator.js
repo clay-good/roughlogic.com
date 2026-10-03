@@ -235,7 +235,7 @@ export function computeElevatorRopeSafetyFactor({ car_weight_lb = 0, rated_load_
   return {
     rope_weight_lb, suspended_load_lb, breaking_total_lb, factor_of_safety,
     fs_without_rope_weight, overstatement, margin,
-    pass: factor_of_safety >= code_minimum_fs,
+    pass: factor_of_safety >= code_minimum_fs - 1e-9 * Math.abs(code_minimum_fs),
     max_rated_load_lb: Math.max(0, max_rated_load_lb),
     minimum_unreachable: max_rated_load_lb <= 0,
     verdict: factor_of_safety >= code_minimum_fs ? "meets the entered minimum" : "BELOW the entered minimum",
@@ -592,7 +592,7 @@ export function computeDoorClosingEnergy({ door_mass_lb = 0, closing_speed_fps =
   return {
     kinetic_energy_ftlb, pass_normal, pass_reduced, speed_for_reduced_limit_fps, speed_change_pct,
     closing_time_s, closing_time_at_limit_s, closing_time_change_s, ke_with_added_mass_ftlb,
-    force_ok: measured_force_lbf <= force_limit_lbf,
+    force_ok: measured_force_lbf <= force_limit_lbf + 1e-9 * Math.abs(force_limit_lbf),
     verdict: pass_reduced ? "within both entered limits"
       : pass_normal ? "within the normal limit but OVER the reduced limit"
         : "OVER both entered limits",
@@ -723,9 +723,9 @@ export function computeGuideRailBracketSpan({ span_ft = 0, horizontal_load_lb = 
   return {
     moment_inlb, stress_psi, deflection_in, max_span_for_deflection_ft,
     halved_span_moment_inlb, halved_span_deflection_in, safety_moment_inlb, safety_stress_psi,
-    deflection_ok: deflection_in <= deflection_limit_in,
-    stress_ok: stress_psi <= allowable_stress_psi,
-    safety_stress_ok: safety_stress_psi <= allowable_stress_psi,
+    deflection_ok: deflection_in <= deflection_limit_in + 1e-9 * Math.abs(deflection_limit_in),
+    stress_ok: stress_psi <= allowable_stress_psi + 1e-9 * Math.abs(allowable_stress_psi),
+    safety_stress_ok: safety_stress_psi <= allowable_stress_psi + 1e-9 * Math.abs(allowable_stress_psi),
     note: "A guide rail spans between brackets like any beam, carrying the horizontal load at the guide shoes as a concentrated load. For a concentrated load at midspan the moment goes as the span and the deflection as its CUBE, so halving the span halves the moment and cuts the deflection to an eighth. A rail that is marginal on deflection is therefore usually fixed by adding a bracket rather than by upsizing the rail, which matters because rails are a long-lead item and brackets are not: matching an eighth of the deflection by section alone would take eight times the moment of inertia, several sizes of rail. The governing load is safety application, not normal operation. When the car safeties set they clamp the rails and transmit a large force, and the rail and its brackets have to take it without permanent deformation; normal eccentric loading -- a heavy load in one corner of the car -- is a much smaller number that governs the deflection limit rather than the strength. A rail arrangement checked only for normal operating loads is checked for the wrong case. Seismic is what changes everything in higher-hazard regions: the code's provisions require larger sections, closer brackets, retainer plates, and additional devices, so a rail layout carried over from a low-seismic project is not transferable, which is a common source of trouble on repeat-design buildings. This is a single-span beam calculation and the code's load cases, allowable stresses and deflections, rail sections, and bracket and fastening requirements determine acceptability rather than a general beam formula. It does not determine the horizontal loads, evaluate the bracket itself or its fastening to the structure -- frequently the weak element -- or address rail joints, alignment tolerances, or the rail's function as part of the safety system. The 15,000 psi and 0.25 in limits of A17.1 2.23.5.1.1 apply to loading, unloading and running; safety application is checked separately, through the car-weight-against-bracket-spacing chart (Fig. 2.23.4.1-1) or a 0.25 in rail deflection during the stop, with the rail loaded as a column, and 2.23.5.3 allows 27,500 psi for emergency braking, while 2.23.5.2 holds the BRACKET to 0.125 in. The safety line here is a bending screen only. ASME A17.1 and A17.2, the equipment manufacturer, the elevator authority having jurisdiction, and a licensed elevator mechanic govern.",
   };
 }

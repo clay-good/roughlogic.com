@@ -114,7 +114,9 @@ export function computePipeInsulationTakeoff({ pipe_ft = 250, waste_pct = 5, num
   const has_derived_od = pipe_od_in > 0 && insul_thickness_in > 0;
   const derived_jacket_od_in = has_derived_od ? pipe_od_in + 2 * insul_thickness_in : 0;
   const pipe_circumference_ft = pipe_od_in > 0 ? Math.PI * (pipe_od_in / 12) : 0;
-  const od_mismatch = has_derived_od && Math.abs(derived_jacket_od_in - insul_od_in) > 0.01;
+  // Catalog ODs and walls are each printed to 0.01 in, so 0.02 in of disagreement is rounding
+  // (Johns Manville CI-214: 2 in pipe 2.40 + 2 x 1.03 = 4.46 against a printed 4.45).
+  const od_mismatch = has_derived_od && Math.abs(derived_jacket_od_in - insul_od_in) > 0.02 + 1e-9;
   const jacket_od_verdict = !has_derived_od
     ? "(no pipe OD and insulation thickness entered)"
     : fmt(pipe_od_in, 2) + " in pipe with " + fmt(insul_thickness_in, 2) + " in of insulation is a "

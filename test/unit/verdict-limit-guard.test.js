@@ -18,6 +18,18 @@ const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..", "..");
 const NAME = "[a-z_]*(?:ok|pass|passes|within|meets|fits|reaches|adequate|compliant|safe|covers|sufficient)[a-z_]*";
 const LINE = new RegExp("^\\s*const (" + NAME + ") = (.+);\\s*(//.*)?$");
 
+// A verdict can also be a field of the returned object (`fits_shift: a <= b,`).
+// 2026-10-03: a waste route that fit its 9 h shift exactly read 9.000000000000002
+// h and "does not fit"; 83 such fields were guarded. A field whose expression
+// holds a top-level comma or a string literal is skipped (not a single verdict).
+function propVerdict(line, name) {
+  const m = new RegExp("^\\s*(" + name + "): (.+),\\s*(//.*)?$").exec(line);
+  if (!m || /["'`]/.test(m[2])) return null;
+  let d = 0;
+  for (const c of m[2]) { if ("([{".includes(c)) d++; else if (")]}".includes(c)) d--; else if (c === "," && d === 0) return null; }
+  return m;
+}
+
 // Split at top-level && / || (a top-level ternary skips the line: its branches
 // are values, not verdict terms), and flag each term that is a single
 // inclusive comparison without slack. 2026-10-03: a second codemod pass covered
@@ -93,7 +105,7 @@ test("every simple inclusive verdict comparison carries float slack toward the l
   const bad = [];
   for (const f of readdirSync(ROOT).filter((n) => /^calc-.*\.js$/.test(n))) {
     readFileSync(resolve(ROOT, f), "utf8").split("\n").forEach((line, i) => {
-      const m = LINE.exec(line);
+      const m = LINE.exec(line) || propVerdict(line, NAME);
       if (!m) return;
       for (const t of unguardedTerms(m[2])) bad.push(f + ":" + (i + 1) + " " + m[1] + ": " + t.slice(0, 60));
     });
@@ -127,7 +139,7 @@ test("every strict failure verdict against a limit carries float slack away from
   const bad = [];
   for (const f of readdirSync(ROOT).filter((n) => /^calc-.*\.js$/.test(n))) {
     readFileSync(resolve(ROOT, f), "utf8").split("\n").forEach((line, i) => {
-      const m = FAIL.exec(line);
+      const m = FAIL.exec(line) || propVerdict(line, "(?![a-z_]*govern)[a-z_]*(?:exceed|over|fail|violat|insufficient|inadequate|too_|undersize|short)[a-z_]*");
       if (!m) return;
       const terms = flatTerms(m[2]);
       for (const t of terms) if (!t.includes("1e-") && !t.startsWith("!") && !t.startsWith("(") && singleStrict(t)) bad.push(f + ":" + (i + 1) + " " + m[1] + ": " + t.slice(0, 60));

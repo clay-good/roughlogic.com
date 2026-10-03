@@ -1517,9 +1517,9 @@ export function computeVehicleLoad({ wheelbase_in = 0, payload_lb = 0, payload_p
   const rear_total = curb_rear_lb + payload_to_rear;
   const gross = front_total + rear_total;
   const flags = {
-    over_gvwr: gvwr_lb !== null && gross > gvwr_lb,
-    over_front_gawr: front_gawr_lb !== null && front_total > front_gawr_lb,
-    over_rear_gawr: rear_gawr_lb !== null && rear_total > rear_gawr_lb,
+    over_gvwr: gvwr_lb !== null && gross > gvwr_lb + 1e-9 * Math.abs(gvwr_lb),
+    over_front_gawr: front_gawr_lb !== null && front_total > front_gawr_lb + 1e-9 * Math.abs(front_gawr_lb),
+    over_rear_gawr: rear_gawr_lb !== null && rear_total > rear_gawr_lb + 1e-9 * Math.abs(rear_gawr_lb),
   };
   return { front_axle_lb: front_total, rear_axle_lb: rear_total, gross_lb: gross, flags };
 }

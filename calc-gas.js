@@ -349,7 +349,7 @@ export function computeGasPipePressureDrop({ flow_cfh = 0, id_in = 0, length_ft 
   return {
     drop_inwc: Number.isFinite(dH) ? dH : null,
     velocity_fpm: Number.isFinite(velocity) ? velocity : null,
-    exceeds_low_pressure: dH > LOW_PRESSURE_LIMIT_INWC,
+    exceeds_low_pressure: dH > LOW_PRESSURE_LIMIT_INWC + 1e-9 * Math.abs(LOW_PRESSURE_LIMIT_INWC),
     note: (dH > LOW_PRESSURE_LIMIT_INWC ? "Drop exceeds the ~1.5 psi low-pressure validity range - use the high-pressure compressible form. " : "")
       + "Inside diameter must be the actual bore, not nominal. Longhand alternative to the NFPA 54 / IFGC capacity tables; NFPA 54 governs the installation.",
   };
@@ -404,7 +404,7 @@ export function computeGasPipeMaxFlow({ drop_inwc = 0, id_in = 0, length_ft = 0,
   return {
     flow_cfh: Number.isFinite(flow_cfh) ? flow_cfh : null,
     velocity_fpm: Number.isFinite(velocity) ? velocity : null,
-    exceeds_low_pressure: dH > LOW_PRESSURE_LIMIT_INWC,
+    exceeds_low_pressure: dH > LOW_PRESSURE_LIMIT_INWC + 1e-9 * Math.abs(LOW_PRESSURE_LIMIT_INWC),
     note: (dH > LOW_PRESSURE_LIMIT_INWC ? "The allowable drop exceeds the ~1.5 psi low-pressure validity range - use the high-pressure compressible form. " : "")
       + "Inside diameter must be the actual bore, not nominal. Longhand Spitzglass alternative to the NFPA 54 / IFGC capacity tables, the inverse of the gas-pipe pressure-drop tile; NFPA 54 governs the installation.",
   };
