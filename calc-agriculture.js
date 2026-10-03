@@ -1158,7 +1158,7 @@ function renderStockingRate(inputRegion, outputRegion, citationEl) {
     });
     if (r.error) { oForage.textContent = r.error; oAum.textContent = "-"; oDays.textContent = "-"; oNote.textContent = ""; return; }
     oForage.textContent = fmt(r.available_forage_lb, 0) + " lb dry matter (" + r.utilization_pct + "% of " + fmt(r.forage_lb_per_acre * r.area_acres, 0) + " lb)";
-    oAum.textContent = fmt(r.aums_available, 1) + " AUMs; ~" + Math.floor(r.head_one_month) + " head of this class for 30 days";
+    oAum.textContent = fmt(r.aums_available, 1) + " AUMs; ~" + Math.floor(r.head_one_month) + " head of this class for one AUM (30.4 days)";
     oDays.textContent = r.grazing_days != null ? fmt(r.grazing_days, 0) + " days for " + r.herd_size + " head (" + fmt(r.acres_per_head, 1) + " acres/head)" : "enter a herd size";
     oNote.textContent = r.warnings.length ? r.warnings.join(" ") : "Carrying capacity from clip-and-weigh or the NRCS Ecological Site Description; adjust for drought.";
   }, DEBOUNCE_MS);
@@ -2509,7 +2509,7 @@ export function computeDripZoneFlow({ mode = "inline", tubing_ft = 0, spacing_in
   return {
     emitters, zone_gph, zone_gpm, utilization,
     over_limit: utilization > 100 + 1e-9 * Math.abs(100),
-    note: "Total emitter flow = emitters x rated gph; convert to gpm (/60) and check it against the valve's and lateral tubing's flow limit. Inline mode derives the emitter count from the dripline length and emitter spacing (emitters = floor(length x 12 / spacing)); point-source mode takes the count directly. Keep utilization under 100% - over the valve or lateral limit, the far emitters starve. The per-emitter flow is the manufacturer's rated gph at the design pressure, the valve and lateral limits come from the product's published maximum flow, and this is a flow-budget check, not a hydraulic pressure-loss model.",
+    note: "Total emitter flow = emitters x rated gph; convert to gpm (/60) and check it against the valve's and lateral tubing's flow limit. Inline mode derives the emitter count from the dripline length and emitter spacing (emitters = floor(length x 12 / spacing)); point-source mode takes the count directly. Keep utilization at or under 100% - over the valve or lateral limit, the far emitters starve. The per-emitter flow is the manufacturer's rated gph at the design pressure, the valve and lateral limits come from the product's published maximum flow, and this is a flow-budget check, not a hydraulic pressure-loss model.",
   };
 }
 export const dripZoneFlowExample = { inputs: { mode: "inline", tubing_ft: 300, spacing_in: 18, emitter_gph: 0.9, emitter_count: 0, valve_gpm: 12 } };

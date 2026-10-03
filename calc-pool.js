@@ -216,7 +216,7 @@ export function computePoolPumpSpeedSavings({
     ? "(no equipment minimum flow entered -- and heaters, chlorinators, cleaners and some filters have one)"
     : below_minimum
       ? "BUT " + fmt(speed_fraction * 100, 0) + "% SPEED IS BELOW THE " + fmt(minimum_flow_fraction * 100, 0) + "% MINIMUM FLOW the equipment needs. A heater will not fire, a salt cell will not generate, a suction cleaner will not drive, and a solar system will not lift. The usual answer is a schedule: a short high-speed period for the equipment that needs flow, and the rest of the turnover at low speed"
-      : fmt(speed_fraction * 100, 0) + "% speed is above the " + fmt(minimum_flow_fraction * 100, 0) + "% minimum the equipment needs, so a single low-speed schedule works here";
+      : fmt(speed_fraction * 100, 0) + "% speed is at or above the " + fmt(minimum_flow_fraction * 100, 0) + "% minimum the equipment needs, so a single low-speed schedule works here";
   const filtration_verdict = "AND FILTRATION IS BETTER AT LOW FLOW, NOT WORSE, which is the counterintuitive part. Slower water through a sand or cartridge bed gives finer particles time to be captured rather than driven through, so long slow filtration cleans better than short fast filtration as well as costing less. The instinct that a pump on low speed is 'not really doing anything' has it backwards";
   if (![full_kw, reduced_kw, reduced_hours, full_kwh_day, reduced_kwh_day, saving_kwh_day, annual_saving_cost, energy_fraction].every(Number.isFinite)) return { error: "Pool pump math is not a finite value." };
   return {

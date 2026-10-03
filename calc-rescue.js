@@ -308,7 +308,7 @@ export function computeSweatRateHydration({ pre_weight_lb = 0, post_weight_lb = 
   const rehydration_oz = 1.5 * Math.max(0, weight_change_oz);
   return {
     sweat_loss_oz, sweat_rate_oz_hr, pct_bw_loss, rehydration_oz,
-    over_2pct: pct_bw_loss >= 2,
+    over_2pct: pct_bw_loss >= 2 - 1e-9,
     note: "A stable body weight means intake matched sweat; a drop of even 2% of body weight measurably degrades performance and judgment. Rehydration targets about 1.25-1.5x the deficit because sweating continues and urine takes some. This is fluid volume, not electrolyte replacement. Individual and medical guidance governs.",
   };
 }

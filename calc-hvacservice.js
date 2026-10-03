@@ -110,7 +110,7 @@ HVACSERVICE_RENDERERS["condensate-drain"] = _simpleRenderer({
   example: condensateDrainExample.inputs,
   fields: [
     { key: "tons", label: "Cooling capacity (tons)", kind: "number" },
-    { key: "pints_per_ton_hr", label: "Condensate rate (pints/ton-hr)", kind: "number" },
+    { key: "pints_per_ton_hr", label: "Condensate rate (pints/ton-hr)", kind: "number", default: 3 },
     { key: "run_ft", label: "Horizontal run (ft)", kind: "number", default: 0 },
     { key: "slope_in_per_ft", label: "Slope (in/ft)", kind: "number", default: 0.125 },
   ],
@@ -152,7 +152,7 @@ HVACSERVICE_RENDERERS["recovery-cylinder"] = _simpleRenderer({
     { key: "water_capacity_lb", label: "Cylinder water capacity WC (lb)", kind: "number" },
     { key: "refrig_density_lb_gal", label: "Refrigerant liquid density (lb/gal)", kind: "number" },
     { key: "current_net_lb", label: "Refrigerant already in (net lb)", kind: "number", default: 0 },
-    { key: "fill_fraction", label: "Max fill fraction", kind: "number" },
+    { key: "fill_fraction", label: "Max fill fraction", kind: "number", default: 0.8 },
   ],
   outputs: [
     { key: "m", id: "rc-out-m", label: "Max net at fill limit", value: (r) => fmt(r.max_net_lb, 1) + " lb" },
@@ -406,7 +406,7 @@ HVACSERVICE_RENDERERS["gas-meter-clock"] = _simpleRenderer({
   fields: [
     { key: "sec_per_rev", label: "Seconds per revolution", kind: "number" },
     { key: "dial_size_cf", label: "Test-dial size (cf/rev)", kind: "number" },
-    { key: "heating_value_btu_cf", label: "Heating value (BTU/cf)", kind: "number" },
+    { key: "heating_value_btu_cf", label: "Heating value (BTU/cf)", kind: "number", default: 1030 },
     { key: "nameplate_input_btuh", label: "Nameplate input (BTU/hr, optional)", kind: "number", default: 0 },
   ],
   outputs: [

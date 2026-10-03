@@ -187,7 +187,8 @@ export const backcountryExample = { inputs: { body_weight_lb: 170, ambient_band:
 const WGS84 = { a: 6378137.0, f: 1 / 298.257223563 };
 
 function utmZone(lon_deg) {
-  return Math.floor((lon_deg + 180) / 6 + 1e-9) + 1;
+  // Longitude 180 is the east edge of zone 60, not a zone 61.
+  return Math.min(60, Math.floor((lon_deg + 180) / 6 + 1e-9) + 1);
 }
 
 // dims: in { lat_deg: dimensionless, lon_deg: dimensionless }

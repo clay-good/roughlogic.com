@@ -1091,8 +1091,10 @@ export function computeGreaseTrap({ peak_flow_gpm = 0, retention_minutes = 30, l
   const volume_gal = peak_flow_gpm * retention_minutes * loading_factor;
   // Typical commercial trap nominal sizes (gallons).
   const standardSizes = [20, 35, 50, 75, 100, 150, 200, 300, 500, 750, 1000, 1500, 2000, 3000];
-  const recommended = standardSizes.find((s) => s >= volume_gal) || standardSizes[standardSizes.length - 1];
-  return { volume_gal, recommended_nominal_gal: recommended };
+  const largest = standardSizes[standardSizes.length - 1];
+  const exceeds_standard = volume_gal > largest + 1e-9 * Math.abs(largest);
+  const recommended = standardSizes.find((s) => s >= volume_gal) || largest;
+  return { volume_gal, recommended_nominal_gal: recommended, exceeds_standard };
 }
 
 export const greaseTrapExample = {
@@ -1406,7 +1408,7 @@ export function renderGreaseTrap(inputRegion, outputRegion, citationEl) {
     const r = computeGreaseTrap({ peak_flow_gpm: Number(pf.input.value) || 0, retention_minutes: Number(rt.input.value) || 30, loading_factor: Number(lf.input.value) || 1.25 });
     if (r.error) { oV.textContent = r.error; oR.textContent = "-"; return; }
     oV.textContent = fmt(r.volume_gal, 0) + " gal";
-    oR.textContent = String(r.recommended_nominal_gal) + " gal";
+    oR.textContent = String(r.recommended_nominal_gal) + " gal" + (r.exceeds_standard ? " -- the required volume EXCEEDS the largest listed size; multiple or engineered interceptors required" : "");
   }, DEBOUNCE_MS);
   for (const el of [pf.input, rt.input, lf.input]) el.addEventListener("input", update);
 }
@@ -3080,7 +3082,7 @@ export function computeTrapSealLoss({ developed_distance_ft = 0, table_max_ft = 
 }
 export const trapSealLossExample = { inputs: { developed_distance_ft: 6, table_max_ft: 8, trap_seal_in: 2 } };
 const renderTrapSealLoss = _v23SimpleRenderer({
-  citation: "Citation: Per the adopted plumbing code's trap-seal-protection and trap-to-vent distance provisions (IPC §1002 / UPC §1002). The permitted maximum distance is user-supplied from the adopted table; no proprietary table is reproduced. S-traps are out of scope. The AHJ-adopted edition governs. Free read-only at codes.iccsafe.org.",
+  citation: "Citation: Per the adopted plumbing code's trap-seal-protection and trap-to-vent distance provisions (IPC §1002 (trap seals) and §906 / Table 906.1 (trap-to-vent distance); UPC §1002 / Table 1002.2). The permitted maximum distance is user-supplied from the adopted table; no proprietary table is reproduced. S-traps are out of scope. The AHJ-adopted edition governs. Free read-only at codes.iccsafe.org.",
   example: trapSealLossExample.inputs,
   fields: [
     { key: "developed_distance_ft", label: "Developed trap-to-vent distance (ft)", kind: "number" },
@@ -3745,12 +3747,12 @@ export function computeWaterHeaterStorageSizing({ tank_gal = 0, input_btuh = 0, 
 export const waterHeaterStorageSizingExample = { inputs: { tank_gal: 50, input_btuh: 40000, efficiency_pct: 80, rise_F: 90, usable_fraction: 0.70, peak_hour_gal: 80 } };
 
 function renderWaterHeaterStorageSizing(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: first-principles recovery Q = 8.33 x gph x delta-T with the DOE/AHRI first-hour-rating definition (usable storage plus one hour of recovery), by name, not reproduced. The 8.33 lb/gal water constant and the default 0.70 usable-storage fraction are editable. The manufacturer's rated FHR on the EnergyGuide label and the AHJ govern.";
+  citationEl.textContent = "Citation: first-principles recovery Q = 8.33 x gph x delta-T with the DOE/AHRI first-hour-rating definition (usable storage plus one hour of recovery), by name, not reproduced. The 0.70 usable-storage fraction is editable; the 8.33 lb/gal constant is fixed. The manufacturer's rated FHR on the EnergyGuide label and the AHJ govern.";
   const tank = makeNumber("Tank capacity (gal)", "whss-tank", { step: "any", min: "0" });
   const input = makeNumber("Input rate (BTU/hr)", "whss-in", { step: "any", min: "0" });
-  const eff = makeNumber("Recovery efficiency (%)", "whss-eff", { step: "any", min: "0" });
-  const rise = makeNumber("Temperature rise (°F)", "whss-rise", { step: "any", min: "0" });
-  const usable = makeNumber("Usable-storage fraction", "whss-usable", { step: "any", min: "0" });
+  const eff = makeNumber("Recovery efficiency (%)", "whss-eff", { step: "any", min: "0", value: "80" });
+  const rise = makeNumber("Temperature rise (°F)", "whss-rise", { step: "any", min: "0", value: "90" });
+  const usable = makeNumber("Usable-storage fraction", "whss-usable", { step: "any", min: "0", value: "0.70" });
   const peak = makeNumber("Peak-hour demand (gal)", "whss-peak", { step: "any", min: "0" });
   for (const f of [tank, input, eff, rise, usable, peak]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => {

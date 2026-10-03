@@ -116,7 +116,8 @@ test("chiller staging: each option's power is load x interpolated kW/ton plus th
 test("variable primary: the bypass makes up the chillers' minimum, and Cv is flow over root dP", () => {
   const r = computeVariablePrimaryBypass({ machine_design_gpm: 1000, minimum_flow_fraction: 0.45, machines_running: 2, system_flow_gpm: 600, bypass_differential_psi: 24, design_differential_psi: 12 });
   close(r.bypass_gpm, 900 - 600, "bypass");
-  close(r.required_cv, 300 / Math.sqrt(24), "Cv");
+  close(r.required_cv, 450 / Math.sqrt(24), "Cv sized on one machine's minimum");
+  close(r.current_flow_cv, 300 / Math.sqrt(24), "this condition's bypass Cv");
   close(r.oversize_ratio, Math.SQRT2, "sized at half the differential");
 });
 

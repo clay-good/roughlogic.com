@@ -2761,10 +2761,12 @@ ELECTRICAL_RENDERERS["panel-rebalance"] = _v8e_renderPanelRebalance;
 // PPE category bands cited by name only (NFPA 70E Table 130.7(C)(15)(c)
 // is not reproduced):
 //   < 1.2  cal/cm^2 : no PPE required (still hazard band)
-//   1.2-4  cal/cm^2 : CAT 1 (4 cal/cm^2 minimum arc-rated)
-//   4-8    cal/cm^2 : CAT 2 (8 cal/cm^2 minimum)
-//   8-25   cal/cm^2 : CAT 3 (25 cal/cm^2 minimum)
-//   25-40  cal/cm^2 : CAT 4 (40 cal/cm^2 minimum)
+//   1.2 to 4 cal/cm^2 : CAT 1 (4 cal/cm^2 minimum arc-rated)
+//   over 4 to 8  : CAT 2 (8 cal/cm^2 minimum)
+//   over 8 to 25 : CAT 3 (25 cal/cm^2 minimum)
+//   over 25 to 40: CAT 4 (40 cal/cm^2 minimum)
+// A garment rated N cal/cm^2 covers an incident energy of exactly N, so each
+// band is inclusive at its top.
 //   > 40   cal/cm^2 : no PPE rated; remote operation required.
 
 const _LEE_THRESHOLD_CAL_CM2 = 1.2;
@@ -2805,7 +2807,11 @@ export function computeArcFlashScreen({
   // PPE band lookup.
   let ppe_band = _PPE_BANDS[_PPE_BANDS.length - 1].label;
   for (const b of _PPE_BANDS) {
-    if (incident_energy_cal_cm2 >= b.min && incident_energy_cal_cm2 < b.max) {
+    const E = incident_energy_cal_cm2;
+    const inBand = b.max === _LEE_THRESHOLD_CAL_CM2
+      ? E < b.max
+      : (b.min === _LEE_THRESHOLD_CAL_CM2 ? E >= b.min : E > b.min) && E <= b.max;
+    if (inBand) {
       ppe_band = b.label;
       break;
     }
@@ -2852,7 +2858,7 @@ export function renderArcFlashScreen(inputRegion, outputRegion, citationEl) {
   d.input.value = "18";
   const cfg = makeSelect("Equipment configuration", "af-cfg", [
     { value: "open_air", label: "Open air", selected: true },
-    { value: "box", label: "Box / enclosed (Lee is conservative for box; IEEE 1584 needed)" },
+    { value: "box", label: "Box / enclosed (Lee open-air may be non-conservative for box; IEEE 1584 needed)" },
   ]);
   for (const f of [v, ibf, t, d, cfg]) inputRegion.appendChild(f.wrap);
 

@@ -53,7 +53,7 @@ export const SECTION_179_LIMITS = {
   2024: { cap: 1220000, phaseout_start: 3050000, bonus_pct: 60, verified_on: "2024-02-01" },
   2025: {
     cap: 2500000, phaseout_start: 4000000, bonus_pct: 100, verified_on: "2026-09-02",
-    bonus_note: "100% applies to qualified property acquired after 2025-01-19. Property placed in service after 2024-12-31 but before 2025-01-20 takes 40% (60% for long-production-period property and certain aircraft); enter that rate over the default.",
+    bonus_note: "100% applies to qualified property acquired after 2025-01-19. Property placed in service after 2024-12-31 but before 2025-01-20 takes 40% (60% for long-production-period property and certain aircraft); the page applies the default; pass bonus_pct to override.",
   },
   2026: { cap: 2560000, phaseout_start: 4090000, bonus_pct: 100, verified_on: "2026-09-02" },
 };
@@ -968,7 +968,7 @@ function renderPayroll(inputRegion, outputRegion, citationEl) {
   const yr = makeSelect("Tax year", "pw-yr", [
     { value: "2026", label: "2026", selected: true }, { value: "2025", label: "2025" }, { value: "2024", label: "2024" },
   ]);
-  const ytdSs = makeNumber("YTD wages subject to SS (USD)", "pw-ytd", { step: "any", min: "0" });
+  const ytdSs = makeNumber("YTD wages before this period (USD)", "pw-ytd", { step: "any", min: "0" });
   for (const f of [gross, freq, fs, yr, ytdSs]) inputRegion.appendChild(f.wrap);
   const fedOut = makeOutputLine(outputRegion, "Federal income tax this period", "pw-out-f");
   const ssOut = makeOutputLine(outputRegion, "Social Security this period", "pw-out-ss");

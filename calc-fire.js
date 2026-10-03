@@ -549,7 +549,7 @@ export function computeReverseLayFriction({ hose_diameter, gpm, length_ft, n_pum
 export const reverseLayExample = {
   inputs: { hose_diameter: "5_in", gpm: 1000, length_ft: 1000, n_pumps: 2 },
   // Single-pump 5" at 1000 GPM, 1000 ft: FL = 0.08 * (10)^2 * (10) = 80 psi.
-  // Two-pump: 80 * (1/2)^2 = 20 psi per pump.
+  // Two parallel lines: 80 x (1/2)^2 = 20 psi per line.
   expected: { single_pump_psi: 80, per_pump_psi: 20 },
 };
 
@@ -1493,8 +1493,7 @@ function _v15f_renderStandpipePDP(inputRegion, outputRegion, citationEl) {
     { value: "III", label: "Class III (both)" },
   ]);
   const elev = _v15f_makeNumber("Highest outlet above pumper (ft)", "spp-elev", { step: "any"});
-  const np = _v15f_makeNumber("Required nozzle pressure (psi)", "spp-np", { step: "any", min: "0", value: "100" });
-  np.input.value = "100";
+  const np = _v15f_makeNumber("Required nozzle pressure (psi; blank = 100 Class I/III, 65 Class II)", "spp-np", { step: "any", min: "0"});
   const gpm = _v15f_makeNumber("Design flow (GPM)", "spp-gpm", { step: "any", min: "0"});
   const appl = _v15f_makeNumber("Appliance loss (psi)", "spp-appl", { step: "any", min: "0", value: "25" });
   appl.input.value = "25";

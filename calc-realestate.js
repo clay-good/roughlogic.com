@@ -2467,6 +2467,7 @@ export function computePmiCancellationDate({ value = 0, loan = 0, rate_pct = 0, 
     balance_80: month80 != null ? balance(month80) : null,
     balance_78: month78 != null ? balance(month78) : null,
     midpoint_month: midpoint,
+    backstop_month: midpoint + 1,
     months_pmi_saved: month78 != null ? midpoint - month78 : null,
     note: "The HPA uses original value and scheduled amortization (not market value or extra payments). Automatic termination at 78%, borrower-requested cancellation at 80%, with the amortization-midpoint backstop. Does not apply to FHA MIP; the borrower must be current.",
   };
@@ -2489,7 +2490,7 @@ function renderPmiCancellationDate(inputRegion, outputRegion, citationEl) {
     const r = computePmiCancellationDate({ value: readNum(value.input), loan: readNum(loan.input), rate_pct: readNum(rate.input), term_months: readNum(term.input) });
     if (r.error) { o80.textContent = r.error; o78.textContent = ""; oNote.textContent = ""; return; }
     o80.textContent = r.month_80 != null ? "Month " + r.month_80 + " (balance $" + fmt(r.balance_80, 0) + ")" : "Not reached in term";
-    o78.textContent = r.month_78 != null ? "Month " + r.month_78 + " (balance $" + fmt(r.balance_78, 0) + "); midpoint backstop month " + r.midpoint_month : "Not reached in term";
+    o78.textContent = r.month_78 != null ? "Month " + r.month_78 + " (balance $" + fmt(r.balance_78, 0) + "); midpoint backstop month " + r.backstop_month + (r.month_78 > r.backstop_month ? " (the midpoint backstop ends PMI first)" : "") : "Not reached in term";
     oNote.textContent = r.note;
   }, DEBOUNCE_MS);
   for (const f of [value.input, loan.input, rate.input, term.input]) f.addEventListener("input", update);

@@ -60,7 +60,7 @@ test("Wind chill: T > 50 errors", () => { const r = computeWindChill({ T_F: 60, 
 test("Wind chill: wind < 3 mph returns ambient", () => { const r = computeWindChill({ T_F: 5, wind_mph: 1 }); assert.equal(r.wind_chill_F, 5); });
 test("Wind chill: stronger wind colder WC", () => { const a = computeWindChill({ T_F: 5, wind_mph: 10 }); const b = computeWindChill({ T_F: 5, wind_mph: 30 }); assert.ok(b.wind_chill_F < a.wind_chill_F); });
 test("Wind chill: very cold yields short frostbite time", () => { const r = computeWindChill({ T_F: -30, wind_mph: 30 }); assert.ok(r.frostbite_minutes <= 10); });
-test("Wind chill: mild yields 30 min", () => { const r = computeWindChill({ T_F: 30, wind_mph: 10 }); assert.equal(r.frostbite_minutes, 30); });
+test("Wind chill: mild yields no frostbite time (not expected above -18 F wind chill)", () => { const r = computeWindChill({ T_F: 30, wind_mph: 10 }); assert.equal(r.frostbite_minutes, null); });
 test("Wind chill: 0 mph wind below 3 returns ambient with no frostbite", () => { const r = computeWindChill({ T_F: 30, wind_mph: 0 }); assert.equal(r.wind_chill_F, 30); });
 test("Wind chill: WC < T when valid", () => { const r = computeWindChill({ T_F: 0, wind_mph: 20 }); assert.ok(r.wind_chill_F < 0); });
 test("Wind chill: -45 to -55 ~ 5 min frostbite", () => { const r = computeWindChill({ T_F: -50, wind_mph: 30 }); assert.ok(r.frostbite_minutes >= 2 && r.frostbite_minutes <= 10); });

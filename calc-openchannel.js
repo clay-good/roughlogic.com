@@ -48,7 +48,10 @@ export function computeWeirFlow({ weir_type = "vnotch90", head_ft = 0, crest_len
     flow_mgd: Number.isFinite(mgd) ? mgd : null,
     low_accuracy: H < 0.2,
     note: (H < 0.2 ? "Head below ~0.2 ft - low-accuracy reading, flagged. " : "")
-      + "Requires a fully-contracted, ventilated, sharp-crested weir with free flow; a submerged/drowned condition is invalid. Approach-velocity correction ignored.",
+      + (weir_type === "rect_suppressed"
+        ? "Requires a ventilated, sharp-crested weir with end contractions suppressed (crest spanning the channel) and free flow; "
+        : "Requires a fully-contracted, ventilated, sharp-crested weir with free flow; ")
+      + "a submerged/drowned condition is invalid. Approach-velocity correction ignored.",
   };
 }
 export const weirFlowExample = { inputs: { weir_type: "vnotch90", head_ft: 0.5, crest_length_ft: 0, coeff: 0 } };

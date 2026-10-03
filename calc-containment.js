@@ -489,6 +489,8 @@ export function computeLabContainmentPressure({
   const negative = has_supply && offset_cfm > 1e-9;
   const offset_verdict = !has_supply
     ? "(no supply airflow entered -- and the OFFSET is what holds the pressure relationship)"
+    : Math.abs(offset_cfm) <= 1e-9
+      ? "supply at " + fmt(supply_cfm, 0) + " cfm equals the " + fmt(total_exhaust_cfm, 0) + " of exhaust -- the room is NEUTRAL, with no pressure relationship to hold, which is not containment for a chemical laboratory"
     : negative
       ? "supply at " + fmt(supply_cfm, 0) + " cfm against " + fmt(total_exhaust_cfm, 0) + " of exhaust is an offset of " + fmt(offset_cfm, 0) + " cfm, about " + fmt(offset_pct, 1) + "% -- the room runs NEGATIVE to the corridor, which is the intended direction for a chemical laboratory"
       : "supply at " + fmt(supply_cfm, 0) + " cfm EXCEEDS the " + fmt(total_exhaust_cfm, 0) + " of exhaust by " + fmt(-offset_cfm, 0) + " cfm -- the room runs POSITIVE, which pushes laboratory air into the corridor. That is the intended direction for a cleanroom or some pharmacy areas and the wrong one for a chemical laboratory, and getting it backwards is not an error of degree";

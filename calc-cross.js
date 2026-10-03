@@ -953,7 +953,7 @@ export function renderUpgradeROI(inputRegion, outputRegion, citationEl) {
   for (const f of [c, s, d, y]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { c.input.value = "5000"; s.input.value = "800"; d.input.value = "4"; y.input.value = "10"; update(); });
   const oP = makeOutputLine(outputRegion, "Simple payback", "ur-out-p");
-  const oN = makeOutputLine(outputRegion, "10-year NPV", "ur-out-n");
+  const oN = makeOutputLine(outputRegion, "NPV over the entered years", "ur-out-n");
   const update = debounce(() => {
     const r = computeUpgradeROI({
       incremental_cost: Number(c.input.value) || 0,
@@ -963,7 +963,7 @@ export function renderUpgradeROI(inputRegion, outputRegion, citationEl) {
     });
     if (r.error) { oP.textContent = r.error; oN.textContent = "-"; return; }
     oP.textContent = fmt(r.simple_payback_yr, 2) + " yr";
-    oN.textContent = "$" + fmt(r.npv_dollars, 2);
+    oN.textContent = "$" + fmt(r.npv_dollars, 2) + " over " + Math.floor(Number(y.input.value) || 0) + " years";
   }, DEBOUNCE_MS);
   for (const el of [c.input, s.input, d.input, y.input]) el.addEventListener("input", update);
 }
@@ -1304,8 +1304,10 @@ export function computeWindChill({ T_F = 0, wind_mph = 0 }) {
   // NWS 2001 formula:
   const WC = 35.74 + 0.6215 * T_F - 35.75 * Math.pow(wind_mph, 0.16) + 0.4275 * T_F * Math.pow(wind_mph, 0.16);
   // Frostbite times (NWS published curves, rough piecewise):
+  // Above about -18 F wind chill the NWS chart shows no frostbite band.
   let frostbite_minutes;
-  if (WC > -20) frostbite_minutes = 30;
+  if (WC > -18) frostbite_minutes = null;
+  else if (WC > -20) frostbite_minutes = 30;
   else if (WC > -45) frostbite_minutes = 10;
   else if (WC > -55) frostbite_minutes = 5;
   else frostbite_minutes = 2;
@@ -1656,7 +1658,7 @@ const renderWindChill = _simpleRendererG({
   ],
   outputs: [
     { key: "wc", id: "wc-out-wc", label: "Wind chill", value: (r) => _fmtG(r.wind_chill_F, 1) + " F" },
-    { key: "fb", id: "wc-out-fb", label: "Time to frostbite", value: (r) => r.frostbite_minutes === null ? "n/a" : r.frostbite_minutes + " min" },
+    { key: "fb", id: "wc-out-fb", label: "Time to frostbite", value: (r) => r.frostbite_minutes === null ? (r.wind_chill_F > -18 ? "not expected" : "n/a") : r.frostbite_minutes + " min" },
   ],
   compute: computeWindChill,
 });
@@ -2357,7 +2359,7 @@ function renderHydraulicCylinder(inputRegion, outputRegion, citationEl) {
   const oArea = makeOutputLine(outputRegion, "Effective area (in²)", "hc-out-a");
   const oSpeed = makeOutputLine(outputRegion, "Speed (in/s)", "hc-out-v");
   const oOil = makeOutputLine(outputRegion, "Oil per stroke (gal)", "hc-out-o");
-  const oCycle = makeOutputLine(outputRegion, "Cycle time (s)", "hc-out-t");
+  const oCycle = makeOutputLine(outputRegion, "Stroke time, this direction (s)", "hc-out-t");
   const oW = makeOutputLine(outputRegion, "Notes", "hc-out-w");
 
   function readNum(input) {

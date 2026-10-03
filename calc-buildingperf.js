@@ -235,11 +235,13 @@ export function computeBuildingTightnessLimit({
   const has_plan = planned_cfm50_reduction > 0;
   const after_cfm50 = cfm50 - planned_cfm50_reduction;
   const after_above = has_plan && after_cfm50 > tightness_limit_cfm50;
-  const crosses_limit = has_plan && above_limit && !after_above;
+  const crosses_limit = has_plan && (above_limit || at_limit) && !after_above;
   const plan_verdict = !has_plan
     ? (above_limit
       ? "a sealing job of " + fmt(margin_cfm50, 0) + " CFM50 would take this house to the limit -- worth knowing before the scope is written rather than after"
-      : "(no planned reduction entered; the house is already below the limit)")
+      : at_limit
+        ? "(no planned reduction entered) the house is AT the limit; any further sealing takes it below and needs a ventilation fan"
+        : "(no planned reduction entered; the house is already below the limit)")
     : crosses_limit
       ? "the planned " + fmt(planned_cfm50_reduction, 0) + " CFM50 of sealing takes the house to " + fmt(after_cfm50, 0) + ", BELOW the limit -- so the scope of work should include the ventilation fan rather than discovering the need afterward"
       : after_above

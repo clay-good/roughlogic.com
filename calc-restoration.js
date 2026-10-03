@@ -2317,13 +2317,13 @@ export function computeCategoryDeterioration({ origin_category = "cat1", elapsed
     origin_category: origin,
     likely_category: WATER_CATEGORY_LABELS[likely],
     rationale,
-    note: "Category is a professional determination made at the time of restoration, not by the source alone. The amplification window commonly cited is on the order of 48-72 hours under favorable conditions. When in doubt, the higher category is assumed. IICRC S500 governs.",
+    note: "Category is a professional determination made at the time of restoration, not by the source alone. The amplification window commonly cited is on the order of 48-72 hours under favorable conditions; the screen here reclassifies at 48 h, or 24 h when warm. When in doubt, the higher category is assumed. IICRC S500 governs.",
   };
 }
 export const categoryDeteriorationExample = { inputs: { origin_category: "cat1", elapsed_hours: 72, warm_environment: 1, contacted_contaminant: 0 } };
 
 function renderCategoryDeterioration(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: Category-at-time-of-remediation principle (ANSI/IICRC S500), by name. Category is a professional determination made at the time of restoration, not by the source alone; elevated temperature and contact with contaminated materials accelerate the shift. The amplification window commonly cited is 48-72 hours under favorable conditions. When in doubt, the higher category is assumed.";
+  citationEl.textContent = "Citation: Category-at-time-of-remediation principle (ANSI/IICRC S500), by name. Category is a professional determination made at the time of restoration, not by the source alone; elevated temperature and contact with contaminated materials accelerate the shift. The amplification window commonly cited is 48-72 hours under favorable conditions; the screen here reclassifies at 48 h, or 24 h when warm. When in doubt, the higher category is assumed.";
   const cat = makeSelect("Origin category", "cd-cat", [
     { value: "cat1", label: "Category 1 (clean)", selected: true },
     { value: "cat2", label: "Category 2 (gray)" },

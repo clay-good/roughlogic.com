@@ -2073,7 +2073,7 @@ const renderAsphaltTonnage = _simpleRenderer({
   fields: [
     { key: "area_ft2", label: "Paved area (ft²)", kind: "number" },
     { key: "depth_in", label: "Compacted depth (in)", kind: "number" },
-    { key: "density_pcf", label: "Mix density (pcf)", kind: "number" },
+    { key: "density_pcf", label: "Mix density (pcf)", kind: "number", default: 145 },
     // v8 §C.4: optional paving width activates paving-distance + per-truck length.
     { key: "paving_width_ft", label: "Paving width (ft, optional)", kind: "number", attrs: { step: "any", min: "0" } },
   ],
@@ -4407,7 +4407,7 @@ CONSTRUCTION_RENDERERS["fillet-weld-strength"] = _v27renderFilletWeldStrength;
 //
 // theoretical = 1604 x (vol_solids/100) / dft; practical = theoretical x
 // (1 - loss/100); gallons = area / practical; wft = dft / (vol_solids/100).
-// 1604 ft^2-mil per gallon at 100% solids is the exact conversion.
+// 1604 ft^2-mil per gallon at 100% solids (231 / 0.144 = 1604.2, rounded).
 // dims: in { vol_solids_pct: dimensionless, dft_mils: L, area_ft2: L^2, loss_pct: dimensionless, reduction_pct: dimensionless, wet_reading_mils: L } out: { theoretical_cov_ft2_gal: L^-1, practical_cov_ft2_gal: L^-1, gallons: L^3, wft_mils: L, reduced_solids_pct: dimensionless, reduced_wft_mils: L, reduced_theoretical_cov_ft2_gal: L^-1, wet_reading_dft_mils: L, wet_reading_shortfall_pct: dimensionless }
 // (Volume-solids and loss are dimensionless percents; the DFT and WFT are
 //  lengths L (mils); the coverage is area-per-volume L^-1 and the gallons L^3.)
@@ -4469,7 +4469,7 @@ export function computeCoatingCoverageDft({ vol_solids_pct, dft_mils, area_ft2, 
     wet_reading_dft_mils: wetReadingDft,
     wet_reading_shortfall_pct: wetReadingShortfallPct,
     wet_reading_verdict: wetReadingVerdict,
-    note: "1604 is the exact conversion (a gallon spread one mil thick covers 1604 ft^2 at 100% solids). The product data sheet's volume-solids is the governing number and thinning lowers it -- REDUCTION is the term that is easiest to lose track of, because it moves the wet-film target without moving the specification. Thinning 25% takes 45% solids to 36%, and the wet film for a 2.0 mil dry build rises from 4.44 to 5.56 mils; a shop that adds reducer for a hot day and keeps spraying to the old gauge reading is 20% under build, which on a clearcoat is UV protection the customer paid for and is not getting. The reverse is reported too: a wet reading times the reduced solids is the dry build it will leave. Under-build gives poor hiding, reduced durability, and insufficient UV protection; over-build gives solvent entrapment, sags, extended cure, and on some coatings cracking -- which is why manufacturers specify a range rather than a number, and why the wet gauge is used while the coating is still wet enough to fix. The loss factor is the honest difference between theory and the job; 35% spray loss is a default, not a promise. DFT is verified with a gauge per SSPC / AMPP PA 2, not assumed from the WFT. Multiple coats and touch-up are not in this single-coat number.",
+    note: "1604 is the rounded conversion (231 in^3 per gallon / 0.144 in^3 per ft^2-mil = 1604.2; a gallon spread one mil thick covers about 1604 ft^2 at 100% solids). The product data sheet's volume-solids is the governing number and thinning lowers it -- REDUCTION is the term that is easiest to lose track of, because it moves the wet-film target without moving the specification. Thinning 25% takes 45% solids to 36%, and the wet film for a 2.0 mil dry build rises from 4.44 to 5.56 mils; a shop that adds reducer for a hot day and keeps spraying to the old gauge reading is 20% under build, which on a clearcoat is UV protection the customer paid for and is not getting. The reverse is reported too: a wet reading times the reduced solids is the dry build it will leave. Under-build gives poor hiding, reduced durability, and insufficient UV protection; over-build gives solvent entrapment, sags, extended cure, and on some coatings cracking -- which is why manufacturers specify a range rather than a number, and why the wet gauge is used while the coating is still wet enough to fix. The loss factor is the honest difference between theory and the job; 35% spray loss is a default, not a promise. DFT is verified with a gauge per SSPC / AMPP PA 2, not assumed from the WFT. Multiple coats and touch-up are not in this single-coat number.",
   };
 }
 
@@ -6763,9 +6763,9 @@ const _renderWoodBoltConnection = _simpleRenderer({
     { key: "d_in", label: "Bolt diameter D (1/4 to 1 in) (in)", kind: "number" },
     { key: "lm_in", label: "Main-member bearing length lm (in)", kind: "number" },
     { key: "ls_in", label: "Side-member bearing length ls (in)", kind: "number" },
-    { key: "gm", label: "Main-member specific gravity Gm", kind: "number" },
-    { key: "gs", label: "Side-member specific gravity Gs", kind: "number" },
-    { key: "fyb_psi", label: "Bolt bending yield Fyb (psi)", kind: "number" },
+    { key: "gm", label: "Main-member specific gravity Gm", kind: "number", default: 0.50 },
+    { key: "gs", label: "Side-member specific gravity Gs", kind: "number", default: 0.50 },
+    { key: "fyb_psi", label: "Bolt bending yield Fyb (psi)", kind: "number", default: 45000 },
     { key: "theta_deg", label: "Angle of load to grain theta (0 to 90 deg)", kind: "number" },
   ],
   outputs: [
@@ -7363,9 +7363,12 @@ export function computeSectionProperties({ shape = "rectangle", b_in = 0, h_in =
   if (!(A > 0) || !(I > 0)) return { error: "Section properties are not valid for these dimensions." };
   const S = I / c;
   const r = Math.sqrt(I / A);
+  const axis_text = shape === "rectangle" || shape === "tube"
+    ? (h_in >= b_in ? "the bending (strong) axis" : "the bending (weak) axis, since h is the smaller dimension")
+    : "the bending axis";
   return {
     A_in2: A, I_in4: I, S_in3: S, c_in: c, r_in: r,
-    note: "Cross-section properties about the bending (strong) axis: area A, moment of inertia I, section modulus S = I/c, extreme-fiber distance c, and radius of gyration r = sqrt(I/A). I scales with the cube of the depth in the bending direction, so orientation dominates - turning a board flatwise can cost an order of magnitude in stiffness. Tube uses the entered wall thickness. A design aid, not a substitute for the engineer of record.",
+    note: "Cross-section properties about " + axis_text + ": area A, moment of inertia I, section modulus S = I/c, extreme-fiber distance c, and radius of gyration r = sqrt(I/A). I scales with the cube of the depth in the bending direction, so orientation dominates - turning a board flatwise can cost an order of magnitude in stiffness. Tube uses the entered wall thickness. A design aid, not a substitute for the engineer of record.",
   };
 }
 export const sectionPropertiesExample = { inputs: { shape: "rectangle", b_in: 1.5, h_in: 7.25, d_in: 0, di_in: 0 } };
@@ -7543,12 +7546,11 @@ export function computeThermalStressRestrained({ E_psi = 0, alpha = 0, dT_F = 0,
   const dT = Number(dT_F) || 0;
   const A = Number(A_in2) || 0;
   const L = Number(L_in) || 0;
-  let r = Number(restraint);
-  if (!Number.isFinite(r) || r === 0) r = 1;
+  const r = restraint === undefined || restraint === null || restraint === "" ? 1 : Number(restraint);
   if (!(E > 0)) return { error: "Modulus of elasticity must be positive (psi)." };
   if (!(a > 0)) return { error: "Thermal expansion coefficient must be positive (/F)." };
   if (dT === 0) return { error: "Temperature change must be non-zero (F)." };
-  if (!(r > 0 && r <= 1)) return { error: "Restraint factor must be over 0 and up to 1." };
+  if (!(r >= 0 && r <= 1)) return { error: "Restraint factor must be from 0 (unrestrained) to 1 (fully restrained)." };
   const sigma_psi = E * a * dT * r;
   const F_lb = A > 0 ? sigma_psi * A : null;
   const free_delta_in = L > 0 ? a * L * dT : null;
@@ -7587,12 +7589,12 @@ export function computeThermalStressMaxDeltaT({ allowable_stress_psi = 0, E_psi 
   const S = Number(allowable_stress_psi) || 0;
   const E = Number(E_psi) || 0;
   const a = Number(alpha) || 0;
-  let r = Number(restraint);
-  if (!Number.isFinite(r) || r === 0) r = 1;
+  const r = restraint === undefined || restraint === null || restraint === "" ? 1 : Number(restraint);
   if (!(S > 0)) return { error: "Allowable stress must be positive (psi)." };
   if (!(E > 0)) return { error: "Modulus of elasticity must be positive (psi)." };
   if (!(a > 0)) return { error: "Thermal expansion coefficient must be positive (/F)." };
-  if (!(r > 0 && r <= 1)) return { error: "Restraint factor must be over 0 and up to 1." };
+  if (!(r >= 0 && r <= 1)) return { error: "Restraint factor must be from 0 (unrestrained) to 1 (fully restrained)." };
+  if (r === 0) return { error: "An unrestrained member (restraint 0) develops no thermal stress, so there is no temperature-change limit." };
   // Inverse of sigma = E x alpha x dT x restraint: dT_max = sigma_allow / (E x alpha x restraint).
   const max_dT_F = S / (E * a * r);
   if (!Number.isFinite(max_dT_F) || !(max_dT_F > 0)) return { error: "Temperature-change math is not a finite positive value." };

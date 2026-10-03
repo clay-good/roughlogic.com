@@ -442,17 +442,20 @@ export function computeRetrievalWinchForce({
     ? "(no entanglement factor entered -- and an entangled or wedged entrant is a DIFFERENT NUMBER ENTIRELY, several times body weight, at which a system rated for the free-hanging case stalls)"
     : "an entangled or wedged entrant at " + fmt(entanglement_factor, 1) + " times that is " + fmt(entangled_lb, 0) + " lb. A system rated for the free-hanging " + fmt(retrieval_lb, 0) + " lb stalls there";
   const has_system = system_rating_lb > 0;
-  const system_margin_lb = has_system ? system_rating_lb - retrieval_lb : 0;
-  const system_ok = has_system && system_margin_lb >= 0 - 1e-9 * Math.abs(0);
-  const system_verdict = !has_system
-    ? "(no system rating entered)"
-    : system_ok
-      ? "the " + fmt(system_rating_lb, 0) + " lb system rating covers the free-hanging force with " + fmt(system_margin_lb, 0) + " lb of margin"
-        + (has_entanglement ? ", and " + (system_rating_lb >= entangled_lb ? "also covers the entangled case" : "does NOT cover the " + fmt(entangled_lb, 0) + " lb entangled case") : "")
-      : "the " + fmt(system_rating_lb, 0) + " lb system rating is " + fmt(-system_margin_lb, 0) + " lb SHORT of the free-hanging retrieval force";
   const has_anchorage = anchorage_rating_lb > 0;
   const anchorage_margin_lb = has_anchorage ? anchorage_rating_lb - retrieval_lb : 0;
   const weakest_rating_lb = has_system && has_anchorage ? Math.min(system_rating_lb, anchorage_rating_lb) : (has_system ? system_rating_lb : anchorage_rating_lb);
+  const anchorage_governs = has_anchorage && (!has_system || anchorage_rating_lb < system_rating_lb);
+  const governs_text = " (set by the " + (anchorage_governs ? "anchorage" : "winch") + ")";
+  const has_rating = has_system || has_anchorage;
+  const system_margin_lb = has_rating ? weakest_rating_lb - retrieval_lb : 0;
+  const system_ok = has_rating && system_margin_lb >= 0 - 1e-9 * Math.abs(0);
+  const system_verdict = !has_rating
+    ? "(no system rating entered)"
+    : system_ok
+      ? "the " + fmt(weakest_rating_lb, 0) + " lb system rating" + governs_text + " covers the free-hanging force with " + fmt(system_margin_lb, 0) + " lb of margin"
+        + (has_entanglement ? ", and " + (weakest_rating_lb >= entangled_lb ? "also covers the entangled case" : "does NOT cover the " + fmt(entangled_lb, 0) + " lb entangled case") : "")
+      : "the " + fmt(weakest_rating_lb, 0) + " lb system rating" + governs_text + " is " + fmt(-system_margin_lb, 0) + " lb SHORT of the free-hanging retrieval force";
   const anchorage_verdict = !has_anchorage
     ? "(no anchorage rating entered -- and THE SYSTEM IS RATED BY ITS WEAKEST ELEMENT)"
     : "THE SYSTEM IS RATED AS A SYSTEM -- winch, line, davit or tripod, and the anchorage -- and the rating is the WEAKEST element. The anchorage at " + fmt(anchorage_rating_lb, 0) + " lb"

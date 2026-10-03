@@ -855,7 +855,7 @@ export function computeChainLeverHoist({ load_lb, rated_wll_lb, mech_adv, effici
     hand_pull_lb: handPull,
     hand_chain_travel_ft: handChainTravel,
     pass: load <= rated + 1e-9 * Math.abs(rated),
-    verdict: load <= rated ? "pass" : "fail - over the rated WLL",
+    verdict: load <= rated + 1e-9 * Math.abs(rated) ? "pass" : "fail - over the rated WLL",
     note: "ASME B30.16 / B30.21 limit the effort one person may apply - a load that needs a cheater bar or a second person on the lever is overloaded, stop. The hoist's rated WLL is the ceiling regardless of the leverage available. The hand chain is long because the advantage is high, and the load drops fast if the brake is defeated. Inspect the hoist, hooks, and chain before the lift.",
   };
 }

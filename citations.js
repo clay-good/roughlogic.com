@@ -359,7 +359,7 @@ export const CITATIONS = {
     edition: "Standard reagent preparation - stock molarity from assay and density, by name.",
     freeAccess: "Standard analytical-chemistry reagent-preparation relation; the reagent lot certificate of analysis governs.",
     governance: GOVERNANCE.general,
-    editionNote: "A concentrated liquid reagent is labeled by weight percent and density, not molarity, so both must be combined with the molecular weight (ignoring either is a 20-40% error); the 10 factor converts g per 100 mL to per liter. Always add concentrated acid to water, never the reverse. A prep aid, not a substitute for the certificate of analysis.",
+    editionNote: "A concentrated liquid reagent is labeled by weight percent and density, not molarity, so both must be combined with the molecular weight (ignoring the density is a 15-45% error on common acids; ignoring the assay percent is far larger); the 10 factor converts g per 100 mL to per liter. Always add concentrated acid to water, never the reverse. A prep aid, not a substitute for the certificate of analysis.",
     assumptions: [
       { name: "Assay and density", value: "the label weight percent and density are for the specific lot; verify against the certificate of analysis", source: "reagent lot COA" },
     ],
@@ -438,7 +438,7 @@ export const CITATIONS = {
     governance: GOVERNANCE.general,
     editionNote: "Salvage is NOT subtracted before applying the DB rate (unlike straight-line). Pure DDB never reaches salvage without the SL switch.",
     assumptions: [
-      { name: "Salvage floor", value: "book value is floored at salvage; depreciation in the final year is plugged to reach salvage", source: "ASC 360" },
+      { name: "Salvage floor", value: "book value is floored at salvage; with the straight-line switch on, the final year reaches salvage; pure DDB (switch off) ends above salvage", source: "ASC 360" },
     ],
   },
 
@@ -707,7 +707,7 @@ export const CITATIONS = {
     governance: GOVERNANCE.general,
     editionNote: "Requires a sharp-crested, ventilated, free-flow weir; a submerged/drowned condition is invalid. Head below ~0.2 ft is low-accuracy.",
     assumptions: [
-      { name: "Weir condition", value: "fully-contracted, ventilated, sharp-crested, free-flow", source: "USBR Water Measurement Manual" },
+      { name: "Weir condition", value: "ventilated, sharp-crested, free-flow (fully contracted for the V-notch and contracted rectangular; end contractions suppressed for the suppressed rectangular)", source: "USBR Water Measurement Manual" },
     ],
   },
   "cipolletti-weir": {
@@ -2583,7 +2583,7 @@ export const CITATIONS = {
     ],
   },
   "cattle-stocking-rate": {
-    formula: "Available forage = production (lb/acre) x area (acres) x utilization. AUMs = available forage / 790 lb (one animal-unit-month). Head supported for 30 days = AUMs / AU-equivalent. Grazing days for a herd = available forage / (herd x AU-equivalent x 26 lb/day).",
+    formula: "Available forage = production (lb/acre) x area (acres) x utilization. AUMs = available forage / 790 lb (one animal-unit-month). Head supported for one AUM (30.4 days) = AUMs / AU-equivalent. Grazing days for a herd = available forage / (herd x AU-equivalent x 26 lb/day).",
     edition: "USDA NRCS National Range and Pasture Handbook Chapter 6 (stocking rate) by name.",
     freeAccess: "Free at nrcs.usda.gov for the handbook.",
     governance: GOVERNANCE.general,
@@ -3344,7 +3344,7 @@ export const CITATIONS = {
 
   "trap-seal-loss": {
     formula: "Pass if the developed trap-to-vent distance <= the code-permitted maximum for the drain diameter; percent used = distance / permitted x 100; siphonage risk when the vent is inadequate or the trap seal is below 1 in.",
-    edition: "IPC §1002 / UPC §1002 trap-seal-protection and trap-to-vent distance provisions, by name.",
+    edition: "IPC §1002 (trap seals) and §906 / Table 906.1 (trap-to-vent distance); UPC §1002 / Table 1002.2, by name.",
     freeAccess: "Free read-only at codes.iccsafe.org; the AHJ-adopted edition governs.",
     governance: GOVERNANCE.plumbing,
     editionNote: "Single-edition (trap-seal-protection principle is stable; the permitted maximum distance is user-supplied from the AHJ-adopted IPC/UPC table - no proprietary table reproduced).",
@@ -3388,7 +3388,7 @@ export const CITATIONS = {
   },
 
   "deck-ledger-fasteners": {
-    formula: "Fastener count = floor(ledger_length_ft x 12 / on-center spacing) + 1; spans <= 18 ft are within the IRC table, beyond require an engineered connection.",
+    formula: "Fastener count = ceil(ledger_length_ft x 12 / on-center spacing) + 1 (no gap exceeds the spacing); spans <= 18 ft are within the IRC table, beyond require an engineered connection.",
     edition: "IRC §R507.9 deck ledger connection provisions, by name.",
     freeAccess: "Free read-only at codes.iccsafe.org; the AHJ-adopted edition governs.",
     governance: GOVERNANCE.structural,
@@ -3891,7 +3891,7 @@ export const CITATIONS = {
     governance: GOVERNANCE.plumbing,
     editionNote: IPC_DISCLOSURE,
     assumptions: [
-      { name: "Minimum slope rule", value: "1/4 in per ft for ≤ 2.5 in DWV; 1/8 in per ft for ≥ 3 in", source: "IPC 2021 Table 704.1" },
+      { name: "Minimum slope rule", value: "1/4 in per ft for ≤ 2-1/2 in; 1/8 in per ft for 3 to 6 in; 1/16 in per ft for 8 in and larger", source: "IPC 2021 Table 704.1" },
     ],
   },
   "pressure-conversion": {
@@ -3913,7 +3913,7 @@ export const CITATIONS = {
     assumptions: [],
   },
   "water-hammer-arrestor": {
-    formula: "PDI WH-201 method: arrestor size class A–F selected by branch length and fixture-unit count.",
+    formula: "PDI WH-201 method: size A–F selected by the branch's total fixture units (WSFU); a branch over 20 ft is flagged for an additional unit at each fixture group.",
     edition: "PDI WH-201 by name.",
     freeAccess: "PDI specifications licensed; manufacturer data sheets (Sioux Chief, Watts) free at each manufacturer site.",
     governance: GOVERNANCE.plumbing,
@@ -4239,14 +4239,14 @@ export const CITATIONS = {
     ],
   },
   "grease-trap": {
-    formula: "Volume = peak GPM × retention time × loading factor. Recommended nominal sizes follow PDI G101 step ladder. IPC 2021 Section 1003 governs interceptor selection.",
+    formula: "Volume = peak GPM × retention time × loading factor. Recommended nominal size is the next typical commercial trap size (20 to 3,000 gal). IPC 2021 Section 1003 governs interceptor selection.",
     edition: "PDI G101 by name; " + IPC_2021 + " Section 1003.",
     freeAccess: ICC_FREE + " PDI G101 licensed; manufacturer (Schier, Thermaco, Rockford) sizing tools free.",
     governance: GOVERNANCE.plumbing,
     editionNote: IPC_DISCLOSURE,
     assumptions: [
       { name: "Retention time", value: "30 min unless user supplies", source: "PDI G101 by name" },
-      { name: "Loading factor", value: "1.0 unless user supplies adjustment for high-grease use", source: "engineering practice" },
+      { name: "Loading factor", value: "1.25 unless user supplies a job-specific factor", source: "engineering practice" },
     ],
   },
   "grease-interceptor-flow-capacity": {
@@ -4360,9 +4360,9 @@ export const CITATIONS = {
     assumptions: [],
   },
   "emergency-contacts": {
-    formula: "(reference page; no compute) Universal U.S. emergency and information numbers: 911 (emergency), 811 (call before you dig), 1-800-222-1222 (Poison Help), 1-800-321-OSHA (OSHA hotline), 301-415-7000 (NRC operations), and the per-state utility locator extensions.",
+    formula: "(reference page; no compute) Universal U.S. emergency and information numbers: 911 (emergency), 811 (call before you dig), 1-800-222-1222 (Poison Help), 1-800-321-OSHA (OSHA hotline), 1-800-424-8802 (National Response Center, chemical and oil spills).",
     edition: "FCC and state-PUC published assignments; refreshed annually.",
-    freeAccess: "Free at call811.com, poisonhelp.org, osha.gov, and nrc.gov.",
+    freeAccess: "Free at call811.com, poisonhelp.org, osha.gov, and nrc.uscg.mil.",
     governance: GOVERNANCE.general,
     editionNote: "Single-edition (refreshed at build time from federal-agency publications).",
     assumptions: [],
@@ -5707,7 +5707,7 @@ export const CITATIONS = {
   // Operator of record and primacy agency govern."
 
   "pounds-formula": {
-    formula: "lb/day = flow (MGD) × dose (mg/L) × 8.34. Adjusted product feed = pure_lb / (purity %), keyed to the chemical: chlorine gas 100%, sodium hypochlorite 12.5%, calcium hypochlorite 65%, fluorosilicic acid 23%, alum dry 100% / liquid 48.5%, ferric chloride 38%.",
+    formula: "lb/day = flow (MGD) × dose (mg/L) × 8.34. Adjusted product feed = pure_lb / (purity %), keyed to the chemical: chlorine gas 100%, sodium hypochlorite 12.5%, calcium hypochlorite 65%, fluorosilicic acid 23% x 0.792 available fluoride ion (dose as F), alum dry 100% / liquid 48.5%, ferric chloride 38%.",
     edition: "AWWA M3 (Safety Practices for Water Utilities) by name; Water Environment Federation MOP-11 by name. The 8.34 factor is a physical constant: 1 gal H2O at 60 °F = 8.345 lb.",
     freeAccess: "AWWA / WEF manuals licensed; principles free in published water-treatment texts and at most state primacy-agency operator-training pages. EPA water-treatment manuals free at epa.gov.",
     governance: GOVERNANCE.water,
@@ -5969,7 +5969,7 @@ export const CITATIONS = {
     assumptions: [],
   },
   "standing-water": {
-    formula: "Volume = L × W × D for rectangular footprints; pool / partial-floor variants resolved geometrically. 1 ft³ water = 7.4805 gal × 8.34 lb/gal = 62.4 lb (room-temperature water).",
+    formula: "Volume (ft³) = affected area (ft²) × depth (in) / 12; gallons = ft³ × 7.48052; weight = ft³ × 62.4 lb (room-temperature water).",
     edition: "Classical geometry; physical-fact density of water (62.4 lb/ft³ at 60 °F).",
     freeAccess: "NIST physical constants free at nist.gov.",
     governance: GOVERNANCE.general,
@@ -6064,7 +6064,7 @@ export const CITATIONS = {
   // standard rescue / arboriculture mechanical-advantage references.
 
   "fire-friction": {
-    formula: "Friction loss FL = C × Q² × L per 100 ft of hose. C and L per hose diameter from NFA training tables (1.75 in, 2.5 in, 3 in, 4 in, 5 in, etc.).",
+    formula: "FL = C × (Q/100)² × (L/100), FL in psi, Q in gpm, L in ft; C per hose diameter from NFA training tables (1.75 in, 2.5 in, 3 in, 4 in, 5 in, etc.).",
     edition: "National Fire Academy hose-hydraulics training materials (U.S. government, public domain).",
     freeAccess: "Free at usfa.fema.gov/training.",
     governance: GOVERNANCE.fire,
@@ -6301,7 +6301,7 @@ export const CITATIONS = {
     editionNote: "Editions available: NFPA 14-2024 is the current published edition; earlier editions (2019 / 2016) carry slightly different residual-pressure requirements; verify the edition adopted by your AHJ.",
     assumptions: [
       { name: "Appliance loss", value: "25 psi default for the standpipe system (intake, riser check, hose valve, FDC); user-adjustable", source: "NFPA 14 / IFSTA typical" },
-      { name: "Design flow", value: "250 GPM default at the topmost outlet; the system demand (500 GPM first riser) governs the supply", source: "NFPA 14-2024 §7" },
+      { name: "Design flow", value: "250 GPM default (Class I/III; 100 GPM for Class II) at the topmost outlet; the system demand (500 GPM first riser) governs the supply", source: "NFPA 14-2024 §7" },
     ],
   },
   "smoke-ejector-cfm": {
@@ -6640,7 +6640,7 @@ export const CITATIONS = {
     governance: GOVERNANCE.general,
     editionNote: "Single-edition (NWS 2001 formula; replaced the 1945 Siple-Passel formulation).",
     assumptions: [
-      { name: "Frostbite-time table", value: "5 / 10 / 30 min thresholds per NWS table", source: "NWS Wind Chill Chart" },
+      { name: "Frostbite-time table", value: "not expected above -18 F wind chill; 30 min to -20 F; 10 min to -45 F; 5 min to -55 F; 2 min below that (rough piecewise of the NWS table)", source: "NWS Wind Chill Chart" },
     ],
   },
   "ladder-angle": {
@@ -8037,7 +8037,7 @@ export const CITATIONS = {
     ],
   },
   "loan-limits": {
-    formula: "Per-county lookup against the FHFA Conforming Loan Limit Values table (one-unit baseline + HERA high-cost adjustments). FHA single-family limit equals 65% of the conforming baseline as the floor and 150% of the FHFA ceiling as the FHA ceiling per 12 USC §1709(b)(2). VA full-entitlement borrowers have no statutory cap since 2020-01-01 per the Blue Water Navy Vietnam Veterans Act; partial-entitlement borrowers use the county conforming limit as the upper bound on the VA-guaranteed portion. Unknown counties fall back to the 48-state contiguous baseline.",
+    formula: "Per-county lookup against the FHFA Conforming Loan Limit Values table (one-unit baseline + HERA high-cost adjustments). FHA single-family limit equals 65% of the conforming baseline as the floor and 150% of the conforming baseline (equal to the FHFA high-cost ceiling) as the FHA ceiling per 12 USC §1709(b)(2). VA full-entitlement borrowers have no statutory cap since 2020-01-01 per the Blue Water Navy Vietnam Veterans Act; partial-entitlement borrowers use the county conforming limit as the upper bound on the VA-guaranteed portion. Unknown counties fall back to the 48-state contiguous baseline.",
     edition: "FHFA Conforming Loan Limit Values for 2026 (annual, published 2025-11). HUD FHA Single-Family Mortgage Limits for 2026 (annual, published 2025-12). VA loan-limit policy per Public Law 116-23 (Blue Water Navy Vietnam Veterans Act of 2019).",
     freeAccess: "FHFA loan-limit values at fhfa.gov (Data). HUD FHA limits at hud.gov (FHA mortgage-limits lookup). VA county loan limits at va.gov (Home Loans).",
     governance: GOVERNANCE.real_estate,
@@ -8387,10 +8387,10 @@ export const CITATIONS = {
     edition: "The AASHTO A Policy on Geometric Design of Highways and Streets (the Green Book) point-mass curve model, solved for the speed, by name.",
     freeAccess: "The AASHTO point-mass relation is published in the Green Book; the side-friction design factors are in its speed table. AHJ, state DOT design manual, and the licensed civil engineer of record govern.",
     governance: GOVERNANCE.general,
-    editionNote: "The maximum safe speed a curve supports, the inverse of the AASHTO Green Book point-mass relation: V = sqrt( 15 R (e + f) ) mph from the radius R, the superelevation e, and the side-friction factor f. The side-friction factor f decreases with design speed (about 0.16 at 30 mph to 0.08 at 80 mph), so use the f for the resulting speed band and iterate once if the answer lands in a different band - a higher f borrowed from a lower speed over-predicts the safe speed. This is the point-mass model; it ignores grade, the superelevation runoff/transition and spiral, and the driver comfort a full geometric design covers. A design/check aid, not a substitute for a licensed civil engineer's geometric design.",
+    editionNote: "The maximum safe speed a curve supports, the inverse of the AASHTO Green Book point-mass relation: V = sqrt( 15 R (e + f) ) mph from the radius R, the superelevation e, and the side-friction factor f. The side-friction factor f decreases with design speed (about 0.20 at 30 mph to 0.08 at 80 mph), so use the f for the resulting speed band and iterate once if the answer lands in a different band - a higher f borrowed from a lower speed over-predicts the safe speed. This is the point-mass model; it ignores grade, the superelevation runoff/transition and spiral, and the driver comfort a full geometric design covers. A design/check aid, not a substitute for a licensed civil engineer's geometric design.",
     assumptions: [
       { name: "Point-mass model", value: "V = sqrt( 15 R (e + f) ), V in mph and R in ft", source: "AASHTO Green Book" },
-      { name: "Side-friction factor", value: "use the AASHTO f for the resulting speed band (about 0.16 at 30 mph to 0.08 at 80 mph); iterate once", source: "AASHTO Green Book speed table" },
+      { name: "Side-friction factor", value: "use the AASHTO f for the resulting speed band (about 0.20 at 30 mph to 0.08 at 80 mph); iterate once", source: "AASHTO Green Book speed table" },
       { name: "Not a runoff/spiral design", value: "ignores grade, the transition/spiral, and driver comfort", source: "scope of this tile" },
     ],
   },
@@ -8399,10 +8399,10 @@ export const CITATIONS = {
     edition: "The AASHTO A Policy on Geometric Design of Highways and Streets (the Green Book) point-mass curve model, by name.",
     freeAccess: "The AASHTO point-mass relation is published in the Green Book; the side-friction design factors are in its speed table. AHJ, state DOT design manual, and the licensed civil engineer of record govern.",
     governance: GOVERNANCE.general,
-    editionNote: "The AASHTO Green Book point-mass relation e + f = V^2/(15 R), the required superelevation e = V^2/(15 R) - f, the minimum radius R_min = V^2/(15(e_max + f)), and that the side-friction factor f decreases with design speed (about 0.16 at 30 mph to 0.08 at 80 mph). This returns the point-mass superelevation and minimum radius: it uses the entered design side-friction factor (from the AASHTO speed table), does not distribute e and f by an AASHTO method (1 through 5) over the speed range, and does not size the superelevation transition/runoff length or the spiral. A negative required e (a curve flat enough that side friction alone holds it) is reported as no superelevation required. A design aid, not a substitute for a licensed civil engineer's geometric design.",
+    editionNote: "The AASHTO Green Book point-mass relation e + f = V^2/(15 R), the required superelevation e = V^2/(15 R) - f, the minimum radius R_min = V^2/(15(e_max + f)), and that the side-friction factor f decreases with design speed (about 0.20 at 30 mph to 0.08 at 80 mph). This returns the point-mass superelevation and minimum radius: it uses the entered design side-friction factor (from the AASHTO speed table), does not distribute e and f by an AASHTO method (1 through 5) over the speed range, and does not size the superelevation transition/runoff length or the spiral. A negative required e (a curve flat enough that side friction alone holds it) is reported as no superelevation required. A design aid, not a substitute for a licensed civil engineer's geometric design.",
     assumptions: [
       { name: "Point-mass model", value: "e + f = V^2/(15 R), V in mph and R in ft", source: "AASHTO Green Book" },
-      { name: "Side-friction factor", value: "f is the AASHTO design value at the design speed (about 0.16 at 30 mph to 0.08 at 80 mph)", source: "AASHTO Green Book speed table" },
+      { name: "Side-friction factor", value: "f is the AASHTO design value at the design speed (about 0.20 at 30 mph to 0.08 at 80 mph)", source: "AASHTO Green Book speed table" },
       { name: "Not a runoff/spiral design", value: "no e/f distribution method, no transition or spiral length", source: "scope of this tile" },
     ],
   },
@@ -11587,11 +11587,11 @@ export const CITATIONS = {
   "coating-coverage-dft": {
     formula: "theoretical = 1604 x (vol_solids/100) / dft; practical = theoretical x (1 - loss/100); gallons = area / practical; wft = dft / (vol_solids/100).",
     edition: "SSPC / AMPP PA 2 (dry-film thickness) and the 1604 ft^2-mil/gal coverage constant by name; first-principles film-build math.",
-    freeAccess: "The 1604 coverage constant is exact public arithmetic. SSPC / AMPP PA 2 is a published consensus standard.",
+    freeAccess: "The 1604 coverage constant is public arithmetic (231 in^3 per gallon / 0.144 in^3 per ft^2-mil = 1604.2, rounded). SSPC / AMPP PA 2 is a published consensus standard.",
     governance: GOVERNANCE.general,
-    editionNote: "1604 is exact (a gallon spread one mil thick covers 1604 ft^2 at 100% solids). The product data sheet's volume-solids governs and thinning lowers it. 35% spray loss is a default. DFT is verified with a gauge per SSPC / AMPP PA 2, not assumed from the WFT. Multiple coats and touch-up are not in this single-coat number.",
+    editionNote: "1604 is the rounded constant (231 in^3 per gallon / 0.144 in^3 per ft^2-mil = 1604.2; a gallon spread one mil thick covers about 1604 ft^2 at 100% solids). The product data sheet's volume-solids governs and thinning lowers it. 35% spray loss is a default. DFT is verified with a gauge per SSPC / AMPP PA 2, not assumed from the WFT. Multiple coats and touch-up are not in this single-coat number.",
     assumptions: [
-      { name: "Coverage constant", value: "1604 ft^2-mil per gallon at 100% volume solids (exact)", source: "physical fact" },
+      { name: "Coverage constant", value: "1604 ft^2-mil per gallon at 100% volume solids (231 / 0.144 = 1604.2, rounded)", source: "physical fact" },
       { name: "Application loss", value: "35% spray-loss default (varies with method and conditions)", source: "coatings practice" },
     ],
   },
@@ -12257,7 +12257,7 @@ export const CITATIONS = {
     governance: GOVERNANCE.general,
     editionNote: "First-principles joint geometry and steel density. Deposition efficiency is the deposited/purchased ratio (solid wire about 0.90, SMAW about 0.60 to 0.65); the WPS and the shop's measured efficiency govern the purchase, and pass count is a planning estimate.",
     assumptions: [
-      { name: "Steel density", value: "0.2836 lb/in3 (carbon steel, matching metal-weight); editable", source: "metal-weight" },
+      { name: "Steel density", value: "0.2836 lb/in3 (carbon steel, matching metal-weight); fixed in this tile", source: "metal-weight" },
       { name: "Deposition efficiency", value: "deposited / filler purchased; default 0.90 solid wire", source: "WPS / shop measurement" },
       { name: "Max single-pass area", value: "default 0.05 in2; passes = ceil(weld area / max pass area)", source: "welding practice" },
     ],
@@ -12285,13 +12285,13 @@ export const CITATIONS = {
     ],
   },
   "weld-transverse-shrinkage": {
-    formula: "Transverse shrinkage per weld = 0.2 x weld area / thickness (the 0.2 coefficient is dimensionless; the area-over-thickness ratio carries the length); total = per-weld x weld count; recommended pre-set = total.",
+    formula: "Transverse shrinkage per weld = 0.2 x weld area / thickness + 0.05 x root opening (the coefficients are dimensionless; the area-over-thickness ratio carries the length); total = per-weld x weld count; recommended pre-set = total.",
     edition: "Transverse weld shrinkage - the Blodgett weld-area-over-thickness relation from Blodgett, Design of Welded Structures (James F. Lincoln Arc Welding Foundation), by name.",
     freeAccess: "The published Blodgett relation; the weld area, thickness, and weld count are user-supplied.",
     governance: GOVERNANCE.general,
-    editionNote: "Blodgett transverse-shrinkage relation shrink = 0.2 x A_w / t. This is a screen: joint restraint, fixturing, sequence, and a mock-up govern the actual movement, and longitudinal and angular distortion (restraint-dominated) are out of scope.",
+    editionNote: "Blodgett transverse-shrinkage relation shrink = 0.2 x A_w / t + 0.05 d (d the root opening). This is a screen: joint restraint, fixturing, sequence, and a mock-up govern the actual movement, and longitudinal and angular distortion (restraint-dominated) are out of scope.",
     assumptions: [
-      { name: "Blodgett coefficient", value: "0.2 (dimensionless); editable", source: "Blodgett, Design of Welded Structures" },
+      { name: "Blodgett coefficient", value: "0.2 (dimensionless); fixed in the compute", source: "Blodgett, Design of Welded Structures" },
       { name: "Scope", value: "transverse component only; longitudinal and angular distortion not estimated", source: "screen scope" },
     ],
   },
@@ -13365,7 +13365,7 @@ export const CITATIONS = {
     governance: GOVERNANCE.electrical,
     editionNote: "NEC Article 392.22. The AHJ-adopted NEC edition governs; ampacity derating for tray fill (392.80) is cross-linked, not bundled. Distinct from conduit-fill.",
     assumptions: [
-      { name: "Column-2 allowance", value: "the linear column-2 area the NEC Table 392.22(A) encodes; verify against the adopted table", source: "NEC Table 392.22(A)" },
+      { name: "Column-1 / Column-3 allowance", value: "the linear Column 1 (ladder) / Column 3 (solid bottom) area the NEC Table 392.22(A) encodes; verify against the adopted table", source: "NEC Table 392.22(A)" },
     ],
   },
   "cctv-storage": {
@@ -14053,7 +14053,7 @@ export const CITATIONS = {
     governance: GOVERNANCE.general,
     editionNote: "Single-edition (engineering-practice / first-principles take-off; refresh as practice and product data shift).",
     assumptions: [
-      { name: "Embedment + drainage", value: "bury ~1 in per ft, 2 ft x 6 in base pad, 12 in drainage zone (editable); engineered design over ~4 ft", source: "Allan Block / Versa-Lok" },
+      { name: "Embedment + drainage", value: "bury ~1 in per ft, 2 ft x 6 in base pad, 12 in drainage zone (fixed in the take-off); engineered design over ~4 ft", source: "Allan Block / Versa-Lok" },
     ],
   },
   "crawl-space-ventilation": {
@@ -15794,7 +15794,7 @@ export const CITATIONS = {
     governance: GOVERNANCE.general,
     editionNote: "Single-edition (the manufacturer's rated first-hour rating on the DOE EnergyGuide label and the AHJ govern the selection).",
     assumptions: [
-      { name: "Constants", value: "8.33 lb/gal water and the default 0.70 usable-storage fraction (before the stored water drops below the set point) are editable", source: "first principles / DOE FHR method" },
+      { name: "Constants", value: "the default 0.70 usable-storage fraction (before the stored water drops below the set point) is editable; the 8.33 lb/gal water constant is fixed", source: "first principles / DOE FHR method" },
       { name: "FHR definition", value: "first-hour rating = usable storage + one hour of recovery; match it to the peak-hour draw, not to tank gallons alone", source: "DOE/AHRI first-hour-rating method" },
       { name: "Check, not rating", value: "this is a sizing check; the manufacturer's tested FHR on the yellow EnergyGuide label is the governing value", source: "manufacturer EnergyGuide label" },
     ],
@@ -17284,7 +17284,7 @@ export const CITATIONS = {
     edition: "The standard cross-section property formulas (mechanics of materials; AISC Manual shapes), by name.",
     freeAccess: "Section-property formulas are published free in any mechanics-of-materials reference and the AISC Manual shape tables. The engineer of record governs the design.",
     governance: GOVERNANCE.general,
-    editionNote: "The elastic cross-section properties about the bending (strong) axis: area A, moment of inertia I (b h^3/12 rectangle, pi d^4/64 round, the hollow difference for pipe/tube), section modulus S = I/c, extreme-fiber distance c, and radius of gyration r = sqrt(I/A). This returns the properties for a single rectangle, solid round, pipe, or hollow rectangular tube using the entered actual dimensions: it is the elastic (not plastic Z) property, is about the entered axis only, and does not handle built-up, composite, or standard rolled-shape lookups. I scales with the cube of the bending-direction depth, so orientation dominates. A design aid, not a substitute for the engineer of record.",
+    editionNote: "The elastic cross-section properties about the bending axis set by h (the strong axis when h is the larger dimension): area A, moment of inertia I (b h^3/12 rectangle, pi d^4/64 round, the hollow difference for pipe/tube), section modulus S = I/c, extreme-fiber distance c, and radius of gyration r = sqrt(I/A). This returns the properties for a single rectangle, solid round, pipe, or hollow rectangular tube using the entered actual dimensions: it is the elastic (not plastic Z) property, is about the entered axis only, and does not handle built-up, composite, or standard rolled-shape lookups. I scales with the cube of the bending-direction depth, so orientation dominates. A design aid, not a substitute for the engineer of record.",
     assumptions: [
       { name: "Shapes", value: "rectangle, solid round, pipe (d/di), hollow rectangular tube (b/h, wall t)", source: "mechanics of materials" },
       { name: "Elastic properties", value: "I, S = I/c, r = sqrt(I/A); not the plastic modulus Z", source: "AISC / mechanics" },
@@ -17400,11 +17400,11 @@ export const CITATIONS = {
     ],
   },
   "combined-stress-axial-bending": {
-    formula: "sigma_axial = P/A; sigma_bend = M c/I; sigma_max = P/A + M c/I; sigma_min = P/A - M c/I; optional M = P e; no tension while M c/I <= P/A (kern e <= r^2/c).",
+    formula: "sigma_axial = P/A; sigma_bend = M c/I; sigma_max = P/A + |M c/I|; sigma_min = P/A - |M c/I|; optional M = P e; no tension while M c/I <= P/A (kern e <= r^2/c).",
     edition: "The standard combined axial-plus-bending stress superposition (mechanics of materials), by name.",
     freeAccess: "The combined-stress superposition is published free in any mechanics-of-materials reference. The engineer of record governs the design.",
     governance: GOVERNANCE.general,
-    editionNote: "The combined axial-plus-bending fiber stress on a short (non-buckling) member: sigma = P/A +/- M c/I, extreme compression fiber at P/A + M c/I and the other fiber at P/A - M c/I (tension where negative); an eccentricity e sets M = P e. The section stays wholly in compression only while M c/I <= P/A, the kern limit e <= r^2/c. This returns the elastic uniaxial fiber stresses: it does NOT include the P-delta / moment amplification of a slender member (use a beam-column interaction check for that), assumes bending about one axis, and is not an allowable-stress or code capacity check. A design aid, not a substitute for the engineer of record.",
+    editionNote: "The combined axial-plus-bending fiber stress on a short (non-buckling) member: sigma = P/A +/- M c/I, one extreme fiber at P/A + |M c/I| and the other at P/A - |M c/I| (tension where negative); an eccentricity e sets M = P e. The section stays wholly in compression only while M c/I <= P/A, the kern limit e <= r^2/c. This returns the elastic uniaxial fiber stresses: it does NOT include the P-delta / moment amplification of a slender member (use a beam-column interaction check for that), assumes bending about one axis, and is not an allowable-stress or code capacity check. A design aid, not a substitute for the engineer of record.",
     assumptions: [
       { name: "Superposition", value: "sigma = P/A +/- M c/I, extreme fibers; M from a moment or an eccentricity M = P e", source: "mechanics of materials" },
       { name: "Kern / no-tension", value: "the far face stays in compression while e <= r^2/c (the kern)", source: "mechanics of materials" },
@@ -20083,8 +20083,8 @@ export const CITATIONS = {
     governance: GOVERNANCE.general,
     editionNote: "The manufacturer's allowable base-plate load and the geotechnical allowable soil bearing govern - \"looks solid\" is not a number. OSHA 1926.451(c)(2) requires scaffold legs on base plates and mudsills on a sound, rigid foundation. Frost, voids, backfill, slopes, and adjacent excavations all cut soil capacity. A competent person verifies the setup; this is a first-check estimator, not the engineered design.",
     assumptions: [
-      { name: "Allowable soil bearing", value: "from the geotechnical report or a presumptive-load table; 2000 psf is only a placeholder default", source: "geotechnical" },
-      { name: "Mudsill board", value: "9.25 in wide default (a nominal 2x10); the actual plank width and length govern", source: "OSHA 1926.451(c)(2)" },
+      { name: "Allowable soil bearing", value: "from the geotechnical report or a presumptive-load table; 2000 psf is the worked example's value only", source: "geotechnical" },
+      { name: "Mudsill board", value: "9.25 in (a nominal 2x10) in the worked example; the actual plank width and length govern", source: "OSHA 1926.451(c)(2)" },
     ],
   },
   "fresh-concrete-temp": {
@@ -21242,7 +21242,7 @@ export const CITATIONS = {
     ],
   },
   "category-deterioration": {
-    formula: "Reference lookup with threshold comparisons: origin category + elapsed wet hours + warm flag + contaminant-contact flag -> likely current category. Contaminant contact -> Category 3; Category 1 past ~48-72 h (sooner if warm) -> Category 2; otherwise origin.",
+    formula: "Reference lookup with threshold comparisons: origin category + elapsed wet hours + warm flag + contaminant-contact flag -> likely current category. Contaminant contact -> Category 3; Category 1 at or past 48 h (24 h if warm) -> Category 2; Category 2 at or past 24 h when warm -> Category 3; otherwise origin.",
     edition: "Category-at-time-of-remediation principle, by name; ANSI/IICRC S500.",
     freeAccess: "Adds the time dimension to the water category: a clean loss left standing, warm, or in contact with contaminated materials degrades to a higher category.",
     governance: GOVERNANCE.general,
@@ -25496,7 +25496,7 @@ export const CITATIONS = {
   },
   "tank-vent-api-2000": {
     formula: "liquid-movement venting = pump rate x 5.615 cu ft/bbl, times an allowance above unity for a volatile product; the requirement in each direction adds the thermal rate; the fire case is separate.",
-    edition: "The 1:1 displacement (5.615 cu ft per bbl) is the ISO 28300 / API 2000 6th-7th edition main method; the 5th edition (1998) Table 1A prints 6 SCFH per bbl/h out-breathing for a non-volatile stock and 12 for a volatile one (about 6.4% above 5.615 x 1 or 2), so state which edition the jurisdiction adopted. The thermal rates and the fire case are ENTERED from the API 2000 tables, which are indexed by tank capacity and by wetted surface area and whose adopted edition governs.",
+    edition: "The 1:1 displacement (5.615 cu ft per bbl) is the ISO 28300 / API 2000 6th-7th edition main method; the 5th edition (1998) Table 1A prints 6 SCFH per bbl/h out-breathing for a non-volatile stock and 12 for a volatile one (about 6.9% above 5.615 x 1 or 2), so state which edition the jurisdiction adopted. The thermal rates and the fire case are ENTERED from the API 2000 tables, which are indexed by tank capacity and by wetted surface area and whose adopted edition governs.",
     freeAccess: "One displacement conversion and two sums.",
     governance: GOVERNANCE.general,
     editionNote: "THE VACUUM SIDE IS THE ONE THAT DESTROYS TANKS. Tanks are far weaker in vacuum than in pressure, so an under-vented tank dishes in long before it would rupture outward -- and every cubic foot of the in-breathing requirement has to pass INWARD through a vent screen that ice, insects or a coat of paint can restrict. That puts vent screen maintenance directly on the path of the failure mode rather than on a housekeeping list. AND THERMAL IN-BREATHING NEEDS NO PUMPING AT ALL, which is what makes it quiet: a warm tank hit by a cold rain contracts its vapour space in minutes, and a tank that has sat idle for weeks with nobody near it can be found dished in the next morning. THE FIRE CASE IS A DIFFERENT ORDER OF MAGNITUDE -- on the case here it is 41 times the normal out-breathing requirement -- which is why emergency relief is a weak-seam roof or a dedicated emergency vent rather than the normal conservation breather.",

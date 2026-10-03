@@ -169,7 +169,7 @@ export function computeStackEmissionPte({
   const pte_with_limit_tpy = has_permit_limit ? controlled_rate_lb_h * permitted_hours_per_year / _AQ_LB_PER_TON : 0;
   const limit_makes_minor = has_permit_limit && pte_with_limit_tpy < major_threshold_tpy;
   const limit_verdict = !has_permit_limit
-    ? (hours_for_minor >= _AQ_HOURS_PER_YEAR
+    ? (hours_for_minor > _AQ_HOURS_PER_YEAR
       ? "no hours limit is needed: even at 8,760 hours the source stays under the threshold"
       : "a federally enforceable limit below " + fmt(hours_for_minor, 0) + " hours a year would make this a synthetic minor source -- the trade is that the limit is enforceable, with recordkeeping and reporting, and exceeding it is a violation rather than a busy month")
     : limit_makes_minor

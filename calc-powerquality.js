@@ -137,7 +137,11 @@ export function computeNeutralCurrent3ph({ ia_A = 0, ib_A = 0, ic_A = 0, triplen
     neutral_is_ccc: dominant,
     note: dominant
       ? "Triplen-dominated: the neutral may exceed the phase current and counts as a current-carrying conductor (NEC 310.15(E), IEEE 519)."
-      : (a === b && b === c ? "Balanced linear load - fundamental neutral current is zero." : "Unbalanced fundamental neutral current (RMS magnitude, not direction)."),
+      : (a === b && b === c
+        ? (harmonicNeutral == null || Math.abs(harmonicNeutral) <= 1e-9
+          ? "Balanced linear load - fundamental neutral current is zero."
+          : "Balanced fundamental - fundamental neutral current is zero; the triplen neutral is about " + harmonicNeutral.toFixed(1) + " A.")
+        : "Unbalanced fundamental neutral current (RMS magnitude, not direction)."),
   };
 }
 export const neutralCurrent3phExample = { inputs: { ia_A: 100, ib_A: 80, ic_A: 60, triplen_pct: 0 } };

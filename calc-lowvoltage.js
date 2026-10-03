@@ -355,7 +355,7 @@ export function computeCableTrayFill({ tray_type = "ladder", tray_width_in = 0, 
     fill_value = diameter_sum; allowable = diameter_allow; pass = diameter_sum <= diameter_allow;
     fill_percent = (diameter_sum / diameter_allow) * 100;
   } else if (hasSmall && !hasLarge) {
-    // 392.22(A)(1)(b): sum of areas <= column-2 allowable.
+    // 392.22(A)(1)(b) / (A)(3)(b): sum of areas <= the Column 1 (ladder) / Column 3 (solid bottom) allowable.
     basis = "sum-of-areas (cables smaller than 4/0)";
     allowable = _trayColumn2Area(tray_type, width);
     fill_value = area_sum; pass = area_sum <= allowable;

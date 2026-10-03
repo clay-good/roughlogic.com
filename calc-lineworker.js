@@ -1082,7 +1082,7 @@ LINEWORKER_RENDERERS["capacitor-bank-voltage-rise"] = _simpleRenderer({
     { key: "upper_limit_v", label: "Upper voltage limit (V on a 120 V base)", kind: "number", default: 126 },
   ],
   outputs: [
-    { key: "p", id: "cbv-out-p", label: "Voltage rise", value: (r) => fmt(r.rise_pct, 2) + "% -- " + fmt(r.rise_volts_120_base, 2) + " V on a 120 V base, a bit over one regulator tap step" },
+    { key: "p", id: "cbv-out-p", label: "Voltage rise", value: (r) => fmt(r.rise_pct, 2) + "% -- " + fmt(r.rise_volts_120_base, 2) + " V on a 120 V base, about " + fmt(r.rise_volts_120_base / 0.75, 1) + " regulator tap steps of 0.75 V" },
     { key: "v", id: "cbv-out-v", label: "At light load", value: (r) => r.verdict },
     { key: "k", id: "cbv-out-k", label: "At peak load", value: (r) => fmt(r.peak_load_result_v, 2) + " V, " + (r.within_limit_peak ? "inside" : "OVER") + " the " + fmt(r.upper_limit_v, 1) + " V limit -- the condition the bank was sized for, and not the one that binds" },
     { key: "i", id: "cbv-out-i", label: "Leading current the bank draws", value: (r) => fmt(r.leading_current_a, 2) + " A" },

@@ -157,13 +157,13 @@ export function computeMolarityFromStock({ purity_pct = 0, density_g_ml = 0, mol
   return {
     stock_m,
     volume_to_draw_ml,
-    note: "A concentrated liquid reagent is labeled by weight percent and density, not molarity, so both must be combined with the molecular weight (ignoring either is a 20-40% error); the 10 factor converts g per 100 mL to per liter. Always add concentrated acid to water, never the reverse. The reagent lot assay and lab safety procedures govern.",
+    note: "A concentrated liquid reagent is labeled by weight percent and density, not molarity, so both must be combined with the molecular weight (ignoring the density is a 15-45% error on common acids; ignoring the assay percent is far larger); the 10 factor converts g per 100 mL to per liter. Always add concentrated acid to water, never the reverse. The reagent lot assay and lab safety procedures govern.",
   };
 }
 export const molarityFromStockExample = { inputs: { purity_pct: 37, density_g_ml: 1.19, mol_weight: 36.46, target_m: 1.0, final_volume_ml: 1000 } };
 
 function renderMolarityFromStock(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: Standard reagent preparation - stock molarity from assay and density, stock_M = 10 x purity_pct x density / MW; volume_to_draw = target_M x final_volume / stock_M. A concentrated liquid reagent is labeled by weight percent and density, not molarity, so both must be combined with the molecular weight (ignoring either is a 20-40% error). Always add concentrated acid to water, never the reverse. The reagent lot certificate of analysis and lab safety procedures govern.";
+  citationEl.textContent = "Citation: Standard reagent preparation - stock molarity from assay and density, stock_M = 10 x purity_pct x density / MW; volume_to_draw = target_M x final_volume / stock_M. A concentrated liquid reagent is labeled by weight percent and density, not molarity, so both must be combined with the molecular weight (ignoring the density is a 15-45% error on common acids; ignoring the assay percent is far larger). Always add concentrated acid to water, never the reverse. The reagent lot certificate of analysis and lab safety procedures govern.";
   const purity = makeNumber("Assay / purity (% w/w)", "mfs-purity", { step: "any", min: "0" });
   const density = makeNumber("Density (g/mL)", "mfs-density", { step: "any", min: "0" });
   const mw = makeNumber("Molecular weight (g/mol)", "mfs-mw", { step: "any", min: "0" });

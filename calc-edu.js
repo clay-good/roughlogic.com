@@ -354,7 +354,9 @@ export function computeQuadratic({ a, b, c }) {
   const discriminant = B * B - 4 * A * C;
   const vertex_x = -B / (2 * A);
   const vertex_y = A * vertex_x * vertex_x + B * vertex_x + C;
-  if (discriminant > 0) {
+  // A discriminant within float noise of zero is a double root.
+  const d_is_zero = Math.abs(discriminant) <= 1e-12 * Math.max(B * B, Math.abs(4 * A * C));
+  if (discriminant > 0 && !d_is_zero) {
     const sqrtD = Math.sqrt(discriminant);
     return {
       kind: "real-distinct",
@@ -363,10 +365,10 @@ export function computeQuadratic({ a, b, c }) {
       vertex_x, vertex_y,
     };
   }
-  if (discriminant === 0) {
+  if (d_is_zero) {
     return {
       kind: "real-double",
-      discriminant,
+      discriminant: 0,
       roots: [-B / (2 * A)],
       vertex_x, vertex_y,
     };
@@ -734,8 +736,10 @@ export function computeBaseConvert({ value, from_base, to_base }) {
   if (!Number.isFinite(fromB) || fromB < 2 || fromB > 36) return { error: "Source base must be 2-36." };
   if (!Number.isFinite(toB) || toB < 2 || toB > 36) return { error: "Target base must be 2-36." };
   // Validate digits against the source base.
-  const valid = new RegExp("^[-+]?[0-" + Math.min(9, fromB - 1) + "a-zA-Z]+$");
-  if (!valid.test(v)) return { error: "Value contains characters not valid for base " + fromB + "." };
+  const valid = new RegExp("^[-+]?[0-9a-zA-Z]+$");
+  const digits = v.replace(/^[-+]/, "").toLowerCase();
+  const badDigit = [...digits].find((ch) => parseInt(ch, 36) >= fromB);
+  if (!valid.test(v) || badDigit !== undefined) return { error: "Value contains characters not valid for base " + fromB + (badDigit !== undefined ? " ('" + badDigit + "')" : "") + "." };
   const parsed = parseInt(v, fromB);
   if (!Number.isFinite(parsed) || isNaN(parsed)) return { error: "Could not parse '" + v + "' as base " + fromB + "." };
   // DR-22 (D-6/C-6): parseInt truncates magnitudes beyond 2^53 - 1, so the

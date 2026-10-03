@@ -6465,7 +6465,7 @@
   {
    "tile_id": "grease-trap",
    "source_publisher": "PDI",
-   "source_title": "Grease trap volume = peak flow x retention x loading factor; nominal-size rounding to PDI G101 series",
+   "source_title": "Grease trap volume = peak flow x retention x loading factor; nominal size rounded up to the next typical commercial trap size (20 to 3,000 gal)",
    "source_edition_or_year": "PDI G101 (current edition)",
    "source_section_or_page": "50 gpm peak / 30 min retention / 1.25 loading factor -> 1875 gal calculated, rounded up to 2000 gal nominal series size",
    "verified_by": "rl",
@@ -10596,7 +10596,7 @@
   {
    "tile_id": "reverse-lay-friction",
    "source_publisher": "IFSTA Pumping Apparatus / NFPA 1962 hose-friction tables",
-   "source_title": "Friction-loss split across n parallel pumps: per_pump_psi = single_pump_psi / n^2",
+   "source_title": "Friction-loss split across n parallel supply lines: per-line psi (per_pump_psi) = single-line psi / n^2",
    "source_edition_or_year": "IFSTA Pumping Apparatus reverse-lay tables (2.5 in @ 250 gpm coefficient 2)",
    "source_section_or_page": "2.5 in / 250 gpm / 600 ft / 2 pumps -> 75 psi single-pump / 18.75 psi per pump (75 / 4)",
    "verified_by": "rl",
@@ -11453,7 +11453,7 @@
   {
    "tile_id": "crane-lift-quick",
    "source_publisher": "ASME B30.5 / manufacturer load-chart practice",
-   "source_title": "Crane lift screen: per_leg = load / (n_legs * sin(angle from horizontal)); flag GREEN < 75% / YELLOW 75-90% / RED > 90% of chart",
+   "source_title": "Crane lift screen: per_leg = load / (n_legs * sin(angle from horizontal)); flag GREEN < 75% / YELLOW 75-90% / RED \u2265 90% of chart",
    "source_edition_or_year": "ASME B30.5; manufacturer load chart governs over the screen",
    "source_section_or_page": "8000 lb load + 200 lb rigging / 2-leg sling at 60 deg from horizontal / 12,000 lb chart -> gross 8200, per-leg 4618.8 lb, 68.33% of chart, GREEN",
    "verified_by": "rl",
@@ -13793,7 +13793,7 @@
   {
    "tile_id": "color-codes",
    "source_publisher": "NEC + APWA + project bundled color-code systems",
-   "source_title": "NEC residential phase + APWA underground utility color-code reference",
+   "source_title": "NEC / IEC conductor, gas piping and ASME A13.1 color-code reference",
    "source_edition_or_year": "NEC 2023 + APWA Uniform Color Code",
    "source_section_or_page": "Reference compute returns the per-attribute table; runner asserts non-error object only (smoke test).",
    "verified_by": "rl",
@@ -17401,7 +17401,7 @@
    "tile_id": "grain-bin-capacity",
    "source_publisher": "USDA FGIS",
    "source_title": "Grain bin capacity: 30 ft diameter, 20 ft eave, 8 ft cone, corn, free-flow",
-   "source_edition_or_year": "Bin geometry first-principles; USDA FGIS test-weight standards",
+   "source_edition_or_year": "Bin geometry first-principles; standard (legal) bushel weights",
    "source_section_or_page": "area = pi*15^2 = 706.86; cyl = 14,137.2 ft^3; cone = (1/3)*706.86*8 = 1,884.96; total = 16,022.1 -> 12,875 bu",
    "verified_by": "rl",
    "verified_on": "2026-06-05",
@@ -18013,7 +18013,7 @@
   {
    "tile_id": "deck-ledger-fasteners",
    "source_publisher": "IRC R507.9 (deck ledger connection)",
-   "source_title": "Fastener count = floor(ledger_ft x 12 / spacing) + 1",
+   "source_title": "Fastener count = ceil(ledger_ft x 12 / spacing) + 1 (no gap exceeds the spacing)",
    "source_edition_or_year": "IRC R507.9 (spacing user-supplied from the adopted table)",
    "source_section_or_page": "16 ft ledger at 16 in OC -> floor(192/16)+1 = 13 fasteners",
    "verified_by": "rl",
@@ -39495,7 +39495,7 @@
   {
    "tile_id": "metal-roof-panels",
    "source_publisher": "MCA / MRA install references + manufacturer panel-coverage charts",
-   "source_title": "cross-check: 16 in standing-seam net nearly doubles the panel count",
+   "source_title": "cross-check: 16 in standing-seam net more than doubles the panel count",
    "source_edition_or_year": "spec-v216 worked example (machine-verified)",
    "source_section_or_page": "spec-v216 section 2.1 cross-check (standing seam, 16 in net)",
    "verified_by": "rl",
@@ -43936,7 +43936,7 @@
   {
    "tile_id": "delta-wye-line-phase",
    "source_publisher": "First-principles three-phase theory",
-   "source_title": "208 V wye, 10 A line -> 120.1 V phase, 10 A phase, 3,602 VA",
+   "source_title": "208 V wye, 10 A line -> 120.1 V phase, 10 A phase, 3,603 VA",
    "source_edition_or_year": "n/a; V_line = root-3 x V_phase (wye)",
    "source_section_or_page": "spec-v128 section 2.1 pinned example",
    "verified_by": "rl",
@@ -121606,13 +121606,13 @@
      }
     },
     "required_cv": {
-     "value": 61.23724,
+     "value": 91.85587,
      "tolerance": {
       "pct": 0.5
      }
     },
     "cv_at_design_differential": {
-     "value": 86.60254,
+     "value": 129.90381,
      "tolerance": {
       "pct": 0.5
      }
@@ -125531,7 +125531,7 @@
      }
     },
     "system_margin_lb": {
-     "value": 120,
+     "value": 80,
      "tolerance": {
       "pct": 0.5
      }
@@ -151225,7 +151225,7 @@
    "source_publisher": "VERSA-LOK Retaining Wall Systems",
    "source_title": "VERSA-LOK Standard Design & Installation Guidelines",
    "source_edition_or_year": "D_IGuideEnglish (current web PDF)",
-   "source_section_or_page": "Embedment, p.7: \"a wall with 10 feet of height exposed above grade would have a minimum of 1 foot buried below grade-making a total wall height of 11 feet\"; Standard unit p.3: \"Height: 6 inches\", \"Width (face): 16 inches\". 11 ft total / 6 in unit = 22 courses (exact). wall_length_ft is NOT printed and does not affect courses (16 ft entered). URL: https://www.versa-lok.com/assets/sites/versalok2016/uploads/assets/uploads/D_IGuideEnglish.pdf",
+   "source_section_or_page": "Embedment, p.7: \"a wall with 10 feet of height exposed above grade would have a minimum of 1 foot buried below grade-making a total wall height of 11 feet\"; Standard unit p.3: \"Height: 6 inches\", \"Width (face): 16 inches\". The tile buries 1 in/ft (10 in, 10.83 ft total), so 130/6 rounds up to the same 22 courses; Versa-Lok's 1 ft per 10 ft (12 in) is 1.2 in/ft. wall_length_ft is NOT printed and does not affect courses (16 ft entered). URL: https://www.versa-lok.com/assets/sites/versalok2016/uploads/assets/uploads/D_IGuideEnglish.pdf",
    "verified_by": "rl",
    "verified_on": "2026-10-02",
    "inputs": {

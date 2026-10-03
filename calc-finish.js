@@ -265,7 +265,7 @@ FINISH_RENDERERS["retaining-wall-block"] = _simpleRenderer({
     { key: "c", id: "rwb-out-c", label: "Courses", value: (r) => String(r.courses) },
     { key: "t", id: "rwb-out-t", label: "Total blocks", value: (r) => r.total_blocks + " (+ " + r.cap_blocks + " caps)" },
     { key: "g", id: "rwb-out-g", label: "Gravel", value: (r) => fmt(r.base_cuyd, 2) + " cu yd base, " + fmt(r.drain_cuyd, 2) + " cu yd drainage" },
-    { key: "a", id: "rwb-out-a", label: "Advisory", value: (r) => r.over_4ft ? "Over 4 ft - engineered design + geogrid required" : "Under 4 ft - no engineered design flagged" },
+    { key: "a", id: "rwb-out-a", label: "Advisory", value: (r) => r.over_4ft ? "Over 4 ft - engineered design + geogrid required" : "4 ft or less - no engineered design flagged" },
     { key: "n", id: "rwb-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeRetainingWallBlock,

@@ -7018,7 +7018,9 @@ test("bounds: calc-cross computeWindChill pins NWS 2001 wind chill formula on th
   const expected = 35.74 + 0.6215 * 5 - 35.75 * w + 0.4275 * 5 * w;
   assert.ok(Math.abs(r.wind_chill_F - expected) < 1e-9);
   assert.ok(r.wind_chill_F < 5, "wind chill colder than T");
-  assert.strictEqual(typeof r.frostbite_minutes, "number");
+  // WC is about -17 F here, above the -18 F line, so no frostbite time is expected.
+  assert.strictEqual(r.frostbite_minutes, null);
+  assert.strictEqual(typeof computeWindChill({ T_F: -10, wind_mph: 25 }).frostbite_minutes, "number");
   // Wind < 3 mph -> passthrough.
   const calm = computeWindChill({ T_F: 5, wind_mph: 1 });
   assert.strictEqual(calm.wind_chill_F, 5);
@@ -49874,8 +49876,9 @@ test("bounds: spec-v1629 computeVariablePrimaryBypass -- two machines have twice
   assert.ok(Math.abs(r.wasted_fraction - 300 / 900) < 1e-12);
   // IDENTITY: Cv = gpm / sqrt(psi), and sizing at HALF the differential asks
   // for exactly sqrt(2) times the Cv -- an oversized valve.
-  assert.ok(Math.abs(r.required_cv - 300 / Math.sqrt(24)) < 1e-9);
-  assert.ok(Math.abs(r.cv_at_design_differential - 300 / Math.sqrt(12)) < 1e-9);
+  assert.ok(Math.abs(r.required_cv - 450 / Math.sqrt(24)) < 1e-9);
+  assert.ok(Math.abs(r.current_flow_cv - 300 / Math.sqrt(24)) < 1e-9);
+  assert.ok(Math.abs(r.cv_at_design_differential - 450 / Math.sqrt(12)) < 1e-9);
   assert.ok(Math.abs(r.oversize_ratio - Math.SQRT2) < 1e-9);
   assert.ok(r.cv_at_design_differential > r.required_cv);
   // The bypass boundary, tested either side rather than on it.

@@ -1611,18 +1611,18 @@ export function computeGcwrCheck({ gcwr_lb = 0, tractor_weight_lb = 0, trailer_w
     : "OVER by " + fmt(over_by, 0) + " lb against the " + (gcwr_lb <= federal_max_lb ? "GCWR" : "federal cap") + " - a permit or the AHJ governs the move";
   return {
     combined_lb, margin_gcwr, margin_fed, ok, over_by, verdict,
-    note: "The combined power-unit plus trailer weight must stay at or below both the manufacturer's rated gross combination weight (GCWR, the structural / drivetrain limit) and the federal 80,000 lb gross cap (49 CFR 658.17, editable for a state or permit limit). The binding limit is the smaller of the two. Axle and bridge-formula limits are separate checks; a permit or the AHJ governs any over-limit move.",
+    note: "The combined power-unit plus trailer weight must stay at or below both the manufacturer's rated gross combination weight (GCWR, the structural / drivetrain limit) and the federal 80,000 lb gross cap (23 CFR 658.17, editable for a state or permit limit). The binding limit is the smaller of the two. Axle and bridge-formula limits are separate checks; a permit or the AHJ governs any over-limit move.",
   };
 }
 export const gcwrCheckExample = { inputs: { gcwr_lb: 80000, tractor_weight_lb: 18000, trailer_weight_lb: 60000, federal_max_lb: 80000 } };
 const renderGcwrCheck = _simpleRenderer({
-  citation: "Citation: 49 CFR 393.75 (tires) / 658.17 (80,000 lb federal gross) and the manufacturer's GCWR rating plate (by section, not reproduced). The binding limit is the smaller of the GCWR and the federal cap. A permit or the AHJ governs an over-limit move. Free at ecfr.gov.",
+  citation: "Citation: 49 CFR 393.75 (tires) / 23 CFR 658.17 (80,000 lb federal gross) and the manufacturer's GCWR rating plate (by section, not reproduced). The binding limit is the smaller of the GCWR and the federal cap. A permit or the AHJ governs an over-limit move. Free at ecfr.gov.",
   example: gcwrCheckExample.inputs,
   fields: [
     { key: "gcwr_lb", label: "Rated GCWR (lb)", kind: "number" },
     { key: "tractor_weight_lb", label: "Power-unit weight, loaded (lb)", kind: "number" },
     { key: "trailer_weight_lb", label: "Trailer weight, loaded (lb)", kind: "number" },
-    { key: "federal_max_lb", label: "Federal gross cap (lb)", kind: "number" },
+    { key: "federal_max_lb", label: "Federal gross cap (lb)", kind: "number", default: 80000 },
   ],
   outputs: [
     { key: "c", id: "gcwr-out-c", label: "Combined weight", value: (r) => fmt(r.combined_lb, 0) + " lb" },
