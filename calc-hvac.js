@@ -3052,7 +3052,7 @@ export function computeFanMotorBhp({ cfm = 0, tsp_inwc = 0, eta_fan = 0.65, eta_
   const ahp = CFM * TSP / 6356;
   const bhp = ahp / ef;
   const motorHp = bhp / ed;
-  let nextHp = NEMA_HP_SIZES.find((s) => s >= motorHp);
+  let nextHp = NEMA_HP_SIZES.find((s) => s >= motorHp - 1e-9 * Math.abs(motorHp));
   // Above the largest listed size there is no standard size to round to; report none rather than 300 hp.
   if (nextHp === undefined) nextHp = null;
   return {

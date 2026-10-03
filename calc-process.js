@@ -123,7 +123,7 @@ export function computeInjectionClampTonnage({
     : "(no runner area entered -- a cold runner ALWAYS has projected area, and a part-only figure specifies a machine that flashes)";
   const has_machine = machine_rating_tons > 0;
   const margin_tons = has_machine ? machine_rating_tons - clamp_with_safety_tons : 0;
-  const fits = has_machine && margin_tons >= 0 - 1e-9 * Math.abs(0);
+  const fits = has_machine && margin_tons >= -1e-9 * Math.abs(clamp_with_safety_tons);
   const machine_verdict = !has_machine
     ? "(no machine rating entered)"
     : fits
@@ -663,7 +663,7 @@ export function computeThermoplasticTemperatureDerate({
   const has_operating = operating_pressure_psi > 0;
   const margin_psi = has_operating ? derated_pressure_psi - operating_pressure_psi : 0;
   const utilization_pct = has_operating ? operating_pressure_psi / derated_pressure_psi * 100 : 0;
-  const passes = has_operating && margin_psi >= 0 - 1e-9 * Math.abs(0) && !over_temp;
+  const passes = has_operating && margin_psi >= -1e-9 * Math.abs(operating_pressure_psi) && !over_temp;
   const operating_verdict = !has_operating
     ? "(no operating pressure entered)"
     : over_temp

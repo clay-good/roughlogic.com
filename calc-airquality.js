@@ -150,8 +150,8 @@ export function computeStackEmissionPte({
   const actual_tpy = controlled_rate_lb_h * actual_hours_per_year / _AQ_LB_PER_TON;
   const pte_tpy = controlled_rate_lb_h * _AQ_HOURS_PER_YEAR / _AQ_LB_PER_TON;
   const pte_ratio = actual_hours_per_year > 0 ? pte_tpy / actual_tpy : 0;
-  const actual_is_major = actual_tpy >= major_threshold_tpy;
-  const pte_is_major = pte_tpy >= major_threshold_tpy;
+  const actual_is_major = actual_tpy >= major_threshold_tpy - 1e-9 * Math.abs(major_threshold_tpy);
+  const pte_is_major = pte_tpy >= major_threshold_tpy - 1e-9 * Math.abs(major_threshold_tpy);
   const control_verdict = control_efficiency_pct <= 0
     ? "(no control efficiency entered)"
     : control_counts
@@ -167,7 +167,7 @@ export function computeStackEmissionPte({
   const hours_for_minor = major_threshold_tpy * _AQ_LB_PER_TON / controlled_rate_lb_h;
   const has_permit_limit = permitted_hours_per_year > 0;
   const pte_with_limit_tpy = has_permit_limit ? controlled_rate_lb_h * permitted_hours_per_year / _AQ_LB_PER_TON : 0;
-  const limit_makes_minor = has_permit_limit && pte_with_limit_tpy < major_threshold_tpy;
+  const limit_makes_minor = has_permit_limit && pte_with_limit_tpy < major_threshold_tpy - 1e-9 * Math.abs(major_threshold_tpy);
   const limit_verdict = !has_permit_limit
     ? (hours_for_minor > _AQ_HOURS_PER_YEAR
       ? "no hours limit is needed: even at 8,760 hours the source stays under the threshold"
@@ -599,7 +599,7 @@ export function computeCoatingVocCompliance({
     : "adding " + fmt(thinner_gal, 2) + " gal of thinner at " + fmt(thinner_voc_lb_per_gal, 2) + " lb/gal takes the as-applied figure to " + fmt(applied_voc_less_water, 2) + " lb/gal less water, " + (applied_voc_less_water >= voc_less_water ? "up" : "down") + " from " + fmt(voc_less_water, 2) + " -- the thinner's VOC goes into the numerator and only its non-water, non-exempt volume into the denominator";
   // Compliance against the entered limit, on the governing basis.
   const has_limit = limit_lb_per_gal > 0;
-  const complies = has_limit && governing_voc <= limit_lb_per_gal;
+  const complies = has_limit && governing_voc <= limit_lb_per_gal + 1e-9 * Math.abs(limit_lb_per_gal);
   const margin_lb_per_gal = has_limit ? limit_lb_per_gal - governing_voc : 0;
   const label_would_pass = has_limit && voc_as_supplied <= limit_lb_per_gal + 1e-9 * Math.abs(limit_lb_per_gal);
   const limit_verdict = !has_limit

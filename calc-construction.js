@@ -1896,7 +1896,7 @@ export function computeDemoDebris({ structure_type = "wood_frame", volume_yd3 = 
   const volume_ft3 = volume_yd3 * 27;
   const tons = (volume_ft3 * pcf) / 2000;
   // Dumpster recommendation (volume-based; weight limits per dumpster vary by hauler).
-  const dumpster_yd3 = DUMPSTER_SIZES_YD3.find((s) => s >= volume_yd3) || DUMPSTER_SIZES_YD3[DUMPSTER_SIZES_YD3.length - 1];
+  const dumpster_yd3 = DUMPSTER_SIZES_YD3.find((s) => s >= volume_yd3 - 1e-9 * Math.abs(volume_yd3)) || DUMPSTER_SIZES_YD3[DUMPSTER_SIZES_YD3.length - 1];
   return { tons, volume_ft3, dumpster_yd3, pcf };
 }
 
@@ -2539,7 +2539,7 @@ export function computePlywoodSpan({
   let allow_live = branch.live_psf;
   let allow_total = branch.total_psf;
   if (branch.live_by_spacing) {
-    const col = Object.keys(branch.live_by_spacing).map(Number).sort((a, b) => a - b).find((c) => c >= support_spacing_in);
+    const col = Object.keys(branch.live_by_spacing).map(Number).sort((a, b) => a - b).find((c) => c >= support_spacing_in - 1e-9 * Math.abs(support_spacing_in));
     if (col !== undefined) { allow_live = branch.live_by_spacing[col]; allow_total = allow_live + 10; }
   }
   let live_pass = true;
@@ -3456,7 +3456,7 @@ function _v15cLedgerSpacing(joist_ft, load_psf) {
   if (col < 0 || load_psf > 70) return null;
   const L = Math.max(load_psf, 40);
   const lo = [40, 50, 60, 70].filter((x) => x <= L).pop();
-  const hi = [40, 50, 60, 70].find((x) => x >= L);
+  const hi = [40, 50, 60, 70].find((x) => x >= L - 1e-9 * Math.abs(L));
   const a = _V15C_LEDGER_BY_LOAD[lo][col], b = _V15C_LEDGER_BY_LOAD[hi][col];
   return Math.floor((hi === lo ? a : a + (b - a) * (L - lo) / (hi - lo)) + 1e-9);
 }

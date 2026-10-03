@@ -3694,10 +3694,10 @@ test("monotonicity: computeShortCircuitPP I_sca_panel_A is strictly decreasing i
   assert.equal(zero.M_factor, 1);
   assert.ok(Math.abs(zero.I_sca_panel_A - zero.I_sca_secondary_A) < 1e-9,
     `at L=0: panel = ${zero.I_sca_panel_A} != secondary = ${zero.I_sca_secondary_A}`);
-  // Secondary fault current closed-form pin: I = (kVA * 1000) / (V * 1.732 * Z)
+  // Secondary fault current closed-form pin: I = (kVA * 1000) / (V * 1.732 * 0.9 * Z)
   // using the bundled three-phase factor (the codebase uses the rounded
   // 1.732 constant for Bussmann point-to-point per spec convention).
-  const expectedI = (1500 * 1000) / (480 * 1.732 * 0.0575);
+  const expectedI = (1500 * 1000) / (480 * 1.732 * 0.9 * 0.0575);
   assert.ok(Math.abs(zero.I_sca_secondary_A - expectedI) < 1e-6,
     `I_sca_secondary = ${zero.I_sca_secondary_A}, expected ${expectedI}`);
 });
@@ -10786,7 +10786,7 @@ import { computeDuctLeakage } from "../../calc-hvac.js";
 import { computeDemoDebris } from "../../calc-construction.js";
 import { computeFallProtectionClearance } from "../../calc-cross.js";
 
-test("monotonicity: computeGroundingElectrodeResistance resistance_ohms strictly proportional to soil_resistivity (2x rho -> 2x R, Dwight 1936 linear pin) and strictly decreasing in rod_length_ft (longer driven rod -> lower resistance); ufer (concrete-encased, halved) < driven_rod at identical geometry; meets_25_ohm / supplemental_count_to_25_ohm threshold pin; bad rho / type / length -> error", () => {
+test("monotonicity: computeGroundingElectrodeResistance resistance_ohms strictly proportional to soil_resistivity (2x rho -> 2x R, Dwight 1936 linear pin) and strictly decreasing in rod_length_ft (longer driven rod -> lower resistance); ufer (concrete-encased, wider effective diameter) < driven_rod at identical geometry; meets_25_ohm / supplemental_count_to_25_ohm threshold pin; bad rho / type / length -> error", () => {
   // Group A. R = (rho / (2*pi*L_cm)) * (ln(8*L_cm/d_cm) - 1). Linear in rho.
   const geom = { electrode_type: "driven_rod", rod_diameter_in: 0.625, rod_length_ft: 8 };
   const r10k = computeGroundingElectrodeResistance({ ...geom, soil_resistivity_ohm_cm: 10000 });
@@ -10805,7 +10805,7 @@ test("monotonicity: computeGroundingElectrodeResistance resistance_ohms strictly
       `R at L=${rod_length_ft} = ${r.resistance_ohms} not less than prev=${prev}`);
     prev = r.resistance_ohms;
   }
-  // Ufer (concrete-encased, effective concrete diameter then halved) < bare driven rod.
+  // Ufer (concrete-encased, effective concrete diameter) < bare driven rod.
   const ufer = computeGroundingElectrodeResistance({ electrode_type: "ufer", rod_diameter_in: 0.625, rod_length_ft: 8, soil_resistivity_ohm_cm: 10000 });
   assert.ok(ufer.resistance_ohms < r10k.resistance_ohms,
     `ufer ${ufer.resistance_ohms} should be below driven_rod ${r10k.resistance_ohms}`);

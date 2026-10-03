@@ -8866,9 +8866,9 @@
    "source_publisher": "NEMA / Bussmann (Cooper)",
    "source_title": "Point-to-point short-circuit current at a downstream panel via the M-factor over cable C-value",
    "source_edition_or_year": "Bussmann Selecting Protective Devices (point-to-point method); IEEE 1584 reference",
-   "source_section_or_page": "1500 kVA / 5.75 %Z / 480 V three-phase utility -> 31,379 A at the secondary; 100 ft cable (C=22,185) -> 20,776 A at the downstream panel",
+   "source_section_or_page": "1500 kVA / 5.75 %Z / 480 V three-phase utility with the method's 0.9 x %Z worst-case impedance (multiplier 100 / (0.9 x 5.75)) -> 34,865 A at the secondary; 100 ft cable (C=22,185) -> 22,249 A at the downstream panel",
    "verified_by": "rl",
-   "verified_on": "2026-05-11",
+   "verified_on": "2026-10-03",
    "inputs": {
     "utility_kVA": 1500,
     "utility_Z_pct": 5.75,
@@ -8880,13 +8880,13 @@
    },
    "outputs": {
     "I_sca_secondary_A": {
-     "value": 31379,
+     "value": 34865,
      "tolerance": {
       "abs": 5
      }
     },
     "I_sca_panel_A": {
-     "value": 20776,
+     "value": 22249,
      "tolerance": {
       "abs": 5
      }
@@ -96468,11 +96468,11 @@
   {
    "tile_id": "hearing-protector-nrr",
    "source_publisher": "Occupational Safety and Health Administration / NIOSH",
-   "source_title": "An NRR 29 pre-molded earplug on a 98 dBA job credits 8.7 dB, not 29 (spec-v1166)",
+   "source_title": "An NRR 29 pre-molded earplug on a 98 dBA job credits 1.7 dB, not 29 (spec-v1166)",
    "source_edition_or_year": "29 CFR 1910.95 Appendix B; NIOSH Criteria for a Recommended Standard, Occupational Noise Exposure (1998)",
-   "source_section_or_page": "NIOSH derates the labelled NRR by protector type: 'all other earplugs -- subtract 70% from the manufacturers labeled NRR.' A pre-molded (not foam: foam is a slow-recovery formable plug, less 50%) earplug labelled 29 therefore credits 29 x 0.30 = 8.7 dB, leaving 89.3 dB at the ear on a 98 dBA shift -- over an 85 dB target by 4.3 dB, where the package number would have suggested 69. This tile does not also take OSHA Appendix B 7 dB spectral adjustment on top of the NIOSH factor, on the stated reading that the NIOSH derating IS the real-world adjustment. Reaching 85 dB by this method would take an NRR of about 43, which no product provides.",
+   "source_section_or_page": "NIOSH derates the labelled NRR by protector type: 'all other earplugs -- subtract 70% from the manufacturers labeled NRR.' A pre-molded (not foam: foam is a slow-recovery formable plug, less 50%) earplug labelled 29 therefore derates to 29 x 0.30 = 8.7 dB, and on an A-weighted exposure NIOSH subtracts 'derated NRRs minus 7 dB', so it credits 1.7 dB and leaves 96.3 dB at the ear on a 98 dBA shift -- over an 85 dB target by 11.3 dB, where the package number would have suggested 69. Reaching 85 dB by this method would take an NRR of about 67, which no product provides.",
    "verified_by": "rl",
-   "verified_on": "2026-07-28",
+   "verified_on": "2026-10-03",
    "inputs": {
     "twa_db": 98,
     "weighting": "A",
@@ -96490,25 +96490,25 @@
      }
     },
     "effective_attenuation_db": {
-     "value": 8.7,
+     "value": 1.7,
      "tolerance": {
       "abs": 0.0001
      }
     },
     "protected_twa_db": {
-     "value": 89.3,
+     "value": 96.3,
      "tolerance": {
       "abs": 0.0001
      }
     },
     "label_vs_real_db": {
-     "value": 20.3,
+     "value": 27.3,
      "tolerance": {
       "abs": 0.0001
      }
     },
     "spectral_adjustment_db": {
-     "value": 0,
+     "value": 7,
      "tolerance": {
       "abs": 0
      }

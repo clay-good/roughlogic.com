@@ -632,7 +632,7 @@ export function computeWaterServicePressureCheck({ static_pressure_psi = 0, min_
   // 2026-10-03 one below 80 psi was ignored and the system read OPEN.
   const delivered = setpoint_entered ? set : p;
   const headroom_psi = delivered - minFix;
-  const fixture_ok = headroom_psi >= 0 - 1e-9 * Math.abs(0);
+  const fixture_ok = headroom_psi >= -1e-9 * Math.abs(minFix);
 
   // The closed system: a PRV, a check valve, or a backflow preventer all close it.
   const closed_system = prv_required || setpoint_entered || otherClosure;

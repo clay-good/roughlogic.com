@@ -276,8 +276,8 @@ test("grounding-electrode: Ufer is ~half of equivalent rod in the same soil", ()
   const rod = computeGroundingElectrodeResistance({ electrode_type: "driven_rod", soil_resistivity_ohm_cm: 10000, rod_diameter_in: 0.625, rod_length_ft: 8 });
   const ufer = computeGroundingElectrodeResistance({ electrode_type: "ufer", soil_resistivity_ohm_cm: 10000, rod_diameter_in: 0.625, rod_length_ft: 8, ufer_concrete_diameter_in: 6 });
   // Ufer is rod-with-bigger-effective-diameter (so lower resistance even pre-0.5)
-  // then halved. So well under half of bare rod.
-  assert.ok(ufer.resistance_ohms < rod.resistance_ohms * 0.6);
+  // so it reads below the bare rod.
+  assert.ok(ufer.resistance_ohms < rod.resistance_ohms);
   assert.ok(ufer.warnings.some((w) => /Ufer resistance computed as a rod/.test(w)));
 });
 

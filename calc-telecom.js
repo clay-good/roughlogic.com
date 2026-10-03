@@ -312,7 +312,7 @@ export function computeFiberStrandCountPlanning({ living_units = 0, split_ratio 
   if (![lower_material_cost_per_ft, selected_material_cost_per_ft, placement_cost_per_ft].every((v) => v >= 0)) return { error: "Entered costs cannot be negative." };
   const standards = _parseStandardCounts(standard_counts);
   if (standards.length === 0) return { error: "Enter at least one positive standard cable count." };
-  const roundUp = (required) => standards.find((count) => count >= required) ?? null;
+  const roundUp = (required) => standards.find((count) => count >= required - 1e-9 * Math.abs(required)) ?? null;
   const feeder_fibers_required = Math.ceil(living_units / split_ratio - 1e-9);
   const feeder_with_spare = Math.ceil(feeder_fibers_required * (1 + spare_pct / 100) - 1e-9);
   const standard_without_spare = roundUp(feeder_fibers_required);

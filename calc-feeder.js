@@ -470,7 +470,7 @@ export function computeExistingLoad22087({ recorded_peak_a = 0, new_load_a = 0, 
   const basis_a = 1.25 * peak;
   const total_a = basis_a + nl;
   const headroom_a = rating - total_a;
-  const fits = headroom_a >= 0 - 1e-9 * Math.abs(0) && !pv_or_peakshave;
+  const fits = headroom_a >= -1e-9 * Math.abs(rating) && !pv_or_peakshave;
   if (![basis_a, total_a, headroom_a].every(Number.isFinite)) return { error: "Existing-load math is not a finite value." };
   return {
     basis_a, total_a, headroom_a, fits, pv_or_peakshave: !!pv_or_peakshave,

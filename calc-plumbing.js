@@ -1093,7 +1093,7 @@ export function computeGreaseTrap({ peak_flow_gpm = 0, retention_minutes = 30, l
   const standardSizes = [20, 35, 50, 75, 100, 150, 200, 300, 500, 750, 1000, 1500, 2000, 3000];
   const largest = standardSizes[standardSizes.length - 1];
   const exceeds_standard = volume_gal > largest + 1e-9 * Math.abs(largest);
-  const recommended = standardSizes.find((s) => s >= volume_gal) || largest;
+  const recommended = standardSizes.find((s) => s >= volume_gal - 1e-9 * Math.abs(volume_gal)) || largest;
   return { volume_gal, recommended_nominal_gal: recommended, exceeds_standard };
 }
 
@@ -2465,7 +2465,7 @@ export function computeWhExpansionTank({
   const expansion_factor = (rho_cold - rho_hot) / rho_hot;
   const v_expansion_gal = vol * expansion_factor;
   const v_tank_gal = v_expansion_gal / af;
-  const recommended_gal = EXPANSION_TANK_SIZES_GAL.find((s) => s >= v_tank_gal) ?? EXPANSION_TANK_SIZES_GAL[EXPANSION_TANK_SIZES_GAL.length - 1];
+  const recommended_gal = EXPANSION_TANK_SIZES_GAL.find((s) => s >= v_tank_gal - 1e-9 * Math.abs(v_tank_gal)) ?? EXPANSION_TANK_SIZES_GAL[EXPANSION_TANK_SIZES_GAL.length - 1];
 
   const warnings = [];
   if (Pi > 80) warnings.push("Incoming pressure above 80 psi requires a pressure-reducing valve (IPC 604.8); a PRV creates a closed system that mandates this tank.");

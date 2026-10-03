@@ -818,7 +818,7 @@ export function computeEqualSpacing({ run_in = 0, item_width_in = 0, mode = "max
     if (!(N >= 0)) N = 0;
   }
   const gap_in = (run - N * w) / (N + 1);
-  const fits = gap_in >= 0 - 1e-9 * Math.abs(0);
+  const fits = gap_in >= -1e-9 * Math.abs(run);
   const center_to_center_in = gap_in + w; // for w = 0 (marks) this equals the gap
   const span_used_in = N * w + (N + 1) * Math.max(gap_in, 0);
   // Item-center (or division-point) positions from the start of the run.

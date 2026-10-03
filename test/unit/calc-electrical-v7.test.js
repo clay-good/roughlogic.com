@@ -84,10 +84,10 @@ test("235 example yields finite outputs", () => {
   assert.ok(r.I_sca_panel_A < r.I_sca_secondary_A);
 });
 
-test("235 I_sca_secondary = (kVA × 1000) / (V × √3 × Z%)", () => {
-  // Bussmann canonical: 1500 kVA, 5.75 %Z, 480V three-phase → I_sca_sec ≈ 31370 A
+test("235 I_sca_secondary = (kVA × 1000) / (V × √3 × 0.9 × Z%)", () => {
+  // Bussmann canonical: 1500 kVA, 5.75 %Z (x 0.9 worst case), 480V three-phase → I_sca_sec ≈ 34865 A
   const r = computeShortCircuitPP({ utility_kVA: 1500, utility_Z_pct: 5.75, secondary_V: 480, phase: "three", C_value: 22185, length_ft: 0, parallel_sets: 1 });
-  const expected = (1500 * 1000) / (480 * Math.sqrt(3) * 0.0575);
+  const expected = (1500 * 1000) / (480 * 1.732 * 0.9 * 0.0575);
   assert.ok(close(r.I_sca_secondary_A, expected, 1));
 });
 

@@ -251,7 +251,7 @@ export function computeLoopVoltageBudget({ supply_v = 24, transmitter_min_v = 10
   const voltage_at_transmitter_v = supply_v - I_MAX * total_series_ohms;
   const margin_v = voltage_at_transmitter_v - transmitter_min_v;
   const headroom_ohms = max_loop_resistance_ohms - total_series_ohms;
-  const within_spec = margin_v >= 0 - 1e-9 * Math.abs(0);
+  const within_spec = margin_v >= -1e-9 * Math.abs(transmitter_min_v);
   if (![max_loop_resistance_ohms, voltage_at_transmitter_v, margin_v].every(Number.isFinite)) return { error: "Loop-budget math is not a finite value." };
   return {
     max_loop_resistance_ohms,

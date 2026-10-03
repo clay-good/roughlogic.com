@@ -309,7 +309,7 @@ export function computeBatteryInverterDcConductor({ inverter_power_w = 4000, bat
   const dc_current_a = inverter_power_w / (battery_voltage_v * (efficiency_pct / 100));
   // NEC 690.8(B)/706/240.4: conductor and OCPD at 125% of the continuous current.
   const min_conductor_ampacity_a = 1.25 * dc_current_a;
-  const ocpd_a = _V941_STD_OCPD.find((s) => s >= min_conductor_ampacity_a) || Math.ceil(min_conductor_ampacity_a - 1e-9);
+  const ocpd_a = _V941_STD_OCPD.find((s) => s >= min_conductor_ampacity_a - 1e-9 * Math.abs(min_conductor_ampacity_a)) || Math.ceil(min_conductor_ampacity_a - 1e-9);
   if (![dc_current_a, min_conductor_ampacity_a, ocpd_a].every(Number.isFinite)) return { error: "Battery-conductor math is not a finite value." };
   return {
     dc_current_a,
@@ -358,7 +358,7 @@ export function computePvAcOutputCircuit({ ac_power_w = 9600, ac_voltage_v = 240
   const continuous_current_a = ac_power_w / (ac_voltage_v * phase_factor);
   // NEC 690.8(B) / 705.60 / 240.4: conductor and OCPD at 125% of the continuous inverter output current.
   const min_conductor_ampacity_a = 1.25 * continuous_current_a;
-  const ocpd_a = _V941_STD_OCPD.find((s) => s >= min_conductor_ampacity_a) || Math.ceil(min_conductor_ampacity_a - 1e-9);
+  const ocpd_a = _V941_STD_OCPD.find((s) => s >= min_conductor_ampacity_a - 1e-9 * Math.abs(min_conductor_ampacity_a)) || Math.ceil(min_conductor_ampacity_a - 1e-9);
   if (![continuous_current_a, min_conductor_ampacity_a, ocpd_a].every(Number.isFinite)) return { error: "AC-output math is not a finite value." };
   return {
     continuous_current_a,
@@ -551,10 +551,11 @@ export function computeConduitNipple60Fill({ conduit_area_sqin = 0.864, conducto
   const nipple_max_conductors = note7(0.60 * conduit_area_sqin / conductor_area_sqin);
   const normal_max_conductors = note7(0.40 * conduit_area_sqin / conductor_area_sqin);
   if (![fill_area_sqin, fill_pct, nipple_max_conductors, normal_max_conductors].every(Number.isFinite)) return { error: "Nipple-fill math is not a finite value." };
-  const nipple_ok = fill_pct <= 60 + 1e-9 * Math.abs(60);
+  // The verdicts use the Note 7 counts, so a count the rounded-up maximum allows passes.
+  const nipple_ok = fill_pct <= 60 + 1e-9 * Math.abs(60) || conductor_count <= nipple_max_conductors + 1e-9 * nipple_max_conductors;
   // Ch. 9 Table 1: the normal limit is 53% for one conductor, 31% for two, 40% for three or more.
   const normal_limit_pct = conductor_count === 1 ? 53 : conductor_count === 2 ? 31 : 40;
-  const passes_normal = fill_pct <= normal_limit_pct + 1e-9 * Math.abs(normal_limit_pct);
+  const passes_normal = fill_pct <= normal_limit_pct + 1e-9 * Math.abs(normal_limit_pct) || (conductor_count > 2 && conductor_count <= normal_max_conductors + 1e-9 * normal_max_conductors);
   const verdict = !nipple_ok
     ? "OVER 60%: too full even for a nipple -- go up a conduit size."
     : passes_normal

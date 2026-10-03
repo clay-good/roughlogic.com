@@ -774,7 +774,7 @@ export function computeFireplaceFlueArea({ opening_width_in = 0, opening_height_
   const required_area_sqin = opening_area_sqin / divisor;
   const actual_area_sqin = round ? Math.PI * dia * dia / 4 : a * b;
   const surplus_sqin = actual_area_sqin - required_area_sqin;
-  const adequate = surplus_sqin >= 0 - 1e-9 * Math.abs(0);
+  const adequate = surplus_sqin >= -1e-9 * Math.abs(required_area_sqin);
   const ratio_actual = actual_area_sqin > 0 ? opening_area_sqin / actual_area_sqin : null;
   // The smallest liner of each shape that would satisfy this opening, so an undersized flue
   // comes with the size to order rather than just a failure.

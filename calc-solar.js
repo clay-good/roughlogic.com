@@ -506,7 +506,7 @@ export function computeEvChargerLoad({
 
   const warnings = [];
   const continuous_circuit_a = ch * 1.25; // NEC 625.41 / 625.42 continuous load
-  const recommended_breaker_a = _EV_BREAKER_SIZES.find((s) => s >= continuous_circuit_a) ?? continuous_circuit_a;
+  const recommended_breaker_a = _EV_BREAKER_SIZES.find((s) => s >= continuous_circuit_a - 1e-9 * Math.abs(continuous_circuit_a)) ?? continuous_circuit_a;
 
   // First-principles conductor pick: smallest copper AWG whose 75 C ampacity
   // covers the continuous circuit ampacity.

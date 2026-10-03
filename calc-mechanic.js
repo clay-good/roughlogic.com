@@ -3387,7 +3387,7 @@ export function computeAbycDcWire({ current_a = 0, run_length_ft = 0, system_vol
   if (!(dp > 0 && dp <= 100)) return { error: "Allowable drop must be over 0 and at most 100 percent." };
   const v_drop_v = dp / 100 * v;
   const circular_mils = 10.75 * i * (2 * len) / v_drop_v;
-  const pick = _AWG_CIRCULAR_MILS.find((a) => a.cm >= circular_mils);
+  const pick = _AWG_CIRCULAR_MILS.find((a) => a.cm >= circular_mils - 1e-9 * Math.abs(circular_mils));
   const awg = pick ? pick.awg : null;
   if (![v_drop_v, circular_mils].every(Number.isFinite)) return { error: "ABYC wire-size math is not a finite value." };
   return {
@@ -4385,7 +4385,7 @@ export function computeAdhesiveBondArea({ bond_length_in = 0, bond_width_in = 0,
   const has_required = required_load_lb > 0;
   const margin_lb = capacity_lb - required_load_lb;
   const length_for_required_in = has_required ? required_load_lb / (bond_width_in * shear_strength_psi) : 0;
-  const adequate = margin_lb >= 0 - 1e-9 * Math.abs(0);
+  const adequate = margin_lb >= -1e-9 * Math.abs(required_load_lb);
   const required_verdict = !has_required
     ? "(no required capacity entered)"
     : adequate

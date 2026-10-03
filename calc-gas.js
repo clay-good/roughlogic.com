@@ -219,6 +219,9 @@ export function computeGasLeakRate({ orifice_diameter_in, upstream_psi, gas, c =
   const d = Number(orifice_diameter_in) || 0;
   const dP = Number(upstream_psi) || 0;
   if (d <= 0 || dP <= 0) return { error: "Provide positive orifice diameter and pressure." };
+  // The equation holds gas density at its standard value; gas density rises with line pressure,
+  // so the leak is understated more at higher pressure. Until 2026-10-03 any pressure was accepted.
+  if (dP > 5) return { error: "Above 5 psig the incompressible orifice equation under-reads the leak by more than about 15% (and chokes near 13 psig); this low-pressure estimate does not apply." };
   const A = Math.PI * (d / 2) ** 2;
   const Q = _ORIFICE_CFH_K * c * A * Math.sqrt(dP / props.specific_gravity);
   return {
@@ -278,6 +281,7 @@ export function computeGasLeakHoleDiameter({ leak_rate_cfh, upstream_psi, gas, c
   const cd = Number(c) || 0;
   if (!(Q > 0)) return { error: "Provide a positive leak rate (cfh)." };
   if (!(dP > 0)) return { error: "Provide a positive upstream pressure (psi)." };
+  if (dP > 5) return { error: "Above 5 psig the incompressible orifice equation under-reads the leak by more than about 15% (and chokes near 13 psig); this low-pressure estimate does not apply." };
   if (!(cd > 0)) return { error: "Discharge coefficient must be positive." };
   const orifice_area_in2 = Q / (_ORIFICE_CFH_K * cd * Math.sqrt(dP / props.specific_gravity));
   const orifice_diameter_in = Math.sqrt(4 * orifice_area_in2 / Math.PI);

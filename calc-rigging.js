@@ -191,7 +191,7 @@ export function computeCraneGroundBearing({ reaction_lb, bearing_area_ft2, allow
   return {
     gbp_psf: gbp,
     pass: gbp <= allowable + 1e-9 * Math.abs(allowable),
-    verdict: gbp <= allowable ? "pass" : "fail - increase the bearing area",
+    verdict: gbp <= allowable + 1e-9 * Math.abs(allowable) ? "pass" : "fail - increase the bearing area",
     required_ft2: requiredFt2,
     mat_side_ft: matSideFt,
     note: "The maximum reaction comes from the manufacturer's outrigger-reaction chart for the lift quadrant, not the static average - the heaviest corner is during the swing. Allowable soil bearing must come from a geotechnical source; \"looks solid\" is not a number. Voids, backfill, frost, slopes, and adjacent excavations all reduce capacity, and a qualified person verifies the setup.",
@@ -472,6 +472,8 @@ export function computeTandemLiftShare({ total_weight_lb, span_in, cg_from_c1_in
   if (!Number.isFinite(w) || w <= 0) return { error: "Total weight must be a positive finite number (lb)." };
   if (!Number.isFinite(span) || span <= 0) return { error: "Span must be a positive finite number (in)." };
   if (!Number.isFinite(cg)) return { error: "CG distance must be a finite number (in)." };
+  // A CG outside the two picks puts one crane in negative load: the load tips, and no share is valid.
+  if (cg < 0 || cg > span) return { error: "The CG must lie between the two pick points (0 to the span); outside them the load tips." };
   if (!Number.isFinite(derate) || derate <= 0) return { error: "Derate must be a positive finite number (percent)." };
   if (!Number.isFinite(c1) || c1 <= 0) return { error: "Crane 1 capacity must be a positive finite number (lb)." };
   if (!Number.isFinite(c2) || c2 <= 0) return { error: "Crane 2 capacity must be a positive finite number (lb)." };
@@ -480,8 +482,8 @@ export function computeTandemLiftShare({ total_weight_lb, span_in, cg_from_c1_in
   const allowC1 = c1 * derate / 100;
   const allowC2 = c2 * derate / 100;
   if (![shareC1, shareC2, allowC1, allowC2].every(Number.isFinite)) return { error: "Tandem-share math is not a finite value." };
-  const passC1 = shareC1 <= allowC1;
-  const passC2 = shareC2 <= allowC2;
+  const passC1 = shareC1 <= allowC1 + 1e-9 * Math.abs(allowC1);
+  const passC2 = shareC2 <= allowC2 + 1e-9 * Math.abs(allowC2);
   return {
     share_c1: shareC1,
     share_c2: shareC2,
@@ -578,7 +580,7 @@ export function computeShackleEyeboltWll({ leg_load_lb, rated_wll_lb, angle_deg 
     mbs_lb: mbs,
     hardware: hardware === "shoulder_eyebolt" ? "shoulder eye bolt" : "shackle",
     pass: deratedCapacity >= leg - 1e-9 * Math.abs(leg),
-    verdict: deratedCapacity >= leg ? "pass" : "fail - hardware undersized at this angle",
+    verdict: deratedCapacity >= leg - 1e-9 * Math.abs(leg) ? "pass" : "fail - hardware undersized at this angle",
     note: "Shackles are loaded in line through the bow and pin; a side load follows the manufacturer's reduced chart. A shoulder eye bolt keeps 30% of its rating at 45 degrees and 25% at 90 (Crosby's chart), and an angular pull on a plain (non-shoulder) eye bolt is not permitted. The 5:1 design factor is on the WLL, not a license to load to the minimum breaking strength. Inspect every piece; the manufacturer's exact chart governs.",
   };
 }
@@ -638,6 +640,7 @@ export function computeSpreaderBeam({ load_lb, bar_length_ft, top_height_ft } = 
     bar_compression_lb: barCompression,
     beam_moment_ftlb: beamMoment,
     headroom_ft: top,
+    below_30_deg: slingAngleDeg < 30 - 1e-9,
     note: "A spreader bar keeps the slings off the load and carries axial compression - check it for buckling, not just stress. A lifting beam needs more headroom but lets the slings hang vertical. Both are engineered below-the-hook devices marked with a rated capacity; ASME BTH-1 / B30.20 and the rating plate govern. This tile sizes the demand, not the device.",
   };
 }
@@ -657,7 +660,7 @@ function renderSpreaderBeam(inputRegion, outputRegion, citationEl) {
   const update = debounce(() => {
     const r = computeSpreaderBeam({ load_lb: Number(load.input.value) || 0, bar_length_ft: Number(bar.input.value) || 0, top_height_ft: Number(top.input.value) || 0 });
     if (r.error) { oAngle.textContent = r.error; for (const o of [oTop, oBar, oMoment, oHead]) o.textContent = "-"; return; }
-    oAngle.textContent = fmt(r.sling_angle_deg, 1) + " deg";
+    oAngle.textContent = fmt(r.sling_angle_deg, 1) + " deg" + (r.below_30_deg ? " -- BELOW 30 deg: ASME B30.9 does not permit it without a qualified person's approval" : "");
     oTop.textContent = fmt(r.top_sling_tension_lb, 0) + " lb";
     oBar.textContent = fmt(r.bar_compression_lb, 0) + " lb";
     oMoment.textContent = fmt(r.beam_moment_ftlb, 0) + " ft-lb";
@@ -673,7 +676,7 @@ RIGGING_RENDERERS["spreader-beam"] = renderSpreaderBeam;
 // top_sling_tension = (load/2) / sin(angle) and angle = atan(top / (bar/2)),
 // angle_min = asin( load / (2 x WLL) ) and top_min = (bar/2) x tan(angle_min). Only solvable when WLL > load/2, since
 // each top sling carries at least half the load even hung vertical.
-// dims: in { load_lb: M L T^-2, bar_length_ft: L, sling_wll_lb: M L T^-2 } out: { min_top_height_ft: L, sling_angle_deg: dimensionless, bar_compression_lb: M L T^-2 }
+// dims: in { load_lb: M L T^-2, bar_length_ft: L, sling_wll_lb: M L T^-2 } out: { min_top_height_ft: L, sling_angle_deg: dimensionless, bar_compression_lb: M L T^-2, angle_floor_governs: dimensionless }
 export function computeSpreaderBeamMinHeight({ load_lb, bar_length_ft, sling_wll_lb } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const load = Number(load_lb);
@@ -684,14 +687,19 @@ export function computeSpreaderBeamMinHeight({ load_lb, bar_length_ft, sling_wll
   if (!Number.isFinite(wll) || wll <= 0) return { error: "Sling WLL must be a positive finite number (lb)." };
   const ratio = load / (2 * wll);
   if (!(ratio < 1)) return { error: "Sling WLL must exceed half the load (each top sling carries at least W/2 even hung vertical)." };
-  const angleRad = Math.asin(ratio);
+  // ASME B30.9 does not permit horizontal sling angles below 30 deg without a qualified person's
+  // approval, so the WLL height is floored at the 30 deg height. Until 2026-10-03 a strong sling
+  // could report a "minimum" at 14.5 deg.
+  const wllAngleRad = Math.asin(ratio);
+  const angle_floor_governs = wllAngleRad < Math.PI / 6 - 1e-12;
+  const angleRad = angle_floor_governs ? Math.PI / 6 : wllAngleRad;
   const sling_angle_deg = angleRad * 180 / Math.PI;
   const min_top_height_ft = (bar / 2) * Math.tan(angleRad);
   const bar_compression_lb = (load / 2) / Math.tan(angleRad);
   if (![sling_angle_deg, min_top_height_ft, bar_compression_lb].every(Number.isFinite)) return { error: "Min-height math is not a finite value." };
   return {
-    min_top_height_ft, sling_angle_deg, bar_compression_lb,
-    note: "Minimum top-point height so the top-sling tension stays within the sling WLL: angle = asin( load / (2 x WLL) ), then top = (bar/2) x tan(angle). A taller rig makes a steeper (nearer-vertical) sling that carries less tension, so this is a floor - build to at least this height, and more is safer. Each top sling still carries at least half the load even hung vertical, so the WLL must exceed W/2 or no height works. The spreader bar carries the axial compression shown - check it for buckling. Both spreader bars and lifting beams are engineered below-the-hook devices; ASME BTH-1 / B30.20 and the rating plate govern. This tile sizes the demand, not the device.",
+    min_top_height_ft, sling_angle_deg, bar_compression_lb, angle_floor_governs,
+    note: "Minimum top-point height so the top-sling tension stays within the sling WLL: angle = asin( load / (2 x WLL) ), then top = (bar/2) x tan(angle). A taller rig makes a steeper (nearer-vertical) sling that carries less tension, so this is a floor - build to at least this height, and more is safer. Each top sling still carries at least half the load even hung vertical, so the WLL must exceed W/2 or no height works. Where the sling WLL alone would allow a flatter angle, the height is held at the 30 deg sling angle, the lowest ASME B30.9 permits without a qualified person's approval. The spreader bar carries the axial compression shown - check it for buckling. Both spreader bars and lifting beams are engineered below-the-hook devices; ASME BTH-1 / B30.20 and the rating plate govern. This tile sizes the demand, not the device.",
   };
 }
 function renderSpreaderBeamMinHeight(inputRegion, outputRegion, citationEl) {
@@ -709,7 +717,7 @@ function renderSpreaderBeamMinHeight(inputRegion, outputRegion, citationEl) {
     const r = computeSpreaderBeamMinHeight({ load_lb: Number(load.input.value) || 0, bar_length_ft: Number(bar.input.value) || 0, sling_wll_lb: Number(wll.input.value) || 0 });
     if (r.error) { oHeight.textContent = r.error; for (const o of [oAngle, oBar, oNote]) o.textContent = o === oNote ? "" : "-"; return; }
     oHeight.textContent = fmt(r.min_top_height_ft, 2) + " ft";
-    oAngle.textContent = fmt(r.sling_angle_deg, 1) + " deg";
+    oAngle.textContent = fmt(r.sling_angle_deg, 1) + " deg" + (r.angle_floor_governs ? " (the B30.9 30 deg floor governs, not the sling WLL)" : "");
     oBar.textContent = fmt(r.bar_compression_lb, 0) + " lb";
     oNote.textContent = r.note;
   }, DEBOUNCE_MS);
@@ -741,7 +749,7 @@ export function computeForkliftCapacityDerate({ rated_cap_lb, rated_lc_in = 24, 
     net_capacity_lb: netCapacity,
     margin_pct: marginPct,
     pass: load <= netCapacity + 1e-9 * Math.abs(netCapacity),
-    verdict: load <= netCapacity ? "pass" : "fail - over the derated capacity",
+    verdict: load <= netCapacity + 1e-9 * Math.abs(netCapacity) ? "pass" : "fail - over the derated capacity",
     note: "The truck's capacity plate is the legal rating, and an attachment changes the plate - a derated plate must be fitted by the dealer for any attachment. Raising the load, tilting forward, soft ground, and grade all reduce real capacity further. A load whose CG is beyond the rated load center tips the truck forward before the rear wheels can react.",
   };
 }
@@ -846,7 +854,7 @@ export function computeChainLeverHoist({ load_lb, rated_wll_lb, mech_adv, effici
   if (!Number.isFinite(load) || load <= 0) return { error: "Load must be a positive finite number (lb)." };
   if (!Number.isFinite(rated) || rated <= 0) return { error: "Rated WLL must be a positive finite number (lb)." };
   if (!Number.isFinite(ma) || ma <= 0) return { error: "Mechanical advantage must be a positive finite number." };
-  if (!Number.isFinite(eff) || eff <= 0) return { error: "Efficiency must be a positive finite number." };
+  if (!Number.isFinite(eff) || eff <= 0 || eff > 1) return { error: "Efficiency must be a fraction above 0 and at most 1 (0.85, not 85)." };
   if (!Number.isFinite(lift) || lift < 0) return { error: "Lift distance must be a non-negative finite number (ft)." };
   const handPull = load / (ma * eff);
   const handChainTravel = lift * ma;

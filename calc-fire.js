@@ -566,8 +566,19 @@ export const SPRINKLER_HAZARD_MIN_DENSITY = {
   extra_2: 0.40,
 };
 
+// The NFPA 13 density/area curves start at 1,500 ft^2 for light and ordinary hazard and 2,500 ft^2
+// for extra hazard; a smaller design area is not a curve point. Until 2026-10-03 the tile checked
+// density only and passed 100 ft^2 at ordinary hazard group 2.
+export const SPRINKLER_HAZARD_MIN_AREA_FT2 = {
+  light: 1500,
+  ordinary_1: 1500,
+  ordinary_2: 1500,
+  extra_1: 2500,
+  extra_2: 2500,
+};
+
 // dims: in { area_of_operation_ft2: L^2, density_gpm_per_ft2: L T^-1, hazard_category: dimensionless }
-//        out: { total_gpm: L^3 T^-1, density_gpm_per_ft2: L T^-1, meets_minimum: dimensionless, hazard_minimum_density: L T^-1 }
+//        out: { total_gpm: L^3 T^-1, density_gpm_per_ft2: L T^-1, meets_minimum: dimensionless, hazard_minimum_density: L T^-1, hazard_minimum_area_ft2: L^2 }
 export function computeSprinklerDensity({ area_of_operation_ft2, density_gpm_per_ft2, hazard_category }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const a = Number(area_of_operation_ft2) || 0;
@@ -577,8 +588,10 @@ export function computeSprinklerDensity({ area_of_operation_ft2, density_gpm_per
   if (!(d > 0)) return { error: "Provide density or hazard category." };
   const total_gpm = a * d;
   const minimum_for_hazard = hazard_category ? SPRINKLER_HAZARD_MIN_DENSITY[hazard_category] : null;
-  const meets_minimum = minimum_for_hazard === null ? null : d >= minimum_for_hazard - 1e-9 * Math.abs(minimum_for_hazard);
-  return { total_gpm, density_gpm_per_ft2: d, meets_minimum, hazard_minimum_density: minimum_for_hazard };
+  const minimum_area = hazard_category ? SPRINKLER_HAZARD_MIN_AREA_FT2[hazard_category] : null;
+  const meets_minimum = minimum_for_hazard === null ? null
+    : d >= minimum_for_hazard - 1e-9 * Math.abs(minimum_for_hazard) && a >= minimum_area - 1e-9 * minimum_area;
+  return { total_gpm, density_gpm_per_ft2: d, meets_minimum, hazard_minimum_density: minimum_for_hazard, hazard_minimum_area_ft2: minimum_area };
 }
 
 export const sprinklerDensityExample = {
@@ -738,7 +751,7 @@ export function renderSprinklerDensity(inputRegion, outputRegion, citationEl) {
     });
     if (r.error) { oG.textContent = r.error; oM.textContent = "-"; return; }
     oG.textContent = fmt(r.total_gpm, 1) + " gpm @ " + fmt(r.density_gpm_per_ft2, 2) + " gpm/ft^2";
-    oM.textContent = r.meets_minimum === null ? "n/a" : (r.meets_minimum ? "yes" : "no (" + r.hazard_minimum_density + " gpm/ft^2 minimum)");
+    oM.textContent = r.meets_minimum === null ? "n/a" : (r.meets_minimum ? "yes" : "no (" + r.hazard_minimum_density + " gpm/ft^2 over at least " + r.hazard_minimum_area_ft2 + " ft^2 minimum)");
   }, DEBOUNCE_MS);
   for (const el of [a.input, d.input, cat.select]) el.addEventListener("input", update);
 }

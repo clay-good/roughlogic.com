@@ -345,7 +345,7 @@ export function computeTransformerKFactor({ i1 = 1, i3 = 0, i5 = 0, i7 = 0, i9 =
     den += ih * ih;
   }
   const k_factor = num / den;
-  const recommended_k_rating = _K_RATINGS.find((r) => r >= k_factor) ?? _K_RATINGS[_K_RATINGS.length - 1];
+  const recommended_k_rating = _K_RATINGS.find((r) => r >= k_factor - 1e-9 * Math.abs(k_factor)) ?? _K_RATINGS[_K_RATINGS.length - 1];
   return {
     k_factor,
     recommended_k_rating,

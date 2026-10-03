@@ -2,7 +2,7 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "a8d6789b8e487f4e",
+      "sha": "4d0cbc7b0574fd58",
       "date": "2026-10-03"
     },
     "/tools/": {
@@ -3526,8 +3526,8 @@
       "date": "2026-09-29"
     },
     "/tools/grounding-electrode/": {
-      "sha": "e7067645a705050f",
-      "date": "2026-09-29"
+      "sha": "f411fb0fba377bad",
+      "date": "2026-10-03"
     },
     "/tools/grounding-electrode-conductor/": {
       "sha": "de61d515816b00e1",
@@ -3662,7 +3662,7 @@
       "date": "2026-10-03"
     },
     "/tools/hearing-protector-nrr/": {
-      "sha": "1ca16b9c1087fca9",
+      "sha": "f4af61bcdaf73592",
       "date": "2026-10-03"
     },
     "/tools/heat-pump-cold-capacity/": {
@@ -6918,8 +6918,8 @@
       "date": "2026-09-29"
     },
     "/tools/short-circuit-pp/": {
-      "sha": "05212e88c96951f3",
-      "date": "2026-09-29"
+      "sha": "68102365ff4d7f91",
+      "date": "2026-10-03"
     },
     "/tools/shot-size-residence-time/": {
       "sha": "b9ef857b247d373e",
@@ -7342,12 +7342,12 @@
       "date": "2026-09-29"
     },
     "/tools/spreader-beam/": {
-      "sha": "1d1aa656ba71b608",
-      "date": "2026-09-29"
+      "sha": "8b01104f74f3b3c9",
+      "date": "2026-10-03"
     },
     "/tools/spreader-beam-min-height/": {
-      "sha": "82d3d6df7d0188ba",
-      "date": "2026-09-29"
+      "sha": "82880048e3d8e159",
+      "date": "2026-10-03"
     },
     "/tools/spring-natural-frequency/": {
       "sha": "a4e3a4339ec0f72e",
@@ -7358,7 +7358,7 @@
       "date": "2026-09-29"
     },
     "/tools/sprinkler-density/": {
-      "sha": "90ea9a4b43887cf5",
+      "sha": "3fd4d560deeb4736",
       "date": "2026-10-03"
     },
     "/tools/sprinkler-gpm-for-precip/": {

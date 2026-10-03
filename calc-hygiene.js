@@ -204,7 +204,7 @@ HYGIENE_RENDERERS["dilution-ventilation-solvent"] = _simpleRenderer({
 // =====================================================================
 // spec-v1732: respirator cartridge service life and change schedule.
 // =====================================================================
-// dims: in { estimated_life_hr: T, safety_fraction: dimensionless, shift_hours: T, concentration_ppm: dimensionless, worst_case_ppm: dimensionless, humidity_pct: dimensionless, humidity_derate_above_65: dimensionless } out: { schedule_hr: T, changes_per_shift: dimensionless, worst_case_life_hr: T, worst_case_schedule_hr: T, humidity_adjusted_hr: T }
+// dims: in { estimated_life_hr: T, safety_fraction: dimensionless, shift_hours: T, concentration_ppm: dimensionless, worst_case_ppm: dimensionless, humidity_pct: dimensionless, humidity_derate_above_65: dimensionless } out: { schedule_hr: T, changes_per_shift: dimensionless, worst_case_life_hr: T, worst_case_schedule_hr: T, humidity_adjusted_hr: T, governing_schedule_hr: T, governing_changes_per_shift: dimensionless }
 export function computeRespiratorCartridgeLife({
   estimated_life_hr = 0, safety_fraction = 0.5, shift_hours = 8,
   concentration_ppm = 0, worst_case_ppm = 0, humidity_pct = 50, humidity_derate_above_65 = 0.5,
@@ -231,6 +231,13 @@ export function computeRespiratorCartridgeLife({
     : "at the worst-case " + fmt(worst_case_ppm, 0) + " ppm rather than the typical " + fmt(concentration_ppm, 0) + ", service life falls roughly inversely to " + fmt(worst_case_life_hr, 1) + " hours and the schedule to " + fmt(worst_case_schedule_hr, 1) + ". A SCHEDULE ESTABLISHED FOR THE TYPICAL TASK IS WRONG FOR THE WORST TASK, and the worst task is the one it has to cover";
   const humid = humidity_pct > 65;
   const humidity_adjusted_hr = humid ? worst_case_schedule_hr > 0 ? worst_case_schedule_hr * humidity_derate_above_65 : schedule_hr * humidity_derate_above_65 : (worst_case_schedule_hr > 0 ? worst_case_schedule_hr : schedule_hr);
+  // The schedule that governs is the shortest of the three; the headline must not stop at the typical one.
+  const governing_schedule_hr = humidity_adjusted_hr;
+  const governing_changes_per_shift = Math.ceil(shift_hours / governing_schedule_hr - 1e-9) - 1;
+  const governing_text = governing_schedule_hr < schedule_hr - 1e-9 * schedule_hr
+    ? "; BUT THE GOVERNING SCHEDULE, after the worst case" + (humid ? " and the humidity derate" : "") + ", is " + fmt(governing_schedule_hr, 1) + " hours -- "
+      + (governing_changes_per_shift <= 0 ? "one cartridge still covers the shift" : fmt(governing_changes_per_shift, 0) + " change" + (governing_changes_per_shift > 1 ? "s" : "") + " per shift")
+    : "";
   const humidity_verdict = !humid
     ? "at " + fmt(humidity_pct, 0) + "% relative humidity the cartridge is in its normal range; above roughly 65% the sorbent takes up water and service life falls substantially"
     : "AT " + fmt(humidity_pct, 0) + "% RELATIVE HUMIDITY the sorbent competes with water vapour and service life falls substantially -- at the entered " + fmt(humidity_derate_above_65, 2) + " derate the schedule becomes " + fmt(humidity_adjusted_hr, 1) + " hours. High humidity and high concentration together turn a cartridge that lasted a shift into one that lasts a fraction of one";
@@ -238,7 +245,8 @@ export function computeRespiratorCartridgeLife({
   const model_verdict = "The service life itself comes from the MANUFACTURER'S model or test data for the specific cartridge and contaminant, and is entered here. It depends on the contaminant, the concentration, the work rate, the temperature and the humidity, and no generic figure covers a real combination -- a mixture is harder still, because one contaminant can displace another already adsorbed and release it downstream";
   if (![schedule_hr, changes_per_shift, worst_case_life_hr, worst_case_schedule_hr, humidity_adjusted_hr].every(Number.isFinite)) return { error: "Cartridge life math is not a finite value." };
   return {
-    schedule_hr, changes_per_shift, schedule_verdict,
+    schedule_hr, changes_per_shift, schedule_verdict: schedule_verdict + governing_text,
+    governing_schedule_hr, governing_changes_per_shift,
     has_worst, worst_case_life_hr, worst_case_schedule_hr, worst_verdict,
     humid, humidity_adjusted_hr, humidity_verdict, smell_verdict, model_verdict,
     note: "A respirator cartridge change schedule, which is an estimated service life multiplied by a safety fraction -- commonly a half -- and then checked against the conditions that actually shorten it. The arithmetic is trivial and the discipline is not, because every input moves and the failure is invisible to the person wearing it. SERVICE LIFE IS ROUGHLY INVERSE IN CONCENTRATION, so a schedule set for a typical task is wrong for the worst one. Doubling the concentration roughly halves the life, and the task that drives the schedule is the worst exposure a wearer will see rather than the average across a shift. Humidity is the other large term: above roughly 65 percent the sorbent takes up water in competition with the contaminant and service life falls substantially, so a humid day and a heavy task together turn a cartridge that covered a shift into one that covers a fraction of it. THE SCHEDULE EXISTS BECAUSE THE WEARER CANNOT DETECT BREAKTHROUGH RELIABLY. Changing the cartridge when it starts to smell is not a method: odour thresholds vary widely between people, olfactory fatigue sets in during the exposure itself, several important contaminants have poor warning properties or none, and a wearer with a head cold has no warning at all. Where an end-of-service-life indicator is not fitted, a change schedule based on data is what the standard requires, and 'change it when you notice' is the practice it was written to replace. The estimated life is entered from the manufacturer's model or test data for the specific cartridge and contaminant, because it depends on the contaminant, the concentration, the work rate, the temperature and the humidity together, and no generic figure covers a real combination. A MIXTURE IS HARDER STILL: one contaminant can displace another already adsorbed on the sorbent and release it downstream, so a mixture's behaviour is not the shortest of its components' lives. This computes a schedule from an entered life. It does not estimate service life, select a cartridge or a respirator, determine an assigned protection factor or whether air-purifying respirators are permitted at all (they are not in an oxygen-deficient or IDLH atmosphere), address fit testing, medical evaluation, or the written respiratory protection programme, cover particulate filters, which load differently, or account for storage between uses, during which some cartridges continue to degrade. The manufacturer's service life data, 29 CFR 1910.134, and a certified industrial hygienist govern.",
@@ -283,7 +291,7 @@ export function computeArcRatedClothingSelection({
   const has_system = system_arc_rating_cal_cm2 > 0;
   const margin_cal_cm2 = has_system ? system_arc_rating_cal_cm2 - incident_energy_cal_cm2 : 0;
   const margin_pct = has_system && incident_energy_cal_cm2 > 0 ? margin_cal_cm2 / incident_energy_cal_cm2 * 100 : 0;
-  const adequate = has_system && margin_cal_cm2 >= 0 - 1e-9 * Math.abs(0);
+  const adequate = has_system && margin_cal_cm2 >= -1e-9 * Math.abs(incident_energy_cal_cm2);
   const selection_verdict = !has_system
     ? "the system arc rating must be AT OR ABOVE " + fmt(minimum_rating_cal_cm2, 1) + " cal/cm2. (No system rating entered)"
     : adequate
@@ -449,12 +457,12 @@ export function computeRetrievalWinchForce({
   const governs_text = " (set by the " + (anchorage_governs ? "anchorage" : "winch") + ")";
   const has_rating = has_system || has_anchorage;
   const system_margin_lb = has_rating ? weakest_rating_lb - retrieval_lb : 0;
-  const system_ok = has_rating && system_margin_lb >= 0 - 1e-9 * Math.abs(0);
+  const system_ok = has_rating && system_margin_lb >= -1e-9 * Math.abs(retrieval_lb);
   const system_verdict = !has_rating
     ? "(no system rating entered)"
     : system_ok
       ? "the " + fmt(weakest_rating_lb, 0) + " lb system rating" + governs_text + " covers the free-hanging force with " + fmt(system_margin_lb, 0) + " lb of margin"
-        + (has_entanglement ? ", and " + (weakest_rating_lb >= entangled_lb ? "also covers the entangled case" : "does NOT cover the " + fmt(entangled_lb, 0) + " lb entangled case") : "")
+        + (has_entanglement ? ", and " + (weakest_rating_lb >= entangled_lb - 1e-9 * Math.abs(entangled_lb) ? "also covers the entangled case" : "does NOT cover the " + fmt(entangled_lb, 0) + " lb entangled case") : "")
       : "the " + fmt(weakest_rating_lb, 0) + " lb system rating" + governs_text + " is " + fmt(-system_margin_lb, 0) + " lb SHORT of the free-hanging retrieval force";
   const anchorage_verdict = !has_anchorage
     ? "(no anchorage rating entered -- and THE SYSTEM IS RATED BY ITS WEAKEST ELEMENT)"

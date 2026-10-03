@@ -445,7 +445,7 @@ export function computeStairwellPressurization({ leakage_area_sqft = 0, pressure
   const door_force_lbf = closer_force_lbf + pressure_force_lbf;
   const margin_lbf = force_limit_lbf - door_force_lbf;
   const max_pressure_inwg = (force_limit_lbf - closer_force_lbf) * lever / (5.2 * door_width_ft * door_area_sqft);
-  const verdict = door_force_lbf <= force_limit_lbf
+  const verdict = door_force_lbf <= force_limit_lbf + 1e-9 * Math.abs(force_limit_lbf)
     ? "PASSES the opening-force limit with " + fmt(margin_lbf, 1) + " lbf of margin"
     : "FAILS the opening-force limit by " + fmt(-margin_lbf, 1) + " lbf -- a person cannot reliably open this door";
   if (![airflow_cfm, door_force_lbf, margin_lbf, max_pressure_inwg].every(Number.isFinite)) return { error: "Stairwell-pressurization math is not a finite value." };

@@ -929,7 +929,8 @@ test("bounds: calc-fire computeSprinklerDensity is finite-positive across NFPA 1
     for (const area_of_operation_ft2 of [500, 1500, 5000]) {
       const r = computeSprinklerDensity({ area_of_operation_ft2, density_gpm_per_ft2: 0, hazard_category });
       assertFinitePositive(r.total_gpm, `hazard=${hazard_category} A=${area_of_operation_ft2}`);
-      assert.equal(r.meets_minimum, true, "hazard density should meet its own minimum");
+      const minArea = hazard_category.startsWith("extra") ? 2500 : 1500;
+      assert.equal(r.meets_minimum, area_of_operation_ft2 >= minArea, "hazard density meets its own minimum only over the curve's minimum area");
     }
   }
 });
@@ -9825,8 +9826,8 @@ test("bounds: calc-electrical computeShortCircuitPP pins Bussmann I_sca and M-mu
     utility_kVA: 1500, utility_Z_pct: 5.75, secondary_V: 480, phase: "three",
     C_value: 22185, length_ft: 100, parallel_sets: 1,
   });
-  // I_sca_sec = 1500000 / (480 * 1.732 * 0.0575) ~ 31379 A
-  assert.ok(r.I_sca_secondary_A > 31000 && r.I_sca_secondary_A < 32000);
+  // I_sca_sec = 1500000 / (480 * 1.732 * 0.9 * 0.0575) ~ 34865 A
+  assert.ok(r.I_sca_secondary_A > 34800 && r.I_sca_secondary_A < 34900);
   // M = 1 / (1 + f); I_panel = I_sec * M (panel is downstream so always <= secondary).
   assert.ok(r.I_sca_panel_A < r.I_sca_secondary_A);
   assert.ok(Math.abs(r.M_factor - 1 / (1 + r.f_factor)) < 1e-9);
@@ -36633,8 +36634,8 @@ import { computeHearingProtectorNrr as _v1166 } from "../../calc-safety.js";
 test("bounds: spec-v1166 computeHearingProtectorNrr pins the 7 dB spectral step, the three NIOSH factors, the OSHA halving, the inverse, and error seams", () => {
   const base = { twa_db: 98, weighting: "A", nrr_db: 29, method: "niosh-other", dual_protection: "no", dual_bonus_db: 5, target_db: 85 };
   const r = _v1166(base);
-  assert.ok(Math.abs(r.derated_nrr_db - 8.7) < 1e-9 && Math.abs(r.effective_attenuation_db - 8.7) < 1e-9);
-  assert.ok(Math.abs(r.protected_twa_db - 89.3) < 1e-9 && !r.meets_target && r.spectral_adjustment_db === 0);
+  assert.ok(Math.abs(r.derated_nrr_db - 8.7) < 1e-9 && Math.abs(r.effective_attenuation_db - 1.7) < 1e-9);
+  assert.ok(Math.abs(r.protected_twa_db - 96.3) < 1e-9 && !r.meets_target && r.spectral_adjustment_db === 7);
   // THE 7 dB STEP: dBA takes it, dBC does not, under OSHA's methods.
   const appA = _v1166({ ...base, method: "appendix-b" });
   const appC = _v1166({ ...base, method: "appendix-b", weighting: "C" });
@@ -36645,18 +36646,18 @@ test("bounds: spec-v1166 computeHearingProtectorNrr pins the 7 dB spectral step,
   const osha = _v1166({ ...base, method: "osha-50" });
   assert.ok(osha.effective_attenuation_db === 11 && osha.protected_twa_db === 87 && osha.spectral_adjustment_db === 7);
   assert.ok(_v1166({ ...base, method: "osha-50", weighting: "C" }).effective_attenuation_db === 14.5);
-  // THE THREE NIOSH FACTORS, and none of them takes the 7 as well.
+  // THE THREE NIOSH FACTORS, and a dBA exposure takes the 7 off the derated value (NIOSH 1998).
   for (const [m, keep] of [["niosh-muff", 0.75], ["niosh-formable", 0.5], ["niosh-other", 0.3]]) {
     for (const wgt of ["A", "C"]) {
       const t = _v1166({ ...base, method: m, weighting: wgt });
+      const spec = wgt === "A" ? 7 : 0;
       assert.ok(Math.abs(t.derated_nrr_db - 29 * keep) < 1e-9, "derating wrong for " + m);
-      assert.ok(Math.abs(t.effective_attenuation_db - 29 * keep) < 1e-9, "the 7 must not stack onto " + m);
-      assert.ok(t.spectral_adjustment_db === 0);
+      assert.ok(Math.abs(t.effective_attenuation_db - Math.max(0, 29 * keep - spec)) < 1e-9, "the 7 must come off the derated value for " + m);
+      assert.ok(t.spectral_adjustment_db === spec);
     }
   }
-  // WITHIN each family the ordering is fixed, and BETWEEN them it is not - which is worth pinning,
-  // because the two families cross over. At NRR 20 an A-weighted Appendix B credits 13 dB while
-  // NIOSH earmuffs credit 15; at NRR 29 it is 22 against 21.75. Neither method dominates.
+  // WITHIN each family the ordering is fixed. With the 7 dB taken in both families, Appendix B as
+  // written now credits at least as much as any NIOSH derating at every NRR, on dBA or dBC.
   for (const n of [10, 20, 29, 33]) {
     const muff = _v1166({ ...base, nrr_db: n, method: "niosh-muff" }).effective_attenuation_db;
     const form = _v1166({ ...base, nrr_db: n, method: "niosh-formable" }).effective_attenuation_db;
@@ -36665,9 +36666,8 @@ test("bounds: spec-v1166 computeHearingProtectorNrr pins the 7 dB spectral step,
     const app = _v1166({ ...base, nrr_db: n, method: "appendix-b" }).effective_attenuation_db;
     const half = _v1166({ ...base, nrr_db: n, method: "osha-50" }).effective_attenuation_db;
     assert.ok(app >= half, "OSHA ordering broke at NRR " + n);
+    assert.ok(app >= muff, "Appendix B fell below the NIOSH muff figure at NRR " + n);
   }
-  assert.ok(_v1166({ ...base, nrr_db: 20, method: "niosh-muff" }).effective_attenuation_db > _v1166({ ...base, nrr_db: 20, method: "appendix-b" }).effective_attenuation_db, "at a low NRR the NIOSH muff figure is the more generous one");
-  assert.ok(_v1166({ ...base, nrr_db: 33, method: "appendix-b" }).effective_attenuation_db > _v1166({ ...base, nrr_db: 33, method: "niosh-muff" }).effective_attenuation_db, "at a high NRR it reverses");
   // Attenuation rises with the NRR and the exposure at the ear falls, in every method.
   for (const m of ["appendix-b", "osha-50", "niosh-muff", "niosh-formable", "niosh-other"]) {
     let prev = -1;
@@ -36684,9 +36684,9 @@ test("bounds: spec-v1166 computeHearingProtectorNrr pins the 7 dB spectral step,
   // DUAL PROTECTION adds the editable bonus, and only when it is worn.
   assert.ok(_v1166({ ...base, dual_protection: "no" }).dual_bonus_applied_db === 0);
   assert.ok(_v1166({ ...base, dual_protection: "yes" }).dual_bonus_applied_db === 5);
-  assert.ok(Math.abs(_v1166({ ...base, dual_protection: "yes" }).effective_attenuation_db - 13.7) < 1e-9);
-  assert.ok(Math.abs(_v1166({ ...base, dual_protection: "yes", dual_bonus_db: 0 }).effective_attenuation_db - 8.7) < 1e-9);
-  assert.ok(Math.abs(_v1166({ ...base, dual_protection: "yes", dual_bonus_db: 12 }).effective_attenuation_db - 20.7) < 1e-9);
+  assert.ok(Math.abs(_v1166({ ...base, dual_protection: "yes" }).effective_attenuation_db - 6.7) < 1e-9);
+  assert.ok(Math.abs(_v1166({ ...base, dual_protection: "yes", dual_bonus_db: 0 }).effective_attenuation_db - 1.7) < 1e-9);
+  assert.ok(Math.abs(_v1166({ ...base, dual_protection: "yes", dual_bonus_db: 12 }).effective_attenuation_db - 13.7) < 1e-9);
   // THE INVERSE ROUND-TRIPS: the NRR the tile names must actually reach the target, in every method.
   for (const m of ["appendix-b", "osha-50", "niosh-muff", "niosh-formable", "niosh-other"]) {
     for (const wgt of ["A", "C"]) {
@@ -37294,10 +37294,12 @@ test("bounds: spec-v1174 computeLifelineTension pins the midspan statics, the 1/
   assert.ok(!_v1174({ ...base, sag_ft: 1, workers: 10 }).engineered_governs);
   assert.ok(_v1174({ ...base, sag_ft: 1, workers: 10 }).governing_anchorage_lb === 50000);
   // The safety factor scales the engineered demand exactly and never the prescriptive figure.
-  for (const sf of [1, 2, 3]) {
+  for (const sf of [2, 2.5, 3]) {
     const t = _v1174({ ...base, safety_factor: sf });
     assert.ok(Math.abs(t.anchorage_demand_lb - sf * t.cable_tension_lb) < 1e-9 && t.prescriptive_anchorage_lb === 5000);
   }
+  // 1926.502(d)(8) requires a safety factor of at least two; a lower entry errors.
+  assert.ok("error" in _v1174({ ...base, safety_factor: 1.5 }));
   // Capacity checking is optional and reports null rather than a pass when omitted.
   const noCap = _v1174({ ...base, anchorage_capacity_lb: 0 });
   assert.ok(noCap.anchorage_ok === null && noCap.anchorage_deficit_lb === null);

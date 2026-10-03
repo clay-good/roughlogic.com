@@ -142,8 +142,8 @@ export function computeVoltageDrop({ phase, material, awg, length_ft, current_A,
   const voltage_at_load_V = source_voltage_V > 0 ? source_voltage_V - drop_V : null;
   let flag = null;
   if (percent !== null) {
-    if (percent > 5) flag = "exceeds limit (>5%)";
-    else if (percent > 3) flag = "exceeds advisory (>3%)";
+    if (percent > 5 + 1e-9 * 5) flag = "exceeds limit (>5%)";
+    else if (percent > 3 + 1e-9 * 3) flag = "exceeds advisory (>3%)";
     else flag = "within advisory (≤3%)";
   }
   return { drop_V, percent, voltage_at_load_V, flag };
@@ -215,6 +215,7 @@ export function computeConduitFill({ conduit, trade_size, conductors }) {
     if (!ins) return { error: "Unknown insulation: " + c.insulation };
     const a = ins[c.awg];
     if (a === undefined) return { error: "Unknown size for insulation: " + c.awg };
+    if (Number(c.count) < 0) return { error: "Conductor counts cannot be negative." };
     total += a * (c.count || 1);
     count += (c.count || 1);
   }
@@ -225,7 +226,17 @@ export function computeConduitFill({ conduit, trade_size, conductors }) {
   const threshold = count === 1 ? 53 : count === 2 ? 31 : 40;
   // v8 §C.1: explicit PASS / FAIL flag string + margin so the renderer
   // surfaces a one-line badge before the percent.
-  const pass = fill_percent <= threshold + 1e-9 * Math.abs(threshold);
+  // NEC Ch. 9 Note 7: with three or more conductors all of the same size, a
+  // maximum count whose decimal is 0.8 or larger rounds UP (Annex C: 6 #8 THHN
+  // in 3/4 in EMT is 5.82, so 6 are allowed even though they fill 41.2%).
+  const same_size = conductors.every((c) => c.insulation === conductors[0].insulation && c.awg === conductors[0].awg);
+  let note7_max = null;
+  if (same_size && count >= 3) {
+    const x = (threshold / 100) * conduit_area / (total / count);
+    const w = Math.floor(x + 1e-9);
+    note7_max = x - w >= 0.8 - 1e-9 ? w + 1 : w;
+  }
+  const pass = fill_percent <= threshold + 1e-9 * Math.abs(threshold) || (note7_max !== null && count <= note7_max + 1e-9 * note7_max);
   const margin_pct = threshold - fill_percent;
   const pass_flag = pass ? "PASS" : "FAIL";
   return {
@@ -257,12 +268,13 @@ export function computeBoxFill({ box_volume_in3, conductors_by_size, devices = 0
   for (const [awg, count] of Object.entries(conductors_by_size)) {
     const v = BOX_FILL_PER_CONDUCTOR_IN3[awg];
     if (v === undefined) return { error: "Unknown AWG for box fill: " + awg };
+    if (Number(count) < 0) return { error: "Conductor counts cannot be negative." };
     fill += v * (count || 0);
   }
   const largest = BOX_FILL_PER_CONDUCTOR_IN3[largest_awg_for_clamp_and_device] || 0;
   if (internal_clamps) fill += largest;
   fill += 2 * largest * devices;
-  return { fill_in3: fill, box_volume_in3, pass: fill <= box_volume_in3, free_in3: box_volume_in3 - fill };
+  return { fill_in3: fill, box_volume_in3, pass: fill <= box_volume_in3 + 1e-9 * Math.abs(box_volume_in3), free_in3: box_volume_in3 - fill };
 }
 
 export const boxFillExample = {
@@ -294,7 +306,7 @@ export function computeBreakerSize({ load_A, continuous, load_W = 0, voltage_V =
   const non_continuous_required_A = derived_load_A;
   const required_A = continuous ? continuous_required_A : non_continuous_required_A;
   const standardSizes = [15, 20, 25, 30, 35, 40, 45, 50, 60, 70, 80, 90, 100, 110, 125, 150, 175, 200, 225, 250, 300, 350, 400];
-  const next_A = standardSizes.find((s) => s >= required_A) ?? required_A;
+  const next_A = standardSizes.find((s) => s >= required_A - 1e-9 * Math.abs(required_A)) ?? required_A;
   return {
     required_A, next_standard_A: next_A,
     derived_load_A,
@@ -1005,7 +1017,7 @@ export function computeServiceLoad({
 
   const total_W = general_demand + fixed_demand + range_demand + dryer_demand + hvac_demand;
   const required_A = total_W / 240;
-  const next_standard_A = STANDARD_SERVICE_AMPACITIES.find((s) => s >= required_A) ?? required_A;
+  const next_standard_A = STANDARD_SERVICE_AMPACITIES.find((s) => s >= required_A - 1e-9 * Math.abs(required_A)) ?? required_A;
   return {
     total_demand_W: total_W,
     required_A,
@@ -2134,7 +2146,7 @@ export function computeTransformerKvaSizing({
   const _tk_steps = phase === "three" ? TRANSFORMER_KVA_STEPS : TRANSFORMER_KVA_STEPS_1PH;
   const _tk_max = _tk_steps[_tk_steps.length - 1];
   const exceeds_standard = required_kVA > _tk_max + 1e-9 * Math.abs(_tk_max);
-  const recommended_kVA = _tk_steps.find((s) => s >= required_kVA) ?? _tk_max;
+  const recommended_kVA = _tk_steps.find((s) => s >= required_kVA - 1e-9 * Math.abs(required_kVA)) ?? _tk_max;
   const fla_primary_A = (recommended_kVA * 1000) / (primary_V * sqrt_phases);
   const fla_secondary_A = (recommended_kVA * 1000) / (secondary_V * sqrt_phases);
   return { connected_kVA, required_kVA, recommended_kVA, fla_primary_A, fla_secondary_A, exceeds_standard };
@@ -2149,7 +2161,7 @@ export const transformerKvaSizingExample = {
 
 // --- 235: Short-Circuit Current at Panel (Bussmann Point-to-Point Method) ---
 //
-// I_sca_secondary = (kVA * 1000) / (V * sqrt(phases) * Z_pct/100)
+// I_sca_secondary = (kVA * 1000) / (V * sqrt(phases) * 0.9 * Z_pct/100)
 // f = (1.732 * L * I_sca_sec) / (n * C * V)   for 3-phase
 // f = (2 * L * I_sca_sec) / (n * C * V)       for 1-phase
 // M = 1 / (1 + f)
@@ -2175,7 +2187,10 @@ export function computeShortCircuitPP({
   if (!(length_ft >= 0)) return { error: "Run length must be non-negative." };
   if (!(parallel_sets >= 1)) return { error: "Parallel sets must be >= 1." };
   const sqrt_phases = phase === "three" ? POINT_TO_POINT_SQRT3 : 1;
-  const z_factor = utility_Z_pct / 100;
+  // Bussmann multiplies the nameplate %Z by 0.9 for the worst case, since a transformer's actual
+  // impedance may run below nameplate (UL 1561 +/-10%). Until 2026-10-03 the tile used %Z as-is,
+  // which read the available fault current about 11% low against the 110.9 interrupting rating.
+  const z_factor = 0.9 * utility_Z_pct / 100;
   const I_sca_secondary = (utility_kVA * 1000) / (secondary_V * sqrt_phases * z_factor);
   const num_factor = phase === "three" ? POINT_TO_POINT_SQRT3 : 2;
   const f = (num_factor * length_ft * I_sca_secondary) / (parallel_sets * C_value * secondary_V);
@@ -2268,7 +2283,7 @@ export function computeGeneratorMotorStarting({
   // computeTransformerSize already does with at_cap.
   const _gk_max = GENERATOR_KW_STEPS[GENERATOR_KW_STEPS.length - 1];
   const exceeds_standard = required_kW > _gk_max + 1e-9 * Math.abs(_gk_max);
-  const recommended_kW = GENERATOR_KW_STEPS.find((s) => s >= required_kW) ?? _gk_max;
+  const recommended_kW = GENERATOR_KW_STEPS.find((s) => s >= required_kW - 1e-9 * Math.abs(required_kW)) ?? _gk_max;
   return {
     running_kW, worst_starting_kVA, required_starting_kVA,
     required_kW, recommended_kW, starts_factor: sf, exceeds_standard, generator_xd: xd,
@@ -2345,7 +2360,7 @@ export function computeServiceLoadStandard({
   // computeTransformerSize already does with at_cap.
   const _sa_max = STD_SERVICE_AMPACITIES[STD_SERVICE_AMPACITIES.length - 1];
   const exceeds_standard = required_A > _sa_max + 1e-9 * Math.abs(_sa_max);
-  const recommended_A = STD_SERVICE_AMPACITIES.find((s) => s >= required_A) ?? _sa_max;
+  const recommended_A = STD_SERVICE_AMPACITIES.find((s) => s >= required_A - 1e-9 * Math.abs(required_A)) ?? _sa_max;
   return {
     total_VA, required_A, recommended_A, exceeds_standard,
     breakdown: {
@@ -3124,9 +3139,9 @@ export function computeGroundingElectrodeResistance({
     const d_cm = electrode_type === "ufer" ? Math.max(d_cm_rod, (Number(ufer_concrete_diameter_in) || 6) * 2.54) : d_cm_rod;
     R = (rho / (2 * Math.PI * L_cm)) * (Math.log(8 * L_cm / d_cm) - 1);
     if (electrode_type === "ufer") {
-      // Empirical concrete-encasement reduction (IEEE 142 §4.2.4 typical).
-      R = R * 0.5;
-      warnings.push("Ufer resistance computed as a rod with the concrete-cylinder effective diameter, then halved. The 0.5 factor is a conservative empirical estimate; field megger reading is authoritative.");
+      // The concrete's benefit is the larger effective diameter above. Until 2026-10-03 the result
+      // was also halved, which counted the encasement twice and read optimistic against 25 ohms.
+      warnings.push("Ufer resistance computed as a rod with the concrete-cylinder effective diameter (the concrete's own resistivity is not modeled). Field megger reading is authoritative.");
     }
   } else if (electrode_type === "ring") {
     const D_ft = Number(ring_diameter_ft) || 0;
@@ -3296,8 +3311,8 @@ export function computeVoltageDropReactance({
   const voltage_at_load_v = V - drop_v;
 
   let advisory;
-  if (drop_percent > 5) advisory = "exceeds 5% total (NEC 215.2(A)(1) Note 2 advisory)";
-  else if (drop_percent > 3) advisory = "exceeds 3% branch (NEC 210.19(A) Note 4 advisory)";
+  if (drop_percent > 5 + 1e-9 * 5) advisory = "exceeds 5% total (NEC 215.2(A)(1) Note 2 advisory)";
+  else if (drop_percent > 3 + 1e-9 * 3) advisory = "exceeds 3% branch (NEC 210.19(A) Note 4 advisory)";
   else advisory = "within the 3% branch / 5% total advisory band";
   if (phase === "single") warnings.push("Single-phase 3-wire (120/240 V) drop uses the per-line current; enter the line-to-neutral load current.");
 
@@ -3801,7 +3816,7 @@ export function computeServiceLoadOptional({
   // computeTransformerSize already does with at_cap.
   const _so_max = STD_SERVICE_AMPACITIES[STD_SERVICE_AMPACITIES.length - 1];
   const exceeds_standard = governing_a > _so_max + 1e-9 * Math.abs(_so_max);
-  const recommended_a = STD_SERVICE_AMPACITIES.find((s) => s >= governing_a) ?? _so_max;
+  const recommended_a = STD_SERVICE_AMPACITIES.find((s) => s >= governing_a - 1e-9 * Math.abs(governing_a)) ?? _so_max;
 
   return {
     general_va,
@@ -4343,7 +4358,7 @@ export function computeConduitThermalExpansion({ run_length_ft = 0, temp_change_
   if (!(trigger_in > 0)) return { error: "Trigger length must be positive (in)." };
   // A zero or negative temperature swing yields zero longitudinal expansion to absorb.
   const delta_l_in = Math.max(0, coeff_in_per_in_f * (run_length_ft * 12) * temp_change_f);
-  const fitting_required = delta_l_in >= trigger_in;
+  const fitting_required = delta_l_in >= trigger_in - 1e-9 * trigger_in;
   return {
     delta_l_in, fitting_required,
     note: "delta_L = coefficient x (run-length x 12 in/ft) x temperature swing; the bundled PVC coefficient 3.38e-5 in/in/deg-F is the public physical property underlying NEC Table 352.44. An expansion fitting is required once movement reaches the 1/4-inch trigger, sized for that travel. The AHJ and the conduit manufacturer govern.",
@@ -4834,7 +4849,7 @@ export function computeMotorBranchProtection({ flc_a = 0, device_type = "inverse
   // to a standard rating, the next higher standard size (240.6) is permitted.
   // Fuses carry the extra 240.6(A) ratings; breakers do not.
   const ladder = /fuse/i.test(device_type) ? _STD_FUSE_240_6 : _STD_OCPD_240_6;
-  const next_std = ladder.find((s) => s >= max_ocpd_a);
+  const next_std = ladder.find((s) => s >= max_ocpd_a - 1e-9 * Math.abs(max_ocpd_a));
   const is_standard = ladder.some((s) => Math.abs(s - max_ocpd_a) < 1e-9);
   const max_ocpd_std_a = next_std ?? max_ocpd_a;
   const min_disconnect_a = 1.15 * flc;

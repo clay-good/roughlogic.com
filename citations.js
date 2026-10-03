@@ -1955,7 +1955,7 @@ export const CITATIONS = {
     ],
   },
   "short-circuit-pp": {
-    formula: "I_sca_secondary = (kVA × 1000) / (V × √phases × Z%/100). f = (√3 × L × I_sca) / (n × C × V) for three-phase (use 2 instead of √3 for single-phase). M = 1 / (1 + f). I_sca_panel = I_sca_secondary × M.",
+    formula: "I_sca_secondary = (kVA × 1000) / (V × √phases × 0.9 × Z%/100), the 0.9 being Bussmann's worst-case allowance for the transformer impedance tolerance. f = (√3 × L × I_sca) / (n × C × V) for three-phase (use 2 instead of √3 for single-phase). M = 1 / (1 + f). I_sca_panel = I_sca_secondary × M.",
     edition: "Bussmann Point-to-Point Method (Eaton/Bussmann SPD electrical-safety publication) by name. C-values from Eaton/Bussmann published table.",
     freeAccess: "Bussmann SPD documents free at eaton.com/bussmann-spd. " + NEC_FREE,
     governance: GOVERNANCE.electrical,
@@ -1963,6 +1963,7 @@ export const CITATIONS = {
     assumptions: [
       { name: "C-value table", value: "data/electrical/conductor-c-values.json keyed to conductor class / size / raceway", source: "Eaton/Bussmann SPD" },
       { name: "Three-phase factor", value: "√3 (use 2 for single-phase)", source: "Bussmann SPD" },
+      { name: "Transformer %Z", value: "nameplate x 0.9 (worst-case impedance tolerance); infinite primary source; motor contribution not added", source: "Bussmann SPD point-to-point notes" },
     ],
   },
   "generator-motor-starting": {
@@ -2287,17 +2288,17 @@ export const CITATIONS = {
     ],
   },
   "hearing-protector-nrr": {
-    formula: "C-weighted measurement: attenuation = NRR. A-weighted measurement under OSHA methods: attenuation = NRR - 7. OSHA field guidance halves that adjusted value. NIOSH derating applies to the labelled NRR by protector type - x0.75 earmuffs, x0.50 slow-recovery formable earplugs, x0.30 all other earplugs. Exposure at the ear = TWA - effective attenuation.",
+    formula: "C-weighted measurement: attenuation = NRR. A-weighted measurement under OSHA methods: attenuation = NRR - 7. OSHA field guidance halves that adjusted value. NIOSH derating applies to the labelled NRR by protector type - x0.75 earmuffs, x0.50 slow-recovery formable earplugs, x0.30 all other earplugs - and an A-weighted measurement then takes 7 dB off the derated value. Exposure at the ear = TWA - effective attenuation.",
     edition: "OSHA 29 CFR 1910.95 Appendix B (Methods for Estimating the Adequacy of Hearing Protector Attenuation), a US federal regulation in the public domain; derating factors from NIOSH, Criteria for a Recommended Standard: Occupational Noise Exposure (1998).",
     freeAccess: "29 CFR is published in full at no cost by OSHA and the eCFR; the NIOSH criteria document is published at no cost by CDC/NIOSH.",
     governance: GOVERNANCE.general,
-    editionNote: "The number on the package is never the protection, and Appendix B says why in one step people skip. The NRR comes off a C-WEIGHTED measurement directly, but where the measurement is A-weighted - which is what a dosimeter reports and what everyone actually has - Appendix B directs that you 'subtract 7 dB from the NRR' first, for spectral uncertainty, and then subtract the remainder. That single step is worth 7 dB every time, and measuring in dBC rather than dBA is therefore worth 7 dB of paper protection on the same job. On top of that sits derating, which is NOT Appendix B text and is labelled as such here. The 50% field adjustment is OSHA enforcement guidance rather than regulation. The type-specific factors are NIOSH\'s: earmuffs subtract 25% from the labelled NRR, slow-recovery formable earplugs subtract 50%, and all other earplugs subtract 70%. This tile applies the NIOSH factors to the labelled NRR WITHOUT also taking OSHA\'s 7 dB, on the reading that NIOSH\'s derating is itself the adjustment for real-world performance rather than an addition to OSHA\'s - a stated reading rather than a quoted instruction, and the reason the two families report different spectral terms. The practical consequence is large: an NRR 29 pre-molded earplug on a 98 dBA job credits about 8.7 dB under NIOSH and leaves 89.3 dB at the ear, where the package number would have suggested 69. The dual-protection bonus is an editable input defaulted to the 5 dB commonly applied under OSHA Technical Manual guidance; NIOSH recommends double protection above a 100 dBA TWA without quantifying the gain, and two protectors never add their ratings because the second is working against sound arriving by bone conduction and around the first. Not checked: whether the exposure is measured correctly, which is the TWA calculation and a separate tile; the noise spectrum, since the NRR is a single number standing in for a curve and low-frequency noise defeats it; fit, which is what derating exists to approximate and what fit-testing measures directly; wearing time, where removing a protector for a few minutes of an eight-hour shift costs more than any derating; protector condition, size, and insertion; and the audiometric testing, training, and recordkeeping the standard also requires, including the provision that an employee who has experienced a significant threshold shift must have attenuation sufficient to reduce exposure to a TWA of 85 dB. An attenuation estimate, not a hearing conservation program.",
+    editionNote: "The number on the package is never the protection, and Appendix B says why in one step people skip. The NRR comes off a C-WEIGHTED measurement directly, but where the measurement is A-weighted - which is what a dosimeter reports and what everyone actually has - Appendix B directs that you 'subtract 7 dB from the NRR' first, for spectral uncertainty, and then subtract the remainder. That single step is worth 7 dB every time, and measuring in dBC rather than dBA is therefore worth 7 dB of paper protection on the same job. On top of that sits derating, which is NOT Appendix B text and is labelled as such here. The 50% field adjustment is OSHA enforcement guidance rather than regulation. The type-specific factors are NIOSH\'s: earmuffs subtract 25% from the labelled NRR, slow-recovery formable earplugs subtract 50%, and all other earplugs subtract 70%. NIOSH then computes the effective level by subtracting the derated NRR from a C-weighted exposure, or the derated NRR minus 7 dB from an A-weighted one, so both families take the 7 dB on a dosimeter reading (until 2026-10-03 this tile left it off the NIOSH methods). The practical consequence is large: an NRR 29 pre-molded earplug on a 98 dBA job credits about 1.7 dB under NIOSH and leaves 96.3 dB at the ear, where the package number would have suggested 69. The dual-protection bonus is an editable input defaulted to the 5 dB commonly applied under OSHA Technical Manual guidance; NIOSH recommends double protection above a 100 dBA TWA without quantifying the gain, and two protectors never add their ratings because the second is working against sound arriving by bone conduction and around the first. Not checked: whether the exposure is measured correctly, which is the TWA calculation and a separate tile; the noise spectrum, since the NRR is a single number standing in for a curve and low-frequency noise defeats it; fit, which is what derating exists to approximate and what fit-testing measures directly; wearing time, where removing a protector for a few minutes of an eight-hour shift costs more than any derating; protector condition, size, and insertion; and the audiometric testing, training, and recordkeeping the standard also requires, including the provision that an employee who has experienced a significant threshold shift must have attenuation sufficient to reduce exposure to a TWA of 85 dB. An attenuation estimate, not a hearing conservation program.",
     assumptions: [
       { name: "C-weighted measurement", value: "the NRR is subtracted directly", source: "29 CFR 1910.95 App. B" },
       { name: "A-weighted measurement", value: "subtract 7 dB from the NRR, then subtract the remainder from the TWA", source: "29 CFR 1910.95 App. B" },
       { name: "OSHA 50% derating", value: "halves the adjusted value; enforcement guidance, not Appendix B text", source: "OSHA field guidance" },
       { name: "NIOSH derating", value: "earmuffs -25%, slow-recovery formable earplugs -50%, all other earplugs -70% of the labelled NRR", source: "NIOSH Criteria for a Recommended Standard, Occupational Noise Exposure (1998)" },
-      { name: "NIOSH and the 7 dB", value: "not stacked; the derating stands in for the real-world adjustment - a stated reading", source: "roughlogic interpretation, stated" },
+      { name: "NIOSH and the 7 dB", value: "an A-weighted exposure takes the derated NRR minus 7 dB", source: "NIOSH Criteria for a Recommended Standard, Occupational Noise Exposure (1998)" },
       { name: "Dual protection", value: "editable bonus, defaulted to 5 dB per OSHA Technical Manual guidance; not from Appendix B", source: "OSHA Technical Manual" },
     ],
   },
@@ -2868,7 +2869,7 @@ export const CITATIONS = {
   },
 
   "grounding-electrode": {
-    formula: "Driven rod (Dwight 1936): R = (rho / (2*pi*L)) * (ln(8L/d) - 1). Ring: R = (rho / (2*pi^2*D)) * (ln(8D/d) + ln(4D/s)), with s = 2 x burial depth (the distance to the image ring). Plate: R = (rho / 4) * sqrt(pi / A). Ufer: rod formula with concrete-cylinder effective diameter, times 0.5 empirical reduction.",
+    formula: "Driven rod (Dwight 1936): R = (rho / (2*pi*L)) * (ln(8L/d) - 1). Ring: R = (rho / (2*pi^2*D)) * (ln(8D/d) + ln(4D/s)), with s = 2 x burial depth (the distance to the image ring). Plate: R = (rho / 4) * sqrt(pi / A). Ufer: rod formula with the concrete-cylinder effective diameter (no further reduction; the concrete's own resistivity is not modeled).",
     edition: "IEEE 142-2007 (Green Book) §4. " + NEC_2023 + " §250.53 governs adoption.",
     freeAccess: "standards.ieee.org for IEEE 142 bibliographic data; " + NEC_FREE + " for NEC 250.",
     governance: GOVERNANCE.electrical,
@@ -2877,7 +2878,7 @@ export const CITATIONS = {
       { name: "Soil resistivity", value: "user-supplied (ohm-cm); varies seasonally", source: "field megger reading is the authoritative value at the time of inspection" },
       { name: "25-ohm advisory", value: "NEC 250.53(A)(2) two-electrode rule when a single electrode exceeds 25 ohms", source: "NEC 2023 §250.53(A)(2)" },
       { name: "Mutual impedance", value: "supplemental-rod count ignores mutual impedance at typical 6 ft spacing", source: "engineering practice; field check required" },
-      { name: "Ufer reduction factor", value: "0.5 empirical (conservative)", source: "IEEE 142 §4.2.4" },
+      { name: "Ufer model", value: "effective diameter = concrete cylinder; no extra reduction factor", source: "IEEE 142 §4.2.4 (concrete-encased electrodes)" },
     ],
   },
 
@@ -6280,6 +6281,7 @@ export const CITATIONS = {
     editionNote: "Editions available: NFPA 13-2025 is the current published edition; 2022 and 2019 share the Chapter 19 layout, and 2016 / 2013 carry the same approach as Chapter 11. Verify the edition adopted by your AHJ.",
     assumptions: [
       { name: "Hose-stream allowance", value: "100 gpm light hazard / 250 gpm ordinary / 500 gpm extra hazard", source: "NFPA 13 hose-stream allowance table (Chapter 19)" },
+      { name: "Minimum design area", value: "1,500 ft² light and ordinary hazard / 2,500 ft² extra hazard (the smallest area on the density/area curves); a smaller area does not meet the minimum", source: "NFPA 13 density/area curves (Chapter 19)" },
     ],
   },
   "standpipe-friction": {

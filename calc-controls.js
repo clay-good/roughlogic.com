@@ -368,7 +368,7 @@ export function computeDamperActuatorTorque({ damper_width_in = 0, damper_height
   const damper_area_ft2 = damper_width_in * damper_height_in / 144;
   const largest = _ACTUATOR_SIZES_IN_LB[_ACTUATOR_SIZES_IN_LB.length - 1];
   const select = (design) => {
-    const fit = _ACTUATOR_SIZES_IN_LB.find((s) => s >= design);
+    const fit = _ACTUATOR_SIZES_IN_LB.find((s) => s >= design - 1e-9 * Math.abs(design));
     return fit === undefined ? null : fit;
   };
   const required_torque_in_lb = damper_area_ft2 * torque_factor_in_lb_ft2;
