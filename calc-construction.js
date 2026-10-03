@@ -3925,10 +3925,11 @@ CONSTRUCTION_RENDERERS["beam-reactions"] = renderBeamReactions;
 
 // --- v24 E.x: Weld heat input (`weld-heat-input`) ---
 // Heat input HI = (60 * V * I) / TS gives arc energy per unit length (J/in
-// when TS is in/min); multiply by arc efficiency eta and divide by 1000 for
-// kJ/in. Process sets a default eta (user-editable). Optional WPS range
-// (kJ/in) gives a pass/fail.
-// dims: in { voltage_V: M L^2 T^-3 I^-1, current_A: I, travel_in_min: L T^-1, efficiency: dimensionless, wps_min_kj_in: M L T^-2, wps_max_kj_in: M L T^-2 } out: { arc_energy_j_in: M L T^-2, heat_input_kj_in: M L T^-2, heat_input_kj_mm: M L T^-2 }
+// when TS is in/min), the ASME IX QW-409.1 / AWS D1.1 heat input with no
+// efficiency factor; the optional WPS range (kJ/in) is checked against it.
+// The EN 1011-1 heat input multiplies by the process k-factor eta (default
+// by process, user-editable) and is reported separately.
+// dims: in { voltage_V: M L^2 T^-3 I^-1, current_A: I, travel_in_min: L T^-1, efficiency: dimensionless, wps_min_kj_in: M L T^-2, wps_max_kj_in: M L T^-2 } out: { arc_energy_j_in: M L T^-2, arc_energy_kj_in: M L T^-2, heat_input_kj_in: M L T^-2, heat_input_kj_mm: M L T^-2 }
 export function computeWeldHeatInput({ process, voltage_V, current_A, travel_in_min, efficiency, wps_min_kj_in, wps_max_kj_in } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const V = Number(voltage_V) || 0;
@@ -3940,6 +3941,7 @@ export function computeWeldHeatInput({ process, voltage_V, current_A, travel_in_
   const eta = efficiency > 0 && efficiency <= 1 ? efficiency : null;
   if (eta === null) return { error: "Efficiency must be between 0 and 1." };
   const arc_energy_j_in = (60 * V * I) / TS;
+  const arc_energy_kj_in = arc_energy_j_in / 1000;
   const heat_input_kj_in = (arc_energy_j_in * eta) / 1000;
   const heat_input_kj_mm = heat_input_kj_in * 0.0393701;
   let pass = null;
@@ -3947,21 +3949,22 @@ export function computeWeldHeatInput({ process, voltage_V, current_A, travel_in_
     const lo = Number(wps_min_kj_in);
     const hi = Number(wps_max_kj_in);
     if (Number.isFinite(lo) && Number.isFinite(hi) && hi >= lo) {
-      pass = heat_input_kj_in >= lo && heat_input_kj_in <= hi;
+      pass = arc_energy_kj_in >= lo - 1e-9 * Math.abs(lo) && arc_energy_kj_in <= hi + 1e-9 * Math.abs(hi);
     }
   }
   return {
     arc_energy_j_in: Number.isFinite(arc_energy_j_in) ? arc_energy_j_in : null,
+    arc_energy_kj_in: Number.isFinite(arc_energy_kj_in) ? arc_energy_kj_in : null,
     heat_input_kj_in: Number.isFinite(heat_input_kj_in) ? heat_input_kj_in : null,
     heat_input_kj_mm: Number.isFinite(heat_input_kj_mm) ? heat_input_kj_mm : null,
     pass,
-    note: "Arc efficiency varies by process and is user-editable. WPS/PQR ranges are user-supplied; the adopted code edition and the qualified WPS govern.",
+    note: "The WPS check uses the arc energy 60VI/S with no efficiency factor, the heat input as ASME IX QW-409.1 and AWS D1.1 define it. The efficiency-reduced figure is the EN 1011-1 heat input (process k-factor, user-editable) and is not the basis of an AWS/ASME WPS range. WPS/PQR ranges are user-supplied; the adopted code edition and the qualified WPS govern.",
   };
 }
 export const weldHeatInputExample = { inputs: { process: "SMAW", voltage_V: 25, current_A: 200, travel_in_min: 8, efficiency: 0.8 } };
 
 function renderWeldHeatInput(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: Per AWS D1.1 Structural Welding Code and ASME BPVC Section IX, the heat-input definition HI = (60 * V * I) / TS, by name, with an arc-efficiency factor by process. WPS/PQR ranges are user-supplied; the adopted code edition and the qualified WPS govern. Free overviews at aws.org.";
+  citationEl.textContent = "Citation: Per AWS D1.1 Structural Welding Code and ASME BPVC Section IX QW-409.1, the heat-input definition HI = (60 * V * I) / TS with no efficiency factor, by name; the WPS range is checked against that arc energy. The arc-efficiency (k) factor by process is EN 1011-1 / ISO/TR 17671 and applies only to the separate EN 1011-1 heat-input figure. WPS/PQR ranges are user-supplied; the adopted code edition and the qualified WPS govern. Free overviews at aws.org.";
   const ETA_BY_PROCESS = { SMAW: 0.8, GMAW: 0.8, FCAW: 0.8, GTAW: 0.6, SAW: 1.0 };
   const proc = makeSelect("Process", "whi-proc", [
     { value: "SMAW", label: "SMAW" }, { value: "GMAW", label: "GMAW" },
@@ -3977,8 +3980,8 @@ function renderWeldHeatInput(inputRegion, outputRegion, citationEl) {
   for (const f of [proc, volt, cur, ts, eff, wmin, wmax]) inputRegion.appendChild(f.wrap);
   proc.select.addEventListener("input", () => { eff.input.value = String(ETA_BY_PROCESS[proc.select.value]); update(); });
   attachExampleButton(inputRegion, () => { proc.select.value = "SMAW"; volt.input.value = "25"; cur.input.value = "200"; ts.input.value = "8"; eff.input.value = "0.8"; wmin.input.value = ""; wmax.input.value = ""; update(); });
-  const oArc = makeOutputLine(outputRegion, "Arc energy", "whi-out-arc");
-  const oHi = makeOutputLine(outputRegion, "Heat input", "whi-out-hi");
+  const oArc = makeOutputLine(outputRegion, "Arc energy (ASME IX / AWS D1.1 heat input)", "whi-out-arc");
+  const oHi = makeOutputLine(outputRegion, "EN 1011-1 heat input (k-factor)", "whi-out-hi");
   const oPass = makeOutputLine(outputRegion, "WPS range", "whi-out-pass");
   function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
   const update = debounce(() => {
@@ -3994,7 +3997,7 @@ function renderWeldHeatInput(inputRegion, outputRegion, citationEl) {
     if (r.error) { oArc.textContent = r.error; oHi.textContent = ""; oPass.textContent = ""; return; }
     oArc.textContent = fmt(r.arc_energy_j_in, 0) + " J/in";
     oHi.textContent = fmt(r.heat_input_kj_in, 2) + " kJ/in (" + fmt(r.heat_input_kj_mm, 3) + " kJ/mm)";
-    oPass.textContent = r.pass == null ? "(enter min and max to check)" : (r.pass ? "Within WPS range" : "Outside WPS range");
+    oPass.textContent = r.pass == null ? "(enter min and max to check)" : (r.pass ? "Within WPS range" : "Outside WPS range") + " (arc energy " + fmt(r.arc_energy_kj_in, 2) + " kJ/in, no efficiency factor)";
   }, DEBOUNCE_MS);
   for (const f of [volt.input, cur.input, ts.input, eff.input, wmin.input, wmax.input]) f.addEventListener("input", update);
 }
@@ -4609,7 +4612,7 @@ export function computeFenceEstimate({ length_ft = 0, post_spacing_ft = 8, rails
   const pickets = picket_width_in > 0 ? Math.ceil(length_ft * 12 / (picket_width_in + picket_gap_in) - 1e-9) : null;
   return {
     sections, posts, rails, pickets,
-    note: "For a straight run the posts are the sections plus one; every corner, end, and gate post is an extra you add by eye from the layout. Rails are the sections times the rails per section (2 for most privacy and picket fence, 3 for tall or ranch rail). Pickets divide the run by the picket width plus the gap. Add a waste allowance and order full bundles - this is the material count, post-hole-concrete sizes the footing.",
+    note: "For a straight run the posts are the sections plus one, which includes both end posts; corners and gate posts (and heavier end/terminal posts in place of line posts) are judged from the layout. Rails are the sections times the rails per section (2 for most privacy and picket fence, 3 for tall or ranch rail). Pickets divide the run by the picket width plus the gap. Add a waste allowance and order full bundles - this is the material count, post-hole-concrete sizes the footing.",
   };
 }
 export const fenceEstimateExample = { inputs: { length_ft: 120, post_spacing_ft: 8, rails_per_section: 3, picket_width_in: 5.5, picket_gap_in: 0.25 } };

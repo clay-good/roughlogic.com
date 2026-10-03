@@ -16019,7 +16019,7 @@
    "source_publisher": "Kincaid et al. (1975); Flesch (1948); both public-domain U.S. government / journal publications",
    "source_title": "Flesch-Kincaid Grade Level + Flesch Reading Ease; deterministic syllable counter",
    "source_edition_or_year": "Naval Technical Training Command Research Branch Report 8-75 (1975) / J. Applied Psychology 32:3 (1948)",
-   "source_section_or_page": "7-sentence ~65-word example paragraph from the renderer's attachExampleButton; expected FKGL ~7-9, FRE ~65-75; syllable-counter heuristic admits ~5 percent edge-case variance which the tolerance bands absorb.",
+   "source_section_or_page": "7-sentence 64-word example paragraph from the renderer's attachExampleButton; it computes FKGL ~7.9 and FRE ~54.8 (108 syllables); this row checks the sentence and word counts only, not either score, so the ~5 percent syllable-counter variance does not reach it.",
    "verified_by": "rl",
    "verified_on": "2026-05-12",
    "inputs": {
@@ -24932,7 +24932,7 @@
   {
    "tile_id": "weld-heat-input",
    "source_publisher": "AWS D1.1 / ASME BPVC Section IX (by name)",
-   "source_title": "Heat input HI = (60 * V * I) / TS * efficiency",
+   "source_title": "Arc energy = (60 * V * I) / TS (ASME IX QW-409.1 / AWS D1.1); x efficiency gives the EN 1011-1 heat input",
    "source_edition_or_year": "AWS D1.1 / ASME BPVC Section IX",
    "source_section_or_page": "25 V, 200 A, 8 in/min, eta 0.8 -> arc energy 37500 J/in, HI 30 kJ/in",
    "verified_by": "rl",
@@ -43588,7 +43588,7 @@
   {
    "tile_id": "conductor-short-circuit-withstand",
    "source_publisher": "ICEA / Onderdonk",
-   "source_title": "Cu #6 (26,240 cmil), 75-250 C, 0.1 s -> 6,313 A withstand, 41,560 cmil minimum vs 10,000 A",
+   "source_title": "Cu #6 (26,240 cmil), 75-250 C, 0.1 s -> 6,313 A withstand, 41,565 cmil minimum vs 10,000 A",
    "source_edition_or_year": "ICEA P-32-382 / Onderdonk adiabatic equation",
    "source_section_or_page": "spec-v125 section 2.1 pinned example",
    "verified_by": "rl",
@@ -43619,7 +43619,7 @@
   {
    "tile_id": "conductor-short-circuit-withstand",
    "source_publisher": "ICEA / Onderdonk",
-   "source_title": "Al (26,240 cmil), 75-250 C, 0.1 s -> 4,129 A withstand (lower constant than copper)",
+   "source_title": "Al (26,240 cmil), 75-250 C, 0.1 s -> 4,128 A withstand (lower constant than copper)",
    "source_edition_or_year": "ICEA P-32-382 / Onderdonk adiabatic equation",
    "source_section_or_page": "spec-v125 section 2.1 cross-check",
    "verified_by": "rl",

@@ -905,14 +905,15 @@ export function computeProductPullDownLoad({ mass_lb = 0, cp_above = 0, t_enter_
     q_btu = mass * cpa * (tEnter - tStore);
   }
   const rate_btuh = q_btu / hrs;
+  const latent_included = freezing && tEnter > tFreeze;
   return {
-    q_btu, rate_btuh, freezing,
+    q_btu, rate_btuh, freezing, latent_included,
     note: "Product pull-down (cooling) load: the heat to bring the product from its entering temperature to storage over the pull-down period. Above freezing it is a single sensible term mass x cp x deltaT; for a freezer it is the sensible cooling to the freezing point, plus the latent heat of fusion (the bulk of the load), plus the sensible cooling of the frozen product to storage. The rate = total heat / the pull-down hours (commonly 24) is the product contribution to the box load. Respiration heat of live produce is a separate, smaller add. A sizing aid; the product property tables (ASHRAE Refrigeration) govern.",
   };
 }
 export const productPullDownLoadExample = { inputs: { mass_lb: 2000, cp_above: 0.9, t_enter_f: 80, t_storage_f: 35, t_freeze_f: 0, hif_btu_lb: 0, cp_below: 0, hours: 24 } };
 function _v433renderProductPullDownLoad(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: Product pull-down load (ASHRAE Refrigeration): above freezing Q = m cp deltaT; for a freezer Q = sensible-to-freezing + m x latent heat of fusion + sensible-of-frozen; rate = Q / pull-down hours. A sizing aid; the product property tables govern.";
+  citationEl.textContent = "Citation: Product pull-down load (ASHRAE Refrigeration): above freezing Q = m cp deltaT; for a freezer Q = sensible-to-freezing + m x latent heat of fusion + sensible-of-frozen (product entering at or below its freezing point: m cp_below (t_enter - t_storage), no latent term); rate = Q / pull-down hours. A sizing aid; the product property tables govern.";
   const mass = makeNumber("Product mass (lb)", "ppd-m", { step: "any", min: "0" });
   const cpa = makeNumber("Specific heat above freezing (Btu/lb-F)", "ppd-cpa", { step: "any", min: "0" });
   const tEnter = makeNumber("Entering temperature (°F)", "ppd-te", { step: "any" });
@@ -930,7 +931,7 @@ function _v433renderProductPullDownLoad(inputRegion, outputRegion, citationEl) {
   const update = debounce(() => {
     const r = computeProductPullDownLoad({ mass_lb: readNum(mass.input), cp_above: readNum(cpa.input), t_enter_f: readNum(tEnter.input), t_storage_f: readNum(tStore.input), t_freeze_f: readNum(tFreeze.input), hif_btu_lb: readNum(hif.input), cp_below: readNum(cpb.input), hours: readNum(hrs.input) });
     if (r.error) { oQ.textContent = r.error; oR.textContent = "-"; oNote.textContent = ""; return; }
-    oQ.textContent = fmt(r.q_btu, 0) + " Btu" + (r.freezing ? " (incl. latent freezing)" : "");
+    oQ.textContent = fmt(r.q_btu, 0) + " Btu" + (r.latent_included ? " (incl. latent freezing)" : "");
     oR.textContent = fmt(r.rate_btuh, 0) + " Btu/hr";
     oNote.textContent = r.note;
   }, DEBOUNCE_MS);
@@ -952,13 +953,13 @@ export function computeProductPullDownTime({ mass_lb = 0, cp_above = 0, t_enter_
   if (!(base.q_btu > 0)) return { error: "Pull-down heat is not positive; the product must enter warmer than storage." };
   const hours = base.q_btu / cap;
   return {
-    hours, q_btu: base.q_btu, rate_btuh: cap, freezing: base.freezing,
+    hours, q_btu: base.q_btu, rate_btuh: cap, freezing: base.freezing, latent_included: base.latent_included,
     note: "Pull-down time = total product heat / the refrigeration capacity dedicated to product load. Q above freezing is a single sensible term m x cp x deltaT; for a freezer it adds the latent heat of fusion (the bulk) plus the sensible cooling of the frozen product. If the time exceeds the design window (commonly 24 h), add capacity or stage the loading. A sizing aid; the product property tables (ASHRAE Refrigeration) govern.",
   };
 }
 export const productPullDownTimeExample = { inputs: { mass_lb: 2000, cp_above: 0.9, t_enter_f: 80, t_storage_f: 35, capacity_btuh: 3375 } };
 function _v698renderProductPullDownTime(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: Product pull-down time (ASHRAE Refrigeration): hours = Q / capacity, with Q = m cp deltaT above freezing, or sensible-to-freezing + m x latent heat of fusion + sensible-of-frozen for a freezer. A sizing aid; the product property tables govern.";
+  citationEl.textContent = "Citation: Product pull-down time (ASHRAE Refrigeration): hours = Q / capacity, with Q = m cp deltaT above freezing, or sensible-to-freezing + m x latent heat of fusion + sensible-of-frozen for a freezer; product entering at or below its freezing point is charged only m cp_below (t_enter - t_storage), no latent term. A sizing aid; the product property tables govern.";
   const mass = makeNumber("Product mass (lb)", "ppt-m", { step: "any", min: "0" });
   const cpa = makeNumber("Specific heat above freezing (Btu/lb-F)", "ppt-cpa", { step: "any", min: "0" });
   const tEnter = makeNumber("Entering temperature (°F)", "ppt-te", { step: "any" });
@@ -977,7 +978,7 @@ function _v698renderProductPullDownTime(inputRegion, outputRegion, citationEl) {
     const r = computeProductPullDownTime({ mass_lb: readNum(mass.input), cp_above: readNum(cpa.input), t_enter_f: readNum(tEnter.input), t_storage_f: readNum(tStore.input), t_freeze_f: readNum(tFreeze.input), hif_btu_lb: readNum(hif.input), cp_below: readNum(cpb.input), capacity_btuh: readNum(cap.input) });
     if (r.error) { oH.textContent = r.error; oQ.textContent = "-"; oNote.textContent = ""; return; }
     oH.textContent = fmt(r.hours, 1) + " hr";
-    oQ.textContent = fmt(r.q_btu, 0) + " Btu" + (r.freezing ? " (incl. latent freezing)" : "");
+    oQ.textContent = fmt(r.q_btu, 0) + " Btu" + (r.latent_included ? " (incl. latent freezing)" : "");
     oNote.textContent = r.note;
   }, DEBOUNCE_MS);
   for (const f of [mass, cpa, tEnter, tStore, tFreeze, hif, cpb, cap]) f.input.addEventListener("input", update);

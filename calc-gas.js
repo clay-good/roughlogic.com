@@ -518,7 +518,7 @@ export function computeGasFuelConversion({ appliance_input_btuh = 0, hv_from = 1
   const area_ratio = (cfh_to / cfh_from) * Math.sqrt((p_from / sg_from) / (p_to / sg_to));
   let direction;
   if (Math.abs(area_ratio - 1) < 1e-9) direction = "same orifice area (the two fuels match at these values)";
-  else if (area_ratio < 1) direction = "the new orifice is smaller (" + fmt(area_ratio * 100, 0) + "% of the original area) - drill DOWN; use the listed kit";
+  else if (area_ratio < 1) direction = "the new orifice is smaller (" + fmt(area_ratio * 100, 0) + "% of the original area) - install the listed kit's orifices; do not drill";
   else direction = "the new orifice is larger (" + fmt(area_ratio * 100, 0) + "% of the original area) - use the listed kit";
   return {
     cfh_from, cfh_to, area_ratio, direction,

@@ -596,7 +596,7 @@ HVACACOUSTICS_RENDERERS["mechanical-room-nc"] = _simpleRenderer({
     { key: "receiving_absorption_sabins", label: "Receiving room absorption (sabins)" },
     { key: "criterion_db", label: "Room criterion (dB, 0 to skip)" },
     { key: "measured_spl_db", label: "Measured level in the receiving room (dB, 0 to skip)" },
-    { key: "flanking_threshold_db", label: "Flanking threshold (dB)" },
+    { key: "flanking_threshold_db", label: "Flanking threshold (dB)", default: 5 },
   ],
   outputs: [
     { key: "received_spl_db", label: "Calculated level next door", unit: "dB", value: (r) => fmt(r.received_spl_db, 1) + " dB" },

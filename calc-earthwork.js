@@ -120,8 +120,9 @@ EARTHWORK_RENDERERS["soil-swell-shrink"] = _v67renderSoilSwellShrink;
 // --- haul-cycle-production: Truck/Loader Haul-Cycle Production and Fleet Match ---
 //
 // cycle = load + haul + dump + return + spot; loads/hr = eff_min / cycle;
-// production = cap x loads/hr; trucks = ceil(cycle / load); fleet = production x trucks.
-// dims: in { truck_cap_lcy: L^3, load_min: T, haul_min: T, dump_min: T, return_min: T, spot_min: T, eff_min_per_hr: T } out: { cycle_min: T, loads_per_hour: dimensionless, production_lcy_hr: L^3 T^-1, trucks_to_match: dimensionless, fleet_production_lcy_hr: L^3 T^-1 }
+// production = cap x loads/hr; trucks = ceil(cycle / load);
+// fleet = min(production x trucks, cap x eff_min / load), the loader's ceiling.
+// dims: in { truck_cap_lcy: L^3, load_min: T, haul_min: T, dump_min: T, return_min: T, spot_min: T, eff_min_per_hr: T } out: { cycle_min: T, loads_per_hour: dimensionless, production_lcy_hr: L^3 T^-1, trucks_to_match: dimensionless, fleet_production_lcy_hr: L^3 T^-1, loader_capacity_lcy_hr: L^3 T^-1 }
 // (Truck capacity is L^3; every time is T; production is a volume-rate L^3 T^-1
 //  and the loads-per-hour and truck count are dimensionless.)
 export function computeHaulCycleProduction({ truck_cap_lcy, load_min, haul_min = 0, dump_min = 0, return_min = 0, spot_min = 0.5, eff_min_per_hr = 50 } = {}) {
@@ -143,20 +144,25 @@ export function computeHaulCycleProduction({ truck_cap_lcy, load_min, haul_min =
   const loadsPerHour = eff / cycleMin;
   const productionLcyHr = cap * loadsPerHour;
   const trucksToMatch = Math.ceil(cycleMin / load - 1e-9);
-  const fleetProductionLcyHr = productionLcyHr * trucksToMatch;
-  if (![cycleMin, loadsPerHour, productionLcyHr, trucksToMatch, fleetProductionLcyHr].every(Number.isFinite)) return { error: "Production math is not a finite value." };
+  const truckFleetLcyHr = productionLcyHr * trucksToMatch;
+  const loaderCapacityLcyHr = cap * eff / load;
+  const loaderGoverns = truckFleetLcyHr > loaderCapacityLcyHr + 1e-9 * loaderCapacityLcyHr;
+  const fleetProductionLcyHr = Math.min(truckFleetLcyHr, loaderCapacityLcyHr);
+  if (![cycleMin, loadsPerHour, productionLcyHr, trucksToMatch, fleetProductionLcyHr, loaderCapacityLcyHr].every(Number.isFinite)) return { error: "Production math is not a finite value." };
   return {
     cycle_min: cycleMin,
     loads_per_hour: loadsPerHour,
     production_lcy_hr: productionLcyHr,
     trucks_to_match: trucksToMatch,
     fleet_production_lcy_hr: fleetProductionLcyHr,
-    note: "The 50-minute hour accounts for real-world delays and is a planning default, not a guarantee. Haul and return times grow with distance, grade, and traffic - they are the variable that moves the answer. The matched count keeps the loader (the expensive machine) working: one truck short idles the loader, one over queues the trucks. Convert the loose production back to bank yards with soil-swell-shrink for earned quantity.",
+    loader_capacity_lcy_hr: loaderCapacityLcyHr,
+    loader_governs: loaderGoverns,
+    note: "The 50-minute hour accounts for real-world delays and is a planning default, not a guarantee. Haul and return times grow with distance, grade, and traffic - they are the variable that moves the answer. The matched count keeps the loader (the expensive machine) working: one truck short idles the loader, one over queues the trucks. When the truck count rounds up, the loader (capacity x working minutes / load time) caps the fleet output. Convert the loose production back to bank yards with soil-swell-shrink for earned quantity.",
   };
 }
 
 function _v67renderHaulCycleProduction(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: Caterpillar Performance Handbook cycle-time production method by name. cycle = load + haul + dump + return + spot; loads/hr = working minutes / cycle; trucks = ceil(cycle / load time).";
+  citationEl.textContent = "Citation: Caterpillar Performance Handbook cycle-time production method by name. cycle = load + haul + dump + return + spot; loads/hr = working minutes / cycle; trucks = ceil(cycle / load time); fleet = the lesser of the trucks' output and the loader's (capacity x working minutes / load time).";
   const cap = makeNumber("Truck capacity (loose cy)", "hc-cap", { step: "any", min: "0" });
   const load = makeNumber("Loader fill time (min)", "hc-load", { step: "any", min: "0" });
   const haul = makeNumber("Loaded haul time (min)", "hc-haul", { step: "any", min: "0" });
@@ -172,6 +178,7 @@ function _v67renderHaulCycleProduction(inputRegion, outputRegion, citationEl) {
   const oProd = makeOutputLine(outputRegion, "Production per truck", "hc-out-prod");
   const oTrucks = makeOutputLine(outputRegion, "Trucks to match the loader", "hc-out-trucks");
   const oFleet = makeOutputLine(outputRegion, "Matched fleet production", "hc-out-fleet");
+  const oLoader = makeOutputLine(outputRegion, "Loader ceiling", "hc-out-loader");
   const update = debounce(() => {
     const r = computeHaulCycleProduction({
       truck_cap_lcy: Number(cap.input.value) || 0, load_min: Number(load.input.value) || 0,
@@ -179,11 +186,14 @@ function _v67renderHaulCycleProduction(inputRegion, outputRegion, citationEl) {
       return_min: Number(ret.input.value) || 0, spot_min: spot.input.value === "" ? 0.5 : Number(spot.input.value),
       eff_min_per_hr: eff.input.value === "" ? 50 : Number(eff.input.value),
     });
-    if (r.error) { oCycle.textContent = r.error; for (const o of [oProd, oTrucks, oFleet]) o.textContent = "-"; return; }
+    if (r.error) { oCycle.textContent = r.error; for (const o of [oProd, oTrucks, oFleet, oLoader]) o.textContent = "-"; return; }
     oCycle.textContent = fmt(r.cycle_min, 1) + " min (" + fmt(r.loads_per_hour, 2) + " loads/hr)";
     oProd.textContent = fmt(r.production_lcy_hr, 1) + " lcy/hr";
     oTrucks.textContent = r.trucks_to_match + " trucks";
     oFleet.textContent = fmt(r.fleet_production_lcy_hr, 0) + " lcy/hr";
+    oLoader.textContent = fmt(r.loader_capacity_lcy_hr, 0) + " lcy/hr" + (r.loader_governs
+      ? " -- the loader governs: " + r.trucks_to_match + " trucks could haul " + fmt(r.production_lcy_hr * r.trucks_to_match, 0) + " lcy/hr, but the loader fills only this much, so the fleet figure is the loader's"
+      : "; the trucks govern");
   }, DEBOUNCE_MS);
   for (const f of [cap, load, haul, dump, ret, spot, eff]) f.input.addEventListener("input", update);
 }

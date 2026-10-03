@@ -655,7 +655,9 @@ export function computeMastClimberPlatformLoad({ platform_length_ft = 0, cantile
     ? "Enter the zone's rated capacity from the manufacturer's load chart. Cantilever ends carry a small fraction of the platform's rating."
     : within_zone
       ? "ZONE WITHIN RATING: " + fmt(load_lb, 0) + " lb against a zone rating of " + fmt(zone_rated_capacity_lb, 0) + " lb, " + fmt(zone_utilization_pct, 0) + "%"
-      : "ZONE EXCEEDED WHILE THE TOTAL IS WITHIN CAPACITY: " + fmt(load_lb, 0) + " lb on a zone rated " + fmt(zone_rated_capacity_lb, 0) + " lb, " + fmt(zone_utilization_pct, 0) + "% of it. The scale says the load is fine and the structure says it is not -- this is the case the load chart exists for";
+      : within_total
+        ? "ZONE EXCEEDED WHILE THE TOTAL IS WITHIN CAPACITY: " + fmt(load_lb, 0) + " lb on a zone rated " + fmt(zone_rated_capacity_lb, 0) + " lb, " + fmt(zone_utilization_pct, 0) + "% of it. The scale says the load is fine and the structure says it is not -- this is the case the load chart exists for"
+        : "ZONE EXCEEDED, AND THE TOTAL IS OVER THE PLATFORM RATING TOO: " + fmt(load_lb, 0) + " lb on a zone rated " + fmt(zone_rated_capacity_lb, 0) + " lb, " + fmt(zone_utilization_pct, 0) + "% of it";
   const tie_verdict = tie_ok === null
     ? "Enter the mast tie spacing and capacity to carry the moment into the ties."
     : tie_ok
@@ -689,7 +691,7 @@ SPECIALTYTRADES_RENDERERS["mast-climber-platform-load"] = _simpleRenderer({
     { key: "t", id: "mcpl-out-t", label: "Against the platform rating", value: (r) => r.total_verdict },
     { key: "z", id: "mcpl-out-z", label: "Against the zone rating", value: (r) => r.zone_verdict },
     { key: "m", id: "mcpl-out-m", label: "Moment about the mast", value: (r) => fmt(r.moment_ft_lb, 0) + " ft-lb from " + fmt(r.load_lb, 0) + " lb at " + fmt(r.load_centroid_ft, 1) + " ft" + (r.on_cantilever ? ", which is out on a cantilever end" : ", inside the mast bay") },
-    { key: "d", id: "mcpl-out-d", label: "The same load spread evenly", value: (r) => "about " + fmt(r.distributed_moment_ft_lb, 0) + " ft-lb about a centre mast, and every zone within its rating. Same weight, same platform, entirely different structure" },
+    { key: "d", id: "mcpl-out-d", label: "The same load spread evenly", value: (r) => "about " + fmt(r.distributed_moment_ft_lb, 0) + " ft-lb about a centre mast" + (r.within_total ? ", and every zone within its rating. Same weight, same platform, entirely different structure" : ", but the total is over the platform rating, so spreading it does not make it a permitted load") },
     { key: "k", id: "mcpl-out-k", label: "Into the ties", value: (r) => r.tie_verdict },
     { key: "n", id: "mcpl-out-n", label: "Note", value: (r) => r.note },
   ],

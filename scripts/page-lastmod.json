@@ -2,7 +2,7 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "16d9389ebe7de128",
+      "sha": "a8d6789b8e487f4e",
       "date": "2026-10-03"
     },
     "/tools/": {
@@ -22,7 +22,7 @@
       "date": "2026-10-03"
     },
     "/groups/construction/": {
-      "sha": "c6950fdf00f5bd16",
+      "sha": "8a684dddcf6a03ab",
       "date": "2026-10-03"
     },
     "/groups/cross-trade/": {
@@ -434,8 +434,8 @@
       "date": "2026-10-03"
     },
     "/tools/baghouse-cleaning-interval/": {
-      "sha": "fae5c4d86be57557",
-      "date": "2026-09-29"
+      "sha": "73d540b48f5efddb",
+      "date": "2026-10-03"
     },
     "/tools/bakers-percentage/": {
       "sha": "329ef8edc858c61b",
@@ -1698,8 +1698,8 @@
       "date": "2026-09-29"
     },
     "/tools/conduit-offset/": {
-      "sha": "bab89945fd560582",
-      "date": "2026-09-29"
+      "sha": "9c8fcd38132fdafd",
+      "date": "2026-10-03"
     },
     "/tools/conduit-saddle/": {
       "sha": "b3ba3366fba68c5d",
@@ -2798,8 +2798,8 @@
       "date": "2026-09-29"
     },
     "/tools/extrusion-output-rate/": {
-      "sha": "665813914758f43d",
-      "date": "2026-09-29"
+      "sha": "3b76424d4f574a15",
+      "date": "2026-10-03"
     },
     "/tools/eyring-reverberation/": {
       "sha": "1c6c1292be5aa1a4",
@@ -2874,8 +2874,8 @@
       "date": "2026-09-29"
     },
     "/tools/fence-estimate/": {
-      "sha": "f127ba47126ee511",
-      "date": "2026-09-29"
+      "sha": "3e4adb9b2f39d489",
+      "date": "2026-10-03"
     },
     "/tools/fermentation-time-q10/": {
       "sha": "667a90d9df93b571",
@@ -3514,8 +3514,8 @@
       "date": "2026-09-29"
     },
     "/tools/gross-rent-multiplier/": {
-      "sha": "97611a0c225105f4",
-      "date": "2026-09-29"
+      "sha": "480dcb04c74e1bc2",
+      "date": "2026-10-03"
     },
     "/tools/ground-loop-flow-antifreeze/": {
       "sha": "c14d720d6309abe6",
@@ -3606,8 +3606,8 @@
       "date": "2026-09-29"
     },
     "/tools/haul-cycle-production/": {
-      "sha": "75a99f9039e7b6e1",
-      "date": "2026-09-30"
+      "sha": "8fb44798bea03425",
+      "date": "2026-10-03"
     },
     "/tools/haul-road-resistance/": {
       "sha": "deb7871b4199846b",
@@ -3706,8 +3706,8 @@
       "date": "2026-09-29"
     },
     "/tools/henderson-hasselbalch/": {
-      "sha": "fc1065bfadf33780",
-      "date": "2026-09-29"
+      "sha": "8d092d22cde0a60b",
+      "date": "2026-10-03"
     },
     "/tools/hepa-filter-life/": {
       "sha": "45efd2963233044a",
@@ -3754,8 +3754,8 @@
       "date": "2026-09-29"
     },
     "/tools/horizontal-curve/": {
-      "sha": "3fc4a6730cdfc21d",
-      "date": "2026-09-29"
+      "sha": "34e8e17cb642090c",
+      "date": "2026-10-03"
     },
     "/tools/horizontal-sightline-offset/": {
       "sha": "39db013e9bf5a74a",
@@ -4542,8 +4542,8 @@
       "date": "2026-09-29"
     },
     "/tools/masonry-cleaning-dilution/": {
-      "sha": "ac0fe0fe89906b28",
-      "date": "2026-09-29"
+      "sha": "5045a75868c246a6",
+      "date": "2026-10-03"
     },
     "/tools/masonry-control-joint-layout/": {
       "sha": "fa1bc7dc69d33136",
@@ -4774,8 +4774,8 @@
       "date": "2026-10-03"
     },
     "/tools/molecular-weight/": {
-      "sha": "606808d4ec36039b",
-      "date": "2026-09-29"
+      "sha": "ba9d61a9f63f01fe",
+      "date": "2026-10-03"
     },
     "/tools/mooring-load-wind-current/": {
       "sha": "8a9d06499b9b0097",
@@ -4790,8 +4790,8 @@
       "date": "2026-09-29"
     },
     "/tools/mortgage-point-breakeven/": {
-      "sha": "8f58ffacf18b4546",
-      "date": "2026-09-29"
+      "sha": "1e4c59aa8423fb52",
+      "date": "2026-10-03"
     },
     "/tools/mortgage-reserves/": {
       "sha": "cf1f58870e8cecf4",
@@ -5346,8 +5346,8 @@
       "date": "2026-10-03"
     },
     "/tools/pipe-fitting-takeout/": {
-      "sha": "100e74bd4b5acb08",
-      "date": "2026-09-29"
+      "sha": "8bc82da5045ba750",
+      "date": "2026-10-03"
     },
     "/tools/pipe-flotation/": {
       "sha": "eb123ee27696c10f",
@@ -5422,8 +5422,8 @@
       "date": "2026-09-30"
     },
     "/tools/piti/": {
-      "sha": "9f022415770fb946",
-      "date": "2026-09-29"
+      "sha": "e4c39afe8d6ed0a8",
+      "date": "2026-10-03"
     },
     "/tools/pitot-traverse-average/": {
       "sha": "a2fcab9c1dde94c9",
@@ -5710,12 +5710,12 @@
       "date": "2026-09-29"
     },
     "/tools/product-pull-down-load/": {
-      "sha": "00301471ec693bca",
-      "date": "2026-09-29"
+      "sha": "485e65b53ffabd59",
+      "date": "2026-10-03"
     },
     "/tools/product-pull-down-time/": {
-      "sha": "d985e99b238b9730",
-      "date": "2026-09-29"
+      "sha": "1ab54070c30a12cc",
+      "date": "2026-10-03"
     },
     "/tools/projectile-range/": {
       "sha": "8e6273e0f94de587",
@@ -6366,8 +6366,8 @@
       "date": "2026-09-29"
     },
     "/tools/ripper-production/": {
-      "sha": "086d18657099b6d7",
-      "date": "2026-09-29"
+      "sha": "d17768b6faba0952",
+      "date": "2026-10-03"
     },
     "/tools/riprap-d50/": {
       "sha": "4434e0ec0cdeb46e",
@@ -6582,8 +6582,8 @@
       "date": "2026-09-29"
     },
     "/tools/sand-permeability-vent/": {
-      "sha": "5799e778565bfb91",
-      "date": "2026-09-29"
+      "sha": "fedf1e68f42ae2f5",
+      "date": "2026-10-03"
     },
     "/tools/sandbag-levee-quantity/": {
       "sha": "bf9471da986418b5",
@@ -6706,8 +6706,8 @@
       "date": "2026-10-03"
     },
     "/tools/seepage-travel-time/": {
-      "sha": "892fb423755e61c7",
-      "date": "2026-09-29"
+      "sha": "ebfa48965ce5db46",
+      "date": "2026-10-03"
     },
     "/tools/seer-eer/": {
       "sha": "2cf5cd37342032a4",
@@ -6838,8 +6838,8 @@
       "date": "2026-09-29"
     },
     "/tools/shackle-eyebolt-wll/": {
-      "sha": "c6a67578199cac90",
-      "date": "2026-09-29"
+      "sha": "c41a12a5bc8484ca",
+      "date": "2026-10-03"
     },
     "/tools/shade-cloth-transmission/": {
       "sha": "cad8b3029ee9b7b6",
@@ -7010,8 +7010,8 @@
       "date": "2026-09-30"
     },
     "/tools/sling-d-d-efficiency/": {
-      "sha": "fde05161bd3d0df8",
-      "date": "2026-09-29"
+      "sha": "24353a69119259d6",
+      "date": "2026-10-03"
     },
     "/tools/slip-critical-with-tension/": {
       "sha": "9cd8fb7c532498b9",
@@ -8102,8 +8102,8 @@
       "date": "2026-09-29"
     },
     "/tools/tonnage-rating-grade/": {
-      "sha": "f9f59b020ffbd7f1",
-      "date": "2026-10-01"
+      "sha": "55ed69943a3e737a",
+      "date": "2026-10-03"
     },
     "/tools/tool-maintenance/": {
       "sha": "2de3730ad3716e98",
@@ -8590,8 +8590,8 @@
       "date": "2026-09-30"
     },
     "/tools/walk-in-door-infiltration/": {
-      "sha": "4505ea64c428bf3a",
-      "date": "2026-10-01"
+      "sha": "511d55d960f705d4",
+      "date": "2026-10-03"
     },
     "/tools/walkway-clearing-productivity/": {
       "sha": "523ad00ab3676c21",
@@ -8726,8 +8726,8 @@
       "date": "2026-09-29"
     },
     "/tools/weld-heat-input/": {
-      "sha": "f35b7b36ade50d5b",
-      "date": "2026-09-29"
+      "sha": "0374b7cd26d1991c",
+      "date": "2026-10-03"
     },
     "/tools/weld-metal-volume/": {
       "sha": "cbb98394014dc43a",
@@ -8738,8 +8738,8 @@
       "date": "2026-10-03"
     },
     "/tools/weld-preheat-fuel/": {
-      "sha": "845e761c2d93e1d9",
-      "date": "2026-09-29"
+      "sha": "29a8dc700dca3ba1",
+      "date": "2026-10-03"
     },
     "/tools/weld-transverse-shrinkage/": {
       "sha": "5d50e1943fbb5538",

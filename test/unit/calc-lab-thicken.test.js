@@ -105,5 +105,5 @@ test("HH: total_moles invariant: base+acid = total", () => {
 // --- Hemocytometer: 4 more tests ---
 test("Hemo: 4 squares, dilution=10, 50 cells/sq -> 5e6 cells/mL", () => { const r = computeHemocytometer({ total_cells_counted: 200, squares_counted: 4, dilution_factor: 10 }); assert.ok(closeRel(r.cells_per_mL, 5e6, 0.001)); });
 test("Hemo: viability 50% from 100 total / 50 dead", () => { const r = computeHemocytometer({ total_cells_counted: 100, squares_counted: 4, dilution_factor: 1, dead_cells: 50 }); assert.equal(r.viability_pct, 50); });
-test("Hemo: dead > total still computes (operator error noted)", () => { const r = computeHemocytometer({ total_cells_counted: 100, squares_counted: 4, dilution_factor: 1, dead_cells: 150 }); assert.ok(r.viability_pct <= 0); });
+test("Hemo: dead > total is an error (viability cannot go negative)", () => { const r = computeHemocytometer({ total_cells_counted: 100, squares_counted: 4, dilution_factor: 1, dead_cells: 150 }); assert.ok("error" in r); });
 test("Hemo: zero counts -> zero cells/mL", () => { const r = computeHemocytometer({ total_cells_counted: 0, squares_counted: 4, dilution_factor: 1 }); assert.equal(r.cells_per_mL, 0); });

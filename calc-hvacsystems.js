@@ -1656,8 +1656,8 @@ export function computeFlowHoodCorrection({
   const direction_verdict = Math.abs(factor_used - 1) < 1e-12
     ? "the factor is 1.00, so the hood reading stands as measured"
     : hood_reads_low
-      ? "the factor is above 1, so the hood was reading LOW by " + fmt(Math.abs(correction_pct), 1) + "% and the correction RAISES the reading -- the back pressure a hood adds in series with the diffuser is the usual cause"
-      : "the factor is below 1, so the hood was reading HIGH by " + fmt(Math.abs(correction_pct), 1) + "% and the correction LOWERS the reading";
+      ? "the factor is above 1, so the hood was reading LOW and the correction RAISES the reading by " + fmt(Math.abs(correction_pct), 1) + "% -- the back pressure a hood adds in series with the diffuser is the usual cause"
+      : "the factor is below 1, so the hood was reading HIGH and the correction LOWERS the reading by " + fmt(Math.abs(correction_pct), 1) + "%";
   const has_design = design_cfm > 0;
   const pct_of_design = has_design ? corrected_cfm / design_cfm * 100 : 0;
   const uncorrected_pct_of_design = has_design ? hood_reading_cfm / design_cfm * 100 : 0;
@@ -2077,7 +2077,7 @@ HVACSYSTEMS_RENDERERS["coil-capacity-verification"] = _simpleRenderer({
   ],
   outputs: [
     { key: "a", id: "ccv2-out-a", label: "Air side", value: (r) => r.has_enthalpy ? fmt(r.air_total_btuh, 0) + " BTU/h total from enthalpy (" + fmt(r.air_sensible_btuh, 0) + " sensible, " + fmt(r.latent_btuh, 0) + " latent)" : fmt(r.air_sensible_btuh, 0) + " BTU/h sensible only" },
-    { key: "w", id: "ccv2-out-w", label: "Water side", value: (r) => fmt(r.water_btuh, 0) + " BTU/h across a " + fmt(r.water_dt_f, 1) + " °F rise" },
+    { key: "w", id: "ccv2-out-w", label: "Water side", value: (r) => fmt(r.water_btuh, 0) + " BTU/h across a " + fmt(r.water_dt_f, 1) + " °F water temperature difference" },
     { key: "b", id: "ccv2-out-b", label: "Heat balance", value: (r) => r.balance_verdict },
     { key: "m", id: "ccv2-out-m", label: "Method", value: (r) => r.method_verdict },
     { key: "g", id: "ccv2-out-g", label: "Against design", value: (r) => r.design_verdict },
@@ -2476,7 +2476,9 @@ export function computePlenumReturnDrop({
   const area_for_target_ft2 = return_cfm / target_velocity_fpm;
   const width_for_target_ft = area_for_target_ft2 / (pinch_clear_in / 12);
   const bays_needed = pinch_width_ft > 0 ? width_for_target_ft / pinch_width_ft : 0;
-  const size_verdict = fmt(area_for_target_ft2, 1) + " sq ft is needed at the target, which at " + fmt(pinch_clear_in, 1) + " in clear means " + fmt(width_for_target_ft, 0) + " ft of width -- " + fmt(bays_needed, 1) + " times the " + fmt(pinch_width_ft, 1) + " ft entered, so the air has to come through that many bays rather than one, and the design question is whether the openings and the routing actually let it";
+  const size_verdict = bays_needed <= 1
+    ? fmt(area_for_target_ft2, 1) + " sq ft is needed at the target, which at " + fmt(pinch_clear_in, 1) + " in clear means " + fmt(width_for_target_ft, 1) + " ft of width -- which the " + fmt(pinch_width_ft, 1) + " ft entered already provides"
+    : fmt(area_for_target_ft2, 1) + " sq ft is needed at the target, which at " + fmt(pinch_clear_in, 1) + " in clear means " + fmt(width_for_target_ft, 0) + " ft of width -- " + fmt(bays_needed, 1) + " times the " + fmt(pinch_width_ft, 1) + " ft entered, so the air has to come through that many bays rather than one, and the design question is whether the openings and the routing actually let it";
   // The static consequence, which is what makes this a balancing issue rather
   // than a design curiosity.
   const has_measured = measured_room_to_plenum_inwg > 0 || measured_plenum_to_shaft_inwg > 0;

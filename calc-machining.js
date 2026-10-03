@@ -228,8 +228,9 @@ export function computeCuttingFluidConcentration({ brix_reading = 0, refractomet
   if (!(target_pct > 0 && target_pct < 100)) return { error: "Target must be between 0 and 100 percent." };
   const current_pct = brix_reading * refractometer_factor;
   let action = "none", add_gal = 0;
-  if (current_pct < target_pct) { action = "add concentrate"; add_gal = sump_volume_gal * (target_pct - current_pct) / (100 - target_pct); }
-  else if (current_pct > target_pct) { action = "add water"; add_gal = sump_volume_gal * (current_pct - target_pct) / target_pct; }
+  const diff = current_pct - target_pct;
+  if (diff < -1e-9 * target_pct) { action = "add concentrate"; add_gal = sump_volume_gal * (target_pct - current_pct) / (100 - target_pct); }
+  else if (diff > 1e-9 * target_pct) { action = "add water"; add_gal = sump_volume_gal * (current_pct - target_pct) / target_pct; }
   return {
     current_pct, action, add_gal,
     note: "Read the concentration as the Brix times the coolant's refractometer factor (on the data sheet, usually between 1 and 4 - do not assume Brix is the concentration). Keep the sump in the maker's range, often about 6-10% for general machining - too lean invites rust and bacteria (and the sour smell), too rich leaves residue and can irritate skin. The concentrate figure here is the neat deficit, but in practice add it as pre-mixed coolant, never neat concentrate straight into the sump. Skim tramp oil and check the Brix at the same spot and temperature each time.",

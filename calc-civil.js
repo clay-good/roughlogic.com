@@ -579,7 +579,7 @@ export function computeEarthworkEndArea({ areas, interval_ft, mid_area_ft2, swel
     prismoidal_ft3: prismoidal != null && Number.isFinite(prismoidal) ? prismoidal : null,
     prismoidal_diff_ft3: prismoidalDiff != null && Number.isFinite(prismoidalDiff) ? prismoidalDiff : null,
     adjusted_ft3: adjusted != null && Number.isFinite(adjusted) ? adjusted : null,
-    note: "One material per run: cut and fill are NOT netted here. Average-end-area only; the project earthwork report governs the paid quantity.",
+    note: "One material per run: cut and fill are NOT netted here. Average-end-area total; the prismoidal figure (when a middle area is entered) covers the first station pair only; the project earthwork report governs the paid quantity.",
   };
 }
 export const earthworkEndAreaExample = { inputs: { areas: [100, 100], interval_ft: 100 } };
@@ -665,7 +665,7 @@ function renderSlopeStakeCutFill(inputRegion, outputRegion, citationEl) {
     });
     if (r.error) { oCf.textContent = r.error; oCatch.textContent = ""; return; }
     oCf.textContent = r.which === "on grade" ? "on grade (0.00 ft)" : fmt(r.magnitude_ft, 2) + " ft " + r.which;
-    oCatch.textContent = fmt(r.catch_offset_ft, 2) + " ft from the hinge reference";
+    oCatch.textContent = fmt(r.catch_offset_ft, 2) + " ft from CL (hinge offset + H x depth)";
   }, DEBOUNCE_MS);
   attachExampleButton(inputRegion, () => { existing.input.value = "104.5"; design.input.value = "100"; slope.input.value = "2"; offset.input.value = ""; update(); });
   for (const f of [existing.input, design.input, slope.input, offset.input]) f.addEventListener("input", update);
@@ -1119,7 +1119,7 @@ export function computeSpeedHumpGeometry({ height_in = 0, total_length_ft = 0, f
 }
 const speedHumpGeometryExample = { inputs: { height_in: 3, total_length_ft: 12, flat_top_length_ft: 0, crossing_speed_mph: 25, comfort_limit_g: 0.25, wheelbase_in: 120, ground_clearance_in: 5, target_ramp_slope_pct: 5 } };
 CIVIL_RENDERERS["speed-hump-geometry"] = _simpleRenderer({
-  citation: "Citation: the parabolic vertical-deflection relations by name -- ramp slope = height / ramp length; wheel vertical acceleration = 8 x height x speed squared / transition length squared, constant across a parabolic ramp; and the comfort speed as that relation inverted at an entered acceleration limit. The ground-clearance check is the crest height less the parabolic profile height under the design vehicle's wheels. Device dimensions are set by the agency's standard drawings and by ITE traffic calming guidance and are ENTERED, not shipped. Emergency response delay is not quantified; it needs the fire department's apparatus and route data. The agency's standard drawings, ITE traffic calming guidance, the fire department, and the adopted MUTCD for signing and marking govern.",
+  citation: "Citation: the parabolic vertical-deflection relations by name -- ramp slope = height / ramp length; wheel vertical acceleration = 8 x height x speed squared / transition length squared, constant across a parabolic ramp; and the comfort speed as that relation inverted at an entered acceleration limit. The ground-clearance check is the crest height less the parabolic profile height under the design vehicle's wheels. Device dimensions are set by the agency's standard drawings and by ITE traffic calming guidance and are ENTERED, not shipped; the prefilled figures are the worked example's, not a recommendation. Emergency response delay is not quantified; it needs the fire department's apparatus and route data. The agency's standard drawings, ITE traffic calming guidance, the fire department, and the adopted MUTCD for signing and marking govern.",
   example: speedHumpGeometryExample.inputs,
   fields: [
     { key: "height_in", label: "Device height (in)", kind: "number", default: 3 },

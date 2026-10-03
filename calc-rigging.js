@@ -269,7 +269,7 @@ export function computeSlingDdEfficiency({ rated_wll_lb, bend_dia_in, sling_dia_
 }
 
 function renderSlingDdEfficiency(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: Wire Rope Technical Board Wire Rope Users Manual (D/d bend efficiency) and ASME B30.9 by name. ratio = bend diameter / sling diameter; the curve ships as editable breakpoints. Estimate - inspect every sling.";
+  citationEl.textContent = "Citation: Wire Rope Technical Board Wire Rope Users Manual (D/d bend efficiency) and ASME B30.9 by name. ratio = bend diameter / sling diameter; the curve ships as fixed breakpoints from the WRTB 6x19 / 6x37 chart (75/79/83/86/89/91/93/95% at D/d 4/6/8/10/15/20/25/40). Estimate - inspect every sling.";
   const rated = makeNumber("Catalog WLL, straight pull (lb)", "sdd-rated", { step: "any", min: "0" });
   const bend = makeNumber("Bend diameter D (in) - pin / load", "sdd-bend", { step: "any", min: "0" });
   const sling = makeNumber("Sling diameter d (in)", "sdd-sling", { step: "any", min: "0" });
@@ -538,10 +538,10 @@ RIGGING_RENDERERS["tandem-lift-share"] = renderTandemLiftShare;
 // approximations of the ASME B30.26 manufacturer charts. Helpers above dims.
 const SHACKLE_DERATE = [[0, 1.00], [45, 0.70], [90, 0.50]];
 // Crosby shoulder eye bolt chart: 30% of the rated load at 45 deg, 25% at
-// 90 deg. The 15 and 30 deg points are interpolation between in-line and 45,
-// held slightly under the straight line. (Until 2026-09-24 the curve fell to
+// 90 deg. The 15 and 30 deg points are set at or slightly under the straight
+// line between in-line and 45 (0.767 and 0.533 on the line). (Until 2026-09-24 the curve fell to
 // 15% at 60 deg and held there, a floor no source gives.)
-const EYEBOLT_DERATE = [[0, 1.00], [15, 0.75], [30, 0.55], [45, 0.30], [90, 0.25]];
+const EYEBOLT_DERATE = [[0, 1.00], [15, 0.75], [30, 0.53], [45, 0.30], [90, 0.25]];
 const _derateInterp = (curve, angle) => {
   if (angle <= curve[0][0]) return curve[0][1];
   if (angle >= curve[curve.length - 1][0]) return curve[curve.length - 1][1];
@@ -584,7 +584,7 @@ export function computeShackleEyeboltWll({ leg_load_lb, rated_wll_lb, angle_deg 
 }
 
 function renderShackleEyeboltWll(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: ASME B30.26 (Rigging Hardware) and ASME B18.15 / manufacturer eye-bolt data by name; the eye-bolt curve carries the Crosby chart points (30% at 45 deg, 25% at 90 deg), and the shackle side-load curve is an editable approximation. Estimate - the rating plate governs.";
+  citationEl.textContent = "Citation: ASME B30.26 (Rigging Hardware) and ASME B18.15 / manufacturer eye-bolt data by name; the eye-bolt curve carries the Crosby chart points (30% at 45 deg, 25% at 90 deg), and the shackle side-load curve is a fixed approximation (100% in line, 70% at 45 deg, 50% at 90 deg). Estimate - the rating plate governs.";
   const leg = makeNumber("Leg load (lb)", "se-leg", { step: "any", min: "0" });
   const rated = makeNumber("Catalog WLL of the hardware (lb)", "se-rated", { step: "any", min: "0" });
   const hardware = makeSelect("Hardware", "se-hw", [
@@ -1284,7 +1284,7 @@ export function computeBridleLegTension({ apex_load_lb, run1_ft, rise1_ft, run2_
   const over_load = t1_lb > W + 1e-9 * Math.abs(W) || t2_lb > W + 1e-9 * Math.abs(W);
   return {
     l1_ft: L1, l2_ft: L2, t1_lb, t2_lb, horizontal_lb, angle1_deg, angle2_deg, over_load,
-    note: "An off-center or unequal-height apex makes the two legs carry unequal tension (the steeper or shorter leg carries more). A shallow bridle multiplies leg tension so a leg can exceed the hung load and drives a large horizontal pull into the beams. This is a static two-dimensional resolution (a three-point bridle or out-of-plane geometry differs). The hardware ratings and a qualified rigger govern.",
+    note: "An off-center or unequal-height apex makes the two legs carry unequal tension (the steeper leg, the one closer to vertical, carries more). A shallow bridle multiplies leg tension so a leg can exceed the hung load and drives a large horizontal pull into the beams. This is a static two-dimensional resolution (a three-point bridle or out-of-plane geometry differs). The hardware ratings and a qualified rigger govern.",
   };
 }
 

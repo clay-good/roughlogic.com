@@ -159,7 +159,7 @@ export const CITATIONS = {
   },
 
   "gross-rent-multiplier": {
-    formula: "GRM_annual = price / gross_annual_rent; GRM_monthly = price / gross_monthly_rent; implied_value = market_GRM * gross_rent; gross_yield% = 1/GRM_annual * 100.",
+    formula: "GRM_annual = price / gross_annual_rent; GRM_monthly = price / gross_monthly_rent; implied_value = market_GRM * gross_rent on the selected basis (an annual GRM times annual rent, a monthly GRM times monthly rent); gross_yield% = 1/GRM_annual * 100.",
     edition: "Standard income-approach screening metric per the Appraisal Institute's The Appraisal of Real Estate income approach, by name; USPAP governs the appraiser's value opinion.",
     freeAccess: "Distinct from cap-rate-dscr, which uses NOI, not gross rent. Screening only.",
     governance: GOVERNANCE.general,
@@ -7648,10 +7648,10 @@ export const CITATIONS = {
     edition: "IUPAC/CIAAW Abridged Standard Atomic Weights 2024 -- the Atomic Weights 2021 report with the 2024 revisions to gadolinium, lutetium and zirconium. Bundled in IUPAC_ATOMIC_WEIGHTS (data/lab/iupac-atomic-weights.json); of the three revised elements only zirconium is bundled, at its 2024 value of 91.222.",
     freeAccess: "Free at iupac.org/publications/journals/pac/. Element-by-element values published in Pure and Applied Chemistry.",
     governance: GOVERNANCE.lab,
-    editionNote: "IUPAC publishes adjustments roughly every 2-4 years; bundled values follow the 2021 edition.",
+    editionNote: "IUPAC publishes adjustments roughly every 2-4 years; bundled values follow the 2024 abridged table (the 2021 report plus the 2024 revisions, of which only zirconium is bundled).",
     assumptions: [
       { name: "Isotopic abundance", value: "natural terrestrial average per IUPAC", source: "IUPAC 2021" },
-      { name: "Hydrate notation", value: "dot (.) and middle-dot treated as concatenation", source: "convention" },
+      { name: "Hydrate notation", value: "dot (.) and middle-dot join molecules; a leading hydrate coefficient (CuSO4·5H2O) is not supported -- write it as CuSO4·(H2O)5", source: "convention" },
     ],
   },
   "mass-moles": {
@@ -7774,12 +7774,12 @@ export const CITATIONS = {
   },
   "henderson-hasselbalch": {
     formula: "pH = pKa + log10([A-] / [HA]). ratio = 10^(pH - pKa). fraction_base = ratio / (ratio + 1). Moles each side from total buffer concentration * total volume * fraction.",
-    edition: "Henderson-Hasselbalch equation. First principles. Common laboratory buffer pKa values bundled in BUFFER_PKA (data/lab/buffer-pka.json) with per-entry citation (Good et al. 1966; CRC Handbook 95th ed.).",
+    edition: "Henderson-Hasselbalch equation. First principles. Common laboratory buffer pKa values bundled in BUFFER_PKA (data/lab/buffer-pka.json) with per-entry citation (Good et al. 1966 names the Good's buffers, tabulated at 20 C; their 25 C values per PanReac AppliChem IP-022EN; CRC Handbook 95th ed. for Tris / phosphate / acetate / bicarbonate).",
     freeAccess: "Good et al. 1966 historical paper free at the journal archive; CRC Handbook is a commercial reference book; the bundled pKa values are public physical constants cited only by name.",
     governance: GOVERNANCE.lab,
     editionNote: "Single-edition (physical chemistry).",
     assumptions: [
-      { name: "Temperature", value: "pKa values at 25 C", source: "CRC Handbook / Good et al. tabulation convention" },
+      { name: "Temperature", value: "pKa values at 25 C", source: "CRC Handbook 95th ed.; PanReac AppliChem IP-022EN for HEPES / MES / MOPS / PIPES (Good et al. tabulate at 20 C)" },
       { name: "Activity coefficients", value: "ignored (concentrations approximate activities at low ionic strength)", source: "approximation" },
     ],
   },
@@ -7865,7 +7865,7 @@ export const CITATIONS = {
     ],
   },
   "piti": {
-    formula: "Monthly P&I = (P * r) / (1 - (1 + r)^-n) where P is principal, r is APR/12, n is term in months. PITI = P&I + monthly_tax + monthly_insurance. Tax = annual_property_tax / 12; insurance = annual_premium / 12. HOA and PMI are user-supplied monthly line items.",
+    formula: "Monthly P&I = (P * r) / (1 - (1 + r)^-n) where P is principal, r is APR/12, n is term in months. PITI = P&I + monthly_tax + monthly_insurance. Tax = annual_property_tax / 12; insurance = annual_premium / 12. HOA and PMI are user-supplied monthly line items; the total output (key piti_plus_hoa) includes both HOA and PMI.",
     edition: "Standard mortgage amortization. The closed-form annuity-payment formula is universal.",
     freeAccess: "Public reference; covered in any introductory finance text. CFPB Closing Disclosure form (public) shows the same line-item composition.",
     governance: GOVERNANCE.real_estate,
@@ -7877,7 +7877,7 @@ export const CITATIONS = {
     ],
   },
   "mortgage-point-breakeven": {
-    formula: "Monthly payment at each rate = (P * r) / (1 - (1 + r)^-n), r = rate/12, n = term months. monthly_savings = payment_base - payment_points. point_cost = loan * point_cost_pct/100. break_even_months = point_cost / monthly_savings. Verdict compares holding period (months) to break-even.",
+    formula: "Monthly payment at each rate = (P * r) / (1 - (1 + r)^-n), r = rate/12, n = term months. monthly_savings = payment_base - payment_points. point_cost = loan * point_cost_pct/100. break_even_months = point_cost / monthly_savings. Verdict compares holding period (months) to the break-even rounded up to the first whole month that recovers the point cost.",
     edition: "First-principles amortization. Discount points and their cost are disclosed on the CFPB Loan Estimate and Closing Disclosure (12 CFR 1026.37-38).",
     freeAccess: "CFPB Loan Estimate / Closing Disclosure forms free at consumerfinance.gov. The amortization formula is universal.",
     governance: GOVERNANCE.real_estate,
@@ -8316,7 +8316,7 @@ export const CITATIONS = {
 
   // ---- spec-v24 conduit-bending suite (Group A) ----
   "conduit-offset": {
-    formula: "Distance between the two bend marks = offset / sin(angle) (the cosecant multiplier); total shrink = offset * tan(angle/2). The classic multipliers (30 deg = 2.0, 45 deg = 1.41, 22.5 deg = 2.61, 60 deg = 1.15) and shrink rules fall out of the trig exactly.",
+    formula: "Distance between the two bend marks = offset / sin(angle) (the cosecant multiplier); total shrink = offset * tan(angle/2). The classic multipliers (30 deg = 2.0, 45 deg = 1.41, 22.5 deg = 2.61, 60 deg = 1.15) fall out of the trig (rounded); the field shrink-per-inch rules are approximations of tan(angle/2).",
     edition: "Standard conduit-bending trigonometry taught in the electrical apprenticeship and summarized in Ugly's Electrical References and the NECA bending guidance, by name. NEC Article 358 minimum radius and the 360-degree-per-run limit govern the install.",
     freeAccess: "Free read-only access to the NEC at nfpa.org/freeaccess. The bending trigonometry is public first-principles math.",
     governance: GOVERNANCE.electrical,
@@ -8350,13 +8350,13 @@ export const CITATIONS = {
 
   // ---- spec-v24 welding / metal / layout (Group E) ----
   "weld-heat-input": {
-    formula: "Arc energy = (60 * V * I) / TS (J per unit length); heat input HI = arc energy * efficiency / 1000 (kJ per unit length). Arc efficiency defaults by process: 0.8 SMAW/GMAW/FCAW, 0.6 GTAW, 1.0 SAW (user-editable). kJ/in to kJ/mm via x 0.0394.",
-    edition: "AWS D1.1 Structural Welding Code and ASME BPVC Section IX heat-input definition HI = (60*V*I)/TS, by name, with the arc-efficiency factor by process.",
+    formula: "Arc energy = (60 * V * I) / TS (J per unit length), the ASME IX QW-409.1 / AWS D1.1 heat input; the WPS range is checked against arc energy / 1000 (kJ per unit length). EN 1011-1 heat input = arc energy * k / 1000, with k by process: 0.8 SMAW/GMAW/FCAW, 0.6 GTAW, 1.0 SAW (user-editable), reported separately. kJ/in to kJ/mm via x 0.0394.",
+    edition: "AWS D1.1 Structural Welding Code and ASME BPVC Section IX QW-409.1 heat-input definition HI = (60*V*I)/TS with no efficiency factor, by name; the per-process arc-efficiency (k) factors are EN 1011-1 / ISO/TR 17671 and apply only to the EN 1011-1 figure.",
     freeAccess: "Free overviews at aws.org. The governing WPS/PQR ranges are user-supplied.",
     governance: GOVERNANCE.engineer_of_record,
     editionNote: "Editions available: AWS D1.1 and ASME BPVC Section IX revise on multi-year cycles; the heat-input definition is stable but the qualified-WPS ranges govern. Verify the adopted code edition.",
     assumptions: [
-      { name: "Arc efficiency", value: "process default 0.6 to 1.0, user-editable", source: "AWS/ASME process convention" },
+      { name: "Arc efficiency", value: "process default 0.6 to 1.0, user-editable; EN 1011-1 figure only, not the WPS check", source: "EN 1011-1 / ISO/TR 17671 k-factors" },
     ],
   },
   "metal-weight": {
@@ -8458,9 +8458,9 @@ export const CITATIONS = {
     edition: "Simple circular-curve geometry per the AASHTO A Policy on Geometric Design of Highways and Streets (the Green Book) and FM 5-233 Construction Surveying, by name; first-principles trig.",
     freeAccess: "FM 5-233 is public-domain US Government work, free at US Army publication archives. The design of record and the engineer of record govern the alignment.",
     governance: GOVERNANCE.engineer_of_record,
-    editionNote: "Single-edition (first-principles curve trig). The arc-vs-chord degree-of-curve definition is a labeled toggle so the two never silently mix.",
+    editionNote: "Single-edition (first-principles curve trig). Arc definition only (D = 5729.58 / R); the chord definition is not offered.",
     assumptions: [
-      { name: "Degree definition", value: "arc definition D = 5729.58 / R unless the chord toggle is set", source: "AASHTO / FM 5-233" },
+      { name: "Degree definition", value: "arc definition D = 5729.58 / R (no chord option)", source: "AASHTO / FM 5-233" },
     ],
   },
   "spiral-curve": {
@@ -8525,7 +8525,7 @@ export const CITATIONS = {
     edition: "The average-end-area and prismoidal earthwork-volume methods per the FHWA and state-DOT earthwork references and FM 5-233, by name; first-principles.",
     freeAccess: "FM 5-233 is public-domain US Government work. Compaction swell/shrink factors are material- and spec-specific and user-supplied; the project earthwork report governs the paid quantity.",
     governance: GOVERNANCE.engineer_of_record,
-    editionNote: "Single-edition (first-principles volume methods). Cut and fill are entered and labeled separately, never netted automatically, to avoid a sign trap.",
+    editionNote: "Single-edition (first-principles volume methods). One material per run; cut and fill are not netted (run each separately) to avoid a sign trap.",
     assumptions: [
       { name: "Swell/shrink factor", value: "material- and spec-specific, user-supplied", source: "project earthwork report" },
     ],
@@ -8535,7 +8535,7 @@ export const CITATIONS = {
     edition: "Slope-stake cut/fill and the catch-point (daylight) offset for a planar design slope per FM 5-233 Construction Surveying and the FHWA construction-survey guidance, by name; first-principles grading geometry.",
     freeAccess: "FM 5-233 is public-domain US Government work. A field staking aid; the grading plan and the surveyor of record govern.",
     governance: GOVERNANCE.engineer_of_record,
-    editionNote: "Single-edition (first-principles grading geometry). The H:V vs V:H convention is a labeled toggle so a 2:1 is never read upside down.",
+    editionNote: "Single-edition (first-principles grading geometry). The slope is entered as H in H:V (2 for a 2:1 slope), and the field label says so, so a 2:1 is never read upside down.",
     assumptions: [
       { name: "Planar slope", value: "planar design slope to a single catch point; compound slopes out of scope", source: "method" },
     ],
@@ -8625,7 +8625,7 @@ export const CITATIONS = {
     edition: "The coordinate (shoelace) method for the area of a closed traverse per FM 5-233 Construction Surveying and the standard surveying texts, by name; public-domain US Government work and first-principles coordinate geometry.",
     freeAccess: "FM 5-233 is public-domain US Government work, free at US Army publication archives. The recorded plat and the surveyor of record govern the legal area.",
     governance: GOVERNANCE.general,
-    editionNote: "Single-edition (first-principles coordinate geometry). A self-intersecting (bow-tie) polygon is flagged; the signed area is reported but is not a simple enclosed area.",
+    editionNote: "Single-edition (first-principles coordinate geometry). The absolute shoelace area and the winding (clockwise / counter-clockwise) are reported; a self-intersecting (bow-tie) ring is not detected, and its shoelace result is not a simple enclosed area.",
     assumptions: [
       { name: "Coordinate order", value: "North/East (surveying convention), labeled inline", source: "FM 5-233" },
     ],
@@ -8635,7 +8635,7 @@ export const CITATIONS = {
     edition: "Traverse latitude/departure, linear misclosure, relative precision, and the Compass (Bowditch) rule adjustment per FM 5-233 Construction Surveying and the standard surveying references, by name; public-domain and first-principles.",
     freeAccess: "FM 5-233 is public-domain US Government work, free at US Army publication archives. The field procedure, instrument calibration, and the surveyor of record govern the record traverse.",
     governance: GOVERNANCE.general,
-    editionNote: "Single-edition (first-principles traverse geometry). A misclosure of exactly zero reports perfect closure rather than 1:infinity; an open traverse suppresses the precision ratio with a note.",
+    editionNote: "Single-edition (first-principles traverse geometry). A misclosure of exactly zero reports perfect closure rather than 1:infinity. The tile assumes a closed loop traverse; an open traverse is not detected, and its precision ratio is meaningless.",
     assumptions: [
       { name: "Adjustment method", value: "Compass (Bowditch) rule; the transit rule and least-squares are alternatives", source: "FM 5-233" },
     ],
@@ -9713,12 +9713,12 @@ export const CITATIONS = {
   },
   "sling-d-d-efficiency": {
     formula: "ratio = bend_dia / sling_dia; efficiency interpolated from the WRTB 6x19 / 6x37 D/d curve (1->0.50 ... 25->0.93, 40+ ->0.95, plateauing below full strength); reduced_wll = rated_wll x efficiency.",
-    edition: "Wire Rope Technical Board Wire Rope Users Manual (D/d bend efficiency) and ASME B30.9 by name; the curve ships as editable breakpoints.",
+    edition: "Wire Rope Technical Board Wire Rope Users Manual (D/d bend efficiency) and ASME B30.9 by name; the curve ships as fixed breakpoints from the WRTB 6x19 / 6x37 chart (75/79/83/86/89/91/93/95% at D/d 4/6/8/10/15/20/25/40).",
     freeAccess: "The WRTB D/d efficiency curve is published guidance; ASME B30.9 is a consensus standard.",
     governance: GOVERNANCE.rigging,
     editionNote: "The bundled curve is for 6x19 / 6x37 wire-rope slings; synthetic round and web slings follow their own bend factors. The rated WLL is the catalog straight-pull value; the sling-angle factor and any choker reduction apply on top. A damaged or kinked sling is removed from service.",
     assumptions: [
-      { name: "D/d curve", value: "editable [ratio, efficiency] breakpoints for 6x19 / 6x37 wire rope", source: "WRTB Wire Rope Users Manual" },
+      { name: "D/d curve", value: "fixed [ratio, efficiency] breakpoints for 6x19 / 6x37 wire rope", source: "WRTB Wire Rope Users Manual" },
     ],
   },
   "wind-on-load": {
@@ -9765,13 +9765,13 @@ export const CITATIONS = {
     ],
   },
   "shackle-eyebolt-wll": {
-    formula: "derated_capacity = rated_wll x derate(angle, hardware); pass = derated_capacity >= leg_load. Shackle side-load 0->1.00 / 45->0.70 / 90->0.50; shoulder eye bolt 0->1.00 / 15->0.75 / 30->0.55 / 45->0.30 / 90->0.25 (Crosby chart at 45 and 90 deg; 15 and 30 interpolated). MBS = rated_wll x design_factor (5:1).",
-    edition: "ASME B30.26 (Rigging Hardware) and ASME B18.15 / manufacturer eye-bolt data by name; the eye-bolt curve carries the Crosby chart points (30% at 45 deg, 25% at 90 deg), and the shackle side-load curve is an editable approximation.",
+    formula: "derated_capacity = rated_wll x derate(angle, hardware); pass = derated_capacity >= leg_load. Shackle side-load 0->1.00 / 45->0.70 / 90->0.50; shoulder eye bolt 0->1.00 / 15->0.75 / 30->0.53 / 45->0.30 / 90->0.25 (Crosby chart at 45 and 90 deg; 15 and 30 set at or slightly under the 0-45 straight line). MBS = rated_wll x design_factor (5:1).",
+    edition: "ASME B30.26 (Rigging Hardware) and ASME B18.15 / manufacturer eye-bolt data by name; the eye-bolt curve carries the Crosby chart points (30% at 45 deg, 25% at 90 deg), and the shackle side-load curve is a fixed approximation (100% in line, 70% at 45 deg, 50% at 90 deg).",
     freeAccess: "ASME B30.26 is a published consensus standard. The angular derate follows the manufacturer's chart.",
     governance: GOVERNANCE.rigging,
     editionNote: "Shackles are loaded in line through the bow and pin; a side load follows the reduced chart. A shoulder eye bolt keeps 30% of its rating at 45 degrees and 25% at 90 (Crosby), and an angular pull on a plain (non-shoulder) eye bolt is not permitted. The 5:1 design factor is on the WLL.",
     assumptions: [
-      { name: "Derate curves", value: "editable [angle, factor] breakpoints per hardware type", source: "ASME B30.26 manufacturer charts" },
+      { name: "Derate curves", value: "fixed [angle, factor] breakpoints per hardware type", source: "ASME B30.26 manufacturer charts" },
       { name: "Design factor", value: "5:1 on the WLL (reported as MBS)", source: "ASME B30.26 / B30.9" },
     ],
   },
@@ -11278,7 +11278,7 @@ export const CITATIONS = {
     ],
   },
   "haul-cycle-production": {
-    formula: "cycle = load + haul + dump + return + spot; loads_per_hour = working_min / cycle; production = truck_cap x loads_per_hour; trucks = ceil(cycle / load); fleet = production x trucks.",
+    formula: "cycle = load + haul + dump + return + spot; loads_per_hour = working_min / cycle; production = truck_cap x loads_per_hour; trucks = ceil(cycle / load); fleet = min(production x trucks, truck_cap x working_min / load), the loader capping the fleet when the truck count rounds up.",
     edition: "Caterpillar Performance Handbook cycle-time production-estimating method by name; first-principles cycle arithmetic.",
     freeAccess: "The cycle-time production method is published earthmoving practice.",
     governance: GOVERNANCE.general,
@@ -11322,7 +11322,7 @@ export const CITATIONS = {
     ],
   },
   "ripper-production": {
-    formula: "cross_section_ft2 = spacing_ft x penetration_ft; production_bcy_hr = cross_section_ft2 x speed_fpm x 60 x efficiency / 27 (60 min/hr, 27 ft^3/cy fold the units).",
+    formula: "cross_section_ft2 = spacing_ft x penetration_ft; production_bcy_hr = cross_section_ft2 x speed_fpm x 60 x efficiency / 27 (60 min/hr, 27 ft^3/cy fold the units); with a pass length and turn time (Cat timing method): production = (cross_section_ft2 x pass_length / 27) x 60 / (pass_length / speed + turn) x efficiency.",
     edition: "Swept-prism production identity by name (loosened volume = ripped cross-section x travel rate); first-principles unit-folding arithmetic.",
     freeAccess: "The swept-prism production identity is published earthmoving practice; the 60 and 27 unit constants are exact.",
     governance: GOVERNANCE.general,
@@ -11616,7 +11616,7 @@ export const CITATIONS = {
     ],
   },
   "pipe-fitting-takeout": {
-    formula: "Center-to-center: cut = C-to-C - (takeout_A + takeout_B) + (makeup_A + makeup_B). Face-to-face lands on the fitting faces, so only make-up / weld gap applies.",
+    formula: "Center-to-center: cut = C-to-C - (takeout_A + takeout_B) + (makeup_A + makeup_B) - (weld_gap_A + weld_gap_B); thread make-up adds back for threaded joints, and a butt-weld root gap is subtracted at each end. Face-to-face lands on the fitting faces, so only make-up (added) and weld gap (subtracted) apply.",
     edition: "Fitting take-out / make-up cut-length layout as taught in NCCER Pipefitting and the standard fitter's references, by name; first-principles.",
     freeAccess: "Public first-principles layout. Fitting take-out and thread make-up are product-/schedule-specific and user-supplied; confirm against your fittings and the spool drawing.",
     governance: GOVERNANCE.general,
@@ -12230,8 +12230,8 @@ export const CITATIONS = {
     governance: GOVERNANCE.worker_safety,
     editionNote: "Hot-work hazards govern; follow the equipment maker's instructions and your site's hot-work permit. The preheat TEMPERATURE comes from carbon-equivalent or the WPS; this tile only sizes the FUEL to reach it.",
     assumptions: [
-      { name: "Steel specific heat", value: "0.11 Btu/lb-degF default; editable", source: "carbon-steel property tables" },
-      { name: "Propane heating value", value: "21,600 Btu/lb and 91,500 Btu/gal default; editable", source: "propane property tables" },
+      { name: "Steel specific heat", value: "0.11 Btu/lb-degF default (compute input c_steel; not on the page)", source: "carbon-steel property tables" },
+      { name: "Propane heating value", value: "21,600 Btu/lb (compute input propane_btu_lb; not on the page) and a fixed 91,500 Btu/gal for the gallon figure", source: "propane property tables" },
       { name: "Open-torch efficiency", value: "25% default (roughly 15 to 30% for an open torch on a plate); an enclosed heat, blanket, or induction is far higher; hold the preheat through the weld and verify the interpass temperature", source: "welding preheat practice" },
     ],
   },
@@ -16294,7 +16294,7 @@ export const CITATIONS = {
     edition: "Entertainment rigging bridle geometry (asymmetric two-leg static resolution), by name.",
     freeAccess: "Static bridle resolution is a public statics result; ASME B30.9 governs rigging practice. An ESTIMATE only; the hardware ratings and a qualified rigger govern.",
     governance: GOVERNANCE.rigging,
-    editionNote: "An off-center or unequal-height apex makes the two legs carry unequal tension (the steeper or shorter leg carries more); a shallow bridle multiplies leg tension so a leg can exceed the hung load and drives a large horizontal pull into the beams; this is a static two-dimensional resolution (a three-point bridle or out-of-plane geometry differs). A design aid, not a rigging sign-off.",
+    editionNote: "An off-center or unequal-height apex makes the two legs carry unequal tension (the steeper leg, the one closer to vertical, carries more); a shallow bridle multiplies leg tension so a leg can exceed the hung load and drives a large horizontal pull into the beams; this is a static two-dimensional resolution (a three-point bridle or out-of-plane geometry differs). A design aid, not a rigging sign-off.",
     assumptions: [
       { name: "Two-dimensional statics", value: "single apex, two legs in one vertical plane; a three-point or out-of-plane bridle differs", source: "bridle statics" },
       { name: "Estimate only", value: "the hardware working load limits and a qualified rigger govern the actual pick", source: "ASME B30.9" },
@@ -17949,7 +17949,7 @@ export const CITATIONS = {
     ],
   },
   "product-pull-down-load": {
-    formula: "above freezing: Q = m cp (t_enter - t_storage); freezing: Q = m cp_above (t_enter - t_freeze) + m hif + m cp_below (t_freeze - t_storage); rate = Q / hours.",
+    formula: "above freezing: Q = m cp (t_enter - t_storage); freezing: Q = m cp_above (t_enter - t_freeze) + m hif + m cp_below (t_freeze - t_storage); product entering at or below its freezing point: Q = m cp_below (t_enter - t_storage), no latent term; rate = Q / hours.",
     edition: "The product pull-down (cooling and freezing) load with the latent heat of fusion, from ASHRAE Refrigeration, by name.",
     freeAccess: "The sensible-plus-latent product-cooling load is standard published refrigeration practice; the property tables are in the ASHRAE Handbook - Refrigeration.",
     governance: GOVERNANCE.general,
@@ -17961,7 +17961,7 @@ export const CITATIONS = {
     ],
   },
   "product-pull-down-time": {
-    formula: "hours = Q / capacity_btuh, with Q from the product pull-down relation (above freezing Q = m cp (t_enter - t_storage); freezing Q = m cp_above (t_enter - t_freeze) + m hif + m cp_below (t_freeze - t_storage)). The inverse of product-pull-down-load (which returns rate = Q / hours).",
+    formula: "hours = Q / capacity_btuh, with Q from the product pull-down relation (above freezing Q = m cp (t_enter - t_storage); freezing Q = m cp_above (t_enter - t_freeze) + m hif + m cp_below (t_freeze - t_storage); product entering at or below its freezing point: Q = m cp_below (t_enter - t_storage), no latent term). The inverse of product-pull-down-load (which returns rate = Q / hours).",
     edition: "The product pull-down time from the sensible-plus-latent cooling load and the available capacity, from ASHRAE Refrigeration, by name.",
     freeAccess: "The sensible-plus-latent product-cooling load is standard published refrigeration practice; the property tables are in the ASHRAE Handbook - Refrigeration.",
     governance: GOVERNANCE.general,
@@ -22847,13 +22847,13 @@ export const CITATIONS = {
   },
   "extrusion-output-rate": {
     formula: "output = cross-sectional area x line speed x the product's solid density (the dimensions are the cooled product's), with the EXACT annular area pi/4 x (OD^2 - ID^2); line speed inverts it, and draw-down is die opening over product size.",
-    edition: "The extrusion mass balance. The exact annulus is used rather than the thin-wall approximation pi x OD x wall, which runs several percent high on a heavy wall and puts that error directly onto the output figure. Melt density is ENTERED because it differs from solid density and varies with temperature.",
+    edition: "The extrusion mass balance. The exact annulus is used rather than the thin-wall approximation pi x OD x wall, which runs several percent high on a heavy wall and puts that error directly onto the output figure. The SOLID product density is entered, not the melt density, because the dimensions are the cooled product's.",
     freeAccess: "One mass balance on entered geometry.",
     governance: GOVERNANCE.general,
     editionNote: "COOLING USUALLY GOVERNS, NOT THE SCREW, and that is the diagnosis this supports. An extruder rated above what the bath can solidify does not make more good product: it makes product that leaves the bath soft, ovalises under the puller and drifts dimensionally. Adding extruder output to a cooling-limited line buys nothing, and the money goes to bath length or a vacuum tank rather than a bigger machine. The operator's instinct to slow the line and leave the screw alone makes it worse, because it puts more material in every foot. Draw-down is why speed and output are not independently adjustable -- changing one without the other changes the orientation the product was qualified at.",
     assumptions: [
       { name: "Exact annulus, round product only", value: "profiles and non-uniform walls are a different area", source: "the product drawing" },
-      { name: "Melt density is entered", value: "differs from solid density and varies with temperature", source: "the material supplier's melt data" },
+      { name: "Solid density is entered", value: "the cooled product's density; melt density would read about 20% low", source: "the material supplier's data" },
       { name: "No die swell", value: "which is why the die is not cut to the product size", source: "the die manufacturer's data" },
     ],
   },
@@ -22922,7 +22922,7 @@ export const CITATIONS = {
     edition: "Foundry mould gas estimation. spec-v1715 supplied no arithmetic of its own, so only relations that can be defended from first principles are computed and everything else is stated as guidance. The binder gas evolution rate is ENTERED because binder suppliers publish it in cm3/g and it differs by binder system and by the metal poured against it.",
     freeAccess: "The ideal gas law and one published binder rate.",
     governance: GOVERNANCE.general,
-    editionNote: "Water expands roughly seventeen hundred times on flashing at the boil and some seven thousand times at pouring temperature, so a sand a percent or two over its target moisture generates gas faster than any permeability can pass it -- a problem no venting and no sand change fixes, because the control is at the MULLER. CORES ARE THE WORST CASE and are not in this arithmetic: a core is surrounded by metal on nearly every side, its binder decomposes as soon as metal arrives, and its only escape is through its own body to its prints, so an unvented core or one whose prints seal sends that gas into the casting, and the blowholes appear on the cored surface where inspection is hardest. The permeability trade does not resolve in general, which is why a foundry runs more than one sand system.",
+    editionNote: "Water expands roughly seventeen hundred times on flashing at the boil and nearly eight thousand times at pouring temperature, so a sand a percent or two over its target moisture generates gas faster than any permeability can pass it -- a problem no venting and no sand change fixes, because the control is at the MULLER. CORES ARE THE WORST CASE and are not in this arithmetic: a core is surrounded by metal on nearly every side, its binder decomposes as soon as metal arrives, and its only escape is through its own body to its prints, so an unvented core or one whose prints seal sends that gas into the casting, and the blowholes appear on the cored surface where inspection is hardest. The permeability trade does not resolve in general, which is why a foundry runs more than one sand system.",
     assumptions: [
       { name: "Volumes, not rates", value: "whether a casting gases depends on the RATE against the mould's passing rate", source: "AFS test procedures" },
       { name: "Binder gas rate is entered", value: "differs by binder system and by the metal poured", source: "the binder supplier's data" },
@@ -23517,7 +23517,7 @@ export const CITATIONS = {
     edition: "Darcy's law and the seepage velocity relation by name. EFFECTIVE porosity, not total porosity: only interconnected pore space conducts flow, and the gap between the two is largest in clay. One-dimensional steady flow through a homogeneous isotropic aquifer; no dispersion, degradation, density effects, or preferential pathways. The hydrogeologist's conceptual model, the site's own measured conductivity and gradient, and the regulator govern.",
     freeAccess: "Two divisions on a conductivity and a gradient the reader measures; no aquifer data is reproduced.",
     governance: GOVERNANCE.general,
-    editionNote: "Darcy's law gives a FLUX and not a speed, and the difference is the most consequential mistake in groundwater arithmetic. The Darcy velocity is flow per unit of TOTAL area, solids included, and no particle moves at it; water moves only through the pores, so the particle speed is that divided by the effective porosity and is always several times larger. Using the Darcy velocity to estimate travel time overstates it by exactly the reciprocal of the porosity, and in the dangerous direction -- it says a plume takes thirteen years to reach a receptor it reaches in four. Preferential pathways carry water far faster than any bulk average, so a computed travel time is a central estimate with a very fast tail.",
+    editionNote: "Darcy's law gives a FLUX and not a speed, and the difference is the most consequential mistake in groundwater arithmetic. The Darcy velocity is flow per unit of TOTAL area, solids included, and no particle moves at it; water moves only through the pores, so the particle speed is that divided by the effective porosity and is always several times larger. Using the Darcy velocity to estimate travel time overstates it by exactly the reciprocal of the porosity, and in the dangerous direction -- it says a plume takes about fourteen years to reach a receptor it reaches in four. Preferential pathways carry water far faster than any bulk average, so a computed travel time is a central estimate with a very fast tail.",
     assumptions: [
       { name: "Effective porosity, not total", value: "dead-end pores and bound water are part of the total and conduct nothing", source: "the hydrogeologist's conceptual model" },
       { name: "Homogeneous isotropic aquifer", value: "sand lenses, fractures and old trenches carry water far faster", source: "the site investigation" },
@@ -23697,7 +23697,7 @@ export const CITATIONS = {
   },
   "masonry-cleaning-dilution": {
     formula: "diluted solution = area / coverage; one part concentrate to N parts water is one part in N+1, so concentrate = diluted / (N+1) and water is the remainder; prewet and rinse water are counted at their own rates per 100 sq ft.",
-    edition: "The dilution and coverage identities by name. NO CLEANER, DILUTION OR COVERAGE IS SHIPPED: all three come from the manufacturer for the specific unit, and a test panel is required rather than advisable. Acid attacks polished stone, limestone, marble, many coloured and glazed units, and metal the runoff reaches. The cleaner manufacturer's instructions, the project specification, a test panel, and the applicable environmental rules govern.",
+    edition: "The dilution and coverage identities by name. NO CLEANER, DILUTION OR COVERAGE IS SHIPPED: all three come from the manufacturer for the specific unit, and a test panel is required rather than advisable. The prefilled dilution and coverage are the worked example's, not a recommendation. Acid attacks polished stone, limestone, marble, many coloured and glazed units, and metal the runoff reaches. The cleaner manufacturer's instructions, the project specification, a test panel, and the applicable environmental rules govern.",
     freeAccess: "Two divisions on a dilution and a coverage rate the reader has; no product data is reproduced.",
     governance: GOVERNANCE.general,
     editionNote: "THE CONCENTRATION IS A PROPERTY OF THE MASONRY RATHER THAN OF THE SOILING. Acid cleaners attack the cement paste in the mortar and the surface of many units, so the correct dilution is the weakest that removes the soiling, established on a test panel -- and strengthening it because the wall is dirty is the standard way to burn a facade, with damage that appears after the scaffold is down and is permanent. Prewetting keeps the cleaner on the surface rather than letting dry masonry draw it in, where it attacks the mortar from within and leaves salts that migrate out for years. Rinsing is a quantity as well as an action: residual cleaner keeps working, and an inadequate rinse produces damage that shows up days later on a wall that looked finished.",
@@ -23830,7 +23830,7 @@ export const CITATIONS = {
     ],
   },
   "tonnage-rating-grade": {
-    formula: "total resistance = 20 lb/ton per 1% of grade + the entered rolling resistance + 0.8 lb/ton per degree of curve; tonnage rating = governing tractive effort / total resistance, where the governing effort is the LOWER of the consist's tractive effort and the adhesion ceiling (weight on drivers x adhesion factor).",
+    formula: "total resistance = 20 lb/ton per 1% of grade + the entered rolling resistance + 0.8 lb/ton per degree of curve; trailing tonnage rating = governing tractive effort / total resistance - locomotive tons (weight on drivers / 2,000), where the governing effort is the LOWER of the consist's tractive effort and the adhesion ceiling (weight on drivers x adhesion factor).",
     edition: "The train resistance components by name, with the 20 lb/ton per 1% grade constant shared with the haul-road resistance calculation so the two cannot disagree about what a grade costs. Adhesion runs roughly 0.25 to 0.35 dry with modern control and much less on wet or contaminated rail. Steady state at constant speed: no starting resistance, slack action, drawbar limits, or braking. The railroad's own tonnage tables, the locomotive builder's tractive effort curves, and the operating department govern.",
     freeAccess: "Three multiplications and a division; no railroad tonnage table is reproduced.",
     governance: GOVERNANCE.general,
@@ -24256,7 +24256,7 @@ export const CITATIONS = {
     edition: "The damper torque factor convention. Factors are ENTERED: roughly 3 to 5 in-lb per sq ft for an ordinary low-pressure damper, 5 to 7 at higher velocity and pressure, and 7 to 10 or more with blade and jamb seals.",
     freeAccess: "An area calculation and a ladder lookup.",
     governance: GOVERNANCE.general,
-    editionNote: "SEALS ARE THE WHOLE STORY AND THEY ARE SPECIFIED BY SOMEONE ELSE. A 48 x 36 in damper needs a 140 in-lb actuator unsealed and 180 with blade and jamb seals -- the seals move the selection up a size, and the leakage specification that required them lives on the DAMPER schedule rather than the actuator schedule. That is the disconnect: the damper is correctly specified, the actuator is sized from the ordinary factor, and the two documents never meet. THE FAILURE LOOKS LIKE A CONTROL PROBLEM: the damper strokes to within a few degrees of closed, the actuator sits at stall compressing the last of the seal, and the control system reports the COMMANDED position rather than the achieved one -- so what gets investigated is the freeze stat that tripped. AND NONE OF THIS ADDRESSES CLOSE-OFF, which is separately rated and frequently governs for isolation service: an actuator adequate to stroke a damper can be inadequate to keep it closed once the fan starts. A spring-return actuator delivers LESS torque than the same frame size without one. The actuator ladder is bundled as the four standard sizes rather than taken as a list input; a different ladder is the manufacturer's to supply.",
+    editionNote: "SEALS ARE THE WHOLE STORY AND THEY ARE SPECIFIED BY SOMEONE ELSE. A 48 x 36 in damper needs a 140 in-lb actuator unsealed and 180 with blade and jamb seals -- the seals move the selection up a size, and the leakage specification that required them lives on the DAMPER schedule rather than the actuator schedule. That is the disconnect: the damper is correctly specified, the actuator is sized from the ordinary factor, and the two documents never meet. THE FAILURE LOOKS LIKE A CONTROL PROBLEM: the damper strokes to within a few degrees of closed, the actuator sits at stall compressing the last of the seal, and the control system reports the COMMANDED position rather than the achieved one -- so what gets investigated is the freeze stat that tripped. AND NONE OF THIS ADDRESSES CLOSE-OFF, which is separately rated and frequently governs for isolation service: an actuator adequate to stroke a damper can be inadequate to keep it closed once the fan starts. A spring-return actuator delivers LESS torque than the same frame size without one. The actuator ladder is bundled as the five standard sizes rather than taken as a list input; a different ladder is the manufacturer's to supply.",
     assumptions: [
       { name: "Torque factors are entered", value: "blade style, bearings, linkage, frame, velocity and seals all move them", source: "the damper manufacturer's published torque" },
       { name: "Close-off is NOT computed", value: "holding shut against fan pressure is a separate published rating", source: "the actuator datasheet" },
@@ -25319,7 +25319,7 @@ export const CITATIONS = {
     edition: "Standard metal finishing mass balance and the counterflow rinse dilution relation. The dragout rate is ENTERED and must be measured for the actual parts, racks and drain practice.",
     freeAccess: "A mass balance and an Nth root.",
     governance: GOVERNANCE.general,
-    editionNote: "THE POWER LAW IS THE RESULT: the required flow falls as the Nth ROOT of the dilution ratio, so on a 1,000:1 target the step from one rinse tank to two cuts the water by 96.8%, the step from two to three adds only 2.2 points more, and a fourth stage saves an order of magnitude less again while costing a tank, floor space and another transfer. That is why lines are built with two or three rinses and almost never with five. The relation assumes IDEAL MIXING in each stage, complete carry-over between stages and steady state, and a real rinse falls short of all three, so these flows are a LOWER BOUND. And the cheapest gallon is the one never dragged out -- longer drain time, a rack that lets solution run off instead of cupping, drain boards and air knives cut the chemical loss, the rinse water and the effluent load at once, because all three are proportional to the same number.",
+    editionNote: "THE POWER LAW IS THE RESULT: the required flow falls as the Nth ROOT of the dilution ratio, so on a 1,000:1 target the step from one rinse tank to two cuts the water by 96.8%, the step from two to three adds only 2.2 points more, and a fourth stage saves about a fifth as much again while costing a tank, floor space and another transfer. That is why lines are built with two or three rinses and almost never with five. The relation assumes IDEAL MIXING in each stage, complete carry-over between stages and steady state, and a real rinse falls short of all three, so these flows are a LOWER BOUND. And the cheapest gallon is the one never dragged out -- longer drain time, a rack that lets solution run off instead of cupping, drain boards and air knives cut the chemical loss, the rinse water and the effluent load at once, because all three are proportional to the same number.",
     assumptions: [
       { name: "Dragout is measured, not predicted", value: "roughly 0.4 to 2 gal per 1,000 sq ft for well-drained flat work, up to 10 for cupped or threaded parts", source: "weighing racked parts wet and dry over the tank" },
       { name: "Ideal counterflow", value: "perfect mixing, complete carry-over, steady state", source: "the standard dilution relation" },

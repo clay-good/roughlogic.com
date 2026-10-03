@@ -672,6 +672,7 @@ export function computeHemocytometer({
   if (!(total_cells_counted >= 0)) return { error: "Cell count cannot be negative." };
   if (!(squares_counted > 0)) return { error: "Need at least one square counted." };
   if (!(dilution_factor > 0)) return { error: "Dilution factor must be positive." };
+  if (Number.isFinite(dead_cells) && dead_cells > total_cells_counted) return { error: "Dead cells cannot exceed the total cells counted." };
   const avg_per_square = total_cells_counted / squares_counted;
   const cells_per_mL = avg_per_square * 1e4 * dilution_factor;
   let viability_pct = null;
@@ -998,7 +999,7 @@ function renderResuspend(inputRegion, outputRegion, citationEl) {
 }
 
 function renderPcrMix(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: master-mix arithmetic. component_total = per_reaction * n_reactions * (1 + fudge_factor).";
+  citationEl.textContent = "Citation: master-mix arithmetic. component_total = per_reaction * n_reactions * (1 + fudge_factor_pct / 100).";
   inputRegion.appendChild(makeNotice(LAB_NOTICE));
   const n = makeNumber("Number of reactions", "pcr-n", { step: "1", min: "1" });
   n.input.value = "24";
@@ -1103,7 +1104,7 @@ function renderHemocytometer(inputRegion, outputRegion, citationEl) {
   const update = debounce(() => {
     const r = computeHemocytometer({
       total_cells_counted: Number(cnt.input.value), squares_counted: Number(sq.input.value),
-      dilution_factor: Number(df.input.value), dead_cells: Number(dead.input.value) || null,
+      dilution_factor: Number(df.input.value), dead_cells: dead.input.value === "" ? null : Number(dead.input.value),
     });
     if (r.error) { out.textContent = r.error; via.textContent = ""; return; }
     out.textContent = r.cells_per_mL.toExponential(3);

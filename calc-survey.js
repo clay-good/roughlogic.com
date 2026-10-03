@@ -1262,7 +1262,7 @@ export function computeLidarPointDensity({ pulse_rate_khz = 0, scan_angle_deg = 
   const point_spacing_m = 1 / Math.sqrt(point_density_per_m2);
   const line_spacing_m = swath_width_m * (1 - side_overlap_pct / 100);
   // The two levers, and their costs. Speed is linear in both density and time;
-  // height is linear in density and QUADRATIC in flight lines.
+  // height is linear in density and linear in flight lines too.
   const half_speed_density = densityFor(flight_height_m, ground_speed_ms / 2);
   const half_height_swath_m = swathFor(flight_height_m / 2);
   const half_height_density = densityFor(flight_height_m / 2, ground_speed_ms);

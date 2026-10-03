@@ -3619,7 +3619,7 @@ export const wsfuDemandExample = {
 };
 
 function renderWsfuDemand(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: Hunter's curve (NBS BMS65, Methods of Estimating Loads in Plumbing Systems) and IPC 2021 Appendix E (Table E103.3(2)) by name; the demand curve ships as editable breakpoints, not a transcribed table.";
+  citationEl.textContent = "Citation: Hunter's curve (NBS BMS65, Methods of Estimating Loads in Plumbing Systems) and IPC 2021 Appendix E (Table E103.3(3)) by name; the demand curve carries that table's printed rows as editable breakpoints, linearly interpolated.";
   const fu = makeNumber("Total water-supply fixture units (WSFU)", "wd-fu", { step: "any", min: "0" });
   const sys = makeSelect("System type", "wd-sys", [
     { value: "flush_tank", label: "Flush tank (gravity)", selected: true }, { value: "flush_valve", label: "Flush valve (flushometer)" },

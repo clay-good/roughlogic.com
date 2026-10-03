@@ -61,8 +61,11 @@ test("conduit-90-stub: segment shot count, impractical-deduct flag", () => {
 test("weld-heat-input: kJ/mm conversion and WPS range flag", () => {
   const r = computeWeldHeatInput({ process: "SMAW", voltage_V: 25, current_A: 200, travel_in_min: 8, efficiency: 0.8 });
   assert.ok(near(r.heat_input_kj_mm, 30 * 0.0393701, 1e-4));
-  const pass = computeWeldHeatInput({ process: "SMAW", voltage_V: 25, current_A: 200, travel_in_min: 8, efficiency: 0.8, wps_min_kj_in: 20, wps_max_kj_in: 35 });
+  // The WPS range is checked against the arc energy (37.5 kJ/in, ASME IX QW-409.1 / AWS D1.1), not the
+  // efficiency-reduced EN 1011-1 figure (30 kJ/in): 32-40 passes, and 20-35 now fails.
+  const pass = computeWeldHeatInput({ process: "SMAW", voltage_V: 25, current_A: 200, travel_in_min: 8, efficiency: 0.8, wps_min_kj_in: 32, wps_max_kj_in: 40 });
   assert.strictEqual(pass.pass, true);
+  assert.strictEqual(computeWeldHeatInput({ process: "SMAW", voltage_V: 25, current_A: 200, travel_in_min: 8, efficiency: 0.8, wps_min_kj_in: 20, wps_max_kj_in: 35 }).pass, false);
   const fail = computeWeldHeatInput({ process: "SMAW", voltage_V: 25, current_A: 200, travel_in_min: 8, efficiency: 0.8, wps_min_kj_in: 5, wps_max_kj_in: 25 });
   assert.strictEqual(fail.pass, false);
   assert.ok("error" in computeWeldHeatInput({ process: "SMAW", voltage_V: 25, current_A: 200, travel_in_min: 8, efficiency: 1.5 }));

@@ -63,7 +63,7 @@ export function computeLTV({ loan_amount, value }) {
   else if (ltv <= 80) band = "conforming (75-80%, no PMI)";
   else if (ltv <= 90) band = "high (80-90%, PMI required for conventional)";
   else if (ltv <= 97) band = "very high (90-97%, conforming limit for first-time buyers)";
-  else band = "exceeds conforming (>97%; FHA / VA / specialty programs only)";
+  else band = "exceeds conforming (>97%; VA / USDA / specialty programs only -- FHA caps purchase LTV at 96.5%)";
   return { ltv_percent: ltv, pmi_required, band };
 }
 
@@ -1776,11 +1776,12 @@ export function computeMortgagePointBreakeven({ loan_amount, base_rate_pct, poin
   let verdict;
   if (Number.isFinite(hold) && hold > 0) {
     const holdMonths = Math.round(hold * 12);
-    // Compare against the break-even month as printed: 60 mo held vs a 59.6 mo break-even used to read
-    // "you exit at 60 mo, before the 60-mo break-even."
-    verdict = holdMonths >= Math.round(break_even_months)
-      ? "Worth it: you hold " + holdMonths + " mo, past the " + Math.round(break_even_months) + "-mo break-even."
-      : "Not worth it for this hold: you exit at " + holdMonths + " mo, before the " + Math.round(break_even_months) + "-mo break-even.";
+    // Compare against the first whole month that recovers the cost, and print that month: 60 mo held
+    // vs a 60.18 mo break-even is not yet recovered (60 x $99.70 < $6,000), and 60 vs 59.6 is.
+    const breakEvenMonth = Math.ceil(break_even_months - 1e-9);
+    verdict = holdMonths >= breakEvenMonth
+      ? "Worth it: you hold " + holdMonths + " mo, past the " + breakEvenMonth + "-mo break-even."
+      : "Not worth it for this hold: you exit at " + holdMonths + " mo, before the " + breakEvenMonth + "-mo break-even.";
   } else {
     verdict = "Enter a holding period for a worth-it verdict.";
   }
@@ -2389,7 +2390,8 @@ REALESTATE_RENDERERS["rent-roll-vacancy"] = renderRentRollVacancy;
 // ===========================================================================
 
 // --- v20 X.1: Gross rent multiplier (`gross-rent-multiplier`) ---
-// GRM_annual = price / gross_annual_rent; implied_value = market_GRM * gross_rent.
+// GRM_annual = price / gross_annual_rent; implied_value = market_GRM * gross_rent on the
+// selected basis (the market GRM is read on the same annual or monthly basis as the rent).
 // dims: in { price: dimensionless, gross_rent: dimensionless, rent_basis: dimensionless, market_grm: dimensionless } out: { grm_annual: dimensionless, gross_yield_pct: dimensionless }
 export function computeGrossRentMultiplier({ price = 0, gross_rent = 0, rent_basis = "annual", market_grm = 0 } = {}) {
   const P = Number(price) || 0;
@@ -2402,7 +2404,8 @@ export function computeGrossRentMultiplier({ price = 0, gross_rent = 0, rent_bas
   const grmAnnual = P / annualRent;
   const grmMonthly = P / monthlyRent;
   const grossYield = 1 / grmAnnual * 100;
-  const impliedValue = mgrm > 0 ? mgrm * annualRent : null;
+  const basisRent = rent_basis === "monthly" ? monthlyRent : annualRent;
+  const impliedValue = mgrm > 0 ? mgrm * basisRent : null;
   return {
     grm_annual: Number.isFinite(grmAnnual) ? grmAnnual : null,
     grm_monthly: Number.isFinite(grmMonthly) ? grmMonthly : null,
@@ -2418,7 +2421,7 @@ function renderGrossRentMultiplier(inputRegion, outputRegion, citationEl) {
   const price = makeNumber("Purchase price / value ($)", "grm-price", { step: "any", min: "0" });
   const rent = makeNumber("Gross rental income ($)", "grm-rent", { step: "any", min: "0" });
   const basis = makeSelect("Rent basis", "grm-basis", [{ value: "annual", label: "Annual", selected: true }, { value: "monthly", label: "Monthly" }]);
-  const mgrm = makeNumber("Market/comparable GRM (optional)", "grm-mgrm", { step: "any", min: "0" });
+  const mgrm = makeNumber("Market/comparable GRM, same basis as the rent (optional)", "grm-mgrm", { step: "any", min: "0" });
   for (const f of [price, rent, basis, mgrm]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { price.input.value = "300000"; rent.input.value = "36000"; basis.select.value = "annual"; mgrm.input.value = ""; update(); });
   const oGrm = makeOutputLine(outputRegion, "GRM (annual / monthly)", "grm-out-grm");

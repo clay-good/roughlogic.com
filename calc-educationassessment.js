@@ -184,7 +184,7 @@ function renderTwoSampleTTest(inputRegion, outputRegion, citationEl) {
   const m2 = makeNumber("Group 2 mean", "tt-m2", { step: "any" });
   const s2 = makeNumber("Group 2 SD", "tt-s2", { step: "any", min: "0" });
   const n2 = makeNumber("Group 2 n", "tt-n2", { step: "1", min: "2" });
-  const tail = makeSelect("Tail", "tt-tail", [{ value: "two", label: "Two-sided", selected: true }, { value: "one", label: "One-sided" }]);
+  const tail = makeSelect("Tail", "tt-tail", [{ value: "two", label: "Two-sided", selected: true }, { value: "one", label: "One-sided, in the observed direction" }]);
   for (const f of [m1, s1, n1, m2, s2, n2, tail]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { m1.input.value = "82"; s1.input.value = "6"; n1.input.value = "25"; m2.input.value = "78"; s2.input.value = "7"; n2.input.value = "22"; tail.select.value = "two"; update(); });
   const oT = makeOutputLine(outputRegion, "t-statistic / df", "tt-out-t");

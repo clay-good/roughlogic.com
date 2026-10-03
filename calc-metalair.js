@@ -265,7 +265,7 @@ export function computeDuctStaticTotal({ components = [], rated_esp_in_wc = 0 } 
   }
   const rated = Number(rated_esp_in_wc) || 0;
   let remaining_in_wc = null, within_rating = null;
-  if (rated > 0) { remaining_in_wc = rated - total_esp_in_wc; within_rating = total_esp_in_wc <= rated; }
+  if (rated > 0) { remaining_in_wc = rated - total_esp_in_wc; within_rating = total_esp_in_wc <= rated + 1e-9 * rated; }
   const notes = [];
   if (within_rating === false) notes.push("Total external static " + fmt(total_esp_in_wc, 3) + " in. w.c. exceeds the blower rating (" + fmt(rated, 3) + " in. w.c.): airflow will fall below the rated CFM. Reduce restriction or select a higher-static blower tap.");
   notes.push("Total external static pressure is the sum of every external resistance the blower drives (registers, grilles, filter, wet coil, dampers, and the duct-run friction). Component drops are user-supplied from the manufacturer's tables or a manometer reading; the blower fan table governs the delivered CFM at this static.");

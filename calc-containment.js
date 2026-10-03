@@ -248,7 +248,7 @@ export function computeSubSlabSuctionField({
   const area_per_point_ft2 = Math.PI * effective_radius_ft * effective_radius_ft;
   const points_required = Math.max(1, Math.ceil(slab_area_ft2 / area_per_point_ft2 - 1e-9));
   const coverage_ratio = slab_area_ft2 / area_per_point_ft2;
-  const area_verdict = "a confirmed radius of " + fmt(effective_radius_ft, 0) + " ft covers " + fmt(area_per_point_ft2, 0) + " sq ft per point, so a " + fmt(slab_area_ft2, 0) + " sq ft slab needs " + fmt(points_required, 0) + " suction point" + (points_required > 1 ? "s" : "") + " on area alone (" + fmt(coverage_ratio, 2) + " slab areas per point)";
+  const area_verdict = "a confirmed radius of " + fmt(effective_radius_ft, 0) + " ft covers " + fmt(area_per_point_ft2, 0) + " sq ft per point, so a " + fmt(slab_area_ft2, 0) + " sq ft slab needs " + fmt(points_required, 0) + " suction point" + (points_required > 1 ? "s" : "") + " on area alone (" + fmt(coverage_ratio, 2) + " points' worth of coverage)";
   // Area alone is not enough: a long narrow slab needs more than a compact one.
   const has_shape = slab_length_ft > 0 && slab_width_ft > 0;
   const longest_dimension_ft = has_shape ? Math.max(slab_length_ft, slab_width_ft) : 0;

@@ -579,7 +579,7 @@ function renderIrsFormIndex(inputRegion, outputRegion, citationEl) {
 function renderSalesTaxNexus(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: per-state department of revenue published nexus guidance. Verified-on date stamped per entry; a 2025-01-15 stamp means that row has not been re-checked since.";
   const intro = document.createElement("p");
-  intro.textContent = "Post-Wayfair economic-nexus thresholds. Whether the two thresholds are joined by OR or by AND is a per-state rule, not a formatting detail: in New York and Connecticut BOTH must be met, so a seller over the dollar threshold with too few transactions does not have to register there, while in most states either one is enough. The row below says which rule that state uses. The lookback period also varies by state. Verify with the state department of revenue before relying on this for filing.";
+  intro.textContent = "Post-Wayfair economic-nexus thresholds. Whether the two thresholds are joined by OR or by AND is a per-state rule, not a formatting detail: in New York and Connecticut BOTH must be met, so a seller over the dollar threshold with too few transactions does not have to register there, while most other states that keep a transaction count accept either one (most bundled states now use the sales threshold alone). The row below says which rule that state uses. The lookback period also varies by state. Verify with the state department of revenue before relying on this for filing.";
   outputRegion.appendChild(intro);
   const sel = makeSelect("State", "stn-s", Object.keys(SALES_TAX_NEXUS).map((k) => ({ value: k, label: k })));
   inputRegion.appendChild(sel.wrap);

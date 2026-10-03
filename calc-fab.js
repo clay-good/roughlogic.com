@@ -50,26 +50,29 @@ export const FAB_RENDERERS = {};
 // pipe-expansion-loop.
 // =====================================================================
 
-// dims: in { center_to_center_in: L, takeout_a_in: L, takeout_b_in: L, makeup_a_in: L, makeup_b_in: L } out: { cut_length_in: L }
-export function computePipeFittingTakeout({ reference = "center-to-center", dimension_in = 0, takeout_a_in = 0, takeout_b_in = 0, makeup_a_in = 0, makeup_b_in = 0 } = {}) {
+// dims: in { center_to_center_in: L, takeout_a_in: L, takeout_b_in: L, makeup_a_in: L, makeup_b_in: L, weld_gap_a_in: L, weld_gap_b_in: L } out: { cut_length_in: L }
+export function computePipeFittingTakeout({ reference = "center-to-center", dimension_in = 0, takeout_a_in = 0, takeout_b_in = 0, makeup_a_in = 0, makeup_b_in = 0, weld_gap_a_in = 0, weld_gap_b_in = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const dim = Number(dimension_in);
   const toA = Number(takeout_a_in) || 0, toB = Number(takeout_b_in) || 0;
   const muA = Number(makeup_a_in) || 0, muB = Number(makeup_b_in) || 0;
+  const gapA = Number(weld_gap_a_in) || 0, gapB = Number(weld_gap_b_in) || 0;
   if (!(dim > 0)) return { error: "Run dimension must be positive (in)." };
-  if (toA < 0 || toB < 0 || muA < 0 || muB < 0) return { error: "Take-out and make-up must be non-negative." };
+  if (toA < 0 || toB < 0 || muA < 0 || muB < 0 || gapA < 0 || gapB < 0) return { error: "Take-out, make-up and weld gap must be non-negative." };
   const isFaceToFace = String(reference) === "face-to-face";
   // Center-to-center subtracts the fitting take-outs and adds back thread
-  // make-up (or weld gap). Face-to-face already lands on the fitting faces,
-  // so only make-up / weld gap applies (no take-out subtraction).
+  // make-up; a butt-weld root gap at each end is subtracted. Face-to-face
+  // already lands on the fitting faces, so only make-up and weld gap apply
+  // (no take-out subtraction).
   const takeout_total = isFaceToFace ? 0 : (toA + toB);
   const makeup_total = muA + muB;
-  const cut_length_in = dim - takeout_total + makeup_total;
+  const weld_gap_total = gapA + gapB;
+  const cut_length_in = dim - takeout_total + makeup_total - weld_gap_total;
   const notes = [];
   if (cut_length_in <= 0) notes.push("Computed cut length is " + fmt(cut_length_in, 3) + " in: the fittings consume the whole run - impractical, verify the dimension and take-outs.");
   if (!isFaceToFace && (muA > toA || muB > toB)) notes.push("Thread make-up exceeds the take-out at an end (over-engagement): verify the fitting and engagement.");
   notes.push("Reference is " + reference + ". Take-out and thread make-up are product-/schedule-specific and user-supplied; confirm against your fittings and the spool drawing.");
-  return { reference: String(reference), dimension_in: dim, takeout_total_in: takeout_total, makeup_total_in: makeup_total, cut_length_in, impractical: cut_length_in <= 0, notes };
+  return { reference: String(reference), dimension_in: dim, takeout_total_in: takeout_total, makeup_total_in: makeup_total, weld_gap_total_in: weld_gap_total, cut_length_in, impractical: cut_length_in <= 0, notes };
 }
 
 export const pipeFittingTakeoutExample = { inputs: { reference: "center-to-center", dimension_in: 24, takeout_a_in: 1.5, takeout_b_in: 1.5, makeup_a_in: 0.5, makeup_b_in: 0.5 } };
@@ -84,10 +87,14 @@ function _v26renderPipeFittingTakeout(inputRegion, outputRegion, citationEl) {
   const dim = makeNumber("Run dimension (in)", "pft-dim", { step: "any", min: "0" });
   const toA = makeNumber("Take-out end A (in)", "pft-toa", { step: "any", min: "0" });
   const toB = makeNumber("Take-out end B (in)", "pft-tob", { step: "any", min: "0" });
-  const muA = makeNumber("Make-up / weld gap end A (in)", "pft-mua", { step: "any", min: "0" });
-  const muB = makeNumber("Make-up / weld gap end B (in)", "pft-mub", { step: "any", min: "0" });
-  for (const f of [ref, dim, toA, toB, muA, muB]) inputRegion.appendChild(f.wrap);
-  attachExampleButton(inputRegion, () => { ref.select.value = "center-to-center"; dim.input.value = "24"; toA.input.value = "1.5"; toB.input.value = "1.5"; muA.input.value = "0.5"; muB.input.value = "0.5"; update(); });
+  const muA = makeNumber("Thread make-up end A (in)", "pft-mua", { step: "any", min: "0" });
+  const muB = makeNumber("Thread make-up end B (in)", "pft-mub", { step: "any", min: "0" });
+  const gapA = makeNumber("Weld root gap end A (in)", "pft-gapa", { step: "any", min: "0" });
+  const gapB = makeNumber("Weld root gap end B (in)", "pft-gapb", { step: "any", min: "0" });
+  gapA.input.value = "0";
+  gapB.input.value = "0";
+  for (const f of [ref, dim, toA, toB, muA, muB, gapA, gapB]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { ref.select.value = "center-to-center"; dim.input.value = "24"; toA.input.value = "1.5"; toB.input.value = "1.5"; muA.input.value = "0.5"; muB.input.value = "0.5"; gapA.input.value = "0"; gapB.input.value = "0"; update(); });
 
   const oCut = makeOutputLine(outputRegion, "Cut length (in)", "pft-out-cut");
   const oTerms = makeOutputLine(outputRegion, "Deductions", "pft-out-terms");
@@ -101,13 +108,15 @@ function _v26renderPipeFittingTakeout(inputRegion, outputRegion, citationEl) {
       takeout_b_in: Number(toB.input.value) || 0,
       makeup_a_in: Number(muA.input.value) || 0,
       makeup_b_in: Number(muB.input.value) || 0,
+      weld_gap_a_in: Number(gapA.input.value) || 0,
+      weld_gap_b_in: Number(gapB.input.value) || 0,
     });
     if (r.error) { oCut.textContent = r.error; oTerms.textContent = "-"; oNote.textContent = ""; return; }
     oCut.textContent = fmt(r.cut_length_in, 3) + " in" + (r.impractical ? " (impractical)" : "");
-    oTerms.textContent = "dim " + fmt(r.dimension_in, 2) + " - take-out " + fmt(r.takeout_total_in, 2) + " + make-up " + fmt(r.makeup_total_in, 2) + " in";
+    oTerms.textContent = "dim " + fmt(r.dimension_in, 2) + " - take-out " + fmt(r.takeout_total_in, 2) + " + make-up " + fmt(r.makeup_total_in, 2) + " - weld gap " + fmt(r.weld_gap_total_in, 3) + " in";
     oNote.textContent = r.notes.join(" ");
   }, DEBOUNCE_MS);
-  for (const f of [dim.input, toA.input, toB.input, muA.input, muB.input]) f.addEventListener("input", update);
+  for (const f of [dim.input, toA.input, toB.input, muA.input, muB.input, gapA.input, gapB.input]) f.addEventListener("input", update);
   ref.select.addEventListener("change", update);
 }
 FAB_RENDERERS["pipe-fitting-takeout"] = _v26renderPipeFittingTakeout;
@@ -390,7 +399,7 @@ export function computeConduitOffset({ offset_in = 0, angle_deg = 0 } = {}) {
     shrink_in: Number.isFinite(shrink_in) ? shrink_in : null,
     multiplier: Number.isFinite(multiplier) ? multiplier : null,
     shrink_per_in: Number.isFinite(shrink_per_in) ? shrink_per_in : null,
-    note: "Mark spacing = offset / sin(angle). Shrink uses the exact tan(angle/2); the 0.75x-per-inch rule of thumb is approximate. Confirm bender deduct/shoe figures against your tool.",
+    note: "Mark spacing = offset / sin(angle). Shrink uses the exact tan(angle/2); the field shrink rules (1/4 in per inch at 30 deg, 3/8 at 45, 3/16 at 22.5) are approximate. Confirm bender deduct/shoe figures against your tool.",
   };
 }
 export const conduitOffsetExample = { inputs: { offset_in: 6, angle_deg: 30 } };
