@@ -580,7 +580,7 @@ const renderBoltStretch = _simpleRenderer({
     { key: "grip_length_in", label: "Grip length (in)", kind: "number" },
     { key: "stretch_thou", label: "Target stretch (0.001 in)", kind: "number" },
     { key: "material", label: "Fastener material", kind: "select", options: Object.keys(FASTENER_MODULUS_PSI).map((k) => ({ value: k, label: k })) },
-    { key: "k_factor", label: "Torque K-factor", kind: "number" },
+    { key: "k_factor", label: "Torque K-factor", kind: "number", default: 0.18 },
   ],
   outputs: [
     { key: "f", id: "bs-out-f", label: "Clamp load", value: (r) => fmt(r.clamp_load_lb, 0) + " lb" },
@@ -1254,7 +1254,7 @@ MECHANIC_RENDERERS["vehicle-road-load-power"] = _simpleRenderer({
     { key: "vehicle_weight_lb", label: "Vehicle weight W (lb)", kind: "number" },
     { key: "frontal_area_ft2", label: "Frontal area A (ft²)", kind: "number" },
     { key: "drag_coefficient", label: "Drag coefficient Cd", kind: "number" },
-    { key: "rolling_coefficient", label: "Rolling-resistance coefficient Crr", kind: "number", attrs: { step: "any", value: "0.012" } },
+    { key: "rolling_coefficient", label: "Rolling-resistance coefficient Crr", kind: "number", default: 0.012, attrs: { step: "any", value: "0.012" } },
     { key: "grade_pct", label: "Grade (%)", kind: "number", attrs: { step: "any", value: "0" } },
     { key: "air_density_lb_ft3", label: "Air density (lb/ft³)", kind: "number", attrs: { step: "any", value: "0.0765" } },
   ],
@@ -2755,7 +2755,7 @@ MECHANIC_RENDERERS["density-altitude"] = _simpleRenderer({
   fields: [
     { key: "field_elevation_ft", label: "Field / station elevation (ft)", kind: "number" },
     { key: "altimeter_in_hg", label: "Altimeter setting (in Hg)", kind: "number" },
-    { key: "oat_f", label: "Outside air temperature (°F)", kind: "number" },
+    { key: "oat_f", label: "Outside air temperature (°F)", kind: "number", default: 59 },
   ],
   outputs: [
     { key: "pa", id: "da-out-pa", label: "Pressure altitude", value: (r) => fmt(r.pa_ft, 0) + " ft" },
@@ -3230,7 +3230,7 @@ MECHANIC_RENDERERS["brake-pedal-hydraulic"] = _simpleRenderer({
     { key: "booster_factor", label: "Booster factor (1.0 = manual)", kind: "number" },
     { key: "mc_bore_in", label: "Master-cylinder bore (in)", kind: "number" },
     { key: "caliper_area_in2", label: "Caliper piston area, ONE side (in²; the torque doubles it for two pad faces)", kind: "number" },
-    { key: "pad_friction", label: "Pad friction coefficient (~0.4)", kind: "number" },
+    { key: "pad_friction", label: "Pad friction coefficient (~0.4)", kind: "number", default: 0.4 },
     { key: "rotor_radius_in", label: "Effective rotor radius (in)", kind: "number" },
   ],
   outputs: [
@@ -4278,7 +4278,7 @@ MECHANIC_RENDERERS["carburetor-altitude-jetting"] = _simpleRenderer({
   example: carburetorAltitudeJettingExample.inputs,
   fields: [
     { key: "baseline_pressure_inhg", label: "Baseline absolute pressure (in Hg)", kind: "number" },
-    { key: "baseline_temp_f", label: "Baseline temperature (F)", kind: "number", attrs: { step: "any" } },
+    { key: "baseline_temp_f", label: "Baseline temperature (F)", kind: "number", default: 59, attrs: { step: "any" } },
     { key: "actual_pressure_inhg", label: "Actual absolute pressure (in Hg)", kind: "number" },
     { key: "actual_temp_f", label: "Actual temperature (F)", kind: "number", attrs: { step: "any" } },
     { key: "jet_flow_number", label: "Original jet flow number (0 to skip)", kind: "number" },

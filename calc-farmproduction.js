@@ -815,7 +815,7 @@ FARMPRODUCTION_RENDERERS["dressing-percentage"] = _r({
     { key: "live_weight_lb", label: "Live weight (lb)", kind: "number" },
     { key: "hot_carcass_weight_lb", label: "Hot carcass weight (lb)", kind: "number" },
     { key: "cutting_yield_pct", label: "Cutting yield (% of chilled carcass)", kind: "number" },
-    { key: "chill_shrink_pct", label: "Cooler chill shrink (%)", kind: "number" },
+    { key: "chill_shrink_pct", label: "Cooler chill shrink (%)", kind: "number", default: 3.5 },
   ],
   outputs: [
     { key: "d", id: "drp-out-d", label: "Dressing percentage", value: (r) => fmt(r.dressing_pct, 1) + " %" },

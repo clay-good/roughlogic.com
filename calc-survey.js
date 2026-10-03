@@ -783,19 +783,20 @@ export function computeTapingNormalTension({ span_ft = 100, tape_weight_plf = 0.
   const sag_at_applied_ft = has_applied ? sagAt(Pa) : null;
   const pull_at_applied_ft = has_applied ? pullAt(Pa) : null;
   const net_at_applied_ft = has_applied ? sag_at_applied_ft + pull_at_applied_ft : null;
-  const applied_reads_short = has_applied ? net_at_applied_ft < 0 : null;
+  // A negative net correction means the tape reads LONG (until 2026-10-03 this key was named the reverse).
+  const applied_reads_long = has_applied ? net_at_applied_ft < 0 : null;
 
   const note = "A " + L + " ft unsupported span of this tape weighs " + span_weight_lb.toFixed(2) + " lb. "
     + (rhs > 0
       ? "Normal tension is " + normal_tension_lb.toFixed(1) + " lb: at that pull the tape stretches exactly as much as its own sag shortens it, so the sag term (" + sag_at_normal_ft.toFixed(4) + " ft) and the tension term (+" + pull_at_normal_ft.toFixed(4) + " ft) cancel and the tape reads true with no correction applied. "
       : "With no tape weight there is no sag to cancel, so the only pull needing no correction is the standardization pull itself, " + P0.toFixed(1) + " lb. ")
     + (has_applied
-      ? "At the " + Pa.toFixed(1) + " lb you entered the two terms are " + sag_at_applied_ft.toFixed(4) + " and " + (pull_at_applied_ft >= 0 ? "+" : "") + pull_at_applied_ft.toFixed(4) + " ft, a net " + (net_at_applied_ft >= 0 ? "+" : "") + net_at_applied_ft.toFixed(4) + " ft over the span - the tape reads " + (applied_reads_short ? "LONG, so the true distance is shorter than the reading" : "SHORT, so the true distance is longer than the reading") + " by that much. "
+      ? "At the " + Pa.toFixed(1) + " lb you entered the two terms are " + sag_at_applied_ft.toFixed(4) + " and " + (pull_at_applied_ft >= 0 ? "+" : "") + pull_at_applied_ft.toFixed(4) + " ft, a net " + (net_at_applied_ft >= 0 ? "+" : "") + net_at_applied_ft.toFixed(4) + " ft over the span - the tape reads " + (applied_reads_long ? "LONG, so the true distance is shorter than the reading" : "SHORT, so the true distance is longer than the reading") + " by that much. "
       : "")
     + "Why it collapses so cleanly: setting the tension correction (P - P0) L / (A E) equal and opposite to the sag correction w^2 L^3 / (24 P^2) and writing W = w L for the span weight removes the length from both sides, leaving P^2 (P - P0) = A E W^2 / 24. Square-rooting that gives the textbook P = 0.204 W sqrt(A E) / sqrt(P - P0), which is the same equation - 0.204 is just 1 over the square root of 24. This tile solves the cubic directly instead of iterating the implicit form. "
     + "Normal tension is not always practical: it can exceed what a crew can hold steadily or what the tape is rated for, and a tape supported throughout has no sag to cancel in the first place. It also does nothing about temperature or the tape's own standardization error, which still need the correction tile. Steel at 29,000,000 psi by default; a tape's actual area and weight come from its own specification, and the difference between a light 100-ft tape and a heavy one moves this answer a lot. A field aid; the tape calibration and the survey's procedure govern.";
 
-  return { normal_tension_lb, span_weight_lb, sag_at_normal_ft, pull_at_normal_ft, residual_at_normal_ft, sag_at_applied_ft, pull_at_applied_ft, net_at_applied_ft, applied_reads_short, note };
+  return { normal_tension_lb, span_weight_lb, sag_at_normal_ft, pull_at_normal_ft, residual_at_normal_ft, sag_at_applied_ft, pull_at_applied_ft, net_at_applied_ft, applied_reads_long, note };
 }
 
 export const tapingNormalTensionExample = { inputs: { span_ft: 100, tape_weight_plf: 0.02, tape_area_in2: 0.006, standard_pull_lb: 10, applied_pull_lb: 20, e_psi: 29e6 } };
@@ -820,7 +821,7 @@ function renderTapingNormalTension(inputRegion, outputRegion, citationEl) {
     oNt.textContent = fmt(r.normal_tension_lb, 1) + " lb";
     oWt.textContent = fmt(r.span_weight_lb, 2) + " lb";
     oCanc.textContent = fmt(r.sag_at_normal_ft, 4) + " ft and +" + fmt(r.pull_at_normal_ft, 4) + " ft - they cancel";
-    oApp.textContent = r.net_at_applied_ft === null ? "- (enter the pull you used)" : fmt(r.net_at_applied_ft, 4) + " ft over the span, tape reads " + (r.applied_reads_short ? "long" : "short");
+    oApp.textContent = r.net_at_applied_ft === null ? "- (enter the pull you used)" : fmt(r.net_at_applied_ft, 4) + " ft over the span, tape reads " + (r.applied_reads_long ? "long" : "short");
     oNote.textContent = r.note;
   }, DEBOUNCE_MS);
   for (const f of [l.input, w.input, a.input, p0.input, pa.input]) f.addEventListener("input", update);

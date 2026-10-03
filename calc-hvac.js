@@ -2346,14 +2346,18 @@ export function computeDuctLeakage({
   // exceeds the measured leak).
   const sortedClasses = Object.keys(SMACNA_LEAKAGE_CLASSES).map(Number).sort((a, b) => a - b);
   let effective_class = sortedClasses[sortedClasses.length - 1];
+  let exceeds_all_classes = true;
   for (const c of sortedClasses) {
-    if (leak_per_100ft2 <= SMACNA_LEAKAGE_CLASSES[c].cfm_per_100ft2_at_1inwc) { effective_class = c; break; }
+    const lim = SMACNA_LEAKAGE_CLASSES[c].cfm_per_100ft2_at_1inwc;
+    if (leak_per_100ft2 <= lim + 1e-9 * Math.abs(lim)) { effective_class = c; exceeds_all_classes = false; break; }
   }
+  // Until 2026-10-03 a leak past every class printed as Class 48, the loosest class.
   const pass = leak_per_100ft2 <= target.cfm_per_100ft2_at_1inwc + 1e-9 * Math.abs(target.cfm_per_100ft2_at_1inwc);
   return {
     leakage_cfm, leakage_pct,
     leak_at_1inwc, leak_per_100ft2,
     effective_class,
+    exceeds_all_classes,
     target_class: design_class, target_label: target.description,
     pass,
   };
@@ -2388,7 +2392,7 @@ function _v8h_renderDuctLeakage(inputRegion, outputRegion, citationEl) {
     if (r.error) { oL.textContent = r.error; oP.textContent = "-"; oC.textContent = "-"; oF.textContent = "-"; return; }
     oL.textContent = _v7h_fmt(r.leakage_cfm, 1) + " CFM (" + _v7h_fmt(r.leak_per_100ft2, 1) + " CFM per 100 ft² at 1 in WC)";
     oP.textContent = _v7h_fmt(r.leakage_pct, 2) + " %";
-    oC.textContent = "Class " + r.effective_class;
+    oC.textContent = r.exceeds_all_classes ? "worse than Class " + r.effective_class + " (past every SMACNA class)" : "Class " + r.effective_class;
     oF.textContent = r.pass ? "PASS (≤ Class " + r.target_class + ")" : "FAIL (exceeds Class " + r.target_class + ")";
   }, _V7H_DEB);
   for (const f of [dc.input, mc.input, sf.input, tp.input, cl.select]) f.addEventListener("input", update);
@@ -3425,9 +3429,9 @@ HVAC_RENDERERS["assembly-r-value"] = _rEnv({
     { key: "cavity_r", label: "Cavity insulation R", kind: "number" },
     { key: "continuous_r", label: "Continuous insulation R", kind: "number" },
     { key: "stud_depth_in", label: "Stud depth (in)", kind: "number" },
-    { key: "framing_factor", label: "Framing factor (0-1)", kind: "number" },
-    { key: "air_films_r", label: "Air films R", kind: "number" },
-    { key: "finish_layers_r", label: "Finish layers R", kind: "number" },
+    { key: "framing_factor", label: "Framing factor (0-1)", kind: "number", default: 0.25 },
+    { key: "air_films_r", label: "Air films R", kind: "number", default: 0.85 },
+    { key: "finish_layers_r", label: "Finish layers R", kind: "number", default: 1.05 },
   ],
   outputs: [
     { key: "f", id: "arv-out-f", label: "Framing path R", value: (r) => fmt(r.r_framing_path, 2) },
@@ -3775,7 +3779,7 @@ HVAC_RENDERERS["erv-sensible-recovery"] = _rEnv({
     { key: "cfm", label: "Balanced ventilation airflow (cfm)", kind: "number" },
     { key: "t_oa_F", label: "Outdoor air temperature (°F)", kind: "number" },
     { key: "t_ra_F", label: "Return/exhaust air temperature (°F)", kind: "number" },
-    { key: "eps_s", label: "Rated sensible effectiveness (0-1)", kind: "number" },
+    { key: "eps_s", label: "Rated sensible effectiveness (0-1)", kind: "number", default: 0.75 },
   ],
   outputs: [
     { key: "dt", id: "esr-out-dt", label: "Available temperature difference", value: (r) => fmt(r.dT_F, 1) + " F" },
@@ -3856,7 +3860,7 @@ HVAC_RENDERERS["dcv-co2-ventilation"] = _rEnv({
   fields: [
     { key: "n", label: "Occupancy (people)", kind: "number" },
     { key: "co2_set_ppm", label: "Indoor CO2 setpoint (ppm)", kind: "number" },
-    { key: "co2_oa_ppm", label: "Outdoor CO2 (ppm)", kind: "number" },
+    { key: "co2_oa_ppm", label: "Outdoor CO2 (ppm)", kind: "number", default: 400 },
     { key: "gen_cfm", label: "CO2 generation per person (cfm)", kind: "number" },
   ],
   outputs: [
@@ -4231,7 +4235,7 @@ function _v442renderRadiantFloorOutput(inputRegion, outputRegion, citationEl) {
   ]);
   inputRegion.appendChild(mode.wrap);
   const surf = makeNumber("Floor mean surface temperature (°F)", "rfo-surf", { step: "any" });
-  const room = makeNumber("Room air temperature (°F)", "rfo-room", { step: "any" });
+  const room = makeNumber("Room air temperature (°F)", "rfo-room", { step: "any", value: "70" });
   const qt = makeNumber("Target output (Btu/hr-ft²)", "rfo-qt", { step: "any", min: "0" });
   for (const f of [surf, room, qt]) inputRegion.appendChild(f.wrap);
   const oQ = makeOutputLine(outputRegion, "Heat output", "rfo-out-q");
@@ -4292,9 +4296,9 @@ HVAC_RENDERERS["snowmelt-load"] = _rEnv({
     { key: "t_air_f", label: "Design air temperature (°F)", kind: "number", attrs: { step: "any" } },
     { key: "wind_mph", label: "Design wind speed (mph)", kind: "number", attrs: { step: "any", min: "0" } },
     { key: "rh_pct", label: "Relative humidity (%)", kind: "number", attrs: { step: "any", min: "0" } },
-    { key: "ar", label: "Snow-free area ratio A_r (0 / 0.5 / 1)", kind: "number", attrs: { step: "any", min: "0" } },
+    { key: "ar", label: "Snow-free area ratio A_r (0 / 0.5 / 1)", kind: "number", default: 0.5, attrs: { step: "any", min: "0" } },
     { key: "area_ft2", label: "Heated slab area (ft²)", kind: "number", attrs: { step: "any", min: "0" } },
-    { key: "back_loss_pct", label: "Back + edge losses (%)", kind: "number", attrs: { step: "any", min: "0" } },
+    { key: "back_loss_pct", label: "Back + edge losses (%)", kind: "number", default: 20, attrs: { step: "any", min: "0" } },
   ],
   outputs: [
     { key: "qo", id: "sml-out-qo", label: "Design surface flux q_o", value: (r) => fmt(r.q_o, 1) + " Btu/hr-ft^2" },

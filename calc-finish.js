@@ -121,7 +121,7 @@ FINISH_RENDERERS["thinset-coverage"] = _simpleRenderer({
     ] },
     { key: "coverage_per_bag", label: "Coverage override (sq ft/bag, optional)", kind: "number" },
     { key: "bag_weight_lb", label: "Bag weight (lb)", kind: "number" },
-    { key: "waste_pct", label: "Waste (%)", kind: "number" },
+    { key: "waste_pct", label: "Waste (%)", kind: "number", default: 10 },
   ],
   outputs: [
     { key: "c", id: "tsc-out-c", label: "Coverage per bag", value: (r) => fmt(r.cov_per_bag, 0) + " sq ft" },
@@ -218,7 +218,7 @@ FINISH_RENDERERS["paver-patio"] = _simpleRenderer({
     { key: "paver_width_in", label: "Paver width (in)", kind: "number" },
     { key: "base_depth_in", label: "Base depth (in)", kind: "number" },
     { key: "sand_depth_in", label: "Bedding sand (in)", kind: "number" },
-    { key: "waste_pct", label: "Cut allowance (%)", kind: "number" },
+    { key: "waste_pct", label: "Cut allowance (%)", kind: "number", default: 5 },
   ],
   outputs: [
     { key: "p", id: "pp-out-p", label: "Pavers per sq ft", value: (r) => fmt(r.pavers_per_sqft, 2) },
@@ -402,9 +402,9 @@ FINISH_RENDERERS["deck-board-takeoff"] = _simpleRenderer({
     { key: "deck_width_ft", label: "Deck width across the boards (ft)", kind: "number" },
     { key: "deck_length_ft", label: "Board run length (ft)", kind: "number" },
     { key: "board_face_width_in", label: "Board face width (in, 5.5 for 5/4x6 or 2x6)", kind: "number" },
-    { key: "gap_in", label: "Gap between boards (in)", kind: "number" },
+    { key: "gap_in", label: "Gap between boards (in)", kind: "number", default: 0.25 },
     { key: "joist_spacing_in", label: "Joist spacing on center (in)", kind: "number" },
-    { key: "waste_pct", label: "Waste (%)", kind: "number" },
+    { key: "waste_pct", label: "Waste (%)", kind: "number", default: 10 },
   ],
   outputs: [
     { key: "b", id: "deck-out-b", label: "Deck boards", value: (r) => String(r.boards) + " boards across" },
@@ -572,7 +572,7 @@ FINISH_RENDERERS["cement-board-takeoff"] = _simpleRenderer({
   fields: [
     { key: "area_sf", label: "Backer area (sf)", kind: "number" },
     { key: "sheet_area_sf", label: "Sheet area (sf, 3x5 = 15)", kind: "number" },
-    { key: "waste_pct", label: "Waste / cuts (%)", kind: "number" },
+    { key: "waste_pct", label: "Waste / cuts (%)", kind: "number", default: 10 },
     { key: "screws_per_sheet", label: "Screws per sheet (~30-40)", kind: "number" },
   ],
   outputs: [
@@ -609,7 +609,7 @@ FINISH_RENDERERS["step-flashing-count"] = _simpleRenderer({
   fields: [
     { key: "wall_run_ft", label: "Sloped wall / chimney sidewall run (ft)", kind: "number" },
     { key: "shingle_exposure_in", label: "Shingle exposure (in, ~5)", kind: "number" },
-    { key: "waste_pct", label: "Waste (percent)", kind: "number" },
+    { key: "waste_pct", label: "Waste (percent)", kind: "number", default: 5 },
   ],
   outputs: [
     { key: "p", id: "sfc-out-p", label: "Step-flashing pieces (one per course + 1)", value: (r) => String(r.step_flashing_pieces) + " pieces" },
@@ -657,8 +657,8 @@ FINISH_RENDERERS["rough-opening-size"] = _simpleRenderer({
     { key: "opening_type", label: "Opening type", kind: "select", options: [{ value: "prehung-door", label: "Prehung door (enter SLAB size)", selected: true }, { value: "window", label: "Window (enter FRAME outside dims)" }] },
     { key: "unit_width_in", label: "Unit width (in)", kind: "number" },
     { key: "unit_height_in", label: "Unit height (in)", kind: "number" },
-    { key: "width_adder_in", label: "Width adder override (in, -1 = convention)", kind: "number" },
-    { key: "height_adder_in", label: "Height adder override (in, -1 = convention)", kind: "number" },
+    { key: "width_adder_in", label: "Width adder override (in, -1 = convention)", kind: "number", default: -1 },
+    { key: "height_adder_in", label: "Height adder override (in, -1 = convention)", kind: "number", default: -1 },
   ],
   outputs: [
     { key: "row", id: "ros-out-w", label: "Rough opening width", value: (r) => fmt(r.ro_width_in, 2) + " in (+" + fmt(r.wa_used, 2) + ")" },
@@ -848,9 +848,9 @@ FINISH_RENDERERS["cabinet-linear-feet"] = _simpleRenderer({
     { key: "appliance_openings_ft", label: "Appliance openings in the base run (ft)", kind: "number", default: 0 },
     { key: "corners", label: "Inside corners (count)", kind: "number", default: 0 },
     { key: "cabinet_depth_in", label: "Base cabinet depth (in)", kind: "number" },
-    { key: "filler_per_corner_in", label: "Filler per corner (in)", kind: "number" },
+    { key: "filler_per_corner_in", label: "Filler per corner (in)", kind: "number", default: 3 },
     { key: "standard_width_in", label: "Standard cabinet width (in)", kind: "number" },
-    { key: "toe_kick_height_in", label: "Toe-kick height (in)", kind: "number" },
+    { key: "toe_kick_height_in", label: "Toe-kick height (in)", kind: "number", default: 4 },
   ],
   outputs: [
     { key: "b", id: "clf-out-b", label: "Base LF (after openings and corners)", value: (r) => fmt(r.base_lf, 2) + " ft -- " + fmt(r.base_cabinets, 0) + " standard boxes" },
@@ -916,8 +916,8 @@ FINISH_RENDERERS["drip-edge-takeoff"] = _simpleRenderer({
     { key: "rake_count", label: "Number of rakes", kind: "number", default: 0 },
     { key: "pitch_rise_per_12", label: "Roof pitch (rise per 12)", kind: "number" },
     { key: "stock_length_ft", label: "Stock length (ft)", kind: "number" },
-    { key: "lap_in", label: "Lap at each joint (in)", kind: "number" },
-    { key: "waste_pct", label: "Waste (%)", kind: "number" },
+    { key: "lap_in", label: "Lap at each joint (in)", kind: "number", default: 2 },
+    { key: "waste_pct", label: "Waste (%)", kind: "number", default: 10 },
   ],
   outputs: [
     { key: "e", id: "det-out-e", label: "Eave drip edge", value: (r) => fmt(r.eave_lf, 1) + " ft (" + fmt(r.eave_pieces, 0) + " sticks)" },
@@ -983,8 +983,8 @@ FINISH_RENDERERS["valley-flashing-takeoff"] = _simpleRenderer({
     { key: "pitch_rise_per_12", label: "Roof pitch (rise per 12)", kind: "number" },
     { key: "metal_width_in", label: "Valley metal width (in)", kind: "number" },
     { key: "stock_length_ft", label: "Stock length (ft)", kind: "number" },
-    { key: "lap_in", label: "Lap at each joint (in)", kind: "number" },
-    { key: "waste_pct", label: "Waste (%)", kind: "number" },
+    { key: "lap_in", label: "Lap at each joint (in)", kind: "number", default: 6 },
+    { key: "waste_pct", label: "Waste (%)", kind: "number", default: 10 },
   ],
   outputs: [
     { key: "m", id: "vft-out-m", label: "Valley multiplier (vs common rafter)", value: (r) => fmt(r.valley_multiplier, 4) + " vs " + fmt(r.common_multiplier, 4) },
@@ -1281,7 +1281,7 @@ FINISH_RENDERERS["texture-material-takeoff"] = _simpleRenderer({
     { key: "gross_area_sqft", label: "Gross area to texture (sq ft)", kind: "number" },
     { key: "openings_sqft", label: "Openings to deduct (sq ft)", kind: "number" },
     { key: "coverage_per_bag_sqft", label: "Coverage per bag, from the product (sq ft)", kind: "number" },
-    { key: "waste_pct", label: "Waste factor (%)", kind: "number" },
+    { key: "waste_pct", label: "Waste factor (%)", kind: "number", default: 10 },
     { key: "bag_weight_lb", label: "Bag weight (lb)", kind: "number" },
     { key: "water_gal_per_bag", label: "Mix water per bag (gal)", kind: "number" },
   ],

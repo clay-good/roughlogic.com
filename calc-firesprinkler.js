@@ -153,7 +153,7 @@ FIRESPRINKLER_RENDERERS["sprinkler-system-demand"] = _simpleRenderer({
   fields: [
     { key: "density", label: "Design density (gpm/ft²)", kind: "number" },
     { key: "design_area", label: "Hydraulic design area (ft²)", kind: "number" },
-    { key: "hose_gpm", label: "Hose-stream allowance (gpm)", kind: "number" },
+    { key: "hose_gpm", label: "Hose-stream allowance (gpm)", kind: "number", default: 250 },
     { key: "duration_min", label: "Required supply duration (min)", kind: "number" },
   ],
   outputs: [
@@ -193,7 +193,7 @@ FIRESPRINKLER_RENDERERS["sprinkler-protection-area-for-supply"] = _simpleRendere
   fields: [
     { key: "available_supply_gpm", label: "Available water supply (gpm)", kind: "number" },
     { key: "density", label: "Design density (gpm/ft²)", kind: "number" },
-    { key: "hose_gpm", label: "Hose-stream allowance (gpm)", kind: "number" },
+    { key: "hose_gpm", label: "Hose-stream allowance (gpm)", kind: "number", default: 250 },
   ],
   outputs: [
     { key: "area", id: "spa-out-area", label: "Max hydraulic design area", value: (r) => fmt(r.max_design_area_ft2, 0) + " ft^2" },
@@ -407,7 +407,7 @@ FIRESPRINKLER_RENDERERS["jockey-pump-sizing"] = _simpleRenderer({
   fields: [
     { key: "fire_pump_gpm", label: "Fire pump rated flow (gpm)", kind: "number" },
     { key: "churn_psi", label: "Fire pump churn / shutoff pressure (psi)", kind: "number" },
-    { key: "min_static_psi", label: "Minimum static supply pressure (psi)", kind: "number" },
+    { key: "min_static_psi", label: "Minimum static supply pressure (psi)", kind: "number", default: 50 },
   ],
   outputs: [
     { key: "q", id: "jps-out-q", label: "Jockey pump flow", value: (r) => fmt(r.jockey_gpm, 1) + " gpm" },
@@ -471,7 +471,7 @@ FIRESPRINKLER_RENDERERS["stairwell-pressurization"] = _simpleRenderer({
     { key: "door_width_ft", label: "Door width (ft)", kind: "number" },
     { key: "door_height_ft", label: "Door height (ft)", kind: "number" },
     { key: "knob_setback_in", label: "Knob setback from the latch edge (in)", kind: "number" },
-    { key: "closer_force_lbf", label: "Door closer force (lbf)", kind: "number" },
+    { key: "closer_force_lbf", label: "Door closer force (lbf)", kind: "number", default: 10 },
     { key: "force_limit_lbf", label: "Opening-force limit (lbf)", kind: "number" },
   ],
   outputs: [
@@ -522,7 +522,7 @@ FIRESPRINKLER_RENDERERS["fire-tank-sizing"] = _simpleRenderer({
     { key: "sprinkler_demand_gpm", label: "Sprinkler demand at the point of connection (gpm)", kind: "number" },
     { key: "hose_allowance_gpm", label: "Hose stream allowance (gpm)", kind: "number" },
     { key: "duration_min", label: "Required duration (min)", kind: "number" },
-    { key: "unusable_fraction", label: "Unusable fraction of tank volume (0-1)", kind: "number" },
+    { key: "unusable_fraction", label: "Unusable fraction of tank volume (0-1)", kind: "number", default: 0.08 },
     { key: "refill_gpm", label: "Refill rate (gpm)", kind: "number" },
   ],
   outputs: [

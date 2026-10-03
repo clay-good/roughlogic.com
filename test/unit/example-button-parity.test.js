@@ -159,3 +159,41 @@ test("a blank unprefilled field does not silently compute as zero against a docu
   }
   assert.deepEqual(bad, []);
 });
+
+// The same check through the shared spec renderers (_simpleRenderer, _r, _rEnv...),
+// which read every blank number field as 0. 2026-10-03: 127 optional parameters
+// -- waste %, laps, allowances, coefficients, ambient temperatures, the ASCE 7
+// rain-on-snow 8 psf -- gained a visible default equal to the compute's own.
+// The reviewed fields are counts, sizes and measured values the reader must
+// supply, where a prefilled sample number could pass for data.
+const SCHEMA_REVIEWED = new Set(["formwork-pressure:wall_height_ft", "smoke-alarm-placement:sleeping_areas", "co-alarm-placement:sleeping_areas", "seismic-overturning-stability:sds", "plumbing-fixture-count:distribution", "scaffold-leg-load:platform_dead_lb", "scaffold-leg-load:num_workers", "scaffold-leg-load:material_lb", "mass-concrete-temp-rise:placing_temp_f", "duct-bank-concrete:num_conduits", "tapered-roof-insulation:start_thk_in", "metal-stud-takeoff:openings", "metal-stud-takeoff:extra_per_opening", "anchor-epoxy-volume:bar_dia_in", "joist-hanger-count:ends_per_joist", "joist-hanger-count:nails_per_hanger", "roof-insulation-fasteners:field_boards", "roof-insulation-fasteners:field_per_board", "roof-insulation-fasteners:perimeter_boards", "roof-insulation-fasteners:perimeter_per_board", "roof-insulation-fasteners:corner_boards", "roof-insulation-fasteners:corner_per_board", "chain-link-fence-takeoff:corners", "allowable-area:open_width_ft", "paver-patio:base_depth_in", "paver-patio:sand_depth_in", "attic-ventilation:intake_vent_nfa_sqin", "attic-ventilation:ridge_nfa_per_lf_sqin", "crawl-space-ventilation:corner_count", "concrete-isolation-joint:num_columns", "concrete-isolation-joint:column_perimeter_ft", "niosh-lifting:V_in", "niosh-lifting:frequency_per_min", "heat-treat-soak-time:start_temp_f", "invoice-factoring-cost:fee_pct", "idle-fuel-cost:miles_per_engine_hour", "brake-pad-life:rotor_mass_lb", "paint-mix-ratio:part_hardener", "line-array-splay:ear_height_ft", "delay-tower-alignment:compare_temp_f", "warewasher-hot-water:supply_temp_f", "tphc-window:start_temp_f", "steam-kettle-heatup:start_temp_f", "dough-water-temperature:flour_temp_f", "dough-water-temperature:room_temp_f", "litter-carry-team:support_personnel", "depreciation-recapture:max_1250_rate_pct", ]);
+
+test("a spec-renderer number field with no prefill does not silently compute as zero against a documented default", async () => {
+  const rmap = readFileSync(resolve(ROOT, "test/fixtures/renderer-map.js"), "utf8");
+  const bad = [];
+  for (const m of rmap.matchAll(/"([a-z0-9-]+)":\s*\{\s*module:\s*"([^"]+)",\s*exportName:\s*"(\w+)"/g)) {
+    const [, id, mod, exp] = m;
+    const reg = COMPUTE_MAP[id];
+    if (!reg) continue;
+    const R = (await importCalc(mod))[exp]?.[id];
+    if (!R?.schema) continue;
+    const C = await importCalc(reg.module);
+    const cf = C[reg.fn];
+    if (typeof cf !== "function") continue;
+    const s = cf.toString();
+    const sig = s.slice(0, s.indexOf("{", s.indexOf("}") + 1));
+    const defs = Object.fromEntries([...sig.matchAll(/(\w+)\s*=\s*(-?[\d.]+)/g)].map((d) => [d[1], Number(d[2])]));
+    const exKey = Object.keys(C).find((k) => k.toLowerCase() === reg.fn.replace(/^compute/, "").toLowerCase() + "example");
+    const base = exKey && C[exKey].inputs ? { ...C[exKey].inputs } : {};
+    for (const inp of R.schema.inputs) {
+      if (inp.kind === "select" || (inp.default !== null && inp.default !== undefined)) continue;
+      const d = defs[inp.key];
+      if (d === undefined || d === 0 || SCHEMA_REVIEWED.has(id + ":" + inp.key)) continue;
+      let a, b;
+      try { a = cf({ ...base }); b = cf({ ...base, [inp.key]: 0 }); } catch { continue; }
+      if (!a || a.error || !b || b.error || JSON.stringify(a) === JSON.stringify(b)) continue;
+      bad.push(`${id}: ${inp.key} has no default; blank computes as 0, the compute documents ${d}`);
+    }
+  }
+  assert.deepEqual(bad, []);
+});

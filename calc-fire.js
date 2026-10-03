@@ -2168,7 +2168,7 @@ FIRE_RENDERERS["hose-lay-section-count"] = _simpleRenderer({
   example: hoseLaySectionCountExample.inputs,
   fields: [
     { key: "map_distance_ft", label: "Map distance to the objective (ft)", kind: "number" },
-    { key: "slack_fraction", label: "Slack allowance (0.20 = 20%)", kind: "number" },
+    { key: "slack_fraction", label: "Slack allowance (0.20 = 20%)", kind: "number", default: 0.2 },
     { key: "section_length_ft", label: "Section length (ft)", kind: "number" },
     { key: "hose_id_in", label: "Hose inside diameter (in)", kind: "number" },
     { key: "dry_weight_per_section_lb", label: "Dry weight per section (lb)", kind: "number" },

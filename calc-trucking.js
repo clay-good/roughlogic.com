@@ -1976,7 +1976,7 @@ TRUCKING_RENDERERS["truck-startability"] = _simpleRenderer({
     { key: "gross_weight_lb", label: "Gross combination weight (lb)", kind: "number" },
     { key: "drive_axle_weight_lb", label: "Weight on drive axles (lb)", kind: "number" },
     { key: "friction_coeff", label: "Tire-road friction (0.6 dry, 0.3 wet, 0.15 ice)", kind: "number" },
-    { key: "rolling_resistance_coeff", label: "Rolling resistance coefficient (~0.012 pavement)", kind: "number" },
+    { key: "rolling_resistance_coeff", label: "Rolling resistance coefficient (~0.012 pavement)", kind: "number", default: 0.012 },
   ],
   outputs: [
     { key: "grade", id: "tsg-out-grade", label: "Max startable grade", value: (r) => fmt(r.max_grade_pct, 1) + "%" + (r.max_grade_pct <= 0 ? " (cannot start on any upgrade)" : "") },

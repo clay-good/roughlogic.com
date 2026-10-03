@@ -2387,7 +2387,7 @@ MACHINING_RENDERERS["counterbore-depth"] = _simpleRenderer({
   fields: [
     { key: "screw_diameter_in", label: "Screw nominal diameter (in)", kind: "number" },
     { key: "head_height_in", label: "Head height (in)", kind: "number" },
-    { key: "below_flush_in", label: "Clearance below flush (in)", kind: "number" },
+    { key: "below_flush_in", label: "Clearance below flush (in)", kind: "number", default: 0.015 },
     { key: "plate_thickness_in", label: "Plate thickness (in)", kind: "number" },
     { key: "engagement_multiplier", label: "Engagement multiplier (1.0 steel, 1.5 cast iron, 2.0 aluminum)", kind: "number" },
     { key: "tapped_part", label: "The counterbore is in the tapped part", kind: "select", options: [{ value: "yes", label: "Yes -- the bore eats the thread engagement" }, { value: "no", label: "No -- it is a separate clearance plate" }] },

@@ -192,7 +192,7 @@ export const BESPOKE_OUTPUT_UNITS = {
   "drywell-infiltration": {"footprint_sf":{"prefix":"","suffix":" sf","digits":0}},
   "dti": {"front_end_dti_percent":{"prefix":"","suffix":"%","digits":1},"back_end_dti_percent":{"prefix":"","suffix":"%","digits":1}},
   "duct-friction-static": {"velocity_fpm":{"prefix":"","suffix":" fpm","digits":0},"velocity_pressure_in_wc":{"prefix":"","suffix":" in WC","digits":4},"friction_loss_per_100ft_in_wc":{"prefix":"","suffix":" in WC / 100 ft","digits":4},"straight_loss_in_wc":{"prefix":"","suffix":" in WC","digits":4},"fitting_loss_in_wc":{"prefix":"","suffix":" in WC","digits":4},"total_static_in_wc":{"prefix":"","suffix":" in WC","digits":4}},
-  "duct-leakage": {"leakage_pct":{"prefix":"","suffix":" %","digits":2},"effective_class":{"prefix":"Class ","suffix":""}},
+  "duct-leakage": {"leakage_pct":{"prefix":"","suffix":" %","digits":2}},
   "duct-sizing": {"round_diameter_in":{"prefix":"","suffix":" in","digits":2},"equivalent_square_in":{"prefix":"","suffix":" in (square)","digits":2},"velocity_fpm":{"prefix":"","suffix":" fpm","digits":0}},
   "duct-transition-length": {"length_concentric_in":{"prefix":"","suffix":" in","digits":2},"length_eccentric_in":{"prefix":"","suffix":" in","digits":2}},
   "dump-truck-loads": {"loads":{"prefix":"","suffix":" loads","digits":0}},

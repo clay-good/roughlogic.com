@@ -180,7 +180,7 @@ MASONRY_RENDERERS["cmu-shear-wall"] = _simpleRenderer({
     { key: "b_in", label: "Net wall thickness (in)", kind: "number" },
     { key: "dv_in", label: "Shear depth dv, wall length (in)", kind: "number" },
     { key: "p_lb", label: "Sustained axial load P (lb)", kind: "number", default: 0 },
-    { key: "mvd", label: "Shear-span ratio M/(V dv)", kind: "number" },
+    { key: "mvd", label: "Shear-span ratio M/(V dv)", kind: "number", default: 0.5 },
     { key: "av_in2", label: "Horizontal bar area Av (in², 0 = none)", kind: "number", default: 0 },
     { key: "s_in", label: "Horizontal bar spacing s (in)", kind: "number" },
     { key: "fs_psi", label: "Allowable steel stress Fs (psi)", kind: "number" },
@@ -662,7 +662,7 @@ MASONRY_RENDERERS["masonry-joint-reinforcement"] = _simpleRenderer({
     { key: "wall_height_ft", label: "Wall height (ft)", kind: "number" },
     { key: "vertical_spacing_in", label: "Vertical spacing (in, code cap 16)", kind: "number" },
     { key: "piece_length_ft", label: "Wire piece length (ft)", kind: "number" },
-    { key: "lap_in", label: "Lap between pieces (in, 6 min; 9 for 3/16 in wire)", kind: "number" },
+    { key: "lap_in", label: "Lap between pieces (in, 6 min; 9 for 3/16 in wire)", kind: "number", default: 6 },
   ],
   outputs: [
     { key: "c", id: "mjr-out-c", label: "Reinforced courses", value: (r) => fmt(r.reinforced_courses, 0) },

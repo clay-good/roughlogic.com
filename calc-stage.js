@@ -1470,7 +1470,7 @@ const renderSpeedOfSoundAir = _r({
   citation: "Citation: speed of sound in dry air c = 331.3 sqrt(1 + T_C/273.15) m/s, from c = sqrt(gamma R T / M) (kinetic theory; NIST), converted to ft/s (x 3.28084); propagation delay = 1000/c ms per foot. 1,126 ft/s at 68 F, the ~1,130 ft/s rule of thumb. Dry air; humidity is a small second-order correction. A first-principles aid; the system tuning governs.",
   example: speedOfSoundAirExample.inputs,
   fields: [
-    { key: "temperature_f", label: "Air temperature (°F)", kind: "number", attrs: { step: "any" } },
+    { key: "temperature_f", label: "Air temperature (°F)", kind: "number", default: 68, attrs: { step: "any" } },
   ],
   outputs: [
     { key: "ft", id: "sos-out-ft", label: "Speed of sound", value: (r) => fmt(r.speed_ftps, 1) + " ft/s (" + fmt(r.speed_mps, 1) + " m/s)" },
@@ -1602,7 +1602,7 @@ const renderLedTapeRun = _r({
     { key: "run_length_ft", label: "Run length (ft)", kind: "number" },
     { key: "supply_voltage_v", label: "Supply voltage (V, 12 / 24)", kind: "number" },
     { key: "resistance_per_ft", label: "Round-trip resistance (ohm/ft)", kind: "number" },
-    { key: "headroom_pct", label: "PSU headroom (%)", kind: "number" },
+    { key: "headroom_pct", label: "PSU headroom (%)", kind: "number", default: 20 },
     { key: "drop_tolerance_pct", label: "Acceptable end drop (%)", kind: "number" },
   ],
   outputs: [

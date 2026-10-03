@@ -1402,7 +1402,7 @@ REFRIGERANT_RENDERERS["defrost-cycle-sizing"] = _simpleRenderer({
   example: defrostCycleSizingExample.inputs,
   fields: [
     { key: "frost_lb", label: "Frost mass per cycle (lb)", kind: "number" },
-    { key: "coil_temp_f", label: "Coil temperature at defrost start (F)", kind: "number", attrs: { step: "any" } },
+    { key: "coil_temp_f", label: "Coil temperature at defrost start (F)", kind: "number", default: -10, attrs: { step: "any" } },
     { key: "coil_mass_lb", label: "Coil mass (lb)", kind: "number" },
     { key: "coil_specific_heat", label: "Coil specific heat (BTU/lb-F)", kind: "number" },
     { key: "coil_temp_rise_f", label: "Coil temperature rise during defrost (F)", kind: "number" },

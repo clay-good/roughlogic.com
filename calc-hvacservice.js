@@ -112,7 +112,7 @@ HVACSERVICE_RENDERERS["condensate-drain"] = _simpleRenderer({
     { key: "tons", label: "Cooling capacity (tons)", kind: "number" },
     { key: "pints_per_ton_hr", label: "Condensate rate (pints/ton-hr)", kind: "number" },
     { key: "run_ft", label: "Horizontal run (ft)", kind: "number", default: 0 },
-    { key: "slope_in_per_ft", label: "Slope (in/ft)", kind: "number" },
+    { key: "slope_in_per_ft", label: "Slope (in/ft)", kind: "number", default: 0.125 },
   ],
   outputs: [
     { key: "p", id: "cd-out-p", label: "Condensate rate", value: (r) => fmt(r.rate_pints_hr, 1) + " pints/hr" },
@@ -490,8 +490,8 @@ HVACSERVICE_RENDERERS["furnace-temp-rise"] = _simpleRenderer({
     { key: "supply_air_F", label: "Supply-air temp (°F)", kind: "number" },
     { key: "input_btuh", label: "Furnace input (BTU/hr)", kind: "number" },
     { key: "efficiency_pct", label: "Efficiency (%)", kind: "number" },
-    { key: "rise_min_F", label: "Plate min rise (°F)", kind: "number" },
-    { key: "rise_max_F", label: "Plate max rise (°F)", kind: "number" },
+    { key: "rise_min_F", label: "Plate min rise (°F)", kind: "number", default: 40 },
+    { key: "rise_max_F", label: "Plate max rise (°F)", kind: "number", default: 70 },
   ],
   outputs: [
     { key: "d", id: "ftr-out-d", label: "Temperature rise", value: (r) => fmt(r.delta_T_F, 1) + " F" },
@@ -536,9 +536,9 @@ HVACSERVICE_RENDERERS["furnace-airflow-to-rise"] = _simpleRenderer({
     { key: "input_btuh", label: "Furnace input (BTU/hr)", kind: "number" },
     { key: "efficiency_pct", label: "Efficiency (%)", kind: "number" },
     { key: "cfm", label: "Blower airflow (CFM)", kind: "number" },
-    { key: "return_air_F", label: "Return-air temp (°F)", kind: "number" },
-    { key: "rise_min_F", label: "Plate min rise (°F)", kind: "number" },
-    { key: "rise_max_F", label: "Plate max rise (°F)", kind: "number" },
+    { key: "return_air_F", label: "Return-air temp (°F)", kind: "number", default: 70 },
+    { key: "rise_min_F", label: "Plate min rise (°F)", kind: "number", default: 40 },
+    { key: "rise_max_F", label: "Plate max rise (°F)", kind: "number", default: 70 },
   ],
   outputs: [
     { key: "d", id: "far-out-d", label: "Predicted temperature rise", value: (r) => fmt(r.delta_T_F, 1) + " F" },
@@ -1170,7 +1170,7 @@ HVACSERVICE_RENDERERS["flue-gas-dew-point"] = _simpleRenderer({
   citation: "Citation: natural-gas flue-gas water dew point, by name. Methane stoichiometry (CH4 -> 2 H2O; wet moles 1 + 9.52*lambda) gives the water fraction; its partial pressure into the Antoine saturation relation (water, NIST) gives the dew point (~134 F at 15% excess air). Non-condensing appliances must keep flue gas above it or the vent corrodes. The appliance listing, the vent-sizing tables (NFPA 54), and the AHJ govern.",
   example: flueGasDewPointExample.inputs,
   fields: [
-    { key: "excess_air_pct", label: "Excess air (%, not flue O2: 5% O2 is about 28% excess air)", kind: "number" },
+    { key: "excess_air_pct", label: "Excess air (%, not flue O2: 5% O2 is about 28% excess air)", kind: "number", default: 15 },
   ],
   outputs: [
     { key: "w", id: "fgd-out-w", label: "Flue-gas water vapor", value: (r) => fmt(r.water_vapor_pct, 1) + " %" },

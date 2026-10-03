@@ -366,7 +366,7 @@ HVACAIRSIDE_RENDERERS["air-density-correction"] = _rEnv({
   example: airDensityCorrectionExample.inputs,
   fields: [
     { key: "elev_ft", label: "Site elevation (ft)", kind: "number" },
-    { key: "T_F", label: "Air temperature (°F)", kind: "number" },
+    { key: "T_F", label: "Air temperature (°F)", kind: "number", default: 70 },
     { key: "acfm", label: "Actual airflow ACFM (cfm, optional)", kind: "number" },
     { key: "rated_sp", label: "Sea-level rated fan static (in-wc, optional)", kind: "number" },
   ],

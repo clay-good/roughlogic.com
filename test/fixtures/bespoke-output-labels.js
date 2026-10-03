@@ -280,7 +280,7 @@ export const BESPOKE_OUTPUT_LABELS = {
   "drywell-infiltration": {"excavation_volume_ft3":"Excavation volume","footprint_sf":"Footprint (at this depth)","draindown_time_hr":"Draindown time"},
   "dti": {"front_end_dti_percent":"Front-end DTI (housing only)","back_end_dti_percent":"Back-end DTI (total debt)","conventional_pass":"Conventional (total DTI 45 max; no front-end ratio)","fha_pass":"FHA thresholds (31/43)","va_pass":"VA threshold (41 back)"},
   "duct-friction-static": {"velocity_fpm":"Velocity","velocity_pressure_in_wc":"Velocity pressure","friction_factor":"Friction factor","friction_loss_per_100ft_in_wc":"Friction per 100 ft","straight_loss_in_wc":"Straight-duct static","fitting_loss_in_wc":"Fitting losses","total_static_in_wc":"Total static"},
-  "duct-leakage": {"leakage_cfm":"Leakage","leakage_pct":"Leakage % of design","effective_class":"Effective leakage class"},
+  "duct-leakage": {"leakage_cfm":"Leakage","leakage_pct":"Leakage % of design","exceeds_all_classes":"Effective leakage class"},
   "duct-sizing": {"round_diameter_in":"Round diameter","equivalent_square_in":"Equivalent square","velocity_fpm":"Velocity","friction_color":"Friction rate band","velocity_label":"Velocity ceiling"},
   "duct-static-pressure-total": {"total_esp_in_wc":"Total external static","notes":"Notes"},
   "duct-static-regain": {"static_regain_inwc":"Static regain"},

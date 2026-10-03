@@ -2297,7 +2297,7 @@ CONCRETE_RENDERERS["slab-dowel-schedule"] = _simpleRenderer({
     { key: "joint_length_ft", label: "Joint length (ft)", kind: "number" },
     { key: "slab_thickness_in", label: "Slab thickness (in)", kind: "number" },
     { key: "dowel_spacing_in", label: "Dowel spacing (in o.c.)", kind: "number" },
-    { key: "edge_clearance_in", label: "Edge clearance (in)", kind: "number" },
+    { key: "edge_clearance_in", label: "Edge clearance (in)", kind: "number", default: 6 },
     { key: "num_joints", label: "Number of dowelled joints", kind: "number" },
   ],
   outputs: [
@@ -2341,7 +2341,7 @@ CONCRETE_RENDERERS["concrete-premix-bags"] = _simpleRenderer({
     { key: "width_ft", label: "Width (ft)", kind: "number" },
     { key: "thickness_in", label: "Thickness (in)", kind: "number" },
     { key: "bag_yield_ft3", label: "Bag yield (ft³): 80lb 0.60, 60lb 0.45, 50lb 0.375, 40lb 0.30", kind: "number" },
-    { key: "waste_pct", label: "Waste (percent)", kind: "number" },
+    { key: "waste_pct", label: "Waste (percent)", kind: "number", default: 10 },
   ],
   outputs: [
     { key: "v", id: "cpb-out-v", label: "Pour volume", value: (r) => fmt(r.volume_ft3, 2) + " ft^3" },

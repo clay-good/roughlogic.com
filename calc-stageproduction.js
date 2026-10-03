@@ -175,8 +175,8 @@ STAGEPRODUCTION_RENDERERS["delay-tower-alignment"] = _r({
   example: delayTowerAlignmentExample.inputs,
   fields: [
     { key: "distance_ft", label: "Main array to delay position (ft)", kind: "number" },
-    { key: "temp_f", label: "Air temperature (F)", kind: "number" },
-    { key: "haas_offset_ms", label: "Haas offset (ms)", kind: "number" },
+    { key: "temp_f", label: "Air temperature (F)", kind: "number", default: 70 },
+    { key: "haas_offset_ms", label: "Haas offset (ms)", kind: "number", default: 15 },
     { key: "compare_temp_f", label: "Comparison temperature (F)", kind: "number" },
   ],
   outputs: [
@@ -231,7 +231,7 @@ STAGEPRODUCTION_RENDERERS["cardioid-sub-array"] = _r({
   fields: [
     { key: "spacing_ft", label: "Element spacing, front to back (ft)", kind: "number" },
     { key: "elements", label: "Number of elements", kind: "number" },
-    { key: "temp_f", label: "Air temperature (F)", kind: "number" },
+    { key: "temp_f", label: "Air temperature (F)", kind: "number", default: 70 },
     { key: "target_freq_hz", label: "Target rejection frequency (Hz, 0 to skip)", kind: "number" },
   ],
   outputs: [
@@ -283,7 +283,7 @@ STAGEPRODUCTION_RENDERERS["driver-spacing-lobing"] = _r({
   fields: [
     { key: "spacing_ft", label: "Center-to-center spacing (ft)", kind: "number" },
     { key: "test_freq_hz", label: "Crossover or test frequency (Hz)", kind: "number" },
-    { key: "temp_f", label: "Air temperature (F)", kind: "number" },
+    { key: "temp_f", label: "Air temperature (F)", kind: "number", default: 70 },
   ],
   outputs: [
     { key: "c", id: "dslo-out-c", label: "Crossover ceiling", value: (r) => fmt(r.crossover_ceiling_hz, 1) + " Hz" },

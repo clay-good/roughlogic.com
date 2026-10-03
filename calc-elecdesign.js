@@ -946,7 +946,7 @@ ELECDESIGN_RENDERERS["fuse-let-through"] = _simpleRenderer({
   example: fuseLetThroughExample.inputs,
   fields: [
     { key: "conductor_cmil", label: "Conductor area (circular mils)", kind: "number" },
-    { key: "initial_temp_c", label: "Initial conductor temperature (deg C)", kind: "number" },
+    { key: "initial_temp_c", label: "Initial conductor temperature (deg C)", kind: "number", default: 75 },
     { key: "damage_temp_c", label: "Insulation damage temperature (deg C)", kind: "number" },
     { key: "duration_s", label: "Fault duration basis (s)", kind: "number" },
     { key: "let_through_i2t", label: "Device let-through I-squared-t (A2s, from the curve)", kind: "number" },

@@ -2037,7 +2037,7 @@ const renderDrywall = _simpleRenderer({
     { key: "wall_area_ft2", label: "Wall area (ft²)", kind: "number" },
     { key: "ceiling_area_ft2", label: "Ceiling area (ft²)", kind: "number" },
     { key: "sheet_size", label: "Sheet size", kind: "select", options: [{ value: "4x8", label: "4x8" }, { value: "4x10", label: "4x10" }, { value: "4x12", label: "4x12" }] },
-    { key: "waste_percent", label: "Waste (%)", kind: "number" },
+    { key: "waste_percent", label: "Waste (%)", kind: "number", default: 10 },
   ],
   outputs: [
     { key: "sheets", id: "dr-out-s", label: "Sheets", value: (r) => String(r.sheets) },
@@ -2168,7 +2168,7 @@ const renderMortarMix = _simpleRenderer({
   fields: [
     { key: "unit_count", label: "Unit count", kind: "number" },
     { key: "unit_kind", label: "Unit kind", kind: "select", options: [{ value: "brick", label: "Standard brick" }, { value: "cmu_8", label: "8-in CMU" }] },
-    { key: "joint_in", label: "Joint thickness (in)", kind: "number" },
+    { key: "joint_in", label: "Joint thickness (in)", kind: "number", default: 0.375 },
     { key: "mortar_type", label: "Mortar type", kind: "select", options: [{ value: "N", label: "Type N" }, { value: "S", label: "Type S" }, { value: "M", label: "Type M" }] },
   ],
   outputs: [
@@ -2183,7 +2183,7 @@ const renderConcreteMixDesign = _simpleRenderer({
   fields: [
     { key: "strength_psi", label: "Target strength (psi)", kind: "number" },
     { key: "exposure", label: "Exposure class", kind: "select", options: ["interior", "freeze_thaw", "marine", "sulfate"].map((v) => ({ value: v, label: v.replace(/_/g, " ") })) },
-    { key: "max_aggregate_in", label: "Max aggregate (in)", kind: "number" },
+    { key: "max_aggregate_in", label: "Max aggregate (in)", kind: "number", default: 1 },
     { key: "slump_in", label: "Slump (in)", kind: "number" },
   ],
   outputs: [
@@ -5774,8 +5774,8 @@ const _renderShorePostLoad = _simpleRenderer({
   fields: [
     { key: "slab_in", label: "Slab / pour thickness (in)", kind: "number" },
     { key: "unit_weight", label: "Concrete unit weight (pcf)", kind: "number" },
-    { key: "form_load", label: "Formwork dead load (psf)", kind: "number" },
-    { key: "live_load", label: "Construction live load (psf)", kind: "number" },
+    { key: "form_load", label: "Formwork dead load (psf)", kind: "number", default: 10 },
+    { key: "live_load", label: "Construction live load (psf)", kind: "number", default: 50 },
     { key: "spacing_x", label: "Shore spacing one way (ft)", kind: "number" },
     { key: "spacing_y", label: "Shore spacing other way (ft)", kind: "number" },
     { key: "shore_capacity", label: "Rated shore capacity (lb)", kind: "number" },
@@ -6263,7 +6263,7 @@ const _renderConcreteWashoutVolume = _simpleRenderer({
   fields: [
     { key: "trucks", label: "Ready-mix trucks (or pump washes)", kind: "number" },
     { key: "washout_gal_per_truck", label: "Washout volume per truck (gal)", kind: "number" },
-    { key: "freeboard_pct", label: "Freeboard allowance (percent)", kind: "number" },
+    { key: "freeboard_pct", label: "Freeboard allowance (percent)", kind: "number", default: 15 },
     { key: "pit_depth_ft", label: "Usable pit depth (ft)", kind: "number" },
   ],
   outputs: [
@@ -6303,9 +6303,9 @@ const _renderConcreteEvaporationRate = _simpleRenderer({
   citation: "Citation: ACI 305 (Hot Weather Concreting) nomograph and the Menzel/NRMCA evaporation equation: E [kg/m^2/hr] = 5 x [(Tc + 18)^2.5 - (RH/100)(Ta + 18)^2.5](V + 4) x 10^-6, with Tc, Ta in C and V in km/h (converted from F and mph; 1 kg/m^2/hr = 0.2048 lb/ft^2/hr). Take precautions above 0.2 lb/ft^2/hr (~1.0 kg/m^2/hr); use the lower 0.1 lb/ft^2/hr caution for low-bleed mixes (low w/c, silica fume, high-early cement). The concrete temperature, not the air, drives the vapor term; a low-bleed mix cracks below the nominal threshold. A field screen, not a curing specification (curing follows ACI 308).",
   example: concreteEvaporationRateExample.inputs,
   fields: [
-    { key: "air_temp_f", label: "Air temperature (°F)", kind: "number", attrs: { step: "any" } },
+    { key: "air_temp_f", label: "Air temperature (°F)", kind: "number", default: 70, attrs: { step: "any" } },
     { key: "concrete_temp_f", label: "Concrete temperature (°F)", kind: "number", attrs: { step: "any" } },
-    { key: "rh_pct", label: "Relative humidity (%)", kind: "number" },
+    { key: "rh_pct", label: "Relative humidity (%)", kind: "number", default: 50 },
     { key: "wind_mph", label: "Wind speed (mph)", kind: "number" },
   ],
   outputs: [
@@ -6397,7 +6397,7 @@ const _renderConcreteMaturity = _simpleRenderer({
   fields: [
     { key: "concrete_temp_f", label: "Average concrete temperature (°F)", kind: "number", attrs: { step: "any" } },
     { key: "hours", label: "Elapsed curing time (hours)", kind: "number", attrs: { step: "any" } },
-    { key: "datum_f", label: "Datum temperature T0 (°F)", kind: "number", attrs: { step: "any" } },
+    { key: "datum_f", label: "Datum temperature T0 (°F)", kind: "number", default: 32, attrs: { step: "any" } },
     { key: "q_kelvin", label: "Arrhenius constant Q (K)", kind: "number" },
     { key: "ref_temp_f", label: "Reference temperature Tr (°F)", kind: "number", attrs: { step: "any" } },
     { key: "target_ttf_c", label: "Target TTF (°C-hr, 0 = none)", kind: "number" },
@@ -6958,7 +6958,7 @@ const _renderWindCcPressure = _simpleRenderer({
     { key: "kzt", label: "Topographic factor Kzt", kind: "number" },
     { key: "kd", label: "Directionality factor Kd", kind: "number" },
     { key: "ke", label: "Ground-elevation factor Ke", kind: "number" },
-    { key: "gcpi", label: "Internal GCpi magnitude", kind: "number" },
+    { key: "gcpi", label: "Internal GCpi magnitude", kind: "number", default: 0.18 },
   ],
   outputs: [
     { key: "qh", id: "wcc-out-qh", label: "Velocity pressure qh", value: (r) => fmt(r.qh_psf, 1) + " psf" },
@@ -7050,10 +7050,10 @@ const _renderWindMwfrsPressure = _simpleRenderer({
   fields: [
     { key: "qz_psf", label: "Windward velocity pressure qz, including Kd (psf)", kind: "number" },
     { key: "qh_psf", label: "Leeward velocity pressure qh, including Kd (psf)", kind: "number" },
-    { key: "cp_ww", label: "Windward wall Cp", kind: "number" },
-    { key: "cp_lw", label: "Leeward wall Cp", kind: "number" },
+    { key: "cp_ww", label: "Windward wall Cp", kind: "number", default: 0.8 },
+    { key: "cp_lw", label: "Leeward wall Cp", kind: "number", default: -0.5 },
     { key: "g_f", label: "Gust-effect factor G", kind: "number" },
-    { key: "gcpi", label: "Internal GCpi magnitude", kind: "number" },
+    { key: "gcpi", label: "Internal GCpi magnitude", kind: "number", default: 0.18 },
   ],
   outputs: [
     { key: "ww", id: "wmw-out-ww", label: "Windward wall pressure", value: (r) => fmt(r.p_ww_psf, 1) + " psf (pushing in)" },
@@ -7478,7 +7478,7 @@ const _renderShaftTorsion = _simpleRenderer({
     { key: "d_in", label: "Outer diameter d (in)", kind: "number" },
     { key: "di_in", label: "Inner diameter (in; 0 = solid)", kind: "number" },
     { key: "L_in", label: "Length for twist L (in, optional)", kind: "number" },
-    { key: "G_psi", label: "Shear modulus G (psi; 11.5e6 steel)", kind: "number" },
+    { key: "G_psi", label: "Shear modulus G (psi; 11.5e6 steel)", kind: "number", default: 11.5 },
   ],
   outputs: [
     { key: "tau", id: "st-out-tau", label: "Max shear stress", value: (r) => fmt(r.tau_psi, 0) + " psi" },
@@ -7522,7 +7522,7 @@ const _renderShaftDiameterForTorsion = _simpleRenderer({
     { key: "T_lbin", label: "Torque T (lb-in)", kind: "number" },
     { key: "tau_allow_psi", label: "Allowable shear stress (psi)", kind: "number" },
     { key: "L_in", label: "Length for twist L (in, optional)", kind: "number" },
-    { key: "G_psi", label: "Shear modulus G (psi; 11.5e6 steel)", kind: "number" },
+    { key: "G_psi", label: "Shear modulus G (psi; 11.5e6 steel)", kind: "number", default: 11.5 },
   ],
   outputs: [
     { key: "d", id: "sdt-out-d", label: "Minimum solid-shaft diameter", value: (r) => fmt(r.d_in, 3) + " in" },
@@ -7894,7 +7894,7 @@ const _v431renderReadyMixConcreteOrder = _simpleRenderer({
   example: readyMixConcreteOrderExample.inputs,
   fields: [
     { key: "volume_yd3", label: "Required in-place volume (yd³)", kind: "number" },
-    { key: "waste_pct", label: "Waste/over-order allowance (%)", kind: "number" },
+    { key: "waste_pct", label: "Waste/over-order allowance (%)", kind: "number", default: 8 },
     { key: "load_yd3", label: "Truck capacity (yd³, default 10)", kind: "number" },
     { key: "min_yd3", label: "Plant minimum before short-load fee (yd³)", kind: "number" },
     { key: "price_per_yd3", label: "Concrete price ($/yd³, optional)", kind: "number" },
@@ -7952,7 +7952,7 @@ const _v816renderShotcreteReboundQuantity = _simpleRenderer({
   fields: [
     { key: "area_sf", label: "Area to shoot (ft²)", kind: "number" },
     { key: "thickness_in", label: "In-place section thickness (in)", kind: "number" },
-    { key: "rebound_pct", label: "Rebound loss (% of material shot)", kind: "number" },
+    { key: "rebound_pct", label: "Rebound loss (% of material shot)", kind: "number", default: 20 },
     { key: "shot_actual_cy", label: "Volume actually shot so far (cy)", kind: "number" },
   ],
   outputs: [
@@ -8000,7 +8000,7 @@ const _v817renderAnnularGroutVolume = _simpleRenderer({
     { key: "bore_dia_in", label: "Bore / casing inside diameter (in)", kind: "number" },
     { key: "carrier_od_in", label: "Carrier pipe outside diameter (in)", kind: "number" },
     { key: "length_ft", label: "Run length (ft)", kind: "number" },
-    { key: "waste_pct", label: "Pumping / overcut waste (%)", kind: "number" },
+    { key: "waste_pct", label: "Pumping / overcut waste (%)", kind: "number", default: 5 },
   ],
   outputs: [
     { key: "cy", id: "agv-out-cy", label: "Grout to order", value: (r) => _fmtC(r.grout_cy, 2) + " cy (" + _fmtC(r.grout_gal, 0) + " gal)" },
@@ -8180,9 +8180,9 @@ const _v819renderWeldedWireMesh = _simpleRenderer({
     { key: "slab_area_sf", label: "Slab area to reinforce (ft²)", kind: "number" },
     { key: "sheet_width_ft", label: "Mesh sheet width (ft)", kind: "number" },
     { key: "sheet_length_ft", label: "Mesh sheet length (ft)", kind: "number" },
-    { key: "side_lap_in", label: "Side lap (in)", kind: "number" },
-    { key: "end_lap_in", label: "End lap (in)", kind: "number" },
-    { key: "waste_pct", label: "Waste / cutting allowance (%)", kind: "number" },
+    { key: "side_lap_in", label: "Side lap (in)", kind: "number", default: 6 },
+    { key: "end_lap_in", label: "End lap (in)", kind: "number", default: 6 },
+    { key: "waste_pct", label: "Waste / cutting allowance (%)", kind: "number", default: 5 },
   ],
   outputs: [
     { key: "s", id: "wwm-out-s", label: "Sheets to order", value: (r) => String(r.sheets) + " sheets (" + _fmtC(r.purchased_sf, 0) + " sf purchased)" },
@@ -8307,7 +8307,7 @@ const _v440renderTrimLinearFootage = _simpleRenderer({
   fields: [
     { key: "perimeter_ft", label: "Room perimeter (ft)", kind: "number" },
     { key: "openings_ft", label: "Total door-opening width (ft, no trim below)", kind: "number" },
-    { key: "waste_pct", label: "Waste allowance (%)", kind: "number" },
+    { key: "waste_pct", label: "Waste allowance (%)", kind: "number", default: 10 },
     { key: "stock_len_ft", label: "Trim stock length (ft, default 16)", kind: "number" },
     { key: "spring_deg", label: "Crown spring angle (deg, 0 = baseboard/casing)", kind: "number" },
   ],
@@ -8511,7 +8511,7 @@ const _v468renderRainOnSnowSurcharge = _simpleRenderer({
     { key: "pg_psf", label: "Ground snow load Pg (psf)", kind: "number" },
     { key: "slope_deg", label: "Roof slope (deg)", kind: "number" },
     { key: "eave_to_ridge_ft", label: "Eave-to-ridge distance W (ft)", kind: "number" },
-    { key: "surcharge_psf", label: "Surcharge value (psf, ASCE 7-22: 8)", kind: "number" },
+    { key: "surcharge_psf", label: "Surcharge value (psf, ASCE 7-22: 8)", kind: "number", default: 8 },
     { key: "risk_category", label: "Risk category", kind: "select", options: [{ value: "I", label: "I" }, { value: "II", label: "II", selected: true }, { value: "III", label: "III" }, { value: "IV", label: "IV" }] },
   ],
   outputs: [
@@ -9052,7 +9052,7 @@ const _v853renderDuctBankConcrete = _simpleRenderer({
     { key: "length_ft", label: "Run length (ft)", kind: "number" },
     { key: "num_conduits", label: "Number of conduits in the bank", kind: "number" },
     { key: "conduit_od_in", label: "Conduit actual outside diameter (in)", kind: "number" },
-    { key: "waste_pct", label: "Waste allowance (percent)", kind: "number" },
+    { key: "waste_pct", label: "Waste allowance (percent)", kind: "number", default: 5 },
   ],
   outputs: [
     { key: "o", id: "dbc-out-o", label: "Concrete to order", value: (r) => _fmtC(r.ordered_cy, 2) + " cy (with waste)" },
@@ -9230,7 +9230,7 @@ const _v863renderMembraneRoofTakeoff = _simpleRenderer({
     { key: "roof_area_sf", label: "Roof area (ft²)", kind: "number" },
     { key: "roll_width_ft", label: "Membrane roll width (ft)", kind: "number" },
     { key: "roll_length_ft", label: "Membrane roll length (ft)", kind: "number" },
-    { key: "sidelap_in", label: "Side lap (in)", kind: "number" },
+    { key: "sidelap_in", label: "Side lap (in)", kind: "number", default: 6 },
     { key: "waste_pct", label: "Waste allowance (percent)", kind: "number" },
   ],
   outputs: [
@@ -9275,7 +9275,7 @@ const _v864renderTaperedRoofInsulation = _simpleRenderer({
   example: taperedRoofInsulationExample.inputs,
   fields: [
     { key: "run_ft", label: "Taper run length to drain (ft)", kind: "number" },
-    { key: "slope_in_per_ft", label: "Taper slope (in/ft)", kind: "number" },
+    { key: "slope_in_per_ft", label: "Taper slope (in/ft)", kind: "number", default: 0.25 },
     { key: "start_thk_in", label: "Thickness at the low (start) edge (in)", kind: "number" },
     { key: "area_sf", label: "Field area (ft²)", kind: "number" },
     { key: "r_per_in", label: "Insulation R per inch", kind: "number" },
@@ -9318,7 +9318,7 @@ const _v865renderSheathingTakeoff = _simpleRenderer({
   example: sheathingTakeoffExample.inputs,
   fields: [
     { key: "area_sf", label: "Area to sheathe (ft²)", kind: "number" },
-    { key: "waste_pct", label: "Waste allowance (percent)", kind: "number" },
+    { key: "waste_pct", label: "Waste allowance (percent)", kind: "number", default: 8 },
     { key: "sheet_sf", label: "Panel area (ft², 32 for a 4x8)", kind: "number" },
     { key: "nails_per_sheet", label: "Nails per panel from the schedule", kind: "number" },
   ],
@@ -9406,7 +9406,7 @@ const _v867renderSillPlateAnchorCount = _simpleRenderer({
   fields: [
     { key: "wall_length_ft", label: "Wall / plate length (ft)", kind: "number" },
     { key: "max_spacing_ft", label: "Maximum anchor spacing (ft)", kind: "number" },
-    { key: "end_distance_in", label: "Bolt distance from each end (in)", kind: "number" },
+    { key: "end_distance_in", label: "Bolt distance from each end (in)", kind: "number", default: 9 },
   ],
   outputs: [
     { key: "b", id: "spa-out-b", label: "Anchor bolts", value: (r) => _fmtC(r.bolts, 0) + " bolts" },
@@ -9680,7 +9680,7 @@ const _v873renderSelfLevelerBags = _simpleRenderer({
     { key: "area_sf", label: "Area to pour (ft²)", kind: "number" },
     { key: "avg_thickness_in", label: "Average pour thickness (in)", kind: "number" },
     { key: "bag_yield_sf_in", label: "Bag yield (square-foot-inches)", kind: "number" },
-    { key: "waste_pct", label: "Waste allowance (percent)", kind: "number" },
+    { key: "waste_pct", label: "Waste allowance (percent)", kind: "number", default: 5 },
   ],
   outputs: [
     { key: "b", id: "slb-out-b", label: "Bags to order", value: (r) => _fmtC(r.bags, 0) + " bags" },
@@ -9722,7 +9722,7 @@ const _v874renderCarpetTakeoff = _simpleRenderer({
   example: carpetTakeoffExample.inputs,
   fields: [
     { key: "area_sf", label: "Area to carpet (ft²)", kind: "number" },
-    { key: "waste_pct", label: "Waste allowance (percent)", kind: "number" },
+    { key: "waste_pct", label: "Waste allowance (percent)", kind: "number", default: 10 },
     { key: "roll_width_ft", label: "Carpet roll width (ft)", kind: "number" },
   ],
   outputs: [
@@ -9770,7 +9770,7 @@ const _v875renderSfrmTakeoff = _simpleRenderer({
     { key: "thickness_in", label: "Design thickness (in)", kind: "number" },
     { key: "density_pcf", label: "Material density (pcf)", kind: "number" },
     { key: "bag_lb", label: "Bag weight (lb)", kind: "number" },
-    { key: "waste_pct", label: "In-place waste / overspray (percent)", kind: "number" },
+    { key: "waste_pct", label: "In-place waste / overspray (percent)", kind: "number", default: 15 },
   ],
   outputs: [
     { key: "b", id: "sfr-out-b", label: "Bags to order", value: (r) => _fmtC(r.bags, 0) + " bags" },
@@ -9858,7 +9858,7 @@ const _v877renderMetalDeckTakeoff = _simpleRenderer({
     { key: "area_sf", label: "Deck area (ft²)", kind: "number" },
     { key: "cover_width_in", label: "Net cover width (in)", kind: "number" },
     { key: "sheet_length_ft", label: "Sheet length (ft)", kind: "number" },
-    { key: "waste_pct", label: "Waste allowance (percent)", kind: "number" },
+    { key: "waste_pct", label: "Waste allowance (percent)", kind: "number", default: 5 },
   ],
   outputs: [
     { key: "s", id: "mdt-out-s", label: "Deck sheets", value: (r) => _fmtC(r.sheets, 0) + " sheets" },
@@ -9910,7 +9910,7 @@ const _v878renderRebarTieWire = _simpleRenderer({
     { key: "length_ft", label: "Mat length (ft)", kind: "number" },
     { key: "width_ft", label: "Mat width (ft)", kind: "number" },
     { key: "spacing_in", label: "Bar spacing each way (in)", kind: "number" },
-    { key: "tie_fraction", label: "Fraction of intersections tied (0-1)", kind: "number" },
+    { key: "tie_fraction", label: "Fraction of intersections tied (0-1)", kind: "number", default: 0.5 },
     { key: "tie_length_in", label: "Wire per tie (in)", kind: "number" },
     { key: "wire_lb_per_ft", label: "Tie wire weight (lb/ft; 16 ga annealed, 0.0625 in, is 0.0104)", kind: "number" },
   ],
@@ -9962,7 +9962,7 @@ const _v879renderAnchorEpoxyVolume = _simpleRenderer({
     { key: "bar_dia_in", label: "Anchor / rebar diameter (in)", kind: "number" },
     { key: "embed_in", label: "Embedment depth (in)", kind: "number" },
     { key: "cartridge_in3", label: "Cartridge volume (in³)", kind: "number" },
-    { key: "waste_pct", label: "Nozzle-purge waste (percent)", kind: "number" },
+    { key: "waste_pct", label: "Nozzle-purge waste (percent)", kind: "number", default: 10 },
   ],
   outputs: [
     { key: "c", id: "aev-out-c", label: "Epoxy cartridges", value: (r) => _fmtC(r.cartridges, 0) + " cartridges" },
@@ -10013,7 +10013,7 @@ const _v880renderBaseplateGroutVolume = _simpleRenderer({
     { key: "column_area_in2", label: "Leave-out under the plate (in²: sleeves or a grout hole; the column sits ON the plate and takes none)", kind: "number" },
     { key: "grout_thickness_in", label: "Grout bed thickness (in)", kind: "number" },
     { key: "bag_yield_ft3", label: "Bag yield (ft³)", kind: "number" },
-    { key: "waste_pct", label: "Waste allowance (percent)", kind: "number" },
+    { key: "waste_pct", label: "Waste allowance (percent)", kind: "number", default: 10 },
   ],
   outputs: [
     { key: "b", id: "bgv-out-b", label: "Non-shrink grout bags", value: (r) => _fmtC(r.bags, 0) + " bags" },
@@ -10140,7 +10140,7 @@ const _v883renderSidingTakeoff = _simpleRenderer({
   fields: [
     { key: "wall_area_sf", label: "Gross wall area (ft²)", kind: "number" },
     { key: "opening_area_sf", label: "Openings to deduct (ft²)", kind: "number", default: 0 },
-    { key: "waste_pct", label: "Waste allowance (%)", kind: "number" },
+    { key: "waste_pct", label: "Waste allowance (%)", kind: "number", default: 12 },
     { key: "exposure_in", label: "Lap exposure / reveal (in)", kind: "number" },
   ],
   outputs: [
@@ -10182,7 +10182,7 @@ const _v884renderStuccoCoverage = _simpleRenderer({
     { key: "area_sf", label: "Area to plaster (ft²)", kind: "number" },
     { key: "total_thickness_in", label: "Total coat thickness (in)", kind: "number" },
     { key: "bag_yield_sf_in", label: "Bag yield (square-foot-inches)", kind: "number" },
-    { key: "waste_pct", label: "Waste allowance (%)", kind: "number" },
+    { key: "waste_pct", label: "Waste allowance (%)", kind: "number", default: 10 },
   ],
   outputs: [
     { key: "bags", id: "stu-out-bags", label: "Plaster bags", value: (r) => _fmtC(r.bags, 0) + " bags (" + _fmtC(r.raw_bags, 1) + " before rounding)" },
@@ -10221,7 +10221,7 @@ const _v885renderVaporBarrierRolls = _simpleRenderer({
   fields: [
     { key: "area_sf", label: "Slab area (ft²)", kind: "number" },
     { key: "roll_coverage_sf", label: "Coverage per roll (ft²)", kind: "number" },
-    { key: "overlap_waste_pct", label: "Overlap + waste (%)", kind: "number" },
+    { key: "overlap_waste_pct", label: "Overlap + waste (%)", kind: "number", default: 10 },
     { key: "roll_width_ft", label: "Roll width (ft)", kind: "number" },
   ],
   outputs: [
@@ -10439,7 +10439,7 @@ const _v891renderPolymericSandBags = _simpleRenderer({
   fields: [
     { key: "area_sf", label: "Paver surface area (ft²)", kind: "number" },
     { key: "coverage_per_bag_sf", label: "Coverage per bag (ft²)", kind: "number" },
-    { key: "waste_pct", label: "Waste allowance (%)", kind: "number" },
+    { key: "waste_pct", label: "Waste allowance (%)", kind: "number", default: 5 },
   ],
   outputs: [
     { key: "bags", id: "psb-out-bags", label: "Polymeric sand bags", value: (r) => _fmtC(r.bags, 0) + " bags (" + _fmtC(r.raw_bags, 1) + " before rounding)" },
@@ -10479,7 +10479,7 @@ const _v892renderRigidFoamBoardCount = _simpleRenderer({
     { key: "area_sf", label: "Area to insulate (ft²)", kind: "number" },
     { key: "board_area_sf", label: "Board area (ft²)", kind: "number" },
     { key: "layers", label: "Number of layers", kind: "number", default: 1 },
-    { key: "waste_pct", label: "Waste allowance (%)", kind: "number" },
+    { key: "waste_pct", label: "Waste allowance (%)", kind: "number", default: 8 },
   ],
   outputs: [
     { key: "b", id: "rfb-out-b", label: "Rigid insulation boards", value: (r) => _fmtC(r.boards, 0) + " boards (" + _fmtC(r.boards_per_layer, 0) + " per layer)" },
@@ -10562,7 +10562,7 @@ const _v895renderHousewrapRolls = _simpleRenderer({
   fields: [
     { key: "wall_area_sf", label: "Wall area (ft²)", kind: "number" },
     { key: "roll_coverage_sf", label: "Coverage per roll (ft²)", kind: "number" },
-    { key: "overlap_waste_pct", label: "Overlap + waste (%)", kind: "number" },
+    { key: "overlap_waste_pct", label: "Overlap + waste (%)", kind: "number", default: 10 },
     { key: "fasteners_per_sf", label: "Cap fasteners per ft²", kind: "number" },
     { key: "roll_width_ft", label: "Roll width / height (ft)", kind: "number" },
   ],
@@ -10662,7 +10662,7 @@ const _v904renderCurbGutterVolume = _simpleRenderer({
   fields: [
     { key: "cross_section_ft2", label: "Curb + gutter cross-section (ft²)", kind: "number" },
     { key: "length_ft", label: "Run length (ft)", kind: "number" },
-    { key: "waste_pct", label: "Waste allowance (%)", kind: "number" },
+    { key: "waste_pct", label: "Waste allowance (%)", kind: "number", default: 8 },
   ],
   outputs: [
     { key: "v", id: "cgv-out-v", label: "Concrete volume", value: (r) => _fmtC(r.volume_cy, 1) + " cy" },
@@ -10701,7 +10701,7 @@ const _v905renderRebarChairCount = _simpleRenderer({
   fields: [
     { key: "slab_area_sf", label: "Slab / mat area (ft²)", kind: "number" },
     { key: "support_spacing_ft", label: "Chair spacing each way (ft)", kind: "number" },
-    { key: "waste_pct", label: "Waste allowance (%)", kind: "number" },
+    { key: "waste_pct", label: "Waste allowance (%)", kind: "number", default: 5 },
   ],
   outputs: [
     { key: "c", id: "rcc-out-c", label: "Rebar chairs / bar supports", value: (r) => _fmtC(r.chairs, 0) + " chairs (" + _fmtC(r.raw_chairs, 1) + " before rounding)" },
@@ -10910,7 +10910,7 @@ CONSTRUCTION_RENDERERS["foundation-waterproofing-takeoff"] = _simpleRenderer({
     { key: "below_grade_height_ft", label: "Average below-grade height (ft)", kind: "number" },
     { key: "coverage_sf_per_gal", label: "Coverage per coat (sf/gal, from the data sheet)", kind: "number" },
     { key: "coats", label: "Coats (1 default; 2 typical for brush-grade dampproofing)", kind: "number" },
-    { key: "waste_pct", label: "Waste (percent)", kind: "number" },
+    { key: "waste_pct", label: "Waste (percent)", kind: "number", default: 10 },
   ],
   outputs: [
     { key: "a", id: "fwt-out-a", label: "Below-grade wall area", value: (r) => fmt(r.wall_area_sf, 0) + " sf" },
@@ -10993,7 +10993,7 @@ CONSTRUCTION_RENDERERS["drainage-board-takeoff"] = _simpleRenderer({
     { key: "below_grade_height_ft", label: "Average below-grade height (ft)", kind: "number" },
     { key: "roll_width_ft", label: "Roll width (ft)", kind: "number" },
     { key: "roll_length_ft", label: "Roll length (ft)", kind: "number" },
-    { key: "waste_pct", label: "Waste (percent)", kind: "number" },
+    { key: "waste_pct", label: "Waste (percent)", kind: "number", default: 10 },
   ],
   outputs: [
     { key: "a", id: "dbt-out-a", label: "Below-grade wall area", value: (r) => fmt(r.wall_area_sf, 0) + " sf" },
@@ -11049,7 +11049,7 @@ CONSTRUCTION_RENDERERS["corner-bead-takeoff"] = _simpleRenderer({
     { key: "opening_width_ft", label: "Opening width (ft)", kind: "number" },
     { key: "opening_height_ft", label: "Opening height (ft)", kind: "number" },
     { key: "stock_length_ft", label: "Bead stock length (ft)", kind: "number", default: 8 },
-    { key: "waste_pct", label: "Waste (%)", kind: "number" },
+    { key: "waste_pct", label: "Waste (%)", kind: "number", default: 10 },
   ],
   outputs: [
     { key: "clf", id: "cbt-out-clf", label: "Corner bead LF", value: (r) => fmt(r.corner_lf, 0) + " ft" },
@@ -11105,7 +11105,7 @@ CONSTRUCTION_RENDERERS["siding-course-layout"] = _simpleRenderer({
     { key: "wall_length_ft", label: "Wall length (ft)", kind: "number" },
     { key: "target_exposure_in", label: "Target exposure / reveal (in)", kind: "number" },
     { key: "board_height_in", label: "Board height (in)", kind: "number" },
-    { key: "min_overlap_in", label: "Manufacturer minimum overlap (in)", kind: "number" },
+    { key: "min_overlap_in", label: "Manufacturer minimum overlap (in)", kind: "number", default: 1 },
   ],
   outputs: [
     { key: "c", id: "scl-out-c", label: "Courses", value: (r) => fmt(r.courses, 0) },
@@ -11413,7 +11413,7 @@ CONSTRUCTION_RENDERERS["chip-seal-mcleod"] = _simpleRenderer({
     { key: "bulk_specific_gravity", label: "Bulk specific gravity G", kind: "number" },
     { key: "wastage_factor", label: "Wastage factor E (whip-off, ~1.05-1.10)", kind: "number" },
     { key: "traffic_factor", label: "Traffic factor T (0.85 light to 0.60 heavy)", kind: "number" },
-    { key: "surface_factor_gal_sy", label: "Surface condition factor S (gal/SY)", kind: "number" },
+    { key: "surface_factor_gal_sy", label: "Surface condition factor S (gal/SY)", kind: "number", default: 0.02 },
     { key: "absorption_gal_sy", label: "Aggregate absorption A (gal/SY)", kind: "number" },
     { key: "residual_asphalt", label: "Residual asphalt R (0.67 emulsion, 1.0 AC)", kind: "number" },
     { key: "project_area_sy", label: "Project area (SY, 0 to skip the totals)", kind: "number", default: 0 },
@@ -11517,7 +11517,7 @@ CONSTRUCTION_RENDERERS["carpet-seam-layout"] = _simpleRenderer({
     { key: "room_width_ft", label: "Room width (ft)", kind: "number" },
     { key: "roll_width_ft", label: "Roll width (ft; 12 or 15 typical)", kind: "number" },
     { key: "pattern_repeat_in", label: "Pattern repeat (in; 0 for plain)", kind: "number" },
-    { key: "waste_pct", label: "Waste allowance (%)", kind: "number" },
+    { key: "waste_pct", label: "Waste allowance (%)", kind: "number", default: 5 },
     { key: "min_fill_strip_in", label: "Minimum acceptable fill strip (in)", kind: "number" },
   ],
   outputs: [
@@ -11683,12 +11683,12 @@ CONSTRUCTION_RENDERERS["membrane-fastener-takeoff"] = _simpleRenderer({
   fields: [
     { key: "roof_area_sf", label: "Roof area (sq ft)", kind: "number" },
     { key: "roll_width_ft", label: "Membrane roll width (ft)", kind: "number" },
-    { key: "sidelap_in", label: "Side lap (in)", kind: "number" },
+    { key: "sidelap_in", label: "Side lap (in)", kind: "number", default: 6 },
     { key: "field_spacing_in", label: "Field fastener spacing (in o.c.)", kind: "number" },
     { key: "perimeter_spacing_in", label: "Perimeter / corner spacing (in o.c.)", kind: "number" },
-    { key: "perimeter_fraction_pct", label: "Share of seam in perimeter / corner zones (%)", kind: "number" },
+    { key: "perimeter_fraction_pct", label: "Share of seam in perimeter / corner zones (%)", kind: "number", default: 25 },
     { key: "field_seam_covered", label: "Fasteners in the field of a sheet (need cover tape)?", kind: "select", options: [{ value: "no", label: "No - all fasteners in welded side laps", selected: true }, { value: "yes", label: "Yes - count cover tape" }] },
-    { key: "waste_pct", label: "Waste allowance (%)", kind: "number" },
+    { key: "waste_pct", label: "Waste allowance (%)", kind: "number", default: 5 },
   ],
   outputs: [
     { key: "s", id: "mft-out-s", label: "Seam length (the fastener rows)", value: (r) => fmt(r.seam_lf, 0) + " LF on a " + fmt(r.usable_w_ft, 2) + " ft usable width" },
@@ -11769,7 +11769,7 @@ CONSTRUCTION_RENDERERS["guard-post-load"] = _simpleRenderer({
     { key: "post_height_in", label: "Top of guard above the connection (in)", kind: "number" },
     { key: "post_spacing_ft", label: "Post spacing (ft)", kind: "number" },
     { key: "concentrated_lb", label: "Concentrated load (lb; IBC 200)", kind: "number" },
-    { key: "uniform_plf", label: "Uniform load (plf; IBC 50)", kind: "number" },
+    { key: "uniform_plf", label: "Uniform load (plf; IBC 50)", kind: "number", default: 50 },
     { key: "post_b_in", label: "Post width, actual (in)", kind: "number" },
     { key: "post_d_in", label: "Post depth in the load direction, actual (in)", kind: "number" },
     { key: "allowable_fb_psi", label: "Allowable bending stress Fb' (psi; 0 to skip)", kind: "number", default: 0 },
@@ -11924,7 +11924,7 @@ CONSTRUCTION_RENDERERS["landing-check"] = _simpleRenderer({
     { key: "flight_width_in", label: "Width of the flight or door served (in)", kind: "number" },
     { key: "threshold_drop_in", label: "Landing below the threshold (in; doors only)", kind: "number", default: 0 },
     { key: "min_depth_in", label: "Minimum landing depth (in; IRC 36)", kind: "number" },
-    { key: "max_threshold_drop_in", label: "Maximum threshold drop (in; IRC 1.5)", kind: "number" },
+    { key: "max_threshold_drop_in", label: "Maximum threshold drop (in; IRC 1.5)", kind: "number", default: 1.5 },
   ],
   outputs: [
     { key: "v", id: "lnd-out-v", label: "Verdict", value: (r) => r.passes ? "PASSES" : "FAILS: " + [!r.depth_ok ? "depth short " + fmt(r.depth_deficit_in, 1) + " in" : null, !r.width_ok ? "width short " + fmt(r.width_deficit_in, 1) + " in" : null, r.drop_ok === false ? "threshold drop over by " + fmt(r.drop_excess_in, 2) + " in" : null].filter(Boolean).join(", ") },

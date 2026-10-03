@@ -451,7 +451,7 @@ GEOTECH_RENDERERS["soil-settlement-elastic"] = _simpleRenderer({
     { key: "q_ksf", label: "Net contact pressure q (ksf)", kind: "number" },
     { key: "b_ft", label: "Footing width B (ft)", kind: "number" },
     { key: "es_ksf", label: "Soil elastic modulus Es (ksf)", kind: "number" },
-    { key: "nu", label: "Poisson's ratio nu (0.3 sand)", kind: "number" },
+    { key: "nu", label: "Poisson's ratio nu (0.3 sand)", kind: "number", default: 0.3 },
     { key: "is_f", label: "Influence factor Is (0.82 rigid square)", kind: "number" },
   ],
   outputs: [
@@ -496,7 +496,7 @@ GEOTECH_RENDERERS["elastic-settlement-allowable-pressure"] = _simpleRenderer({
     { key: "settlement_limit_in", label: "Settlement limit Se (in)", kind: "number" },
     { key: "b_ft", label: "Footing width B (ft)", kind: "number" },
     { key: "es_ksf", label: "Soil elastic modulus Es (ksf)", kind: "number" },
-    { key: "nu", label: "Poisson's ratio nu (0.3 sand)", kind: "number" },
+    { key: "nu", label: "Poisson's ratio nu (0.3 sand)", kind: "number", default: 0.3 },
     { key: "is_f", label: "Influence factor Is (0.82 rigid square)", kind: "number" },
   ],
   outputs: [

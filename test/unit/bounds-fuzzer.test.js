@@ -34009,7 +34009,7 @@ test("bounds: spec-v1121 computeTapingNormalTension pins cancellation, the 1/sqr
     assert.ok(Math.abs(t.pull_at_applied_ft - sib.cp_ft) < 1e-12, "tension disagrees with the sibling at P=" + P);
   }
   // Under-pulling reads long (net negative), over-pulling reads short; the sign flips at normal tension.
-  assert.ok(_v1121({ ...base, applied_pull_lb: 20 }).applied_reads_short === true);
+  assert.ok(_v1121({ ...base, applied_pull_lb: 20 }).applied_reads_long === true);
   assert.ok(_v1121({ ...base, applied_pull_lb: 20 }).net_at_applied_ft < 0);
   assert.ok(_v1121({ ...base, applied_pull_lb: 60 }).net_at_applied_ft > 0);
   assert.ok(Math.abs(_v1121({ ...base, applied_pull_lb: r.normal_tension_lb }).net_at_applied_ft) < 1e-12);
@@ -34028,7 +34028,7 @@ test("bounds: spec-v1121 computeTapingNormalTension pins cancellation, the 1/sqr
   assert.ok(Math.abs(massless.pull_at_normal_ft) < 1e-15);
   // No applied pull entered leaves the applied-case outputs null rather than fabricating zeros.
   const noApplied = _v1121({ ...base, applied_pull_lb: 0 });
-  assert.ok(noApplied.net_at_applied_ft === null && noApplied.sag_at_applied_ft === null && noApplied.applied_reads_short === null);
+  assert.ok(noApplied.net_at_applied_ft === null && noApplied.sag_at_applied_ft === null && noApplied.applied_reads_long === null);
   // Error seams.
   assert.ok("error" in _v1121({ ...base, span_ft: 0 }));
   assert.ok("error" in _v1121({ ...base, tape_area_in2: 0 }));

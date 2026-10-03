@@ -1999,7 +1999,7 @@ FAB_RENDERERS["weld-cooling-rate-t85"] = _simpleRenderer({
   example: weldCoolingRateT85Example.inputs,
   fields: [
     { key: "heat_input_kj_mm", label: "Heat input Q (kJ/mm, after process efficiency)", kind: "number" },
-    { key: "preheat_c", label: "Preheat / interpass temperature (deg C)", kind: "number", attrs: { step: "any" } },
+    { key: "preheat_c", label: "Preheat / interpass temperature (deg C)", kind: "number", default: 20, attrs: { step: "any" } },
     { key: "thickness_mm", label: "Plate thickness (mm, the t8/5 model is metric)", kind: "number" },
     { key: "f2", label: "Two-dimensional joint shape factor F2", kind: "number" },
     { key: "f3", label: "Three-dimensional joint shape factor F3", kind: "number" },
@@ -2062,7 +2062,7 @@ FAB_RENDERERS["interpass-temperature-control"] = _simpleRenderer({
   example: interpassTemperatureControlExample.inputs,
   fields: [
     { key: "tau_min", label: "Measured joint time constant tau (min)", kind: "number" },
-    { key: "ambient_f", label: "Ambient temperature (F)", kind: "number", attrs: { step: "any" } },
+    { key: "ambient_f", label: "Ambient temperature (F)", kind: "number", default: 70, attrs: { step: "any" } },
     { key: "preheat_min_f", label: "Preheat minimum from the WPS (F)", kind: "number" },
     { key: "interpass_max_f", label: "Interpass maximum from the WPS (F)", kind: "number" },
     { key: "current_temp_f", label: "Current or post-pass joint temperature (F)", kind: "number" },

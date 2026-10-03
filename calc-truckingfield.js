@@ -599,7 +599,7 @@ TRUCKINGFIELD_RENDERERS["flatbed-tarp-size"] = _simpleRenderer({
     { key: "tarp_length_ft", label: "Tarp length (ft)", kind: "number" },
     { key: "tarp_width_ft", label: "Tarp width (ft)", kind: "number" },
     { key: "overlap_ft", label: "Overlap between tarps (ft)", kind: "number" },
-    { key: "tuck_ft", label: "Tuck allowance per side (ft)", kind: "number" },
+    { key: "tuck_ft", label: "Tuck allowance per side (ft)", kind: "number", default: 1 },
     { key: "tarp_weight_lb", label: "Weight per tarp (lb)", kind: "number" },
   ],
   outputs: [

@@ -368,9 +368,9 @@ export const suretyBondPremiumExample = { inputs: { contract_usd: 500000, rate1_
 function renderSuretyBondPremium(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Surety bond premium (tiered rate, surety-industry practice): charged per $1,000 of contract in bands (e.g. $25/$15/$10 per thousand on the first $100k / next $400k / above $500k). The effective rate falls as the contract grows. A budgeting aid; the surety's rate schedule and underwriting govern.";
   const c = makeNumber("Contract value to bond ($)", "sbp-c", { step: "any", min: "0" });
-  const r1 = makeNumber("Rate on first $100k ($/thousand)", "sbp-r1", { step: "any", min: "0" });
-  const r2 = makeNumber("Rate on next $400k ($/thousand)", "sbp-r2", { step: "any", min: "0" });
-  const r3 = makeNumber("Rate above $500k ($/thousand)", "sbp-r3", { step: "any", min: "0" });
+  const r1 = makeNumber("Rate on first $100k ($/thousand)", "sbp-r1", { step: "any", min: "0", value: "25" });
+  const r2 = makeNumber("Rate on next $400k ($/thousand)", "sbp-r2", { step: "any", min: "0", value: "15" });
+  const r3 = makeNumber("Rate above $500k ($/thousand)", "sbp-r3", { step: "any", min: "0", value: "10" });
   for (const f of [c, r1, r2, r3]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { c.input.value = "500000"; r1.input.value = "25"; r2.input.value = "15"; r3.input.value = "10"; update(); });
   const oP = makeOutputLine(outputRegion, "Bond premium", "sbp-out-p");
