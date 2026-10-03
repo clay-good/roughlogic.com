@@ -304,7 +304,7 @@ function renderGasLeakHoleDiameter(inputRegion, outputRegion, citationEl) {
     { value: "natural_gas", label: "Natural gas" }, { value: "propane", label: "Propane" },
   ]);
   for (const f of [q, psi, c, gas]) inputRegion.appendChild(f.wrap);
-  attachExampleButton(inputRegion, () => { q.input.value = "3.15"; psi.input.value = "0.25"; c.input.value = "0.7"; gas.select.value = "natural_gas"; update(); });
+  attachExampleButton(inputRegion, () => { q.input.value = "7.72"; psi.input.value = "0.25"; c.input.value = "0.7"; gas.select.value = "natural_gas"; update(); });
   const oD = makeOutputLine(outputRegion, "Equivalent orifice diameter", "glh-out-d");
   const oA = makeOutputLine(outputRegion, "Orifice area", "glh-out-a");
   const oN = makeOutputLine(outputRegion, "Note", "glh-out-n");
