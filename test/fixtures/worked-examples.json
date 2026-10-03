@@ -8700,7 +8700,7 @@
    "source_publisher": "Project (first-principles)",
    "source_title": "Cumulative voltage drop along a feeder with discrete loads at distance",
    "source_edition_or_year": "n/a; NEC 215 advisory + Ohm's-law identity over copper resistance per foot",
-   "source_section_or_page": "12 AWG copper feeder at 120 V with 5 A @ 50 ft and 10 A @ 100 ft -> worst drop 4.83 V (4.02%) at the second load, at the 75 C Table 8 resistance (1.93 ohm/kft)",
+   "source_section_or_page": "12 AWG copper feeder at 120 V with 5 A @ 50 ft and 10 A @ 100 ft -> worst drop 4.94 V (4.12%) at the second load, at the 75 C Table 8 stranded resistance (K 12.9 / 6,530 cmil = 1.976 ohm/kft; Table 8 prints 1.98). Recomputed 2026-10-02: the earlier 4.83 V used the 1.93 ohm/kft SOLID figure.",
    "verified_by": "rl",
    "verified_on": "2026-09-18",
    "inputs": {
@@ -8720,19 +8720,19 @@
    },
    "outputs": {
     "worst_drop_V": {
-     "value": 4.83,
+     "value": 4.94,
      "tolerance": {
       "abs": 0.05
      }
     },
     "worst_voltage_V": {
-     "value": 115.17,
+     "value": 115.06,
      "tolerance": {
       "abs": 0.05
      }
     },
     "worst_percent": {
-     "value": 4.02,
+     "value": 4.12,
      "tolerance": {
       "abs": 0.05
      }
@@ -147683,6 +147683,1068 @@
      "value": 26.6195,
      "tolerance": {
       "abs": 0.23
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "cutting-speed-rpm",
+   "source_publisher": "U.S. Navy, Naval Education and Training Command",
+   "source_title": "Machinery Repairman, NAVEDTRA 12204-A (Training Manual)",
+   "source_edition_or_year": "September 1993 (Errata #1, April 2000)",
+   "source_section_or_page": "Ch. 4 Drilling, p. 4-19: 'drill a hole 1 inch in diameter at the speed of 50 fpm ... rpm = fpm x 12 / (pi x D) = 50 x 12 / (3.1415 x 1) = 600/3.1416 = 190'. Exact 190.99; the manual truncates to 190, so abs 1.0 covers the printed truncation.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "surface_speed_sfm": 50,
+    "diameter_in": 1,
+    "num_flutes": 0,
+    "chip_load_in": 0
+   },
+   "outputs": {
+    "rpm": {
+     "value": 190,
+     "tolerance": {
+      "abs": 1.0
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "cutting-speed-rpm",
+   "source_publisher": "U.S. Navy, Naval Education and Training Command",
+   "source_title": "Machinery Repairman, NAVEDTRA 12204-A (Training Manual)",
+   "source_edition_or_year": "September 1993 (Errata #1, April 2000)",
+   "source_section_or_page": "Ch. 7 Milling, p. 7-51: 'What is the spindle speed for a 1/2-inch cutter running at 45 fpm? rpm = 45 / (0.2618 x 0.5) ... rpm = 343.7'. Tile 343.77; abs 0.1 covers the one-decimal print and the 0.2618 (=pi/12 rounded) constant.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "surface_speed_sfm": 45,
+    "diameter_in": 0.5,
+    "num_flutes": 0,
+    "chip_load_in": 0
+   },
+   "outputs": {
+    "rpm": {
+     "value": 343.7,
+     "tolerance": {
+      "abs": 0.1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "cutting-speed-rpm",
+   "source_publisher": "CNC Concepts, Inc. (Mike Lynch)",
+   "source_title": "Calculating machining time for any machining operation",
+   "source_edition_or_year": "web article, cncci.com (accessed 2026-10-02)",
+   "source_section_or_page": "Milling example: 0.75 dia four-flute end mill, 90 sfm, 0.002 ipt: '3.82 x 90 / 0.75 is 458 rpm' ... '4 times 0.002 is 0.008 ipr' ... '458 x 0.008 is 3.664 ipm'. Tile 458.37 rpm / 3.667 ipm; the article uses the rounded 3.82 constant and rounds rpm to 458 before multiplying, so abs 0.5 rpm and abs 0.005 ipm cover it.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "surface_speed_sfm": 90,
+    "diameter_in": 0.75,
+    "num_flutes": 4,
+    "chip_load_in": 0.002
+   },
+   "outputs": {
+    "rpm": {
+     "value": 458,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "feed_ipm": {
+     "value": 3.664,
+     "tolerance": {
+      "abs": 0.005
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "tap-drill-size",
+   "source_publisher": "North American Tool Corporation",
+   "source_title": "Special Taps Engineering Data: Formula for Tap/Drill Sizes (Inch)",
+   "source_edition_or_year": "data sheet (hosted at suncoasttools.com, accessed 2026-10-02)",
+   "source_section_or_page": "Method 2 example: 'To find the hole size for obtaining 75% of thread in a 1/4-20 tapped hole ... This figure (.0485), when subtracted from the .250 diameter, is .2015 ... .250 - .0485 = .2015'. Tile 0.20129 (subtracts 0.04871 = 0.06495 x 0.75 from the sheet's own double-depth column); the sheet's 4-place .0485 entry runs 0.0002 low, so abs 0.0003 covers the printed rounding.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "thread_standard": "inch",
+    "major_dia_in": 0.25,
+    "tpi": 20,
+    "pitch_mm": 0,
+    "thread_percent": 75
+   },
+   "outputs": {
+    "drill_dia_in": {
+     "value": 0.2015,
+     "tolerance": {
+      "abs": 0.0003
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "thread-measure-wire",
+   "source_publisher": "U.S. Navy, Naval Education and Training Command",
+   "source_title": "Machinery Repairman, NAVEDTRA 12204-A (Training Manual)",
+   "source_edition_or_year": "September 1993 (Errata #1, April 2000)",
+   "source_section_or_page": "Ch. 6 Lathe, pp. 6-53/6-54: 3/4-10 UNC-2A, 'Pitch diameter (PD) = 0.6832 in. Pitch (P) = 0.100 in. Wire size (W) = 0.0577 in.' ... 'M = 0.769697 in.' Tile 0.7696975; abs 0.000005 covers the printed 6-place value.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "thread_standard": "inch",
+    "tpi": 10,
+    "pitch_mm": 0,
+    "pitch_diameter_in": 0.6832,
+    "wire_dia_in": 0.0577
+   },
+   "outputs": {
+    "measurement_over_wires_in": {
+     "value": 0.769697,
+     "tolerance": {
+      "abs": 5e-06
+     }
+    },
+    "best_wire_in": {
+     "value": 0.0577,
+     "tolerance": {
+      "abs": 5e-05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "thread-measure-wire",
+   "source_publisher": "Osborn Products, Inc.",
+   "source_title": "Thread Measuring Wires catalog page (Page 18)",
+   "source_edition_or_year": "catalog PDF, osbornproducts.com/pdfs/3_wire_thread.pdf (accessed 2026-10-02)",
+   "source_section_or_page": "60 deg INCH table, 'Nominal Best Wire Diameter': 13 threads per inch -> '.04441'; formula 'W = .57735 x P'. Tile 0.0444116; abs 0.000006 covers the 5-place print.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "thread_standard": "inch",
+    "tpi": 13,
+    "pitch_mm": 0,
+    "pitch_diameter_in": 0.45,
+    "wire_dia_in": 0
+   },
+   "outputs": {
+    "best_wire_in": {
+     "value": 0.04441,
+     "tolerance": {
+      "abs": 6e-06
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "thread-pitch-dia-from-wires",
+   "source_publisher": "U.S. Navy, Naval Education and Training Command",
+   "source_title": "Machinery Repairman, NAVEDTRA 12204-A (Training Manual)",
+   "source_edition_or_year": "September 1993 (Errata #1, April 2000)",
+   "source_section_or_page": "Ch. 6 Lathe, pp. 6-53/6-54 (run in reverse): 3/4-10 UNC-2A, 'Pitch diameter (PD) = 0.6832 in.', 'Wire size (W) = 0.0577 in.', 'M = 0.769697 in.' The printed M gives back the printed PD; tile 0.6831995, abs 0.00001 covers the 6-place M print.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "thread_standard": "inch",
+    "tpi": 10,
+    "pitch_mm": 0,
+    "measurement_over_wires_in": 0.769697,
+    "wire_dia_in": 0.0577
+   },
+   "outputs": {
+    "pitch_diameter_in": {
+     "value": 0.6832,
+     "tolerance": {
+      "abs": 1e-05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "bend-allowance",
+   "source_publisher": "SendCutSend",
+   "source_title": "Guide to Calculating Bend Allowance and Bend Deduction",
+   "source_edition_or_year": "web article, sendcutsend.com/blog (accessed 2026-10-02)",
+   "source_section_or_page": "Worked example: 'Angle = 90 degrees Bend Radius = .050\" K-Factor = .43 Thickness = .080\"' -> 'a bend allowance value of .1326\"' and 'a bend deduction of .1274\" for each bend'. Tile 0.13258 / 0.12742; abs 0.00006 covers the 4-place print. Legs are not part of the printed single-bend numbers (flat blank not asserted).",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "thickness_in": 0.08,
+    "bend_angle_deg": 90,
+    "inside_radius_in": 0.05,
+    "k_factor": 0.43,
+    "leg_a_in": 2,
+    "leg_b_in": 6
+   },
+   "outputs": {
+    "bend_allowance_in": {
+     "value": 0.1326,
+     "tolerance": {
+      "abs": 6e-05
+     }
+    },
+    "bend_deduction_in": {
+     "value": 0.1274,
+     "tolerance": {
+      "abs": 6e-05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "countersink-depth",
+   "source_publisher": "Keith Brooke (hosted by Carter Tools)",
+   "source_title": "On Countersinking, Release 1",
+   "source_edition_or_year": "February 11, 2014",
+   "source_section_or_page": "Sec. 2.2 Countersink Depth, p. 4: 'an 82 deg 10-32 FHMS whose head diameter measures .366\", then its countersink depth will be .366x.575 = .210in' (depth factor x = cot(41)/2 = .57518, p. 8). No pilot hole in the printed case. Tile 0.21052; abs 0.001 covers the 3-place print and the rounded .575 factor.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "countersink_dia_in": 0.366,
+    "included_angle_deg": 82,
+    "pilot_hole_dia_in": 0
+   },
+   "outputs": {
+    "z_in": {
+     "value": 0.21,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "sine-bar",
+   "source_publisher": "U.S. Navy, Naval Education and Training Command",
+   "source_title": "Machinery Repairman, NAVEDTRA 12204-A (Training Manual)",
+   "source_edition_or_year": "September 1993 (Errata #1, April 2000)",
+   "source_section_or_page": "Ch. 2 Layout, pp. 2-12/2-13 Using the Sine Bar: 'set a 10-inch sine bar to check a 30 deg 5 min angle ... find the sine of 30 deg 5 min. Then, multiply the sine value by 10 inches (0.50126 x 10 = 5.0126)'. Input 30 deg 5 min = 30.08333 deg. Tile 5.01259; abs 0.00005 covers the 5-place sine table.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "solve_for": "stack",
+    "bar_length_in": 10,
+    "stack_height_in": 0,
+    "target_angle_deg": 30.083333333333332
+   },
+   "outputs": {
+    "stack_height_in": {
+     "value": 5.0126,
+     "tolerance": {
+      "abs": 5e-05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "drill-point-depth",
+   "source_publisher": "Haas Automation UK",
+   "source_title": "Working out Drill Depth (Better Techniques / Control Tips)",
+   "source_edition_or_year": "web article, haas.co.uk (accessed 2026-10-02)",
+   "source_section_or_page": "'135 deg then multiply the diameter of the drill by 0.207' ... '12mm * 0.207 = 2.484mm. Add this onto the 25mm depth = 27.484mm.' Printed mm values converted exactly at 25.4 mm/in: inputs 12 mm = 0.472441 in, 25 mm = 0.984252 in; outputs 2.484 mm = 0.097795 in, 27.484 mm = 1.082047 in. Tile 0.097846 / 1.082098; the 0.207 factor is rounded from 0.20711, so abs 0.0001 in covers it.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "diameter_in": 0.4724409448818898,
+    "point_angle_deg": 135,
+    "full_depth_in": 0.984251968503937
+   },
+   "outputs": {
+    "point_length_in": {
+     "value": 0.097795,
+     "tolerance": {
+      "abs": 0.0001
+     }
+    },
+    "drill_to_depth_in": {
+     "value": 1.082047,
+     "tolerance": {
+      "abs": 0.0001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "machining-time",
+   "source_publisher": "CNC Concepts, Inc. (Mike Lynch)",
+   "source_title": "Calculating machining time for any machining operation",
+   "source_edition_or_year": "web article, cncci.com (accessed 2026-10-02)",
+   "source_section_or_page": "Drilling example: 0.75 deep hole plus 0.1 approach, 7.0 ipm: 'motion distance (0.85) by the feedrate (7.0) ... is 0.12143 minutes' ... '7.2887 seconds'. Tile 0.121429 min / 7.2857 s; the article divides by 0.01666 instead of multiplying by 60, so time_s gets abs 0.005.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "feed_mode": "direct",
+    "cut_length_in": 0.85,
+    "rpm": 0,
+    "feed_ipr_in": 0,
+    "feed_ipm_in": 7,
+    "passes": 1
+   },
+   "outputs": {
+    "time_min": {
+     "value": 0.12143,
+     "tolerance": {
+      "abs": 1e-05
+     }
+    },
+    "time_s": {
+     "value": 7.2887,
+     "tolerance": {
+      "abs": 0.005
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "machining-time",
+   "source_publisher": "CNC Concepts, Inc. (Mike Lynch)",
+   "source_title": "Calculating machining time for any machining operation",
+   "source_edition_or_year": "web article, cncci.com (accessed 2026-10-02)",
+   "source_section_or_page": "Milling example: 3.0 in slot, '458 rpm', '0.008 ipr', '458 x 0.008 is 3.664 ipm', '3 inches of motion divided by 3.664 ipm is 0.8187 minutes'. Tile 3.664 ipm / 0.81878 min; abs 0.0001 covers the 4-place print.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "feed_mode": "rpm-ipr",
+    "cut_length_in": 3,
+    "rpm": 458,
+    "feed_ipr_in": 0.008,
+    "feed_ipm_in": 0,
+    "passes": 1
+   },
+   "outputs": {
+    "feed_ipm": {
+     "value": 3.664,
+     "tolerance": {
+      "abs": 0.0001
+     }
+    },
+    "time_min": {
+     "value": 0.8187,
+     "tolerance": {
+      "abs": 0.0001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "material-removal-rate",
+   "source_publisher": "East Tennessee State University (G. Stanton and B. Hemphill), ENTC 3710",
+   "source_title": "Numerical Control Programming, Chapter 3: Programming, More Mathematics",
+   "source_edition_or_year": "updated January 9, 2002",
+   "source_section_or_page": "'a 1-inch-diameter end mill was making a 1-inch-deep cut in low-carbon steel with a feedrate of 10 inches per minute (IPM). The MRR is 1 (depth) * 1 (width) * 10 (IPM) = 10.' Exact arithmetic; abs 0.000001.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "mode": "milling",
+    "woc_in": 1,
+    "doc_in": 1,
+    "feed_ipm_in": 10,
+    "sfm": 0,
+    "feed_ipr_in": 0,
+    "drill_dia_in": 0
+   },
+   "outputs": {
+    "mrr_in3": {
+     "value": 10,
+     "tolerance": {
+      "abs": 1e-06
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "spindle-power-torque",
+   "source_publisher": "East Tennessee State University (G. Stanton and B. Hemphill), ENTC 3710",
+   "source_title": "Numerical Control Programming, Chapter 3: Programming, More Mathematics",
+   "source_edition_or_year": "updated January 9, 2002",
+   "source_section_or_page": "'Table 3.3 shows low-carbon steel has an MMF of 1.25. Thus, it would require 10 (MRR) * 1.25 (MMF) = 12.5 HP to drive the spindle.' Only the cutting (spindle) hp is printed; efficiency 100 and the 400 rpm from the same example's chip-load step are filled in but do not affect cutting_hp. Exact arithmetic; abs 0.000001.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "mrr_in3_min": 10,
+    "unit_power_hp": 1.25,
+    "efficiency_pct": 100,
+    "rpm": 400
+   },
+   "outputs": {
+    "cutting_hp": {
+     "value": 12.5,
+     "tolerance": {
+      "abs": 1e-06
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "powder-coating-coverage",
+   "source_publisher": "Reliant Finishing Systems",
+   "source_title": "The Basics of Powder Coating Coverage (Bruce Chirrey), https://reliantfinishingsystems.com/the-basics-of-powder-coating-coverage/",
+   "source_edition_or_year": "2016",
+   "source_section_or_page": "Worked example \"Powder A\": specific gravity 1.5, 2 mils, 50% transfer efficiency: printed \"ACR = 192.3/1.5 (specific gravity)/2 (mil thickness) x .50 (transfer efficiency)\" = \"32.05 square feet per pound\". Tile waste_coverage (no reclaim) = 32.05; abs 0.01 covers the two-decimal print.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "specific_gravity": 1.5,
+    "film_thickness_mils": 2,
+    "part_area_sqft": 3,
+    "transfer_efficiency": 0.5,
+    "reclaim_efficiency": 0,
+    "price_per_lb": 5
+   },
+   "outputs": {
+    "waste_coverage": {
+     "value": 32.05,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "pneumatic-cylinder-scfm",
+   "source_publisher": "AutomationDirect",
+   "source_title": "Pneumatics In Depth: Air Consumption, https://www.automationdirect.com/pneumatics/misc/air_consumption",
+   "source_edition_or_year": "accessed 2026-10-02",
+   "source_section_or_page": "Worked example: 2 in bore, 4 in stroke, 30 complete cycles/min, 80 PSI, rod displacement disregarded (rod_in 0): printed \"25.12 cu.in. per cycle\", \"(80 PSI + 14.7 PSI) / 14.7 PSI = 6.44\", \"0.436 cu. ft. x 6.44 compression ratio = 2.81 cu. ft. of free air used per minute\". Tolerances cover the printer rounding pi to 3.14 (25.13 vs 25.12) and two-decimal prints.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "bore_in": 2,
+    "rod_in": 0,
+    "stroke_in": 4,
+    "cycles_per_min": 30,
+    "pressure_psig": 80,
+    "cylinders": 1,
+    "cfm_per_hp": 4
+   },
+   "outputs": {
+    "per_cycle_in3": {
+     "value": 25.12,
+     "tolerance": {
+      "abs": 0.02
+     }
+    },
+    "compression_ratio": {
+     "value": 6.44,
+     "tolerance": {
+      "abs": 0.005
+     }
+    },
+    "scfm_total": {
+     "value": 2.81,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "kiln-charge-water",
+   "source_publisher": "USDA Forest Service, Forest Products Laboratory",
+   "source_title": "Dry Kiln Operator's Manual, Agriculture Handbook AH-188, Chapter 6 Kiln Samples, https://www.fpl.fs.usda.gov/documnts/usda/ah188/chapter06.pdf",
+   "source_edition_or_year": "1991 (rev.)",
+   "source_section_or_page": "p. 122, \"Calculating Ovendry Weight of Kiln Samples\", Example: kiln sample A-1 \"original weight of 4.46 lb\" at \"62.2 percent\"; printed \"4.46 / (1 + 0.622) = 2.75 lb\". Only oven_dry_lb is asserted (final MC, schedule days and intermediate MC are required inputs not used by this output). abs 0.005 covers the 0.01-lb print.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "green_weight_lb": 4.46,
+    "mc_initial_pct": 62.2,
+    "mc_final_pct": 8,
+    "btu_per_lb_water": 2000,
+    "schedule_days": 28,
+    "intermediate_mc_pct": 30
+   },
+   "outputs": {
+    "oven_dry_lb": {
+     "value": 2.75,
+     "tolerance": {
+      "abs": 0.005
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "air-dryer-sizing",
+   "source_publisher": "Sullair, LLC",
+   "source_title": "How to Size a Compressed Air Dryer (or SCFM vs. ACFM), Peter Sawochka-Dalton, https://america.sullair.com/sites/default/files/2021-11/How%20to%20size%20a%20compressed%20air%20dryer%20Blog.pdf",
+   "source_edition_or_year": "2021",
+   "source_section_or_page": "Examples, Refrigerated dryer (SR+ 500, need 458 ICFM): printed \"ACFM = 500 x 1.13 x .82 x .94\" = \"ACFM = 435\", \"435 ACFM is smaller than 458 ICFM, so the SR+ 500 will not have enough capacity\". Tile candidate_delivers_scfm = 435.50; abs 1 covers the integer print.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "actual_scfm": 458,
+    "temp_correction": 0.82,
+    "pressure_correction": 1.13,
+    "ambient_correction": 0.94,
+    "candidate_rated_scfm": 500,
+    "purge_fraction": 0
+   },
+   "outputs": {
+    "candidate_delivers_scfm": {
+     "value": 435,
+     "tolerance": {
+      "abs": 1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "air-dryer-sizing",
+   "source_publisher": "Sullair, LLC",
+   "source_title": "How to Size a Compressed Air Dryer (or SCFM vs. ACFM), Peter Sawochka-Dalton, https://america.sullair.com/sites/default/files/2021-11/How%20to%20size%20a%20compressed%20air%20dryer%20Blog.pdf",
+   "source_edition_or_year": "2021",
+   "source_section_or_page": "Examples, Desiccant dryer (DEX-500, need 458 ICFM, no ambient factor for desiccant so ambient_correction 1): printed \"ACFM = 500 x 1.16 x .86\" = \"ACFM = 499\", \"499 ACFM is larger than 458 ICFM\". Tile = 498.8; abs 0.5 covers the integer print.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "actual_scfm": 458,
+    "temp_correction": 0.86,
+    "pressure_correction": 1.16,
+    "ambient_correction": 1,
+    "candidate_rated_scfm": 500,
+    "purge_fraction": 0
+   },
+   "outputs": {
+    "candidate_delivers_scfm": {
+     "value": 499,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "plating-tank-current",
+   "source_publisher": "ASM International (via Canadian Association for Surface Finishing reprint)",
+   "source_title": "Nickel Electroplating, based on G. A. Di Bari, \"Nickel Plating\", ASM Handbook Vol. 5 Surface Engineering, p. 201; https://www.casf.ca/wp-content/uploads/2014/04/NickelElectroplating.pdf",
+   "source_edition_or_year": "1994",
+   "source_section_or_page": "Table 2 \"Nickel electrodeposition data - Based on 95.5% cathode efficiency\": 20 um at 5 A/dm2 printed \"20\" minutes. Inputs converted with the source's own Table 1B factors (A/dm2 x 9.29 = A/ft2) and 25.4 um/mil; Ni 58.69, valence 2, SG 8.90 from Table 1A. The table prints two significant figures and uses F = 96,500; tolerance abs 0.5 min covers that rounding.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "current_density_asf": 46.45,
+    "part_area_sqft": 1,
+    "atomic_weight": 58.69,
+    "valence": 2,
+    "metal_density_gcc": 8.9,
+    "current_efficiency": 0.955,
+    "target_thickness_in": 0.00078740157
+   },
+   "outputs": {
+    "plating_time_min": {
+     "value": 20,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "plating-tank-current",
+   "source_publisher": "ASM International (via Canadian Association for Surface Finishing reprint)",
+   "source_title": "Nickel Electroplating, based on G. A. Di Bari, \"Nickel Plating\", ASM Handbook Vol. 5 Surface Engineering, p. 201; https://www.casf.ca/wp-content/uploads/2014/04/NickelElectroplating.pdf",
+   "source_edition_or_year": "1994",
+   "source_section_or_page": "Table 2 \"Nickel electrodeposition data - Based on 95.5% cathode efficiency\": 10 um at 2 A/dm2 printed \"26\" minutes. Inputs converted with the source's own Table 1B factors (A/dm2 x 9.29 = A/ft2) and 25.4 um/mil; Ni 58.69, valence 2, SG 8.90 from Table 1A. The table prints two significant figures and uses F = 96,500; tolerance abs 0.5 min covers that rounding.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "current_density_asf": 18.58,
+    "part_area_sqft": 1,
+    "atomic_weight": 58.69,
+    "valence": 2,
+    "metal_density_gcc": 8.9,
+    "current_efficiency": 0.955,
+    "target_thickness_in": 0.00039370079
+   },
+   "outputs": {
+    "plating_time_min": {
+     "value": 26,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "plating-tank-current",
+   "source_publisher": "ASM International (via Canadian Association for Surface Finishing reprint)",
+   "source_title": "Nickel Electroplating, based on G. A. Di Bari, \"Nickel Plating\", ASM Handbook Vol. 5 Surface Engineering, p. 201; https://www.casf.ca/wp-content/uploads/2014/04/NickelElectroplating.pdf",
+   "source_edition_or_year": "1994",
+   "source_section_or_page": "Table 2 \"Nickel electrodeposition data - Based on 95.5% cathode efficiency\": 40 um at 1 A/dm2 printed \"200\" minutes. Inputs converted with the source's own Table 1B factors (A/dm2 x 9.29 = A/ft2) and 25.4 um/mil; Ni 58.69, valence 2, SG 8.90 from Table 1A. The table prints two significant figures and uses F = 96,500; tolerance abs 5 min covers that rounding.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "current_density_asf": 9.29,
+    "part_area_sqft": 1,
+    "atomic_weight": 58.69,
+    "valence": 2,
+    "metal_density_gcc": 8.9,
+    "current_efficiency": 0.955,
+    "target_thickness_in": 0.0015748031
+   },
+   "outputs": {
+    "plating_time_min": {
+     "value": 200,
+     "tolerance": {
+      "abs": 5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "melt-furnace-energy",
+   "source_publisher": "U.S. Department of Energy (BCS, Inc. / J. F. Schifo)",
+   "source_title": "Theoretical/Best Practice Energy Use in Metalcasting Operations, https://www.energy.gov/sites/prod/files/2013/11/f4/doebestpractice_052804.pdf",
+   "source_edition_or_year": "2004",
+   "source_section_or_page": "Table 13 \"Theoretical Energy Requirements by Metal Type\": Gray Iron \"600\" Btu/pound and \"1.200\" 10^6 Btu/Ton; Table 1 (Executive Summary) Iron Induction Melting theoretical minimum \"351.5\" delivered kWh/Ton melt. One short ton charge at 100% efficiency. abs 0.0005 MMBtu covers the 3-decimal print; abs 0.5 kWh covers DOE's Btu/kWh conversion (tile 3,412.14 gives 351.69).",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "charge_weight_lb": 2000,
+    "theoretical_btu_lb": 600,
+    "furnace_efficiency_pct": 100,
+    "energy_cost_per_kwh": 0,
+    "alt_efficiency_pct": 0,
+    "alt_theoretical_btu_lb": 0,
+    "casting_yield_pct": 0
+   },
+   "outputs": {
+    "theoretical_mmbtu": {
+     "value": 1.2,
+     "tolerance": {
+      "abs": 0.0005
+     }
+    },
+    "input_kwh": {
+     "value": 351.5,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "melt-furnace-energy",
+   "source_publisher": "U.S. Department of Energy (BCS, Inc. / J. F. Schifo)",
+   "source_title": "Theoretical/Best Practice Energy Use in Metalcasting Operations, https://www.energy.gov/sites/prod/files/2013/11/f4/doebestpractice_052804.pdf",
+   "source_edition_or_year": "2004",
+   "source_section_or_page": "Table 13 \"Theoretical Energy Requirements by Metal Type\": Aluminum \"493\" Btu/pound and \"0.986\" 10^6 Btu/Ton; Table 1 (Executive Summary) Aluminum Reverberatory Melt Furnaces theoretical minimum \"288.7\" delivered kWh/Ton melt. One short ton charge at 100% efficiency. abs 0.0005 MMBtu covers the 3-decimal print; abs 0.5 kWh covers DOE's Btu/kWh conversion (tile 3,412.14 gives 288.97).",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "charge_weight_lb": 2000,
+    "theoretical_btu_lb": 493,
+    "furnace_efficiency_pct": 100,
+    "energy_cost_per_kwh": 0,
+    "alt_efficiency_pct": 0,
+    "alt_theoretical_btu_lb": 0,
+    "casting_yield_pct": 0
+   },
+   "outputs": {
+    "theoretical_mmbtu": {
+     "value": 0.986,
+     "tolerance": {
+      "abs": 0.0005
+     }
+    },
+    "input_kwh": {
+     "value": 288.7,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "contour-slope",
+   "source_publisher": "National Wildfire Coordinating Group (NWCG)",
+   "source_title": "Firefighter Math, 5.5 Contour Lines and Intervals (nwcg.gov/course/ffm/mapping/55-contour-lines-and-intervals)",
+   "source_edition_or_year": "web course page as retrieved 2026-10-02",
+   "source_section_or_page": "Example 4 and the completed Slope Worksheet: 'CON INT Contour interval, ft 40', 'SLC Map Scale 1:24,000', '#INTVLS # of contour intervals 3', 'RISE Rise in elevation, ft 120', 'MD Map distance, in (between points) 0.5', 'HZGD Horizontal ground distance, ft 1,000', 'SLOPE% 12'; text: 'slope percent = (120ft / 1000ft) x 100 = 12% Slope'. Rise and run are exact products of the printed inputs; the slope is printed as a whole percent, so abs 0.5 covers the printed rounding (the tile gives exactly 12.0).",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "contour_interval_ft": 40,
+    "intervals_crossed": 3,
+    "map_distance_in": 0.5,
+    "representative_fraction": 24000
+   },
+   "outputs": {
+    "rise_ft": {
+     "value": 120,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "run_ft": {
+     "value": 1000,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "grade_pct": {
+     "value": 12,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "three-point-resection",
+   "source_publisher": "National Wildfire Coordinating Group (NWCG)",
+   "source_title": "Firefighter Math, 6.9 Resection (nwcg.gov/course/ffm/location/69-resection)",
+   "source_edition_or_year": "web course page as retrieved 2026-10-02",
+   "source_section_or_page": "Example 1: azimuths 'of the first peak ... 327' and 'second peak ... 83', 'The declination for the area is 17 W'; Step 1 '327 - 17 = 310', '83 - 17 = 66'; Step 2 '310 - 180 = 130', '66 + 180 = 246'. West declination is entered as -17 (the tile adds declination_deg). The landmark coordinates are NOT printed (the page plots on a map graphic); the inputs use placeholder control points A=(0,0), B=(1000,0), which do not affect the two checked back-azimuth outputs. Back azimuths are printed as whole degrees; abs 0.5 covers that.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "ax": 0,
+    "ay": 0,
+    "azimuth_to_a_deg": 327,
+    "bx": 1000,
+    "by": 0,
+    "azimuth_to_b_deg": 83,
+    "declination_deg": -17
+   },
+   "outputs": {
+    "back_azimuth_a_deg": {
+     "value": 130,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "back_azimuth_b_deg": {
+     "value": 246,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "grade-rod-cut-fill",
+   "source_publisher": "U.S. Navy, Naval Education and Training Professional Development and Technology Center",
+   "source_title": "Equipment Operator Basic (NAVEDTRA 14081), Chapter 15, 'Checking Grade with a Level Instrument' -- Missing Grade Stake, Figure 15-52",
+   "source_edition_or_year": "NAVEDTRA 14081 (as reproduced at enginemechanics.tpub.com/14081, page 15-30)",
+   "source_section_or_page": "Page 15-30, Figure 15-52: 'finish elevation ... at point B is supposed to be 378.75', 'backsight ... reading of 11.56 feet', 'bench mark elevation of 365.01 feet gives you an instrument height of 376.57 feet', 'foresight shot at point B ... 1.42 feet', 'existing ground is at elevation 375.15', 'FILL requirement of 3.6 feet at point B' (the text's later '376.15' is a typo for 375.15; 378.75 - 375.15 = 3.60). All values are printed to 0.01 ft (fill to 0.1 ft), so abs 0.005 / 0.05 cover the printed rounding. NOTE: the tile currently REFUSES this input (design 378.75 is above HI 376.57, so grade rod = -2.18 trips the 'no rod reading can reach it' error); the row reproduces only after that guard is relaxed -- see r57c_report.md.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "benchmark_elev_ft": 365.01,
+    "backsight_ft": 11.56,
+    "design_elev_ft": 378.75,
+    "ground_rod_ft": 1.42
+   },
+   "outputs": {
+    "hi_ft": {
+     "value": 376.57,
+     "tolerance": {
+      "abs": 0.005
+     }
+    },
+    "ground_elevation_ft": {
+     "value": 375.15,
+     "tolerance": {
+      "abs": 0.005
+     }
+    },
+    "cut_fill_ft": {
+     "value": -3.6,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "pipe-expansion-loop",
+   "source_publisher": "Copper Development Association",
+   "source_title": "The Copper Tube Handbook, Section III Design Data, 'Expansion and Contraction'",
+   "source_edition_or_year": "A4015-04/06 (2006)",
+   "source_section_or_page": "p. 16: 'average coefficient of expansion of copper which is 0.0000094 inch per inch per degree F', 'the expansion of each 100 feet of length of any size tube heated from room temperature (70F) to 170F (a 100F rise) is 1.128 inches', worked '100F x 100 ft x 12 in./ft. x 0.0000094 in./in./F = 1.128 in.' Printed to 0.001 in; abs 0.0005 covers it. pipe_OD_in (1.125, a 1 in copper tube OD) is required by the compute but does not enter delta_L_in ('any size tube'); the loop-leg output is NOT checked because CDA uses P = 6,000 psi where the tile uses S_a = 5,800 psi.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "material": "copper",
+    "length_ft": 100,
+    "delta_T_F": 100,
+    "pipe_OD_in": 1.125
+   },
+   "outputs": {
+    "delta_L_in": {
+     "value": 1.128,
+     "tolerance": {
+      "abs": 0.0005
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "septic-drainfield-capacity",
+   "source_publisher": "North Carolina Department of Health and Human Services, Division of Public Health, On-Site Water Protection Branch",
+   "source_title": "Innovative Wastewater System Approval IWWS 2024-01-R2, Prinsco Pro4/36 Chamber System",
+   "source_edition_or_year": "February 7, 2024",
+   "source_section_or_page": "Sizing section, Example: 'Three bedroom residence with a design daily sewage flow of 360 gallons on a sandy clay loam (Group III) soil', 'Total computed trench bottom area is: 360 gpd/0.5 LTAR = 720 ft2', 'The required linear footage ... 720 ft2/4.0 ft = 180 linear ft Where 4.0 ft. is the equivalency factor'. Run inverse: 180 ft of trench x 4.0 ft2/ft equivalency (entered as trench_width_ft) x 0.5 gpd/ft2 = 720 ft2 and 360 gpd; 360 gpd over three bedrooms is the NC 120 gpd/bedroom basis. All printed values are whole numbers and exact; abs 0.5 (bedrooms abs 0).",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "available_trench_ft": 180,
+    "application_rate_gpd_per_ft2": 0.5,
+    "trench_width_ft": 4.0,
+    "gpd_per_bedroom": 120
+   },
+   "outputs": {
+    "absorption_area_ft2": {
+     "value": 720,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "design_flow_gpd": {
+     "value": 360,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "bedrooms": {
+     "value": 3,
+     "tolerance": {
+      "abs": 0
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "generator-sizing",
+   "source_publisher": "Lee County Electric Cooperative (LCEC)",
+   "source_title": "Wattage Worksheet (lcec.net/wp-content/uploads/Wattage-Worksheet.pdf)",
+   "source_edition_or_year": "worksheet PDF as retrieved 2026-10-02",
+   "source_section_or_page": "EXAMPLE table: 'Refrigerator/Freezer 700 / 2200', '1/2 HP Furnace Fan 800 / 2350', 'Television 500', 'Lights (8 x 75 watts) 600', 'Microwave 600'; 'TOTAL RUNNING WATTS = 3200', highest additional starting 2350, 'With this example you need a generator that produces at least 3200 total running watts and 5550 total starting watts.' The worksheet's second column is ADDITIONAL starting watts, so each item's starting_watts input here is running + additional (700+2200=2900, 800+2350=3150); the tile's surge = running total + largest (starting - running) is then the worksheet's method exactly. Whole watts; abs 0.5.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "items": [
+     {
+      "name": "Refrigerator/Freezer",
+      "running_watts": 700,
+      "starting_watts": 2900
+     },
+     {
+      "name": "1/2 HP Furnace Fan",
+      "running_watts": 800,
+      "starting_watts": 3150
+     },
+     {
+      "name": "Television",
+      "running_watts": 500,
+      "starting_watts": 500
+     },
+     {
+      "name": "Lights (8 x 75 watts)",
+      "running_watts": 600,
+      "starting_watts": 600
+     },
+     {
+      "name": "Microwave",
+      "running_watts": 600,
+      "starting_watts": 600
+     }
+    ]
+   },
+   "outputs": {
+    "running_W": {
+     "value": 3200,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "surge_W": {
+     "value": 5550,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "pf-correction",
+   "source_publisher": "Eaton Corporation (Cutler-Hammer)",
+   "source_title": "Power Factor Correction: A Guide for the Plant Engineer",
+   "source_edition_or_year": "SA02607001E, July 2004",
+   "source_section_or_page": "PDF p. 13 (Table 5 instructions): 'If your plant consumed 410 kW, was currently operating at 73% power factor and you wanted to correct power factor to 95%', 'Multiply 0.607 by 410 = 249 (round to 250)'. Printed 249 is 0.607 x 410 rounded to a whole kvar; the 3-place multiplier plus the whole-kvar rounding is covered by abs 1 (tile 249.09). system_V is not printed except in the 450 kW (480 V) example and does not enter kVAR; 480 V three-phase is used throughout.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "kW": 410,
+    "pf1": 0.73,
+    "pf2": 0.95,
+    "system_V": 480,
+    "phase": "three"
+   },
+   "outputs": {
+    "kVAR": {
+     "value": 249,
+     "tolerance": {
+      "abs": 1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "pf-correction",
+   "source_publisher": "Eaton Corporation (Cutler-Hammer)",
+   "source_title": "Power Factor Correction: A Guide for the Plant Engineer",
+   "source_edition_or_year": "SA02607001E, July 2004",
+   "source_section_or_page": "PDF p. 6: 'to raise the Power Factor from 0.87 to 0.97 requires capacitor: Multiplier of .316 x kW', '.316 x 400 = 126 kvar (use 140 kvar)'. Whole kvar; abs 1 covers the 3-place multiplier and rounding (tile 126.44). system_V is not printed except in the 450 kW (480 V) example and does not enter kVAR; 480 V three-phase is used throughout.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "kW": 400,
+    "pf1": 0.87,
+    "pf2": 0.97,
+    "system_V": 480,
+    "phase": "three"
+   },
+   "outputs": {
+    "kVAR": {
+     "value": 126,
+     "tolerance": {
+      "abs": 1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "pf-correction",
+   "source_publisher": "Eaton Corporation (Cutler-Hammer)",
+   "source_title": "Power Factor Correction: A Guide for the Plant Engineer",
+   "source_edition_or_year": "SA02607001E, July 2004",
+   "source_section_or_page": "PDF p. 7, Case 1: 'Assume a 400 kW load, 87% power factor', 'To raise an 87% power factor to 96%, refer to Table 5. Find 0.275 x 400 kW = 110 kvar'. Whole kvar; abs 1 (tile 110.0). system_V is not printed except in the 450 kW (480 V) example and does not enter kVAR; 480 V three-phase is used throughout.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "kW": 400,
+    "pf1": 0.87,
+    "pf2": 0.96,
+    "system_V": 480,
+    "phase": "three"
+   },
+   "outputs": {
+    "kVAR": {
+     "value": 110,
+     "tolerance": {
+      "abs": 1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "pf-correction",
+   "source_publisher": "Eaton Corporation (Cutler-Hammer)",
+   "source_title": "Power Factor Correction: A Guide for the Plant Engineer",
+   "source_edition_or_year": "SA02607001E, July 2004",
+   "source_section_or_page": "PDF p. 7: 'To raise 81% power factor to 96%, select the multiplier from Table 5. 0.432 x 400 kW = 173 kvar'. Whole kvar; abs 1 (tile 172.93). system_V is not printed except in the 450 kW (480 V) example and does not enter kVAR; 480 V three-phase is used throughout.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "kW": 400,
+    "pf1": 0.81,
+    "pf2": 0.96,
+    "system_V": 480,
+    "phase": "three"
+   },
+   "outputs": {
+    "kVAR": {
+     "value": 173,
+     "tolerance": {
+      "abs": 1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "pf-correction",
+   "source_publisher": "Eaton Corporation (Cutler-Hammer)",
+   "source_title": "Power Factor Correction: A Guide for the Plant Engineer",
+   "source_edition_or_year": "SA02607001E, July 2004",
+   "source_section_or_page": "PDF p. 8, Figure 8 discussion (480 V plant): 'To correct 450 kW from 75% to 95%, power factor requires 450 x 0.553 (from Table 5) = 248.8 kvar'. The 3-place multiplier carries +/-0.0005 x 450 = 0.23 kvar; abs 0.3 covers it (tile 248.95). system_V is not printed except in the 450 kW (480 V) example and does not enter kVAR; 480 V three-phase is used throughout.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "kW": 450,
+    "pf1": 0.75,
+    "pf2": 0.95,
+    "system_V": 480,
+    "phase": "three"
+   },
+   "outputs": {
+    "kVAR": {
+     "value": 248.8,
+     "tolerance": {
+      "abs": 0.3
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "pf-correction",
+   "source_publisher": "Eaton Corporation (Cutler-Hammer)",
+   "source_title": "Power Factor Correction: A Guide for the Plant Engineer",
+   "source_edition_or_year": "SA02607001E, July 2004",
+   "source_section_or_page": "PDF p. 8: 'To correct 400 kW from 81% to 90% requires 400 x 0.240 (from Table 5) = 96 kvar. (Use 100 kvar.)'. Whole kvar; abs 1 (tile 95.87). system_V is not printed except in the 450 kW (480 V) example and does not enter kVAR; 480 V three-phase is used throughout.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "kW": 400,
+    "pf1": 0.81,
+    "pf2": 0.9,
+    "system_V": 480,
+    "phase": "three"
+   },
+   "outputs": {
+    "kVAR": {
+     "value": 96,
+     "tolerance": {
+      "abs": 1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "multi-load-vd",
+   "source_publisher": "EC&M (Mike Holt, author)",
+   "source_title": "Code Calculations (voltage drop), EC&M magazine (ecmweb.com/content/article/20891042/code-calculations)",
+   "source_edition_or_year": "February 1, 2000 (based on the 1999 NEC)",
+   "source_section_or_page": "Single-phase example: 'What is the voltage drop for a No. 6 conductor that supplies a 44A, 240V, single-phase load located 160 ft from the panelboard?', 'VD = 2 wires x 12.9 ohms x 44A x 160 ft/26,240 circular mils', 'Answer: (b) 6.9V', '(6.9V /240V = 2.9% volts drop)', 'Operating voltage = 233.1V'. Printed to 0.1 V; abs 0.06 covers the rounding (exact 6.92 V). NOTE: the tile currently returns 6.76 V because its #6 copper resistance is 0.4804 ohm/kft (solid-conductor resistivity) against the K = 12.9 basis (0.4916 ohm/kft) its own comment cites; the row reproduces only after that fix -- see r57c_report.md.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "material": "copper",
+    "awg": "6",
+    "source_voltage_V": 240,
+    "loads": [
+     {
+      "distance_ft": 160,
+      "current_A": 44
+     }
+    ]
+   },
+   "outputs": {
+    "worst_drop_V": {
+     "value": 6.9,
+     "tolerance": {
+      "abs": 0.06
+     }
+    },
+    "worst_voltage_V": {
+     "value": 233.1,
+     "tolerance": {
+      "abs": 0.06
      }
     }
    }

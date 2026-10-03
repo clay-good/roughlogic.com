@@ -1759,6 +1759,7 @@ export function computeBendAllowance({ thickness_in = 0, bend_angle_deg = 0, ins
   if (!(thickness_in > 0)) return { error: "Thickness must be positive." };
   if (!(bend_angle_deg > 0 && bend_angle_deg < 180)) return { error: "Bend angle must be 0-180 deg." };
   if (!(inside_radius_in >= 0)) return { error: "Inside radius cannot be negative." };
+  if (!(k_factor > 0 && k_factor <= 0.5)) return { error: "K-factor must be above 0 and at most 0.5 (the neutral axis lies inside the inner half of the sheet)." };
   const ba = (Math.PI / 180) * bend_angle_deg * (inside_radius_in + k_factor * thickness_in);
   // Outside setback (OSSB) for the flat-pattern formula.
   const setback = (inside_radius_in + thickness_in) * Math.tan((bend_angle_deg / 2) * Math.PI / 180);

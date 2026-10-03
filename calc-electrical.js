@@ -10,6 +10,7 @@
 
 import {
   conductorResistancePerKft,
+  kResistancePerKft,
   conductorResistance,
   ampacityFromPhysics,
   voltageDrop,
@@ -1270,20 +1271,20 @@ export function renderGeneratorSize(inputRegion, outputRegion, citationEl, param
 
   const totalRun = makeNumber("Total running watts (sum of all loads)", "gs-run", { step: "any", min: "0" });
   const largeRun = makeNumber("Largest motor running watts", "gs-largerun", { step: "any", min: "0" });
-  const largeStart = makeNumber("Largest motor starting watts", "gs-largestart", { step: "any", min: "0" });
+  const largeStart = makeNumber("Largest motor starting watts (TOTAL at start: running + a chart's 'additional starting watts')", "gs-largestart", { step: "any", min: "0" });
   for (const f of [totalRun, largeRun, largeStart]) inputRegion.appendChild(f.wrap);
 
   const outRun = makeOutputLine(outputRegion, "Continuous", "gs-out-run");
   const outSurge = makeOutputLine(outputRegion, "Surge", "gs-out-surge");
 
   function fillExample(v) {
-    let runSum = 0, biggestStart = 0, biggestRun = 0;
+    // Pick the motor with the largest starting-over-running EXCESS, the one
+    // computeGeneratorSize charges, not the largest starting figure.
+    let runSum = 0, biggestStart = 0, biggestRun = 0, biggestExcess = 0;
     for (const it of v.items) {
-      runSum += Number(it.running_watts) || 0;
-      if ((Number(it.starting_watts) || 0) > biggestStart) {
-        biggestStart = Number(it.starting_watts) || 0;
-        biggestRun = Number(it.running_watts) || 0;
-      }
+      const r = Number(it.running_watts) || 0, st = Number(it.starting_watts) || 0;
+      runSum += r;
+      if (st - r > biggestExcess) { biggestExcess = st - r; biggestStart = st; biggestRun = r; }
     }
     totalRun.input.value = runSum;
     largeRun.input.value = biggestRun;
@@ -1614,9 +1615,10 @@ export function computeMultiLoadVoltageDrop({
   if (!Array.isArray(loads) || loads.length === 0) return { error: "Provide at least one load." };
   const knownAwg = ["18","16","14","12","10","8","6","4","2","1","1/0","2/0","3/0","4/0"];
   if (!knownAwg.includes(awg)) return { error: "Unknown AWG." };
-  // 75 C, the NEC Chapter 9 Table 8 basis the citation names and the
-  // voltage-drop tile's K = 12.9 uses; 25 C read 18% low against both.
-  const r_per_kft = conductorResistancePerKft({ material, awg, temperature_C: 75 });
+  // 75 C stranded, the NEC Chapter 9 Table 8 basis the citation names, on the
+  // voltage-drop tile's K = 12.9. 25 C read 18% low; solid-wire resistivity
+  // (until 2026-10-02) read 2.3% low against EC&M's 6.9 V on 160 ft of #6 at 44 A.
+  const r_per_kft = kResistancePerKft({ material, awg });
   if (!Number.isFinite(r_per_kft)) return { error: "Unknown conductor size or material." };
   // Sort by distance ascending.
   const ordered = [...loads].map((l) => ({ distance_ft: Number(l.distance_ft) || 0, current_A: Number(l.current_A) || 0 })).sort((a, b) => a.distance_ft - b.distance_ft);
@@ -1682,8 +1684,9 @@ export function computeLVDCDrop({ system_V = 12, awg = "10", run_length_ft = 0, 
   if (!(current_A >= 0)) return { error: "Current must be non-negative." };
   const knownAwg = ["18","16","14","12","10","8","6","4","2","1","1/0","2/0","3/0","4/0"];
   if (!knownAwg.includes(awg)) return { error: "Unknown AWG." };
-  // 75 C, the NEC Chapter 9 Table 8 basis the citation names (25 C read 18% low).
-  const r_per_kft = conductorResistancePerKft({ material: "copper", awg, temperature_C: 75 });
+  // 75 C stranded, the NEC Chapter 9 Table 8 basis the citation names (25 C read
+  // 18% low; solid-wire resistivity, until 2026-10-02, 2.3% low), on K = 12.9.
+  const r_per_kft = kResistancePerKft({ material: "copper", awg });
   if (!Number.isFinite(r_per_kft)) return { error: "Unknown AWG." };
   const drop_V = current_A * (2 * r_per_kft) * (run_length_ft / 1000);
   const percent = (drop_V / system_V) * 100;

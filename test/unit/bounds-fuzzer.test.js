@@ -30,6 +30,7 @@ import {
   awgAreaM2,
   conductorResistance,
   conductorResistancePerKft,
+  kResistancePerKft,
   ampacityFromPhysics,
   voltageDrop,
   threePhasePower,
@@ -120,6 +121,14 @@ test("bounds: conductorResistancePerKft is finite-positive across the AWG sweep"
     const r = conductorResistancePerKft({ material: "copper", awg, temperature_C: 75 });
     assertFinitePositive(r, `kft AWG ${awg}`);
   }
+});
+
+test("bounds: kResistancePerKft is the stranded Table 8 basis (K 12.9 / 21.2) and finite-positive", () => {
+  for (const awg of ["4/0", "1", "10", "14", "24"]) assertFinitePositive(kResistancePerKft({ material: "aluminum", awg }), `K-basis AWG ${awg}`);
+  // NEC Ch. 9 Table 8: #6 stranded copper 0.491, #12 stranded 1.98 ohm/kft at 75 C.
+  assert.ok(Math.abs(kResistancePerKft({ material: "copper", awg: "6" }) - 0.491) < 0.005);
+  assert.ok(Math.abs(kResistancePerKft({ material: "copper", awg: "12" }) - 1.98) < 0.01);
+  assert.throws(() => kResistancePerKft({ material: "gold", awg: "12" }));
 });
 
 test("bounds: ampacityFromPhysics returns 0 sentinel when T_c <= T_a (documented)", () => {
@@ -12820,6 +12829,13 @@ test("bounds: spec-v40 thread-measure-wire pins best wire/M + rejects bad inputs
   // out-of-range wire is flagged, not blocked.
   const c = _cv40f({ thread_standard: "inch", tpi: 13, pitch_diameter_in: 0.45, wire_dia_in: 0.2 });
   assert.ok(c.wire_out_of_range === true && Number.isFinite(c.measurement_over_wires_in));
+  // 60-degree usable range is 0.505182P-1.010362P (ASME B1.2 via Osborn); the
+  // Navy Machinery Repairman manual accepts any wire 0.056-0.090 in on 10 TPI.
+  // 0.650P is the Acme maximum and used to flag the 0.090 in wire.
+  const d = _cv40f({ thread_standard: "inch", tpi: 10, pitch_diameter_in: 0.6832, wire_dia_in: 0.090 });
+  assert.equal(d.wire_out_of_range, false);
+  assert.ok(Math.abs(d.wire_max_in - 0.1010362) < 1e-9 && Math.abs(d.wire_min_in - 0.0505182) < 1e-9);
+  assert.equal(_cv40f({ thread_standard: "inch", tpi: 10, pitch_diameter_in: 0.6832, wire_dia_in: 0.102 }).wire_out_of_range, true);
   assert.ok("error" in _cv40f({ thread_standard: "inch", tpi: 0, pitch_diameter_in: 0.45 }));
   assert.ok("error" in _cv40f({ thread_standard: "inch", tpi: 13, pitch_diameter_in: 0 }));
   assert.ok("error" in _cv40f({ thread_standard: "metric", pitch_mm: Infinity, pitch_diameter_in: 0.45 }));
@@ -40546,9 +40562,14 @@ test("bounds: spec-v1396 computeGradeRodCutFill pins the grade rod and the backw
   const onGrade = _v1396({ ...base, ground_rod_ft: r.grade_rod_ft });
   assert.strictEqual(onGrade.label, "ON GRADE");
   assert.ok(Math.abs(onGrade.ground_elevation_ft - base.design_elev_ft) < 1e-9);
-  // A design grade at or above the instrument cannot be reached by any rod reading.
-  assert.ok("error" in _v1396({ ...base, design_elev_ft: 105.20 }));
-  assert.ok("error" in _v1396({ ...base, design_elev_ft: 110 }));
+  // A design grade above the instrument is a negative grade rod and still a fill
+  // (Navy NAVEDTRA 14081 p.15-30: BM 365.01 + BS 11.56 = HI 376.57; grade 378.75, ground rod 1.42 -> 3.6 ft fill).
+  const navy = _v1396({ benchmark_elev_ft: 365.01, backsight_ft: 11.56, design_elev_ft: 378.75, ground_rod_ft: 1.42 });
+  assert.equal(navy.error, undefined);
+  assert.ok(Math.abs(navy.cut_fill_ft + 3.60) < 1e-9);
+  assert.strictEqual(navy.label, "FILL 3.60 ft");
+  assert.ok(navy.note.startsWith("The design grade is at or above") && r.note.startsWith("The cut or fill"));
+  assert.strictEqual(_v1396({ ...base, design_elev_ft: 105.20 }).grade_rod_ft, 0);
   assert.ok("error" in _v1396({ ...base, backsight_ft: 0 }));
   assert.ok("error" in _v1396({ ...base, ground_rod_ft: 0 }));
   assert.ok("error" in _v1396({ ...base, benchmark_elev_ft: Infinity }));

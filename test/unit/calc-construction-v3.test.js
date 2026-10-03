@@ -180,3 +180,4 @@ test("Drywall: screws scale with area, not with the sheet count (4x12 board is n
   assert.equal(a.screws, 840); // 960 / 32 x 28
   assert.equal(b.screws, a.screws);
 });
+test("Bend: K-factor outside (0, 0.5] errors", () => { for (const k of [0, -0.1, 0.6]) { const r = computeBendAllowance({ thickness_in: 0.06, bend_angle_deg: 90, inside_radius_in: 0.125, k_factor: k, leg_a_in: 1, leg_b_in: 1 }); assert.ok(r.error, "k=" + k); } assert.ok(!computeBendAllowance({ thickness_in: 0.06, bend_angle_deg: 90, inside_radius_in: 0.125, k_factor: 0.5, leg_a_in: 1, leg_b_in: 1 }).error); });

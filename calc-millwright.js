@@ -982,7 +982,8 @@ export function computeAirDryerSizing({ actual_scfm = 0, temp_correction = 1, pr
   const required_rated_scfm = actual_scfm / combined_factor;
   const candidate_delivers_scfm = candidate_rated_scfm > 0 ? candidate_rated_scfm * combined_factor : null;
   const candidate_shortfall_scfm = candidate_delivers_scfm === null ? null : actual_scfm - candidate_delivers_scfm;
-  const candidate_ok = candidate_delivers_scfm === null ? null : candidate_delivers_scfm >= actual_scfm;
+  // 1e-9: 100 x 0.70 x 0.80 is 55.99999999999999, which read 56 scfm as short of 56.
+  const candidate_ok = candidate_delivers_scfm === null ? null : candidate_delivers_scfm >= actual_scfm * (1 - 1e-9);
   // The purge is real compressor capacity that must be ADDED to the compressor
   // sizing, not subtracted from the dryer's.
   const compressor_load_scfm = purge_fraction > 0 ? actual_scfm / (1 - purge_fraction) : actual_scfm;

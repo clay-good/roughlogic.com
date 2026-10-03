@@ -1783,7 +1783,7 @@ export const CITATIONS = {
     governance: GOVERNANCE.electrical,
     editionNote: NEC_DISCLOSURE,
     assumptions: [
-      { name: "Motor starting", value: "one motor starts at a time, the one with the largest starting-over-running excess; starting watts are the user's nameplate or manufacturer figures", source: "engineering practice" },
+      { name: "Motor starting", value: "one motor starts at a time, the one with the largest starting-over-running excess; starting watts are the TOTAL draw at start (nameplate or manufacturer figures); a wattage chart that lists 'additional starting watts' must have the running watts added back first", source: "engineering practice" },
     ],
   },
   "existing-load-220-87": {
@@ -3929,8 +3929,8 @@ export const CITATIONS = {
     governance: GOVERNANCE.plumbing,
     editionNote: "Single-edition (engineering practice).",
     assumptions: [
-      { name: "Design recirc flow", value: "0.5 gpm per branch unless user supplies", source: "ASHRAE Handbook typical" },
-      { name: "Minor-loss factor", value: "20% of straight-pipe friction", source: "engineering practice" },
+      { name: "Design recirc flow", value: "entered by the user (no default); size it from the loop's heat loss", source: "ASHRAE Handbook" },
+      { name: "Fitting allowance", value: "each fitting adds an equivalent length, default 2 ft, to the straight pipe before Hazen-Williams is applied", source: "engineering practice" },
     ],
   },
   "recirc-loop-sizing": {
@@ -4170,10 +4170,10 @@ export const CITATIONS = {
   },
   "manning-slope": {
     formula: "English Manning V = (1.486 / n) × R^(2/3) × S^(1/2), solved for self-cleansing slope at 2 ft/s and the slope to carry target flow at half-full with R = D / 4.",
-    edition: "Manning equation; n-values from USGS WSP-2339 (public domain).",
-    freeAccess: "USGS WSP-2339 free at pubs.usgs.gov.",
+    edition: "Manning equation; closed-conduit n-values are the 'normal' values of Chow, Open-Channel Hydraulics (1959) Table 5-6 (copper 0.011, coated cast iron 0.013, galvanized 0.016, corrugated storm drain 0.024), by name; PVC 0.009 is the plastic-pipe industry design figure. USGS WSP-2339 covers natural channels and floodplains and was cited here until 2026-10-02 in error.",
+    freeAccess: "Chow 1959 at archive.org; the Manning relation is public.",
     governance: GOVERNANCE.plumbing,
-    editionNote: "Single-edition (USGS public-domain n-values).",
+    editionNote: "Single-edition (textbook n-values). The 2 ft/s self-cleansing slope is a velocity criterion only; a sewer design standard can set a higher minimum slope (Ten States Standards 33.41: 0.40% for an 8 in sewer), and the adopted standard governs.",
     assumptions: [
       { name: "Half-full hydraulic radius", value: "R = D / 4", source: "circular cross-section geometry" },
       { name: "Self-cleansing velocity", value: "2 ft/s for sanitary sewers", source: "public engineering practice" },
@@ -5158,13 +5158,13 @@ export const CITATIONS = {
     ],
   },
   "bend-allowance": {
-    formula: "BA = (π / 180) × angle × (R + K × t) where K is the K-factor (neutral-axis offset) and t is sheet thickness; flat blank = leg1 + leg2 + BA - setback.",
+    formula: "BA = (π / 180) × angle × (R + K × t) where K is the K-factor (neutral-axis offset) and t is sheet thickness; outside setback OSSB = (R + t) × tan(angle / 2); bend deduction BD = 2 × OSSB - BA; flat blank = leg1 + leg2 - BD with both legs measured to the outside mold line.",
     edition: "Machinery's Handbook by name; SME Sheet Metal Forming by name.",
     freeAccess: "Older Machinery's Handbook editions free at archive.org.",
     governance: GOVERNANCE.general,
     editionNote: "Single-edition (engineering-practice geometry).",
     assumptions: [
-      { name: "Default K-factor", value: "0.33 (mild steel air bend) unless user supplies", source: "Machinery's Handbook typical" },
+      { name: "Default K-factor", value: "0.44 unless the user supplies the shop's own (the neutral axis sits between 0 and 0.5 t)", source: "sheet-metal practice; SendCutSend bend guide prints K .43" },
     ],
   },
   "multi-bend-flat-pattern": {
@@ -12103,7 +12103,7 @@ export const CITATIONS = {
     ],
   },
   "thread-measure-wire": {
-    formula: "Best wire W = P / (2 cos30) = 0.57735 x P (range 0.560P to 0.650P); measurement over three wires M = E + 3W - 0.86603 x P for a 60-degree thread.",
+    formula: "Best wire W = P / (2 cos30) = 0.57735 x P (usable range 0.505182P to 1.010362P, ASME B1.2 limits as printed in the Osborn three-wire catalog; 0.650013P is the 29-degree Acme maximum); measurement over three wires M = E + 3W - 0.86603 x P for a 60-degree thread.",
     edition: "The three-wire measurement-over-wires method for 60-degree threads and the best-wire / 0.86603 constant - first-principles geometry as in Machinery's Handbook (Industrial Press), by name; public domain.",
     freeAccess: "Pure geometry, public; the pitch diameter E is user-supplied (no thread-class table lookup here).",
     governance: GOVERNANCE.general,
@@ -12113,7 +12113,7 @@ export const CITATIONS = {
     ],
   },
   "thread-pitch-dia-from-wires": {
-    formula: "E = M - 3W + 0.86603 x P, the three-wire relation M = E + 3W - 0.86603 x P solved for the pitch diameter; best wire W = 0.57735 x P (range 0.560P to 0.650P) for a 60-degree thread.",
+    formula: "E = M - 3W + 0.86603 x P, the three-wire relation M = E + 3W - 0.86603 x P solved for the pitch diameter; best wire W = 0.57735 x P (usable range 0.505182P to 1.010362P, ASME B1.2 limits as printed in the Osborn three-wire catalog; 0.650013P is the 29-degree Acme maximum) for a 60-degree thread.",
     edition: "The three-wire measurement-over-wires method for 60-degree threads solved for the pitch diameter, and the best-wire / 0.86603 constant - first-principles geometry as in Machinery's Handbook (Industrial Press), by name; public domain.",
     freeAccess: "Pure geometry, public; compare the resulting pitch diameter E to the thread-class limits for the fit.",
     governance: GOVERNANCE.general,

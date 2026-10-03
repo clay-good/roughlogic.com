@@ -126,10 +126,11 @@ export function computeLaundryWasherTurns({ machine_capacity_lb = 0, wash_cycle_
   const idle_loss_lb_per_day = idle_loss_lb_per_machine * machine_count * shifts_per_day;
   const idle_loss_pct = ideal_lb_per_shift_per_machine > 0 ? idle_loss_lb_per_machine / ideal_lb_per_shift_per_machine * 100 : 0;
   const machines_exact = required_lb_per_day / (machine_capacity_lb * turns_per_shift * shifts_per_day);
-  const machines_required = Math.ceil(machines_exact);
+  const machines_required = Math.ceil(machines_exact - 1e-9);
   const ideal_machines_exact = required_lb_per_day / (machine_capacity_lb * ideal_turns_per_shift * shifts_per_day);
-  const ideal_machines_required = Math.ceil(ideal_machines_exact);
-  const meets_requirement = lb_per_day >= required_lb_per_day;
+  const ideal_machines_required = Math.ceil(ideal_machines_exact - 1e-9);
+  // 1e-9: three 50 lb washers making exactly 1,600 lb summed to 1599.9999999999998.
+  const meets_requirement = lb_per_day >= required_lb_per_day * (1 - 1e-9);
   const outs = [total_cycle_min, turns_per_shift, lb_per_shift, lb_per_day, machines_exact, idle_loss_lb_per_day];
   if (!outs.every(Number.isFinite)) return { error: "Washer throughput math is not a finite value." };
   return {

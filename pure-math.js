@@ -141,11 +141,19 @@ export function ampacityFromPhysics({
 // dims: in { phase: dimensionless, material: dimensionless, awg: dimensionless, length_ft: L, current_A: I }
 //        out: voltage_drop_V: M L^2 T^-3 I^-1
 export function voltageDrop({ phase, material, awg, length_ft, current_A }) {
+  const factor = phase === "three" ? Math.sqrt(3) : 2;
+  return factor * current_A * kResistancePerKft({ material, awg }) * (length_ft / 1000);
+}
+
+// Stranded-conductor DC resistance per 1000 ft at 75 C on the same K basis,
+// R = K x 1000 / cmil (NEC Ch. 9 Table 8: #6 Cu 0.491 ohm/kft x 26,240 cmil = 12.88).
+// conductorResistancePerKft is SOLID-wire resistivity and reads about 2% under
+// Table 8's stranded values; the voltage-drop tiles that name Table 8 use this.
+// dims: in { material: dimensionless, awg: dimensionless } out: resistance_ohm_per_kft: M L^2 T^-3 I^-2
+export function kResistancePerKft({ material, awg }) {
   const K = material === "copper" ? 12.9 : material === "aluminum" ? 21.2 : null;
   if (K === null) throw new Error("Unknown material: " + material);
-  const cmils = awgAreaCmils(awg);
-  const factor = phase === "three" ? Math.sqrt(3) : 2;
-  return (factor * K * current_A * length_ft) / cmils;
+  return (K * 1000) / awgAreaCmils(awg);
 }
 
 // Three-phase power. P = sqrt(3) * V_LL * I_L * pf.

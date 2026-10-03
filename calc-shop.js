@@ -560,6 +560,11 @@ SHOP_RENDERERS["dividing-head"] = _v40renderDividingHead;
 
 const _V40_BESTWIRE = 1 / (2 * Math.cos(Math.PI / 6)); // 0.5773502691896258
 const _V40_MOW_K = Math.cos(Math.PI / 6); // 0.8660254 = (1/2)cot(30deg) = sqrt(3)/2, the 60-degree measurement-over-wires constant (M = E + 3W - K*P)
+// Smallest and largest wires that still bear on a 60-degree flank (ASME B1.2,
+// Osborn three-wire catalog p.18: .505182p / 1.010362p). Until 2026-10-02 the
+// tiles flagged anything above 0.650P, which is the 29-degree ACME maximum.
+const _WIRE_MIN_P = 0.505182;
+const _WIRE_MAX_P = 1.010362;
 
 // dims: in { thread_standard: dimensionless, tpi: L^-1, pitch_mm: L, pitch_diameter_in: L, wire_dia_in: L } out: { best_wire_in: L, measurement_over_wires_in: L }
 export function computeThreadMeasureWire({ thread_standard = "inch", tpi = 0, pitch_mm = 0, pitch_diameter_in = 0, wire_dia_in = 0 } = {}) {
@@ -578,16 +583,16 @@ export function computeThreadMeasureWire({ thread_standard = "inch", tpi = 0, pi
   const E = Number(pitch_diameter_in) || 0;
   if (!(E > 0)) return { error: "Pitch diameter E must be positive (in)." };
   const best_wire_in = _V40_BESTWIRE * P_in;
-  const wire_min_in = 0.560 * P_in, wire_max_in = 0.650 * P_in;
+  const wire_min_in = _WIRE_MIN_P * P_in, wire_max_in = _WIRE_MAX_P * P_in;
   let W = Number(wire_dia_in) || 0;
   let used_best = false;
   if (!(W > 0)) { W = best_wire_in; used_best = true; }
   const wire_out_of_range = W < wire_min_in || W > wire_max_in;
   const M = E + 3 * W - _V40_MOW_K * P_in;
   const notes = [];
-  notes.push("For a 60-degree thread, best wire W = P / (2 cos30) = 0.57735 x P (acceptable range 0.560P to 0.650P); the measurement over three wires M = E + 3W - 0.86603 x P. First-principles thread geometry; the pitch diameter E is user-supplied (no thread-class table here).");
+  notes.push("For a 60-degree thread, best wire W = P / (2 cos30) = 0.57735 x P (usable range 0.505P to 1.010P, the wires that still bear on the flanks; 0.650P is the 29-degree Acme maximum, not the 60-degree one); the measurement over three wires M = E + 3W - 0.86603 x P. First-principles thread geometry; the pitch diameter E is user-supplied (no thread-class table here).");
   if (used_best) notes.push("Using the best-wire size " + fmt(best_wire_in, 6) + " in.");
-  if (wire_out_of_range) notes.push("The entered wire " + fmt(W, 6) + " in is outside the acceptable range " + fmt(wire_min_in, 6) + " to " + fmt(wire_max_in, 6) + " in - the contact point moves off the pitch line and M is less reliable.");
+  if (wire_out_of_range) notes.push("The entered wire " + fmt(W, 6) + " in is outside the acceptable range " + fmt(wire_min_in, 6) + " to " + fmt(wire_max_in, 6) + " in - a wire that small bottoms in the root, and one that large rides on the crests, so it no longer bears on the flanks and M is meaningless.");
   return {
     pitch_in: P_in, best_wire_in, wire_min_in, wire_max_in,
     wire_dia_in: W, wire_out_of_range,
@@ -644,7 +649,7 @@ export function computeThreadPitchDiaFromWires({ thread_standard = "inch", tpi =
   const M = Number(measurement_over_wires_in) || 0;
   if (!(M > 0)) return { error: "Measurement over wires M must be positive (in)." };
   const best_wire_in = _V40_BESTWIRE * P_in;
-  const wire_min_in = 0.560 * P_in, wire_max_in = 0.650 * P_in;
+  const wire_min_in = _WIRE_MIN_P * P_in, wire_max_in = _WIRE_MAX_P * P_in;
   let W = Number(wire_dia_in) || 0;
   let used_best = false;
   if (!(W > 0)) { W = best_wire_in; used_best = true; }
@@ -652,9 +657,9 @@ export function computeThreadPitchDiaFromWires({ thread_standard = "inch", tpi =
   const E = M - 3 * W + _V40_MOW_K * P_in;
   if (!(E > 0)) return { error: "Computed pitch diameter is not positive; check the measurement, the wire size, and the thread pitch." };
   const notes = [];
-  notes.push("For a 60-degree thread, best wire W = 0.57735 x P (acceptable range 0.560P to 0.650P); the pitch diameter from a measurement over three wires is E = M - 3W + 0.86603 x P. First-principles thread geometry; compare E to the thread-class pitch-diameter limits for the fit.");
+  notes.push("For a 60-degree thread, best wire W = 0.57735 x P (usable range 0.505P to 1.010P, the wires that still bear on the flanks; 0.650P is the 29-degree Acme maximum, not the 60-degree one); the pitch diameter from a measurement over three wires is E = M - 3W + 0.86603 x P. First-principles thread geometry; compare E to the thread-class pitch-diameter limits for the fit.");
   if (used_best) notes.push("Using the best-wire size " + fmt(best_wire_in, 6) + " in.");
-  if (wire_out_of_range) notes.push("The entered wire " + fmt(W, 6) + " in is outside the acceptable range " + fmt(wire_min_in, 6) + " to " + fmt(wire_max_in, 6) + " in - the contact point moves off the pitch line and E is less reliable.");
+  if (wire_out_of_range) notes.push("The entered wire " + fmt(W, 6) + " in is outside the acceptable range " + fmt(wire_min_in, 6) + " to " + fmt(wire_max_in, 6) + " in - a wire that small bottoms in the root, and one that large rides on the crests, so it no longer bears on the flanks and E is meaningless.");
   return {
     pitch_in: P_in, best_wire_in, wire_min_in, wire_max_in,
     wire_dia_in: W, wire_out_of_range, used_best,
@@ -3216,7 +3221,7 @@ export function computePowderCoatingCoverage({ specific_gravity = 0, film_thickn
     theoretical_coverage_sqft_lb, waste_coverage, waste_powder_lb,
     utilization, reclaim_coverage, reclaim_powder_lb, saving_pct,
     waste_cost, reclaim_cost, cost_saving: waste_cost - reclaim_cost,
-    note: "How much powder a job takes, and the two factors that move the answer by a factor of two. Theoretical coverage is fixed by physics -- specific gravity and film thickness -- and no shop achieves it, because what leaves the gun is not all what lands on the part. TRANSFER EFFICIENCY is the first-pass share, typically 60% or so on manual equipment, and what misses becomes overspray. RECLAIM is the second factor and it is the one that decides the booth: a reclaim booth recovers the overspray and returns it to the hopper, so the utilisation is the first pass plus the recovered share of what missed, which pushes a 60% transfer efficiency to 98%. A powder of specific gravity 1.5 at 2.0 mils covers 64.2 sq ft per pound theoretically. Sprayed to waste at 60% transfer that is 38.5 sq ft per pound and a 500 sq ft job takes 13.0 lb; with 95% reclaim the effective coverage rises to 62.9 and the same job takes 7.9 lb. Thirteen pounds against eight is a 39% cut in material on one job, and at four to eight dollars a pound across a production year that difference is the reclaim booth's payback. Then check the thickness discipline, because it outweighs the transfer efficiency: running the same job at 3.0 mils instead of 2.0 pushes the no-reclaim requirement from 13.0 lb to 19.5 lb. Material only. Part surface area is the input this is most sensitive to and it is genuinely hard to estimate on a complex part, where the Faraday cage effect in inside corners and recesses both lowers transfer efficiency and leaves those areas thin. It does not address cure schedule, film build uniformity, pretreatment, color change losses in a reclaim system -- which are substantial and are why some shops spray to waste deliberately -- powder shelf life, or the contamination that ends a reclaim batch. The powder manufacturer's technical data sheet, the coating specification's film thickness range, and the booth manufacturer govern.",
+    note: "How much powder a job takes, and the two factors that move the answer by a factor of two. Theoretical coverage is fixed by physics -- specific gravity and film thickness -- and no shop achieves it, because what leaves the gun is not all what lands on the part. TRANSFER EFFICIENCY is the first-pass share, typically 60% or so on manual equipment, and what misses becomes overspray. RECLAIM is the second factor and it is the one that decides the booth: a reclaim booth recovers the overspray and returns it to the hopper, so the utilisation is the first pass plus the recovered share of what missed, which pushes a 60% transfer efficiency to 98%. A powder of specific gravity 1.5 at 2.0 mils covers 64.1 sq ft per pound theoretically. Sprayed to waste at 60% transfer that is 38.5 sq ft per pound and a 500 sq ft job takes 13.0 lb; with 95% reclaim the effective coverage rises to 62.8 and the same job takes 8.0 lb. Thirteen pounds against eight is a 39% cut in material on one job, and at four to eight dollars a pound across a production year that difference is the reclaim booth's payback. Then check the thickness discipline, because it outweighs the transfer efficiency: running the same job at 3.0 mils instead of 2.0 pushes the no-reclaim requirement from 13.0 lb to 19.5 lb. Material only. Part surface area is the input this is most sensitive to and it is genuinely hard to estimate on a complex part, where the Faraday cage effect in inside corners and recesses both lowers transfer efficiency and leaves those areas thin. It does not address cure schedule, film build uniformity, pretreatment, color change losses in a reclaim system -- which are substantial and are why some shops spray to waste deliberately -- powder shelf life, or the contamination that ends a reclaim batch. The powder manufacturer's technical data sheet, the coating specification's film thickness range, and the booth manufacturer govern.",
   };
 }
 

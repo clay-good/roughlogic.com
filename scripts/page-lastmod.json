@@ -2,24 +2,24 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "eef2d1b1ef924ff9",
-      "date": "2026-10-01"
+      "sha": "ace74744afa30ad7",
+      "date": "2026-10-03"
     },
     "/tools/": {
       "sha": "9f4fa71712d975ac",
       "date": "2026-10-01"
     },
     "/collections/disaster-response/": {
-      "sha": "c4cbdccd4228a88a",
-      "date": "2026-10-01"
+      "sha": "83326a630cce26fa",
+      "date": "2026-10-03"
     },
     "/groups/accounting/": {
       "sha": "c712148ed4ce2312",
       "date": "2026-10-01"
     },
     "/groups/agriculture/": {
-      "sha": "e73c6687d4c0f1d1",
-      "date": "2026-10-01"
+      "sha": "1637f9de7f11cd73",
+      "date": "2026-10-03"
     },
     "/groups/construction/": {
       "sha": "db307a20c4972b07",
@@ -66,8 +66,8 @@
       "date": "2026-10-01"
     },
     "/groups/plumbing/": {
-      "sha": "9ea65522726043a5",
-      "date": "2026-10-01"
+      "sha": "198e72256cbee389",
+      "date": "2026-10-03"
     },
     "/groups/real-estate/": {
       "sha": "40ad4828614e3535",
@@ -618,8 +618,8 @@
       "date": "2026-09-29"
     },
     "/tools/bend-allowance/": {
-      "sha": "f8f41329ad179754",
-      "date": "2026-09-29"
+      "sha": "416761d0bf2ff3db",
+      "date": "2026-10-03"
     },
     "/tools/bend-springback/": {
       "sha": "82d49ca191bc5678",
@@ -3170,8 +3170,8 @@
       "date": "2026-09-29"
     },
     "/tools/friction-loss/": {
-      "sha": "ce06d821432df01d",
-      "date": "2026-09-30"
+      "sha": "e2ebf067dc16367a",
+      "date": "2026-10-03"
     },
     "/tools/frost-depth-berggren/": {
       "sha": "abf6d85bb1fe919d",
@@ -3378,8 +3378,8 @@
       "date": "2026-10-01"
     },
     "/tools/generator-sizing/": {
-      "sha": "5dddbf1bad009360",
-      "date": "2026-09-30"
+      "sha": "90fbf11b252cb3f0",
+      "date": "2026-10-03"
     },
     "/tools/geometry/": {
       "sha": "f1d03d3e7bba477e",
@@ -4102,8 +4102,8 @@
       "date": "2026-09-29"
     },
     "/tools/kiln-drying-time/": {
-      "sha": "e6d0900e4606ce1f",
-      "date": "2026-09-29"
+      "sha": "d55f5e03f9f4dec3",
+      "date": "2026-10-03"
     },
     "/tools/kingpin-to-axle/": {
       "sha": "70a02b4309960715",
@@ -4470,8 +4470,8 @@
       "date": "2026-09-29"
     },
     "/tools/manning-slope/": {
-      "sha": "c224149708559362",
-      "date": "2026-09-29"
+      "sha": "9bc9322cf02b119d",
+      "date": "2026-10-03"
     },
     "/tools/manual-d-friction-rate/": {
       "sha": "a40ea8fc8670d39a",
@@ -4906,8 +4906,8 @@
       "date": "2026-09-29"
     },
     "/tools/multi-load-vd/": {
-      "sha": "5680b2bf8eebee9b",
-      "date": "2026-09-29"
+      "sha": "7896b3a4d6ae57cc",
+      "date": "2026-10-03"
     },
     "/tools/multi-motor-feeder/": {
       "sha": "86828f0084035087",
@@ -5630,8 +5630,8 @@
       "date": "2026-09-29"
     },
     "/tools/powder-coating-coverage/": {
-      "sha": "6bdbd7f35ca1ef9a",
-      "date": "2026-09-29"
+      "sha": "3b840d86421e1b56",
+      "date": "2026-10-03"
     },
     "/tools/power-distro/": {
       "sha": "6c4c6e6a5124f8b3",
@@ -6146,8 +6146,8 @@
       "date": "2026-09-29"
     },
     "/tools/recirc-pump-head/": {
-      "sha": "890ce73603582fc6",
-      "date": "2026-09-29"
+      "sha": "048511ff55e4a6b4",
+      "date": "2026-10-03"
     },
     "/tools/recloser-fuse-coordination/": {
       "sha": "0bd9237626ff085a",
@@ -8002,16 +8002,16 @@
       "date": "2026-09-29"
     },
     "/tools/thread-measure-wire/": {
-      "sha": "5252af2eef8d6cce",
-      "date": "2026-09-29"
+      "sha": "1a2ddc027bd687f0",
+      "date": "2026-10-03"
     },
     "/tools/thread-pitch/": {
       "sha": "126f88f104699472",
       "date": "2026-09-29"
     },
     "/tools/thread-pitch-dia-from-wires/": {
-      "sha": "96a13221e88e9300",
-      "date": "2026-09-29"
+      "sha": "f6195125ef54acca",
+      "date": "2026-10-03"
     },
     "/tools/thread-single-depth/": {
       "sha": "8abf7688da910873",
