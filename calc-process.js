@@ -123,7 +123,7 @@ export function computeInjectionClampTonnage({
     : "(no runner area entered -- a cold runner ALWAYS has projected area, and a part-only figure specifies a machine that flashes)";
   const has_machine = machine_rating_tons > 0;
   const margin_tons = has_machine ? machine_rating_tons - clamp_with_safety_tons : 0;
-  const fits = has_machine && margin_tons >= 0;
+  const fits = has_machine && margin_tons >= 0 - 1e-9 * Math.abs(0);
   const machine_verdict = !has_machine
     ? "(no machine rating entered)"
     : fits
@@ -521,7 +521,7 @@ export function computeThermoformingDrawRatio({
   const corner_wall_in = average_wall_in * corner_fraction;
   const corner_verdict = "the average is not the specification. The bottom corners are the LAST material to arrive, formed from sheet that has already chilled against the sidewall, so at " + fmt(corner_fraction * 100, 0) + "% of average they are about " + fmt(corner_wall_in, 4) + " in -- and the corner is what the part fails at";
   const has_min = min_wall_in > 0;
-  const corner_passes = has_min && corner_wall_in >= min_wall_in;
+  const corner_passes = has_min && corner_wall_in >= min_wall_in - 1e-9 * Math.abs(min_wall_in);
   // The inversion the part's cost actually turns on.
   const sheet_for_corner_in = has_min ? min_wall_in / corner_fraction * areal_draw_ratio : 0;
   const min_verdict = !has_min
@@ -663,7 +663,7 @@ export function computeThermoplasticTemperatureDerate({
   const has_operating = operating_pressure_psi > 0;
   const margin_psi = has_operating ? derated_pressure_psi - operating_pressure_psi : 0;
   const utilization_pct = has_operating ? operating_pressure_psi / derated_pressure_psi * 100 : 0;
-  const passes = has_operating && margin_psi >= 0 && !over_temp;
+  const passes = has_operating && margin_psi >= 0 - 1e-9 * Math.abs(0) && !over_temp;
   const operating_verdict = !has_operating
     ? "(no operating pressure entered)"
     : over_temp
@@ -817,7 +817,7 @@ export function computeRiserModulusFeeding({
   const has_volume_check = shrinkage_pct > 0 && riser_efficiency_pct > 0;
   const shrinkage_volume_in3 = has_volume_check ? section_volume_in3 * shrinkage_pct / 100 : 0;
   const volume_needed_in3 = has_volume_check ? shrinkage_volume_in3 / (riser_efficiency_pct / 100) : 0;
-  const volume_ok = has_volume_check && riser_volume_in3 >= volume_needed_in3;
+  const volume_ok = has_volume_check && riser_volume_in3 >= volume_needed_in3 - 1e-9 * Math.abs(volume_needed_in3);
   const volume_verdict = !has_volume_check
     ? "(no shrinkage and feeding efficiency entered -- and the volume check is a SECOND condition, not a restatement of the modulus one)"
     : volume_ok

@@ -1936,7 +1936,7 @@ export function computePumpImpellerTrim({
       : "the trimmed diameter is " + fmt(fraction_of_max * 100, 1) + "% of the casing maximum, inside the " + fmt(min_trim_fraction * 100, 0) + "% practical limit";
   // The head check, which is the one that decides whether the trim is usable.
   const has_head_check = current_head_ft > 0 && required_head_ft > 0;
-  const head_adequate = has_head_check && head_at_trim_ft >= required_head_ft;
+  const head_adequate = has_head_check && head_at_trim_ft >= required_head_ft - 1e-9 * Math.abs(required_head_ft);
   const head_margin_ft = head_at_trim_ft - required_head_ft;
   // Flow unchanged but head to spare is the THROTTLED-pump case: the saving is
   // in removing the excess head, which this flow-balancing trim does not size.
@@ -2120,7 +2120,7 @@ export function computeValveActuatorCloseOff({
   const has_driven = actuator_closeoff_psi > 0;
   const actuator_force_lb = has_driven ? actuator_closeoff_psi * seat_area_in2 : 0;
   const force_shortfall_lb = worst_case_seat_force_lb - actuator_force_lb;
-  const driven_adequate = has_driven && actuator_closeoff_psi >= minimum_flow_differential_psi;
+  const driven_adequate = has_driven && actuator_closeoff_psi >= minimum_flow_differential_psi - 1e-9 * Math.abs(minimum_flow_differential_psi);
   const driven_verdict = !has_driven
     ? "(no actuator close-off rating entered)"
     : driven_adequate
@@ -2130,7 +2130,7 @@ export function computeValveActuatorCloseOff({
   const is_spring = is_spring_return === "yes";
   const has_spring_rating = spring_closeoff_psi > 0;
   const spring_force_lb = has_spring_rating ? spring_closeoff_psi * seat_area_in2 : 0;
-  const spring_adequate = is_spring && has_spring_rating && spring_closeoff_psi >= minimum_flow_differential_psi;
+  const spring_adequate = is_spring && has_spring_rating && spring_closeoff_psi >= minimum_flow_differential_psi - 1e-9 * Math.abs(minimum_flow_differential_psi);
   const spring_verdict = !is_spring
     ? "(not a spring-return actuator)"
     : !has_spring_rating
@@ -2388,7 +2388,7 @@ export function computeLouverFreeArea({
   const is_intake = application === "intake";
   const limit_fpm = is_intake ? water_penetration_fpm : allowable_velocity_fpm;
   const has_limit = limit_fpm > 0;
-  const within_limit = has_limit && free_velocity_fpm <= limit_fpm;
+  const within_limit = has_limit && free_velocity_fpm <= limit_fpm + 1e-9 * Math.abs(limit_fpm);
   const gross_sized_free_velocity_fpm = has_limit ? limit_fpm / free_area_ratio : 0;
   const limit_verdict = !has_limit
     ? is_intake

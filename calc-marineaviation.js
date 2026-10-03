@@ -403,8 +403,8 @@ export function computeTravelLiftSlingPlacement({
     : (aft_carries_more ? "the AFT" : "the FORWARD") + " sling carries " + fmt(governing_lb, 0) + " lb against " + fmt(displacement_lb - governing_lb, 0) + " lb on the other -- " + fmt(Math.max(aft_share_pct, 100 - aft_share_pct), 0) + "% of the boat, and " + fmt(difference_lb, 0) + " lb more than the other sling";
   // The check people actually make, and why it is wrong.
   const has_wll = sling_wll_lb > 0;
-  const within_wll = has_wll && governing_lb <= sling_wll_lb;
-  const even_split_would_pass = has_wll && even_split_lb <= sling_wll_lb;
+  const within_wll = has_wll && governing_lb <= sling_wll_lb + 1e-9 * Math.abs(sling_wll_lb);
+  const even_split_would_pass = has_wll && even_split_lb <= sling_wll_lb + 1e-9 * Math.abs(sling_wll_lb);
   const wll_verdict = !has_wll
     ? "(no sling working load limit entered)"
     : within_wll
@@ -513,7 +513,7 @@ export function computeDockPilingLateral({
     : fmt(scour_ft, 1) + " ft of scour drops the effective mudline, so the cantilever grows to " + fmt(scoured_height_ft, 1) + " ft and the moment to " + fmt(scoured_moment_ftlb, 0) + " ft-lb, while the embedment that remains is measured from the LOWER mudline -- the pile must be driven " + fmt(total_depth_needed_ft, 1) + " ft below the ORIGINAL mudline, " + fmt(extra_depth_ft, 1) + " ft more than the unscoured case";
   // Against what is already in the ground.
   const has_existing = existing_embedment_ft > 0;
-  const adequate = has_existing && existing_embedment_ft >= total_depth_needed_ft;
+  const adequate = has_existing && existing_embedment_ft >= total_depth_needed_ft - 1e-9 * Math.abs(total_depth_needed_ft);
   const shortfall_ft = total_depth_needed_ft - existing_embedment_ft;
   const existing_verdict = !has_existing
     ? "(no existing embedment entered)"

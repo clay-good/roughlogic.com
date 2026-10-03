@@ -198,7 +198,7 @@ export function computeHeatTraceSizing({ pipe_ft = 150, allowance_pct = 10, num_
   const sf = Number(start_factor);
   if (!(sf >= 1)) return { error: "Start-up factor must be at least 1 (the manufacturer's cold-start multiple)." };
   const start_amps = amps * sf;
-  const breaker_ok = amps <= 0.8 * breaker_a && start_amps <= breaker_a;
+  const breaker_ok = amps <= (0.8 * breaker_a) + 1e-9 * Math.abs((0.8 * breaker_a)) && start_amps <= breaker_a + 1e-9 * Math.abs(breaker_a);
   if (![cable_ft, watts, amps].every(Number.isFinite)) return { error: "Heat-trace math is not a finite value." };
   return {
     cable_ft,

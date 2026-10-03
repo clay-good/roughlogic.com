@@ -283,7 +283,7 @@ export function computeArcRatedClothingSelection({
   const has_system = system_arc_rating_cal_cm2 > 0;
   const margin_cal_cm2 = has_system ? system_arc_rating_cal_cm2 - incident_energy_cal_cm2 : 0;
   const margin_pct = has_system && incident_energy_cal_cm2 > 0 ? margin_cal_cm2 / incident_energy_cal_cm2 * 100 : 0;
-  const adequate = has_system && margin_cal_cm2 >= 0;
+  const adequate = has_system && margin_cal_cm2 >= 0 - 1e-9 * Math.abs(0);
   const selection_verdict = !has_system
     ? "the system arc rating must be AT OR ABOVE " + fmt(minimum_rating_cal_cm2, 1) + " cal/cm2. (No system rating entered)"
     : adequate
@@ -443,7 +443,7 @@ export function computeRetrievalWinchForce({
     : "an entangled or wedged entrant at " + fmt(entanglement_factor, 1) + " times that is " + fmt(entangled_lb, 0) + " lb. A system rated for the free-hanging " + fmt(retrieval_lb, 0) + " lb stalls there";
   const has_system = system_rating_lb > 0;
   const system_margin_lb = has_system ? system_rating_lb - retrieval_lb : 0;
-  const system_ok = has_system && system_margin_lb >= 0;
+  const system_ok = has_system && system_margin_lb >= 0 - 1e-9 * Math.abs(0);
   const system_verdict = !has_system
     ? "(no system rating entered)"
     : system_ok

@@ -282,7 +282,7 @@ export function computePhosphateCoatingWeight({ panel_length_in = 0, panel_width
   const coating_mg_ft2 = mass_lost_mg / area_coated_ft2;
   const coating_g_m2 = coating_mg_ft2 * (1 / (0.3048 * 0.3048)) / 1000;
   const one_sided_mg_ft2 = mass_lost_mg / area_one_face_ft2;
-  const within_spec = coating_mg_ft2 >= spec_min_mg_ft2 && coating_mg_ft2 <= spec_max_mg_ft2;
+  const within_spec = coating_mg_ft2 >= spec_min_mg_ft2 - 1e-9 * Math.abs(spec_min_mg_ft2) && coating_mg_ft2 <= spec_max_mg_ft2 + 1e-9 * Math.abs(spec_max_mg_ft2);
   const margin_mg_ft2 = within_spec ? 0 : (coating_mg_ft2 < spec_min_mg_ft2 ? spec_min_mg_ft2 - coating_mg_ft2 : coating_mg_ft2 - spec_max_mg_ft2);
   const spec_verdict = within_spec
     ? "WITHIN the entered " + fmt(spec_min_mg_ft2, 0) + " to " + fmt(spec_max_mg_ft2, 0) + " mg/sq ft range."

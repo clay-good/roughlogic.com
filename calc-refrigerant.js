@@ -1080,7 +1080,7 @@ export function computeFlashGasSubcool({ vertical_lift_ft = 0, friction_dp_psi =
   const dp_lift_psi = grad * lift;
   const dp_total_psi = dp_lift_psi + friction;
   const required_subcool_f = dp_total_psi / slope;
-  const meets_target = required_subcool_f >= 8 && required_subcool_f <= 12;
+  const meets_target = required_subcool_f >= 8 - 1e-9 * Math.abs(8) && required_subcool_f <= 12 + 1e-9 * Math.abs(12);
   return {
     dp_lift_psi, dp_total_psi, required_subcool_f, meets_target,
     note: "Techs often credit only the friction and forget the 0.43 psi/ft vertical-lift column, which dominates on a tall riser. Liquid-line heat gain also flashes liquid. Subcooling should be measured at the metering device, not the condenser outlet. The 5 psi/degF P-T slope flattens at higher pressure (an approximation). Add margin to reach the 8 to 12 F field target. The manufacturer data and the actual refrigerant govern - a design aid, not a commissioning measurement.",

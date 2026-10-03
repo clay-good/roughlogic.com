@@ -1194,7 +1194,7 @@ export function computeCargoSecurementWLL({ cargo_weight_lb = 0, tiedown_count =
   // >5 ft to 10 ft -> 2 tiedowns; >10 ft -> 2 for the first 10 ft plus 1 for
   // each additional 10 ft or fraction thereof.
   const min_tiedowns = len <= 5 ? (W > 1100 ? 2 : 1) : len <= 10 ? 2 : 2 + Math.ceil((len - 10) / 10 - 1e-9);
-  const pass = aggregate_wll_lb >= required_wll_lb && n >= min_tiedowns;
+  const pass = aggregate_wll_lb >= required_wll_lb - 1e-9 * Math.abs(required_wll_lb) && n >= min_tiedowns - 1e-9 * Math.abs(min_tiedowns);
   return { aggregate_wll_lb, required_wll_lb, min_tiedowns, tiedown_count: n, tiedown_path, pass };
 }
 

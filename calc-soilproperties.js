@@ -445,7 +445,7 @@ export function computeFineAggregateGrading({ p38 = 100, p4 = 100, p8 = 90, p16 
   const fmRes = computeFinenessModulus({ r4: 100 - sieves[1].p, r8: 100 - sieves[2].p, r16: 100 - sieves[3].p, r30: 100 - sieves[4].p, r50: 100 - sieves[5].p, r100: 100 - sieves[6].p });
   if (fmRes.error) return { error: fmRes.error };
   const fm = fmRes.fm;
-  const fm_ok = fm >= 2.3 && fm <= 3.1;
+  const fm_ok = fm >= 2.3 - 1e-9 * Math.abs(2.3) && fm <= 3.1 + 1e-9 * Math.abs(3.1);
   const conforms = band_ok && consecutive_ok && fm_ok;
   const failures = [];
   if (!band_ok) failures.push(`grading band (${band_detail})`);
@@ -516,7 +516,7 @@ export function computeSoilGradationCoefficients({ d10_mm = 0, d30_mm = 0, d60_m
   // between 1 and 3 inclusive. Both must hold; failing either is poorly graded.
   const cu_threshold = is_gravel ? 4 : 6;
   const cu_ok = cu >= cu_threshold - 1e-9 * Math.abs(cu_threshold);
-  const cc_ok = cc >= 1 && cc <= 3;
+  const cc_ok = cc >= 1 - 1e-9 * Math.abs(1) && cc <= 3 + 1e-9 * Math.abs(3);
   const well_graded = cu_ok && cc_ok;
   // The fines content decides whether the gradation criteria control at all.
   let fines_class, uscs_symbol;

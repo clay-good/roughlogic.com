@@ -18,17 +18,36 @@ const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..", "..");
 const NAME = "[a-z_]*(?:ok|pass|passes|within|meets|fits|reaches|adequate|compliant|safe|covers|sufficient)[a-z_]*";
 const LINE = new RegExp("^\\s*const (" + NAME + ") = (.+);\\s*(//.*)?$");
 
-// One top-level <= or >=, and no &&, ||, ==, !=, ?? or ?: at the top level.
-function singleInclusive(expr) {
-  let d = 0, n = 0;
+// Split at top-level && / || (a top-level ternary skips the line: its branches
+// are values, not verdict terms), and flag each term that is a single
+// inclusive comparison without slack. 2026-10-03: a second codemod pass covered
+// 81 such terms inside compound verdicts (`a >= b && c <= d`).
+function unguardedTerms(expr) {
+  const terms = []; let d = 0, start = 0;
   for (let i = 0; i < expr.length; i++) {
     const c = expr[i], two = expr.slice(i, i + 2);
     if ("([{".includes(c)) d++;
     else if (")]}".includes(c)) d--;
     else if (d === 0) {
-      if (["&&", "||", "==", "!=", "??"].includes(two) || c === "?") return false;
+      if (c === "?" && expr[i + 1] !== "?") return [];
+      if (two === "??") return [];
+      if (two === "&&" || two === "||") { terms.push(expr.slice(start, i)); start = i + 2; i++; }
+    }
+  }
+  terms.push(expr.slice(start));
+  return terms.map((t) => t.trim()).filter((t) => !t.includes("1e-") && singleInclusive(t));
+}
+
+function singleInclusive(t) {
+  let d = 0, n = 0;
+  for (let i = 0; i < t.length; i++) {
+    const c = t[i], two = t.slice(i, i + 2);
+    if ("([{".includes(c)) d++;
+    else if (")]}".includes(c)) d--;
+    else if (d === 0) {
+      if (two === "==" || two === "!=") return false;
       if (two === "<=" || two === ">=") { n++; i++; continue; }
-      if ((c === "<" || c === ">") && expr[i + 1] !== "=") return false;
+      if (c === "<" || c === ">") return false;
     }
   }
   return n === 1;
@@ -39,7 +58,8 @@ test("every simple inclusive verdict comparison carries float slack toward the l
   for (const f of readdirSync(ROOT).filter((n) => /^calc-.*\.js$/.test(n))) {
     readFileSync(resolve(ROOT, f), "utf8").split("\n").forEach((line, i) => {
       const m = LINE.exec(line);
-      if (m && !line.includes("1e-") && singleInclusive(m[2])) bad.push(f + ":" + (i + 1) + " " + m[1]);
+      if (!m) return;
+      for (const t of unguardedTerms(m[2])) bad.push(f + ":" + (i + 1) + " " + m[1] + ": " + t.slice(0, 60));
     });
   }
   assert.deepEqual(bad, []);

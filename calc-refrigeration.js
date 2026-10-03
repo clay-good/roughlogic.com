@@ -774,7 +774,7 @@ export function computeRefrigerationReliefCapacity({
   const has_valve = valve_rated_lb_min > 0;
   const margin_ratio = has_valve ? valve_rated_lb_min / required_lb_min : 0;
   const relief_basis = "legacy C = f D L (UMC 1113.5 / ASHRAE 15 before 2019)";
-  const valve_adequate = has_valve && valve_rated_lb_min >= required_lb_min;
+  const valve_adequate = has_valve && valve_rated_lb_min >= required_lb_min - 1e-9 * Math.abs(required_lb_min);
   const valve_verdict = !has_valve
     ? "(no valve rating entered)"
     : valve_adequate
@@ -787,7 +787,7 @@ export function computeRefrigerationReliefCapacity({
   const equivalent_length_ft = pipe_straight_length_ft + fitting_equivalent_length_ft;
   const has_piping_check = max_allowable_equivalent_length_ft > 0 && equivalent_length_ft > 0;
   const length_margin_ft = max_allowable_equivalent_length_ft - equivalent_length_ft;
-  const piping_adequate = has_piping_check && equivalent_length_ft <= max_allowable_equivalent_length_ft;
+  const piping_adequate = has_piping_check && equivalent_length_ft <= max_allowable_equivalent_length_ft + 1e-9 * Math.abs(max_allowable_equivalent_length_ft);
   const piping_verdict = !has_piping_check
     ? "(no discharge piping entered -- a correctly sized valve on undersized discharge piping is an undersized relief system)"
     : piping_adequate
@@ -871,7 +871,7 @@ export function computeMachineryRoomVentilation({
   const louver_free_area_ft2 = required_exhaust_cfm / louver_face_velocity_fpm;
   const gross_louver_area_ft2 = louver_free_area_ft2 / louver_free_area_fraction;
   const has_fan = installed_fan_cfm > 0;
-  const fan_adequate = has_fan && installed_fan_cfm >= required_exhaust_cfm;
+  const fan_adequate = has_fan && installed_fan_cfm >= required_exhaust_cfm - 1e-9 * Math.abs(required_exhaust_cfm);
   // Run backwards: the charge the installed fan actually covers.
   const charge_covered_lb = has_fan && !is_ammonia ? (installed_fan_cfm / 100) ** 2 : 0;
   const fan_verdict = is_ammonia && has_fan

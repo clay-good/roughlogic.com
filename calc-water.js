@@ -1557,7 +1557,7 @@ export function computeBackflowTestPSI({ assembly_type = "rp", check1_psid = 0, 
   if (!(Number.isFinite(relief) && relief >= 0)) return { error: "Relief opening point must be zero or positive (psid)." };
   if (!(Number.isFinite(c2) && c2 >= 0)) return { error: "Check #2 tightness must be zero or positive (psi)." };
   if (assembly_type === "dc") {
-    const pass = c1 >= 1 && c2 >= 1;
+    const pass = c1 >= 1 - 1e-9 * Math.abs(1) && c2 >= 1 - 1e-9 * Math.abs(1);
     return { assembly_type: "dc", pass, buffer_psid: 0, criterion: "DC: each check >= 1 psid tight" };
   }
   // RP (USC FCCCHR Manual, 10th edition): the #1 check "must be above the relief valve opening
@@ -1566,7 +1566,7 @@ export function computeBackflowTestPSI({ assembly_type = "rp", check1_psid = 0, 
   // 9th edition's gap was 3.0).
   const buffer_psid = c1 - relief;
   const check1_ok = c1 >= 5;
-  const relief_ok = relief >= 2 && buffer_psid > 0;
+  const relief_ok = relief >= 2 - 1e-9 * Math.abs(2) && buffer_psid > 0;
   const check2_ok = c2 >= 1;
   const pass = check1_ok && relief_ok && check2_ok;
   return { assembly_type: "rp", pass, buffer_psid, check1_ok, relief_ok, check2_ok, criterion: "RP: #1 check >= 5 psid and above the relief opening point, relief opens at >= 2 psid, #2 check tight >= 1 psid (USC 10th ed.)" };
@@ -2728,7 +2728,7 @@ export function computePressureZoneHgl({
   const has_fire = fire_flow_friction_ft > 0;
   const fire_hgl_ft = has_fire ? hgl_ft - fire_flow_friction_ft : 0;
   const fire_flow_psi = has_fire ? (fire_hgl_ft - service_elevation_ft) * _HGL_PSI_PER_FT : 0;
-  const fire_ok = has_fire && fire_flow_psi >= 20;
+  const fire_ok = has_fire && fire_flow_psi >= 20 - 1e-9 * Math.abs(20);
   const fire_verdict = !has_fire
     ? "(no fire flow friction entered -- and the STATIC case is not the one that governs)"
     : "under fire flow, " + fmt(fire_flow_friction_ft, 0) + " ft of friction drops the HGL to " + fmt(fire_hgl_ft, 0) + " ft and this service to " + fmt(fire_flow_psi, 1) + " psi"

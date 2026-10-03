@@ -889,7 +889,7 @@ export function computeFootingArea({ column_load_lb, soil_class, applied_moment_
   const q_min_psf = axial - Math.abs(bending);
   const eccentric_flag = M !== 0;
   const uplift_flag = q_min_psf < 0;
-  const bearing_pass = q_max_psf <= allow && !uplift_flag;
+  const bearing_pass = q_max_psf <= allow + 1e-9 * Math.abs(allow) && !uplift_flag;
   return {
     required_area_ft2,
     side_ft,
@@ -4786,7 +4786,7 @@ export function computeGuardHandrailCheck({ occupancy = "residential", surface_h
   // 4-3/8 in sphere there. IBC 1015.4 keeps 4 in below 36 in on a commercial stair.
   const min_guard = isCommercial ? 42 : onStairs ? 34 : 36;
   const max_infill = onStairs && !isCommercial ? 4.375 : 4.0;
-  const guard_ok = !guard_required || measured_guard_in >= min_guard;
+  const guard_ok = !guard_required || measured_guard_in >= min_guard - 1e-9 * Math.abs(min_guard);
   const infill_ok = measured_infill_gap_in <= max_infill + 1e-9 * Math.abs(max_infill);
   const handrail_ok = !onStairs || (measured_handrail_in >= 34 && measured_handrail_in <= 38);
   const all_pass = guard_ok && infill_ok && handrail_ok;
@@ -4840,11 +4840,11 @@ export function computeStairCodeCheck({ occupancy = "commercial", riser_height_i
   const ol = Number(occupant_load) || 0;
   if (ol < 0) return { error: "Occupant load cannot be negative (enter 0 if unknown)." };
   const min_width = isCommercial ? (ol > 0 && ol < 50 ? 36 : 44) : 36;
-  const riser_ok = riser_height_in <= max_riser && riser_height_in >= min_riser;
+  const riser_ok = riser_height_in <= max_riser + 1e-9 * Math.abs(max_riser) && riser_height_in >= min_riser - 1e-9 * Math.abs(min_riser);
   const tread_ok = tread_depth_in >= min_tread - 1e-9 * Math.abs(min_tread);
   const width_ok = stair_width_in >= min_width - 1e-9 * Math.abs(min_width);
   const two_r_plus_t = 2 * riser_height_in + tread_depth_in;
-  const comfort_ok = two_r_plus_t >= 24 && two_r_plus_t <= 25;
+  const comfort_ok = two_r_plus_t >= 24 - 1e-9 * Math.abs(24) && two_r_plus_t <= 25 + 1e-9 * Math.abs(25);
   const all_pass = riser_ok && tread_ok && width_ok;
   return {
     max_riser, min_riser, min_tread, min_width, riser_ok, tread_ok, width_ok, two_r_plus_t, comfort_ok, all_pass,
@@ -10831,7 +10831,7 @@ export function computeJoistCantileverCheck({ backspan_ft = 10, overhang_ft = 2,
   const permitted = table_limit_ft !== null;
   const cantilever_max_ft = permitted ? Math.min(ratio_limit_ft, table_limit_ft) : 0;
   const margin_ft = cantilever_max_ft - overhang_ft;
-  const within_limit = permitted && overhang_ft <= cantilever_max_ft;
+  const within_limit = permitted && overhang_ft <= cantilever_max_ft + 1e-9 * Math.abs(cantilever_max_ft);
   if (![cantilever_max_ft, margin_ft].every(Number.isFinite)) return { error: "Cantilever math is not a finite value." };
   return {
     cantilever_max_ft,
@@ -12363,7 +12363,7 @@ export function computeScaffoldGuardrailCheck({ top_rail_height_in = 0, midrail_
   if (!(tol > 0)) return { error: "Midrail tolerance must be positive (in) - the standard says approximately midway, so a band is required to test it." };
 
   const TOP_MIN = 38, TOP_MAX = 45, TOE_MIN = 3.5;
-  const top_ok = top >= TOP_MIN && top <= TOP_MAX;
+  const top_ok = top >= TOP_MIN - 1e-9 * Math.abs(TOP_MIN) && top <= TOP_MAX + 1e-9 * Math.abs(TOP_MAX);
   const top_low = top < TOP_MIN;
 
   // "Approximately midway" - the target moves with the toprail, so it is computed, not fixed.
@@ -12554,7 +12554,7 @@ export function computeScaffoldPlatformCheck({ plank_length_ft = 0, platform_wid
   const overhang_within = oh <= max_overhang_in + 1e-9 * Math.abs(max_overhang_in);
   const overhang_ok = overhang_within || designed;
 
-  const front_ok = fe <= MAX_FRONT || protectedEdge;
+  const front_ok = fe <= MAX_FRONT + 1e-9 * Math.abs(MAX_FRONT) || protectedEdge;
   const front_within = fe <= MAX_FRONT + 1e-9 * Math.abs(MAX_FRONT);
 
   const passes = gap_ok && width_ok && overhang_ok && front_ok;
@@ -12630,7 +12630,7 @@ export function computeTemporaryStairwayCheck({ riser_count = 0, total_rise_in =
   const total_rise_used_in = rise > 0 ? rise : n * rh;
   // Angle from the actual step geometry.
   const angle_deg = Math.atan(rh / td) * 180 / Math.PI;
-  const angle_ok = angle_deg >= ANGLE_MIN && angle_deg <= ANGLE_MAX;
+  const angle_ok = angle_deg >= ANGLE_MIN - 1e-9 * Math.abs(ANGLE_MIN) && angle_deg <= ANGLE_MAX + 1e-9 * Math.abs(ANGLE_MAX);
   const too_shallow = angle_deg < ANGLE_MIN;
 
   // "Four or more risers OR rising more than 30 inches, whichever is less" - whichever
@@ -13603,7 +13603,7 @@ export function computeTurningAndClearFloorSpace({ cfs_width_in = 0, cfs_depth_i
   // a forward approach puts the 48 in in the direction of travel toward the element.
   const cfs_short_side_in = Math.min(w, d);
   const cfs_long_side_in = Math.max(w, d);
-  const cfs_size_ok = cfs_short_side_in >= CFS_SHORT && cfs_long_side_in >= CFS_LONG;
+  const cfs_size_ok = cfs_short_side_in >= CFS_SHORT - 1e-9 * Math.abs(CFS_SHORT) && cfs_long_side_in >= CFS_LONG - 1e-9 * Math.abs(CFS_LONG);
   const cfs_depth_ok = forward ? d >= CFS_LONG : d >= CFS_SHORT;
   const cfs_width_ok = forward ? w >= CFS_SHORT : w >= CFS_LONG;
   const cfs_oriented_ok = cfs_depth_ok && cfs_width_ok;
@@ -13720,7 +13720,7 @@ export function computeHandrailGeometry({ rail_height_in = 0, clearance_in = 0, 
   const DIA_MIN = 1.25, DIA_MAX = 2, PER_MIN = 4, PER_MAX = 6.25, CS_MAX = 2.25;
   const EXT_FLAT = 12;
 
-  const height_ok = h >= H_MIN && h <= H_MAX;
+  const height_ok = h >= H_MIN - 1e-9 * Math.abs(H_MIN) && h <= H_MAX + 1e-9 * Math.abs(H_MAX);
   const height_too_high = h > H_MAX;
   const clearance_ok = clr >= CLR_MIN - 1e-9 * Math.abs(CLR_MIN);
   const clearance_deficit_in = Math.max(0, CLR_MIN - clr);
@@ -14000,7 +14000,7 @@ export function computeAdaStairCheck({ riser_height_in = 0, tread_depth_in = 0, 
   const RISER_MIN = 4, RISER_MAX = 7, TREAD_MIN = 11;
   const RADIUS_MAX = 0.5, NOSE_MAX = 1.5, SLOPE_MAX = 30;
 
-  const riser_ok = rise >= RISER_MIN && rise <= RISER_MAX;
+  const riser_ok = rise >= RISER_MIN - 1e-9 * Math.abs(RISER_MIN) && rise <= RISER_MAX + 1e-9 * Math.abs(RISER_MAX);
   const riser_too_tall = rise > RISER_MAX;
   const riser_deficit_in = riser_too_tall ? rise - RISER_MAX : Math.max(0, RISER_MIN - rise);
   const tread_ok = tread >= TREAD_MIN - 1e-9 * Math.abs(TREAD_MIN);
@@ -14104,7 +14104,7 @@ export function computeTactileSignMounting({ lowest_baseline_in = 0, tactile_blo
   const usable_range_in = mountable ? lowest_max_in - lowest_min_in : 0;
 
   const position_ok = sign_position !== "on-door" && sign_position !== "hinge-side";
-  const space_size_ok = w >= SPACE_MIN && d >= SPACE_MIN;
+  const space_size_ok = w >= SPACE_MIN - 1e-9 * Math.abs(SPACE_MIN) && d >= SPACE_MIN - 1e-9 * Math.abs(SPACE_MIN);
   const space_ok = space_size_ok && beyond;
   const space_deficit_in = Math.max(0, SPACE_MIN - Math.min(w, d));
 
@@ -14183,7 +14183,7 @@ export function computeDrinkingFountainCheck({ units_provided = 0, bi_level = "n
 
   const wheelchair_ok = wc <= WC_MAX + 1e-9 * Math.abs(WC_MAX);
   const wheelchair_excess_in = Math.max(0, wc - WC_MAX);
-  const standing_ok = st >= STAND_MIN && st <= STAND_MAX;
+  const standing_ok = st >= STAND_MIN - 1e-9 * Math.abs(STAND_MIN) && st <= STAND_MAX + 1e-9 * Math.abs(STAND_MAX);
   const standing_too_low = st < STAND_MIN;
   const standing_deficit_in = standing_too_low ? STAND_MIN - st : Math.max(0, st - STAND_MAX);
   // The dead band between the two windows: 36 to 38 in satisfies neither.
@@ -14192,7 +14192,7 @@ export function computeDrinkingFountainCheck({ units_provided = 0, bi_level = "n
   const in_dead_band = single_height && wc > WC_MAX && wc < STAND_MIN;
 
   // 211.2: two units, or one bi-level unit that complies with both.
-  const count_ok = units >= 2 || (units === 1 && bi);
+  const count_ok = units >= 2 - 1e-9 * Math.abs(2) || (units === 1 && bi);
   const substitution_used = units === 1 && bi;
   const units_short = count_ok ? 0 : 2 - units;
 
@@ -14575,12 +14575,12 @@ export function computeWaterClosetLocation({ centerline_in = 0, seat_height_in =
   const C_MIN = amb ? 17 : 16, C_MAX = amb ? 19 : 18, S_MIN = 17, S_MAX = 19;
   const SIDE_MIN = 60, REAR_MIN = 56, IPC_MIN = 15;
 
-  const centerline_ok = c >= C_MIN && c <= C_MAX;
+  const centerline_ok = c >= C_MIN - 1e-9 * Math.abs(C_MIN) && c <= C_MAX + 1e-9 * Math.abs(C_MAX);
   const centerline_too_close = c < C_MIN;
   const centerline_deficit_in = centerline_too_close ? C_MIN - c : Math.max(0, c - C_MAX);
-  const meets_ipc_only = c >= IPC_MIN && c < C_MIN;
+  const meets_ipc_only = c >= IPC_MIN - 1e-9 * Math.abs(IPC_MIN) && c < C_MIN;
 
-  const seat_ok = s >= S_MIN && s <= S_MAX;
+  const seat_ok = s >= S_MIN - 1e-9 * Math.abs(S_MIN) && s <= S_MAX + 1e-9 * Math.abs(S_MAX);
   const seat_too_low = s < S_MIN;
   const seat_deficit_in = seat_too_low ? S_MIN - s : Math.max(0, s - S_MAX);
 

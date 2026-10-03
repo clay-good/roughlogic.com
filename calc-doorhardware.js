@@ -187,7 +187,7 @@ export function computeLockBacksetLayout({ backset_in = 2.375, cross_bore_dia_in
   const stile_ok = stile_width_in >= min_stile_required_in - 1e-9 * Math.abs(min_stile_required_in);
   const edge_bore_center_from_face_in = door_thickness_in / 2;
   const edge_bore_side_wall_in = (door_thickness_in - edge_bore_dia_in) / 2;
-  const height_ok = lock_height_in >= accessible_min_in && lock_height_in <= accessible_max_in;
+  const height_ok = lock_height_in >= accessible_min_in - 1e-9 * Math.abs(accessible_min_in) && lock_height_in <= accessible_max_in + 1e-9 * Math.abs(accessible_max_in);
   // The classic error: boring one standard backset for a lock supplied at the
   // other leaves the latch face short of the door edge by the difference.
   const other_backset_in = Math.abs(backset_in - 2.375) < 1e-9 ? 2.75 : 2.375;
@@ -249,7 +249,7 @@ export function computePanicHardwareForce({ release_force_lbf = 0, set_in_motion
   const swing_ok = swing_force_lbf <= swing_limit_lbf + 1e-9 * Math.abs(swing_limit_lbf);
   const required_actuating_in = door_leaf_width_in / 2;
   const actuating_ok = actuating_portion_in >= required_actuating_in - 1e-9 * Math.abs(required_actuating_in);
-  const height_ok = mounting_height_in >= 34 && mounting_height_in <= 48;
+  const height_ok = mounting_height_in >= 34 - 1e-9 * Math.abs(34) && mounting_height_in <= 48 + 1e-9 * Math.abs(48);
   const all_ok = release_ok && set_in_motion_ok && swing_ok && actuating_ok && height_ok;
   const points_at = all_ok ? "nothing -- every measured value is inside its entered limit"
     : !release_ok ? "the DEVICE: binding, a bent bar, a latch dragging on a misaligned strike, or a device never lubricated"

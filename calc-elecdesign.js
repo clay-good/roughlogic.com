@@ -531,7 +531,7 @@ export function computeGroundPotentialRise({ grid_current_a = 0, grid_resistance
   if (et < 0) return { error: "Tolerable touch voltage cannot be negative (V)." };
   const gpr_v = ig * rg;
   const has_limit = et > 0;
-  const safe_by_gpr = has_limit && gpr_v <= et;
+  const safe_by_gpr = has_limit && gpr_v <= et + 1e-9 * Math.abs(et);
   const margin_v = has_limit ? et - gpr_v : null;
   const ratio = has_limit ? gpr_v / et : null;
   return {

@@ -307,7 +307,7 @@ export function computeCranePowerLineClearance({ option = "default", voltage_kv 
   // What determining the voltage would buy, against the default you would otherwise take.
   const table_a_saving_ft = table_a_ft !== null && default_clearance_ft !== null ? Math.max(0, default_clearance_ft - table_a_ft) : 0;
   const table_a_helps = table_a_saving_ft > 0;
-  const default_is_unsafe = voltage_known && kv > 350 && option === "default" && act >= 20 && act < 50;
+  const default_is_unsafe = voltage_known && kv > 350 && option === "default" && act >= 20 - 1e-9 * Math.abs(20) && act < 50;
   const boom_reaches = boom > 0 && determinable ? boom > act : null;
 
   const passes = option === "deenergized" || (clearance_ok === true);

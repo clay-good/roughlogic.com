@@ -601,7 +601,7 @@ export function computeCoatingVocCompliance({
   const has_limit = limit_lb_per_gal > 0;
   const complies = has_limit && governing_voc <= limit_lb_per_gal;
   const margin_lb_per_gal = has_limit ? limit_lb_per_gal - governing_voc : 0;
-  const label_would_pass = has_limit && voc_as_supplied <= limit_lb_per_gal;
+  const label_would_pass = has_limit && voc_as_supplied <= limit_lb_per_gal + 1e-9 * Math.abs(limit_lb_per_gal);
   const limit_verdict = !has_limit
     ? "(no limit entered)"
     : complies

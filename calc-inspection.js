@@ -124,7 +124,7 @@ export function computeWeldVisualAcceptance({
   const undersize_length_fraction = undersize_length_in / weld_length_in;
   const allowed_undersize_length_in = weld_length_in * allowed_undersize_fraction;
   const has_size_allowance = allowed_undersize_in > 0;
-  const size_within = has_size_allowance && undersize_in <= allowed_undersize_in;
+  const size_within = has_size_allowance && undersize_in <= allowed_undersize_in + 1e-9 * Math.abs(allowed_undersize_in);
   // D1.1 "shall not exceed 10%": 0.7 x 0.10 is 0.06999999999999999, so a 0.07 in undersize REJECTED.
   const length_within = undersize_length_in <= allowed_undersize_length_in * (1 + 1e-9);
   const undersize_ok = !is_undersize || (size_within && length_within);
@@ -142,7 +142,7 @@ export function computeWeldVisualAcceptance({
           : "REJECT on length: " + fmt(undersize_length_in, 1) + " in exceeds the " + fmt(allowed_undersize_length_in, 1) + " in permitted (" + fmt(allowed_undersize_fraction * 100, 0) + "% of the weld), even though " + fmt(undersize_in, 4) + " in is within the amount allowed";
   const has_undercut = measured_undercut_in > 0 && allowed_undercut_in > 0;
   const undercut_margin_in = has_undercut ? allowed_undercut_in - measured_undercut_in : 0;
-  const undercut_ok = has_undercut && undercut_margin_in >= 0;
+  const undercut_ok = has_undercut && undercut_margin_in >= 0 - 1e-9 * Math.abs(0);
   const undercut_verdict = !has_undercut
     ? "(no measured undercut and limit entered)"
     : undercut_ok
@@ -751,7 +751,7 @@ export function computeJominyQuenchSeverity({
   const position_verdict = "an equivalent Jominy distance of " + fmt(jominy_distance_sixteenths, 1) + " sixteenths (" + fmt(jominy_distance_in, 4) + " in from the quenched end) reads " + fmt(hardness_at_distance_hrc, 1) + " HRC off this steel's Jominy curve";
   const has_requirement = required_core_hardness_hrc > 0;
   const hardness_margin_hrc = has_requirement ? hardness_at_distance_hrc - required_core_hardness_hrc : 0;
-  const meets = has_requirement && hardness_margin_hrc >= 0;
+  const meets = has_requirement && hardness_margin_hrc >= 0 - 1e-9 * Math.abs(0);
   const requirement_verdict = !has_requirement
     ? "(no required core hardness entered)"
     : meets
@@ -760,7 +760,7 @@ export function computeJominyQuenchSeverity({
   const has_alt = alt_jominy_distance_sixteenths > 0 && alt_hardness_hrc > 0;
   const alt_jominy_distance_in = has_alt ? alt_jominy_distance_sixteenths / 16 : 0;
   const alt_margin_hrc = has_alt && has_requirement ? alt_hardness_hrc - required_core_hardness_hrc : 0;
-  const alt_meets = has_alt && has_requirement && alt_margin_hrc >= 0;
+  const alt_meets = has_alt && has_requirement && alt_margin_hrc >= 0 - 1e-9 * Math.abs(0);
   const severity_verdict = !has_alt
     ? "(no alternative quench entered -- and comparing two severities on the SAME bar is what this is for)"
     : "the more severe quench puts the same location at " + fmt(alt_jominy_distance_sixteenths, 1) + " sixteenths and " + fmt(alt_hardness_hrc, 1) + " HRC"

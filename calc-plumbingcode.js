@@ -438,7 +438,7 @@ export function computeGrabBarLayout({ bar_height_in = 34, side_bar_length_in = 
   if (fs < 0) return { error: "Fastener spacing cannot be negative (in)." };
 
   const H_MIN = 33, H_MAX = 36, SIDE_MIN = 42, SIDE_FROM_REAR_MAX = 12, REAR_MIN = 36, REAR_SIDE_MIN = 12, REAR_OPEN_MIN = 24;
-  const height_ok = h >= H_MIN && h <= H_MAX;
+  const height_ok = h >= H_MIN - 1e-9 * Math.abs(H_MIN) && h <= H_MAX + 1e-9 * Math.abs(H_MAX);
   const side_length_ok = sl >= SIDE_MIN - 1e-9 * Math.abs(SIDE_MIN);
   const side_position_ok = sf <= SIDE_FROM_REAR_MAX + 1e-9 * Math.abs(SIDE_FROM_REAR_MAX);
   const rear_length_ok = rl >= REAR_MIN - 1e-9 * Math.abs(REAR_MIN);

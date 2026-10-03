@@ -2043,7 +2043,7 @@ export function computeConcreteAnchorInteraction({ nua_lb = 0, vua_lb = 0, phi_n
   if (!(pv > 0)) return { error: "Design shear capacity phiVn must be positive (lb) - the least of the shear-mode tiles." };
   const tension_ratio = nua / pn;
   const shear_ratio = vua / pv;
-  const individual_ok = tension_ratio <= 1.0 && shear_ratio <= 1.0;
+  const individual_ok = tension_ratio <= 1.0 + 1e-9 * Math.abs(1.0) && shear_ratio <= 1.0 + 1e-9 * Math.abs(1.0);
   let branch, sum_ratio, limit, governing_ratio;
   if (shear_ratio <= 0.2) {
     branch = "full tension permitted (shear under 20%)";

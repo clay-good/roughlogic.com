@@ -105,7 +105,7 @@ export function computePortableLadderSetup({ ladder_length_ft = 0, landing_heigh
 
   const REQ_EXT = 3, RUNG_MIN = 10, RUNG_MAX = 14, WIDTH_MIN = 11.5;
   // Extension: required unless secured at the top with a grasping device.
-  const extension_ok = ext >= REQ_EXT || secured;
+  const extension_ok = ext >= REQ_EXT - 1e-9 * Math.abs(REQ_EXT) || secured;
   const extension_by_alternative = ext < REQ_EXT && secured;
   const extension_shortfall_ft = Math.max(0, REQ_EXT - ext);
 
@@ -123,7 +123,7 @@ export function computePortableLadderSetup({ ladder_length_ft = 0, landing_heigh
   const climbable_height_ft = Math.min(H, Math.max(0, max_landing_served_ft));
 
   // Rung spacing is a WINDOW.
-  const rung_ok = rs >= RUNG_MIN && rs <= RUNG_MAX;
+  const rung_ok = rs >= RUNG_MIN - 1e-9 * Math.abs(RUNG_MIN) && rs <= RUNG_MAX + 1e-9 * Math.abs(RUNG_MAX);
   const rung_too_close = rs < RUNG_MIN;
   const width_ok = cw >= WIDTH_MIN - 1e-9 * Math.abs(WIDTH_MIN);
   const width_shortfall_in = Math.max(0, WIDTH_MIN - cw);
