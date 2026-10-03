@@ -366,7 +366,7 @@ export function renderDryingGoal(inputRegion, outputRegion, citationEl) {
 //        out: { dom_side_effect: dimensionless }
 // (DOM-mount renderer; HTMLElement refs are categorical.)
 export function renderDehumidifier(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: AHAM rating method (80 F / 60 percent RH) and an engineering field method scaled by job conditions. References IICRC S500.";
+  citationEl.textContent = "Citation: IICRC S500 LGR sizing chart (AHAM pints/day = ft³ / 100, 50, 40, 40 for Classes 1-4), rated at the AHAM 80 F / 60 percent RH condition; the chart figure is already the field recommendation.";
   const v = makeNumber("Room volume (ft³)", "dh-v", { step: "any", min: "0" });
   const c = makeSelect("Water class", "dh-c", [
     { value: "1", label: "Class 1" }, { value: "2", label: "Class 2", selected: true }, { value: "3", label: "Class 3" }, { value: "4", label: "Class 4" },
@@ -568,10 +568,13 @@ export function computeNAMSizing({ room_volume_ft3, target_ach = 6, filter_loadi
   const rated_cfm_needed = derate > 0 ? required_cfm / (1 - derate / 100) : null;
   // A containment cannot go negative unless air can get in. The opening a
   // given flow needs at a given pressure follows the orifice relation for
-  // air, with 4,005 the standard velocity-pressure constant in fpm and in wc.
+  // air, with 4,005 the standard velocity-pressure constant in fpm and in wc,
+  // and a sharp-edged opening's discharge coefficient of 0.61:
+  // Q = Cd x A x 4,005 x sqrt(in wc).
+  const makeup_discharge_coefficient = 0.61;
   const makeup_velocity_fpm = (negWc > 0) ? 4005 * Math.sqrt(negWc) : null;
   const makeup_area_needed_ft2 = (makeup_velocity_fpm !== null && makeup_velocity_fpm > 0)
-    ? required_cfm / makeup_velocity_fpm
+    ? required_cfm / (makeup_discharge_coefficient * makeup_velocity_fpm)
     : null;
   const makeup_adequate = (makeup_area_needed_ft2 !== null && makeup > 0)
     ? makeup >= makeup_area_needed_ft2
@@ -580,7 +583,7 @@ export function computeNAMSizing({ room_volume_ft3, target_ach = 6, filter_loadi
     required_cfm, recommendations, clean_filter_cfm,
     filter_loading_derate_pct: derate, rated_cfm_needed,
     target_negative_wc: negWc > 0 ? negWc : null,
-    makeup_velocity_fpm, makeup_area_needed_ft2,
+    makeup_velocity_fpm, makeup_area_needed_ft2, makeup_discharge_coefficient,
     makeup_opening_ft2: makeup > 0 ? makeup : null, makeup_adequate,
   };
 }
@@ -684,7 +687,7 @@ export function renderStandingWater(inputRegion, outputRegion, citationEl) {
 //        out: { dom_side_effect: dimensionless }
 // (DOM-mount renderer; HTMLElement refs are categorical.)
 export function renderNAMSizing(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: Required CFM = room volume x ACH / 60, by name. Typical NAM unit sizes 500 / 1000 / 2000 CFM (manufacturer technical bulletins). A machine's rated airflow is a CLEAN-FILTER figure and falls as the HEPA loads, so the rated capacity needed is the requirement divided by (1 - the derate). The NEGATIVE PRESSURE is a separate requirement from the air change rate, commonly 0.02 in wc and continuously monitored, and a containment cannot go negative unless makeup air can enter: the opening a flow needs follows the orifice relation, velocity = 4,005 x sqrt(in wc). The applicable standard, the project design, and the licensed contractor govern.";
+  citationEl.textContent = "Citation: Required CFM = room volume x ACH / 60, by name. Typical NAM unit sizes 500 / 1000 / 2000 CFM (manufacturer technical bulletins). A machine's rated airflow is a CLEAN-FILTER figure and falls as the HEPA loads, so the rated capacity needed is the requirement divided by (1 - the derate). The NEGATIVE PRESSURE is a separate requirement from the air change rate, commonly 0.02 in wc and continuously monitored, and a containment cannot go negative unless makeup air can enter: the opening a flow needs follows the orifice relation, Q = Cd x A x 4,005 x sqrt(in wc), with a sharp-edged discharge coefficient Cd of 0.61. The applicable standard, the project design, and the licensed contractor govern.";
   const v = makeNumber("Room volume (ft³)", "nam-v", { step: "any", min: "0" });
   const ach = makeNumber("Target air changes per hour", "nam-ach", { step: "any", min: "0", value: "6" });
   ach.input.value = "6";
@@ -717,7 +720,7 @@ export function renderNAMSizing(inputRegion, outputRegion, citationEl) {
     o1000.textContent = get(1000).units_needed + " unit(s) (" + get(1000).total_cfm + " CFM)";
     o2000.textContent = get(2000).units_needed + " unit(s) (" + get(2000).total_cfm + " CFM)";
     oRated.textContent = r.rated_cfm_needed === null ? "(enter a HEPA loading derate) -- a machine is rated at a CLEAN filter and delivers less as it loads" : fmt(r.rated_cfm_needed, 0) + " CFM rated to still deliver " + fmt(r.required_cfm, 0) + " at a " + fmt(r.filter_loading_derate_pct, 0) + "% derate";
-    oNeg.textContent = r.makeup_area_needed_ft2 === null ? "(enter a negative pressure target) -- pressure is a SEPARATE requirement from the air change rate, and a containment cannot go negative unless air can get in" : fmt(r.makeup_area_needed_ft2, 2) + " ft\u00b2 of opening at " + fmt(r.makeup_velocity_fpm, 0) + " fpm for " + fmt(r.target_negative_wc, 3) + " in wc" + (r.makeup_adequate === null ? "" : r.makeup_adequate ? " -- the entered opening is adequate" : " -- the entered opening is SMALLER than that, so the pressure will overshoot and the flow fall short");
+    oNeg.textContent = r.makeup_area_needed_ft2 === null ? "(enter a negative pressure target) -- pressure is a SEPARATE requirement from the air change rate, and a containment cannot go negative unless air can get in" : fmt(r.makeup_area_needed_ft2, 2) + " ft\u00b2 of opening (Cd 0.61) at " + fmt(r.makeup_velocity_fpm, 0) + " fpm ideal velocity for " + fmt(r.target_negative_wc, 3) + " in wc" + (r.makeup_adequate === null ? "" : r.makeup_adequate ? " -- the entered opening is adequate" : " -- the entered opening is SMALLER than that, so the pressure will overshoot and the flow fall short");
   }, DEBOUNCE_MS);
   for (const el of [v.input, ach.input, derate.input, negwc.input, makeup.input]) el.addEventListener("input", update);
 }
@@ -1477,8 +1480,11 @@ export function computeMoldRemediationLevel({ affected_area_ft2, porous = false,
   else if (area <= 100) level = "Medium isolated area (10-100 ft2)";
   else level = "Large area (> 100 ft2)";
   const full = band === "large" || hvac || (band === "medium" && porousB);
+  // EPA 402-K-01-001 Table 1: under 10 ft2 (no HVAC) needs no containment.
   const containment = full
     ? "full (decontamination chamber + negative air)"
+    : band === "small"
+    ? "none required (EPA 402-K-01-001 Table 1, under 10 ft2)"
     : "limited (poly sheeting + negative air)";
   const ppe_tier = band === "large"
     ? "full-face respirator / PAPR, suit, gloves"
@@ -1489,7 +1495,7 @@ export function computeMoldRemediationLevel({ affected_area_ft2, porous = false,
   const clearance = (band !== "small" || hvac || vuln) ? "recommended" : "optional";
   return {
     band, level, containment, ppe_tier, iep_assess, clearance,
-    note: "Scope guidance keyed to EPA 402-K-01-001, the NYC DOHMH guidelines, and IICRC S520 - not a substitute for an assessment. Sum visible plus reasonably suspected growth; the highest moisture reading and the protocol govern the cut line. Hidden Condition 3 growth can exceed the visible estimate; a vulnerable occupant raises the recommended controls independent of area. HVAC involvement overrides to Level V.",
+    note: "Scope guidance keyed to EPA 402-K-01-001, the NYC DOHMH guidelines, and IICRC S520 - not a substitute for an assessment. Sum visible plus reasonably suspected growth; the highest moisture reading and the protocol govern the cut line. Hidden Condition 3 growth can exceed the visible estimate; a vulnerable occupant raises the recommended controls independent of area. HVAC involvement moves the job to the NYC 2008 HVAC category and forces full containment.",
   };
 }
 

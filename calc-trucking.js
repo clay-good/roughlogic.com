@@ -795,7 +795,7 @@ const renderReeferBurn = _simpleRenderer({
   ],
   outputs: [
     { key: "g", id: "rf-out-g", label: "GPH (corrected)", value: (r) => fmt(r.gph, 2) },
-    { key: "f", id: "rf-out-f", label: "Fuel burned",     value: (r) => fmt(r.fuel_burned, 1) + " gal" },
+    { key: "f", id: "rf-out-f", label: "Fuel burned",     value: (r) => fmt(r.fuel_burned_effective, 1) + " gal" },
     { key: "t", id: "rf-out-t", label: "Run time on tank",value: (r) => fmt(r.run_time_hr, 1) + " hr" },
     { key: "r", id: "rf-out-r", label: "Refuel required", value: (r) => r.refuel_required ? "YES" : "no" },
     { key: "rs", id: "rf-out-rs", label: "Fuel reserve at end of haul", value: (r) => r.reserve_gal === null ? "-" : (r.reserve_gal >= 0 ? fmt(r.reserve_gal, 1) + " gal remaining" : fmt(-r.reserve_gal, 1) + " gal short - refuel mid-haul") },
@@ -927,7 +927,7 @@ export function computeStoppingSightDistance({
 export const stoppingSightDistanceExample = {
   // 55 mph design speed, level (AASHTO t_pr = 2.5 s, a = 11.2 ft/s^2 so f = 0.348)
   // -> 202.1 + 290.3 = 492.4 ft, the Green Book row (rounded up to 495 for design).
-  inputs: { speed_mph: 55, reaction_time_s: 2.5, friction: 0.348, grade: 0 },
+  inputs: { speed_mph: 55, reaction_time_s: 2.5, friction: SSD_AASHTO_F, grade: 0 },
 };
 
 // dims: in { sight_distance_ft: L, reaction_time_s: T, friction: dimensionless, grade: dimensionless } out: { design_speed_mph: L T^-1 }
@@ -974,8 +974,8 @@ export function renderStoppingSightDistance(inputRegion, outputRegion, citationE
   const cond = makeSelect("Pavement condition", "ssd-cond",
     Object.keys(SSD_FRICTION_DEFAULTS).map((k) => ({ value: k, label: SSD_FRICTION_DEFAULTS[k].label, selected: k === "dry" })),
   );
-  const f = makeNumber("Friction coefficient f (set from condition or enter directly)", "ssd-f", { step: "any", value: "0.348" });
-  f.input.value = "0.348";
+  const f = makeNumber("Friction coefficient f (set from condition or enter directly)", "ssd-f", { step: "any", value: String(SSD_AASHTO_F) });
+  f.input.value = String(SSD_AASHTO_F);
   const g = makeNumber("Grade (decimal; + uphill, - downhill)", "ssd-g", { step: "any", value: "0" });
   g.input.value = "0";
   const avail = makeNumber("Available distance to check against (ft; 0 to skip)", "ssd-avail", { step: "any", min: "0", value: "0" });
@@ -991,7 +991,7 @@ export function renderStoppingSightDistance(inputRegion, outputRegion, citationE
   });
 
   attachExampleButton(inputRegion, () => {
-    v.input.value = "55"; tpr.input.value = "2.5"; cond.select.value = "dry"; f.input.value = "0.348"; g.input.value = "0"; update();
+    v.input.value = "55"; tpr.input.value = "2.5"; cond.select.value = "dry"; f.input.value = String(SSD_AASHTO_F); g.input.value = "0"; update();
   });
 
   const oPR = makeOutputLine(outputRegion, "Perception-reaction distance (ft)", "ssd-out-pr");

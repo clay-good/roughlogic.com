@@ -117,8 +117,10 @@ export function computeMoistureDryGoal({ reference_reading, affected_reading, ac
   // tile declares soaked material "at dry standard". Measured 2026-09-10.
   if (ref < 0 || aff < 0) return { error: "Meter readings cannot be negative." };
   const delta = aff - ref;
-  const atDry = delta <= allow;
-  const pointsToGo = Math.max(0, delta - allow);
+  // Float slack: 16.1 - 12.1 is 4.000000000000002, which is AT a 4-point allowance.
+  const slack = 1e-9 * Math.abs(allow);
+  const atDry = delta <= allow + slack;
+  const pointsToGo = atDry ? 0 : delta - allow;
   return {
     delta,
     points_to_go: pointsToGo,

@@ -154,7 +154,10 @@ export function computeSlingAngle({ load_lb = 0, sling_config = "vertical", incl
   const min_required_capacity_lb = tension_per_leg;
   const per_leg_share = load_lb / n_legs;
   const angle_factor = per_leg_share > 0 ? tension_per_leg / per_leg_share : 1;
-  const low_angle_hazard = angle_factor >= 2; // ~30 deg from horizontal or flatter
+  // The hazard is geometric (1/cos of the leg angle from vertical), so a choker's 0.75 derate
+  // does not trip it at 40 deg; float slack catches the exact 30 deg case (1.9999999999999996).
+  const geom_factor = sling_config === "vertical" ? 1 : 1 / Math.cos(theta_rad);
+  const low_angle_hazard = geom_factor >= 2 * (1 - 1e-9); // ~30 deg from horizontal or flatter
   const dd_efficiency = _v27SlingDDEfficiency(Number(dd_ratio) || 0);
   let effective_capacity_lb = null, utilization = null;
   const rated = Number(sling_rated_capacity_lb) || 0;

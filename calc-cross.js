@@ -80,7 +80,7 @@ export const UNITS = {
       psi: { factor: 6894.757293168361 },
       atm: { factor: 101325 },
       in_h2o: { factor: 248.84 },
-      ft_h2o: { factor: 2989.067 },
+      ft_h2o: { factor: 2986.08 },
       mm_hg: { factor: 133.322 },
       in_hg: { factor: 3386.388 },
     },
@@ -1697,7 +1697,7 @@ const renderPulleyMAGen = _simpleRendererG({
   example: pulleyMAExample.inputs,
   fields: [
     { key: "rig", label: "Rig", kind: "select", options: Object.keys(PULLEY_RIGS).map((k) => ({ value: k, label: k })) },
-    { key: "efficiency", label: "Pulley efficiency (0-1)", kind: "number" },
+    { key: "efficiency", label: "Pulley efficiency (0-1)", kind: "number", default: 0.95 },
   ],
   outputs: [
     { key: "t", id: "pm-out-t", label: "Theoretical MA", value: (r) => String(r.theoretical_ma) },
@@ -1764,7 +1764,7 @@ function renderRainwaterCatchmentArea(inputRegion, outputRegion, citationEl) {
 }
 
 function renderTimesheet(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: Standard payroll math; reuses overtime utility logic and IRS standard mileage rate.";
+  citationEl.textContent = "Citation: Standard payroll math: time-and-a-half past 40 hours a week (no double time) and the IRS standard mileage rate.";
   _aeG(inputRegion, () => fillExample(timesheetExample.inputs));
   const list = document.createElement("div"); inputRegion.appendChild(list);
   const rows = [];
@@ -1914,7 +1914,7 @@ export function computeFallProtectionClearance({
   const remaining_clearance_ft = (Number(actual_clearance_ft) || 0) - required_clearance_ft;
   let flag;
   if (actual_clearance_ft <= 0) flag = "(actual clearance not entered)";
-  else if (remaining_clearance_ft >= 0) flag = "PASS (clearance margin)";
+  else if (remaining_clearance_ft >= -1e-9 * required_clearance_ft) flag = "PASS (clearance margin)";
   else flag = "FAIL (negative remaining clearance: contact next lower level)";
   return {
     connector_label: c.description,
@@ -2680,7 +2680,8 @@ export function computeGearCascade({
   const output_torque = tqIn > 0 ? tqIn * overall_ratio * Math.pow(eta, valid.length) : null;
 
   const warnings = [];
-  if (valid.some((s) => s.n_in < 8 || s.n_out < 8)) warnings.push("A tooth count below 8 risks undercut on a standard spur gear; verify the profile or use a corrected tooth.");
+  // A 20-degree full-depth pinion undercuts below 2 / sin^2(20 deg) = 17.1 teeth, so 18 is the first clean count.
+  if (valid.some((s) => s.n_in < 18 || s.n_out < 18)) warnings.push("A tooth count below 18 undercuts a standard 20-degree full-depth spur tooth (2/sin^2 20 deg = 17.1; about 14 is the practical minimum); verify the profile or use a corrected tooth.");
   if (stage_ratios.some((r) => r > 100)) warnings.push("A single-stage ratio above 100:1 is outside the spur-gear range; use a worm or multi-stage train.");
 
   return {
@@ -2758,7 +2759,7 @@ function renderGearCascade(inputRegion, outputRegion, citationEl) {
     oStages.textContent = r.stage_ratios.map((x) => fmt(x, 3) + ":1").join("  ·  ");
     oRpm.textContent = r.output_rpm === null ? "enter input RPM" : fmt(r.output_rpm, 1) + " RPM";
     oTq.textContent = r.output_torque === null ? "enter input torque" : fmt(r.output_torque, 2) + " lb-in";
-    oW.textContent = r.warnings.length ? r.warnings.join(" ") : "Torque uses a per-stage efficiency of " + fmt(r.output_torque === null ? 0.97 : readNum(eta.input), 2) + "; the AGMA quality class governs real losses.";
+    oW.textContent = r.warnings.length ? r.warnings.join(" ") : "Torque uses a per-stage efficiency of " + fmt(readNum(eta.input), 2) + "; the AGMA quality class governs real losses.";
   }, DEBOUNCE_MS);
   for (const s of stageFields) { s.nIn.input.addEventListener("input", update); s.nOut.input.addEventListener("input", update); }
   for (const f of [rpm.input, tq.input, eta.input]) f.addEventListener("input", update);

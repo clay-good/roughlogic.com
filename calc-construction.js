@@ -1361,7 +1361,7 @@ export function renderExcavation(inputRegion, outputRegion, citationEl) {
 
 // dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderMasonryCount(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: count = ceil(wall_area / face_area * 1.05). Face area uses (w + mortar) * (h + mortar).";
+  citationEl.textContent = "Citation: count = ceil(wall_area / face_area) + ceil(that x 5%). Face area uses (w + mortar) * (h + mortar).";
   const a = makeNumber("Wall area (ft²)", "mc-a", { step: "any", min: "0" });
   const u = makeSelect("Unit type", "mc-u", Object.keys(MASONRY_UNIT_FACE_IN).map((k) => ({ value: k, label: k.replace(/_/g, " ") })));
   const m = makeNumber("Mortar joint (in)", "mc-m", { step: "any", min: "0", value: "0.375" });
@@ -2003,6 +2003,7 @@ function _simpleRenderer(spec) {
       const params = {};
       for (const f of spec.fields) {
         if (f.kind === "select") params[f.key] = fields[f.key].select.value;
+        else if (f.blankUndefined && fields[f.key].input.value === "") params[f.key] = undefined;
         else params[f.key] = Number(fields[f.key].input.value) || 0;
       }
       const r = spec.compute(params);
@@ -2093,9 +2094,9 @@ const renderAsphaltPavingSpeed = _simpleRenderer({
     { key: "speed_fpm", label: "Paver forward speed (ft/min)", kind: "number", attrs: { step: "any", min: "0" } },
     { key: "width_ft", label: "Mat / screed width (ft)", kind: "number", attrs: { step: "any", min: "0" } },
     { key: "depth_in", label: "Compacted mat thickness (in)", kind: "number", attrs: { step: "any", min: "0" } },
-    { key: "density_pcf", label: "Compacted HMA density (pcf)", kind: "number" },
-    { key: "eff_min_per_hr", label: "Working minutes per hour", kind: "number" },
-    { key: "hours_per_day", label: "Productive hours per day", kind: "number" },
+    { key: "density_pcf", label: "Compacted HMA density (pcf)", kind: "number", default: 145 },
+    { key: "eff_min_per_hr", label: "Working minutes per hour", kind: "number", default: 50 },
+    { key: "hours_per_day", label: "Productive hours per day", kind: "number", default: 8 },
   ],
   outputs: [
     { key: "tph", id: "aps-out-tph", label: "Production", value: (r) => _fmtC(r.tons_per_hour, 1) + " tons/hr" },
@@ -2220,7 +2221,7 @@ const renderBendAllowance = _simpleRenderer({
     { key: "thickness_in", label: "Thickness (in)", kind: "number" },
     { key: "bend_angle_deg", label: "Bend angle (deg)", kind: "number" },
     { key: "inside_radius_in", label: "Inside radius (in)", kind: "number" },
-    { key: "k_factor", label: "K-factor", kind: "number" },
+    { key: "k_factor", label: "K-factor", kind: "number", default: 0.44 },
     { key: "leg_a_in", label: "Leg A (in)", kind: "number" },
     { key: "leg_b_in", label: "Leg B (in)", kind: "number" },
   ],
@@ -2239,7 +2240,7 @@ const renderSpeedsAndFeeds = _simpleRenderer({
     { key: "tool", label: "Tool", kind: "select", options: [{ value: "drill", label: "Drill" }, { value: "end_mill", label: "End mill" }, { value: "lathe", label: "Lathe" }] },
     { key: "material", label: "Material", kind: "select", options: ["steel", "stainless", "aluminum", "brass", "hardwood", "softwood", "plastic"].map((v) => ({ value: v, label: v })) },
     { key: "diameter_in", label: "Diameter (in)", kind: "number" },
-    { key: "flutes", label: "Flutes (blank: 2 for a drill or end mill, 1 for a lathe tool)", kind: "number", default: 2 },
+    { key: "flutes", label: "Flutes (blank: 2 for a drill or end mill, 1 for a lathe tool)", kind: "number", blankUndefined: true },
   ],
   outputs: [
     { key: "rpm", id: "sf-out-rpm", label: "RPM", value: (r) => _fmtC(r.rpm, 0) },
@@ -2381,10 +2382,12 @@ export function computeStairStringerV7({
   const theta = Math.atan2(total_rise_in, total_run_in);
   const throat_in = stringer_thickness_in * Math.cos(theta) - exact_rise_in * Math.sin(theta);
   const rise_pass = exact_rise_in <= code_max_rise_in + 1e-9 * Math.abs(code_max_rise_in);
-  const tread_pass = target_tread_in + Math.max(0, nosing_in) >= code_min_tread_in - 1e-9 * Math.abs(code_min_tread_in);
+  // IRC R311.7.5.2 measures tread depth nosing to nosing (the unit run); the nosing projection does not add to it.
+  const tread_pass = target_tread_in >= code_min_tread_in - 1e-9 * Math.abs(code_min_tread_in);
   return {
     riser_count, exact_rise_in,
     tread_depth_in: target_tread_in, tread_count,
+    tread_board_depth_in: target_tread_in + Math.max(0, nosing_in),
     total_run_in, stringer_length_in,
     angle_deg: theta * 180 / Math.PI,
     throat_in, rise_pass, tread_pass,
@@ -3882,10 +3885,11 @@ export function computeBeamReactions({ span_ft = 0, w_plf = 0, point_lb = 0, a_f
   // Max moment: UDL at midspan + point-load contribution (approx superposition at the load point for the combined case; report the larger of midspan and load-point moment)
   // Bending moment at distance x: M(x) = R_left*x - w*x^2/2 - (x>a ? P*(x-a) : 0)
   const Mtot = (x) => (rLeft) * x - w * x * x / 2 - (x > a && P > 0 ? P * (x - a) : 0);
+  // The maximum sits at a zero-shear point: the load point, R_left/w left of it,
+  // or (R_left - P)/w right of it. Every candidate is a real M(x), so the largest is the maximum.
   let mMax = 0;
-  const xc = rLeft / w; // location of zero shear for UDL-dominant
-  const candidates = [a, Number.isFinite(xc) && xc > 0 && xc < L ? xc : L / 2, L / 2];
-  for (const x of candidates) { if (x >= 0 && x <= L) mMax = Math.max(mMax, Mtot(x)); }
+  const candidates = [a, L / 2, rLeft / w, (rLeft - P) / w];
+  for (const x of candidates) { if (Number.isFinite(x) && x >= 0 && x <= L) mMax = Math.max(mMax, Mtot(x)); }
   return {
     r_left_lb: Number.isFinite(rLeft) ? rLeft : null,
     r_right_lb: Number.isFinite(rRight) ? rRight : null,
@@ -8230,7 +8234,7 @@ const _v814renderConcretePourRate = _simpleRenderer({
     { key: "placement_rate_cyhr", label: "Crew placement rate (cy/hr)", kind: "number" },
     { key: "form_plan_area_ft2", label: "Form plan footprint (ft², wall = length x thickness)", kind: "number" },
     { key: "total_volume_cy", label: "Total pour volume (cy)", kind: "number" },
-    { key: "truck_load_cy", label: "Ready-mix truck load (cy)", kind: "number" },
+    { key: "truck_load_cy", label: "Ready-mix truck load (cy)", kind: "number", default: 10 },
   ],
   outputs: [
     { key: "ror", id: "cpr-out-ror", label: "Rate of rise", value: (r) => _fmtC(r.rate_of_rise_ft_hr, 2) + " ft/hr" },

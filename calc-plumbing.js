@@ -343,13 +343,13 @@ export const slopeExample = {
 // dims: in { value: M L^-1 T^-2, from: dimensionless, to: dimensionless } out: { value: M L^-1 T^-2 }
 export function pressureConvert({ value, from, to }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
-  // Convert all to Pa first.
+  // Convert all to Pa first. Both water columns are at 60 F: ft_h2o = 12 x in_h2o.
   const toPa = {
     psi: 6894.757293168361,
     kPa: 1000,
     bar: 100000,
     in_h2o: 248.84,
-    ft_h2o: 2989.067,
+    ft_h2o: 2986.08,
     Pa: 1,
     atm: 101325,
   };

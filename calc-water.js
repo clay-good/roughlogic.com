@@ -409,7 +409,7 @@ const renderFilterLoading = _r({
   fields: [
     { key: "filter_area_ft2",       label: "Filter area (ft²)", kind: "number" },
     { key: "flow_gpm",              label: "Flow (GPM)", kind: "number" },
-    { key: "backwash_rate_gpm_ft2", label: "Backwash rate (gpm/ft²)", kind: "number" },
+    { key: "backwash_rate_gpm_ft2", label: "Backwash rate (gpm/ft²)", kind: "number", default: 15 },
   ],
   outputs: [
     { key: "l", id: "fl-out-l", label: "Loading rate", value: (r) => fmt(r.loading_gpm_per_ft2, 2) + " gpm/ft^2" },

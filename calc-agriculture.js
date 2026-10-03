@@ -300,7 +300,7 @@ export const COMPACTION_THRESHOLDS_PCC = {
   sand: 1.80, sandy_loam: 1.80, loam: 1.80, silt_loam: 1.75, clay_loam: 1.75, silty_clay_loam: 1.65, clay: 1.47,
 };
 export const ROOT_GROWTH_AFFECTED_PCC = {
-  sand: 1.63, sandy_loam: 1.63, loam: 1.63, silt_loam: 1.60, clay_loam: 1.60, silty_clay_loam: 1.55, clay: 1.39,
+  sand: 1.69, sandy_loam: 1.63, loam: 1.63, silt_loam: 1.60, clay_loam: 1.60, silty_clay_loam: 1.55, clay: 1.39,
 };
 
 // dims: in { dry_mass_g: M, core_volume_cc: L^3, particle_density_pcc: M L^-3, texture: dimensionless }
@@ -2014,7 +2014,7 @@ function renderLivestockWaterRequirement(inputRegion, outputRegion, citationEl) 
   const th = makeNumber("High breakpoint temp (°F)", "lwr-th", { step: "any", value: "90" }); th.input.value = "90";
   const gh = makeNumber("Gallons/head at high temp", "lwr-gh", { step: "any", min: "0", value: "20" }); gh.input.value = "20";
   const dmi = makeNumber("Dry-matter intake (lb, intake method)", "lwr-dmi", { step: "any", min: "0" });
-  const ratio = makeNumber("Water per lb DMI (gal-lb basis)", "lwr-ratio", { step: "any", min: "0", value: "3.5" }); ratio.input.value = "3.5";
+  const ratio = makeNumber("Water per lb DMI (lb water per lb dry matter; 3.5 typical)", "lwr-ratio", { step: "any", min: "0", value: "3.5" }); ratio.input.value = "3.5";
   const lact = makeCheckbox("Lactating (doubles demand)", "lwr-lact");
   for (const f of [method, head, temp, tl, gl, th, gh, dmi, ratio, lact]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { method.select.value = "table"; head.input.value = "50"; temp.input.value = "80"; tl.input.value = "40"; gl.input.value = "8"; th.input.value = "90"; gh.input.value = "20"; lact.input.checked = false; update(); });
@@ -2690,7 +2690,8 @@ function renderLivestockDryMatterIntake(inputRegion, outputRegion, citationEl) {
   const BW = makeNumber("Body weight (lb)", "ldm-bw", { step: "any", min: "0" });
   const intake = makeNumber("Dry-matter intake (% of body weight)", "ldm-in", { step: "any", min: "0" });
   const dm = makeNumber("Feed dry matter (%; 88 hay, 35 silage)", "ldm-dm", { step: "any", min: "0", max: "100" });
-  const head = makeNumber("Number of animals", "ldm-head", { step: "1", min: "0" });
+  const head = makeNumber("Number of animals", "ldm-head", { step: "1", min: "0", value: "1" });
+  head.input.value = "1";
   for (const f of [BW, intake, dm, head]) inputRegion.appendChild(f.wrap);
   const oDMI = makeOutputLine(outputRegion, "Dry-matter intake", "ldm-out-dmi");
   const oAF = makeOutputLine(outputRegion, "As-fed intake", "ldm-out-af");

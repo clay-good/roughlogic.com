@@ -578,6 +578,8 @@ const renderSolar = _r({
     { key: "sr", id: "ss-out-sr", label: "Sunrise",          value: (r) => r.sunrise || "n/a" },
     { key: "ss", id: "ss-out-ss", label: "Sunset",           value: (r) => r.sunset || "n/a" },
     { key: "cd", id: "ss-out-cd", label: "Civil dawn / dusk",value: (r) => (r.civil_dawn || "-") + " / " + (r.civil_dusk || "-") },
+    { key: "nd", id: "ss-out-nd", label: "Nautical dawn / dusk", value: (r) => (r.nautical_dawn || "-") + " / " + (r.nautical_dusk || "-") },
+    { key: "ad", id: "ss-out-ad", label: "Astronomical dawn / dusk", value: (r) => (r.astro_dawn || "-") + " / " + (r.astro_dusk || "-") },
     { key: "dl", id: "ss-out-dl", label: "Daylight",         value: (r) => r.daylight_minutes === null ? "n/a" : fmt(r.daylight_minutes, 0) + " min" },
     { key: "de", id: "ss-out-de", label: "Declination",      value: (r) => fmt(r.declination_deg, 2) + " deg" },
   ],

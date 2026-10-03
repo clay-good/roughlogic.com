@@ -222,7 +222,8 @@ export function computeSuperheatSubcool({ refrigerant, system_pressure_psig, lin
     const iwb = Number(indoor_wet_bulb_F) || 0, odb = Number(outdoor_dry_bulb_F) || 0;
     let dead = Number(deadband_F); if (!Number.isFinite(dead) || dead < 0) dead = 5;
     if (iwb > 0 && Number.isFinite(iwb) && Number.isFinite(odb)) {
-      const tgt = (3 * iwb - 80 - odb) / 2;
+      // Clamped to [5, 30] F, the same band refrigerant-pt applies, so the two agree.
+      const tgt = Math.max(5, Math.min(30, (3 * iwb - 80 - odb) / 2));
       if (Number.isFinite(tgt)) {
         target_superheat_F = tgt;
         if (Number.isFinite(value)) {

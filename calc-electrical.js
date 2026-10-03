@@ -1085,7 +1085,7 @@ export const NEMA_HP_DERATE_TABLE = [
   { imbalance_pct: 2.0, hp_derate_pct: 5,  note: "2% imbalance → ~5% HP derate" },
   { imbalance_pct: 3.0, hp_derate_pct: 12, note: "3% imbalance → ~12% HP derate" },
   { imbalance_pct: 4.0, hp_derate_pct: 18, note: "4% imbalance → ~18% HP derate" },
-  { imbalance_pct: 5.0, hp_derate_pct: 25, note: "5% imbalance → ~25% HP derate (NEMA MG-1: do NOT operate)" },
+  { imbalance_pct: 5.0, hp_derate_pct: 25, note: "5% imbalance → ~25% HP derate (the limit; NEMA MG-1: do not operate above it)" },
 ];
 
 // dims: in { V_a: M L^2 T^-3 I^-1, V_b: M L^2 T^-3 I^-1, V_c: M L^2 T^-3 I^-1 } out: { imbalance_percent: dimensionless, derate: dimensionless }
@@ -1310,7 +1310,7 @@ export function renderGeneratorSize(inputRegion, outputRegion, citationEl, param
 
 // dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderVoltageImbalance(inputRegion, outputRegion, citationEl, params) {
-  citationEl.textContent = "Citation: Percent imbalance = max(|V_i - V_avg|) / V_avg * 100 (NEMA MG-1 §14.36). Motor derate factor = 1 - (NEMA HP-derate %)/100 from the MG-1 derating table (~2% derate at 1% imbalance, 25% / do NOT operate at 5%).";
+  citationEl.textContent = "Citation: Percent imbalance = max(|V_i - V_avg|) / V_avg * 100 (NEMA MG-1 §14.36). Motor derate factor = 1 - (NEMA HP-derate %)/100 from the MG-1 derating table (~2% derate at 1% imbalance, 25% at 5%, the limit; do NOT operate above it).";
   attachExampleButton(inputRegion, () => fillExample(voltageImbalanceExample.inputs));
 
   const a = makeNumber("Line A voltage (V)", "vi-a", { step: "any", min: "0" });
@@ -1336,7 +1336,7 @@ export function renderVoltageImbalance(inputRegion, outputRegion, citationEl, pa
     oImb.textContent = fmt(r.imbalance_percent, 3) + " %";
     oDer.textContent = fmt(r.derate_factor, 4);
     const nemaPct = fmt(r.nema_hp_derate_pct, 1);
-    const nemaWarn = r.imbalance_percent >= 5 ? " - NEMA MG-1: do NOT operate" : "";
+    const nemaWarn = r.imbalance_percent > 5 + 1e-9 ? " - NEMA MG-1: do NOT operate" : "";
     oNema.textContent = nemaPct + " %" + nemaWarn;
   }, DEBOUNCE_MS);
 
@@ -1895,7 +1895,7 @@ function renderPFCorrection(inputRegion, outputRegion, citationEl, params) {
 }
 
 function renderPhaseBalance(inputRegion, outputRegion, citationEl, params) {
-  citationEl.textContent = "Citation: Imbalance percent = (max - min) / average * 100. Greedy swap rebalances by moving the smallest fitting circuit from heaviest to lightest phase.";
+  citationEl.textContent = "Citation: Imbalance percent = (max - min) / average * 100. Greedy swap rebalances by moving the largest circuit that fits under half the gap from the heaviest to the lightest phase.";
   attachExampleButton(inputRegion, () => fillExample(phaseBalanceExample.inputs));
 
   const list = document.createElement("div");
@@ -1943,7 +1943,7 @@ function renderPhaseBalance(inputRegion, outputRegion, citationEl, params) {
     update();
   }
   const update = debounce(() => {
-    const circuits = rows.map((r) => ({ phase: r.ph.value, load_W: Number(r.ld.value) || 0 })).filter((c) => c.load_W > 0);
+    const circuits = rows.map((r, i) => ({ phase: r.ph.value, load_W: Number(r.ld.value) || 0, row: i + 1 })).filter((c) => c.load_W > 0);
     if (circuits.length === 0) {
       oTot.textContent = "-"; oImb.textContent = "-"; oFinal.textContent = "-"; oSwaps.textContent = "-";
       return;
@@ -1953,7 +1953,7 @@ function renderPhaseBalance(inputRegion, outputRegion, citationEl, params) {
     oTot.textContent = fmt(r.totals.A, 0) + " / " + fmt(r.totals.B, 0) + " / " + fmt(r.totals.C, 0) + " W";
     oImb.textContent = fmt(r.imbalance_percent, 2) + " %";
     oFinal.textContent = fmt(r.final_imbalance_percent, 2) + " %";
-    oSwaps.textContent = r.swaps.length === 0 ? "none" : r.swaps.map((s) => "circuit " + s.circuit + " " + s.from + "->" + s.to).join("; ");
+    oSwaps.textContent = r.swaps.length === 0 ? "none" : r.swaps.map((s) => "circuit " + circuits[s.circuit].row + " " + s.from + "->" + s.to).join("; ");
   }, DEBOUNCE_MS);
 }
 
@@ -2098,6 +2098,8 @@ function renderPoEBudget(inputRegion, outputRegion, citationEl, params) {
 // primary and secondary FLA = kVA * 1000 / (V * sqrt(phases)).
 
 export const TRANSFORMER_KVA_STEPS = [15, 30, 45, 75, 112.5, 150, 225, 300, 500, 750, 1000];
+// ANSI C57 single-phase ladder; a single-phase job is not sized on the three-phase steps.
+export const TRANSFORMER_KVA_STEPS_1PH = [10, 15, 25, 37.5, 50, 75, 100, 167, 250, 333, 500];
 
 // dims: in { loads: dimensionless, primary_V: M L^2 T^-3 I^-1, secondary_V: M L^2 T^-3 I^-1, phase: dimensionless, growth_reserve_pct: dimensionless } out: { kva: M L^2 T^-3, recommended_kva: M L^2 T^-3 }
 export function computeTransformerKvaSizing({
@@ -2129,9 +2131,10 @@ export function computeTransformerKvaSizing({
   // "recommended 1,000 kW", a 7.5x undersize presented as a recommendation. Keep returning
   // the largest step (so the tile still shows the ceiling) but FLAG it, the way
   // computeTransformerSize already does with at_cap.
-  const _tk_max = TRANSFORMER_KVA_STEPS[TRANSFORMER_KVA_STEPS.length - 1];
+  const _tk_steps = phase === "three" ? TRANSFORMER_KVA_STEPS : TRANSFORMER_KVA_STEPS_1PH;
+  const _tk_max = _tk_steps[_tk_steps.length - 1];
   const exceeds_standard = required_kVA > _tk_max + 1e-9 * Math.abs(_tk_max);
-  const recommended_kVA = TRANSFORMER_KVA_STEPS.find((s) => s >= required_kVA) ?? _tk_max;
+  const recommended_kVA = _tk_steps.find((s) => s >= required_kVA) ?? _tk_max;
   const fla_primary_A = (recommended_kVA * 1000) / (primary_V * sqrt_phases);
   const fla_secondary_A = (recommended_kVA * 1000) / (secondary_V * sqrt_phases);
   return { connected_kVA, required_kVA, recommended_kVA, fla_primary_A, fla_secondary_A, exceeds_standard };
@@ -2721,7 +2724,7 @@ function _v8e_renderPanelRebalance(inputRegion, outputRegion, citationEl) {
     oA.textContent = _v8e_fmt(a, 1) + " A";
     oB.textContent = _v8e_fmt(b, 1) + " A";
     oC.textContent = _v8e_fmt(c, 1) + " A";
-    oI.textContent = _v8e_fmt(imb, 2) + " % (NEMA MG-1 caution > 1%)";
+    oI.textContent = _v8e_fmt(imb, 2) + " % (max-min spread of load current; a spread above 5% triggers a rebalance suggestion)";
     if (imb <= 5) {
       oS.textContent = "balanced (≤ 5 %); no swap suggested";
     } else {
@@ -3456,7 +3459,7 @@ export function computePowerTriangle({
     pf: out_pf,
     angle_deg: out_angle,
     sign,
-    kvar_label: (sign === "leading" ? "+" : "-") + fmt(out_kvar, 2) + " kVAR (" + sign + ")",
+    kvar_label: (sign === "leading" ? "-" : "+") + fmt(out_kvar, 2) + " kVAR (" + sign + ")",
   };
 }
 

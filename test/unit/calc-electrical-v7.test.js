@@ -36,9 +36,11 @@ test("234 watts + pf converts to kVA correctly", () => {
 
 test("234 single-phase uses √1 instead of √3", () => {
   const r = computeTransformerKvaSizing({ loads: [{ kVA: 25 }], primary_V: 240, secondary_V: 120, phase: "single", growth_reserve_pct: 0 });
-  // Recommended is the next step up from 25, which is 30 kVA. FLA = 30000/120 = 250 A
-  assert.equal(r.recommended_kVA, 30);
-  assert.ok(close(r.fla_secondary_A, 30000 / 120, 0.5));
+  // Single-phase sizes on the ANSI C57 single-phase ladder, where 25 kVA is a step. FLA = 25000/120 = 208.3 A
+  assert.equal(r.recommended_kVA, 25);
+  assert.ok(close(r.fla_secondary_A, 25000 / 120, 0.5));
+  const r20 = computeTransformerKvaSizing({ loads: [{ kVA: 20 }], primary_V: 240, secondary_V: 120, phase: "single", growth_reserve_pct: 0 });
+  assert.equal(r20.recommended_kVA, 25, "20 kVA single-phase rounds to 25, not the three-phase 30");
 });
 
 test("234 25% reserve picks the next step up", () => {

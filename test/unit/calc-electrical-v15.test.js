@@ -232,11 +232,11 @@ test("power-triangle: kVA + angle solves both legs", () => {
   assert.ok(Math.abs(r.kvar - 75) < 1e-6);
 });
 
-test("power-triangle: leading vs lagging is reflected in the label", () => {
+test("power-triangle: leading vs lagging is reflected in the label (IEEE 1459: inductive Q positive)", () => {
   const lag = computePowerTriangle({ kw: 100, pf: 0.8, sign: "lagging" });
   const lead = computePowerTriangle({ kw: 100, pf: 0.8, sign: "leading" });
-  assert.ok(lag.kvar_label.includes("lagging") && lag.kvar_label.startsWith("-"));
-  assert.ok(lead.kvar_label.includes("leading") && lead.kvar_label.startsWith("+"));
+  assert.ok(lag.kvar_label.includes("lagging") && lag.kvar_label.startsWith("+"));
+  assert.ok(lead.kvar_label.includes("leading") && lead.kvar_label.startsWith("-"));
 });
 
 test("power-triangle: PF and angle alone (shape only) is rejected", () => {

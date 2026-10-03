@@ -1674,7 +1674,8 @@ export function computeNPSHa({
   const H_static = source_elevation_relative_ft;
   const npsha = H_atm - H_vapor + H_static - friction_loss_ft;
   let cavitation = null;
-  if (npsh_required_ft !== null) cavitation = npsha < npsh_required_ft;
+  // NPSHr is where head has already fallen 3%, so NPSHa equal to it is cavitating, not ok.
+  if (npsh_required_ft !== null) cavitation = npsha <= npsh_required_ft;
   // spec-v1568 (CUT, its material landed here): the margin itself, the
   // friction the arrangement tolerates before the margin is gone, and the
   // static height a target margin needs. On SATURATED liquid -- hot condensate
@@ -1734,7 +1735,7 @@ function renderAffinityLaws(inputRegion, outputRegion, citationEl) {
 }
 
 function renderBeltAndPulley(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: Public V-belt length L = 2C + (pi/2)(D + d) + (D - d)^2 / (4C). Driven RPM via diameter ratio. Belt speed = pi * D / 12 * RPM.";
+  citationEl.textContent = "Citation: Public V-belt length L = 2C + (pi/2)(D + d) + (D - d)^2 / (4C). Driven RPM via diameter ratio. Belt speed = pi * D_drive / 12 * motor RPM.";
   attachExampleButton(inputRegion, () => fillExample(beltAndPulleyExample.inputs));
   const dr = makeNumber("Drive pulley diameter (in)", "bp-dr", { step: "any", min: "0" });
   const dn = makeNumber("Driven pulley diameter (in)", "bp-dn", { step: "any", min: "0" });
@@ -3046,13 +3047,14 @@ export function computeFanMotorBhp({ cfm = 0, tsp_inwc = 0, eta_fan = 0.65, eta_
   const ed = Number(eta_drive) || 0;
   if (!(CFM > 0 && Number.isFinite(CFM))) return { error: "Airflow must be positive (CFM)." };
   if (!(TSP > 0 && Number.isFinite(TSP))) return { error: "Total static pressure must be positive (in. w.c.)." };
-  if (!(ef > 0 && ef <= 1)) return { error: "Fan total efficiency must be in (0, 1]." };
+  if (!(ef > 0 && ef <= 1)) return { error: "Fan static efficiency must be in (0, 1]." };
   if (!(ed > 0 && ed <= 1)) return { error: "Drive/belt efficiency must be in (0, 1]." };
   const ahp = CFM * TSP / 6356;
   const bhp = ahp / ef;
   const motorHp = bhp / ed;
   let nextHp = NEMA_HP_SIZES.find((s) => s >= motorHp);
-  if (nextHp === undefined) nextHp = NEMA_HP_SIZES[NEMA_HP_SIZES.length - 1];
+  // Above the largest listed size there is no standard size to round to; report none rather than 300 hp.
+  if (nextHp === undefined) nextHp = null;
   return {
     ahp: Number.isFinite(ahp) ? ahp : null,
     bhp: Number.isFinite(bhp) ? bhp : null,
@@ -3067,7 +3069,7 @@ function renderFanMotorBhp(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: AMCA / ASHRAE fan-power relation BHP = (CFM * SP) / (6356 * eta) (public); standard motor HP sizes per NEMA MG 1, by name. Estimate; fan curve and motor data govern. TSP must be total (external + internal). Free principles in published HVAC texts.";
   const cfm = makeNumber("Airflow (CFM)", "fmb-cfm", { step: "any", min: "0" });
   const tsp = makeNumber("Total static pressure (in. w.c.)", "fmb-tsp", { step: "any", min: "0" });
-  const ef = makeNumber("Fan total efficiency (0-1)", "fmb-ef", { step: "any", min: "0", max: "1" });
+  const ef = makeNumber("Fan static efficiency (0-1)", "fmb-ef", { step: "any", min: "0", max: "1" });
   const ed = makeNumber("Drive/belt efficiency (0-1)", "fmb-ed", { step: "any", min: "0", max: "1" });
   for (const f of [cfm, tsp, ef, ed]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { cfm.input.value = "4000"; tsp.input.value = "2.0"; ef.input.value = "0.65"; ed.input.value = "1"; update(); });
@@ -3080,7 +3082,7 @@ function renderFanMotorBhp(inputRegion, outputRegion, citationEl) {
     if (r.error) { oA.textContent = r.error; oB.textContent = ""; oN.textContent = ""; return; }
     oA.textContent = fmt(r.ahp, 3) + " HP";
     oB.textContent = fmt(r.bhp, 3) + " BHP";
-    oN.textContent = r.next_nema_hp + " HP (NEMA MG 1)";
+    oN.textContent = r.next_nema_hp === null ? "over 300 hp: no standard size listed" : r.next_nema_hp + " HP (NEMA MG 1)";
   }, DEBOUNCE_MS);
   for (const f of [cfm.input, tsp.input, ef.input, ed.input]) f.addEventListener("input", update);
 }
@@ -3097,7 +3099,7 @@ export function computeFanMotorMaxAirflow({ power_hp = 0, power_basis = "motor",
   if (!(power > 0)) return { error: "Power must be positive (hp)." };
   if (basis !== "brake" && basis !== "motor") return { error: "Power basis must be brake or motor." };
   if (!(TSP > 0)) return { error: "Total static pressure must be positive (in. w.c.)." };
-  if (!(ef > 0 && ef <= 1)) return { error: "Fan total efficiency must be in (0, 1]." };
+  if (!(ef > 0 && ef <= 1)) return { error: "Fan static efficiency must be in (0, 1]." };
   if (!(ed > 0 && ed <= 1)) return { error: "Drive/belt efficiency must be in (0, 1]." };
   // Inverse of bhp = (CFM x TSP / 6356) / eta_fan and motor_hp = bhp / eta_drive:
   // brake hp -> bhp = power; motor (nameplate) hp -> bhp = power x eta_drive.
@@ -3116,7 +3118,7 @@ function renderFanMotorMaxAirflow(inputRegion, outputRegion, citationEl) {
   const power = makeNumber("Motor / brake power (hp)", "fma-p", { step: "any", min: "0" });
   const basis = makeSelect("Power basis", "fma-basis", [{ value: "motor", label: "Motor (nameplate) HP", selected: true }, { value: "brake", label: "Brake HP" }]);
   const tsp = makeNumber("Total static pressure (in. w.c.)", "fma-tsp", { step: "any", min: "0" });
-  const ef = makeNumber("Fan total efficiency (0-1)", "fma-ef", { step: "any", min: "0", max: "1" });
+  const ef = makeNumber("Fan static efficiency (0-1)", "fma-ef", { step: "any", min: "0", max: "1" });
   const ed = makeNumber("Drive/belt efficiency (0-1)", "fma-ed", { step: "any", min: "0", max: "1" });
   for (const f of [power, basis, tsp, ef, ed]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { power.input.value = "1.936"; basis.select.value = "brake"; tsp.input.value = "2.0"; ef.input.value = "0.65"; ed.input.value = "1"; update(); });

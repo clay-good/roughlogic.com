@@ -104,7 +104,7 @@ export function computeChemicalFeedPump({ flow_mgd = 0, dose_mgl = 0, strength_p
       + "Percent-by-weight differs from trade strength (12.5% trade NaOCl is ~10.8% by weight). Calibrate against a drawdown cylinder, not the dial.",
   };
 }
-export const chemicalFeedPumpExample = { inputs: { flow_mgd: 0.5, dose_mgl: 8, strength_pct: 12.5, sg: 1.16, pump_max_gpd: 50 } };
+export const chemicalFeedPumpExample = { inputs: { flow_mgd: 0.5, dose_mgl: 8, strength_pct: 10.78, sg: 1.16, pump_max_gpd: 50 } };
 
 function renderChemicalFeedPump(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Pounds-formula basis (lb/day = MGD x mg/L x 8.34), standard AWWA / EPA water-operator practice, by name. Distinct from the coagulant-dose and pounds-formula tiles - this solves for the physical pump setting (% / GPD / mL per min). The operator of record and primacy agency govern.";
@@ -114,7 +114,7 @@ function renderChemicalFeedPump(inputRegion, outputRegion, citationEl) {
   const sg = makeNumber("Solution specific gravity", "cfp-sg", { step: "any", min: "0" });
   const pump = makeNumber("Pump max output (GPD)", "cfp-pump", { step: "any", min: "0" });
   for (const f of [flow, dose, strength, sg, pump]) inputRegion.appendChild(f.wrap);
-  attachExampleButton(inputRegion, () => { flow.input.value = "0.5"; dose.input.value = "8"; strength.input.value = "12.5"; sg.input.value = "1.16"; pump.input.value = "50"; update(); });
+  attachExampleButton(inputRegion, () => { flow.input.value = "0.5"; dose.input.value = "8"; strength.input.value = "10.78"; sg.input.value = "1.16"; pump.input.value = "50"; update(); });
   const oFeed = makeOutputLine(outputRegion, "Solution feed", "cfp-out-feed");
   const oSet = makeOutputLine(outputRegion, "Pump setting", "cfp-out-set");
   const oNote = makeOutputLine(outputRegion, "Note", "cfp-out-note");

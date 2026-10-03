@@ -6013,7 +6013,7 @@
   {
    "tile_id": "cable-bend-radius",
    "source_publisher": "Southwire",
-   "source_title": "Cable Bend Radius (single conductor, no shield) = 8 x cable OD",
+   "source_title": "Cable Bend Radius (single conductor, no shield, 1000 V and below) = 4 x cable OD up to 1 in OD",
    "source_edition_or_year": "Southwire Power Cable Manual / technical bulletin",
    "source_section_or_page": "Single-conductor THHN, 1000 V and below: 4D up to 1.0 in OD (Southwire bend radius table); 0.5 in OD -> 2 in minimum inside bend radius",
    "verified_by": "rl",
@@ -9884,7 +9884,7 @@
   {
    "tile_id": "time-alignment",
    "source_publisher": "Project (first-principles) over Haas precedence-effect threshold",
-   "source_title": "Speed of sound c = 331.3 + 0.606 * T_C m/s; delay_ms = (d_delay - d_main) * 304.8 / c - haas_offset_ms",
+   "source_title": "Speed of sound c = 331.3 + 0.606 * T_C m/s; delay_ms = (d_main - d_delay) * 0.3048 / c * 1000 + haas_offset_ms",
    "source_edition_or_year": "n/a; ISO/AES standard speed-of-sound formula; Haas window 5-30 ms",
    "source_section_or_page": "Main 80 ft, delay 30 ft, 50 ft difference at 22 C (344.632 m/s = 1130.7 ft/s) = 44.22 ms; + 15 ms Haas offset = 59.22 ms",
    "verified_by": "rl",
@@ -12590,7 +12590,7 @@
   {
    "tile_id": "pan-conversion",
    "source_publisher": "ServSafe / hotel-pan capacity tables (project bundled)",
-   "source_title": "Pan-fill conversion: total_qt = portion_oz * servings / 32; capacity_qt = pan_size * (depth_in / 4); pans = ceil(total / capacity)",
+   "source_title": "Pan-fill conversion: total_qt = portion_oz * servings / 32; capacity_qt = tabulated steam-table pan capacity by size and depth; pans = ceil(total / capacity)",
    "source_edition_or_year": "Standard NSF hotel-pan dimensions (full pan @ 4 in -> ~13.5 qt)",
    "source_section_or_page": "120 servings * 6 oz / full pan @ 4 in -> 22.5 qt total / 13.5 qt capacity / 2 pans / 72 servings/pan + cooling warning",
    "verified_by": "rl",
@@ -12756,7 +12756,7 @@
   {
    "tile_id": "mold",
    "source_publisher": "EPA / IICRC S520-2024 mold-risk practice",
-   "source_title": "Mold-risk classifier: high if RH > 70 or sustained > 60 with elevated hours",
+   "source_title": "Mold-risk classifier: high if RH >= 70 for >= 24 h; moderate if RH >= 60 for >= 48 h",
    "source_edition_or_year": "EPA / IICRC bundled thresholds (60% growth threshold, 70% high; 24 hr typical germination)",
    "source_section_or_page": "80% RH / 75 F / 60 hr elevated -> high risk; exercises the string-equality path on the risk enum",
    "verified_by": "rl",
@@ -14285,7 +14285,7 @@
   {
    "tile_id": "pump-eff-w2w",
    "source_publisher": "Hydraulic Institute pump-efficiency identity",
-   "source_title": "WHP = Q*H*SG/3960; BHP from input kW; wire-to-water_pct = 100 * WHP / BHP",
+   "source_title": "WHP = Q*H*SG/3960; BHP from input kW; wire-to-water_pct = 100 * WHP / motor input HP",
    "source_edition_or_year": "Hydraulic Institute Standards (degraded < 50%, ok 50-65%, good > 65%)",
    "source_section_or_page": "500 gpm / 120 ft TDH / 25 kW / 0.92 motor eff -> WHP 15.15, BHP 30.84, 45.19% wire-to-water (degraded)",
    "verified_by": "rl",
@@ -22866,25 +22866,25 @@
    "source_publisher": "Pounds formula (AWWA / EPA water-operator practice)",
    "source_title": "GPD = MGD*dose*8.34/(strength/100)/(8.34*SG)",
    "source_edition_or_year": "8.34 lb/gal",
-   "source_section_or_page": "0.5 MGD, 8 mg/L, 12.5% NaOCl, SG 1.16, 50 GPD pump -> ~55% of max",
+   "source_section_or_page": "0.5 MGD, 8 mg/L, 12.5% trade NaOCl entered as 10.78% by weight (12.5 / 1.16), SG 1.16, 50 GPD pump -> ~64% of max",
    "verified_by": "rl",
    "verified_on": "2026-06-06",
    "inputs": {
     "flow_mgd": 0.5,
     "dose_mgl": 8,
-    "strength_pct": 12.5,
+    "strength_pct": 10.78,
     "sg": 1.16,
     "pump_max_gpd": 50
    },
    "outputs": {
     "setting_pct": {
-     "value": 55.2,
+     "value": 64.0,
      "tolerance": {
       "abs": 0.5
      }
     },
     "solution_gpd": {
-     "value": 27.59,
+     "value": 31.99,
      "tolerance": {
       "abs": 0.1
      }
@@ -124368,7 +124368,7 @@
   {
    "tile_id": "hdpe-fusion-pressure-time",
    "source_publisher": "Project (first-principles)",
-   "source_title": "HDPE Butt Fusion Interface Pressure and Cycle Time -- the spec-v1711 worked example, recomputed",
+   "source_title": "HDPE Butt Fusion Gauge Pressure and Drag -- the spec-v1711 worked example, recomputed",
    "source_edition_or_year": "spec-v1711 of scope-trade-expansion-2, 2026-09-09",
    "source_section_or_page": "the standards named in the tile citation govern",
    "verified_by": "rl",
@@ -124586,7 +124586,7 @@
   {
    "tile_id": "riser-modulus-feeding",
    "source_publisher": "Project (first-principles)",
-   "source_title": "Riser Modulus and Feeding Distance -- the spec-v1714 worked example, recomputed",
+   "source_title": "Riser Modulus and the Feeding Volume Check -- the spec-v1714 worked example, recomputed",
    "source_edition_or_year": "spec-v1714 of scope-trade-expansion-2, 2026-09-09",
    "source_section_or_page": "the standards named in the tile citation govern",
    "verified_by": "rl",

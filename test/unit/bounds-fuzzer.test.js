@@ -9285,7 +9285,7 @@ test("bounds: calc-construction computeStairStringerV7 pins riser_count = ceil(r
   assert.strictEqual(r.total_run_in, (r.riser_count - 1) * 11.0);
   assert.ok(Math.abs(r.stringer_length_in - Math.sqrt(109 * 109 + r.total_run_in * r.total_run_in)) < 1e-9);
   assert.strictEqual(r.rise_pass, r.exact_rise_in <= 7.75);
-  assert.strictEqual(r.tread_pass, 11 + 1 >= 10);
+  assert.strictEqual(r.tread_pass, 11 >= 10); // tread run alone, nosing not added (IRC R311.7.5.2)
   // Rejections.
   assert.ok("error" in computeStairStringerV7({ total_rise_in: 0 }));
   assert.ok("error" in computeStairStringerV7({ total_rise_in: 100, target_rise_in: 0 }));
@@ -48664,10 +48664,10 @@ test("bounds: spec-v1690 cut -- nam-sizing gains negative pressure, airflow unto
   assert.ok(derated.rated_cfm_needed > derated.required_cfm);
   assert.ok(Math.abs(derated.required_cfm - four.required_cfm) < 1e-12);
   // Makeup air: velocity = 4,005 sqrt(in wc), and the opening is the flow
-  // over it. A containment cannot go negative unless air can get in.
-  const neg = _v1690host({ room_volume_ft3: 8000, target_ach: 4, target_negative_wc: 0.02, makeup_opening_ft2: 1.5 });
+  // over Cd (0.61, sharp-edged) times it. A containment cannot go negative unless air can get in.
+  const neg = _v1690host({ room_volume_ft3: 8000, target_ach: 4, target_negative_wc: 0.02, makeup_opening_ft2: 1.6 });
   assert.ok(Math.abs(neg.makeup_velocity_fpm - 4005 * Math.sqrt(0.02)) < 1e-9);
-  assert.ok(Math.abs(neg.makeup_area_needed_ft2 - neg.required_cfm / neg.makeup_velocity_fpm) < 1e-9);
+  assert.ok(Math.abs(neg.makeup_area_needed_ft2 - neg.required_cfm / (0.61 * neg.makeup_velocity_fpm)) < 1e-9);
   assert.equal(neg.makeup_adequate, true);
   // A smaller opening than that is reported as inadequate.
   const tight = _v1690host({ room_volume_ft3: 8000, target_ach: 4, target_negative_wc: 0.02, makeup_opening_ft2: 0.5 });

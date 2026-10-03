@@ -298,7 +298,7 @@ GREENHOUSE_RENDERERS["ppfd-daily-light-integral"] = _simpleRenderer({
 export function computeGrowLightFixtureCount({ growing_area_sqft = 0, target_ppfd_umol_m2_s = 0, fixture_ppf_umol_s = 0, fixture_watts = 0, on_target_fraction = 0, photoperiod_hours = 0, season_days = 0, energy_rate_per_kwh = 0 } = {}) {
   const guard = _finiteGuard(arguments[0]); if (guard) return { error: guard.error };
   // Unit / range guard added 2026-09-26 after printed-example probing.
-  if (Number(arguments[0]?.fixture_ppf_umol_s) > 0 && Number(arguments[0]?.fixture_ppf_umol_s) < 50) return { error: "Enter the fixture output in umol/s (about 1,000 for a 700 W LED), not its efficacy in umol/J." }; if (Number(arguments[0]?.energy_rate_per_kwh) > 2) return { error: "Enter the energy rate in dollars per kWh (0.12), not cents." };
+  if (Number(arguments[0]?.fixture_ppf_umol_s) > 0 && Number(arguments[0]?.fixture_ppf_umol_s) < 50) return { error: "Enter the fixture output in umol/s (about 1,700 for a 650 W LED), not its efficacy in umol/J." }; if (Number(arguments[0]?.energy_rate_per_kwh) > 2) return { error: "Enter the energy rate in dollars per kWh (0.12), not cents." };
   if (!(growing_area_sqft > 0) || !(target_ppfd_umol_m2_s > 0)) return { error: "Growing area and target PPFD must be positive." };
   if (!(fixture_ppf_umol_s > 0) || !(fixture_watts > 0)) return { error: "Fixture PPF and input watts must be positive." };
   if (!(on_target_fraction > 0 && on_target_fraction <= 1)) return { error: "The on-target fraction must be above 0 and at most 1." };

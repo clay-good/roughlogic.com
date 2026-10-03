@@ -809,7 +809,7 @@ export function computeRiserModulusFeeding({
   const casting_modulus_in = section_volume_in3 / section_surface_in2;
   const riser_modulus_in = casting_modulus_in * modulus_ratio;
   // A cylindrical riser of height equal to its diameter has a modulus of d/6 when every surface cools;
-  // a riser sitting on the casting loses its bottom face and is d/5, which the note names.
+  // a riser sitting on the casting loses its bottom face and is d/5 (not modeled here; the d/6 case is used).
   const riser_diameter_in = 6 * riser_modulus_in / sleeve_factor;
   const modulus_verdict = "the section is " + fmt(section_volume_in3, 1) + " in3 over " + fmt(section_surface_in2, 1) + " in2, a modulus of " + fmt(casting_modulus_in, 4) + " in. At a " + fmt(modulus_ratio, 2) + " ratio the riser needs " + fmt(riser_modulus_in, 4) + " in of modulus, which a cylinder of height equal to its diameter reaches at " + fmt(riser_diameter_in, 2) + " in"
     + (sleeve_factor !== 1 ? " with the " + fmt(sleeve_factor, 2) + "x sleeve" : "");

@@ -774,7 +774,7 @@ export const CITATIONS = {
     edition: "Pounds-formula basis (lb/day = MGD x mg/L x 8.34), standard AWWA / EPA water-operator practice, by name.",
     freeAccess: "Public pounds formula; the operator of record and primacy agency govern.",
     governance: GOVERNANCE.general,
-    editionNote: "Percent-by-weight differs from trade strength (12.5% NaOCl is ~11.8% by weight). Calibrate against a drawdown cylinder, not the dial.",
+    editionNote: "Percent-by-weight differs from trade strength (12.5% trade NaOCl is ~10.8% by weight). Calibrate against a drawdown cylinder, not the dial.",
     assumptions: [
       { name: "8.34 lb/gal", value: "weight of one gallon of water", source: "pounds formula" },
     ],
@@ -935,7 +935,7 @@ export const CITATIONS = {
     edition: "Per the USDA / NWS growing-degree-day method and McMaster & Wilhelm (1997), 'Growing degree-days: one equation, two interpretations,' Agric. & Forest Meteorology 87, by name.",
     freeAccess: "Free at university extension sites and agresearch indexes; corn 50/86 F is the land-grant convention.",
     governance: GOVERNANCE.general,
-    editionNote: "Two methods (standard vs. modified) that diverge on hot days; the method is labeled. Days with Tmin > Tmax are skipped.",
+    editionNote: "Two methods (standard vs. modified); with the cutoff entered as its own field both cap Tmax, so they diverge on cold nights (the modified method floors Tmin at the base). The method is labeled. Days with Tmin > Tmax are skipped.",
     assumptions: [
       { name: "Base/cutoff", value: "crop-specific (corn 50/86 F); user-supplied", source: "land-grant extension" },
     ],
@@ -1246,7 +1246,7 @@ export const CITATIONS = {
 
   "axle-load-distribution": {
     formula: "Lever-arm: moving the tandem d inches changes the trailer reaction by dW = trailer_load * d / L (L = kingpin-to-tandem). shift_per_hole = trailer * hole_spacing / L; holes = ceil(target_shift / shift_per_hole).",
-    edition: "Per the federal axle/gross weight limits - 23 CFR 658.17 (12,000 lb steer, 34,000 lb tandem, 80,000 lb gross) and the federal Bridge Formula, by name; lever-arm statics is public.",
+    edition: "Per the federal axle/gross weight limits - 23 CFR 658.17 (20,000 lb single, 34,000 lb tandem, 80,000 lb gross; the common 12,000 lb steer figure is an axle rating, not a federal limit) and the federal Bridge Formula, by name; lever-arm statics is public.",
     freeAccess: "Free at ecfr.gov; cross-references the bridge-formula tile. FMCSA enforces.",
     governance: GOVERNANCE.general,
     editionNote: "Single-method (lever-arm slide); sliding redistributes drive<->trailer only, cannot fix an over-gross load. Bridge-formula spacing may bind before the cap.",
@@ -1415,7 +1415,7 @@ export const CITATIONS = {
   },
 
   "fan-motor-bhp": {
-    formula: "AHP = CFM * TSP / 6356; BHP = AHP / eta_fan; motor HP = BHP / eta_drive, rounded up to the next standard NEMA MG 1 size.",
+    formula: "AHP = CFM * TSP / 6356; BHP = AHP / eta_fan; motor HP = BHP / eta_drive, rounded up to the next standard NEMA MG 1 size (none is listed above 300 hp).",
     edition: "AMCA / ASHRAE fan-power relation BHP = (CFM * SP) / (6356 * eta) (public); standard motor HP sizes per NEMA MG 1, by name.",
     freeAccess: "Free principles in published HVAC texts; the 6356 constant is a pure unit derivation.",
     governance: GOVERNANCE.mechanical,
@@ -1514,14 +1514,14 @@ export const CITATIONS = {
     ],
   },
   "voltage-drop": {
-    formula: "VD = 2 * I * R * L for single-phase; VD = √3 * I * R * L for three-phase. R from NEC Chapter 9 Table 8 (DC ohm/kFT) with temperature correction; reactance per IEEE 141 for long runs.",
+    formula: "VD = 2 x K x I x L / cmil single-phase; sqrt(3) replaces 2 for three-phase; K = 12.9 (Cu) / 21.2 (Al) ohm-cmil/ft, the 75 C stranded basis of NEC Chapter 9 Table 8. DC resistance only: no reactance, no power factor (use voltage-drop-reactance for that).",
     edition: NEC_2023 + " Chapter 9 Tables 8 and 9; IEEE 141 by name.",
     freeAccess: NEC_FREE + " IEEE 141 is licensed; principles free at university OCW and IEEE-USA outreach.",
     governance: GOVERNANCE.electrical,
     editionNote: NEC_DISCLOSURE,
     assumptions: [
-      { name: "Conductor temperature", value: "75°C unless user supplies", source: "NEC 310.15(B)(1)" },
-      { name: "Power factor", value: "0.85 for AC unless user supplies", source: "engineering practice for general lighting / receptacle loads" },
+      { name: "Conductor temperature", value: "75°C (fixed in K)", source: "NEC 310.15(B)(1)" },
+      { name: "Power factor", value: "not modeled; resistive drop only", source: "engineering practice for general lighting / receptacle loads" },
       { name: "Voltage-drop target", value: "3% branch + 5% feeder = 5% total", source: "NEC informational notes 210.19(A)(1) FPN 4 / 215.2(A)(1) FPN 2" },
     ],
   },
@@ -1646,7 +1646,7 @@ export const CITATIONS = {
     governance: GOVERNANCE.electrical,
     editionNote: "Single-edition (physics).",
     assumptions: [
-      { name: "Balanced load", value: "true unless user supplies imbalance", source: "calculation convention" },
+      { name: "Balanced load", value: "balanced load assumed; per-phase imbalance is not an input", source: "calculation convention" },
     ],
   },
   "copper-resistance": {
@@ -1844,7 +1844,7 @@ export const CITATIONS = {
     ],
   },
   "voltage-imbalance": {
-    formula: "% imbalance = max deviation from average / average × 100; NEMA MG 1 derate curve applied at > 1%.",
+    formula: "% imbalance = max deviation from average / average × 100; NEMA MG 1 derating table (2/5/12/18/25% HP at 1-5%), linearly interpolated from 0% upward.",
     edition: "NEMA MG 1 by name.",
     freeAccess: "NEMA standards licensed; principles free in IEEE-USA outreach.",
     governance: GOVERNANCE.electrical,
@@ -1883,7 +1883,7 @@ export const CITATIONS = {
   },
   "cable-bend-radius": {
     formula: "Min bend radius = multiplier × cable OD; multipliers per cable type (THHN/XHHW 4x to 1 in OD, 5x to 2 in, 6x above; MC 7x, control 6x, coax 10x, fiber 20x).",
-    edition: "Manufacturer minimums (Southwire, AFC, Belden, Corning); NEC 300.34 by name.",
+    edition: "Manufacturer minimums (Southwire 1000 V and below table, AFC, Belden, Corning); NEC 300.34 (8D/12D) applies only over 1000 V and is not the basis here.",
     freeAccess: NEC_FREE + " Manufacturer guides free at each manufacturer site.",
     governance: GOVERNANCE.electrical,
     editionNote: NEC_DISCLOSURE,
@@ -1944,7 +1944,7 @@ export const CITATIONS = {
   // --- v7 Group A extensions (utilities 234 through 237) ---
 
   "transformer-kva-sizing": {
-    formula: "Total connected kVA = Σ load_i; required kVA = connected × (1 + reserve%). Recommended size from the ANSI/IEEE C57 standard step series (15 / 30 / 45 / 75 / 112.5 / 150 / 225 / 300 / 500 / 750 / 1000). FLA = kVA × 1000 / (V × √phases).",
+    formula: "Total connected kVA = Σ load_i; required kVA = connected × (1 + reserve%). Recommended size from the ANSI/IEEE C57 standard step series (three-phase 15 / 30 / 45 / 75 / 112.5 / 150 / 225 / 300 / 500 / 750 / 1000; single-phase 10 / 15 / 25 / 37.5 / 50 / 75 / 100 / 167 / 250 / 333 / 500). FLA = kVA × 1000 / (V × √phases).",
     edition: "ANSI/IEEE C57 standard kVA step series by name; " + NEC_2023 + " Article 450 (Transformers).",
     freeAccess: NEC_FREE + " ANSI/IEEE C57 licensed; step-series values free in carrier engineering literature.",
     governance: GOVERNANCE.electrical,
@@ -2204,7 +2204,7 @@ export const CITATIONS = {
     ],
   },
   "residential-framing": {
-    formula: "Stud count = ceil(perimeter / stud_oc) + 8 (corner/T allowance). Plate lf = ceil(perimeter × 3 × 1.10) (sole + 2 top + 10% waste). Joist count = ceil(footprint / (joist_span × joist_oc)) + 2. Rafter count derived from approx_length / rafter_oc × 2 (both sides). Rafter length = building_run × m_common where m_common = sqrt(P² + 144) / 12. Board feet per ft per nominal: 2x4 = 0.667, 2x6 = 1.0, 2x8 = 1.333, 2x10 = 1.667, 2x12 = 2.0.",
+    formula: "Stud count = ceil(perimeter / stud_oc) + 8 (corner/T allowance). Plate lf = ceil(perimeter × 3 × 1.10) (sole + 2 top + 10% waste). Joist count = ceil(footprint / (joist_span × joist_oc)) + 2. Rafter count derived from approx_length / rafter_oc × 2 (both sides) + 2 (ridge ends). Rafter length = building_run × m_common where m_common = sqrt(P² + 144) / 12. Board feet per ft per nominal: 2x4 = 0.667, 2x6 = 1.0, 2x8 = 1.333, 2x10 = 1.667, 2x12 = 2.0.",
     edition: IRC_2021 + " Tables R502.5 (joists), R602.5 (studs), R802.5.1 (rafters). WWPA standard grading rules for board-feet conversions.",
     freeAccess: ICC_FREE,
     governance: GOVERNANCE.structural,
@@ -2212,7 +2212,7 @@ export const CITATIONS = {
     assumptions: [
       { name: "Corner / T allowance", value: "+8 studs for a simple rectangle (engineering practice)", source: "framing convention" },
       { name: "Plate waste factor", value: "10%", source: "engineering practice" },
-      { name: "Sizes", value: "stud 2x4 / joist 2x10 / rafter 2x8 defaults; user-selectable", source: "IRC 2021 typical residential" },
+      { name: "Sizes", value: "stud 2x4 / joist 2x10 / rafter 2x8 (fixed in the page; selectable only through the API)", source: "IRC 2021 typical residential" },
     ],
   },
   "coagulant-dose": {
@@ -2386,7 +2386,7 @@ export const CITATIONS = {
     editionNote: "First-principles; the ratio math is independent of the AGMA quality class.",
     assumptions: [
       { name: "Per-stage efficiency", value: "0.97 default for spur gears; the user can override", source: "typical spur-gear practice" },
-      { name: "Undercut threshold", value: "tooth count below 8 risks undercut on a standard 20-degree spur tooth", source: "first-principles gear geometry" },
+      { name: "Undercut threshold", value: "a tooth count below 18 undercuts a standard 20-degree full-depth spur tooth (2/sin^2 20 deg = 17.1; about 14 is the practical minimum)", source: "first-principles gear geometry" },
     ],
   },
 
@@ -2947,7 +2947,7 @@ export const CITATIONS = {
     editionNote: "Single-edition (IEEE 1459 power-quantity definitions; the sinusoidal-case power triangle is a physical identity).",
     assumptions: [
       { name: "Sinusoidal system", value: "the classic power triangle applies to sinusoidal voltage and current; non-sinusoidal systems add a distortion-power term", source: "IEEE 1459" },
-      { name: "Reactive sign", value: "lagging (inductive) reactive power is drawn by motors; leading (capacitive) by over-correction", source: "first-principles AC theory" },
+      { name: "Reactive sign", value: "lagging (inductive) reactive power is drawn by motors and shown positive (IEEE 1459); leading (capacitive) by over-correction, shown negative", source: "first-principles AC theory" },
     ],
   },
 
@@ -3210,7 +3210,7 @@ export const CITATIONS = {
     governance: GOVERNANCE.general,
     editionNote: "Single-edition (exact photometric unit identity + IES lumen method; the room result is a maintained average, not a point reading).",
     assumptions: [
-      { name: "Conversion constant", value: "1 fc = 10.764 lux (exact, from 1 ft^2 = 0.092903 m^2)", source: "SI/US-customary unit identity" },
+      { name: "Conversion constant", value: "1 fc = 10.76391 lux (exact identity from 1 ft = 0.3048 m; 10.764 rounded)", source: "SI/US-customary unit identity" },
       { name: "CU / LLF", value: "coefficient of utilization and light-loss factor are project-specific and user-supplied from the luminaire photometric report and maintenance schedule", source: "IES Lighting Handbook lumen method" },
     ],
   },
@@ -3821,14 +3821,14 @@ export const CITATIONS = {
   // every constant the tile applies that the user does not supply.
 
   "pipe-sizing": {
-    formula: "Water-supply size from Hunter's Curve fixture units (DFU per IPC 2021 Section 709, Table 709.1); WSFU for water supply per IPC Section 604, Table 604.3.",
-    edition: IPC_2021 + " Sections 604, 709, Tables 604.3 and 709.1. Hunter's Curve methodology by name.",
+    formula: "WSFU from UPC-style private-use fixture-unit values (above IPC Appendix E Table E103.3(2)); Hunter's Curve converts total WSFU to gpm; DFU per IPC 2021 Table 709.1; supply and drain sizes from the bundled gpm and DFU thresholds.",
+    edition: IPC_2021 + " Table 709.1 and Appendix E by name; Hunter's Curve (NBS BMS65).",
     freeAccess: ICC_FREE,
     governance: GOVERNANCE.plumbing,
     editionNote: IPC_DISCLOSURE,
     assumptions: [
-      { name: "Pressure head at most-distant fixture", value: "8 psi minimum unless user supplies", source: "IPC 2021 Section 604.6" },
-      { name: "Maximum velocity", value: "8 fps water supply / 5 fps hot water", source: "IPC 2021 Section 604.4" },
+      { name: "Pressure head at most-distant fixture", value: "not checked here (IPC 604.6 sets an 8 psi minimum)", source: "IPC 2021 Section 604.6" },
+      { name: "Maximum velocity", value: "not checked here (8 fps water supply / 5 fps hot water is common practice)", source: "IPC 2021 Section 604.4" },
     ],
   },
   "friction-loss": {
@@ -4032,14 +4032,14 @@ export const CITATIONS = {
     ],
   },
   "septic-dose-tank": {
-    formula: "Net dose = daily flow / doses per day; pumped per cycle = net dose + drainback; pumped per day = pumped per cycle x doses; dose-to-void ratio = net dose / drainback (target >= 5).",
+    formula: "Net dose = daily flow / doses per day; pumped per cycle = net dose + drainback; pumped per day = pumped per cycle x doses; dose-to-void ratio = net dose / distribution-network volume (laterals + manifold; drainback only as a proxy when the network is not entered), target >= 5.",
     edition: "USEPA Onsite Wastewater Treatment Systems Manual (EPA/625/R-00/008); university onsite-wastewater extension low-pressure-pipe design guidance, by name.",
     freeAccess: "Free at epa.gov/septic. Extension LPP design guidance free on land-grant university extension sites.",
     governance: GOVERNANCE.plumbing,
     editionNote: "Single-edition (EPA manual + extension LPP design guidance, refreshed at build time).",
     assumptions: [
       { name: "Default doses per day", value: "4 (editable; more, smaller doses rest the soil better)", source: "extension LPP design guidance" },
-      { name: "Dose-to-void target", value: "net dose >= 5x the drainback volume so the field pressurizes before the dose is spent", source: "extension LPP design guidance" },
+      { name: "Dose-to-void target", value: "net dose >= 5x the distribution-network volume (laterals plus manifold), not the drainback, so the field pressurizes before the dose is spent", source: "extension LPP design guidance" },
       { name: "Drainback handling", value: "drainback returns to the tank and is re-pumped (pumping energy, not lost flow); the dose count, dose volume, and float settings on the permit drawing govern", source: "EPA/625/R-00/008" },
     ],
   },
@@ -4109,7 +4109,7 @@ export const CITATIONS = {
     editionNote: "Single-edition (material properties).",
     assumptions: [
       { name: "Coefficient table", value: "from data/plumbing/material-expansion.json keyed to pipe material", source: "NIST + manufacturer" },
-      { name: "Reference (cold) temperature", value: "60 °F unless user supplies", source: "engineering practice" },
+      { name: "Reference (cold) temperature", value: "none; the user enters the temperature change", source: "engineering practice" },
     ],
   },
   "tankless-gpm": {
@@ -4169,14 +4169,14 @@ export const CITATIONS = {
     ],
   },
   "manning-slope": {
-    formula: "English Manning V = (1.486 / n) × R^(2/3) × S^(1/2), solved for self-cleansing slope at 2 ft/s and the slope to carry target flow at half-full with R = D / 4.",
+    formula: "English Manning V = (1.486 / n) × R^(2/3) × S^(1/2), solved for the self-cleansing slope at the entered scour velocity (2 ft/s if blank) and the slope to carry target flow at half-full with R = D / 4.",
     edition: "Manning equation; closed-conduit n-values are the 'normal' values of Chow, Open-Channel Hydraulics (1959) Table 5-6 (copper 0.011, coated cast iron 0.013, galvanized 0.016, corrugated storm drain 0.024), by name; PVC 0.009 is the plastic-pipe industry design figure. USGS WSP-2339 covers natural channels and floodplains and was cited here until 2026-10-02 in error.",
     freeAccess: "Chow 1959 at archive.org; the Manning relation is public.",
     governance: GOVERNANCE.plumbing,
     editionNote: "Single-edition (textbook n-values). The 2 ft/s self-cleansing slope is a velocity criterion only; a sewer design standard can set a higher minimum slope (Ten States Standards 33.41: 0.40% for an 8 in sewer), and the adopted standard governs.",
     assumptions: [
       { name: "Half-full hydraulic radius", value: "R = D / 4", source: "circular cross-section geometry" },
-      { name: "Self-cleansing velocity", value: "2 ft/s for sanitary sewers", source: "public engineering practice" },
+      { name: "Self-cleansing velocity", value: "entered; 2 ft/s if blank (2.5 common, 3.0 on large interceptors)", source: "public engineering practice" },
     ],
   },
   "pipe-partial-flow-depth": {
@@ -4344,7 +4344,7 @@ export const CITATIONS = {
     assumptions: [],
   },
   "knot-reference": {
-    formula: "(reference page; no compute) Common rigging and rescue knots (figure-eight, bowline, clove hitch, prusik, water knot, double fisherman) with typical strength-reduction percentages from public rope-rescue and arboriculture training materials.",
+    formula: "(reference page; no compute) Common rigging and rescue knots (bowline, clove hitch, figure-eight on a bight, double fisherman, Munter hitch) with typical strength-reduction percentages from public rope-rescue and arboriculture training materials.",
     edition: "NFPA 1006 / NFPA 1670 by name; National Fire Academy rope rescue training materials (U.S. government, public domain).",
     freeAccess: "NFA training materials free at usfa.fema.gov. NFPA 1006 / 1670 read-only at nfpa.org/freeaccess.",
     governance: GOVERNANCE.fire,
@@ -4368,7 +4368,7 @@ export const CITATIONS = {
     assumptions: [],
   },
   "tool-maintenance": {
-    formula: "(reference page; no compute) Maintenance interval recommendations for common trade tools (drills, impact drivers, multimeters, megohmmeters, manometers, pipe wrenches, torque wrenches, etc.) compiled from manufacturer technical bulletins and OSHA 29 CFR 1910 Subpart P (Hand and Portable Powered Tools) requirements.",
+    formula: "(reference page; no compute) Maintenance interval recommendations for common trade tools (circular saws, cordless drills, hand planes, pipe wrenches, generators, compressors, refrigerant gauges, multimeters) compiled from manufacturer technical bulletins and OSHA 29 CFR 1910 Subpart P (Hand and Portable Powered Tools) requirements.",
     edition: "OSHA 29 CFR 1910 Subpart P by section. Manufacturer technical bulletins by name.",
     freeAccess: "29 CFR 1910 free at ecfr.gov. Manufacturer guides free on each manufacturer site.",
     governance: GOVERNANCE.general,
@@ -4439,19 +4439,19 @@ export const CITATIONS = {
     editionNote: ACCA_DISCLOSURE,
     assumptions: [
       { name: "Indoor design temperature", value: "75 °F unless user supplies", source: "ACCA Manual J 8th ed. typical" },
-      { name: "Outdoor design temperature", value: "data/hvac/climate-data.json keyed to location (NOAA NCEI 99% / 1% values)", source: "NOAA NCEI" },
+      { name: "Outdoor design temperature", value: "user-entered (look up the NOAA NCEI 99% / 1% design value for the site)", source: "NOAA NCEI" },
       { name: "Air density factor", value: "1.08 BTU/(hr × CFM × °F)", source: "ASHRAE Fundamentals by name (sea level, 70 °F)" },
     ],
   },
   "manual-j-heating": {
-    formula: "Heating load = U×A×ΔT + infiltration sensible (1.08 × CFM_inf × ΔT). Simplified estimator only; ACCA Manual J 8th ed. is the code-compliant method.",
+    formula: "Heating load = U×A×ΔT for walls, ceiling and windows + U×A×0.5ΔT for the floor + infiltration sensible (1.08 × CFM_inf × ΔT). Simplified estimator only; ACCA Manual J 8th ed. is the code-compliant method.",
     edition: ACCA_J + " NOAA NCEI heating design temperatures by location.",
     freeAccess: "ACCA Manual J licensed. NOAA design temps free at ncei.noaa.gov.",
     governance: GOVERNANCE.mechanical,
     editionNote: ACCA_DISCLOSURE,
     assumptions: [
       { name: "Indoor design temperature", value: "70 °F unless user supplies", source: "ACCA Manual J 8th ed. typical" },
-      { name: "Outdoor design temperature", value: "data/hvac/climate-data.json keyed to location (NOAA NCEI 99% values)", source: "NOAA NCEI" },
+      { name: "Outdoor design temperature", value: "user-entered (look up the NOAA NCEI 99% design value for the site)", source: "NOAA NCEI" },
       { name: "Air density factor", value: "1.08 BTU/(hr × CFM × °F)", source: "ASHRAE Fundamentals by name (sea level, 70 °F)" },
     ],
   },
@@ -4463,12 +4463,12 @@ export const CITATIONS = {
     editionNote: "Editions available: ACCA Manual D 3rd ed. is the current published edition. The simplified estimator on this tile does not replace Manual D for layouts.",
     assumptions: [
       { name: "Default friction rate", value: "0.08 in WC per 100 ft unless user supplies", source: "ACCA Manual D 3rd ed. typical" },
-      { name: "Duct surface roughness", value: "data/hvac/duct-friction.json by material", source: "public engineering reference" },
+      { name: "Duct surface roughness", value: "galvanized steel, 0.0003 ft (fixed; the tile has no material input)", source: "public engineering reference" },
       { name: "Method not covered", value: "static regain; the tile sizes to a constant friction rate only", source: "ASHRAE Fundamentals duct design chapter" },
     ],
   },
   "static-pressure-hvac": {
-    formula: "Total external static pressure = sum of element pressure drops (filter + coil + grille + register + duct path) compared against the AHU's rated TESP.",
+    formula: "Total external static pressure = sum of element pressure drops (filter + coil + grille + register + duct path); compare the total with the AHU's rated TESP.",
     edition: "Manufacturer AHU rating data + ACCA Manual D, 3rd edition by name.",
     freeAccess: "Manufacturer technical bulletins free on each manufacturer site.",
     governance: GOVERNANCE.mechanical,
@@ -4495,7 +4495,7 @@ export const CITATIONS = {
     editionNote: "Single-edition (physics + manufacturer reference).",
     assumptions: [
       { name: "Superheat target", value: "manufacturer commissioning guide; typical 10–14 °F", source: "manufacturer technical bulletin" },
-      { name: "Subcool target", value: "manufacturer commissioning guide; typical 10–12 °F", source: "manufacturer technical bulletin" },
+      { name: "Subcool target", value: "manufacturer commissioning guide; typical about 8–10 °F, flagged high above 10 °F (2–10 °F reads in range)", source: "manufacturer technical bulletin" },
     ],
   },
   "seer-eer": {
@@ -4510,7 +4510,7 @@ export const CITATIONS = {
     ],
   },
   "balance-point": {
-    formula: "Outdoor temperature at which heat-pump heating capacity equals the building heat-loss line. Solve C_design × (T_in − T_bp) = HP_capacity(T_bp) by interpolation across the manufacturer capacity-vs-OAT table.",
+    formula: "Outdoor temperature at which heat-pump heating capacity equals the building heat-loss line. Solve C_design × (T_in − T_bp) = Q_design × (1 + 0.01 × (T_bp − T_design)), a linear capacity line rising 1% of the design-point capacity per °F; a manufacturer capacity table governs.",
     edition: ACCA_J + " manufacturer heat-pump capacity tables by name.",
     freeAccess: "Manufacturer capacity tables free on each manufacturer site.",
     governance: GOVERNANCE.mechanical,
@@ -4544,7 +4544,7 @@ export const CITATIONS = {
     governance: GOVERNANCE.mechanical,
     editionNote: IFGC_DISCLOSURE,
     assumptions: [
-      { name: "Standard method", value: "IFGC §304.5; known-air-infiltration method §304.6 not applied unless user supplies", source: "IFGC 2021" },
+      { name: "Standard method", value: "IFGC §304.5; the known-air-infiltration-rate method (§304.5.2) is not applied unless user supplies; outdoor openings are §304.6", source: "IFGC 2021" },
     ],
   },
   "combustion-air-max-input": {
@@ -4554,11 +4554,11 @@ export const CITATIONS = {
     governance: GOVERNANCE.mechanical,
     editionNote: IFGC_DISCLOSURE,
     assumptions: [
-      { name: "Standard method", value: "IFGC §304.5 volume rule; above the returned input the space is confined and needs openings, or use the known-air-infiltration method §304.6", source: "IFGC 2021" },
+      { name: "Standard method", value: "IFGC §304.5 volume rule; above the returned input the space is confined and needs openings, or use the known-air-infiltration-rate method (§304.5.2), or outdoor openings (§304.6)", source: "IFGC 2021" },
     ],
   },
   "compare-refrigerants": {
-    formula: "Side-by-side P-T lookup for two refrigerants at the same temperature or pressure, plus GWP / safety-class comparison.",
+    formula: "Side-by-side P-T lookup for two refrigerants at the same temperature or pressure.",
     edition: "Manufacturer P-T tables (as per refrigerant-pt). ASHRAE 34 safety classifications by name.",
     freeAccess: "Manufacturer tables free at each manufacturer site. ASHRAE 34 read-only at ashrae.org.",
     governance: GOVERNANCE.mechanical,
@@ -4578,23 +4578,23 @@ export const CITATIONS = {
     ],
   },
   "approach-delta-t": {
-    formula: "Approach = T_liquid_line − T_outdoor (cooling) or T_supply − T_outdoor (heat-pump heating). Delta-T = T_return_air − T_supply_air. Targets compared against manufacturer commissioning guide ranges.",
+    formula: "Approach = condenser saturation temperature − outdoor temperature (cooling). Delta-T = T_return_air − T_supply_air. Targets compared against manufacturer commissioning guide ranges.",
     edition: "Manufacturer commissioning guides by name.",
     freeAccess: "Free at each manufacturer site.",
     governance: GOVERNANCE.mechanical,
     editionNote: "Single-edition (manufacturer commissioning targets).",
     assumptions: [
-      { name: "Typical delta-T", value: "18–22 °F across the indoor coil for cooling", source: "manufacturer typical" },
+      { name: "Typical delta-T", value: "16–22 °F across the indoor coil for cooling", source: "manufacturer typical" },
     ],
   },
   "outdoor-air-mix": {
-    formula: "Mixed-air dry bulb T_mix = (CFM_OA × T_OA + CFM_RA × T_RA) / (CFM_OA + CFM_RA). Outdoor-air ratio against ASHRAE 62.1 ventilation rates by occupancy.",
+    formula: "Mixed dry bulb = f × T_OA + (1 − f) × T_RA; mixed humidity ratio mass-weighted the same way (f = OA fraction).",
     edition: ASHRAE_62_1,
     freeAccess: ASHRAE_FREE,
     governance: GOVERNANCE.mechanical,
     editionNote: "Editions available: ASHRAE 62.1-2022 is the current published edition; ASHRAE 62.1-2019 is widely adopted in jurisdictions on IECC 2018.",
     assumptions: [
-      { name: "Default occupancy ventilation rate", value: "user-supplied per ASHRAE 62.1-2022 Table 6-1", source: "ASHRAE 62.1-2022" },
+      { name: "OA fraction", value: "user-entered; ASHRAE 62.1 sets the minimum", source: "ASHRAE 62.1-2022" },
     ],
   },
   "equivalent-length": {
@@ -4673,13 +4673,12 @@ export const CITATIONS = {
     ],
   },
   "belt-pulley": {
-    formula: "V-belt length L = 2C + (π/2)(D + d) + (D − d)² / (4C). Driven RPM via diameter ratio. Belt speed (fpm) = π × D × RPM / 12.",
+    formula: "V-belt length L = 2C + (π/2)(D + d) + (D − d)² / (4C). Driven RPM via diameter ratio. Belt speed (fpm) = π × d_drive × motor RPM / 12.",
     edition: "Gates / Goodyear / Bando manufacturer drive-design manuals by name.",
     freeAccess: "Free at each manufacturer site.",
     governance: GOVERNANCE.mechanical,
     editionNote: "Single-edition (manufacturer geometry; physics).",
     assumptions: [
-      { name: "V-belt cross-section", value: "user-supplied (A / B / 3V / 5V)", source: "manufacturer cross-section table" },
     ],
   },
   "air-receiver": {
@@ -4724,7 +4723,7 @@ export const CITATIONS = {
     ],
   },
   "npsh-a": {
-    formula: "NPSHa = H_atm + H_static_source − H_friction − H_vapor (all in ft of pumped fluid). H_atm from elevation-lapse; H_vapor from a public engineering psi-by-temperature table converted via 2.31 ft/psi.",
+    formula: "NPSHa = H_atm + H_static_source − H_friction − H_vapor (all in ft of 60 F water). H_atm from elevation-lapse; H_vapor from a public engineering psi-by-temperature table converted via 2.31 ft/psi.",
     edition: "Hydraulic Institute by name; ASHRAE Fundamentals water-property tables.",
     freeAccess: "HI standards licensed; vapor-pressure data free at NIST.",
     governance: GOVERNANCE.mechanical,
@@ -4761,7 +4760,7 @@ export const CITATIONS = {
     assumptions: [],
   },
   "rafter": {
-    formula: "Rafter length L = sqrt(run² + rise²) plus tail and ridge plumb cuts. Birdsmouth depth limited to 1/3 rafter depth per IRC 2021 §R802.5.",
+    formula: "Rafter length = (horizontal run + overhang) x sqrt(P^2 + 144)/12; no ridge or plumb-cut allowance. Birdsmouth depth limited to 1/3 rafter depth per IRC 2021 §R802.5.",
     edition: IRC_2021 + " §R802.5.",
     freeAccess: ICC_FREE,
     governance: GOVERNANCE.structural,
@@ -4842,7 +4841,7 @@ export const CITATIONS = {
     ],
   },
   "beam-loading": {
-    formula: "Simple-beam reactions / moment / deflection from load-type formulas (uniform, point, partial). M_max for uniform = wL²/8; deflection_max = 5wL⁴/(384 EI).",
+    formula: "Simple-beam maximum moment and deflection for a uniform load (M = wL^2/8, delta = 5wL^4/384EI) or a centered point load (M = PL/4, delta = PL^3/48EI).",
     edition: "Classical mechanics of materials; AWC NDS-2018 design values for wood.",
     freeAccess: "Mechanics-of-materials texts free at university OCW. AWC NDS free at awc.org.",
     governance: GOVERNANCE.structural,
@@ -4852,13 +4851,13 @@ export const CITATIONS = {
     ],
   },
   "material-quantity": {
-    formula: "Sheet / linear / plank quantities = area or run / unit + waste factor + per-edge cut allowance.",
+    formula: "Units = ceil(area / coverage per unit x (1 + waste)).",
     edition: "Engineering-practice waste-factor consensus.",
     freeAccess: "Free in published trade references.",
     governance: GOVERNANCE.general,
     editionNote: "Single-edition (engineering practice).",
     assumptions: [
-      { name: "Default waste factor", value: "10% unless user supplies", source: "engineering practice" },
+      { name: "Waste factor", value: "fixed per assembly (10%; 15% for 3-tab roofing)", source: "engineering practice" },
     ],
   },
   "stair-stringer": {
@@ -4947,13 +4946,13 @@ export const CITATIONS = {
     ],
   },
   "tile-count": {
-    formula: "Tile count = floor area / tile_area + per-edge cut allowance. Grout volume = joint_area × depth × waste factor.",
+    formula: "Tile count = ceil(area x 144 / (w x h)) + ceil(base x 10%). Grout volume = tiles x (w + h) x joint width x tile thickness.",
     edition: "TCNA Handbook by name; ANSI A108 / A118 setting standards by name.",
     freeAccess: "TCNA Handbook licensed; ANSI standards licensed; principles free in trade references.",
     governance: GOVERNANCE.general,
     editionNote: "Single-edition (TCNA / ANSI engineering practice).",
     assumptions: [
-      { name: "Default waste factor", value: "10% straight set / 15% diagonal", source: "TCNA Handbook typical" },
+      { name: "Default waste factor", value: "10% (straight set; no diagonal option)", source: "TCNA Handbook typical" },
     ],
   },
   "paint-coverage": {
@@ -4977,7 +4976,7 @@ export const CITATIONS = {
     ],
   },
   "masonry-count": {
-    formula: "Units = ceil(wall_area / laid module face x (1 + waste)), the module being the unit face plus one mortar joint each way. Modular brick lays three courses to 8 in (2-2/3 in course, 8 in length: 6.75 per ft^2, BIA Technical Note 10); standard brick 8 x 2-1/4 with 3/8 in joints is 6.55 per ft^2; an 8 x 16 CMU module is 1.125 per ft^2. Allow 5% breakage waste.",
+    formula: "Units = ceil(wall_area / laid module face) + ceil(that x waste), the module being the unit face plus one mortar joint each way. Modular brick lays three courses to 8 in (2-2/3 in course, 8 in length: 6.75 per ft^2, BIA Technical Note 10); standard brick 8 x 2-1/4 with 3/8 in joints is 6.55 per ft^2; an 8 x 16 CMU module is 1.125 per ft^2. Allow 5% breakage waste.",
     edition: "BIA (Brick Industry Association) Technical Notes by name; NCMA TEK manuals by name.",
     freeAccess: "BIA Tech Notes free at gobrick.com. NCMA TEK manuals free at ncma.org.",
     governance: GOVERNANCE.general,
@@ -5148,7 +5147,7 @@ export const CITATIONS = {
     ],
   },
   "bolt-torque": {
-    formula: "T = K × D × F where T is torque (ft-lb), K is the nut factor, D is bolt diameter, F is desired clamp load (= proof load × torque-tension factor). Proof loads per ASTM / SAE bolt-grade specifications.",
+    formula: "T (in-lb) = K × D (in) × F (lb); ft-lb = T / 12, where K is the nut factor, D is bolt diameter, F is desired clamp load (= proof load × torque-tension factor). Proof loads per ASTM / SAE bolt-grade specifications.",
     edition: "ASTM A325 / A490 / SAE J429 by name.",
     freeAccess: "ASTM / SAE licensed; principles free in Machinery's Handbook (free at archive.org for older editions).",
     governance: GOVERNANCE.structural,
@@ -5470,7 +5469,7 @@ export const CITATIONS = {
   // verdict. Local health department governs."
 
   "recipe-scale": {
-    formula: "Linear scaling of every ingredient by factor = target_yield / original_yield. Conversion to grams via USDA FoodData Central reference weights when scaling produces fractional eggs or unusual cup amounts (flour ~ 125 g/cup, sugar ~ 200 g/cup, butter ~ 227 g/cup, etc.).",
+    formula: "Linear scaling of every ingredient by factor = target_yield / original_yield. A gram weight for every cup measure of a listed ingredient and for any fractional egg, via USDA FoodData Central reference weights (flour ~ 125 g/cup, sugar ~ 200 g/cup, butter ~ 227 g/cup, etc.).",
     edition: "USDA FoodData Central, accessed " + "at build time" + ".",
     freeAccess: "Free at fdc.nal.usda.gov.",
     governance: GOVERNANCE.food,
@@ -5777,7 +5776,7 @@ export const CITATIONS = {
     governance: GOVERNANCE.water,
     editionNote: "Single-edition (40 CFR 141 SWTR as currently codified). State primacy agencies may impose stricter CT requirements.",
     assumptions: [
-      { name: "Plug-flow assumption", value: "T_10 ≈ 0.5-0.7 × theoretical detention time unless user supplies a tracer-study value", source: "EPA Disinfection Profiling Guidance" },
+      { name: "Theoretical time", value: "volume / flow, the plug-flow (theoretical) time; for CT credit use T_10, typically 0.1-0.7 x this by baffling class from a tracer study, which this tile does not apply", source: "EPA Disinfection Profiling Guidance" },
     ],
   },
   "detention-basin-volume": {
@@ -5855,7 +5854,7 @@ export const CITATIONS = {
     ],
   },
   "dehumidifier": {
-    formula: "Required dehumidifier capacity (PPD = pints per day) sized from affected cubic feet, water class (1-4 per IICRC S500), and category (1-3 per IICRC S500). Required AHAM pints per day = affected cubic feet / IICRC LGR factor (100 ft³ per pint for Class 1, 50 for Class 2, 40 for Classes 3 and 4). AHAM-rated capacity is the published rating at 80 °F / 60% RH; the IICRC chart is already the field recommendation in AHAM pints, so the field figure equals it.",
+    formula: "Required dehumidifier capacity (PPD = pints per day) sized from affected cubic feet, water class (1-4 per IICRC S500). Required AHAM pints per day = affected cubic feet / IICRC LGR factor (100 ft³ per pint for Class 1, 50 for Class 2, 40 for Classes 3 and 4). AHAM-rated capacity is the published rating at 80 °F / 60% RH; the IICRC chart is already the field recommendation in AHAM pints, so the field figure equals it.",
     edition: "IICRC S500-2021 §10 (Equipment); AHAM DH-1-2008 (Dehumidifier rating standard) by name.",
     freeAccess: "AHAM standards licensed; rating principles free at AHAM (aham.org) outreach.",
     governance: GOVERNANCE.general,
@@ -5884,7 +5883,7 @@ export const CITATIONS = {
     assumptions: [],
   },
   "drying-times": {
-    formula: "(reference page; no compute) Typical drying-time benchmarks for common building materials (drywall 2-3 days, hardwood 4-7 days, carpet pad 1-2 days, plaster 5-10 days, etc.) based on engineering-practice observations and original plain-English notes.",
+    formula: "(reference page; no compute) Typical drying-time benchmarks for common building materials (drywall 2-4 days, hardwood 5-10+ days, carpet pad 1-2 days, plaster 5-14 days, framing 3-7 days, concrete varies) based on engineering-practice observations and original plain-English notes.",
     edition: "IICRC S500-2021 by name; original plain-English notes by the project author.",
     freeAccess: "IICRC standards licensed; engineering-practice observations free in published restoration training literature.",
     governance: GOVERNANCE.general,
@@ -5892,7 +5891,7 @@ export const CITATIONS = {
     assumptions: [],
   },
   "mold": {
-    formula: "(reference page; no compute) Mold-growth conditions: temperature 40-100 °F, RH ≥ 60-70% sustained, organic substrate, time ≥ 24-48 hours. EPA / IICRC S520-2024 thresholds.",
+    formula: "Mold-growth conditions: temperature 40-100 °F, RH ≥ 60-70% sustained, organic substrate, time ≥ 24-48 hours. EPA / IICRC S520-2024 thresholds.",
     edition: "EPA 402-K-01-001 (Mold Remediation in Schools and Commercial Buildings) + IICRC S520-2024 (Standard for Professional Mold Remediation) by name.",
     freeAccess: "EPA 402-K-01-001 free at epa.gov/mold. IICRC S520-2024 licensed.",
     governance: GOVERNANCE.general,
@@ -5900,7 +5899,7 @@ export const CITATIONS = {
     assumptions: [],
   },
   "mold-remediation-level": {
-    formula: "Deterministic lookup: EPA 402-K-01-001 area bands (small < 10 ft2, medium 10-100, large > 100); NYC DOHMH 2008 categories (small < 10, medium 10-100, large > 100; HVAC small < 10 and large >= 10 ft2; the 2008 edition supersedes the 2000 edition's Levels I-V). Derived controls: containment (limited / full) by band and porous material; PPE tier by band; independent assessor when area > 100, HVAC, or vulnerable occupant; clearance for medium/large, HVAC, or vulnerable occupant.",
+    formula: "Deterministic lookup: EPA 402-K-01-001 area bands (small < 10 ft2, medium 10-100, large > 100); NYC DOHMH 2008 categories (small < 10, medium 10-100, large > 100; HVAC small < 10 and large >= 10 ft2; the 2008 edition supersedes the 2000 edition's Levels I-V). Derived controls: containment (none under 10 ft2 without HVAC, per EPA 402-K-01-001 Table 1; otherwise limited / full) by band and porous material; PPE tier by band; independent assessor when area > 100, HVAC, or vulnerable occupant; clearance for medium/large, HVAC, or vulnerable occupant.",
     edition: "EPA 402-K-01-001 (Mold Remediation in Schools and Commercial Buildings) area bands; NYC DOHMH Guidelines on Assessment and Remediation of Fungi in Indoor Environments (November 2008) categories; IICRC S520-2024 by name.",
     freeAccess: "EPA 402-K-01-001 free at epa.gov/mold; NYC DOHMH guidelines free at nyc.gov. IICRC S520-2024 licensed.",
     governance: GOVERNANCE.general,
@@ -5934,9 +5933,9 @@ export const CITATIONS = {
     edition: "ASTM D7391 (spore-trap method) and the cassette manufacturer's instructions; AIHA-accredited laboratory analysis.",
     freeAccess: "ASTM D7391 licensed; cassette manufacturer instructions free with the product. AIHA lab accreditation directory free at aiha.org.",
     governance: GOVERNANCE.general,
-    editionNote: "The calibrated rotameter flow governs (not the nominal pump rating); the cassette manufacturer sets the acceptable volume window. Defaults are spore-trap placeholders (15 L/min, 75 L).",
+    editionNote: "The calibrated rotameter flow governs (not the nominal pump rating); the cassette manufacturer sets the acceptable volume window. The worked example uses spore-trap placeholders (15 L/min, 75 L); there is no default.",
     assumptions: [
-      { name: "Spore-trap defaults", value: "15 L/min flow, 75 L target volume", source: "common spore-trap cassette instructions" },
+      { name: "Spore-trap example values", value: "15 L/min flow, 75 L target volume", source: "common spore-trap cassette instructions" },
     ],
   },
   "moisture-dry-goal": {
@@ -5985,7 +5984,7 @@ export const CITATIONS = {
     governance: GOVERNANCE.general,
     editionNote: "Single-edition (IICRC S520-2024 + ASHRAE 170).",
     assumptions: [
-      { name: "Default target ACH", value: "12 ACH (active remediation) unless user supplies", source: "IICRC S520-2024 §12" },
+      { name: "Default target ACH", value: "6 ACH (prefilled; 12+ for active mold remediation per IICRC S520-2024 §12)", source: "IICRC S520-2024 §12" },
     ],
   },
   "hepa-filter-life": {
@@ -5999,7 +5998,7 @@ export const CITATIONS = {
     ],
   },
   "thermal-delta-t": {
-    formula: "(reference page; no compute) Thermal-imager delta-T interpretation: compare inspected component temperature against an unloaded reference of the same construction; ≥ 1 °C above reference flags moisture migration, ≥ 5-10 °C flags an active issue per IR-imaging engineering practice.",
+    formula: "(reference page; no compute) Thermal-imager delta-T interpretation: compare inspected component temperature against an unloaded reference of the same construction; a surface 1 °C or more BELOW a dry reference of the same construction flags moisture (evaporative cooling); 5-10 °C differences flag an active issue per IR-imaging engineering practice.",
     edition: "ASTM C1153 (Standard Practice for Location of Wet Insulation in Roofing Systems) by name; FLIR / Fluke published thermography training materials.",
     freeAccess: "ASTM licensed; training overviews free at flir.com / fluke.com / infraredtraining.com.",
     governance: GOVERNANCE.general,
@@ -6018,13 +6017,13 @@ export const CITATIONS = {
     ],
   },
   "chamber-turnover": {
-    formula: "ACH = ((air_movers_total_cfm + dehu_cfm) × 60) / chamber_volume_ft³. Target ACH set by drying class (Class 1 ≥ 6, Class 2-3 ≥ 8, Class 4 ≥ 10 per IICRC S500-2021 typical). Gap = target_ACH - actual_ACH.",
+    formula: "ACH = ((air_movers_total_cfm + dehu_cfm) × 60) / chamber_volume_ft³. Target ACH is entered (default 60). Gap (cfm) = max(0, target_ACH x volume / 60 - (air-mover + dehu cfm)).",
     edition: "IICRC S500-2021 §12 (Drying Process) by name.",
     freeAccess: "IICRC licensed; principles free in published water-damage-restoration training literature.",
     governance: GOVERNANCE.general,
     editionNote: "Single-edition (IICRC S500-2021).",
     assumptions: [
-      { name: "Default target ACH", value: "Class 1 ≥ 6, Class 2-3 ≥ 8, Class 4 ≥ 10", source: "IICRC S500-2021 typical" },
+      { name: "Target ACH", value: "entered (default 60); for reference, IICRC S500-2021 typical figures by class are Class 1 ≥ 6, Class 2-3 ≥ 8, Class 4 ≥ 10", source: "IICRC S500-2021 typical" },
     ],
   },
 
@@ -6219,7 +6218,7 @@ export const CITATIONS = {
     ],
   },
   "master-stream": {
-    formula: "Reach in feet = horizontal-stream and broken-stream reach by nozzle pressure and tip diameter, from NFPA 1965-published nozzle test data.",
+    formula: "Reach = published base reach for the nozzle type x sqrt(P / P_typical); smooth-bore reaction NR = 1.57 d^2 NP.",
     edition: "NFPA 1965 (Standard for Fire Hose Appliances) by name; NFA training-material reach tables.",
     freeAccess: "NFPA 1965 read-only at nfpa.org/freeaccess; NFA materials free at usfa.fema.gov.",
     governance: GOVERNANCE.fire,
@@ -6316,7 +6315,7 @@ export const CITATIONS = {
     ],
   },
   "ladder-pipe-reach": {
-    formula: "Effective reach = aerial-tip horizontal projection + master-stream forward reach (from master-stream tile). Combines aerial-ladder geometry with NFPA 1965 nozzle reach.",
+    formula: "Effective reach = aerial-tip horizontal projection + master-stream reach x cos 30 deg (stream assumed to leave about 30 deg below horizontal). Combines aerial-ladder geometry with NFPA 1965 nozzle reach.",
     edition: "NFPA 1901 + NFPA 1965 by name; NFA tactical-aerial training materials.",
     freeAccess: "NFPA standards read-only at nfpa.org/freeaccess; NFA materials free at usfa.fema.gov.",
     governance: GOVERNANCE.fire,
@@ -6330,7 +6329,7 @@ export const CITATIONS = {
     governance: GOVERNANCE.fire,
     editionNote: "Physics, with AASHTO Green Book design values named for comparison: 2.5 s perception-reaction time and 11.2 ft/s² deceleration. The tile's 1.5 s and friction defaults are alert-driver and reconstruction values, not the Green Book's design values.",
     assumptions: [
-      { name: "Default friction μ", value: "0.7 dry asphalt / 0.4 wet / 0.2 ice unless user supplies; the AASHTO Green Book's stopping sight distance uses a fixed 11.2 ft/s² deceleration (about μ = 0.35) instead", source: "common accident-reconstruction values; AASHTO Green Book for the design deceleration" },
+      { name: "Typical friction μ (enter one)", value: "0.7 dry asphalt / 0.4 wet / 0.2 ice; the AASHTO Green Book's stopping sight distance uses a fixed 11.2 ft/s² deceleration (about μ = 0.35) instead", source: "common accident-reconstruction values; AASHTO Green Book for the design deceleration" },
       { name: "Default reaction time", value: "1.5 s unless user supplies, an alert driver expecting to stop; the AASHTO Green Book design perception-reaction time is 2.5 s, which adds 1.0 s x 1.467 ft/s per mph (about 81 ft at 55 mph)", source: "AASHTO Green Book (2.5 s design value)" },
     ],
   },
@@ -6499,7 +6498,7 @@ export const CITATIONS = {
     ],
   },
   "tip-out": {
-    formula: "Per-person split = total / count, optionally weighted by tip-out points per role.",
+    formula: "Each member's share = (member hours / total hours) x total amount.",
     edition: "Engineering-practice arithmetic.",
     freeAccess: "No licensed source required. The split is definitional arithmetic; the pool, the roles, and the point weights come from house policy and from the wage-and-hour rules that govern tip pooling.",
     governance: GOVERNANCE.general,
@@ -6548,7 +6547,7 @@ export const CITATIONS = {
   },
   "per-diem": {
     formula: "Lodging + M&IE looked up by state. GSA publishes per-diem by LOCALITY (county or city), not by state: there is one standard CONUS rate plus several hundred non-standard localities set above it. The bundled per-state values approximate standard CONUS, raised where a state is broadly above it (DC, NY, MA, HI and similar).",
-    edition: "GSA Federal Travel Regulation per-diem rates, FY2026 (effective 2025-10-01). M&IE figures are the published FY2026 tier values ($68 / $74 / $80 / $86 / $92); the standard CONUS rate is $110 lodging / $68 M&IE.",
+    edition: "GSA Federal Travel Regulation per-diem rates; the fiscal year is selected by date (FY2026 / FY2027). FY2026 (effective 2025-10-01): standard CONUS $110 lodging / $68 M&IE, through 2026-09-30. FY2027 (effective 2026-10-01): standard lodging $113, applied to the states carried at the standard rate. M&IE figures are the published tier values ($68 / $74 / $80 / $86 / $92), unchanged in FY2027.",
     freeAccess: "Free at gsa.gov/travel/plan-book/per-diem-rates.",
     governance: GOVERNANCE.general,
     editionNote: "Single-edition (GSA rates; annual update each fiscal year). Named by fiscal year rather than \"current fiscal year\": FY2026 ends 2026-09-30, and a page that calls a fixed table \"current\" is wrong from the day after without changing a character.",
@@ -6613,13 +6612,13 @@ export const CITATIONS = {
     ],
   },
   "heat-stress": {
-    formula: "NWS Heat Index = polynomial of T_db (°F) and RH (%) (Steadman regression); WBGT estimate from public OSHA heat-illness work-rest table; OSHA-style work / rest cycle by exertion.",
+    formula: "NWS Heat Index = polynomial of T_db (°F) and RH (%) (Steadman regression); WBGT approximated as 0.7 Twb + 0.2 Tg + 0.1 Tdb (Twb ~ T - 30(1 - RH), Tg = T + 5, or + 15 in sun); work/rest from WBGT bands 82 / 86 / 90 F.",
     edition: "NWS Heat Index polynomial by name; OSHA Heat Illness Prevention work-rest table by name.",
     freeAccess: "Free at weather.gov/safety/heat-index and osha.gov/heat-exposure.",
     governance: GOVERNANCE.general,
     editionNote: "Single-edition (NWS / OSHA public formulas).",
     assumptions: [
-      { name: "Default acclimatization", value: "user-supplied (acclimatized vs. unacclimatized worker)", source: "OSHA Heat Illness Prevention" },
+      { name: "Acclimatization", value: "not modeled", source: "OSHA Heat Illness Prevention" },
     ],
   },
   "wind-chill-wind-speed": {
@@ -6654,7 +6653,7 @@ export const CITATIONS = {
     ],
   },
   "pulley-ma-gen": {
-    formula: "Theoretical MA = number of supporting rope segments. Actual MA = theoretical × pulley_efficiency^n_pulleys. Fixed pulley redirects but does not multiply force; movable pulley × 2; the block_n options are an n-part tackle (MA n) reeved over n sheaves, the haul line leaving the fixed block. The p^n friction model is a simple approximation: tension tracking (1 + p + ... per sheave) and the Army FM 5-125 rule (add about 10% of the load per sheave: 5,000 lb on a 4-part, 4-sheave tackle takes a 1,750 lb pull) each give a somewhat higher actual MA.",
+    formula: "Theoretical MA = number of supporting rope segments. Actual MA = theoretical × pulley_efficiency^n_pulleys. Fixed pulley redirects but does not multiply force; movable pulley × 2; the block_n options are an n-part tackle (MA n) reeved over n sheaves, the haul line leaving the fixed block. The p^n friction model is a simple approximation: tension tracking (1 + p + ... per sheave) gives a somewhat higher actual MA, and the Army FM 5-125 rule (add about 10% of the load per sheave: 5,000 lb on a 4-part, 4-sheave tackle takes a 1,750 lb pull, MA 2.86) a lower one than p^n at 0.95.",
     edition: "Classical mechanics; NFPA 1006 / 1670 by name for rescue context.",
     freeAccess: "Mechanics texts free at university OCW.",
     governance: GOVERNANCE.general,
@@ -7115,17 +7114,17 @@ export const CITATIONS = {
     editionNote: "Single-edition (USDA NRCS).",
     assumptions: [
       { name: "Particle density", value: "2.65 g/cm³ for mineral soils unless user supplies", source: "USDA NRCS SSM" },
-      { name: "Compaction threshold", value: "bulk density that restricts root growth, by texture: sand, sandy loam, loam 1.80; silt loam, clay loam 1.75; silty clay loam 1.65; clay 1.47 g/cm³ (root growth already affected at 1.63 / 1.60 / 1.55 / 1.39)", source: "USDA NRCS Soil Quality Indicators" },
+      { name: "Compaction threshold", value: "bulk density that restricts root growth, by texture: sand, sandy loam, loam 1.80; silt loam, clay loam 1.75; silty clay loam 1.65; clay 1.47 g/cm³ (root growth already affected at 1.69 sand, 1.63 sandy loam and loam / 1.60 / 1.55 / 1.39)", source: "USDA NRCS Soil Quality Indicators" },
     ],
   },
   "crop-yield": {
-    formula: "Adjusted yield = field_yield × (1 − moisture_field) / (1 − moisture_standard). Standard moisture: corn 15.0%, soybean 13.0%, wheat 13.5% (USDA standard).",
+    formula: "Adjusted yield = field_yield × (1 − moisture_field) / (1 − moisture_standard). Standard moisture: corn 15.5%, soybean 13.0%, wheat 13.5% (USDA standard).",
     edition: "USDA Federal Grain Inspection Service (FGIS) standard moisture grades by name.",
     freeAccess: "Free at usda.gov / ams.usda.gov.",
     governance: GOVERNANCE.general,
     editionNote: "Single-edition (USDA FGIS).",
     assumptions: [
-      { name: "Standard moisture", value: "corn 15.0% / soy 13.0% / wheat 13.5%", source: "USDA FGIS" },
+      { name: "Standard moisture", value: "corn 15.5% / soy 13.0% / wheat 13.5%", source: "USDA FGIS" },
     ],
   },
 
@@ -7146,7 +7145,7 @@ export const CITATIONS = {
     ],
   },
   "time-alignment": {
-    formula: "Speed of sound c = 331.3 + 0.606 × T_C (m/s). Delay-tower delay (ms) = distance_m / c × 1000. Haas-window offset 10-30 ms recommended for delayed system natural-source perception.",
+    formula: "Speed of sound c = 331.3 + 0.606 × T_C (m/s). Delay-tower delay (ms) = (d_main − d_delay)_m / c × 1000 + the Haas offset. Haas-window offset 10-30 ms recommended for delayed system natural-source perception.",
     edition: "Classical acoustics; AES (Audio Engineering Society) information documents on time-alignment by name.",
     freeAccess: "AES information documents free at aes.org/standards/blog.",
     governance: GOVERNANCE.general,
@@ -7578,10 +7577,10 @@ export const CITATIONS = {
   },
   "inventory-turnover": {
     formula: "Average inventory = (BI + EI) / 2. Turnover = COGS / avg_inventory. Days sales of inventory = period_days / turnover.",
-    edition: "Standard inventory-management identity. Industry medians bundled from U.S. Census Annual Retail Trade Survey (ARTS) and SBA published medians.",
+    edition: "Standard inventory-management identity. Industry aggregate turnovers bundled from the U.S. Census Annual Retail Trade Survey (ARTS 2022, benchmarked).",
     freeAccess: "Free at census.gov/retail/arts. SBA at sba.gov/data.",
     governance: GOVERNANCE.small_business,
-    editionNote: "Quarterly cadence: industry medians refreshed when Census ARTS publishes.",
+    editionNote: "Annual cadence: industry aggregates refreshed when Census ARTS publishes.",
     assumptions: [
       { name: "Average method", value: "simple average of beginning and ending inventory", source: "convention; some firms use 13-month rolling" },
       { name: "Period days", value: "365 default", source: "calendar year" },
@@ -21259,7 +21258,7 @@ export const CITATIONS = {
     governance: GOVERNANCE.general,
     editionNote: "Single-edition (the sizing arithmetic does not roll). Hydroxyl generators are SAFE for occupied spaces (unlike ozone, which requires an evacuated, sealed structure) but work more slowly, commonly running continuously for several days. Coverage ratings and run times are MANUFACTURER-specific; severe odor still requires source removal and cleaning first. The manufacturer and ANSI/IICRC S700 GOVERN.",
     assumptions: [
-      { name: "Coverage rating", value: "per-unit coverage (ft^3/unit) is manufacturer-specific; the bundled value is a typical default", source: "manufacturer rating" },
+      { name: "Coverage rating", value: "per-unit coverage (ft^3/unit) is manufacturer-specific and must be entered from the unit's rating; no default is bundled", source: "manufacturer rating" },
       { name: "Occupied-safe", value: "hydroxyl is occupied-safe but slower than ozone; run continuously", source: "ANSI/IICRC S700" },
     ],
   },
@@ -22755,7 +22754,7 @@ export const CITATIONS = {
     governance: GOVERNANCE.general,
     editionNote: "Depth goes with the SQUARE ROOT of time, so a deeper case costs far more than it looks: doubling a case quadruples the cycle, which on a batch furnace is the difference between two loads a day and one every two days. The temperature lever is real and not free -- raising the carburising temperature increases k substantially and reaches the same case in far less time, at the cost of grain coarsening, more distortion to correct in grinding, and shorter fixture and furnace life. AND THE SPECIFICATION TRAP IS WHERE SUPPLIER AND CUSTOMER DISAGREE ABOUT A CORRECT PART: 'case depth 0.030 in' does not say whether it is EFFECTIVE case depth measured to a stated hardness or TOTAL case depth, and the total is always larger.",
     assumptions: [
-      { name: "Rate constant is entered", value: "it depends on temperature, atmosphere and steel", source: "the heat treater's process data" },
+      { name: "Reference case is entered", value: "k = reference depth / sqrt(reference time); it depends on temperature, atmosphere and steel", source: "the heat treater's process data" },
       { name: "Effective and total case differ", value: "and the drawing must say which, and to what hardness", source: "the applicable process standard" },
       { name: "Hardness profile is not predicted", value: "it depends on the quench as much as on the carburising", source: "a metallurgical section" },
     ],
@@ -24459,7 +24458,7 @@ export const CITATIONS = {
     governance: GOVERNANCE.general,
     editionNote: "Passing dry bulb does not guarantee compliance: the hot-and-humid corner can fail the upper dew-point limit. The entered envelope must match the installed equipment class and current manufacturer requirements.",
     assumptions: [
-      { name: "One humidity limit pair", value: "the entered dew point / RH ceiling is checked for both conditions; the defaults are the RECOMMENDED 59 F / 70%, while A1 ALLOWABLE is 17 C (62.6 F) dew point and 80% RH, so enter those to judge an allowable excursion. Lower humidity limits are not checked", source: "ASHRAE TC 9.9 Thermal Guidelines, 5th ed. (2021), Table 2.1" },
+      { name: "One humidity limit pair", value: "the entered dew point / RH ceiling is checked for both conditions; the worked example uses the RECOMMENDED 59 F / 70% (there is no default; enter the limit), while A1 ALLOWABLE is 17 C (62.6 F) dew point and 80% RH, so enter those to judge an allowable excursion. Lower humidity limits are not checked", source: "ASHRAE TC 9.9 Thermal Guidelines, 5th ed. (2021), Table 2.1" },
       { name: "Correlation range", value: "ordinary data-center air temperatures within the validated input bounds", source: "Tetens correlation" },
       { name: "Steady inlet condition", value: "rack-level spatial and temporal excursions are not averaged into compliance", source: "ASHRAE TC 9.9 / site survey" },
     ],
@@ -25577,7 +25576,7 @@ export const CITATIONS = {
     edition: "Insertion loss, catalogue pressure drop and regenerated sound power are ENTERED from the manufacturer's tested data; a silencer's rating also differs with flow direction relative to the sound.",
     freeAccess: "A square-law scaling and one energy sum.",
     governance: GOVERNANCE.general,
-    editionNote: "REGENERATED NOISE IS THE LIMIT PEOPLE DISCOVER LAST, and energy-summing is what makes it visible. The silencer generates turbulent noise downstream of its own baffles -- created AFTER the attenuation, so nothing removes it -- and above some face velocity it becomes the dominant source. On the case here, squeezing a 9,000 cfm silencer from a 36 by 24 face into a 30 by 20 takes the velocity from 1,500 to 2,160 fpm, DOUBLES the pressure drop from 0.35 to 0.73 in wc, and puts the regenerated level above the attenuated one -- at which point another 10 dB of insertion loss buys 1.9 dB in the room. spec-v1634 describes that floor and never computes it, and ships two unrendered python placeholders for the pressure drop besides. INSERTION LOSS AND PRESSURE DROP ARE NOT INDEPENDENT: the geometry that absorbs sound is the geometry that restricts flow. Attenuation and pressure drop both rise with LENGTH, linearly; regenerated noise rises much faster with VELOCITY -- and that asymmetry is the whole design rule.",
+    editionNote: "REGENERATED NOISE IS THE LIMIT PEOPLE DISCOVER LAST, and energy-summing is what makes it visible. The silencer generates turbulent noise downstream of its own baffles -- created AFTER the attenuation, so nothing removes it -- and above some face velocity it becomes the dominant source. On the case here, squeezing a 9,000 cfm silencer from a 36 by 24 face into a 30 by 20 takes the velocity from 1,500 to 2,160 fpm, DOUBLES the pressure drop from 0.35 to 0.73 in wc. Separately, at the entered 72 dB regenerated level the silencer's own noise already exceeds the 70 dB attenuated level, so another 10 dB of insertion loss buys only 1.9 dB in the room (the regenerated figure is entered from the catalog at the face velocity actually used). spec-v1634 describes that floor and never computes it, and ships two unrendered python placeholders for the pressure drop besides. INSERTION LOSS AND PRESSURE DROP ARE NOT INDEPENDENT: the geometry that absorbs sound is the geometry that restricts flow. Attenuation and pressure drop both rise with LENGTH, linearly; regenerated noise rises much faster with VELOCITY -- and that asymmetry is the whole design rule.",
     assumptions: [
       { name: "Catalogue data is entered", value: "insertion loss, drop and regenerated noise are tested values", source: "the silencer manufacturer" },
       { name: "Square-law pressure drop", value: "scaled from one reference point", source: "standard duct fitting practice" },
