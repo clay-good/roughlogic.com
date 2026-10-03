@@ -545,7 +545,7 @@ TREATMENT_RENDERERS["breakpoint-chlorination"] = _rPool({
   fields: [
     { key: "total_ppm", label: "Total chlorine (ppm)" },
     { key: "free_ppm", label: "Free chlorine (ppm)" },
-    { key: "ratio", label: "Breakpoint ratio (default 10)" },
+    { key: "ratio", label: "Breakpoint ratio (default 10)", default: 10 },
     { key: "gallons", label: "Pool volume (gallons, optional)" },
     { key: "avail", label: "Product available chlorine (%, optional)" },
   ],

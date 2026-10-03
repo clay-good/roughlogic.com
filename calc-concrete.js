@@ -1025,7 +1025,7 @@ CONCRETE_RENDERERS["concrete-shrinkage-temperature-steel"] = _simpleRenderer({
   example: concreteShrinkageTemperatureSteelExample.inputs,
   fields: [
     { key: "h_in", label: "Slab thickness h (in)", kind: "number" },
-    { key: "b_in", label: "Design strip width b (in, default 12)", kind: "number" },
+    { key: "b_in", label: "Design strip width b (in, default 12)", kind: "number", default: 12 },
     { key: "grade_ksi", label: "Reinforcement grade (ksi)", kind: "select", options: [
       { value: "60", label: "Grade 60 (ratio 0.0018)" },
       { value: "40", label: "Grade 40 (ratio 0.0018)" },

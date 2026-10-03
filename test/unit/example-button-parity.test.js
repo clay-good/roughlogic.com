@@ -227,3 +227,26 @@ test("a spec-renderer prefilled default equals the compute default or the exampl
   }
   assert.deepEqual(bad, []);
 });
+
+// A label that promises a default must deliver it. 2026-10-03: "Climb gradient
+// (ft/nm, 200 default)", "Turndown fraction (default 0.30)" and others sent a
+// blank as 0. A spec field whose label names a default must be prefilled with it.
+test("a spec-renderer field whose label states a default is prefilled with that default", async () => {
+  const rmap = readFileSync(resolve(ROOT, "test/fixtures/renderer-map.js"), "utf8");
+  const bad = [];
+  for (const m of rmap.matchAll(/"([a-z0-9-]+)":\s*\{\s*module:\s*"([^"]+)",\s*exportName:\s*"(\w+)"/g)) {
+    const [, id, mod, exp] = m;
+    const R = (await importCalc(mod))[exp]?.[id];
+    if (!R?.schema) continue;
+    for (const inp of R.schema.inputs) {
+      if (inp.kind === "select") continue;
+      const lm = /\bdefault[:\s]+~?(-?\d[\d.,]*\d|-?\d)|(-?\d[\d.,]*\d|-?\d)\s+default\b/i.exec(inp.label || "");
+      if (!lm) continue;
+      const stated = Number((lm[1] || lm[2]).replace(/,/g, ""));
+      if (!Number.isFinite(stated)) continue;
+      const pre = inp.default ?? (inp.attrs && inp.attrs.value !== undefined ? Number(inp.attrs.value) : null);
+      if (pre === null || pre === undefined || !near(Number(pre), stated)) bad.push(`${id}: ${inp.key} label says default ${stated}, prefill ${pre}`);
+    }
+  }
+  assert.deepEqual(bad, []);
+});

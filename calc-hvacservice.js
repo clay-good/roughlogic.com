@@ -760,7 +760,7 @@ HVACSERVICE_RENDERERS["duct-leakage-cfm25"] = _simpleRenderer({
   fields: [
     { key: "leakage_cfm25", label: "Measured total leakage at 25 Pa (CFM25)", kind: "number" },
     { key: "cfa_ft2", label: "Conditioned floor area (ft²)", kind: "number" },
-    { key: "limit", label: "Limit (CFM25 per 100 ft², default 4)", kind: "number" },
+    { key: "limit", label: "Limit (CFM25 per 100 ft², default 4)", kind: "number", default: 4 },
   ],
   outputs: [
     { key: "norm", id: "dlc-out-norm", label: "Normalized leakage", value: (r) => fmt(r.normalized, 2) + " CFM25 / 100 ft^2" },

@@ -1508,7 +1508,7 @@ const renderRoomAbsorptionTarget = _r({
     { key: "volume_ft3", label: "Room volume (ft³)", kind: "number", attrs: { step: "any", min: "0" } },
     { key: "target_rt60_s", label: "Target RT60 (s)", kind: "number", attrs: { step: "any", min: "0" } },
     { key: "existing_sabins", label: "Existing absorption (sabins, 0 = none)", kind: "number", default: 0, attrs: { step: "any", min: "0" } },
-    { key: "sabine_coeff", label: "Sabine coefficient (default 0.049)", kind: "number", attrs: { step: "any", min: "0" } },
+    { key: "sabine_coeff", label: "Sabine coefficient (default 0.049)", kind: "number", default: 0.049, attrs: { step: "any", min: "0" } },
   ],
   outputs: [
     { key: "req", id: "rat-out-req", label: "Total absorption required", value: (r) => fmt(r.required_sabins, 0) + " sabins" },

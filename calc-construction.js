@@ -7569,7 +7569,7 @@ const _renderThermalStressRestrained = _simpleRenderer({
     { key: "dT_F", label: "Temperature change dT (F, + heating)", kind: "number" },
     { key: "A_in2", label: "Cross-section area A (in², for force)", kind: "number" },
     { key: "L_in", label: "Length L (in, for free expansion)", kind: "number" },
-    { key: "restraint", label: "Restraint factor (0-1, default 1)", kind: "number" },
+    { key: "restraint", label: "Restraint factor (0-1, default 1)", kind: "number", default: 1 },
   ],
   outputs: [
     { key: "s", id: "tsr-out-s", label: "Thermal stress", value: (r) => fmt(r.sigma_psi, 0) + " psi (" + (r.compression ? "compression" : "tension") + ")" },
@@ -7610,7 +7610,7 @@ const _renderThermalStressMaxDeltaT = _simpleRenderer({
     { key: "allowable_stress_psi", label: "Allowable stress (psi)", kind: "number" },
     { key: "E_psi", label: "Modulus E (psi; 29e6 steel, 10e6 alum)", kind: "number" },
     { key: "alpha", label: "Thermal expansion alpha (/F; 6.5e-6 steel)", kind: "number" },
-    { key: "restraint", label: "Restraint factor (0-1, default 1)", kind: "number" },
+    { key: "restraint", label: "Restraint factor (0-1, default 1)", kind: "number", default: 1 },
   ],
   outputs: [
     { key: "dt", id: "tsmd-out-dt", label: "Max temperature change", value: (r) => fmt(r.max_dT_F, 1) + " F" },
@@ -7764,7 +7764,7 @@ const _renderSeismicStoryDrift = _simpleRenderer({
     { key: "cd", label: "Deflection amplification Cd (Table 12.2-1)", kind: "number" },
     { key: "ie", label: "Importance factor Ie", kind: "number" },
     { key: "hsx_in", label: "Story height hsx (in)", kind: "number" },
-    { key: "drift_ratio", label: "Allowable drift coefficient (default 0.020)", kind: "number" },
+    { key: "drift_ratio", label: "Allowable drift coefficient (default 0.020)", kind: "number", default: 0.02 },
   ],
   outputs: [
     { key: "dx", id: "ssd-out-dx", label: "Design story drift delta_x = Cd delta_xe / Ie", value: (r) => fmt(r.delta_x, 2) + " in" },
@@ -7811,7 +7811,7 @@ const _renderSeismicPdelta = _simpleRenderer({
     { key: "vx_kip", label: "Seismic story shear Vx (kip)", kind: "number" },
     { key: "hsx_in", label: "Story height hsx (in)", kind: "number" },
     { key: "cd", label: "Deflection amplification Cd", kind: "number" },
-    { key: "beta", label: "Shear demand/capacity ratio beta (default 1.0)", kind: "number" },
+    { key: "beta", label: "Shear demand/capacity ratio beta (default 1.0)", kind: "number", default: 1 },
   ],
   outputs: [
     { key: "th", id: "spd-out-th", label: "Stability coefficient theta", value: (r) => fmt(r.theta, 3) },
@@ -7898,7 +7898,7 @@ const _v431renderReadyMixConcreteOrder = _simpleRenderer({
   fields: [
     { key: "volume_yd3", label: "Required in-place volume (yd³)", kind: "number" },
     { key: "waste_pct", label: "Waste/over-order allowance (%)", kind: "number", default: 8 },
-    { key: "load_yd3", label: "Truck capacity (yd³, default 10)", kind: "number" },
+    { key: "load_yd3", label: "Truck capacity (yd³, default 10)", kind: "number", default: 10 },
     { key: "min_yd3", label: "Plant minimum before short-load fee (yd³)", kind: "number" },
     { key: "price_per_yd3", label: "Concrete price ($/yd³, optional)", kind: "number" },
   ],
@@ -8311,7 +8311,7 @@ const _v440renderTrimLinearFootage = _simpleRenderer({
     { key: "perimeter_ft", label: "Room perimeter (ft)", kind: "number" },
     { key: "openings_ft", label: "Total door-opening width (ft, no trim below)", kind: "number" },
     { key: "waste_pct", label: "Waste allowance (%)", kind: "number", default: 10 },
-    { key: "stock_len_ft", label: "Trim stock length (ft, default 16)", kind: "number" },
+    { key: "stock_len_ft", label: "Trim stock length (ft, default 16)", kind: "number", default: 16 },
     { key: "spring_deg", label: "Crown spring angle (deg, 0 = baseboard/casing)", kind: "number" },
   ],
   outputs: [
@@ -10915,7 +10915,7 @@ CONSTRUCTION_RENDERERS["foundation-waterproofing-takeoff"] = _simpleRenderer({
     { key: "perimeter_ft", label: "Foundation perimeter (ft)", kind: "number" },
     { key: "below_grade_height_ft", label: "Average below-grade height (ft)", kind: "number" },
     { key: "coverage_sf_per_gal", label: "Coverage per coat (sf/gal, from the data sheet)", kind: "number" },
-    { key: "coats", label: "Coats (1 default; 2 typical for brush-grade dampproofing)", kind: "number" },
+    { key: "coats", label: "Coats (1 default; 2 typical for brush-grade dampproofing)", kind: "number", default: 1 },
     { key: "waste_pct", label: "Waste (percent)", kind: "number", default: 10 },
   ],
   outputs: [
