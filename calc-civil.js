@@ -767,7 +767,7 @@ function renderSuperelevationSafeCurveSpeed(inputRegion, outputRegion, citationE
   const e = makeNumber("Superelevation e (e.g. 0.08)", "ses-e", { step: "any" });
   const f = makeNumber("Side-friction factor f", "ses-f", { step: "any", min: "0" });
   for (const fld of [R, e, f]) inputRegion.appendChild(fld.wrap);
-  attachExampleButton(inputRegion, () => { R.input.value = "1500"; e.input.value = "0.08"; f.input.value = "0.12"; update(); });
+  attachExampleButton(inputRegion, () => { R.input.value = "1500"; e.input.value = "0.08"; f.input.value = "0.11"; update(); });
   const oV = makeOutputLine(outputRegion, "Maximum safe speed", "ses-out-v");
   const oNote = makeOutputLine(outputRegion, "Note", "ses-out-n");
   function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }

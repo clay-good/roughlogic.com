@@ -465,8 +465,8 @@ export function computeRooftopCurbUplift({
 
   const upliftVerdict = "a " + fmt(unit_length_ft, 1) + " by " + fmt(unit_width_ft, 1) + " ft unit is " + fmt(plan_area_ft2, 0) + " sq ft, so " + fmt(uplift_psf, 0) + " psf of net uplift is " + fmt(uplift_lb, 0) + " lb -- " + fmt(uplift_pct_of_weight, 0) + "% of the unit's " + fmt(unit_weight_lb, 0) + " lb weight";
   const directionVerdict = weight_governs
-    ? "THE WEIGHT WINS ON DIRECT UPLIFT, with " + fmt(weight_reserve_lb, 0) + " lb of reserve: the unit's " + fmt(unit_weight_lb, 0) + " lb exceeds the " + fmt(uplift_lb, 0) + " lb of uplift, so the direct wind load is fully resisted before any fastener is counted. THAT DOES NOT MEAN THE ANCHORAGE IS ADEQUATE -- the overturning couple below is a separate demand and it is the one that governs here"
-    : "THE WIND WINS ON DIRECT UPLIFT by " + fmt(net_uplift_lb, 0) + " lb: " + fmt(uplift_lb, 0) + " lb of uplift against " + fmt(unit_weight_lb, 0) + " lb of weight, and that net is distributed among the fasteners before the overturning couple is added";
+    ? "THE WEIGHT WINS ON DIRECT UPLIFT, with " + fmt(weight_reserve_lb, 0) + " lb of reserve: 0.6 x the unit's " + fmt(unit_weight_lb, 0) + " lb (ASCE 7 ASD) exceeds the " + fmt(uplift_lb, 0) + " lb of uplift, so the direct wind load is fully resisted before any fastener is counted. THAT DOES NOT MEAN THE ANCHORAGE IS ADEQUATE -- the overturning couple below is a separate demand and it is the one that governs here"
+    : "THE WIND WINS ON DIRECT UPLIFT by " + fmt(net_uplift_lb, 0) + " lb: " + fmt(uplift_lb, 0) + " lb of uplift against 0.6 x the unit's " + fmt(unit_weight_lb, 0) + " lb of weight (ASCE 7 ASD), and that net is distributed among the fasteners before the overturning couple is added";
   const lateralVerdict = "lateral wind on the " + fmt(unit_length_ft, 1) + " by " + fmt(unit_height_ft, 1) + " ft side profile is " + fmt(lateral_lb, 0) + " lb, acting " + fmt(lever_arm_ft, 1) + " ft above the curb for an overturning moment of " + fmt(overturning_ftlb, 0) + " ft-lb. Resolved across the " + fmt(unit_width_ft, 1) + " ft width that is a couple of " + fmt(couple_tension_lb, 0) + " lb";
   const coupleVerdict = couple_dominates
     ? "AND THE COUPLE IS THE LARGER DEMAND. It adds " + fmt(couple_tension_lb, 0) + " lb of tension to the windward side, more than the direct uplift does -- which is the part that gets omitted entirely. A TALL NARROW UNIT IS HARDER TO ANCHOR THAN A LOW WIDE ONE OF THE SAME WEIGHT, because the lever arm grows and the resolving width shrinks at the same time"
@@ -618,7 +618,7 @@ HVACACOUSTICS_RENDERERS["mechanical-room-nc"] = _simpleRenderer({
 HVACACOUSTICS_RENDERERS["rooftop-curb-uplift"] = _simpleRenderer({
   compute: computeRooftopCurbUplift,
   example: rooftopCurbUpliftExample.inputs,
-  citation: "Citation: uplift = plan area x the net uplift pressure for the roof zone, resisted by the unit's weight; lateral wind on the side profile acts at mid-height and resolves across the unit's width as a couple that adds tension to the windward fasteners. The design pressures are ENTERED. ASCE 7 as adopted and the engineer of record govern.",
+  citation: "Citation: uplift = plan area x the net uplift pressure for the roof zone, resisted by 0.6 x the unit's weight (ASCE 7 ASD 0.6 D + 0.6 W); lateral wind on the side profile acts at mid-height and resolves across the unit's width as a couple that adds tension to the windward fasteners. The design pressures are ENTERED. ASCE 7 as adopted and the engineer of record govern.",
   fields: [
     { key: "unit_length_ft", label: "Unit length (ft)" },
     { key: "unit_width_ft", label: "Unit width (ft)" },

@@ -881,7 +881,7 @@ export function computeSelectiveCoordinationScreen({ device_type = "fuse", upstr
 export const selectiveCoordinationScreenExample = { inputs: { device_type: "breaker", upstream_rating_a: 400, downstream_rating_a: 100, published_ratio: 2, instantaneous_multiplier: 10, available_fault_a: 12000 } };
 
 ELECDESIGN_RENDERERS["selective-coordination-screen"] = _simpleRenderer({
-  citation: "Citation: selective coordination screened by device type -- fuses against the manufacturer's published minimum ratio for the family (commonly 2:1), which holds to the interrupting rating, and breakers only up to the upstream instantaneous pickup, above which both devices open. Cited by name; the ratio and the instantaneous setting are the manufacturer's published values and are entered rather than bundled. A screen, never a study: the published time-current curves, a full coordination study, and the engineer of record govern.",
+  citation: "Citation: selective coordination screened by device type -- fuses against the manufacturer's published minimum ratio for the family (commonly 2:1), which holds to the interrupting rating, and breakers only up to the low edge of the upstream instantaneous pickup band, above which both devices open. Cited by name; the ratio and the instantaneous setting are the manufacturer's published values and are entered rather than bundled. A screen, never a study: the published time-current curves, a full coordination study, and the engineer of record govern.",
   example: selectiveCoordinationScreenExample.inputs,
   fields: [
     { key: "device_type", label: "Device type", kind: "select", options: [{ value: "fuse", label: "Fuses (ratio method)" }, { value: "breaker", label: "Circuit breakers (instantaneous pickup)" }] },

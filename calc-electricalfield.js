@@ -220,14 +220,14 @@ export function computeWelderArcCircuitConductor({ primary_current_a = 40, duty_
     effective_current_a,
     ocpd_max_a,
     ocpd_std_a,
-    note: "Arc-welder branch circuit per NEC 630.11 and 630.12, for an AC/DC TRANSFORMER or DC-RECTIFIER welder. The conductor is sized on an EFFECTIVE current, not the nameplate primary: I_eff = I_primary x the Table 630.11(A) duty-cycle multiplier. This tile uses the transformer/rectifier column, which is the square root of the duty cycle (verified against the table's published values: 0.71 at 50%, 0.55 at 30%, 0.45 at 20%). A MOTOR-GENERATOR welder uses a DIFFERENT, HIGHER column of Table 630.11(A) that is not modeled here -- size those from the table, or the conductor will be undersized. Pick a conductor whose ampacity is at least I_eff. The overcurrent device may not exceed 200% of the rated primary current (630.12(A)); the largest standard 240.6 size at or below that ceiling is reported. A 40 A primary, 50%-duty transformer welder needs conductors rated for 28.3 A (a #10 Cu at 60 C) and an OCPD no larger than 80 A. Use the nameplate rated primary current and duty; the AHJ, the welder nameplate, and the adopted NEC edition govern.",
+    note: "Arc-welder branch circuit per NEC 630.11 and 630.12, for an AC/DC TRANSFORMER or DC-RECTIFIER welder. The conductor is sized on an EFFECTIVE current, not the nameplate primary: I_eff = I_primary x the Table 630.11(A) duty-cycle multiplier. This tile uses the transformer/rectifier column, which is the square root of the duty cycle, held at 0.45 at 20% duty or less (verified against the table's published values: 0.71 at 50%, 0.55 at 30%, 0.45 at 20%). A MOTOR-GENERATOR welder uses a DIFFERENT, HIGHER column of Table 630.11(A) that is not modeled here -- size those from the table, or the conductor will be undersized. Pick a conductor whose ampacity is at least I_eff. The overcurrent device may not exceed 200% of the rated primary current (630.12(A)); the largest standard 240.6 size at or below that ceiling is reported. A 40 A primary, 50%-duty transformer welder needs conductors rated for 28.3 A (a #10 Cu at 60 C) and an OCPD no larger than 80 A. Use the nameplate rated primary current and duty; the AHJ, the welder nameplate, and the adopted NEC edition govern.",
   };
 }
 
 export const welderArcCircuitConductorExample = { inputs: { primary_current_a: 40, duty_pct: 50 } };
 
 function _v932renderWelderArcCircuitConductor(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: arc-welder branch-circuit conductor and OCPD by name (NEC 630.11 / 630.12) for a TRANSFORMER or DC-RECTIFIER welder. I_eff = I_primary x sqrt(duty), the transformer/rectifier column of Table 630.11(A); a MOTOR-GENERATOR welder uses a different, higher column not modeled here. Conductor ampacity >= I_eff; OCPD <= 200% of the rated primary. The welder nameplate and the adopted NEC edition govern.";
+  citationEl.textContent = "Citation: arc-welder branch-circuit conductor and OCPD by name (NEC 630.11 / 630.12) for a TRANSFORMER or DC-RECTIFIER welder. I_eff = I_primary x sqrt(duty) above 20% duty, x 0.45 at 20% or less, the transformer/rectifier column of Table 630.11(A); a MOTOR-GENERATOR welder uses a different, higher column not modeled here. Conductor ampacity >= I_eff; OCPD <= 200% of the rated primary. The welder nameplate and the adopted NEC edition govern.";
   const ip = makeNumber("Nameplate primary current (A)", "wac-ip", { step: "any", min: "0" });
   const dc = makeNumber("Duty cycle (%)", "wac-dc", { step: "any", min: "0" });
   for (const f of [ip, dc]) inputRegion.appendChild(f.wrap);
@@ -269,14 +269,14 @@ export function computeWelderResistanceCircuitConductor({ primary_current_a = 10
     duty_multiplier,
     conductor_current_a,
     ocpd_max_a,
-    note: "Resistance (spot / seam / projection) welder branch circuit per NEC 630.31 and 630.32. A resistance welder fires in brief high-current pulses, so the conductor is sized on the primary current times the square root of the duty cycle (NEC 630.31(A)(2) for a specific nonrepetitive welder), the same duty-derating as an arc welder. But the overcurrent device is allowed up to 300% of the rated primary current (630.32(A)) -- higher than the 200% for arc welders -- because the pulses would nuisance-trip a tighter device. A 100 A primary, 50%-duty spot welder needs conductors rated 70.7 A (a #4 Cu at 75 C) on up to a 300 A device. Use the nameplate rated primary current and duty; the AHJ, the welder nameplate, and the adopted NEC edition govern. Arc welders use the separate 630.11/630.12 (200%) method.",
+    note: "Resistance (spot / seam / projection) welder branch circuit per NEC 630.31 and 630.32. A resistance welder fires in brief high-current pulses, so the conductor is sized on the primary current times the Table 630.31(A)(2) multiplier (0.71 at 50%; sqrt between rows; 0.22 at 5% or less) (NEC 630.31(A)(2) for a specific nonrepetitive welder), the same duty-derating as an arc welder. But the overcurrent device is allowed up to 300% of the rated primary current (630.32(A)) -- higher than the 200% for arc welders -- because the pulses would nuisance-trip a tighter device. A 100 A primary, 50%-duty spot welder needs conductors rated 71 A (a #4 Cu at 75 C) on up to a 300 A device. Use the nameplate rated primary current and duty; the AHJ, the welder nameplate, and the adopted NEC edition govern. Arc welders use the separate 630.11/630.12 (200%) method.",
   };
 }
 
 export const welderResistanceCircuitConductorExample = { inputs: { primary_current_a: 100, duty_pct: 50 } };
 
 function _v933renderWelderResistanceCircuitConductor(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: resistance-welder branch-circuit conductor and OCPD by name (NEC 630.31 / 630.32). conductor = primary x sqrt(duty) (630.31(A)(2)); OCPD <= 300% of the rated primary (630.32(A)). The welder nameplate and the adopted NEC edition govern.";
+  citationEl.textContent = "Citation: resistance-welder branch-circuit conductor and OCPD by name (NEC 630.31 / 630.32). conductor = primary x the Table 630.31(A)(2) multiplier (sqrt(duty) between listed rows; 0.22 at 5% or less) (630.31(A)(2)); OCPD <= 300% of the rated primary (630.32(A)). The welder nameplate and the adopted NEC edition govern.";
   const ip = makeNumber("Nameplate primary current (A)", "wrc-ip", { step: "any", min: "0" });
   const dc = makeNumber("Duty cycle (%)", "wrc-dc", { step: "any", min: "0" });
   for (const f of [ip, dc]) inputRegion.appendChild(f.wrap);

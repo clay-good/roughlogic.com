@@ -458,7 +458,7 @@ MINING_RENDERERS["crusher-reduction-ratio"] = _simpleRenderer({
     { key: "s", id: "crr-out-s", label: "Per stage at the entered stage count", value: (r) => fmt(r.per_stage_ratio, 2) + " to 1 -- " + r.stage_verdict },
     { key: "i", id: "crr-out-i", label: "Intermediate sizes an even split implies", value: (r) => fmt(r.first_intermediate_in, 2) + " in, then " + fmt(r.second_intermediate_in, 2) + " in" },
     { key: "n2", id: "crr-out-n2", label: "Stages the target actually needs", value: (r) => fmt(r.stages_required, 0) + " at " + fmt(r.comfortable_ratio, 2) + " to 1 each" },
-    { key: "d", id: "crr-out-d", label: "What the next machine is really being asked for", value: (r) => fmt(r.actual_downstream_ratio, 2) + " to 1 -- " + r.diagnostic },
+    { key: "d", id: "crr-out-d", label: "What the next machine is really being asked for", value: (r) => fmt(r.actual_downstream_ratio, 2) + " to 1 overall, " + fmt(r.downstream_per_stage_ratio, 2) + " to 1 per remaining stage -- " + r.diagnostic },
     { key: "n", id: "crr-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeCrusherReductionRatio,

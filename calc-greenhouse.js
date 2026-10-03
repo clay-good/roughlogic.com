@@ -449,7 +449,7 @@ export function computeCo2EnrichmentRate({ house_volume_ft3 = 0, ambient_ppm = 0
     daily_cost: makeup_lb_per_hour * gas_price_per_lb * enrichment_hours_per_day,
     vented_makeup_ft3_per_hour, vented_lb_per_hour,
     vented_hourly_cost: vented_lb_per_hour * gas_price_per_lb,
-    vented_cost_ratio: vented_air_changes_per_hour / air_changes_per_hour,
+    vented_cost_ratio: vented_makeup_ft3_per_hour / makeup_ft3_per_hour,
     lb_per_1000_sqft_per_hour: makeup_lb_per_hour / (floor_area_sqft / 1000),
     note: "The makeup rate is proportional to the air change rate, so a controller that keeps the injector open when the vents crack is paying that multiple to enrich the outdoors. INTERLOCKING THE INJECTOR TO VENT POSITION is the whole control strategy and it is worth more than any refinement of the setpoint. The closed-house rate per 1,000 square feet is the figure to carry, because supplier sizing tables are usually quoted in exactly those units. This assumes a well-mixed house at steady state; the crop's own uptake, the burner or tank supplier's data, and any combustion safety requirements govern.",
   };
@@ -457,7 +457,7 @@ export function computeCo2EnrichmentRate({ house_volume_ft3 = 0, ambient_ppm = 0
 
 const co2Example = { house_volume_ft3: 43200, ambient_ppm: 400, target_ppm: 1000, air_changes_per_hour: 1, gas_price_per_lb: 0.10, vented_air_changes_per_hour: 30, floor_area_sqft: 2880, enrichment_hours_per_day: 10 };
 GREENHOUSE_RENDERERS["co2-enrichment-rate"] = _simpleRenderer({
-  citation: "Citation: mass balance -- the initial charge = house volume x the concentration lift, and the makeup rate = volume x air changes per hour x the lift, at 0.1138 lb per cubic foot of carbon dioxide. Ambient is about 400 ppm and 1,000 to 1,500 ppm the customary enrichment target. The crop's uptake, the supplier's data, and any combustion safety requirements govern.",
+  citation: "Citation: mass balance -- the initial charge = house volume x the concentration lift, and the makeup rate = volume x air changes per hour x the lift + the crop's own CO2 use, at 0.1138 lb per cubic foot of carbon dioxide. Ambient is about 400 ppm and 1,000 to 1,500 ppm the customary enrichment target. The crop's uptake, the supplier's data, and any combustion safety requirements govern.",
   example: co2Example,
   fields: [
     { key: "house_volume_ft3", label: "House volume (cu ft)" },

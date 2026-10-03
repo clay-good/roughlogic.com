@@ -148,7 +148,7 @@ DOORHARDWARE_RENDERERS["door-closer-opening-force"] = _simpleRenderer({
     { key: "door_width_in", label: "Door width (in)", kind: "number", default: 36 },
     { key: "door_height_in", label: "Door height (in)", kind: "number", default: 84 },
     { key: "door_weight_lb", label: "Door leaf weight (lb)", kind: "number", default: 85 },
-    { key: "measured_opening_force_lbf", label: "Measured opening force at the latch edge (lbf)", kind: "number", default: 6.5 },
+    { key: "measured_opening_force_lbf", label: "Measured opening force at the knob (lbf)", kind: "number", default: 6.5 },
     { key: "force_limit_lbf", label: "Applicable opening force limit (lbf)", kind: "number", default: 5 },
     { key: "measured_closing_time_s", label: "Measured closing time, 90 to 12 degrees (s)", kind: "number", default: 4.2 },
     { key: "min_closing_time_s", label: "Required minimum closing time (s)", kind: "number", default: 5 },

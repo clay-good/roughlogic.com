@@ -1253,7 +1253,7 @@ export function renderStaticPressureHvac(inputRegion, outputRegion, citationEl) 
 // dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 // dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderSeerEer(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: SEER and EER are rated under different conditions. The 1.12 conversion factor is an engineering approximation; actual values depend on the rating method.";
+  citationEl.textContent = "Citation: SEER and EER are rated under different conditions. EER = -0.02 SEER^2 + 1.12 SEER (NREL House Simulation Protocols) is an engineering approximation; actual values depend on the rating method.";
   const value = makeNumber("Value", "se-v", { step: "any", min: "0" });
   const from = makeSelect("From", "se-f", [{ value: "EER", label: "EER" }, { value: "SEER", label: "SEER" }, { value: "SEER2", label: "SEER2" }, { value: "EER2", label: "EER2" }]);
   // v23 EN.1: optional annual-kWh / $ cross-check.

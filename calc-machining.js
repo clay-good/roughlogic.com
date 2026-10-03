@@ -1587,7 +1587,7 @@ export function computeCountersinkDiameterFromDepth({ plunge_depth_in = 0, inclu
 export const countersinkDiameterFromDepthExample = { inputs: { plunge_depth_in: 0.1438, included_angle_deg: 82, pilot_hole_dia_in: 0.25 } };
 function renderCountersinkDiameterFromDepth(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: countersink depth-to-diameter (Machinery's Handbook countersinking) solved for the diameter: D_cs = 2 Z tan(angle/2) + d, d = the diameter at the tool zero (hole edge or flat tip; 0 for a pointed tool zeroed at the surface). 82 deg inch flat-head and 90 deg metric heads are not interchangeable. A setup aid; the tool geometry and the fastener callout govern.";
-  const z = makeNumber("Plunge depth below surface Z (in)", "cdd-z", { step: "any", min: "0" });
+  const z = makeNumber("Plunge depth from the tool zero Z (in)", "cdd-z", { step: "any", min: "0" });
   const ang = makeSelect("Included angle (deg)", "cdd-ang", [
     { value: "82", label: "82 (inch flat-head)", selected: true },
     { value: "90", label: "90 (metric flat-head)" },

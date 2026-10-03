@@ -581,8 +581,8 @@ export function computeCoatingVocCompliance({
   const basis_verdict = non_voc_gal > 0
     ? fmt(voc_as_supplied, 2) + " lb/gal on the can and " + fmt(voc_less_water, 2) + " lb/gal on the regulatory basis, " + fmt(basis_ratio, 2) + " times higher -- because " + fmt(non_voc_gal, 2) + " gal of water and exempt solvent come out of the denominator, and a coating that is mostly water has a small denominator"
     : "with no water or exempt solvent the two bases are the same number";
-  // As applied, after thinning. Thinner adds VOC and volume, and the water is
-  // unchanged, so the less-water figure rises on both counts.
+  // As applied, after thinning. A solvent thinner adds VOC and non-water volume;
+  // a water or exempt thinner leaves the less-water figure unchanged (see below).
   const has_thinner = thinner_gal > 0;
   const applied_voc_lb = voc_lb + thinner_gal * thinner_voc_lb_per_gal;
   const applied_gal = coating_gal + thinner_gal;

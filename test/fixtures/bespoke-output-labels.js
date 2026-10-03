@@ -162,7 +162,7 @@ export const BESPOKE_OUTPUT_LABELS = {
   "clarifier-surface-loading": {"sor_gpd_ft2":"Surface overflow rate","weir_gpd_ft":"Weir overflow rate","solids_lb_ft2_day":"Solids loading","note":"Note"},
   "class-of-loss-screen": {"water_class":"Candidate water class","rationale":"Rationale","evap_factor_gal_ft2":"Evaporation load factor (feeds evaporation-load)"},
   "clausius-clapeyron": {"enthalpy_kj_mol":"Enthalpy of vaporization dHvap","slope_k":"ln(P) vs 1/T slope","note":"Note"},
-  "cleanout-layout": {"total_cleanouts":"Total cleanouts","spacing_cleanouts":"From spacing","change_cleanouts":"From changes of direction","stack_cleanouts":"From stack bases","clear_ok":"Access","note":"Note"},
+  "cleanout-layout": {"total_cleanouts":"Total cleanouts","spacing_cleanouts":"From spacing","change_cleanouts":"From changes of direction","stack_cleanouts":"Stack bases (practice, not in the code total)","clear_ok":"Access","note":"Note"},
   "closing-costs": {"total_mid":"Estimated closing costs (mid)","total_pct_of_price_mid":"Mid as % of purchase price","items":"Line items (mid)"},
   "co-air-free": {"co_air_free_ppm":"Air-free CO","over_ansi":"Against the limits","note":"Note"},
   "coagulant-dose": {"pure_lb_day":"Pure equivalent"},

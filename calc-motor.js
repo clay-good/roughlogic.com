@@ -97,12 +97,12 @@ export function computeMotorPoleIdentification({ rated_rpm = 0, line_freq_hz = 6
   const at_or_above_sync = slip <= 1e-9;
   return {
     poles, sync_rpm, slip, slip_pct, at_or_above_sync,
-    note: "Identify an induction motor's pole count from the nameplate full-load speed and the line frequency, the inverse of the synchronous-speed relation Ns = 120 x f / P. The synchronous speed sits just above the running speed, so the pole count is the nearest even integer: pole-pairs = round(60 x f / rpm), poles = 2 x pole-pairs, then Ns = 120 x f / poles and slip = (Ns - rpm)/Ns. A 1750 rpm 60 Hz motor is a 4-pole machine (Ns 1800, 2.78% slip); 1150 rpm is 6-pole, 3450 rpm is 2-pole. If the entered speed is at or above the identified synchronous speed the slip is zero or negative, which an induction-motor nameplate never shows - recheck the rpm or frequency. The nameplate and the manufacturer govern.",
+    note: "Identify an induction motor's pole count from the nameplate full-load speed and the line frequency, the inverse of the synchronous-speed relation Ns = 120 x f / P. The synchronous speed sits just above the running speed, so the pole pairs are the whole number at or below 60 x f / rpm: pole-pairs = floor(60 x f / rpm) (a speed up to 5% above a synchronous speed keeps that pole count and is flagged), poles = 2 x pole-pairs, then Ns = 120 x f / poles and slip = (Ns - rpm)/Ns. A 1750 rpm 60 Hz motor is a 4-pole machine (Ns 1800, 2.78% slip); 1150 rpm is 6-pole, 3450 rpm is 2-pole. If the entered speed is at or above the identified synchronous speed the slip is zero or negative, which an induction-motor nameplate never shows - recheck the rpm or frequency. The nameplate and the manufacturer govern.",
   };
 }
 export const motorPoleIdentificationExample = { inputs: { rated_rpm: 1750, line_freq_hz: 60 } };
 function renderMotorPoleIdentification(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: first-principles AC-machine relation Ns = 120 x f / P inverted to identify the poles - pole-pairs = round(60 x f / rpm), poles = 2 x pole-pairs, then Ns = 120 x f / poles and slip = (Ns - rpm)/Ns. The motor nameplate and the manufacturer govern the rated full-load speed.";
+  citationEl.textContent = "Citation: first-principles AC-machine relation Ns = 120 x f / P inverted to identify the poles - pole-pairs = floor(60 x f / rpm), poles = 2 x pole-pairs, then Ns = 120 x f / poles and slip = (Ns - rpm)/Ns. The motor nameplate and the manufacturer govern the rated full-load speed.";
   const rpm = makeNumber("Nameplate full-load speed (rpm)", "mpi-rpm", { step: "any", min: "0" });
   const freq = makeNumber("Line frequency (Hz)", "mpi-freq", { step: "any", min: "0" });
   for (const f of [rpm, freq]) inputRegion.appendChild(f.wrap);

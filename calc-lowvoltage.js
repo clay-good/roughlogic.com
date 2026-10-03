@@ -927,7 +927,7 @@ export function computeCeilingSpeakerCoverageAngle({ ceiling_ft = 0, ear_ft = 0,
   if (![coverage_deg, drop_ft].every(Number.isFinite)) return { error: "Coverage-angle math is not a finite value." };
   return {
     coverage_deg, drop_ft,
-    note: "Required coverage angle = 2 x atan( target diameter / (2 x (ceiling - ear)) ), the inverse of diameter = 2 x (ceiling - ear) x tan(angle/2). Spec a speaker whose coverage angle (Lowell: use the linear-dispersion angle, not the conical rating) at the design frequency is at least this wide; the coverage angle narrows at high frequency, so a speaker rated exactly here dims the highs at the edge of the pattern. For edge-to-edge layout set the target diameter to the on-center spacing; for even (minimum-overlap) coverage set it to spacing / 0.7 (JBL's square-grid D / sqrt 2; Lowell prints 0.75, spacing / 0.75). A layout aid; verify with the speaker's coverage-angle spec and the target SPL.",
+    note: "Required coverage angle = 2 x atan( target diameter / (2 x (ceiling - ear)) ), the inverse of diameter = 2 x (ceiling - ear) x tan(angle/2). Spec a speaker whose coverage angle (Lowell: use the linear-dispersion angle, not the conical rating) at the design frequency is at least this wide; the coverage angle narrows at high frequency, so a speaker rated exactly here dims the highs at the edge of the pattern. For edge-to-edge layout set the target diameter to the on-center spacing; for even (minimum-overlap) coverage set it to spacing x sqrt 2 (spacing / 0.707, JBL's square-grid D / sqrt 2; Lowell prints 0.75, spacing / 0.75). A layout aid; verify with the speaker's coverage-angle spec and the target SPL.",
   };
 }
 export const ceilingSpeakerCoverageAngleExample = { inputs: { ceiling_ft: 10, ear_ft: 4, target_diameter_ft: 8 } };
@@ -991,7 +991,7 @@ export function computeStructuredCablingChannel({ permanent_link_m = 0, cords_m 
 }
 export const structuredCablingChannelExample = { inputs: { permanent_link_m: 85, cords_m: 8, temp_c: 20, derate_per_c: 0.004 } };
 function _renderStructuredCablingChannel(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: Structured cabling channel (TIA-568): 100 m total = 90 m permanent link + up to 10 m cords; above 20 deg C the max permanent link de-rates ~0.4%/deg C (UTP). Passes if the link is within its de-rated max, cords total <= 10 m, and the channel is within 100 m. A design aid; the cable's published de-rating and the adopted TIA-568 edition govern.";
+  citationEl.textContent = "Citation: Structured cabling channel (TIA-568): 100 m total = 90 m permanent link + up to 10 m cords; above 20 deg C the max permanent link de-rates per TIA-568-C.2 Table G.2 (UTP 84.0 m at 40 deg C, 75.0 m at 60 deg C). Passes if the link is within its de-rated max, cords total <= 10 m, and the channel is within 100 m. A design aid; the cable's published de-rating and the adopted TIA-568 edition govern.";
   const pl = makeNumber("Permanent-link length (m)", "scc-pl", { step: "any", min: "0" });
   const cd = makeNumber("Total patch + equipment cords (m)", "scc-cd", { step: "any", min: "0" });
   const tc = makeNumber("Installed cable temperature (°C)", "scc-tc", { step: "any" });
@@ -1039,7 +1039,7 @@ export function computeLvCablePullFootage({ drops = 48, avg_run_ft = 120, slack_
 export const lvCablePullFootageExample = { inputs: { drops: 48, avg_run_ft: 120, slack_ft: 15, box_ft: 1000 } };
 
 function _v855renderLvCablePullFootage(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: footage takeoff identity by name. total = drops x (average run + slack); boxes = ceil(total / box length). The slack covers service loops and rack dressing; each run is length-limited by structured-cabling-channel.";
+  citationEl.textContent = "Citation: footage takeoff identity by name. total = drops x (average run + slack); boxes = ceil(drops / floor(box length / (average run + slack))), since a run cannot be spliced. The slack covers service loops and rack dressing; each run is length-limited by structured-cabling-channel.";
   const d = makeNumber("Number of cable drops", "lvf-d", { step: "any", min: "0" });
   const ar = makeNumber("Average run length (ft)", "lvf-ar", { step: "any", min: "0" });
   const sl = makeNumber("Service-loop / dressing slack per drop (ft)", "lvf-sl", { step: "any", min: "0" });

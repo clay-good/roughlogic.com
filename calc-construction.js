@@ -704,7 +704,7 @@ export function renderLumberSpans(inputRegion, outputRegion, citationEl) {
 
 // dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderPullout(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: Withdrawal capacity W = G^2.5 * D * 1380 (lb per inch of penetration), where G is wood specific gravity and D is fastener shank diameter.";
+  citationEl.textContent = "Citation: Withdrawal per inch of penetration (NDS 12.2): nails W = 1380 G^2.5 D; wood screws W = 2850 G^2 D, where G is wood specific gravity and D is fastener shank diameter.";
   const ftype = makeSelect("Fastener type", "po-ft", [{ value: "nail", label: "Nail" }, { value: "screw", label: "Screw" }]);
   inputRegion.appendChild(ftype.wrap);
   const sizeWrap = document.createElement("div"); inputRegion.appendChild(sizeWrap);
@@ -1303,7 +1303,7 @@ export function renderTileCount(inputRegion, outputRegion, citationEl) {
 
 // dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderPaintCoverage(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: gallons = area / (coverage * surface_factor). 350 ft^2/gal smooth, 250 textured, 175 rough.";
+  citationEl.textContent = "Citation: gallons per coat = area / the coverage for the surface (350 ft^2/gal smooth, 250 textured, 175 rough); total = per coat x coats.";
   const a = makeNumber("Area (ft²)", "pc-a", { step: "any", min: "0" });
   const c = makeNumber("Coats", "pc-c", { step: "1", min: "1", value: "2" });
   c.input.value = "2";
@@ -2267,7 +2267,7 @@ const renderWeldUsage = _simpleRenderer({
 });
 
 const renderDemoDebris = _simpleRenderer({
-  citation: "Citation: Public engineering benchmarks (wood frame 50 pcf, mixed 100, masonry 130, concrete 150). Dumpster sizes 10/20/30/40 yd^3.",
+  citation: "Citation: loose debris densities (wood frame ~18 pcf, mixed ~60, masonry ~110, broken concrete ~85). Dumpster sizes 10/20/30/40 yd^3.",
   example: demoDebrisExample.inputs,
   fields: [
     { key: "structure_type", label: "Structure type", kind: "select", options: Object.keys(DEMO_DEBRIS_PCF).map((k) => ({ value: k, label: k.replace(/_/g, " ") })) },
@@ -5845,9 +5845,10 @@ CONSTRUCTION_RENDERERS["scaffold-mudsill-bearing"] = _renderScaffoldMudsillBeari
 // The load-side companion to scaffold-mudsill-bearing: total intended bay load
 // divided over the legs, checked against the OSHA 4:1 safe working load.
 //   total_load_lb = platform_dead_lb + num_workers x worker_lb + material_lb
-//   leg_load_lb = total_load_lb / n_legs; swl_lb = component_rating_lb / 4
-//   pass = leg_load_lb <= swl_lb
-// dims: in { platform_dead_lb: M L T^-2, num_workers: dimensionless, worker_lb: M L T^-2, material_lb: M L T^-2, n_legs: dimensionless, component_rating_lb: M L T^-2 } out: { total_load_lb: M L T^-2, leg_load_lb: M L T^-2, swl_lb: M L T^-2, utilization: dimensionless }
+//   leg_load_lb = total_load_lb / n_legs; swl_lb = component_rating_lb / 4 (kept for reference)
+//   pass = dead per leg + 4 x intended per leg <= component_rating_lb (OSHA 1926.451(a)(1))
+//   allowable_intended_per_leg_lb = (component_rating_lb - dead per leg) / 4
+// dims: in { platform_dead_lb: M L T^-2, num_workers: dimensionless, worker_lb: M L T^-2, material_lb: M L T^-2, n_legs: dimensionless, component_rating_lb: M L T^-2 } out: { total_load_lb: M L T^-2, leg_load_lb: M L T^-2, swl_lb: M L T^-2, allowable_intended_per_leg_lb: M L T^-2, utilization: dimensionless }
 export function computeScaffoldLegLoad({ platform_dead_lb = 100, num_workers = 2, worker_lb = 250, material_lb = 500, n_legs = 4, component_rating_lb = 2500 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(n_legs > 0)) return { error: "Leg count must be positive." };
@@ -5864,11 +5865,13 @@ export function computeScaffoldLegLoad({ platform_dead_lb = 100, num_workers = 2
   const intended_per_leg_lb = (total_load_lb - platform_dead_lb) / n_legs;
   const utilization = (platform_dead_lb / n_legs + 4 * intended_per_leg_lb) / component_rating_lb;
   const pass = utilization <= 1 + 1e-9;
+  const allowable_intended_per_leg_lb = (component_rating_lb - platform_dead_lb / n_legs) / 4;
   if (![total_load_lb, leg_load_lb, swl_lb, utilization].every(Number.isFinite)) return { error: "Scaffold-load math is not a finite value." };
   return {
     total_load_lb,
     leg_load_lb,
     swl_lb,
+    allowable_intended_per_leg_lb,
     utilization,
     pass,
     note: "The rating is the component's ULTIMATE capacity: OSHA 1926.451(a)(1) requires it to carry its own weight plus 4 times the maximum intended load (the 2013-12-06 interpretation excludes the scaffold's own weight from the intended load), so the check is dead + 4 x (workers + material) per leg against the capacity. A manufacturer's published ALLOWABLE leg load already includes the 4:1, so enter 4 times it here; the 250 lb per person is the non-mandatory Appendix A to Subpart L's one-person allowance. The distribution to legs depends on the configuration and any stacked lifts above - this assumes an even share. A competent person verifies the load and setup. The leg load feeds scaffold-mudsill-bearing for the foundation check.",
@@ -5878,7 +5881,7 @@ export function computeScaffoldLegLoad({ platform_dead_lb = 100, num_workers = 2
 export const scaffoldLegLoadExample = { inputs: { platform_dead_lb: 100, num_workers: 2, worker_lb: 250, material_lb: 500, n_legs: 4, component_rating_lb: 2500 } };
 
 const _renderScaffoldLegLoad = _simpleRenderer({
-  citation: "Citation: OSHA capacity rule by name. safe working load = component rating / 4; leg load = total intended load / legs; total = platform dead + workers x weight + material. OSHA 1926.451(a)(1) requires 4x the intended load; the 250 lb per person comes from the non-mandatory Appendix A to Subpart L.",
+  citation: "Citation: OSHA capacity rule by name. Capacity check per OSHA 1926.451(a)(1) and the 2013-12-06 interpretation: dead load per leg + 4 x intended (workers + material) load per leg <= the component's ultimate rating; leg load = (dead + workers + material) / legs. OSHA 1926.451(a)(1) requires 4x the intended load; the 250 lb per person comes from the non-mandatory Appendix A to Subpart L.",
   example: scaffoldLegLoadExample.inputs,
   fields: [
     { key: "platform_dead_lb", label: "Platform + scaffold dead load in the bay (lb)", kind: "number" },
@@ -5890,7 +5893,7 @@ const _renderScaffoldLegLoad = _simpleRenderer({
   ],
   outputs: [
     { key: "leg", id: "sll-out-leg", label: "Load per leg", value: (r) => _fmtC(r.leg_load_lb, 0) + " lb" + (r.pass ? " (OK)" : " (OVER: own weight + 4 x intended exceeds the capacity)") },
-    { key: "swl", id: "sll-out-swl", label: "Safe working load per leg", value: (r) => _fmtC(r.swl_lb, 0) + " lb" },
+    { key: "swl", id: "sll-out-swl", label: "Intended load each leg may carry", value: (r) => _fmtC(r.allowable_intended_per_leg_lb, 0) + " lb of workers and material (capacity less own weight, over 4)" },
     { key: "u", id: "sll-out-u", label: "Utilization", value: (r) => _fmtC(r.utilization * 100, 0) + "% of capacity (own weight + 4 x intended)" },
     { key: "n", id: "sll-out-n", label: "Note", value: (r) => r.note },
   ],
@@ -9998,7 +10001,7 @@ export function computeBaseplateGroutVolume({ plate_length_in = 18, plate_width_
 export const baseplateGroutVolumeExample = { inputs: { plate_length_in: 18, plate_width_in: 18, column_area_in2: 0, grout_thickness_in: 1.5, bag_yield_ft3: 0.45, waste_pct: 10 } };
 
 const _v880renderBaseplateGroutVolume = _simpleRenderer({
-  citation: "Citation: grout-volume identity by name. grout = (plate length x plate width - column area) x thickness; bags = ceil(grout / bag yield). The column area is the steel footprint; the grout flows fully under the plate with a head and dam.",
+  citation: "Citation: grout-volume identity by name. grout = (plate length x plate width - leave-out) x thickness; bags = ceil(grout / bag yield). The column sits ON the plate and displaces no grout; the leave-out is only a real one such as anchor sleeves. The grout flows fully under the plate with a head and dam.",
   example: baseplateGroutVolumeExample.inputs,
   fields: [
     { key: "plate_length_in", label: "Base plate length (in)", kind: "number" },
@@ -10889,14 +10892,14 @@ export function computeFoundationWaterproofingTakeoff({ perimeter_ft = 150, belo
     wall_area_sf,
     gallons,
     pails_5gal: Math.ceil(gallons / 5 - 1e-9),
-    note: "The fluid-applied waterproofing or dampproofing to coat a below-grade foundation wall: area = perimeter x the average below-grade height, and gallons = ceil(area x (1 + waste) / the product's coverage rate). A 150 ft perimeter, 8 ft below grade is 1,200 sf, so at a 50 sf/gal spray-applied rate with 10% waste it takes 27 gallons (6 five-gallon pails). The coverage rate is the LEVER and it varies widely: an emulsion DAMPPROOFing runs ~70-100 sf/gal PER COAT for a spray grade and 40-50 for a brush/trowel grade applied in two coats (W.R. Meadows Sealmastic Type I / II; a moisture barrier, IRC R406.1), so enter the coats, while a true fluid-applied WATERPROOFing membrane built to a wet-mil thickness (a below-grade-with-hydrostatic-pressure requirement, IRC R406.2) covers far fewer sf/gal per coat and often needs two coats and reinforcing fabric at cracks and cold joints -- read the coverage off the product data sheet, not a default. Foundation dampproofing vs waterproofing is a code distinction (waterproofing where a high water table or hydrostatic head exists). Sheet (peel-and-stick) membrane is ordered by the roll instead (see the roll coverage). A material-ordering estimate; the product data sheet, the assembly detail (with the drainage board and footing drain), and the AHJ / IRC R406 govern.",
+    note: "The fluid-applied waterproofing or dampproofing to coat a below-grade foundation wall: area = perimeter x the average below-grade height, and gallons = ceil(area x coats x (1 + waste) / the product's coverage rate per coat). A 150 ft perimeter, 8 ft below grade is 1,200 sf, so at a 50 sf/gal spray-applied rate with 10% waste it takes 27 gallons (6 five-gallon pails). The coverage rate is the LEVER and it varies widely: an emulsion DAMPPROOFing runs ~70-100 sf/gal PER COAT for a spray grade and 40-50 for a brush/trowel grade applied in two coats (W.R. Meadows Sealmastic Type I / II; a moisture barrier, IRC R406.1), so enter the coats, while a true fluid-applied WATERPROOFing membrane built to a wet-mil thickness (a below-grade-with-hydrostatic-pressure requirement, IRC R406.2) covers far fewer sf/gal per coat and often needs two coats and reinforcing fabric at cracks and cold joints -- read the coverage off the product data sheet, not a default. Foundation dampproofing vs waterproofing is a code distinction (waterproofing where a high water table or hydrostatic head exists). Sheet (peel-and-stick) membrane is ordered by the roll instead (see the roll coverage). A material-ordering estimate; the product data sheet, the assembly detail (with the drainage board and footing drain), and the AHJ / IRC R406 govern.",
   };
 }
 
 export const foundationWaterproofingTakeoffExample = { inputs: { perimeter_ft: 150, below_grade_height_ft: 8, coverage_sf_per_gal: 50, waste_pct: 10 } };
 
 CONSTRUCTION_RENDERERS["foundation-waterproofing-takeoff"] = _simpleRenderer({
-  citation: "Citation: foundation waterproofing / dampproofing takeoff, by name. area = perimeter x below-grade height; gallons = ceil(area x (1 + waste) / coverage rate). Coverage is per coat and varies widely (emulsion dampproofing ~70-100 sf/gal spray, 40-50 brush, two coats typical; a fluid membrane at a wet-mil thickness) -- read it off the product data sheet. IRC R406 (dampproofing vs waterproofing) and the AHJ govern.",
+  citation: "Citation: foundation waterproofing / dampproofing takeoff, by name. area = perimeter x below-grade height; gallons = ceil(area x coats x (1 + waste) / coverage rate). Coverage is per coat and varies widely (emulsion dampproofing ~70-100 sf/gal spray, 40-50 brush, two coats typical; a fluid membrane at a wet-mil thickness) -- read it off the product data sheet. IRC R406 (dampproofing vs waterproofing) and the AHJ govern.",
   example: foundationWaterproofingTakeoffExample.inputs,
   fields: [
     { key: "perimeter_ft", label: "Foundation perimeter (ft)", kind: "number" },

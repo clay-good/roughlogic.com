@@ -1398,7 +1398,7 @@ export function computeDefrostCycleSizing({ frost_lb = 0, coil_temp_f = -10, coi
 export const defrostCycleSizingExample = { inputs: { frost_lb: 20, coil_temp_f: -10, coil_mass_lb: 60, coil_specific_heat: 0.10, coil_temp_rise_f: 60, heater_btuh: 10236, defrost_efficiency: 0.80 } };
 
 REFRIGERANT_RENDERERS["defrost-cycle-sizing"] = _simpleRenderer({
-  citation: "Citation: defrost heat from the sensible, latent, and coil warm-up terms -- 144 BTU/lb to melt ice, about 0.5 BTU/lb-F to warm it to 32 F -- divided by the defrost efficiency, by name; public thermodynamics with the efficiency entered rather than bundled. The equipment manufacturer's defrost data and a measured coil temperature at termination govern.",
+  citation: "Citation: defrost heat from the sensible, latent, melt-water, and coil warm-up terms -- 144 BTU/lb to melt ice, about 0.5 BTU/lb-F to warm it to 32 F, 1.0 BTU/lb-F to warm the melt water to the drain temperature -- divided by the defrost efficiency, by name; public thermodynamics with the efficiency entered rather than bundled. The equipment manufacturer's defrost data and a measured coil temperature at termination govern.",
   example: defrostCycleSizingExample.inputs,
   fields: [
     { key: "frost_lb", label: "Frost mass per cycle (lb)", kind: "number" },

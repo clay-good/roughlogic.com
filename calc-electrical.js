@@ -3833,7 +3833,7 @@ export const serviceLoadOptionalExample = {
 
 // dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderServiceLoadOptional(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: Per NEC 2023 220.82 (optional dwelling load calculation): general load demand = first 10 kVA at 100% + remainder at 40%; 220.82(C) adds the larger of heating vs cooling at 100%. Compared against the standard Part III method (Table 220.45 lighting demand); size to the larger. AHJ governs the adopted edition. Free at nfpa.org/freeaccess for the NEC table of contents.";
+  citationEl.textContent = "Citation: Per NEC 2023 220.82 (optional dwelling load calculation): general load demand = first 10 kVA at 100% + remainder at 40%; 220.82(C) adds the larger of cooling at 100% and heating at 100% (heat pump), 65% or 40% by type. Compared against the standard Part III method (Table 220.45 lighting demand); size to the larger. AHJ governs the adopted edition. Free at nfpa.org/freeaccess for the NEC table of contents.";
 
   const area = makeNumber("Dwelling area (ft²)", "slo-area", { step: "any", min: "0" });
   const sa = makeNumber("Small-appliance circuits", "slo-sa", { step: "1", min: "0" });

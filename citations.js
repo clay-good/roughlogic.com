@@ -2964,13 +2964,13 @@ export const CITATIONS = {
     ],
   },
   "motor-pole-identification": {
-    formula: "pole-pairs = round(60 x f / rpm); poles = 2 x pole-pairs; Ns = 120 x f / poles; slip = (Ns - rpm) / Ns.",
+    formula: "pole-pairs = floor(60 x f / rpm) (a speed up to 5% above a synchronous speed keeps that pole count and is flagged); poles = 2 x pole-pairs; Ns = 120 x f / poles; slip = (Ns - rpm) / Ns.",
     edition: "First-principles AC-machine speed relation Ns = 120 x f / P inverted to identify the poles; classical induction-machine theory.",
     freeAccess: "First-principles physics; no licensed source required.",
     governance: GOVERNANCE.general,
-    editionNote: "The inverse of the synchronous-speed relation: given the nameplate full-load speed and the line frequency, identify the pole count. Because the synchronous speed sits just above the running speed, the pole count is the nearest even integer to 120 x f / rpm - pole-pairs = round(60 x f / rpm), poles = 2 x pole-pairs - and then the synchronous speed Ns = 120 x f / poles and slip = (Ns - rpm)/Ns follow. If the entered speed is at or above the identified synchronous speed the slip is zero or negative, which an induction-motor nameplate never shows, so the rpm or frequency should be rechecked. The nameplate and the manufacturer govern.",
+    editionNote: "The inverse of the synchronous-speed relation: given the nameplate full-load speed and the line frequency, identify the pole count. Because the synchronous speed sits just above the running speed, the pole count is the even number at or below 120 x f / rpm - pole-pairs = floor(60 x f / rpm), poles = 2 x pole-pairs (an 800 rpm Design D motor is 8-pole, not 10) - and then the synchronous speed Ns = 120 x f / poles and slip = (Ns - rpm)/Ns follow. If the entered speed is at or above the identified synchronous speed the slip is zero or negative, which an induction-motor nameplate never shows, so the rpm or frequency should be rechecked. The nameplate and the manufacturer govern.",
     assumptions: [
-      { name: "Nearest even poles", value: "poles = 2 x round(60 x f / rpm); the synchronous speed sits just above the running speed", source: "AC-machine theory" },
+      { name: "Poles at or below the ratio", value: "poles = 2 x floor(60 x f / rpm); the synchronous speed sits just above the running speed", source: "AC-machine theory" },
       { name: "Induction machine", value: "the nameplate speed is below synchronous; a zero/negative slip flags a bad rpm or frequency", source: "AC-machine construction" },
     ],
   },
@@ -4890,13 +4890,13 @@ export const CITATIONS = {
     ],
   },
   "header-sizing": {
-    formula: "Tributary uniform load w (plf) = total area load (psf) × supported width (ft); roof = ground snow + 15 psf dead, each floor adds 50 psf. Smallest built-up member with min(L_bending, L_deflection) ≥ span, where Fb is adjusted by load-duration C_D and size factor C_F. Jack studs each end = ceil(end reaction / (F_c-perp × 5.25 in²)).",
+    formula: "Tributary uniform load w (plf) = total area load (psf) × supported width (ft); roof = the greater of ground snow and the 20 psf roof live load, + 15 psf dead, each floor adds 50 psf. Smallest built-up member with min(L_bending, L_deflection) ≥ span, where Fb is adjusted by load-duration C_D and size factor C_F. Jack studs each end = ceil(end reaction / (F_c-perp × 5.25 in²)).",
     edition: IRC_2021 + " §R602.7 (headers). " + AWC_NDS + " reference design values, load-duration C_D and size factor C_F.",
     freeAccess: ICC_FREE + " AWC NDS free at awc.org.",
     governance: GOVERNANCE.structural,
     editionNote: IRC_DISCLOSURE,
     assumptions: [
-      { name: "Load assembly", value: "roof = snow (live) + 15 psf dead; each floor above = 40 psf live + 10 psf dead", source: "IRC 2021 typical residential" },
+      { name: "Load assembly", value: "roof = max(ground snow, 20 psf roof live) + 15 psf dead; each floor above = 40 psf live + 10 psf dead", source: "IRC 2021 typical residential" },
       { name: "Load-duration factor C_D", value: "1.15 snow (roof-only) / 1.0 occupancy (floors above)", source: "AWC NDS-2018 Table 2.3.2" },
       { name: "Cross-check", value: "allowable spans verified against IRC Table R602.7(1) by physics; discrepancies flagged", source: "IRC 2021 Table R602.7(1)" },
     ],
@@ -5811,14 +5811,14 @@ export const CITATIONS = {
     ],
   },
   "srt-fm-ratio": {
-    formula: "SRT (solids retention time, days) = (MLSS_lb in tank) / (TSS_lb wasted per day + TSS_lb lost in effluent per day). F/M ratio = BOD_lb_per_day / MLVSS_lb_in_tank. Conventional activated sludge typical: SRT 5-15 d, F/M 0.2-0.5.",
+    formula: "SRT (solids retention time, days) = (MLSS_lb in tank) / (TSS_lb wasted per day + TSS_lb lost in effluent per day). F/M ratio = BOD_lb_per_day / MLVSS_lb_in_tank. Conventional activated sludge typical: SRT 4-15 d, F/M 0.2-0.5.",
     edition: "Metcalf & Eddy (Wastewater Engineering: Treatment and Resource Recovery), 5th edition by name. Water Environment Federation MOP-8 (Design of Municipal Wastewater Treatment Plants) by name.",
     freeAccess: "Metcalf & Eddy / WEF MOP-8 licensed; principles free in EPA wastewater operator-training materials at epa.gov.",
     governance: GOVERNANCE.water,
     editionNote: "Single-edition (engineering-practice convention; CAS range from Metcalf & Eddy).",
     assumptions: [
       { name: "Conversion factor", value: "1 MGD × 1 mg/L × 8.34 = 1 lb/day (mass-balance constant)", source: "physical fact" },
-      { name: "CAS range", value: "SRT 5-15 d, F/M 0.2-0.5 typical", source: "Metcalf & Eddy 5th ed." },
+      { name: "CAS range", value: "SRT 4-15 d, F/M 0.2-0.5 typical", source: "Metcalf & Eddy 5th ed." },
     ],
   },
 
@@ -6274,7 +6274,7 @@ export const CITATIONS = {
     ],
   },
   "sprinkler-density": {
-    formula: "Total demand GPM = density (gpm/ft²) × area_of_operation (ft²) + hose-stream allowance per the NFPA 13 density/area design approach (Chapter 19 since the 2019 edition; §11.2 in 2013/2016).",
+    formula: "Sprinkler demand GPM = density (gpm/ft²) × area_of_operation (ft²) per the NFPA 13 density/area design approach (Chapter 19 since the 2019 edition; §11.2 in 2013/2016); the hose-stream allowance is added separately and is not in this total.",
     edition: "NFPA 13 (2022) Chapter 19 (design approaches: density/area curves and hose-stream allowance) by name.",
     freeAccess: "NFPA 13 read-only at nfpa.org/freeaccess.",
     governance: GOVERNANCE.fire,
@@ -8682,11 +8682,11 @@ export const CITATIONS = {
     edition: "The grade-rod method of differential leveling, by name; standard construction-surveying practice. A smaller rod reading means higher ground and therefore a cut. The grading plan, the benchmark of record, and a checked level circuit govern.",
     freeAccess: "Four subtractions on the crew's own benchmark, rod readings, and design elevation.",
     governance: GOVERNANCE.general,
-    editionNote: "Set the instrument, shoot the benchmark, and the height of instrument is fixed for the whole setup. From then on a single number carries the entire design: the grade rod is the height of instrument less the design elevation, which is the rod reading that would be observed if the rod were standing on finished grade. Every subsequent shot is compared against that one number and the difference is the cut or fill, with no elevation arithmetic at all -- which is the whole reason the method exists, because it turns a per-shot calculation into a per-shot subtraction. The sign is where crews go wrong and it is worth stating plainly. A rod reading smaller than the grade rod means the rod is standing higher than design, because the rod reads downward from a fixed instrument: smaller reading, higher ground, cut. It reads backward the first hundred times and it is worth checking the first few shots independently against the ground elevation, which the same height of instrument also gives. When the design grade sits at or above the instrument no rod reading can reach it, and the setup has to move.",
+    editionNote: "Set the instrument, shoot the benchmark, and the height of instrument is fixed for the whole setup. From then on a single number carries the entire design: the grade rod is the height of instrument less the design elevation, which is the rod reading that would be observed if the rod were standing on finished grade. Every subsequent shot is compared against that one number and the difference is the cut or fill, with no elevation arithmetic at all -- which is the whole reason the method exists, because it turns a per-shot calculation into a per-shot subtraction. The sign is where crews go wrong and it is worth stating plainly. A rod reading smaller than the grade rod means the rod is standing higher than design, because the rod reads downward from a fixed instrument: smaller reading, higher ground, cut. It reads backward the first hundred times and it is worth checking the first few shots independently against the ground elevation, which the same height of instrument also gives. When the design grade sits at or above the instrument the grade rod is zero or negative and no rod reads on finished grade, but the fill is still the grade rod less the ground rod; mark it from the ground shot, or reset the instrument higher for staking.",
     assumptions: [
       { name: "One setup", value: "the height of instrument and therefore the grade rod are fixed until the instrument moves", source: "differential leveling practice" },
       { name: "Sign", value: "a SMALLER rod reading than the grade rod means higher ground and a cut", source: "differential leveling practice" },
-      { name: "Reachable design", value: "if the design elevation is at or above the instrument, no rod reading reaches it and the setup must move", source: "differential leveling practice" },
+      { name: "Reachable design", value: "if the design elevation is at or above the instrument the grade rod is zero or negative; the fill still follows (grade rod - ground rod)", source: "differential leveling practice" },
     ],
   },
   "map-scale-conversion": {
@@ -9077,10 +9077,10 @@ export const CITATIONS = {
   },
   "selective-coordination-screen": {
     formula: "fuses: ratio = upstream_rating / downstream_rating, coordinated when ratio >= the family's published minimum, and then to the interrupting rating. breakers: pickup = upstream_rating x instantaneous_multiplier, the low edge of its band = pickup x (1 - tolerance), and coordination holds only up to that low edge (Bussmann, Selective Coordination, 2008: a 400 A breaker at 5x can trip at 2000 x 0.75 = 1500 A).",
-    edition: "Selective coordination screened by device type -- fuses against the manufacturer's published minimum ratio for the family (commonly 2:1), which holds to the interrupting rating, and breakers only up to the upstream instantaneous pickup, above which both devices open. Cited by name; the ratio and the instantaneous setting are the manufacturer's published values and are entered rather than bundled. A screen, never a study: the published time-current curves, a full coordination study, and the engineer of record govern.",
+    edition: "Selective coordination screened by device type -- fuses against the manufacturer's published minimum ratio for the family (commonly 2:1), which holds to the interrupting rating, and breakers only up to the low edge of the upstream instantaneous pickup band, above which both devices open. Cited by name; the ratio and the instantaneous setting are the manufacturer's published values and are entered rather than bundled. A screen, never a study: the published time-current curves, a full coordination study, and the engineer of record govern.",
     freeAccess: "Both screens are comparisons on values the user reads off the manufacturer's published data; no ratio table or time-current curve is reproduced.",
     governance: GOVERNANCE.general,
-    editionNote: "Fuses coordinate on a ratio, and the ratio is a published test result for a specific fuse family rather than a general rule of thumb. Within a family, an upstream fuse at or above the published ratio will not open before a downstream one clears, at any fault current up to the interrupting rating, which is why fuses coordinate all the way down and why the ratio table is the whole answer. Circuit breakers fail differently, and understanding how is the point of screening them separately. A thermal-magnetic breaker's instantaneous element trips essentially without delay, so once the fault current exceeds the upstream breaker's instantaneous pickup both devices open and selectivity is lost, no matter how far apart the ratings are. A four-to-one rating spread that looks comfortable coordinates not at all above the pickup. Coordination therefore holds only up to that pickup current, and whether that is acceptable depends entirely on the available fault current at the downstream device. The breaker case has three fixes and all are real work: raise the instantaneous setting if the breaker allows it and the downstream equipment survives the longer clearing time, move to a breaker with a short-time delay and no instantaneous -- which raises incident energy, so the arc-flash and coordination requirements genuinely conflict -- or use fuses.",
+    editionNote: "Fuses coordinate on a ratio, and the ratio is a published test result for a specific fuse family rather than a general rule of thumb. Within a family, an upstream fuse at or above the published ratio will not open before a downstream one clears, at any fault current up to the interrupting rating, which is why fuses coordinate all the way down and why the ratio table is the whole answer. Circuit breakers fail differently, and understanding how is the point of screening them separately. A thermal-magnetic breaker's instantaneous element trips essentially without delay, so once the fault current exceeds the upstream breaker's instantaneous pickup both devices open and selectivity is lost, no matter how far apart the ratings are. A four-to-one rating spread that looks comfortable coordinates not at all above the pickup. Coordination therefore holds only up to the LOW edge of that pickup band (Bussmann's 400 A breaker at 5x can trip at 1,500 A, not 2,000), and whether that is acceptable depends entirely on the available fault current at the downstream device. The breaker case has three fixes and all are real work: raise the instantaneous setting if the breaker allows it and the downstream equipment survives the longer clearing time, move to a breaker with a short-time delay and no instantaneous -- which raises incident energy, so the arc-flash and coordination requirements genuinely conflict -- or use fuses.",
     assumptions: [
       { name: "Fuse ratios are tested", value: "a published ratio for a specific family, not a general rule; met, it holds to the interrupting rating", source: "fuse manufacturer coordination tables" },
       { name: "Breakers lose selectivity above pickup", value: "above the upstream instantaneous pickup BOTH open, whatever the ratio", source: "overcurrent protection practice" },
@@ -10074,9 +10074,9 @@ export const CITATIONS = {
     edition: "Pavement-marking quantity identity by name (area from length x width; gallons from area / coverage; beads from gallons x rate); first-principles arithmetic.",
     freeAccess: "The marking quantity is public quantity-survey arithmetic; the coverage and bead rate come from the marking specification.",
     governance: GOVERNANCE.general,
-    editionNote: "The coverage (sf/gal) follows the specified wet-mil thickness - a waterborne line near 15 mil runs about 320-360 sf/gal. The glass-bead drop rate is set by the retroreflectivity spec. A skip (dashed) line applies a duty-cycle fraction of the length. Distinct from architectural wall-paint coverage.",
+    editionNote: "The coverage (sf/gal) follows the specified wet-mil thickness - a gallon covers 1,604 sf at 1 mil, so a 15 mil line runs about 107 sf/gal and 16 mil about 100. The glass-bead drop rate is set by the retroreflectivity spec. A skip (dashed) line applies a duty-cycle fraction of the length. Distinct from architectural wall-paint coverage.",
     assumptions: [
-      { name: "Coverage", value: "~320 sf/gal default for a waterborne line near 15 wet mil; the marking spec's thickness governs", source: "marking specification" },
+      { name: "Coverage", value: "~100 sf/gal default for a 16 wet mil line; the marking spec's thickness governs", source: "marking specification" },
       { name: "Bead rate", value: "~6 lb/gal default; set by the retroreflectivity spec", source: "retroreflectivity specification" },
     ],
   },
@@ -10125,13 +10125,13 @@ export const CITATIONS = {
     ],
   },
   "foundation-waterproofing-takeoff": {
-    formula: "wall_area_sf = perimeter_ft x below_grade_height_ft; gallons = ceil(wall_area_sf x (1 + waste_pct/100) / coverage_sf_per_gal); pails_5gal = ceil(gallons / 5).",
+    formula: "wall_area_sf = perimeter_ft x below_grade_height_ft; gallons = ceil(wall_area_sf x coats x (1 + waste_pct/100) / coverage_sf_per_gal); pails_5gal = ceil(gallons / 5).",
     edition: "Foundation waterproofing / dampproofing material takeoff (area x coverage), by name; IRC R406 (dampproofing vs waterproofing) and the product data sheet and AHJ govern.",
     freeAccess: "The takeoff is public first-principles (wall area over the product coverage rate); the coverage rate comes from the product data sheet and the dimensions from the foundation.",
     governance: GOVERNANCE.general,
     editionNote: "A material takeoff for coating a below-grade foundation wall against moisture. The area is the foundation perimeter times the average below-grade wall height, and the fluid-applied product quantity is that area, plus waste, divided by the product's published coverage rate: a 150-foot perimeter, 8-foot-below-grade wall is 1,200 sf, so at a 50 sf/gal spray-applied rate with 10% waste it takes 27 gallons, or six five-gallon pails. The coverage rate is the dominant variable and it spans a wide range depending on which of two code-distinct treatments the job calls for. DAMPPROOFING (IRC R406.1) -- required on the exterior of below-grade walls enclosing habitable space where a high water table or hydrostatic pressure is NOT present -- is typically a thin sprayed or brushed bituminous coating, roughly 70-100 sf/gal per coat for a spray-grade emulsion and 40-50 for a brush grade applied in two coats (W.R. Meadows Sealmastic Type I / II), a vapor/moisture retarder only; the coverage is per coat, so the coats multiply the gallons. WATERPROOFING (IRC R406.2) -- required where a high water table or other hydrostatic head exists -- is a more robust fluid-applied membrane built to a specified wet-mil thickness (so it covers far fewer square feet per gallon, often in two coats with reinforcing fabric bridged over cracks and cold joints) or a sheet membrane. Because of that range, the coverage rate must be read off the actual product data sheet, not assumed. Sheet (peel-and-stick) membrane is ordered by the roll from its own roll coverage rather than by the gallon. This is a material-ordering estimate; the product data sheet, the full assembly detail (with the protection/drainage board and the footing drain), and IRC R406 and the AHJ govern the specification.",
     assumptions: [
-      { name: "Area over coverage", value: "area = perimeter x below-grade height; gallons = ceil(area x (1 + waste) / coverage rate); pails = ceil(gallons/5)", source: "material-takeoff practice" },
+      { name: "Area over coverage", value: "area = perimeter x below-grade height; gallons = ceil(area x coats x (1 + waste) / coverage rate per coat); pails = ceil(gallons/5)", source: "material-takeoff practice" },
       { name: "Dampproofing vs waterproofing", value: "coverage is per coat and varies widely: emulsion dampproofing ~70-100 sf/gal spray, 40-50 brush in two coats (IRC R406.1; W.R. Meadows) vs a fluid membrane at a wet-mil thickness (IRC R406.2); read the data sheet; sheet membrane is by the roll", source: "IRC R406 / product data sheet" },
     ],
   },
@@ -10591,7 +10591,7 @@ export const CITATIONS = {
     ],
   },
   "smoke-detector-spacing-count": {
-    formula: "rows = ceil(room_length_ft / listed_spacing_ft); cols = ceil(room_width_ft / listed_spacing_ft); detectors = rows x cols; wall_max_ft = listed_spacing_ft / 2.",
+    formula: "detectors = rows x cols, the fewest grid cells that each fit the listed S x S square or keep every point within 0.7 S (NFPA 72 17.7.4.2.3.1); wall_max_ft = listed_spacing_ft / 2.",
     edition: "NFPA 72 spot-detector grid identity by name (grid count over the listed spacing; wall maximum at half the spacing); first-principles grid arithmetic.",
     freeAccess: "The grid arithmetic is public first-principles; the listed spacing comes from the device listing and the reductions from NFPA 72.",
     governance: GOVERNANCE.general,
@@ -10953,7 +10953,7 @@ export const CITATIONS = {
   },
   "lv-cable-pull-footage": {
     formula: "total_ft = drops x (avg_run_ft + slack_ft); runs_per_box = floor(box_ft / (avg_run_ft + slack_ft)); boxes = ceil(drops / runs_per_box) -- each run whole from one box, since TIA-568 allows no splice in a horizontal copper run.",
-    edition: "Low-voltage cable footage takeoff identity by name (drops x per-drop length; boxes from total / box); first-principles count arithmetic.",
+    edition: "Low-voltage cable footage takeoff identity by name (drops x per-drop length; boxes from whole runs per box); first-principles count arithmetic.",
     freeAccess: "The footage takeoff is public quantity arithmetic; the drop count and runs come from the drop schedule and the plan.",
     governance: GOVERNANCE.general,
     editionNote: "The slack covers service loops at both ends plus rack dressing. Each run's length is limited separately by structured-cabling-channel (the 100 m channel). Cable is bought by the box.",
@@ -11823,7 +11823,7 @@ export const CITATIONS = {
     edition: "Countersink diameter-to-depth relation (Machinery's Handbook countersinking; 82 deg inch and 90 deg metric flat-head standards), first-principles trigonometry, by name, solved for the diameter; the tool geometry and the fastener callout govern.",
     freeAccess: "The countersink depth-to-diameter relation is first-principles cone trigonometry; the depth, angle, and pilot hole come from the setup and the tool.",
     governance: GOVERNANCE.general,
-    editionNote: "Countersink depth-to-diameter relation, the inverse of the plunge-depth calc. D_cs = 2 x Z x tan(angle/2) + d_hole is the finished (major) diameter the cone opens to at a plunge depth Z below the surface, so a machinist reading a dial or a Z stop can check the diameter the print calls out. A small over-plunge sits a flat-head screw proud or sunken. 82 degree inch flat-head heads and 90 degree metric heads are not interchangeable in the same sink, and a shallower (larger) angle opens a wider diameter for the same depth. A setup aid, not the print; the actual tool geometry and the fastener callout govern.",
+    editionNote: "Countersink depth-to-diameter relation, the inverse of the plunge-depth calc. D_cs = 2 x Z x tan(angle/2) + d_hole is the finished (major) diameter the cone opens to at a plunge depth Z from the tool zero, d being the diameter at that zero (the hole edge, a flat tip, or 0 for a pointed tool zeroed at the surface), so a machinist reading a dial or a Z stop can check the diameter the print calls out. A small over-plunge sits a flat-head screw proud or sunken. 82 degree inch flat-head heads and 90 degree metric heads are not interchangeable in the same sink, and a shallower (larger) angle opens a wider diameter for the same depth. A setup aid, not the print; the actual tool geometry and the fastener callout govern.",
     assumptions: [
       { name: "Depth to diameter", value: "the finished diameter is read back from the plunge depth the machine is set to", source: "Machinery's Handbook" },
       { name: "Angle standard", value: "82 deg inch flat-head and 90 deg metric are not interchangeable", source: "flat-head fastener standards" },
@@ -13458,10 +13458,10 @@ export const CITATIONS = {
     edition: "Distributed ceiling-loudspeaker coverage geometry, standard commercial-audio design practice (manufacturer design guides, e.g. Bose / JBL / Atlas) by name, solved for the angle; first-principles cone geometry.",
     freeAccess: "The coverage-cone geometry is first-principles; the spacing conventions are published in loudspeaker-manufacturer design guides.",
     governance: GOVERNANCE.electrical,
-    editionNote: "The coverage angle a target coverage diameter (or on-center spacing) needs at a mounting drop, the inverse of the coverage-cone geometry. Spec a speaker whose coverage angle (Lowell: use the linear-dispersion angle, not the conical rating) at the design frequency is at least this wide; the rated angle narrows at high frequency, so a speaker rated exactly here dims the highs at the edge of the pattern - use the 2-4 kHz coverage for speech. For edge-to-edge layout set the target diameter to the on-center spacing; for even (minimum-overlap) coverage set it to spacing / 0.7 (JBL's square-grid D / sqrt 2; Lowell prints 0.75, spacing / 0.75). Verify against the speaker's directivity data and the target SPL.",
+    editionNote: "The coverage angle a target coverage diameter (or on-center spacing) needs at a mounting drop, the inverse of the coverage-cone geometry. Spec a speaker whose coverage angle (Lowell: use the linear-dispersion angle, not the conical rating) at the design frequency is at least this wide; the rated angle narrows at high frequency, so a speaker rated exactly here dims the highs at the edge of the pattern - use the 2-4 kHz coverage for speech. For edge-to-edge layout set the target diameter to the on-center spacing; for even (minimum-overlap) coverage set it to spacing x sqrt 2 (spacing / 0.707, JBL's square-grid D / sqrt 2; Lowell prints 0.75, spacing / 0.75). Verify against the speaker's directivity data and the target SPL.",
     assumptions: [
       { name: "Coverage cone", value: "coverage angle = 2 x atan( diameter / (2 x (ceiling - ear)) ) at the listener plane", source: "cone geometry" },
-      { name: "Spacing convention", value: "edge-to-edge target = spacing; minimum overlap target = spacing / 0.7 (JBL D/sqrt 2) or spacing / 0.75 (Lowell)", source: "JBL Control Contractor guide; Lowell DSSS (2020)" },
+      { name: "Spacing convention", value: "edge-to-edge target = spacing; minimum overlap target = spacing x sqrt 2 (spacing / 0.707, JBL D/sqrt 2) or spacing / 0.75 (Lowell)", source: "JBL Control Contractor guide; Lowell DSSS (2020)" },
       { name: "Angle narrows with frequency", value: "the rated angle is broadest at low frequency; use the 2-4 kHz coverage for speech", source: "loudspeaker directivity data" },
     ],
   },
@@ -13482,7 +13482,7 @@ export const CITATIONS = {
     edition: "ANSI/TIA-568 (Balanced Twisted-Pair Telecommunications Cabling) 100 m channel model and the temperature de-rating of the permanent link, by name.",
     freeAccess: "The 100 m channel / 90 m permanent-link model and the temperature de-rating are published in ANSI/TIA-568; the arithmetic is public.",
     governance: GOVERNANCE.electrical,
-    editionNote: "ANSI/TIA-568 limits a balanced twisted-pair horizontal channel to 100 m total: a 90 m permanent link (the fixed in-wall horizontal cable, wall plate to patch panel) plus up to 10 m of patch and equipment cords combined. Above 20 deg C the maximum permanent-link length de-rates because warmer copper has higher insertion loss - about 0.4% per deg C for unscreened (UTP) cable from 20 to 40 deg C (0.6% above 40) and about 0.2% per deg C for screened cable - so a hot ceiling or plenum shortens the allowed run. The channel is compliant only if the permanent link is within its de-rated maximum AND the total channel is within 100 m. The de-rate factor and the cable's specifics are user inputs; the adopted TIA-568 edition and the cable manufacturer's data govern.",
+    editionNote: "ANSI/TIA-568 limits a balanced twisted-pair horizontal channel to 100 m total: a 90 m permanent link (the fixed in-wall horizontal cable, wall plate to patch panel) plus up to 10 m of patch and equipment cords combined. Above 20 deg C the maximum permanent-link length de-rates because warmer copper has higher insertion loss, by TIA-568-C.2 Table G.2 (UTP 84.0 m at 40 deg C and 75.0 m at 60 deg C; screened 87.0 and 83.0) - so a hot ceiling or plenum shortens the allowed run. The channel is compliant only if the permanent link is within its de-rated maximum AND the total channel is within 100 m. The de-rate factor and the cable's specifics are user inputs; the adopted TIA-568 edition and the cable manufacturer's data govern.",
     assumptions: [
       { name: "100 m channel", value: "channel = permanent link + cords <= 100 m, with the permanent link <= 90 m at 20 deg C", source: "ANSI/TIA-568" },
       { name: "Temperature de-rate", value: "max permanent link from Table G.2 (84.0 m UTP / 87.0 m screened at 40 deg C; 75.0 / 83.0 at 60); the 0.4%/deg C UTP figure is the insertion-loss rise behind the table, not a length cut", source: "ANSI/TIA-568-C.2 Annex G" },
@@ -13859,13 +13859,13 @@ export const CITATIONS = {
     ],
   },
   "pool-chlorine-dose": {
-    formula: "lb_cl = ppm x (gallons/1e6) x 8.34; lb_prod = lb_cl / (avail/100); dry_oz = lb_prod x 16; liq_floz = lb_cl / (avail/100 x 8.34) x 128 (liquid sold by trade percent, grams of available chlorine per 100 mL).",
+    formula: "lb_cl = ppm x (gallons/1e6) x 8.34; lb_prod = lb_cl / (avail/100) for dry products; for liquid, lb_prod = liquid gallons x 8.34 x (1 + 0.0158 x trade %) (about 10 lb/gal at 12.5%); dry_oz = lb_prod x 16; liq_floz = lb_cl / (avail/100 x 8.34) x 128 (liquid sold by trade percent, grams of available chlorine per 100 mL).",
     edition: "The standard pool free-chlorine dose mass balance and product available-chlorine fractions, by name.",
     freeAccess: "The 8.34 lb/gal water constant and product available-chlorine strengths are published free by pool-care references and product labels. The product label directions govern.",
     governance: GOVERNANCE.general,
-    editionNote: "The free-chlorine dose: pounds of chlorine = ppm x (gallons/1,000,000) x 8.34, divided by the product's available-chlorine fraction (liquid 12.5%, cal-hypo 65%, dichlor 56%, trichlor 90%, or a custom %) for the product weight, then dry ounces, or for liquid (sold by trade percent, grams of available chlorine per 100 mL) fluid ounces from gallons = lb chlorine / (percent x 8.34). A weaker product needs proportionally more weight. This returns the dose to raise free chlorine by the target: it does not subtract the pool's existing chlorine demand and does not model the CYA (stabilizer) effect on effective chlorine. Dose to a target and retest; the product label directions govern.",
+    editionNote: "The free-chlorine dose: pounds of chlorine = ppm x (gallons/1,000,000) x 8.34, divided by the product's available-chlorine fraction (liquid 12.5%, cal-hypo 65%, dichlor 56%, trichlor 90%, or a custom %) for a dry product's weight (a liquid's weight is its volume x its density, about 10 lb/gal at 12.5%), then dry ounces, or for liquid (sold by trade percent, grams of available chlorine per 100 mL) fluid ounces from gallons = lb chlorine / (percent x 8.34). A weaker product needs proportionally more weight. This returns the dose to raise free chlorine by the target: it does not subtract the pool's existing chlorine demand and does not model the CYA (stabilizer) effect on effective chlorine. Dose to a target and retest; the product label directions govern.",
     assumptions: [
-      { name: "Mass balance", value: "lb chlorine = ppm x (gal/1e6) x 8.34; product weight = /available fraction", source: "pool-care practice" },
+      { name: "Mass balance", value: "lb chlorine = ppm x (gal/1e6) x 8.34; dry product weight = /available fraction", source: "pool-care practice" },
       { name: "Product strengths", value: "liquid 12.5% trade, cal-hypo 65%, dichlor 56%, trichlor 90%; liquid volume = lb chlorine / (trade percent x 8.34) gal", source: "product labels" },
       { name: "No demand/CYA", value: "does not subtract chlorine demand or model the CYA effect", source: "scope of this tile" },
     ],
@@ -14108,9 +14108,9 @@ export const CITATIONS = {
     edition: "Flat glass lite weight (NGA Glazing Manual glass-weight table; ASTM C1036 flat glass), by name; the glass type and the lifter's rating govern.",
     freeAccess: "The density x volume weight is first-principles; the 158 lb/ft^3 (2531 kg/m^3) density is the one NGA Technical Paper FM01-08 (2020) gives for an exact weight (free PDF via ogs.ny.gov). Until 2026-10-02 this used 156.1 (SG 2.50) and called it universal.",
     governance: GOVERNANCE.general,
-    editionNote: "Flat-glass weight for handling: glass weighs its density times its volume, and soda-lime float glass (standard window glass) runs about 13.2 lb per square foot per inch of thickness (158 lb/ft^3 per NGA FM01-08), so a lite weighs 13.2 x thickness(in) x area(ft^2). Tempering and heat-strengthening do not change the weight; an insulating unit (IGU) is the sum of its lites, and a laminated lite's thin plastic interlayer is close enough to ignore for a lift estimate. This sizes the two-person or vacuum-cup lift and checks it against a suction lifter's rating -- OSHA and most shops flag a manual lift above about 50 lb per person. The 13.0 figure carries a ~1% material tolerance (published tables run 13.0-13.1). A handling estimate, not a structural glass design.",
+    editionNote: "Flat-glass weight for handling: glass weighs its density times its volume, and soda-lime float glass (standard window glass) runs about 13.2 lb per square foot per inch of thickness (158 lb/ft^3 per NGA FM01-08), so a lite weighs 13.2 x thickness(in) x area(ft^2). Tempering and heat-strengthening do not change the weight; an insulating unit (IGU) is the sum of its lites, and a laminated lite's thin plastic interlayer is close enough to ignore for a lift estimate. This sizes the two-person or vacuum-cup lift and checks it against a suction lifter's rating -- OSHA and most shops flag a manual lift above about 50 lb per person. The 13.2 figure carries a ~1% material tolerance (published tables run 13.0-13.1). A handling estimate, not a structural glass design.",
     assumptions: [
-      { name: "Soda-lime density", value: "SG 2.50, 156.1 lb/ft^3, ~13.0 lb/ft^2 per inch (published tables 13.0-13.1, ~1% tolerance)", source: "ASTM C1036 / NGA table" },
+      { name: "Soda-lime density", value: "158 lb/ft^3 (NGA FM01-08), ~13.2 lb/ft^2 per inch (published tables 13.0-13.1, ~1% tolerance)", source: "ASTM C1036 / NGA table" },
       { name: "Tempering / IGU", value: "tempering does not change the weight; an IGU is the sum of its lites", source: "NGA Glazing Manual" },
     ],
   },
@@ -14828,7 +14828,7 @@ export const CITATIONS = {
     ],
   },
   "defrost-cycle-sizing": {
-    formula: "sensible_btu = frost_lb x 0.5 x (32 - coil_temp_f); latent_btu = frost_lb x 144; coil_warmup_btu = coil_mass x specific_heat x rise; total_btu = (sensible + latent + coil warm-up) / defrost_efficiency; defrost_min = total_btu / heater_btuh x 60.",
+    formula: "sensible_btu = frost_lb x 0.5 x (32 - coil_temp_f); latent_btu = frost_lb x 144; coil_warmup_btu = coil_mass x specific_heat x rise; meltwater_btu = frost_lb x 1.0 x (drain_temp_f - 32); total_btu = (sensible + latent + melt water warmed to the drain temperature + coil warm-up) / defrost_efficiency; defrost_min = total_btu / heater_btuh x 60.",
     edition: "Defrost heat from the sensible, latent, and coil warm-up terms -- 144 BTU/lb to melt ice, about 0.5 BTU/lb-F to warm it to 32 F -- divided by the defrost efficiency, by name; public thermodynamics with the efficiency entered rather than bundled. The equipment manufacturer's defrost data and a measured coil temperature at termination govern.",
     freeAccess: "The latent heat of fusion and the specific heat of ice are public physical constants; the frost load, coil mass, heater rating, and efficiency are the system's own values.",
     governance: GOVERNANCE.general,
@@ -15179,14 +15179,14 @@ export const CITATIONS = {
   // from the adopted edition, because they differ between the accessibility
   // standards, the building code, and the life safety code.
   "door-closer-opening-force": {
-    formula: "closer size band = one size per six inches of door width from a 30 in size 1, stepped up for a heavy leaf or a pressure difference; the force a pressure difference adds at the pull = door area x pressure x 5.2 lbf per sq ft per in wc / 2; closer force = measured force - that.",
+    formula: "closer size band = one size per six inches of door width from a 30 in size 1, stepped up for a heavy leaf or a pressure difference; the force a pressure difference adds at the pull = door area x pressure x 5.2 lbf per sq ft per in wc x W / (2 (W - d)), d the knob offset from the latch edge (NFPA 92 / Klote); closer force = measured force - that.",
     edition: "ANSI/BHMA A156.4 closer size bands by door width, by name, with the accessibility and building-code opening force limits and the minimum closing time named, and NFPA 80 cited for rated doors. Limits are entered from the adopted code; the closer itself is a manufacturer selection from its own chart.",
     freeAccess: "A size band from door width and a subtraction on the user's own gauge reading; no manufacturer sizing chart or code table is reproduced.",
     governance: GOVERNANCE.general,
-    editionNote: "A door closer has to be strong enough to close and latch the door and weak enough that a person can open it, and those two requirements fight. A closer sized down until the opening force meets the limit may not have the power to close the door against its latch, its gasketing, and the building's stack pressure, and a fire door that does not latch is a failed fire door. When both cannot be met the answer is a lower-friction hinge set, a different latch, addressing the pressure difference across the door, or a power operator, not a weaker spring. The reading is often not the closer at all: a door hinged at one edge and pulled at the other carries half the total pressure force at the hand, so a room held slightly positive to the corridor can put a pound or two into a gauge reading and turn a compliant closer into a failing one. Turning the spring down then fixes the gauge and breaks the latching, which is why the split is printed. The adjustments are commonly confused as well. Spring power sets the opening force; sweep speed and latch speed set how fast it closes and are hydraulic rather than spring; backcheck protects the door and the closer from being thrown open into a wall. Slowing the sweep does not reduce opening force. Accessibility also imposes a minimum closing TIME, so a door tuned to slam shut fails even when its force is fine.",
+    editionNote: "A door closer has to be strong enough to close and latch the door and weak enough that a person can open it, and those two requirements fight. A closer sized down until the opening force meets the limit may not have the power to close the door against its latch, its gasketing, and the building's stack pressure, and a fire door that does not latch is a failed fire door. When both cannot be met the answer is a lower-friction hinge set, a different latch, addressing the pressure difference across the door, or a power operator, not a weaker spring. The reading is often not the closer at all: a door hinged at one edge and pulled at the other carries a little more than half (W / (2 (W - d))) of the total pressure force at the hand, so a room held slightly positive to the corridor can put a pound or two into a gauge reading and turn a compliant closer into a failing one. Turning the spring down then fixes the gauge and breaks the latching, which is why the split is printed. The adjustments are commonly confused as well. Spring power sets the opening force; sweep speed and latch speed set how fast it closes and are hydraulic rather than spring; backcheck protects the door and the closer from being thrown open into a wall. Slowing the sweep does not reduce opening force. Accessibility also imposes a minimum closing TIME, so a door tuned to slam shut fails even when its force is fine.",
     assumptions: [
       { name: "The two requirements fight", value: "a closer weak enough to meet the force limit may not latch the door, and a fire door that does not latch has failed", source: "NFPA 80" },
-      { name: "Half the pressure force lands at the hand", value: "a door is a lever hinged at one edge, so a small pressure difference reads as a hardware problem", source: "statics" },
+      { name: "About half the pressure force lands at the hand (W / (2 (W - d)))", value: "a door is a lever hinged at one edge, so a small pressure difference reads as a hardware problem", source: "statics" },
       { name: "Spring power is not sweep speed", value: "slowing the sweep does not reduce opening force, and the two adjustments are independent", source: "closer manufacturer data" },
     ],
   },
@@ -15620,7 +15620,7 @@ export const CITATIONS = {
     ],
   },
   "grounding-electrode-conductor": {
-    formula: "GEC from NEC Table 250.66 by the largest ungrounded service conductor (or equivalent parallel area), then the 250.66(A)-(C) electrode caps: rod/pipe/plate sole connection not larger than 6 AWG copper / 4 AWG aluminum; concrete-encased not larger than 4 AWG copper; ground ring not smaller than the ring conductor and not smaller than 2 AWG; water-pipe / structural-steel electrode takes the full table size.",
+    formula: "GEC from NEC Table 250.66 by the largest ungrounded service conductor (or equivalent parallel area), then the 250.66(A)-(C) electrode caps: rod/pipe/plate sole connection not larger than 6 AWG copper / 4 AWG aluminum; concrete-encased not larger than 4 AWG copper; ground ring sole connection not required to be larger than the ring conductor (at least 2 AWG copper, 250.52(A)(4)), so capped at 2 AWG copper for the minimum ring; water-pipe / structural-steel electrode takes the full table size.",
     edition: NEC_2023 + " Section 250.66 and Table 250.66.",
     freeAccess: NEC_FREE,
     governance: GOVERNANCE.electrical,
@@ -16022,13 +16022,13 @@ export const CITATIONS = {
     ],
   },
   "stair-code-check": {
-    formula: "IBC (commercial): riser 4-7 in, tread >= 11 in, width >= 44 in. IRC (residential): riser <= 7.75 in, tread >= 10 in, width >= 36 in. Each measured value is compared to its limit; 2R + T (comfort 24-25 in) is reported, not enforced.",
+    formula: "IBC (commercial): riser 4-7 in, tread >= 11 in, width >= 44 in (36 in where the occupant load is under 50). IRC (residential): riser <= 7.75 in, tread >= 10 in, width >= 36 in. Each measured value is compared to its limit; 2R + T (comfort 24-25 in) is reported, not enforced.",
     edition: "IBC 2021 (International Building Code) §1011.5.2 (riser/tread) and §1011.2 (width), and IRC 2021 (International Residential Code) R311.7.5 (riser/tread) and R311.7.1 (width), by section; dimensional minimums only, not reproduced.",
     freeAccess: "Read-only at codes.iccsafe.org. The dimensional stair limits are facts; the AHJ-adopted code and edition govern.",
     governance: GOVERNANCE.structural,
     editionNote: "Multi-edition (the AHJ-adopted IBC / IRC edition governs the riser, tread, and width minimums). IBC 2021 §1011.5.2 caps the commercial riser at 7 in (4 in minimum) and floors the tread at 11 in; §1011.2 requires 44 in of width (36 in where the occupant load is under 50). IRC 2021 R311.7.5 allows a 7-3/4 in residential riser and a 10 in tread; R311.7.1 requires 36 in of width. The tread is the horizontal run excluding the nosing; 2R + T of 24-25 in is a comfort rule of thumb, not a code pass/fail. The 3/8 in riser/tread uniformity limit over a flight, the nosing profile, the landings, and winder/spiral geometry are separate checks; the egress width the occupant load requires is the egress-capacity tile.",
     assumptions: [
-      { name: "Thresholds", value: "IBC commercial riser 4-7 in, tread 11 in min, width 44 in; IRC residential riser 7-3/4 in max, tread 10 in min, width 36 in", source: "IBC 1011.5.2 / 1011.2 / IRC R311.7.5 / R311.7.1" },
+      { name: "Thresholds", value: "IBC commercial riser 4-7 in, tread 11 in min, width 44 in (36 in where the occupant load is under 50); IRC residential riser 7-3/4 in max, tread 10 in min, width 36 in", source: "IBC 1011.5.2 / 1011.2 / IRC R311.7.5 / R311.7.1" },
       { name: "Comfort read", value: "2R + T between 24 and 25 in is a design rule of thumb reported for reference, not a code pass/fail requirement", source: "trade practice" },
       { name: "Separate checks", value: "the 3/8 in flight uniformity limit, nosing, landings, winders, and the occupant-load egress width (the egress-capacity tile) are not checked here; the AHJ governs", source: "IBC 1011 / IRC R311" },
     ],
@@ -19798,13 +19798,13 @@ export const CITATIONS = {
     ],
   },
   "mua-tempering-load": {
-    formula: "dT_F = t_target_F - t_oa_F; Q_s_btuh = 1.08 x cfm x dT_F; Q_l_btuh = 0.68 x cfm x (w_oa_gr - w_target_gr); Q_t_btuh = Q_s_btuh + Q_l_btuh; input_btuh = Q_s_btuh / eta.",
+    formula: "dT_F = t_target_F - t_oa_F; Q_s_btuh = 1.08 x cfm x |dT_F|; Q_l_btuh = 0.68 x cfm x (w_oa_gr - w_target_gr); Q_t_btuh = Q_s_btuh + Q_l_btuh; input_btuh = Q_s_btuh / eta when heating, 0 when the target is below the outdoor air (cooling MUA: size the coil for Q_t).",
     edition: "The ASHRAE Fundamentals sensible (Q_s = 1.08 x CFM x dT), latent (Q_l = 0.68 x CFM x dW in gr/lb), and total psychrometric load equations and the IMC 508 makeup-air-equals-exhaust requirement, by name; the sea-level constants 1.08, 0.68, and 4.5 are named constants.",
     freeAccess: "The psychrometric load equations and their sea-level constants are public; the IMC makeup-air requirement is readable free at codes.iccsafe.org.",
     governance: GOVERNANCE.general,
     editionNote: "The ASHRAE Fundamentals sensible Q_s = 1.08 x CFM x dT, latent Q_l = 0.68 x CFM x dW (gr/lb), and total Q_t = 4.5 x CFM x dh equations with the sea-level constants 1.08 = 60 x 0.075 x 0.24, 0.68 = 60 x 0.075 x 1061/7000 = 0.682 (ASHRAE's 4840-based figure, 4.5 x 1076/7000, is 0.69), and 4.5 = 60 x 0.075, and the IMC 508 makeup-air-equals-exhaust requirement. This returns the design tempering load at the stated supply target - it uses sea-level air density (no altitude derate), assumes the makeup CFM equals the exhaust and is delivered at the target temperature (a neutral, not a heating, supply unless the target is set above space temperature), and excludes duct and cabinet losses, the fan heat, and the exhaust-hood capture efficiency; the latent term is zero when the humidity ratios are omitted (a heating-only MUA). A design aid, not a substitute for the mechanical engineer's stamped design.",
     assumptions: [
-      { name: "Sensible load", value: "Q_s = 1.08 x CFM x (T_target - T_oa) at sea-level air density", source: "ASHRAE Fundamentals" },
+      { name: "Sensible load", value: "Q_s = 1.08 x CFM x |T_target - T_oa| at sea-level air density", source: "ASHRAE Fundamentals" },
       { name: "Latent load", value: "optional Q_l = 0.68 x CFM x dW with the humidity ratios in grains per pound", source: "ASHRAE Fundamentals" },
       { name: "Makeup requirement", value: "makeup air approximately equal to the exhaust; the burner input is the sensible load over the thermal efficiency", source: "IMC 508" },
     ],
@@ -20053,7 +20053,7 @@ export const CITATIONS = {
     ],
   },
   "plumbing-fixture-count": {
-    formula: "per_sex = ol x distribution; wc(sex) = ceil(min(per_sex, wc_tier) / wc_ratio) + (wc_ratio_over > 0 ? ceil(max(per_sex - wc_tier, 0) / wc_ratio_over) : 0); lav(sex) = ceil(min(per_sex, lav_tier) / lav_ratio) + (lav_tier > 0 and lav_ratio_over > 0 ? ceil(max(per_sex - lav_tier, 0) / lav_ratio_over) : 0); fountains = ceil(ol / fountain_ratio); service = 1.",
+    formula: "per_sex = ol x distribution; wc(sex) = (wc_tier > 0 and wc_ratio_over > 0) ? ceil(min(per_sex, wc_tier) / wc_ratio) + ceil(max(per_sex - wc_tier, 0) / wc_ratio_over) : ceil(per_sex / wc_ratio); lav(sex) the same form with lav_tier / lav_ratio / lav_ratio_over; fountains = ceil(ol / fountain_ratio); service = 1.",
     edition: "IBC 2021 §2902 and Table 2902.1 (minimum plumbing fixtures by occupancy, mirrored in IPC Table 403.1) and §2902.1.1 (round each ratio up), by name.",
     freeAccess: "The fixture-count relation is stated in the published IBC §2902 / Table 2902.1; the arithmetic is public. The ratios are the table values for the occupancy.",
     governance: GOVERNANCE.general,
@@ -20854,7 +20854,7 @@ export const CITATIONS = {
     edition: "The masonry arching-action lintel-load method (TMS 402 commentary / masonry design references), by name.",
     freeAccess: "The 45-degree arching triangle for masonry lintel loads is a standard masonry-design method (TMS 402 commentary / masonry design references). The engineer of record governs.",
     governance: GOVERNANCE.general,
-    editionNote: "Masonry lintel arching load: for masonry above an opening, the lintel carries only the triangular dead load within a 45-degree triangle (height = span/2) IF enough wall is above (wall above >= span/2 + 8 in, NCMA TEK 17-1), W = 0.5 x span x (span/2) x wall psf, a moment-equivalent UDL of 4W/(3 x span) (W/span matches the end shear but understates the moment 25%). NCMA TEK 17-01D's own worked example loads the triangle to 3.5 ft (half span plus the 8 in), which reads about 25% more moment than its text's half-span triangle; this follows the text and BIA Technical Note 31B. If the wall above is shorter than the triangle (a lintel near the top of the wall or under a beam bearing), arching is not developed and the lintel carries the full rectangle span x height x psf - MORE load than the arched case. This returns the dead load only: add the floor/roof/superimposed loads within the triangle separately, and confirm the arching assumptions (bond, no control joint in the triangle). A design aid; the engineer of record governs.",
+    editionNote: "Masonry lintel arching load: for masonry above an opening, the lintel carries only the triangular dead load within a 45-degree triangle (height = span/2) IF enough wall is above (wall above >= span/2 + 8 in, NCMA TEK 17-1), W = 0.5 x span x (span/2) x wall psf, a moment-equivalent UDL of 4W/(3 x span) (W/span matches the end shear but understates the moment 25%). NCMA TEK 17-01D's own worked example loads the triangle to 3.5 ft (half span plus the 8 in), which reads about 25% more moment than its text's half-span triangle; this follows the text and BIA Technical Note 31B. If the wall above is shorter than the triangle plus 8 in (a lintel near the top of the wall or under a beam bearing), arching is not developed and the lintel carries the full rectangle span x height x psf - MORE load than the arched case. This returns the dead load only: add the floor/roof/superimposed loads within the triangle separately, and confirm the arching assumptions (bond, no control joint in the triangle). A design aid; the engineer of record governs.",
     assumptions: [
       { name: "Arching triangle", value: "45-degree triangle, height span/2; arches only when wall above >= span/2 + 8 in (TEK 17-1: 8 in of wall above the apex)", source: "masonry design method" },
       { name: "No arching case", value: "insufficient wall above -> the full rectangle span x height x psf (more load)", source: "masonry design method" },
@@ -22014,11 +22014,11 @@ export const CITATIONS = {
     ],
   },
   "conductor-blowout": {
-    formula: "wind load per foot = wind pressure x conductor diameter / 12; swing angle = atan(wind load per foot / weight per foot); blowout at midspan = sag x sin(swing angle); a wind speed entered instead of a pressure is converted as 0.00256 V^2.",
+    formula: "wind load per foot = wind pressure x conductor diameter / 12; swing angle = atan(wind load per foot / weight per foot); blowout at midspan = (insulator string length + sag) x sin(swing angle) (RUS 1724E-200 Eq. 5-1; 0 string for pin or post insulators); a wind speed entered instead of a pressure is converted as 0.00256 V^2.",
     edition: "The transverse blowout relation as standard overhead line practice, by name, with the ASCE 7 velocity-pressure constant 0.00256 -- the same relation the wind-pressure calculator uses, so the two cannot disagree. The applicable NESC edition, the utility's construction standards, and the right-of-way requirements govern.",
     freeAccess: "Trigonometry on a wind pressure and a sag the user supplies; no clearance table is reproduced.",
     governance: GOVERNANCE.general,
-    editionNote: "Ground clearance is checked straight down and nothing checks sideways. A conductor in wind swings out of the plane of the poles like a hinged sheet, and because it does not stretch to do so the horizontal displacement at midspan is the sag times the sine of the swing angle. The swing angle is independent of span and of tension -- it depends only on the ratio of wind load to weight -- but the blowout DISTANCE is proportional to sag, so the long slack spans blow out furthest, on exactly the hot days when vertical clearance is also worst. A light conductor blows out far further than a heavy one in the same wind: Drake at 1.094 lb/ft in a 9 psf wind swings 37.2 degrees and moves 7.26 ft, and at half that weight it swings 56.7 degrees and moves 10.0 ft. That is why small distribution conductor near buildings is the recurring problem.",
+    editionNote: "Ground clearance is checked straight down and nothing checks sideways. A conductor in wind swings out of the plane of the poles like a hinged sheet, and because it does not stretch to do so the horizontal displacement at midspan is the sag, plus any suspension insulator string, times the sine of the swing angle. The swing angle is independent of span and of tension -- it depends only on the ratio of wind load to weight -- but the blowout DISTANCE is proportional to sag, so the long slack spans blow out furthest, on exactly the hot days when vertical clearance is also worst. A light conductor blows out far further than a heavy one in the same wind: Drake at 1.094 lb/ft in a 9 psf wind swings 37.2 degrees and moves 7.26 ft, and at half that weight it swings 56.7 degrees and moves 10.0 ft. That is why small distribution conductor near buildings is the recurring problem.",
     assumptions: [
       { name: "Midspan on a level span", value: "insulator restraint near the structures is not modelled", source: "overhead line practice" },
       { name: "Rigid swing about the chord", value: "differential swing between phases is not evaluated", source: "overhead line practice" },
@@ -22143,7 +22143,7 @@ export const CITATIONS = {
     editionNote: "A propeller shaft is not loaded in torsion alone. The propeller hangs on the end of an overhung shaft supported at the strut, and its weight plus hydrodynamic side loads put bending into the shaft that a torsion-only calculation misses entirely -- which is why the rule figure is almost always larger, and why both are reported here so a reader who computed the torsion number elsewhere can see what it leaves out. The cube root is what makes a repower interesting: a large power increase calls for a small proportional diameter increase, which sounds negligible and is often a whole nominal size, at which point the coupling, stern tube, bearings and stuffing box all change with it.",
     assumptions: [
       { name: "The rule factor is entered", value: "bronze, Aquamet and stainless allowables differ substantially", source: "the classification society's table" },
-      { name: "Torsion is shown, not used", value: "it cannot see the propeller's bending or the corrosion allowance", source: "ABYC P-6 and the society's rules" },
+      { name: "Torsion is shown, not used", value: "at a working allowable it is not the rule: ABYC P-6 is the same torsion formula at shear yield over a 2-10 safety factor that carries bending, fatigue and corrosion", source: "ABYC P-6 and the society's rules" },
       { name: "No whirling or critical speed", value: "bearing spacing sets those and is a separate calculation", source: "a marine engineer" },
     ],
   },
@@ -22172,7 +22172,7 @@ export const CITATIONS = {
     ],
   },
   "dock-piling-lateral": {
-    formula: "the nonconstrained embedment d = 0.5 A (1 + sqrt(1 + 4.36 h / A)) with A = 2.34 P / (S1 b), S1 being the lateral bearing rate at one third of the embedment (rate x d / 3, IBC 1807.3.2.1), so d is solved iteratively; scour lengthens the cantilever by the scour depth and the pile must be driven that much deeper below the ORIGINAL mudline on top of the deeper embedment the longer cantilever demands.",
+    formula: "the nonconstrained embedment d = 0.5 A (1 + sqrt(1 + 4.36 h / A)) with A = 2.34 P / (S1 b), S1 being the lateral bearing rate at one third of the embedment (rate x min(d, 12 ft) / 3, IBC 1807.3.2.1), so d is solved iteratively; scour lengthens the cantilever by the scour depth and the pile must be driven that much deeper below the ORIGINAL mudline on top of the deeper embedment the longer cantilever demands.",
     edition: "The nonconstrained lateral embedment relation the building code gives for posts and poles, applied to a marine pile, with the soil's lateral bearing ENTERED from the geotechnical information for the site rather than inferred from the driving record. It does not compute berthing energy, wind or current loading, or ice; it does not check the pile's own bending capacity or its section loss to marine borers, address pile group effects, evaluate uplift or axial capacity, or account for a sloping mudline.",
     freeAccess: "One code relation evaluated twice; no code text is reproduced.",
     governance: GOVERNANCE.general,
@@ -22415,7 +22415,7 @@ export const CITATIONS = {
     ],
   },
   "coating-voc-compliance": {
-    formula: "VOC as supplied = lb of VOC / gallons of coating; VOC less water = the same VOC / (gallons of coating minus water minus exempt solvent); as applied adds the thinner's VOC to the numerator and its volume to the denominator, with the water unchanged.",
+    formula: "VOC as supplied = lb of VOC / gallons of coating; VOC less water = the same VOC / (gallons of coating minus water minus exempt solvent); as applied adds the thinner's VOC to the numerator and its non-water, non-exempt volume to the denominator (a water or exempt thinner leaves the less-water figure unchanged).",
     edition: "The VOC content bases as coating rules define them, with less water the regulatory basis in most rules. Volumes and masses are ENTERED from the technical data sheet. It does not determine which compounds are exempt (the list is specific and changes), apply transfer-efficiency credits some rules allow, address limits expressed per gallon of SOLIDS, compute emissions from usage, or determine which rule applies.",
     freeAccess: "Two divisions on numbers from a data sheet.",
     governance: GOVERNANCE.general,
@@ -22785,7 +22785,7 @@ export const CITATIONS = {
     ],
   },
   "pwht-holding-time": {
-    formula: "holding time = governing thickness x a code rate against a stated minimum; above a threshold temperature the heating and cooling rates are limited to a constant divided by the thickness, under a ceiling; the total cycle is the hold plus both controlled ramps.",
+    formula: "holding time = governing thickness x a code rate (commonly 1 h per inch) to 2 in, then 15 min per inch beyond for P-No. 1 (ASME VIII UCS-56), against a stated minimum; above a threshold temperature the heating and cooling rates are limited to a constant divided by the thickness, under a ceiling; the total cycle is the hold plus both controlled ramps.",
     edition: "Post-weld heat treatment cycle arithmetic. Every parameter -- rates, minimum, threshold, constants, ceiling and the code's definition of GOVERNING THICKNESS -- is entered from the applicable code, which for a joint between unequal thicknesses does not simply take the thicker member.",
     freeAccess: "Arithmetic on entered code parameters; no code table is reproduced.",
     governance: GOVERNANCE.general,
@@ -22983,12 +22983,12 @@ export const CITATIONS = {
   },
   "zonal-pressure-diagnostics": {
     formula: "pressure ratio = zone pressure with reference to outdoors / house pressure with reference to outdoors, both taken during a blower door depressurization; the ratio of the two series leakage paths follows as (ratio / (1 - ratio))^n on the field flow exponent n = 0.65 (Energy Conservatory; JLC 2023).",
-    edition: "The zonal pressure diagnostic as building-performance field practice states it, with the series-leakage interpretation on an assumed flow exponent of 0.5. It is a RATIO diagnostic: it says which of two planes is leakier, not how many cfm either passes.",
-    freeAccess: "One measured ratio and one square-root relation.",
+    edition: "The zonal pressure diagnostic as building-performance field practice states it, with the series-leakage interpretation on the field flow exponent n = 0.65. It is a RATIO diagnostic: it says which of two planes is leakier, not how many cfm either passes.",
+    freeAccess: "One measured ratio and one 0.65-power relation.",
     governance: GOVERNANCE.general,
     editionNote: "A ratio near the house pressure means the plane between the house and the zone is the leaky one and the zone is effectively inside; a ratio near zero means that plane is tight and the zone is effectively outdoors. That single reading decides where the money goes, and it is the answer to the question a blower door number cannot address at all -- an attic at house pressure is being ventilated by the house, and insulating over it without air sealing first is close to wasted work.",
     assumptions: [
-      { name: "Flow exponent 0.5", value: "real envelopes run roughly 0.5 to 0.75", source: "the power-law leakage model" },
+      { name: "Flow exponent 0.65", value: "real envelopes run roughly 0.5 to 0.75", source: "the power-law leakage model" },
       { name: "Series leakage, two planes", value: "a zone with a third path is not this model", source: "a multi-point diagnostic" },
       { name: "A ratio, not a flow", value: "it does not report cfm through either plane", source: "an add-a-hole measurement" },
     ],
@@ -23061,7 +23061,7 @@ export const CITATIONS = {
     edition: "AMCA Publication 201 (Fans and Systems) by name -- the effective duct length below which an outlet system effect applies, and the inlet conditions that reduce the pressure a fan can develop, worst when an elbow spins the air WITH the wheel rotation. It reports whether the installation meets the effective length; it does NOT compute the system effect pressure penalty, because AMCA's factors depend on the specific geometry, blast area ratio and elbow orientation.",
     freeAccess: "One velocity, one diameter, and one length comparison.",
     governance: GOVERNANCE.general,
-    editionNote: "A catalogue fan curve is measured with ideal approach and discharge and a real installation rarely provides them. Air leaves a centrifugal fan through a small blast area at high velocity and needs straight duct to expand and convert that velocity into static pressure; cut that short and the recovery does not happen. The inlet case is worse and more common, and it is invisible in any measurement taken downstream of the fan. The diagnostic value is the point: a fan at design speed, drawing design amps, short on flow and showing MORE static than designed is very often a system effect, and speeding it up raises the flow and the loss with it.",
+    editionNote: "A catalogue fan curve is measured with ideal approach and discharge and a real installation rarely provides them. Air leaves a centrifugal fan through a small blast area at high velocity and needs straight duct to expand and convert that velocity into static pressure; cut that short and the recovery does not happen. The inlet case is worse and more common, and it is invisible in any measurement taken downstream of the fan. The diagnostic value is the point: a fan at design speed, drawing design amps, short on flow and developing LESS pressure than its catalog curve at the measured flow is very often a system effect, and speeding it up raises the flow and the loss with it.",
     assumptions: [
       { name: "The penalty itself is not computed", value: "AMCA's factors depend on geometry a single coefficient cannot carry", source: "AMCA Publication 201" },
       { name: "The inlet effect is named, not quantified", value: "it depends on clearance, elbow geometry and swirl direction", source: "the fan manufacturer" },
@@ -23081,7 +23081,7 @@ export const CITATIONS = {
     ],
   },
   "pump-impeller-trim": {
-    formula: "trim affinity: Q2/Q1 = D2/D1, H2/H1 = (D2/D1)^2, P2/P1 = (D2/D1)^3; the required diameter is the current one times the flow ratio; the head at the trimmed diameter is checked against the head required; and the annual saving is the motor power times one minus the power ratio, over the operating hours.",
+    formula: "trim affinity: Q2/Q1 = D2/D1, H2/H1 = (D2/D1)^2, P2/P1 = (D2/D1)^3; the required diameter is the current one times the flow ratio, or, for a throttled pump at unchanged flow, times (required head / current head)^(1/3) (DOE Pumping Systems Tip Sheet #7); the head at the trimmed diameter is checked against the head required; and the annual saving is the motor power times one minus the power ratio, over the operating hours.",
     edition: "The impeller-trim affinity relations as pump practice writes them, noting that a TRIM is not a speed change: it alters the impeller's geometry relative to its casing, so the correspondence is APPROXIMATE and the manufacturer's published trim curves are the authority. The practical limit of roughly 75 to 80% of the casing maximum is ENTERED. It does not read a pump curve, compute efficiency at the trimmed condition, check NPSH available, or address minimum flow.",
     freeAccess: "Three affinity ratios and one energy calculation.",
     governance: GOVERNANCE.general,
@@ -23603,10 +23603,10 @@ export const CITATIONS = {
     edition: "The NFPA 96 inspection intervals by cooking volume, by name -- monthly for solid fuel, quarterly for high volume (24 hour, charbroiling, wok), semiannually for moderate, annually for low volume -- with the NFPA 96 12.6.1.1 depth criteria: clean at 2,000 micrometres (0.078 in) in the system or 3,175 (0.125 in) in a fan housing, and clean to 50 micrometres (0.002 in). The schedule and the measurement are separate tests and the MEASUREMENT GOVERNS. Cleaning scope is the entire system: hood, filters, the full duct, the fan and the roof discharge. NFPA 96 as adopted, the authority having jurisdiction, and the certified cleaning contractor govern.",
     freeAccess: "One subtraction and one comparison on a measurement the reader takes; no NFPA text is reproduced.",
     governance: GOVERNANCE.general,
-    editionNote: "The interval is set by COOKING VOLUME rather than by kitchen size, and a charbroiler in an otherwise moderate kitchen moves the whole system into the quarterly column. The schedule and the measurement are two separate tests and the MEASUREMENT GOVERNS: a system inspected on time and found with grease is cleaned on the spot, and one found clean is still inspected again at the interval. The scope trap is the one that leaves buildings on fire -- cleaning means the entire system including horizontal runs, the fan housing and the roof curb, and a cleaning that addresses the hood, the filters and the first accessible duct section has cleaned the easy part and left the part that burns.",
+    editionNote: "The interval is set by COOKING VOLUME rather than by kitchen size, and a charbroiler in an otherwise moderate kitchen moves the whole system into the quarterly column. The schedule and the measurement are two separate tests and the MEASUREMENT GOVERNS: a system inspected on time and found at the NFPA 96 depth trigger (2,000 micrometres, 3,175 in a fan housing) is cleaned on the spot, and one found clean is still inspected again at the interval. The scope trap is the one that leaves buildings on fire -- cleaning means the entire system including horizontal runs, the fan housing and the roof curb, and a cleaning that addresses the hood, the filters and the first accessible duct section has cleaned the easy part and left the part that burns.",
     assumptions: [
       { name: "The cooking volume category is a judgment", value: "and it sets the whole schedule", source: "the authority having jurisdiction" },
-      { name: "The measurement governs over the schedule", value: "any measurable grease means cleaning, whatever the interval says", source: "NFPA 96 as adopted" },
+      { name: "The measurement governs over the schedule", value: "buildup at the NFPA 96 depth trigger means cleaning, whatever the interval says", source: "NFPA 96 as adopted" },
       { name: "Scope is the entire system", value: "the fan housing and roof curb are routinely skipped", source: "the certified cleaning contractor" },
     ],
   },
@@ -24814,7 +24814,7 @@ export const CITATIONS = {
     ],
   },
   "co2-enrichment-rate": {
-    formula: "initial charge = house volume x concentration lift; makeup = volume x air changes per hour x the lift; mass at 0.1138 lb per cubic foot of carbon dioxide.",
+    formula: "initial charge = house volume x concentration lift; makeup = volume x air changes per hour x the lift + the crop's own CO2 use; mass at 0.1138 lb per cubic foot of carbon dioxide.",
     edition: "Ambient is about 400 ppm and 1,000 to 1,500 ppm the customary target. The crop's uptake, the supplier's data, and any combustion safety requirements govern.",
     freeAccess: "Public mass balance; supplier sizing tables are quoted per 1,000 square feet.",
     governance: GOVERNANCE.general,

@@ -397,7 +397,7 @@ CONCRETEPLACEMENT_RENDERERS["tilt-up-lift-stress"] = _simpleRenderer({
   outputs: [
     { key: "w", id: "tls-out-w", label: "Panel weight", value: (r) => fmt(r.panel_weight_lb, 0) + " lb (" + fmt(r.panel_weight_lb / 2000, 2) + " tons)" + (r.suction_fraction > 0 ? ", and " + fmt(r.lift_load_lb, 0) + " lb with the " + fmt(r.suction_fraction * 100, 0) + "% suction allowance" : "") },
     { key: "i", id: "tls-out-i", label: "Load per insert", value: (r) => fmt(r.load_per_insert_lb, 0) + " lb across " + fmt(r.insert_count, 0) + " inserts (" + fmt(r.insert_rows, 0) + " rows x " + fmt(r.insert_columns, 0) + " columns)" },
-    { key: "s", id: "tls-out-s", label: "Bending stress", value: (r) => fmt(r.bending_stress_psi, 0) + " psi over a " + fmt(r.span_between_rows_ft, 1) + " ft span between rows" },
+    { key: "s", id: "tls-out-s", label: "Bending stress", value: (r) => fmt(r.bending_stress_psi, 0) + " psi (two-row span " + fmt(r.span_between_rows_ft, 1) + " ft, scaled by (2 / n)^0.75 for n insert rows)" },
     { key: "r", id: "tls-out-r", label: "Modulus of rupture on lift day", value: (r) => fmt(r.modulus_of_rupture_psi, 0) + " psi at " + fmt(r.lift_day_strength_psi, 0) + " psi -- allowable " + fmt(r.allowable_stress_psi, 0) + " psi after the " + fmt(r.safety_factor, 2) + " factor" },
     { key: "v", id: "tls-out-v", label: "Against capacity", value: (r) => r.verdict },
     { key: "n", id: "tls-out-n", label: "Note", value: (r) => r.note },

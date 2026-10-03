@@ -499,7 +499,7 @@ export function computeDockPilingLateral({
     return bracketed ? (lo + hi) / 2 : NaN;
   };
   const embedment_ft = embedFor(height_above_mudline_ft);
-  const a_term = _MEC_EMBED_A_CONST * lateral_load_lb / (soil_lateral_bearing_psf_per_ft * embedment_ft / 3 * b_ft);
+  const a_term = _MEC_EMBED_A_CONST * lateral_load_lb / (soil_lateral_bearing_psf_per_ft * Math.min(embedment_ft, 12) / 3 * b_ft);
   // Scour is what makes this a marine problem rather than a fence problem: the
   // effective mudline drops, so the cantilever LENGTHENS and the embedment
   // SHORTENS at the same time.
@@ -532,7 +532,7 @@ export function computeDockPilingLateral({
 }
 export const dockPilingLateralExample = { inputs: { lateral_load_lb: 1200, height_above_mudline_ft: 6, pile_diameter_in: 12, soil_lateral_bearing_psf_per_ft: 150, scour_ft: 2, existing_embedment_ft: 10 } };
 MARINEAVIATION_RENDERERS["dock-piling-lateral"] = _simpleRenderer({
-  citation: "Citation: the nonconstrained lateral embedment relation IBC 1807.3.2.1 gives -- d = 0.5 A (1 + sqrt(1 + 4.36 h / A)) with A = 2.34 P / (S1 b) -- applied to a marine pile, with the soil's lateral bearing S1 ENTERED from the geotechnical information for the site rather than inferred from the driving record. Scour is applied by lengthening the cantilever and deepening the required drive by the scour depth. It does not compute berthing energy, wind or current loading, or ice; it does not check the pile's own bending capacity or section loss to marine borers, address pile group effects, evaluate uplift or axial capacity, or account for a sloping mudline. The geotechnical report and a marine structural engineer govern.",
+  citation: "Citation: the nonconstrained lateral embedment relation IBC 1807.3.2.1 gives -- d = 0.5 A (1 + sqrt(1 + 4.36 h / A)) with A = 2.34 P / (S1 b) -- applied to a marine pile, with the soil's lateral bearing rate (psf per ft of depth) ENTERED from the geotechnical information for the site rather than inferred from the driving record; S1 = rate x min(d, 12 ft) / 3, IBC 1807.3.2.1. Scour is applied by lengthening the cantilever and deepening the required drive by the scour depth. It does not compute berthing energy, wind or current loading, or ice; it does not check the pile's own bending capacity or section loss to marine borers, address pile group effects, evaluate uplift or axial capacity, or account for a sloping mudline. The geotechnical report and a marine structural engineer govern.",
   example: dockPilingLateralExample.inputs,
   fields: [
     { key: "lateral_load_lb", label: "Lateral load (lb)", kind: "number" },

@@ -370,7 +370,7 @@ SAFETY_RENDERERS["silica-table-1"] = _simpleRendererG({
   fields: [
     { key: "task", label: "Table 1 task", kind: "select", options: [
       { value: "i", label: "(i) Stationary masonry saws" },
-      { value: "ii", label: "(ii) Handheld power saws (blade 12 in or less)" },
+      { value: "ii", label: "(ii) Handheld power saws (any blade diameter)" },
       { value: "iii", label: "(iii) Handheld power saws for fiber-cement board (blade 8 in or less)" },
       { value: "iv", label: "(iv) Walk-behind saws" },
       { value: "v", label: "(v) Drivable saws" },

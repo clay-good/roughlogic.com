@@ -570,7 +570,7 @@ export function computeCleanoutLayout({ horizontal_run_ft = 0, max_spacing_ft = 
 export const cleanoutLayoutExample = { inputs: { horizontal_run_ft: 240, max_spacing_ft: 100, direction_changes: 9, changes_grouped_away: 0, stack_count: 2, pipe_size_in: 4, clear_space_in: 18, crawl_height_in: 30 } };
 
 function _v1140renderCleanoutLayout(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: IPC 708 - horizontal drains provided with cleanouts located not more than 100 ft apart; a cleanout where a horizontal drainage pipe, building drain, or building sewer has a change of horizontal direction greater than 45 degrees, with the allowance that where more than one such change occurs within 40 ft of developed length the cleanout at the first change serves all of them; a cleanout at the base of each waste or soil stack; a clear space of not less than 18 in at the opening of cleanouts 6 in and smaller; and, where a cleanout is in a crawl space, an unobstructed pathway height of not less than 24 in. Larger cleanouts carry their own clearance requirement, not checked here. Also not checked: cleanout size relative to the pipe, fittings or fixtures serving as cleanouts, the building drain and sewer junction, manholes, cleanout orientation, concealed piping and access covers, or material and threads. A screen; the adopted code and the AHJ govern.";
+  citationEl.textContent = "Citation: IPC 708 - horizontal drains provided with cleanouts located not more than 100 ft apart; a cleanout where a horizontal drainage pipe, building drain, or building sewer has a change of horizontal direction greater than 45 degrees, with the allowance that where more than one such change occurs within 40 ft of developed length the cleanout at the first change serves all of them (a stack-base cleanout is good practice but not an IPC 2021 708 requirement and is not in the total); a clear space of not less than 18 in at the opening of cleanouts 6 in and smaller; and, where a cleanout is in a crawl space, an unobstructed pathway height of not less than 24 in. Larger cleanouts carry their own clearance requirement, not checked here. Also not checked: cleanout size relative to the pipe, fittings or fixtures serving as cleanouts, the building drain and sewer junction, manholes, cleanout orientation, concealed piping and access covers, or material and threads. A screen; the adopted code and the AHJ govern.";
   const L = makeNumber("Horizontal drain run (ft)", "clo-l", { step: "any", min: "0" });
   const sp = makeNumber("Maximum cleanout spacing (ft; IPC 100)", "clo-sp", { step: "any", min: "0" });
   const dc = makeNumber("Changes of horizontal direction over 45 degrees", "clo-dc", { step: "1", min: "0" });
@@ -584,7 +584,7 @@ function _v1140renderCleanoutLayout(inputRegion, outputRegion, citationEl) {
   const oT = makeOutputLine(outputRegion, "Total cleanouts", "clo-out-t");
   const oS = makeOutputLine(outputRegion, "From spacing", "clo-out-s");
   const oC = makeOutputLine(outputRegion, "From changes of direction", "clo-out-c");
-  const oB = makeOutputLine(outputRegion, "From stack bases", "clo-out-b");
+  const oB = makeOutputLine(outputRegion, "Stack bases (practice, not in the code total)", "clo-out-b");
   const oA = makeOutputLine(outputRegion, "Access", "clo-out-a");
   const oNote = makeOutputLine(outputRegion, "Note", "clo-out-note");
   const update = debounce(() => {

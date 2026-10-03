@@ -6718,7 +6718,7 @@
   {
    "tile_id": "paint-coverage",
    "source_publisher": "Project (first-principles)",
-   "source_title": "Paint quantity = area / (coverage_per_gal * surface_factor); primer adds one coat",
+   "source_title": "Paint quantity = area / coverage_per_gal for the surface; primer adds one coat",
    "source_edition_or_year": "n/a; industry coverage rule of thumb (350 ft^2/gal smooth)",
    "source_section_or_page": "700 ft^2 smooth wall, 2 coats, primer needed -> 2.0 gal/coat / 4.0 gal total finish / 2.0 gal primer",
    "verified_by": "rl",
@@ -6896,7 +6896,7 @@
   {
    "tile_id": "seer-eer",
    "source_publisher": "Project (engineering approximation)",
-   "source_title": "SEER ~ EER * 1.12; SEER2 ~ SEER * 0.95 (averaged across rating conditions)",
+   "source_title": "SEER from EER = -0.02 SEER^2 + 1.12 SEER; SEER2 ~ SEER * 0.95 (averaged across rating conditions)",
    "source_edition_or_year": "n/a; industry approximation",
    "source_section_or_page": "EER 12 -> SEER 14.435 / SEER2 estimate 13.714 on the NREL House Simulation Protocols relation EER = -0.02 SEER^2 + 1.12 SEER (recomputed 2026-10-02 from the linear SEER = 1.12 EER, 13.44)",
    "verified_by": "rl",
@@ -7589,7 +7589,7 @@
   {
    "tile_id": "fastener-pullout",
    "source_publisher": "Project (public fastener-engineering formula)",
-   "source_title": "Nail withdrawal: W (lb/in penetration) = G^2.5 * D * 1380, where G is wood specific gravity and D is shank diameter; screw factor ~1.85x",
+   "source_title": "Nail withdrawal: W (lb/in penetration) = G^2.5 * D * 1380, where G is wood specific gravity and D is shank diameter; wood screws W = 2850 G^2 D (NDS 12.2)",
    "source_edition_or_year": "n/a; public AWC/NDS withdrawal identity (G^2.5 * D * 1380)",
    "source_section_or_page": "16d common nail (D=0.162 in) in DF-L (G=0.50), 1.5 in penetration -> 39.52 lb/in / 59.28 lb total",
    "verified_by": "rl",
@@ -12373,7 +12373,7 @@
   {
    "tile_id": "confined-space-purge",
    "source_publisher": "29 CFR 1910.146 + ACGIH ventilation engineering practice",
-   "source_title": "Purge time (min) = ceil((volume * target_air_changes) / blower_cfm)",
+   "source_title": "Purge time (min) = (volume * target_air_changes) / blower_cfm",
    "source_edition_or_year": "ACGIH Industrial Ventilation Manual (target 7 air changes typical for the air-monitor zero before entry)",
    "source_section_or_page": "2000 ft^3 / 1000 cfm / 7 target purges -> 14 min purge",
    "verified_by": "rl",
@@ -31361,7 +31361,7 @@
   {
    "tile_id": "glass-weight",
    "source_publisher": "NGA Glazing Manual glass-weight table; ASTM C1036",
-   "source_title": "weight = 156.1 lb/ft3 x area_ft2 x thickness_in/12 (~13.0 lb/ft2 per inch)",
+   "source_title": "weight = 158 lb/ft3 x area_ft2 x thickness_in/12 (~13.2 lb/ft2 per inch)",
    "source_edition_or_year": "spec-v798 worked example (machine-verified)",
    "source_section_or_page": "60 x 40 in lite of 1/4 in soda-lime at 158 lb/ft3 (NGA FM01-08) -> 16.67 ft2, 54.9 lb. Recomputed 2026-10-02 from 156.1 (54.2 lb); trade tables at 3.27 lb/ft2 give 54.5.",
    "verified_by": "rl",
@@ -35446,9 +35446,9 @@
   {
    "tile_id": "conduit-nipple-60-fill",
    "source_publisher": "Conduit nipple 60% fill (NEC Chapter 9 Note 4)",
-   "source_title": "cross-check: 30 #12 THHN (0.0133) in the same nipple -> 46.2%, nipple allows 38, normal 25",
+   "source_title": "cross-check: 30 #12 THHN (0.0133) in the same nipple -> 46.2%, nipple allows 39, normal 26",
    "source_edition_or_year": "spec-v989 worked example (machine-verified)",
-   "source_section_or_page": "fill = 30 x 0.0133 / 0.864 = 46.2%; nipple max 0.6 x 0.864/0.0133 = 38.98 -> 39 (NEC Ch. 9 Note 7: a decimal of 0.8 or more rounds up); normal 25",
+   "source_section_or_page": "fill = 30 x 0.0133 / 0.864 = 46.2%; nipple max 0.6 x 0.864/0.0133 = 38.98 -> 39 (NEC Ch. 9 Note 7: a decimal of 0.8 or more rounds up); normal 0.4 x 0.864/0.0133 = 25.98 -> 26",
    "verified_by": "rl",
    "verified_on": "2026-07-18",
    "inputs": {
@@ -40897,7 +40897,7 @@
   {
    "tile_id": "internal-heat-gains",
    "source_publisher": "ASHRAE / ACCA Manual J internal gains",
-   "source_title": "6 people, 800 W light, 1,200 W equip -> 8,294 sensible, 9,494 total",
+   "source_title": "6 people, 800 W light, 1,200 W equip -> 8,324 sensible, 9,524 total",
    "source_edition_or_year": "spec-v228 worked example (machine-verified)",
    "source_section_or_page": "spec-v228 section 2.1 pinned example (small office)",
    "verified_by": "rl",
@@ -40934,7 +40934,7 @@
   {
    "tile_id": "internal-heat-gains",
    "source_publisher": "ASHRAE / ACCA Manual J internal gains",
-   "source_title": "cross-check: 20 people, 600 W + 300 W -> 7,971 sensible, 11,971 total",
+   "source_title": "cross-check: 20 people, 600 W + 300 W -> 8,071 sensible, 12,071 total",
    "source_edition_or_year": "spec-v228 worked example (machine-verified)",
    "source_section_or_page": "spec-v228 section 2.1 cross-check (packed conference room)",
    "verified_by": "rl",
@@ -47132,7 +47132,7 @@
   {
    "tile_id": "welder-resistance-circuit-conductor",
    "source_publisher": "resistance-welder circuit sizing (NEC 630.31 / 630.32)",
-   "source_title": "100 A primary, 50% duty -> 70.71 A conductor, 300 A max OCPD",
+   "source_title": "100 A primary, 50% duty -> 71 A conductor, 300 A max OCPD",
    "source_edition_or_year": "spec-v933 worked example (machine-verified)",
    "source_section_or_page": "Table 630.31(A)(2) multiplier at 50% = 0.71 (the code rounds sqrt(0.5) = 0.7071); conductor = 100*0.71 = 71; OCPD = 3.0*100 = 300",
    "verified_by": "rl",
@@ -47159,7 +47159,7 @@
   {
    "tile_id": "welder-resistance-circuit-conductor",
    "source_publisher": "resistance-welder circuit sizing (NEC 630.31 / 630.32)",
-   "source_title": "cross-check: 60 A primary, 20% duty -> 26.83 A conductor, 180 A OCPD",
+   "source_title": "cross-check: 60 A primary, 20% duty -> 27 A conductor, 180 A OCPD",
    "source_edition_or_year": "spec-v933 worked example (machine-verified)",
    "source_section_or_page": "Table 630.31(A)(2) multiplier at 20% = 0.45; conductor = 60*0.45 = 27; OCPD = 3.0*60 = 180",
    "verified_by": "rl",
@@ -47690,7 +47690,7 @@
   {
    "tile_id": "masonry-joint-reinforcement",
    "source_publisher": "masonry joint-reinforcement takeoff (IRC R606.12.2)",
-   "source_title": "40 x 12 ft CMU wall, 16 in vertical, 10 ft pieces -> 9 courses, 4 per course, 36 total",
+   "source_title": "40 x 12 ft CMU wall, 16 in vertical, 10 ft pieces lapped 6 in -> 9 courses, 5 per course, 45 total",
    "source_edition_or_year": "spec-v922 worked example (machine-verified)",
    "source_section_or_page": "courses = ceil(144/16) = 9; per course = 1 + ceil((40 - 10)/(10 - 0.5)) = 5 with a 6 in lap; total = 45 (36 until 2026-09-25, when the lap was ignored)",
    "verified_by": "rl",
@@ -54753,7 +54753,7 @@
   {
    "tile_id": "allowable-area",
    "source_publisher": "IBC 2021 \u00a7506.2 / \u00a7506.3 and Table 506.2",
-   "source_title": "VB / B corner-lot office, sprinklered -> 29,250 ft^2 allowable, 25,000 passes",
+   "source_title": "VB / B corner-lot office, sprinklered -> If 0.50, 31,500 ft^2 allowable, 25,000 passes",
    "source_edition_or_year": "spec-v251 worked example (machine-verified)",
    "source_section_or_page": "spec-v251 section 2.1 pinned example",
    "verified_by": "rl",
@@ -71626,7 +71626,7 @@
   {
    "tile_id": "striping-paint-quantity",
    "source_publisher": "Pavement-marking quantity identity (first-principles)",
-   "source_title": "1 mile of 4-in line, 320 sf/gal, 6 lb/gal beads",
+   "source_title": "1 mile of 4-in line, 100 sf/gal, 6 lb/gal beads",
    "source_edition_or_year": "spec-v839 worked example",
    "source_section_or_page": "area = 5280*4/12 = 1,760 sf; paint = 1760/100 = 17.6 gal (16 wet mil); beads = 17.6*6 = 105.6 lb. Recomputed 2026-10-02: the earlier 320 sf/gal was a 5 mil film.",
    "verified_by": "rl",
@@ -72378,7 +72378,7 @@
   {
    "tile_id": "shingle-nails",
    "source_publisher": "Roofing fastener-count identity (first-principles)",
-   "source_title": "30 squares, 80 shingles/sq, 6 nails/shingle (high wind), 140 nails/lb",
+   "source_title": "30 squares, 80 shingles/sq, 6 nails/shingle (high wind), 218 nails/lb",
    "source_edition_or_year": "spec-v850 worked example",
    "source_section_or_page": "nails = 30*80*6 = 14,400; weight = 14400/218 = 66.06 lb (1-1/4 in 11 ga at 218/lb, Grip-Rite; recomputed 2026-10-02 from 140/lb)",
    "verified_by": "rl",
@@ -73722,7 +73722,7 @@
   {
    "tile_id": "sealant-joint-yield",
    "source_publisher": "Sealant cartridge-yield identity (first-principles)",
-   "source_title": "500 LF joint, 10.1 oz cartridge (20.5 in^3), 3/8 x 1/4 in joint",
+   "source_title": "500 LF joint, 10.1 oz cartridge (18.23 in^3), 3/8 x 1/4 in joint",
    "source_edition_or_year": "spec-v872 worked example",
    "source_section_or_page": "cross = 0.375*0.25 = 0.09375 in^2; lf/cart = 18.23/0.09375/12 = 16.2 ft; cartridges = ceil(500/16.2) = 31. Recomputed 2026-10-02: a 10.1 fl oz cartridge is 18.23 in^3, not 20.5.",
    "verified_by": "rl",
@@ -74064,7 +74064,7 @@
   {
    "tile_id": "rebar-tie-wire",
    "source_publisher": "Rebar tie-wire identity (first-principles)",
-   "source_title": "30 x 20 ft mat, #4 at 12 in each way, 50% tied, 8 in ties, 0.0181 lb/ft",
+   "source_title": "30 x 20 ft mat, #4 at 12 in each way, 50% tied, 8 in ties, 0.0104 lb/ft (16 ga)",
    "source_edition_or_year": "spec-v878 worked example",
    "source_section_or_page": "bars = 21 x 31 = 651 intersections; ties = round(651*0.5) = 326; wire = 217 ft; weight = 217.3 x 0.0104 = 2.26 lb (16 ga; recomputed 2026-10-02 from the 14 ga 0.0181)",
    "verified_by": "rl",
@@ -74194,7 +74194,7 @@
   {
    "tile_id": "baseplate-grout-volume",
    "source_publisher": "Base-plate grout-volume identity (first-principles)",
-   "source_title": "18 x 18 in plate, 64 in^2 column, 1.5 in grout, 0.45 ft^3/bag, 10% waste",
+   "source_title": "18 x 18 in plate (column sits on it, no leave-out), 1.5 in grout, 0.45 ft^3/bag, 10% waste",
    "source_edition_or_year": "spec-v880 worked example",
    "source_section_or_page": "grout = 324*1.5 = 486 in^3 (no leave-out: the column sits on the plate); ft^3 = 486/1728*1.10 = 0.309; bags = ceil(0.309/0.45) = 1. Recomputed 2026-10-02 from the 64 in^2 column deduction (390 in^3).",
    "verified_by": "rl",
@@ -77115,7 +77115,7 @@
   {
    "tile_id": "superelevation-safe-curve-speed",
    "source_publisher": "AASHTO Green Book (solved for speed)",
-   "source_title": "V = sqrt( 15 R (e + f) ); R 1,500 ft, e 0.08, f 0.12 -> 67.1 mph",
+   "source_title": "V = sqrt( 15 R (e + f) ); R 1,500 ft, e 0.08, f 0.11 -> 65.4 mph",
    "source_edition_or_year": "spec-v756 worked example (machine-verified)",
    "source_section_or_page": "R 1500 ft, e 0.08, f 0.11 (the AASHTO side-friction factor at 65 mph): V = sqrt(15 x 1500 x 0.19) = 65.4 mph",
    "verified_by": "rl",
@@ -77493,7 +77493,7 @@
   {
    "tile_id": "grain-shrink-moisture",
    "source_publisher": "USDA / land-grant extension",
-   "source_title": "10,000 lb corn, 20% to 15% market, 0.5% handling, 56 lb/bu -> 167.2 bu, 6.35% shrink",
+   "source_title": "10,000 lb corn, 20% to 15% market, 0.5% handling, 56 lb/bu -> 167.2 bu, 6.38% shrink",
    "source_edition_or_year": "spec-v338 worked example (machine-verified)",
    "source_section_or_page": "spec-v338 section 2.1 pinned example",
    "verified_by": "rl",
@@ -77507,7 +77507,7 @@
    },
    "outputs": {
     "W_net_lb": {
-     "value": 9365,
+     "value": 9361.8,
      "tolerance": {
       "pct": 0.2
      }
@@ -77519,7 +77519,7 @@
      }
     },
     "total_shrink_pct": {
-     "value": 6.35,
+     "value": 6.38,
      "tolerance": {
       "pct": 1
      }
@@ -77529,7 +77529,7 @@
   {
    "tile_id": "grain-shrink-moisture",
    "source_publisher": "USDA / land-grant extension",
-   "source_title": "cross-check: drying to 14% costs more shrink -> 165.3 bu, 7.44%",
+   "source_title": "cross-check: drying to 14% costs more shrink -> 165.2 bu, 7.48%",
    "source_edition_or_year": "spec-v338 worked example (machine-verified)",
    "source_section_or_page": "spec-v338 section 2.1 cross-check",
    "verified_by": "rl",
@@ -77543,13 +77543,13 @@
    },
    "outputs": {
     "bushels": {
-     "value": 165.3,
+     "value": 165.2,
      "tolerance": {
       "pct": 0.3
      }
     },
     "total_shrink_pct": {
-     "value": 7.44,
+     "value": 7.48,
      "tolerance": {
       "pct": 1
      }
@@ -82997,7 +82997,7 @@
   {
    "tile_id": "equipment-hourly-rate",
    "source_publisher": "CAT / AED method",
-   "source_title": "$50K skid steer, $10K salvage, 5,000-hr life, 1,000 hr/yr -> $23.40/hr",
+   "source_title": "$50K skid steer, $10K salvage, 5,000-hr life, 1,000 hr/yr -> $23.72/hr",
    "source_edition_or_year": "spec-v363 worked example (machine-verified)",
    "source_section_or_page": "spec-v363 section 2.1 pinned example",
    "verified_by": "rl",
@@ -83031,7 +83031,7 @@
   {
    "tile_id": "equipment-hourly-rate",
    "source_publisher": "CAT / AED method",
-   "source_title": "cross-check: running 2,000 hr/yr halves the interest carry -> $22.20/hr",
+   "source_title": "cross-check: running 2,000 hr/yr cuts the interest carry ($2.72 -> $1.52/hr) -> $22.52/hr",
    "source_edition_or_year": "spec-v363 worked example (machine-verified)",
    "source_section_or_page": "spec-v363 section 2.1 cross-check",
    "verified_by": "rl",
@@ -83166,7 +83166,7 @@
   {
    "tile_id": "lighting-light-loss-factor",
    "source_publisher": "IES Lighting Handbook",
-   "source_title": "LLD 0.85 x LDD 0.90 x BF 0.95 -> LLF 0.727; a 4,000 lm fixture holds 2,908 maintained",
+   "source_title": "LLD 0.85 x LDD 0.90 x BF 0.95 -> LLF 0.727; a 4,000 lm fixture holds 2,907 maintained",
    "source_edition_or_year": "spec-v365 worked example (machine-verified)",
    "source_section_or_page": "spec-v365 section 2.1 pinned example",
    "verified_by": "rl",
@@ -86364,7 +86364,7 @@
   {
    "tile_id": "cross-connection-air-gap",
    "source_publisher": "IPC 608.15.1 / ASME A112.1.2",
-   "source_title": "1/2 in opening -> 2x0.5 = 1 in, the 1 in absolute minimum governs",
+   "source_title": "1/2 in opening -> 1 in (Table 608.16.1 first step)",
    "source_edition_or_year": "spec-v450 cross-check (machine-verified)",
    "source_section_or_page": "spec-v450 section 2.1 cross-check",
    "verified_by": "rl",
@@ -86859,7 +86859,7 @@
   {
    "tile_id": "ceiling-speaker-coverage",
    "source_publisher": "commercial-audio design practice",
-   "source_title": "minimum-overlap spacing 0.7x12 = 8.4 ft -> 18 speakers (exact ceil(1200/70.56))",
+   "source_title": "minimum-overlap spacing 12/sqrt 2 = 8.485 ft -> 17 speakers (ceil(1200/72))",
    "source_edition_or_year": "spec-v457 cross-check (machine-verified; spec prose 17 used rounded 70.6, exact is 18)",
    "source_section_or_page": "spec-v457 section 2.1 cross-check; recomputed 2026-10-02 at D / sqrt 2 (8.485 ft, 17 speakers; 0.7 D read 8.4 ft and 18)",
    "verified_by": "rl",
@@ -86918,7 +86918,7 @@
   {
    "tile_id": "structured-cabling-channel",
    "source_publisher": "ANSI/TIA-568",
-   "source_title": "40 deg C de-rates max link to 82.8 m, so 85 m link now fails",
+   "source_title": "40 deg C de-rates max link to 84.0 m, so 85 m link now fails",
    "source_edition_or_year": "spec-v458 cross-check (machine-verified)",
    "source_section_or_page": "spec-v458 section 2.1 cross-check; recomputed 2026-10-02 on TIA-568-C.2 Table G.2 (84.0 m at 40 C; the linear 0.4%/C form read 82.8)",
    "verified_by": "rl",
@@ -88513,7 +88513,7 @@
   {
    "tile_id": "dyno-correction-sae",
    "source_publisher": "SAE J1349 dyno correction factor",
-   "source_title": "400 hp observed, 980 mbar dry, 30 C -> CF 1.0220, 408.8 hp corrected",
+   "source_title": "400 hp observed, 980 mbar dry, 30 C -> CF 1.0219, 408.8 hp corrected",
    "source_edition_or_year": "spec-v515 worked example (machine-verified)",
    "source_section_or_page": "spec-v515 section 2.1 pinned example",
    "verified_by": "rl",
@@ -88541,7 +88541,7 @@
   {
    "tile_id": "dyno-correction-sae",
    "source_publisher": "SAE J1349 dyno correction factor",
-   "source_title": "cross-check: a hot, thin 970 mbar / 35 C day corrects harder -> CF 1.0444",
+   "source_title": "cross-check: a hot, thin 970 mbar / 35 C day corrects harder -> CF 1.0442",
    "source_edition_or_year": "spec-v515 worked example (machine-verified)",
    "source_section_or_page": "spec-v515 section 2.1 cross-check",
    "verified_by": "rl",
@@ -89401,7 +89401,7 @@
   {
    "tile_id": "asymmetrical-fault-xr",
    "source_publisher": "first-cycle fault asymmetry model (DC offset from X/R)",
-   "source_title": "20 kA symmetrical at X/R 15 -> 51.2 kA peak (2.56x), 30.4 kA asymmetrical RMS (1.52x)",
+   "source_title": "20 kA symmetrical at X/R 15 -> 51.3 kA peak (2.57x), 30.4 kA asymmetrical RMS (1.52x)",
    "source_edition_or_year": "spec-v496 worked example (machine-verified)",
    "source_section_or_page": "spec-v496 section 2.1 pinned example",
    "verified_by": "rl",
@@ -89434,7 +89434,7 @@
   {
    "tile_id": "asymmetrical-fault-xr",
    "source_publisher": "first-cycle fault asymmetry model (DC offset from X/R)",
-   "source_title": "cross-check: same 20 kA at X/R 5 offsets less -> 43.4 kA peak (2.17x), 25.1 kA RMS (1.25x)",
+   "source_title": "cross-check: same 20 kA at X/R 5 offsets less -> 44.0 kA peak (2.20x), 25.1 kA RMS (1.25x)",
    "source_edition_or_year": "spec-v496 worked example (machine-verified)",
    "source_section_or_page": "spec-v496 section 2.1 cross-check",
    "verified_by": "rl",
@@ -110801,7 +110801,7 @@
   {
    "tile_id": "spray-tip-selection",
    "source_publisher": "Project (first-principles)",
-   "source_title": "517 tip at 2,000 psi laying 6 wet mils, calibrated to a .015 tip at 0.31 gpm",
+   "source_title": "517 tip at 2,000 psi laying 6 wet mils, calibrated to a .015 tip at 0.24 gpm",
    "source_edition_or_year": "airless spray practice",
    "source_section_or_page": "flow scales as orifice squared from the Graco chart calibration .015 = 0.24 gpm at 2000 psi; 1,604.17 sq ft per gal at 1 mil (recomputed 2026-10-03 from the one-column-off 0.31)",
    "verified_by": "rl",
@@ -151385,7 +151385,7 @@
    "source_publisher": "Bose Professional (Transom Post OpCo LLC)",
    "source_title": "In-ceiling Loudspeakers Design Guide",
    "source_edition_or_year": "Rev. 01, 08/2023",
-   "source_section_or_page": "REPRODUCES ONLY AFTER THE REPORTED FIX (tile 0.7 x D = 2.4249). Design Worksheet p.6: small woofer (CA 120 deg) 'Minimum Overlap 2.45' = 3.46/sqrt2 = 2.449. Inputs set H - L = 1 ft so spacing = M. Tolerance abs 0.005 covers 2-decimal printing.",
+   "source_section_or_page": "Reproduces since the 2026-10-02 D / sqrt 2 fix (the tile was 0.7 x D = 2.4249). Design Worksheet p.6: small woofer (CA 120 deg) 'Minimum Overlap 2.45' = 3.46/sqrt2 = 2.449. Inputs set H - L = 1 ft so spacing = M. Tolerance abs 0.005 covers 2-decimal printing.",
    "verified_by": "rl",
    "verified_on": "2026-10-02",
    "inputs": {
@@ -151433,7 +151433,7 @@
    "source_publisher": "Bose Professional (Transom Post OpCo LLC)",
    "source_title": "In-ceiling Loudspeakers Design Guide",
    "source_edition_or_year": "Rev. 01, 08/2023",
-   "source_section_or_page": "REPRODUCES ONLY AFTER THE REPORTED FIX (tile 0.7 x D = 1.8245). Design Worksheet p.6: large woofer (CA 105 deg) 'Minimum Overlap 1.84' = 2.606/sqrt2 = 1.843. H - L = 1 ft so spacing = M. Tolerance abs 0.005 covers 2-decimal printing.",
+   "source_section_or_page": "Reproduces since the 2026-10-02 D / sqrt 2 fix (the tile was 0.7 x D = 1.8245). Design Worksheet p.6: large woofer (CA 105 deg) 'Minimum Overlap 1.84' = 2.606/sqrt2 = 1.843. H - L = 1 ft so spacing = M. Tolerance abs 0.005 covers 2-decimal printing.",
    "verified_by": "rl",
    "verified_on": "2026-10-02",
    "inputs": {
@@ -155925,7 +155925,7 @@
    "source_publisher": "USG (United States Gypsum Company)",
    "source_title": "USG Sheetrock Brand All Purpose Joint Compound (Ready-Mixed) Submittal Sheet",
    "source_edition_or_year": "J1969-USA-ENG/rev. 6-22",
-   "source_section_or_page": "https://www.usg.com/content/dam/USG/pdpmovedocuments/sheetrock-all-purpose-joint-compound-submittal-J1969.pdf PRODUCT DATA: 'Coverage: Approximately 10 gal./1,000 sq. ft. (37.8 L/100 sq. m) of gypsum panels.' FAILS TODAY: tile gives 14.29 gal (1 gal per 70 ft2, calc-construction.js:1488); reproduces only after the reported fix (1 gal per 100 ft2). pct 5.",
+   "source_section_or_page": "https://www.usg.com/content/dam/USG/pdpmovedocuments/sheetrock-all-purpose-joint-compound-submittal-J1969.pdf PRODUCT DATA: 'Coverage: Approximately 10 gal./1,000 sq. ft. (37.8 L/100 sq. m) of gypsum panels.' Tile 10.0 gal (1 gal per 100 ft2 since 2026-10-02; it was 14.29 at 1 gal per 70 ft2). pct 5.",
    "verified_by": "rl",
    "verified_on": "2026-10-02",
    "inputs": {
@@ -161379,7 +161379,7 @@
    "source_publisher": "Reliability Solutions (reliabilitysolutions.net)",
    "source_title": "How to Calculate Bearing Relubrication Intervals",
    "source_edition_or_year": "web article dated August 4, 2026",
-   "source_section_or_page": "Worked example, https://reliabilitysolutions.net/resources/blog/bearing-relubrication-intervals/ : 'Bearing: 6310 deep groove ball bearing - bore d = 50 mm, OD D = 110 mm, width B = 27 mm.' 'Conditions: n = 1,500 rpm' ... 'G = 0.005 x 110 x 27 = 14.9 grams per regreasing event.' Only grease_grams asserted (14.85 printed as 14.9; abs 0.06 covers it). The article's interval (tf ~13,500 h from the SKF diagram) is NOT asserted: the tile gives 1,120 h (see report, K-factor bug).",
+   "source_section_or_page": "Worked example, https://reliabilitysolutions.net/resources/blog/bearing-relubrication-intervals/ : 'Bearing: 6310 deep groove ball bearing - bore d = 50 mm, OD D = 110 mm, width B = 27 mm.' 'Conditions: n = 1,500 rpm' ... 'G = 0.005 x 110 x 27 = 14.9 grams per regreasing event.' Only grease_grams asserted (14.85 printed as 14.9; abs 0.06 covers it). The article's interval (tf ~13,500 h from the SKF diagram) is NOT asserted: the tile gives 11,200 h (K 10 ball-bearing factor, fixed 2026-10-03).",
    "verified_by": "rl",
    "verified_on": "2026-10-03",
    "inputs": {
