@@ -250,6 +250,39 @@ which must land exactly on the limit. All 19 do. The one
 tolerance is 8 ppm for voltage drop, where the forward tile
 computes 12 AWG as 6,529.9 cmil and NEC Table 8 prints 6,530.
 
+## A value exactly at its limit (2026-10-01 to 10-03)
+
+Floating-point arithmetic lands a hair off round numbers: 3 x 0.1 A
+is 0.30000000000000004 A, and 12 x 1.1 / 0.6 is 22.000000000000004
+bags. Unguarded, these cases failed a 0.3 A supply, ordered a 23rd
+bag, and read a beam sized exactly at capacity as OVER. Two unit
+tests keep every such site guarded:
+
+| Test | What it holds |
+| --- | --- |
+| `test/unit/rounding-quotient-guard.test.js` | Every `Math.ceil` / `Math.floor` of a product or quotient, inline or stored first in a variable, carries a 1e-9 guard. |
+| `test/unit/verdict-limit-guard.test.js` | Every verdict that compares a result against a limit gives float slack toward the limit. This covers inclusive (`<=`) and strict (`>`) comparisons, and terms inside `&&`, parentheses, ternaries and returned object fields. A difference compared against zero treats \|x\| < 1e-9 as zero. |
+
+Each guard was proven by seeding an unguarded comparison and
+watching the test fail. When each codemod was applied, the full
+output of every fixture row was snapshotted before and after, and
+the two were byte-identical.
+
+## The example a page opens (2026-10-03)
+
+`check-example-parity` pins each tile's `<name>Example` export to
+the worked example the page prints. `test/unit/example-button-parity.test.js`
+covers what a reader actually gets on the live page:
+
+| Check | Failure it caught |
+| --- | --- |
+| Every number an inline "Test with example" button types is one of the example's inputs or a compute default. | Gas leak printed 7.72 cfh and opened at 3.15. |
+| A blank-field fallback (`=== "" ? N`) equals the compute's documented default. | 14 fields fell back to 0, e.g. a level haul road and no pipe-insulation waste. |
+| A blank unprefilled field (`\|\| 0`) does not silently compute against a documented default. | Blank fall-protection fields dropped 7 ft of clearance. |
+
+Each check lists its reviewed exceptions with a reason, such as a
+field for another mode or a measurement the reader supplies.
+
 ## Per-group reviewer signoff (Phase H)
 
 **Status: not yet operating. 0 of 19 non-exempt groups are
