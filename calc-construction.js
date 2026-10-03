@@ -44,7 +44,10 @@ export function computeStairs({ total_rise_in, preferred_riser_height_in = 7.5 }
   if (!(preferred_riser_height_in > 0)) return { error: "Preferred riser height must be positive." };
   // Number of risers: round to nearest that gets closest to preferred height.
   const target = preferred_riser_height_in;
-  const risers = Math.max(1, Math.round(total_rise_in / target));
+  // IRC R311.7.5.1 caps a riser at 7-3/4 in: rounding to the nearest count could exceed it (108.7 in
+  // at a 7.5 in preference rounded to 14 risers of 7.764 in until 2026-10-02), so add risers until it fits.
+  let risers = Math.max(1, Math.round(total_rise_in / target));
+  while (total_rise_in / risers > 7.75 + 1e-9) risers += 1;
   const riser_height_in = total_rise_in / risers;
   const treads = risers - 1;
   // IRC default tread depth 10 in (sufficient for most carpentry contexts).
@@ -158,9 +161,11 @@ export const boardFootageExample = {
 
 // --- Utility 45: Concrete Volume ---
 
-// dims: in { shape: dimensionless, waste_factor: dimensionless, d: dimensionless } out: { volume_yd3: L^3, bags_60: dimensionless, bags_80: dimensionless }
-export function computeConcreteVolume({ shape, waste_factor = 0.10, ...d }) {
+// dims: in { shape: dimensionless, waste_factor: dimensionless, length_ft: L, width_ft: L, thickness_in: L, diameter_in: L, height_ft: L, footing_thickness_in: L, footing_width_ft: L, stem_thickness_in: L, stem_height_ft: L } out: { volume_yd3: L^3, bags_60: dimensionless, bags_80: dimensionless }
+export function computeConcreteVolume({ shape, waste_factor = 0.10, length_ft, width_ft, thickness_in, diameter_in, height_ft, footing_thickness_in, footing_width_ft, stem_thickness_in, stem_height_ft } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // Named inputs (was a ...rest) so the fixture-key check can see them; same values either way.
+  const d = { length_ft, width_ft, thickness_in, diameter_in, height_ft, footing_thickness_in, footing_width_ft, stem_thickness_in, stem_height_ft };
   // Until 2026-09-26 a negative entry here returned a negative quantity with no error.
   if (["length_ft", "width_ft", "thickness_in", "diameter_in", "height_ft", "footing_thickness_in", "footing_width_ft", "stem_thickness_in", "stem_height_ft", "waste_factor"].some((k) => Number(arguments[0]?.[k]) < 0)) return { error: "Concrete dimensions and waste cannot be negative." };
   waste_factor = Number(waste_factor);
@@ -273,8 +278,8 @@ export const LUMBER_NOMINAL_TO_ACTUAL = {
   "2x12": { b_in: 1.5, d_in: 11.25 },
 };
 
-// dims: in { species_grade: dimensionless, nominal_size: dimensionless, total_load_psf: M L^-1 T^-2, tributary_width_in: L, deflection_limit: dimensionless } out: { max_span_ft: L, governing: dimensionless }
-export function computeLumberSpan({ species_grade, nominal_size, total_load_psf, tributary_width_in = 16, deflection_limit = 360 }) {
+// dims: in { species_grade: dimensionless, nominal_size: dimensionless, total_load_psf: M L^-1 T^-2, tributary_width_in: L, deflection_limit: dimensionless, live_load_psf: M L^-1 T^-2 } out: { max_span_ft: L, governing: dimensionless }
+export function computeLumberSpan({ species_grade, nominal_size, total_load_psf, tributary_width_in = 16, deflection_limit = 360, live_load_psf = 0 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const props = LUMBER_SPECIES_GRADES[species_grade];
   if (!props) return { error: "Unknown species/grade." };
@@ -287,6 +292,12 @@ export function computeLumberSpan({ species_grade, nominal_size, total_load_psf,
   if (!(tributary_width_in > 0)) return { error: "Tributary width must be positive." };
   if (!(deflection_limit > 0)) return { error: "Deflection limit must be positive." };
   const w_lb_ft = total_load_psf * (tributary_width_in / 12);
+  // The span tables (AWC, IRC R502.3, SFPA) check bending on the TOTAL load and the L/360 deflection on
+  // the LIVE load only. A blank live load keeps the total (conservative); entering it reproduces the
+  // tables -- SFPA's No. 2 cells at 50 psf bending / 40 psf deflection. Added 2026-10-02.
+  const ll = Number(live_load_psf) || 0;
+  if (ll < 0 || ll > total_load_psf) return { error: "Live load must be between 0 and the total load (psf)." };
+  const w_defl_lb_ft = (ll > 0 ? ll : total_load_psf) * (tributary_width_in / 12);
   // Fb' for repetitive joists (NDS 4.3): the size factor C_F (1.0 for SP, whose
   // table is already per width) and the repetitive-member factor C_r = 1.15 at
   // 24 in on center or closer. Until 2026-09-18 the raw Fb was used, 9-27%
@@ -294,13 +305,13 @@ export function computeLumberSpan({ species_grade, nominal_size, total_load_psf,
   const C_F = String(species_grade || "").split("_")[0] === "SYP" ? 1.0 : (_V15C_CF_BENDING[nominal_size] || 1.0);
   const C_r = tributary_width_in <= 24 ? 1.15 : 1.0;
   const L_b = allowableSpanByBending({ w_lb_ft, Fb_psi: _lumberBaseFb(species_grade, nominal_size, props) * C_F * C_r, b_in: dim.b_in, d_in: dim.d_in });
-  const L_d = allowableSpanByDeflection({ w_lb_ft, E_psi: props.E_psi, b_in: dim.b_in, d_in: dim.d_in, deflectionLimit: deflection_limit });
+  const L_d = allowableSpanByDeflection({ w_lb_ft: w_defl_lb_ft, E_psi: props.E_psi, b_in: dim.b_in, d_in: dim.d_in, deflectionLimit: deflection_limit });
   const L_max = Math.min(L_b, L_d);
   const governs = L_b < L_d ? "bending" : "deflection";
   // v8 §C.4: actual deflection (inches) at the allowable span.
   // δ = 5 × w × L⁴ / (384 × E × I)  with w in lb/in, L in in, E in psi, I in in⁴.
   const sec = rectangularSection({ b_in: dim.b_in, d_in: dim.d_in });
-  const w_lb_in = w_lb_ft / 12;
+  const w_lb_in = w_defl_lb_ft / 12;
   const L_in = L_max * 12;
   const deflection_in = (5 * w_lb_in * Math.pow(L_in, 4)) / (384 * props.E_psi * sec.I_in4);
   // Allowable deflection at the limit (e.g., L/360 in inches).
@@ -500,7 +511,7 @@ export function renderRoofPitch(inputRegion, outputRegion, citationEl) {
 // dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderRafter(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: per IRC 2021 Table R802.5.1 (rafter spans). Rafter = horizontal span * sqrt(1 + (rise/run)^2) by Pythagoras. AHJ governs. Free at codes.iccsafe.org.";
-  const span = makeNumber("Horizontal span (ft)", "rf-s", { step: "any", min: "0" });
+  const span = makeNumber("Horizontal run (ft; half the building span on a gable)", "rf-s", { step: "any", min: "0" });
   const pitch = makeNumber("Pitch (rise per 12)", "rf-p", { step: "any", min: "0" });
   const overhang = makeNumber("Overhang (ft)", "rf-o", { step: "any", min: "0", value: "0" });
   overhang.input.value = "0";
@@ -662,7 +673,8 @@ export function renderLumberSpans(inputRegion, outputRegion, citationEl) {
   tw.input.value = "16";
   const dl = makeNumber("Deflection limit (L/x)", "ls-dl", { step: "1", min: "120", value: "360" });
   dl.input.value = "360";
-  for (const f of [sp, sz, tl, tw, dl]) inputRegion.appendChild(f.wrap);
+  const ll = makeNumber("Live load for the deflection check (psf; blank = total)", "ls-ll", { step: "any", min: "0" });
+  for (const f of [sp, sz, tl, tw, dl, ll]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { sp.select.value = "DF-L_No2"; sz.select.value = "2x10"; tl.input.value = "50"; tw.input.value = "16"; dl.input.value = "360"; update(); });
   const oS = makeOutputLine(outputRegion, "Allowable span", "ls-out-s");
   const oB = makeOutputLine(outputRegion, "By bending", "ls-out-b");
@@ -677,6 +689,7 @@ export function renderLumberSpans(inputRegion, outputRegion, citationEl) {
       total_load_psf: Number(tl.input.value) || 0,
       tributary_width_in: Number(tw.input.value) || 0,
       deflection_limit: Number(dl.input.value) || 360,
+      live_load_psf: Number(ll.input.value) || 0,
     });
     if (r.error) { oS.textContent = r.error; oB.textContent = "-"; oD.textContent = "-"; oG.textContent = "-"; oDef.textContent = "-"; return; }
     oS.textContent = fmt(r.allowable_span_ft, 2) + " ft";
@@ -685,7 +698,7 @@ export function renderLumberSpans(inputRegion, outputRegion, citationEl) {
     oG.textContent = r.governing;
     oDef.textContent = fmt(r.deflection_in, 3) + " in (limit " + fmt(r.allowable_deflection_in, 3) + " in)";
   }, DEBOUNCE_MS);
-  for (const el of [sp.select, sz.select, tl.input, tw.input, dl.input]) el.addEventListener("input", update);
+  for (const el of [sp.select, sz.select, tl.input, tw.input, dl.input, ll.input]) el.addEventListener("input", update);
 }
 
 // dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
@@ -986,7 +999,10 @@ export const excavationExample = {
 // joint the module is 16 x 8 = 128 in^2 -> the standard 1.125 CMU/ft^2. (Storing the
 // nominal 16 x 8 here and adding the joint again double-counted it, undercounting ~7%.)
 export const MASONRY_UNIT_FACE_IN = {
-  modular_brick: { w: 7.625, h: 2.25 },
+  // Modular brick is laid three courses to 8 in (BIA Technical Note 10: 6.75 per ft^2), so its
+  // course is 2-2/3 in; with the default 3/8 in joint the stored height is 2.2917, not the 2-1/4 unit
+  // (2-1/4 + 3/8 gave a 7-7/8 in module and 6.86 per ft^2 until 2026-10-02).
+  modular_brick: { w: 7.625, h: 8 / 3 - 0.375 },
   standard_brick: { w: 8, h: 2.25 },
   cmu_8x8x16: { w: 15.625, h: 7.625 },
   cmu_8x16x16: { w: 15.625, h: 7.625 },
@@ -1482,16 +1498,18 @@ export function computeDrywall({ wall_area_ft2 = 0, ceiling_area_ft2 = 0, sheet_
   const total_ft2 = wall_area_ft2 + ceiling_area_ft2;
   if (total_ft2 === 0) return { error: "Provide a wall or ceiling area." };
   const sheets = Math.ceil((total_ft2 * (1 + waste_percent / 100)) / sheetA - 1e-9);
-  // The rates the citation states (USG / GA-216 practice): about 1 gal of
-  // ready-mix per 70 ft^2 and 0.4 lf of tape per ft^2. Until 2026-09-18 the
-  // code used 0.053 gal and 1.0 lf per ft^2, 3.7x and 2.5x its own citation.
-  const mud_gal = total_ft2 / 70;
-  const tape_lf = total_ft2 * 0.4;
+  // USG's printed rates: All Purpose ready-mix about 10 gal per 1,000 ft^2 of board (USG J1969) and
+  // 370 lf of tape per 1,000 ft^2 (Gypsum Construction Handbook). Until 2026-10-02 this used 1 gal
+  // per 70 ft^2 (43% high) and 0.4 lf/ft^2.
+  const mud_gal = total_ft2 / 100;
+  const tape_lf = total_ft2 * 0.37;
   // 28 / 32 screws per 4x8 (32 ft^2) sheet is a per-area rate: a 4x12 sheet
   // spans more studs and joists, so it takes more screws, not the same 28.
   // Until 2026-09-25 this divided by the chosen sheet's area, so 4x12 board
   // counted a third fewer screws than 4x8 on the same wall.
-  const screws = Math.ceil((wall_area_ft2 / 32) * 28 + (ceiling_area_ft2 / 32) * 32 - 1e-9);
+  // USG Gypsum Construction Handbook: 875 screws per 1,000 ft^2 on walls (28 a 4x8) and 1,125 on
+  // ceilings (36 a 4x8; 32 until 2026-10-02, 11% low).
+  const screws = Math.ceil((wall_area_ft2 / 32) * 28 + (ceiling_area_ft2 / 32) * 36 - 1e-9);
   return { sheets, mud_gal, tape_lf, screws, total_ft2 };
 }
 
@@ -2011,7 +2029,7 @@ function _simpleRenderer(spec) {
 }
 
 const renderDrywall = _simpleRenderer({
-  citation: "Citation: Public engineering practice (USG / GA-216): about 1 gal of ready-mix joint compound per 70 ft^2, 0.4 lf of tape per ft^2, and screws at 28 per 4x8 wall sheet or 32 per 4x8 ceiling sheet, scaled by area for larger sheets.",
+  citation: "Citation: Public engineering practice (USG / GA-216): about 10 gal of ready-mix joint compound per 1,000 ft^2, 370 lf of tape per 1,000 ft^2, and screws at 28 per 4x8 wall sheet or 36 per 4x8 ceiling sheet, scaled by area for larger sheets.",
   example: drywallExample.inputs,
   fields: [
     { key: "wall_area_ft2", label: "Wall area (ft²)", kind: "number" },
@@ -2032,7 +2050,7 @@ const renderRoofingSquares = _simpleRenderer({
   citation: "Citation: Roofing squares (1 sq = 100 ft^2). Bundles per square per shingle product (3 for 3-tab/architectural, 4 for premium). Manufacturer benchmarks generally.",
   example: roofingSquaresExample.inputs,
   fields: [
-    { key: "roof_area_ft2", label: "Roof area (ft²)", kind: "number" },
+    { key: "roof_area_ft2", label: "Roof area, SLOPED surface (ft²; a plan footprint x the pitch factor)", kind: "number" },
     { key: "pitch_rise", label: "Pitch rise (in / 12)", kind: "number" },
     { key: "shingle_product", label: "Shingle product", kind: "select", options: [{ value: "3-tab", label: "3-tab" }, { value: "architectural", label: "Architectural" }, { value: "premium", label: "Premium" }] },
     { key: "perimeter_ft", label: "Perimeter (ft)", kind: "number" },

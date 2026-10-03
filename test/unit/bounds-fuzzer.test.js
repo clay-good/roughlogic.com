@@ -1049,20 +1049,23 @@ test("bounds: calc-hvac computeSHR rejects non-positive total load (documented)"
 });
 
 test("bounds: calc-hvac computeSeerEer round-trips EER -> SEER -> EER exactly across the rating sweep", () => {
-  for (const eer of [9, 11, 12, 14, 16]) {
+  for (const eer of [9, 11, 12, 14, 15]) {
     const fwd = computeSeerEer({ value: eer, from: "EER" });
     assertFinitePositive(fwd.SEER, `EER=${eer} SEER`);
     assertFinitePositive(fwd.SEER2_estimate, `EER=${eer} SEER2_estimate`);
-    // SEER = EER * 1.12 exactly; SEER2_estimate = SEER * 0.95.
-    assert.ok(Math.abs(fwd.SEER - eer * 1.12) < 1e-12, `SEER identity EER=${eer}`);
-    assert.ok(Math.abs(fwd.SEER2_estimate - eer * 1.12 * 0.95) < 1e-12, `SEER2 identity EER=${eer}`);
+    // NREL HSP (Wassmer): EER = -0.02 SEER^2 + 1.12 SEER, so the forward SEER satisfies it; SEER2 = SEER * 0.95.
+    assert.ok(Math.abs(-0.02 * fwd.SEER * fwd.SEER + 1.12 * fwd.SEER - eer) < 1e-9, `SEER identity EER=${eer}`);
+    assert.ok(Math.abs(fwd.SEER2_estimate - fwd.SEER * 0.95) < 1e-12, `SEER2 identity EER=${eer}`);
     // Reverse: SEER -> EER should land back at the original within fp tolerance.
     const back = computeSeerEer({ value: fwd.SEER, from: "SEER" });
-    assert.ok(Math.abs(back.EER - eer) < 1e-12, `round-trip EER=${eer}: ${back.EER}`);
+    assert.ok(Math.abs(back.EER - eer) < 1e-9, `round-trip EER=${eer}: ${back.EER}`);
   }
 });
 
 test("bounds: calc-hvac computeSeerEer rejects unknown rating system (documented)", () => {
+  // SEER 16 is EER 12.8 on the NREL curve (SEER/1.12 read 14.29), and EER past the 15.68 peak errors.
+  assert.ok(Math.abs(computeSeerEer({ value: 16, from: "SEER" }).EER - 12.8) < 1e-9);
+  assert.ok("error" in computeSeerEer({ value: 16, from: "EER" }));
   const r = computeSeerEer({ value: 12, from: "not-a-rating" });
   assert.ok("error" in r);
 });
@@ -8950,13 +8953,13 @@ test("bounds: calc-construction computeAnchorEmbedment pins the ACI 318-19 17.6.
   assert.ok("error" in computeAnchorEmbedment({ uplift_lb: 1, bolt_diameter_in: 0.5, fc_psi: 0 }));
 });
 
-test("bounds: calc-construction computeDrywall pins sheets = ceil(total*(1+waste)/sheetA), mud = 1 gal/70 ft^2, tape = 0.4 lf/ft^2", () => {
+test("bounds: calc-construction computeDrywall pins sheets = ceil(total*(1+waste)/sheetA), mud = 10 gal / 1,000 ft^2, tape = 370 lf / 1,000 ft^2 (USG)", () => {
   const r = computeDrywall({ wall_area_ft2: 1200, ceiling_area_ft2: 600, sheet_size: "4x8", waste_percent: 10 });
   assert.strictEqual(r.total_ft2, 1800);
   assert.strictEqual(r.sheets, Math.ceil((1800 * 1.10) / 32));
-  assert.ok(Math.abs(r.mud_gal - 1800 / 70) < 1e-9);
-  assert.ok(Math.abs(r.tape_lf - 720) < 1e-9);
-  assert.strictEqual(r.screws, Math.ceil((1200 / 32) * 28 + (600 / 32) * 32));
+  assert.ok(Math.abs(r.mud_gal - 1800 / 100) < 1e-9);
+  assert.ok(Math.abs(r.tape_lf - 666) < 1e-9);
+  assert.strictEqual(r.screws, Math.ceil((1200 / 32) * 28 + (600 / 32) * 36));
   // Rejections.
   assert.ok("error" in computeDrywall({ wall_area_ft2: -1, ceiling_area_ft2: 0 }));
   assert.ok("error" in computeDrywall({ wall_area_ft2: 100, ceiling_area_ft2: 0, sheet_size: "moon" }));

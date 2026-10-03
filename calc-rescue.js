@@ -60,7 +60,10 @@ export const confinedSpacePurgeExample = { inputs: { volume_ft3: 2000, blower_cf
 
 // --- Utility 160: Rope Rescue Mechanical Advantage ---
 //
-// theoretical MA from rig type; actual MA = theoretical * (efficiency)^pulleys.
+// theoretical MA from rig type; actual MA by tension tracking: each pulley passes on efficiency x
+// the tension, so a simple rig with n pulleys gives 1 + p + p^2 + ... + p^n (Rescue Dynamics,
+// Shokoples 1994: 3:1 = 2.71 at p 0.90). Until 2026-10-02 it was ma x p^n (2.43), which read a
+// carabiner-redirect 3:1 at p 0.45 as 0.61, worse than no system.
 // haul_force = load / actual MA. NFA / NFPA training literature cited by name.
 
 export const ROPE_RIGS = {
@@ -81,7 +84,8 @@ export function computeRopeMA({ rig = "3:1", efficiency = 0.9, load_lb = 0 }) {
   if (!r) return { error: "Unknown rig type." };
   if (!(efficiency > 0 && efficiency <= 1)) return { error: "Efficiency must be 0..1." };
   if (!(load_lb >= 0)) return { error: "Load must be non-negative." };
-  const actual_ma = r.ma * Math.pow(efficiency, r.pulleys);
+  let actual_ma = 0;
+  for (let k = 0; k <= r.pulleys; k++) actual_ma += Math.pow(efficiency, k);
   const haul_force_lb = load_lb / actual_ma;
   return { theoretical_ma: r.ma, actual_ma, haul_force_lb, pulleys: r.pulleys };
 }

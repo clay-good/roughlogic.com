@@ -19,9 +19,10 @@ import { computeCapRateDSCR } from "../../calc-realestate.js";
 
 // EN.1 seer-eer: annual-cost cross-check; default conversion unchanged.
 test("EN.1 seer-eer: SEER from EER unchanged; annual kWh = load*hrs/(SEER*1000)", () => {
-  assert.ok(Math.abs(computeSeerEer({ value: 12, from: "EER" }).SEER - 13.44) < 1e-9);
+  const seer12 = (1.12 - Math.sqrt(1.2544 - 0.96)) / 0.04; // NREL HSP quadratic, 14.4353
+  assert.ok(Math.abs(computeSeerEer({ value: 12, from: "EER" }).SEER - seer12) < 1e-9);
   const r = computeSeerEer({ value: 12, from: "EER", cooling_load_btu_hr: 36000, annual_hours: 1000, electricity_rate: 0.15 });
-  assert.ok(Math.abs(r.annual_kwh - (36000 * 1000) / (13.44 * 1000)) < 1e-6);
+  assert.ok(Math.abs(r.annual_kwh - (36000 * 1000) / (seer12 * 1000)) < 1e-6);
   assert.ok(Math.abs(r.annual_cost_usd - r.annual_kwh * 0.15) < 1e-6);
   assert.strictEqual(computeSeerEer({ value: 12, from: "EER" }).annual_kwh, null);
 });

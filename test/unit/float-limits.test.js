@@ -14,6 +14,7 @@ import { computePaverPatio, computeStepFlashingCount } from "../../calc-finish.j
 import { computeErosionBlanketCoverage } from "../../calc-earthwork.js";
 import { computeLightingUniformityRatio } from "../../calc-elecdesign.js";
 import { computeAlternatorChargingLoad } from "../../calc-mechanic.js";
+import { computeRampSlope } from "../../calc-cross.js";
 
 test("premix bags: a 6 x 6 ft, 4 in pad at 10% waste is exactly 22 bags of 0.60 cu ft, not 23", () => {
   assert.equal(computeConcretePremixBags({ length_ft: 6, width_ft: 6, thickness_in: 4, bag_yield_ft3: 0.6, waste_pct: 10 }).bags, 22);
@@ -62,4 +63,8 @@ test("a rounded PRODUCT: 99, 55, and 55 whole units, not one more (2026-10-02)",
 test("uniformity 2.1 / 0.7 fc is exactly 3:1 and passes a 3:1 target; an alternator exactly at the load balances", () => {
   assert.equal(computeLightingUniformityRatio({ readings: [2.1, 0.7, 1.4], target_maxmin: 3 }).pass, true);
   assert.equal(computeAlternatorChargingLoad({ total_load_a: 63, alternator_a: 90, idle_frac: 0.7 }).idle_ok, true);
+});
+
+test("ramp: a 1.1 in rise over 13.2 in is exactly 1:12 and passes ADA 405.2", () => {
+  assert.equal(computeRampSlope({ rise_in: 1.1, run_in: 13.2 }).pass_1_to_12, true);
 });

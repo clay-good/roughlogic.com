@@ -136,7 +136,7 @@ test("Subcool: line cooler than saturated -> positive subcool", () => {
 
 // --- SEER/EER (Utility 27) ---
 
-test("SEER from EER: 12 EER -> ~ 13.4 SEER", () => {
+test("SEER from EER: 12 EER -> ~ 14.4 SEER (NREL quadratic)", () => {
   const r = computeSeerEer(seerEerExample.inputs);
   assert.ok(r.SEER > seerEerExample.expectedRange.SEER.min);
   assert.ok(r.SEER < seerEerExample.expectedRange.SEER.max);

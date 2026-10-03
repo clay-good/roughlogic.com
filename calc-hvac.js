@@ -285,15 +285,24 @@ export const staticPressureHvacExample = {
 // dims: in { value: dimensionless, from: dimensionless, cooling_load_btu_hr: M L^2 T^-3, annual_hours: T, electricity_rate: dimensionless } out: { seer: dimensionless, eer: dimensionless, annual_kwh: M L^2 T^-2, annual_cost_usd: dimensionless }
 export function computeSeerEer({ value, from, cooling_load_btu_hr = 0, annual_hours = 0, electricity_rate = 0 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
-  // Common engineering approximation: SEER ~ EER * 1.12 (averaged across rating conditions).
-  // This is an estimate; actual conversion depends on rating method.
+  // NREL Building America House Simulation Protocols (Wassmer 2003): EER = -0.02 SEER^2 + 1.12 SEER;
+  // the inverse is the smaller root, SEER = (1.12 - sqrt(1.2544 - 0.08 EER)) / 0.04. Until 2026-10-02
+  // this took EER = SEER / 1.12, which drops the square term and read 12% high at SEER 16, 24% at 20.
   // The 0.95 factor is the ~4.5% DOE 10 CFR 430 App. M1 external-static delta
   // (SEER2 ~ SEER * 0.95), user-confirmable against the nameplate.
+  const eerOf = (S) => -0.02 * S * S + 1.12 * S;
+  const seerOf = (E) => (1.12 - Math.sqrt(1.2544 - 0.08 * E)) / 0.04;
+  if (from === "EER" || from === "EER2") {
+    const E = from === "EER" ? value : value / 0.95;
+    if (!(E > 0 && E <= 15.68)) return { error: "EER must be above 0 and at most 15.68, where the NREL SEER-EER curve peaks." };
+  } else if ((from === "SEER" || from === "SEER2") && !(value > 0 && (from === "SEER" ? value : value / 0.95) <= 28)) {
+    return { error: "SEER must be above 0 and at most 28, the range of the NREL SEER-EER relation." };
+  }
   let out, seer;
-  if (from === "EER") { seer = value * 1.12; out = { SEER: seer, SEER2_estimate: value * 1.12 * 0.95 }; }
-  else if (from === "SEER") { seer = value; out = { EER: value / 1.12, EER2_estimate: (value / 1.12) * 0.95 }; }
-  else if (from === "SEER2") { seer = value / 0.95; out = { SEER: value / 0.95, EER: (value / 0.95) / 1.12 }; }
-  else if (from === "EER2") { seer = (value / 0.95) * 1.12; out = { EER: value / 0.95, SEER: (value / 0.95) * 1.12 }; }
+  if (from === "EER") { seer = seerOf(value); out = { SEER: seer, SEER2_estimate: seer * 0.95 }; }
+  else if (from === "SEER") { seer = value; out = { EER: eerOf(value), EER2_estimate: eerOf(value) * 0.95 }; }
+  else if (from === "SEER2") { seer = value / 0.95; out = { SEER: seer, EER: eerOf(seer) }; }
+  else if (from === "EER2") { seer = seerOf(value / 0.95); out = { EER: value / 0.95, SEER: seer }; }
   else return { error: "Unknown rating system." };
   // v23 EN.1: optional annual-kWh / $ cross-check from a cooling load + rate.
   // annual_kWh = load_BTU/hr * hours / (SEER * 1000). Default (no load) omits it.
@@ -311,7 +320,7 @@ export function computeSeerEer({ value, from, cooling_load_btu_hr = 0, annual_ho
 
 export const seerEerExample = {
   inputs: { value: 12, from: "EER" },
-  expectedRange: { SEER: { min: 13, max: 14 } },
+  expectedRange: { SEER: { min: 14, max: 15 } },
 };
 
 // --- Utility 28: Heat Pump Balance Point ---

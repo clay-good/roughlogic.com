@@ -2,7 +2,7 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "c25da2cb15ef4f2b",
+      "sha": "48abfde7ddebdacd",
       "date": "2026-10-03"
     },
     "/tools/": {
@@ -10,7 +10,7 @@
       "date": "2026-10-01"
     },
     "/collections/disaster-response/": {
-      "sha": "83326a630cce26fa",
+      "sha": "ca98638f92a7f960",
       "date": "2026-10-03"
     },
     "/groups/accounting/": {
@@ -22,7 +22,7 @@
       "date": "2026-10-03"
     },
     "/groups/construction/": {
-      "sha": "fa2607f68bb18b4d",
+      "sha": "2e11438b42907867",
       "date": "2026-10-03"
     },
     "/groups/cross-trade/": {
@@ -42,16 +42,16 @@
       "date": "2026-10-01"
     },
     "/groups/fire-ground/": {
-      "sha": "0bdabb2ebde45bf6",
-      "date": "2026-10-01"
+      "sha": "8cc8621d1bdfe32e",
+      "date": "2026-10-03"
     },
     "/groups/historical/": {
       "sha": "584a6c8aeca1d70b",
       "date": "2026-10-01"
     },
     "/groups/hvac/": {
-      "sha": "c65b237976d6f89e",
-      "date": "2026-10-01"
+      "sha": "f626b77dd581c724",
+      "date": "2026-10-03"
     },
     "/groups/kitchen/": {
       "sha": "d728c493b8be6e73",
@@ -186,8 +186,8 @@
       "date": "2026-09-29"
     },
     "/tools/aerial-ladder/": {
-      "sha": "3b2135ce8e6219cf",
-      "date": "2026-09-29"
+      "sha": "3645bc98c355120c",
+      "date": "2026-10-03"
     },
     "/tools/aerodynamic-drag-force/": {
       "sha": "255e54ab4fcd639e",
@@ -2418,8 +2418,8 @@
       "date": "2026-09-29"
     },
     "/tools/drywall/": {
-      "sha": "b17698d432e64241",
-      "date": "2026-09-29"
+      "sha": "34c0e631e1060652",
+      "date": "2026-10-03"
     },
     "/tools/drywall-fastener-takeoff/": {
       "sha": "342e004e944f657d",
@@ -4550,8 +4550,8 @@
       "date": "2026-09-29"
     },
     "/tools/masonry-count/": {
-      "sha": "2c9ee0a78f4b883e",
-      "date": "2026-09-29"
+      "sha": "ec517ce19472d346",
+      "date": "2026-10-03"
     },
     "/tools/masonry-coursing/": {
       "sha": "536e1a0b56d2091c",
@@ -5970,8 +5970,8 @@
       "date": "2026-10-01"
     },
     "/tools/rafter/": {
-      "sha": "36e30e5534b3b64c",
-      "date": "2026-09-29"
+      "sha": "ff34035b988c03b0",
+      "date": "2026-10-03"
     },
     "/tools/rail-wear-condemning-limit/": {
       "sha": "bb7d39e0a3c96b07",
@@ -6446,8 +6446,8 @@
       "date": "2026-09-29"
     },
     "/tools/roofing-squares/": {
-      "sha": "c393c460face7afd",
-      "date": "2026-09-29"
+      "sha": "1b893d364eb37b1c",
+      "date": "2026-10-03"
     },
     "/tools/rooftop-curb-uplift/": {
       "sha": "321e825f935b94be",
@@ -6474,8 +6474,8 @@
       "date": "2026-10-01"
     },
     "/tools/rope-ma/": {
-      "sha": "912005d051077a37",
-      "date": "2026-09-30"
+      "sha": "73b1cc7b912e1c0d",
+      "date": "2026-10-03"
     },
     "/tools/rope-safety-factor/": {
       "sha": "7c97d8755ed49c5a",
@@ -6710,8 +6710,8 @@
       "date": "2026-09-29"
     },
     "/tools/seer-eer/": {
-      "sha": "7735e22f25c6f755",
-      "date": "2026-09-29"
+      "sha": "2cf5cd37342032a4",
+      "date": "2026-10-03"
     },
     "/tools/seismic-approximate-period/": {
       "sha": "e5a3f641cceddf4b",
@@ -7466,8 +7466,8 @@
       "date": "2026-09-29"
     },
     "/tools/stairs/": {
-      "sha": "77ba1020d886f808",
-      "date": "2026-09-29"
+      "sha": "3fb37021ea8dabc4",
+      "date": "2026-10-03"
     },
     "/tools/stairwell-pressurization/": {
       "sha": "494be25bd320a762",
@@ -7866,8 +7866,8 @@
       "date": "2026-09-29"
     },
     "/tools/tankless-gpm/": {
-      "sha": "672637ed1d549fe9",
-      "date": "2026-09-29"
+      "sha": "099d76b66f402ea4",
+      "date": "2026-10-03"
     },
     "/tools/tap-drill-size/": {
       "sha": "56ed4f551ae5c5af",

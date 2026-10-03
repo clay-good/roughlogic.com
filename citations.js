@@ -4120,7 +4120,7 @@ export const CITATIONS = {
     editionNote: "Single-edition (engineering practice + manufacturer data).",
     assumptions: [
       { name: "Specific heat × density factor", value: "8.33 (BTU per gal-°F)", source: "physical fact for water" },
-      { name: "Default thermal efficiency", value: "0.82 unless user supplies a tested EF", source: "DOE federal minimum for gas tankless" },
+      { name: "Default efficiency", value: "0.82 (the former DOE Energy Factor minimum for gas tankless; the current rating is a Uniform Energy Factor, 0.81 minimum) unless the user supplies the unit's own", source: "DOE 10 CFR 430" },
     ],
   },
   "gas-leak-hole-diameter": {
@@ -4506,6 +4506,7 @@ export const CITATIONS = {
     editionNote: "Editions available: AHRI 210/240-2023 is the current edition (SEER2 / EER2). Older equipment rated per AHRI 210/240-2008 (SEER / EER) is shown alongside.",
     assumptions: [
       { name: "Test conditions", value: "AHRI 95 °F outdoor / 80 °F indoor / 67 °F wet bulb", source: "AHRI 210/240" },
+      { name: "SEER-EER relation", value: "EER = -0.02 SEER^2 + 1.12 SEER (Wassmer 2003, NREL Building America House Simulation Protocols); a nameplate EER governs", source: "NREL HSP" },
     ],
   },
   "balance-point": {
@@ -4976,13 +4977,13 @@ export const CITATIONS = {
     ],
   },
   "masonry-count": {
-    formula: "Brick count = wall_area / brick_face_area × layer factor. CMU count = wall_area / cmu_face_area. Allow 5% breakage waste.",
+    formula: "Units = ceil(wall_area / laid module face x (1 + waste)), the module being the unit face plus one mortar joint each way. Modular brick lays three courses to 8 in (2-2/3 in course, 8 in length: 6.75 per ft^2, BIA Technical Note 10); standard brick 8 x 2-1/4 with 3/8 in joints is 6.55 per ft^2; an 8 x 16 CMU module is 1.125 per ft^2. Allow 5% breakage waste.",
     edition: "BIA (Brick Industry Association) Technical Notes by name; NCMA TEK manuals by name.",
     freeAccess: "BIA Tech Notes free at gobrick.com. NCMA TEK manuals free at ncma.org.",
     governance: GOVERNANCE.general,
     editionNote: "Single-edition (BIA / NCMA engineering practice).",
     assumptions: [
-      { name: "Modular brick face area", value: "32 in² (4 in × 8 in nominal) unless user supplies", source: "BIA Tech Note 10" },
+      { name: "Modular brick module", value: "8 in long x 2-2/3 in course (three courses = 8 in), 21.3 in^2 laid face", source: "BIA Tech Note 10" },
     ],
   },
   "wind-pressure": {
@@ -5030,7 +5031,7 @@ export const CITATIONS = {
     ],
   },
   "drywall": {
-    formula: "Sheets = wall_area / sheet_area + waste factor. Mud (joint compound) = 1 gal per ~70 ft² of seams. Tape = ~0.4 ft per ft² of wall. Screws ≈ 1 per ft² (16 in OC).",
+    formula: "Sheets = ceil(area x (1 + waste) / sheet area). Mud (ready-mix) = 10 gal per 1,000 ft² of board (USG All Purpose, J1969). Tape = 370 ft per 1,000 ft². Screws = 875 per 1,000 ft² on walls and 1,125 on ceilings (USG Gypsum Construction Handbook).",
     edition: "USG / National Gypsum technical literature by name; GA-216 (Gypsum Association Application and Finishing of Gypsum Panel Products) by name.",
     freeAccess: "GA-216 free at gypsum.org. Manufacturer guides free at usg.com / nationalgypsum.com.",
     governance: GOVERNANCE.general,
@@ -5046,7 +5047,7 @@ export const CITATIONS = {
     governance: GOVERNANCE.general,
     editionNote: IRC_DISCLOSURE,
     assumptions: [
-      { name: "Pitch-based waste factor", value: "8% (≤ 6/12) / 12% (8-9/12) / 17% (≥ 10/12)", source: "ARMA / engineering practice" },
+      { name: "Pitch-based waste factor", value: "10% (below 6/12) / 12% (6-8/12) / 15% (9-11/12) / 18% (12/12 and steeper), on the SLOPED roof area; shingle makers set waste by roof size and gable vs hip, so treat these as defaults", source: "engineering practice" },
     ],
   },
   "asphalt-tonnage": {
@@ -6226,7 +6227,7 @@ export const CITATIONS = {
     assumptions: [],
   },
   "aerial-ladder": {
-    formula: "Horizontal reach = ladder_length × cos(angle); vertical reach = ladder_length × sin(angle) + apparatus turntable height.",
+    formula: "Horizontal reach = ladder_length × cos(angle); vertical reach = ladder_length × sin(angle), measured from the turntable pivot; a manufacturer's rated vertical reach adds the pivot height above grade (Spartan's 75 ft rear mount prints 75 ft vertical where 75 x sin 72 is 71.3), so add it for the height above the street.",
     edition: "NFPA 1901 (Standard for Automotive Fire Apparatus) by name; manufacturer aerial-device technical data sheets (Pierce, E-One, Sutphen) by name.",
     freeAccess: "NFPA 1901 read-only at nfpa.org/freeaccess; manufacturer specs free on each manufacturer site.",
     governance: GOVERNANCE.fire,
@@ -6359,7 +6360,7 @@ export const CITATIONS = {
   },
 
   "rope-ma": {
-    formula: "Theoretical MA per rig type × pulley_efficiency^n_pulleys. Haul force = load / actual_MA. Common rigs 1:1, 2:1, 3:1, 4:1 (Z-rig), 5:1 piggyback, T-method.",
+    formula: "Actual MA by tension tracking for a simple rig: 1 + p + p^2 + ... + p^n for n pulleys of efficiency p (Rescue Dynamics: 3:1 = 2.71 at p 0.90, 2.19 at 0.70, 1.65 at a 0.45 carabiner). Haul force = load / actual_MA. Rigs 1:1, 2:1, 3:1 (the Z-rig), 4:1, 5:1; the T_method and 5:1_piggyback options compute a simple 5:1 (the T-method is a way to analyze any rig, and a complex or piggyback rig needs its own tension tracking).",
     edition: "NFPA 1006 / NFPA 1670 by name; CMC Rope Rescue Manual + Rigging for Rescue training materials by name.",
     freeAccess: "NFPA standards read-only at nfpa.org/freeaccess; NFA rope-rescue materials free at usfa.fema.gov.",
     governance: GOVERNANCE.fire,

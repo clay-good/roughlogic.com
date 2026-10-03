@@ -25,7 +25,7 @@ test("Purge: identity check 1*1/1 = 1", () => { const r = computeConfinedSpacePu
 test("Purge: returns finite for normal inputs", () => { const r = computeConfinedSpacePurge({ volume_ft3: 800, blower_cfm: 250, target_purges: 7 }); assert.ok(Number.isFinite(r.minutes)); });
 
 // 160 Rope MA
-test("Rope MA: example 4:1 0.9 efficiency", () => { const r = computeRopeMA(ropeMAExample.inputs); const expected_ma = 4 * Math.pow(0.9, 3); assert.ok(close(r.actual_ma, expected_ma, 0.001)); });
+test("Rope MA: example 4:1 0.9 efficiency", () => { const r = computeRopeMA(ropeMAExample.inputs); const expected_ma = 1 + 0.9 + 0.81 + 0.729; /* tension tracking (Rescue Dynamics), not 4 x 0.9^3 */ assert.ok(close(r.actual_ma, expected_ma, 0.001)); });
 test("Rope MA: theoretical from rig", () => { const r = computeRopeMA({ rig: "5:1", efficiency: 1.0, load_lb: 100 }); assert.equal(r.theoretical_ma, 5); });
 test("Rope MA: 1:1 has no pulley losses", () => { const r = computeRopeMA({ rig: "1:1", efficiency: 0.5, load_lb: 100 }); assert.equal(r.actual_ma, 1); });
 test("Rope MA: lower efficiency -> lower actual MA", () => { const a = computeRopeMA({ rig: "5:1", efficiency: 0.95, load_lb: 100 }); const b = computeRopeMA({ rig: "5:1", efficiency: 0.7, load_lb: 100 }); assert.ok(b.actual_ma < a.actual_ma); });
@@ -34,6 +34,7 @@ test("Rope MA: unknown rig errors", () => { const r = computeRopeMA({ rig: "x", 
 test("Rope MA: bad efficiency errors", () => { const r = computeRopeMA({ rig: "3:1", efficiency: 1.5, load_lb: 100 }); assert.ok(r.error); });
 test("Rope MA: negative load errors", () => { const r = computeRopeMA({ rig: "3:1", efficiency: 0.9, load_lb: -100 }); assert.ok(r.error); });
 test("Rope MA: every rig has positive MA", () => { for (const k of Object.keys(ROPE_RIGS)) assert.ok(ROPE_RIGS[k].ma > 0); });
+test("Rope MA: 3:1 at 0.90 / 0.70 / 0.45 is 2.71 / 2.19 / 1.65 (Rescue Dynamics)", () => { for (const [p, m] of [[0.9, 2.71], [0.7, 2.19], [0.45, 1.6525]]) assert.ok(close(computeRopeMA({ rig: "3:1", efficiency: p, load_lb: 200 }).actual_ma, m, 1e-9)); });
 test("Rope MA: T-method ~ 5", () => { const r = computeRopeMA({ rig: "T_method", efficiency: 1.0, load_lb: 100 }); assert.equal(r.theoretical_ma, 5); });
 
 // 161 Sling angle

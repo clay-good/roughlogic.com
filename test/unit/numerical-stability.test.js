@@ -1102,13 +1102,12 @@ test("computeRecircPumpHead: bit-stable head_ft + pressure_psi at the spec examp
 });
 
 test("computeSeerEer: bit-stable SEER + SEER2_estimate at the spec example (EER 12)", () => {
-  // Group C. AHRI 210/240 conversion: SEER = EER * 1.12 = 13.44 at EER
-  // 12; SEER2 = SEER * 0.95 ratchet for the 2023 test procedure update.
-  // Pins both the 1.12 EER->SEER conversion and the 0.95 SEER->SEER2
-  // ratchet against a future regulatory drift.
+  // Group C. NREL HSP relation EER = -0.02 SEER^2 + 1.12 SEER, so EER 12 -> SEER 14.4353 (the smaller
+  // root); SEER2 = SEER * 0.95 for the 2023 test procedure update. Re-pinned 2026-10-02 from the
+  // linear SEER = 1.12 EER (13.44).
   const r = computeSeerEer(seerEerExample.inputs);
-  assert.equal(bits(r.SEER), "402ae147ae147ae2", `SEER=${r.SEER}`);
-  assert.equal(bits(r.SEER2_estimate), "402989374bc6a7f0", `SEER2=${r.SEER2_estimate}`);
+  assert.equal(bits(r.SEER), "402cdee4e38f2fde", `SEER=${r.SEER}`);
+  assert.equal(bits(r.SEER2_estimate), "402b6d5971c80713", `SEER2=${r.SEER2_estimate}`);
 });
 
 test("computeSnowLoad: bit-stable Pf_psf at the ASCE 7 spec example", () => {

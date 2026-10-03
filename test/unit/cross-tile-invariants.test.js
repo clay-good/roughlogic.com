@@ -4104,8 +4104,8 @@ test("monotonicity: computeMolecularWeight molecular_weight is strictly increasi
     `MW(O2) = ${o2.molecular_weight} != 2 * MW(O) = ${2 * o.molecular_weight}`);
 });
 
-test("monotonicity: computeDrywall mud_gal + tape_lf + total_ft2 are strictly increasing in wall_area_ft2 at fixed ceiling / sheet (1/70 gal/ft^2 + 0.4 lf/ft^2 linear pin, the citation's rates)", () => {
-  // Group E. mud_gal = total_ft2 / 70; tape_lf = total_ft2 * 0.4.
+test("monotonicity: computeDrywall mud_gal + tape_lf + total_ft2 are strictly increasing in wall_area_ft2 at fixed ceiling / sheet (USG 10 gal and 370 lf per 1,000 ft^2 linear pin)", () => {
+  // Group E. mud_gal = total_ft2 / 100; tape_lf = total_ft2 * 0.37 (USG).
   // Strictly increasing in wall_area_ft2 at fixed ceiling.
   let prevMud = -Infinity;
   let prevTape = -Infinity;
@@ -4121,13 +4121,13 @@ test("monotonicity: computeDrywall mud_gal + tape_lf + total_ft2 are strictly in
     prevTotal = r.total_ft2;
   }
   // Closed-form pin from drywallExample: wall=1200 + ceiling=600 -> total=1800;
-  // mud = 1800 / 70 = 25.7 gal; tape = 720 lf.
+  // mud = 1800 / 100 = 18 gal; tape = 666 lf.
   const ref = computeDrywall({ wall_area_ft2: 1200, ceiling_area_ft2: 600, sheet_size: "4x8", waste_percent: 10 });
   assert.equal(ref.total_ft2, 1800);
-  assert.ok(Math.abs(ref.mud_gal - 1800 / 70) < 1e-12,
-    `mud = ${ref.mud_gal}, expected ${1800 / 70}`);
-  assert.ok(Math.abs(ref.tape_lf - 720) < 1e-9,
-    `tape = ${ref.tape_lf}, expected 720`);
+  assert.ok(Math.abs(ref.mud_gal - 1800 / 100) < 1e-12,
+    `mud = ${ref.mud_gal}, expected ${1800 / 100}`);
+  assert.ok(Math.abs(ref.tape_lf - 666) < 1e-9,
+    `tape = ${ref.tape_lf}, expected 666`);
   // Sheets pin at 4x8 / 10% waste: ceil(1800 * 1.10 / 32) = ceil(61.875) = 62.
   assert.equal(ref.sheets, 62);
 });
@@ -5309,7 +5309,7 @@ test("monotonicity: computeRoofPitch percent + degrees + pitch_in_per_ft are str
 test("monotonicity: computeSeerEer SEER is strictly increasing in EER value at fixed conversion (1.12 SEER/EER published-ratio pin); SEER<->EER round-trip identity", () => {
   // Group C. SEER = EER * 1.12; strictly increasing in EER.
   let prev = -Infinity;
-  for (const value of [6, 8, 10, 12, 14, 16, 20]) {
+  for (const value of [6, 8, 10, 12, 14, 15, 15.5]) {
     const r = computeSeerEer({ value, from: "EER" });
     assert.ok(Number.isFinite(r.SEER) && r.SEER > 0,
       `SEER at EER=${value}: ${JSON.stringify(r)}`);
@@ -5317,24 +5317,24 @@ test("monotonicity: computeSeerEer SEER is strictly increasing in EER value at f
       `SEER at EER=${value} = ${r.SEER} not greater than prev=${prev}`);
     prev = r.SEER;
   }
-  // Closed-form pin from seerEerExample: EER=12 -> SEER = 12 * 1.12 =
-  // 13.44; SEER2_estimate = 13.44 * 0.95 = 12.768.
+  // Closed-form pin from seerEerExample on the NREL HSP relation EER = -0.02 SEER^2 + 1.12 SEER:
+  // EER 12 -> SEER = (1.12 - sqrt(1.2544 - 0.96)) / 0.04 = 14.4353; SEER2_estimate = SEER * 0.95.
   const ref = computeSeerEer({ value: 12, from: "EER" });
-  assert.ok(Math.abs(ref.SEER - 12 * 1.12) < 1e-12,
-    `SEER = ${ref.SEER}, expected ${12 * 1.12}`);
-  assert.ok(Math.abs(ref.SEER2_estimate - 12 * 1.12 * 0.95) < 1e-12,
-    `SEER2_estimate = ${ref.SEER2_estimate}, expected ${12 * 1.12 * 0.95}`);
+  const seer12 = (1.12 - Math.sqrt(1.2544 - 0.96)) / 0.04;
+  assert.ok(Math.abs(ref.SEER - seer12) < 1e-12,
+    `SEER = ${ref.SEER}, expected ${seer12}`);
+  assert.ok(Math.abs(ref.SEER2_estimate - seer12 * 0.95) < 1e-12,
+    `SEER2_estimate = ${ref.SEER2_estimate}, expected ${seer12 * 0.95}`);
   // SEER<->EER round-trip identity (1.12 ratio): EER -> SEER -> EER
   // returns the same value to the floating-point floor.
   const fwd = computeSeerEer({ value: 14, from: "EER" });
   const back = computeSeerEer({ value: fwd.SEER, from: "SEER" });
-  assert.ok(Math.abs(back.EER - 14) < 1e-12,
+  assert.ok(Math.abs(back.EER - 14) < 1e-9,
     `EER round-trip = ${back.EER}, expected 14`);
-  // Doubling-EER pin: 2x EER -> 2x SEER exactly.
+  // The relation is concave: doubling EER more than doubles SEER (no linear pin any more).
   const a = computeSeerEer({ value: 6, from: "EER" });
   const b = computeSeerEer({ value: 12, from: "EER" });
-  assert.ok(Math.abs(b.SEER - 2 * a.SEER) < 1e-12,
-    `2x EER: SEER = ${b.SEER} != 2 * ${a.SEER}`);
+  assert.ok(b.SEER > 2 * a.SEER, `2x EER: SEER = ${b.SEER} not above 2 * ${a.SEER}`);
   // SEER2 / EER2 conversions reduce by the 0.95 published derating factor.
   const seer2to = computeSeerEer({ value: 15, from: "SEER2" });
   assert.ok(Math.abs(seer2to.SEER - 15 / 0.95) < 1e-12,
@@ -5986,9 +5986,9 @@ test("monotonicity: computeRopeMA haul_force_lb is strictly decreasing as the ri
   assert.ok(Math.abs(b.haul_force_lb - 2 * a.haul_force_lb) < 1e-9,
     `2x load: haul = ${b.haul_force_lb} != 2 * ${a.haul_force_lb}`);
   // Closed-form pin from ropeMAExample: 4:1 / eta=0.9 / 600 lb load.
-  // actual_ma = 4 * 0.9^3 = 4 * 0.729 = 2.916; haul = 600 / 2.916.
+  // Tension tracking: actual_ma = 1 + 0.9 + 0.81 + 0.729 = 3.439 (Rescue Dynamics; was 4 x 0.9^3).
   const ref = computeRopeMA({ rig: "4:1", efficiency: 0.9, load_lb: 600 });
-  const expectedActualMa = 4 * Math.pow(0.9, 3);
+  const expectedActualMa = 1 + 0.9 + 0.81 + 0.729;
   assert.ok(Math.abs(ref.actual_ma - expectedActualMa) < 1e-12,
     `actual_ma = ${ref.actual_ma}, expected ${expectedActualMa}`);
   assert.equal(ref.theoretical_ma, 4);

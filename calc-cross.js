@@ -1392,7 +1392,8 @@ export function computeRampSlope({ rise_in = 0, run_in = 0 }) {
   if (!(rise_in > 0 && run_in > 0)) return { error: "Provide positive rise and run." };
   const ratio = run_in / rise_in;
   const percent = (rise_in / run_in) * 100;
-  const pass = ratio >= 12;
+  // ADA 405.2: "not steeper than 1:12", so exactly 1:12 passes. 1e-9: 13.2 / 1.1 is 11.999999999999998.
+  const pass = ratio >= 12 * (1 - 1e-9);
   return { ratio: ratio.toFixed(2) + ":1", percent, pass_1_to_12: pass };
 }
 

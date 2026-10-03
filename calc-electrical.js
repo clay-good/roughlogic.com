@@ -388,6 +388,8 @@ export const transformerSizeExample = {
 // dims: in { V_LL: M L^2 T^-3 I^-1, I_L: I, pf: dimensionless } out: { kw: M L^2 T^-3, kva: M L^2 T^-3 }
 export function computeThreePhase({ V_LL, I_L, pf }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // A power factor above 1 made kW exceed kVA without complaint.
+  if (Number(pf) > 1 || Number(pf) < 0) return { error: "Power factor must be between 0 and 1." };
   return threePhasePower({ V_LL, I_L, pf });
 }
 

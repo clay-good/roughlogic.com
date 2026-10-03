@@ -3663,7 +3663,7 @@
    "source_publisher": "Project (first-principles)",
    "source_title": "1200 ft^2 walls + 600 ft^2 ceilings, 4x8 sheets, 10% waste",
    "source_edition_or_year": "engineering practice (USG / National Gypsum spec sheets)",
-   "source_section_or_page": "sheets = ceil(1.10 * 1800 / 32) = 62; mud = 1800 / 70 = 25.7 gal; tape = 0.4 * 1800 = 720 lf (the citation rates: 1 gal per ~70 ft^2, 0.4 lf per ft^2)",
+   "source_section_or_page": "sheets = ceil(1.10 * 1800 / 32) = 62; mud = 1800 / 100 = 18.0 gal; tape = 0.37 * 1800 = 666 lf (USG: 10 gal per 1,000 ft^2, J1969; 370 ft of tape per 1,000 ft^2. Recomputed 2026-10-02 from 1 gal per 70 ft^2 and 0.4 lf/ft^2)",
    "verified_by": "rl",
    "verified_on": "2026-09-18",
    "inputs": {
@@ -3680,13 +3680,13 @@
      }
     },
     "mud_gal": {
-     "value": 25.714,
+     "value": 18,
      "tolerance": {
       "pct": 0.5
      }
     },
     "tape_lf": {
-     "value": 720,
+     "value": 666,
      "tolerance": {
       "abs": 1e-06
      }
@@ -6647,7 +6647,7 @@
    "source_publisher": "Project (first-principles)",
    "source_title": "Rope rescue MA: actual_ma = theoretical_ma * efficiency^pulleys; haul_force = load / actual_ma",
    "source_edition_or_year": "n/a; standard rope-rescue mechanical-advantage identity",
-   "source_section_or_page": "4:1 rig (3 pulleys), efficiency 0.9, 600 lb load -> theoretical MA 4 / actual MA 2.916 / haul force 205.76 lb",
+   "source_section_or_page": "4:1 rig (3 pulleys), efficiency 0.9, 600 lb load -> theoretical MA 4 / actual MA 1 + 0.9 + 0.81 + 0.729 = 3.439 (tension tracking) / haul force 174.47 lb. Recomputed 2026-10-02 from 4 x 0.9^3 = 2.916.",
    "verified_by": "rl",
    "verified_on": "2026-05-11",
    "inputs": {
@@ -6663,13 +6663,13 @@
      }
     },
     "actual_ma": {
-     "value": 2.916,
+     "value": 3.439,
      "tolerance": {
       "pct": 0.5
      }
     },
     "haul_force_lb": {
-     "value": 205.76,
+     "value": 174.47,
      "tolerance": {
       "pct": 0.5
      }
@@ -6898,7 +6898,7 @@
    "source_publisher": "Project (engineering approximation)",
    "source_title": "SEER ~ EER * 1.12; SEER2 ~ SEER * 0.95 (averaged across rating conditions)",
    "source_edition_or_year": "n/a; industry approximation",
-   "source_section_or_page": "EER 12 -> SEER 13.44 / SEER2 estimate 12.768",
+   "source_section_or_page": "EER 12 -> SEER 14.435 / SEER2 estimate 13.714 on the NREL House Simulation Protocols relation EER = -0.02 SEER^2 + 1.12 SEER (recomputed 2026-10-02 from the linear SEER = 1.12 EER, 13.44)",
    "verified_by": "rl",
    "verified_on": "2026-05-11",
    "inputs": {
@@ -6907,13 +6907,13 @@
    },
    "outputs": {
     "SEER": {
-     "value": 13.44,
+     "value": 14.435,
      "tolerance": {
       "pct": 0.5
      }
     },
     "SEER2_estimate": {
-     "value": 12.768,
+     "value": 13.714,
      "tolerance": {
       "pct": 0.5
      }
@@ -7246,7 +7246,7 @@
    "source_publisher": "Project (first-principles)",
    "source_title": "Simply-supported uniform-load deflection: delta = 5*w*L^4 / (384*E*I); span limits L/360 and L/240",
    "source_edition_or_year": "n/a; standard beam-deflection formula",
-   "source_section_or_page": "50 plf / 12 ft span / E 1.6e6 psi / I 47.6 in^4 (typical 2x10 DF#2) -> 0.306 in deflection vs 0.400 in L/360 limit -> PASS",
+   "source_section_or_page": "50 plf / 12 ft span / E 1.6e6 psi / I 47.6 in^4 (a 2x8; a 2x10 is 98.9 in^4) -> 0.306 in deflection vs 0.400 in L/360 limit -> PASS",
    "verified_by": "rl",
    "verified_on": "2026-05-11",
    "inputs": {
@@ -153627,6 +153627,2338 @@
      "value": 8700,
      "tolerance": {
       "abs": 5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "joist-deflection",
+   "source_publisher": "Jonathan Ochshorn (Cornell University)",
+   "source_title": "Structural Elements for Architects and Builders, online text, Chapter 3.07 Wood beams (jonochshorn.com/structuralelements/book/3.07-beams.html)",
+   "source_edition_or_year": "Third Edition (online)",
+   "source_section_or_page": "Example 3.5 (2x8 Hem-Fir No.2 at 16 in o.c., 12 ft span), step 10: total load w = 67.33 lb/ft, E = 1,300,000 psi, Ix = 47.63 in^4, printed 'Delta T act = 22.46(808)(144/12)3/(1,300,000 x 47.63) = 0.5 in.' vs allow span/240 = 0.6 in. Tile 0.507 in; abs 0.01 covers the one-decimal print.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "uniform_load_plf": 67.33,
+    "span_ft": 12,
+    "E_psi": 1300000,
+    "I_in4": 47.63
+   },
+   "outputs": {
+    "deflection_in": {
+     "value": 0.5,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "limit_L_over_240_in": {
+     "value": 0.6,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "joist-deflection",
+   "source_publisher": "Jonathan Ochshorn (Cornell University)",
+   "source_title": "Structural Elements for Architects and Builders, online text, Chapter 3.07 Wood beams (jonochshorn.com/structuralelements/book/3.07-beams.html)",
+   "source_edition_or_year": "Third Edition (online)",
+   "source_section_or_page": "Example 3.5 step 11 (live load only): w = 53.33 lb/ft (40 psf x 16/12), E = 1,300,000 psi, Ix = 47.63 in^4, printed 'Delta L act = 22.46(640)(144/12)3/(1,300,000 x 47.63) = 0.4 in.' vs allow span/360 = 0.4 in. Tile 0.4018 in; abs 0.01 covers the one-decimal print (note: tile pass_L_over_360 is false at 0.4018 > 0.400; the printed OK rests on rounding).",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "uniform_load_plf": 53.33,
+    "span_ft": 12,
+    "E_psi": 1300000,
+    "I_in4": 47.63
+   },
+   "outputs": {
+    "deflection_in": {
+     "value": 0.4,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "limit_L_over_360_in": {
+     "value": 0.4,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "beam-loading",
+   "source_publisher": "Jonathan Ochshorn (Cornell University)",
+   "source_title": "Structural Elements for Architects and Builders, online text, Chapter 3.07 Wood beams (jonochshorn.com/structuralelements/book/3.07-beams.html)",
+   "source_edition_or_year": "Third Edition (online)",
+   "source_section_or_page": "Example 3.8 (4x8 floor beam, 7.5 ft span, 6 ft tributary, 40 psf live + 10.5 psf dead): w = (40 + 10.5)(6) = 303 lb/ft, E = 1,600,000 psi, I = 111.1 in^4 (3.5 x 7.25 actual); printed M = 25,566 in-lb (step 4, = 2,130.5 ft-lb) and 'Delta T act = 22.46(2272.5)(90/12)3/(1,600,000 x 111.1) = 0.12 in.' Tile 2,130.47 ft-lb / 0.1213 in; abs tolerances cover the printed rounding.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "load_type": "uniform",
+    "load_value": 303,
+    "length_ft": 7.5,
+    "E_psi": 1600000,
+    "b_in": 3.5,
+    "d_in": 7.25
+   },
+   "outputs": {
+    "M_lbft": {
+     "value": 2130.5,
+     "tolerance": {
+      "abs": 1
+     }
+    },
+    "delta_in": {
+     "value": 0.12,
+     "tolerance": {
+      "abs": 0.005
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "beam-loading",
+   "source_publisher": "Jonathan Ochshorn (Cornell University)",
+   "source_title": "Structural Elements for Architects and Builders, online text, Chapter 3.07 Wood beams (jonochshorn.com/structuralelements/book/3.07-beams.html)",
+   "source_edition_or_year": "Third Edition (online)",
+   "source_section_or_page": "Example 3.8 step 11 (live load only): w = 40 x 6 = 240 lb/ft over 7.5 ft, E = 1,600,000 psi, I = 111.1 in^4; printed 'Delta L act = 22.46(1800)(90/12)3/(1,600,000 x 111.1) = 0.096 in.' Tile 0.09608 in; abs 0.001 covers the 3-decimal print.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "load_type": "uniform",
+    "load_value": 240,
+    "length_ft": 7.5,
+    "E_psi": 1600000,
+    "b_in": 3.5,
+    "d_in": 7.25
+   },
+   "outputs": {
+    "delta_in": {
+     "value": 0.096,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "beam-loading",
+   "source_publisher": "Jonathan Ochshorn (Cornell University)",
+   "source_title": "Structural Elements for Architects and Builders, online text, Chapter 3.07 Wood beams (jonochshorn.com/structuralelements/book/3.07-beams.html)",
+   "source_edition_or_year": "Third Edition (online)",
+   "source_section_or_page": "Example 3.5 (2x8, 1.5 x 7.25 actual, 12 ft span): w = 67.33 lb/ft, E = 1,300,000 psi; printed M = 14,543 in-lb (step 4, S req = 14,543/1173, i.e. 1,211.9 ft-lb) and total-load deflection 0.5 in. Tile 1,211.94 ft-lb / 0.507 in.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "load_type": "uniform",
+    "load_value": 67.33,
+    "length_ft": 12,
+    "E_psi": 1300000,
+    "b_in": 1.5,
+    "d_in": 7.25
+   },
+   "outputs": {
+    "M_lbft": {
+     "value": 1211.9,
+     "tolerance": {
+      "abs": 1
+     }
+    },
+    "delta_in": {
+     "value": 0.5,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "lumber-spans",
+   "source_publisher": "American Wood Council",
+   "source_title": "Span Tables for Joists and Rafters (AWC_STJR2024)",
+   "source_edition_or_year": "2024 edition",
+   "source_section_or_page": "Table F-2 Floor Joists with L/360 deflection limits ('Deflection - For 40 psf live load. Limited to span in inches divided by 360'), 2x8 at 16.0 in spacing, E = 1.6 (1,000,000 psi) column: printed 12 - 10. Tile by_deflection_ft at 40 psf (live) with DF-L No.2 (E = 1.6e6) at 16 in o.c.; abs 0.05 ft covers AWC's nearest-inch rounding. The Fb row of the same table (1,255 psi at E 1.6, 16 in) is the strength check at 40 live + 10 dead and is not part of this output.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "species_grade": "DF-L_No2",
+    "nominal_size": "2x8",
+    "total_load_psf": 40,
+    "tributary_width_in": 16,
+    "deflection_limit": 360
+   },
+   "outputs": {
+    "by_deflection_ft": {
+     "value": 12.833,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "lumber-spans",
+   "source_publisher": "American Wood Council",
+   "source_title": "Span Tables for Joists and Rafters (AWC_STJR2024)",
+   "source_edition_or_year": "2024 edition",
+   "source_section_or_page": "Table F-2 Floor Joists with L/360 deflection limits ('Deflection - For 40 psf live load. Limited to span in inches divided by 360'), 2x10 at 16.0 in spacing, E = 1.6 (1,000,000 psi) column: printed 16 - 5. Tile by_deflection_ft at 40 psf (live) with DF-L No.2 (E = 1.6e6) at 16 in o.c.; abs 0.05 ft covers AWC's nearest-inch rounding. The Fb row of the same table (1,255 psi at E 1.6, 16 in) is the strength check at 40 live + 10 dead and is not part of this output.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "species_grade": "DF-L_No2",
+    "nominal_size": "2x10",
+    "total_load_psf": 40,
+    "tributary_width_in": 16,
+    "deflection_limit": 360
+   },
+   "outputs": {
+    "by_deflection_ft": {
+     "value": 16.417,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "lumber-spans",
+   "source_publisher": "American Wood Council",
+   "source_title": "Span Tables for Joists and Rafters (AWC_STJR2024)",
+   "source_edition_or_year": "2024 edition",
+   "source_section_or_page": "Table F-2 Floor Joists with L/360 deflection limits ('Deflection - For 40 psf live load. Limited to span in inches divided by 360'), 2x12 at 16.0 in spacing, E = 1.6 (1,000,000 psi) column: printed 19 - 11. Tile by_deflection_ft at 40 psf (live) with DF-L No.2 (E = 1.6e6) at 16 in o.c.; abs 0.05 ft covers AWC's nearest-inch rounding. The Fb row of the same table (1,255 psi at E 1.6, 16 in) is the strength check at 40 live + 10 dead and is not part of this output.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "species_grade": "DF-L_No2",
+    "nominal_size": "2x12",
+    "total_load_psf": 40,
+    "tributary_width_in": 16,
+    "deflection_limit": 360
+   },
+   "outputs": {
+    "by_deflection_ft": {
+     "value": 19.917,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "lumber-spans",
+   "source_publisher": "Southern Forest Products Association",
+   "source_title": "Maximum Spans: Southern Pine Joists & Rafters, Table 2 Floor Joists - 40 psf live load, 10 psf dead load, L/360 deflection (southernpine.com SPtable2_060113.pdf)",
+   "source_edition_or_year": "2013 Edition",
+   "source_section_or_page": "Table 2, Visually Graded No.2, 2x8 at 24.0 in o.c.: printed 9 - 8. Bending governs this cell (strength at 40 live + 10 dead = 50 psf; tile Fb' = SPIB per-width Fb x C_r 1.15), so the tile's single 50 psf total input reproduces it; abs 0.05 ft covers the nearest-inch print. Deflection-governed cells of the same table (e.g. 2x8 at 16 in, 11 - 10) do NOT reproduce: see r63b report, deflection is on live load only.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "species_grade": "SYP_No2",
+    "nominal_size": "2x8",
+    "total_load_psf": 50,
+    "tributary_width_in": 24,
+    "deflection_limit": 360
+   },
+   "outputs": {
+    "allowable_span_ft": {
+     "value": 9.667,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "lumber-spans",
+   "source_publisher": "Southern Forest Products Association",
+   "source_title": "Maximum Spans: Southern Pine Joists & Rafters, Table 2 Floor Joists - 40 psf live load, 10 psf dead load, L/360 deflection (southernpine.com SPtable2_060113.pdf)",
+   "source_edition_or_year": "2013 Edition",
+   "source_section_or_page": "Table 2, Visually Graded No.2, 2x10 at 16.0 in o.c.: printed 14 - 0. Bending governs this cell (strength at 40 live + 10 dead = 50 psf; tile Fb' = SPIB per-width Fb x C_r 1.15), so the tile's single 50 psf total input reproduces it; abs 0.05 ft covers the nearest-inch print. Deflection-governed cells of the same table (e.g. 2x8 at 16 in, 11 - 10) do NOT reproduce: see r63b report, deflection is on live load only.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "species_grade": "SYP_No2",
+    "nominal_size": "2x10",
+    "total_load_psf": 50,
+    "tributary_width_in": 16,
+    "deflection_limit": 360
+   },
+   "outputs": {
+    "allowable_span_ft": {
+     "value": 14,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "lumber-spans",
+   "source_publisher": "Southern Forest Products Association",
+   "source_title": "Maximum Spans: Southern Pine Joists & Rafters, Table 2 Floor Joists - 40 psf live load, 10 psf dead load, L/360 deflection (southernpine.com SPtable2_060113.pdf)",
+   "source_edition_or_year": "2013 Edition",
+   "source_section_or_page": "Table 2, Visually Graded No.2, 2x10 at 24.0 in o.c.: printed 11 - 5. Bending governs this cell (strength at 40 live + 10 dead = 50 psf; tile Fb' = SPIB per-width Fb x C_r 1.15), so the tile's single 50 psf total input reproduces it; abs 0.05 ft covers the nearest-inch print. Deflection-governed cells of the same table (e.g. 2x8 at 16 in, 11 - 10) do NOT reproduce: see r63b report, deflection is on live load only.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "species_grade": "SYP_No2",
+    "nominal_size": "2x10",
+    "total_load_psf": 50,
+    "tributary_width_in": 24,
+    "deflection_limit": 360
+   },
+   "outputs": {
+    "allowable_span_ft": {
+     "value": 11.417,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "lumber-spans",
+   "source_publisher": "Southern Forest Products Association",
+   "source_title": "Maximum Spans: Southern Pine Joists & Rafters, Table 2 Floor Joists - 40 psf live load, 10 psf dead load, L/360 deflection (southernpine.com SPtable2_060113.pdf)",
+   "source_edition_or_year": "2013 Edition",
+   "source_section_or_page": "Table 2, Visually Graded No.2, 2x12 at 16.0 in o.c.: printed 16 - 6. Bending governs this cell (strength at 40 live + 10 dead = 50 psf; tile Fb' = SPIB per-width Fb x C_r 1.15), so the tile's single 50 psf total input reproduces it; abs 0.05 ft covers the nearest-inch print. Deflection-governed cells of the same table (e.g. 2x8 at 16 in, 11 - 10) do NOT reproduce: see r63b report, deflection is on live load only.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "species_grade": "SYP_No2",
+    "nominal_size": "2x12",
+    "total_load_psf": 50,
+    "tributary_width_in": 16,
+    "deflection_limit": 360
+   },
+   "outputs": {
+    "allowable_span_ft": {
+     "value": 16.5,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "lumber-spans",
+   "source_publisher": "Southern Forest Products Association",
+   "source_title": "Maximum Spans: Southern Pine Joists & Rafters, Table 2 Floor Joists - 40 psf live load, 10 psf dead load, L/360 deflection (southernpine.com SPtable2_060113.pdf)",
+   "source_edition_or_year": "2013 Edition",
+   "source_section_or_page": "Table 2, Visually Graded No.2, 2x12 at 24.0 in o.c.: printed 13 - 6. Bending governs this cell (strength at 40 live + 10 dead = 50 psf; tile Fb' = SPIB per-width Fb x C_r 1.15), so the tile's single 50 psf total input reproduces it; abs 0.05 ft covers the nearest-inch print. Deflection-governed cells of the same table (e.g. 2x8 at 16 in, 11 - 10) do NOT reproduce: see r63b report, deflection is on live load only.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "species_grade": "SYP_No2",
+    "nominal_size": "2x12",
+    "total_load_psf": 50,
+    "tributary_width_in": 24,
+    "deflection_limit": 360
+   },
+   "outputs": {
+    "allowable_span_ft": {
+     "value": 13.5,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "masonry-count",
+   "source_publisher": "Concrete Masonry & Hardscapes Association (NCMA)",
+   "source_title": "TEK 04-02A Concrete Masonry Unit and Mortar Estimating (as printed)",
+   "source_edition_or_year": "TEK 04-02A",
+   "source_section_or_page": "Page 1, Estimating Concrete Masonry Units: 'the exposed surface area of a single unit in the wall is 8/9 ft2 ... Including a 5 percent allowance for waste and breakage, this translates to 119 units per 100 ft2' (8x16 conventional unit). Tile 113 base + ceil(5% x 113) = 119; exact.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "wall_area_ft2": 100,
+    "unit_type": "cmu_8x8x16",
+    "mortar_joint_in": 0.375,
+    "waste_factor": 0.05
+   },
+   "outputs": {
+    "unit_count": {
+     "value": 119,
+     "tolerance": {
+      "abs": 0
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "masonry-count",
+   "source_publisher": "Brick Industry Association",
+   "source_title": "Technical Note 10, Dimensioning and Estimating Brick Masonry",
+   "source_edition_or_year": "TN 10 (2009)",
+   "source_section_or_page": "Table 4 (continued) Non-Modular Brick Sizes: Standard, specified 3-5/8 x 2-1/4 x 8 in, 3/8 in joint: printed 655 brick per 100 sq ft (no waste). Tile (8.375 x 2.625 in module) 655.06 raw, base_count 656 after ceil; abs 1 covers the ceil vs BIA's rounding.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "wall_area_ft2": 100,
+    "unit_type": "standard_brick",
+    "mortar_joint_in": 0.375,
+    "waste_factor": 0
+   },
+   "outputs": {
+    "base_count": {
+     "value": 655,
+     "tolerance": {
+      "abs": 1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "masonry-count",
+   "source_publisher": "Brick Industry Association",
+   "source_title": "Technical Note 10, Dimensioning and Estimating Brick Masonry",
+   "source_edition_or_year": "TN 10 (2009)",
+   "source_section_or_page": "REPRODUCES ONLY AFTER THE r63b BUG FIX (modular course height). Table 4 Modular Brick Sizes: Modular, nominal 4 x 2-2/3 x 8 in, 3/8 in joint: printed 675 brick per 100 sq ft; Table 1 vertical coursing '3C = 8 in.' Tile today: (7.625+0.375) x (2.25+0.375) = 21.0 in^2 -> 686 (1.6% high). abs 1.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "wall_area_ft2": 100,
+    "unit_type": "modular_brick",
+    "mortar_joint_in": 0.375,
+    "waste_factor": 0
+   },
+   "outputs": {
+    "base_count": {
+     "value": 675,
+     "tolerance": {
+      "abs": 1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "fastener-pullout",
+   "source_publisher": "International Staple, Nail and Tool Association (ISANTA)",
+   "source_title": "Technical Bulletin: Nail Head Pull-Through, Fastener Uplift Design Examples",
+   "source_edition_or_year": "Rev 5, November 2023",
+   "source_section_or_page": "Example 1, page 5-6: 2x4 SPF main member G = 0.42, 2-1/2 x 0.131 8d common nail through 7/16 in plywood: printed 'W = 21 pounds per inch ... per Table 12.2C NDS', 'Length of penetration = 2 1/2 - 7/16 = 2 1/16', 'Withdrawal = 21 x 2 1/16 = 43 pounds'. Tile 20.67 lb/in, 42.6 lb; tolerances cover NDS table rounding to whole lb.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "fastener_type": "nail",
+    "fastener_size": "8d_common",
+    "species": "SPF",
+    "penetration_in": 2.0625
+   },
+   "outputs": {
+    "withdrawal_per_inch_lb": {
+     "value": 21,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "total_withdrawal_lb": {
+     "value": 43,
+     "tolerance": {
+      "abs": 1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "static-pressure-piping",
+   "source_publisher": "Pennsylvania Department of Environmental Protection, Bureau of Safe Drinking Water",
+   "source_title": "Wastewater Treatment Plant Operator Certification Training, Module 9: Pumps and Hydraulics (Workbook)",
+   "source_edition_or_year": "WW-9 Workbook (final)",
+   "source_section_or_page": "Unit 3, Figure 3.1 hydraulic grade line: printed 'The head at Point A would be 5.0 ft. The pressure would be 5.0 ft. x 0.433 psi/ft. = 2.16 psi' (0.433 from Example 1.1, 62.4 lb / 144 sq in). Tile 5 x 62.4/144 = 2.1667 psi; abs 0.01 covers the 2-decimal print.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "elevation_change_ft": 5,
+    "friction_loss_psi": 0
+   },
+   "outputs": {
+    "elevation_loss_psi": {
+     "value": 2.16,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "total_psi": {
+     "value": 2.16,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "static-pressure-piping",
+   "source_publisher": "Pennsylvania Department of Environmental Protection, Bureau of Safe Drinking Water",
+   "source_title": "Wastewater Treatment Plant Operator Certification Training, Module 9: Pumps and Hydraulics (Workbook)",
+   "source_edition_or_year": "WW-9 Workbook (final)",
+   "source_section_or_page": "Unit 3, Figure 3.1 hydraulic grade line: printed 'The head at Point C would be 2.0 ft. The pressure would be 2.0 ft. x 0.433 psi/ft. = 0.87 psi' (0.433 from Example 1.1, 62.4 lb / 144 sq in). Tile 2 x 62.4/144 = 0.8667 psi; abs 0.01 covers the 2-decimal print.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "elevation_change_ft": 2,
+    "friction_loss_psi": 0
+   },
+   "outputs": {
+    "elevation_loss_psi": {
+     "value": 0.87,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "total_psi": {
+     "value": 0.87,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "pump-sizing",
+   "source_publisher": "Pennsylvania Department of Environmental Protection, Bureau of Safe Drinking Water",
+   "source_title": "Wastewater Treatment Plant Operator Certification Training, Module 9: Pumps and Hydraulics (Workbook)",
+   "source_edition_or_year": "WW-9 Workbook (final)",
+   "source_section_or_page": "Unit 4, Head/Capacity Curves (Figure 4.2): printed 'that pump will operate at 69 feet of head when delivering 450 gpm. When operating at that point, the pump efficiency would be 76% and brake horsepower would be 10.3 HP', with BHP = Q x H / (3,960 x e). Tile 10.32 hp; abs 0.05 covers the 1-decimal print.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "flow_gpm": 450,
+    "total_dynamic_head_ft": 69,
+    "efficiency": 0.76,
+    "fluid_specific_gravity": 1
+   },
+   "outputs": {
+    "shaft_hp": {
+     "value": 10.3,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "pipe-volume",
+   "source_publisher": "AMTROL Inc.",
+   "source_title": "Sizing the EXTROL (form 9003-036)",
+   "source_edition_or_year": "03/19",
+   "source_section_or_page": "Table 2 Water Content of Commercial Finned Tube, Baseboard Radiators and Piping, Steel Pipe, nominal 1/2 in: printed 0.016 Gals/Foot. Tile Schedule 40 ID gives 0.01579 gal/ft; pct 3 covers AMTROL's 3-significant-figure print.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "nominal_size": "0.5",
+    "length_ft": 1
+   },
+   "outputs": {
+    "gallons_per_ft": {
+     "value": 0.016,
+     "tolerance": {
+      "pct": 3
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "pipe-volume",
+   "source_publisher": "AMTROL Inc.",
+   "source_title": "Sizing the EXTROL (form 9003-036)",
+   "source_edition_or_year": "03/19",
+   "source_section_or_page": "Table 2 Water Content of Commercial Finned Tube, Baseboard Radiators and Piping, Steel Pipe, nominal 1 in: printed 0.045 Gals/Foot. Tile Schedule 40 ID gives 0.04490 gal/ft; pct 1.5 covers AMTROL's 3-significant-figure print.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "nominal_size": "1",
+    "length_ft": 1
+   },
+   "outputs": {
+    "gallons_per_ft": {
+     "value": 0.045,
+     "tolerance": {
+      "pct": 1.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "pipe-volume",
+   "source_publisher": "AMTROL Inc.",
+   "source_title": "Sizing the EXTROL (form 9003-036)",
+   "source_edition_or_year": "03/19",
+   "source_section_or_page": "Table 2 Water Content of Commercial Finned Tube, Baseboard Radiators and Piping, Steel Pipe, nominal 2 in: printed 0.172 Gals/Foot. Tile Schedule 40 ID gives 0.17432 gal/ft; pct 2 covers AMTROL's 3-significant-figure print.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "nominal_size": "2",
+    "length_ft": 1
+   },
+   "outputs": {
+    "gallons_per_ft": {
+     "value": 0.172,
+     "tolerance": {
+      "pct": 2
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "pipe-volume",
+   "source_publisher": "AMTROL Inc.",
+   "source_title": "Sizing the EXTROL (form 9003-036)",
+   "source_edition_or_year": "03/19",
+   "source_section_or_page": "Table 2 Water Content of Commercial Finned Tube, Baseboard Radiators and Piping, Steel Pipe, nominal 4 in: printed 0.667 Gals/Foot. Tile Schedule 40 ID gives 0.66131 gal/ft; pct 1.5 covers AMTROL's 3-significant-figure print.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "nominal_size": "4",
+    "length_ft": 1
+   },
+   "outputs": {
+    "gallons_per_ft": {
+     "value": 0.667,
+     "tolerance": {
+      "pct": 1.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "tankless-gpm",
+   "source_publisher": "Georgia Department of Public Health, Environmental Health",
+   "source_title": "Appendix-I: Water Heating System Sizing Verification Record (Work Sheets A and B), DPH Chapter 511-6-1 Manual for Design, Installation and Construction",
+   "source_edition_or_year": "current download (dph.georgia.gov)",
+   "source_section_or_page": "Page 5-6, gas heat-energy example for a 3-compartment warewashing sink: incoming 40 F, required 110 F, '110 F - 40 F = 70 F', '91 (gph) X 70 F temperature rise X 8.33 = 70,749 BTU's' over '.75 (operating efficiency)'. Tile solve_for kbtu with target_gpm = 91 gph / 60, inlet override 40 F, outlet 110 F, efficiency 0.75: 70.749 kBtu/h (exact).",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "solve_for": "kbtu",
+    "kbtu_input": 0,
+    "target_gpm": 1.5166666666666666,
+    "climate_zone": "5A_Chicago_IL",
+    "inlet_override_F": 40,
+    "target_outlet_F": 110,
+    "thermal_efficiency": 0.75
+   },
+   "outputs": {
+    "kbtu_input": {
+     "value": 70.749,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "delta_T_F": {
+     "value": 70,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "three-phase",
+   "source_publisher": "U.S. Department of Energy, Motor Challenge",
+   "source_title": "Determining Electric Motor Load and Efficiency (fact sheet DOE/GO-10097-517)",
+   "source_edition_or_year": "1997 fact sheet (energy.gov 10097517.pdf)",
+   "source_section_or_page": "Equation 1 'Pi = V x I x PF x sqrt3 / 1000'; Example: Input Power Calculation (40-hp motor): 'V = (467+473+469)/3 = 469.7 volts', 'I = (36+38+37)/3 = 37 amps', 'PF = (0.75+0.78+0.76)/3 = 0.763', 'Pi = 469.7 x 37 x 0.763 x sqrt3 / 1000 = 22.9 kW'. Tile 22.97 kW; abs 0.1 covers the printed truncation.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "V_LL": 469.7,
+    "I_L": 37,
+    "pf": 0.763
+   },
+   "outputs": {
+    "kW": {
+     "value": 22.9,
+     "tolerance": {
+      "abs": 0.1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "loan-payment",
+   "source_publisher": "Consumer Financial Protection Bureau",
+   "source_title": "Know Before You Owe sample Loan Estimate (Ficus Bank fixed-rate purchase loan), files.consumerfinance.gov/f/201311_cfpb_kbyo_loan-estimate.pdf",
+   "source_edition_or_year": "November 2013 sample form",
+   "source_section_or_page": "Page 1, Loan Terms: 'Loan Amount $162,000', 'Interest Rate 3.875%', 'Monthly Principal & Interest $761.78', 'LOAN TERM 30 years'. Tile 761.784; abs 0.01 covers the printed cent rounding.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "principal": 162000,
+    "apr_percent": 3.875,
+    "term_months": 360
+   },
+   "outputs": {
+    "monthly_payment": {
+     "value": 761.78,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "loan-amortization",
+   "source_publisher": "Consumer Financial Protection Bureau",
+   "source_title": "Know Before You Owe sample Loan Estimate (Ficus Bank fixed-rate purchase loan), files.consumerfinance.gov/f/201311_cfpb_kbyo_loan-estimate.pdf",
+   "source_edition_or_year": "November 2013 sample form",
+   "source_section_or_page": "Page 1, Loan Terms: 'Loan Amount $162,000', 'Interest Rate 3.875%', 'Monthly Principal & Interest $761.78', 'LOAN TERM 30 years'. Tile payment 761.784 (abs 0.01 covers cent rounding); payoff at month 360. (Printed TIP 69.45%/69.46% includes $279.04 prepaid interest, so total_interest is not compared.)",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "principal": 162000,
+    "annual_rate_pct": 3.875,
+    "term_months": 360
+   },
+   "outputs": {
+    "payment": {
+     "value": 761.78,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "payoff_month": {
+     "value": 360,
+     "tolerance": {
+      "abs": 0
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "straight-line-depreciation",
+   "source_publisher": "Internal Revenue Service",
+   "source_title": "Publication 946, How To Depreciate Property",
+   "source_edition_or_year": "2025 (for 2025 returns)",
+   "source_section_or_page": "Chapter 1, Straight Line Method, page 9 Example: 'bought a patent for $5,100', '17-year useful life and no salvage value', 'divide the $5,100 basis by 17 years to get your $300 yearly depreciation deduction'; 'Next year, you can deduct $300 for the full year.' Tile 300 exactly (year 2, a full year; year 1 is prorated 9/12 by the IRS, which the tile does not do).",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "cost": 5100,
+    "salvage": 0,
+    "life_years": 17,
+    "year_of_interest": 2
+   },
+   "outputs": {
+    "annual_depreciation": {
+     "value": 300,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "breakeven",
+   "source_publisher": "OpenStax (Rice University)",
+   "source_title": "Principles of Accounting, Volume 2: Managerial Accounting",
+   "source_edition_or_year": "2019 (web edition)",
+   "source_section_or_page": "Sec. 3.1: 'sells its Blue Jay Model for $100 and incurs variable costs of $20 per unit'; Sec. 3.2: fixed costs '$18,000', break-even '225' units, 'contribution margin ratio of 80%', 'generate $22,500 in monthly sales'. Tile reproduces exactly; tolerances only absorb float error.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "fixed_costs": 18000,
+    "variable_cost_per_unit": 20,
+    "sale_price_per_unit": 100
+   },
+   "outputs": {
+    "contribution_margin": {
+     "value": 80,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "contribution_margin_ratio": {
+     "value": 0.8,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "breakeven_units": {
+     "value": 225,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "breakeven_revenue": {
+     "value": 22500,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "beer-lambert",
+   "source_publisher": "LibreTexts Chemistry",
+   "source_title": "The Beer-Lambert Law (Supplemental Modules, Physical and Theoretical Chemistry, Electronic Spectroscopy Basics)",
+   "source_edition_or_year": "web edition, read 2026-10-02",
+   "source_section_or_page": "Example 2 Guanosine: 'epsilon_275 = 8400 M^-1 cm^-1 and the path length is 1 cm', 'A_275 = 0.70', answer 'c = 8.33x10-5 mol/L'. Tile 8.3333e-5; pct 0.5 covers the 3-figure printed rounding.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "absorbance": 0.7,
+    "path_length_cm": 1,
+    "epsilon": 8400
+   },
+   "outputs": {
+    "concentration": {
+     "value": 8.33e-05,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "beer-lambert",
+   "source_publisher": "LibreTexts Chemistry (David Harvey, DePauw University)",
+   "source_title": "Instrumental Analysis, 13.2: Beer's Law",
+   "source_edition_or_year": "web edition, read 2026-10-02",
+   "source_section_or_page": "Exercise 13.2.1 answer: 'A=0.228=epsilon b C=(676 M^-1 cm^-1)(1 cm) C', 'gives a concentration of 3.37 x 10^-4 M'. Tile 3.3728e-4; pct 0.5 covers the printed 3-figure rounding.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "absorbance": 0.228,
+    "path_length_cm": 1,
+    "epsilon": 676
+   },
+   "outputs": {
+    "concentration": {
+     "value": 0.000337,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "henderson-hasselbalch",
+   "source_publisher": "LibreTexts Chemistry (South Puget Sound Community College, Chem 121)",
+   "source_title": "10.3: Henderson-Hasselbalch Approximation",
+   "source_edition_or_year": "web edition, read 2026-10-02",
+   "source_section_or_page": "Example 2 Acetic Acid buffer: 'pKa = -log Ka = -log(1.8x10^-5) = 4.74' (Ka from Table E1, 25 C), 'pH 5.0', '10^0.26 = [A-]/[HA]', '1.8 = [A-]/[HA]'. Tile 1.8197; abs 0.03 covers the 2-figure printed ratio.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "pKa": 4.74,
+    "target_pH": 5,
+    "total_buffer_concentration": 0.1,
+    "total_volume": 1
+   },
+   "outputs": {
+    "ratio_base_acid": {
+     "value": 1.8,
+     "tolerance": {
+      "abs": 0.03
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "henderson-hasselbalch",
+   "source_publisher": "King Saud University, Biochemistry Department",
+   "source_title": "BCH202 Practical 1: Preparation of Buffer Solutions (faculty.ksu.edu.sa)",
+   "source_edition_or_year": "undated course handout, read 2026-10-02",
+   "source_section_or_page": "Worked example: 'Prepare 50 ml from phosphate buffer with concentration 0.25M and pH=7.4', '(pKa=7.2)' (temperature not stated; 7.2 is the 25 C H2PO4-/HPO4 2- value); '1.6 = y/(0.25-y)', moles A- '= 0.15 x 0.05 = 0.0075 mole', moles HA '= 0.1 x 0.05 = 0.005 mole'. Tile ratio 1.585, moles 0.00766 / 0.00484; the handout rounds the ratio to 1.6 and the molarities to 0.15/0.1 M, so abs 0.02 (ratio) and abs 0.0002 mol cover it.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "pKa": 7.2,
+    "target_pH": 7.4,
+    "total_buffer_concentration": 0.25,
+    "total_volume": 0.05
+   },
+   "outputs": {
+    "ratio_base_acid": {
+     "value": 1.6,
+     "tolerance": {
+      "abs": 0.02
+     }
+    },
+    "moles_base": {
+     "value": 0.0075,
+     "tolerance": {
+      "abs": 0.0002
+     }
+    },
+    "moles_acid": {
+     "value": 0.005,
+     "tolerance": {
+      "abs": 0.0002
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "rcf-rpm",
+   "source_publisher": "Beckman Coulter",
+   "source_title": "JA-10 Fixed Angle Rotor instruction manual, J-TB-006BB",
+   "source_edition_or_year": "February 2014",
+   "source_section_or_page": "Page 4 Specifications: 'Maximum speed . . . 10 000 rpm'; Relative Centrifugal Field 'At rmax (158 mm) . . . 17 700 x g'; formula footnote 'RCF = 1.12 r (RPM/1000)^2' (r in mm). Tile uses 1.118e-5 and gets 17664; pct 0.5 covers Beckman's 1.12 constant and 3-figure rounding.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "rotor_radius_mm": 158,
+    "rpm": 10000,
+    "rcf": null
+   },
+   "outputs": {
+    "rcf": {
+     "value": 17700,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "rcf-rpm",
+   "source_publisher": "Beckman Coulter",
+   "source_title": "JA-10 Fixed Angle Rotor instruction manual, J-TB-006BB",
+   "source_edition_or_year": "February 2014",
+   "source_section_or_page": "Page 4 Specifications: 'Maximum speed . . . 10 000 rpm'; Relative Centrifugal Field 'At rav (98 mm) . . . 11 000 x g'; formula footnote 'RCF = 1.12 r (RPM/1000)^2' (r in mm). Tile uses 1.118e-5 and gets 10956; pct 0.5 covers Beckman's 1.12 constant and 3-figure rounding.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "rotor_radius_mm": 98,
+    "rpm": 10000,
+    "rcf": null
+   },
+   "outputs": {
+    "rcf": {
+     "value": 11000,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "rcf-rpm",
+   "source_publisher": "Beckman Coulter",
+   "source_title": "JA-10 Fixed Angle Rotor instruction manual, J-TB-006BB",
+   "source_edition_or_year": "February 2014",
+   "source_section_or_page": "Page 4 Specifications: 'Maximum speed . . . 10 000 rpm'; Relative Centrifugal Field 'At rmin (38 mm) . . . 4 260 x g'; formula footnote 'RCF = 1.12 r (RPM/1000)^2' (r in mm). Tile uses 1.118e-5 and gets 4248; pct 0.5 covers Beckman's 1.12 constant and 3-figure rounding.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "rotor_radius_mm": 38,
+    "rpm": 10000,
+    "rcf": null
+   },
+   "outputs": {
+    "rcf": {
+     "value": 4260,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "rcf-rpm",
+   "source_publisher": "Beckman Coulter",
+   "source_title": "JA-10 Fixed Angle Rotor instruction manual, J-TB-006BB",
+   "source_edition_or_year": "February 2014",
+   "source_section_or_page": "Page 4 Specifications (reverse direction): 'At rmax (158 mm) . . . 17 700 x g' at 'Maximum speed . . . 10 000 rpm'. Tile rpm 10,010; pct 0.5 covers Beckman's 1.12 constant and the 3-figure g rounding.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "rotor_radius_mm": 158,
+    "rpm": null,
+    "rcf": 17700
+   },
+   "outputs": {
+    "rpm": {
+     "value": 10000,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "ramp-slope",
+   "source_publisher": "U.S. Access Board",
+   "source_title": "Guide to the ADA Accessibility Standards, Chapter 4: Ramps and Curb Ramps",
+   "source_edition_or_year": "web guide, read 2026-10-02",
+   "source_section_or_page": "Slope and Cross Slope (sec. 405.2): 'running slope (1:12 maximum)'; Recommendation: 'below the 1:12 (8.33%) maximum'. Rise 1 / run 12 gives 8.333%; abs 0.005 covers the printed 2-decimal rounding; 1:12 passes ('maximum').",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "rise_in": 1,
+    "run_in": 12
+   },
+   "outputs": {
+    "percent": {
+     "value": 8.33,
+     "tolerance": {
+      "abs": 0.005
+     }
+    },
+    "pass_1_to_12": {
+     "value": 1,
+     "tolerance": {
+      "abs": 0
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "braking-distance",
+   "source_publisher": "Gary A. Presswood, ScD, PE (accidentexpert.com; first published in The Advocate, Nevada Trial Lawyers Association)",
+   "source_title": "The Skid to Stop Formula - Its Use and Misuse",
+   "source_edition_or_year": "February 1995",
+   "source_section_or_page": "Page 1: 'S = {30Df}^1/2', 'measured length of skid of 90\\' (D)', 'drag coefficient (f) is found (by measurement) to be 0.7', 'initial speed (S) ... 43.5 MPH'. Run in the tile's forward direction (speed in, distance out, no reaction time): 90.1 ft; abs 0.5 covers the printed 43.5 mph rounding (43.45-43.55 mph spans 89.9-90.3 ft).",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "speed_mph": 43.5,
+    "friction_coefficient": 0.7,
+    "grade_percent": 0,
+    "reaction_time_s": 0
+   },
+   "outputs": {
+    "braking_distance_ft": {
+     "value": 90,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "battery-runtime",
+   "source_publisher": "SmartGauge Electronics",
+   "source_title": "Peukert's Equation - what it means to you (smartgauge.co.uk/peukert2.html)",
+   "source_edition_or_year": "web article, read 2026-10-02",
+   "source_section_or_page": "Corrected equation example: 100 Ah at the 20 hour rate, Peukert exponent 1.3: 'T = 100/(10/(100/20))n X (20/100)', 'T = 100/2.46 X 0.2', 'T = 40.6 X 0.2 = 8.1 hours'. Source works in amps; 12 V x 10 A = 120 W carries the 10 A current (runtime is independent of V). Tile 8.12 h; abs 0.05 covers the 2-figure print.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "amp_hours": 100,
+    "system_V": 12,
+    "dod_percent": 100,
+    "load_W": 120,
+    "peukert_k": 1.3,
+    "inverter_efficiency_pct": 100,
+    "rated_hours": 20
+   },
+   "outputs": {
+    "hours": {
+     "value": 8.1,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "battery-runtime",
+   "source_publisher": "SmartGauge Electronics",
+   "source_title": "Peukert's Equation - what it means to you (smartgauge.co.uk/peukert2.html)",
+   "source_edition_or_year": "web article, read 2026-10-02",
+   "source_section_or_page": "Rated-current check: 'T = 100/(5/(100/20))n X (20/100)' ... 'T = 20 hours, which we know to be correct.' (100 Ah, 20 h rate, n 1.3, 5 A; 12 V x 5 A = 60 W carries the current.) Tile 20.000 h.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "amp_hours": 100,
+    "system_V": 12,
+    "dod_percent": 100,
+    "load_W": 60,
+    "peukert_k": 1.3,
+    "inverter_efficiency_pct": 100,
+    "rated_hours": 20
+   },
+   "outputs": {
+    "hours": {
+     "value": 20,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "belt-pulley",
+   "source_publisher": "Bando USA",
+   "source_title": "V-Belt Design Manual, BU-143/05-06",
+   "source_edition_or_year": "2006",
+   "source_section_or_page": "Page 4 (Power Ace drive selection, Procedure 5) agitator example: driver '900 RPM', 'Select a 3.0\" drive sheave and a 10.6\" driveN sheave', 'center distance is known to be 32 inches', 'Belt Size = 2(32) + 1.57(10.6+3) + (10.6-3)^2/4(32) = 85.8\"'. Tile 85.81 in (pi/2 vs 1.57); abs 0.05 covers the 1-decimal print.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "drive_dia_in": 3,
+    "driven_dia_in": 10.6,
+    "center_distance_in": 32,
+    "motor_rpm": 900
+   },
+   "outputs": {
+    "belt_length_in": {
+     "value": 85.8,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "rope-ma",
+   "source_publisher": "CMC (CMC Rescue)",
+   "source_title": "Pulleys and Mechanical Advantage Systems (cmcpro.com blog)",
+   "source_edition_or_year": "web article, read 2026-10-02",
+   "source_section_or_page": "Simple Pulley Systems: 'The most common is a 3:1 mechanical advantage, sometimes called a \"Z\" rig'; 'In theory, a 100-pound pull would raise a 300-pound load.' Theoretical (frictionless, efficiency 1.0). Tile haul 100 lb exactly.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "rig": "3:1",
+    "efficiency": 1,
+    "load_lb": 300
+   },
+   "outputs": {
+    "theoretical_ma": {
+     "value": 3,
+     "tolerance": {
+      "abs": 0
+     }
+    },
+    "haul_force_lb": {
+     "value": 100,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "rope-ma",
+   "source_publisher": "Rescue Dynamics (Cyril Shokoples)",
+   "source_title": "Pulleys & The 3:1 Pulley System, 2nd Revision",
+   "source_edition_or_year": "1994",
+   "source_section_or_page": "[REPRODUCES ONLY AFTER BUG FIX: tile gives actual_ma 2.43 / haul 82.3 lb] Page 1 table for the 3:1 Simple System, 'p' 0.90: 'CFAR ... 2.71', 'w' (force required to raise 200 lbs) '74'. CFAR = 1 + p + p^2; abs 0.01 / abs 0.5 lb cover the printed rounding.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "rig": "3:1",
+    "efficiency": 0.9,
+    "load_lb": 200
+   },
+   "outputs": {
+    "actual_ma": {
+     "value": 2.71,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "haul_force_lb": {
+     "value": 74,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "rope-ma",
+   "source_publisher": "Rescue Dynamics (Cyril Shokoples)",
+   "source_title": "Pulleys & The 3:1 Pulley System, 2nd Revision",
+   "source_edition_or_year": "1994",
+   "source_section_or_page": "[REPRODUCES ONLY AFTER BUG FIX: tile gives actual_ma 1.47 / haul 136 lb] Page 1: 'two common rescue pulleys with a pulley factor of approximately 0.70' predict 'a Force Advantage Ratio of 2.2:1'; table 'p' 0.70: 'CFAR 2.19', 'w' '91' lb to raise 200 lbs. abs 0.01 / abs 0.5 lb cover printed rounding.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "rig": "3:1",
+    "efficiency": 0.7,
+    "load_lb": 200
+   },
+   "outputs": {
+    "actual_ma": {
+     "value": 2.19,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "haul_force_lb": {
+     "value": 91,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "bolt-torque",
+   "source_publisher": "Fastenal",
+   "source_title": "Torque-Tension Relationship for A307A, Grade 5, 8 & 9 Bolts",
+   "source_edition_or_year": "Rev 3-6-09",
+   "source_section_or_page": "https://crafter.fastenal.com/static-assets/pdfs/Torque-Tension_Chart_for_A307_Gr5_Gr8_Gr9.pdf Unified Coarse Thread Series table. SAE J429 Grade 5, 1/2-13 row: clamp load '9046' lbs, K = 0.20 torque '75' ft-lbs. Clamp load = 75% of proof load; T = K D F. Tolerance 0.5% (abs 0.5 ft-lb under 100 ft-lb) covers whole-unit rounding and the chart's 4-decimal stress areas.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "grade": "SAE_5",
+    "diameter_in": 0.5,
+    "lubrication": "dry",
+    "preload_fraction": 0.75
+   },
+   "outputs": {
+    "F_lb": {
+     "value": 9046,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "torque_ft_lb": {
+     "value": 75,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "bolt-torque",
+   "source_publisher": "Fastenal",
+   "source_title": "Torque-Tension Relationship for A307A, Grade 5, 8 & 9 Bolts",
+   "source_edition_or_year": "Rev 3-6-09",
+   "source_section_or_page": "https://crafter.fastenal.com/static-assets/pdfs/Torque-Tension_Chart_for_A307_Gr5_Gr8_Gr9.pdf Unified Coarse Thread Series table. SAE J429 Grade 5, 1/2-13 row: clamp load '9046' lbs, K = 0.15 ('lubricated') torque '57' ft-lbs. Clamp load = 75% of proof load; T = K D F. Tolerance 0.5% (abs 0.5 ft-lb under 100 ft-lb) covers whole-unit rounding and the chart's 4-decimal stress areas.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "grade": "SAE_5",
+    "diameter_in": 0.5,
+    "lubrication": "antiseize",
+    "preload_fraction": 0.75
+   },
+   "outputs": {
+    "F_lb": {
+     "value": 9046,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "torque_ft_lb": {
+     "value": 57,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "bolt-torque",
+   "source_publisher": "Fastenal",
+   "source_title": "Torque-Tension Relationship for A307A, Grade 5, 8 & 9 Bolts",
+   "source_edition_or_year": "Rev 3-6-09",
+   "source_section_or_page": "https://crafter.fastenal.com/static-assets/pdfs/Torque-Tension_Chart_for_A307_Gr5_Gr8_Gr9.pdf Unified Coarse Thread Series table. SAE J429 Grade 5, 3/4-10 row: clamp load '21322' lbs, K = 0.20 torque '267' ft-lbs (chart area 0.3345 vs tile 0.334 sq in, 0.15% low). Clamp load = 75% of proof load; T = K D F. Tolerance 0.5% (abs 0.5 ft-lb under 100 ft-lb) covers whole-unit rounding and the chart's 4-decimal stress areas.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "grade": "SAE_5",
+    "diameter_in": 0.75,
+    "lubrication": "dry",
+    "preload_fraction": 0.75
+   },
+   "outputs": {
+    "F_lb": {
+     "value": 21322,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "torque_ft_lb": {
+     "value": 267,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "bolt-torque",
+   "source_publisher": "Fastenal",
+   "source_title": "Torque-Tension Relationship for A307A, Grade 5, 8 & 9 Bolts",
+   "source_edition_or_year": "Rev 3-6-09",
+   "source_section_or_page": "https://crafter.fastenal.com/static-assets/pdfs/Torque-Tension_Chart_for_A307_Gr5_Gr8_Gr9.pdf Unified Coarse Thread Series table. SAE J429 Grade 5, 1-8 row: clamp load '38616' lbs, K = 0.20 torque '644' ft-lbs. Clamp load = 75% of proof load; T = K D F. Tolerance 0.5% (abs 0.5 ft-lb under 100 ft-lb) covers whole-unit rounding and the chart's 4-decimal stress areas.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "grade": "SAE_5",
+    "diameter_in": 1,
+    "lubrication": "dry",
+    "preload_fraction": 0.75
+   },
+   "outputs": {
+    "F_lb": {
+     "value": 38616,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "torque_ft_lb": {
+     "value": 644,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "bolt-torque",
+   "source_publisher": "Fastenal",
+   "source_title": "Torque-Tension Relationship for A307A, Grade 5, 8 & 9 Bolts",
+   "source_edition_or_year": "Rev 3-6-09",
+   "source_section_or_page": "https://crafter.fastenal.com/static-assets/pdfs/Torque-Tension_Chart_for_A307_Gr5_Gr8_Gr9.pdf Unified Coarse Thread Series table. SAE J429 Grade 5, 1 1/4-7 row: clamp load '53786' lbs, K = 0.20 torque '1121' ft-lbs (exercises the 74 ksi proof step above 1 in). Clamp load = 75% of proof load; T = K D F. Tolerance 0.5% (abs 0.5 ft-lb under 100 ft-lb) covers whole-unit rounding and the chart's 4-decimal stress areas.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "grade": "SAE_5",
+    "diameter_in": 1.25,
+    "lubrication": "dry",
+    "preload_fraction": 0.75
+   },
+   "outputs": {
+    "F_lb": {
+     "value": 53786,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "torque_ft_lb": {
+     "value": 1121,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "bolt-torque",
+   "source_publisher": "Fastenal",
+   "source_title": "Torque-Tension Relationship for A307A, Grade 5, 8 & 9 Bolts",
+   "source_edition_or_year": "Rev 3-6-09",
+   "source_section_or_page": "https://crafter.fastenal.com/static-assets/pdfs/Torque-Tension_Chart_for_A307_Gr5_Gr8_Gr9.pdf Unified Coarse Thread Series table. SAE J429 Grade 5, 1 1/2-6 row: clamp load '77991' lbs, K = 0.20 torque '1950' ft-lbs. Clamp load = 75% of proof load; T = K D F. Tolerance 0.5% (abs 0.5 ft-lb under 100 ft-lb) covers whole-unit rounding and the chart's 4-decimal stress areas.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "grade": "SAE_5",
+    "diameter_in": 1.5,
+    "lubrication": "dry",
+    "preload_fraction": 0.75
+   },
+   "outputs": {
+    "F_lb": {
+     "value": 77991,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "torque_ft_lb": {
+     "value": 1950,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "bolt-torque",
+   "source_publisher": "Fastenal",
+   "source_title": "Torque-Tension Relationship for A307A, Grade 5, 8 & 9 Bolts",
+   "source_edition_or_year": "Rev 3-6-09",
+   "source_section_or_page": "https://crafter.fastenal.com/static-assets/pdfs/Torque-Tension_Chart_for_A307_Gr5_Gr8_Gr9.pdf Unified Coarse Thread Series table. SAE J429 Grade 8, 1/2-13 row: clamp load '12771' lbs, K = 0.20 torque '106' ft-lbs. Clamp load = 75% of proof load; T = K D F. Tolerance 0.5% (abs 0.5 ft-lb under 100 ft-lb) covers whole-unit rounding and the chart's 4-decimal stress areas.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "grade": "SAE_8",
+    "diameter_in": 0.5,
+    "lubrication": "dry",
+    "preload_fraction": 0.75
+   },
+   "outputs": {
+    "F_lb": {
+     "value": 12771,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "torque_ft_lb": {
+     "value": 106,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "bolt-torque",
+   "source_publisher": "Fastenal",
+   "source_title": "Torque-Tension Relationship for A307A, Grade 5, 8 & 9 Bolts",
+   "source_edition_or_year": "Rev 3-6-09",
+   "source_section_or_page": "https://crafter.fastenal.com/static-assets/pdfs/Torque-Tension_Chart_for_A307_Gr5_Gr8_Gr9.pdf Unified Coarse Thread Series table. SAE J429 Grade 8, 1 1/2-6 row: clamp load '126473' lbs, K = 0.20 torque '3162' ft-lbs (chart area 1.4053 vs tile 1.405). Clamp load = 75% of proof load; T = K D F. Tolerance 0.5% (abs 0.5 ft-lb under 100 ft-lb) covers whole-unit rounding and the chart's 4-decimal stress areas.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "grade": "SAE_8",
+    "diameter_in": 1.5,
+    "lubrication": "dry",
+    "preload_fraction": 0.75
+   },
+   "outputs": {
+    "F_lb": {
+     "value": 126473,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "torque_ft_lb": {
+     "value": 3162,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "bolt-torque",
+   "source_publisher": "Fastenal",
+   "source_title": "Torque-Tension Relationship for A307A, Grade 5, 8 & 9 Bolts",
+   "source_edition_or_year": "Rev 3-6-09",
+   "source_section_or_page": "https://crafter.fastenal.com/static-assets/pdfs/Torque-Tension_Chart_for_A307_Gr5_Gr8_Gr9.pdf Unified Coarse Thread Series table. ASTM A307 Grade A, 1/2-13 row: clamp load '3831' lbs, K = 0.20 torque '32' ft-lbs; footnote 'ASTM A307 utilized 75% of 36,000 PSI'. Clamp load = 75% of proof load; T = K D F. Tolerance 0.5% (abs 0.5 ft-lb under 100 ft-lb) covers whole-unit rounding and the chart's 4-decimal stress areas.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "grade": "ASTM_A307",
+    "diameter_in": 0.5,
+    "lubrication": "dry",
+    "preload_fraction": 0.75
+   },
+   "outputs": {
+    "F_lb": {
+     "value": 3831,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "torque_ft_lb": {
+     "value": 32,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "bolt-torque",
+   "source_publisher": "Fastenal",
+   "source_title": "Torque-Tension Relationship for A307A, Grade 5, 8 & 9 Bolts",
+   "source_edition_or_year": "Rev 3-6-09",
+   "source_section_or_page": "https://crafter.fastenal.com/static-assets/pdfs/Torque-Tension_Chart_for_A307_Gr5_Gr8_Gr9.pdf Unified Coarse Thread Series table. ASTM A307 Grade A, 1-8 row: clamp load '16355' lbs, K = 0.20 torque '273' ft-lbs. Clamp load = 75% of proof load; T = K D F. Tolerance 0.5% (abs 0.5 ft-lb under 100 ft-lb) covers whole-unit rounding and the chart's 4-decimal stress areas.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "grade": "ASTM_A307",
+    "diameter_in": 1,
+    "lubrication": "dry",
+    "preload_fraction": 0.75
+   },
+   "outputs": {
+    "F_lb": {
+     "value": 16355,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "torque_ft_lb": {
+     "value": 273,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "rafter",
+   "source_publisher": "CertainTeed",
+   "source_title": "Master Craftsman Shingle Applicator's Manual",
+   "source_edition_or_year": "Sixteenth Edition",
+   "source_section_or_page": "https://pdf.lowes.com/productdocuments/ae976d33-1de9-40af-acb5-58fec7ef9267/63087716.pdf Chapter 3 p.22, TABLE 1 'Rise inches/ft / Slope factor': '4  1.054'. Slope factor = rake length / run (B = Y x slope factor). Printed to 3 decimals with mixed rounding (7/12 prints 1.157 and 11/12 prints 1.356 where sqrt(r^2+144)/12 is 1.1577 and 1.3566, i.e. truncated, while 8/12 prints 1.202 for 1.2019); abs 0.001 covers both.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "horizontal_span_ft": 12,
+    "pitch_rise_per_12": 4,
+    "overhang_ft": 0
+   },
+   "outputs": {
+    "multiplier": {
+     "value": 1.054,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "rafter",
+   "source_publisher": "CertainTeed",
+   "source_title": "Master Craftsman Shingle Applicator's Manual",
+   "source_edition_or_year": "Sixteenth Edition",
+   "source_section_or_page": "https://pdf.lowes.com/productdocuments/ae976d33-1de9-40af-acb5-58fec7ef9267/63087716.pdf Chapter 3 p.22, TABLE 1 'Rise inches/ft / Slope factor': '5  1.083'. Slope factor = rake length / run (B = Y x slope factor). Printed to 3 decimals with mixed rounding (7/12 prints 1.157 and 11/12 prints 1.356 where sqrt(r^2+144)/12 is 1.1577 and 1.3566, i.e. truncated, while 8/12 prints 1.202 for 1.2019); abs 0.001 covers both.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "horizontal_span_ft": 12,
+    "pitch_rise_per_12": 5,
+    "overhang_ft": 0
+   },
+   "outputs": {
+    "multiplier": {
+     "value": 1.083,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "rafter",
+   "source_publisher": "CertainTeed",
+   "source_title": "Master Craftsman Shingle Applicator's Manual",
+   "source_edition_or_year": "Sixteenth Edition",
+   "source_section_or_page": "https://pdf.lowes.com/productdocuments/ae976d33-1de9-40af-acb5-58fec7ef9267/63087716.pdf Chapter 3 p.22, TABLE 1 'Rise inches/ft / Slope factor': '6  1.118'. Slope factor = rake length / run (B = Y x slope factor). Printed to 3 decimals with mixed rounding (7/12 prints 1.157 and 11/12 prints 1.356 where sqrt(r^2+144)/12 is 1.1577 and 1.3566, i.e. truncated, while 8/12 prints 1.202 for 1.2019); abs 0.001 covers both.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "horizontal_span_ft": 12,
+    "pitch_rise_per_12": 6,
+    "overhang_ft": 0
+   },
+   "outputs": {
+    "multiplier": {
+     "value": 1.118,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "rafter",
+   "source_publisher": "CertainTeed",
+   "source_title": "Master Craftsman Shingle Applicator's Manual",
+   "source_edition_or_year": "Sixteenth Edition",
+   "source_section_or_page": "https://pdf.lowes.com/productdocuments/ae976d33-1de9-40af-acb5-58fec7ef9267/63087716.pdf Chapter 3 p.22, TABLE 1 'Rise inches/ft / Slope factor': '7  1.157'. Slope factor = rake length / run (B = Y x slope factor). Printed to 3 decimals with mixed rounding (7/12 prints 1.157 and 11/12 prints 1.356 where sqrt(r^2+144)/12 is 1.1577 and 1.3566, i.e. truncated, while 8/12 prints 1.202 for 1.2019); abs 0.001 covers both.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "horizontal_span_ft": 12,
+    "pitch_rise_per_12": 7,
+    "overhang_ft": 0
+   },
+   "outputs": {
+    "multiplier": {
+     "value": 1.157,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "rafter",
+   "source_publisher": "CertainTeed",
+   "source_title": "Master Craftsman Shingle Applicator's Manual",
+   "source_edition_or_year": "Sixteenth Edition",
+   "source_section_or_page": "https://pdf.lowes.com/productdocuments/ae976d33-1de9-40af-acb5-58fec7ef9267/63087716.pdf Chapter 3 p.22, TABLE 1 'Rise inches/ft / Slope factor': '8  1.202'. Slope factor = rake length / run (B = Y x slope factor). Printed to 3 decimals with mixed rounding (7/12 prints 1.157 and 11/12 prints 1.356 where sqrt(r^2+144)/12 is 1.1577 and 1.3566, i.e. truncated, while 8/12 prints 1.202 for 1.2019); abs 0.001 covers both.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "horizontal_span_ft": 12,
+    "pitch_rise_per_12": 8,
+    "overhang_ft": 0
+   },
+   "outputs": {
+    "multiplier": {
+     "value": 1.202,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "rafter",
+   "source_publisher": "CertainTeed",
+   "source_title": "Master Craftsman Shingle Applicator's Manual",
+   "source_edition_or_year": "Sixteenth Edition",
+   "source_section_or_page": "https://pdf.lowes.com/productdocuments/ae976d33-1de9-40af-acb5-58fec7ef9267/63087716.pdf Chapter 3 p.22, TABLE 1 'Rise inches/ft / Slope factor': '9  1.250'. Slope factor = rake length / run (B = Y x slope factor). Printed to 3 decimals with mixed rounding (7/12 prints 1.157 and 11/12 prints 1.356 where sqrt(r^2+144)/12 is 1.1577 and 1.3566, i.e. truncated, while 8/12 prints 1.202 for 1.2019); abs 0.001 covers both.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "horizontal_span_ft": 12,
+    "pitch_rise_per_12": 9,
+    "overhang_ft": 0
+   },
+   "outputs": {
+    "multiplier": {
+     "value": 1.25,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "rafter",
+   "source_publisher": "CertainTeed",
+   "source_title": "Master Craftsman Shingle Applicator's Manual",
+   "source_edition_or_year": "Sixteenth Edition",
+   "source_section_or_page": "https://pdf.lowes.com/productdocuments/ae976d33-1de9-40af-acb5-58fec7ef9267/63087716.pdf Chapter 3 p.22, TABLE 1 'Rise inches/ft / Slope factor': '10  1.302'. Slope factor = rake length / run (B = Y x slope factor). Printed to 3 decimals with mixed rounding (7/12 prints 1.157 and 11/12 prints 1.356 where sqrt(r^2+144)/12 is 1.1577 and 1.3566, i.e. truncated, while 8/12 prints 1.202 for 1.2019); abs 0.001 covers both.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "horizontal_span_ft": 12,
+    "pitch_rise_per_12": 10,
+    "overhang_ft": 0
+   },
+   "outputs": {
+    "multiplier": {
+     "value": 1.302,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "rafter",
+   "source_publisher": "CertainTeed",
+   "source_title": "Master Craftsman Shingle Applicator's Manual",
+   "source_edition_or_year": "Sixteenth Edition",
+   "source_section_or_page": "https://pdf.lowes.com/productdocuments/ae976d33-1de9-40af-acb5-58fec7ef9267/63087716.pdf Chapter 3 p.22, TABLE 1 'Rise inches/ft / Slope factor': '11  1.356'. Slope factor = rake length / run (B = Y x slope factor). Printed to 3 decimals with mixed rounding (7/12 prints 1.157 and 11/12 prints 1.356 where sqrt(r^2+144)/12 is 1.1577 and 1.3566, i.e. truncated, while 8/12 prints 1.202 for 1.2019); abs 0.001 covers both.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "horizontal_span_ft": 12,
+    "pitch_rise_per_12": 11,
+    "overhang_ft": 0
+   },
+   "outputs": {
+    "multiplier": {
+     "value": 1.356,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "rafter",
+   "source_publisher": "CertainTeed",
+   "source_title": "Master Craftsman Shingle Applicator's Manual",
+   "source_edition_or_year": "Sixteenth Edition",
+   "source_section_or_page": "https://pdf.lowes.com/productdocuments/ae976d33-1de9-40af-acb5-58fec7ef9267/63087716.pdf Chapter 3 p.22, TABLE 1 'Rise inches/ft / Slope factor': '12  1.414'. Slope factor = rake length / run (B = Y x slope factor). Printed to 3 decimals with mixed rounding (7/12 prints 1.157 and 11/12 prints 1.356 where sqrt(r^2+144)/12 is 1.1577 and 1.3566, i.e. truncated, while 8/12 prints 1.202 for 1.2019); abs 0.001 covers both.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "horizontal_span_ft": 12,
+    "pitch_rise_per_12": 12,
+    "overhang_ft": 0
+   },
+   "outputs": {
+    "multiplier": {
+     "value": 1.414,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "rafter",
+   "source_publisher": "CertainTeed",
+   "source_title": "Master Craftsman Shingle Applicator's Manual",
+   "source_edition_or_year": "Sixteenth Edition",
+   "source_section_or_page": "https://pdf.lowes.com/productdocuments/ae976d33-1de9-40af-acb5-58fec7ef9267/63087716.pdf Chapter 3 p.22: 'To find the length of the rake, multiply the run (y) by the slope factor: 12 x 1.083 = 12.9 ft.' (5 in rise per ft, Figure 3-4). Exact 5/12 factor is 13/12, so the exact rake is 13.0 ft; the printed 12.9 carries the truncated 1.083 (12.996 floored to 0.1). abs 0.11.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "horizontal_span_ft": 12,
+    "pitch_rise_per_12": 5,
+    "overhang_ft": 0
+   },
+   "outputs": {
+    "rafter_length_ft": {
+     "value": 12.9,
+     "tolerance": {
+      "abs": 0.11
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "rafter",
+   "source_publisher": "Naval Education and Training Professional Development and Technology Center",
+   "source_title": "Builder 3 & 2, Volume 2 (NAVEDTRA 14044)",
+   "source_edition_or_year": "1994 Edition (March 1994)",
+   "source_section_or_page": "https://www.constructionknowledge.net/public_domain_documents/Builder_3_and_2_vol_2_NAVEDTRA_14044_1994.pdf Chapter 2, Calculating Lengths of Common Rafters, Example 1 (p.2-11/2-12): 'a 7-inch unit of rise and a 16-foot span', 'The total run for a roof with a 16-foot span is 8 feet', bridge measure '13.89', result 'total common rafter length of 111 1/8 inches, or 9 feet 3 1/8 inches' (9.260 ft). The tile's horizontal_span_ft is the rafter's run. abs 0.01 ft covers the 1/16 in rounding.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "horizontal_span_ft": 8,
+    "pitch_rise_per_12": 7,
+    "overhang_ft": 0
+   },
+   "outputs": {
+    "rafter_length_ft": {
+     "value": 9.2604,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "rafter",
+   "source_publisher": "Naval Education and Training Professional Development and Technology Center",
+   "source_title": "Builder 3 & 2, Volume 2 (NAVEDTRA 14044)",
+   "source_edition_or_year": "1994 Edition (March 1994)",
+   "source_section_or_page": "https://www.constructionknowledge.net/public_domain_documents/Builder_3_and_2_vol_2_NAVEDTRA_14044_1994.pdf Chapter 2, Example 2 (p.2-12): 'A roof has a 6-inch unit of rise and a 25-foot span. The total run of the roof is 12 feet 6 inches', per-foot length '13.42 inches', result 'total common rafter length of 167 3/4 inches, or 13 feet 11 3/4 inches' (13.979 ft). abs 0.01 ft covers the 13.42 rounding of 13.4164.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "horizontal_span_ft": 12.5,
+    "pitch_rise_per_12": 6,
+    "overhang_ft": 0
+   },
+   "outputs": {
+    "rafter_length_ft": {
+     "value": 13.979,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "multiplier": {
+     "value": 1.1183333333333334,
+     "tolerance": {
+      "abs": 0.0005
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "rafter",
+   "source_publisher": "Naval Education and Training Professional Development and Technology Center",
+   "source_title": "Builder 3 & 2, Volume 2 (NAVEDTRA 14044)",
+   "source_edition_or_year": "1994 Edition (March 1994)",
+   "source_section_or_page": "https://www.constructionknowledge.net/public_domain_documents/Builder_3_and_2_vol_2_NAVEDTRA_14044_1994.pdf Chapter 2, Determining Line Length (p.2-5/2-6): brace with 'total run of 60 inches and a total rise of 72 inches', unit of rise '14.4 inches', 'the length of the hypotenuse of a right triangle with the other sides 60 and 72 inches long is slightly more than 93.72 inches' (7.810 ft). abs 0.005 ft.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "horizontal_span_ft": 5,
+    "pitch_rise_per_12": 14.4,
+    "overhang_ft": 0
+   },
+   "outputs": {
+    "rafter_length_ft": {
+     "value": 7.81,
+     "tolerance": {
+      "abs": 0.005
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "stairs",
+   "source_publisher": "Journal of Light Construction (JLC)",
+   "source_title": "Stair Stringers: Calculation and Layout (Training the Trades)",
+   "source_edition_or_year": "2021 (article, IRC 2021 link)",
+   "source_section_or_page": "https://www.jlconline.com/training-the-trades/stair-stringers-calculation-and-layout_o (read via web.archive.org 2024 snapshot). Steps 4-6 and 'Verify the total run': total rise '30 1/2 inches' divided by 7 'gives us about 4', unit rise '7 5/8 inches', 'target run of 10 inches', total run '3 X 10 inches = 30 inches'. Tile with preferred 7 in rounds 30.5/7 = 4.36 to 4 risers. 7 5/8 is exact.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "total_rise_in": 30.5,
+    "preferred_riser_height_in": 7
+   },
+   "outputs": {
+    "risers": {
+     "value": 4,
+     "tolerance": {
+      "abs": 0
+     }
+    },
+    "treads": {
+     "value": 3,
+     "tolerance": {
+      "abs": 0
+     }
+    },
+    "riser_height_in": {
+     "value": 7.625,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "total_run_in": {
+     "value": 30,
+     "tolerance": {
+      "abs": 0
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "stairs",
+   "source_publisher": "Naval Education and Training Professional Development and Technology Center",
+   "source_title": "Builder 3 & 2, Volume 2 (NAVEDTRA 14044)",
+   "source_edition_or_year": "1994 Edition (March 1994)",
+   "source_section_or_page": "https://www.constructionknowledge.net/public_domain_documents/Builder_3_and_2_vol_2_NAVEDTRA_14044_1994.pdf Chapter 6, Stairway Layout (p.6-11/6-12): 'total rise measures 8 feet 11 inches' = '107 inches', divided by 'average unit rise, which is 7 inches' gives '107/7 or 15' risers, unit rise '107/15, or nearly 7 1/8 inches'; with the upper floor as the top tread 'the total number of complete treads is again 14'. Total run NOT used: Navy sets unit run = 17 1/2 - rise (10 3/8 in), the tile fixes 10 in. abs 0.01 on riser height covers 7.133 vs 'nearly 7 1/8'.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "total_rise_in": 107,
+    "preferred_riser_height_in": 7
+   },
+   "outputs": {
+    "risers": {
+     "value": 15,
+     "tolerance": {
+      "abs": 0
+     }
+    },
+    "treads": {
+     "value": 14,
+     "tolerance": {
+      "abs": 0
+     }
+    },
+    "riser_height_in": {
+     "value": 7.133,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "board-footage",
+   "source_publisher": "Naval Education and Training Professional Development and Technology Center",
+   "source_title": "Builder 3 & 2, Volume 2 (NAVEDTRA 14044)",
+   "source_edition_or_year": "1994 Edition (March 1994)",
+   "source_section_or_page": "https://www.constructionknowledge.net/public_domain_documents/Builder_3_and_2_vol_2_NAVEDTRA_14044_1994.pdf Chapter 2, Essex Board measure (p.2-9): 'a piece of lumber 10 feet long by 10 inches wide by 1 inch thick' ... '84, or 8 4/12 board feet' ... 'to a decimal (8.33)'. abs 0.02 covers the decimal rounding.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "thickness_in": 1,
+    "width_in": 10,
+    "length_ft": 10,
+    "count": 1
+   },
+   "outputs": {
+    "board_feet_each": {
+     "value": 8.33,
+     "tolerance": {
+      "abs": 0.02
+     }
+    },
+    "total_board_feet": {
+     "value": 8.33,
+     "tolerance": {
+      "abs": 0.02
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "board-footage",
+   "source_publisher": "Naval Education and Training Professional Development and Technology Center",
+   "source_title": "Builder 3 & 2, Volume 2 (NAVEDTRA 14044)",
+   "source_edition_or_year": "1994 Edition (March 1994)",
+   "source_section_or_page": "https://www.constructionknowledge.net/public_domain_documents/Builder_3_and_2_vol_2_NAVEDTRA_14044_1994.pdf Chapter 2, Essex Board measure (p.2-9): 'a piece 33 feet long by 7 inches wide by 1 inch thick' ... 'The total number of board feet is 6 5/12 (or 6.42) x 3, or 19 3/12 (or 19.26) board feet' (19 3/12 = 19.25 exact; 19.26 is 6.42 x 3). abs 0.02 covers the decimal rounding.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "thickness_in": 1,
+    "width_in": 7,
+    "length_ft": 33,
+    "count": 1
+   },
+   "outputs": {
+    "board_feet_each": {
+     "value": 19.26,
+     "tolerance": {
+      "abs": 0.02
+     }
+    },
+    "total_board_feet": {
+     "value": 19.26,
+     "tolerance": {
+      "abs": 0.02
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "board-footage",
+   "source_publisher": "Naval Education and Training Professional Development and Technology Center",
+   "source_title": "Builder 3 & 2, Volume 2 (NAVEDTRA 14044)",
+   "source_edition_or_year": "1994 Edition (March 1994)",
+   "source_section_or_page": "https://www.constructionknowledge.net/public_domain_documents/Builder_3_and_2_vol_2_NAVEDTRA_14044_1994.pdf Chapter 2, Essex Board measure (p.2-9): 'a piece 25 feet long by 10 inches wide by 1 inch thick' ... '8 4/12 (8.33) plus 12 6/12 (12.5), or 20 10/12 (20.83) board feet'. abs 0.02 covers the decimal rounding.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "thickness_in": 1,
+    "width_in": 10,
+    "length_ft": 25,
+    "count": 1
+   },
+   "outputs": {
+    "board_feet_each": {
+     "value": 20.83,
+     "tolerance": {
+      "abs": 0.02
+     }
+    },
+    "total_board_feet": {
+     "value": 20.83,
+     "tolerance": {
+      "abs": 0.02
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "concrete",
+   "source_publisher": "Naval Education and Training Professional Development and Technology Center",
+   "source_title": "Builder Basic (NAVEDTRA 14043A)",
+   "source_edition_or_year": "October 2010",
+   "source_section_or_page": "https://media.defense.gov/2014/Jun/20/2002655876/-1/-1/1/140620-N-ZZ182-6520.pdf (read via web.archive.org 2024 snapshot) Chapter 1, 11.4.3 Cylinder (p.1-30): 'a column 2 feet in diameter and 12 feet high', 'V = 3.14 square feet x 12 feet = 37.68 cubic feet', '37.69 cubic feet / 27 cubic feet / cubic yard = 1.395 cubic yards'. Tile takes diameter in inches (24). pct 0.2 covers pi = 3.14.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "shape": "column",
+    "diameter_in": 24,
+    "height_ft": 12,
+    "waste_factor": 0
+   },
+   "outputs": {
+    "cubic_feet": {
+     "value": 37.68,
+     "tolerance": {
+      "pct": 0.2
+     }
+    },
+    "cubic_yards": {
+     "value": 1.395,
+     "tolerance": {
+      "pct": 0.2
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "concrete",
+   "source_publisher": "Naval Education and Training Professional Development and Technology Center",
+   "source_title": "Builder Basic (NAVEDTRA 14043A)",
+   "source_edition_or_year": "October 2010",
+   "source_section_or_page": "https://media.defense.gov/2014/Jun/20/2002655876/-1/-1/1/140620-N-ZZ182-6520.pdf Chapter 1, 11.4.1 Rectangular Shape (p.1-28): 'V = 15 feet x 10 feet x .33 feet = 49.5 cubic feet', '49.5 cubic feet / 27 cubic feet / cubic yard = 1.83 cubic yards' (the problem sentence says '5 feet wide' but the worked computation and its stated basis use 'a width of 10 feet'). Exact 4 in = 0.3333 ft gives 50 ft3 / 1.852 yd3; pct 1.5 covers the printed .33 ft truncation.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "shape": "slab",
+    "length_ft": 15,
+    "width_ft": 10,
+    "thickness_in": 4,
+    "waste_factor": 0
+   },
+   "outputs": {
+    "cubic_feet": {
+     "value": 49.5,
+     "tolerance": {
+      "pct": 1.5
+     }
+    },
+    "cubic_yards": {
+     "value": 1.83,
+     "tolerance": {
+      "pct": 1.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "footing-area",
+   "source_publisher": "Journal of Light Construction (JLC) / Professional Deck Builder",
+   "source_title": "Better Deck Piers (Professional Deck Builder), Mike Guertin",
+   "source_edition_or_year": "2016 (jlconline.com/deck-builder/better-deck-piers_o)",
+   "source_section_or_page": "https://www.jlconline.com/deck-builder/better-deck-piers_o (read via web.archive.org 2024 snapshot), 'Size the Footings': 'End-footing area (1,912.5 lb. + 120 lb.) / 1,500 psf = 1.355 sq. ft. or 195.12 sq. in.' ... 'End-footing side lengths sqrt(195.12 in.) = 14 in. by 14 in.'. 1,500 psf is the IRC Table R401.4.1 presumptive value for clay / silt (tile soil_class clay). The tile's 6-in rounded side is its own convention and is not compared. abs 0.001 ft2 on area; abs 0.01 ft on side.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "column_load_lb": 2032.5,
+    "soil_class": "clay"
+   },
+   "outputs": {
+    "required_area_ft2": {
+     "value": 1.355,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "side_ft": {
+     "value": 1.1666666666666667,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "footing-area",
+   "source_publisher": "Journal of Light Construction (JLC) / Professional Deck Builder",
+   "source_title": "Better Deck Piers (Professional Deck Builder), Mike Guertin",
+   "source_edition_or_year": "2016 (jlconline.com/deck-builder/better-deck-piers_o)",
+   "source_section_or_page": "https://www.jlconline.com/deck-builder/better-deck-piers_o (read via web.archive.org 2024 snapshot), 'Size the Footings': 'Middle-footing area (2,587.5 lb. + 120 lb.) / 1,500 psf = 1.805 sq. ft. or 259.92 sq. in.' ... 'Middle-footing side lengths sqrt(259.92 in.) = 16 1/8 in. by 16 1/8 in.'. 1,500 psf is the IRC Table R401.4.1 presumptive value for clay / silt (tile soil_class clay). The tile's 6-in rounded side is its own convention and is not compared. abs 0.001 ft2 on area; abs 0.01 ft on side.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "column_load_lb": 2707.5,
+    "soil_class": "clay"
+   },
+   "outputs": {
+    "required_area_ft2": {
+     "value": 1.805,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "side_ft": {
+     "value": 1.34375,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "asphalt-tonnage",
+   "source_publisher": "Nebraska Department of Transportation",
+   "source_title": "Estimating Quantities in English & Metric",
+   "source_edition_or_year": "Sheet 9 of 10, 6/25/24",
+   "source_section_or_page": "http://dot.nebraska.gov/media/4ffnhg4d/estimating-material-quantities.pdf Sheet 9, 'Asphaltic Concrete Tonnage Table', 'Tons/SY/Inch' block: 145 'Pounds per Cubic Foot' column, 1-inch row prints '0.054'. 1 SY entered as 9 ft2. Printed to 3 decimals; abs 0.0006 covers the rounding.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "area_ft2": 9,
+    "depth_in": 1,
+    "density_pcf": 145
+   },
+   "outputs": {
+    "tons": {
+     "value": 0.054,
+     "tolerance": {
+      "abs": 0.0006
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "asphalt-tonnage",
+   "source_publisher": "Nebraska Department of Transportation",
+   "source_title": "Estimating Quantities in English & Metric",
+   "source_edition_or_year": "Sheet 9 of 10, 6/25/24",
+   "source_section_or_page": "http://dot.nebraska.gov/media/4ffnhg4d/estimating-material-quantities.pdf Sheet 9, 'Asphaltic Concrete Tonnage Table', 'Tons/SY/Inch' block: 145 'Pounds per Cubic Foot' column, 2-inch row prints '0.109'. 1 SY entered as 9 ft2. Printed to 3 decimals; abs 0.0006 covers the rounding.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "area_ft2": 9,
+    "depth_in": 2,
+    "density_pcf": 145
+   },
+   "outputs": {
+    "tons": {
+     "value": 0.109,
+     "tolerance": {
+      "abs": 0.0006
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "asphalt-tonnage",
+   "source_publisher": "Nebraska Department of Transportation",
+   "source_title": "Estimating Quantities in English & Metric",
+   "source_edition_or_year": "Sheet 9 of 10, 6/25/24",
+   "source_section_or_page": "http://dot.nebraska.gov/media/4ffnhg4d/estimating-material-quantities.pdf Sheet 9, 'Asphaltic Concrete Tonnage Table', 'Tons/SY/Inch' block: 145 'Pounds per Cubic Foot' column, 3-inch row prints '0.163'. 1 SY entered as 9 ft2. Printed to 3 decimals; abs 0.0006 covers the rounding.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "area_ft2": 9,
+    "depth_in": 3,
+    "density_pcf": 145
+   },
+   "outputs": {
+    "tons": {
+     "value": 0.163,
+     "tolerance": {
+      "abs": 0.0006
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "asphalt-tonnage",
+   "source_publisher": "Nebraska Department of Transportation",
+   "source_title": "Estimating Quantities in English & Metric",
+   "source_edition_or_year": "Sheet 9 of 10, 6/25/24",
+   "source_section_or_page": "http://dot.nebraska.gov/media/4ffnhg4d/estimating-material-quantities.pdf Sheet 9, 'Asphaltic Concrete Tonnage Table', 'Tons/SY/Inch' block: 145 'Pounds per Cubic Foot' column, 4-inch row prints '0.218'. 1 SY entered as 9 ft2. Printed to 3 decimals; abs 0.0006 covers the rounding.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "area_ft2": 9,
+    "depth_in": 4,
+    "density_pcf": 145
+   },
+   "outputs": {
+    "tons": {
+     "value": 0.218,
+     "tolerance": {
+      "abs": 0.0006
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "asphalt-tonnage",
+   "source_publisher": "Nebraska Department of Transportation",
+   "source_title": "Estimating Quantities in English & Metric",
+   "source_edition_or_year": "Sheet 9 of 10, 6/25/24",
+   "source_section_or_page": "http://dot.nebraska.gov/media/4ffnhg4d/estimating-material-quantities.pdf Sheet 9, 'Asphaltic Concrete Tonnage Table', 'Tons/SY/Inch' block: 145 'Pounds per Cubic Foot' column, 6-inch row prints '0.326'. 1 SY entered as 9 ft2. Printed to 3 decimals; abs 0.0006 covers the rounding.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "area_ft2": 9,
+    "depth_in": 6,
+    "density_pcf": 145
+   },
+   "outputs": {
+    "tons": {
+     "value": 0.326,
+     "tolerance": {
+      "abs": 0.0006
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "asphalt-tonnage",
+   "source_publisher": "Nebraska Department of Transportation",
+   "source_title": "Estimating Quantities in English & Metric",
+   "source_edition_or_year": "Sheet 9 of 10, 6/25/24",
+   "source_section_or_page": "http://dot.nebraska.gov/media/4ffnhg4d/estimating-material-quantities.pdf Sheet 9, 'Asphaltic Concrete Tonnage Table', 'Tons/SY/Inch' block: 145 'Pounds per Cubic Foot' column, 10-inch row prints '0.544'. 1 SY entered as 9 ft2. Printed to 3 decimals; abs 0.0006 covers the rounding.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "area_ft2": 9,
+    "depth_in": 10,
+    "density_pcf": 145
+   },
+   "outputs": {
+    "tons": {
+     "value": 0.544,
+     "tolerance": {
+      "abs": 0.0006
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "asphalt-tonnage",
+   "source_publisher": "Nebraska Department of Transportation",
+   "source_title": "Estimating Quantities in English & Metric",
+   "source_edition_or_year": "Sheet 9 of 10, 6/25/24",
+   "source_section_or_page": "http://dot.nebraska.gov/media/4ffnhg4d/estimating-material-quantities.pdf Sheet 9, 'Asphaltic Concrete Tonnage Table', 'Tons/SY/Inch' block: 148 'Pounds per Cubic Foot' column, 4-inch row prints '0.222'. 1 SY entered as 9 ft2. Printed to 3 decimals; abs 0.0006 covers the rounding.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "area_ft2": 9,
+    "depth_in": 4,
+    "density_pcf": 148
+   },
+   "outputs": {
+    "tons": {
+     "value": 0.222,
+     "tolerance": {
+      "abs": 0.0006
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "asphalt-tonnage",
+   "source_publisher": "Nebraska Department of Transportation",
+   "source_title": "Estimating Quantities in English & Metric",
+   "source_edition_or_year": "Sheet 9 of 10, 6/25/24",
+   "source_section_or_page": "http://dot.nebraska.gov/media/4ffnhg4d/estimating-material-quantities.pdf Sheet 9, 'Asphaltic Concrete Tonnage Table', 'Tons/SY/Inch' block: 148 'Pounds per Cubic Foot' column, 10-inch row prints '0.555'. 1 SY entered as 9 ft2. Printed to 3 decimals; abs 0.0006 covers the rounding.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "area_ft2": 9,
+    "depth_in": 10,
+    "density_pcf": 148
+   },
+   "outputs": {
+    "tons": {
+     "value": 0.555,
+     "tolerance": {
+      "abs": 0.0006
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "asphalt-tonnage",
+   "source_publisher": "Nebraska Department of Transportation",
+   "source_title": "Estimating Quantities in English & Metric",
+   "source_edition_or_year": "Sheet 9 of 10, 6/25/24",
+   "source_section_or_page": "http://dot.nebraska.gov/media/4ffnhg4d/estimating-material-quantities.pdf Sheet 9, 'Asphaltic Concrete Tonnage Table', 'Tons/SY/Inch' block: 120 'Pounds per Cubic Foot' column, 4-inch row prints '0.180'. 1 SY entered as 9 ft2. Printed to 3 decimals; abs 0.0006 covers the rounding.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "area_ft2": 9,
+    "depth_in": 4,
+    "density_pcf": 120
+   },
+   "outputs": {
+    "tons": {
+     "value": 0.18,
+     "tolerance": {
+      "abs": 0.0006
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "asphalt-tonnage",
+   "source_publisher": "Nebraska Department of Transportation",
+   "source_title": "Estimating Quantities in English & Metric",
+   "source_edition_or_year": "Sheet 9 of 10, 6/25/24",
+   "source_section_or_page": "http://dot.nebraska.gov/media/4ffnhg4d/estimating-material-quantities.pdf Sheet 9, 'Asphaltic Concrete Tonnage Table', 'Tons/SY/Inch' block: 139 'Pounds per Cubic Foot' column, 1-inch row prints '0.052'. 1 SY entered as 9 ft2. Printed to 3 decimals; abs 0.0006 covers the rounding.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "area_ft2": 9,
+    "depth_in": 1,
+    "density_pcf": 139
+   },
+   "outputs": {
+    "tons": {
+     "value": 0.052,
+     "tolerance": {
+      "abs": 0.0006
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "asphalt-tonnage",
+   "source_publisher": "Nebraska Department of Transportation",
+   "source_title": "Estimating Quantities in English & Metric",
+   "source_edition_or_year": "Sheet 9 of 10, 6/25/24",
+   "source_section_or_page": "http://dot.nebraska.gov/media/4ffnhg4d/estimating-material-quantities.pdf Sheet 9, 'Tons per 100 Cubic Feet' row prints '7.25' under the '145' pounds-per-cubic-foot column. 100 ft3 entered as 100 ft2 x 12 in.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "area_ft2": 100,
+    "depth_in": 12,
+    "density_pcf": 145
+   },
+   "outputs": {
+    "tons": {
+     "value": 7.25,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "volume_ft3": {
+     "value": 100,
+     "tolerance": {
+      "abs": 1e-09
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "drywall",
+   "source_publisher": "USG (United States Gypsum Company)",
+   "source_title": "The Gypsum Construction Handbook, Appendix: Gypsum Board Screw Usage",
+   "source_edition_or_year": "Appendix p.494",
+   "source_section_or_page": "https://www.usg.com/content/dam/USG_Marketing_Communications/united_states/product_promotional_materials/finished_assets/appendix2.pdf 'Gypsum Board Screw Usage', screws per 1,000 ft2, vertical 4x8 board on 16 in framing at 16 in screw spacing (the GA-216 wall pattern) prints '875'. Tile wall rate 28 per 32 ft2 sheet. Exact.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "wall_area_ft2": 1000,
+    "ceiling_area_ft2": 0,
+    "sheet_size": "4x8",
+    "waste_percent": 0
+   },
+   "outputs": {
+    "screws": {
+     "value": 875,
+     "tolerance": {
+      "abs": 0
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "drywall",
+   "source_publisher": "USG (United States Gypsum Company)",
+   "source_title": "USG Sheetrock Brand All Purpose Joint Compound (Ready-Mixed) Submittal Sheet",
+   "source_edition_or_year": "J1969-USA-ENG/rev. 6-22",
+   "source_section_or_page": "https://www.usg.com/content/dam/USG/pdpmovedocuments/sheetrock-all-purpose-joint-compound-submittal-J1969.pdf PRODUCT DATA: 'Coverage: Approximately 10 gal./1,000 sq. ft. (37.8 L/100 sq. m) of gypsum panels.' FAILS TODAY: tile gives 14.29 gal (1 gal per 70 ft2, calc-construction.js:1488); reproduces only after the reported fix (1 gal per 100 ft2). pct 5.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "wall_area_ft2": 1000,
+    "ceiling_area_ft2": 0,
+    "sheet_size": "4x8",
+    "waste_percent": 0
+   },
+   "outputs": {
+    "mud_gal": {
+     "value": 10,
+     "tolerance": {
+      "pct": 5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "roof-pitch",
+   "source_publisher": "CertainTeed",
+   "source_title": "Master Craftsman Shingle Applicator's Manual",
+   "source_edition_or_year": "Sixteenth Edition",
+   "source_section_or_page": "https://pdf.lowes.com/productdocuments/ae976d33-1de9-40af-acb5-58fec7ef9267/63087716.pdf application limits: 'exceeding 21/12 (60 degrees)'. atan(21/12) = 60.26 deg; printed to the whole degree, abs 0.5.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "rise": 21,
+    "run": 12,
+    "mode": "rise_run"
+   },
+   "outputs": {
+    "degrees": {
+     "value": 60,
+     "tolerance": {
+      "abs": 0.5
      }
     }
    }

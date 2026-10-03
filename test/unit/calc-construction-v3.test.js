@@ -3,7 +3,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import {
-  computeDrywall, drywallExample,
+  computeDrywall, drywallExample, computeLumberSpan,
   computeRoofingSquares, roofingSquaresExample, SHINGLE_BUNDLES_PER_SQUARE,
   computeAsphaltTonnage, asphaltTonnageExample,
   computeAggregate, aggregateExample, AGGREGATE_DENSITIES_PCF,
@@ -24,8 +24,8 @@ test("Drywall: example yields sheet count", () => { const r = computeDrywall(dry
 test("Drywall: 4x12 needs fewer sheets than 4x8", () => { const a = computeDrywall({ wall_area_ft2: 1000, ceiling_area_ft2: 0, sheet_size: "4x8", waste_percent: 10 }); const b = computeDrywall({ wall_area_ft2: 1000, ceiling_area_ft2: 0, sheet_size: "4x12", waste_percent: 10 }); assert.ok(b.sheets < a.sheets); });
 test("Drywall: zero areas error", () => { const r = computeDrywall({ wall_area_ft2: 0, ceiling_area_ft2: 0, sheet_size: "4x8", waste_percent: 10 }); assert.ok(r.error); });
 test("Drywall: unknown size errors", () => { const r = computeDrywall({ wall_area_ft2: 100, ceiling_area_ft2: 0, sheet_size: "4x99", waste_percent: 10 }); assert.ok(r.error); });
-test("Drywall: mud scales with total area", () => { const r = computeDrywall({ wall_area_ft2: 1000, ceiling_area_ft2: 0, sheet_size: "4x8", waste_percent: 0 }); assert.ok(close(r.mud_gal, 1000 / 70, 0.001)); });
-test("Drywall: tape lf = 0.4 x total ft^2 (the citation's rate)", () => { const r = computeDrywall({ wall_area_ft2: 800, ceiling_area_ft2: 200, sheet_size: "4x8", waste_percent: 0 }); assert.ok(close(r.tape_lf, 400, 0.001)); });
+test("Drywall: mud scales with total area", () => { const r = computeDrywall({ wall_area_ft2: 1000, ceiling_area_ft2: 0, sheet_size: "4x8", waste_percent: 0 }); assert.ok(close(r.mud_gal, 1000 / 100, 0.001)); });
+test("Drywall: USG rates -- 370 ft tape and 10 gal mud per 1,000 ft^2, 875 / 1,125 screws per 1,000 ft^2 wall / ceiling", () => { const r = computeDrywall({ wall_area_ft2: 800, ceiling_area_ft2: 200, sheet_size: "4x8", waste_percent: 0 }); assert.ok(close(r.tape_lf, 370, 0.001)); assert.ok(close(r.mud_gal, 10, 0.001)); assert.equal(computeDrywall({ wall_area_ft2: 0, ceiling_area_ft2: 1000, sheet_size: "4x8", waste_percent: 0 }).screws, 1125); });
 test("Drywall: ceiling screws > wall screws per sheet", () => { const w = computeDrywall({ wall_area_ft2: 320, ceiling_area_ft2: 0, sheet_size: "4x8", waste_percent: 0 }); const c = computeDrywall({ wall_area_ft2: 0, ceiling_area_ft2: 320, sheet_size: "4x8", waste_percent: 0 }); assert.ok(c.screws > w.screws); });
 test("Drywall: more waste -> more sheets", () => { const a = computeDrywall({ wall_area_ft2: 1000, ceiling_area_ft2: 0, sheet_size: "4x8", waste_percent: 0 }); const b = computeDrywall({ wall_area_ft2: 1000, ceiling_area_ft2: 0, sheet_size: "4x8", waste_percent: 25 }); assert.ok(b.sheets >= a.sheets); });
 test("Drywall: negative area errors", () => { const r = computeDrywall({ wall_area_ft2: -1, ceiling_area_ft2: 0, sheet_size: "4x8", waste_percent: 10 }); assert.ok(r.error); });
@@ -181,3 +181,4 @@ test("Drywall: screws scale with area, not with the sheet count (4x12 board is n
   assert.equal(b.screws, a.screws);
 });
 test("Bend: K-factor outside (0, 0.5] errors", () => { for (const k of [0, -0.1, 0.6]) { const r = computeBendAllowance({ thickness_in: 0.06, bend_angle_deg: 90, inside_radius_in: 0.125, k_factor: k, leg_a_in: 1, leg_b_in: 1 }); assert.ok(r.error, "k=" + k); } assert.ok(!computeBendAllowance({ thickness_in: 0.06, bend_angle_deg: 90, inside_radius_in: 0.125, k_factor: 0.5, leg_a_in: 1, leg_b_in: 1 }).error); });
+test("Lumber span: deflection on the LIVE load (AWC/IRC basis) -- DF-L No.2 2x10 at 16 in, 50 psf total / 40 live is 15.6 ft (table 15-7)", () => { const r = computeLumberSpan({ species_grade: "DF-L_No2", nominal_size: "2x10", total_load_psf: 50, live_load_psf: 40 }); assert.ok(Math.abs(r.allowable_span_ft - 15.6055) < 0.01); assert.ok(computeLumberSpan({ species_grade: "DF-L_No2", nominal_size: "2x10", total_load_psf: 50 }).allowable_span_ft < r.allowable_span_ft); assert.ok(computeLumberSpan({ species_grade: "DF-L_No2", nominal_size: "2x10", total_load_psf: 50, live_load_psf: 60 }).error); });
