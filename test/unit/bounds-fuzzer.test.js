@@ -55888,10 +55888,11 @@ test("bounds: spec-v1784 computeFermenterGlycolLoad -- the crash sizes the chill
   const base = { batch_volume_gal: 310, original_gravity: 1.055, final_gravity: 1.012, heat_of_fermentation_btu_per_lb: 280, peak_day_share_pct: 40, crash_start_temp_f: 68, crash_target_temp_f: 34, crash_hours: 24, tank_surface_sqft: 143, tank_u_factor: 0.15, cellar_temp_f: 70, glycol_delta_t_f: 8 };
   const r = _v1784(base); assertFiniteNumericOutputs(r, "v1784");
   assert.ok(Math.abs(r.fermentation_heat_btu - 81139.13) < 0.1);
-  assert.ok(Math.abs(r.adiabatic_rise_f - 34.622) < 1e-3);
-  assert.ok(Math.abs(r.crash_load_btuh - 4092.28) < 0.1);
-  assert.ok(Math.abs(r.fast_crash_load_btuh - 7412.36) < 0.1);
-  assert.ok(Math.abs(r.glycol_gpm - 1.1015) < 1e-3);
+  // Beer at 0.96 Btu/lb-F (ASHRAE ch. 8 Eq. 8; 0.90 until 2026-10-03).
+  assert.ok(Math.abs(r.adiabatic_rise_f - 32.458) < 1e-3);
+  assert.ok(Math.abs(r.crash_load_btuh - 4313.64) < 0.1);
+  assert.ok(Math.abs(r.fast_crash_load_btuh - 7855.08) < 0.1);
+  assert.ok(Math.abs(r.glycol_gpm - 1.1611) < 1e-3);
   assert.ok(r.crash_load_btuh > r.fermentation_load_btuh);
   for (const bad of [{ batch_volume_gal: 0 }, { final_gravity: 1.06 }, { crash_hours: 0 }, { crash_target_temp_f: 70 }, { glycol_delta_t_f: 0 }, { peak_day_share_pct: 0 }, { tank_u_factor: -1 }]) {
     assert.ok(_v1784({ ...base, ...bad }).error);

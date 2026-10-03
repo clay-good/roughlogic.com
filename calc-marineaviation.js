@@ -235,7 +235,8 @@ export function computeMarineShaftDiameter({
   const torsion_diameter_in = has_allowable ? Math.cbrt(16 * torque_inlb / (Math.PI * allowable_stress_psi)) : 0;
   // The rule diameter: d = F x cbrt(hp / rpm). ABYC P-6 writes it as the torsion
   // formula itself, D = cbrt(321,000 P SF / (S N)) with 321,000 ~ 16 x 63,025 / pi (320,984),
-  // at shear yield over a safety factor (about 5) meant to cover bending, fatigue
+  // at shear yield over a safety factor (2 light pleasure, about 5 heavy-service/diesel
+  // pleasure, about 10 commercial and high-performance, per ABYC) meant to cover bending, fatigue
   // and corrosion. Until 2026-10-01 the verdict said torsion "cannot see" bending.
   const has_rule = rule_factor > 0;
   const power_speed_root = Math.cbrt(engine_hp / shaft_rpm);
@@ -249,7 +250,7 @@ export function computeMarineShaftDiameter({
       : rules_agree
         ? "the rule and torsion diameters agree at " + fmt(rule_diameter_in, 3) + " in -- the rule IS the torsion formula at shear yield over its safety factor, so the entered allowable equals yield / SF"
       : rule_governs
-        ? "the rule diameter of " + fmt(rule_diameter_in, 3) + " in GOVERNS, against " + fmt(torsion_diameter_in, 3) + " in at the entered allowable -- " + fmt(rule_diameter_in - torsion_diameter_in, 3) + " in more, because the rule's yield / safety factor (about 5 in ABYC P-6, for bending, fatigue and corrosion) is a lower stress than the entered allowable"
+        ? "the rule diameter of " + fmt(rule_diameter_in, 3) + " in GOVERNS, against " + fmt(torsion_diameter_in, 3) + " in at the entered allowable -- " + fmt(rule_diameter_in - torsion_diameter_in, 3) + " in more, because the rule's yield / safety factor (2 to 10 by service in ABYC P-6, about 5 for diesel pleasure craft, for bending, fatigue and corrosion) is a lower stress than the entered allowable"
         : "the torsion diameter of " + fmt(torsion_diameter_in, 3) + " in exceeds the rule diameter of " + fmt(rule_diameter_in, 3) + " in, which is unusual -- check the allowable stress and the rule factor against the material and the society's table";
   const shaft_verdict = !has_shaft
     ? "(no shaft diameter entered)"
@@ -276,7 +277,7 @@ export function computeMarineShaftDiameter({
 }
 export const marineShaftDiameterExample = { inputs: { engine_hp: 350, shaft_rpm: 1200, shaft_diameter_in: 2.0, allowable_stress_psi: 12000, rule_factor: 3.4, repower_hp: 500 } };
 MARINEAVIATION_RENDERERS["marine-shaft-diameter"] = _simpleRenderer({
-  citation: "Citation: shaft torque T = 63,025 x hp / rpm and torsional stress tau = 16 T / (pi d^3) as machinery practice writes them, against the rule form d = F x cube root(hp / rpm), which ABYC P-6 writes as the same torsion formula, D = cube root(321,000 P SF / (S N)), at shear yield over a safety factor of about 5 that covers bending, fatigue and corrosion -- so the rule governs whenever the entered allowable is above yield / SF. The rule factor is ENTERED from the society's own table for the shaft material, because bronze, Aquamet and stainless allowables differ substantially. It does not compute shaft whirling or critical speed, bearing spacing, thrust and its bearing, the coupling or keyway, or alignment. ABYC P-6, the classification society's rules, and a marine engineer govern.",
+  citation: "Citation: shaft torque T = 63,025 x hp / rpm and torsional stress tau = 16 T / (pi d^3) as machinery practice writes them, against the rule form d = F x cube root(hp / rpm), which ABYC P-6 writes as the same torsion formula, D = cube root(321,000 P SF / (S N)), at shear yield over a safety factor of 2 for light pleasure service, approaching 5 for heavy-service and all diesel pleasure boats, and approaching 10 for commercial and high-performance craft (ABYC as quoted in shaft makers' data, e.g. Aqualoy Marine Shafting), covering bending, fatigue and corrosion -- so the rule governs whenever the entered allowable is above yield / SF. The rule factor is ENTERED from the society's own table for the shaft material, because bronze, Aquamet and stainless allowables differ substantially. It does not compute shaft whirling or critical speed, bearing spacing, thrust and its bearing, the coupling or keyway, or alignment. ABYC P-6, the classification society's rules, and a marine engineer govern.",
   example: marineShaftDiameterExample.inputs,
   fields: [
     { key: "engine_hp", label: "Engine power at the shaft (hp)", kind: "number", attrs: { step: "any" } },

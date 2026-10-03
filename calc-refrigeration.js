@@ -727,7 +727,7 @@ export function computeCo2TranscriticalPressure({ ambient_f = 0, gas_cooler_appr
 }
 export const co2TranscriticalPressureExample = { inputs: { ambient_f: 95, gas_cooler_approach_f: 5, evaporating_psig: 300 } };
 REFRIGERATION_RENDERERS["co2-transcritical-pressure"] = _simpleRenderer({
-  citation: "Citation: CO2's critical point at 87.8 °F and about 1,071 psia, with the widely used transcritical optimum-pressure correlation P_opt = 2.6 x T_gas-cooler-outlet + 7.54, published in bar and degC and converted here (1 bar = 100,000 Pa, 1 psi = 6,894.757293168361 Pa, both exact). The correlation applies only above the critical temperature and is withheld below it. It does not compute COP, capacity, or discharge temperature, and does not model flash-gas bypass or ejectors; the equipment manufacturer's control algorithm governs.",
+  citation: "Citation: CO2's critical point at 87.8 °F and about 1,071 psia, with the widely used transcritical optimum-pressure correlation P_opt = 2.6 x T_gas-cooler-outlet + 7.54, published in bar and degC and converted here (1 bar = 100,000 Pa, 1 psi = 6,894.757293168361 Pa, both exact). The correlation applies only above the critical temperature and is withheld below it. Secondary sources disagree whether Kauf (1999) wrote it on the gas cooler outlet or on ambient with a 2.9 K approach (2.6 x 2.9 = 7.54); read on ambient, the optimum is about 7.5 bar (110 psi) lower. It does not compute COP, capacity, or discharge temperature, and does not model flash-gas bypass or ejectors; the equipment manufacturer's control algorithm governs.",
   example: co2TranscriticalPressureExample.inputs,
   fields: [
     { key: "ambient_f", label: "Ambient temperature (°F)", kind: "number", attrs: { step: "any" } },

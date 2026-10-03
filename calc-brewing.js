@@ -659,7 +659,9 @@ export function computeFermenterGlycolLoad({ batch_volume_gal = 0, original_grav
   const extract_consumed_lb = (_points(original_gravity) - _points(final_gravity)) * batch_volume_gal / 46;
   const fermentation_heat_btu = extract_consumed_lb * heat_of_fermentation_btu_per_lb;
   const beer_lb = batch_volume_gal * 8.4;
-  const beer_specific_heat = 0.9;
+  // ASHRAE Refrigeration Handbook ch. 8 Eq. 8 gives about 0.97 for beer's 3-5% solids, and
+  // Briggs of Burton (2014) prints wort at 4.0 kJ/kg K (0.955). 0.9 until 2026-10-03.
+  const beer_specific_heat = 0.96;
   const beer_heat_capacity = beer_lb * beer_specific_heat;
   // Shell gain is area x U x (room - beer), and the beer is at a different
   // temperature in each period. spec-v1784 states that formula, then charges the
@@ -697,7 +699,7 @@ export function computeFermenterGlycolLoad({ batch_volume_gal = 0, original_grav
 
 const glycolExample = { batch_volume_gal: 310, original_gravity: 1.055, final_gravity: 1.012, heat_of_fermentation_btu_per_lb: 280, peak_day_share_pct: 40, crash_start_temp_f: 68, crash_target_temp_f: 34, crash_hours: 24, tank_surface_sqft: 143, tank_u_factor: 0.15, cellar_temp_f: 70, glycol_delta_t_f: 8 };
 BREWING_RENDERERS["fermenter-glycol-load"] = _simpleRenderer({
-  citation: "Citation: heat of fermentation about 280 Btu per lb of extract consumed, with extract = (OG - FG points) x volume / 46; the crash load = beer mass x 0.9 Btu/lb-degF x the temperature drop / the hours allowed; each load adds ambient gain through the tank shell, area x U x (cellar - beer), at the beer's temperature in that period (spec-v1784 took the fermentation-period gain at the crash target); glycol flow = load / (60 x 8.6 lb/gal x 0.9 x the glycol temperature rise). The chiller manufacturer's capacity at the actual glycol temperature governs.",
+  citation: "Citation: heat of fermentation about 280 Btu per lb of extract consumed, with extract = (OG - FG points) x volume / 46; the crash load = beer mass x 0.96 Btu/lb-degF x the temperature drop / the hours allowed; each load adds ambient gain through the tank shell, area x U x (cellar - beer), at the beer's temperature in that period (spec-v1784 took the fermentation-period gain at the crash target); glycol flow = load / (60 x 8.6 lb/gal x 0.9 x the glycol temperature rise). The chiller manufacturer's capacity at the actual glycol temperature governs.",
   example: glycolExample,
   fields: [
     { key: "batch_volume_gal", label: "Batch volume (gal)" },

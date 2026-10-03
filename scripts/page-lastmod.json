@@ -2,7 +2,7 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "90fbc1865db0bfc4",
+      "sha": "025484757c3b9796",
       "date": "2026-10-03"
     },
     "/tools/": {
@@ -1294,8 +1294,8 @@
       "date": "2026-09-29"
     },
     "/tools/co2-transcritical-pressure/": {
-      "sha": "7794733dbc5a2dc4",
-      "date": "2026-09-29"
+      "sha": "a43754d78a47b0b8",
+      "date": "2026-10-03"
     },
     "/tools/coagulant-dose/": {
       "sha": "0dd868969b3c06cf",
@@ -2882,8 +2882,8 @@
       "date": "2026-09-29"
     },
     "/tools/fermenter-glycol-load/": {
-      "sha": "48c2096ba1e7fc72",
-      "date": "2026-10-01"
+      "sha": "5d741eb8ec79ce30",
+      "date": "2026-10-03"
     },
     "/tools/fertigation-injection-rate/": {
       "sha": "749ad3b24a35db68",
@@ -4510,8 +4510,8 @@
       "date": "2026-09-29"
     },
     "/tools/marine-shaft-diameter/": {
-      "sha": "fcc4fdf359dc3830",
-      "date": "2026-10-01"
+      "sha": "687fa353303c9aec",
+      "date": "2026-10-03"
     },
     "/tools/markup/": {
       "sha": "7daf482a37a52103",
@@ -7402,8 +7402,8 @@
       "date": "2026-09-29"
     },
     "/tools/spt-required-n60/": {
-      "sha": "4388fba50cf0fb87",
-      "date": "2026-09-29"
+      "sha": "66ada6f7e0d78594",
+      "date": "2026-10-03"
     },
     "/tools/spur-gear-geometry/": {
       "sha": "0bf4dd669567eb7b",

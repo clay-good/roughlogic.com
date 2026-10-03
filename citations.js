@@ -20707,12 +20707,12 @@ export const CITATIONS = {
   },
   "spt-required-n60": {
     formula: "N60 = qa_target / qa(N60=1), the Meyerhof SPT allowable qa = [N60/4 (B <= 4 ft) or (N60/6)((B+1)/B)^2] x Kd solved for the blow count; Kd = min(1 + 0.33 D/B, 1.33).",
-    edition: "The Meyerhof SPT settlement-based allowable bearing on sand solved for the blow count, as compiled in Das, Principles of Foundation Engineering, by name.",
+    edition: "The Meyerhof (1956) SPT settlement-based allowable bearing on sand (N60/4 and (N60/6)((B+1)/B)^2 ksf; Das, Principles of Foundation Engineering, 8th ed., Eqs. 7.32-7.33, which carry no depth factor), solved for the blow count, with the depth factor Kd = 1 + 0.33 D/B (capped at 1.33) applied as in spt-bearing-capacity. Das prints that depth factor only with Bowles' (1977) modified form, N60/2.5 and N60/4 (Eqs. 7.34-7.35), which runs about 50% higher; this tile keeps the conservative original constants.",
     freeAccess: "The Meyerhof N-value allowable-bearing correlations are standard published foundation-engineering results.",
     governance: GOVERNANCE.general,
     editionNote: "The inverse of spt-bearing-capacity: the energy-corrected SPT N60 the sand must show to carry a target allowable pressure at a 1 inch settlement. Because qa is linear in N60 (both footing branches) and the depth factor Kd is independent of N60, the required N60 is the target pressure divided by the allowable at N60 = 1; round up to the next whole blow count for design. This is a settlement-controlled (serviceability) check against the boring's N-value, not the ultimate bearing capacity; N60 must be energy-corrected, and a high water table near the footing roughly halves the capacity (raising the required N60) and is not applied here. A design aid; the engineer of record and the geotechnical report govern.",
     assumptions: [
-      { name: "Blow count from pressure", value: "N60 = qa_target / qa(N60=1), qa linear in N60 in both branches", source: "Meyerhof / Das" },
+      { name: "Blow count from pressure", value: "N60 = qa_target / qa(N60=1), qa linear in N60 in both branches", source: "Meyerhof (1956) via Das Eqs. 7.32-7.33" },
       { name: "Depth factor", value: "Kd = min(1 + 0.33 D/B, 1.33), independent of N60", source: "Meyerhof" },
       { name: "Settlement-controlled", value: "1 in settlement check; N60 energy-corrected; round up for design", source: "scope of this tile" },
     ],
@@ -22137,7 +22137,7 @@ export const CITATIONS = {
   },
   "marine-shaft-diameter": {
     formula: "torque T = 63,025 hp / rpm; torsional stress tau = 16 T / (pi d^3) and the diameter that satisfies an allowable is its cube-root inverse; the classification rule diameter is d = F x cube root(hp / rpm), and the repower ratio is the cube root of the power ratio.",
-    edition: "Shaft torque and torsional stress as machinery practice writes them, against the classification-society rule form, which ABYC P-6 writes as the torsion formula itself, D = cube root(321,000 P SF / (S N)) (321,000 = 16 x 63,025 / pi), at shear yield over a safety factor of about 5 that is meant to carry bending, fatigue and corrosion. The rule factor is ENTERED from the society's table for the shaft material. It does not compute shaft whirling or critical speed, bearing spacing, thrust and its bearing, the coupling or keyway, or alignment.",
+    edition: "Shaft torque and torsional stress as machinery practice writes them, against the classification-society rule form, which ABYC P-6 writes as the torsion formula itself, D = cube root(321,000 P SF / (S N)) (321,000 = 16 x 63,025 / pi), at shear yield over a safety factor of 2 for light pleasure service, approaching 5 for heavy-service and all diesel pleasure boats, and approaching 10 for commercial and high-performance craft (ABYC as quoted in shaft makers' data, e.g. Aqualoy Marine Shafting), meant to carry bending, fatigue and corrosion. The rule factor is ENTERED from the society's table for the shaft material. It does not compute shaft whirling or critical speed, bearing spacing, thrust and its bearing, the coupling or keyway, or alignment.",
     freeAccess: "One torque relation and one published rule form.",
     governance: GOVERNANCE.general,
     editionNote: "A propeller shaft is not loaded in torsion alone. The propeller hangs on the end of an overhung shaft supported at the strut, and its weight plus hydrodynamic side loads put bending into the shaft that a torsion-only calculation misses entirely -- which is why the rule figure is almost always larger, and why both are reported here so a reader who computed the torsion number elsewhere can see what it leaves out. The cube root is what makes a repower interesting: a large power increase calls for a small proportional diameter increase, which sounds negligible and is often a whole nominal size, at which point the coupling, stern tube, bearings and stuffing box all change with it.",
@@ -23384,6 +23384,7 @@ export const CITATIONS = {
       { name: "A correlation, not a cycle model", value: "COP, capacity and discharge temperature are not computed", source: "the equipment manufacturer's control algorithm" },
       { name: "Withheld below the critical temperature", value: "the relation has no meaning where the high side condenses", source: "CO2 property data" },
       { name: "The approach is entered", value: "gas cooler approach depends on the coil and the ambient conditions", source: "the gas cooler manufacturer" },
+      { name: "Which temperature the correlation takes", value: "secondary sources disagree whether Kauf (1999) wrote it on the gas cooler OUTLET or on AMBIENT with a 2.9 K approach (2.6 x 2.9 = 7.54); read on ambient, the optimum is about 7.5 bar (110 psi) lower than shown, which sits closer to the Liao and Sawalha correlations; the original paper governs", source: "ACS Omega 2020 (PMC7409259); Purdue IRAC 2018; Brunel PhD thesis Fig. 3.13" },
     ],
   },
   "refrigeration-relief-capacity": {
@@ -24705,14 +24706,14 @@ export const CITATIONS = {
     ],
   },
   "fermenter-glycol-load": {
-    formula: "extract = (OG - FG points) x gal / 46; Q = extract x 280 Btu/lb; crash = gal x 8.4 x 0.90 x dT / hours; ambient = A x U x (cellar - beer), at the fermenting beer for the fermentation load and the crashed beer for the crash; gpm = load / (60 x 8.6 x 0.90 x glycol rise).",
+    formula: "extract = (OG - FG points) x gal / 46; Q = extract x 280 Btu/lb; crash = gal x 8.4 x 0.96 x dT / hours; ambient = A x U x (cellar - beer), at the fermenting beer for the fermentation load and the crashed beer for the crash; gpm = load / (60 x 8.6 x 0.90 x glycol rise).",
     edition: "Heat of fermentation about 280 Btu per lb of extract. The chiller manufacturer's capacity at the actual glycol temperature governs.",
     freeAccess: "Public heat-balance arithmetic.",
     governance: GOVERNANCE.general,
-    editionNote: "The adiabatic rise (20 to 40 degF observed) checks the heat figure. The crash, not fermentation, sizes the chiller. spec-v1784 states shell gain as area x U x (room - beer), then charged the fermenting tank the gain of a crashed one (70 - 34 degF) while its beer is at 68; the tile takes each period at its own beer temperature, giving a 1,395 Btu/h peak fermentation load where the spec said 2,125. The conclusion strengthens: the crash is 2.9 times the fermentation load (the spec said 1.9), and a plant sized on fermentation is 66% short (the spec said 48).",
+    editionNote: "The adiabatic rise (20 to 40 degF observed) checks the heat figure. The crash, not fermentation, sizes the chiller. spec-v1784 states shell gain as area x U x (room - beer), then charged the fermenting tank the gain of a crashed one (70 - 34 degF) while its beer is at 68; the tile takes each period at its own beer temperature, giving a 1,395 Btu/h peak fermentation load where the spec said 2,125. The conclusion strengthens: the crash is 3.1 times the fermentation load (the spec said 1.9), and a plant sized on fermentation is 68% short (the spec said 48).",
     assumptions: [
-      { name: "Beer heat capacity", value: "8.4 lb/gal x 0.9 Btu/lb-F; chiller vendors (American Chillers, Brau Supply) size the crash on water, 8.33 x 1.0, about 10% higher, and quote heat of fermentation per degree Plato per barrel rather than per lb of extract", source: "American Chillers; Brau Supply glycol sizing guides" },
-      { name: "Beer", value: "8.4 lb/gal at 0.90 Btu/lb-degF", source: "spec-v1784" },
+      { name: "Beer heat capacity", value: "8.4 lb/gal x 0.96 Btu/lb-F (ASHRAE Refrigeration Handbook ch. 8 Eq. 8 gives about 0.97 for 3-5% solids; Briggs 2014 prints wort at 4.0 kJ/kg K = 0.955); chiller vendors (American Chillers, Brau Supply) size the crash on water, 8.33 x 1.0, about 3% higher, and quote heat of fermentation per degree Plato per barrel rather than per lb of extract", source: "American Chillers; Brau Supply glycol sizing guides" },
+      { name: "Beer", value: "8.4 lb/gal at 0.96 Btu/lb-degF (0.90 until 2026-10-03)", source: "ASHRAE 1998 Refrigeration Handbook ch. 8 Eq. 8; Briggs of Burton 2014" },
       { name: "Glycol", value: "8.6 lb/gal at 0.90 Btu/lb-degF", source: "spec-v1784" },
     ],
   },
