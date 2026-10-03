@@ -7478,7 +7478,7 @@ const _renderShaftTorsion = _simpleRenderer({
     { key: "d_in", label: "Outer diameter d (in)", kind: "number" },
     { key: "di_in", label: "Inner diameter (in; 0 = solid)", kind: "number" },
     { key: "L_in", label: "Length for twist L (in, optional)", kind: "number" },
-    { key: "G_psi", label: "Shear modulus G (psi; 11.5e6 steel)", kind: "number", default: 11.5 },
+    { key: "G_psi", label: "Shear modulus G (psi; 11.5e6 steel)", kind: "number", default: 11500000 },
   ],
   outputs: [
     { key: "tau", id: "st-out-tau", label: "Max shear stress", value: (r) => fmt(r.tau_psi, 0) + " psi" },
@@ -7522,7 +7522,7 @@ const _renderShaftDiameterForTorsion = _simpleRenderer({
     { key: "T_lbin", label: "Torque T (lb-in)", kind: "number" },
     { key: "tau_allow_psi", label: "Allowable shear stress (psi)", kind: "number" },
     { key: "L_in", label: "Length for twist L (in, optional)", kind: "number" },
-    { key: "G_psi", label: "Shear modulus G (psi; 11.5e6 steel)", kind: "number", default: 11.5 },
+    { key: "G_psi", label: "Shear modulus G (psi; 11.5e6 steel)", kind: "number", default: 11500000 },
   ],
   outputs: [
     { key: "d", id: "sdt-out-d", label: "Minimum solid-shaft diameter", value: (r) => fmt(r.d_in, 3) + " in" },
@@ -8784,7 +8784,7 @@ const _v797renderConcreteYield = _simpleRenderer({
   ],
   outputs: [
     { key: "y", id: "cyld-out-y", label: "Yield produced", value: (r) => fmt(r.yield_yd3, 3) + " yd^3 (" + fmt(r.yield_ft3, 2) + " ft^3)" },
-    { key: "r", id: "cyld-out-r", label: "Relative yield", value: (r) => fmt(r.relative_yield, 3) + (r.short ? " -- SHORT load (denser than designed)" : (r.relative_yield > 1.01 ? " -- over-yield (light / high air)" : " -- on target") ) },
+    { key: "r", id: "cyld-out-r", label: "Relative yield", value: (r) => fmt(r.relative_yield, 3) + (r.relative_yield < 0.99 ? " -- SHORT load (denser than designed)" : (r.relative_yield > 1.01 ? " -- over-yield (light / high air)" : " -- on target (within 1%)") ) },
     { key: "c", id: "cyld-out-c", label: "Actual cement content", value: (r) => r.cement_content_lb_yd3 === null ? "(enter cementitious mass)" : fmt(r.cement_content_lb_yd3, 1) + " lb/yd^3" },
     { key: "n", id: "cyld-out-n", label: "Note", value: (r) => r.note },
   ],

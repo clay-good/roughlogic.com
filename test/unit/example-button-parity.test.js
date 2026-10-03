@@ -57,7 +57,7 @@ test("every inline example button types only the example's values or the compute
     if (k < 0) continue;
     let d = 0, j = k + "attachExampleButton".length;
     for (; j < body.length; j++) { if (body[j] === "(") d++; else if (body[j] === ")" && --d === 0) break; }
-    const typed = [...body.slice(k, j).matchAll(/\.value = "(-?[\d.]+)"/g)].map((x) => Number(x[1]));
+    const typed = [...body.slice(k, j).matchAll(/\.value = "(-?[\d.]+(?:e[-+]?\d+)?)"/g)].map((x) => Number(x[1]));
     if (!typed.length) continue;
     const mod = await importCalc(reg.module);
     const stem = reg.fn.replace(/^compute/, "");
@@ -70,7 +70,7 @@ test("every inline example button types only the example's values or the compute
     const allowed = numbers(mod[key].inputs);
     const fsrc = mod[reg.fn].toString();
     const sig = fsrc.slice(0, fsrc.indexOf("{", fsrc.indexOf("}") + 1));
-    for (const dflt of sig.matchAll(/\b\w+ = (-?[\d.]+)/g)) allowed.push(Number(dflt[1]));
+    for (const dflt of sig.matchAll(/\b\w+ = (-?[\d.]+(?:e[-+]?\d+)?)/g)) allowed.push(Number(dflt[1]));
     checked++;
     const stray = typed.filter((t) => !allowed.some((v) => near(t, v)));
     if (stray.length) bad.push(`${id}: button types ${JSON.stringify(stray)} not in ${key}`);
@@ -97,9 +97,9 @@ test("a blank optional field falls back to the compute's own default", () => {
     const src = readFileSync(resolve(ROOT, f), "utf8");
     const sigs = [...src.matchAll(/export function (compute\w+)\(\{([^}]*)\}/g)].map((m) => ({
       fn: m[1], at: m.index,
-      defs: Object.fromEntries([...m[2].matchAll(/(\w+)\s*=\s*(-?[\d.]+)/g)].map((d) => [d[1], Number(d[2])])),
+      defs: Object.fromEntries([...m[2].matchAll(/(\w+)\s*=\s*(-?[\d.]+(?:e[-+]?\d+)?)/g)].map((d) => [d[1], Number(d[2])])),
     }));
-    for (const m of src.matchAll(/(\w+):\s*\w+\.input\.value\s*===\s*""\s*\?\s*(-?[\d.]+)\s*:/g)) {
+    for (const m of src.matchAll(/(\w+):\s*\w+\.input\.value\s*===\s*""\s*\?\s*(-?[\d.]+(?:e[-+]?\d+)?)\s*:/g)) {
       const [, key, fb] = m;
       if (FALLBACK_REVIEWED.has(f + ":" + key)) continue;
       const before = sigs.filter((s) => key in s.defs && s.at < m.index);
@@ -135,10 +135,10 @@ test("a blank unprefilled field does not silently compute as zero against a docu
     const src = readFileSync(resolve(ROOT, f), "utf8");
     const sigs = [...src.matchAll(/export function (compute\w+)\(\{([^}]*)\}/g)].map((m) => ({
       fn: m[1], at: m.index,
-      defs: Object.fromEntries([...m[2].matchAll(/(\w+)\s*=\s*(-?[\d.]+)/g)].map((d) => [d[1], Number(d[2])])),
+      defs: Object.fromEntries([...m[2].matchAll(/(\w+)\s*=\s*(-?[\d.]+(?:e[-+]?\d+)?)/g)].map((d) => [d[1], Number(d[2])])),
     }));
     let mod = null;
-    for (const m of src.matchAll(/(\w+):\s*Number\((\w+)\.input\.value\)\s*\|\|\s*(-?[\d.]+)\b/g)) {
+    for (const m of src.matchAll(/(\w+):\s*Number\((\w+)\.input\.value\)\s*\|\|\s*(-?[\d.]+(?:e[-+]?\d+)?)\b/g)) {
       const [, key, v, fb] = m;
       if (ZERO_REVIEWED.has(f + ":" + key)) continue;
       const before = sigs.filter((s) => key in s.defs && s.at < m.index);
@@ -182,7 +182,7 @@ test("a spec-renderer number field with no prefill does not silently compute as 
     if (typeof cf !== "function") continue;
     const s = cf.toString();
     const sig = s.slice(0, s.indexOf("{", s.indexOf("}") + 1));
-    const defs = Object.fromEntries([...sig.matchAll(/(\w+)\s*=\s*(-?[\d.]+)/g)].map((d) => [d[1], Number(d[2])]));
+    const defs = Object.fromEntries([...sig.matchAll(/(\w+)\s*=\s*(-?[\d.]+(?:e[-+]?\d+)?)/g)].map((d) => [d[1], Number(d[2])]));
     const exKey = Object.keys(C).find((k) => k.toLowerCase() === reg.fn.replace(/^compute/, "").toLowerCase() + "example");
     const base = exKey && C[exKey].inputs ? { ...C[exKey].inputs } : {};
     for (const inp of R.schema.inputs) {
@@ -193,6 +193,36 @@ test("a spec-renderer number field with no prefill does not silently compute as 
       try { a = cf({ ...base }); b = cf({ ...base, [inp.key]: 0 }); } catch { continue; }
       if (!a || a.error || !b || b.error || JSON.stringify(a) === JSON.stringify(b)) continue;
       bad.push(`${id}: ${inp.key} has no default; blank computes as 0, the compute documents ${d}`);
+    }
+  }
+  assert.deepEqual(bad, []);
+});
+
+// A prefilled default must be the compute's own default (or the worked example's
+// value). 2026-10-03: a codemod read the compute default 11.5e6 as 11.5, and
+// shaft-torsion opened at a 2,887,037-degree twist until an audit caught it.
+test("a spec-renderer prefilled default equals the compute default or the example value", async () => {
+  const rmap = readFileSync(resolve(ROOT, "test/fixtures/renderer-map.js"), "utf8");
+  const bad = [];
+  for (const m of rmap.matchAll(/"([a-z0-9-]+)":\s*\{\s*module:\s*"([^"]+)",\s*exportName:\s*"(\w+)"/g)) {
+    const [, id, mod, exp] = m;
+    const reg = COMPUTE_MAP[id];
+    if (!reg) continue;
+    const R = (await importCalc(mod))[exp]?.[id];
+    if (!R?.schema) continue;
+    const C = await importCalc(reg.module);
+    const cf = C[reg.fn];
+    if (typeof cf !== "function") continue;
+    const s = cf.toString();
+    const sig = s.slice(0, s.indexOf("{", s.indexOf("}") + 1));
+    const defs = Object.fromEntries([...sig.matchAll(/(\w+)\s*=\s*(-?[\d.]+(?:e[-+]?\d+)?)/g)].map((d) => [d[1], Number(d[2])]));
+    const exKey = Object.keys(C).find((k) => k.toLowerCase() === reg.fn.replace(/^compute/, "").toLowerCase() + "example");
+    const ex = exKey && C[exKey].inputs ? C[exKey].inputs : {};
+    for (const inp of R.schema.inputs) {
+      if (inp.kind === "select" || typeof inp.default !== "number") continue;
+      const d = defs[inp.key];
+      if (d === undefined || d === 0 || near(inp.default, d) || (typeof ex[inp.key] === "number" && near(inp.default, ex[inp.key]))) continue;
+      if (Math.abs(inp.default / d) < 1e-3 || Math.abs(inp.default / d) > 1e3) bad.push(`${id}: ${inp.key} prefills ${inp.default}, the compute defaults to ${d}`);
     }
   }
   assert.deepEqual(bad, []);

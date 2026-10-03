@@ -551,13 +551,13 @@ export function computeSprinklerObstruction({ obstruction_width_in = 0, horizont
   const passes = horizontal_separation_in >= required_separation_in - 1e-9 * Math.abs(required_separation_in);
   // The second remedy is a vertical one: dropping the deflector to the obstruction's
   // bottom takes the obstruction out of the pattern instead of moving the head sideways.
-  const deflector_rise_in = obstruction_depth_in;
+  const deflector_drop_in = obstruction_depth_in;
   const remedy = passes
     ? (deficiency_in === 0 && horizontal_separation_in === required_separation_in
       ? "meets the requirement exactly, with nothing to spare"
       : "clears the requirement by " + fmt(horizontal_separation_in - required_separation_in, 1) + " in")
     : "deficient by " + fmt(deficiency_in, 1) + " in: move the sprinkler at least that far horizontally, drop the deflector the "
-      + fmt(deflector_rise_in, 1) + " in to sit at or below the obstruction's bottom, or add a sprinkler below the obstruction -- which is a design and hydraulic change, not a field adjustment";
+      + fmt(deflector_drop_in, 1) + " in to sit at or below the obstruction's bottom, or add a sprinkler below the obstruction -- which is a design and hydraulic change, not a field adjustment";
   if (![required_separation_in, deficiency_in].every(Number.isFinite)) return { error: "Obstruction-clearance math is not a finite value." };
   return {
     required_separation_in,
@@ -565,7 +565,7 @@ export function computeSprinklerObstruction({ obstruction_width_in = 0, horizont
     capped,
     deficiency_in,
     passes,
-    deflector_rise_in,
+    deflector_drop_in,
     remedy,
     note: "Whether a sprinkler sits far enough from an obstruction, by the three-times rule. A standard spray sprinkler throws its water outward and downward from the deflector, and anything hanging in that pattern casts a dry shadow behind it. The general rule for an obstruction against a wall or in the pattern is to keep the sprinkler horizontally away by at least three times the obstruction's width, capped at 24 inches -- past two feet of width the three-times rule stops growing and a different provision takes over, which is counterintuitive and is precisely why the cap exists. The rule is a screen with three outcomes and reporting all three is the point: either the sprinkler is far enough away, or it can be moved, or the deflector drops to sit at or below the obstruction's bottom so the obstruction is no longer in the pattern, or -- when none of those is possible, which is the common case with a wide duct or a continuous obstruction -- the answer is a sprinkler underneath, which is a design change and a hydraulic change rather than a field adjustment. A 12 in wide duct with the nearest sprinkler 24 in away needs min(36, 24) = 24 in and meets it exactly with nothing to spare; widen the duct to 18 in and the requirement stays at 24 in because of the cap, so the same sprinkler still passes; narrow the separation to 18 in and the head is deficient by 6 in and either moves or gains a sprinkler below it. Finding that out at rough-in is a great deal cheaper than finding it out at inspection. A screen, never a stamp; NFPA 13's obstruction provisions in full, the sprinkler manufacturer's listing, and the AHJ govern.",
   };
@@ -584,7 +584,7 @@ FIRESPRINKLER_RENDERERS["sprinkler-obstruction"] = _simpleRenderer({
   outputs: [
     { key: "r", id: "sprob-out-r", label: "Required separation", value: (r) => fmt(r.required_separation_in, 1) + " in" + (r.capped ? " (three times the width would be " + fmt(r.three_times_in, 1) + " in, capped at 24)" : "") },
     { key: "d", id: "sprob-out-d", label: "Deficiency", value: (r) => (r.deficiency_in > 0 ? fmt(r.deficiency_in, 1) + " in short" : "none") },
-    { key: "e", id: "sprob-out-e", label: "Deflector drop that clears the obstruction instead", value: (r) => fmt(r.deflector_rise_in, 1) + " in, to sit at or below the obstruction's bottom" },
+    { key: "e", id: "sprob-out-e", label: "Deflector drop that clears the obstruction instead", value: (r) => fmt(r.deflector_drop_in, 1) + " in, to sit at or below the obstruction's bottom" },
     { key: "v", id: "sprob-out-v", label: "Against the rule", value: (r) => (r.passes ? "PASSES: " : "FAILS: ") + r.remedy },
     { key: "n", id: "sprob-out-n", label: "Note", value: (r) => r.note },
   ],
