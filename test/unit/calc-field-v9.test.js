@@ -38,11 +38,11 @@ test("lightning-countdown: under 5 s = imminent-danger band", () => {
   assert.equal(r.seek_shelter, true);
 });
 
-test("lightning-countdown: 30 s flips seek_shelter to false (NWS 30-30 threshold)", () => {
-  const r29 = computeLightningCountdown({ flash_to_bang_s: 29 });
+test("lightning-countdown: 30 s or less seeks shelter (NWS 30-30 rule); 31 s does not", () => {
   const r30 = computeLightningCountdown({ flash_to_bang_s: 30 });
-  assert.equal(r29.seek_shelter, true);
-  assert.equal(r30.seek_shelter, false);
+  const r31 = computeLightningCountdown({ flash_to_bang_s: 31 });
+  assert.equal(r30.seek_shelter, true);
+  assert.equal(r31.seek_shelter, false);
 });
 
 test("lightning-countdown: above 60 s = storm-distant band", () => {

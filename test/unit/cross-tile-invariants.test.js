@@ -6399,7 +6399,8 @@ test("monotonicity: computeLightningCountdown distance_miles is strictly increas
   assert.equal(distant.seek_shelter, false);
   // Boundary pins at exactly 5, 30, 60.
   assert.ok(/seek shelter/.test(computeLightningCountdown({ flash_to_bang_s: 5 }).band));
-  assert.ok(/caution/.test(computeLightningCountdown({ flash_to_bang_s: 30 }).band));
+  assert.ok(/seek shelter/.test(computeLightningCountdown({ flash_to_bang_s: 30 }).band)); // NWS: 30 s or less
+  assert.ok(/caution/.test(computeLightningCountdown({ flash_to_bang_s: 31 }).band));
   assert.ok(/distant/.test(computeLightningCountdown({ flash_to_bang_s: 60 }).band));
   // Error pin: s <= 0 -> error.
   const bad = computeLightningCountdown({ flash_to_bang_s: 0 });
@@ -10106,8 +10107,9 @@ test("monotonicity: computeHoodExhaust Q_exhaust_cfm is strictly increasing in l
   assert.ok(noL.error, `expected error for L=0, got ${JSON.stringify(noL)}`);
   const badCls = computeHoodExhaust({ hood_type: "wall-canopy", hood_class: "III", duty: "medium", length_ft: 8 });
   assert.ok(badCls.error, `expected error for class III, got ${JSON.stringify(badCls)}`);
+  // Type II is 100 cfm per foot of length (507.5.5); width does not enter, so none is required.
   const t2NoW = computeHoodExhaust({ hood_type: "wall-canopy", hood_class: "II", length_ft: 8 });
-  assert.ok(t2NoW.error, `expected error for Type II without width, got ${JSON.stringify(t2NoW)}`);
+  assert.ok(!t2NoW.error && t2NoW.Q_exhaust_cfm === 800, `Type II without width should size by length, got ${JSON.stringify(t2NoW)}`);
 });
 
 test("monotonicity: computeMasonryCount unit_count is monotone non-decreasing in wall_area_ft2 (linear + ceiling pin); brick face area smaller than CMU face -> brick demand greater than CMU at same wall area; mortar_joint_in increase -> slightly larger face area -> slightly fewer units; waste_factor pin: unit_count = base + ceil(base * waste)", () => {

@@ -409,7 +409,7 @@ function _v184renderMotorCapacitorMax(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: NEMA MG-1 / IEEE 18 - a motor-terminal capacitor must stay below the magnetizing (no-load) kVAR = sqrt(3) x V x I_no-load / 1000, with a safety margin (default 0.90), to avoid self-excitation overvoltage. The manufacturer's max-kVAR table governs.";
   const v = makeNumber("Motor line-to-line voltage (V)", "mcm-v", { step: "any", min: "0" });
   const i = makeNumber("No-load (magnetizing) current (A)", "mcm-i", { step: "any", min: "0" });
-  const sf = makeNumber("Safety factor (default 0.90)", "mcm-sf", { step: "any", min: "0" });
+  const sf = makeNumber("Safety factor (default 0.90)", "mcm-sf", { step: "any", min: "0", value: "0.90" });
   for (const f of [v, i, sf]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { v.input.value = "480"; i.input.value = "8"; sf.input.value = "0.90"; update(); });
 

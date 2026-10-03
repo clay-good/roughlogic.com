@@ -1318,7 +1318,7 @@ export function computeSubgradeCbrThickness({ cbr_pct = 0, wheel_load_lb = 0, ti
   if (!outs.every(Number.isFinite)) return { error: "Cover-thickness math is not a finite value." };
   const verdict = needs_improvement
     ? "BELOW THE PRACTICAL FLOOR: at CBR " + fmt(cbr_pct, 1) + " the relation still returns " + fmt(thickness_in, 1) + " in, but the subgrade deforms under construction traffic regardless and aggregate punches into it. That is an undercut, a stabilization, or a designed working platform -- not more rock"
-    : "WORKABLE: CBR " + fmt(cbr_pct, 1) + " is above the practical floor of " + fmt(PRACTICAL_CBR_FLOOR, 0) + ", so " + fmt(thickness_in, 1) + " in of cover is a rock answer rather than a subgrade problem";
+    : "WORKABLE: CBR " + fmt(cbr_pct, 1) + " is at or above the practical floor of " + fmt(PRACTICAL_CBR_FLOOR, 0) + ", so " + fmt(thickness_in, 1) + " in of cover is a rock answer rather than a subgrade problem";
   return {
     cbr_pct, wheel_load_lb, tire_pressure_psi, coverages, alpha_factor,
     thickness_in, geosynthetic_reduction_pct, thickness_with_geosynthetic_in,

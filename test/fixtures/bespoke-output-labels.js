@@ -116,7 +116,7 @@ export const BESPOKE_OUTPUT_LABELS = {
   "cap-rate-dscr": {"cap_rate_percent":"Cap rate (%)","cap_band":"Cap-rate band","annual_debt_service_computed":"Debt service (computed from loan)","dscr":"DSCR","dscr_band":"DSCR band","break_even_occupancy":"Break-even occupancy"},
   "capacitor-bank-for-resonance-order": {"max_cap_bank_mvar":"Max capacitor bank","note":"Note"},
   "capacitor-discharge-time": {"input":"Resistor (max compliant or chosen)","t_discharge_s":"Discharge time to safe voltage","p_continuous_w":"Continuous power while energized","meets_code":"Meets the code time?","note":"Note"},
-  "carbon-equivalent": {"carbon_equivalent":"Carbon equivalent (IIW)","band_label":"Weldability / preheat screen","notes":"Notes"},
+  "carbon-equivalent": {"carbon_equivalent":"Carbon equivalent (AWS D1.1; IIW when Si = 0)","band_label":"Weldability / preheat screen","notes":"Notes"},
   "carpet-restore-replace": {"decision":"Decision","rationale":"Rationale"},
   "cash-conversion-cycle": {"ccc_days":"Cash conversion cycle","dio":"Breakdown"},
   "cash-on-cash": {"cash_on_cash_percent":"Cash-on-cash return (%)","band":"Band","payback_years":"Payback period (years to recover cash invested)"},

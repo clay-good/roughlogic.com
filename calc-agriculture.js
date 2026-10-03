@@ -2353,7 +2353,7 @@ export function computeHayDryMatter({ bale_weight_lb = 0, moisture_pct = 0, targ
 export const hayDryMatterExample = { inputs: { bale_weight_lb: 1200, moisture_pct: 22, target_moisture_pct: 15, safe_threshold_pct: 18 } };
 
 function renderHayDryMatter(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: first-principles dry-matter balance with USDA NRCS / land-grant extension safe-storage guidance (by name). Dry matter = weight x (1 - moisture); weight at target = dry matter / (1 - target). Safe ceiling ~18% large / 20% small (editable). The producer and extension govern.";
+  citationEl.textContent = "Citation: first-principles dry-matter balance with USDA NRCS / land-grant extension safe-storage guidance (by name). Dry matter = weight x (1 - moisture); weight at target = dry matter / (1 - target). Safe ceiling 18% by default, the large-package ceiling (enter 20% for small squares). The producer and extension govern.";
   const wt = makeNumber("Bale weight, as-baled (lb)", "hdm-wt", { step: "any", min: "0" });
   const moist = makeNumber("Measured moisture (%)", "hdm-m", { step: "any", min: "0" });
   const tgt = makeNumber("Target moisture (%)", "hdm-t", { step: "any", min: "0" });

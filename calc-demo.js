@@ -478,7 +478,7 @@ export function computeSilicaVentilationScreen({ measured_concentration_ug_m3 = 
     : controlled_over_pel
       ? "STILL OVER at " + fmt(controlled_twa_ug_m3, 1) + " with a " + fmt(control_efficiency_pct, 0) + "% control -- " + fmt(required_efficiency_pct, 0) + "% is what this exposure needs"
       : "CONTROLLED to " + fmt(controlled_twa_ug_m3, 1) + " with a " + fmt(control_efficiency_pct, 0) + "% control, under the " + fmt(pel_ug_m3, 0) + " PEL"
-        + (max_task_minutes_controlled === null ? "" : ", and the task could run " + fmt(max_task_minutes_controlled, 0) + " min at that control");
+        + (max_task_minutes_controlled === null ? "" : max_task_minutes_controlled >= REFERENCE_MINUTES ? ", and the task could run the full shift at that control" : ", and the task could run " + fmt(max_task_minutes_controlled, 0) + " min at that control");
   return {
     measured_concentration_ug_m3, sample_minutes, shift_minutes, twa_ug_m3,
     pel_ug_m3, action_level_ug_m3, pel_ratio, over_pel, over_action_level,

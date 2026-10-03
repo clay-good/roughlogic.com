@@ -3605,7 +3605,7 @@ export function computeAmbientAmpacityAdjust({
   if (!(base > 0)) return { error: "Base ampacity must be positive (A; from your NEC 310.16 column)." };
   if (![60, 75, 90].includes(col)) return { error: "Temperature column must be 60, 75, or 90 C." };
   if (!Number.isFinite(amb)) return { error: "Ambient temperature is required (C)." };
-  if (amb < -10) return { error: "Ambient below -10 C is outside the bundled 310.15(B)(1) table." };
+  // The 310.15(B)(1) first row is "10 C or less", so any colder ambient takes it.
   if (!(n >= 1)) return { error: "Conductor count must be at least 1." };
 
   const table = _AMBIENT_FACTORS[col];
@@ -3619,7 +3619,7 @@ export function computeAmbientAmpacityAdjust({
   }
 
   const warnings = [];
-  if (n > 40) warnings.push("More than 40 current-carrying conductors is outside the standard 310.15(C)(1) table; the 0.35 floor is applied.");
+  if (n > 40) warnings.push("41 or more current-carrying conductors takes the 310.15(C)(1) '41 and above' factor of 35%.");
   const fill_factor = _fillFactor(n);
   const combined_factor = ambient_factor * fill_factor;
   const adjusted_ampacity_a = base * combined_factor;

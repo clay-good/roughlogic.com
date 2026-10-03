@@ -852,7 +852,7 @@ function _v57renderEqualSpacing(inputRegion, outputRegion, citationEl) {
     { value: "max-gap", label: "Count from a maximum gap" },
     { value: "count", label: "Gap from a desired count" },
   ]);
-  const gmax = makeNumber("Maximum gap (in)", "es-gmax", { step: "any", min: "0", value: "4" }); gmax.input.value = "4";
+  const gmax = makeNumber("Maximum gap (in; just under the 4 in sphere)", "es-gmax", { step: "any", min: "0", value: "3.875" }); gmax.input.value = "3.875";
   const count = makeNumber("Desired count", "es-count", { step: "1", min: "1" });
   for (const f of [run, w, mode, gmax, count]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { run.input.value = "60"; w.input.value = "1.5"; mode.select.value = "max-gap"; gmax.input.value = "4"; count.input.value = ""; update(); });

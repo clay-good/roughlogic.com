@@ -391,7 +391,7 @@ export function computeGrainAerationAirflow({ bin_capacity_bu = 0, airflow_rate 
 export const grainAerationAirflowExample = { inputs: { bin_capacity_bu: 20000, airflow_rate: 0.15 } };
 
 function _v569renderGrainAerationAirflow(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: stored-grain aeration fan airflow (MWPS / university extension; Shedd airflow-resistance curves), by name. required_cfm = rate_cfm_per_bu x bushels; cooling_hours = 15 / rate (per cooling front). Bands: aeration cooling 0.1-0.25 cfm/bu, natural-air drying 0.5-1.0 cfm/bu. Static pressure rises steeply with depth and fan power grows ~fourfold when the rate or depth doubles - read the fan curve at the actual static pressure. The fan selection and grain condition govern.";
+  citationEl.textContent = "Citation: stored-grain aeration fan airflow (MWPS / university extension; Shedd airflow-resistance curves), by name. required_cfm = rate_cfm_per_bu x bushels; cooling_hours = 15 / rate (per cooling front). Bands: aeration cooling 0.1-0.25 cfm/bu, natural-air drying 0.5-1.0 cfm/bu. Static pressure rises steeply with depth and fan power grows ~4-5x when the rate doubles and ~8-10x when the depth doubles - read the fan curve at the actual static pressure. The fan selection and grain condition govern.";
   const bu = makeNumber("Stored grain (bushels)", "gaa-bu", { step: "any", min: "0" });
   const rate = makeNumber("Target airflow (cfm/bu, 0.1-0.25 cool, 0.5-1.0 dry)", "gaa-rate", { step: "any", min: "0" });
   for (const f of [bu, rate]) inputRegion.appendChild(f.wrap);

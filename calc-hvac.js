@@ -2597,7 +2597,7 @@ export function computeHoodExhaust({
   let Q_cfm = 0;
   let cfm_per_ft = 0;
   if (hood_class === "II") {
-    if (W <= 0) return { error: "Type II vapor-only hood requires positive width (ft)." };
+    // Type II is 100 cfm per foot of length (507.5.5); width does not enter.
     cfm_per_ft = TYPE_II_HOOD_CFM_PER_FT;
     Q_cfm = cfm_per_ft * L;
     warnings.push("Type II: the 100 cfm/ft rate is IMC 507.5.5's minimum for hoods over DISHWASHING appliances; the code sets no rate for other Type II hoods (ovens, steam kettles), where the hood listing governs. Greasy effluent requires a Type I hood.");
@@ -2660,7 +2660,7 @@ function renderHoodExhaust(inputRegion, outputRegion, citationEl) {
     { value: "extra-heavy", label: "Extra-heavy (solid-fuel, mesquite)" },
   ]);
   const len = makeNumber("Hood length (ft)", "he-len", { step: "any", min: "0" });
-  const wid = makeNumber("Hood width (ft; Type II only)", "he-wid", { step: "any", min: "0" });
+  const wid = makeNumber("Hood width (ft; for the record only: both hood types size by length)", "he-wid", { step: "any", min: "0" });
   const vel = makeNumber("Duct velocity (fpm; default 1500)", "he-vel", { step: "any", min: "0", value: "1500" });
   vel.input.value = "1500";
   for (const f of [cls, ht, duty, len, wid, vel]) inputRegion.appendChild(f.wrap);

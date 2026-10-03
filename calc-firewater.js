@@ -223,12 +223,12 @@ export function computeDraftLiftMax({ site_elevation_ft = 0, pump_factor = 0.667
   const attainable_lift_ft = factor * theoretical_lift_ft - loss;
   return {
     theoretical_lift_ft, attainable_lift_ft,
-    note: "A real pump cannot pull a perfect vacuum, so about two-thirds of theoretical is the practical ceiling (about 22.5 ft at sea level), and every 1,000 ft of altitude shaves another foot. Lift is limited by atmospheric pressure pushing water up the suction, not the pump pulling it, so a bigger pump does not help; over the attainable lift you must resite the pump lower. 1 in Hg of vacuum is about 1.13 ft of lift. A planning aid, not incident command.",
+    note: "A real pump cannot pull a perfect vacuum, so about two-thirds of theoretical is the practical ceiling (about 22.5 ft at sea level), and every 1,000 ft of altitude takes about a foot off the theoretical lift (about two-thirds of a foot off the attainable). Lift is limited by atmospheric pressure pushing water up the suction, not the pump pulling it, so a bigger pump does not help; over the attainable lift you must resite the pump lower. 1 in Hg of vacuum is about 1.13 ft of lift. A planning aid, not incident command.",
   };
 }
 export const draftLiftMaxExample = { inputs: { site_elevation_ft: 3000, pump_factor: 0.667, suction_losses_ft: 0 } };
 function renderDraftLiftMax(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Notice: A planning aid, not incident command. Citation: IFSTA / NWCG firefighter math altitude-corrected drafting maximum lift, by name. theoretical = 33.9 - elevation / 1000; attainable = factor x theoretical - suction losses (factor about 2/3). 1 in Hg of vacuum is about 1.13 ft of lift. A real pump cannot pull a perfect vacuum, so about two-thirds of theoretical (about 22.5 ft at sea level) is the ceiling, and every 1,000 ft of altitude shaves another foot; lift is set by atmosphere pushing water up the suction, not the pump.";
+  citationEl.textContent = "Notice: A planning aid, not incident command. Citation: IFSTA / NWCG firefighter math altitude-corrected drafting maximum lift, by name. theoretical = 33.9 - elevation / 1000; attainable = factor x theoretical - suction losses (factor about 2/3). 1 in Hg of vacuum is about 1.13 ft of lift. A real pump cannot pull a perfect vacuum, so about two-thirds of theoretical (about 22.5 ft at sea level) is the ceiling, and every 1,000 ft of altitude takes about a foot off the theoretical lift (about two-thirds of a foot off the attainable); lift is set by atmosphere pushing water up the suction, not the pump.";
   const elev = makeNumber("Site elevation (ft above sea level)", "draft-elev", { step: "any", min: "0" });
   const factor = makeNumber("Pump condition factor (0-1, default 0.667)", "draft-factor", { step: "any", min: "0", max: "1" });
   const loss = makeNumber("Strainer / suction losses (ft, 0 if unknown)", "draft-loss", { step: "any", min: "0" });

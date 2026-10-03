@@ -31,7 +31,7 @@ test("noise-dose: 85 dBA continuous for 8 hr ~ 50% dose (action level)", () => {
   const r = computeNoiseDose({ rows: [{ level_dBA: 85, hours: 8 }] });
   // T_85 = 8 / 2^(-1) = 16 hr; D = 8/16 * 100 = 50%
   assert.ok(closePct(r.total_dose_pct, 50, 0.5));
-  assert.equal(r.pass_action_level_85, true);
+  assert.equal(r.pass_action_level_85, false); // 1910.95(c)(1): "equals or exceeds" 85 dBA triggers the program
   assert.equal(r.pass_pel_90, true);
 });
 

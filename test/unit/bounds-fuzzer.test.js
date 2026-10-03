@@ -7810,7 +7810,7 @@ test("bounds: calc-hvac computeHoodExhaust pins IMC 507.5.1-507.5.4 Q = cfm_per_
   // Rejections.
   assert.ok("error" in computeHoodExhaust({ hood_class: "I", hood_type: "wall-canopy", duty: "heavy", length_ft: 0 }));
   assert.ok("error" in computeHoodExhaust({ hood_class: "III", length_ft: 8 }));
-  assert.ok("error" in computeHoodExhaust({ hood_class: "II", length_ft: 6 })); // width missing
+  assert.ok(!("error" in computeHoodExhaust({ hood_class: "II", length_ft: 6 }))); // Type II sizes by length; width not needed
   assert.ok("error" in computeHoodExhaust({ hood_class: "I", hood_type: "not-real", duty: "heavy", length_ft: 8 }));
   assert.ok("error" in computeHoodExhaust({ hood_class: "I", hood_type: "backshelf", duty: "extra-heavy", length_ft: 8 })); // disallowed duty
 });
@@ -35506,7 +35506,9 @@ test("bounds: spec-v1146 computeWaterServicePressureCheck pins the 80 psi cap, t
   // Present control satisfies it.
   assert.ok(_v1146({ ...base, expansion_control_present: "yes" }).passes);
   // Delivered pressure follows the setpoint only where a PRV is actually required.
-  assert.ok(_v1146({ ...base, static_pressure_psi: 65, prv_setpoint_psi: 50 }).delivered_psi === 65, "a setpoint on an uncapped service does not reduce the reported pressure");
+  // A fitted PRV regulates and closes the system at any static pressure (IPC 607.3).
+  const fitted = _v1146({ ...base, static_pressure_psi: 65, prv_setpoint_psi: 50 });
+  assert.ok(fitted.delivered_psi === 50 && fitted.closed_system, "a fitted PRV sets the delivered pressure and closes the system");
   assert.ok(_v1146({ ...base, prv_setpoint_psi: 0 }).delivered_psi === 95);
   // Headroom is exact and can go negative.
   for (const mf of [0, 20, 45, 80]) {

@@ -32,7 +32,7 @@ export const BESPOKE_OUTPUT_BOOLS = {
   "motor-overload-sizing": {"hi_class":{"t":"higher (SF >= 1.15 or rise <= 40 degC): 125% base","f":"lower (unmarked or outside): 115% base"}},
   "motor-unbalance-derate": {"do_not_operate":{"t":"DO NOT OPERATE (over 5% unbalance)","f":"Derate and run; correct the unbalance source"}},
   "nfa-fireground-flow": {"valid":{"t":"YES - offensive attack within the formula's range","f":"NO - over ~50% involved or ~1,000 gpm; go defensive, use ISO / required-fire-flow"}},
-  "noise-dose": {"pass_action_level_85":{"t":"PASS (<= 50% dose)","f":"EXCEEDED (engineering controls + monitoring required)"},"pass_pel_90":{"t":"PASS (<= 100% dose)","f":"EXCEEDED (hearing-protection mandatory)"}},
+  "noise-dose": {"pass_action_level_85":{"t":"PASS (< 50% dose)","f":"REACHED (hearing conservation program required: monitoring, audiometry, protectors available)"},"pass_pel_90":{"t":"PASS (<= 100% dose)","f":"EXCEEDED (hearing-protection mandatory)"}},
   "pipe-partial-flow-depth": {"self_cleansing":{"t":"YES (at or above 2 ft/s)","f":"NO - below 2 ft/s, solids may settle"}},
   "power-screw-torque": {"self_locking":{"t":"Yes - holds the load with no brake","f":"No - the load runs the screw back down"}},
   "pv-ballast-weight": {"pass":{"t":"PASS (at or under the allowable)","f":"OVER -- re-check with the engineer"}},

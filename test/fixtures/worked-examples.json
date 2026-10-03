@@ -1552,7 +1552,7 @@
   {
    "tile_id": "van-der-waals",
    "source_publisher": "van der Waals equation of state (CRC Handbook constants)",
-   "source_title": "CO2, 1 mol in 1 L at 0 C -> P_real 19.77 atm, Z 0.882 (spec-v1258)",
+   "source_title": "CO2, 1 mol in 1 L at 0 C -> P_real 19.82 atm, Z 0.884 (spec-v1258)",
    "source_edition_or_year": "P = nRT/(V - nb) - a n^2/V^2; a = 3.640, b = 0.04267 for CO2",
    "source_section_or_page": "P = (1 x 0.0820573 x 273.15)/(1 - 0.04267) - (3.640/1.01325)/1 = 23.413 - 3.592 = 19.821 atm (CRC a = 3.640 L^2 bar/mol^2 = 3.592 L^2 atm/mol^2); ideal 22.414 atm; Z = 19.821/22.414 = 0.884 (attraction dominates near condensation).",
    "verified_by": "rl",
@@ -37602,7 +37602,7 @@
   {
    "tile_id": "digester-vs-loading",
    "source_publisher": "WEF / university operator courses",
-   "source_title": "a richer feed overloads at the same flow",
+   "source_title": "a richer feed doubles the loading at the same flow (near, not over, the 400 ceiling)",
    "source_edition_or_year": "WEF",
    "source_section_or_page": "Same flow at 8% TS -> 7506 lb/day, VSLR 375 (near the 400 ceiling)",
    "verified_by": "rl",
@@ -39070,7 +39070,7 @@
   {
    "tile_id": "cmu-grout-volume",
    "source_publisher": "TMS 602 / ACI 530.1, NCMA TEK",
-   "source_title": "same wall fully grouted at 16 in oc -> 0.94 yd^3",
+   "source_title": "same wall grouted at 16 in oc (every other cell) -> 0.94 yd^3",
    "source_edition_or_year": "spec-v212 worked example (machine-verified)",
    "source_section_or_page": "spec-v212 section 2.1 cross-check (full grout, every cell)",
    "verified_by": "rl",
@@ -62882,7 +62882,7 @@
   {
    "tile_id": "concrete-corbel-bracket",
    "source_publisher": "ACI 318-19 Section 16.5 (brackets and corbels)",
-   "source_title": "Asc = max(Af + An, (2/3)Avf + An); Nuc = max(input, 0.2 Vu)",
+   "source_title": "Asc = max(Af + An, (2/3)Avf + An, 0.04 (f'c/fy) b d); Nuc = max(input, 0.2 Vu)",
    "source_edition_or_year": "ACI 318-19",
    "source_section_or_page": "Vu 40k, av 4, d 12, h 14, b 14, fc 4000, fy 60k -> Nuc 8k, Asc 0.601 (shear-friction), phiVn 100.8k",
    "verified_by": "rl",
@@ -91513,7 +91513,7 @@
   {
    "tile_id": "sweep-width-correction",
    "source_publisher": "IAMSAR Manual Vol. II / US National SAR Supplement",
-   "source_title": "cross-check: good visibility, fatigue only",
+   "source_title": "cross-check: good visibility (weather 0.9) and fatigue 0.9",
    "source_edition_or_year": "IAMSAR / US National SAR Supplement practice",
    "source_section_or_page": "250 ft raw width, weather 0.9, speed 1.0, fatigue 0.9 -> total 0.81, corrected 202.5 ft, 19% reduction",
    "verified_by": "rl",
@@ -92498,7 +92498,7 @@
   {
    "tile_id": "corner-bead-takeoff",
    "source_publisher": "takeoff arithmetic",
-   "source_title": "cross-check: the LF division governs when runs are long vs stock",
+   "source_title": "cross-check: 9 ft corners on 8 ft stock take two sticks each, so the per-run floor (6) beats the LF division (4)",
    "source_edition_or_year": "trade practice",
    "source_section_or_page": "3 corners x 9 ft on 8-ft stock, no wraps, 0% waste -> 27 LF -> ceil 4 by LF; per-run 3 x ceil(9/8) = 6 governs (each 9-ft corner takes 2 sticks)",
    "verified_by": "rl",

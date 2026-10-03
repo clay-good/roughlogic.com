@@ -329,17 +329,18 @@ test("ambient-adjust: each temperature column has the correct 31-35 C factor", (
   assert.strictEqual(computeAmbientAmpacityAdjust({ base_ampacity_a: 100, temp_column: 90, ambient_c: 35, conductor_count: 1 }).ambient_factor, 0.96);
 });
 
-test("ambient-adjust: more than 40 conductors applies the 0.35 floor with a warning", () => {
+test("ambient-adjust: 41 or more conductors takes the 310.15(C)(1) '41 and above' factor of 35%", () => {
   const r = computeAmbientAmpacityAdjust({ base_ampacity_a: 100, temp_column: 75, ambient_c: 30, conductor_count: 45 });
   assert.strictEqual(r.fill_factor, 0.35);
-  assert.ok(r.warnings.some((w) => w.includes("40")));
+  assert.ok(r.warnings.some((w) => w.includes("41 and above")));
 });
 
-test("ambient-adjust: rejection paths (zero base, bad column, ambient above column range, below -10 C)", () => {
+test("ambient-adjust: rejection paths (zero base, bad column, ambient above column range; a cold ambient takes the first row)", () => {
   assert.ok("error" in computeAmbientAmpacityAdjust({ base_ampacity_a: 0, temp_column: 75, ambient_c: 30 }));
   assert.ok("error" in computeAmbientAmpacityAdjust({ base_ampacity_a: 50, temp_column: 70, ambient_c: 30 }));
   assert.ok("error" in computeAmbientAmpacityAdjust({ base_ampacity_a: 50, temp_column: 60, ambient_c: 58 }));
-  assert.ok("error" in computeAmbientAmpacityAdjust({ base_ampacity_a: 50, temp_column: 75, ambient_c: -20 }));
+  // The 310.15(B)(1) first row is "10 C or less", so -20 C takes it rather than erroring.
+  assert.ok(!("error" in computeAmbientAmpacityAdjust({ base_ampacity_a: 50, temp_column: 75, ambient_c: -20 })));
 });
 
 // ---------------------------------------------------------------------------

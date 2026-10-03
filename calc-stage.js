@@ -764,7 +764,7 @@ STAGE_RENDERERS["spl-atmospheric"] = renderSPLAtmospheric;
 // ===========================================================================
 
 // --- v20 N.1: Power distro per-leg loading (`power-distro`) ---
-// 1-phase I = W/(V*PF); 3-phase I = W/(sqrt(3)*V_LL*PF); continuous limit = rating*0.80.
+// 1-phase I = W/(V*PF); 3-phase I = W/(sqrt(3)*V_LL*PF); continuous limit = rating x the entered continuous-derate target (0.80 for the NEC 80% rule).
 // dims: in { watts: M*L^2*T^-3, voltage_v: M*L^2*T^-3*I^-1, phase: dimensionless, rating_a: I, pf: dimensionless, derate: dimensionless } out: { amps_per_leg: I, pct_load: dimensionless }
 export function computePowerDistro({ watts = 0, voltage_v = 208, phase = "three", rating_a = 0, pf = 1, derate = 0.8 } = {}) {
   const W = Number(watts) || 0;
@@ -788,7 +788,8 @@ export function computePowerDistro({ watts = 0, voltage_v = 208, phase = "three"
     continuous_limit_a: Number.isFinite(continuousLimit) ? continuousLimit : null,
     headroom_a: Number.isFinite(headroom) ? headroom : null,
     pass: amps <= continuousLimit + 1e-9 * Math.abs(continuousLimit),
-    note: "Assumes balanced legs unless per-phase entered. Ignores inrush / dimmer harmonics on the neutral. PF < 1 for LED/motor loads raises current. NEC continuous-load 80% rule and temporary-power Articles 520/525 govern.",
+    derate: der,
+    note: "Assumes balanced legs (per-phase loads are not entered). Ignores inrush / dimmer harmonics on the neutral. PF < 1 for LED/motor loads raises current. NEC continuous-load 80% rule and temporary-power Articles 520/525 govern.",
   };
 }
 export const powerDistroExample = { inputs: { watts: 12000, voltage_v: 208, phase: "three", rating_a: 60, pf: 1, derate: 0.8 } };
@@ -811,7 +812,7 @@ function renderPowerDistro(inputRegion, outputRegion, citationEl) {
     const r = computePowerDistro({ watts: readNum(w.input), voltage_v: readNum(v.input), phase: phase.select.value, rating_a: readNum(rating.input), pf: readNum(pf.input), derate: readNum(der.input) });
     if (r.error) { oAmps.textContent = r.error; oPct.textContent = ""; oNote.textContent = ""; return; }
     oAmps.textContent = fmt(r.amps_per_leg, 1) + " A/leg (" + fmt(r.headroom_a, 1) + " A headroom)";
-    oPct.textContent = fmt(r.pct_load, 1) + "% of rating - " + (r.pass ? "PASS (within 80%)" : "FAIL (over continuous limit)");
+    oPct.textContent = fmt(r.pct_load, 1) + "% of rating - " + (r.pass ? "PASS (within the " + fmt(r.derate * 100, 0) + "% continuous target)" : "FAIL (over continuous limit)");
     oNote.textContent = r.note;
   }, DEBOUNCE_MS);
   for (const f of [w.input, v.input, phase.select, rating.input, pf.input, der.input]) f.addEventListener("input", update);

@@ -2958,7 +2958,7 @@ export function computeBackflowSizing({
 export const backflowSizingExample = {
   // High-hazard cross-connection, user picked a double-check, 2 in service
   // at 100 GPM, 70 psi upstream. The screen overrides to RP (high hazard);
-  // RP 2 in at 100 GPM loses ~7 psi, leaving 63 psi downstream.
+  // RP 2 in at 100 GPM loses ~11.5 psi, leaving 58.5 psi downstream.
   inputs: { service_flow_gpm: 100, hazard: "high", assembly_type: "DC", pipe_size_in: "2", upstream_pressure_psi: 70 },
 };
 
@@ -2983,7 +2983,7 @@ function _v16p_renderBackflowSizing(inputRegion, outputRegion, citationEl) {
     { value: "2", label: "2 in" },
   ]);
   const up = makeNumber("Upstream supply pressure (psi)", "bs-up", { step: "any", min: "0" });
-  const minRes = makeNumber("Minimum residual required (psi)", "bs-res", { step: "any", min: "0" });
+  const minRes = makeNumber("Minimum residual required (psi)", "bs-res", { step: "any", min: "0", value: "20" });
   for (const f of [flow, hazard, assembly, size, up, minRes]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => {
     flow.input.value = "100"; hazard.select.value = "high"; assembly.select.value = "DC";

@@ -412,7 +412,7 @@ export function computeFumeHoodFaceVelocity({
   const has_cost = has_energy && hours_per_year > 0 && energy_cost_per_mmbtu > 0;
   const annual_cost = has_cost ? heating_btuh * hours_per_year / 1e6 * energy_cost_per_mmbtu : 0;
   const energy_verdict = !has_energy
-    ? "(no heating rise and alternative sash entered)"
+    ? (has_alt && extra_cfm < 0 ? "the alternative sash is lower -- it exhausts " + fmt(-extra_cfm, 0) + " cfm less, so there is no extra air to heat" : has_alt && extra_cfm === 0 ? "the alternative sash is the same height, so there is no extra air to heat" : "(no heating rise and alternative sash entered)")
     : "heating that extra " + fmt(extra_cfm, 0) + " cfm through a " + fmt(heating_rise_f, 0) + " degF rise is " + fmt(heating_btuh / 1000, 1) + " kBTU/h"
       + (has_cost ? ", or " + fmt(annual_cost, 0) + " a year over " + fmt(hours_per_year, 0) + " hours at " + fmt(energy_cost_per_mmbtu, 2) + " per MMBTU -- for one hood, from a sash nobody closed" : " -- and that is one hood, continuously, from a sash nobody closed");
   const containment_verdict = "AND FACE VELOCITY IS A SURROGATE, NOT THE MEASUREMENT. It is easy to read with an anemometer and it correlates loosely with containment, which is why it became the field check -- but what actually matters is whether the hood keeps contaminants inside it, and that is what ASHRAE 110 tracer gas testing determines. A hood can pass a face velocity survey and fail containment because of cross-drafts from a door or a diffuser, a person walking past, clutter blocking the rear baffle, or equipment set too close to the face";

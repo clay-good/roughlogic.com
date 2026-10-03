@@ -483,13 +483,13 @@ export function computeFurnaceTempRise({ return_air_F = 0, supply_air_F = 0, inp
 }
 export const furnaceTempRiseExample = { inputs: { return_air_F: 70, supply_air_F: 120, input_btuh: 100000, efficiency_pct: 80, rise_min_F: 40, rise_max_F: 70 } };
 HVACSERVICE_RENDERERS["furnace-temp-rise"] = _simpleRenderer({
-  citation: "Citation: first-principles sensible-heat relation Qs = 1.08 x CFM x delta-T solved for airflow, with output = input x efficiency (public); the 1.08 sea-level air factor and the default 80% efficiency are editable. The rating-plate temperature-rise range and the equipment manufacturer govern.",
+  citation: "Citation: first-principles sensible-heat relation Qs = 1.08 x CFM x delta-T solved for airflow, with output = input x efficiency (public); the 1.08 sea-level air factor is fixed; the efficiency (default 80%) is editable. The rating-plate temperature-rise range and the equipment manufacturer govern.",
   example: furnaceTempRiseExample.inputs,
   fields: [
     { key: "return_air_F", label: "Return-air temp (°F)", kind: "number" },
     { key: "supply_air_F", label: "Supply-air temp (°F)", kind: "number" },
     { key: "input_btuh", label: "Furnace input (BTU/hr)", kind: "number" },
-    { key: "efficiency_pct", label: "Efficiency (%)", kind: "number" },
+    { key: "efficiency_pct", label: "Efficiency (%)", kind: "number", default: 80 },
     { key: "rise_min_F", label: "Plate min rise (°F)", kind: "number", default: 40 },
     { key: "rise_max_F", label: "Plate max rise (°F)", kind: "number", default: 70 },
   ],

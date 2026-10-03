@@ -792,7 +792,7 @@ export function computeCondenserCopForHeatRejection({ q_evap = 0, target_thr = 0
 export const condenserCopForHeatRejectionExample = { inputs: { q_evap: 60000, target_thr: 100000, unit_tons: 0 } };
 
 function _renderCondenserCopForHeatRejection(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: total heat of rejection THR = Q_evap (1 + 1/COP) solved for the COP: COP = Q_evap / (THR - Q_evap); compressor work W_comp = THR - Q_evap. Hermetic motor heat inflates the measured THR and lowers the apparent COP. An engineering aid; the rated heat-of-rejection data govern.";
+  citationEl.textContent = "Citation: total heat of rejection THR = Q_evap (1 + 1/COP) solved for the COP: COP = Q_evap / (THR - Q_evap); compressor work W_comp = THR - Q_evap. A hermetic compressor's motor heat is in the measured THR, so the implied COP is the electrical COP; an open-drive compressor rejects its motor losses to the room, so its implied COP reads high. An engineering aid; the rated heat-of-rejection data govern.";
   const q = makeNumber("Evaporator capacity (tons, or Btu/h if unit set to 0)", "ccp-q", { step: "any", min: "0" });
   const unit = makeSelect("Capacity unit", "ccp-unit", [{ value: "1", label: "Tons" }, { value: "0", label: "Btu/h" }]);
   const thr = makeNumber("Total heat of rejection (same unit as capacity)", "ccp-thr", { step: "any", min: "0" });
@@ -1083,7 +1083,7 @@ export function computeFlashGasSubcool({ vertical_lift_ft = 0, friction_dp_psi =
   const meets_target = required_subcool_f >= 8 - 1e-9 * Math.abs(8) && required_subcool_f <= 12 + 1e-9 * Math.abs(12);
   return {
     dp_lift_psi, dp_total_psi, required_subcool_f, meets_target,
-    note: "Techs often credit only the friction and forget the 0.43 psi/ft vertical-lift column, which dominates on a tall riser. Liquid-line heat gain also flashes liquid. Subcooling should be measured at the metering device, not the condenser outlet. The 5 psi/degF P-T slope flattens at higher pressure (an approximation). Add margin to reach the 8 to 12 F field target. The manufacturer data and the actual refrigerant govern - a design aid, not a commissioning measurement.",
+    note: "Techs often credit only the friction and forget the 0.43 psi/ft vertical-lift column, which dominates on a tall riser. Liquid-line heat gain also flashes liquid. Subcooling should be measured at the metering device, not the condenser outlet. The ~5 psi/degF P-T slope (R-410A near 100 F condensing) steepens at higher condensing pressure and flattens at lower; enter the slope at the actual condensing temperature. Add margin to reach the 8 to 12 F field target. The manufacturer data and the actual refrigerant govern - a design aid, not a commissioning measurement.",
   };
 }
 export const flashGasSubcoolExample = { inputs: { vertical_lift_ft: 40, friction_dp_psi: 15, static_gradient: 0.43, pt_slope: 5 } };

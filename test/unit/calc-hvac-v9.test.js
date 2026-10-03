@@ -113,9 +113,10 @@ test("hood-exhaust: Type II vapor-only at 100 cfm/ft with greasy-effluent warnin
   assert.ok(r.warnings.some((w) => /greasy effluent/i.test(w)));
 });
 
-test("hood-exhaust: Type II requires positive width", () => {
+test("hood-exhaust: Type II sizes by length alone (IMC 507.5.5, 100 cfm per ft); width is not required", () => {
   const r = computeHoodExhaust({ hood_class: "II", length_ft: 10 });
-  assert.match(r.error, /width/);
+  assert.ok(!r.error);
+  assert.equal(r.Q_exhaust_cfm, 1000);
 });
 
 test("hood-exhaust: length below 4 ft and above 16 ft warned", () => {

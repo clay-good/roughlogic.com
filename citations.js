@@ -690,13 +690,13 @@ export const CITATIONS = {
   },
 
   "power-distro": {
-    formula: "1-phase I = W/(V*PF); 3-phase I = W/(sqrt(3)*V_LL*PF); %load = I/rating*100; continuous limit = rating*0.80.",
+    formula: "1-phase I = W/(V*PF); 3-phase I = W/(sqrt(3)*V_LL*PF); %load = I/rating*100; continuous limit = rating x the entered continuous-derate target (0.80 for the NEC 80% rule).",
     edition: "First-principles AC power (P = V*I*PF; 3-phase adds sqrt(3)); the NEC continuous-load 80% rule and temporary-power Articles 520/525, by name.",
     freeAccess: "NFPA 70 free read-only at nfpa.org/freeaccess; a qualified electrician and the AHJ govern temporary power.",
     governance: GOVERNANCE.electrical,
-    editionNote: "Assumes balanced legs unless per-phase entered; ignores inrush / dimmer harmonics on the neutral. Distinct from neutral-imbalance.",
+    editionNote: "Assumes balanced legs (per-phase loads are not entered); ignores inrush / dimmer harmonics on the neutral. Distinct from neutral-imbalance.",
     assumptions: [
-      { name: "Balanced legs", value: "per-leg current assumes a balanced load unless per-phase watts are entered", source: "AC power" },
+      { name: "Balanced legs", value: "per-leg current assumes a balanced load (per-phase loads are not entered)", source: "AC power" },
     ],
   },
 
@@ -866,7 +866,7 @@ export const CITATIONS = {
     edition: "Camp-Stein velocity gradient, tapered multi-stage schedule (Camp & Stein 1943; Ten States Standards), by name.",
     freeAccess: "The velocity-gradient relation is a public water-treatment result; the viscosity comes from a standard water-property table and the treatment-process design governs.",
     governance: GOVERNANCE.general,
-    editionNote: "A tapered schedule decreases G stage to stage - the vigorous first stage builds many small flocs and each gentler stage grows them without the shear that would tear them apart; each stage should sit in the 10-100 per-second flocculation band (rapid mix G 500-1,000 belongs in a separate basin). Cold water is more viscous, so the same G costs more power in winter. Gt characterizes the whole train (10^4-10^5 typical). A design aid, not a process design.",
+    editionNote: "A tapered schedule decreases G stage to stage - the vigorous first stage builds many small flocs and each gentler stage grows them without the shear that would tear them apart; each stage should sit in the 10-100 per-second flocculation band (rapid mix, G of at least 750 per Ten States, belongs in a separate basin). Cold water is more viscous, so the same G costs more power in winter. Gt characterizes the whole train (10^4-10^5 typical). A design aid, not a process design.",
     assumptions: [
       { name: "Equal stages", value: "each stage is taken at the same volume; the power is P = G^2 mu V per stage from the inverted Camp-Stein relation", source: "Camp & Stein 1943" },
       { name: "Tapered band", value: "G decreases stage to stage, each in the 10-100/s flocculation band; merging rapid mix shears the floc", source: "Ten States Standards" },
@@ -1040,7 +1040,7 @@ export const CITATIONS = {
     editionNote: "Static pressure rises steeply with grain depth and the fan power grows about four- to fivefold when the airflow rate doubles and about eight- to tenfold when the depth doubles at the same cfm/bu, so a fan sized on cfm/bu alone stalls against back-pressure in a tall bin and the fan curve must be read at the actual static pressure; aeration cooling (0.1-0.25 cfm/bu) is not the same job as natural-air drying (0.5-1.0 cfm/bu). A sizing aid, not a fan selection.",
     assumptions: [
       { name: "Airflow bands", value: "aeration cooling 0.1-0.25 cfm/bu, natural-air drying 0.5-1.0 cfm/bu", source: "MWPS / extension" },
-      { name: "Static-pressure stall", value: "power grows ~fourfold when the rate or depth doubles; read the fan curve at the design static pressure", source: "Shedd airflow-resistance curves" },
+      { name: "Static-pressure stall", value: "power grows ~4-5x when the rate doubles and ~8-10x when the depth doubles; read the fan curve at the design static pressure", source: "Shedd airflow-resistance curves" },
     ],
   },
   "pivot-timer-depth": {
@@ -2718,7 +2718,7 @@ export const CITATIONS = {
   },
 
   "lightning-countdown": {
-    formula: "distance_mi = flash_to_bang_seconds / 5 (sound at sea level ~ 1125 ft/s). 30-30 rule: under 30 s flash-to-bang (~6 mi) -> seek shelter.",
+    formula: "distance_mi = flash_to_bang_seconds / 5 (sound at sea level ~ 1125 ft/s). 30-30 rule: 30 s or less flash-to-bang (~6 mi or closer) -> seek shelter.",
     edition: "NOAA / NWS lightning safety; 30-30 rule is a public guideline.",
     freeAccess: "weather.gov/safety/lightning.",
     governance: GOVERNANCE.field,
@@ -3725,7 +3725,7 @@ export const CITATIONS = {
     edition: "ASHRAE 62.1-2022 (ventilation for acceptable indoor air quality) by name; ASHRAE 170-2021 (ventilation of health care facilities) by name.",
     freeAccess: "ASHRAE standard TOCs free at ashrae.org; full standards licensed.",
     governance: GOVERNANCE.mechanical,
-    editionNote: "Occupancy target bands are comparison ranges, not the code minimum for a specific project; the AHJ and the governing standard's full procedure govern.",
+    editionNote: "The residential, office, classroom and lab bands are comparison ranges; the patient-room and operating-room entries are ASHRAE 170 Table 7-1 minimums with no ceiling. The AHJ and the governing standard's full procedure govern.",
     assumptions: [
       { name: "Residential band", value: "0.35-1 ACH", source: "the older ASHRAE 62-1989 0.35 ACH figure (62.2 sets a cfm rate instead)" },
       { name: "Classroom band", value: "4-6 ACH", source: "ASHRAE 62.1 typical" },
@@ -5876,7 +5876,7 @@ export const CITATIONS = {
     ],
   },
   "water-classes": {
-    formula: "(reference page; no compute) IICRC S500-2021 water-loss classes (1 = least amount of water absorption through 4 = greatest, water trapped in materials with low evaporation rates) and categories (1 = sanitary / 2 = significantly contaminated / 3 = grossly contaminated). Original plain-English summary; standard text not reproduced.",
+    formula: "(reference page; no compute) IICRC S500-2021 water-loss classes (1 = least, 2 = significant, 3 = greatest absorption and evaporation load -- under 5% / 5-40% / over 40% of the floor, wall and ceiling surface wet -- and 4 = specialty drying of bound water in low-porosity materials) and categories (1 = sanitary / 2 = significantly contaminated / 3 = grossly contaminated). Original plain-English summary; standard text not reproduced.",
     edition: "IICRC S500-2021 §10.6 (Class) and §10.5 (Category) by section.",
     freeAccess: "IICRC S500-2021 licensed; original summaries free here. Industry overviews free at most restoration-equipment manufacturer (Phoenix, Dri-Eaz, B-Air) sites.",
     governance: GOVERNANCE.general,
@@ -6169,7 +6169,7 @@ export const CITATIONS = {
     edition: "IFSTA / NWCG firefighter math altitude-corrected drafting maximum lift, by name.",
     freeAccess: "The drafting-lift relations are public fire-service / wildland training material; incident command governs the actual setup.",
     governance: GOVERNANCE.general,
-    editionNote: "1 in Hg of vacuum is about 1.13 ft of lift. A real pump cannot pull a perfect vacuum, so about two-thirds of theoretical is the practical ceiling (about 22.5 ft at sea level), and every 1,000 ft of altitude shaves another foot. Lift is limited by atmospheric pressure pushing water up the suction, not the pump pulling it, so a bigger pump does not help; over the attainable lift you must resite the pump lower - a planning aid, not incident command.",
+    editionNote: "1 in Hg of vacuum is about 1.13 ft of lift. A real pump cannot pull a perfect vacuum, so about two-thirds of theoretical is the practical ceiling (about 22.5 ft at sea level), and every 1,000 ft of altitude takes about a foot off the theoretical lift (about two-thirds of a foot off the attainable). Lift is limited by atmospheric pressure pushing water up the suction, not the pump pulling it, so a bigger pump does not help; over the attainable lift you must resite the pump lower - a planning aid, not incident command.",
     assumptions: [
       { name: "Practical ceiling", value: "about two-thirds of theoretical (about 22.5 ft at sea level); a perfect vacuum is unattainable", source: "IFSTA / NWCG" },
       { name: "Altitude correction", value: "theoretical lift falls about 1 ft per 1,000 ft of elevation", source: "atmospheric pressure vs altitude" },
@@ -7889,7 +7889,7 @@ export const CITATIONS = {
     ],
   },
   "per-diem-interest": {
-    formula: "daily_interest = loan_amount * (annual_rate/100) / basis (365, 360, or 30/360). days_to_eom = last_day_of_month - closing_day + 1 (counting the closing day; 30/360 uses 30 - closing_day + 1). prepaid_interest = daily_interest * days_to_eom.",
+    formula: "daily_interest = loan_amount * (annual_rate/100) / basis (365, 360, or 30/360). days_to_eom = last_day_of_month - closing_day + 1 (counting the closing day; 30/360 uses 30 - min(closing_day, 30) + 1, so a close on the 31st accrues one day). prepaid_interest = daily_interest * days_to_eom.",
     edition: "CFPB Closing Disclosure (12 CFR 1026.38, Appendix H) prepaid-interest line item.",
     freeAccess: "Closing Disclosure form and Regulation Z free at consumerfinance.gov and ecfr.gov.",
     governance: GOVERNANCE.real_estate,
@@ -9479,13 +9479,13 @@ export const CITATIONS = {
     ],
   },
   "pool-bonding-680-26": {
-    formula: "returns the 680.26(B) bonded-component list by pool type (pool shell/rebar, 3 ft perimeter, underwater forming shells, metal fittings >= 1 in, pump motor, metal piping/awnings/fences within 5 ft, listed water bond >= 9 sq in) with the #8 AWG solid copper minimum.",
+    formula: "returns the 680.26(B) bonded-component list by pool type (pool shell/rebar, 3 ft perimeter, underwater forming shells, metal fittings attached to the pool structure (isolated parts 4 in or less that penetrate 1 in or less exempt), pump motor, metal piping/awnings/fences within 5 ft, listed water bond >= 9 sq in) with the #8 AWG solid copper minimum.",
     edition: "Swimming-pool equipotential bonding, NEC 2023 680.26, by name.",
     freeAccess: "NEC is free to read at nfpa.org/freeaccess. The equipotential grid ties the listed conductive parts to the same potential and need not run to a remote grounding electrode; connections are listed and irreversible.",
     governance: GOVERNANCE.electrical,
     editionNote: NEC_DISCLOSURE,
     assumptions: [
-      { name: "Bonded components", value: "the 680.26(B) list: pool shell/rebar, perimeter within 3 ft, metal structure, underwater forming shells, metal fittings 1 in and larger, electrical equipment, metal piping within 5 ft, and the listed water bond (680.26(C))", source: "NEC 680.26(B),(C)" },
+      { name: "Bonded components", value: "the 680.26(B) list: pool shell/rebar, perimeter within 3 ft, metal structure, underwater forming shells, metal fittings attached to the pool structure (isolated parts 4 in or less that penetrate 1 in or less exempt), electrical equipment, metal piping within 5 ft, and the listed water bond (680.26(C))", source: "NEC 680.26(B),(C)" },
       { name: "Conductor", value: "solid copper #8 AWG minimum; the grid is equipotential", source: "NEC 680.26(B)" },
     ],
   },
@@ -12031,7 +12031,7 @@ export const CITATIONS = {
     ],
   },
   "turning-surface-finish": {
-    formula: "Theoretical peak-to-valley Rt = f^2 / (8 x r); estimated arithmetic average Ra ~= Rt / 4 (= 0.032 x f^2 / r).",
+    formula: "Theoretical peak-to-valley Rt = f^2 / (8 x r); estimated arithmetic average Ra ~= Rt / 4 (= f^2 / (32 x r), about 0.031 x f^2 / r).",
     edition: "Theoretical surface roughness from feed and nose radius - first-principles scallop geometry as in Machinery's Handbook (Industrial Press), by name; public domain.",
     freeAccess: "Pure geometry, public; the measured finish is rougher than this theoretical value.",
     governance: GOVERNANCE.general,
@@ -15715,7 +15715,7 @@ export const CITATIONS = {
   },
   "furnace-temp-rise": {
     formula: "delta_T = supply_air - return_air; output = input x efficiency / 100; CFM = output / (1.08 x delta_T). Verdict checks delta_T against the rating-plate rise range.",
-    edition: "First-principles sensible-heat relation Qs = 1.08 x CFM x delta-T (public); the 1.08 air factor and efficiency are editable.",
+    edition: "First-principles sensible-heat relation Qs = 1.08 x CFM x delta-T (public); the 1.08 air factor is fixed; the efficiency (default 80%) is editable.",
     freeAccess: "The sensible-heat relation is public physics; the rating-plate rise range governs.",
     governance: GOVERNANCE.general,
     editionNote: "Single-edition (the equipment manufacturer's rating plate and the licensed tech govern).",
@@ -16379,14 +16379,14 @@ export const CITATIONS = {
     ],
   },
   "hay-dry-matter": {
-    formula: "dry_matter = bale_weight x (1 - moisture/100); weight_at_target = dry_matter / (1 - target_moisture/100); flag set where moisture > safe_threshold (default 18% large / 20% small).",
+    formula: "dry_matter = bale_weight x (1 - moisture/100); weight_at_target = dry_matter / (1 - target_moisture/100); flag set where moisture > safe_threshold (default 18%, the large-package ceiling; enter 20% for small squares).",
     edition: "First-principles dry-matter mass balance with USDA NRCS / land-grant extension safe-storage guidance (by name); no edition cycle.",
     freeAccess: "The mass balance is public; the safe-storage thresholds are editable. The producer and local extension guidance govern.",
     governance: GOVERNANCE.general,
     editionNote: "Single-edition (the dry-matter mass balance does not roll; the safe-storage moisture thresholds are editable and local extension guidance governs).",
     assumptions: [
       { name: "Dry-matter balance", value: "dry matter = weight x (1 - moisture); restating at a target moisture compares loads on an equal basis", source: "first principles" },
-      { name: "Safe ceiling", value: "default 18% for large packages, 20% for small squares, both editable; wetter hay heats and molds", source: "USDA NRCS / extension" },
+      { name: "Safe ceiling", value: "default 18%, the large-package ceiling; enter 20% for small squares; wetter hay heats and molds", source: "USDA NRCS / extension" },
       { name: "Combustion risk", value: "very wet, tightly stacked hay can heat enough to spontaneously combust; monitor and do not store tight above the ceiling", source: "extension guidance" },
     ],
   },
@@ -16535,13 +16535,13 @@ export const CITATIONS = {
   },
   "ridge-cap-fasteners": {
     formula: "cap_len_lf = ridge_lf + hip_lf; cap_bundles = ceil(cap_len_lf / cap_lf_per_bundle); field_nails = squares x shingles_per_sq x nails_per_shingle; cap_pieces = ceil(cap_len_lf x 12 / cap_exposure_in); cap_nails = cap_pieces x 2; total_nails = field_nails + cap_nails; nail_lbs = ceil(total_nails / nails_per_lb).",
-    edition: "IRC R905.2.6 (the asphalt-shingle fastening pattern: four nails standard, six in the high-wind / steep-slope rows) and the shingle manufacturer's application instructions, by name; the cap-bundle and nail relations are first-principles arithmetic.",
+    edition: "IRC R905.2.6 (asphalt-shingle fastening: at least four nails per strip shingle, and the manufacturer's count where it is higher; six in the manufacturer's high-wind / steep-slope instructions) and the shingle manufacturer's application instructions, by name; the cap-bundle and nail relations are first-principles arithmetic.",
     freeAccess: "The fastening pattern is stated in the published IRC R905.2.6; the cap-bundle and nail relations are public roofing-takeoff arithmetic. The cap coverage and nails-per-shingle are the product wrapper's values.",
     governance: GOVERNANCE.general,
-    editionNote: "IRC R905.2.6 sets the asphalt-shingle fastening pattern (four nails standard, six in the high-wind / steep-slope rows); the shingle manufacturer's application instructions govern the product. The nails-per-shingle and the cap coverage per bundle come from the product's wrapper and the adopted wind zone (a pre-formed hip-and-ridge product covers far less per bundle than field-cut three-tab caps); the shingles-per-square is the product's count. A material takeoff, not a fastening approval.",
+    editionNote: "IRC R905.2.6 sets a floor of four nails per strip shingle and defers to the manufacturer, whose high-wind and steep-slope instructions call for six; the shingle manufacturer's application instructions govern the product. The nails-per-shingle and the cap coverage per bundle come from the product's wrapper and the adopted wind zone (a pre-formed hip-and-ridge product covers far less per bundle than field-cut three-tab caps); the shingles-per-square is the product's count. A material takeoff, not a fastening approval.",
     assumptions: [
       { name: "Cap bundles", value: "cap length = ridge + hip; cap bundles = ceil(cap length / lf per bundle): a pre-formed hip/ridge product (~20 lf) covers far less per bundle than field-cut 3-tab (~35 lf)", source: "manufacturer wrapper" },
-      { name: "Field nails", value: "field nails = squares x shingles per square x nails per shingle: IRC R905.2.6 steps the pattern from four nails to six in the high-wind / steep rows", source: "IRC R905.2.6" },
+      { name: "Field nails", value: "field nails = squares x shingles per square x nails per shingle: IRC R905.2.6 sets a floor of four nails per strip shingle; the manufacturer's high-wind / steep-slope instructions call for six", source: "IRC R905.2.6" },
       { name: "Nails by the pound", value: "cap pieces = ceil(cap length x 12 / exposure), two nails each; nail lbs = ceil(total nails / nails per pound): roofers order nails by the pound, not the each", source: "first principles" },
     ],
   },
@@ -16862,7 +16862,7 @@ export const CITATIONS = {
     ],
   },
   "air-pressure-setpoint-savings": {
-    formula: "work_current = ((current_psig + 14.7) / inlet_psia)^((k-1)/k) - 1; work_reduced = ((reduced_psig + 14.7) / inlet_psia)^((k-1)/k) - 1; pct_saved = 1 - work_reduced / work_current; kw_saved = input_kw x pct_saved; annual_kwh = kw_saved x run_hours; annual_savings = annual_kwh x rate_kwh. (k = 1.4)",
+    formula: "work_current = ((current_psig + inlet_psia) / inlet_psia)^((k-1)/k) - 1; work_reduced = ((reduced_psig + inlet_psia) / inlet_psia)^((k-1)/k) - 1; saved_fraction = 1 - work_reduced / work_current; pct_saved = 100 x saved_fraction; kw_saved = input_kw x saved_fraction; annual_kwh = kw_saved x run_hours; annual_savings = annual_kwh x rate_kwh. (k = 1.4)",
     edition: "The isentropic compression-power ratio (percent saved = 1 - [(P_reduced/P1)^((k-1)/k) - 1] / [(P_current/P1)^((k-1)/k) - 1]), which reproduces the DOE rule of roughly 0.5% of compressor energy per psi of reduction, by name; k = 1.4 for air is a named constant.",
     freeAccess: "The isentropic pressure-ratio relation and the DOE per-psi rule are public; the DOE compressed-air tip sheets are free at energy.gov.",
     governance: GOVERNANCE.general,
@@ -18033,10 +18033,10 @@ export const CITATIONS = {
     edition: "ASHRAE Refrigeration Handbook / refrigerant piping guides liquid-line subcooling to prevent flash gas, by name.",
     freeAccess: "The flash-gas relations are standard refrigerant-piping design practice; the manufacturer data and the actual refrigerant govern the commissioning.",
     governance: GOVERNANCE.general,
-    editionNote: "Techs often credit only the friction and forget the 0.43 psi/ft vertical-lift static column, which dominates on a tall riser. Liquid-line heat gain also flashes liquid. Subcooling should be measured at the metering device, not the condenser outlet. The 5 psi/degF P-T slope flattens at higher pressure (an approximation). Add margin to reach the 8 to 12 F field target. The manufacturer data and the actual refrigerant govern - a design aid, not a commissioning measurement.",
+    editionNote: "Techs often credit only the friction and forget the 0.43 psi/ft vertical-lift static column, which dominates on a tall riser. Liquid-line heat gain also flashes liquid. Subcooling should be measured at the metering device, not the condenser outlet. The ~5 psi/degF P-T slope (R-410A near 100 F condensing) steepens at higher condensing pressure and flattens at lower; enter the slope at the actual condensing temperature. Add margin to reach the 8 to 12 F field target. The manufacturer data and the actual refrigerant govern - a design aid, not a commissioning measurement.",
     assumptions: [
       { name: "Vertical-lift column", value: "the 0.43 psi/ft static gradient for R-410A liquid dominates on a tall riser and is the term techs forget", source: "ASHRAE Refrigeration Handbook" },
-      { name: "P-T slope", value: "about 5 psi/degF for R-410A near condensing; it flattens at higher pressure", source: "refrigerant piping guides" },
+      { name: "P-T slope", value: "about 5 psi/degF for R-410A near 100 F condensing; it steepens at higher condensing pressure and flattens at lower", source: "refrigerant piping guides" },
     ],
   },
   "evaporator-td-dtd": {
@@ -19137,14 +19137,14 @@ export const CITATIONS = {
     ],
   },
   "concrete-corbel-bracket": {
-    formula: "Nuc = max(input, 0.2 Vu); Avf = Vu/(phi mu fy); Mu = Vu av + Nuc(h - d); Af = Mu/(phi fy 0.85 d); An = Nuc/(phi fy); Asc = max(Af + An, (2/3)Avf + An); phiVn = phi min(0.2 f'c, 480 + 0.08 f'c, 1600) b d (phi = 0.75).",
+    formula: "Nuc = max(input, 0.2 Vu); Avf = Vu/(phi mu fy); Mu = Vu av + Nuc(h - d); Af = Mu/(phi fy 0.85 d); An = Nuc/(phi fy); Asc = max(Af + An, (2/3)Avf + An, 0.04 (f'c/fy) b d); phiVn = phi min(0.2 f'c, 480 + 0.08 f'c, 1600) b d (phi = 0.75).",
     edition: "The ACI 318-19 Section 16.5 brackets-and-corbels design provisions, by name.",
     freeAccess: "ACI 318 is readable free through the ACI online reading room at concrete.org; the Section 16.5 corbel provisions are in the published code.",
     governance: GOVERNANCE.general,
-    editionNote: "The horizontal tension Nuc of at least 0.2 Vu is mandatory (restrained shrinkage and creep drag on the bearing) and drives the top steel; the primary steel is the greater of the flexure-plus-tension and shear-friction-plus-tension paths (which governs flips with the shear span); the shear is capped by the min-of-three limit, not the sqrt(f'c) shear, so a deep short corbel is cap-governed. Applies for av/d <= 1. A design aid, not the engineer of record.",
+    editionNote: "The horizontal tension Nuc of at least 0.2 Vu is mandatory (restrained shrinkage and creep drag on the bearing) and drives the top steel; the primary steel is the greatest of the flexure-plus-tension path, the shear-friction-plus-tension path, and the 16.5.5.1 minimum 0.04 (f'c/fy) b d (which governs flips with the shear span); the shear is capped by the min-of-three limit, not the sqrt(f'c) shear, so a deep short corbel is cap-governed. Applies for av/d <= 1. A design aid, not the engineer of record.",
     assumptions: [
       { name: "Mandatory tension", value: "Nuc >= 0.2 Vu regardless of the applied horizontal load", source: "ACI 318-19 16.5.3.5" },
-      { name: "Greater-of-two steel", value: "Asc = max(Af + An, (2/3)Avf + An); the governing path flips with the shear span", source: "ACI 318-19 16.5.5" },
+      { name: "Greatest-of-three steel", value: "Asc = max(Af + An, (2/3)Avf + An, 0.04 (f'c/fy) b d); the governing path flips with the shear span; the minimum governs a lightly loaded corbel", source: "ACI 318-19 16.5.5" },
       { name: "Shear cap", value: "Vn <= min(0.2 f'c, 480 + 0.08 f'c, 1600) b d, not the usual sqrt(f'c) shear", source: "ACI 318-19 16.5.2.4" },
     ],
   },
@@ -19246,7 +19246,7 @@ export const CITATIONS = {
     ],
   },
   "pipe-insulation-for-condensation": {
-    formula: "Tdp from the ambient RH (saturation-vapor-pressure psychrometrics); minimum wall from the outer-surface balance h (2 pi r2/12)(Tamb - Tdp) = 2 pi k (Tdp - Tpipe)/ln(r2/r1), solved for r2; thickness = r2 - r1.",
+    formula: "Tdp from the ambient RH (saturation-vapor-pressure psychrometrics); minimum wall from the outer-surface balance h (2 pi r2/12)(Tamb - Tdp) = 2 pi (k/12) (Tdp - Tpipe)/ln(r2/r1), with k per inch, solved for r2; thickness = r2 - r1.",
     edition: "Standard cylindrical-conduction and surface-film heat balance (the same public engineering relations as the landed insulation-thickness and pipe-heat-loss-radial tiles) with the dew point from the catalog's pinned psychrometric functions; no standard table reproduced.",
     freeAccess: "The conduction/film balance and Magnus-form psychrometrics are public engineering relations; manufacturer condensation-control design guides publish the equivalent tables free.",
     governance: GOVERNANCE.general,
@@ -19859,11 +19859,11 @@ export const CITATIONS = {
     ],
   },
   "seismic-base-shear": {
-    formula: "cs_basic = sds / (R / Ie); cs_cap = sd1 / (period_s x (R / Ie)); cs_min = max(0.044 x sds x Ie, 0.01); cs = max(cs_min, min(cs_basic, cs_cap)); base_shear = cs x weight.",
-    edition: "ASCE 7 §12.8 equivalent lateral force (Cs = SDS / (R / Ie), the cap Cs <= SD1 / (T x (R / Ie)) for T <= TL, the minimum Cs >= max(0.044 x SDS x Ie, 0.01), V = Cs x W), by name.",
+    formula: "cs_basic = sds / (R / Ie); cs_cap = sd1 / (period_s x (R / Ie)); cs_min = max(0.044 x sds x Ie, 0.01, s1 >= 0.6 ? 0.5 x s1 / (R / Ie) : 0); cs = max(cs_min, min(cs_basic, cs_cap)); base_shear = cs x weight.",
+    edition: "ASCE 7 §12.8 equivalent lateral force (Cs = SDS / (R / Ie), the cap Cs <= SD1 / (T x (R / Ie)) for T <= TL, the minimum Cs >= max(0.044 x SDS x Ie, 0.01) and, where S1 >= 0.6 g, Cs >= 0.5 S1 / (R / Ie) (Eq. 12.8-6), V = Cs x W), by name.",
     freeAccess: "The equivalent-lateral-force base-shear relations are stated in ASCE 7 §12.8; the arithmetic is public. SDS / SD1 are from the USGS seismic design maps.",
     governance: GOVERNANCE.general,
-    editionNote: "ASCE 7 §12.8: Cs = SDS / (R / Ie), the upper bound Cs <= SD1 / (T x (R / Ie)) for T <= TL, the minimum Cs >= max(0.044 x SDS x Ie, 0.01), and V = Cs x W. SDS and SD1 are the site's design spectral accelerations from the USGS seismic design maps (the user supplies them, not a bundled hazard map); R is the response-modification factor from ASCE 7 Table 12.2-1 for the chosen lateral system; the long-period transition TL is assumed not to govern (T <= TL); this is the equivalent-lateral-force base shear for a regular building (not a modal or response-history analysis, and not the vertical distribution to each level). A licensed engineer governs.",
+    editionNote: "ASCE 7 §12.8: Cs = SDS / (R / Ie), the upper bound Cs <= SD1 / (T x (R / Ie)) for T <= TL, the minimum Cs >= max(0.044 x SDS x Ie, 0.01) and, where S1 >= 0.6 g, Cs >= 0.5 S1 / (R / Ie) (Eq. 12.8-6), and V = Cs x W. SDS and SD1 are the site's design spectral accelerations from the USGS seismic design maps (the user supplies them, not a bundled hazard map); R is the response-modification factor from ASCE 7 Table 12.2-1 for the chosen lateral system; the long-period transition TL is assumed not to govern (T <= TL); this is the equivalent-lateral-force base shear for a regular building (not a modal or response-history analysis, and not the vertical distribution to each level). A licensed engineer governs.",
     assumptions: [
       { name: "Response coefficient", value: "Cs = SDS / (R / Ie), bounded above by the period cap and below by the code minimum", source: "ASCE 7 §12.8" },
       { name: "Period cap", value: "Cs <= SD1 / (T x (R / Ie)) for T <= TL recognizes a flexible structure rides the short-period spectral peak less", source: "ASCE 7 §12.8" },
@@ -20233,7 +20233,7 @@ export const CITATIONS = {
     edition: "IBC 2021 Table 705.8 (maximum area of exterior wall openings) and §705.3 (measurement of the fire separation distance), by name.",
     freeAccess: "The opening-area limits are stated in the published IBC Table 705.8; the percentage comparison is public arithmetic.",
     governance: GOVERNANCE.general,
-    editionNote: "IBC 2021 Table 705.8 (maximum area of exterior wall openings), keyed by fire separation distance and by protection / sprinkler status. Bundled bands (editable): under 3 ft none; 3 to under 5 ft 15% protected else none; 5 to under 10 ft 25% / 10%; 10 to under 15 ft 45% / 15%; 15 to under 20 ft 75% / 25%; 20 to under 25 ft no limit / 45%; 25 to under 30 ft no limit / 70%; 30 ft or more no limit. The fire separation distance is measured per §705.3 to the lot line, the centerline of a public way, or an imaginary line between buildings on the same lot; unprotected openings in a sprinklered building take the protected allowance per Note a to Table 705.8; the §705.8.5 vertical-separation and §705.8.6 protected-opening rules can further govern. A design aid, not a code-official determination.",
+    editionNote: "IBC 2021 Table 705.8 (maximum area of exterior wall openings), keyed by fire separation distance and by protection / sprinkler status. Bundled bands (fixed; the adopted edition's Table 705.8 governs): under 3 ft none; 3 to under 5 ft 15% protected else none; 5 to under 10 ft 25% / 10%; 10 to under 15 ft 45% / 15%; 15 to under 20 ft 75% / 25%; 20 to under 25 ft no limit / 45%; 25 to under 30 ft no limit / 70%; 30 ft or more no limit. The fire separation distance is measured per §705.3 to the lot line, the centerline of a public way, or an imaginary line between buildings on the same lot; unprotected openings in a sprinklered building take the protected allowance per Note a to Table 705.8; the §705.8.5 vertical-separation and §705.8.6 protected-opening rules can further govern. A design aid, not a code-official determination.",
     assumptions: [
       { name: "Band lookup", value: "the allowable percentage is set by the fire separation distance band and by protection / sprinkler status", source: "IBC 2021 Table 705.8" },
       { name: "Sprinklered equals protected", value: "unprotected openings in a sprinklered building take the protected allowance per Note a", source: "IBC 2021 Table 705.8 Note a" },
@@ -22676,7 +22676,7 @@ export const CITATIONS = {
     ],
   },
   "ut-thickness-velocity": {
-    formula: "thickness = velocity x round-trip transit time / 2. The velocity error is a PERCENTAGE, so its absolute effect scales with the wall being inspected; the thinnest wall that still reads at a retirement limit is limit x gauge velocity / actual velocity.",
+    formula: "thickness = velocity x round-trip transit time / 2. The velocity error is a PERCENTAGE, so its absolute effect scales with the wall being inspected; the thinnest wall that still reads at a retirement limit is limit x actual velocity / gauge velocity.",
     edition: "The ultrasonic pulse-echo thickness relation. Velocities are ENTERED (steel about 0.232 in/us, aluminium about 0.2490) because they vary with alloy, temperature and grain structure -- a published table is a starting point and not a calibration.",
     freeAccess: "One relation and two entered velocities.",
     governance: GOVERNANCE.general,
@@ -22839,7 +22839,7 @@ export const CITATIONS = {
     edition: "Moulding shrinkage allowance as tool design states it, with the shrinkage rate ENTERED in in/in from the resin supplier's data for the specific grade -- amorphous materials run roughly 0.004 to 0.008 and semi-crystalline roughly 0.010 to 0.025.",
     freeAccess: "One division and one multiplication.",
     governance: GOVERNANCE.general,
-    editionNote: "The published shrinkage is a RANGE rather than a value, and mould temperature, hold pressure and hold time all move the actual figure within it, so the range is the real uncertainty. Anisotropy is the second reason one number is insufficient: flow and cross-flow shrinkage differ sharply in filled and semi-crystalline materials, so a square feature cut uniformly comes out rectangular. The steel-safe rule follows from an ASYMMETRY rather than from caution -- a cavity cut to the low end of the range makes a large part, corrected by removing metal, while the high end makes a small part, corrected only by welding the cavity and re-cutting it.",
+    editionNote: "The published shrinkage is a RANGE rather than a value, and mould temperature, hold pressure and hold time all move the actual figure within it, so the range is the real uncertainty. Anisotropy is the second reason one number is insufficient: flow and cross-flow shrinkage differ sharply in filled and semi-crystalline materials, so a square feature cut uniformly comes out rectangular. The steel-safe rule follows from an ASYMMETRY rather than from caution -- a cavity cut to the low end of the range makes a small part, corrected by removing metal, while the high end makes a large part, corrected only by welding the cavity and re-cutting it.",
     assumptions: [
       { name: "Shrinkage is entered per grade", value: "published as a range, not a value", source: "the resin supplier's data sheet" },
       { name: "Process moves it within the range", value: "mould temperature, hold pressure and hold time", source: "the moulder's process record" },
@@ -23779,7 +23779,7 @@ export const CITATIONS = {
     assumptions: [
       { name: "A circle, not the reach diagram", value: "real envelopes have dead zones and configuration-dependent limits", source: "the manufacturer's reach diagram" },
       { name: "Mats are not sized here", value: "that needs the actual outrigger loads and an allowable bearing", source: "a geotechnical assessment" },
-      { name: "Power line clearance is absolute", value: "it governs the setup independently of reach", source: "OSHA 1926.1408 and the utility" },
+      { name: "Power line clearance is absolute", value: "it governs the setup independently of reach", source: "ASME B30.27, the pump manufacturer and the utility" },
     ],
   },
   "post-tension-elongation": {
@@ -24829,7 +24829,7 @@ export const CITATIONS = {
     edition: "Cloth manufacturer transmission data measured on the installed fabric, and the crop's own DLI requirement, govern.",
     freeAccess: "Public arithmetic; transmission percentages are published by cloth manufacturers.",
     governance: GOVERNANCE.general,
-    editionNote: "The label percentage is not what the crop receives: the glazing takes its share first and the fractions MULTIPLY. Two layers transmit a quarter rather than nothing, which is a propagation light level under what was meant to be a production crop.",
+    editionNote: "The label percentage is not what the crop receives: the glazing takes its share first and the fractions MULTIPLY. Two layers transmit a quarter of the light that reaches them (16.25% of outdoor light under 65% glazing) rather than nothing, which is a propagation light level under what was meant to be a production crop.",
     assumptions: [
       { name: "Layers", value: "compound multiplicatively; adding shade percentages is wrong", source: "spec-v1756 method" },
       { name: "Heat", value: "real and the reason the cloth exists, but bought with exactly the light the crop lost", source: "grower trade-off" },
@@ -25204,7 +25204,7 @@ export const CITATIONS = {
     governance: GOVERNANCE.general,
     editionNote: "Service range answers whether the leveler can REACH a bed height; grade answers whether equipment can work across it once it does. A leveler comfortably within its service range can still present a ramp too steep to run pallets over.",
     assumptions: [
-      { name: "Nominal length", value: "grade here is rise over the NOMINAL deck; manufacturers' charts use the shorter working length, so read about 17% steeper on a 6 ft leveler (Poweramp: 8 in on 6 ft = 13.3%, on 10 ft = 7.6%). Limits differ by truck: hand pallet 3%, powered pallet 7%, electric fork 10%, gas fork 15%", source: "Poweramp Grade Chart for Dock Levelers" },
+      { name: "Nominal length", value: "grade here is rise over the NOMINAL deck; manufacturers' charts use the shorter working length, so read about 20% steeper on a 6 ft leveler (the working length is about 17% shorter; Poweramp: 8 in on 6 ft = 13.3%, on 10 ft = 7.6%). Limits differ by truck: hand pallet 3%, powered pallet 7%, electric fork 10%, gas fork 15%", source: "Poweramp Grade Chart for Dock Levelers" },
       { name: "Grade guideline", value: "roughly 10% a common practical maximum for powered equipment, 7% or less preferred; a manual pallet truck struggles well before a forklift does", source: "industry practice, entered as an input" },
       { name: "Static geometry", value: "a trailer settles as it loads, rises as it empties, and can creep away from the dock; restraints and chocks address the creep", source: "spec-v1814 scope" },
     ],
@@ -25272,7 +25272,7 @@ export const CITATIONS = {
     edition: "Snow densification and prism geometry. Densities and the height limit are ENTERED; fresh snow runs roughly 5 to 10 lb per cu ft and a worked pile 20 to 30.",
     freeAccess: "A density ratio and two solid geometries.",
     governance: GOVERNANCE.general,
-    editionNote: "THE HEIGHT LIMIT IS WHAT CONVERTS A COMPACT PILE INTO A LONG ONE, and the price of it is computed here rather than described. One 12 in event on a 100,000 sq ft lot piles to 28,000 cu ft, which as a free cone would stand about 30 ft tall on 2,809 sq ft but as a 12 ft windrow occupies 4,667 sq ft -- the cone uses 40% less ground, and the 1,858 sq ft of difference is the price of being able to see past the pile and to build it at all. Three events with no thaw reach 14% of the lot and 47 parking spaces, which is when hauling starts. STORAGE IS CONSUMED LINEARLY, NOT GRADUALLY. The multi-event case assumes NO MELTING between events, which is the design case rather than the typical one. A late-season pile is denser and dirtier than this arithmetic suggests. Where storage may be PLACED -- drainage, sight lines, fire lanes, accessible routes -- is a site constraint and several parts of it are regulatory.",
+    editionNote: "THE HEIGHT LIMIT IS WHAT CONVERTS A COMPACT PILE INTO A LONG ONE, and the price of it is computed here rather than described. One 12 in event on a 100,000 sq ft lot piles to 28,000 cu ft, which as a free cone would stand about 30 ft tall on 2,809 sq ft but as a 12 ft windrow occupies 4,667 sq ft -- the cone uses 40% less ground, and the 1,858 sq ft of difference is the price of being able to see past the pile and to build it at all. The second event with no thaw already overruns the 5% allocation (56,000 cu ft against 30,000), which is when hauling starts; three reach 14% of the lot and 47 parking spaces, with 54,000 cu ft (2,000 cu yd) to haul. STORAGE IS CONSUMED LINEARLY, NOT GRADUALLY. The multi-event case assumes NO MELTING between events, which is the design case rather than the typical one. A late-season pile is denser and dirtier than this arithmetic suggests. Where storage may be PLACED -- drainage, sight lines, fire lanes, accessible routes -- is a site constraint and several parts of it are regulatory.",
     assumptions: [
       { name: "No melting between events", value: "the design case, not the typical one", source: "a season's own records are better" },
       { name: "Densities are entered", value: "fresh 5 to 10, worked pile 20 to 30 lb per cu ft", source: "the site's snow plan" },

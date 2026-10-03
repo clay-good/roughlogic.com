@@ -1111,7 +1111,8 @@ export function computeWellDrawdown({
   const stat = Number(static_level_ft);
   const pump = Number(pumping_level_ft);
   const q = Number(discharge_gpm) || 0;
-  const offset = Number(pump_offset_ft);
+  // A blank offset arrives as null or "" and Number() of either is 0, so the documented 20 ft never applied.
+  const offset = pump_offset_ft == null || pump_offset_ft === "" ? 20 : Number(pump_offset_ft);
   if (!Number.isFinite(stat) || !Number.isFinite(pump)) return { error: "Enter the static and pumping water levels (ft below ground)." };
   if (!(q > 0)) return { error: "Enter a positive discharge rate (GPM)." };
   if (!(pump > stat)) return { error: "Pumping level must be deeper than the static level (drawdown is positive)." };

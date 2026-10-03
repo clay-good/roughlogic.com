@@ -628,12 +628,14 @@ export function computeWaterServicePressureCheck({ static_pressure_psi = 0, min_
   const over_by_psi = Math.max(0, p - MAX);
   const setpoint_entered = set > 0;
   const setpoint_ok = setpoint_entered ? set <= MAX + 1e-9 * Math.abs(MAX) : null;
-  const delivered = setpoint_entered && prv_required ? set : p;
+  // A fitted PRV regulates (and closes the system) whatever the static pressure; until
+  // 2026-10-03 one below 80 psi was ignored and the system read OPEN.
+  const delivered = setpoint_entered ? set : p;
   const headroom_psi = delivered - minFix;
   const fixture_ok = headroom_psi >= 0 - 1e-9 * Math.abs(0);
 
   // The closed system: a PRV, a check valve, or a backflow preventer all close it.
-  const closed_system = prv_required || otherClosure;
+  const closed_system = prv_required || setpoint_entered || otherClosure;
   const expansion_required = closed_system && heater;
   const expansion_ok = expansion_required ? control : null;
   const passes = (!prv_required || setpoint_ok !== false) && fixture_ok && (expansion_ok !== false);

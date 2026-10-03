@@ -175,7 +175,7 @@ export function computeChillerTons({
   const required_gpm = np != null && np > 0 ? (np * 12000) / (factor * delta_T_F) : null;
 
   const warnings = [];
-  if (delta_T_F < 5 || delta_T_F > 20) warnings.push("Delta-T outside the typical 10-14 F chiller range; confirm the entering and leaving temperatures.");
+  if (delta_T_F < 5 || delta_T_F > 20) warnings.push("Delta-T outside the 5-20 F screening band (typical 10-14 F); confirm the entering and leaving temperatures.");
   if (fluid !== "water") warnings.push("Glycol factor is property-derived at a typical chilled-water mean; the manufacturer's fluid correction table governs.");
 
   return {
@@ -232,7 +232,7 @@ function _v16h_renderChillerTons(inputRegion, outputRegion, citationEl) {
     oDt.textContent = fmt(r.delta_T_F, 1) + " F (factor " + r.factor + ")";
     oTons.textContent = fmt(r.tons, 1) + " tons (" + fmt(r.q_btu_hr, 0) + " BTU/hr, " + fmt(r.kw, 1) + " kW)";
     oReq.textContent = r.required_gpm != null ? fmt(r.required_gpm, 1) + " GPM for " + fmt(r.nameplate_tons, 1) + " tons" : "-";
-    oNote.textContent = r.warnings.length ? r.warnings.join(" ") : "Within the typical chiller delta-T range.";
+    oNote.textContent = r.warnings.length ? r.warnings.join(" ") : "Within the 5-20 F screening band (typical 10-14 F).";
   }, DEBOUNCE_MS);
   for (const el of [gpm.input, ewt.input, lwt.input, np.input]) el.addEventListener("input", update);
   fluid.select.addEventListener("change", update);
@@ -391,8 +391,8 @@ HVACSYSTEMS_RENDERERS["hx-lmtd-ntu"] = _v16h_renderHxLmtdNtu;
 // --- C.9 Air changes per hour from CFM and room volume ---------------
 
 // Typical ACH design targets by occupancy (ASHRAE 62.1-2022 ventilation
-// and ASHRAE 170-2021 healthcare). These are comparison bands, not the
-// code minimum for a specific project; the AHJ and the governing
+// and ASHRAE 170-2021 healthcare). Most are comparison bands; the patient-room and OR entries are ASHRAE 170 Table 7-1
+// minimums with no ceiling. None is the code minimum for a specific project; the AHJ and the governing
 // standard's full procedure govern.
 export const ACH_TARGET_BANDS = {
   residential: { lo: 0.35, hi: 1, label: "Residential whole-house ventilation (the older ASHRAE 62-1989 0.35 ACH figure; 62.2 sets a cfm rate instead)" },
@@ -616,7 +616,7 @@ export const boilerPipeSizingExample = {
   // 200,000 BTU/hr boiler, 20 F delta-T -> 20 GPM. Copper Type L at a
   // 4 ft/s quiet-operation ceiling: 1-1/4 in (ID 1.265) runs 5.11 ft/s
   // (over), so the tile steps up to 1-1/2 in (ID 1.505) at 3.61 ft/s.
-  // Hazen-Williams (C=150): 1.48 ft head per 100 ft; 100 ft run -> 1.48 ft.
+  // Hazen-Williams (C=150): 3.42 ft head (1.48 psi) per 100 ft; 100 ft run -> 3.42 ft.
   inputs: { boiler_btu_hr: 200000, delta_T_F: 20, material: "copper", max_velocity_fps: 4, length_ft: 100 },
 };
 

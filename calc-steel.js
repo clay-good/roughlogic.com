@@ -1534,7 +1534,7 @@ export function computeStaggeredNetWidth({ plate_width_in = 0, thickness_in = 0,
   const pitch_headroom_in = pitch_where_straight_governs_in === null ? null : Math.max(0, pitch_where_straight_governs_in - s);
 
   const note = "AISC 360 B4.3b: for a chain of holes running across a part on any DIAGONAL OR ZIGZAG line, deduct the diameters of ALL the holes in that chain from the gross width, then ADD s^2/4g for each gage space the chain crosses. Every possible chain has to be checked and the SMALLEST net width governs. "
-    + "THE HOLE IS NOT THE BOLT: it is deducted at " + db + " + " + allow + " = " + hole_dia_in.toFixed(3) + " in - a 1/16 for the standard hole and another 1/16 for damage around it - and using the bolt diameter overstates the net area on every hole in the chain. "
+    + "THE HOLE IS NOT THE BOLT: it is deducted at " + db + " + " + allow + " = " + hole_dia_in.toFixed(3) + " in (the entered allowance; the default 1/8 in is 1/16 for the standard hole plus 1/16 for damage around it) - and using the bolt diameter overstates the net area on every hole in the chain. "
     + "STRAIGHT CHAIN: " + W + " - " + nS + " x " + hole_dia_in.toFixed(3) + " = " + net_width_straight_in.toFixed(3) + " in. "
     + "ZIGZAG CHAIN: " + W + " - " + nZ + " x " + hole_dia_in.toFixed(3) + (k > 0 ? " + " + k + " x " + s + "^2/(4 x " + g + ") = " + net_width_zigzag_in.toFixed(3) : " = " + net_width_zigzag_in.toFixed(3)) + " in"
     + (k > 0 ? ", where the stagger credit is " + stagger_credit_in.toFixed(3) + " in across " + k + " gage space" + (k === 1 ? "" : "s") + ". " : ". ")

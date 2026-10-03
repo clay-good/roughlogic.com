@@ -689,10 +689,11 @@ export function computeLightningCountdown({ flash_to_bang_s = 0 } = {}) {
   if (!(s > 0)) return { error: "Flash-to-bang seconds must be positive." };
   const distance_miles = s / 5;
   const distance_km = distance_miles * 1.609344;
-  const seek_shelter = s < 30;
+  // NWS 30-30 rule: thunder 30 seconds or LESS after the flash means shelter now (30 s read "monitor" until 2026-10-03).
+  const seek_shelter = s <= 30;
   let band;
   if (s < 5) band = "imminent danger (< 1 mi); seek shelter NOW";
-  else if (s < 30) band = "seek shelter (NWS 30-30 rule; storm within 6 mi)";
+  else if (s <= 30) band = "seek shelter (NWS 30-30 rule; storm within 6 mi)";
   else if (s < 60) band = "caution (6-12 mi); continue to monitor";
   else band = "storm distant (> 12 mi); continue to monitor";
   return { distance_miles, distance_km, seek_shelter, band };

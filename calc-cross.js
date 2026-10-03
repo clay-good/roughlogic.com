@@ -2041,7 +2041,9 @@ export function computeNoiseDose({ rows = [] } = {}) {
   // TWA: 16.61 * log10(D / 100) + 90. For D = 0 the formula is
   // undefined (log10 of 0), so TWA is reported as null (no exposure).
   const twa = dose_pct > 0 ? 16.61 * Math.log10(dose_pct / 100) + 90 : null;
-  const pass_action_level_85 = dose_pct <= 50;
+  // 1910.95(c)(1): the program is triggered when exposure EQUALS or exceeds 85 dBA / 50% dose,
+  // so exactly 50% does not pass (it read PASS until 2026-10-03).
+  const pass_action_level_85 = dose_pct < 50 - 1e-9 * 50;
   const pass_pel_90 = dose_pct <= 100;
 
   return {
@@ -2052,7 +2054,7 @@ export function computeNoiseDose({ rows = [] } = {}) {
     per_row,
     total_hours,
     warnings: [
-      "OSHA 1910.95(b) implements a 5 dB exchange rate; NIOSH 98-126 recommends 3 dB and a 4 dB-per-doubling rule. This calculator uses the OSHA convention because OSHA is the regulatory record.",
+      "OSHA 1910.95(b) implements a 5 dB exchange rate; NIOSH 98-126 recommends an 85 dBA REL with a 3 dB exchange rate. This calculator uses the OSHA convention because OSHA is the regulatory record.",
     ],
   };
 }
@@ -2118,7 +2120,7 @@ function renderNoiseDose(inputRegion, outputRegion, citationEl) {
     }
     oD.textContent = fmt(r.total_dose_pct, 1) + " %";
     oTWA.textContent = r.twa_dBA === null ? "(below 80 dBA: no OSHA TWA)" : fmt(r.twa_dBA, 1) + " dBA";
-    oAL.textContent = r.pass_action_level_85 ? "PASS (<= 50% dose)" : "EXCEEDED (engineering controls + monitoring required)";
+    oAL.textContent = r.pass_action_level_85 ? "PASS (< 50% dose)" : "REACHED (hearing conservation program required: monitoring, audiometry, protectors available)";
     oPEL.textContent = r.pass_pel_90 ? "PASS (<= 100% dose)" : "EXCEEDED (hearing-protection mandatory)";
     oW.textContent = r.warnings.join(" ");
   }, DEBOUNCE_MS);

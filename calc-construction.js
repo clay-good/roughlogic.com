@@ -5122,7 +5122,7 @@ export function computeRidgeCapFasteners({ ridge_lf = 0, hip_lf = 0, cap_lf_per_
   const cap_len_lf = ridge_lf + hip_lf;
   if (cap_len_lf === 0 && squares === 0) return { error: "Nothing to order: cap length and field squares are both zero." };
   const cap_bundles = Math.ceil(cap_len_lf / cap_lf_per_bundle - 1e-9);
-  // IRC R905.2.6: four nails standard, six in the high-wind / steep rows.
+  // IRC R905.2.6: at least four nails per strip shingle; the manufacturer's high-wind / steep-slope instructions call for six.
   const field_nails = squares * shingles_per_sq * nails_per_shingle;
   const cap_pieces = Math.ceil((cap_len_lf * 12) / cap_exposure_in - 1e-9);
   const cap_nails = cap_pieces * 2; // two nails per cap piece
@@ -5136,7 +5136,7 @@ export const ridgeCapFastenersExample = {
 };
 
 const renderRidgeCapFasteners = _simpleRenderer({
-  citation: "Citation: IRC R905.2.6 (asphalt-shingle fastening: four nails standard, six in the high-wind / steep-slope rows) and the manufacturer's application instructions. cap length = ridge + hip; cap bundles = ceil(cap length / lf per bundle); field nails = squares x shingles per square x nails per shingle; cap pieces = ceil(cap length x 12 / exposure); cap nails = 2 per piece; nail lbs = ceil(total nails / nails per pound). The nails-per-shingle and cap coverage per bundle come from the product wrapper and the adopted wind zone (a pre-formed hip/ridge product covers far less than field-cut 3-tab). A material takeoff, not a nailing schedule.",
+  citation: "Citation: IRC R905.2.6 (asphalt-shingle fastening: at least four nails per strip shingle, and the manufacturer's count where it is higher; six in the manufacturer's high-wind / steep-slope instructions) and the manufacturer's application instructions. cap length = ridge + hip; cap bundles = ceil(cap length / lf per bundle); field nails = squares x shingles per square x nails per shingle; cap pieces = ceil(cap length x 12 / exposure); cap nails = 2 per piece; nail lbs = ceil(total nails / nails per pound). The nails-per-shingle and cap coverage per bundle come from the product wrapper and the adopted wind zone (a pre-formed hip/ridge product covers far less than field-cut 3-tab). A material takeoff, not a nailing schedule.",
   example: ridgeCapFastenersExample.inputs,
   fields: [
     { key: "ridge_lf", label: "Ridge length (ft)", kind: "number" },
@@ -5275,7 +5275,7 @@ export function computeSeismicBaseShear({ weight_kip = 0, sds = 0, sd1 = 0, r_fa
   const governing = cs === cs_min ? "code minimum" : (cs_cap < cs_basic ? "period cap (T <= TL)" : "basic Cs");
   return {
     cs_basic, cs_cap, cs_min, cs, base_shear_kip, governing,
-    note: "ASCE 7 §12.8 equivalent lateral force: Cs = SDS / (R / Ie), capped at SD1 / (T x (R / Ie)) for T <= TL, with the minimum max(0.044 x SDS x Ie, 0.01); the base shear V = Cs x W. SDS and SD1 are the site's design spectral accelerations from the USGS seismic design maps (entered, not a bundled hazard map); R is from ASCE 7 Table 12.2-1 for the chosen lateral system; the long-period transition TL is assumed not to govern. The equivalent-lateral-force base shear for a regular building, not a modal or response-history analysis and not the vertical distribution. A licensed engineer governs.",
+    note: "ASCE 7 §12.8 equivalent lateral force: Cs = SDS / (R / Ie), capped at SD1 / (T x (R / Ie)) for T <= TL, with the minimum max(0.044 x SDS x Ie, 0.01) and, where S1 >= 0.6 g, 0.5 S1 / (R / Ie) (Eq. 12.8-6); the base shear V = Cs x W. SDS and SD1 are the site's design spectral accelerations from the USGS seismic design maps (entered, not a bundled hazard map); R is from ASCE 7 Table 12.2-1 for the chosen lateral system; the long-period transition TL is assumed not to govern. The equivalent-lateral-force base shear for a regular building, not a modal or response-history analysis and not the vertical distribution. A licensed engineer governs.",
   };
 }
 export const seismicBaseShearExample = { inputs: { weight_kip: 200, sds: 1.0, sd1: 0.6, r_factor: 6.5, ie: 1.0, period_s: 0.3 } };
@@ -6493,11 +6493,11 @@ const _renderEgressTravelDistance = _simpleRenderer({
   example: egressTravelDistanceExample.inputs,
   fields: [
     { key: "travel_ft", label: "Measured travel distance (ft)", kind: "number" },
-    { key: "travel_limit_ft", label: "Travel limit, Table 1017.2 (ft)", kind: "number" },
+    { key: "travel_limit_ft", label: "Travel limit, Table 1017.2 (ft)", kind: "number", default: 300 },
     { key: "common_path_ft", label: "Measured common path (ft)", kind: "number" },
-    { key: "common_path_limit_ft", label: "Common-path limit (ft)", kind: "number" },
+    { key: "common_path_limit_ft", label: "Common-path limit (ft)", kind: "number", default: 100 },
     { key: "dead_end_ft", label: "Longest dead-end corridor (ft)", kind: "number" },
-    { key: "dead_end_limit_ft", label: "Dead-end limit, §1020.5 (ft)", kind: "number" },
+    { key: "dead_end_limit_ft", label: "Dead-end limit, §1020.5 (ft)", kind: "number", default: 50 },
   ],
   outputs: [
     { key: "t", id: "etd-out-t", label: "Travel distance", value: (r) => (r.pass_travel ? "PASS" : "FAIL") + " (" + _fmtC(r.margin_travel, 0) + " ft margin)" },

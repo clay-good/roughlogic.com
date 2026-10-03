@@ -393,7 +393,7 @@ export function compute1031Timeline({ sale_close_iso }) {
     earliest_replacement_deadline_iso: aprilFirst ? aprilDue : ex180,
     note: aprilFirst
       ? "Tax-return due date " + aprilDue + " falls before the 180-day deadline; this earlier date governs unless the taxpayer files for an extension (Treas. Reg. 1.1031(k)-1(b)(2))."
-      : "180-day deadline " + ex180 + " falls before the next April 15 federal return due date.",
+      : "180-day deadline " + ex180 + " falls on or before the next April 15 federal return due date.",
   };
 }
 

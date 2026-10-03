@@ -189,7 +189,7 @@ export function computeTurningSurfaceFinish({ feed_ipr_in = 0, nose_radius_in = 
   const rt_in = (f * f) / (8 * r);
   const ra_in = rt_in / 4;
   const notes = [];
-  notes.push("Theoretical peak-to-valley roughness from feed and nose radius only: Rt = f^2 / (8 x r); a common estimate for the arithmetic average is Ra ~= Rt / 4 (= 0.032 x f^2 / r). First-principles scallop geometry.");
+  notes.push("Theoretical peak-to-valley roughness from feed and nose radius only: Rt = f^2 / (8 x r); a common estimate for the arithmetic average is Ra ~= Rt / 4 (= f^2 / (32 x r), about 0.031 x f^2 / r). First-principles scallop geometry.");
   notes.push("This is the theoretical finish from feed and nose radius; built-up edge, tool wear, deflection, and vibration make the measured finish rougher. Lower the feed or use a larger nose radius to improve it.");
   return {
     rt_in, ra_in,
@@ -1000,7 +1000,7 @@ function _v40renderCarbonEquivalent(inputRegion, outputRegion, citationEl) {
   const cu = makeNumber("Copper Cu (wt %)", "ce-cu", { step: "any", min: "0" });
   for (const f of [c, mn, si, cr, mo, v, ni, cu]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { c.input.value = "0.25"; mn.input.value = "0.8"; si.input.value = ""; cr.input.value = ""; mo.input.value = ""; v.input.value = ""; ni.input.value = ""; cu.input.value = ""; update(); });
-  const oCe = makeOutputLine(outputRegion, "Carbon equivalent (IIW)", "ce-out-ce");
+  const oCe = makeOutputLine(outputRegion, "Carbon equivalent (AWS D1.1; IIW when Si = 0)", "ce-out-ce");
   const oBand = makeOutputLine(outputRegion, "Weldability / preheat screen", "ce-out-band");
   const oNote = makeOutputLine(outputRegion, "Notes", "ce-out-note");
   const update = debounce(() => {

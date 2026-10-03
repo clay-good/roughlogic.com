@@ -279,7 +279,7 @@ export function computePvInterconnectionBusbar({
   let recommendation = "";
   if (!passes && limit_a !== null) {
     const downsized_main = Math.max(0, Math.floor(limit_a - pvE - pvP));
-    recommendation = "Sum (" + sum + " A) exceeds the limit (" + limit_a + " A). Move the PV breaker to the opposite end of the busbar from the main for the 120% allowance, downsize the main to " + downsized_main + " A or less, or use a supply-side tap per NEC 705.11.";
+    recommendation = "Sum (" + sum + " A) exceeds the limit (" + limit_a + " A). " + (method === "opposite_end_load_side" ? "" : "Move the PV breaker to the opposite end of the busbar from the main for the 120% allowance, ") + "downsize the main to " + downsized_main + " A or less, or use a supply-side tap per NEC 705.11.";
   }
 
   return {
