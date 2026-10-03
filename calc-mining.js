@@ -413,7 +413,7 @@ export function computeCrusherReductionRatio({ feed_size_in = 0, product_size_in
   if (!(actual_intermediate_in < feed_size_in)) return { error: "The measured intermediate size must be smaller than the feed." };
   const total_ratio = feed_size_in / product_size_in;
   const per_stage_ratio = Math.pow(total_ratio, 1 / stages);
-  const in_range = per_stage_ratio >= machine_ratio_low && per_stage_ratio <= machine_ratio_high;
+  const in_range = per_stage_ratio >= machine_ratio_low - 1e-9 * machine_ratio_low && per_stage_ratio <= machine_ratio_high + 1e-9 * machine_ratio_high;
   const first_intermediate_in = feed_size_in / per_stage_ratio;
   const second_intermediate_in = first_intermediate_in / per_stage_ratio;
   // Stages needed to keep every machine at the top of its range.
@@ -426,7 +426,7 @@ export function computeCrusherReductionRatio({ feed_size_in = 0, product_size_in
   // whole downstream ratio was checked against ONE machine's range (Metso's 3 x 3 = 9 read as out of range).
   const downstream_stages = Math.max(1, stages - 1);
   const downstream_per_stage_ratio = Math.pow(actual_downstream_ratio, 1 / downstream_stages);
-  const downstream_in_range = downstream_per_stage_ratio <= machine_ratio_high;
+  const downstream_in_range = downstream_per_stage_ratio <= machine_ratio_high + 1e-9 * machine_ratio_high;
   return {
     total_ratio, per_stage_ratio, in_range, first_intermediate_in, second_intermediate_in,
     stages_required, comfortable_ratio, actual_downstream_ratio, downstream_per_stage_ratio, downstream_in_range,

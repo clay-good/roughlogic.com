@@ -848,7 +848,7 @@ export function computePhotoperiodBlackoutSchedule({ blackout_pull_hour = 0, bla
   return {
     dark_hours, light_hours: 24 - dark_hours,
     critical_dark_hours,
-    satisfies_critical: dark_hours >= critical_dark_hours,
+    satisfies_critical: dark_hours >= critical_dark_hours - 1e-9 * Math.abs(critical_dark_hours),
     dark_margin_hours: dark_hours - critical_dark_hours,
     long_dli, short_dli,
     dli_given_up: long_dli - short_dli,

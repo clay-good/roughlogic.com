@@ -878,6 +878,8 @@ export function computeStoppingSightDistance({
   const t = Number(reaction_time_s);
   const f = Number(friction);
   const g = Number(grade) || 0;
+  // The grade is a decimal (0.03 for 3%); a percent typed here halved the stopping distance at 55 mph.
+  if (Math.abs(g) > 0.3) return { error: "Enter the grade as a decimal (0.03 for 3%), between -0.30 and 0.30." };
   if (!(v > 0)) return { error: "Speed must be positive (mph)." };
   if (!Number.isFinite(t) || !(t > 0)) return { error: "Perception-reaction time must be positive (s)." };
   if (!Number.isFinite(f) || !(f > -1)) return { error: "Friction coefficient must be a number > -1." };
@@ -903,7 +905,7 @@ export function computeStoppingSightDistance({
   const distance_shortfall_ft = avail > 0 ? Math.max(0, d_total_ft - avail) : null;
   const distance_adequate = avail > 0 ? avail >= d_total_ft - 1e-9 * Math.abs(d_total_ft) : null;
   const distance_verdict = avail > 0
-    ? (avail >= d_total_ft
+    ? (distance_adequate
       ? "ADEQUATE: " + fmt(avail, 0) + " ft available against " + fmt(d_total_ft, 0) + " ft required, " + fmt(avail - d_total_ft, 0) + " ft to spare"
       : "SHORT by " + fmt(d_total_ft - avail, 0) + " ft: " + fmt(avail, 0) + " ft available against " + fmt(d_total_ft, 0) + " ft required. Lower the speed through the zone, or occupy the gap with a shadow vehicle and attenuator -- moving the cones closer is not one of the options")
     : null;
@@ -937,6 +939,8 @@ export function computeSsdDesignSpeed({ sight_distance_ft = 0, reaction_time_s =
   const t = Number(reaction_time_s);
   const f = Number(friction);
   const g = Number(grade) || 0;
+  // The grade is a decimal (0.03 for 3%); a percent typed here halved the stopping distance at 55 mph.
+  if (Math.abs(g) > 0.3) return { error: "Enter the grade as a decimal (0.03 for 3%), between -0.30 and 0.30." };
   if (!(D > 0)) return { error: "Available sight distance must be positive (ft)." };
   if (!Number.isFinite(t) || !(t > 0)) return { error: "Perception-reaction time must be positive (s)." };
   if (!Number.isFinite(f) || !(f > -1)) return { error: "Friction coefficient must be a number > -1." };

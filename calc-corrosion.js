@@ -860,7 +860,7 @@ export function computePolarizationDecayCriterion({ on_potential_v = 0, instant_
     formation_passes: formation_mv >= polarization_criterion_mv - 1e-9 * Math.abs(polarization_criterion_mv),
     decay_passes: decay_mv >= polarization_criterion_mv - 1e-9 * Math.abs(polarization_criterion_mv),
     absolute_passes: absolute_margin_mv >= -1e-9,
-    protected_under_either: formation_mv >= polarization_criterion_mv || decay_mv >= polarization_criterion_mv || absolute_margin_mv >= -1e-9,
+    protected_under_either: formation_mv >= polarization_criterion_mv - 1e-9 * Math.abs(polarization_criterion_mv) || decay_mv >= polarization_criterion_mv - 1e-9 * Math.abs(polarization_criterion_mv) || absolute_margin_mv >= -1e-9,
     decay_overstatement_ratio: decay_mv > 1e-9 ? decay_from_on_mv / decay_mv : 0,
     decay_margin_mv: decay_mv - polarization_criterion_mv,
     note: "A line can FAIL -0.850 V and be properly protected under the 100 mV criterion -- that is precisely why the 100 mV criterion exists. Driving a well-coated line in high-resistivity soil further negative to meet -0.850 V would take current and rectifier voltage it does not need and risk the coating disbondment that overprotection causes; reporting it as a failure is a misreading of the standard, not a finding. The error the criterion is most often got wrong by is measuring the decay from the ON potential: it adds the IR drop, which is soil and not steel, and it makes a structure genuinely below 100 mV pass comfortably -- the failure mode that matters, because it certifies an unprotected line. NACE SP0169 (now AMPP) governs.",

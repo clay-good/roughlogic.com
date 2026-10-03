@@ -550,12 +550,15 @@ export function computeNAMSizing({ room_volume_ft3, target_ach = 6, filter_loadi
   if (negWc < 0) return { error: "The negative pressure target cannot be negative (in wc)." };
   if (makeup < 0) return { error: "The makeup opening area cannot be negative (sq ft)." };
   const required_cfm = (v * ach) / 60;
+  // Units are counted on their RATED (clean-filter) airflow, so a loaded-filter derate raises the
+  // airflow they must be rated for. Until 2026-10-03 the counts ignored the derate the tile computes.
+  const count_cfm = derate > 0 ? required_cfm / (1 - derate / 100) : required_cfm;
   // Recommend NAM count using the largest unit that divides cleanly, then
   // size up. We pick the smallest unit count that meets demand.
   const recommendations = NAM_UNIT_SIZES_CFM.map((unit) => ({
     unit_cfm: unit,
-    units_needed: Math.ceil(required_cfm / unit - 1e-9),
-    total_cfm: Math.ceil(required_cfm / unit - 1e-9) * unit,
+    units_needed: Math.ceil(count_cfm / unit - 1e-9),
+    total_cfm: Math.ceil(count_cfm / unit - 1e-9) * unit,
   }));
   // spec-v1690 negative-air-ach was CUT here rather than built: the airflow
   // above IS its relation, and the machine count is these recommendations.
@@ -2090,13 +2093,16 @@ export function computeDryingBalance({ evap_load_ppd = 0, installed_ppd = 0, tar
   if (!(evap > 0)) return { error: "Evaporation load must be positive (pints/day)." };
   if (!(installed > 0)) return { error: "Installed dehumidification capacity must be positive (pints/day)." };
   if (!(margin > 0)) margin = 1.2;
+  // A margin is a multiplier of at least 1 (1.2 = 20% over); below 1 is a deficit called balanced,
+  // and 120 is a percent typed as a multiplier. Both were accepted until 2026-10-03.
+  if (margin < 1 || margin > 5) return { error: "Target margin is a multiplier from 1 to 5 (1.2 for 20% over the load)." };
   const balance = installed - evap;
   const ratio = installed / evap;
   let verdict;
   let add_ppd = 0;
-  if (ratio >= margin) {
+  if (ratio >= margin * (1 - 1e-9)) {
     verdict = "Balanced with margin.";
-  } else if (ratio >= 1) {
+  } else if (ratio >= 1 - 1e-9) {
     verdict = "Meeting the load with no margin - add capacity or improve airflow.";
     add_ppd = margin * evap - installed;
   } else {

@@ -436,7 +436,7 @@ export function computeSoilSettlementElastic({ q_ksf = 0, b_ft = 0, es_ksf = 0, 
   if (!(is_f > 0)) return { error: "The influence factor must be positive (0.82 rigid square)." };
   const se_ft = (q_ksf * b_ft * (1 - nu * nu) * is_f) / es_ksf;
   const se_in = se_ft * 12;
-  const verdict = se_in <= 1 ? "within the customary 1 in serviceability limit" : "over the customary 1 in limit - resize the footing or improve the soil";
+  const verdict = se_in <= 1 + 1e-9 ? "within the customary 1 in serviceability limit" : "over the customary 1 in limit - resize the footing or improve the soil";
   return {
     se_ft, se_in, verdict,
     note: "Theory-of-elasticity immediate settlement Se = q B (1 - nu^2) Is / Es, with the shape-and-rigidity influence factor Is (~0.82 rigid square, ~0.95 flexible-square average, larger for strips) as compiled in Bowles and the customary geotechnical texts. Immediate (elastic) settlement on a deep uniform elastic layer only - not the time-dependent consolidation settlement of a clay; one homogeneous modulus (no layering or increase with depth); influence factor as entered; no embedment correction. A design aid, not a substitute for the geotechnical engineer of record's report.",
@@ -612,7 +612,8 @@ export function computeSlopeStabilityInfinite({ beta_deg = 0, phi_deg = 0, c_psf
   const driving_psf = gamma_pcf * h_ft * Math.sin(b) * Math.cos(b);
   const resisting_psf = c_psf + gamma_pcf * h_ft * Math.cos(b) * Math.cos(b) * Math.tan(p);
   const fs_slope = resisting_psf / driving_psf;
-  const verdict = fs_slope >= 1.5 ? "at or above the customary 1.5 - the slope holds" : (fs_slope >= 1.0 ? "between 1.0 and 1.5 - marginal; flatten the slope or retain it" : "below 1.0 - the slope is predicted to slide");
+  // Slack on both edges: c = 0 and phi = beta is FS exactly 1 but computes 0.9999999999999998 at 19 of 89 angles.
+  const verdict = fs_slope >= 1.5 - 1e-9 * 1.5 ? "at or above the customary 1.5 - the slope holds" : (fs_slope >= 1.0 - 1e-9 ? "between 1.0 and 1.5 - marginal; flatten the slope or retain it" : "below 1.0 - the slope is predicted to slide");
   return {
     driving_psf, resisting_psf, fs_slope, verdict,
     note: "Infinite-slope factor of safety FS = (c' + gamma H cos^2 beta tan phi') / (gamma H sin beta cos beta), as compiled in the Das and NAVFAC slope-stability references; for a cohesionless soil (c' = 0) it collapses to FS = tan phi' / tan beta - depth- and weight-independent, which is why a dry sand slope stands exactly at its angle of repose. Shallow translational slide on a plane parallel to a long uniform slope, dry (no seepage or pore pressure; the submerged gamma - gamma_w case is a follow-on), drained effective-stress parameters, no seismic loading - not a circular Bishop/Spencer analysis. A screening aid; the geotechnical engineer of record governs.",

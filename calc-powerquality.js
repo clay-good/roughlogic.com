@@ -211,7 +211,7 @@ export function computeMotorVdStarting({ source_voltage_V = 0, length_ft = 0, cm
     pass: dipPct <= lim + 1e-9 * Math.abs(lim),
     dip_limit_pct: lim,
     note: (lrc_estimated ? "LRC estimated as 6x FLA (no code letter entered - confirm against the nameplate). " : "")
-      + (dipPct > lim ? "Starting dip exceeds " + lim + "% - likely contactor dropout / failed start." : "Within the " + lim + "% starting-dip limit.")
+      + (dipPct > lim + 1e-9 * Math.abs(lim) ? "Starting dip exceeds " + lim + "% - likely contactor dropout / failed start." : "Within the " + lim + "% starting-dip limit.")
       + " This is the starting dip, distinct from the steady-state voltage-drop tile.",
   };
 }

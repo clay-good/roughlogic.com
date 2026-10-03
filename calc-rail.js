@@ -648,7 +648,7 @@ RAIL_RENDERERS["tonnage-rating-grade"] = _simpleRenderer({
   ],
   outputs: [
     { key: "r", id: "trg-out-r", label: "Resistance", value: (r) => fmt(r.total_resistance_lb_per_ton, 2) + " lb/ton -- grade " + fmt(r.grade_resistance_lb_per_ton, 1) + ", rolling " + fmt(r.rolling_resistance_lb_per_ton, 1) + ", curve " + fmt(r.curve_resistance_lb_per_ton, 1) },
-    { key: "t", id: "trg-out-t", label: "Trailing tonnage rating", value: (r) => fmt(r.tonnage_rating_tons, 0) + " trailing tons over that hill, behind " + fmt(r.loco_tons, 0) + " tons of locomotives" },
+    { key: "t", id: "trg-out-t", label: "Trailing tonnage rating", value: (r) => r.loco_tons > 0 ? fmt(r.tonnage_rating_tons, 0) + " trailing tons over that hill, behind " + fmt(r.loco_tons, 0) + " tons of locomotives" : fmt(r.tonnage_rating_tons, 0) + " tons over that hill INCLUDING the locomotives -- enter the weight on drivers to take their weight off and get trailing tons" },
     { key: "a", id: "trg-out-a", label: "Adhesion", value: (r) => r.adhesion_verdict },
     { key: "l", id: "trg-out-l", label: "The hill, not the railroad", value: (r) => "on level track the same power moves " + fmt(r.level_tonnage_tons, 0) + " tons at " + fmt(r.level_resistance_lb_per_ton, 2) + " lb/ton -- " + fmt(r.grade_penalty_x, 1) + "x as much" },
     { key: "c", id: "trg-out-c", label: "At the comparison grade", value: (r) => r.alternate_tonnage_tons === null ? "(no comparison grade entered)" : fmt(r.alternate_tonnage_tons, 0) + " tons at " + fmt(r.alternate_grade_pct, 2) + "%, " + fmt(r.alternate_resistance_lb_per_ton, 2) + " lb/ton" },

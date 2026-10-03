@@ -172,7 +172,8 @@ HVACSERVICE_RENDERERS["recovery-cylinder"] = _simpleRenderer({
 const _STD_OCPD_A = [15, 20, 25, 30, 35, 40, 45, 50, 60, 70, 80, 90, 100, 110, 125, 150, 175, 200, 225, 250, 300, 350, 400, 450, 500, 600, 700, 800, 1000, 1200];
 function _ocpdRoundDown(a) {
   let pick = _STD_OCPD_A[0];
-  for (const s of _STD_OCPD_A) { if (s <= a) pick = s; else break; }
+  // NEC 440.22(A) "not exceeding 175 percent": a size landing exactly on 175% is allowed.
+  for (const s of _STD_OCPD_A) { if (s <= a + 1e-9 * a) pick = s; else break; }
   return pick;
 }
 // dims: in { compressor_rla_A: I, fan_fla_A: I, other_load_A: I, installed_breaker_A: I } out: { mca_A: I, mocp_A: I, mocp_max_A: I, min_conductor_A: I }
@@ -473,8 +474,8 @@ export function computeFurnaceTempRise({ return_air_F = 0, supply_air_F = 0, inp
   const output_btuh = input_btuh * efficiency_pct / 100;
   const cfm = output_btuh / (_SENSIBLE_HEAT_FACTOR * delta_T_F);
   let verdict;
-  if (delta_T_F < rise_min_F) verdict = "rise low (" + fmt(delta_T_F, 0) + " F, below the " + fmt(rise_min_F, 0) + " F minimum) - airflow too high, or the burner is underfired";
-  else if (delta_T_F > rise_max_F) verdict = "rise high (" + fmt(delta_T_F, 0) + " F, above the " + fmt(rise_max_F, 0) + " F maximum) - airflow too low; check the filter, ductwork, and blower speed";
+  if (delta_T_F < rise_min_F - 1e-9 * Math.abs(rise_min_F)) verdict = "rise low (" + fmt(delta_T_F, 0) + " F, below the " + fmt(rise_min_F, 0) + " F minimum) - airflow too high, or the burner is underfired";
+  else if (delta_T_F > rise_max_F + 1e-9 * Math.abs(rise_max_F)) verdict = "rise high (" + fmt(delta_T_F, 0) + " F, above the " + fmt(rise_max_F, 0) + " F maximum) - airflow too low; check the filter, ductwork, and blower speed";
   else verdict = "rise in range (" + fmt(delta_T_F, 0) + " F, within " + fmt(rise_min_F, 0) + " to " + fmt(rise_max_F, 0) + " F)";
   return {
     delta_T_F, output_btuh, cfm, verdict,
@@ -520,8 +521,8 @@ export function computeFurnaceAirflowToRise({ input_btuh = 0, efficiency_pct = 8
   const delta_T_F = output_btuh / (_SENSIBLE_HEAT_FACTOR * cfm);
   const supply_air_F = return_air_F + delta_T_F;
   let verdict;
-  if (delta_T_F < rise_min_F) verdict = "rise low (" + fmt(delta_T_F, 0) + " F, below the " + fmt(rise_min_F, 0) + " F minimum) - this airflow is too high for the firing rate; drop to a lower blower tap";
-  else if (delta_T_F > rise_max_F) verdict = "rise high (" + fmt(delta_T_F, 0) + " F, above the " + fmt(rise_max_F, 0) + " F maximum) - this airflow is too low; raise the blower tap or clear the filter and ductwork";
+  if (delta_T_F < rise_min_F - 1e-9 * Math.abs(rise_min_F)) verdict = "rise low (" + fmt(delta_T_F, 0) + " F, below the " + fmt(rise_min_F, 0) + " F minimum) - this airflow is too high for the firing rate; drop to a lower blower tap";
+  else if (delta_T_F > rise_max_F + 1e-9 * Math.abs(rise_max_F)) verdict = "rise high (" + fmt(delta_T_F, 0) + " F, above the " + fmt(rise_max_F, 0) + " F maximum) - this airflow is too low; raise the blower tap or clear the filter and ductwork";
   else verdict = "rise in range (" + fmt(delta_T_F, 0) + " F, within " + fmt(rise_min_F, 0) + " to " + fmt(rise_max_F, 0) + " F)";
   return {
     output_btuh, delta_T_F, supply_air_F, verdict,

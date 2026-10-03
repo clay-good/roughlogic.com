@@ -1958,7 +1958,7 @@ export function computeMortgageReserves({ piti_monthly, reserves_months, liquid_
   const delta = eligible - required;
   const flags = [];
   if (months > 24) flags.push("Reserves above 24 months is outside the typical agency range; verify the program.");
-  return { required, eligible, eligible_retirement, delta, months_covered: piti > 0 ? eligible / piti : 0, meets: delta >= 0, flags };
+  return { required, eligible, eligible_retirement, delta, months_covered: piti > 0 ? eligible / piti : 0, meets: delta >= -1e-9 * Math.abs(required), flags };
 }
 
 export const mortgageReservesExample = {

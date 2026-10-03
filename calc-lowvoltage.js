@@ -47,13 +47,15 @@ export function computeFiberLossBudget({ length_m = 0, attenuation_db_km = 0, co
   const ns = Math.max(0, Number(splice_count) || 0);
   const lpc = Number(loss_per_connector_db) || 0;
   const lps = Number(loss_per_splice_db) || 0;
+  // A negative per-event loss is a gain no connector or splice provides; it could flip a failing link.
+  if (lpc < 0 || lps < 0) return { error: "Connector and splice losses cannot be negative (dB)." };
   const fiber_loss_db = (len / 1000) * att;
   const connector_loss_db = nc * lpc;
   const splice_loss_db = ns * lps;
   const total_loss_db = fiber_loss_db + connector_loss_db + splice_loss_db;
   const maxch = Number(max_channel_loss_db) || 0;
   let margin_db = null, pass = null;
-  if (maxch > 0) { margin_db = maxch - total_loss_db; pass = margin_db >= 0; }
+  if (maxch > 0) { margin_db = maxch - total_loss_db; pass = margin_db >= -1e-9 * maxch; }
   const notes = [];
   if (pass === false) notes.push("Total loss " + fmt(total_loss_db, 2) + " dB exceeds the channel maximum (" + fmt(maxch, 2) + " dB): the link fails the budget.");
   notes.push("Attenuation coefficients and component losses are component-specific and user-supplied; the OTDR/power-meter field test governs the certified link.");
@@ -273,6 +275,8 @@ export function computeFiberMaxLength({ max_channel_loss_db = 0, attenuation_db_
   const ns = Math.max(0, Number(splice_count) || 0);
   const lpc = Number(loss_per_connector_db) || 0;
   const lps = Number(loss_per_splice_db) || 0;
+  // A negative per-event loss is a gain no connector or splice provides; it could flip a failing link.
+  if (lpc < 0 || lps < 0) return { error: "Connector and splice losses cannot be negative (dB)." };
   const fixed_loss_db = nc * lpc + ns * lps;
   const fiber_budget_db = maxch - fixed_loss_db;
   if (!(fiber_budget_db > 0)) return { error: "The connector and splice losses alone (" + fmt(fixed_loss_db, 2) + " dB) meet or exceed the channel budget; no fiber length is available (reduce connectors/splices or raise the budget)." };
@@ -352,13 +356,13 @@ export function computeCableTrayFill({ tray_type = "ladder", tray_width_in = 0, 
     // 392.22(A)(3)(a): <= 90% of the width on a solid-bottom tray.
     basis = "sum-of-diameters (cables 4/0 and larger)";
     const diameter_allow = tray_type === "solid-bottom" ? 0.9 * width : width;
-    fill_value = diameter_sum; allowable = diameter_allow; pass = diameter_sum <= diameter_allow;
+    fill_value = diameter_sum; allowable = diameter_allow; pass = diameter_sum <= diameter_allow + 1e-9 * Math.abs(diameter_allow);
     fill_percent = (diameter_sum / diameter_allow) * 100;
   } else if (hasSmall && !hasLarge) {
     // 392.22(A)(1)(b) / (A)(3)(b): sum of areas <= the Column 1 (ladder) / Column 3 (solid bottom) allowable.
     basis = "sum-of-areas (cables smaller than 4/0)";
     allowable = _trayColumn2Area(tray_type, width);
-    fill_value = area_sum; pass = area_sum <= allowable;
+    fill_value = area_sum; pass = area_sum <= allowable + 1e-9 * Math.abs(allowable);
     fill_percent = (area_sum / allowable) * 100;
   } else {
     // Mixed (392.22(A)(1)(c)): the smaller-cable Column-1 area is reduced by the
@@ -371,7 +375,7 @@ export function computeCableTrayFill({ tray_type = "ladder", tray_width_in = 0, 
     const sdFactor = tray_type === "solid-bottom" ? 1.0 : 1.2;
     const reduced_allowable = Math.max(0, _trayColumn2Area(tray_type, width) - sdFactor * diameter_sum);
     allowable = reduced_allowable; fill_value = area_sum;
-    pass = diameter_sum <= width && area_sum <= reduced_allowable;
+    pass = diameter_sum <= width + 1e-9 * width && area_sum <= reduced_allowable + 1e-9 * Math.abs(reduced_allowable);
     fill_percent = reduced_allowable > 0 ? (area_sum / reduced_allowable) * 100 : Infinity;
     notes.push("Mixed 4/0-and-larger and smaller cables: verify against NEC 392.22(A)(1)(c). Large-cable diameter sum " + fmt(diameter_sum, 2) + " in of " + fmt(width, 1) + " in width.");
     if (!Number.isFinite(fill_percent)) { fill_percent = null; pass = false; notes.push("Large cables consume the whole tray width; no room for smaller cables."); }

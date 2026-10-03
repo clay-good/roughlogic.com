@@ -843,9 +843,9 @@ export function computePvInverterRatio({ dc_kw = 0, ac_kw = 0, inv_eff = 0.96 } 
   const ilr = dc_kw / ac_kw;
   const clip_dc_kw = ac_kw / inv_eff;
   const clip_fraction = clip_dc_kw / dc_kw;
-  const verdict = ilr < 1.1
+  const verdict = ilr < 1.1 * (1 - 1e-9)
     ? "Inverter oversized - ratio below the typical 1.1-1.3 band; it rarely fills"
-    : ilr <= 1.3
+    : ilr <= 1.3 * (1 + 1e-9)
       ? "In the typical cost-optimal 1.1-1.3 band"
       : "Inverter undersized - ratio above 1.3; expect frequent clipping of array peaks";
   return {

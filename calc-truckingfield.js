@@ -630,7 +630,7 @@ export function computeDeckPointLoadDunnage({ load_lb = 0, feet_count = 4, foot_
   const utilization_pct = linear_load_plf / deck_rating_plf * 100;
   const required_length_ft = load_lb / deck_rating_plf;
   const shortfall_ft = Math.max(0, required_length_ft - dunnage_bearing_ft);
-  const verdict = utilization_pct > 100
+  const verdict = utilization_pct > 100 + 1e-9 * 100
     ? "OVER the deck rating: add " + fmt(shortfall_ft, 2) + " ft of dunnage bearing to reach 100%"
     : utilization_pct > 85
       ? "inside the deck rating but with little margin"

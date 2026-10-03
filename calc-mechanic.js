@@ -3328,7 +3328,9 @@ export function computeAircraftWeightBalance({ empty_weight_lb = 0, empty_arm_in
   for (const [w, arm] of stations) { total_weight_lb += w; total_moment_inlb += w * arm; }
   const cg_in = total_moment_inlb / total_weight_lb;
   const over_gross = total_weight_lb > mgw + 1e-9 * Math.abs(mgw);
-  const cg_out = cg_in < fwd || cg_in > aft;
+  // The envelope limits are inclusive; 1,500 lb at 32.2 plus 170 lb at 48.9 is a 33.9 in CG that
+  // computes 33.900000000000006 and read outside a 33.9 aft limit until 2026-10-03.
+  const cg_out = cg_in < fwd - 1e-9 * Math.abs(fwd) || cg_in > aft + 1e-9 * Math.abs(aft);
   const in_envelope = !over_gross && !cg_out;
   if (![total_weight_lb, total_moment_inlb, cg_in].every(Number.isFinite)) return { error: "Weight-and-balance math is not a finite value." };
   return {
@@ -3748,7 +3750,7 @@ export function computeUjointOperatingAngle({ input_angle_deg = 10, output_angle
   const first_joint_variation_pct = varPct(input_angle_deg);
   const second_joint_variation_pct = varPct(output_angle_deg);
   const angle_difference_deg = Math.abs(input_angle_deg - output_angle_deg);
-  const cancelled = angle_difference_deg <= 1.0;
+  const cancelled = angle_difference_deg <= 1.0 + 1e-9;
   if (![first_joint_variation_pct, second_joint_variation_pct].every(Number.isFinite)) return { error: "U-joint angle math is not a finite value." };
   return {
     first_joint_variation_pct,

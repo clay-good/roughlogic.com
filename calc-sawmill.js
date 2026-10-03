@@ -314,7 +314,7 @@ export function computeBandmillSpeedBite({ wheel_diameter_in = 0, wheel_rpm = 0,
   // Bite per tooth is the wood advanced between successive teeth.
   const bite_in = feed_rate_fpm * 12 / teeth_per_min;
   const feed_for_target_fpm = target_bite_in * teeth_per_min / 12;
-  const in_typical_band = bite_in >= 0.020 && bite_in <= 0.045;
+  const in_typical_band = bite_in >= 0.020 * (1 - 1e-9) && bite_in <= 0.045 * (1 + 1e-9);
   // Each gullet carries the sawdust from one bite across the whole face.
   const gullet_load_cuin = bite_in * kerf_in * depth_of_face_in;
   const gullet_use_pct = gullet_load_cuin / gullet_capacity_cuin * 100;
@@ -324,12 +324,12 @@ export function computeBandmillSpeedBite({ wheel_diameter_in = 0, wheel_rpm = 0,
     blade_speed_sfpm, teeth_per_min, bite_in, feed_for_target_fpm,
     in_typical_band, gullet_load_cuin, gullet_use_pct, max_face_in,
     max_feed_at_face_fpm,
-    bite_verdict: bite_in < 0.020
+    bite_verdict: bite_in < 0.020 * (1 - 1e-9)
       ? "BELOW the 0.020 to 0.045 in band -- the teeth are rubbing rather than cutting, which is what makes heat, dulling, and washboard"
-      : bite_in > 0.045
+      : bite_in > 0.045 * (1 + 1e-9)
         ? "ABOVE the 0.020 to 0.045 in band -- a gullet that fills before it leaves the cut packs, and a packed gullet is what makes a saw dive"
         : "inside the 0.020 to 0.045 in band that suits softwood; dense hardwood wants the lower half of it",
-    face_verdict: max_face_in >= depth_of_face_in
+    face_verdict: max_face_in >= depth_of_face_in * (1 - 1e-9)
       ? "the gullet carries this bite through the entered face with room left"
       : "the gullet is over capacity in the entered face -- slow the feed to " + fmt(max_feed_at_face_fpm, 0) + " ft/min or take a shallower face",
     note: "Bite per tooth is what each tooth actually takes, and a band's behaviour follows from it. Too small a bite means the tooth is rubbing rather than cutting, which generates heat, work-hardens the tip, and produces the washboard finish that gets blamed on tension. Too large a bite overloads the gullet, and a gullet that fills before it exits the cut packs, which is what makes a saw dive. THE GULLET IS THE REAL CONSTRAINT and it is why bite and depth of face cannot be considered separately. A bite that is fine in a 12 in cant is too much in a 30 in one, because the gullet has to carry the sawdust across a face two and a half times as deep. That is the arithmetic behind slowing the feed as the cants get bigger, and it is why a mill running mixed sizes at a fixed feed speed has a saw problem on the big logs only -- so the deepest face the gullet supports at the current bite is reported beside the bite itself. FOR A FILER THE USEFUL INVERSION is what feed speed a target bite implies at the current blade speed and tooth spacing, because that is a setting the sawyer can act on directly, where blade speed and tooth spacing are not. A kinematic relation between feed, blade speed, and tooth spacing. It does not evaluate gullet capacity from first principles, which requires the gullet area, the sawdust bulking factor for the species and moisture, and the depth of face; the capacity is entered and the interaction is flagged, but the filer's judgment and the saw manufacturer's guidance govern. It does not address saw tension, wheel alignment and tracking, tooth geometry, hook and clearance angles, set or swage, blade width and gauge, or strain -- all of which affect cutting behaviour at least as much as bite does and none of which is arithmetic. It does not address sawing accuracy, target sizes, or the oversize allowances that determine recovery. Band saws operating at these speeds are a serious hazard: the saw and mill manufacturers' specifications, a qualified filer, and OSHA govern.",
