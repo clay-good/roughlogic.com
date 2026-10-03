@@ -92,6 +92,7 @@ export function computeTiedownCount({ length_ft = 0, weight_lb = 0, tiedowns = 0
   if (!(length_ft > 0)) return { error: "Article length must be positive." };
   if (!(weight_lb > 0)) return { error: "Article weight must be positive." };
   if (!(tiedowns >= 1)) return { error: "Plan at least one tiedown." };
+  if (!Number.isInteger(Number(tiedowns))) return { error: "Tiedowns are counted whole; 3.5 is not a tiedown count." };
   if (!(wll_per_tiedown_lb > 0)) return { error: "Working load limit per tiedown must be positive." };
   // Two INDEPENDENT rules. The count rule is about LENGTH; the aggregate working
   // load limit rule is about WEIGHT. The securement has to satisfy both.
@@ -281,23 +282,30 @@ export function computeAirBrakePushrodStroke({ readjustment_limit_in = 2.0, meas
   if (!(total_brakes >= 1)) return { error: "Total brake count must be at least 1." };
   if (!(defective_brakes >= 0)) return { error: "Defective brake count cannot be negative." };
   if (defective_brakes > total_brakes) return { error: "Defective brakes cannot exceed the total brake count." };
-  // Being AT the limit counts as defective, not just being over it.
+  // Being AT the limit is out of adjustment, not just being over it.
   const margin_in = readjustment_limit_in - measured_stroke_in;
   const this_brake_defective = measured_stroke_in >= readjustment_limit_in;
+  // CVSA OOS counting: a brake 1/4 in or more BEYOND the readjustment limit counts as one defective
+  // brake, and two brakes each less than 1/4 in beyond count as one (so each is a half). A brake
+  // exactly at the limit is out of adjustment but not "beyond" it (added 2026-10-03).
+  const over_in = measured_stroke_in - readjustment_limit_in;
+  const oos_count_weight = over_in >= 0.25 - 1e-9 ? 1 : over_in > 1e-9 ? 0.5 : 0;
   const defective_fraction_pct = defective_brakes / total_brakes * 100;
   const out_of_service = defective_fraction_pct >= 20;
   const brakes_to_oos = Math.max(0, Math.ceil(0.2 * total_brakes - 1e-9) - defective_brakes);
   const verdict = out_of_service
     ? "OUT OF SERVICE: " + fmt(defective_fraction_pct, 1) + "% of the brakes are defective, at or past the 20% threshold"
     : "not out of service at " + fmt(defective_fraction_pct, 1) + "%, but " + String(brakes_to_oos) + " more defective brake(s) reaches the threshold";
+  const count_text = "; this brake counts as " + (oos_count_weight === 1 ? "one defective brake (1/4 in or more beyond the limit)" : oos_count_weight === 0.5 ? "half a defective brake (under 1/4 in beyond; two of these count as one)" : "no defective brake toward the OOS count") + " under the CVSA criteria -- enter the defective count on that basis";
   if (![margin_in, defective_fraction_pct].every(Number.isFinite)) return { error: "Pushrod-stroke math is not a finite value." };
   return {
     margin_in,
     this_brake_defective,
+    oos_count_weight,
     defective_fraction_pct,
     out_of_service,
     brakes_to_oos,
-    verdict,
+    verdict: verdict + count_text,
     note: "Whether a measured pushrod stroke is inside its chamber's readjustment limit, and whether the combination has enough defective brakes to be placed out of service. Each brake chamber has a published readjustment limit -- the stroke at which the brake is considered out of adjustment -- and it depends on the chamber type and size rather than on the vehicle: a standard type 30 clamp chamber sits at 2 inches and a long-stroke type 30 at 2.5 inches, so the limit is entered rather than assumed. Being AT the limit counts as defective, not merely being over it, which is the detail that turns a marginal brake into a violation. The vehicle-level rule is the one that decides whether the truck moves: when 20% or more of the combination's brakes are defective, the whole vehicle is out of service. On a five-axle combination with ten brakes, two defective brakes is exactly 20%, so a driver who finds one out of adjustment is one brake away from being parked, and three defective is 30% and the truck does not move until they are adjusted. Only at one defective brake, 10%, is the combination legal to operate, and it is a violation on the inspection report either way. That is the number worth knowing before the inspection rather than during it. A screen; the chamber manufacturer's published readjustment limit, the CVSA out-of-service criteria in full, and the inspector govern.",
   };
 }

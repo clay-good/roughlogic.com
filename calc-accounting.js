@@ -332,6 +332,10 @@ export function computeEstimatedTax({
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(projected_current_tax >= 0)) return { error: "Projected tax cannot be negative." };
   if (!(prior_year_tax >= 0)) return { error: "Prior-year tax cannot be negative." };
+  // IRC 6654(d)(1)(B): the prior-year safe harbor is 100%, or 110% above $150,000 AGI; the UI
+  // offers only those, but the compute took any multiplier (0.5 halved the required payment).
+  const mult = Number(prior_year_multiplier);
+  if (!(Math.abs(mult - 1) < 1e-9 || Math.abs(mult - 1.1) < 1e-9)) return { error: "The prior-year multiplier is 1.0 (100%) or 1.1 (110% when prior-year AGI was over $150,000)." };
   const ninety_pct = projected_current_tax * 0.90;
   const prior_safe = prior_year_tax * prior_year_multiplier;
   const required = Math.min(ninety_pct, prior_safe);

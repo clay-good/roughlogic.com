@@ -1293,8 +1293,8 @@ LINEWORKER_RENDERERS["feeder-loss-load-factor"] = _simpleRenderer({
 
 // ============ spec-v1466: watt-hour meter CT / PT multiplier ============
 
-// dims: in { ct_primary_a: I, ct_secondary_a: I, pt_primary_v: M L^2 T^-3 I^-1, pt_secondary_v: M L^2 T^-3 I^-1, register_constant: dimensionless, register_reading_kwh: M L^2 T^-2, demand_register_kw: M L^2 T^-3, service_voltage_kv: M L^2 T^-3 I^-1 } out: { ct_ratio: dimensionless, pt_ratio: dimensionless, multiplier: dimensionless, billed_kwh: M L^2 T^-2, implied_demand_kw: M L^2 T^-3, implied_current_a: I }
-export function computeMeterCtPtMultiplier({ ct_primary_a = 0, ct_secondary_a = 5, pt_primary_v = 0, pt_secondary_v = 120, register_constant = 1, register_reading_kwh = 0, demand_register_kw = 0, service_voltage_kv = 0 } = {}) {
+// dims: in { ct_primary_a: I, ct_secondary_a: I, pt_primary_v: M L^2 T^-3 I^-1, pt_secondary_v: M L^2 T^-3 I^-1, register_constant: dimensionless, register_reading_kwh: M L^2 T^-2, demand_register_kw: M L^2 T^-3, service_voltage_kv: M L^2 T^-3 I^-1, ct_rating_factor: dimensionless } out: { ct_ratio: dimensionless, pt_ratio: dimensionless, multiplier: dimensionless, billed_kwh: M L^2 T^-2, implied_demand_kw: M L^2 T^-3, implied_current_a: I }
+export function computeMeterCtPtMultiplier({ ct_primary_a = 0, ct_secondary_a = 5, pt_primary_v = 0, pt_secondary_v = 120, register_constant = 1, register_reading_kwh = 0, demand_register_kw = 0, service_voltage_kv = 0, ct_rating_factor = 1 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   // Unit / range guard added 2026-09-26 after printed-example probing.
   if (Number(arguments[0]?.service_voltage_kv) > 1000) return { error: "Enter the service voltage in kV (12.47), not volts." };
@@ -1306,6 +1306,9 @@ export function computeMeterCtPtMultiplier({ ct_primary_a = 0, ct_secondary_a = 
   if (register_reading_kwh < 0) return { error: "Register reading cannot be negative (kWh)." };
   if (demand_register_kw < 0) return { error: "Demand register reading cannot be negative (kW)." };
   if (service_voltage_kv < 0) return { error: "Service voltage cannot be negative (kV)." };
+  // IEEE C57.13: a metering CT carries a thermal rating factor (commonly 1.33 to 4.0), so it runs
+  // continuously above its primary rating. Until 2026-10-03 anything over 100% read NOT PLAUSIBLE.
+  if (!(ct_rating_factor >= 1 && ct_rating_factor <= 4)) return { error: "The CT rating factor runs from 1.0 to 4.0 (from the CT nameplate)." };
   const ct_ratio = ct_primary_a / ct_secondary_a;
   const pt_ratio = pt_primary_v / pt_secondary_v;
   const multiplier = ct_ratio * pt_ratio * register_constant;
@@ -1319,19 +1322,20 @@ export function computeMeterCtPtMultiplier({ ct_primary_a = 0, ct_secondary_a = 
     ? implied_demand_kw * 1000 / (Math.sqrt(3) * service_voltage_kv * 1000)
     : null;
   const ct_utilization_pct = implied_current_a === null ? null : implied_current_a / ct_primary_a * 100;
-  const within_ct_rating = implied_current_a === null ? null : implied_current_a <= ct_primary_a + 1e-9 * Math.abs(ct_primary_a);
+  const ct_continuous_a = ct_primary_a * ct_rating_factor;
+  const within_ct_rating = implied_current_a === null ? null : implied_current_a <= ct_continuous_a + 1e-9 * Math.abs(ct_continuous_a);
   const outs = [ct_ratio, pt_ratio, multiplier, billed_kwh, implied_demand_kw];
   if (!outs.every(Number.isFinite)) return { error: "Metering multiplier math is not a finite value." };
   const verdict = within_ct_rating === null
     ? "Enter a demand register reading and the service voltage to run the plausibility check."
     : within_ct_rating
-      ? "PLAUSIBLE: the implied " + fmt(implied_current_a, 1) + " A is " + fmt(ct_utilization_pct, 0) + "% of the " + fmt(ct_primary_a, 0) + " A CT primary, which is a load this installation can actually carry"
-      : "NOT PLAUSIBLE: the implied " + fmt(implied_current_a, 1) + " A is " + fmt(ct_utilization_pct, 0) + "% of the " + fmt(ct_primary_a, 0) + " A CT primary. A CT does not pass " + fmt(ct_utilization_pct / 100, 2) + " times its rating in normal service, so the multiplier, the CT record, or the register reading is wrong -- and this is exactly the discrepancy the check exists to surface";
+      ? "PLAUSIBLE: the implied " + fmt(implied_current_a, 1) + " A is " + fmt(ct_utilization_pct, 0) + "% of the " + fmt(ct_primary_a, 0) + " A CT primary" + (ct_rating_factor > 1 ? ", inside its rating factor of " + fmt(ct_rating_factor, 2) : "") + ", which is a load this installation can actually carry"
+      : "NOT PLAUSIBLE: the implied " + fmt(implied_current_a, 1) + " A is " + fmt(ct_utilization_pct, 0) + "% of the " + fmt(ct_primary_a, 0) + " A CT primary" + (ct_rating_factor > 1 ? ", past its rating factor of " + fmt(ct_rating_factor, 2) : "") + ". A CT does not pass " + fmt(ct_utilization_pct / 100, 2) + " times its rating in normal service, so the multiplier, the CT record, or the register reading is wrong -- and this is exactly the discrepancy the check exists to surface";
   return {
     ct_primary_a, ct_secondary_a, pt_primary_v, pt_secondary_v, register_constant,
     ct_ratio, pt_ratio, multiplier, register_reading_kwh, billed_kwh,
     demand_register_kw, implied_demand_kw, implied_current_a, ct_utilization_pct,
-    within_ct_rating, service_voltage_kv, verdict,
+    within_ct_rating, service_voltage_kv, ct_rating_factor, ct_continuous_a, verdict,
     note: "A transformer-rated meter does not read energy, it reads a scaled fraction of it, and the multiplier that converts the register to real kilowatt-hours is the product of two instrument transformer ratios and a register constant. The multiplier is a pure product, and that is exactly why it goes wrong: swapping a 200:5 current transformer for a 400:5 during a load upgrade doubles the correct multiplier, and if the billing record is not changed with it the customer is billed half, indefinitely. The same happens with a potential transformer changed on a voltage conversion. Neither error announces itself, because the meter keeps working and the register keeps advancing -- there is nothing to see in the field, and a billing error of this kind commonly runs for years in either direction before anyone catches it. THE CHECK THAT CATCHES IT IS DIMENSIONAL RATHER THAN CLERICAL. Take the metered demand, multiply it out to the primary, turn it into a current at the service voltage, and hold that current against the current transformer that is supposed to be carrying it. A multiplier off by a factor of two puts the implied load somewhere the service physically cannot go, and the discrepancy shows up in one line of arithmetic rather than in an audit. A current transformer is not passing two or three times its primary rating in normal service, so an implied current above it means the multiplier, the CT record, or the reading is wrong. This is the multiplier arithmetic for a transformer-rated installation and the plausibility check on it. It does not verify instrument transformer accuracy class, burden, or polarity: a reversed CT polarity, or a current transformer paired with the wrong phase's potential transformer, produces a wrong reading that no multiplier fixes and that this cannot see. It does not detect a meter wired to the wrong phase, a shorted CT secondary, or a blown PT fuse, which are the field failures. Ratio-correction and phase-angle-correction factors from the instrument transformer test report are not applied, and transformer-loss compensation, used where the metering sits on the low side of a customer-owned transformer, is a separate adjustment. ANSI C12.1, the instrument transformer test reports, and the utility's metering standard govern.",
   };
 }
@@ -1348,6 +1352,7 @@ LINEWORKER_RENDERERS["meter-ct-pt-multiplier"] = _simpleRenderer({
     { key: "register_reading_kwh", label: "Register reading (kWh)", kind: "number", default: 1480 },
     { key: "demand_register_kw", label: "Demand register reading (kW, 0 to skip the check)", kind: "number", default: 4.1 },
     { key: "service_voltage_kv", label: "Service voltage, line to line (kV)", kind: "number", default: 12.47 },
+    { key: "ct_rating_factor", label: "CT rating factor (nameplate RF, 1.0 if none)", kind: "number", default: 1 },
   ],
   outputs: [
     { key: "r", id: "mcm-out-r", label: "The two ratios", value: (r) => "CT " + fmt(r.ct_ratio, 1) + " to 1, PT " + fmt(r.pt_ratio, 1) + " to 1" },
