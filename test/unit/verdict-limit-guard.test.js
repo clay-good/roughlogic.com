@@ -103,3 +103,19 @@ test("every strict failure verdict against a limit carries float slack away from
   }
   assert.deepEqual(bad, []);
 });
+
+// A demand/capacity unity check (`dcr <= 1`, `utilization > 1`) lives in
+// returned objects, verdict strings, and output labels, not only in `_ok`
+// consts. A member sized exactly at capacity computes 1.0000000000000002 and
+// read OVER. 2026-10-03: 23 such checks gained `1 + 1e-9`. Input validation
+// (`return { error`) is exempt; it bounds an entered value, not a result.
+test("every demand/capacity unity check carries float slack", () => {
+  const bad = [];
+  const re = /\b\w*(?:util|dcr|interaction)\w* (?:<=|>) 1(?:\.0)?(?![\d.]| \+ 1e-)/;
+  for (const f of readdirSync(ROOT).filter((n) => /^calc-.*\.js$/.test(n))) {
+    readFileSync(resolve(ROOT, f), "utf8").split("\n").forEach((line, i) => {
+      if (re.test(line) && !/return \{ error/.test(line) && !/^\s*\/\//.test(line)) bad.push(f + ":" + (i + 1) + " " + line.trim().slice(0, 80));
+    });
+  }
+  assert.deepEqual(bad, []);
+});

@@ -1454,7 +1454,7 @@ export function computeLiftingLugDesign({ applied_load_kip, plate_thick_in, hole
   const governing_mode = governing_kip === bearing_kip ? "bearing" : governing_kip === tension_kip ? "net tension" : "shear tear-out";
   const dcr = P / governing_kip;
   return {
-    bearing_kip, tension_kip, tearout_kip, governing_kip, governing_mode, dcr, adequate: dcr <= 1.0,
+    bearing_kip, tension_kip, tearout_kip, governing_kip, governing_mode, dcr, adequate: dcr <= 1 + 1e-9,
     beff_in: beff, Cr, Av_in2: Av,
     note: "The four modes trade off through hole placement: moving the hole from the edge cures tear-out but shrinks the net tension width, and the pin-to-hole clearance drives bearing - a lug sized for gross tension alone can tear out at the pin. The design factor Nd depends on the ASME BTH-1 design category and service class. Cheek plates and weld design are separate checks. ASME BTH-1 and the engineer of record govern.",
   };

@@ -168,7 +168,7 @@ function _renderGrooveWeldStrength(inputRegion, outputRegion, citationEl) {
     if (r.error) { oCap.textContent = r.error; oThroat.textContent = "-"; oUtil.textContent = "-"; oNote.textContent = ""; return; }
     oCap.textContent = fmt(r.capacity_lb, 0) + " lb (" + r.method + ", " + r.electrode + ")";
     oThroat.textContent = fmt(r.throat_in, 3) + " in throat; " + fmt(r.strength_per_in_lb, 0) + " lb per in";
-    oUtil.textContent = r.utilization === null ? "(enter an applied load)" : (fmt(r.utilization * 100, 1) + "% - " + (r.utilization <= 1 ? "OK" : "OVERSTRESSED"));
+    oUtil.textContent = r.utilization === null ? "(enter an applied load)" : (fmt(r.utilization * 100, 1) + "% - " + (r.utilization <= 1 + 1e-9 ? "OK" : "OVERSTRESSED"));
     oNote.textContent = r.notes.join(" ");
   }, DEBOUNCE_MS);
   for (const f of [throat.input, base.input, fy.input, fu.input, len.input, load.input]) f.addEventListener("input", update);

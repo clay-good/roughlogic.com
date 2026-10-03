@@ -122,10 +122,10 @@ export function computePalletRackBeamCapacity({ span_in = 0, pallet_weight_lb = 
   return {
     load_per_beam_lb, level_load_lb, moment_in_lb, impact_moment_in_lb, design_moment_in_lb,
     bending_stress_psi, allowable_stress_psi, stress_ratio,
-    stress_pass: stress_ratio <= 1,
+    stress_pass: stress_ratio <= 1 + 1e-9,
     stress_margin_pct: 100 * (1 - stress_ratio),
     deflection_in, deflection_limit_in, deflection_ratio,
-    deflection_pass: deflection_ratio <= 1,
+    deflection_pass: deflection_ratio <= 1 + 1e-9,
     deflection_margin_pct: 100 * (1 - deflection_ratio),
     governs: deflection_ratio >= stress_ratio ? "deflection" : "stress",
     required_moment_of_inertia_in4,

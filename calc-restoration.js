@@ -2892,7 +2892,7 @@ export function computeSporeIoRatio({ indoor_spores_m3 = 0, outdoor_spores_m3 = 
   const ratio = ind / out;
   return {
     io_ratio: ratio,
-    pass: ratio <= 1 && marker === 0 ? 1 : 0,
+    pass: ratio <= 1 + 1e-9 && marker === 0 ? 1 : 0,
     note: "A screen, not a clearance certificate. An independent environmental professional (IEP/CIH) interprets the genera and the full criteria (ANSI/IICRC S520); a ratio at or under 1 alone does not clear a project.",
   };
 }

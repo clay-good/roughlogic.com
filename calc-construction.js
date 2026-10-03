@@ -5785,7 +5785,7 @@ const _renderShorePostLoad = _simpleRenderer({
     { key: "sl", id: "spl-out-sl", label: "Slab dead load", value: (r) => _fmtC(r.slab_load, 1) + " psf" },
     { key: "dp", id: "spl-out-dp", label: "Design pressure", value: (r) => _fmtC(r.design_psf, 1) + " psf" },
     { key: "sh", id: "spl-out-sh", label: "Load per shore", value: (r) => _fmtC(r.shore_load, 0) + " lb" },
-    { key: "ut", id: "spl-out-ut", label: "Utilization", value: (r) => _fmtC(r.utilization, 2) + (r.utilization > 1 ? " (OVER capacity)" : "") },
+    { key: "ut", id: "spl-out-ut", label: "Utilization", value: (r) => _fmtC(r.utilization, 2) + (r.utilization > 1 + 1e-9 ? " (OVER capacity)" : "") },
   ],
   compute: computeShorePostLoad,
 });
@@ -6643,7 +6643,7 @@ const _renderWoodBeamShear = _simpleRenderer({
     { key: "ra", id: "wbs-out-ra", label: "Depth ratio dn/d", value: (r) => _fmtC(r.ratio, 3) },
     { key: "vn", id: "wbs-out-vn", label: "Notched allowable Vr'", value: (r) => _fmtC(r.vr_notch_lb, 0) + " lb" },
     { key: "fv", id: "wbs-out-fv", label: "Actual stress fv", value: (r) => r.fv_psi === null ? "-" : _fmtC(r.fv_psi, 1) + " psi" },
-    { key: "dc", id: "wbs-out-dc", label: "Demand / capacity", value: (r) => r.dcr === null ? "-" : _fmtC(r.dcr, 2) + (r.dcr > 1 ? " (OVERSTRESS)" : "") },
+    { key: "dc", id: "wbs-out-dc", label: "Demand / capacity", value: (r) => r.dcr === null ? "-" : _fmtC(r.dcr, 2) + (r.dcr > 1 + 1e-9 ? " (OVERSTRESS)" : "") },
   ],
   compute: computeWoodBeamShear,
 });
@@ -6704,7 +6704,7 @@ const _renderWoodBeamCompressionNotch = _simpleRenderer({
     { key: "vt", id: "wcn-out-vt", label: "Same notch, tension side (for contrast)", value: (r) => _fmtC(r.vr_tension_lb, 0) + " lb" },
     { key: "rf", id: "wcn-out-rf", label: "Compression keeps this much more", value: (r) => r.relief_factor === null ? "-" : _fmtC(r.relief_factor, 2) + "x the tension-side allowable" },
     { key: "fv", id: "wcn-out-fv", label: "Actual stress fv", value: (r) => r.fv_psi === null ? "-" : _fmtC(r.fv_psi, 1) + " psi" },
-    { key: "dc", id: "wcn-out-dc", label: "Demand / capacity", value: (r) => r.dcr === null ? "-" : _fmtC(r.dcr, 2) + (r.dcr > 1 ? " (OVERSTRESS)" : "") },
+    { key: "dc", id: "wcn-out-dc", label: "Demand / capacity", value: (r) => r.dcr === null ? "-" : _fmtC(r.dcr, 2) + (r.dcr > 1 + 1e-9 ? " (OVERSTRESS)" : "") },
   ],
   compute: computeWoodBeamCompressionNotch,
 });
@@ -6819,7 +6819,7 @@ const _renderWoodBearingPerpendicular = _simpleRenderer({
     { key: "cb", id: "wbp-out-cb", label: "Bearing-area factor Cb", value: (r) => fmt(r.cb_f, 3) + " (" + r.cb_flag + ")" },
     { key: "fa", id: "wbp-out-fa", label: "Adjusted Fc-perp'", value: (r) => fmt(r.fcperp_adj_psi, 0) + " psi" },
     { key: "fs", id: "wbp-out-fs", label: "Applied bearing stress", value: (r) => fmt(r.fc_perp_psi, 0) + " psi" },
-    { key: "dcr", id: "wbp-out-dcr", label: "Demand / capacity", value: (r) => fmt(r.dcr, 2) + (r.dcr > 1 ? " (OVER - add bearing length or a plate)" : "") },
+    { key: "dcr", id: "wbp-out-dcr", label: "Demand / capacity", value: (r) => fmt(r.dcr, 2) + (r.dcr > 1 + 1e-9 ? " (OVER - add bearing length or a plate)" : "") },
     { key: "req", id: "wbp-out-req", label: "Required bearing length (Cb = 1)", value: (r) => fmt(r.lb_req_in, 2) + " in" },
     { key: "n", id: "wbp-out-n", label: "Note", value: (r) => r.note },
   ],
@@ -6866,7 +6866,7 @@ const _renderWoodTensionMember = _simpleRenderer({
     { key: "an", id: "wtm-out-an", label: "Gross / net area", value: (r) => fmt(r.ag_in2, 3) + " / " + fmt(r.an_in2, 3) + " in^2" },
     { key: "fa", id: "wtm-out-fa", label: "Adjusted Ft'", value: (r) => fmt(r.ft_adj_psi, 0) + " psi" },
     { key: "ft", id: "wtm-out-ft", label: "Applied tension stress", value: (r) => fmt(r.ft_applied_psi, 0) + " psi" },
-    { key: "dcr", id: "wtm-out-dcr", label: "Demand / capacity", value: (r) => fmt(r.dcr, 2) + (r.dcr > 1 ? " (OVER)" : "") },
+    { key: "dcr", id: "wtm-out-dcr", label: "Demand / capacity", value: (r) => fmt(r.dcr, 2) + (r.dcr > 1 + 1e-9 ? " (OVER)" : "") },
     { key: "n", id: "wtm-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeWoodTensionMember,
@@ -6889,7 +6889,7 @@ export function computeWoodCombinedBendingAxial({ p_lb = 0, m_inlb = 0, a_in2 = 
   if (!(fc_psi < fce_psi)) return { error: "The axial stress reaches the Euler buckling stress FcE - the column buckles before the interaction applies. Shorten the unbraced length or enlarge the member." };
   const amplifier = 1 / (1 - fc_psi / fce_psi);
   const interaction = Math.pow(fc_psi / fc_adj_psi, 2) + fb_psi / (fb_adj_psi * (1 - fc_psi / fce_psi));
-  const verdict = interaction <= 1.0 ? "passes (at or under 1.0)" : "FAILS the NDS 3.9.2 interaction (over 1.0)";
+  const verdict = interaction <= 1 + 1e-9 ? "passes (at or under 1.0)" : "FAILS the NDS 3.9.2 interaction (over 1.0)";
   return {
     fc_psi, fb_psi, fce_psi, amplifier, interaction, verdict,
     note: "NDS 3.9.2 beam-column interaction (fc/Fc')^2 + fb/[Fb'(1 - fc/FcE)] <= 1.0 with the Euler stress FcE = 0.822 Emin'/(le/d)^2; the 1 - fc/FcE term is the P-delta moment magnifier that grows without bound as the axial stress approaches FcE. Uniaxial bending plus concentric compression; enter Fc' already carrying Cp (column-buckling-wood) and Fb' already carrying CL (wood-beam-bending). Biaxial bending, the eccentric 6e/d term, and tension-plus-bending (3.9.1) are separate. A design aid, not a substitute for the engineer of record.",

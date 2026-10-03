@@ -1105,7 +1105,7 @@ function _v890renderCableSupportJhook(inputRegion, outputRegion, citationEl) {
     if (r.error) { oHooks.textContent = r.error; oLoad.textContent = "-"; oUtil.textContent = "-"; return; }
     oHooks.textContent = fmt(r.hooks, 0) + " hooks";
     oLoad.textContent = fmt(r.load_per_hook_lb, 1) + " lb/hook";
-    oUtil.textContent = r.utilization === null ? "-- (enter a hook WLL to check)" : (fmt(r.utilization * 100, 0) + "% of the hook WLL" + (r.utilization > 1 ? " (OVER -- split the bundle or upsize)" : ""));
+    oUtil.textContent = r.utilization === null ? "-- (enter a hook WLL to check)" : (fmt(r.utilization * 100, 0) + "% of the hook WLL" + (r.utilization > 1 + 1e-9 ? " (OVER -- split the bundle or upsize)" : ""));
   }, DEBOUNCE_MS);
   for (const f of [rn, sp, nc, cw, hw]) f.input.addEventListener("input", update);
 }
