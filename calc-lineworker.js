@@ -389,7 +389,10 @@ export function computeConductorUpliftCheck({ span_ft = 0, elevation_rise_ft = 0
   // The real load at the structure is BOTH adjacent spans together.
   let back_span_contribution_lb = null, structure_vertical_load_lb = null;
   if (back_span_ft > 0) {
-    back_span_contribution_lb = weight_lb_per_ft * back_span_ft / 2 + tension_lb * back_span_rise_ft / back_span_ft;
+    // A rise over the back span pulls UP on this structure exactly as the ahead-span rise does (RUS
+    // 1724E-200 10.4.7: uplift when the summed vertical span is negative). Until 2026-10-03 it was ADDED,
+    // so a structure in a sag between two higher ones read 392 lb down where it carries 608 lb of uplift.
+    back_span_contribution_lb = weight_lb_per_ft * back_span_ft / 2 - tension_lb * back_span_rise_ft / back_span_ft;
     structure_vertical_load_lb = vertical_load_low_lb + back_span_contribution_lb;
   }
   const outs = [vertical_load_low_lb, vertical_load_high_lb, low_point_offset_ft, uplift_tension_lb];
@@ -420,7 +423,7 @@ LINEWORKER_RENDERERS["conductor-uplift-check"] = _simpleRenderer({
     { key: "weight_lb_per_ft", label: "Conductor weight (lb/ft)", kind: "number", default: 1.094 },
     { key: "tension_lb", label: "Horizontal tension, cold condition (lb)", kind: "number", default: 5000 },
     { key: "back_span_ft", label: "Back span (ft, 0 to skip)", kind: "number", default: 400 },
-    { key: "back_span_rise_ft", label: "Elevation rise over the back span (ft)", kind: "number", default: 40 },
+    { key: "back_span_rise_ft", label: "Rise from this structure UP to the back structure (ft; negative if it is lower)", kind: "number", default: 40 },
   ],
   outputs: [
     { key: "l", id: "cup-out-l", label: "Vertical load at the low structure", value: (r) => fmt(r.vertical_load_low_lb, 1) + " lb -- " + fmt(r.half_weight_lb, 1) + " lb of conductor weight against " + fmt(r.slope_component_lb, 1) + " lb pulling up" },
@@ -448,7 +451,8 @@ export function computeLineGroundClearanceNesc({ attachment_height_ft = 0, max_c
   const sag_headroom_ft = max_allowable_sag_ft - max_condition_sag_ft;
   const min_attachment_height_ft = required_clearance_ft + max_condition_sag_ft;
   const height_shortfall_ft = min_attachment_height_ft - attachment_height_ft;
-  const passes = margin_ft >= 0;
+  // 1e-9: 34.3 - 15.8 is 18.499999999999996, which failed an 18.5 ft clearance it meets.
+  const passes = margin_ft >= -1e-9 * required_clearance_ft;
   const outs = [clearance_ft, margin_ft, max_allowable_sag_ft, min_attachment_height_ft, sag_headroom_ft];
   if (!outs.every(Number.isFinite)) return { error: "Clearance math is not a finite value." };
   return {

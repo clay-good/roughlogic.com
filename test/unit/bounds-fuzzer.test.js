@@ -45900,10 +45900,12 @@ test("bounds: spec-v1453 computeConductorUpliftCheck -- the threshold is 2,279 l
   assert.strictEqual(_v1453({ ...base, tension_lb: r.uplift_tension_lb * 1.001 }).uplift, true);
   // The two reactions always sum to the conductor weight in the span.
   assert.ok(Math.abs(r.vertical_load_low_lb + r.vertical_load_high_lb - base.weight_lb_per_ft * base.span_ft) < 1e-9);
-  // Counting the back span, this structure is NOT in uplift -- which is the
-  // point the spec makes about running both spans and never demonstrates.
-  assert.ok(r.structure_vertical_load_lb > 0);
-  assert.strictEqual(r.structure_uplift, false);
+  // A structure in a sag between two HIGHER structures: the back-span rise pulls up too (RUS 1724E-200
+  // 10.4.7), so the net is -607.7 lb -- uplift. It was added until 2026-10-03 and read +392 lb.
+  assert.ok(Math.abs(r.structure_vertical_load_lb + 607.7) < 0.05);
+  assert.strictEqual(r.structure_uplift, true);
+  // A back structure LOWER than this one (negative rise) adds load instead.
+  assert.ok(_v1453({ ...base, back_span_rise_ft: -40 }).structure_vertical_load_lb > 0);
   // Cold (high tension) is the governing case, not hot.
   assert.ok(_v1453({ ...base, tension_lb: 8000 }).vertical_load_low_lb < r.vertical_load_low_lb);
   assert.ok("error" in _v1453({ ...base, elevation_rise_ft: 0 }));

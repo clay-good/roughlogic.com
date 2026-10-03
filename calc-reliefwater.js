@@ -577,7 +577,7 @@ export function computeOshaToiletCount({ industry = "construction", worker_count
       urinals = toilet_seats;
       rule = "29 CFR 1926.51(c)(1) Table D-1: 200 or more -> 1 toilet seat and 1 urinal per 50 workers";
       const per40 = Math.ceil(worker_count / 40 - 1e-9);
-      if (per40 > toilet_seats) boundary_note = "At 199 workers the per-40 row asked for more: this count would be " + per40 + " and " + per40 + " at one per 40. The table steps DOWN at 200; a site at the line should not read the drop as permission to remove units.";
+      if (per40 > toilet_seats) boundary_note = "The per-40 row (used up to 199 workers) would ask for more at this headcount: " + per40 + " and " + per40 + " at one per 40 for " + worker_count + " workers. The table steps DOWN at 200; a site at the line should not read the drop as permission to remove units.";
     }
     if (worker_count === 20) boundary_note = "Table D-1's \"20 or less\" and \"20 or more\" rows overlap at exactly 20: the first gives 1 facility, the per-40 row 1 seat and 1 urinal. The larger reading is shown.";
   } else if (industry === "general") {

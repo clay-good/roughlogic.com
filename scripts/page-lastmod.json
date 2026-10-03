@@ -2,7 +2,7 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "f30d29024d76f67d",
+      "sha": "c7f5da577ada6cd5",
       "date": "2026-10-03"
     },
     "/tools/": {
@@ -482,8 +482,8 @@
       "date": "2026-10-01"
     },
     "/tools/barrel-volume/": {
-      "sha": "e5faff709c2e8272",
-      "date": "2026-09-29"
+      "sha": "09c06573e7e0c984",
+      "date": "2026-10-03"
     },
     "/tools/barstock-cutlist/": {
       "sha": "90aed9e23c98ee4f",
@@ -1674,8 +1674,8 @@
       "date": "2026-09-29"
     },
     "/tools/conductor-uplift-check/": {
-      "sha": "eb22af83371eb413",
-      "date": "2026-09-29"
+      "sha": "7b11d60d653da84e",
+      "date": "2026-10-03"
     },
     "/tools/conduit-90-stub/": {
       "sha": "9834d944413643ea",
@@ -2614,8 +2614,8 @@
       "date": "2026-10-03"
     },
     "/tools/ellipsoid-volume/": {
-      "sha": "08eba95a123892bb",
-      "date": "2026-09-29"
+      "sha": "76cd20f75fa91b2c",
+      "date": "2026-10-03"
     },
     "/tools/emergency-contacts/": {
       "sha": "d41533c680cc848e",
@@ -5198,8 +5198,8 @@
       "date": "2026-09-29"
     },
     "/tools/paraboloid-volume/": {
-      "sha": "80ddc05c7ed2cc9d",
-      "date": "2026-09-29"
+      "sha": "9d0598a22e32056e",
+      "date": "2026-10-03"
     },
     "/tools/parallel-conductor-derate/": {
       "sha": "422d6a2e8e46830d",
@@ -5898,8 +5898,8 @@
       "date": "2026-09-29"
     },
     "/tools/pyramid-frustum-volume/": {
-      "sha": "dfd585571dd595fe",
-      "date": "2026-09-29"
+      "sha": "4c39fab2381c41c3",
+      "date": "2026-10-03"
     },
     "/tools/quadratic-formula/": {
       "sha": "a891373495d63017",
@@ -7326,8 +7326,8 @@
       "date": "2026-09-29"
     },
     "/tools/spray-tip-selection/": {
-      "sha": "31f293212764f4d3",
-      "date": "2026-09-29"
+      "sha": "434d686006e6080d",
+      "date": "2026-10-03"
     },
     "/tools/spray-transfer-efficiency/": {
       "sha": "ad47970b79894257",

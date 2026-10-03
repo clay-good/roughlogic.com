@@ -110803,7 +110803,7 @@
    "source_publisher": "Project (first-principles)",
    "source_title": "517 tip at 2,000 psi laying 6 wet mils, calibrated to a .015 tip at 0.31 gpm",
    "source_edition_or_year": "airless spray practice",
-   "source_section_or_page": "flow scales as orifice squared; 1,604.17 sq ft per gal at 1 mil",
+   "source_section_or_page": "flow scales as orifice squared from the Graco chart calibration .015 = 0.24 gpm at 2000 psi; 1,604.17 sq ft per gal at 1 mil (recomputed 2026-10-03 from the one-column-off 0.31)",
    "verified_by": "rl",
    "verified_on": "2026-08-27",
    "inputs": {
@@ -110811,7 +110811,7 @@
     "pressure_psi": 2000,
     "wet_film_mils": 6,
     "ref_orifice_in": 0.015,
-    "ref_flow_gpm": 0.31,
+    "ref_flow_gpm": 0.24,
     "ref_pressure_psi": 2000
    },
    "outputs": {
@@ -110828,19 +110828,19 @@
      }
     },
     "flow_gpm": {
-     "value": 0.398178,
+     "value": 0.308265,
      "tolerance": {
       "pct": 0.5
      }
     },
     "coverage_rate_sqft_min": {
-     "value": 106.457,
+     "value": 82.4214,
      "tolerance": {
       "pct": 0.5
      }
     },
     "travel_speed_fpm": {
-     "value": 127.749,
+     "value": 98.9057,
      "tolerance": {
       "pct": 0.5
      }
@@ -116130,7 +116130,7 @@
    "source_publisher": "Project (first-principles)",
    "source_title": "500 ft span rising 60 ft, 1.094 lb/ft, at a cold 5,000 lb of tension",
    "source_edition_or_year": "V_low = w L / 2 - H h / L; low point offset = L/2 - H h / (w L); uplift at H = w L^2 / (2 h)",
-   "source_section_or_page": "the utility construction standards and the line designer govern",
+   "source_section_or_page": "the utility construction standards and the line designer govern. Structure net recomputed 2026-10-03: a back span rising 40 ft to a higher structure pulls UP (RUS 1724E-200 10.4.7), so 273.5 + 218.8 - 600 - 500 = -607.7 lb, uplift; it was added before (+392.3)",
    "verified_by": "rl",
    "verified_on": "2026-09-07",
    "inputs": {
@@ -116167,7 +116167,7 @@
      }
     },
     "structure_vertical_load_lb": {
-     "value": 392.3,
+     "value": -607.7,
      "tolerance": {
       "pct": 0.5
      }
@@ -161418,6 +161418,2257 @@
      "value": 107,
      "tolerance": {
       "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "decimal-to-fraction",
+   "source_publisher": "Engineering ToolBox",
+   "source_title": "Inches: Fractional to Decimal Equivalents Conversion Chart",
+   "source_edition_or_year": "Web page, read 2026-10-03 (https://www.engineeringtoolbox.com/inches-decimal-equivalents-d_471.html)",
+   "source_section_or_page": "Sixteenths table prints \"11/16 | 0.6875\". Exact binary fraction, so the tile's rounding error is 0; exact tolerance.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "value_in": 0.6875,
+    "denominator": 16
+   },
+   "outputs": {
+    "whole_in": {
+     "value": 0,
+     "tolerance": {
+      "abs": 0.0001
+     }
+    },
+    "numerator": {
+     "value": 11,
+     "tolerance": {
+      "abs": 0.0001
+     }
+    },
+    "reduced_denominator": {
+     "value": 16,
+     "tolerance": {
+      "abs": 0.0001
+     }
+    },
+    "error_in": {
+     "value": 0,
+     "tolerance": {
+      "abs": 1e-09
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "decimal-to-fraction",
+   "source_publisher": "Engineering ToolBox",
+   "source_title": "Inches: Fractional to Decimal Equivalents Conversion Chart",
+   "source_edition_or_year": "Web page, read 2026-10-03 (https://www.engineeringtoolbox.com/inches-decimal-equivalents-d_471.html)",
+   "source_section_or_page": "Thirty-seconds table prints \"23/32 | 0.71875\". Exact binary fraction, so the tile's rounding error is 0; exact tolerance.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "value_in": 0.71875,
+    "denominator": 32
+   },
+   "outputs": {
+    "whole_in": {
+     "value": 0,
+     "tolerance": {
+      "abs": 0.0001
+     }
+    },
+    "numerator": {
+     "value": 23,
+     "tolerance": {
+      "abs": 0.0001
+     }
+    },
+    "reduced_denominator": {
+     "value": 32,
+     "tolerance": {
+      "abs": 0.0001
+     }
+    },
+    "error_in": {
+     "value": 0,
+     "tolerance": {
+      "abs": 1e-09
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "decimal-to-fraction",
+   "source_publisher": "Engineering ToolBox",
+   "source_title": "Inches: Fractional to Decimal Equivalents Conversion Chart",
+   "source_edition_or_year": "Web page, read 2026-10-03 (https://www.engineeringtoolbox.com/inches-decimal-equivalents-d_471.html)",
+   "source_section_or_page": "Sixty-fourths table prints \"45/64 | 0.703125\". Exact binary fraction, so the tile's rounding error is 0; exact tolerance.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "value_in": 0.703125,
+    "denominator": 64
+   },
+   "outputs": {
+    "whole_in": {
+     "value": 0,
+     "tolerance": {
+      "abs": 0.0001
+     }
+    },
+    "numerator": {
+     "value": 45,
+     "tolerance": {
+      "abs": 0.0001
+     }
+    },
+    "reduced_denominator": {
+     "value": 64,
+     "tolerance": {
+      "abs": 0.0001
+     }
+    },
+    "error_in": {
+     "value": 0,
+     "tolerance": {
+      "abs": 1e-09
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "linear-interpolation",
+   "source_publisher": "FAMU-FSU College of Engineering (L. van Dommelen, EML 3100 Thermodynamics course aids)",
+   "source_title": "Linear interpolation",
+   "source_edition_or_year": "Course web page, read 2026-10-03 (https://web1.eng.famu.fsu.edu/~dommelen/courses/eml3100/aids/intpol/)",
+   "source_section_or_page": "Saturated-pressure example: Table B.1.1 gives \"5.628 kPa\" at 35 C and \"7.384 kPa\" at 40 C; at 38 C the page prints \"= 6.682 kPa\". Tile 6.6816; abs 0.001 covers the 3-decimal printed rounding.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "x1": 35,
+    "y1": 5.628,
+    "x2": 40,
+    "y2": 7.384,
+    "x": 38
+   },
+   "outputs": {
+    "y": {
+     "value": 6.682,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "linear-interpolation",
+   "source_publisher": "FAMU-FSU College of Engineering (L. van Dommelen, EML 3100 Thermodynamics course aids)",
+   "source_title": "Linear interpolation",
+   "source_edition_or_year": "Course web page, read 2026-10-03 (https://web1.eng.famu.fsu.edu/~dommelen/courses/eml3100/aids/intpol/)",
+   "source_section_or_page": "Superheated example at 100 C: d1 = \"17.19561 m3/kg\" at 10 kPa, d2 = \"3.41833 m3/kg\" at 50 kPa; at 20 kPa prints \"= 13.75129 m3/kg\". Tile 13.75129; abs 0.00001 covers the 5-decimal print.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "x1": 10,
+    "y1": 17.19561,
+    "x2": 50,
+    "y2": 3.41833,
+    "x": 20
+   },
+   "outputs": {
+    "y": {
+     "value": 13.75129,
+     "tolerance": {
+      "abs": 1e-05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "linear-interpolation",
+   "source_publisher": "FAMU-FSU College of Engineering (L. van Dommelen, EML 3100 Thermodynamics course aids)",
+   "source_title": "Linear interpolation",
+   "source_edition_or_year": "Course web page, read 2026-10-03 (https://web1.eng.famu.fsu.edu/~dommelen/courses/eml3100/aids/intpol/)",
+   "source_section_or_page": "\"Other problems\" example at 50 C: d1 = \"14.86920\" at 10 kPa, g2 = \"12.350\" kPa with d2 = \"12.0318\"; at 11 kPa prints \"= 13.6618 m3/kg\". Tile 13.66180; abs 0.0001 covers the 4-decimal print.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "x1": 10,
+    "y1": 14.8692,
+    "x2": 12.35,
+    "y2": 12.0318,
+    "x": 11
+   },
+   "outputs": {
+    "y": {
+     "value": 13.6618,
+     "tolerance": {
+      "abs": 0.0001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "drill-point-angle-from-length",
+   "source_publisher": "Sundi Cutting Tools",
+   "source_title": "Drill Point Angle Chart: 118 vs 135",
+   "source_edition_or_year": "Technical article, read 2026-10-03 (https://www.sundicuttingtools.com/news/technology-articles/drill-point-angle-chart/)",
+   "source_section_or_page": "Worked example \"For a 10 mm drill: 118 point: approximately 3.00 mm high\" (h = (D/2)/tan(A/2)). Inputs converted mm -> in (10/25.4, 3.00/25.4); the angle depends only on the ratio. Tile 118.07 deg; abs 0.2 deg covers the 0.01 mm print rounding of h (+/-0.09 deg).",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "diameter_in": 0.393701,
+    "point_length_in": 0.11811
+   },
+   "outputs": {
+    "point_angle_deg": {
+     "value": 118,
+     "tolerance": {
+      "abs": 0.2
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "drill-point-angle-from-length",
+   "source_publisher": "Sundi Cutting Tools",
+   "source_title": "Drill Point Angle Chart: 118 vs 135",
+   "source_edition_or_year": "Technical article, read 2026-10-03 (https://www.sundicuttingtools.com/news/technology-articles/drill-point-angle-chart/)",
+   "source_section_or_page": "Same example: \"135 point: approximately 2.07 mm high\" for a 10 mm drill. Inputs converted mm -> in (10/25.4, 2.07/25.4). Tile 135.02 deg; abs 0.2 deg covers the 0.01 mm print rounding of h.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "diameter_in": 0.393701,
+    "point_length_in": 0.081496
+   },
+   "outputs": {
+    "point_angle_deg": {
+     "value": 135,
+     "tolerance": {
+      "abs": 0.2
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "pacing-distance",
+   "source_publisher": "National Wildfire Coordinating Group (NWCG)",
+   "source_title": "Firefighter Math, 4.6 Chain, Pace, Walking a Chain",
+   "source_edition_or_year": "Web course page (nwcg.gov/course/ffm), Wayback 2024 copy read 2026-10-03",
+   "source_section_or_page": "Example 1: \"Victor marks off 3 chains or 198 feet ... He walks the distance in 36 paces\" ... \"The length of Victor's pace is 5 & 1/2 feet.\" Exact; flat terrain (level ground).",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "calibration_distance_ft": 198,
+    "calibration_paces": 36,
+    "current_paces": 36,
+    "terrain": "flat"
+   },
+   "outputs": {
+    "pace_length_ft": {
+     "value": 5.5,
+     "tolerance": {
+      "abs": 0.0001
+     }
+    },
+    "distance_ft": {
+     "value": 198,
+     "tolerance": {
+      "abs": 0.0001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "pacing-distance",
+   "source_publisher": "Alabama Cooperative Extension System",
+   "source_title": "Forest Inventory Basics for Family Forest Landowners, Chapter 3: Determining Your Pace (FOR-2082)",
+   "source_edition_or_year": "2022 (https://www.aces.edu/wp-content/uploads/2022/02/Chapter-3_FOR-2082_022422L-G.pdf)",
+   "source_section_or_page": "p. 21 Answers: \"63 paces / 12 paces per chain = 5.25 chains (346.50 ft.)\" with a chain = 66 ft (calibration entered as 66 ft in 12 paces). Tile 346.5 ft exactly.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "calibration_distance_ft": 66,
+    "calibration_paces": 12,
+    "current_paces": 63,
+    "terrain": "flat"
+   },
+   "outputs": {
+    "distance_ft": {
+     "value": 346.5,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "pacing-distance",
+   "source_publisher": "Alabama Cooperative Extension System",
+   "source_title": "Forest Inventory Basics for Family Forest Landowners, Chapter 3: Determining Your Pace (FOR-2082)",
+   "source_edition_or_year": "2022 (https://www.aces.edu/wp-content/uploads/2022/02/Chapter-3_FOR-2082_022422L-G.pdf)",
+   "source_section_or_page": "p. 21 Answers: \"130 paces / 12 paces per chain = 10.83 chains (714.78 ft.)\". The publisher multiplied the ROUNDED 10.83 chains by 66; exact is 715.0 ft. Tile 715.0; pct 0.1 covers the publisher's 2-decimal chain rounding (0.03%).",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "calibration_distance_ft": 66,
+    "calibration_paces": 12,
+    "current_paces": 130,
+    "terrain": "flat"
+   },
+   "outputs": {
+    "distance_ft": {
+     "value": 714.78,
+     "tolerance": {
+      "pct": 0.1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "timesheet",
+   "source_publisher": "U.S. Department of Labor (eCFR)",
+   "source_title": "29 CFR 778.110 Hourly rate employee",
+   "source_edition_or_year": "eCFR current as read 2026-10-03",
+   "source_section_or_page": "778.110(a): \"$12 hourly rate ... works 46 hours ... a total weekly wage of $588.\" The printed 46 weekly hours are entered as one job (start 0, end 46, no lunch); the source gives no per-day split. Tile 40 reg + 6 OT, $588 exactly.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "jobs": [
+     {
+      "start_hr": 0,
+      "end_hr": 46,
+      "lunch_min": 0,
+      "miles": 0
+     }
+    ],
+    "regular_rate": 12
+   },
+   "outputs": {
+    "total_hours": {
+     "value": 46,
+     "tolerance": {
+      "abs": 0.0001
+     }
+    },
+    "overtime_hours": {
+     "value": 6,
+     "tolerance": {
+      "abs": 0.0001
+     }
+    },
+    "gross_pay": {
+     "value": 588,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "spray-tip-selection",
+   "source_publisher": "Graco Inc.",
+   "source_title": "Tip Charts (RAC X SwitchTips, LTXxxx), airless accessories catalog p. 12",
+   "source_edition_or_year": "Catalog page as distributed by Paint Supply TDS 2024 (https://assets.paintsupply.com/wp-content/uploads/2024/08/TDS-Graco-633955912946-157304-5.pdf)",
+   "source_section_or_page": "RAC X chart, \"Water @ 2000 psi\": orifice row \".015 ... .017\" aligned with \"Flow Rate (gpm) ... .24 ... 0.31\". Calibration entered from the same chart (.015 = .24 gpm at 2000 psi). Tile = 0.24 x (17/15)^2; pct 1 covers the chart's 2-decimal print. wet_film_mils (6) does not affect flow. NOTE: the tile DEFAULT calibration (0.31 gpm for .015) is the chart's .017 value; with defaults this row fails (see report).",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "tip_number": 517,
+    "pressure_psi": 2000,
+    "wet_film_mils": 6,
+    "ref_orifice_in": 0.015,
+    "ref_flow_gpm": 0.24,
+    "ref_pressure_psi": 2000
+   },
+   "outputs": {
+    "flow_gpm": {
+     "value": 0.31,
+     "tolerance": {
+      "pct": 1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "spray-tip-selection",
+   "source_publisher": "Graco Inc.",
+   "source_title": "Tip Charts (RAC X SwitchTips, LTXxxx), airless accessories catalog p. 12",
+   "source_edition_or_year": "Catalog page as distributed by Paint Supply TDS 2024 (https://assets.paintsupply.com/wp-content/uploads/2024/08/TDS-Graco-633955912946-157304-5.pdf)",
+   "source_section_or_page": "RAC X chart, \"Water @ 2000 psi\": orifice row \".015 ... .021\" aligned with \"Flow Rate (gpm) ... .24 ... 0.47\". Calibration entered from the same chart (.015 = .24 gpm at 2000 psi). Tile = 0.24 x (21/15)^2; pct 1 covers the chart's 2-decimal print. wet_film_mils (6) does not affect flow. NOTE: the tile DEFAULT calibration (0.31 gpm for .015) is the chart's .017 value; with defaults this row fails (see report).",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "tip_number": 521,
+    "pressure_psi": 2000,
+    "wet_film_mils": 6,
+    "ref_orifice_in": 0.015,
+    "ref_flow_gpm": 0.24,
+    "ref_pressure_psi": 2000
+   },
+   "outputs": {
+    "flow_gpm": {
+     "value": 0.47,
+     "tolerance": {
+      "pct": 1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "spray-tip-selection",
+   "source_publisher": "Graco Inc.",
+   "source_title": "Tip Charts (RAC X SwitchTips, LTXxxx), airless accessories catalog p. 12",
+   "source_edition_or_year": "Catalog page as distributed by Paint Supply TDS 2024 (https://assets.paintsupply.com/wp-content/uploads/2024/08/TDS-Graco-633955912946-157304-5.pdf)",
+   "source_section_or_page": "RAC X chart, \"Water @ 2000 psi\": orifice row \".015 ... .031\" aligned with \"Flow Rate (gpm) ... .24 ... 1.03\". Calibration entered from the same chart (.015 = .24 gpm at 2000 psi). Tile = 0.24 x (31/15)^2; pct 1 covers the chart's 2-decimal print. wet_film_mils (6) does not affect flow. NOTE: the tile DEFAULT calibration (0.31 gpm for .015) is the chart's .017 value; with defaults this row fails (see report).",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "tip_number": 531,
+    "pressure_psi": 2000,
+    "wet_film_mils": 6,
+    "ref_orifice_in": 0.015,
+    "ref_flow_gpm": 0.24,
+    "ref_pressure_psi": 2000
+   },
+   "outputs": {
+    "flow_gpm": {
+     "value": 1.03,
+     "tolerance": {
+      "pct": 1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "spray-tip-selection",
+   "source_publisher": "Graco Inc.",
+   "source_title": "Tip Charts (RAC X SwitchTips, LTXxxx), airless accessories catalog p. 12",
+   "source_edition_or_year": "Catalog page as distributed by Paint Supply TDS 2024 (https://assets.paintsupply.com/wp-content/uploads/2024/08/TDS-Graco-633955912946-157304-5.pdf)",
+   "source_section_or_page": "RAC X chart, \"Water @ 2000 psi\": orifice row \".015 ... .051\" aligned with \"Flow Rate (gpm) ... .24 ... 2.79\". Calibration entered from the same chart (.015 = .24 gpm at 2000 psi). Tile = 0.24 x (51/15)^2; pct 1 covers the chart's 2-decimal print. wet_film_mils (6) does not affect flow. NOTE: the tile DEFAULT calibration (0.31 gpm for .015) is the chart's .017 value; with defaults this row fails (see report).",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "tip_number": 551,
+    "pressure_psi": 2000,
+    "wet_film_mils": 6,
+    "ref_orifice_in": 0.015,
+    "ref_flow_gpm": 0.24,
+    "ref_pressure_psi": 2000
+   },
+   "outputs": {
+    "flow_gpm": {
+     "value": 2.79,
+     "tolerance": {
+      "pct": 1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "osha-toilet-count",
+   "source_publisher": "U.S. Department of Labor, OSHA (eCFR)",
+   "source_title": "29 CFR 1926.51(c)(1) Table D-1",
+   "source_edition_or_year": "eCFR current as read 2026-10-03",
+   "source_section_or_page": "Table D-1 row \"20 or less | 1.\" 10 workers -> 1 facility, no urinal.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "industry": "construction",
+    "worker_count": 10,
+    "used_by_women": "yes"
+   },
+   "outputs": {
+    "toilet_seats": {
+     "value": 1,
+     "tolerance": {
+      "abs": 0.0001
+     }
+    },
+    "urinals": {
+     "value": 0,
+     "tolerance": {
+      "abs": 0.0001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "osha-toilet-count",
+   "source_publisher": "U.S. Department of Labor, OSHA (eCFR)",
+   "source_title": "29 CFR 1910.141(c)(1)(i) Table J-1",
+   "source_edition_or_year": "eCFR current as read 2026-10-03",
+   "source_section_or_page": "Table J-1 row \"1 to 15 | 1\"; tested at the row boundary. All-male-or-unsplit workforce (no women_count split).",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "industry": "general",
+    "worker_count": 15,
+    "used_by_women": "yes"
+   },
+   "outputs": {
+    "water_closets_min": {
+     "value": 1,
+     "tolerance": {
+      "abs": 0.0001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "osha-toilet-count",
+   "source_publisher": "U.S. Department of Labor, OSHA (eCFR)",
+   "source_title": "29 CFR 1910.141(c)(1)(i) Table J-1",
+   "source_edition_or_year": "eCFR current as read 2026-10-03",
+   "source_section_or_page": "Table J-1 row \"16 to 35 | 2\"; tested at the row boundary. All-male-or-unsplit workforce (no women_count split).",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "industry": "general",
+    "worker_count": 16,
+    "used_by_women": "yes"
+   },
+   "outputs": {
+    "water_closets_min": {
+     "value": 2,
+     "tolerance": {
+      "abs": 0.0001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "osha-toilet-count",
+   "source_publisher": "U.S. Department of Labor, OSHA (eCFR)",
+   "source_title": "29 CFR 1910.141(c)(1)(i) Table J-1",
+   "source_edition_or_year": "eCFR current as read 2026-10-03",
+   "source_section_or_page": "Table J-1 row \"16 to 35 | 2\"; tested at the row boundary. All-male-or-unsplit workforce (no women_count split).",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "industry": "general",
+    "worker_count": 35,
+    "used_by_women": "yes"
+   },
+   "outputs": {
+    "water_closets_min": {
+     "value": 2,
+     "tolerance": {
+      "abs": 0.0001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "osha-toilet-count",
+   "source_publisher": "U.S. Department of Labor, OSHA (eCFR)",
+   "source_title": "29 CFR 1910.141(c)(1)(i) Table J-1",
+   "source_edition_or_year": "eCFR current as read 2026-10-03",
+   "source_section_or_page": "Table J-1 row \"36 to 55 | 3\"; tested at the row boundary. All-male-or-unsplit workforce (no women_count split).",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "industry": "general",
+    "worker_count": 36,
+    "used_by_women": "yes"
+   },
+   "outputs": {
+    "water_closets_min": {
+     "value": 3,
+     "tolerance": {
+      "abs": 0.0001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "osha-toilet-count",
+   "source_publisher": "U.S. Department of Labor, OSHA (eCFR)",
+   "source_title": "29 CFR 1910.141(c)(1)(i) Table J-1",
+   "source_edition_or_year": "eCFR current as read 2026-10-03",
+   "source_section_or_page": "Table J-1 row \"81 to 110 | 5.\"; tested at the row boundary. All-male-or-unsplit workforce (no women_count split).",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "industry": "general",
+    "worker_count": 110,
+    "used_by_women": "yes"
+   },
+   "outputs": {
+    "water_closets_min": {
+     "value": 5,
+     "tolerance": {
+      "abs": 0.0001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "osha-toilet-count",
+   "source_publisher": "U.S. Department of Labor, OSHA (eCFR)",
+   "source_title": "29 CFR 1910.141(c)(1)(i) Table J-1",
+   "source_edition_or_year": "eCFR current as read 2026-10-03",
+   "source_section_or_page": "Table J-1 row \"111 to 150 | 6\"; tested at the row boundary. All-male-or-unsplit workforce (no women_count split).",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "industry": "general",
+    "worker_count": 111,
+    "used_by_women": "yes"
+   },
+   "outputs": {
+    "water_closets_min": {
+     "value": 6,
+     "tolerance": {
+      "abs": 0.0001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "osha-toilet-count",
+   "source_publisher": "U.S. Department of Labor, OSHA (eCFR)",
+   "source_title": "29 CFR 1910.141(c)(1)(i) Table J-1",
+   "source_edition_or_year": "eCFR current as read 2026-10-03",
+   "source_section_or_page": "Table J-1 row \"111 to 150 | 6\"; tested at the row boundary. All-male-or-unsplit workforce (no women_count split).",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "industry": "general",
+    "worker_count": 150,
+    "used_by_women": "yes"
+   },
+   "outputs": {
+    "water_closets_min": {
+     "value": 6,
+     "tolerance": {
+      "abs": 0.0001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "osha-toilet-count",
+   "source_publisher": "U.S. Department of Labor, OSHA (eCFR)",
+   "source_title": "29 CFR 1910.141(c)(1)(i) Table J-1",
+   "source_edition_or_year": "eCFR current as read 2026-10-03",
+   "source_section_or_page": "Table J-1 row \"Over 150 | (2)\" with footnote 2 \"1 additional fixture for each additional 40 employees\": 150 + 40 = 190 -> 6 + 1 = 7; tested at the row boundary. All-male-or-unsplit workforce (no women_count split).",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "industry": "general",
+    "worker_count": 190,
+    "used_by_women": "yes"
+   },
+   "outputs": {
+    "water_closets_min": {
+     "value": 7,
+     "tolerance": {
+      "abs": 0.0001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "osha-toilet-count",
+   "source_publisher": "U.S. Department of Labor, OSHA (eCFR)",
+   "source_title": "29 CFR 1928.110 Field sanitation",
+   "source_edition_or_year": "eCFR current as read 2026-10-03",
+   "source_section_or_page": "(a) \"eleven (11) or more employees\"; (c)(2)(i) \"One toilet facility and one handwashing facility ... for each twenty (20) employees or fraction thereof\": 20 -> 1.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "industry": "agriculture",
+    "worker_count": 20,
+    "used_by_women": "yes"
+   },
+   "outputs": {
+    "toilet_seats": {
+     "value": 1,
+     "tolerance": {
+      "abs": 0.0001
+     }
+    },
+    "handwash_facilities": {
+     "value": 1,
+     "tolerance": {
+      "abs": 0.0001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "osha-toilet-count",
+   "source_publisher": "U.S. Department of Labor, OSHA (eCFR)",
+   "source_title": "29 CFR 1928.110 Field sanitation",
+   "source_edition_or_year": "eCFR current as read 2026-10-03",
+   "source_section_or_page": "(c)(2)(i) \"for each twenty (20) employees or fraction thereof\": 21 -> 2 (fraction thereof).",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "industry": "agriculture",
+    "worker_count": 21,
+    "used_by_women": "yes"
+   },
+   "outputs": {
+    "toilet_seats": {
+     "value": 2,
+     "tolerance": {
+      "abs": 0.0001
+     }
+    },
+    "handwash_facilities": {
+     "value": 2,
+     "tolerance": {
+      "abs": 0.0001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "osha-toilet-count",
+   "source_publisher": "U.S. Department of Labor, OSHA (eCFR)",
+   "source_title": "29 CFR 1928.110 Field sanitation",
+   "source_edition_or_year": "eCFR current as read 2026-10-03",
+   "source_section_or_page": "(a) Scope: applies only where \"eleven (11) or more employees\" do field hand labor; 10 -> section does not apply, 0 required.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "industry": "agriculture",
+    "worker_count": 10,
+    "used_by_women": "yes"
+   },
+   "outputs": {
+    "toilet_seats": {
+     "value": 0,
+     "tolerance": {
+      "abs": 0.0001
+     }
+    },
+    "handwash_facilities": {
+     "value": 0,
+     "tolerance": {
+      "abs": 0.0001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "triangle-sas",
+   "source_publisher": "Naval Education and Training Professional Development and Technology Center (U.S. Navy)",
+   "source_title": "Mathematics, Trigonometry, NAVEDTRA 14140",
+   "source_edition_or_year": "February 1989",
+   "source_section_or_page": "Ch. 5 p. 5-13, Case 3 example: 'given b = 7, c = 5, and A = 19 deg' -> 'a = 2.8' (one decimal place). Book b,c,A map to tile side_a, side_b, included angle; tile 2.7953. The book's angles B = 125 deg 15', C = 35 deg 41' were computed from the rounded a = 2.8 and are not fixtured. abs 0.05 covers the one-decimal rounding.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "side_a": 7,
+    "side_b": 5,
+    "included_angle_deg": 19
+   },
+   "outputs": {
+    "side_c": {
+     "value": 2.8,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "triangle-sas",
+   "source_publisher": "Naval Education and Training Professional Development and Technology Center (U.S. Navy)",
+   "source_title": "Mathematics, Trigonometry, NAVEDTRA 14140",
+   "source_edition_or_year": "February 1989",
+   "source_section_or_page": "Ch. 5 p. 5-14/5-15 pond example: 'distance from A to a third point, C, is 10.2 feet; the distance from C to B is 13.8 feet; and angle C is 52 deg 40'' -> 'c = 11.12 feet', 'A = 80 deg 33'', 'B = 46 deg 49''. Tile side_a = 13.8 (book a), side_b = 10.2 (book b): c 11.1244, A 80.527 deg, B 46.807 deg. The book re-derived A and B from the rounded c = 11.12, so the angle tolerances (abs 0.04 / 0.03 deg, about 2 arc-minutes) cover that rounding; side abs 0.006 covers two-decimal rounding.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "side_a": 13.8,
+    "side_b": 10.2,
+    "included_angle_deg": 52.666666666666664
+   },
+   "outputs": {
+    "side_c": {
+     "value": 11.12,
+     "tolerance": {
+      "abs": 0.006
+     }
+    },
+    "angle_a_deg": {
+     "value": 80.55,
+     "tolerance": {
+      "abs": 0.04
+     }
+    },
+    "angle_b_deg": {
+     "value": 46.81666666666667,
+     "tolerance": {
+      "abs": 0.03
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "triangle-sas",
+   "source_publisher": "Naval Education and Training Professional Development and Technology Center (U.S. Navy)",
+   "source_title": "Mathematics, Trigonometry, NAVEDTRA 14140",
+   "source_edition_or_year": "February 1989",
+   "source_section_or_page": "Ch. 5 p. 5-16 Law of Cosines practice problem 1: 'a = 54.2, c = 83.4, and B = 111 deg 11'' -> answers 'b = 114.72, A = 26 deg 8', C = 42 deg 41''. Tile side_a = 54.2, side_b = 83.4: third side 114.7172, angle opposite 54.2 = 26.138 deg, opposite 83.4 = 42.678 deg. abs 0.006 on the side (two decimals), abs 0.01 deg on the angles (nearest minute = 0.0083 deg).",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "side_a": 54.2,
+    "side_b": 83.4,
+    "included_angle_deg": 111.18333333333334
+   },
+   "outputs": {
+    "side_c": {
+     "value": 114.72,
+     "tolerance": {
+      "abs": 0.006
+     }
+    },
+    "angle_a_deg": {
+     "value": 26.133333333333333,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "angle_b_deg": {
+     "value": 42.68333333333333,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "triangle-sas",
+   "source_publisher": "Naval Education and Training Professional Development and Technology Center (U.S. Navy)",
+   "source_title": "Mathematics, Trigonometry, NAVEDTRA 14140",
+   "source_edition_or_year": "February 1989",
+   "source_section_or_page": "Ch. 5 p. 5-16 Law of Cosines practice problem 2: 'b = 6.6, c = 6.6, and A = 60 deg' -> answers 'a = 6.6, B = 60 deg, C = 60 deg'. Tile exact equilateral; abs 0.006 / 0.01 deg per the stated precision.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "side_a": 6.6,
+    "side_b": 6.6,
+    "included_angle_deg": 60
+   },
+   "outputs": {
+    "side_c": {
+     "value": 6.6,
+     "tolerance": {
+      "abs": 0.006
+     }
+    },
+    "angle_a_deg": {
+     "value": 60,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "angle_b_deg": {
+     "value": 60,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "triangle-sas",
+   "source_publisher": "Naval Education and Training Professional Development and Technology Center (U.S. Navy)",
+   "source_title": "Mathematics, Trigonometry, NAVEDTRA 14140",
+   "source_edition_or_year": "February 1989",
+   "source_section_or_page": "Ch. 5 p. 5-17 area example: 'Find the area of triangle ABC to one decimal place if a = 13, b = 9, and C = 40 deg' -> 'area = 1/2 (13)(9) sin 40 deg = 58.5(0.64279) = 37.6'. Tile 37.603; abs 0.05 (one decimal).",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "side_a": 13,
+    "side_b": 9,
+    "included_angle_deg": 40
+   },
+   "outputs": {
+    "area": {
+     "value": 37.6,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "triangle-sas",
+   "source_publisher": "Naval Education and Training Professional Development and Technology Center (U.S. Navy)",
+   "source_title": "Mathematics, Trigonometry, NAVEDTRA 14140",
+   "source_edition_or_year": "February 1989",
+   "source_section_or_page": "Ch. 5 p. 5-19 area practice problem 1: 'b = 20.02, c = 40.04, and A = 80 deg 8'' -> answer '394.873' (three decimal places). Tile 394.8722; abs 0.002.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "side_a": 20.02,
+    "side_b": 40.04,
+    "included_angle_deg": 80.13333333333334
+   },
+   "outputs": {
+    "area": {
+     "value": 394.873,
+     "tolerance": {
+      "abs": 0.002
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "triangle-sas",
+   "source_publisher": "Naval Education and Training Professional Development and Technology Center (U.S. Navy)",
+   "source_title": "Mathematics, Trigonometry, NAVEDTRA 14140",
+   "source_edition_or_year": "February 1989",
+   "source_section_or_page": "Ch. 5 p. 5-19 area practice problem 2: 'a = 3.28, c = 9.18, and B = 42 deg 21'' -> answer '10.142'. Tile 10.14205; abs 0.001.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "side_a": 3.28,
+    "side_b": 9.18,
+    "included_angle_deg": 42.35
+   },
+   "outputs": {
+    "area": {
+     "value": 10.142,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "triangle-asa",
+   "source_publisher": "Naval Education and Training Professional Development and Technology Center (U.S. Navy)",
+   "source_title": "Mathematics, Trigonometry, NAVEDTRA 14140",
+   "source_edition_or_year": "February 1989",
+   "source_section_or_page": "Ch. 5 p. 5-11 Law of Sines practice problem 1: 'A = 59 deg 36', B = 48 deg 14', and c = 86.4' (c is the side between A and B) -> answers 'C = 72 deg 10', a = 78.3, b = 67.7'. Tile C 72.1667, a 78.2826, b 67.6953; abs 0.001 deg on C (exact), abs 0.05 on the one-decimal sides.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "angle_a_deg": 59.6,
+    "angle_b_deg": 48.233333333333334,
+    "included_side_c": 86.4
+   },
+   "outputs": {
+    "angle_c_deg": {
+     "value": 72.16666666666667,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "side_a": {
+     "value": 78.3,
+     "tolerance": {
+      "abs": 0.05
+     }
+    },
+    "side_b": {
+     "value": 67.7,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "triangle-asa",
+   "source_publisher": "Naval Education and Training Professional Development and Technology Center (U.S. Navy)",
+   "source_title": "Mathematics, Trigonometry, NAVEDTRA 14140",
+   "source_edition_or_year": "February 1989",
+   "source_section_or_page": "Ch. 5 p. 5-11 Law of Sines practice problem 2: 'A = 98 deg 8', C = 25 deg 25', and b = 2.1' (b is the side between A and C) -> answers 'B = 56 deg 27', a = 2.5, c = 1.1'. Tile inputs: angle_a = 98 deg 8', angle_b = book C 25 deg 25', included side 2.1; tile third angle 56.45 deg, side opposite 98 deg 8' = 2.4944, side opposite 25 deg 25' = 1.0815 (book c). abs 0.05 on one-decimal sides.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "angle_a_deg": 98.13333333333334,
+    "angle_b_deg": 25.416666666666668,
+    "included_side_c": 2.1
+   },
+   "outputs": {
+    "angle_c_deg": {
+     "value": 56.45,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "side_a": {
+     "value": 2.5,
+     "tolerance": {
+      "abs": 0.05
+     }
+    },
+    "side_b": {
+     "value": 1.1,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "triangle-asa",
+   "source_publisher": "Naval Education and Training Professional Development and Technology Center (U.S. Navy)",
+   "source_title": "Mathematics, Trigonometry, NAVEDTRA 14140",
+   "source_edition_or_year": "February 1989",
+   "source_section_or_page": "Ch. 5 p. 5-4/5-5 Case 1 example: 'given c = 5, B = 30 deg, and C = 97 deg 30''; the book prints 'A = 52 deg 30'', then 'a = 4.0' and 'b = 2.5'. Side c lies between A and B, so the tile's ASA inputs are A = 52.5, B = 30, c = 5: tile C 97.5, a 4.0010, b 2.5216. abs 0.05 (one decimal).",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "angle_a_deg": 52.5,
+    "angle_b_deg": 30,
+    "included_side_c": 5
+   },
+   "outputs": {
+    "angle_c_deg": {
+     "value": 97.5,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "side_a": {
+     "value": 4,
+     "tolerance": {
+      "abs": 0.05
+     }
+    },
+    "side_b": {
+     "value": 2.5,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "triangle-asa",
+   "source_publisher": "Naval Education and Training Professional Development and Technology Center (U.S. Navy)",
+   "source_title": "Mathematics, Trigonometry, NAVEDTRA 14140",
+   "source_edition_or_year": "February 1989",
+   "source_section_or_page": "Ch. 5 p. 5-18/5-19 area example: 'Find the area of triangle ABC to one decimal place if A = 25 deg, C = 105 deg, and b = 12' (b lies between A and C) -> 'B = 50 deg', 'area = 38.4'. Tile angle_a = 25, angle_b = 105, included side 12: third angle 50, area 38.368. abs 0.05.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "angle_a_deg": 25,
+    "angle_b_deg": 105,
+    "included_side_c": 12
+   },
+   "outputs": {
+    "angle_c_deg": {
+     "value": 50,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "area": {
+     "value": 38.4,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "regular-polygon",
+   "source_publisher": "Math Is Fun (Rod Pierce)",
+   "source_title": "Regular Polygons - Properties (geometry/regular-polygons.html)",
+   "source_edition_or_year": "web page, retrieved 2026-10-03",
+   "source_section_or_page": "'A Table of Values' (Radius 1): 'Regular Hexagon 6 120 deg 1 1 0.866 (1/2 sqrt3) 2.598 ((3/2) sqrt3)' i.e. radius 1, side 1, apothem 0.866, area 2.598. Tile side 1: circumradius 1, apothem 0.86603, area 2.59808. abs 0.001 ('values correct to 3 decimal places only').",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "num_sides": 6,
+    "side_length": 1
+   },
+   "outputs": {
+    "interior_angle_deg": {
+     "value": 120,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "circumradius": {
+     "value": 1,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "apothem": {
+     "value": 0.866,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "area": {
+     "value": 2.598,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "regular-polygon",
+   "source_publisher": "Math Is Fun (Rod Pierce)",
+   "source_title": "Regular Polygons - Properties (geometry/regular-polygons.html)",
+   "source_edition_or_year": "web page, retrieved 2026-10-03",
+   "source_section_or_page": "Same table: 'Regular Heptagon 7 128.571 deg 1 0.868 0.901 2.736' (radius 1, side 0.868, apothem 0.901, area 2.736). Side entered as the printed 0.868 (rounded), so circumradius reads 1.0003 and area 2.7372; abs 0.002 (area 0.003) covers the 3-decimal side rounding.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "num_sides": 7,
+    "side_length": 0.868
+   },
+   "outputs": {
+    "interior_angle_deg": {
+     "value": 128.571,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "circumradius": {
+     "value": 1,
+     "tolerance": {
+      "abs": 0.002
+     }
+    },
+    "apothem": {
+     "value": 0.901,
+     "tolerance": {
+      "abs": 0.002
+     }
+    },
+    "area": {
+     "value": 2.736,
+     "tolerance": {
+      "abs": 0.003
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "regular-polygon",
+   "source_publisher": "Math Is Fun (Rod Pierce)",
+   "source_title": "Regular Polygons - Properties (geometry/regular-polygons.html)",
+   "source_edition_or_year": "web page, retrieved 2026-10-03",
+   "source_section_or_page": "Same table: 'Regular Octagon 8 135 deg 1 0.765 0.924 2.828 (2 sqrt2)'. Side entered as printed 0.765: tile circumradius 0.99950, apothem 0.92341, area 2.8259. abs 0.003 covers the side rounding (0.0004 in 0.765 moves the area 0.1%).",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "num_sides": 8,
+    "side_length": 0.765
+   },
+   "outputs": {
+    "interior_angle_deg": {
+     "value": 135,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "circumradius": {
+     "value": 1,
+     "tolerance": {
+      "abs": 0.003
+     }
+    },
+    "apothem": {
+     "value": 0.924,
+     "tolerance": {
+      "abs": 0.003
+     }
+    },
+    "area": {
+     "value": 2.828,
+     "tolerance": {
+      "abs": 0.003
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "regular-polygon",
+   "source_publisher": "Math Is Fun (Rod Pierce)",
+   "source_title": "Octagon (geometry/octagon.html)",
+   "source_edition_or_year": "web page, retrieved 2026-10-03",
+   "source_section_or_page": "Properties: 'Interior Angles of 135 deg', 'Area = 2(1+sqrt2)s^2, or approximately 4.828427 x s^2'. s = 1: tile area 4.8284271. abs 0.000001.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "num_sides": 8,
+    "side_length": 1
+   },
+   "outputs": {
+    "interior_angle_deg": {
+     "value": 135,
+     "tolerance": {
+      "abs": 1e-06
+     }
+    },
+    "area": {
+     "value": 4.828427,
+     "tolerance": {
+      "abs": 1e-06
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "regular-polygon",
+   "source_publisher": "Math Is Fun (Rod Pierce)",
+   "source_title": "Hexagon (geometry/hexagon.html)",
+   "source_edition_or_year": "web page, retrieved 2026-10-03",
+   "source_section_or_page": "Properties: 'Interior Angles of 120 deg', 'Area = (1.5 sqrt3) x s^2, or approximately 2.5980762 x s^2', 'Radius equals side length'. s = 1: tile area 2.5980762, circumradius 1. abs 1e-6.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "num_sides": 6,
+    "side_length": 1
+   },
+   "outputs": {
+    "area": {
+     "value": 2.5980762,
+     "tolerance": {
+      "abs": 1e-06
+     }
+    },
+    "circumradius": {
+     "value": 1,
+     "tolerance": {
+      "abs": 1e-06
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "regular-polygon",
+   "source_publisher": "Mathwords (Bruce Simmons)",
+   "source_title": "Regular Polygon (r/regular_polygon.htm)",
+   "source_edition_or_year": "web page, retrieved 2026-10-03",
+   "source_section_or_page": "Example Problem: 'regular hexagon with side length 10 cm and apothem approximately 8.66 cm' -> 'Each interior angle is 120 deg, and the area is approximately 259.8 cm^2'. Tile s = 10: apothem 8.6603, area 259.81. abs 0.05 on area (one decimal, computed from apothem 8.66), abs 0.005 on apothem.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "num_sides": 6,
+    "side_length": 10
+   },
+   "outputs": {
+    "interior_angle_deg": {
+     "value": 120,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "apothem": {
+     "value": 8.66,
+     "tolerance": {
+      "abs": 0.005
+     }
+    },
+    "area": {
+     "value": 259.8,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "parabolic-segment",
+   "source_publisher": "Mathwords (Bruce Simmons)",
+   "source_title": "Parabolic Segment (p/parabolic_segment.htm)",
+   "source_edition_or_year": "web page, retrieved 2026-10-03",
+   "source_section_or_page": "Example Problem: segment cut from y = x^2 by y = 9: 'b = 6, h = 9', 'A = 2/3 (6)(9) = 36'. Tile area 36 exactly; abs 1e-9. (No printed arc length.)",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "base_span": 6,
+    "rise_height": 9
+   },
+   "outputs": {
+    "area": {
+     "value": 36,
+     "tolerance": {
+      "abs": 1e-09
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "pyramid-frustum-volume",
+   "source_publisher": "Naval Education and Training Professional Development and Technology Center (U.S. Navy)",
+   "source_title": "Mathematics, Basic Math and Algebra, NAVEDTRA 14139",
+   "source_edition_or_year": "June 1985 course (2003 PDF)",
+   "source_section_or_page": "Ch. 18 p. 197 practice problem 3: 'volume of a regular pyramid with a square base measuring 4 cm on each side, if the vertex is 9 cm above the base' -> answer '3. 48 cu cm'. Entered as 4 x 4 base, top 0 x 0, height 9 (the formula is unit-homogeneous; the volume_ft3 key then reads cubic centimeters). Tile 48 exactly; abs 1e-9.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "bottom_length_ft": 4,
+    "bottom_width_ft": 4,
+    "top_length_ft": 0,
+    "top_width_ft": 0,
+    "height_ft": 9
+   },
+   "outputs": {
+    "volume_ft3": {
+     "value": 48,
+     "tolerance": {
+      "abs": 1e-09
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "pyramid-frustum-volume",
+   "source_publisher": "Naval Education and Training Professional Development and Technology Center (U.S. Navy)",
+   "source_title": "Steelworker, Volume 2, NAVEDTRA 14251",
+   "source_edition_or_year": "November 1996",
+   "source_section_or_page": "Appendix II p. AII-20, Volume of a Frustum of a Regular Pyramid: 'one side of its upper base is 2\" and one side of the lower base is 8\". The distance between the bases is 10\".' -> 'V = 280 cu in.' Entered in ft (8/12, 2/12, 10/12); 280/1728 = 0.162037 ft^3. Prismoidal tile is exact here (similar ends); abs 1e-6.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "bottom_length_ft": 0.6666666666666666,
+    "bottom_width_ft": 0.6666666666666666,
+    "top_length_ft": 0.16666666666666666,
+    "top_width_ft": 0.16666666666666666,
+    "height_ft": 0.8333333333333334
+   },
+   "outputs": {
+    "volume_ft3": {
+     "value": 0.16203703703703703,
+     "tolerance": {
+      "abs": 1e-06
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "pyramid-frustum-volume",
+   "source_publisher": "Naval Education and Training Professional Development and Technology Center (U.S. Navy)",
+   "source_title": "Steelworker, Volume 2, NAVEDTRA 14251",
+   "source_edition_or_year": "November 1996",
+   "source_section_or_page": "Appendix II p. AII-19, Volume of a Pyramid: 'rectangular pyramid whose base is 3\" x 4\" and whose altitude is 6\"' -> 'V = 12 x 6 / 3 = 24 cubic inches'. Entered in ft (3/12 x 4/12 base, top 0 x 0, 6/12 high); 24/1728 = 0.0138889 ft^3. abs 1e-7.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "bottom_length_ft": 0.3333333333333333,
+    "bottom_width_ft": 0.25,
+    "top_length_ft": 0,
+    "top_width_ft": 0,
+    "height_ft": 0.5
+   },
+   "outputs": {
+    "volume_ft3": {
+     "value": 0.013888888888888888,
+     "tolerance": {
+      "abs": 1e-07
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "ellipsoid-volume",
+   "source_publisher": "Mathwords (Bruce Simmons)",
+   "source_title": "Ellipsoid (e/ellipsoid.htm)",
+   "source_edition_or_year": "web page, retrieved 2026-10-03",
+   "source_section_or_page": "'Another Example': 'Find the volume of an ellipsoid with semi-axes a = 3, b = 4, and c = 5' -> 'The volume of the ellipsoid is 80 pi ~ 251.33 cubic units'. Tile takes full axes: L 6, W 8, H 10 -> 251.327; abs 0.005. half_volume is printed as nothing and not fixtured.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "length_ft": 6,
+    "width_ft": 8,
+    "height_ft": 10
+   },
+   "outputs": {
+    "volume_ft3": {
+     "value": 251.33,
+     "tolerance": {
+      "abs": 0.005
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "annulus-area",
+   "source_publisher": "Naval Education and Training Professional Development and Technology Center (U.S. Navy)",
+   "source_title": "Mathematics, Basic Math and Algebra, NAVEDTRA 14139",
+   "source_edition_or_year": "June 1985 course (2003 PDF)",
+   "source_section_or_page": "Ch. 17 p. 189, Concentric Circles practice problem 1: 'R = 4 in., r = 3 in.' -> 'Answers: 1. 22 sq in.' Entered as diameters 8 and 6; tile 21.991 (pi(R+r)(R-r) = 7 pi). abs 0.05 (book rounds to whole units).",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "outer_diameter": 8,
+    "inner_diameter": 6
+   },
+   "outputs": {
+    "ring_area": {
+     "value": 22,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "annulus-area",
+   "source_publisher": "Naval Education and Training Professional Development and Technology Center (U.S. Navy)",
+   "source_title": "Mathematics, Basic Math and Algebra, NAVEDTRA 14139",
+   "source_edition_or_year": "June 1985 course (2003 PDF)",
+   "source_section_or_page": "Ch. 17 p. 189, Concentric Circles practice problem 2: 'R = 6 ft, r = 2 ft' -> '2. 100.5 sq ft'. Diameters 12 and 4; tile 100.531. abs 0.05.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "outer_diameter": 12,
+    "inner_diameter": 4
+   },
+   "outputs": {
+    "ring_area": {
+     "value": 100.5,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "annulus-area",
+   "source_publisher": "Math Is Fun (Rod Pierce)",
+   "source_title": "Annulus (geometry/annulus.html)",
+   "source_edition_or_year": "web page, retrieved 2026-10-03",
+   "source_section_or_page": "Example: 'a steel pipe has an outside diameter (OD) of 100mm and an inside diameter (ID) of 80mm' -> 'Area = 2827 mm^2 (to nearest mm^2)'. Tile 2827.43; abs 0.5.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "outer_diameter": 100,
+    "inner_diameter": 80
+   },
+   "outputs": {
+    "ring_area": {
+     "value": 2827,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "wall_thickness": {
+     "value": 10,
+     "tolerance": {
+      "abs": 1e-09
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "annulus-area",
+   "source_publisher": "Mathwords (Bruce Simmons)",
+   "source_title": "Annulus (a/annulus.htm)",
+   "source_edition_or_year": "web page, retrieved 2026-10-03",
+   "source_section_or_page": "Example Problem: 'outer edge of the path has a radius of 10 m, and the inner edge ... radius of 6 m' -> '64 pi ~ 201.06 square metres'. Diameters 20 and 12; tile 201.062. abs 0.005.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "outer_diameter": 20,
+    "inner_diameter": 12
+   },
+   "outputs": {
+    "ring_area": {
+     "value": 201.06,
+     "tolerance": {
+      "abs": 0.005
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "annulus-area",
+   "source_publisher": "Mathwords (Bruce Simmons)",
+   "source_title": "Annulus (a/annulus.htm)",
+   "source_edition_or_year": "web page, retrieved 2026-10-03",
+   "source_section_or_page": "Another Example: 'washer (flat ring) has an outer diameter of 8 cm and an inner diameter of 3 cm' -> '13.75 pi ~ 43.20 square centimetres'. Tile 43.197. abs 0.005.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "outer_diameter": 8,
+    "inner_diameter": 3
+   },
+   "outputs": {
+    "ring_area": {
+     "value": 43.2,
+     "tolerance": {
+      "abs": 0.005
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "circular-sector",
+   "source_publisher": "Naval Education and Training Professional Development and Technology Center (U.S. Navy)",
+   "source_title": "Mathematics, Trigonometry, NAVEDTRA 14140",
+   "source_edition_or_year": "February 1989",
+   "source_section_or_page": "Ch. 3 p. 3-12, Area of a Sector example: 'radius of 6 inches having a central angle of 60 deg' -> '= 6 pi square inches' (18.8496). Tile area 18.8496; abs 1e-4.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "radius": 6,
+    "angle_deg": 60
+   },
+   "outputs": {
+    "area": {
+     "value": 18.84955592153876,
+     "tolerance": {
+      "abs": 0.0001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "circular-sector",
+   "source_publisher": "Naval Education and Training Professional Development and Technology Center (U.S. Navy)",
+   "source_title": "Mathematics, Trigonometry, NAVEDTRA 14140",
+   "source_edition_or_year": "February 1989",
+   "source_section_or_page": "Ch. 3 p. 3-14 practice problem 3: 'central angle is pi/3 and whose diameter is 24 inches' -> '3. 24 pi square inches' (75.398). Radius 12, angle 60 deg; tile 75.398. abs 1e-3.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "radius": 12,
+    "angle_deg": 60
+   },
+   "outputs": {
+    "area": {
+     "value": 75.39822368615503,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "circular-sector",
+   "source_publisher": "Mathwords (Bruce Simmons)",
+   "source_title": "Sector (s/sector.htm)",
+   "source_edition_or_year": "web page, retrieved 2026-10-03",
+   "source_section_or_page": "Example Problem: 'sector with a central angle of 90 deg in a circle of radius 6 cm' -> '9 pi ~ 28.27 cm^2'. Tile 28.274; abs 0.005.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "radius": 6,
+    "angle_deg": 90
+   },
+   "outputs": {
+    "area": {
+     "value": 28.27,
+     "tolerance": {
+      "abs": 0.005
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "spherical-zone-volume",
+   "source_publisher": "Mathwords (Bruce Simmons)",
+   "source_title": "Spherical Cap (s/spherical_cap.htm)",
+   "source_edition_or_year": "web page, retrieved 2026-10-03",
+   "source_section_or_page": "Example Problem: sphere R = 10 cm cut at h = 4 cm: 'V = pi(4)^2/3 (3 x 10 - 4) = 416 pi/3 ~ 435.6 cm^3'; base radius printed as 'a = sqrt(2(10)(4) - 4^2) = sqrt64 = 8 cm'. Entered as one base r1 = 8, r2 = 0, h = 4 (cap case); tile 435.634. abs 0.05.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "base_radius_1_ft": 8,
+    "base_radius_2_ft": 0,
+    "zone_height_ft": 4
+   },
+   "outputs": {
+    "volume_ft3": {
+     "value": 435.6,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "spherical-zone-volume",
+   "source_publisher": "GeeksforGeeks",
+   "source_title": "Spherical Segment Formula (maths/spherical-segment-formula)",
+   "source_edition_or_year": "web page, retrieved 2026-10-03",
+   "source_section_or_page": "Problem 4: 'R1 = 8, R2 = 5 and h = 3' -> '433.71 cu. cm'. The page evaluates V = pi h/6 (3R1^2 + 3R2^2 + h^2) with pi = 22/7; tile (true pi) 433.54, -0.04%. pct 0.1.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "base_radius_1_ft": 8,
+    "base_radius_2_ft": 5,
+    "zone_height_ft": 3
+   },
+   "outputs": {
+    "volume_ft3": {
+     "value": 433.71,
+     "tolerance": {
+      "pct": 0.1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "spherical-zone-volume",
+   "source_publisher": "GeeksforGeeks",
+   "source_title": "Spherical Segment Formula (maths/spherical-segment-formula)",
+   "source_edition_or_year": "web page, retrieved 2026-10-03",
+   "source_section_or_page": "Problem 7: 'R1 = 4, R2 = 2 and h = 6' -> '301.71 cu. cm' (pi = 22/7). Tile 301.59, -0.04%. pct 0.1.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "base_radius_1_ft": 4,
+    "base_radius_2_ft": 2,
+    "zone_height_ft": 6
+   },
+   "outputs": {
+    "volume_ft3": {
+     "value": 301.71,
+     "tolerance": {
+      "pct": 0.1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "barrel-volume",
+   "source_publisher": "Brewery History Society",
+   "source_title": "Brewery History No. 133, 'Gauging: the art behind the slide rule' (Tom Martin)",
+   "source_edition_or_year": "2009",
+   "source_section_or_page": "pp. 80-81, head-rod example: 'Head diameter - 27.0 inches, Bung diameter - 33.0 inches, Length - 45.0 inches' -> 'the content of the cask (124 gallons)', read on the 'spheroid line' (first variety, 'the middle frustrum of a spheroid', p. 72). Imperial gallons (277.419 in^3): 124 x 277.419/231 = 148.92 US gal. The tile's (pi L/12)(2D^2 + d^2) is the exact spheroidal-frustum volume: 148.26 US gal (-0.44%). pct 1 covers the slide-rule reading (mean diameter read as 31.2 to 0.1 in, about 0.6% in volume).",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "bung_diameter_in": 33,
+    "head_diameter_in": 27,
+    "length_in": 45
+   },
+   "outputs": {
+    "circular_gal": {
+     "value": 148.92,
+     "tolerance": {
+      "pct": 1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "paraboloid-volume",
+   "source_publisher": "OpenStax (Rice University)",
+   "source_title": "Calculus Volume 1, Section 6.2 Determining Volumes by Slicing",
+   "source_edition_or_year": "2016 (web edition)",
+   "source_section_or_page": "Example 6.9: region bounded by g(y) = sqrt(4 - y) and the y-axis over [0, 4], rotated about the y-axis -> 'The volume is 8 pi units^3' (25.1327). The solid is a paraboloid with base radius g(0) = 2 and height 4: base diameter 4, height 4, filled to the rim. Tile full_ft3 25.1327; abs 1e-4.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "base_diameter_ft": 4,
+    "height_ft": 4,
+    "fill_depth_ft": 4
+   },
+   "outputs": {
+    "full_ft3": {
+     "value": 25.132741228718345,
+     "tolerance": {
+      "abs": 0.0001
+     }
+    },
+    "fill_ft3": {
+     "value": 25.132741228718345,
+     "tolerance": {
+      "abs": 0.0001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "tapered-tank-volume",
+   "source_publisher": "Naval Education and Training Professional Development and Technology Center (U.S. Navy)",
+   "source_title": "Steelworker, Volume 2, NAVEDTRA 14251",
+   "source_edition_or_year": "November 1996",
+   "source_section_or_page": "Appendix II p. AII-19, Volume of the Frustum of a Right Circular Cone: conical container drawn with 'R = 12\"' at the top, 'r = 6\"' at the bottom, 15\" high -> 'V = 5 pi(252)', 'V = 3956.4 cubic inches' (pi = 3.14). Entered in ft: bottom diameter 1, top 2, height 1.25, depth 1.25 (full); 3956.4/1728 = 2.28958 ft^3, tile 2.29074 (+0.05% for pi = 3.14). pct 0.1.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "bottom_diameter_ft": 1,
+    "top_diameter_ft": 2,
+    "height_ft": 1.25,
+    "depth_ft": 1.25
+   },
+   "outputs": {
+    "volume_ft3": {
+     "value": 2.2895833333333333,
+     "tolerance": {
+      "pct": 0.1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "tapered-tank-volume",
+   "source_publisher": "Mathwords (Bruce Simmons)",
+   "source_title": "Frustum of a Cone or Pyramid (f/frustum.htm)",
+   "source_edition_or_year": "web page, retrieved 2026-10-03",
+   "source_section_or_page": "Example Problem: 'conical frustum has a larger base radius of 6 cm, a smaller base radius of 3 cm, and a height of 8 cm' -> '168 pi ~ 527.8 cm^3'. Entered as bottom diameter 12, top 6, height 8, depth 8 (full); tile 527.79. abs 0.05.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "bottom_diameter_ft": 12,
+    "top_diameter_ft": 6,
+    "height_ft": 8,
+    "depth_ft": 8
+   },
+   "outputs": {
+    "volume_ft3": {
+     "value": 527.8,
+     "tolerance": {
+      "abs": 0.05
+     }
+    },
+    "percent_full": {
+     "value": 100,
+     "tolerance": {
+      "abs": 1e-09
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "circular-arc-rise-from-radius",
+   "source_publisher": "Mathwords (Bruce Simmons)",
+   "source_title": "sagitta (s/sagitta.htm)",
+   "source_edition_or_year": "web page, retrieved 2026-10-03",
+   "source_section_or_page": "Example Problem: 'A circular arch has a radius of 10 m and a chord (span) of 12 m' -> 'The sagitta is 2 m'. Tile rise 2 exactly (unit-homogeneous). abs 1e-9.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "chord_in": 12,
+    "radius_in": 10
+   },
+   "outputs": {
+    "rise_in": {
+     "value": 2,
+     "tolerance": {
+      "abs": 1e-09
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "circular-arc-rise-from-radius",
+   "source_publisher": "Jerry Mahun, Open Access Surveying Library",
+   "source_title": "Chapter C. Horizontal Curves",
+   "source_edition_or_year": "web edition (Wayback 2024 capture)",
+   "source_section_or_page": "Section 3.c Example, 'Summary of given and computed curve data': 'Delta = 55 deg 00'00\"', 'R = 500.00 ft', 'L = 479.965 ft', 'LC = 461.749 ft', 'M = 56.494 ft'. Chord = LC 461.749, radius 500: tile rise (middle ordinate) 56.4943, central angle 55.0000, arc 479.9655. abs 0.001 / 0.0002 deg / 0.001 (three-decimal printing).",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "chord_in": 461.749,
+    "radius_in": 500
+   },
+   "outputs": {
+    "rise_in": {
+     "value": 56.494,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "central_angle_deg": {
+     "value": 55,
+     "tolerance": {
+      "abs": 0.0002
+     }
+    },
+    "arc_length_in": {
+     "value": 479.965,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "tile_id": "tip-speed-ratio",
+   "source_publisher": "InTechOpen (M. Ragheb and A. M. Ragheb, University of Illinois)",
+   "source_title": "Wind Turbines Theory - The Betz Equation and Optimal Rotor Tip Speed Ratio, in Fundamental and Advanced Topics in Wind Power",
+   "source_edition_or_year": "2011",
+   "source_section_or_page": "Section 3, Rotor optimal Tip Speed Ratio: 'At a wind speed of 15 m/sec, for a rotor blade radius of 10 m, rotating at 1 rotation per second ... v = wr = 2pi.10 = 20pi [m/sec] ... lambda = 62.83/15 = 4'. Inputs converted: 20 m diameter = 65.6168 ft, 1 rps = 60 rpm, 15 m/s = 33.5541 mph. Printed tip speed 62.83 m/s = 206.14 ft/s (tol 0.1%). Printed ratio is written as 4 although 62.83/15 = 4.19; abs 0.2 covers the source's rounding. design_tsr and tip_speed_cap_fps are tile defaults, not printed, and do not enter these outputs.",
+   "inputs": {
+    "rotor_diameter_ft": 65.6168,
+    "rotor_rpm": 60,
+    "wind_speed_mph": 33.55404,
+    "design_tsr": 7,
+    "tip_speed_cap_fps": 280
+   },
+   "outputs": {
+    "tip_speed_fps": {
+     "value": 206.14,
+     "tolerance": {
+      "pct": 0.1
+     }
+    },
+    "tip_speed_ratio": {
+     "value": 4,
+     "tolerance": {
+      "abs": 0.2
+     }
+    }
+   }
+  },
+  {
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "tile_id": "tip-speed-ratio",
+   "source_publisher": "InTechOpen (M. Ragheb and A. M. Ragheb, University of Illinois)",
+   "source_title": "Wind Turbines Theory - The Betz Equation and Optimal Rotor Tip Speed Ratio, in Fundamental and Advanced Topics in Wind Power",
+   "source_edition_or_year": "2011",
+   "source_section_or_page": "Section 3, Suzlon S.66/1250 example: 'rated power at 12 m/s rated wind speed ... rotor diameter of 66 meters and a rotational speed of 13.9-20.8 rpm ... v = wr = (1.46 - 2.18) 66/2 = 48.18 - 71.94 [m/sec] ... lambda = 48.18 - 71.94 / 12 = 4 - 6'. Low end (13.9 rpm): 66 m = 216.5354 ft, 12 m/s = 26.8432 mph. Printed 48.18 m/s = 158.07 ft/s; the source rounds omega to 1.46 rad/s (exact 1.4556), so tile 157.59 ft/s is 0.3% low, inside 0.5%. Ratio printed as approximately 4 (tile 4.003), abs 0.1. design_tsr and tip cap are tile defaults that do not enter these outputs.",
+   "inputs": {
+    "rotor_diameter_ft": 216.5354,
+    "rotor_rpm": 13.9,
+    "wind_speed_mph": 26.84324,
+    "design_tsr": 7,
+    "tip_speed_cap_fps": 280
+   },
+   "outputs": {
+    "tip_speed_fps": {
+     "value": 158.07,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "tip_speed_ratio": {
+     "value": 4,
+     "tolerance": {
+      "abs": 0.1
+     }
+    }
+   }
+  },
+  {
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "tile_id": "tip-speed-ratio",
+   "source_publisher": "InTechOpen (M. Ragheb and A. M. Ragheb, University of Illinois)",
+   "source_title": "Wind Turbines Theory - The Betz Equation and Optimal Rotor Tip Speed Ratio, in Fundamental and Advanced Topics in Wind Power",
+   "source_edition_or_year": "2011",
+   "source_section_or_page": "Section 3, Suzlon S.66/1250 example, high end: '13.9-20.8 rpm ... = 1.46 - 2.18 [radian/sec] ... v = 48.18 - 71.94 [m/sec] ... lambda ... = 4 - 6' at the 12 m/s rated wind. 20.8 rpm, 66 m = 216.5354 ft, 12 m/s = 26.8432 mph. Printed 71.94 m/s = 236.02 ft/s (tile 235.83, 0.08% low from omega rounded to 2.18); ratio printed 6 (tile 5.99), abs 0.1. design_tsr and tip cap are tile defaults that do not enter these outputs.",
+   "inputs": {
+    "rotor_diameter_ft": 216.5354,
+    "rotor_rpm": 20.8,
+    "wind_speed_mph": 26.84324,
+    "design_tsr": 7,
+    "tip_speed_cap_fps": 280
+   },
+   "outputs": {
+    "tip_speed_fps": {
+     "value": 236.02,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "tip_speed_ratio": {
+     "value": 6,
+     "tolerance": {
+      "abs": 0.1
+     }
+    }
+   }
+  },
+  {
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "tile_id": "weibull-capacity-factor",
+   "source_publisher": "Kansas State University (Gary L. Johnson)",
+   "source_title": "Wind Energy Systems, Electronic Edition, Chapter 2 Wind Characteristics",
+   "source_edition_or_year": "Electronic edition, November 2001",
+   "source_section_or_page": "p. 2-36, Example: 'The Weibull parameters at a given site are c = 6 m/s and k = 1.8 ... P(u >= 15) = exp[-(15/6)^1.8] = 0.0055 which represents (0.0055)(8760) = 48 h/year'. Tile hours_above_cut_out with cut-out = 15 m/s (33.55405 mph) and c = 6 m/s (13.42162 mph) gives 48.16 h; abs 1 h covers the printed rounding of P to 0.0055. rated_power_kw, cut_in_mph, rated_speed_mph and loss_factor_pct are tile defaults, not printed, and do not enter hours_above_cut_out.",
+   "inputs": {
+    "weibull_k": 1.8,
+    "weibull_c_mph": 13.42162,
+    "rated_power_kw": 2500,
+    "cut_in_mph": 7,
+    "rated_speed_mph": 27,
+    "cut_out_mph": 33.55404,
+    "loss_factor_pct": 15
+   },
+   "outputs": {
+    "hours_above_cut_out": {
+     "value": 48,
+     "tolerance": {
+      "abs": 1
+     }
+    }
+   }
+  },
+  {
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "tile_id": "feeder-loss-load-factor",
+   "source_publisher": "Electrical Engineering Portal (EEP)",
+   "source_title": "An example of calculating the technical losses of T&D lines (Example - 11 kV Distribution Line)",
+   "source_edition_or_year": "web article, Wayback capture 2025-08-15",
+   "source_section_or_page": "Calculation section: 'Loss load factor (LLF) = (0.8 x LF x LF)+ (0.2 x LF)' and 'Loss load factor (LLF) = (0.8 x 0.3060 x 0.3060) + (0.2 x 0.306) = 0.1361'. Entered as load_factor 0.306 with loss_factor_k 0.2; tile 0.13611, abs 0.0001 covers the 4-place print. Peak current, resistance, length, cost and peak demand are tile defaults (not printed for this step) and do not enter loss_factor.",
+   "inputs": {
+    "peak_current_a": 180,
+    "resistance_ohm_per_mile": 0.29,
+    "length_miles": 4.2,
+    "load_factor": 0.306,
+    "energy_cost_per_kwh": 0.09,
+    "peak_demand_kw": 3887,
+    "loss_factor_k": 0.2
+   },
+   "outputs": {
+    "loss_factor": {
+     "value": 0.1361,
+     "tolerance": {
+      "abs": 0.0001
+     }
+    }
+   }
+  },
+  {
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "tile_id": "transformer-diversity-loading",
+   "source_publisher": "Iowa State University, ECpE Department (Zhaoyu Wang), after W. H. Kersting",
+   "source_title": "EE 653 lecture slides: Nature of Loads",
+   "source_edition_or_year": "course notes (retrieved 2026-10-03)",
+   "source_section_or_page": "Slides 16 and 20: 'Max_noncoincident_demand = 6.18 + 6.82 + 4.94 + 7.05 = 24.98kW ... Diversity_factor = 24.98/16.16 = 1.5458' and 'the transformer serving the four loads is rated 15 kVA ... assuming a power factor of 0.9 ... 17.96 kVA. ... Utilization_factor = 17.96/15 = 1.197'. Entered: 4 customers, individual peak = 24.98 kW / 4 / 0.9 = 6.938889 kVA (the printed noncoincident sum at the printed 0.9 PF), coincidence factor = 1/1.5458 = 0.646914. Tile 17.955 kVA, 119.7%, 1.5458. Tolerances cover the 2-decimal prints.",
+   "inputs": {
+    "customers": 4,
+    "individual_peak_kva": 6.938889,
+    "diversity_factor": 0.646914,
+    "continuous_rating_kva": 15,
+    "short_time_rating_kva": 0,
+    "average_demand_kva": 0
+   },
+   "outputs": {
+    "diversified_kva": {
+     "value": 17.96,
+     "tolerance": {
+      "abs": 0.02
+     }
+    },
+    "continuous_loading_pct": {
+     "value": 119.7,
+     "tolerance": {
+      "abs": 0.1
+     }
+    },
+    "classic_diversity_factor": {
+     "value": 1.5458,
+     "tolerance": {
+      "abs": 0.0005
+     }
+    }
+   }
+  },
+  {
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "tile_id": "transformer-diversity-loading",
+   "source_publisher": "Iowa State University, ECpE Department (Zhaoyu Wang), after W. H. Kersting",
+   "source_title": "EE 653 lecture slides: Nature of Loads",
+   "source_edition_or_year": "course notes (retrieved 2026-10-03)",
+   "source_section_or_page": "Example 1, slides 29-30, transformer T1: 'Noncoin._max. = 12.4 + 13.4 + 16.1 + 12.9 + 11.9 = 66.7kW ... = 66.7/2.20 = 30.3kW', 'Max._kVA._demand(T1) = 30.3/0.9 = 33.7', rated 25 kVA, 'only transformer T1 would experience a significant maximum kVA demand greater than its rating (135%)'. Entered: 5 customers, individual peak = 66.7/5/0.9 = 14.822222 kVA, coincidence factor 1/2.20 = 0.454545. Tile 33.69 kVA and 134.75%; abs 0.05 and 0.6 cover the 1-decimal and whole-percent prints.",
+   "inputs": {
+    "customers": 5,
+    "individual_peak_kva": 14.822222,
+    "diversity_factor": 0.454545,
+    "continuous_rating_kva": 25,
+    "short_time_rating_kva": 0,
+    "average_demand_kva": 0
+   },
+   "outputs": {
+    "diversified_kva": {
+     "value": 33.7,
+     "tolerance": {
+      "abs": 0.05
+     }
+    },
+    "continuous_loading_pct": {
+     "value": 135,
+     "tolerance": {
+      "abs": 0.6
+     }
+    },
+    "classic_diversity_factor": {
+     "value": 2.2,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "tile_id": "transformer-diversity-loading",
+   "source_publisher": "Iowa State University, ECpE Department (Zhaoyu Wang), after W. H. Kersting",
+   "source_title": "EE 653 lecture slides: Nature of Loads",
+   "source_edition_or_year": "course notes (retrieved 2026-10-03)",
+   "source_section_or_page": "Example 1, slides 29-30, transformer T2: 'Noncoin._max. = 12.9 + 13.8 + 14.2 + 16.3 + 14.3 + 17.0 = 81.6kW ... = 81.6/2.30 = 35.5kW', 'Max._kVA._demand(T2) = 35.5/0.9 = 39.4', selected 37.5 kVA. Entered: 6 customers, individual peak = 81.6/6/0.9 = 15.111111 kVA, coincidence factor 1/2.30 = 0.434783. Tile 39.42 kVA; abs 0.05 covers the 1-decimal print.",
+   "inputs": {
+    "customers": 6,
+    "individual_peak_kva": 15.111111,
+    "diversity_factor": 0.434783,
+    "continuous_rating_kva": 37.5,
+    "short_time_rating_kva": 0,
+    "average_demand_kva": 0
+   },
+   "outputs": {
+    "diversified_kva": {
+     "value": 39.4,
+     "tolerance": {
+      "abs": 0.05
+     }
+    },
+    "classic_diversity_factor": {
+     "value": 2.3,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "tile_id": "transformer-diversity-loading",
+   "source_publisher": "Iowa State University, ECpE Department (Zhaoyu Wang), after W. H. Kersting",
+   "source_title": "EE 653 lecture slides: Nature of Loads",
+   "source_edition_or_year": "course notes (retrieved 2026-10-03)",
+   "source_section_or_page": "Example 1, slides 29-30, transformer T3: 'Noncoin._max. = 17.0 + 15.1 + 16.7 + 18.3 + 17.3 + 16.1 + 17.0 = 117.5kW ... = 117.5/2.40 = 49.0kW', 'Max._kVA._demand(T3) = 49.0/0.9 = 54.4', selected 50 kVA. Entered: 7 customers, individual peak = 117.5/7/0.9 = 18.650794 kVA, coincidence factor 1/2.40 = 0.416667. Tile 54.40 kVA; abs 0.05 covers the print.",
+   "inputs": {
+    "customers": 7,
+    "individual_peak_kva": 18.650794,
+    "diversity_factor": 0.416667,
+    "continuous_rating_kva": 50,
+    "short_time_rating_kva": 0,
+    "average_demand_kva": 0
+   },
+   "outputs": {
+    "diversified_kva": {
+     "value": 54.4,
+     "tolerance": {
+      "abs": 0.05
+     }
+    },
+    "classic_diversity_factor": {
+     "value": 2.4,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "tile_id": "safety-valve-capacity",
+   "source_publisher": "Crosby (Tyco Valves & Controls), training presentation hosted by SteamForum",
+   "source_title": "Section I Boiler Safety Valve Sizing & Selection",
+   "source_edition_or_year": "23 and 24 January 2007",
+   "source_section_or_page": "Slides 'Boiler Specifications' to 'Boiler Set Safety Valve selection': 'Total steam generation: 813,036 lbs/hr', 'Design Pressure: 2190 psig'; low set drum 2190 psig 274,145 lbs/hr; high set drum 2254 psig 401,428 lbs/hr; SHO 2100 psig 192,014 lbs/hr; 'Total Flow thru all SV's 867,587 Lbs/Hr 106.7% of MCR'. Tile installed 867,587 and margin 6.71% above required (106.7% of MCR printed to 1 decimal, abs 0.05). fuel_input 0 (nameplate governs); efficiency and enthalpy rise are tile defaults that do not enter these outputs.",
+   "inputs": {
+    "rated_steaming_capacity_lb_hr": 813036,
+    "fuel_input_btuh": 0,
+    "boiler_efficiency": 0.8,
+    "steam_enthalpy_rise_btu_lb": 1000,
+    "mawp_psig": 2190,
+    "accumulation_limit_pct": 6,
+    "valve1_set_psig": 2190,
+    "valve1_capacity_lb_hr": 274145,
+    "valve2_set_psig": 2254,
+    "valve2_capacity_lb_hr": 401428,
+    "valve3_set_psig": 2100,
+    "valve3_capacity_lb_hr": 192014,
+    "uprated_capacity_lb_hr": 0
+   },
+   "outputs": {
+    "installed_capacity_lb_hr": {
+     "value": 867587,
+     "tolerance": {
+      "abs": 1
+     }
+    },
+    "margin_pct": {
+     "value": 6.7,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "tile_id": "soft-foot-correction",
+   "source_publisher": "VibrAlign, Inc.",
+   "source_title": "Shaft Alignment with the Shaft100 & Shaft200 Systems (Fixturlaser) training manual, Unit 3 Lesson 1",
+   "source_edition_or_year": "2003",
+   "source_section_or_page": "p. 3-4, Figures 3-4 and 3-5: soft-foot screen reads foot 1 = 3, foot 2 = 1, foot 3 = 0, foot 4 = 3 mils; 'Start at the foot with greatest value', 'Correct until all feet are 2 mils or less', and feet 1 and 4 are circled ('You will add 3 mils to either of these two feet'). Entered as LF = foot 1 (0.003), LR = foot 2 (0.001), RF = foot 3 (0), RR = foot 4 (0.003), threshold 0.002 in. Worst foot 3 mils and two feet over 2 mils are read straight off the figure; exact.",
+   "inputs": {
+    "foot_lf_in": 0.003,
+    "foot_rf_in": 0,
+    "foot_lr_in": 0.001,
+    "foot_rr_in": 0.003,
+    "threshold_in": 0.002
+   },
+   "outputs": {
+    "worst_foot_rise_in": {
+     "value": 0.003,
+     "tolerance": {
+      "abs": 1e-05
+     }
+    },
+    "failing_feet": {
+     "value": 2,
+     "tolerance": {
+      "abs": 0
+     }
+    }
+   }
+  },
+  {
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "tile_id": "lumber-recovery-overrun",
+   "source_publisher": "University of Tennessee Agricultural Extension Service",
+   "source_title": "PB 1650 Understanding Log Scales and Log Rules",
+   "source_edition_or_year": "PB 1650",
+   "source_section_or_page": "p. 4-5, Table 3 (16-ft logs): small-end diameter 10 in reads Doyle 36 board feet and International 1/4-inch 65 board feet. Tile Doyle (D-4)^2 L/16 is exact (abs 0.5); the published International table is rounded to the nearest 5 board feet, so abs 2.5 covers it. Scaled/actual board feet, log volume, benchmark, kerfs and board thickness are tile defaults that do not enter doyle_bf or international_bf.",
+   "inputs": {
+    "scaled_bf": 1000,
+    "actual_bf": 1240,
+    "log_volume_cuft": 210,
+    "benchmark_lrf": 7,
+    "kerf_in": 0.18,
+    "target_kerf_in": 0.125,
+    "board_thickness_in": 1,
+    "avg_log_diameter_in": 10,
+    "log_length_ft": 16
+   },
+   "outputs": {
+    "doyle_bf": {
+     "value": 36,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "international_bf": {
+     "value": 65,
+     "tolerance": {
+      "abs": 2.5
+     }
+    }
+   }
+  },
+  {
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "tile_id": "lumber-recovery-overrun",
+   "source_publisher": "University of Tennessee Agricultural Extension Service",
+   "source_title": "PB 1650 Understanding Log Scales and Log Rules",
+   "source_edition_or_year": "PB 1650",
+   "source_section_or_page": "p. 4-5, Table 3 (16-ft logs): small-end diameter 14 in reads Doyle 100 board feet and International 1/4-inch 135 board feet. Tile Doyle (D-4)^2 L/16 is exact (abs 0.5); the published International table is rounded to the nearest 5 board feet, so abs 2.5 covers it. Scaled/actual board feet, log volume, benchmark, kerfs and board thickness are tile defaults that do not enter doyle_bf or international_bf.",
+   "inputs": {
+    "scaled_bf": 1000,
+    "actual_bf": 1240,
+    "log_volume_cuft": 210,
+    "benchmark_lrf": 7,
+    "kerf_in": 0.18,
+    "target_kerf_in": 0.125,
+    "board_thickness_in": 1,
+    "avg_log_diameter_in": 14,
+    "log_length_ft": 16
+   },
+   "outputs": {
+    "doyle_bf": {
+     "value": 100,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "international_bf": {
+     "value": 135,
+     "tolerance": {
+      "abs": 2.5
+     }
+    }
+   }
+  },
+  {
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "tile_id": "lumber-recovery-overrun",
+   "source_publisher": "University of Tennessee Agricultural Extension Service",
+   "source_title": "PB 1650 Understanding Log Scales and Log Rules",
+   "source_edition_or_year": "PB 1650",
+   "source_section_or_page": "p. 4-5, Table 3 (16-ft logs): small-end diameter 20 in reads Doyle 256 board feet and International 1/4-inch 290 board feet. Tile Doyle (D-4)^2 L/16 is exact (abs 0.5); the published International table is rounded to the nearest 5 board feet, so abs 2.5 covers it. Scaled/actual board feet, log volume, benchmark, kerfs and board thickness are tile defaults that do not enter doyle_bf or international_bf.",
+   "inputs": {
+    "scaled_bf": 1000,
+    "actual_bf": 1240,
+    "log_volume_cuft": 210,
+    "benchmark_lrf": 7,
+    "kerf_in": 0.18,
+    "target_kerf_in": 0.125,
+    "board_thickness_in": 1,
+    "avg_log_diameter_in": 20,
+    "log_length_ft": 16
+   },
+   "outputs": {
+    "doyle_bf": {
+     "value": 256,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "international_bf": {
+     "value": 290,
+     "tolerance": {
+      "abs": 2.5
+     }
+    }
+   }
+  },
+  {
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "tile_id": "lumber-recovery-overrun",
+   "source_publisher": "University of Tennessee Agricultural Extension Service",
+   "source_title": "PB 1650 Understanding Log Scales and Log Rules",
+   "source_edition_or_year": "PB 1650",
+   "source_section_or_page": "p. 4-5, Table 2 (12-ft logs): small-end diameter 20 in reads Doyle 192 board feet and International 1/4-inch 210 board feet. Tile Doyle (D-4)^2 L/16 is exact (abs 0.5); the published International table is rounded to the nearest 5 board feet, so abs 2.5 covers it. Scaled/actual board feet, log volume, benchmark, kerfs and board thickness are tile defaults that do not enter doyle_bf or international_bf.",
+   "inputs": {
+    "scaled_bf": 1000,
+    "actual_bf": 1240,
+    "log_volume_cuft": 210,
+    "benchmark_lrf": 7,
+    "kerf_in": 0.18,
+    "target_kerf_in": 0.125,
+    "board_thickness_in": 1,
+    "avg_log_diameter_in": 20,
+    "log_length_ft": 12
+   },
+   "outputs": {
+    "doyle_bf": {
+     "value": 192,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "international_bf": {
+     "value": 210,
+     "tolerance": {
+      "abs": 2.5
      }
     }
    }

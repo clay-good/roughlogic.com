@@ -447,7 +447,7 @@ export function computeVibrationSeverityZone({ reading = 0, reading_is_mm_s = 0,
   const previous_in_s = previous_reading > 0 ? toIns(previous_reading) : null;
   const change_pct = previous_in_s === null ? null : (reading_in_s - previous_in_s) / previous_in_s * 100;
   const change_per_month_in_s = previous_in_s === null || !(interval_months > 0) ? null : (reading_in_s - previous_in_s) / interval_months;
-  const crossed = previous_in_s === null ? null : (previous_in_s <= boundary_ab ? "A" : previous_in_s <= boundary_bc ? "B" : previous_in_s <= boundary_cd ? "C" : "D") !== zone;
+  const crossed = previous_in_s === null ? null : (previous_in_s <= _at(boundary_ab) ? "A" : previous_in_s <= _at(boundary_bc) ? "B" : previous_in_s <= _at(boundary_cd) ? "C" : "D") !== zone;
   const outs = [reading_in_s, reading_mm_s, margin_to_next_zone_in_s];
   if (!outs.every(Number.isFinite)) return { error: "Vibration zone math is not a finite value." };
   const meaning = { A: "new machine condition", B: "acceptable for unrestricted long-term operation", C: "unsatisfactory for long-term operation: plan corrective action, do not necessarily shut down", D: "severe -- damage may be occurring" }[zone];

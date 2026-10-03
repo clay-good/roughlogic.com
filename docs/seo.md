@@ -267,8 +267,8 @@ Every tile shell links:
   the whole catalog after the per-tile lists are built: each tile
   that received no link is appended to the list of the one group
   sibling that ranks it highest and still has room under the cap of
-  six. 306 of the 307 find a host; `historical-pricing` cannot,
-  being the only tile in group Q. The graph now carries 7,753 edges
+  six. 307 of the 308 find a host; `historical-pricing` cannot,
+  being the only tile in group Q. The graph now carries 7,754 edges
   across 2,230 tiles, a mean of 3.5 inbound links per tile, and the
   heaviest receiver is unchanged at 30.
 - Sideways from the SPA's hash-route view by way of the canonical
