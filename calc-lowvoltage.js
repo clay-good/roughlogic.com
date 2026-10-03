@@ -1021,12 +1021,18 @@ export function computeLvCablePullFootage({ drops = 48, avg_run_ft = 120, slack_
   if (!(box_ft > 0)) return { error: "Box length must be positive (ft)." };
   if (slack_ft < 0) return { error: "Slack cannot be negative (ft)." };
   const total_ft = drops * (avg_run_ft + slack_ft);
-  const boxes = Math.ceil(total_ft / box_ft - 1e-9);
+  // A horizontal copper run cannot be spliced (TIA-568), so each run comes whole out of one box and the
+  // tail of every box is scrap. Until 2026-10-02 this was ceil(total / box), which counted 100 runs of
+  // 105 ft as 11 boxes; nine whole runs fit a 1,000 ft box, so it takes 12.
+  const run_ft = avg_run_ft + slack_ft;
+  if (run_ft > box_ft) return { error: "One run (average + slack) is longer than a box; a run cannot be spliced." };
+  const runs_per_box = Math.floor(box_ft / run_ft + 1e-9);
+  const boxes = Math.ceil(drops / runs_per_box - 1e-9);
   if (![total_ft, boxes].every(Number.isFinite)) return { error: "Footage math is not a finite value." };
   return {
     total_ft,
     boxes,
-    note: "The slack covers service loops at both ends plus rack dressing. Each run's length is limited separately by structured-cabling-channel (the 100 m channel). Cable is bought by the box, so this is the box count to order.",
+    note: "The slack covers service loops at both ends plus rack dressing. Each run's length is limited separately by structured-cabling-channel (the 100 m channel). Cable is bought by the box, and a run cannot be spliced, so the count is whole runs per box: the leftover tail of each box is scrap.",
   };
 }
 

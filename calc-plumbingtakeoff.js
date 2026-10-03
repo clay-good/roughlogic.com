@@ -57,7 +57,7 @@ export function computeSolderJointQuantity({ joints = 200, wire_in_per_joint = 0
     w_per_in,
     solder_lb,
     spools,
-    note: "The wire length per joint is a field rule of thumb (roughly the pipe diameter in inches of 1/8 in solid wire) that varies with cup depth and technique. Lead-free plumbing solder (mostly tin: 95/5 tin-antimony or tin-copper-silver, about 7.3 g/cm^3) runs about 0.265 lb/in^3; the 0.30 once used here is a tin-lead figure. The crew buys spools with a spare. Flux is a separate small line, roughly one 4 oz jar per 100-150 joints.",
+    note: "The wire length per joint is a field rule of thumb (roughly the pipe diameter in inches of 1/8 in solid wire) that varies with cup depth and technique. Lead-free plumbing solder (mostly tin: 95/5 tin-antimony or tin-copper-silver, about 7.3 g/cm^3) runs about 0.265 lb/in^3; the 0.30 once used here is a tin-lead figure. The crew buys spools with a spare. The result is the solder that ends up in the joints. The Copper Development Association's estimating weights add 100% for wastage and loss, so order about twice this (200 three-quarter-inch joints: CDA 1.10 lb), and its flux allowance is 2 oz per lb of solder.",
   };
 }
 
@@ -72,7 +72,7 @@ function _v856renderSolderJointQuantity(inputRegion, outputRegion, citationEl) {
   const sp = makeNumber("Spool weight (lb)", "sjq-sp", { step: "any", min: "0" });
   for (const f of [j, wj, wd, dn, sp]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { j.input.value = "200"; wj.input.value = "0.75"; wd.input.value = "0.125"; dn.input.value = "0.265"; sp.input.value = "1"; update(); });
-  const oSolder = makeOutputLine(outputRegion, "Solder to order", "sjq-out-solder");
+  const oSolder = makeOutputLine(outputRegion, "Solder in the joints (order about 2x: CDA adds 100% for waste)", "sjq-out-solder");
   const oSpools = makeOutputLine(outputRegion, "Spools", "sjq-out-spools");
   const update = debounce(() => {
     const r = computeSolderJointQuantity({

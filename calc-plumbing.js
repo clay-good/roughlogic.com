@@ -1603,7 +1603,7 @@ export function computeWaterHammerSurge({
   // a = sqrt((K_psf / rho_slug_ft3)) / sqrt(1 + (K_psf * D / (E_psf * t)))
   const K_psf = f.K_psi * 144;
   const E_psf = m.E_psi * 144;
-  const a_unrestricted = Math.sqrt(K_psf / f.rho_slug_ft3); // pure-water celerity ~ 4720 fps
+  const a_unrestricted = Math.sqrt(K_psf / f.rho_slug_ft3); // pure-water celerity ~ 4,860 fps at the bulk modulus and density used here
   // Korteweg's D is the INSIDE diameter (Twyman 2016: "the inner pipe
   // diameter"). Until 2026-10-01 this took the outside diameter, which lowered
   // the wave speed and read surge 10-13% low on PEX SDR 9 and CPVC SDR 11.

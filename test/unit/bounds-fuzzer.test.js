@@ -19491,10 +19491,11 @@ test("bounds: spec-v849 computeCableReelCapacity pins the reel length and error 
 });
 
 test("bounds: spec-v850 computeShingleNails pins the nail count, weight, and error seams", () => {
-  // 30 squares, 80 shingles/sq, 6 nails (high wind), 140 nails/lb -> 14,400 nails, 102.9 lb.
-  const r = _v850shn({ squares: 30, shingles_per_square: 80, nails_per_shingle: 6, nails_per_lb: 140 });
+  // 30 squares, 80 shingles/sq, 6 nails (high wind), 218 nails/lb (1-1/4 in 11 ga) -> 14,400 nails, 66.1 lb.
+  const r = _v850shn({ squares: 30, shingles_per_square: 80, nails_per_shingle: 6, nails_per_lb: 218 });
   assert.strictEqual(r.nails_total, 14400);
-  assert.ok(Math.abs(r.nail_weight_lb - 102.857) < 1e-2);
+  assert.ok(Math.abs(r.nail_weight_lb - 66.055) < 1e-2);
+  assert.ok(Math.abs(_v850shn({ squares: 30, shingles_per_square: 80, nails_per_shingle: 6 }).nail_weight_lb - 66.055) < 1e-2); // default 218/lb
   // The standard four-nail pattern is fewer.
   assert.strictEqual(_v850shn({ squares: 30, shingles_per_square: 80, nails_per_shingle: 4, nails_per_lb: 140 }).nails_total, 9600);
   // Error seams.
@@ -19582,7 +19583,7 @@ test("bounds: spec-v855 computeLvCablePullFootage pins the total footage, box co
   // A denser 100-drop job scales it.
   const dense = _v855lvf({ drops: 100, avg_run_ft: 90, slack_ft: 15, box_ft: 1000 });
   assert.strictEqual(dense.total_ft, 10500);
-  assert.strictEqual(dense.boxes, 11);
+  assert.strictEqual(dense.boxes, 12); // nine whole 105 ft runs per box (no splices)
   // Error seams.
   assert.ok("error" in _v855lvf({ drops: 0, avg_run_ft: 120, slack_ft: 15, box_ft: 1000 }));
   assert.ok("error" in _v855lvf({ drops: 48, avg_run_ft: 0, slack_ft: 15, box_ft: 1000 }));
@@ -28908,14 +28909,15 @@ import { computeChainLinkFenceTakeoff as _v901 } from "../../calc-construction.j
 test("bounds: spec-v901 computeChainLinkFenceTakeoff pins the fabric, posts, terminals, bands, and error seams", () => {
   const r = _v901({ perimeter_ft: 200, height_ft: 4, gate_width_ft: 4, corners: 4, line_post_spacing_ft: 10 });
   assert.equal(r.fabric_lf, 196); // 200 - 4
-  assert.equal(r.rail_wire_lf, 200); // perimeter
+  assert.equal(r.rail_wire_lf, 196); // follows the fabric, gates off
   assert.equal(r.terminals, 6); // 4 corners + 2 gate jambs
   assert.equal(r.total_posts, 20); // ceil(200/10)
   assert.equal(r.line_posts, 14); // 20 - 6
-  assert.equal(r.tension_bands, 18); // 6 * (4-1)
+  assert.equal(r.tension_bands, 30); // (2*4 corners + 2 jambs) * (4-1)
+  assert.equal(_v901({ perimeter_ft: 200, height_ft: 3.5, gate_width_ft: 0, corners: 4, line_post_spacing_ft: 10 }).tension_bands, 24); // 42 in: 3 per set
   // Height drives the bands, the run drives the posts: a taller fence adds bands only.
   const tall = _v901({ perimeter_ft: 200, height_ft: 6, gate_width_ft: 4, corners: 4, line_post_spacing_ft: 10 });
-  assert.equal(tall.tension_bands, 30); // 6 * (6-1)
+  assert.equal(tall.tension_bands, 50); // 10 sets * (6-1)
   assert.equal(tall.total_posts, 20); // unchanged
   // With no gate, terminals are just the corners.
   assert.equal(_v901({ perimeter_ft: 200, height_ft: 4, gate_width_ft: 0, corners: 4, line_post_spacing_ft: 10 }).terminals, 4);

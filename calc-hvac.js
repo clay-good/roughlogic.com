@@ -696,6 +696,7 @@ export function computeEvaporativeCooling({ evaporation_rate_lb_hr, hfg_btu_per_
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const m = Number(evaporation_rate_lb_hr) || 0;
   if (m <= 0) return { error: "Evaporation rate must be positive." };
+  if (!(Number(hfg_btu_per_lb) > 0)) return { error: "Latent heat must be positive (Btu/lb)." };
   const Q = m * hfg_btu_per_lb;
   return { cooling_btu_hr: Q, cooling_tons: Q / 12000 };
 }

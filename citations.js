@@ -4130,7 +4130,7 @@ export const CITATIONS = {
     governance: GOVERNANCE.plumbing,
     editionNote: "Single-edition (physics). The equivalent orifice (hole) diameter for a measured gas leak, the inverse of Q = 8706 c A sqrt(dP/SG). This is the small-leak orifice-flow approximation (incompressible, low-pressure) and gives an ESTIMATE of the effective hole size, not a code leak-test method. The discharge coefficient (about 0.7 for a sharp orifice) and the actual crack geometry, temperature, and choked flow at high pressure ratios all shift it. Distinct from the water orifice-diameter tile, which inverts the incompressible Q = Cd A sqrt(2 g h) form. Any positive leak is a hazard: find and repair it, and follow the code test and the utility's procedure.",
     assumptions: [
-      { name: "Discharge coefficient c", value: "about 0.7 for a sharp orifice unless the user supplies otherwise", source: "engineering practice" },
+      { name: "Discharge coefficient c", value: "0.7 default for a rough-edged crack or fitting leak; a sharp-edged orifice is about 0.6 (Eclipse prints 0.60)", source: "engineering practice" },
       { name: "Gas specific gravity", value: "bundled natural-gas / propane specific gravity", source: "engineering reference" },
       { name: "Estimate only", value: "the small-leak orifice approximation, not a code leak-test method", source: "scope of this tile" },
     ],
@@ -4628,13 +4628,13 @@ export const CITATIONS = {
     ],
   },
   "evaporative-cooling": {
-    formula: "Indirect-evaporative supply temperature ≈ T_db − ε × (T_db − T_wb). Latent heat of vaporization for water = 970.3 BTU/lb at 212 °F (used to convert water consumption to cooling output).",
+    formula: "Cooling (Btu/hr) = water evaporated (lb/hr) x latent heat of vaporization h_fg (Btu/lb), default 1054 Btu/lb (water near 70-80 F; 970.3 is the 212 F value); tons = Btu/hr / 12,000.",
     edition: "ASHRAE Fundamentals psychrometrics by name; classical thermodynamics.",
     freeAccess: "Psychrometric formulas free in published engineering texts.",
     governance: GOVERNANCE.mechanical,
     editionNote: "Single-edition (physics).",
     assumptions: [
-      { name: "Default effectiveness ε", value: "0.85 indirect / 0.70 direct unless user supplies", source: "manufacturer typical" },
+      { name: "Latent heat", value: "h_fg 1054 Btu/lb at typical evaporating temperatures unless the user supplies another; the supply-temperature effectiveness relations are in the evaporative-cooler tiles, not here", source: "steam tables" },
     ],
   },
   "evaporative-cooler-effectiveness": {
@@ -10227,9 +10227,9 @@ export const CITATIONS = {
     edition: "Drywall fastener identity by name (studs a sheet crosses x screws per stud, over the sheet count); first-principles count arithmetic.",
     freeAccess: "The fastener count is public first-principles; the field spacing comes from the code and the assembly.",
     governance: GOVERNANCE.general,
-    editionNote: "The field spacing comes from the code and the assembly (about 12 in on walls, 12 in or tighter on ceilings and fire-rated assemblies -- entered here). This counts fasteners only; the sheets and mud are in the drywall tile. A collated auto-feed screw gun tallies by the strip of about 50.",
+    editionNote: "The field spacing comes from the code and the assembly (GA-216 at 16 in framing: 16 in on walls, 12 in on ceilings, tighter in fire-rated assemblies -- entered here; the 12 in default is the ceiling pattern and counts about 29% more than a wall needs). This counts fasteners only; the sheets and mud are in the drywall tile. A collated auto-feed screw gun tallies by the strip of about 50.",
     assumptions: [
-      { name: "Field spacing", value: "~12 in on walls, 12 in or tighter on ceilings / fire-rated (entered); the assembly governs", source: "IBC / GA-216" },
+      { name: "Field spacing", value: "16 in on walls and 12 in on ceilings at 16 in framing (GA-216), tighter for fire-rated assemblies (entered); the assembly governs", source: "GA-216" },
       { name: "Scope", value: "fasteners only; sheets and mud are in the drywall tile", source: "takeoff convention" },
     ],
   },
@@ -10384,9 +10384,9 @@ export const CITATIONS = {
     edition: "Polymeric joint-sand bag-count identity by name (area over the per-bag coverage, plus waste); first-principles arithmetic.",
     freeAccess: "The bag-count arithmetic is public first-principles; the coverage per bag comes from the product chart.",
     governance: GOVERNANCE.general,
-    editionNote: "The coverage per bag comes from the product chart and drops sharply with wider joints and larger pavers. Polymeric sand is swept in, compacted, and activated with a light water mist. Distinct from the paver and base takeoff in paver-patio.",
+    editionNote: "The coverage per bag comes from the product chart and drops sharply with wider and deeper joints (and rises with larger pavers, which have fewer joints per square foot). Polymeric sand is swept in, compacted, and activated with a light water mist. Distinct from the paver and base takeoff in paver-patio.",
     assumptions: [
-      { name: "Coverage per bag", value: "~75 sf/bag for tight joints, dropping to ~45 sf/bag with wide joints and large pavers; the product chart governs", source: "polymeric sand manufacturer" },
+      { name: "Coverage per bag", value: "~75 sf/bag for tight joints, dropping to roughly 22-42 sf/bag for wide joints (Techniseal SmartSand, Alliance Gator Maxx G2 charts); the product chart governs", source: "polymeric sand manufacturer" },
       { name: "Waste", value: "~5% default for the sweep-in and activation", source: "installation practice" },
     ],
   },
@@ -10435,7 +10435,7 @@ export const CITATIONS = {
     ],
   },
   "pv-rail-clamp-takeoff": {
-    formula: "run_len_ft = modules_per_row x (module_width_ft + gap_ft); rail_lf = rows x rails_per_row x run_len_ft; mid_clamps = rails_per_row x rows x (modules_per_row - 1); end_clamps = 2 x rails_per_row x rows; splices = (ceil(run_len_ft / rail_stock_ft) - 1) x rails_per_row x rows.",
+    formula: "run_len_ft = modules_per_row x module_width_ft + (modules_per_row - 1) x gap_ft; rail_lf = rows x rails_per_row x run_len_ft; mid_clamps = rails_per_row x rows x (modules_per_row - 1); end_clamps = 2 x rails_per_row x rows; splices = (ceil(run_len_ft / rail_stock_ft) - 1) x rails_per_row x rows.",
     edition: "PV racking-takeoff identity by name (run from the module pitch; rail, clamps, and splices from the rows and rails); first-principles count arithmetic.",
     freeAccess: "The count arithmetic is public first-principles; the rail layout, clamp type, and splice come from the rack manufacturer's engineering.",
     governance: GOVERNANCE.general,
@@ -10513,14 +10513,14 @@ export const CITATIONS = {
     ],
   },
   "chain-link-fence-takeoff": {
-    formula: "fabric_lf = perimeter_ft - gate_width_ft; total_posts = ceil(perimeter_ft / line_post_spacing_ft); terminals = corners + (gate jambs); line_posts = total_posts - terminals; tension_bands = terminals x (height_ft - 1).",
+    formula: "fabric_lf = rail_wire_lf = perimeter_ft - gate_width_ft; total_posts = ceil(perimeter_ft / line_post_spacing_ft); terminals = corners + (gate jambs); line_posts = total_posts - terminals; tension_bands = (2 x corners + gate jambs) x ceil(height_ft - 1).",
     edition: "Chain-link takeoff identity by name (fabric net of gates; posts over the run; bands per terminal per foot of height); first-principles count arithmetic.",
     freeAccess: "The count arithmetic is public first-principles; the fabric gauge, post schedule, and hardware follow the fence spec.",
     governance: GOVERNANCE.general,
-    editionNote: "Line posts run about 10 ft on center. Terminals (corners, ends, gate jambs) each get tension bands, a rail end, and a brace. The fabric is stretched against a tension wire and bar. Gate hardware is taken off separately. Distinct from the generic fence-estimate.",
+    editionNote: "Line posts run about 10 ft on center. Terminals (corners, ends, gate jambs) each get tension bands, a rail end, and a brace; corners take two sets of bands (Master Halco, Hoover). The fabric is stretched against a tension wire and bar. Gate hardware is taken off separately. Distinct from the generic fence-estimate.",
     assumptions: [
       { name: "Line post spacing", value: "~10 ft on center (default); the fence spec governs", source: "chain-link fence spec" },
-      { name: "Tension bands", value: "one per foot of height less one at each terminal (terminals x (height - 1))", source: "installation practice" },
+      { name: "Tension bands", value: "one per foot of height less one (rounded up) per set; two sets at a corner, one at an end or gate jamb", source: "Master Halco chain-link estimating" },
     ],
   },
   "leach-field-aggregate": {
@@ -10834,7 +10834,7 @@ export const CITATIONS = {
     edition: "Roofing fastener-count identity by name (nails from squares x shingles x pattern; weight from nails / nails-per-pound); first-principles count arithmetic.",
     freeAccess: "The fastener count is public quantity arithmetic; the nailing pattern comes from the IRC wind zone and the shingle manufacturer.",
     governance: GOVERNANCE.general,
-    editionNote: "The nails-per-shingle comes from the manufacturer and the wind zone - IRC and most manufacturers require six on steep or high-wind roofs and along the eaves and rakes, four elsewhere. The shingles-per-square depends on the product (about 80 for three-tab, 64 for many architectural shingles). This counts field fasteners, not the ridge and hip caps.",
+    editionNote: "The nails-per-shingle comes from the manufacturer and the wind zone - the IRC sets at least four per strip shingle and defers to the manufacturer, whose high-wind and steep-slope methods typically call for six. A 1-1/4 in 11 ga roofing nail runs about 218 per lb (Grip-Rite spec sheet). The shingles-per-square depends on the product (about 80 for three-tab, 64 for many architectural shingles). This counts field fasteners, not the ridge and hip caps.",
     assumptions: [
       { name: "Nailing pattern", value: "4 nails/shingle standard, 6 on steep/high-wind roofs and at eaves/rakes; the wind zone governs", source: "IRC / shingle manufacturer" },
       { name: "Shingles per square", value: "~80 for three-tab, ~64 for many architectural shingles; the product governs", source: "shingle manufacturer" },
@@ -10951,7 +10951,7 @@ export const CITATIONS = {
     ],
   },
   "lv-cable-pull-footage": {
-    formula: "total_ft = drops x (avg_run_ft + slack_ft); boxes = ceil(total_ft / box_ft).",
+    formula: "total_ft = drops x (avg_run_ft + slack_ft); runs_per_box = floor(box_ft / (avg_run_ft + slack_ft)); boxes = ceil(drops / runs_per_box) -- each run whole from one box, since TIA-568 allows no splice in a horizontal copper run.",
     edition: "Low-voltage cable footage takeoff identity by name (drops x per-drop length; boxes from total / box); first-principles count arithmetic.",
     freeAccess: "The footage takeoff is public quantity arithmetic; the drop count and runs come from the drop schedule and the plan.",
     governance: GOVERNANCE.general,
@@ -11271,9 +11271,9 @@ export const CITATIONS = {
     edition: "Guard baluster spacing by name (the IRC 4 in sphere rule); first-principles equal-spacing arithmetic.",
     freeAccess: "The equal-spacing geometry is public first-principles; the 4 in sphere limit is the code rule, stated by name.",
     governance: GOVERNANCE.general,
-    editionNote: "The IRC limits a guard opening so a 4 in sphere cannot pass (the stair triangle at an open riser uses a 6 in sphere, and the space below the rail a 4 3/8 in). Solving the equal-spacing count at or under the maximum gap gives the picket count and the actual gap. The guard height and load are checked by guard-handrail-check; the adopted code governs.",
+    editionNote: "The IRC limits a guard opening so a 4 in sphere cannot pass (the stair triangle formed by a riser, tread, and bottom rail uses a 6 in sphere, and a guard on the open side of a stair a 4-3/8 in sphere, IRC R312.1.3). Solving the equal-spacing count at or under the maximum gap gives the picket count and the actual gap. The guard height and load are checked by guard-handrail-check; the adopted code governs.",
     assumptions: [
-      { name: "Sphere rule", value: "4 in maximum guard opening (IRC R312.1.3); 6 in at the stair triangle, 4 3/8 in below the rail", source: "IRC" },
+      { name: "Sphere rule", value: "4 in maximum guard opening (IRC R312.1.3); 6 in at the riser-tread-bottom-rail triangle, 4-3/8 in for a guard on the open side of a stair", source: "IRC" },
       { name: "Equal spacing", value: "pickets and gaps evenly distributed across the clear span", source: "first principles" },
     ],
   },

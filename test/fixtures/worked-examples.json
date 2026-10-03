@@ -72380,14 +72380,14 @@
    "source_publisher": "Roofing fastener-count identity (first-principles)",
    "source_title": "30 squares, 80 shingles/sq, 6 nails/shingle (high wind), 140 nails/lb",
    "source_edition_or_year": "spec-v850 worked example",
-   "source_section_or_page": "nails = 30*80*6 = 14,400; weight = 14400/140 = 102.9 lb",
+   "source_section_or_page": "nails = 30*80*6 = 14,400; weight = 14400/218 = 66.06 lb (1-1/4 in 11 ga at 218/lb, Grip-Rite; recomputed 2026-10-02 from 140/lb)",
    "verified_by": "rl",
    "verified_on": "2026-07-17",
    "inputs": {
     "squares": 30,
     "shingles_per_square": 80,
     "nails_per_shingle": 6,
-    "nails_per_lb": 140
+    "nails_per_lb": 218
    },
    "outputs": {
     "nails_total": {
@@ -72397,7 +72397,7 @@
      }
     },
     "nail_weight_lb": {
-     "value": 102.86,
+     "value": 66.06,
      "tolerance": {
       "abs": 0.05
      }
@@ -72409,14 +72409,14 @@
    "source_publisher": "Roofing fastener-count identity (first-principles)",
    "source_title": "cross-check: the standard four-nail pattern",
    "source_edition_or_year": "spec-v850 worked example",
-   "source_section_or_page": "nails = 30*80*4 = 9,600; weight = 9600/140 = 68.6 lb",
+   "source_section_or_page": "nails = 30*80*4 = 9,600; weight = 9600/218 = 44.0 lb",
    "verified_by": "rl",
    "verified_on": "2026-07-17",
    "inputs": {
     "squares": 30,
     "shingles_per_square": 80,
     "nails_per_shingle": 4,
-    "nails_per_lb": 140
+    "nails_per_lb": 218
    },
    "outputs": {
     "nails_total": {
@@ -72660,7 +72660,7 @@
    "source_publisher": "Low-voltage footage takeoff identity (first-principles)",
    "source_title": "48 drops, 120 ft average run, 15 ft slack, 1,000 ft boxes",
    "source_edition_or_year": "spec-v855 worked example",
-   "source_section_or_page": "total = 48*(120+15) = 6,480 ft; boxes = ceil(6480/1000) = 7",
+   "source_section_or_page": "total = 48*(120+15) = 6,480 ft; whole 135 ft runs per box = 7; boxes = ceil(48/7) = 7",
    "verified_by": "rl",
    "verified_on": "2026-07-17",
    "inputs": {
@@ -72689,7 +72689,7 @@
    "source_publisher": "Low-voltage footage takeoff identity (first-principles)",
    "source_title": "cross-check: a denser 100-drop job at a shorter 90 ft run",
    "source_edition_or_year": "spec-v855 worked example",
-   "source_section_or_page": "total = 100*(90+15) = 10,500 ft; boxes = ceil(10500/1000) = 11",
+   "source_section_or_page": "total = 100*(90+15) = 10,500 ft; whole 105 ft runs per 1,000 ft box = 9; boxes = ceil(100/9) = 12 (no splices; recomputed 2026-10-02 from ceil(10500/1000) = 11)",
    "verified_by": "rl",
    "verified_on": "2026-07-17",
    "inputs": {
@@ -72706,7 +72706,7 @@
      }
     },
     "boxes": {
-     "value": 11,
+     "value": 12,
      "tolerance": {
       "abs": 0.01
      }
@@ -75806,7 +75806,7 @@
    "source_publisher": "Chain-link takeoff identity (first-principles)",
    "source_title": "200 ft, 4 ft, one 4 ft gate, 4 corners, 10 ft spacing -> 196 LF fabric, 20 posts (14 line, 6 terminal), 18 bands",
    "source_edition_or_year": "spec-v901 worked example",
-   "source_section_or_page": "fabric=200-4=196; terminals=4+2=6; posts=ceil(200/10)=20; line=20-6=14; bands=6*(4-1)=18",
+   "source_section_or_page": "fabric=200-4=196; terminals=4+2=6; posts=ceil(200/10)=20; line=20-6=14; bands=(2*4+2)*(4-1)=30 (corners take two sets; recomputed 2026-10-02 from 18)",
    "verified_by": "rl",
    "verified_on": "2026-07-17",
    "inputs": {
@@ -75836,7 +75836,7 @@
      }
     },
     "tension_bands": {
-     "value": 18,
+     "value": 30,
      "tolerance": {
       "abs": 0.01
      }
@@ -75848,7 +75848,7 @@
    "source_publisher": "Chain-link takeoff identity (first-principles)",
    "source_title": "cross-check: a taller 6 ft fence raises the bands to 30 while posts and fabric hold",
    "source_edition_or_year": "spec-v901 worked example",
-   "source_section_or_page": "bands = 6*(6-1) = 30; posts 20, fabric 196 unchanged",
+   "source_section_or_page": "bands = (2*4+2)*(6-1) = 50; posts 20, fabric 196 unchanged",
    "verified_by": "rl",
    "verified_on": "2026-07-17",
    "inputs": {
@@ -75860,7 +75860,7 @@
    },
    "outputs": {
     "tension_bands": {
-     "value": 30,
+     "value": 50,
      "tolerance": {
       "abs": 0.01
      }
@@ -152808,6 +152808,825 @@
      "value": 40,
      "tolerance": {
       "abs": 0.001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "drywall-fastener-takeoff",
+   "source_publisher": "USG Corporation",
+   "source_title": "The Gypsum Construction Handbook (Appendix: Gypsum Board Screw Usage)",
+   "source_edition_or_year": "Centennial Edition (appendix file dated 2009-01-13)",
+   "source_section_or_page": "Appendix p. 494, 'Vertical Board Attachment (Screws/1000 ft.2)', 4' x 8' Board, framing spacing 16 in row (screw spacing 8/12/16/24 in: 1625 1125 875 625); printed 1125 screws per 1,000 sq ft at 12 in screw spacing. URL https://www.usg.com/content/dam/USG_Marketing_Communications/united_states/product_promotional_materials/finished_assets/appendix2.pdf . Inputs: 1,000 sq ft of 32 sq ft boards = 31.25 sheets (the table's per-1,000-sq-ft basis); tile gives 1125. Tolerance abs 0.5 covers USG's rounding of the per-1,000-sq-ft count to a whole screw.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "sheets": 31.25,
+    "sheet_length_ft": 8,
+    "sheet_width_ft": 4,
+    "stud_spacing_in": 16,
+    "field_screw_spacing_in": 12
+   },
+   "outputs": {
+    "total_screws": {
+     "value": 1125,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "drywall-fastener-takeoff",
+   "source_publisher": "USG Corporation",
+   "source_title": "The Gypsum Construction Handbook (Appendix: Gypsum Board Screw Usage)",
+   "source_edition_or_year": "Centennial Edition (appendix file dated 2009-01-13)",
+   "source_section_or_page": "Appendix p. 494, 'Vertical Board Attachment (Screws/1000 ft.2)', 4' x 8' Board, framing spacing 16 in row (screw spacing 8/12/16/24 in: 1625 1125 875 625); printed 875 screws per 1,000 sq ft at 16 in screw spacing. URL https://www.usg.com/content/dam/USG_Marketing_Communications/united_states/product_promotional_materials/finished_assets/appendix2.pdf . Inputs: 1,000 sq ft of 32 sq ft boards = 31.25 sheets (the table's per-1,000-sq-ft basis); tile gives 875. Tolerance abs 0.5 covers USG's rounding of the per-1,000-sq-ft count to a whole screw.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "sheets": 31.25,
+    "sheet_length_ft": 8,
+    "sheet_width_ft": 4,
+    "stud_spacing_in": 16,
+    "field_screw_spacing_in": 16
+   },
+   "outputs": {
+    "total_screws": {
+     "value": 875,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "drywall-fastener-takeoff",
+   "source_publisher": "USG Corporation",
+   "source_title": "The Gypsum Construction Handbook (Appendix: Gypsum Board Screw Usage)",
+   "source_edition_or_year": "Centennial Edition (appendix file dated 2009-01-13)",
+   "source_section_or_page": "Appendix p. 494, 'Vertical Board Attachment (Screws/1000 ft.2)', 4' x 8' Board, framing spacing 16 in row (screw spacing 8/12/16/24 in: 1625 1125 875 625); printed 1625 screws per 1,000 sq ft at 8 in screw spacing. URL https://www.usg.com/content/dam/USG_Marketing_Communications/united_states/product_promotional_materials/finished_assets/appendix2.pdf . Inputs: 1,000 sq ft of 32 sq ft boards = 31.25 sheets (the table's per-1,000-sq-ft basis); tile gives 1625. Tolerance abs 0.5 covers USG's rounding of the per-1,000-sq-ft count to a whole screw.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "sheets": 31.25,
+    "sheet_length_ft": 8,
+    "sheet_width_ft": 4,
+    "stud_spacing_in": 16,
+    "field_screw_spacing_in": 8
+   },
+   "outputs": {
+    "total_screws": {
+     "value": 1625,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "drywall-fastener-takeoff",
+   "source_publisher": "USG Corporation",
+   "source_title": "The Gypsum Construction Handbook (Appendix: Gypsum Board Screw Usage)",
+   "source_edition_or_year": "Centennial Edition (appendix file dated 2009-01-13)",
+   "source_section_or_page": "Appendix p. 494, 'Vertical Board Attachment (Screws/1000 ft.2)', 4' x 8' Board, framing spacing 24 in row (screw spacing 8/12/16/24 in: 1219 844 656 469); printed 844 screws per 1,000 sq ft at 12 in screw spacing. URL https://www.usg.com/content/dam/USG_Marketing_Communications/united_states/product_promotional_materials/finished_assets/appendix2.pdf . Inputs: 1,000 sq ft of 32 sq ft boards = 31.25 sheets (the table's per-1,000-sq-ft basis); tile gives 843.75. Tolerance abs 0.5 covers USG's rounding of the per-1,000-sq-ft count to a whole screw.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "sheets": 31.25,
+    "sheet_length_ft": 8,
+    "sheet_width_ft": 4,
+    "stud_spacing_in": 24,
+    "field_screw_spacing_in": 12
+   },
+   "outputs": {
+    "total_screws": {
+     "value": 844,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "drywall-fastener-takeoff",
+   "source_publisher": "USG Corporation",
+   "source_title": "The Gypsum Construction Handbook (Appendix: Gypsum Board Screw Usage)",
+   "source_edition_or_year": "Centennial Edition (appendix file dated 2009-01-13)",
+   "source_section_or_page": "Appendix p. 494, 'Horizontal Board Attachment (Screws/1000 ft.2)', 4' x 8' Board, framing spacing 16 in row (screw spacing 8/12/16/24 in: 1531 1094 875 656); printed 1094 screws per 1,000 sq ft at 12 in screw spacing. URL https://www.usg.com/content/dam/USG_Marketing_Communications/united_states/product_promotional_materials/finished_assets/appendix2.pdf . Inputs: 1,000 sq ft of 32 sq ft boards = 31.25 sheets (the table's per-1,000-sq-ft basis); tile gives 1093.75. Tolerance abs 0.5 covers USG's rounding of the per-1,000-sq-ft count to a whole screw.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "sheets": 31.25,
+    "sheet_length_ft": 4,
+    "sheet_width_ft": 8,
+    "stud_spacing_in": 16,
+    "field_screw_spacing_in": 12
+   },
+   "outputs": {
+    "total_screws": {
+     "value": 1094,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "drywall-fastener-takeoff",
+   "source_publisher": "USG Corporation",
+   "source_title": "The Gypsum Construction Handbook (Appendix: Gypsum Board Screw Usage)",
+   "source_edition_or_year": "Centennial Edition (appendix file dated 2009-01-13)",
+   "source_section_or_page": "Appendix p. 494, 'Horizontal Board Attachment (Screws/1000 ft.2)', 4' x 8' Board, framing spacing 24 in row (screw spacing 8/12/16/24 in: 1094 781 625 469); printed 625 screws per 1,000 sq ft at 16 in screw spacing. URL https://www.usg.com/content/dam/USG_Marketing_Communications/united_states/product_promotional_materials/finished_assets/appendix2.pdf . Inputs: 1,000 sq ft of 32 sq ft boards = 31.25 sheets (the table's per-1,000-sq-ft basis); tile gives 625. Tolerance abs 0.5 covers USG's rounding of the per-1,000-sq-ft count to a whole screw.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "sheets": 31.25,
+    "sheet_length_ft": 4,
+    "sheet_width_ft": 8,
+    "stud_spacing_in": 24,
+    "field_screw_spacing_in": 16
+   },
+   "outputs": {
+    "total_screws": {
+     "value": 625,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "drywall-fastener-takeoff",
+   "source_publisher": "USG Corporation",
+   "source_title": "The Gypsum Construction Handbook (Appendix: Gypsum Board Screw Usage)",
+   "source_edition_or_year": "Centennial Edition (appendix file dated 2009-01-13)",
+   "source_section_or_page": "Appendix p. 494, 'Vertical Board Attachment (Screws/1000 ft.2)', 4' x 10' Board, framing spacing 16 in row (screw spacing 8/12/16/24 in: 1600 1100 850 600); printed 1100 screws per 1,000 sq ft at 12 in screw spacing. URL https://www.usg.com/content/dam/USG_Marketing_Communications/united_states/product_promotional_materials/finished_assets/appendix2.pdf . Inputs: 1,000 sq ft of 40 sq ft boards = 25 sheets (the table's per-1,000-sq-ft basis); tile gives 1100. Tolerance abs 0.5 covers USG's rounding of the per-1,000-sq-ft count to a whole screw.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "sheets": 25,
+    "sheet_length_ft": 10,
+    "sheet_width_ft": 4,
+    "stud_spacing_in": 16,
+    "field_screw_spacing_in": 12
+   },
+   "outputs": {
+    "total_screws": {
+     "value": 1100,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "drywall-fastener-takeoff",
+   "source_publisher": "USG Corporation",
+   "source_title": "The Gypsum Construction Handbook (Appendix: Gypsum Board Screw Usage)",
+   "source_edition_or_year": "Centennial Edition (appendix file dated 2009-01-13)",
+   "source_section_or_page": "Appendix p. 494, 'Vertical Board Attachment (Screws/1000 ft.2)', 4' x 12' Board, framing spacing 16 in row (screw spacing 8/12/16/24 in: 1583 1083 833 583); printed 1083 screws per 1,000 sq ft at 12 in screw spacing. URL https://www.usg.com/content/dam/USG_Marketing_Communications/united_states/product_promotional_materials/finished_assets/appendix2.pdf . Inputs: 1,000 sq ft of 48 sq ft boards = 20.8333 sheets (the table's per-1,000-sq-ft basis); tile gives 1083.33. Tolerance abs 0.5 covers USG's rounding of the per-1,000-sq-ft count to a whole screw.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "sheets": 20.833333333333332,
+    "sheet_length_ft": 12,
+    "sheet_width_ft": 4,
+    "stud_spacing_in": 16,
+    "field_screw_spacing_in": 12
+   },
+   "outputs": {
+    "total_screws": {
+     "value": 1083,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "solder-joint-quantity",
+   "source_publisher": "Copper Development Association",
+   "source_title": "The Copper Tube Handbook (CDA Publication A4015-04/06)",
+   "source_edition_or_year": "2006 (A4015-04/06)",
+   "source_section_or_page": "Table 10 \"Solder Requirements for Solder Joint Pressure Fittings\", p. 39: nominal size 1/2 in, length of 1/8-inch (No. 9) wire at 0.010 in clearance .800 in per joint, \"Wt. in lbs at .010 clearance per 100 joints\" 0.261; footnote 1 \"(1 inch length = .01227 cubic inches)\". Inputs: 100 joints x the printed .800 in at the printed 1/8 in wire; density is the tile's 0.265 lb/in^3 lead-free default (the table's own figures imply 0.266, back-checked across four sizes). 1% tolerance covers that 0.3-0.4% density difference and the three-decimal printing.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "joints": 100,
+    "wire_in_per_joint": 0.8,
+    "wire_dia_in": 0.125,
+    "solder_density_lb_in3": 0.265,
+    "spool_lb": 1
+   },
+   "outputs": {
+    "solder_lb": {
+     "value": 0.261,
+     "tolerance": {
+      "pct": 1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "solder-joint-quantity",
+   "source_publisher": "Copper Development Association",
+   "source_title": "The Copper Tube Handbook (CDA Publication A4015-04/06)",
+   "source_edition_or_year": "2006 (A4015-04/06)",
+   "source_section_or_page": "Table 10 \"Solder Requirements for Solder Joint Pressure Fittings\", p. 39: nominal size 3/4 in, length of 1/8-inch (No. 9) wire at 0.010 in clearance 1.680 in per joint, \"Wt. in lbs at .010 clearance per 100 joints\" 0.548; footnote 1 \"(1 inch length = .01227 cubic inches)\". Inputs: 100 joints x the printed 1.680 in at the printed 1/8 in wire; density is the tile's 0.265 lb/in^3 lead-free default (the table's own figures imply 0.266, back-checked across four sizes). 1% tolerance covers that 0.3-0.4% density difference and the three-decimal printing.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "joints": 100,
+    "wire_in_per_joint": 1.68,
+    "wire_dia_in": 0.125,
+    "solder_density_lb_in3": 0.265,
+    "spool_lb": 1
+   },
+   "outputs": {
+    "solder_lb": {
+     "value": 0.548,
+     "tolerance": {
+      "pct": 1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "solder-joint-quantity",
+   "source_publisher": "Copper Development Association",
+   "source_title": "The Copper Tube Handbook (CDA Publication A4015-04/06)",
+   "source_edition_or_year": "2006 (A4015-04/06)",
+   "source_section_or_page": "Table 10 \"Solder Requirements for Solder Joint Pressure Fittings\", p. 39: nominal size 1 in, length of 1/8-inch (No. 9) wire at 0.010 in clearance 2.621 in per joint, \"Wt. in lbs at .010 clearance per 100 joints\" 0.856; footnote 1 \"(1 inch length = .01227 cubic inches)\". Inputs: 100 joints x the printed 2.621 in at the printed 1/8 in wire; density is the tile's 0.265 lb/in^3 lead-free default (the table's own figures imply 0.266, back-checked across four sizes). 1% tolerance covers that 0.3-0.4% density difference and the three-decimal printing.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "joints": 100,
+    "wire_in_per_joint": 2.621,
+    "wire_dia_in": 0.125,
+    "solder_density_lb_in3": 0.265,
+    "spool_lb": 1
+   },
+   "outputs": {
+    "solder_lb": {
+     "value": 0.856,
+     "tolerance": {
+      "pct": 1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "solder-joint-quantity",
+   "source_publisher": "Copper Development Association",
+   "source_title": "The Copper Tube Handbook (CDA Publication A4015-04/06)",
+   "source_edition_or_year": "2006 (A4015-04/06)",
+   "source_section_or_page": "Table 10 \"Solder Requirements for Solder Joint Pressure Fittings\", p. 39: nominal size 2 in, length of 1/8-inch (No. 9) wire at 0.010 in clearance 7.291 in per joint, \"Wt. in lbs at .010 clearance per 100 joints\" 2.380; footnote 1 \"(1 inch length = .01227 cubic inches)\". Inputs: 100 joints x the printed 7.291 in at the printed 1/8 in wire; density is the tile's 0.265 lb/in^3 lead-free default (the table's own figures imply 0.266, back-checked across four sizes). 1% tolerance covers that 0.3-0.4% density difference and the three-decimal printing.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "joints": 100,
+    "wire_in_per_joint": 7.291,
+    "wire_dia_in": 0.125,
+    "solder_density_lb_in3": 0.265,
+    "spool_lb": 1
+   },
+   "outputs": {
+    "solder_lb": {
+     "value": 2.38,
+     "tolerance": {
+      "pct": 1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "construction-adhesive-tubes",
+   "source_publisher": "Henkel Corporation (Loctite)",
+   "source_title": "LOCTITE PL 400 Subfloor Construction Adhesive Technical Data Sheet",
+   "source_edition_or_year": "Revision 01/11/2022",
+   "source_section_or_page": "p. 1 \"COVERAGE\": \"For a 10-fl. oz. (295 ml) cartridge: A 1/4\u201d bead extrudes approximately 30.6 ft.\" Tube volume entered as 10 US fl oz x 1.8046875 in^3/fl oz (exact unit definition, 231 in^3 / 128). Tolerance 0.1 ft covers the printed rounding (30.6 printed to 0.1 ft). The PL Premium TDS (Rev. 12/12/2019) prints the same four figures.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "total_lf": 1200,
+    "tube_volume_in3": 18.0469,
+    "bead_dia_in": 0.25
+   },
+   "outputs": {
+    "lf_per_tube": {
+     "value": 30.6,
+     "tolerance": {
+      "abs": 0.1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "construction-adhesive-tubes",
+   "source_publisher": "Henkel Corporation (Loctite)",
+   "source_title": "LOCTITE PL 400 Subfloor Construction Adhesive Technical Data Sheet",
+   "source_edition_or_year": "Revision 01/11/2022",
+   "source_section_or_page": "p. 1 \"COVERAGE\": \"For a 10-fl. oz. (295 ml) cartridge: A 3/8\u201d bead extrudes approximately 13.6 ft.\" Tube volume entered as 10 US fl oz x 1.8046875 in^3/fl oz (exact unit definition, 231 in^3 / 128). Tolerance 0.1 ft covers the printed rounding (13.6 printed to 0.1 ft). The PL Premium TDS (Rev. 12/12/2019) prints the same four figures.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "total_lf": 1200,
+    "tube_volume_in3": 18.0469,
+    "bead_dia_in": 0.375
+   },
+   "outputs": {
+    "lf_per_tube": {
+     "value": 13.6,
+     "tolerance": {
+      "abs": 0.1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "construction-adhesive-tubes",
+   "source_publisher": "Henkel Corporation (Loctite)",
+   "source_title": "LOCTITE PL 400 Subfloor Construction Adhesive Technical Data Sheet",
+   "source_edition_or_year": "Revision 01/11/2022",
+   "source_section_or_page": "p. 1 \"COVERAGE\": \"For a 28-fl. oz. (828 ml) cartridge: A 1/4\u201d bead extrudes approximately 86 ft.\" Tube volume entered as 28 US fl oz x 1.8046875 in^3/fl oz (exact unit definition, 231 in^3 / 128). Tolerance 0.6 ft covers the printed rounding (86 printed to the whole foot). The PL Premium TDS (Rev. 12/12/2019) prints the same four figures.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "total_lf": 1200,
+    "tube_volume_in3": 50.5313,
+    "bead_dia_in": 0.25
+   },
+   "outputs": {
+    "lf_per_tube": {
+     "value": 86,
+     "tolerance": {
+      "abs": 0.6
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "construction-adhesive-tubes",
+   "source_publisher": "Henkel Corporation (Loctite)",
+   "source_title": "LOCTITE PL 400 Subfloor Construction Adhesive Technical Data Sheet",
+   "source_edition_or_year": "Revision 01/11/2022",
+   "source_section_or_page": "p. 1 \"COVERAGE\": \"For a 28-fl. oz. (828 ml) cartridge: A 3/8\u201d bead extrudes approximately 38 ft.\" Tube volume entered as 28 US fl oz x 1.8046875 in^3/fl oz (exact unit definition, 231 in^3 / 128). Tolerance 0.6 ft covers the printed rounding (38 printed to the whole foot). The PL Premium TDS (Rev. 12/12/2019) prints the same four figures.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "total_lf": 1200,
+    "tube_volume_in3": 50.5313,
+    "bead_dia_in": 0.375
+   },
+   "outputs": {
+    "lf_per_tube": {
+     "value": 38,
+     "tolerance": {
+      "abs": 0.6
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "siding-takeoff",
+   "source_publisher": "James Hardie Building Products",
+   "source_title": "HardiePlank Lap Siding product brochure (as submitted to the City of Detroit HDC, 2022)",
+   "source_edition_or_year": "2020 brochure (PDF created 2020-02-20)",
+   "source_section_or_page": "p. 12 \"SELECT CEDARMILL & SMOOTH\" table: \"Length 12 ft planks\", width 5.25 in, \"Exposure 4 in\", \"Pcs/Sq 25.0\". One square (100 sf, no openings, no waste) needs 25.0 pcs x the printed 12 ft length = 300.0 LF. Tolerance 0.6 LF covers the one-decimal piece rounding (0.05 pc x 12 ft).",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "wall_area_sf": 100,
+    "opening_area_sf": 0,
+    "waste_pct": 0,
+    "exposure_in": 4
+   },
+   "outputs": {
+    "linear_ft": {
+     "value": 300,
+     "tolerance": {
+      "abs": 0.6
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "siding-takeoff",
+   "source_publisher": "James Hardie Building Products",
+   "source_title": "HardiePlank Lap Siding product brochure (as submitted to the City of Detroit HDC, 2022)",
+   "source_edition_or_year": "2020 brochure (PDF created 2020-02-20)",
+   "source_section_or_page": "p. 12 \"SELECT CEDARMILL & SMOOTH\" table: \"Length 12 ft planks\", width 6.25 in, \"Exposure 5 in\", \"Pcs/Sq 20.0\". One square (100 sf, no openings, no waste) needs 20.0 pcs x the printed 12 ft length = 240.0 LF. Tolerance 0.6 LF covers the one-decimal piece rounding (0.05 pc x 12 ft).",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "wall_area_sf": 100,
+    "opening_area_sf": 0,
+    "waste_pct": 0,
+    "exposure_in": 5
+   },
+   "outputs": {
+    "linear_ft": {
+     "value": 240,
+     "tolerance": {
+      "abs": 0.6
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "siding-takeoff",
+   "source_publisher": "James Hardie Building Products",
+   "source_title": "HardiePlank Lap Siding product brochure (as submitted to the City of Detroit HDC, 2022)",
+   "source_edition_or_year": "2020 brochure (PDF created 2020-02-20)",
+   "source_section_or_page": "p. 12 \"SELECT CEDARMILL & SMOOTH\" table: \"Length 12 ft planks\", width 7.25 in, \"Exposure 6 in\", \"Pcs/Sq 16.7\". One square (100 sf, no openings, no waste) needs 16.7 pcs x the printed 12 ft length = 200.4 LF. Tolerance 0.6 LF covers the one-decimal piece rounding (0.05 pc x 12 ft).",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "wall_area_sf": 100,
+    "opening_area_sf": 0,
+    "waste_pct": 0,
+    "exposure_in": 6
+   },
+   "outputs": {
+    "linear_ft": {
+     "value": 200.4,
+     "tolerance": {
+      "abs": 0.6
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "siding-takeoff",
+   "source_publisher": "James Hardie Building Products",
+   "source_title": "HardiePlank Lap Siding product brochure (as submitted to the City of Detroit HDC, 2022)",
+   "source_edition_or_year": "2020 brochure (PDF created 2020-02-20)",
+   "source_section_or_page": "p. 12 \"SELECT CEDARMILL & SMOOTH\" table: \"Length 12 ft planks\", width 8.25 in, \"Exposure 7 in\", \"Pcs/Sq 14.3\". One square (100 sf, no openings, no waste) needs 14.3 pcs x the printed 12 ft length = 171.6 LF. Tolerance 0.6 LF covers the one-decimal piece rounding (0.05 pc x 12 ft).",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "wall_area_sf": 100,
+    "opening_area_sf": 0,
+    "waste_pct": 0,
+    "exposure_in": 7
+   },
+   "outputs": {
+    "linear_ft": {
+     "value": 171.6,
+     "tolerance": {
+      "abs": 0.6
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "siding-takeoff",
+   "source_publisher": "James Hardie Building Products",
+   "source_title": "HardiePlank Lap Siding product brochure (as submitted to the City of Detroit HDC, 2022)",
+   "source_edition_or_year": "2020 brochure (PDF created 2020-02-20)",
+   "source_section_or_page": "p. 12 \"SELECT CEDARMILL & SMOOTH\" table: \"Length 12 ft planks\", width 9.25 in, \"Exposure 8 in\", \"Pcs/Sq 12.5\". One square (100 sf, no openings, no waste) needs 12.5 pcs x the printed 12 ft length = 150.0 LF. Tolerance 0.6 LF covers the one-decimal piece rounding (0.05 pc x 12 ft).",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "wall_area_sf": 100,
+    "opening_area_sf": 0,
+    "waste_pct": 0,
+    "exposure_in": 8
+   },
+   "outputs": {
+    "linear_ft": {
+     "value": 150,
+     "tolerance": {
+      "abs": 0.6
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "spray-foam-board-feet",
+   "source_publisher": "Tiger Foam",
+   "source_title": "Spray Foam Basics: R-Value, Board Feet & Foam Types",
+   "source_edition_or_year": "accessed 2026-10-02",
+   "source_section_or_page": "Body text: \"an 8'x20' wall is 160 square feet, but to achieve an R-Value of 14 (2 inches of foam) would require 320 board feet.\" Set yield and waste do not enter board_feet; they are the tile defaults. Exact identity, tolerance 0.5 bd-ft.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "area_sf": 160,
+    "thickness_in": 2,
+    "yield_bd_ft_per_set": 4800,
+    "waste_pct": 10
+   },
+   "outputs": {
+    "board_feet": {
+     "value": 320,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "tile_id": "wire-feed-deposition",
+   "source_publisher": "Welding Design & Fabrication (Penton Media)",
+   "source_title": "Pre-Calculating Wire-Feed Speed, Travel Speed, and Voltage (Kevin Beardsley)",
+   "source_edition_or_year": "Nov 1, 2009",
+   "source_section_or_page": "'Formula, Sample Calculations' page: 'Deposition rate (lb./hr) = 13.1x(Wire diameter)^2x(Wire-feed speed)x(Efficiency)', efficiency '1.0 for solid wire'; 'Wire diameter = 0.045 in. ... solid wire, WFS = 300 IPM. Deposition rate = 13.1x(0.045)^2x(300)x(1.0) = 7.96 lb./hr'. Tile 8.12 lb/hr (+2.0%): its constant is 60 x pi/4 x 0.2836 = 13.36 vs the article's rounded 13.1; pct 2.5 covers that constant difference.",
+   "inputs": {
+    "wfs_in_min": 300,
+    "wire_dia_in": 0.045,
+    "deposition_eff": 1
+   },
+   "outputs": {
+    "deposit_lb_hr": {
+     "value": 7.96,
+     "tolerance": {
+      "pct": 2.5
+     }
+    }
+   }
+  },
+  {
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "tile_id": "wire-feed-deposition",
+   "source_publisher": "Welding Design & Fabrication (Penton Media)",
+   "source_title": "Pre-Calculating Wire-Feed Speed, Travel Speed, and Voltage (Kevin Beardsley)",
+   "source_edition_or_year": "Nov 1, 2009",
+   "source_section_or_page": "Sample Calculation No.1: '0.052 in. solid wire ... WFS at 325 IPM ... Deposition Rate (lb./hr) = 13.1x(0.052)^2x(325)x(1.0) = 11.51 lb./hr'. Tile 11.74 (+2.0%, the 13.36 vs 13.1 constant); pct 2.5.",
+   "inputs": {
+    "wfs_in_min": 325,
+    "wire_dia_in": 0.052,
+    "deposition_eff": 1
+   },
+   "outputs": {
+    "deposit_lb_hr": {
+     "value": 11.51,
+     "tolerance": {
+      "pct": 2.5
+     }
+    }
+   }
+  },
+  {
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "tile_id": "wire-feed-deposition",
+   "source_publisher": "Welding Design & Fabrication (Penton Media)",
+   "source_title": "Pre-Calculating Wire-Feed Speed, Travel Speed, and Voltage (Kevin Beardsley)",
+   "source_edition_or_year": "Nov 1, 2009",
+   "source_section_or_page": "Sample Calculation No.2: '1/16 in. cored wire ... WFS at 285 IPM ... Deposition rate (lb./hr) = 13.1x(1/16 in.)^2 x (285)x(.85) = 12.39 lb./hr'. Tile 12.65 (+2.1%, the 13.36 vs 13.1 constant); pct 2.5.",
+   "inputs": {
+    "wfs_in_min": 285,
+    "wire_dia_in": 0.0625,
+    "deposition_eff": 0.85
+   },
+   "outputs": {
+    "deposit_lb_hr": {
+     "value": 12.39,
+     "tolerance": {
+      "pct": 2.5
+     }
+    }
+   }
+  },
+  {
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "tile_id": "band-brake-torque",
+   "source_publisher": "Dr. Ahmed Nagib Elmekawy (Machine Design II course notes)",
+   "source_title": "Machine Design II, Lecture 3: Brakes",
+   "source_edition_or_year": "Fall 2017",
+   "source_section_or_page": "Band Brake Example 1, slides 22-23: 'f = 0.3 ... phi = 210*pi/180 = 3.66', 'F1/F2 = e^(0.3*3.66) = 2.98', 'F2 = 880 N', 'F1 = 2.98 x 880 = 2622.4 N', 'T = (2622.4 - 880) x 125', 'T = 217.8 Nm'. SI converted exactly: F2 880 N = 197.83 lbf, r 125 mm = 4.9213 in; printed F1 = 589.54 lbf, T = 1927.7 in-lbf. Tile ratio 3.0028, F1 594.06 lbf, T 1949.9 in-lbf (+0.8% / +1.2%) because the notes round theta to 3.66 and the ratio to 2.98; pct 1.5 covers that rounding.",
+   "inputs": {
+    "slack_tension_lbf": 197.832,
+    "wrap_angle_deg": 210,
+    "friction_coefficient": 0.3,
+    "drum_radius_in": 4.9213
+   },
+   "outputs": {
+    "tension_ratio": {
+     "value": 2.98,
+     "tolerance": {
+      "pct": 1.5
+     }
+    },
+    "tight_tension_lbf": {
+     "value": 589.54,
+     "tolerance": {
+      "pct": 1.5
+     }
+    },
+    "brake_torque_in_lbf": {
+     "value": 1927.7,
+     "tolerance": {
+      "pct": 1.5
+     }
+    }
+   }
+  },
+  {
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "tile_id": "band-brake-torque",
+   "source_publisher": "NPTEL / IIT Kharagpur",
+   "source_title": "Machine Design I, Module 12 Lesson 2: Design of Band and Disc Brakes",
+   "source_edition_or_year": "Version 2 ME (NPTEL web course)",
+   "source_section_or_page": "Q2 (differential band brake): 'brake drum of diameter 500mm ... maximum torque on the drum is 1000 N-m ... embraces 2/3rd of the circumference ... coefficient of friction 0.3'; 'Tbr = T1(1 - e^(-0.3x4pi/3)) x 0.25 ... Which yield T1 = 5587 N, T2 = e^(-mu beta) T1 = 1587 N'. Entered the printed slack side T2 1587 N = 356.77 lbf, R 0.25 m = 9.8425 in, wrap 240 deg; printed T1 5587 N = 1256.0 lbf, torque 1000 N-m = 8850.7 in-lbf. Tile 1253.5 lbf, 8826.5 in-lbf (-0.2%/-0.3%, T2 printed rounded to the newton); pct 0.5.",
+   "inputs": {
+    "slack_tension_lbf": 356.772,
+    "wrap_angle_deg": 240,
+    "friction_coefficient": 0.3,
+    "drum_radius_in": 9.8425
+   },
+   "outputs": {
+    "tight_tension_lbf": {
+     "value": 1256,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "brake_torque_in_lbf": {
+     "value": 8850.7,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "tile_id": "gear-contact-stress",
+   "source_publisher": "McGraw-Hill",
+   "source_title": "Shigley's Mechanical Engineering Design (Budynas & Nisbett)",
+   "source_edition_or_year": "8th edition, 2008",
+   "source_section_or_page": "Example 14-4 (Ch. 14, pdf pp. 36-37 of the chapter excerpt): '17-tooth 20 deg pressure angle spur pinion ... 52-tooth disk gear. The diametral pitch is 10 teeth/in, the face width 1.5 in'; Eq. (14-23) 'I = cos 20 sin 20 / 2 x 3.059/(3.059 + 1) = 0.121'; 'C p = 2300'; Wt = 164.8 lbf. Only I is compared (the printed sigma_c carries Ko Kv Ks Km, which the tile holds at 1). Tile I 0.12110; abs 0.0006 covers the 3-figure print.",
+   "inputs": {
+    "transmitted_load_lb": 164.8,
+    "diametral_pitch_1_in": 10,
+    "pinion_teeth": 17,
+    "gear_teeth": 52,
+    "face_width_in": 1.5,
+    "pressure_angle_deg": 20,
+    "elastic_coefficient_cp": 2300
+   },
+   "outputs": {
+    "geometry_factor_I": {
+     "value": 0.121,
+     "tolerance": {
+      "abs": 0.0006
+     }
+    }
+   }
+  },
+  {
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "tile_id": "gear-contact-stress",
+   "source_publisher": "McGraw-Hill",
+   "source_title": "Shigley's Mechanical Engineering Design (Budynas & Nisbett)",
+   "source_edition_or_year": "8th edition, 2008",
+   "source_section_or_page": "Example 14-8 (book pp. 756-758; pdf pp. 45-46 of the chapter excerpt): 'N P = 18 teeth, NG = 72 teeth', 'Pd = 4 teeth/in', 'F = 4p = 3.14 in', 'Wt = 2502 lbf', phi 20 deg; 'From Eq. (14-23), with m G = 4 and m N = 1, I = cos 20 sin 20 / 2 x 4/(4+1) = 0.1286'. Only I compared (printed stresses carry the AGMA factors). Tile 0.12856; abs 0.0001.",
+   "inputs": {
+    "transmitted_load_lb": 2502,
+    "diametral_pitch_1_in": 4,
+    "pinion_teeth": 18,
+    "gear_teeth": 72,
+    "face_width_in": 3.14,
+    "pressure_angle_deg": 20,
+    "elastic_coefficient_cp": 2300
+   },
+   "outputs": {
+    "geometry_factor_I": {
+     "value": 0.1286,
+     "tolerance": {
+      "abs": 0.0001
+     }
+    }
+   }
+  },
+  {
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "tile_id": "water-hammer-surge",
+   "source_publisher": "Spears Manufacturing Co.",
+   "source_title": "Marine & Offshore Technical: Engineering & Design Data (Schedule 40/80 PVC)",
+   "source_edition_or_year": "Spears sourcebook MARINETECH (current web edition)",
+   "source_section_or_page": "pdf p. 5, Hydraulic Shock section,  'Schedule 80 Pipe Pressure Surge (psi) at Different Velocities', 'based on instantaneous valve closure in a PVC system': size 2, '5 ft/Sec' row = 113.1 psi. Tile 117.7 psi (+4.0%): the tile's PVC E 420,000 psi vs the ~400,000 psi PVC 1120 modulus explains ~2 pts and the rest is the fluid constants; the +4% is uniform across all 8 tile sizes (see report), so pct 5 covers the basis difference, not scatter.",
+   "inputs": {
+    "material": "pvc",
+    "pipe_size": "2",
+    "velocity_fps": 5,
+    "closure_time_s": 0,
+    "run_length_ft": 100,
+    "fluid": "water"
+   },
+   "outputs": {
+    "surge_psi": {
+     "value": 113.1,
+     "tolerance": {
+      "pct": 5
+     }
+    }
+   }
+  },
+  {
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "tile_id": "water-hammer-surge",
+   "source_publisher": "Spears Manufacturing Co.",
+   "source_title": "Marine & Offshore Technical: Engineering & Design Data (Schedule 40/80 PVC)",
+   "source_edition_or_year": "Spears sourcebook MARINETECH (current web edition)",
+   "source_section_or_page": "pdf p. 5 'Schedule 80 Pipe Pressure Surge (psi) at Different Velocities', instantaneous closure: size 4, '5 ft/Sec' row = 101.6 psi. Tile 105.6 psi (+4.0%, same uniform E/fluid-constant offset as the 2 in row); pct 5.",
+   "inputs": {
+    "material": "pvc",
+    "pipe_size": "4",
+    "velocity_fps": 5,
+    "closure_time_s": 0,
+    "run_length_ft": 100,
+    "fluid": "water"
+   },
+   "outputs": {
+    "surge_psi": {
+     "value": 101.6,
+     "tolerance": {
+      "pct": 5
+     }
+    }
+   }
+  },
+  {
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "tile_id": "gas-leak-rate",
+   "source_publisher": "Eclipse, Inc.",
+   "source_title": "Eclipse Engineering Guide (EFE-825)",
+   "source_edition_or_year": "Copyright 1986",
+   "source_section_or_page": "p. 4 'Orifice Flow Formulas' Q = 1658.5 x A x Cd sqrt(h/g), 'Sharp Edge Cd = 0.60'; p. 5 example: 'What is the flow of natural gas through a 7/32\" diameter sharp edge orifice at 6\" w.c. pressure drop? ... 80.7 x 0.60 = 48.4 cfh at 1\" w.c. ... Q2 = 48.4 x sqrt(6) = 119 cfh'; table 'Natural Gas 0.60 Sp. Gr.', 7/32 = .2187 in. Pressure converted 6 in w.c. / 27.68 = 0.21676 psi. Tile 117.95 cfh (-0.9%: its 8706 constant is 1654.8 per in w.c. vs Eclipse 1658.5, and Eclipse's table rounds the 7/32 flow up to 80.7); pct 1.5.",
+   "inputs": {
+    "orifice_diameter_in": 0.2187,
+    "upstream_psi": 0.21676,
+    "gas": "natural_gas",
+    "c": 0.6
+   },
+   "outputs": {
+    "leak_rate_cfh": {
+     "value": 119,
+     "tolerance": {
+      "pct": 1.5
+     }
+    }
+   }
+  },
+  {
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "tile_id": "gas-leak-hole-diameter",
+   "source_publisher": "BCcampus Open Education",
+   "source_title": "Plumbing Apprenticeship Program Level 3 (open textbook), 'Describe burner orifices', Learning Task 3",
+   "source_edition_or_year": "3rd edition (opentextbc.ca/plumbing3e)",
+   "source_section_or_page": "Orifice flow formula Q = 1,658.5 x K x A x sqrt(dP/Sg) worked example: '100 MBH appliance with 4 burners operating on natural gas (Sg 0.6) at a manifold pressure of 4 inches of water column using orifice with a 0.9 K factor' -> 'Flow rate per orifice (Q) = 25 ft3/hr', 'A = .0065 in2', 'D = .0909 in'. Pressure converted 4 in w.c. / 27.68 = 0.14451 psi. Tile D 0.09098 in, A 0.006501 in2 (8706 vs 1658.5 x sqrt(27.68) = 8725.6 is 0.2%); abs 0.0005 in and 0.00005 in2 cover the printed rounding.",
+   "inputs": {
+    "leak_rate_cfh": 25,
+    "upstream_psi": 0.14451,
+    "gas": "natural_gas",
+    "c": 0.9
+   },
+   "outputs": {
+    "orifice_diameter_in": {
+     "value": 0.0909,
+     "tolerance": {
+      "abs": 0.0005
+     }
+    },
+    "orifice_area_in2": {
+     "value": 0.0065,
+     "tolerance": {
+      "abs": 5e-05
+     }
+    }
+   }
+  },
+  {
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "tile_id": "evaporative-cooling",
+   "source_publisher": "PDHonline.com (A. Bhatia)",
+   "source_title": "PDH Course M231: Principles of Evaporative Cooling System",
+   "source_edition_or_year": "PDHonline course M231 (2026 printing)",
+   "source_section_or_page": "Definitions item 6 (pdf p. 8) and design notes p. 21: 'The heat of vaporization (evaporation) of water is 1043 BTU/lb and evaporation of 1 gallon of water requires almost 8700 BTU's of heat (the 8700 conversion factor is based on 8.34 lb. water/gallon and 1043 BTU/lb)'. One gallon = 8.34 lb evaporated (per hour) at h_fg 1043. Tile 8,698.6 Btu/hr; printed 'almost 8700', abs 5 covers the rounding.",
+   "inputs": {
+    "evaporation_rate_lb_hr": 8.34,
+    "hfg_btu_per_lb": 1043
+   },
+   "outputs": {
+    "cooling_btu_hr": {
+     "value": 8700,
+     "tolerance": {
+      "abs": 5
      }
     }
    }

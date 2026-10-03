@@ -2,7 +2,7 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "578107e99df7c43c",
+      "sha": "c25da2cb15ef4f2b",
       "date": "2026-10-03"
     },
     "/tools/": {
@@ -458,8 +458,8 @@
       "date": "2026-09-29"
     },
     "/tools/baluster-picket-count/": {
-      "sha": "eb5bfa8dd064a714",
-      "date": "2026-09-29"
+      "sha": "9d4c7f482b0bab0c",
+      "date": "2026-10-03"
     },
     "/tools/band-brake-torque/": {
       "sha": "8d38f0e012409404",
@@ -1094,8 +1094,8 @@
       "date": "2026-09-29"
     },
     "/tools/chain-link-fence-takeoff/": {
-      "sha": "d4e504bdecba9959",
-      "date": "2026-09-29"
+      "sha": "351f41af91cf7568",
+      "date": "2026-10-03"
     },
     "/tools/chamber-cc-for-cr/": {
       "sha": "574f6127eb0111aa",
@@ -2422,8 +2422,8 @@
       "date": "2026-09-29"
     },
     "/tools/drywall-fastener-takeoff/": {
-      "sha": "a7ac38271a418929",
-      "date": "2026-09-29"
+      "sha": "342e004e944f657d",
+      "date": "2026-10-03"
     },
     "/tools/drywell-infiltration/": {
       "sha": "22bde51698e520d8",
@@ -2746,8 +2746,8 @@
       "date": "2026-09-29"
     },
     "/tools/evaporative-cooling/": {
-      "sha": "316fb87ee5d8323a",
-      "date": "2026-09-29"
+      "sha": "bb2555e06d6a797c",
+      "date": "2026-10-03"
     },
     "/tools/evaporator-td-dtd/": {
       "sha": "1526db9a2ea95253",
@@ -3258,8 +3258,8 @@
       "date": "2026-09-29"
     },
     "/tools/gas-leak-hole-diameter/": {
-      "sha": "a7ccbe5f2313235f",
-      "date": "2026-09-29"
+      "sha": "d26062cdf53f5922",
+      "date": "2026-10-03"
     },
     "/tools/gas-leak-rate/": {
       "sha": "f62986985b53bcc8",
@@ -3778,8 +3778,8 @@
       "date": "2026-09-29"
     },
     "/tools/housewrap-rolls/": {
-      "sha": "e4ef813920c1679c",
-      "date": "2026-09-29"
+      "sha": "e7fc2e7154557d19",
+      "date": "2026-10-03"
     },
     "/tools/hp-from-torque/": {
       "sha": "091b9a49c3ab7aba",
@@ -4418,8 +4418,8 @@
       "date": "2026-09-29"
     },
     "/tools/lv-cable-pull-footage/": {
-      "sha": "45be47cd064bd473",
-      "date": "2026-09-29"
+      "sha": "3e4f7dc170e7ee82",
+      "date": "2026-10-03"
     },
     "/tools/lv-dc-drop/": {
       "sha": "ce35c2d6765fa074",
@@ -5534,8 +5534,8 @@
       "date": "2026-09-29"
     },
     "/tools/polymeric-sand-bags/": {
-      "sha": "020498907a3112c6",
-      "date": "2026-09-29"
+      "sha": "13ce3e4423c81e5b",
+      "date": "2026-10-03"
     },
     "/tools/pon-split-loss-budget/": {
       "sha": "a6e349fec4250248",
@@ -5874,8 +5874,8 @@
       "date": "2026-09-29"
     },
     "/tools/pv-rail-clamp-takeoff/": {
-      "sha": "03ee7b2d0eabc72c",
-      "date": "2026-09-29"
+      "sha": "05b01ea2857c3e50",
+      "date": "2026-10-03"
     },
     "/tools/pv-row-shade-angle/": {
       "sha": "a8699dc9605b93e7",
@@ -6902,8 +6902,8 @@
       "date": "2026-09-29"
     },
     "/tools/shingle-nails/": {
-      "sha": "175904308a97bfd1",
-      "date": "2026-09-29"
+      "sha": "8479975a10a4a3b3",
+      "date": "2026-10-03"
     },
     "/tools/shock-approach-boundary/": {
       "sha": "36f9e5401aa58d55",
@@ -7206,8 +7206,8 @@
       "date": "2026-10-01"
     },
     "/tools/solder-joint-quantity/": {
-      "sha": "beb065a336b9113e",
-      "date": "2026-09-29"
+      "sha": "7807cc23226d42e0",
+      "date": "2026-10-03"
     },
     "/tools/soot-cleaning-takeoff/": {
       "sha": "003607e689952414",
@@ -8490,8 +8490,8 @@
       "date": "2026-09-29"
     },
     "/tools/vapor-barrier-rolls/": {
-      "sha": "423e737814ff258e",
-      "date": "2026-09-29"
+      "sha": "d973c80a8b476e40",
+      "date": "2026-10-03"
     },
     "/tools/vapor-pressure-deficit/": {
       "sha": "c15d71138128ef69",

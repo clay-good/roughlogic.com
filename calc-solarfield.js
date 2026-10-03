@@ -232,7 +232,8 @@ export function computePvRailClampTakeoff({ rows = 2, modules_per_row = 12, modu
   if (!(rails_per_row > 0)) return { error: "Rails per row must be positive." };
   if (!(rail_stock_ft > 0)) return { error: "Rail stock length must be positive (ft)." };
   if (gap_ft < 0) return { error: "Gap cannot be negative (ft)." };
-  const run_len_ft = modules_per_row * (module_width_ft + gap_ft);
+  // N modules have N - 1 clamp gaps between them (until 2026-10-02 the run counted N).
+  const run_len_ft = modules_per_row * module_width_ft + (modules_per_row - 1) * gap_ft;
   const rail_lf = rows * rails_per_row * run_len_ft;
   const mid_clamps = rails_per_row * rows * (modules_per_row - 1);
   const end_clamps = 2 * rails_per_row * rows;
@@ -251,7 +252,7 @@ export function computePvRailClampTakeoff({ rows = 2, modules_per_row = 12, modu
 export const pvRailClampTakeoffExample = { inputs: { rows: 2, modules_per_row: 12, module_width_ft: 3.42, gap_ft: 0, rails_per_row: 2, rail_stock_ft: 14 } };
 
 function _v896renderPvRailClampTakeoff(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: racking-takeoff identity by name. run = modules x (width + gap); rail = rows x rails x run; mid clamps = rails x rows x (modules - 1); end clamps = 2 x rails x rows; splices = (ceil(run / stock) - 1) x rails x rows.";
+  citationEl.textContent = "Citation: racking-takeoff identity by name. run = modules x width + (modules - 1) x gap; rail = rows x rails x run; mid clamps = rails x rows x (modules - 1); end clamps = 2 x rails x rows; splices = (ceil(run / stock) - 1) x rails x rows.";
   const rw = makeNumber("Module rows", "prc-rw", { step: "any", min: "0" });
   const mp = makeNumber("Modules per row", "prc-mp", { step: "any", min: "0" });
   const mw = makeNumber("Module width along the rail (ft)", "prc-mw", { step: "any", min: "0" });

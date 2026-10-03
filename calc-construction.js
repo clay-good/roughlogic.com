@@ -8898,7 +8898,7 @@ CONSTRUCTION_RENDERERS["asce-live-load-reduction"] = _v803renderAsceLiveLoadRedu
 //   nails_total = squares x shingles_per_square x nails_per_shingle
 //   nail_weight_lb = nails_total / nails_per_lb
 // dims: in { squares: dimensionless, shingles_per_square: dimensionless, nails_per_shingle: dimensionless, nails_per_lb: dimensionless } out: { nails_total: dimensionless, nail_weight_lb: M }
-export function computeShingleNails({ squares = 30, shingles_per_square = 80, nails_per_shingle = 4, nails_per_lb = 140 } = {}) {
+export function computeShingleNails({ squares = 30, shingles_per_square = 80, nails_per_shingle = 4, nails_per_lb = 218 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(squares > 0)) return { error: "Squares must be positive." };
   if (!(shingles_per_square > 0)) return { error: "Shingles per square must be positive." };
@@ -8910,11 +8910,11 @@ export function computeShingleNails({ squares = 30, shingles_per_square = 80, na
   return {
     nails_total,
     nail_weight_lb,
-    note: "The nails-per-shingle comes from the manufacturer and the wind zone - IRC and most manufacturers require six on steep or high-wind roofs and along the eaves and rakes, four elsewhere. The shingles-per-square depends on the product (about 80 for three-tab, 64 for many architectural shingles). This counts field fasteners, not the ridge and hip caps.",
+    note: "The nails-per-shingle comes from the manufacturer and the wind zone - the IRC sets at least four per strip shingle and defers to the manufacturer, whose high-wind and steep-slope methods typically call for six. The nails per pound follow the nail: a 1-1/4 in 11 ga roofing nail runs about 218 per lb (Grip-Rite), a 1-3/4 to 2 in nail about 144-152 (the 140 used until 2026-10-02 overstated the weight by about half). The shingles-per-square depends on the product (about 80 for three-tab, 64 for many architectural shingles). This counts field fasteners, not the ridge and hip caps.",
   };
 }
 
-export const shingleNailsExample = { inputs: { squares: 30, shingles_per_square: 80, nails_per_shingle: 6, nails_per_lb: 140 } };
+export const shingleNailsExample = { inputs: { squares: 30, shingles_per_square: 80, nails_per_shingle: 6, nails_per_lb: 218 } };
 
 const _v850renderShingleNails = _simpleRenderer({
   citation: "Citation: fastener-count identity by name. nails = squares x shingles-per-square x nails-per-shingle; weight = nails / nails-per-pound. The nails-per-shingle comes from the manufacturer and the wind zone (six on steep/high-wind, four elsewhere).",
@@ -10014,7 +10014,7 @@ export function computeBalusterPicketCount({ rail_clear_in = 96, picket_width_in
     pickets,
     gaps,
     actual_gap_in,
-    note: "The IRC limits the opening so a 4 in sphere cannot pass through a guard (the triangle at a stair open riser uses a 6 in sphere, and the space below the rail a 4 3/8 in). This holds the actual gap at or under the maximum. The guard height and load are checked by guard-handrail-check; the adopted code governs.",
+    note: "The IRC limits the opening so a 4 in sphere cannot pass through a guard (IRC R312.1.3: the triangle formed by a riser, tread, and bottom rail uses a 6 in sphere, and a guard on the open side of a STAIR uses a 4-3/8 in sphere). This holds the actual gap at or under the maximum. The guard height and load are checked by guard-handrail-check; the adopted code governs.",
   };
 }
 
@@ -10030,7 +10030,7 @@ const _v881renderBalusterPicketCount = _simpleRenderer({
   ],
   outputs: [
     { key: "p", id: "bpc-out-p", label: "Balusters / pickets", value: (r) => _fmtC(r.pickets, 0) + " pickets (" + _fmtC(r.gaps, 0) + " gaps)" },
-    { key: "g", id: "bpc-out-g", label: "Actual clear gap", value: (r) => _fmtC(r.actual_gap_in, 2) + " in" + (r.actual_gap_in <= 4 ? " (meets the IRC 4 in sphere rule)" : " (over the IRC 4 in guard limit - fine only where the guard rule does not apply)") },
+    { key: "g", id: "bpc-out-g", label: "Actual clear gap", value: (r) => _fmtC(r.actual_gap_in, 2) + " in" + (r.actual_gap_in <= 4 + 1e-9 ? " (meets the IRC 4 in sphere rule)" : r.actual_gap_in <= 4.375 + 1e-9 ? " (over 4 in: meets only the 4-3/8 in rule for a guard on the open side of a stair)" : " (over the IRC 4 in guard limit - fine only where the guard rule does not apply)") },
     { key: "note", id: "bpc-out-note", label: "Note", value: (r) => r.note },
   ],
   compute: computeBalusterPicketCount,
@@ -10196,7 +10196,7 @@ const _v885renderVaporBarrierRolls = _simpleRenderer({
   ],
   outputs: [
     { key: "rolls", id: "vbr-out-rolls", label: "Vapor barrier rolls", value: (r) => _fmtC(r.rolls, 0) + " rolls" },
-    { key: "tape", id: "vbr-out-tape", label: "Seam tape", value: (r) => _fmtC(r.seam_tape_lf, 0) + " LF" },
+    { key: "tape", id: "vbr-out-tape", label: "Seam tape (upper bound)", value: (r) => _fmtC(r.seam_tape_lf, 0) + " LF -- the total strip run; the seams between strips are one strip-length shorter" },
     { key: "note", id: "vbr-out-note", label: "Note", value: (r) => r.note },
   ],
   compute: computeVaporBarrierRolls,
@@ -10313,7 +10313,7 @@ export function computeDrywallFastenerTakeoff({ sheets = 100, sheet_length_ft = 
     screws_per_stud,
     screws_per_sheet,
     total_screws,
-    note: "The field spacing comes from the code and the assembly (about 12 in on walls, 12 in or tighter on ceilings and fire-rated assemblies -- entered here). This counts fasteners only; the sheets and mud are in the drywall tile. A collated auto-feed screw gun tallies by the strip of about 50.",
+    note: "The field spacing comes from the code and the assembly (GA-216 at 16 in framing: 16 in on walls, 12 in on ceilings, tighter in fire-rated assemblies -- entered here; the 12 in default is the ceiling pattern and counts about 29% more than a wall needs). This counts fasteners only; the sheets and mud are in the drywall tile. A collated auto-feed screw gun tallies by the strip of about 50.",
   };
 }
 
@@ -10397,14 +10397,14 @@ export function computePolymericSandBags({ area_sf = 400, coverage_per_bag_sf = 
   return {
     bags,
     raw_bags,
-    note: "The coverage per bag comes from the product chart and drops sharply with wider joints and larger pavers. Polymeric sand is swept in, compacted, and activated with a light water mist. Distinct from the paver and base takeoff in paver-patio.",
+    note: "The coverage per bag comes from the product chart and drops sharply with wider and deeper joints (and rises with larger pavers, which have fewer joints per square foot). Polymeric sand is swept in, compacted, and activated with a light water mist. Distinct from the paver and base takeoff in paver-patio.",
   };
 }
 
 export const polymericSandBagsExample = { inputs: { area_sf: 400, coverage_per_bag_sf: 75, waste_pct: 5 } };
 
 const _v891renderPolymericSandBags = _simpleRenderer({
-  citation: "Citation: bag-count identity by name. bags = ceil(area x (1 + waste/100) / coverage per bag). The coverage per bag comes from the product chart and drops sharply with wider joints and larger pavers.",
+  citation: "Citation: bag-count identity by name. bags = ceil(area x (1 + waste/100) / coverage per bag). The coverage per bag comes from the product chart and drops sharply with wider and deeper joints (and rises with larger pavers, which have fewer joints per square foot).",
   example: polymericSandBagsExample.inputs,
   fields: [
     { key: "area_sf", label: "Paver surface area (ft²)", kind: "number" },
@@ -10539,7 +10539,7 @@ const _v895renderHousewrapRolls = _simpleRenderer({
   outputs: [
     { key: "rolls", id: "hwr-out-rolls", label: "Housewrap rolls", value: (r) => _fmtC(r.rolls, 0) + " rolls" },
     { key: "cap", id: "hwr-out-cap", label: "Cap fasteners", value: (r) => _fmtC(r.cap_fasteners, 0) + " fasteners" },
-    { key: "tape", id: "hwr-out-tape", label: "Seam tape", value: (r) => _fmtC(r.seam_tape_lf, 0) + " LF" },
+    { key: "tape", id: "hwr-out-tape", label: "Seam tape (upper bound)", value: (r) => _fmtC(r.seam_tape_lf, 0) + " LF -- the total wrap run; horizontal seams are one course of perimeter shorter, and a single course has none" },
     { key: "note", id: "hwr-out-note", label: "Note", value: (r) => r.note },
   ],
   compute: computeHousewrapRolls,
@@ -10560,11 +10560,16 @@ export function computeChainLinkFenceTakeoff({ perimeter_ft = 200, height_ft = 4
   if (corners < 0) return { error: "Corner count cannot be negative." };
   if (gate_width_ft >= perimeter_ft) return { error: "Gate width meets or exceeds the perimeter." };
   const fabric_lf = perimeter_ft - gate_width_ft;
-  const rail_wire_lf = perimeter_ft;
+  // Top rail and bottom tension wire follow the fabric, so gate openings come off (Master Halco).
+  const rail_wire_lf = fabric_lf;
   const terminals = corners + (gate_width_ft > 0 ? 2 : 0);
   const total_posts = Math.ceil(perimeter_ft / line_post_spacing_ft - 1e-9);
   const line_posts = Math.max(0, total_posts - terminals);
-  const tension_bands = terminals * (height_ft - 1);
+  // A corner post takes fabric from two directions and so two sets of bands; ends and gate jambs one.
+  // One band per foot of height less one, rounded up (Master Halco: 3 for a 42 in fence). Until
+  // 2026-10-02 every terminal took one set, so the 200 ft example read 18 bands against 30.
+  const bands_per_set = Math.max(1, Math.ceil(height_ft - 1 - 1e-9));
+  const tension_bands = (2 * corners + (gate_width_ft > 0 ? 2 : 0)) * bands_per_set;
   if (![fabric_lf, rail_wire_lf, terminals, total_posts, line_posts, tension_bands].every(Number.isFinite)) return { error: "Chain-link math is not a finite value." };
   return {
     fabric_lf,
@@ -10573,14 +10578,14 @@ export function computeChainLinkFenceTakeoff({ perimeter_ft = 200, height_ft = 4
     total_posts,
     line_posts,
     tension_bands,
-    note: "Line posts run about 10 ft on center. Terminals (corners, ends, gate jambs) each get tension bands, a rail end, and a brace. The fabric is stretched against a tension wire and bar. Gate hardware is taken off separately. Distinct from the generic fence-estimate.",
+    note: "Line posts run about 10 ft on center. Terminals (corners, ends, gate jambs) each get tension bands, a rail end, and a brace; a corner takes two sets of bands because the fabric ties on from both sides. The fabric is stretched against a tension wire and bar. Gate hardware is taken off separately. Distinct from the generic fence-estimate.",
   };
 }
 
 export const chainLinkFenceTakeoffExample = { inputs: { perimeter_ft: 200, height_ft: 4, gate_width_ft: 4, corners: 4, line_post_spacing_ft: 10 } };
 
 const _v901renderChainLinkFenceTakeoff = _simpleRenderer({
-  citation: "Citation: takeoff identity by name. fabric = perimeter - gates; total posts = ceil(perimeter / spacing); terminals = corners + gate jambs; line posts = total - terminals; bands = terminals x (height - 1).",
+  citation: "Citation: takeoff identity by name (Master Halco chain-link estimating). fabric and top rail = perimeter - gates; total posts = ceil(perimeter / spacing); terminals = corners + gate jambs; line posts = total - terminals; bands = (2 x corners + gate jambs) x ceil(height - 1), a corner taking two sets.",
   example: chainLinkFenceTakeoffExample.inputs,
   fields: [
     { key: "perimeter_ft", label: "Fence run / perimeter (ft)", kind: "number" },

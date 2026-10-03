@@ -205,7 +205,7 @@ GAS_RENDERERS["gas-pipe-sizing"] = renderGasPipeSizing;
 // Q (cfh) = 8706 * c * A * sqrt(dP / SG / L_unit_factor)
 // Simplified per spec-v2: Q (cfh) = 8706 * c * A * sqrt(dP / SG)
 // where A is orifice area in in^2, dP in psi (gauge), SG is gas specific
-// gravity. The 8706 is the orifice equation Q = c A sqrt(2 dP / rho) in cfh, in^2, psi, with rho = SG x 0.0764 lb/ft^3 air: 25 sqrt(2 x 144 x 32.174 / 0.0764). Until 2026-09-18 this used 3550, the SPITZGLASS PIPE constant, and read 2.45x low. Incompressible: fair at the low pressures of a leak test, understates choked flow above about 13 psi.
+// gravity. The 8706 is the orifice equation Q = c A sqrt(2 dP / rho) in cfh, in^2, psi, with rho = SG x 0.0764 lb/ft^3 air: 25 sqrt(2 x 144 x 32.174 / 0.0764). Until 2026-09-18 this used 3550, the SPITZGLASS PIPE constant, and read 2.45x low. Incompressible: fair at the low pressures of a leak test, drifts from the compressible result above about 13 psi (reads up to ~5% HIGH to about 30 psi, low only beyond that, where flow chokes).
 // =====================================================================
 
 // Orifice-equation constant for cfh from in^2 and psi: 25 sqrt(2 x 144 x 32.174 / 0.0764) = 8706.
@@ -287,7 +287,7 @@ export function computeGasLeakHoleDiameter({ leak_rate_cfh, upstream_psi, gas, c
     orifice_area_in2,
     discharge_coefficient: cd,
     specific_gravity: props.specific_gravity,
-    note: "Equivalent orifice diameter for a measured gas leak: from Q = 8706 c A sqrt(dP / SG) with A = pi d^2 / 4, d = sqrt( 4 Q / (8706 c pi sqrt(dP / SG)) ). This is the small-leak orifice-flow approximation (compressible, subsonic) - an ESTIMATE of the effective hole size, not a code leak-test method. The discharge coefficient (~0.7 for a sharp orifice) and the actual crack geometry, temperature, and choked-flow at high pressure ratios all shift it. Any positive leak is a hazard: find and repair it, and follow the code test and the utility's procedure.",
+    note: "Equivalent orifice diameter for a measured gas leak: from Q = 8706 c A sqrt(dP / SG) with A = pi d^2 / 4, d = sqrt( 4 Q / (8706 c pi sqrt(dP / SG)) ). This is the small-leak orifice-flow approximation (compressible, subsonic) - an ESTIMATE of the effective hole size, not a code leak-test method. The discharge coefficient (0.7 default for a rough crack; about 0.6 for a sharp-edged orifice) and the actual crack geometry, temperature, and choked-flow at high pressure ratios all shift it. Any positive leak is a hazard: find and repair it, and follow the code test and the utility's procedure.",
   };
 }
 export const gasLeakHoleDiameterExample = {
