@@ -175,7 +175,7 @@ export function computePipelineMaoBarlow({
   const has_operating = operating_pressure_psig > 0;
   const hoop_stress_psi = has_operating ? operating_pressure_psig * od_in / (2 * wall_in) : 0;
   const pct_smys = has_operating ? hoop_stress_psi / smys_psi * 100 : 0;
-  const within_maop = has_operating ? operating_pressure_psig <= maop_psig : true;
+  const within_maop = has_operating ? operating_pressure_psig <= maop_psig + 1e-9 * Math.abs(maop_psig) : true;
   const operating_verdict = !has_operating
     ? "(no operating pressure entered)"
     : within_maop
@@ -184,7 +184,7 @@ export function computePipelineMaoBarlow({
   // Inverted: the wall a target pressure needs at the selected class.
   const has_target = target_pressure_psig > 0;
   const wall_required_in = has_target ? target_pressure_psig * od_in / (2 * smys_psi * design_factor * joint_factor * temperature_factor) : 0;
-  const wall_adequate = has_target ? wall_in >= wall_required_in : true;
+  const wall_adequate = has_target ? wall_in >= wall_required_in - 1e-9 * Math.abs(wall_required_in) : true;
   if (![barlow_yield_psi, maop_psig, hoop_stress_psi, pct_smys, wall_required_in].every(Number.isFinite)) return { error: "MAOP math is not a finite value." };
   return {
     barlow_yield_psi, maop_psig, design_factor, class_location,

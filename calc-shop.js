@@ -2427,9 +2427,9 @@ export function computeCylinderStorageSeparation({ separation_ft = 0, barrier_pr
   const separation_shortfall_ft = Math.max(0, REQ_SEP - sep);
 
   // The barrier route has THREE conditions and they all have to hold.
-  const barrier_height_ok = hasBarrier ? bh >= REQ_H : null;
+  const barrier_height_ok = hasBarrier ? bh >= REQ_H - 1e-9 * Math.abs(REQ_H) : null;
   const barrier_noncomb_ok = hasBarrier ? nonComb : null;
-  const barrier_rating_ok = hasBarrier ? br >= REQ_RATING : null;
+  const barrier_rating_ok = hasBarrier ? br >= REQ_RATING - 1e-9 * Math.abs(REQ_RATING) : null;
   const barrier_ok = hasBarrier ? (barrier_height_ok && barrier_noncomb_ok && barrier_rating_ok) : false;
   const barrier_failures = hasBarrier
     ? [barrier_noncomb_ok ? null : "not stated noncombustible", barrier_height_ok ? null : "under 5 ft", barrier_rating_ok ? null : "under a half-hour rating"].filter(Boolean)
@@ -3129,7 +3129,7 @@ export function computeSprayBoothAirflow({ opening_width_ft = 0, opening_height_
   const has_measured = measured_face_velocity_fpm > 0;
   const measured_cfm = has_measured ? opening_sqft * measured_face_velocity_fpm : 0;
   const velocity_shortfall_pct = has_measured ? (1 - measured_face_velocity_fpm / face_velocity_fpm) * 100 : 0;
-  const velocity_compliant = has_measured ? measured_face_velocity_fpm >= face_velocity_fpm : true;
+  const velocity_compliant = has_measured ? measured_face_velocity_fpm >= face_velocity_fpm - 1e-9 * Math.abs(face_velocity_fpm) : true;
   const velocity_verdict = !has_measured
     ? "(no measured face velocity entered)"
     : velocity_compliant

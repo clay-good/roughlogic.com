@@ -524,7 +524,7 @@ export function computeRailcarLoadLimit({ gross_rail_load_lb = 0, light_weight_l
   const route_load_limit_lb = route_gross_rail_load_lb > 0 ? route_gross_rail_load_lb - light_weight_lb : null;
   const governing_load_limit_lb = route_load_limit_lb === null ? load_limit_lb : Math.min(load_limit_lb, route_load_limit_lb);
   const route_shortfall_lb = route_load_limit_lb === null ? null : load_limit_lb - route_load_limit_lb;
-  const within_route = route_gross_rail_load_lb > 0 ? gross_on_rail_lb <= route_gross_rail_load_lb : null;
+  const within_route = route_gross_rail_load_lb > 0 ? gross_on_rail_lb <= route_gross_rail_load_lb + 1e-9 * Math.abs(route_gross_rail_load_lb) : null;
   const route_governs = route_load_limit_lb !== null && route_load_limit_lb < load_limit_lb;
   // Weight or cube: light bulky lading fills the car before it reaches the
   // load limit, dense lading reaches the limit with the car half empty.
@@ -759,7 +759,7 @@ export function computeClearancePlateEnvelope({ truck_centres_ft = 0, car_length
   const inside_half_width_in = half_width_in + mid_ordinate_in;
   const outside_half_width_in = half_width_in + end_overhang_in;
   const remaining_clearance_in = clearance_to_obstruction_in > 0 ? clearance_to_obstruction_in - effective_half_width_in : null;
-  const fits = remaining_clearance_in === null ? null : remaining_clearance_in >= required_clearance_in;
+  const fits = remaining_clearance_in === null ? null : remaining_clearance_in >= required_clearance_in - 1e-9 * Math.abs(required_clearance_in);
   // Worked backwards: the sharpest curve that still leaves the required
   // clearance, given the measured distance to the obstruction.
   let sharpest_curve_deg = null;

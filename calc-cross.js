@@ -1355,7 +1355,7 @@ export function computeLadderAngle({ ladder_length_ft = 0, working_height_ft = 0
   // sin(angle) = working_height / ladder_length.
   const actual_angle_deg = working_height_ft === 0 ? 0 : (Math.asin(Math.min(1, working_height_ft / ladder_length_ft)) * 180) / Math.PI;
   // Pass/fail at 75.5 deg +/- 3 deg (working height 0 = laying flat = fail).
-  const pass = working_height_ft === 0 ? false : Math.abs(actual_angle_deg - 75.5) <= 3;
+  const pass = working_height_ft === 0 ? false : Math.abs(actual_angle_deg - 75.5) <= 3 + 1e-9 * Math.abs(3);
   return { base_distance_ft: recommended_base_ft, set_angle_deg: actual_angle_deg, pass };
 }
 
@@ -2976,7 +2976,7 @@ export function computeCrossConnectionAirGap({ opening_in = 0, near_wall = false
   const [air_gap_in, air_gap_wall_in] = opening <= 0.5 ? [1, 1.5] : opening <= 0.75 ? [1.5, 2.5] : opening <= 1 ? [2, 3] : [2 * opening, 3 * opening];
   const wall = near_wall === true || near_wall === "true" || near_wall === "yes"; // a "false" string must not read as near a wall
   const required_in = wall ? air_gap_wall_in : air_gap_in;
-  const passes = measured > 0 ? measured >= required_in : null;
+  const passes = measured > 0 ? measured >= required_in - 1e-9 * Math.abs(required_in) : null;
   return {
     air_gap_in, air_gap_wall_in, required_in, near_wall: wall, passes,
     note: "IPC 2021 608.16.1 / Table 608.16.1 air gap: the minimum vertical distance between a supply outlet and the flood-level rim of the fixture it discharges into is 1, 1-1/2 or 2 in for effective openings up to 1/2, 3/4 or 1 in (1-1/2, 2-1/2 or 3 in close to a wall), and twice (three times close to a wall) the opening above 1 in. 'Close to a wall' means within three diameters of one wall, or four of two walls meeting. The effective opening is the least cross-sectional area of the supply outlet (a round pipe's diameter, or the equivalent diameter of a non-round outlet). An air gap is the most positive cross-connection protection -- nothing mechanical can defeat it. A design aid, not a substitute for the plumbing code adopted by your AHJ.",

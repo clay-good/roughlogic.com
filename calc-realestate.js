@@ -3071,7 +3071,7 @@ export function computeFloorAreaRatio({ building_floor_area_sf = 0, lot_area_sf 
   const has_limit = limit > 0;
   const max_buildable_sf = has_limit ? limit * lot : null;
   const remaining_sf = has_limit ? max_buildable_sf - bldg : null;
-  const within = has_limit ? far <= limit : null;
+  const within = has_limit ? far <= limit + 1e-9 * Math.abs(limit) : null;
   if (![far].every(Number.isFinite)) return { error: "Floor-area-ratio math is not a finite value." };
   return {
     far, has_limit, far_limit: limit, max_buildable_sf, remaining_sf, within,

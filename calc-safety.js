@@ -336,7 +336,7 @@ export function computeSilicaTable1({ task = "xi", location = "outdoors", hours_
   const hours_to_upgrade = has_cliff && !over_four ? CLIFF - hrs : null;
 
   const respirator_required = required_apf !== null && required_apf > 0;
-  const apf_ok = required_apf === null ? null : provided >= required_apf;
+  const apf_ok = required_apf === null ? null : provided >= required_apf - 1e-9 * Math.abs(required_apf);
   const apf_shortfall = required_apf === null ? null : Math.max(0, required_apf - provided);
   const passes = in_table_1 && apf_ok === true;
 
@@ -448,7 +448,7 @@ export function computeLifelineTension({ span_ft = 0, sag_ft = 0, arrest_force_l
   const prescriptive_anchorage_lb = PER_WORKER * n;
   const governing_anchorage_lb = Math.max(anchorage_demand_lb, prescriptive_anchorage_lb);
   const engineered_governs = anchorage_demand_lb > prescriptive_anchorage_lb;
-  const anchorage_ok = cap > 0 ? cap >= governing_anchorage_lb : null;
+  const anchorage_ok = cap > 0 ? cap >= governing_anchorage_lb - 1e-9 * Math.abs(governing_anchorage_lb) : null;
   const anchorage_deficit_lb = cap > 0 ? Math.max(0, governing_anchorage_lb - cap) : null;
 
   // The inverse: the sag that would bring the cable tension down to a target.

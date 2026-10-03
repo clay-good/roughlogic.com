@@ -303,7 +303,7 @@ export function computeCranePowerLineClearance({ option = "default", voltage_kv 
   }
 
   const determinable = required_clearance_ft !== null;
-  const clearance_ok = determinable ? act >= required_clearance_ft : null;
+  const clearance_ok = determinable ? act >= required_clearance_ft - 1e-9 * Math.abs(required_clearance_ft) : null;
   const clearance_shortfall_ft = determinable ? Math.max(0, required_clearance_ft - act) : 0;
   // What determining the voltage would buy, against the default you would otherwise take.
   const table_a_saving_ft = table_a_ft !== null && default_clearance_ft !== null ? Math.max(0, default_clearance_ft - table_a_ft) : 0;

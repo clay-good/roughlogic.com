@@ -443,7 +443,7 @@ export function computeTiltUpBraceLoad({ panel_width_ft = 0, panel_height_ft = 0
   const braces_required = brace_capacity_lb > 0
     ? Math.max(1, Math.ceil(total_lateral_lb * brace_safety_factor / Math.cos(brace_angle_deg * DEG_TO_RAD) / brace_capacity_lb - 1e-9))
     : null;
-  const within_capacity = brace_capacity_lb > 0 ? design_axial_per_brace_lb <= brace_capacity_lb : null;
+  const within_capacity = brace_capacity_lb > 0 ? design_axial_per_brace_lb <= brace_capacity_lb + 1e-9 * Math.abs(brace_capacity_lb) : null;
   const outs = [wind_force_lb, lateral_per_brace_lb, axial_per_brace_lb, anchor_vertical_lb, anchor_offset_ft, alternate_axial_lb];
   if (!outs.every(Number.isFinite)) return { error: "Brace load math is not a finite value." };
   const verdict = within_capacity === null

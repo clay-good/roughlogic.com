@@ -1300,9 +1300,9 @@ export function computeCondensateOverflowPan({ unit_width_in = 0, unit_length_in
   const MARGIN = 3, MIN_DEPTH = 1.5;
   const required_width_in = needs_pan ? uw + MARGIN : null;
   const required_length_in = needs_pan ? ul + MARGIN : null;
-  const width_ok = needs_pan ? pw >= required_width_in : null;
-  const length_ok = needs_pan ? pl >= required_length_in : null;
-  const depth_ok = needs_pan ? pd >= MIN_DEPTH : null;
+  const width_ok = needs_pan ? pw >= required_width_in - 1e-9 * Math.abs(required_width_in) : null;
+  const length_ok = needs_pan ? pl >= required_length_in - 1e-9 * Math.abs(required_length_in) : null;
+  const depth_ok = needs_pan ? pd >= MIN_DEPTH - 1e-9 * Math.abs(MIN_DEPTH) : null;
   const width_deficit_in = needs_pan ? Math.max(0, required_width_in - pw) : 0;
   const length_deficit_in = needs_pan ? Math.max(0, required_length_in - pl) : 0;
   const depth_deficit_in = needs_pan ? Math.max(0, MIN_DEPTH - pd) : 0;

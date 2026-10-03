@@ -452,7 +452,7 @@ export function computeFallArrestClearance({ free_fall_distance_ft = 0, decelera
   const required_clearance_ft = ffd + dd + hh + sf;
   const hasAvail = avail > 0;
   const margin_ft = hasAvail ? avail - required_clearance_ft : null;
-  const adequate = hasAvail ? margin_ft >= 0 : null;
+  const adequate = hasAvail ? margin_ft >= -1e-9 : null;
   return {
     required_clearance_ft, margin_ft, adequate,
     note: "Required fall clearance below the anchor for a personal fall-arrest system: RFC = free-fall distance + deceleration distance + worker height (harness D-ring to the feet) + a safety margin. Enter each explicitly - the free-fall distance depends on the anchor position relative to the D-ring (a foot-level anchor gives a large free fall, an overhead anchor a small one) and on the connector length; the deceleration distance is the energy absorber's stroke - OSHA 1926.502(d)(16)(iv) limits the system to 3.5 ft, but an ANSI/ASSP Z359.13 absorber rated for a 6 ft free fall may deploy up to 48 in (4 ft) and one rated for 12 ft up to 60 in, so plan on the label's figure (a self-retracting lifeline is usually less); the worker height D-ring-to-feet is about 5 ft; and the safety margin (commonly 2-3 ft) keeps the feet off the lower level. If the available clearance below the anchor is less than RFC, the worker contacts the level before the system arrests the fall. A planning aid; the equipment manufacturer's instructions and a qualified/competent person govern per ANSI Z359 and OSHA 1926 Subpart M.",
@@ -529,17 +529,17 @@ export function computeFallArrestAnchorage({ workers_attached = 1, anchorage_cap
   // Prescriptive route: 5,000 lb PER EMPLOYEE ATTACHED.
   const required_anchorage_lb = engineered ? SF * dl : PER_WORKER * n;
   const anchorage_entered = cap > 0;
-  const anchorage_ok = anchorage_entered ? cap >= required_anchorage_lb : null;
+  const anchorage_ok = anchorage_entered ? cap >= required_anchorage_lb - 1e-9 * Math.abs(required_anchorage_lb) : null;
   const anchorage_shortfall_lb = anchorage_entered ? Math.max(0, required_anchorage_lb - cap) : 0;
   const achieved_safety_factor = anchorage_entered && dl > 0 ? cap / dl : null;
 
   // System performance, 502(d)(16). Each is independent of the anchorage.
   const force_entered = af > 0;
-  const force_ok = force_entered ? af <= MAX_FORCE : null;
+  const force_ok = force_entered ? af <= MAX_FORCE + 1e-9 * Math.abs(MAX_FORCE) : null;
   const decel_entered = dd > 0;
-  const decel_ok = decel_entered ? dd <= MAX_DECEL : null;
+  const decel_ok = decel_entered ? dd <= MAX_DECEL + 1e-9 * Math.abs(MAX_DECEL) : null;
   const freefall_entered = ff > 0;
-  const freefall_ok = freefall_entered ? ff <= MAX_FREEFALL : null;
+  const freefall_ok = freefall_entered ? ff <= MAX_FREEFALL + 1e-9 * Math.abs(MAX_FREEFALL) : null;
   const system_ok = (force_ok !== false) && (decel_ok !== false) && (freefall_ok !== false);
   const passes = (anchorage_ok !== false) && system_ok;
 

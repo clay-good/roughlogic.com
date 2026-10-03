@@ -373,7 +373,7 @@ export function computeIceMeltWorkingTemperature({ area_ft2 = 0, ice_thickness_i
   const product_ratio = compared ? alt_product_lb / product_lb : null;
   const capacity_ratio = compared ? capacity_lb_ice_per_lb / alt_capacity_lb_ice_per_lb : null;
   const within_practical_limit = pavement_temp_f >= practical_limit_f - 1e-9 * Math.abs(practical_limit_f);
-  const alt_within_practical_limit = compared ? alt_temp_f >= practical_limit_f : null;
+  const alt_within_practical_limit = compared ? alt_temp_f >= practical_limit_f - 1e-9 * Math.abs(practical_limit_f) : null;
   const margin_f = pavement_temp_f - practical_limit_f;
   const limit_verdict = within_practical_limit
     ? "INSIDE the product's practical working limit of " + practical_limit_f.toFixed(0) + " degF, by " + margin_f.toFixed(0) + " degF."

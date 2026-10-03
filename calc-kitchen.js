@@ -2398,8 +2398,8 @@ export function computeKitchenMakeupAirDeficit({ hood_exhaust_cfm = 0, other_exh
   // NFPA 96 8.3.1 and UMC 511.3 cap the kitchen's negative pressure at 0.02 in wc
   // (about 5 Pa); IMC 508.1 itself only asks makeup air about equal to exhaust.
   const pressure_inwc = pressure_pa === null ? null : pressure_pa / 249.089;
-  const negative_pressure_ok = pressure_inwc === null ? null : pressure_inwc <= 0.02;
-  const door_force_ok = door_total_force_lbf === null ? null : door_total_force_lbf <= EGRESS_DOOR_LIMIT_LBF;
+  const negative_pressure_ok = pressure_inwc === null ? null : pressure_inwc <= 0.02 + 1e-9 * Math.abs(0.02);
+  const door_force_ok = door_total_force_lbf === null ? null : door_total_force_lbf <= EGRESS_DOOR_LIMIT_LBF + 1e-9 * Math.abs(EGRESS_DOOR_LIMIT_LBF);
   const outs = [total_exhaust_cfm, deficit_cfm, deficit_percent, uncontrolled_cfm, makeup_shortfall_cfm];
   if (!outs.every(Number.isFinite)) return { error: "Makeup air balance math is not a finite value." };
   const balance_verdict = balanced

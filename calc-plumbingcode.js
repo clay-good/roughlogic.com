@@ -73,14 +73,14 @@ export function computeFixtureClearanceCheck({ center_to_left_in = 0, center_to_
   const right_ok = R >= minSide - 1e-9 * Math.abs(minSide);
   const front_ok = F >= minFront - 1e-9 * Math.abs(minFront);
   const has_adjacent = adj > 0;
-  const center_ok = has_adjacent ? adj >= minCenter : null;
+  const center_ok = has_adjacent ? adj >= minCenter - 1e-9 * Math.abs(minCenter) : null;
   const side_deficit_in = Math.max(0, minSide - Math.min(L, R));
   const front_deficit_in = Math.max(0, minFront - F);
   const center_deficit_in = has_adjacent ? Math.max(0, minCenter - adj) : 0;
 
   const is_compartment = cw > 0 || cd > 0;
-  const compartment_width_ok = is_compartment ? cw >= 30 : null;
-  const compartment_depth_ok = is_compartment ? cd >= 60 : null;
+  const compartment_width_ok = is_compartment ? cw >= 30 - 1e-9 * Math.abs(30) : null;
+  const compartment_depth_ok = is_compartment ? cd >= 60 - 1e-9 * Math.abs(60) : null;
 
   // The number that decides a layout before anything is drawn.
   const min_row_width_in = 2 * minSide + (n - 1) * minCenter;
@@ -263,9 +263,9 @@ export function computeVentTerminalCheck({ height_above_roof_in = 6, snow_accumu
   const frost_zone = t <= 0;
   const min_diameter_in = frost_zone ? 3 : null;
   const min_increase_depth_in = frost_zone ? 12 : null;
-  const diameter_ok = frost_zone ? dia >= 3 : null;
+  const diameter_ok = frost_zone ? dia >= 3 - 1e-9 * Math.abs(3) : null;
   const needs_increase = frost_zone && dia >= 3 && inc > 0;
-  const increase_ok = frost_zone && inc > 0 ? inc >= 12 : null;
+  const increase_ok = frost_zone && inc > 0 ? inc >= 12 - 1e-9 * Math.abs(12) : null;
   const frost_ok = frost_zone ? (diameter_ok && increase_ok !== false) : null;
 
   // Location: IPC 903.5 / IRC P3103.5
@@ -356,10 +356,10 @@ export function computeAavInstallCheck({ height_above_drain_in = 0, height_above
   const drain_ok = hd >= MIN_DRAIN - 1e-9 * Math.abs(MIN_DRAIN);
   const drain_deficit_in = Math.max(0, MIN_DRAIN - hd);
   const has_insulation = hi > 0;
-  const insulation_ok = has_insulation ? hi >= MIN_INSUL : null;
+  const insulation_ok = has_insulation ? hi >= MIN_INSUL - 1e-9 * Math.abs(MIN_INSUL) : null;
   const insulation_deficit_in = has_insulation ? Math.max(0, MIN_INSUL - hi) : 0;
   const rated = rating > 0 && dfu > 0;
-  const dfu_ok = rated ? rating >= dfu : null;
+  const dfu_ok = rated ? rating >= dfu - 1e-9 * Math.abs(dfu) : null;
   const dfu_margin = rated ? rating - dfu : null;
 
   const passes = outdoor && ventilated && access && drain_ok && (insulation_ok !== false) && (dfu_ok !== false);
@@ -546,9 +546,9 @@ export function computeCleanoutLayout({ horizontal_run_ft = 0, max_spacing_ft = 
   const total_cleanouts = spacing_cleanouts + change_cleanouts;
 
   const small_bore = size <= 6;
-  const clear_ok = small_bore ? clear >= 18 : null;
+  const clear_ok = small_bore ? clear >= 18 - 1e-9 * Math.abs(18) : null;
   const in_crawl = crawl > 0;
-  const crawl_ok = in_crawl ? crawl >= 24 : null;
+  const crawl_ok = in_crawl ? crawl >= 24 - 1e-9 * Math.abs(24) : null;
   const access_ok = (clear_ok !== false) && (crawl_ok !== false);
 
   const note = "Two code triggers, and they ADD - counting from either alone comes out low. "
@@ -627,7 +627,7 @@ export function computeWaterServicePressureCheck({ static_pressure_psi = 0, min_
   const prv_required = p > MAX;
   const over_by_psi = Math.max(0, p - MAX);
   const setpoint_entered = set > 0;
-  const setpoint_ok = setpoint_entered ? set <= MAX : null;
+  const setpoint_ok = setpoint_entered ? set <= MAX + 1e-9 * Math.abs(MAX) : null;
   const delivered = setpoint_entered && prv_required ? set : p;
   const headroom_psi = delivered - minFix;
   const fixture_ok = headroom_psi >= 0 - 1e-9 * Math.abs(0);
@@ -736,9 +736,9 @@ export function computeAccessibleToiletCompartment({ compartment_count = 0, urin
   const ambulatory_required = by_compartments || by_fixtures;
   const fixtures_alone_trigger = by_fixtures && !by_compartments;
 
-  const ambulatory_width_ok = ambProvided ? (aW >= AMB_MIN_W && aW <= AMB_MAX_W) : null;
-  const ambulatory_too_wide = ambProvided ? aW > AMB_MAX_W : null;
-  const ambulatory_depth_ok = ambProvided ? aD >= AMB_MIN_D : null;
+  const ambulatory_width_ok = ambProvided ? (aW >= AMB_MIN_W - 1e-9 * Math.abs(AMB_MIN_W) && aW <= AMB_MAX_W + 1e-9 * Math.abs(AMB_MAX_W)) : null;
+  const ambulatory_too_wide = ambProvided ? aW > AMB_MAX_W + 1e-9 * Math.abs(AMB_MAX_W) : null;
+  const ambulatory_depth_ok = ambProvided ? aD >= AMB_MIN_D - 1e-9 * Math.abs(AMB_MIN_D) : null;
   const ambulatory_ok = ambProvided ? (ambulatory_width_ok && ambulatory_depth_ok) : null;
   const ambulatory_missing = ambulatory_required && !ambProvided;
 

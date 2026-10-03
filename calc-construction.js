@@ -3658,7 +3658,7 @@ export function computeWallBracingLength({ wall_line_length_ft = 0, bracing_perc
   let provided = Number(provided_length_ft);
   if (!Number.isFinite(provided) || provided < 0) provided = 0;
   const required_length_ft = (pct / 100) * L;
-  const pass = provided > 0 ? provided >= required_length_ft : null;
+  const pass = provided > 0 ? provided >= required_length_ft - 1e-9 * Math.abs(required_length_ft) : null;
   return { required_length_ft, provided_length_ft: provided, pass, method: String(method || "") };
 }
 
@@ -4166,7 +4166,7 @@ export function computeLayoutSquaring({ mode, side_a, side_b, diag1, diag2, tole
     const tol = Number(tolerance) || 0;
     if (tol < 0) return { error: "Tolerance cannot be negative (0 to skip the verdict)." };
     const has_tolerance = tol > 0;
-    const within_tolerance = has_tolerance ? out_of_square <= tol : null;
+    const within_tolerance = has_tolerance ? out_of_square <= tol + 1e-9 * Math.abs(tol) : null;
     const tolerance_verdict = !has_tolerance
       ? "(no tolerance entered)"
       : within_tolerance
@@ -4177,7 +4177,7 @@ export function computeLayoutSquaring({ mode, side_a, side_b, diag1, diag2, tole
     if (l < 0 || r < 0) return { error: "Symmetry measurements cannot be negative (0 to skip)." };
     const has_symmetry = l > 0 && r > 0;
     const symmetry_difference = has_symmetry ? Math.abs(l - r) : 0;
-    const symmetry_within = has_symmetry && has_tolerance ? symmetry_difference <= tol : null;
+    const symmetry_within = has_symmetry && has_tolerance ? symmetry_difference <= tol + 1e-9 * Math.abs(tol) : null;
     const symmetry_verdict = !has_symmetry
       ? "(no paired left and right measurements entered)"
       : symmetry_difference === 0
@@ -6526,7 +6526,7 @@ export function computeExteriorOpeningProtection({ fsd_ft = 0, wall_area = 0, pr
   const no_limit = band === Infinity;
   const allowable_pct = no_limit ? Infinity : band * 100;
   const allowable_area = no_limit ? Infinity : band * wall_area;
-  const pass = no_limit ? true : actual_opening <= allowable_area;
+  const pass = no_limit ? true : actual_opening <= allowable_area + 1e-9 * Math.abs(allowable_area);
   return { protected: p, no_limit, allowable_pct, allowable_area, pass };
 }
 
@@ -11733,7 +11733,7 @@ export function computeGuardPostLoad({ post_height_in = 36, post_spacing_ft = 6,
   // The post itself, bending about the axis the push acts on.
   const section_modulus_in3 = b * d * d / 6;
   const required_fb_psi = moment_inlb / section_modulus_in3;
-  const post_ok = Fb > 0 ? required_fb_psi <= Fb : null;
+  const post_ok = Fb > 0 ? required_fb_psi <= Fb + 1e-9 * Math.abs(Fb) : null;
   const post_utilization = Fb > 0 ? required_fb_psi / Fb : null;
 
   // The connection resolves the SAME moment over the bolt spacing, not the post height.
@@ -11885,7 +11885,7 @@ export function computeLandingCheck({ landing_depth_in = 0, landing_width_in = 0
   const depth_deficit_in = Math.max(0, minD - d);
   const width_deficit_in = Math.max(0, fw - w);
   // The threshold drop only applies at a door.
-  const drop_ok = is_door ? drop <= maxDrop : null;
+  const drop_ok = is_door ? drop <= maxDrop + 1e-9 * Math.abs(maxDrop) : null;
   const drop_excess_in = is_door ? Math.max(0, drop - maxDrop) : 0;
   const passes = depth_ok && width_ok && (drop_ok !== false);
   const min_landing_area_sf = (minD * fw) / 144;
@@ -12127,7 +12127,7 @@ export function computeSmokeAlarmPlacement({ sleeping_rooms = 0, sleeping_areas 
   const cooking_deficit_ft = Math.max(0, required_cooking_ft - dCook);
   const BATH_MIN = 3;
   const bath_entered = dBath > 0;
-  const bath_ok = bath_entered ? dBath >= BATH_MIN : null;
+  const bath_ok = bath_entered ? dBath >= BATH_MIN - 1e-9 * Math.abs(BATH_MIN) : null;
   const bath_deficit_ft = bath_entered ? Math.max(0, BATH_MIN - dBath) : 0;
   const passes = cooking_ok && (bath_ok !== false);
   // What a change of sensing type would buy, since it is usually the cheapest fix.
@@ -12284,9 +12284,9 @@ export function computeEgressWindowWell({ well_width_in = 0, well_projection_in 
   const ladder_required = depth > LADDER_DEPTH;
   const ladder_present_ok = ladder_required ? ladder : null;
   const ladder_dims_entered = ladder && (lw > 0 || lp > 0 || ls > 0);
-  const ladder_width_ok = ladder_dims_entered ? lw >= LADDER_W : null;
-  const ladder_proj_ok = ladder_dims_entered ? lp >= LADDER_PROJ : null;
-  const ladder_spacing_ok = ladder_dims_entered ? ls <= LADDER_SPACING : null;
+  const ladder_width_ok = ladder_dims_entered ? lw >= LADDER_W - 1e-9 * Math.abs(LADDER_W) : null;
+  const ladder_proj_ok = ladder_dims_entered ? lp >= LADDER_PROJ - 1e-9 * Math.abs(LADDER_PROJ) : null;
+  const ladder_spacing_ok = ladder_dims_entered ? ls <= LADDER_SPACING + 1e-9 * Math.abs(LADDER_SPACING) : null;
   const ladder_ok = ladder_required ? (ladder && ladder_width_ok !== false && ladder_proj_ok !== false && ladder_spacing_ok !== false) : null;
 
   const passes = area_ok && width_ok && projection_ok && fullyOpens && (ladder_ok !== false);
@@ -12370,19 +12370,19 @@ export function computeScaffoldGuardrailCheck({ top_rail_height_in = 0, midrail_
   const midrail_target_in = top / 2;
   const midrail_entered = mid > 0;
   const midrail_offset_in = midrail_entered ? mid - midrail_target_in : 0;
-  const midrail_ok = midrail_entered ? Math.abs(midrail_offset_in) <= tol : null;
+  const midrail_ok = midrail_entered ? Math.abs(midrail_offset_in) <= tol + 1e-9 * Math.abs(tol) : null;
 
   const toeboard_entered = toe > 0;
-  const toeboard_ok = toeboard_entered ? toe >= TOE_MIN : null;
+  const toeboard_ok = toeboard_entered ? toe >= TOE_MIN - 1e-9 * Math.abs(TOE_MIN) : null;
 
   // The capacities are paired, not independent.
   const required_toprail_lb = suspension ? 100 : 200;
   // 1926.451(g)(4)(xv): 150 lbf with a 200 lbf top rail, 75 lbf with a 100 lbf top rail.
   const required_midrail_lb = required_toprail_lb === 200 ? 150 : 75;
   const toprail_cap_entered = topCap > 0;
-  const toprail_cap_ok = toprail_cap_entered ? topCap >= required_toprail_lb : null;
+  const toprail_cap_ok = toprail_cap_entered ? topCap >= required_toprail_lb - 1e-9 * Math.abs(required_toprail_lb) : null;
   const midrail_cap_entered = midCap > 0;
-  const midrail_cap_ok = midrail_cap_entered && required_midrail_lb !== null ? midCap >= required_midrail_lb : null;
+  const midrail_cap_ok = midrail_cap_entered && required_midrail_lb !== null ? midCap >= required_midrail_lb - 1e-9 * Math.abs(required_midrail_lb) : null;
 
   const passes = top_ok && (midrail_ok !== false) && (toeboard_ok !== false) && (toprail_cap_ok !== false) && (midrail_cap_ok !== false);
 
@@ -12459,7 +12459,7 @@ export function computeExcavationProtectionTrigger({ depth_ft = 0, trench_length
   // Each point covers 25 ft each way, so 50 ft of run, and the ends must be reachable.
   const has_length = L > 0;
   const egress_points_needed = egress_required && has_length ? Math.max(1, Math.ceil(L / (2 * LATERAL) - 1e-9)) : egress_required ? 1 : 0;
-  const egress_ok = egress_required ? pts >= egress_points_needed : null;
+  const egress_ok = egress_required ? pts >= egress_points_needed - 1e-9 * Math.abs(egress_points_needed) : null;
   const worst_travel_ft = egress_required && has_length && pts > 0 ? L / (2 * pts) : null;
 
   // 652(a)(1): protection required unless stable rock, OR under 5 ft AND examined.
@@ -12645,9 +12645,9 @@ export function computeTemporaryStairwayCheck({ riser_count = 0, total_rise_in =
   const variation_source = rv >= tv ? "riser height" : "tread depth";
 
   const rail_entered = rail > 0;
-  const rail_height_ok = rail_required && rail_entered ? rail >= RAIL_MIN : null;
+  const rail_height_ok = rail_required && rail_entered ? rail >= RAIL_MIN - 1e-9 * Math.abs(RAIL_MIN) : null;
   const landing_entered = land > 0;
-  const landing_ok = landing_entered ? land >= LANDING_MIN : null;
+  const landing_ok = landing_entered ? land >= LANDING_MIN - 1e-9 * Math.abs(LANDING_MIN) : null;
 
   const passes = angle_ok && uniform_ok && (rail_height_ok !== false) && (landing_ok !== false) && !(rail_required && !rail_entered);
 
@@ -12736,7 +12736,7 @@ export function computeFlammableCabinetStorage({ cat123_gallons = 0, cat4_gallon
   const room_required = !within_area_cap;
 
   const have_entered = have > 0;
-  const cabinets_ok = have_entered ? have >= cabinets_needed : null;
+  const cabinets_ok = have_entered ? have >= cabinets_needed - 1e-9 * Math.abs(cabinets_needed) : null;
   const cabinets_short = have_entered ? Math.max(0, cabinets_needed - have) : 0;
   const too_many_cabinets = have > maxCab + 1e-9 * Math.abs(maxCab);
 
@@ -12830,10 +12830,10 @@ export function computeMaterialStackingLimits({ material = "brick", stack_height
     rule = "lumber: not more than " + LUMBER_MAX + " ft, and not more than " + LUMBER_MANUAL_MAX + " ft where handled manually";
   }
 
-  const height_ok = max_height_ft === null ? null : h <= max_height_ft;
+  const height_ok = max_height_ft === null ? null : h <= max_height_ft + 1e-9 * Math.abs(max_height_ft);
   const height_over_ft = max_height_ft === null ? 0 : Math.max(0, h - max_height_ft);
   const taper_required = taper_required_in > 0;
-  const taper_ok = taper_required ? tp >= taper_required_in : null;
+  const taper_ok = taper_required ? tp >= taper_required_in - 1e-9 * Math.abs(taper_required_in) : null;
   const taper_shortfall_in = taper_required ? Math.max(0, taper_required_in - tp) : 0;
   const passes = (height_ok !== false) && (taper_ok !== false);
 
@@ -13100,9 +13100,9 @@ export function computeReachRange({ approach = "forward", obstructed = "yes", ob
   }
 
   // The obstruction's own height ceiling applies to the side case only.
-  const obstruction_height_ok = isObs && isSide ? obsH <= MAX_OBS_HEIGHT : null;
+  const obstruction_height_ok = isObs && isSide ? obsH <= MAX_OBS_HEIGHT + 1e-9 * Math.abs(MAX_OBS_HEIGHT) : null;
 
-  const high_ok = max_height_in === null ? false : h <= max_height_in;
+  const high_ok = max_height_in === null ? false : h <= max_height_in + 1e-9 * Math.abs(max_height_in);
   const low_ok = h >= LOW - 1e-9 * Math.abs(LOW);
   const height_excess_in = max_height_in === null ? null : Math.max(0, h - max_height_in);
   const low_deficit_in = Math.max(0, LOW - h);
@@ -13184,7 +13184,7 @@ export function computeProtrudingObject({ mounting = "wall", leading_edge_height
   const in_zone = h > LOW && h <= HIGH;
   const LIMIT = { wall: 4, handrail: 4.5, post: 12 };
   const max_projection_in = in_zone ? LIMIT[mounting] : null;
-  const projection_ok = in_zone ? p <= max_projection_in : true;
+  const projection_ok = in_zone ? p <= max_projection_in + 1e-9 * Math.abs(max_projection_in) : true;
   const projection_excess_in = in_zone ? Math.max(0, p - max_projection_in) : 0;
   // The move people do not think of: drop the leading edge into the cane-detectable zone.
   const drop_to_cane_zone_in = in_zone && !projection_ok ? h - LOW : null;
@@ -13198,7 +13198,7 @@ export function computeProtrudingObject({ mounting = "wall", leading_edge_height
   // 307.4: overhead.
   const vertical_ok = vc >= MIN_VERT - 1e-9 * Math.abs(MIN_VERT);
   const barrier_present = barrier > 0;
-  const barrier_ok = vertical_ok ? null : (barrier_present ? barrier <= BARRIER_MAX : false);
+  const barrier_ok = vertical_ok ? null : (barrier_present ? barrier <= BARRIER_MAX + 1e-9 * Math.abs(BARRIER_MAX) : false);
   const overhead_ok = vertical_ok || barrier_ok === true;
 
   const passes = projection_ok && width_ok && overhead_ok;
@@ -13284,9 +13284,9 @@ export function computeAccessibleRouteWidth({ clear_width_in = 0, pinch_present 
   const width_deficit_in = Math.max(0, MIN_W - w);
 
   // The pinch exception: a width AND a length AND a separation, all three.
-  const pinch_width_ok = hasPinch ? pw >= PINCH_MIN_W : null;
-  const pinch_length_ok = hasPinch ? pl <= PINCH_MAX_L : null;
-  const pinch_separation_ok = hasPinch ? sep >= SEP_MIN : null;
+  const pinch_width_ok = hasPinch ? pw >= PINCH_MIN_W - 1e-9 * Math.abs(PINCH_MIN_W) : null;
+  const pinch_length_ok = hasPinch ? pl <= PINCH_MAX_L + 1e-9 * Math.abs(PINCH_MAX_L) : null;
+  const pinch_separation_ok = hasPinch ? sep >= SEP_MIN - 1e-9 * Math.abs(SEP_MIN) : null;
   const pinch_length_excess_in = hasPinch ? Math.max(0, pl - PINCH_MAX_L) : null;
   const pinch_ok = hasPinch ? (pinch_width_ok && pinch_length_ok && pinch_separation_ok) : null;
 
@@ -13295,8 +13295,8 @@ export function computeAccessibleRouteWidth({ clear_width_in = 0, pinch_present 
   const turn_relieved = hasTurn && turn_applies ? tw >= TURN_RELIEF : null;
   const required_at_turn_in = hasTurn && turn_applies && !turn_relieved ? TURN_AT : null;
   const required_approach_in = hasTurn && turn_applies && !turn_relieved ? TURN_APPROACH : null;
-  const turn_approach_ok = required_approach_in === null ? null : aw >= required_approach_in;
-  const turn_at_ok = required_at_turn_in === null ? null : tw >= required_at_turn_in;
+  const turn_approach_ok = required_approach_in === null ? null : aw >= required_approach_in - 1e-9 * Math.abs(required_approach_in);
+  const turn_at_ok = required_at_turn_in === null ? null : tw >= required_at_turn_in - 1e-9 * Math.abs(required_at_turn_in);
   const turn_ok = hasTurn ? (!turn_applies || turn_relieved === true || (turn_approach_ok && turn_at_ok)) : null;
 
   // Passing spaces: triggered by width alone, spaced so no stretch exceeds 200 ft.
@@ -13411,7 +13411,7 @@ export function computeDoorClearWidth({ leaf_width_in = 0, door_thickness_in = 1
 
   const has_series = spacing > 0;
   const required_series_spacing_in = has_series ? SERIES_BASE + seriesDoor : null;
-  const series_ok = has_series ? spacing >= required_series_spacing_in : null;
+  const series_ok = has_series ? spacing >= required_series_spacing_in - 1e-9 * Math.abs(required_series_spacing_in) : null;
   const series_deficit_in = has_series ? Math.max(0, required_series_spacing_in - spacing) : null;
 
   const passes = clear_width_ok && threshold_ok && (series_ok !== false);
@@ -13498,7 +13498,7 @@ export function computeFloorLevelChange({ level_change_in = 0, bevel_run_in = 0,
   const required_bevel_run_in = needs_bevel ? h * BEVEL_SLOPE_RUN : null;
   const bevel_run_deficit_in = needs_bevel ? Math.max(0, required_bevel_run_in - run) : null;
   const bevel_slope_run_per_rise = needs_bevel && h > 0 ? run / h : null;
-  const bevel_ok = needs_bevel ? run >= required_bevel_run_in : null;
+  const bevel_ok = needs_bevel ? run >= required_bevel_run_in - 1e-9 * Math.abs(required_bevel_run_in) : null;
 
   const ramp_run_required_in = needs_ramp ? h * rampRatio : null;
   // What the same change would have cost had it landed a hair under the 1/2 in line.
@@ -13507,9 +13507,9 @@ export function computeFloorLevelChange({ level_change_in = 0, bevel_run_in = 0,
   const over_by_in = needs_ramp ? h - BEVEL_MAX : null;
 
   const has_carpet = pile > 0;
-  const carpet_ok = has_carpet ? pile <= PILE_MAX : null;
+  const carpet_ok = has_carpet ? pile <= PILE_MAX + 1e-9 * Math.abs(PILE_MAX) : null;
   const has_opening = open > 0;
-  const opening_size_ok = has_opening ? open <= SPHERE_MAX : null;
+  const opening_size_ok = has_opening ? open <= SPHERE_MAX + 1e-9 * Math.abs(SPHERE_MAX) : null;
   const opening_orientation_ok = has_opening && elongated ? perpendicular : null;
   const opening_ok = has_opening ? (opening_size_ok && opening_orientation_ok !== false) : null;
 
@@ -13604,15 +13604,15 @@ export function computeTurningAndClearFloorSpace({ cfs_width_in = 0, cfs_depth_i
   const cfs_short_side_in = Math.min(w, d);
   const cfs_long_side_in = Math.max(w, d);
   const cfs_size_ok = cfs_short_side_in >= CFS_SHORT - 1e-9 * Math.abs(CFS_SHORT) && cfs_long_side_in >= CFS_LONG - 1e-9 * Math.abs(CFS_LONG);
-  const cfs_depth_ok = forward ? d >= CFS_LONG : d >= CFS_SHORT;
-  const cfs_width_ok = forward ? w >= CFS_SHORT : w >= CFS_LONG;
+  const cfs_depth_ok = forward ? d >= CFS_LONG - 1e-9 * Math.abs(CFS_LONG) : d >= CFS_SHORT - 1e-9 * Math.abs(CFS_SHORT);
+  const cfs_width_ok = forward ? w >= CFS_SHORT - 1e-9 * Math.abs(CFS_SHORT) : w >= CFS_LONG - 1e-9 * Math.abs(CFS_LONG);
   const cfs_oriented_ok = cfs_depth_ok && cfs_width_ok;
 
   // 305.7 alcoves.
   const alcove_trigger_in = forward ? FWD_TRIGGER : PAR_TRIGGER;
   const is_alcove = alc > alcove_trigger_in;
   const required_alcove_width_in = is_alcove ? (forward ? FWD_WIDTH : PAR_WIDTH) : null;
-  const alcove_width_ok = is_alcove ? w >= required_alcove_width_in : null;
+  const alcove_width_ok = is_alcove ? w >= required_alcove_width_in - 1e-9 * Math.abs(required_alcove_width_in) : null;
   const alcove_width_deficit_in = is_alcove ? Math.max(0, required_alcove_width_in - w) : null;
   // What the other approach would have demanded of the same nook.
   const other_required_width_in = alc > (forward ? PAR_TRIGGER : FWD_TRIGGER) ? (forward ? PAR_WIDTH : FWD_WIDTH) : null;
@@ -13725,10 +13725,10 @@ export function computeHandrailGeometry({ rail_height_in = 0, clearance_in = 0, 
   const clearance_ok = clr >= CLR_MIN - 1e-9 * Math.abs(CLR_MIN);
   const clearance_deficit_in = Math.max(0, CLR_MIN - clr);
 
-  const diameter_ok = circular ? dia >= DIA_MIN && dia <= DIA_MAX : null;
-  const diameter_too_fat = circular ? dia > DIA_MAX : null;
-  const perimeter_ok = circular ? null : per >= PER_MIN && per <= PER_MAX;
-  const cross_section_ok = circular ? null : cs <= CS_MAX;
+  const diameter_ok = circular ? dia >= DIA_MIN - 1e-9 * Math.abs(DIA_MIN) && dia <= DIA_MAX + 1e-9 * Math.abs(DIA_MAX) : null;
+  const diameter_too_fat = circular ? dia > DIA_MAX + 1e-9 * Math.abs(DIA_MAX) : null;
+  const perimeter_ok = circular ? null : per >= PER_MIN - 1e-9 * Math.abs(PER_MIN) && per <= PER_MAX + 1e-9 * Math.abs(PER_MAX);
+  const cross_section_ok = circular ? null : cs <= CS_MAX + 1e-9 * Math.abs(CS_MAX);
   const grip_ok = circular ? diameter_ok : (perimeter_ok && cross_section_ok);
 
   const required_top_extension_in = EXT_FLAT;
@@ -13829,7 +13829,7 @@ export function computeKneeToeClearance({ apron_height_in = 0, knee_depth_at_9_i
   const knee_27_ok = has_knee_zone ? k27 >= KNEE_MIN_AT_27 : null;
   const actual_taper_in = has_knee_zone ? k9 - k27 : null;
   const taper_ok = has_knee_zone ? actual_taper_in <= taper_allowed_in + 1e-9 : null;
-  const knee_depth_over_max = has_knee_zone ? k9 > MAX_DEPTH : null;
+  const knee_depth_over_max = has_knee_zone ? k9 > MAX_DEPTH + 1e-9 * Math.abs(MAX_DEPTH) : null;
   const knee_deficit_in = has_knee_zone ? Math.max(Math.max(0, KNEE_MIN_AT_9 - k9), Math.max(0, KNEE_MIN_AT_27 - k27)) : null;
   const knee_ok = has_knee_zone ? (knee_9_ok && knee_27_ok && taper_ok && !knee_depth_over_max) : false;
 
@@ -13921,7 +13921,7 @@ export function computeFloodOpeningArea({ enclosed_area_sf = 0, opening_type = "
   const count_governed_by_minimum = openings_for_area < MIN_OPENINGS;
   const count_ok = provided >= openings_required - 1e-9 * Math.abs(openings_required);
   const openings_short = Math.max(0, openings_required - provided);
-  const area_ok = engineered ? provided * cov >= area : provided_net_area_sqin >= required_net_area_sqin;
+  const area_ok = engineered ? provided * cov >= area - 1e-9 * Math.abs(area) : provided_net_area_sqin >= required_net_area_sqin - 1e-9 * Math.abs(required_net_area_sqin);
   const coverage_provided_sf = engineered ? provided * cov : null;
 
   const height_ok = bottom <= MAX_BOTTOM_IN + 1e-9 * Math.abs(MAX_BOTTOM_IN);
@@ -14288,8 +14288,8 @@ export function computeAccessibleShowerCheck({ shower_type = "transfer", width_i
   const inside_ok = width_ok && depth_ok && entry_ok;
 
   const clearance_entered = cw > 0 || cl > 0;
-  const clearance_width_ok = clearance_entered ? cw >= reqCW : null;
-  const clearance_length_ok = clearance_entered ? cl >= reqCL : null;
+  const clearance_width_ok = clearance_entered ? cw >= reqCW - 1e-9 * Math.abs(reqCW) : null;
+  const clearance_length_ok = clearance_entered ? cl >= reqCL - 1e-9 * Math.abs(reqCL) : null;
   const clearance_ok = clearance_entered ? (clearance_width_ok && clearance_length_ok) : null;
   const clearance_width_deficit_in = clearance_entered ? Math.max(0, reqCW - cw) : null;
   const clearance_length_deficit_in = clearance_entered ? Math.max(0, reqCL - cl) : null;
@@ -14482,7 +14482,7 @@ export function computeAccessibleParkingGeometry({ space_type = "van", space_wid
   const wide_aisle_path = isVan && w >= VAN_ALT_W && a >= VAN_ALT_AISLE;
   const required_space_width_in = isVan ? (a >= VAN_ALT_AISLE ? VAN_ALT_W : VAN_W) : CAR_W;
   const required_aisle_width_in = isVan && w < VAN_W ? VAN_ALT_AISLE : AISLE_W;
-  const width_ok = isVan ? (wide_van_path || wide_aisle_path) : (w >= CAR_W && a >= AISLE_W);
+  const width_ok = isVan ? (wide_van_path || wide_aisle_path) : (w >= CAR_W - 1e-9 * Math.abs(CAR_W) && a >= AISLE_W - 1e-9 * Math.abs(AISLE_W));
   const space_deficit_in = Math.max(0, required_space_width_in - w);
   const aisle_deficit_in = Math.max(0, required_aisle_width_in - a);
   const pair_width_in = w + a;
@@ -14496,7 +14496,7 @@ export function computeAccessibleParkingGeometry({ space_type = "van", space_wid
   const side_ok = side_applies ? passengerSide : null;
 
   const clearance_applies = isVan;
-  const clearance_ok = clearance_applies ? vc >= VAN_CLEAR : null;
+  const clearance_ok = clearance_applies ? vc >= VAN_CLEAR - 1e-9 * Math.abs(VAN_CLEAR) : null;
   const clearance_deficit_in = clearance_applies ? Math.max(0, VAN_CLEAR - vc) : null;
 
   const slope_ok = slope >= SLOPE_MAX - 1e-9 * Math.abs(SLOPE_MAX);
@@ -14585,8 +14585,8 @@ export function computeWaterClosetLocation({ centerline_in = 0, seat_height_in =
   const seat_deficit_in = seat_too_low ? S_MIN - s : Math.max(0, s - S_MAX);
 
   const clearance_entered = cs > 0 || cr > 0;
-  const side_ok = clearance_entered ? cs >= SIDE_MIN : null;
-  const rear_ok = clearance_entered ? cr >= REAR_MIN : null;
+  const side_ok = clearance_entered ? cs >= SIDE_MIN - 1e-9 * Math.abs(SIDE_MIN) : null;
+  const rear_ok = clearance_entered ? cr >= REAR_MIN - 1e-9 * Math.abs(REAR_MIN) : null;
   const side_deficit_in = clearance_entered ? Math.max(0, SIDE_MIN - cs) : null;
   const rear_deficit_in = clearance_entered ? Math.max(0, REAR_MIN - cr) : null;
   const clearance_ok = clearance_entered ? (side_ok && rear_ok) : null;
@@ -14676,7 +14676,7 @@ export function computeLavatoryTubClearance({ rim_height_in = 0, counter_height_
   const hidden_by_counter = rim_alone_ok && !lav_ok;
 
   const metering_entered = meter > 0;
-  const metering_ok = metering_entered ? meter >= METER_MIN : null;
+  const metering_ok = metering_entered ? meter >= METER_MIN - 1e-9 * Math.abs(METER_MIN) : null;
   const metering_deficit_s = metering_entered ? Math.max(0, METER_MIN - meter) : null;
 
   const required_clear_length_in = tub + (seat ? SEAT_EXTRA : 0);

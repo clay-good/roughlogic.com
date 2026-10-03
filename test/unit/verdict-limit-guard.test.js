@@ -47,7 +47,26 @@ function wrapped(t) {
   return true;
 }
 
+// A ternary verdict -- `rating === null ? null : force <= rating` -- is checked
+// in its two branches; the condition picks a branch and is not a verdict term
+// (2026-10-03: a tree-cabling rating hid there; a codemod then guarded 124
+// such terms, and a fixture snapshot was unchanged).
+function ternaryBranches(expr) {
+  let d = 0, q = -1, n = 0;
+  for (let i = 0; i < expr.length; i++) {
+    const c = expr[i];
+    if ("([{".includes(c)) d++;
+    else if (")]}".includes(c)) d--;
+    else if (d === 0 && c === "?" && expr[i + 1] !== "?" && expr[i + 1] !== "." && expr[i - 1] !== "?") {
+      if (q < 0) q = i; n++;
+    } else if (d === 0 && c === ":" && q >= 0 && --n === 0) return [expr.slice(q + 1, i), expr.slice(i + 1)];
+  }
+  return null;
+}
+
 function flatTerms(expr) {
+  const br = ternaryBranches(expr);
+  if (br) return br.flatMap((b) => flatTerms(b.trim()));
   return splitTop(expr).flatMap((t) => (wrapped(t) ? flatTerms(t.slice(1, -1)) : [t]));
 }
 

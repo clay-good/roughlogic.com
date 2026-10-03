@@ -237,7 +237,7 @@ export function computeTrendLogStorage({ point_count = 0, interval_min = 0, rete
   const controller_samples_per_hour = ctrlUsed ? controller_points * (60 / interval_min) : null;
   const buffer_fill_min = ctrlUsed ? 60 * controller_buffer_samples / controller_samples_per_hour : null;
   const max_poll_interval_min = buffer_fill_min;
-  const poll_overruns = ctrlUsed ? poll_interval_min > buffer_fill_min : null;
+  const poll_overruns = ctrlUsed ? poll_interval_min > buffer_fill_min + 1e-9 * Math.abs(buffer_fill_min) : null;
   // Per poll the controller generates this many samples but can only hand over
   // a bufferful; the rest were overwritten before anyone collected them.
   const samples_per_poll = ctrlUsed ? controller_samples_per_hour * (poll_interval_min / 60) : null;
@@ -441,10 +441,10 @@ export function computeLoopErrorStackup({ span_eng = 0, element_err_eng = 0, tra
   const installUsed = installation_err_eng > 0;
   const total_with_installation_eng = installUsed ? Math.sqrt(rss_eng * rss_eng + installation_err_eng * installation_err_eng) : null;
   const installation_multiple = installUsed ? total_with_installation_eng / rss_eng : null;
-  const installed_within_deadband = installUsed ? total_with_installation_eng <= deadband_eng : null;
+  const installed_within_deadband = installUsed ? total_with_installation_eng <= deadband_eng + 1e-9 * Math.abs(deadband_eng) : null;
   const avgUsed = averaging_err_eng > 0;
   const total_with_averaging_eng = avgUsed ? Math.sqrt(rss_eng * rss_eng + averaging_err_eng * averaging_err_eng) : null;
-  const averaging_within_deadband = avgUsed ? total_with_averaging_eng <= deadband_eng : null;
+  const averaging_within_deadband = avgUsed ? total_with_averaging_eng <= deadband_eng + 1e-9 * Math.abs(deadband_eng) : null;
   const deadband_verdict = !installUsed
     ? (instrument_within_deadband ? "The instrument chain alone is INSIDE the deadband." : "The instrument chain alone already EXCEEDS the deadband.")
     : (installed_within_deadband

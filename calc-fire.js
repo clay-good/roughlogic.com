@@ -577,7 +577,7 @@ export function computeSprinklerDensity({ area_of_operation_ft2, density_gpm_per
   if (!(d > 0)) return { error: "Provide density or hazard category." };
   const total_gpm = a * d;
   const minimum_for_hazard = hazard_category ? SPRINKLER_HAZARD_MIN_DENSITY[hazard_category] : null;
-  const meets_minimum = minimum_for_hazard === null ? null : d >= minimum_for_hazard;
+  const meets_minimum = minimum_for_hazard === null ? null : d >= minimum_for_hazard - 1e-9 * Math.abs(minimum_for_hazard);
   return { total_gpm, density_gpm_per_ft2: d, meets_minimum, hazard_minimum_density: minimum_for_hazard };
 }
 

@@ -704,7 +704,7 @@ export function computeGasApplianceConnection({ appliance = "furnace", shutoff_s
 
   const connector_limit_ft = CONN_LIMIT;
   const has_connector = conn > 0;
-  const connector_ok = has_connector ? conn <= connector_limit_ft : null;
+  const connector_ok = has_connector ? conn <= connector_limit_ft + 1e-9 * Math.abs(connector_limit_ft) : null;
   const connector_over_ft = has_connector ? Math.max(0, conn - connector_limit_ft) : 0;
 
   const passes = shutoff_ok && (trap_ok !== false) && (connector_ok !== false);

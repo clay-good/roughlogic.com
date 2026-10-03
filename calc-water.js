@@ -176,7 +176,7 @@ export function computeDetentionTime({ tank_volume_gal = 0, flow_gpm = 0, target
   const minutes = tank_volume_gal / flow_gpm;
   const hours = minutes / 60;
   const days = hours / 24;
-  const pass_target = target_minutes > 0 ? minutes >= target_minutes : null;
+  const pass_target = target_minutes > 0 ? minutes >= target_minutes - 1e-9 * Math.abs(target_minutes) : null;
   // v23 EN.16: surface overflow rate (gpd/ft^2) and weir overflow rate
   // (gpd/ft) companion loadings every Ten States Standards review checks.
   const flow_gpd = flow_gpm * 1440;

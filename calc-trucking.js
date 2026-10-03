@@ -901,7 +901,7 @@ export function computeStoppingSightDistance({
   // Entering nothing leaves the answer exactly as it was.
   const available_distance_ft_out = avail > 0 ? avail : null;
   const distance_shortfall_ft = avail > 0 ? Math.max(0, d_total_ft - avail) : null;
-  const distance_adequate = avail > 0 ? avail >= d_total_ft : null;
+  const distance_adequate = avail > 0 ? avail >= d_total_ft - 1e-9 * Math.abs(d_total_ft) : null;
   const distance_verdict = avail > 0
     ? (avail >= d_total_ft
       ? "ADEQUATE: " + fmt(avail, 0) + " ft available against " + fmt(d_total_ft, 0) + " ft required, " + fmt(avail - d_total_ft, 0) + " ft to spare"

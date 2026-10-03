@@ -620,7 +620,7 @@ export function computePvCircuitAmpacity({ module_isc_a = 0, parallel_strings = 
   const min_ampacity_a = max_current_a * 1.25;
   const stacked_factor = 1.25 * 1.25; // 1.5625 -> the "156%" of Isc
   const ocpd = Number(ocpd_a) || 0;
-  const ocpd_ok = ocpd > 0 ? ocpd >= max_current_a : null;
+  const ocpd_ok = ocpd > 0 ? ocpd >= max_current_a - 1e-9 * Math.abs(max_current_a) : null;
   return {
     max_current_a,
     min_ampacity_a,

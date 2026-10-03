@@ -102,8 +102,8 @@ export function computeFirePumpCurve({ rated_gpm = 0, rated_psi = 0, churn_psi =
   const churn_limit_psi = 1.40 * rated_psi;
   const overload_flow_gpm = 1.50 * rated_gpm;
   const overload_min_psi = 0.65 * rated_psi;
-  const churn_ok = churn_psi > 0 ? churn_psi <= churn_limit_psi : null;
-  const overload_ok = overload_psi > 0 ? overload_psi >= overload_min_psi : null;
+  const churn_ok = churn_psi > 0 ? churn_psi <= churn_limit_psi + 1e-9 * Math.abs(churn_limit_psi) : null;
+  const overload_ok = overload_psi > 0 ? overload_psi >= overload_min_psi - 1e-9 * Math.abs(overload_min_psi) : null;
   const churn_margin_pct = churn_psi > 0 ? (churn_limit_psi - churn_psi) / rated_psi * 100 : null;
   const overload_margin_pct = overload_psi > 0 ? (overload_psi - overload_min_psi) / rated_psi * 100 : null;
   return { churn_limit_psi, overload_flow_gpm, overload_min_psi, churn_ok, overload_ok, churn_margin_pct, overload_margin_pct };

@@ -1168,7 +1168,7 @@ export function computeIntersectionSightTriangle({ major_speed_mph = 0, time_gap
     ? Math.min(available_left_ft, available_right_ft)
     : (available_left_ft > 0 ? available_left_ft : (available_right_ft > 0 ? available_right_ft : null));
   const adequate_speed_mph = worst_available_ft === null ? null : worst_available_ft / (AASHTO_FT_PER_S_PER_MPH * total_time_gap_s);
-  const adequate = worst_available_ft === null ? null : worst_available_ft >= required_distance_ft;
+  const adequate = worst_available_ft === null ? null : worst_available_ft >= required_distance_ft - 1e-9 * Math.abs(required_distance_ft);
   const outs = [total_time_gap_s, required_distance_ft, triangle_area_ft2];
   if (!outs.every(Number.isFinite)) return { error: "Sight triangle math is not a finite value." };
   const verdict = adequate === null
@@ -1231,7 +1231,7 @@ export function computePavementStructuralNumber({ ac_thickness_in = 0, ac_coeffi
   // 2026-10-01, so the margin is snapped at float noise.
   const _raw_margin = sn_total - required_sn;
   const sn_margin = required_sn > 0 ? (Math.abs(_raw_margin) < 1e-9 * Math.max(1, required_sn) ? 0 : _raw_margin) : null;
-  const meets_required = required_sn > 0 ? sn_margin >= 0 : null;
+  const meets_required = required_sn > 0 ? sn_margin >= -1e-9 : null;
   // The substitution question, which is what the coefficients exist for.
   const base_rate = base_coefficient * base_drainage;
   const base_per_inch_of_ac_in = base_rate > 0 ? ac_coefficient / base_rate : null;

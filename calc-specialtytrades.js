@@ -562,7 +562,7 @@ export function computeScaffoldTieSpacing({ scaffold_height_ft = 0, base_width_f
   // The base outriggers would have to reach for this height to stand alone.
   const base_to_eliminate_ties_ft = scaffold_height_ft / max_ratio;
   const outrigger_reach_needed_ft = Math.max(0, base_to_eliminate_ties_ft - base_width_ft);
-  const outriggers_sufficient = outrigger_base_ft > 0 ? outrigger_base_ft >= base_to_eliminate_ties_ft : null;
+  const outriggers_sufficient = outrigger_base_ft > 0 ? outrigger_base_ft >= base_to_eliminate_ties_ft - 1e-9 * Math.abs(base_to_eliminate_ties_ft) : null;
   const is_sheeted = sheeted >= 0.5;
   const outs = [effective_base_ft, height_to_base_ratio, max_free_standing_ft, base_to_eliminate_ties_ft];
   if (!outs.every(Number.isFinite)) return { error: "Scaffold tie math is not a finite value." };
@@ -640,12 +640,12 @@ export function computeMastClimberPlatformLoad({ platform_length_ft = 0, cantile
   const distributed_moment_ft_lb = 0;
   const on_cantilever = cantilever_length_ft > 0 && load_centroid_ft > half_platform_ft - cantilever_length_ft;
   const zone_utilization_pct = zone_rated_capacity_lb > 0 ? load_lb / zone_rated_capacity_lb * 100 : null;
-  const within_zone = zone_rated_capacity_lb > 0 ? load_lb <= zone_rated_capacity_lb : null;
+  const within_zone = zone_rated_capacity_lb > 0 ? load_lb <= zone_rated_capacity_lb + 1e-9 * Math.abs(zone_rated_capacity_lb) : null;
   const max_load_at_position_lb = zone_rated_capacity_lb > 0 && on_cantilever ? zone_rated_capacity_lb : rated_capacity_lb;
   // The moment ends up in the ties to the building at their spacing.
   const tie_force_lb = tie_spacing_ft > 0 ? moment_ft_lb / tie_spacing_ft : null;
   const tie_utilization_pct = (tie_force_lb !== null && tie_capacity_lb > 0) ? tie_force_lb / tie_capacity_lb * 100 : null;
-  const tie_ok = (tie_force_lb !== null && tie_capacity_lb > 0) ? tie_force_lb <= tie_capacity_lb : null;
+  const tie_ok = (tie_force_lb !== null && tie_capacity_lb > 0) ? tie_force_lb <= tie_capacity_lb + 1e-9 * Math.abs(tie_capacity_lb) : null;
   const outs = [total_utilization_pct, moment_ft_lb, max_load_at_position_lb];
   if (!outs.every(Number.isFinite)) return { error: "Mast climber load math is not a finite value." };
   const total_verdict = within_total
@@ -789,7 +789,7 @@ export function computeShoringReshoringLoad({ slab_dead_psf = 0, construction_li
   const share_per_level_psf = redistributed_load_psf / N;
   const governing_level_load_psf = slab_dead_psf + share_per_level_psf;
   const capacity_margin_psf = governing_slab_capacity_psf > 0 ? governing_slab_capacity_psf - governing_level_load_psf : null;
-  const within_capacity = governing_slab_capacity_psf > 0 ? governing_level_load_psf <= governing_slab_capacity_psf : null;
+  const within_capacity = governing_slab_capacity_psf > 0 ? governing_level_load_psf <= governing_slab_capacity_psf + 1e-9 * Math.abs(governing_slab_capacity_psf) : null;
   const utilization_pct = governing_slab_capacity_psf > 0 ? governing_level_load_psf / governing_slab_capacity_psf * 100 : null;
   // Levels needed to bring the governing slab inside capacity. Below its own
   // dead load no number of levels helps, which is a different problem.

@@ -989,7 +989,7 @@ export function computeTransformerDiversityLoading({ customers = 0, individual_p
   const headroom_customers = customers_at_continuous - customers;
   const load_factor = average_demand_kva > 0 ? average_demand_kva / diversified_kva : null;
   const within_continuous = continuous_loading_pct <= 100 + 1e-9;
-  const within_short_time = short_time_rating_kva > 0 ? diversified_kva <= short_time_rating_kva : null;
+  const within_short_time = short_time_rating_kva > 0 ? diversified_kva <= short_time_rating_kva + 1e-9 * Math.abs(short_time_rating_kva) : null;
   const outs = [connected_kva, diversified_kva, continuous_loading_pct, customers_at_continuous, headroom_customers];
   if (!outs.every(Number.isFinite)) return { error: "Diversified-loading math is not a finite value." };
   const verdict = within_continuous
@@ -1317,7 +1317,7 @@ export function computeMeterCtPtMultiplier({ ct_primary_a = 0, ct_secondary_a = 
     ? implied_demand_kw * 1000 / (Math.sqrt(3) * service_voltage_kv * 1000)
     : null;
   const ct_utilization_pct = implied_current_a === null ? null : implied_current_a / ct_primary_a * 100;
-  const within_ct_rating = implied_current_a === null ? null : implied_current_a <= ct_primary_a;
+  const within_ct_rating = implied_current_a === null ? null : implied_current_a <= ct_primary_a + 1e-9 * Math.abs(ct_primary_a);
   const outs = [ct_ratio, pt_ratio, multiplier, billed_kwh, implied_demand_kw];
   if (!outs.every(Number.isFinite)) return { error: "Metering multiplier math is not a finite value." };
   const verdict = within_ct_rating === null
@@ -1411,7 +1411,7 @@ export function computeCounterpoiseResistance({ soil_resistivity_ohm_cm = 0, len
       length_for_target_ft = (lo + hi) / 2;
     }
   }
-  const meets_target = target_resistance_ohm > 0 ? array_ohm <= target_resistance_ohm : null;
+  const meets_target = target_resistance_ohm > 0 ? array_ohm <= target_resistance_ohm + 1e-9 * Math.abs(target_resistance_ohm) : null;
   const outs = [single_wire_ohm, ideal_parallel_ohm, array_ohm, coupling_cost_ohm];
   if (!outs.every(Number.isFinite)) return { error: "Counterpoise math is not a finite value." };
   const verdict = meets_target === null

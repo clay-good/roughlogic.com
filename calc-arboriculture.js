@@ -197,7 +197,7 @@ export function computeRootBallSizeWeight({ caliper_in = 0, ball_per_caliper_in 
   const ball_volume_ft3 = Math.PI / 4 * ball_diameter_ft * ball_diameter_ft * ball_depth_ft;
   const ball_weight_lb = ball_volume_ft3 * soil_density_pcf;
   const ball_weight_tons = ball_weight_lb / LB_PER_TON;
-  const within_handling = handling_limit_lb > 0 ? ball_weight_lb <= handling_limit_lb : null;
+  const within_handling = handling_limit_lb > 0 ? ball_weight_lb <= handling_limit_lb + 1e-9 * Math.abs(handling_limit_lb) : null;
   // Weight goes as the CUBE of caliper at a fixed ratio, so the caliper a
   // given handling limit allows is a cube root.
   const caliper_for_limit_in = handling_limit_lb > 0
@@ -269,7 +269,7 @@ export function computeTreeCablingRating({ defect_to_tips_ft = 0, placement_frac
     : (system_rating_lb === anchor_rating_lb ? "the anchors"
       : system_rating_lb === termination_rating_lb ? "the terminations" : "the cable");
   const utilization_pct = system_rating_lb === null ? null : force_at_placement_lb / system_rating_lb * 100;
-  const within_rating = system_rating_lb === null ? null : force_at_placement_lb <= system_rating_lb;
+  const within_rating = system_rating_lb === null ? null : force_at_placement_lb <= system_rating_lb + 1e-9 * Math.abs(system_rating_lb);
   const outs = [placement_height_ft, force_at_placement_lb];
   if (!outs.every(Number.isFinite)) return { error: "Cabling rating math is not a finite value." };
   const verdict = within_rating === null
@@ -388,7 +388,7 @@ export function computeSoilVolumeForCanopy({ canopy_diameter_ft = 0, soil_per_ca
   const usable_pit_volume_ft3 = pit_volume_ft3 * usable_fraction;
   const provision_pct = soil_required_ft3 > 0 && pit_volume_ft3 > 0 ? usable_pit_volume_ft3 / soil_required_ft3 * 100 : null;
   const shortfall_ft3 = pit_volume_ft3 > 0 ? Math.max(0, soil_required_ft3 - usable_pit_volume_ft3) : null;
-  const adequate = provision_pct === null ? null : usable_pit_volume_ft3 >= soil_required_ft3;
+  const adequate = provision_pct === null ? null : usable_pit_volume_ft3 >= soil_required_ft3 - 1e-9 * Math.abs(soil_required_ft3);
   // What this pit actually supports, which is the honest reading of it.
   const supported_area_ft2 = usable_pit_volume_ft3 / soil_per_canopy_ft3_per_ft2;
   const supported_canopy_ft = pit_volume_ft3 > 0 ? Math.sqrt(4 * supported_area_ft2 / Math.PI) : null;

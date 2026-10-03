@@ -417,7 +417,7 @@ export function computeRcOneWayShear({ fc_psi = 4000, bw_in = 0, d_in = 0, as_in
   const vc_kip = (vc_psi * bw_in * d_in) / 1000;
   const phi_vc_kip = 0.75 * vc_kip;
   const vc_simplified_kip = (2 * lambda * sqrt_fc * bw_in * d_in) / 1000;
-  const adequate = vu_kip > 0 ? vu_kip <= phi_vc_kip : null;
+  const adequate = vu_kip > 0 ? vu_kip <= phi_vc_kip + 1e-9 * Math.abs(phi_vc_kip) : null;
   return {
     rho_w, lambda_s, vc_psi, vc_kip, phi_vc_kip, vc_simplified_kip, adequate,
     note: "ACI 318-19 Table 22.5.5.1(c) one-way (beam-action) shear for a member WITHOUT at least minimum shear reinforcement and no axial load: Vc = 8 lambda_s lambda (rho_w)^(1/3) sqrt(f'c) bw d, where rho_w = As/(bw d) is the longitudinal tension-steel ratio and lambda_s = sqrt(2 / (1 + d/10)) capped at 1.0 is the 22.5.5.1.3 size-effect factor (new in the 2019 edition), phi = 0.75. This is the check that governs footings, one-way slabs, and shallow beams with no stirrups; the size-effect penalty and the (rho_w)^(1/3) term make a deep, lightly reinforced section carry noticeably less than the old 2 sqrt(f'c) rule of thumb (shown for comparison). sqrt(f'c) is capped at 100 psi per 22.5.3.1. If the member has at least Av,min stirrups, lambda_s = 1.0 and the simplified 2 lambda sqrt(f'c) (or the (a) expressions) applies instead - see rc-beam-shear. Normalweight unless lambda is set. A design aid, not a substitute for the structural engineer of record's stamped design.",
@@ -484,7 +484,7 @@ export function computeRcMinShearReinforcement({ fc_psi = 4000, fyt_psi = 60000,
   const tightened = vs_req_kip > vs_half_kip;
   const s_max_code_in = tightened ? Math.min(d_in / 4, 12) : Math.min(d_in / 2, 24);
   const s_max_in = Math.min(s_max_code_in, s_max_av_min_in);
-  const section_adequate = vu_kip > 0 ? vu_kip <= phi_vn_max_kip : null;
+  const section_adequate = vu_kip > 0 ? vu_kip <= phi_vn_max_kip + 1e-9 * Math.abs(phi_vn_max_kip) : null;
   return {
     av_min_per_s, av_min_governs, s_max_av_min_in, trigger_kip, av_min_required,
     vc_kip, vs_req_kip, vs_max_kip, phi_vn_max_kip, tightened, s_max_code_in, s_max_in, section_adequate,

@@ -404,7 +404,7 @@ export function computeEgressLightingCheck({ avg_fc = 0, min_fc = 0, max_fc = 0,
   const max_min = max / min;
   const avg_ok = avg >= avg_thr - 1e-9 * Math.abs(avg_thr);
   const min_ok = min >= min_thr - 1e-9 * Math.abs(min_thr);
-  const ratio_ok = (emergency || emergencyInitial) ? max_min <= 40 : true;
+  const ratio_ok = (emergency || emergencyInitial) ? max_min <= 40 + 1e-9 * Math.abs(40) : true;
   const pass = avg_ok && min_ok && ratio_ok;
   return {
     max_min, avg_thr, min_thr, avg_ok, min_ok, ratio_ok, pass, emergency,
@@ -787,7 +787,7 @@ export function computeGroundingGridConductor({ fault_current_ka = 0, clearing_t
   // real substitute for copper, and high available fault current costs conductor everywhere.
   const area_kcmil = fault_current_ka * m.kf * Math.sqrt(clearing_time_s);
   const area_cmil = area_kcmil * 1000;
-  const adequate = installed_kcmil > 0 ? installed_kcmil >= area_kcmil : null;
+  const adequate = installed_kcmil > 0 ? installed_kcmil >= area_kcmil - 1e-9 * Math.abs(area_kcmil) : null;
   const verdict = installed_kcmil === 0
     ? "no installed size entered"
     : adequate
@@ -920,7 +920,7 @@ export function computeFuseLetThrough({ conductor_cmil = 0, initial_temp_c = 75,
   const withstand_i2t = withstand_a * withstand_a * duration_s;
   const margin = withstand_i2t / let_through_i2t;
   const thermal_ok = margin >= 1 - 1e-9 * Math.abs(1);
-  const peak_ok = (let_through_peak_a > 0 && equipment_peak_withstand_a > 0) ? let_through_peak_a <= equipment_peak_withstand_a : null;
+  const peak_ok = (let_through_peak_a > 0 && equipment_peak_withstand_a > 0) ? let_through_peak_a <= equipment_peak_withstand_a + 1e-9 * Math.abs(equipment_peak_withstand_a) : null;
   const peak_verdict = peak_ok === null
     ? "no peak comparison entered"
     : peak_ok

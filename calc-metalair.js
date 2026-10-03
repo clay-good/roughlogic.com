@@ -644,7 +644,7 @@ export function computeMetalRoofThermalMovement({ panel_length_ft = 0, alpha_per
   const movement_down_slope_in = total_movement_in * fixed_point_fraction;
   const governing_movement_in = Math.max(movement_up_slope_in, movement_down_slope_in);
   const travel_margin_in = clip_travel_in > 0 ? clip_travel_in - governing_movement_in : null;
-  const travel_adequate = clip_travel_in > 0 ? clip_travel_in >= governing_movement_in : null;
+  const travel_adequate = clip_travel_in > 0 ? clip_travel_in >= governing_movement_in - 1e-9 * Math.abs(governing_movement_in) : null;
   // The longest panel this clip supports, at this fixed point. A panel fixed
   // at the middle carries twice the length for the same clip travel.
   const governing_fraction = Math.max(1 - fixed_point_fraction, fixed_point_fraction);

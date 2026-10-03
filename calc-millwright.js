@@ -923,7 +923,7 @@ export function computeReceiverPumpUpTime({ receiver_volume_ft3 = 0, fill_start_
   const outs = [receiver_volume_ft3];
   if (!outs.every(Number.isFinite)) return { error: "Receiver time math is not a finite value." };
   if (pump_up_minutes === null && draw_down_minutes === null) return { error: "Enter a fill (a rising pressure pair and a compressor flow) or a draw-down (a cut-out above a cut-in, and a net demand)." };
-  const covers = draw_down_minutes !== null && required_cover_minutes > 0 ? draw_down_minutes >= required_cover_minutes : null;
+  const covers = draw_down_minutes !== null && required_cover_minutes > 0 ? draw_down_minutes >= required_cover_minutes - 1e-9 * Math.abs(required_cover_minutes) : null;
   return {
     pump_up_minutes, draw_down_minutes, usable_free_air_ft3, receiver_required_ft3,
     band_psi, receiver_volume_ft3, net_demand_scfm, required_cover_minutes,
