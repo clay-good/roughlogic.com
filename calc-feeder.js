@@ -573,7 +573,7 @@ export function computeEvChargerThrottle({ aggregate_limit_a = 0, charger_max_a 
   const share_a = limit / active;
   const throttled_a = Math.min(cmax, share_a);
   const full_rate_count = Math.floor(limit / cmax + 1e-9);
-  const all_full = active * cmax <= limit;
+  const all_full = active * cmax <= limit + 1e-9 * Math.abs(limit);
   return {
     throttled_a, full_rate_count, all_full, share_a,
     note: "The EVEMS shares the aggregate limit equally among the active chargers, never above a charger's own maximum. A listed and hardware-enforced EVEMS is what permits the sharing. This is the equal-share case; priority or round-robin schemes deliver different currents. The current is what each active car receives, so more cars plugged in slows all of them. NEC 625.42(A) permits the management; the NEC and the AHJ govern - a planning aid, not the EVEMS configuration.",

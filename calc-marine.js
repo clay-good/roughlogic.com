@@ -622,7 +622,9 @@ export function computePierScourDepth({ pier_width_ft = 0, pier_length_ft = 0, f
   const aligned_limited = round_nose && scourAt(pier_width_ft, 1, 1) > aligned_limit_ratio * pier_width_ft;
   const angle_factor = angleFactor(length_ratio_used);
   const skewed_k1 = angle_of_attack_deg > 5 ? 1 : nose_shape_factor;
-  const skewed_scour_ft = scourAt(pier_width_ft, skewed_k1, angle_factor);
+  // At zero skew the pier IS aligned, so the round-nose HEC-18 cap applies to it too. Until
+  // 2026-10-03 the governing scour ignored the cap the aligned output had already taken.
+  const skewed_scour_ft = angle_of_attack_deg === 0 ? scour_depth_ft : scourAt(pier_width_ft, skewed_k1, angle_factor);
   return {
     froude_number, angle_factor, length_ratio_used, skewed_k1, aligned_limit_ratio, aligned_limited,
     scour_depth_ft, wider_pier_scour_ft,

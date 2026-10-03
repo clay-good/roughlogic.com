@@ -908,8 +908,10 @@ export function computeInsulationResistancePi({ ir_30s_mohm = 800, ir_1min_mohm 
   // DAR = IR(60s)/IR(30s); PI = IR(10min)/IR(1min). 1 minute = 60 seconds, so ir_1min IS the 60-second reading.
   const dar = ir_1min_mohm / ir_30s_mohm;
   const polarization_index = ir_10min_mohm / ir_1min_mohm;
-  const piVerdict = polarization_index < 1 ? "dangerous (investigate)" : polarization_index < 2 ? "questionable" : polarization_index < 4 ? "good" : "excellent";
-  const darVerdict = dar < 1 ? "poor (investigate)" : dar < 1.25 ? "questionable" : dar < 1.4 ? "acceptable" : "good";
+  // Band edges carry slack so a ratio sitting on an edge (8.3 then 11.62 Mohm is DAR 1.4) takes the upper band.
+  const below = (v, edge) => v < edge - 1e-9 * edge;
+  const piVerdict = below(polarization_index, 1) ? "dangerous (investigate)" : below(polarization_index, 2) ? "questionable" : below(polarization_index, 4) ? "good" : "excellent";
+  const darVerdict = below(dar, 1) ? "poor (investigate)" : below(dar, 1.25) ? "questionable" : below(dar, 1.4) ? "acceptable" : "good";
   if (![dar, polarization_index].every(Number.isFinite)) return { error: "PI / DAR math is not a finite value." };
   return {
     polarization_index,

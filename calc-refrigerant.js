@@ -1318,9 +1318,9 @@ export function computeTxvCapacityCheck({ nominal_tons = 0, rated_dp_psi = 100, 
   const pressure_factor = Math.sqrt(actual_dp_psi / rated_dp_psi);
   const installed_capacity_tons = nominal_tons * liquid_temp_factor * pressure_factor;
   const sizing_ratio_pct = installed_capacity_tons / evaporator_load_tons * 100;
-  const verdict = sizing_ratio_pct < 100
+  const verdict = sizing_ratio_pct < 100 - 1e-9 * 100
     ? "UNDERSIZED at " + fmt(sizing_ratio_pct, 0) + "% of load: the valve starves the coil at design conditions -- high superheat, lost capacity, and a compressor that never satisfies"
-    : sizing_ratio_pct <= 130
+    : sizing_ratio_pct <= 130 + 1e-9 * 130
       ? "inside the 100-130% window"
       : "OVERSIZED at " + fmt(sizing_ratio_pct, 0) + "% of load: the valve hunts -- it overfeeds, floods back, closes, starves, and cycles, and the symptom looks like a bad bulb rather than a sizing error";
   if (![pressure_factor, installed_capacity_tons, sizing_ratio_pct].every(Number.isFinite)) return { error: "TXV capacity math is not a finite value." };

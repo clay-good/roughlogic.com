@@ -706,7 +706,9 @@ export function computeSuspendedScaffoldCounterweight({ rated_load_lb = 0, outbo
   if (!(rated_load_lb > 0)) return { error: "The hoist's RATED load must be positive (lb) -- not its empty weight, and not what happens to be on it today." };
   if (!(outboard_arm_ft > 0)) return { error: "The outboard arm must be positive (ft)." };
   if (!(inboard_arm_ft > 0)) return { error: "The inboard arm must be positive (ft)." };
-  if (!(factor_of_safety >= 1)) return { error: "The factor of safety cannot be below one; 4:1 against overturning is the common requirement." };
+  // 29 CFR 1926.451(a)(2): the counterweights resist at least 4 times the tipping moment at the
+  // hoist's rated load. Until 2026-10-03 any factor from 1 up was accepted.
+  if (!(factor_of_safety >= 4 - 1e-9 * 4)) return { error: "The factor of safety against tipping must be at least 4 (29 CFR 1926.451(a)(2))." };
   if (counterweight_unit_lb < 0) return { error: "The counterweight unit weight cannot be negative (lb)." };
   if (target_counterweight_lb < 0) return { error: "The target counterweight cannot be negative (lb)." };
   if (hoist_stall_load_lb < 0) return { error: "The hoist stall load cannot be negative (lb)." };

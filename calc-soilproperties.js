@@ -263,7 +263,8 @@ export function computeAtterbergIndices({ ll = 0, pl = 0, w_pct = 0 } = {}) {
   if (!(ll > 0)) return { error: "Liquid limit must be positive (%)." };
   if (!(pl > 0)) return { error: "Plastic limit must be positive (%)." };
   if (!(ll > pl)) return { error: "The liquid limit must exceed the plastic limit (a soil with PL >= LL is nonplastic)." };
-  const pi = ll - pl;
+  // Rounded to 1e-9 so LL 20.1 / PL 13.1 is PI 7, not 7.000000000000002 (which read CL, not CL-ML).
+  const pi = Math.round((ll - pl) * 1e9) / 1e9;
   const aline = 0.73 * (ll - 20);
   // ASTM D2487 fine-grained groups: "on or above" the A-line counts as clay. With LL < 50, PI > 7 is CL,
   // PI 4-7 is the dual CL-ML, and PI < 4 is ML even above the line. Until 2026-09-26 any point strictly
@@ -510,8 +511,10 @@ export function computeSoilGradationCoefficients({ d10_mm = 0, d30_mm = 0, d60_m
   if (pct_fines < 0 || pct_fines > 100) return { error: "Percent fines (passing #200) must be between 0 and 100." };
   const cu = d60_mm / d10_mm;
   const cc = (d30_mm * d30_mm) / (d10_mm * d60_mm);
-  // USCS coarse fraction: more than half of it retained on the #4 is a gravel.
-  const is_gravel = pct_coarse_passing_no4 <= 50;
+  // USCS coarse fraction: MORE than half of it retained on the #4 is a gravel; ASTM D2487 puts
+  // "50% or more of coarse fraction passes No. 4" in sand. Until 2026-10-03 exactly 50% read
+  // gravel, so a Cu 5 soil was GW instead of SP.
+  const is_gravel = pct_coarse_passing_no4 < 50;
   const coarse_type = is_gravel ? "gravel" : "sand";
   // ASTM D2487 well-graded criteria: Cu >= 4 (gravel) or >= 6 (sand), AND Cc
   // between 1 and 3 inclusive. Both must hold; failing either is poorly graded.
@@ -550,7 +553,7 @@ function _v1018renderSoilGradationCoefficients(inputRegion, outputRegion, citati
   const d10 = makeNumber("D10, effective size (mm)", "sgc-d10", { step: "any", min: "0" });
   const d30 = makeNumber("D30 (mm)", "sgc-d30", { step: "any", min: "0" });
   const d60 = makeNumber("D60 (mm)", "sgc-d60", { step: "any", min: "0" });
-  const p4 = makeNumber("Coarse fraction passing the #4 sieve (%, <= 50 = gravel)", "sgc-p4", { step: "any", min: "0", max: "100", value: "60" });
+  const p4 = makeNumber("Coarse fraction passing the #4 sieve (%, under 50 = gravel)", "sgc-p4", { step: "any", min: "0", max: "100", value: "60" });
   const pf = makeNumber("Fines passing the #200 sieve (%)", "sgc-pf", { step: "any", min: "0", max: "100", value: "0" });
   p4.input.value = "60"; pf.input.value = "0";
   for (const f of [d10, d30, d60, p4, pf]) inputRegion.appendChild(f.wrap);

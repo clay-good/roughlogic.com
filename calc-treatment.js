@@ -370,7 +370,8 @@ export function computePoolHeaterBtu({ gallons = 0, dT_F = 0, output = 0, eff = 
   if (!(out > 0)) return { error: "Heater input must be positive (Btu/h)." };
   if (!(e > 0)) return { error: "Efficiency must be positive (a fraction, 0.80 gas; 1.0 for a heat pump entered at its heat output)." };
   // A fraction, not a percent or a COP: 80 used to give a 0.05 h heat-up, and a heat pump's COP 5 cut the time 5x.
-  if (e > 1.2) return { error: "Enter efficiency as a fraction (0.80); for a heat pump enter its heat output and 1.0, not its COP." };
+  // No fuel or heat-output efficiency exceeds 1; 1.0 to 1.2 used to pass (until 2026-10-03) and skewed the result by up to 17%.
+  if (e > 1 + 1e-9) return { error: "Enter efficiency as a fraction (0.80), at most 1.0; for a heat pump enter its heat output and 1.0, not its COP." };
   const Q_btu = gal * 8.34 * dT;
   const delivered = out * e;
   const hours = Q_btu / delivered;
@@ -409,7 +410,8 @@ export function computePoolHeaterSize({ gallons = 0, dT_F = 0, target_hours = 0,
   if (!(hrs > 0)) return { error: "Target heat-up time must be positive (h)." };
   if (!(e > 0)) return { error: "Efficiency must be positive (a fraction, 0.80 gas; 1.0 for a heat pump entered at its heat output)." };
   // A fraction, not a percent or a COP: 80 used to give a 0.05 h heat-up, and a heat pump's COP 5 cut the time 5x.
-  if (e > 1.2) return { error: "Enter efficiency as a fraction (0.80); for a heat pump enter its heat output and 1.0, not its COP." };
+  // No fuel or heat-output efficiency exceeds 1; 1.0 to 1.2 used to pass (until 2026-10-03) and skewed the result by up to 17%.
+  if (e > 1 + 1e-9) return { error: "Enter efficiency as a fraction (0.80), at most 1.0; for a heat pump enter its heat output and 1.0, not its COP." };
   const Q_btu = gal * 8.34 * dT;
   // Inverse of hours = (gallons x 8.34 x dT) / (output x eff): output = (gallons x 8.34 x dT) / (target_hours x eff).
   const required_output_btu = Q_btu / (hrs * e);
@@ -778,7 +780,7 @@ export function computeDigesterVsLoading({ feed_flow_gpd = 0, percent_ts = 0, pe
   const vslr = vs_fed_lb_day / vol * 1000;
   const dt_days = vol * 7.48 / feed;
   const over_limit = vslr > 400 + 1e-9 * Math.abs(400);
-  const in_band = vslr >= 100 && vslr <= 400;
+  const in_band = vslr >= 100 - 1e-9 * 100 && vslr <= 400 + 1e-9 * 400;
   return {
     vs_fed_lb_day, vslr, dt_days, over_limit, in_band,
     note: "Overloading past about 400 lb VS/day per 1,000 ft^3 sours the digester as the acid-formers outrun the methane-formers and the pH and alkalinity crash - a slow failure that takes weeks to recover. The loading rate, not a full tank, is the health metric; a thin feed can hit the limit at high flow and a rich feed at low flow. The high-rate band is 100-400 lb VS/day per 1,000 ft^3 (operating practice). A design reviewed under the Recommended Standards for Wastewater Facilities (Ten States, 2014) is held far lower: 80 lb VS/day per 1,000 ft^3 for a completely mixed digester and 40 for a moderately mixed one (84.321-84.322). The digester monitoring (pH, alkalinity, gas) and the operator govern.",

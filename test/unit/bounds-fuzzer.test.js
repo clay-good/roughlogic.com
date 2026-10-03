@@ -32158,9 +32158,10 @@ test("bounds: spec-v1018 computeSoilGradationCoefficients pins Cu/Cc, the both-c
   assert.strictEqual(asSand.coarse_type, "sand");
   assert.strictEqual(asSand.cu_threshold, 6);
   assert.strictEqual(asSand.well_graded, false); // same curve, Cu 5 < 6
-  // #4 boundary: exactly 50% passing is still a gravel (more than half retained).
-  assert.strictEqual(_v1018({ ...base, pct_coarse_passing_no4: 50 }).coarse_type, "gravel");
-  assert.strictEqual(_v1018({ ...base, pct_coarse_passing_no4: 50.1 }).coarse_type, "sand");
+  // #4 boundary: ASTM D2487 puts "50% or more of coarse fraction passes No. 4" in sand, so a
+  // gravel needs MORE than half retained.
+  assert.strictEqual(_v1018({ ...base, pct_coarse_passing_no4: 49.9 }).coarse_type, "gravel");
+  assert.strictEqual(_v1018({ ...base, pct_coarse_passing_no4: 50 }).coarse_type, "sand");
   // Fines ladder: < 5 clean symbol, 5-12 dual, > 12 the fines govern.
   assert.strictEqual(_v1018({ ...base, pct_fines: 4.9 }).uscs_symbol, "SW");
   assert.ok(_v1018({ ...base, pct_fines: 8 }).uscs_symbol.includes("-"));
@@ -47869,11 +47870,9 @@ test("bounds: spec-v1688 computeSuspendedScaffoldCounterweight -- the lever rati
   assert.equal(r.counterweight_units, 480);
   assert.ok(Math.abs(r.achieved_fos - 4) < 1e-9);
   assert.ok(Math.abs(r.inboard_for_target_ft - 3) < 1e-9);
-  // A bare balance is exactly a factor of one: the moments are equal.
-  const bare = _v1688({ ...base, factor_of_safety: 1, counterweight_unit_lb: 0 });
-  assert.ok(Math.abs(bare.resisting_moment_ft_lb - bare.overturning_moment_ft_lb) < 1e-6);
-  assert.ok(Math.abs(bare.achieved_fos - 1) < 1e-9);
-  assert.ok(Math.abs(bare.required_counterweight_lb - r.balance_counterweight_lb) < 1e-9);
+  // A bare balance (a factor of one) is not a design: 1926.451(a)(2) requires 4, so it errors.
+  assert.ok("error" in _v1688({ ...base, factor_of_safety: 1, counterweight_unit_lb: 0 }));
+  assert.ok("error" in _v1688({ ...base, factor_of_safety: 3.9 }));
   // The requirement is exactly linear in the load and in the factor.
   assert.ok(Math.abs(_v1688({ ...base, rated_load_lb: 3000 }).required_counterweight_lb - 2 * r.required_counterweight_lb) < 1e-9);
   assert.ok(Math.abs(_v1688({ ...base, factor_of_safety: 8 }).required_counterweight_lb - 2 * r.required_counterweight_lb) < 1e-9);
