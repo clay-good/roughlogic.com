@@ -307,8 +307,9 @@ export function computeElectricLockPowerBudget({ device_count = 0, holding_curre
   const steady_current_a = device_count * holding_current_a;
   const peak_inrush_a = device_count * inrush_current_a;
   const supply_margin_a = supply_rating_a - steady_current_a;
-  const supply_ok = supply_rating_a >= steady_current_a;
-  const inrush_ok = supply_rating_a >= peak_inrush_a;
+  // 1e-9: three 0.1 A devices total 0.30000000000000004 A and failed a 0.3 A supply.
+  const supply_ok = supply_rating_a >= steady_current_a * (1 - 1e-9);
+  const inrush_ok = supply_rating_a >= peak_inrush_a * (1 - 1e-9);
   // Standby plus the alarm period that follows it (sounders, strikes held
   // open, the panel itself). Fail-safe maglocks draw nothing in alarm: they
   // release by LOSING power. Until 2026-09-30 there was no alarm term.
@@ -317,7 +318,7 @@ export function computeElectricLockPowerBudget({ device_count = 0, holding_curre
   const amp_hours_required = standby_amp_hours + alarm_amp_hours;
   const amp_hours_after_derate = amp_hours_required / battery_derate;
   const battery_margin_ah = installed_battery_ah - amp_hours_after_derate;
-  const battery_ok = installed_battery_ah >= amp_hours_after_derate;
+  const battery_ok = installed_battery_ah >= amp_hours_after_derate * (1 - 1e-9); // 24.000000000000004 Ah read SHORT on a 24 Ah battery
   const batteries_needed = Math.ceil(amp_hours_after_derate / installed_battery_ah - 1e-9);
   return {
     steady_current_a, peak_inrush_a, supply_margin_a, supply_ok, inrush_ok,
@@ -688,12 +689,12 @@ export function computeGateOperatorDuty({ gate_weight_lb = 0, rolling_coefficien
   const grade_force_lb = gate_weight_lb * Math.sin(grade_angle);
   const total_force_lb = rolling_force_lb + grade_force_lb;
   const force_margin_lb = operator_rated_force_lb - total_force_lb;
-  const force_ok = operator_rated_force_lb >= total_force_lb;
+  const force_ok = operator_rated_force_lb >= total_force_lb * (1 - 1e-9); // 1300 x 0.07 = 91.00000000000001 lb
   const travel_time_s = gate_length_ft / operator_speed_fps;
   const cycle_time_s = 2 * travel_time_s;
   const run_time_hr = cycles_per_day * cycle_time_s / 3600;
   const duty_cycle_pct = run_time_hr / operating_hours * 100;
-  const continuous_required = duty_cycle_pct > intermittent_duty_limit_pct;
+  const continuous_required = duty_cycle_pct > intermittent_duty_limit_pct * (1 + 1e-9); // exactly 10% computed 10.000000000000002
   return {
     rolling_force_lb, grade_force_lb, total_force_lb, force_margin_lb, force_ok,
     travel_time_s, cycle_time_s, run_time_hr, duty_cycle_pct, continuous_required,

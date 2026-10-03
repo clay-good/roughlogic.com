@@ -312,9 +312,11 @@ export function computeLocateDepthOffset({ instrument_depth_in = 0, half_signal_
   const null_asymmetry_in = Math.abs(left_null_in - right_null_in);
   const null_asymmetry_pct = null_asymmetry_in / ((left_null_in + right_null_in) / 2) * 100;
   const current_drop_pct = (current_near_ma - current_far_ma) / current_near_ma * 100;
-  const depth_agrees = depth_disagreement_pct <= 10;
-  const nulls_symmetric = null_asymmetry_pct <= 10;
-  const current_gradual = current_drop_pct <= sharp_drop_pct;
+  // 1e-9: 36 vs 39.6 in is 10.000000000000004% and 4.2 -> 3.15 mA is 25.000000000000007%, which read
+  // past their limits; "within" includes the limit.
+  const depth_agrees = depth_disagreement_pct <= 10 * (1 + 1e-9);
+  const nulls_symmetric = null_asymmetry_pct <= 10 * (1 + 1e-9);
+  const current_gradual = current_drop_pct <= sharp_drop_pct * (1 + 1e-9);
   const reads_shallow = depth_difference_in > 0;
   const confident = depth_agrees && nulls_symmetric && current_gradual;
   const cause = confident ? "the checks agree, so both readings are probably right"

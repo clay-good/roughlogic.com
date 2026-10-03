@@ -2,7 +2,7 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "2ed7df5ae90dd6f5",
+      "sha": "a4dc53a6044672d8",
       "date": "2026-10-03"
     },
     "/tools/": {
@@ -22,7 +22,7 @@
       "date": "2026-10-03"
     },
     "/groups/construction/": {
-      "sha": "2e11438b42907867",
+      "sha": "680086662b9b07c1",
       "date": "2026-10-03"
     },
     "/groups/cross-trade/": {
@@ -3562,8 +3562,8 @@
       "date": "2026-09-29"
     },
     "/tools/guide-rail-bracket-span/": {
-      "sha": "e1aab63cbdc00a27",
-      "date": "2026-10-01"
+      "sha": "b0aeac9c02657501",
+      "date": "2026-10-03"
     },
     "/tools/gutter-downspout/": {
       "sha": "683e356015bf8a70",
@@ -3634,8 +3634,8 @@
       "date": "2026-09-29"
     },
     "/tools/hdd-annular-pressure/": {
-      "sha": "e49c7af383d3cecc",
-      "date": "2026-09-29"
+      "sha": "6d1d8d0c08bbdcbe",
+      "date": "2026-10-03"
     },
     "/tools/hdd-bend-radius/": {
       "sha": "ee3dc844359aaaee",
@@ -4350,12 +4350,12 @@
       "date": "2026-09-29"
     },
     "/tools/locate-depth-offset/": {
-      "sha": "32d88af44f549934",
-      "date": "2026-09-29"
+      "sha": "11ed993f81183c4c",
+      "date": "2026-10-03"
     },
     "/tools/lock-backset-strike-layout/": {
-      "sha": "490ab6c215d37ce2",
-      "date": "2026-09-29"
+      "sha": "c23fca50483af0da",
+      "date": "2026-10-03"
     },
     "/tools/log-limb-weight/": {
       "sha": "9319305751eb40a2",
@@ -5974,8 +5974,8 @@
       "date": "2026-10-03"
     },
     "/tools/rail-wear-condemning-limit/": {
-      "sha": "bb7d39e0a3c96b07",
-      "date": "2026-09-29"
+      "sha": "83cf7b111b9e3b72",
+      "date": "2026-10-03"
     },
     "/tools/railcar-load-limit/": {
       "sha": "e7785197b17f162d",
@@ -6594,8 +6594,8 @@
       "date": "2026-09-29"
     },
     "/tools/sawmill-residue-yield/": {
-      "sha": "406f3329cea27e0b",
-      "date": "2026-09-29"
+      "sha": "8706f062dc7925db",
+      "date": "2026-10-03"
     },
     "/tools/scaffold-guardrail-check/": {
       "sha": "f9df45399e8770eb",

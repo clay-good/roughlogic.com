@@ -374,7 +374,7 @@ export function computeCouplingAlignmentTolerance({ rpm = 0, measured_offset_in 
   // spacer, not an offset at a plane: a long spacer legitimately allows a
   // large end-to-end offset while the slope stays tight.
   const spacer_slope_mils_per_in = spacer_length_in > 0 ? spacer_end_offset_in * _MILS_PER_IN / spacer_length_in : null;
-  const spacer_passes = spacer_slope_mils_per_in === null ? null : spacer_slope_mils_per_in <= angularity_acceptable_mils_per_in;
+  const spacer_passes = spacer_slope_mils_per_in === null ? null : spacer_slope_mils_per_in <= angularity_acceptable_mils_per_in * (1 + 1e-9);
   const outs = [offset_pct_of_acceptable, angularity_pct_of_acceptable, offset_over_by_in];
   if (!outs.every(Number.isFinite)) return { error: "Alignment tolerance math is not a finite value." };
   return {

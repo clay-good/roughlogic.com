@@ -194,7 +194,7 @@ export function computeLaundryCostPerPound({ lb_per_day = 0, gal_per_lb = 0, wat
   if (!(labor_rate_per_hour >= 0)) return { error: "Labor rate cannot be negative." };
   if (!(days_per_year > 0)) return { error: "Operating days per year must be positive." };
   // Six components, all per pound of linen. The two energy lines are the ones
-  // that get left out, and together they are the larger half of the utilities.
+  // that get left out, and together they are a large share of the utilities.
   const water_cost_per_lb = gal_per_lb * water_rate_per_gal;
   const sewer_cost_per_lb = gal_per_lb * sewer_rate_per_gal;
   const delta_t_f = wash_temp_f - incoming_temp_f;

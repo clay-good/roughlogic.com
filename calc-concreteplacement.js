@@ -186,7 +186,7 @@ export function computeBoomPumpReach({ boom_reach_ft = 0, required_distance_ft =
   const reach_lost_to_height_ft = boom_reach_ft - reach_at_height_ft;
   const setup_to_target_ft = required_distance_ft + boom_centre_offset_ft;
   const reach_margin_ft = reach_at_height_ft - required_distance_ft;
-  const reaches = reach_margin_ft >= 0;
+  const reaches = reach_margin_ft >= -1e-9 * required_distance_ft; // exact right triangles computed a hair short
   const max_height_at_distance_ft = required_distance_ft < boom_reach_ft
     ? Math.sqrt(boom_reach_ft * boom_reach_ft - required_distance_ft * required_distance_ft)
     : 0;

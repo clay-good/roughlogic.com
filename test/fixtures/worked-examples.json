@@ -166027,6 +166027,686 @@
      }
     }
    }
+  },
+  {
+   "tile_id": "governor-tripping-speed",
+   "source_publisher": "California Department of Industrial Relations (Title 8, Elevator Safety Orders)",
+   "source_title": "Cal. Code Regs. tit. 8, sec. 3036 Governors, Table No. 3036 B (Maximum Speeds in Feet-Per-Minute At Which Governor Trips and Governor Overspeed Switch Operates)",
+   "source_edition_or_year": "Title 8 sec. 3036 as published at dir.ca.gov/title8/3036.html (accessed 2026-10-03)",
+   "source_section_or_page": "Table No. 3036 B row 'Rated Speed 250 ... Max Governor Trip Speed 337 ... Max Speed at Which Governor Overspeed Switch Operates, Down 303'; 3036(d)(4)(A)/(B): switch opens at not more than 90 percent of trip up to and including 500 fpm, 95 percent above 500 fpm. Tile switch_max_fpm = trip x 90% = 303.3; the table prints whole fpm (and its trip column is itself rounded, e.g. 568 x 0.9 = 511.2 printed 512), so abs 1 fpm covers the printed rounding. Electrical trip entered at the tabled switch speed; mechanical trip and code maximum both at the tabled maximum trip.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "rated_speed_fpm": 250,
+    "electrical_trip_fpm": 303,
+    "mechanical_trip_fpm": 337,
+    "code_minimum_pct": 115,
+    "code_maximum_fpm": 337,
+    "switch_limit_pct": 0
+   },
+   "outputs": {
+    "switch_max_fpm": {
+     "value": 303,
+     "tolerance": {
+      "abs": 1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "governor-tripping-speed",
+   "source_publisher": "California Department of Industrial Relations (Title 8, Elevator Safety Orders)",
+   "source_title": "Cal. Code Regs. tit. 8, sec. 3036 Governors, Table No. 3036 B (Maximum Speeds in Feet-Per-Minute At Which Governor Trips and Governor Overspeed Switch Operates)",
+   "source_edition_or_year": "Title 8 sec. 3036 as published at dir.ca.gov/title8/3036.html (accessed 2026-10-03)",
+   "source_section_or_page": "Table No. 3036 B row 'Rated Speed 400 ... Max Governor Trip Speed 510 ... Max Speed at Which Governor Overspeed Switch Operates, Down 459'; 3036(d)(4)(A)/(B): switch opens at not more than 90 percent of trip up to and including 500 fpm, 95 percent above 500 fpm. Tile switch_max_fpm = trip x 90% = 459; the table prints whole fpm (and its trip column is itself rounded, e.g. 568 x 0.9 = 511.2 printed 512), so abs 1 fpm covers the printed rounding. Electrical trip entered at the tabled switch speed; mechanical trip and code maximum both at the tabled maximum trip.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "rated_speed_fpm": 400,
+    "electrical_trip_fpm": 459,
+    "mechanical_trip_fpm": 510,
+    "code_minimum_pct": 115,
+    "code_maximum_fpm": 510,
+    "switch_limit_pct": 0
+   },
+   "outputs": {
+    "switch_max_fpm": {
+     "value": 459,
+     "tolerance": {
+      "abs": 1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "governor-tripping-speed",
+   "source_publisher": "California Department of Industrial Relations (Title 8, Elevator Safety Orders)",
+   "source_title": "Cal. Code Regs. tit. 8, sec. 3036 Governors, Table No. 3036 B (Maximum Speeds in Feet-Per-Minute At Which Governor Trips and Governor Overspeed Switch Operates)",
+   "source_edition_or_year": "Title 8 sec. 3036 as published at dir.ca.gov/title8/3036.html (accessed 2026-10-03)",
+   "source_section_or_page": "Table No. 3036 B row 'Rated Speed 500 ... Max Governor Trip Speed 625 ... Max Speed at Which Governor Overspeed Switch Operates, Down 563'; 3036(d)(4)(A)/(B): switch opens at not more than 90 percent of trip up to and including 500 fpm, 95 percent above 500 fpm. Tile switch_max_fpm = trip x 90% = 562.5; the table prints whole fpm (and its trip column is itself rounded, e.g. 568 x 0.9 = 511.2 printed 512), so abs 1 fpm covers the printed rounding. Electrical trip entered at the tabled switch speed; mechanical trip and code maximum both at the tabled maximum trip.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "rated_speed_fpm": 500,
+    "electrical_trip_fpm": 563,
+    "mechanical_trip_fpm": 625,
+    "code_minimum_pct": 115,
+    "code_maximum_fpm": 625,
+    "switch_limit_pct": 0
+   },
+   "outputs": {
+    "switch_max_fpm": {
+     "value": 563,
+     "tolerance": {
+      "abs": 1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "governor-tripping-speed",
+   "source_publisher": "California Department of Industrial Relations (Title 8, Elevator Safety Orders)",
+   "source_title": "Cal. Code Regs. tit. 8, sec. 3036 Governors, Table No. 3036 B (Maximum Speeds in Feet-Per-Minute At Which Governor Trips and Governor Overspeed Switch Operates)",
+   "source_edition_or_year": "Title 8 sec. 3036 as published at dir.ca.gov/title8/3036.html (accessed 2026-10-03)",
+   "source_section_or_page": "Table No. 3036 B row 'Rated Speed 600 ... Max Governor Trip Speed 740 ... Max Speed at Which Governor Overspeed Switch Operates, Down 703'; 3036(d)(4)(A)/(B): switch opens at not more than 90 percent of trip up to and including 500 fpm, 95 percent above 500 fpm. Tile switch_max_fpm = trip x 95% = 703; the table prints whole fpm (and its trip column is itself rounded, e.g. 568 x 0.9 = 511.2 printed 512), so abs 1 fpm covers the printed rounding. Electrical trip entered at the tabled switch speed; mechanical trip and code maximum both at the tabled maximum trip.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "rated_speed_fpm": 600,
+    "electrical_trip_fpm": 703,
+    "mechanical_trip_fpm": 740,
+    "code_minimum_pct": 115,
+    "code_maximum_fpm": 740,
+    "switch_limit_pct": 0
+   },
+   "outputs": {
+    "switch_max_fpm": {
+     "value": 703,
+     "tolerance": {
+      "abs": 1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "governor-tripping-speed",
+   "source_publisher": "California Department of Industrial Relations (Title 8, Elevator Safety Orders)",
+   "source_title": "Cal. Code Regs. tit. 8, sec. 3036 Governors, Table No. 3036 B (Maximum Speeds in Feet-Per-Minute At Which Governor Trips and Governor Overspeed Switch Operates)",
+   "source_edition_or_year": "Title 8 sec. 3036 as published at dir.ca.gov/title8/3036.html (accessed 2026-10-03)",
+   "source_section_or_page": "Table No. 3036 B row 'Rated Speed 1000 ... Max Governor Trip Speed 1200 ... Max Speed at Which Governor Overspeed Switch Operates, Down 1140'; 3036(d)(4)(A)/(B): switch opens at not more than 90 percent of trip up to and including 500 fpm, 95 percent above 500 fpm. Tile switch_max_fpm = trip x 95% = 1140; the table prints whole fpm (and its trip column is itself rounded, e.g. 568 x 0.9 = 511.2 printed 512), so abs 1 fpm covers the printed rounding. Electrical trip entered at the tabled switch speed; mechanical trip and code maximum both at the tabled maximum trip.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "rated_speed_fpm": 1000,
+    "electrical_trip_fpm": 1140,
+    "mechanical_trip_fpm": 1200,
+    "code_minimum_pct": 115,
+    "code_maximum_fpm": 1200,
+    "switch_limit_pct": 0
+   },
+   "outputs": {
+    "switch_max_fpm": {
+     "value": 1140,
+     "tolerance": {
+      "abs": 1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "governor-tripping-speed",
+   "source_publisher": "California Department of Industrial Relations (Title 8, Elevator Safety Orders)",
+   "source_title": "Cal. Code Regs. tit. 8, sec. 3036 Governors, Table No. 3036 B (Maximum Speeds in Feet-Per-Minute At Which Governor Trips and Governor Overspeed Switch Operates)",
+   "source_edition_or_year": "Title 8 sec. 3036 as published at dir.ca.gov/title8/3036.html (accessed 2026-10-03)",
+   "source_section_or_page": "Table No. 3036 B row 'Rated Speed 1500 ... Max Governor Trip Speed 1800 ... Max Speed at Which Governor Overspeed Switch Operates, Down 1710'; 3036(d)(4)(A)/(B): switch opens at not more than 90 percent of trip up to and including 500 fpm, 95 percent above 500 fpm. Tile switch_max_fpm = trip x 95% = 1710; the table prints whole fpm (and its trip column is itself rounded, e.g. 568 x 0.9 = 511.2 printed 512), so abs 1 fpm covers the printed rounding. Electrical trip entered at the tabled switch speed; mechanical trip and code maximum both at the tabled maximum trip.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "rated_speed_fpm": 1500,
+    "electrical_trip_fpm": 1710,
+    "mechanical_trip_fpm": 1800,
+    "code_minimum_pct": 115,
+    "code_maximum_fpm": 1800,
+    "switch_limit_pct": 0
+   },
+   "outputs": {
+    "switch_max_fpm": {
+     "value": 1710,
+     "tolerance": {
+      "abs": 1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "gate-operator-duty-cycle",
+   "source_publisher": "FIRGELLI Automations",
+   "source_title": "Automated Gate Opener: How to Calculate the Force to Open a Heavy Gate (Robbie Dickson)",
+   "source_edition_or_year": "web technical guide, accessed 2026-10-03",
+   "source_section_or_page": "Inclined-driveway section, printed: 'Using our 400-pound gate example on a 5% grade (2.86 degrees): Friction component: 0.015 x 400 x cos(2.86 deg) = 5.99 pounds Gravity component: 400 x sin(2.86 deg) = 19.95 pounds Total continuous force: 25.94 pounds' (400 lb gate, mu = 0.015). Tile omits the cos(theta) on the rolling term (6.00 vs 5.99) and uses sin(atan(grade)) rather than the rounded angle, so it reads 19.975 / 25.975; pct 0.5 covers the printed rounding (max 0.22%). Duty inputs (24 ft, 1 ft/s, 150 cycles, 10 h, 400 lb rating) are not in the source and do not enter the force outputs.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "gate_weight_lb": 400,
+    "rolling_coefficient": 0.015,
+    "grade_pct": 5,
+    "gate_length_ft": 24,
+    "operator_speed_fps": 1,
+    "cycles_per_day": 150,
+    "operating_hours": 10,
+    "operator_rated_force_lb": 400,
+    "intermittent_duty_limit_pct": 10
+   },
+   "outputs": {
+    "grade_force_lb": {
+     "value": 19.95,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "total_force_lb": {
+     "value": 25.94,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "gate-operator-duty-cycle",
+   "source_publisher": "FIRGELLI Automations",
+   "source_title": "Automated Gate Opener: How to Calculate the Force to Open a Heavy Gate (Robbie Dickson)",
+   "source_edition_or_year": "web technical guide, accessed 2026-10-03",
+   "source_section_or_page": "Inclined-driveway section, printed: 'On a 10% grade (5.71 degrees), the gravity component increases to 39.8 pounds, with total force reaching 45.7 pounds' (400 lb gate, mu = 0.015). Tile omits the cos(theta) on the rolling term (6.00 vs 5.99) and uses sin(atan(grade)) rather than the rounded angle, so it reads 39.80 / 45.80; pct 0.5 covers the printed rounding (max 0.22%). Duty inputs (24 ft, 1 ft/s, 150 cycles, 10 h, 400 lb rating) are not in the source and do not enter the force outputs.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "gate_weight_lb": 400,
+    "rolling_coefficient": 0.015,
+    "grade_pct": 10,
+    "gate_length_ft": 24,
+    "operator_speed_fps": 1,
+    "cycles_per_day": 150,
+    "operating_hours": 10,
+    "operator_rated_force_lb": 400,
+    "intermittent_duty_limit_pct": 10
+   },
+   "outputs": {
+    "grade_force_lb": {
+     "value": 39.8,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "total_force_lb": {
+     "value": 45.7,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "key-cut-macs-check",
+   "source_publisher": "Mr. Locksmith (reproducing the Allegion/Schlage MACS FAQ)",
+   "source_title": "Maximum Adjacent Cut Specification -- 'What are the MACS values for Schlage and Falcon keys?'",
+   "source_edition_or_year": "web FAQ, accessed 2026-10-03 (mrlocksmith.com/maximum-adjacent-cut-specification/)",
+   "source_section_or_page": "Printed: 'For Schlage Conventional and Full Size keyways, the MACS is 7. Violators of this rule would be bittings with the following adjacent pairs: 0 and 8, 0 and 9, 1 and 9.' The adjacent pair 0-8 is entered as a 2-position key (pin_count 2) on the 0-9 depth range; the source prints it as a violator, i.e. one failing pair. Exact integer comparison, abs 1e-9.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "depth_1": 0,
+    "depth_2": 8,
+    "depth_3": 0,
+    "depth_4": 0,
+    "depth_5": 0,
+    "depth_6": 0,
+    "macs": 7,
+    "min_depth": 0,
+    "max_depth": 9,
+    "pin_count": 2
+   },
+   "outputs": {
+    "failing_pairs": {
+     "value": 1,
+     "tolerance": {
+      "abs": 1e-09
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "key-cut-macs-check",
+   "source_publisher": "Mr. Locksmith (reproducing the Allegion/Schlage MACS FAQ)",
+   "source_title": "Maximum Adjacent Cut Specification -- 'What are the MACS values for Schlage and Falcon keys?'",
+   "source_edition_or_year": "web FAQ, accessed 2026-10-03 (mrlocksmith.com/maximum-adjacent-cut-specification/)",
+   "source_section_or_page": "Printed: 'For Schlage Conventional and Full Size keyways, the MACS is 7. Violators of this rule would be bittings with the following adjacent pairs: 0 and 8, 0 and 9, 1 and 9.' The adjacent pair 1-9 is entered as a 2-position key (pin_count 2) on the 0-9 depth range; the source prints it as a violator, i.e. one failing pair. Exact integer comparison, abs 1e-9.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "depth_1": 1,
+    "depth_2": 9,
+    "depth_3": 0,
+    "depth_4": 0,
+    "depth_5": 0,
+    "depth_6": 0,
+    "macs": 7,
+    "min_depth": 0,
+    "max_depth": 9,
+    "pin_count": 2
+   },
+   "outputs": {
+    "failing_pairs": {
+     "value": 1,
+     "tolerance": {
+      "abs": 1e-09
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "key-cut-macs-check",
+   "source_publisher": "Mr. Locksmith (reproducing the Allegion/Schlage MACS FAQ)",
+   "source_title": "Maximum Adjacent Cut Specification -- 'What are the MACS values for Schlage and Falcon keys?'",
+   "source_edition_or_year": "web FAQ, accessed 2026-10-03 (mrlocksmith.com/maximum-adjacent-cut-specification/)",
+   "source_section_or_page": "Printed: 'For most Falcon Conventional keyways, the MACS is 5. Violators of this rule would be bittings with the following adjacent pairs: ... 2 and 8, 2 and 9, and 3 and 9.' The adjacent pair 3-9 is entered as a 2-position key (pin_count 2) on the 0-9 depth range; the source prints it as a violator, i.e. one failing pair. Exact integer comparison, abs 1e-9.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "depth_1": 3,
+    "depth_2": 9,
+    "depth_3": 0,
+    "depth_4": 0,
+    "depth_5": 0,
+    "depth_6": 0,
+    "macs": 5,
+    "min_depth": 0,
+    "max_depth": 9,
+    "pin_count": 2
+   },
+   "outputs": {
+    "failing_pairs": {
+     "value": 1,
+     "tolerance": {
+      "abs": 1e-09
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "cwr-neutral-temperature",
+   "source_publisher": "U.S. Patent and Trademark Office (US 10,753,654 B2)",
+   "source_title": "Rail cooling system and method for reducing thermal expansion",
+   "source_edition_or_year": "Issued August 25, 2020",
+   "source_section_or_page": "Detailed description (Google Patents text): 'Stress=0.0000065 in/in x 30,000,000 psi x dT F' (195 psi per F) ... 'a 136 lb. section of steel rail with a cross-sectional area of 0.0929 ft.2 (13.3776 in.2) and with a temperature change of 60 F.' ... 'Force=13.3776 in.2 x 195 psi/F x 60 F=156,518 lbs.' Entered as neutral 60 F, air 120 F, sun adder 0 so the differential is the printed 60 F. Tile gives 156,517.92 lb; abs 1 covers the source's rounding to whole pounds.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "rail_area_in2": 13.3776,
+    "modulus_psi": 30000000,
+    "alpha_per_degf": 6.5e-06,
+    "neutral_temp_f": 60,
+    "air_temp_f": 120,
+    "sun_adder_f": 0
+   },
+   "outputs": {
+    "force_per_rail_lb": {
+     "value": 156518,
+     "tolerance": {
+      "abs": 1
+     }
+    },
+    "differential_f": {
+     "value": 60,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "dust-deflagration-vent-area",
+   "source_publisher": "National Fire Protection Association",
+   "source_title": "NFPA 68, Standard on Explosion Protection by Deflagration Venting, Annex A.8.5 example problem",
+   "source_edition_or_year": "2007 Edition",
+   "source_section_or_page": "A.8.5, Example problem (Figure A.8.5(b)), steps (3)-(4): V = 25 m3, enclosure L/D = 4, Pstat = 0.25 bar-g, KSt = 200 bar-m/s, Pmax = 8 bar, assumed Pred = 1 bar-g; Eq. 8.2.2 'Av0 = 0.735 m2'; Eq. 8.2.3 'Av1 = 1.02 m2'. Entered in the tile's units: 25 m3 = 882.87 cu ft, 1 bar = 14.504 psig, 0.25 bar = 3.6259 psig; comparison strength 30 psig and available area 1 sq ft are fillers that do not feed vent_area_sqft. Printed 1.02 m2 = 10.979 sq ft; tile 11.000 sq ft (1.0219 m2), pct 0.6 covers the printed rounding to 0.01 m2 (0.5%) plus input rounding.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "volume_cuft": 882.87,
+    "kst_bar_m_s": 200,
+    "pmax_bar": 8,
+    "p_red_psig": 14.504,
+    "p_stat_psig": 3.6259,
+    "length_to_diameter": 4,
+    "stronger_p_red_psig": 30,
+    "available_vent_area_sqft": 1
+   },
+   "outputs": {
+    "vent_area_sqft": {
+     "value": 10.979,
+     "tolerance": {
+      "pct": 0.6
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "dust-deflagration-vent-area",
+   "source_publisher": "National Fire Protection Association",
+   "source_title": "NFPA 68, Standard on Explosion Protection by Deflagration Venting, Annex A.8.5 example problem",
+   "source_edition_or_year": "2007 Edition",
+   "source_section_or_page": "A.8.5, Example problem step (3), Eq. 8.2.2 before the elongation correction: V = 25 m3, Pstat = 0.25 bar-g, KSt = 200, Pmax = 8 bar, Pred = 1 bar-g, 'Av0 = 0.735 m2' (= 7.9115 sq ft). Entered with L/D = 2 so the tile applies no elongation factor and returns Av0 directly. Tile 7.9124 sq ft (0.73509 m2); pct 0.3 covers the printed rounding to 0.001 m2 plus input rounding.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "volume_cuft": 882.87,
+    "kst_bar_m_s": 200,
+    "pmax_bar": 8,
+    "p_red_psig": 14.504,
+    "p_stat_psig": 3.6259,
+    "length_to_diameter": 2,
+    "stronger_p_red_psig": 30,
+    "available_vent_area_sqft": 1
+   },
+   "outputs": {
+    "vent_area_sqft": {
+     "value": 7.9115,
+     "tolerance": {
+      "pct": 0.3
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "dust-deflagration-vent-area",
+   "source_publisher": "National Fire Protection Association",
+   "source_title": "NFPA 68, Standard on Explosion Protection by Deflagration Venting, Annex A.8.3 Process Equipment Example (spray dryer)",
+   "source_edition_or_year": "2007 Edition",
+   "source_section_or_page": "A.8.3 Process Equipment Example, Step 1: 'A 100 m3 spray dryer with a length/diameter ratio of 1.8', 'Pmax of 10 bar and a KSt of 100 bar-m/sec', 'Pred of 0.50 bar and a Pstat = 0.10 bar'; Using Equation 8.2.2 'Av0 = 1.48 m2' (= 15.931 sq ft). Entered as 3531.5 cu ft, 7.252 psig, 1.4504 psig; L/D 1.8 so no elongation. Tile 15.898 sq ft (1.4769 m2); pct 0.5 covers the printed rounding to 0.01 m2 (0.34%). Step 2's partial-volume reduction to 1.16 m2 is not modeled by the tile and is not asserted.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "volume_cuft": 3531.5,
+    "kst_bar_m_s": 100,
+    "pmax_bar": 10,
+    "p_red_psig": 7.252,
+    "p_stat_psig": 1.4504,
+    "length_to_diameter": 1.8,
+    "stronger_p_red_psig": 30,
+    "available_vent_area_sqft": 1
+   },
+   "outputs": {
+    "vent_area_sqft": {
+     "value": 15.931,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "mine-face-ventilation",
+   "source_publisher": "U.S. Department of Labor, Mine Safety and Health Administration",
+   "source_title": "Controlling Respirable Coal Mine Dust in Underground Coal Mines, Workshop Materials: Ventilation -- A principal control for dust as well as methane (Vent3)",
+   "source_edition_or_year": "2007 (PDF created November 13, 2009)",
+   "source_section_or_page": "Mean entry air velocity slide: 'Ave Height = (6+8.5+6.5)/ 3 = 7 ft.', width '(5 + 6.5 + 5.5) / 3 = 16.5 ft', 'Area = H x W = 7 x 16.5 = 115.5 sq ft', 'MEAV = 8,000 cfm / 115.5 sq ft = 69.26 ft/min'. The 8,000 cfm is the measured quantity, so it is entered as fan airflow at 100% tubing efficiency; diesel units 0 (per-machine rate 1 cfm is a filler required to be positive). abs 0.01 covers the printed two decimals.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "heading_width_ft": 16.5,
+    "heading_height_ft": 7,
+    "fan_airflow_cfm": 8000,
+    "tubing_efficiency_pct": 100,
+    "diesel_units": 0,
+    "diesel_cfm_each": 1,
+    "min_face_velocity_fpm": 60
+   },
+   "outputs": {
+    "heading_area_sqft": {
+     "value": 115.5,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "face_velocity_fpm": {
+     "value": 69.26,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "hdd-annular-pressure",
+   "source_publisher": "The Driller (BNP Media)",
+   "source_title": "Hydrostatic Pressure: Both a Friend and Foe for Drillers (Mario Brunet)",
+   "source_edition_or_year": "September 13, 2021",
+   "source_section_or_page": "Horizontal application: 'mud weight x 0.052 x depth = psi', '8.5 lbs./gallon x 0.052 x 30 feet = 13.26 psi'. Only the hydrostatic term is asserted; soil weight, cohesion, shallow station, friction 0 and FS are fillers that do not feed hydrostatic_psi. Tile 13.26 psi; abs 0.005 covers the printed two decimals.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "cover_depth_ft": 30,
+    "shallow_cover_ft": 8,
+    "soil_unit_weight_pcf": 120,
+    "soil_cohesion_psf": 0,
+    "fluid_density_ppg": 8.5,
+    "annular_friction_psi": 0,
+    "required_fs": 1.5
+   },
+   "outputs": {
+    "hydrostatic_psi": {
+     "value": 13.26,
+     "tolerance": {
+      "abs": 0.005
+     }
+    },
+    "annular_pressure_psi": {
+     "value": 13.26,
+     "tolerance": {
+      "abs": 0.005
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "hdd-annular-pressure",
+   "source_publisher": "The Driller (BNP Media)",
+   "source_title": "Hydrostatic Pressure: Both a Friend and Foe for Drillers (Mario Brunet)",
+   "source_edition_or_year": "September 13, 2021",
+   "source_section_or_page": "High-density fluid, horizontal scenario at the same 30 ft: a '19 lbs./gallon' fluid 'produces 29.64 psi' (19 x 0.052 x 30). Only the hydrostatic term is asserted; other inputs are fillers. abs 0.005 covers the printed two decimals.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "cover_depth_ft": 30,
+    "shallow_cover_ft": 8,
+    "soil_unit_weight_pcf": 120,
+    "soil_cohesion_psf": 0,
+    "fluid_density_ppg": 19,
+    "annular_friction_psi": 0,
+    "required_fs": 1.5
+   },
+   "outputs": {
+    "hydrostatic_psi": {
+     "value": 29.64,
+     "tolerance": {
+      "abs": 0.005
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "sawmill-residue-yield",
+   "source_publisher": "USDA Forest Service, Northeastern Area State and Private Forestry",
+   "source_title": "Thin Kerf Sawing: A Technology Worth Adopting (Stephen M. Bratkovich)",
+   "source_edition_or_year": "mid-1990s web publication (na.fs.fed.us/spfo/pubs/forestprod/thinkerf/kerf.htm, printed 8/27/04)",
+   "source_section_or_page": "'in cutting a board that is 1.125 inches thick with a saw kerf of 0.300, the total wood usage per pass is 1.425 inches. Calculating the saw kerf as a percentage of the total wood usage per pass results in 21% of the wood removed as sawdust' and 'A band saw with a kerf of 0.140 inch would result in an increase in lumber recovery of about 10%.' Tile: sawdust share 21.05% (abs 0.5 covers the whole-percent print); gain_pts 9.98 points of the wood cut (0.300/1.425 - 0.140/1.265), abs 0.5 covers 'about 10%' read as points of the wood removed. Recovery 50% ('a typical circular sawmill converts 50% of the log'), bark 0, alt thickness 2 in and annual MBF are fillers.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "lumber_recovery_pct": 50,
+    "kerf_in": 0.3,
+    "target_kerf_in": 0.14,
+    "board_thickness_in": 1.125,
+    "alt_board_thickness_in": 2,
+    "bark_fraction_pct": 0,
+    "annual_lumber_mbf": 1000
+   },
+   "outputs": {
+    "sawdust_share_pct": {
+     "value": 21,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "gain_pts": {
+     "value": 10,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "vibration-forcing-frequencies",
+   "source_publisher": "Vibromera",
+   "source_title": "Vane Passing Frequency: Pump Blade Diagnostics Guide (glossary), https://vibromera.eu/glossary/vane-passing-frequency/",
+   "source_edition_or_year": "web glossary, read 2026-10-03",
+   "source_section_or_page": "'Worked examples': 'Large process pump: 7 vanes at 1750 RPM -> VPF = 7 x 1750 / 60 = 204 Hz'. Tile gives 204.17 Hz; printed value is rounded to the whole Hz, so abs 0.5 covers the rounding.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "rpm": 1750,
+    "blade_count": 7,
+    "gear_tooth_count": 0,
+    "belt_length_in": 0,
+    "sheave_diameter_in": 0,
+    "line_frequency_hz": 60,
+    "rotor_bar_count": 0
+   },
+   "outputs": {
+    "blade_pass_hz": {
+     "value": 204,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "vibration-forcing-frequencies",
+   "source_publisher": "Vibromera",
+   "source_title": "Vane Passing Frequency: Pump Blade Diagnostics Guide (glossary), https://vibromera.eu/glossary/vane-passing-frequency/",
+   "source_edition_or_year": "web glossary, read 2026-10-03",
+   "source_section_or_page": "'Worked examples': 'Small pump: 5 vanes at 3500 RPM -> VPF = 5 x 3500 / 60 = 292 Hz'. Tile gives 291.67 Hz; printed value is rounded to the whole Hz, so abs 0.5 covers the rounding.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "rpm": 3500,
+    "blade_count": 5,
+    "gear_tooth_count": 0,
+    "belt_length_in": 0,
+    "sheave_diameter_in": 0,
+    "line_frequency_hz": 60,
+    "rotor_bar_count": 0
+   },
+   "outputs": {
+    "blade_pass_hz": {
+     "value": 292,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "conductor-creep-elongation",
+   "source_publisher": "Power Line Systems",
+   "source_title": "Elevated Temperature Creep of AAC, AAAC, ACAR, AACSR, & ACSR Conductors (technote), https://www.powline.com/technotes/Elevated_Temperature_Creep.pdf",
+   "source_edition_or_year": "2020",
+   "source_section_or_page": "p. 5, eq. A.16, first example (795 kcmil AAC Arbutus, 800 ft ruling span, 5644 lbf, installed at 16 C): 'dT1 = (981.25-475.29)/23 = 22.00 C' with 'The value of alpha for the cable in this example is 23.0*10-6' (per C). Entered as creep_strain 5.0596e-4 and alpha 23.0e-6/1.8 per F; the printed 22.00 C is 39.60 F. Tile gives 39.597 F (21.998 C); abs 0.05 F covers the printed 0.01 C rounding (0.018 F). Only the equivalent rise is asserted: weight 0.7462 lb/ft and modulus 8.6e6 psi are catalog-typical entries the technote does not print and they do not enter this output.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "creep_strain": 0.00050596,
+    "alpha_per_f": 1.27777778e-05,
+    "span_ft": 800,
+    "area_in2": 0.62434,
+    "weight_lb_per_ft": 0.7462,
+    "modulus_psi": 8600000,
+    "tension1_lb": 5644,
+    "design_temp_f": 60.8
+   },
+   "outputs": {
+    "equivalent_temp_rise_f": {
+     "value": 39.6,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "conductor-creep-elongation",
+   "source_publisher": "Power Line Systems",
+   "source_title": "Elevated Temperature Creep of AAC, AAAC, ACAR, AACSR, & ACSR Conductors (technote), https://www.powline.com/technotes/Elevated_Temperature_Creep.pdf",
+   "source_edition_or_year": "2020",
+   "source_section_or_page": "p. 5, eq. A.16, first example: 'dT3 = (1046.11-475.29)/23 = 24.82 C', alpha 23.0e-6 per C. Entered as creep_strain 5.7082e-4 and alpha 23.0e-6/1.8 per F; the printed 24.82 C is 44.676 F. Tile gives 44.673 F (24.818 C); abs 0.05 F covers the printed 0.01 C rounding. Weight and modulus are catalog-typical entries not printed and not in this output.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "creep_strain": 0.00057082,
+    "alpha_per_f": 1.27777778e-05,
+    "span_ft": 800,
+    "area_in2": 0.62434,
+    "weight_lb_per_ft": 0.7462,
+    "modulus_psi": 8600000,
+    "tension1_lb": 5644,
+    "design_temp_f": 60.8
+   },
+   "outputs": {
+    "equivalent_temp_rise_f": {
+     "value": 44.676,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "standing-seam-takeoff",
+   "source_publisher": "Mid-Michigan Metal Sales",
+   "source_title": "Calculating Materials For Your New Metal Roof (FAQ), https://www.midmichiganmetalsales.com/faq/calculating-materials-for-your-new-metal-roof/",
+   "source_edition_or_year": "web FAQ, read 2026-10-03",
+   "source_section_or_page": "Step 3 example: 'The ridge ... is 60 feet long. If you were calculating for the Hardy rib panel you would divide that number by 3 ... That would give you 20 panels per side' (3 ft coverage panel); same page: 'if you measure 14 ft from the Drip Edge to the Ridge Cap that would give you the panel length'. Panel count is the coverage division the tile performs; the source panel is an exposed-fastener rib panel, so only panel_count and panel_length_ft are asserted. Clip spacing 24 in is the page's 'most common screw pattern ... 24 inch on center' and is not asserted. Exact integers, abs 0.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "building_width_ft": 60,
+    "run_length_ft": 14,
+    "coverage_width_in": 36,
+    "sheet_width_in": 0,
+    "field_clip_spacing_in": 24,
+    "perimeter_clip_spacing_in": 0,
+    "perimeter_panels": 0,
+    "fasteners_per_clip": 1,
+    "eave_ridge_allowance_in": 0,
+    "waste_pct": 0
+   },
+   "outputs": {
+    "panel_count": {
+     "value": 20,
+     "tolerance": {
+      "abs": 0
+     }
+    },
+    "panel_length_ft": {
+     "value": 14,
+     "tolerance": {
+      "abs": 0
+     }
+    }
+   }
   }
  ]
 }

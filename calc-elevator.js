@@ -650,8 +650,12 @@ export function computeGovernorTrippingSpeed({ rated_speed_fpm = 0, electrical_t
   const switch_limit_used_pct = switch_limit_pct > 0 ? switch_limit_pct : rated_speed_fpm <= 150 ? 100 : rated_speed_fpm <= 500 ? 90 : 95;
   const switch_max_fpm = mechanical_trip_fpm * switch_limit_used_pct / 100;
   const switch_pct_of_trip = electrical_trip_fpm / mechanical_trip_fpm * 100;
-  const switch_ok = electrical_trip_fpm <= switch_max_fpm * (1 + 1e-9);
-  const ordering_ok = electrical_trip_fpm < mechanical_trip_fpm;
+  // Half-fpm margin: the published tables (Cal. Title 8 3036 B) round the switch setting to a whole fpm,
+  // sometimes up -- 407 at 350 fpm against a 406.8 limit -- and their own rows read TOO CLOSE without it.
+  const switch_ok = electrical_trip_fpm <= switch_max_fpm + 0.5;
+  // Where the switch may be set at up to 100% (150 fpm and under, or a speed-reducing switch), equal
+  // settings are allowed ("not more than 100 percent"); the table row 150 / 210 / 210 read INVERTED.
+  const ordering_ok = switch_limit_used_pct >= 100 ? electrical_trip_fpm <= mechanical_trip_fpm : electrical_trip_fpm < mechanical_trip_fpm;
   const headroom_fpm = code_maximum_fpm - mechanical_trip_fpm;
   const impact_speed_fps = mechanical_trip_fpm / 60;
   const implied_buffer_stroke_in = impact_speed_fps * impact_speed_fps / (2 * _G_FPS2) * 12;
