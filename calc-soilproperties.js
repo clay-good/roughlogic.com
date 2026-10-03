@@ -36,7 +36,8 @@ export function computeRelativeCompaction({ wet_pcf = 0, w_pct = 0, max_pcf = 0,
   if (!(spec_pct > 0)) return { error: "The required relative compaction must be positive (%)." };
   const gd_field = wet_pcf / (1 + w_pct / 100);
   const rc_pct = (gd_field / max_pcf) * 100;
-  const pass = rc_pct >= spec_pct;
+  // 1e-9: 133.0 pcf at 12% on a 125 Proctor is exactly 95%, and read 94.99999999999999 -- FAIL.
+  const pass = rc_pct >= spec_pct * (1 - 1e-9);
   return {
     gd_field, rc_pct, pass,
     note: "Relative compaction RC = (gamma_d,field / gamma_d,max) x 100, with the field dry density backed out of the measured wet density and moisture, gamma_d,field = gamma_wet / (1 + w). The Proctor maximum is from ASTM D698 (standard) or D1557 (modified), and typical specs run 90-95% (structural fill often 95%, pavement subgrade higher). The moisture reading is as important as the density - the same wet density fails when the extra water is not soil, which is why over-wet fill is rejected. Enter the Proctor maximum (it depends on the standard vs modified test and the soil); it does not compute the optimum-moisture window, the one-point Proctor, or the cohesionless relative density Dr. A QC aid; the project geotechnical specification and the testing agency govern.",

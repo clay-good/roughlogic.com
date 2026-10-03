@@ -1036,7 +1036,7 @@ GEOTECH_RENDERERS["frost-depth-berggren"] = _simpleRenderer({
   citation: "Citation: Stefan / modified-Berggren frost penetration (US Army Corps / FHWA), by name. Stefan X = sqrt(48 kf FI / L); L = 144 x dry density x water content/100 (latent heat of fusion); modified Berggren X_MB = lambda x X_Stefan, lambda ~0.6-0.9 from the Berggren nomograph. Computes the physics, not the code frost line -- the locally adopted frost depth (IRC Table R301.2 / amendment), the geotech report, and the AHJ govern the footing depth.",
   example: frostDepthBerggrenExample.inputs,
   fields: [
-    { key: "freezing_index_f_days", label: "Air-freezing index (F-days)", kind: "number" },
+    { key: "freezing_index_f_days", label: "Surface freezing index nF = n-factor x air-freezing index (F-days; TM 5-852-6)", kind: "number" },
     { key: "frozen_conductivity_btu", label: "Frozen conductivity kf (BTU/hr-ft-F)", kind: "number" },
     { key: "dry_density_pcf", label: "Dry density (pcf)", kind: "number" },
     { key: "water_content_pct", label: "Water content (percent)", kind: "number" },

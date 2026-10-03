@@ -3785,13 +3785,18 @@ export function computeMuaTemperingLoad({ cfm = 0, t_oa_F = 0, t_target_F = 0, e
   if (!(eta > 0 && eta <= 1)) return { error: "Thermal efficiency must be over 0 and up to 1." };
   if (w_oa_gr < 0 || w_target_gr < 0) return { error: "Humidity ratios must be non-negative (gr/lb)." };
   const dT_F = t_target_F - t_oa_F;
-  const Q_s_btuh = 1.08 * cfm * dT_F;
+  // A target BELOW the outdoor air is a cooling MUA: the sensible and the dehumidifying latent are
+  // both heat REMOVED and add. Until 2026-10-02 the signed sensible (negative) cancelled the latent:
+  // 2,000 cfm 95 -> 55 F, 120 -> 65 gr/lb read -11,600 Btu/h total instead of 161,200.
+  const cooling = dT_F < 0;
+  const Q_s_btuh = 1.08 * cfm * Math.abs(dT_F);
   const Q_l_btuh = 0.68 * cfm * (w_oa_gr - w_target_gr);
   const Q_t_btuh = Q_s_btuh + Q_l_btuh;
-  const input_btuh = Q_s_btuh / eta;
+  const input_btuh = cooling ? 0 : Q_s_btuh / eta;
   return {
     dT_F, Q_s_btuh, Q_l_btuh, Q_t_btuh, input_btuh,
-    note: "ASHRAE Fundamentals psychrometric loads at sea level: sensible Q_s = 1.08 x CFM x dT, latent Q_l = 0.68 x CFM x dW (gr/lb), total Q_t = Q_s + Q_l; the gas/heater input is the sensible load over the thermal efficiency. IMC 508 requires makeup air roughly equal to the exhaust. Leave both humidity ratios at zero for a heating-only MUA (latent = 0). Sea-level air density (no altitude derate), makeup CFM equal to the exhaust, delivery at the target temperature; duct and cabinet losses, fan heat, and hood capture efficiency excluded. A design aid, not the mechanical engineer's stamped design.",
+    mode: cooling ? "cooling: size the coil for the total; there is no burner input" : "heating",
+    note: (cooling ? "COOLING MUA: the target is below the outdoor air, so the sensible and latent loads are heat removed and the total is the coil load; the burner input is zero. " : "") + "ASHRAE Fundamentals psychrometric loads at sea level: sensible Q_s = 1.08 x CFM x dT, latent Q_l = 0.68 x CFM x dW (gr/lb), total Q_t = Q_s + Q_l; the gas/heater input is the sensible load over the thermal efficiency. IMC 508 requires makeup air roughly equal to the exhaust. Leave both humidity ratios at zero for a heating-only MUA (latent = 0). Sea-level air density (no altitude derate), makeup CFM equal to the exhaust, delivery at the target temperature; duct and cabinet losses, fan heat, and hood capture efficiency excluded. A design aid, not the mechanical engineer's stamped design.",
   };
 }
 export const muaTemperingLoadExample = { inputs: { cfm: 2000, t_oa_F: 20, t_target_F: 65, eta: 0.80 } };

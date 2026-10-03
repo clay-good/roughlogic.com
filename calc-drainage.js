@@ -280,18 +280,21 @@ export function computeOverflowScupperSizing({ length_in = 0, head_in = 0 } = {}
   const q_cfs_contracted = 3.33 * effL * Math.pow(H, 1.5);
   return {
     q_cfs, q_cfs_contracted, q_gpm: q_cfs * (60 * 1728 / 231), q_gpm_contracted: q_cfs_contracted * (60 * 1728 / 231),
-    note: "Overflow scupper capacity as a rectangular (Francis) weir: Q = 3.33 L H^1.5 (cfs, L and H in feet), or the contracted form 3.33 (L - 0.2 H) H^1.5 for a scupper narrower than the wall. The head H is measured above the scupper invert at the design (blocked-primary) condition, and the overflow scuppers or drains must pass the design rainfall with the primary system assumed plugged (IPC 1108 / FM Global). Round the width up and keep the parapet high enough for the head. A design aid; the plumbing code and the structural roof-loading check govern.",
+    note: "Overflow scupper capacity as a rectangular (Francis) weir: Q = 3.33 L H^1.5 (cfs, L and H in feet), or the contracted form 3.33 (L - 0.2 H) H^1.5 for a scupper narrower than the wall. The IPC sizing figure uses the contracted form (Figure 1106.5, 2015 IPC basis) and measures the head H above the scupper invert 6 ft back from the opening, at the design (blocked-primary) condition; the overflow scuppers or drains must pass the design rainfall with the primary system assumed plugged (IPC 1108 / FM Global). Round the width up and keep the parapet high enough for the head. A design aid; the plumbing code and the structural roof-loading check govern.",
   };
 }
 export const overflowScupperSizingExample = { inputs: { length_in: 6, head_in: 3.5 } };
 function renderOverflowScupperSizing(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Overflow scupper as a rectangular weir Q = 3.33 L H^1.5 (cfs, feet), contracted 3.33 (L - 0.2 H) H^1.5 (IPC 1108 secondary drainage / FM Global). Head at the blocked-primary condition. A design aid; the plumbing code and roof-loading check govern.";
   const len = makeNumber("Scupper opening width (in)", "oss-len", { step: "any", min: "0" });
-  const head = makeNumber("Head above scupper invert (in)", "oss-head", { step: "any", min: "0" });
+  const head = makeNumber("Head above scupper invert, 6 ft back from the opening (in)", "oss-head", { step: "any", min: "0" });
   for (const f of [len, head]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { len.input.value = "6"; head.input.value = "3.5"; update(); });
-  const oQ = makeOutputLine(outputRegion, "Capacity (suppressed)", "oss-out-q");
-  const oC = makeOutputLine(outputRegion, "Capacity (contracted)", "oss-out-c");
+  // Contracted first: it is the only form the IPC prints (Figure 1106.5, 2015 base), and the
+  // suppressed figure reads 13% higher -- the unsafe side for an overflow scupper. Until
+  // 2026-10-02 the suppressed value was the headline.
+  const oC = makeOutputLine(outputRegion, "Capacity (contracted, the IPC Figure 1106.5 basis)", "oss-out-c");
+  const oQ = makeOutputLine(outputRegion, "Capacity (suppressed: only an opening spanning the full channel width)", "oss-out-q");
   const oNote = makeOutputLine(outputRegion, "Note", "oss-out-n");
   const update = debounce(() => {
     const r = computeOverflowScupperSizing({ length_in: Number(len.input.value) || 0, head_in: Number(head.input.value) || 0 });
@@ -324,7 +327,7 @@ export function computeScupperWidthForFlow({ required_gpm = 0, head_in = 0 } = {
   if (![q_cfs, width_suppressed_in, width_contracted_in].every(Number.isFinite)) return { error: "Scupper-width math is not a finite value." };
   return {
     q_cfs, width_suppressed_in, width_contracted_in,
-    note: "Scupper width for a required overflow flow as a rectangular (Francis) weir: L = Q / (3.33 H^1.5) for the suppressed (full-wall-width) case, or L = Q / (3.33 H^1.5) + 0.2 H for the contracted case (a scupper narrower than the wall, which needs the wider opening for the same flow). The head H is measured above the scupper invert at the design (blocked-primary) condition, and the overflow scuppers must pass the design rainfall with the primary system assumed plugged (IPC 1108 / FM Global). Round the width UP and keep the parapet high enough for the head; use the contracted width to be safe. A design aid; the plumbing code and the structural roof-loading check govern.",
+    note: "Scupper width for a required overflow flow as a rectangular (Francis) weir: L = Q / (3.33 H^1.5) for the suppressed (full-wall-width) case, or L = Q / (3.33 H^1.5) + 0.2 H for the contracted case (a scupper narrower than the wall, which needs the wider opening for the same flow). The IPC sizing figure uses the contracted form (Figure 1106.5, 2015 IPC basis) and measures the head H above the scupper invert 6 ft back from the opening, at the design (blocked-primary) condition; the overflow scuppers must pass the design rainfall with the primary system assumed plugged (IPC 1108 / FM Global). Round the width UP and keep the parapet high enough for the head; use the contracted width to be safe. A design aid; the plumbing code and the structural roof-loading check govern.",
   };
 }
 export const scupperWidthForFlowExample = { inputs: { required_gpm: 118, head_in: 3.5 } };

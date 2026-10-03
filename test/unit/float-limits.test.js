@@ -8,6 +8,8 @@ import { computeLuminaireSpacingMh } from "../../calc-elecdesign.js";
 import { computeDuctBankAmpacityDerate } from "../../calc-lineworker.js";
 import { computeLaundryWasherTurns } from "../../calc-steamplant.js";
 import { computeAirDryerSizing } from "../../calc-millwright.js";
+import { computeDuctLeakageCfm25 } from "../../calc-hvacservice.js";
+import { computeRelativeCompaction } from "../../calc-soilproperties.js";
 
 test("premix bags: a 6 x 6 ft, 4 in pad at 10% waste is exactly 22 bags of 0.60 cu ft, not 23", () => {
   assert.equal(computeConcretePremixBags({ length_ft: 6, width_ft: 6, thickness_in: 4, bag_yield_ft3: 0.6, waste_pct: 10 }).bags, 22);
@@ -31,4 +33,13 @@ test("washer turns: three 50 lb washers on a 45 min cycle make exactly 1,600 lb,
 
 test("air dryer: a 100 scfm nameplate at 0.70 x 0.80 delivers exactly the 56 scfm required", () => {
   assert.equal(computeAirDryerSizing({ actual_scfm: 56, temp_correction: 0.7, pressure_correction: 0.8, candidate_rated_scfm: 100 }).candidate_ok, true);
+});
+
+test("duct leakage: 64.2 CFM25 on 2,140 ft2 is exactly 3.0 per 100 ft2 and passes a limit of 3", () => {
+  assert.equal(computeDuctLeakageCfm25({ leakage_cfm25: 64.2, cfa_ft2: 2140, limit: 3 }).passes, true);
+  assert.equal(computeDuctLeakageCfm25({ leakage_cfm25: 64.3, cfa_ft2: 2140, limit: 3 }).passes, false);
+});
+
+test("relative compaction: 133.0 pcf wet at 12% on a 125 pcf Proctor is exactly 95% and passes a 95% spec", () => {
+  assert.equal(computeRelativeCompaction({ wet_pcf: 133, w_pct: 12, max_pcf: 125, spec_pct: 95 }).pass, true);
 });

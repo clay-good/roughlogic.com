@@ -602,7 +602,7 @@ export const BESPOKE_LABELS = {
   "outdoor-air-ventilation": {"Rp_cfm_per_person":"Rp (cfm per person)","Ra_cfm_per_ft2":"Ra (cfm per ft²)","people":"People (Pz)","floor_area_ft2":"Floor area (ft²; Az)","Ez":"Air-distribution effectiveness (E_z; default 1.0)"},
   "outdoor-reset-ratio": {"supply_design_f":"Design supply temp (F, at design OA)","supply_min_f":"Minimum supply temp (F, at no-heat OA)","oa_design_f":"Design outdoor temp (°F)","oa_noheat_f":"No-heat outdoor temp (°F)","oa_current_f":"Current outdoor temp (°F)"},
   "oval-tank-volume": {"width_in":"Width across the flats W (in)","height_in":"Height, rounded top to bottom H (in)","length_in":"Tank length L (in)","depth_in":"Liquid depth (dipstick, in)"},
-  "overflow-scupper-sizing": {"length_in":"Scupper opening width (in)","head_in":"Head above scupper invert (in)"},
+  "overflow-scupper-sizing": {"length_in":"Scupper opening width (in)","head_in":"Head above scupper invert, 6 ft back from the opening (in)"},
   "overhead-recovery-rate": {"annual_overhead":"Annual overhead ($)","basis":"Recovery basis","billable_hours":"Annual billable hours","annual_direct":"Annual direct cost ($)","job_direct":"Job direct cost ($, optional)"},
   "overtime": {"total_hours":"Total hours","regular_rate":"Regular rate ($/hr)","overtime_multiplier":"OT multiplier","double_time_multiplier":"Double-time multiplier","double_time_threshold_hr":"Double-time threshold (hr)"},
   "oxyfuel-cutting-gas": {"oxygen_cfh":"Cutting-oxygen flow (cfh)","fuel_cfh":"Preheat fuel-gas flow (cfh)","cut_length_in":"Total cut length (in)","cut_speed_ipm":"Travel speed (ipm)","oxygen_cyl_ft3":"Oxygen per cylinder (ft3)","fuel_cyl_ft3":"Fuel per cylinder (ft3)"},

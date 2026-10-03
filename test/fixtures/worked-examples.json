@@ -67872,7 +67872,7 @@
   {
    "tile_id": "boussinesq-surcharge-wall",
    "source_publisher": "NAVFAC DM-7.2 modified Boussinesq",
-   "source_title": "1,000 lb/ft line, 4 ft back from a 10 ft wall (m 0.4), z 3 ft (n 0.3) -> 97.4 psf",
+   "source_title": "1,000 lb/ft line, 4 ft back from a 10 ft wall (m 0.4), z 3 ft (n 0.3) -> 96.0 psf (0.20 qL/H, NAVFAC DM-7.02 Fig. 11)",
    "source_edition_or_year": "spec-v310 worked example (machine-verified)",
    "source_section_or_page": "spec-v310 section 2.1 pinned example",
    "verified_by": "rl",
@@ -148745,6 +148745,1147 @@
      "value": 233.1,
      "tolerance": {
       "abs": 0.06
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "compressor-displacement",
+   "source_publisher": "Copeland Corporation (Emerson Climate Technologies)",
+   "source_title": "Refrigeration & A/C Duty Compressors, Copelametic R12, R22, R502 (specification catalog; https://www.copeland-compressor.com/images/reciprocating-compressors.pdf)",
+   "source_edition_or_year": "Copelametic specification catalog (undated reprint)",
+   "source_section_or_page": "Specifications (Refrigerant-Cooled) table, row 6RA*-1000: 10 H.P., 6 cyls., Bore 2-1/2 in, Stroke 2 in, 'CFH @ 1750 R.P.M.' 3580 (= 59.67 CFM). Tile 59.655 CFM. 0.5% tolerance covers the catalog rounding CFH to whole numbers and nominal fractional bore/stroke.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "bore_in": 2.5,
+    "stroke_in": 2,
+    "cylinders": 6,
+    "rpm": 1750
+   },
+   "outputs": {
+    "displacement_cfm": {
+     "value": 59.667,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "compressor-displacement",
+   "source_publisher": "Copeland Corporation (Emerson Climate Technologies)",
+   "source_title": "Refrigeration & A/C Duty Compressors, Copelametic R12, R22, R502 (specification catalog; https://www.copeland-compressor.com/images/reciprocating-compressors.pdf)",
+   "source_edition_or_year": "Copelametic specification catalog (undated reprint)",
+   "source_section_or_page": "Specifications (Capacity Control Models) table, row 4RR1-3000: 30 H.P., 4 cyls., Bore 2-15/16 in, Stroke 2-3/16 in, 'CFH @ 1750 R.P.M.' 3603 (= 60.05 CFM). Tile 60.055 CFM. 0.5% tolerance covers catalog rounding and nominal fractional dimensions.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "bore_in": 2.9375,
+    "stroke_in": 2.1875,
+    "cylinders": 4,
+    "rpm": 1750
+   },
+   "outputs": {
+    "displacement_cfm": {
+     "value": 60.05,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "compressor-displacement",
+   "source_publisher": "Copeland Corporation (Emerson Climate Technologies)",
+   "source_title": "Refrigeration & A/C Duty Compressors, Copelametic R12, R22, R502 (specification catalog; https://www.copeland-compressor.com/images/reciprocating-compressors.pdf)",
+   "source_edition_or_year": "Copelametic specification catalog (undated reprint)",
+   "source_section_or_page": "Specifications (Refrigerant-Cooled) table, row 9RS*-0765: 7-1/2 H.P., 3 cyls., Bore 2-7/16 in, Stroke 2-1/2 in, 'CFH @ 1750 R.P.M.' 2120 (= 35.33 CFM). Tile 35.443 CFM (+0.31%). 0.6% tolerance covers the catalog's rounding of CFH and the nominal fractional bore/stroke (the 9RA/9RB rows read 0.3-0.35% the other way).",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "bore_in": 2.4375,
+    "stroke_in": 2.5,
+    "cylinders": 3,
+    "rpm": 1750
+   },
+   "outputs": {
+    "displacement_cfm": {
+     "value": 35.333,
+     "tolerance": {
+      "pct": 0.6
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "compressor-displacement",
+   "source_publisher": "Copeland Corporation (Emerson Climate Technologies)",
+   "source_title": "Refrigeration & A/C Duty Compressors, Copelametic R12, R22, R502 (specification catalog; https://www.copeland-compressor.com/images/reciprocating-compressors.pdf)",
+   "source_edition_or_year": "Copelametic specification catalog (undated reprint)",
+   "source_section_or_page": "Specifications (Refrigerant-Cooled) table, row MRA*-0500: 5 H.P., 2 cyls., Bore 2-1/2 in, Stroke 1-13/16 in, 'CFH @ 1750 R.P.M.' 1080 (= 18.00 CFM). Tile 18.021 CFM. 0.5% tolerance covers catalog rounding.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "bore_in": 2.5,
+    "stroke_in": 1.8125,
+    "cylinders": 2,
+    "rpm": 1750
+   },
+   "outputs": {
+    "displacement_cfm": {
+     "value": 18,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "walk-in-cooler-load",
+   "source_publisher": "Heatcraft Refrigeration Products",
+   "source_title": "Engineering Manual: Commercial Refrigeration Cooling and Freezing Load Calculations and Reference Guide, H-ENGM0408 (https://www.heatcraftrpd.com/dA/7cbd476a70/EM.pdf)",
+   "source_edition_or_year": "H-ENGM0408, April 2008",
+   "source_section_or_page": "p. 8, 'Example: 35\u00baF Beef Cooler' load form: 14 x 16 x 8 ft, 95 F ambient, 35 F room (60 F T.D.), 4 in styrene; walls+ceiling 704 ft^2 x 87 Btu/24h/ft^2 (Table 1, 4 in styrene at 60 F = 1.44 Btu/24h/ft^2/F, entered as U = 87/1440); floor 28000, air change 58007, motors 7500, lights 18368, product 11550 Btu/24 hrs (each entered /24 as Btu/hr; floor lumped into internal because the tile has one U); 'Total Refrigeration Load ... 184673', 'Add 10% Safety Factor', 'Divide by No. of Operating Hrs. (16) to obtain BTUH Cooling Requirement 12696'. Tile equipment_btuh 12696.27; abs 1 covers the form's whole-Btu rounding.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "u_factor": 0.0604166667,
+    "area_ft2": 704,
+    "delta_t_f": 60,
+    "infiltration_btuh": 2416.9583333,
+    "product_btuh": 481.25,
+    "internal_btuh": 2244.5,
+    "safety": 1.1,
+    "run_hours": 16
+   },
+   "outputs": {
+    "equipment_btuh": {
+     "value": 12696,
+     "tolerance": {
+      "abs": 1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "walk-in-cooler-load",
+   "source_publisher": "Heatcraft Refrigeration Products",
+   "source_title": "Engineering Manual: Commercial Refrigeration Cooling and Freezing Load Calculations and Reference Guide, H-ENGM0408 (https://www.heatcraftrpd.com/dA/7cbd476a70/EM.pdf)",
+   "source_edition_or_year": "H-ENGM0408, April 2008",
+   "source_section_or_page": "p. 7, 'Example: 35\u00baF Convenience Store Cooler With Glass Doors': 8 x 28 x 8 ft, 85 F ambient, 35 F room (50 F T.D.); walls+ceiling 800 ft^2 x 72 Btu/24h/ft^2 (Table 1 at 50 F, entered as U = 72/1200); floor 28000, air change 43331, motors 15000, lights 18368, glass doors 192000, product 92000 + 930 Btu/24 hrs (each /24 as Btu/hr; floor and glass doors lumped into internal); 'Total ... 447229', 'Total with Safety/Factor ... 491952', 'Divide by No. of Operating Hrs. (16) ... 30747'. Tile 30746.99; abs 1 covers the form's whole-Btu rounding.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "u_factor": 0.06,
+    "area_ft2": 800,
+    "delta_t_f": 50,
+    "infiltration_btuh": 1805.4583333,
+    "product_btuh": 3872.0833333,
+    "internal_btuh": 10557,
+    "safety": 1.1,
+    "run_hours": 16
+   },
+   "outputs": {
+    "equipment_btuh": {
+     "value": 30747,
+     "tolerance": {
+      "abs": 1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "product-pull-down-time",
+   "source_publisher": "Heatcraft Refrigeration Products",
+   "source_title": "Engineering Manual: Commercial Refrigeration Cooling and Freezing Load Calculations and Reference Guide, H-ENGM0408 (https://www.heatcraftrpd.com/dA/7cbd476a70/EM.pdf)",
+   "source_edition_or_year": "H-ENGM0408, April 2008",
+   "source_section_or_page": "p. 8, 'Example: 35\u00baF Beef Cooler', line 4 'Product Load: Sensible (Product Load Figured @ 24 hr. Pulldown*)': '1000 lbs./day x 0.77 Spec. Heat x 15 \u00baF. Temp Drop = 11550' (50 F entering to 35 F). Capacity entered as the 24-h rate 11550/24 so the printed 24 hr pulldown is the hours check; q_btu is the printed 11550 exactly.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "mass_lb": 1000,
+    "cp_above": 0.77,
+    "t_enter_f": 50,
+    "t_storage_f": 35,
+    "capacity_btuh": 481.25
+   },
+   "outputs": {
+    "q_btu": {
+     "value": 11550,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "hours": {
+     "value": 24,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "product-pull-down-time",
+   "source_publisher": "Heatcraft Refrigeration Products",
+   "source_title": "Engineering Manual: Commercial Refrigeration Cooling and Freezing Load Calculations and Reference Guide, H-ENGM0408 (https://www.heatcraftrpd.com/dA/7cbd476a70/EM.pdf)",
+   "source_edition_or_year": "H-ENGM0408, April 2008",
+   "source_section_or_page": "p. 11, 'Example: -10\u00baF Beef Freezer', line 4 '(Product Load Figured @ 24 hr. Pulldown*)': 3000 lbs./day beef entering 35 F, freezing point 28 F (7 F initial drop), final drop 38 F to -10 F: '3000 x 0.77 ... 16170', '3000 x Latent Heat Fusion 100 ... 300000', '3000 x 0.4 ... 38 ... 45600' (sum 361770 Btu). Capacity entered as 361770/24 so hours checks the printed 24 hr pulldown; q_btu abs 0.5 (exact sum of printed terms).",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "mass_lb": 3000,
+    "cp_above": 0.77,
+    "t_enter_f": 35,
+    "t_storage_f": -10,
+    "t_freeze_f": 28,
+    "hif_btu_lb": 100,
+    "cp_below": 0.4,
+    "capacity_btuh": 15073.75
+   },
+   "outputs": {
+    "q_btu": {
+     "value": 361770,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "hours": {
+     "value": 24,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "steam-trap-sizing",
+   "source_publisher": "Armstrong International",
+   "source_title": "Steam Conservation Guidelines for Condensate Drainage, Handbook P-101 (https://www.armstronginternational.com/wp-content/uploads/Broch_SteamConservationGuidelines_P101D_EN_20-20190501.pdf)",
+   "source_edition_or_year": "P-101D, 2019",
+   "source_section_or_page": "p. 27-28, Trap Selection for Unit Heaters and Air Handling Units: 'What size trap will drain a 3,500 CFM heater that produces an 80\u00b0F temperature rise? Steam pressure is constant at 60 psig ... 3,500 x 1.08 x 80 = 302,400 Btu/hr ... divide 302,400 Btu/hr by 904.5 Btu ... to obtain 334 lbs/hr and then multiply by the recommended safety factor 3 ... a 1,002 lbs/hr capacity.' Tile 334.33 / 1003.0; abs 0.5 / abs 2 cover Armstrong rounding the load to 334 before multiplying.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "heat_duty_btuhr": 302400,
+    "hfg_btulb": 904.5,
+    "safety_factor": 3
+   },
+   "outputs": {
+    "condensate_lbhr": {
+     "value": 334,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "req_capacity_lbhr": {
+     "value": 1002,
+     "tolerance": {
+      "abs": 2
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "steam-trap-sizing",
+   "source_publisher": "Armstrong International",
+   "source_title": "Steam Conservation Guidelines for Condensate Drainage, Handbook P-101 (https://www.armstronginternational.com/wp-content/uploads/Broch_SteamConservationGuidelines_P101D_EN_20-20190501.pdf)",
+   "source_edition_or_year": "P-101D, 2019",
+   "source_section_or_page": "p. 37, Jacketed Kettles: 'Select a trap for a 250-gallon kettle using 25 psig steam ... (Assume 3:1 safety factor.) Q = 250 gal x 0.98 x 0.95 x 110\u00b0F x 8.3 / (933 Btu/lb x 0.5 hr) = 212,500 / 466.5 = 455 lbs/hr ... multiply by a safety factor of 3 to get 1,365 lbs/hr'. Duty entered as 212,500 Btu / 0.5 hr = 425,000 Btu/hr. Tile 455.5 / 1366.6; abs 1 / abs 2 cover Armstrong's rounding to 455 before tripling.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "heat_duty_btuhr": 425000,
+    "hfg_btulb": 933,
+    "safety_factor": 3
+   },
+   "outputs": {
+    "condensate_lbhr": {
+     "value": 455,
+     "tolerance": {
+      "abs": 1
+     }
+    },
+    "req_capacity_lbhr": {
+     "value": 1365,
+     "tolerance": {
+      "abs": 2
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "steam-trap-sizing",
+   "source_publisher": "Armstrong International",
+   "source_title": "Steam Conservation Guidelines for Condensate Drainage, Handbook P-101 (https://www.armstronginternational.com/wp-content/uploads/Broch_SteamConservationGuidelines_P101D_EN_20-20190501.pdf)",
+   "source_edition_or_year": "P-101D, 2019",
+   "source_section_or_page": "p. 33, Embossed Coils example: 'Q = 20 x 175 x 252 = 882,000 Btu/hr ... Latent heat of steam at 125 psig = 867.6 ... 882,000 / 867.6 = 1,016 lbs condensate per hr' (safety factor applied afterward, not printed; entered as 1). Tile 1016.6; abs 1 covers rounding.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "heat_duty_btuhr": 882000,
+    "hfg_btulb": 867.6,
+    "safety_factor": 1
+   },
+   "outputs": {
+    "condensate_lbhr": {
+     "value": 1016,
+     "tolerance": {
+      "abs": 1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "steam-pipe-capacity",
+   "source_publisher": "Armstrong International",
+   "source_title": "Steam Conservation Guidelines for Condensate Drainage, Handbook P-101 (https://www.armstronginternational.com/wp-content/uploads/Broch_SteamConservationGuidelines_P101D_EN_20-20190501.pdf)",
+   "source_edition_or_year": "P-101D, 2019",
+   "source_section_or_page": "p. 52, Pipe Sizing - Use of Basic and Velocity Multiplier Charts, Example: 'Given a flow rate of 6,700 lb/hr, an initial steam pressure of 100 psig ... Nominal pipe size is 2-1/2 in. ... The velocity ... is about 13,000 fpm.' Specific volume 3.88 cu ft/lb at 100 psig from the same handbook's Steam Table (p. 5, Column 8). Tile capacity at 13,000 fpm in 2-1/2 in Sch 40 = 6,684 lb/hr (-0.24%). 2% tolerance covers the 'about 13,000 fpm' chart reading.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "nps": "2-1/2",
+    "spec_vol_ft3lb": 3.88,
+    "vel_ceiling_fpm": 13000
+   },
+   "outputs": {
+    "capacity_lbhr": {
+     "value": 6700,
+     "tolerance": {
+      "pct": 2
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "mua-tempering-load",
+   "source_publisher": "Armstrong International",
+   "source_title": "Steam Conservation Guidelines for Condensate Drainage, Handbook P-101 (https://www.armstronginternational.com/wp-content/uploads/Broch_SteamConservationGuidelines_P101D_EN_20-20190501.pdf)",
+   "source_edition_or_year": "P-101D, 2019",
+   "source_section_or_page": "p. 27-28, Trap Selection for Unit Heaters and Air Handling Units: '3,500 CFM heater that produces an 80\u00b0F temperature rise ... 3,500 x 1.08 x 80 = 302,400 Btu/hr', with the 1.08 derivation '60 CFH x .075 lbs of air/cu ft = 4.5 lbs of air/hr; 4.5 x 0.24 Btu/lb-\u00b0F = 1.08'. Only the 80 F rise is printed; entered as 0 F -> 80 F (sensible term depends only on the difference). Exact arithmetic, abs 1.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "cfm": 3500,
+    "t_oa_F": 0,
+    "t_target_F": 80,
+    "eta": 1
+   },
+   "outputs": {
+    "dT_F": {
+     "value": 80,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "Q_s_btuh": {
+     "value": 302400,
+     "tolerance": {
+      "abs": 1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "isolator-deflection",
+   "source_publisher": "Barry Controls (Hutchinson)",
+   "source_title": "Isolator Selection Guide / Barry Controls catalog, Design Examples (https://wp.optics.arizona.edu/optomech/wp-content/uploads/sites/53/2016/08/Barry-isolators-selection-guide.pdf; same example in All-State Industries' online Isolator Selection Guide)",
+   "source_edition_or_year": "Barry Controls catalog (undated)",
+   "source_section_or_page": "pp. 63-64, Design Examples, 'Example 1 - Vertical Vibration: A metal tumbling drum directly driven by a 1080 RPM motor ... The required isolation is 80%'; solution 'transmissibility = 0.20', 'fn of 7.35 Hz' and 'a Ds of approximately 0.18 inches'. Tile fn 7.348 Hz, deflection 0.1814 in; abs 0.01 covers the printed two-decimal rounding.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "equipment_rpm": 1080,
+    "target_efficiency": 80
+   },
+   "outputs": {
+    "fn_hz": {
+     "value": 7.35,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "deflection_in": {
+     "value": 0.18,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "duct-leakage-cfm25",
+   "source_publisher": "BNP Media (The ACHR News)",
+   "source_title": "Duct Dynasty: Residential Duct-leakage Testing (https://www.achrnews.com/articles/129855-duct-dynasty-residential-duct-leakage-testing)",
+   "source_edition_or_year": "The ACHR News article 129855",
+   "source_section_or_page": "Worked normalization: '72 CFM25 \u00f7 2,000 ft2 x 100 = 3.6 CFM25/100 ft2' (passes a 4 limit). Tile 3.6 (3.5999999999999996); abs 0.001.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "leakage_cfm25": 72,
+    "cfa_ft2": 2000,
+    "limit": 4
+   },
+   "outputs": {
+    "normalized": {
+     "value": 3.6,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "duct-leakage-cfm25",
+   "source_publisher": "JADE Learning",
+   "source_title": "Duct Leakage Tests (https://www.jadelearning.com/blog/duct-leakage-tests/)",
+   "source_edition_or_year": "JADE Learning blog (undated)",
+   "source_section_or_page": "Worked example: '80 CFM moves through the ducts when put under the negative pressure of 25 Pa ... The house has 2000 square feet of conditioned floor area ... 8000 / 2000 sq. ft. ... = 4 CFM' (per 100 ft^2), at the 4 CFM/100 ft^2 rough-in-with-air-handler limit. Tile 4.0, passes; abs 0.001.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "leakage_cfm25": 80,
+    "cfa_ft2": 2000,
+    "limit": 4
+   },
+   "outputs": {
+    "normalized": {
+     "value": 4,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "ssd-design-speed",
+   "source_publisher": "Illinois Department of Transportation (IDOT), Bureau of Local Roads and Streets",
+   "source_title": "Bureau of Local Roads and Streets Manual, Chapter 28 Sight Distance",
+   "source_edition_or_year": "August 2016",
+   "source_section_or_page": "p. 28-1-2, Figure 28-1A Stopping Sight Distance on Level Roadways: design speed 40 mph, brake reaction distance 147.0 ft, braking distance on level 153.6 ft (notes: 2.5 s reaction, 11.2 ft/s2 deceleration). Calculated SSD 147.0 + 153.6 = 300.6 ft inverts to the printed 40 mph; the printed distances are to 0.1 ft, worth under 0.02 mph, so abs 0.05 covers it.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "sight_distance_ft": 300.6,
+    "reaction_time_s": 2.5,
+    "friction": 0.348,
+    "grade": 0
+   },
+   "outputs": {
+    "design_speed_mph": {
+     "value": 40,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "ssd-design-speed",
+   "source_publisher": "Illinois Department of Transportation (IDOT), Bureau of Local Roads and Streets",
+   "source_title": "Bureau of Local Roads and Streets Manual, Chapter 28 Sight Distance",
+   "source_edition_or_year": "August 2016",
+   "source_section_or_page": "p. 28-1-2, Figure 28-1B Stopping Sight Distance on Grades: 40 mph row, downgrade 6% = 333 ft. Inverting 333 ft at grade -0.06 returns the printed 40 mph; the table rounds to whole feet (+/-0.5 ft is about +/-0.05 mph), so abs 0.1 covers it.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "sight_distance_ft": 333,
+    "reaction_time_s": 2.5,
+    "friction": 0.348,
+    "grade": -0.06
+   },
+   "outputs": {
+    "design_speed_mph": {
+     "value": 40,
+     "tolerance": {
+      "abs": 0.1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "ssd-design-speed",
+   "source_publisher": "Illinois Department of Transportation (IDOT), Bureau of Local Roads and Streets",
+   "source_title": "Bureau of Local Roads and Streets Manual, Chapter 28 Sight Distance",
+   "source_edition_or_year": "August 2016",
+   "source_section_or_page": "p. 28-1-2, Figure 28-1B Stopping Sight Distance on Grades: 40 mph row, upgrade 9% = 269 ft. Inverting 269 ft at grade +0.09 returns the printed 40 mph; whole-foot table rounding is about +/-0.05 mph, so abs 0.1 covers it.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "sight_distance_ft": 269,
+    "reaction_time_s": 2.5,
+    "friction": 0.348,
+    "grade": 0.09
+   },
+   "outputs": {
+    "design_speed_mph": {
+     "value": 40,
+     "tolerance": {
+      "abs": 0.1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "static-rollover-threshold",
+   "source_publisher": "SEA, Ltd. for the National Highway Traffic Safety Administration",
+   "source_title": "Rollover Stability Measurements For 2020 New Car Assessment Program (NCAP), Final Report, Contract 693JJ919D000013",
+   "source_edition_or_year": "October 2020",
+   "source_section_or_page": "Appendix C, 2019 Audi A6 AWD results page: track width measurements Front A 63.60, B 63.55, C 63.55, D 63.60, Rear E-H 63.10 in (average track 63.3375 in, listed 63.3); AVERAGE C.G. HEIGHT 20.81 in; 'T/2h 1.5222'. The CG height is listed to 0.01 in while T/2h is computed unrounded (0.005 in of CG is 0.0004 in T/2h), so abs 0.001 covers it.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "track_width_in": 63.3375,
+    "cg_height_in": 20.81,
+    "curve_radius_ft": 0
+   },
+   "outputs": {
+    "srt_g": {
+     "value": 1.5222,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "static-rollover-threshold",
+   "source_publisher": "SEA, Ltd. for the National Highway Traffic Safety Administration",
+   "source_title": "Rollover Stability Measurements For 2020 New Car Assessment Program (NCAP), Final Report, Contract 693JJ919D000013",
+   "source_edition_or_year": "October 2020",
+   "source_section_or_page": "Appendix C, 2020 Buick Encore GX AWD results page: track measurements Front 60.95, 61.00, 61.00, 60.95; Rear 61.60, 61.85, 61.65, 61.85 in (average 61.35625 in, listed 61.4); AVERAGE C.G. HEIGHT 25.26 in; 'T/2h 1.2144'. CG listed to 0.01 in (worth 0.0003 in T/2h), so abs 0.001 covers it.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "track_width_in": 61.35625,
+    "cg_height_in": 25.26,
+    "curve_radius_ft": 0
+   },
+   "outputs": {
+    "srt_g": {
+     "value": 1.2144,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "overflow-scupper-sizing",
+   "source_publisher": "North Carolina Building Code Council (International Code Council base text)",
+   "source_title": "2018 North Carolina Plumbing Code (IPC 2015 base), Figure 1106.5 Size of Scuppers",
+   "source_edition_or_year": "2018",
+   "source_section_or_page": "Section 1106.5, Figure 1106.5 'Size of Scuppers', 'Based on the Francis formula: Q = 3.33 (L - 0.2 H) H^1.5': head 3 in, length 6 in -> 84.1 gpm. Tile q_gpm_contracted 84.07; table printed to 0.1 gpm, pct 0.5 covers it.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "length_in": 6,
+    "head_in": 3
+   },
+   "outputs": {
+    "q_gpm_contracted": {
+     "value": 84.1,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "overflow-scupper-sizing",
+   "source_publisher": "North Carolina Building Code Council (International Code Council base text)",
+   "source_title": "2018 North Carolina Plumbing Code (IPC 2015 base), Figure 1106.5 Size of Scuppers",
+   "source_edition_or_year": "2018",
+   "source_section_or_page": "Section 1106.5, Figure 1106.5 'Size of Scuppers' (Francis formula Q = 3.33 (L - 0.2 H) H^1.5): head 4 in, length 24 in -> 557.5 gpm. Tile 556.1 (-0.25%); the table's wide-scupper columns run 0.15-0.33% above the formula at every head (a slightly larger gpm/cfs factor), so pct 0.5 covers it.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "length_in": 24,
+    "head_in": 4
+   },
+   "outputs": {
+    "q_gpm_contracted": {
+     "value": 557.5,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "scupper-width-for-flow",
+   "source_publisher": "North Carolina Building Code Council (International Code Council base text)",
+   "source_title": "2018 North Carolina Plumbing Code (IPC 2015 base), Figure 1106.5 Size of Scuppers",
+   "source_edition_or_year": "2018",
+   "source_section_or_page": "Section 1106.5, Figure 1106.5 (Francis formula Q = 3.33 (L - 0.2 H) H^1.5): a 6 in scupper at 3 in head passes 84.1 gpm, so 84.1 gpm at 3 in head needs the printed 6 in contracted width (tile 6.002 in). Table gpm to 0.1 is worth 0.01 in; abs 0.05 covers it.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "required_gpm": 84.1,
+    "head_in": 3
+   },
+   "outputs": {
+    "width_contracted_in": {
+     "value": 6,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "scupper-width-for-flow",
+   "source_publisher": "North Carolina Building Code Council (International Code Council base text)",
+   "source_title": "2018 North Carolina Plumbing Code (IPC 2015 base), Figure 1106.5 Size of Scuppers",
+   "source_edition_or_year": "2018",
+   "source_section_or_page": "Section 1106.5, Figure 1106.5: a 6 in scupper at 2 in head passes 47.5 gpm, so 47.5 gpm at 2 in head needs the printed 6 in contracted width (tile 6.005 in). abs 0.05 covers the 0.1 gpm table rounding.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "required_gpm": 47.5,
+    "head_in": 2
+   },
+   "outputs": {
+    "width_contracted_in": {
+     "value": 6,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "oil-water-separator-sizing",
+   "source_publisher": "Applied Mechanical Technology (AMT), Water / Wastewater Division",
+   "source_title": "Oil Water Separator Sizing Calculation (example sizing per API 421), EXAMPLE-SIZING-OWS-Calculation-per-API-421.pdf",
+   "source_edition_or_year": "2016 (cites API Publication 421, February 1990)",
+   "source_section_or_page": "Single page: inputs 200 gpm, 65 F, oil SG 0.9, droplet 60 micron; results 'Density of the Water 0.9984', 'Viscosity (in Poise) 0.0105', 'Rise Rate of Oil Droplet (gpm/ft2) 0.2711'. 0.2711 gpm/ft2 / 7.48052 gal/ft3 = 0.03624 ft/min (exact unit change). Tile 0.03612 (-0.33%); the sheet prints viscosity to 3 figures (0.0105 poise = +/-0.5%) and uses SG x 1000 kg/m3 where the tile uses SG x 62.3 lb/ft3, so pct 1 covers it. Only the rise rate is comparable: the sheet's area uses a coalescing-media factor, not the API 421 F.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "flow_gpm": 200,
+    "oil_sg": 0.9,
+    "droplet_micron": 60,
+    "water_viscosity_cp": 1.05,
+    "water_sg": 0.9984
+   },
+   "outputs": {
+    "rise_velocity_ftmin": {
+     "value": 0.03624,
+     "tolerance": {
+      "pct": 1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "helical-pile-torque",
+   "source_publisher": "Supportworks, Inc.",
+   "source_title": "Supportworks Design Examples - Helical Piles (commercial.supportworks.com/technical-information/design-examples/helical-piles.html)",
+   "source_edition_or_year": "web page, accessed 2026",
+   "source_section_or_page": "Example 1 (Model HP288, 2.875 in O.D.): 'design working load of 30 kips per pile with a Factor of Safety (FOS) = 2'; 'Qu = Design Working Load (30,000 lb) x FOS (2) = 60,000 lb'; 'we use the default value from ICC-ES AC358 for a 2.875-inch O.D. shaft, Kt = 9'; 'T = 60,000 / 9 = 6,667 ft-lb'. Printed to the whole ft-lb (exact 6,666.67); abs 0.5 covers that rounding.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "shaft": "2.875_inch_pipe",
+    "target_capacity_lb": 30000,
+    "capacity_basis": "allowable",
+    "factor_of_safety": 2
+   },
+   "outputs": {
+    "torque_ft_lb": {
+     "value": 6667,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "ultimate_lb": {
+     "value": 60000,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "helical-pile-torque",
+   "source_publisher": "Supportworks, Inc.",
+   "source_title": "Supportworks Design Examples - Helical Piles (commercial.supportworks.com/technical-information/design-examples/helical-piles.html)",
+   "source_edition_or_year": "web page, accessed 2026",
+   "source_section_or_page": "Example 2 (Model HP350, 3.5 in O.D.): 'working loads of 40 kips in compression'; 'Factor of Safety (FOS) = 2'; 'Qu = Design Working Compression Load (40,000 lb) x FOS (2) = 80,000 lb'; 'T = Qu / Kt'; 'T = 80,000 / 7 = 11,428 ft-lb' (AC358 default Kt 7 for 3.5 in O.D.). Printed value is truncated (exact 11,428.57); abs 1 covers it.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "shaft": "3.5_inch_pipe",
+    "target_capacity_lb": 40000,
+    "capacity_basis": "allowable",
+    "factor_of_safety": 2
+   },
+   "outputs": {
+    "torque_ft_lb": {
+     "value": 11428,
+     "tolerance": {
+      "abs": 1
+     }
+    },
+    "ultimate_lb": {
+     "value": 80000,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "pile-axial-capacity",
+   "source_publisher": "Middle East Technical University, Dept. of Civil Engineering (CE 366)",
+   "source_title": "CE 366 - Pile Foundations, Recitation 6 (users.metu.edu.tr/nejan/366/files/Recitation6_PileFoundations_Spring2012.pdf)",
+   "source_edition_or_year": "Spring 2012",
+   "source_section_or_page": "Q2(a), p. 2: single pile 'Diameter : 0.4m, Cu=50kPa', L = 12 m clay, 'use F.S.=2.5'; 'Qp=9cuAp =9x50xx(0.4)2/4 = 56.5 kN'; 'Qs=.cu.As =0.84x50xx0.4x12 = 633kN'; 'Qult = 56.5+633 = 689.5 kN'; 'Qall = 689.5 / 2.5 = 275.8 kN'. SI inputs converted exactly (0.4 m = 1.312336 ft, 12 m = 39.37008 ft, 50 kPa = 1.044272 ksf); printed kN converted to kip (x0.224809): Qp 12.70, Qs 142.30, Qult 155.01, Qall 62.00 kip. Printed values carry 3-4 significant figures (exact Qs 633.3, Qult 689.9 kN); pct 0.3 covers that rounding.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "d_ft": 1.312336,
+    "l_ft": 39.37008,
+    "cu_ksf": 1.044272,
+    "alpha": 0.84,
+    "fs": 2.5
+   },
+   "outputs": {
+    "qp_kip": {
+     "value": 12.702,
+     "tolerance": {
+      "pct": 0.3
+     }
+    },
+    "qs_kip": {
+     "value": 142.304,
+     "tolerance": {
+      "pct": 0.3
+     }
+    },
+    "qult_kip": {
+     "value": 155.006,
+     "tolerance": {
+      "pct": 0.3
+     }
+    },
+    "qall_kip": {
+     "value": 62.002,
+     "tolerance": {
+      "pct": 0.3
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "pile-length-for-capacity",
+   "source_publisher": "Middle East Technical University, Dept. of Civil Engineering (CE 366)",
+   "source_title": "CE 366 - Pile Foundations, Recitation 6 (users.metu.edu.tr/nejan/366/files/Recitation6_PileFoundations_Spring2012.pdf)",
+   "source_edition_or_year": "Spring 2012",
+   "source_section_or_page": "Q2(a), p. 2, run in reverse: 'Diameter : 0.4m, Cu=50kPa', alpha 0.84, 'F.S.=2.5', printed 'Qall = 689.5 / 2.5 = 275.8 kN' for the printed length L = 12 m and 'Qp=9cuAp ... = 56.5 kN'. Target 275.8 kN = 62.002 kip; 0.4 m = 1.312336 ft; 50 kPa = 1.044272 ksf; 12 m = 39.370 ft; 56.5 kN = 12.70 kip. The printed Qall is rounded (exact 275.97 kN), which shifts L by under 0.1%; pct 0.3 covers it.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "qall_target_kip": 62.0023,
+    "d_ft": 1.312336,
+    "cu_ksf": 1.044272,
+    "alpha": 0.84,
+    "fs": 2.5
+   },
+   "outputs": {
+    "l_ft": {
+     "value": 39.37008,
+     "tolerance": {
+      "pct": 0.3
+     }
+    },
+    "qp_kip": {
+     "value": 12.702,
+     "tolerance": {
+      "pct": 0.3
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "boussinesq-surcharge-wall",
+   "source_publisher": "FHWA (National Highway Institute)",
+   "source_title": "Soils and Foundations Reference Manual, Volume II, FHWA-NHI-06-089",
+   "source_edition_or_year": "December 2006",
+   "source_section_or_page": "Example 10-2, pp. 10-32 to 10-33: 'a line load of 700 lb/ft located 15 ft behind the top of a 30 ft high unyielding wall'; 'm = 15ft/30ft = 0.5 > 0.4'; Ph = 1.28(Ql/H)[m^2 n/(m^2+n^2)^2]; table 'Computation of Lateral Earth Pressures Due To Line Load' row n = 0.1, depth 3 ft, Ph = 11 psf. Table printed to 0.1 psf; abs 0.06 covers it.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "ql_plf": 700,
+    "h_ft": 30,
+    "x_ft": 15,
+    "z_ft": 3
+   },
+   "outputs": {
+    "m_ratio": {
+     "value": 0.5,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "sigma_h_psf": {
+     "value": 11,
+     "tolerance": {
+      "abs": 0.06
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "boussinesq-surcharge-wall",
+   "source_publisher": "FHWA (National Highway Institute)",
+   "source_title": "Soils and Foundations Reference Manual, Volume II, FHWA-NHI-06-089",
+   "source_edition_or_year": "December 2006",
+   "source_section_or_page": "Example 10-2, pp. 10-32 to 10-33: 'a line load of 700 lb/ft located 15 ft behind the top of a 30 ft high unyielding wall'; 'm = 15ft/30ft = 0.5 > 0.4'; Ph = 1.28(Ql/H)[m^2 n/(m^2+n^2)^2]; table 'Computation of Lateral Earth Pressures Due To Line Load' row n = 0.3, depth 9 ft, Ph = 19.4 psf. Table printed to 0.1 psf; abs 0.06 covers it.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "ql_plf": 700,
+    "h_ft": 30,
+    "x_ft": 15,
+    "z_ft": 9
+   },
+   "outputs": {
+    "m_ratio": {
+     "value": 0.5,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "sigma_h_psf": {
+     "value": 19.4,
+     "tolerance": {
+      "abs": 0.06
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "boussinesq-surcharge-wall",
+   "source_publisher": "FHWA (National Highway Institute)",
+   "source_title": "Soils and Foundations Reference Manual, Volume II, FHWA-NHI-06-089",
+   "source_edition_or_year": "December 2006",
+   "source_section_or_page": "Example 10-2, pp. 10-32 to 10-33: 'a line load of 700 lb/ft located 15 ft behind the top of a 30 ft high unyielding wall'; 'm = 15ft/30ft = 0.5 > 0.4'; Ph = 1.28(Ql/H)[m^2 n/(m^2+n^2)^2]; table 'Computation of Lateral Earth Pressures Due To Line Load' row n = 1, depth 30 ft, Ph = 4.8 psf. Table printed to 0.1 psf; abs 0.06 covers it.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "ql_plf": 700,
+    "h_ft": 30,
+    "x_ft": 15,
+    "z_ft": 30
+   },
+   "outputs": {
+    "m_ratio": {
+     "value": 0.5,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "sigma_h_psf": {
+     "value": 4.8,
+     "tolerance": {
+      "abs": 0.06
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "slope-stability-infinite",
+   "source_publisher": "Cengage Learning",
+   "source_title": "Das, Principles of Geotechnical Engineering - Chapter 15 Slope Stability multiple-choice quiz with answers (cengage.com/resource_uploads/downloads/1133108660_356598.pdf)",
+   "source_edition_or_year": "2014",
+   "source_section_or_page": "Q5, p. 15-1: 'For an infinite sandy slope inclined at an angle of 20\u00b0 to the horizontal, the drained angle of friction is 30\u00b0. The factor of safety of this slope will be' ... answer p. 15-5: '5. (c)' 'Discussion: Eq. (15.15): 1.59.' Cohesionless, so unit weight and depth do not enter (any gamma/H). Printed to 2 decimals (exact 1.586); abs 0.005 covers it.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "beta_deg": 20,
+    "phi_deg": 30,
+    "c_psf": 0,
+    "gamma_pcf": 120,
+    "h_ft": 10
+   },
+   "outputs": {
+    "fs_slope": {
+     "value": 1.59,
+     "tolerance": {
+      "abs": 0.005
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "frost-depth-berggren",
+   "source_publisher": "Headquarters, Departments of the Army and the Air Force",
+   "source_title": "TM 5-852-6 / AFR 88-19 Vol. 6, Arctic and Subarctic Construction: Calculation Methods for Determination of Depths of Freeze and Thaw in Soils",
+   "source_edition_or_year": "January 1988",
+   "source_section_or_page": "Para 3-3 homogeneous-soil example, p. 3-3: 'Surface freezing index (nF) = 2500 degree-days'; 'yd = 100 lb/ft3, w = 15%'; 'L = 144(100)(0.15) = 2160 Btu/ft3'; 'Kavg = 1/2 (Ku + Kf) = 0.76'; '\u03bb = 0.89 (fig. 3-1)'; 'X = 0.89 sqrt(48(0.76)(2500)/2160) = 5.8 ft' (eq 3-9). Enter nF in the index field and Kavg in the conductivity field. Depth printed to 0.1 ft (exact 5.783); abs 0.05 covers it.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "freezing_index_f_days": 2500,
+    "frozen_conductivity_btu": 0.76,
+    "dry_density_pcf": 100,
+    "water_content_pct": 15,
+    "berggren_lambda": 0.89
+   },
+   "outputs": {
+    "volumetric_latent_heat_btu_ft3": {
+     "value": 2160,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "berggren_depth_ft": {
+     "value": 5.8,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "relative-compaction",
+   "source_publisher": "North Carolina Department of Transportation, Materials and Tests Unit",
+   "source_title": "Conventional Density Testing Manual",
+   "source_edition_or_year": "M&T Form 504E Rev. 10/2014 example",
+   "source_section_or_page": "Figure 7 'Example of Test 2 (English units)', p. 37: road wet density '141.2 lb./ft3', moisture '9.8 % (moisture)', 'Dry Density ... 141.2/109.8 = 128.6 lb./ft3 (Dry Road Density)'; AASHTO 'Dry Density ... 129.3 lb./ft3'; 'Percent Compaction 128.6/129.3 = 99.5 % Fail' (100% requirement). Printed to 0.1; abs 0.06 covers it.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "wet_pcf": 141.2,
+    "w_pct": 9.8,
+    "max_pcf": 129.3,
+    "spec_pct": 100
+   },
+   "outputs": {
+    "gd_field": {
+     "value": 128.6,
+     "tolerance": {
+      "abs": 0.06
+     }
+    },
+    "rc_pct": {
+     "value": 99.5,
+     "tolerance": {
+      "abs": 0.06
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "relative-compaction",
+   "source_publisher": "North Carolina Department of Transportation, Materials and Tests Unit",
+   "source_title": "Conventional Density Testing Manual",
+   "source_edition_or_year": "M&T Form 504E Rev. 10/2014 example",
+   "source_section_or_page": "Figure 5 'Example of Test 1 \"Long Test\" (English units)', p. 30: road wet density '109.5 lb./ft3', moisture '11.9 % (moisture)', 'Dry Density ... 109.5/111.9 = 97.9 lb./ft3 (Dry Road Density)'; AASHTO 'Dry Density ... 97.2 lb./ft3'; 'Percent Compaction 97.9/97.2 = 100.7 % Pass'. NCDOT divided the rounded 97.9 (exact 97.855 -> 100.67%); abs 0.06 covers both roundings.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "wet_pcf": 109.5,
+    "w_pct": 11.9,
+    "max_pcf": 97.2,
+    "spec_pct": 100
+   },
+   "outputs": {
+    "gd_field": {
+     "value": 97.9,
+     "tolerance": {
+      "abs": 0.06
+     }
+    },
+    "rc_pct": {
+     "value": 100.7,
+     "tolerance": {
+      "abs": 0.06
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "riprap-d50",
+   "source_publisher": "Catchments & Creeks Pty Ltd",
+   "source_title": "Background to Rock Sizing Equations",
+   "source_edition_or_year": "Version 1, July 2011",
+   "source_section_or_page": "Section 2.2, Eq. 3 (Isbash) 'd50 = V^2/(2.g.K^2.(sr - 1))' and Table 2, p. 3, row 'Sandstone 2.2 ... d50 = 0.041 V^2 ... Equ. Isbash K 1.018' (metric: d50 m, V m/s). Run at V = 1 m/s = 3.28084 ft/s with SF = 1 (plain Isbash), so the printed d50 = 0.041 m = 0.13451 ft. The coefficient is printed to 0.001 m (2 significant figures) and the source uses g = 9.81 m/s^2 vs the tile's 32.2 ft/s^2; pct 2 covers that.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "velocity_fps": 3.28084,
+    "specific_gravity": 2.2,
+    "turbulence_coeff": 1.018,
+    "safety_factor": 1
+   },
+   "outputs": {
+    "d50_ft": {
+     "value": 0.13451,
+     "tolerance": {
+      "pct": 2
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "riprap-d50",
+   "source_publisher": "Catchments & Creeks Pty Ltd",
+   "source_title": "Background to Rock Sizing Equations",
+   "source_edition_or_year": "Version 1, July 2011",
+   "source_section_or_page": "Section 2.2, Eq. 3 (Isbash) 'd50 = V^2/(2.g.K^2.(sr - 1))' and Table 2, p. 3, row 'Basalt 2.9 ... d50 = 0.026 V^2 ... Equ. Isbash K 1.016' (metric: d50 m, V m/s). Run at V = 1 m/s = 3.28084 ft/s with SF = 1 (plain Isbash), so the printed d50 = 0.026 m = 0.08530 ft. The coefficient is printed to 0.001 m (2 significant figures) and the source uses g = 9.81 m/s^2 vs the tile's 32.2 ft/s^2; pct 2 covers that.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "velocity_fps": 3.28084,
+    "specific_gravity": 2.9,
+    "turbulence_coeff": 1.016,
+    "safety_factor": 1
+   },
+   "outputs": {
+    "d50_ft": {
+     "value": 0.0853,
+     "tolerance": {
+      "pct": 2
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "flexible-pipe-deflection",
+   "source_publisher": "Westlake Pipe & Fittings",
+   "source_title": "Technical Bulletin PI-TB-009-US-EN-0522.1, Burial Depth Guidance for PVC Pipe",
+   "source_edition_or_year": "2022",
+   "source_section_or_page": "Modified Iowa 'Deflection % = (DL KP + KW') 100 / (0.149PS + 0.061E')'; table 'PIPE DEFLECTION (%) FOR GRAVITY SEWER PIPE AT VARIOUS DEPTHS AND BEDDING CONDITIONS', 'Assumptions: DL=1.0, K=0.1, Backfill Weight=120 lb/ft3, Live Load=H20 Highway'; row Depth of Cover 45 ft, E' 2000 psi, SDR35 PS46 = 2.9%. H20 live load is negligible at this depth (the table's 10 ft row already matches prism-only to 0.1%). Printed to 0.1%; abs 0.06 covers it.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "cover_ft": 45,
+    "soil_density_pcf": 120,
+    "deflection_lag": 1,
+    "bedding_constant": 0.1,
+    "pipe_stiffness_psi": 46,
+    "soil_modulus_psi": 2000,
+    "allowable_pct": 7.5
+   },
+   "outputs": {
+    "deflection_pct": {
+     "value": 2.9,
+     "tolerance": {
+      "abs": 0.06
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "flexible-pipe-deflection",
+   "source_publisher": "Westlake Pipe & Fittings",
+   "source_title": "Technical Bulletin PI-TB-009-US-EN-0522.1, Burial Depth Guidance for PVC Pipe",
+   "source_edition_or_year": "2022",
+   "source_section_or_page": "Modified Iowa 'Deflection % = (DL KP + KW') 100 / (0.149PS + 0.061E')'; table 'PIPE DEFLECTION (%) FOR GRAVITY SEWER PIPE AT VARIOUS DEPTHS AND BEDDING CONDITIONS', 'Assumptions: DL=1.0, K=0.1, Backfill Weight=120 lb/ft3, Live Load=H20 Highway'; row Depth of Cover 20 ft, E' 200 psi, SDR35 PS46 = 8.7%. H20 live load is negligible at this depth (the table's 10 ft row already matches prism-only to 0.1%). Printed to 0.1%; abs 0.06 covers it.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "cover_ft": 20,
+    "soil_density_pcf": 120,
+    "deflection_lag": 1,
+    "bedding_constant": 0.1,
+    "pipe_stiffness_psi": 46,
+    "soil_modulus_psi": 200,
+    "allowable_pct": 7.5
+   },
+   "outputs": {
+    "deflection_pct": {
+     "value": 8.7,
+     "tolerance": {
+      "abs": 0.06
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "flexible-pipe-deflection",
+   "source_publisher": "Westlake Pipe & Fittings",
+   "source_title": "Technical Bulletin PI-TB-009-US-EN-0522.1, Burial Depth Guidance for PVC Pipe",
+   "source_edition_or_year": "2022",
+   "source_section_or_page": "Modified Iowa 'Deflection % = (DL KP + KW') 100 / (0.149PS + 0.061E')'; table 'PIPE DEFLECTION (%) FOR GRAVITY SEWER PIPE AT VARIOUS DEPTHS AND BEDDING CONDITIONS', 'Assumptions: DL=1.0, K=0.1, Backfill Weight=120 lb/ft3, Live Load=H20 Highway'; row Depth of Cover 30 ft, E' 1000 psi, SDR26 PS115 = 3.2%. H20 live load is negligible at this depth (the table's 10 ft row already matches prism-only to 0.1%). Printed to 0.1%; abs 0.06 covers it.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "cover_ft": 30,
+    "soil_density_pcf": 120,
+    "deflection_lag": 1,
+    "bedding_constant": 0.1,
+    "pipe_stiffness_psi": 115,
+    "soil_modulus_psi": 1000,
+    "allowable_pct": 7.5
+   },
+   "outputs": {
+    "deflection_pct": {
+     "value": 3.2,
+     "tolerance": {
+      "abs": 0.06
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "submerged-earth-pressure",
+   "source_publisher": "PDHonline (PDH Center)",
+   "source_title": "Course C155, Earth Pressure and Retaining Wall Basics for Non-Geotechnical Engineers (R.P. Weber)",
+   "source_edition_or_year": "course content PDF, accessed 2026",
+   "source_section_or_page": "p. 10 of 20: 'If the surface of water behind a 10-foot high wall (H) were located 5-feet (d) below the backfill surface, then the superimposed total lateral force resulting from groundwater pressure would be: W = 1/2 (\u03b3w)(H-d)2 = 780 pounds' with 'unit weight of water (62.4 pcf)'; 'W acts at a height of (H-d)/3 (or 1.67-ft) above the base'. Run as a 5 ft submerged height; only the water thrust Pw is checked (phi and gamma_sat do not enter Pw). Exact; abs 0.01.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "phi": 32,
+    "gamma_sat": 120,
+    "h_ft": 5,
+    "q": 0
+   },
+   "outputs": {
+    "pw": {
+     "value": 780,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "submerged-earth-pressure",
+   "source_publisher": "PDHonline (PDH Center)",
+   "source_title": "Course C155, Earth Pressure and Retaining Wall Basics for Non-Geotechnical Engineers (R.P. Weber)",
+   "source_edition_or_year": "course content PDF, accessed 2026",
+   "source_section_or_page": "Example (1.0), p. 11 of 20: '10-foot high vertical wall', 'total unit weight of 120 pcf and a friction value of 32 degrees', 'uniform surcharge of 100 psf'; 'Ka = 1 - sin (32) / 1 + sin (32) = 0.307'; 'Ps = Ka(q)H = 307 pounds'; 'Pa = 1/2 (0.307) (120) (10)2 = 1842 pounds'. Checks the tile's dry-backfill contrast thrust dry_ref (0.5 Ka gamma H^2 with gamma = 120) and its surcharge term. The source rounded Ka to 0.307 (exact 0.3073 -> 1,843.6 lb); pct 0.2 covers it.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "phi": 32,
+    "gamma_sat": 120,
+    "h_ft": 10,
+    "q": 100
+   },
+   "outputs": {
+    "ka": {
+     "value": 0.307,
+     "tolerance": {
+      "abs": 0.0005
+     }
+    },
+    "dry_ref": {
+     "value": 1842,
+     "tolerance": {
+      "pct": 0.2
+     }
+    },
+    "pa_surch": {
+     "value": 307,
+     "tolerance": {
+      "pct": 0.2
      }
     }
    }

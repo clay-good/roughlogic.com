@@ -744,8 +744,9 @@ export function computeDuctLeakageCfm25({ leakage_cfm25 = 0, cfa_ft2 = 0, limit 
   if (!(leak >= 0)) return { error: "Measured leakage must be non-negative (CFM25)." };
   if (!(cfa > 0)) return { error: "Conditioned floor area must be positive (ft^2)." };
   if (!(lim > 0)) return { error: "Leakage limit must be positive (CFM25 per 100 ft^2)." };
-  const normalized = leakage_cfm25 / cfa * 100;
-  const passes = normalized <= lim;
+  const normalized = leak / cfa * 100;
+  // 1e-9: 64.2 CFM25 on 2,140 ft^2 is 3.0000000000000004, which failed a limit of 3 it meets.
+  const passes = normalized <= lim * (1 + 1e-9);
   return {
     normalized, passes, limit: lim,
     note: "Residential duct leakage (IECC R403.3.5): a blower (duct blaster) pressurizes the duct system to 25 Pa and the leakage is normalized to the conditioned floor area, CFM25 per 100 ft^2 = leakage / area x 100. The IECC total-leakage limit is 4 CFM25 per 100 ft^2 for a rough-in test with the air handler installed, or the post-construction total; a rough-in test without the air handler is limited to 3, and where all ducts and the air handler sit inside the building thermal envelope the limit is 8.0 (IECC 2021 R403.3.6; R403.3.5 is the test method; verify the test type and the code edition adopted). A tighter system wastes less conditioned air into attics and crawlspaces. A field aid; the adopted energy code, the required test type, and the rater govern.",

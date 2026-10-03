@@ -17075,6 +17075,12 @@ test("bounds: spec-v276 computeMuaTemperingLoad pins the kitchen MUA, the latent
   assert.ok(Math.abs(r2.Q_s_btuh - 140400) < 1e-9);
   assert.ok(Math.abs(r2.Q_l_btuh - 13600) < 1e-9);
   assert.ok(Math.abs(r2.Q_t_btuh - 154000) < 1e-9);
+  // A cooling MUA: sensible and dehumidifying latent are both removed and ADD (was -11,600 total).
+  const c = _v276({ cfm: 2000, t_oa_F: 95, t_target_F: 55, eta: 0.80, w_oa_gr: 120, w_target_gr: 65 });
+  assert.ok(Math.abs(c.Q_s_btuh - 86400) < 1e-9 && Math.abs(c.Q_l_btuh - 74800) < 1e-9);
+  assert.ok(Math.abs(c.Q_t_btuh - 161200) < 1e-9);
+  assert.strictEqual(c.input_btuh, 0);
+  assert.ok(c.mode.startsWith("cooling"));
   // Error seams.
   assert.ok("error" in _v276({ cfm: 0, t_oa_F: 20, t_target_F: 65 }));
   assert.ok("error" in _v276({ cfm: 2000, t_oa_F: 20, t_target_F: 65, eta: 0 }));

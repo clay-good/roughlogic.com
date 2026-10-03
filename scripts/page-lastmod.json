@@ -2,7 +2,7 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "ace74744afa30ad7",
+      "sha": "2015f421275762b5",
       "date": "2026-10-03"
     },
     "/tools/": {
@@ -762,8 +762,8 @@
       "date": "2026-09-29"
     },
     "/tools/boussinesq-surcharge-wall/": {
-      "sha": "ccb50f293454df24",
-      "date": "2026-09-29"
+      "sha": "adafab7c7d30f752",
+      "date": "2026-10-03"
     },
     "/tools/box-culvert-headwater/": {
       "sha": "a9f5ec1919060fbd",
@@ -3174,8 +3174,8 @@
       "date": "2026-10-03"
     },
     "/tools/frost-depth-berggren/": {
-      "sha": "abf6d85bb1fe919d",
-      "date": "2026-09-29"
+      "sha": "6810cd7f6c7ee382",
+      "date": "2026-10-03"
     },
     "/tools/frustum-volume/": {
       "sha": "261afe9cb1a64a7c",
@@ -5122,8 +5122,8 @@
       "date": "2026-09-29"
     },
     "/tools/overflow-scupper-sizing/": {
-      "sha": "9387aaac5fb98f3f",
-      "date": "2026-09-29"
+      "sha": "1856caebf427f5b3",
+      "date": "2026-10-03"
     },
     "/tools/overhead-recovery-rate/": {
       "sha": "46b547cbdc83eb47",
@@ -6370,8 +6370,8 @@
       "date": "2026-09-29"
     },
     "/tools/riprap-d50/": {
-      "sha": "2b00da73233cc0da",
-      "date": "2026-09-29"
+      "sha": "4434e0ec0cdeb46e",
+      "date": "2026-10-03"
     },
     "/tools/riprap-tonnage/": {
       "sha": "7ed59bd043ad9698",
@@ -7386,12 +7386,12 @@
       "date": "2026-09-29"
     },
     "/tools/sprinkler-protection-area-for-supply/": {
-      "sha": "949422363be9acac",
-      "date": "2026-09-29"
+      "sha": "16f19d53224c964a",
+      "date": "2026-10-03"
     },
     "/tools/sprinkler-system-demand/": {
-      "sha": "63ea1bc249bbed69",
-      "date": "2026-09-29"
+      "sha": "5ad9b901f3b482d5",
+      "date": "2026-10-03"
     },
     "/tools/sprocket-pitch-diameter/": {
       "sha": "a4973911f0681bfd",
@@ -8874,8 +8874,8 @@
       "date": "2026-09-29"
     },
     "/tools/window-solar-heat-gain/": {
-      "sha": "0ebd1f7824810f3d",
-      "date": "2026-09-29"
+      "sha": "840f88bf74df42e9",
+      "date": "2026-10-03"
     },
     "/tools/windrow-stockpile-volume/": {
       "sha": "c11ac42323555473",
@@ -8958,8 +8958,8 @@
       "date": "2026-09-29"
     },
     "/tools/wood-combined-bending-axial/": {
-      "sha": "fc520997c9edabf5",
-      "date": "2026-09-29"
+      "sha": "939b52a29d42d48b",
+      "date": "2026-10-03"
     },
     "/tools/wood-emc/": {
       "sha": "e57a3933826426b5",
