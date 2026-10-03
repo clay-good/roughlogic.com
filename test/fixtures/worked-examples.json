@@ -1136,17 +1136,17 @@
    "source_publisher": "Project (first-principles)",
    "source_title": "Rainwater = catchment_ft2 * rainfall_in * 0.6233 * efficiency",
    "source_edition_or_year": "n/a",
-   "source_section_or_page": "Standard 0.6233 gal-per-in-per-ft^2 conversion factor",
+   "source_section_or_page": "Standard 0.6233 gal-per-in-per-ft^2 conversion factor at the TWDB 0.85 collection efficiency: 1000 x 30 x 0.6233 x 0.85 = 15,894 gal (recomputed 2026-10-02 from the 0.62 default, which was the conversion constant reused as an efficiency)",
    "verified_by": "rl",
    "verified_on": "2026-05-10",
    "inputs": {
     "catchment_ft2": 1000,
     "annual_in": 30,
-    "efficiency": 0.62
+    "efficiency": 0.85
    },
    "outputs": {
     "annual_gal": {
-     "value": 11593.4,
+     "value": 15894.15,
      "tolerance": {
       "pct": 0.5
      }
@@ -1158,17 +1158,17 @@
    "source_publisher": "ARCSA / NOAA (inverse)",
    "source_title": "catchment_ft2 = target_gal / (annual_in * 0.6233 * efficiency)",
    "source_edition_or_year": "spec-v675 worked example (machine-verified)",
-   "source_section_or_page": "11,593 gal target, 30 in, 0.62 efficiency -> about 1,000 ft^2 (round-trips rainwater-yield)",
+   "source_section_or_page": "15,895 gal target, 30 in, 0.85 efficiency -> about 1,000 ft^2 (round-trips rainwater-yield; recomputed 2026-10-02 at the 0.85 default)",
    "verified_by": "rl",
    "verified_on": "2026-07-13",
    "inputs": {
-    "target_annual_gal": 11593,
+    "target_annual_gal": 15895,
     "annual_in": 30,
-    "efficiency": 0.62
+    "efficiency": 0.85
    },
    "outputs": {
     "catchment_ft2": {
-     "value": 999.97,
+     "value": 1000.05,
      "tolerance": {
       "pct": 0.5
      }
@@ -155959,6 +155959,2228 @@
      "value": 60,
      "tolerance": {
       "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "taper-calc",
+   "source_publisher": "U.S. Navy, Naval Education and Training Command",
+   "source_title": "Machinery Repairman, NAVEDTRA 12204-A (Training Manual), https://maritime.org/doc/pdf/machinery-repairman.pdf",
+   "source_edition_or_year": "September 1993 (Errata #1, April 2000)",
+   "source_section_or_page": "Ch. 6 Lathe, p. 6-42, Tapers, EXAMPLE 1: 'a piece of work 2 inches long: Diameter of the small end is 1 inch; diameter of the large end is 2 inches ... the taper is 1 inch in 2 inches of length. In 12 inches of length it would be 6 inches.' Exact arithmetic, abs 1e-9.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "large_dia_in": 2,
+    "small_dia_in": 1,
+    "length_in": 2
+   },
+   "outputs": {
+    "tpf_in": {
+     "value": 6,
+     "tolerance": {
+      "abs": 1e-09
+     }
+    },
+    "tpi_in": {
+     "value": 0.5,
+     "tolerance": {
+      "abs": 1e-09
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "taper-calc",
+   "source_publisher": "U.S. Navy, Naval Education and Training Command",
+   "source_title": "Machinery Repairman, NAVEDTRA 12204-A (Training Manual), https://maritime.org/doc/pdf/machinery-repairman.pdf",
+   "source_edition_or_year": "September 1993 (Errata #1, April 2000)",
+   "source_section_or_page": "Ch. 6 Lathe, p. 6-42, Tapers, EXAMPLE 2: 'a piece 6 inches long. Diameter of the small end is 1 inch; diameter of the large end is 2 inches ... 1 inch x 12/6 = 2 inches per foot.' Exact arithmetic, abs 1e-9.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "large_dia_in": 2,
+    "small_dia_in": 1,
+    "length_in": 6
+   },
+   "outputs": {
+    "tpf_in": {
+     "value": 2,
+     "tolerance": {
+      "abs": 1e-09
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "dividing-head",
+   "source_publisher": "U.S. Navy, Naval Education and Training Command",
+   "source_title": "Machinery Repairman, NAVEDTRA 12204-A (Training Manual), https://maritime.org/doc/pdf/machinery-repairman.pdf",
+   "source_edition_or_year": "September 1993 (Errata #1, April 2000)",
+   "source_section_or_page": "Ch. 7 Milling, p. 7-12, Plain indexing (40:1 worm), 'Example 1: Index for five divisions ... There are eight turns of the crank for each division.' Exact, abs 1e-9. (Hole circle list irrelevant for whole turns; Plate 1 circle 15 supplied because the tile requires a list.)",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "divisions": 5,
+    "worm_ratio": 40,
+    "circles": "15,16,17,18,19,20"
+   },
+   "outputs": {
+    "turns": {
+     "value": 8,
+     "tolerance": {
+      "abs": 1e-09
+     }
+    },
+    "full_turns": {
+     "value": 8,
+     "tolerance": {
+      "abs": 1e-09
+     }
+    },
+    "fraction": {
+     "value": 0,
+     "tolerance": {
+      "abs": 1e-09
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "dividing-head",
+   "source_publisher": "U.S. Navy, Naval Education and Training Command",
+   "source_title": "Machinery Repairman, NAVEDTRA 12204-A (Training Manual), https://maritime.org/doc/pdf/machinery-repairman.pdf",
+   "source_edition_or_year": "September 1993 (Errata #1, April 2000)",
+   "source_section_or_page": "Ch. 7 Milling, p. 7-12: 'indexing for 18 divisions ... the mixed number 2 4/18 indicates that the index crank will be moved 2 full turns plus 4 holes on the 18-hole circle that you will find on index plate 1' (Plate 1: 15-16-17-18-19-20). 2 4/18 = 2.2222..; exact fraction, abs 1e-7.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "divisions": 18,
+    "worm_ratio": 40,
+    "circles": "15,16,17,18,19,20"
+   },
+   "outputs": {
+    "turns": {
+     "value": 2.22222222,
+     "tolerance": {
+      "abs": 1e-07
+     }
+    },
+    "full_turns": {
+     "value": 2,
+     "tolerance": {
+      "abs": 1e-09
+     }
+    },
+    "fraction": {
+     "value": 0.22222222,
+     "tolerance": {
+      "abs": 1e-07
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "dividing-head",
+   "source_publisher": "U.S. Navy, Naval Education and Training Command",
+   "source_title": "Machinery Repairman, NAVEDTRA 12204-A (Training Manual), https://maritime.org/doc/pdf/machinery-repairman.pdf",
+   "source_edition_or_year": "September 1993 (Errata #1, April 2000)",
+   "source_section_or_page": "Ch. 7 Milling, pp. 7-12/7-13: hexagon N = 6: 'The original indexing rotation of 6 2/3 turns becomes 6 26/39 turns ... move the index crank 6 full turns and 26 holes on the 39-hole circle' (or 10/15 on the 15-hole circle). 6 2/3 exact, abs 1e-7.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "divisions": 6,
+    "worm_ratio": 40,
+    "circles": "15,18,21,33,39"
+   },
+   "outputs": {
+    "turns": {
+     "value": 6.66666667,
+     "tolerance": {
+      "abs": 1e-07
+     }
+    },
+    "full_turns": {
+     "value": 6,
+     "tolerance": {
+      "abs": 1e-09
+     }
+    },
+    "fraction": {
+     "value": 0.66666667,
+     "tolerance": {
+      "abs": 1e-07
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "dividing-head",
+   "source_publisher": "U.S. Navy, Naval Education and Training Command",
+   "source_title": "Machinery Repairman, NAVEDTRA 12204-A (Training Manual), https://maritime.org/doc/pdf/machinery-repairman.pdf",
+   "source_edition_or_year": "September 1993 (Errata #1, April 2000)",
+   "source_section_or_page": "Ch. 7 Milling, p. 7-13: 'Example 1: Index for 9 divisions' ... '4/9 x 2/2 = 8/18. For each division, turn the crank 4 turns and 8 holes on an 18-hole circle.' 4 4/9 exact, abs 1e-7.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "divisions": 9,
+    "worm_ratio": 40,
+    "circles": "18"
+   },
+   "outputs": {
+    "turns": {
+     "value": 4.44444444,
+     "tolerance": {
+      "abs": 1e-07
+     }
+    },
+    "full_turns": {
+     "value": 4,
+     "tolerance": {
+      "abs": 1e-09
+     }
+    },
+    "fraction": {
+     "value": 0.44444444,
+     "tolerance": {
+      "abs": 1e-07
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "dividing-head",
+   "source_publisher": "U.S. Navy, Naval Education and Training Command",
+   "source_title": "Machinery Repairman, NAVEDTRA 12204-A (Training Manual), https://maritime.org/doc/pdf/machinery-repairman.pdf",
+   "source_edition_or_year": "September 1993 (Errata #1, April 2000)",
+   "source_section_or_page": "Ch. 7 Milling, p. 7-13: 'Example 2: Index for 136 divisions ... There is a 17-hole circle, so for each division turn the crank 5 holes on a 17-hole circle.' 40/136 = 5/17 = 0.294118 turn, 0 full turns; abs 1e-7.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "divisions": 136,
+    "worm_ratio": 40,
+    "circles": "17"
+   },
+   "outputs": {
+    "turns": {
+     "value": 0.29411765,
+     "tolerance": {
+      "abs": 1e-07
+     }
+    },
+    "full_turns": {
+     "value": 0,
+     "tolerance": {
+      "abs": 1e-09
+     }
+    },
+    "fraction": {
+     "value": 0.29411765,
+     "tolerance": {
+      "abs": 1e-07
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "dividing-head",
+   "source_publisher": "U.S. Navy, Naval Education and Training Command",
+   "source_title": "Machinery Repairman, NAVEDTRA 12204-A (Training Manual), https://maritime.org/doc/pdf/machinery-repairman.pdf",
+   "source_edition_or_year": "September 1993 (Errata #1, April 2000)",
+   "source_section_or_page": "Ch. 7 Milling, p. 7-12: 'if 160 divisions are required ... To use a 16-hole circle, divide the numerator and denominator by 10. ... Turn 4 holes on the 16-hole circle.' 40/160 = 4/16 = 0.25 turn; exact, abs 1e-9.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "divisions": 160,
+    "worm_ratio": 40,
+    "circles": "16"
+   },
+   "outputs": {
+    "turns": {
+     "value": 0.25,
+     "tolerance": {
+      "abs": 1e-09
+     }
+    },
+    "full_turns": {
+     "value": 0,
+     "tolerance": {
+      "abs": 1e-09
+     }
+    },
+    "fraction": {
+     "value": 0.25,
+     "tolerance": {
+      "abs": 1e-09
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "displacement-cr",
+   "source_publisher": "PowerNation",
+   "source_title": "Compression Ratio Calculator (Static CR), https://www.powernationtv.com/calculators/compression-calculator; Engine Displacement Calculator, https://www.powernationtv.com/calculators/displacement-calculator",
+   "source_edition_or_year": "pages fetched 2026-10-02",
+   "source_section_or_page": "Compression page, 350 small-block: 4.030 in bore, 3.480 in stroke, 64cc chambers, gasket 4.100 in x .041 in, flat-tops with 5cc valve reliefs .025 in below deck; 'Clearance volume is 64 + 8.87 + 5.23 + 5 = 83.10 cc', 'Compression ratio is (727.4 + 83.10) / 83.10 = 9.75:1'. Displacement page: 'A 350 bored .030 inch over (a 4.030-inch bore) comes out to 355.1 cubic inches'. Reliefs entered as dish -5 cc (tile sign: dome +, dish -). Tile 9.7538 / 355.115; CR printed to 0.01 (abs 0.005), CI to 0.1 (abs 0.05).",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "bore_in": 4.03,
+    "stroke_in": 3.48,
+    "cylinders": 8,
+    "chamber_cc": 64,
+    "gasket_bore_in": 4.1,
+    "gasket_thickness_in": 0.041,
+    "deck_clearance_in": 0.025,
+    "dome_dish_cc": -5
+   },
+   "outputs": {
+    "compression_ratio": {
+     "value": 9.75,
+     "tolerance": {
+      "abs": 0.005
+     }
+    },
+    "displacement_in3": {
+     "value": 355.1,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "tire-gearing",
+   "source_publisher": "PowerNation",
+   "source_title": "Tire Size Calculator: Diameter, Sidewall & Revs/Mile, https://www.powernationtv.com/calculators/tire-size-calculator",
+   "source_edition_or_year": "page fetched 2026-10-02",
+   "source_section_or_page": "Worked example 265/70R17: '(2 x 185.5 + 17 x 25.4) / 25.4 = 31.61 inches', '63,360 / 99.29 = 638'; upgrade to 285/70R17 (32.71 in) is '3.5% taller, so when the speedometer shows 60 mph you're doing about 62.1.' Tile 31.606 / 32.709 / 638.10 / 3.488% / 62.093. Axle 3.73, top gear 1, target rpm 1800 are NOT printed; they are placeholders that do not enter any asserted output. Tolerances = half the last printed digit.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "original_size": "265/70R17",
+    "new_size": "285/70R17",
+    "axle_ratio": 3.73,
+    "top_gear_ratio": 1,
+    "target_rpm": 1800,
+    "indicated_mph": 60
+   },
+   "outputs": {
+    "diameter_orig_in": {
+     "value": 31.61,
+     "tolerance": {
+      "abs": 0.005
+     }
+    },
+    "diameter_new_in": {
+     "value": 32.71,
+     "tolerance": {
+      "abs": 0.005
+     }
+    },
+    "rev_per_mi_orig": {
+     "value": 638,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "speedo_error_pct": {
+     "value": 3.5,
+     "tolerance": {
+      "abs": 0.05
+     }
+    },
+    "actual_mph": {
+     "value": 62.1,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "shrink-fit",
+   "source_publisher": "Industrial Monitor Direct",
+   "source_title": "Shrink Fit Interference Calculator: 0.001 in/Inch Rule for Steel, https://industrialmonitordirect.com/blogs/knowledgebase/shrink-fit-calculations-0001-per-inch-rule-for-steel-and-cast-iron",
+   "source_edition_or_year": "knowledge-base article fetched 2026-10-02",
+   "source_section_or_page": "Worked example: steel 'alpha ~ 6 x 10^-6/F', 4.5 in diameter, '0.0045 in interference': 'Delta T ~ 167 F'. No clearance in the printed example (0); ambient 70 F is the tile default and does not enter delta_t. Tile 166.67; abs 0.5 covers the whole-degree print.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "nominal_dia_in": 4.5,
+    "interference_in": 0.0045,
+    "clearance_in": 0,
+    "alpha_per_f": 6e-06,
+    "ambient_f": 70
+   },
+   "outputs": {
+    "delta_t_f": {
+     "value": 167,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "planetary-gear-ratio",
+   "source_publisher": "KHK (Kohara Gear Industry Co.)",
+   "source_title": "Practical Information on Gears, Section 2.1 Planetary Gear System, http://ftp.demec.ufpr.br/disciplinas/TMEC038/Prof.Walter_Kapp/khk/gear_guide2.pdf",
+   "source_edition_or_year": "KHK Gear Technical Reference (as hosted by UFPR TMEC038)",
+   "source_section_or_page": "pp. 4-5, (a) Planetary type, Eq. (2.7): 'Example: za = 16, zb = 16, zc = 48, then transmission ratio = 4.' Planet zb = 16 = (48-16)/2 is also printed. Input speed is not printed; 1 rpm is a placeholder that does not enter gear_ratio or planet_teeth. abs 1e-6 covers the 8-digit print.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "sun_teeth": 16,
+    "ring_teeth": 48,
+    "input_speed_rpm": 1,
+    "configuration": "ring-fixed-sun-carrier"
+   },
+   "outputs": {
+    "gear_ratio": {
+     "value": 4,
+     "tolerance": {
+      "abs": 1e-06
+     }
+    },
+    "planet_teeth": {
+     "value": 16,
+     "tolerance": {
+      "abs": 1e-09
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "planetary-gear-ratio",
+   "source_publisher": "KHK (Kohara Gear Industry Co.)",
+   "source_title": "Practical Information on Gears, Section 2.1 Planetary Gear System, http://ftp.demec.ufpr.br/disciplinas/TMEC038/Prof.Walter_Kapp/khk/gear_guide2.pdf",
+   "source_edition_or_year": "KHK Gear Technical Reference (as hosted by UFPR TMEC038)",
+   "source_section_or_page": "pp. 4-5, (b) Solar type (sun fixed, internal gear in, carrier out), Eq. (2.8): 'Example: za =16, zb =16, zc = 48, then the transmission ratio = 1.3333333' Planet zb = 16 = (48-16)/2 is also printed. Input speed is not printed; 1 rpm is a placeholder that does not enter gear_ratio or planet_teeth. abs 1e-6 covers the 8-digit print.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "sun_teeth": 16,
+    "ring_teeth": 48,
+    "input_speed_rpm": 1,
+    "configuration": "sun-fixed-ring-carrier"
+   },
+   "outputs": {
+    "gear_ratio": {
+     "value": 1.3333333,
+     "tolerance": {
+      "abs": 1e-06
+     }
+    },
+    "planet_teeth": {
+     "value": 16,
+     "tolerance": {
+      "abs": 1e-09
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "planetary-gear-ratio",
+   "source_publisher": "KHK (Kohara Gear Industry Co.)",
+   "source_title": "Practical Information on Gears, Section 2.1 Planetary Gear System, http://ftp.demec.ufpr.br/disciplinas/TMEC038/Prof.Walter_Kapp/khk/gear_guide2.pdf",
+   "source_edition_or_year": "KHK Gear Technical Reference (as hosted by UFPR TMEC038)",
+   "source_section_or_page": "pp. 4-5, (c) Star type (carrier fixed, sun in, internal gear out), Eq. (2.9): 'Example: za =16, zb =16, zc= 48; then transmission ratio = -3.' Planet zb = 16 = (48-16)/2 is also printed. Input speed is not printed; 1 rpm is a placeholder that does not enter gear_ratio or planet_teeth. abs 1e-6 covers the 8-digit print.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "sun_teeth": 16,
+    "ring_teeth": 48,
+    "input_speed_rpm": 1,
+    "configuration": "carrier-fixed-sun-ring"
+   },
+   "outputs": {
+    "gear_ratio": {
+     "value": -3,
+     "tolerance": {
+      "abs": 1e-06
+     }
+    },
+    "planet_teeth": {
+     "value": 16,
+     "tolerance": {
+      "abs": 1e-09
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "torsion-spring-rate",
+   "source_publisher": "McGraw-Hill (Shigley's Mechanical Engineering Design solutions manual, as hosted by Oakland University ME4300)",
+   "source_title": "Shigley's MED, 11th edition, Chapter 10 Solutions, https://www.secs.oakland.edu/~latcha/ME4300/SM_PDF/CH10.pdf",
+   "source_edition_or_year": "11th edition",
+   "source_section_or_page": "Problem 10-45, p. 42/47: 'd = 0.081 in and OD = 0.500', 'D = 0.500 - 0.081 = 0.419 in', '(b) C = D/d = 0.419/0.081 = 5.17', 'Ki = (4C^2 - C - 1)/(4C(C - 1)) = ... = 1.168'. Only the index and the Wahl bending factor are asserted (both independent of E and deflection); the printed rate 24.7 lbf-in/turn uses E = 28.6 Mpsi, which the tile cannot select (hard-drawn is pinned at 28.8), so it is not asserted. Tolerances = half the last printed digit.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "wire_diameter_in": 0.081,
+    "mean_coil_diameter_in": 0.419,
+    "active_coils": 11,
+    "deflection_deg": 0,
+    "material": "hard-drawn"
+   },
+   "outputs": {
+    "spring_index": {
+     "value": 5.17,
+     "tolerance": {
+      "abs": 0.005
+     }
+    },
+    "wahl_kb": {
+     "value": 1.168,
+     "tolerance": {
+      "abs": 0.0005
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "universal-joint-speed",
+   "source_publisher": "Mustansiriyah University, College of Engineering",
+   "source_title": "Universal joint (lecture notes), https://uomustansiriyah.edu.iq/media/lectures/5/5_2021_12_11!08_27_23_PM.pdf",
+   "source_edition_or_year": "2021 lecture",
+   "source_section_or_page": "Example 3: 'The driving shaft rotates at a uniform speed of 1200 r.p.m.' ... 'alpha = 16.39', 'N1max = N/cos alpha = 1200/cos 16.39 = 1250.83 rpm', 'N1min = N cos alpha = 1200 cos16.39 = 1151.23 rpm'. Tile 1250.830 / 1151.236; abs 0.05 covers the 2-decimal print.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "joint_angle_deg": 16.39,
+    "input_speed_rpm": 1200
+   },
+   "outputs": {
+    "max_output_rpm": {
+     "value": 1250.83,
+     "tolerance": {
+      "abs": 0.05
+     }
+    },
+    "min_output_rpm": {
+     "value": 1151.23,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "universal-joint-speed",
+   "source_publisher": "Mustansiriyah University, College of Engineering",
+   "source_title": "Universal joint (lecture notes), https://uomustansiriyah.edu.iq/media/lectures/5/5_2021_12_11!08_27_23_PM.pdf",
+   "source_edition_or_year": "2021 lecture",
+   "source_section_or_page": "Example 2: driver at 500 r.p.m., 'total permissible variation in speed of the driven shaft is not to exceed +/- 6% of the mean speed', 'q = 0.12 omega = omega (1 - cos^2 alpha)/cos alpha' solved to 'alpha = 19.64'. Run forward at the printed 19.64 deg: tile fluctuation 11.995% vs printed 12% (0.12); abs 0.02 covers the 0.01-deg rounding of alpha.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "joint_angle_deg": 19.64,
+    "input_speed_rpm": 500
+   },
+   "outputs": {
+    "fluctuation_pct": {
+     "value": 12,
+     "tolerance": {
+      "abs": 0.02
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "aerodynamic-drag-force",
+   "source_publisher": "The Engineering ToolBox",
+   "source_title": "Drag Coefficient, https://www.engineeringtoolbox.com/drag-coefficient-d_627.html",
+   "source_edition_or_year": "page fetched 2026-10-02",
+   "source_section_or_page": "Example, normal car: 'Fd = 0.29 1/2 (1.2 kg/m3) ((90 km/h) (1000 m/km) / (3600 s/h))2 (2 m2) = 217.5 N', 'Pd = (217.5 N) (90 km/h) ... = 5436 (Nm/s, J/s, W)'. Inputs are the printed SI values converted exactly (90 km/h = 55.923 mph, 2 m2 = 21.528 ft2, 1.2 kg/m3 = 0.074914 lb/ft3); 217.5 N = 48.896 lbf. Tile 48.896 lbf / 5.4375 kW; abs 0.05 lbf and 0.005 kW cover the printed 0.1 N and 1 W.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "speed_mph": 55.92340730136006,
+    "frontal_area_ft2": 21.527820833419444,
+    "drag_coefficient": 0.29,
+    "air_density_lb_ft3": 0.07491355272
+   },
+   "outputs": {
+    "drag_force_lbf": {
+     "value": 48.89594512418704,
+     "tolerance": {
+      "abs": 0.05
+     }
+    },
+    "drag_power_kw": {
+     "value": 5.436,
+     "tolerance": {
+      "abs": 0.005
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "aerodynamic-drag-force",
+   "source_publisher": "LibreTexts Engineering (Fundamentals of Transportation, Wikibooks-derived)",
+   "source_title": "7.2: Grade, Example 1: Racecar Acceleration, https://eng.libretexts.org/Bookshelves/Civil_Engineering/Fundamentals_of_Transportation/07:_Geometric_Design/7.02:_Grade",
+   "source_edition_or_year": "page fetched 2026-10-02",
+   "source_section_or_page": "Example 1: 100 km/hr, 'coefficient of drag of 0.3, a frontal area of 1.5 m^2', 'air density is 1.054 kg/m^3': 'R_a = 1.054/2 (1.5)(0.3)(100*1000/3600)^2 = 183 N'. Inputs converted exactly to mph/ft2/lb-ft3; 183 N = 41.140 lbf. Tile 41.137 lbf; abs 0.12 lbf covers the whole-newton print (+/-0.5 N).",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "speed_mph": 62.13711922373339,
+    "frontal_area_ft2": 16.145865625064584,
+    "drag_coefficient": 0.3,
+    "air_density_lb_ft3": 0.0657990704724
+   },
+   "outputs": {
+    "drag_force_lbf": {
+     "value": 41.140036587247025,
+     "tolerance": {
+      "abs": 0.12
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "vehicle-road-load-power",
+   "source_publisher": "LibreTexts Engineering (Fundamentals of Transportation, Wikibooks-derived)",
+   "source_title": "7.2: Grade, Example 1: Racecar Acceleration, https://eng.libretexts.org/Bookshelves/Civil_Engineering/Fundamentals_of_Transportation/07:_Geometric_Design/7.02:_Grade",
+   "source_edition_or_year": "page fetched 2026-10-02",
+   "source_section_or_page": "Example 1 (level, grade 0): 100 km/hr, Cd 0.3, 1.5 m^2, 1.054 kg/m^3, 'a weight of 10 kN': 'R_a = ... = 183 N', 'f_rl = 0.01(1 + V/44.73) = 0.016', 'R_rl = f_rl W = 0.016(10000) = 160 N'. The printed (rounded) f_rl 0.016 is entered as Crr; inputs converted exactly (10 kN = 2248.09 lb). 183 N = 41.140 lbf (abs 0.12 for the whole-newton print); 160 N = 35.969 lbf (exact product, abs 0.01).",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "speed_mph": 62.13711922373339,
+    "vehicle_weight_lb": 2248.089430997105,
+    "frontal_area_ft2": 16.145865625064584,
+    "drag_coefficient": 0.3,
+    "rolling_coefficient": 0.016,
+    "grade_pct": 0,
+    "air_density_lb_ft3": 0.0657990704724
+   },
+   "outputs": {
+    "aero_force_lbf": {
+     "value": 41.140036587247025,
+     "tolerance": {
+      "abs": 0.12
+     }
+    },
+    "rolling_force_lbf": {
+     "value": 35.96943089595368,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "rainwater-yield",
+   "source_publisher": "Texas Water Development Board",
+   "source_title": "The Texas Manual on Rainwater Harvesting",
+   "source_edition_or_year": "Third Edition, 2005",
+   "source_section_or_page": "Ch. 4 Rainwater Harvesting System Sizing, p. 38: '1.97in. rainfall x 2,500sq. ft. catchment x 0.62 gallons/in. rain/sq. ft. x 0.85 collection efficiency = 2,595 gallons' (Table 4-2 January prints 2,596). TWDB uses 0.62 gal/sf/in; the tile uses the exact 0.6233 (144/231), so it reads 2,609 (+0.55%); pct 1 covers that conversion-constant rounding.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "catchment_ft2": 2500,
+    "annual_in": 1.97,
+    "efficiency": 0.85
+   },
+   "outputs": {
+    "annual_gal": {
+     "value": 2595,
+     "tolerance": {
+      "pct": 1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "rainwater-yield",
+   "source_publisher": "Texas Water Development Board",
+   "source_title": "The Texas Manual on Rainwater Harvesting",
+   "source_edition_or_year": "Third Edition, 2005",
+   "source_section_or_page": "Table 4-2 Sample Water Balance, Dallas, p. 39, May row: average rainfall 5.01 in, rainfall collected 6,601 gallons (2,500 sf, 85% efficiency, 0.62 gal/sf/in). Tile 6,636 (+0.53%) from its exact 0.6233 constant vs TWDB's rounded 0.62; pct 1 covers it.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "catchment_ft2": 2500,
+    "annual_in": 5.01,
+    "efficiency": 0.85
+   },
+   "outputs": {
+    "annual_gal": {
+     "value": 6601,
+     "tolerance": {
+      "pct": 1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "gpa-rate",
+   "source_publisher": "Mississippi State University Extension",
+   "source_title": "Pesticide Calibration Made Easy",
+   "source_edition_or_year": "Publication P2939 (2025)",
+   "source_section_or_page": "Broadcast example: 'GPM = (5 x 20 x 10) / 5940 = 1000 / 5940 = 0.16835(GPM)' (5 MPH, 20 in nozzle spacing, 10 GPA). Printed to 5 decimals; abs 0.00001.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "gpm": 0,
+    "spacing_in": 20,
+    "speed_mph": 5,
+    "target_gpa": 10
+   },
+   "outputs": {
+    "required_gpm": {
+     "value": 0.16835,
+     "tolerance": {
+      "abs": 1e-05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "gpa-rate",
+   "source_publisher": "Mississippi State University Extension",
+   "source_title": "Pesticide Calibration Made Easy",
+   "source_edition_or_year": "Publication P2939 (2025)",
+   "source_section_or_page": "Banded example: 'GPM = (4 x 19 x 5) / 5940 = 380 / 5940 = 0.06397 (GPM)' (4 MPH, 19 in band width used as W, 5 GPA). Printed to 5 decimals; abs 0.00001.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "gpm": 0,
+    "spacing_in": 19,
+    "speed_mph": 4,
+    "target_gpa": 5
+   },
+   "outputs": {
+    "required_gpm": {
+     "value": 0.06397,
+     "tolerance": {
+      "abs": 1e-05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "seed-rate",
+   "source_publisher": "Purdue University Cooperative Extension Service",
+   "source_title": "Plant Populations and Seeding Rates for Soybeans (AY-217)",
+   "source_edition_or_year": "AY-217",
+   "source_section_or_page": "Worked example: '17,424 ft of row/acre x 7.4 seeds/ft.of row / 2,830 seeds/lb. for Resnik = 128,938 / 2,830 = 45.6 lb. seed' (30 in rows; the 7.4 seeds/ft already includes the 0.9 germ x 0.9 emergence adjustment, so germination_pct = 100). Input in_row_spacing_in = 12/7.4 = 1.6216 in is the printed 7.4 seeds/ft expressed per inch, a unit conversion. abs 1 seed and abs 0.05 lb cover the printed rounding.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "row_width_in": 30,
+    "in_row_spacing_in": 1.6216216216,
+    "target_pop_per_acre": 0,
+    "seeds_per_lb": 2830,
+    "germination_pct": 100,
+    "seed_price_per_lb": 0
+   },
+   "outputs": {
+    "seeds_per_acre": {
+     "value": 128938,
+     "tolerance": {
+      "abs": 1
+     }
+    },
+    "lbs_per_acre": {
+     "value": 45.6,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "timber-cruise",
+   "source_publisher": "University of Tennessee Agricultural Extension Service",
+   "source_title": "Understanding Log Scales and Log Rules (PB 1650), Brian Bond",
+   "source_edition_or_year": "PB 1650",
+   "source_section_or_page": "Table 3 (16-ft logs), small-end diameter 12 in: Doyle 64 bf. Doyle is exact integer arithmetic; abs 0.001.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "small_end_dib_in": 12,
+    "log_length_ft": 16,
+    "rule": "doyle",
+    "price_per_bf": 0
+   },
+   "outputs": {
+    "board_feet": {
+     "value": 64,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "timber-cruise",
+   "source_publisher": "University of Tennessee Agricultural Extension Service",
+   "source_title": "Understanding Log Scales and Log Rules (PB 1650), Brian Bond",
+   "source_edition_or_year": "PB 1650",
+   "source_section_or_page": "Table 2 (oak logs 12 ft in length), 10 in diameter: Doyle rule 27 BF. (10-4)^2 x 12/16 = 27 exactly; abs 0.001.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "small_end_dib_in": 10,
+    "log_length_ft": 12,
+    "rule": "doyle",
+    "price_per_bf": 0
+   },
+   "outputs": {
+    "board_feet": {
+     "value": 27,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "timber-cruise",
+   "source_publisher": "University of Tennessee Agricultural Extension Service",
+   "source_title": "Understanding Log Scales and Log Rules (PB 1650), Brian Bond",
+   "source_edition_or_year": "PB 1650",
+   "source_section_or_page": "Table 3 (16-ft logs), 12 in: International 1/4-inch rule 95 bf; the pub states International values are 'rounded to the nearest 5 board feet'. Tile 96.9 unrounded; abs 2.5 is the nearest-5 rounding band.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "small_end_dib_in": 12,
+    "log_length_ft": 16,
+    "rule": "international",
+    "price_per_bf": 0
+   },
+   "outputs": {
+    "board_feet": {
+     "value": 95,
+     "tolerance": {
+      "abs": 2.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "timber-cruise",
+   "source_publisher": "University of Tennessee Agricultural Extension Service",
+   "source_title": "Understanding Log Scales and Log Rules (PB 1650), Brian Bond",
+   "source_edition_or_year": "PB 1650",
+   "source_section_or_page": "Table 2 (oak logs 12 ft), 14 in: International 1/4-inch rule 100 BF; rule values are 'rounded to the nearest 5 board feet'. Tile 97.7 unrounded; abs 2.5 is the nearest-5 rounding band.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "small_end_dib_in": 14,
+    "log_length_ft": 12,
+    "rule": "international",
+    "price_per_bf": 0
+   },
+   "outputs": {
+    "board_feet": {
+     "value": 100,
+     "tolerance": {
+      "abs": 2.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "timber-cruise",
+   "source_publisher": "University of Washington Rural Technology Initiative (Briggs, Forest Products Measurements and Conversion Factors)",
+   "source_title": "Appendix 3. Board Foot Log Rules, Table 1 (Scribner Decimal C from Koch 1972)",
+   "source_edition_or_year": "Briggs 1994, Appendix 3",
+   "source_section_or_page": "Table 1 continued, Scribner Decimal C log scale, contents in board feet: scaling diameter 20 in, 16 ft = 280. Table lookup; abs 0.001.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "small_end_dib_in": 20,
+    "log_length_ft": 16,
+    "rule": "scribner",
+    "price_per_bf": 0
+   },
+   "outputs": {
+    "board_feet": {
+     "value": 280,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "timber-cruise",
+   "source_publisher": "University of Washington Rural Technology Initiative (Briggs, Forest Products Measurements and Conversion Factors)",
+   "source_title": "Appendix 3. Board Foot Log Rules, Table 1 (Scribner Decimal C from Koch 1972)",
+   "source_edition_or_year": "Briggs 1994, Appendix 3",
+   "source_section_or_page": "Table 1 continued, Scribner Decimal C: scaling diameter 14 in, 12 ft = 90. Table lookup; abs 0.001.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "small_end_dib_in": 14,
+    "log_length_ft": 12,
+    "rule": "scribner",
+    "price_per_bf": 0
+   },
+   "outputs": {
+    "board_feet": {
+     "value": 90,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "two-stroke-mix",
+   "source_publisher": "STIHL Inc.",
+   "source_title": "STIHL General Frequently Asked Questions (stihlusa.com)",
+   "source_edition_or_year": "web page accessed 2026-10-02",
+   "source_section_or_page": "'STIHL recommends a 50:1 mix ... (2.6 oz. of STIHL branded oil for 1 gallon of premium gasoline)'. Tile 128/50 = 2.56 oz; STIHL prints one decimal, so abs 0.05 covers the rounding.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "ratio": 50,
+    "fuel_amount": 1,
+    "fuel_unit": "gallon"
+   },
+   "outputs": {
+    "oil_oz": {
+     "value": 2.6,
+     "tolerance": {
+      "abs": 0.05
+     }
+    },
+    "oz_per_gallon": {
+     "value": 2.6,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "mortgage-point-breakeven",
+   "source_publisher": "Bank of America (Better Money Habits)",
+   "source_title": "Everything You Need to Know About Mortgage Discount Points",
+   "source_edition_or_year": "web page, accessed 2026-10-02",
+   "source_section_or_page": "$300,000 30-year at 6%: '1 point costs $3,000 and saves $48 monthly', break-even 63 months (5.75% with the point). Tile savings 47.93, break-even 62.59 mo; abs 0.5 covers whole-dollar and whole-month printing.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "loan_amount": 300000,
+    "base_rate_pct": 6,
+    "points_rate_pct": 5.75,
+    "point_cost_pct": 1,
+    "term_years": 30,
+    "holding_years": 0
+   },
+   "outputs": {
+    "point_cost": {
+     "value": 3000,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "monthly_savings": {
+     "value": 48,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "break_even_months": {
+     "value": 63,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "mortgage-point-breakeven",
+   "source_publisher": "Bank of America (Better Money Habits)",
+   "source_title": "Everything You Need to Know About Mortgage Discount Points",
+   "source_edition_or_year": "web page, accessed 2026-10-02",
+   "source_section_or_page": "Table: 2 points, $6,000, new rate 5.5%, monthly savings $96, 30-year savings $34,303 ($300,000, 30 yr, 6% base). Tile 95.28/mo (x360 = $34,302, matching the printed 30-year figure, so the printed $96 is rounded up); pct 1 covers it.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "loan_amount": 300000,
+    "base_rate_pct": 6,
+    "points_rate_pct": 5.5,
+    "point_cost_pct": 2,
+    "term_years": 30,
+    "holding_years": 0
+   },
+   "outputs": {
+    "point_cost": {
+     "value": 6000,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "monthly_savings": {
+     "value": 96,
+     "tolerance": {
+      "pct": 1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "inventory-turnover",
+   "source_publisher": "OpenStax (Rice University)",
+   "source_title": "Principles of Accounting, Volume 1: Financial Accounting",
+   "source_edition_or_year": "2019",
+   "source_section_or_page": "Sec. 10.5, The Spy Who Loves You, Year 1: beginning inventory $3,150, ending $8,955, COGS $7,200; average inventory $6,053, turnover 1.19 times, 'about 307 days'. Printed rounded to whole dollars / 2 decimals / whole days; tolerances are the half-unit of each.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "cogs": 7200,
+    "beginning_inventory": 3150,
+    "ending_inventory": 8955,
+    "period_days": 365
+   },
+   "outputs": {
+    "turnover": {
+     "value": 1.19,
+     "tolerance": {
+      "abs": 0.005
+     }
+    },
+    "days_sales_of_inventory": {
+     "value": 307,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "average_inventory": {
+     "value": 6053,
+     "tolerance": {
+      "abs": 1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "inventory-turnover",
+   "source_publisher": "OpenStax (Rice University)",
+   "source_title": "Principles of Accounting, Volume 1: Financial Accounting",
+   "source_edition_or_year": "2019",
+   "source_section_or_page": "Sec. 10.5, Year 2: beginning $8,955, ending $9,851, COGS $7,920; average inventory $9,403, turnover 0.84 times, 'about 433 days'. Tolerances are the half-unit of the printed rounding.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "cogs": 7920,
+    "beginning_inventory": 8955,
+    "ending_inventory": 9851,
+    "period_days": 365
+   },
+   "outputs": {
+    "turnover": {
+     "value": 0.84,
+     "tolerance": {
+      "abs": 0.005
+     }
+    },
+    "days_sales_of_inventory": {
+     "value": 433,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "average_inventory": {
+     "value": 9403,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "cash-conversion-cycle",
+   "source_publisher": "OpenStax (Rice University)",
+   "source_title": "Principles of Finance",
+   "source_edition_or_year": "2022",
+   "source_section_or_page": "Sec. 19.1 What Is Working Capital?, Scenario 1 King Sized Products: 'Cash Conversion Cycle = 36.5 days + 54.7 days - 34 days = 57.2 days'. Exact sum; abs 0.001.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "dio": 36.5,
+    "dso": 54.7,
+    "dpo": 34
+   },
+   "outputs": {
+    "ccc_days": {
+     "value": 57.2,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "cash-conversion-cycle",
+   "source_publisher": "OpenStax (Rice University)",
+   "source_title": "Principles of Finance",
+   "source_edition_or_year": "2022",
+   "source_section_or_page": "Sec. 19.1, Scenario 2: 'Cash Conversion Cycle = 34.07 days + 50.21 days - 40.15 days = 44.13 days'. Exact sum; abs 0.001.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "dio": 34.07,
+    "dso": 50.21,
+    "dpo": 40.15
+   },
+   "outputs": {
+    "ccc_days": {
+     "value": 44.13,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "upgrade-roi",
+   "source_publisher": "Energy Management Task Force (Saskatchewan)",
+   "source_title": "A Guide for the Selection of Energy Efficient Technologies (Technical Guide)",
+   "source_edition_or_year": "c. 1995",
+   "source_section_or_page": "Acme Tools lighting retrofit, p. 9: installed cost $60,000, savings $20,000/yr, hurdle 16%, 10-yr life; 'Payback 3.0'. Simple payback only: the guide's printed NPV $31,607 is the Excel NPV() misuse that also discounts the year-0 outlay (36,665/1.16 = 31,607), so it is not used. abs 0.05 covers the one-decimal print.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "incremental_cost": 60000,
+    "annual_savings": 20000,
+    "discount_rate_percent": 16,
+    "years": 10
+   },
+   "outputs": {
+    "simple_payback_yr": {
+     "value": 3,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "haversine",
+   "source_publisher": "National Geospatial-Intelligence Agency",
+   "source_title": "The American Practical Navigator (Bowditch), Pub. No. 9, Volume 1, Chapter 13 The Sailings",
+   "source_edition_or_year": "2024 edition",
+   "source_section_or_page": "Art. 1307 Example 1: 'find the distance and initial great circle course from L 22 S, lambda 116 E to 20 S, lambda 031 E' -> 'Cn = 253 T' (C = S 72.98691 W). Printed to the whole degree; abs 0.5.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "lat1": -22,
+    "lon1": 116,
+    "lat2": -20,
+    "lon2": 31
+   },
+   "outputs": {
+    "initial_bearing_deg": {
+     "value": 253,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "haversine",
+   "source_publisher": "National Geospatial-Intelligence Agency",
+   "source_title": "The American Practical Navigator (Bowditch), Pub. No. 9, Volume 1, Chapter 13 The Sailings",
+   "source_edition_or_year": "2024 edition",
+   "source_section_or_page": "Art. 1307 Example 3 (Final Course Angle), same track 22 S 116 E to 20 S 031 E: 'Cn = 289.4 T'. Tile 289.351; abs 0.05 is the one-decimal print.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "lat1": -22,
+    "lon1": 116,
+    "lat2": -20,
+    "lon2": 31
+   },
+   "outputs": {
+    "final_bearing_deg": {
+     "value": 289.4,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "haversine",
+   "source_publisher": "National Geospatial-Intelligence Agency",
+   "source_title": "The American Practical Navigator (Bowditch), Pub. No. 9, Volume 1, Chapter 13 The Sailings",
+   "source_edition_or_year": "2024 edition",
+   "source_section_or_page": "Art. 1307 Example 2: from L 28 N, lambda 122 W to L 24 S, lambda 151 E: 'D = 5,913.1 nm', 'Cn = 247.3 T'. Tile 247.303; abs 0.05 is the one-decimal print.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "lat1": 28,
+    "lon1": -122,
+    "lat2": -24,
+    "lon2": 151
+   },
+   "outputs": {
+    "initial_bearing_deg": {
+     "value": 247.3,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "bearing-conversion",
+   "source_publisher": "National Wildfire Coordinating Group",
+   "source_title": "Firefighter Math 6.5: Declination",
+   "source_edition_or_year": "NWCG Firefighter Math course, web page accessed 2026-10-02",
+   "source_section_or_page": "Example 1: declination 17 E, compass reading 35 -> 'Paloma's true reading is 52 degrees.' Exact; abs 1e-9.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "declination_deg": 17,
+    "bearing_deg": 35,
+    "direction": "magnetic_to_true"
+   },
+   "outputs": {
+    "result_deg": {
+     "value": 52,
+     "tolerance": {
+      "abs": 1e-09
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "bearing-conversion",
+   "source_publisher": "National Wildfire Coordinating Group",
+   "source_title": "Firefighter Math 6.5: Declination",
+   "source_edition_or_year": "NWCG Firefighter Math course, web page accessed 2026-10-02",
+   "source_section_or_page": "Example 2: Augusta, Maine declination 18 W (entered as -18), magnetic reading 45 -> 'Sonia's true reading is 27 degrees.' Exact; abs 1e-9.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "declination_deg": -18,
+    "bearing_deg": 45,
+    "direction": "magnetic_to_true"
+   },
+   "outputs": {
+    "result_deg": {
+     "value": 27,
+     "tolerance": {
+      "abs": 1e-09
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "bearing-conversion",
+   "source_publisher": "National Wildfire Coordinating Group",
+   "source_title": "Firefighter Math 6.5: Declination",
+   "source_edition_or_year": "NWCG Firefighter Math course, web page accessed 2026-10-02",
+   "source_section_or_page": "Example 3: true map azimuth 85, declination 12 E -> '85 - 12 = 73 ... Roger's magnetic reading is 73 degrees.' Exact; abs 1e-9.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "declination_deg": 12,
+    "bearing_deg": 85,
+    "direction": "true_to_magnetic"
+   },
+   "outputs": {
+    "result_deg": {
+     "value": 73,
+     "tolerance": {
+      "abs": 1e-09
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "ohms-law",
+   "source_publisher": "Naval Education and Training Professional Development and Technology Center (US Navy)",
+   "source_title": "Navy Electricity and Electronics Training Series (NEETS) Module 1: Introduction to Matter, Energy, and Direct Current",
+   "source_edition_or_year": "NAVEDTRA 14173 (maritime.org/doc/neets/mod01.pdf)",
+   "source_section_or_page": "Chapter 3, p. 3-12/3-13, Figure 3-9 discussion: 'The resistance of this circuit is 2 ohms'; at 2 volts 'P = 2 volts x 1 ampere, P = 2 watts'. Exact integers; tolerance abs 0.001 is float only.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "V": 2,
+    "I": null,
+    "R": 2,
+    "P": null
+   },
+   "outputs": {
+    "I": {
+     "value": 1,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "P": {
+     "value": 2,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "ohms-law",
+   "source_publisher": "Naval Education and Training Professional Development and Technology Center (US Navy)",
+   "source_title": "Navy Electricity and Electronics Training Series (NEETS) Module 1: Introduction to Matter, Energy, and Direct Current",
+   "source_edition_or_year": "NAVEDTRA 14173 (maritime.org/doc/neets/mod01.pdf)",
+   "source_section_or_page": "Chapter 3, p. 3-13, same 2-ohm circuit: 'When the voltage increased to 3 volts, the power increased to 4.5 watts'. Exact; tolerance abs 0.001 is float only.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "V": 3,
+    "I": null,
+    "R": 2,
+    "P": null
+   },
+   "outputs": {
+    "P": {
+     "value": 4.5,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "mixed-water-temp",
+   "source_publisher": "R.L. Deppmann Company",
+   "source_title": "Monday Morning Minutes: Domestic Water Recirculation Systems Part 7: Mixing Valves",
+   "source_edition_or_year": "web article (deppmann.com/blog/monday-morning-minutes/29th-4/)",
+   "source_section_or_page": "Worked text: 'If the flow was equal on both the hot and cold sides of the mixing valve, the temperature would be (50% X 140) + (50% X 40) = 100% at 90'. Exact; tolerance abs 0.01 is float only. (Same article's 'three times more hot water than cold' for 120 F is not reproduced: a 3:1 blend of 140/40 gives 115 F; 120 F needs 4:1 -- see report.)",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "mode": "find-blend",
+    "hot_temp_F": 140,
+    "cold_temp_F": 40,
+    "hot_gpm": 1,
+    "cold_gpm": 1
+   },
+   "outputs": {
+    "blend_temp_F": {
+     "value": 90,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "percent_hot": {
+     "value": 50,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "dewatering-rate",
+   "source_publisher": "Indigo Water Group (Sidney Innerebner, PhD, PE)",
+   "source_title": "Selected Math Problems for Collection and Distribution",
+   "source_edition_or_year": "2021 (indigowatergroup.com/wp-content/uploads/2021/04/CD-Math-PRO.pdf)",
+   "source_section_or_page": "Problem 10 and worked answer: wet well '12 feet by 6 feet', influent '600 GPM', level 'Drops 3' 9\" in 18 min'; '270 ft3 x 7.48 gal / 18 min = 112 gal/min'; '600 gpm + 112 gpm = 712 gpm' total pumped (pump A 425 + pump B 287). Same identity as the tile (drawdown volume / time + inflow); safety_pct 0 so sized = pump. Tile 712.21 (7.48052 vs printed 7.48 and the 112 rounding); tolerance abs 1 covers.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "pit_len_ft": 12,
+    "pit_wid_ft": 6,
+    "drawdown_ft": 3.75,
+    "drawdown_min": 18,
+    "inflow_gpm": 600,
+    "safety_pct": 0
+   },
+   "outputs": {
+    "pump_gpm": {
+     "value": 712,
+     "tolerance": {
+      "abs": 1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "molarity-dilution",
+   "source_publisher": "LibreTexts (Chemistry LibreTexts; Diablo Valley College, Introductory Chemistry (Petersen))",
+   "source_title": "11.4: Solution Dilution (M1V1 = M2V2)",
+   "source_edition_or_year": "web textbook, accessed 2026-10-02",
+   "source_section_or_page": "Example 1 (nitric acid): M1 = 16 M stock, M2 = 0.50 M, V2 = 8.00 L; 'V1 = 0.25 L (250 mL) of the stock HNO3 needs to be diluted with water to a final volume of 8.00 L.' Exact; tolerance abs 0.0001 is float only.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "c1": 16,
+    "v1": null,
+    "c2": 0.5,
+    "v2": 8
+   },
+   "outputs": {
+    "v1": {
+     "value": 0.25,
+     "tolerance": {
+      "abs": 0.0001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "molarity-dilution",
+   "source_publisher": "LibreTexts (Chemistry LibreTexts; Diablo Valley College, Introductory Chemistry (Petersen))",
+   "source_title": "11.4: Solution Dilution (M1V1 = M2V2)",
+   "source_edition_or_year": "web textbook, accessed 2026-10-02",
+   "source_section_or_page": "Exercise 1: 76.5 mL of 0.885 M KBr diluted to 0.500 M; printed answer '135.4 mL' (tile 135.405). Tolerance abs 0.06 covers the printed 0.1 mL rounding.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "c1": 0.885,
+    "v1": 76.5,
+    "c2": 0.5,
+    "v2": null
+   },
+   "outputs": {
+    "v2": {
+     "value": 135.4,
+     "tolerance": {
+      "abs": 0.06
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "serial-dilution",
+   "source_publisher": "American Society for Microbiology",
+   "source_title": "Serial Dilution Protocols (J. Reynolds)",
+   "source_edition_or_year": "2005, (c) 2016 (asm.org/asm/media/protocol-images/serial-dilution-protocols.pdf)",
+   "source_section_or_page": "p. 3, worked series: '1ml added to 9ml = 1/10 (2nd tube)' -> per-tube total 10 mL, DF 10, transfer 1 mL, diluent 9 mL. starting_concentration 51,000 (the protocol's '51,000 CFUs/ml' specimen result) and 2 steps only populate the tubes array; they do not affect the checked scalars. Exact; tolerance abs 0.0001 is float only.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "starting_concentration": 51000,
+    "dilution_factor": 10,
+    "volume_per_tube": 10,
+    "number_of_steps": 2
+   },
+   "outputs": {
+    "transfer_volume": {
+     "value": 1,
+     "tolerance": {
+      "abs": 0.0001
+     }
+    },
+    "diluent_volume": {
+     "value": 9,
+     "tolerance": {
+      "abs": 0.0001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "serial-dilution",
+   "source_publisher": "American Society for Microbiology",
+   "source_title": "Serial Dilution Protocols (J. Reynolds)",
+   "source_edition_or_year": "2005, (c) 2016 (asm.org/asm/media/protocol-images/serial-dilution-protocols.pdf)",
+   "source_section_or_page": "p. 3, worked series: '0.5 ml added to 4.5ml = 0.5/5.0 = 5/50 = 1/10 for 1st tube' -> per-tube total 5 mL, DF 10, transfer 0.5 mL, diluent 4.5 mL. starting_concentration does not affect the checked scalars. Exact; tolerance abs 0.0001 is float only.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "starting_concentration": 51000,
+    "dilution_factor": 10,
+    "volume_per_tube": 5,
+    "number_of_steps": 1
+   },
+   "outputs": {
+    "transfer_volume": {
+     "value": 0.5,
+     "tolerance": {
+      "abs": 0.0001
+     }
+    },
+    "diluent_volume": {
+     "value": 4.5,
+     "tolerance": {
+      "abs": 0.0001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "pcr-master-mix",
+   "source_publisher": "Lab Manager",
+   "source_title": "PCR and qPCR Master Mix Calculator: Set Up Every Reaction the Same Way",
+   "source_edition_or_year": "web article, accessed 2026-10-02 (labmanager.com, article 35710)",
+   "source_section_or_page": "Worked text: 'Each reaction needs 10 uL of the 2X mix, 1 uL of each primer, and 6 uL of water, which is 18 uL of master mix per reaction'; 'Multiply that 18 uL by 10 reactions and add 10 percent to cover pipetting loss, and you prepare 198 uL of master mix.' Exact; tolerance abs 0.01 is float only.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "number_of_reactions": 10,
+    "fudge_factor_pct": 10,
+    "components": [
+     {
+      "name": "2X master mix",
+      "per_reaction": 10
+     },
+     {
+      "name": "Forward primer (10 uM)",
+      "per_reaction": 1
+     },
+     {
+      "name": "Reverse primer (10 uM)",
+      "per_reaction": 1
+     },
+     {
+      "name": "Nuclease-free water",
+      "per_reaction": 6
+     }
+    ]
+   },
+   "outputs": {
+    "total_per_reaction": {
+     "value": 18,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "total_master_mix": {
+     "value": 198,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "scaling_factor": {
+     "value": 11,
+     "tolerance": {
+      "abs": 0.0001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "mass-moles",
+   "source_publisher": "LibreTexts (Chemistry LibreTexts; CK-12 Introductory Chemistry)",
+   "source_title": "10.4: Conversions Between Moles and Mass",
+   "source_edition_or_year": "web textbook, accessed 2026-10-02",
+   "source_section_or_page": "Example 'Converting Moles to Mass': 0.560 mol Cr at 52.00 g/mol -> printed '29.1 g Cr' (tile 29.12). Tolerance abs 0.05 covers the 3-significant-figure rounding.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "mass_g": null,
+    "moles": 0.56,
+    "molecular_weight": 52
+   },
+   "outputs": {
+    "mass_g": {
+     "value": 29.1,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "mass-moles",
+   "source_publisher": "LibreTexts (Chemistry LibreTexts; CK-12 Introductory Chemistry)",
+   "source_title": "10.4: Conversions Between Moles and Mass",
+   "source_edition_or_year": "web textbook, accessed 2026-10-02",
+   "source_section_or_page": "Example 'Converting Mass to Moles': 2.81 g Cu(OH)2 at 97.57 g/mol -> printed '0.0288 mol' (tile 0.028800). Tolerance abs 0.00005 covers the printed rounding.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "mass_g": 2.81,
+    "moles": null,
+    "molecular_weight": 97.57
+   },
+   "outputs": {
+    "moles": {
+     "value": 0.0288,
+     "tolerance": {
+      "abs": 5e-05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "helical-pile",
+   "source_publisher": "Hubbell Power Systems, Inc. (CHANCE)",
+   "source_title": "CHANCE Technical Design Manual, Table 7-4: CHANCE Helical Pile/Anchor Load Capacity Table",
+   "source_edition_or_year": "(c) 2014, page 7-12",
+   "source_section_or_page": "Table 7-4 row SS5 1-1/2 in: torque rating 5,700 ft-lb, ultimate [Pu] 57 kip, allowable [Pa = 0.5 Pu] 28.5 kip; footnote: 'Capacity = Torque Rating x Kt ... Default Kt for Type SS = 10 ft-1 ... RS2875 Series = 9 ft-1 ... RS3500.300 = 7 ft-1'. Exact products; tolerance abs 1 lb is float only.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "shaft": "1.5_inch_solid",
+    "torque_ft_lb": 5700,
+    "factor_of_safety": 2
+   },
+   "outputs": {
+    "Kt": {
+     "value": 10,
+     "tolerance": {
+      "abs": 0
+     }
+    },
+    "ultimate_lb": {
+     "value": 57000,
+     "tolerance": {
+      "abs": 1
+     }
+    },
+    "allowable_lb": {
+     "value": 28500,
+     "tolerance": {
+      "abs": 1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "helical-pile",
+   "source_publisher": "Hubbell Power Systems, Inc. (CHANCE)",
+   "source_title": "CHANCE Technical Design Manual, Table 7-4: CHANCE Helical Pile/Anchor Load Capacity Table",
+   "source_edition_or_year": "(c) 2014, page 7-12",
+   "source_section_or_page": "Table 7-4 row SS150 1-1/2 in: torque rating 7,000 ft-lb, ultimate [Pu] 70 kip, allowable [Pa = 0.5 Pu] 35 kip; footnote: 'Capacity = Torque Rating x Kt ... Default Kt for Type SS = 10 ft-1 ... RS2875 Series = 9 ft-1 ... RS3500.300 = 7 ft-1'. Exact products; tolerance abs 1 lb is float only.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "shaft": "1.5_inch_solid",
+    "torque_ft_lb": 7000,
+    "factor_of_safety": 2
+   },
+   "outputs": {
+    "Kt": {
+     "value": 10,
+     "tolerance": {
+      "abs": 0
+     }
+    },
+    "ultimate_lb": {
+     "value": 70000,
+     "tolerance": {
+      "abs": 1
+     }
+    },
+    "allowable_lb": {
+     "value": 35000,
+     "tolerance": {
+      "abs": 1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "helical-pile",
+   "source_publisher": "Hubbell Power Systems, Inc. (CHANCE)",
+   "source_title": "CHANCE Technical Design Manual, Table 7-4: CHANCE Helical Pile/Anchor Load Capacity Table",
+   "source_edition_or_year": "(c) 2014, page 7-12",
+   "source_section_or_page": "Table 7-4 row SS175 1-3/4 in: torque rating 10,500 ft-lb, ultimate [Pu] 105 kip, allowable [Pa = 0.5 Pu] 52.5 kip; footnote: 'Capacity = Torque Rating x Kt ... Default Kt for Type SS = 10 ft-1 ... RS2875 Series = 9 ft-1 ... RS3500.300 = 7 ft-1'. Exact products; tolerance abs 1 lb is float only.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "shaft": "1.75_inch_solid",
+    "torque_ft_lb": 10500,
+    "factor_of_safety": 2
+   },
+   "outputs": {
+    "Kt": {
+     "value": 10,
+     "tolerance": {
+      "abs": 0
+     }
+    },
+    "ultimate_lb": {
+     "value": 105000,
+     "tolerance": {
+      "abs": 1
+     }
+    },
+    "allowable_lb": {
+     "value": 52500,
+     "tolerance": {
+      "abs": 1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "helical-pile",
+   "source_publisher": "Hubbell Power Systems, Inc. (CHANCE)",
+   "source_title": "CHANCE Technical Design Manual, Table 7-4: CHANCE Helical Pile/Anchor Load Capacity Table",
+   "source_edition_or_year": "(c) 2014, page 7-12",
+   "source_section_or_page": "Table 7-4 row RS2875.203 2-7/8 in: torque rating 5,500 ft-lb, ultimate [Pu] 49.5 kip, allowable [Pa = 0.5 Pu] 24.75 kip; footnote: 'Capacity = Torque Rating x Kt ... Default Kt for Type SS = 10 ft-1 ... RS2875 Series = 9 ft-1 ... RS3500.300 = 7 ft-1'. Exact products; tolerance abs 1 lb is float only.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "shaft": "2.875_inch_pipe",
+    "torque_ft_lb": 5500,
+    "factor_of_safety": 2
+   },
+   "outputs": {
+    "Kt": {
+     "value": 9,
+     "tolerance": {
+      "abs": 0
+     }
+    },
+    "ultimate_lb": {
+     "value": 49500,
+     "tolerance": {
+      "abs": 1
+     }
+    },
+    "allowable_lb": {
+     "value": 24750,
+     "tolerance": {
+      "abs": 1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "helical-pile",
+   "source_publisher": "Hubbell Power Systems, Inc. (CHANCE)",
+   "source_title": "CHANCE Technical Design Manual, Table 7-4: CHANCE Helical Pile/Anchor Load Capacity Table",
+   "source_edition_or_year": "(c) 2014, page 7-12",
+   "source_section_or_page": "Table 7-4 row RS2875.276 2-7/8 in: torque rating 8,000 ft-lb, ultimate [Pu] 72 kip, allowable [Pa = 0.5 Pu] 36 kip; footnote: 'Capacity = Torque Rating x Kt ... Default Kt for Type SS = 10 ft-1 ... RS2875 Series = 9 ft-1 ... RS3500.300 = 7 ft-1'. Exact products; tolerance abs 1 lb is float only.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "shaft": "2.875_inch_pipe",
+    "torque_ft_lb": 8000,
+    "factor_of_safety": 2
+   },
+   "outputs": {
+    "Kt": {
+     "value": 9,
+     "tolerance": {
+      "abs": 0
+     }
+    },
+    "ultimate_lb": {
+     "value": 72000,
+     "tolerance": {
+      "abs": 1
+     }
+    },
+    "allowable_lb": {
+     "value": 36000,
+     "tolerance": {
+      "abs": 1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "helical-pile",
+   "source_publisher": "Hubbell Power Systems, Inc. (CHANCE)",
+   "source_title": "CHANCE Technical Design Manual, Table 7-4: CHANCE Helical Pile/Anchor Load Capacity Table",
+   "source_edition_or_year": "(c) 2014, page 7-12",
+   "source_section_or_page": "Table 7-4 row RS3500.300 3-1/2 in: torque rating 13,000 ft-lb, ultimate [Pu] 91 kip, allowable [Pa = 0.5 Pu] 45.5 kip; footnote: 'Capacity = Torque Rating x Kt ... Default Kt for Type SS = 10 ft-1 ... RS2875 Series = 9 ft-1 ... RS3500.300 = 7 ft-1'. Exact products; tolerance abs 1 lb is float only.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "shaft": "3.5_inch_pipe",
+    "torque_ft_lb": 13000,
+    "factor_of_safety": 2
+   },
+   "outputs": {
+    "Kt": {
+     "value": 7,
+     "tolerance": {
+      "abs": 0
+     }
+    },
+    "ultimate_lb": {
+     "value": 91000,
+     "tolerance": {
+      "abs": 1
+     }
+    },
+    "allowable_lb": {
+     "value": 45500,
+     "tolerance": {
+      "abs": 1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "hip-valley-rafter",
+   "source_publisher": "Naval Education and Training Professional Development and Technology Center (US Navy)",
+   "source_title": "Builder 3 & 2, Volume 2, Chapter 2: Roof Framing",
+   "source_edition_or_year": "NAVEDTRA 14044 (1994)",
+   "source_section_or_page": "pp. 2-20/2-21: span 30 ft so common total run 15 ft, unit rise 8; hip 'bridge measure' 18.76 in per 16.97 in unit run; '16.97:18.76::21.21:x, or 23.45 feet' and '18.76 x 15, or 281.40 inches -- 23.45 feet'; p. 2-31: common unit length '14.42 units long for every 12 units of run'. Multipliers expressed per 12 in: 14.42/12 = 1.2017, 18.76/12 = 1.5633 (tile 1.20185 / 1.56347). Tolerances abs 0.001 (multipliers) and abs 0.01 ft (length) cover the printed 2-decimal rounding. overhang_in 0 and jack_oc_in 16 (the manual's OC) do not affect the checked scalars.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "run_ft": 15,
+    "pitch": 8,
+    "pitch_irregular": 0,
+    "overhang_in": 0,
+    "jack_oc_in": 16
+   },
+   "outputs": {
+    "common_run_multiplier": {
+     "value": 1.2017,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "hip_run_multiplier": {
+     "value": 1.5633,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "hip_length_ft": {
+     "value": 23.45,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "stair-stringer",
+   "source_publisher": "Naval Education and Training Professional Development and Technology Center (US Navy)",
+   "source_title": "Builder 3 & 2, Volume 2, Chapter 6: Interior Finish of Floors, Stairs, Doors, and Trim",
+   "source_edition_or_year": "NAVEDTRA 14044 (1994)",
+   "source_section_or_page": "p. 6-13: 'For an approximate length estimate, call the sides 9 and 13 feet long. Then, the length of the hypotenuse will equal the square root of 9^2 plus 13^2. This is the square root of 250, about 15.8 feet' (tile 15.811 ft). Tolerance abs 0.05 ft covers the printed 1-decimal rounding.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "total_rise_in": 108,
+    "total_run_in": 156,
+    "tread_cut_depth_in": 1
+   },
+   "outputs": {
+    "stringer_ft": {
+     "value": 15.8,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "metal-weight",
+   "source_publisher": "Wheatland Tube (Zekelman Industries)",
+   "source_title": "Standard Pipe brochure (ASTM A53 / ASME B36.10 dimensions)",
+   "source_edition_or_year": "2017 (wheatland.com/wp-content/uploads/2017/12/Standard-Pipe-Brochure-2.pdf)",
+   "source_section_or_page": "Schedule 40 (STD) table, NPS 2: OD 2.375 in, ID 2.067 in, plain-end weight 3.66 lb/ft. One 12 in piece at the tile's carbon-steel 0.2836 lb/in3. Tolerance pct 0.5 covers the printed 2-decimal rounding and the 0.2833 vs 0.2836 density basis.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "shape": "round-tube",
+    "dia_in": 2.375,
+    "id_in": 2.067,
+    "length_in": 12,
+    "quantity": 1,
+    "density_lb_in3": 0.2836
+   },
+   "outputs": {
+    "weight_per_piece_lb": {
+     "value": 3.66,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "metal-weight",
+   "source_publisher": "Wheatland Tube (Zekelman Industries)",
+   "source_title": "Standard Pipe brochure (ASTM A53 / ASME B36.10 dimensions)",
+   "source_edition_or_year": "2017 (wheatland.com/wp-content/uploads/2017/12/Standard-Pipe-Brochure-2.pdf)",
+   "source_section_or_page": "Schedule 40 (STD) table, NPS 4: OD 4.5 in, ID 4.026 in, plain-end weight 10.80 lb/ft. One 12 in piece at the tile's carbon-steel 0.2836 lb/in3. Tolerance pct 0.5 covers the printed 2-decimal rounding and the 0.2833 vs 0.2836 density basis.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "shape": "round-tube",
+    "dia_in": 4.5,
+    "id_in": 4.026,
+    "length_in": 12,
+    "quantity": 1,
+    "density_lb_in3": 0.2836
+   },
+   "outputs": {
+    "weight_per_piece_lb": {
+     "value": 10.8,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "metal-weight",
+   "source_publisher": "Wheatland Tube (Zekelman Industries)",
+   "source_title": "Standard Pipe brochure (ASTM A53 / ASME B36.10 dimensions)",
+   "source_edition_or_year": "2017 (wheatland.com/wp-content/uploads/2017/12/Standard-Pipe-Brochure-2.pdf)",
+   "source_section_or_page": "Schedule 80 (XS) table, NPS 1: OD 1.315 in, ID 0.957 in, plain-end weight 2.17 lb/ft. One 12 in piece at the tile's carbon-steel 0.2836 lb/in3. Tolerance pct 0.5 covers the printed 2-decimal rounding and the 0.2833 vs 0.2836 density basis.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "shape": "round-tube",
+    "dia_in": 1.315,
+    "id_in": 0.957,
+    "length_in": 12,
+    "quantity": 1,
+    "density_lb_in3": 0.2836
+   },
+   "outputs": {
+    "weight_per_piece_lb": {
+     "value": 2.17,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "metal-weight",
+   "source_publisher": "Wheatland Tube (Zekelman Industries)",
+   "source_title": "Standard Pipe brochure (ASTM A53 / ASME B36.10 dimensions)",
+   "source_edition_or_year": "2017 (wheatland.com/wp-content/uploads/2017/12/Standard-Pipe-Brochure-2.pdf)",
+   "source_section_or_page": "Schedule 80 (XS) table, NPS 4: OD 4.5 in, ID 3.826 in, plain-end weight 15.00 lb/ft. One 12 in piece at the tile's carbon-steel 0.2836 lb/in3. Tolerance pct 0.5 covers the printed 2-decimal rounding and the 0.2833 vs 0.2836 density basis.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "shape": "round-tube",
+    "dia_in": 4.5,
+    "id_in": 3.826,
+    "length_in": 12,
+    "quantity": 1,
+    "density_lb_in3": 0.2836
+   },
+   "outputs": {
+    "weight_per_piece_lb": {
+     "value": 15,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "metal-weight",
+   "source_publisher": "Service Steel Warehouse",
+   "source_title": "Equal Angles Sizing Chart",
+   "source_edition_or_year": "2025 (servicesteel.org/wp-content/uploads/2025/04/Equal-Angles-Sizing-Chart-Service-Steel-Warehouse.pdf)",
+   "source_section_or_page": "Row 'L8 x 8 x 1': weight 51.0 lb/ft, area 15 in2. Tile area (l1 + l2 - t) t ignores the root fillet. One 12 in piece at 0.2836 lb/in3. Tolerance pct 0.5 covers the printed 3-significant-figure rounding.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "shape": "angle",
+    "leg1_in": 8,
+    "leg2_in": 8,
+    "thickness_in": 1,
+    "length_in": 12,
+    "quantity": 1,
+    "density_lb_in3": 0.2836
+   },
+   "outputs": {
+    "cross_section_area_in2": {
+     "value": 15,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "weight_per_piece_lb": {
+     "value": 51,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "metal-weight",
+   "source_publisher": "Service Steel Warehouse",
+   "source_title": "Equal Angles Sizing Chart",
+   "source_edition_or_year": "2025 (servicesteel.org/wp-content/uploads/2025/04/Equal-Angles-Sizing-Chart-Service-Steel-Warehouse.pdf)",
+   "source_section_or_page": "Row 'L6 x 6 x 1/2': weight 19.6 lb/ft, area 5.75 in2. Tile area (l1 + l2 - t) t ignores the root fillet. One 12 in piece at 0.2836 lb/in3. Tolerance pct 0.5 covers the printed 3-significant-figure rounding.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "shape": "angle",
+    "leg1_in": 6,
+    "leg2_in": 6,
+    "thickness_in": 0.5,
+    "length_in": 12,
+    "quantity": 1,
+    "density_lb_in3": 0.2836
+   },
+   "outputs": {
+    "cross_section_area_in2": {
+     "value": 5.75,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "weight_per_piece_lb": {
+     "value": 19.6,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "metal-weight",
+   "source_publisher": "Service Steel Warehouse",
+   "source_title": "Equal Angles Sizing Chart",
+   "source_edition_or_year": "2025 (servicesteel.org/wp-content/uploads/2025/04/Equal-Angles-Sizing-Chart-Service-Steel-Warehouse.pdf)",
+   "source_section_or_page": "Row 'L4 x 4 x 1/2': weight 12.8 lb/ft, area 3.75 in2. Tile area (l1 + l2 - t) t ignores the root fillet. One 12 in piece at 0.2836 lb/in3. Tolerance pct 0.5 covers the printed 3-significant-figure rounding.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "shape": "angle",
+    "leg1_in": 4,
+    "leg2_in": 4,
+    "thickness_in": 0.5,
+    "length_in": 12,
+    "quantity": 1,
+    "density_lb_in3": 0.2836
+   },
+   "outputs": {
+    "cross_section_area_in2": {
+     "value": 3.75,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "weight_per_piece_lb": {
+     "value": 12.8,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "weld-metal-volume",
+   "source_publisher": "Naval Education and Training Professional Development and Technology Center (US Navy)",
+   "source_title": "Steelworker Advanced, Chapter 5: Welding Costs (Table 5-1, Calculation of Electrode Consumption)",
+   "source_edition_or_year": "NAVEDTRA 14251A",
+   "source_section_or_page": "Table 5-1 (p. 5-6), fillet size 1/8 in: 'Steel Deposited per linear foot of weld (in pounds)' 0.027. 12 in of weld. Publisher arithmetic is leg^2/2 x 12 x 0.283 lb/in3 (e.g., 1 in: 0.5 x 12 x 0.283 = 1.698); tile uses 0.2836, a 0.21% difference. Deposition efficiency 0.9 (tile default) does not affect deposit_lb. Tolerance abs 0.0006 lb covers the 3-decimal printing and the density basis.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "joint_type": "fillet",
+    "fillet_leg_in": 0.125,
+    "length_in": 12,
+    "deposition_eff": 0.9,
+    "max_pass_area_in2": 0.05
+   },
+   "outputs": {
+    "deposit_lb": {
+     "value": 0.027,
+     "tolerance": {
+      "abs": 0.0006
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "weld-metal-volume",
+   "source_publisher": "Naval Education and Training Professional Development and Technology Center (US Navy)",
+   "source_title": "Steelworker Advanced, Chapter 5: Welding Costs (Table 5-1, Calculation of Electrode Consumption)",
+   "source_edition_or_year": "NAVEDTRA 14251A",
+   "source_section_or_page": "Table 5-1 (p. 5-6), fillet size 1/4 in: 'Steel Deposited per linear foot of weld (in pounds)' 0.106. 12 in of weld. Publisher arithmetic is leg^2/2 x 12 x 0.283 lb/in3 (e.g., 1 in: 0.5 x 12 x 0.283 = 1.698); tile uses 0.2836, a 0.21% difference. The p. 5-18 semiautomatic GMAW sample uses '.106 lbs/ft' with deposition efficiency '.95' (entered here). Tolerance pct 0.5 covers the 3-decimal printing and the density basis.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "joint_type": "fillet",
+    "fillet_leg_in": 0.25,
+    "length_in": 12,
+    "deposition_eff": 0.95,
+    "max_pass_area_in2": 0.05
+   },
+   "outputs": {
+    "deposit_lb": {
+     "value": 0.106,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "weld-metal-volume",
+   "source_publisher": "Naval Education and Training Professional Development and Technology Center (US Navy)",
+   "source_title": "Steelworker Advanced, Chapter 5: Welding Costs (Table 5-1, Calculation of Electrode Consumption)",
+   "source_edition_or_year": "NAVEDTRA 14251A",
+   "source_section_or_page": "Table 5-1 (p. 5-6), fillet size 5/16 in: 'Steel Deposited per linear foot of weld (in pounds)' 0.166. 12 in of weld. Publisher arithmetic is leg^2/2 x 12 x 0.283 lb/in3 (e.g., 1 in: 0.5 x 12 x 0.283 = 1.698); tile uses 0.2836, a 0.21% difference. Deposition efficiency 0.9 (tile default) does not affect deposit_lb. Tolerance pct 0.5 covers the 3-decimal printing and the density basis.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "joint_type": "fillet",
+    "fillet_leg_in": 0.3125,
+    "length_in": 12,
+    "deposition_eff": 0.9,
+    "max_pass_area_in2": 0.05
+   },
+   "outputs": {
+    "deposit_lb": {
+     "value": 0.166,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "weld-metal-volume",
+   "source_publisher": "Naval Education and Training Professional Development and Technology Center (US Navy)",
+   "source_title": "Steelworker Advanced, Chapter 5: Welding Costs (Table 5-1, Calculation of Electrode Consumption)",
+   "source_edition_or_year": "NAVEDTRA 14251A",
+   "source_section_or_page": "Table 5-1 (p. 5-6), fillet size 3/8 in: 'Steel Deposited per linear foot of weld (in pounds)' 0.239. 12 in of weld. Publisher arithmetic is leg^2/2 x 12 x 0.283 lb/in3 (e.g., 1 in: 0.5 x 12 x 0.283 = 1.698); tile uses 0.2836, a 0.21% difference. Deposition efficiency 0.9 (tile default) does not affect deposit_lb. Tolerance pct 0.5 covers the 3-decimal printing and the density basis.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "joint_type": "fillet",
+    "fillet_leg_in": 0.375,
+    "length_in": 12,
+    "deposition_eff": 0.9,
+    "max_pass_area_in2": 0.05
+   },
+   "outputs": {
+    "deposit_lb": {
+     "value": 0.239,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "weld-metal-volume",
+   "source_publisher": "Naval Education and Training Professional Development and Technology Center (US Navy)",
+   "source_title": "Steelworker Advanced, Chapter 5: Welding Costs (Table 5-1, Calculation of Electrode Consumption)",
+   "source_edition_or_year": "NAVEDTRA 14251A",
+   "source_section_or_page": "Table 5-1 (p. 5-6), fillet size 1/2 in: 'Steel Deposited per linear foot of weld (in pounds)' 0.425. 12 in of weld. Publisher arithmetic is leg^2/2 x 12 x 0.283 lb/in3 (e.g., 1 in: 0.5 x 12 x 0.283 = 1.698); tile uses 0.2836, a 0.21% difference. Deposition efficiency 0.9 (tile default) does not affect deposit_lb. Tolerance pct 0.5 covers the 3-decimal printing and the density basis.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "joint_type": "fillet",
+    "fillet_leg_in": 0.5,
+    "length_in": 12,
+    "deposition_eff": 0.9,
+    "max_pass_area_in2": 0.05
+   },
+   "outputs": {
+    "deposit_lb": {
+     "value": 0.425,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "weld-metal-volume",
+   "source_publisher": "Naval Education and Training Professional Development and Technology Center (US Navy)",
+   "source_title": "Steelworker Advanced, Chapter 5: Welding Costs (Table 5-1, Calculation of Electrode Consumption)",
+   "source_edition_or_year": "NAVEDTRA 14251A",
+   "source_section_or_page": "Table 5-1 (p. 5-6), fillet size 5/8 in: 'Steel Deposited per linear foot of weld (in pounds)' 0.663. 12 in of weld. Publisher arithmetic is leg^2/2 x 12 x 0.283 lb/in3 (e.g., 1 in: 0.5 x 12 x 0.283 = 1.698); tile uses 0.2836, a 0.21% difference. Deposition efficiency 0.9 (tile default) does not affect deposit_lb. Tolerance pct 0.5 covers the 3-decimal printing and the density basis.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "joint_type": "fillet",
+    "fillet_leg_in": 0.625,
+    "length_in": 12,
+    "deposition_eff": 0.9,
+    "max_pass_area_in2": 0.05
+   },
+   "outputs": {
+    "deposit_lb": {
+     "value": 0.663,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "weld-metal-volume",
+   "source_publisher": "Naval Education and Training Professional Development and Technology Center (US Navy)",
+   "source_title": "Steelworker Advanced, Chapter 5: Welding Costs (Table 5-1, Calculation of Electrode Consumption)",
+   "source_edition_or_year": "NAVEDTRA 14251A",
+   "source_section_or_page": "Table 5-1 (p. 5-6), fillet size 3/4 in: 'Steel Deposited per linear foot of weld (in pounds)' 0.955. 12 in of weld. Publisher arithmetic is leg^2/2 x 12 x 0.283 lb/in3 (e.g., 1 in: 0.5 x 12 x 0.283 = 1.698); tile uses 0.2836, a 0.21% difference. Deposition efficiency 0.9 (tile default) does not affect deposit_lb. Tolerance pct 0.5 covers the 3-decimal printing and the density basis.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "joint_type": "fillet",
+    "fillet_leg_in": 0.75,
+    "length_in": 12,
+    "deposition_eff": 0.9,
+    "max_pass_area_in2": 0.05
+   },
+   "outputs": {
+    "deposit_lb": {
+     "value": 0.955,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "weld-metal-volume",
+   "source_publisher": "Naval Education and Training Professional Development and Technology Center (US Navy)",
+   "source_title": "Steelworker Advanced, Chapter 5: Welding Costs (Table 5-1, Calculation of Electrode Consumption)",
+   "source_edition_or_year": "NAVEDTRA 14251A",
+   "source_section_or_page": "Table 5-1 (p. 5-6), fillet size 1 in: 'Steel Deposited per linear foot of weld (in pounds)' 1.698. 12 in of weld. Publisher arithmetic is leg^2/2 x 12 x 0.283 lb/in3 (e.g., 1 in: 0.5 x 12 x 0.283 = 1.698); tile uses 0.2836, a 0.21% difference. Deposition efficiency 0.9 (tile default) does not affect deposit_lb. Tolerance pct 0.5 covers the 3-decimal printing and the density basis.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "joint_type": "fillet",
+    "fillet_leg_in": 1,
+    "length_in": 12,
+    "deposition_eff": 0.9,
+    "max_pass_area_in2": 0.05
+   },
+   "outputs": {
+    "deposit_lb": {
+     "value": 1.698,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "weld-metal-volume",
+   "source_publisher": "TWI Ltd",
+   "source_title": "Job Knowledge 95: Calculating Weld Volume and Weight",
+   "source_edition_or_year": "web article (twi-global.com/technical-knowledge/job-knowledge/calculating-weld-volume-and-weight-095)",
+   "source_section_or_page": "Single-V butt example: 'Total cross-sectional area: 5.07 sq cm', '507 cu cm/metre', carbon steel (7.86 g/cm3) '3.98 kg/metre'. Entered as groove_area_in2 = 5.07/6.4516 = 0.78585 in2 and length_in = 1,000/25.4 = 39.3701 in (exact unit conversions); 3.98 kg = 8.774 lb, 507 cm3 = 30.94 in3. Tile 8.7743 lb (0.2836 lb/in3 = 7.850 g/cm3 vs 7.86). Tolerance pct 0.5 covers the density basis and 3-figure rounding. Deposition efficiency (tile default 0.9) does not affect deposit.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "joint_type": "groove",
+    "groove_area_in2": 0.785852,
+    "length_in": 39.3701,
+    "deposition_eff": 0.9,
+    "max_pass_area_in2": 0.05
+   },
+   "outputs": {
+    "deposit_in3": {
+     "value": 30.94,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "deposit_lb": {
+     "value": 8.774,
+     "tolerance": {
+      "pct": 0.5
      }
     }
    }

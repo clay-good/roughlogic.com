@@ -1402,7 +1402,7 @@ export const rampSlopeExample = { inputs: { rise_in: 6, run_in: 72 } };
 // --- Utility 169: Rainwater Harvesting Yield ---
 
 // dims: in { catchment_ft2: L^2, monthly_in: L, annual_in: L, efficiency: dimensionless } out: { gallons: L^3 }
-export function computeRainwaterYield({ catchment_ft2 = 0, monthly_in = [], annual_in = null, efficiency = 0.62 }) {
+export function computeRainwaterYield({ catchment_ft2 = 0, monthly_in = [], annual_in = null, efficiency = 0.85 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   // Until 2026-09-26 a negative entry here returned a negative quantity with no error.
   if (["catchment_ft2", "annual_in", "efficiency"].some((k) => Number(arguments[0]?.[k]) < 0)) return { error: "Catchment area, rainfall, and efficiency cannot be negative." };
@@ -1421,16 +1421,16 @@ export function computeRainwaterYield({ catchment_ft2 = 0, monthly_in = [], annu
 }
 
 export const rainwaterYieldExample = {
-  inputs: { catchment_ft2: 1000, monthly_in: [3, 3, 4, 4, 4, 3, 2, 2, 2, 3, 4, 4], efficiency: 0.62 },
+  inputs: { catchment_ft2: 1000, monthly_in: [3, 3, 4, 4, 4, 3, 2, 2, 2, 3, 4, 4], efficiency: 0.85 },
 };
 
 // --- spec-v675: catchment area for a target rainwater harvest (inverse of rainwater-yield) ---
 // dims: in { target_annual_gal: L^3, annual_in: L, efficiency: dimensionless } out: { catchment_ft2: L^2 }
-export function computeRainwaterCatchmentArea({ target_annual_gal = 0, annual_in = 0, efficiency = 0.62 } = {}) {
+export function computeRainwaterCatchmentArea({ target_annual_gal = 0, annual_in = 0, efficiency = 0.85 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const target = Number(target_annual_gal) || 0;
   const rain = Number(annual_in) || 0;
-  const eff = (efficiency === undefined || efficiency === null || efficiency === "") ? 0.62 : Number(efficiency);
+  const eff = (efficiency === undefined || efficiency === null || efficiency === "") ? 0.85 : Number(efficiency);
   if (!(target > 0)) return { error: "Target annual harvest must be positive (gal)." };
   if (!(rain > 0)) return { error: "Annual rainfall must be positive (in)." };
   if (!(eff > 0 && eff <= 1)) return { error: "Collection efficiency must be over 0 and up to 1." };
@@ -1439,10 +1439,10 @@ export function computeRainwaterCatchmentArea({ target_annual_gal = 0, annual_in
   if (!Number.isFinite(catchment_ft2) || !(catchment_ft2 > 0)) return { error: "Catchment-area math is not a finite positive value." };
   return {
     catchment_ft2,
-    note: "The catchment (roof) area needed to harvest a target volume of rainwater a year, the inverse of the rainwater-yield tile: area = target_gal / (annual_in x 0.6233 x efficiency). The 0.6233 converts one inch of rain over one square foot to gallons; efficiency (about 0.62 for a sloped roof, higher for metal) accounts for first-flush, splash, and evaporation losses. The area is the horizontal footprint the rain falls on, not the sloped surface. A planning estimate; local rainfall records, the storage tank size, and the demand pattern govern the real system."
+    note: "The catchment (roof) area needed to harvest a target volume of rainwater a year, the inverse of the rainwater-yield tile: area = target_gal / (annual_in x 0.6233 x efficiency). The 0.6233 converts one inch of rain over one square foot to gallons; efficiency (about 0.85 per TWDB, 0.75-0.90; lower for rough or porous roofs) accounts for first-flush, splash, and evaporation losses. The area is the horizontal footprint the rain falls on, not the sloped surface. A planning estimate; local rainfall records, the storage tank size, and the demand pattern govern the real system."
   };
 }
-export const rainwaterCatchmentAreaExample = { inputs: { target_annual_gal: 11593, annual_in: 30, efficiency: 0.62 } };
+export const rainwaterCatchmentAreaExample = { inputs: { target_annual_gal: 15895, annual_in: 30, efficiency: 0.85 } };
 
 // --- Utility 171: Daily Multi-Job Timesheet ---
 
@@ -1715,11 +1715,11 @@ const renderRampSlope = _simpleRendererG({
 });
 
 function renderRainwaterYield(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: Public engineering form gallons = area * rainfall * 0.6233 * efficiency. Default efficiency 0.62 for sloped roofs.";
+  citationEl.textContent = "Citation: Public engineering form gallons = area * rainfall * 0.6233 * efficiency. Default collection efficiency 0.85 (TWDB Rainwater Harvesting Manual: installers assume 75-90%; 0.62 is the gallons-per-inch-per-ft^2 constant, not an efficiency, and was the default here until 2026-10-02).";
   _aeG(inputRegion, () => fillExample(rainwaterYieldExample.inputs));
   const a = _mnG("Catchment area (ft^2)", "rw-a", { step: "any", min: "0" });
-  const e = _mnG("Collection efficiency (0-1)", "rw-e", { step: "any", min: "0", max: "1", value: "0.62" });
-  e.input.value = "0.62";
+  const e = _mnG("Collection efficiency (0-1)", "rw-e", { step: "any", min: "0", max: "1", value: "0.85" });
+  e.input.value = "0.85";
   const an = _mnG("Annual rainfall (in)", "rw-an", { step: "any", min: "0" });
   for (const f of [a, e, an]) inputRegion.appendChild(f.wrap);
   const oA = _moG(outputRegion, "Annual yield", "rw-out-a");
@@ -1739,11 +1739,11 @@ function renderRainwaterYield(inputRegion, outputRegion, citationEl) {
 
 function renderRainwaterCatchmentArea(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: public engineering form solved for area: area = target_gal / (annual_in * 0.6233 * efficiency), from gallons = area * rainfall * 0.6233 * efficiency. Default efficiency 0.62 for sloped roofs. A planning estimate; local rainfall, storage, and demand govern.";
-  _aeG(inputRegion, () => { g.input.value = "11593"; an.input.value = "30"; e.input.value = "0.62"; update(); });
+  _aeG(inputRegion, () => { g.input.value = "15895"; an.input.value = "30"; e.input.value = "0.85"; update(); });
   const g = _mnG("Target annual harvest (gal)", "rwca-g", { step: "any", min: "0" });
   const an = _mnG("Annual rainfall (in)", "rwca-an", { step: "any", min: "0" });
-  const e = _mnG("Collection efficiency (0-1)", "rwca-e", { step: "any", min: "0", max: "1", value: "0.62" });
-  e.input.value = "0.62";
+  const e = _mnG("Collection efficiency (0-1)", "rwca-e", { step: "any", min: "0", max: "1", value: "0.85" });
+  e.input.value = "0.85";
   for (const f of [g, an, e]) inputRegion.appendChild(f.wrap);
   const oA = _moG(outputRegion, "Catchment area needed", "rwca-out-a");
   const oN = _moG(outputRegion, "Note", "rwca-out-n");

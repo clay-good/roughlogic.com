@@ -1902,7 +1902,7 @@ export const CITATIONS = {
     ],
   },
   "phase-balance": {
-    formula: "Per-phase totals, then imbalance % = (max - min) / average x 100. The swap suggestion is a greedy pass that moves the smallest fitting circuit from the heaviest phase to the lightest.",
+    formula: "Per-phase totals, then imbalance % = (max - min) / average x 100. The swap suggestion is a greedy pass that moves the largest circuit that fits under half the gap from the heaviest phase to the lightest. The spread (max - min) / average is about twice NEMA's maximum-deviation-from-average measure (48/52/50 A: 8% here, 4% by NEMA).",
     edition: "Engineering practice; NEC Article 220 by name.",
     freeAccess: NEC_FREE,
     governance: GOVERNANCE.electrical,
@@ -2238,7 +2238,7 @@ export const CITATIONS = {
     editionNote: NEC_DISCLOSURE,
     assumptions: [
       { name: "Phases", value: "A / B / C single-leg circuits only (multi-pole breakers must be aggregated by the user)", source: "engineering practice" },
-      { name: "Swap threshold", value: "imbalance > 5% triggers a suggestion (NEMA MG-1 caution at 1%; engineering-practice 5% rebalance trigger)", source: "engineering practice" },
+      { name: "Swap threshold", value: "imbalance > 5% triggers a suggestion (an engineering-practice 5% rebalance trigger on the max-min spread; NEMA MG-1's 1% is a VOLTAGE-unbalance limit for motors, measured as maximum deviation from the average, not a load-current spread)", source: "engineering practice" },
     ],
   },
 
@@ -3581,7 +3581,7 @@ export const CITATIONS = {
     ],
   },
   "hip-valley-rafter": {
-    formula: "Common-rafter run multiplier m = sqrt(P² + 144) / 12 (P = pitch, rise per 12 in run). Hip / valley multiplier m_hip = sqrt(P² + 288) / 12 (square 12 × 12 diagonal = 16.97). Jack-rafter shortening per OC: dx_oc = oc × m_common; jack length at distance n × dx_oc = (run − n × dx_oc) × m_common.",
+    formula: "Common-rafter run multiplier m = sqrt(P² + 144) / 12 (P = pitch, rise per 12 in run). Hip / valley multiplier m_hip = sqrt(P² + 288) / 12 (square 12 × 12 diagonal = 16.97). Hip jacks: the n-th jack sits n × oc along the plate from the corner and runs that far to the hip, so its length is n × oc × m_common, each jack longer by the common difference oc × m_common (NAVEDTRA 14044: 19.23 in at 16 in o.c. and 8 in rise).",
     edition: "Carpentry framing-square method by name. Public layout taught in any framing-square reference (Steel Square Pocket Book, Audel's Carpenters and Builders Library) by name.",
     freeAccess: "Older Steel Square Pocket Book editions free at archive.org.",
     governance: GOVERNANCE.structural,
@@ -5376,7 +5376,7 @@ export const CITATIONS = {
   },
   "bolt-stretch": {
     formula: "Clamp load F = (stretch × area × E) / grip. Stretch is residual elongation after torque; E is fastener elastic modulus per material.",
-    edition: "ASTM A325 / A490 / SAE J429 by name; SAE bolt material moduli (steel ~ 30e6 psi, stainless A2/A4 ~ 28e6, Inconel 718 ~ 29.6e6, titanium 6Al-4V ~ 16.5e6, aluminum 2024 ~ 10.6e6).",
+    edition: "ASTM A325 / A490 / SAE J429 by name; SAE bolt material moduli (steel ~ 30e6 psi, stainless A2/A4 ~ 28e6, Inconel 718 ~ 29.6e6, titanium 6Al-4V ~ 16.5e6, aluminum 2024 ~ 10.6e6). The code uses these except Inconel 31e6 and aluminum 10e6, round figures within the grade-to-grade spread; enter the fastener maker's modulus for a critical joint.",
     freeAccess: "ASTM / SAE licensed; engineering-property values free in Machinery's Handbook (older editions free at archive.org).",
     governance: GOVERNANCE.general,
     editionNote: "Single-edition (ASTM / SAE bolt material properties).",
@@ -5396,13 +5396,13 @@ export const CITATIONS = {
     ],
   },
   "driveshaft-crit": {
-    formula: "Euler-Bernoulli first-mode whirl (simply-supported, eigenvalue (βL)² = π²): N_crit (RPM) = (π² / L²) × sqrt((E × I) / (ρ × A)). Recommended max operating = 0.65 × N_crit (engineering-practice safety margin).",
+    formula: "Euler-Bernoulli first-mode whirl (simply-supported, eigenvalue (βL)² = π²): N_crit = (60 / 2π) × (π² / L²) × sqrt((E × I) / (ρ × A)) RPM (the bracketed term is rad/s). Recommended max operating = 0.65 × N_crit (engineering-practice safety margin).",
     edition: "Euler-Bernoulli beam theory by name; AAM (American Axle) and Spicer / Dana driveshaft engineering manuals by name.",
     freeAccess: "Beam-theory principles free in mechanics-of-materials texts at university OCW.",
     governance: GOVERNANCE.general,
     editionNote: "Single-edition (physics + manufacturer engineering practice).",
     assumptions: [
-      { name: "Material moduli / densities", value: "from data/construction or user-supplied; steel E = 30e6 psi / ρ = 0.283 lb/in³ default", source: "engineering reference" },
+      { name: "Material moduli / densities", value: "steel E = 200 GPa (29.0e6 psi) and 7,850 kg/m^3 (0.284 lb/in^3) by default, or user-supplied", source: "engineering reference" },
       { name: "Operating margin", value: "0.65 × N_crit recommended", source: "AAM / Spicer engineering manuals" },
     ],
   },
@@ -5441,7 +5441,7 @@ export const CITATIONS = {
     ],
   },
   "tire-gearing": {
-    formula: "Effective tire diameter from metric size (e.g., 285/75R17): D_in = (W_mm × ratio/100 × 2 + R_in × 25.4) / 25.4. Revs/mile = 63 360 / (π × D). Effective ratio = axle_ratio × (rev/mi_stock / rev/mi_new).",
+    formula: "Effective tire diameter from metric size (e.g., 285/75R17): D_in = (W_mm × ratio/100 × 2 + R_in × 25.4) / 25.4. Revs/mile = 63 360 / (π × D). Effective ratio = axle_ratio × (rev/mi_new / rev/mi_stock) x top gear -- a taller tire turns fewer revs per mile and LOWERS the effective ratio (3.73 to a 33 in tire reads about 3.57).",
     edition: "Tire & Rim Association (TRA) Yearbook by name; ETRTO Standards Manual by name; SAE J267 metric-tire size convention.",
     freeAccess: "TRA / ETRTO licensed; principles free at most tire-manufacturer technical pages (Goodyear, Michelin).",
     governance: GOVERNANCE.general,
@@ -6582,13 +6582,13 @@ export const CITATIONS = {
     assumptions: [],
   },
   "haversine": {
-    formula: "Great-circle distance via the haversine formula a = sin²(Δφ/2) + cos(φ1) × cos(φ2) × sin²(Δλ/2); d = 2 × R × atan2(sqrt(a), sqrt(1−a)). R = 6371 km mean earth radius. Initial bearing from atan2(sin(Δλ) cos(φ2), cos(φ1) sin(φ2) − sin(φ1) cos(φ2) cos(Δλ)); FINAL bearing is the reverse leg's initial bearing turned 180 degrees, and the drift between them is reported as a signed shortest-angle difference.",
+    formula: "Great-circle distance via the haversine formula a = sin²(Δφ/2) + cos(φ1) × cos(φ2) × sin²(Δλ/2); d = 2 × R × atan2(sqrt(a), sqrt(1−a)). R = 6371.0088 km, the IUGG mean earth radius. Initial bearing from atan2(sin(Δλ) cos(φ2), cos(φ1) sin(φ2) − sin(φ1) cos(φ2) cos(Δλ)); FINAL bearing is the reverse leg's initial bearing turned 180 degrees, and the drift between them is reported as a signed shortest-angle difference.",
     edition: "Classical spherical trigonometry; WGS84 mean radius.",
     freeAccess: "Haversine / great-circle derivations are free in navigation texts and at nist.gov and university OCW.",
     governance: GOVERNANCE.general,
     editionNote: "Single-edition (spherical geometry; mean spherical earth model).",
     assumptions: [
-      { name: "Earth radius", value: "6371 km (mean spherical) - actual oblate-spheroid distance can differ ≤ 0.5%", source: "WGS84 mean radius" },
+      { name: "Earth radius", value: "6371.0088 km (IUGG mean) - actual oblate-spheroid distance can differ by up to 0.5%", source: "WGS84 / IUGG mean radius" },
     ],
   },
   "trench-slope": {
@@ -7029,13 +7029,13 @@ export const CITATIONS = {
   // tractor and irrigation conventions.
 
   "gpa-rate": {
-    formula: "GPA = (5940 × GPM) / (speed_mph × spacing_in). The constant 5940 = 60 min/hr × 43 560 ft²/acre / (12 in/ft × ?)... derives from unit reconciliation.",
+    formula: "GPA = (5940 × GPM) / (speed_mph × spacing_in). The constant 5940 = 60 min/hr × 43,560 ft²/acre × 12 in/ft / 5,280 ft/mi = 5,940.",
     edition: "ASABE EP367 (Guide for Preparing Field Sprayer Calibration Procedures) by name; manufacturer sprayer-calibration guides (John Deere, AGCO, Case IH) by name.",
     freeAccess: "ASABE standards licensed; calibration principles free at most state-extension service pages (e.g., extension.psu.edu).",
     governance: GOVERNANCE.pesticide,
     editionNote: "Single-edition (ASABE EP367 + manufacturer calibration guides). Pesticide labels supersede this calculation: read and follow the product label.",
     assumptions: [
-      { name: "Constant 5940", value: "engineering-practice constant for GPM-to-GPA at 1 mph nozzle spacing", source: "ASABE EP367" },
+      { name: "Constant 5940", value: "60 min/hr x 43,560 ft2/acre x 12 in/ft / 5,280 ft/mi: converts gal/min per nozzle at mph and inches of spacing to gal/acre", source: "unit conversion; extension calibration guides" },
     ],
   },
   "timber-cruise": {
@@ -7050,7 +7050,7 @@ export const CITATIONS = {
   },
   "seed-rate": {
     formula: "Seeds per acre = target_population_per_acre / germination_pct. Lbs per acre = seeds_per_acre / seeds_per_lb. Cost = lbs × $/lb.",
-    edition: "ASABE EP367 by name; USDA Cooperative Extension published seeding-rate guides.",
+    edition: "USDA Cooperative Extension published seeding-rate guides (Purdue AY-217, Montana State) by name.",
     freeAccess: "USDA Extension materials free at most state-extension-service sites.",
     governance: GOVERNANCE.pesticide,
     editionNote: "Single-edition (USDA Extension + ASABE engineering practice).",
@@ -12760,7 +12760,7 @@ export const CITATIONS = {
     edition: "Horizontal-tank partial gauging - the straight shell is the circular-segment prism and the two dished heads form an ellipsoid whose partial fill is an affine-scaled spherical cap; standard tank-gauging geometry as in Machinery's Handbook (Industrial Press) and API 2551 manual-tank-strapping practice, by name; public domain.",
     freeAccess: "Public-domain solid geometry; the diameter, shell length, depth, and head type are user-supplied.",
     governance: GOVERNANCE.general,
-    editionNote: "Partial volume of a horizontal cylindrical tank with dished (curved) heads from a dipstick depth - the head-type correction the flat-end tank-volume tile leaves out. The straight shell is the circular-segment prism, area = R^2 acos((R-h)/R) - (R-h) sqrt(2Rh-h^2) times the seam-to-seam shell length; the two curved heads together form an ellipsoid of revolution, so their partial fill is the spherical cap scaled by the head depth, V_heads = (b/R)(pi h^2/3)(3R-h), with b = R/2 for a 2:1 semi-elliptical (ASME dished) head and b = R for a hemispherical head. Enter the straight-shell length, not the overall length - the heads are added on. A torispherical (ASME flanged-and-dished) head is slightly shallower than a true 2:1 ellipse, so this is a close estimate; the tank's strapping chart governs custody transfer. Reported in cubic feet and US gallons with the percent full.",
+    editionNote: "Partial volume of a horizontal cylindrical tank with dished (curved) heads from a dipstick depth - the head-type correction the flat-end tank-volume tile leaves out. The straight shell is the circular-segment prism, area = R^2 acos((R-h)/R) - (R-h) sqrt(2Rh-h^2) times the seam-to-seam shell length; the two curved heads together form an ellipsoid of revolution, so their partial fill is the spherical cap scaled by the head depth, V_heads = (b/R)(pi h^2/3)(3R-h), with b = R/2 for a 2:1 semi-elliptical (ASME dished) head and b = R for a hemispherical head. Enter the straight-shell length, not the overall length - the heads are added on. A torispherical (ASME flanged-and-dished) head holds only about two-thirds of a 2:1 elliptical head (Brighton Tru-Edge: 323 vs 501 gal at 96 in), so the elliptical option overstates an F&D tank; the tank's strapping chart governs custody transfer. Reported in cubic feet and US gallons with the percent full.",
     assumptions: [
       { name: "Shell partial volume", value: "circular-segment prism, area x shell length (the flat-end tank-volume result)", source: "plane/solid geometry" },
       { name: "Head partial volume", value: "(b/R)(pi h^2/3)(3R-h), b = R/2 elliptical or R hemispherical", source: "affine-scaled spherical cap" },

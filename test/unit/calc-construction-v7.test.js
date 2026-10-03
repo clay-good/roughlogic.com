@@ -289,3 +289,10 @@ test("249 roof spans follow APA E30 Table 33, including the no-edge-support span
   // Live load is read at the actual spacing: 32/16 at 16 in allows 165 psf.
   assert.equal(f({ span_rating: "32/16", support_spacing_in: 16, live_load_psf: 100 }).allowable_live_psf, 165);
 });
+
+test("hip-valley-rafter: the n-th hip jack is n x spacing x common multiplier (NAVEDTRA 14044: 19.23 in, then twice that)", () => {
+  const r = computeHipValleyRafter({ run_ft: 15, pitch: 8, jack_oc_in: 16 });
+  assert.ok(Math.abs(r.jacks[0].length_ft * 12 - 19.23) < 0.01);
+  assert.ok(Math.abs(r.jacks[1].length_ft - 2 * r.jacks[0].length_ft) < 1e-9);
+  assert.ok(r.jacks.every((j, i, a) => i === 0 || j.length_ft > a[i - 1].length_ft));
+});

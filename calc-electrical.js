@@ -1556,8 +1556,8 @@ export function computePhaseBalance({ circuits = [], threshold_percent = 10 }) {
   const min = Math.min(...values);
   const imbalance = avg > 0 ? ((max - min) / avg) * 100 : 0;
 
-  // Greedy swap: while above threshold, move the smallest circuit on the
-  // heaviest phase to the lightest phase.
+  // Greedy swap: while above threshold, move the LARGEST circuit on the heaviest phase that fits
+  // under half the gap to the lightest phase (it narrows the gap most without overshooting).
   const swaps = [];
   const work = circuits.map((c, i) => ({ ...c, _i: i, load_W: Number(c.load_W) || 0 }));
   const recompute = () => {

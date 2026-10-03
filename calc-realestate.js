@@ -1776,7 +1776,9 @@ export function computeMortgagePointBreakeven({ loan_amount, base_rate_pct, poin
   let verdict;
   if (Number.isFinite(hold) && hold > 0) {
     const holdMonths = Math.round(hold * 12);
-    verdict = holdMonths >= break_even_months
+    // Compare against the break-even month as printed: 60 mo held vs a 59.6 mo break-even used to read
+    // "you exit at 60 mo, before the 60-mo break-even."
+    verdict = holdMonths >= Math.round(break_even_months)
       ? "Worth it: you hold " + holdMonths + " mo, past the " + Math.round(break_even_months) + "-mo break-even."
       : "Not worth it for this hold: you exit at " + holdMonths + " mo, before the " + Math.round(break_even_months) + "-mo break-even.";
   } else {
@@ -2083,6 +2085,8 @@ export function computeRentVsBuy({
   if (hold > 30) return { error: "Holding period over 30 years is outside this tile's scope." };
 
   const N = Math.round(hold);
+  // A hold under half a year rounded to N = 0 and compared zero years of costs.
+  if (N < 1) return { error: "Holding period must round to at least one year." };
   const loan = price - down;
   const n = Math.round(term * 12);
   const mr = rate / 100 / 12;

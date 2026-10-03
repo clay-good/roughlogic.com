@@ -122,7 +122,9 @@ export function computeTimberCruise({ small_end_dib_in = 0, log_length_ft = 16, 
   if (!(log_length_ft > 0)) return { error: "Log length must be positive." };
   let bf;
   if (rule === "doyle") {
-    bf = Math.max(0, Math.pow(small_end_dib_in - 4, 2) * (log_length_ft / 16));
+    // Clamp the deduction, not the square: (D - 4)^2 is never negative, so a log under 4 in used to
+    // GROW as it shrank (D 2 -> 4 bf, D 1 -> 9 bf). Doyle gives no board feet below a 4 in top.
+    bf = Math.pow(Math.max(0, small_end_dib_in - 4), 2) * (log_length_ft / 16);
   } else if (rule === "international") {
     bf = _international14Bf(small_end_dib_in, log_length_ft);
   } else if (rule === "scribner") {

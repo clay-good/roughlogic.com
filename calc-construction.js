@@ -2417,7 +2417,10 @@ export function computeHipValleyRafter({
   const jacks = [];
   let n = 1;
   while (n * dx_oc_ft < run_ft) {
-    const length_ft = (run_ft - n * dx_oc_ft) * m_common;
+    // A hip jack n spacings from the corner runs n x spacing to the hip (NAVEDTRA 14044 p. 2-31: the
+    // shortest jack 16 in from the corner at 8 in rise is 19.23 in, the next twice that). Until
+    // 2026-10-02 this was (run - n x spacing) x m, which paired each position with another jack's length.
+    const length_ft = n * dx_oc_ft * m_common;
     jacks.push({ index: n, distance_from_corner_ft: n * dx_oc_ft, length_ft });
     n += 1;
   }
