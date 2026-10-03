@@ -114,7 +114,7 @@ STEEL_RENDERERS["steel-beam-flexure"] = _simpleRenderer({
   fields: [
     { key: "fy", label: "Yield stress Fy (ksi)", kind: "number" },
     { key: "zx", label: "Plastic section modulus Zx (in³)", kind: "number" },
-    { key: "mu", label: "Required moment Mu (kip-ft, 0 to skip)", kind: "number", default: 0 },
+    { key: "mu", label: "Required moment, ASD service-level Ma (kip-ft, 0 to skip)", kind: "number", default: 0 },
   ],
   outputs: [
     { key: "mn", id: "sbf-out-mn", label: "Nominal Mn", value: (r) => fmt(r.mn_kipft, 1) + " kip-ft" },

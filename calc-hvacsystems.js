@@ -1366,7 +1366,7 @@ function _v410renderVavBoxAirflow(inputRegion, outputRegion, citationEl) {
   const oMin = makeOutputLine(outputRegion, "Minimum airflow", "vav-out-min");
   const oNote = makeOutputLine(outputRegion, "Note", "vav-out-note");
   const update = debounce(() => {
-    const r = computeVavBoxAirflow({ zone_sensible_btuh: Number(load.input.value) || 0, supply_dt_f: Number(dt.input.value) || 0, ventilation_cfm: Number(vent.input.value) || 0, turndown: Number(td.input.value) || 0 });
+    const r = computeVavBoxAirflow({ zone_sensible_btuh: Number(load.input.value) || 0, supply_dt_f: Number(dt.input.value) || 0, ventilation_cfm: Number(vent.input.value) || 0, turndown: td.input.value === "" ? 0.30 : Number(td.input.value) });
     if (r.error) { oMax.textContent = r.error; oMin.textContent = ""; oNote.textContent = ""; return; }
     oMax.textContent = fmt(r.cfm_max, 0) + " cfm";
     oMin.textContent = fmt(r.cfm_min, 0) + " cfm (" + r.min_governed_by + " governs)";
@@ -1536,7 +1536,7 @@ export function computeHydronicInjectionMixing({ secondary_gpm = 10, secondary_s
     injection_gpm,
     injection_pct_of_secondary,
     reachable,
-    note: "The injection flow that feeds a lower-temperature secondary (radiant or reset) loop from a hotter primary, by an energy/mass balance: the hot injection water must carry the secondary loop's load, so injection gpm = secondary gpm x (secondary supply - secondary return) / (primary supply - secondary return). A 10 gpm secondary at 110/90 F off a 180 F primary needs only 2.2 gpm of injection (22% of the secondary flow); the balance is the secondary loop's own recirculated water. A cooler primary needs MORE injection to deliver the same heat -- drop the primary to 140 F and the injection climbs to 4.0 gpm. If the primary supply is not warmer than the required secondary supply, the target is unreachable at any injection rate (flagged). This sizes the injection FLOW (and the injection pump/valve Cv follows from it and the primary loop head); the actual control is a variable-speed injection pump or a modulating two-way valve on a differential-pressure-decoupled primary, and the boiler protection, the room-by-room heat loss, and the control strategy govern the design.",
+    note: "The injection flow that feeds a lower-temperature secondary (radiant or reset) loop from a hotter primary, by an energy/mass balance: the hot injection water must carry the secondary loop's load, so injection gpm = secondary gpm x (secondary supply - secondary return) / (primary supply - secondary return). A 10 gpm secondary at 110/90 F off a 180 F primary needs only 2.2 gpm of injection (22% of the secondary flow); the balance is the secondary loop's own recirculated water. A cooler primary needs MORE injection to deliver the same heat -- drop the primary to 140 F and the injection climbs to 4.0 gpm. If the primary supply is cooler than the required secondary supply, the target is unreachable at any injection rate (flagged). This sizes the injection FLOW (and the injection pump/valve Cv follows from it and the primary loop head); the actual control is a variable-speed injection pump or a modulating two-way valve on a differential-pressure-decoupled primary, and the boiler protection, the room-by-room heat loss, and the control strategy govern the design.",
   };
 }
 

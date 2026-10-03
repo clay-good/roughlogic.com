@@ -709,7 +709,7 @@ export const tdsFromConductivityExample = { inputs: { conductivity_us_cm: 1000, 
 function renderTdsFromConductivity(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: TDS from conductivity (Standard Methods 2510 / operator practice): TDS (mg/L) = k x EC (uS/cm at 25 C), k commonly 0.55-0.75 by ion makeup. An estimate, not a gravimetric TDS; calibrate k against a lab result. An operations aid; the operator of record and the primacy agency govern compliance.";
   const ec = makeNumber("Conductivity (uS/cm at 25 C)", "tfc-ec", { step: "any", min: "0" });
-  const k = makeNumber("TDS/EC factor (0.4-0.9, default 0.65)", "tfc-k", { step: "any", min: "0" });
+  const k = makeNumber("TDS/EC factor (0.4-0.9, default 0.65)", "tfc-k", { step: "any", min: "0", value: "0.65" });
   for (const f of [ec, k]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { ec.input.value = "1000"; k.input.value = "0.65"; update(); });
   const oTds = makeOutputLine(outputRegion, "Total dissolved solids", "tfc-out-tds");
@@ -744,7 +744,7 @@ export const conductivityFromTdsExample = { inputs: { tds_mgl: 650, k_factor: 0.
 function renderConductivityFromTds(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: conductivity from TDS (Standard Methods 2510 / operator practice), the inverse of the TDS estimate: EC (uS/cm at 25 C) = TDS (mg/L) / k, k commonly 0.55-0.75 by ion makeup. An estimate, not a measurement; calibrate k against a lab result. An operations aid; the operator of record and the primacy agency govern compliance.";
   const tds = makeNumber("Total dissolved solids (mg/L)", "cft-tds", { step: "any", min: "0" });
-  const k = makeNumber("TDS/EC factor (0.4-0.9, default 0.65)", "cft-k", { step: "any", min: "0" });
+  const k = makeNumber("TDS/EC factor (0.4-0.9, default 0.65)", "cft-k", { step: "any", min: "0", value: "0.65" });
   for (const f of [tds, k]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { tds.input.value = "650"; k.input.value = "0.65"; update(); });
   const oEc = makeOutputLine(outputRegion, "Electrical conductivity", "cft-out-ec");

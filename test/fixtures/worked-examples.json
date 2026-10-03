@@ -55500,7 +55500,7 @@
   {
    "tile_id": "steel-beam-flexure",
    "source_publisher": "AISC 360-22 Chapter F / Steel Construction Manual Table 3-2",
-   "source_title": "W18x50 A992 (Fy 50, Zx 101) -> Mn 421, Ma 252, phi_b Mn 379 kip-ft, util 0.79 at Mu 200",
+   "source_title": "W18x50 A992 (Fy 50, Zx 101) -> Mn 421, Ma 252, phi_b Mn 379 kip-ft, util 0.79 at Ma 200",
    "source_edition_or_year": "spec-v254 worked example (machine-verified)",
    "source_section_or_page": "spec-v254 section 2.1 pinned example",
    "verified_by": "rl",
@@ -78633,7 +78633,7 @@
   {
    "tile_id": "required-face-rent",
    "source_publisher": "required face rent (inverse of the net-effective-rent spread)",
-   "source_title": "net $30/SF over 120 months with 20 free months, no credit -> $36.00/SF face (16.7% above effective)",
+   "source_title": "net $30/SF over 120 months with 20 free months, no credit -> $36.00/SF face (effective 16.7% below face; face 20% above effective)",
    "source_edition_or_year": "spec-v646 worked example (machine-verified)",
    "source_section_or_page": "spec-v646 section 2.1 pinned example",
    "verified_by": "rl",
@@ -79986,7 +79986,7 @@
   {
    "tile_id": "pitot-traverse-cfm",
    "source_publisher": "ASHRAE Fundamentals / AABC-NEBB",
-   "source_title": "cross-check: a lighter 0.05 in wc in the same duct -> 896 fpm, 1792 CFM",
+   "source_title": "cross-check: a lighter 0.05 in wc in the same duct -> 896 fpm, 1791 CFM",
    "source_edition_or_year": "spec-v385 worked example (machine-verified)",
    "source_section_or_page": "spec-v385 section 2.1 cross-check",
    "verified_by": "rl",
@@ -87311,7 +87311,7 @@
   {
    "tile_id": "engine-fuel-burn-gph",
    "source_publisher": "BSFC engine-performance practice",
-   "source_title": "same 300 hp gasoline (BSFC 0.50, 6.1 lb/gal) -> 24.6 GPH, 58% more",
+   "source_title": "same 300 hp gasoline (BSFC 0.50, 6.1 lb/gal) -> 24.6 GPH, 57% more",
    "source_edition_or_year": "spec-v463 cross-check (machine-verified)",
    "source_section_or_page": "spec-v463 section 2.1 cross-check",
    "verified_by": "rl",
@@ -104417,7 +104417,7 @@
   {
    "tile_id": "plain-bearing-pressure-pv",
    "source_publisher": "Project (first-principles)",
-   "source_title": "Larger slower journal",
+   "source_title": "Larger faster journal",
    "source_edition_or_year": "Machinery Handbook",
    "source_section_or_page": "P=W/(LD), PV=P*V",
    "verified_by": "rl",
@@ -116386,7 +116386,7 @@
    "tile_id": "nesc-district-loading",
    "source_publisher": "Project (first-principles)",
    "source_title": "ACSR Drake, 1.108 in bare at 1.094 lb/ft, in the NESC Heavy district",
-   "source_edition_or_year": "iced d = bare + 2t; ice weight = (pi/4)(iced^2 - bare^2)/144 x 57.3; resultant = sqrt(v^2 + h^2) + k",
+   "source_edition_or_year": "iced d = bare + 2t; ice weight = (pi/4)(iced^2 - bare^2)/144 x 57; resultant = sqrt(v^2 + h^2) + k",
    "source_section_or_page": "the applicable NESC edition and its district map govern; recomputed 2026-10-01 after the batch-54 fixes",
    "verified_by": "rl",
    "verified_on": "2026-09-07",
@@ -143077,7 +143077,7 @@
    "source_publisher": "USDA Rural Utilities Service",
    "source_title": "NESC Light district loading for ACSR DRAKE 795 kcmil 26/7: vertical, transverse and resultant (with K = 0.05) per foot",
    "source_edition_or_year": "RUS Bulletin 1724E-200, Design Manual for High Voltage Transmission Lines (RD-GD-2015-78), 2015",
-   "source_section_or_page": "Appendix B, Table 'ACSR Conductors -- NESC District Loadings', p. B-3: LIGHT (.00 in ice, 9 lb wind, K=.05) for DRAKE 795 kcmil 26/7 (diam 1.108 in, 1.094 lb/ft) prints VERT 1.094, TRANS 0.831, RESULTANT 1.4238 lb/ft (4 decimals; tolerance is half a unit in the 4th place). Light district carries no ice, so the 57 vs 57.3 lb/ft3 ice-density difference does not enter. Custom-district fields are unused placeholders (0).",
+   "source_section_or_page": "Appendix B, Table 'ACSR Conductors -- NESC District Loadings', p. B-3: LIGHT (.00 in ice, 9 lb wind, K=.05) for DRAKE 795 kcmil 26/7 (diam 1.108 in, 1.094 lb/ft) prints VERT 1.094, TRANS 0.831, RESULTANT 1.4238 lb/ft (4 decimals; tolerance is half a unit in the 4th place). Light district carries no ice, so the ice density does not enter. Custom-district fields are unused placeholders (0).",
    "verified_by": "rl",
    "verified_on": "2026-10-01",
    "inputs": {
@@ -143115,7 +143115,7 @@
    "source_publisher": "USDA Rural Utilities Service",
    "source_title": "NESC Light district loading for ACSR HAWK 477 kcmil 26/7: vertical, transverse and resultant (with K = 0.05) per foot",
    "source_edition_or_year": "RUS Bulletin 1724E-200, Design Manual for High Voltage Transmission Lines (RD-GD-2015-78), 2015",
-   "source_section_or_page": "Appendix B, Table 'ACSR Conductors -- NESC District Loadings', p. B-3: LIGHT (.00 in ice, 9 lb wind, K=.05) for HAWK 477 kcmil 26/7 (diam 0.858 in, 0.657 lb/ft) prints VERT 0.657, TRANS 0.6435, RESULTANT 0.9696 lb/ft (4 decimals; tolerance is half a unit in the 4th place). Light district carries no ice, so the 57 vs 57.3 lb/ft3 ice-density difference does not enter. Custom-district fields are unused placeholders (0).",
+   "source_section_or_page": "Appendix B, Table 'ACSR Conductors -- NESC District Loadings', p. B-3: LIGHT (.00 in ice, 9 lb wind, K=.05) for HAWK 477 kcmil 26/7 (diam 0.858 in, 0.657 lb/ft) prints VERT 0.657, TRANS 0.6435, RESULTANT 0.9696 lb/ft (4 decimals; tolerance is half a unit in the 4th place). Light district carries no ice, so the ice density does not enter. Custom-district fields are unused placeholders (0).",
    "verified_by": "rl",
    "verified_on": "2026-10-01",
    "inputs": {
@@ -143153,7 +143153,7 @@
    "source_publisher": "USDA Rural Utilities Service",
    "source_title": "NESC Light district loading for ACSR RAVEN 1/0 6/1: vertical, transverse and resultant (with K = 0.05) per foot",
    "source_edition_or_year": "RUS Bulletin 1724E-200, Design Manual for High Voltage Transmission Lines (RD-GD-2015-78), 2015",
-   "source_section_or_page": "Appendix B, Table 'ACSR Conductors -- NESC District Loadings', p. B-3: LIGHT (.00 in ice, 9 lb wind, K=.05) for RAVEN 1/0 6/1 (diam 0.398 in, 0.1452 lb/ft) prints VERT 0.1452, TRANS 0.2985, RESULTANT 0.3819 lb/ft (4 decimals; tolerance is half a unit in the 4th place). Light district carries no ice, so the 57 vs 57.3 lb/ft3 ice-density difference does not enter. Custom-district fields are unused placeholders (0).",
+   "source_section_or_page": "Appendix B, Table 'ACSR Conductors -- NESC District Loadings', p. B-3: LIGHT (.00 in ice, 9 lb wind, K=.05) for RAVEN 1/0 6/1 (diam 0.398 in, 0.1452 lb/ft) prints VERT 0.1452, TRANS 0.2985, RESULTANT 0.3819 lb/ft (4 decimals; tolerance is half a unit in the 4th place). Light district carries no ice, so the ice density does not enter. Custom-district fields are unused placeholders (0).",
    "verified_by": "rl",
    "verified_on": "2026-10-01",
    "inputs": {
@@ -143191,7 +143191,7 @@
    "source_publisher": "USDA Rural Utilities Service",
    "source_title": "NESC Heavy district transverse load on ACSR DRAKE 795 kcmil 26/7 (4 psf on 1.108 in + 2 x 0.5 in ice)",
    "source_edition_or_year": "RUS Bulletin 1724E-200, Design Manual for High Voltage Transmission Lines (RD-GD-2015-78), 2015",
-   "source_section_or_page": "Appendix B p. B-3 HEAVY (.5 in ice, 4 lb wind, K=.30): DRAKE TRANS 0.7027 lb/ft; repeated in Ch. 13 Fig. 13-5 'Conductor loads, Heavy, Transverse 0.7027'. Only the transverse output is pinned: the printed VERT 2.0938 and RESULTANT 2.5086 use 57 lb/ft3 ice and the tile (57.3) reads 2.0991 / 2.5136, outside printed rounding (see report lead).",
+   "source_section_or_page": "Appendix B p. B-3 HEAVY (.5 in ice, 4 lb wind, K=.30): DRAKE TRANS 0.7027 lb/ft; repeated in Ch. 13 Fig. 13-5 'Conductor loads, Heavy, Transverse 0.7027'. Only the transverse output is pinned: the printed VERT 2.0938 and RESULTANT 2.5086 use 57 lb/ft3 ice, as the tile now does (2.0938 / 2.5086).",
    "verified_by": "rl",
    "verified_on": "2026-10-01",
    "inputs": {
@@ -143217,7 +143217,7 @@
    "source_publisher": "USDA Rural Utilities Service",
    "source_title": "NESC Medium district transverse load on ACSR DRAKE 795 kcmil 26/7 (4 psf on 1.108 in + 2 x 0.25 in ice)",
    "source_edition_or_year": "RUS Bulletin 1724E-200, Design Manual for High Voltage Transmission Lines (RD-GD-2015-78), 2015",
-   "source_section_or_page": "Appendix B p. B-3 MEDIUM (.25 in ice, 4 lb wind, K=.20): DRAKE TRANS 0.5360 lb/ft. Vertical (1.5162) and resultant (1.8081) not pinned: printed with 57 lb/ft3 ice, tile uses 57.3 (reads 1.5184 / 1.8102).",
+   "source_section_or_page": "Appendix B p. B-3 MEDIUM (.25 in ice, 4 lb wind, K=.20): DRAKE TRANS 0.5360 lb/ft. Vertical (1.5162) and resultant (1.8081) not pinned: printed with 57 lb/ft3 ice, tile uses 57 (reads 1.5162 / 1.8081).",
    "verified_by": "rl",
    "verified_on": "2026-10-01",
    "inputs": {
@@ -143243,7 +143243,7 @@
    "source_publisher": "USDA Rural Utilities Service",
    "source_title": "Extreme ice with concurrent wind on DRAKE: 0.75 in radial ice and 30 psf (northern Mississippi example)",
    "source_edition_or_year": "RUS Bulletin 1724E-200, Design Manual for High Voltage Transmission Lines (RD-GD-2015-78), 2015",
-   "source_section_or_page": "Ch. 11, para 11.b.(7) 'Example of Extreme Ice/Wind Calculations', pp. 11-16/11-17: iced diameter 1.108 + (.75x2) = 2.608 in; pt = 30 x 2.608/12 = 6.520 lb/ft. Entered as custom district 0 with k = 0 (the example adds no constant); custom_temp_f is a placeholder. The printed vertical 2.8269 lb/ft uses 57 lb/ft3 ice; tile reads 2.8360 with 57.3, so it is not pinned (see report lead).",
+   "source_section_or_page": "Ch. 11, para 11.b.(7) 'Example of Extreme Ice/Wind Calculations', pp. 11-16/11-17: iced diameter 1.108 + (.75x2) = 2.608 in; pt = 30 x 2.608/12 = 6.520 lb/ft. Entered as custom district 0 with k = 0 (the example adds no constant); custom_temp_f is a placeholder. The printed vertical 2.8269 lb/ft uses 57 lb/ft3 ice; the tile now reads 2.8269 with 57, but it is not pinned (see report lead).",
    "verified_by": "rl",
    "verified_on": "2026-10-01",
    "inputs": {
@@ -143275,7 +143275,7 @@
    "source_publisher": "USDA Rural Utilities Service",
    "source_title": "Extreme ice (1 in) with concurrent 4 psf wind on DRAKE, TS-type structure example",
    "source_edition_or_year": "RUS Bulletin 1724E-200, Design Manual for High Voltage Transmission Lines (RD-GD-2015-78), 2015",
-   "source_section_or_page": "Ch. 13, Fig. 13-5 TS Type Structure Example, p. 13-15: 'Extreme Ice with Concurrent Wind 4 psf, 1 inch radial ice'; conductor loads EI&W Transverse 1.036 lb/ft. Custom district 0, k = 0, temp placeholder. Printed EI&W vertical 3.7154 (57 lb/ft3) vs tile 3.7292 (57.3) not pinned.",
+   "source_section_or_page": "Ch. 13, Fig. 13-5 TS Type Structure Example, p. 13-15: 'Extreme Ice with Concurrent Wind 4 psf, 1 inch radial ice'; conductor loads EI&W Transverse 1.036 lb/ft. Custom district 0, k = 0, temp placeholder. Printed EI&W vertical 3.7154 (57 lb/ft3) vs tile 3.7154 (57), not pinned.",
    "verified_by": "rl",
    "verified_on": "2026-10-01",
    "inputs": {

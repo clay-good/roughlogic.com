@@ -2130,7 +2130,7 @@ export function computeBallnoseFeedCusp({ r_in = 0.25, stepover_in = 0.03, feed_
     + "The surface you get is the larger of the two, so " + governed_by + " governs here at " + governing_cusp_in.toFixed(6) + " in"
     + (ratio !== null ? " (the feed cusp is " + ratio.toFixed(2) + " times the stepover cusp)" : "") + ". "
     + (feed_governs
-      ? "Tightening the STEPOVER any further buys nothing until the feed comes down - a common way to spend cycle time on the cusp that was not governing. Drop the feed per tooth to " + balanced_stepover_in + " in to match the stepover cusp. "
+      ? "Tightening the STEPOVER any further buys nothing until the feed comes down - a common way to spend cycle time on the cusp that was not governing. Drop the feed per tooth to " + balanced_feed_in + " in to match the stepover cusp. "
       : Math.abs(feed_cusp_in - stepover_cusp_in) < 1e-12
         ? "The two are balanced, which is the efficient point: neither setting is wasting time on a cusp the other already dominates. "
         : "The stepover governs, so the feed has geometric headroom: the cusp would not care until " + balanced_feed_in + " in per tooth. Geometric headroom is not permission - chip load, tool strength, deflection, and the machine's ability to hold the path at speed are what actually cap the feed, and they usually bind first. What this tells you is only that the FINISH is not the reason to keep the feed low. ")
@@ -2163,7 +2163,7 @@ function _v1128renderBallnoseFeedCusp(inputRegion, outputRegion, citationEl) {
     oAcross.textContent = fmt(res.stepover_cusp_in, 6) + " in";
     oAlong.textContent = fmt(res.feed_cusp_in, 6) + " in";
     oGov.textContent = fmt(res.governing_cusp_in, 6) + " in - " + res.governed_by + " governs";
-    oBal.textContent = res.feed_governs ? "drop the feed to " + fmt(res.balanced_stepover_in, 4) + " in/tooth" : "the feed could open to " + fmt(res.balanced_feed_in, 4) + " in/tooth for free";
+    oBal.textContent = res.feed_governs ? "drop the feed to " + fmt(res.balanced_feed_in, 4) + " in/tooth" : "the feed could open to " + fmt(res.balanced_feed_in, 4) + " in/tooth for free";
     oFeed.textContent = res.feedrate_ipm === null ? "- (enter an rpm)" : fmt(res.feedrate_ipm, 1) + " in/min";
     oNote.textContent = res.note;
   }, DEBOUNCE_MS);

@@ -1475,8 +1475,9 @@ export function renderAnchorEmbedment(inputRegion, outputRegion, citationEl) {
       edge_distance_in: Number(edge.input.value) || 0,
     });
     if (r.error) { oI.textContent = r.error; oF.textContent = "-"; oE.textContent = "-"; return; }
-    oI.textContent = fmt(r.embedment_in, 2) + " in (concrete breakout; steel, pullout and code minimums checked separately)";
-    oF.textContent = fmt(r.embedment_ft, 3) + " ft";
+    const req_in = r.cracked ? r.embedment_cracked_in : r.embedment_in;
+    oI.textContent = fmt(req_in, 2) + " in (" + (r.cracked ? "cracked" : "uncracked") + " concrete breakout; steel, pullout and code minimums checked separately)";
+    oF.textContent = fmt(req_in / 12, 3) + " ft";
     oE.textContent = (r.cracked ? "cracked: " + fmt(r.embedment_cracked_in, 2) + " in required; " : "uncracked; ") + "critical edge " + fmt(r.edge_critical_in, 2) + " in" + (r.edge_reduced_flag ? " - FLAG: edge below critical, capacity reduced" : "");
   }, DEBOUNCE_MS);
   for (const el of [T.input, d.input, fc.input, cracked.select, edge.input]) el.addEventListener("input", update);
@@ -7789,9 +7790,11 @@ export function computeSeismicPdeltaStability({ px_kip = 0, delta_in = 0, ie = 1
   const theta = Px * delta * Ie / (Vx * hsx * Cd);
   const theta_max = Math.min(0.5 / (b * Cd), 0.25);
   let verdict, amplifier = null;
-  if (theta <= 0.10) verdict = "neglect P-delta (theta <= 0.10)";
-  else if (theta <= theta_max) { amplifier = 1 / (1 - theta); verdict = "amplify forces and drifts by 1/(1 - theta)"; }
-  else verdict = "potentially unstable -- redesign (theta > theta_max)";
+  // theta_max is checked FIRST: at Cd 5.5 it is 0.091, below the 0.10 neglect line, and until
+  // 2026-10-03 a story at theta 0.095 read "neglect P-delta" past its stability limit.
+  if (theta > theta_max + 1e-9 * theta_max) verdict = "potentially unstable -- redesign (theta > theta_max)";
+  else if (theta <= 0.10 + 1e-9) verdict = "neglect P-delta (theta <= 0.10)";
+  else { amplifier = 1 / (1 - theta); verdict = "amplify forces and drifts by 1/(1 - theta)"; }
   return {
     theta, theta_max, amplifier, verdict,
     note: "ASCE 7-22 §12.8.7 stability coefficient theta = Px delta Ie / (Vx hsx Cd). Below 0.10 P-delta may be neglected; between 0.10 and theta_max = min(0.5/(beta Cd), 0.25) the forces and drifts must be amplified by 1/(1 - theta); above theta_max the story is potentially unstable and must be redesigned (stiffen it). Px is the total gravity design load at and above the story; beta is the shear demand-to-capacity ratio (1.0 if unknown). A design aid; the engineer of record's stamped design governs.",
@@ -12330,7 +12333,7 @@ CONSTRUCTION_RENDERERS["egress-window-well"] = _simpleRenderer({
     { key: "well_depth_in", label: "Well vertical depth (in)", kind: "number" },
     { key: "opening_fully_opens", label: "Does the well let the window open FULLY?", kind: "select", options: [{ value: "yes", label: "Yes", selected: true }, { value: "no", label: "No" }] },
     { key: "has_ladder", label: "Permanently affixed ladder or steps?", kind: "select", options: [{ value: "no", label: "No", selected: true }, { value: "yes", label: "Yes" }] },
-    { key: "ladder_inside_width_in", label: "Ladder inside width (in; 0 to skip)", kind: "number" },
+    { key: "ladder_inside_width_in", label: "Ladder inside width (in; leave all three rung fields 0 to skip)", kind: "number" },
     { key: "ladder_projection_in", label: "Ladder projection from the wall (in)", kind: "number" },
     { key: "ladder_spacing_in", label: "Rung spacing on centre (in)", kind: "number" },
   ],
@@ -13191,7 +13194,8 @@ export function computeProtrudingObject({ mounting = "wall", leading_edge_height
   if (barrier < 0) return { error: "Barrier leading edge height cannot be negative (in)." };
 
   const LOW = 27, HIGH = 80, MIN_VERT = 80, BARRIER_MAX = 27;
-  const in_zone = h > LOW && h <= HIGH;
+  // 307.2 wall: leading edge MORE than 27 in; 307.3 post: 27 in MINIMUM, so 27 is in the band.
+  const in_zone = (mounting === "post" ? h >= LOW : h > LOW) && h <= HIGH;
   const LIMIT = { wall: 4, handrail: 4.5, post: 12 };
   const max_projection_in = in_zone ? LIMIT[mounting] : null;
   const projection_ok = in_zone ? p <= max_projection_in + 1e-9 * Math.abs(max_projection_in) : true;
@@ -13217,7 +13221,7 @@ export function computeProtrudingObject({ mounting = "wall", leading_edge_height
     + "This leading edge is at " + h + " in, which is " + (in_zone ? "INSIDE that band" : h <= LOW ? "at or below 27 in, where a cane finds the object before a knee does" : "above 80 in, where a person walks under it") + ". "
     + (in_zone
       ? "A " + (mounting === "post" ? "free-standing object on posts or pylons may overhang the path 12 in" : mounting === "handrail" ? "handrail may protrude 4 1/2 in" : "wall-mounted object may protrude 4 in") + " maximum. This one projects " + p + " in: " + (projection_ok ? "OK. " : "OVER by " + projection_excess_in.toFixed(1) + " in. "
-        + "THREE MOVES FIX IT, and the obvious one is the hardest: shrink the projection by " + projection_excess_in.toFixed(1) + " in, or LOWER the leading edge " + drop_to_cane_zone_in.toFixed(1) + " in to 27 in, or RAISE it " + raise_above_zone_in.toFixed(1) + " in to above 80 in. Lowering is the move people do not think of, because the limit is about detection rather than size - once a cane finds the object, how far it sticks out stops being 307.2's concern. ")
+        + "THREE MOVES FIX IT, and the obvious one is the hardest: shrink the projection by " + projection_excess_in.toFixed(1) + " in, or LOWER the leading edge " + drop_to_cane_zone_in.toFixed(1) + " in to 27 in, or RAISE it more than " + raise_above_zone_in.toFixed(1) + " in, to above 80 in. Lowering is the move people do not think of, because the limit is about detection rather than size - once a cane finds the object, how far it sticks out stops being 307.2's concern. ")
       : "307.2 does not limit how far it projects at this height. " + (h > HIGH ? "But note the vertical clearance rule below - clearing 80 in for the protrusion and providing 80 in of headroom are different questions. " : ""))
     + (mounting === "post" && in_zone ? "A post-mounted object gets THREE TIMES the wall-mounted allowance, which is why the same drinking fountain is a violation recessed into a wall and compliant on a pylon. Where a sign is mounted BETWEEN posts more than 12 in apart, its lowest edge must be 27 in maximum or 80 in minimum - there is no permitted middle. " : "")
     + "CLEAR WIDTH (307.5): a protruding object may not reduce the clear width an accessible route requires, and a projection that passes 307.2 can still fail this. " + w + " in less " + p + " in leaves " + remaining_width_in.toFixed(1) + " in against " + reqW + " in required: " + (width_ok ? "OK. " : "SHORT by " + width_deficit_in.toFixed(1) + " in. ")
@@ -13245,7 +13249,7 @@ CONSTRUCTION_RENDERERS["protruding-object-check"] = _simpleRenderer({
   outputs: [
     { key: "z", id: "po-out-z", label: "Is the leading edge in the limited band?", value: (r) => r.in_zone ? "yes - over 27 in and not over 80 in, so 307.2 applies" : "no - 307.2 places no limit on the projection at this height" },
     { key: "p", id: "po-out-p", label: "Projection", value: (r) => !r.in_zone ? "unlimited by 307.2 here" : r.projection_ok ? "within the " + r.max_projection_in + " in maximum" : "OVER the " + r.max_projection_in + " in maximum by " + fmt(r.projection_excess_in, 1) + " in" },
-    { key: "f", id: "po-out-f", label: "Three ways to fix it", value: (r) => r.projection_ok || !r.in_zone ? "nothing to fix" : "shrink " + fmt(r.projection_excess_in, 1) + " in, lower " + fmt(r.drop_to_cane_zone_in, 1) + " in to 27 in, or raise " + fmt(r.raise_above_zone_in, 1) + " in above 80 in" },
+    { key: "f", id: "po-out-f", label: "Three ways to fix it", value: (r) => r.projection_ok || !r.in_zone ? "nothing to fix" : "shrink " + fmt(r.projection_excess_in, 1) + " in, lower " + fmt(r.drop_to_cane_zone_in, 1) + " in to 27 in, or raise more than " + fmt(r.raise_above_zone_in, 1) + " in, to above 80 in" },
     { key: "w", id: "po-out-w", label: "Clear width left (307.5)", value: (r) => fmt(r.remaining_width_in, 1) + " in - " + (r.width_ok ? "meets the required width" : "SHORT by " + fmt(r.width_deficit_in, 1) + " in") },
     { key: "v", id: "po-out-v", label: "Vertical clearance (307.4)", value: (r) => r.vertical_ok ? "80 in or more - OK" : r.barrier_ok ? "under 80 in, but a barrier is provided at a compliant leading edge" : r.barrier_present ? "under 80 in and the barrier leading edge is above 27 in" : "under 80 in and no barrier is stated" },
     { key: "d", id: "po-out-d", label: "Verdict", value: (r) => r.passes ? "PASSES 307" : "DOES NOT PASS" },
@@ -13685,7 +13689,7 @@ CONSTRUCTION_RENDERERS["turning-clear-floor-space"] = _simpleRenderer({
   outputs: [
     { key: "c", id: "tcf-out-c", label: "Clear floor space", value: (r) => r.cfs_oriented_ok ? "meets 30 x 48 in the right orientation" : r.cfs_size_ok ? "big enough but TURNED THE WRONG WAY for this approach" : "under 30 x 48 in" },
     { key: "a", id: "tcf-out-a", label: "Alcove", value: (r) => !r.is_alcove ? "not an alcove at this depth (trigger is " + r.alcove_trigger_in + " in for this approach)" : "confined past " + r.alcove_trigger_in + " in, so it needs " + r.required_alcove_width_in + " in of width - " + (r.alcove_width_ok ? "OK" : "short by " + fmt(r.alcove_width_deficit_in, 1) + " in") },
-    { key: "o", id: "tcf-out-o", label: "The other approach", value: (r) => r.other_required_width_in === null ? "would not be an alcove either" : "the same nook would demand " + r.other_required_width_in + " in of width" },
+    { key: "o", id: "tcf-out-o", label: "The other approach", value: (r) => r.other_required_width_in === null ? (r.is_alcove ? "would not be an alcove" : "would not be an alcove either") : "the same nook would demand " + r.other_required_width_in + " in of width" },
     { key: "t", id: "tcf-out-t", label: "Turning space", value: (r) => r.turning_ok === null ? "none entered" : r.turning_ok ? "meets 304.3" : r.circle_deficit_in !== null ? "circle short by " + fmt(r.circle_deficit_in, 1) + " in" : [r.t_square_ok ? null : "square under 60 in", r.t_arm_width_ok ? null : "arms under 36 in", r.t_arm_clear_ok ? null : "arm clearance under 12 in", r.t_base_clear_ok ? null : "base clearance under 24 in"].filter(Boolean).join(", ") },
     { key: "v", id: "tcf-out-v", label: "Verdict", value: (r) => r.passes ? "PASSES the items entered" : "DOES NOT PASS" },
     { key: "n", id: "tcf-out-n", label: "Note", value: (r) => r.note },
@@ -14609,7 +14613,7 @@ export function computeWaterClosetLocation({ centerline_in = 0, seat_height_in =
 
   const passes = centerline_ok && seat_ok && (clearance_ok !== false) && (flush_ok !== false);
 
-  const note = "THE 18 IN EVERYONE REMEMBERS IS A WINDOW OF 16 TO 18, and the plumbing code's 15 in minimum is not inside it. A water closet roughed at the IPC minimum is code-compliant and ADA-noncompliant by an inch; one set at 20 in, which reads as generous, fails the other end. There are three inches of rough-in between the two codes and two of them do not work. "
+  const note = "THE 18 IN EVERYONE REMEMBERS IS A WINDOW OF 16 TO 18, and the plumbing code's 15 in minimum is not inside it. A water closet roughed at the IPC minimum is code-compliant and ADA-noncompliant by an inch (by two in an ambulatory compartment); one set at 20 in, which reads as generous, fails the other end. There are three inches of rough-in between the two codes and two of them do not work. "
     + "Centerline " + c + " in: " + (centerline_ok ? "within " + C_MIN + " to " + C_MAX + (amb ? " (the ambulatory-compartment window). " : ". ") : centerline_too_close ? "TOO CLOSE by " + centerline_deficit_in.toFixed(2) + " in" + (meets_ipc_only ? " - and note that it does satisfy the plumbing code's 15 in minimum, which is exactly how this gets roughed in wrong: the plumber met a code, just not this one. " : ". ") : "TOO FAR by " + centerline_deficit_in.toFixed(2) + " in - a centerline can be too far from the wall, because the grab bar has to be in reach from the seat. ")
     + "SEAT: 17 to 19 in measured to the TOP OF THE SEAT, not the rim of the bowl - so a standard 15 in bowl with a thick seat can still land under, and a comfort-height bowl with a thick seat can land over. Entered " + s + " in: " + (seat_ok ? "OK. " : seat_too_low ? "UNDER by " + seat_deficit_in.toFixed(2) + " in. " : "OVER by " + seat_deficit_in.toFixed(2) + " in - too high is a real failure, because a transfer works both ways. ")
     + (clearance_entered
@@ -14637,7 +14641,7 @@ CONSTRUCTION_RENDERERS["water-closet-location"] = _simpleRenderer({
     { key: "ambulatory", label: "Ambulatory accessible compartment?", kind: "select", options: [{ value: "no", label: "No", selected: true }, { value: "yes", label: "Yes" }] },
   ],
   outputs: [
-    { key: "c", id: "wcl-out-c", label: "Centerline (16 to 18 in)", value: (r) => r.centerline_ok ? "within the window" : r.centerline_too_close ? "TOO CLOSE by " + fmt(r.centerline_deficit_in, 2) + " in" + (r.meets_ipc_only ? " - though it does meet the plumbing code's 15 in" : "") : "TOO FAR by " + fmt(r.centerline_deficit_in, 2) + " in" },
+    { key: "c", id: "wcl-out-c", label: "Centerline (16 to 18 in; 17 to 19 in an ambulatory compartment)", value: (r) => r.centerline_ok ? "within the window" : r.centerline_too_close ? "TOO CLOSE by " + fmt(r.centerline_deficit_in, 2) + " in" + (r.meets_ipc_only ? " - though it does meet the plumbing code's 15 in" : "") : "TOO FAR by " + fmt(r.centerline_deficit_in, 2) + " in" },
     { key: "s", id: "wcl-out-s", label: "Seat height (17 to 19 in)", value: (r) => r.seat_ok ? "within the window" : r.seat_too_low ? "under by " + fmt(r.seat_deficit_in, 2) + " in" : "over by " + fmt(r.seat_deficit_in, 2) + " in" },
     { key: "l", id: "wcl-out-l", label: "Clearance (60 side x 56 rear)", value: (r) => r.clearance_ok === null ? "not entered" : r.clearance_ok ? fmt(r.clear_area_sf, 2) + " sq ft - meets both" : [r.side_ok ? null : "side short " + fmt(r.side_deficit_in, 1), r.rear_ok ? null : "rear short " + fmt(r.rear_deficit_in, 1)].filter(Boolean).join(", ") + " in" },
     { key: "f", id: "wcl-out-f", label: "Flush control", value: (r) => r.flush_ok === null ? "rule does not apply in an ambulatory compartment" : r.flush_ok ? "on the open side" : "on the WALL side - not permitted" },

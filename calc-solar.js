@@ -620,7 +620,9 @@ export function computePvCircuitAmpacity({ module_isc_a = 0, parallel_strings = 
   const min_ampacity_a = max_current_a * 1.25;
   const stacked_factor = 1.25 * 1.25; // 1.5625 -> the "156%" of Isc
   const ocpd = Number(ocpd_a) || 0;
-  const ocpd_ok = ocpd > 0 ? ocpd >= max_current_a - 1e-9 * Math.abs(max_current_a) : null;
+  // 690.9(B)(1): the OCPD is at least 125% of the 690.8(A) maximum current -- the same
+  // 156% of Isc as the conductor. Until 2026-10-03 it was checked against 125% of Isc.
+  const ocpd_ok = ocpd > 0 ? ocpd >= min_ampacity_a - 1e-9 * Math.abs(min_ampacity_a) : null;
   return {
     max_current_a,
     min_ampacity_a,
@@ -652,7 +654,7 @@ function renderPvCircuitAmpacity(inputRegion, outputRegion, citationEl) {
     oMax.textContent = fmt(r.max_current_a, 2) + " A";
     oMin.textContent = fmt(r.min_ampacity_a, 2) + " A";
     oFactor.textContent = fmt(r.stacked_factor, 4) + " (156%)";
-    oOcpd.textContent = r.ocpd_ok === null ? "-" : (r.ocpd_ok ? "OCPD " + fmt(r.ocpd_a, 0) + " A >= max current, OK" : "OCPD " + fmt(r.ocpd_a, 0) + " A below max current");
+    oOcpd.textContent = r.ocpd_ok === null ? "-" : (r.ocpd_ok ? "OCPD " + fmt(r.ocpd_a, 0) + " A >= 125% of max current, OK" : "OCPD " + fmt(r.ocpd_a, 0) + " A below 125% of max current");
     oNote.textContent = r.note;
   }, DEBOUNCE_MS);
   for (const f of [isc, strings, ocpd]) f.input.addEventListener("input", update);

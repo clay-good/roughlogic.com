@@ -467,7 +467,7 @@ SAWMILL_RENDERERS["log-truck-payload"] = _simpleRenderer({
     { key: "tare_lb", label: "Truck and trailer tare (lb)", kind: "number", default: 32000 },
     { key: "weight_per_mbf_lb", label: "Green weight of this wood (lb per MBF)", kind: "number", default: 10500 },
     { key: "alt_weight_per_mbf_lb", label: "Heavier species to compare (lb per MBF)", kind: "number", default: 13000 },
-    { key: "seasoned_weight_per_mbf_lb", label: "Same wood after decking (lb per MBF)", kind: "number", default: 11000 },
+    { key: "seasoned_weight_per_mbf_lb", label: "Heavier species after decking through a dry season (lb per MBF)", kind: "number", default: 11000 },
     { key: "load_volume_mbf", label: "Volume being loaded (MBF)", kind: "number", default: 5 },
   ],
   outputs: [
@@ -475,7 +475,7 @@ SAWMILL_RENDERERS["log-truck-payload"] = _simpleRenderer({
     { key: "l", id: "ltp-out-l", label: "Legal load of this wood", value: (r) => fmt(r.legal_load_mbf, 2) + " MBF" },
     { key: "a", id: "ltp-out-a", label: "Legal load of the heavier species", value: (r) => fmt(r.alt_legal_load_mbf, 2) + " MBF -- " + fmt(r.mbf_difference, 2) + " MBF less on the same truck and the same road" },
     { key: "h", id: "ltp-out-h", label: "Loading it to the same stake height", value: (r) => fmt(r.overload_if_habit_lb, 0) + " lb over the payload" },
-    { key: "s", id: "ltp-out-s", label: "After decking through a dry season", value: (r) => fmt(r.seasoned_legal_load_mbf, 2) + " MBF of the same wood becomes legal" },
+    { key: "s", id: "ltp-out-s", label: "After decking through a dry season", value: (r) => fmt(r.seasoned_legal_load_mbf, 2) + " MBF of the decked heavier species becomes legal" },
     { key: "m", id: "ltp-out-m", label: "The load entered", value: (r) => fmt(r.entered_load_lb, 0) + " lb of wood, " + fmt(r.gross_with_load_lb, 0) + " lb gross -- " + r.load_verdict },
     { key: "n", id: "ltp-out-n", label: "Note", value: (r) => r.note },
   ],

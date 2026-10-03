@@ -2331,13 +2331,13 @@ export function computeTrapSpeedHorsepower({ weight_lb = 0, trap_mph = 0 } = {})
   const et_s = 5.825 * Math.pow(weight_lb / hp, 1 / 3);
   return {
     hp, et_s,
-    note: "Hale's empirical quarter-mile relations HP = weight x (mph/234)^3 and ET = 5.825 x (weight/HP)^(1/3), with weight the race weight including driver (lb) and mph the trap speed. Trap speed depends on power by a CUBE law, so a small trap gain implies a large power gain (7 mph on a 108 mph run is ~20% more power), which makes trap speed - not ET, which traction and launch corrupt - the cleaner power indicator. A statistical fit to typical cars (the 234 constant averages out aerodynamics, driveline loss, and traction; a very slippery or very draggy car deviates); it reflects the power reaching the wheels at the traps and is not a substitute for a dyno. A hobbyist estimate; the actual dyno measurement governs.",
+    note: "Hale's empirical quarter-mile relations HP = weight x (mph/234)^3 and ET = 5.825 x (weight/HP)^(1/3), with weight the race weight including driver (lb) and mph the trap speed. Trap speed depends on power by a CUBE law, so a small trap gain implies a large power gain (7 mph on a 108 mph run is ~20% more power), which makes trap speed - not ET, which traction and launch corrupt - the cleaner power indicator. A statistical fit to typical cars (the 234 constant averages out aerodynamics, driveline loss, and traction; a very slippery or very draggy car deviates); it estimates flywheel (crank) power, as Hale and Wallace Racing define it, and is not a substitute for a dyno. A hobbyist estimate; the actual dyno measurement governs.",
   };
 }
 export const trapSpeedHorsepowerExample = { inputs: { weight_lb: 3200, trap_mph: 108 } };
 
 function renderTrapSpeedHorsepower(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: Hale's quarter-mile HP = weight x (mph/234)^3 and ET = 5.825 x (weight/HP)^(1/3), weight including driver (lb), mph the trap speed, per the drag-racing references, by name. Empirical fit, wheel power, not a dyno. A hobbyist estimate; the dyno governs.";
+  citationEl.textContent = "Citation: Hale's quarter-mile HP = weight x (mph/234)^3 and ET = 5.825 x (weight/HP)^(1/3), weight including driver (lb), mph the trap speed, per the drag-racing references, by name. Empirical fit, flywheel (crank) power, not a dyno. A hobbyist estimate; the dyno governs.";
   const w = makeNumber("Vehicle weight incl. driver (lb)", "tsh-w", { step: "any", min: "0" });
   const trap = makeNumber("Quarter-mile trap speed (mph)", "tsh-trap", { step: "any", min: "0" });
   for (const f of [w, trap]) inputRegion.appendChild(f.wrap);

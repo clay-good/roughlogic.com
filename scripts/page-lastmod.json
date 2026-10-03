@@ -2,11 +2,11 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "4539be122bfad39c",
+      "sha": "5171d26f58351cd9",
       "date": "2026-10-03"
     },
     "/tools/": {
-      "sha": "a5986ca5b0d1d6f5",
+      "sha": "e3e038ca0f1801e6",
       "date": "2026-10-03"
     },
     "/collections/disaster-response/": {
@@ -22,7 +22,7 @@
       "date": "2026-10-03"
     },
     "/groups/construction/": {
-      "sha": "82e775d311baaf5c",
+      "sha": "e8e827d195363301",
       "date": "2026-10-03"
     },
     "/groups/cross-trade/": {
@@ -278,8 +278,8 @@
       "date": "2026-09-29"
     },
     "/tools/anchor-embedment/": {
-      "sha": "be54881aa660bde3",
-      "date": "2026-09-29"
+      "sha": "db9d05542ca5228b",
+      "date": "2026-10-03"
     },
     "/tools/anchor-epoxy-volume/": {
       "sha": "ede0f1112966d5f3",
@@ -598,8 +598,8 @@
       "date": "2026-09-29"
     },
     "/tools/belt-conveyor-tension-power/": {
-      "sha": "9b4b7c256669b341",
-      "date": "2026-09-29"
+      "sha": "0746ab3c7c93a455",
+      "date": "2026-10-03"
     },
     "/tools/belt-deflection-tension/": {
       "sha": "27fc6c89d38ff805",
@@ -974,8 +974,8 @@
       "date": "2026-10-01"
     },
     "/tools/cardioid-sub-array/": {
-      "sha": "d7f7adc51acf37e7",
-      "date": "2026-09-29"
+      "sha": "ff3a998b0049f468",
+      "date": "2026-10-03"
     },
     "/tools/cargo-securement-wll/": {
       "sha": "e98e346cdcd01ee8",
@@ -1162,8 +1162,8 @@
       "date": "2026-09-29"
     },
     "/tools/chimney-height-for-draft/": {
-      "sha": "2f2eb12b7cb22d15",
-      "date": "2026-09-29"
+      "sha": "59e061bd4399cc52",
+      "date": "2026-10-03"
     },
     "/tools/chip-seal-mcleod/": {
       "sha": "bdcd1d1b39079144",
@@ -1450,8 +1450,8 @@
       "date": "2026-09-29"
     },
     "/tools/compressed-air-pressure-drop/": {
-      "sha": "c8571bb20205b97e",
-      "date": "2026-09-29"
+      "sha": "9fe4a7b2be8cfac3",
+      "date": "2026-10-03"
     },
     "/tools/compression-ratio-refrig/": {
       "sha": "3331bb4cedbe461b",
@@ -1542,8 +1542,8 @@
       "date": "2026-09-29"
     },
     "/tools/concrete-evaporation-rate/": {
-      "sha": "ad143ad18764026c",
-      "date": "2026-09-29"
+      "sha": "b8bdb6cadf56c462",
+      "date": "2026-10-03"
     },
     "/tools/concrete-immediate-deflection/": {
       "sha": "4a07296b264cbb0d",
@@ -1558,8 +1558,8 @@
       "date": "2026-09-29"
     },
     "/tools/concrete-maturity/": {
-      "sha": "92ade1d16ace9851",
-      "date": "2026-09-29"
+      "sha": "6cf11bbfb3f360a7",
+      "date": "2026-10-03"
     },
     "/tools/concrete-mix-design/": {
       "sha": "dfa8458e23124298",
@@ -2946,8 +2946,8 @@
       "date": "2026-09-29"
     },
     "/tools/fire-pump-curve/": {
-      "sha": "c13a782f9b211691",
-      "date": "2026-09-29"
+      "sha": "840f8b2a9cc9e364",
+      "date": "2026-10-03"
     },
     "/tools/fire-stream-reaction/": {
       "sha": "f870cbbe0efdd2af",
@@ -3206,8 +3206,8 @@
       "date": "2026-10-01"
     },
     "/tools/furnace-airflow-to-rise/": {
-      "sha": "77a6424f1ead27bf",
-      "date": "2026-09-29"
+      "sha": "2f76f262723f65d8",
+      "date": "2026-10-03"
     },
     "/tools/furnace-temp-rise/": {
       "sha": "e8198407bfaaecf1",
@@ -3634,7 +3634,7 @@
       "date": "2026-10-03"
     },
     "/tools/hdd-annular-pressure/": {
-      "sha": "6d1d8d0c08bbdcbe",
+      "sha": "0b9fe4a854c341a0",
       "date": "2026-10-03"
     },
     "/tools/hdd-bend-radius/": {
@@ -3858,8 +3858,8 @@
       "date": "2026-09-29"
     },
     "/tools/hydraulic-pump-horsepower/": {
-      "sha": "bea5d54ef2f4407f",
-      "date": "2026-09-29"
+      "sha": "b0d2bcbcc9d461cd",
+      "date": "2026-10-03"
     },
     "/tools/hydraulic-reservoir-cooler/": {
       "sha": "37092cf1f84d4228",
@@ -3878,8 +3878,8 @@
       "date": "2026-09-29"
     },
     "/tools/hydronic-injection-mixing/": {
-      "sha": "169cafa058261e51",
-      "date": "2026-09-29"
+      "sha": "8cbf828b1bf61a6b",
+      "date": "2026-10-03"
     },
     "/tools/hydronic-system-volume/": {
       "sha": "e633d812caea885b",
@@ -4362,8 +4362,8 @@
       "date": "2026-09-29"
     },
     "/tools/log-truck-payload/": {
-      "sha": "b1822d4f37bc6529",
-      "date": "2026-09-29"
+      "sha": "a601d7854c3f19d7",
+      "date": "2026-10-03"
     },
     "/tools/loop-error-stackup/": {
       "sha": "36988ec06e5d63ab",
@@ -4926,8 +4926,8 @@
       "date": "2026-09-29"
     },
     "/tools/nesc-district-loading/": {
-      "sha": "cfb08c49a8ce1bc3",
-      "date": "2026-10-01"
+      "sha": "cd75050f90029915",
+      "date": "2026-10-03"
     },
     "/tools/net-effective-rent/": {
       "sha": "bbeb715b16e6da3b",
@@ -5522,8 +5522,8 @@
       "date": "2026-10-01"
     },
     "/tools/pole-class-groundline-moment/": {
-      "sha": "5cfefc66d39d9740",
-      "date": "2026-09-29"
+      "sha": "b611703a03b2054d",
+      "date": "2026-10-03"
     },
     "/tools/pole-embedment-depth/": {
       "sha": "5168edcdc0cf4886",
@@ -6066,8 +6066,8 @@
       "date": "2026-10-03"
     },
     "/tools/rc-shear-friction/": {
-      "sha": "af7993e9b1993cc5",
-      "date": "2026-09-29"
+      "sha": "18e69e53d76687ea",
+      "date": "2026-10-03"
     },
     "/tools/rc-slab-max-span-for-thickness/": {
       "sha": "683ef92ea3d60f7c",
@@ -6406,8 +6406,8 @@
       "date": "2026-09-29"
     },
     "/tools/roller-chain-wear-elongation/": {
-      "sha": "324d84b824419396",
-      "date": "2026-10-01"
+      "sha": "c54deddde7e368b9",
+      "date": "2026-10-03"
     },
     "/tools/roller-jack-force/": {
       "sha": "e6b02d6f73d206a8",
@@ -7014,7 +7014,7 @@
       "date": "2026-09-29"
     },
     "/tools/slip-critical-with-tension/": {
-      "sha": "e06db5520994a72b",
+      "sha": "9cd8fb7c532498b9",
       "date": "2026-10-03"
     },
     "/tools/slope/": {
@@ -7186,8 +7186,8 @@
       "date": "2026-09-29"
     },
     "/tools/solar-azimuth-angle/": {
-      "sha": "4b5ea32529a81acd",
-      "date": "2026-09-29"
+      "sha": "bc894bd9a32e79c9",
+      "date": "2026-10-03"
     },
     "/tools/solar-egc-690-45/": {
       "sha": "86b591cd8f7f7616",
@@ -7554,8 +7554,8 @@
       "date": "2026-09-29"
     },
     "/tools/steel-beam-flexure/": {
-      "sha": "5fa7c7a48c3016e6",
-      "date": "2026-09-29"
+      "sha": "21fb8111335f85fa",
+      "date": "2026-10-03"
     },
     "/tools/steel-beam-ltb/": {
       "sha": "974bceeeee439cad",
@@ -7574,7 +7574,7 @@
       "date": "2026-10-03"
     },
     "/tools/steel-bolt-tension-shear/": {
-      "sha": "067ef6943a16e2f6",
+      "sha": "3d0e90b9bf729ddd",
       "date": "2026-10-03"
     },
     "/tools/steel-camber/": {
@@ -7626,7 +7626,7 @@
       "date": "2026-09-29"
     },
     "/tools/steel-tau-b-stiffness-reduction/": {
-      "sha": "21e13cb978e11dd9",
+      "sha": "55d5ca1b56f91a8b",
       "date": "2026-10-03"
     },
     "/tools/steel-tension-member/": {
@@ -7930,8 +7930,8 @@
       "date": "2026-09-29"
     },
     "/tools/termination-temp-ampacity/": {
-      "sha": "c998d8610fe003ef",
-      "date": "2026-09-29"
+      "sha": "311fb9c54f625fb9",
+      "date": "2026-10-03"
     },
     "/tools/texture-material-takeoff/": {
       "sha": "d843468b8f211fa7",
@@ -8230,8 +8230,8 @@
       "date": "2026-09-29"
     },
     "/tools/trap-speed-horsepower/": {
-      "sha": "d5c6c0c15c94c26b",
-      "date": "2026-09-29"
+      "sha": "2252673dbf0d9ed1",
+      "date": "2026-10-03"
     },
     "/tools/trapezoidal-channel-flow/": {
       "sha": "d6da3576e3dd4171",
@@ -8466,8 +8466,8 @@
       "date": "2026-09-29"
     },
     "/tools/vacuum-lift-reading/": {
-      "sha": "dce5159642af6526",
-      "date": "2026-09-29"
+      "sha": "dcc5fa759cf3ccd0",
+      "date": "2026-10-03"
     },
     "/tools/valley-flashing-takeoff/": {
       "sha": "337ba87f2de839b4",
@@ -8630,8 +8630,8 @@
       "date": "2026-09-29"
     },
     "/tools/water-closet-location/": {
-      "sha": "b532542e7dab5616",
-      "date": "2026-09-29"
+      "sha": "bfc6788cfcf41245",
+      "date": "2026-10-03"
     },
     "/tools/water-extraction-rate/": {
       "sha": "0aeb88d371ddb1f7",
@@ -8698,8 +8698,8 @@
       "date": "2026-09-29"
     },
     "/tools/weir-head-from-flow/": {
-      "sha": "6c722bc9c34f03fc",
-      "date": "2026-09-29"
+      "sha": "538181f0178da2c0",
+      "date": "2026-10-03"
     },
     "/tools/weld-cooling-rate-t85/": {
       "sha": "7f2a02bf8796c4b8",
@@ -8886,8 +8886,8 @@
       "date": "2026-09-29"
     },
     "/tools/wire-ampacity/": {
-      "sha": "b7e7f7084bcdc227",
-      "date": "2026-09-29"
+      "sha": "d9c795f987992efe",
+      "date": "2026-10-03"
     },
     "/tools/wire-feed-deposition/": {
       "sha": "8ad9352505b197e3",
@@ -8974,8 +8974,8 @@
       "date": "2026-09-29"
     },
     "/tools/wood-screw-withdrawal/": {
-      "sha": "d40449213ce2a66f",
-      "date": "2026-09-29"
+      "sha": "2ac1b9a2e0461d04",
+      "date": "2026-10-03"
     },
     "/tools/wood-tension-member/": {
       "sha": "51e19d6108cbaaed",

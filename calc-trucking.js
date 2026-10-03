@@ -1688,7 +1688,7 @@ export function computeDetentionDemurrageBilling({ free_hours = 0, actual_hours 
   const opportunity_usd = detention_hours * rev;
   return {
     detention_hours, billable_usd, opportunity_usd,
-    shortfall_usd: opportunity_usd > 0 ? opportunity_usd - billable_usd : null,
+    shortfall_usd: rev > 0 ? opportunity_usd - billable_usd : null,
     note: "Detention (or demurrage) billing: the chargeable hours = the time at the facility beyond the free time (max of zero), the detention charge = those hours x the detention rate, and the opportunity cost = those hours x what the truck earns per hour on the road. The detention rate rarely covers the lost revenue (a truck sitting is not driving the next load), so a large gap is the case for a higher rate or a stricter free-time clause. This bills the entered numbers; the carrier's tariff and the signed rate confirmation govern the actual charge.",
   };
 }

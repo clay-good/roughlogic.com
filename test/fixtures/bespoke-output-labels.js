@@ -22,7 +22,7 @@ export const BESPOKE_OUTPUT_LABELS = {
   "ambient-ampacity-adjust": {"ambient_factor":"Ambient correction factor","fill_factor":"Conductor-fill factor","combined_factor":"Combined factor","adjusted_ampacity_a":"Adjusted ampacity (A)","warnings":"Notes"},
   "amortization-schedule": {"monthly_principal_and_interest":"Monthly P&I","actual_term_months":"Actual term (months / years)","total_interest":"Total interest","total_paid":"Total paid","months_saved":"Months saved by extra principal","sample_rows":"Sample rows (first / mid / last)"},
   "amp-power-spl": {"spl_db":"Continuous SPL at listener","peak_spl_db":"Peak SPL after headroom","power_for_target_w":"Power needed for target SPL"},
-  "anchor-embedment": {"embedment_in":"Required embedment","embedment_ft":"Required embedment (ft)"},
+  "anchor-embedment": {"cracked":"Required embedment"},
   "anhydrous-ammonia-rate": {"product_lb_per_ac":"Anhydrous rate","acres_per_tank":"Acres per tank"},
   "annulus-area": {"ring_area":"Ring (annulus) area","wall_thickness":"Wall thickness","note":"Note"},
   "antimicrobial-dilution": {"finished_gal":"Finished solution","concentrate_oz":"Total concentrate","water_gal":"Total water","per_tank_conc_oz":"Per full tank","tanks_needed":"Tank fills"},

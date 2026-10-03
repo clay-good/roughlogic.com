@@ -5588,7 +5588,7 @@ export function computeTerminationTempAmpacity({ amp_90c = 0, amp_75c = 0, amp_6
 export const terminationTempAmpacityExample = { inputs: { amp_90c: 260, amp_75c: 230, amp_60c: 195, termination_rating: 75, over_100a: true, derate_factor: 0.8 } };
 
 function _v562renderTerminationTempAmpacity(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: NEC 2023 110.14(C) temperature limitations with Table 310.16: the usable ampacity is capped at the lowest-rated termination (60 C at or below 100 A unless listed 75 C, else 75 C; 75 C above 100 A), and the 90 C column is used ONLY for the ambient/fill derating math (derated 90 C = amp_90c x derate), not the final termination current; governing = min(termination column, derated 90 C). The NEC and the equipment listing govern.";
+  citationEl.textContent = "Citation: NEC 2023 110.14(C) temperature limitations with Table 310.16: the usable ampacity is capped at the lowest-rated termination you declare (60 or 75 C); the NEC default column is 60 C at or below 100 A unless listed 75 C, and 75 C above 100 A, but a 60 C-marked termination governs even above 100 A; the 90 C column is used ONLY for the ambient/fill derating math (derated 90 C = amp_90c x derate), not the final termination current; governing = min(termination column, derated 90 C). The NEC and the equipment listing govern.";
   const a90 = makeNumber("90 C ampacity (Table 310.16)", "tta-90", { step: "any", min: "0" });
   const a75 = makeNumber("75 C ampacity", "tta-75", { step: "any", min: "0" });
   const a60 = makeNumber("60 C ampacity", "tta-60", { step: "any", min: "0" });
@@ -5597,7 +5597,7 @@ function _v562renderTerminationTempAmpacity(inputRegion, outputRegion, citationE
     { value: "60", label: "60 C" },
   ]);
   const over = makeSelect("Circuit over 100 A?", "tta-over", [
-    { value: "yes", label: "Yes (75 C column)", selected: true },
+    { value: "yes", label: "Yes (75 C default column)", selected: true },
     { value: "no", label: "No (<= 100 A)" },
   ]);
   const d = makeNumber("Combined ambient/fill derate (1.0 = none)", "tta-d", { step: "any", min: "0", max: "1" });

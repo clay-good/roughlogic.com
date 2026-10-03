@@ -530,7 +530,7 @@ export function computeFurnaceAirflowToRise({ input_btuh = 0, efficiency_pct = 8
 }
 export const furnaceAirflowToRiseExample = { inputs: { input_btuh: 100000, efficiency_pct: 80, cfm: 1200, return_air_F: 70, rise_min_F: 40, rise_max_F: 70 } };
 HVACSERVICE_RENDERERS["furnace-airflow-to-rise"] = _simpleRenderer({
-  citation: "Citation: first-principles sensible-heat relation Qs = 1.08 x CFM x delta-T solved for the rise, with output = input x efficiency (public), the inverse of the furnace temperature-rise tile; the 1.08 sea-level air factor and the default 80% efficiency are editable. The rating-plate temperature-rise range and the equipment manufacturer govern.",
+  citation: "Citation: first-principles sensible-heat relation Qs = 1.08 x CFM x delta-T solved for the rise, with output = input x efficiency (public), the inverse of the furnace temperature-rise tile; the default 80% efficiency is editable; the 1.08 sea-level air factor is fixed. The rating-plate temperature-rise range and the equipment manufacturer govern.",
   example: furnaceAirflowToRiseExample.inputs,
   fields: [
     { key: "input_btuh", label: "Furnace input (BTU/hr)", kind: "number" },
