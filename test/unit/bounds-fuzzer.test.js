@@ -5608,7 +5608,7 @@ test("bounds: calc-edu computeStatistics pins mean / median / mode / sample-vs-p
   assert.strictEqual(single.mean, 7);
   assert.strictEqual(single.median, 7);
   assert.deepStrictEqual(single.mode, [], "single value has no mode (all unique)");
-  assert.strictEqual(single.variance_sample, 0);
+  assert.strictEqual(single.variance_sample, null); // the n-1 variance is undefined for one value
   // Even-length median = midpoint.
   const even = computeStatistics({ values: [1, 2, 3, 4] });
   assert.strictEqual(even.median, 2.5);

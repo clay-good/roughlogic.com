@@ -268,7 +268,8 @@ export function computeStatistics({ values }) {
   // Sample variance (n-1) and population variance (n)
   const sqDev = nums.reduce((acc, v) => acc + (v - mean) * (v - mean), 0);
   const variance_population = sqDev / n;
-  const variance_sample = n > 1 ? sqDev / (n - 1) : 0;
+  // The n-1 sample variance is undefined for one value (it read 0 until 2026-10-03).
+  const variance_sample = n > 1 ? sqDev / (n - 1) : null;
   return {
     count: n,
     sum,
@@ -280,7 +281,7 @@ export function computeStatistics({ values }) {
     range,
     variance_sample,
     variance_population,
-    sd_sample: Math.sqrt(variance_sample),
+    sd_sample: variance_sample === null ? null : Math.sqrt(variance_sample),
     sd_population: Math.sqrt(variance_population),
   };
 }
@@ -324,7 +325,7 @@ export function renderStatistics(inputRegion, outputRegion, citationEl) {
     oMin.textContent = fmt(r.min, 4);
     oMax.textContent = fmt(r.max, 4);
     oRange.textContent = fmt(r.range, 4);
-    oSDs.textContent = fmt(r.sd_sample, 4);
+    oSDs.textContent = r.sd_sample === null ? "- (needs 2 or more values)" : fmt(r.sd_sample, 4);
     oSDp.textContent = fmt(r.sd_population, 4);
   }, DEBOUNCE_MS);
   V.input.addEventListener("input", update);

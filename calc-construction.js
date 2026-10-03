@@ -6727,6 +6727,8 @@ CONSTRUCTION_RENDERERS["wood-beam-compression-notch"] = _renderWoodBeamCompressi
 export function computeWoodBoltConnection({ d_in = 0, lm_in = 0, ls_in = 0, gm = 0.50, gs = 0.50, fyb_psi = 45000, theta_deg = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(d_in > 0)) return { error: "Bolt diameter D must be positive (in)." };
+  // NDS Table 12.3.1B bolt reduction terms cover 1/4 to 1 in; a smaller dowel takes Rd = KD instead.
+  if (d_in < 0.25 - 1e-9 || d_in > 1 + 1e-9) return { error: "This tile covers bolts 1/4 to 1 in (the NDS Table 12.3.1B reduction terms); a smaller fastener uses Rd = KD and a larger one is outside the table." };
   if (!(lm_in > 0)) return { error: "Main-member bearing length lm must be positive (in)." };
   if (!(ls_in > 0)) return { error: "Side-member bearing length ls must be positive (in)." };
   if (!(gm > 0 && gm < 1)) return { error: "Main-member specific gravity Gm must be between 0 and 1." };

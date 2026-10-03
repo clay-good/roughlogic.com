@@ -138,7 +138,7 @@ function renderCategoryWeightedGrade(inputRegion, outputRegion, citationEl) {
   const update = debounce(() => {
     const r = computeCategoryWeightedGrade({ categories: parse(data.input.value) });
     if (r.error) { oOverall.textContent = r.error; oCheck.textContent = ""; oNote.textContent = ""; return; }
-    oOverall.textContent = fmt(r.overall_pct, 1) + "% (" + r.letter + ")";
+    oOverall.textContent = fmt(r.overall_pct, 2) + "% (" + r.letter + ")";
     oCheck.textContent = fmt(r.weight_sum, 0) + (r.weight_normalized ? " (normalized - does not sum to 100)" : "");
     oNote.textContent = r.note;
   }, DEBOUNCE_MS);
@@ -234,7 +234,7 @@ function renderPairedTTest(inputRegion, outputRegion, citationEl) {
   const md = makeNumber("Mean of the differences d_bar", "ptt-md", { step: "any" });
   const sd = makeNumber("SD of the differences s_d", "ptt-sd", { step: "any", min: "0" });
   const n = makeNumber("Number of pairs n", "ptt-n", { step: "1", min: "2" });
-  const tail = makeSelect("Tail", "ptt-tail", [{ value: "two", label: "Two-sided", selected: true }, { value: "one", label: "One-sided" }]);
+  const tail = makeSelect("Tail", "ptt-tail", [{ value: "two", label: "Two-sided", selected: true }, { value: "one", label: "One-sided, in the observed direction" }]);
   for (const f of [md, sd, n, tail]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { md.input.value = "2.5"; sd.input.value = "3"; n.input.value = "20"; tail.select.value = "two"; update(); });
   const oT = makeOutputLine(outputRegion, "t-statistic / df", "ptt-out-t");
@@ -286,7 +286,7 @@ function renderOneSampleTTest(inputRegion, outputRegion, citationEl) {
   const sd = makeNumber("Sample SD s", "ostt-sd", { step: "any", min: "0" });
   const n = makeNumber("Sample size n", "ostt-n", { step: "1", min: "2" });
   const mu0 = makeNumber("Hypothesized / target mean mu0", "ostt-mu", { step: "any" });
-  const tail = makeSelect("Tail", "ostt-tail", [{ value: "two", label: "Two-sided", selected: true }, { value: "one", label: "One-sided" }]);
+  const tail = makeSelect("Tail", "ostt-tail", [{ value: "two", label: "Two-sided", selected: true }, { value: "one", label: "One-sided, in the observed direction" }]);
   for (const f of [xb, sd, n, mu0, tail]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { xb.input.value = "16.1"; sd.input.value = "0.3"; n.input.value = "25"; mu0.input.value = "16.0"; tail.select.value = "two"; update(); });
   const oT = makeOutputLine(outputRegion, "t-statistic / df", "ostt-out-t");
@@ -556,7 +556,7 @@ function renderTwoProportionZTest(inputRegion, outputRegion, citationEl) {
   const n1 = makeNumber("Group 1 total n1", "tp-n1", { step: "1", min: "1" });
   const x2 = makeNumber("Group 2 successes x2", "tp-x2", { step: "1", min: "0" });
   const n2 = makeNumber("Group 2 total n2", "tp-n2", { step: "1", min: "1" });
-  const tail = makeSelect("Tail", "tp-tail", [{ value: "two", label: "Two-sided", selected: true }, { value: "one", label: "One-sided" }]);
+  const tail = makeSelect("Tail", "tp-tail", [{ value: "two", label: "Two-sided", selected: true }, { value: "one", label: "One-sided, in the observed direction" }]);
   for (const f of [x1, n1, x2, n2, tail]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { x1.input.value = "45"; n1.input.value = "100"; x2.input.value = "30"; n2.input.value = "100"; tail.select.value = "two"; update(); });
   const oP = makeOutputLine(outputRegion, "Proportions p1 / p2 / difference", "tp-out-p");

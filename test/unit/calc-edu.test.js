@@ -199,10 +199,10 @@ test("computeStatistics: even-length median is midpoint of the two middle sorted
   assert.equal(r.median, 4);
 });
 
-test("computeStatistics: sample SD undefined for n=1 returns 0 (no Bessel correction available)", () => {
+test("computeStatistics: sample SD is undefined for n=1 and returns null (no Bessel correction available)", () => {
   const r = computeStatistics({ values: "42" });
   assert.equal(r.count, 1);
-  assert.equal(r.sd_sample, 0);
+  assert.equal(r.sd_sample, null);
   assert.equal(r.sd_population, 0);
 });
 
