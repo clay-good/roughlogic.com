@@ -448,7 +448,7 @@ export function computeHazardTreeStumpScreen({ disaster_threat = "yes", dbh_in =
   if (!(stump_dia_in > 0)) return { error: "Stump diameter must be positive." };
   const threat = disaster_threat === "yes";
   const lean_deg = Math.atan(lean_offset_ft / lean_height_ft) * 180 / Math.PI;
-  const dbh_ok = dbh_in >= 6;
+  const dbh_ok = dbh_in >= 6 - 1e-9 * Math.abs(6);
   const crown_ok = crown_damage_pct > 50;
   const split_ok = split_trunk === "yes";
   const fallen_ok = fallen_in_public_use === "yes";

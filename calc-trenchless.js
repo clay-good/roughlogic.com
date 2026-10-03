@@ -121,7 +121,7 @@ export function computeHddBendRadius({ pipe_diameter_in = 0, radius_per_inch_ft 
   // which costs run at the entry angle.
   const extra_run_to_depth_ft = depth_short_ft / Math.tan(theta);
   const run_to_depth_ft = sag_run_ft + extra_run_to_depth_ft;
-  const setback_ok = available_setback_ft >= run_to_depth_ft;
+  const setback_ok = available_setback_ft >= run_to_depth_ft - 1e-9 * Math.abs(run_to_depth_ft);
   return {
     pipe_min_radius_ft, governing_radius_ft, governs, sag_run_ft, sag_depth_ft,
     depth_short_ft, extra_run_to_depth_ft, run_to_depth_ft, setback_ok,
@@ -431,7 +431,7 @@ export function computePipeBurstingPullLoad({ old_diameter_in = 0, new_diameter_
   const drag_lb = drag_lb_per_ft * run_length_ft;
   const pull_load_lb = expansion_force_lb + drag_lb;
   const pull_margin_lb = pipe_safe_pull_lb - pull_load_lb;
-  const pull_ok = pipe_safe_pull_lb >= pull_load_lb;
+  const pull_ok = pipe_safe_pull_lb >= pull_load_lb - 1e-9 * Math.abs(pull_load_lb);
   // Heave screen: the shallower the cover relative to the new pipe, the more
   // of the displacement reaches the surface. Cover of at least a few
   // diameters is the conventional comfort.

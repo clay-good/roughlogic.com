@@ -109,8 +109,8 @@ export function computeTiedownCount({ length_ft = 0, weight_lb = 0, tiedowns = 0
   if (!(tiedown_path in TIEDOWN_CREDIT)) return { error: "Tiedown path must be over_other_side, direct, or same_side." };
   const effective_wll_each = wll_per_tiedown_lb * TIEDOWN_CREDIT[tiedown_path];
   const provided_wll_lb = tiedowns * effective_wll_each;
-  const count_ok = tiedowns >= min_tiedowns;
-  const wll_ok = provided_wll_lb >= required_wll_lb;
+  const count_ok = tiedowns >= min_tiedowns - 1e-9 * Math.abs(min_tiedowns);
+  const wll_ok = provided_wll_lb >= required_wll_lb - 1e-9 * Math.abs(required_wll_lb);
   const count_margin = tiedowns - min_tiedowns;
   const wll_margin_lb = provided_wll_lb - required_wll_lb;
   // Which rule GOVERNS is a property of the cargo and the hardware, not of the plan:
@@ -183,7 +183,7 @@ export function computeKingpinToAxle({ kpra_ft = 0, state_limit_ft = 40, hole_sp
   const holes_needed = excess_ft > 0 ? Math.ceil(excess_ft * 12 / hole_spacing_in - 1e-9) : 0;
   const resulting_kpra_ft = kpra_ft - holes_needed * hole_spacing_in / 12;
   const slide_in = holes_needed * hole_spacing_in;
-  const compliant = resulting_kpra_ft <= state_limit_ft;
+  const compliant = resulting_kpra_ft <= state_limit_ft + 1e-9 * Math.abs(state_limit_ft);
   const verdict = excess_ft <= 0
     ? "COMPLIANT as measured, with " + fmt(-excess_ft, 2) + " ft to spare"
     : compliant
@@ -564,12 +564,12 @@ export function computeFlatbedTarpSize({ load_length_ft = 0, load_width_ft = 0, 
   if (!(tarp_length_ft > overlap_ft)) return { error: "The overlap must be shorter than the tarp." };
   // A tarp has to come down BOTH sides: a tarp sized to the deck width is a lid.
   const width_needed_ft = load_width_ft + 2 * load_height_ft + 2 * tuck_ft;
-  const width_ok = tarp_width_ft >= width_needed_ft;
+  const width_ok = tarp_width_ft >= width_needed_ft - 1e-9 * Math.abs(width_needed_ft);
   const width_spare_ft = tarp_width_ft - width_needed_ft;
   const tarps_needed = Math.max(1, Math.ceil((load_length_ft - overlap_ft) / (tarp_length_ft - overlap_ft) - 1e-9));
   const covered_length_ft = tarps_needed * tarp_length_ft - (tarps_needed - 1) * overlap_ft;
   const total_weight_lb = tarps_needed * tarp_weight_lb;
-  const length_ok = covered_length_ft >= load_length_ft;
+  const length_ok = covered_length_ft >= load_length_ft - 1e-9 * Math.abs(load_length_ft);
   const verdict = width_ok
     ? "the tarps on hand are wide enough, with " + fmt(width_spare_ft, 1) + " ft to spare"
     : "the tarps on hand are " + fmt(-width_spare_ft, 1) + " ft too narrow -- they will not reach down both sides, and the answer is a different tarp, not a tighter bungee";

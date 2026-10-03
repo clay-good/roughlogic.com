@@ -125,7 +125,7 @@ export function computeTrussCapacity({ truss_model = "16in_box", span_ft = 0, po
   // a single concentrated load: equivalent UDL = 2 * point / span; sum across loads.
   const equivalent_udl = total_point_load > 0 ? (2 * total_point_load) / span_ft : 0;
   const safety_factor = udl_max > 0 ? udl_max / Math.max(equivalent_udl, 0.01) : Infinity;
-  const pass = equivalent_udl <= udl_max;
+  const pass = equivalent_udl <= udl_max + 1e-9 * Math.abs(udl_max);
   return {
     udl_max_lb_per_ft: udl_max,
     total_uniform_capacity_lb: total_uniform_capacity,
@@ -345,7 +345,7 @@ export function computeRiggingCheck({ hardware = "sling_5_8_steel", configuratio
   }
   const effective_wll = h.wll_lb * derate_factor;
   const safety_factor = tension_per_leg > 0 ? effective_wll / tension_per_leg : null;
-  const pass = tension_per_leg <= effective_wll;
+  const pass = tension_per_leg <= effective_wll + 1e-9 * Math.abs(effective_wll);
   return {
     hardware_label: h.label,
     base_wll_lb: h.wll_lb,

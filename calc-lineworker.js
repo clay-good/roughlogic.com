@@ -1048,8 +1048,8 @@ export function computeCapacitorBankVoltageRise({ bank_kvar = 0, line_voltage_kv
   const peak_load_result_v = peak_load_voltage_v + rise_volts_120_base;
   const light_load_result_v = light_load_voltage_v + rise_volts_120_base;
   const light_load_margin_v = upper_limit_v - light_load_result_v;
-  const within_limit_light = light_load_result_v <= upper_limit_v;
-  const within_limit_peak = peak_load_result_v <= upper_limit_v;
+  const within_limit_light = light_load_result_v <= upper_limit_v + 1e-9 * Math.abs(upper_limit_v);
+  const within_limit_peak = peak_load_result_v <= upper_limit_v + 1e-9 * Math.abs(upper_limit_v);
   // Working the relation backwards at the binding condition, which is light
   // load: the largest fixed bank whose rise still fits under the limit.
   const headroom_v = Math.max(0, upper_limit_v - light_load_voltage_v);

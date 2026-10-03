@@ -225,7 +225,7 @@ export function computeWirelessLinkBudget({ tx_power_dbm = 20, tx_gain_dbi = 0, 
   const fspl_db = 32.44 + 20 * Math.log10(d) + 20 * Math.log10(f);
   const rx_power_dbm = eirp_dbm - fspl_db + gr - lrx;
   const fade_margin_db = rx_power_dbm - sens;
-  const adequate = fade_margin_db >= 10;
+  const adequate = fade_margin_db >= 10 - 1e-9 * Math.abs(10);
   if (![eirp_dbm, fspl_db, rx_power_dbm, fade_margin_db].every(Number.isFinite)) return { error: "Link-budget math is not a finite value." };
   return {
     eirp_dbm, fspl_db, rx_power_dbm, fade_margin_db, adequate,
@@ -550,7 +550,7 @@ export function computeSpeaker70vLine({ amp_rated_w = 0, headroom_percent = 20, 
   const total_tap_w = tw * tc;
   const headroom = Number(headroom_percent) || 0;
   const budget_limit_w = rating * (1 - headroom / 100);
-  const within_budget = total_tap_w <= budget_limit_w;
+  const within_budget = total_tap_w <= budget_limit_w + 1e-9 * Math.abs(budget_limit_w);
   const notes = [];
   let reflected_impedance_ohm = null;
   if (total_tap_w > 0) reflected_impedance_ohm = (V * V) / total_tap_w;
@@ -979,11 +979,11 @@ export function computeStructuredCablingChannel({ permanent_link_m = 0, cords_m 
   const table = derate === 0.004 ? _TIA_G2_UTP : derate === 0.002 ? _TIA_G2_SCREENED : null;
   const max_pl_m = table ? _tiaG2(table, temp) : Math.max(0, 90 * (1 - Math.max(temp - 20, 0) * derate));
   const channel_m = pl + cords;
-  const pl_ok = pl <= max_pl_m;
-  const chan_ok = channel_m <= 100;
+  const pl_ok = pl <= max_pl_m + 1e-9 * Math.abs(max_pl_m);
+  const chan_ok = channel_m <= 100 + 1e-9 * Math.abs(100);
   // TIA-568: patch + equipment + work-area cords total at most 10 m. Until 2026-09-26 the note said so but the code
   // never checked it, so 60 m of link and 30 m of cords passed.
-  const cords_ok = cords <= 10;
+  const cords_ok = cords <= 10 + 1e-9 * Math.abs(10);
   return {
     max_pl_m, channel_m, pl_ok, chan_ok, cords_ok, ok: pl_ok && chan_ok && cords_ok,
     note: "Structured cabling channel length (TIA-568): a horizontal channel is limited to 100 m total = a 90 m permanent link (the fixed horizontal cable) plus up to 10 m of patch and equipment cords. Above 20 deg C the maximum permanent-link length de-rates by TIA-568-C.2 Table G.2 (unscreened 90.0 m at 20 deg C, 84.0 at 40, 75.0 at 60; screened 87.0 at 40 and 83.0 at 60), interpolated between its 5 deg C rows; a de-rate entry other than 0.004 (UTP) or 0.002 (screened) is applied as a straight 90 x (1 - rate x (T - 20)), and the table stops at 60 deg C because warmer copper has higher resistance and insertion loss, so a hot ceiling or plenum shortens the allowed run. The channel passes only if the permanent link is within its de-rated maximum, the cords total no more than 10 m, AND the total channel is within 100 m (longer cords need the TIA zone-cabling formula, not checked here). A design aid; the specific cable's published de-rating and the TIA-568 edition adopted govern.",
@@ -1183,7 +1183,7 @@ export function computeFireAlarmNacVoltageDrop({ nominal_voltage_v = 24, total_c
   const voltage_drop_v = total_current_a * loop_resistance;
   const eol_voltage_v = available_voltage_v - voltage_drop_v;
   const margin_v = eol_voltage_v - device_min_v;
-  const within_spec = eol_voltage_v >= device_min_v;
+  const within_spec = eol_voltage_v >= device_min_v - 1e-9 * Math.abs(device_min_v);
   if (![available_voltage_v, voltage_drop_v, eol_voltage_v, margin_v].every(Number.isFinite)) return { error: "NAC voltage-drop math is not a finite value." };
   return {
     available_voltage_v,

@@ -135,9 +135,9 @@ export function computeDTI({ gross_monthly_income, housing_payment, other_monthl
   // allows it. The pass flag uses the 45% manual ceiling.
   // FHA: front 31 / back 43 default thresholds.
   // VA: back 41 default threshold (no front-end limit).
-  const conventional_pass = back <= 45;
+  const conventional_pass = back <= 45 + 1e-9 * Math.abs(45);
   const fha_pass = front <= 31 && back <= 43;
-  const va_pass = back <= 41;
+  const va_pass = back <= 41 + 1e-9 * Math.abs(41);
   return {
     front_end_dti_percent: front,
     back_end_dti_percent: back,

@@ -518,7 +518,7 @@ export function computeRailcarLoadLimit({ gross_rail_load_lb = 0, light_weight_l
   const gross_on_rail_lb = light_weight_lb + lading_net_lb;
   const utilization_pct = lading_net_lb > 0 ? lading_net_lb / load_limit_lb * 100 : 0;
   const remaining_capacity_lb = load_limit_lb - lading_net_lb;
-  const within_car = gross_on_rail_lb <= gross_rail_load_lb;
+  const within_car = gross_on_rail_lb <= gross_rail_load_lb + 1e-9 * Math.abs(gross_rail_load_lb);
   // The constraint that gets missed: the ROUTE's own limit, which is invisible
   // on the car and which the stencil knows nothing about.
   const route_load_limit_lb = route_gross_rail_load_lb > 0 ? route_gross_rail_load_lb - light_weight_lb : null;

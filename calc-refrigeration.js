@@ -558,7 +558,7 @@ export function computeReceiverPumpdownCapacity({
   const required_gal = charge_to_pump_lb / density_lb_gal;
   const resulting_gal = existing_liquid_gal + required_gal;
   const resulting_fill_pct = resulting_gal / receiver_volume_gal * 100;
-  const fits = required_gal <= available_gal;
+  const fits = required_gal <= available_gal + 1e-9 * Math.abs(available_gal);
   const spare_gal = available_gal - required_gal;
   const max_charge_lb = Math.max(0, available_gal) * density_lb_gal;
   const verdict = already_over_limit

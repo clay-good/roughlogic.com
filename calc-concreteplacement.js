@@ -122,7 +122,7 @@ export function computeConcretePumpLinePressure({ horizontal_length_ft = 0, vert
   const line_psi = horizontal_length_ft * friction_per_ft;
   const total_psi = static_psi + friction_psi;
   const margin_psi = pump_rated_psi - total_psi;
-  const within_rating = total_psi <= pump_rated_psi;
+  const within_rating = total_psi <= pump_rated_psi + 1e-9 * Math.abs(pump_rated_psi);
   const utilization_pct = total_psi / pump_rated_psi * 100;
   // What a crew actually wants: how much more line is left before the limit.
   const additional_line_ft = friction_per_ft > 0 ? Math.max(0, margin_psi) / friction_per_ft : 0;
@@ -359,7 +359,7 @@ export function computeTiltUpLiftStress({ panel_width_ft = 0, panel_height_ft = 
   const modulus_of_rupture_psi = _MODULUS_OF_RUPTURE_COEFF * Math.sqrt(lift_day_strength_psi);
   const allowable_stress_psi = modulus_of_rupture_psi / safety_factor;
   const stress_margin_psi = allowable_stress_psi - bending_stress_psi;
-  const within_capacity = bending_stress_psi <= allowable_stress_psi;
+  const within_capacity = bending_stress_psi <= allowable_stress_psi + 1e-9 * Math.abs(allowable_stress_psi);
   const utilization_pct = bending_stress_psi / allowable_stress_psi * 100;
   // Rows needed to bring the stress inside capacity, on the same (2 / n)^0.75 fall.
   const rows_required = Math.max(2, Math.ceil(2 * Math.pow(two_row_stress_psi / allowable_stress_psi, 1 / ROW_EXPONENT) - 1e-9));

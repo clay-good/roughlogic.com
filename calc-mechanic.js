@@ -4385,7 +4385,7 @@ export function computeAdhesiveBondArea({ bond_length_in = 0, bond_width_in = 0,
   const has_required = required_load_lb > 0;
   const margin_lb = capacity_lb - required_load_lb;
   const length_for_required_in = has_required ? required_load_lb / (bond_width_in * shear_strength_psi) : 0;
-  const adequate = margin_lb >= 0;
+  const adequate = margin_lb >= 0 - 1e-9 * Math.abs(0);
   const required_verdict = !has_required
     ? "(no required capacity entered)"
     : adequate

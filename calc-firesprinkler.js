@@ -219,7 +219,7 @@ export function computeSprinklerHeadLayout({ room_length = 0, room_width = 0, ar
   const room_area = room_length * room_width;
   const achieved_area_per_head = room_area / total_heads;
   const max_wall_distance = spacing / 2;
-  const coverage_ok = achieved_area_per_head <= area_per_head;
+  const coverage_ok = achieved_area_per_head <= area_per_head + 1e-9 * Math.abs(area_per_head);
   return { spacing, heads_per_line, num_lines, total_heads, room_area, achieved_area_per_head, max_wall_distance, coverage_ok };
 }
 
@@ -548,7 +548,7 @@ export function computeSprinklerObstruction({ obstruction_width_in = 0, horizont
   const required_separation_in = Math.min(three_times_in, 24);
   const capped = three_times_in > 24;
   const deficiency_in = Math.max(0, required_separation_in - horizontal_separation_in);
-  const passes = horizontal_separation_in >= required_separation_in;
+  const passes = horizontal_separation_in >= required_separation_in - 1e-9 * Math.abs(required_separation_in);
   // The second remedy is a vertical one: dropping the deflector to the obstruction's
   // bottom takes the obstruction out of the pattern instead of moving the head sideways.
   const deflector_rise_in = obstruction_depth_in;
@@ -607,7 +607,7 @@ export function computeHydrantSpacingCount({ required_flow_gpm = 0, credited_flo
   const governing_count = Math.max(hydrants_by_flow, hydrants_by_frontage);
   const actual_spacing_ft = governing_count > 1 ? frontage_ft / (governing_count - 1) : frontage_ft;
   const worst_distance_ft = actual_spacing_ft / 2;
-  const passes = worst_distance_ft <= max_distance_ft;
+  const passes = worst_distance_ft <= max_distance_ft + 1e-9 * Math.abs(max_distance_ft);
   const governing = hydrants_by_frontage > hydrants_by_flow
     ? "the spacing rule (geometry)"
     : hydrants_by_flow > hydrants_by_frontage

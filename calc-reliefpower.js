@@ -189,7 +189,7 @@ export function computeGeneratorPartLoadFuel({ standby_kw = 0, rating_kw = 0, fu
   const full_load_kwh_per_gal = rating_kw / fuel_full_gph;
   const load_pct_of_standby = 100 * load_kw / standby_kw;
   const min_load_kw = NFPA110_MIN_LOAD_FRACTION * standby_kw;
-  const meets_minimum = load_kw >= min_load_kw;
+  const meets_minimum = load_kw >= min_load_kw - 1e-9 * Math.abs(min_load_kw);
   const load_bank_kw = Math.max(0, min_load_kw - load_kw);
   return {
     fuel_gph, kwh_per_gal, full_load_kwh_per_gal,

@@ -435,7 +435,7 @@ export function computeMasonryAnchorEmbedment({ required_tension_lb = 0, fm_psi 
   const lbe_in = Math.sqrt(T / (1.25 * Math.PI * Math.sqrt(fm)));
   const apt_in2 = Math.PI * lbe_in * lbe_in;
   const bas_lb = 0.6 * ab * fy;
-  const steel_adequate = bas_lb >= T;
+  const steel_adequate = bas_lb >= T - 1e-9 * Math.abs(T);
   return {
     lbe_in, apt_in2, bas_lb, steel_adequate,
     note: "The effective embedment lbe that makes the TMS 402 masonry-breakout capacity Bab = 1.25 x (pi lbe^2) x sqrt(f'm) equal the required tension, the inverse of masonry-anchor-bolt. Deeper embedment pulls a larger 45-degree cone and carries more load. The steel branch Bas = 0.6 x Ab x fy is a separate ceiling: if it is below the required tension the bolt yields no matter how deep it is set, so a larger-diameter or higher-grade bolt is needed. Edge distance or overlapping cones reduce the projected area Apt (this full-cone value is an upper bound, so the real required embedment is deeper); anchor shear (pryout) is a separate check. A design aid, not a substitute for a licensed engineer's design -- the engineer of record's stamped design governs.",
@@ -774,13 +774,13 @@ export function computeFireplaceFlueArea({ opening_width_in = 0, opening_height_
   const required_area_sqin = opening_area_sqin / divisor;
   const actual_area_sqin = round ? Math.PI * dia * dia / 4 : a * b;
   const surplus_sqin = actual_area_sqin - required_area_sqin;
-  const adequate = surplus_sqin >= 0;
+  const adequate = surplus_sqin >= 0 - 1e-9 * Math.abs(0);
   const ratio_actual = actual_area_sqin > 0 ? opening_area_sqin / actual_area_sqin : null;
   // The smallest liner of each shape that would satisfy this opening, so an undersized flue
   // comes with the size to order rather than just a failure.
   const min_round_dia_in = Math.sqrt(4 * (opening_area_sqin / 12) / Math.PI);
   const min_square_side_in = Math.sqrt(opening_area_sqin / 10);
-  const height_ok = H >= 15;
+  const height_ok = H >= 15 - 1e-9 * Math.abs(15);
 
   const shapeWord = round ? "round" : aspect_ratio >= 2 ? "rectangular at " + aspect_ratio.toFixed(2) + ":1 (2:1 or worse)" : aspect_ratio > 1.001 ? "rectangular at " + aspect_ratio.toFixed(2) + ":1 (under 2:1)" : "square";
   const note = "Opening " + w + " x " + h + " = " + opening_area_sqin.toFixed(0) + " sq in. A " + shapeWord
@@ -850,7 +850,7 @@ export function computeMasonryLimitedAccessZone({ wall_height_ft = 0, wall_lengt
 
   const ADDER = 4, BRACE_TRIGGER = 8;
   const required_zone_width_ft = h + ADDER;
-  const width_ok = provided >= required_zone_width_ft;
+  const width_ok = provided >= required_zone_width_ft - 1e-9 * Math.abs(required_zone_width_ft);
   const zone_width_shortfall_ft = Math.max(0, required_zone_width_ft - provided);
   const zone_area_sf = required_zone_width_ft * L;
   const provided_area_sf = provided * (fullLength ? L : 0);
@@ -1018,8 +1018,8 @@ export function computeGroutLiftPourHeight({ pour_height_ft = 0, lift_height_ft 
   // limit typed as 5.33 or 5.333 must not fail a pour of exactly 5 ft 4 in; the
   // comparison carries 0.005 ft (1/16 in). Until 2026-10-01 it was exact.
   const LIMIT_TOL_FT = 0.005;
-  const pour_ok = pour_height_ft <= max_pour_height_ft + LIMIT_TOL_FT;
-  const lift_ok = lift_height_ft <= max_lift_height_ft + LIMIT_TOL_FT;
+  const pour_ok = pour_height_ft <= (max_pour_height_ft + LIMIT_TOL_FT) + 1e-9 * Math.abs(max_pour_height_ft + LIMIT_TOL_FT);
+  const lift_ok = lift_height_ft <= (max_lift_height_ft + LIMIT_TOL_FT) + 1e-9 * Math.abs(max_lift_height_ft + LIMIT_TOL_FT);
   const cleanouts_required = pour_height_ft > cleanout_threshold_ft + LIMIT_TOL_FT;
   const outs = [lifts_in_pour, base_pressure_psi, base_pressure_psf, pour_margin_ft, lift_margin_ft];
   if (!outs.every(Number.isFinite)) return { error: "Grout lift math is not a finite value." };
@@ -1082,7 +1082,7 @@ export function computeMasonryCleaningDilution({ area_ft2 = 0, dilution_parts_wa
   const prewet_gal = prewet_gal_per_100ft2 * hundreds;
   const rinse_gal = rinse_gal_per_100ft2 * hundreds;
   const total_water_gal = water_gal + prewet_gal + rinse_gal;
-  const acid_ok = acid_safe_unit >= 0.5;
+  const acid_ok = acid_safe_unit >= 0.5 - 1e-9 * Math.abs(0.5);
   const outs = [diluted_gal, concentrate_gal, water_gal, prewet_gal, rinse_gal, total_water_gal];
   if (!outs.every(Number.isFinite)) return { error: "Cleaning dilution math is not a finite value." };
   const compat_verdict = acid_ok

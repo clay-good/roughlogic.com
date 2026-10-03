@@ -532,10 +532,10 @@ export function computeSafetyValveCapacity({ rated_steaming_capacity_lb_hr = 0, 
   const installed_capacity_lb_hr = valves.reduce((a, v) => a + v.capacity_lb_hr, 0);
   const margin_lb_hr = installed_capacity_lb_hr - required_capacity_lb_hr;
   const margin_pct = margin_lb_hr / required_capacity_lb_hr * 100;
-  const passes = margin_lb_hr >= 0;
+  const passes = margin_lb_hr >= 0 - 1e-9 * Math.abs(0);
   const lowest_set_psig = Math.min(...valves.map((v) => v.set_psig));
   const highest_set_psig = Math.max(...valves.map((v) => v.set_psig));
-  const lowest_set_compliant = lowest_set_psig <= mawp_psig;
+  const lowest_set_compliant = lowest_set_psig <= mawp_psig + 1e-9 * Math.abs(mawp_psig);
   const accumulation_pressure_psig = mawp_psig * (1 + accumulation_limit_pct / 100);
   const supplementary_above_mawp = highest_set_psig > mawp_psig;
   // ASME Section I PG-67.3: any additional valve may be set no more than 3%
@@ -547,7 +547,7 @@ export function computeSafetyValveCapacity({ rated_steaming_capacity_lb_hr = 0, 
   const spread_compliant = highest_set_psig - lowest_set_psig <= 0.10 * highest_set_psig + 1e-9;
   const set_pressures_compliant = lowest_set_compliant && highest_set_compliant && spread_compliant;
   const uprated_shortfall_lb_hr = uprated_capacity_lb_hr > 0 ? uprated_capacity_lb_hr - installed_capacity_lb_hr : 0;
-  const uprate_passes = uprated_shortfall_lb_hr <= 0;
+  const uprate_passes = uprated_shortfall_lb_hr <= 0 + 1e-9 * Math.abs(0);
   const outs = [required_capacity_lb_hr, installed_capacity_lb_hr, margin_lb_hr, margin_pct, accumulation_pressure_psig];
   if (!outs.every(Number.isFinite)) return { error: "Safety valve capacity math is not a finite value." };
   return {

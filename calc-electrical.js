@@ -225,7 +225,7 @@ export function computeConduitFill({ conduit, trade_size, conductors }) {
   const threshold = count === 1 ? 53 : count === 2 ? 31 : 40;
   // v8 §C.1: explicit PASS / FAIL flag string + margin so the renderer
   // surfaces a one-line badge before the percent.
-  const pass = fill_percent <= threshold;
+  const pass = fill_percent <= threshold + 1e-9 * Math.abs(threshold);
   const margin_pct = threshold - fill_percent;
   const pass_flag = pass ? "PASS" : "FAIL";
   return {
@@ -4288,7 +4288,7 @@ export function computeConductorShortCircuitWithstand({ area_cmil = 0, fault_cur
   const C = m.K * Math.log10((t_final_c + m.B) / (t_initial_c + m.B)); // > 0 since t_final > t_initial
   const withstand_a = area_cmil * Math.sqrt(C / clearing_time_s);
   const min_cmil = fault_current_a * Math.sqrt(clearing_time_s / C);
-  const adequate = withstand_a >= fault_current_a;
+  const adequate = withstand_a >= fault_current_a - 1e-9 * Math.abs(fault_current_a);
   return {
     C, withstand_a, min_cmil, adequate,
     note: "ICEA / Onderdonk adiabatic relation (I/A)^2 t = K log10((T2 + B)/(T1 + B)); copper K=0.0297 B=234, aluminum K=0.0125 B=228. withstand = area x sqrt(C / t); min size = fault x sqrt(t / C). A thermal-withstand SCREEN -- the protective-device clearing curve and an engineered study govern.",
@@ -4589,7 +4589,7 @@ export function computeWirewayFill({ width_in = 0, height_in = 0, conductor_area
   const interior_in2 = w * h;
   const allowed_in2 = 0.20 * interior_in2;
   const used_pct = interior_in2 > 0 ? ca / interior_in2 * 100 : null;
-  const area_ok = ca <= allowed_in2;
+  const area_ok = ca <= allowed_in2 + 1e-9 * Math.abs(allowed_in2);
   const over_30 = n > 30;
   const count_note = over_30
     ? "Over 30 current-carrying conductors: apply the 310.15(C)(1) ampacity adjustment (this is an adjustment trigger, not a prohibition)."
@@ -4885,7 +4885,7 @@ export function computeBendsBetweenPulls({ bend1_deg = 0, bend2_deg = 0, bend3_d
   if (bends.some((b) => b < 0)) return { error: "Bend angles must be non-negative (deg)." };
   const total_deg = bends.reduce((a, b) => a + b, 0);
   const quarter_bends_eq = total_deg / 90;
-  const within = total_deg <= 360;
+  const within = total_deg <= 360 + 1e-9 * Math.abs(360);
   return {
     total_deg,
     quarter_bends_eq,

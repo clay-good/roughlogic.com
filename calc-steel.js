@@ -415,7 +415,7 @@ export function computeColumnBasePlate({ pu_kip = 0, fc_ksi = 4, fy_ksi = 36, d_
   if (b_in < 0.80 * bf_in) return { error: "Plate width B is smaller than 0.80 bf (negative n cantilever) - enlarge the plate." };
   const a1_req = pu_kip / (0.65 * 0.85 * fc_ksi);
   const a1 = b_in * n_in;
-  const area_ok = a1 >= a1_req;
+  const area_ok = a1 >= a1_req - 1e-9 * Math.abs(a1_req);
   const m = (n_in - 0.95 * d_in) / 2;
   const n = (b_in - 0.80 * bf_in) / 2;
   const np = Math.sqrt(d_in * bf_in) / 4;
@@ -842,7 +842,7 @@ export function computeSteelH1Interaction({ pr_kip = 0, pc_kip = 0, mrx_kft = 0,
   const moment_term = mrx_kft / mcx_kft + (mry_kft > 0 ? mry_kft / mcy_kft : 0);
   const interaction = ratio >= 0.2 ? ratio + (8 / 9) * moment_term : ratio / 2 + moment_term;
   const branch = ratio >= 0.2 ? "high-axial branch (Pr/Pc >= 0.2): Pr/Pc + (8/9)(sum Mr/Mc)" : "low-axial branch (Pr/Pc < 0.2): Pr/(2Pc) + (sum Mr/Mc)";
-  const pass = interaction <= 1.0;
+  const pass = interaction <= 1.0 + 1e-9 * Math.abs(1.0);
   return {
     ratio, interaction, branch, pass,
     note: "AISC 360-22 H1.1 combined axial force and flexure: for Pr/Pc >= 0.2, Pr/Pc + (8/9)(Mrx/Mcx + Mry/Mcy) <= 1.0; for Pr/Pc < 0.2, Pr/(2Pc) + (Mrx/Mcx + Mry/Mcy) <= 1.0, consistent for ASD (available = nominal/Omega) or LRFD (available = phi x nominal). This evaluates the interaction from the required and available strengths supplied - it takes Pc and Mc as already computed (from steel-column-capacity and steel-beam-ltb in the same ASD or LRFD basis), assumes the second-order (P-delta/P-Delta) amplification is already in Mr (Chapter C / Appendix 8), and does not cover the H1.3 out-of-plane or H2 unsymmetric-member cases. A design aid, not a substitute for the engineer of record.",
@@ -1384,7 +1384,7 @@ export function computeSteelFloorVibration({ natural_freq_hz = 0, effective_wt_l
   if (!(beta > 0 && beta < 1)) return { error: "Damping ratio must be between 0 and 1 (0.02-0.05 typical)." };
   if (!(limit > 0)) return { error: "Occupancy limit must be positive (e.g. 0.005 office)." };
   const ap_over_g = P0 * Math.exp(-0.35 * fn) / (beta * W);
-  const pass = ap_over_g <= limit;
+  const pass = ap_over_g <= limit + 1e-9 * Math.abs(limit);
   return {
     ap_over_g, limit_ratio: limit, pass,
     note: "Acceleration falls with frequency through the e^(-0.35 fn) term, so for the same weight and damping a stiffer floor responds less; floors at about 4-8 Hz, where the walking harmonics excite them, respond most. Damping (beta) and the effective panel weight (W) matter as much as the frequency. The natural frequency comes from the combined beam-plus-girder deflection. A full DG11 evaluation and the engineer of record govern.",

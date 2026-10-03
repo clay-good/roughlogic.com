@@ -694,7 +694,7 @@ export function computeGasApplianceConnection({ appliance = "furnace", shutoff_s
   // tile used it until 2026-09-25, failing 3-6 ft connectors on furnaces, water heaters and boilers.
   const MAX_DIST = 6, CONN_LIMIT = 6;
   const movable = MOVABLE.includes(appliance);
-  const distance_ok = dist <= MAX_DIST;
+  const distance_ok = dist <= MAX_DIST + 1e-9 * Math.abs(MAX_DIST);
   const shutoff_distance_deficit_ft = Math.max(0, dist - MAX_DIST);
   const shutoff_ok = sameRoom && distance_ok && upstream;
 

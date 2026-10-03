@@ -438,7 +438,7 @@ export function computeBridgeFormulaMinSpacing({ target_weight_lb = 0, num_axles
   // less a half; the Bridge Table lists whole feet, so the minimum is the first
   // whole foot past that threshold (FHWA: 80,000 lb on 5 axles at 51 ft).
   const threshold = (Math.ceil(w / 500 - 1e-9) - 0.5 - 12 * n - 36) * (n - 1) / n;
-  const fits_at_zero = bridgeFormulaW(0, n) >= w;
+  const fits_at_zero = bridgeFormulaW(0, n) >= w - 1e-9 * Math.abs(w);
   const min_spacing_ft = fits_at_zero ? 0 : Math.floor(threshold + 1e-9) + 1;
   const over_interstate_cap = w > 80000;
   const avg_axle_lb = w / n;
@@ -1605,7 +1605,7 @@ export function computeGcwrCheck({ gcwr_lb = 0, tractor_weight_lb = 0, trailer_w
   const margin_fed = federal_max_lb - combined_lb;
   const binding = Math.min(gcwr_lb, federal_max_lb);
   const over_by = combined_lb - binding;
-  const ok = combined_lb <= binding;
+  const ok = combined_lb <= binding + 1e-9 * Math.abs(binding);
   const verdict = ok
     ? "ok - within both the GCWR and the federal cap"
     : "OVER by " + fmt(over_by, 0) + " lb against the " + (gcwr_lb <= federal_max_lb ? "GCWR" : "federal cap") + " - a permit or the AHJ governs the move";
@@ -1644,7 +1644,7 @@ export function computeTireLoadCheck({ axle_weight_lb = 0, tires_on_axle = 2, ti
   const axle_capacity_lb = tires_on_axle * tire_max_load_lb;
   const utilization_pct = 100 * axle_weight_lb / axle_capacity_lb;
   const over_by = axle_weight_lb - axle_capacity_lb;
-  const ok = axle_weight_lb <= axle_capacity_lb;
+  const ok = axle_weight_lb <= axle_capacity_lb + 1e-9 * Math.abs(axle_capacity_lb);
   const verdict = ok
     ? "ok - " + fmt(utilization_pct, 1) + "% of tire capacity"
     : "OVERLOADED by " + fmt(over_by, 0) + " lb (" + fmt(utilization_pct, 1) + "% of tire capacity)";

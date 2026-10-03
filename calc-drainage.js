@@ -1761,7 +1761,7 @@ export function computeWellPointSpacing({ excavation_depth_ft = 0, water_table_d
   // - 1e-9: 13.1 - 1.1 + 3 is 15.000000000000002 and read two 15 ft stages (fixed 2026-10-01).
   const stages_required = Math.max(1, Math.ceil(total_drawdown_ft / practical_lift_ft - 1e-9));
   const drawdown_per_stage_ft = total_drawdown_ft / stages_required;
-  const single_stage_sufficient = stages_required <= 1;
+  const single_stage_sufficient = stages_required <= 1 + 1e-9 * Math.abs(1);
   const perimeter_ft = 2 * (excavation_length_ft + excavation_width_ft);
   const points_per_stage = Math.ceil(perimeter_ft / point_spacing_ft - 1e-9);
   const point_count = points_per_stage * stages_required;

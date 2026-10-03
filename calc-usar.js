@@ -213,7 +213,7 @@ export function computeUsrVerticalShoreCapacity({ shore_height_ft = 10, post_siz
   const species_factor = _SPECIES_FACTOR[species];
   const shore_capacity_lb = posts * load_per_post_lb * species_factor;
   const load_ratio = load_per_shore_lb / shore_capacity_lb;
-  const passes = load_ratio <= 1;
+  const passes = load_ratio <= 1 + 1e-9 * Math.abs(1);
   const ld_over_25 = slenderness_ld > 25;
   // Lateral bracing: at least 2% of the vertical capacity; 10% where
   // aftershocks are expected (DHS BIPS 08 / FEMA US&R).

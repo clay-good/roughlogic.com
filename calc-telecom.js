@@ -146,7 +146,7 @@ export function computeChromaticDispersionReach({ dispersion_ps_nm_km = 0, span_
   const reach_km = reachAt(bit_rate_gbps);
   const lower_rate_reach_km = reachAt(lower_bit_rate_gbps);
   const higher_rate_reach_km = reachAt(higher_bit_rate_gbps);
-  const within_limit = span_km <= reach_km;
+  const within_limit = span_km <= reach_km + 1e-9 * Math.abs(reach_km);
   return {
     accumulated_dispersion_ps_nm, pulse_spread_ps, bit_period_ps, reach_km,
     lower_rate_reach_km, higher_rate_reach_km, within_limit,

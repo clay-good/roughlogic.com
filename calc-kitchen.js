@@ -1141,7 +1141,7 @@ export function computeOverrunPercent({ mix_weight_lb = 0, finished_weight_lb = 
   if (mix <= finished) return { error: "The mix must weigh more than the finished product for equal volumes: freezing whips in air, which lowers density." };
   const overrun_pct = (mix - finished) / finished * 100;
   const air_pct = (mix - finished) / mix * 100;
-  const meets_fda = finished >= 4.5;
+  const meets_fda = finished >= 4.5 - 1e-9 * Math.abs(4.5);
   let band = "economy / soft-serve";
   if (overrun_pct < 35) band = "gelato / premium (dense)";
   else if (overrun_pct < 80) band = "standard ice cream";

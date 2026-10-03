@@ -1641,7 +1641,7 @@ export function computeUvDose({ intensity_mw_cm2 = 0, exposure_time_s = 0, targe
   if (!(exposure_time_s > 0)) return { error: "Exposure time must be positive (s)." };
   if (!(target_dose_mj_cm2 > 0)) return { error: "Target dose must be positive (mJ/cm^2)." };
   const dose_mj_cm2 = intensity_mw_cm2 * exposure_time_s;
-  const meets = dose_mj_cm2 >= target_dose_mj_cm2;
+  const meets = dose_mj_cm2 >= target_dose_mj_cm2 - 1e-9 * Math.abs(target_dose_mj_cm2);
   const margin = dose_mj_cm2 - target_dose_mj_cm2;
   return {
     dose_mj_cm2, meets, margin,

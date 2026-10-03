@@ -678,9 +678,9 @@ export function computeSpccContainmentVolume({
   const net_ft3 = gross_ft3 - displacement_ft3;
   const net_gal = net_ft3 * _AQ_GAL_PER_CUFT;
   if (!(net_ft3 > 0)) return { error: "Displacement equals or exceeds the dike's gross volume -- there is no containment capacity left." };
-  const adequate = net_gal >= required_gal;
+  const adequate = net_gal >= required_gal - 1e-9 * Math.abs(required_gal);
   const margin_gal = net_gal - required_gal;
-  const gross_would_pass = gross_gal >= required_gal;
+  const gross_would_pass = gross_gal >= required_gal - 1e-9 * Math.abs(required_gal);
   const verdict = adequate
     ? "ADEQUATE: " + fmt(net_gal, 0) + " gal net against " + fmt(required_gal, 0) + " gal required, with " + fmt(margin_gal, 0) + " gal to spare"
     : "NOT ADEQUATE: " + fmt(net_gal, 0) + " gal net against " + fmt(required_gal, 0) + " gal required, short by " + fmt(-margin_gal, 0) + " gal" + (gross_would_pass ? " -- the GROSS volume of " + fmt(gross_gal, 0) + " gal would have passed, and the displacement is the whole difference" : "");

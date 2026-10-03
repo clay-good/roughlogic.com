@@ -1281,7 +1281,7 @@ export function computePvStringFusing({ Isc_A = 0, max_fuse_A = 0, n_strings = 1
   let fuse_A = null;
   for (const s of _PV_STD_OCPD_A) { if (s >= req_A) { fuse_A = s; break; } }
   if (fuse_A === null) return { error: "Required fuse exceeds the standard ratings table (check the design)." };
-  const compliant = fuse_A <= maxf;
+  const compliant = fuse_A <= maxf + 1e-9 * Math.abs(maxf);
   const fuse_required = n >= 3; // 690.9(A): fuses required with 3+ paralleled source circuits
   return {
     req_A, fuse_A, compliant, fuse_required, n,

@@ -560,7 +560,7 @@ export function computeBlowerDoorAch50({ cfm50 = 0, volume_ft3 = 0, n_factor = 1
   if (!(n_factor > 0)) return { error: "N-factor must be positive." };
   if (!(target_ach50 > 0)) return { error: "Target ACH50 must be positive." };
   const ach50 = cfm50 * 60 / volume_ft3;
-  const pass = ach50 <= target_ach50;
+  const pass = ach50 <= target_ach50 + 1e-9 * Math.abs(target_ach50);
   const verdict = pass
     ? "PASS - meets the " + fmt(target_ach50, 1) + " ACH50 target"
     : "FAIL - exceeds the " + fmt(target_ach50, 1) + " ACH50 target; air-seal and retest";

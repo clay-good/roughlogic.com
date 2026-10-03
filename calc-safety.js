@@ -116,7 +116,7 @@ export function computePortableLadderSetup({ ladder_length_ft = 0, landing_heigh
   const base_setback_ft = H / ratio;
   const rail_used_to_landing_ft = H * railPerFootOfHeight;
   const rail_used_total_ft = rail_used_to_landing_ft + REQ_EXT * railPerFootOfHeight;
-  const length_ok = rail_used_total_ft <= L;
+  const length_ok = rail_used_total_ft <= L + 1e-9 * Math.abs(L);
   const length_short_ft = Math.max(0, rail_used_total_ft - L);
   // The highest landing this ladder can actually serve, with the 3 ft still above it.
   const max_landing_served_ft = (L / railPerFootOfHeight) - REQ_EXT;
@@ -125,7 +125,7 @@ export function computePortableLadderSetup({ ladder_length_ft = 0, landing_heigh
   // Rung spacing is a WINDOW.
   const rung_ok = rs >= RUNG_MIN && rs <= RUNG_MAX;
   const rung_too_close = rs < RUNG_MIN;
-  const width_ok = cw >= WIDTH_MIN;
+  const width_ok = cw >= WIDTH_MIN - 1e-9 * Math.abs(WIDTH_MIN);
   const width_shortfall_in = Math.max(0, WIDTH_MIN - cw);
 
   const passes = extension_ok && length_ok && rung_ok && width_ok;
@@ -215,7 +215,7 @@ export function computeHearingProtectorNrr({ twa_db = 0, weighting = "A", nrr_db
   const effective_attenuation_db = Math.max(0, base_attenuation_db + dual_bonus_applied_db);
   const attenuation_floored = base_attenuation_db + dual_bonus_applied_db < 0;
   const protected_twa_db = twa - effective_attenuation_db;
-  const meets_target = protected_twa_db <= target;
+  const meets_target = protected_twa_db <= target + 1e-9 * Math.abs(target);
   const margin_db = target - protected_twa_db;
 
   // What the package number would have suggested, versus what the method leaves.

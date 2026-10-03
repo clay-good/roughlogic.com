@@ -1746,7 +1746,7 @@ export function computeGrindingWheelRpm({ wheel_diameter_in = 7, rated_max_sfpm 
   const max_rpm = rated_max_sfpm * 12 / (Math.PI * wheel_diameter_in);
   const actual_sfpm = Math.PI * wheel_diameter_in * grinder_rpm / 12;
   const margin_rpm = max_rpm - grinder_rpm;
-  const within_rating = grinder_rpm <= max_rpm;
+  const within_rating = grinder_rpm <= max_rpm + 1e-9 * Math.abs(max_rpm);
   if (![max_rpm, actual_sfpm, margin_rpm].every(Number.isFinite)) return { error: "Grinding-wheel speed math is not a finite value." };
   return {
     max_rpm,

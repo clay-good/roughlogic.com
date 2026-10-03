@@ -440,7 +440,7 @@ export function computeFineAggregateGrading({ p38 = 100, p4 = 100, p8 = 90, p16 
     const retained = sieves[i - 1].p - sieves[i].p;
     if (retained > max_retained_pct) { max_retained_pct = retained; max_retained_gap = `${sieves[i - 1].key} to ${sieves[i].key}`; }
   }
-  const consecutive_ok = max_retained_pct <= 45;
+  const consecutive_ok = max_retained_pct <= 45 + 1e-9 * Math.abs(45);
   // §6.2: fineness modulus 2.3-3.1, delegated so the two tiles cannot drift.
   const fmRes = computeFinenessModulus({ r4: 100 - sieves[1].p, r8: 100 - sieves[2].p, r16: 100 - sieves[3].p, r30: 100 - sieves[4].p, r50: 100 - sieves[5].p, r100: 100 - sieves[6].p });
   if (fmRes.error) return { error: fmRes.error };
@@ -515,7 +515,7 @@ export function computeSoilGradationCoefficients({ d10_mm = 0, d30_mm = 0, d60_m
   // ASTM D2487 well-graded criteria: Cu >= 4 (gravel) or >= 6 (sand), AND Cc
   // between 1 and 3 inclusive. Both must hold; failing either is poorly graded.
   const cu_threshold = is_gravel ? 4 : 6;
-  const cu_ok = cu >= cu_threshold;
+  const cu_ok = cu >= cu_threshold - 1e-9 * Math.abs(cu_threshold);
   const cc_ok = cc >= 1 && cc <= 3;
   const well_graded = cu_ok && cc_ok;
   // The fines content decides whether the gradation criteria control at all.

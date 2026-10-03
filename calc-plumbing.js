@@ -3073,7 +3073,7 @@ export function computeTrapSealLoss({ developed_distance_ft = 0, table_max_ft = 
   if (!(dist > 0 && Number.isFinite(dist))) return { error: "Developed vent distance must be positive (ft)." };
   if (!(max > 0 && Number.isFinite(max))) return { error: "Permitted trap-to-vent distance must be positive (ft)." };
   const percent_used = (dist / max) * 100;
-  const within_limit = dist <= max;
+  const within_limit = dist <= max + 1e-9 * Math.abs(max);
   const siphonage_risk = !within_limit || seal < 1;
   return { percent_used, within_limit, siphonage_risk, trap_seal_in: seal };
 }
@@ -3107,7 +3107,7 @@ export function computeWaterMeterSizing({ peak_demand_gpm = 0, normal_rating_gpm
   if (!(normal > 0 && Number.isFinite(normal))) return { error: "Meter normal-flow rating must be positive (gpm)." };
   const percent_used = (peak / normal) * 100;
   const headroom_gpm = normal - peak;
-  const adequate = peak <= normal;
+  const adequate = peak <= normal + 1e-9 * Math.abs(normal);
   const above_peak_rating = peakRating > 0 ? peak > peakRating : false;
   return { percent_used, headroom_gpm, adequate, above_peak_rating };
 }

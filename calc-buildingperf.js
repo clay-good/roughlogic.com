@@ -482,7 +482,7 @@ export function computeCazDepressurizationLimit({
   for (const a of present) if (a.limit < weakest.limit) weakest = a;
   const governing_limit_pa = weakest.limit;
   const margin_pa = governing_limit_pa - measured;
-  const passes = measured <= governing_limit_pa;
+  const passes = measured <= governing_limit_pa + 1e-9 * Math.abs(governing_limit_pa);
   const per_appliance = present.map((a) => a.name + " " + fmt(a.limit, 1) + " Pa " + (measured <= a.limit ? "pass by " + fmt(a.limit - measured, 1) : "FAIL by " + fmt(measured - a.limit, 1))).join("; ");
   const verdict = passes
     ? "the zone PASSES: " + fmt(measured, 1) + " Pa against the governing " + fmt(governing_limit_pa, 1) + " Pa limit for the " + weakest.name + ", with " + fmt(margin_pa, 1) + " Pa of margin"
@@ -812,7 +812,7 @@ export function computeGroundLoopFlowAntifreeze({
   const pump_bhp = design_flow_gpm * head_ft * specific_gravity / (_PUMP_CONSTANT * wire_to_water_efficiency);
   const pump_watts = pump_bhp * 745.699872;
   const watts_per_ton = pump_watts / tons;
-  const within_benchmark = watts_per_ton <= benchmark_w_per_ton;
+  const within_benchmark = watts_per_ton <= benchmark_w_per_ton + 1e-9 * Math.abs(benchmark_w_per_ton);
   const pump_verdict = fmt(design_flow_gpm, 1) + " gpm at " + fmt(head_ft, 0) + " ft of head and "
     + fmt(wire_to_water_efficiency * 100, 0) + "% wire-to-water is " + fmt(pump_bhp, 2) + " bhp = "
     + fmt(pump_watts, 0) + " W, or " + fmt(watts_per_ton, 0) + " W per ton";

@@ -125,7 +125,7 @@ export function computeCrownReductionLeafArea({ crown_radius_ft = 0, reduction_f
   const leaf_area_removed_fraction = removedOuter * outerDensity + removedInner * innerDensity;
   const leaf_area_removed_pct = leaf_area_removed_fraction * 100;
   const amplification = area_removed_pct > 0 ? leaf_area_removed_pct / area_removed_pct : null;
-  const within_cap = leaf_area_removed_pct <= live_crown_cap_pct;
+  const within_cap = leaf_area_removed_pct <= live_crown_cap_pct + 1e-9 * Math.abs(live_crown_cap_pct);
   // The reduction that just reaches the cap, bisected on the same relation.
   let radius_for_cap_ft = null;
   {

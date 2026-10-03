@@ -901,7 +901,7 @@ export function computeBranchReinforcement({ run_od_in = 0, run_wall_in = 0, run
   const a1 = (2 * d2 - d1) * Math.max(0, Thm - trh - c);   // excess metal in the run
   const a2 = 2 * L4 * Math.max(0, Tbm - trb - c) / sinB;   // excess metal in the branch
   const a_available = a1 + a2;
-  const adequate = a_available >= a_required;
+  const adequate = a_available >= a_required - 1e-9 * Math.abs(a_required);
   const pad_area = Math.max(0, a_required - a_available);
   // Applicability screen: the simple area-replacement rules are intended for a
   // branch that is not a near-full-size outlet on the run. When the branch OD

@@ -1385,10 +1385,10 @@ export function computeHelicopterLzSizing({ rotor_diameter_ft = 0, size_factor =
   // Three checks, and a clearing has to pass ALL of them. The approach one is the check a
   // ground team miscalculates: a tree line does not cost its own height, it costs the ratio.
   const required_side_ft = size_factor * rotor_diameter_ft;
-  const area_ok = measured_clear_ft >= required_side_ft;
+  const area_ok = measured_clear_ft >= required_side_ft - 1e-9 * Math.abs(required_side_ft);
   const slope_limit_pct = Math.tan(slope_limit_deg * Math.PI / 180) * 100;
   const ground_slope_pct = Math.tan(ground_slope_deg * Math.PI / 180) * 100;
-  const slope_ok = ground_slope_deg <= slope_limit_deg;
+  const slope_ok = ground_slope_deg <= slope_limit_deg + 1e-9 * Math.abs(slope_limit_deg);
   const approach_length_ft = obstacle_height_ft * approach_ratio;
   const total_clear_ft = required_side_ft + 2 * approach_length_ft;
   const failures = [];

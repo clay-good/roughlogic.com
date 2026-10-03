@@ -246,8 +246,8 @@ export function computeNitroxMod({ oxygen_fraction = 0.32, ppo2_limit = 1.4, con
   const best_mix_pct_floor = Math.floor(best_mix_fraction * 100 + 1e-9);
   const best_mix_ppo2 = best_mix_pct_floor / 100 * depth_ata;
   const air_mod_ft = feet_per_atm * (ppo2_limit / 0.21 - 1);
-  const within_working = ppo2_at_depth <= ppo2_limit;
-  const within_contingency = ppo2_at_depth <= contingency_ppo2_limit;
+  const within_working = ppo2_at_depth <= ppo2_limit + 1e-9 * Math.abs(ppo2_limit);
+  const within_contingency = ppo2_at_depth <= contingency_ppo2_limit + 1e-9 * Math.abs(contingency_ppo2_limit);
   const margin_ft = mod_working_ft - planned_depth_ft;
   return {
     depth_ata, ppo2_at_depth, mod_working_ft, mod_contingency_ft,
@@ -303,7 +303,7 @@ export function computeNitroxEad({ oxygen_fraction = 0.36, depth_ft = 0, target_
   const mix_for_target_ead = 1 - _N2_IN_AIR * (target_ead_ft + feet_per_atm) / (depth_ft + feet_per_atm);
   // THE OXYGEN CHECK, which is the half a plan built on EAD alone is missing.
   const ppo2_at_depth = oxygen_fraction * depth_ata;
-  const oxygen_ok = ppo2_at_depth <= ppo2_limit;
+  const oxygen_ok = ppo2_at_depth <= ppo2_limit + 1e-9 * Math.abs(ppo2_limit);
   const deepest_usable_mix = ppo2_limit / depth_ata;
   // Floored to a blendable whole percent for the same reason as `nitrox-mod`:
   // rounding a mix UP puts the diver past the limit. spec-v1560 called EAN35

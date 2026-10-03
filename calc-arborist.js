@@ -784,7 +784,7 @@ export function computeCrownPruningDose({ live_foliage = 0, removed_foliage = 0,
   if (!(maturity_class in _CROWN_CAP_PCT)) return { error: "Maturity class must be young, mature, over-mature, or stressed." };
   const removal_pct = removed / live * 100;
   const cap_pct = _CROWN_CAP_PCT[maturity_class];
-  const within = removal_pct <= cap_pct;
+  const within = removal_pct <= cap_pct + 1e-9 * Math.abs(cap_pct);
   if (!Number.isFinite(removal_pct)) return { error: "Pruning-dose math is not a finite value." };
   return {
     removal_pct, cap_pct, within, maturity_class,

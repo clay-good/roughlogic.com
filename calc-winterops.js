@@ -372,7 +372,7 @@ export function computeIceMeltWorkingTemperature({ area_ft2 = 0, ice_thickness_i
   const alt_product_lb = compared ? ice_mass_lb / alt_capacity_lb_ice_per_lb : null;
   const product_ratio = compared ? alt_product_lb / product_lb : null;
   const capacity_ratio = compared ? capacity_lb_ice_per_lb / alt_capacity_lb_ice_per_lb : null;
-  const within_practical_limit = pavement_temp_f >= practical_limit_f;
+  const within_practical_limit = pavement_temp_f >= practical_limit_f - 1e-9 * Math.abs(practical_limit_f);
   const alt_within_practical_limit = compared ? alt_temp_f >= practical_limit_f : null;
   const margin_f = pavement_temp_f - practical_limit_f;
   const limit_verdict = within_practical_limit
@@ -439,7 +439,7 @@ export function computeWalkwayClearingProductivity({ total_area_ft2 = 0, hand_ar
   // Reported as "balanced" when the two finish together, so the field never
   // names a governing operation the arithmetic does not actually single out.
   const governing_operation = balanced ? "balanced" : (blower_hr > hand_hr ? "machine work" : "hand work");
-  const meets_window = crew_hr <= service_window_hr;
+  const meets_window = crew_hr <= service_window_hr + 1e-9 * Math.abs(service_window_hr);
   const crews_required = Math.ceil(crew_hr / service_window_hr - 1e-9);
   const icemelt_per_application_lb = total_area_ft2 / 1000 * icemelt_lb_per_1000ft2;
   const icemelt_event_lb = icemelt_per_application_lb * apps;

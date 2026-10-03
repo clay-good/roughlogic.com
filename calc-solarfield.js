@@ -293,7 +293,7 @@ export function computePvBallastWeight({ modules = 30, module_wt_lb = 50, ballas
   if (racking_wt_lb < 0) return { error: "Racking weight cannot be negative (lb)." };
   const total_wt_lb = modules * (module_wt_lb + ballast_per_module_lb) + racking_wt_lb;
   const added_psf = total_wt_lb / array_area_sf;
-  const pass = added_psf <= allowable_psf;
+  const pass = added_psf <= allowable_psf + 1e-9 * Math.abs(allowable_psf);
   if (![total_wt_lb, added_psf].every(Number.isFinite)) return { error: "Ballast-load math is not a finite value." };
   return {
     total_wt_lb,

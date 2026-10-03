@@ -176,7 +176,7 @@ export function computeBlastBurdenSpacing({ hole_diameter_in = 0, burden_ratio =
   const subdrill_ft = subdrill_ratio * burden_ft;
   const stemming_ft = stemming_ratio * burden_ft;
   const stiffness_ratio = bench_height_ft / burden_ft;
-  const stiff_ok = stiffness_ratio >= 2;
+  const stiff_ok = stiffness_ratio >= 2 - 1e-9 * Math.abs(2);
   const pattern_area_sqft = burden_ft * spacing_ft;
   const rock_volume_cy = pattern_area_sqft * bench_height_ft / _CUFT_PER_CY;
   // The largest hole this bench supports at the entered burden ratio, from
@@ -230,8 +230,8 @@ export function computeBlastScaledDistancePPV({ distance_ft = 0, charge_per_dela
   const scaled_distance = distance_ft / Math.sqrt(charge_per_delay_lb);
   const predicted_ppv_in_s = site_k * Math.pow(scaled_distance, -site_b);
   const margin_in_s = ppv_limit_in_s - predicted_ppv_in_s;
-  const ppv_ok = predicted_ppv_in_s <= ppv_limit_in_s;
-  const sd_ok = scaled_distance >= required_scaled_distance;
+  const ppv_ok = predicted_ppv_in_s <= ppv_limit_in_s + 1e-9 * Math.abs(ppv_limit_in_s);
+  const sd_ok = scaled_distance >= required_scaled_distance - 1e-9 * Math.abs(required_scaled_distance);
   const max_charge_lb = Math.pow(distance_ft / required_scaled_distance, 2);
   // The distance at which this charge meets the PPV limit: from
   // limit = K x (D / sqrt(W))^-b, D = sqrt(W) x (K / limit)^(1/b).
@@ -288,7 +288,7 @@ export function computeBlastAirblastOverpressure({ distance_ft = 0, charge_per_d
   const overpressure_db = 20 * Math.log10(overpressure_psi / _AIRBLAST_REF_PSI);
   const limit_psi = _AIRBLAST_REF_PSI * Math.pow(10, limit_db / 20);
   const margin_db = limit_db - overpressure_db;
-  const db_ok = overpressure_db <= limit_db;
+  const db_ok = overpressure_db <= limit_db + 1e-9 * Math.abs(limit_db);
   // The cube-root scaled distance that lands on the limit, and the charge and
   // distance that reach it.
   const sd_at_limit = Math.pow(limit_psi / airblast_k, -1 / airblast_b);
@@ -304,7 +304,7 @@ export function computeBlastAirblastOverpressure({ distance_ft = 0, charge_per_d
   // recovers it.
   const vented_db = overpressure_db + confinement_penalty_db;
   const vented_psi = _AIRBLAST_REF_PSI * Math.pow(10, vented_db / 20);
-  const vented_ok = vented_db <= limit_db;
+  const vented_ok = vented_db <= limit_db + 1e-9 * Math.abs(limit_db);
   const vented_pressure_factor = Math.pow(10, confinement_penalty_db / 20);
   return {
     cube_root_scaled_distance, overpressure_psi, overpressure_db, limit_psi,
@@ -659,7 +659,7 @@ export function computeDustDeflagrationVentArea({ volume_cuft = 0, kst_bar_m_s =
   const vent_area_sqft = ventArea(p_red_psig);
   const vent_area_at_stronger_sqft = ventArea(stronger_p_red_psig);
   const stronger_saving_pct = (1 - vent_area_at_stronger_sqft / vent_area_sqft) * 100;
-  const fits = available_vent_area_sqft >= vent_area_sqft;
+  const fits = available_vent_area_sqft >= vent_area_sqft - 1e-9 * Math.abs(vent_area_sqft);
   const shortfall_sqft = Math.max(0, vent_area_sqft - available_vent_area_sqft);
   return {
     dust_class, volume_m3, vent_area_sqft, vent_area_at_stronger_sqft, stronger_saving_pct,
@@ -717,9 +717,9 @@ export function computeMineFaceVentilation({ heading_width_ft = 0, heading_heigh
   const diesel_required_cfm = diesel_units * diesel_cfm_each;
   const governing_cfm = Math.max(velocity_required_cfm, diesel_required_cfm);
   const governing = diesel_required_cfm >= velocity_required_cfm ? "diesel dilution" : "face sweep velocity";
-  const velocity_ok = face_velocity_fpm >= min_face_velocity_fpm;
-  const diesel_ok = delivered_cfm >= diesel_required_cfm;
-  const meets_governing = delivered_cfm >= governing_cfm;
+  const velocity_ok = face_velocity_fpm >= min_face_velocity_fpm - 1e-9 * Math.abs(min_face_velocity_fpm);
+  const diesel_ok = delivered_cfm >= diesel_required_cfm - 1e-9 * Math.abs(diesel_required_cfm);
+  const meets_governing = delivered_cfm >= governing_cfm - 1e-9 * Math.abs(governing_cfm);
   const max_diesel_units = Math.floor(delivered_cfm / diesel_cfm_each + 1e-9);
   const efficiency_needed_pct = governing_cfm / fan_airflow_cfm * 100;
   return {
@@ -775,7 +775,7 @@ export function computePitDewateringStaging({ static_lift_ft = 0, friction_head_
   const total_head_ft = static_lift_ft + friction_head_ft + discharge_pressure_ft;
   const stages = Math.ceil(total_head_ft / head_per_pump_ft - 1e-9);
   const head_per_stage_ft = total_head_ft / stages;
-  const suction_ok = suction_lift_ft <= practical_suction_limit_ft;
+  const suction_ok = suction_lift_ft <= practical_suction_limit_ft + 1e-9 * Math.abs(practical_suction_limit_ft);
   const suction_excess_ft = Math.max(0, suction_lift_ft - practical_suction_limit_ft);
   // Water horsepower for clear water, and the brake horsepower at the entered
   // efficiency: gpm x head / 3,960.
@@ -882,7 +882,7 @@ export function computeRockBoltSupportPressure({ bolt_capacity_lb = 0, spacing_1
   const support_psi = support_psf / _SQIN_PER_SQFT;
   const dead_weight_required_psf = rock_unit_weight_pcf * loosened_zone_ft;
   const dead_weight_ratio = support_psf / dead_weight_required_psf;
-  const dead_weight_ok = support_psf >= dead_weight_required_psf;
+  const dead_weight_ok = support_psf >= dead_weight_required_psf - 1e-9 * Math.abs(dead_weight_required_psf);
   const spacing_for_target_ft = Math.sqrt(bolt_capacity_lb / target_support_psf);
   const spacing_for_dead_weight_ft = Math.sqrt(bolt_capacity_lb / dead_weight_required_psf);
   // Length is tied to spacing (twice it) and to span, and the longer governs.

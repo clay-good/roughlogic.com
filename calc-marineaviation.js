@@ -664,7 +664,7 @@ export function computePropellerTrackBalance({
   // Track first. Out of track is an AERODYNAMIC once-per-revolution imbalance
   // that weight does not correct.
   const track_margin_in = track_limit_in - track_in;
-  const track_ok = track_in <= track_limit_in;
+  const track_ok = track_in <= track_limit_in + 1e-9 * Math.abs(track_limit_in);
   const track_verdict = track_ok
     ? "track is " + fmt(track_in, 4) + " in against a " + fmt(track_limit_in, 4) + " in limit, WITHIN limits -- so tracking is not the fault and the vibration is a balance problem that weight will fix"
     : "track is " + fmt(track_in, 4) + " in, OVER the " + fmt(track_limit_in, 4) + " in limit by " + fmt(-track_margin_in, 4) + " in -- fix the track FIRST. Out of track means the blades sweep different planes and each meets the air differently, which is an aerodynamic once-per-revolution imbalance that no amount of weight corrects";

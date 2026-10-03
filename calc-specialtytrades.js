@@ -630,7 +630,7 @@ export function computeMastClimberPlatformLoad({ platform_length_ft = 0, cantile
   if (tie_capacity_lb < 0) return { error: "Tie capacity cannot be negative (lb)." };
   const half_platform_ft = platform_length_ft / 2;
   const total_utilization_pct = load_lb / rated_capacity_lb * 100;
-  const within_total = load_lb <= rated_capacity_lb;
+  const within_total = load_lb <= rated_capacity_lb + 1e-9 * Math.abs(rated_capacity_lb);
   // A mast climber is a cantilever, and the rating is stated for a defined
   // distribution. The same total at the outboard end is a different structure.
   const moment_ft_lb = load_lb * load_centroid_ft;

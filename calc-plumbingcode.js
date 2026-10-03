@@ -69,9 +69,9 @@ export function computeFixtureClearanceCheck({ center_to_left_in = 0, center_to_
   if (cw < 0 || cd < 0) return { error: "Compartment dimensions cannot be negative (in)." };
   if (!(minSide > 0) || !(minCenter > 0) || !(minFront > 0)) return { error: "The code minimums must all be positive (in)." };
 
-  const left_ok = L >= minSide;
-  const right_ok = R >= minSide;
-  const front_ok = F >= minFront;
+  const left_ok = L >= minSide - 1e-9 * Math.abs(minSide);
+  const right_ok = R >= minSide - 1e-9 * Math.abs(minSide);
+  const front_ok = F >= minFront - 1e-9 * Math.abs(minFront);
   const has_adjacent = adj > 0;
   const center_ok = has_adjacent ? adj >= minCenter : null;
   const side_deficit_in = Math.max(0, minSide - Math.min(L, R));
@@ -157,17 +157,17 @@ export function computeShowerCompartmentCheck({ width_in = 0, depth_in = 0, base
   const least_dim_in = Math.min(w, d);
   const greater_dim_in = Math.max(w, d);
 
-  const base_area_ok = area_sqin >= A0;
-  const base_dim_ok = least_dim_in >= D0;
+  const base_area_ok = area_sqin >= A0 - 1e-9 * Math.abs(A0);
+  const base_dim_ok = least_dim_in >= D0 - 1e-9 * Math.abs(D0);
   const base_path_ok = base_area_ok && base_dim_ok;
-  const exc_area_ok = area_sqin >= A1;
-  const exc_dim_ok = least_dim_in >= D1;
+  const exc_area_ok = area_sqin >= A1 - 1e-9 * Math.abs(A1);
+  const exc_dim_ok = least_dim_in >= D1 - 1e-9 * Math.abs(D1);
   const exception_path_ok = exc_area_ok && exc_dim_ok;
   const passes = base_path_ok || exception_path_ok;
   const path = base_path_ok ? "the base 421.4 rule" : exception_path_ok ? "the 421.4 exception" : "neither path";
 
   // A 30 in disc fits a rectangle exactly when the SHORT side reaches 30.
-  const disc_fits = least_dim_in >= D0;
+  const disc_fits = least_dim_in >= D0 - 1e-9 * Math.abs(D0);
   // What it would take to comply, on each path, holding the least dimension where it is.
   const base_other_needed_in = least_dim_in >= D0 ? Math.max(D0, A0 / least_dim_in) : null;
   const exc_other_needed_in = least_dim_in >= D1 ? Math.max(D1, A1 / least_dim_in) : null;
@@ -255,7 +255,7 @@ export function computeVentTerminalCheck({ height_above_roof_in = 6, snow_accumu
   // number to the adopting jurisdiction (Connecticut writes 12). Until 2026-09-25 this was credited
   // to IPC 903.1 with the 6 in hard-coded, so a 12 in jurisdiction passed a 6 in vent.
   const required_height_in = otherUse ? 84 : Math.max(roofMin, snow + 6);
-  const height_ok = h >= required_height_in;
+  const height_ok = h >= required_height_in - 1e-9 * Math.abs(required_height_in);
   const height_deficit_in = Math.max(0, required_height_in - h);
   const snow_governs = !otherUse && snow + 6 > roofMin;
 
@@ -353,7 +353,7 @@ export function computeAavInstallCheck({ height_above_drain_in = 0, height_above
   if (rating < 0) return { error: "Valve DFU rating cannot be negative." };
 
   const MIN_DRAIN = 4, MIN_INSUL = 6;
-  const drain_ok = hd >= MIN_DRAIN;
+  const drain_ok = hd >= MIN_DRAIN - 1e-9 * Math.abs(MIN_DRAIN);
   const drain_deficit_in = Math.max(0, MIN_DRAIN - hd);
   const has_insulation = hi > 0;
   const insulation_ok = has_insulation ? hi >= MIN_INSUL : null;
@@ -439,15 +439,15 @@ export function computeGrabBarLayout({ bar_height_in = 34, side_bar_length_in = 
 
   const H_MIN = 33, H_MAX = 36, SIDE_MIN = 42, SIDE_FROM_REAR_MAX = 12, REAR_MIN = 36, REAR_SIDE_MIN = 12, REAR_OPEN_MIN = 24;
   const height_ok = h >= H_MIN && h <= H_MAX;
-  const side_length_ok = sl >= SIDE_MIN;
-  const side_position_ok = sf <= SIDE_FROM_REAR_MAX;
-  const rear_length_ok = rl >= REAR_MIN;
-  const rear_side_ok = rs >= REAR_SIDE_MIN;
-  const rear_open_ok = ro >= REAR_OPEN_MIN;
+  const side_length_ok = sl >= SIDE_MIN - 1e-9 * Math.abs(SIDE_MIN);
+  const side_position_ok = sf <= SIDE_FROM_REAR_MAX + 1e-9 * Math.abs(SIDE_FROM_REAR_MAX);
+  const rear_length_ok = rl >= REAR_MIN - 1e-9 * Math.abs(REAR_MIN);
+  const rear_side_ok = rs >= REAR_SIDE_MIN - 1e-9 * Math.abs(REAR_SIDE_MIN);
+  const rear_open_ok = ro >= REAR_OPEN_MIN - 1e-9 * Math.abs(REAR_OPEN_MIN);
   // A rear bar has to reach both ways from the centerline, so its length is not independent
   // of the two extensions - this is the check people miss on a 36 in bar.
   const rear_span_needed_in = rs + ro;
-  const rear_span_ok = rl >= rear_span_needed_in;
+  const rear_span_ok = rl >= rear_span_needed_in - 1e-9 * Math.abs(rear_span_needed_in);
   const layout_ok = height_ok && side_length_ok && side_position_ok && rear_length_ok && rear_side_ok && rear_open_ok && rear_span_ok;
 
   // 609.8: the bar AND its mounting sustain the load. Standoff turns a pull into a pry.
@@ -630,7 +630,7 @@ export function computeWaterServicePressureCheck({ static_pressure_psi = 0, min_
   const setpoint_ok = setpoint_entered ? set <= MAX : null;
   const delivered = setpoint_entered && prv_required ? set : p;
   const headroom_psi = delivered - minFix;
-  const fixture_ok = headroom_psi >= 0;
+  const fixture_ok = headroom_psi >= 0 - 1e-9 * Math.abs(0);
 
   // The closed system: a PRV, a check valve, or a backflow preventer all close it.
   const closed_system = prv_required || otherClosure;
@@ -721,8 +721,8 @@ export function computeAccessibleToiletCompartment({ compartment_count = 0, urin
   const TRIGGER = 6;
 
   const required_wheelchair_depth_in = floorMounted ? DEPTH_FLOOR : DEPTH_WALL;
-  const wheelchair_width_ok = wW >= MIN_W;
-  const wheelchair_depth_ok = wD >= required_wheelchair_depth_in;
+  const wheelchair_width_ok = wW >= MIN_W - 1e-9 * Math.abs(MIN_W);
+  const wheelchair_depth_ok = wD >= required_wheelchair_depth_in - 1e-9 * Math.abs(required_wheelchair_depth_in);
   const wheelchair_width_deficit_in = Math.max(0, MIN_W - wW);
   const wheelchair_depth_deficit_in = Math.max(0, required_wheelchair_depth_in - wD);
   const wheelchair_ok = wheelchair_width_ok && wheelchair_depth_ok;

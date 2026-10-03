@@ -666,8 +666,8 @@ export function computeSiltFenceDrainage({ tributary_area_ac = 0, fence_length_f
   if (!(max_slope_length_ft > 0)) return { error: "Maximum slope length must be positive (ft)." };
   const required_fence_len_ft = tributary_area_ac * 400;
   const max_area_ac = fence_length_ft / 400;
-  const length_adequate = fence_length_ft >= required_fence_len_ft;
-  const slope_ok = slope_length_ft <= max_slope_length_ft;
+  const length_adequate = fence_length_ft >= required_fence_len_ft - 1e-9 * Math.abs(required_fence_len_ft);
+  const slope_ok = slope_length_ft <= max_slope_length_ft + 1e-9 * Math.abs(max_slope_length_ft);
   if (![required_fence_len_ft, max_area_ac].every(Number.isFinite)) return { error: "Silt-fence math is not a finite value." };
   return {
     required_fence_len_ft,
@@ -1440,7 +1440,7 @@ export function computeFlexiblePipeDeflection({ cover_ft = 12, soil_density_pcf 
   if (!(allowable_pct > 0)) return { error: "Allowable deflection must be positive (percent)." };
   const soil_load_psi = (cover_ft * soil_density_pcf) / 144;
   const deflection_pct = (deflection_lag * bedding_constant * soil_load_psi) / (0.149 * pipe_stiffness_psi + 0.061 * soil_modulus_psi) * 100;
-  const pass = deflection_pct <= allowable_pct;
+  const pass = deflection_pct <= allowable_pct + 1e-9 * Math.abs(allowable_pct);
   if (![soil_load_psi, deflection_pct].every(Number.isFinite)) return { error: "Deflection math is not a finite value." };
   return {
     soil_load_psi,

@@ -1589,7 +1589,7 @@ export function computeBeamClampSidePull({ leg_tension_lb, leg_angle_deg, vertic
   const horizontal_rated = Hcap > 0;
   const horizontal_util_pct = horizontal_rated ? horizontal_lb / Hcap * 100 : null;
   const needs_rerig = !horizontal_rated && horizontal_lb > 1e-9;
-  const vertical_ok = vertical_lb <= Vcap;
+  const vertical_ok = vertical_lb <= Vcap + 1e-9 * Math.abs(Vcap);
   const horizontal_ok = horizontal_rated ? horizontal_lb <= Hcap : !needs_rerig;
   const ok = vertical_ok && horizontal_ok;
   return {

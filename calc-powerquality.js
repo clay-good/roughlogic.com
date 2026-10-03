@@ -520,7 +520,7 @@ export function computeTddIeee519({ isc_a = 0, il_a = 0, measured_tdd_pct = 0 } 
   if (tdd < 0) return { error: "Measured TDD cannot be negative (%)." };
   const ratio = isc / il;
   const limit_pct = ratio < 20 ? 5.0 : ratio < 50 ? 8.0 : ratio < 100 ? 12.0 : ratio <= 1000 ? 15.0 : 20.0;
-  const pass = tdd <= limit_pct;
+  const pass = tdd <= limit_pct + 1e-9 * Math.abs(limit_pct);
   if (![ratio, limit_pct].every(Number.isFinite)) return { error: "TDD-limit math is not a finite value." };
   return {
     ratio, limit_pct, pass,

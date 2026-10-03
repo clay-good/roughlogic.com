@@ -437,7 +437,7 @@ export function computeLoopErrorStackup({ span_eng = 0, element_err_eng = 0, tra
   const rss_eng = Math.sqrt(parts.reduce((a, b) => a + b * b, 0));
   const ratio = rss_eng > 0 ? worst_case_eng / rss_eng : null;
   const element_share_of_worst_pct = worst_case_eng > 0 ? 100 * element_eng / worst_case_eng : null;
-  const instrument_within_deadband = rss_eng <= deadband_eng;
+  const instrument_within_deadband = rss_eng <= deadband_eng + 1e-9 * Math.abs(deadband_eng);
   const installUsed = installation_err_eng > 0;
   const total_with_installation_eng = installUsed ? Math.sqrt(rss_eng * rss_eng + installation_err_eng * installation_err_eng) : null;
   const installation_multiple = installUsed ? total_with_installation_eng / rss_eng : null;

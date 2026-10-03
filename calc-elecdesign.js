@@ -402,8 +402,8 @@ export function computeEgressLightingCheck({ avg_fc = 0, min_fc = 0, max_fc = 0,
   const avg_thr = emergency ? 0.6 : 1.0;
   const min_thr = emergency ? 0.06 : emergencyInitial ? 0.1 : 1.0;
   const max_min = max / min;
-  const avg_ok = avg >= avg_thr;
-  const min_ok = min >= min_thr;
+  const avg_ok = avg >= avg_thr - 1e-9 * Math.abs(avg_thr);
+  const min_ok = min >= min_thr - 1e-9 * Math.abs(min_thr);
   const ratio_ok = (emergency || emergencyInitial) ? max_min <= 40 : true;
   const pass = avg_ok && min_ok && ratio_ok;
   return {
@@ -606,7 +606,7 @@ export function computeSccrCombination({ component_sccrs_ka = [], feeder_ir_ka =
   const candidates = feeder > 0 ? vals.concat([feeder]) : vals;
   const panel_sccr_ka = Math.min(...candidates);
   const governing_is_feeder = feeder > 0 && feeder === panel_sccr_ka && feeder < Math.min(...vals);
-  const compliant = panel_sccr_ka >= fault;
+  const compliant = panel_sccr_ka >= fault - 1e-9 * Math.abs(fault);
   return {
     panel_sccr_ka, compliant, governing_is_feeder, n: vals.length,
     note: "The panel SCCR is the lowest-rated power-circuit component (one 5 kA contactor caps the panel), not the main device; the feeder overcurrent device's interrupting rating also bounds it. A current-limiting fuse or breaker ahead of a weak component can raise the combination rating through its let-through energy (a listed combination) - re-enter that component at its qualified rating. NEC 409.110 requires the SCCR to be marked and to meet or exceed the available fault. UL 508A and the AHJ govern.",
@@ -919,7 +919,7 @@ export function computeFuseLetThrough({ conductor_cmil = 0, initial_temp_c = 75,
   const withstand_a = conductor_cmil * Math.sqrt(0.0297 * Math.log10((damage_temp_c + 234) / (initial_temp_c + 234)) / duration_s);
   const withstand_i2t = withstand_a * withstand_a * duration_s;
   const margin = withstand_i2t / let_through_i2t;
-  const thermal_ok = margin >= 1;
+  const thermal_ok = margin >= 1 - 1e-9 * Math.abs(1);
   const peak_ok = (let_through_peak_a > 0 && equipment_peak_withstand_a > 0) ? let_through_peak_a <= equipment_peak_withstand_a : null;
   const peak_verdict = peak_ok === null
     ? "no peak comparison entered"

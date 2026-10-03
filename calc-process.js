@@ -512,7 +512,7 @@ export function computeThermoformingDrawRatio({
   const formed_area_in2 = side_area_in2 + original_area_in2;
   const areal_draw_ratio = formed_area_in2 / original_area_in2;
   const average_wall_in = sheet_thickness_in / areal_draw_ratio;
-  const within_limit = hd_ratio <= hd_limit;
+  const within_limit = hd_ratio <= hd_limit + 1e-9 * Math.abs(hd_limit);
   const depth_verdict = "the draw is H/D " + fmt(hd_ratio, 3) + " (" + fmt(draw_depth_in, 2) + " in deep on a " + fmt(opening_diameter_in, 2) + " in opening), "
     + (within_limit
       ? "within the " + fmt(hd_limit, 2) + " practical limit for unassisted female forming"

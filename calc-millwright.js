@@ -252,7 +252,7 @@ export function computeAlignmentThermalGrowth({ stationary_support_height_in = 0
   const tolerance_multiple = Math.abs(uncorrected_hot_offset_mils) / tolerance_offset_mils;
   const outs = [stationary_growth_in, movable_growth_in, relative_growth_in, cold_target_offset_in, tolerance_multiple];
   if (!outs.every(Number.isFinite)) return { error: "Thermal growth math is not a finite value." };
-  const within = tolerance_multiple <= 1;
+  const within = tolerance_multiple <= 1 + 1e-9 * Math.abs(1);
   return {
     stationary_growth_in, movable_growth_in, relative_growth_in, cold_target_offset_in,
     uncorrected_hot_offset_mils, tolerance_multiple, tolerance_offset_mils, within,
@@ -366,8 +366,8 @@ export function computeCouplingAlignmentTolerance({ rpm = 0, measured_offset_in 
   const angularity_pct_of_acceptable = measured_angularity_mils_per_in / angularity_acceptable_mils_per_in * 100;
   const offset_pct_of_excellent = offset_excellent_in > 0 ? measured_offset_in / offset_excellent_in * 100 : null;
   const angularity_pct_of_excellent = angularity_excellent_mils_per_in > 0 ? measured_angularity_mils_per_in / angularity_excellent_mils_per_in * 100 : null;
-  const offset_passes = measured_offset_in <= offset_acceptable_in;
-  const angularity_passes = measured_angularity_mils_per_in <= angularity_acceptable_mils_per_in;
+  const offset_passes = measured_offset_in <= offset_acceptable_in + 1e-9 * Math.abs(offset_acceptable_in);
+  const angularity_passes = measured_angularity_mils_per_in <= angularity_acceptable_mils_per_in + 1e-9 * Math.abs(angularity_acceptable_mils_per_in);
   const offset_over_by_in = measured_offset_in - offset_acceptable_in;
   const angularity_over_by = measured_angularity_mils_per_in - angularity_acceptable_mils_per_in;
   // For a spacer coupling the meaningful quantity is the SLOPE across the

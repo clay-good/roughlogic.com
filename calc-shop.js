@@ -2423,7 +2423,7 @@ export function computeCylinderStorageSeparation({ separation_ft = 0, barrier_pr
   if (hasBarrier && !(bh > 0)) return { error: "Enter the barrier height (ft) to test it against the 5 ft minimum." };
 
   const REQ_SEP = 20, REQ_H = 5, REQ_RATING = 0.5;
-  const distance_ok = sep >= REQ_SEP;
+  const distance_ok = sep >= REQ_SEP - 1e-9 * Math.abs(REQ_SEP);
   const separation_shortfall_ft = Math.max(0, REQ_SEP - sep);
 
   // The barrier route has THREE conditions and they all have to hold.

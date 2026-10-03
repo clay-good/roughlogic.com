@@ -297,8 +297,8 @@ export function computeBufferStroke({ contract_speed_fpm = 0, governor_trip_fpm 
   const rated_stroke_ft = buffer_rated_stroke_in / 12;
   const retardation_installed_g = v2 / (2 * rated_stroke_ft) / g_code;
   const max_speed_for_buffer_fpm = Math.sqrt(2 * permitted_retardation_g * g_code * rated_stroke_ft) * 60;
-  const stroke_ok = buffer_rated_stroke_in >= (permitted_retardation_g === 1 ? table_stroke_in : stroke_required_in);
-  const speed_ok = buffer_rated_speed_fpm >= striking_speed_fpm;
+  const stroke_ok = buffer_rated_stroke_in >= ((permitted_retardation_g === 1 ? table_stroke_in : stroke_required_in)) - 1e-9 * Math.abs((permitted_retardation_g === 1 ? table_stroke_in : stroke_required_in));
+  const speed_ok = buffer_rated_speed_fpm >= striking_speed_fpm - 1e-9 * Math.abs(striking_speed_fpm);
   return {
     striking_speed_fpm, impact_speed_fps, stroke_required_in, stroke_at_1g_in, table_stroke_in, stroke_at_governor_trip_in, retardation_installed_g,
     max_speed_for_buffer_fpm, stroke_ok, speed_ok,
@@ -361,7 +361,7 @@ export function computeHoistwayVenting({ hoistway_plan_area_sqft = 0, vent_fract
   // NFPA 92 orifice flow: 2,610 cfm per square foot of leakage at one inch
   // water column, scaling with the square root of the pressure difference.
   const supply_airflow_cfm = 2610 * leakage_area_sqft * Math.sqrt(pressure_diff_inwc);
-  const force_ok = door_force_total_lbf <= door_force_limit_lbf;
+  const force_ok = door_force_total_lbf <= door_force_limit_lbf + 1e-9 * Math.abs(door_force_limit_lbf);
   return {
     vent_area_sqft, door_area_sqft, knob_factor, door_force_added_lbf, door_force_total_lbf, max_pressure_inwc, supply_airflow_cfm,
     force_ok,
@@ -580,8 +580,8 @@ export function computeDoorClosingEnergy({ door_mass_lb = 0, closing_speed_fps =
   if (!(added_mass_lb >= 0)) return { error: "Added door mass cannot be negative." };
   const mass_slug = door_mass_lb / _G_FPS2;
   const kinetic_energy_ftlb = 0.5 * mass_slug * closing_speed_fps * closing_speed_fps;
-  const pass_normal = kinetic_energy_ftlb <= ke_limit_normal_ftlb;
-  const pass_reduced = kinetic_energy_ftlb <= ke_limit_reduced_ftlb;
+  const pass_normal = kinetic_energy_ftlb <= ke_limit_normal_ftlb + 1e-9 * Math.abs(ke_limit_normal_ftlb);
+  const pass_reduced = kinetic_energy_ftlb <= ke_limit_reduced_ftlb + 1e-9 * Math.abs(ke_limit_reduced_ftlb);
   const speed_for_reduced_limit_fps = Math.sqrt(2 * ke_limit_reduced_ftlb * _G_FPS2 / door_mass_lb);
   const speed_change_pct = (speed_for_reduced_limit_fps - closing_speed_fps) / closing_speed_fps * 100;
   const width_ft = opening_width_in / 12;
@@ -652,7 +652,7 @@ export function computeGovernorTrippingSpeed({ rated_speed_fpm = 0, electrical_t
   const switch_pct_of_trip = electrical_trip_fpm / mechanical_trip_fpm * 100;
   // Half-fpm margin: the published tables (Cal. Title 8 3036 B) round the switch setting to a whole fpm,
   // sometimes up -- 407 at 350 fpm against a 406.8 limit -- and their own rows read TOO CLOSE without it.
-  const switch_ok = electrical_trip_fpm <= switch_max_fpm + 0.5;
+  const switch_ok = electrical_trip_fpm <= (switch_max_fpm + 0.5) + 1e-9 * Math.abs(switch_max_fpm + 0.5);
   // Where the switch may be set at up to 100% (150 fpm and under, or a speed-reducing switch), equal
   // settings are allowed ("not more than 100 percent"); the table row 150 / 210 / 210 read INVERTED.
   const ordering_ok = switch_limit_used_pct >= 100 ? electrical_trip_fpm <= mechanical_trip_fpm : electrical_trip_fpm < mechanical_trip_fpm;

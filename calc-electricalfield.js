@@ -497,7 +497,7 @@ export function computeOpenDeltaTransformer({ transformer_kva_each = 25, require
   const per_transformer_kva = required_load_kva / s3;
   const utilization_pct = per_transformer_kva / transformer_kva_each * 100;
   if (![available_3ph_kva, per_transformer_kva, utilization_pct].every(Number.isFinite)) return { error: "Open-delta math is not a finite value." };
-  const ok = required_load_kva <= available_3ph_kva;
+  const ok = required_load_kva <= available_3ph_kva + 1e-9 * Math.abs(available_3ph_kva);
   const verdict = ok
     ? "OK: the two-transformer open-delta bank carries this balanced three-phase load."
     : "OVERLOADED: this load exceeds the open-delta bank capacity -- use larger units or close the delta with a third transformer.";
@@ -551,10 +551,10 @@ export function computeConduitNipple60Fill({ conduit_area_sqin = 0.864, conducto
   const nipple_max_conductors = note7(0.60 * conduit_area_sqin / conductor_area_sqin);
   const normal_max_conductors = note7(0.40 * conduit_area_sqin / conductor_area_sqin);
   if (![fill_area_sqin, fill_pct, nipple_max_conductors, normal_max_conductors].every(Number.isFinite)) return { error: "Nipple-fill math is not a finite value." };
-  const nipple_ok = fill_pct <= 60;
+  const nipple_ok = fill_pct <= 60 + 1e-9 * Math.abs(60);
   // Ch. 9 Table 1: the normal limit is 53% for one conductor, 31% for two, 40% for three or more.
   const normal_limit_pct = conductor_count === 1 ? 53 : conductor_count === 2 ? 31 : 40;
-  const passes_normal = fill_pct <= normal_limit_pct;
+  const passes_normal = fill_pct <= normal_limit_pct + 1e-9 * Math.abs(normal_limit_pct);
   const verdict = !nipple_ok
     ? "OVER 60%: too full even for a nipple -- go up a conduit size."
     : passes_normal

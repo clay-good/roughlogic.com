@@ -111,7 +111,7 @@ export function computeDoorCloserForce({ door_width_in = 0, door_height_in = 0, 
   const pressure_bump = pressure_difference_inwc >= 0.05 ? 1 : 0;
   const closer_size = Math.min(6, width_size + heavy_bump + pressure_bump);
   const force_margin_lbf = force_limit_lbf - measured_opening_force_lbf;
-  const force_ok = measured_opening_force_lbf <= force_limit_lbf;
+  const force_ok = measured_opening_force_lbf <= force_limit_lbf + 1e-9 * Math.abs(force_limit_lbf);
   // A uniform pressure acts at the leaf's centreline and the hand pulls at
   // the knob, a few inches in from the latch edge: NFPA 92 / Klote
   // F = Fdc + A dP W / (2 (W - d)). Until 2026-09-30 the tile used W / 2W,
@@ -125,7 +125,7 @@ export function computeDoorCloserForce({ door_width_in = 0, door_height_in = 0, 
   // A pressure force larger than the whole gauge reading means the reading
   // and the pressure figure cannot both be right.
   const readings_inconsistent = closer_force_lbf < 0;
-  const closing_time_ok = measured_closing_time_s >= min_closing_time_s;
+  const closing_time_ok = measured_closing_time_s >= min_closing_time_s - 1e-9 * Math.abs(min_closing_time_s);
   const pressure_explains = !force_ok && closer_force_lbf <= force_limit_lbf;
   return {
     closer_size, width_size, force_margin_lbf, force_ok, door_area_sqft, knob_factor,
@@ -184,7 +184,7 @@ export function computeLockBacksetLayout({ backset_in = 2.375, cross_bore_dia_in
   const cross_bore_far_side_in = backset_in + cross_bore_dia_in / 2;
   const cross_bore_near_side_in = backset_in - cross_bore_dia_in / 2;
   const min_stile_required_in = cross_bore_far_side_in;
-  const stile_ok = stile_width_in >= min_stile_required_in;
+  const stile_ok = stile_width_in >= min_stile_required_in - 1e-9 * Math.abs(min_stile_required_in);
   const edge_bore_center_from_face_in = door_thickness_in / 2;
   const edge_bore_side_wall_in = (door_thickness_in - edge_bore_dia_in) / 2;
   const height_ok = lock_height_in >= accessible_min_in && lock_height_in <= accessible_max_in;
@@ -244,11 +244,11 @@ export function computePanicHardwareForce({ release_force_lbf = 0, set_in_motion
   const release_margin_lbf = release_limit_lbf - release_force_lbf;
   const set_in_motion_margin_lbf = set_in_motion_limit_lbf - set_in_motion_lbf;
   const swing_margin_lbf = swing_limit_lbf - swing_force_lbf;
-  const release_ok = release_force_lbf <= release_limit_lbf;
-  const set_in_motion_ok = set_in_motion_lbf <= set_in_motion_limit_lbf;
-  const swing_ok = swing_force_lbf <= swing_limit_lbf;
+  const release_ok = release_force_lbf <= release_limit_lbf + 1e-9 * Math.abs(release_limit_lbf);
+  const set_in_motion_ok = set_in_motion_lbf <= set_in_motion_limit_lbf + 1e-9 * Math.abs(set_in_motion_limit_lbf);
+  const swing_ok = swing_force_lbf <= swing_limit_lbf + 1e-9 * Math.abs(swing_limit_lbf);
   const required_actuating_in = door_leaf_width_in / 2;
-  const actuating_ok = actuating_portion_in >= required_actuating_in;
+  const actuating_ok = actuating_portion_in >= required_actuating_in - 1e-9 * Math.abs(required_actuating_in);
   const height_ok = mounting_height_in >= 34 && mounting_height_in <= 48;
   const all_ok = release_ok && set_in_motion_ok && swing_ok && actuating_ok && height_ok;
   const points_at = all_ok ? "nothing -- every measured value is inside its entered limit"

@@ -237,8 +237,8 @@ export function computeDuctSize({ cfm, friction_in_wc_per_100ft = 0.08, roughnes
   // trunk <= 900 fpm, branch <= 600 fpm. Additive; reported alongside the
   // friction band so the prior output is unchanged.
   const velocity_fpm = (cfm / (Math.PI * (d_in / 12 / 2) ** 2));
-  const within_trunk = velocity_fpm <= 900;
-  const within_branch = velocity_fpm <= 600;
+  const within_trunk = velocity_fpm <= 900 + 1e-9 * Math.abs(900);
+  const within_branch = velocity_fpm <= 600 + 1e-9 * Math.abs(600);
   let velocity_label;
   if (within_branch) velocity_label = "within branch ceiling (<= 600 fpm) and trunk ceiling (<= 900 fpm)";
   else if (within_trunk) velocity_label = "within trunk ceiling (<= 900 fpm) but over the 600 fpm branch ceiling";
@@ -403,7 +403,7 @@ export function computeCombustionAir({ btu_input, room_volume_ft3 }) {
   // openings, direct/vertical), or the larger 1 in^2 per 1000 BTU/hr from
   // indoor adjacent communicating spaces (that reservoir of air is limited).
   const required_volume_ft3 = (btu_input / 1000) * 50;
-  const adequate_by_volume = room_volume_ft3 >= required_volume_ft3;
+  const adequate_by_volume = room_volume_ft3 >= required_volume_ft3 - 1e-9 * Math.abs(required_volume_ft3);
   const opening_outdoor_in2 = btu_input / 4000;
   // IFGC 304.5.3.1: each indoor opening at least 1 in^2 per 1,000 Btu/h and
   // never less than 100 in^2 (the floor was missing until 2026-09-19).
@@ -2349,7 +2349,7 @@ export function computeDuctLeakage({
   for (const c of sortedClasses) {
     if (leak_per_100ft2 <= SMACNA_LEAKAGE_CLASSES[c].cfm_per_100ft2_at_1inwc) { effective_class = c; break; }
   }
-  const pass = leak_per_100ft2 <= target.cfm_per_100ft2_at_1inwc;
+  const pass = leak_per_100ft2 <= target.cfm_per_100ft2_at_1inwc + 1e-9 * Math.abs(target.cfm_per_100ft2_at_1inwc);
   return {
     leakage_cfm, leakage_pct,
     leak_at_1inwc, leak_per_100ft2,

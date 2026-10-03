@@ -156,7 +156,7 @@ export function computeRcBeamShear({ fc = 4000, fyt = 60000, bw = 0, d = 0, av_i
   const tight = vs_req_kip > 4 * sqfc_bwd_kip;
   const s_geom_in = tight ? Math.min(d / 4, 12) : Math.min(d / 2, 24);
   const s_max_in = Math.min(s_geom_in, s_avmin_in);
-  const section_ok = vs_req_kip <= 8 * sqfc_bwd_kip;
+  const section_ok = vs_req_kip <= (8 * sqfc_bwd_kip) + 1e-9 * Math.abs(8 * sqfc_bwd_kip);
   const stirrups = vu > phi_vc;
   return { vc_kip, phi_vc, vs_req_kip, s_req_in, s_max_in, s_avmin_in, s_max_rule: s_avmin_in < s_geom_in ? "Av,min" : tight ? "d/4" : "d/2", min_required, section_ok, stirrups };
 }

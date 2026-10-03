@@ -1733,7 +1733,7 @@ export function computeFanSystemEffect({
     : 2.5 + (outlet_velocity_fpm - 2500) / 1000;
   const effective_length_ft = diameters_required * equivalent_diameter_ft;
   const length_shortfall_ft = effective_length_ft - straight_duct_ft;
-  const length_adequate = straight_duct_ft >= effective_length_ft;
+  const length_adequate = straight_duct_ft >= effective_length_ft - 1e-9 * Math.abs(effective_length_ft);
   const length_fraction = effective_length_ft > 0 ? straight_duct_ft / effective_length_ft : 0;
   const outlet_verdict = length_adequate
     ? "the " + fmt(straight_duct_ft, 1) + " ft of straight duct meets the " + fmt(effective_length_ft, 1) + " ft effective length at this velocity, so no outlet system effect applies"
@@ -2462,7 +2462,7 @@ export function computePlenumReturnDrop({
   if (measured_room_to_plenum_inwg < 0 || measured_plenum_to_shaft_inwg < 0 || assumed_return_inwg < 0) return { error: "Pressures cannot be negative (in wg)." };
   const pinch_area_ft2 = pinch_width_ft * (pinch_clear_in / 12);
   const pinch_velocity_fpm = return_cfm / pinch_area_ft2;
-  const within_target = pinch_velocity_fpm <= target_velocity_fpm;
+  const within_target = pinch_velocity_fpm <= target_velocity_fpm + 1e-9 * Math.abs(target_velocity_fpm);
   const velocity_ratio = pinch_velocity_fpm / target_velocity_fpm;
   const velocity_verdict = within_target
     ? fmt(pinch_velocity_fpm, 0) + " fpm at the restriction, inside the " + fmt(target_velocity_fpm, 0) + " fpm target"
