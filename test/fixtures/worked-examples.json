@@ -4966,7 +4966,7 @@
   {
    "tile_id": "voltage-drop-reactance",
    "source_publisher": "NFPA",
-   "source_title": "Three-phase voltage drop with reactance: 100 A, 200 ft, 1/0 Cu in steel conduit, 480 V, PF 0.85 (R=0.13, X=0.044 ohm/1000 ft per NEC Chapter 9 Table 9)",
+   "source_title": "Three-phase voltage drop with reactance: 100 A, 200 ft, 1/0 Cu in aluminum conduit, 480 V, PF 0.85 (R=0.13, X=0.044 ohm/1000 ft per NEC Chapter 9 Table 9)",
    "source_edition_or_year": "NEC 2023 Chapter 9 Table 9; 215.2(A)(1)",
    "source_section_or_page": "Vd = sqrt(3)*I*(R*cos(theta)+X*sin(theta))*L/1000",
    "verified_by": "rl",
@@ -82623,16 +82623,16 @@
   {
    "tile_id": "seismic-design-spectral-acceleration",
    "source_publisher": "ASCE 7-16 11.4",
-   "source_title": "Ss 1.0, S1 0.4, Site Class D (Fa 1.1, Fv 1.6) -> SDS 0.733g, SD1 0.427g",
+   "source_title": "Ss 1.0, S1 0.4, Site Class D (Fa 1.1, Fv 1.9) -> SDS 0.733g, SD1 0.507g",
    "source_edition_or_year": "spec-v381 worked example (machine-verified)",
-   "source_section_or_page": "spec-v381 section 2.1 pinned example",
+   "source_section_or_page": "spec-v381 section 2.1 pinned example; Fv read from ASCE 7-16 Table 11.4-2 (Site D: 2.4, 2.2, 2.0, 1.9, 1.8, 1.7 at S1 0.1 to 0.6). The pinned 1.6 was the ASCE 7-10 value until 2026-10-03",
    "verified_by": "rl",
-   "verified_on": "2026-07-03",
+   "verified_on": "2026-10-03",
    "inputs": {
     "ss": 1.0,
     "s1": 0.4,
     "fa": 1.1,
-    "fv": 1.6
+    "fv": 1.9
    },
    "outputs": {
     "sms": {
@@ -82642,7 +82642,7 @@
      }
     },
     "sm1": {
-     "value": 0.64,
+     "value": 0.76,
      "tolerance": {
       "pct": 0.5
      }
@@ -82654,7 +82654,7 @@
      }
     },
     "sd1": {
-     "value": 0.4267,
+     "value": 0.5067,
      "tolerance": {
       "pct": 0.5
      }

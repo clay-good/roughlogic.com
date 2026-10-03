@@ -1713,6 +1713,10 @@ export function computeLinearRegression({ x_values, y_values, predict_x = null, 
 
   const warnings = [];
   if (n < 10) warnings.push("Small sample (n < 10): the slope test is sensitive to outliers and non-linearity; inspect a scatter plot.");
+  // The fit says nothing outside the observed x range; the shipped example predicts at x = 6 from x = 1..5.
+  const xLo = Math.min(...xs), xHi = Math.max(...xs);
+  const extrapolated = px != null && (px < xLo || px > xHi);
+  if (extrapolated) warnings.push("x = " + px + " is outside the data (" + xLo + " to " + xHi + "): the prediction is an extrapolation the fit does not support.");
 
   return {
     n,
@@ -1731,6 +1735,7 @@ export function computeLinearRegression({ x_values, y_values, predict_x = null, 
     significant,
     predict_x: px,
     predicted_y,
+    extrapolated,
     warnings,
   };
 }

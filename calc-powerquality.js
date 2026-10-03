@@ -136,12 +136,14 @@ export function computeNeutralCurrent3ph({ ia_A = 0, ib_A = 0, ic_A = 0, triplen
     max_phase_A: maxPhase,
     neutral_is_ccc: dominant,
     note: dominant
-      ? "Triplen-dominated: the neutral may exceed the phase current and counts as a current-carrying conductor (NEC 310.15(E), IEEE 519)."
+      ? "Triplen-dominated: the neutral current exceeds the largest phase current, so it counts as a current-carrying conductor (NEC 310.15(E)(3), IEEE 519) and must be sized above the phases."
       : (a === b && b === c
         ? (harmonicNeutral == null || Math.abs(harmonicNeutral) <= 1e-9
           ? "Balanced linear load - fundamental neutral current is zero."
           : "Balanced fundamental - fundamental neutral current is zero; the triplen neutral is about " + harmonicNeutral.toFixed(1) + " A.")
-        : "Unbalanced fundamental neutral current (RMS magnitude, not direction)."),
+        : "Unbalanced fundamental neutral current (RMS magnitude, not direction).")
+        // 310.15(E)(3) turns on the share of nonlinear load, not on the neutral exceeding a phase.
+        + (trip > 0 ? " NEC 310.15(E)(3) counts this neutral as a current-carrying conductor whenever the major portion of the load is nonlinear, well before it exceeds a phase; this tile flags only the triplen-dominated case, so judge the load mix." : ""),
   };
 }
 export const neutralCurrent3phExample = { inputs: { ia_A: 100, ib_A: 80, ic_A: 60, triplen_pct: 0 } };

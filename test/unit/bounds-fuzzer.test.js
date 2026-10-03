@@ -9974,7 +9974,7 @@ test("bounds: calc-electrical computeOffGridBattery pins the IEEE 1013 sizing ch
 });
 
 test("bounds: calc-electrical computeVoltageDropReactance pins the R*cos+X*sin impedance drop and rejection paths", () => {
-  // 100 A, 200 ft, 1/0 Cu in steel conduit (R=0.13, X=0.044 ohm/1000 ft),
+  // 100 A, 200 ft, 1/0 Cu in aluminum conduit (R=0.13, X=0.044 ohm/1000 ft),
   // 480 V three-phase, PF 0.85: Vd = 1.732*100*(0.13*0.85+0.044*0.52678)*0.2
   // = 4.63 V (0.965%).
   const r = computeVoltageDropReactance({ system_voltage_v: 480, current_a: 100, length_ft: 200, r_ohm_per_kft: 0.13, x_ohm_per_kft: 0.044, power_factor: 0.85, phase: "three" });
@@ -21425,11 +21425,11 @@ test("bounds: spec-v380 computeConcreteShrinkageTemperatureSteel pins the ratio,
 import { computeSeismicDesignSpectralAcceleration as _v381, computeSeismicStoryDrift as _v382, computeSeismicPdeltaStability as _v383 } from "../../calc-construction.js";
 
 test("bounds: spec-v381 computeSeismicDesignSpectralAcceleration pins SMS/SM1/SDS/SD1 and error seams", () => {
-  const r = _v381({ ss: 1.0, s1: 0.4, fa: 1.1, fv: 1.6 });
+  const r = _v381({ ss: 1.0, s1: 0.4, fa: 1.1, fv: 1.9 });
   assert.ok(Math.abs(r.sms - 1.10) < 1e-9);
-  assert.ok(Math.abs(r.sm1 - 0.64) < 1e-9);
+  assert.ok(Math.abs(r.sm1 - 0.76) < 1e-9);
   assert.ok(Math.abs(r.sds - (2 / 3) * 1.10) < 1e-9);
-  assert.ok(Math.abs(r.sd1 - (2 / 3) * 0.64) < 1e-9);
+  assert.ok(Math.abs(r.sd1 - (2 / 3) * 0.76) < 1e-9);
   // Higher site coefficient -> higher design acceleration.
   assert.ok(_v381({ ss: 1.0, s1: 0.4, fa: 1.4, fv: 1.6 }).sds > r.sds);
   // Error seams.

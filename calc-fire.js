@@ -1209,7 +1209,10 @@ export function computeNFPA1142WaterSupply({
 
   const warnings = [];
   if (V < 8000) warnings.push("Building volume below 8,000 ft^3 may not require formal NFPA 1142 calculation per Ch. 4; the AHJ may waive.");
-  if (sprinkler_listed) warnings.push("Sprinkler 0.5x reduction is contingent on a confirmed UL-listed system; AHJ inspection governs.");
+  if (sprinkler_listed) warnings.push("Sprinkler 0.5x reduction is contingent on a confirmed UL-listed system; AHJ inspection governs. Some AHJs allow no reduction and instead require the greater of this supply and the sprinkler system demand (Fresno County Fire and Grayson County Fire Marshal guidelines), so confirm which rule is adopted.");
+  // A small or highly rated building can compute far below the standard's minimum total supply;
+  // the floor is not applied here because it has not been read from the adopted edition.
+  if (Q < 3000) warnings.push("This result is below 3,000 gal. NFPA 1142 also sets a minimum total water supply (commonly cited as 2,000 gal with no exposure hazard and 3,000 gal with one); check the adopted edition before using a smaller figure.");
   if (exposure_within_50_ft) warnings.push("1.5x exposure multiplier applies when an adjacent structure is within 50 ft; verify pre-incident plan.");
 
   return {

@@ -3328,9 +3328,10 @@ export function computeVoltageDropReactance({
 }
 
 export const voltageDropReactanceExample = {
-  // 100 A, 200 ft, 1/0 copper THHN in steel conduit, 480 V three-phase, PF
-  // 0.85. NEC Chapter 9 Table 9 for 1/0 Cu in steel conduit: R = 0.13,
-  // X = 0.044 ohm/1000 ft. z_eff = 0.13*0.85 + 0.044*sin(acos 0.85)
+  // 100 A, 200 ft, 1/0 copper THHN in aluminum conduit, 480 V three-phase, PF
+  // 0.85. NEC Chapter 9 Table 9 for 1/0 Cu in aluminum conduit: R = 0.13,
+  // X = 0.044 ohm/1000 ft (steel conduit is R = 0.12, X = 0.055; until
+  // 2026-10-03 these aluminum-conduit values were labeled steel). z_eff = 0.13*0.85 + 0.044*sin(acos 0.85)
   // = 0.1105 + 0.044*0.52678 = 0.13368; Vd = 1.732*100*0.13368*200/1000
   // = 4.63 V (0.965%), within ~2% of the Mike Holt voltage-drop calculator.
   inputs: {
