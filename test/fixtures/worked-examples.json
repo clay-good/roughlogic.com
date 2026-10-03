@@ -129757,9 +129757,9 @@
    "outputs": {"door_hours":{"value":55,"tolerance":{"pct":0.5}},"doors_at_full_utilization":{"value":5.5,"tolerance":{"pct":0.5}},"doors_required":{"value":9,"tolerance":{"pct":0.5}},"peak_trucks":{"value":24,"tolerance":{"pct":0.5}},"peak_door_hours":{"value":22,"tolerance":{"pct":0.5}},"peak_doors_required":{"value":12,"tolerance":{"pct":0.5}},"peak_shortfall_doors":{"value":3,"tolerance":{"pct":0.5}},"improved_peak_doors_required":{"value":9,"tolerance":{"pct":0.5}},"doors_saved_by_turn_time":{"value":3,"tolerance":{"pct":0.5}}}
   },
   {
-   "tile_id": "order-pick-labor-standard", "source_publisher": "Project (first-principles)", "source_title": "Order Pick Rate and Labour Standard -- the spec-v1817 worked example, recomputed", "source_edition_or_year": "spec-v1817 of scope-trade-expansion-3, 2026-09-17", "source_section_or_page": "the facility's own time study governs", "verified_by": "rl", "verified_on": "2026-09-17",
+   "tile_id": "order-pick-labor-standard", "source_publisher": "Project (first-principles)", "source_title": "Order Pick Rate and Labour Standard -- the spec-v1817 worked example, recomputed", "source_edition_or_year": "spec-v1817 of scope-trade-expansion-3, 2026-09-17", "source_section_or_page": "the facility's own time study governs; batch figures recomputed 2026-10-03 with one 8 min setup shared across the batch of 4 (batch_size was unused before)", "verified_by": "rl", "verified_on": "2026-09-17",
    "inputs": {"lines_per_order":120,"units_per_line":2.5,"travel_time_s":18,"pick_time_s":12,"additional_unit_time_s":3,"setup_time_min":8,"pfd_allowance_pct":15,"batch_size":4,"batch_travel_time_s":7},
-   "outputs": {"time_per_line_s":{"value":34.5,"tolerance":{"pct":0.5}},"pick_time_total_min":{"value":69,"tolerance":{"pct":0.5}},"allowed_order_time_min":{"value":88.55,"tolerance":{"pct":0.5}},"lines_per_hour":{"value":81.30999435347262,"tolerance":{"pct":0.5}},"units_per_hour":{"value":203.27498588368155,"tolerance":{"pct":0.5}},"travel_share_pct":{"value":52.17391304347826,"tolerance":{"pct":0.5}},"batch_time_per_line_s":{"value":23.5,"tolerance":{"pct":0.5}},"batch_allowed_order_time_min":{"value":63.24999999999999,"tolerance":{"pct":0.5}},"batch_lines_per_hour":{"value":113.83399209486167,"tolerance":{"pct":0.5}},"batch_improvement_pct":{"value":40.00000000000001,"tolerance":{"pct":0.5}}}
+   "outputs": {"time_per_line_s":{"value":34.5,"tolerance":{"pct":0.5}},"pick_time_total_min":{"value":69,"tolerance":{"pct":0.5}},"allowed_order_time_min":{"value":88.55,"tolerance":{"pct":0.5}},"lines_per_hour":{"value":81.30999435347262,"tolerance":{"pct":0.5}},"units_per_hour":{"value":203.27498588368155,"tolerance":{"pct":0.5}},"travel_share_pct":{"value":52.17391304347826,"tolerance":{"pct":0.5}},"batch_time_per_line_s":{"value":23.5,"tolerance":{"pct":0.5}},"batch_allowed_order_time_min":{"value":56.35,"tolerance":{"pct":0.5}},"batch_lines_per_hour":{"value":127.77284826974268,"tolerance":{"pct":0.5}},"batch_improvement_pct":{"value":57.14285714285713,"tolerance":{"pct":0.5}}}
   },
   {
    "tile_id": "dredge-production-rate", "source_publisher": "Project (first-principles)", "source_title": "Cutter Suction Dredge Production -- the spec-v1828 worked example, recomputed", "source_edition_or_year": "spec-v1828 of scope-trade-expansion-3, 2026-09-18", "source_section_or_page": "contract porosity and effective hours govern", "verified_by": "rl", "verified_on": "2026-09-18",
@@ -165408,6 +165408,622 @@
      "value": 68.25,
      "tolerance": {
       "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "odor-dilution-threshold",
+   "source_publisher": "Scentroid (IDES Canada Inc.)",
+   "source_title": "WikiOdour: Odour Emission Rate (OER)",
+   "source_edition_or_year": "web page, accessed 2026",
+   "source_section_or_page": "https://scentroid.com/wikiodour/odour-emission-rate-oer/ : 'if a stack has a volumetric flow rate of 2m3/s and the olfactometry analysis resulted in 220 OUE/m3, then the OER = 2m3/s * 220OU/m3 = 440 OU/s.' 2 m3/s entered as 2 x 60 / 0.3048^3 = 4,237.76 acfm (exact unit conversion). Tile odour_emission_rate_oue_s = 440.000. Tolerance 0.1%. Dilution factor is not part of this check (set 1).",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "source_dt": 220,
+    "airflow_acfm": 4237.76000657863,
+    "dilution_factor": 1,
+    "limit_dt": 0,
+    "target_dt": 0
+   },
+   "outputs": {
+    "odour_emission_rate_oue_s": {
+     "value": 440,
+     "tolerance": {
+      "pct": 0.1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "odor-dilution-threshold",
+   "source_publisher": "St. Croix Sensory, Inc.",
+   "source_title": "Odor Parameters",
+   "source_edition_or_year": "2018",
+   "source_section_or_page": "Page 2, threshold example: 'detection threshold values of 13,000 for the inlet and 450 for the outlet. These results show an odor control reduction efficiency of 97% ([13,000-450]/13,000 * 100%) [EN13725].' Mapped as source D/T 13,000 and target 450 at the point of measurement (dilution factor 1, i.e. the target is the treated outlet). Tile reduction_pct 96.54; tolerance abs 0.5 covers the printed rounding to 97%. Airflow does not enter reduction_pct (entered as 1,000 acfm, not printed).",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "source_dt": 13000,
+    "airflow_acfm": 1000,
+    "dilution_factor": 1,
+    "limit_dt": 0,
+    "target_dt": 450
+   },
+   "outputs": {
+    "reduction_pct": {
+     "value": 97,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "optical-return-loss",
+   "source_publisher": "Experior Photonics, Inc. (L. Cartellieri)",
+   "source_title": "Optical Return Loss Meters: Measurement and Application Issues",
+   "source_edition_or_year": "white paper, undated (c. 2004)",
+   "source_section_or_page": "Section 2.1: 'The 4% reflectivity of the glass to air interface is approximate. This value assumes the refractive index of the fiber core to be 1.5. ... This text uses 4 %, or -14 dB.' Tile at n = 1.5: 4.000% and -13.98 dB. Tolerances abs 0.01 % and abs 0.05 dB cover the printed rounding to -14. Connector inputs do not enter the Fresnel outputs (entered 1 connector at -50 dB, required 32 dB; not printed).",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "connector_count": 1,
+    "connector_reflectance_db": -50,
+    "unmated_end_count": 1,
+    "fiber_index": 1.5,
+    "required_orl_db": 32,
+    "apc_reflectance_db": -60
+   },
+   "outputs": {
+    "fresnel_reflectance_pct": {
+     "value": 4,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "fresnel_reflectance_db": {
+     "value": -14,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "optical-return-loss",
+   "source_publisher": "Experior Photonics, Inc. (L. Cartellieri)",
+   "source_title": "Optical Return Loss Meters: Measurement and Application Issues",
+   "source_edition_or_year": "white paper, undated (c. 2004)",
+   "source_section_or_page": "Section 2.1: 'If, for example, the refractive index of the fiber used is 1.47, about -3.6% of the light are reflected at the glass to air interface.' Tile at n = 1.47: 3.621%. Tolerance abs 0.05 covers the printed 'about 3.6'. Connector inputs not printed and do not enter this output.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "connector_count": 1,
+    "connector_reflectance_db": -50,
+    "unmated_end_count": 1,
+    "fiber_index": 1.47,
+    "required_orl_db": 32,
+    "apc_reflectance_db": -60
+   },
+   "outputs": {
+    "fresnel_reflectance_pct": {
+     "value": 3.6,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "containment-bypass-airflow",
+   "source_publisher": "Upsite Technologies (Lars Strong)",
+   "source_title": "6 Key Metrics to Optimize Your Data Center's Cooling",
+   "source_edition_or_year": "April 20, 2016",
+   "source_section_or_page": "Bypass airflow example: 'eight cooling units that each deliver 12,000 CFM ... The average IT equipment dT is 25\u00b0F IT required cooling flow rate is 126 CFM/kW UPS load is 325 kW Therefore the total IT equipment cooling flow rate is 40,950 CFM ... Bypass airflow rate is 55,050 CFM or 57%'. Tile: 41,070 cfm IT (3,412/(1.08 x 25) = 126.37 cfm/kW, printed rounded to 126), bypass 54,930 cfm, 57.22%. Tolerances 0.5% on the flows and abs 0.5 on the percent cover the printed 126 cfm/kW rounding. Supply 65 F / exhaust 90 F, zero fan power and $0.10/kWh are not printed and do not enter these outputs.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "it_load_kw": 325,
+    "equipment_delta_t_f": 25,
+    "unit_count": 8,
+    "airflow_per_unit_cfm": 12000,
+    "supply_temp_f": 65,
+    "exhaust_temp_f": 90,
+    "fan_power_per_unit_kw": 0,
+    "tariff_per_kwh": 0.1
+   },
+   "outputs": {
+    "it_airflow_cfm": {
+     "value": 40950,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "bypass_cfm": {
+     "value": 55050,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "bypass_fraction_pct": {
+     "value": 57,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "containment-bypass-airflow",
+   "source_publisher": "Upsite Technologies (Lars Strong)",
+   "source_title": "6 Key Metrics to Optimize Your Data Center's Cooling",
+   "source_edition_or_year": "April 20, 2016",
+   "source_section_or_page": "Server airflow: 'a 5kW blade server chassis with 16 servers and a 35\u00b0F dT would draw 451.4 CFM: 451.4 CFM = 3.16 x 5,000 / 35\u00b0 F'. Tile it_airflow_cfm 451.32 (3,412/1.08 = 3,159 vs printed 3.16 per W). Tolerance 0.1%. Unit count/airflow/temps/tariff not printed and do not enter it_airflow_cfm.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "it_load_kw": 5,
+    "equipment_delta_t_f": 35,
+    "unit_count": 1,
+    "airflow_per_unit_cfm": 1000,
+    "supply_temp_f": 65,
+    "exhaust_temp_f": 100,
+    "fan_power_per_unit_kw": 0,
+    "tariff_per_kwh": 0.1
+   },
+   "outputs": {
+    "it_airflow_cfm": {
+     "value": 451.4,
+     "tolerance": {
+      "pct": 0.1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "containment-bypass-airflow",
+   "source_publisher": "Upsite Technologies (Lars Strong)",
+   "source_title": "6 Key Metrics to Optimize Your Data Center's Cooling",
+   "source_edition_or_year": "April 20, 2016",
+   "source_section_or_page": "Server airflow: 'ten 500W pizza box servers with a 20\u00b0F dT would draw 790 CFM: 790 CFM = 3.16 x 5,000 / 20\u00b0 F'. Tile it_airflow_cfm 789.81. Tolerance 0.1%. Other inputs not printed and do not enter it_airflow_cfm.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "it_load_kw": 5,
+    "equipment_delta_t_f": 20,
+    "unit_count": 1,
+    "airflow_per_unit_cfm": 1000,
+    "supply_temp_f": 65,
+    "exhaust_temp_f": 85,
+    "fan_power_per_unit_kw": 0,
+    "tariff_per_kwh": 0.1
+   },
+   "outputs": {
+    "it_airflow_cfm": {
+     "value": 790,
+     "tolerance": {
+      "pct": 0.1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "crac-sensible-derate",
+   "source_publisher": "MEP Academy",
+   "source_title": "How to Calculate Sensible Heat Transfer for Air",
+   "source_edition_or_year": "April 23, 2022",
+   "source_section_or_page": "Worked example: 2,000 cfm, air 55 F to 90 F, 'q = 2,000 x 1.08 x 35 = 75,600 Btu/hour'. The printed case is a heating coil; the tile's relation 1.08 x cfm x (return - supply) is the same arithmetic with 90 F as the warm side. Tile capacity_btu_h 75,600. Tolerance 0.1%. Contained and bypassed return temperatures not printed (set equal to 90 F); they do not enter capacity_btu_h.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "airflow_cfm": 2000,
+    "supply_temp_f": 55,
+    "return_temp_f": 90,
+    "contained_return_temp_f": 90,
+    "bypass_return_temp_f": 90
+   },
+   "outputs": {
+    "capacity_btu_h": {
+     "value": 75600,
+     "tolerance": {
+      "pct": 0.1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "server-inlet-envelope",
+   "source_publisher": "Vaisala Oyj",
+   "source_title": "Humidity Conversion Formulas (B210973EN-F)",
+   "source_edition_or_year": "2013",
+   "source_section_or_page": "Section 3, Example: 'The ambient temperature is 40\u00b0C and the RH is 50%. Calculate Td: Pw = Pws(40\u00b0C) x 50/100 = 36.88 hPa, Td = ... = 27.6\u00b0C'. Entered as 104 F / 50% RH; 27.6 C = 81.68 F. Tile dew_point_f 81.61 (Magnus 17.27/237.7). Tolerance abs 0.15 F covers the printed 0.1 C rounding (+/-0.09 F) and the Magnus-vs-Vaisala constant difference. Envelope limits are ASHRAE A1 values, not part of the printed example, and do not enter dew_point_f.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "dry_bulb_f": 104,
+    "relative_humidity_pct": 50,
+    "recommended_min_f": 64.4,
+    "recommended_max_f": 80.6,
+    "allowable_min_f": 59,
+    "allowable_max_f": 89.6,
+    "upper_dew_point_f": 59,
+    "upper_rh_pct": 70,
+    "alternative_temp_f": 104,
+    "alternative_rh_pct": 50
+   },
+   "outputs": {
+    "dew_point_f": {
+     "value": 81.68,
+     "tolerance": {
+      "abs": 0.15
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "rt-exposure-time",
+   "source_publisher": "U.S. Air Force / Navy / Army (Oklahoma City AFLCMC/GUEAA)",
+   "source_title": "TO 33B-1-1 / NAVAIR 01-1A-16-1 / TM 1-1500-335-23, Nondestructive Inspection Methods, Basic Theory (Section IV, Radiographic Method)",
+   "source_edition_or_year": "2020 (PDF dated Feb 28, 2020)",
+   "source_section_or_page": "Para 6.7.4 Source-to-Film Distance, p. 6-158/6-159: 'if a technique calls for exposing a part at 36-inches using 300 MAS, but the tube head must be moved to make a 48-inch SFD' ... 'T2 = (300 * 2304)/1296' ... 'Solving, T2 = 533 MAS'. Exposure entered as 300 (mAs at fixed mA scales exactly like time, so the tile's seconds field carries it). Tile gives 533.33; abs 0.5 covers the source rounding to whole mAs.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "base_exposure_s": 300,
+    "base_distance_in": 36,
+    "new_distance_in": 48,
+    "source_size_in": 0,
+    "material_thickness_in": 0,
+    "days_elapsed": 0,
+    "half_life_days": 73.83,
+    "unsharpness_limit_in": 0
+   },
+   "outputs": {
+    "new_exposure_s": {
+     "value": 533,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "tank-strapping-volume",
+   "source_publisher": "University of Regina, Math Central (Quandaries & Queries)",
+   "source_title": "Barrels of oil (question from Daryl, answer by Harley)",
+   "source_edition_or_year": "2013 (QQ.09.13)",
+   "source_section_or_page": "http://mathcentral.uregina.ca/QQ/database/QQ.09.13/h/daryl1.html -- 15'-6\" diameter tank, 1 in of height = '117.63 US gallons ... 117.63/42 = 2.801 barrels'. Tile bbl_per_in 2.80062; abs 0.0005 covers the printed 3-decimal rounding.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "tank_diameter_ft": 15.5,
+    "gauge_ft": 1,
+    "gauge_in": 0,
+    "closing_gauge_ft": 0,
+    "closing_gauge_in": 0,
+    "volume_correction_factor": 1,
+    "sediment_water_pct": 0
+   },
+   "outputs": {
+    "bbl_per_in": {
+     "value": 2.801,
+     "tolerance": {
+      "abs": 0.0005
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "tank-strapping-volume",
+   "source_publisher": "University of Regina, Math Central (Quandaries & Queries)",
+   "source_title": "Barrels of oil (question from Daryl, answer by Harley)",
+   "source_edition_or_year": "2013 (QQ.09.13)",
+   "source_section_or_page": "http://mathcentral.uregina.ca/QQ/database/QQ.09.13/h/daryl1.html -- 'a tank with this diameter [15.5 ft] and a height of 16 feet contains 537.7 barrels not 500'. Tile gross_bbl 537.719 at a 16 ft 0 in gauge; abs 0.05 covers the printed 1-decimal rounding.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "tank_diameter_ft": 15.5,
+    "gauge_ft": 16,
+    "gauge_in": 0,
+    "closing_gauge_ft": 0,
+    "closing_gauge_in": 0,
+    "volume_correction_factor": 1,
+    "sediment_water_pct": 0
+   },
+   "outputs": {
+    "gross_bbl": {
+     "value": 537.7,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "tank-strapping-volume",
+   "source_publisher": "University of Regina, Math Central (Quandaries & Queries)",
+   "source_title": "Barrels of oil (question from Daryl, answer by Harley)",
+   "source_edition_or_year": "2013 (QQ.09.13)",
+   "source_section_or_page": "http://mathcentral.uregina.ca/QQ/database/QQ.09.13/h/daryl1.html -- '180/2.801 = 64.27 inches would give 180 barrels' on the 15.5 ft tank. Entered as a 5 ft 4.27 in gauge; tile gross_bbl 179.996. abs 0.05 covers the printed 64.27 in being rounded to 0.01 in (+/-0.014 bbl) and the 2.801 rounding.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "tank_diameter_ft": 15.5,
+    "gauge_ft": 5,
+    "gauge_in": 4.27,
+    "closing_gauge_ft": 0,
+    "closing_gauge_in": 0,
+    "volume_correction_factor": 1,
+    "sediment_water_pct": 0
+   },
+   "outputs": {
+    "gross_bbl": {
+     "value": 180,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "pool-pump-speed-savings",
+   "source_publisher": "U.S. Department of Energy, Building America Solution Center (PNNL)",
+   "source_title": "Variable-Speed Pool Pumps (resource guide)",
+   "source_edition_or_year": "accessed 2026-10-03",
+   "source_section_or_page": "https://basc.pnnl.gov/resource-guides/variable-speed-pool-pumps -- 'A typical 1\u00bd-horsepower (hp) pool pump draws about 2,000 watts and runs at 3,450 revolutions per minute (rpm).' Checks only the nameplate-hp draw constant: full_kw 2.000 at pump_hp 1.5 (exact). speed_fraction is the guide's own 2,400/3,450 rpm; full_speed_hours (8) is not printed and does not enter full_kw. The guide's companion figure (593 W at 2,400 rpm) is NOT used: the cube law gives 673 W at its own rpm (see report).",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "pump_hp": 1.5,
+    "full_speed_hours": 8,
+    "speed_fraction": 0.6956521739130435,
+    "electricity_rate_per_kwh": 0,
+    "days_per_year": 365,
+    "minimum_flow_fraction": 0
+   },
+   "outputs": {
+    "full_kw": {
+     "value": 2.0,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "berthing-fender-energy",
+   "source_publisher": "Civil Engineering and Development Department, Hong Kong SAR Government",
+   "source_title": "Port Works Design Manual Part 2, Appendix A Design of Fenders",
+   "source_edition_or_year": "2004 (Part 2), Appendix A",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "source_section_or_page": "Appendix A, Example 2, p. 116-117 (https://www.cedd.gov.hk/filemanager/eng/content_98/p2_app_a_109_120.pdf): 'Displacement = 940 tonnes', 'Vb = 0.3 m/s', 'Cm = 1+2(2.0/12) = 1.33', 'Ce = ... = 0.67', 'Cs = 1.0', 'Cc = 1.0 for piled deck pier', 'Berthing energy = 0.5x(1.33x940x0.3^2x0.67x1.0x1.0) = 37.7 kNm'; 'Berthing energy to be absorbed = 37.7 x 1.5 = 56.6 kNm'. Inputs converted exactly: 940 t / 0.90718474 = 1036.17 short tons, 0.3 m/s / 0.3048 = 0.98425 ft/s; outputs x 737.562 ft-lb per kNm (37.7 -> 27,806; 56.6 -> 41,746). Tile gives 37.66 / 56.49 kNm; 1% tolerance covers the 3-significant-figure printing (+/-0.13%) and the tile's g = 32.2 vs 32.174 ft/s2 (0.08%). fender_rating_ftlb and alternative_velocity_fps are not printed and not asserted.",
+   "inputs": {
+    "displacement_tons": 1036.1726322689246,
+    "approach_velocity_fps": 0.9842519685039369,
+    "virtual_mass_factor": 1.33,
+    "eccentricity_factor": 0.67,
+    "softness_factor": 1,
+    "configuration_factor": 1,
+    "fender_rating_ftlb": 100000,
+    "alternative_velocity_fps": 0.9842519685039369
+   },
+   "outputs": {
+    "design_energy_ftlb": {
+     "value": 27806.091170000003,
+     "tolerance": {
+      "pct": 1
+     }
+    },
+    "accidental_energy_ftlb": {
+     "value": 41746.01486,
+     "tolerance": {
+      "pct": 1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "berthing-fender-energy",
+   "source_publisher": "Civil Engineering and Development Department, Hong Kong SAR Government",
+   "source_title": "Port Works Design Manual Part 2, Appendix A Design of Fenders",
+   "source_edition_or_year": "2004 (Part 2), Appendix A",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "source_section_or_page": "Appendix A, Example 1, Type 2 vessel, p. 112-113: 'Displacement 400 tonnes', 'Vb 0.3 m/s', 'Cm = 1+2(1.5/20.0) = 1.15', 'Ce = ... = 0.61', 'Cs 1.0', 'Cc (for solid pier) 0.9', 'Berthing energy 0.5(1.15x400x0.3^2x0.61x1.0x0.9) = 11.4 kNm'; 'design energy absorption capacity greater than 11.4 x 1.5 = 17.1 kNm'. Inputs converted exactly (400 t = 440.92 short tons; 0.98425 ft/s); 11.4 kNm = 8,408 ft-lb, 17.1 kNm = 12,612 ft-lb. Tile 11.36 / 17.03 kNm (-0.4%); 1% tolerance covers 3-significant-figure printing (+/-0.44%) and g = 32.2. Rating and alternative velocity not printed, not asserted.",
+   "inputs": {
+    "displacement_tons": 440.92452436975515,
+    "approach_velocity_fps": 0.9842519685039369,
+    "virtual_mass_factor": 1.15,
+    "eccentricity_factor": 0.61,
+    "softness_factor": 1,
+    "configuration_factor": 0.9,
+    "fender_rating_ftlb": 100000,
+    "alternative_velocity_fps": 0.9842519685039369
+   },
+   "outputs": {
+    "design_energy_ftlb": {
+     "value": 8408.20794,
+     "tolerance": {
+      "pct": 1
+     }
+    },
+    "accidental_energy_ftlb": {
+     "value": 12612.31191,
+     "tolerance": {
+      "pct": 1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "fan-system-effect",
+   "source_publisher": "National Environmental Balancing Bureau (NEBB)",
+   "source_title": "System Effect, The NEBB Professional (reproducing the AMCA 201 effective-duct-length figure, Figure 6-32)",
+   "source_edition_or_year": "Summer 2015",
+   "source_section_or_page": "Figure 6-32 note (https://indoorenvironmentaltesting.com/wp-content/uploads/2020/06/System-Effect-The-NEBB-Professional-Summer-2015.pdf): 'TO CALCULATE 100% EFFECTIVE DUCT LENGTH, ASSUME A MINIMUM OF 2.5 DUCT DIAMETERS FOR 2500 ... OR LESS. ADD 1 DUCT DIAMETER FOR EACH ADDITIONAL 1000 FPM ... EXAMPLE: 5000 FPM (25 M/S) = 5 EQUIVALENT DUCT DIAMETERS.' Printed velocity 5,000 fpm is entered as 5,000 cfm through a 12 x 12 in outlet (1 sq ft); diameters_required depends on velocity alone. Tile 5.000; abs 0.01 tolerance (exact printed integer).",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "flow_cfm": 5000,
+    "outlet_width_in": 12,
+    "outlet_height_in": 12,
+    "straight_duct_ft": 0,
+    "inlet_condition": "clear",
+    "fan_curve_tp_inwg": 0,
+    "measured_tp_inwg": 0
+   },
+   "outputs": {
+    "outlet_velocity_fpm": {
+     "value": 5000,
+     "tolerance": {
+      "abs": 1
+     }
+    },
+    "diameters_required": {
+     "value": 5,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "fan-system-effect",
+   "source_publisher": "ASHRAE Rocky Mountain Chapter (Matthew Spink, P.E.)",
+   "source_title": "System Effects (2011 Technical Conference, Fundamentals track)",
+   "source_edition_or_year": "2011",
+   "source_section_or_page": "Example slide (https://rockymtnashrae.starchapter.com/downloads/2011_Technical_Conference/tc_fundamentals_2011_fan_system_effects.pdf): '3,000 cfm / (13 x 13) = 2556 FPM'. Tile 2,556.2 fpm; abs 1 fpm covers the integer printing. Only the velocity is asserted: the slide's '(4 x 13 x 13 / 3.14)^0.5 = 14.5 inches' is an arithmetic slip (the expression is 14.67 in, as the tile gives) and its '2.5 + 1 = 3.5 ducts' rounds the partial 56 fpm up to a whole diameter, which AMCA's own '5000 FPM = 5 diameters' example does not do.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "flow_cfm": 3000,
+    "outlet_width_in": 13,
+    "outlet_height_in": 13,
+    "straight_duct_ft": 0,
+    "inlet_condition": "clear",
+    "fan_curve_tp_inwg": 0,
+    "measured_tp_inwg": 0
+   },
+   "outputs": {
+    "outlet_velocity_fpm": {
+     "value": 2556,
+     "tolerance": {
+      "abs": 1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "landfill-airspace-density",
+   "source_publisher": "University of Massachusetts Amherst, Dept. of Civil & Environmental Engineering (CEE 370, Reckhow)",
+   "source_title": "CEE 370 Homework #9 Solid Waste Problems -- solutions",
+   "source_edition_or_year": "Fall 2019",
+   "source_section_or_page": "Problem 3 (http://www.ecs.umass.edu/cee/reckhow/courses/370/370hw/370hw9s.pdf, via Wayback 2024): '(50 Mg/d)(5 d/wk)(52 wk/y) = 13000 Mg/y'; density as spread 122 kg/m3, compacted from 0.50 to 0.25 m so '(2)0.122 Mg/m3'; 'E = [3(0.25) + (0.15)] / 3(0.25) = 1.2'; waste '13000 Mg/y / (2)0.122 Mg/m3 = 53278.7 m3/y'; total '(13000)(1.2)/(2)(0.122) = 63,934 m3'. Inputs converted exactly: 13,000 Mg = 14,330.08 short tons; 0.244 Mg/m3 x 1,685.555 = 411.28 lb/cy; cover ratio (E - 1) = 20%. Outputs: 53,278.7 m3 = 69,686 cy, 63,934 m3 = 83,623 cy (x 1.307951). Tile 69,685.9 / 83,623.1 cy; 0.5% tolerance covers unit-conversion rounding.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "annual_tons": 14330.047042017042,
+    "in_place_density_lb_per_cy": 411.2753956,
+    "cover_ratio_pct": 20,
+    "airspace_value_per_cy": 0,
+    "improved_density_lb_per_cy": 411.2753956
+   },
+   "outputs": {
+    "waste_airspace_cy": {
+     "value": 69685.90864451531,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "total_airspace_cy": {
+     "value": 83622.51487514601,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "landfill-airspace-density",
+   "source_publisher": "Stormwater Solutions (Endeavor Business Media), Daniel P. Duffy, P.E.",
+   "source_title": "ADC: It's as Easy as 1, 2, 3",
+   "source_edition_or_year": "February 20, 2014",
+   "source_section_or_page": "https://www.stormwater.com/stormwater-bmps/article/13009499/adc-its-as-easy-as-1-2-3 : compaction 'doubles the in-place density of the waste to 0.9 tons per cubic yard'; 'Each 1-foot thickness of waste over an acre is equivalent to slightly more than 1,600 cubic yards. After compaction, this acre-foot of waste has a weight of about 1,450 tons.' Inputs 1,450 tons at 0.9 t/cy = 1,800 lb/cy, no cover; tile 1,611 cy. 1.5% tolerance covers 'slightly more than 1,600' and 'about 1,450'.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "annual_tons": 1450,
+    "in_place_density_lb_per_cy": 1800,
+    "cover_ratio_pct": 0,
+    "airspace_value_per_cy": 0,
+    "improved_density_lb_per_cy": 1800
+   },
+   "outputs": {
+    "waste_airspace_cy": {
+     "value": 1600,
+     "tolerance": {
+      "pct": 1.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "daily-cover-volume",
+   "source_publisher": "Atmos Technologies (alternative daily cover manufacturer), Learning Center",
+   "source_title": "The True Cost of Dirt: Airspace Utilization",
+   "source_edition_or_year": "accessed 2026-10-03",
+   "source_section_or_page": "https://atmos-technologies.com/learning-center/true-cost-of-dirt-airspace-utilization/ : 'Say you're covering a half-acre working face with 6 inches of dirt each day. That comes out to just over 400 cubic yards per day. At six days a week, that adds to 2,418 cubic yards per week.' Half acre = 21,780 sq ft entered as 145.2 x 150 ft; operating_days = 6 because the printed total is per WEEK (so cover_cy_per_year here reads the weekly figure). Tile 403.3 cy/day and 2,420 cy; the printed 2,418 is 6 x a rounded 403. Tolerances: abs 6 on 'just over 400', 0.5% on 2,418. Remaining inputs are not printed and not asserted.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "face_length_ft": 145.2,
+    "face_width_ft": 150,
+    "cover_depth_in": 6,
+    "operating_days": 6,
+    "airspace_value_per_cy": 8,
+    "annual_tons": 250000,
+    "in_place_density_lb_per_cy": 1200,
+    "alternative_cover_annual_cost": 5000
+   },
+   "outputs": {
+    "cover_cy_per_day": {
+     "value": 400,
+     "tolerance": {
+      "abs": 6
+     }
+    },
+    "cover_cy_per_year": {
+     "value": 2418,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "leachate-water-balance",
+   "source_publisher": "Oklahoma Cooperative Extension Service, Oklahoma State University",
+   "source_title": "BAE-1501 Water Measurement Units and Conversion Factors",
+   "source_edition_or_year": "fact sheet (irrigationtoolbox.com copy, accessed 2026-10-03)",
+   "source_section_or_page": "p. 1 (https://irrigationtoolbox.com/ReferenceDocuments/Extension/Oklahoma/BAE-1501web.pdf): 'One acre-inch ... = 27,154 gallons (27,200 for ordinary calculations)'. Table value check of the tile's depth-to-gallons conversion: 1 acre, 1 in of infiltration (precip 1 in, runoff and ET coefficients 0). Tile 27,154.3 gal; abs 1 gal tolerance.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "open_acres": 1,
+    "annual_precip_in": 1,
+    "runoff_coefficient": 0,
+    "evapotranspiration_coefficient": 0,
+    "capped_infiltration_in_per_year": 0,
+    "design_storm_in": 1
+   },
+   "outputs": {
+    "leachate_gal_per_year": {
+     "value": 27154,
+     "tolerance": {
+      "abs": 1
      }
     }
    }

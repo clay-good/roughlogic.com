@@ -468,15 +468,16 @@ export function computeDockLevelerSlope({ dock_height_in = 0, low_bed_height_in 
   const outlier_grade_pct = gradeOf(outlier_differential_in, leveler_length_in);
   const longer_leveler_grade_pct = gradeOf(low_differential_in, longer_leveler_length_in);
   const outlier_longer_grade_pct = gradeOf(outlier_differential_in, longer_leveler_length_in);
+  // 1e-9 on the grade checks: a 40.8 in bed on a 48 in dock is 10.000000000000004% and failed a 10% guideline.
   return {
     low_differential_in, high_differential_in, outlier_differential_in,
     low_within_service_range: Math.abs(low_differential_in) <= service_range_in,
     high_within_service_range: Math.abs(high_differential_in) <= service_range_in,
     outlier_within_service_range: Math.abs(outlier_differential_in) <= service_range_in,
     low_grade_pct, high_grade_pct, outlier_grade_pct,
-    low_grade_pass: low_grade_pct <= grade_guideline_pct,
-    high_grade_pass: high_grade_pct <= grade_guideline_pct,
-    outlier_grade_pass: outlier_grade_pct <= grade_guideline_pct,
+    low_grade_pass: low_grade_pct <= grade_guideline_pct * (1 + 1e-9),
+    high_grade_pass: high_grade_pct <= grade_guideline_pct * (1 + 1e-9),
+    outlier_grade_pass: outlier_grade_pct <= grade_guideline_pct * (1 + 1e-9),
     governing_grade_pct: Math.max(low_grade_pct, high_grade_pct, outlier_grade_pct),
     longer_leveler_grade_pct, outlier_longer_grade_pct,
     longer_leveler_grade_pass: longer_leveler_grade_pct <= grade_guideline_pct,
@@ -664,10 +665,12 @@ export function computeOrderPickLaborStandard({ lines_per_order = 0, units_per_l
   const pfd_factor = 1 + pfd_allowance_pct / 100;
   const additional_units = units_per_line - 1;
   const handling_time_s = pick_time_s + additional_units * additional_unit_time_s;
-  const standardFor = (travel_s) => {
+  // Batch mode shares one setup across the batch: batch_size was validated and shown but unused, so the
+  // setup was still charged per order (batch 1, 4 and 40 read alike) until 2026-10-03.
+  const standardFor = (travel_s, setup_min) => {
     const time_per_line_s = travel_s + handling_time_s;
     const pick_time_total_s = lines_per_order * time_per_line_s;
-    const allowed_order_time_min = (pick_time_total_s / 60 + setup_time_min) * pfd_factor;
+    const allowed_order_time_min = (pick_time_total_s / 60 + setup_min) * pfd_factor;
     return {
       time_per_line_s, pick_time_total_s,
       pick_time_total_min: pick_time_total_s / 60,
@@ -677,8 +680,8 @@ export function computeOrderPickLaborStandard({ lines_per_order = 0, units_per_l
       travel_share_pct: 100 * travel_s / time_per_line_s,
     };
   };
-  const discrete = standardFor(travel_time_s);
-  const batch = standardFor(batch_travel_time_s);
+  const discrete = standardFor(travel_time_s, setup_time_min);
+  const batch = standardFor(batch_travel_time_s, setup_time_min / batch_size);
   return {
     handling_time_s,
     time_per_line_s: discrete.time_per_line_s,

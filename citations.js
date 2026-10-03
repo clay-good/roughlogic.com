@@ -25362,15 +25362,15 @@ export const CITATIONS = {
     ],
   },
   "sub-slab-suction-field": {
-    formula: "area per point = pi x the confirmed radius squared; points on area = slab area / that; points along the longest run = ceil(run / two radii); the LARGER of the two governs.",
+    formula: "area per point = pi x the confirmed radius squared; points on area = slab area / that; points by shape = the fewest points on a rectangular grid whose circles of the confirmed radius cover every corner of the slab (each cell's half-diagonal within the radius); the LARGER of the two governs.",
     edition: "A diagnostic communication test -- vacuum applied at a candidate point, a micromanometer read at test holes at increasing distances -- converted into a point count. The reach is MEASURED because nothing about it is calculable.",
     freeAccess: "Circle area and a spacing count on entered test readings.",
     governance: GOVERNANCE.general,
-    editionNote: "SHAPE GOVERNS MORE OFTEN THAN AREA, and a coverage figure alone hides it. The 1,600 sq ft slab in the source case needs 1 point on area -- a 25 ft radius covers 1,963 sq ft -- but 2 along an 80 ft run, and a compact 40 by 40 ft slab of identical area needs 1. On a tight sub-slab with a 6 ft field the same slab needs 15. Both checks are made here and the larger is reported, because designing on coverage alone under-counts every corridor-shaped building. THE SUB-SLAB MATERIAL DECIDES EVERYTHING and varies between ends of one house: clean gravel carries a field twenty-five or thirty feet, a slab on compacted fines gives a few. A BIGGER FAN DOES NOT FIX POOR COMMUNICATION -- it pulls harder on the same small area. And the test costs an hour BEFORE installation; the same finding after a failed post-mitigation measurement costs a second mobilisation and a second penetration.",
+    editionNote: "SHAPE GOVERNS MORE OFTEN THAN AREA, and a coverage figure alone hides it. The 1,600 sq ft slab in the source case needs 1 point on area -- a 25 ft radius covers 1,963 sq ft -- but 2 to cover an 80 by 20 ft run, and even a compact 40 by 40 ft slab of identical area needs 2, because one 25 ft circle at its center leaves the corners (28.3 ft out) uncovered. On a tight sub-slab with a 6 ft field the 80 by 20 slab needs 26, not the 15 its area alone suggests. Both checks are made here and the larger is reported, because designing on coverage alone under-counts every corridor-shaped building. THE SUB-SLAB MATERIAL DECIDES EVERYTHING and varies between ends of one house: clean gravel carries a field twenty-five or thirty feet, a slab on compacted fines gives a few. A BIGGER FAN DOES NOT FIX POOR COMMUNICATION -- it pulls harder on the same small area. And the test costs an hour BEFORE installation; the same finding after a failed post-mitigation measurement costs a second mobilisation and a second penetration.",
     assumptions: [
       { name: "The confirmed radius is the design input", value: "not the distance at which vacuum was absent", source: "the communication test" },
       { name: "Circular field assumed", value: "footings and slab joints compartmentalise it in reality", source: "the mitigation professional" },
-      { name: "Points spaced two radii apart", value: "the standard non-overlapping spacing", source: "sub-slab depressurisation practice" },
+      { name: "Grid coverage", value: "points on a rectangular grid, each cell within one radius of its point at the corners (a 1.41-radius square cell), so the whole slab is inside some field -- not circles spaced two radii apart, which leaves the gaps between them", source: "sub-slab depressurisation practice" },
     ],
   },
   "acid-waste-neutralization": {

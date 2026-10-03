@@ -2,7 +2,7 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "92ca3a3428e9b24e",
+      "sha": "2ed7df5ae90dd6f5",
       "date": "2026-10-03"
     },
     "/tools/": {
@@ -5054,8 +5054,8 @@
       "date": "2026-09-29"
     },
     "/tools/order-pick-labor-standard/": {
-      "sha": "3e7133d1e5af6106",
-      "date": "2026-09-29"
+      "sha": "aeeacdf6faaefe82",
+      "date": "2026-10-03"
     },
     "/tools/orifice-diameter-for-flow/": {
       "sha": "2c66426dbb5cd8de",
@@ -7718,8 +7718,8 @@
       "date": "2026-10-01"
     },
     "/tools/sub-slab-suction-field/": {
-      "sha": "72f758d5ba58b177",
-      "date": "2026-09-29"
+      "sha": "b783b84e6c352e3e",
+      "date": "2026-10-03"
     },
     "/tools/subgrade-cbr-thickness/": {
       "sha": "50cf1593ddb7c7f3",

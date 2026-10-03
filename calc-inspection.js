@@ -125,7 +125,8 @@ export function computeWeldVisualAcceptance({
   const allowed_undersize_length_in = weld_length_in * allowed_undersize_fraction;
   const has_size_allowance = allowed_undersize_in > 0;
   const size_within = has_size_allowance && undersize_in <= allowed_undersize_in;
-  const length_within = undersize_length_in <= allowed_undersize_length_in;
+  // D1.1 "shall not exceed 10%": 0.7 x 0.10 is 0.06999999999999999, so a 0.07 in undersize REJECTED.
+  const length_within = undersize_length_in <= allowed_undersize_length_in * (1 + 1e-9);
   const undersize_ok = !is_undersize || (size_within && length_within);
   const size_verdict = !is_undersize
     ? "the weld measures " + fmt(measured_leg_in, 4) + " in against a " + fmt(nominal_leg_in, 4) + " in nominal leg, at or over size"
@@ -315,7 +316,8 @@ export function computeRtExposureTime({
     : "geometric unsharpness is " + fmt(ug_base_in, 5) + " in at " + fmt(base_distance_in, 1) + " in"
       + (has_new ? " and " + fmt(ug_new_in, 5) + " in at " + fmt(new_distance_in, 1) + (ug_new_in <= ug_base_in ? " -- a " + fmt((1 - ug_new_in / ug_base_in) * 100, 0) + "% reduction bought with " + fmt(distance_ratio * distance_ratio, 2) + "x the exposure" : " -- a " + fmt((ug_new_in / ug_base_in - 1) * 100, 0) + "% increase in unsharpness for " + fmt(distance_ratio * distance_ratio, 2) + "x the exposure") : "");
   const has_limit = unsharpness_limit_in > 0 && has_geometry;
-  const base_passes = has_limit && ug_base_in <= unsharpness_limit_in;
+  // ASME V "shall not exceed": 0.1 x 1.5 / 7.5 is 0.020000000000000004 and failed a 0.020 in limit.
+  const base_passes = has_limit && ug_base_in <= unsharpness_limit_in * (1 + 1e-9);
   // The distance the limit actually requires -- the number that decides the shot.
   // F d / Ug is the source-to-OBJECT distance; the film sits a thickness
   // further on. Until 2026-10-01 this omitted the thickness, so the "minimum"

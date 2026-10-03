@@ -51660,7 +51660,9 @@ test("bounds: spec-v1588 computeStepDrawdownEfficiency -- efficiency depends on 
   assert.ok(Math.abs(r.efficiency_change_pts + 21.5) < 0.01);
   // Two steps at the same rate plus a third still determine the line, so that
   // is not degenerate. ALL steps at one rate is.
-  assert.ok(!_v1588({ ...base, q2_gpm: 300 }).error);
+  assert.ok(!_v1588({ ...base, q2_gpm: 300, s2_ft: 12 }).error);
+  // A negative fitted well loss (s/Q falling with rate) is not physical and errors.
+  assert.ok(_v1588({ ...base, q1_gpm: 100, s1_ft: 12, q2_gpm: 200, s2_ft: 22, q3_gpm: 300, s3_ft: 31, operating_gpm: 300 }).error);
   assert.ok(_v1588({ ...base, q1_gpm: 900, s1_ft: 48, q2_gpm: 900, s2_ft: 48, q3_gpm: 900, s3_ft: 48 }).error);
   assert.ok(_v1588({ ...base, q2_gpm: 0, q3_gpm: 0 }).error);
 });
@@ -54591,8 +54593,10 @@ test("bounds: spec-v1817 computeOrderPickLaborStandard -- the gain comes out of 
   assert.ok(Math.abs(r.units_per_hour - r.lines_per_hour * 2.5) < 1e-9);
   // Travel is over half the picking time and none of it touches a carton.
   assert.ok(Math.abs(r.travel_share_pct - 100 * 18 / 34.5) < 1e-9);
-  assert.ok(Math.abs(r.batch_lines_per_hour - 113.83399209486166) < 1e-9);
-  assert.ok(Math.abs(r.batch_improvement_pct - 40) < 1e-9);
+  assert.ok(Math.abs(r.batch_lines_per_hour - 120 / ((47 + 8 / 4) * 1.15) * 60) < 1e-9); // one setup per batch of 4
+  assert.ok(Math.abs(r.batch_improvement_pct - 57.142857142857) < 1e-6);
+  // batch_size is used: a batch of 1 charges the full setup (40% from travel alone).
+  assert.ok(Math.abs(_v1817({ ...base, batch_size: 1 }).batch_improvement_pct - 40) < 1e-9);
   // Only the travel element changes under batching; the handling does not.
   assert.ok(Math.abs(r.time_per_line_s - r.batch_time_per_line_s - (18 - 7)) < 1e-12);
   // Batching cannot make travel worse than the discrete order it replaces.

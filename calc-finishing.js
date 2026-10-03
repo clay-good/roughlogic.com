@@ -268,7 +268,8 @@ export function computePhosphateCoatingWeight({ panel_length_in = 0, panel_width
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(panel_length_in > 0)) return { error: "Panel length must be positive (in)." };
   if (!(panel_width_in > 0)) return { error: "Panel width must be positive (in)." };
-  const faces = Math.round(faces_coated);
+  if (!Number.isInteger(Number(faces_coated))) return { error: "Faces coated must be 1 or 2." };
+  const faces = Number(faces_coated);
   if (!(faces === 1 || faces === 2)) return { error: "Faces coated must be 1 or 2." };
   if (!(mass_before_g > 0)) return { error: "Mass before stripping must be positive (g)." };
   if (!(mass_after_g > 0)) return { error: "Mass after stripping must be positive (g)." };

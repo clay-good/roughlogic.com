@@ -2305,6 +2305,9 @@ export function computeStepDrawdownEfficiency({
   const c_ft_per_gpm2 = (n * sxy - sx * sy) / denom;
   const b_ft_per_gpm = (sy - c_ft_per_gpm2 * sx) / n;
   if (!(b_ft_per_gpm > 0)) return { error: "The fitted aquifer loss coefficient is not positive -- check the step drawdowns, which must rise with rate." };
+  // A negative well-loss coefficient (specific drawdown FALLING with rate) is not physical: it reported
+  // a 124% efficient well with "-7.5 ft" of recoverable loss until 2026-10-03.
+  if (!(c_ft_per_gpm2 >= -1e-9 * b_ft_per_gpm)) return { error: "The fitted well-loss coefficient is negative -- the specific drawdown s/Q must not fall as the rate rises; check the steps (or the well developed during the test)." };
   const aquifer_loss_ft = b_ft_per_gpm * operating_gpm;
   const well_loss_ft = c_ft_per_gpm2 * operating_gpm * operating_gpm;
   const total_drawdown_ft = aquifer_loss_ft + well_loss_ft;

@@ -225,7 +225,8 @@ export function computeTrendLogStorage({ point_count = 0, interval_min = 0, rete
   if (!(interval_min > 0)) return { error: "Sample interval must be positive (min)." };
   if (!(retention_years > 0)) return { error: "Retention period must be positive (years)." };
   if (!(bytes_per_sample > 0)) return { error: "Bytes per sample must be positive." };
-  if (!(controller_buffer_samples > 0)) return { error: "Controller buffer depth must be positive (samples)." };
+  // The buffer only matters when a controller is entered ("0 to skip" used to error on a blank buffer).
+  if (controller_points > 0 && !(controller_buffer_samples > 0)) return { error: "Controller buffer depth must be positive (samples)." };
   const samples_per_point_year = (60 / interval_min) * 24 * 365;
   const total_samples = point_count * samples_per_point_year * retention_years;
   const storage_gb = total_samples * bytes_per_sample / 1e9;
