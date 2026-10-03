@@ -190,12 +190,15 @@ test("spec-v1341 provenance: a shared link never claims its recipient typed it",
 // sign which one. The card asks for it in words, names its unit, and shows a
 // receipt of what is already in so the work does not look lost.
 
-const ASK_QUERY = "asphalt tonnage 2400 sq ft 3 in deep 12 ft wide";
+// The query must leave a required field with NO default blank. Asphalt tonnage
+// served here until 2026-10-01, when its mix density gained the 145 pcf default
+// its compute already used -- and a prefilled box is not a missing one.
+const ASK_QUERY = "voltage drop 120 v 150 ft 12 awg copper";
 
 test("spec-v1342 ask card: asks for the missing value, naming its unit", async ({ page }) => {
   await page.goto("/");
   const input = page.locator("#search-input");
-  const ranked = awaitSearchData(page, "aliases-e.json");
+  const ranked = awaitSearchData(page, "aliases-a.json");
   await input.click();
   await input.fill(ASK_QUERY);
   await ranked;
@@ -203,15 +206,15 @@ test("spec-v1342 ask card: asks for the missing value, naming its unit", async (
   // shard: `ranked` resolving means the response landed, not that the ranker
   // has re-run and repainted, and on a loaded runner those are seconds apart.
   await expect(page.locator("#search-results .search-result").first().locator(".sr-name"))
-    .toHaveText("Asphalt Tonnage", { timeout: 30_000 });
+    .toHaveText("Voltage Drop", { timeout: 30_000 });
   await input.press("Enter");
 
   const card = page.locator(".ask-card");
   await expect(card).toBeVisible();
-  // The unit matters: "What is the mix density?" is unanswerable beside a box
-  // measured in pcf.
-  await expect(card.locator(".ask-q")).toHaveText("What is the mix density in pcf?");
-  await expect(card.locator(".ask-receipt")).toContainText("paved area 2400");
+  // The unit matters: "What is the current?" is unanswerable without saying
+  // the box is in amperes.
+  await expect(card.locator(".ask-q")).toHaveText("What is the current in A?");
+  await expect(card.locator(".ask-receipt")).toContainText("length one-way 150");
 
   // A tile that reads a blank required field as zero renders a confident
   // answer that looks exactly like a real one. It stays hidden while asking.
@@ -226,7 +229,7 @@ test("spec-v1342 ask card: asks for the missing value, naming its unit", async (
 test("spec-v1342 ask card: answering it computes and dismisses", async ({ page }) => {
   await page.goto("/");
   const input = page.locator("#search-input");
-  const ranked = awaitSearchData(page, "aliases-e.json");
+  const ranked = awaitSearchData(page, "aliases-a.json");
   await input.click();
   await input.fill(ASK_QUERY);
   await ranked;
@@ -237,19 +240,19 @@ test("spec-v1342 ask card: answering it computes and dismisses", async ({ page }
     // pointer from freezing the list: the ranking now re-renders when the late
     // alias shards land, which is correct, and correct takes longer than a
     // frozen first paint. The assertion is unchanged.
-    .toHaveText("Asphalt Tonnage", { timeout: 30_000 });
+    .toHaveText("Voltage Drop", { timeout: 30_000 });
   await input.press("Enter");
 
   const card = page.locator(".ask-card");
   await expect(card).toBeVisible();
-  await card.locator("input").fill("145");
+  await card.locator("input").fill("20");
   await card.locator(".ask-go").click();
 
   await expect(card).toHaveCount(0);
-  await expect(page.locator("#density_pcf")).toHaveValue("145");
+  await expect(page.locator("#vd-cur")).toHaveValue("20");
   const answer = page.locator(".output-region");
   await expect(answer).toBeVisible();
-  await expect(answer).toContainText("43.5");
+  await expect(answer).toContainText("11.85");
   expect(await answer.textContent()).not.toMatch(/NaN|Infinity|undefined/);
 });
 
@@ -258,16 +261,16 @@ test("spec-v1342 ask card: it is a shortcut, never a gate", async ({ page }) => 
   // stays interactive underneath the card the entire time.
   await page.goto("/");
   const input = page.locator("#search-input");
-  const ranked = awaitSearchData(page, "aliases-e.json");
+  const ranked = awaitSearchData(page, "aliases-a.json");
   await input.click();
   await input.fill(ASK_QUERY);
   await ranked;
   await expect(page.locator("#search-results .search-result").first().locator(".sr-name"))
-    .toHaveText("Asphalt Tonnage", { timeout: 30_000 });
+    .toHaveText("Voltage Drop", { timeout: 30_000 });
   await input.press("Enter");
   await expect(page.locator(".ask-card")).toBeVisible({ timeout: 30_000 });
 
-  await page.locator("#density_pcf").fill("150");
+  await page.locator("#vd-cur").fill("15");
   await expect(page.locator(".ask-card")).toHaveCount(0);
   await expect(page.locator(".output-region")).toBeVisible();
 });
