@@ -379,9 +379,11 @@ function renderThermistorSteinhartHart(inputRegion, outputRegion, citationEl) {
   const update = debounce(() => {
     const r = computeThermistorSteinhartHart({
       resistance_ohms: rm.input.value === "" ? 10000 : Number(rm.input.value),
-      coeff_a: a.input.value === "" ? 0 : Number(a.input.value),
-      coeff_b: b.input.value === "" ? 0 : Number(b.input.value),
-      coeff_c: c.input.value === "" ? 0 : Number(c.input.value),
+      coeff_a: a.input.value === "" ? 0.001125308852122 : Number(a.input.value),
+      coeff_b: b.input.value === "" ? 0.000234711863267 : Number(b.input.value),
+      // Blank C means the two-constant form (C = 0) once A and B are your own; all three
+      // blank uses the bundled 10k NTC set.
+      coeff_c: c.input.value === "" ? (a.input.value === "" && b.input.value === "" ? 0.000000085663516 : 0) : Number(c.input.value),
     });
     if (r.error) { oC.textContent = r.error; oF.textContent = "-"; oNote.textContent = ""; return; }
     oC.textContent = fmt(r.temperature_c, 2) + " C";

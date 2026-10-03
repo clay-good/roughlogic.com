@@ -1258,8 +1258,8 @@ function _v844renderHaulRoadResistance(inputRegion, outputRegion, citationEl) {
   const update = debounce(() => {
     const r = computeHaulRoadResistance({
       gvw_lb: g.input.value === "" ? 150000 : Number(g.input.value),
-      grade_pct: gr.input.value === "" ? 0 : Number(gr.input.value),
-      rolling_resistance_pct: rr.input.value === "" ? 0 : Number(rr.input.value),
+      grade_pct: gr.input.value === "" ? 5 : Number(gr.input.value),
+      rolling_resistance_pct: rr.input.value === "" ? 4 : Number(rr.input.value),
     });
     if (r.error) { oRimpull.textContent = r.error; oTotal.textContent = "-"; return; }
     oRimpull.textContent = fmt(r.required_rimpull_lb, 0) + " lb (" + fmt(r.rimpull_per_ton_lb, 0) + " lb/ton)" + (r.required_rimpull_lb < 0 ? " - downhill, on the retarder" : "");
@@ -1361,7 +1361,7 @@ function _v846renderUnitCostEarthwork(inputRegion, outputRegion, citationEl) {
   const oTotal = makeOutputLine(outputRegion, "Total cost for the quantity", "uce-out-total");
   const update = debounce(() => {
     const r = computeUnitCostEarthwork({
-      equipment_rate_per_hr: eq.input.value === "" ? 0 : Number(eq.input.value), operator_rate_per_hr: op.input.value === "" ? 0 : Number(op.input.value),
+      equipment_rate_per_hr: eq.input.value === "" ? 150 : Number(eq.input.value), operator_rate_per_hr: op.input.value === "" ? 65 : Number(op.input.value),
       support_rate_per_hr: su.input.value === "" ? 0 : Number(su.input.value), production_cy_per_hr: pr.input.value === "" ? 656 : Number(pr.input.value),
       total_cy: tc.input.value === "" ? 0 : Number(tc.input.value),
     });

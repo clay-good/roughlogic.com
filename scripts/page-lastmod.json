@@ -2,7 +2,7 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "11735b13df5f821f",
+      "sha": "733f32cdfa9b29e2",
       "date": "2026-10-03"
     },
     "/tools/": {
@@ -5990,7 +5990,7 @@
       "date": "2026-09-29"
     },
     "/tools/rainwater-catchment-area/": {
-      "sha": "389f336918fa63fe",
+      "sha": "722ec6574e8a3eab",
       "date": "2026-10-03"
     },
     "/tools/rainwater-yield/": {

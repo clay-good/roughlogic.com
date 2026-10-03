@@ -165,8 +165,8 @@ function _v857renderPipeInsulationTakeoff(inputRegion, outputRegion, citationEl)
   const oJacket = makeOutputLine(outputRegion, "Jacket area", "pit-out-jacket");
   const update = debounce(() => {
     const r = computePipeInsulationTakeoff({
-      pipe_ft: p.input.value === "" ? 250 : Number(p.input.value), waste_pct: w.input.value === "" ? 0 : Number(w.input.value),
-      num_fittings: nf.input.value === "" ? 0 : Number(nf.input.value), fitting_allow_ft: fa.input.value === "" ? 1 : Number(fa.input.value),
+      pipe_ft: p.input.value === "" ? 250 : Number(p.input.value), waste_pct: w.input.value === "" ? 5 : Number(w.input.value),
+      num_fittings: nf.input.value === "" ? 12 : Number(nf.input.value), fitting_allow_ft: fa.input.value === "" ? 1 : Number(fa.input.value),
       section_len_ft: sl.input.value === "" ? 3 : Number(sl.input.value), insul_od_in: od.input.value === "" ? 4.5 : Number(od.input.value),
     });
     if (r.error) { oSections.textContent = r.error; oJacket.textContent = "-"; return; }
@@ -230,8 +230,8 @@ function _v858renderHeatTraceSizing(inputRegion, outputRegion, citationEl) {
   const oCircuit = makeOutputLine(outputRegion, "Circuit load", "hts-out-circuit");
   const update = debounce(() => {
     const r = computeHeatTraceSizing({
-      pipe_ft: p.input.value === "" ? 150 : Number(p.input.value), allowance_pct: al.input.value === "" ? 0 : Number(al.input.value),
-      num_valves: nv.input.value === "" ? 0 : Number(nv.input.value), valve_allow_ft: va.input.value === "" ? 3 : Number(va.input.value),
+      pipe_ft: p.input.value === "" ? 150 : Number(p.input.value), allowance_pct: al.input.value === "" ? 10 : Number(al.input.value),
+      num_valves: nv.input.value === "" ? 1 : Number(nv.input.value), valve_allow_ft: va.input.value === "" ? 3 : Number(va.input.value),
       rated_w_per_ft: wf.input.value === "" ? 5 : Number(wf.input.value), voltage: v.input.value === "" ? 120 : Number(v.input.value),
       breaker_a: br.input.value === "" ? 20 : Number(br.input.value), start_factor: sf.input.value === "" ? 3 : Number(sf.input.value),
     });

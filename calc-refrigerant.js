@@ -1188,7 +1188,7 @@ function _v861renderRefrigerantLinesetChargeAdjust(inputRegion, outputRegion, ci
   const oOz = makeOutputLine(outputRegion, "Refrigerant to add", "rlc-out-oz");
   const update = debounce(() => {
     const r = computeRefrigerantLinesetChargeAdjust({
-      lineset_length_ft: ll.input.value === "" ? 60 : Number(ll.input.value), factory_charge_length_ft: fl.input.value === "" ? 0 : Number(fl.input.value),
+      lineset_length_ft: ll.input.value === "" ? 60 : Number(ll.input.value), factory_charge_length_ft: fl.input.value === "" ? 15 : Number(fl.input.value),
       rate_oz_per_ft: rt.input.value === "" ? 0.6 : Number(rt.input.value),
     });
     if (r.error) { oOz.textContent = r.error; return; }

@@ -1051,7 +1051,7 @@ function _v855renderLvCablePullFootage(inputRegion, outputRegion, citationEl) {
   const update = debounce(() => {
     const r = computeLvCablePullFootage({
       drops: d.input.value === "" ? 48 : Number(d.input.value), avg_run_ft: ar.input.value === "" ? 120 : Number(ar.input.value),
-      slack_ft: sl.input.value === "" ? 0 : Number(sl.input.value), box_ft: bx.input.value === "" ? 1000 : Number(bx.input.value),
+      slack_ft: sl.input.value === "" ? 15 : Number(sl.input.value), box_ft: bx.input.value === "" ? 1000 : Number(bx.input.value),
     });
     if (r.error) { oTotal.textContent = r.error; oBoxes.textContent = "-"; return; }
     oTotal.textContent = fmt(r.total_ft, 0) + " ft";

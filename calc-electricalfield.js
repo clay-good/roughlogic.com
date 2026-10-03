@@ -58,7 +58,7 @@ function _v849renderCableReelCapacity(inputRegion, outputRegion, citationEl) {
   const oLen = makeOutputLine(outputRegion, "Cable that fits on the reel", "crc-out-len");
   const update = debounce(() => {
     const r = computeCableReelCapacity({
-      flange_dia_in: fl.input.value === "" ? 30 : Number(fl.input.value), drum_dia_in: dr.input.value === "" ? 0 : Number(dr.input.value),
+      flange_dia_in: fl.input.value === "" ? 30 : Number(fl.input.value), drum_dia_in: dr.input.value === "" ? 12 : Number(dr.input.value),
       traverse_width_in: tw.input.value === "" ? 18 : Number(tw.input.value), cable_od_in: od.input.value === "" ? 1 : Number(od.input.value),
       fill_factor: ff.input.value === "" ? 0.9 : Number(ff.input.value),
     });
@@ -145,7 +145,7 @@ function _v854renderBranchCircuitWireFootage(inputRegion, outputRegion, citation
   const update = debounce(() => {
     const r = computeBranchCircuitWireFootage({
       circuits: c.input.value === "" ? 20 : Number(c.input.value), avg_homerun_ft: hr.input.value === "" ? 45 : Number(hr.input.value),
-      makeup_ft: mu.input.value === "" ? 0 : Number(mu.input.value), conductors_per_circuit: cp.input.value === "" ? 3 : Number(cp.input.value),
+      makeup_ft: mu.input.value === "" ? 15 : Number(mu.input.value), conductors_per_circuit: cp.input.value === "" ? 3 : Number(cp.input.value),
       roll_ft: rf.input.value === "" ? 1000 : Number(rf.input.value),
     });
     if (r.error) { oTotal.textContent = r.error; oRolls.textContent = "-"; return; }

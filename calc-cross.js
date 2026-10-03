@@ -1735,7 +1735,7 @@ function renderRainwaterYield(inputRegion, outputRegion, citationEl) {
     update();
   }
   const update = _debG(() => {
-    const r = computeRainwaterYield({ catchment_ft2: Number(a.input.value) || 0, efficiency: Number(e.input.value) || 0.62, annual_in: Number(an.input.value) || 0 });
+    const r = computeRainwaterYield({ catchment_ft2: Number(a.input.value) || 0, efficiency: Number(e.input.value) || 0.85, annual_in: Number(an.input.value) || 0 });
     if (r.error) { oA.textContent = r.error; return; }
     oA.textContent = _fmtG(r.annual_gal, 0) + " gal";
   }, _DG);
@@ -1743,7 +1743,7 @@ function renderRainwaterYield(inputRegion, outputRegion, citationEl) {
 }
 
 function renderRainwaterCatchmentArea(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: public engineering form solved for area: area = target_gal / (annual_in * 0.6233 * efficiency), from gallons = area * rainfall * 0.6233 * efficiency. Default efficiency 0.62 for sloped roofs. A planning estimate; local rainfall, storage, and demand govern.";
+  citationEl.textContent = "Citation: public engineering form solved for area: area = target_gal / (annual_in * 0.6233 * efficiency), from gallons = area * rainfall * 0.6233 * efficiency. Default collection efficiency 0.85 (TWDB Rainwater Harvesting Manual: installers assume 75-90%). A planning estimate; local rainfall, storage, and demand govern.";
   _aeG(inputRegion, () => { g.input.value = "15895"; an.input.value = "30"; e.input.value = "0.85"; update(); });
   const g = _mnG("Target annual harvest (gal)", "rwca-g", { step: "any", min: "0" });
   const an = _mnG("Annual rainfall (in)", "rwca-an", { step: "any", min: "0" });
@@ -1753,7 +1753,7 @@ function renderRainwaterCatchmentArea(inputRegion, outputRegion, citationEl) {
   const oA = _moG(outputRegion, "Catchment area needed", "rwca-out-a");
   const oN = _moG(outputRegion, "Note", "rwca-out-n");
   const update = _debG(() => {
-    const r = computeRainwaterCatchmentArea({ target_annual_gal: Number(g.input.value) || 0, annual_in: Number(an.input.value) || 0, efficiency: e.input.value === "" ? 0.62 : Number(e.input.value) });
+    const r = computeRainwaterCatchmentArea({ target_annual_gal: Number(g.input.value) || 0, annual_in: Number(an.input.value) || 0, efficiency: e.input.value === "" ? 0.85 : Number(e.input.value) });
     if (r.error) { oA.textContent = r.error; oN.textContent = ""; return; }
     oA.textContent = _fmtG(r.catchment_ft2, 0) + " ft^2";
     oN.textContent = r.note;

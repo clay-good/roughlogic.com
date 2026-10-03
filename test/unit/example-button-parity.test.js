@@ -14,7 +14,7 @@
 // field the example does not use (another mode, a unit-converted twin, a list).
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { readFileSync, readdirSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, resolve } from "node:path";
 import { COMPUTE_MAP, importCalc } from "../fixtures/compute-map.js";
@@ -76,5 +76,36 @@ test("every inline example button types only the example's values or the compute
     if (stray.length) bad.push(`${id}: button types ${JSON.stringify(stray)} not in ${key}`);
   }
   assert.ok(checked > 600, `only ${checked} inline buttons were checked; the renderer-map scan broke`);
+  assert.deepEqual(bad, []);
+});
+
+// The same drift in a renderer's blank-field fallback (`key: f.input.value === ""
+// ? N : ...`): a reader who leaves an optional field blank should get the compute's
+// documented default. 2026-10-03: 14 fallbacks typed 0 where the compute defaults
+// to 5% grade, a 12 in drum, 15 ft of makeup, 5% waste... and rainwater catchment
+// fell back to 0.62 (the gal/in-ft^2 constant misread as an efficiency).
+const FALLBACK_REVIEWED = new Map([
+  ["calc-hvacservice.js:air_temp_f", "a measurement; 70 F room air, as the example"],
+  ["calc-instrumentation.js:flow_high", "the transmitter range, 500 as the example"],
+  ["calc-instrumentation.js:resistance_ohms", "a measurement, 20,000 as the example"],
+  ["calc-lab.js:temperature_c", "the renderers call computeVanDerWaals (a measured temperature) and computeOsmolarity (37 C), not Nernst"],
+]);
+
+test("a blank optional field falls back to the compute's own default", () => {
+  const bad = [];
+  for (const f of readdirSync(ROOT).filter((x) => /^calc-.*\.js$/.test(x))) {
+    const src = readFileSync(resolve(ROOT, f), "utf8");
+    const sigs = [...src.matchAll(/export function (compute\w+)\(\{([^}]*)\}/g)].map((m) => ({
+      fn: m[1], at: m.index,
+      defs: Object.fromEntries([...m[2].matchAll(/(\w+)\s*=\s*(-?[\d.]+)/g)].map((d) => [d[1], Number(d[2])])),
+    }));
+    for (const m of src.matchAll(/(\w+):\s*\w+\.input\.value\s*===\s*""\s*\?\s*(-?[\d.]+)\s*:/g)) {
+      const [, key, fb] = m;
+      if (FALLBACK_REVIEWED.has(f + ":" + key)) continue;
+      const before = sigs.filter((s) => key in s.defs && s.at < m.index);
+      const s = before[before.length - 1] || sigs.find((x) => key in x.defs);
+      if (s && Math.abs(s.defs[key] - Number(fb)) > 1e-9) bad.push(`${f}:${src.slice(0, m.index).split("\n").length} ${key} blank -> ${fb}, ${s.fn} default ${s.defs[key]}`);
+    }
+  }
   assert.deepEqual(bad, []);
 });
