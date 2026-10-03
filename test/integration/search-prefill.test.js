@@ -658,7 +658,8 @@ test("spec-v590: a failed alias fetch is retried on the next keystroke", async (
   await page.goto("/");
   const input = page.locator("#search-input");
   await input.click();
-  await input.fill(ASK_QUERY);
+  // Its own query: this test shared ASK_QUERY until the ask card moved to voltage drop.
+  await input.fill("asphalt tonnage 2400 sq ft 3 in deep 12 ft wide");
 
   // This used to assert the degraded ranking does NOT lead with Asphalt Tonnage,
   // which was true and is no longer: with no aliases at all the ranker used to
