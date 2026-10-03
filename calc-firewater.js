@@ -265,7 +265,7 @@ export function computeVacuumLiftReading({ vacuum_inhg = 0, site_elevation_ft = 
   const attainable_ceiling_ft = factor * theoretical_ceiling_ft;
   const margin_ft = attainable_ceiling_ft - suction_head_ft;
   const pct_of_attainable = attainable_ceiling_ft > 0 ? suction_head_ft / attainable_ceiling_ft * 100 : null;
-  const over_ceiling = margin_ft < 0;
+  const over_ceiling = margin_ft < -1e-9;
   const near_ceiling = !over_ceiling && pct_of_attainable !== null && pct_of_attainable >= 90;
   return {
     suction_head_ft, theoretical_ceiling_ft, attainable_ceiling_ft, margin_ft, pct_of_attainable, over_ceiling, near_ceiling,
@@ -465,7 +465,7 @@ export function computeFoamEductorLimit({ inlet_pressure_psi = 0, eductor_flow_g
   const max_back_pressure_psi = 0.65 * inlet;
   const fl_per_100_psi = C * Math.pow(Q / 100, 2);
   const friction_budget = max_back_pressure_psi - nozzle - 0.434 * elev;
-  const max_length_ft = friction_budget > 0 ? friction_budget / fl_per_100_psi * 100 : 0;
+  const max_length_ft = friction_budget > 1e-9 ? friction_budget / fl_per_100_psi * 100 : 0;
   const proportions = max_length_ft > 0;
   return {
     max_back_pressure_psi, fl_per_100_psi, max_length_ft, proportions,

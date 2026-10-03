@@ -486,7 +486,7 @@ export function computeLabContainmentPressure({
   const has_supply = supply_cfm > 0;
   const offset_cfm = has_supply ? total_exhaust_cfm - supply_cfm : 0;
   const offset_pct = has_supply && total_exhaust_cfm > 0 ? offset_cfm / total_exhaust_cfm * 100 : 0;
-  const negative = has_supply && offset_cfm > 0;
+  const negative = has_supply && offset_cfm > 1e-9;
   const offset_verdict = !has_supply
     ? "(no supply airflow entered -- and the OFFSET is what holds the pressure relationship)"
     : negative

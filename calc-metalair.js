@@ -419,7 +419,7 @@ export function computeDuctStaticRegain({ upstream_velocity_fpm = 2000, downstre
     vp_upstream_inwc,
     vp_downstream_inwc,
     static_regain_inwc,
-    is_loss: static_regain_inwc < 0,
+    is_loss: static_regain_inwc < -1e-9,
     note: "The static pressure a duct RECOVERS when the air slows down at a size increase -- the basis of the static-regain duct-design method. Velocity pressure is VP = (V/4005)^2 in inches of water for standard air (the 4005 is the sea-level, 0.075 lb/ft^3 velocity-pressure constant), and when a larger downstream duct drops the velocity, part of that lost velocity pressure converts back to STATIC pressure: static regain = R x (VP_upstream - VP_downstream), with a recovery factor R commonly 0.75 (about 0.5 to 0.9 depending on the fitting quality and the transition angle). Dropping from 2,000 to 1,500 fpm (VP 0.249 to 0.140 in) at R = 0.75 regains about 0.082 in w.c. -- pressure the next run does not need the fan to provide. The static-regain method sizes each downstream section so its regain offsets its friction loss, holding static pressure nearly constant along the trunk. If the velocity INCREASES (a smaller downstream duct), the result is negative -- a static LOSS, not a regain (flagged). The 4005 constant assumes standard air, so altitude and temperature shift it; the recovery factor depends on the actual fitting, and SMACNA / ASHRAE and the engineer of record govern the design.",
   };
 }
@@ -497,7 +497,7 @@ export function computeSquareToRoundDevelopment({ square_side_in = 0, round_diam
   const plan_fan_edge_distance_in = Math.max(Math.hypot(corner_x - radius, corner_y), Math.hypot(corner_x, corner_y - radius));
   const fan_edge_true_length_in = trueLength(plan_fan_edge_distance_in);
   const longest_true_length_in = Math.max(corner_true_length_in, midpoint_true_length_in, fan_edge_true_length_in);
-  const understatement_pct = plan_corner_distance_in > 0 ? (corner_true_length_in / plan_corner_distance_in - 1) * 100 : null;
+  const understatement_pct = plan_corner_distance_in > 1e-9 ? (corner_true_length_in / plan_corner_distance_in - 1) * 100 : null;
   // The check that costs a sheet rather than a fitting: the developed curved
   // edge is the sum of the chords across each element, and it must come back
   // to the circle's circumference. Too few elements and it lands short.

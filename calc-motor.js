@@ -94,7 +94,7 @@ export function computeMotorPoleIdentification({ rated_rpm = 0, line_freq_hz = 6
   const sync_rpm = (120 * line_freq_hz) / poles;
   const slip = (sync_rpm - rated_rpm) / sync_rpm;
   const slip_pct = slip * 100;
-  const at_or_above_sync = slip <= 0;
+  const at_or_above_sync = slip <= 1e-9;
   return {
     poles, sync_rpm, slip, slip_pct, at_or_above_sync,
     note: "Identify an induction motor's pole count from the nameplate full-load speed and the line frequency, the inverse of the synchronous-speed relation Ns = 120 x f / P. The synchronous speed sits just above the running speed, so the pole count is the nearest even integer: pole-pairs = round(60 x f / rpm), poles = 2 x pole-pairs, then Ns = 120 x f / poles and slip = (Ns - rpm)/Ns. A 1750 rpm 60 Hz motor is a 4-pole machine (Ns 1800, 2.78% slip); 1150 rpm is 6-pole, 3450 rpm is 2-pole. If the entered speed is at or above the identified synchronous speed the slip is zero or negative, which an induction-motor nameplate never shows - recheck the rpm or frequency. The nameplate and the manufacturer govern.",

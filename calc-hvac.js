@@ -3272,7 +3272,7 @@ export function computeFixedOrificeTargetSuperheat({ indoor_wetbulb_f = 0, outdo
   if (!Number.isFinite(odt)) return { error: "Outdoor dry-bulb temperature must be a number (F)." };
   const target_superheat_f = (3 * idwb - 80 - odt) / 2;
   const low_ambient = odt < 55;
-  const out_of_range = target_superheat_f <= 0;
+  const out_of_range = target_superheat_f <= 1e-9;
   if (!Number.isFinite(target_superheat_f)) return { error: "Target-superheat math is not a finite value." };
   return {
     target_superheat_f, low_ambient, out_of_range,
@@ -4131,7 +4131,7 @@ export function computeWallCondensationGradient({ r_inside = 0, r_outside = 0, t
   const dew_c = (b * gamma) / (a - gamma);
   const t_dew_f = dew_c * 1.8 + 32;
   const margin_f = t_plane_f - t_dew_f;
-  const condensing = margin_f <= 0;
+  const condensing = margin_f <= 1e-9;
   return {
     t_plane_f, t_dew_f, margin_f, condensing,
     note: "One-dimensional steady-state wall condensation screen: temperature drops across an assembly in proportion to R-value, so the interface temperature is T_plane = T_in - (R_inside/R_total)(T_in - T_out), and condensation forms wherever that plane sits at or below the interior air's Magnus dew point. Warming the plane - by adding continuous exterior insulation, which raises R_outside and shifts the ratio - keeps the structural sheathing above the dew point, the whole point of the ratio rule. This is a 1-D steady-state gradient (no thermal bridging, air movement, or vapor-diffusion/transient moisture accumulation, which a Glaser or hygrothermal model adds), uses the interior air's dew point moderated by any vapor retarder, and is a screen. A building-science aid, not a substitute for a hygrothermal (WUFI-type) analysis; the assembly's vapor control governs.",
@@ -4654,7 +4654,7 @@ export function computeEconomicInsulationThickness({ delta_t_f = 0, bare_r_value
   const annual_savings = bare_annual_cost - total_annual_cost;
   const first_cost = price * optimum_thickness_in;
   const energy_saved_annual = bare_annual_cost - annual_energy_cost;
-  const simple_payback_years = energy_saved_annual > 0 ? first_cost / energy_saved_annual : null;
+  const simple_payback_years = energy_saved_annual > 1e-9 ? first_cost / energy_saved_annual : null;
   const heat_loss_reduction_pct = (1 - q_optimum / q_bare) * 100;
   if (![optimum_thickness_in, total_annual_cost, annual_savings].every(Number.isFinite)) return { error: "Economic-thickness math did not produce a finite value." };
   return {

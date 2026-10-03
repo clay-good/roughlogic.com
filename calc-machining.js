@@ -1121,7 +1121,7 @@ export function computePowerScrewTorque({ axial_load_lbf = 0, mean_diameter_in =
   const lower_torque_in_lbf = lower_thread + collar;
   const efficiency_pct = (F * l) / (2 * Math.PI * raise_torque_in_lbf) * 100;
   const lead_angle_deg = Math.atan(l / (Math.PI * dm)) * 180 / Math.PI;
-  const self_locking = lower_thread > 0;
+  const self_locking = lower_thread > 1e-9;
   if (![raise_torque_in_lbf, lower_torque_in_lbf, efficiency_pct, lead_angle_deg].every(Number.isFinite) || !(raise_torque_in_lbf > 0)) return { error: "Power-screw math is not a finite value; check the inputs." };
   return {
     raise_torque_in_lbf, lower_torque_in_lbf, efficiency_pct, lead_angle_deg, self_locking, thread_half_angle_deg: halfAngle,

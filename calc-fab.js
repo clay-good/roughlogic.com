@@ -523,7 +523,7 @@ export function computeConduit90Stub({ mode = "stub-up", height_in = 0, deduct_i
       n_shots: Number.isFinite(n_shots) ? n_shots : null,
       arc_per_shot_in: Number.isFinite(arc_per_shot_in) ? arc_per_shot_in : null,
       residual_deg: Number.isFinite(residual_deg) ? residual_deg : null,
-      note: "Segment 90: " + n_shots + " shots of " + perShot + " deg" + (residual_deg > 0 ? " (last shot covers the " + residual_deg + " deg residual since 90 is not divisible by the per-shot angle)" : "") + ". Arc length per shot = radius * angle(rad). Confirm against your bender.",
+      note: "Segment 90: " + n_shots + " shots of " + perShot + " deg" + (residual_deg > 1e-9 ? " (last shot covers the " + residual_deg + " deg residual since 90 is not divisible by the per-shot angle)" : "") + ". Arc length per shot = radius * angle(rad). Confirm against your bender.",
     };
   }
   const height = Number(height_in) || 0;
@@ -531,7 +531,7 @@ export function computeConduit90Stub({ mode = "stub-up", height_in = 0, deduct_i
   if (!(height > 0)) return { error: "Stub height must be greater than zero (in)." };
   if (!(deduct >= 0)) return { error: "Bender deduct/take-up must be zero or greater (in)." };
   const mark_in = height - deduct;
-  const impractical = mark_in < 0;
+  const impractical = mark_in < -1e-9;
   if (mode === "back-to-back") {
     const b2b = Number(back_to_back_in) || 0;
     if (!(b2b > 0)) return { error: "Back-to-back dimension must be greater than zero (in)." };

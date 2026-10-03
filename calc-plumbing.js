@@ -3665,7 +3665,7 @@ export function computeSupplyPressureBudget({ street_pressure, fixture_height = 
     available,
     headroom,
     adequate: headroom >= -1e-9,
-    verdict: headroom >= 0 ? "adequate" : "short",
+    verdict: headroom >= -1e-9 ? "adequate" : "short",
     note: "Use the minimum recorded street pressure (a residual sized at peak-day low pressure protects the worst case). IPC 2021 Table 604.3 minimum flow pressures: 8 psi for lavatories, sinks, showers, laundry trays and hose bibbs; 20 psi for a tank or flushometer-tank water closet and for thermostatic or pressure-balance shower and tub valves; 25 psi for a urinal flush valve; 35 psi for a siphonic and 45 psi for a blowout flushometer-valve water closet. The 8 psi default is for the simplest fixtures; enter the governing fixture's figure. IPC 604 caps static pressure at 80 psi, requiring a PRV above it (which adds its own downstream loss).",
   };
 }

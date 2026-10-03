@@ -135,7 +135,7 @@ export function computeMetacentricHeight({
   if (free_surface_moment_ftlb < 0) return { error: "The free surface moment cannot be negative (ft-lb)." };
   if (heel_angle_deg < 0 || heel_angle_deg > 90) return { error: "The heel angle must be between 0 and 90 degrees." };
   const gm_ft = km_ft - kg_ft;
-  const is_positive = gm_ft > 0;
+  const is_positive = gm_ft > 1e-9;
   // Adding weight moves KG toward it. A weight added HIGH raises KG and takes
   // GM directly, and because GM is a difference between two similar numbers a
   // small KG change is a large percentage of it.
@@ -166,7 +166,7 @@ export function computeMetacentricHeight({
     : "the free surface correction is " + fmt(free_surface_correction_ft, 3) + " ft, leaving an effective GM of " + fmt(effective_gm_ft, 3) + " ft -- and it depends on the tank's WIDTH CUBED rather than on how much liquid is in it, so a wide shallow tank half full costs far more than a narrow deep one holding the same volume";
   // The righting arm at a small angle, and the verdict that matters.
   const gz_ft = effective_gm_ft * Math.sin(heel_angle_deg * Math.PI / 180);
-  const effective_is_positive = effective_gm_ft > 0;
+  const effective_is_positive = effective_gm_ft > 1e-9;
   const stability_verdict = effective_is_positive
     ? "effective GM is " + fmt(effective_gm_ft, 3) + " ft, POSITIVE, giving a righting arm of " + fmt(gz_ft, 3) + " ft at " + fmt(heel_angle_deg, 0) + " degrees of heel"
     : Math.abs(effective_gm_ft) <= 1e-9
@@ -759,7 +759,7 @@ export function computeAviationFuelWeight({
   const standard_weight_lb = gallons * standard_density_lb_gal;
   const actual_weight_lb = gallons * actual_density_lb_gal;
   const weight_difference_lb = actual_weight_lb - standard_weight_lb;
-  const warmer = temp_difference_f > 0;
+  const warmer = temp_difference_f > 1e-9;
   const weight_verdict = Math.abs(temp_difference_f) < 0.01
     ? "at the reference temperature the weight is the standard " + fmt(standard_weight_lb, 0) + " lb"
     : warmer

@@ -1125,7 +1125,7 @@ export function computeGradeRodCutFill({ benchmark_elev_ft = 0, backsight_ft = 0
   // Until 2026-10-02 this case returned an error.
   const ground_elevation_ft = hi_ft - ground_rod_ft;
   const cut_fill_ft = grade_rod_ft - ground_rod_ft;
-  const label = cut_fill_ft > 0 ? "CUT " + fmt(cut_fill_ft, 2) + " ft" : cut_fill_ft < 0 ? "FILL " + fmt(-cut_fill_ft, 2) + " ft" : "ON GRADE";
+  const label = cut_fill_ft > 1e-9 ? "CUT " + fmt(cut_fill_ft, 2) + " ft" : cut_fill_ft < -1e-9 ? "FILL " + fmt(-cut_fill_ft, 2) + " ft" : "ON GRADE";
   if (![hi_ft, grade_rod_ft, ground_elevation_ft, cut_fill_ft].every(Number.isFinite)) return { error: "Grade-rod math is not a finite value." };
   return {
     hi_ft,
@@ -1133,7 +1133,7 @@ export function computeGradeRodCutFill({ benchmark_elev_ft = 0, backsight_ft = 0
     ground_elevation_ft,
     cut_fill_ft,
     label,
-    note: (grade_rod_ft > 0 ? "" : "The design grade is at or above the instrument's line of sight, so the grade rod is " + fmt(grade_rod_ft, 2) + " ft: no rod can be read on finished grade, but the fill is still the grade rod less the ground rod. Mark it from the ground shot, or reset the instrument higher for staking. ") + "The cut or fill at a shot, from one grade rod that carries the whole design for the instrument setup. Set the instrument, shoot the benchmark, and the height of instrument is fixed: it is the benchmark elevation plus the backsight. From then on a single number does all the work -- the grade rod is the height of instrument less the design elevation, which is the rod reading that WOULD be observed if the rod were standing on finished grade. Every subsequent shot is compared against it and the difference is the cut or fill, with no elevation arithmetic at all. The sign is where crews go wrong and it is worth stating plainly: a rod reading SMALLER than the grade rod means the rod is standing HIGHER than design, because the rod reads downward from a fixed instrument. Smaller reading, higher ground, cut. It reads backward the first hundred times. A benchmark at 100.00 with a 5.20 backsight fixes the height of instrument at 105.20, and a design grade of 98.50 makes the grade rod 6.70; a ground shot reading 4.90 is therefore a cut of 1.80 ft, which checks independently because the ground sits at 100.30 against a design of 98.50. A shot reading 7.55 on the same setup is a fill of 0.85 ft. One grade rod, every shot on the setup, until the instrument moves. A field calculation; the grading plan, the benchmark of record, and a checked level circuit govern.",
+    note: (grade_rod_ft > 1e-9 ? "" : "The design grade is at or above the instrument's line of sight, so the grade rod is " + fmt(grade_rod_ft, 2) + " ft: no rod can be read on finished grade, but the fill is still the grade rod less the ground rod. Mark it from the ground shot, or reset the instrument higher for staking. ") + "The cut or fill at a shot, from one grade rod that carries the whole design for the instrument setup. Set the instrument, shoot the benchmark, and the height of instrument is fixed: it is the benchmark elevation plus the backsight. From then on a single number does all the work -- the grade rod is the height of instrument less the design elevation, which is the rod reading that WOULD be observed if the rod were standing on finished grade. Every subsequent shot is compared against it and the difference is the cut or fill, with no elevation arithmetic at all. The sign is where crews go wrong and it is worth stating plainly: a rod reading SMALLER than the grade rod means the rod is standing HIGHER than design, because the rod reads downward from a fixed instrument. Smaller reading, higher ground, cut. It reads backward the first hundred times. A benchmark at 100.00 with a 5.20 backsight fixes the height of instrument at 105.20, and a design grade of 98.50 makes the grade rod 6.70; a ground shot reading 4.90 is therefore a cut of 1.80 ft, which checks independently because the ground sits at 100.30 against a design of 98.50. A shot reading 7.55 on the same setup is a fill of 0.85 ft. One grade rod, every shot on the setup, until the instrument moves. A field calculation; the grading plan, the benchmark of record, and a checked level circuit govern.",
   };
 }
 
@@ -1404,9 +1404,9 @@ export function computeMassHaulOverhaul({ cut_volume_cy = 0, shrinkage_factor = 
   const balance_cy = compacted_from_cut_cy - fill_required_cy;
   // Relative: an absolute 1e-9 printed "DEFICIT of 0 cy" on 10M cy jobs (fixed 2026-10-01).
   const balanced = Math.abs(balance_cy) < 1e-9 * Math.max(1, fill_required_cy, compacted_from_cut_cy);
-  const surplus = balance_cy > 0;
-  const borrow_needed_cy = balance_cy < 0 ? -balance_cy : 0;
-  const waste_cy = balance_cy > 0 ? balance_cy : 0;
+  const surplus = balance_cy > 1e-9;
+  const borrow_needed_cy = balance_cy < -1e-9 ? -balance_cy : 0;
+  const waste_cy = balance_cy > 1e-9 ? balance_cy : 0;
   const cut_needed_for_fill_cy = fill_required_cy / shrinkage_factor;
   // Overhaul is a volume-distance product beyond the free haul, priced in
   // station-yards: one cubic yard moved one hundred feet past free haul.

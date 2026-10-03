@@ -350,7 +350,7 @@ export function computeInstantOffIrDrop({ on_potential_v = 0, instant_off_potent
     ir_drop_mv, off_margin_mv, on_margin_mv, polarization_mv,
     meets_absolute_criterion: off_margin_mv >= -1e-9,
     meets_polarization_criterion: polarization_mv >= polarization_criterion_mv - 1e-9 * Math.abs(polarization_criterion_mv),
-    optimism_ratio: off_margin_mv > 0 ? on_margin_mv / off_margin_mv : 0,
+    optimism_ratio: off_margin_mv > 1e-9 ? on_margin_mv / off_margin_mv : 0,
     note: "The ON potential includes the IR drop through the soil, which is voltage across the ground and NOT polarisation of the steel -- read against it, a thin real margin looks comfortable and a surveyor records the station as protected and moves on, while a seasonal drop in soil moisture takes it to failure. A station can satisfy one criterion narrowly and the other comfortably, which is common and entirely normal. The 100 mV criterion does not apply to a mixed-metal system: steel coupled to copper can show 100 mV of polarization and still be unprotected. And ONE rectifier left running voids all of it: its IR drop stays in the 'instant off' reading, and the number recorded is an on potential wearing an off potential's label. NACE SP0169 (now AMPP) governs the criteria and how they are applied.",
   };
 }
@@ -860,8 +860,8 @@ export function computePolarizationDecayCriterion({ on_potential_v = 0, instant_
     formation_passes: formation_mv >= polarization_criterion_mv - 1e-9 * Math.abs(polarization_criterion_mv),
     decay_passes: decay_mv >= polarization_criterion_mv - 1e-9 * Math.abs(polarization_criterion_mv),
     absolute_passes: absolute_margin_mv >= -1e-9,
-    protected_under_either: formation_mv >= polarization_criterion_mv || decay_mv >= polarization_criterion_mv || absolute_margin_mv >= 0,
-    decay_overstatement_ratio: decay_mv > 0 ? decay_from_on_mv / decay_mv : 0,
+    protected_under_either: formation_mv >= polarization_criterion_mv || decay_mv >= polarization_criterion_mv || absolute_margin_mv >= -1e-9,
+    decay_overstatement_ratio: decay_mv > 1e-9 ? decay_from_on_mv / decay_mv : 0,
     decay_margin_mv: decay_mv - polarization_criterion_mv,
     note: "A line can FAIL -0.850 V and be properly protected under the 100 mV criterion -- that is precisely why the 100 mV criterion exists. Driving a well-coated line in high-resistivity soil further negative to meet -0.850 V would take current and rectifier voltage it does not need and risk the coating disbondment that overprotection causes; reporting it as a failure is a misreading of the standard, not a finding. The error the criterion is most often got wrong by is measuring the decay from the ON potential: it adds the IR drop, which is soil and not steel, and it makes a structure genuinely below 100 mV pass comfortably -- the failure mode that matters, because it certifies an unprotected line. NACE SP0169 (now AMPP) governs.",
   };

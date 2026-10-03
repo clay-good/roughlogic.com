@@ -317,7 +317,7 @@ export function computeLocateDepthOffset({ instrument_depth_in = 0, half_signal_
   const depth_agrees = depth_disagreement_pct <= 10 * (1 + 1e-9);
   const nulls_symmetric = null_asymmetry_pct <= 10 * (1 + 1e-9);
   const current_gradual = current_drop_pct <= sharp_drop_pct * (1 + 1e-9);
-  const reads_shallow = depth_difference_in > 0;
+  const reads_shallow = depth_difference_in > 1e-9;
   const confident = depth_agrees && nulls_symmetric && current_gradual;
   const cause = confident ? "the checks agree, so both readings are probably right"
     : !current_gradual ? "the signal current dropped sharply -- it has likely left the target and coupled onto something else, and everything located beyond that point may be a different utility"

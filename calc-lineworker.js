@@ -382,10 +382,10 @@ export function computeConductorUpliftCheck({ span_ft = 0, elevation_rise_ft = 0
   const vertical_load_low_lb = half_weight_lb - slope_component_lb;
   const vertical_load_high_lb = half_weight_lb + slope_component_lb;
   const low_point_offset_ft = span_ft / 2 - tension_lb * elevation_rise_ft / (weight_lb_per_ft * span_ft);
-  const low_point_inside_span = low_point_offset_ft >= 0 && low_point_offset_ft <= span_ft;
+  const low_point_inside_span = low_point_offset_ft >= -1e-9 && low_point_offset_ft <= span_ft;
   // V_low = 0 when H = w L^2 / (2 h). Above that the structure is being lifted.
   const uplift_tension_lb = weight_lb_per_ft * span_ft * span_ft / (2 * elevation_rise_ft);
-  const uplift = vertical_load_low_lb < 0;
+  const uplift = vertical_load_low_lb < -1e-9;
   // The real load at the structure is BOTH adjacent spans together.
   let back_span_contribution_lb = null, structure_vertical_load_lb = null;
   if (back_span_ft > 0) {
@@ -462,7 +462,7 @@ export function computeLineGroundClearanceNesc({ attachment_height_ft = 0, max_c
     verdict: passes
       ? "PASSES with " + fmt(margin_ft, 2) + " ft of margin"
       : "FAILS by " + fmt(-margin_ft, 2) + " ft -- the conductor is " + fmt(clearance_ft, 2) + " ft up where " + fmt(required_clearance_ft, 2) + " ft is required",
-    height_verdict: height_shortfall_ft <= 0
+    height_verdict: height_shortfall_ft <= 1e-9
       ? "the attachment is " + fmt(-height_shortfall_ft, 2) + " ft higher than it needs to be"
       : "the attachment must come up " + fmt(height_shortfall_ft, 2) + " ft, which is what sizes the pole",
     note: "Clearance is the reason sag matters, and the arithmetic connecting them is a subtraction nobody writes down: the conductor's height above ground is the attachment height minus the sag AT THE WORST CONDITION, not at the condition it was strung in. That is the whole difficulty. NESC checks clearance at the maximum conductor temperature the line is designed to operate at, or at the final-sag ice condition, whichever gives the greater sag -- not at 60 degF on the day the crew strung it. A line sagged in spring with a comfortable margin can be out of compliance at design temperature, and the difference is routinely several feet: on a 600 ft ruling span, sixty degrees of heating adds about 3 ft of sag, and creep adds the equivalent of another forty-odd degrees permanently over the life of the line. One relation is run four ways. Given a sag it returns the clearance and the margin. Given a required clearance it returns the maximum sag the span may be strung to, which is the number a crew wants at the pole. Given a sag and a requirement it returns the minimum attachment height, which is what sizes the structure. And the margin is reported SIGNED, so a failing span reads as a negative number of feet rather than as a passing-looking small one. NO NESC TABLE IS SHIPPED. The required clearance depends on the voltage, on what is under the line -- road, driveway, pedestrian-only, water, rail -- and on the edition the jurisdiction has adopted, and it is taken as an input for the same reason the pole-embedment calculator takes lateral bearing as an input: a table copied into a calculator is a table that goes stale silently, and a wrong clearance is not a rounding error. This checks one point, midspan on a level span, against one entered requirement. It does not find the governing point on an inclined span or over uneven ground, where the low point of the curve and the high point of the ground are not at the same place; it does not evaluate clearance to buildings, other conductors, or communication lines, which have their own requirements; it does not address blowout, which is the horizontal question; and it does not determine which condition governs. The adopted NESC edition, the utility's construction standards, and the authority having jurisdiction govern.",
@@ -602,7 +602,7 @@ export function computeGuyAnchorHoldingCapacity({ helix_diameter_in = 0, install
     helix_area_ft2, overburden_psf, cohesive_capacity_lb, granular_capacity_lb, governs,
     ultimate_capacity_lb, allowable_capacity_lb, torque_capacity_lb, torque_allowable_lb,
     method_ratio, guy_tension_lb, margin_lb, factor_of_safety,
-    holds: margin_lb === null ? null : margin_lb >= 0,
+    holds: margin_lb === null ? null : margin_lb >= -1e-9,
     margin_verdict: margin_lb === null
       ? "(no guy tension entered)"
       : margin_lb >= 0
@@ -899,7 +899,7 @@ export function computeSaggingReturnWave({ elapsed_seconds = 0, return_waves = 3
   const sag_error_ft = sag_at_error_ft - reference_sag;
   const single_wave_time = Math.sqrt(reference_sag / _RETURN_WAVE_CONSTANT);
   const single_wave_sag_error_ft = _RETURN_WAVE_CONSTANT * Math.pow(single_wave_time + stopwatch_error_seconds, 2) - reference_sag;
-  const error_advantage = sag_error_ft > 0 ? single_wave_sag_error_ft / sag_error_ft : null;
+  const error_advantage = sag_error_ft > 1e-9 ? single_wave_sag_error_ft / sag_error_ft : null;
   const outs = [period_per_wave_seconds, sag_error_ft, single_wave_sag_error_ft];
   if (!outs.every(Number.isFinite)) return { error: "Return-wave math is not a finite value." };
   return {

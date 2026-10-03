@@ -1396,7 +1396,7 @@ export function computeRentalWorksheet({
   // Cash flow after interest; the form has no principal line, so principal
   // repayment is not subtracted.
   const cash_on_cash_pct = cash_invested > 0 ? ((NOI - interest) / cash_invested) * 100 : null;
-  const expense_ratio_pct = effective_gross_income > 0 ? (operating_expenses / effective_gross_income) * 100 : null;
+  const expense_ratio_pct = effective_gross_income > 1e-9 ? (operating_expenses / effective_gross_income) * 100 : null;
   // X.5 income-method valuation: the gross-rent multiplier on annual
   // scheduled gross rent (GRM = price / gross annual rent; the standard
   // quick-screen the appraisal income approach uses). When the user
@@ -2789,7 +2789,7 @@ export function computeBrrrrRefi({ arv_usd = 0, total_invested_usd = 0, refi_ltv
   const new_loan_usd = arv * ltv / 100;
   const cash_returned_usd = new_loan_usd - payoff;
   const capital_left_usd = invested - cash_returned_usd;
-  const all_recovered = capital_left_usd <= 0;
+  const all_recovered = capital_left_usd <= 1e-9;
   const coc = all_recovered ? null : cashflow / capital_left_usd;
   return {
     new_loan_usd, cash_returned_usd, capital_left_usd, coc, all_recovered,

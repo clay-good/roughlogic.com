@@ -912,7 +912,7 @@ export function computeReceiverPumpUpTime({ receiver_volume_ft3 = 0, fill_start_
   // The useful air is the pressure BAND, not the tank: widening the band from
   // 20 to 40 psi doubles the usable storage out of the same vessel.
   const band_psi = cut_out_psig - cut_in_psig;
-  const has_band = band_psi > 0;
+  const has_band = band_psi > 1e-9;
   const usable_free_air_ft3 = has_band ? receiver_volume_ft3 * band_psi / ATM : null;
   const draw_down_minutes = has_band && net_demand_scfm > 0
     ? receiver_volume_ft3 * band_psi / (ATM * net_demand_scfm) : null;

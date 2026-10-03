@@ -1431,7 +1431,7 @@ export function computeSlipCriticalWithTension({ mu = 0.30, tb_kip = 0, ns = 1, 
   const clamp_total_kip = duv * tb * nb;
   const ksc_raw = 1 - tu / clamp_total_kip;
   const ksc = Math.max(0, ksc_raw);
-  const fully_relieved = ksc_raw <= 0;
+  const fully_relieved = ksc_raw <= 1e-9;
   const reduced_rn_bolt_kip = base.rn_bolt_kip * ksc;
   const lrfd_bolt_kip = 1.0 * reduced_rn_bolt_kip;
   // ASD has its own reduction, AISC Eq. J3-5b: ksc = 1 - 1.5 Ta / (Du Tb nb),

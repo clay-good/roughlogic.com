@@ -163,3 +163,29 @@ test("every demand/capacity unity check carries float slack", () => {
   }
   assert.deepEqual(bad, []);
 });
+
+// A difference compared against literal 0 (`margin >= 0`) has no relative slack
+// to give: a lift station sized to overflow in exactly the 30 min response
+// computed a -3.6e-15 min margin and said the crew loses the race. 2026-10-03:
+// 109 such comparisons on a variable defined by a subtraction now treat
+// |x| < 1e-9 as zero (`>= -1e-9`, `> 1e-9`). A new bare one fails here.
+test("a computed difference compared against zero treats float noise as zero", () => {
+  const bad = [];
+  const re = /^\s*(?:const\s+)?([a-z_]+)\s*[:=]\s*(.*?)\b([a-z_][a-z0-9_]*)\s*(?:<=|>=|<|>)\s*0(?:\.0+)?\s*([,;)&|?]|$)/;
+  for (const f of readdirSync(ROOT).filter((n) => /^calc-.*\.js$/.test(n))) {
+    const lines = readFileSync(resolve(ROOT, f), "utf8").split("\n");
+    lines.forEach((line, i) => {
+      const t = line.trim();
+      if (line.includes("return { error") || t.startsWith("if (") || t.startsWith("//")) return;
+      const m = re.exec(line);
+      if (!m || (m[2].split('"').length - 1) % 2 === 1) return;
+      for (let k = i; k >= Math.max(0, i - 60); k--) {
+        const d = new RegExp("\\b(?:const|let)\\s+" + m[3] + "\\s*=\\s*([^;]*)").exec(lines[k]);
+        if (!d) continue;
+        if (/[\w)\]]\s+-\s+[\w(]/.test(d[1]) && !/Math\.(max|min)/.test(d[1])) bad.push(f + ":" + (i + 1) + " " + m[1] + ": " + m[3]);
+        break;
+      }
+    });
+  }
+  assert.deepEqual(bad, []);
+});

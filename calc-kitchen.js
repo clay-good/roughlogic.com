@@ -1199,7 +1199,7 @@ export function computeDraftBeerLineBalance({ applied_pressure_psi = 0, rise_ft 
   const R = tube.r;
   const line_length_ft = (P - 0.5 * rise - fixture) / R;
   if (!Number.isFinite(line_length_ft)) return { error: "Line-balance math is not a finite value." };
-  const balanced = line_length_ft > 0;
+  const balanced = line_length_ft > 1e-9;
   return {
     line_length_ft, resistance_psi_per_ft: R, tubing_label: tube.label, balanced,
     note: (balanced ? "" : "The applied pressure barely exceeds the rise plus the tower/fixture resistance, so no positive line length balances it -- raise the applied pressure, use a less restrictive (larger) line, or shorten the rise. ")
@@ -1794,7 +1794,7 @@ export function computeFermentationTimeQ10({ reference_time_hr = 0, reference_te
   const ratio = Math.pow(q10, delta_c / 10);
   const predicted_time_hr = reference_time_hr * ratio;
   const predicted_time_min = predicted_time_hr * 60;
-  const direction = delta_f > 0 ? "colder than reference, so slower" : delta_f < 0 ? "warmer than reference, so faster" : "at the reference temperature";
+  const direction = delta_f > 1e-9 ? "colder than reference, so slower" : delta_f < -1e-9 ? "warmer than reference, so faster" : "at the reference temperature";
   if (![delta_f, delta_c, ratio, predicted_time_hr, predicted_time_min].every(Number.isFinite)) return { error: "Q10 fermentation math is not a finite value." };
   return {
     predicted_time_hr,
@@ -2230,7 +2230,7 @@ export function computeGreaseDuctCleaningInterval({ inspection_interval_months =
   const at_designated_point = is_designated_point === 1;
   const applicable_trigger_um = at_designated_point ? inspection_point_trigger_um : cleaning_trigger_um;
   const months_overdue = months_since_inspection - inspection_interval_months;
-  const inspection_overdue = months_overdue > 0;
+  const inspection_overdue = months_overdue > 1e-9;
   const next_inspection_months = Math.max(0, -months_overdue);
   const inspections_per_year = MONTHS_PER_YEAR / inspection_interval_months;
   const thickness_margin_um = applicable_trigger_um - measured_thickness_um;

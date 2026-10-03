@@ -2847,7 +2847,7 @@ export function computeSurfaceCondensationRisk({ air_temp_f = 0, air_rh_pct = 0,
   return {
     dew_point_f: dewF,
     margin_f: margin,
-    condensing: margin <= 0 ? 1 : 0,
+    condensing: margin <= 1e-9 ? 1 : 0,
     note: "Magnus dew-point approximation; the IR-read surface temperature GOVERNS. Keep surfaces above the dew point (ANSI/IICRC S500) -- lower the humidity or warm the surface to clear the risk. A screen, not the psychrometric chamber reference.",
   };
 }

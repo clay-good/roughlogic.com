@@ -192,7 +192,7 @@ export function computeBoomPumpReach({ boom_reach_ft = 0, required_distance_ft =
     : 0;
   const outrigger_pressure_psf = outrigger_pad_area_ft2 > 0 ? outrigger_load_lb / outrigger_pad_area_ft2 : null;
   const power_line_margin_ft = power_line_distance_ft > 0 ? power_line_distance_ft - required_line_clearance_ft : null;
-  const power_line_clear = power_line_margin_ft === null ? null : power_line_margin_ft >= 0;
+  const power_line_clear = power_line_margin_ft === null ? null : power_line_margin_ft >= -1e-9;
   const outs = [reach_at_height_ft, reach_margin_ft, setup_to_target_ft, max_height_at_distance_ft];
   if (!outs.every(Number.isFinite)) return { error: "Boom reach math is not a finite value." };
   const verdict = reaches

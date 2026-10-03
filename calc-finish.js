@@ -1044,7 +1044,7 @@ export function computeSrwGeogridSpacing({ wall_height_ft = 0, block_depth_in = 
   const total_courses = Math.floor(H_in / hb + 1e-9);
   const first_layer_height_in = hb;
   const layer_count = total_courses >= 1 ? Math.floor((total_courses - 1) / courses_per_layer + 1e-9) + 1 : 0;
-  const top_layer_height_in = layer_count > 0 ? first_layer_height_in + (layer_count - 1) * actual_spacing_in : 0;
+  const top_layer_height_in = layer_count > 1e-9 ? first_layer_height_in + (layer_count - 1) * actual_spacing_in : 0;
   const unreinforced_crest_in = H_in - top_layer_height_in;
   // FHWA NHI-10-024 4.4.7.d (quoting AASHTO 11.10.2.3.1): "The top row of reinforcement should be
   // limited to 1.5 the block depth", and the facing below the bottom layer to the block depth Wu.

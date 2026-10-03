@@ -1106,7 +1106,7 @@ export function computeVoltageImbalance({ V_a, V_b, V_c }) {
     for (const row of NEMA_HP_DERATE_TABLE) {
       if (ip <= row.imbalance_pct) {
         const span = row.imbalance_pct - prev.imbalance_pct;
-        const frac = span > 0 ? (ip - prev.imbalance_pct) / span : 0;
+        const frac = span > 1e-9 ? (ip - prev.imbalance_pct) / span : 0;
         nema_hp_derate_pct = prev.hp_derate_pct + frac * (row.hp_derate_pct - prev.hp_derate_pct);
         break;
       }
@@ -4519,7 +4519,7 @@ export function computeBuckBoostSizing({ supply_v = 0, desired_v = 0, load_a = 0
   const load_kva = des * amp / 1000;         // full load, for reference
   const xfmr_kva = Math.abs(boost_v) * amp / 1000;  // the autotransformer rating
   const ratio_pct = load_kva > 0 ? xfmr_kva / load_kva * 100 : null;
-  const direction = boost_v > 0 ? "boost" : boost_v < 0 ? "buck" : "none";
+  const direction = boost_v > 1e-9 ? "boost" : boost_v < -1e-9 ? "buck" : "none";
 
   const notes = [];
   if (boost_v === 0) {
@@ -5166,7 +5166,7 @@ export function computeEconomicConductorSizing({ current_a = 0, r_small_ohm = 0,
   const loss_small_kw = 3 * I * I * rs / 1000;
   const loss_big_kw = 3 * I * I * rb / 1000;
   const annual_saving = (loss_small_kw - loss_big_kw) * hr * rate;
-  const payback_yr = annual_saving > 0 ? cost / annual_saving : null;
+  const payback_yr = annual_saving > 1e-9 ? cost / annual_saving : null;
   return {
     loss_small_kw, loss_big_kw, annual_saving, payback_yr,
     note: "Economic conductor sizing (I^2R payback): a feeder sized to the code minimum still wastes energy as heat in the conductor. Upsizing lowers the per-phase resistance, so the three-phase loss = 3 x I^2 x R drops and the annual energy saving = (loss at the small size - loss at the large) x run hours x rate. Divide the added material cost by that saving for a simple payback. Because the loss scales with the square of the current, upsizing only pays on heavily loaded, long-hour feeders; a lightly loaded or intermittent run may never earn back the copper. A screening estimate; installed cost, conduit fill, and the code minimum still govern the actual conductor.",

@@ -476,7 +476,7 @@ export function computeCondenserTdHeadPressure({
   const alternate_condensing_f = alternate_ambient_f !== 0 ? alternate_ambient_f + alt_td : ambient_f + alt_td;
   const condensing_change_f = alternate_condensing_f - condensing_f;
   const power_change_pct = condensing_change_f * power_pct_per_deg_f;
-  const condensing_falls = condensing_change_f < 0;
+  const condensing_falls = condensing_change_f < -1e-9;
   // Price the change, if a machine and a duty cycle were entered.
   const has_cost_basis = compressor_hp > 0 && annual_hours > 0;
   const compressor_kw = compressor_hp * _REF_KW_PER_HP;

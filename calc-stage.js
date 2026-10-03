@@ -1419,7 +1419,7 @@ export function computeMassLawTL({ surface_mass_psf = 0, frequency_hz = 0, incid
   const surface_mass_kgm2 = psf * (0.45359237 / (0.3048 * 0.3048));
   const constant = incidence === "normal" ? 42 : 47;
   const transmission_loss_db = 20 * Math.log10(surface_mass_kgm2 * f) - constant;
-  const below_floor = transmission_loss_db < 0;
+  const below_floor = transmission_loss_db < -1e-9;
   if (![transmission_loss_db, surface_mass_kgm2].every(Number.isFinite)) return { error: "Mass-law math is not a finite value." };
   return {
     transmission_loss_db, surface_mass_kgm2, below_floor,
@@ -1537,7 +1537,7 @@ export function computeCounterweightArborLoad({ batten_weight_lb = 0, attached_l
   const required_cw_lb = (batten + load) * purchase_ratio;
   const out_of_weight_lb = required_cw_lb - existing;
   const bricks = Math.ceil(Math.abs(out_of_weight_lb) / brick - 1e-9);
-  const action = out_of_weight_lb > 0 ? "add" : out_of_weight_lb < 0 ? "remove" : "balanced";
+  const action = out_of_weight_lb > 1e-9 ? "add" : out_of_weight_lb < -1e-9 ? "remove" : "balanced";
   return {
     required_cw_lb, out_of_weight_lb, bricks, purchase_ratio, action,
     note: "A double-purchase system needs two pounds of counterweight per pound on the batten (and the arbor travels half as far), so reversing the ratio lets the pipe run away. Load the arbor only when the batten is at the loading rail - an out-of-weight batten is the classic fly-rail hazard. Arbor capacity is finite. The venue rigging inspection and the AHJ govern.",
@@ -1802,7 +1802,7 @@ export function computeAcousticGainPagNag({ ds_ft = 2, d0_ft = 30, d1_ft = 8, d2
   const nag_db = 20 * l(d0_ft / ead_ft);
   const margin_db = pag_db - nag_db;
   if (![pag_db, nag_db, margin_db].every(Number.isFinite)) return { error: "Acoustic-gain math is not a finite value." };
-  const verdict = margin_db >= 0
+  const verdict = margin_db >= -1e-9
     ? "OK: the potential gain meets or exceeds the needed gain -- the system can be loud enough before feedback."
     : "SHORT: the needed gain exceeds the potential gain -- move the mic closer to the talker, the speaker closer to the listeners, or reduce open mics, or it will feed back before it is loud enough.";
   return {

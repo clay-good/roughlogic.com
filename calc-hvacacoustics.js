@@ -302,7 +302,7 @@ export function computeSilencerInsertionLoss({
 
   const has_fan = fan_available_static_in_wc > 0;
   const static_margin_in_wc = has_fan ? fan_available_static_in_wc - pressure_drop_in_wc : 0;
-  const static_short = has_fan && static_margin_in_wc < 0;
+  const static_short = has_fan && static_margin_in_wc < -1e-9;
 
   const faceVerdict = "a " + fmt(face_width_in, 0) + " by " + fmt(face_height_in, 0) + " in face is " + fmt(face_area_ft2, 2) + " sq ft, so " + fmt(airflow_cfm, 0) + " cfm runs at " + fmt(face_velocity_fpm, 0) + " fpm and costs " + fmt(pressure_drop_in_wc, 2) + " in wc";
   const squeezeVerdict = !has_alt
@@ -435,7 +435,7 @@ export function computeRooftopCurbUplift({
   // uplift. Until 2026-10-01 the full weight did, and the worked unit read
   // weight-governed where the wind wins by 280 lb.
   const net_uplift_lb = uplift_lb - 0.6 * unit_weight_lb;
-  const weight_governs = net_uplift_lb <= 0;
+  const weight_governs = net_uplift_lb <= 1e-9;
   const weight_reserve_lb = weight_governs ? -net_uplift_lb : 0;
   const uplift_pct_of_weight = 100 * uplift_lb / unit_weight_lb;
 

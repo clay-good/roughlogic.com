@@ -218,7 +218,7 @@ export function computeCwrThermalForce({ rail_area_in2 = 0, modulus_psi = 300000
   const differential_f = rail_temp_f - neutral_temp_f;
   const force_per_rail_lb = Math.abs(force_per_degf_lb * differential_f);
   const force_track_lb = 2 * force_per_rail_lb;
-  const state = differential_f > 0 ? "compression (buckling is the risk)"
+  const state = differential_f > 1e-9 ? "compression (buckling is the risk)"
     : differential_f < 0 ? "tension (a pull-apart is the risk)" : "no thermal force";
   return {
     force_per_degf_lb, rail_temp_f, differential_f, force_per_rail_lb, force_track_lb, state,

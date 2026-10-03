@@ -321,9 +321,9 @@ export function computeBaghouseCleaningInterval({
   const has_history = original_baseline_inwc > 0;
   const baseline_rise_inwc = has_history ? baseline_inwc - original_baseline_inwc : 0;
   const baseline_rise_pct = has_history ? baseline_rise_inwc / original_baseline_inwc * 100 : 0;
-  const blinding = has_history && baseline_rise_inwc > 0;
+  const blinding = has_history && baseline_rise_inwc > 1e-9;
   const original_range_inwc = has_history ? trigger_inwc - original_baseline_inwc : 0;
-  const range_lost_pct = has_history && original_range_inwc > 0 ? baseline_rise_inwc / original_range_inwc * 100 : 0;
+  const range_lost_pct = has_history && original_range_inwc > 1e-9 ? baseline_rise_inwc / original_range_inwc * 100 : 0;
   // How long until the baseline reaches the trigger at the observed rate, at
   // which point the collector cannot complete a cycle at all.
   const rise_per_month = has_history && elapsed_months > 0 ? baseline_rise_inwc / elapsed_months : 0;
@@ -696,10 +696,10 @@ export function computeSpccContainmentVolume({
   // under-report the height every time.
   const tank_footprint_ft2 = other_tank_count * (Math.PI / 4) * other_tank_diameter_ft * other_tank_diameter_ft;
   const free_footprint_ft2 = dike_length_ft * dike_width_ft - tank_footprint_ft2;
-  const height_needed_ft = free_footprint_ft2 > 0
+  const height_needed_ft = free_footprint_ft2 > 1e-9
     ? (required_ft3 + other_equipment_ft3) / free_footprint_ft2
     : 0;
-  const height_verdict = free_footprint_ft2 <= 0
+  const height_verdict = free_footprint_ft2 <= 1e-9
     ? "the tanks inside cover the whole footprint, so no wall height gives capacity"
     : adequate
       ? "a wall of " + fmt(height_needed_ft, 2) + " ft would be the minimum on this footprint; the dike has " + fmt(dike_height_ft, 2) + " ft"

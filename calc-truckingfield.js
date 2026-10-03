@@ -180,11 +180,11 @@ export function computeKingpinToAxle({ kpra_ft = 0, state_limit_ft = 40, hole_sp
   // Sliding the tandems FORWARD to fix KPRA moves weight onto the drives: run the
   // axle-weight check before pulling the pin, not after crossing the scale.
   const excess_ft = kpra_ft - state_limit_ft;
-  const holes_needed = excess_ft > 0 ? Math.ceil(excess_ft * 12 / hole_spacing_in - 1e-9) : 0;
+  const holes_needed = excess_ft > 1e-9 ? Math.ceil(excess_ft * 12 / hole_spacing_in - 1e-9) : 0;
   const resulting_kpra_ft = kpra_ft - holes_needed * hole_spacing_in / 12;
   const slide_in = holes_needed * hole_spacing_in;
   const compliant = resulting_kpra_ft <= state_limit_ft + 1e-9 * Math.abs(state_limit_ft);
-  const verdict = excess_ft <= 0
+  const verdict = excess_ft <= 1e-9
     ? "COMPLIANT as measured, with " + fmt(-excess_ft, 2) + " ft to spare"
     : compliant
       ? "OVER as measured: slide the tandems forward " + String(holes_needed) + " hole(s) to comply"

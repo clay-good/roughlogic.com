@@ -991,23 +991,23 @@ export function computePropaneRegulatorSizing({
 
   const required_cfh = connected_load_btuh / btu_per_ft3;
   const min_inlet_margin_cfh = capacity_at_min_inlet_cfh - required_cfh;
-  const short_at_min = min_inlet_margin_cfh < 0;
+  const short_at_min = min_inlet_margin_cfh < -1e-9;
   const min_inlet_pct = 100 * required_cfh / capacity_at_min_inlet_cfh;
 
   const has_max = capacity_at_max_inlet_cfh > 0;
   const max_inlet_margin_cfh = has_max ? capacity_at_max_inlet_cfh - required_cfh : 0;
-  const short_at_max = has_max && max_inlet_margin_cfh < 0;
+  const short_at_max = has_max && max_inlet_margin_cfh < -1e-9;
   const capacity_fall_pct = has_max && capacity_at_max_inlet_cfh > 0
     ? 100 * (1 - capacity_at_min_inlet_cfh / capacity_at_max_inlet_cfh) : 0;
   const passes_warm_fails_cold = has_max && !short_at_max && short_at_min;
 
   const has_second = second_stage_capacity_cfh > 0;
   const second_stage_margin_cfh = has_second ? second_stage_capacity_cfh - required_cfh : 0;
-  const short_second = has_second && second_stage_margin_cfh < 0;
+  const short_second = has_second && second_stage_margin_cfh < -1e-9;
 
   const has_lockup = lockup_psig > 0 && downstream_rating_psig > 0;
   const lockup_margin_psig = has_lockup ? downstream_rating_psig - lockup_psig : 0;
-  const lockup_over = has_lockup && lockup_margin_psig < 0;
+  const lockup_over = has_lockup && lockup_margin_psig < -1e-9;
 
   const flowVerdict = "a " + fmt(connected_load_btuh, 0) + " BTU/h connected load at " + fmt(btu_per_ft3, 0) + " BTU per cubic foot is " + fmt(required_cfh, 0) + " CFH, and EVERY stage has to pass all of it";
   const minVerdict = short_at_min

@@ -986,7 +986,7 @@ export function computeSpringWireStress({ wire_diameter_in = 0, mean_coil_diamet
   // Ground ends close flat: Ls = Nt d. Unground ends leave a gap: Ls = (Nt + 1) d.
   const solid_height_in = GROUND[end_type] ? Nt * d : (Nt + 1) * d;
   const max_deflection_in = L0 - solid_height_in;
-  const bottoms_out = max_deflection_in <= 0;
+  const bottoms_out = max_deflection_in <= 1e-9;
   const slenderness = L0 / D;
   // Absolute stability for squared-and-ground ends on parallel flat plates
   // requires L0 < 2.63 D / alpha with alpha = 0.5, i.e. slenderness < 5.26.
@@ -4318,7 +4318,7 @@ export function computeSprayTransferEfficiency({ applied_material_qt = 0, transf
   const saving_per_job_usd = saving_per_job_qt * price_per_qt;
   const annual_saving_usd = saving_per_job_usd * jobs_per_year;
   // Report the direction in words: an alternative can be WORSE than the gun in hand.
-  const better = saving_per_job_qt > 0;
+  const better = saving_per_job_qt > 1e-9;
   const alt_verdict = !has_alt
     ? "(no alternative transfer efficiency entered)"
     : Math.abs(saving_per_job_qt) < 1e-9

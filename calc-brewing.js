@@ -395,7 +395,7 @@ export function computeBeerColorSrm({ base_malt_lb = 0, base_lovibond = 0, cryst
   // color of a power-law result; it is NOT the share of the final SRM.
   const roast_weight_share_pct = grain_lb > 0 ? 100 * roast_malt_lb / grain_lb : 0;
   const roast_mcu_share_pct = 100 * roast_units / color_units;
-  const srm_without_roast = mcu_without_roast > 0 ? morey(mcu_without_roast) : 0;
+  const srm_without_roast = mcu_without_roast > 1e-9 ? morey(mcu_without_roast) : 0;
   const roast_error_mcu = 2 * roast_lovibond / batch_volume_gal;
   const base_error_mcu = 50 * base_lovibond / batch_volume_gal;
   return {
@@ -824,7 +824,7 @@ export function computePackagingYieldLoss({ brite_volume_gal = 0, transfer_loss_
     whole_packages, saleable_gal, remainder_gal,
     process_loss_gal, total_loss_gal,
     total_loss_pct: 100 * total_loss_gal / brite_volume_gal,
-    remainder_share_of_loss_pct: total_loss_gal > 0 ? 100 * remainder_gal / total_loss_gal : 0,
+    remainder_share_of_loss_pct: total_loss_gal > 1e-9 ? 100 * remainder_gal / total_loss_gal : 0,
     remainder_package_fraction: remainder_gal / package_gal,
     small_packages_from_remainder,
     remainder_short_of_smallest_gal: Math.max(0, smallest_package_gal - remainder_gal),

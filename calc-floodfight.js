@@ -354,7 +354,7 @@ export function computeFloodUpliftCoverSlab({ head_ft = 0, water = "fresh", elem
   const net_lb = net_psf * area_sqft;
   const floating_head_ft = resisting_psf / gamma;
   const counterweight_lb = Math.max(0, net_lb);
-  const lifts = net_psf > 0;
+  const lifts = net_psf > 1e-9;
   return {
     uplift_psf, area_sqft, uplift_lb, resisting_psf, net_psf, net_lb, floating_head_ft, counterweight_lb, lifts, head_ft, element,
     note: "Uplift is the vertical half of hydrostatics. Water standing above the underside of a slab pushes up on every square foot with its unit weight times the head, and the slab resists only with its own weight plus whatever holds it down: a 4 in slab weighs 50 psf, which 0.8 ft of water matches, and a basement pumped dry while the ground outside is saturated can have several feet of head beneath it, which is why floors heave after floods and why basements are pumped down in stages. A manhole cover is the same problem on a smaller area under a higher head; when a sewer surcharges, the force under any real head exceeds what sandbags stacked on the cover can hold, so the USACE handbook's advice is to ring the manhole with sandbags to reduce the head, or pump it. The handbook's printed 2,060 lb for a 10 ft head on a 2 ft cover implies about 65.6 pcf; at 62.4 pcf it is 1,960 lb. This does not account for reinforcement, connection to walls or footings, pressure relief or underdrains, soil above a buried structure, dynamic surcharge, cover locks, or the slab's capacity spanning under uplift. FEMA P-55, the USACE Flood Fight Handbook, the engineer of record, and the utility govern.",

@@ -888,7 +888,7 @@ export function computeFootingArea({ column_load_lb, soil_class, applied_moment_
   const q_max_psf = axial + Math.abs(bending);
   const q_min_psf = axial - Math.abs(bending);
   const eccentric_flag = M !== 0;
-  const uplift_flag = q_min_psf < 0;
+  const uplift_flag = q_min_psf < -1e-9;
   const bearing_pass = q_max_psf <= allow + 1e-9 * Math.abs(allow) && !uplift_flag;
   return {
     required_area_ft2,
@@ -7406,7 +7406,7 @@ export function computeCombinedStressAxialBending({ P_lb = 0, M_lbin = 0, A_in2 
   const S_in3 = I_in4 / c_in;
   return {
     sigma_axial, sigma_bend, sigma_max, sigma_min, M_used: M, S_in3,
-    no_tension: sigma_min >= 0,
+    no_tension: sigma_min >= -1e-9,
     note: "Combined axial-plus-bending fiber stress on a short (non-buckling) member: sigma = P/A +/- M c/I, with one extreme fiber at P/A + |M c/I| and the other at P/A - |M c/I| (tension where negative; the moment's sign only says which face is which). Enter a moment directly, or an eccentricity e to set M = P e. The far face stays in compression only while M c/I <= P/A - the kern limit e <= r^2/c, the same no-tension threshold the eccentric-footing tile enforces. Short member: this does NOT include the P-delta / column amplification of a slender member (use a beam-column interaction check). A design aid, not a substitute for the engineer of record.",
   };
 }
@@ -11471,7 +11471,7 @@ export function computeCarpetSeamLayout({ room_length_ft = 0, room_width_ft = 0,
   const waste_sf = with_waste_sf - room_sf;
   const waste_actual_pct = room_sf > 0 ? (waste_sf / room_sf) * 100 : null;
   const sy = with_waste_sf / 9;
-  const narrow_fill = best.fill_in > 0 && best.fill_in < minFill;
+  const narrow_fill = best.fill_in > 1e-9 && best.fill_in < minFill;
   const seamless = best.seam_count === 0;
 
   const dir = lengthwise_better ? "along the " + L + " ft length" : "across the " + W + " ft width";

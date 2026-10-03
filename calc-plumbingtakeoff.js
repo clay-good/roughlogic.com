@@ -406,7 +406,7 @@ export function computeSolarThermalCollector({ optical_efficiency = 0.70, loss_c
   const useful_btu_per_sqft = irradiance_btu * eff_clamped;
   const useful_btu_hr = useful_btu_per_sqft * area_sqft;
   if (![efficiency, useful_btu_per_sqft, useful_btu_hr].every(Number.isFinite)) return { error: "Collector math is not a finite value." };
-  const verdict = efficiency > 0
+  const verdict = efficiency > 1e-9
     ? "The collector delivers useful heat at this operating point."
     : "AT OR BELOW STAGNATION: the collector loses as much as it captures -- no useful heat until the irradiance rises or the inlet temperature drops.";
   return {

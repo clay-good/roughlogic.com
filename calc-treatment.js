@@ -664,7 +664,7 @@ export function computeBodTssLoadingRemoval({ flow_mgd = 0, influent_mgl = 0, ef
   const removal_pct = (inf - eff) / inf * 100;
   return {
     influent_lb_day, effluent_lb_day, removed_lb_day, removal_pct,
-    upset: removal_pct < 0,
+    upset: removal_pct < -1e-9,
     note: "BOD/TSS mass loading and percent removal: load (lb/day) = flow (MGD) x concentration (mg/L) x 8.34, applied to the influent and effluent, with removed = influent - effluent load and removal% = (influent - effluent) / influent x 100. Load scales with flow while removal efficiency does not, so a bigger plant at the same concentrations carries a proportionally larger load. An effluent above the influent is a treatment upset (negative removal), reported rather than errored. An operations aid; the operator of record and the primacy agency govern compliance.",
   };
 }

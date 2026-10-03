@@ -636,8 +636,8 @@ export function computeMwbcVoltageDrop({ awg = "12", material = "copper", one_wa
   const heavier = Math.max(ia, ib);
   const two_wire_vd = 2 * r_ohms * heavier;
   const balanced_vd = r_ohms * heavier;
-  const b_rises = vd_b_volts < 0;
-  const a_rises = vd_a_volts < 0;
+  const b_rises = vd_b_volts < -1e-9;
+  const a_rises = vd_a_volts < -1e-9;
   const worst_pct = Math.max(pct_a, pct_b);
   const over_3pct = worst_pct > 3;
   if (![r_ohms, vd_a_volts, vd_b_volts, neutral_amps].every(Number.isFinite)) return { error: "Voltage-drop math did not produce a finite value." };

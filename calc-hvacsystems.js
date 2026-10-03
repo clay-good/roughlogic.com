@@ -298,7 +298,7 @@ export function computeHxLmtdNtu({
     const c_max = Math.max(Ch, Cc);
     cr = c_min / c_max;
     const q_max = c_min * (Thi - Tci);
-    effectiveness = q_max > 0 ? q_btu_hr / q_max : null;
+    effectiveness = q_max > 1e-9 ? q_btu_hr / q_max : null;
     ntu = ua_btu_hr_F != null ? ua_btu_hr_F / c_min : null;
   }
 
@@ -1754,7 +1754,7 @@ export function computeFanSystemEffect({
   // the curve as the signature, the wrong way round.
   const has_pressures = fan_curve_tp_inwg > 0 && measured_tp_inwg > 0;
   const pressure_shortfall_inwg = has_pressures ? fan_curve_tp_inwg - measured_tp_inwg : 0;
-  const measured_below_curve = has_pressures && pressure_shortfall_inwg > 0;
+  const measured_below_curve = has_pressures && pressure_shortfall_inwg > 1e-9;
   const diagnostic_verdict = !has_pressures
     ? "(no fan curve and measured pressures entered)"
     : measured_below_curve
@@ -2478,7 +2478,7 @@ export function computePlenumReturnDrop({
   const has_measured = measured_room_to_plenum_inwg > 0 || measured_plenum_to_shaft_inwg > 0;
   const measured_total_inwg = measured_room_to_plenum_inwg + measured_plenum_to_shaft_inwg;
   const static_shortfall_inwg = has_measured ? measured_total_inwg - assumed_return_inwg : 0;
-  const understated = has_measured && static_shortfall_inwg > 0;
+  const understated = has_measured && static_shortfall_inwg > 1e-9;
   const static_verdict = !has_measured
     ? "(no measured pressure differences entered -- measuring room to plenum and plenum to shaft is what localizes the restriction)"
     : understated

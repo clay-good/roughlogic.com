@@ -1682,7 +1682,7 @@ export function computeLinearRegression({ x_values, y_values, predict_x = null, 
   // Residual sum of squares and the residual standard error.
   const rss = Math.max(0, syy - slope * sxy);
   const df = n - 2;
-  const rse = df > 0 ? Math.sqrt(rss / df) : 0;
+  const rse = df > 1e-9 ? Math.sqrt(rss / df) : 0;
   // Standard error of the slope and its t-test for slope = 0.
   const slope_se = rse / Math.sqrt(sxx);
   let t, p_value, perfect_fit = false;

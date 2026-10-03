@@ -1444,7 +1444,7 @@ export function computeChilledWaterDeltaT({ load_btuh = 0, actual_gpm = 0, desig
   const excess_pct = excess_flow_gpm / design_flow_gpm * 100;
   const pump_penalty = (actual_gpm / design_flow_gpm) ** 3;
   const tons = load_btuh / 12000;
-  const verdict = excess_flow_gpm > 0
+  const verdict = excess_flow_gpm > 1e-9
     ? "LOW delta-T: the plant is moving " + fmt(excess_flow_gpm, 0) + " gpm more than the load needs, " + fmt(excess_pct, 0) + "% over, and the pumps are drawing " + fmt(pump_penalty, 2) + " times design power to do it"
     : excess_flow_gpm < 0
       ? "running ABOVE the design delta-T on " + fmt(-excess_flow_gpm, 0) + " gpm less than design flow"

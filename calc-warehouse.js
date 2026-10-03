@@ -250,7 +250,7 @@ export function computeRackBasePlateAnchorage({ frame_weight_lb = 0, frame_depth
   return {
     frame_depth_ft, effective_height_ft, lateral_force_lb, overturning_moment_ftlb, resisting_moment_ftlb,
     resisting_share_pct: 100 * resisting_moment_ftlb / overturning_moment_ftlb,
-    weight_alone_resists: net_moment_ftlb <= 0,
+    weight_alone_resists: net_moment_ftlb <= 1e-9,
     net_uplift_lb, anchors_required,
     base_plate_sufficient: anchors_required <= base_plate_holes + 1e-9 * Math.abs(base_plate_holes),
     anchors_short: Math.max(0, anchors_required - base_plate_holes),
@@ -332,7 +332,7 @@ export function computeStackingAisleWidth({ load_length_in = 0, operating_cleara
     // share of the turret truck's gain that it captures is 20%.
     turret_gain_pct: 100 * turret_gain / counterbalanced_modules,
     reach_gain_pct: 100 * reach_gain / counterbalanced_modules,
-    reach_share_of_turret_gain_pct: turret_gain > 0 ? 100 * reach_gain / turret_gain : 0,
+    reach_share_of_turret_gain_pct: turret_gain > 1e-9 ? 100 * reach_gain / turret_gain : 0,
     note: "A narrow aisle is bought with constraints that compound: wire or rail guidance, a superflat floor tolerance an ordinary slab will not meet, tighter rack alignment, slower aisle entry and exit, and one truck per aisle -- so the aisle count caps how many trucks can work at once. A layout that maximises storage can be short of throughput, and the order profile decides which matters. Truck manufacturer right-angle stack data at the actual load and mast, the fire code's aisle requirements, and the equipment supplier govern.",
   };
 }

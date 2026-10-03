@@ -570,7 +570,7 @@ export function computeRlcReactanceResonance({ frequency_hz = 60, resistance_ohm
   const impedance_ohm = Math.sqrt(resistance_ohm * resistance_ohm + net_reactance_ohm * net_reactance_ohm);
   const resonant_frequency_hz = 1 / (2 * Math.PI * Math.sqrt(inductance_h * c_farad));
   const power_factor = impedance_ohm > 0 ? resistance_ohm / impedance_ohm : 1;
-  const character = Math.abs(net_reactance_ohm) < 1e-9 ? "resonant (XL = XC)" : (net_reactance_ohm > 0 ? "inductive (lagging)" : "capacitive (leading)");
+  const character = Math.abs(net_reactance_ohm) < 1e-9 ? "resonant (XL = XC)" : (net_reactance_ohm > 1e-9 ? "inductive (lagging)" : "capacitive (leading)");
   if (![inductive_reactance_ohm, capacitive_reactance_ohm, impedance_ohm, resonant_frequency_hz, power_factor].every(Number.isFinite)) {
     return { error: "RLC math is not a finite value." };
   }

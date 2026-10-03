@@ -1100,7 +1100,7 @@ export function computeSpeedHumpGeometry({ height_in = 0, total_length_ft = 0, f
   const wheel_height_in = profileHeightIn(half_wheelbase_ft);
   const clearance_required_in = height_in - wheel_height_in;
   const clearance_margin_in = ground_clearance_in - clearance_required_in;
-  const clears = clearance_margin_in >= 0;
+  const clears = clearance_margin_in >= -1e-9;
   const sits_on_flat = wheelbase_in / IN_PER_FT <= flat_top_length_ft;
   const ramp_length_for_target_ft = height_ft / (target_ramp_slope_pct / 100);
   const outs = [ramp_length_ft, ramp_slope_pct, vertical_accel_g, comfort_speed_mph, clearance_required_in, ramp_length_for_target_ft];

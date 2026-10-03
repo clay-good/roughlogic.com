@@ -145,7 +145,7 @@ export function computeShearwallOverturning({ v_lb = 0, b_ft = 0, h_ft = 0, w_lb
   const t_raw = (mot_ftlb - mr_ftlb) / b_ft;
   const t_lb = Math.max(t_raw, 0);
   const t_kip = t_lb / 1000;
-  const holdown_required = t_raw > 0;
+  const holdown_required = t_raw > 1e-9;
   return { v_plf, mot_ftlb, mr_ftlb, t_lb, t_kip, holdown_required, dead_factor };
 }
 

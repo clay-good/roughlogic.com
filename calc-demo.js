@@ -338,7 +338,7 @@ export function computeAbatementWasteContainers({ area_ft2 = 0, thickness_in = 0
   const waste_weight_tons = waste_weight_lb / 2000;
   const container_count = container_volume_yd3 > 0 ? Math.ceil(bulked_volume_yd3 / container_volume_yd3 - 1e-9) : null;
   const naive_bag_count = Math.ceil(in_place_volume_ft3 / bag_volume_ft3 - 1e-9);
-  const bag_multiple = naive_bag_count > 0 ? bag_count / naive_bag_count : null;
+  const bag_multiple = naive_bag_count > 1e-9 ? bag_count / naive_bag_count : null;
   const outs = [in_place_volume_ft3, bulked_volume_ft3, bag_count, waste_weight_lb];
   if (!outs.every(Number.isFinite)) return { error: "Abatement waste math is not a finite value." };
   return {

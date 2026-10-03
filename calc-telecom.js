@@ -261,7 +261,7 @@ export function computePonSplitLossBudget({ class_budget_db = 0, split_ratio = 0
     splitter_share_pct: 100 * base.splitter_loss_db / class_budget_db,
     alternative_splitter_loss_db: alt?.splitter_loss_db ?? null,
     alternative_remaining_fiber_budget_db: alt?.remaining_fiber_budget_db ?? null,
-    alternative_reach_km: alt?.remaining_fiber_budget_db > 0 ? alt.reach_km : null,
+    alternative_reach_km: alt?.remaining_fiber_budget_db > 1e-9 ? alt.reach_km : null,
     split_loss_delta_db: alt ? alt.splitter_loss_db - base.splitter_loss_db : null,
     note: "Every doubling of split ratio costs 3.01 dB before fiber or connectors are counted. Close the budget at the worse operating wavelength and reserve design margin before calculating reach; the PON standard and component datasheets govern.",
   };

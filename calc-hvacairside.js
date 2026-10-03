@@ -455,7 +455,7 @@ export function computeCoolingCoilTotalLoad({ cfm = 0, h_ent_btu = 0, h_lvg_btu 
   const tons = q_btuh / 12000;
   return {
     q_btuh, tons, dh,
-    heating: dh < 0,
+    heating: dh < -1e-9,
     note: "Total coil load Q = 4.5 x CFM x (h_ent - h_lvg) Btu/hr, where 4.5 = 60 min/hr x 0.075 lb/ft^3 standard air density. This is the whole heat the coil removes - sensible drop plus condensed moisture (latent) - not the dry-bulb-only 1.08 x CFM x deltaT, which misses the latent load. Feed the entering and leaving enthalpies from moist-air-enthalpy. tons = Q / 12000. A leaving enthalpy above entering returns a negative Q (the coil is heating). A design aid; the equipment ratings govern.",
   };
 }

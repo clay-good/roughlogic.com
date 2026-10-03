@@ -120,7 +120,7 @@ export function computeWeldVisualAcceptance({
     ? "REJECT. A CRACK IS PRESENT, and that rejects the weld regardless of every dimension below. No size applies: any crack is rejectable, and a crater crack at a stop is the one most likely to be dismissed as cosmetic"
     : "no crack reported. Any crack is rejectable without regard to size -- and the crater crack at a stop is the one most often called cosmetic and left";
   const undersize_in = nominal_leg_in - measured_leg_in;
-  const is_undersize = undersize_in > 0;
+  const is_undersize = undersize_in > 1e-9;
   const undersize_length_fraction = undersize_length_in / weld_length_in;
   const allowed_undersize_length_in = weld_length_in * allowed_undersize_fraction;
   const has_size_allowance = allowed_undersize_in > 0;

@@ -2276,7 +2276,7 @@ export function computeSlabDowelSchedule({ joint_length_ft = 40, slab_thickness_
   if (!(num_joints >= 1)) return { error: "Number of joints must be at least 1." };
   // One dowel every spacing along the joint, inset from each edge, plus one to start.
   const usable_in = joint_length_ft * 12 - 2 * edge_clearance_in;
-  const dowels_per_joint = usable_in <= 0 ? 1 : Math.floor(usable_in / dowel_spacing_in + 1e-9) + 1;
+  const dowels_per_joint = usable_in <= 1e-9 ? 1 : Math.floor(usable_in / dowel_spacing_in + 1e-9) + 1;
   const total_dowels = dowels_per_joint * Math.round(num_joints);
   const dowel_diameter_in = slab_thickness_in / 8;
   if (![dowels_per_joint, total_dowels, dowel_diameter_in].every(Number.isFinite)) return { error: "Dowel-schedule math is not a finite value." };

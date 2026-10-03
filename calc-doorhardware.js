@@ -124,7 +124,7 @@ export function computeDoorCloserForce({ door_width_in = 0, door_height_in = 0, 
   const closer_force_lbf = measured_opening_force_lbf - pressure_force_lbf;
   // A pressure force larger than the whole gauge reading means the reading
   // and the pressure figure cannot both be right.
-  const readings_inconsistent = closer_force_lbf < 0;
+  const readings_inconsistent = closer_force_lbf < -1e-9;
   const closing_time_ok = measured_closing_time_s >= min_closing_time_s - 1e-9 * Math.abs(min_closing_time_s);
   const pressure_explains = !force_ok && closer_force_lbf <= force_limit_lbf;
   return {

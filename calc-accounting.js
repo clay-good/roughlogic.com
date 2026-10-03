@@ -1534,7 +1534,7 @@ export function computeMarkupVsMargin({ cost = 0, price = 0, markup_pct = 0, mar
     margin_pct: Number.isFinite(margin) ? margin : null,
     profit_per_unit: Number.isFinite(profit) ? profit : null,
     total_profit: n > 0 && Number.isFinite(n) && Number.isFinite(profit) ? profit * n : null,
-    loss: profit < 0,
+    loss: profit < -1e-9,
     note: "Markup and margin diverge sharply (50% markup = 33.3% margin). Selling below cost is allowed but flagged. Universal cost-volume-profit identity.",
   };
 }

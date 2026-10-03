@@ -228,7 +228,7 @@ export function computeWipPercentComplete({ contract_usd = 0, cost_to_date_usd =
   const loss_contract = projected_loss_usd > 0;
   return {
     pct_complete, earned_revenue, over_under, overrun, projected_loss_usd, loss_contract,
-    underbilled: over_under >= 0,
+    underbilled: over_under >= -1e-9,
     note: "Cost-to-cost percent-complete (POC) revenue recognition: percent complete = cost to date / estimated total cost (capped at 100%), earned revenue = percent complete x contract value, and over/under billing = earned revenue - billed to date. A positive figure is underbilled (a costs-in-excess asset - work done but not yet billed); a negative figure is overbilled (a billings-in-excess liability - cash collected against future work). Persistent overbilling can mask a job going bad. A management aid; the CPA-prepared WIP schedule governs.",
   };
 }

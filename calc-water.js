@@ -1566,7 +1566,7 @@ export function computeBackflowTestPSI({ assembly_type = "rp", check1_psid = 0, 
   // 9th edition's gap was 3.0).
   const buffer_psid = c1 - relief;
   const check1_ok = c1 >= 5;
-  const relief_ok = relief >= 2 - 1e-9 * Math.abs(2) && buffer_psid > 0;
+  const relief_ok = relief >= 2 - 1e-9 * Math.abs(2) && buffer_psid > 1e-9;
   const check2_ok = c2 >= 1;
   const pass = check1_ok && relief_ok && check2_ok;
   return { assembly_type: "rp", pass, buffer_psid, check1_ok, relief_ok, check2_ok, criterion: "RP: #1 check >= 5 psid and above the relief opening point, relief opens at >= 2 psid, #2 check tight >= 1 psid (USC 10th ed.)" };
@@ -2721,7 +2721,7 @@ export function computePressureZoneHgl({
       ? "the service at " + fmt(service_elevation_ft, 0) + " ft is BELOW the band and sees " + fmt(static_psi, 1) + " psi -- over the " + fmt(max_pressure_psi, 0) + " psi limit, so the plumbing code requires a pressure reducing valve at that service"
       : "the service at " + fmt(service_elevation_ft, 0) + " ft is ABOVE the band and sees only " + fmt(static_psi, 1) + " psi -- under the " + fmt(min_pressure_psi, 0) + " psi minimum, so it needs a booster or a higher zone";
   const has_relief = service_relief_ft > 0;
-  const zones_required = has_relief && elevation_band_ft > 0 ? Math.ceil(service_relief_ft / elevation_band_ft - 1e-9) : 0;
+  const zones_required = has_relief && elevation_band_ft > 1e-9 ? Math.ceil(service_relief_ft / elevation_band_ft - 1e-9) : 0;
   const zones_verdict = !has_relief
     ? "(no service area relief entered)"
     : "a service area spanning " + fmt(service_relief_ft, 0) + " ft of relief needs " + fmt(zones_required, 0) + " zone" + (zones_required > 1 ? "s" : "") + " at this band width. That is the arithmetic behind why hilly systems have many zones and flat ones have few, and it is a topography question rather than a design preference";

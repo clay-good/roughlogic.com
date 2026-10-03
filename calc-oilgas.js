@@ -685,7 +685,7 @@ export function computeCasingCementVolume({
   const low_slurry_bbl = has_spread ? annular_volume_bbl * (1 + low_excess_pct / 100) : 0;
   const high_slurry_bbl = has_spread ? annular_volume_bbl * (1 + high_excess_pct / 100) : 0;
   const excess_spread_bbl = high_slurry_bbl - low_slurry_bbl;
-  const spread_column_ft = has_spread && annular_capacity_bbl_ft > 0 ? excess_spread_bbl / annular_capacity_bbl_ft : 0;
+  const spread_column_ft = has_spread && annular_capacity_bbl_ft > 1e-9 ? excess_spread_bbl / annular_capacity_bbl_ft : 0;
   const spread_verdict = !has_spread
     ? "(no excess range entered)"
     : "between " + fmt(low_excess_pct, 0) + "% and " + fmt(high_excess_pct, 0) + "% excess the slurry runs " + fmt(low_slurry_bbl, 1) + " to " + fmt(high_slurry_bbl, 1) + " bbl, a " + fmt(excess_spread_bbl, 1) + " bbl spread on the same hole -- which at the top of the column is " + fmt(spread_column_ft, 0) + " ft of cement either way, and is why the caliper matters more than the arithmetic does";
@@ -747,7 +747,7 @@ export function computeMudHydrostaticPressure({
   // Overbalance, with the SIGN driven off a boolean rather than off a minus.
   const has_formation = formation_pressure_psi > 0;
   const overbalance_psi = has_formation ? hydrostatic_psi - formation_pressure_psi : 0;
-  const is_overbalanced = has_formation && overbalance_psi > 0;
+  const is_overbalanced = has_formation && overbalance_psi > 1e-9;
   const formation_emw_ppg = has_formation ? formation_pressure_psi / (_OG_MUD_GRADIENT_CONST * tvd_ft) : 0;
   const balance_verdict = !has_formation
     ? "(no formation pressure entered)"
@@ -1004,7 +1004,7 @@ export function computeTankStrappingVolume({
   const closing_height_ft = closing_gauge_ft + closing_gauge_in / 12;
   const has_closing = closing_height_ft > 0;
   const moved_bbl = has_closing ? bbl_per_ft * (opening_height_ft - closing_height_ft) : 0;
-  const is_delivery = moved_bbl > 0;
+  const is_delivery = moved_bbl > 1e-9;
   const subject_bbl = has_closing ? Math.abs(moved_bbl) : gross_bbl;
 
   const sw_factor = 1 - sediment_water_pct / 100;
@@ -1061,8 +1061,8 @@ export function computeTankVentApi2000({
   const has_vacuum_vent = installed_vacuum_ft3h > 0;
   const pressure_margin_ft3h = has_pressure_vent ? installed_pressure_ft3h - required_out_ft3h : 0;
   const vacuum_margin_ft3h = has_vacuum_vent ? installed_vacuum_ft3h - required_in_ft3h : 0;
-  const pressure_short = has_pressure_vent && pressure_margin_ft3h < 0;
-  const vacuum_short = has_vacuum_vent && vacuum_margin_ft3h < 0;
+  const pressure_short = has_pressure_vent && pressure_margin_ft3h < -1e-9;
+  const vacuum_short = has_vacuum_vent && vacuum_margin_ft3h < -1e-9;
 
   const thermal_share_out_pct = required_out_ft3h > 0 ? 100 * thermal_out_ft3h / required_out_ft3h : 0;
   const thermal_share_in_pct = required_in_ft3h > 0 ? 100 * thermal_in_ft3h / required_in_ft3h : 0;
@@ -1278,7 +1278,7 @@ export function computeWellDeclineReserves({
   const misread_valid = Number.isFinite(misread_nominal) && misread_nominal > 0;
   const misread_reserves_bbl = misread_valid ? (initial_rate_bpd - economic_limit_bpd) / misread_nominal * 365 : 0;
   const misread_life_years = misread_valid ? Math.log(initial_rate_bpd / economic_limit_bpd) / misread_nominal : 0;
-  const misread_error_pct = misread_valid && remaining_reserves_bbl > 0
+  const misread_error_pct = misread_valid && remaining_reserves_bbl > 1e-9
     ? 100 * (misread_reserves_bbl - remaining_reserves_bbl) / remaining_reserves_bbl : 0;
 
   const declineVerdict = effective_entered

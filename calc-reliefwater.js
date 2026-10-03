@@ -506,7 +506,7 @@ export function computeLiftStationOutageStorage({ wet_well_shape = "round", wet_
   const outage_inflow_gal = inflow_gpm * outage_hr * 60;
   const haul_volume_gal = Math.max(0, outage_inflow_gal - storage_gal);
   const truck_loads = haul_volume_gal > 0 ? Math.ceil(haul_volume_gal / truck_capacity_gal - 1e-9) : 0;
-  const response_wins = margin_min >= 0;
+  const response_wins = margin_min >= -1e-9;
   return {
     wet_well_gal, sewer_gal, storage_gal, sewer_share_pct, time_to_overflow_min,
     response_min, margin_min, shortfall_gal, response_wins,

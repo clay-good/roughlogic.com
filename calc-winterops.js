@@ -429,7 +429,7 @@ export function computeWalkwayClearingProductivity({ total_area_ft2 = 0, hand_ar
   const shovellers = Math.max(1, Math.round(crew_size));
   const apps = Math.max(1, Math.round(applications));
   const open_area_ft2 = total_area_ft2 - hand_area_ft2;
-  const blower_hr = open_area_ft2 > 0 ? open_area_ft2 / (blower_rate_ft2_hr * blower_depth_factor) : 0;
+  const blower_hr = open_area_ft2 > 1e-9 ? open_area_ft2 / (blower_rate_ft2_hr * blower_depth_factor) : 0;
   const hand_hr = hand_area_ft2 > 0 ? hand_area_ft2 / (shovellers * hand_rate_ft2_hr_person * hand_depth_factor) : 0;
   // The crew is done when the SLOWER of the two parallel operations is done.
   const crew_hr = Math.max(blower_hr, hand_hr);
