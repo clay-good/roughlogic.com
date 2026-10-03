@@ -1010,7 +1010,7 @@ export function computeTaperedFlocculationG({ stage1_g_per_s = 0, stage2_g_per_s
 }
 export const taperedFlocculationGExample = { inputs: { stage1_g_per_s: 50, stage2_g_per_s: 30, stage3_g_per_s: 20, stage_volume_m3: 100, water_temp_c: 15, total_detention_min: 30 } };
 const renderTaperedFlocculationG = _rPool({
-  citation: "Citation: Camp-Stein velocity gradient, tapered multi-stage schedule (Camp & Stein; Ten States Standards), by name. P_stage = G_stage^2 x mu(T) x V_stage; Gt = mean(G) x total_time; mu is water dynamic viscosity at the given temperature. A tapered schedule decreases G stage to stage (each in the 10-70/s flocculation band); the vigorous first stage builds floc and the gentle last stage grows it without shear. Cold water is more viscous, so the same G costs more power in winter. The treatment-process design governs.",
+  citation: "Citation: Camp-Stein velocity gradient, tapered multi-stage schedule (Camp & Stein; Ten States Standards), by name. P_stage = G_stage^2 x mu(T) x V_stage; Gt = mean(G) x total_time; mu is water dynamic viscosity at the given temperature. A tapered schedule decreases G stage to stage (each in the 10-100/s flocculation band); the vigorous first stage builds floc and the gentle last stage grows it without shear. Cold water is more viscous, so the same G costs more power in winter. The treatment-process design governs.",
   example: { stage1_g_per_s: 50, stage2_g_per_s: 30, stage3_g_per_s: 20, stage_volume_gal: 26417, water_temp_f: 59, total_detention_min: 30 },
   fields: [
     { key: "stage1_g_per_s", label: "Stage 1 target G (per s, highest)", kind: "number" },

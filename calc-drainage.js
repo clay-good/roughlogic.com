@@ -298,7 +298,7 @@ function renderOverflowScupperSizing(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "oss-out-n");
   const update = debounce(() => {
     const r = computeOverflowScupperSizing({ length_in: Number(len.input.value) || 0, head_in: Number(head.input.value) || 0 });
-    if (r.error) { oQ.textContent = r.error; oC.textContent = "-"; oNote.textContent = ""; return; }
+    if (r.error) { oC.textContent = r.error; oQ.textContent = "-"; oNote.textContent = ""; return; }
     oQ.textContent = fmt(r.q_gpm, 0) + " gpm (" + fmt(r.q_cfs, 3) + " cfs)";
     oC.textContent = fmt(r.q_gpm_contracted, 0) + " gpm";
     oNote.textContent = r.note;

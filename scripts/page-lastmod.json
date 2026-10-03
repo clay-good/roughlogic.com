@@ -2,7 +2,7 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "4c2175afb93cdc9e",
+      "sha": "ed4e1d8c0632d366",
       "date": "2026-10-03"
     },
     "/tools/": {
@@ -114,8 +114,8 @@
       "date": "2026-09-29"
     },
     "/tools/abv-from-gravity/": {
-      "sha": "10ab45f560306252",
-      "date": "2026-09-29"
+      "sha": "f202e76327d1d405",
+      "date": "2026-10-03"
     },
     "/tools/abyc-dc-wire/": {
       "sha": "0b7ba1db63082bbc",
@@ -690,8 +690,8 @@
       "date": "2026-09-29"
     },
     "/tools/blower-door-ach50/": {
-      "sha": "488b7aee06340f3d",
-      "date": "2026-09-29"
+      "sha": "9737fcc605c8ded2",
+      "date": "2026-10-03"
     },
     "/tools/blown-insulation-coverage/": {
       "sha": "c9b1bf9407b5978b",
@@ -1418,8 +1418,8 @@
       "date": "2026-09-29"
     },
     "/tools/community-noise-ldn/": {
-      "sha": "1741a9febe2ec973",
-      "date": "2026-09-29"
+      "sha": "2f00a7a1b905f5cb",
+      "date": "2026-10-03"
     },
     "/tools/compaction-roller-production/": {
       "sha": "862fc625ac337bec",
@@ -2462,7 +2462,7 @@
       "date": "2026-09-29"
     },
     "/tools/duct-leakage/": {
-      "sha": "58a3f6a1560ffa8d",
+      "sha": "179f1d5d7682c92b",
       "date": "2026-10-03"
     },
     "/tools/duct-leakage-cfm25/": {
@@ -2554,8 +2554,8 @@
       "date": "2026-09-29"
     },
     "/tools/effective-annual-rate/": {
-      "sha": "28b783a2912ee9d7",
-      "date": "2026-09-29"
+      "sha": "bfaa3edec28266a7",
+      "date": "2026-10-03"
     },
     "/tools/effective-leakage-area/": {
       "sha": "45ec398e527b17e3",
@@ -2586,8 +2586,8 @@
       "date": "2026-09-29"
     },
     "/tools/egress-window-check/": {
-      "sha": "e25ee527fd5b4447",
-      "date": "2026-09-29"
+      "sha": "7296de1a571e00c5",
+      "date": "2026-10-03"
     },
     "/tools/egress-window-well/": {
       "sha": "17692e5b0c4c59e1",
@@ -2986,8 +2986,8 @@
       "date": "2026-09-29"
     },
     "/tools/flammable-cabinet-storage/": {
-      "sha": "5009e99414d52039",
-      "date": "2026-09-29"
+      "sha": "31fc81471b45ea63",
+      "date": "2026-10-03"
     },
     "/tools/flange-bolt-torque/": {
       "sha": "a30605b5fbf2fc0c",
@@ -3038,8 +3038,8 @@
       "date": "2026-09-29"
     },
     "/tools/flocculator-paddle-power/": {
-      "sha": "39a4792a8c183fd8",
-      "date": "2026-09-29"
+      "sha": "6e612f4b75c525ff",
+      "date": "2026-10-03"
     },
     "/tools/flood-cut-quantity/": {
       "sha": "e0a36f8058fe1060",
@@ -3166,8 +3166,8 @@
       "date": "2026-09-29"
     },
     "/tools/fresnel-zone-clearance/": {
-      "sha": "04e31a2998b1fcfb",
-      "date": "2026-09-29"
+      "sha": "4d4112d256fcb971",
+      "date": "2026-10-03"
     },
     "/tools/friction-loss/": {
       "sha": "e2ebf067dc16367a",
@@ -3318,8 +3318,8 @@
       "date": "2026-09-29"
     },
     "/tools/gear-dynamic-tooth-stress/": {
-      "sha": "8f84a452dc8a62df",
-      "date": "2026-09-29"
+      "sha": "c500085b22b8b3dd",
+      "date": "2026-10-03"
     },
     "/tools/gear-identification/": {
       "sha": "12f7ddbf7c4f9fb2",
@@ -3354,8 +3354,8 @@
       "date": "2026-10-01"
     },
     "/tools/generator-conductor-445/": {
-      "sha": "a8a448f9301c79ec",
-      "date": "2026-09-30"
+      "sha": "1be1e2b4af2791ae",
+      "date": "2026-10-03"
     },
     "/tools/generator-droop-load-share/": {
       "sha": "63dda4655d212f4c",
@@ -3394,8 +3394,8 @@
       "date": "2026-10-01"
     },
     "/tools/gin-pole-uptower-lift/": {
-      "sha": "33232bf2fa7d83e2",
-      "date": "2026-09-29"
+      "sha": "e1ab97db742f6126",
+      "date": "2026-10-03"
     },
     "/tools/glass-thickness-wind/": {
       "sha": "435606ef00aa927a",
@@ -3518,8 +3518,8 @@
       "date": "2026-09-29"
     },
     "/tools/ground-loop-flow-antifreeze/": {
-      "sha": "9ecc8cd44f50350f",
-      "date": "2026-10-01"
+      "sha": "c14d720d6309abe6",
+      "date": "2026-10-03"
     },
     "/tools/ground-potential-rise/": {
       "sha": "980c5cf1fde9ddc7",
@@ -3554,8 +3554,8 @@
       "date": "2026-09-29"
     },
     "/tools/guard-handrail-check/": {
-      "sha": "216cd8cf05bfc409",
-      "date": "2026-09-29"
+      "sha": "457c862ff5dfcfd0",
+      "date": "2026-10-03"
     },
     "/tools/guard-post-load/": {
       "sha": "a63a90a7482b92f1",
@@ -4974,8 +4974,8 @@
       "date": "2026-09-29"
     },
     "/tools/no-decompression-limit/": {
-      "sha": "098af98b090d56f8",
-      "date": "2026-10-01"
+      "sha": "381aa4ae67ffb2ba",
+      "date": "2026-10-03"
     },
     "/tools/noise-barrier-insertion-loss/": {
       "sha": "ffb036429a217e7a",
@@ -5046,8 +5046,8 @@
       "date": "2026-09-29"
     },
     "/tools/open-delta-transformer/": {
-      "sha": "69e477329cbbb2c2",
-      "date": "2026-10-01"
+      "sha": "2dba54da90c48165",
+      "date": "2026-10-03"
     },
     "/tools/optical-return-loss/": {
       "sha": "0c115e9336501e69",
@@ -5290,8 +5290,8 @@
       "date": "2026-10-03"
     },
     "/tools/pid-tuning-ziegler-nichols/": {
-      "sha": "209c47007e5c0ba4",
-      "date": "2026-09-29"
+      "sha": "7c841e952fb08fca",
+      "date": "2026-10-03"
     },
     "/tools/pier-scour-depth/": {
       "sha": "af22441e789fa651",
@@ -6438,8 +6438,8 @@
       "date": "2026-09-29"
     },
     "/tools/roof-snow-ice-weight/": {
-      "sha": "d2726b18d70c9de3",
-      "date": "2026-10-01"
+      "sha": "15faace29ad92b2e",
+      "date": "2026-10-03"
     },
     "/tools/roof-underlayment-rolls/": {
       "sha": "cca1365841af7118",
@@ -6598,8 +6598,8 @@
       "date": "2026-10-03"
     },
     "/tools/scaffold-guardrail-check/": {
-      "sha": "f9df45399e8770eb",
-      "date": "2026-09-29"
+      "sha": "1753305785ccd016",
+      "date": "2026-10-03"
     },
     "/tools/scaffold-leg-load/": {
       "sha": "48ff7fbe041e5bc8",
@@ -7782,8 +7782,8 @@
       "date": "2026-09-29"
     },
     "/tools/suspended-ceiling-grid/": {
-      "sha": "4c73eaeca4e100b9",
-      "date": "2026-09-29"
+      "sha": "54d18a8cb0fff457",
+      "date": "2026-10-03"
     },
     "/tools/suspended-scaffold-counterweight/": {
       "sha": "c39e27a6841e9a89",
@@ -7882,8 +7882,8 @@
       "date": "2026-09-29"
     },
     "/tools/tapered-flocculation-g/": {
-      "sha": "ad0bcbadfc4d86ce",
-      "date": "2026-09-29"
+      "sha": "e5a190f831be6511",
+      "date": "2026-10-03"
     },
     "/tools/tapered-roof-insulation/": {
       "sha": "52f64cbda3d6b8a6",

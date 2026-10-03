@@ -61402,7 +61402,7 @@
   {
    "tile_id": "generator-conductor-445",
    "source_publisher": "NEC 2023 445.13(A)",
-   "source_title": "150 kW, 480 V three-phase, 0.8 pf, standard 115% basis -> 225.6 A nameplate, 259.4 A required",
+   "source_title": "150 kW, 480 V three-phase, 0.8 pf, standard 115% basis -> 225.5 A nameplate, 259.4 A required",
    "source_edition_or_year": "spec-v493 worked example (machine-verified)",
    "source_section_or_page": "spec-v493 section 2.1 pinned example",
    "verified_by": "rl",
@@ -61416,7 +61416,7 @@
    },
    "outputs": {
     "nameplate_a": {
-     "value": 225.6,
+     "value": 225.5,
      "tolerance": {
       "abs": 0.5
      }
@@ -61438,7 +61438,7 @@
   {
    "tile_id": "generator-conductor-445",
    "source_publisher": "NEC 2023 445.13(A) exception",
-   "source_title": "cross-check: an overload-limited design earns the 100% basis -> required ampacity equals the 225.6 A nameplate",
+   "source_title": "cross-check: an overload-limited design earns the 100% basis -> required ampacity equals the 225.5 A nameplate",
    "source_edition_or_year": "spec-v493 worked example (machine-verified)",
    "source_section_or_page": "spec-v493 section 2.1 cross-check",
    "verified_by": "rl",
@@ -61458,7 +61458,7 @@
      }
     },
     "required_ampacity_a": {
-     "value": 225.6,
+     "value": 225.5,
      "tolerance": {
       "abs": 0.5
      }
@@ -67523,7 +67523,7 @@
   {
    "tile_id": "secondary-compression-settlement",
    "source_publisher": "standard secondary-consolidation relation",
-   "source_title": "cross-check: creep grows with the log of the time ratio (1 to 100 yr doubles the log term)",
+   "source_title": "cross-check: creep grows with the log of the time ratio (1 to 100 yr: log term 2.0 vs 1.70 at 50 yr, 18% more creep)",
    "source_edition_or_year": "Ss proportional to log10(t2/t1)",
    "source_section_or_page": "The same clay from 1 to 100 years: log10(100) = 2.0 exactly, so Ss = 0.010811 x 10 x 2.0 = 0.21622 ft = 2.595 in -- 18% more than the 50-year value for double the time, the decelerating log-time creep.",
    "verified_by": "rl",
@@ -84481,7 +84481,7 @@
   {
    "tile_id": "overflow-scupper-sizing",
    "source_publisher": "Francis weir / IPC 1108",
-   "source_title": "6 in scupper, 3.5 in head -> 118 gpm (104 contracted)",
+   "source_title": "6 in scupper, 3.5 in head -> 104 gpm contracted (118 suppressed)",
    "source_edition_or_year": "spec-v426 worked example (machine-verified)",
    "source_section_or_page": "spec-v426 section 2.1 pinned example",
    "verified_by": "rl",
@@ -84535,7 +84535,7 @@
   {
    "tile_id": "overflow-scupper-sizing",
    "source_publisher": "Francis weir / IPC 1108",
-   "source_title": "cross-check: a wide 12 in / 2 in scupper passes 102 gpm",
+   "source_title": "cross-check: a wide 12 in / 2 in scupper passes 98 gpm contracted (102 suppressed)",
    "source_edition_or_year": "spec-v426 worked example (machine-verified)",
    "source_section_or_page": "spec-v426 section 2.1 cross-check",
    "verified_by": "rl",
@@ -91414,7 +91414,7 @@
    "source_publisher": "Camp paddle flocculator power (water-treatment design practice)",
    "source_title": "P = 0.5 x Cd x rho x A x v_rel^3, v_rel = v_tip x (1 - k) (spec-v575's named follow-on)",
    "source_edition_or_year": "Camp / water-treatment design practice",
-   "source_section_or_page": "6-ft wheel, 3 rpm, 40 ft2, Cd 1.8, slip 0.25 -> v_tip 1.885, v_rel 1.414 ft/s, 197 ft-lb/s = 267 W (0.36 hp)",
+   "source_section_or_page": "Paddles at 6 ft radius, 3 rpm, 40 ft2, Cd 1.8, slip 0.25 -> v_tip 1.885, v_rel 1.414 ft/s, 197 ft-lb/s = 267 W (0.36 hp)",
    "verified_by": "rl",
    "verified_on": "2026-07-10",
    "inputs": {
@@ -92873,9 +92873,9 @@
   {
    "tile_id": "trapezoidal-channel-flow",
    "source_publisher": "Chow, Open-Channel Hydraulics",
-   "source_title": "cross-check: V-ditch (zero bottom width) running near critical",
+   "source_title": "cross-check: V-ditch (zero bottom width) at Fr 0.97, subcritical but close to critical",
    "source_edition_or_year": "standard Manning relation",
-   "source_section_or_page": "b 0, z 3, y 1.5 ft, n 0.035, S 0.02 -> A 6.75 sf, Q 32.30 cfs at 4.785 ft/s, Fr 0.974 - close enough to critical that the instability warning earns its place",
+   "source_section_or_page": "b 0, z 3, y 1.5 ft, n 0.035, S 0.02 -> A 6.75 sf, Q 32.30 cfs at 4.785 ft/s, Fr 0.974 - subcritical by the tile's 0.99 band, but close enough to critical that the note's instability warning applies",
    "verified_by": "rl",
    "verified_on": "2026-07-27",
    "inputs": {
@@ -97439,7 +97439,7 @@
    "source_publisher": "Occupational Safety and Health Administration",
    "source_title": "cross-check: the same ladder reaches an 18 ft landing with rail to spare",
    "source_edition_or_year": "29 CFR 1926.1053",
-   "source_section_or_page": "Dropping the landing to 18 ft takes 18.554 ft of rail plus the same 3.092 ft of extension, 21.646 ft total against the 24 ft ladder -- it reaches. The highest landing served is unchanged at 20.284 ft, because that figure depends only on the ladder and the setup ratio, not on the landing being attempted. The four-foot gap between the label and the working height is entirely setback and extension.",
+   "source_section_or_page": "Dropping the landing to 18 ft takes 18.554 ft of rail plus the same 3.092 ft of extension, 21.646 ft total against the 24 ft ladder -- it reaches. The highest landing served is unchanged at 20.283 ft, because that figure depends only on the ladder and the setup ratio, not on the landing being attempted. The four-foot gap between the label and the working height is entirely setback and extension.",
    "verified_by": "rl",
    "verified_on": "2026-07-28",
    "inputs": {
@@ -99597,7 +99597,7 @@
   {
    "tile_id": "egress-window-check",
    "source_publisher": "International Code Council",
-   "source_title": "IRC R310.2.1 -- the code's own three minimums cannot all be met at once (spec-v1131)",
+   "source_title": "IRC R310.2.1 -- the code's own three minimums cannot all be met by building to the dimensional minimums (spec-v1131)",
    "source_edition_or_year": "IRC R310.2.1 / R310.2.3",
    "source_section_or_page": "'Emergency escape and rescue openings shall have a net clear opening of not less than 5.7 square feet... The net clear height of the opening shall be not less than 24 inches and the net clear width shall be not less than 20 inches.' A window built to exactly both minimums is 20 x 24 = 480 sq in against 5.7 x 144 = 820.8 sq in required, failing by 340.8 sq in. At the 24 in height the width must reach 820.8/24 = 34.20 in; at the 20 in width the height must reach 820.8/20 = 41.04 in. The 40 in sill clears the 44 in maximum, but the opening still fails on area.",
    "verified_by": "rl",
@@ -108251,7 +108251,7 @@
   {
    "tile_id": "radiant-exposure-separation",
    "source_publisher": "Project (first-principles)",
-   "source_title": "5 MW fire at a 0.3 radiative fraction against 12.6 kW/m2, flux read at 5 m",
+   "source_title": "5 MW fire at a 0.3 radiative fraction against 12.6 kW/m2, flux read at 20 ft (6.1 m)",
    "source_edition_or_year": "point-source radiation",
    "source_section_or_page": "flux = power / (4 pi r^2)",
    "verified_by": "rl",
@@ -142331,7 +142331,7 @@
    "source_publisher": "Plumbing & Mechanical Engineer (John Siegenthaler, P.E.)",
    "source_title": "Concepts for varying flow rate in geothermal earth loops (Renewable Heating Design: Max COP Tracking, Part 1)",
    "source_edition_or_year": "November 2, 2023",
-   "source_section_or_page": "Worked example under Formula 1: 20% propylene glycol at 30 F through 1-inch DR-11 HDPE (ID 1.076 in) at 5 gpm; density 64.14 lb/ft3, viscosity 4.23 cP (= 0.002843 lb/ft/s); printed Reynolds number 3,560. Tolerance 0.5% covers the publisher's rounded intermediate velocity. Placeholders: tons 1 x gpm_per_ton 5 reproduces the printed 5 gpm; specific_gravity, head_ft, wire_to_water_efficiency and benchmark_w_per_ton do not affect Reynolds. NOTE: the publisher calls Re 3,560 turbulent (IGSHPA minimum 2,500); the tile labels it TRANSITIONAL (see report lead).",
+   "source_section_or_page": "Worked example under Formula 1: 20% propylene glycol at 30 F through 1-inch DR-11 HDPE (ID 1.076 in) at 5 gpm; density 64.14 lb/ft3, viscosity 4.23 cP (= 0.002843 lb/ft/s); printed Reynolds number 3,560. Tolerance 0.5% covers the publisher's rounded intermediate velocity. Placeholders: tons 1 x gpm_per_ton 5 reproduces the printed 5 gpm; specific_gravity, head_ft, wire_to_water_efficiency and benchmark_w_per_ton do not affect Reynolds. NOTE: the publisher calls Re 3,560 turbulent (IGSHPA minimum 2,500); the tile now labels it turbulent (Re >= 2,500).",
    "verified_by": "rl",
    "verified_on": "2026-10-01",
    "inputs": {
@@ -166217,7 +166217,7 @@
    "source_publisher": "FIRGELLI Automations",
    "source_title": "Automated Gate Opener: How to Calculate the Force to Open a Heavy Gate (Robbie Dickson)",
    "source_edition_or_year": "web technical guide, accessed 2026-10-03",
-   "source_section_or_page": "Inclined-driveway section, printed: 'On a 10% grade (5.71 degrees), the gravity component increases to 39.8 pounds, with total force reaching 45.7 pounds' (400 lb gate, mu = 0.015). Tile omits the cos(theta) on the rolling term (6.00 vs 5.99) and uses sin(atan(grade)) rather than the rounded angle, so it reads 39.80 / 45.80; pct 0.5 covers the printed rounding (max 0.22%). Duty inputs (24 ft, 1 ft/s, 150 cycles, 10 h, 400 lb rating) are not in the source and do not enter the force outputs.",
+   "source_section_or_page": "Inclined-driveway section, printed: 'On a 10% grade (5.71 degrees), the gravity component increases to 39.8 pounds, with total force reaching 45.7 pounds' (400 lb gate, mu = 0.015). Tile omits the cos(theta) on the rolling term (6.00 vs 5.97) and uses sin(atan(grade)) rather than the rounded angle, so it reads 39.80 / 45.80; pct 0.5 covers the printed rounding (max 0.22%). Duty inputs (24 ft, 1 ft/s, 150 cycles, 10 h, 400 lb rating) are not in the source and do not enter the force outputs.",
    "verified_by": "rl",
    "verified_on": "2026-10-03",
    "inputs": {
