@@ -981,7 +981,7 @@ export const BESPOKE_OUTPUT_LABELS = {
   "trunk-min-shell-thickness": {"min_shell_in":"Minimum sound-shell thickness","notes":"Note"},
   "truss-capacity": {"udl_max_lb_per_ft":"UDL capacity at this span","equivalent_udl_lb_per_ft":"Equivalent UDL (loaded)","safety_factor":"Safety factor","pass":"Pass / fail","attribution":"Source"},
   "turning-surface-finish": {"rt_uin":"Theoretical Rt","ra_uin":"Estimated Ra","notes":"Notes"},
-  "two-proportion-z-test": {"ci_low":"Difference 95% CI (unpooled)","warnings":"Warnings","note":"Note"},
+  "two-proportion-z-test": {"ci_low":"Difference CI (unpooled; 95% two-sided, 90% when one-sided is chosen)","warnings":"Warnings","note":"Note"},
   "two-sample-t-test": {"note":"Note"},
   "two-source-blend": {"blended_conc":"Blended concentration","target_note":"To hit the target"},
   "two-stroke-mix": {"oil_oz":"Oil to add","oz_per_gallon":"Dose","notes":"Notes"},

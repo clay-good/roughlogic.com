@@ -561,7 +561,7 @@ function renderTwoProportionZTest(inputRegion, outputRegion, citationEl) {
   attachExampleButton(inputRegion, () => { x1.input.value = "45"; n1.input.value = "100"; x2.input.value = "30"; n2.input.value = "100"; tail.select.value = "two"; update(); });
   const oP = makeOutputLine(outputRegion, "Proportions p1 / p2 / difference", "tp-out-p");
   const oZ = makeOutputLine(outputRegion, "z-statistic / p-value", "tp-out-z");
-  const oCI = makeOutputLine(outputRegion, "Difference 95% CI (unpooled)", "tp-out-ci");
+  const oCI = makeOutputLine(outputRegion, "Difference CI (unpooled; 95% two-sided, 90% when one-sided is chosen)", "tp-out-ci");
   const oW = makeOutputLine(outputRegion, "Warnings", "tp-out-w");
   const oNote = makeOutputLine(outputRegion, "Note", "tp-out-note");
   function readNum(i) { if (i.value === "") return NaN; const n = Number(i.value); return Number.isFinite(n) ? n : NaN; }

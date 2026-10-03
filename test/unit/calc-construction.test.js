@@ -202,3 +202,12 @@ test("Material quantity: unknown assembly returns error", () => {
   const r = computeMaterialQuantity({ assembly: "unobtanium", area_ft2: 100 });
   assert.ok(r.error);
 });
+
+test("snow drift: a drift taller than the step is cut to hc, so the surcharge is hc x gamma over the wider base", async () => {
+  // ASCE 7-22 7.7.1. Until 2026-10-03 pd used the uncut hd (4.99 ft) over the 16 ft base.
+  const { computeSnowDriftLoad } = await import("../../calc-construction.js");
+  const r = computeSnowDriftLoad({ lu_ft: 200, pg_psf: 50, hc_ft: 2, w2: 0.5 });
+  assert.ok(r.hd_ft > 2);
+  assert.ok(Math.abs(r.pd_psf - 2 * r.gamma_pcf) < 1e-9);
+  assert.equal(r.w_ft, 16); // min(4 hd^2 / hc, 8 hc)
+});

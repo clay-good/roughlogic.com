@@ -18453,7 +18453,7 @@
   {
    "tile_id": "seismic-earth-pressure",
    "source_publisher": "Mononobe-Okabe (Okabe 1926; Mononobe and Matsuo 1929) / Kramer, Geotechnical Earthquake Engineering / NAVFAC DM-7.02",
-   "source_title": "phi 35 deg, delta 17.5 deg (2/3 phi), vertical wall, level backfill, gamma 120 pcf, H 12 ft, kh 0.15, kv 0 -> Kae 0.3405, Pae 2,942 lb/ft",
+   "source_title": "phi 35 deg, delta 17.5 deg (phi/2), vertical wall, level backfill, gamma 120 pcf, H 12 ft, kh 0.15, kv 0 -> Kae 0.3405, Pae 2,942 lb/ft",
    "source_edition_or_year": "psi = arctan(kh/(1-kv)); Kae = cos^2(phi - theta - psi) / [cos(psi) cos^2(theta) cos(delta + theta + psi) (1 + sqrt(sin(phi+delta) sin(phi - psi - alpha) / (cos(delta+theta+psi) cos(theta-alpha))))^2]; Pae = 0.5 Kae gamma H^2 (1 - kv)",
    "source_section_or_page": "psi = arctan(0.15) = 8.5308 deg; Kae = 0.34053 (the published Kae table for phi 35 / delta phi/2 / kv 0 reads 0.246 at kh 0, 0.306 at kh 0.10, 0.380 at kh 0.20, bracketing this value); Pae = 0.5 x 0.34053 x 120 x 144 = 2,942.2 lb/ft; static Coulomb Ka = 0.24612 gives Pa = 2,126.5 lb/ft, so the dynamic increment is 815.7 lb/ft against the Seed-Whitman envelope 0.375 x 0.15 x 120 x 144 = 972 lb/ft",
    "verified_by": "rl",
@@ -61141,7 +61141,7 @@
   {
    "tile_id": "insulation-resistance-pi",
    "source_publisher": "Insulation resistance PI / DAR (IEEE 43 megger test)",
-   "source_title": "cross-check: a flat 1,000 / 1,000 / 1,000 Mohm test (no rise) gives PI 1.0 -- dangerous",
+   "source_title": "cross-check: a flat 1,000 / 1,000 / 1,000 Mohm test (no rise) gives PI 1.0 -- questionable (the floor of the 1-2 band)",
    "source_edition_or_year": "spec-v957 worked example (machine-verified)",
    "source_section_or_page": "PI = 1000/1000 = 1.0 (insulation not absorbing -> wet/contaminated flag)",
    "verified_by": "rl",
@@ -66110,7 +66110,7 @@
   {
    "tile_id": "tr55-time-of-concentration",
    "source_publisher": "USDA NRCS TR-55 (1986), Chapter 3",
-   "source_title": "TR-55 Ch. 3 velocity-method example: sheet + shallow + channel -> 61.0 min (spec-v1200)",
+   "source_title": "Project example adapted from TR-55 Ch. 3 (velocity method): sheet + shallow + channel -> 61.0 min (spec-v1200)",
    "source_edition_or_year": "TR-55 1986, Chapter 3 worked example",
    "source_section_or_page": "Sheet n 0.24 dense grass, L 100 ft, P2 3.6 in, s 0.01: Tt = 0.007 (0.24 x 100)^0.8 / (3.6^0.5 x 0.01^0.4) = 0.296 hr = 17.75 min. Shallow unpaved L 1400 ft s 0.01: V = 16.1345 sqrt(0.01) = 1.6135 ft/s, Tt = 1400 / (3600 x 1.6135) = 0.241 hr = 14.46 min. Channel n 0.05 R 0.75 ft s 0.005 L 3000 ft: V = (1.49/0.05) 0.75^(2/3) sqrt(0.005) = 1.7394 ft/s, Tt = 3000 / (3600 x 1.7394) = 0.479 hr = 28.74 min. Tc = 17.75 + 14.46 + 28.74 = 60.96 min.",
    "verified_by": "rl",
@@ -85770,7 +85770,7 @@
   {
    "tile_id": "reorder-point",
    "source_publisher": "reorder point and safety stock (service-level inventory control)",
-   "source_title": "cross-check: raising the target to 99% (z 2.326) nearly doubles the buffer to 123, reorder at 823",
+   "source_title": "cross-check: raising the target to 99% (z 2.326) raises the buffer about 41% to 123, reorder at 823",
    "source_edition_or_year": "spec-v530 worked example (machine-verified)",
    "source_section_or_page": "spec-v530 section 2.1 cross-check",
    "verified_by": "rl",
@@ -86083,7 +86083,7 @@
   {
    "tile_id": "masonry-anchor-bolt",
    "source_publisher": "TMS 402 ASD",
-   "source_title": "3/4in anchor, 4in embed, 1500 psi, Fy 36 ksi -> Bab 2,433 lb (masonry governs), Bas 9,547 lb",
+   "source_title": "3/4in anchor, 4in embed, 1500 psi, Fy 36 ksi -> Bab 2,433 lb (masonry governs), Bas 7,214 lb",
    "source_edition_or_year": "spec-v449 worked example (machine-verified)",
    "source_section_or_page": "spec-v449 section 2.1 pinned example",
    "verified_by": "rl",
@@ -86118,7 +86118,7 @@
   {
    "tile_id": "masonry-anchor-bolt",
    "source_publisher": "TMS 402 ASD",
-   "source_title": "8in embed doubles Apt -> Bab 9,733 lb, so 7,214 lb steel now governs",
+   "source_title": "8in embed quadruples Apt -> Bab 9,733 lb, so 7,214 lb steel now governs",
    "source_edition_or_year": "spec-v449 cross-check (machine-verified)",
    "source_section_or_page": "spec-v449 section 2.1 cross-check",
    "verified_by": "rl",
@@ -86178,7 +86178,7 @@
    "source_publisher": "TMS 402 ASD",
    "source_title": "lbe = sqrt(T / (1.25 pi sqrt(f'm))); inverse of the anchor-bolt breakout branch",
    "source_edition_or_year": "spec-v705 worked example (machine-verified; inverse of spec-v449)",
-   "source_section_or_page": "5,000 lb tension, 1,500 psi masonry -> 5.73 in embedment; Bas 9,547 lb adequate",
+   "source_section_or_page": "5,000 lb tension, 1,500 psi masonry -> 5.73 in embedment; Bas 7,214 lb adequate",
    "verified_by": "rl",
    "verified_on": "2026-07-14",
    "inputs": {
@@ -86233,10 +86233,10 @@
   },
   {
    "tile_id": "masonry-anchor-shear",
-   "source_publisher": "TMS 402-16 ASD (Section 8.1.5.2)",
+   "source_publisher": "TMS 402-13 ASD (as NCMA TEK 12-03C prints it) (Section 8.1.5.2)",
    "source_title": "Bv = least of breakout / crushing / pryout / steel",
    "source_edition_or_year": "spec-v1232 worked example (machine-verified; crushing 350 coeff vs NCMA TEK 12-03A)",
-   "source_section_or_page": "3/4in A307, 1,500 psi, 5 in embed 4 in from edge: Bvb 1,217 (governs), Bvc 1,776, Bvpry 7,605, Bvs 5,728",
+   "source_section_or_page": "3/4in A307, 1,500 psi, 5 in embed 4 in from edge: Bvb 1,217 (governs), Bvc 1,656, Bvpry 7,605, Bvs 4,329",
    "verified_by": "rl",
    "verified_on": "2026-08-08",
    "inputs": {
@@ -86263,10 +86263,10 @@
   },
   {
    "tile_id": "masonry-anchor-shear",
-   "source_publisher": "TMS 402-16 ASD (crushing-governs cross-check)",
+   "source_publisher": "TMS 402-13 ASD (as NCMA TEK 12-03C prints it) (crushing-governs cross-check)",
    "source_title": "away from an edge, masonry crushing governs",
    "source_edition_or_year": "spec-v1232 worked example (machine-verified)",
-   "source_section_or_page": "same 3/4in bolt, 8 in embed 10 in from edge: breakout climbs to 4,866 lb so Bvc = 1,776 lb governs",
+   "source_section_or_page": "same 3/4in bolt, 8 in embed 10 in from edge: breakout climbs to 7,605 lb so Bvc = 1,656 lb governs",
    "verified_by": "rl",
    "verified_on": "2026-08-08",
    "inputs": {
@@ -95312,7 +95312,7 @@
    "source_publisher": "FHWA HDS-5 (FHWA-HIF-12-026)",
    "source_title": "36 in concrete pipe, square headwall, 100 ft on 1%, 50 cfs, 2 ft TW -> inlet control governs at HW 3.99 ft (spec-v1277)",
    "source_edition_or_year": "HW_design = max(HW_inlet, HW_outlet); inlet Appendix A, outlet Chapter 3",
-   "source_section_or_page": "HW_inlet = 3.986 ft (unsubmerged inlet control) vs HW_outlet = 3.292 ft (full-flow outlet control), so the design headwater is 3.986 ft and INLET control governs. HW/D = 3.986/3 = 1.329. On this steep 1% barrel with a good square-edge headwall the inlet limits the flow before the barrel does.",
+   "source_section_or_page": "HW_inlet = 3.986 ft (submerged inlet control) vs HW_outlet = 3.292 ft (full-flow outlet control), so the design headwater is 3.986 ft and INLET control governs. HW/D = 3.986/3 = 1.329. On this steep 1% barrel with a good square-edge headwall the inlet limits the flow before the barrel does.",
    "verified_by": "rl",
    "verified_on": "2026-08-09",
    "inputs": {
@@ -100204,9 +100204,9 @@
   {
    "tile_id": "sheet-metal-gauge",
    "source_publisher": "Manufacturers' Standard Gage (U.S. Act of Congress 1893) / Brown & Sharpe",
-   "source_title": "16 gauge is 0.0598 in steel, 0.0625 in galvanized, 0.0508 in aluminum (spec-v1257)",
+   "source_title": "16 gauge is 0.0598 in steel, 0.0635 in galvanized, 0.0508 in aluminum (spec-v1257)",
    "source_edition_or_year": "MSG (steel/galv) + B&S formula (aluminum)",
-   "source_section_or_page": "Steel 16 ga MSG = 2.5 lb/ft2 / 41.82 = 0.0598 in; galvanized 16 ga = 0.0625 in (MSG + zinc); aluminum 16 ga = 0.005 x 92^((36-16)/39) = 0.005 x 92^0.51282 = 0.0508 in -- three different thicknesses for the same gauge number.",
+   "source_section_or_page": "Steel 16 ga MSG = 2.5 lb/ft2 / 41.82 = 0.0598 in; galvanized 16 ga = 0.0635 in (MSG + zinc); aluminum 16 ga = 0.005 x 92^((36-16)/39) = 0.005 x 92^0.51282 = 0.0508 in -- three different thicknesses for the same gauge number.",
    "verified_by": "rl",
    "verified_on": "2026-08-08",
    "inputs": {
@@ -112931,7 +112931,7 @@
   {
    "tile_id": "blast-powder-factor",
    "source_publisher": "Project (first-principles)",
-   "source_title": "8 by 10 ft pattern, 30 ft bench, 3.5 in holes, ANFO at SG 1.25 in 165 pcf rock",
+   "source_title": "8 by 10 ft pattern, 30 ft bench, 3.5 in holes, packaged emulsion at SG 1.25 in 165 pcf rock",
    "source_edition_or_year": "loading density = (pi/4) d^2 x 62.4 x SG; PF = charge / tons",
    "source_section_or_page": "the blaster in charge and the site blast plan govern",
    "verified_by": "rl",

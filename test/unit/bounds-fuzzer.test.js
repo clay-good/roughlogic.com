@@ -33894,7 +33894,7 @@ test("bounds: spec-v1119 computeFireplaceFlueArea pins the three IRC R1003.15.1 
   // HEIGHT: 15 ft exactly is compliant; below it the ratios do not apply and the note says so.
   assert.ok(_v1119({ ...base, chimney_height_ft: 15 }).height_ok);
   const short = _v1119({ ...base, chimney_height_ft: 14.9 });
-  assert.ok(!short.height_ok && /15-ft minimum|at least 15 ft/.test(short.note));
+  assert.ok(!short.height_ok && /15-ft minimum|at least 15 ft|under 15 ft/.test(short.note));
   assert.ok(short.required_area_sqin === r.required_area_sqin, "height gates applicability, it does not change the ratio");
   // Required area scales linearly with the opening; a bigger opening never needs a smaller flue.
   assert.ok(Math.abs(_v1119({ ...base, opening_width_in: 72 }).required_area_sqin - 2 * r.required_area_sqin) < 1e-9);

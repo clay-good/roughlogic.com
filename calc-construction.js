@@ -6980,15 +6980,19 @@ export function computeSnowDriftLoad({ lu_ft = 0, pg_psf = 0, hc_ft = 0, w2 = SN
   const gamma_pcf = Math.min(0.13 * pg_psf + 14, 30);
   const hd_ft = _asce722DriftHeight(pg_psf, lu_ft, w2);
   let w_ft;
-  if (hc_ft > 0 && hd_ft > hc_ft) {
+  const reaches_upper_roof = hc_ft > 0 && hd_ft > hc_ft;
+  if (reaches_upper_roof) {
     w_ft = Math.min((4 * hd_ft * hd_ft) / hc_ft, 8 * hc_ft);
   } else {
     w_ft = 4 * hd_ft;
   }
-  const pd_psf = hd_ft * gamma_pcf;
+  // ASCE 7-22 7.7.1: a drift that would stand above the upper roof is cut to hc,
+  // and the wider 4 hd^2 / hc base keeps its area. Until 2026-10-03 the surcharge
+  // used the uncut hd over that wider width, overstating both.
+  const pd_psf = (reaches_upper_roof ? hc_ft : hd_ft) * gamma_pcf;
   return {
     gamma_pcf, hd_ft, w_ft, pd_psf,
-    note: "ASCE 7-22 Chapter 7 leeward snow drift: hd = 1.5 sqrt(pg^0.74 lu^0.70 W2^1.7 / gamma) (Eq. 7.6-1; lu upwind fetch ft, pg the risk-category ground snow psf, W2 the winter wind parameter from Figure 7.6-1 or the ASCE Hazard Tool, defaulting here to " + SNOW_W2_DEFAULT + ", the top of the lower-48 range, which overstates the drift where winter wind is calmer), the density gamma = 0.13 pg + 14 <= 30 pcf, the peak surcharge pd = hd gamma at the step, and the width w = 4 hd for a full-height triangle (hd <= hc; when the drift reaches the upper roof, w = 4 hd^2/hc <= 8 hc). This is the drift surcharge riding ON TOP OF the balanced load (snow-load) - it uses the leeward form (the windward drift uses 0.75 hd with the lower roof's fetch, and 7-22 sets its width at 6 hd), and excludes the sliding-snow surcharge (7.9) and the unbalanced-gable case (7.6.1). A design aid, not a substitute for the engineer of record.",
+    note: "ASCE 7-22 Chapter 7 leeward snow drift: hd = 1.5 sqrt(pg^0.74 lu^0.70 W2^1.7 / gamma) (Eq. 7.6-1; lu upwind fetch ft, pg the risk-category ground snow psf, W2 the winter wind parameter from Figure 7.6-1 or the ASCE Hazard Tool, defaulting here to " + SNOW_W2_DEFAULT + ", the top of the lower-48 range, which overstates the drift where winter wind is calmer), the density gamma = 0.13 pg + 14 <= 30 pcf, the peak surcharge pd = hd gamma at the step, and the width w = 4 hd for a full-height triangle (hd <= hc; when the drift reaches the upper roof it is cut to hc, so pd = hc gamma and w = 4 hd^2/hc <= 8 hc). This is the drift surcharge riding ON TOP OF the balanced load (snow-load) - it uses the leeward form (the windward drift uses 0.75 hd with the lower roof's fetch, and 7-22 sets its width at 6 hd), and excludes the sliding-snow surcharge (7.9) and the unbalanced-gable case (7.6.1). A design aid, not a substitute for the engineer of record.",
   };
 }
 export const snowDriftLoadExample = { inputs: { lu_ft: 100, pg_psf: 30, hc_ft: 0, w2: 0.5 } };
@@ -11747,7 +11751,7 @@ export function computeGuardPostLoad({ post_height_in = 36, post_spacing_ft = 6,
     + (concentrated_governs ? "the " + P + " lb CONCENTRATED load governs here" : "the UNIFORM load governs here at " + uniform_at_post_lb.toFixed(0) + " lb - posts spaced past " + (P / w).toFixed(1) + " ft cross over to it")
     + ". "
     + "That load " + h + " in up is " + moment_inlb.toFixed(0) + " in-lb (" + moment_ftlb.toFixed(0) + " ft-lb) at the base. "
-    + "The post carries it easily: a " + b + " x " + d + " in section has S = " + section_modulus_in3.toFixed(2) + " in^3, needing only " + required_fb_psi.toFixed(0) + " psi of bending stress"
+    + "The post itself: a " + b + " x " + d + " in section has S = " + section_modulus_in3.toFixed(2) + " in^3, needing " + required_fb_psi.toFixed(0) + " psi of bending stress"
     + (Fb > 0 ? " against the " + Fb + " psi allowable you entered - " + (post_ok ? "OK at " + (post_utilization * 100).toFixed(0) + "% utilization. " : "OVER at " + (post_utilization * 100).toFixed(0) + "%. ") : ". Enter an allowable bending stress for the species, grade, and adjustment factors to get a utilization. ")
     + "THE CONNECTION IS THE PROBLEM. The same " + moment_inlb.toFixed(0) + " in-lb has to be resolved into a couple across only " + lever + " in of fastener spacing, so each side of that couple carries " + connection_force_lb.toFixed(0) + " lb - " + force_multiplier.toFixed(1) + " times the load that was applied. The lever arm collapsed from " + h + " in to " + lever + " in and multiplied the force by exactly that ratio. This is why residential deck guards fail at the rim joist rather than at the post, why lag screws into the end grain of a rim are not acceptable, and why the tested details use through-bolts with washers plus blocking, or a proprietary tension hold-down. "
     + "Notching a post at the connection to clear the rim cuts the section right where the moment is highest - use the notched dimensions here if that is the detail. "

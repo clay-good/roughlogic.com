@@ -607,7 +607,7 @@ DOORHARDWARE_RENDERERS["door-undercut-transfer-air"] = _simpleRenderer({
 // ===================== spec-v1579: fire door clearance and inspection limits =====================
 
 // dims: in { head_in: L, hinge_jamb_in: L, strike_jamb_in: L, meeting_edge_in: L, bottom_in: L, perimeter_limit_in: L, meeting_limit_in: L, bottom_limit_in: L } out: { head_margin_in: L, hinge_margin_in: L, strike_margin_in: L, meeting_margin_in: L, bottom_margin_in: L }
-export function computeFireDoorClearance({ head_in = 0, hinge_jamb_in = 0, strike_jamb_in = 0, meeting_edge_in = 0, bottom_in = 0, perimeter_limit_in = 0.125, meeting_limit_in = 0.1875, bottom_limit_in = 0.75 } = {}) {
+export function computeFireDoorClearance({ head_in = 0, hinge_jamb_in = 0, strike_jamb_in = 0, meeting_edge_in = 0, bottom_in = 0, perimeter_limit_in = 0.125, meeting_limit_in = 0.125, bottom_limit_in = 0.75 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   for (const [name, v] of [["head", head_in], ["hinge jamb", hinge_jamb_in], ["strike jamb", strike_jamb_in], ["meeting edge", meeting_edge_in], ["bottom", bottom_in]]) {
     if (!(v >= 0)) return { error: "The " + name + " clearance cannot be negative." };
