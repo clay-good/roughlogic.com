@@ -3047,7 +3047,7 @@ export const CITATIONS = {
   },
 
   "conduit-expansion-max-run": {
-    formula: "L_max = trigger_in / (coefficient x 12 x |temperature_change|); the longest straight run whose length change stays at or below the 1/4-inch (0.25 in) expansion-fitting trigger, the inverse of conduit-thermal-expansion. PVC coefficient 3.38e-5 in/in/deg-F.",
+    formula: "L_max = trigger_in / (coefficient x 12 x |temperature_change|); the longest straight run whose length change stays below the 1/4-inch (0.25 in) expansion-fitting trigger (NEC 352.44 requires the fitting at 1/4 in or greater, so a run of exactly L_max already needs one), the inverse of conduit-thermal-expansion. PVC coefficient 3.38e-5 in/in/deg-F.",
     edition: NEC_2023 + " 352.44 (expansion fittings for rigid PVC conduit).",
     freeAccess: NEC_FREE,
     governance: GOVERNANCE.electrical,
@@ -10007,7 +10007,7 @@ export const CITATIONS = {
     edition: "Simplified HDD pullback identity by name (F = mu x weight x length x bend + drag); ASTM F1962 basis, first-order form.",
     freeAccess: "The simplified pullback identity is public first-principles friction mechanics; the full model and pipe/rig ratings come from the drilling contractor.",
     governance: GOVERNANCE.general,
-    editionNote: "A first-order estimate: the full ASTM F1962 model adds capstan/bend and hydrokinetic drag terms this tile omits, so treat the result as a floor. The effective pipe weight already accounts for buoyancy in the drilling fluid. The drilling contractor and the rig's rated thrust govern the pull.",
+    editionNote: "A first-order estimate: the capstan relation (tension x e^(mu x total bend angle)) is computed beside the lumped bend factor and the larger governs; the full ASTM F1962 model's hydrokinetic drag term is not, so treat the result as a floor. The effective pipe weight already accounts for buoyancy in the drilling fluid. The drilling contractor and the rig's rated thrust govern the pull.",
     assumptions: [
       { name: "Pullback", value: "friction x effective weight x length x bend factor, plus a hydrokinetic drag allowance", source: "ASTM F1962 (simplified)" },
       { name: "Effective weight", value: "the pipe weight in the drilling fluid (buoyancy already accounted for); a ballasted or empty pipe can be near neutral", source: "drilling contractor" },
@@ -10262,7 +10262,7 @@ export const CITATIONS = {
     governance: GOVERNANCE.general,
     editionNote: "Sizes the DC power supply and standby battery for an access-control door system. The total load rolls up the maglock hold currents, the reader currents, the request-to-exit devices, and the controller; the supply is sized about 25% over the continuous load; and the standby battery is the load times the required standby hours with a 25% aging derate. FAIL-SAFE maglocks draw continuously and release on loss of power (egress on a fire alarm), so they dominate the standby draw; FAIL-SECURE electric strikes draw only during an unlock and stay locked on power loss, cutting the standby battery sharply. NFPA 72 sets the standby time (commonly 4 to 24 hours) for a system tied to the fire alarm or required for egress. A sizing estimate; the listed access-control panel, the door-hardware datasheets, the AHJ, and the fire / life-safety interface govern the final design.",
     assumptions: [
-      { name: "Headroom and aging", value: "supply >= 1.25 x continuous load; battery = load x standby hr x 1.25 aging", source: "NFPA 72 / UL 294 practice" },
+      { name: "Headroom and aging", value: "supply >= 1.25 x continuous load; battery = load x standby hr x 1.25 aging", source: "design-margin practice; neither NFPA 72 nor UL 294 sets 1.25 (Altronix's worksheet uses 1.8 and adds the supply's own standby draw)" },
       { name: "Fail-safe vs fail-secure", value: "fail-safe maglocks draw continuously (dominate standby); fail-secure strikes draw only on unlock", source: "door-hardware behavior" },
     ],
   },
@@ -13412,7 +13412,7 @@ export const CITATIONS = {
     edition: "Secondary (standby) battery runtime for a fire-alarm or security control unit - the sizing worksheet solved for the standby period - per NFPA 72 National Fire Alarm and Signaling Code §10.6 (secondary power supply), by name.",
     freeAccess: "First-principles amp-hour accounting. The AHJ-adopted NFPA 72 edition, the listed panel, and the battery manufacturer's derating govern.",
     governance: GOVERNANCE.fire,
-    editionNote: "The standby (supervisory) time an installed battery supports before the alarm load, the inverse of standby-battery-sizing: Hs = (battery_Ah/derate - alarm_Ah) / I_standby. The derate (aging) factor is applied to the battery capacity, not credited, so the usable Ah is the nameplate divided by the derate (NFPA 72 expects >= 1.0, commonly 1.2). The alarm reserve is subtracted first, then the remainder divides by the standby current; a battery too small to cover even the alarm reserve leaves no standby time and is rejected. A design check against a required standby period (commonly 24 h with 5 or 15 min alarm); the AHJ-adopted edition, the listed panel, and the battery manufacturer's derating govern.",
+    editionNote: "The standby (supervisory) time an installed battery supports before the alarm load, the inverse of standby-battery-sizing: Hs = (battery_Ah/derate - alarm_Ah) / I_standby. The derate (aging) factor is applied to the battery capacity, not credited, so the usable Ah is the nameplate divided by the derate (NFPA 72 expects >= 1.0; the 1.25 used here is the common NFPA 72 battery-calculation margin). The alarm reserve is subtracted first, then the remainder divides by the standby current; a battery too small to cover even the alarm reserve leaves no standby time and is rejected. A design check against a required standby period (commonly 24 h with 5 or 15 min alarm); the AHJ-adopted edition, the listed panel, and the battery manufacturer's derating govern.",
     assumptions: [
       { name: "Derate on capacity", value: "the aging correction divides the usable capacity (not credited); 1.25 default per NFPA 72-2022 (1.2 through 2019)", source: "NFPA 72-2022 / panel worksheet" },
       { name: "Alarm reserve first", value: "the alarm amp-hour reserve is subtracted before dividing by the standby current", source: "NFPA 72 secondary-power method" },
@@ -13870,11 +13870,11 @@ export const CITATIONS = {
     ],
   },
   "pool-heater-btu": {
-    formula: "Q_btu = gallons x 8.34 x dT; delivered = output x eff; hours = Q_btu / delivered.",
+    formula: "Q_btu = gallons x 8.34 x dT; delivered = nameplate input x eff (the output key holds the INPUT rating); hours = Q_btu / delivered.",
     edition: "The sensible water-heating relation (1 Btu raises 1 lb of water 1 F), by name.",
     freeAccess: "The water-heating energy relation and the 8.34 lb/gal constant are standard published values. The equipment ratings and site conditions govern.",
     governance: GOVERNANCE.general,
-    editionNote: "The pool heat-up: energy Btu = gallons x 8.34 lb/gal x temperature rise, and the heat-up time = energy / (heater output x efficiency). A gas heater at ~80% warms fast; a heat pump (entered as its COP-equivalent Btu/h) is far slower but cheaper to run, so it is left on to hold temperature rather than for a quick warm-up. This returns the sensible heat-up only: it ignores the cover, evaporation, and standby losses, so real heat-up takes longer, and it does not size the gas line or verify the electrical service. A sizing estimate; the equipment ratings and site conditions govern.",
+    editionNote: "The pool heat-up: energy Btu = gallons x 8.34 lb/gal x temperature rise, and the heat-up time = energy / (heater nameplate input x efficiency). A gas heater at ~80% warms fast; a heat pump (entered as its COP-equivalent Btu/h) is far slower but cheaper to run, so it is left on to hold temperature rather than for a quick warm-up. This returns the sensible heat-up only: it ignores the cover, evaporation, and standby losses, so real heat-up takes longer, and it does not size the gas line or verify the electrical service. A sizing estimate; the equipment ratings and site conditions govern.",
     assumptions: [
       { name: "Sensible heat", value: "Btu = gallons x 8.34 x dT; 1 Btu raises 1 lb water 1 F", source: "thermodynamics" },
       { name: "Heat-up time", value: "hours = energy / (output x efficiency); enter COP-equiv Btu/h for a heat pump", source: "equipment ratings" },
@@ -14103,11 +14103,11 @@ export const CITATIONS = {
     ],
   },
   "glass-weight": {
-    formula: "weight_lb = 156.1 lb/ft^3 x area_ft2 x thickness_in/12 x panes; area_ft2 = width_in x height_in / 144; weight_per_ft2 = 156.1 x thickness_in/12 (~13.0 lb/ft^2 per inch).",
+    formula: "weight_lb = 158 lb/ft^3 x area_ft2 x thickness_in/12 x panes; area_ft2 = width_in x height_in / 144; weight_per_ft2 = 158 x thickness_in/12 (~13.2 lb/ft^2 per inch).",
     edition: "Flat glass lite weight (NGA Glazing Manual glass-weight table; ASTM C1036 flat glass), by name; the glass type and the lifter's rating govern.",
-    freeAccess: "The density x volume weight is first-principles; the soda-lime density (SG 2.50, 156.1 lb/ft^3) is the standard flat-glass value in every US glass-weight table.",
+    freeAccess: "The density x volume weight is first-principles; the 158 lb/ft^3 (2531 kg/m^3) density is the one NGA Technical Paper FM01-08 (2020) gives for an exact weight (free PDF via ogs.ny.gov). Until 2026-10-02 this used 156.1 (SG 2.50) and called it universal.",
     governance: GOVERNANCE.general,
-    editionNote: "Flat-glass weight for handling: glass weighs its density times its volume, and soda-lime float glass (standard window glass) runs about 13.0 lb per square foot per inch of thickness (specific gravity 2.50, 156.1 lb/ft^3), so a lite weighs 13.0 x thickness(in) x area(ft^2). Tempering and heat-strengthening do not change the weight; an insulating unit (IGU) is the sum of its lites, and a laminated lite's thin plastic interlayer is close enough to ignore for a lift estimate. This sizes the two-person or vacuum-cup lift and checks it against a suction lifter's rating -- OSHA and most shops flag a manual lift above about 50 lb per person. The 13.0 figure carries a ~1% material tolerance (published tables run 13.0-13.1). A handling estimate, not a structural glass design.",
+    editionNote: "Flat-glass weight for handling: glass weighs its density times its volume, and soda-lime float glass (standard window glass) runs about 13.2 lb per square foot per inch of thickness (158 lb/ft^3 per NGA FM01-08), so a lite weighs 13.2 x thickness(in) x area(ft^2). Tempering and heat-strengthening do not change the weight; an insulating unit (IGU) is the sum of its lites, and a laminated lite's thin plastic interlayer is close enough to ignore for a lift estimate. This sizes the two-person or vacuum-cup lift and checks it against a suction lifter's rating -- OSHA and most shops flag a manual lift above about 50 lb per person. The 13.0 figure carries a ~1% material tolerance (published tables run 13.0-13.1). A handling estimate, not a structural glass design.",
     assumptions: [
       { name: "Soda-lime density", value: "SG 2.50, 156.1 lb/ft^3, ~13.0 lb/ft^2 per inch (published tables 13.0-13.1, ~1% tolerance)", source: "ASTM C1036 / NGA table" },
       { name: "Tempering / IGU", value: "tempering does not change the weight; an IGU is the sum of its lites", source: "NGA Glazing Manual" },
@@ -16058,7 +16058,7 @@ export const CITATIONS = {
   },
   "gcwr-check": {
     formula: "combined = tractor + trailer; the binding limit is min(GCWR, federal_max); ok if combined <= binding, else over by combined - binding. GCWR margin and federal margin are reported separately.",
-    edition: "23 CFR 658.17 (80,000 lb federal gross) and 49 CFR 393.75 by section, with the manufacturer's GCWR rating plate; limits not reproduced.",
+    edition: "23 CFR 658.17 (80,000 lb federal gross) by section, with the manufacturer's GCWR rating plate; limits not reproduced.",
     freeAccess: "Read-only at ecfr.gov. State limits may be lower than federal; a permit or the AHJ governs an over-limit move.",
     governance: GOVERNANCE.trucking,
     editionNote: "Single-edition (the federal 80,000 lb gross cap and the GCWR rating plate govern; state and permit limits may be lower and the cap is editable).",
@@ -20815,14 +20815,14 @@ export const CITATIONS = {
     ],
   },
   "brick-veneer-anchor-spacing": {
-    formula: "anchors = ceil(area / area_per_anchor); area_per = 2.67 ft^2 typical (2.0 high-demand); max 32 in horizontal, 24 in vertical spacing.",
+    formula: "anchors = ceil(area / area_per_anchor); area_per = 2.67 ft^2 typical (2.0 high-demand); max 32 in horizontal, 25 in vertical spacing (TMS 402; the IRC R703.8.4 cap is 24 in).",
     edition: "TMS 402 (Building Code Requirements for Masonry Structures) and IBC 1405 veneer-anchor provisions, by name.",
     freeAccess: "The veneer-anchor area and spacing limits are in TMS 402 and IBC Chapter 14 (many jurisdictions post the adopted IBC). TMS 402 / IBC and the engineer of record govern.",
     governance: GOVERNANCE.general,
-    editionNote: "Brick-veneer anchor count per TMS 402 / IBC 1405: one anchor per no more than the entered wall area (2.67 ft^2 typical, 2.0 ft^2 for high wind/seismic demand), with maximum spacing of 32 in horizontal and 24 in vertical. The count = ceil(area / area-per-anchor); a tighter demand limit adds anchors on a denser grid, and if the max horizontal x vertical grid is smaller than the area limit, the spacing caps govern. This returns the count and grid for the entered limits: the area-per-anchor and spacing caps depend on the adopted edition, the anchor type, and the wind/seismic demand, and it does not design the anchor itself. A detailing aid; TMS 402 / IBC and the engineer of record govern.",
+    editionNote: "Brick-veneer anchor count per TMS 402 / IBC 1405: one anchor per no more than the entered wall area (2.67 ft^2 typical, 2.0 ft^2 for high wind/seismic demand), with maximum spacing of 32 in horizontal and 25 in vertical (TMS 402 / BIA Technical Note 28; the IRC caps vertical spacing at 24 in). The count = ceil(area / area-per-anchor); a tighter demand limit adds anchors on a denser grid, and if the max horizontal x vertical grid is smaller than the area limit, the spacing caps govern. This returns the count and grid for the entered limits: the area-per-anchor and spacing caps depend on the adopted edition, the anchor type, and the wind/seismic demand, and it does not design the anchor itself. A detailing aid; TMS 402 / IBC and the engineer of record govern.",
     assumptions: [
       { name: "Area per anchor", value: "one anchor per <= 2.67 ft^2 (2.0 ft^2 high-demand); count = ceil(area/area_per)", source: "TMS 402 / IBC 1405" },
-      { name: "Spacing caps", value: "max 32 in horizontal, 24 in vertical; spacing can govern over area", source: "TMS 402 / IBC" },
+      { name: "Spacing caps", value: "max 32 in horizontal, 25 in vertical (24 in under the IRC); spacing can govern over area", source: "TMS 402 / IBC; BIA TN 28" },
       { name: "Not anchor design", value: "verify the adopted edition and demand; does not design the anchor", source: "scope of this tile" },
     ],
   },

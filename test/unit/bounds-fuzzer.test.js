@@ -4321,6 +4321,10 @@ test("bounds: calc-mechanic computeDisplacementCR rejects non-positive bore/stro
 });
 
 test("bounds: spec-v679 computeChamberCcForCr pins chamber = cyl_cc/(CR-1) - gasket - deck + dome, round-trips through computeDisplacementCR, and error seams", () => {
+  // A piston above the deck (negative clearance) is signed, not clamped: PowerNation's 350
+  // (4.03 x 3.48, CR 9.75, 4.1 x 0.041 gasket, -5 cc dish) needs 70.31 cc at -0.005 in, not 69.26.
+  const above = computeChamberCcForCr({ bore_in: 4.03, stroke_in: 3.48, target_cr: 9.75, gasket_bore_in: 4.1, gasket_thickness_in: 0.041, deck_clearance_in: -0.005, dome_dish_cc: -5 });
+  assert.ok(Math.abs(above.chamber_cc - 70.31) < 0.02, String(above.chamber_cc));
   const geom = { bore_in: 4.0, stroke_in: 3.48, gasket_bore_in: 4.1, gasket_thickness_in: 0.040, deck_clearance_in: 0.005, dome_dish_cc: 0 };
   const fwd = computeDisplacementCR({ ...geom, cylinders: 8, chamber_cc: 64 });
   const r = computeChamberCcForCr({ ...geom, target_cr: fwd.compression_ratio });
@@ -16079,6 +16083,9 @@ test("bounds: spec-v243 computeEgressCapacity pins factor/exit-count/width, the 
 });
 
 test("bounds: spec-v244 computePlumbingFixtureCount pins the two-tier WC schedule, round-up, and error seams", () => {
+  // wc_tier = 0 is single-tier at wc_ratio (it used to ignore wc_ratio and return 0):
+  // a 300-occupant A-2 restaurant at 1:75 needs 2 per sex, 4 total.
+  assert.strictEqual(_v244({ occupant_load: 300, wc_ratio: 75, wc_ratio_over: 0, wc_tier: 0, lav_ratio: 200, fountain_ratio: 500 }).wc_total, 4);
   const r = _v244({ occupant_load: 100, wc_ratio: 25, wc_ratio_over: 50, wc_tier: 50, lav_ratio: 40, fountain_ratio: 100, distribution: 0.5 });
   assert.strictEqual(r.wc_total, 4);
   assert.strictEqual(r.lav_total, 4);
@@ -25474,8 +25481,8 @@ import { computeGlassWeight as _v798 } from "../../calc-finish.js";
 test("bounds: spec-v798 computeGlassWeight pins the lite weight, per-sqft, two-person flag, and error seams", () => {
   const r = _v798({ width_in: 60, height_in: 40, thickness_in: 0.25, panes: 1 });
   assert.ok(Math.abs(r.area_ft2 - 16.6667) < 0.001); // 60*40/144
-  assert.ok(Math.abs(r.weight_lb - 54.2) < 0.2); // 156.1 * area * 0.25/12
-  assert.ok(Math.abs(r.weight_per_ft2 - 3.252) < 0.01); // 156.1 * 0.25/12
+  assert.ok(Math.abs(r.weight_lb - 54.86) < 0.02); // 158 (NGA FM01-08) * area * 0.25/12
+  assert.ok(Math.abs(r.weight_per_ft2 - 3.2917) < 0.001); // 158 * 0.25/12
   assert.strictEqual(r.two_person, true); // > 50 lb
   // Weight is linear in thickness and in panes; a small thin lite is a one-person lift.
   assert.ok(Math.abs(_v798({ width_in: 60, height_in: 40, thickness_in: 0.5, panes: 1 }).weight_lb - 2 * r.weight_lb) < 0.01);

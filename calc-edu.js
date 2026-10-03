@@ -2001,7 +2001,7 @@ export function computeSampleSizeForMargin({ proportion, target_moe, confidence_
   if (!Number.isFinite(E) || E <= 0) return { error: "Target margin of error must be greater than 0." };
   if (E >= 1) return { error: "Target margin of error must be less than 1 (it is a proportion)." };
   const exact = (z * z * p * (1 - p)) / (E * E);
-  const required = Math.max(1, Math.ceil(exact));
+  const required = Math.max(1, Math.ceil(exact - 1e-9));
   return {
     required_n: required,
     exact_n: exact,

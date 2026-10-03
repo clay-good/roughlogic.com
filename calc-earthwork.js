@@ -1154,7 +1154,9 @@ function _v833renderHddPullback(inputRegion, outputRegion, citationEl) {
     if (r.error) { oPull.textContent = r.error; oCap.textContent = "-"; oUtil.textContent = "-"; oGov.textContent = "-"; return; }
     oPull.textContent = fmt(r.pullback_lb, 0) + " lb";
     oCap.textContent = fmt(r.capstan_pullback_lb, 0) + " lb at a capstan factor of " + fmt(r.capstan_factor, 2);
-    oUtil.textContent = r.utilization === null ? "- (enter a safe pull to check)" : fmt(r.utilization * 100, 0) + "% of safe pull";
+    // The governing (larger) of the bend-factor and capstan pulls, the figure within_limit judges;
+    // until 2026-10-02 this showed the bend-factor share even when the capstan pull governed.
+    oUtil.textContent = r.utilization === null ? "- (enter a safe pull to check)" : fmt(Math.max(r.utilization, r.capstan_utilization) * 100, 0) + "% of safe pull (governing pull)";
     oGov.textContent = r.governing_limit === null
       ? "- (enter a safe pull or a rig rating to check)"
       : fmt(r.governing_limit_lb, 0) + " lb, set by " + r.governing_limit + " -- " + (r.within_limit ? "the pull fits inside it" : "the pull EXCEEDS it");

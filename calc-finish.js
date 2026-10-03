@@ -431,19 +431,20 @@ export function computeGlassWeight({ width_in = 0, height_in = 0, thickness_in =
   if (!(t > 0)) return { error: "Thickness must be positive (in)." };
   if (!(n >= 1)) return { error: "Number of panes must be at least 1." };
   const area_ft2 = (w * h) / 144;
-  const weight_per_ft2 = 156.1 * (t / 12);
+  // NGA FM01-08 (2020): "a glass density of 158 lb/ft3 (2531 kg/m3)". Was 156.1 (SG 2.50) until 2026-10-02.
+  const weight_per_ft2 = 158 * (t / 12);
   const per_pane_lb = area_ft2 * weight_per_ft2;
   const weight_lb = per_pane_lb * n;
   if (![area_ft2, weight_lb].every(Number.isFinite)) return { error: "Glass-weight math is not a finite value." };
   const two_person = weight_lb > 50;
   return {
     area_ft2, weight_lb, per_pane_lb, weight_per_ft2, two_person,
-    note: "Flat-glass weight for handling: glass weighs its density times its volume, and soda-lime float glass (the standard window glass) runs about 13.0 lb per square foot per inch of thickness (specific gravity 2.50, 156.1 lb/ft^3), so a lite weighs 13.0 x thickness(in) x area(ft^2). Tempering and heat-strengthening do NOT change the weight (same glass, rearranged stress); an insulating unit (IGU) is the sum of its lites, and a laminated lite adds a thin plastic interlayer that is close enough to ignore for a lift estimate. This sizes the two-person or vacuum-cup lift and checks it against a suction lifter's rating -- OSHA and most shops flag a manual lift above about 50 lb per person. The 13.0 figure carries a ~1% material tolerance (published tables run 13.0-13.1). A handling estimate; the glass type, the lifter's rating, and safe-lifting practice govern.",
+    note: "Flat-glass weight for handling: glass weighs its density times its volume, and soda-lime float glass (the standard window glass) runs about 13.2 lb per square foot per inch of thickness (158 lb/ft^3, the density NGA Technical Paper FM01-08 gives for an exact weight), so a lite weighs 13.2 x thickness(in) x area(ft^2). Tempering and heat-strengthening do NOT change the weight (same glass, rearranged stress); an insulating unit (IGU) is the sum of its lites, and a laminated lite adds a thin plastic interlayer that is close enough to ignore for a lift estimate. This sizes the two-person or vacuum-cup lift and checks it against a suction lifter's rating -- OSHA and most shops flag a manual lift above about 50 lb per person. The 13.2 figure carries a ~1% material tolerance (published trade tables run 13.0-13.1 lb per inch; NGA's approximate-weight table is keyed to the metric actual thickness, 6.0 mm for 1/4 in, and reads lower). A handling estimate; the glass type, the lifter's rating, and safe-lifting practice govern.",
   };
 }
 export const glassWeightExample = { inputs: { width_in: 60, height_in: 40, thickness_in: 0.25, panes: 1 } };
 FINISH_RENDERERS["glass-weight"] = _simpleRenderer({
-  citation: "Citation: flat glass lite weight (NGA Glazing Manual glass-weight table; ASTM C1036 flat glass): weight = 156.1 lb/ft^3 x area(ft^2) x thickness(in)/12, i.e. ~13.0 lb/ft^2 per inch for soda-lime float (SG 2.50). Tempering does not change the weight; an IGU is the sum of its lites. Sizes the two-person / vacuum-cup lift. A handling estimate; the glass type and the lifter's rating govern.",
+  citation: "Citation: flat glass lite weight (NGA Glazing Manual glass-weight table; ASTM C1036 flat glass): weight = 158 lb/ft^3 (NGA FM01-08) x area(ft^2) x thickness(in)/12, i.e. ~13.2 lb/ft^2 per inch for soda-lime float. Tempering does not change the weight; an IGU is the sum of its lites. Sizes the two-person / vacuum-cup lift. A handling estimate; the glass type and the lifter's rating govern.",
   example: glassWeightExample.inputs,
   fields: [
     { key: "width_in", label: "Width (in)", kind: "number" },

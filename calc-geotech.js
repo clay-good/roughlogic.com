@@ -741,7 +741,7 @@ export function computeSptRequiredN60({ qa_target_ksf = 0, b_ft = 0, d_ft = 0 } 
   const qa_per_n60_ksf = base.qa_ksf;
   const n60 = qa / qa_per_n60_ksf;
   return {
-    n60, n60_design: Math.ceil(n60), kd: base.kd, small_footing: base.small_footing, qa_per_n60_ksf,
+    n60, n60_design: Math.ceil(n60 - 1e-9), kd: base.kd, small_footing: base.small_footing, qa_per_n60_ksf,
     note: "Meyerhof SPT allowable bearing solved for the blow count: the energy-corrected N60 the sand must show to carry a target pressure at a 1 in settlement, N60 = qa_target / qa(N60=1), with qa = N60/4 (ksf) for B <= 4 ft or (N60/6)((B+1)/B)^2 for wider footings, times Kd = min(1 + 0.33 D/B, 1.33). Round up to the next whole blow count for design. This is a settlement-controlled (serviceability) check against the boring's N-value, not the ultimate bearing capacity; N60 must be energy-corrected, and a shallow water table roughly halves the capacity (so it raises the required N60, not applied here). A design aid; the engineer of record and the geotechnical report govern.",
   };
 }

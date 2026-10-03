@@ -491,7 +491,7 @@ export function computeDividingHead({ divisions = 0, worm_ratio = 40, circles = 
   if (!(N >= 1)) return { error: "Number of divisions must be 1 or more." };
   if (!(ratio > 0)) return { error: "Worm ratio must be positive." };
   const turns = ratio / N;
-  const full_turns = Math.floor(turns);
+  const full_turns = Math.floor(turns + 1e-9);
   const fraction = turns - full_turns; // 0..1
   // Parse the hole-circle list.
   const list = String(circles).split(",").map((s) => s.trim()).filter((s) => s !== "");
@@ -2322,7 +2322,7 @@ export function computeRollerChainLength({ small_teeth_n1 = 0, large_teeth_n2 = 
   const cp = c / p;
   const k = Math.pow((n2 - n1) / (2 * Math.PI), 2);
   const length_pitches = 2 * cp + (n1 + n2) / 2 + k / cp;
-  let length_even = Math.ceil(length_pitches);
+  let length_even = Math.ceil(length_pitches - 1e-9);
   if (length_even % 2 !== 0) length_even += 1;
   const a = length_even - (n1 + n2) / 2;
   const center_corrected_in = (p / 4) * (a + Math.sqrt(Math.max(0, a * a - 8 * k)));

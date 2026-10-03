@@ -367,7 +367,7 @@ export function computePoolHeaterBtu({ gallons = 0, dT_F = 0, output = 0, eff = 
   const e = Number(eff) || 0;
   if (!(gal > 0)) return { error: "Pool volume must be positive (gallons)." };
   if (!(dT > 0)) return { error: "Temperature rise must be positive (F)." };
-  if (!(out > 0)) return { error: "Heater output must be positive (Btu/h)." };
+  if (!(out > 0)) return { error: "Heater input must be positive (Btu/h)." };
   if (!(e > 0)) return { error: "Efficiency (or COP-equivalent) must be positive." };
   // A fraction, not a percent or a COP: 80 used to give a 0.05 h heat-up, and a heat pump's COP 5 cut the time 5x.
   if (e > 1.2) return { error: "Enter efficiency as a fraction (0.80); for a heat pump enter its heat output and 1.0, not its COP." };
@@ -376,17 +376,17 @@ export function computePoolHeaterBtu({ gallons = 0, dT_F = 0, output = 0, eff = 
   const hours = Q_btu / delivered;
   return {
     Q_btu, delivered, hours,
-    note: "Pool heat-up: energy Btu = gallons x 8.34 lb/gal x temperature rise (1 Btu warms 1 lb of water 1 F), and the heat-up time = energy / (heater output x efficiency). A gas heater at ~80% warms fast; a heat pump (enter its COP-equivalent Btu/h) is far slower but cheaper to run, which is why a heat pump is left on to hold temperature rather than for a quick warm-up. Ignores cover, evaporation, and standby losses, so real heat-up runs longer. A sizing estimate; the equipment ratings and site conditions govern.",
+    note: "Pool heat-up: energy Btu = gallons x 8.34 lb/gal x temperature rise (1 Btu warms 1 lb of water 1 F), and the heat-up time = energy / (heater nameplate input x efficiency). A gas heater at ~80% warms fast; a heat pump (enter its COP-equivalent Btu/h) is far slower but cheaper to run, which is why a heat pump is left on to hold temperature rather than for a quick warm-up. Ignores cover, evaporation, and standby losses, so real heat-up runs longer. A sizing estimate; the equipment ratings and site conditions govern.",
   };
 }
 export const poolHeaterBtuExample = { inputs: { gallons: 20000, dT_F: 10, output: 400000, eff: 0.80 } };
 TREATMENT_RENDERERS["pool-heater-btu"] = _rPool({
-  citation: "Citation: pool heat-up energy Btu = gallons x 8.34 x temperature rise; time = energy / (output x efficiency). Gas ~80%; enter a heat pump's COP-equivalent Btu/h. Ignores cover/evaporation/standby losses. A sizing estimate; the equipment ratings govern.",
+  citation: "Citation: pool heat-up energy Btu = gallons x 8.34 x temperature rise; time = energy / (nameplate input x efficiency). Gas ~80%; enter a heat pump's COP-equivalent Btu/h. Ignores cover/evaporation/standby losses. A sizing estimate; the equipment ratings govern.",
   example: poolHeaterBtuExample.inputs,
   fields: [
     { key: "gallons", label: "Pool volume (gallons)" },
     { key: "dT_F", label: "Temperature rise (°F)" },
-    { key: "output", label: "Heater output (Btu/h)" },
+    { key: "output", label: "Heater nameplate INPUT (Btu/h; a heat pump: its heat output, with efficiency 1.0)" },
     { key: "eff", label: "Efficiency as a fraction (0.80 gas; 1.0 for a heat pump entered at its heat output)" },
   ],
   outputs: [

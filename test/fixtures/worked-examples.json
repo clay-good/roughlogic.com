@@ -8476,7 +8476,7 @@
   {
    "tile_id": "baseboard-length-for-load",
    "source_publisher": "Slant/Fin (inverse)",
-   "source_title": "cross-check: hotter 200 F water (690 BTU/ft) shortens the run for the same load",
+   "source_title": "cross-check: hotter 200 F water (710 BTU/ft) shortens the run for the same load",
    "source_edition_or_year": "spec-v685 cross-check (machine-verified)",
    "source_section_or_page": "4,800 BTU/hr at 200 F (710 BTU/ft on the ratings chart) -> about 6.8 ft (hotter water, shorter baseboard)",
    "verified_by": "rl",
@@ -31363,7 +31363,7 @@
    "source_publisher": "NGA Glazing Manual glass-weight table; ASTM C1036",
    "source_title": "weight = 156.1 lb/ft3 x area_ft2 x thickness_in/12 (~13.0 lb/ft2 per inch)",
    "source_edition_or_year": "spec-v798 worked example (machine-verified)",
-   "source_section_or_page": "60 x 40 in lite of 1/4 in soda-lime -> 16.67 ft2, 54.2 lb (NGA table 54.5, within 1%)",
+   "source_section_or_page": "60 x 40 in lite of 1/4 in soda-lime at 158 lb/ft3 (NGA FM01-08) -> 16.67 ft2, 54.9 lb. Recomputed 2026-10-02 from 156.1 (54.2 lb); trade tables at 3.27 lb/ft2 give 54.5.",
    "verified_by": "rl",
    "verified_on": "2026-07-14",
    "inputs": {
@@ -31380,7 +31380,7 @@
      }
     },
     "weight_lb": {
-     "value": 54.2,
+     "value": 54.9,
      "tolerance": {
       "abs": 0.2
      }
@@ -149886,6 +149886,1027 @@
      "value": 307,
      "tolerance": {
       "pct": 0.2
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "water-heater-input",
+   "source_publisher": "A.O. Smith Water Products Company",
+   "source_title": "Residential Sizing Guide for Water Heaters (AOSSG88150)",
+   "source_edition_or_year": "Revised April 1997, reviewed May 1999 (2010R printing)",
+   "source_section_or_page": "Electric Water Heater Recovery Table (Calculated at 100% Recovery Efficiency), run in reverse: row '4500 ... 30.7' at the 60\u00b0 rise column (4500 W element recovers 30.7 GPH). Inputs 30.7 gph, 60 F rise (50->110), efficiency 1.0 -> tile 4.497 kW vs printed 4500 W (4.5 kW); the printed GPH is rounded to 0.1 (+/-0.16%), covered by 0.5%.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "heater_type": "electric",
+    "target_recovery_gph": 30.7,
+    "efficiency": 1,
+    "incoming_F": 50,
+    "setpoint_F": 110
+   },
+   "outputs": {
+    "input_kw": {
+     "value": 4.5,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "water-heater-input",
+   "source_publisher": "A.O. Smith Water Products Company",
+   "source_title": "Residential Sizing Guide for Water Heaters (AOSSG88150)",
+   "source_edition_or_year": "Revised April 1997, reviewed May 1999 (2010R printing)",
+   "source_section_or_page": "Electric Water Heater Recovery Table (100% Recovery Efficiency), run in reverse: row '5500 ... 22.5' at the 100\u00b0 rise column (5500 W recovers 22.5 GPH). Inputs 22.5 gph, 100 F rise (40->140), efficiency 1.0 -> tile 5.493 kW vs printed 5.5 kW; printed GPH rounded to 0.1 (+/-0.22%), covered by 0.5%.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "heater_type": "electric",
+    "target_recovery_gph": 22.5,
+    "efficiency": 1,
+    "incoming_F": 40,
+    "setpoint_F": 140
+   },
+   "outputs": {
+    "input_kw": {
+     "value": 5.5,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "water-heater-input",
+   "source_publisher": "A.O. Smith Water Products Company",
+   "source_title": "Residential Sizing Guide for Water Heaters (AOSSG88150)",
+   "source_edition_or_year": "Revised April 1997, reviewed May 1999 (2010R printing)",
+   "source_section_or_page": "Electric Water Heater Recovery Table (100% Recovery Efficiency), run in reverse: row '2000 13.7' at the 60\u00b0 rise column (2000 W recovers 13.7 GPH). Inputs 13.7 gph, 60 F rise (50->110), efficiency 1.0 -> tile 2.007 kW vs printed 2.0 kW; printed GPH rounded to 0.1 (+/-0.37%), covered by 0.5%.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "heater_type": "electric",
+    "target_recovery_gph": 13.7,
+    "efficiency": 1,
+    "incoming_F": 50,
+    "setpoint_F": 110
+   },
+   "outputs": {
+    "input_kw": {
+     "value": 2,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "baseboard-length-for-load",
+   "source_publisher": "Slant/Fin Corporation",
+   "source_title": "Fine/Line 30 Residential Baseboard Ratings Chart (ratings_fineline30_r.pdf)",
+   "source_edition_or_year": "current chart at slantfin.com (fetched 2026-10-02)",
+   "source_section_or_page": "Hot water ratings, No. 30-75 baseboard with 3/4 in E-75 element, 4 GPM row: '750' Btu/hr per ft at 200\u00b0F; chart note 'Use 4 gpm ratings only when flow is known to be equal to or greater than 4 gpm'. Run in reverse: a 7,500 Btu/hr load at 200 F, 4 gpm -> btu_per_ft read from the chart; exact table value, abs 0.5 tolerance.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "target_btuhr": 7500,
+    "water_temp_F": 200,
+    "flow_gpm": 4,
+    "model": "slant_fin_baseline"
+   },
+   "outputs": {
+    "btu_per_ft": {
+     "value": 750,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "baseboard-length-for-load",
+   "source_publisher": "Slant/Fin Corporation",
+   "source_title": "Fine/Line 30 Residential Baseboard Ratings Chart (ratings_fineline30_r.pdf)",
+   "source_edition_or_year": "current chart at slantfin.com (fetched 2026-10-02)",
+   "source_section_or_page": "Hot water ratings, No. 30-75, 1 GPM row: '380' Btu/hr per ft at 150\u00b0F. Run in reverse: a 3,800 Btu/hr load at 150 F, 1 gpm -> btu_per_ft read from the chart; exact table value, abs 0.5 tolerance.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "target_btuhr": 3800,
+    "water_temp_F": 150,
+    "flow_gpm": 1,
+    "model": "slant_fin_baseline"
+   },
+   "outputs": {
+    "btu_per_ft": {
+     "value": 380,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "baseboard-length-for-load",
+   "source_publisher": "Slant/Fin Corporation",
+   "source_title": "Fine/Line 30 Residential Baseboard Ratings Chart (ratings_fineline30_r.pdf)",
+   "source_edition_or_year": "current chart at slantfin.com (fetched 2026-10-02)",
+   "source_section_or_page": "Hot water ratings, No. 30-75, 4 GPM row: '340*' Btu/hr per ft at 140\u00b0F. Run in reverse: a 3,400 Btu/hr load at 140 F, 4 gpm -> btu_per_ft read from the chart; exact table value, abs 0.5 tolerance.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "target_btuhr": 3400,
+    "water_temp_F": 140,
+    "flow_gpm": 4,
+    "model": "slant_fin_baseline"
+   },
+   "outputs": {
+    "btu_per_ft": {
+     "value": 340,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "chamber-cc-for-cr",
+   "source_publisher": "PowerNation",
+   "source_title": "Compression Ratio Calculator (Static CR) - Example: a 350 small-block",
+   "source_edition_or_year": "page updated 2026-09-29",
+   "source_section_or_page": "Printed: 4.030 in bore, 3.480 in stroke, 64cc chambers, gasket 4.100 in bore x .041 in, flat-tops with 5cc valve reliefs .025 in below deck; 'Swept volume ... = 727.4 cc', 'Gasket volume ... = 8.87 cc', 'Deck volume ... = 5.23 cc', 'Clearance volume is 64 + 8.87 + 5.23 + 5 = 83.10 cc', 'Compression ratio is (727.4 + 83.10) \u00f7 83.10 = 9.75:1'. Run in reverse with target 9.75 and reliefs as dish -5 cc (tile sign: dome +, dish -): chamber 64.04 cc. The printed CR is rounded to 0.01 (+/-0.005 CR = +/-0.05 cc), so abs 0.1 cc.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "bore_in": 4.03,
+    "stroke_in": 3.48,
+    "target_cr": 9.75,
+    "gasket_bore_in": 4.1,
+    "gasket_thickness_in": 0.041,
+    "deck_clearance_in": 0.025,
+    "dome_dish_cc": -5
+   },
+   "outputs": {
+    "chamber_cc": {
+     "value": 64,
+     "tolerance": {
+      "abs": 0.1
+     }
+    },
+    "tdc_volume_cc": {
+     "value": 83.1,
+     "tolerance": {
+      "abs": 0.1
+     }
+    },
+    "cyl_cc": {
+     "value": 727.4,
+     "tolerance": {
+      "abs": 0.1
+     }
+    },
+    "gasket_cc": {
+     "value": 8.87,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "deck_cc": {
+     "value": 5.23,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "standby-battery-runtime",
+   "source_publisher": "DSC (Digital Security Controls, Johnson Controls)",
+   "source_title": "Standby Battery Calculation Charts: Fire Applications, PC5020(CF) v3.X",
+   "source_edition_or_year": "PC5020(CF) v3.X installation chart (docs.johnsoncontrols.com)",
+   "source_section_or_page": "NOTE 1: 'For 24 hour standby time, at a maximum current of 480mA, the battery size must be 14Ah or greater'; derating factor box '0.0012' (1.2 x mA->A); alarm current not part of the fire calculation. Run in reverse: 14 Ah, 0.48 A, derate 1.2, no alarm -> 24.31 h. The printed 14 Ah is the 13.82 Ah requirement rounded up to a whole battery, so the reverse runs 1.3% long; abs 0.35 h covers that rounding.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "battery_ah": 14,
+    "standby_current_a": 0.48,
+    "alarm_current_a": 0,
+    "alarm_minutes": 0,
+    "derate": 1.2
+   },
+   "outputs": {
+    "standby_hours": {
+     "value": 24,
+     "tolerance": {
+      "abs": 0.35
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "standby-battery-runtime",
+   "source_publisher": "DSC (Digital Security Controls, Johnson Controls)",
+   "source_title": "Standby Battery Calculation Charts: Fire Applications, PC5020(CF) v3.X",
+   "source_edition_or_year": "PC5020(CF) v3.X installation chart (docs.johnsoncontrols.com)",
+   "source_section_or_page": "NOTE 1: 'For 60 hour standby time, at a maximum current of 480mA the battery size must be 35Ah or greater'; derating factor '0.0012'. Run in reverse: 35 Ah, 0.48 A, derate 1.2 -> 60.76 h. The printed 35 Ah is the 34.56 Ah requirement rounded up, so the reverse runs 1.3% long; abs 0.8 h covers that rounding.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "battery_ah": 35,
+    "standby_current_a": 0.48,
+    "alarm_current_a": 0,
+    "alarm_minutes": 0,
+    "derate": 1.2
+   },
+   "outputs": {
+    "standby_hours": {
+     "value": 60,
+     "tolerance": {
+      "abs": 0.8
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "egress-lighting-check",
+   "source_publisher": "Consulting-Specifying Engineer (Scott Gibbs, PE)",
+   "source_title": "Illuminating the means of egress",
+   "source_edition_or_year": "2020-03-09",
+   "source_section_or_page": "Quotes IBC: 'the means of egress illumination level shall be provided at not less than 1 footcandle (11 lux) at the walking surface.' Normal mode threshold min_thr = 1.0 fc exactly.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "avg_fc": 1.5,
+    "min_fc": 1,
+    "max_fc": 3,
+    "mode": "normal"
+   },
+   "outputs": {
+    "min_thr": {
+     "value": 1,
+     "tolerance": {
+      "abs": 0
+     }
+    },
+    "min_ok": {
+     "value": 1,
+     "tolerance": {
+      "abs": 0
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "egress-lighting-check",
+   "source_publisher": "Consulting-Specifying Engineer (Scott Gibbs, PE)",
+   "source_title": "Illuminating the means of egress",
+   "source_edition_or_year": "2020-03-09",
+   "source_section_or_page": "Emergency: 'not be less than 0.1 footcandle (minimum illuminance, not average)', 'not have less than a 1 footcandle average', 'maximum to minimum ratio of not more than 40:1'. Thresholds avg_thr 1.0 / min_thr 0.1 exact; readings 1.5/1/3 -> max/min 3.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "avg_fc": 1.5,
+    "min_fc": 1,
+    "max_fc": 3,
+    "mode": "emergency-initial"
+   },
+   "outputs": {
+    "avg_thr": {
+     "value": 1,
+     "tolerance": {
+      "abs": 0
+     }
+    },
+    "min_thr": {
+     "value": 0.1,
+     "tolerance": {
+      "abs": 0
+     }
+    },
+    "max_min": {
+     "value": 3,
+     "tolerance": {
+      "abs": 0
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "egress-lighting-check",
+   "source_publisher": "International Code Council",
+   "source_title": "2022 California Fire Code, Title 24 Part 9, [BE] 1008.3.5 Illumination level under emergency power",
+   "source_edition_or_year": "2022",
+   "source_section_or_page": "'Illumination levels shall be permitted to decline to 0.6 footcandle (6 lux) average and a minimum at any point of 0.06 footcandle (0.6 lux) at the end of the emergency lighting time duration. A maximum-to-minimum illumination uniformity ratio of 40 to 1 shall not be exceeded.' (text via search index; page 403s to scripts). Thresholds exact.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "avg_fc": 1.5,
+    "min_fc": 1,
+    "max_fc": 3,
+    "mode": "emergency-90min-end"
+   },
+   "outputs": {
+    "avg_thr": {
+     "value": 0.6,
+     "tolerance": {
+      "abs": 0
+     }
+    },
+    "min_thr": {
+     "value": 0.06,
+     "tolerance": {
+      "abs": 0
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "condensate-drain",
+   "source_publisher": "International Code Council",
+   "source_title": "International Mechanical Code, Table 307.2.2 Condensate Drain Sizing",
+   "source_edition_or_year": "2015 (unchanged in 2018/2021)",
+   "source_section_or_page": "Table 307.2.2 row 'Up to 20 tons of refrigeration | 3/4 inch' (codes.iccsafe.org/s/IMC2015/chapter-3-general-regulations/IMC2015-Ch03-Sec307.2.2; row text via search index, page 403s to scripts). Tested at the row's upper bound (20 tons), exact table value.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "tons": 20,
+    "pints_per_ton_hr": 3,
+    "run_ft": 0,
+    "slope_in_per_ft": 0.125
+   },
+   "outputs": {
+    "min_size_in": {
+     "value": 0.75,
+     "tolerance": {
+      "abs": 0
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "condensate-drain",
+   "source_publisher": "International Code Council",
+   "source_title": "International Mechanical Code, Table 307.2.2 Condensate Drain Sizing",
+   "source_edition_or_year": "2015 (unchanged in 2018/2021)",
+   "source_section_or_page": "Table 307.2.2 row 'Over 20 tons to 40 tons of refrigeration | 1 inch' (codes.iccsafe.org/s/IMC2015/chapter-3-general-regulations/IMC2015-Ch03-Sec307.2.2; row text via search index, page 403s to scripts). Tested at the row's upper bound (40 tons), exact table value.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "tons": 40,
+    "pints_per_ton_hr": 3,
+    "run_ft": 0,
+    "slope_in_per_ft": 0.125
+   },
+   "outputs": {
+    "min_size_in": {
+     "value": 1,
+     "tolerance": {
+      "abs": 0
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "condensate-drain",
+   "source_publisher": "International Code Council",
+   "source_title": "International Mechanical Code, Table 307.2.2 Condensate Drain Sizing",
+   "source_edition_or_year": "2015 (unchanged in 2018/2021)",
+   "source_section_or_page": "Table 307.2.2 row 'Over 90 tons to 125 tons of refrigeration | 1 1/2 inch' (codes.iccsafe.org/s/IMC2015/chapter-3-general-regulations/IMC2015-Ch03-Sec307.2.2; row text via search index, page 403s to scripts). Tested at the row's upper bound (125 tons), exact table value.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "tons": 125,
+    "pints_per_ton_hr": 3,
+    "run_ft": 0,
+    "slope_in_per_ft": 0.125
+   },
+   "outputs": {
+    "min_size_in": {
+     "value": 1.5,
+     "tolerance": {
+      "abs": 0
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "condensate-drain",
+   "source_publisher": "International Code Council",
+   "source_title": "International Mechanical Code, Table 307.2.2 Condensate Drain Sizing",
+   "source_edition_or_year": "2015 (unchanged in 2018/2021)",
+   "source_section_or_page": "Table 307.2.2 row 'Over 125 tons to 250 tons of refrigeration | 2 inch' (codes.iccsafe.org/s/IMC2015/chapter-3-general-regulations/IMC2015-Ch03-Sec307.2.2; row text via search index, page 403s to scripts). Tested at the row's upper bound (250 tons), exact table value.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "tons": 250,
+    "pints_per_ton_hr": 3,
+    "run_ft": 0,
+    "slope_in_per_ft": 0.125
+   },
+   "outputs": {
+    "min_size_in": {
+     "value": 2,
+     "tolerance": {
+      "abs": 0
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "pv-row-spacing",
+   "source_publisher": "Greentech Renewables",
+   "source_title": "Determining Module Inter-Row Spacing",
+   "source_edition_or_year": "web article (accessed 2026-10-02), https://www.greentechrenewables.com/article/determining-module-inter-row-spacing",
+   "source_section_or_page": "Worked example, SolarWorld module 39.41 in wide at 15 deg tilt, winter-solstice 9am-3pm solar elevation 17 deg: printed 'Height Difference = Sin (15) x 39.41' = 10.2 in; 'Module Row Spacing = Height Difference / Tan (17)', '10 / Tan(17) = 32.7\" (rounded to 33\")'. This is the tile's rise and shadow (gap) at a due-south sun (profile angle = elevation); the article then applies a separate cos(44 deg) azimuth correction the tile does not model, so only rise and the uncorrected spacing are asserted. Tile: rise 10.20 in (0.8500 ft), shadow 33.36 in (2.780 ft). The printed 32.7 used the height rounded to 10 in and was then rounded to 33 in; abs 0.04 ft (0.5 in) covers 32.7 to 33.4 in.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "module_length_ft": 3.284167,
+    "tilt_deg": 15,
+    "profile_angle_deg": 17
+   },
+   "outputs": {
+    "rise_ft": {
+     "value": 0.85,
+     "tolerance": {
+      "abs": 0.005
+     }
+    },
+    "shadow_ft": {
+     "value": 2.75,
+     "tolerance": {
+      "abs": 0.04
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "vav-box-airflow",
+   "source_publisher": "New York Engineers",
+   "source_title": "Difference between Constant Air Volume and Variable Air Volume (section: Basic Calculations in CAV and VAV Design)",
+   "source_edition_or_year": "web article (accessed 2026-10-02), https://www.ny-engineers.com/blog/differences-between-constant-and-variable-air-volume-systems",
+   "source_section_or_page": "Section 'Basic Calculations in CAV and VAV Design': room load 10,000 BTU/h, indoor 75 F, supply 55 F, printed 'CFM = 10,000 BTU/h / (1.08 x 20 F) = 463 cfm'. Tile cfm_max 462.96. Only cfm_max is printed; ventilation_cfm 0 and turndown 0.30 (tile default) are placeholders that do not enter cfm_max. abs 0.5 covers rounding to whole cfm.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "zone_sensible_btuh": 10000,
+    "supply_dt_f": 20,
+    "ventilation_cfm": 0,
+    "turndown": 0.3
+   },
+   "outputs": {
+    "cfm_max": {
+     "value": 463,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "branch-saddle-cutback",
+   "source_publisher": "Flange Wizard Tools",
+   "source_title": "Flange Wizard Pipe Saddle Chart",
+   "source_edition_or_year": "REV 10/2015, https://flangewizard.com/wp-content/uploads/2016/01/FWI-Pipe-Saddle-Chart.pdf",
+   "source_section_or_page": "Worked example on the chart: 'Example: 6\" Saddle to 8\"', 'Saddle Depth x 1.5' 2-3/8, 'Tip Round Off' 13/16, '2-3/8\" - 13/16\" = 1-9/16\" Actual Saddle Depth' (6.625 OD branch on 8.625 OD run). Tile max_cutback 1.5512 in vs printed 1.5625 in. Chart note: 'All figures rounded to the nearest 1/32\"'; the printed depth is a difference of two rounded figures, so abs 0.035 in (about 1/32) covers it.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "branch_od_in": 6.625,
+    "run_od_in": 8.625,
+    "stations": 6
+   },
+   "outputs": {
+    "max_cutback_in": {
+     "value": 1.5625,
+     "tolerance": {
+      "abs": 0.035
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "medgas-demand",
+   "source_publisher": "Oregon Building Codes Division",
+   "source_title": "2014 Oregon Plumbing Specialty Code, Chapter 13 Health Care Facilities and Medical Gas and Vacuum Systems",
+   "source_edition_or_year": "2014 OPSC, https://www.oregon.gov/bcd/codes-stand/Documents/pl-14opsc-chapter13.pdf",
+   "source_section_or_page": "Table 13-5 Outlet Rating for Vacuum Piping Systems, row 'Recovery Rooms (Post-Anesthesia) and Intensive Care Units ... 1st outlet at each bed': per outlet 3.0 (85.0) CFM, simultaneous usage factor 50 percent, air to be transported 1.5 (42.5) CFM. One outlet x 3.0 x 0.50 = 1.5 exactly; abs 0.01.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "stations": 1,
+    "per_station_scfm": 3.0,
+    "diversity": 0.5
+   },
+   "outputs": {
+    "connected_scfm": {
+     "value": 3.0,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "design_scfm": {
+     "value": 1.5,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "medgas-demand",
+   "source_publisher": "Oregon Building Codes Division",
+   "source_title": "2014 Oregon Plumbing Specialty Code, Chapter 13 Health Care Facilities and Medical Gas and Vacuum Systems",
+   "source_edition_or_year": "2014 OPSC, https://www.oregon.gov/bcd/codes-stand/Documents/pl-14opsc-chapter13.pdf",
+   "source_section_or_page": "Table 13-5 Outlet Rating for Vacuum Piping Systems, row 'Autopsy Area': per outlet 2.0 (56.6) CFM, simultaneous usage factor 20 percent, air to be transported 0.4 (11.3) CFM. 2.0 x 0.20 = 0.4 exactly; abs 0.01.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "stations": 1,
+    "per_station_scfm": 2.0,
+    "diversity": 0.2
+   },
+   "outputs": {
+    "design_scfm": {
+     "value": 0.4,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "cistern-storage-days",
+   "source_publisher": "Texas Water Development Board",
+   "source_title": "The Texas Manual on Rainwater Harvesting",
+   "source_edition_or_year": "Third Edition, 2005",
+   "source_section_or_page": "Chapter 4 Water Balance and System Sizing, printed page 34-35 (water demand): '(3x1) + (3x1.6) = 7.8 gallons multiplied by 3 persons = 23.4 gpd household demand x 30 days = 702 gallons per month.' Asserts required_gal_for_target only (demand x days, exact); usable_storage_gal is not printed and does not enter that output (set to 702 only to satisfy the positive-input guard; reserve_days is not asserted). abs 0.01.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "usable_storage_gal": 702,
+    "daily_demand_gpd": 23.4,
+    "target_days": 30
+   },
+   "outputs": {
+    "required_gal_for_target": {
+     "value": 702,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "drypipe-air-compressor",
+   "source_publisher": "The Viking Corporation",
+   "source_title": "OL Plus Series - Single Phase, Riser Mounted Air Compressors for Dry Pipe Sprinkler Systems (cut sheet)",
+   "source_edition_or_year": "cut sheet (accessed 2026-10-02), https://www.vikinggroupinc.com/sites/default/files/migrated/OL_OilLessRiserCutSheet.pdf",
+   "source_section_or_page": "Selection table, 'Specifically designed to fill the sprinkler system to 40 PSI in 30 minutes'; row '250 gal. OL25033AC 3.03 1/3' (System Capacity 250 gal, Average CFM 3.03, 1/3 HP) ('Average CFM is the average free air delivery from 0 to 40 PSIG'). Tile 3.031. abs 0.02 covers the 0.01 printed rounding.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "dry_volume_gal": 250,
+    "normal_pressure_psig": 40,
+    "restore_minutes": 30
+   },
+   "outputs": {
+    "free_air_cfm": {
+     "value": 3.03,
+     "tolerance": {
+      "abs": 0.02
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "drypipe-air-compressor",
+   "source_publisher": "The Viking Corporation",
+   "source_title": "OL Plus Series - Single Phase, Riser Mounted Air Compressors for Dry Pipe Sprinkler Systems (cut sheet)",
+   "source_edition_or_year": "cut sheet (accessed 2026-10-02), https://www.vikinggroupinc.com/sites/default/files/migrated/OL_OilLessRiserCutSheet.pdf",
+   "source_section_or_page": "Selection table (fill to 40 PSI in 30 minutes): '1225 gal. OL1225200AC* 14.85' (System Capacity 1225 gal, Average CFM 14.85). Tile 14.853. abs 0.02 covers the 0.01 printed rounding. Cross-check: Viking Design Data F_011607 Rev 14.1 'multiplying the system capacity ... by 0.012 for CFM'; tile factor 0.01212/gal.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "dry_volume_gal": 1225,
+    "normal_pressure_psig": 40,
+    "restore_minutes": 30
+   },
+   "outputs": {
+    "free_air_cfm": {
+     "value": 14.85,
+     "tolerance": {
+      "abs": 0.02
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "drypipe-air-compressor",
+   "source_publisher": "The Viking Corporation",
+   "source_title": "OL Plus Series - Single Phase, Riser Mounted Air Compressors for Dry Pipe Sprinkler Systems (cut sheet)",
+   "source_edition_or_year": "cut sheet (accessed 2026-10-02), https://www.vikinggroupinc.com/sites/default/files/migrated/OL_OilLessRiserCutSheet.pdf",
+   "source_section_or_page": "Selection table (fill to 40 PSI in 30 minutes): '615 gal. OL615100AC* 7.46' (System Capacity 615 gal, Average CFM 7.46). Tile 7.457. abs 0.02 covers the 0.01 printed rounding.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "dry_volume_gal": 615,
+    "normal_pressure_psig": 40,
+    "restore_minutes": 30
+   },
+   "outputs": {
+    "free_air_cfm": {
+     "value": 7.46,
+     "tolerance": {
+      "abs": 0.02
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "point-method-required-candela",
+   "source_publisher": "San Diego Gas & Electric Energy Innovation Center (James Donson, PE, LC)",
+   "source_title": "Calculating Lighting Solutions (presentation)",
+   "source_edition_or_year": "2020-04-14, https://www.sdge.com/sites/default/files/200414_17691_Calc%20Photo%20Ltng%20Solutions%20-%20Presentation.pdf",
+   "source_section_or_page": "Example #1 Point Source Display Lighting, slide 13: MR-16 directly above the display 7 ft away, 'E = I / r^2 = 2350 cd / 7 ft^2 = 2350 cd / 49 ft^2 = 48.0 fc'. Inverse: 48.0 fc at 7 ft, nadir -> tile 2352 cd vs printed 2350 cd; the 48.0 fc is rounded to 0.1 fc (+/-0.1%), pct 0.5 covers.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "target_illuminance": 48.0,
+    "illuminance_unit": "fc",
+    "mount_height_ft": 7,
+    "angle_deg": 0
+   },
+   "outputs": {
+    "required_cd": {
+     "value": 2350,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "point-method-required-candela",
+   "source_publisher": "San Diego Gas & Electric Energy Innovation Center (James Donson, PE, LC)",
+   "source_title": "Calculating Lighting Solutions (presentation)",
+   "source_edition_or_year": "2020-04-14, https://www.sdge.com/sites/default/files/200414_17691_Calc%20Photo%20Ltng%20Solutions%20-%20Presentation.pdf",
+   "source_section_or_page": "Example #5 Solution, slide 33 (spot light): h = 10 ft, r = 11.2 ft, 'theta nadir = cos^-1 (10/11.2) = 26.8 deg', 'E = 4000 cd / 11.2 ft^2 x cos 26.8 = ... = 28.5 fc'. Inverse with the printed 28.5 fc, 10 ft, 26.8 deg -> tile 4007.7 cd vs printed 4000 cd (0.19%). The printed angle and E are rounded (26.8 deg, 0.1 fc), pct 1 covers.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "target_illuminance": 28.5,
+    "illuminance_unit": "fc",
+    "mount_height_ft": 10,
+    "angle_deg": 26.8
+   },
+   "outputs": {
+    "required_cd": {
+     "value": 4000,
+     "tolerance": {
+      "pct": 1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "point-method-required-candela",
+   "source_publisher": "San Diego Gas & Electric Energy Innovation Center (James Donson, PE, LC)",
+   "source_title": "Calculating Lighting Solutions (presentation)",
+   "source_edition_or_year": "2020-04-14, https://www.sdge.com/sites/default/files/200414_17691_Calc%20Photo%20Ltng%20Solutions%20-%20Presentation.pdf",
+   "source_section_or_page": "Example #5 Solution - Downlights, slide 34: h = 8 ft, 'theta nadir = 41.6 deg', interpolated 'I = 820 cd', 'E = 820 cd / 10.7 ft^2 x cos 41.6 = 5.4 fc'. Inverse with 5.4 fc, 8 ft, 41.6 deg -> tile 826.5 cd vs printed 820 cd (0.79%). The 5.4 fc is rounded to 0.1 fc (+/-0.93%), pct 1.5 covers.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "target_illuminance": 5.4,
+    "illuminance_unit": "fc",
+    "mount_height_ft": 8,
+    "angle_deg": 41.6
+   },
+   "outputs": {
+    "required_cd": {
+     "value": 820,
+     "tolerance": {
+      "pct": 1.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "capacitor-bank-for-resonance-order",
+   "source_publisher": "Eaton Corporation (Cutler-Hammer)",
+   "source_title": "Power Factor Correction: A Guide for the Plant Engineer",
+   "source_edition_or_year": "Technical Data SA02607001E (2003-era edition, utility-hosted copy https://www.clarkpublicutilities.com/wp-content/uploads/2016/05/Power-Factor-Correction-Guide.pdf)",
+   "source_section_or_page": "'Capacitor Banks and Transformers Can Cause Resonance': h = sqrt(kVAsys / kvar); 'if the plant has a 1,500 kVA transformer with 5-1/2% impedance and the short-circuit rating of the utility is 48,000 kVA, then kVAsys would equal 17,391 kVA. If 350 kvar of capacitors were used ... h = sqrt(17,391/350) = sqrt(49.7) = 7.0'. Inverse: 17.391 MVA, target h 7.0 -> tile 0.3549 MVAR vs printed 0.350 (1.4%); the printed h is rounded (sqrt 49.7 = 7.05), so h^2 carries about 1.4%; pct 2 covers.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "short_circuit_mva": 17.391,
+    "target_resonant_order": 7.0
+   },
+   "outputs": {
+    "max_cap_bank_mvar": {
+     "value": 0.35,
+     "tolerance": {
+      "pct": 2
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "lighting-retrofit-savings",
+   "source_publisher": "LumaQuote",
+   "source_title": "Lighting Retrofit ROI: How to Calculate Payback and Show It in a Proposal (https://www.lumaquote.com/post/lighting-retrofit-roi-how-to-calculate-payback-and-show-it-in-a-proposal)",
+   "source_edition_or_year": "web article, accessed 2026-10-02",
+   "source_section_or_page": "Steps 3, 4 and 5 worked office example: 80 four-lamp T8 troffers at 128W replaced by 80 LED troffers at 40W, 3,000 hours, $0.12 per kWh, $12.00 per kW per month; printed '21,120 kWh saved per year', '21,120 kWh x $0.12 per kWh $2,534 per year', '10.24 kW minus 3.20 kW 7.04 kW demand reduction', '7.04 kW x $12.00 x 12 months $1,014 per year'. Tile 7.04 / 21,120 / 2,534.4 / 1,013.76; abs 1 covers the source's whole-dollar rounding. (The printed $3,759 total and 3.53-yr payback add a $211 maintenance credit and a rebate the tile does not model, so they are not asserted.)",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "fixtures": 80,
+    "watts_existing": 128,
+    "watts_new": 40,
+    "annual_hours": 3000,
+    "rate_kwh": 0.12,
+    "demand_per_kw_mo": 12,
+    "install_cost": 14400
+   },
+   "outputs": {
+    "kw_saved": {
+     "value": 7.04,
+     "tolerance": {
+      "abs": 0.005
+     }
+    },
+    "kwh_saved": {
+     "value": 21120,
+     "tolerance": {
+      "abs": 1
+     }
+    },
+    "energy_usd": {
+     "value": 2534,
+     "tolerance": {
+      "abs": 1
+     }
+    },
+    "demand_usd": {
+     "value": 1014,
+     "tolerance": {
+      "abs": 1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "lighting-retrofit-savings",
+   "source_publisher": "LumaQuote",
+   "source_title": "Lighting Retrofit ROI: How to Calculate Payback and Show It in a Proposal (https://www.lumaquote.com/post/lighting-retrofit-roi-how-to-calculate-payback-and-show-it-in-a-proposal)",
+   "source_edition_or_year": "web article, accessed 2026-10-02",
+   "source_section_or_page": "Payback-method table, same 80-fixture 128W->40W, 3,000 h, $0.12/kWh example with $14,400 gross installed cost: printed 'Energy savings only $14,400 / $2,534 5.68 years'. Energy-only case entered with no demand charge; tile 5.682; abs 0.006 covers the printed two-decimal rounding.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "fixtures": 80,
+    "watts_existing": 128,
+    "watts_new": 40,
+    "annual_hours": 3000,
+    "rate_kwh": 0.12,
+    "demand_per_kw_mo": 0,
+    "install_cost": 14400
+   },
+   "outputs": {
+    "annual_usd": {
+     "value": 2534,
+     "tolerance": {
+      "abs": 1
+     }
+    },
+    "payback_years": {
+     "value": 5.68,
+     "tolerance": {
+      "abs": 0.006
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "dual-fuel-balance-point",
+   "source_publisher": "Ameren Illinois (Ameren Illinois Energy Efficiency program)",
+   "source_title": "Heat Pump Control Strategies and Best Practices (Zak Paine and JT Stewart), https://amerenillinoissavings.com/wp-content/uploads/2025/12/Heat-Pump-Control-Strategies-and-Best-Practices.FINAL_.pdf",
+   "source_edition_or_year": "2025",
+   "source_section_or_page": "Slides 33-34 'Economic Switchover Temperature' / 'Breakeven Coefficient of Performance Calculated': BECOP = (E x C x e)/G with E = $0.132/kWh, C = 29.3 kWh/therm, e = 92%, G = $1.15/therm; printed '3.1 = .132 X 29.3 X 92% / 1.15'. Tile cop_switch 3.0948 (293.07 kWh/MMBtu = 29.307 kWh/therm); abs 0.06 covers the one-decimal print. cop_now is not printed and does not enter cop_switch; it is entered at the printed break-even value only so the compute runs.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "rate_kwh": 0.132,
+    "rate_therm": 1.15,
+    "afue": 0.92,
+    "cop_now": 3.1
+   },
+   "outputs": {
+    "cop_switch": {
+     "value": 3.1,
+     "tolerance": {
+      "abs": 0.06
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "radial-chip-thinning",
+   "source_publisher": "Harvey Performance Company",
+   "source_title": "HEM Guidebook: A Machinist's Guide to Increasing Shop Productivity, ch. 4 'How to Combat Chip Thinning'",
+   "source_edition_or_year": "2017",
+   "source_section_or_page": "p. 20, Figure 2: at '12.7% Step Over' (41.8 deg tool engagement angle) printed 'Feed per tooth is 1.5x the maximum chip thickness', with the IPTadj = CT x D / (2 x sqrt(D x RDOC - RDOC^2)) formula on the same page. The figure prints a percentage of diameter only, entered as ae 0.127 on D 1 in (the factor depends on ae/D alone). Tile RCTF 1.5016; abs 0.01 covers the one-decimal '1.5x'.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "ae_in": 0.127,
+    "d_in": 1
+   },
+   "outputs": {
+    "rctf": {
+     "value": 1.5,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "radial-chip-thinning",
+   "source_publisher": "Harvey Performance Company",
+   "source_title": "HEM Guidebook: A Machinist's Guide to Increasing Shop Productivity, ch. 4 'How to Combat Chip Thinning'",
+   "source_edition_or_year": "2017",
+   "source_section_or_page": "p. 20, Figure 2: at '50% Step Over' (90 deg tool engagement angle) printed 'Maximum chip thickness is equal to the feed per tooth', i.e. factor 1.0 (no compensation). Entered as ae 0.5 on D 1 in. Tile RCTF exactly 1.0.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "ae_in": 0.5,
+    "d_in": 1
+   },
+   "outputs": {
+    "rctf": {
+     "value": 1,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "pool-heater-btu",
+   "source_publisher": "Aquaterra Outdoors (Raypak dealer)",
+   "source_title": "Raypak AVIA Heating Time: 264 vs 404 Pool Heater (https://www.aquaterrabackyard.com/blogs/pool-and-patio-blog/raypak-avia-heating-time-264-vs-404)",
+   "source_edition_or_year": "web article, accessed 2026-10-02",
+   "source_section_or_page": "'Quick answer' and heating-time table: AVIA 264 'published input of 264,000 BTU per hour', 'rated at 84% thermal efficiency', formula 'Gallons x 8.34 x Desired Temperature Rise / Useful Heater Output', 'Useful heater output is the published input multiplied by thermal efficiency'; printed '15,000-gallon pool by 10F in roughly 5.6 hours'. Tile 5.641 h (the input rating goes in the field labelled 'output'); abs 0.05 covers the one-decimal print.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "gallons": 15000,
+    "dT_F": 10,
+    "output": 264000,
+    "eff": 0.84
+   },
+   "outputs": {
+    "hours": {
+     "value": 5.6,
+     "tolerance": {
+      "abs": 0.05
+     }
+    },
+    "Q_btu": {
+     "value": 1251000,
+     "tolerance": {
+      "abs": 1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "pool-heater-btu",
+   "source_publisher": "Aquaterra Outdoors (Raypak dealer)",
+   "source_title": "Raypak AVIA Heating Time: 264 vs 404 Pool Heater (https://www.aquaterrabackyard.com/blogs/pool-and-patio-blog/raypak-avia-heating-time-264-vs-404)",
+   "source_edition_or_year": "web article, accessed 2026-10-02",
+   "source_section_or_page": "Heating-time table, AVIA 404 ('published input of 399,000 BTU per hour', 84% thermal efficiency, 'Approximate useful output: 335,160 BTU/hr'): printed '15,000 gallons 20F ... 7.5 hours' in the 404 column. Tile 1,251,000 x 2 / 335,160 = 7.465 h; abs 0.05 covers the one-decimal print.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "gallons": 15000,
+    "dT_F": 20,
+    "output": 399000,
+    "eff": 0.84
+   },
+   "outputs": {
+    "hours": {
+     "value": 7.5,
+     "tolerance": {
+      "abs": 0.05
+     }
+    },
+    "delivered": {
+     "value": 335160,
+     "tolerance": {
+      "abs": 1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "pool-heater-btu",
+   "source_publisher": "Aquaterra Outdoors (Raypak dealer)",
+   "source_title": "Raypak AVIA Heating Time: 264 vs 404 Pool Heater (https://www.aquaterrabackyard.com/blogs/pool-and-patio-blog/raypak-avia-heating-time-264-vs-404)",
+   "source_edition_or_year": "web article, accessed 2026-10-02",
+   "source_section_or_page": "Spa FAQ: printed 'A 500-gallon spa requiring a 20F increase needs approximately 83,400 BTU of heat before accounting for losses'. Tile Q_btu = 500 x 8.34 x 20 = 83,400 exactly; the heater (AVIA 264, 264,000 input at 84%) only sets the time, which the page does not print for the spa.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "gallons": 500,
+    "dT_F": 20,
+    "output": 264000,
+    "eff": 0.84
+   },
+   "outputs": {
+    "Q_btu": {
+     "value": 83400,
+     "tolerance": {
+      "abs": 1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "plumbing-fixture-count",
+   "source_publisher": "Gustin Design Services",
+   "source_title": "Navigating the Building Code - Part 3 (Required Plumbing Fixtures) (https://gdsatx.com/2019/03/15/navigating-the-building-code-part-3-required-plumbing-fixtures/)",
+   "source_edition_or_year": "2019 (IBC 2018 Table 2902.1)",
+   "source_section_or_page": "Restaurant example: 'a restaurant (occupant classification - Assembly A-2), and the occupant load is determined to be 300 occupants, then the required amount of fixtures (based on IBC 2018 table 2902.1), would be 4 water closets, 2 lavatories, 2 drinking fountains, and 1 service sink'; '2 water closets and 1 lavatory would be required to be designated for women, and 2 ... for men'. A-2 restaurant ratios WC 1:75 single tier, lavatory 1:200, DF 1:500. Exact integers. Drinking fountains NOT asserted: the printed 2 reflects the separate two-fountain (wheelchair + standing) minimum, while Table 2902.1 alone gives ceil(300/500) = 1.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "occupant_load": 300,
+    "wc_ratio": 75,
+    "wc_ratio_over": 0,
+    "wc_tier": 0,
+    "lav_ratio": 200,
+    "lav_ratio_over": 0,
+    "lav_tier": 0,
+    "fountain_ratio": 500,
+    "distribution": 0.5
+   },
+   "outputs": {
+    "wc_total": {
+     "value": 4,
+     "tolerance": {
+      "abs": 0
+     }
+    },
+    "lav_total": {
+     "value": 2,
+     "tolerance": {
+      "abs": 0
+     }
+    },
+    "service_sinks": {
+     "value": 1,
+     "tolerance": {
+      "abs": 0
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "plumbing-fixture-count",
+   "source_publisher": "Dalkita",
+   "source_title": "How Many Plumbing Facilities Are Required in a Building? (Matthew Taylor-Rennert) (https://dalkita.com/how-many-plumbing-facilites-are-required-in-a-building/)",
+   "source_edition_or_year": "web article, accessed 2026-10-02 (IBC Table 2902.1 / IPC Table 403.1)",
+   "source_section_or_page": "Bar/tasting-room example, 1,000 sf / 15 = 67 occupants, A-2 Bar: 'The Water Closets (Toilets) are required to be 1 fixture per 40 people, of each sex. So, We have 33.5 Males, and 33.5 Females. 33.5/40 is .84, so we are required to have 1 toilet for each sex'; 'The lavatories (sinks) would be 33.5/75= .45, which would also just round up to 1 sink for each sex'. Single-tier ratio entered with wc_tier 0 and wc_ratio_over equal to wc_ratio, which gives the same count before and after the reported fix. Exact integers.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "occupant_load": 67,
+    "wc_ratio": 40,
+    "wc_ratio_over": 40,
+    "wc_tier": 0,
+    "lav_ratio": 75,
+    "lav_ratio_over": 0,
+    "lav_tier": 0,
+    "fountain_ratio": 500,
+    "distribution": 0.5
+   },
+   "outputs": {
+    "wc_total": {
+     "value": 2,
+     "tolerance": {
+      "abs": 0
+     }
+    },
+    "lav_total": {
+     "value": 2,
+     "tolerance": {
+      "abs": 0
      }
     }
    }

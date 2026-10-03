@@ -132,7 +132,7 @@ export function computeLumenMethod({ target_fc = 0, area_sqft = 0, lumens_per_lu
   if (!(cu > 0 && cu <= 1.5)) return { error: "Coefficient of utilization must be in (0, 1.5]." };
   if (!(llf > 0 && llf <= 1)) return { error: "Light-loss factor must be in (0, 1]." };
   const count_raw = (target_fc * area_sqft) / (lumens_per_lum * cu * llf);
-  const count = Math.ceil(count_raw);
+  const count = Math.ceil(count_raw - 1e-9);
   const achieved_fc = count * lumens_per_lum * cu * llf / area_sqft;
   const total_lumens = count * lumens_per_lum;
   return {

@@ -42,3 +42,40 @@ test("every Math.ceil / Math.floor of a quotient carries a float guard (within t
   }
   assert.ok(all.length <= BUDGET, `${all.length} unguarded quotient roundings (budget ${BUDGET}):\n${all.join("\n")}`);
 });
+
+// The same error one step removed: the quotient is stored first and the
+// variable is rounded (`const g = a / b * k; Math.ceil(g)`). The check above
+// only sees a "/" inside the parentheses, so 2026-10-02 found curing compound
+// ordering 11 gal for an exact 10.000000000000002 and 20 more such sites.
+// A bare variable whose own definition divides or multiplies must be guarded
+// too. The reviewed exceptions: a DMS formatter that carries its own rollover
+// and a percentile's two bracketing indices (the interpolation weight absorbs
+// the error).
+const REVIEWED = new Set(["calc-survey.js:mFloat", "calc-historical.js:idx"]);
+
+function unguardedVariables(src) {
+  const found = [];
+  const lines = src.split("\n");
+  lines.forEach((line, i) => {
+    for (const m of line.matchAll(/Math\.(ceil|floor)\(([A-Za-z_]\w*)\)/g)) {
+      const v = m[2];
+      for (let k = i; k >= Math.max(0, i - 80); k--) {
+        const d = new RegExp("(?:const|let|var)\\s+(?:[^=;]*,\\s*)?" + v + "\\s*=\\s*([^;]*)").exec(lines[k]);
+        if (!d) continue;
+        if (/[/*]/.test(d[1].replace(/\/\/.*$/, ""))) found.push(v);
+        break;
+      }
+    }
+  });
+  return found;
+}
+
+test("a rounded variable that holds a computed quotient or product carries a float guard", () => {
+  const all = [];
+  for (const f of readdirSync(ROOT).filter((n) => /^calc-.*\.js$/.test(n))) {
+    for (const v of unguardedVariables(readFileSync(resolve(ROOT, f), "utf8"))) {
+      if (!REVIEWED.has(f + ":" + v)) all.push(f + ": " + v);
+    }
+  }
+  assert.deepEqual(all, []);
+});

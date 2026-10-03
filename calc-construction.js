@@ -905,7 +905,7 @@ export function computeTileCount({ area_ft2, tile_width_in, tile_height_in, grou
   const tile_face_in2 = tw * th;
   const area_in2 = a * 144;
   const base_count_raw = area_in2 / tile_face_in2;
-  const base_count = Math.ceil(base_count_raw);
+  const base_count = Math.ceil(base_count_raw - 1e-9);
   const tile_count = base_count + Math.ceil(base_count * waste_factor);
   // Grout volume estimate: linear feet of joint = (W + H) per tile / 2 to
   // avoid double-counting; use perimeter / 2.
@@ -1003,7 +1003,7 @@ export function computeMasonryCount({ wall_area_ft2, unit_type, mortar_joint_in 
   const face_in2 = (u.w + m) * (u.h + m);
   const face_ft2 = face_in2 / 144;
   const base_raw = a / face_ft2;
-  const base = Math.ceil(base_raw);
+  const base = Math.ceil(base_raw - 1e-9);
   const count = base + Math.ceil(base * waste_factor);
   return { unit_count: count, base_count: base, face_ft2 };
 }
@@ -2917,10 +2917,10 @@ export function computeResidentialFraming({
     joist_count, joist_bf,
     rafter_count, rafter_length_ft, rafter_bf,
     total_bf,
-    summary: stud_count + " " + stud_size + " studs (" + Math.ceil(stud_bf) + " bf), " +
-             plate_lf + " ft of " + stud_size + " plate (" + Math.ceil(plate_bf) + " bf), " +
-             joist_count + " " + joist_size + " joists (" + Math.ceil(joist_bf) + " bf), " +
-             rafter_count + " " + rafter_size + " rafters (" + Math.ceil(rafter_bf) + " bf)",
+    summary: stud_count + " " + stud_size + " studs (" + Math.ceil(stud_bf - 1e-9) + " bf), " +
+             plate_lf + " ft of " + stud_size + " plate (" + Math.ceil(plate_bf - 1e-9) + " bf), " +
+             joist_count + " " + joist_size + " joists (" + Math.ceil(joist_bf - 1e-9) + " bf), " +
+             rafter_count + " " + rafter_size + " rafters (" + Math.ceil(rafter_bf - 1e-9) + " bf)",
   };
 }
 
@@ -5677,11 +5677,10 @@ export function computePlumbingFixtureCount({ occupant_load = 0, wc_ratio = 25, 
     const t = tier > 0 && over > 0 ? tier : Infinity;
     return Math.ceil(Math.min(n, t) / ratio - 1e-9) + (t < Infinity ? Math.ceil(Math.max(n - t, 0) / over - 1e-9) : 0);
   };
-  const wcFor = (n) => {
-    const tierN = Math.min(n, wc_tier);
-    const over = Math.max(n - wc_tier, 0);
-    return Math.ceil(tierN / wc_ratio - 1e-9) + (wc_ratio_over > 0 ? Math.ceil(over / wc_ratio_over - 1e-9) : 0);
-  };
+  // Water closets go through the same helper. Until 2026-10-02 they had their own, which with
+  // wc_tier = 0 ("single", per the field label) never applied wc_ratio at all: a 300-occupant A-2
+  // restaurant at 1:75 read 0 water closets where the code requires 4.
+  const wcFor = (n) => tiered(n, wc_ratio, wc_ratio_over, wc_tier);
   const per_sex_a = occupant_load * distribution;
   const per_sex_b = occupant_load * (1 - distribution);
   const wc_a = wcFor(per_sex_a);
@@ -10130,7 +10129,7 @@ export function computeStuccoCoverage({ area_sf = 1000, total_thickness_in = 0.8
   if (!(bag_yield_sf_in > 0)) return { error: "Bag yield must be positive (square-foot-inches)." };
   if (waste_pct < 0) return { error: "Waste cannot be negative (percent)." };
   const raw_bags = area_sf * total_thickness_in / bag_yield_sf_in * (1 + waste_pct / 100);
-  const bags = Math.ceil(raw_bags);
+  const bags = Math.ceil(raw_bags - 1e-9);
   if (![raw_bags, bags].every(Number.isFinite)) return { error: "Stucco-coverage math is not a finite value." };
   return {
     bags,
@@ -10388,7 +10387,7 @@ export function computePolymericSandBags({ area_sf = 400, coverage_per_bag_sf = 
   if (!(coverage_per_bag_sf > 0)) return { error: "Coverage per bag must be positive (ft^2)." };
   if (waste_pct < 0) return { error: "Waste cannot be negative (percent)." };
   const raw_bags = area_sf * (1 + waste_pct / 100) / coverage_per_bag_sf;
-  const bags = Math.ceil(raw_bags);
+  const bags = Math.ceil(raw_bags - 1e-9);
   if (![raw_bags, bags].every(Number.isFinite)) return { error: "Polymeric-sand math is not a finite value." };
   return {
     bags,
@@ -10645,7 +10644,7 @@ export function computeRebarChairCount({ slab_area_sf = 1000, support_spacing_ft
   if (!(support_spacing_ft > 0)) return { error: "Support spacing must be positive (ft)." };
   if (waste_pct < 0) return { error: "Waste cannot be negative (percent)." };
   const raw_chairs = slab_area_sf / (support_spacing_ft * support_spacing_ft) * (1 + waste_pct / 100);
-  const chairs = Math.ceil(raw_chairs);
+  const chairs = Math.ceil(raw_chairs - 1e-9);
   if (![raw_chairs, chairs].every(Number.isFinite)) return { error: "Chair-count math is not a finite value." };
   return {
     chairs,

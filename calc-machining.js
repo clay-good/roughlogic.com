@@ -2031,7 +2031,7 @@ export function computeGearUndercutBacklash({ pressure_angle_deg = 20, teeth = 0
   const phi_rad = phi * Math.PI / 180;
   const sin_phi = Math.sin(phi_rad);
   const min_teeth_exact = 2 * k / (sin_phi * sin_phi);
-  const min_teeth = Math.ceil(min_teeth_exact);
+  const min_teeth = Math.ceil(min_teeth_exact - 1e-9);
   const undercut = n < min_teeth;
   const shortfall = undercut ? min_teeth - n : 0;
   const backlash_in = 2 * dC * Math.tan(phi_rad);

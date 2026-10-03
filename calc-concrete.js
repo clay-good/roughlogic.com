@@ -2149,7 +2149,7 @@ export function computeCuringCompoundCoverage({ slab_area_sf = 2500, coats = 1, 
   if (!(coverage_sf_per_gal > 0)) return { error: "Coverage rate must be positive (sf/gal)." };
   if (waste_pct < 0) return { error: "Waste cannot be negative (percent)." };
   const gallons_exact = slab_area_sf * coats / coverage_sf_per_gal * (100 + waste_pct) / 100;
-  const gallons_needed = Math.ceil(gallons_exact);
+  const gallons_needed = Math.ceil(gallons_exact - 1e-9);
   const pails_5gal = Math.ceil(gallons_needed / 5 - 1e-9);
   if (![gallons_exact, gallons_needed, pails_5gal].every(Number.isFinite)) return { error: "Coverage math is not a finite value." };
   return {

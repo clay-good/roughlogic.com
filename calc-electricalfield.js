@@ -309,7 +309,7 @@ export function computeBatteryInverterDcConductor({ inverter_power_w = 4000, bat
   const dc_current_a = inverter_power_w / (battery_voltage_v * (efficiency_pct / 100));
   // NEC 690.8(B)/706/240.4: conductor and OCPD at 125% of the continuous current.
   const min_conductor_ampacity_a = 1.25 * dc_current_a;
-  const ocpd_a = _V941_STD_OCPD.find((s) => s >= min_conductor_ampacity_a) || Math.ceil(min_conductor_ampacity_a);
+  const ocpd_a = _V941_STD_OCPD.find((s) => s >= min_conductor_ampacity_a) || Math.ceil(min_conductor_ampacity_a - 1e-9);
   if (![dc_current_a, min_conductor_ampacity_a, ocpd_a].every(Number.isFinite)) return { error: "Battery-conductor math is not a finite value." };
   return {
     dc_current_a,
@@ -358,7 +358,7 @@ export function computePvAcOutputCircuit({ ac_power_w = 9600, ac_voltage_v = 240
   const continuous_current_a = ac_power_w / (ac_voltage_v * phase_factor);
   // NEC 690.8(B) / 705.60 / 240.4: conductor and OCPD at 125% of the continuous inverter output current.
   const min_conductor_ampacity_a = 1.25 * continuous_current_a;
-  const ocpd_a = _V941_STD_OCPD.find((s) => s >= min_conductor_ampacity_a) || Math.ceil(min_conductor_ampacity_a);
+  const ocpd_a = _V941_STD_OCPD.find((s) => s >= min_conductor_ampacity_a) || Math.ceil(min_conductor_ampacity_a - 1e-9);
   if (![continuous_current_a, min_conductor_ampacity_a, ocpd_a].every(Number.isFinite)) return { error: "AC-output math is not a finite value." };
   return {
     continuous_current_a,

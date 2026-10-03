@@ -309,15 +309,15 @@ export function computeGrowLightFixtureCount({ growing_area_sqft = 0, target_ppf
   const photons_required_umol_s = target_ppfd_umol_m2_s * growing_area_m2;
   const effective_ppf_umol_s = fixture_ppf_umol_s * on_target_fraction;
   const exact_count = photons_required_umol_s / effective_ppf_umol_s;
-  const fixture_count = Math.ceil(exact_count);
+  const fixture_count = Math.ceil(exact_count - 1e-9);
   const perfect_exact_count = photons_required_umol_s / fixture_ppf_umol_s;
   const connected_load_w = fixture_count * fixture_watts;
   const season_kwh = connected_load_w * photoperiod_hours * season_days / 1000;
   return {
     growing_area_m2, photons_required_umol_s, effective_ppf_umol_s,
     exact_count, fixture_count,
-    perfect_exact_count, perfect_count: Math.ceil(perfect_exact_count),
-    on_target_cost_fixtures: fixture_count - Math.ceil(perfect_exact_count),
+    perfect_exact_count, perfect_count: Math.ceil(perfect_exact_count - 1e-9),
+    on_target_cost_fixtures: fixture_count - Math.ceil(perfect_exact_count - 1e-9),
     connected_load_w,
     watts_per_m2: connected_load_w / growing_area_m2,
     efficacy_umol_per_joule: fixture_ppf_umol_s / fixture_watts,

@@ -2,7 +2,7 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "2015f421275762b5",
+      "sha": "a9839cc3aa58928d",
       "date": "2026-10-03"
     },
     "/tools/": {
@@ -126,8 +126,8 @@
       "date": "2026-09-29"
     },
     "/tools/access-control-power-supply/": {
-      "sha": "9977c9a4e4e99bf8",
-      "date": "2026-09-29"
+      "sha": "deb9095bc5012fe6",
+      "date": "2026-10-03"
     },
     "/tools/accessible-parking-count/": {
       "sha": "a46c1d9b6a00c63b",
@@ -826,8 +826,8 @@
       "date": "2026-09-29"
     },
     "/tools/brick-veneer-anchor-spacing/": {
-      "sha": "96c782b2f485538d",
-      "date": "2026-10-01"
+      "sha": "88a4aec6a970c0f6",
+      "date": "2026-10-03"
     },
     "/tools/brick-veneer-weep-count/": {
       "sha": "1d173ce4c6af87be",
@@ -1098,8 +1098,8 @@
       "date": "2026-09-29"
     },
     "/tools/chamber-cc-for-cr/": {
-      "sha": "f894c2b4b86be8a7",
-      "date": "2026-09-29"
+      "sha": "574f6127eb0111aa",
+      "date": "2026-10-03"
     },
     "/tools/chamber-gas-volume/": {
       "sha": "f6448658c6a49ce9",
@@ -1682,8 +1682,8 @@
       "date": "2026-09-29"
     },
     "/tools/conduit-expansion-max-run/": {
-      "sha": "94de5d6251cc7036",
-      "date": "2026-09-29"
+      "sha": "d3d9a95bf565cd29",
+      "date": "2026-10-03"
     },
     "/tools/conduit-fill/": {
       "sha": "ab520ad2a82522ee",
@@ -2206,8 +2206,8 @@
       "date": "2026-09-29"
     },
     "/tools/displacement-cr/": {
-      "sha": "2cdbc256712c6dec",
-      "date": "2026-09-29"
+      "sha": "feada53eaa585e22",
+      "date": "2026-10-03"
     },
     "/tools/distance-distance-intersection/": {
       "sha": "89666a73155fd6e3",
@@ -3302,8 +3302,8 @@
       "date": "2026-09-29"
     },
     "/tools/gcwr-check/": {
-      "sha": "190e6e7eaa452a73",
-      "date": "2026-09-29"
+      "sha": "b8190bd9c7e5ca83",
+      "date": "2026-10-03"
     },
     "/tools/gear-cascade/": {
       "sha": "4c9f59755b724383",
@@ -3406,8 +3406,8 @@
       "date": "2026-09-29"
     },
     "/tools/glass-weight/": {
-      "sha": "cb38dfaf522fd3b6",
-      "date": "2026-09-29"
+      "sha": "3f4b9dbd84d128eb",
+      "date": "2026-10-03"
     },
     "/tools/glidepath-descent-rate/": {
       "sha": "076aa3fc2ca3319c",
@@ -3646,8 +3646,8 @@
       "date": "2026-10-01"
     },
     "/tools/hdd-pullback/": {
-      "sha": "32269c6dbf0bffdd",
-      "date": "2026-10-01"
+      "sha": "35f2ff343f09b6d7",
+      "date": "2026-10-03"
     },
     "/tools/hdpe-fusion-pressure-time/": {
       "sha": "862a592b7495c87a",
@@ -5570,8 +5570,8 @@
       "date": "2026-09-29"
     },
     "/tools/pool-heater-btu/": {
-      "sha": "27d84260a499d090",
-      "date": "2026-09-29"
+      "sha": "3b6d2ea2b3bb7f32",
+      "date": "2026-10-03"
     },
     "/tools/pool-heater-size/": {
       "sha": "7e669b476bf1d973",

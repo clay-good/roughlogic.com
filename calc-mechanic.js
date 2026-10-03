@@ -76,9 +76,9 @@ export function computeDisplacementCR({
   const gasket_cc = gasket_bore_in > 0 && gasket_thickness_in > 0
     ? Math.PI * 0.25 * gasket_bore_in * gasket_bore_in * gasket_thickness_in * 16.387
     : 0;
-  const deck_cc = deck_clearance_in > 0
-    ? Math.PI * 0.25 * bore_in * bore_in * deck_clearance_in * 16.387
-    : 0;
+  // Signed: a piston ABOVE the deck (negative clearance) takes volume out of the chamber. Until
+  // 2026-10-02 a negative entry was read as 0 (PowerNation's 350: -0.005 in is 70.31 cc, not 69.26).
+  const deck_cc = (Number(deck_clearance_in) || 0) * Math.PI * 0.25 * bore_in * bore_in * 16.387;
   // Standard form: CR = (V_cyl + V_chamber + V_gasket + V_deck - V_dome) / (V_chamber + V_gasket + V_deck - V_dome)
   const tdc_volume = chamber_cc + gasket_cc + deck_cc - dome_dish_cc;
   if (tdc_volume <= 0) return { error: "Top-dead-center volume must be positive." };
@@ -117,9 +117,9 @@ export function computeChamberCcForCr({
   const gasket_cc = gasket_bore_in > 0 && gasket_thickness_in > 0
     ? Math.PI * 0.25 * gasket_bore_in * gasket_bore_in * gasket_thickness_in * 16.387
     : 0;
-  const deck_cc = deck_clearance_in > 0
-    ? Math.PI * 0.25 * bore_in * bore_in * deck_clearance_in * 16.387
-    : 0;
+  // Signed: a piston ABOVE the deck (negative clearance) takes volume out of the chamber. Until
+  // 2026-10-02 a negative entry was read as 0 (PowerNation's 350: -0.005 in is 70.31 cc, not 69.26).
+  const deck_cc = (Number(deck_clearance_in) || 0) * Math.PI * 0.25 * bore_in * bore_in * 16.387;
   const dome = Number(dome_dish_cc) || 0;
   // Inverse of CR = (cyl_cc + tdc) / tdc: tdc = cyl_cc / (CR - 1);
   // then chamber = tdc - gasket_cc - deck_cc + dome (from tdc = chamber + gasket + deck - dome).
@@ -537,7 +537,7 @@ const renderDisplacementCR = _simpleRenderer({
     { key: "chamber_cc", label: "Combustion chamber (cc)", kind: "number" },
     { key: "gasket_bore_in", label: "Gasket bore (in)", kind: "number" },
     { key: "gasket_thickness_in", label: "Gasket thickness (in)", kind: "number" },
-    { key: "deck_clearance_in", label: "Deck clearance (in)", kind: "number" },
+    { key: "deck_clearance_in", label: "Deck clearance (in; negative if the piston sits above the deck)", kind: "number" },
     { key: "dome_dish_cc", label: "Dome (+) / dish (-) cc", kind: "number" },
   ],
   outputs: [
@@ -558,7 +558,7 @@ const renderChamberCcForCr = _simpleRenderer({
     { key: "target_cr", label: "Target compression ratio (x:1)", kind: "number" },
     { key: "gasket_bore_in", label: "Head-gasket bore (in)", kind: "number" },
     { key: "gasket_thickness_in", label: "Head-gasket thickness (in)", kind: "number" },
-    { key: "deck_clearance_in", label: "Deck clearance (in)", kind: "number" },
+    { key: "deck_clearance_in", label: "Deck clearance (in; negative if the piston sits above the deck)", kind: "number" },
     { key: "dome_dish_cc", label: "Dome (+) / dish (-) volume (cc)", kind: "number" },
   ],
   outputs: [
