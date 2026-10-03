@@ -235,8 +235,8 @@ export function computeAsmeShellThickness({ design_pressure_psi = 0, inside_radi
   // P <= 0.665 S E -- the sphere's own pair, not the cylinder's R/2.
   const pressure_limit_psi = (cylindrical ? 0.385 : 0.665) * se;
   const thickness_limit_in = (cylindrical ? 0.5 : 0.356) * R;
-  const over_pressure_limit = P > pressure_limit_psi;
-  const over_thickness_limit = t_required_in > thickness_limit_in;
+  const over_pressure_limit = P > pressure_limit_psi + 1e-9 * Math.abs(pressure_limit_psi);
+  const over_thickness_limit = t_required_in > thickness_limit_in + 1e-9 * Math.abs(thickness_limit_in);
   const outside_ug27 = over_pressure_limit || over_thickness_limit;
   // MAWP for the required thickness, inverting the same relation.
   const mawp_psi = cylindrical

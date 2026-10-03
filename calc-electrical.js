@@ -2130,7 +2130,7 @@ export function computeTransformerKvaSizing({
   // the largest step (so the tile still shows the ceiling) but FLAG it, the way
   // computeTransformerSize already does with at_cap.
   const _tk_max = TRANSFORMER_KVA_STEPS[TRANSFORMER_KVA_STEPS.length - 1];
-  const exceeds_standard = required_kVA > _tk_max;
+  const exceeds_standard = required_kVA > _tk_max + 1e-9 * Math.abs(_tk_max);
   const recommended_kVA = TRANSFORMER_KVA_STEPS.find((s) => s >= required_kVA) ?? _tk_max;
   const fla_primary_A = (recommended_kVA * 1000) / (primary_V * sqrt_phases);
   const fla_secondary_A = (recommended_kVA * 1000) / (secondary_V * sqrt_phases);
@@ -2264,7 +2264,7 @@ export function computeGeneratorMotorStarting({
   // the largest step (so the tile still shows the ceiling) but FLAG it, the way
   // computeTransformerSize already does with at_cap.
   const _gk_max = GENERATOR_KW_STEPS[GENERATOR_KW_STEPS.length - 1];
-  const exceeds_standard = required_kW > _gk_max;
+  const exceeds_standard = required_kW > _gk_max + 1e-9 * Math.abs(_gk_max);
   const recommended_kW = GENERATOR_KW_STEPS.find((s) => s >= required_kW) ?? _gk_max;
   return {
     running_kW, worst_starting_kVA, required_starting_kVA,
@@ -2341,7 +2341,7 @@ export function computeServiceLoadStandard({
   // the largest step (so the tile still shows the ceiling) but FLAG it, the way
   // computeTransformerSize already does with at_cap.
   const _sa_max = STD_SERVICE_AMPACITIES[STD_SERVICE_AMPACITIES.length - 1];
-  const exceeds_standard = required_A > _sa_max;
+  const exceeds_standard = required_A > _sa_max + 1e-9 * Math.abs(_sa_max);
   const recommended_A = STD_SERVICE_AMPACITIES.find((s) => s >= required_A) ?? _sa_max;
   return {
     total_VA, required_A, recommended_A, exceeds_standard,
@@ -3791,7 +3791,7 @@ export function computeServiceLoadOptional({
   // the largest step (so the tile still shows the ceiling) but FLAG it, the way
   // computeTransformerSize already does with at_cap.
   const _so_max = STD_SERVICE_AMPACITIES[STD_SERVICE_AMPACITIES.length - 1];
-  const exceeds_standard = governing_a > _so_max;
+  const exceeds_standard = governing_a > _so_max + 1e-9 * Math.abs(_so_max);
   const recommended_a = STD_SERVICE_AMPACITIES.find((s) => s >= governing_a) ?? _so_max;
 
   return {

@@ -1281,7 +1281,7 @@ export function computeBridleLegTension({ apex_load_lb, run1_ft, rise1_ft, run2_
   const horizontal_lb = t1_lb * a1;
   const angle1_deg = Math.atan2(h1, r1) * 180 / Math.PI;
   const angle2_deg = Math.atan2(h2, r2) * 180 / Math.PI;
-  const over_load = t1_lb > W || t2_lb > W;
+  const over_load = t1_lb > W + 1e-9 * Math.abs(W) || t2_lb > W + 1e-9 * Math.abs(W);
   return {
     l1_ft: L1, l2_ft: L2, t1_lb, t2_lb, horizontal_lb, angle1_deg, angle2_deg, over_load,
     note: "An off-center or unequal-height apex makes the two legs carry unequal tension (the steeper or shorter leg carries more). A shallow bridle multiplies leg tension so a leg can exceed the hung load and drives a large horizontal pull into the beams. This is a static two-dimensional resolution (a three-point bridle or out-of-plane geometry differs). The hardware ratings and a qualified rigger govern.",

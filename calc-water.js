@@ -2568,7 +2568,7 @@ export function computeWetWellCycleTime({
   const fill_min = has_inflow ? active_volume_gal / inflow_gpm : 0;
   const draw_min = has_inflow ? active_volume_gal / (pump_gpm - inflow_gpm) : 0;
   const cycle_at_inflow_min = has_inflow ? fill_min + draw_min : 0;
-  const short_cycling = has_inflow && cycle_at_inflow_min < cycle_min;
+  const short_cycling = has_inflow && cycle_at_inflow_min < cycle_min - 1e-9 * Math.abs(cycle_min);
   const inflow_verdict = !has_inflow
     ? "(no actual inflow entered)"
     : "at " + fmt(inflow_gpm, 0) + " gpm of inflow the well fills in " + fmt(fill_min, 1) + " min and draws down in " + fmt(draw_min, 1) + " min, a " + fmt(cycle_at_inflow_min, 1) + " minute cycle"

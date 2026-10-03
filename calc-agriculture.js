@@ -2341,7 +2341,7 @@ export function computeHayDryMatter({ bale_weight_lb = 0, moisture_pct = 0, targ
   if (!(safe_threshold_pct > 0)) return { error: "Safe-storage threshold must be positive (percent)." };
   const dry_matter_lb = bale_weight_lb * (1 - moisture_pct / 100);
   const weight_at_target_lb = dry_matter_lb / (1 - target_moisture_pct / 100);
-  const over_threshold = moisture_pct > safe_threshold_pct;
+  const over_threshold = moisture_pct > safe_threshold_pct + 1e-9 * Math.abs(safe_threshold_pct);
   return {
     dry_matter_lb, weight_at_target_lb, over_threshold,
     flag: over_threshold

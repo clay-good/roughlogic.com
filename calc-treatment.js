@@ -777,7 +777,7 @@ export function computeDigesterVsLoading({ feed_flow_gpd = 0, percent_ts = 0, pe
   const vs_fed_lb_day = feed * 8.34 * (ts / 100) * (vs / 100);
   const vslr = vs_fed_lb_day / vol * 1000;
   const dt_days = vol * 7.48 / feed;
-  const over_limit = vslr > 400;
+  const over_limit = vslr > 400 + 1e-9 * Math.abs(400);
   const in_band = vslr >= 100 && vslr <= 400;
   return {
     vs_fed_lb_day, vslr, dt_days, over_limit, in_band,

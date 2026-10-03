@@ -154,7 +154,7 @@ export function computeAmmoniaChargeInventory({
   const total_lb = vessel_total_lb + piping_lb;
   if (!(total_lb > 0)) return { error: "Enter at least one vessel or pipe run holding liquid." };
   const margin_lb = threshold_lb - total_lb;
-  const over_threshold = total_lb > threshold_lb;
+  const over_threshold = total_lb > threshold_lb + 1e-9 * Math.abs(threshold_lb);
   const pct_of_threshold = total_lb / threshold_lb * 100;
   const piping_share_pct = piping_lb / total_lb * 100;
   const piping_beats_vessels = piping_lb > vessel_total_lb;

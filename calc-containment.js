@@ -320,7 +320,7 @@ export function computeAcidWasteNeutralization({
   const has_tank = tank_volume_gal > 0;
   const actual_tank_gal = has_tank ? tank_volume_gal : required_volume_gal;
   const turnover_minutes = actual_tank_gal / peak_flow_gpm;
-  const undersized = has_tank && tank_volume_gal < required_volume_gal;
+  const undersized = has_tank && tank_volume_gal < required_volume_gal - 1e-9 * Math.abs(required_volume_gal);
   const turnover_verdict = "a " + fmt(actual_tank_gal, 0) + " gallon tank at " + fmt(peak_flow_gpm, 1) + " gpm turns over every " + fmt(turnover_minutes, 1) + " minutes, so anything entering at the start of that window has " + fmt(turnover_minutes, 1) + " minutes of contact"
     + (undersized ? " -- SHORT of the " + fmt(retention_minutes, 0) + " minutes required, so part of a slug leaves unreacted" : "");
   // The slug case is what actually sizes it.
@@ -396,7 +396,7 @@ export function computeFumeHoodFaceVelocity({
   const open_area_ft2 = sash_width_ft * sash_height_in / 12;
   const exhaust_cfm = open_area_ft2 * face_velocity_fpm;
   const flow_verdict = "a " + fmt(sash_width_ft, 1) + " ft hood at a " + fmt(sash_height_in, 0) + " in sash is " + fmt(open_area_ft2, 2) + " sq ft of opening, so " + fmt(face_velocity_fpm, 0) + " fpm takes " + fmt(exhaust_cfm, 0) + " cfm";
-  const too_fast = face_velocity_fpm > too_fast_fpm;
+  const too_fast = face_velocity_fpm > too_fast_fpm + 1e-9 * Math.abs(too_fast_fpm);
   const velocity_verdict = too_fast
     ? "AND " + fmt(face_velocity_fpm, 0) + " FPM IS ABOVE THE " + fmt(too_fast_fpm, 0) + " FPM THRESHOLD ENTERED, which is the part people get backwards. Too fast is not safer: above roughly this figure, turbulence at the face and in the wake of anyone standing at the hood can pull contaminants OUT rather than in. Face velocity has an optimum, not a floor"
     : fmt(face_velocity_fpm, 0) + " fpm is within the " + fmt(too_fast_fpm, 0) + " fpm threshold entered. Too fast is not safer -- above that figure, turbulence at the face and in the wake of a person standing at the hood can pull contaminants OUT rather than in";

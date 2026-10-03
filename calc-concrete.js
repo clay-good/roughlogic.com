@@ -293,7 +293,7 @@ export function computeRcColumnSteelForLoad({ target_load_kip = 0, b_in = 0, h_i
   const ast_required_in2 = Math.max(ast_strength, ast_min);
   const rho_g = ast_required_in2 / ag_in2;
   const governs = ast_strength <= ast_min ? "the ACI 10.6.1 1% minimum" : "strength";
-  const over_max = ast_required_in2 > ast_max;
+  const over_max = ast_required_in2 > ast_max + 1e-9 * Math.abs(ast_max);
   if (![ast_required_in2, ag_in2, rho_g].every(Number.isFinite)) return { error: "Column-steel math is not a finite value." };
   return {
     ast_required_in2, ag_in2, rho_g, ast_min_in2: ast_min, ast_max_in2: ast_max, governs, over_max,

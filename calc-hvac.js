@@ -4562,8 +4562,8 @@ export function computeFanSheaveForTargetCfm({ current_cfm = 0, target_cfm = 0, 
   const new_bhp = bhp1 > 0 ? bhp1 * Math.pow(ratio, 3) : 0;
   const new_sp_inwg = sp1 > 0 ? sp1 * ratio * ratio : 0;
   const bhp_increase_pct = (Math.pow(ratio, 3) - 1) * 100;
-  const motor_overloaded = mhp > 0 && new_bhp > mhp;
-  const over_motor_rpm = required_fan_rpm > nm;
+  const motor_overloaded = mhp > 0 && new_bhp > mhp + 1e-9 * Math.abs(mhp);
+  const over_motor_rpm = required_fan_rpm > nm + 1e-9 * Math.abs(nm);
   if (![ratio, required_fan_rpm, new_drive_sheave_in, driven_sheave_in].every(Number.isFinite)) return { error: "Sheave-change math did not produce a finite value." };
   return {
     ratio, required_fan_rpm, new_drive_sheave_in, driven_sheave_in, check_fan_rpm,

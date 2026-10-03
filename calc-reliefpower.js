@@ -411,8 +411,8 @@ export function computeSplitPhaseLegBalance({ rated_w = 0, per_leg_rating_a = 0,
   const l1_pct = 100 * l1_a / leg_rating_a;
   const l2_pct = 100 * l2_a / leg_rating_a;
   const total_pct = 100 * total_w / rated_w;
-  const leg_over = l1_a > leg_rating_a || l2_a > leg_rating_a;
-  const total_over = total_w > rated_w;
+  const leg_over = l1_a > leg_rating_a + 1e-9 * Math.abs(leg_rating_a) || l2_a > leg_rating_a + 1e-9 * Math.abs(leg_rating_a);
+  const total_over = total_w > rated_w + 1e-9 * Math.abs(rated_w);
   return {
     leg_rating_a, l1_a, l2_a, l1_pct, l2_pct,
     neutral_a: Math.abs(l1_120_a - l2_120_a),

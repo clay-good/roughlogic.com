@@ -107,8 +107,8 @@ export function computeSandbagLeveeQuantity({ height_ft = 0, length_ft = 0, fill
   const total_bags = Math.ceil(bags_per_ft * length_ft - 1e-9);
   const sand_tons = total_bags * fill_weight_lb / 2000;
   const base_width_ft = 3 * height_ft;
-  const over_preferred = height_ft > 3;
-  const over_practical = height_ft > 5;
+  const over_preferred = height_ft > 3 + 1e-9 * Math.abs(3);
+  const over_practical = height_ft > 5 + 1e-9 * Math.abs(5);
   const height_flag = over_practical
     ? "ABOVE the 5 ft practical limit -- use an earth levee or a manufactured barrier instead of sandbags"
     : over_preferred ? "above the 3 ft preferred maximum, within the 5 ft practical limit"
@@ -237,7 +237,7 @@ export function computeFloodLateralLoad({ depth_ft = 0, width_ft = 0, water = "f
   const hydrodynamic_upper_lb = dyn(velocity_upper_fps);
   const hydrodynamic_height_ft = depth_ft / 2;
   const combined_lateral_lb = hydrostatic_lb + hydrodynamic_lb;
-  const drag_exceeds_static = hydrodynamic_lb > hydrostatic_lb;
+  const drag_exceeds_static = hydrodynamic_lb > hydrostatic_lb + 1e-9 * Math.abs(hydrostatic_lb);
   const entered_outside_bounds = velocity_basis === "entered" && (entered_velocity_fps < velocity_lower_fps || entered_velocity_fps > velocity_upper_fps);
   return {
     hydrostatic_lb_per_ft, hydrostatic_lb, hydrostatic_height_ft, velocity_lower_fps, velocity_upper_fps, velocity_used_fps,

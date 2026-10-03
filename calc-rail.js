@@ -110,9 +110,9 @@ export function computeTrackSuperelevation({ degree_of_curve = 0, speed_mph = 0,
   const required_elevation_in = Math.max(0, equilibrium_at_target_in - allowable_unbalance_in);
   const condition = unbalance_in > 1e-9 ? "underbalanced (leaning to the high rail)"
     : unbalance_in < -1e-9 ? "overbalanced (leaning to the low rail)" : "at equilibrium";
-  const over_elevation = actual_elevation_in > max_elevation_in;
-  const over_unbalance = unbalance_in > allowable_unbalance_in;
-  const required_over_cap = required_elevation_in > max_elevation_in;
+  const over_elevation = actual_elevation_in > max_elevation_in + 1e-9 * Math.abs(max_elevation_in);
+  const over_unbalance = unbalance_in > allowable_unbalance_in + 1e-9 * Math.abs(allowable_unbalance_in);
+  const required_over_cap = required_elevation_in > max_elevation_in + 1e-9 * Math.abs(max_elevation_in);
   return {
     equilibrium_in, unbalance_in, max_speed_mph, equilibrium_at_target_in, required_elevation_in,
     condition, over_elevation, over_unbalance, required_over_cap,

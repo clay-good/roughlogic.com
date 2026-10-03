@@ -2649,7 +2649,7 @@ export function computeSanitaryDfu({
   if (slope_in_per_ft < 0.125 && config !== "stack") warnings.push("Slope below 1/8 in per ft is below the IPC minimum for pipe 3 in and smaller.");
 
   const proposed = proposed_size_in != null ? Number(proposed_size_in) : null;
-  const undersized = proposed != null && min_size_in != null && proposed < min_size_in;
+  const undersized = proposed != null && min_size_in != null && proposed < min_size_in - 1e-9 * Math.abs(min_size_in);
   if (undersized) warnings.push("Proposed " + proposed + " in pipe is undersized for " + total_dfu + " DFU; minimum is " + min_size_in + " in.");
 
   return {
@@ -3501,7 +3501,7 @@ export function computePipeVelocity({ mode = "velocity-from-flow", flow_gpm = 0,
   const q = Number(flow_gpm);
   if (!(q >= 0)) return { error: "Flow must be non-negative (gpm)." };
   const velocity_fps = K * q / (d * d);
-  const over = velocity_fps > ceiling;
+  const over = velocity_fps > ceiling + 1e-9 * Math.abs(ceiling);
   const notes = [];
   if (over) notes.push("Velocity " + fmt(velocity_fps, 2) + " ft/s exceeds the " + mat + " " + svc + " erosion-corrosion ceiling of " + ceiling + " ft/s.");
   notes.push("Actual inside diameter (not nominal) governs. Copper ceiling about 5 ft/s hot, 8 ft/s cold.");

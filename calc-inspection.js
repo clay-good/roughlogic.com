@@ -927,7 +927,7 @@ export function computePwhtHoldingTime({
     ? "(no alternative thickness entered)"
     : "a " + fmt(alt_thickness_in, 2) + " in section runs " + fmt(alt_total_cycle_hr, 1) + " hours, " + fmt(alt_total_cycle_hr / total_cycle_hr, 2) + " times this cycle for " + fmt(alt_thickness_in / governing_thickness_in, 2) + " times the thickness -- the hold scales with thickness and BOTH ramps scale with it too, because the permitted rate falls as the thickness rises";
   const has_actual = actual_heating_rate_f_hr > 0;
-  const rate_exceeded = has_actual && actual_heating_rate_f_hr > max_heating_rate_f_hr;
+  const rate_exceeded = has_actual && actual_heating_rate_f_hr > max_heating_rate_f_hr + 1e-9 * Math.abs(max_heating_rate_f_hr);
   const actual_verdict = !has_actual
     ? "(no actual heating rate entered)"
     : rate_exceeded

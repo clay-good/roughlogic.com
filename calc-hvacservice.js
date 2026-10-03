@@ -827,8 +827,8 @@ export function computeCoAirFree({ measured_co_ppm = 0, measured_o2_pct = 0 } = 
   if (!(o2 < 20.9)) return { error: "Oxygen at or above 20.9% means no combustion product to correct." };
   if (o2 < 0) return { error: "Oxygen cannot be negative (%)." };
   const co_air_free_ppm = co * 20.9 / (20.9 - o2);
-  const over_ansi = co_air_free_ppm > 400;
-  const over_field = co_air_free_ppm > 100;
+  const over_ansi = co_air_free_ppm > 400 + 1e-9 * Math.abs(400);
+  const over_field = co_air_free_ppm > 100 + 1e-9 * Math.abs(100);
   return {
     co_air_free_ppm, over_ansi, over_field,
     note: "As-measured CO is diluted by excess and dilution air and reads deceptively low, so a dangerous appliance can look acceptable. The sample must be taken in the flue, before the draft hood or dilution air, or the correction over-inflates. The correction scales the reading to a no-dilution basis for comparison to the air-free limit (400 ppm ANSI Z21, under 100 ppm field target). The analyzer and the manufacturer instructions govern - a safety-screening aid, not a certified combustion test.",

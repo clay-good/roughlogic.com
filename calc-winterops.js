@@ -177,7 +177,7 @@ export function computeBrineBatchSalinity({ batch_gal = 0, target_pct = 23.3, br
   const salt_per_1000gal_lb = salt_lb / batch_gal * 1000;
   const salometer = target_pct / saturation_pct * 100;
   const freeze_point_f = _naclFreezePointF(target_pct);
-  const over_saturated = target_pct > saturation_pct;
+  const over_saturated = target_pct > saturation_pct + 1e-9 * Math.abs(saturation_pct);
   const compared = alt_pct > 0 && alt_pct <= saturation_pct;
   const alt_salt_lb = compared ? batch_weight_lb * (alt_pct / 100) : null;
   const alt_freeze_point_f = compared ? _naclFreezePointF(alt_pct) : null;

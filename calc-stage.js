@@ -194,7 +194,7 @@ export function computeDMX({ fixtures = [] }) {
     if (universe < 1) return { error: "Universe must be at least 1." };
     max_universe = Math.max(max_universe, universe);
     const end = start + ch - 1;
-    const overflow = end > 512;
+    const overflow = end > 512 + 1e-9 * Math.abs(512);
     ranges.push({
       name: f.name || ("fixture-" + ranges.length),
       universe,
@@ -1587,7 +1587,7 @@ export function computeLedTapeRun({ power_per_ft_w = 0, run_length_ft = 0, suppl
   const end_drop_v = current_a * (rpf * len) / 2;
   const end_voltage_v = volt - end_drop_v;
   const drop_pct = end_drop_v / volt * 100;
-  const too_long = drop_pct > tol;
+  const too_long = drop_pct > tol + 1e-9 * Math.abs(tol);
   return {
     load_w, psu_w, current_a, end_drop_v, end_voltage_v, drop_pct, too_long,
     note: "A single end-fed run dims and color-shifts at the far end because the copper trace drops voltage (12 V strips typically wall out around 16-20 ft, 24 V roughly double). Oversizing the PSU does not fix the drop - power-inject or feed both ends instead. The drop uses the uniform-load approximation (half the full-current drop). The PSU wants about 20% headroom for inrush and lifespan. The strip datasheet governs.",

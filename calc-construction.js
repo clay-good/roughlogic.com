@@ -3470,7 +3470,7 @@ function _v15cPostColumnCapacity({ d_in, height_ft, F_c, E_min }) {
   // during construction). The standalone computeColumnBucklingWood tile already
   // errors past 50; this helper silently returned a capacity for an
   // NDS-prohibited member, so flag it rather than report a bare number.
-  const slenderness_exceeded = le_d > 50;
+  const slenderness_exceeded = le_d > 50 + 1e-9 * Math.abs(50);
   return { A_in2, le_d, C_P, allowable_load_lb: F_c_prime * A_in2, slenderness_exceeded };
 }
 
@@ -6194,7 +6194,7 @@ export function computeMassConcreteTempRise({ cementitious_lb_per_cy = 600, rise
   if (!(diff_limit_f > 0)) return { error: "Differential limit must be positive (degF)." };
   const delta_t_f = (cementitious_lb_per_cy * rise_f_per_100lb) / 100;
   const peak_temp_f = placing_temp_f + delta_t_f;
-  const exceeds_screen = delta_t_f > diff_limit_f;
+  const exceeds_screen = delta_t_f > diff_limit_f + 1e-9 * Math.abs(diff_limit_f);
   if (![delta_t_f, peak_temp_f].every(Number.isFinite)) return { error: "Temperature-rise math is not a finite value." };
   return {
     delta_t_f,
@@ -7874,7 +7874,7 @@ export function computeReadyMixConcreteOrder({ volume_yd3 = 0, waste_pct = 8, lo
   const ordered_yd3 = vol * (1 + waste / 100);
   const trucks = Math.ceil(ordered_yd3 / load - 1e-9);
   const last_load_yd3 = ordered_yd3 - (trucks - 1) * load;
-  const short_load = ordered_yd3 < min;
+  const short_load = ordered_yd3 < min - 1e-9 * Math.abs(min);
   const cost_usd = price > 0 ? ordered_yd3 * price : null;
   return {
     ordered_yd3, trucks, last_load_yd3, short_load, cost_usd,
@@ -8759,7 +8759,7 @@ export function computeConcreteYield({ total_batch_mass_lb = 0, measured_unit_we
   const relative_yield = yield_yd3 / design;
   const cement_content_lb_yd3 = cement > 0 ? cement / yield_yd3 : null;
   if (![yield_ft3, yield_yd3, relative_yield].every(Number.isFinite)) return { error: "Concrete-yield math is not a finite value." };
-  const short = relative_yield < 1;
+  const short = relative_yield < 1 - 1e-9 * Math.abs(1);
   return {
     yield_ft3, yield_yd3, relative_yield, cement_content_lb_yd3, short,
     note: "ASTM C138 concrete yield: the volume a batch actually makes is its total mass divided by the measured fresh unit weight (density), and the relative yield is that over the design volume. A relative yield BELOW 1.0 means the load ran short -- the concrete is denser than designed (low air, heavy or extra aggregate, too little water), so the customer got fewer cubic yards than ordered and the actual cement content per yard is HIGHER than the mix design. Above 1.0 is over-yield -- lighter or higher-air concrete diluting the cement content, which can cost strength. A relative yield within about 1% of 1.0 is a good, honest batch. The unit weight must be measured per C138 (a rodded, struck-off known-volume measure), not estimated. This checks the batch's volume and cement content, not its air content (which needs the theoretical density from the material specific gravities) or its strength. A QC check; the mix design, the C138 measurement, and the mix producer govern.",
@@ -12052,7 +12052,7 @@ export function computeDryerDuctLength({ straight_run_ft = 0, elbow_90_count = 0
   // M1502.4.7: over 35 ft of equivalent length the duct has to be labelled at the connection.
   const label_required = developed_length_ft > 35;
   // M1502.4.3: the transition duct is a separate 8 ft listed assembly and is NOT counted here.
-  const transition_over = trans > 8;
+  const transition_over = trans > 8 + 1e-9 * Math.abs(8);
 
   const note = "Developed length is the straight run PLUS the equivalent length of every fitting, and the fittings are what actually consume the budget: "
     + run + " ft of duct plus " + n90 + " ninety" + (n90 === 1 ? "" : "s") + " and " + n45 + " forty-five" + (n45 === 1 ? "" : "s") + " worth " + fitting_equivalent_ft.toFixed(2) + " ft = " + developed_length_ft.toFixed(2) + " ft against a " + maxL + " ft ceiling. "
@@ -12631,7 +12631,7 @@ export function computeTemporaryStairwayCheck({ riser_count = 0, total_rise_in =
   // Angle from the actual step geometry.
   const angle_deg = Math.atan(rh / td) * 180 / Math.PI;
   const angle_ok = angle_deg >= ANGLE_MIN - 1e-9 * Math.abs(ANGLE_MIN) && angle_deg <= ANGLE_MAX + 1e-9 * Math.abs(ANGLE_MAX);
-  const too_shallow = angle_deg < ANGLE_MIN;
+  const too_shallow = angle_deg < ANGLE_MIN - 1e-9 * Math.abs(ANGLE_MIN);
 
   // "Four or more risers OR rising more than 30 inches, whichever is less" - whichever
   // comes FIRST, so either condition alone triggers it.
@@ -12738,7 +12738,7 @@ export function computeFlammableCabinetStorage({ cat123_gallons = 0, cat4_gallon
   const have_entered = have > 0;
   const cabinets_ok = have_entered ? have >= cabinets_needed : null;
   const cabinets_short = have_entered ? Math.max(0, cabinets_needed - have) : 0;
-  const too_many_cabinets = have > maxCab;
+  const too_many_cabinets = have > maxCab + 1e-9 * Math.abs(maxCab);
 
   const passes = within_area_cap && (cabinets_ok !== false) && !too_many_cabinets;
 
@@ -13721,7 +13721,7 @@ export function computeHandrailGeometry({ rail_height_in = 0, clearance_in = 0, 
   const EXT_FLAT = 12;
 
   const height_ok = h >= H_MIN - 1e-9 * Math.abs(H_MIN) && h <= H_MAX + 1e-9 * Math.abs(H_MAX);
-  const height_too_high = h > H_MAX;
+  const height_too_high = h > H_MAX + 1e-9 * Math.abs(H_MAX);
   const clearance_ok = clr >= CLR_MIN - 1e-9 * Math.abs(CLR_MIN);
   const clearance_deficit_in = Math.max(0, CLR_MIN - clr);
 
@@ -13835,7 +13835,7 @@ export function computeKneeToeClearance({ apron_height_in = 0, knee_depth_at_9_i
 
   const toe_ok = toe >= TOE_MIN - 1e-9 * Math.abs(TOE_MIN);
   const toe_deficit_in = Math.max(0, TOE_MIN - toe);
-  const toe_over_max = toe > MAX_DEPTH;
+  const toe_over_max = toe > MAX_DEPTH + 1e-9 * Math.abs(MAX_DEPTH);
   const width_ok = w >= WIDTH_MIN - 1e-9 * Math.abs(WIDTH_MIN);
   const width_deficit_in = Math.max(0, WIDTH_MIN - w);
 
@@ -14001,7 +14001,7 @@ export function computeAdaStairCheck({ riser_height_in = 0, tread_depth_in = 0, 
   const RADIUS_MAX = 0.5, NOSE_MAX = 1.5, SLOPE_MAX = 30;
 
   const riser_ok = rise >= RISER_MIN - 1e-9 * Math.abs(RISER_MIN) && rise <= RISER_MAX + 1e-9 * Math.abs(RISER_MAX);
-  const riser_too_tall = rise > RISER_MAX;
+  const riser_too_tall = rise > RISER_MAX + 1e-9 * Math.abs(RISER_MAX);
   const riser_deficit_in = riser_too_tall ? rise - RISER_MAX : Math.max(0, RISER_MIN - rise);
   const tread_ok = tread >= TREAD_MIN - 1e-9 * Math.abs(TREAD_MIN);
   const tread_deficit_in = Math.max(0, TREAD_MIN - tread);
@@ -14184,7 +14184,7 @@ export function computeDrinkingFountainCheck({ units_provided = 0, bi_level = "n
   const wheelchair_ok = wc <= WC_MAX + 1e-9 * Math.abs(WC_MAX);
   const wheelchair_excess_in = Math.max(0, wc - WC_MAX);
   const standing_ok = st >= STAND_MIN - 1e-9 * Math.abs(STAND_MIN) && st <= STAND_MAX + 1e-9 * Math.abs(STAND_MAX);
-  const standing_too_low = st < STAND_MIN;
+  const standing_too_low = st < STAND_MIN - 1e-9 * Math.abs(STAND_MIN);
   const standing_deficit_in = standing_too_low ? STAND_MIN - st : Math.max(0, st - STAND_MAX);
   // The dead band between the two windows: 36 to 38 in satisfies neither.
   const dead_band_low_in = WC_MAX, dead_band_high_in = STAND_MIN;
@@ -14576,12 +14576,12 @@ export function computeWaterClosetLocation({ centerline_in = 0, seat_height_in =
   const SIDE_MIN = 60, REAR_MIN = 56, IPC_MIN = 15;
 
   const centerline_ok = c >= C_MIN - 1e-9 * Math.abs(C_MIN) && c <= C_MAX + 1e-9 * Math.abs(C_MAX);
-  const centerline_too_close = c < C_MIN;
+  const centerline_too_close = c < C_MIN - 1e-9 * Math.abs(C_MIN);
   const centerline_deficit_in = centerline_too_close ? C_MIN - c : Math.max(0, c - C_MAX);
   const meets_ipc_only = c >= IPC_MIN - 1e-9 * Math.abs(IPC_MIN) && c < C_MIN;
 
   const seat_ok = s >= S_MIN - 1e-9 * Math.abs(S_MIN) && s <= S_MAX + 1e-9 * Math.abs(S_MAX);
-  const seat_too_low = s < S_MIN;
+  const seat_too_low = s < S_MIN - 1e-9 * Math.abs(S_MIN);
   const seat_deficit_in = seat_too_low ? S_MIN - s : Math.max(0, s - S_MAX);
 
   const clearance_entered = cs > 0 || cr > 0;

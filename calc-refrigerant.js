@@ -1442,7 +1442,7 @@ export function computeRefrigerantLeakRate({ full_charge_lb = 0, pounds_added_lb
   const leak_rate_pct = pounds_added_lb / full_charge_lb * scale * 100;
   const allowed_lb = threshold_pct / 100 * full_charge_lb / scale;
   const pounds_over_lb = pounds_added_lb - allowed_lb;
-  const exceeded = leak_rate_pct > threshold_pct;
+  const exceeded = leak_rate_pct > threshold_pct + 1e-9 * Math.abs(threshold_pct);
   const verdict = exceeded
     ? "EXCEEDED: " + fmt(leak_rate_pct, 1) + "% against a " + fmt(threshold_pct, 1) + "% threshold, " + fmt(pounds_over_lb, 1) + " lb over the allowance -- this starts the repair clock, the verification tests, and, if the leak cannot be repaired, a retrofit or retirement plan"
     : "not exceeded: " + fmt(leak_rate_pct, 1) + "% against a " + fmt(threshold_pct, 1) + "% threshold, with " + fmt(-pounds_over_lb, 1) + " lb of allowance left in this period";

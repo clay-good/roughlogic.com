@@ -2235,7 +2235,7 @@ export function computeChillerStagingPoint({
   const has_setpoint = staging_setpoint_pct > 0;
   const setpoint_tons = machine_tons * staging_setpoint_pct / 100;
   const setpoint_error_tons = setpoint_tons - crossover_tons;
-  const stages_too_early = has_setpoint && crossover_tons > 0 && setpoint_tons < crossover_tons;
+  const stages_too_early = has_setpoint && crossover_tons > 0 && setpoint_tons < crossover_tons - 1e-9 * Math.abs(crossover_tons);
   const setpoint_verdict = !has_setpoint
     ? "(no staging setpoint entered)"
     : crossover_tons <= 0
@@ -2561,7 +2561,7 @@ export function computeRefractoryShellTemperature({
     const hot_side = hot_face_f - flux_btu_hr_ft2 * running;
     running += L.t / L.k;
     const temp = hot_face_f - flux_btu_hr_ft2 * running;
-    const over = L.limit > 0 && hot_side > L.limit;
+    const over = L.limit > 0 && hot_side > L.limit + 1e-9 * Math.abs(L.limit);
     interfaces.push({ n: L.n, temp, hot_side, limit: L.limit, over });
   }
   const shell_temp_f = ambient_f + flux_btu_hr_ft2 * film_resistance;
@@ -2586,7 +2586,7 @@ export function computeRefractoryShellTemperature({
     : "layer " + over_layers.map((i) => i.n).join(" and ") + " has a HOT FACE above its own service temperature. Adding insulation OUTSIDE a lining pushes every interface behind it HOTTER, because less heat is escaping -- a lining 'improved' by adding an outer layer is the usual way this happens, and it shows up months later as a shell hot spot where the backup has shrunk and opened a path";
   // The shell has TWO limits and they pull in opposite directions.
   const has_shell_limit = shell_limit_f > 0;
-  const shell_over = has_shell_limit && shell_temp_f > shell_limit_f;
+  const shell_over = has_shell_limit && shell_temp_f > shell_limit_f + 1e-9 * Math.abs(shell_limit_f);
   const has_dew_point = acid_dew_point_f > 0;
   const shell_below_dew = has_dew_point && shell_temp_f < acid_dew_point_f;
   const shell_verdict = fmt(shell_temp_f, 0) + " degF at the shell"
@@ -2669,7 +2669,7 @@ export function computeCryogenicBoiloff({
     + (latent_heat_btu_lb > 0 ? ", which is " + fmt(heat_leak_btu_hr, 0) + " BTU/hr of heat leaking into the tank" : "");
   // Boil-off against actual use, which is the argument for tank sizing.
   const has_withdrawal = withdrawal_gal_day > 0;
-  const boil_off_exceeds_use = has_withdrawal && boil_off_gal_day > withdrawal_gal_day;
+  const boil_off_exceeds_use = has_withdrawal && boil_off_gal_day > withdrawal_gal_day + 1e-9 * Math.abs(withdrawal_gal_day);
   const use_verdict = !has_withdrawal
     ? "(no withdrawal rate entered)"
     : boil_off_exceeds_use

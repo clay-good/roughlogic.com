@@ -440,7 +440,7 @@ export function computeBridgeFormulaMinSpacing({ target_weight_lb = 0, num_axles
   const threshold = (Math.ceil(w / 500 - 1e-9) - 0.5 - 12 * n - 36) * (n - 1) / n;
   const fits_at_zero = bridgeFormulaW(0, n) >= w - 1e-9 * Math.abs(w);
   const min_spacing_ft = fits_at_zero ? 0 : Math.floor(threshold + 1e-9) + 1;
-  const over_interstate_cap = w > 80000;
+  const over_interstate_cap = w > 80000 + 1e-9 * Math.abs(80000);
   const avg_axle_lb = w / n;
   return {
     min_spacing_ft, fits_at_zero, over_interstate_cap, avg_axle_lb,
@@ -1817,7 +1817,7 @@ export function computeTrailerTongueWeight({ trailer_gross_weight_lb = 0, tongue
   const target_low_lb = gross * band.low / 100;
   const target_high_lb = gross * band.high / 100;
   const in_band = tongue_pct >= band.low && tongue_pct <= band.high;
-  const over_rating = rating > 0 && tongue > rating;
+  const over_rating = rating > 0 && tongue > rating + 1e-9 * Math.abs(rating);
   const verdict = tongue_pct < band.low
     ? "TOO LIGHT (" + fmt(tongue_pct, 1) + "% < " + band.low + "%) - trailer-sway risk; move cargo forward of the trailer axle to add tongue weight"
     : tongue_pct > band.high

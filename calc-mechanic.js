@@ -783,7 +783,7 @@ export function computeScrewConveyor({ screw_diameter_in = 0, shaft_diameter_in 
   // Convert inches to feet: area (ft^2) * pitch (ft) per rev * rev/hr * loading.
   const area_ft2 = (Math.PI / 4) * (((D / 12) ** 2) - ((d / 12) ** 2));
   const capacity_ft3_hr = area_ft2 * (pitch / 12) * (N * 60) * load;
-  const over_loaded = load > 0.45; // typical CEMA Class-limit guard (light loading ~15-45%)
+  const over_loaded = load > 0.45 + 1e-9 * Math.abs(0.45); // typical CEMA Class-limit guard (light loading ~15-45%)
   let mass_rate_lb_hr = null, mass_rate_ton_hr = null;
   if (rho > 0 && Number.isFinite(rho)) {
     mass_rate_lb_hr = capacity_ft3_hr * rho;
@@ -831,7 +831,7 @@ export function computeScrewConveyorRpm({ target_ft3_hr = 0, screw_diameter_in =
   // Inverse of capacity_ft3_hr = area x (pitch/12) x (rpm x 60) x loading: rpm = target / per_rpm.
   const rpm = target / per_rpm;
   if (!Number.isFinite(rpm) || !(rpm > 0)) return { error: "RPM math is not a finite positive value." };
-  const over_speed = rpm > 100;
+  const over_speed = rpm > 100 + 1e-9 * Math.abs(100);
   return {
     rpm, per_rpm, area_ft2, over_speed,
     note: "The screw speed a conveyor must turn to hit a target volumetric capacity, the inverse of the screw-conveyor tile: from capacity = flight_area x (pitch/12) x (rpm x 60) x loading, rpm = target / (flight_area x (pitch/12) x 60 x loading). To hit a mass rate instead, divide the mass rate by the bulk density to get the volumetric target first. Capacity is linear in speed, so doubling the RPM doubles the throughput - but CEMA caps the speed by screw diameter (large augers run slower), and running faster than the class limit accelerates wear and can flood the trough, so a flagged high RPM means step up a screw size instead. Per the CEMA Screw Conveyor standard (Book No. 350); the loading fraction is per the material class. An estimate; CEMA and the manufacturer govern."
@@ -2829,7 +2829,7 @@ export function computeCrosswindComponent({ runway_heading_deg = 0, wind_dir_deg
   const gust_speed = gust > 0 ? gust : sp;
   const gust_xwind_kt = gust_speed * Math.sin(rad);
   const tailwind = angle_deg > 90;
-  const exceeds = maxd > 0 && gust_xwind_kt > maxd;
+  const exceeds = maxd > 0 && gust_xwind_kt > maxd + 1e-9 * Math.abs(maxd);
   if (![angle_deg, crosswind_kt, headwind_kt, gust_xwind_kt].every(Number.isFinite)) return { error: "Wind-component math is not a finite value." };
   return {
     angle_deg, crosswind_kt, headwind_kt, gust_xwind_kt, tailwind, exceeds,
@@ -3327,7 +3327,7 @@ export function computeAircraftWeightBalance({ empty_weight_lb = 0, empty_arm_in
   let total_weight_lb = 0, total_moment_inlb = 0;
   for (const [w, arm] of stations) { total_weight_lb += w; total_moment_inlb += w * arm; }
   const cg_in = total_moment_inlb / total_weight_lb;
-  const over_gross = total_weight_lb > mgw;
+  const over_gross = total_weight_lb > mgw + 1e-9 * Math.abs(mgw);
   const cg_out = cg_in < fwd || cg_in > aft;
   const in_envelope = !over_gross && !cg_out;
   if (![total_weight_lb, total_moment_inlb, cg_in].every(Number.isFinite)) return { error: "Weight-and-balance math is not a finite value." };
@@ -3931,7 +3931,7 @@ export function computeHydraulicLineVelocity({ flow_gpm = 0, inside_dia_in = 0, 
   const max_fps = override > 0 ? override : band.max;
   const area_in2 = Math.PI / 4 * d * d;
   const velocity_fps = HYD_GPM_TO_FPS * q / area_in2;
-  const over = velocity_fps > max_fps;
+  const over = velocity_fps > max_fps + 1e-9 * Math.abs(max_fps);
   const under = velocity_fps < band.min;
   const min_area_in2 = HYD_GPM_TO_FPS * q / max_fps;
   const min_dia_in = Math.sqrt(4 * min_area_in2 / Math.PI);
@@ -4069,7 +4069,7 @@ export function computeBeltDeflectionTension({ center_distance_in = 0, large_she
   const target_min_force_lb = fmin * factor;
   const target_max_force_lb = fmax * factor;
   const under = F < target_min_force_lb;
-  const over = F > target_max_force_lb;
+  const over = F > target_max_force_lb + 1e-9 * Math.abs(target_max_force_lb);
   const status = under ? "UNDER-TENSIONED" : over ? "OVER-TENSIONED" : "IN RANGE";
   const pct_of_min = target_min_force_lb > 0 ? (F / target_min_force_lb) * 100 : null;
 

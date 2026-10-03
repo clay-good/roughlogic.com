@@ -218,7 +218,7 @@ export function computeWipPercentComplete({ contract_usd = 0, cost_to_date_usd =
   // used to print "Percent complete 0.75" for a job 75% done.
   const complete_fraction = Math.min(raw_pct, 1.0);
   const pct_complete = complete_fraction * 100;
-  const overrun = raw_pct > 1.0;
+  const overrun = raw_pct > 1.0 + 1e-9 * Math.abs(1.0);
   const earned_revenue = complete_fraction * contract;
   const over_under = earned_revenue - billed;
   // A contract whose estimated cost exceeds its value is a loss contract: GAAP (ASC 605-35 provision, carried under

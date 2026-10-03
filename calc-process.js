@@ -183,8 +183,8 @@ export function computeShotSizeResidenceTime({
   const shot_pct = shot_weight_oz / barrel_capacity_oz * 100;
   const shots_in_barrel = barrel_capacity_oz / shot_weight_oz;
   const residence_min = shots_in_barrel * cycle_time_s / 60;
-  const too_small = shot_pct < min_pct;
-  const too_large = shot_pct > max_pct;
+  const too_small = shot_pct < min_pct - 1e-9 * Math.abs(min_pct);
+  const too_large = shot_pct > max_pct + 1e-9 * Math.abs(max_pct);
   const in_window = !too_small && !too_large;
   const window_verdict = in_window
     ? "the shot is " + fmt(shot_pct, 1) + "% of barrel capacity, inside the " + fmt(min_pct, 0) + " to " + fmt(max_pct, 0) + "% window"
@@ -193,7 +193,7 @@ export function computeShotSizeResidenceTime({
       : "the shot is " + fmt(shot_pct, 1) + "% of barrel capacity, ABOVE the " + fmt(max_pct, 0) + "% ceiling -- the screw has too little time and stroke to melt and homogenise it, and shot-to-shot consistency suffers";
   const residence_verdict = "residence time is " + fmt(residence_min, 1) + " minutes: " + fmt(shots_in_barrel, 1) + " shots' worth of melt sitting in the barrel at " + fmt(cycle_time_s, 0) + " seconds a cycle";
   const has_limit = max_residence_min > 0;
-  const over_limit = has_limit && residence_min > max_residence_min;
+  const over_limit = has_limit && residence_min > max_residence_min + 1e-9 * Math.abs(max_residence_min);
   const limit_verdict = !has_limit
     ? "(no material residence limit entered -- and the limit is the whole question, because it is a MATERIAL property rather than a machine one)"
     : over_limit
@@ -654,7 +654,7 @@ export function computeThermoplasticTemperatureDerate({
   const factor_at_operating = derating_factor;
   const derate_verdict = "at " + fmt(operating_temp_f, 0) + " degF the " + fmt(rated_pressure_psi, 0) + " psi rating derates to " + fmt(derated_pressure_psi, 0) + " psi -- a factor of " + fmt(derating_factor, 2) + ", so the pipe holds " + fmt((1 - derating_factor) * 100, 0) + "% less than its printed rating";
   // The temperature limit is a HARD one and is not a derating question.
-  const over_temp = max_rated_temp_f > 0 && operating_temp_f > max_rated_temp_f;
+  const over_temp = max_rated_temp_f > 0 && operating_temp_f > max_rated_temp_f + 1e-9 * Math.abs(max_rated_temp_f);
   const temp_limit_verdict = max_rated_temp_f <= 0
     ? "(no maximum rated temperature entered -- and above its limit a material is NOT RATED at any pressure, which is a different thing from a small derating factor)"
     : over_temp

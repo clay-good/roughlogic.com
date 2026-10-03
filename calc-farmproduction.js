@@ -290,7 +290,7 @@ export function computePivotApplicationRate({ pass_depth_in = 0, pivot_length_ft
   const speed_ft_min = 2 * Math.PI * L / (T * 60);
   const wetting_min = W / speed_ft_min;
   const app_rate_in_hr = D * 2 * Math.PI * L / (T * W);
-  const exceeds_intake = app_rate_in_hr > intake;
+  const exceeds_intake = app_rate_in_hr > intake + 1e-9 * Math.abs(intake);
   const ratio = app_rate_in_hr / intake;
   return {
     speed_ft_min, wetting_min, app_rate_in_hr, exceeds_intake, ratio,
@@ -435,7 +435,7 @@ export function computeManureStorageVolume({ daily_manure_ft3 = 0, wastewater_ft
   const freeboard_ft3 = area * fb / 12;
   const total_ft3 = manure_volume_ft3 + precip_storm_ft3 + freeboard_ft3;
   const total_gal = total_ft3 * (1728 / 231);
-  const short_days = days < 120;
+  const short_days = days < 120 - 1e-9 * Math.abs(120);
   return {
     manure_volume_ft3, precip_storm_ft3, freeboard_ft3, total_ft3, total_gal, short_days,
     note: "An uncovered liquid facility must bank the net precipitation and the 25-year, 24-hour storm falling on its own surface over the storage period - sizing to manure alone overtops in a wet spring. CPS 313 sets no fixed minimum storage period -- it bases the period on when the manure can be applied safely given climate, crops, and soils, which is why many nutrient-management plans and states land on 120 to 180 days -- and the tile flags anything under 120 days as short for that reason. CPS 313 also requires at least 6 inches of residual solids in a tank that is not cleaned out completely, which this total does not include. Freeboard is 6 inches for a vertical-wall tank and 12 inches for other structures. NRCS 313 and the engineer/planner govern - a planning aid, not the engineer of record.",

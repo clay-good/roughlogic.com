@@ -726,7 +726,7 @@ export function computeTreeCrzEncroachment({ dbh_in = 0, radius_factor = 1.0, li
     segment_ft2 = radius_ft * radius_ft * Math.acos(d / radius_ft) - d * Math.sqrt(radius_ft * radius_ft - d * d);
     encroach_pct = segment_ft2 / area_ft2 * 100;
   }
-  const over_tolerance = encroach_pct > threshold_pct;
+  const over_tolerance = encroach_pct > threshold_pct + 1e-9 * Math.abs(threshold_pct);
   if (![radius_ft, encroach_pct].every(Number.isFinite)) return { error: "Encroachment math is not a finite value." };
   return {
     radius_ft, area_ft2, segment_ft2, encroach_pct, threshold_pct, over_tolerance,

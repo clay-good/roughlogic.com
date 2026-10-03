@@ -449,14 +449,14 @@ export function computeSilicaVentilationScreen({ measured_concentration_ug_m3 = 
   // period, treating the unsampled remainder of the shift as zero exposure.
   const twa_ug_m3 = measured_concentration_ug_m3 * sample_minutes / REFERENCE_MINUTES;
   const pel_ratio = twa_ug_m3 / pel_ug_m3;
-  const over_pel = twa_ug_m3 > pel_ug_m3;
+  const over_pel = twa_ug_m3 > pel_ug_m3 + 1e-9 * Math.abs(pel_ug_m3);
   // 1926.1153(d)(2)(iii)(C): repeat monitoring at exposures "at or above" the
   // action level; OSHA's own FAQ case (800 x 15 min) lands exactly on 25. Until
   // 2026-10-01 a TWA AT the action level read as under it.
   const over_action_level = twa_ug_m3 >= action_level_ug_m3 * (1 - 1e-9);
   const over_pel_by_ug_m3 = twa_ug_m3 - pel_ug_m3;
   const controlled_twa_ug_m3 = twa_ug_m3 * (1 - control_efficiency_pct / 100);
-  const controlled_over_pel = controlled_twa_ug_m3 > pel_ug_m3;
+  const controlled_over_pel = controlled_twa_ug_m3 > pel_ug_m3 + 1e-9 * Math.abs(pel_ug_m3);
   // The control efficiency that would bring this exposure to the PEL, and the
   // task time that would, which are the two levers an employer has.
   const required_efficiency_pct = twa_ug_m3 > pel_ug_m3 ? (1 - pel_ug_m3 / twa_ug_m3) * 100 : 0;

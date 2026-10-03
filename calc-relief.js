@@ -264,7 +264,7 @@ export function computeShelterCapacitySanitation({ floor_area_sqft = 0, shelter_
   const lavatories_count = _ceil(population_count / 20);
   const showers_count = _ceil(population_count / 25);
   const code_entered = code_occupant_load_count > 0;
-  const exceeds_code_load = code_entered && population_count > code_occupant_load_count;
+  const exceeds_code_load = code_entered && population_count > code_occupant_load_count + 1e-9 * Math.abs(code_occupant_load_count);
   return {
     space_used_sqft, capacity_count,
     capacity_evacuation_count: Math.floor(floor_area_sqft / 20 + 1e-9),
@@ -368,7 +368,7 @@ export function computeSafeRoomCapacity({ room_type = "community_tornado", gross
     area_used_sqft = occupant_capacity_count * t.standing;
   }
   const standing_count = occupant_capacity_count - wheelchair_spaces_count - bed_spaces_count;
-  const residential_limit_exceeded = !t.community && occupant_capacity_count > 16;
+  const residential_limit_exceeded = !t.community && occupant_capacity_count > 16 + 1e-9 * Math.abs(16);
   const hurricane = room_type.includes("hurricane");
   return {
     room_label: t.label, usable_area_sqft,

@@ -573,7 +573,7 @@ export function computeCorrodedPipeB31g({
   const depth_pct = depth_ratio * 100;
   // The screening limit comes first: past 80 percent of wall, B31G does not
   // evaluate the defect at all.
-  const over_depth_limit = depth_ratio > _OG_B31G_MAX_DEPTH_FRACTION;
+  const over_depth_limit = depth_ratio > _OG_B31G_MAX_DEPTH_FRACTION + 1e-9 * Math.abs(_OG_B31G_MAX_DEPTH_FRACTION);
   const flow_stress_psi = _OG_B31G_FLOW_STRESS_FACTOR * smys_psi;
   const hoop_term = 2 * wall_in / od_in;
   // A selects the branch. At or below 4.0 the parabolic (Folias) form applies;

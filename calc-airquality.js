@@ -241,7 +241,7 @@ export function computeOpacitySixMinute({
   // block, against a steady haze that never looks as bad and is a violation.
   const has_peak = peak_reading_pct > 0;
   const peak_over_average_pct = has_peak ? peak_reading_pct - block_average_pct : 0;
-  const peak_over_limit = has_peak && peak_reading_pct > limit_pct;
+  const peak_over_limit = has_peak && peak_reading_pct > limit_pct + 1e-9 * Math.abs(limit_pct);
   const peak_verdict = !has_peak
     ? "(no peak reading entered)"
     : peak_over_limit && complies
@@ -339,7 +339,7 @@ export function computeBaghouseCleaningInterval({
   // The cycle, which shortens as the cake builds faster against a smaller range.
   const has_cycle_history = cycle_minutes > 0 && original_cycle_minutes > 0;
   const cycle_change_pct = has_cycle_history ? (cycle_minutes - original_cycle_minutes) / original_cycle_minutes * 100 : 0;
-  const cycle_shortening = has_cycle_history && cycle_minutes < original_cycle_minutes;
+  const cycle_shortening = has_cycle_history && cycle_minutes < original_cycle_minutes - 1e-9 * Math.abs(original_cycle_minutes);
   const pulses_per_day = cycle_minutes > 0 ? operating_hours_per_day * 60 / cycle_minutes : 0;
   const original_pulses_per_day = original_cycle_minutes > 0 ? operating_hours_per_day * 60 / original_cycle_minutes : 0;
   const cycle_verdict = !has_cycle_history
@@ -918,7 +918,7 @@ export function computePlumeRiseBriggs({
   // Ground-level concentration falls roughly with the SQUARE of effective
   // height, so ignoring plume rise overstates it by that ratio squared.
   const concentration_factor = height_ratio * height_ratio;
-  const rise_exceeds_stack = plume_rise_ft > stack_height_ft;
+  const rise_exceeds_stack = plume_rise_ft > stack_height_ft + 1e-9 * Math.abs(stack_height_ft);
   const rise_verdict = rise_exceeds_stack
     ? "the plume rises " + fmt(plume_rise_ft, 0) + " ft, MORE than the " + fmt(stack_height_ft, 0) + " ft stack itself, for an effective height of " + fmt(effective_height_ft, 0) + " ft"
     : "the plume rises " + fmt(plume_rise_ft, 0) + " ft above the " + fmt(stack_height_ft, 0) + " ft stack, for an effective height of " + fmt(effective_height_ft, 0) + " ft";

@@ -365,7 +365,7 @@ export function computeSpaDrainInterval({
   const interval_weeks = interval_days / 7;
   const interval_verdict = fmt(spa_gallons, 0) + " gallons at " + fmt(daily_bathers, 1) + " bathers a day gives a drain interval of " + fmt(interval_days, 1) + " days -- about " + fmt(interval_weeks, 1) + " weeks. The rule is volume over three times the daily bathers, and the three is a convention rather than a measurement";
   const days_remaining = interval_days - days_since_drain;
-  const overdue = days_since_drain > interval_days;
+  const overdue = days_since_drain > interval_days + 1e-9 * Math.abs(interval_days);
   const status_verdict = days_since_drain <= 0
     ? "(no days since the last drain entered)"
     : overdue
@@ -378,7 +378,7 @@ export function computeSpaDrainInterval({
     : "at " + fmt(alternative_bathers, 1) + " bathers a day the interval becomes " + fmt(alternative_interval_days, 0) + " days. THE INTERVAL IS INVERSE IN BATHER LOAD, so a spa used twice as hard needs draining twice as often -- and a rule set for a quiet household is wrong for the week the family visits";
   const has_tds = current_tds_ppm > 0 && fill_tds_ppm > 0;
   const tds_rise_ppm = has_tds ? current_tds_ppm - fill_tds_ppm : 0;
-  const over_tds = has_tds && current_tds_ppm > tds_limit_ppm;
+  const over_tds = has_tds && current_tds_ppm > tds_limit_ppm + 1e-9 * Math.abs(tds_limit_ppm);
   const tds_verdict = !has_tds
     ? "(no fill and current TDS entered -- and a TDS reading is the measurement the interval rule stands in for)"
     : "TDS has risen " + fmt(tds_rise_ppm, 0) + " ppm above the " + fmt(fill_tds_ppm, 0) + " ppm fill water, to " + fmt(current_tds_ppm, 0) + " ppm"

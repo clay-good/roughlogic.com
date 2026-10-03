@@ -112,7 +112,7 @@ export function computeTipSpeedRatio({ rotor_diameter_ft = 0, rotor_rpm = 0, win
   // Above this wind the machine cannot hold the design ratio without going
   // past the tip cap, so the ratio has to fall whatever the controller wants.
   const wind_at_cap_mph = tip_speed_cap_fps / design_tsr / _FPS_PER_MPH;
-  const over_tip_cap = tip_speed_fps > tip_speed_cap_fps;
+  const over_tip_cap = tip_speed_fps > tip_speed_cap_fps + 1e-9 * Math.abs(tip_speed_cap_fps);
   return {
     tip_speed_fps, tip_speed_mph, wind_fps, tip_speed_ratio, deviation,
     rpm_for_design_tsr, rpm_at_tip_cap, wind_at_cap_mph, over_tip_cap,

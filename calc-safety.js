@@ -124,7 +124,7 @@ export function computePortableLadderSetup({ ladder_length_ft = 0, landing_heigh
 
   // Rung spacing is a WINDOW.
   const rung_ok = rs >= RUNG_MIN - 1e-9 * Math.abs(RUNG_MIN) && rs <= RUNG_MAX + 1e-9 * Math.abs(RUNG_MAX);
-  const rung_too_close = rs < RUNG_MIN;
+  const rung_too_close = rs < RUNG_MIN - 1e-9 * Math.abs(RUNG_MIN);
   const width_ok = cw >= WIDTH_MIN - 1e-9 * Math.abs(WIDTH_MIN);
   const width_shortfall_in = Math.max(0, WIDTH_MIN - cw);
 
@@ -325,7 +325,7 @@ export function computeSilicaTable1({ task = "xi", location = "outdoors", hours_
 
   const [task_label, out4, outOver, in4, inOver, outdoor_only] = T1[task];
   const CLIFF = 4, PEL_UG = 50;
-  const over_four = hrs > CLIFF;
+  const over_four = hrs > CLIFF + 1e-9 * Math.abs(CLIFF);
   const indoor_permitted = !(outdoor_only && indoors);
   const in_table_1 = full && indoor_permitted;
 
@@ -456,7 +456,7 @@ export function computeLifelineTension({ span_ft = 0, sag_ft = 0, arrest_force_l
   const sag_for_target_ft = target > W / 2 ? (W * half) / Math.sqrt(4 * target * target - W * W) : null;
   // Doubling the sag from here, to show the trade.
   const tension_at_double_sag_lb = W * Math.sqrt(half * half + 4 * s * s) / (4 * s);
-  const arrest_over_harness = W > MAF_HARNESS;
+  const arrest_over_harness = W > MAF_HARNESS + 1e-9 * Math.abs(MAF_HARNESS);
 
   const note = "A HORIZONTAL LIFELINE MULTIPLIES THE FORCE IT IS ASKED TO CATCH, and the multiplier is set by SAG. At midspan the two halves of the cable have to turn a vertical arrest force into two axial pulls, and the flatter the cable the less vertical component there is to work with. "
     + "A " + W + " lb arrest at midspan of a " + L + " ft line sagging " + s + " ft puts " + cable_tension_lb.toFixed(0) + " lb in the cable - " + tension_multiple.toFixed(1) + " times the arrest force - with a horizontal pull of " + horizontal_pull_lb.toFixed(0) + " lb at each anchor, the cable sitting at " + angle_deg.toFixed(1) + " degrees off horizontal. "

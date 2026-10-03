@@ -480,7 +480,7 @@ export function computeScreenDeckCapacity({ deck_width_ft = 0, deck_length_ft = 
   const combined_multiplier = oversize_factor * halfsize_factor * deck_factor * wet_factor * efficiency_factor;
   const capacity_tph = screen_area_sqft * base_capacity_tph_per_sqft * combined_multiplier;
   const percent_of_capacity = actual_feed_tph / capacity_tph * 100;
-  const over_capacity = actual_feed_tph > capacity_tph;
+  const over_capacity = actual_feed_tph > capacity_tph + 1e-9 * Math.abs(capacity_tph);
   const area_required_sqft = actual_feed_tph / (base_capacity_tph_per_sqft * combined_multiplier);
   const headroom_tph = capacity_tph - actual_feed_tph;
   return {
