@@ -835,7 +835,7 @@ export function computeTemperingTemperature({
   const is_secondary = secondary_hardening === "yes";
   const secondary_verdict = is_secondary
     ? "SECONDARY HARDENING: this grade gets HARDER with tempering temperature over part of its range, because alloy carbides precipitate. The intuition from a 4140 -- hotter temper, softer part -- gets the direction wrong here, so the curve must be read rather than reasoned from. Secondary-hardening tool steels are also commonly double or triple tempered, because each temper transforms retained austenite that the next one then tempers, and a single temper leaves untempered martensite in the part"
-    : "this grade softens with tempering temperature in the ordinary way. For contrast, a secondary-hardening tool steel such as H13 is HARDER tempered at 1,000 degF than at 700, because alloy carbides precipitate -- so the 4140 intuition gets the direction wrong on those grades, and they are also double or triple tempered to deal with retained austenite";
+    : "this grade softens with tempering temperature in the ordinary way. For contrast, a secondary-hardening tool steel such as H13 climbs back to a peak (about 54 HRC near 900 degF on the maker's curve, against 53 at 700) instead of softening steadily, because alloy carbides precipitate -- so the 4140 intuition gets the direction wrong on those grades, and they are also double or triple tempered to deal with retained austenite";
   const hardness_only_verdict = "AND HARDNESS IS THE ONLY THING THIS CONFIRMS. A part can be at exactly the specified hardness and be wrong in ways a hardness test cannot see: embrittled by the cooling rate through a susceptible range, or carrying untempered martensite from a single temper where the grade needs two";
   if (![soak_time_hr, embrittlement_span_f].every(Number.isFinite)) return { error: "Tempering math is not a finite value." };
   return {
@@ -878,12 +878,12 @@ INSPECTION_RENDERERS["tempering-temperature"] = _simpleRenderer({
 // not address ... ramp rates and thermal shock on thick or complex sections".
 // That is exactly this. Screened by formula before building.
 // =====================================================================
-// dims: in { governing_thickness_in: L, hold_rate_hr_per_in: T L^-1, minimum_hold_hr: T, holding_temp_f: T, rate_threshold_temp_f: T, heating_rate_constant_f_hr_in: T, cooling_rate_constant_f_hr_in: T, rate_ceiling_f_hr: T, actual_heating_rate_f_hr: T, alt_thickness_in: L } out: { holding_time_hr: T, max_heating_rate_f_hr: T, max_cooling_rate_f_hr: T, heating_hours: T, cooling_hours: T, total_cycle_hr: T, alt_total_cycle_hr: T }
+// dims: in { governing_thickness_in: L, hold_rate_hr_per_in: T L^-1, minimum_hold_hr: T, holding_temp_f: T, rate_threshold_temp_f: T, heating_rate_constant_f_hr_in: T, cooling_rate_constant_f_hr_in: T, rate_ceiling_f_hr: T, actual_heating_rate_f_hr: T, alt_thickness_in: L, p1_over_2in_rule: dimensionless } out: { holding_time_hr: T, max_heating_rate_f_hr: T, max_cooling_rate_f_hr: T, heating_hours: T, cooling_hours: T, total_cycle_hr: T, alt_total_cycle_hr: T }
 export function computePwhtHoldingTime({
   governing_thickness_in = 0, hold_rate_hr_per_in = 1, minimum_hold_hr = 0.25,
   holding_temp_f = 0, rate_threshold_temp_f = 800,
   heating_rate_constant_f_hr_in = 400, cooling_rate_constant_f_hr_in = 500, rate_ceiling_f_hr = 400,
-  actual_heating_rate_f_hr = 0, alt_thickness_in = 0,
+  actual_heating_rate_f_hr = 0, alt_thickness_in = 0, p1_over_2in_rule = 1,
 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(governing_thickness_in > 0)) return { error: "Governing thickness must be positive (in)." };
@@ -894,7 +894,11 @@ export function computePwhtHoldingTime({
   if (!(rate_ceiling_f_hr > 0)) return { error: "The rate ceiling must be positive (degF per hour)." };
   if (actual_heating_rate_f_hr < 0 || alt_thickness_in < 0) return { error: "The actual heating rate and alternative thickness cannot be negative." };
   const _cycleFor = (t) => {
-    const hold = Math.max(hold_rate_hr_per_in * t, minimum_hold_hr);
+    // ASME VIII UCS-56 Table for P-No. 1: up to 2 in, 1 h per inch; over 2 in, 2 h plus 15 min for each
+    // additional inch. Until 2026-10-03 the hours-per-inch rate ran linearly at every thickness, so a 4 in
+    // section held 4 h where the table gives 2.5 (Gulf Coast Combustion prints 2.25 / 2.5 / 2.75 at 3 / 4 / 5 in).
+    const p1 = Number(p1_over_2in_rule) === 1 && t > 2;
+    const hold = Math.max(p1 ? hold_rate_hr_per_in * 2 + 0.25 * (t - 2) : hold_rate_hr_per_in * t, minimum_hold_hr);
     const heatRate = Math.min(heating_rate_constant_f_hr_in / t, rate_ceiling_f_hr);
     // UCS-56(d) caps cooling at its own 500 degF/h, not the 400 heating
     // ceiling (until 2026-09-19 one ceiling capped both).
@@ -910,7 +914,7 @@ export function computePwhtHoldingTime({
   const heating_hours = c.heatHr;
   const cooling_hours = c.coolHr;
   const total_cycle_hr = c.total;
-  const hold_verdict = "holding time is " + fmt(holding_time_hr, 2) + " hours at " + fmt(holding_temp_f, 0) + " degF (" + fmt(governing_thickness_in, 2) + " in at " + fmt(hold_rate_hr_per_in, 2) + " h/in"
+  const hold_verdict = "holding time is " + fmt(holding_time_hr, 2) + " hours at " + fmt(holding_temp_f, 0) + " degF (" + fmt(governing_thickness_in, 2) + " in at " + fmt(hold_rate_hr_per_in, 2) + " h/in" + (Number(p1_over_2in_rule) === 1 && governing_thickness_in > 2 ? " to 2 in, then 15 min per extra inch (P-No. 1)" : "")
     + (minimum_hold_hr > hold_rate_hr_per_in * governing_thickness_in ? ", but the " + fmt(minimum_hold_hr, 2) + " hour minimum governs" : "") + ")";
   const rate_verdict = "above " + fmt(rate_threshold_temp_f, 0) + " degF the maximum heating rate is " + fmt(max_heating_rate_f_hr, 0) + " degF/h and the maximum cooling rate " + fmt(max_cooling_rate_f_hr, 0) + " degF/h. THE PERMITTED RATE IS INVERSELY PROPORTIONAL TO THICKNESS, because a thin part can be brought up quickly and a thick one cannot -- heating or cooling too fast puts thermal gradients into exactly the section the treatment exists to relieve, which is stress ADDED rather than removed";
   const cycle_verdict = "the full cycle is " + fmt(total_cycle_hr, 1) + " hours -- " + fmt(heating_hours, 2) + " up from " + fmt(rate_threshold_temp_f, 0) + " degF, " + fmt(holding_time_hr, 2) + " at temperature, and " + fmt(cooling_hours, 2) + " back down under control. That, not the hold, is what a schedule has to allow, and the hold is only " + fmt(holding_time_hr / total_cycle_hr * 100, 0) + "% of it";
@@ -937,7 +941,7 @@ export function computePwhtHoldingTime({
     note: "The full post-weld heat treatment cycle, which is considerably longer than the hold everyone quotes. Holding time comes from the governing thickness at a code rate, commonly an hour an inch with a stated minimum -- and then the controlled heating and cooling either side of it frequently exceed the hold itself, so a schedule written on the hold alone is wrong by a factor of two or more. THE RATES MATTER AS MUCH AS THE HOLD AND THEY ARE THE PART MOST OFTEN VIOLATED. Above a threshold temperature the permitted heating and cooling rates are inversely proportional to the thickness: a thin part can be brought up quickly, a thick one cannot. The reason is not caution but mechanism -- heating or cooling a heavy section too fast puts a thermal gradient through exactly the material the treatment exists to relieve, which ADDS residual stress rather than removing it. Breaking the rate produces nothing visible at the time, costs no scrap, and saves real schedule, which is precisely why it is the requirement that goes. Thickness therefore compounds three times over. On a linear hold rate, doubling the governing thickness doubles the hold (ASME VIII UCS-56 P-No. 1 flattens to 2 h plus 15 min per inch past 2 in), halves the permitted heating rate, and halves the permitted cooling rate, so the cycle grows roughly with the thickness in every one of its three parts. That is the number a fabricator needs before committing a furnace or a bank of pads to a schedule. THE GOVERNING THICKNESS IS DEFINED BY THE CODE RATHER THAN BY MEASUREMENT. For a joint between unequal thicknesses it is not simply the thicker member, and the definition differs between codes and between joint configurations -- so getting it wrong moves the hold and both rate limits at once, in the same direction, and a cycle run on the wrong thickness is wrong throughout. This computes a cycle from entered code parameters. It does not supply the holding temperature, the rate constants, the threshold temperature, or the governing-thickness definition for any code, determine whether PWHT is required or exempt (which is a code question turning on material, thickness and service), address the heated band width, gradient control band, or insulation, specify thermocouple number and placement or the temperature tolerance across the band, evaluate the effect on material properties -- PWHT softens some materials and can embrittle others -- or address local versus furnace treatment. ASME Section VIII, ASME B31.1 or B31.3, AWS D1.1 or the applicable code, the written procedure, and the responsible engineer govern.",
   };
 }
-export const pwhtHoldingTimeExample = { inputs: { governing_thickness_in: 2.0, hold_rate_hr_per_in: 1, minimum_hold_hr: 0.25, holding_temp_f: 1150, rate_threshold_temp_f: 800, heating_rate_constant_f_hr_in: 400, cooling_rate_constant_f_hr_in: 500, rate_ceiling_f_hr: 400, actual_heating_rate_f_hr: 250, alt_thickness_in: 4.0 } };
+export const pwhtHoldingTimeExample = { inputs: { governing_thickness_in: 2.0, hold_rate_hr_per_in: 1, minimum_hold_hr: 0.25, holding_temp_f: 1150, rate_threshold_temp_f: 800, heating_rate_constant_f_hr_in: 400, cooling_rate_constant_f_hr_in: 500, rate_ceiling_f_hr: 400, actual_heating_rate_f_hr: 250, alt_thickness_in: 4.0, p1_over_2in_rule: 1 } };
 INSPECTION_RENDERERS["pwht-holding-time"] = _simpleRenderer({
   citation: "Citation: post-weld heat treatment holding time = governing thickness × a code rate (commonly 1 hour per inch) against a stated minimum, with heating and cooling rates above a threshold temperature limited to a constant divided by the thickness (commonly 400 and 500 °F·in/h) under a ceiling. Every one of those parameters, and the code's definition of GOVERNING THICKNESS -- which for a joint between unequal thicknesses is not simply the thicker member -- is ENTERED from the applicable code. It does not determine whether PWHT is required or exempt, address heated band width or insulation, specify thermocouple placement or band tolerance, evaluate the effect on material properties, or distinguish local from furnace treatment. ASME Section VIII, B31.1/B31.3, AWS D1.1 or the applicable code and the responsible engineer govern.",
   example: pwhtHoldingTimeExample.inputs,
@@ -952,6 +956,7 @@ INSPECTION_RENDERERS["pwht-holding-time"] = _simpleRenderer({
     { key: "rate_ceiling_f_hr", label: "Rate ceiling (°F/h)", kind: "number", default: 400, attrs: { step: "any" } },
     { key: "actual_heating_rate_f_hr", label: "Actual heating rate (°F/h, 0 to skip)", kind: "number", attrs: { step: "any" } },
     { key: "alt_thickness_in", label: "Alternative thickness (in, 0 to skip)", kind: "number", attrs: { step: "any" } },
+    { key: "p1_over_2in_rule", label: "Above 2 in, P-No. 1 table: 2 h + 15 min per extra inch (1 = yes, 0 = straight rate)", kind: "number", default: 1, attrs: { step: "1" } },
   ],
   outputs: [
     { key: "h", id: "pwt-out-h", label: "Holding time", value: (r) => r.hold_verdict },

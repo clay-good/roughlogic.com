@@ -2,7 +2,7 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "c7f5da577ada6cd5",
+      "sha": "92ca3a3428e9b24e",
       "date": "2026-10-03"
     },
     "/tools/": {
@@ -2366,8 +2366,8 @@
       "date": "2026-10-03"
     },
     "/tools/driveshaft-max-length/": {
-      "sha": "da25d6c0b4f50cdb",
-      "date": "2026-09-29"
+      "sha": "2e4f3d20d640a93c",
+      "date": "2026-10-03"
     },
     "/tools/drone-gsd-overlap/": {
       "sha": "fb415f51abe0b33a",
@@ -5342,8 +5342,8 @@
       "date": "2026-09-29"
     },
     "/tools/pipe-filled-support-load/": {
-      "sha": "991d7e526dbee12c",
-      "date": "2026-09-29"
+      "sha": "f998e9e212fa7d72",
+      "date": "2026-10-03"
     },
     "/tools/pipe-fitting-takeout/": {
       "sha": "100e74bd4b5acb08",
@@ -5894,8 +5894,8 @@
       "date": "2026-09-30"
     },
     "/tools/pwht-holding-time/": {
-      "sha": "4f615616d32f6a5f",
-      "date": "2026-09-29"
+      "sha": "560926797acb8abd",
+      "date": "2026-10-03"
     },
     "/tools/pyramid-frustum-volume/": {
       "sha": "4c39fab2381c41c3",
@@ -7842,8 +7842,8 @@
       "date": "2026-09-29"
     },
     "/tools/tank-vent-api-2000/": {
-      "sha": "6e438929b3b10f43",
-      "date": "2026-10-01"
+      "sha": "6e0efac439064181",
+      "date": "2026-10-03"
     },
     "/tools/tank-volume/": {
       "sha": "5b0f1d0a93d7fbc1",
@@ -8454,8 +8454,8 @@
       "date": "2026-09-29"
     },
     "/tools/vacuum-decay-test/": {
-      "sha": "d205a2c9c0cbc98f",
-      "date": "2026-09-29"
+      "sha": "800cdf6ce06452b8",
+      "date": "2026-10-03"
     },
     "/tools/vacuum-evacuation-time/": {
       "sha": "0dc416806184cf83",

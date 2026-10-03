@@ -34850,7 +34850,7 @@
   },
   {
    "tile_id": "vacuum-decay-test",
-   "source_publisher": "First-principles standing-decay (blank-off) arithmetic; ACCA Standard 4 / AHRI 500-micron field convention (by name).",
+   "source_publisher": "First-principles standing-decay (blank-off) arithmetic; ANSI/ACCA 5 QI-2015 (evacuate and hold at or below 500 microns) / AHRI 500-micron field convention (by name).",
    "source_title": "rise = end - start; rate = rise / hold. Pull to 300 microns, valve off, after 15 min reads 450 -> rise 150 microns, 10 microns/min, below the 500 ceiling -> tight and dry.",
    "source_edition_or_year": "spec-v105 worked example (machine-verified)",
    "source_section_or_page": "spec-v105 section 2.1 pinned example",
@@ -125264,7 +125264,8 @@
     "cooling_rate_constant_f_hr_in": 500,
     "rate_ceiling_f_hr": 400,
     "actual_heating_rate_f_hr": 250,
-    "alt_thickness_in": 4
+    "alt_thickness_in": 4,
+    "p1_over_2in_rule": 1
    },
    "outputs": {
     "holding_time_hr": {
@@ -125304,7 +125305,7 @@
      }
     },
     "alt_total_cycle_hr": {
-     "value": 10.3,
+     "value": 8.8,
      "tolerance": {
       "pct": 0.5
      }
@@ -163669,6 +163670,1744 @@
      "value": 210,
      "tolerance": {
       "abs": 2.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "motor-synchronous-speed-slip",
+   "source_publisher": "WEG Electric Corp.",
+   "source_title": "Data Sheet, Three Phase Induction Motor - Squirrel Cage, W22 NEMA Premium Efficiency, catalog # 00318ET3E182TC-W22 (product code 12445724), 3 HP 4-pole (distributor copy: pim.galco.com/Manufacturer/WEG Electric/TechDocument/Product Information Packet/00318ET3E182TC-W22_allDocuments.pdf)",
+   "source_edition_or_year": "WEG data sheet (rev. as distributed by Galco)",
+   "source_section_or_page": "p. 1 data table, 60 Hz column: \"Poles 4\", \"Frequency [Hz] 60\", \"Rated speed [RPM] 1760\", \"Slip [%] 2.22\". Tile: Ns 1800, slip 2.2222% (printed to 2 decimals; abs 0.01 covers the rounding).",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "line_freq_hz": 60,
+    "poles": 4,
+    "rated_rpm": 1760
+   },
+   "outputs": {
+    "sync_rpm": {
+     "value": 1800,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "slip_pct": {
+     "value": 2.22,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "motor-synchronous-speed-slip",
+   "source_publisher": "WEG Electric Corp.",
+   "source_title": "Data Sheet, Three Phase Induction Motor - Squirrel Cage, W22 NEMA Premium Efficiency, catalog # 00318ET3E182TC-W22 (product code 12445724), 3 HP 4-pole (distributor copy: pim.galco.com/Manufacturer/WEG Electric/TechDocument/Product Information Packet/00318ET3E182TC-W22_allDocuments.pdf)",
+   "source_edition_or_year": "WEG data sheet (rev. as distributed by Galco)",
+   "source_section_or_page": "p. 1 data table, first 50 Hz column: \"Poles 4\", \"Frequency [Hz] 50\", \"Rated speed [RPM] 1445\", \"Slip [%] 3.67\". Tile: Ns 1500, slip 3.6667% (abs 0.01 covers the 2-decimal print).",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "line_freq_hz": 50,
+    "poles": 4,
+    "rated_rpm": 1445
+   },
+   "outputs": {
+    "sync_rpm": {
+     "value": 1500,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "slip_pct": {
+     "value": 3.67,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "motor-synchronous-speed-slip",
+   "source_publisher": "WEG Electric Corp.",
+   "source_title": "Data Sheet, Three Phase Induction Motor - Squirrel Cage, W22 NEMA Premium Efficiency, catalog # 06036ET3E364TS-W22 (product code 11165995), 60 HP 2-pole (distributor copy: wolfautomation.com/content/weg-w22-11165995-datasheet.pdf)",
+   "source_edition_or_year": "WEG data sheet (rev. as distributed by Wolf Automation)",
+   "source_section_or_page": "p. 1 data table, 60 Hz column: \"Poles 2\", \"Frequency [Hz] 60\", \"Rated speed [RPM] 3560\", \"Slip [%] 1.11\". Tile: Ns 3600, slip 1.1111% (abs 0.01 covers the print).",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "line_freq_hz": 60,
+    "poles": 2,
+    "rated_rpm": 3560
+   },
+   "outputs": {
+    "sync_rpm": {
+     "value": 3600,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "slip_pct": {
+     "value": 1.11,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "motor-synchronous-speed-slip",
+   "source_publisher": "WEG Electric Corp.",
+   "source_title": "Data Sheet, Three Phase Induction Motor - Squirrel Cage, W22 NEMA Premium Efficiency, catalog # 06036ET3E364TS-W22 (product code 11165995), 60 HP 2-pole (distributor copy: wolfautomation.com/content/weg-w22-11165995-datasheet.pdf)",
+   "source_edition_or_year": "WEG data sheet (rev. as distributed by Wolf Automation)",
+   "source_section_or_page": "p. 1 data table, 50 Hz / 380 V column: \"Poles 2\", \"Frequency [Hz] 50\", \"Rated speed [RPM] 2955\", \"Slip [%] 1.50\". Tile: Ns 3000, slip 1.500%.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "line_freq_hz": 50,
+    "poles": 2,
+    "rated_rpm": 2955
+   },
+   "outputs": {
+    "sync_rpm": {
+     "value": 3000,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "slip_pct": {
+     "value": 1.5,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "motor-synchronous-speed-slip",
+   "source_publisher": "U.S. Department of Energy, Motor Challenge Program",
+   "source_title": "Determining Electric Motor Load and Efficiency (fact sheet, DOE/GO-10097-517)",
+   "source_edition_or_year": "1997 fact sheet (energy.gov/sites/prod/files/2014/04/f15/10097517.pdf)",
+   "source_section_or_page": "p. 6 Table 1 'Induction Motor Synchronous Speeds' (\"4 ... 1800\" at 60 Hertz) and p. 7 Example 'Slip Load Calculation': \"Synchronous speed in rpm = 1800\", \"Nameplate full load speed = 1750\". Only the synchronous speed is printed; tile gives exactly 1800.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "line_freq_hz": 60,
+    "poles": 4,
+    "rated_rpm": 1750
+   },
+   "outputs": {
+    "sync_rpm": {
+     "value": 1800,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "motor-pole-identification",
+   "source_publisher": "WEG Electric Corp.",
+   "source_title": "Data Sheet, Three Phase Induction Motor - Squirrel Cage, W22 NEMA Premium Efficiency, catalog # 00318ET3E182TC-W22 (product code 12445724), 3 HP 4-pole (distributor copy: pim.galco.com/Manufacturer/WEG Electric/TechDocument/Product Information Packet/00318ET3E182TC-W22_allDocuments.pdf)",
+   "source_edition_or_year": "WEG data sheet (rev. as distributed by Galco)",
+   "source_section_or_page": "p. 1 data table, 60 Hz column: \"Rated speed [RPM] 1760\" with \"Poles 4\" and \"Slip [%] 2.22\". Tile identifies 4 poles, Ns 1800, slip 2.2222% (abs 0.01 covers the print).",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "rated_rpm": 1760,
+    "line_freq_hz": 60
+   },
+   "outputs": {
+    "poles": {
+     "value": 4,
+     "tolerance": {
+      "abs": 0
+     }
+    },
+    "sync_rpm": {
+     "value": 1800,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "slip_pct": {
+     "value": 2.22,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "motor-pole-identification",
+   "source_publisher": "WEG Electric Corp.",
+   "source_title": "Data Sheet, Three Phase Induction Motor - Squirrel Cage, W22 NEMA Premium Efficiency, catalog # 00318ET3E182TC-W22 (product code 12445724), 3 HP 4-pole (distributor copy: pim.galco.com/Manufacturer/WEG Electric/TechDocument/Product Information Packet/00318ET3E182TC-W22_allDocuments.pdf)",
+   "source_edition_or_year": "WEG data sheet (rev. as distributed by Galco)",
+   "source_section_or_page": "p. 1 data table, 50 Hz column: \"Rated speed [RPM] 1445\" with \"Poles 4\" and \"Slip [%] 3.67\". Tile: 4 poles, Ns 1500, slip 3.6667%.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "rated_rpm": 1445,
+    "line_freq_hz": 50
+   },
+   "outputs": {
+    "poles": {
+     "value": 4,
+     "tolerance": {
+      "abs": 0
+     }
+    },
+    "sync_rpm": {
+     "value": 1500,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "slip_pct": {
+     "value": 3.67,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "motor-pole-identification",
+   "source_publisher": "WEG Electric Corp.",
+   "source_title": "Data Sheet, Three Phase Induction Motor - Squirrel Cage, W22 NEMA Premium Efficiency, catalog # 06036ET3E364TS-W22 (product code 11165995), 60 HP 2-pole (distributor copy: wolfautomation.com/content/weg-w22-11165995-datasheet.pdf)",
+   "source_edition_or_year": "WEG data sheet (rev. as distributed by Wolf Automation)",
+   "source_section_or_page": "p. 1 data table, 60 Hz column: \"Rated speed [RPM] 3560\" with \"Poles 2\" and \"Slip [%] 1.11\". Tile: 2 poles, Ns 3600, slip 1.1111%.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "rated_rpm": 3560,
+    "line_freq_hz": 60
+   },
+   "outputs": {
+    "poles": {
+     "value": 2,
+     "tolerance": {
+      "abs": 0
+     }
+    },
+    "sync_rpm": {
+     "value": 3600,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "slip_pct": {
+     "value": 1.11,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "motor-pole-identification",
+   "source_publisher": "WEG Electric Corp.",
+   "source_title": "Data Sheet, Three Phase Induction Motor - Squirrel Cage, W22 NEMA Premium Efficiency, catalog # 06036ET3E364TS-W22 (product code 11165995), 60 HP 2-pole (distributor copy: wolfautomation.com/content/weg-w22-11165995-datasheet.pdf)",
+   "source_edition_or_year": "WEG data sheet (rev. as distributed by Wolf Automation)",
+   "source_section_or_page": "p. 1 data table, 50 Hz / 380 V column: \"Rated speed [RPM] 2955\" with \"Poles 2\" and \"Slip [%] 1.50\". Tile: 2 poles, Ns 3000, slip 1.500%.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "rated_rpm": 2955,
+    "line_freq_hz": 50
+   },
+   "outputs": {
+    "poles": {
+     "value": 2,
+     "tolerance": {
+      "abs": 0
+     }
+    },
+    "sync_rpm": {
+     "value": 3000,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "slip_pct": {
+     "value": 1.5,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "motor-shaft-torque",
+   "source_publisher": "WEG Electric Corp.",
+   "source_title": "Data Sheet, Three Phase Induction Motor - Squirrel Cage, W22 NEMA Premium Efficiency, catalog # 00318ET3E182TC-W22 (product code 12445724), 3 HP 4-pole (distributor copy: pim.galco.com/Manufacturer/WEG Electric/TechDocument/Product Information Packet/00318ET3E182TC-W22_allDocuments.pdf)",
+   "source_edition_or_year": "WEG data sheet (rev. as distributed by Galco)",
+   "source_section_or_page": "p. 1 data table, 60 Hz column: \"Output [HP] 3\", \"Rated speed [RPM] 1760\", \"Rated torque [ft.lb] 8.95\". Tile 5252 x 3 / 1760 = 8.952 lb-ft (abs 0.01 covers the 2-decimal print).",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "rpm": 1760,
+    "hp": 3
+   },
+   "outputs": {
+    "torque_lbft": {
+     "value": 8.95,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "hp": {
+     "value": 3,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "motor-shaft-torque",
+   "source_publisher": "WEG Electric Corp.",
+   "source_title": "Data Sheet, Three Phase Induction Motor - Squirrel Cage, W22 NEMA Premium Efficiency, catalog # 00318ET3E182TC-W22 (product code 12445724), 3 HP 4-pole (distributor copy: pim.galco.com/Manufacturer/WEG Electric/TechDocument/Product Information Packet/00318ET3E182TC-W22_allDocuments.pdf)",
+   "source_edition_or_year": "WEG data sheet (rev. as distributed by Galco)",
+   "source_section_or_page": "p. 1 data table, 50 Hz column: \"Output [HP] 3\", \"Rated speed [RPM] 1445\", \"Rated torque [ft.lb] 10.9\". Tile 5252 x 3 / 1445 = 10.904 lb-ft (abs 0.05 covers the 1-decimal print).",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "rpm": 1445,
+    "hp": 3
+   },
+   "outputs": {
+    "torque_lbft": {
+     "value": 10.9,
+     "tolerance": {
+      "abs": 0.05
+     }
+    },
+    "hp": {
+     "value": 3,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "delta-wye-line-phase",
+   "source_publisher": "EC&M (Endeavor Business Media); author Mike Holt",
+   "source_title": "Understanding the Basics of Wye Transformer Calculations (ecmweb.com/basics/article/20897052)",
+   "source_edition_or_year": "Dec. 1, 2004",
+   "source_section_or_page": "Example 2, 36kVA 208V 3-phase load on a 208Y/120V system: \"ILine=36,000VA\u00f7(208V\u00d7\u221a3)=100A\", \"IPhase=12,000VA\u00f7120V=100A\". Tile at 208 V wye, 100 A: phase V 120.09 (printed 120 V; abs 0.1), phase I 100, S 36,027 VA (printed 36 kVA; 0.07%, pct 0.1 covers the rounded 100 A line current).",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "configuration": "wye",
+    "line_voltage_v": 208,
+    "line_current_a": 100,
+    "power_factor": 1
+   },
+   "outputs": {
+    "phase_voltage_v": {
+     "value": 120,
+     "tolerance": {
+      "abs": 0.1
+     }
+    },
+    "phase_current_a": {
+     "value": 100,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "power_va": {
+     "value": 36000,
+     "tolerance": {
+      "pct": 0.1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "delta-wye-line-phase",
+   "source_publisher": "EC&M (Endeavor Business Media); author Mike Holt",
+   "source_title": "Understanding the Basics of Wye Transformer Calculations (ecmweb.com/basics/article/20897052)",
+   "source_edition_or_year": "Dec. 1, 2004",
+   "source_section_or_page": "Example 1, 150kVA 480V to 208Y/120V: \"ILine=150,000VA\u00f7(208V\u00d71.732)=416A\"; phase current also 416A. Tile at 208 V wye, 416 A: phase I 416, S 149,871 VA (printed 150 kVA; 0.09%, pct 0.1 covers the rounded 416 A).",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "configuration": "wye",
+    "line_voltage_v": 208,
+    "line_current_a": 416,
+    "power_factor": 1
+   },
+   "outputs": {
+    "phase_current_a": {
+     "value": 416,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "power_va": {
+     "value": 150000,
+     "tolerance": {
+      "pct": 0.1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "delta-wye-line-phase",
+   "source_publisher": "EC&M (Endeavor Business Media); author Mike Holt",
+   "source_title": "Understanding the Basics of Delta Transformer Calculations (ecmweb.com/content/article/20887773)",
+   "source_edition_or_year": "Nov. 1, 2004",
+   "source_section_or_page": "Example 1, 240V 36kVA 3-phase delta load: \"ILine=36,000VA\u00f7(240V\u00d7\u221a3)\" = 87A and \"IPhase=12,000VA\u00f7240V=50A\" (\"ILine=50A \u00d7 1.732=87A\"). Tile at 240 V delta, 87 A line: phase I 50.23 (abs 0.25 covers the printed 87 A rounded from 86.6), phase V 240, S 36,165 VA (pct 0.5 for the same rounding).",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "configuration": "delta",
+    "line_voltage_v": 240,
+    "line_current_a": 87,
+    "power_factor": 1
+   },
+   "outputs": {
+    "phase_voltage_v": {
+     "value": 240,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "phase_current_a": {
+     "value": 50,
+     "tolerance": {
+      "abs": 0.25
+     }
+    },
+    "power_va": {
+     "value": 36000,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "delta-wye-line-phase",
+   "source_publisher": "EC&M (Endeavor Business Media); author Mike Holt",
+   "source_title": "Understanding the Basics of Delta Transformer Calculations (ecmweb.com/content/article/20887773)",
+   "source_edition_or_year": "Nov. 1, 2004",
+   "source_section_or_page": "Examples 2-3, 150kVA 480V to 240/120V delta secondary: \"ILine=150,000VA\u00f7(240V\u00d71.732)= 360A\"; \"IPhase=50,000VA\u00f7240V\" = 208A. Tile at 240 V delta, 360 A: phase I 207.85 (abs 0.2 covers the integer print), S 149,649 VA (pct 0.25 covers the rounded 360 A).",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "configuration": "delta",
+    "line_voltage_v": 240,
+    "line_current_a": 360,
+    "power_factor": 1
+   },
+   "outputs": {
+    "phase_current_a": {
+     "value": 208,
+     "tolerance": {
+      "abs": 0.2
+     }
+    },
+    "power_va": {
+     "value": 150000,
+     "tolerance": {
+      "pct": 0.25
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "run-capacitor-microfarad",
+   "source_publisher": "ACHR News (BNP Media); author Bryan Orr",
+   "source_title": "Testing the Run Capacitor While the System is Running (achrnews.com/articles/135163)",
+   "source_edition_or_year": "June 12, 2017",
+   "source_section_or_page": "Worked example: 7.8 start-winding amps x 2,652 = 20,685.6; \"20,685.6 \u00f7 292.9 = 70.62. This capacitor is rated at 70 \u03bcF\"; \"many capacitors allow for a 6 percent +/- tolerance\". Tile (exact 1e6/(2 pi 60) = 2652.58) gives 70.639 uF, within tolerance; abs 0.05 covers the article's truncated 2,652 constant.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "rated_uf": 70,
+    "measured_volts_V": 292.9,
+    "measured_amps_A": 7.8,
+    "tolerance_pct": 6
+   },
+   "outputs": {
+    "measured_uf": {
+     "value": 70.62,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "min-conductor-for-vd",
+   "source_publisher": "Mike Holt Enterprises",
+   "source_title": "Voltage Drop Calculations, Part Two (mikeholt.com/technnical-voltage-drop-calculations-part-two.php)",
+   "source_edition_or_year": "Mike Holt technical article (NEC Chapter 9 Table 8 basis)",
+   "source_section_or_page": "Single-phase example: 28 A, 100 ft, 240 V, 3% (7.2 V): \"CM = (2 x 12.9 ohms x 28 amperes x 100 feet)/7.2 volts\", \"CM = 10,033, No. 10, Chapter 9, Table 8\". Tile: 10 AWG copper.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "phase": "single",
+    "material": "copper",
+    "current_A": 28,
+    "length_ft": 100,
+    "source_voltage_V": 240,
+    "target_percent": 3
+   },
+   "outputs": {
+    "min_awg_copper": {
+     "value": "10",
+     "tolerance": {
+      "abs": 0
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "min-conductor-for-vd",
+   "source_publisher": "Mike Holt Enterprises",
+   "source_title": "Voltage Drop Calculations, Part Two (mikeholt.com/technnical-voltage-drop-calculations-part-two.php)",
+   "source_edition_or_year": "Mike Holt technical article (NEC Chapter 9 Table 8 basis)",
+   "source_section_or_page": "Three-phase calculation 2: 404 A locked-rotor, 150 ft, 208 V, 15% (31.2 V): \"CM = (1.732 x 12.9 ohms x 404 ampere x 150 feet)/31.2 volts\", \"CM = 43,396, Chapter 9, Table 8 = No. 3\". Tile: 3 AWG copper.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "phase": "three",
+    "material": "copper",
+    "current_A": 404,
+    "length_ft": 150,
+    "source_voltage_V": 208,
+    "target_percent": 15
+   },
+   "outputs": {
+    "min_awg_copper": {
+     "value": "3",
+     "tolerance": {
+      "abs": 0
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "min-conductor-for-vd",
+   "source_publisher": "Mike Holt Enterprises",
+   "source_title": "Voltage Drop Calculations, Part Two (mikeholt.com/technnical-voltage-drop-calculations-part-two.php)",
+   "source_edition_or_year": "Mike Holt technical article (NEC Chapter 9 Table 8 basis)",
+   "source_section_or_page": "Three-phase calculation 3: 86 A, 175 ft, 208 V, 5% (10.4 V): \"CM = (1.732 x 12.9 ohms x 86 ampere x 175 feet)/10.4 volts\", \"CM = 32,332, Chapter 9, Table 8 = No. 4\". Tile: 4 AWG copper.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "phase": "three",
+    "material": "copper",
+    "current_A": 86,
+    "length_ft": 175,
+    "source_voltage_V": 208,
+    "target_percent": 5
+   },
+   "outputs": {
+    "min_awg_copper": {
+     "value": "4",
+     "tolerance": {
+      "abs": 0
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "gas-meter-clock",
+   "source_publisher": "R.W. Beckett Corporation",
+   "source_title": "Clocking the Gas Meter (CG4 gas burner) training presentation (beckettcorp.com/wp-content/uploads/2022/05/CLOCKING-THE-GAS-METER-CG4.pdf)",
+   "source_edition_or_year": "2014 (PDF created Jun 20, 2014)",
+   "source_section_or_page": "p. 7: \"if the heating value is 1,050 BTU/Cu. Ft. and you timed 1 cubic foot of gas at 42 seconds then firing rate BTU/Hr. = 1050 x 3,600 \u00f7 42 which calculates to 90,000 BTU/Hr.\" Tile: 85.714 cfh, 90,000 BTU/hr exactly.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "sec_per_rev": 42,
+    "dial_size_cf": 1,
+    "heating_value_btu_cf": 1050,
+    "nameplate_input_btuh": 0
+   },
+   "outputs": {
+    "actual_input_btuh": {
+     "value": 90000,
+     "tolerance": {
+      "abs": 1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "gas-meter-clock-target",
+   "source_publisher": "R.W. Beckett Corporation",
+   "source_title": "Clocking the Gas Meter (CG4 gas burner) training presentation (beckettcorp.com/wp-content/uploads/2022/05/CLOCKING-THE-GAS-METER-CG4.pdf)",
+   "source_edition_or_year": "2014 (PDF created Jun 20, 2014)",
+   "source_section_or_page": "p. 7 (same example read in reverse): 1 cubic foot at 1,050 BTU/Cu. Ft. \"timed ... at 42 seconds\" is a 90,000 BTU/Hr. firing rate. Tile: 3600 x 1 x 1050 / 90,000 = 42.0 s exactly.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "target_input_btuh": 90000,
+    "dial_size_cf": 1,
+    "heating_value_btu_cf": 1050
+   },
+   "outputs": {
+    "sec_per_rev": {
+     "value": 42,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "furnace-temp-rise",
+   "source_publisher": "Shearer Supply",
+   "source_title": "Airflow Calculation for Gas Furnace (one-page technical sheet; shearersupply.com/ASSETS/DOCUMENTS/CMS/EN/StaticPage_PDF/Airflow Calculation for Gas Furnace.pdf, Wayback 2024 copy)",
+   "source_edition_or_year": "technical sheet, retrieved via Wayback 2024",
+   "source_section_or_page": "Formula \"BTUH OUTPUT / 1.08 X Temperature Rise\"; example \"BTUH: 100,000\", \"SUPPLY AIR TEMP: 120F\", \"RETURN AIR TEMP: 70F\", \"120F \u2013 70F = 50F\", \"100,000 / 54 = 1852 CFM's\". The printed 100,000 is the OUTPUT, so it is entered as input 100,000 at 100% efficiency (output = input x eff). Tile: 50 F, 1851.85 CFM (abs 0.5 covers the integer print).",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "return_air_F": 70,
+    "supply_air_F": 120,
+    "input_btuh": 100000,
+    "efficiency_pct": 100,
+    "rise_min_F": 40,
+    "rise_max_F": 70
+   },
+   "outputs": {
+    "delta_T_F": {
+     "value": 50,
+     "tolerance": {
+      "abs": 0
+     }
+    },
+    "cfm": {
+     "value": 1852,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "furnace-airflow-to-rise",
+   "source_publisher": "Shearer Supply",
+   "source_title": "Airflow Calculation for Gas Furnace (one-page technical sheet; shearersupply.com/ASSETS/DOCUMENTS/CMS/EN/StaticPage_PDF/Airflow Calculation for Gas Furnace.pdf, Wayback 2024 copy)",
+   "source_edition_or_year": "technical sheet, retrieved via Wayback 2024",
+   "source_section_or_page": "Same sheet read as the inverse: 100,000 BTUH output on \"1852 CFM's\" gives the printed \"120F \u2013 70F = 50F\" rise (supply 120F, return 70F). Output entered as input at 100% efficiency. Tile: 49.996 F rise, 119.996 F supply; abs 0.05 covers the printed CFM being rounded from 1851.85.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "input_btuh": 100000,
+    "efficiency_pct": 100,
+    "cfm": 1852,
+    "return_air_F": 70,
+    "rise_min_F": 40,
+    "rise_max_F": 70
+   },
+   "outputs": {
+    "delta_T_F": {
+     "value": 50,
+     "tolerance": {
+      "abs": 0.05
+     }
+    },
+    "supply_air_F": {
+     "value": 120,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "gas-fuel-conversion",
+   "source_publisher": "BCcampus Open Education (Camosun College authors)",
+   "source_title": "Plumbing Apprenticeship Program, Level 3 (open textbook), Line D, Learning Task 3 'Describe burner orifices' (opentextbc.ca/plumbing3e/chapter/describe-burner-orifices/)",
+   "source_edition_or_year": "3rd edition open textbook (Wayback 2024 copy), CC BY 4.0",
+   "source_section_or_page": "Example 3: 100,000 Btuh furnace, four burners, natural gas 1,000 Btu/Ft.3, Sg 0.60, 4.0 in. w.c.: \"Flow rate per orifice = 100,000/4 \u00f7 1,000\" = \"25 CFH of Natural gas\". Example 4, same furnace converted to butane 3200 Btu/Ft.3, Sg 2.00, 10 in. w.c.: \"100,000/4 \u00f7 3,200\" = \"7.813 CFH of Butane gas\". Entered per orifice (100,000 / 4 = 25,000 Btuh, the source's own step). Tile: 25.0 / 7.8125 cfh. The text of Example 4 says 'three burners' but its arithmetic divides by 4; the row follows the printed arithmetic. Area ratio not printed, not checked.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "appliance_input_btuh": 25000,
+    "hv_from": 1000,
+    "hv_to": 3200,
+    "sg_from": 0.6,
+    "sg_to": 2,
+    "p_from": 4,
+    "p_to": 10
+   },
+   "outputs": {
+    "cfh_from": {
+     "value": 25,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "cfh_to": {
+     "value": 7.813,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "gas-fuel-conversion",
+   "source_publisher": "BCcampus Open Education (Camosun College authors)",
+   "source_title": "Plumbing Apprenticeship Program, Level 3 (open textbook), Line D, Learning Task 3 'Describe burner orifices' (opentextbc.ca/plumbing3e/chapter/describe-burner-orifices/)",
+   "source_edition_or_year": "3rd edition open textbook (Wayback 2024 copy), CC BY 4.0",
+   "source_section_or_page": "Example 5: furnace, five burners, 250,000 Btuh, 7 in. w.c., propane-air 1,450 Btu/Ft.3, Sg 1.2: \"Propane/Air Flow Rate per Orifice = 34.483 CFH\" (250,000 / 1,450 / 5). Entered per orifice (50,000 Btuh). Only cfh_from is printed for the from-fuel; the to-side (natural gas 1,000 Btu/ft3, Sg 0.6 per the chapter, same 7 in. w.c.) is not checked.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "appliance_input_btuh": 50000,
+    "hv_from": 1450,
+    "hv_to": 1000,
+    "sg_from": 1.2,
+    "sg_to": 0.6,
+    "p_from": 7,
+    "p_to": 7
+   },
+   "outputs": {
+    "cfh_from": {
+     "value": 34.483,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "water-heater-storage-sizing",
+   "source_publisher": "A. O. Smith Corporation",
+   "source_title": "Residential Sizing (AOSSG88150), Design Examples and Glossary (assets.aosmith.com/damroot/Original/10004/aossg88150.pdf)",
+   "source_edition_or_year": "Revised April 1997, reviewed May 1999, June 2010R",
+   "source_section_or_page": "p. 2-3 design example: 50 gallon tank, \"35 gallons of 'usable' hot water\" (70% draw efficiency); \"at 90\u00b0 temperature rise, 27,225 Btuh will produce 27.5 GPH\" at the 75% gas recovery efficiency. FLAGGED: A. O. Smith uses 8.25 lb/gal (\"Input x efficiency / 8.25 x temp. rise\"); the tile uses 8.33, giving 27.236 GPH (0.96% low). pct 1.2 covers that constant difference only; drop this row if an exact-method match is required.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "tank_gal": 50,
+    "input_btuh": 27225,
+    "efficiency_pct": 75,
+    "rise_F": 90,
+    "usable_fraction": 0.7,
+    "peak_hour_gal": 0
+   },
+   "outputs": {
+    "recovery_gph": {
+     "value": 27.5,
+     "tolerance": {
+      "pct": 1.2
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "radiant-loop-sizing",
+   "source_publisher": "The Radiant Company",
+   "source_title": "Radiant Floor Heating Design & Installation Manual (radiantcompany.com/wp-content/uploads/radiantcompanymanual.pdf)",
+   "source_edition_or_year": "11th Edition",
+   "source_section_or_page": "p. 26 'Random Header' real-world example: \"a first floor that totals 725 sq. ft. Running the 7/8\\\" PEX tubing at 16\\\" centers will require approximately 543' of tubing. That will give you (2) circuits of 271 ft. each.\" Loop limit from p. 25: one-loop zone \"only possible when less than 400 ft. of 7/8\\\" PEX\". Tile: 543.75 ft, 2 loops, 271.9 ft each (abs 1 covers the truncated prints). FLAGGED: load_btuhr 9000 / design_dt 20 are NOT in the source (the tile requires them); the GPM outputs are not checked.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "floor_area_ft2": 725,
+    "spacing_in": 16,
+    "load_btuhr": 9000,
+    "max_loop_ft": 400,
+    "design_dt": 20
+   },
+   "outputs": {
+    "tube_ft": {
+     "value": 543,
+     "tolerance": {
+      "abs": 1
+     }
+    },
+    "loops": {
+     "value": 2,
+     "tolerance": {
+      "abs": 0
+     }
+    },
+    "per_loop_ft": {
+     "value": 271,
+     "tolerance": {
+      "abs": 1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "pipe-filled-support-load",
+   "source_publisher": "Guenther Supply",
+   "source_title": "Pipe Hanger Spacing & Weight Chart (guenthersupply.com/wp-content/uploads/hanger-spacing-weight-chart.pdf), 'Based on MSS Table 3 & 4' and ASTM A53",
+   "source_edition_or_year": "chart as published (undated)",
+   "source_section_or_page": "Schedule 40 table, 4\": \"Pipe O.D. 4.5\", \"Wall Thickness 0.237\", \"Weight of Pipe 10.8\" lbs/ft, \"Weight of Pipe Filled with Water 16.3\" lbs/ft, \"Suggested Maximum Span 14\" ft (chart footnote: water 62.41 lb/ft3). Tile at steel 490 lb/ft3, water 62.4: abs 0.05 covers the 1-decimal print. Per-hanger load not printed, not checked.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "od_in": 4.5,
+    "wall_in": 0.237,
+    "pipe_density": 490,
+    "fluid_density": 62.4,
+    "insul_thk_in": 0,
+    "insul_density": 6,
+    "spacing_ft": 14
+   },
+   "outputs": {
+    "empty_lbft": {
+     "value": 10.8,
+     "tolerance": {
+      "abs": 0.05
+     }
+    },
+    "filled_lbft": {
+     "value": 16.3,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "pipe-filled-support-load",
+   "source_publisher": "Guenther Supply",
+   "source_title": "Pipe Hanger Spacing & Weight Chart (guenthersupply.com/wp-content/uploads/hanger-spacing-weight-chart.pdf), 'Based on MSS Table 3 & 4' and ASTM A53",
+   "source_edition_or_year": "chart as published (undated)",
+   "source_section_or_page": "Schedule 40 table, 3\": \"Pipe O.D. 3.5\", \"Wall Thickness 0.216\", \"Weight of Pipe 7.6\" lbs/ft, \"Weight of Pipe Filled with Water 10.8\" lbs/ft, \"Suggested Maximum Span 12\" ft (chart footnote: water 62.41 lb/ft3). Tile at steel 490 lb/ft3, water 62.4: abs 0.05 covers the 1-decimal print. Per-hanger load not printed, not checked.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "od_in": 3.5,
+    "wall_in": 0.216,
+    "pipe_density": 490,
+    "fluid_density": 62.4,
+    "insul_thk_in": 0,
+    "insul_density": 6,
+    "spacing_ft": 12
+   },
+   "outputs": {
+    "empty_lbft": {
+     "value": 7.6,
+     "tolerance": {
+      "abs": 0.05
+     }
+    },
+    "filled_lbft": {
+     "value": 10.8,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "pipe-filled-support-load",
+   "source_publisher": "Guenther Supply",
+   "source_title": "Pipe Hanger Spacing & Weight Chart (guenthersupply.com/wp-content/uploads/hanger-spacing-weight-chart.pdf), 'Based on MSS Table 3 & 4' and ASTM A53",
+   "source_edition_or_year": "chart as published (undated)",
+   "source_section_or_page": "Schedule 40 table, 6\": \"Pipe O.D. 6.625\", \"Wall Thickness 0.28\", \"Weight of Pipe 19\" lbs/ft, \"Weight of Pipe Filled with Water 31.5\" lbs/ft, \"Suggested Maximum Span 17\" ft (chart footnote: water 62.41 lb/ft3). Tile at steel 490 lb/ft3, water 62.4: abs 0.05 covers the 1-decimal print. Per-hanger load not printed, not checked.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "od_in": 6.625,
+    "wall_in": 0.28,
+    "pipe_density": 490,
+    "fluid_density": 62.4,
+    "insul_thk_in": 0,
+    "insul_density": 6,
+    "spacing_ft": 17
+   },
+   "outputs": {
+    "empty_lbft": {
+     "value": 19,
+     "tolerance": {
+      "abs": 0.05
+     }
+    },
+    "filled_lbft": {
+     "value": 31.5,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "pipe-filled-support-load",
+   "source_publisher": "Guenther Supply",
+   "source_title": "Pipe Hanger Spacing & Weight Chart (guenthersupply.com/wp-content/uploads/hanger-spacing-weight-chart.pdf), 'Based on MSS Table 3 & 4' and ASTM A53",
+   "source_edition_or_year": "chart as published (undated)",
+   "source_section_or_page": "Schedule 80 table, 4\": \"Pipe O.D. 4.5\", \"Wall Thickness 0.337\", \"Weight of Pipe 15\" lbs/ft, \"Weight of Pipe Filled with Water 20\" lbs/ft, \"Suggested Maximum Span 14\" ft (chart footnote: water 62.41 lb/ft3). Tile at steel 490 lb/ft3, water 62.4: abs 0.05 covers the 1-decimal print. Per-hanger load not printed, not checked.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "od_in": 4.5,
+    "wall_in": 0.337,
+    "pipe_density": 490,
+    "fluid_density": 62.4,
+    "insul_thk_in": 0,
+    "insul_density": 6,
+    "spacing_ft": 14
+   },
+   "outputs": {
+    "empty_lbft": {
+     "value": 15,
+     "tolerance": {
+      "abs": 0.05
+     }
+    },
+    "filled_lbft": {
+     "value": 20,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "drainage-invert",
+   "source_publisher": "Washington Suburban Sanitary Commission (WSSC Water)",
+   "source_title": "Sewer Design Guidelines, Part Three, Section 15: Pipe Slope and Manhole Distance",
+   "source_edition_or_year": "2008",
+   "source_section_or_page": "S-15 item 2 example (p. 1): 'If the manhole invert elevations are 101.00 for one manhole and 99.00 for the other ... divide it by the pipe distance (300 feet). The pipe slope will be ... 0.67%.' Run with the printed 0.67% over 300 ft from invert 101.00: fall 2.01 ft, invert-out 98.99 vs printed 99.00 and 2.0 ft. The source rounded the slope to 0.67% (exact 0.667%), which moves the fall by 0.01 ft, so the tolerance is 0.02 ft.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "invert_in_ft": 101,
+    "slope": 0.67,
+    "slope_units": "percent",
+    "run_ft": 300,
+    "pipe_od_in": 0
+   },
+   "outputs": {
+    "total_fall_ft": {
+     "value": 2.0,
+     "tolerance": {
+      "abs": 0.02
+     }
+    },
+    "invert_out_ft": {
+     "value": 99.0,
+     "tolerance": {
+      "abs": 0.02
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "drainage-invert",
+   "source_publisher": "Washington Suburban Sanitary Commission (WSSC Water)",
+   "source_title": "Sewer Design Guidelines, Part Three, Section 15: Pipe Slope and Manhole Distance",
+   "source_edition_or_year": "2008",
+   "source_section_or_page": "S-15 item 3 example (p. 2, sewers 48 in and larger): 'If the manhole invert elevations are 200.00 for one manhole and 199.00 for the other ... divide it by the pipe distance (595.06 feet). The pipe slope will be ... 0.17%.' Run with the printed 0.17% over 595.06 ft from invert 200.00: fall 1.0116 ft, invert-out 198.988 vs printed 199.00 and 1.0 ft. The source rounded the slope to 0.17% (exact 0.168%), which moves the fall by 0.012 ft, so the tolerance is 0.02 ft.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "invert_in_ft": 200,
+    "slope": 0.17,
+    "slope_units": "percent",
+    "run_ft": 595.06,
+    "pipe_od_in": 0
+   },
+   "outputs": {
+    "total_fall_ft": {
+     "value": 1.0,
+     "tolerance": {
+      "abs": 0.02
+     }
+    },
+    "invert_out_ft": {
+     "value": 199.0,
+     "tolerance": {
+      "abs": 0.02
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "insulation-thickness",
+   "source_publisher": "PDHonline (PDH Center)",
+   "source_title": "Course K115: Making Decisions with Insulation (C. Haslego)",
+   "source_edition_or_year": "2026 course edition",
+   "source_section_or_page": "pp. 14-15, 'Example of Outer Surface Temperature Determination': 850 F fluid, 85 F ambient, 16 in pipe, 130 F surface target, aluminum jacket 'Rs value ... 0.865 h ft2 F/Btu', calcium silicate 'thermal conductivity of 0.0365 Btu/h ft F'; 'Equivalent Thickness = 6.1 in' and 'an actual thickness of nearly 5.0 in of insulation'. Inputs converted: k = 0.0365 x 12 = 0.438 Btu-in/h-ft2-F, h = 1/0.865 = 1.156. The tile gives 4.83 in, whose equivalent thickness r2 ln(r2/r1) is 6.06 in (printed 6.1). The 5.0 in was read off a chart ('nearly'), so the tolerance is 0.2 in.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "pipe_od_in": 16,
+    "surface_temp_F": 850,
+    "ambient_F": 85,
+    "surface_limit_F": 130,
+    "k_btu_in_per_hr_ft2_F": 0.438,
+    "outside_film_coeff_btu_hr_ft2_F": 1.15607
+   },
+   "outputs": {
+    "thickness_in": {
+     "value": 5.0,
+     "tolerance": {
+      "abs": 0.2
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "grain-bin-height-for-capacity",
+   "source_publisher": "University of Nebraska-Lincoln Extension (CropWatch)",
+   "source_title": "How to Estimate Bushels of Grain in a Bin (T. Dorn)",
+   "source_edition_or_year": "2018 (rev. 2019)",
+   "source_section_or_page": "Round Bins example 1: 'Bushels = 0.628 x (30 x 30) x 17 ... Bushels = 9,608' (30 ft bin, 17 ft grain depth, level fill). The tile gives 16.92 ft for 9,608 bu at 30 ft and no peak. UNL's 0.628 = 0.7854 x 0.8 bu/ft3 and the tile uses the USDA 0.8036, which makes the tile 0.45% (0.08 ft) shorter. The tolerance of 0.15 ft covers that and the rounding of the printed 9,608.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "target_bushels": 9608,
+    "diameter_ft": 30,
+    "peak_height_ft": 0,
+    "packing_factor": 1
+   },
+   "outputs": {
+    "eave_height_ft": {
+     "value": 17,
+     "tolerance": {
+      "abs": 0.15
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "grain-bin-height-for-capacity",
+   "source_publisher": "University of Nebraska-Lincoln Extension (CropWatch)",
+   "source_title": "How to Estimate Bushels of Grain in a Bin (T. Dorn)",
+   "source_edition_or_year": "2018 (rev. 2019)",
+   "source_section_or_page": "Round Bins examples 1+2: a 6 ft peak 'Bushels = 0209 x (30 x 30) x 6 = 1,128 bu' and 'Total grain in the bin is 10,736 bushels (9,608 + 1,128)' over a 17 ft level depth. The tile, with the 6 ft cone credited first, gives a wall depth of 16.90 ft (printed 17). UNL's 0.209 = 0.628/3, the same cone the tile uses. The constant difference (0.8 vs 0.8036 bu/ft3) accounts for 0.08 ft, so the tolerance is 0.15 ft.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "target_bushels": 10736,
+    "diameter_ft": 30,
+    "peak_height_ft": 6,
+    "packing_factor": 1
+   },
+   "outputs": {
+    "eave_height_ft": {
+     "value": 17,
+     "tolerance": {
+      "abs": 0.15
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "feed-for-surface-finish",
+   "source_publisher": "Mitsubishi Materials Corporation",
+   "source_title": "Formulas for Cutting: Theoretical Finished Surface Roughness (turning)",
+   "source_edition_or_year": "web technical information, accessed 2026",
+   "source_section_or_page": "Turning formula page: 'h=f2/(8xRe)x1000' and 'Substitute f=0.2 mm/rev, R=0.8 ... =6.25um'. Run inversely with the printed h = 6.25 um as the peak-to-valley (Rt) target = 246.063 uin and Re = 0.8 mm = 0.031496 in: the tile gives 0.0078740 IPR = 0.2 mm/rev exactly. These are exact unit conversions, so the tolerance is 1e-6 in.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "target_finish_uin": 246.0629921,
+    "finish_basis": "rt",
+    "nose_radius_in": 0.0314961
+   },
+   "outputs": {
+    "max_feed_ipr": {
+     "value": 0.007874,
+     "tolerance": {
+      "abs": 1e-06
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "taper-diameter",
+   "source_publisher": "U.S. Navy, Naval Education and Training Program",
+   "source_title": "Machinery Repairman, NAVEDTRA 12204-A",
+   "source_edition_or_year": "1993",
+   "source_section_or_page": "Ch. 6 'Tapers', p. 6-41, EXAMPLE 2: 'a piece 6 inches long. Diameter of the small end is 1 inch; diameter of the large end is 2 inches ... the taper per foot is 1 inch x 12/6 = 2 inches per foot.' Given the small end of 1 in, a TPF of 2 and L = 6 in, the tile gives a large end of 2.000 in. The relation is exact, so the tolerance is 1e-6.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "known_dia_in": 1,
+    "known_end": "small",
+    "taper_per_foot": 2,
+    "length_in": 6
+   },
+   "outputs": {
+    "missing_dia_in": {
+     "value": 2,
+     "tolerance": {
+      "abs": 1e-06
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "taper-diameter",
+   "source_publisher": "U.S. Navy, Naval Education and Training Program",
+   "source_title": "Machinery Repairman, NAVEDTRA 12204-A",
+   "source_edition_or_year": "1993",
+   "source_section_or_page": "Ch. 6 'Tapers', p. 6-41, EXAMPLE 1: 'a piece of work 2 inches long: Diameter of the small end is 1 inch; diameter of the large end is 2 inches ... the taper is 1 inch in 2 inches of length. In 12 inches of length it would be 6 inches.' Given the large end of 2 in, a TPF of 6 and L = 2 in, the tile gives a small end of 1.000 in. The relation is exact.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "known_dia_in": 2,
+    "known_end": "large",
+    "taper_per_foot": 6,
+    "length_in": 2
+   },
+   "outputs": {
+    "missing_dia_in": {
+     "value": 1,
+     "tolerance": {
+      "abs": 1e-06
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "punch-capacity",
+   "source_publisher": "Mate Precision Technologies",
+   "source_title": "Punching & Forming Guide: Punch Press Technical Solutions (LIT00682)",
+   "source_edition_or_year": "Rev E 2021",
+   "source_section_or_page": "p. 7 'Punching Basics', Inch Example: 'Imperial Tonnage for a 1.000\" round in 0.118\" Mild Steel  Tonnage = 3.14 x 0.118 x 25 x 1.0 = 9.27 Imperial Tons'; shear table 'Mild Steel 50000'. Inverted at 9.27 t, 50,000 psi and D = 1.000 in, the tile gives a max thickness of 0.11802 in (printed 0.118). Mate uses pi = 3.14 and rounds the tonnage to 0.01 t, so the tolerance is 0.0005 in.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "capacity_tons": 9.27,
+    "shear_strength_psi": 50000,
+    "solve_for": "thickness",
+    "diameter_in": 1,
+    "thickness_in": 0.118
+   },
+   "outputs": {
+    "max_thickness_in": {
+     "value": 0.118,
+     "tolerance": {
+      "abs": 0.0005
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "punch-capacity",
+   "source_publisher": "Mate Precision Technologies",
+   "source_title": "Punching & Forming Guide: Punch Press Technical Solutions (LIT00682)",
+   "source_edition_or_year": "Rev E 2021",
+   "source_section_or_page": "p. 7 'Punching Basics', Inch Example: 'Tonnage = 3.14 x 0.118 x 25 x 1.0 = 9.27 Imperial Tons' for a '1.000\" round in 0.118\" Mild Steel' (50,000 psi). Solving for diameter at 9.27 t and T = 0.118 in, the tile gives 1.0002 in (printed 1.000). With pi = 3.14 and the tonnage rounded, the tolerance is 0.005 in.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "capacity_tons": 9.27,
+    "shear_strength_psi": 50000,
+    "solve_for": "diameter",
+    "diameter_in": 1,
+    "thickness_in": 0.118
+   },
+   "outputs": {
+    "max_diameter_in": {
+     "value": 1.0,
+     "tolerance": {
+      "abs": 0.005
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "shadow-length",
+   "source_publisher": "Western Connecticut Council of Governments (WestCOG)",
+   "source_title": "Summary of Significant Equations for Determining Shadow Length: A Reference Guide for Solar Access Evaluations",
+   "source_edition_or_year": "Release date July 17, 2019",
+   "source_section_or_page": "p. 7 zip-code table, row '06801 Bethel CT ... 25.19 ... 2.13' (Solar Altitude on December 21st; Shadow Cast by 1 meter pole, Solar Noon December 21st on flat land, meters). The tile's shadow ratio is 1/tan(25.19) = 2.126 (printed 2.13), and the ratio has no units, so the meters carry over. Printed to 0.01, so the tolerance is 0.006.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "object_height_ft": 1,
+    "sun_altitude_deg": 25.19
+   },
+   "outputs": {
+    "shadow_ratio": {
+     "value": 2.13,
+     "tolerance": {
+      "abs": 0.006
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "shadow-length",
+   "source_publisher": "Western Connecticut Council of Governments (WestCOG)",
+   "source_title": "Summary of Significant Equations for Determining Shadow Length: A Reference Guide for Solar Access Evaluations",
+   "source_edition_or_year": "Release date July 17, 2019",
+   "source_section_or_page": "p. 7 zip-code table, row '06820 Darien CT ... 25.49 ... 2.1' (December 21st solar-noon altitude; shadow of a 1 m pole on flat land). The tile's ratio is 1/tan(25.49) = 2.098 (printed 2.1). Printed to 0.1 with the trailing zero dropped, so the tolerance is 0.01.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "object_height_ft": 1,
+    "sun_altitude_deg": 25.49
+   },
+   "outputs": {
+    "shadow_ratio": {
+     "value": 2.1,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "deck-board-takeoff",
+   "source_publisher": "TimberTech (Azek Company)",
+   "source_title": "How to Calculate How Much Decking You Need: Step by Step",
+   "source_edition_or_year": "web article, accessed 2026",
+   "source_section_or_page": "Steps 1-3: 'a deck that is 16 feet long and 12 feet wide ... 192 square feet'; 16-ft board 'width (5.5 inches) ... 0.45 feet ... 7.2 square feet'; 'When you divide 192 by 7.2, you get 26.6. Round up to 27 deck boards.' TimberTech's count is by coverage with no gap (the spacing is figured separately afterward), so gap_in = 0. The tile gives ceil(144/5.5) = 27, an exact integer.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "deck_width_ft": 12,
+    "deck_length_ft": 16,
+    "board_face_width_in": 5.5,
+    "gap_in": 0,
+    "joist_spacing_in": 16,
+    "waste_pct": 0
+   },
+   "outputs": {
+    "boards": {
+     "value": 27,
+     "tolerance": {
+      "abs": 0
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "nitrogen-pressure-test",
+   "source_publisher": "HVAC School (hvacrschool.com)",
+   "source_title": "Does Nitrogen Pressure Change with Temperature - Practical Application of Gas Laws (J. Smith, CMS)",
+   "source_edition_or_year": "January 19, 2018",
+   "source_section_or_page": "Worked example: pressurized 'to 350 PSIG at 90F, and it's now 65F'; 'T1 = 549.67R', 'P1 = 364.7 PSIA', 'T2 = 524.67R', 'P2 = 348.11', '333.41 PSIG'; 'our system dropped to 334 PSIG' and the loss was 'due ONLY to the temperature change'. The tile gives expected 333.41 psig and leak_drop -0.59 psi, a 'holds' verdict at the 1 psi default. Printed to 0.01 psi, so the tolerance is 0.02. The source's '459.76' and '349.03' are typos; its own Rankine values and result use 459.67 and 348.11.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "start_psig": 350,
+    "start_temp_F": 90,
+    "end_temp_F": 65,
+    "end_psig": 334,
+    "atm_psi": 14.7,
+    "tolerance_psi": 1
+   },
+   "outputs": {
+    "expected_psig": {
+     "value": 333.41,
+     "tolerance": {
+      "abs": 0.02
+     }
+    },
+    "leak_drop_psi": {
+     "value": -0.59,
+     "tolerance": {
+      "abs": 0.02
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "hay-dry-matter",
+   "source_publisher": "University of Nebraska-Lincoln Extension",
+   "source_title": "NebGuide G2093: Feed Dry Matter Conversions (B. Reiling)",
+   "source_edition_or_year": "Revised October 2022",
+   "source_section_or_page": "'Conversion of weight from as-fed to dry matter basis - An Example': 'a feedlot finishing ration is 60% dry matter. If the cattle consume 40 lbs of the ration ... 40 lbs as-fed * 0.60 = 24 lbs dry matter.' Moisture is 100 - 60 = 40%. The tile gives 24 lb DM; the arithmetic is exact.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "bale_weight_lb": 40,
+    "moisture_pct": 40,
+    "target_moisture_pct": 15,
+    "safe_threshold_pct": 18
+   },
+   "outputs": {
+    "dry_matter_lb": {
+     "value": 24,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "hay-dry-matter",
+   "source_publisher": "University of Nebraska-Lincoln Extension",
+   "source_title": "NebGuide G2093: Feed Dry Matter Conversions (B. Reiling)",
+   "source_edition_or_year": "Revised October 2022",
+   "source_section_or_page": "Dry-matter-to-as-fed example, step 4 table: 'Alfalfa Hay: 15 lbs DM / .89 = 16.85 lbs as-fed' (alfalfa hay 89% DM, i.e. 11% moisture). Entered as 15 lb at 0% moisture (dry matter) restated at an 11% target: the tile's weight_at_target is 16.854 lb (printed 16.85). Printed to 0.01, so the tolerance is 0.006.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "bale_weight_lb": 15,
+    "moisture_pct": 0,
+    "target_moisture_pct": 11,
+    "safe_threshold_pct": 18
+   },
+   "outputs": {
+    "weight_at_target_lb": {
+     "value": 16.85,
+     "tolerance": {
+      "abs": 0.006
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "generator-fuel-runtime",
+   "source_publisher": "Generac Power Systems",
+   "source_title": "SD200 Industrial Diesel Generator Set Specification Sheet (200 kW, 8.7L)",
+   "source_edition_or_year": "current spec sheet, accessed 2026",
+   "source_section_or_page": "Fuel consumption 'Diesel - gal/hr ... 100% 14.8 (56)'; Open Set tank table 'Run Time Hours 10 / Usable Capacity Gal 153'. The tile gives 153 usable gal (usable_pct 100, since the table already lists usable capacity) / 14.8 gph = 10.34 hr (printed 10). Generac rounds to whole hours, so the tolerance is 0.5 hr.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "tank_capacity_gal": 153,
+    "consumption_gph": 14.8,
+    "usable_pct": 100,
+    "target_runtime_hr": 0
+   },
+   "outputs": {
+    "runtime_hr": {
+     "value": 10,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "generator-fuel-runtime",
+   "source_publisher": "Generac Power Systems",
+   "source_title": "SD200 Industrial Diesel Generator Set Specification Sheet (200 kW, 8.7L)",
+   "source_edition_or_year": "current spec sheet, accessed 2026",
+   "source_section_or_page": "Open Set tank table 'Run Time Hours 90 / Usable Capacity Gal 1,325' at the '100% 14.8' gal/hr full-load rate. The tile gives 1,325 / 14.8 = 89.53 hr (printed 90). Whole-hour rounding, so the tolerance is 0.5 hr.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "tank_capacity_gal": 1325,
+    "consumption_gph": 14.8,
+    "usable_pct": 100,
+    "target_runtime_hr": 0
+   },
+   "outputs": {
+    "runtime_hr": {
+     "value": 90,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "generator-fuel-runtime",
+   "source_publisher": "Generac Power Systems",
+   "source_title": "SD200 Industrial Diesel Generator Set Specification Sheet (200 kW, 8.7L)",
+   "source_edition_or_year": "current spec sheet, accessed 2026",
+   "source_section_or_page": "Open Set tank table 'Run Time Hours 40 / Usable Capacity Gal 589' at the '100% 14.8' gal/hr full-load rate. The tile gives 589 / 14.8 = 39.80 hr (printed 40). Whole-hour rounding, so the tolerance is 0.5 hr.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "tank_capacity_gal": 589,
+    "consumption_gph": 14.8,
+    "usable_pct": 100,
+    "target_runtime_hr": 0
+   },
+   "outputs": {
+    "runtime_hr": {
+     "value": 40,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "hardness-tensile-conversion",
+   "source_publisher": "ASTM International",
+   "source_title": "ASTM A370-16 / ASME SA-370, Standard Test Methods and Definitions for Mechanical Testing of Steel Products (reprint hosted by metalspiping.com)",
+   "source_edition_or_year": "A370-16 (approved May 1, 2016)",
+   "source_section_or_page": "Table 2, Approximate Hardness Conversion Numbers for Nonaustenitic Steels, row Rockwell C 43: Brinell 3000-kgf 10-mm ball '400', Approximate Tensile Strength '201 (1390)' ksi (MPa). Tile at the default 0.50 ksi/HB gives 200 ksi; pct 1 covers the table's whole-ksi rounding plus the 0.5% gap. (At other rows the 0.50 rule departs more, e.g. HB 200 -> 94 ksi in Table 3, so only this row is used.)",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "brinell_hb": 400,
+    "tensile_coefficient_ksi_per_hb": 0.5,
+    "actual_uts_ksi": 0,
+    "case_hardness_hb": 0,
+    "core_hardness_hb": 0
+   },
+   "outputs": {
+    "estimated_uts_ksi": {
+     "value": 201,
+     "tolerance": {
+      "pct": 1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "carburizing-case-depth",
+   "source_publisher": "Engineers Edge (reprinting F. E. Harris, Metal Progress, August 1943)",
+   "source_title": "Heat Treating Steel Time vs Temperature and Case Harden Thickness",
+   "source_edition_or_year": "Metal Progress, August 1943 (Harris case-depth table)",
+   "source_section_or_page": "Case depth table, 1700 deg F column: 1 h '0.025' in; printed example '4320 carburized at 1700F for 11 hours at temperature would attain case depth of 0.083 inches.' Reference = the printed 1 h / 0.025 in cell. Tile 0.0829 in; abs 0.0006 covers the table's 3-decimal rounding.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "reference_case_in": 0.025,
+    "reference_time_hr": 1,
+    "time_hr": 11,
+    "target_case_in": 0,
+    "hotter_reference_case_in": 0
+   },
+   "outputs": {
+    "case_depth_in": {
+     "value": 0.083,
+     "tolerance": {
+      "abs": 0.0006
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "carburizing-case-depth",
+   "source_publisher": "Engineers Edge (reprinting F. E. Harris, Metal Progress, August 1943)",
+   "source_title": "Heat Treating Steel Time vs Temperature and Case Harden Thickness",
+   "source_edition_or_year": "Metal Progress, August 1943 (Harris case-depth table)",
+   "source_section_or_page": "Case depth table, 1700 deg F column: 1 h '0.025', 8 h '0.071', 16 h '0.100' in. Reference = 1 h cell; time_for_target is the printed 16 h row at which 0.100 in is reached. Tile gives 0.0707 in and 16.0 h; abs 0.0006 covers 3-decimal table rounding, abs 0.2 h covers 0.0995-0.1005 in rounding of the 16 h cell.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "reference_case_in": 0.025,
+    "reference_time_hr": 1,
+    "time_hr": 8,
+    "target_case_in": 0.1,
+    "hotter_reference_case_in": 0
+   },
+   "outputs": {
+    "case_depth_in": {
+     "value": 0.071,
+     "tolerance": {
+      "abs": 0.0006
+     }
+    },
+    "time_for_target_hr": {
+     "value": 16,
+     "tolerance": {
+      "abs": 0.2
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "tempering-temperature",
+   "source_publisher": "Cincinnati Tool Steel Company",
+   "source_title": "H13 Hot Work Tool Steel data sheet (cintool.com/documents/mold_quality/H13.pdf)",
+   "source_edition_or_year": "data sheet as retrieved 2026",
+   "source_section_or_page": "Tempering section, p.2: 'held at the tempering temperature for at least two hours per inch of greatest cross section'; 'Hardness tests were made on 1-in. round specimens ... tempered for two hours'; table row 1100 F -> 46 Rockwell C. Tile soak 1 in x 2 h/in = 2 h (minimum set 0 because the sheet states the rate as the minimum). Embrittlement range inputs are the tile defaults and do not affect soak. abs 0.01.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "target_hardness_hrc": 46,
+    "curve_temp_f": 1100,
+    "section_thickness_in": 1,
+    "soak_rate_hr_per_in": 2,
+    "minimum_soak_hr": 0,
+    "embrittlement_low_f": 700,
+    "embrittlement_high_f": 1050,
+    "secondary_hardening": "yes"
+   },
+   "outputs": {
+    "soak_time_hr": {
+     "value": 2,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "pwht-holding-time",
+   "source_publisher": "Gulf Coast Combustion",
+   "source_title": "Pressure Vessel PWHT -- The Complete Guide: Code & Methods",
+   "source_edition_or_year": "2026 (published March 31, 2026)",
+   "source_section_or_page": "Section 4 (temperature and rate specifications): 'On a vessel with 1\" governing wall thickness the maximum heat-up rate above 800F is 400F per hour'; soak list '1\" | 1 hour'; 'GCC standard: 1,150F'. UCS-56 constants 400/500 F-in/h, threshold 800 F. Tile 1 h, 400 F/h exactly; abs 0.01 / abs 0.5.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "governing_thickness_in": 1,
+    "hold_rate_hr_per_in": 1,
+    "minimum_hold_hr": 0.25,
+    "holding_temp_f": 1150,
+    "rate_threshold_temp_f": 800,
+    "heating_rate_constant_f_hr_in": 400,
+    "cooling_rate_constant_f_hr_in": 500,
+    "rate_ceiling_f_hr": 400,
+    "actual_heating_rate_f_hr": 0,
+    "alt_thickness_in": 0
+   },
+   "outputs": {
+    "holding_time_hr": {
+     "value": 1,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "max_heating_rate_f_hr": {
+     "value": 400,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "pwht-holding-time",
+   "source_publisher": "Gulf Coast Combustion",
+   "source_title": "Pressure Vessel PWHT -- The Complete Guide: Code & Methods",
+   "source_edition_or_year": "2026 (published March 31, 2026)",
+   "source_section_or_page": "Section 4: 'On a vessel with 2\" governing wall thickness the maximum rate is 200F per hour'; soak list '2\" | 2 hours'; 'GCC standard: 1,150F'. Tile 2 h, 200 F/h exactly. (The same list prints 3\" -> 2 h 15 min, which the tile's linear hold does NOT reproduce -- see report.)",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "governing_thickness_in": 2,
+    "hold_rate_hr_per_in": 1,
+    "minimum_hold_hr": 0.25,
+    "holding_temp_f": 1150,
+    "rate_threshold_temp_f": 800,
+    "heating_rate_constant_f_hr_in": 400,
+    "cooling_rate_constant_f_hr_in": 500,
+    "rate_ceiling_f_hr": 400,
+    "actual_heating_rate_f_hr": 0,
+    "alt_thickness_in": 0
+   },
+   "outputs": {
+    "holding_time_hr": {
+     "value": 2,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "max_heating_rate_f_hr": {
+     "value": 200,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "propane-run-time",
+   "source_publisher": "Lakes Gas",
+   "source_title": "How Much Propane Does Your Home Use? (lakesgas.com/calculate-propane-consumption)",
+   "source_edition_or_year": "2025 (July 7, 2025)",
+   "source_section_or_page": "Worked fireplace example: '30,000 / 91,500 = 0.33 gallons/hour'; '0.33 gallons/hour x 4 hours = 1.32 gallons/day'. Duty cycle = 4 h / 24 h. Tile 1.3115 gal/day; pct 1 covers the source rounding 0.328 to 0.33 before multiplying. Tank inputs (100 gal, 80%, trigger 0) are placeholders that do not enter gallons_per_day.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "water_capacity_gal": 100,
+    "fill_limit_pct": 80,
+    "current_gauge_pct": 80,
+    "trigger_pct": 0,
+    "connected_load_btuh": 30000,
+    "duty_cycle": 0.16666666666666666,
+    "btu_per_gal": 91500,
+    "gallons_per_hdd": 0,
+    "hdd_per_day": 0
+   },
+   "outputs": {
+    "gallons_per_day": {
+     "value": 1.32,
+     "tolerance": {
+      "pct": 1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "tank-vent-api-2000",
+   "source_publisher": "American Petroleum Institute (via law.resource.org IBR copy)",
+   "source_title": "API Standard 2000, Venting Atmospheric and Low-Pressure Storage Tanks",
+   "source_edition_or_year": "Fifth Edition, April 1998",
+   "source_section_or_page": "Table 1A (SCFH of Air per Barrel per Hour of Liquid Flow), Inbreathing column '5.6' for any flash point; 4.3.2.1 '5.6 SCFH of air for each 42 US gallon barrel ... per hour of maximum emptying rate'. Tile 5.6146 cu ft/h per bbl/h; pct 0.5 covers API's rounding of 5.615 to 5.6.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "pump_in_bph": 0,
+    "pump_out_bph": 1,
+    "volatile_factor": 1,
+    "thermal_out_ft3h": 0,
+    "thermal_in_ft3h": 0,
+    "fire_case_ft3h": 0,
+    "installed_pressure_ft3h": 0,
+    "installed_vacuum_ft3h": 0
+   },
+   "outputs": {
+    "liquid_in_ft3h": {
+     "value": 5.6,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "required_in_ft3h": {
+     "value": 5.6,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "fume-hood-face-velocity",
+   "source_publisher": "Bel-Art / SP Scienceware (SP Industries)",
+   "source_title": "Fume Hood Airflow - Cubic Feet per Minute (CFM) Calculation Explained",
+   "source_edition_or_year": "technical note (Wayback 2024 capture)",
+   "source_section_or_page": "p.1, catalog H50000-0002 '22 inches wide by 12 inches high'; '264 / 144 = 1.83 square foot opening'; '1.8 square feet x 100 fpm = 180 CFM'. Tile 1.8333 sq ft and 183.3 cfm; abs 0.005 covers 1.83; pct 2 covers the note truncating 1.83 to 1.8 before multiplying.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "sash_width_ft": 1.8333333333333333,
+    "sash_height_in": 12,
+    "face_velocity_fpm": 100,
+    "alt_sash_height_in": 0,
+    "heating_rise_f": 0,
+    "hours_per_year": 0,
+    "energy_cost_per_mmbtu": 0,
+    "too_fast_fpm": 125
+   },
+   "outputs": {
+    "open_area_ft2": {
+     "value": 1.83,
+     "tolerance": {
+      "abs": 0.005
+     }
+    },
+    "exhaust_cfm": {
+     "value": 180,
+     "tolerance": {
+      "pct": 2
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "louver-free-area",
+   "source_publisher": "Airolite (Greenheck Group)",
+   "source_title": "Louver Fundamentals and Performance Criteria, Product Application Guide",
+   "source_edition_or_year": "Airolite application guide as hosted by Greenheck 2026",
+   "source_section_or_page": "p.3 Example 3 - Air Volumetric Flow Rate: 'CFM = air velocity (FPM) x Area (sq. ft.) - 1,250 fpm x 6.80 sq. ft. = 8,500 cfm', diagram '6.8sqft (42.5%) Free Area' on the 48\" x 48\" AMCA test size. Gross 16 sq ft x 0.425 = 6.8; tile 6.80 sq ft and 1,250 fpm exactly; pct 0.5.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "width_ft": 4,
+    "height_ft": 4,
+    "free_area_ratio": 0.425,
+    "airflow_cfm": 8500,
+    "water_penetration_fpm": 0,
+    "allowable_velocity_fpm": 0,
+    "application": "intake"
+   },
+   "outputs": {
+    "gross_area_ft2": {
+     "value": 16,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "free_area_ft2": {
+     "value": 6.8,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "free_velocity_fpm": {
+     "value": 1250,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "effective-leakage-area",
+   "source_publisher": "Residential Energy Dynamics (REDCalc)",
+   "source_title": "Air Leakage Metrics, A Rising Star (Rick Karg)",
+   "source_edition_or_year": "2019 (February 11, 2019)",
+   "source_section_or_page": "Article text: 'a blower door test result of 1400 CFM50 ... it would equal 140 square inches' and 'just divide CFM50 by 10' (EqLA convention). Tile eqla_in2 140 exactly; pct 0.5. Floor area is a placeholder (EqLA does not use it).",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "cfm50": 1400,
+    "floor_area_ft2": 1000,
+    "ceiling_height_ft": 8,
+    "storeys": 1
+   },
+   "outputs": {
+    "eqla_in2": {
+     "value": 140,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "effective-leakage-area",
+   "source_publisher": "NASCSP (National Association for State Community Services Programs)",
+   "source_title": "Midwest Weatherization Best Practices, Part 5, Appendix 112 Zone Pressure Diagnostics",
+   "source_edition_or_year": "May 2007",
+   "source_section_or_page": "p.210: 'Total leakage area is about 10% of the flow rate, or approximately 167 in2 (1670 CFM50 x .10 = 167 in2)'. Tile eqla_in2 167 exactly; pct 0.5. Floor area is a placeholder (EqLA does not use it).",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "cfm50": 1670,
+    "floor_area_ft2": 1000,
+    "ceiling_height_ft": 8,
+    "storeys": 1
+   },
+   "outputs": {
+    "eqla_in2": {
+     "value": 167,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "building-tightness-limit",
+   "source_publisher": "ACCA (Air Conditioning Contractors of America), HVAC Blog",
+   "source_title": "2016 Update for ASHRAE 62.2 (Don Prather)",
+   "source_edition_or_year": "2016 (November 2, 2016), ASHRAE 62.2-2016",
+   "source_section_or_page": "Worked example: '1525 ft2 two-bedroom house ... OAcfm = 0.03 (1525) + [7.5 x (2 + 1)] = 68.25 CFM'. Tile required_cfm 68.25 exactly; pct 0.5. cfm50 and n_factor are placeholders that do not enter required_cfm.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "floor_area_ft2": 1525,
+    "bedrooms": 2,
+    "cfm50": 1500,
+    "n_factor": 17,
+    "ceiling_height_ft": 8,
+    "planned_cfm50_reduction": 0
+   },
+   "outputs": {
+    "required_cfm": {
+     "value": 68.25,
+     "tolerance": {
+      "pct": 0.5
      }
     }
    }

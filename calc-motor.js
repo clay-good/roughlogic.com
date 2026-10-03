@@ -83,7 +83,13 @@ export function computeMotorPoleIdentification({ rated_rpm = 0, line_freq_hz = 6
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(rated_rpm > 0)) return { error: "Nameplate full-load speed must be positive (rpm)." };
   if (!(line_freq_hz > 0)) return { error: "Line frequency must be positive (Hz)." };
-  const pole_pairs = Math.round((60 * line_freq_hz) / rated_rpm);
+  // Running speed sits BELOW synchronous, so the pole pairs are floor(60 f / rpm), not round: an 800 rpm
+  // NEMA Design D motor (8-pole, ~11% slip) read 10-pole with -11% slip until 2026-10-03. A speed just
+  // ABOVE a synchronous speed (within 5%, a machine being driven) keeps that pole count and its flag.
+  const ratio = (60 * line_freq_hz) / rated_rpm;
+  let pole_pairs = Math.floor(ratio + 1e-9);
+  const up = Math.ceil(ratio - 1e-9);
+  if (up > pole_pairs && rated_rpm <= (60 * line_freq_hz / up) * 1.05) pole_pairs = up;
   const poles = Math.max(2, 2 * pole_pairs);
   const sync_rpm = (120 * line_freq_hz) / poles;
   const slip = (sync_rpm - rated_rpm) / sync_rpm;

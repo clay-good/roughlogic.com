@@ -5219,7 +5219,7 @@ export function computeGeneratorFuelRuntime({ tank_capacity_gal = 0, consumption
   if (target > 0) {
     fuel_for_target_gal = gph * target;
     tank_for_target_gal = fuel_for_target_gal / (usable / 100);
-    meets_target = runtime_hr >= target;
+    meets_target = runtime_hr >= target * (1 - 1e-9); // 110 gal / 1.1 gph is 99.99999999999999 h
   }
   if (![usable_gallons, runtime_hr, runtime_days].every(Number.isFinite)) return { error: "Runtime math is not a finite value." };
   return {

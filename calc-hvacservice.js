@@ -289,12 +289,12 @@ export function computeVacuumDecayTest({ start_micron = 0, end_micron = 0, hold_
   }
   return {
     rise_micron, rate_micron_per_min, verdict,
-    note: "The standing decay (blank-off) test isolates the pump and watches the gauge: evacuate to the target, close the valve to the pump, and time the rise. The 500-micron pass ceiling is the common HVAC field convention (ACCA Standard 4 / AHRI / the equipment manual) and is editable - some manufacturers call for a deeper hold. Use an electronic micron (vacuum) gauge, not the compound gauge on the manifold. A rise that levels off below ~1000-1500 microns is usually moisture still boiling off; a steady climb that does not plateau is a leak. The equipment manufacturer and the licensed tech govern.",
+    note: "The standing decay (blank-off) test isolates the pump and watches the gauge: evacuate to the target, close the valve to the pump, and time the rise. The 500-micron pass ceiling is the common HVAC field convention (ANSI/ACCA 5 QI-2015 (evacuate and hold at or below 500 microns) / AHRI / the equipment manual) and is editable - some manufacturers call for a deeper hold. Use an electronic micron (vacuum) gauge, not the compound gauge on the manifold. A rise that levels off below ~1000-1500 microns is usually moisture still boiling off; a steady climb that does not plateau is a leak. The equipment manufacturer and the licensed tech govern.",
   };
 }
 const vacuumDecayExample = { inputs: { start_micron: 300, end_micron: 450, hold_min: 15, pass_ceiling_micron: 500 } };
 HVACSERVICE_RENDERERS["vacuum-decay-test"] = _simpleRenderer({
-  citation: "Citation: first-principles standing-decay arithmetic (rise = end - start; rate = rise / hold). The 500-micron evacuation target and the valve-off blank-off (decay) test are the common HVAC field convention (ACCA Standard 4 / AHRI / equipment manual, by name); the pass ceiling is an editable field value.",
+  citation: "Citation: first-principles standing-decay arithmetic (rise = end - start; rate = rise / hold). The 500-micron evacuation target and the valve-off blank-off (decay) test are the common HVAC field convention (ANSI/ACCA 5 QI-2015 (evacuate and hold at or below 500 microns) / AHRI / equipment manual, by name); the pass ceiling is an editable field value.",
   example: vacuumDecayExample.inputs,
   fields: [
     { key: "start_micron", label: "Vacuum at valve-off (microns)", kind: "number" },
@@ -335,7 +335,7 @@ export function computeNitrogenPressureTest({ start_psig = 0, start_temp_F = 0, 
   const leak_drop_psi = expected_psig - end_psig;
   const gauge_change_psi = end_psig - start_psig;
   let verdict;
-  if (Math.abs(leak_drop_psi) <= tolerance_psi) {
+  if (Math.abs(leak_drop_psi) <= tolerance_psi * (1 + 1e-9) + 1e-12) { // 500 -> 499 at 1 psi read 1.0000000000000568
     verdict = "holds - the " + fmt(gauge_change_psi, 1) + " psi gauge change is explained by the temperature swing (tight, within +/-" + fmt(tolerance_psi, 1) + " psi)";
   } else if (leak_drop_psi > tolerance_psi) {
     verdict = "lost " + fmt(leak_drop_psi, 1) + " psi below the temperature-corrected " + fmt(expected_psig, 1) + " psig - a leak; soap-test the joints";
@@ -389,7 +389,8 @@ export function computeGasMeterClock({ sec_per_rev = 0, dial_size_cf = 0, heatin
     verdict = "Enter the nameplate input to compare the clocked rate against it.";
   } else {
     const pct = (actual_input_btuh / nameplate_input_btuh - 1) * 100;
-    if (Math.abs(pct) <= 5) verdict = "firing on rate - within 5% of the " + fmt(nameplate_input_btuh, 0) + " BTU/hr nameplate";
+    // 1e-9: 105,000 against 100,000 is 5.000000000000004% and read "overfired" at the band edge.
+    if (Math.abs(pct) <= 5 + 1e-9) verdict = "firing on rate - within 5% of the " + fmt(nameplate_input_btuh, 0) + " BTU/hr nameplate";
     else if (pct > 5) verdict = "overfired - " + fmt(pct, 0) + "% above the nameplate; reduce manifold pressure or check the orifice";
     else verdict = "underfired - " + fmt(-pct, 0) + "% below the nameplate; check gas pressure, the orifice, or the meter";
   }

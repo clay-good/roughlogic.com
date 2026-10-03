@@ -14926,12 +14926,12 @@ export const CITATIONS = {
   },
   "vacuum-decay-test": {
     formula: "rise_micron = end_micron - start_micron; rate_micron_per_min = rise / hold_min. Verdict: end at or below the pass ceiling (default 500 microns) is tight and dry; above it is residual moisture/outgassing if it plateaus or a leak if it climbs steadily.",
-    edition: "First-principles standing-decay (blank-off) arithmetic (public); the 500-micron evacuation target and valve-off decay test are the common HVAC field convention (ACCA Standard 4 / AHRI / equipment manual, by name).",
+    edition: "First-principles standing-decay (blank-off) arithmetic (public); the 500-micron evacuation target and valve-off decay test are the common HVAC field convention (ANSI/ACCA 5 QI-2015 (evacuate and hold at or below 500 microns) / AHRI / equipment manual, by name).",
     freeAccess: "The rise/time arithmetic is public; the 500-micron pass ceiling is an editable field convention.",
     governance: GOVERNANCE.general,
     editionNote: "Single-edition (the equipment manufacturer and the licensed tech govern; use an electronic micron gauge, not the manifold compound gauge).",
     assumptions: [
-      { name: "Pass ceiling", value: "default 500 microns at valve-off (editable); some manufacturers call for a deeper hold", source: "ACCA Standard 4 / AHRI / equipment manual" },
+      { name: "Pass ceiling", value: "default 500 microns at valve-off (editable); some manufacturers call for a deeper hold", source: "ANSI/ACCA 5 QI-2015 (evacuate and hold at or below 500 microns) / AHRI / equipment manual" },
       { name: "Moisture vs leak", value: "a rise that plateaus below ~1000-1500 microns is residual moisture/outgassing; a steady climb that does not plateau is a leak", source: "field practice" },
       { name: "Instrument", value: "read with an electronic micron (vacuum) gauge isolated from the pump, not the manifold compound gauge", source: "field practice" },
     ],
@@ -21528,7 +21528,7 @@ export const CITATIONS = {
     edition: "First-principles cross-section x density; the MSS SP-58 operating support load the result feeds, by name. Not edition-bound.",
     freeAccess: "The support load is a pure cross-section-times-density buildup; the standard pipe weights and water density are public.",
     governance: GOVERNANCE.general,
-    editionNote: "Single-edition (the geometry does not roll). Bundled pipe weights are NOMINAL MILL VALUES and the water density is taken at 62.4 lb/ft^3 - a hot or dense fluid changes the contents weight, and concentrated loads (valves, flanges) are added separately. MSS SP-58 names the operating support load this feeds.",
+    editionNote: "Single-edition (the geometry does not roll). Pipe weight is computed from the entered OD, wall and steel density (no weight table is bundled; MSS SP-58 / hanger-maker charts are the cross-check) and the water density is taken at 62.4 lb/ft^3 - a hot or dense fluid changes the contents weight, and concentrated loads (valves, flanges) are added separately. MSS SP-58 names the operating support load this feeds.",
     assumptions: [
       { name: "Pipe weight", value: "computed from the entered OD/wall and material density (steel 490, copper 558 lb/ft^3); nominal mill values", source: "first-principles / mill dimensions" },
       { name: "Water density", value: "contents taken at 62.4 lb/ft^3 unless a different fluid density is entered", source: "first-principles" },
@@ -22777,7 +22777,7 @@ export const CITATIONS = {
     edition: "Tempering practice with the temperature taken from the grade's own tempering curve, which is entered because it is a property of the specific steel and no general relationship replaces it.",
     freeAccess: "One soak rule and one range comparison.",
     governance: GOVERNANCE.general,
-    editionNote: "Two things go wrong at exactly the right hardness. TEMPER EMBRITTLEMENT is the failure a hardness test cannot find: some alloy steels are susceptible in a range around the middle of the tempering scale, particularly on SLOW cooling through it, and a part tempered there and furnace-cooled comes out at precisely the specified hardness with substantially reduced impact toughness. SECONDARY HARDENING runs the other way and catches anyone reasoning from structural steel: a tool steel such as H13 is HARDER tempered at the high end of its range than the low, because alloy carbides precipitate there, and such grades are commonly double or triple tempered because each temper transforms retained austenite the next one then tempers -- a single temper leaves untempered martensite in the finished part.",
+    editionNote: "Two things go wrong at exactly the right hardness. TEMPER EMBRITTLEMENT is the failure a hardness test cannot find: some alloy steels are susceptible in a range around the middle of the tempering scale, particularly on SLOW cooling through it, and a part tempered there and furnace-cooled comes out at precisely the specified hardness with substantially reduced impact toughness. SECONDARY HARDENING runs the other way and catches anyone reasoning from structural steel: a tool steel such as H13 climbs to a secondary peak (about 54 HRC near 900 degF, against 53 at 700 and 52 at 1,000 on the maker's curve) instead of softening steadily, because alloy carbides precipitate there, and such grades are commonly double or triple tempered because each temper transforms retained austenite the next one then tempers -- a single temper leaves untempered martensite in the finished part.",
     assumptions: [
       { name: "The tempering curve is entered", value: "it is a property of the specific grade", source: "the steel supplier's data" },
       { name: "Embrittlement susceptibility is grade-specific", value: "and the range is entered", source: "the applicable process standard" },
@@ -25494,7 +25494,7 @@ export const CITATIONS = {
   },
   "tank-vent-api-2000": {
     formula: "liquid-movement venting = pump rate x 5.615 cu ft/bbl, times an allowance above unity for a volatile product; the requirement in each direction adds the thermal rate; the fire case is separate.",
-    edition: "The thermal rates and the fire case are ENTERED from the API 2000 tables, which are indexed by tank capacity and by wetted surface area and whose adopted edition governs.",
+    edition: "The 1:1 displacement (5.615 cu ft per bbl) is the ISO 28300 / API 2000 6th-7th edition main method; the 5th edition (1998) Table 1A prints 6 SCFH per bbl/h out-breathing for a non-volatile stock and 12 for a volatile one (about 6.4% above 5.615 x 1 or 2), so state which edition the jurisdiction adopted. The thermal rates and the fire case are ENTERED from the API 2000 tables, which are indexed by tank capacity and by wetted surface area and whose adopted edition governs.",
     freeAccess: "One displacement conversion and two sums.",
     governance: GOVERNANCE.general,
     editionNote: "THE VACUUM SIDE IS THE ONE THAT DESTROYS TANKS. Tanks are far weaker in vacuum than in pressure, so an under-vented tank dishes in long before it would rupture outward -- and every cubic foot of the in-breathing requirement has to pass INWARD through a vent screen that ice, insects or a coat of paint can restrict. That puts vent screen maintenance directly on the path of the failure mode rather than on a housekeeping list. AND THERMAL IN-BREATHING NEEDS NO PUMPING AT ALL, which is what makes it quiet: a warm tank hit by a cold rain contracts its vapour space in minutes, and a tank that has sat idle for weeks with nobody near it can be found dished in the next morning. THE FIRE CASE IS A DIFFERENT ORDER OF MAGNITUDE -- on the case here it is 41 times the normal out-breathing requirement -- which is why emergency relief is a weak-seam roof or a dedicated emergency vent rather than the normal conservation breather.",

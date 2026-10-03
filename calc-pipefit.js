@@ -551,7 +551,7 @@ export function computePipeFilledSupportLoad({ od_in = 0, wall_in = 0, pipe_dens
 export const pipeFilledSupportLoadExample = { inputs: { od_in: 4.5, wall_in: 0.237, pipe_density: 490, fluid_density: 62.4, insul_thk_in: 0, insul_density: 6, spacing_ft: 14 } };
 
 function _renderPipeFilledSupportLoad(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: Operating support load = (empty pipe + contained fluid + insulation) weight per foot x hanger spacing - first-principles cross-section x density, the MSS SP-58 operating support load, by name. Bundled pipe weights are nominal mill values and water is taken at 62.4 lb/ft^3; a hot or dense fluid changes the contents weight, and concentrated loads (valves, flanges) are added separately. Feeds the hanger-rod sizing.";
+  citationEl.textContent = "Citation: Operating support load = (empty pipe + contained fluid + insulation) weight per foot x hanger spacing - first-principles cross-section x density, the MSS SP-58 operating support load, by name. Pipe weight is computed from the entered OD, wall and steel density (no table is bundled; MSS SP-58 / hanger-maker charts are the cross-check) and water is taken at 62.4 lb/ft^3; a hot or dense fluid changes the contents weight, and concentrated loads (valves, flanges) are added separately. Feeds the hanger-rod sizing.";
   const od = makeNumber("Outside diameter (in)", "fl-od", { step: "any", min: "0" });
   const wall = makeNumber("Wall thickness (in)", "fl-wall", { step: "any", min: "0" });
   const pd = makeNumber("Pipe material density (lb/ft3; steel 490)", "fl-pd", { step: "any", min: "0", value: "490" });

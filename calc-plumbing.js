@@ -3799,7 +3799,7 @@ export function computeDrainageInvert({ invert_in_ft = 0, slope = 0, slope_units
     cover_out_ft = surface_out_ft - top_of_pipe_ft;
     // Under-cover when below the supplied minimum; with no minimum given, a
     // negative cover (pipe crown above grade) is itself the flag.
-    cover_flag = Number.isFinite(min_cover_ft) ? cover_out_ft < min_cover_ft : cover_out_ft < 0;
+    cover_flag = Number.isFinite(min_cover_ft) ? cover_out_ft < min_cover_ft - 1e-9 : cover_out_ft < -1e-9; // 3 ft of cover computed 2.999999999999986
   }
   return { slope_ftft, total_fall_ft, invert_out_ft, top_of_pipe_ft, cover_out_ft, cover_flag };
 }

@@ -51478,10 +51478,12 @@ test("bounds: spec-v1674 computePwhtHoldingTime -- thickness compounds THREE tim
   assert.ok(Math.abs(r.total_cycle_hr - 5.15) < 1e-9);
   // The hold is well under half the cycle, which is the whole point.
   assert.ok(r.holding_time_hr / r.total_cycle_hr < 0.4);
-  // IDENTITY: doubling the thickness doubles the hold AND both ramps, so the
-  // whole cycle exactly doubles.
-  assert.ok(Math.abs(r.alt_total_cycle_hr - 10.3) < 1e-9);
-  assert.ok(Math.abs(r.alt_total_cycle_hr - 2 * r.total_cycle_hr) < 1e-9);
+  // On the P-No. 1 table (default) a 4 in section holds 2.5 h, not 4 (UCS-56: 2 h + 15 min per inch
+  // past 2 in), so the cycle is 8.8 h. On a straight rate (rule off) doubling the thickness doubles the
+  // hold AND both ramps, so the whole cycle exactly doubles.
+  assert.ok(Math.abs(r.alt_total_cycle_hr - 8.8) < 1e-9);
+  const lin = _v1674({ ...base, p1_over_2in_rule: 0 });
+  assert.ok(Math.abs(lin.alt_total_cycle_hr - 2 * lin.total_cycle_hr) < 1e-9);
   // The entered rate exceeds the limit and is flagged.
   assert.equal(r.rate_exceeded, true);
   assert.equal(_v1674({ ...base, actual_heating_rate_f_hr: 150 }).rate_exceeded, false);
