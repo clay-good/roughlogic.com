@@ -109,3 +109,53 @@ test("a blank optional field falls back to the compute's own default", () => {
   }
   assert.deepEqual(bad, []);
 });
+
+// The `Number(f.input.value) || 0` form on a field with no prefilled value: a
+// blank computes as 0. Where the compute documents another default AND still
+// returns an answer at 0, the page silently gives a different result than the
+// tile describes (2026-10-03: blank fall-protection fields dropped 7 ft of
+// clearance; blank NEC circuit counts read 0). Fields where 0 is a real value
+// or a measurement the reader supplies are listed with that reason.
+const ZERO_REVIEWED = new Set([
+  "calc-construction.js:pitch", "calc-construction.js:overhang_in", // a flat roof, no overhang
+  "calc-contractorfinance.js:payroll_pct", "calc-contractorfinance.js:overhead_pct",
+  "calc-contractorfinance.js:profit_pct", "calc-contractorfinance.js:retainage_pct", // a blank percentage reads as none
+  "calc-electrical.js:run_length_ft", "calc-electrical.js:growth_reserve_pct", // measured; no reserve
+  "calc-fab.js:kerf_in", "calc-hvac.js:thickness_in", "calc-plumbing.js:run_length_ft", // measured
+  "calc-plumbing.js:side_slope_z", // z = 0 is a rectangular channel
+  "calc-plumbingcode.js:horizontal_to_opening_ft", "calc-plumbingcode.js:side_bar_from_rear_in",
+  "calc-plumbingcode.js:rear_toward_side_in", "calc-plumbingcode.js:rear_toward_open_in",
+  "calc-plumbingcode.js:standoff_in", "calc-plumbingcode.js:clear_space_in", // field measurements
+  "calc-survey.js:tape_weight_plf", "calc-survey.js:standard_pull_lb", // the tape's own properties, entered
+]);
+
+test("a blank unprefilled field does not silently compute as zero against a documented default", async () => {
+  const bad = [];
+  for (const f of readdirSync(ROOT).filter((x) => /^calc-.*\.js$/.test(x))) {
+    const src = readFileSync(resolve(ROOT, f), "utf8");
+    const sigs = [...src.matchAll(/export function (compute\w+)\(\{([^}]*)\}/g)].map((m) => ({
+      fn: m[1], at: m.index,
+      defs: Object.fromEntries([...m[2].matchAll(/(\w+)\s*=\s*(-?[\d.]+)/g)].map((d) => [d[1], Number(d[2])])),
+    }));
+    let mod = null;
+    for (const m of src.matchAll(/(\w+):\s*Number\((\w+)\.input\.value\)\s*\|\|\s*(-?[\d.]+)\b/g)) {
+      const [, key, v, fb] = m;
+      if (ZERO_REVIEWED.has(f + ":" + key)) continue;
+      const before = sigs.filter((s) => key in s.defs && s.at < m.index);
+      const s = before[before.length - 1] || sigs.find((x) => key in x.defs);
+      if (!s || Math.abs(s.defs[key] - Number(fb)) <= 1e-9) continue;
+      const decls = [...src.slice(0, m.index).matchAll(new RegExp("const " + v + " = (\\w+)\\(([^;]*)\\);", "g"))];
+      if (decls.length && /\bvalue:\s*"/.test(decls[decls.length - 1][2])) continue; // prefilled: blank is a deliberate clear
+      mod = mod || await import(resolve(ROOT, f));
+      const fn = mod[s.fn];
+      if (typeof fn !== "function") continue;
+      const exKey = Object.keys(mod).find((k) => k.toLowerCase() === s.fn.replace(/^compute/, "").toLowerCase() + "example");
+      const base = exKey && mod[exKey].inputs ? { ...mod[exKey].inputs } : {};
+      let a, b;
+      try { a = fn({ ...base }); b = fn({ ...base, [key]: Number(fb) }); } catch { continue; }
+      if (!a || a.error || !b || b.error) continue;
+      if (JSON.stringify(a) !== JSON.stringify(b)) bad.push(`${f}:${src.slice(0, m.index).split("\n").length} ${key} blank -> ${fb} computes; ${s.fn} documents ${s.defs[key]}`);
+    }
+  }
+  assert.deepEqual(bad, []);
+});
