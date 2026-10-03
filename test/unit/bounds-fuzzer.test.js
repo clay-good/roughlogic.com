@@ -8849,15 +8849,15 @@ test("bounds: calc-construction computeTileCount pins base_count = ceil(area_in2
   assert.ok("error" in computeTileCount({ area_ft2: 0, tile_width_in: 12, tile_height_in: 12 }));
 });
 
-test("bounds: calc-construction computePaintCoverage pins gallons = area / (coverage*surface_factor) and primer pin", () => {
+test("bounds: calc-construction computePaintCoverage pins gallons = area / coverage (the table carries the surface) and primer pin", () => {
   const r = computePaintCoverage({ area_ft2: 700, coats: 2, primer_needed: true, surface_porosity: "smooth" });
   // coverage 350, factor 1.0 -> gallons/coat = 2.
   assert.strictEqual(r.gallons_per_coat, 2);
   assert.strictEqual(r.total_paint_gallons, 4);
   assert.strictEqual(r.primer_gallons, 2);
-  // Textured: factor 0.7, coverage 250 -> gallons/coat = area / 175.
+  // Textured: coverage 250 -> gallons/coat = area / 250 (no second 0.7 factor on top of the table).
   const t = computePaintCoverage({ area_ft2: 700, coats: 1, surface_porosity: "textured" });
-  assert.ok(Math.abs(t.gallons_per_coat - 700 / (250 * 0.7)) < 1e-9);
+  assert.ok(Math.abs(t.gallons_per_coat - 700 / 250) < 1e-9);
   assert.ok("error" in computePaintCoverage({ area_ft2: 100, surface_porosity: "moon" }));
   assert.ok("error" in computePaintCoverage({ area_ft2: 0, surface_porosity: "smooth" }));
 });
@@ -40970,16 +40970,17 @@ test("bounds: spec-v1406 computeRotorBalanceGrade pins the inverse-in-speed tole
 
 import { computeBearingRegrease as _v1407 } from "../../calc-shop.js";
 test("bounds: spec-v1407 computeBearingRegrease pins the quantity and the corrected interval", () => {
-  // A 6310 (110 x 27 x 50 mm) at 1,800 rpm horizontal: 14.85 g every 900 hours.
+  // A 6310 ball bearing (110 x 27 x 50 mm) at 1,800 rpm horizontal: 14.85 g every ~9,000 hours (K 10).
   const base = { od_mm: 110, width_mm: 27, bore_mm: 50, rpm: 1800, correction_factor: 1.0, duty_hours_per_day: 24 };
   const r = _v1407(base);
   assert.ok(Math.abs(r.grease_grams - 14.85) < 1e-9);
-  assert.ok(Math.abs(r.base_interval_hr - 900) < 1e-1);
+  assert.ok(Math.abs(r.base_interval_hr - 9000) < 1);
+  assert.ok(Math.abs(_v1407({ ...base, bearing_type: "spherical" }).base_interval_hr - 900) < 1e-1); // K 1
   assert.ok(Math.abs(r.corrected_interval_hr - r.base_interval_hr) < 1e-12);
-  assert.ok(Math.abs(r.interval_days - 37.5) < 1e-1);
+  assert.ok(Math.abs(r.interval_days - 375) < 1);
   // Vertical AND hot quarters the interval -- the corrections multiply.
   const bad = _v1407({ ...base, correction_factor: 0.25 });
-  assert.ok(Math.abs(bad.corrected_interval_hr - 225) < 1e-1);
+  assert.ok(Math.abs(bad.corrected_interval_hr - 2250) < 1);
   assert.ok(Math.abs(bad.corrected_interval_hr - r.corrected_interval_hr / 4) < 1e-9);
   // The quantity does NOT depend on speed or on the corrections, only on the free volume.
   assert.ok(Math.abs(_v1407({ ...base, rpm: 3600 }).grease_grams - r.grease_grams) < 1e-12);

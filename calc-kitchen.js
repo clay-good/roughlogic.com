@@ -85,6 +85,10 @@ function _simpleRenderer(spec) {
 }
 
 
+// One large egg, about 50 g (USDA). Until 2026-10-03 the per-egg weight sat in the per-CUP table, so
+// a cup of whole egg converted to 50 g instead of about 243.
+const EGG_G = 50;
+
 export const INGREDIENT_DENSITIES_G_PER_CUP = {
   flour_ap: 125,
   sugar_granulated: 200,
@@ -93,7 +97,7 @@ export const INGREDIENT_DENSITIES_G_PER_CUP = {
   milk: 244,
   water: 237,
   oil: 218,
-  egg_whole: 50, // single egg in g (USDA reference)
+  egg_whole: 243, // grams per CUP of beaten whole egg (USDA); one large egg is EGG_G below
   honey: 340,
   rice_dry: 185,
   oats: 90,
@@ -118,7 +122,7 @@ export function computeRecipeScale({ rows = [], original_yield = 0, target_yield
     let alt_qty = null;
     let alt_unit = null;
     if (r.unit === "egg" && Math.abs(scaled_qty - Math.round(scaled_qty)) > 0.1) {
-      alt_qty = scaled_qty * INGREDIENT_DENSITIES_G_PER_CUP.egg_whole;
+      alt_qty = scaled_qty * EGG_G;
       alt_unit = "g";
     } else if (r.unit === "cup" && r.ingredient && INGREDIENT_DENSITIES_G_PER_CUP[r.ingredient]) {
       const density = INGREDIENT_DENSITIES_G_PER_CUP[r.ingredient];

@@ -238,6 +238,8 @@ export function computeDilution({ c1 = 0, v1 = 0, c2 = 0, v2 = 0, mode = "single
     else if (out.v2 === 0) out.v2 = (c1 * v1) / c2;
     else if (out.c1 === 0) out.c1 = (c2 * v2) / v1;
     else if (out.v1 === 0) out.v1 = (c2 * v2) / c1;
+    // A dilution cannot concentrate: c2 above c1 gave a negative diluent (c1 1, c2 2, v2 100 -> -100).
+    if (out.c2 > out.c1 * (1 + 1e-9)) return { error: "The final concentration cannot exceed the stock; dilution only lowers it." };
     out.diluent = out.v2 - out.v1;
     return out;
   }

@@ -2600,8 +2600,8 @@ SHOP_RENDERERS["rotor-balance-grade"] = _simpleRenderer({
 });
 
 // ===================== spec-v1407: bearing regrease quantity and interval =====================
-// dims: in { od_mm: L, width_mm: L, bore_mm: L, rpm: T^-1, correction_factor: dimensionless, duty_hours_per_day: T } out: { grease_grams: M, base_interval_hr: T, corrected_interval_hr: T }
-export function computeBearingRegrease({ od_mm = 0, width_mm = 0, bore_mm = 0, rpm = 0, correction_factor = 1.0, duty_hours_per_day = 24 } = {}) {
+// dims: in { od_mm: L, width_mm: L, bore_mm: L, rpm: T^-1, correction_factor: dimensionless, duty_hours_per_day: T, bearing_type: dimensionless } out: { grease_grams: M, base_interval_hr: T, corrected_interval_hr: T }
+export function computeBearingRegrease({ od_mm = 0, width_mm = 0, bore_mm = 0, rpm = 0, correction_factor = 1.0, duty_hours_per_day = 24, bearing_type = "ball" } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(od_mm > 0)) return { error: "Bearing outside diameter must be positive." };
   if (!(width_mm > 0)) return { error: "Bearing width must be positive." };
@@ -2613,7 +2613,12 @@ export function computeBearingRegrease({ od_mm = 0, width_mm = 0, bore_mm = 0, r
   // Over-greasing is NOT conservative: excess grease is churned, it heats, and it either
   // bleeds out or cooks into a varnish that starves the bearing.
   const grease_grams = 0.005 * od_mm * width_mm;
-  const base_interval_hr = 14000000 / (rpm * Math.sqrt(bore_mm)) - 4 * bore_mm;
+  // The relation carries a bearing-type factor K (SKF; STLE, April 2009, Fig. 7-8): 10 for a radial ball
+  // bearing, 5 for cylindrical and needle rollers, 1 for spherical and tapered rollers. Until 2026-10-03 it
+  // was always 1, so a 6310 ball bearing at 1,800 rpm read 900 h where the chart gives about 9,000.
+  const K = { ball: 10, cylindrical: 5, spherical: 1 }[bearing_type];
+  if (K === undefined) return { error: "Bearing type must be ball, cylindrical, or spherical." };
+  const base_interval_hr = K * (14000000 / (rpm * Math.sqrt(bore_mm)) - 4 * bore_mm);
   if (!(base_interval_hr > 0)) {
     return { error: "At this speed and bore the relation gives no relubrication interval -- the bearing is past the grease-lubrication range and wants oil or a continuous system." };
   }
@@ -2625,11 +2630,11 @@ export function computeBearingRegrease({ od_mm = 0, width_mm = 0, bore_mm = 0, r
     base_interval_hr,
     corrected_interval_hr,
     interval_days,
-    note: "How much grease a bearing takes and how often, which are two numbers commonly wrong in the field in opposite directions. The quantity is proportional to the bearing's outside diameter times its width -- essentially to the free volume inside it -- and it comes out much smaller than people expect: a 110 mm by 27 mm bearing takes about 15 grams, not a cartridge. Over-greasing is not the conservative choice it feels like, because excess grease is churned by the rolling elements, it heats, and it either bleeds out or cooks into a varnish that starves the bearing. A great many lubrication failures are over-lubrication. The interval falls with both speed and bore, and the base relation applies to a horizontal, moderately loaded bearing at normal temperature; the correction factor cuts it hard from there. Roughly halve it for every fifteen degrees Celsius above about 70 C, halve it again for a vertical shaft, and cut it substantially for heavy load, contamination, or vibration -- so two identical bearings in different service can have intervals a factor of ten apart. A 6310 at 1,800 rpm horizontal takes 14.9 g every 900 hours, about five weeks of continuous running; put the same bearing on a vertical shaft in a hot room and it is roughly 225 hours, and a schedule built on the base number would be four times too slow. A planning figure; the bearing manufacturer's own relubrication chart, the grease's specification, and a condition-monitoring program govern.",
+    note: "How much grease a bearing takes and how often, which are two numbers commonly wrong in the field in opposite directions. The quantity is proportional to the bearing's outside diameter times its width -- essentially to the free volume inside it -- and it comes out much smaller than people expect: a 110 mm by 27 mm bearing takes about 15 grams, not a cartridge. Over-greasing is not the conservative choice it feels like, because excess grease is churned by the rolling elements, it heats, and it either bleeds out or cooks into a varnish that starves the bearing. A great many lubrication failures are over-lubrication. The interval falls with both speed and bore, and the base relation applies to a horizontal, moderately loaded bearing at normal temperature; the correction factor cuts it hard from there. Roughly halve it for every fifteen degrees Celsius above about 70 C, halve it again for a vertical shaft, and cut it substantially for heavy load, contamination, or vibration -- so two identical bearings in different service can have intervals a factor of ten apart. A 6310 ball bearing at 1,800 rpm horizontal takes 14.9 g about every 9,000 hours (the relation's 900 h times the ball-bearing factor of 10), about a year of continuous running; put the same bearing on a vertical shaft in a hot room and it is roughly 2,250 hours, and a schedule built on the base number would be four times too slow. A spherical roller bearing of the same bore takes the factor 1: ten times as often. A planning figure; the bearing manufacturer's own relubrication chart, the grease's specification, and a condition-monitoring program govern.",
   };
 }
 
-export const bearingRegreaseExample = { inputs: { od_mm: 110, width_mm: 27, bore_mm: 50, rpm: 1800, correction_factor: 1.0, duty_hours_per_day: 24 } };
+export const bearingRegreaseExample = { inputs: { od_mm: 110, width_mm: 27, bore_mm: 50, rpm: 1800, correction_factor: 1.0, duty_hours_per_day: 24, bearing_type: "ball" } };
 
 SHOP_RENDERERS["bearing-regrease"] = _simpleRenderer({
   citation: "Citation: grease quantity from the bearing's free volume, G = 0.005 x OD x width in grams from millimetres, and the standard relubrication-interval relation 14,000,000 / (rpm x sqrt(bore)) - 4 x bore for a horizontal, moderately loaded bearing at normal temperature, by name -- published bearing-maintenance practice, cited not reproduced. The correction factor for temperature, orientation, load, and contamination is entered. The bearing manufacturer's own relubrication chart and a condition-monitoring program govern.",
@@ -2641,6 +2646,7 @@ SHOP_RENDERERS["bearing-regrease"] = _simpleRenderer({
     { key: "rpm", label: "Operating speed (rpm)", kind: "number" },
     { key: "correction_factor", label: "Correction factor (1.0 base; 0.5 vertical or hot, 0.25 both)", kind: "number" },
     { key: "duty_hours_per_day", label: "Operating hours per day", kind: "number" },
+    { key: "bearing_type", label: "Bearing type (interval factor K)", kind: "select", options: [{ value: "ball", label: "Radial ball (K 10)" }, { value: "cylindrical", label: "Cylindrical / needle roller (K 5)" }, { value: "spherical", label: "Spherical / tapered roller (K 1)" }], default: "ball" },
   ],
   outputs: [
     { key: "g", id: "brgr-out-g", label: "Grease quantity", value: (r) => fmt(r.grease_grams, 1) + " g" },

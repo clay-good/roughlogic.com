@@ -108975,7 +108975,7 @@
    "source_publisher": "Project (first-principles)",
    "source_title": "6310 deep-groove ball bearing (110 x 27 x 50 mm) at 1,800 rpm, horizontal",
    "source_edition_or_year": "bearing maintenance practice",
-   "source_section_or_page": "0.005 OD x width; 14e6 / (rpm sqrt(bore)) - 4 bore",
+   "source_section_or_page": "0.005 OD x width; K x (14e6 / (rpm sqrt(bore)) - 4 bore) with K 10 for a ball bearing (recomputed 2026-10-03; K was missing, 899.9 h)",
    "verified_by": "rl",
    "verified_on": "2026-08-26",
    "inputs": {
@@ -108984,7 +108984,8 @@
     "bore_mm": 50,
     "rpm": 1800,
     "correction_factor": 1,
-    "duty_hours_per_day": 24
+    "duty_hours_per_day": 24,
+    "bearing_type": "ball"
    },
    "outputs": {
     "grease_grams": {
@@ -108994,13 +108995,13 @@
      }
     },
     "base_interval_hr": {
-     "value": 899.944,
+     "value": 8999.44,
      "tolerance": {
       "pct": 0.5
      }
     },
     "corrected_interval_hr": {
-     "value": 899.944,
+     "value": 8999.44,
      "tolerance": {
       "pct": 0.5
      }
@@ -159726,6 +159727,1697 @@
      "value": 45.5,
      "tolerance": {
       "pct": 1.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "dilution",
+   "source_publisher": "LibreTexts (Heartland Community College, CHEM 120)",
+   "source_title": "7.19: Concentrations: Dilution, CHEM 120 Fundamentals of Chemistry",
+   "source_edition_or_year": "LibreTexts online text, retrieved 2026-10-03",
+   "source_section_or_page": "Section on the dilution equation, worked example: 'calculate the volume of a 99.5% v/v solution of acetic acid ... diluted to prepare 5.6 liters of vinegar, which has a concentration of 5.0% v/v'; printed V1 = 0.281407... L ~ 0.28 L. Tile concentrate_volume 0.28141 (L); abs 0.0005 covers the printed unrounded 0.281407.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "concentrate_percent": 99.5,
+    "target_percent": 5.0,
+    "final_volume": 5.6
+   },
+   "outputs": {
+    "concentrate_volume": {
+     "value": 0.281407,
+     "tolerance": {
+      "abs": 0.0005
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "lab-dilution",
+   "source_publisher": "LibreTexts (Heartland Community College, CHEM 120)",
+   "source_title": "7.19: Concentrations: Dilution, CHEM 120 Fundamentals of Chemistry",
+   "source_edition_or_year": "LibreTexts online text, retrieved 2026-10-03",
+   "source_section_or_page": "Exercise 1: 'diluting 250 milliliters of a 3.9 M solution to a final volume of 1.55 liters' (worked in mL, V2 = 1,550 mL); printed C2 = 0.629032... M ~ 0.63 M. Tile c2 0.629032; abs 0.0005 covers the printed truncation.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "c1": 3.9,
+    "v1": 250,
+    "c2": 0,
+    "v2": 1550,
+    "mode": "single"
+   },
+   "outputs": {
+    "c2": {
+     "value": 0.629032,
+     "tolerance": {
+      "abs": 0.0005
+     }
+    },
+    "diluent": {
+     "value": 1300,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "lab-dilution",
+   "source_publisher": "LibreTexts (Soult, Chemistry for Allied Health)",
+   "source_title": "8.1: Concentrations of Solutions, Chemistry for Allied Health",
+   "source_edition_or_year": "LibreTexts online text, retrieved 2026-10-03",
+   "source_section_or_page": "Dilutions section: '100. mL of a 2.0 M solution of HCl ... make the solution volume 500. mL'; printed M2 = 2.0 M x 100. mL / 500. mL = 0.40 M HCl. Tile c2 0.4 exact; diluent 400 mL is V2 - V1 of the printed volumes.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "c1": 2.0,
+    "v1": 100,
+    "c2": 0,
+    "v2": 500,
+    "mode": "single"
+   },
+   "outputs": {
+    "c2": {
+     "value": 0.4,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "lab-dilution",
+   "source_publisher": "LibreTexts (Soult, Chemistry for Allied Health)",
+   "source_title": "8.1: Concentrations of Solutions, Chemistry for Allied Health",
+   "source_edition_or_year": "LibreTexts online text, retrieved 2026-10-03",
+   "source_section_or_page": "Example (nitric acid): stock 16 M, 'make 8.00 L of a 0.50 M solution'; printed V1 = 0.50 M x 8.00 L / 16 M = 0.25 L = 250 mL. Tile v1 0.25 exact (L).",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "c1": 16,
+    "v1": 0,
+    "c2": 0.5,
+    "v2": 8.0,
+    "mode": "single"
+   },
+   "outputs": {
+    "v1": {
+     "value": 0.25,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "resuspension-volume",
+   "source_publisher": "Janssen Biotech / U.S. FDA (accessdata.fda.gov)",
+   "source_title": "Infliximab for injection, Full Prescribing Information (BLA 103772)",
+   "source_edition_or_year": "label revised 2021 (103772s5401lbl.pdf)",
+   "source_section_or_page": "Section 2.11 Reconstitution, Dilution, and Administration Instructions, PDF p. 6: 'Reconstitute each 100 mg Infliximab vial with 10 mL of Sterile Water for Injection, USP, to obtain a concentration of 10 mg/mL'. Inputs in the existing row convention (mass in g, target in g/L = mg/mL, volume returned in L): 0.1 g / 10 g/L = 0.010 L = 10 mL, exact.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "mass_g": 0.1,
+    "target_concentration": 10
+   },
+   "outputs": {
+    "volume": {
+     "value": 0.01,
+     "tolerance": {
+      "abs": 1e-05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "recipe-scale",
+   "source_publisher": "Institute of Child Nutrition (USDA-funded, University of Mississippi)",
+   "source_title": "CACFP iTrain Simple Lesson Plan: Adjusting Standardized Recipes",
+   "source_edition_or_year": "2021 (PDF created 2021-11-02)",
+   "source_section_or_page": "PDF p. 7 (script) and p. 10 handout 'Example 1: Increasing a recipe from 25 servings to 35 servings': '35 / 25 = 1.4 ... 3 cups X 1.4 = 4.2 cups' (then rounded to 4 1/4 cups for measuring). Tile factor 1.4 exact; scaled row 4.2 cups (array output, not fixture-checked).",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "rows": [
+     {
+      "ingredient": "tomatoes",
+      "quantity": 3,
+      "unit": "cup"
+     }
+    ],
+    "original_yield": 25,
+    "target_yield": 35
+   },
+   "outputs": {
+    "factor": {
+     "value": 1.4,
+     "tolerance": {
+      "abs": 0.0001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "cctv-storage",
+   "source_publisher": "Axis Communications",
+   "source_title": "Technical guide to network video",
+   "source_edition_or_year": "2008 (bc_techguide_33334_en_0811)",
+   "source_section_or_page": "Section 12.1.2 Calculating storage needs, p. 108-109, Table 12.1a (H.264): 'Approx. bit rate / 8 x 3600s = KB per hour / 1000 = MB per hour; MB per hour x hours of operation per day / 1000 = GB per day'; Camera No. 3, 4CIF, 600 Kbit/s, 15 fps, 270 MB/hour, 12 hours of operation, printed 3.2 GB/day. 12 h of 24 entered as motion duty 50%. Tile 3.24 GB/day; abs 0.05 covers the printed one-decimal rounding. Same decimal (1000) convention as the tile's 0.45 constant.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "camera_count": 1,
+    "bitrate_mbps": 0.6,
+    "recording_mode": "motion",
+    "motion_duty_percent": 50,
+    "retention_days": 1
+   },
+   "outputs": {
+    "per_camera_day_gb": {
+     "value": 3.2,
+     "tolerance": {
+      "abs": 0.05
+     }
+    },
+    "total_storage_gb": {
+     "value": 3.2,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "cctv-storage",
+   "source_publisher": "Axis Communications",
+   "source_title": "Technical guide to network video",
+   "source_edition_or_year": "2008 (bc_techguide_33334_en_0811)",
+   "source_section_or_page": "Section 12.1.2, p. 109, Table 12.1b (MPEG-4): Camera No. 2, CIF, 400 Kbit/s, 15 fps, printed 180 MB/hour, 8 hours of operation, printed 1.4 GB/day. 8 h of 24 entered as motion duty 33.333%. Tile 1.44 GB/day (180 MB/h x 8 / 1000); abs 0.05 covers the printed one-decimal rounding.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "camera_count": 1,
+    "bitrate_mbps": 0.4,
+    "recording_mode": "motion",
+    "motion_duty_percent": 33.333333333333336,
+    "retention_days": 1
+   },
+   "outputs": {
+    "per_camera_day_gb": {
+     "value": 1.4,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "cctv-storage",
+   "source_publisher": "Axis Communications",
+   "source_title": "Technical guide to network video",
+   "source_edition_or_year": "2008 (bc_techguide_33334_en_0811)",
+   "source_section_or_page": "Section 12.1.2, p. 108, Table 12.1a (H.264): Camera No. 1, CIF, 110 Kbit/s, 5 fps, printed 49.5 MB/hour, 8 hours of operation, printed 0.4 GB/day. 8 h of 24 entered as motion duty 33.333%. Tile 0.396 GB/day; abs 0.05 covers the printed one-decimal rounding.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "camera_count": 1,
+    "bitrate_mbps": 0.11,
+    "recording_mode": "motion",
+    "motion_duty_percent": 33.333333333333336,
+    "retention_days": 1
+   },
+   "outputs": {
+    "per_camera_day_gb": {
+     "value": 0.4,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "video-wall-data-rate",
+   "source_publisher": "Biamp Systems",
+   "source_title": "Video Basics (Biamp Cornerstone support article)",
+   "source_edition_or_year": "web article, retrieved 2026-10-03",
+   "source_section_or_page": "'Examples of various video formats' list: '1080p, 60 Hz, RGB 4:4:4, 10-bit = 3.73 Gbps' (uncompressed, 3 full-resolution channels). Tile 1,920 x 1,080 x 10 x 3 x 60 / 1e9 = 3.7325 Gbps; abs 0.01 covers the printed two-decimal rounding. pixels_per_port is the tile default and does not enter the data rate.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "width_px": 1920,
+    "height_px": 1080,
+    "bit_depth": 10,
+    "refresh_hz": 60,
+    "pixels_per_port": 650000
+   },
+   "outputs": {
+    "data_rate_gbps": {
+     "value": 3.73,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "total_pixels": {
+     "value": 2073600,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "time-alignment",
+   "source_publisher": "The Engineering ToolBox",
+   "source_title": "Air - Speed of Sound vs. Temperature",
+   "source_edition_or_year": "web reference, retrieved 2026-10-03",
+   "source_section_or_page": "'Air - Speed of Sound vs. Temperature - SI Units' table: 20 C -> 343.3 m/s (the page's own formula v = 20.05 (273.16 + tC)^1/2). Tile linear form 331.3 + 0.606 x 20 = 343.42 m/s; abs 0.15 covers the linear-vs-square-root difference at 20 C. Distances and Haas offset are not on the table and do not enter c_m_s.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "d_main_ft": 80,
+    "d_delay_ft": 30,
+    "ambient_C": 20,
+    "haas_offset_ms": 15
+   },
+   "outputs": {
+    "c_m_s": {
+     "value": 343.3,
+     "tolerance": {
+      "abs": 0.15
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "delay-tower-alignment",
+   "source_publisher": "The Engineering ToolBox",
+   "source_title": "Air - Speed of Sound vs. Temperature",
+   "source_edition_or_year": "web reference, retrieved 2026-10-03",
+   "source_section_or_page": "'Air - Speed of Sound vs. Temperature - Imperial Units' table: 70 F -> 1128 ft/s and 90 F -> 1149 ft/s; page formula 'v_fts = 49.03 (459.7 + tF)^1/2' (the tile's constant). Tile 1,128.40 and 1,149.51 ft/s; abs 1 covers the table's whole-number truncation. distance_ft and haas_offset_ms do not enter the speed outputs.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "distance_ft": 180,
+    "temp_f": 70,
+    "haas_offset_ms": 15,
+    "compare_temp_f": 90
+   },
+   "outputs": {
+    "speed_ft_s": {
+     "value": 1128,
+     "tolerance": {
+      "abs": 1
+     }
+    },
+    "compare_speed_ft_s": {
+     "value": 1149,
+     "tolerance": {
+      "abs": 1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "delay-tower-alignment",
+   "source_publisher": "The Engineering ToolBox",
+   "source_title": "Air - Speed of Sound vs. Temperature",
+   "source_edition_or_year": "web reference, retrieved 2026-10-03",
+   "source_section_or_page": "Imperial table: 60 F -> 1117 ft/s and 100 F -> 1159 ft/s (49.03 (459.7 + tF)^1/2). Tile 1,117.70 and 1,159.92 ft/s; abs 1 covers the table's whole-number truncation.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "distance_ft": 180,
+    "temp_f": 60,
+    "haas_offset_ms": 15,
+    "compare_temp_f": 100
+   },
+   "outputs": {
+    "speed_ft_s": {
+     "value": 1117,
+     "tolerance": {
+      "abs": 1
+     }
+    },
+    "compare_speed_ft_s": {
+     "value": 1159,
+     "tolerance": {
+      "abs": 1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "driver-spacing-lobing",
+   "source_publisher": "The Engineering ToolBox",
+   "source_title": "Air - Speed of Sound vs. Temperature",
+   "source_edition_or_year": "web reference, retrieved 2026-10-03",
+   "source_section_or_page": "Imperial table: 70 F -> 1128 ft/s (49.03 (459.7 + tF)^1/2). Tile speed_ft_s 1,128.40; abs 1 covers the table's whole-number value. Spacing and test frequency do not enter the speed output.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "spacing_ft": 1.5,
+    "test_freq_hz": 500,
+    "temp_f": 70
+   },
+   "outputs": {
+    "speed_ft_s": {
+     "value": 1128,
+     "tolerance": {
+      "abs": 1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "thread-pitch",
+   "source_publisher": "U.S. Navy, Naval Education and Training Program",
+   "source_title": "Machinery Repairman, NAVEDTRA 12204-A",
+   "source_edition_or_year": "1993",
+   "source_section_or_page": "Chapter 6, p. 6-48 ('Pitch = 1/n or 1 / number of threads per inch'; 'Straight Depth of thread = 0.866 x pitch') and p. 6-53 (PDF p. 178) worked 3/4-10 UNC-2A example: 'Pitch (P) = 0.100 in.' and '(0.86603 in x 0.100 in.)' = '0.086603 in.'. Tile pitch 0.1 in, sharp-V H 0.0866025 in; abs 0.000001 covers the printed 5-figure constant.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "thread_standard": "inch",
+    "tpi": 10,
+    "pitch_mm": 0,
+    "starts": 1
+   },
+   "outputs": {
+    "pitch_in": {
+     "value": 0.1,
+     "tolerance": {
+      "abs": 1e-06
+     }
+    },
+    "sharp_v_height_in": {
+     "value": 0.086603,
+     "tolerance": {
+      "abs": 1e-06
+     }
+    },
+    "lead_in": {
+     "value": 0.1,
+     "tolerance": {
+      "abs": 1e-06
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "markup",
+   "source_publisher": "OpenStax, Rice University",
+   "source_title": "Contemporary Mathematics (Kirk et al.), Section 6.2 Discounts, Markups, and Sales Tax",
+   "source_edition_or_year": "2023 (openstax.org; LibreTexts mirror)",
+   "source_section_or_page": "Example 7 (Determining the Retail Price Based on the Cost and the Percent Markup): 'Cost = $62.00; percent markup is 15%' -> 'markup = 0.15 x 62.00 = 9.30' ... '$62.00 + $9.30 = $71.30'. Exact; abs 0.005 covers cent printing.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "cost": 62,
+    "mode": "markup_percent",
+    "value": 15
+   },
+   "outputs": {
+    "selling_price": {
+     "value": 71.3,
+     "tolerance": {
+      "abs": 0.005
+     }
+    },
+    "profit": {
+     "value": 9.3,
+     "tolerance": {
+      "abs": 0.005
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "markup",
+   "source_publisher": "OpenStax, Rice University",
+   "source_title": "Contemporary Mathematics (Kirk et al.), Section 6.2 Discounts, Markups, and Sales Tax",
+   "source_edition_or_year": "2023 (openstax.org; LibreTexts mirror)",
+   "source_section_or_page": "Example 7 part 2: 'Cost = $750.00; percent markup is 45%' -> 'The markup is $337.50' ... '$750.00 + $337.50 = $1,087.50'. Exact.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "cost": 750,
+    "mode": "markup_percent",
+    "value": 45
+   },
+   "outputs": {
+    "selling_price": {
+     "value": 1087.5,
+     "tolerance": {
+      "abs": 0.005
+     }
+    },
+    "profit": {
+     "value": 337.5,
+     "tolerance": {
+      "abs": 0.005
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "markup",
+   "source_publisher": "OpenStax, Rice University",
+   "source_title": "Contemporary Mathematics (Kirk et al.), Section 6.2 Discounts, Markups, and Sales Tax",
+   "source_edition_or_year": "2023 (openstax.org; LibreTexts mirror)",
+   "source_section_or_page": "Example 10: 'A furniture outlet spends $360.00 to buy a bed. The store marks up the bed by 250%' -> markup $900.00, retail price $1,260.00. Exact.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "cost": 360,
+    "mode": "markup_percent",
+    "value": 250
+   },
+   "outputs": {
+    "selling_price": {
+     "value": 1260,
+     "tolerance": {
+      "abs": 0.005
+     }
+    },
+    "profit": {
+     "value": 900,
+     "tolerance": {
+      "abs": 0.005
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "markup",
+   "source_publisher": "OpenStax, Rice University",
+   "source_title": "Contemporary Mathematics (Kirk et al.), Section 6.2 Discounts, Markups, and Sales Tax",
+   "source_edition_or_year": "2023 (openstax.org; LibreTexts mirror)",
+   "source_section_or_page": "Example 8 (Calculating the Percent Markup from the Cost and Retail Price), 'Round percentages to two decimal places': 'Cost = $5.20; retail price = $9.90' -> 'Solving for the markup gives $4.70' ... 'the percent markup is 90.38%'. Tile 90.3846; abs 0.006 covers the two-decimal rounding.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "cost": 5.2,
+    "mode": "selling_price",
+    "value": 9.9
+   },
+   "outputs": {
+    "markup_percent": {
+     "value": 90.38,
+     "tolerance": {
+      "abs": 0.006
+     }
+    },
+    "profit": {
+     "value": 4.7,
+     "tolerance": {
+      "abs": 0.005
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "markup",
+   "source_publisher": "OpenStax, Rice University",
+   "source_title": "Contemporary Mathematics (Kirk et al.), Section 6.2 Discounts, Markups, and Sales Tax",
+   "source_edition_or_year": "2023 (openstax.org; LibreTexts mirror)",
+   "source_section_or_page": "Example 11 (Percent Markup of a Phone): 'the cost of the phone to the store was $480.00. The phone sells for $840.00' -> 'the markup is $840.00 - $480.00 = $360.00' ... 'The markup on the phone is 75%'. Exact.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "cost": 480,
+    "mode": "selling_price",
+    "value": 840
+   },
+   "outputs": {
+    "markup_percent": {
+     "value": 75,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "profit": {
+     "value": 360,
+     "tolerance": {
+      "abs": 0.005
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "markup",
+   "source_publisher": "eCampusOntario (Pressbooks), adapted from Jean-Paul Olivier, Business Math: A Step-by-Step Handbook (Lyryx)",
+   "source_title": "Introduction to Business Math, Section 4.3 Markup: Setting the Regular Price",
+   "source_edition_or_year": "Pressbooks edition (Wayback 2024 capture)",
+   "source_section_or_page": "Example 4.3.7 (TI BAII Plus calculator): 'S = $39.99, C = $17.23' -> 'M$ = $22.76', 'MoC% = 132.0952%', 'MoS% = 56.9142%' (markup on selling price = the tile's margin). Tile 132.09518 / 56.91423; abs 0.0001 covers the four-decimal print.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "cost": 17.23,
+    "mode": "selling_price",
+    "value": 39.99
+   },
+   "outputs": {
+    "markup_percent": {
+     "value": 132.0952,
+     "tolerance": {
+      "abs": 0.0001
+     }
+    },
+    "margin_percent": {
+     "value": 56.9142,
+     "tolerance": {
+      "abs": 0.0001
+     }
+    },
+    "profit": {
+     "value": 22.76,
+     "tolerance": {
+      "abs": 0.005
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "markup",
+   "source_publisher": "eCampusOntario (Pressbooks), adapted from Jean-Paul Olivier, Business Math: A Step-by-Step Handbook (Lyryx)",
+   "source_title": "Introduction to Business Math, Section 4.3 Markup: Setting the Regular Price",
+   "source_edition_or_year": "Pressbooks edition (Wayback 2024 capture)",
+   "source_section_or_page": "Example 4.3.3 (Benthal Appliance fridge): expenses 30% of S plus profit 25% of S, 'C = $1,200.00' -> 'S = $1,200.00 + 0.55S' ... '0.45S = $1,200.00', 'S = $2,666.67'. Expenses+profit on selling price is the margin, 55% as printed (0.55S). Tile 2666.667; abs 0.005 covers cent rounding.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "cost": 1200,
+    "mode": "margin_percent",
+    "value": 55
+   },
+   "outputs": {
+    "selling_price": {
+     "value": 2666.67,
+     "tolerance": {
+      "abs": 0.005
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "material-cost",
+   "source_publisher": "OpenStax, Rice University",
+   "source_title": "Contemporary Mathematics (Kirk et al.), Section 6.2 Discounts, Markups, and Sales Tax",
+   "source_edition_or_year": "2023 (openstax.org; LibreTexts mirror)",
+   "source_section_or_page": "Example 13 (Sales Tax in Kankakee, Illinois), 'The sales tax in Kankakee, Illinois, is 8.25%', 'Purchase price = $34.88' -> '$34.88 x 0.0825 = $2.8776' ... 'the sales tax is $2.88' ... '$34.88 + $2.88 = $37.76'. Tile does not round tax to the cent (2.8776 / 37.7576); abs 0.005 covers the printed cent rounding. (Part 1 of this example prints a wrong total, $464.87 from a mistyped $35.88, so it is not used.)",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "unit_price": 34.88,
+    "quantity": 1,
+    "tax_rate_percent": 8.25,
+    "delivery_fee": 0
+   },
+   "outputs": {
+    "subtotal": {
+     "value": 34.88,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "tax": {
+     "value": 2.88,
+     "tolerance": {
+      "abs": 0.005
+     }
+    },
+    "total": {
+     "value": 37.76,
+     "tolerance": {
+      "abs": 0.005
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "material-cost",
+   "source_publisher": "OpenStax, Rice University",
+   "source_title": "Contemporary Mathematics (Kirk et al.), Section 6.2 Discounts, Markups, and Sales Tax",
+   "source_edition_or_year": "2023 (openstax.org; LibreTexts mirror)",
+   "source_section_or_page": "Example 16 (Compute Sales Tax for Denver, Colorado): 'The sales tax rate in Denver Colorado is 8.81%' ... 'purchase price (before taxes) is $499.00' -> '$499 x 0.0881 = $43.96' ... '$499.00 + $43.96 = $542.96'. Tile 43.9619 / 542.9619; abs 0.005 covers cent rounding.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "unit_price": 499,
+    "quantity": 1,
+    "tax_rate_percent": 8.81,
+    "delivery_fee": 0
+   },
+   "outputs": {
+    "tax": {
+     "value": 43.96,
+     "tolerance": {
+      "abs": 0.005
+     }
+    },
+    "total": {
+     "value": 542.96,
+     "tolerance": {
+      "abs": 0.005
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "sales-tax-compound",
+   "source_publisher": "OpenStax, Rice University",
+   "source_title": "Contemporary Mathematics (Kirk et al.), Section 6.2 Discounts, Markups, and Sales Tax",
+   "source_edition_or_year": "2023 (openstax.org; LibreTexts mirror)",
+   "source_section_or_page": "Example 16 (Denver): combined 'sales tax rate in Denver Colorado is 8.81%' on '$499.00' -> tax '$43.96', total '$542.96'. Only the combined rate is printed, so it is entered as rate1 with rate2 = 0. Tile 43.9619; abs 0.005 covers cent rounding.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "pre_tax": 499,
+    "post_tax": 0,
+    "rate1_pct": 8.81,
+    "rate2_pct": 0
+   },
+   "outputs": {
+    "tax": {
+     "value": 43.96,
+     "tolerance": {
+      "abs": 0.005
+     }
+    },
+    "post_tax": {
+     "value": 542.96,
+     "tolerance": {
+      "abs": 0.005
+     }
+    },
+    "combined_rate_pct": {
+     "value": 8.81,
+     "tolerance": {
+      "abs": 0.0001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "sales-tax-compound",
+   "source_publisher": "OpenStax, Rice University",
+   "source_title": "Contemporary Mathematics (Kirk et al.), Section 6.2 Discounts, Markups, and Sales Tax",
+   "source_edition_or_year": "2023 (openstax.org; LibreTexts mirror)",
+   "source_section_or_page": "Example 17 (Compute Sales Tax for Austin, Texas), reverse: 'She spends, including sales tax, $467.64. The sales tax rate in Austin Texas is 8.25%' -> '$467.64 = purchase price x (1.0825)', '$432 = purchase price' ... 'Jillian pays $35.64 in sales tax'. Exact.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "pre_tax": 0,
+    "post_tax": 467.64,
+    "rate1_pct": 8.25,
+    "rate2_pct": 0
+   },
+   "outputs": {
+    "pre_tax": {
+     "value": 432,
+     "tolerance": {
+      "abs": 0.005
+     }
+    },
+    "tax": {
+     "value": 35.64,
+     "tolerance": {
+      "abs": 0.005
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "sales-tax-compound",
+   "source_publisher": "OpenStax, Rice University",
+   "source_title": "Contemporary Mathematics (Kirk et al.), Section 6.2 Discounts, Markups, and Sales Tax",
+   "source_edition_or_year": "2023 (openstax.org; LibreTexts mirror)",
+   "source_section_or_page": "Example 15 (Calculating the Purchase Price from the Sales Tax and Total Price): 'Sales tax rate = 5.75%; total price = $36.56' -> '$36.56 / 1.0575 = purchase price', '$34.57 = purchase price'. Tile 34.5721; abs 0.005 covers cent rounding.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "pre_tax": 0,
+    "post_tax": 36.56,
+    "rate1_pct": 5.75,
+    "rate2_pct": 0
+   },
+   "outputs": {
+    "pre_tax": {
+     "value": 34.57,
+     "tolerance": {
+      "abs": 0.005
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "sales-tax-compound",
+   "source_publisher": "OpenStax, Rice University",
+   "source_title": "Contemporary Mathematics (Kirk et al.), Section 6.2 Discounts, Markups, and Sales Tax",
+   "source_edition_or_year": "2023 (openstax.org; LibreTexts mirror)",
+   "source_section_or_page": "Example 15 part 2: 'Sales tax rate = 4.25%; total price = $97.17' -> '$97.17 / 1.0425 = purchase price', '$93.21 = purchase price'. Tile 93.2086; abs 0.005 covers cent rounding.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "pre_tax": 0,
+    "post_tax": 97.17,
+    "rate1_pct": 4.25,
+    "rate2_pct": 0
+   },
+   "outputs": {
+    "pre_tax": {
+     "value": 93.21,
+     "tolerance": {
+      "abs": 0.005
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "overtime",
+   "source_publisher": "U.S. Department of Labor, Wage and Hour Division (Code of Federal Regulations via eCFR)",
+   "source_title": "29 CFR 778.110 Hourly rate employee",
+   "source_edition_or_year": "eCFR as of 2025-01-01 (76 FR 18857, Apr. 5, 2011)",
+   "source_section_or_page": "778.110(a): 'a $12 hourly rate will bring, for an employee who works 46 hours, a total weekly wage of $588 (46 hours at $12 plus 6 at $6) ... $12 an hour for 40 hours and $18 an hour for the 6 hours of overtime'. Exact. 46 hr is under the tile's 60 hr double-time default, so that default does not enter.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "total_hours": 46,
+    "regular_rate": 12,
+    "overtime_multiplier": 1.5,
+    "double_time_multiplier": 2.0,
+    "double_time_threshold_hr": 60
+   },
+   "outputs": {
+    "regular_pay": {
+     "value": 480,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "overtime_hours": {
+     "value": 6,
+     "tolerance": {
+      "abs": 0
+     }
+    },
+    "overtime_pay": {
+     "value": 108,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "gross_pay": {
+     "value": 588,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "overtime",
+   "source_publisher": "U.S. Department of Labor, Wage and Hour Division (Code of Federal Regulations via eCFR)",
+   "source_title": "29 CFR 778.110 Hourly rate employee",
+   "source_edition_or_year": "eCFR as of 2025-01-01 (76 FR 18857, Apr. 5, 2011)",
+   "source_section_or_page": "778.110(b): with a $46 production bonus 'the regular hourly rate of pay is $13 an hour' (printed) ... 'entitled to be paid a total wage of $637 for 46 hours (... or 40 hours at $13 plus 6 hours at $19.50)'. The tile has no bonus input; the printed $13 regular rate is entered directly. Exact.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "total_hours": 46,
+    "regular_rate": 13,
+    "overtime_multiplier": 1.5,
+    "double_time_multiplier": 2.0,
+    "double_time_threshold_hr": 60
+   },
+   "outputs": {
+    "regular_pay": {
+     "value": 520,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "overtime_pay": {
+     "value": 117,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "gross_pay": {
+     "value": 637,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "tip-out",
+   "source_publisher": "Block, Inc. (Square), The Bottom Line",
+   "source_title": "What You Need to Know About Tip Pooling",
+   "source_edition_or_year": "squareup.com article (read 2026-10-03)",
+   "source_section_or_page": "Hours-based pool example: '$220 / 22 hours = $10 per hour', then '8 hours x $10 = $80', '8 hours x $10 = $80', '6 hours x $10 = $60'. Tile total_hours 22 and splits 80/80/60 (splits is an array, so only the scalar total_hours is checked). Exact.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "total_amount": 220,
+    "members": [
+     {
+      "name": "Server 1",
+      "hours": 8
+     },
+     {
+      "name": "Server 2",
+      "hours": 8
+     },
+     {
+      "name": "Server 3",
+      "hours": 6
+     }
+    ]
+   },
+   "outputs": {
+    "total_amount": {
+     "value": 220,
+     "tolerance": {
+      "abs": 0
+     }
+    },
+    "total_hours": {
+     "value": 22,
+     "tolerance": {
+      "abs": 0
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "vehicle-load",
+   "source_publisher": "TruckScience",
+   "source_title": "How to calculate axle weights",
+   "source_edition_or_year": "2018-12-06",
+   "source_section_or_page": "4x2 rigid truck with service body: 'Wheelbase of the vehicle is 208 in', 'total weight of the body is 5000 lb', CG '28.2 in from the rear axle' so 'from the front axle ... 208 in - 28.2 in = 179.8 in'; 'Weight on the Rear Axle is 5000 x 179.8/208 = 4322 lb' and '5000 lb - 4322 lb = 678 lb on the front axle'. Body only (curb weights 0). Tile 4322.12 / 677.88; abs 0.5 covers whole-pound rounding.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "wheelbase_in": 208,
+    "payload_lb": 5000,
+    "payload_position_from_cab_in": 179.8,
+    "gvwr_lb": null,
+    "front_gawr_lb": null,
+    "rear_gawr_lb": null,
+    "curb_front_lb": 0,
+    "curb_rear_lb": 0
+   },
+   "outputs": {
+    "rear_axle_lb": {
+     "value": 4322,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "front_axle_lb": {
+     "value": 678,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "gross_lb": {
+     "value": 5000,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "idle-fuel-cost",
+   "source_publisher": "Maryland Department of the Environment",
+   "source_title": "Facts About... Idle Reduction Technology (fact sheet, citing EPA SmartWay)",
+   "source_edition_or_year": "MDE fact sheet (Hogan administration, 2015-2023)",
+   "source_section_or_page": "'Diesel Fuel - 1,925 gallons/year per vehicle' ... 'based on a truck idling 7 hours a day for 275 days per year, and burning 1 gal per hour idling'; 'A typical long-haul truck idles 1,925 overnight hours and consumes $7,700 of fuel annually at $4.00 per gallon.' Exact. miles_per_engine_hour = tile default 7 and fleet_annual_miles = 0 (not printed; they do not enter the checked outputs).",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "idle_hours_per_day": 7,
+    "operating_days": 275,
+    "idle_gph": 1,
+    "fuel_price": 4,
+    "trucks": 1,
+    "miles_per_engine_hour": 7,
+    "fleet_annual_miles": 0
+   },
+   "outputs": {
+    "annual_idle_hours": {
+     "value": 1925,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "annual_gallons": {
+     "value": 1925,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "annual_cost": {
+     "value": 7700,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "idle-fuel-cost",
+   "source_publisher": "U.S. Environmental Protection Agency, SmartWay",
+   "source_title": "Idle Reduction for Shippers: A Glance at Clean Freight Strategies (EPA-420-F-19-012)",
+   "source_edition_or_year": "2019",
+   "source_section_or_page": "Savings: 'a warehouse distribution facility has 25 trucks idling two hours per day, this would equal 50 idle-hours or the consumption of 40 gallons of diesel (assuming 0.8 gallons per hour). At $3.85 per gallon ... this would cost $154 per day. For facilities operating 300 days a year, this fuel consumption would cost $46,200' (15,000 hours). Tile per truck 600 hr / 480 gal / $1,848; fleet $46,200. Exact. miles_per_engine_hour = tile default 7, fleet_annual_miles = 0 (not printed; do not enter checked outputs).",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "idle_hours_per_day": 2,
+    "operating_days": 300,
+    "idle_gph": 0.8,
+    "fuel_price": 3.85,
+    "trucks": 25,
+    "miles_per_engine_hour": 7,
+    "fleet_annual_miles": 0
+   },
+   "outputs": {
+    "fleet_cost": {
+     "value": 46200,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "annual_idle_hours": {
+     "value": 600,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "flatbed-tarp-size",
+   "source_publisher": "Truck Trailer Pro",
+   "source_title": "The Ultimate Flatbed Tarp Sizes Guide 2026",
+   "source_edition_or_year": "2026",
+   "source_section_or_page": "'Total Width = Trailer Width + (Drop x 2)'; 'If you want an 8' drop: 8' (Trailer Width) + 8' (Left Drop) + 8' (Right Drop) = 24 feet total width' (the standard 24' x 27' lumber tarp); length: '3-4 feet ... of overlap between two tarps' and 'If your trailer is 48 feet long, buying two 24-foot tarps isn't enough. You'll want at least two 27-foot or 30-foot tarps.' Drop = load height, tuck 0 (the drop includes it). Tile: width 24; two 27-ft tarps at a 4-ft lap (3-ft gives the same count) cover 50 ft >= 48. Exact.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "load_length_ft": 48,
+    "load_width_ft": 8,
+    "load_height_ft": 8,
+    "tarp_length_ft": 27,
+    "tarp_width_ft": 24,
+    "overlap_ft": 4,
+    "tuck_ft": 0,
+    "tarp_weight_lb": 0
+   },
+   "outputs": {
+    "width_needed_ft": {
+     "value": 24,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "tarps_needed": {
+     "value": 2,
+     "tolerance": {
+      "abs": 0
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "map-scale-conversion",
+   "source_publisher": "National Wildfire Coordinating Group (NWCG)",
+   "source_title": "Firefighter Math, 5.2 Map Scale",
+   "source_edition_or_year": "nwcg.gov/course/ffm/mapping/52-map-scale (read 2026-10-03)",
+   "source_section_or_page": "Table 5.1 Map Scale Conversion Factors, row '1:24,000' -> 'Map ft/in' 2,000. Tile 2000.000; abs 0.5 covers whole-foot printing.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "representative_fraction": 24000,
+    "map_distance_in": 1,
+    "map_area_sqin": 0
+   },
+   "outputs": {
+    "ft_per_inch": {
+     "value": 2000,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "ground_distance_ft": {
+     "value": 2000,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "map-scale-conversion",
+   "source_publisher": "National Wildfire Coordinating Group (NWCG)",
+   "source_title": "Firefighter Math, 5.2 Map Scale",
+   "source_edition_or_year": "nwcg.gov/course/ffm/mapping/52-map-scale (read 2026-10-03)",
+   "source_section_or_page": "Table 5.1 Map Scale Conversion Factors, row '1:31,680' -> 'Map ft/in' 2,640. Tile 2640.000; abs 0.5 covers whole-foot printing.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "representative_fraction": 31680,
+    "map_distance_in": 1,
+    "map_area_sqin": 0
+   },
+   "outputs": {
+    "ft_per_inch": {
+     "value": 2640,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "ground_distance_ft": {
+     "value": 2640,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "map-scale-conversion",
+   "source_publisher": "National Wildfire Coordinating Group (NWCG)",
+   "source_title": "Firefighter Math, 5.2 Map Scale",
+   "source_edition_or_year": "nwcg.gov/course/ffm/mapping/52-map-scale (read 2026-10-03)",
+   "source_section_or_page": "Table 5.1 Map Scale Conversion Factors, row '1:15,840' -> 'Map ft/in' 1,320. Tile 1320.000; abs 0.5 covers whole-foot printing.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "representative_fraction": 15840,
+    "map_distance_in": 1,
+    "map_area_sqin": 0
+   },
+   "outputs": {
+    "ft_per_inch": {
+     "value": 1320,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "ground_distance_ft": {
+     "value": 1320,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "map-scale-conversion",
+   "source_publisher": "National Wildfire Coordinating Group (NWCG)",
+   "source_title": "Firefighter Math, 5.2 Map Scale",
+   "source_edition_or_year": "nwcg.gov/course/ffm/mapping/52-map-scale (read 2026-10-03)",
+   "source_section_or_page": "Table 5.1 Map Scale Conversion Factors, row '1:7,920' -> 'Map ft/in' 660. Tile 660.000; abs 0.5 covers whole-foot printing.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "representative_fraction": 7920,
+    "map_distance_in": 1,
+    "map_area_sqin": 0
+   },
+   "outputs": {
+    "ft_per_inch": {
+     "value": 660,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "ground_distance_ft": {
+     "value": 660,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "map-scale-conversion",
+   "source_publisher": "National Wildfire Coordinating Group (NWCG)",
+   "source_title": "Firefighter Math, 5.2 Map Scale",
+   "source_edition_or_year": "nwcg.gov/course/ffm/mapping/52-map-scale (read 2026-10-03)",
+   "source_section_or_page": "Table 5.1 Map Scale Conversion Factors, row '1:126,720' -> 'Map ft/in' 10,560. Tile 10560.000; abs 0.5 covers whole-foot printing.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "representative_fraction": 126720,
+    "map_distance_in": 1,
+    "map_area_sqin": 0
+   },
+   "outputs": {
+    "ft_per_inch": {
+     "value": 10560,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "ground_distance_ft": {
+     "value": 10560,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "map-scale-conversion",
+   "source_publisher": "National Wildfire Coordinating Group (NWCG)",
+   "source_title": "Firefighter Math, 5.2 Map Scale",
+   "source_edition_or_year": "nwcg.gov/course/ffm/mapping/52-map-scale (read 2026-10-03)",
+   "source_section_or_page": "Table 5.1 Map Scale Conversion Factors, row '1:253,440' -> 'Map ft/in' 21,120. Tile 21120.000; abs 0.5 covers whole-foot printing.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "representative_fraction": 253440,
+    "map_distance_in": 1,
+    "map_area_sqin": 0
+   },
+   "outputs": {
+    "ft_per_inch": {
+     "value": 21120,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "ground_distance_ft": {
+     "value": 21120,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "map-scale-conversion",
+   "source_publisher": "National Wildfire Coordinating Group (NWCG)",
+   "source_title": "Firefighter Math, 5.2 Map Scale",
+   "source_edition_or_year": "nwcg.gov/course/ffm/mapping/52-map-scale (read 2026-10-03)",
+   "source_section_or_page": "Table 5.1 Map Scale Conversion Factors, row '1:62,500' -> 'Map ft/in' 5,208. Tile 5208.333; abs 0.5 covers whole-foot printing.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "representative_fraction": 62500,
+    "map_distance_in": 1,
+    "map_area_sqin": 0
+   },
+   "outputs": {
+    "ft_per_inch": {
+     "value": 5208,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "ground_distance_ft": {
+     "value": 5208,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "map-scale-conversion",
+   "source_publisher": "National Wildfire Coordinating Group (NWCG)",
+   "source_title": "Firefighter Math, 5.2 Map Scale",
+   "source_edition_or_year": "nwcg.gov/course/ffm/mapping/52-map-scale (read 2026-10-03)",
+   "source_section_or_page": "Table 5.2 Acreage Grid Overlay, Map Scales, and Equivalents, row '1:20,000' -> 'Acres per square inch' 63.769. One square inch entered. abs 0.001 covers the three-decimal print. (The 1:62,500 row prints 622.449; exact is 622.744 -- a table error, not used.)",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "representative_fraction": 20000,
+    "map_distance_in": 0,
+    "map_area_sqin": 1
+   },
+   "outputs": {
+    "acres_per_sq_inch": {
+     "value": 63.769,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "ground_area_acres": {
+     "value": 63.769,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "map-scale-conversion",
+   "source_publisher": "National Wildfire Coordinating Group (NWCG)",
+   "source_title": "Firefighter Math, 5.2 Map Scale",
+   "source_edition_or_year": "nwcg.gov/course/ffm/mapping/52-map-scale (read 2026-10-03)",
+   "source_section_or_page": "Table 5.2 Acreage Grid Overlay, Map Scales, and Equivalents, row '1:24,000' -> 'Acres per square inch' 91.827. One square inch entered. abs 0.001 covers the three-decimal print. (The 1:62,500 row prints 622.449; exact is 622.744 -- a table error, not used.)",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "representative_fraction": 24000,
+    "map_distance_in": 0,
+    "map_area_sqin": 1
+   },
+   "outputs": {
+    "acres_per_sq_inch": {
+     "value": 91.827,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "ground_area_acres": {
+     "value": 91.827,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "map-scale-conversion",
+   "source_publisher": "National Wildfire Coordinating Group (NWCG)",
+   "source_title": "Firefighter Math, 5.2 Map Scale",
+   "source_edition_or_year": "nwcg.gov/course/ffm/mapping/52-map-scale (read 2026-10-03)",
+   "source_section_or_page": "Table 5.2 Acreage Grid Overlay, Map Scales, and Equivalents, row '1:63,360' -> 'Acres per square inch' 640.0. One square inch entered. abs 0.001 covers the three-decimal print. (The 1:62,500 row prints 622.449; exact is 622.744 -- a table error, not used.)",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "representative_fraction": 63360,
+    "map_distance_in": 0,
+    "map_area_sqin": 1
+   },
+   "outputs": {
+    "acres_per_sq_inch": {
+     "value": 640.0,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "ground_area_acres": {
+     "value": 640.0,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "map-scale-conversion",
+   "source_publisher": "National Wildfire Coordinating Group (NWCG)",
+   "source_title": "Firefighter Math, 5.2 Map Scale",
+   "source_edition_or_year": "nwcg.gov/course/ffm/mapping/52-map-scale (read 2026-10-03)",
+   "source_section_or_page": "Example 3a/3b: 'The map distance between two points is 6 inches. The map scale is 1:24,000 (in/in)' -> 'The ground distance is 12,000 feet' and '12,000 feet = 182 chains = 2.3 miles'. Tile 12,000 ft / 2.2727 mi; abs 0.05 mi covers the one-decimal print.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "representative_fraction": 24000,
+    "map_distance_in": 6,
+    "map_area_sqin": 0
+   },
+   "outputs": {
+    "ground_distance_ft": {
+     "value": 12000,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "ground_distance_mi": {
+     "value": 2.3,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "map-scale-conversion",
+   "source_publisher": "U.S. Geological Survey",
+   "source_title": "Map Scales, USGS Fact Sheet 015-02",
+   "source_edition_or_year": "February 2002",
+   "source_section_or_page": "Text: 'If the scale were 1:63,360 ... 1 inch on the map would represent 63,360 inches, or 1 mile, on the ground (63,360 inches divided by 12 inches equals 5,280 feet, or 1 mile)'; table row 'Alaska Maps 1:63,360 ... 1 mile (exact)'. Exact.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "representative_fraction": 63360,
+    "map_distance_in": 1,
+    "map_area_sqin": 0
+   },
+   "outputs": {
+    "ft_per_inch": {
+     "value": 5280,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "ground_distance_mi": {
+     "value": 1,
+     "tolerance": {
+      "abs": 0.0001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "map-scale-conversion",
+   "source_publisher": "U.S. Geological Survey",
+   "source_title": "Map Scales, USGS Fact Sheet 015-02",
+   "source_edition_or_year": "February 2002",
+   "source_section_or_page": "Text: 'If the scale is reduced to 1:316,800, then 1 inch on the map represents 5 miles on the ground'; also '100 miles at 5 miles to the inch equals 20 inches'. Exact.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "representative_fraction": 316800,
+    "map_distance_in": 20,
+    "map_area_sqin": 0
+   },
+   "outputs": {
+    "ground_distance_mi": {
+     "value": 100,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "map-scale-conversion",
+   "source_publisher": "U.S. Geological Survey",
+   "source_title": "Map Scales, USGS Fact Sheet 015-02",
+   "source_edition_or_year": "February 2002",
+   "source_section_or_page": "Table 'USGS Maps': '7.5 minute 1:24,000 ... 2,000 feet (exact)'; '1:250,000 ... 4 miles' (approximately). Here the 1:24,000 exact row. Exact.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "representative_fraction": 24000,
+    "map_distance_in": 1,
+    "map_area_sqin": 0
+   },
+   "outputs": {
+    "ft_per_inch": {
+     "value": 2000,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "square-footage",
+   "source_publisher": "Bob Vila (bobvila.com)",
+   "source_title": "How Much Paint Do I Need? How to Calculate Surface Area and Number of Gallons",
+   "source_edition_or_year": "web article, accessed 2026-10-03",
+   "source_section_or_page": "Wall-area step, https://www.bobvila.com/articles/how-much-paint-do-i-need/ : prints 'a solid wall that measures 12 feet wide by 10 feet high has an area of 120 square feet: 12 x 10 = 120 square feet'. Exact integer product; abs 0.001 is float slack only.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "shape": "rectangle",
+    "length_ft": 12,
+    "width_ft": 10
+   },
+   "outputs": {
+    "area_ft2": {
+     "value": 120,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "square-footage",
+   "source_publisher": "OpenStax (Rice University)",
+   "source_title": "Prealgebra, Section 9.5 Find the Area of Trapezoids (as reproduced in Lumen Learning Math for Liberal Arts Corequisite 3.12)",
+   "source_edition_or_year": "OpenStax Prealgebra, 2015 (CC BY)",
+   "source_section_or_page": "Example 2, https://courses.lumenlearning.com/frontrange-mathforliberalartscorequisite1/chapter/3-12-find-the-area-of-trapezoids/ : 'Find the area of a trapezoid whose height is 5 feet and whose bases are 10.3 and 13.7 feet' ... 'The area of the trapezoid is 60 square feet.' Exact; abs 0.001 is float slack.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "shape": "trapezoid",
+    "base1_ft": 10.3,
+    "base2_ft": 13.7,
+    "height_ft": 5
+   },
+   "outputs": {
+    "area_ft2": {
+     "value": 60,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "material-quantity",
+   "source_publisher": "Inch Calculator (inchcalculator.com)",
+   "source_title": "Drywall Calculator - Estimate Cost and Material",
+   "source_edition_or_year": "web page, accessed 2026-10-03",
+   "source_section_or_page": "How-to-estimate section, https://www.inchcalculator.com/drywall-calculator/ : for a 1,000 sq ft surface with 4'x8' sheets (32 sq ft) prints '1,000 / 32 = 31.25 sheets', then 'about 10% additional' for waste. Only the printed pre-waste sheet count is asserted (exact quotient; abs 0.001 is float slack). The printed final 'at least 32 sheets' is the rounded-up pre-waste count, not a with-waste figure, so units_with_waste is not asserted.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "assembly": "drywall_4x8",
+    "area_ft2": 1000
+   },
+   "outputs": {
+    "units_raw": {
+     "value": 31.25,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "standing-water",
+   "source_publisher": "University of Arizona, Water Wise (College of Agriculture and Life Sciences)",
+   "source_title": "Harvest Rain",
+   "source_edition_or_year": "web page, accessed 2026-10-03",
+   "source_section_or_page": "https://waterwise.arizona.edu/ways-save-water/harvest-rain : '1500 square feet of roof area x 15 inches of rain x 0.623 = 14,017 gallons', with 0.623 described as 'the quantity of water in gallons one inch deep in one square foot of space'. Tile (exact 7.4805 gal/ft3) gives 14,026; the printed 0.623 factor is rounded from 0.62338, a 0.06% gap; pct 0.1 covers it.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "area_ft2": 1500,
+    "depth_in": 15
+   },
+   "outputs": {
+    "gallons": {
+     "value": 14017,
+     "tolerance": {
+      "pct": 0.1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "slope-from-level",
+   "source_publisher": "Archtoolbox",
+   "source_title": "Calculating Slope and Common Slopes in Architecture",
+   "source_edition_or_year": "web page, accessed 2026-10-03",
+   "source_section_or_page": "Common slopes by gradient table, https://www.archtoolbox.com/calculating-slope/ : '1 : 12' = 4.76 deg / 8.33%. Entered as 1 in per ft. Printed to 2 decimals; abs 0.006 covers the half-unit rounding.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "value": 1,
+    "from": "in_per_ft"
+   },
+   "outputs": {
+    "degrees": {
+     "value": 4.76,
+     "tolerance": {
+      "abs": 0.006
+     }
+    },
+    "percent": {
+     "value": 8.33,
+     "tolerance": {
+      "abs": 0.006
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "slope-from-level",
+   "source_publisher": "Archtoolbox",
+   "source_title": "Calculating Slope and Common Slopes in Architecture",
+   "source_edition_or_year": "web page, accessed 2026-10-03",
+   "source_section_or_page": "Plumbing pipe slopes table, https://www.archtoolbox.com/calculating-slope/ : '1/4\" per foot' = 2.08%; gradient table '1 : 48' = 1.19 deg / 2.08%. Printed to 2 decimals; abs 0.006 covers rounding.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "value": 0.25,
+    "from": "in_per_ft"
+   },
+   "outputs": {
+    "percent": {
+     "value": 2.08,
+     "tolerance": {
+      "abs": 0.006
+     }
+    },
+    "degrees": {
+     "value": 1.19,
+     "tolerance": {
+      "abs": 0.006
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "slope-from-level",
+   "source_publisher": "Archtoolbox",
+   "source_title": "Calculating Slope and Common Slopes in Architecture",
+   "source_edition_or_year": "web page, accessed 2026-10-03",
+   "source_section_or_page": "Common slopes by degrees table, https://www.archtoolbox.com/calculating-slope/ : 5 deg = 1 : 11.43 / 8.75%. Printed to 2 decimals (tile 8.7489); abs 0.006 covers rounding.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "value": 5,
+    "from": "degrees"
+   },
+   "outputs": {
+    "percent": {
+     "value": 8.75,
+     "tolerance": {
+      "abs": 0.006
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "slope-from-level",
+   "source_publisher": "U.S. Access Board",
+   "source_title": "Guide to the ABA Accessibility Standards, Chapter 10: Outdoor Developed Areas",
+   "source_edition_or_year": "Access Board guide, accessed 2026-10-03",
+   "source_section_or_page": "Running slope [1017.7.1] table, https://www.access-board.gov/aba/guides/chapter-10-outdoor/ : running slope '1:20' = '5%' (and 1:12 = 8.33%). 1:20 entered as 0.6 in per ft. Printed integer percent; abs 0.01 is rounding/float slack.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "value": 0.6,
+    "from": "in_per_ft"
+   },
+   "outputs": {
+    "percent": {
+     "value": 5,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "asphalt-paving-speed",
+   "source_publisher": "Naval Education and Training Professional Development and Technology Center (NAVEDTRA)",
+   "source_title": "Equipment Operator Basic, NAVEDTRA 14081, Chapter 16 (Tons Per Hour)",
+   "source_edition_or_year": "NAVEDTRA 14081 (via tpub.com)",
+   "source_section_or_page": "Page 16-42, https://enginemechanics.tpub.com/14081/css/Tons-Per-Hour-502.htm : Tons per hour = L x W x D x 146 x 60 / 2,000, 'The NCF uses 11 feet per minute for planning purposes'; Example: 'screed of the paver is set at 10 feet, and the depth of asphalt is 2 inches'; Solution '11 x 10 x .167 x 146 x 60 / 2,000 ... = 80.46 tons per hour'. The manual rounds 2 in to .167 ft; exact 2/12 gives 80.30 (0.2% low); pct 0.5 covers it. hours_per_day left at default (does not enter tons_per_hour).",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "speed_fpm": 11,
+    "width_ft": 10,
+    "depth_in": 2,
+    "density_pcf": 146,
+    "eff_min_per_hr": 60
+   },
+   "outputs": {
+    "tons_per_hour": {
+     "value": 80.46,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "asphalt-paving-speed",
+   "source_publisher": "Pennsylvania Asphalt Pavement Association",
+   "source_title": "Constructing Quality Asphalt Pavements checklist booklet (Balance Plant/Trucks/Paver/Rollers)",
+   "source_edition_or_year": "2019",
+   "source_section_or_page": "Page 6-7, https://pa-asphalt.org/images/PDF/constructing-quality-asphalt-pavements-checklist-booklet-2019.pdf : Given 200 tons/hour, 'Weight of compacted wearing course equals 110 lbs / sy / in', 1.5 in, 12 ft wide, 80% paver efficiency; solution '2000 lbs/ton / (110lbs/sy/in X 1.5 in) = 12.12 sy/ton ... 2424 sy/hour / 1.33 sy/lin ft = 1823 lin ft/hour ... 30 lin ft/min / 0.80 = 38 lin ft/min (FPM)'. Run forward: 38 fpm, 48 working min (0.80 x 60), 110 lb/sy/in = 146.667 pcf (1 sy-in = 0.75 ft3). Tile 200.64 t/h and 1,824 ft/h; the printed 38 fpm is rounded from 37.97, so pct 0.5 and abs 2 cover it.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "speed_fpm": 38,
+    "width_ft": 12,
+    "depth_in": 1.5,
+    "density_pcf": 146.6667,
+    "eff_min_per_hr": 48
+   },
+   "outputs": {
+    "tons_per_hour": {
+     "value": 200,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "lane_ft_per_hour": {
+     "value": 1823,
+     "tolerance": {
+      "abs": 2
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "bearing-regrease",
+   "source_publisher": "Reliability Solutions (reliabilitysolutions.net)",
+   "source_title": "How to Calculate Bearing Relubrication Intervals",
+   "source_edition_or_year": "web article dated August 4, 2026",
+   "source_section_or_page": "Worked example, https://reliabilitysolutions.net/resources/blog/bearing-relubrication-intervals/ : 'Bearing: 6310 deep groove ball bearing - bore d = 50 mm, OD D = 110 mm, width B = 27 mm.' 'Conditions: n = 1,500 rpm' ... 'G = 0.005 x 110 x 27 = 14.9 grams per regreasing event.' Only grease_grams asserted (14.85 printed as 14.9; abs 0.06 covers it). The article's interval (tf ~13,500 h from the SKF diagram) is NOT asserted: the tile gives 1,120 h (see report, K-factor bug).",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "od_mm": 110,
+    "width_mm": 27,
+    "bore_mm": 50,
+    "rpm": 1500
+   },
+   "outputs": {
+    "grease_grams": {
+     "value": 14.9,
+     "tolerance": {
+      "abs": 0.06
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "defrost-cycle-sizing",
+   "source_publisher": "Oak Ridge National Laboratory (Fricke and Sharma)",
+   "source_title": "Demand Defrost Strategies in Supermarket Refrigeration Systems, Interim Report",
+   "source_edition_or_year": "ORNL, 2011",
+   "source_section_or_page": "Low Temperature Glass-Doored Reach-In Case, Eq. (1), p. 7-8, https://info.ornl.gov/sites/publications/files/pub31296.pdf : frost 0.60 lb, t1 = -19 F, t3 (drain) = 41 F, cp ice 0.502, Lf 144, cp water 1.00: 'the energy required to melt 0.60 lb/(ft\u00b7day) of frost is 107 Btu/(day\u00b7ft)'; heater '320 W/ft or 1092 Btu/(hr\u00b7ft)'. Eq. 1 has no coil-mass term (coil_mass 0) and is the melt energy itself (efficiency 1, so total_btu = the melt energy). Tile 107.1 (ice cp 0.5 vs 0.502 = 0.06 Btu); abs 0.5 covers the printed integer.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-03",
+   "inputs": {
+    "frost_lb": 0.6,
+    "coil_temp_f": -19,
+    "coil_mass_lb": 0,
+    "coil_temp_rise_f": 0,
+    "heater_btuh": 1092,
+    "defrost_efficiency": 1,
+    "drain_temp_f": 41
+   },
+   "outputs": {
+    "total_btu": {
+     "value": 107,
+     "tolerance": {
+      "abs": 0.5
      }
     }
    }

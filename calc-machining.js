@@ -2358,8 +2358,9 @@ export function computeCounterboreDepth({ screw_diameter_in = 0, head_height_in 
   }
   const required_engagement_in = engagement_multiplier * screw_diameter_in;
   const available_engagement_in = in_tapped_part ? remaining_thickness_in : plate_thickness_in;
-  const shortfall_in = Math.max(0, required_engagement_in - available_engagement_in);
-  const passes = available_engagement_in >= required_engagement_in;
+  // 1e-9: the tile's own minimum thickness (1.015 in) left 0.4999999999999999 in and "FAILS by 0.000 in".
+  const passes = available_engagement_in >= required_engagement_in * (1 - 1e-9);
+  const shortfall_in = passes ? 0 : required_engagement_in - available_engagement_in;
   const minimum_thickness_in = in_tapped_part ? counterbore_depth_in + required_engagement_in : required_engagement_in;
   const verdict = passes
     ? "PASSES with " + fmt(available_engagement_in - required_engagement_in, 3) + " in of engagement to spare"

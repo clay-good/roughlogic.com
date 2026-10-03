@@ -4957,13 +4957,13 @@ export const CITATIONS = {
     ],
   },
   "paint-coverage": {
-    formula: "Gallons = total_area / coverage_per_gal × number_of_coats × waste factor.",
+    formula: "Gallons per coat = area / coverage for the surface (smooth 350, textured 250, rough 175 ft²/gal); total = per coat × coats; primer = one coat. No separate waste factor.",
     edition: "Manufacturer technical data sheets (PDS) by name.",
     freeAccess: "Free at each manufacturer site (sherwin-williams.com, benjaminmoore.com, behr.com).",
     governance: GOVERNANCE.general,
     editionNote: "Single-edition (manufacturer PDS).",
     assumptions: [
-      { name: "Default coverage", value: "350 ft²/gal latex unless user supplies", source: "manufacturer PDS typical" },
+      { name: "Coverage by surface", value: "smooth 350 / textured 250 / rough 175 ft²/gal (manufacturer PDS ranges); the table carries the surface penalty, applied once", source: "manufacturer PDS typical" },
     ],
   },
   "excavation": {
@@ -5470,7 +5470,7 @@ export const CITATIONS = {
   // verdict. Local health department governs."
 
   "recipe-scale": {
-    formula: "Linear scaling of every ingredient by factor = target_yield / original_yield. Conversion to grams via USDA FoodData Central reference weights when scaling produces fractional eggs or unusual cup amounts (flour ~ 120 g/cup, sugar ~ 200 g/cup, butter ~ 227 g/cup, etc.).",
+    formula: "Linear scaling of every ingredient by factor = target_yield / original_yield. Conversion to grams via USDA FoodData Central reference weights when scaling produces fractional eggs or unusual cup amounts (flour ~ 125 g/cup, sugar ~ 200 g/cup, butter ~ 227 g/cup, etc.).",
     edition: "USDA FoodData Central, accessed " + "at build time" + ".",
     freeAccess: "Free at fdc.nal.usda.gov.",
     governance: GOVERNANCE.food,
@@ -6537,7 +6537,7 @@ export const CITATIONS = {
     ],
   },
   "overtime": {
-    formula: "Regular pay = min(hours, 40) × rate. OT = max(hours − 40, 0) × rate × 1.5 per FLSA 29 USC 207. Some states (CA, AK, NV) require daily OT.",
+    formula: "Regular pay = min(hours, 40) × rate. OT = max(hours − 40, 0) × rate × 1.5 per FLSA 29 USC 207, up to the double-time threshold; hours past that threshold (default 60) pay the double-time multiple. The FLSA has no double time -- set the threshold above the week's hours for a pure FLSA figure; double time is a contract or state rule (California's is DAILY, past 12 h). The regular rate must include non-discretionary bonuses (29 CFR 778.110(b)); enter that rate. Some states (CA, AK, NV) require daily OT.",
     edition: "Fair Labor Standards Act 29 USC 207 by section. State daily-OT rules per CA Labor Code §510, AK Stat §23.10.060, NV Admin Code §608.140.",
     freeAccess: "29 USC 207 free at uscode.house.gov; state codes free at each state legislature site.",
     governance: GOVERNANCE.general,
@@ -12862,7 +12862,7 @@ export const CITATIONS = {
     ],
   },
   "bearing-regrease": {
-    formula: "grease_grams = 0.005 x od_mm x width_mm; base_interval_hr = 14,000,000 / (rpm x sqrt(bore_mm)) - 4 x bore_mm; corrected_interval_hr = base x correction_factor.",
+    formula: "grease_grams = 0.005 x od_mm x width_mm; base_interval_hr = K x (14,000,000 / (rpm x sqrt(bore_mm)) - 4 x bore_mm) with the bearing-type factor K = 10 radial ball, 5 cylindrical / needle roller, 1 spherical / tapered roller (SKF; STLE TLT April 2009 Fig. 7-8); corrected_interval_hr = base x correction_factor.",
     edition: "Grease quantity from the bearing's free volume and the standard relubrication-interval relation for a horizontal, moderately loaded bearing at normal temperature, by name -- published bearing-maintenance practice, cited and not reproduced. The correction factor for temperature, orientation, load, and contamination is entered. The bearing manufacturer's own relubrication chart and a condition-monitoring program govern.",
     freeAccess: "Both relations are published maintenance practice applied to the bearing's own dimensions and speed; no manufacturer's interval chart is reproduced.",
     governance: GOVERNANCE.general,

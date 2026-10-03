@@ -2,7 +2,7 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "cf6d917778084240",
+      "sha": "f30d29024d76f67d",
       "date": "2026-10-03"
     },
     "/tools/": {
@@ -578,8 +578,8 @@
       "date": "2026-09-29"
     },
     "/tools/bearing-regrease/": {
-      "sha": "e03a1a4ef3713cb5",
-      "date": "2026-09-29"
+      "sha": "0efc190faf97823b",
+      "date": "2026-10-03"
     },
     "/tools/beer-color-srm/": {
       "sha": "8321f658b7b85f86",
@@ -5138,8 +5138,8 @@
       "date": "2026-10-01"
     },
     "/tools/overtime/": {
-      "sha": "d446882f27c7ad96",
-      "date": "2026-09-29"
+      "sha": "1e5f3fa442cb3a7a",
+      "date": "2026-10-03"
     },
     "/tools/oxyfuel-cutting-gas/": {
       "sha": "0d6128f175ee2611",
@@ -5158,8 +5158,8 @@
       "date": "2026-09-29"
     },
     "/tools/paint-coverage/": {
-      "sha": "cdedf481a568b78d",
-      "date": "2026-09-29"
+      "sha": "74d861191ed072c3",
+      "date": "2026-10-03"
     },
     "/tools/paint-mix-ratio/": {
       "sha": "2d85a570356c6d6f",
@@ -6138,8 +6138,8 @@
       "date": "2026-09-29"
     },
     "/tools/recipe-scale/": {
-      "sha": "49cf045cabad85f4",
-      "date": "2026-09-29"
+      "sha": "a694b836fbac15a4",
+      "date": "2026-10-03"
     },
     "/tools/recirc-loop-sizing/": {
       "sha": "98952ac147daac21",

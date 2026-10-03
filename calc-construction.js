@@ -443,6 +443,7 @@ export function computeMaterialQuantity({ assembly, area_ft2 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const a = ASSEMBLY_DEFAULTS[assembly];
   if (!a) return { error: "Unknown assembly." };
+  if (!(Number(area_ft2) >= 0)) return { error: "Area cannot be negative." };
   const units_raw = area_ft2 / a.coverage_ft2_per_unit;
   const units_with_waste = (Math.ceil(units_raw * (1 + a.waste) - 1e-9) || 0);
   return {
@@ -947,8 +948,9 @@ export function computePaintCoverage({ area_ft2, coats = 2, primer_needed = fals
   const cov = PAINT_COVERAGE_FT2_PER_GAL[surface_porosity];
   if (cov === undefined) return { error: "Unknown surface porosity." };
   if (a <= 0) return { error: "Area must be positive." };
-  const surface_factor = surface_porosity === "smooth" ? 1.0 : surface_porosity === "textured" ? 0.7 : 0.5;
-  const gallons_per_coat = a / (cov * surface_factor);
+  // The coverage table already carries the surface (smooth 350, textured 250, rough 175 sf/gal); until
+  // 2026-10-03 a 0.7 / 0.5 factor was applied on top, so rough read 87.5 sf/gal, 4x a smooth wall.
+  const gallons_per_coat = a / cov;
   const total_paint = gallons_per_coat * c;
   const primer = primer_needed ? gallons_per_coat : 0;
   return { gallons_per_coat, total_paint_gallons: total_paint, primer_gallons: primer };

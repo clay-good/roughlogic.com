@@ -207,6 +207,7 @@ export function computeMarkup({ cost, mode, value }) {
   if (mode === "markup_percent") {
     const m = value / 100;
     const price = cost * (1 + m);
+    if (!(price > 0)) return { error: "A markup of -100% or less leaves no selling price." };
     const margin = (price - cost) / price * 100;
     return { selling_price: price, markup_percent: value, margin_percent: margin, profit: price - cost };
   }
@@ -325,6 +326,7 @@ export function computeTipOut({ total_amount, members }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   total_amount = Number(total_amount);
   if (!Array.isArray(members) || members.length === 0) return { error: "Provide at least one crew member." };
+  if (members.some((m) => Number(m.hours) < 0)) return { error: "Hours cannot be negative." };
   const total_hours = members.reduce((s, m) => s + (Number(m.hours) || 0), 0);
   if (total_hours <= 0) return { error: "Total hours must be positive." };
   const splits = members.map((m) => ({
@@ -674,6 +676,9 @@ export function computeOvertime({ total_hours, regular_rate, overtime_multiplier
   const h = Number(total_hours) || 0;
   const rate = Number(regular_rate) || 0;
   if (h < 0 || rate < 0) return { error: "Hours and rate must be non-negative." };
+  // A double-time threshold under 40 paid the hours between it and 40 twice (50 h at a 30 h threshold
+  // paid for 60). The FLSA itself has no double time; it is a contract or state option above 40.
+  if (!(Number(double_time_threshold_hr) >= 40)) return { error: "The double-time threshold must be at least 40 hours (the FLSA has no double time; it is a contract or state rule above the 40-hour overtime line)." };
   const reg_h = Math.min(40, h);
   const ot_h = Math.max(0, Math.min(double_time_threshold_hr, h) - 40);
   const dt_h = Math.max(0, h - double_time_threshold_hr);
