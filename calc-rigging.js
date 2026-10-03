@@ -1343,7 +1343,7 @@ export function computeWinchDrumLinePull({ rated_pull_lb, drum_dia_in, rope_dia_
 }
 
 function renderWinchDrumLinePull(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: Wire-rope drum mechanics / SAE winch rating convention, by name. Dn = drum_dia + (2n - 1) x rope_dia; Pn = rated_pull x drum_dia / Dn; Vn = drum_speed x Dn / drum_dia; wraps_per_layer = floor(barrel_width / rope_dia). The rated pull is a bare-drum first-wrap figure that fades layer by layer (outer layers 30-40% weaker) as line speed rises in proportion. The winch manufacturer's layer ratings govern.";
+  citationEl.textContent = "Citation: Wire-rope drum mechanics / SAE winch rating convention, by name. Dn = drum_dia + (2n - 1) x rope_dia; Pn = rated_pull x (drum_dia + rope_dia) / Dn; Vn = first-layer speed x Dn / (drum_dia + rope_dia); wraps_per_layer = floor(barrel_width / rope_dia). The rated pull is a bare-drum first-wrap figure that fades layer by layer (outer layers 30-40% weaker) as line speed rises in proportion. The winch manufacturer's layer ratings govern.";
   const p = makeNumber("Bare-drum rated pull (lb)", "wdl-p", { step: "any", min: "0" });
   const d = makeNumber("Bare drum diameter (in)", "wdl-d", { step: "any", min: "0" });
   const rr = makeNumber("Wire rope diameter (in)", "wdl-r", { step: "any", min: "0" });

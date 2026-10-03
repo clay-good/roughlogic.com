@@ -817,7 +817,7 @@ export function computeSprayerCalibration({
   }
 
   const warnings = [];
-  if (travel_distance_ft < 50) warnings.push("Travel distance under 50 ft: boom-width is large enough that the precision degrades; consider 2x distance.");
+  if (travel_distance_ft < 50) warnings.push("Travel distance under 50 ft: the spray width is large enough that the precision degrades; consider 2x distance.");
   if (oz < 1) warnings.push("Volume per nozzle under 1 oz: below the precision threshold; re-collect at 2x distance.");
 
   // v23 EN.19: tank batches and refill points from field acres + tank size.
@@ -870,7 +870,7 @@ function renderSprayerCalibration(inputRegion, outputRegion, citationEl) {
   for (const f of [w, oz, t, tg, fa, tk]) inputRegion.appendChild(f.wrap);
 
   attachExampleButton(inputRegion, () => {
-    w.input.value = "20"; oz.input.value = "20"; t.input.value = "2.9"; tg.input.value = "20"; fa.input.value = "80"; tk.input.value = "300"; update();
+    w.input.value = "1.667"; oz.input.value = "20"; t.input.value = "34.8"; tg.input.value = "20"; fa.input.value = "80"; tk.input.value = "300"; update();
   });
 
   const oTD = makeOutputLine(outputRegion, "Travel distance for 1/128 acre (ft)", "sc-out-td");

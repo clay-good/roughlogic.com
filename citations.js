@@ -1811,13 +1811,13 @@ export const CITATIONS = {
     ],
   },
   "pv-string-sizing": {
-    formula: "Vmax = Voc(STC) × temperature correction at record-low ambient (NEC 690.7); current sizing 125% × Isc per NEC 690.8(A); OCP per NEC 690.9.",
+    formula: "Max modules in series = floor(inverter max dc V / cold Voc), cold Voc = Voc(STC) × (1 + |coeff| × (25 − record low °C)/100) (NEC 690.7); min modules in series = ceil(MPPT min V / warm Vmp), warm Vmp = Vmp(STC) × (1 − |coeff| × (record high + cell rise − 25)/100), cell rise default 30 °C. Current (690.8) and OCP (690.9) sizing are not computed.",
     edition: NEC_2023 + " Article 690.",
     freeAccess: NEC_FREE,
     governance: GOVERNANCE.electrical,
     editionNote: NEC_DISCLOSURE,
     assumptions: [
-      { name: "Temperature-coefficient default", value: "−0.30%/°C unless user supplies", source: "module datasheet typical" },
+      { name: "Temperature coefficient", value: "entered from the module datasheet (about −0.30%/°C typical; no default)", source: "module datasheet" },
       { name: "Inverter-input window", value: "user-supplied from listing", source: "UL 1741 listing" },
     ],
   },
@@ -1966,7 +1966,7 @@ export const CITATIONS = {
     ],
   },
   "generator-motor-starting": {
-    formula: "Steady kW = Σ running_kW + non_motor_kW. Worst starting kVA = max over motors of starting_kVA(motor); starting_kVA = HP × code_kVA_per_HP from the NEMA MG-1 code letter, OR LRA × V × √phases / 1000 if the user supplies LRA. Required gen kVA = worst_starting_kVA x X'd x (1 - dip) / dip, the reactance divider dip = X'd S_m / (S_gen + X'd S_m) solved for S_gen, with X'd the generator transient reactance (default 0.25 per unit) and dip_factor (0.30 default per the 30% voltage-dip criterion). Required kW = max(steady, required_starting_kVA × 0.8).",
+    formula: "Steady kW = Σ running_kW + non_motor_kW. Worst starting kVA = max over motors of starting_kVA(motor); starting_kVA = HP × code_kVA_per_HP from the NEMA MG-1 code letter, OR LRA × V × √phases / 1000 if the user supplies LRA. Required gen kVA = worst_starting_kVA x X'd x (1 - dip) / dip x starts factor (1.0 / 1.15 / 1.30), the reactance divider dip = X'd S_m / (S_gen + X'd S_m) solved for S_gen, with X'd the generator transient reactance (default 0.25 per unit) and dip_factor (0.30 default per the 30% voltage-dip criterion). Required kW = max(steady, required_starting_kVA × 0.8).",
     edition: "NEMA MG-1 (Motors and Generators) by name; engineering-practice 30% voltage-dip criterion for transient motor starts.",
     freeAccess: "NEMA MG-1 licensed; code-letter principles free in published power-engineering texts.",
     governance: GOVERNANCE.electrical,
@@ -2048,7 +2048,7 @@ export const CITATIONS = {
     assumptions: [
       { name: "Construction-class F table", value: "1=1.5 / 2=1.0 / 3=4=0.8 / 5=6=0.6", source: "ISO PPC" },
       { name: "Cap on Ci", value: "8,000 gpm (Classes 1-2), 6,000 gpm (Classes 3-6, or any one-story building), rounded to 250 and at least 500, before X / P / Oi", source: "ISO Guide for Determination of Needed Fire Flow (2014), ch. 2 sec. 5" },
-      { name: "Round increment / floor / cap", value: "250 gpm / 500 gpm / 12 000 gpm", source: "ISO PPC" },
+      { name: "Round increment / floor / cap", value: "250 gpm (500 above 2,500 gpm) / 500 gpm / 12,000 gpm", source: "ISO PPC" },
     ],
   },
 
@@ -2459,7 +2459,7 @@ export const CITATIONS = {
     editionNote: "The evaporation rule of thumb (~1% of recirculation per ~10 F of range) is approximate; site psychrometrics and the makeup-water hardness govern the cycles-of-concentration target.",
     assumptions: [
       { name: "Evaporation rule", value: "evaporation = recirculation x delta-T / 1000", source: "CTI / ASHRAE rule of thumb" },
-      { name: "Drift default", value: "0.002 (0.2%) for a modern drift eliminator", source: "CTI drift-eliminator practice" },
+      { name: "Drift default", value: "0.002 (0.2%) default; modern high-efficiency eliminators hold drift near 0.001-0.005% of recirculation", source: "CTI drift-eliminator practice" },
       { name: "COC scaling flag", value: "> 10 cycles flagged as a scaling risk", source: "cooling-water treatment practice" },
     ],
   },
@@ -3240,7 +3240,7 @@ export const CITATIONS = {
 
   "motor-vd-starting": {
     formula: "V_drop = (2 for 1-phase, sqrt(3) for 3-phase) x LRC x L x (R cos phi + X sin phi), R = K / cmils per ft, X the conductor reactance and phi the locked-rotor power-factor angle (typ. pf 0.2-0.4); V_terminal = V_source - V_drop; %dip = V_drop / V_source x 100. K is the conductor constant (Cu ~12.9, Al ~21.2 ohm-cmil/ft) and LRC the motor locked-rotor current.",
-    edition: "Ohm's-law voltage-drop method (first principles); motor locked-rotor current per NEC Article 430 code-letter tables; contactor pickup/dropout ~85% nominal per NEMA ICS 2, by name.",
+    edition: "Impedance voltage-drop method at the locked-rotor power factor (IEEE 141 by name); motor locked-rotor current per NEC Article 430 code-letter tables; contactor pickup/dropout ~85% nominal per NEMA ICS 2, by name.",
     freeAccess: "NFPA 70 free read-only at nfpa.org/freeaccess; LRC user-supplied from the nameplate code letter or estimated as 6x FLA.",
     governance: GOVERNANCE.electrical,
     editionNote: "AHJ governs; distinct from the steady-state voltage-drop tile (this is the transient starting dip that decides whether the contactor holds).",
@@ -3399,7 +3399,7 @@ export const CITATIONS = {
   },
 
   "cargo-securement-wll": {
-    formula: "Aggregate WLL = number of tiedowns x per-tiedown WLL x path credit (1.0 over the cargo to the other side, 0.5 direct or same-side, per 49 CFR 393.106(d)); required >= 0.5 x cargo weight; minimum tiedown count from the length/weight rule (>= 1 per 10 ft, >= 2 for articles over 5 ft or 1100 lb).",
+    formula: "Aggregate WLL = number of tiedowns x per-tiedown WLL x path credit (1.0 over the cargo to the other side, 0.5 direct or same-side, per 49 CFR 393.106(d)); required >= 0.5 x cargo weight; minimum tiedown count from the length/weight rule of 393.110(b) (<= 5 ft: 1, or 2 over 1,100 lb; over 5 to 10 ft: 2; over 10 ft: 2 plus 1 per additional 10 ft or fraction).",
     edition: "FMCSA 49 CFR 393.100-393.136 cargo securement (aggregate-WLL and tiedown-count rules), by name.",
     freeAccess: "Free at ecfr.gov; FMCSA enforces.",
     governance: GOVERNANCE.trucking,
@@ -3614,7 +3614,7 @@ export const CITATIONS = {
     ],
   },
   "plywood-span": {
-    formula: "Allowable uniform load = lookup(span_rating, application). Pass/fail = (support_spacing ≤ allowable_spacing) AND (live_load ≤ allowable_live) AND (live + dead ≤ allowable_total).",
+    formula: "Roof: allowable spacing = APA E30 Table 33 max span for the rating (with or without edge support: clips, blocking or T&G); allowable live = the Table 33 value at the next tabulated spacing at or above the actual spacing; allowable total = live + 10 psf dead. Floor: allowable spacing and total load from the rating. Pass/fail = (support_spacing ≤ allowable_spacing) AND (live_load ≤ allowable_live) AND (live + dead ≤ allowable_total).",
     edition: "APA - The Engineered Wood Association published span-rating tables by name. Cited by APA name only; numeric tables shipped under APA's technical-bulletin reuse policy. " + IRC_2021 + " §R503 / §R803 references the APA tables.",
     freeAccess: "APA technical bulletins free at apawood.org/publications.",
     governance: GOVERNANCE.structural,
@@ -3881,7 +3881,7 @@ export const CITATIONS = {
     editionNote: IFGC_DISCLOSURE,
     assumptions: [
       { name: "Pressure-drop allowance", value: "0.5 in WC (low-pressure) / 1.0 psig (medium-pressure) unless user supplies", source: "IFGC 2021 Section 402.3" },
-      { name: "Specific gravity", value: "0.60 natural gas / 1.50 propane", source: "data/plumbing/gas-pipe-capacity.json" },
+      { name: "Gas factor Cr", value: "0.6094 natural gas (SG 0.60) / 1.2462 undiluted propane (SG 1.52)", source: "IFGC 2021 Table 402.4" },
     ],
   },
   "slope": {
@@ -4278,12 +4278,12 @@ export const CITATIONS = {
     editionNote: "Single-edition (engineering practice).",
     assumptions: [
       { name: "Working temperatures", value: "user-supplied (cold fill, hot operating)", source: "user input" },
-      { name: "Final pressure margin", value: "set 5 psi below relief-valve setting", source: "ASHRAE Handbook by name" },
+      { name: "Final pressure", value: "the entered relief-valve setting (enter a lower value to keep a margin below it)", source: "ASHRAE Handbook by name" },
     ],
   },
   "backflow-loss": {
     formula: "Linear interpolation of manufacturer pressure-loss curves by device class (RP / DCV / PVB / AVB) and pipe size.",
-    edition: "Manufacturer technical bulletins (Watts Series 909 RP / 909 DCV / 800 PVB / Series 8 AVB) by name.",
+    edition: "Watts Series LF909 RP (ES-LF909S) and Series 800M4QT PVB (ES-800M4QT) capacity charts; DCV and AVB are typical curves naming no product.",
     freeAccess: "Free at watts.com.",
     governance: GOVERNANCE.plumbing,
     editionNote: "Single-edition (manufacturer curves; quarterly recheck).",
@@ -4568,7 +4568,7 @@ export const CITATIONS = {
     ],
   },
   "refrigerant-charge": {
-    formula: "Total charge = factory charge + per-foot adder × (line length − rated length). Per-foot adders from manufacturer line-set tables (oz/ft) by refrigerant and liquid-line diameter.",
+    formula: "Line-set charge (oz) = sum over line sections of oz_per_ft(refrigerant, line diameter) x section length; lb = oz / 16. Per-foot values from manufacturer line-set tables (oz/ft). The factory charge and any rated-length credit come from the unit's data plate and are not included.",
     edition: "Manufacturer line-set bulletins (Daikin, Carrier, Trane, Rheem) by name.",
     freeAccess: "Free at each manufacturer site.",
     governance: GOVERNANCE.mechanical,
@@ -4618,7 +4618,7 @@ export const CITATIONS = {
     ],
   },
   "insulation-thickness": {
-    formula: "Heat loss / gain through pipe insulation: Q = (2π × k × L × ΔT) / ln(r2 / r1) for cylindrical insulation. Surface temperature compared against condensation / safe-touch limits.",
+    formula: "Heat loss through pipe insulation: Q = 2π × (k/12) × L × ΔT / ln(r2/r1) per foot of pipe, k per inch of thickness (BTU-in/hr-ft²-°F), balanced against the outer film h × (2π r2/12) × (T_surface − T_ambient) and solved for r2. Hot-surface (touch-limit) case only; condensation is a separate tile (pipe-insulation-for-condensation).",
     edition: "ASHRAE Fundamentals by name; ASTM C680 for surface-condition calculation.",
     freeAccess: "ASTM C680 licensed; principles free in published engineering texts.",
     governance: GOVERNANCE.mechanical,
@@ -4693,7 +4693,7 @@ export const CITATIONS = {
     ],
   },
   "geothermal-loop": {
-    formula: "Required loop length = peak design BTU/hr (max of heating, cooling) / BTU-per-foot benchmark from soil-class lookup (vertical / horizontal × dry / moist / saturated soil).",
+    formula: "Required loop length = peak design BTU/hr (max of heating, cooling) / BTU-per-foot benchmark from soil-class lookup (vertical sand 30 / clay 40 / rock 55 BTU/ft; horizontal sand 18 / clay 25; rock not supported horizontally).",
     edition: "DOE / IGSHPA technical reports by name (U.S. government, public domain).",
     freeAccess: "DOE reports free at energy.gov / nrel.gov. IGSHPA training materials licensed.",
     governance: GOVERNANCE.mechanical,
@@ -4821,7 +4821,7 @@ export const CITATIONS = {
     ],
   },
   "lumber-spans": {
-    formula: "Allowable simple-beam span: deflection-limited L = sqrt(48 × E × I × Δ_allow / (5 × w × n)); strength-limited from M_allow = Fb' × S, with Fb' = Fb × C_F × C_r (C_F the size factor, 1.0 for Southern Pine; C_r = 1.15 at 24 in on center or closer). F_b and E from AWC NDS-2018 design values; deflection limit L/360 (live) or L/240 (total) per IRC §R301.7.",
+    formula: "Allowable simple-beam span: deflection-limited L = cbrt(384 × E × I / (5 × w × n)) (5wL⁴/384EI = L/n), w the live load when entered, else the total; strength-limited from M_allow = Fb' × S, with Fb' = Fb × C_F × C_r (C_F the size factor, 1.0 for Southern Pine; C_r = 1.15 at 24 in on center or closer). F_b and E from AWC NDS-2018 design values; deflection limit L/360 (live) or L/240 (total) per IRC §R301.7.",
     edition: AWC_NDS + " " + IRC_2021 + " §R301.7, R502.3, R802.4.",
     freeAccess: "AWC NDS free at awc.org/codes-standards. " + ICC_FREE,
     governance: GOVERNANCE.structural,
@@ -4862,7 +4862,7 @@ export const CITATIONS = {
     ],
   },
   "stair-stringer": {
-    formula: "Stringer length = sqrt((rise × n_risers)² + (run × n_treads)²) plus rise / drop adjustments at top and bottom plates.",
+    formula: "Stringer length = sqrt(total_rise² + total_run²); board feet on a nominal 2x12.",
     edition: IRC_2021 + " §R311.7.",
     freeAccess: ICC_FREE,
     governance: GOVERNANCE.structural,
@@ -4870,7 +4870,7 @@ export const CITATIONS = {
     assumptions: [],
   },
   "joist-deflection": {
-    formula: "Mid-span deflection Δ = 5 × w × L⁴ / (384 × E × I) for uniformly loaded simple span. E and I from AWC NDS-2018 design values keyed to species / grade / size.",
+    formula: "Mid-span deflection Δ = 5 × w × L⁴ / (384 × E × I) for uniformly loaded simple span. E and I are entered (take them from the AWC NDS Supplement design values and section properties for the species, grade and size).",
     edition: AWC_NDS + " " + IRC_2021 + " §R301.7.",
     freeAccess: "Free at awc.org. " + ICC_FREE,
     governance: GOVERNANCE.structural,
@@ -5138,7 +5138,7 @@ export const CITATIONS = {
     ],
   },
   "concrete-mix-design": {
-    formula: "ACI 211 simplified: w/c ratio interpolated by target strength and exposure class; water content from aggregate size + slump; cement = water / w_c; aggregate proportions per ACI 211 absolute-volume method.",
+    formula: "ACI 211 simplified: w/c ratio interpolated by target strength and exposure class; water content from aggregate size + slump; cement = water / w_c; coarse aggregate a fixed 1,700 lb/yd^3; fine aggregate = 4,000 lb/yd^3 total - water - cement - coarse (simplified weight method, not absolute volume).",
     edition: "ACI 211.1 (Standard Practice for Selecting Proportions for Normal, Heavyweight, and Mass Concrete) by name.",
     freeAccess: "ACI 211 licensed; principles free in published concrete texts.",
     governance: GOVERNANCE.structural,
@@ -5191,7 +5191,7 @@ export const CITATIONS = {
     ],
   },
   "weld-usage": {
-    formula: "Deposit weight = section_area × length × 0.283 lb/in³ (steel). Consumable weight = deposit / efficiency. Efficiency by process: SMAW ~65%, GMAW ~92%, FCAW ~82%, GTAW ~95%.",
+    formula: "Deposit weight = section_area × length × 0.283 lb/in³ (steel). Consumable weight = deposit / efficiency. Efficiency by process: SMAW 60%, GMAW 90%, FCAW 80%, GTAW 100%.",
     edition: "AWS Welding Handbook by name; AWS A5 series filler-metal specifications by name.",
     freeAccess: "AWS A5 specs licensed; AWS outreach materials free at aws.org.",
     governance: GOVERNANCE.structural,
@@ -5217,7 +5217,7 @@ export const CITATIONS = {
     governance: GOVERNANCE.structural,
     editionNote: "Single-edition (ACI 347R-14 simplified formula; full procedure supersedes).",
     assumptions: [
-      { name: "Concrete unit weight", value: "150 pcf normal-weight unless user supplies", source: "ACI 347" },
+      { name: "Concrete unit weight", value: "150 pcf normal-weight (115 / 135 for the lightweight options) unless user supplies", source: "ACI 347" },
       { name: "Unit weight coefficient C_w", value: "0.5 (1 + w/145) but not less than 0.80 below 140 pcf; 1.0 at 140-150 pcf; w/145 above 150", source: "ACI 347R-14 Table 4.2.2.1a(c)" },
       { name: "Chemistry coefficient C_c", value: "1.0 Type I/II/III without retarder up to 1.5 for >= 70% slag or >= 40% fly ash with retarder; an HRWR counts as a retarder", source: "ACI 347R-14 Table 4.2.2.1a(b)" },
     ],
@@ -6479,7 +6479,7 @@ export const CITATIONS = {
     assumptions: [],
   },
   "time-and-materials": {
-    formula: "Total billable = labor_hours × hourly_rate × (1 + OT_factor) + materials_cost × (1 + markup_pct) + travel.",
+    formula: "Total billable = (labor_hours × hourly_rate + materials_cost) × (1 + overhead%) × (1 + profit%).",
     edition: "Engineering-practice billing convention.",
     freeAccess: "No licensed source required. The total is definitional arithmetic; the rates, prices, and markup are the user's own figures, and the contract governs which of them are billable.",
     governance: GOVERNANCE.general,
@@ -6644,7 +6644,7 @@ export const CITATIONS = {
     ],
   },
   "ladder-angle": {
-    formula: "4:1 rule: base distance = working_length / 4. Angle θ = atan(rise / run); pass band 75-77 degrees per the ANSI portable-ladder standards A14.1 / A14.2 / A14.5 (target 75.5°).",
+    formula: "4:1 rule: base distance = working_length / 4. Angle θ = asin(working height / ladder length); pass within 3° of the 75.5° (4:1) target, 72.5-78.5°, per the ANSI portable-ladder standards A14.1 / A14.2 / A14.5.",
     edition: "ANSI/ASC A14.1 (wood), A14.2 (metal) and A14.5 (reinforced plastic) portable ladders, which set the 75.5° (4:1) setup angle, by name; OSHA 29 CFR 1926.1053 by section. A14.7 covers mobile ladder stands, not leaning ladders.",
     freeAccess: "29 CFR 1926.1053 free at ecfr.gov; ANSI standards licensed.",
     governance: GOVERNANCE.general,
@@ -7855,7 +7855,7 @@ export const CITATIONS = {
     ],
   },
   "dti": {
-    formula: "Front-end DTI = housing_payment / gross_monthly_income. Back-end DTI = (housing + other_debts) / gross_monthly_income. Thresholds per FNMA Selling Guide §B3-6-02 (typical 36/45, up to 50 with compensating factors), FHA Handbook 4000.1 §II.A.5 (default 31/43), VA Lenders Handbook M26-7 (back-end 41; no front-end limit).",
+    formula: "Front-end DTI = housing_payment / gross_monthly_income. Back-end DTI = (housing + other_debts) / gross_monthly_income. Thresholds per FNMA Selling Guide §B3-6-02 (no front-end ratio; total 36 manual, up to 45 with credit/reserves (the pass flag), 50 through DU), FHA Handbook 4000.1 §II.A.5 (default 31/43), VA Lenders Handbook M26-7 (back-end 41; no front-end limit).",
     edition: "FNMA Single-Family Selling Guide §B3-6-02 (current). FHA Handbook 4000.1 §II.A.5. VA Lenders Handbook M26-7.",
     freeAccess: "Free at selling-guide.fanniemae.com, hud.gov, and benefits.va.gov.",
     governance: GOVERNANCE.real_estate,
@@ -7911,7 +7911,7 @@ export const CITATIONS = {
     ],
   },
   "rent-vs-buy": {
-    formula: "discount d_t = 1/(1+i)^t, i = investment return. PV_buy = down_payment + Σ ownership_outflow_t * d_t − net_sale * d_N, where ownership_outflow = P&I*12 + tax_pct*price + insurance + HOA*12 + maint_pct*price and net_sale = price*(1+appr)^N − sell_pct*value − loan_balance_N. PV_rent = Σ rent*12*(1+rent_infl)^(t-1) * d_t. difference = PV_buy − PV_rent.",
+    formula: "discount d_t = 1/(1+i)^t, i = investment return. PV_buy = down_payment + Σ ownership_outflow_t * d_t − net_sale * d_N, where ownership_outflow_t = P&I x (months of year t still inside the loan term) + tax_pct*price + insurance + HOA*12 + maint_pct*price and net_sale = price*(1+appr)^N − sell_pct*value − loan_balance_N. PV_rent = Σ rent*12*(1+rent_infl)^(t-1) * d_t. difference = PV_buy − PV_rent.",
     edition: "New York Times 'Is It Better to Rent or Buy?' rent-vs-buy methodology (published interactive). AICPA personal-financial-planning guidance. First-principles discounted cash flow.",
     freeAccess: "The NYT methodology is published; the DCF math is universal. CFPB homebuyer materials free at consumerfinance.gov.",
     governance: GOVERNANCE.real_estate,
@@ -8024,7 +8024,7 @@ export const CITATIONS = {
     ],
   },
   "rental-worksheet": {
-    formula: "gross_rent = monthly_rent * 12. vacancy_loss = gross_rent * vacancy_pct/100. EGI = gross_rent - vacancy_loss + other_income. NOI = EGI - sum(expenses) (excluding depreciation). taxable_rental_income = NOI - depreciation. cap_rate = NOI / property_value. cash_on_cash = NOI / cash_invested. grm = property_value / gross_rent (gross rent multiplier, income approach). value_at_market_grm = market_grm * gross_rent.",
+    formula: "gross_rent = monthly_rent * 12. vacancy_loss = gross_rent * vacancy_pct/100. EGI = gross_rent - vacancy_loss + other_income. NOI = EGI - operating expenses (Schedule E lines 5-19 less depreciation and less mortgage/other interest, lines 12-13). taxable_rental_income = EGI - all expenses - depreciation. cap_rate = NOI / property_value. cash_on_cash = (NOI - interest) / cash_invested (before principal). grm = property_value / gross_rent (gross rent multiplier, income approach). value_at_market_grm = market_grm * gross_rent.",
     edition: "IRS Schedule E (Form 1040), Supplemental Income and Loss, Part I (Income or Loss From Rental Real Estate). Schedule E lines 5-19 (expense categories). 26 USC §469 (passive activity loss rules). 26 USC §1402 (self-employment tax exemption for rental real estate). The gross-rent-multiplier income approach per the Appraisal Institute, The Appraisal of Real Estate (15th ed.).",
     freeAccess: "Schedule E form + instructions free at irs.gov. 26 USC Part 1 free at uscode.house.gov.",
     governance: GOVERNANCE.real_estate,
@@ -11993,7 +11993,7 @@ export const CITATIONS = {
     governance: GOVERNANCE.general,
     editionNote: "SAE J429 bolt strength model. The strength acts on the tensile stress area at the thread root, At = 0.7854 x (D - 0.9743/n)^2 (roughly 20-35% smaller than the nominal shank area, 28% for a 1/2-13, so a nominal-area estimate over-predicts). Proof, yield, and tensile loads are At times the grade's proof, yield, and tensile strengths (Grade 2: 55/57/74 ksi through 3/4 in, 33/36/60 over 3/4 to 1-1/2 in; Grade 5 and A325: 85/92/120 through 1 in, 74/81/105 over 1 in; Grade 8 and A490: 120/130/150 through 1-1/2 in). The grade, read from the head markings, sets every number. The recommended clamp of about 75% of proof leaves margin for torque scatter and service loads. A design aid, not the engineer of record; the joint design, torque method, and any preload requirement govern.",
     assumptions: [
-      { name: "Stress area", value: "At = 0.7854 x (D - 0.9743/n)^2 at the thread root, ~15% under the nominal shank area", source: "ASME B1.1 / SAE J429" },
+      { name: "Stress area", value: "At = 0.7854 x (D - 0.9743/n)^2 at the thread root, ~20-35% under the nominal shank area (28% for a 1/2-13)", source: "ASME B1.1 / SAE J429" },
       { name: "Grade sets strength", value: "the grade read from the head markings sets proof, yield, and tensile strength", source: "SAE J429" },
       { name: "Recommended clamp", value: "about 75% of proof leaves margin for torque scatter and service loads", source: "fastener practice" },
     ],
@@ -13426,7 +13426,7 @@ export const CITATIONS = {
     governance: GOVERNANCE.electrical,
     editionNote: "Manufacturer loss curves (Belden / CommScope). The inverse max-run guards a zero loss coefficient.",
     assumptions: [
-      { name: "Per-100-ft loss", value: "type- and frequency-specific; RG6 ~ 6 dB, RG59 ~ 11 dB, RG11 ~ 3.5 dB per 100 ft at ~1 GHz default", source: "Belden / CommScope datasheets" },
+      { name: "Per-100-ft loss", value: "type- and frequency-specific; RG6 6.3 dB, RG59 7.6 dB, RG11 4.3 dB per 100 ft at 1 GHz default (Belden 1694A / 1505A / 7731A)", source: "Belden / CommScope datasheets" },
     ],
   },
   "camera-max-distance-for-ppf": {
@@ -16169,7 +16169,7 @@ export const CITATIONS = {
     editionNote: "Nitrification adds 4.6 lb of oxygen per pound of ammonia-nitrogen oxidized - a large term easy to forget that starves the process at high sludge age; the standard oxygen transfer efficiency of diffused aeration is only about 10-35%, so most blown air leaves unused and the air demand far exceeds what the oxygen pounds suggest; the oxygen factor rises 0.9 (short SRT) to 1.5 (extended aeration). A sizing aid, not a blower selection.",
     assumptions: [
       { name: "Nitrification term", value: "4.6 lb O2 per lb ammonia-N nitrified, added to the carbonaceous oxygen demand", source: "WEF aeration design" },
-      { name: "Air from SOTE", value: "air_scfm = O2 / (0.075 lb/ft^3 x 0.232 O2 fraction x SOTE x 1440); diffused SOTE ~10-35%", source: "WEF aeration design" },
+      { name: "Air from SOTE", value: "air_scfm = SOR / (0.075 lb/ft^3 x 0.232 O2 fraction x SOTE x 1440), SOR = AOR / [alpha F 1.024^(T-20) (beta Cs,T - C) / Cs,20]; diffused SOTE ~10-35%", source: "WEF aeration design" },
     ],
   },
   "was-srt-control": {
@@ -19675,11 +19675,11 @@ export const CITATIONS = {
     ],
   },
   "rc-punching-shear": {
-    formula: "bo = 2(c1 + d) + 2(c2 + d) interior, 2(c1 + d/2) + (c2 + d) edge, (c1 + d/2) + (c2 + d/2) corner (c1 perpendicular to the edge); beta = max(c1,c2)/min(c1,c2); vc = min(4, 2 + 4/beta, 2 + alpha_s d/bo) x lambda sqrt(f'c); phi Vc = 0.75 vc bo d. (alpha_s = 40/30/20 interior/edge/corner)",
+    formula: "bo = 2(c1 + d) + 2(c2 + d) interior, 2(c1 + d/2) + (c2 + d) edge, (c1 + d/2) + (c2 + d/2) corner (c1 perpendicular to the edge); beta = max(c1,c2)/min(c1,c2); vc = min(4, 2 + 4/beta, 2 + alpha_s d/bo) x lambda_s x lambda x min(sqrt(f'c), 100), lambda_s = min(sqrt(2/(1 + d/10)), 1.0); phi Vc = 0.75 vc bo d. (alpha_s = 40/30/20 interior/edge/corner)",
     edition: "The ACI 318-19 Table 22.6.5.2 two-way (punching) shear stress (least of the three terms) on the 22.6.4.1 critical section at d/2 from the column face, with alpha_s = 40/30/20 and phi = 0.75, by name.",
     freeAccess: "ACI 318 is readable free through the ACI online reading room at concrete.org; Table 22.6.5.2 and the 22.6.4.1 critical-section definition are in the published code.",
     governance: GOVERNANCE.general,
-    editionNote: "The ACI 318-19 Table 22.6.5.2 two-way shear stress as the least of 4 lambda sqrt(f'c), (2 + 4/beta) lambda sqrt(f'c), and (2 + alpha_s d/bo) lambda sqrt(f'c), the d/2 critical perimeter, alpha_s = 40/30/20 for an interior/edge/corner column, and phi = 0.75. This returns the concrete two-way shear capacity on the d/2 critical section for a rectangular column - it assumes shear without unbalanced-moment transfer (no gamma_v eccentric-shear amplification), no shear reinforcement or shear-cap/drop panel, and a rectangular column; the edge column takes a three-sided perimeter and the corner column a two-sided one, with the slab edge flush with the column face. A design aid, not a substitute for the structural engineer of record's stamped design.",
+    editionNote: "The ACI 318-19 Table 22.6.5.2 two-way shear stress as the least of 4 lambda sqrt(f'c), (2 + 4/beta) lambda sqrt(f'c), and (2 + alpha_s d/bo) lambda sqrt(f'c), each times the 22.5.5.1.3 size-effect factor lambda_s = min(sqrt(2/(1 + d/10)), 1.0) with sqrt(f'c) capped at 100 psi (22.5.3.1), the d/2 critical perimeter, alpha_s = 40/30/20 for an interior/edge/corner column, and phi = 0.75. This returns the concrete two-way shear capacity on the d/2 critical section for a rectangular column - it assumes shear without unbalanced-moment transfer (no gamma_v eccentric-shear amplification), no shear reinforcement or shear-cap/drop panel, and a rectangular column; the edge column takes a three-sided perimeter and the corner column a two-sided one, with the slab edge flush with the column face. A design aid, not a substitute for the structural engineer of record's stamped design.",
     assumptions: [
       { name: "Critical section", value: "the perimeter bo at d/2 from the column faces; capacity phi vc bo d", source: "ACI 318-19 22.6.4.1" },
       { name: "Three-term least", value: "4, 2 + 4/beta, and 2 + alpha_s d/bo, each x lambda sqrt(f'c); the least governs", source: "ACI 318-19 Table 22.6.5.2" },
@@ -22501,7 +22501,7 @@ export const CITATIONS = {
     ],
   },
   "pool-heat-pump-capacity": {
-    formula: "delivered capacity = rated capacity x the air, humidity and water derate factors multiplied together, all three read from the manufacturer's own capacity table; heat required = gallons x 8.34 x the temperature rise, and the heat-up time divides it by the DERATED capacity.",
+    formula: "delivered capacity = rated capacity x the air, humidity and water derate factors multiplied together, all three read from the manufacturer's own capacity table; heat required = gallons x 8.34 x the temperature rise, and the heat-up time divides it by the DERATED capacity less the entered surface loss (a cover cuts that loss by its percent, never below the lossless time).",
     edition: "Pool heat pump performance from the manufacturer's published capacity tables. The factors are ENTERED because the shape of the capacity surface differs between units and refrigerants enough that a generic correlation would be wrong for most of them.",
     freeAccess: "Three entered factors and one thermal mass relation.",
     governance: GOVERNANCE.general,
@@ -22638,7 +22638,7 @@ export const CITATIONS = {
     ],
   },
   "fixed-ladder-fall-protection": {
-    formula: "a height threshold above which fall protection is required (commonly 24 ft), and rest platforms at an entered interval; a CAGE does not satisfy the fall protection requirement.",
+    formula: "a height threshold above which fall protection is required (commonly 24 ft), and rest platforms at an entered interval; a CAGE does not satisfy the fall protection requirement on a ladder installed on or after November 19, 2018; one installed before is accepted until November 18, 2036.",
     edition: "Fixed ladder requirements as 29 CFR 1910.28 structures them. The threshold and the rest platform interval are ENTERED because they differ between jurisdictions and have changed; the federal phase-out dates (cages installed before November 19, 2018 acceptable until November 18, 2036, 1910.28(b)(9)) are built in over time.",
     freeAccess: "Two threshold comparisons.",
     governance: GOVERNANCE.general,
@@ -24095,7 +24095,7 @@ export const CITATIONS = {
     edition: "The ASME Section I and IV relieving-capacity requirement, cited not mirrored: the valves must pass everything the boiler can generate at full fire with the outlet shut, no valve is set above the maximum allowable working pressure except as the code permits for supplementary valves, and pressure must not rise more than the permitted accumulation. ASME BPVC Sections I and IV, the National Board inspection code, the valve manufacturer, and the jurisdiction's boiler inspector govern.",
     freeAccess: "A comparison of stamped and rated values the user supplies; no code table or valve catalogue is reproduced.",
     governance: GOVERNANCE.general,
-    editionNote: "The requirement is easy to fail after twenty years of modifications. A boiler rated 20,700 lb/hr with valves stamped 11,500 and 10,200 has 21,700 lb/hr installed and passes; uprate the burner to 24,000 lb/hr and the same valves are 2,300 lb/hr short, nothing was done to them, and the boiler is outside its code case. Stamped capacity is at a specific set pressure -- the same valve passes more at a higher one -- so the sum is taken at the pressures actually installed, and a supplementary valve set above the maximum allowable working pressure carries its stamp there. The required capacity is not always the nameplate either: for a fired boiler it is at least the output the fuel input supports. The accumulation test, not this arithmetic, is the demonstration of compliance.",
+    editionNote: "The requirement is easy to fail after twenty years of modifications. A boiler rated 20,700 lb/hr with valves stamped 11,500 and 10,200 has 21,700 lb/hr installed and passes on capacity (its 155 psig second valve exceeds the 154.5 psig MAWP + 3% ceiling, a separate set-pressure finding); uprate the burner to 24,000 lb/hr and the same valves are 2,300 lb/hr short, nothing was done to them, and the boiler is outside its code case. Stamped capacity is at a specific set pressure -- the same valve passes more at a higher one -- so the sum is taken at the pressures actually installed, and a supplementary valve set above the maximum allowable working pressure carries its stamp there. The required capacity is not always the nameplate either: for a fired boiler it is at least the output the fuel input supports. The accumulation test, not this arithmetic, is the demonstration of compliance.",
     assumptions: [
       { name: "Stamped capacity is at a set pressure", value: "not a catalogue figure", source: "ASME BPVC Sections I and IV" },
       { name: "The accumulation test is the demonstration", value: "this is a screen, not a code calculation", source: "the National Board inspection code" },

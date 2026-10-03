@@ -226,7 +226,7 @@ DEMO_RENDERERS["flood-cut-quantity"] = renderFloodCutQuantity;
 //
 // poly = (floor_sf x floor_layers + wall_sf x wall_layers) x 1.10;
 // req_cfm = volume x ach / 60; nam_count = ceil(req_cfm / nam_cfm);
-// waste_bags = ceil(debris_cy x 27 / 4.4).
+// waste_bags = ceil(debris_cy x 27 / (4.4 x 0.7)).
 // dims: in { room_len_ft: L, room_wid_ft: L, room_ht_ft: L, ach_target: dimensionless, nam_cfm: L^3 T^-1, debris_cy: L^3, floor_layers: dimensionless, wall_layers: dimensionless } out: { poly_sf: L^2, req_cfm: L^3 T^-1, nam_count: dimensionless, waste_bags: dimensionless }
 // (Room dimensions are lengths L; the poly area is L^2; the required exhaust and
 //  machine airflow are volume-rates L^3 T^-1; the machine and bag counts are

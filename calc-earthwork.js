@@ -1044,7 +1044,7 @@ export function computeRestrainedPipeLength({ pipe_od_in = 12, pressure_psi = 15
     area_in2,
     thrust_lb,
     length_each_side_ft,
-    note: "The unit soil resistance (pipe friction plus fitting bearing per foot) comes from the restraint manufacturer's tables (EBAA / AWWA M41) with the site soil parameters; enter that value here. This is the restrained-joint alternative to a concrete thrust block. The sine of the half-angle sets how hard the bend pulls. The engineer and AHJ govern.",
+    note: "The unit resistance per foot (pipe friction plus half the bearing, Ff + Rs/2, as DIPRA counts it) comes from the restraint manufacturer's tables (EBAA / AWWA M41) with the site soil parameters; enter that value here. This is the restrained-joint alternative to a concrete thrust block. The sine of the half-angle sets how hard the bend pulls. The engineer and AHJ govern.",
   };
 }
 

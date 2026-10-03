@@ -934,7 +934,7 @@ export function renderPipeExpansion(inputRegion, outputRegion, citationEl) {
 
 // dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderTanklessGPM(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: GPM = kBTU * 1000 / (8.33 * 60 * dT). 1 lb water requires 1 BTU per F; 1 gal water = 8.33 lb. Inlet temperatures by climate zone (NOAA design data).";
+  citationEl.textContent = "Citation: GPM = kBTU x 1000 x thermal efficiency / (8.33 x 60 x dT) (default 0.82). 1 lb water requires 1 BTU per F; 1 gal water = 8.33 lb. Inlet temperatures by climate zone (NOAA design data).";
   // v23 EN.4: solve-for selector + worst-case inlet override (season preset).
   const solve = makeSelect("Solve for", "tl-s", [
     { value: "gpm", label: "GPM from kBTU + dT" },
@@ -2666,8 +2666,9 @@ export function computeSanitaryDfu({
 
 export const sanitaryDfuExample = {
   // Single-bathroom branch: 1 private WC (3) + 1 lavatory (1) + 1
-  // bathtub (2) = 6 DFU. A 2 in horizontal branch (max 6 DFU) is the
-  // minimum per IPC Table 710.1(2).
+  // bathtub (2) = 6 DFU. The DFU load alone allows a 2 in horizontal branch
+  // (max 6 DFU, IPC Table 710.1(2)), but the water closet's 3 in outlet
+  // raises it to 3 in (IPC Table 709.1, 704.2).
   inputs: {
     fixtures: { water_closet_private: 1, lavatory: 1, bathtub: 1 },
     config: "horizontal_branch",

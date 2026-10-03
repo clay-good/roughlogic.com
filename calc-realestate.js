@@ -170,7 +170,7 @@ export function renderDTI(inputRegion, outputRegion, citationEl) {
   });
   const oFront = makeOutputLine(outputRegion, "Front-end DTI (housing only)", "dti-out-front");
   const oBack = makeOutputLine(outputRegion, "Back-end DTI (total debt)", "dti-out-back");
-  const oConv = makeOutputLine(outputRegion, "Conventional thresholds (36/45)", "dti-out-conv");
+  const oConv = makeOutputLine(outputRegion, "Conventional (total DTI 45 max; no front-end ratio)", "dti-out-conv");
   const oFHA = makeOutputLine(outputRegion, "FHA thresholds (31/43)", "dti-out-fha");
   const oVA = makeOutputLine(outputRegion, "VA threshold (41 back)", "dti-out-va");
   const update = debounce(() => {
@@ -1438,9 +1438,9 @@ export const rentalWorksheetExample = {
     cash_invested: 80000,
   },
   // gross = 26400; vacancy = 1320; EGI = 25080. Expenses 1200+9800+4800+2112+1500 = 19412.
-  // NOI = 25080 - 19412 = 5668. Taxable = 5668 - 9200 = -3532 (passive loss; suspended unless qualifies).
-  // Cap rate = 5668/320000 = 1.77%. CoC = 5668/80000 = 7.085%. GRM = 320000/26400 = 12.121.
-  expected: { NOI_approx: 5668, cap_rate_pct_approx: 1.77, cash_on_cash_pct_approx: 7.085, grm_approx: 12.121 },
+  // NOI = 25080 - (19412 - 9800 interest) = 15468. Taxable = 25080 - 19412 - 9200 = -3532 (passive loss; suspended unless qualifies).
+  // Cap rate = 15468/320000 = 4.83%. CoC = (15468 - 9800)/80000 = 7.085%. GRM = 320000/26400 = 12.121.
+  expected: { NOI_approx: 15468, cap_rate_pct_approx: 4.83, cash_on_cash_pct_approx: 7.085, grm_approx: 12.121 },
 };
 
 // dims: in { inputRegion: dimensionless, outputRegion: dimensionless, citationEl: dimensionless }
@@ -1448,7 +1448,7 @@ export const rentalWorksheetExample = {
 // (DOM-mount renderer; HTMLElement refs are categorical.)
 export function renderRentalWorksheet(inputRegion, outputRegion, citationEl) {
   citationEl.textContent =
-    "Citation: IRS Schedule E (Form 1040), Supplemental Income and Loss, Part I (Income or Loss From Rental Real Estate). Expense categories mirror Schedule E lines 5-19. NOI excludes depreciation (a non-cash, separately-tracked line). Passive-loss rules (26 USC §469) govern whether a taxable rental loss reduces other income. The gross-rent multiplier (GRM = property value / annual gross rent) and the value it implies at a market GRM are the income-approach quick-screen per the Appraisal Institute, The Appraisal of Real Estate. CPA / appraiser governs.";
+    "Citation: IRS Schedule E (Form 1040), Supplemental Income and Loss, Part I (Income or Loss From Rental Real Estate). Expense categories mirror Schedule E lines 5-19. NOI excludes depreciation (a non-cash, separately-tracked line) and mortgage and other interest (financing, not operations). Passive-loss rules (26 USC §469) govern whether a taxable rental loss reduces other income. The gross-rent multiplier (GRM = property value / annual gross rent) and the value it implies at a market GRM are the income-approach quick-screen per the Appraisal Institute, The Appraisal of Real Estate. CPA / appraiser governs.";
   const M = makeNumber("Monthly rent ($)", "rw-m", { step: "any", min: "0" });
   const V = makeNumber("Vacancy rate (%, default 0)", "rw-v", { step: "any", min: "0", max: "100", value: "0" });
   const O = makeNumber("Other annual income ($, e.g. parking, laundry)", "rw-o", { step: "any", min: "0", value: "0" });

@@ -1026,7 +1026,7 @@ export const serviceLoadExample = {
     fixed_appliances_W: 6000, range_W: 12000, dryer_W: 5000,
     hvac_cooling_W: 5000, hvac_heating_W: 8000,
   },
-  expectedRange: { required_A: { min: 80, max: 130 }, next_standard_A_min: 100 },
+  expectedRange: { required_A: { min: 120, max: 150 }, next_standard_A_min: 150 },
 };
 
 // --- Utility 66: Generator Sizing ---

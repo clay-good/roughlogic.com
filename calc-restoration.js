@@ -2581,7 +2581,7 @@ function renderCharDepthCapacity(inputRegion, outputRegion, citationEl) {
   const rate = makeNumber("Nominal char rate (in/hr)", "ch-rate", { step: "any", min: "0" });
   const zs = makeNumber("Zero-strength layer (in)", "ch-zs", { step: "any", min: "0" });
   for (const f of [t, b, d, fw, fd, rate, zs]) inputRegion.appendChild(f.wrap);
-  attachExampleButton(inputRegion, () => { t.input.value = "30"; b.input.value = "5.5"; d.input.value = "9.5"; fw.input.value = "2"; fd.input.value = "1"; rate.input.value = "1.5"; zs.input.value = "0.2"; update(); });
+  attachExampleButton(inputRegion, () => { t.input.value = "30"; b.input.value = "5.5"; d.input.value = "9.5"; fw.input.value = "2"; fd.input.value = "1"; rate.input.value = "1.5"; zs.input.value = "0"; update(); });
   const oChar = makeOutputLine(outputRegion, "Effective char depth", "ch-out-char");
   const oRes = makeOutputLine(outputRegion, "Residual section", "ch-out-res");
   const oRatio = makeOutputLine(outputRegion, "Bending capacity remaining", "ch-out-ratio");
@@ -2589,7 +2589,7 @@ function renderCharDepthCapacity(inputRegion, outputRegion, citationEl) {
     const r = computeCharDepthCapacity({
       exposure_min: Number(t.input.value) || 0, nominal_width_in: Number(b.input.value) || 0, nominal_depth_in: Number(d.input.value) || 0,
       faces_across_width: fw.input.value === "" ? 2 : Number(fw.input.value), faces_across_depth: fd.input.value === "" ? 1 : Number(fd.input.value),
-      char_rate_in_hr: rate.input.value === "" ? 1.5 : Number(rate.input.value), zero_strength_in: zs.input.value === "" ? 0.2 : Number(zs.input.value),
+      char_rate_in_hr: rate.input.value === "" ? 1.5 : Number(rate.input.value), zero_strength_in: zs.input.value === "" ? 0 : Number(zs.input.value),
     });
     if (r.error) { oChar.textContent = r.error; oRes.textContent = "-"; oRatio.textContent = "-"; return; }
     oChar.textContent = fmt(r.effective_char_in, 2) + " in (char " + fmt(r.char_depth_in, 2) + " in x 1.2, NDS)";

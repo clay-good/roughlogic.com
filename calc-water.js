@@ -1313,13 +1313,13 @@ export function computeCoolingWaterMakeup({
 
 export const coolingWaterMakeupExample = {
   // 1,000 GPM recirculation, 10 F range, COC 4, drift 0.002:
-  // evaporation 10, blowdown 10/3 = 3.33, drift 2, makeup 15.33 GPM.
+  // evaporation 10, blowdown 10/3 - 2 = 1.33, drift 2, makeup 13.33 GPM.
   inputs: { recirculation_gpm: 1000, delta_T_F: 10, coc: 4, drift_fraction: 0.002 },
 };
 
 // dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 function _v16w_renderCoolingWaterMakeup(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: evaporation = recirculation x delta-T / 1000; blowdown = evaporation / (COC - 1); drift = recirculation x drift fraction; makeup = evaporation + blowdown + drift. Per the Cooling Technology Institute (CTI) publications and ASHRAE Systems and Equipment 2020 Ch. 40 (cooling towers). Free at cti.org and ashrae.org for the TOCs.";
+  citationEl.textContent = "Citation: evaporation = recirculation x delta-T / 1000; blowdown = evaporation / (COC - 1) - drift (not below 0); drift = recirculation x drift fraction; makeup = evaporation + blowdown + drift. Per the Cooling Technology Institute (CTI) publications and ASHRAE Systems and Equipment 2020 Ch. 40 (cooling towers). Free at cti.org and ashrae.org for the TOCs.";
   const recirc = makeNumber("Recirculation flow (GPM)", "cm-recirc", { step: "any", min: "0" });
   const dT = makeNumber("Cooling range delta-T (°F)", "cm-dt", { step: "any", min: "0" });
   const coc = makeNumber("Cycles of concentration", "cm-coc", { step: "any", min: "0" });

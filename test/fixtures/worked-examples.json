@@ -6181,7 +6181,7 @@
   {
    "tile_id": "tankless-gpm",
    "source_publisher": "Project (first-principles)",
-   "source_title": "Tankless GPM = (kBTU * 1000) / (8.33 lb/gal * 60 min/hr * dT_F)",
+   "source_title": "Tankless GPM = (kBTU * 1000 * efficiency) / (8.33 lb/gal * 60 min/hr * dT_F)",
    "source_edition_or_year": "n/a",
    "source_section_or_page": "199 kBTU input, climate 5A (Chicago) inlet 50 F, target 110 F outlet -> dT 60 F -> 5.44 gpm at the default 0.82 thermal efficiency (199,000 x 0.82 / (8.33 x 60 x 60)); standard sensible-heat identity for water",
    "verified_by": "rl",
@@ -6278,7 +6278,7 @@
   {
    "tile_id": "septic-tank",
    "source_publisher": "USEPA",
-   "source_title": "Minimum septic tank gallons from bedroom count (typical 150 gpd/br design flow, 2x retention factor, 1000 gal floor)",
+   "source_title": "Minimum septic tank gallons from bedroom count (EPA Table 4-13 volume, 1000 gal floor; 150 gpd/br design flow)",
    "source_edition_or_year": "EPA Onsite Wastewater Treatment Systems Manual (EPA/625/R-00/008), Table 4-13",
    "source_section_or_page": "4 bedrooms -> 1,200 gal (EPA Table 4-13, one- and two-family dwellings); 600 gpd design flow at 150 gpd per bedroom",
    "verified_by": "rl",
@@ -6310,7 +6310,7 @@
   {
    "tile_id": "trap-arm",
    "source_publisher": "IPC",
-   "source_title": "Maximum trap arm length by pipe diameter (Table 906.1)",
+   "source_title": "Maximum trap arm length by pipe diameter (Table 909.1)",
    "source_edition_or_year": "IPC 2024",
    "source_section_or_page": "Table 906.1: 2 in trap arm at 1/4 in/ft slope -> 8 ft maximum length",
    "verified_by": "rl",
@@ -6645,7 +6645,7 @@
   {
    "tile_id": "rope-ma",
    "source_publisher": "Project (first-principles)",
-   "source_title": "Rope rescue MA: actual_ma = theoretical_ma * efficiency^pulleys; haul_force = load / actual_ma",
+   "source_title": "Rope rescue MA: actual_ma = 1 + p + p^2 + ... + p^pulleys (tension tracking); haul_force = load / actual_ma",
    "source_edition_or_year": "n/a; standard rope-rescue mechanical-advantage identity",
    "source_section_or_page": "4:1 rig (3 pulleys), efficiency 0.9, 600 lb load -> theoretical MA 4 / actual MA 1 + 0.9 + 0.81 + 0.729 = 3.439 (tension tracking) / haul force 174.47 lb. Recomputed 2026-10-02 from 4 x 0.9^3 = 2.916.",
    "verified_by": "rl",
@@ -6979,7 +6979,7 @@
   {
    "tile_id": "hydrostatic-test",
    "source_publisher": "IPC / Plumbing engineering practice",
-   "source_title": "Hydrostatic test pressure = working pressure * multiplier (1.5x water / 1.25x fuel gas); hold time piecewise by system volume",
+   "source_title": "Hydrostatic test pressure = working pressure * multiplier (1.5x water / 1.5x fuel gas, fuel gas never below 3 psig); hold time piecewise by system volume",
    "source_edition_or_year": "IPC 2024; standard public hydrostatic-test practice",
    "source_section_or_page": "100 psi working / 200 gal volume / water -> test_pressure 150 psi / hold 30 min (50 - 500 gal band)",
    "verified_by": "rl",
@@ -9843,7 +9843,7 @@
   {
    "tile_id": "cooling-curve",
    "source_publisher": "FDA Food Code 2022 (project bundled time-to-temperature targets)",
-   "source_title": "Two-stage cooling curve: phase 1 = 135 -> 70 F in <= 2 hr; phase 2 = 70 -> 41 F in <= 4 hr (total <= 6 hr)",
+   "source_title": "Two-stage cooling curve: phase 1 = 135 -> 70 F in <= 2 hr; phase 2 = 70 -> 41 F in what remains of a 6 hr total",
    "source_edition_or_year": "FDA Food Code 2022, 3-501.14",
    "source_section_or_page": "Full 4 in pan / thick liquid / start 135 F / ambient 70 F -> 110 min phase 1 + 176 min phase 2, both pass; exercises the boolean-coerce-to-0/1 tolerance path",
    "verified_by": "rl",
@@ -11917,7 +11917,7 @@
   {
    "tile_id": "formwork-pressure",
    "source_publisher": "ACI 347 Guide to Formwork for Concrete",
-   "source_title": "ACI 347 lateral pressure on wall forms: P = Cw * Cc * (150 + 9000 R / T) for R <= 7 ft/hr",
+   "source_title": "ACI 347 lateral pressure on wall forms: P = Cw * Cc * (150 + 9000 R / T) for R < 7 ft/hr in walls up to 14 ft",
    "source_edition_or_year": "ACI 347 (Class I mix Cc = 1.0; weight factor Cw = 1.0 for ordinary concrete)",
    "source_section_or_page": "Pour 5 ft/hr / 70 F / normal-weight 150 pcf / 12 ft wall -> 792.86 psf design pressure (below the 1,800 psf wet-concrete head)",
    "verified_by": "rl",
@@ -12531,7 +12531,7 @@
   {
    "tile_id": "truss-capacity",
    "source_publisher": "Tomcat USA",
-   "source_title": "Truss UDL screening: published udl_max_lb_per_ft * span; pass if total imposed (udl + equivalent point) <= published",
+   "source_title": "Truss UDL screening: published udl_max_lb_per_ft * span; pass if the equivalent point-load UDL (2 x sum P / span) <= published",
    "source_edition_or_year": "Tomcat Middle Duty 16 in x 16 in box truss data sheet (maximum allowable uniform load, 40 ft span: 77 lb/ft)",
    "source_section_or_page": "16 in box / 40 ft span / 200 + 400 + 200 lb point loads -> 77 plf / 3,080 lb total uniform capacity / 800 lb of point load (40 plf equivalent) / 1.925 safety factor / pass",
    "verified_by": "rl",
@@ -14411,7 +14411,7 @@
   {
    "tile_id": "rigging-check",
    "source_publisher": "OSHA 1926.251 + ASME B30.9 sling capacity tables",
-   "source_title": "WLL lookup; tension_per_leg = load / (n_legs * cos(angle/2)); pass if WLL >= tension * derate",
+   "source_title": "WLL lookup; tension_per_leg = load / (n_legs * cos(angle/2)); pass if WLL x derate >= tension",
    "source_edition_or_year": "ASME B30.9 5/8 in 6x19 IWRC steel sling vertical WLL 6700 lb",
    "source_section_or_page": "5/8 in steel / vertical / 1500 lb / 2 legs -> WLL 6700 / 750 lb per leg / SF 8.93 / pass",
    "verified_by": "rl",
@@ -15002,7 +15002,7 @@
   {
    "tile_id": "dti",
    "source_publisher": "FNMA / FHA / VA underwriting guidelines (public)",
-   "source_title": "Front-end + back-end DTI vs conventional 36/45, FHA 31/43, VA 41 back",
+   "source_title": "Front-end + back-end DTI vs conventional 45 total, FHA 31/43, VA 41 back",
    "source_edition_or_year": "Current",
    "source_section_or_page": "Worked example: $7500/mo income, $2100 housing, $600 other debts -> front 28%, back 36% (passes all three programs)",
    "verified_by": "rl",
@@ -18641,7 +18641,7 @@
   {
    "tile_id": "backflow-test-psi",
    "source_publisher": "USC FCCCHR Manual / AWWA C511",
-   "source_title": "RP pass: #1 check >= 5 psid and relief >= 2 psid below it",
+   "source_title": "RP pass: #1 check >= 5 psid and relief >= 2 psid and below it",
    "source_edition_or_year": "USC FCCCHR / AWWA C511 field-test procedure",
    "source_section_or_page": "#1 check 8 psid, relief 4 psid -> buffer 4 psid, pass",
    "verified_by": "rl",
@@ -23400,7 +23400,7 @@
   {
    "tile_id": "brine-cure",
    "source_publisher": "Mass-fraction chemistry + USDA FSIS 9 CFR 424 nitrite limit",
-   "source_title": "equilibrium ingoing nitrite ppm = cure*0.0625*1e6/meat (green meat weight, 9 CFR 424.22)",
+   "source_title": "equilibrium ingoing nitrite ppm = cure*0.0625*1e6/meat (green meat weight; 9 CFR 424.21(c) chopped limit 156 ppm)",
    "source_edition_or_year": "6.25% nitrite constant",
    "source_section_or_page": "equilibrium: meat 1000 g, salt 25 g, cure 2.5 g -> 2.5% salt, 156 ppm nitrite (2.5 g Cure #1 / kg meat)",
    "verified_by": "rl",
@@ -29200,9 +29200,9 @@
   {
    "tile_id": "abatement-containment",
    "source_publisher": "EPA NESHAP 40 CFR 61 M / OSHA 1926.1101",
-   "source_title": "poly = (floor x layers + wall x layers) x 1.10; req_cfm = volume x ACH / 60; nam_count = ceil(req/nam); bags = ceil(debris x 27 / 4.4)",
+   "source_title": "poly = (floor x layers + wall x layers) x 1.10; req_cfm = volume x ACH / 60; nam_count = ceil(req/nam); bags = ceil(debris x 27 / (4.4 x 0.7))",
    "source_edition_or_year": "asbestos abatement practice",
-   "source_section_or_page": "20 x 15 x 9 containment, 4 ACH, 1,500 cfm machines, 3 cy debris, 2 floor / 1 wall -> 1,353 ft^2 poly, 180 cfm, 1 machine, 19 bags",
+   "source_section_or_page": "20 x 15 x 9 containment, 4 ACH, 1,500 cfm machines, 3 cy debris, 2 floor / 1 wall -> 1,353 ft^2 poly, 180 cfm, 1 machine, 27 bags",
    "verified_by": "rl",
    "verified_on": "2026-06-13",
    "inputs": {
@@ -107648,7 +107648,7 @@
   {
    "tile_id": "tiedown-count",
    "source_publisher": "FMCSA",
-   "source_title": "24 ft, 12,000 lb steel beam on four tiedowns at 5,400 lb WLL each, secured both ends",
+   "source_title": "24 ft, 12,000 lb steel beam on four tiedowns at 5,400 lb WLL each, over the cargo to the other side",
    "source_edition_or_year": "49 CFR 393",
    "source_section_or_page": "393.110 count rule and 393.106 aggregate WLL",
    "verified_by": "rl",
@@ -116328,7 +116328,7 @@
    "tile_id": "transverse-wind-load-conductor",
    "source_publisher": "Project (first-principles)",
    "source_title": "9 psf on one ACSR Drake at a 400 ft wind span, 45 ft pole standing 39 ft out of the ground",
-   "source_edition_or_year": "F_c = p x (d/12) x wind span; F_p = p x tapered projected area at mid-height; M = sum of F x h",
+   "source_edition_or_year": "F_c = p x (d/12) x wind span; F_p = p x tapered projected area at the trapezoid centroid, h/3 x (B + 2T)/(B + T); M = sum of F x h",
    "source_section_or_page": "the applicable NESC edition and a qualified line designer govern",
    "verified_by": "rl",
    "verified_on": "2026-09-19",

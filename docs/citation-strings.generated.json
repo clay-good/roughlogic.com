@@ -211,7 +211,7 @@
     },
     "rental-worksheet": {
       "group": "calc-realestate.js (Group X, v12 §8)",
-      "stamp": "Citation: IRS Schedule E (Form 1040), Supplemental Income and Loss, Part I (Income or Loss From Rental Real Estate). Expense categories mirror Schedule E lines 5-19. NOI excludes depreciation (a non-cash, separately-tracked line). Passive-loss rules (26 USC §469) govern whether a taxable rental loss reduces other income. The gross-rent multiplier (GRM = property value / annual gross rent) and the value it implies at a market GRM are the income-approach quick-screen per the Appraisal Institute, The Appraisal of Real Estate. CPA / appraiser governs."
+      "stamp": "Citation: IRS Schedule E (Form 1040), Supplemental Income and Loss, Part I (Income or Loss From Rental Real Estate). Expense categories mirror Schedule E lines 5-19. NOI excludes depreciation (a non-cash, separately-tracked line) and mortgage and other interest (financing, not operations). Passive-loss rules (26 USC §469) govern whether a taxable rental loss reduces other income. The gross-rent multiplier (GRM = property value / annual gross rent) and the value it implies at a market GRM are the income-approach quick-screen per the Appraisal Institute, The Appraisal of Real Estate. CPA / appraiser governs."
     },
     "required-fire-flow": {
       "group": "calc-fire.js (Group F)",

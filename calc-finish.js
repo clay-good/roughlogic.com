@@ -336,7 +336,7 @@ export function computeGutterDownspout({ roof_area_sqft = 0, pitch_factor = "1.0
     // 5 in/hr (6,600) needs 6 in, not 5 in.
     gutter_size: roof_area_sqft * pf * rainfall_in_hr <= 5520 ? "5 in K-style" : roof_area_sqft * pf * rainfall_in_hr <= 7960 ? "6 in K-style" : "over a single 6 in K-style run -- split the roof into more gutter runs or go larger",
     gutter_design_area: roof_area_sqft * pf * rainfall_in_hr,
-    note: "Scale the plan roof area by the pitch (a steeper roof catches more wind-driven rain - about 1.05 at 4/12 up to 1.30 at 12/12) and by the local rainfall intensity against a 5 in/hr reference. A 5 in K-style gutter handles roughly 5,500 sq ft of adjusted area and a 6 in handles more. Size one square inch of downspout per about 100 sq ft of roof (a 2x3 is 6 sq in, a 3x4 is 12). Put at least two outlets on any run longer than about 60 ft.",
+    note: "Scale the plan roof area by the pitch (a steeper roof catches more wind-driven rain - about 1.05 at 4/12 up to 1.30 at 12/12) and by the local rainfall intensity against a 5 in/hr reference. A 5 in K-style gutter handles a design area (plan area x pitch factor x rainfall in in/hr) up to about 5,520 and a 6 in up to about 7,960 -- about 1,100 and 1,600 sq ft of roof at 5 in/hr. Size one square inch of downspout per about 100 sq ft of roof (a 2x3 is 6 sq in, a 3x4 is 12). Put at least two outlets on any run longer than about 60 ft.",
   };
 }
 export const gutterDownspoutExample = { inputs: { roof_area_sqft: 1200, pitch_factor: "1.10", rainfall_in_hr: 5, downspout_sqin: 12 } };

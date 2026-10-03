@@ -1201,7 +1201,7 @@ export const anchorEmbedmentExample = {
 
 // dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderStairStringer(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: stringer_ft = sqrt(rise^2 + run^2). Board-foot estimate uses a 2x12 stringer (1.5 in x 11.25 in actual).";
+  citationEl.textContent = "Citation: stringer_ft = sqrt(rise^2 + run^2). Board-foot estimate uses a nominal 2x12 (2 x 12 in), the way lumber is priced.";
   // v10 §B.3 wiring: simplified-screening banner (AHJ-adopted code edition governs final geometry).
   renderLimitationBanner(inputRegion, getLimitationCopy("stair-stringer"));
   const rise = makeNumber("Total rise (in)", "ss-r", { step: "any", min: "0" });

@@ -223,7 +223,7 @@ function _v858renderHeatTraceSizing(inputRegion, outputRegion, citationEl) {
   const wf = makeNumber("Cable rated wattage (W/ft)", "hts-wf", { step: "any", min: "0" });
   const v = makeNumber("Supply voltage (V)", "hts-v", { step: "any", min: "0" });
   const br = makeNumber("Circuit breaker rating (A)", "hts-br", { step: "any", min: "0" });
-  const sf = makeNumber("Cold-start current multiple (manufacturer; ~2-3)", "hts-sf", { step: "any", min: "1", value: "2" });
+  const sf = makeNumber("Cold-start current multiple (manufacturer; ~2-3)", "hts-sf", { step: "any", min: "1", value: "3" });
   for (const f of [p, al, nv, va, wf, v, br, sf]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { p.input.value = "150"; al.input.value = "10"; nv.input.value = "1"; va.input.value = "3"; wf.input.value = "5"; v.input.value = "120"; br.input.value = "20"; update(); });
   const oCable = makeOutputLine(outputRegion, "Heat-trace cable", "hts-out-cable");

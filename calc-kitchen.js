@@ -415,7 +415,7 @@ const renderCoolingCurve = _r({
   ],
   outputs: [
     { key: "p1", id: "cc-out-p1", label: "Phase 1 (135->70 F)", value: (r) => fmt(r.phase1_minutes, 0) + " min - " + (r.phase1_pass ? "PASS (<=120)" : "FAIL (>120)") },
-    { key: "p2", id: "cc-out-p2", label: "Phase 2 (70->41 F)",  value: (r) => fmt(r.phase2_minutes, 0) + " min - " + (r.phase2_pass ? "PASS (<=240)" : "FAIL (>240)") },
+    { key: "p2", id: "cc-out-p2", label: "Phase 2 (70->41 F)",  value: (r) => fmt(r.phase2_minutes, 0) + " min - " + (r.phase2_pass ? "PASS (total <=360)" : "FAIL (total >360 or phase 1 failed)") },
   ],
   compute: computeCoolingCurve,
 });
@@ -760,7 +760,7 @@ function renderBrineCure(inputRegion, outputRegion, citationEl) {
   for (const f of [mode, meat, water, salt, cure, target, prod]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { mode.select.value = "equilibrium"; meat.input.value = "1000"; water.input.value = ""; salt.input.value = "25"; cure.input.value = "2.5"; target.input.value = ""; update(); });
   const oConc = makeOutputLine(outputRegion, "Concentration", "bc-out-conc");
-  const oNitrite = makeOutputLine(outputRegion, "Finished nitrite", "bc-out-nit");
+  const oNitrite = makeOutputLine(outputRegion, "Nitrite (ingoing / pickle)", "bc-out-nit");
   const oNote = makeOutputLine(outputRegion, "Note", "bc-out-note");
   function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
   const update = debounce(() => {

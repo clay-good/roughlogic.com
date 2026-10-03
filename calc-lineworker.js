@@ -860,7 +860,7 @@ LINEWORKER_RENDERERS["conductor-creep-elongation"] = _simpleRenderer({
     { key: "d", id: "cce-out-d", label: "Design sag today", value: (r) => fmt(r.sag_design_ft, 2) + " ft at " + fmt(r.design_temp_f, 0) + " F" },
     { key: "a", id: "cce-out-a", label: "Sag once the creep is spent", value: (r) => fmt(r.sag_after_creep_ft, 2) + " ft at the same temperature -- up " + fmt(r.creep_sag_increase_ft, 2) + " ft, " + fmt(r.creep_sag_increase_pct, 0) + "%, with nothing having gone wrong" },
     { key: "s", id: "cce-out-s", label: "Sag the new conductor to", value: (r) => fmt(r.initial_stringing_sag_ft, 2) + " ft, which is " + fmt(r.stringing_offset_ft, 2) + " ft HIGH -- string it as though it were " + fmt(r.string_at_temp_f, 0) + " F" },
-    { key: "t", id: "cce-out-t", label: "Stringing tension for that sag", value: (r) => fmt(r.initial_stringing_tension_lb, 0) + " lb against the " + fmt(r.sag_design_ft > 0 ? r.tension_after_creep_lb : 0, 0) + " lb it settles to" },
+    { key: "t", id: "cce-out-t", label: "Stringing tension for that sag", value: (r) => fmt(r.initial_stringing_tension_lb, 0) + " lb, settling to the design tension (a line strung to the design sag would fall to " + fmt(r.sag_design_ft > 0 ? r.tension_after_creep_lb : 0, 0) + " lb)" },
     { key: "n", id: "cce-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeConductorCreepElongation,
